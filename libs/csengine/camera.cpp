@@ -167,21 +167,21 @@ void csCamera::Correct (int n, float* vals[])
     }
   }
 
-  angle = atan2 (*vals[1], *vals[0]);
+  angle = (float) atan2 (*vals[1], *vals[0]);
   angle = (TWO_PI / n) * QRound (n * angle / TWO_PI);
   *vals[1] = qsqrt ( (*vals[0])*(*vals[0]) + (*vals[1])*(*vals[1]) );
   Correct (n, vals+1);
   r = *vals[1];
-  *vals[0] = r*cos (angle);
-  *vals[1] = r*sin (angle);
+  *vals[0] = r * (float) cos (angle);
+  *vals[1] = r * (float) sin (angle);
   cameranr = cur_cameranr++;
 }
 
 void csCamera::SetFOVAngle (float a, int width)
 {
   float disp_width = (float) width / 2.0f;
-  float disp_radius = disp_width / cos (a / (2.0f * (360.0f / TWO_PI)));
-  float rview_fov = qsqrt (disp_radius*disp_radius - disp_width*disp_width);
+  float disp_radius = disp_width / (float) cos (a / (2.0f * (360.0f / TWO_PI)));
+  float rview_fov = qsqrt (disp_radius * disp_radius - disp_width * disp_width);
   aspect = int (rview_fov * 2.0f);
   inv_aspect = 1.0f / (rview_fov * 2.0f);
   fov_angle = a;
@@ -193,7 +193,7 @@ void csCamera::ComputeAngle (int width)
   float rview_fov = (float) GetFOV () / 2.0f;
   float disp_width = (float) width / 2.0f;
   float inv_disp_radius = qisqrt (rview_fov*rview_fov + disp_width * disp_width);
-  fov_angle = 2.0f * acos (disp_width * inv_disp_radius) * (360.0f / TWO_PI);
+  fov_angle = 2.0f * (float) acos (disp_width * inv_disp_radius) * (360.0f / TWO_PI);
 }
 
 void csCamera::ComputeDefaultAngle (int width)
@@ -201,7 +201,7 @@ void csCamera::ComputeDefaultAngle (int width)
   float rview_fov = (float) GetDefaultFOV () / 2.0f;
   float disp_width = (float) width / 2.0f;
   float inv_disp_radius = qisqrt (rview_fov*rview_fov + disp_width * disp_width);
-  default_fov_angle = 2.0f * acos (disp_width * inv_disp_radius)
+  default_fov_angle = 2.0f * (float) acos (disp_width * inv_disp_radius)
   	* (360.0f / TWO_PI);
 }
 

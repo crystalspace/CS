@@ -429,10 +429,10 @@ void csRadPoly::CalcLumel2World(csVector3& res, int x, int y)
   // Slow getting lumel to world coords
 
   // see polytext.cpp for more info.
-  int ww=0, hh=0;
+  int ww = 0, hh = 0;
   polygon->GetMaterialHandle()->GetTexture()->GetMipMapDimensions(0, ww, hh);
-  float invww = 1. / (float)ww;
-  float invhh = 1. / (float)hh;
+  float invww = 1.0f / (float) ww;
+  float invhh = 1.0f / (float) hh;
 
   csPolyTexture *polytext = polygon->GetLightMapInfo()->GetPolyTex();
   csPolyTxtPlane* txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
@@ -478,7 +478,7 @@ csColor csRadPoly::GetFlatColor() const
 {
   csRGBpixel color;
   polygon->GetMaterialHandle ()->GetFlatColor (color);
-  return csColor (color.red / 255.0, color.green / 255.0, color.blue / 255.0);
+  return csColor (color.red / 255.0f, color.green / 255.0f, color.blue / 255.0f);
 }
 
 //--------------- csRadCurve -------------------------------------
@@ -803,11 +803,11 @@ void csRadList :: Print()
 
 // configuration defaults
 bool  csRadiosity::do_static_specular = false;
-float csRadiosity::static_specular_amount = 0.70;
+float csRadiosity::static_specular_amount = 0.70f;
 int   csRadiosity::static_specular_tightness = 2;
-float csRadiosity::colour_bleed = 1.0;
-float csRadiosity::stop_priority = 0.1;
-float csRadiosity::stop_improvement = 10000.0;
+float csRadiosity::colour_bleed = 1.0f;
+float csRadiosity::stop_priority = 0.1f;
+float csRadiosity::stop_improvement = 10000.0f;
 int   csRadiosity::stop_iterations = 1000;
 int   csRadiosity::source_patch_size = 2;
 
@@ -1006,7 +1006,7 @@ csRadElement* csRadiosity :: FetchNext()
   // by returning NULL. The remaining unshot light will be added as
   // ambient light
 
-  float stop_value = 0.1000; // the amount of unshot light, where we can stop.
+  float stop_value = 0.1000f; // the amount of unshot light, where we can stop.
 
   /// take first stop moment, do the least work expected.
   if(stop_priority > start_priority / stop_improvement)
@@ -1023,7 +1023,7 @@ csRadElement* csRadiosity :: FetchNext()
 
   csRadElement* element = list->PopHighest();
 
-  float nextpriority = element ? element->GetPriority() : 0.0;
+  float nextpriority = element ? element->GetPriority() : 0.0f;
 
   float val = (start_priority - nextpriority ) / start_priority;
 
@@ -1032,7 +1032,7 @@ csRadElement* csRadiosity :: FetchNext()
     val=0.0f;
   }
 
-  val = pow(val, 2.0f) * 0.98f;
+  val = (float) pow(val, 2.0f) * 0.98f;
 
   if (meter)
   {
@@ -1420,7 +1420,7 @@ void csRadiosity :: PrepareShootSourceLumel(int sx, int sy, int suv)
   colored_delta.blue *= src_lumel_color.blue;
   /// now take a weighted average depending on colour_bleed
   delta_color += colored_delta; /// for 1.0 + colourbleed of delta
-  delta_color *= 1.0 / (1.0 + colour_bleed);
+  delta_color *= 1.0f / (1.0f + colour_bleed);
 }
 
 
@@ -1623,20 +1623,20 @@ static void add_delta_func(csRadElement *p)
 
 void csRadiosity :: RemoveAmbient()
 {
-  total_delta_color_red = -csLight::ambient_red;
-  total_delta_color_green = -csLight::ambient_green;
-  total_delta_color_blue = -csLight::ambient_blue;
+  total_delta_color_red = (float) -csLight::ambient_red;
+  total_delta_color_green = (float) -csLight::ambient_green;
+  total_delta_color_blue = (float) -csLight::ambient_blue;
   list->Traverse(add_ambient_sec_func);
 }
 
 void csRadiosity :: ApplyDeltaAndAmbient()
 {
   /// first calculate the Ambient
-  total_delta_color_red = 0.0;
-  total_delta_color_green = 0.0;
-  total_delta_color_blue = 0.0;
-  total_reflect = 0.0;
-  total_area = 0.0;
+  total_delta_color_red = 0.0f;
+  total_delta_color_green = 0.0f;
+  total_delta_color_blue = 0.0f;
+  total_reflect = 0.0f;
+  total_area = 0.0f;
 
   list->Traverse(calc_ambient_func);
 
@@ -1645,7 +1645,7 @@ void csRadiosity :: ApplyDeltaAndAmbient()
   /// the usual formula - 1.0
   /// subtraction, as the deltamaps will already get added directly.
   /// thus the 1.0, immediate path to the polygon is already added.
-  total_reflect = 1.0 / (1.0 - total_reflect) - 1.0;
+  total_reflect = 1.0f / (1.0f - total_reflect) - 1.0f;
 
   float mult = total_reflect / total_area;
 
@@ -1661,9 +1661,9 @@ void csRadiosity :: ApplyDeltaAndAmbient()
   list->Traverse(apply_ambient_func);
 
   /// re-apply static ambient (was removed at start of radiosity)
-  total_delta_color_blue = csLight::ambient_blue;
-  total_delta_color_red = csLight::ambient_red;
-  total_delta_color_green = csLight::ambient_green;
+  total_delta_color_blue = (float) csLight::ambient_blue;
+  total_delta_color_red = (float) csLight::ambient_red;
+  total_delta_color_green = (float) csLight::ambient_green;
   list->Traverse(add_ambient_sec_func);
 
   /// add deltamaps

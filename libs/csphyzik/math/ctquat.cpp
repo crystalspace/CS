@@ -23,6 +23,7 @@
 #include "csphyzik/ctmatrix.h"
 #include "csphyzik/ctquat.h"
 #include "csgeom/quaterni.h"
+#include "qsqrt.h"
 
 ctMatrix3 ctQuaternion::to_matrix ()
 {
@@ -50,7 +51,7 @@ void ctQuaternion::from_matrix(ctMatrix3& M)
   tr = M[0][0] + M[1][1] + M[2][2];
   if (tr >= 0.0)
   {
-    s = sqrt(tr + 1.0);
+    s = qsqrt(tr + 1.0);
     r = 0.5 * s;
     x = (M[2][1] - M[1][2]) * s;
     y = (M[0][2] - M[2][0]) * s;
@@ -66,7 +67,7 @@ void ctQuaternion::from_matrix(ctMatrix3& M)
     switch (i)
     {
       case 0:
-	s = sqrt((M[0][0] - (M[1][1] + M[2][2])) + 1.0);
+	s = qsqrt((M[0][0] - (M[1][1] + M[2][2])) + 1.0);
 	x = 0.5 * s;
 	s = 0.5 / s;
 	y = (M[0][1] + M[1][0]) * s;
@@ -74,7 +75,7 @@ void ctQuaternion::from_matrix(ctMatrix3& M)
 	r = (M[2][1] - M[1][2]) * s;
 	break;
       case 1:
-	s = sqrt((M[1][1] - (M[0][0] + M[2][2])) + 1.0);
+	s = qsqrt((M[1][1] - (M[0][0] + M[2][2])) + 1.0);
 	y = 0.5 * s;
 	s = 0.5 / s;
 	z = (M[1][2] + M[2][1]) * s;
@@ -82,7 +83,7 @@ void ctQuaternion::from_matrix(ctMatrix3& M)
 	r = (M[0][2] - M[2][0]) * s;
 	break;
       case 2:
-	s = sqrt((M[2][2] - (M[1][1] + M[0][0])) + 1.0);
+	s = qsqrt((M[2][2] - (M[1][1] + M[0][0])) + 1.0);
 	z = 0.5 * s;
 	s = 0.5 / s;
 	x = (M[2][0] + M[0][2]) * s;

@@ -122,7 +122,7 @@ static inline float long2float (long l)
   if (exp & 0x40) exp = exp | ~0x7f;
   float mant = float (l & 0x00ffffff) / 0x1000000;
   if (l & 0x80000000) mant = -mant;
-  return ldexp (mant, exp);
+  return (float) ldexp (mant, exp);
 }
 
 /**
@@ -151,7 +151,7 @@ static inline float short2float (short s)
   if (exp & 0x8) exp = exp | ~0xf;
   float mant = float ((s & 0x07ff) | 0x0800) / 0x1000;
   if (s & 0x8000) mant = -mant;
-  return ldexp (mant, exp);
+  return (float) ldexp (mant, exp);
 }
 
 /// Swap the bytes in a uint32 value.

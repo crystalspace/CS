@@ -186,7 +186,7 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDP& poly)
   {
     // Calculate the original 3D coordinate again (camera space).
     csVector3 v;
-    v.z = 1. / (M * (poly.vertices[i].x - shift_x) + N * (poly.vertices[i].y - shift_y) + O);
+    v.z = 1.0f / (M * (poly.vertices[i].x - shift_x) + N * (poly.vertices[i].y - shift_y) + O);
     v.x = (poly.vertices[i].x - shift_x) * v.z * inv_aspect;
     v.y = (poly.vertices[i].y - shift_y) * v.z * inv_aspect;
 
@@ -248,7 +248,7 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDP& poly)
 	if (I > CS_FOGTABLE_CLAMPVALUE)
 	  I = CS_FOGTABLE_CLAMPVALUE;
 	poly.fog_info[i].intensity = I;
-	float fact = 1. / I;
+	float fact = 1.0f / I;
 	poly.fog_info[i].r = (I2*fi->fog->red + I1*poly.fog_info[i].r
 		+ I1*I2*poly.fog_info[i].r) * fact;
 	poly.fog_info[i].g = (I2*fi->fog->green + I1*poly.fog_info[i].g
@@ -290,7 +290,7 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDPFX& poly)
   {
     // Calculate the original 3D coordinate again (camera space).
     csVector3 v;
-    v.z = 1. / poly.vertices[i].z;
+    v.z = 1.0f / poly.vertices[i].z;
     v.x = (poly.vertices[i].x - shift_x) * v.z * inv_aspect;
     v.y = (poly.vertices[i].y - shift_y) * v.z * inv_aspect;
 
@@ -358,7 +358,7 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDPFX& poly)
 	if (I > CS_FOGTABLE_CLAMPVALUE)
 	  I = CS_FOGTABLE_CLAMPVALUE;
 	poly.fog_info[i].intensity = I;
-	float fact = 1. / I;
+	float fact = 1.0f / I;
 	poly.fog_info[i].r = (I2*fi->fog->red + I1*poly.fog_info[i].r
 		+ I1*I2*poly.fog_info[i].r) * fact;
 	poly.fog_info[i].g = (I2*fi->fog->green + I1*poly.fog_info[i].g
@@ -475,7 +475,7 @@ void csRenderView::CalculateFogMesh (const csTransform& tr_o2c,
 	if (I > CS_FOGTABLE_CLAMPVALUE)
 	  I = CS_FOGTABLE_CLAMPVALUE;
 	mesh.vertex_fog[i].intensity = I;
-	float fact = 1. / I;
+	float fact = 1.0f / I;
 	mesh.vertex_fog[i].r = (I2*finfo->fog->red + I1*mesh.vertex_fog[i].r
 		+ I1*I2*mesh.vertex_fog[i].r) * fact;
 	mesh.vertex_fog[i].g = (I2*finfo->fog->green + I1*mesh.vertex_fog[i].g

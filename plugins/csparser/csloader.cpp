@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
 #include "qint.h"
+#include "qsqrt.h"
 #include "csutil/cfgfile.h"
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
@@ -2453,8 +2454,8 @@ defaulthalo:
     {
       case CS_ATTN_NONE      : dist = 100000000; break;
       case CS_ATTN_LINEAR    : break;
-      case CS_ATTN_INVERSE   : dist = 16 * sqrt (dist); break;
-      case CS_ATTN_REALISTIC : dist = 256 * dist; break;
+      case CS_ATTN_INVERSE   : dist = 16.0f * qsqrt (dist); break;
+      case CS_ATTN_REALISTIC : dist = 256.0f * dist; break;
     }
   }
 

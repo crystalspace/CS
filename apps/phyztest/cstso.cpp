@@ -1,5 +1,6 @@
 
 #include "cssysdef.h"
+#include "qsqrt.h"
 #include "csphyzik/phyziks.h"
 #include "cstso.h"
 #include "iengine/mesh.h"
@@ -247,7 +248,7 @@ real csRigidSpaceTimeObj::collision_check ()
     }
   }
 
-  return sqrt (max_depth);
+  return qsqrt (max_depth);
 }
 
 

@@ -178,7 +178,7 @@ void csCubicSpline::PrecalculateDerivatives (int dim)
     //d2[i+1] = temp;
 
     d2[i+1] = (d[i+2]-d[i+1]) / (t[i+2]-t[i+1]) - (d[i+1]-d[i])/(t[i+1]-t[i]);
-    d2[i+1] *= 3.0 / (t[i+2]-t[i]);
+    d2[i+1] *= 3.0f / (t[i+2]-t[i]);
   }
 #endif
 }

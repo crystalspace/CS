@@ -422,7 +422,7 @@ void csPortal::CheckFrustum (iFrustumView* lview, int alpha)
         {
           uint8 mr, mg, mb;
           filter_texture->GetMeanColor (mr, mg, mb);
-          fr = mr / 255.; fg = mg / 255.; fb = mb / 255.;
+          fr = mr / 255.0f; fg = mg / 255.0f; fb = mb / 255.0f;
         }
         else
         {

@@ -45,7 +45,7 @@ struct iHalo;
 struct csRGBpixel;
 struct csPixelFormat;
 
-#define CS_FOG_FRONT		0
+#define CS_FOG_FRONT	0
 #define CS_FOG_BACK		1
 #define CS_FOG_VIEW		2
 
@@ -58,9 +58,9 @@ struct csPixelFormat;
 // (distance*density) value represented by the texel at the center of
 // the fog table.  The fog calculation is:
 // alpha = 1.0 - exp( -(density*distance) / CS_FOGTABLE_MEDIANDISTANCE)
-#define CS_FOGTABLE_MEDIANDISTANCE 10.0
-#define CS_FOGTABLE_MAXDISTANCE (CS_FOGTABLE_MEDIANDISTANCE * 2.0)
-#define CS_FOGTABLE_DISTANCESCALE (1.0 / CS_FOGTABLE_MAXDISTANCE)
+#define CS_FOGTABLE_MEDIANDISTANCE 10.0f
+#define CS_FOGTABLE_MAXDISTANCE (CS_FOGTABLE_MEDIANDISTANCE * 2.0f)
+#define CS_FOGTABLE_DISTANCESCALE (1.0f / CS_FOGTABLE_MAXDISTANCE)
 
 // Fog (distance*density) is mapped to a texture coordinate and then
 // clamped.  This determines the clamp value.  Some drivers don't

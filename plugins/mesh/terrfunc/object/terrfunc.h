@@ -28,6 +28,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "ivideo/vbufmgr.h"
+#include "qsqrt.h"
 
 struct iEngine;
 struct iMaterialWrapper;
@@ -324,7 +325,7 @@ public:
   /// Get the distance at which lod will switch to that level.
   float GetLODDistance (int lod)
   {
-    return sqrt (lod_sqdist[lod-1]);
+    return qsqrt (lod_sqdist[lod-1]);
   }
   /// Set the maximum cost for LOD level (1..3).
   void SetMaximumLODCost (int lod, float maxcost)

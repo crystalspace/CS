@@ -2521,9 +2521,9 @@ void csEngine::SetAmbientLight (const csColor &c)
 
 void csEngine::GetAmbientLight (csColor &c) const
 {
-  c.red = csLight::ambient_red / 255.0;
-  c.green = csLight::ambient_green / 255.0;
-  c.blue = csLight::ambient_blue / 255.0;
+  c.red = csLight::ambient_red / 255.0f;
+  c.green = csLight::ambient_green / 255.0f;
+  c.blue = csLight::ambient_blue / 255.0f;
 }
 
 //-------------------End-Multi-Context-Support--------------------------------

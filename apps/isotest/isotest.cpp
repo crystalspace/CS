@@ -19,6 +19,7 @@
 
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
+#include "qsqrt.h"
 #include "cstool/initapp.h"
 #include "csutil/cmdhelp.h"
 #include "apps/isotest/isotest.h"
@@ -754,8 +755,8 @@ bool IsoTest::HandleEvent (iEvent &Event)
     float ycorrect = 1.0;
     if(setting!=0)
     {
-      ycorrect = sqrt(settings[setting][4]*settings[setting][4]+1.)
-        + sqrt(settings[setting][3]*settings[setting][3]+1.);
+      ycorrect = qsqrt(settings[setting][4]*settings[setting][4]+1.)
+        + qsqrt(settings[setting][3]*settings[setting][3]+1.);
       ycorrect *= .5;
     }
     view->SetAxes( h*settings[setting][0], h*settings[setting][1]*ycorrect,

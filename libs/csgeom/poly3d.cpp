@@ -545,7 +545,7 @@ csVector3 csPoly3D::ComputeNormal (csVector3* vertices, int num)
   float sqd = ayz*ayz + azx*azx + axy*axy;
   float invd;
   if (sqd < SMALL_EPSILON)
-    invd = 1./SMALL_EPSILON;
+    invd = 1.0f / SMALL_EPSILON;
   else
     invd = qisqrt (sqd);
   return csVector3 (ayz * invd, azx * invd, axy * invd);
@@ -561,12 +561,12 @@ csPlane3 csPoly3D::ComputePlane (csVector3* vertices, int num_vertices)
 
 float csPoly3D::GetSignedArea () const
 {
-  float area = 0.0;
+  float area = 0.0f;
   // triangulize the polygon, triangles are (0,1,2), (0,2,3), (0,3,4), etc..
   int i;
   for (i = 0 ; i < num_vertices-2 ; i++)
     area += csMath3::Area3 ( vertices[0], vertices[i+1], vertices[i+2] );
-  return area / 2.0;
+  return area / 2.0f;
 }
 
 csVector3 csPoly3D::GetCenter () const

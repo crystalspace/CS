@@ -39,7 +39,7 @@ static float __calc_area (int n, csVector2 *p)
   while (i < n);
   area += (p [n-1].y + p [0].y) * (p [n-1].x - p [0].x);
 
-  return ABS (area / 2.0);
+  return ABS (area / 2.0f);
 }
 
 // No doubt static vars are !!!EVIL!!! :-) but for

@@ -498,7 +498,7 @@ float csPoly2D::GetSignedArea ()
   int i;
   for (i = 0 ; i < GetVertexCount()-2 ; i++)
     area += csMath2::Area2 ( vertices[0], vertices[i+1], vertices[i+2] );
-  return area / 2.0;
+  return area / 2.0f;
 }
 
 static float randflt ()

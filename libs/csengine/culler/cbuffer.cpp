@@ -285,7 +285,7 @@ bool csCBuffer::TestPolygon (csVector2* verts, int num_verts)
           sxR = verts [scanR1].x;
           dxR = (verts [scanR2].x - sxR) / dyR;
           // horizontal pixel correction
-          sxR += dxR * (verts [scanR1].y - (float (sy) - 0.5));
+          sxR += dxR * (verts [scanR1].y - (float (sy) - 0.5f));
         }
       }
       if (sy <= fyL)
@@ -305,7 +305,7 @@ bool csCBuffer::TestPolygon (csVector2* verts, int num_verts)
           sxL = verts [scanL1].x;
           dxL = (verts [scanL2].x - sxL) / dyL;
           // horizontal pixel correction
-          sxL += dxL * (verts [scanL1].y - (float (sy) - 0.5));
+          sxL += dxL * (verts [scanL1].y - (float (sy) - 0.5f));
         }
       }
     } while (!leave);
@@ -442,7 +442,7 @@ bool csCBuffer::InsertPolygon (csVector2* verts, int num_verts, bool negative)
           sxR = verts [scanR1].x;
           dxR = (verts [scanR2].x - sxR) / dyR;
           // horizontal pixel correction
-          sxR += dxR * (verts [scanR1].y - (float (sy) - 0.5));
+          sxR += dxR * (verts [scanR1].y - (float (sy) - 0.5f));
         }
       }
       if (sy <= fyL)
@@ -462,7 +462,7 @@ bool csCBuffer::InsertPolygon (csVector2* verts, int num_verts, bool negative)
           sxL = verts [scanL1].x;
           dxL = (verts [scanL2].x - sxL) / dyL;
           // horizontal pixel correction
-          sxL += dxL * (verts [scanL1].y - (float (sy) - 0.5));
+          sxL += dxL * (verts [scanL1].y - (float (sy) - 0.5f));
         }
       }
     } while (!leave);

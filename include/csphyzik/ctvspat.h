@@ -22,6 +22,7 @@
 #define CT_SPATIALVECTOR
 
 #include "csphyzik/ctvector.h"
+#include "qsqrt.h"
 
 class ctSpatialVector6;
 class ctSpatialMatrix6;
@@ -390,7 +391,7 @@ protected:
 
 inline real ctSpatialVector6::length ()
 {
-  return sqrt (   elements[0] * elements[0]
+  return qsqrt (   elements[0] * elements[0]
 		+ elements[1] * elements[1]
 		+ elements[2] * elements[2]
 		+ elements[3] * elements[3]

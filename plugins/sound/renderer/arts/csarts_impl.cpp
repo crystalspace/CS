@@ -2,6 +2,7 @@
 #include <soundserver.h>
 #include <connect.h>
 #include "csarts_impl.h"
+#include "qsqrt.h"
 #include <factory.h>
 #include <convert.h>
 
@@ -165,7 +166,7 @@ void cs3DEffect_impl::recalcVolume ()
 
 float cs3DEffect_impl::Norm (float x, float y, float z)
 {
-  return sqrt (x*x + y*y + z*z);
+  return qsqrt (x*x + y*y + z*z);
 }
 
 //////////////////////// csSoundModule /////////////////////////////////////

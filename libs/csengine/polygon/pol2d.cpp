@@ -69,7 +69,7 @@ void csPolygon2D::AddPerspectiveUnit (const csVector3& v)
   if (num_vertices >= max_vertices)
     MakeRoom (max_vertices+5);
 
-  float iz = 1./v.z;
+  float iz = 1.0f / v.z;
   vertices[num_vertices].x = v.x * iz;
   vertices[num_vertices].y = v.y * iz;
   bbox.AddBoundingVertex (vertices[num_vertices]);
@@ -456,19 +456,19 @@ void csPolygon2D::DrawFilled (iRenderView* rview, csPolygon3D* poly,
     // Here we have to do a little messy thing because PreparePolygonFX()
     // still requires the original triangle that was valid before clipping.
     csVector2 orig_triangle[3];
-    float iz = 1. / unsplit->Vcam (0).z;
+    float iz = 1.0f / unsplit->Vcam (0).z;
     g3dpolyfx.vertices[0].z = iz;
     iz *= aspect;
     orig_triangle[0].x = unsplit->Vcam (0).x * iz + shift_x;
     orig_triangle[0].y = unsplit->Vcam (0).y * iz + shift_y;
 
-    iz = 1. / unsplit->Vcam (1).z;
+    iz = 1.0f / unsplit->Vcam (1).z;
     g3dpolyfx.vertices[1].z = iz;
     iz *= aspect;
     orig_triangle[1].x = unsplit->Vcam (1).x * iz + shift_x;
     orig_triangle[1].y = unsplit->Vcam (1).y * iz + shift_y;
 
-    iz = 1. / unsplit->Vcam (2).z;
+    iz = 1.0f / unsplit->Vcam (2).z;
     g3dpolyfx.vertices[2].z = iz;
     iz *= aspect;
     orig_triangle[2].x = unsplit->Vcam (2).x * iz + shift_x;

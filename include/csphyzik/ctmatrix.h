@@ -27,6 +27,7 @@
 #include "csphyzik/ctvector.h"
 #include "csphyzik/mtrxutil.h"
 #include "csphyzik/debug.h"
+#include "qsqrt.h"
 
 class ctMatrix
 {
@@ -652,7 +653,7 @@ inline void ctMatrix3::orthonormalize()
 */
 inline void ctMatrix3::orthonormalize ()
 {
-  real len = sqrt (  rows[0][0] * rows[0][0]
+  real len = qsqrt (  rows[0][0] * rows[0][0]
 		   + rows[0][1] * rows[0][1]
 		   + rows[0][2] * rows[0][2] );
 

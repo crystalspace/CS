@@ -102,21 +102,21 @@ void csCurveTesselated::UpdateColors (csLightMap* LightMap)
     cx = QInt (ControlPoints[ct.a].x * (lm_width - 1));
     cy = QInt (ControlPoints[ct.a].y * (lm_height - 1));
     lm_idx = cy*lm_width + cx;
-    Colors[ct.a].red = ((float)map[lm_idx].red)/256.;
-    Colors[ct.a].green = ((float)map[lm_idx].green)/256.;
-    Colors[ct.a].blue = ((float)map[lm_idx].blue)/256.;
+    Colors[ct.a].red = ((float)map[lm_idx].red) / 256.0f;
+    Colors[ct.a].green = ((float)map[lm_idx].green) / 256.0f;
+    Colors[ct.a].blue = ((float)map[lm_idx].blue) / 256.0f;
     cx = QInt (ControlPoints[ct.b].x * (lm_width - 1));
     cy = QInt (ControlPoints[ct.b].y * (lm_height - 1));
     lm_idx = cy*lm_width + cx;
-    Colors[ct.b].red = ((float)map[lm_idx].red)/256.;
-    Colors[ct.b].green = ((float)map[lm_idx].green)/256.;
-    Colors[ct.b].blue = ((float)map[lm_idx].blue)/256.;
+    Colors[ct.b].red = ((float)map[lm_idx].red) / 256.0f;
+    Colors[ct.b].green = ((float)map[lm_idx].green) / 256.0f;
+    Colors[ct.b].blue = ((float)map[lm_idx].blue) / 256.0f;
     cx = QInt (ControlPoints[ct.c].x * (lm_width - 1));
     cy = QInt (ControlPoints[ct.c].y * (lm_height - 1));
     lm_idx = cy*lm_width + cx;
-    Colors[ct.c].red = ((float)map[lm_idx].red)/256.;
-    Colors[ct.c].green = ((float)map[lm_idx].green)/256.;
-    Colors[ct.c].blue = ((float)map[lm_idx].blue)/256.;
+    Colors[ct.c].red = ((float)map[lm_idx].red) / 256.0f;
+    Colors[ct.c].green = ((float)map[lm_idx].green) / 256.0f;
+    Colors[ct.c].blue = ((float)map[lm_idx].blue) / 256.0f;
   }
 
   ColorsValid = true;
@@ -924,8 +924,8 @@ csBezierCurve::csBezierCurve (csBezierTemplate* parent_tmpl) :
   for (i=0 ; i<3 ; i++)
     for (j=0 ; j<3 ; j++)
     {
-      texture_coords[i][j].x = (0.5*i);
-      texture_coords[i][j].y = (0.5*j);
+      texture_coords[i][j].x = (0.5f * i);
+      texture_coords[i][j].y = (0.5f * j);
     }
   previous_tesselation = NULL;
   previous_resolution = -1;

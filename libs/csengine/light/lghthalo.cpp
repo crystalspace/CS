@@ -247,8 +247,8 @@ bool csLightHalo::Process (csTicks ElapsedTime, const csEngine &Engine)
     // Create a rectangle containing the halo and clip it against screen
     int hw = Handle->GetWidth ();
     int hh = Handle->GetHeight ();
-    float hw2 = float (hw) / 2.0;
-    float hh2 = float (hh) / 2.0;
+    float hw2 = float (hw) / 2.0f;
+    float hh2 = float (hh) / 2.0f;
     csVector2 HaloPoly [4] =
     {
       csVector2 (v.x - hw2, v.y - hh2),
@@ -308,7 +308,7 @@ bool csLightFlareHalo::Process (csTicks elapsed_time, csEngine const& engine)
   csVector2 center (engine.current_camera->GetShiftX (),
     engine.current_camera->GetShiftY ());
   /// start point of the flare is the (projected) light position
-  csVector2 start (v.x, engine.current_camera->GetShiftY()*2.-v.y);
+  csVector2 start (v.x, engine.current_camera->GetShiftY() * 2.0f - v.y);
   /// deltaposition, 1.0 positional change.
   csVector2 deltapos = center - start;
 
@@ -446,8 +446,8 @@ void csLightFlareHalo::ProcessFlareComponent(csEngine const& engine,
   G3DPolygonDPFX dpfx;
 
   // Create a rectangle containing the halo and clip it against screen
-  float hw2 = compw / 2.0;
-  float hh2 = comph / 2.0;
+  float hw2 = compw / 2.0f;
+  float hh2 = comph / 2.0f;
   csVector2 HaloPoly [4] =
   {
     csVector2 (pos.x - hw2, pos.y - hh2),

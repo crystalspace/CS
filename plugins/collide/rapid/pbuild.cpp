@@ -21,6 +21,7 @@
 #include "csgeom/vector3.h"
 #include "rapcol.h"
 #include "prapid.h"
+#include "qsqrt.h"
 
 /**
  * Located in eigen.cpp, this function returns the eigenvectors of M,
@@ -421,7 +422,7 @@ bool csCdBBox::SetLeaf(csCdTriangle* pTriangle)
     }
   }
 
-  sv = sqrt (sv);
+  sv = qsqrt (sv);
   a0 = a0 / (float)(sv > SMALL_EPSILON ? sv : SMALL_EPSILON);
   // Now compute unit normal to triangle, and put into a2.
   csVector3 a2 = u12 % u23;

@@ -20,6 +20,7 @@
 #include "walktest/walktest.h"
 #include "walktest/infmaze.h"
 #include "qint.h"
+#include "qsqrt.h"
 #include "csgeom/frustum.h"
 #include "ivaria/view.h"
 #include "imesh/thing/polygon.h"
@@ -205,7 +206,7 @@ int FindSectors (csVector3 v, csVector3 d, iSector *s, iSector **sa)
 {
   int c = 0;
   // @@@ Avoid this sqrt somehow? i.e. by having it in the objects.
-  float size = sqrt (d.x * d.x + d.y * d.y + d.z * d.z);
+  float size = qsqrt (d.x * d.x + d.y * d.y + d.z * d.z);
   iSectorIterator* it = Sys->Engine->GetNearbySectors (s, v, size);
   iSector* sector;
   while ((sector = it->Fetch ()) != NULL)

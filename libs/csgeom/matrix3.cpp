@@ -225,21 +225,21 @@ bool operator> (float f, const csMatrix3& m)
 csXRotMatrix3::csXRotMatrix3 (float angle)
 {
   m11 = 1; m12 = 0;           m13 = 0;
-  m21 = 0; m22 = cos (angle); m23 = -sin(angle);
-  m31 = 0; m32 = sin (angle); m33 =  cos(angle);
+  m21 = 0; m22 = (float) cos (angle); m23 = (float) -sin(angle);
+  m31 = 0; m32 = (float) sin (angle); m33 =  (float) cos(angle);
 }
 
 csYRotMatrix3::csYRotMatrix3 (float angle)
 {
-  m11 = cos (angle); m12 = 0; m13 = -sin(angle);
+  m11 = (float) cos (angle); m12 = 0; m13 = (float) -sin(angle);
   m21 = 0;           m22 = 1; m23 = 0;
-  m31 = sin (angle); m32 = 0; m33 =  cos(angle);
+  m31 = (float) sin (angle); m32 = 0; m33 =  (float) cos(angle);
 }
 
 csZRotMatrix3::csZRotMatrix3 (float angle)
 {
-  m11 = cos (angle); m12 = -sin(angle); m13 = 0;
-  m21 = sin (angle); m22 =  cos(angle); m23 = 0;
+  m11 = (float) cos (angle); m12 = (float) -sin(angle); m13 = 0;
+  m21 = (float) sin (angle); m22 =  (float) cos(angle); m23 = 0;
   m31 = 0;           m32 = 0;           m33 = 1;
 }
 

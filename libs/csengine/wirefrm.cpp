@@ -431,28 +431,28 @@ void csWireFrameCam::KeyRightStrafe (float speed, bool slow, bool fast)
 
 void csWireFrameCam::KeyLeft (float speed, bool slow, bool fast)
 {
-  if (slow) c->RotateThis (CS_VEC_ROT_LEFT, speed*.005);
-  else if (fast) c->RotateThis (CS_VEC_ROT_LEFT, speed*.2);
-  else c->RotateThis (CS_VEC_ROT_LEFT, speed*.1);
+  if (slow) c->RotateThis (CS_VEC_ROT_LEFT, speed * 0.005f);
+  else if (fast) c->RotateThis (CS_VEC_ROT_LEFT, speed * 0.2f);
+  else c->RotateThis (CS_VEC_ROT_LEFT, speed * 0.1f);
 }
 
 void csWireFrameCam::KeyRight (float speed, bool slow, bool fast)
 {
-  if (slow) c->RotateThis (CS_VEC_ROT_RIGHT, speed*.005);
-  else if (fast) c->RotateThis (CS_VEC_ROT_RIGHT, speed*.2);
-  else c->RotateThis (CS_VEC_ROT_RIGHT, speed*.1);
+  if (slow) c->RotateThis (CS_VEC_ROT_RIGHT, speed * 0.005f);
+  else if (fast) c->RotateThis (CS_VEC_ROT_RIGHT, speed * 0.2f);
+  else c->RotateThis (CS_VEC_ROT_RIGHT, speed * 0.1f);
 }
 
 void csWireFrameCam::KeyPgUp (float speed, bool slow, bool fast)
 {
-  if (slow) c->RotateThis (CS_VEC_TILT_UP, speed*.005);
-  else if (fast) c->RotateThis (CS_VEC_TILT_UP, speed*.2);
-  else c->RotateThis (CS_VEC_TILT_UP, speed*.1);
+  if (slow) c->RotateThis (CS_VEC_TILT_UP, speed * 0.005f);
+  else if (fast) c->RotateThis (CS_VEC_TILT_UP, speed * 0.2f);
+  else c->RotateThis (CS_VEC_TILT_UP, speed * 0.1f);
 }
 
 void csWireFrameCam::KeyPgDn (float speed, bool slow, bool fast)
 {
-  if (slow) c->RotateThis (CS_VEC_TILT_DOWN, speed*.005);
-  else if (fast) c->RotateThis (CS_VEC_TILT_DOWN, speed*.2);
-  else c->RotateThis (CS_VEC_TILT_DOWN, speed*.1);
+  if (slow) c->RotateThis (CS_VEC_TILT_DOWN, speed * 0.005f);
+  else if (fast) c->RotateThis (CS_VEC_TILT_DOWN, speed * 0.2f);
+  else c->RotateThis (CS_VEC_TILT_DOWN, speed * 0.1f);
 }

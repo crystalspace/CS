@@ -21,6 +21,7 @@
 #include "csws/cscwheel.h"
 #include "csws/csapp.h"
 #include "csws/cswsaux.h"
+#include "qsqrt.h"
 
 #define COLORWHEEL_TEXTURE_NAME	"csws::ColorWheel"
 
@@ -68,7 +69,7 @@ bool csColorWheel::HandleEvent (iEvent &Event)
         }
         float xc = bound.Width () / 2.0;
         float yc = bound.Height () / 2.0;
-        float ns = sqrt (csSquareFloat (Event.Mouse.x - xc) + csSquareFloat (Event.Mouse.y - yc)) / xc;
+        float ns = qsqrt (csSquareFloat (Event.Mouse.x - xc) + csSquareFloat (Event.Mouse.y - yc)) / xc;
         if (ns > 1) ns = 1;
         float nh = atan2 (yc - Event.Mouse.y, Event.Mouse.x - xc) / TWO_PI;
         if (nh < 0) nh += 1;

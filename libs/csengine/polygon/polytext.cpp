@@ -230,7 +230,7 @@ void csPolyTexture::FillLightMap (csFrustumView* lview, bool vis,
 
   csFrustum* light_frustum = lview->GetFrustumContext ()->GetLightFrustum ();
   csVector3& lightpos = light_frustum->GetOrigin ();
-  float inv_lightcell_size = 1.0 / csLightMap::lightcell_size;
+  float inv_lightcell_size = 1.0f / csLightMap::lightcell_size;
   int ww, hh;
   if (mat_handle && mat_handle->GetTexture ())
     mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
@@ -277,8 +277,8 @@ void csPolyTexture::FillLightMap (csFrustumView* lview, bool vis,
     csMatrix3 m_t2w = txt_pl->m_world2tex.GetInverse ();
     csVector3& v_t2w = txt_pl->v_world2tex;
     csVector3 v;
-    float inv_ww = 1. / float (ww);
-    float inv_hh = 1. / float (hh);
+    float inv_ww = 1.0f / float (ww);
+    float inv_hh = 1.0f / float (hh);
     v.z = 0;
     v.x = (-2 * csLightMap::lightcell_size + Imin_u) * inv_ww;
     v.y = (-2 * csLightMap::lightcell_size + Imin_v) * inv_hh;
@@ -443,8 +443,8 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
 
   int ru, rv;
   float invww, invhh;
-  invww = 1. / (float)ww;
-  invhh = 1. / (float)hh;
+  invww = 1.0f / (float)ww;
+  invhh = 1.0f / (float)hh;
 
   csRGBMap& remap = lm->GetRealMap ();
   csDynLight* light = (csDynLight*)(lp->GetLight ());
@@ -453,7 +453,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
   int i;
   float miny = 1000000, maxy = -1000000;
   int MaxIndex = -1, MinIndex = -1;
-  float inv_lightcell_size = 1.0 / csLightMap::lightcell_size;
+  float inv_lightcell_size = 1.0f / csLightMap::lightcell_size;
 
   csVector3 lightpos;
   if (lp->GetLightFrustum ())
@@ -688,8 +688,8 @@ void csPolyTexture::UpdateFromShadowBitmap (csLight* light,
     mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
   else
     ww = hh = 64;
-  float mul_u = 1.0 / ww;
-  float mul_v = 1.0 / hh;
+  float mul_u = 1.0f / ww;
+  float mul_v = 1.0f / hh;
 
   csStatLight* slight = (csStatLight *)light;
   bool dyn = slight->IsDynamic ();
@@ -956,7 +956,7 @@ void csShadowBitmap::RenderPolygon (csVector2* shadow_poly, int num_vertices,
   }
   else if (quality < 0)
   {
-    float div = 1. / float (1 << -quality);
+    float div = 1.0f / float (1 << -quality);
     for (i = 0 ; i < num_vertices ; i++)
       shadow_poly[i] = shadow_poly[i] * div;
   }

@@ -20,6 +20,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+#include "qsqrt.h"
+
 void ifprintf(FILE *f, int indent, const char *fmt, ...) {
   for(int i=0; i<indent; i++) {
     fputc(' ', f);
@@ -80,7 +82,7 @@ void WriteBone(FILE *f, int ind, float scale, CalCoreSkeleton *skel, CalCoreBone
 }
 
 void CalQuatInverse(CalQuaternion &qdest, const CalQuaternion &qin) {
-  float inverselen=1.0f/sqrt(qin[0]*qin[0]+qin[1]*qin[1]+qin[2]*qin[2]+qin[3]*qin[3]);
+  float inverselen=1.0f / qsqrt(qin[0]*qin[0]+qin[1]*qin[1]+qin[2]*qin[2]+qin[3]*qin[3]);
   qdest[0]=-inverselen*qin[0];
   qdest[1]=-inverselen*qin[1];
   qdest[2]=-inverselen*qin[2];

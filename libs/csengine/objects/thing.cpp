@@ -497,9 +497,9 @@ void csThing::CompressVertices ()
   for (i = 0 ; i < num_vertices ; i++)
   {
     vt[i].orig_idx = i;
-    vt[i].x = ceil (obj_verts[i].x*1000000);
-    vt[i].y = ceil (obj_verts[i].y*1000000);
-    vt[i].z = ceil (obj_verts[i].z*1000000);
+    vt[i].x = (float) ceil (obj_verts[i].x * 1000000);
+    vt[i].y = (float) ceil (obj_verts[i].y * 1000000);
+    vt[i].z = (float) ceil (obj_verts[i].z * 1000000);
   }
 
   // First sort so that all (nearly) equal vertices are together.

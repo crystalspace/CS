@@ -613,7 +613,7 @@ bool csBspPolygon::DoPerspective (const csTransform& trans,
      }
 
      // Add the NEAR points appropriately.
-#    define MAX_VALUE 1000000.
+#define MAX_VALUE 1000000.0f
 
      // First, for the exit point.
      float ex, ey, epointx, epointy;
