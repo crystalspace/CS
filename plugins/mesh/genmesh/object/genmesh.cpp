@@ -1620,7 +1620,7 @@ void csGenmeshMeshObjectFactory::CalculateBBoxRadius ()
   object_bbox_valid = true;
   if (num_mesh_vertices == 0)
   {
-    object_bbox.StartBoundingBox ();
+    object_bbox.Set (0, 0, 0, 0, 0, 0);
     radius.Set (0, 0, 0);
     return;
   }
@@ -1932,6 +1932,8 @@ void csGenmeshMeshObjectFactory::SetVertexCount (int n)
   normal_buffer = 0;
   texel_buffer = 0;
   color_buffer = 0;
+  tangent_buffer = 0;
+  binormal_buffer = 0;
   mesh_vertices_dirty_flag = true;
   mesh_texels_dirty_flag = true;
   mesh_normals_dirty_flag = true;
