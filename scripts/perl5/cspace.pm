@@ -1367,11 +1367,13 @@ sub new {
 *B = *cspacec::csPlane3_B;
 *C = *cspacec::csPlane3_C;
 *D = *cspacec::csPlane3_D;
+*GetNormal = *cspacec::csPlane3_GetNormal;
 *Set = *cspacec::csPlane3_Set;
 *Classify = *cspacec::csPlane3_Classify;
 *Distance = *cspacec::csPlane3_Distance;
 *Invert = *cspacec::csPlane3_Invert;
 *Normalize = *cspacec::csPlane3_Normalize;
+*FindPoint = *cspacec::csPlane3_FindPoint;
 *ClipPolygon = *cspacec::csPlane3_ClipPolygon;
 *__mult_ass__ = *cspacec::csPlane3___mult_ass__;
 *__divide_ass__ = *cspacec::csPlane3___divide_ass__;
@@ -1450,13 +1452,13 @@ package cspace::csIntersect2;
 @ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
-*IntersectPolygon = *cspacec::csIntersect2_IntersectPolygon;
-*Segments = *cspacec::csIntersect2_Segments;
+*PlanePolygon = *cspacec::csIntersect2_PlanePolygon;
+*SegmentSegment = *cspacec::csIntersect2_SegmentSegment;
 *SegmentLine = *cspacec::csIntersect2_SegmentLine;
-*Lines = *cspacec::csIntersect2_Lines;
-*Plane = *cspacec::csIntersect2_Plane;
-*PlaneNoTest = *cspacec::csIntersect2_PlaneNoTest;
-*Planes = *cspacec::csIntersect2_Planes;
+*LineLine = *cspacec::csIntersect2_LineLine;
+*SegmentPlane = *cspacec::csIntersect2_SegmentPlane;
+*SegmentPlaneNoTest = *cspacec::csIntersect2_SegmentPlaneNoTest;
+*PlanePlane = *cspacec::csIntersect2_PlanePlane;
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_csIntersect2(@_);
@@ -1674,25 +1676,31 @@ package cspace::csIntersect3;
 @ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
-*IntersectSegment = *cspacec::csIntersect3_IntersectSegment;
-*IntersectTriangle = *cspacec::csIntersect3_IntersectTriangle;
-*IntersectPolygon = *cspacec::csIntersect3_IntersectPolygon;
-*Plane = *cspacec::csIntersect3_Plane;
-*Planes = *cspacec::csIntersect3_Planes;
+*PlanePolygon = *cspacec::csIntersect3_PlanePolygon;
+*SegmentFrustum = *cspacec::csIntersect3_SegmentFrustum;
+*SegmentTriangle = *cspacec::csIntersect3_SegmentTriangle;
+*SegmentPolygon = *cspacec::csIntersect3_SegmentPolygon;
+*SegmentPlanes = *cspacec::csIntersect3_SegmentPlanes;
+*SegmentPlane = *cspacec::csIntersect3_SegmentPlane;
+*ThreePlanes = *cspacec::csIntersect3_ThreePlanes;
 *PlaneXPlane = *cspacec::csIntersect3_PlaneXPlane;
 *PlaneYPlane = *cspacec::csIntersect3_PlaneYPlane;
 *PlaneZPlane = *cspacec::csIntersect3_PlaneZPlane;
 *PlaneAxisPlane = *cspacec::csIntersect3_PlaneAxisPlane;
-*Z0Plane = *cspacec::csIntersect3_Z0Plane;
-*XPlane = *cspacec::csIntersect3_XPlane;
-*YPlane = *cspacec::csIntersect3_YPlane;
-*ZPlane = *cspacec::csIntersect3_ZPlane;
-*AxisPlane = *cspacec::csIntersect3_AxisPlane;
-*XFrustum = *cspacec::csIntersect3_XFrustum;
-*YFrustum = *cspacec::csIntersect3_YFrustum;
+*SegmentZ0Plane = *cspacec::csIntersect3_SegmentZ0Plane;
+*SegmentXPlane = *cspacec::csIntersect3_SegmentXPlane;
+*SegmentYPlane = *cspacec::csIntersect3_SegmentYPlane;
+*SegmentZPlane = *cspacec::csIntersect3_SegmentZPlane;
+*SegmentAxisPlane = *cspacec::csIntersect3_SegmentAxisPlane;
+*SegmentXFrustum = *cspacec::csIntersect3_SegmentXFrustum;
+*SegmentYFrustum = *cspacec::csIntersect3_SegmentYFrustum;
 *BoxSegment = *cspacec::csIntersect3_BoxSegment;
 *BoxFrustum = *cspacec::csIntersect3_BoxFrustum;
 *BoxSphere = *cspacec::csIntersect3_BoxSphere;
+*BoxPlane = *cspacec::csIntersect3_BoxPlane;
+*BoxTriangle = *cspacec::csIntersect3_BoxTriangle;
+*BoxBox = *cspacec::csIntersect3_BoxBox;
+*FrustumFrustum = *cspacec::csIntersect3_FrustumFrustum;
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_csIntersect3(@_);
@@ -6703,6 +6711,37 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iAnimTimeUpdateHandler ##############
+
+package cspace::iAnimTimeUpdateHandler;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*UpdatePosition = *cspacec::iAnimTimeUpdateHandler_UpdatePosition;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iAnimTimeUpdateHandler($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iSpriteCal3DState ##############
 
 package cspace::iSpriteCal3DState;
@@ -6743,6 +6782,7 @@ package cspace::iSpriteCal3DState;
 *SetAnimationTime = *cspacec::iSpriteCal3DState_SetAnimationTime;
 *GetCal3DModel = *cspacec::iSpriteCal3DState_GetCal3DModel;
 *SetUserData = *cspacec::iSpriteCal3DState_SetUserData;
+*SetAnimTimeUpdateHandler = *cspacec::iSpriteCal3DState_SetAnimTimeUpdateHandler;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -7268,6 +7308,86 @@ sub DESTROY {
     }
 }
 
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iTerrainObjectState ##############
+
+package cspace::iTerrainObjectState;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*SetMaterialPalette = *cspacec::iTerrainObjectState_SetMaterialPalette;
+*GetMaterialPalette = *cspacec::iTerrainObjectState_GetMaterialPalette;
+*SetMaterialMap = *cspacec::iTerrainObjectState_SetMaterialMap;
+*SetLODValue = *cspacec::iTerrainObjectState_SetLODValue;
+*GetLODValue = *cspacec::iTerrainObjectState_GetLODValue;
+*SaveState = *cspacec::iTerrainObjectState_SaveState;
+*RestoreState = *cspacec::iTerrainObjectState_RestoreState;
+*CollisionDetect = *cspacec::iTerrainObjectState_CollisionDetect;
+*SetStaticLighting = *cspacec::iTerrainObjectState_SetStaticLighting;
+*GetStaticLighting = *cspacec::iTerrainObjectState_GetStaticLighting;
+*SetCastShadows = *cspacec::iTerrainObjectState_SetCastShadows;
+*GetCastShadows = *cspacec::iTerrainObjectState_GetCastShadows;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iTerrainObjectState($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iTerrainObjectState_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iTerrainFactoryState ##############
+
+package cspace::iTerrainFactoryState;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*SetTerraFormer = *cspacec::iTerrainFactoryState_SetTerraFormer;
+*GetTerraFormer = *cspacec::iTerrainFactoryState_GetTerraFormer;
+*SetSamplerRegion = *cspacec::iTerrainFactoryState_SetSamplerRegion;
+*GetSamplerRegion = *cspacec::iTerrainFactoryState_GetSamplerRegion;
+*SaveState = *cspacec::iTerrainFactoryState_SaveState;
+*RestoreState = *cspacec::iTerrainFactoryState_RestoreState;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iTerrainFactoryState($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iTerrainFactoryState_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -12285,6 +12405,118 @@ sub DESTROY {
 }
 
 *scfGetVersion = *cspacec::iScript_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSimpleFormerState ##############
+
+package cspace::iSimpleFormerState;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*SetHeightmap = *cspacec::iSimpleFormerState_SetHeightmap;
+*SetScale = *cspacec::iSimpleFormerState_SetScale;
+*SetOffset = *cspacec::iSimpleFormerState_SetOffset;
+*SetIntegerMap = *cspacec::iSimpleFormerState_SetIntegerMap;
+*SetFloatMap = *cspacec::iSimpleFormerState_SetFloatMap;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSimpleFormerState($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iSimpleFormerState_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iTerraFormer ##############
+
+package cspace::iTerraFormer;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*GetSampler = *cspacec::iTerraFormer_GetSampler;
+*SampleFloat = *cspacec::iTerraFormer_SampleFloat;
+*SampleVector2 = *cspacec::iTerraFormer_SampleVector2;
+*SampleVector3 = *cspacec::iTerraFormer_SampleVector3;
+*SampleInteger = *cspacec::iTerraFormer_SampleInteger;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iTerraFormer($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iTerraFormer_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iTerraSampler ##############
+
+package cspace::iTerraSampler;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*SampleFloat = *cspacec::iTerraSampler_SampleFloat;
+*SampleVector2 = *cspacec::iTerraSampler_SampleVector2;
+*SampleVector3 = *cspacec::iTerraSampler_SampleVector3;
+*SampleInteger = *cspacec::iTerraSampler_SampleInteger;
+*GetMaterialPalette = *cspacec::iTerraSampler_GetMaterialPalette;
+*GetRegion = *cspacec::iTerraSampler_GetRegion;
+*GetResolution = *cspacec::iTerraSampler_GetResolution;
+*GetVersion = *cspacec::iTerraSampler_GetVersion;
+*Cleanup = *cspacec::iTerraSampler_Cleanup;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iTerraSampler($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iTerraSampler_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
