@@ -400,7 +400,7 @@ public:
     void DrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d, csTransform& o2c,
 	csClipper* clipper, float aspect,
 	int width2, int height2);
-    DrawTriangleMesh (mesh, this, o2c, clipper, aspect, width2, height2);
+    ::DrawTriangleMesh (mesh, this, o2c, clipper, aspect, width2, height2);
   }
 
   /// Get the iGraphics2D driver.
