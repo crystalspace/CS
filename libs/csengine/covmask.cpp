@@ -30,7 +30,7 @@ void csCovMask::Dump () const
   for (i = 0 ; i < CS_CM_BITS ; i++)
   {
     printf ("%c", st[GetState (i)]);
-    if ((i+1) % CS_CM_HOR == 0) printf ("\n");
+    if ((i+1) % CS_CM_DIM == 0) printf ("\n");
   }
 }
 
@@ -40,8 +40,8 @@ void csCovMask::GfxDump (iGraphics2D* ig2d, int xoffs, int yoffs) const
   int x, y;
   for (i = 0 ; i < CS_CM_BITS ; i++)
   {
-    col = xoffs + 16 * (i & CS_CM_HORMASK);
-    row = yoffs + 16 * (i >> CS_CM_HORSHIFT);
+    col = xoffs + 16 * (i & CS_CM_DIMMASK);
+    row = yoffs + 16 * (i >> CS_CM_DIMSHIFT);
     st = GetState (i) ? 0xf800 : 0x8410;
     for (x = 0 ; x < 15 ; x++)
       for (y = 0 ; y < 15 ; y++)
@@ -56,7 +56,7 @@ void csCovMaskTriage::Dump () const
   for (i = 0 ; i < CS_CM_BITS ; i++)
   {
     printf ("%c", st[GetState (i)]);
-    if ((i+1) % CS_CM_HOR == 0) printf ("\n");
+    if ((i+1) % CS_CM_DIM == 0) printf ("\n");
   }
 }
 
@@ -66,8 +66,8 @@ void csCovMaskTriage::GfxDump (iGraphics2D* ig2d, int xoffs, int yoffs) const
   int x, y;
   for (i = 0 ; i < CS_CM_BITS ; i++)
   {
-    col = xoffs + 16 * (i & CS_CM_HORMASK);
-    row = yoffs + 16 * (i >> CS_CM_HORSHIFT);
+    col = xoffs + 16 * (i & CS_CM_DIMMASK);
+    row = yoffs + 16 * (i >> CS_CM_DIMSHIFT);
     st = GetState (i);
     switch (st)
     {
@@ -98,16 +98,18 @@ csCovMaskLUT::csCovMaskLUT (int dimension)
   
   switch (dimension)
   {
-    case 1: dim_shift = 0+2; break;
-    case 2: dim_shift = 1+2; break;
-    case 4: dim_shift = 2+2; break;
-    case 8: dim_shift = 3+2; break;
-    case 16: dim_shift = 4+2; break;
-    case 32: dim_shift = 5+2; break;
-    case 64: dim_shift = 6+2; break;
-    case 128: dim_shift = 7+2; break;
-    case 256: dim_shift = 8+2; break;
+    case 1: dim_shift = 0; break;
+    case 2: dim_shift = 1; break;
+    case 4: dim_shift = 2; break;
+    case 8: dim_shift = 3; break;
+    case 16: dim_shift = 4; break;
+    case 32: dim_shift = 5; break;
+    case 64: dim_shift = 6; break;
+    case 128: dim_shift = 7; break;
+    case 256: dim_shift = 8; break;
   }
+  edge_shift = dim_shift+2;
+
   // build lookup table here.
   BuildTables ();
 }
@@ -219,8 +221,8 @@ void csCovMaskLUT::BuildTables ()
 
   // Allocate a left and right matrix for all boxes defined in
   // a coverage mask. See below for info how left and right are filled.
-  CHK (bool* left = new bool[(CS_CM_HOR+1)*(CS_CM_VER+1)]);
-  CHK (bool* right = new bool[(CS_CM_HOR+1)*(CS_CM_VER+1)]);
+  CHK (bool* left = new bool[(CS_CM_DIM+1)*(CS_CM_DIM+1)]);
+  CHK (bool* right = new bool[(CS_CM_DIM+1)*(CS_CM_DIM+1)]);
   
   for (from = 0 ; from < num_edge_points ; from++)
   {
@@ -241,7 +243,7 @@ void csCovMaskLUT::BuildTables ()
       if (from / dimension == to / dimension) continue;
 
       // The mask index for which are calculating now.
-      int mask_idx = (from << dim_shift) + to;
+      int mask_idx = (from << edge_shift) + to;
 
       // Calculate two integer x and y's on the edges of the box
       // corresponding with the 'to' point.
@@ -258,16 +260,16 @@ void csCovMaskLUT::BuildTables ()
       csVector2 to1 ((float)to_ix1, (float)to_iy1);
       csVector2 to2 ((float)to_ix2, (float)to_iy2);
 
-      // We traverse all (CS_CM_HOR+1)*(CS_CM_VER+1) pixels in the box
+      // We traverse all (CS_CM_DIM+1)*(CS_CM_DIM+1) pixels in the box
       // and mark if they are left of L1 and/or right of L2.
-      int dimhor1 = CS_CM_HOR+1;
+      int dimhor1 = CS_CM_DIM+1;
       float fdim = (float)dimension;
-      for (ix = 0 ; ix <= CS_CM_HOR ; ix++)
-        for (iy = 0 ; iy <= CS_CM_VER ; iy++)
+      for (ix = 0 ; ix <= CS_CM_DIM ; ix++)
+        for (iy = 0 ; iy <= CS_CM_DIM ; iy++)
 	{
 	  csVector2 p (
-	  	((float)ix) * fdim / (float)CS_CM_HOR,
-	  	((float)iy) * fdim / (float)CS_CM_VER);
+	  	((float)ix) * fdim / (float)CS_CM_DIM,
+	  	((float)iy) * fdim / (float)CS_CM_DIM);
 	  if (ABS (from1.x-to1.x) < EPSILON &&
 	  	ABS (from1.y-to1.y) < EPSILON)
 	  {
@@ -297,8 +299,8 @@ void csCovMaskLUT::BuildTables ()
       // For every bit in the mask.
       for (bit = 0 ; bit < CS_CM_BITS ; bit++)
       {
-	ix = bit % CS_CM_HOR;
-	iy = bit / CS_CM_HOR;
+	ix = bit % CS_CM_DIM;
+	iy = bit / CS_CM_DIM;
 	// 'so' will be 1 if all points of this position in mask
 	// are completely left of L1.
 	int so = left[iy*dimhor1+ix] && left[iy*dimhor1+ix+1] &&
@@ -317,11 +319,6 @@ void csCovMaskLUT::BuildTables ()
 	//masks[mask_idx].SetState (bit, s);
 	masks[mask_idx].SetState (bit, !so);
       }
-
-if (mask_idx == 353)
-{
-  triage_masks[mask_idx].Dump ();
-}
     }
   }
 
@@ -337,21 +334,23 @@ if (mask_idx == 353)
 int csCovMaskLUT::GetIndex (const csVector2& start,
 	const csVector2& stop,
 	float dxdy, float dydx,
-	int hor_offs, int ver_offs, int box_hor, int box_ver) const
+	int hor_offs, int ver_offs,
+	int box_dim, int box_shift) const
 {
-//@@@ This routine is not optimal. It should use the
-// fact that 'box_???' is power of two and not try to
-// convert to float or something.
   float fhor_offs = (float)hor_offs;	// Optimal?@@@
   float fver_offs = (float)ver_offs;	// Optimal?@@@
-  float fbox_hor = (float)box_hor;	// Optimal?@@@
-  float fbox_ver = (float)box_ver;	// Optimal?@@@
-  float fdim = (float)dimension; 	// Optimal?@@@
-  float x_top=0, x_bot=0;
-  float y_left=0, y_right=0;
+  float fbox_dim = (float)box_dim;	// Optimal?@@@
+  int x_top = 0, x_bot = 0;
+  int y_left = 0, y_right = 0;
   int from = 0, to = 0;
-  csVector2 sta (start.x-fhor_offs, (480-start.y)-fver_offs);
-  csVector2 sto (stop.x-fhor_offs, (480-stop.y)-fver_offs);
+  float f;
+
+  // Note: y is actually reversed in this routine to correct
+  // clockwise stuff.
+  
+  // @@@ HARDCODED!!! This should be the max size of the cov mask tree.
+  csVector2 sta (start.x-fhor_offs, (start.y-1024)+fver_offs);
+  csVector2 sto (stop.x-fhor_offs, (stop.y-1024)+fver_offs);
 
   // We're going to create a bitmask with four bits to represent
   // all intersections. The bits are tblr (top, bottom, left,
@@ -362,173 +361,189 @@ int csCovMaskLUT::GetIndex (const csVector2& start,
   if (ABS (dydx) >= SMALL_EPSILON)
   {
     // Top horizontal side.
-    x_top = dxdy * (0-sta.y) + sta.x;
-    if (x_top >= 0 && x_top < fbox_hor) mask |= 0x8;
+    f = -dxdy * (0+sta.y) + sta.x;
+    if (f >= 0 && f < fbox_dim)
+    {
+      x_top = QInt (f);
+      mask |= 0x8;
+    }
     // Bottom horizontal side.
-    x_bot = dxdy * (fbox_ver-sta.y) + sta.x;
-    if (x_bot >= 0 && x_bot < fbox_hor) mask |= 0x4;
+    f = -dxdy * (fbox_dim+sta.y) + sta.x;
+    if (f >= 0 && f < fbox_dim)
+    {
+      x_bot = QInt (f);
+      mask |= 0x4;
+    }
   }
   if (ABS (dxdy) >= SMALL_EPSILON)
   {
     // Left vertical side.
-    y_left = dydx * (0-sta.x) + sta.y;
-    if (y_left >= 0 && y_left < fbox_ver) mask |= 0x2;
+    f = -dydx * (0-sta.x) - sta.y;
+    if (f >= 0 && f < fbox_dim)
+    {
+      y_left = QInt (f);
+      mask |= 0x2;
+    }
     // Right vertical side.
-    y_right = dydx * (fbox_hor-sta.x) + sta.y;
-    if (y_right >= 0 && y_right < fbox_ver) mask |= 0x1;
+    f = -dydx * (fbox_dim-sta.x) - sta.y;
+    if (f >= 0 && f < fbox_dim)
+    {
+      y_right = QInt (f);
+      mask |= 0x1;
+    }
   }
 
   // Try all combinations. Also make sure we have
   // reasonable actions for pathological cases.
   switch (mask)
   {
-    // No intersections with edges. In this case we need to test
-    // if the box is left or right of the edge.
-    case 0x0:
-      if (csMath2::WhichSide2D (csVector2 (0, 0), sta, sto) < 0)
-        return index_inside;
-      else
-        return index_outside;
+    case 0x0:	// No intersection.
+    case 0x1:	// Intersection on right side.
+    case 0x4:	// Intersection on bottom side.
+      // No or one intersections with edges. In this case we need to test
+      // if the box is left or right of the edge.
+
+      // We can use csMath2::WhichSide2D() here but since the
+      // first parameter is always (0,0) we make a more optimal
+      // solution here by doing the calculations ourselves.
+      {
+        float k  = -sta.y*(sto.x - sta.x);
+        float k1 = sta.x*(-sto.y + sta.y);
+        if (k < k1)
+          return index_inside;
+        else
+          return index_outside;
+      }
       break;
-    // Only one intersection is also considered a case where
-    // there is no intersection (near miss).
-    case 0x1:
-    case 0x2:
-    case 0x4:
-    case 0x8:
-      //@@@ Avoid divide by 2?
-      if (csMath2::WhichSide2D (csVector2 (fbox_hor/2, fbox_ver/2), sta, sto) < 0)
-        return index_inside;
-      else
-        return index_outside;
+    case 0x2:	// Intersection on left side.
+    case 0x8:	// Intersection on top side.
+      // Only one intersection is also considered a case where
+      // there is no intersection (near miss).
+      {
+        float k  = (-sta.y-fbox_dim) * (sto.x - sta.x);
+        float k1 = (sta.x-fbox_dim) * (-sto.y + sta.y);
+        if (k < k1)
+          return index_inside;
+        else
+          return index_outside;
+      }
       break;
-    // Top, left, and right side.
-    case 0xb:
-    // Top, left, and bottom side.
-    case 0xe:
-    // Top, right, and bottom side.
-    case 0xd:
-    // Bottom, left, and right side.
-    case 0x7:
+    case 0xb:	// Top, left, and right side.
+    case 0xe:	// Top, left, and bottom side.
+    case 0xd:	// Top, right, and bottom side.
+    case 0x7:	// Bottom, left, and right side.
       CsPrintf (MSG_INTERNAL_ERROR,
       	"ERROR: Three intersections in csCovMaskLUT::GetIndex()!\n");
       break;
-    // All sides.
-    case 0xf:
+    case 0xf:	// All sides.
       CsPrintf (MSG_INTERNAL_ERROR,
       	"ERROR: Four intersections in csCovMaskLUT::GetIndex()!\n");
       break;
-    // Left and right side.
-    case 0x3:
+    case 0x3:	// Left and right side.
       if (sta.x < sto.x)
       {
-        from = QInt (fdim * y_left / fbox_ver) + 2*dimension;
-        to = QInt (fdim * y_right / fbox_ver) + 3*dimension;
+        from = ((y_left << dim_shift) >> box_shift) + 2*dimension;
+        to   = ((y_right << dim_shift) >> box_shift) + 3*dimension;
       }
       else
       {
-        from = QInt (fdim * y_right / fbox_ver) + 3*dimension;
-        to = QInt (fdim * y_left / fbox_ver) + 2*dimension;
+        from = ((y_right << dim_shift) >> box_shift) + 3*dimension;
+        to   = ((y_left << dim_shift) >> box_shift) + 2*dimension;
       }
       break;
-    // Top and bottom side.
-    case 0xc:
-      if (sta.y < sto.y)
+    case 0xc:	// Top and bottom side.
+      if (sta.y > sto.y)
       {
-        from = QInt (fdim * x_top / fbox_hor);
-        to = QInt (fdim * x_bot / fbox_hor) + dimension;
+        from = ((x_top << dim_shift) >> box_shift);
+        to   = ((x_bot << dim_shift) >> box_shift) + dimension;
       }
       else
       {
-        from = QInt (fdim * x_bot / fbox_hor) + dimension;
-        to = QInt (fdim * x_top / fbox_hor);
+        from = ((x_bot << dim_shift) >> box_shift) + dimension;
+        to   = ((x_top << dim_shift) >> box_shift);
       }
       break;
-    // Left and top side.
-    case 0xa:
+    case 0xa:	// Left and top side.
       if (sta.x < sto.x)
       {
-        from = QInt (fdim * y_left / fbox_ver) + 2*dimension;
-        to = QInt (fdim * x_top / fbox_hor);
+        from = ((y_left << dim_shift) >> box_shift) + 2*dimension;
+        to   = ((x_top << dim_shift) >> box_shift);
       }
       else
       {
-        from = QInt (fdim * x_top / fbox_hor);
-        to = QInt (fdim * y_left / fbox_ver) + 2*dimension;
+        from = ((x_top << dim_shift) >> box_shift);
+        to   = ((y_left << dim_shift) >> box_shift) + 2*dimension;
       }
       break;
-    // Left and bottom side.
-    case 0x6:
+    case 0x6:	// Left and bottom side.
       if (sta.x < sto.x)
       {
-        from = QInt (fdim * y_left / fbox_ver) + 2*dimension;
-        to = QInt (fdim * x_bot / fbox_hor) + dimension;
+        from = ((y_left << dim_shift) >> box_shift) + 2*dimension;
+        to   = ((x_bot << dim_shift) >> box_shift) + dimension;
       }
       else
       {
-        from = QInt (fdim * x_bot / fbox_hor) + dimension;
-        to = QInt (fdim * y_left / fbox_ver) + 2*dimension;
+        from = ((x_bot << dim_shift) >> box_shift) + dimension;
+        to   = ((y_left << dim_shift) >> box_shift) + 2*dimension;
       }
       break;
-    // Top and right side.
-    case 0x9:
+    case 0x9:	// Top and right side.
       if (sta.x < sto.x)
       {
-        from = QInt (fdim * x_top / fbox_hor);
-        to = QInt (fdim * y_right / fbox_ver) + 3*dimension;
+        from = ((x_top << dim_shift) >> box_shift);
+        to   = ((y_right << dim_shift) >> box_shift) + 3*dimension;
       }
       else
       {
-        from = QInt (fdim * y_right / fbox_ver) + 3*dimension;
-        to = QInt (fdim * x_top / fbox_hor);
+        from = ((y_right << dim_shift) >> box_shift) + 3*dimension;
+        to   = ((x_top << dim_shift) >> box_shift);
       }
       break;
-    // Bottom and right side.
-    case 0x5:
+    case 0x5:	// Bottom and right side.
       if (sta.x < sto.x)
       {
-        from = QInt (fdim * x_bot / fbox_hor) + dimension;
-        to = QInt (fdim * y_right / fbox_ver) + 3*dimension;
+        from = ((x_bot << dim_shift) >> box_shift) + dimension;
+        to   = ((y_right << dim_shift) >> box_shift) + 3*dimension;
       }
       else
       {
-        from = QInt (fdim * y_right / fbox_ver) + 3*dimension;
-        to = QInt (fdim * x_bot / fbox_hor) + dimension;
+        from = ((y_right << dim_shift) >> box_shift) + 3*dimension;
+        to   = ((x_bot << dim_shift) >> box_shift) + dimension;
       }
       break;
   }
 
-  return (from<<dim_shift) + to;
+  return (from<<edge_shift) + to;
 }
 
 csCovMaskTriage csCovMaskLUT::GetTriageMask (csVector2* verts, int num_verts,
   	float* dxdy, float* dydx, int hor_offs, int ver_offs,
-	int box_hor, int box_ver) const
+	int box_dim, int box_shift) const
 {
   csCovMaskTriage mask = GetTriageMask (verts[num_verts-1], verts[0],
   	dxdy[num_verts-1], dydx[num_verts-1],
-	hor_offs, ver_offs, box_hor, box_ver);
+	hor_offs, ver_offs, box_dim, box_shift);
   int i;
   for (i = 0 ; i < num_verts-1 ; i++)
   {
     mask.Intersect (GetTriageMask (verts[i], verts[i+1], dxdy[i], dydx[i],
-	hor_offs, ver_offs, box_hor, box_ver));
+	hor_offs, ver_offs, box_dim, box_shift));
   }
   return mask;
 }
 
 csCovMask csCovMaskLUT::GetMask (csVector2* verts, int num_verts,
   	float* dxdy, float* dydx, int hor_offs, int ver_offs,
-	int box_hor, int box_ver) const
+	int box_dim, int box_shift) const
 {
   csCovMask mask = GetMask (verts[num_verts-1], verts[0],
   	dxdy[num_verts-1], dydx[num_verts-1],
-	hor_offs, ver_offs, box_hor, box_ver);
+	hor_offs, ver_offs, box_dim, box_shift);
   int i;
   for (i = 0 ; i < num_verts-1 ; i++)
   {
     mask.Intersect (GetMask (verts[i], verts[i+1], dxdy[i], dydx[i],
-    	hor_offs, ver_offs, box_hor, box_ver));
+    	hor_offs, ver_offs, box_dim, box_shift));
   }
   return mask;
 }

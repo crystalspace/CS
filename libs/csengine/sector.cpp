@@ -497,7 +497,9 @@ copy_persp.SetVertices (persp.GetVertices (), persp.GetNumVertices ());
 	persp.GetNumVertices (), persp.GetBoundingBox ());
       vis1 = c_buffer->TestPolygon (persp.GetVertices (),
       	persp.GetNumVertices ());
-      if (vis != vis1)
+      if (vis && !vis1)
+        printf ("MISMATCH CullOctreeNode covtree=%d cbuffer=%d!\n", vis, vis1);
+      else if (vis1 && !vis)
       {
         printf ("MISMATCH CullOctreeNode covtree=%d cbuffer=%d!\n", vis, vis1);
 	printf ("min=(%f,%f,%f) max=(%f,%f,%f)\n",

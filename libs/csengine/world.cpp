@@ -790,7 +790,8 @@ stop_processing = false;
   if (covtree)
   {
   //@@@@@@@@@@@@
-  covtree->MakeInvalid ();
+  //printf ("----------\n");
+  //covtree->MakeInvalid ();
     covtree->MakeEmpty ();
     csVector2 verts[50];	// @@@ BAD! Hardcoded!
     int i, num;

@@ -568,10 +568,19 @@ if (stop_processing) return (void*)1;
 		  clip->GetNumVertices (), clip->GetBoundingBox ());
             visible1 = c_buffer->InsertPolygon (clip->GetVertices (),
 		  clip->GetNumVertices ());
-	    if (visible1 != visible)
+	    if (visible && !visible1)
 	    {
 	      printf ("MISMATCH TestQueuePolygonArray covtree=%d cbuffer=%d\n",
 	      	visible, visible1);
+	    }
+	    else if (visible1 && !visible)
+	    {
+	      printf ("MISMATCH TestQueuePolygonArray covtree=%d cbuffer=%d\n",
+	      	visible, visible1);
+	      stop_processing = true;
+		extern csPolygon2D debug_poly2d;
+	debug_poly2d.MakeRoom (clip->GetNumVertices ());
+	debug_poly2d.SetVertices (clip->GetVertices (), clip->GetNumVertices ());
 	      return (void*)1;
 	    }
 	  }

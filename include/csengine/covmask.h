@@ -21,32 +21,20 @@
 
 // Define one of the three below to set the coverage mask size.
 #define CS_CM_4x4
-//#define CS_CM_8x4
 //#define CS_CM_8x8
 
 #if defined(CS_CM_4x4)
-#   define CS_CM_HOR 4
-#   define CS_CM_VER 4
-#   define CS_CM_HORSHIFT 2
-#   define CS_CM_VERSHIFT 2
-#   define CS_CM_HORMASK 0x3
+#   define CS_CM_DIM 4
+#   define CS_CM_DIMSHIFT 2
+#   define CS_CM_DIMMASK 0x3
 typedef UShort csMask;
-#elif defined(CS_CM_8x4)
-#   define CS_CM_HOR 8
-#   define CS_CM_VER 4
-#   define CS_CM_HORSHIFT 3
-#   define CS_CM_VERSHIFT 2
-#   define CS_CM_HORMASK 0x7
-typedef ULong csMask;
 #elif defined(CS_CM_8x8)
-#   define CS_CM_HOR 8
-#   define CS_CM_VER 8
-#   define CS_CM_HORSHIFT 3
-#   define CS_CM_VERSHIFT 3
-#   define CS_CM_HORMASK 0x7
+#   define CS_CM_DIM 8
+#   define CS_CM_DIMSHIFT 3
+#   define CS_CM_DIMMASK 0x7
 typedef ULong csMask;
 #endif
-#define CS_CM_BITS (CS_CM_HOR*CS_CM_VER)
+#define CS_CM_BITS (CS_CM_DIM*CS_CM_DIM)
 #define CS_CM_MASKBITS (sizeof (csMask)*8)
 
 struct iGraphics2D;
@@ -101,7 +89,7 @@ public:
    */
   void SetState (int bit, int s)
   {
-#   if defined(CS_CM_4x4) || defined(CS_CM_8x4)
+#   if defined(CS_CM_4x4)
       in = (in & ~(1<<bit)) | (s<<bit);
 #   elif defined(CS_CM_8x8)
       if (bit < 32)
@@ -124,7 +112,7 @@ public:
    */
   int GetState (int bit) const
   {
-#   if defined(CS_CM_4x4) || defined(CS_CM_8x4)
+#   if defined(CS_CM_4x4)
       return (in & (1<<bit)) >> bit;
 #   elif defined(CS_CM_8x8)
       if (bit < 32)
@@ -151,7 +139,7 @@ public:
    */
   bool IsFull () const
   {
-#   if defined(CS_CM_4x4) || defined(CS_CM_8x4)
+#   if defined(CS_CM_4x4)
       return in == (csMask)~0;
 #   elif defined(CS_CM_8x8)
       return (in == (csMask)~0) && (in2 == (csMask)~0);
@@ -164,7 +152,7 @@ public:
    */
   bool IsEmpty () const
   {
-#   if defined(CS_CM_4x4) || defined(CS_CM_8x4)
+#   if defined(CS_CM_4x4)
       return in == 0;
 #   elif defined(CS_CM_8x8)
       return (in == 0) && (in2 == 0);
@@ -189,16 +177,16 @@ public:
     return false;
   }
 
-  /// Return the horizontal number of pixels for a mask.
-  static int GetHorizontalSize ()
+  /// Return the horizontal/vertical number of pixels for a mask.
+  static int GetPixelSize ()
   {
-    return CS_CM_HOR;
+    return CS_CM_DIM;
   }
 
-  /// Return the vertical number of pixels for a mask.
-  static int GetVerticalSize ()
+  /// Return the horizontal/vertical number of pixels for a mask (shift).
+  static int GetPixelShift ()
   {
-    return CS_CM_VER;
+    return CS_CM_DIMSHIFT;
   }
 
   /**
@@ -285,7 +273,7 @@ public:
   void SetState (int bit, int so, int si)
   {
     csCovMask::SetState (bit, si);
-#   if defined(CS_CM_4x4) || defined(CS_CM_8x4)
+#   if defined(CS_CM_4x4)
       out = (out & ~(1<<bit)) | (so<<bit);
 #   elif defined(CS_CM_8x8)
       if (bit < 32)
@@ -308,7 +296,7 @@ public:
    */
   int GetState (int bit) const
   {
-#   if defined(CS_CM_4x4) || defined(CS_CM_8x4)
+#   if defined(CS_CM_4x4)
       return (((out & (1<<bit)) >> bit) << 1) |
       	     ((in & (1<<bit)) >> bit);
 #   elif defined(CS_CM_8x8)
@@ -338,7 +326,7 @@ public:
    */
   bool IsFull () const
   {
-#   if defined(CS_CM_4x4) || defined(CS_CM_8x4)
+#   if defined(CS_CM_4x4)
       return (in == (csMask)~0) && (out == 0);
 #   elif defined(CS_CM_8x8)
       return (in == (csMask)~0) && (out == 0) &&
@@ -352,7 +340,7 @@ public:
    */
   bool IsEmpty () const
   {
-#   if defined(CS_CM_4x4) || defined(CS_CM_8x4)
+#   if defined(CS_CM_4x4)
       return (out == (csMask)~0) && (in == 0);
 #   elif defined(CS_CM_8x8)
       return (out == (csMask)~0) && (in == 0) &&
@@ -456,8 +444,10 @@ private:
   int dimension;
   /// Total number of possible edge intersections with box (i.e. 4*dimension).
   int num_edge_points;
-  /// Shift value to use instead of multiplying with num_edge_points.
+  /// Shift value to use instead of multiplying with dimension.
   int dim_shift;
+  /// Shift value to use instead of multiplying with num_edge_points.
+  int edge_shift;
   /// LUT.
   csCovMaskTriage* triage_masks;
   /// LUT.
@@ -473,14 +463,14 @@ private:
   /**
    * Take a line given as a start point and the two
    * gradients dx/dy and dy/dz. Also take a box at position
-   * (hor_offs,ver_offs)-(hor_offs+box_hor,ver_offs+box_ver)
-   * (box_??? must be a power of two).
+   * (hor_offs,ver_offs)-(hor_offs+box_dim,ver_offs+box_dim)
+   * (box_dim must be a power of two).
    * Return the index in the masks tables for the
    * intersection of the line with the box.
    */
   int GetIndex (const csVector2& start, const csVector2& stop,
   	float dxdy, float dydx, int hor_offs, int ver_offs,
-	int box_hor, int box_ver) const;
+	int box_dim, int box_shift) const;
 
 public:
   /**
@@ -500,7 +490,7 @@ public:
    */
   csCovMaskTriage& GetTriageMask (int from, int to) const
   {
-    return triage_masks[(from<<dim_shift) + to];
+    return triage_masks[(from<<edge_shift) + to];
   }
 
   /**
@@ -510,37 +500,37 @@ public:
    */
   csCovMask& GetMask (int from, int to) const
   {
-    return masks[(from<<dim_shift) + to];
+    return masks[(from<<edge_shift) + to];
   }
 
   /**
    * Take a line given as a start point and the two
    * gradients dx/dy and dy/dz. Also take a box at position
-   * (hor_offs,ver_offs)-(hor_offs+box_hor,ver_offs+box_ver)
-   * (box_??? must be a power of two).
+   * (hor_offs,ver_offs)-(hor_offs+box_dim,ver_offs+box_dim)
+   * (box_dim must be a power of two).
    * Return the triage mask for the intersection of the line with the box.
    */
   csCovMaskTriage& GetTriageMask (const csVector2& start,
   	const csVector2& stop, float dxdy, float dydx,
-	int hor_offs, int ver_offs, int box_hor, int box_ver) const
+	int hor_offs, int ver_offs, int box_dim, int box_shift) const
   {
     return (triage_masks[GetIndex (start, stop, dxdy, dydx,
-    	hor_offs, ver_offs, box_hor, box_ver)]);
+    	hor_offs, ver_offs, box_dim, box_shift)]);
   }
 
   /**
    * Take a line given as a start point and the two
    * gradients dx/dy and dy/dz. Also take a box at position
-   * (hor_offs,ver_offs)-(hor_offs+box_hor,ver_offs+box_ver)
-   * (box_??? must be a power of two).
+   * (hor_offs,ver_offs)-(hor_offs+box_dim,ver_offs+box_dim)
+   * (box_dim must be a power of two).
    * Return the mask for the intersection of the line with the box.
    */
   csCovMask& GetMask (const csVector2& start,
   	const csVector2& stop, float dxdy, float dydx,
-	int hor_offs, int ver_offs, int box_hor, int box_ver) const
+	int hor_offs, int ver_offs, int box_dim, int box_shift) const
   {
     return (masks[GetIndex (start, stop, dxdy, dydx,
-    	hor_offs, ver_offs, box_hor, box_ver)]);
+    	hor_offs, ver_offs, box_dim, box_shift)]);
   }
 
   /**
@@ -549,7 +539,7 @@ public:
    */
   csCovMaskTriage GetTriageMask (csVector2* verts, int num_verts,
   	float* dxdy, float* dydx,
-	int hor_offs, int ver_offs, int box_hor, int box_ver) const;
+	int hor_offs, int ver_offs, int box_dim, int box_shift) const;
 
   /**
    * Take a polygon with vertices and gradients (dx/dy and dy/dx)
@@ -557,7 +547,7 @@ public:
    */
   csCovMask GetMask (csVector2* verts, int num_verts,
   	float* dxdy, float* dydx,
-	int hor_offs, int ver_offs, int box_hor, int box_ver) const;
+	int hor_offs, int ver_offs, int box_dim, int box_shift) const;
 };
 
 #endif /*COVMASK_H*/

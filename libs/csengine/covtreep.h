@@ -119,16 +119,16 @@ public:
    */
   bool TestConsistency (int hor_offs, int ver_offs) const;
 
-  /// Return the horizontal number of pixels for this node.
-  static int GetHorizontalSize ()
+  /// Return the horizontal/vertical number of pixels for this node.
+  static int GetPixelSize ()
   {
-    return Child::GetHorizontalSize ()*csCovMaskTriage::GetHorizontalSize ();
+    return Child::GetPixelSize ()*csCovMaskTriage::GetPixelSize ();
   }
 
-  /// Return the vertical number of pixels for this node.
-  static int GetVerticalSize ()
+  /// Return the horizontal/vertical number of pixels for this node (shift).
+  static int GetPixelShift ()
   {
-    return Child::GetVerticalSize ()*csCovMaskTriage::GetVerticalSize ();
+    return Child::GetPixelShift ()+csCovMaskTriage::GetPixelShift ();
   }
 
   /**

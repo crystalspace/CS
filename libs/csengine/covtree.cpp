@@ -39,7 +39,7 @@ bool csCovTreeNode<Child>::TestPolygonNotEmpty (csVector2* poly, int num_poly,
 	int hor_offs, int ver_offs) const
 {
   csCovMaskTriage pol_mask = lut->GetTriageMask (poly, num_poly, dxdy, dydx,
-  	hor_offs, ver_offs, GetHorizontalSize (), GetVerticalSize ());
+  	hor_offs, ver_offs, GetPixelSize (), GetPixelShift ());
 
   // Trivial case. If polygon mask is empty then nothing remains to be done.
   if (pol_mask.IsEmpty ()) return false;
@@ -78,10 +78,10 @@ again:
     {
       if (traverse & 1)
       {
-        col = idx & CS_CM_HORMASK;
-        row = idx >> CS_CM_HORSHIFT;
-        new_hor_offs = hor_offs + col * Child::GetHorizontalSize ();
-        new_ver_offs = ver_offs + row * Child::GetVerticalSize ();
+        col = idx & CS_CM_DIMMASK;
+        row = idx >> CS_CM_DIMSHIFT;
+        new_hor_offs = hor_offs + (col << Child::GetPixelShift ());
+        new_ver_offs = ver_offs + (row << Child::GetPixelShift ());
         if (children[idx].TestPolygonNotEmpty (poly, num_poly, dxdy, dydx,
 		new_hor_offs, new_ver_offs))
 	  return true;
@@ -123,7 +123,7 @@ bool csCovTreeNode<Child>::TestPolygon (csVector2* poly, int num_poly,
   	hor_offs, ver_offs);
 
   csCovMaskTriage pol_mask = lut->GetTriageMask (poly, num_poly, dxdy, dydx,
-  	hor_offs, ver_offs, GetHorizontalSize (), GetVerticalSize ());
+  	hor_offs, ver_offs, GetPixelSize (), GetPixelShift ());
 
   // Trivial case. If polygon mask is empty then nothing remains to be done.
   if (pol_mask.IsEmpty ()) return false;
@@ -168,20 +168,20 @@ again:
     {
       if (traverse_empty & 1)
       {
-        col = idx & CS_CM_HORMASK;
-        row = idx >> CS_CM_HORSHIFT;
-        new_hor_offs = hor_offs + col * Child::GetHorizontalSize ();
-        new_ver_offs = ver_offs + row * Child::GetVerticalSize ();
+        col = idx & CS_CM_DIMMASK;
+        row = idx >> CS_CM_DIMSHIFT;
+        new_hor_offs = hor_offs + (col << Child::GetPixelShift ());
+        new_ver_offs = ver_offs + (row << Child::GetPixelShift ());
         if (children[idx].TestPolygonNotEmpty (poly, num_poly, dxdy, dydx,
 		new_hor_offs, new_ver_offs))
 	  return true;
       }
       if (traverse & 1)
       {
-        col = idx & CS_CM_HORMASK;
-        row = idx >> CS_CM_HORSHIFT;
-        new_hor_offs = hor_offs + col * Child::GetHorizontalSize ();
-        new_ver_offs = ver_offs + row * Child::GetVerticalSize ();
+        col = idx & CS_CM_DIMMASK;
+        row = idx >> CS_CM_DIMSHIFT;
+        new_hor_offs = hor_offs + (col << Child::GetPixelShift ());
+        new_ver_offs = ver_offs + (row << Child::GetPixelShift ());
         if (children[idx].TestPolygon (poly, num_poly, dxdy, dydx,
 		new_hor_offs, new_ver_offs))
 	  return true;
@@ -216,7 +216,7 @@ bool csCovTreeNode<Child>::UpdatePolygon (csVector2* poly, int num_poly,
 {
   // Copy polygon mask to this one.
   Copy (lut->GetTriageMask (poly, num_poly, dxdy, dydx,
-  	hor_offs, ver_offs, GetHorizontalSize (), GetVerticalSize ()));
+  	hor_offs, ver_offs, GetPixelSize (), GetPixelShift ()));
 
   // Trivial case. If mask is empty then nothing remains to be done.
   if (IsEmpty ()) return false;
@@ -241,7 +241,8 @@ bool csCovTreeNode<Child>::UpdatePolygon (csVector2* poly, int num_poly,
   int idx = 0;		// Index for computing column/row in mask.
   int col, row, new_hor_offs, new_ver_offs;
 
-  bool modified = false;
+  // If some of the bits are inside then modified will certainly be true.
+  bool modified = !!in;
 
 # if defined(CS_CM_8x8)
   bool looped = false;
@@ -256,10 +257,10 @@ again:
       if (partial & 1)
       {
         // Partial. Update child.
-        col = idx & CS_CM_HORMASK;
-        row = idx >> CS_CM_HORSHIFT;
-        new_hor_offs = hor_offs + col * Child::GetHorizontalSize ();
-        new_ver_offs = ver_offs + row * Child::GetVerticalSize ();
+        col = idx & CS_CM_DIMMASK;
+        row = idx >> CS_CM_DIMSHIFT;
+        new_hor_offs = hor_offs + (col << Child::GetPixelShift ());
+        new_ver_offs = ver_offs + (row << Child::GetPixelShift ());
 	if (children[idx].UpdatePolygon (poly, num_poly, dxdy, dydx,
 		new_hor_offs, new_ver_offs))
 	{
@@ -345,7 +346,7 @@ bool csCovTreeNode<Child>::UpdatePolygonInverted (csVector2* poly, int num_poly,
 {
   // Copy polygon mask to this one.
   Copy (lut->GetTriageMask (poly, num_poly, dxdy, dydx,
-  	hor_offs, ver_offs, GetHorizontalSize (), GetVerticalSize ()));
+  	hor_offs, ver_offs, GetPixelSize (), GetPixelShift ()));
   
   // Invert this mask.
   Invert ();
@@ -373,7 +374,8 @@ bool csCovTreeNode<Child>::UpdatePolygonInverted (csVector2* poly, int num_poly,
   int idx = 0;		// Index for computing column/row in mask.
   int col, row, new_hor_offs, new_ver_offs;
 
-  bool modified = false;
+  // If some of the bits are inside then modified will certainly be true.
+  bool modified = !!in;
 
 # if defined(CS_CM_8x8)
   bool looped = false;
@@ -388,10 +390,10 @@ again:
       if (partial & 1)
       {
         // Partial. Update child.
-        col = idx & CS_CM_HORMASK;
-        row = idx >> CS_CM_HORSHIFT;
-        new_hor_offs = hor_offs + col * Child::GetHorizontalSize ();
-        new_ver_offs = ver_offs + row * Child::GetVerticalSize ();
+        col = idx & CS_CM_DIMMASK;
+        row = idx >> CS_CM_DIMSHIFT;
+        new_hor_offs = hor_offs + (col << Child::GetPixelShift ());
+        new_ver_offs = ver_offs + (row << Child::GetPixelShift ());
 	if (children[idx].UpdatePolygonInverted (poly, num_poly, dxdy, dydx,
 		new_hor_offs, new_ver_offs))
 	{
@@ -487,7 +489,7 @@ bool csCovTreeNode<Child>::InsertPolygon (csVector2* poly, int num_poly,
   }
 
   csCovMaskTriage pol_mask = lut->GetTriageMask (poly, num_poly, dxdy, dydx,
-  	hor_offs, ver_offs, GetHorizontalSize (), GetVerticalSize ());
+  	hor_offs, ver_offs, GetPixelSize (), GetPixelShift ());
 
   // Trivial case. If polygon mask is empty then nothing remains to be done.
   if (pol_mask.IsEmpty ()) return false;
@@ -543,10 +545,10 @@ again:
     {
       if (update & 1)
       {
-      	col = idx & CS_CM_HORMASK;
-      	row = idx >> CS_CM_HORSHIFT;
-      	new_hor_offs = hor_offs + col * Child::GetHorizontalSize ();
-      	new_ver_offs = ver_offs + row * Child::GetVerticalSize ();
+      	col = idx & CS_CM_DIMMASK;
+      	row = idx >> CS_CM_DIMSHIFT;
+        new_hor_offs = hor_offs + (col << Child::GetPixelShift ());
+        new_ver_offs = ver_offs + (row << Child::GetPixelShift ());
       	if (children[idx].UpdatePolygon (poly, num_poly, dxdy, dydx,
 		new_hor_offs, new_ver_offs))
 	{
@@ -561,10 +563,10 @@ again:
       }
       else if (insert & 1)
       {
-      	col = idx & CS_CM_HORMASK;
-      	row = idx >> CS_CM_HORSHIFT;
-      	new_hor_offs = hor_offs + col * Child::GetHorizontalSize ();
-      	new_ver_offs = ver_offs + row * Child::GetVerticalSize ();
+      	col = idx & CS_CM_DIMMASK;
+      	row = idx >> CS_CM_DIMSHIFT;
+        new_hor_offs = hor_offs + (col << Child::GetPixelShift ());
+        new_ver_offs = ver_offs + (row << Child::GetPixelShift ());
 	if (children[idx].InsertPolygon (poly, num_poly, dxdy, dydx,
 		new_hor_offs, new_ver_offs))
 	{
@@ -594,6 +596,7 @@ again:
       // Set 'inside' mode for all bits in 'setinside'.
       in2 |= setinside;
       out2 &= ~setinside;
+      modified = true;
     }
     if (setpartial != 0)
     {
@@ -611,6 +614,7 @@ again:
       // Set 'inside' mode for all bits in 'setinside'.
       in |= setinside;
       out &= ~setinside;
+      modified = true;
     }
     if (setpartial != 0)
     {
@@ -635,6 +639,7 @@ again:
     // Set 'inside' mode for all bits in 'setinside'.
     in |= setinside;
     out &= ~setinside;
+    modified = true;
   }
   if (setpartial != 0)
   {
@@ -667,14 +672,14 @@ again:
 
   while (bits > 0)
   {
-    col = idx & CS_CM_HORMASK;
-    row = idx >> CS_CM_HORSHIFT;
-    new_hor_offs = hor_offs + col * Child::GetHorizontalSize ();
-    new_ver_offs = ver_offs + row * Child::GetVerticalSize ();
+    col = idx & CS_CM_DIMMASK;
+    row = idx >> CS_CM_DIMSHIFT;
+    new_hor_offs = hor_offs + (col << Child::GetPixelShift ());
+    new_ver_offs = ver_offs + (row << Child::GetPixelShift ());
     if (INSIDE (msk_in))
     {
-      for (c = 0 ; c < Child::GetHorizontalSize () ; c++)
-        for (r = 0 ; r < Child::GetVerticalSize () ; r++)
+      for (c = 0 ; c < Child::GetPixelSize () ; c++)
+        for (r = 0 ; r < Child::GetPixelSize () ; r++)
       	  ig2d->DrawPixel (new_hor_offs+c, /*ig2d->GetHeight () -*/ (new_ver_offs+r), ~0);
     }
     else if (OUTSIDE (msk_out))
@@ -684,10 +689,10 @@ again:
     else
     {
       // Partial.
-      col = idx & CS_CM_HORMASK;
-      row = idx >> CS_CM_HORSHIFT;
-      new_hor_offs = hor_offs + col * Child::GetHorizontalSize ();
-      new_ver_offs = ver_offs + row * Child::GetVerticalSize ();
+      col = idx & CS_CM_DIMMASK;
+      row = idx >> CS_CM_DIMSHIFT;
+      new_hor_offs = hor_offs + (col << Child::GetPixelShift ());
+      new_ver_offs = ver_offs + (row << Child::GetPixelShift ());
       if (level > 1)
       {
         // Traverse to child.
@@ -696,18 +701,18 @@ again:
       }
       else
       {
-        for (c = 0 ; c < Child::GetHorizontalSize () ; c++)
-          for (r = 0 ; r < Child::GetVerticalSize () ; r++)
+        for (c = 0 ; c < Child::GetPixelSize () ; c++)
+          for (r = 0 ; r < Child::GetPixelSize () ; r++)
       	    ig2d->DrawPixel (new_hor_offs+c, /*ig2d->GetHeight () -*/ (new_ver_offs+r), 0x5555);
       }
     }
     if (level <= 1)
     {
-      for (c = 0 ; c < Child::GetHorizontalSize () ; c++)
+      for (c = 0 ; c < Child::GetPixelSize () ; c++)
       	ig2d->DrawPixel (new_hor_offs+c,
-		/*ig2d->GetHeight () -*/ (new_ver_offs+Child::GetVerticalSize ()-1), 0xaaaa);
-      for (r = 0 ; r < Child::GetVerticalSize () ; r++)
-        ig2d->DrawPixel (new_hor_offs+Child::GetHorizontalSize ()-1,
+		/*ig2d->GetHeight () -*/ (new_ver_offs+Child::GetPixelSize ()-1), 0xaaaa);
+      for (r = 0 ; r < Child::GetPixelSize () ; r++)
+        ig2d->DrawPixel (new_hor_offs+Child::GetPixelSize ()-1,
 		/*ig2d->GetHeight () -*/ (new_ver_offs+r), 0xaaaa);
     }
 
@@ -747,7 +752,7 @@ bool csCovTreeNode<Child>::TestConsistency (int hor_offs, int ver_offs) const
   if (IsInvalid ())
   {
     printf ("Node at %dx%d (size %dx%d) has invalid bits!\n",
-    	hor_offs, ver_offs, GetHorizontalSize (), GetVerticalSize ());
+    	hor_offs, ver_offs, GetPixelSize (), GetPixelSize ());
     return false;
   }
 
@@ -770,17 +775,17 @@ again:
     {
       printf ("Child %d for node %dx%d (size %dx%d) is %s while mask\n\
 bit says it should be partial!\n", idx, hor_offs, ver_offs,
-	GetHorizontalSize (), GetVerticalSize (),
+	GetPixelSize (), GetPixelSize (),
 		children[idx].IsFull () ? "full" : children[idx].IsEmpty () ? "empty" :
 		children[idx].IsInvalid () ? "invalid" : "unknown");
       return false;
     }
     if (PARTIAL (msk_in, msk_out))
     {
-      col = idx & CS_CM_HORMASK;
-      row = idx >> CS_CM_HORSHIFT;
-      new_hor_offs = hor_offs + col * Child::GetHorizontalSize ();
-      new_ver_offs = ver_offs + row * Child::GetVerticalSize ();
+      col = idx & CS_CM_DIMMASK;
+      row = idx >> CS_CM_DIMSHIFT;
+      new_hor_offs = hor_offs + (col << Child::GetPixelShift ());
+      new_ver_offs = ver_offs + (row << Child::GetPixelShift ());
       if (!children[idx].TestConsistency (new_hor_offs, new_ver_offs))
         return false;
     }
@@ -812,7 +817,7 @@ bool csCovTreeNode0::UpdatePolygon (csVector2* poly, int num_poly,
 	int hor_offs, int ver_offs)
 {
   Copy (lut->GetMask (poly, num_poly, dxdy, dydx,
-  	hor_offs, ver_offs, GetHorizontalSize (), GetVerticalSize ()));
+  	hor_offs, ver_offs, GetPixelSize (), GetPixelShift ()));
 
   // Trivial case. If mask is empty then nothing remains to be done.
   if (IsEmpty ()) return false;
@@ -825,7 +830,7 @@ bool csCovTreeNode0::UpdatePolygonInverted (csVector2* poly, int num_poly,
 	int hor_offs, int ver_offs)
 {
   Copy (lut->GetMask (poly, num_poly, dxdy, dydx,
-  	hor_offs, ver_offs, GetHorizontalSize (), GetVerticalSize ()));
+  	hor_offs, ver_offs, GetPixelSize (), GetPixelShift ()));
   Invert ();
 
   // Trivial case. If mask is empty then nothing remains to be done.
@@ -839,7 +844,7 @@ bool csCovTreeNode0::TestPolygonNotEmpty (csVector2* poly, int num_poly,
 	int hor_offs, int ver_offs) const
 {
   csCovMask pol_mask = lut->GetMask (poly, num_poly, dxdy, dydx,
-  	hor_offs, ver_offs, GetHorizontalSize (), GetVerticalSize ());
+  	hor_offs, ver_offs, GetPixelSize (), GetPixelShift ());
 
   // Trivial case. If polygon mask is empty then nothing remains to be done.
   if (pol_mask.IsEmpty ()) return false;
@@ -856,7 +861,7 @@ bool csCovTreeNode0::TestPolygon (csVector2* poly, int num_poly,
   if (IsFull ()) return false;
 
   csCovMask pol_mask = lut->GetMask (poly, num_poly, dxdy, dydx,
-  	hor_offs, ver_offs, GetHorizontalSize (), GetVerticalSize ());
+  	hor_offs, ver_offs, GetPixelSize (), GetPixelShift ());
 
   // Trivial case. If polygon mask is empty then nothing remains to be done.
   if (pol_mask.IsEmpty ()) return false;
@@ -882,7 +887,7 @@ bool csCovTreeNode0::InsertPolygon (csVector2* poly, int num_poly,
   if (IsFull ()) return false;
 
   csCovMask pol_mask = lut->GetMask (poly, num_poly, dxdy, dydx,
-  	hor_offs, ver_offs, GetHorizontalSize (), GetVerticalSize ());
+  	hor_offs, ver_offs, GetPixelSize (), GetPixelShift ());
 
   // Trivial case. If polygon mask is empty then nothing remains to be done.
   if (pol_mask.IsEmpty ()) return false;
@@ -945,8 +950,8 @@ again:
   {
     if (INSIDE (msk_in))
     {
-      col = idx & CS_CM_HORMASK;
-      row = idx >> CS_CM_HORSHIFT;
+      col = idx & CS_CM_DIMMASK;
+      row = idx >> CS_CM_DIMSHIFT;
       ig2d->DrawPixel (hor_offs+col, /*ig2d->GetHeight () -*/ (ver_offs+row), ~0);
     }
 
@@ -969,11 +974,11 @@ again:
 
 void calc_size ()
 {
-printf ("1: %lu (%dx%d)\n", (unsigned long)sizeof(csCovTreeNode1), csCovTreeNode1::GetHorizontalSize(), csCovTreeNode1::GetVerticalSize());
-printf ("2: %lu (%dx%d)\n", (unsigned long)sizeof(csCovTreeNode2), csCovTreeNode2::GetHorizontalSize(), csCovTreeNode2::GetVerticalSize());
-printf ("3: %lu (%dx%d)\n", (unsigned long)sizeof(csCovTreeNode3), csCovTreeNode3::GetHorizontalSize(), csCovTreeNode3::GetVerticalSize());
-printf ("4: %lu (%dx%d)\n", (unsigned long)sizeof(csCovTreeNode4), csCovTreeNode4::GetHorizontalSize(), csCovTreeNode4::GetVerticalSize());
-printf ("5: %lu (%dx%d)\n", (unsigned long)sizeof(csCovTreeNode5), csCovTreeNode5::GetHorizontalSize(), csCovTreeNode5::GetVerticalSize());
+printf ("1: %lu (%dx%d)\n", (unsigned long)sizeof(csCovTreeNode1), csCovTreeNode1::GetPixelSize (), csCovTreeNode1::GetPixelSize ());
+printf ("2: %lu (%dx%d)\n", (unsigned long)sizeof(csCovTreeNode2), csCovTreeNode2::GetPixelSize (), csCovTreeNode2::GetPixelSize ());
+printf ("3: %lu (%dx%d)\n", (unsigned long)sizeof(csCovTreeNode3), csCovTreeNode3::GetPixelSize (), csCovTreeNode3::GetPixelSize ());
+printf ("4: %lu (%dx%d)\n", (unsigned long)sizeof(csCovTreeNode4), csCovTreeNode4::GetPixelSize (), csCovTreeNode4::GetPixelSize ());
+printf ("5: %lu (%dx%d)\n", (unsigned long)sizeof(csCovTreeNode5), csCovTreeNode5::GetPixelSize (), csCovTreeNode5::GetPixelSize ());
 }
 
 //---------------------------------------------------------------------------
@@ -1019,12 +1024,10 @@ void csCoverageMaskTree::UpdatePolygonInverted (csVector2* verts, int num_verts)
   {
     float dx = verts[i].x - verts[i1].x;
     float dy = verts[i].y - verts[i1].y;
-dy=-dy;
     if (dy >= 0 && dy < SMALL_EPSILON) dy = SMALL_EPSILON;
     else if (dy <= 0 && dy > -SMALL_EPSILON) dy = -SMALL_EPSILON;
     dxdy[i1] = dx / dy;
     dy = verts[i].y - verts[i1].y;
-dy=-dy;
     if (dx >= 0 && dx < SMALL_EPSILON) dx = SMALL_EPSILON;
     else if (dx <= 0 && dx > -SMALL_EPSILON) dx = -SMALL_EPSILON;
     dydx[i1] = dy / dx;
@@ -1076,12 +1079,10 @@ bool csCoverageMaskTree::InsertPolygon (csVector2* verts, int num_verts,
   {
     float dx = verts[i].x - verts[i1].x;
     float dy = verts[i].y - verts[i1].y;
-dy=-dy;
     if (dy >= 0 && dy < SMALL_EPSILON) dy = SMALL_EPSILON;
     else if (dy <= 0 && dy > -SMALL_EPSILON) dy = -SMALL_EPSILON;
     dxdy[i1] = dx / dy;
     dy = verts[i].y - verts[i1].y;
-dy=-dy;
     if (dx >= 0 && dx < SMALL_EPSILON) dx = SMALL_EPSILON;
     else if (dx <= 0 && dx > -SMALL_EPSILON) dx = -SMALL_EPSILON;
     dydx[i1] = dy / dx;
@@ -1132,12 +1133,10 @@ bool csCoverageMaskTree::TestPolygon (csVector2* verts, int num_verts,
   {
     float dx = verts[i].x - verts[i1].x;
     float dy = verts[i].y - verts[i1].y;
-dy=-dy;
     if (dy >= 0 && dy < SMALL_EPSILON) dy = SMALL_EPSILON;
     else if (dy <= 0 && dy > -SMALL_EPSILON) dy = -SMALL_EPSILON;
     dxdy[i1] = dx / dy;
     dy = verts[i].y - verts[i1].y;
-dy=-dy;
     if (dx >= 0 && dx < SMALL_EPSILON) dx = SMALL_EPSILON;
     else if (dx <= 0 && dx > -SMALL_EPSILON) dx = -SMALL_EPSILON;
     dydx[i1] = dy / dx;
