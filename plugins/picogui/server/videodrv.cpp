@@ -228,15 +228,15 @@ void csPGVideoDriver::Blit (hwrbitmap b, int16 x, int16 y, int16 w, int16 h,
     {
     case PG_LGOP_OR:
       for (int i=0; i<l; i++)
-          *(s++) = 128;
+        *(s++) |= *(d++);
       break;
     case PG_LGOP_AND:
       for (int i=0; i<l; i++)
-        *(s++) = 128;
+        *(s++) &= *(d++);
       break;
     case PG_LGOP_XOR:
       for (int i=0; i<l; i++)
-          *(s++) = 128;
+        *(s++) ^= *(d++);
       break;
     default:
       printf ("Unsupported logical operation.\n");
