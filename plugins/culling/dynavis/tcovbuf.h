@@ -398,8 +398,12 @@ public:
    * Test a rectangle with the coverage buffer.
    * Function returns false if rectangle was not visible (i.e.
    * screen buffer would not have been modified).
+   * This function returns an estimated x,y point in screen space
+   * that could be visible. There is no guarantee that this point
+   * is actually visible but it is guaranteed that the tile this
+   * point is in is actually partially visible.
    */
-  bool TestRectangle (const csBox2& rect, float min_depth);
+  bool TestRectangle (const csBox2& rect, float min_depth, int& x, int& y);
 
   /**
    * Test a point with the coverage buffer.

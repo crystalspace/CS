@@ -742,26 +742,61 @@ bool csBox3::ProjectBox (const csTransform& trans, float fov,
   max_z = cbox.MaxZ ();
 
   if (max_z < 0.01) return false;
-  if (min_z < 0.01)
-  {
-    //@@@ Is there a better solution to this?
-    sbox.Set (-10000, -10000, 10000, 10000);
-    return true;
-  }
 
 // @@@ In theory we can optimize here again by calling CalculatePointSegment
 // again for the new box and the 0,0,0 point. By doing that we could
 // avoid doing four perspective projections.
   csVector2 oneCorner;
-  Perspective (cbox.Max (), oneCorner, fov, sx, sy);
+  if (cbox.Max ().z < .1)
+  {
+    // Conservative clipping. Not correct but it will generate a box that
+    // is bigger then the real one which is ok for testing culling.
+    float iz = fov * 10;
+    oneCorner.x = cbox.Max ().x * iz + sx;
+    oneCorner.y = cbox.Max ().y * iz + sy;
+  }
+  else
+  {
+    Perspective (cbox.Max (), oneCorner, fov, sx, sy);
+  }
   sbox.StartBoundingBox (oneCorner);
+
   csVector3 v (cbox.MinX (), cbox.MinY (), cbox.MaxZ ());
-  Perspective (v, oneCorner, fov, sx, sy);
+  if (v.z < .1)
+  {
+    float iz = fov * 10;
+    oneCorner.x = v.x * iz + sx;
+    oneCorner.y = v.y * iz + sy;
+  }
+  else
+  {
+    Perspective (v, oneCorner, fov, sx, sy);
+  }
   sbox.AddBoundingVertexSmart (oneCorner);
-  Perspective (cbox.Min (), oneCorner, fov, sx, sy);
+
+  if (cbox.Min ().z < .1)
+  {
+    float iz = fov * 10;
+    oneCorner.x = cbox.Min ().x * iz + sx;
+    oneCorner.y = cbox.Min ().y * iz + sy;
+  }
+  else
+  {
+    Perspective (cbox.Min (), oneCorner, fov, sx, sy);
+  }
   sbox.AddBoundingVertexSmart (oneCorner);
+
   v.Set (cbox.MaxX (), cbox.MaxY (), cbox.MinZ ());
-  Perspective (v, oneCorner, fov, sx, sy);
+  if (v.z < .1)
+  {
+    float iz = fov * 10;
+    oneCorner.x = v.x * iz + sx;
+    oneCorner.y = v.y * iz + sy;
+  }
+  else
+  {
+    Perspective (v, oneCorner, fov, sx, sy);
+  }
   sbox.AddBoundingVertexSmart (oneCorner);
 
   return true;

@@ -156,7 +156,14 @@ void csVisibilityObjectWrapper::MovableChanged (iMovable* /*movable*/)
 // This function defines the amount to use for keeping
 // an object/node visible after it was marked visible
 // for some other reason.
-#define RAND_HISTORY (4+((rand ()>>3)&0x3))
+static int distribute()
+{
+  static int cnt = 0;
+  cnt++;
+  cnt = cnt & 7;
+  return cnt;
+}
+#define RAND_HISTORY (6+distribute ())
 
 csDynaVis::csDynaVis (iBase *iParent)
 {
@@ -402,6 +409,15 @@ void csDynaVis::UpdateObject (csVisibilityObjectWrapper* visobj_wrap)
 namespace
 {
 
+void InvPerspective (const csVector2& p, float z, csVector3& v,
+	float fov, float sx, float sy)
+{
+  float iz = z / fov;
+  v.x = (p.x - sx) * iz;
+  v.y = (p.y - sy) * iz;
+  v.z = z;
+}
+
 void Perspective (const csVector3& v, csVector2& p, float fov, float sx, float sy)
 {
   float iz = fov / v.z;
@@ -501,7 +517,7 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
 
   if (do_cull_coverage != COVERAGE_NONE)
   {
-    // @@@ Do write queue here too?
+    // @@@ Do write queue here too? First tests indicate that this is not a good idea.
     iCamera* camera = data->rview->GetCamera ();
     float max_depth;
     if (node_bbox.ProjectBox (camera->GetTransform (), camera->GetFOV (),
@@ -515,7 +531,9 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
         printf ("Before node test:\n%s\n", str->GetData ());
       }
 #     endif
-      bool rc = tcovbuf->TestRectangle (sbox, min_depth);
+      int x, y;
+      // @@@ VPT tracking for nodes!!!
+      bool rc = tcovbuf->TestRectangle (sbox, min_depth, x, y);
 
       if (!rc)
       {
@@ -918,7 +936,6 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   	VisTest_Front2BackData* data, uint32 frustum_mask)
 {
   bool vis = true;
-  bool do_write_object = false;
 
   // For coverage test.
   csBox2 sbox;
@@ -933,7 +950,6 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
       obj->MarkVisible (VISIBLE_HISTORY, hist->vis_cnt-1, current_vistest_nr,
 		      history_frame_cnt);
       data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
-      do_write_object = true;
       goto end;
     }
 
@@ -944,7 +960,6 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
       obj->MarkVisible (VISIBLE_INSIDE, RAND_HISTORY, current_vistest_nr,
 		      history_frame_cnt);
       data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
-      do_write_object = true;
       goto end;
     }
   
@@ -953,6 +968,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 		frustum_mask, new_mask2))
     {
       hist->reason = INVISIBLE_FRUSTUM;
+      hist->has_vpt_point = false;
       vis = false;
       goto end;
     }
@@ -961,6 +977,9 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
     {
       iCamera* camera = data->rview->GetCamera ();
       iMovable* movable = obj->visobj->GetMovable ();
+      float fov = camera->GetFOV ();
+      float sx = camera->GetShiftX ();
+      float sy = camera->GetShiftY ();
 
       const csReversibleTransform& camtrans = camera->GetTransform ();
       csReversibleTransform trans = camtrans;
@@ -970,29 +989,60 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
         trans /= movtrans;
       }
 
-      float max_depth;
       bool rc = false;
+      float max_depth;
+
+      if (do_cull_vpt)
+      {
+	csVector3 cam_center;
+#if 0
+	if (hist->has_vpt_point)
+	{
+	  cam_center = camtrans * hist->vpt_point;
+	  cnt_real++;
+	}
+	else
+#endif
+	  cam_center = camtrans * obj_bbox.GetCenter ();
+
+	if (cam_center.z >= .1)
+	{
+	  csVector2 sbox_center;
+	  Perspective (cam_center, sbox_center, fov, sx, sy);
+	  rc = tcovbuf->TestPoint (sbox_center, cam_center.z);
+	  if (rc)
+	  {
+	    // The point is visible. If we have write queue enabled we have to test
+	    // further.
+	    if (do_cull_writequeue)
+	      if (write_queue->IsPointAffected (sbox_center, cam_center.z))
+	        rc = false;
+	  }
+
+	  if (rc)
+	  {
+	    // Point is visible. So we know the entire object is visible.
+	    obj->MarkVisible (VISIBLE_VPT, RAND_HISTORY, current_vistest_nr,
+	      	  history_frame_cnt);
+	    data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
+	    goto end;
+	  }
+        }
+      }
+
       if (obj->model->HasOBB ())
       {
         const csOBB& obb = obj->model->GetOBB ();
         csOBBFrozen frozen_obb (obb, trans);
-        rc = frozen_obb.ProjectOBB (camera->GetFOV (),
-    	    camera->GetShiftX (), camera->GetShiftY (), sbox,
-	    min_depth, max_depth);
+        rc = frozen_obb.ProjectOBB (fov, sx, sy, sbox, min_depth, max_depth);
       }
       else
       {
 	// No OBB, so use AABB instead.
-        rc = obj_bbox.ProjectBox (camtrans, camera->GetFOV (),
-    	    camera->GetShiftX (), camera->GetShiftY (), sbox,
-	    min_depth, max_depth);
+        rc = obj_bbox.ProjectBox (camtrans, fov, sx, sy, sbox, min_depth, max_depth);
       }
 
-      csVector2 sbox_center;
-      bool do_vpt_test = do_cull_vpt;
-      if (do_cull_vpt)
-        sbox_center = sbox.GetCenter ();
-
+      int testrect_x = -1, testrect_y;
       if (rc)
       {
 #       ifdef CS_DEBUG
@@ -1002,24 +1052,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
           printf ("Before obj test:\n%s\n", str->GetData ());
         }
 #       endif
-	if (do_cull_vpt)
-	{
-	  // If we do VPT then we first test the center point of the box.
-	  // If that fails we test the rectangle.
-	  rc = tcovbuf->TestPoint (sbox_center, min_depth);
-	  if (!rc)
-	  {
-	    rc = tcovbuf->TestRectangle (sbox, min_depth);
-	    // There is no need to continue doing the vpt test later
-	    // because we know the sbox_center point is already covered
-	    // even without accounting for write queue.
-	    do_vpt_test = false;
-	  }
-	}
-	else
-	{
-	  rc = tcovbuf->TestRectangle (sbox, min_depth);
-        }
+	rc = tcovbuf->TestRectangle (sbox, min_depth, testrect_x, testrect_y);
       }
 
       if (rc)
@@ -1029,26 +1062,6 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 	// object as non-visible.
 	if (do_cull_writequeue)
 	{
-	  if (do_vpt_test)
-	  {
-	    // Write queue is enabled and we're using VPT. If do_vpt_test is true
-	    // (i.e. if the tested center point was visible) then we will see if
-	    // the write queue could potentially affect that test point. If it
-	    // does then we assume the vpt test fails. Otherwise we know the object
-	    // is visible. If do_vpt_test is false
-	    // then the tested center point is already covered so we don't have
-	    // to continue the vpt test here.
-	    if (!write_queue->IsPointAffected (sbox_center, min_depth))
-	    {
-	      // Point is visible. So we know the entire object is visible.
-	      obj->MarkVisible (VISIBLE_VPT, RAND_HISTORY, current_vistest_nr,
-	      	  history_frame_cnt);
-	      data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
-	      do_write_object = true;
-	      goto end;
-	    }
-	  }
-
 	  // If the write queue is enabled we try to see if there
 	  // are occluders that are relevant (intersect with this object
 	  // to test). We will insert those object with the coverage
@@ -1069,10 +1082,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 	    do
 	    {
 	      // Yes! We found such an object. Insert it now.
-	      bool cc = (do_cull_coverage == COVERAGE_POLYGON);
-	      if (!qobj->use_outline_filler)
-		cc = true;
-	      if (cc)
+	      if (do_cull_coverage == COVERAGE_POLYGON || !qobj->use_outline_filler)
 		UpdateCoverageBuffer (data->rview->GetCamera (), qobj->visobj,
 		    qobj->model);
 	      else
@@ -1083,11 +1093,12 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 	    }
 	    while (qobj);
 	    // Now try again.
-            rc = tcovbuf->TestRectangle (sbox, min_depth);
+            rc = tcovbuf->TestRectangle (sbox, min_depth, testrect_x, testrect_y);
             if (!rc)
 	    {
 	      // It really is invisible.
               hist->reason = INVISIBLE_TESTRECT;
+	      hist->has_vpt_point = false;
 	      vis = false;
               goto end;
 	    }
@@ -1097,21 +1108,37 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
       else
       {
         hist->reason = INVISIBLE_TESTRECT;
+	hist->has_vpt_point = false;
 	vis = false;
         goto end;
       }
+
+#if 0
+      // If we come here we are visible and we can update a point for VPT tracking.
+      if (do_cull_vpt && testrect_x != -1)
+      {
+        // We have a visible point for VPT tracking.
+	csVector3 cam_center = camtrans * obj_bbox.GetCenter ();
+	if (cam_center.z >= .1)
+	{
+	  csVector2 p (testrect_x, testrect_y);
+	  csVector3 v;
+	  InvPerspective (p, cam_center.z, v, fov, sx, sy);
+	  hist->vpt_point = camtrans.This2Other (v);
+	  hist->has_vpt_point = true;
+        }
+      }
+#endif
     }
 
     //---------------------------------------------------------------
-
     // Object is visible so we should write it to the coverage buffer.
     obj->MarkVisible (VISIBLE, RAND_HISTORY, current_vistest_nr, history_frame_cnt);
     data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
-    do_write_object = true;
   }
 
 end:
-  if (do_write_object && do_cull_coverage != COVERAGE_NONE &&
+  if (vis && do_cull_coverage != COVERAGE_NONE &&
   	obj->visobj->GetObjectModel ()->GetPolygonMeshViscull ())
   {
     if (!obj->hint_badoccluder)
@@ -1128,10 +1155,7 @@ end:
       {
         // Let it update the coverage buffer if we
         // are using cull_coverage.
-	bool cc = (do_cull_coverage == COVERAGE_POLYGON);
-	if (!obj->use_outline_filler)
-	  cc = true;
-        if (cc)
+	if (do_cull_coverage == COVERAGE_POLYGON || !obj->use_outline_filler)
           UpdateCoverageBuffer (data->rview->GetCamera (), obj->visobj,
     	      obj->model);
         else
@@ -2392,7 +2416,8 @@ public:
     csBox2 box;
     box.Set (bugplug->DebugViewGetPoint (box_idx1),
     	bugplug->DebugViewGetPoint (box_idx2));
-    bool rc = tcovbuf->TestRectangle (box, 100);
+    int x, y;
+    bool rc = tcovbuf->TestRectangle (box, 100, x, y);
     if (rc)
     {
       int colred = g3d->GetDriver2D ()->FindRGB (255, 0, 0);

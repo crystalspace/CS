@@ -1544,7 +1544,8 @@ void csTiledCoverageBuffer::InsertOutline (csVector2* verts, int num_verts,
   }
 }
 
-bool csTiledCoverageBuffer::TestRectangle (const csBox2& rect, float min_depth)
+bool csTiledCoverageBuffer::TestRectangle (const csBox2& rect, float min_depth,
+	int& x, int& y)
 {
   csBox2Int bbox;
   if (rect.MaxX () > 10000.0) bbox.maxx = 10000;
@@ -1627,18 +1628,30 @@ bool csTiledCoverageBuffer::TestRectangle (const csBox2& rect, float min_depth)
         if (!do_vermask)
 	{
           if (tile->TestRect (sx, ex, min_depth))
+	  {
+	    x = (tx << 5)+16;
+	    y = (ty << 6)+32;
 	    return true;
+	  }
 	}
 	else
 	{
           if (tile->TestRect (vermask, sx, ex, min_depth))
+	  {
+	    x = (tx << 5)+16;
+	    y = (ty << 6)+32;
 	    return true;
+	  }
         }
       }
       else
       {
         if (tile->TestFullRect (min_depth))
+	{
+	  x = (tx << 5)+16;
+	  y = (ty << 6)+32;
           return true;
+        }
       }
       tile++;
     }

@@ -42,6 +42,16 @@ chronological order.
 	  it will now also create a conservative projection of the OBB
 	  if one or more of the points are behind the view plane (z < 0).
 	  In the past it would simply create a huge screensize box.
+	- Jorrit moved the VPT test in Dynavis so that it now works on 3D
+	  coordinates instead of 2D.
+	- Jorrit attempted to change VPT tracking so it would find a real
+	  visible point. This doensn't work very well yet so it is still
+	  disabled. Currently the center of the object is still used.
+	- Jorrit did some additional small optimizations to Dynavis. Including
+	  increasing the time a visible object remains visible.
+	- Jorrit fixed csBox3::ProjectBox() in a similar way as csOBBFrozen
+	  so that points behind the view plane (z < 0) are clipped in a
+	  conservative manner.
 	- Eric Sunshine fixed a bug in assembler.jam where the pathnames used
 	  with the -I directives lacked a trailing slash.  The slash is
 	  required by NASM.  (Bug #827028)

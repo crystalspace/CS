@@ -56,6 +56,10 @@ public:
   // When this object was last made visible.
   uint32 history_frame_cnt;
 
+  // 3D point to use for VPT testing (object space).
+  bool has_vpt_point;
+  csVector3 vpt_point;
+
   SCF_DECLARE_IBASE;
 
   csVisibilityObjectHistory ()
@@ -64,6 +68,7 @@ public:
     vis_cnt = 0;
     history_frame_cnt = 0;
     reason = LAST_REASON;
+    has_vpt_point = false;
   }
 };
 
