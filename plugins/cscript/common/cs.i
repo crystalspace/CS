@@ -1,7 +1,7 @@
 %module cspace
 %{
   #include "css.h"
-  #include "ispawn.h"
+//  #include "ispawn.h"
 
 //***** SCF Wrappers
   int MakeVersion(int version0, int version1, int version2) {
@@ -46,7 +46,6 @@ struct csRGBpixel {
 struct iPlugIn:public iBase {
   bool Initialize(iSystem *iSys);
   bool HandleEvent(iEvent&);
-  void SuspendResume(bool);
 };
 
 struct iTextureHandle : public iBase
@@ -70,9 +69,9 @@ struct iGraphics3D:public iPlugIn {
   void DrawPolygonDebug (G3DPolygonDP& poly);
   void DrawLine (const csVector3& v1, const csVector3& v2,
     float fov, int color);
-  void StartPolygonFX (iTextureHandle* handle, UInt mode);
-  void FinishPolygonFX ();
-  void DrawPolygonFX (G3DPolygonDPFX& poly);
+//  void StartPolygonFX (iTextureHandle* handle, UInt mode);
+//  void FinishPolygonFX ();
+//  void DrawPolygonFX (G3DPolygonDPFX& poly);
   void DrawTriangleMesh (G3DTriangleMesh& mesh);
   void DrawPolygonMesh (G3DPolygonMesh& mesh);
   void OpenFogObject (CS_ID id, csFog* fog);
@@ -137,7 +136,7 @@ struct iPolygon3D : public iBase {
   iPolygonSet *GetContainer ();
   iLightMap *GetLightMap ();
   iPolygonTexture *GetTexture ();
-  iTextureHandle *GetTextureHandle ();
+//  iTextureHandle *GetTextureHandle ();
   int GetVertexCount ();
   csVector3 &GetVertex (int idx);
   csVector3 &GetVertexW (int idx);
@@ -186,7 +185,7 @@ struct iTextureManager : public iBase
 
 struct iPolygonTexture : public iBase
 {
-  iTextureHandle *GetTextureHandle ();
+//  iTextureHandle *GetTextureHandle ();
   float GetFDU ();
   float GetFDV ();
   int GetWidth ();
@@ -246,5 +245,5 @@ void* GetMyPtr();
 
 //***** Spawner
 
-%include include/ispawn.h
+//%include include/ispawn.h
 

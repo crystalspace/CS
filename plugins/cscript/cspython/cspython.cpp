@@ -60,7 +60,7 @@ bool csPython::Initialize(iSystem* iSys) {
 
   if(!LoadModule("sys"))
     return 0;
-  if(!RunText("sys.path.append('./scripts/')"))
+  if(!RunText("sys.path.append('./scripts/python/')"))
     return 0;
   if(!LoadModule("cshelper"))
     return 0;

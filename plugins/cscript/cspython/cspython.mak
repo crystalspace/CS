@@ -34,7 +34,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
 
 #TCLTK=-ltk8.0 -ltcl8.0 -L/usr/X11R6/lib -lX11
-#PTHREAD=-lpthread
+PTHREAD=-lpthread
 
 CFLAGS.PYTHON += $(CFLAGS.I)$(PYTHON_INC)
 LIBS.CSPYTHON += $(LFLAGS.l)$(notdir $(PYTHON_LIB)) \
@@ -55,7 +55,7 @@ DESCRIPTION.$(CSPYTHON) = $(DESCRIPTION.cspython)
 SWIG.CSPYTHON = plugins/cscript/cspython/cs_pyth.cpp
 SWIG.INTERFACE = plugins/cscript/common/cs.i
 
-SRC.CSPYTHON = $(wildcard plugins/cspython/*.cpp) $(SWIG.CSPYTHON)
+SRC.CSPYTHON = $(wildcard plugins/cscript/cspython/*.cpp) $(SWIG.CSPYTHON)
 OBJ.CSPYTHON = $(addprefix $(OUT),$(notdir $(SRC.CSPYTHON:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
