@@ -248,7 +248,7 @@ bool InfPortalCS::Draw (csPolygon2D* new_clipper, csPlane* portal_plane, bool lo
     {
       int old_draw_busy = s->draw_busy;
       s->draw_busy = 0;
-      ShineLightmaps (lviews->lv);
+      CalculateLighting (lviews->lv);
       s->draw_busy = old_draw_busy;
 
       LV* n = lviews->next;
@@ -272,7 +272,7 @@ bool InfPortalCS::BlockingThings (csVector3& start, csVector3& end, csPolygon3D*
   else return false;
 }
 
-void InfPortalCS::ShineLightmaps (csLightView& lview)
+void InfPortalCS::CalculateLighting (csLightView& lview)
 {
   if (!GetSector ())
   {
@@ -283,12 +283,14 @@ void InfPortalCS::ShineLightmaps (csLightView& lview)
       CHK (LV* lv = new LV ());
       lv->next = lviews;
       lviews = lv;
-      lv->lv.Copy (lview);
+      lv->lv = lview;
+      if (lview.light_frustrum)
+        CHKB (lv->lv.light_frustrum = new csFrustrum (*lview.light_frustrum));
     }
   }
   else
   {
-    csPortalCS::ShineLightmaps (lview);
+    csPortalCS::CalculateLighting (lview);
   }
 }
 
