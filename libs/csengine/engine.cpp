@@ -2076,6 +2076,7 @@ iMeshFactoryWrapper* csEngine::CreateMeshFactory (const char* classId,
   iMeshFactoryWrapper *fwrap = CreateMeshFactory (fact, NULL);
   if (fwrap && name) fwrap->QueryObject()->SetName(name);
   fact->DecRef ();
+  type->DecRef ();
   return fwrap;
 }
 
