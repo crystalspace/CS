@@ -5,6 +5,10 @@ The overall history is in reverse (descending) chronological order, so that
 each new day's apears before the previous day's entry.  The individual changes
 for each given day, however, are in normal (ascending) chronological order.
 
+30-Jul-2003
+	- Anders Stenberg brought the variable system for the new renderer
+	  back up and running, now using Oktal's symbol table which should
+	  make variable lookups a lot faster.
 29-Jul-2003
 	- Jorrit made scfStringArray actually work by adding the needed
 	  SCF_CONSTRUCT stuff.

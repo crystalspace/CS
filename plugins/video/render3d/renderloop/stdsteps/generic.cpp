@@ -163,13 +163,13 @@ csGenericRenderStep::~csGenericRenderStep ()
 }
 
 void csGenericRenderStep::RenderMeshes (iRender3D* r3d,
-                                         iShader* shader, 
+                                         iShaderWrapper* shader, 
                                          csRenderMesh** meshes, 
                                          int num)
 {
   if (num == 0) return;
 
-  iShaderTechnique *tech = shader->GetBestTechnique ();
+  iShaderTechnique *tech = shader->GetShader()->GetBestTechnique ();
 
   for (int p=0; p<tech->GetPassCount (); p++)
   {
@@ -180,6 +180,8 @@ void csGenericRenderStep::RenderMeshes (iRender3D* r3d,
     for (j = 0; j < num; j++)
     {
       csRenderMesh* mesh = meshes[j];
+
+      shader->SelectMaterial (mesh->material->GetMaterial ());
 
       pass->SetupState (mesh);
 
@@ -210,7 +212,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
   int meshnum = meshes->GetCount();
   CS_ALLOC_STACK_ARRAY (csRenderMesh*, sameShaderMeshes, meshnum);
   int numSSM = 0;
-  iShader* shader = 0;
+  iShaderWrapper* shader = 0;
   //iLightList* lights = sector->GetLights();
 
   int i;
@@ -236,12 +238,15 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
     if (!mesh) continue;
 
     mesh->material->Visit(); // @@@ here?
-    iShader* meshShader = mesh->material->GetMaterialHandle()->GetShader(shadertype);
+    iShaderWrapper* meshShader = mesh->material->GetMaterialHandle()->GetShader(shadertype);
+
     if (meshShader != shader)
     {
       // @@@ Need error reporter
       if (shader != 0)
+      {
         RenderMeshes (r3d, shader, sameShaderMeshes, numSSM);
+      }
 
       shader = meshShader;
       numSSM = 0;

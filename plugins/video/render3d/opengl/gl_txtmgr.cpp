@@ -1033,6 +1033,12 @@ csPtr<iMaterialHandle> csGLTextureManager::RegisterMaterial (iMaterial* material
   if (!material) return 0;
   csGLMaterialHandle *mat = new csGLMaterialHandle (material, this);
   materials.Push (mat);
+
+  // @@@ Dunno if this should be _here_ really.
+  csRef<iShaderManager> shadman = 
+    CS_QUERY_REGISTRY (object_reg, iShaderManager);
+  shadman->AddChild (material);
+  
   return csPtr<iMaterialHandle> (mat);
 }
 
@@ -1042,6 +1048,12 @@ csPtr<iMaterialHandle> csGLTextureManager::RegisterMaterial (
   if (!txthandle) return 0;
   csGLMaterialHandle *mat = new csGLMaterialHandle (txthandle, this);
   materials.Push (mat);
+
+  // @@@ Dunno if this should be _here_ really.
+  csRef<iShaderManager> shadman = 
+    SCF_QUERY_INTERFACE (object_reg, iShaderManager);
+  shadman->AddChild (mat->GetMaterial ());
+
   return csPtr<iMaterialHandle> (mat);
 }
 

@@ -19,8 +19,27 @@
 #include "cssysdef.h"
 #include "csutil/symtable.h"
 
-inline void csSymbolTable::SetParent (csSymbolTable *p)
+csSymbolTable::csSymbolTable (const csSymbolTable &other, int size)
+ : Hash (size), Parent (0)
 {
+  csGlobalHashIterator iter (&other.Hash);
+  while (iter.HasNext ())
+  {
+    Symbol *s = (Symbol *) iter.NextConst ();
+    if (s->Auth)
+      Hash.Put (s->Name, (csHashObject) new Symbol (s->Name, s->Val, true));
+  }
+}
+
+csSymbolTable::~csSymbolTable ()
+{
+  csGlobalHashIterator iter (&Hash); 
+  while (iter.HasNext ()) 
+    delete (Symbol *) iter.Next (); 
+}
+
+inline void csSymbolTable::SetParent (csSymbolTable *p)
+{ 
   Parent = p;
   csGlobalHashIterator i (& Parent->Hash);
   while (i.HasNext ())

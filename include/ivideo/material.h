@@ -152,7 +152,7 @@ struct iMaterialHandle : public iBase
   /**
    * Get shader associated with a shader type
    */
-  virtual iShader* GetShader (csStringID type) = 0;
+  virtual iShaderWrapper* GetShader (csStringID type) = 0;
 #endif
 
   /**

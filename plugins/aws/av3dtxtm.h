@@ -328,7 +328,7 @@ public:
   /**
   * Get associated shader
   */
-  virtual iShader* GetShader (csStringID type) 
+  virtual iShaderWrapper* GetShader (csStringID type) 
   { return 0; }
 #endif // CS_USE_NEW_RENDERER
 };

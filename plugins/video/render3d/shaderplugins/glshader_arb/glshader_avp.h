@@ -37,19 +37,21 @@ private:
   csArray<csSymbolTable> symtabs;
   csSymbolTable *symtab;
 
-  struct streammapentry
+  struct variablemapentry
   {
-    streammapentry() { name = 0; }
+    variablemapentry() { name = csInvalidStringID; }
     csStringID name;
-    int attribnum;
+    int registernum;
   };
+
+  csArray<variablemapentry> variablemap;
 
   csGLExtensionManager* ext;
   csRef<iObjectRegistry> object_reg;
 
+
   unsigned int program_num;
 
-  csBasicVector streammap;
   csStringHash xmltokens;
 
   void BuildTokenHash();

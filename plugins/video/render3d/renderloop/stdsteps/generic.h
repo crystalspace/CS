@@ -77,7 +77,7 @@ private:
   csZBufMode zmode;
   csRef<iStringSet> strings;
 
-  inline void RenderMeshes (iRender3D* r3d, iShader* shader, 
+  inline void RenderMeshes (iRender3D* r3d, iShaderWrapper* shader, 
     csRenderMesh** meshes, int num);
 public:
   SCF_DECLARE_IBASE;

@@ -63,11 +63,11 @@ public:
 
   virtual iShader* GetShader() { return shader; }
   virtual void SelectMaterial(iMaterial *mat) {
-    symtab = mat->GetSymbolTable();
     int index = (int) materials.Get((csHashKey) mat);
     if (! index)
        materials.Put((csHashKey) mat, (csHashObject) (index = matnum++));
     shader->SelectSymbolTable(index - 1);
+    symtab = shader->GetSymbolTable();
   }
 
   virtual void AddChild(iShaderBranch *b) { shader->AddChild(b); }
@@ -285,14 +285,24 @@ public:
     { return (iShaderVariable *) symtab->GetSymbol (s); }
   virtual csSymbolTable* GetSymbolTable() { return symtab; }
   virtual csSymbolTable* GetSymbolTable(int i) {
-    if (symtabs.Length () <= i) symtabs.SetLength (i + 1, csSymbolTable ());
+    if (symtabs.Length () <= i) 
+    {
+      symtabs.SetLength (i + 1, symtabs[0]);
+      for (int j = 0; j < children.Length (); j++)
+        symtabs[i].AddChild (children[j]->GetSymbolTable (i));
+    }
     return & symtabs[i];
   }
   virtual void SelectSymbolTable(int i) {
-    if (symtabs.Length () <= i) symtabs.SetLength (i + 1, csSymbolTable ());
+    if (symtabs.Length () <= i) 
+    {
+      symtabs.SetLength (i + 1, symtabs[0]);
+      for (int j = 0; j < children.Length (); j++)
+        symtabs[i].AddChild (children[j]->GetSymbolTable (i));
+    }
     symtab = & symtabs[i];
-    for (int i = 0; i < children.Length (); i++)
-      children[i]->SelectSymbolTable (i);
+    for (int j = 0; j < children.Length (); j++)
+      children[j]->SelectSymbolTable (i);
   }
 
   /// Private variable to get the variable without virtual call
@@ -324,7 +334,8 @@ private:
   //loading related
   enum
   {
-    XMLTOKEN_PASS
+    XMLTOKEN_PASS,
+    XMLTOKEN_DECLARE
   };
 
   csStringHash xmltokens;
@@ -369,17 +380,27 @@ public:
     { return (iShaderVariable *) symtab->GetSymbol (s); }
   virtual csSymbolTable* GetSymbolTable() { return symtab; }
   virtual csSymbolTable* GetSymbolTable(int i) {
-    if (symtabs.Length () <= i) symtabs.SetLength (i + 1, csSymbolTable ());
+    if (symtabs.Length () <= i) 
+    {
+      symtabs.SetLength (i + 1, symtabs[0]);
+      for (int j = 0; j < children.Length (); j++)
+        symtabs[i].AddChild (children[j]->GetSymbolTable (i));
+    }
     return & symtabs[i];
   }
   virtual void SelectSymbolTable(int i) {
-    if (symtabs.Length () <= i) symtabs.SetLength (i + 1, csSymbolTable ());
+    if (symtabs.Length () <= i) 
+    {
+      symtabs.SetLength (i + 1, symtabs[0]);
+      for (int j = 0; j < children.Length (); j++)
+        symtabs[i].AddChild (children[j]->GetSymbolTable (i));
+    }
     symtab = & symtabs[i];
-    for (int i = 0; i < children.Length (); i++)
-      children[i]->SelectSymbolTable (i);
+    for (int j = 0; j < children.Length (); j++)
+      children[j]->SelectSymbolTable (i);
   }
 
-  /// Check if valid (normaly a shader is valid if there is at least one valid technique)
+  /// Check if valid (normally a shader is valid if there is at least one valid technique)
   virtual bool IsValid() const; 
 
   /// Loads a shader from buffer
@@ -458,6 +479,8 @@ public:
     writemaskGreen = true;
     writemaskBlue = true;
     writemaskAlpha = true;
+
+    symtabs.SetLength (1, csSymbolTable());
   }
   virtual ~csShaderPass () {}
 
@@ -483,13 +506,15 @@ public:
   virtual iShaderProgram* GetVertexProgram() {return vp; }
 
   /// Set vertex-program
-  virtual void SetVertexProgram(iShaderProgram* program) { vp = program; }
+  virtual void SetVertexProgram(iShaderProgram* program) 
+    { vp = program; AddChild (program); }
 
   /// Get fragment-program
   virtual iShaderProgram* GetFragmentProgram() { return fp; }
 
   /// Set fragment-program
-  virtual void SetFragmentProgram(iShaderProgram* program) { fp = program; }
+  virtual void SetFragmentProgram(iShaderProgram* program) 
+    { fp = program; AddChild (program); }
 
   /// Check if valid
   virtual bool IsValid() const
@@ -525,14 +550,24 @@ public:
     { return (iShaderVariable *) symtab->GetSymbol (s); }
   virtual csSymbolTable* GetSymbolTable() { return symtab; }
   virtual csSymbolTable* GetSymbolTable(int i) {
-    if (symtabs.Length () <= i) symtabs.SetLength (i + 1, csSymbolTable ());
+    if (symtabs.Length () <= i) 
+    {
+      symtabs.SetLength (i + 1, symtabs[0]);
+      for (int j = 0; j < children.Length (); j++)
+        symtabs[i].AddChild (children[j]->GetSymbolTable (i));
+    }
     return & symtabs[i];
   }
   virtual void SelectSymbolTable(int i) {
-    if (symtabs.Length () <= i) symtabs.SetLength (i + 1, csSymbolTable ());
+    if (symtabs.Length () <= i) 
+    {
+      symtabs.SetLength (i + 1, symtabs[0]);
+      for (int j = 0; j < children.Length (); j++)
+        symtabs[i].AddChild (children[j]->GetSymbolTable (i));
+    }
     symtab = & symtabs[i];
-    for (int i = 0; i < children.Length (); i++)
-      children[i]->SelectSymbolTable (i);
+    for (int j = 0; j < children.Length (); j++)
+      children[j]->SelectSymbolTable (i);
   }
 
   /// Private variable to get the variable without virtual call

@@ -40,19 +40,31 @@ private:
   csArray<csSymbolTable> symtabs;
   csSymbolTable *symtab;
 
+  struct variablemapentry
+  {
+    variablemapentry() { name = csInvalidStringID; cgvarname = 0; }
+    ~variablemapentry() { if (cgvarname) delete[] cgvarname; }
+    csStringID name;
+    char* cgvarname;
+    CGparameter parameter;
+  };
+
   struct matrixtrackerentry
   {
+
     CGGLenum matrix;
     CGGLenum modifier;
     CGparameter parameter;
   };
+
+  csArray<variablemapentry> variablemap;
+  csArray<matrixtrackerentry> matrixtrackers;
 
   csRef<iObjectRegistry> object_reg;
   CGcontext context;
 
   CGprogram program;
 
-  csBasicVector matrixtrackers;
   csStringHash xmltokens;
 
   void BuildTokenHash();
@@ -104,14 +116,18 @@ public:
   virtual void AddChild(iShaderBranch *b) {}
   virtual void AddVariable(iShaderVariable* variable) {}
   virtual iShaderVariable* GetVariable(csStringID s)
-    { return (iShaderVariable *) symtab->GetSymbol(s); }
+    { 
+      return (iShaderVariable *) symtab->GetSymbol(s); 
+    }
   virtual csSymbolTable* GetSymbolTable() { return symtab; }
   virtual csSymbolTable* GetSymbolTable(int i) {
-    if (symtabs.Length () <= i) symtabs.SetLength (i + 1, csSymbolTable ());
+    if (symtabs.Length () <= i) 
+      symtabs.SetLength (i + 1, csSymbolTable ());
     return & symtabs[i];
   }
   virtual void SelectSymbolTable(int i) {
-    if (symtabs.Length () <= i) symtabs.SetLength (i + 1, csSymbolTable ());
+    if (symtabs.Length () <= i) 
+      symtabs.SetLength (i + 1, csSymbolTable ());
     symtab = & symtabs[i];
   }
 

@@ -220,6 +220,8 @@ csShader::csShader(csShaderManager* owner, iObjectRegistry* reg)
   techniques = new csBasicVector();
   parent = owner;
   objectreg = reg;
+
+  symtabs.SetLength (1, csSymbolTable());
 }
 
 csShader::csShader(const char* name, csShaderManager* owner, iObjectRegistry* reg)
@@ -231,6 +233,8 @@ csShader::csShader(const char* name, csShaderManager* owner, iObjectRegistry* re
   parent = owner;
   objectreg = reg;
   SetName(name);
+
+  symtabs.SetLength (1, csSymbolTable());
 }
 
 csShader::~csShader()
@@ -295,6 +299,7 @@ csPtr<iShaderTechnique> csShader::CreateTechnique()
   mytech->IncRef();
 
   techniques->Push(mytech);
+  AddChild (mytech);
   return mytech;
 }
 
@@ -342,6 +347,10 @@ bool csShader::Load(iDocumentNode* node)
 
   BuildTokenHash();
 
+  csRef<iStringSet> strings = 
+    CS_QUERY_REGISTRY_TAG_INTERFACE (objectreg, 
+    "crystalspace.renderer.stringset", iStringSet);
+
   if(node)
   {
     csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -367,10 +376,14 @@ bool csShader::Load(iDocumentNode* node)
         break;
       case XMLTOKEN_DECLARE:
         {
-#if 0
           //create a new variable
           csRef<iShaderVariable> var = 
-            parent->CreateVariable (child->GetAttributeValue ("name"));
+            parent->CreateVariable (
+            strings->Request(child->GetAttributeValue ("name")));
+
+          // @@@ Will leak! Should do proper refcounting.
+          var->IncRef ();
+
           csStringID idtype = xmltokens.Request( child->GetAttributeValue("type") );
           idtype -= 100;
           var->SetType( (iShaderVariable::VariableType) idtype);
@@ -392,10 +405,7 @@ bool csShader::Load(iDocumentNode* node)
             var->SetValue( v );
             break;
           }
-          // @@@ I'll blame Matze if this is bad :) /Anders Stenberg
-          var->IncRef (); 
-          variables->Put( csHashCompute(var->GetName()), var);
-#endif
+          AddVariable (var);
         }
         break;
       }
@@ -631,7 +641,6 @@ bool csShaderPass::Load(iDocumentNode* node)
 
   BuildTokenHash();
   csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY(objectreg, iShaderManager);
-  r3d = CS_QUERY_REGISTRY(objectreg, iRender3D);
   csRef<iSyntaxService> synserv = 
     CS_QUERY_REGISTRY (objectreg, iSyntaxService);
 
@@ -785,10 +794,14 @@ bool csShaderPass::Load(iDocumentNode* node)
         break;
       case XMLTOKEN_DECLARE:
         {
-#if 0
           //create a new variable
           csRef<iShaderVariable> var = 
-            shadermgr->CreateVariable (child->GetAttributeValue ("name"));
+            shadermgr->CreateVariable (
+            strings->Request (child->GetAttributeValue ("name")));
+
+          // @@@ Will leak! Should do proper refcounting.
+          var->IncRef ();
+
           csStringID idtype = xmltokens.Request( child->GetAttributeValue("type") );
           idtype -= 100;
           var->SetType( (iShaderVariable::VariableType) idtype);
@@ -810,10 +823,7 @@ bool csShaderPass::Load(iDocumentNode* node)
             var->SetValue( v );
             break;
           }
-          // @@@ I'll blame Matze if this is bad :) /Anders Stenberg
-          var->IncRef (); 
-          variables.Put( csHashCompute(var->GetName()), var);
-#endif
+          AddVariable (var);
         }
         break;
       case XMLTOKEN_WRITEMASK:
@@ -870,6 +880,8 @@ csShaderTechnique::csShaderTechnique(csShader* owner, iObjectRegistry* reg)
   passes = new csBasicVector();
   parent = owner;
   objectreg = reg;
+
+  symtabs.SetLength (1, csSymbolTable());
 }
 
 csShaderTechnique::~csShaderTechnique()
@@ -887,6 +899,7 @@ csPtr<iShaderPass> csShaderTechnique::CreatePass()
   mpass->IncRef();
 
   passes->Push(mpass);
+  AddChild (mpass);
   return mpass;
 }
 
@@ -913,6 +926,13 @@ bool csShaderTechnique::IsValid() const
 void csShaderTechnique::BuildTokenHash()
 {
   xmltokens.Register ("pass", XMLTOKEN_PASS);
+  xmltokens.Register ("declare", XMLTOKEN_DECLARE);
+
+  xmltokens.Register("integer", 100+iShaderVariable::INT);
+  xmltokens.Register("float", 100+iShaderVariable::FLOAT);
+  xmltokens.Register("string", 100+iShaderVariable::STRING);
+  xmltokens.Register("vector3", 100+iShaderVariable::VECTOR3);
+
 }
 
 bool csShaderTechnique::Load(iDocumentNode* node)
@@ -921,6 +941,11 @@ bool csShaderTechnique::Load(iDocumentNode* node)
     return false;
 
   BuildTokenHash();
+
+  csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY(objectreg, iShaderManager);
+  csRef<iStringSet> strings = 
+    CS_QUERY_REGISTRY_TAG_INTERFACE (objectreg, 
+    "crystalspace.renderer.stringset", iStringSet);
 
   if(node)
   {
@@ -943,7 +968,41 @@ bool csShaderTechnique::Load(iDocumentNode* node)
           // passes->Push(pass);
         }
         break;
-      }
+      case XMLTOKEN_DECLARE:
+        {
+          //create a new variable
+          csRef<iShaderVariable> var = 
+            shadermgr->CreateVariable (
+            strings->Request(child->GetAttributeValue ("name")));
+
+          // @@@ Will leak! Should do proper refcounting.
+          var->IncRef ();
+
+          csStringID idtype = xmltokens.Request( child->GetAttributeValue("type") );
+          idtype -= 100;
+          var->SetType( (iShaderVariable::VariableType) idtype);
+          switch(idtype)
+          {
+          case iShaderVariable::INT:
+            var->SetValue( child->GetAttributeValueAsInt("default") );
+            break;
+          case iShaderVariable::FLOAT:
+            var->SetValue( child->GetAttributeValueAsFloat("default") );
+            break;
+          case iShaderVariable::STRING:
+            var->SetValue(new scfString( child->GetAttributeValue("default")) );
+            break;
+          case iShaderVariable::VECTOR3:
+            const char* def = child->GetAttributeValue("default");
+            csVector3 v;
+            sscanf(def, "%f,%f,%f", &v.x, &v.y, &v.z);
+            var->SetValue( v );
+            break;
+          }
+          AddVariable (var);
+        }
+        break;
+    }
     }
   }
   return false;

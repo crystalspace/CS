@@ -69,6 +69,19 @@ public:
    */
   csSymbolTable (int size = 53) : Hash (size), Parent (0) {}
 
+  /**
+  * Construct the table with a hash of the given initial size,
+  * which should be a prime number, for optimisation reasons.
+  * See the csHashMap docs for more info.
+  * Also copies auth variables from another symbol table.
+  */
+  csSymbolTable (const csSymbolTable &other, int size = 53);
+
+  /**
+  * Destruct the table and delete all variables.
+  */
+  ~csSymbolTable ();
+
   /// Add a child table which will inherit the symbols of this one.
   void AddChild (csSymbolTable *);
 

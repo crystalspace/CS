@@ -307,8 +307,8 @@ public:
   /**
    * Get associated shader
    */
-  virtual iShader* GetShader (csStringID type) 
-  { return material->GetShader (type)->GetShader(); }
+  virtual iShaderWrapper* GetShader (csStringID type) 
+  { return material->GetShader (type); }
 
   /**
    * Get a texture from the material.

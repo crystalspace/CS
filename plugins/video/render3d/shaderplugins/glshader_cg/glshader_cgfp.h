@@ -43,6 +43,15 @@ private:
   csArray<csSymbolTable> symtabs;
   csSymbolTable *symtab;
 
+  struct variablemapentry
+  {
+    variablemapentry() { name = csInvalidStringID; cgvarname = 0; }
+    ~variablemapentry() { if (cgvarname) delete[] cgvarname; }
+    csStringID name;
+    char* cgvarname;
+    CGparameter parameter;
+  };
+
   struct texturemapentry
   {
     texturemapentry() { name = 0; layer = -1; }
@@ -53,6 +62,9 @@ private:
     CGparameter parameter;
   };
 
+  csArray<variablemapentry> variablemap;
+  csArray<texturemapentry> texturemap;
+
   csRef<iObjectRegistry> object_reg;
   CGcontext context;
   iGLTextureCache* txtcache;
@@ -60,7 +72,6 @@ private:
 
   CGprogram program;
 
-  csBasicVector texturemap;
   csStringHash xmltokens;
 
   void BuildTokenHash();

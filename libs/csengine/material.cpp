@@ -119,6 +119,7 @@ iEffectDefinition *csMaterial::GetEffect ()
 void csMaterial::SetShader (csStringID type, iShaderWrapper* shd)
 {
   shd->IncRef ();
+  AddChild (shd);
   shaders->Put (type, shd);
 }
 

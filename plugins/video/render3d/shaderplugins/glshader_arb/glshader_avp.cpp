@@ -31,6 +31,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "iutil/document.h"
 #include "iutil/string.h"
+#include "iutil/strset.h"
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 #include "ivideo/render3d.h"
@@ -60,15 +61,12 @@ void csShaderGLAVP::Deactivate(iShaderPass* current)
 
 void csShaderGLAVP::SetupState (iShaderPass *current, csRenderMesh *mesh)
 {
-#if 0
-    // set variables
   int i;
+
+  // set variables
   for(i = 0; i < variablemap.Length(); ++i)
   {
-    variablemapentry* e = (variablemapentry*)variablemap.Get(i);
-    iShaderVariable* lvar = GetVariable(e->namehash );
-    if(!lvar)
-      lvar = current->GetVariable(e->namehash);
+    iShaderVariable* lvar = GetVariable(variablemap[i].name);
 
     if(lvar)
     {
@@ -78,41 +76,43 @@ void csShaderGLAVP::SetupState (iShaderPass *current, csRenderMesh *mesh)
         {
           int intval;
           if(lvar->GetValue(intval))
-            ext->glProgramLocalParameter4fARB(GL_VERTEX_PROGRAM_ARB, e->registernum,
-                                              (float)intval, (float)intval, (float)intval, (float)intval);
+            ext->glProgramLocalParameter4fARB(GL_VERTEX_PROGRAM_ARB, 
+            variablemap[i].registernum,
+            (float)intval, (float)intval, (float)intval, (float)intval);
         }
         break;
       case iShaderVariable::FLOAT:
         {
           float fval;
           if(lvar->GetValue(fval))
-            ext->glProgramLocalParameter4fARB(GL_VERTEX_PROGRAM_ARB, e->registernum,
-                                              fval,fval,fval,fval);
+            ext->glProgramLocalParameter4fARB(GL_VERTEX_PROGRAM_ARB, 
+            variablemap[i].registernum,
+            fval, fval, fval, fval);
         }
         break;
       case iShaderVariable::VECTOR3:
         {
           csVector3 v3;
           if(lvar->GetValue(v3))
-            ext->glProgramLocalParameter4fARB(GL_VERTEX_PROGRAM_ARB, e->registernum,
-                                              v3.x ,v3.y,v3.z,1);
+            ext->glProgramLocalParameter4fARB(GL_VERTEX_PROGRAM_ARB, 
+            variablemap[i].registernum,
+            v3.x, v3.y, v3.z, 1);
         }
         break;
       case iShaderVariable::VECTOR4:
         {
           csVector4 v4;
           if(lvar->GetValue(v4))
-            ext->glProgramLocalParameter4fARB(GL_VERTEX_PROGRAM_ARB, e->registernum,
-                                              v4.x ,v4.y,v4.z,v4.w);
+            ext->glProgramLocalParameter4fARB(GL_VERTEX_PROGRAM_ARB, 
+            variablemap[i].registernum,
+            v4.x, v4.y, v4.z, v4.w);
         }
         break;
-      // iShaderVariable::STRING missing...
       default:
 	break;
       }
     }
   }
-#endif
 }
 
 void csShaderGLAVP::ResetState ()
@@ -203,8 +203,9 @@ bool csShaderGLAVP::Load(iDocumentNode* program)
 
   BuildTokenHash();
 
-  csRef<iRender3D> r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
   csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY(object_reg, iShaderManager);
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+    object_reg, "crystalspace.renderer.stringset", iStringSet);
 
   csRef<iDocumentNode> variablesnode = program->GetNode("arbvp");
   if(variablesnode)
@@ -226,11 +227,15 @@ bool csShaderGLAVP::Load(iDocumentNode* program)
         }
           break;
       case XMLTOKEN_DECLARE:
-#if 0
         {
           //create a new variable
           csRef<iShaderVariable> var = 
-            shadermgr->CreateVariable (child->GetAttributeValue ("name"));
+            shadermgr->CreateVariable (
+            strings->Request(child->GetAttributeValue ("name")));
+
+          // @@@ Will leak! Should do proper refcounting.
+          var->IncRef ();
+
           csStringID idtype = xmltokens.Request( child->GetAttributeValue("type") );
           idtype -= 100;
           var->SetType( (iShaderVariable::VariableType) idtype);
@@ -252,30 +257,20 @@ bool csShaderGLAVP::Load(iDocumentNode* program)
             var->SetValue( v );
             break;
           }
-          // @@@ I'll blame Matze if this is bad :) /Anders Stenberg
-          var->IncRef (); 
-          variables.Put( csHashCompute(var->GetName()), var);
+          AddVariable (var);
         }
-#endif
         break;
       case XMLTOKEN_VARIABLEMAP:
-#if 0
         {
-          //create a varable<->register mapping
-          /*variablemapentry * map = new variablemapentry();
-          const char* varname = child->GetAttributeValue("variable");
-          map->name = new char[strlen(varname)+1];
-          memset(map->name, 0, strlen(varname)+1); 
-          memcpy(map->name, varname, strlen(varname));
+          variablemap.Push (variablemapentry ());
+          int i = variablemap.Length ()-1;
 
-          map->registernum = child->GetAttributeValueAsInt("register");
-          //compute the namehash
-          map->namehash = csHashCompute (varname);
+          variablemap[i].name = strings->Request (
+            child->GetAttributeValue("variable"));
 
-          //save it for later
-          variablemap.Push( map );*/
+          variablemap[i].registernum = 
+            child->GetAttributeValueAsInt("register");
         }
-#endif
         break;
       default:
         return false;

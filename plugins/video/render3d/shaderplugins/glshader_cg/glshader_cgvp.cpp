@@ -31,6 +31,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "iutil/document.h"
 #include "iutil/string.h"
+#include "iutil/strset.h"
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 #include "ivideo/render3d.h"
@@ -48,16 +49,14 @@ void csShaderGLCGVP::Activate(iShaderPass* current, csRenderMesh* mesh)
 {
   int i;
 
-#if 0
+  cgGLEnableProfile (cgGetProgramProfile (program));
+
   // set variables
   for(i = 0; i < variablemap.Length(); ++i)
   {
-    variablemapentry* e = (variablemapentry*)variablemap.Get(i);
-    if (!e->parameter)
+    if (!variablemap[i].parameter)
       continue;
-    iShaderVariable* lvar = GetVariable(e->namehash);
-    if(!lvar)
-      lvar = current->GetVariable(e->namehash);
+    iShaderVariable* lvar = GetVariable(variablemap[i].name);
 
     if(lvar)
     {
@@ -67,42 +66,54 @@ void csShaderGLCGVP::Activate(iShaderPass* current, csRenderMesh* mesh)
         {
           int intval;
           if(lvar->GetValue(intval))
-            cgGLSetParameter1f(e->parameter, (float)intval);
+            cgGLSetParameter1f(variablemap[i].parameter, (float)intval);
         }
         break;
       case iShaderVariable::FLOAT:
         {
           float fval;
           if(lvar->GetValue(fval))
-            cgGLSetParameter1f(e->parameter, (float)fval);
+            cgGLSetParameter1f(variablemap[i].parameter, (float)fval);
         }
         break;
       case iShaderVariable::VECTOR3:
         {
           csVector3 v3;
           if(lvar->GetValue(v3))
-            cgGLSetParameter3f(e->parameter, v3.x, v3.y, v3.z);
+            cgGLSetParameter3f(variablemap[i].parameter, v3.x, v3.y, v3.z);
         }
         break;
       case iShaderVariable::VECTOR4:
         {
           csVector4 v4;
           if(lvar->GetValue(v4))
-            cgGLSetParameter4f(e->parameter, v4.x, v4.y, v4.z, v4.w);
+            cgGLSetParameter4f(variablemap[i].parameter, v4.x, v4.y, v4.z, v4.w);
         }
         break;
       }
     }
   }
-#endif
+
+  /*csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+    object_reg, "crystalspace.renderer.stringset", iStringSet);
+  iShaderVariable* var = GetVariable (strings->Request ("STANDARD_LIGHT_0_POSITION"));
+  if (var)
+  {
+    CGparameter param = cgGetNamedParameter (program, "LightPos");
+    csVector4 blah;
+    var->GetValue (blah);
+    if (cgIsParameter(param))
+      cgGLSetParameter4f(param, blah.x, blah.y, blah.z, blah.w);
+  } else printf("Not found!\n");*/
 
   for(i = 0; i < matrixtrackers.Length(); ++i)
   {
-    matrixtrackerentry* e = (matrixtrackerentry*)matrixtrackers.Get(i);
-    cgGLSetStateMatrixParameter (e->parameter, e->matrix, e->modifier);
+    cgGLSetStateMatrixParameter (
+      matrixtrackers[i].parameter, 
+      matrixtrackers[i].matrix, 
+      matrixtrackers[i].modifier);
   }
 
-  cgGLEnableProfile (cgGetProgramProfile (program));
   cgGLBindProgram (program);
 }
 
@@ -163,8 +174,10 @@ bool csShaderGLCGVP::Load(iDocumentNode* program)
 
   BuildTokenHash();
 
-  csRef<iRender3D> r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
   csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY(object_reg, iShaderManager);
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+    object_reg, "crystalspace.renderer.stringset", iStringSet);
+
 
   csRef<iDocumentNode> variablesnode = program->GetNode("cgvp");
   if(variablesnode)
@@ -187,10 +200,14 @@ bool csShaderGLCGVP::Load(iDocumentNode* program)
         break;
       case XMLTOKEN_DECLARE:
         {
-#if 0
           //create a new variable
           csRef<iShaderVariable> var = 
-            shadermgr->CreateVariable (child->GetAttributeValue ("name"));
+            shadermgr->CreateVariable (
+            strings->Request(child->GetAttributeValue ("name")));
+
+          // @@@ Will leak! Should do proper refcounting.
+          var->IncRef ();
+
           csStringID idtype = xmltokens.Request( child->GetAttributeValue("type") );
           idtype -= 100;
           var->SetType( (iShaderVariable::VariableType) idtype);
@@ -212,32 +229,22 @@ bool csShaderGLCGVP::Load(iDocumentNode* program)
             var->SetValue( v );
             break;
           }
-          // @@@ I'll blame Matze if this is bad :) /Anders Stenberg
-          var->IncRef (); 
-          variables.Put( csHashCompute(var->GetName()), var);
-#endif
+          AddVariable (var);
         }
         break;
       case XMLTOKEN_VARIABLEMAP:
         {
-#if 0
-          //create a varable<->register mapping
-          variablemapentry * map = new variablemapentry();
-          const char* varname = child->GetAttributeValue("variable");
-          map->name = new char[strlen(varname)+1];
-          memset(map->name, 0, strlen(varname)+1); 
-          memcpy(map->name, varname, strlen(varname));
+          variablemap.Push (variablemapentry ());
+          int i = variablemap.Length ()-1;
+
+          variablemap[i].name = strings->Request (
+            child->GetAttributeValue("variable"));
 
           const char* cgvarname = child->GetAttributeValue("cgvar");
-          map->cgvarname = new char[strlen(cgvarname)+1];
-          memset(map->cgvarname, 0, strlen(cgvarname)+1); 
-          memcpy(map->cgvarname, cgvarname, strlen(cgvarname));
-          map->parameter = 0;
-          
-          map->namehash = csHashCompute(varname);
-          //save it for later
-          variablemap.Push( map );
-#endif
+          variablemap[i].cgvarname = new char[strlen(cgvarname)+1];
+          memset(variablemap[i].cgvarname, 0, strlen(cgvarname)+1); 
+          memcpy(variablemap[i].cgvarname, cgvarname, strlen(cgvarname));
+          variablemap[i].parameter = 0;
         }
         break;
       default:
@@ -255,22 +262,22 @@ bool csShaderGLCGVP::Prepare()
   if (!LoadProgramStringToGL(programstring))
     return false;
 
-#if 0
   for(int i = 0; i < variablemap.Length(); i++)
   {
-    variablemapentry* e = (variablemapentry*)variablemap.Get(i);
-    e->parameter = cgGetNamedParameter (program, e->cgvarname);
-    if (!e->parameter)
+    variablemap[i].parameter = cgGetNamedParameter (
+      program, variablemap[i].cgvarname);
+    if (!variablemap[i].parameter)
     {
       char msg[500];
-      sprintf (msg, "Variablemap warning: Variable '%s' not found in CG program.", e->cgvarname);
-      csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,"crystalspace.render3d.shader.glcg",
-        msg, 0);
+      sprintf (msg, 
+        "Variablemap warning: Variable '%s' not found in CG program.", 
+        variablemap[i].cgvarname);
+      csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
+        "crystalspace.render3d.shader.glcg", msg, 0);
     }
-    if (!cgIsParameterReferenced (e->parameter))
-      e->parameter = 0;
+    if (!cgIsParameterReferenced (variablemap[i].parameter))
+      variablemap[i].parameter = 0;
   }
-#endif
 
   CGparameter param = cgGetFirstLeafParameter (program, CG_SOURCE);
   while (param)
@@ -278,87 +285,87 @@ bool csShaderGLCGVP::Prepare()
     const char* binding = cgGetParameterSemantic (param);
     if (!strcmp (binding, "MV_MATRIX"))
     {
-      matrixtrackerentry * map = new matrixtrackerentry();
-      map->matrix = CG_GL_MODELVIEW_MATRIX;
-      map->modifier = CG_GL_MATRIX_IDENTITY;
-      map->parameter = param;
+      matrixtrackerentry map;
+      map.matrix = CG_GL_MODELVIEW_MATRIX;
+      map.modifier = CG_GL_MATRIX_IDENTITY;
+      map.parameter = param;
       matrixtrackers.Push (map);
     } else if (!strcmp (binding, "I_MV_MATRIX"))
     {
-      matrixtrackerentry * map = new matrixtrackerentry();
-      map->matrix = CG_GL_MODELVIEW_MATRIX;
-      map->modifier = CG_GL_MATRIX_INVERSE;
-      map->parameter = param;
+      matrixtrackerentry map;
+      map.matrix = CG_GL_MODELVIEW_MATRIX;
+      map.modifier = CG_GL_MATRIX_INVERSE;
+      map.parameter = param;
       matrixtrackers.Push (map);
     } else if (!strcmp (binding, "T_MV_MATRIX"))
     {
-      matrixtrackerentry * map = new matrixtrackerentry();
-      map->matrix = CG_GL_MODELVIEW_MATRIX;
-      map->modifier = CG_GL_MATRIX_TRANSPOSE;
-      map->parameter = param;
+      matrixtrackerentry map;
+      map.matrix = CG_GL_MODELVIEW_MATRIX;
+      map.modifier = CG_GL_MATRIX_TRANSPOSE;
+      map.parameter = param;
       matrixtrackers.Push (map);
     } else if (!strcmp (binding, "IT_MV_MATRIX"))
     {
-      matrixtrackerentry * map = new matrixtrackerentry();
-      map->matrix = CG_GL_MODELVIEW_MATRIX;
-      map->modifier = CG_GL_MATRIX_INVERSE_TRANSPOSE;
-      map->parameter = param;
+      matrixtrackerentry map;
+      map.matrix = CG_GL_MODELVIEW_MATRIX;
+      map.modifier = CG_GL_MATRIX_INVERSE_TRANSPOSE;
+      map.parameter = param;
       matrixtrackers.Push (map);
     } else if (!strcmp (binding, "MVP_MATRIX"))
     {
-      matrixtrackerentry * map = new matrixtrackerentry();
-      map->matrix = CG_GL_MODELVIEW_PROJECTION_MATRIX;
-      map->modifier = CG_GL_MATRIX_IDENTITY;
-      map->parameter = param;
+      matrixtrackerentry map;
+      map.matrix = CG_GL_MODELVIEW_PROJECTION_MATRIX;
+      map.modifier = CG_GL_MATRIX_IDENTITY;
+      map.parameter = param;
       matrixtrackers.Push (map);
     } else if (!strcmp (binding, "I_MVP_MATRIX"))
     {
-      matrixtrackerentry * map = new matrixtrackerentry();
-      map->matrix = CG_GL_MODELVIEW_PROJECTION_MATRIX;
-      map->modifier = CG_GL_MATRIX_INVERSE;
-      map->parameter = param;
+      matrixtrackerentry map;
+      map.matrix = CG_GL_MODELVIEW_PROJECTION_MATRIX;
+      map.modifier = CG_GL_MATRIX_INVERSE;
+      map.parameter = param;
       matrixtrackers.Push (map);
     } else if (!strcmp (binding, "T_MVP_MATRIX"))
     {
-      matrixtrackerentry * map = new matrixtrackerentry();
-      map->matrix = CG_GL_MODELVIEW_PROJECTION_MATRIX;
-      map->modifier = CG_GL_MATRIX_TRANSPOSE;
-      map->parameter = param;
+      matrixtrackerentry map;
+      map.matrix = CG_GL_MODELVIEW_PROJECTION_MATRIX;
+      map.modifier = CG_GL_MATRIX_TRANSPOSE;
+      map.parameter = param;
       matrixtrackers.Push (map);
     } else if (!strcmp (binding, "IT_MVP_MATRIX"))
     {
-      matrixtrackerentry * map = new matrixtrackerentry();
-      map->matrix = CG_GL_MODELVIEW_PROJECTION_MATRIX;
-      map->modifier = CG_GL_MATRIX_INVERSE_TRANSPOSE;
-      map->parameter = param;
+      matrixtrackerentry map;
+      map.matrix = CG_GL_MODELVIEW_PROJECTION_MATRIX;
+      map.modifier = CG_GL_MATRIX_INVERSE_TRANSPOSE;
+      map.parameter = param;
       matrixtrackers.Push (map);
     } else if (!strcmp (binding, "P_MATRIX"))
     {
-      matrixtrackerentry * map = new matrixtrackerentry();
-      map->matrix = CG_GL_PROJECTION_MATRIX;
-      map->modifier = CG_GL_MATRIX_IDENTITY;
-      map->parameter = param;
+      matrixtrackerentry map;
+      map.matrix = CG_GL_PROJECTION_MATRIX;
+      map.modifier = CG_GL_MATRIX_IDENTITY;
+      map.parameter = param;
       matrixtrackers.Push (map);
     } else if (!strcmp (binding, "I_P_MATRIX"))
     {
-      matrixtrackerentry * map = new matrixtrackerentry();
-      map->matrix = CG_GL_PROJECTION_MATRIX;
-      map->modifier = CG_GL_MATRIX_INVERSE;
-      map->parameter = param;
+      matrixtrackerentry map;
+      map.matrix = CG_GL_PROJECTION_MATRIX;
+      map.modifier = CG_GL_MATRIX_INVERSE;
+      map.parameter = param;
       matrixtrackers.Push (map);
     } else if (!strcmp (binding, "T_P_MATRIX"))
     {
-      matrixtrackerentry * map = new matrixtrackerentry();
-      map->matrix = CG_GL_PROJECTION_MATRIX;
-      map->modifier = CG_GL_MATRIX_TRANSPOSE;
-      map->parameter = param;
+      matrixtrackerentry map;
+      map.matrix = CG_GL_PROJECTION_MATRIX;
+      map.modifier = CG_GL_MATRIX_TRANSPOSE;
+      map.parameter = param;
       matrixtrackers.Push (map);
     } else if (!strcmp (binding, "IT_P_MATRIX"))
     {
-      matrixtrackerentry * map = new matrixtrackerentry();
-      map->matrix = CG_GL_PROJECTION_MATRIX;
-      map->modifier = CG_GL_MATRIX_INVERSE_TRANSPOSE;
-      map->parameter = param;
+      matrixtrackerentry map;
+      map.matrix = CG_GL_PROJECTION_MATRIX;
+      map.modifier = CG_GL_MATRIX_INVERSE_TRANSPOSE;
+      map.parameter = param;
       matrixtrackers.Push (map);
     }
     
