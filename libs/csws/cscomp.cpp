@@ -1355,7 +1355,7 @@ void csComponent::SetState (int mask, bool enable)
 
   // If our focused status is set, update parent `focused' field
   if ((mask & CSS_FOCUSED)
-   && enabled
+   && enable
    && parent)
     parent->focused = this;
 
