@@ -19,6 +19,8 @@ The history order has been reversed so that new features are at the top.
 	  require a clear of the Z-buffer.
 	- Started preparation work for stencil buffer support in OpenGL
 	  renderer.
+	- Added csCubicSpline to csgeom. This is going to be used for an
+	  algo to calculate a smooth path between points.
 	- Wouter Wijngaards did the following update:
 	  The isometric sprites now use zbuffer TEST mode when the sprite is
 	  transparent. This removes some glitches in drawing overlapping
