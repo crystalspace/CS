@@ -235,20 +235,20 @@ void ddgTBinTree::calculateVariance(ddgTriIndex tindex)
 		int hmin, hmax, error;
 		if (first(tindex) < _mesh->leafTriNo())
 		{
-			hmin = int (ddgUtil::min(_rawMinVal[first(tindex)],_rawMinVal[second(tindex)]));
-			hmax = int (ddgUtil::max(_rawMaxVal[first(tindex)],_rawMaxVal[second(tindex)]));
-			error = int (ddgUtil::max(_treeError[first(tindex)],_treeError[second(tindex)]));
+			hmin = (int)ddgUtil::min(_rawMinVal[first(tindex)],_rawMinVal[second(tindex)]);
+			hmax = (int)ddgUtil::max(_rawMaxVal[first(tindex)],_rawMaxVal[second(tindex)]);
+			error = (int)ddgUtil::max(_treeError[first(tindex)],_treeError[second(tindex)]);
 		}
 		else // Leaf node.
 		{
-			hmin = int (ddgUtil::min(_rawHeight[first(tindex)],_rawHeight[second(tindex)]));
-			hmax = int (ddgUtil::max(_rawHeight[first(tindex)],_rawHeight[second(tindex)]));
+			hmin = (int)ddgUtil::min(_rawHeight[first(tindex)],_rawHeight[second(tindex)]);
+			hmax = (int)ddgUtil::max(_rawHeight[first(tindex)],_rawHeight[second(tindex)]);
 			error = 0;
 		}
 
 		_rawMinVal[tindex] = (short)ddgUtil::min(_rawHeight[parent(tindex)],hmin);
 		_rawMaxVal[tindex] = (short)ddgUtil::max(_rawHeight[parent(tindex)],hmax);
-	    _treeError[tindex] = error+(short)ddgUtil::abs(((_rawHeight[_stri[tindex].v0]-_rawHeight[_stri[tindex].v1])/2)-_rawHeight[tindex]);
+	    _treeError[tindex] = (unsigned short)(error+ddgUtil::abs(((_rawHeight[_stri[tindex].v0]-_rawHeight[_stri[tindex].v1])/2)-_rawHeight[tindex]));
 	}
 }
 

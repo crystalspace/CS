@@ -198,10 +198,12 @@ void ddgContext::itransformation( ddgMatrix4 *matinv)
 
 void ddgContext::updateClippingInfo(void)
 {
-	//ddgPlane3 *_frustrum3dx = new ddgPlane3[6];
-
-//	extractPlanesFromMatrix(_frustrum3d);
+	ddgPlane3 *_frustrum3dx = new ddgPlane3[6];
+#ifdef DDG
+	extractPlanesFromMatrix(_frustrum3d);
+#else
 	extractPlanes(_frustrum3d);
+#endif
 	// Generally we want to clip against the left/right top/bottom and near planes.
 	// Far is handled by the _farClipSQ and provides a curved clip plane.
 	// When our up vector is near to parallel with the y/height axis
@@ -306,24 +308,26 @@ void ddgContext::extractPlanes( ddgPlane3 planes[6])
 	ddgVector3 f = _forward;
 	f.multiply(sfar);
 
-	ddgVector3 t;
+	ddgVector3 t, pn, pf;
+	pn = p+n;
+	pf = p+f;
 	t = u - r; t.multiply(snear);
-	c[0] = p + n + t;	// Near Top Left
-	c[3] = p + n - t;	// Near Bottom Right
+	c[0] = pn + t;	// Near Top Left
+	c[3] = pn - t;	// Near Bottom Right
 	t = u + r; t.multiply(snear);
-	c[1] = p + n + t;	// Near Top Right
-	c[2] = p + n - t;	// Near Bottom Left
+	c[1] = pn + t;	// Near Top Right
+	c[2] = pn - t;	// Near Bottom Left
 	
 	t = u - r; t.multiply(sfar);
-	c[4] = p + f + t;	// Far Top Left
-	c[7] = p + f - t;	// Far Bottom Right
+	c[4] = pf + t;	// Far Top Left
+	c[7] = pf - t;	// Far Bottom Right
 
 	t = u + r; t.multiply(sfar);
-	c[5] = p + f + t;	// Far Top Right
-	c[6] = p + f - t;	// Far Bottom Left
+	c[5] = pf + t;	// Far Top Right
+	c[6] = pf - t;	// Far Bottom Left
 	// Find the plane vectors for each side of the frustrum.
 
-	ddgVector3 pn, v1, v2;
+	ddgVector3 pnormal, v1, v2;
 	int i;
 
 	// Points which can be used to create plane equations.
@@ -332,8 +336,8 @@ void ddgContext::extractPlanes( ddgPlane3 planes[6])
 	{
 		v1 = c[pv[i][1]] - c[pv[i][0]];
 		v2 = c[pv[i][2]] - c[pv[i][0]];
-		pn.cross(&v1 , &v2);
-		planes[i].set(pn,-1 * pn.dot(p));
+		pnormal.cross(&v1 , &v2);
+		planes[i].set(pnormal,-1 * pnormal.dot(p));
 		planes[i].normalize();
 	}
 
