@@ -1,0 +1,73 @@
+bin/csupdate.py CVS Update Python script for Crystal Space.
+Copyright(c) 1999 by Michael Dale Long under the terms of 
+the GNU Lesser General Public License.  See COPYING for details.
+
+I wrote this script to ease the CVS update/build cycle, and also to create a
+way to cut out the extra junk that CVS always spits out when it updates.  This
+script 'memorizes' what files you never change, and after so many updates it 
+doesn't include them in the output or the log file it generates.  This allows
+you to see what files are in the source tree that are significant, and letting
+know when something that doesn't normally change has changed.
+
+Relevant files:
+bin/csupdate.py - The script itself
+bin/cvslog.py - The script's memory file
+cvs.log - The log file of CVS transactions
+
+That last two are automatically generated and overwritten everytime you update
+from CVS with the script.
+
+<SCRIPTING PLUG>
+I also wrote this to take the time to learn a little bit about how Python 
+works, since we're planning on using it for CrystalScript.  I must say that
+after this experience Python definitely rocks!  Check out 
+http://www.python.org/ for more information on this excellent Open Source/
+Cross Platform language.
+</SCRIPTING PLUG>
+
+Now then, where was I?  Oh yes, how to use csupdate.py.
+Usage:  bin/csupdate.py [OPTIONS]"
+Options:"
+-b, --build       Execute bin/build.pl after update is completed"
+-h, --help        Display this help screen"
+-v, --version     Display the version number"
+-V, --verbose     Print CVS error messages"
+
+bin/csupdate.py expects to be run from the root CS directory.  Also,
+the --build and --verbose options may make use of UNIX specific
+features.  Let me know if you have troubles/successes on other 
+platforms.  Patches are welcome, too.
+
+The --version and --help options are obvious information options.  The script
+doesn't do anything else if they are specified.
+
+The --verbose option tell CVS to print out error messages.  Specifically, it
+doesn't redirect stderr to /dev/null (that's the UNIX dependent part).
+
+The --build option executes another script to build CS.  Very nice for 
+updating and compiling in one fell swoop, although for really automated 
+builds be sure to change the line
+$Make="make all";
+to
+$Make="make -k all";
+so errors don't stop the build process.  Check the other options there to see
+if they're to your liking as well.  A text build.log and 
+platform-processor.html (e.g. linux-i386.html) file are created to log the 
+build process, for your convenience.  Oh yeah, it's a Perl script, so you'll
+need Perl installed to make it work.
+
+Finally, here are some bash aliases I use to make my CS life easier:
+
+alias update-cs="cd <wherever CS is> ; ./bin/csupdate.py"
+alias build-cs="cd <wherever CS is> ; ./bin/build.pl"
+alias update-build-cs="update-cs --build"
+
+Todo:
+
+* Add a --silence option?
+* Add a --no-log option?
+These might come in handy in some case, I don't know.
+
+-ML
+Created 12/20/1999
+Updated 12/23/1999
