@@ -60,7 +60,17 @@ struct iWin32Assistant : public iBase
   virtual bool SetHCursor (HCURSOR cursor) = 0;
   /// Disable the console window (if present)
   virtual void DisableConsole () = 0;
-  /// Display a nice message box
+  /**
+   * Display a nice message box.
+   * \param window Parent window of the message box.
+   * \param type Type of the message box, one of CS_ALERT_*.
+   * \param title Title used for the message box.
+   * \param okMsg Label of the "OK" button. 0 means default.
+   * \param msg Message. Can contain cs_snprintf()-like format
+   *  specifiers.
+   * \param args Message formatting arguments
+   * \sa CS_ALERT_ERROR
+   */
   virtual void AlertV (HWND window, int type, const char* title, 
     const char* okMsg, const char* msg, va_list args) = 0;
   /**

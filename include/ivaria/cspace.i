@@ -81,7 +81,13 @@
   and there will be a "X" function in the scripting language available.
 */
 
+//#define USE_DIRECTORS
+
+#ifdef USE_DIRECTORS
+%module(directors="1") cspace
+#else
 %module cspace
+#endif
 
 // Ignored macro's.
 #define CS_STRUCT_ALIGN_4BYTE_BEGIN

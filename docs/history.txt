@@ -14,6 +14,9 @@ chronological order.
 	  code paths.  This was particularly obvious if the user specified
 	  --without-python, in which case $cs_cv_python would incorrectly
 	  resolve to the empty string rather than the literal "no".
+	- res made some small documentation tweaks.
+	- res started to play with SWIG directors. Doesn't work at all yet, 
+	  tho.
 8-Mar-2005
 	- Eric Sunshine renamed the following configuration control macros
 	  (most of which are emitted to csconfig.h by configure.ac) to improve
