@@ -32,6 +32,7 @@ DRIVERS+=cs2d/openglx/empty
 
 # uncomment the following to build Glide stuff
 #DRIVERS+=cs3d/glide2 cs2d/unxglide2
+#DRIVERS+=cs3d/glide3 cs2d/unxglide3
 
 #---------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
