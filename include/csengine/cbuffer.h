@@ -182,7 +182,7 @@ public:
   /// Create a new c-buffer with the given dimensions.
   csCBuffer (int sx, int ex, int n_lines);
   /// Destroy the c-buffer.
-  virtual ~csCBuffer ();
+  ~csCBuffer ();
 
   /// Initialize the c-buffer to empty.
   void Initialize ();
