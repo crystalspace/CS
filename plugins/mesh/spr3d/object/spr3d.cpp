@@ -850,7 +850,10 @@ void csSprite3DMeshObject::GetObjectBoundingBox (csBox3& b, int /*type*/)
 
 void csSprite3DMeshObject::GetRadius (csVector3& rad, csVector3& cent)
 {
-  csVector3 r;
+  csVector3 r; csBox3 bbox;
+  GetObjectBoundingBox(bbox);
+  cent = bbox.GetCenter();
+
   if (skeleton_state)
   {
     skeleton_state->ComputeSqRadius (csTransform (), r,
@@ -865,7 +868,6 @@ void csSprite3DMeshObject::GetRadius (csVector3& rad, csVector3& cent)
     cframe->GetRadius (r);
   }
   rad =  r;
-  cent = csVector3(0); //@@@TODO: get real center...MHV
 }
 
 void csSprite3DMeshObject::SetupObject ()
@@ -1550,7 +1552,9 @@ bool csSprite3DMeshObject::HitBeamObject (const csVector3& start,
   {
     csTriangle& tr = tris[i];
     if (csIntersect3::IntersectTriangle (verts[tr.a], verts[tr.b],
-    	verts[tr.c], seg, isect))
+    	verts[tr.c], seg, isect) ||
+	csIntersect3::IntersectTriangle (verts[tr.c], verts[tr.b],
+    	verts[tr.a], seg, isect))
     {
       if (pr)
       {

@@ -220,7 +220,7 @@ void csBugPlug::HideSpider (iCamera* camera)
 	}
 	break;
       case DEBUGCMD_MOUSE1:
-        MouseButton1 (camera);
+        MouseButton3 (camera); //@@@ Temporary hack to make bugplug cross platform. MHV.
 	break;
       case DEBUGCMD_MOUSE2:
         MouseButton2 (camera);
