@@ -414,7 +414,7 @@ public:
       scfParent->AddConditionMeshClick (mesh);
     }
     virtual void AddConditionLightChange (iLight *whichlight, 
-					  int oper,csColor& col)
+					  int oper, const csColor& col)
     {
       scfParent->AddConditionLightChange(whichlight,oper,col);
     }

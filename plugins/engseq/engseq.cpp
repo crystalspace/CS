@@ -1221,7 +1221,7 @@ private:
 
 public:
   csTriggerLightCallback (csSequenceTrigger* trigger,
-	int oper, csColor& col)
+	int oper, const csColor& col)
   {
     SCF_CONSTRUCT_IBASE (NULL);
     csTriggerLightCallback::trigger = trigger;
