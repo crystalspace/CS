@@ -397,8 +397,11 @@ csPolygon3D::~csPolygon3D ()
     if (thing) thing->RemovePortalPolygon (this);
   }
 
-  while (light_info.lightpatches)
-    csEngine::current_engine->lightpatch_pool->Free (light_info.lightpatches);
+  if (thing)
+  {
+    while (light_info.lightpatches)
+      thing->thing_type->lightpatch_pool->Free (light_info.lightpatches);
+  }
   VectorArray->DecRef ();
 #ifdef DO_HW_UVZ
   if (uvz) delete[] uvz;
@@ -682,10 +685,7 @@ void csPolygon3D::eiPolygon3D::CreatePlane (
 
 bool csPolygon3D::eiPolygon3D::SetPlane (const char *iName)
 {
-  csRef<iThingEnvironment> te (SCF_QUERY_INTERFACE (
-      csEngine::current_engine->GetThingType (),
-      iThingEnvironment));
-  iPolyTxtPlane *ppl = te->FindPolyTxtPlane (iName);
+  iPolyTxtPlane *ppl = scfParent->thing->thing_type->FindPolyTxtPlane (iName);
   if (!ppl) return false;
   scfParent->SetTextureSpace (ppl->GetPrivateObject ());
   return true;
@@ -2080,7 +2080,7 @@ void csPolygon3D::FillLightMapDynamic (csFrustumView &lview)
 
   // We are working for a dynamic light. In this case we create
   // a light patch for this polygon.
-  csLightPatch *lp = csEngine::current_engine->lightpatch_pool->Alloc ();
+  csLightPatch *lp = thing->thing_type->lightpatch_pool->Alloc ();
   AddLightpatch (lp);
 
   csLightingPolyTexQueue *lptq = (csLightingPolyTexQueue *)

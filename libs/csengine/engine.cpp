@@ -33,7 +33,6 @@
 #include "csengine/material.h"
 #include "csengine/lghtmap.h"
 #include "csengine/stats.h"
-#include "csengine/lppool.h"
 #include "csengine/region.h"
 #include "csgeom/fastsqrt.h"
 #include "csgeom/sphere.h"
@@ -63,7 +62,6 @@
 #include "ivaria/engseq.h"
 #include "iutil/plugin.h"
 #include "iutil/virtclk.h"
-#include "csgeom/polypool.h"
 #include "csengine/polygon.h"
 #include "csengine/pol2d.h"
 #include "csengine/radiosty.h"
@@ -622,7 +620,6 @@ csEngine::csEngine (iBase *iParent) :
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
   DG_TYPE (&scfiObject, "csEngine");
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
-  render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory ());
   thing_type = new csThingObjectType (NULL);
   rad_debug = NULL;
   first_dyn_lights = NULL;
@@ -648,8 +645,6 @@ csEngine::csEngine (iBase *iParent) :
   textures = new csTextureList ();
   materials = new csMaterialList ();
   shared_variables = new csSharedVariableList();
-
-  lightpatch_pool = new csLightPatchPool ();
 
   BuildSqrtTable ();
   resize = false;
@@ -684,11 +679,9 @@ csEngine::~csEngine ()
 
   render_priorities.DeleteAll ();
 
-  delete render_pol2d_pool;
   delete rad_debug;
   delete materials;
   delete textures;
-  delete lightpatch_pool;
   delete shared_variables;
 }
 
@@ -856,15 +849,9 @@ void csEngine::DeleteAll ()
   csRef<iThingEnvironment> te (
   	SCF_QUERY_INTERFACE (thing_type, iThingEnvironment));
   CS_ASSERT (te != NULL);
-  te->ClearPolyTxtPlanes ();
-  te->ClearCurveTemplates ();
+  te->Clear ();
 
   render_context = NULL;
-
-  delete render_pol2d_pool;
-  render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory ());
-  delete lightpatch_pool;
-  lightpatch_pool = new csLightPatchPool ();
 
   // Clear all regions.
   region = NULL;

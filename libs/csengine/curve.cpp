@@ -160,7 +160,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 unsigned long csCurve:: LastCurveID = 0;
 
-csCurve::csCurve (csCurveTemplate *parent_tmpl) :
+csCurve::csCurve (csCurveTemplate *parent_tmpl, csThingObjectType* thing_type) :
   csObject(),
   CurveTemplate(parent_tmpl),
   LightPatches(NULL),
@@ -176,6 +176,8 @@ csCurve::csCurve (csCurveTemplate *parent_tmpl) :
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
 #endif // CS_USE_NEW_RENDERER
 
+  csCurve::thing_type = thing_type;
+
   CurveID = LastCurveID++;
 #ifndef CS_USE_NEW_RENDERER
   vbufmgr = NULL;
@@ -189,7 +191,7 @@ csCurve::csCurve (csCurveTemplate *parent_tmpl) :
 csCurve::~csCurve ()
 {
   while (LightPatches)
-    csEngine::current_engine->lightpatch_pool->Free (LightPatches);
+    thing_type->lightpatch_pool->Free (LightPatches);
   delete O2W;
   delete LightMap;
   delete[] uv2World;
@@ -204,7 +206,7 @@ void csCurve::SetupVertexBuffer ()
 {
   if (!vbuf)
   {
-    vbufmgr = csEngine::current_engine->G3D->GetVertexBufferManager ();
+    vbufmgr = thing_type->G3D->GetVertexBufferManager ();
 
     // @@@ priority should be a parameter.
     vbuf = vbufmgr->CreateBuffer (2);
@@ -540,7 +542,7 @@ void csCurve::CalculateLightingDynamic (csFrustumView *lview)
 
   // We are working for a dynamic light. In this case we create
   // a light patch for this polygon.
-  csLightPatch *lp = csEngine::current_engine->lightpatch_pool->Alloc ();
+  csLightPatch *lp = thing_type->lightpatch_pool->Alloc ();
 
   AddLightPatch (lp);
 
@@ -608,7 +610,7 @@ bool csCurve::ReadFromCache (iFile* file)
       CURVE_LM_SIZE * csLightMap::lightcell_size,
       this,
       false,
-      csEngine::current_engine);
+      thing_type->engine);
   LightmapUpToDate = true;
   return true;
 }
@@ -620,9 +622,9 @@ bool csCurve::WriteToCache (iFile* file)
   {
     LightmapUpToDate = true;
     if (
-      csEngine::current_engine->GetLightingCacheMode ()
+      thing_type->engine->GetLightingCacheMode ()
         & CS_ENGINE_CACHE_WRITE)
-      LightMap->Cache (file, NULL, this, csEngine::current_engine);
+      LightMap->Cache (file, NULL, this, thing_type->engine);
   }
 
   return true;
@@ -870,11 +872,12 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csCurveTemplate::CurveTemplate)
   SCF_IMPLEMENTS_INTERFACE(iCurveTemplate)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csCurveTemplate::csCurveTemplate () :
+csCurveTemplate::csCurveTemplate (csThingObjectType* thing_type) :
   csObject()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCurveTemplate);
   csEngine::current_engine->AddToCurrentRegion (this);
+  csCurveTemplate::thing_type = thing_type;
 }
 
 csCurveTemplate::~csCurveTemplate ()
@@ -993,8 +996,8 @@ void csBezierCurve::GetObjectBoundingBox (csBox3 &bbox)
   bbox = object_bbox;
 }
 
-csBezierCurve::csBezierCurve (csBezierTemplate *parent_tmpl) :
-  csCurve(parent_tmpl)
+csBezierCurve::csBezierCurve (csBezierTemplate *parent_tmpl,
+	csThingObjectType* thing_type) : csCurve(parent_tmpl, thing_type)
 {
   int i, j;
   for (i = 0; i < 3; i++)
@@ -1072,8 +1075,8 @@ void csBezierCurve::HardTransform (const csReversibleTransform &trans)
 }
 
 //------------------------------------------------------------------
-csBezierTemplate::csBezierTemplate () :
-  csCurveTemplate()
+csBezierTemplate::csBezierTemplate (csThingObjectType* thing_type) :
+  csCurveTemplate(thing_type)
 {
   int i;
   for (i = 0; i < 9; i++) ver_id[i] = 0;
@@ -1096,7 +1099,7 @@ int csBezierTemplate::GetVertexCount ()
 
 csCurve *csBezierTemplate::MakeCurve ()
 {
-  csBezierCurve *p = new csBezierCurve (this);
+  csBezierCurve *p = new csBezierCurve (this, thing_type);
   p->SetMaterial (Material);
   return p;
 }

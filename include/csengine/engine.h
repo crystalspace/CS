@@ -287,10 +287,6 @@ public:
   static iEngine* current_iengine;
   /// Need to render using newradiosity?
   static bool use_new_radiosity;
-  /// An object pool for 2D polygons used by the rendering process.
-  csPoly2DPool* render_pol2d_pool;
-  /// An object pool for lightpatches.
-  csLightPatchPool* lightpatch_pool;
   /// The 3D driver
   csRef<iGraphics3D> G3D;
   /// The 2D driver

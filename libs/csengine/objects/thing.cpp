@@ -23,14 +23,14 @@
 #include "csengine/polytmap.h"
 #include "csengine/pol2d.h"
 #include "csengine/polytext.h"
-#include "csengine/light.h"
-#include "csengine/engine.h"
-#include "csengine/stats.h"
-#include "csengine/sector.h"
+#include "csengine/lppool.h"
+#include "csgeom/polypool.h"
+#include "iengine/light.h"
+#include "iengine/engine.h"
+#include "iengine/sector.h"
 #include "csengine/curve.h"
-#include "csengine/texture.h"
-#include "csengine/material.h"
-#include "csengine/meshobj.h"
+#include "iengine/material.h"
+#include "iengine/mesh.h"
 #include "csgeom/sphere.h"
 #include "csgeom/math3d.h"
 #include "csutil/csstring.h"
@@ -53,9 +53,37 @@
 #include "qint.h"
 #include "qsqrt.h"
 #include "ivideo/graph3d.h"
+#include "ivaria/reporter.h"
 
 
 //---------------------------------------------------------------------------
+
+static void Warn (iObjectRegistry* object_reg, const char *description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+
+  csRef<iReporter> Reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+
+  if (Reporter)
+  {
+    Reporter->ReportV (
+        CS_REPORTER_SEVERITY_WARNING,
+        "crystalspace.engine.warning",
+        description,
+        arg);
+  }
+  else
+  {
+    csPrintfV (description, arg);
+    csPrintf ("\n");
+  }
+
+  va_end (arg);
+}
+
+//---------------------------------------------------------------------------
+
 SCF_IMPLEMENT_IBASE_EXT(csThing)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iThingState)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iLightingInfo)
@@ -101,11 +129,13 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 int csThing:: last_thing_id = 0;
 
-csThing::csThing (iBase *parent) :
+csThing::csThing (iBase *parent, csThingObjectType* thing_type) :
   csObject(parent),
   polygons(64, 64),
   curves(16, 16)
 {
+  csThing::thing_type = thing_type;
+
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiThingState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
@@ -1133,7 +1163,7 @@ void csThing::HardTransform (const csReversibleTransform &t)
       // This plane is potentially shared. We have to make a duplicate
       // and modify all polygons to use this one. Note that this will
       // mean that potentially two planes exist with the same name.
-      csRef<iPolyTxtPlane> new_pl (csEngine::current_engine->thing_type->
+      csRef<iPolyTxtPlane> new_pl (thing_type->
         CreatePolyTxtPlane (pl->QueryObject ()->GetName ()));
       csMatrix3 m;
       csVector3 v;
@@ -1326,8 +1356,6 @@ void csThing::DrawOnePolygon (
     d->GetFirstFogInfo ()->outgoing_plane = p->GetPlane ()->GetCameraPlane ();
   }
 
-  Stats::polygons_drawn++;
-
   csPortal *po = p->GetPortal ();
   if (csSector::do_portals && po)
   {
@@ -1393,7 +1421,7 @@ void csThing::DrawPolygonArray (
   csVector3 *verts;
   int num_verts;
   int i;
-  csPoly2DPool *render_pool = csEngine::current_engine->render_pol2d_pool;
+  csPoly2DPool *render_pool = thing_type->render_pol2d_pool;
   csPolygon2D *clip;
   iCamera *icam = d->GetCamera ();
   const csReversibleTransform &camtrans = icam->GetTransform ();
@@ -1465,7 +1493,7 @@ void csThing::PreparePolygonBuffer ()
 {
   if (polybuf) return ;
 
-  iVertexBufferManager *vbufmgr = csEngine::current_engine->G3D->
+  iVertexBufferManager *vbufmgr = thing_type->G3D->
     GetVertexBufferManager ();
   polybuf = vbufmgr->CreatePolygonBuffer ();
   polybuf->SetVertexArray (obj_verts, num_vertices);
@@ -2356,7 +2384,8 @@ bool csThing::DrawCurves (
     mesh.use_vertex_color = gouraud;
     if (mesh.mat_handle == NULL)
     {
-      csEngine::current_engine->Warn ("Warning! Curve without material!");
+      // @@@ Use other Warn!!!
+      Warn (thing_type->object_reg, "Warning! Curve without material!");
       continue;
     }
 
@@ -2482,7 +2511,6 @@ bool csThing::Draw (iRenderView *rview, iMovable *movable, csZBufMode zMode)
 
   draw_busy++;
 
-  Stats::polygons_considered += polygons.Length ();
   DrawCurves (rview, movable, zMode);
 
   if (flags.Check (CS_THING_FASTMESH))
@@ -2520,14 +2548,13 @@ bool csThing::DrawFoggy (iRenderView *d, iMovable *)
   csVector3 *verts;
   int num_verts;
   int i;
-  csPoly2DPool *render_pool = csEngine::current_engine->render_pol2d_pool;
+  csPoly2DPool *render_pool = thing_type->render_pol2d_pool;
   csPolygon2D *clip;
 
   // @@@ Wouldn't it be nice if we checked all vertices against the Z plane?
   {
     csVector2 orig_triangle[3];
     d->GetGraphics3D ()->OpenFogObject (GetID (), &GetFog ());
-    Stats::polygons_considered += polygons.Length ();
 
     icam->SetMirrored (!icam->IsMirrored ());
     for (i = 0; i < polygons.Length (); i++)
@@ -2563,8 +2590,6 @@ bool csThing::DrawFoggy (iRenderView *d, iMovable *)
         clip->ClipAgainst (d->GetClipper ()))
       {
         p->GetPlane ()->WorldToCamera (camtrans, verts[0]);
-
-        Stats::polygons_drawn++;
 
         clip->AddFogPolygon (
             d->GetGraphics3D (),
@@ -2612,8 +2637,6 @@ bool csThing::DrawFoggy (iRenderView *d, iMovable *)
         clip->ClipAgainst (d->GetClipper ()))
       {
         p->GetPlane ()->WorldToCamera (camtrans, verts[0]);
-
-        Stats::polygons_drawn++;
 
         clip->AddFogPolygon (
             d->GetGraphics3D (),
@@ -2950,7 +2973,7 @@ iMeshObjectFactory *csThing::MeshObject::GetFactory () const
 //---------------------------------------------------------------------------
 csPtr<iMeshObject> csThing::MeshObjectFactory::NewInstance ()
 {
-  csThing *thing = new csThing (scfParent);
+  csThing *thing = new csThing (scfParent, scfParent->thing_type);
   thing->MergeTemplate (&(scfParent->scfiThingState), NULL);
   return csPtr<iMeshObject> (&thing->scfiMeshObject);
 }
@@ -2978,23 +3001,44 @@ csThingObjectType::csThingObjectType (
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiThingEnvironment);
+  lightpatch_pool = NULL;
+  render_pol2d_pool = NULL;
 }
 
 csThingObjectType::~csThingObjectType ()
 {
   ClearPolyTxtPlanes ();
   ClearCurveTemplates ();
+  delete render_pol2d_pool;
+  delete lightpatch_pool;
 }
 
 bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
 {
   csThingObjectType::object_reg = object_reg;
+  csRef<iEngine> e = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine = e;	// We don't want a real ref here to avoid circular refs.
+  csRef<iGraphics3D> g = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  G3D = g;
+
+  lightpatch_pool = new csLightPatchPool ();
+  render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory ());
   return true;
+}
+
+void csThingObjectType::Clear ()
+{
+  ClearPolyTxtPlanes ();
+  ClearCurveTemplates ();
+  delete lightpatch_pool;
+  delete render_pol2d_pool;
+  lightpatch_pool = new csLightPatchPool ();
+  render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory ());
 }
 
 csPtr<iMeshObjectFactory> csThingObjectType::NewFactory ()
 {
-  csThing *cm = new csThing (this);
+  csThing *cm = new csThing (this, this);
   csRef<iMeshObjectFactory> ifact (SCF_QUERY_INTERFACE (
       cm, iMeshObjectFactory));
   cm->DecRef ();
@@ -3020,7 +3064,7 @@ iPolyTxtPlane *csThingObjectType::FindPolyTxtPlane (const char *iName)
 
 csPtr<iCurveTemplate> csThingObjectType::CreateBezierTemplate (const char *name)
 {
-  csBezierTemplate *ptemplate = new csBezierTemplate ();
+  csBezierTemplate *ptemplate = new csBezierTemplate (this);
   if (name) ptemplate->SetName (name);
   curve_templates.Push (ptemplate);
   return SCF_QUERY_INTERFACE (ptemplate, iCurveTemplate);

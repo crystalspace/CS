@@ -408,15 +408,19 @@ csDynLight::csDynLight (
 
 csDynLight::~csDynLight ()
 {
+  // @@@ VERY DIRTY!
+  csThingObjectType* t = (csThingObjectType*)csEngine::current_engine->GetThingType ();
   while (lightpatches)
-    csEngine::current_engine->lightpatch_pool->Free (lightpatches);
+    t->lightpatch_pool->Free (lightpatches);
   //csEngine::current_engine->RemoveDynLight (this);
 }
 
 void csDynLight::Setup ()
 {
+  // @@@ VERY DIRTY!
+  csThingObjectType* t = (csThingObjectType*)csEngine::current_engine->GetThingType ();
   while (lightpatches)
-    csEngine::current_engine->lightpatch_pool->Free (lightpatches);
+    t->lightpatch_pool->Free (lightpatches);
 
   csFrustumView lview;
   csFrustumContext *ctxt = lview.GetFrustumContext ();

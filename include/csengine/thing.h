@@ -34,6 +34,7 @@
 #include "iengine/mesh.h"
 #include "iengine/rview.h"
 #include "iengine/shadcast.h"
+#include "csengine/material.h"	// @@@
 #include "imesh/thing/thing.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/object.h"
@@ -41,17 +42,12 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 
-class csSector;
-class csEngine;
-class csStatLight;
-class csMaterialWrapper;
-class csMaterialList;
 class csThing;
+class csThingObjectType;
 class csPolygon3D;
-class csPolygonTree;
 class csPolygon2D;
-class csPolygon2DQueue;
-class csFrustumList;
+class csPoly2DPool;
+class csLightPatchPool;
 struct iShadowBlockList;
 struct csVisObjInfo;
 struct iGraphics3D;
@@ -170,6 +166,9 @@ private:
 class csThing : public csObject
 {
   friend class PolyMeshHelper;
+
+public:
+  csThingObjectType* thing_type;
 
 private:
   /// ID for this thing (will be >0).
@@ -375,9 +374,9 @@ private:
 	iRenderView* rview, iMovable* movable, csZBufMode zMode);
 
   /**
-   * Draw the given array of polygons in the current csPolygonSet.
+   * Draw the given array of polygons.
    */
-  static void DrawPolygonArray (csPolygon3D** polygon, int num,
+  void DrawPolygonArray (csPolygon3D** polygon, int num,
 	iRenderView* rview, csZBufMode zMode);
 
   /**
@@ -413,7 +412,7 @@ public:
   /**
    * Create an empty thing.
    */
-  csThing (iBase* parent);
+  csThing (iBase* parent, csThingObjectType* thing_type);
 
   /// Destructor.
   virtual ~csThing ();
@@ -1266,8 +1265,6 @@ public:
 class csThingObjectType : public iMeshObjectType
 {
 private:
-  iObjectRegistry* object_reg;
-
   /**
    * List of planes. This vector contains objects of type
    * csPolyTxtPlane*. Note that this vector only contains named
@@ -1283,6 +1280,15 @@ private:
   csNamedObjVector curve_templates;
 
 public:
+  iObjectRegistry* object_reg;
+  iEngine* engine;
+  iGraphics3D* G3D;
+  /// An object pool for 2D polygons used by the rendering process.
+  csPoly2DPool* render_pol2d_pool;
+  /// An object pool for lightpatches.
+  csLightPatchPool* lightpatch_pool;
+
+public:
   SCF_DECLARE_IBASE;
 
   /// Constructor.
@@ -1293,6 +1299,7 @@ public:
 
   /// Register plugin with the system driver
   virtual bool Initialize (iObjectRegistry *object_reg);
+  void Clear ();
 
   /// New Factory.
   virtual csPtr<iMeshObjectFactory> NewFactory ();
@@ -1310,6 +1317,10 @@ public:
   struct eiThingEnvironment : public iThingEnvironment
   {
     SCF_DECLARE_EMBEDDED_IBASE(csThingObjectType);
+    virtual void Clear ()
+    {
+      scfParent->Clear ();
+    }
     virtual csPtr<iPolyTxtPlane> CreatePolyTxtPlane (const char* name = NULL)
     {
       return scfParent->CreatePolyTxtPlane (name);

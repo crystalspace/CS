@@ -29,12 +29,12 @@ class csThing;
 class csPolygon3D;
 class csCurve;
 class csLight;
-class csEngine;
 class csDelayedLightingInfo;
 class csObject;
 struct iLight;
 struct iCacheManager;
 struct iFile;
+struct iEngine;
 
 CS_DECLARE_STATIC_ARRAY (csRGBMap, csRGBpixel);
 CS_DECLARE_STATIC_ARRAY (csShadowMapHelper, unsigned char);
@@ -214,13 +214,13 @@ public:
    * Read lightmap from a file. Return true if succesful.
    */
   bool ReadFromCache (iFile* file, int w, int h,
-    csObject* obj, bool isPolygon, csEngine*);
+    csObject* obj, bool isPolygon, iEngine*);
 
   /**
    * Write lightmap to a file.
    */
   void Cache (iFile* file, csPolygon3D* poly,
-  	csCurve* curve, csEngine*);
+  	csCurve* curve, iEngine*);
 
   /**
    * Convert the lightmaps to the correct mixing mode.

@@ -284,7 +284,7 @@ struct iThingState : public iBase
   virtual csVector3* GetNormals () = 0;
 };
 
-SCF_VERSION (iThingEnvironment, 0, 0, 2);
+SCF_VERSION (iThingEnvironment, 0, 1, 0);
 
 /**
  * This interface is implemented by the iObjectType for things.
@@ -293,6 +293,12 @@ SCF_VERSION (iThingEnvironment, 0, 0, 2);
  */
 struct iThingEnvironment : public iBase
 {
+  /**
+   * Reset the thing environment (clear all curves, polygon planes,
+   * and other stuff related to things).
+   */
+  virtual void Clear () = 0;
+
   /**
    * Create a new texture mapping plane with the given name.
    * If you don't use a name then there is no way to find the plane by name

@@ -34,6 +34,11 @@ The history order is reversed so that new features are at the top.
 	  remove another link between csThing and the engine (this was
 	  used for resetting the gouraud color but apparently this is no
 	  longer needed).
+	- Added iThingEnvironment->Clear() to reset the thing environment.
+	- Moved the light patch and polygon pools from the engine to the
+	  thing environment.
+	- Cleaned up a lot more links between csEngine and csThing.
+	- Added iEngine->FindLight() to find a light given an index.
 17-Dec-2002
 	- Fixed the fix on reparenting of a mesh object for the culler.
 	- Added 'do_popup' parameter to iStandardReporterListener->

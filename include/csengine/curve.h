@@ -36,6 +36,7 @@
 
 
 class csThing;
+class csThingObjectType;
 class csCurveTemplate;
 class csLightPatch;
 class csSector;
@@ -119,6 +120,8 @@ class csCurve : public csObject
   friend class csRadCurve;
 
 private:
+  csThingObjectType* thing_type;
+
   /// ID for this curve.
   unsigned long CurveID;
   /// Last used ID.
@@ -187,7 +190,7 @@ public:
 public:
 
   /// Constructor
-  csCurve (csCurveTemplate* parent_tmpl);
+  csCurve (csCurveTemplate* parent_tmpl, csThingObjectType* thing_type);
   /// Destructor
   virtual ~csCurve ();
 
@@ -345,6 +348,7 @@ class csCurveTemplate : public csObject
 {
 protected:
   csRef<iMaterialWrapper> Material;
+  csThingObjectType* thing_type;
 
 protected:
   ///
@@ -352,7 +356,7 @@ protected:
 
 public:
   ///
-  csCurveTemplate();
+  csCurveTemplate(csThingObjectType* thing_type);
 
   /// Create an instance of this template.
   virtual csCurve* MakeCurve () = 0;
@@ -403,7 +407,7 @@ private:
   int ver_id[9];
 
 public:
-  csBezierTemplate();
+  csBezierTemplate(csThingObjectType* thing_type);
 
   virtual csCurve* MakeCurve();
 
@@ -442,7 +446,7 @@ private:
 
 public:
   ///
-  csBezierCurve (csBezierTemplate* parent_tmpl);
+  csBezierCurve (csBezierTemplate* parent_tmpl, csThingObjectType* thing_type);
   ///
   ~csBezierCurve ();
 

@@ -239,7 +239,7 @@ bool csLightMap::ReadFromCache (
   int h,
   csObject *obj,
   bool isPolygon,
-  csEngine *engine)
+  iEngine *engine)
 {
   PolySave ps, pswanted;
   LightHeader lh;
@@ -394,7 +394,7 @@ void csLightMap::Cache (
   iFile* file,
   csPolygon3D *poly,
   csCurve *curve,
-  csEngine *engine)
+  iEngine *engine)
 {
   (void)engine;
 

@@ -173,7 +173,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 9, 1);
+SCF_VERSION (iEngine, 0, 10, 0);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -523,6 +523,8 @@ struct iEngine : public iBase
   /// Find a static/pseudo-dynamic light by name.
   virtual iStatLight* FindLight (const char *Name, bool RegionOnly = false)
     const = 0;
+  /// Find a static/pseudo-dynamic light by id.
+  virtual iStatLight* FindLight (unsigned long light_id) const = 0;
   /**
    * Create an iterator to iterate over all static lights of the engine.
    * Assign to a csRef or use DecRef().
