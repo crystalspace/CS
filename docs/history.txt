@@ -23,6 +23,7 @@ chronological order.
 	      triplet as a 24bit number (R is most significant) instead of
 	      computing the RGB intensity.
 	- res fixed some wrong types in ie3ds.
+	- Eric Sunshine added a test suite (strset.t) for csStringSet.
 3-Apr-2005
 	- Eric Sunshine updated csBlockAllocator<> so that it automatically
 	  destroys contained objects at its own destruction time rather than
