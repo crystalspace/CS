@@ -194,9 +194,6 @@ clean:
 ifneq (.,$(OUTDLL))
 	-$(RMDIR) $(OUTDLL)
 endif
-ifneq (,$(wildcard *.txt))
-	-$(RM) $(wildcard *.txt)
-endif
 
 cleanlib:
 

@@ -9,6 +9,7 @@ The history order is reversed so that new features are at the top.
 	  experienced "internal compiler error" when encountering function
 	  CreateSystem() in walktest.cpp which was both a local function and
 	  declared "extern".
+	- 'make clean' no longer deletes all .txt files.
 13-Oct-2002
 	- Fixed OpenGL/backbuffer implementation of the procedural
 	  textures so that it at least doesn't crash anymore. It also
