@@ -1311,6 +1311,7 @@ Static integer and float @code{Format()} methods.  The same functionality can
 be achieved by utilizing the remaining @code{Replace()} or @code{Format()}
 methods.
 
+@item
 @code{SetGrowsExponentially()} and @code{GetGrowsExponentially()}. The same
 functionality is provided by @code{SetGrowsBy(0)} and @code{GetGrowsBy()}.
 @end itemize
