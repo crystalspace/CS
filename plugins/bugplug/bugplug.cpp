@@ -143,6 +143,9 @@ csBugPlug::csBugPlug (iBase *iParent)
   debug_view.num_lines = 0;
   debug_view.max_lines = 0;
   debug_view.lines = NULL;
+  debug_view.num_boxes = 0;
+  debug_view.max_boxes = 0;
+  debug_view.boxes = NULL;
   debug_view.object = NULL;
   debug_view.drag_point = -1;
 }
@@ -1041,6 +1044,19 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
       	debug_view.points[i1].x, debug_view.points[i1].y,
       	debug_view.points[i2].x, debug_view.points[i2].y, linecol);
     }
+    for (i = 0 ; i < debug_view.num_boxes ; i++)
+    {
+      int i1 = debug_view.boxes[i].i1;
+      int i2 = debug_view.boxes[i].i2;
+      float x1 = debug_view.points[i1].x;
+      float y1 = debug_view.points[i1].y;
+      float x2 = debug_view.points[i2].x;
+      float y2 = debug_view.points[i2].y;
+      G2D->DrawLine (x1, y1, x2, y1, linecol);
+      G2D->DrawLine (x2, y1, x2, y2, linecol);
+      G2D->DrawLine (x2, y2, x1, y2, linecol);
+      G2D->DrawLine (x1, y2, x1, y1, linecol);
+    }
     for (i = 0 ; i < debug_view.num_points ; i++)
     {
       float x = debug_view.points[i].x;
@@ -1828,6 +1844,10 @@ void csBugPlug::CleanDebugView ()
   debug_view.lines = NULL;
   debug_view.num_lines = 0;
   debug_view.max_lines = 0;
+  delete[] debug_view.boxes;
+  debug_view.boxes = NULL;
+  debug_view.num_boxes = 0;
+  debug_view.max_boxes = 0;
   delete[] debug_view.points;
   debug_view.points = NULL;
   debug_view.num_points = 0;
@@ -1879,6 +1899,25 @@ void csBugPlug::DebugViewLine (int i1, int i2)
   debug_view.lines[debug_view.num_lines].i1 = i1;
   debug_view.lines[debug_view.num_lines].i2 = i2;
   debug_view.num_lines++;
+}
+
+void csBugPlug::DebugViewBox (int i1, int i2)
+{
+  if (debug_view.num_boxes >= debug_view.max_boxes)
+  {
+    debug_view.max_boxes += 30;
+    dbLine* new_boxes = new dbLine [debug_view.max_boxes];
+    if (debug_view.num_boxes > 0)
+    {
+      memcpy (new_boxes, debug_view.boxes,
+      	sizeof (dbLine)*debug_view.num_boxes);
+      delete[] debug_view.boxes;
+    }
+    debug_view.boxes = new_boxes;
+  }
+  debug_view.boxes[debug_view.num_boxes].i1 = i1;
+  debug_view.boxes[debug_view.num_boxes].i2 = i2;
+  debug_view.num_boxes++;
 }
 
 void csBugPlug::DebugViewRenderObject (iBugPlugRenderObject* obj)

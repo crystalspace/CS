@@ -58,6 +58,11 @@ public:
     b1 = ~b1;
     b2 = ~b2;
   }
+  inline bool TestInvertedMask (const csBits64& b)
+  {
+    if (b1 & ~b.b1) return true;
+    return b2 & ~b.b2;
+  }
   inline void XorBit (int b)
   {
     if (b >= 32)

@@ -12,7 +12,9 @@ The history order is reversed so that new features are at the top.
 	  debug view for testing of the tiled coverage buffer. Assigned
 	  this command to the 's' key. This command will setup the
 	  debug view with three outlines that are rendered on the tiled
-	  coverage buffer.
+	  coverage buffer. It also shows a box which does TestRectangle().
+	  If the box is visible you see a small red box in the top-left
+	  corner of the display.
 	- Extended BugPlug so that you can now drag the points.
 	- Implemented the graphical dump of the tiled coverage buffer.
 	  This is now used in the setup_debugview command.
@@ -20,6 +22,9 @@ The history order is reversed so that new features are at the top.
 	  if a tile can is full.
 	- Fixed a bug where tiles which are full where not marked as
 	  dirty even though they have to be marked.
+	- Fixed TestRectangle() so it does a smarter test now.
+	- Tiled coverage culling starts to work now. Time to optimize
+	  a bit :-)
 17-Jun-2002
 	- Worked further on the tiled coverage buffer in Dynavis.
 	- Fixed bug in handling of 'analyze_vis' command in Dynavis.

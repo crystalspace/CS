@@ -107,6 +107,11 @@ struct iBugPlug : public iBase
   virtual void DebugViewLine (int i1, int i2) = 0;
 
   /**
+   * Add a box. The two indices are as returned from DebugViewPoint().
+   */
+  virtual void DebugViewBox (int i1, int i2) = 0;
+
+  /**
    * Return the current number of points.
    */
   virtual int DebugViewPointCount () const = 0;
@@ -125,6 +130,16 @@ struct iBugPlug : public iBase
    * Return a line.
    */
   virtual void DebugViewGetLine (int i, int& i1, int& i2) const = 0;
+
+  /**
+   * Return the current number of boxes.
+   */
+  virtual int DebugViewBoxCount () const = 0;
+
+  /**
+   * Return a box.
+   */
+  virtual void DebugViewGetBox (int i, int& i1, int& i2) const = 0;
 
   /**
    * Add some rendering code that will be rendered right before the

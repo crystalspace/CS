@@ -195,6 +195,20 @@ public:
   bool TestFullRect (float testdepth);
 
   /**
+   * Test if a given rectangle is visible. The rectangle is defined
+   * as a set of full vertical columns from 'start' to 'end'.
+   */
+  bool TestRect (int start, int end, float testdepth);
+
+  /**
+   * Test if a given rectangle is visible. The rectangle is defined
+   * as the vertical mask from 'start' to 'end' horizontally (inclusive
+   * range).
+   */
+  bool TestRect (const csBits64& vermask, int start, int end,
+  	float testdepth);
+
+  /**
    * Test if a given point is visible in this tile. Coordinates
    * are given relative to top-left coordinate of this tile.
    */

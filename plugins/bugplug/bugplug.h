@@ -221,6 +221,9 @@ private:
     int num_lines;
     int max_lines;
     dbLine* lines;
+    int num_boxes;
+    int max_boxes;
+    dbLine* boxes;
     iBugPlugRenderObject* object;
     int drag_point;	// Or -1 if not dragging a point.
   } debug_view;
@@ -317,6 +320,7 @@ public:
   void SetupDebugView ();
   int DebugViewPoint (const csVector2& point);
   void DebugViewLine (int i1, int i2);
+  void DebugViewBox (int i1, int i2);
   int DebugViewPointCount () const { return debug_view.num_points; }
   const csVector2& DebugViewGetPoint (int i) const
   {
@@ -327,6 +331,12 @@ public:
   {
     i1 = debug_view.lines[i].i1;
     i2 = debug_view.lines[i].i2;
+  }
+  int DebugViewBoxCount () const { return debug_view.num_boxes; }
+  void DebugViewGetBox (int i, int& i1, int& i2) const
+  {
+    i1 = debug_view.boxes[i].i1;
+    i2 = debug_view.boxes[i].i2;
   }
   void DebugViewRenderObject (iBugPlugRenderObject* obj);
   void DebugViewClearScreen (bool cs) { debug_view.clear = cs; }
@@ -370,6 +380,10 @@ public:
     {
       scfParent->DebugViewLine (i1, i2);
     }
+    virtual void DebugViewBox (int i1, int i2)
+    {
+      scfParent->DebugViewBox (i1, i2);
+    }
     virtual int DebugViewPointCount () const
     {
       return scfParent->DebugViewPointCount ();
@@ -385,6 +399,14 @@ public:
     virtual void DebugViewGetLine (int i, int& i1, int& i2) const
     {
       scfParent->DebugViewGetLine (i, i1, i2);
+    }
+    virtual int DebugViewBoxCount () const
+    {
+      return scfParent->DebugViewBoxCount ();
+    }
+    virtual void DebugViewGetBox (int i, int& i1, int& i2) const
+    {
+      scfParent->DebugViewGetBox (i, i1, i2);
     }
     virtual void DebugViewRenderObject (iBugPlugRenderObject* obj)
     {

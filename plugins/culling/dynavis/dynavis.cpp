@@ -1194,6 +1194,8 @@ private:
     }
   };
   outline o1, o2, o3;
+  int box_idx1;
+  int box_idx2;
 
 public:
   SCF_DECLARE_IBASE;
@@ -1309,6 +1311,10 @@ public:
     *e++ = 3; *e++ = 4;
     *e++ = 4; *e++ = 0;
     o3.depth = 150;
+
+    box_idx1 = bugplug->DebugViewPoint (csVector2 (10, 10));
+    box_idx2 = bugplug->DebugViewPoint (csVector2 (200, 200));
+    bugplug->DebugViewBox (box_idx1, box_idx2);
   }
   virtual ~DynavisRenderObject ()
   {
@@ -1332,6 +1338,15 @@ public:
     RenderOutline (o1, bugplug);
     RenderOutline (o2, bugplug);
     RenderOutline (o3, bugplug);
+    csBox2 box;
+    box.Set (bugplug->DebugViewGetPoint (box_idx1),
+    	bugplug->DebugViewGetPoint (box_idx2));
+    bool rc = tcovbuf->TestRectangle (box, 100);
+    if (rc)
+    {
+      int colred = g3d->GetTextureManager ()->FindRGB (255, 0, 0);
+      g3d->GetDriver2D ()->DrawBox (5, 5, 10, 10, colred);
+    }
     tcovbuf->Debug_Dump (g3d);
   }
 };

@@ -264,45 +264,48 @@ void csCoverageTile::Flush (csBits64& fvalue, float maxdepth)
         mods |= coverage_cache[idx++];
 	j++;
       }
-      if (mods.CheckByte0 ())
+      if (!mods.IsEmpty ())
       {
-        float& d = ldepth[0];
-	if (maxdepth > d) d = maxdepth;
-      }
-      if (mods.CheckByte1 ())
-      {
-        float& d = ldepth[4];
-	if (maxdepth > d) d = maxdepth;
-      }
-      if (mods.CheckByte2 ())
-      {
-        float& d = ldepth[8];
-	if (maxdepth > d) d = maxdepth;
-      }
-      if (mods.CheckByte3 ())
-      {
-        float& d = ldepth[12];
-	if (maxdepth > d) d = maxdepth;
-      }
-      if (mods.CheckByte4 ())
-      {
-        float& d = ldepth[16];
-	if (maxdepth > d) d = maxdepth;
-      }
-      if (mods.CheckByte5 ())
-      {
-        float& d = ldepth[20];
-	if (maxdepth > d) d = maxdepth;
-      }
-      if (mods.CheckByte6 ())
-      {
-        float& d = ldepth[24];
-	if (maxdepth > d) d = maxdepth;
-      }
-      if (mods.CheckByte7 ())
-      {
-        float& d = ldepth[28];
-	if (maxdepth > d) d = maxdepth;
+        if (mods.CheckByte0 ())
+        {
+          float& d = ldepth[0];
+	  if (maxdepth > d) d = maxdepth;
+        }
+        if (mods.CheckByte1 ())
+        {
+          float& d = ldepth[4];
+	  if (maxdepth > d) d = maxdepth;
+        }
+        if (mods.CheckByte2 ())
+        {
+          float& d = ldepth[8];
+	  if (maxdepth > d) d = maxdepth;
+        }
+        if (mods.CheckByte3 ())
+        {
+          float& d = ldepth[12];
+	  if (maxdepth > d) d = maxdepth;
+        }
+        if (mods.CheckByte4 ())
+        {
+          float& d = ldepth[16];
+	  if (maxdepth > d) d = maxdepth;
+        }
+        if (mods.CheckByte5 ())
+        {
+          float& d = ldepth[20];
+	  if (maxdepth > d) d = maxdepth;
+        }
+        if (mods.CheckByte6 ())
+        {
+          float& d = ldepth[24];
+	  if (maxdepth > d) d = maxdepth;
+        }
+        if (mods.CheckByte7 ())
+        {
+          float& d = ldepth[28];
+	  if (maxdepth > d) d = maxdepth;
+        }
       }
     }
   }
@@ -325,6 +328,108 @@ bool csCoverageTile::TestFullRect (float testdepth)
     // visible.
     return true;
   }
+}
+
+bool csCoverageTile::TestRect (int start, int end, float testdepth)
+{
+  int i;
+  for (i = 0 ; i < start ; i++) coverage_cache[i].Empty ();
+  for (i = start ; i <= end ; i++) coverage_cache[i].Full ();
+  for (i = end ; i < 32 ; i++) coverage_cache[i].Empty ();
+
+  //@@@@@@@@@@@ This routine can be optimized considerably!
+
+  if (!tile_full)
+  {
+    // Tile is not full which means we only have to test depth wherever
+    // the global coverage buffer is filled.
+    csBits64* c = coverage+start;
+    for (i = start ; i <= end ; i++)
+    {
+      if (!c->IsFull ())
+        return true;
+      c++;
+    }
+  }
+
+  // Test depth where appropriate.
+  for (i = 0 ; i < 4 ; i++)
+  {
+    float* ld = &depth[i];
+    int idx = i << 3;
+    int j = 1;
+    csBits64 mods = coverage_cache[idx];
+    while (j < 8)
+    {
+      mods |= coverage_cache[idx++];
+      j++;
+    }
+    if (!mods.IsEmpty ())
+    {
+      if (mods.CheckByte0 ()) { if (testdepth <= ld[0]) return true; }
+      if (mods.CheckByte1 ()) { if (testdepth <= ld[4]) return true; }
+      if (mods.CheckByte2 ()) { if (testdepth <= ld[8]) return true; }
+      if (mods.CheckByte3 ()) { if (testdepth <= ld[12]) return true; }
+      if (mods.CheckByte4 ()) { if (testdepth <= ld[16]) return true; }
+      if (mods.CheckByte5 ()) { if (testdepth <= ld[20]) return true; }
+      if (mods.CheckByte6 ()) { if (testdepth <= ld[24]) return true; }
+      if (mods.CheckByte7 ()) { if (testdepth <= ld[28]) return true; }
+    }
+  }
+  return false;
+}
+
+bool csCoverageTile::TestRect (const csBits64& vermask, int start, int end,
+  	float testdepth)
+{
+  int i;
+  for (i = 0 ; i < start ; i++) coverage_cache[i].Empty ();
+  for (i = start ; i <= end ; i++) coverage_cache[i] = vermask;
+  for (i = end ; i < 32 ; i++) coverage_cache[i].Empty ();
+
+  //@@@@@@@@@@@ This routine can be optimized considerably!
+
+  if (!tile_full)
+  {
+    // Tile is not full which means we only have to test depth wherever
+    // the global coverage buffer is filled.
+    csBits64* cc = coverage_cache+start;
+    csBits64* c = coverage+start;
+    for (i = start ; i <= end ; i++)
+    {
+      if (cc->TestInvertedMask (*c))
+        return true;
+      *cc &= *c;
+      cc++;
+      c++;
+    }
+  }
+
+  // Test depth where appropriate.
+  for (i = 0 ; i < 4 ; i++)
+  {
+    float* ld = &depth[i];
+    int idx = i << 3;
+    int j = 1;
+    csBits64 mods = coverage_cache[idx];
+    while (j < 8)
+    {
+      mods |= coverage_cache[idx++];
+      j++;
+    }
+    if (!mods.IsEmpty ())
+    {
+      if (mods.CheckByte0 ()) { if (testdepth <= ld[0]) return true; }
+      if (mods.CheckByte1 ()) { if (testdepth <= ld[4]) return true; }
+      if (mods.CheckByte2 ()) { if (testdepth <= ld[8]) return true; }
+      if (mods.CheckByte3 ()) { if (testdepth <= ld[12]) return true; }
+      if (mods.CheckByte4 ()) { if (testdepth <= ld[16]) return true; }
+      if (mods.CheckByte5 ()) { if (testdepth <= ld[20]) return true; }
+      if (mods.CheckByte6 ()) { if (testdepth <= ld[24]) return true; }
+      if (mods.CheckByte7 ()) { if (testdepth <= ld[28]) return true; }
+    }
+  }
+  return false;
 }
 
 bool csCoverageTile::TestPoint (int x, int y, float testdepth)
@@ -1152,14 +1257,59 @@ bool csTiledCoverageBuffer::TestRectangle (const csBox2& rect, float min_depth)
   CS_ASSERT (bbox.maxx < width);
   int endcol = bbox.maxx >> 5;
 
+  csBits64 vermask;
+  int start_x = bbox.minx & 31;
+  int end_x = bbox.maxx & 31;
+
   for (ty = startrow ; ty <= endrow ; ty++)
   {
+    bool do_vermask = false;
+    vermask.Full ();
+    if (ty == startrow && (bbox.miny & 63) != 0)
+    {
+      vermask = csCoverageTile::precalc_end_lines[bbox.miny & 63];
+      do_vermask = true;
+    }
+    if (ty == endrow && (bbox.maxy & 63) != 63)
+    {
+      vermask &= csCoverageTile::precalc_start_lines[bbox.maxy & 63];
+      do_vermask = true;
+    }
+
     csCoverageTile* tile = GetTile (startcol, ty);
     for (tx = startcol ; tx <= endcol ; tx++)
     {
-      //@@@ NOT ALWAYS USE FULLRECT!
-      if (tile->TestFullRect (min_depth))
-        return true;
+      int sx = 0, ex = 31;
+      bool do_hor = false;
+      if (tx == 0 && start_x != 0)
+      {
+        sx = start_x;
+	do_hor = true;
+      }
+      if (tx == endcol && end_x != 31)
+      {
+        ex = end_x;
+	do_hor = true;
+      }
+
+      if (do_hor || do_vermask)
+      {
+        if (!do_vermask)
+	{
+          if (tile->TestRect (sx, ex, min_depth))
+	    return true;
+	}
+	else
+	{
+          if (tile->TestRect (vermask, sx, ex, min_depth))
+	    return true;
+        }
+      }
+      else
+      {
+        if (tile->TestFullRect (min_depth))
+          return true;
+      }
       tile++;
     }
   }
