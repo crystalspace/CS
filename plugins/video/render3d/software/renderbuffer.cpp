@@ -76,7 +76,7 @@ void csSoftRenderBuffer::SetComponentType (csRenderBufferComponentType type)
 
 csPtr<iRenderBuffer> csSoftwareGraphics3DCommon::CreateRenderBuffer (size_t size, 
   csRenderBufferType type, csRenderBufferComponentType componentType,
-  int componentCount)
+  int componentCount, bool copy)
 {
   csSoftRenderBuffer *buffer = new csSoftRenderBuffer (
     new char[size], size, type, componentType, componentCount);
@@ -85,7 +85,7 @@ csPtr<iRenderBuffer> csSoftwareGraphics3DCommon::CreateRenderBuffer (size_t size
 
 csPtr<iRenderBuffer> csSoftwareGraphics3DCommon::CreateIndexRenderBuffer (
   size_t size, csRenderBufferType type, csRenderBufferComponentType componentType,
-  size_t rangeStart, size_t rangeEnd)
+  size_t rangeStart, size_t rangeEnd, bool copy)
 {
   csSoftRenderBuffer *buffer = new csSoftRenderBuffer (
     new char[size], size, type, componentType, 1);

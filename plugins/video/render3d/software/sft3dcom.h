@@ -541,20 +541,13 @@ public:
 
 
 
-
-
-
-
-
-
-
   /// Create a renderbuffer
   virtual csPtr<iRenderBuffer> CreateRenderBuffer (size_t size, 
     csRenderBufferType type, csRenderBufferComponentType componentType, 
-    int componentCount);
+    int componentCount, bool copy = true);
   virtual csPtr<iRenderBuffer> CreateIndexRenderBuffer (size_t size, 
     csRenderBufferType type, csRenderBufferComponentType componentType,
-    size_t rangeStart, size_t rangeEnd);
+    size_t rangeStart, size_t rangeEnd, bool copy = true);
 
   /// Create interleaved renderbuffers
   virtual void CreateInterleavedRenderBuffers (size_t size, 
@@ -575,7 +568,8 @@ public:
     activebuffers[attrib - CS_VATTRIB_SPECIFIC_FIRST] = 0;
   }
 
-  virtual void SetBufferState (csVertexAttrib* attribs, iRenderBuffer** buffers, int count)
+  virtual void SetBufferState (csVertexAttrib* attribs, iRenderBuffer** buffers,
+      int count)
   {
     int i;
     for (i = 0 ; i < count ; i++)

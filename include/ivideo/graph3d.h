@@ -992,10 +992,12 @@ struct iGraphics3D : public iBase
    *  CS_BUF_STREAM.
    * \param componentType Components Types; CS_BUFCOMP_FLOAT, CS_BUFCOMP_INT, etc
    * \param componentCount Number of components per element (e.g. 4 for RGBA)
+   * \param copy if true (default) then this buffer will make a copy of the data.
+   *        hardware vertex buffers and interleaved buffers will always copy data.
    */
   virtual csPtr<iRenderBuffer> CreateRenderBuffer (size_t size, 
     csRenderBufferType type, csRenderBufferComponentType componentType, 
-    int componentCount) = 0;
+    int componentCount, bool copy = true) = 0;
   /**
    * Create an index buffer.
    * \param size Size of the buffer in bytes.
@@ -1006,10 +1008,12 @@ struct iGraphics3D : public iBase
    *  the created buffer.
    * \param rangeEnd Maximum index value that is expected to be written to 
    *  the created buffer.
+   * \param copy if true (default) then this buffer will make a copy of the data.
+   *        hardware vertex buffers and interleaved buffers will always copy data.
    */
   virtual csPtr<iRenderBuffer> CreateIndexRenderBuffer (size_t size, 
     csRenderBufferType type, csRenderBufferComponentType componentType,
-    size_t rangeStart, size_t rangeEnd) = 0;
+    size_t rangeStart, size_t rangeEnd, bool copy = true) = 0;
 
   /**
    * Create an interleaved renderbuffer (You would use this then set stride to

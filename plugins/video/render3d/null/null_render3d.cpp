@@ -484,7 +484,7 @@ bool csNullGraphics3D::SetOption (const char*, const char*)
 
 csPtr<iRenderBuffer> csNullGraphics3D::CreateRenderBuffer (size_t size,
   csRenderBufferType type, csRenderBufferComponentType componentType,
-  int componentCount)
+  int componentCount, bool copy)
 {
   return csPtr<iRenderBuffer> (new csSysRenderBuffer (
     new char[size], size, type, componentType, componentCount));
@@ -492,7 +492,7 @@ csPtr<iRenderBuffer> csNullGraphics3D::CreateRenderBuffer (size_t size,
 
 csPtr<iRenderBuffer> csNullGraphics3D::CreateIndexRenderBuffer (size_t size, 
   csRenderBufferType type, csRenderBufferComponentType componentType,
-  size_t rangeStart, size_t rangeEnd)
+  size_t rangeStart, size_t rangeEnd, bool copy)
 {
   return csPtr<iRenderBuffer> (new csSysRenderBuffer (
     new char[size], size, type, componentType, 1));

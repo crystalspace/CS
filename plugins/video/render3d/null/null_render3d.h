@@ -132,10 +132,10 @@ public:
   bool SetOption (const char*, const char*);
   csPtr<iRenderBuffer> CreateRenderBuffer (size_t size,
     csRenderBufferType type, csRenderBufferComponentType componentType,
-    int componentCount);
+    int componentCount, bool copy = true);
   virtual csPtr<iRenderBuffer> CreateIndexRenderBuffer (size_t size, 
     csRenderBufferType type, csRenderBufferComponentType componentType,
-    size_t rangeStart, size_t rangeEnd);
+    size_t rangeStart, size_t rangeEnd, bool copy = true);
   void CreateInterleavedRenderBuffers (size_t size, csRenderBufferType type,
     int count, csRefArray<iRenderBuffer>& buffers);
   void SetBufferState (csVertexAttrib* attribs, iRenderBuffer** buffers, 

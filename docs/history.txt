@@ -7,6 +7,11 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 
+30-Sep-2004
+	- Jorrit added a new 'copy' flag to CreateRenderBuffer() and
+	  CreateIndexRenderBuffer() which is default to true. Meshes can
+	  set that to false if they keep the data for the buffer in their
+	  own memory. Currently not yet implemented. API change only.
 29-Sep-2004
 	- Rhad changed csMutexes in the windows software driver to
 	  critical sections.  Per MMsystem documentation, critical sections

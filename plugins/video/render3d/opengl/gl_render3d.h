@@ -291,10 +291,10 @@ public:
   /// Create a renderbuffer
   virtual csPtr<iRenderBuffer> CreateRenderBuffer (size_t size, 
     csRenderBufferType type, csRenderBufferComponentType componentType, 
-    int componentCount);
+    int componentCount, bool copy = true);
   virtual csPtr<iRenderBuffer> CreateIndexRenderBuffer (size_t size, 
     csRenderBufferType type, csRenderBufferComponentType componentType,
-    size_t rangeStart, size_t rangeEnd);
+    size_t rangeStart, size_t rangeEnd, bool copy = true);
 
   /// Create interleaved renderbuffers
   virtual void CreateInterleavedRenderBuffers (size_t size, 

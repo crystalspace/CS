@@ -98,7 +98,7 @@ void* csVBORenderBuffer::RenderLock (csGLRenderBufferLockType type)
 
 csPtr<iRenderBuffer> csGLGraphics3D::CreateRenderBuffer (size_t size, 
   csRenderBufferType type, csRenderBufferComponentType componentType,
-  int componentCount)
+  int componentCount, bool copy)
 {
   if (use_hw_render_buffers && size >= vbo_thresshold)
   {
@@ -117,7 +117,7 @@ csPtr<iRenderBuffer> csGLGraphics3D::CreateRenderBuffer (size_t size,
 
 csPtr<iRenderBuffer> csGLGraphics3D::CreateIndexRenderBuffer (size_t size, 
     csRenderBufferType type, csRenderBufferComponentType componentType,
-    size_t rangeStart, size_t rangeEnd)
+    size_t rangeStart, size_t rangeEnd, bool copy)
 {
   if (use_hw_render_buffers && size >= vbo_thresshold)
   {

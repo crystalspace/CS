@@ -818,10 +818,10 @@ public:
   //========================================================================
   virtual csPtr<iRenderBuffer> CreateRenderBuffer (size_t, 
     csRenderBufferType, csRenderBufferComponentType, 
-    int) { return 0; }
+    int, bool copy = true) { return 0; }
   virtual csPtr<iRenderBuffer> CreateIndexRenderBuffer (size_t, 
     csRenderBufferType, csRenderBufferComponentType, 
-    size_t, size_t) { return 0; }
+    size_t, size_t, bool copy = true) { return 0; }
   virtual void CreateInterleavedRenderBuffers (size_t size, 
     csRenderBufferType type, int count, csRefArray<iRenderBuffer>& buffers) { }
   virtual void SetBufferState (csVertexAttrib*,
