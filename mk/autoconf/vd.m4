@@ -1,3 +1,46 @@
+###############################################################################
+#
+# From the input pattern we create regular expressions we send through sed 
+# to extract the version information from the standard input to sed.
+# Then we extract from the resulting version string subparts.
+# The same happens with the supplied version string. It too is split into its 
+# subparts according to the pattern.
+# Then the subparts from the gathered version string and the supplied one are
+# compared.
+#
+# How does the pattern look like ?
+# It is a sequence of 9s and _s and separators.
+# 9 denotes a non empty sequence of digits.
+# _ denotes a non empty sequence of characters from the class [a-zA-Z].
+# Everything else is treated as a separator.
+# Consecutive 9s and _s are compressed to contain only one of each type.
+# For instance "99_.9.__abc9_" will become "9_.9._abc9_".
+#
+# How we find the parts we compare ?
+# From this transformed string we yield the parts we will later compare.
+# We break up the string as follows:
+# Any sequence of separators represent one breakup. Additional breakups are
+# placed behind every 9 and _ .
+# So the example from above will give:
+#
+# "99_.9.__abc9_"  ===compress==> "9_.9._abc9_" ===breakup==> "9" "_" "9" "_" "9" "_"
+#
+# How we create the regular expressions ?
+# We take the compressed pattern and quote every separator.
+# The we replace the 9s with [0-9][0-9]*
+# and the _s with [a-zA-Z][a-zA-Z]* .
+# The above example will become:
+#
+# "99_.9.__abc9_"  ===compress==> "9_.9._abc9_" ===rexify==> 
+# [0-9][0-9]*[a-zA-Z][a-zA-Z]*\.[0-9][0-9]*\.[a-zA-Z][a-zA-Z]*\a\b\c[0-9][0-9]*[a-zA-Z][a-zA-Z]*
+#
+# Voila.
+#
+# To yield the subparts from the string we additionally enclose the 
+# 9s and _s with \( and \).
+#
+###############################################################################
+
 dnl ****************************************************************
 dnl **                      helper definitions                    **
 dnl ****************************************************************
