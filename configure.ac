@@ -627,10 +627,10 @@ CS_EMIT_BUILD_FLAGS([if -multiply_defined suppress is needed],
 
 #------------------------------------------------------------------------------
 # Check if the linker recognizes "-force_cpusubtype_ALL".  This is required on
-# MacOS/X since the Crystal Space's PowerPC implementation of qsqrt() uses the
-# `frsqrte' instruction which is only valid when the -force_cpusubtype_ALL flag
-# is present.  This flag is marked "mandatory" because it is required even for
-# external projects if they use qsqrt().
+# MacOS/X since the Crystal Space's PowerPC implementation of csQsqrt() uses
+# the `frsqrte' instruction which is only valid when the -force_cpusubtype_ALL
+# flag is present.  This flag is marked "mandatory" because it is required even
+# for external projects if they use csQsqrt().
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_FORCE_CPUSUBTYPE_ALL],
     [CS_CHECK_BUILD_FLAGS([if -force_cpusubtype_ALL is needed],
@@ -1922,17 +1922,17 @@ AS_IF([test $cs_cv_cxx_explicit_template_specialization = no],
 
 #------------------------------------------------------------------------------
 # CS_CHECK_QSQRT
-#	Check if gcc is able to understand CS/include/qsqrt.h.  This test will
-#	catch not only versions of gcc which do not understand the assembly
-#	content, but also buggy versions which fail with an internal error on
-#	this file (such as the RedHat 7 gcc).  Furthermore, it is reported that
-#	some versions of gcc 3.2.x cause qsqrt() to return bogus results when
+#	Check if gcc is able to understand csqsqrt.h.  This test will catch not
+#	only versions of gcc which do not understand the assembly content, but
+#	also buggy versions which fail with an internal error on this file
+#	(such as the RedHat 7 gcc).  Furthermore, it is reported that some
+#	versions of gcc 3.2.x cause qsqrt() to return bogus results when
 #	compiled in optimize mode on Intel hardware.  It is reported that this
 #	same compiler crashes with an internal error when -fPIC is used, so we
 #	use -fPIC as a way to detect this buggy compiler.  The MacOS/X PowerPC
 #	version of qsqrt() requires the -force_cpusubtype_ALL flag, so we use
 #	that flag when available.  Sets the shell variable cs_cv_cxx_qsqrt_ok
-#	to "yes" if qsqrt.h is usable, otherwise "no".
+#	to "yes" if csqsqrt.h is usable, otherwise "no".
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_QSQRT],
     [AC_REQUIRE([CS_CHECK_HOST_CPU])
@@ -1943,7 +1943,7 @@ AC_DEFUN([CS_CHECK_QSQRT],
 	[AC_CACHE_CHECK([if $CXX recognizes -fPIC], [cs_cv_prog_cxx_fpic],
 	    [CS_BUILD_IFELSE([], [CS_CREATE_TUPLE([-fPIC])], [C++],
 	    [cs_cv_prog_cxx_fpic=-fPIC], [cs_cv_prog_cxx_fpic=no])])
-	AC_CACHE_CHECK([if qsqrt() compiles], [cs_cv_cxx_qsqrt_ok],
+	AC_CACHE_CHECK([if csQsqrt() compiles], [cs_cv_cxx_qsqrt_ok],
 	    [cs_qsqrt_cflags="$cs_optimize_flags"
 	    AS_IF([test $cs_cv_prog_cxx_fpic != no],
 		[cs_qsqrt_cflags="$cs_qsqrt_cflags $cs_cv_prog_cxx_fpic"])
@@ -1953,9 +1953,9 @@ AC_DEFUN([CS_CHECK_QSQRT],
 		[AC_LANG_PROGRAM(
 		    [[#define PROC_$cs_host_cpu_normalized
 		    #define COMP_GCC
-		    #include <qsqrt.h>
+		    #include <csqsqrt.h>
 		    ]],
-		    [float n = qsqrt(1.0f); (void)n;])],
+		    [float n = csQsqrt(1.0f); (void)n;])],
 		[CS_CREATE_TUPLE([$cs_qsqrt_cflags -I$srcdir/include])], [C++],
 		[cs_cv_cxx_qsqrt_ok=yes], [cs_cv_cxx_qsqrt_ok=no])])],
 	[cs_cv_cxx_qsqrt_ok=no])])
@@ -1968,11 +1968,11 @@ AS_IF([test $cs_cv_cxx_qsqrt_ok = no],
 
 #------------------------------------------------------------------------------
 # Check if a compiler bug discovered in gcc 2.96 (RedHat and other unstable
-# versions) and gcc 3.0.1 causes qint() to misbehave.
+# versions) and gcc 3.0.1 causes csQint() to misbehave.
 # -----------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_QINT],
     [AC_REQUIRE([CS_CHECK_OPTIMIZE_FLAGS])
-    AC_CACHE_CHECK([if qint() functions correctly], [cs_cv_cxx_qint_ok],
+    AC_CACHE_CHECK([if csQint() functions correctly], [cs_cv_cxx_qint_ok],
 	[AC_LANG_PUSH([C++])
 	cs_cflags_save="$CXXFLAGS"
 	CXXFLAGS="$CXXFLAGS $cs_optimize_flags"
@@ -2218,12 +2218,12 @@ AC_MSG_RESULT([$enable_make_emulation])
 
 
 #------------------------------------------------------------------------------
-# Boilerplate: volatile.h
+# Boilerplate: csconfig.h
 #------------------------------------------------------------------------------
 CS_HEADER_PREPEND(
 [// File generated automatically.
-#ifndef __CS_VOLATILE_H__
-#define __CS_VOLATILE_H__
+#ifndef __CS_CSCONFIG_H__
+#define __CS_CSCONFIG_H__
 ])
 
 CS_HEADER_PROPERTY([CS_PACKAGE_NAME],
@@ -2231,7 +2231,7 @@ CS_HEADER_PROPERTY([CS_PACKAGE_NAME],
 CS_HEADER_PROPERTY([CS_PACKAGE_VERSION],
     [AS_ESCAPE(["])$PACKAGE_VERSION[]AS_ESCAPE(["])])
 CS_HEADER_APPEND(
-[#endif // __CS_VOLATILE_H__
+[#endif // __CS_CSCONFIG_H__
 ])
 
 
@@ -2252,7 +2252,7 @@ CS_OUTPUT_INSTALLDIRS
 #------------------------------------------------------------------------------
 # Output generated files.
 #------------------------------------------------------------------------------
-CS_HEADER_OUTPUT([include/volatile.h])
+CS_HEADER_OUTPUT([include/csconfig.h])
 CS_JAMCONFIG_OUTPUT([Jamconfig])
 AC_CONFIG_FILES([Jamfile])
 

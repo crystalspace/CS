@@ -18,7 +18,7 @@
 
 #include "cssysdef.h"
 #include "csutil/csendian.h"
-#include "qint.h"
+#include "csqint.h"
 #include "beziermsh.h"
 #include "lightpool.h"
 #include "curvebase.h"
@@ -54,7 +54,7 @@
 #include "iutil/cmdline.h"
 #include "iengine/rview.h"
 #include "iengine/fview.h"
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 #include "ivideo/graph3d.h"
 #include "ivaria/reporter.h"
 
@@ -253,17 +253,17 @@ char* csBezierMesh::GenerateCacheName ()
     }
   }
 
-  l = convert_endian ((int32)QInt ((b.MinX () * 1000)+.5));
+  l = convert_endian ((int32)csQint ((b.MinX () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)QInt ((b.MinY () * 1000)+.5));
+  l = convert_endian ((int32)csQint ((b.MinY () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)QInt ((b.MinZ () * 1000)+.5));
+  l = convert_endian ((int32)csQint ((b.MinZ () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)QInt ((b.MaxX () * 1000)+.5));
+  l = convert_endian ((int32)csQint ((b.MaxX () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)QInt ((b.MaxY () * 1000)+.5));
+  l = convert_endian ((int32)csQint ((b.MaxY () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)QInt ((b.MaxZ () * 1000)+.5));
+  l = convert_endian ((int32)csQint ((b.MaxZ () * 1000)+.5));
   mf.Write ((char*)&l, 4);
 
   csMD5::Digest digest = csMD5::Encode (mf.GetData (), mf.GetSize ());
@@ -631,7 +631,7 @@ void csBezierMesh::GetBoundingBox (csBox3 &box)
   }
 
   static_data->obj_radius = (static_data->obj_bbox.Max () - static_data->obj_bbox.Min ()) * 0.5f;
-  static_data->max_obj_radius = qsqrt (csSquaredDist::PointPoint (
+  static_data->max_obj_radius = csQsqrt (csSquaredDist::PointPoint (
   	static_data->obj_bbox.Max (), static_data->obj_bbox.Min ())) * 0.5f;
   box = static_data->obj_bbox;
 }

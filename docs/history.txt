@@ -17,6 +17,24 @@ chronological order.
 	  csBaseEventHandler::HandleEvent() for dispatch as usual. Added an
 	  explicit warning against overriding csBaseEventHandler::HandleEvent()
 	  except for special cases, such as this.
+	- Eric Sunshine renamed the following global header files in order to
+	  avoid possible conflict with headers installed by other packages:
+	    platform.h --> csplatform.h
+	    qint.h     --> csqint.h
+	    qsqrt.h    --> csqsqrt.h
+	    volatile.h --> csconfig.h
+	- Eric Sunshine renamed the following functions in order to avoid
+	  global namespace pollution:
+	    QRound() --> csQround()
+	    QInt()   --> csQint()
+	    QInt8()  --> csQint8()
+	    QInt16() --> csQint16()
+	    QInt24() --> csQint24()
+	    qsqrt()  --> csQsqrt()
+	    qisqrt() --> csQisqrt()
+	- Eric Sunshine renamed the following macros in order to avoid global
+	  namespace pollution:
+	    WIN32_VOLATILE --> CS_WIN32_CSCONFIG
 30-Jul-2004
 	- Eric Sunshine fixed bugs in csInitializer::OpenApplication() and
 	  CloseApplication() where they created broadcast events on the stack.

@@ -30,7 +30,7 @@
 #include "iengine/engine.h"
 #include "iengine/light.h"
 #include "haze.h"
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 
 CS_IMPLEMENT_PLUGIN
 

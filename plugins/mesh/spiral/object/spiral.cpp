@@ -23,7 +23,7 @@
 #include "ivideo/material.h"
 #include "iengine/material.h"
 #include "spiral.h"
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 #include <math.h>
 #include <stdlib.h>
 
@@ -62,7 +62,7 @@ void csSpiralMeshObject::SetupObject ()
     if (size.y > max_size) max_size = size.y;
     if (size.z > max_size) max_size = size.z;
     float a = max_size/2.;
-    radius = qsqrt (a*a + a*a);
+    radius = csQsqrt (a*a + a*a);
 
     // create particles
     size_t i;
@@ -143,7 +143,7 @@ void csSpiralMeshObject::SetSource (const csVector3& source)
 {
   initialized = false;
   csSpiralMeshObject::source = source;
-  part_source.Set( qsqrt(source.x*source.x+source.z*source.z),
+  part_source.Set( csQsqrt(source.x*source.x+source.z*source.z),
                   source.y,
                   atan2(source.x,-source.z));
   scfiObjectModel.ShapeChanged ();

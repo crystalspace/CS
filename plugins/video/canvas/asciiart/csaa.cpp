@@ -28,7 +28,7 @@
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
-#include "qint.h"
+#include "csqint.h"
 
 //---------------------------------------------------------- csGraphics2DAA ---
 
@@ -171,10 +171,10 @@ void csGraphics2DAA::Print (csRect const* area)
     float xc = float (aa_scrwidth (context)) / Width;
     float yc = float (aa_scrheight (context)) / Height;
 
-    sx1 = QRound (area->xmin * xc);
-    sx2 = QRound (area->xmax * xc);
-    sy1 = QRound (area->ymin * yc);
-    sy2 = QRound (area->ymax * yc);
+    sx1 = csQround (area->xmin * xc);
+    sx2 = csQround (area->xmax * xc);
+    sy1 = csQround (area->ymin * yc);
+    sy2 = csQround (area->ymax * yc);
   }
   else
   {

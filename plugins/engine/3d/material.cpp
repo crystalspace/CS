@@ -174,8 +174,8 @@ csRGBcolor& csMaterial::GetFlatColor ()
   {
     csVector3 v;
     var->GetValue (v);
-    flat_color.Set (QInt (v.x * 255.99f), QInt (v.y * 255.99f), 
-      QInt (v.z * 255.99f));
+    flat_color.Set (csQint (v.x * 255.99f), csQint (v.y * 255.99f), 
+      csQint (v.z * 255.99f));
   }
   return flat_color;
 }

@@ -19,8 +19,8 @@
 #include "cssysdef.h"
 #include "walktest.h"
 #include "infmaze.h"
-#include "qint.h"
-#include "qsqrt.h"
+#include "csqint.h"
+#include "cscsQsqrt.h"
 #include "csgeom/frustum.h"
 #include "igeom/objmodel.h"
 #include "igeom/polymesh.h"
@@ -79,7 +79,7 @@ void WalkTest::CreateColliders ()
 		   csVector3 (DX_2, OY+DY, DZ_2));
   csPolygonMeshBox* mesh = new csPolygonMeshBox (body_box);
   body = collide_system->CreateCollider (mesh);
-  float radius = qsqrt (csSquaredDist::PointPoint (body_box.GetCenter (),
+  float radius = csQsqrt (csSquaredDist::PointPoint (body_box.GetCenter (),
 	body_box.Min ()));
   body_radius.Set (radius);
   body_center = body_box.GetCenter ();
@@ -89,7 +89,7 @@ void WalkTest::CreateColliders ()
 		   csVector3 (DX_2L, OYL+DYL, DZ_2L));
   mesh = new csPolygonMeshBox (legs_box);
   legs = collide_system->CreateCollider (mesh);
-  radius = qsqrt (csSquaredDist::PointPoint (legs_box.GetCenter (),
+  radius = csQsqrt (csSquaredDist::PointPoint (legs_box.GetCenter (),
 	legs_box.Min ()));
   legs_radius.Set (radius);
   legs_center = legs_box.GetCenter ();
@@ -110,7 +110,7 @@ int FindSectors (csVector3 v, csVector3 d, iSector *s, iSector **sa)
 {
   int c = 0;
   // @@@ Avoid this sqrt somehow? i.e. by having it in the objects.
-  float size = qsqrt (d.x * d.x + d.y * d.y + d.z * d.z);
+  float size = csQsqrt (d.x * d.x + d.y * d.y + d.z * d.z);
   csRef<iSectorIterator> it (Sys->Engine->GetNearbySectors (s, v, size));
   while (it->HasNext ())
   {

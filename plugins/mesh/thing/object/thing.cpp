@@ -21,7 +21,7 @@
 #include "cssysdef.h"
 #include <limits.h>
 #include "csutil/csendian.h"
-#include "qint.h"
+#include "csqint.h"
 #include "thing.h"
 #include "polygon.h"
 #include "polytext.h"
@@ -63,7 +63,7 @@
 #include "iutil/strset.h"
 #include "iengine/rview.h"
 #include "iengine/fview.h"
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/polyrender.h"
 #include "ivaria/reporter.h"
@@ -1040,7 +1040,7 @@ void csThingStatic::GetBoundingBox (csBox3 &box)
   }
 
   obj_radius = (obj_bbox.Max () - obj_bbox.Min ()) * 0.5f;
-  max_obj_radius = qsqrt (csSquaredDist::PointPoint (
+  max_obj_radius = csQsqrt (csSquaredDist::PointPoint (
   	obj_bbox.Max (), obj_bbox.Min ())) * 0.5f;
   box = obj_bbox;
 }
@@ -1652,17 +1652,17 @@ char* csThing::GenerateCacheName ()
     }
   }
 
-  l = convert_endian ((int32)QInt ((b.MinX () * 1000)+.5));
+  l = convert_endian ((int32)csQint ((b.MinX () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)QInt ((b.MinY () * 1000)+.5));
+  l = convert_endian ((int32)csQint ((b.MinY () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)QInt ((b.MinZ () * 1000)+.5));
+  l = convert_endian ((int32)csQint ((b.MinZ () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)QInt ((b.MaxX () * 1000)+.5));
+  l = convert_endian ((int32)csQint ((b.MaxX () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)QInt ((b.MaxY () * 1000)+.5));
+  l = convert_endian ((int32)csQint ((b.MaxY () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)QInt ((b.MaxZ () * 1000)+.5));
+  l = convert_endian ((int32)csQint ((b.MaxZ () * 1000)+.5));
   mf.Write ((char*)&l, 4);
 
   csMD5::Digest digest = csMD5::Encode (mf.GetData (), mf.GetSize ());

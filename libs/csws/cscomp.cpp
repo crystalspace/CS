@@ -23,7 +23,7 @@
 
 #include "cstool/cspixmap.h"
 #include "csutil/csinput.h"
-#include "qint.h"
+#include "csqint.h"
 #include "ivideo/graph2d.h"
 #include "csws/cscomp.h"
 #include "csws/csapp.h"

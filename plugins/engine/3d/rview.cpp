@@ -234,7 +234,7 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDP &poly)
 
 #ifdef USE_EXP_FOG
       // Implement semi-exponential fog (linearily approximated)
-      uint table_index = QRound (
+      uint table_index = csQround (
           (100 * ABS (dist2 - dist1)) * fi->fog->density);
       float I2;
       if (table_index < FOG_EXP_TABLE_SIZE)
@@ -366,7 +366,7 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDPFX &poly)
 
 #ifdef USE_EXP_FOG
       // Implement semi-exponential fog (linearily approximated)
-      uint table_index = QRound (
+      uint table_index = csQround (
           (100 * ABS (dist2 - dist1)) * fi->fog->density);
       float I2;
       if (table_index < FOG_EXP_TABLE_SIZE)
@@ -506,7 +506,7 @@ void csRenderView::CalculateFogMesh (
 
 #ifdef USE_EXP_FOG
       // Implement semi-exponential fog (linearily approximated)
-      uint table_index = QRound (
+      uint table_index = csQround (
           (100 * ABS (dist2 - dist1)) * finfo->fog->density);
       float I2;
       if (table_index < FOG_EXP_TABLE_SIZE)
@@ -646,7 +646,7 @@ void csRenderView::CalculateFogMesh (
 
 #ifdef USE_EXP_FOG
       // Implement semi-exponential fog (linearily approximated)
-      uint table_index = QRound (
+      uint table_index = csQround (
           (100 * ABS (dist2 - dist1)) * finfo->fog->density);
       float I2;
       if (table_index < FOG_EXP_TABLE_SIZE)

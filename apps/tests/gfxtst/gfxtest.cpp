@@ -35,7 +35,7 @@
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"
 #include "csutil/cmdhelp.h"
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 
 #include <string.h>
 
@@ -230,7 +230,7 @@ static bool display_picture (iImage *ifile)
     for (x = 0; x < opt.displayW; x++)
     {
       csRGBpixel &src = rgb [*idx++];
-      int gray = int (qsqrt (src.red * src.red + src.green * src.green +
+      int gray = int (csQsqrt (src.red * src.red + src.green * src.green +
         src.blue * src.blue) * 8 / 442);
       putc (imgchr [gray], stdout);
     }

@@ -47,7 +47,7 @@
 #include "iutil/strset.h"
 #include "genmesh.h"
 
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 
 #include "ivideo/rendermesh.h"
 
@@ -253,46 +253,46 @@ char* csGenmeshMeshObject::GenerateCacheName ()
         mf.Write (sect->QueryObject ()->GetName (),
         strlen (sect->QueryObject ()->GetName ()));
       csVector3 pos = movable->GetFullPosition ();
-      l = convert_endian ((int32)QInt ((pos.x * 1000)+.5));
+      l = convert_endian ((int32)csQint ((pos.x * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)QInt ((pos.y * 1000)+.5));
+      l = convert_endian ((int32)csQint ((pos.y * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)QInt ((pos.z * 1000)+.5));
+      l = convert_endian ((int32)csQint ((pos.z * 1000)+.5));
       mf.Write ((char*)&l, 4);
       csReversibleTransform tr = movable->GetFullTransform ();
       const csMatrix3& o2t = tr.GetO2T ();
-      l = convert_endian ((int32)QInt ((o2t.m11 * 1000)+.5));
+      l = convert_endian ((int32)csQint ((o2t.m11 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)QInt ((o2t.m12 * 1000)+.5));
+      l = convert_endian ((int32)csQint ((o2t.m12 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)QInt ((o2t.m13 * 1000)+.5));
+      l = convert_endian ((int32)csQint ((o2t.m13 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)QInt ((o2t.m21 * 1000)+.5));
+      l = convert_endian ((int32)csQint ((o2t.m21 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)QInt ((o2t.m22 * 1000)+.5));
+      l = convert_endian ((int32)csQint ((o2t.m22 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)QInt ((o2t.m23 * 1000)+.5));
+      l = convert_endian ((int32)csQint ((o2t.m23 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)QInt ((o2t.m31 * 1000)+.5));
+      l = convert_endian ((int32)csQint ((o2t.m31 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)QInt ((o2t.m32 * 1000)+.5));
+      l = convert_endian ((int32)csQint ((o2t.m32 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)QInt ((o2t.m33 * 1000)+.5));
+      l = convert_endian ((int32)csQint ((o2t.m33 * 1000)+.5));
       mf.Write ((char*)&l, 4);
     }
   }
 
-  l = convert_endian ((int32)QInt ((b.MinX () * 1000)+.5));
+  l = convert_endian ((int32)csQint ((b.MinX () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)QInt ((b.MinY () * 1000)+.5));
+  l = convert_endian ((int32)csQint ((b.MinY () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)QInt ((b.MinZ () * 1000)+.5));
+  l = convert_endian ((int32)csQint ((b.MinZ () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)QInt ((b.MaxX () * 1000)+.5));
+  l = convert_endian ((int32)csQint ((b.MaxX () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)QInt ((b.MaxY () * 1000)+.5));
+  l = convert_endian ((int32)csQint ((b.MaxY () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)QInt ((b.MaxZ () * 1000)+.5));
+  l = convert_endian ((int32)csQint ((b.MaxZ () * 1000)+.5));
   mf.Write ((char*)&l, 4);
 
   csMD5::Digest digest = csMD5::Encode (mf.GetData (), mf.GetSize ());
@@ -386,15 +386,15 @@ bool csGenmeshMeshObject::WriteToCache (iCacheManager* cache_mgr)
     const csColor& c = static_mesh_colors[v];
     int i; uint8 b;
 
-    i = QInt (c.red * (float)CS_NORMAL_LIGHT_LEVEL);
+    i = csQint (c.red * (float)CS_NORMAL_LIGHT_LEVEL);
     if (i < 0) i = 0; if (i > 255) i = 255; b = i;
     mf.Write ((char*)&b, sizeof (b));
 
-    i = QInt (c.green * (float)CS_NORMAL_LIGHT_LEVEL);
+    i = csQint (c.green * (float)CS_NORMAL_LIGHT_LEVEL);
     if (i < 0) i = 0; if (i > 255) i = 255; b = i;
     mf.Write ((char*)&b, sizeof (b));
 
-    i = QInt (c.blue * (float)CS_NORMAL_LIGHT_LEVEL);
+    i = csQint (c.blue * (float)CS_NORMAL_LIGHT_LEVEL);
     if (i < 0) i = 0; if (i > 255) i = 255; b = i;
     mf.Write ((char*)&b, sizeof (b));
   }
@@ -415,7 +415,7 @@ bool csGenmeshMeshObject::WriteToCache (iCacheManager* cache_mgr)
     for (int n = 0; n < num_lit_mesh_colors; n++)
     {
       int i; uint8 b;
-      i = QInt (intensities[n] * (float)CS_NORMAL_LIGHT_LEVEL);
+      i = csQint (intensities[n] * (float)CS_NORMAL_LIGHT_LEVEL);
       if (i < 0) i = 0; if (i > 255) i = 255; b = i;
       mf.Write ((char*)&b, sizeof (b));
     }
@@ -713,7 +713,7 @@ void csGenmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
     if (inShadow) continue;
 
     float in_vrt_dist =
-      (vrt_sq_dist >= SMALL_EPSILON) ? qisqrt (vrt_sq_dist) : 1.0f;
+      (vrt_sq_dist >= SMALL_EPSILON) ? csQisqrt (vrt_sq_dist) : 1.0f;
 
     float cosinus;
     if (vrt_sq_dist < SMALL_EPSILON) cosinus = 1;
@@ -727,14 +727,14 @@ void csGenmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
       if (pseudoDyn)
       {
 	// Pseudo-dynamic
-	float bright = li->GetBrightnessAtDistance (qsqrt (vrt_sq_dist));
+	float bright = li->GetBrightnessAtDistance (csQsqrt (vrt_sq_dist));
 	if (cosinus < 1) bright *= cosinus;
 	if (bright > 2.0f) bright = 2.0f; // @@@ clamp here?
 	shadowArr->shadowmap[i] = bright;
       }
       else
       {
-	col = light_color * li->GetBrightnessAtDistance (qsqrt (vrt_sq_dist));
+	col = light_color * li->GetBrightnessAtDistance (csQsqrt (vrt_sq_dist));
 	if (cosinus < 1) col *= cosinus;
 	colors[i] += col;
       }
@@ -758,10 +758,10 @@ void csGenmeshMeshObject::UpdateLightingOne (
   float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, 0);
   if (obj_sq_dist >= li->GetInfluenceRadiusSq ()) return;
   float in_obj_dist =
-    (obj_sq_dist >= SMALL_EPSILON) ? qisqrt (obj_sq_dist) : 1.0f;
+    (obj_sq_dist >= SMALL_EPSILON) ? csQisqrt (obj_sq_dist) : 1.0f;
 
   csColor light_color = li->GetColor () * (256. / CS_NORMAL_LIGHT_LEVEL)
-      * li->GetBrightnessAtDistance (qsqrt (obj_sq_dist));
+      * li->GetBrightnessAtDistance (csQsqrt (obj_sq_dist));
 
   csColor col;
   int i;
@@ -1112,7 +1112,7 @@ bool csGenmeshMeshObject::HitBeamOutline (const csVector3& start,
     if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],
         vrt[tr[i].c], seg, isect))
     {
-      if (pr) *pr = qsqrt (csSquaredDist::PointPoint (start, isect) /
+      if (pr) *pr = csQsqrt (csSquaredDist::PointPoint (start, isect) /
         csSquaredDist::PointPoint (start, end));
 
       return true;
@@ -1152,7 +1152,7 @@ bool csGenmeshMeshObject::HitBeamObject (const csVector3& start,
       }
     }
   }
-  if (pr) *pr = qsqrt (dist * itot_dist);
+  if (pr) *pr = csQsqrt (dist * itot_dist);
   if (dist >= tot_dist)
     return false;
   return true;
@@ -1469,8 +1469,8 @@ void csGenmeshMeshObjectFactory::CalculateBBoxRadius ()
     if (sq_radius.y > max_sq_radius.y) max_sq_radius.y = sq_radius.y;
     if (sq_radius.z > max_sq_radius.z) max_sq_radius.z = sq_radius.z;
   }
-  radius.Set (qsqrt (max_sq_radius.x),
-    qsqrt (max_sq_radius.y), qsqrt (max_sq_radius.z));
+  radius.Set (csQsqrt (max_sq_radius.x),
+    csQsqrt (max_sq_radius.y), csQsqrt (max_sq_radius.z));
 }
 
 const csVector3& csGenmeshMeshObjectFactory::GetRadius ()

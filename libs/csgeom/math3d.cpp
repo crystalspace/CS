@@ -20,8 +20,8 @@
 #include <math.h>
 #include <float.h>
 #include "cssysdef.h"
-#include "qint.h"
-#include "qsqrt.h"
+#include "csqint.h"
+#include "cscsQsqrt.h"
 #include "csgeom/math3d.h"
 #include "csgeom/math3d_d.h"
 #include "csgeom/matrix3.h"
@@ -175,7 +175,7 @@ void csMath3::Between (
       return ;
     }
 
-    float invdist = qisqrt (sqdist);
+    float invdist = csQisqrt (sqdist);
     pct = wid * invdist;
   }
 

@@ -400,8 +400,8 @@ Q. @emph{I get the following error:}
 ----------Configuration: simple1 - Win32 Release----------
 Compiling...
 simple1.cpp
-C:\CS\INCLUDE\platform.h(26) : fatal error C1083:
-  Cannot open include file: 'volatile.h': No such file or directory
+C:\CS\INCLUDE\csplatform.h(26) : fatal error C1083:
+  Cannot open include file: 'csconfig.h': No such file or directory
 Error executing cl.exe.
 
 simple1.exe - 1 error(s), 0 warning(s)

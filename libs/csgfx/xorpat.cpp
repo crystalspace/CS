@@ -21,7 +21,7 @@
 #include "igraphic/image.h"
 #include "csgfx/memimage.h"
 #include "csgfx/rgbpixel.h"
-#include "qint.h"
+#include "csqint.h"
 #include "csgfx/xorpat.h"
 
 csPtr<iImage> csCreateXORPatternImage(int width, int height, int recdepth,
@@ -44,9 +44,9 @@ csPtr<iImage> csCreateXORPatternImage(int width, int height, int recdepth,
     {
       unsigned char value = ((x & coordmask) ^ (y & coordmask));
       int v = (value << shlpixel) + ((value >> valueshr) * valueadd);
-      pixel->red = QInt (v * red);
-      pixel->green = QInt (v * green);
-      pixel->blue = QInt (v * blue);
+      pixel->red = csQint (v * red);
+      pixel->green = csQint (v * green);
+      pixel->blue = csQint (v * blue);
       pixel++;
     }
   }

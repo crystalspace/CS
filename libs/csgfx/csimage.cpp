@@ -22,7 +22,7 @@
 #include <assert.h>
 
 #include "cssysdef.h"
-#include "qint.h"
+#include "csqint.h"
 #include "csgfx/csimage.h"
 #include "csgfx/quantize.h"
 #include "csutil/util.h"
@@ -189,8 +189,8 @@ void csImageFile::Rescale (int newwidth, int newheight)
   // just a rough scale. It could be improved by someone in the future.
 
   unsigned long x, y;
-  unsigned long dx = QInt16 (float (Width) / float (newwidth));
-  unsigned long dy = QInt16 (float (Height) / float (newheight));
+  unsigned long dx = csQint16 (float (Width) / float (newwidth));
+  unsigned long dy = csQint16 (float (Height) / float (newheight));
 
 #define RESIZE(pt, field)				\
   {							\

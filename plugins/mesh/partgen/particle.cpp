@@ -25,7 +25,7 @@
 #include "ivideo/material.h"
 #include "ivideo/vbufmgr.h"
 #include "iutil/objreg.h"
-#include "qint.h"
+#include "csqint.h"
 
 SCF_IMPLEMENT_IBASE_EXT (csNewParticleSystem)
 #ifndef CS_USE_NEW_RENDERER

@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "csgeom/math3d.h"
 #include "csgeom/textrans.h"
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 
 //---------------------------------------------------------------------------
 void csTextureTrans::compute_texture_space (
@@ -61,7 +61,7 @@ void csTextureTrans::compute_texture_space (
   float B,
   float C)
 {
-  float invl1 = qisqrt (
+  float invl1 = csQisqrt (
       (xo - x1) * (xo - x1) + (yo - y1) * (yo - y1) + (zo - z1) * (zo - z1));
   x1 = (x1 - xo) * invl1;
   y1 = (y1 - yo) * invl1;
@@ -76,7 +76,7 @@ void csTextureTrans::compute_texture_space (
   y2 = z1 * A - x1 * C;
   z2 = x1 * B - y1 * A;
 
-  float invl2 = qisqrt (x2 * x2 + y2 * y2 + z2 * z2);
+  float invl2 = csQisqrt (x2 * x2 + y2 * y2 + z2 * z2);
 
   x1 *= len1;
   y1 *= len1;
@@ -85,7 +85,7 @@ void csTextureTrans::compute_texture_space (
   y2 = y2 * len1 * invl2;
   z2 = z2 * len1 * invl2;
 
-  float invl3 = qisqrt (A * A + B * B + C * C);
+  float invl3 = csQisqrt (A * A + B * B + C * C);
   float a, b, c;
   a = A * len1 * invl3;
   b = B * len1 * invl3;
@@ -104,11 +104,11 @@ void csTextureTrans::compute_texture_space (
   float len2)
 {
   float d = csSquaredDist::PointPoint (v_orig, v1);
-  float invl1 = qisqrt (d);
+  float invl1 = csQisqrt (d);
 
   //if (ABS (l1) < SMALL_EPSILON) l1 = SMALL_EPSILON;
   d = csSquaredDist::PointPoint  (v_orig, v2);
-  float invl2 = (d) ? qisqrt (d) : 0;
+  float invl2 = (d) ? csQisqrt (d) : 0;
 
   //if (ABS (l2) < SMALL_EPSILON) l2 = SMALL_EPSILON;
   csVector3 v_u = (v1 - v_orig) * len1 * invl1;

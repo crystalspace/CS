@@ -33,7 +33,7 @@
 #include "csgeom/csrect.h"
 #include "csutil/cmdhelp.h"
 #include "csutil/util.h"
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -430,7 +430,7 @@ void csEditFontView::Reevaluate() //// number of chars in font and so on.
     celw = font->GetWidth() + inset;
     if(celw < 4*tinyw) celw = 4*tinyw;
     celh = font->GetHeight() + inset + tinyh;
-    celperrow = (int) qsqrt(font->GetCharCount());
+    celperrow = (int) csQsqrt(font->GetCharCount());
     celpercol = (font->GetCharCount() + celperrow -1) / celperrow;
 
     stats.Set(BorderWidth+inset, BorderHeight+inset+TitlebarHeight,

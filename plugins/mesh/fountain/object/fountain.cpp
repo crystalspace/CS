@@ -23,7 +23,7 @@
 #include "fountain.h"
 #include "ivideo/material.h"
 #include "iengine/material.h"
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 #include <math.h>
 #include <stdlib.h>
 

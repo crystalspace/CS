@@ -18,7 +18,7 @@
 */
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
-#include "qint.h"
+#include "csqint.h"
 #include "plugins/engine/3d/halo.h"
 #include "plugins/engine/3d/engine.h"
 #include "csgeom/polyclip.h"
@@ -199,7 +199,7 @@ bool csLightHalo::IsVisible (iCamera* camera, csEngine* Engine, csVector3 &v)
 
     if (Engine->top_clipper->GetClipper ()->IsInside (csVector2 (v.x, v.y)))
     {
-      float zv = Engine->G3D->GetZBuffValue (QRound (v.x), QRound (v.y));
+      float zv = Engine->G3D->GetZBuffValue (csQround (v.x), csQround (v.y));
       return v.z <= zv;
     }
   }

@@ -19,7 +19,7 @@
 
 #include <limits.h>
 #include "cssysdef.h"
-#include "qint.h"
+#include "csqint.h"
 #include "csws/csgfxppl.h"
 #include "csws/csmouse.h"
 #include "csutil/util.h"
@@ -119,8 +119,8 @@ void csGraphicsPipeline::Line (float x1, float y1, float x2, float y2, int color
   if (!BeginDraw (CSDRAW_2DGRAPHICS))
     return;
 
-  INCLUDE_POINT (QInt (x1), QInt (y1));
-  INCLUDE_POINT (QInt (x2), QInt (y2));
+  INCLUDE_POINT (csQint (x1), csQint (y1));
+  INCLUDE_POINT (csQint (x2), csQint (y2));
   G2D->DrawLine (x1, y1, x2, y2, color);
 }
 
@@ -239,8 +239,8 @@ void csGraphicsPipeline::Polygon3D (G3DPolygonDPFX &poly, uint mode)
   int i;
   for (i = 0; i < poly.num; i++)
   {
-    int x = QInt (poly.vertices [i].x);
-    int y = FrameHeight - 1 - QInt (poly.vertices [i].y);
+    int x = csQint (poly.vertices [i].x);
+    int y = FrameHeight - 1 - csQint (poly.vertices [i].y);
     INCLUDE_MIN_POINT (x, y);
     INCLUDE_MAX_POINT (x + 1, y + 1);
   }

@@ -28,8 +28,8 @@
 #include "csutil/csstring.h"
 #include "cstool/initapp.h"
 #include "ivaria/reporter.h"
-#include "qint.h"
-#include "qsqrt.h"
+#include "csqint.h"
+#include "cscsQsqrt.h"
 #include "csgeom/polyaa.h"
 #include "csgeom/vector2.h"
 
@@ -1043,8 +1043,8 @@ void G2DTestSystemDriver::DrawLinePerf ()
       float x2 = sx + rng.Get () * sw;
       float y2 = sy + rng.Get () * sh;
       myG2D->DrawLine (x1, y1, x2, y2, colors [rng.Get (4)]);
-      x2 = QInt (x2 - x1); y2 = QInt (y2 - y1);
-      pix_count += qsqrt (x2 * x2 + y2 * y2);
+      x2 = csQint (x2 - x1); y2 = csQint (y2 - y1);
+      pix_count += csQsqrt (x2 * x2 + y2 * y2);
     }
     myG2D->PerformExtension ("flush");
     delta_time = csGetTicks () - start_time;

@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 
 #include "iutil/cache.h"
 #include "iutil/object.h"
@@ -1331,7 +1331,7 @@ void csChunkLodTerrainObject::UpdateColors (const csArray<int>& colors,
 	if (obj_sq_dist >= ql.inflRadSq) continue;
 
 	csColor light_color = ql.lightcol * 
-	  ql.light->GetBrightnessAtDistance (qsqrt (obj_sq_dist));
+	  ql.light->GetBrightnessAtDistance (csQsqrt (obj_sq_dist));
 
 	float cosinus;
 	if (obj_sq_dist < SMALL_EPSILON) cosinus = 1;
@@ -1342,7 +1342,7 @@ void csChunkLodTerrainObject::UpdateColors (const csArray<int>& colors,
 	  csColor newcol = light_color;
 	  if (obj_sq_dist >= SMALL_EPSILON) 
 	    cosinus *= (obj_sq_dist >= SMALL_EPSILON) ? 
-	      qisqrt (obj_sq_dist) : 1.0f;
+	      csQisqrt (obj_sq_dist) : 1.0f;
 	  if (cosinus < 1) newcol *= cosinus;
 	  staticColors[i] += newcol;
 	}
@@ -1378,46 +1378,46 @@ char* csChunkLodTerrainObject::GenerateCacheName ()
         mf.Write (sect->QueryObject ()->GetName (),
         strlen (sect->QueryObject ()->GetName ()));
       csVector3 pos = movable->GetFullPosition ();
-      l = convert_endian ((int32)QInt ((pos.x * 1000)+.5));
+      l = convert_endian ((int32)csQint ((pos.x * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)QInt ((pos.y * 1000)+.5));
+      l = convert_endian ((int32)csQint ((pos.y * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)QInt ((pos.z * 1000)+.5));
+      l = convert_endian ((int32)csQint ((pos.z * 1000)+.5));
       mf.Write ((char*)&l, 4);
       csReversibleTransform tr = movable->GetFullTransform ();
       const csMatrix3& o2t = tr.GetO2T ();
-      l = convert_endian ((int32)QInt ((o2t.m11 * 1000)+.5));
+      l = convert_endian ((int32)csQint ((o2t.m11 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)QInt ((o2t.m12 * 1000)+.5));
+      l = convert_endian ((int32)csQint ((o2t.m12 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)QInt ((o2t.m13 * 1000)+.5));
+      l = convert_endian ((int32)csQint ((o2t.m13 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)QInt ((o2t.m21 * 1000)+.5));
+      l = convert_endian ((int32)csQint ((o2t.m21 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)QInt ((o2t.m22 * 1000)+.5));
+      l = convert_endian ((int32)csQint ((o2t.m22 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)QInt ((o2t.m23 * 1000)+.5));
+      l = convert_endian ((int32)csQint ((o2t.m23 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)QInt ((o2t.m31 * 1000)+.5));
+      l = convert_endian ((int32)csQint ((o2t.m31 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)QInt ((o2t.m32 * 1000)+.5));
+      l = convert_endian ((int32)csQint ((o2t.m32 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int32)QInt ((o2t.m33 * 1000)+.5));
+      l = convert_endian ((int32)csQint ((o2t.m33 * 1000)+.5));
       mf.Write ((char*)&l, 4);
     }
   }
 
-  l = convert_endian ((int32)QInt ((b.MinX () * 1000)+.5));
+  l = convert_endian ((int32)csQint ((b.MinX () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)QInt ((b.MinY () * 1000)+.5));
+  l = convert_endian ((int32)csQint ((b.MinY () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)QInt ((b.MinZ () * 1000)+.5));
+  l = convert_endian ((int32)csQint ((b.MinZ () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)QInt ((b.MaxX () * 1000)+.5));
+  l = convert_endian ((int32)csQint ((b.MaxX () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)QInt ((b.MaxY () * 1000)+.5));
+  l = convert_endian ((int32)csQint ((b.MaxY () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)QInt ((b.MaxZ () * 1000)+.5));
+  l = convert_endian ((int32)csQint ((b.MaxZ () * 1000)+.5));
   mf.Write ((char*)&l, 4);
 
   csMD5::Digest digest = csMD5::Encode (mf.GetData (), mf.GetSize ());
@@ -1532,15 +1532,15 @@ bool csChunkLodTerrainObject::WriteToCache (iCacheManager* cache_mgr)
     const csColor& c = staticLights[v];
     int i; uint8 b;
 
-    i = QInt (c.red * STATIC_LIGHT_SCALE);
+    i = csQint (c.red * STATIC_LIGHT_SCALE);
     if (i < 0) i = 0; if (i > 255) i = 255; b = i;
     mf.Write ((char*)&b, sizeof (b));
 
-    i = QInt (c.green * STATIC_LIGHT_SCALE);
+    i = csQint (c.green * STATIC_LIGHT_SCALE);
     if (i < 0) i = 0; if (i > 255) i = 255; b = i;
     mf.Write ((char*)&b, sizeof (b));
 
-    i = QInt (c.blue * STATIC_LIGHT_SCALE);
+    i = csQint (c.blue * STATIC_LIGHT_SCALE);
     if (i < 0) i = 0; if (i > 255) i = 255; b = i;
     mf.Write ((char*)&b, sizeof (b));
   }
@@ -1561,7 +1561,7 @@ bool csChunkLodTerrainObject::WriteToCache (iCacheManager* cache_mgr)
     for (size_t n = 0; n < staticLights.Length(); n++)
     {
       int i; uint8 b;
-      i = QInt (intensities[n] * STATIC_LIGHT_SCALE);
+      i = csQint (intensities[n] * STATIC_LIGHT_SCALE);
       if (i < 0) i = 0; if (i > 255) i = 255; b = i;
       mf.Write ((char*)&b, sizeof (b));
     }
@@ -1698,7 +1698,7 @@ void csChunkLodTerrainObject::CastShadows (iMovable* movable,
     if (inShadow) continue;
         
     float in_vrt_dist =
-      (vrt_sq_dist >= SMALL_EPSILON) ? qisqrt (vrt_sq_dist) : 1.0f;
+      (vrt_sq_dist >= SMALL_EPSILON) ? csQisqrt (vrt_sq_dist) : 1.0f;
 
     float cosinus;
     if (vrt_sq_dist < SMALL_EPSILON) cosinus = 1;
@@ -1709,7 +1709,7 @@ void csChunkLodTerrainObject::CastShadows (iMovable* movable,
     if (cosinus > 0)
     {
       if (vrt_sq_dist >= SMALL_EPSILON) cosinus *= in_vrt_dist;
-      float bright = li->GetBrightnessAtDistance (qsqrt (vrt_sq_dist));
+      float bright = li->GetBrightnessAtDistance (csQsqrt (vrt_sq_dist));
       if (cosinus < 1) bright *= cosinus;
       if (pseudoDyn)
       {

@@ -18,8 +18,8 @@
 
 #include <math.h>
 #include "cssysdef.h"
-#include "qint.h"
-#include "qsqrt.h"
+#include "csqint.h"
+#include "cscsQsqrt.h"
 #include "csgeom/matrix3.h"
 
 //---------------------------------------------------------------------------
@@ -75,10 +75,10 @@ int Eigen (csMatrix3& M, csMatrix3& vout, csVector3& dout)
 	    else
       {
         theta = (0.5f * h) / (M.m12);
-        t = 1.0f / (ABS (theta) + qsqrt (1.0f + theta * theta));
+        t = 1.0f / (ABS (theta) + csQsqrt (1.0f + theta * theta));
         if (theta < 0.0) t = -t;
       }
-      c = 1.0f / qsqrt(1.0f + t * t); s=t*c; tau = s / (1.0f + c); h = t * M.m12;
+      c = 1.0f / csQsqrt(1.0f + t * t); s=t*c; tau = s / (1.0f + c); h = t * M.m12;
 	    z.x -= h; z.y += h; d.x -= h; d.y += h;
 	    M.m12 = 0.0f;
 	    rotate(M.m13,M.m23); rotate(v.m11,v.m12);
@@ -100,10 +100,10 @@ int Eigen (csMatrix3& M, csMatrix3& vout, csVector3& dout)
 	    else
 	      {
 		theta = 0.5f * h / (M.m13);
-		t = 1.0f / (ABS (theta) + qsqrt(1.0f + theta * theta));
+		t = 1.0f / (ABS (theta) + csQsqrt(1.0f + theta * theta));
 		if (theta < 0.0f) t = -t;
 	      }
-	    c = 1.0f / qsqrt(1.0f + t * t); s = t * c;
+	    c = 1.0f / csQsqrt(1.0f + t * t); s = t * c;
       tau = s / (1.0f + c); h = t * M.m13;
 	    z.x -= h; z.z += h; d.x -= h; d.z += h;
 	    M.m13 = 0.0f;
@@ -126,10 +126,10 @@ int Eigen (csMatrix3& M, csMatrix3& vout, csVector3& dout)
 	    else
 	      {
 		theta = 0.5f * h / (M.m23);
-		t = 1.0f / (ABS (theta)+ qsqrt(1.0f + theta * theta));
+		t = 1.0f / (ABS (theta)+ csQsqrt(1.0f + theta * theta));
 		if (theta < 0.0f) t = -t;
 	      }
-	    c = 1.0f / qsqrt(1.0f + t * t); s = t * c;
+	    c = 1.0f / csQsqrt(1.0f + t * t); s = t * c;
       tau = s / (1.0f + c); h = t * M.m23;
 	    z.y -= h; z.z += h; d.y -= h; d.z += h;
 	    M.m23 = 0.0f;

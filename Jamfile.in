@@ -30,7 +30,7 @@ CleanDir clean : out ;
 Clean distclean : Jamconfig Jamfile jambuild jam$(SUFEXE) Makefile
 		  config.log config.status config.status.lineno
 		  config.cache configure.lineno
-		  include/volatile.h ;
+		  include/csconfig.h ;
 CleanDir distclean : autom4te.cache ;
 Depends distclean : clean ;
 Help distclean : "Remove configuration information and built targets" ;
@@ -68,7 +68,7 @@ SubInclude TOP scripts ;
 # When build directory differs from source directory, also arrange for
 # 'distclean' to remove the $(BUILDDIR)/include directory created by
 # configure.  Also ensure that 'install' installs the generated
-# $(BUILDDIR)/include/volatile.h.
+# $(BUILDDIR)/include/csconfig.h.
 if [ Property build : standalone ]
 {
   CleanDir distclean : include ;

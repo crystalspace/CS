@@ -16,7 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 #include "csgeom/poly3d.h"
 #include "csgeom/poly2d.h"
 
@@ -635,7 +635,7 @@ csVector3 csPoly3D::ComputeNormal (csVector3 *vertices, int num)
   if (sqd < SMALL_EPSILON)
     invd = 1.0f / SMALL_EPSILON;
   else
-    invd = qisqrt (sqd);
+    invd = csQisqrt (sqd);
   return csVector3 (ayz * invd, azx * invd, axy * invd);
 }
 

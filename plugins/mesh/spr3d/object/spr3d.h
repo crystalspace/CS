@@ -49,7 +49,7 @@
 #include "cstool/anonrndbuf.h"
 #include "cstool/rendermeshholder.h"
 #include "ivideo/material.h"
-#include "qint.h"
+#include "csqint.h"
 #include "csgfx/shadervarcontext.h"
 #include "csutil/garray.h"
 

@@ -19,7 +19,7 @@
 #ifndef __CS_UTIL_REGEX_WRAPPER_H__
 #define __CS_UTIL_REGEX_WRAPPER_H__
 
-#include "platform.h"
+#include "csplatform.h"
 
 #ifdef CS_HAS_REGEX
   #include <regex.h>

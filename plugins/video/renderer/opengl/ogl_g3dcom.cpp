@@ -23,7 +23,7 @@
 
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
-#include "qint.h"
+#include "csqint.h"
 #include "csutil/scf.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
@@ -60,7 +60,7 @@
 #include "csutil/util.h"
 #include "csgfx/rgbpixel.h"
 #include "csgfx/memimage.h"
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 
 #include "ieffects/efserver.h"
 #include "ieffects/efdef.h"
@@ -5739,11 +5739,11 @@ void csGraphics3DOGLCommon::DrawLine (const csVector3 & v1,
     z2 = SMALL_Z;
   }
   float iz1 = fov / z1;
-  int px1 = QInt (x1 * iz1 + (width / 2));
-  int py1 = height - 1 - QInt (y1 * iz1 + (height / 2));
+  int px1 = csQint (x1 * iz1 + (width / 2));
+  int py1 = height - 1 - csQint (y1 * iz1 + (height / 2));
   float iz2 = fov / z2;
-  int px2 = QInt (x2 * iz2 + (width / 2));
-  int py2 = height - 1 - QInt (y2 * iz2 + (height / 2));
+  int px2 = csQint (x2 * iz2 + (width / 2));
+  int py2 = height - 1 - csQint (y2 * iz2 + (height / 2));
 
   G2D->DrawLine (px1, py1, px2, py2, color);
 }

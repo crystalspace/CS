@@ -18,7 +18,7 @@
 */
 
 #include "cssysdef.h"
-#include "qint.h"
+#include "csqint.h"
 
 #include "csutil/csmd5.h"
 #include "csutil/ref.h"
@@ -244,10 +244,10 @@ csPtr<iBase> csFuncTexLoader::Parse (iDocumentNode* node,
 	    {
 	      csVector4 v;
 	      result->GetValue (v);
-	      line->red   = QInt (v.x * 255.99f);
-	      line->green = QInt (v.y * 255.99f);
-	      line->blue  = QInt (v.z * 255.99f);
-	      line->alpha = QInt (v.w * 255.99f);
+	      line->red   = csQint (v.x * 255.99f);
+	      line->green = csQint (v.y * 255.99f);
+	      line->blue  = csQint (v.z * 255.99f);
+	      line->alpha = csQint (v.w * 255.99f);
 	    }
 	    line++;
 	  }

@@ -108,10 +108,10 @@ void LM_NAME (csPolyTextureMapping* tmapping,
 	uint8 *lt_G = texman->lightmap_tables [1];
 	uint8 *lt_B = texman->lightmap_tables [2];
 
-	int min_lu = QRound (floor (u_min));
-	int max_lu = QRound (ceil (u_max));
-	int min_lv = QRound (floor (v_min));
-	int max_lv = QRound (ceil (v_max));
+	int min_lu = csQround (floor (u_min));
+	int max_lu = csQround (ceil (u_max));
+	int min_lv = csQround (floor (v_min));
+	int max_lv = csQround (ceil (v_max));
 
 	if (min_lu < 0) min_lu = 0;
 	if (min_lv < 0) min_lv = 0;
@@ -223,10 +223,10 @@ void LM_NAME (csPolyTextureMapping* tmapping,
 	uint8 *lt_G = texman->lightmap_tables [1];
 	uint8 *lt_B = texman->lightmap_tables [2];
 
-	int min_lu = QRound (floor (u_min)) >> pt_cell_shift;
-	int max_lu = (QRound (ceil (u_max)) + pt_cell_size - 1) >> pt_cell_shift;
-	int min_lv = QRound (floor (v_min)) >> pt_cell_shift;
-	int max_lv = (QRound (ceil (v_max)) + pt_cell_size - 1) >> pt_cell_shift;
+	int min_lu = csQround (floor (u_min)) >> pt_cell_shift;
+	int max_lu = (csQround (ceil (u_max)) + pt_cell_size - 1) >> pt_cell_shift;
+	int min_lv = csQround (floor (v_min)) >> pt_cell_shift;
+	int max_lv = (csQround (ceil (v_max)) + pt_cell_size - 1) >> pt_cell_shift;
 
 	if (min_lu < 0) min_lu = 0;
 	if (min_lv < 0) min_lv = 0;

@@ -20,7 +20,7 @@
 
 #define CS_SYSDEF_PROVIDE_SOFTWARE2D
 #include "cssysdef.h"
-#include "qint.h"
+#include "csqint.h"
 #include "null_g3d.h"
 #include "null_txt.h"
 #include "iutil/cfgfile.h"

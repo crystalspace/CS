@@ -41,7 +41,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/csmd5.h"
 #include "iengine/mesh.h"
 #include "csutil/csendian.h"
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 
 // STL include required by cal3d
 #include <string>
@@ -1012,10 +1012,10 @@ void csSpriteCal3DMeshObject::UpdateLightingSubmesh (const csArray<iLight*>& lig
     csVector3 obj_light_pos = trans.Other2This (wor_light_pos);
     float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, 0);
     if (obj_sq_dist >= li->GetInfluenceRadiusSq ()) return;
-    float in_obj_dist = (obj_sq_dist >= SMALL_EPSILON)?qisqrt (obj_sq_dist):1.0f;
+    float in_obj_dist = (obj_sq_dist >= SMALL_EPSILON)?csQisqrt (obj_sq_dist):1.0f;
 
     csColor light_color = li->GetColor () * (256.0f / CS_NORMAL_LIGHT_LEVEL)
-      * li->GetBrightnessAtDistance (qsqrt (obj_sq_dist));
+      * li->GetBrightnessAtDistance (csQsqrt (obj_sq_dist));
 
     int normal_index=0;
     for (i = 0; i < vertCount; i++)
@@ -1347,7 +1347,7 @@ bool csSpriteCal3DMeshObject::HitBeamOutline (const csVector3& start,
 		  vertices[m][s][(*iteratorFace).vertexId[2]], seg, tsect))
 	    {
 	      isect = tsect;
-	      if (pr) *pr = qsqrt (csSquaredDist::PointPoint (start, isect) /
+	      if (pr) *pr = csQsqrt (csSquaredDist::PointPoint (start, isect) /
 		  csSquaredDist::PointPoint (start, end));
 	      return true;
 	    }
@@ -1479,7 +1479,7 @@ bool csSpriteCal3DMeshObject::HitBeamObject (const csVector3& start,
 	}
       }
     }
-    if (pr) *pr = qsqrt (dist / max);
+    if (pr) *pr = csQsqrt (dist / max);
     if (dist >= max) return false;
     return true;
   }

@@ -18,7 +18,7 @@
 */
 
 #include "cssysdef.h"
-#include "qint.h"
+#include "csqint.h"
 #include "scan.h"
 #include "tcache.h"
 #include "soft_txt.h"
@@ -38,8 +38,8 @@ void csScan_scan_zfil (int xx, unsigned char* d,
   (void)u_div_z; (void)v_div_z; (void)inv_z; (void)d;
   uint32* lastZbuf = z_buf + xx-1;
   int dzz, izz;
-  izz = QInt24 (inv_z);
-  dzz = QInt24 (Scan.M);
+  izz = csQint24 (inv_z);
+  dzz = csQint24 (Scan.M);
 
   do
   {
@@ -87,11 +87,11 @@ void csScan_Initialize ()
 
   int i;
   for (i = 1; i < (1 << 12); i++)
-    Scan.one_div_z [i] = QRound (float (0x1000000) / float (i));
+    Scan.one_div_z [i] = csQround (float (0x1000000) / float (i));
   Scan.one_div_z [0] = Scan.one_div_z [1];
 
   for (i = 0; i < EXP_256_SIZE; i++)
-    Scan.exp_256 [i] = QRound (255 * exp (-float (i) / 256.));
+    Scan.exp_256 [i] = csQround (255 * exp (-float (i) / 256.));
 }
 
 void csScan_CalcBlendTables (unsigned char *BlendingTable[], int rbits,

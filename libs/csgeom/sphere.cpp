@@ -18,8 +18,8 @@
 #include <math.h>
 #include <float.h>
 #include "cssysdef.h"
-#include "qint.h"
-#include "qsqrt.h"
+#include "csqint.h"
+#include "cscsQsqrt.h"
 #include "csgeom/sphere.h"
 #include "csgeom/math3d.h"
 
@@ -34,7 +34,7 @@ csSphere operator+ (const csSphere &s1, const csSphere &s2)
 void csSphere::Union (const csVector3 &ocenter, float oradius)
 {
   // First calculate distance between centers of two spheres.
-  float distance = qsqrt (csSquaredDist::PointPoint (center, ocenter));
+  float distance = csQsqrt (csSquaredDist::PointPoint (center, ocenter));
 
   if (radius >= oradius + distance)       // Sphere 2 is inside sphere 1
   {

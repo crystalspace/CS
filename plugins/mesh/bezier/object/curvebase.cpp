@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "qint.h"
-#include "qsqrt.h"
+#include "csqint.h"
+#include "cscsQsqrt.h"
 #include "bezier2.h"
 #include "curvebase.h"
 #include "beziermsh.h"
@@ -112,20 +112,20 @@ void csCurveTesselated::UpdateColors (csCurveLightMap *LightMap)
     csTriangle &ct = Triangles[j];
     int lm_idx;
     int cx, cy;
-    cx = QInt (ControlPoints[ct.a].x * (lm_width - 1));
-    cy = QInt (ControlPoints[ct.a].y * (lm_height - 1));
+    cx = csQint (ControlPoints[ct.a].x * (lm_width - 1));
+    cy = csQint (ControlPoints[ct.a].y * (lm_height - 1));
     lm_idx = cy * lm_width + cx;
     Colors[ct.a].red = ((float)map[lm_idx].red) / 256.0f;
     Colors[ct.a].green = ((float)map[lm_idx].green) / 256.0f;
     Colors[ct.a].blue = ((float)map[lm_idx].blue) / 256.0f;
-    cx = QInt (ControlPoints[ct.b].x * (lm_width - 1));
-    cy = QInt (ControlPoints[ct.b].y * (lm_height - 1));
+    cx = csQint (ControlPoints[ct.b].x * (lm_width - 1));
+    cy = csQint (ControlPoints[ct.b].y * (lm_height - 1));
     lm_idx = cy * lm_width + cx;
     Colors[ct.b].red = ((float)map[lm_idx].red) / 256.0f;
     Colors[ct.b].green = ((float)map[lm_idx].green) / 256.0f;
     Colors[ct.b].blue = ((float)map[lm_idx].blue) / 256.0f;
-    cx = QInt (ControlPoints[ct.c].x * (lm_width - 1));
-    cy = QInt (ControlPoints[ct.c].y * (lm_height - 1));
+    cx = csQint (ControlPoints[ct.c].x * (lm_width - 1));
+    cy = csQint (ControlPoints[ct.c].y * (lm_height - 1));
     lm_idx = cy * lm_width + cx;
     Colors[ct.c].red = ((float)map[lm_idx].red) / 256.0f;
     Colors[ct.c].green = ((float)map[lm_idx].green) / 256.0f;
@@ -339,7 +339,7 @@ void csCurve::ShineDynLight (csBezierLightPatch *lp)
 
       d = csSquaredDist::PointPoint (center, pos);
       if (d >= light->GetInfluenceRadiusSq ()) continue;
-      d = qsqrt (d);
+      d = csQsqrt (d);
       normal = uv2Normal[uv];
 
       float cosinus = (pos - center) * normal;
@@ -354,21 +354,21 @@ void csCurve::ShineDynLight (csBezierLightPatch *lp)
 
       if (color.red > 0)
       {
-        lval = map[uv].red + QRound (color.red * brightness);
+        lval = map[uv].red + csQround (color.red * brightness);
         if (lval > 255) lval = 255;
         map[uv].red = lval;
       }
 
       if (color.green > 0)
       {
-        lval = map[uv].green + QRound (color.green * brightness);
+        lval = map[uv].green + csQround (color.green * brightness);
         if (lval > 255) lval = 255;
         map[uv].green = lval;
       }
 
       if (color.blue > 0)
       {
-        lval = map[uv].blue + QRound (color.blue * brightness);
+        lval = map[uv].blue + csQround (color.blue * brightness);
         if (lval > 255) lval = 255;
         map[uv].blue = lval;
       }
@@ -502,7 +502,7 @@ void csCurve::CalculateLightingStatic (iFrustumView *lview, bool vis)
 
       d = csSquaredDist::PointPoint (center, pos);
       if (d >= l->GetInfluenceRadiusSq ()) continue;
-      d = qsqrt (d);
+      d = csQsqrt (d);
 
       normal = uv2Normal[uv];
 
@@ -519,7 +519,7 @@ void csCurve::CalculateLightingStatic (iFrustumView *lview, bool vis)
 
       if (dyn)
       {
-        lval = ShadowMap[uv] + QRound (CS_NORMAL_LIGHT_LEVEL * brightness);
+        lval = ShadowMap[uv] + csQround (CS_NORMAL_LIGHT_LEVEL * brightness);
         if (lval > 255) lval = 255;
         ShadowMap[uv] = lval;
       }
@@ -527,21 +527,21 @@ void csCurve::CalculateLightingStatic (iFrustumView *lview, bool vis)
       {
         if (col.red > 0)
         {
-          lval = Lightmap[uv].red + QRound (color.red * brightness);
+          lval = Lightmap[uv].red + csQround (color.red * brightness);
           if (lval > 255) lval = 255;
           Lightmap[uv].red = lval;
         }
 
         if (col.green > 0)
         {
-          lval = Lightmap[uv].green + QRound (color.green * brightness);
+          lval = Lightmap[uv].green + csQround (color.green * brightness);
           if (lval > 255) lval = 255;
           Lightmap[uv].green = lval;
         }
 
         if (col.blue > 0)
         {
-          lval = Lightmap[uv].blue + QRound (color.blue * brightness);
+          lval = Lightmap[uv].blue + csQround (color.blue * brightness);
           if (lval > 255) lval = 255;
           Lightmap[uv].blue = lval;
         }

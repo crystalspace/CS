@@ -2,10 +2,10 @@
   This header is used by COMP_VC and COMP_BC for OS_WIN32 builds.  It is
   not used for COMP_GCC builds under normal circumstances since GCC builds
   are performed in concert with invocation of the CS configure script which
-  generates a suitable volatile.h file.
+  generates a suitable csconfig.h file.
 */
-#ifndef __CS_WIN32_VOLATILE_H__
-#define __CS_WIN32_VOLATILE_H__
+#ifndef __CS_WIN32_CSCONFIG_H__
+#define __CS_WIN32_CSCONFIG_H__
 
 #define CS_PACKAGE_NAME "crystalspace"
 
@@ -59,4 +59,4 @@
 
 //#define CS_REF_TRACKER
 
-#endif // __CS_WIN32_VOLATILE_H__
+#endif // __CS_WIN32_CSCONFIG_H__

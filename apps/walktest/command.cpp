@@ -30,7 +30,7 @@
 #include "command.h"
 #include "csutil/scanstr.h"
 #include "walktest.h"
-#include "qint.h"
+#include "csqint.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivaria/conout.h"

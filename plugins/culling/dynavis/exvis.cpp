@@ -19,8 +19,8 @@
 #include "csutil/sysfunc.h"
 #include "csutil/scfstr.h"
 #include "iutil/string.h"
-#include "qint.h"
-#include "qsqrt.h"
+#include "csqint.h"
+#include "cscsQsqrt.h"
 #include "csgeom/box.h"
 #include "csgeom/math3d.h"
 #include "csgeom/poly3d.h"
@@ -102,7 +102,7 @@ void csExactCuller::InsertPolygon (csVector2* tr_verts, int num_verts,
 
   sxL = sxR = dxL = dxR = 0;            // Avoid warnings about "uninit vars"
   scanL2 = scanR2 = max_i;
-  sy = fyL = fyR = QRound (tr_verts [scanL2].y);
+  sy = fyL = fyR = csQround (tr_verts [scanL2].y);
 
   for ( ; ; )
   {
@@ -123,7 +123,7 @@ void csExactCuller::InsertPolygon (csVector2* tr_verts, int num_verts,
 	  scanR2 = 0;
 
         leave = false;
-        fyR = QRound (tr_verts [scanR2].y);
+        fyR = csQround (tr_verts [scanR2].y);
         if (sy <= fyR)
           continue;
 
@@ -143,7 +143,7 @@ void csExactCuller::InsertPolygon (csVector2* tr_verts, int num_verts,
 	  scanL2 = num_verts - 1;
 
         leave = false;
-        fyL = QRound (tr_verts [scanL2].y);
+        fyL = csQround (tr_verts [scanL2].y);
         if (sy <= fyL)
           continue;
 
@@ -172,8 +172,8 @@ void csExactCuller::InsertPolygon (csVector2* tr_verts, int num_verts,
       if (screenY >= 0 && screenY < height)
       {
         // Compute the rounded screen coordinates of horizontal strip
-        xL = QRound (sxL);
-        xR = QRound (sxR);
+        xL = csQround (sxL);
+        xR = csQround (sxR);
 	if (xR >= 0 && xL < width && xR != xL)
 	{
 	  if (xL < 0) xL = 0;

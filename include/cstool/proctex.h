@@ -29,7 +29,7 @@
 #include "iutil/eventh.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
-#include "qint.h"
+#include "csqint.h"
 
 struct iTextureWrapper;
 struct iMaterialWrapper;

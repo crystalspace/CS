@@ -21,7 +21,7 @@
 #include "OSXDelegate.h"
 #include "OSXMenu.h"
 #include "iutil/evdefs.h"
-#include "volatile.h"		// OS_MACOSXS
+#include "csconfig.h"		// OS_MACOSXS
 #include <stdio.h>
 #import <AppKit/NSApplication.h>
 #import <AppKit/NSCursor.h>

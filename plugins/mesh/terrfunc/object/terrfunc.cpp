@@ -39,8 +39,8 @@
 #include "terrfunc.h"
 #include "terrvis.h"
 #include "terrdiv.h"
-#include "qint.h"
-#include "qsqrt.h"
+#include "csqint.h"
+#include "cscsQsqrt.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -917,13 +917,13 @@ void TerrFuncTriangleVertices::csTriangleVertex::CalculateCost (TerrFuncTriangle
     int vtl = top, vtr = top, vbl = _vbl, vbr = _vbr;
     float x = this_pos.x;
     float y = this_pos.y;
-    int ry = QRound (y);
-    if (ry > QRound (v[vbl].y))
+    int ry = csQround (y);
+    if (ry > csQround (v[vbl].y))
     {
       vtl = vbl;
       if (--vbl < 0) vbl = 2;
     }
-    else if (ry > QRound (v[vbr].y))
+    else if (ry > csQround (v[vbr].y))
     {
       vtr = vbr;
       if (++vbr > 2) vbr = 0;
@@ -933,12 +933,12 @@ void TerrFuncTriangleVertices::csTriangleVertex::CalculateCost (TerrFuncTriangle
 //printf ("a: v[vbl].x=%g v[vtl].x=%g x=%g\n", v[vbl].x, v[vtl].x, x);
     // Now interpolate the height.
     float tL, tR, xL, xR, tX;
-    if (QRound (v[vbl].y) != QRound (v[vtl].y))
+    if (csQround (v[vbl].y) != csQround (v[vtl].y))
       tL = (y - v[vtl].y) / (v[vbl].y - v[vtl].y);
     else
       tL = ((v[vbl].x - v[vtl].x) > SMALL_EPSILON) ? (x - v[vtl].x) / (v[vbl].x - v[vtl].x) : 1000000.;
 //printf ("b\n");
-    if (QRound (v[vbr].y) != QRound (v[vtr].y))
+    if (csQround (v[vbr].y) != csQround (v[vtr].y))
       tR = (y - v[vtr].y) / (v[vbr].y - v[vtr].y);
     else
       tR = ((v[vbr].x - v[vtr].x) > SMALL_EPSILON) ? (x - v[vtr].x) / (v[vbr].x - v[vtr].x) : 1000000.;
@@ -1327,7 +1327,7 @@ void csTerrFuncObject::ComputeBBoxes ()
   t = (v.x - rad_center.x)*(v.x - rad_center.x) +
       (v.y - rad_center.y)*(v.y - rad_center.y) +
 	  (v.z - rad_center.z)*(v.z - rad_center.z);
-  t = qsqrt (t);
+  t = csQsqrt (t);
   radius = csVector3 (t,t,t);
 }
 
@@ -1966,7 +1966,7 @@ bool csTerrFuncObject::HitBeamOutline (const csVector3& start,
     	     vrt[tr[i].c], seg, isect))
         {
 
-            if (pr) *pr = qsqrt(csSquaredDist::PointPoint (start, isect) /
+            if (pr) *pr = csQsqrt(csSquaredDist::PointPoint (start, isect) /
 	                           csSquaredDist::PointPoint (start, end));
 	    return true;
 	}
@@ -2035,7 +2035,7 @@ bool csTerrFuncObject::HitBeamObject (const csVector3& start,
 	  {
 	    isect = st;
 	    dist = dist2;
-            if (pr) *pr = qsqrt( dist / max_dist );
+            if (pr) *pr = csQsqrt( dist / max_dist );
 	  }
 	}
       }

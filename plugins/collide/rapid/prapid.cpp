@@ -61,8 +61,8 @@
 \**************************************************************************/
 
 #include "cssysdef.h"
-#include "qsqrt.h"
-#include "qint.h"
+#include "cscsQsqrt.h"
+#include "csqint.h"
 #include "csutil/garray.h"
 #include "csgeom/transfrm.h"
 #include "rapcol.h"

@@ -20,7 +20,7 @@
 #include "cssysdef.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/transfrm.h"
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 
 //---------------------------------------------------------------------------
 csTransform csTransform::GetReflect (const csPlane3 &pl)
@@ -361,7 +361,7 @@ void csReversibleTransform::LookAt (
   sqr = v * v;
   if (sqr > SMALL_EPSILON)
   {
-    w3 *= qisqrt (sqr);
+    w3 *= csQisqrt (sqr);
     w1 = w3 % up;
     sqr = w1 * w1;
     if (sqr < SMALL_EPSILON)
@@ -375,7 +375,7 @@ void csReversibleTransform::LookAt (
       }
     }
 
-    w1 *= qisqrt (sqr);
+    w1 *= csQisqrt (sqr);
     w2 = w3 % w1;
 
     m.m11 = w1.x;

@@ -17,8 +17,8 @@
 */
 #include <math.h>
 #include "cssysdef.h"
-#include "qint.h"
-#include "qsqrt.h"
+#include "csqint.h"
+#include "cscsQsqrt.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/polyaa.h"
 #include "csgeom/poly3d.h"
@@ -548,9 +548,9 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp,
   scanL2 = scanR2 = MaxIndex;
 
   // sy = fyL = fyR =
-  //   (QRound (f_uv[scanL2].y)>lh-1)?lh-1:QRound (f_uv[scanL2].y);
-  sy = fyL = fyR = (QRound (ceil (f_uv[scanL2].y)) > lh - 1) ?
-    lh - 1 : QRound (ceil (f_uv[scanL2].y));
+  //   (csQround (f_uv[scanL2].y)>lh-1)?lh-1:csQround (f_uv[scanL2].y);
+  sy = fyL = fyR = (csQround (ceil (f_uv[scanL2].y)) > lh - 1) ?
+    lh - 1 : csQround (ceil (f_uv[scanL2].y));
 
   for (;;)
   {
@@ -579,7 +579,7 @@ a:
         scanR1 = scanR2;
         scanR2 = (scanR2 + 1) % lp->num_vertices;
 */
-        fyR = QRound (floor (f_uv[scanR2].y));
+        fyR = csQround (floor (f_uv[scanR2].y));
 
         float dyR = (f_uv[scanR1].y - f_uv[scanR2].y);
         sxR = f_uv[scanR1].x;
@@ -611,7 +611,7 @@ b:
         //scanL1 = scanL2;
 
         //scanL2 = (scanL2 - 1 + lp->num_vertices) % lp->num_vertices;
-        fyL = QRound (floor (f_uv[scanL2].y));
+        fyL = csQround (floor (f_uv[scanL2].y));
 
         float dyL = (f_uv[scanL1].y - f_uv[scanL2].y);
         sxL = f_uv[scanL1].x;
@@ -654,8 +654,8 @@ b:
         _l = _;
       }
 
-      xL = 1 + QRound (ceil (_l));
-      xR = QRound (floor (_r));
+      xL = 1 + csQround (ceil (_l));
+      xR = csQround (floor (_r));
 
       //if (xR > xL) { int xswap = xR; xR = xL; xL = xswap; }
       if (xR < 0) xR = 0;
@@ -699,7 +699,7 @@ b:
           d = csSquaredDist::PointPoint (lightpos, v2);
 
           if (d >= light->GetInfluenceRadiusSq ()) continue;
-          d = qsqrt (d);
+          d = csQsqrt (d);
 
           float cosinus = (v2 - lightpos) * polygon_world_plane.Normal ();
           cosinus /= d;
@@ -713,7 +713,7 @@ b:
 
           if (color.red > 0)
           {
-            l1 = QRound (color.red * brightness);
+            l1 = csQround (color.red * brightness);
             if (l1)
             {
               CS_ASSERT (uv >= 0 && uv < lm_size);
@@ -725,7 +725,7 @@ b:
 
           if (color.green > 0)
           {
-            l2 = QRound (color.green * brightness);
+            l2 = csQround (color.green * brightness);
             if (l2)
             {
               CS_ASSERT (uv >= 0 && uv < lm_size);
@@ -737,7 +737,7 @@ b:
 
           if (color.blue > 0)
           {
-            l3 = QRound (color.blue * brightness);
+            l3 = csQround (color.blue * brightness);
             if (l3)
             {
               CS_ASSERT (uv >= 0 && uv < lm_size);
@@ -1240,7 +1240,7 @@ void csShadowBitmap::UpdateLightMap (
       float d = csSquaredDist::PointPoint (lightpos, v);
       if (d >= light->GetInfluenceRadiusSq ()) continue;
 
-      d = qsqrt (d);
+      d = csQsqrt (d);
 
       // Initialize normal with the flat one
       csVector3 normal = poly_world_plane.Normal ();
@@ -1289,17 +1289,17 @@ void csShadowBitmap::UpdateLightMap (
 
 	  // Find the normal in the nearest point of the segment
 	  // ==> Linear interpolation between vertexs
-	  float AllDistance = qsqrt (
+	  float AllDistance = csQsqrt (
 	    csSquaredDist::PointPoint(seg.Start (), seg.End()));
-	  float factorA = 1.0f - (qsqrt (csSquaredDist::PointPoint (
+	  float factorA = 1.0f - (csQsqrt (csSquaredDist::PointPoint (
 	    seg.Start (),nearest) ) / AllDistance);
-	  float factorB = 1.0f - (qsqrt (csSquaredDist::PointPoint
+	  float factorB = 1.0f - (csQsqrt (csSquaredDist::PointPoint
 	    (seg.End (),nearest) ) / AllDistance);
 	  nearestNormals[act] = factorA * normals[vertexs[act]]
 	    + factorB * normals[vertexs[((act+1)%vCount)]];
 
 	  // Get the distance
-	  distances[act] = qsqrt (csSquaredDist::PointPoint(v,nearest));
+	  distances[act] = csQsqrt (csSquaredDist::PointPoint(v,nearest));
 	  if (distances[act] < shortestDistance)
 	  {
 	    nearestNormal = act;
@@ -1339,13 +1339,13 @@ void csShadowBitmap::UpdateLightMap (
 
       int l;
       csRGBpixel &lumel = lightmap[uv];
-      l = lumel.red + QRound (light_r * scale);
+      l = lumel.red + csQround (light_r * scale);
 //    if (l<20) l = 20;
       lumel.red = l < 255 ? l : 255;
-      l = lumel.green + QRound (light_g * scale);
+      l = lumel.green + csQround (light_g * scale);
 //    if (l<20) l = 20;
       lumel.green = l < 255 ? l : 255;
-      l = lumel.blue + QRound (light_b * scale);
+      l = lumel.blue + csQround (light_b * scale);
 //    if (l<20) l = 20;
       lumel.blue = l < 255 ? l : 255;
     }
@@ -1414,7 +1414,7 @@ bool csShadowBitmap::UpdateShadowMap (
       float d = csSquaredDist::PointPoint (lightpos, v);
       if (d >= light->GetInfluenceRadiusSq ()) continue;
 
-      d = qsqrt (d);
+      d = csQsqrt (d);
 
       csVector3 normal = poly_world_plane.Normal ();
       if ( static_data->GetSmoothingFlag() )
@@ -1470,17 +1470,17 @@ bool csShadowBitmap::UpdateShadowMap (
 
     // Find the normal in the nearest point of the segment
     // ==> Linear interpolation between vertexs
-    float AllDistance = qsqrt (csSquaredDist::PointPoint
+    float AllDistance = csQsqrt (csSquaredDist::PointPoint
       (segments[act].Start (),segments[act].End()));
-    float factorA = 1.0f - (qsqrt (csSquaredDist::PointPoint
+    float factorA = 1.0f - (csQsqrt (csSquaredDist::PointPoint
       (segments[act].Start (),nearest[act]) ) / AllDistance);
-    float factorB = 1.0f - (qsqrt (csSquaredDist::PointPoint
+    float factorB = 1.0f - (csQsqrt (csSquaredDist::PointPoint
       (segments[act].End (),nearest[act]) ) / AllDistance);
     nearestNormals[act] = factorA * normals[vertexs[act]]
       + factorB * normals[vertexs[((act+1)%vCount)]];
 
     // Get the distance
-    distances[act] = qsqrt (csSquaredDist::PointPoint(v,nearest[act]));
+    distances[act] = csQsqrt (csSquaredDist::PointPoint(v,nearest[act]));
     if (distances[act] < shortestDistance)
     {
       nearestNormal = act;
@@ -1530,7 +1530,7 @@ bool csShadowBitmap::UpdateShadowMap (
 
       float brightness = cosinus * light->GetBrightnessAtDistance (d);
 
-      int l = shadowmap[uv] + QRound (
+      int l = shadowmap[uv] + csQround (
           CS_NORMAL_LIGHT_LEVEL * lightness * brightness);
       shadowmap[uv] = l < 255 ? l : 255;
       if ((!relevant) && shadowmap[uv] > 0) relevant = true;

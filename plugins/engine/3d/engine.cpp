@@ -17,7 +17,7 @@
 */
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
-#include "qint.h"
+#include "csqint.h"
 #include "csutil/scf.h"
 #include "csutil/scfstrset.h"
 #include "ivaria/pmeter.h"
@@ -1486,7 +1486,7 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
       float xf;
       sscanf (endkw, "%f", &xf);
 
-      int xi = QRound (xf);
+      int xi = csQround (xf);
 
       if (!strcmp (keyword, "LMVERSION"))
       {
@@ -1917,7 +1917,7 @@ void csEngine::AddHalo (iCamera* camera, csLight *Light)
   if (!top_clipper->GetClipper ()->IsInside (csVector2 (v.x, v.y))) return ;
 
   // Check if light is not obscured by anything
-  float zv = G3D->GetZBuffValue (QRound (v.x), QRound (v.y));
+  float zv = G3D->GetZBuffValue (csQround (v.x), csQround (v.y));
   if (v.z > zv) return ;
 
   // Halo size is 1/4 of the screen height; also we make sure its odd
@@ -2784,9 +2784,9 @@ iTextureWrapper *csEngine::CreateTexture (
 
   if (iTransp)
     tex->SetKeyColor (
-        QInt (iTransp->red * 255.2),
-        QInt (iTransp->green * 255.2),
-        QInt (iTransp->blue * 255.2));
+        csQint (iTransp->red * 255.2),
+        csQint (iTransp->green * 255.2),
+        csQint (iTransp->blue * 255.2));
 
   return tex;
 }
@@ -2814,9 +2814,9 @@ iTextureWrapper *csEngine::CreateBlackTexture (
 
   if (iTransp)
     tex->SetKeyColor (
-        QInt (iTransp->red * 255.2),
-        QInt (iTransp->green * 255.2),
-        QInt (iTransp->blue * 255.2));
+        csQint (iTransp->red * 255.2),
+        csQint (iTransp->green * 255.2),
+        csQint (iTransp->blue * 255.2));
 
   return tex;
 }

@@ -26,7 +26,7 @@
 #include "iengine/material.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 #include <math.h>
 #include <stdlib.h>
 

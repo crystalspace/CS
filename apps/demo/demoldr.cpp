@@ -29,7 +29,7 @@
 #include "iutil/databuff.h"
 #include "iutil/vfs.h"
 #include "csutil/xmltiny.h"
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 
 // Define all tokens used through this file
 enum
@@ -595,7 +595,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (iDocumentNode* node,
 	for (i = 1 ; i < num ; i++)
 	{
 	  v1.Set (xv[i], yv[i], zv[i]);
-	  float d = qsqrt (csSquaredDist::PointPoint (v0, v1));
+	  float d = csQsqrt (csSquaredDist::PointPoint (v0, v1));
 	  tot += (1/list[i]) * d;
 	  list[i] = tot;
 	  v0 = v1;
@@ -632,7 +632,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (iDocumentNode* node,
 	for (i = 1 ; i < num ; i++)
 	{
 	  v1.Set (xv[i], yv[i], zv[i]);
-	  float d = qsqrt (csSquaredDist::PointPoint (v0, v1));
+	  float d = csQsqrt (csSquaredDist::PointPoint (v0, v1));
 	  totlen += d;
 	  v0 = v1;
 	}
@@ -646,7 +646,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (iDocumentNode* node,
 	for (i = 1 ; i < num ; i++)
 	{
 	  v1.Set (xv[i], yv[i], zv[i]);
-	  float d = qsqrt (csSquaredDist::PointPoint (v0, v1));
+	  float d = csQsqrt (csSquaredDist::PointPoint (v0, v1));
 	  tot += d;
 	  list[i] = tot / totlen;
 	  v0 = v1;

@@ -22,7 +22,7 @@
 #include "csws/csapp.h"
 #include "csws/cswsutil.h"
 #include "csws/sdefault.h"
-#include "qint.h"
+#include "csqint.h"
 
 void csDefaultDialogSkin::Initialize (csApp *iApp, csSkin *Parent)
 {
@@ -78,7 +78,7 @@ void csDefaultDialogSkin::Draw (csComponent &This)
   {
     float r, g, b;
     csGetRGB (This.GetColor (CSPAL_DIALOG_BACKGROUND), This.app, r, g, b);
-    csRGBcolor rgb (QInt (r * 255.9), QInt (g * 255.9), QInt (b * 255.9));
+    csRGBcolor rgb (csQint (r * 255.9), csQint (g * 255.9), csQint (b * 255.9));
     Back.SetColor (CSPAL_DIALOG_BACKGROUND);
     Back.SetColor (0, rgb);
     Back.SetColor (1, rgb);

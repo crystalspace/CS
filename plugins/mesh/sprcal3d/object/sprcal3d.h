@@ -50,7 +50,7 @@
 #include "ivideo/rndbuf.h"
 #include "cstool/anonrndbuf.h"
 #include "ivideo/material.h"
-#include "qint.h"
+#include "csqint.h"
 
 #include <cal3d/cal3d.h>
 

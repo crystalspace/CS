@@ -16,7 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 #include "csgeom/frustum.h"
 #include "plugins/engine/3d/light.h"
 #include "plugins/engine/3d/sector.h"
@@ -144,21 +144,21 @@ const char* csLight::GenerateUniqueID ()
   }
 
   int32 l;
-  l = convert_endian ((int32)QInt ((center.x * 1000)+.5));
+  l = convert_endian ((int32)csQint ((center.x * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)QInt ((center.y * 1000)+.5));
+  l = convert_endian ((int32)csQint ((center.y * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)QInt ((center.z * 1000)+.5));
+  l = convert_endian ((int32)csQint ((center.z * 1000)+.5));
   mf.Write ((char*)&l, 4);
 //#ifndef CS_USE_NEW_RENDERER
-  l = convert_endian ((int32)QInt ((influenceRadius * 1000)+.5));
+  l = convert_endian ((int32)csQint ((influenceRadius * 1000)+.5));
   mf.Write ((char*)&l, 4);
 //#else
-  l = convert_endian ((int32)QInt ((attenuationvec.x * 1000)+.5));
+  l = convert_endian ((int32)csQint ((attenuationvec.x * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)QInt ((attenuationvec.y * 1000)+.5));
+  l = convert_endian ((int32)csQint ((attenuationvec.y * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)QInt ((attenuationvec.z * 1000)+.5));
+  l = convert_endian ((int32)csQint ((attenuationvec.z * 1000)+.5));
   mf.Write ((char*)&l, 4);
 //#endif
 
@@ -416,7 +416,7 @@ bool csLight::GetDistanceForBrightness (float brightness, float& distance)
       else 
       {
         float radius1, radius2, det;
-        det = qsqrt (discr);
+        det = csQsqrt (discr);
         float denom = 0.5 / kq;
         radius1 = denom * (-kl + det);
         radius2 = denom * (-kl - det);

@@ -30,7 +30,7 @@
 #include "iutil/eventq.h"
 #include "igraphic/image.h"
 #include "ivaria/reporter.h"
-#include "qint.h"
+#include "csqint.h"
 #include "csgfx/memimage.h"
 #include "csgfx/xorpat.h"
 #include "soft_g3d.h"

@@ -21,7 +21,7 @@
 #define CS_SYSDEF_PROVIDE_SOFTWARE2D
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
-#include "qint.h"
+#include "csqint.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/transfrm.h"
@@ -1577,7 +1577,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
 
   sxL = sxR = dxL = dxR = 0;
   scanL2 = scanR2 = max_i;
-  sy = fyL = fyR = QRound (poly.vertices [scanL2].y);
+  sy = fyL = fyR = csQround (poly.vertices [scanL2].y);
 
   for ( ; ; )
   {
@@ -1598,7 +1598,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
 	  scanR2 = 0;
 
         leave = false;
-        fyR = QRound (poly.vertices [scanR2].y);
+        fyR = csQround (poly.vertices [scanR2].y);
         if (sy <= fyR)
           continue;
 
@@ -1618,7 +1618,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
 	  scanL2 = poly.num - 1;
 
         leave = false;
-        fyL = QRound (poly.vertices [scanL2].y);
+        fyL = csQround (poly.vertices [scanL2].y);
         if (sy <= fyL)
           continue;
 
@@ -1661,8 +1661,8 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
 #endif
       {
         // Compute the rounded screen coordinates of horizontal strip
-        xL = QRound (sxL);
-        xR = QRound (sxR);
+        xL = csQround (sxL);
+        xR = csQround (sxR);
 
         d = line_table [screenY] + (xL << pixel_shift);
         z_buf = z_buffer + width * screenY + xL;
@@ -2034,7 +2034,7 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
   {
     sxL = sxR = dxL = dxR = 0;
     scanL2 = scanR2 = max_i;
-    sy = fyL = fyR = QRound (poly.vertices [scanL2].y);
+    sy = fyL = fyR = csQround (poly.vertices [scanL2].y);
 
     // Find the largest texture rectangle that is going to be displayed
     float u_min = +99999999.0f;
@@ -2059,7 +2059,7 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
             scanR2 = 0;
 
           leave = false;
-          fyR = QRound (poly.vertices [scanR2].y);
+          fyR = csQround (poly.vertices [scanR2].y);
           if (sy <= fyR)
             continue;
 
@@ -2079,7 +2079,7 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
             scanL2 = poly.num - 1;
 
           leave = false;
-          fyL = QRound (poly.vertices [scanL2].y);
+          fyL = csQround (poly.vertices [scanL2].y);
           if (sy <= fyL)
             continue;
 
@@ -2221,7 +2221,7 @@ texr_done:
 
   sxL = sxR = dxL = dxR = 0; // Avoid warnings about "uninitialized variables"
   scanL2 = scanR2 = max_i;
-  sy = fyL = fyR = QRound (poly.vertices [scanL2].y);
+  sy = fyL = fyR = csQround (poly.vertices [scanL2].y);
 
   if (do_alpha) 
   {
@@ -2249,7 +2249,7 @@ texr_done:
 	  scanR2 = 0;
 
         leave = false;
-        fyR = QRound (poly.vertices [scanR2].y);
+        fyR = csQround (poly.vertices [scanR2].y);
         if (sy <= fyR)
           continue;
 
@@ -2269,7 +2269,7 @@ texr_done:
 	  scanL2 = poly.num - 1;
 
         leave = false;
-        fyL = QRound (poly.vertices [scanL2].y);
+        fyL = csQround (poly.vertices [scanL2].y);
         if (sy <= fyL)
           continue;
 
@@ -2309,8 +2309,8 @@ texr_done:
       if ((sy & 1) != do_interlaced)
       {
         // Compute the rounded screen coordinates of horizontal strip
-        xL = QRound (sxL);
-        xR = QRound (sxR);
+        xL = csQround (sxL);
+        xR = csQround (sxR);
 
         // Sub-pixel U & V correction
         float deltaX = (float)xL - sxL;
@@ -2474,12 +2474,12 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id,
       return;
     }
 
-    Scan.FogDensity = QRound (fb->density * 100);
-    Scan.FogR = QRound (fb->red * ((1 << pfmt.RedBits) - 1))
+    Scan.FogDensity = csQround (fb->density * 100);
+    Scan.FogR = csQround (fb->red * ((1 << pfmt.RedBits) - 1))
       	<< pfmt.RedShift;
-    Scan.FogG = QRound (fb->green * ((1 << pfmt.GreenBits) - 1))
+    Scan.FogG = csQround (fb->green * ((1 << pfmt.GreenBits) - 1))
       	<< pfmt.GreenShift;
-    Scan.FogB = QRound (fb->blue * ((1 << pfmt.BlueBits) - 1))
+    Scan.FogB = csQround (fb->blue * ((1 << pfmt.BlueBits) - 1))
       	<< pfmt.BlueShift;
 
     if (pfmt.PixelBytes == 4)
@@ -2539,7 +2539,7 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id,
 
   sxL = sxR = dxL = dxR = 0; // Avoid warnings about "uninitialized variables"
   scanL2 = scanR2 = max_i;
-  sy = fyL = fyR = QRound (poly.vertices [scanL2].y);
+  sy = fyL = fyR = csQround (poly.vertices [scanL2].y);
 
   for ( ; ; )
   {
@@ -2560,7 +2560,7 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id,
 	  scanR2 = 0;
 
         leave = false;
-        fyR = QRound (poly.vertices [scanR2].y);
+        fyR = csQround (poly.vertices [scanR2].y);
         if (sy <= fyR)
           continue;
 
@@ -2580,7 +2580,7 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id,
 	  scanL2 = poly.num - 1;
 
         leave = false;
-        fyL = QRound (poly.vertices [scanL2].y);
+        fyL = csQround (poly.vertices [scanL2].y);
         if (sy <= fyL)
           continue;
 
@@ -2616,8 +2616,8 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id,
       if ((sy & 1) != do_interlaced)
       {
         // Compute the rounded screen coordinates of horizontal strip
-        xL = QRound (sxL);
-        xR = QRound (sxR);
+        xL = csQround (sxL);
+        xR = csQround (sxR);
 
         // Sub-pixel U & V correction
         float deltaX = (float)xL - sxL;
@@ -2711,8 +2711,8 @@ void csGraphics3DSoftwareCommon::RealStartPolygonFX (iMaterialHandle* handle,
     pqinfo.tw = txt_unl->get_width ();
     pqinfo.th = txt_unl->get_height ();
     pqinfo.shf_w = txt_unl->get_w_shift ();
-    pqinfo.twfp = QInt16 (pqinfo.tw) - 1;
-    pqinfo.thfp = QInt16 (pqinfo.th) - 1;
+    pqinfo.twfp = csQint16 (pqinfo.tw) - 1;
+    pqinfo.thfp = csQint16 (pqinfo.th) - 1;
     pqinfo.keycolor = tex_mm->GetKeyColor ();
     pqinfo.textured = do_textured;
     pqinfo.tiling = !!(mode & CS_FX_TILING);
@@ -2891,7 +2891,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
 // Start of code to stop MSVC bitching about uninitialized variables
   L.sv = R.sv = top;
   L.fv = R.fv = top;
-  int sy = L.fy = R.fy = QRound (poly.vertices [top].y);
+  int sy = L.fy = R.fy = csQround (poly.vertices [top].y);
 
   L.x = R.x = 0;
   L.dxdy = R.dxdy = 0;
@@ -2937,7 +2937,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
 	  R.fv = 0;
 
         leave = false;
-	R.fy = QRound (poly.vertices [R.fv].y);
+	R.fy = csQround (poly.vertices [R.fv].y);
 	if (sy <= R.fy)
 	  continue;
 
@@ -2945,26 +2945,26 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
         if (dyR)
         {
           float inv_dyR = 1 / dyR;
-          R.x = QInt16 (poly.vertices [R.sv].x);
-          R.dxdy = QInt16 (
+          R.x = csQint16 (poly.vertices [R.sv].x);
+          R.dxdy = csQint16 (
             (poly.vertices [R.fv].x - poly.vertices [R.sv].x) * inv_dyR);
-          R.dzdy = QInt24 ((iz [R.fv] - iz [R.sv]) * inv_dyR);
+          R.dzdy = csQint24 ((iz [R.fv] - iz [R.sv]) * inv_dyR);
           if (pqinfo.textured)
           {
-            R.dudy = QInt16 ((uu [R.fv] - uu [R.sv]) * inv_dyR);
-            R.dvdy = QInt16 ((vv [R.fv] - vv [R.sv]) * inv_dyR);
+            R.dudy = csQint16 ((uu [R.fv] - uu [R.sv]) * inv_dyR);
+            R.dvdy = csQint16 ((vv [R.fv] - vv [R.sv]) * inv_dyR);
           }
           if (!(pqinfo.mixmode & CS_FX_FLAT))
           {
-            R.drdy = QRound ((rr [R.fv] - rr [R.sv]) * inv_dyR);
-            R.dgdy = QRound ((gg [R.fv] - gg [R.sv]) * inv_dyR);
-            R.dbdy = QRound ((bb [R.fv] - bb [R.sv]) * inv_dyR);
+            R.drdy = csQround ((rr [R.fv] - rr [R.sv]) * inv_dyR);
+            R.dgdy = csQround ((gg [R.fv] - gg [R.sv]) * inv_dyR);
+            R.dbdy = csQround ((bb [R.fv] - bb [R.sv]) * inv_dyR);
           }
 
           // horizontal pixel correction
           float deltaX = (R.dxdy * 1/65536.) *
             (poly.vertices [R.sv].y - (float (sy) - 0.5));
-          R.x += QInt16 (deltaX);
+          R.x += csQint16 (deltaX);
 
           // apply sub-pixel accuracy factor
           float Factor;
@@ -2974,15 +2974,15 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
             Factor = 0;
           if (pqinfo.textured)
           {
-            R.u = QInt16 (uu [R.sv] + (uu [R.fv] - uu [R.sv]) * Factor);
-            R.v = QInt16 (vv [R.sv] + (vv [R.fv] - vv [R.sv]) * Factor);
+            R.u = csQint16 (uu [R.sv] + (uu [R.fv] - uu [R.sv]) * Factor);
+            R.v = csQint16 (vv [R.sv] + (vv [R.fv] - vv [R.sv]) * Factor);
           }
-          R.z = QInt24 (iz [R.sv] + (iz [R.fv] - iz [R.sv]) * Factor);
+          R.z = csQint24 (iz [R.sv] + (iz [R.fv] - iz [R.sv]) * Factor);
           if (!(pqinfo.mixmode & CS_FX_FLAT))
           {
-            R.r = QRound (rr [R.sv] + (rr [R.fv] - rr [R.sv]) * Factor);
-            R.g = QRound (gg [R.sv] + (gg [R.fv] - gg [R.sv]) * Factor);
-            R.b = QRound (bb [R.sv] + (bb [R.fv] - bb [R.sv]) * Factor);
+            R.r = csQround (rr [R.sv] + (rr [R.fv] - rr [R.sv]) * Factor);
+            R.g = csQround (gg [R.sv] + (gg [R.fv] - gg [R.sv]) * Factor);
+            R.b = csQround (bb [R.sv] + (bb [R.fv] - bb [R.sv]) * Factor);
           }
         } /* endif */
       } /* endif */
@@ -2997,7 +2997,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
 	  L.fv = poly.num - 1;
 
         leave = false;
-	L.fy = QRound (poly.vertices [L.fv].y);
+	L.fy = csQround (poly.vertices [L.fv].y);
 	if (sy <= L.fy)
 	  continue;
 
@@ -3005,26 +3005,26 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
         if (dyL)
         {
           float inv_dyL = 1 / dyL;
-          L.x = QInt16 (poly.vertices [L.sv].x);
-          L.dxdy = QInt16 (
+          L.x = csQint16 (poly.vertices [L.sv].x);
+          L.dxdy = csQint16 (
             (poly.vertices [L.fv].x - poly.vertices [L.sv].x) * inv_dyL);
-          L.dzdy = QInt24 ((iz [L.fv] - iz [L.sv]) * inv_dyL);
+          L.dzdy = csQint24 ((iz [L.fv] - iz [L.sv]) * inv_dyL);
           if (pqinfo.textured)
           {
-            L.dudy = QInt16 ((uu [L.fv] - uu [L.sv]) * inv_dyL);
-            L.dvdy = QInt16 ((vv [L.fv] - vv [L.sv]) * inv_dyL);
+            L.dudy = csQint16 ((uu [L.fv] - uu [L.sv]) * inv_dyL);
+            L.dvdy = csQint16 ((vv [L.fv] - vv [L.sv]) * inv_dyL);
           }
           if (!(pqinfo.mixmode & CS_FX_FLAT))
           {
-            L.drdy = QRound ((rr [L.fv] - rr [L.sv]) * inv_dyL);
-            L.dgdy = QRound ((gg [L.fv] - gg [L.sv]) * inv_dyL);
-            L.dbdy = QRound ((bb [L.fv] - bb [L.sv]) * inv_dyL);
+            L.drdy = csQround ((rr [L.fv] - rr [L.sv]) * inv_dyL);
+            L.dgdy = csQround ((gg [L.fv] - gg [L.sv]) * inv_dyL);
+            L.dbdy = csQround ((bb [L.fv] - bb [L.sv]) * inv_dyL);
           }
 
           // horizontal pixel correction
           float deltaX = (L.dxdy * 1/65536.) *
             (poly.vertices [L.sv].y - (float (sy) - 0.5));
-          L.x += QInt16 (deltaX);
+          L.x += csQint16 (deltaX);
 
           // apply sub-pixel accuracy factor
           float Factor;
@@ -3034,15 +3034,15 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
             Factor = 0;
           if (pqinfo.textured)
           {
-            L.u = QInt16 (uu [L.sv] + (uu [L.fv] - uu [L.sv]) * Factor);
-            L.v = QInt16 (vv [L.sv] + (vv [L.fv] - vv [L.sv]) * Factor);
+            L.u = csQint16 (uu [L.sv] + (uu [L.fv] - uu [L.sv]) * Factor);
+            L.v = csQint16 (vv [L.sv] + (vv [L.fv] - vv [L.sv]) * Factor);
           }
-          L.z = QInt24 (iz [L.sv] + (iz [L.fv] - iz [L.sv]) * Factor);
+          L.z = csQint24 (iz [L.sv] + (iz [L.fv] - iz [L.sv]) * Factor);
           if (!(pqinfo.mixmode & CS_FX_FLAT))
           {
-            L.r = QRound (rr [L.sv] + (rr [L.fv] - rr [L.sv]) * Factor);
-            L.g = QRound (gg [L.sv] + (gg [L.fv] - gg [L.sv]) * Factor);
-            L.b = QRound (bb [L.sv] + (bb [L.fv] - bb [L.sv]) * Factor);
+            L.r = csQround (rr [L.sv] + (rr [L.fv] - rr [L.sv]) * Factor);
+            L.g = csQround (gg [L.sv] + (gg [L.fv] - gg [L.sv]) * Factor);
+            L.b = csQround (bb [L.sv] + (bb [L.fv] - bb [L.sv]) * Factor);
           }
         } /* endif */
       } /* endif */
@@ -3073,14 +3073,14 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
           int l = xr - xl;
           float inv_l = 1. / l;
 
-          int dzz = QRound ((R.z - L.z) * inv_l);
+          int dzz = csQround ((R.z - L.z) * inv_l);
           int uu = 0, duu = 0, vv = 0, dvv = 0;
           if (pqinfo.textured)
           {
             int span_u = R.u - L.u;
             int span_v = R.v - L.v;
-            uu = L.u; duu = QInt (span_u * inv_l);
-            vv = L.v; dvv = QInt (span_v * inv_l);
+            uu = L.u; duu = csQint (span_u * inv_l);
+            vv = L.v; dvv = csQint (span_v * inv_l);
 
 	    if (!pqinfo.tiling)
 	    {
@@ -3093,14 +3093,14 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
               {
                 if (tmpu < 0) tmpu = 0; if (tmpu > pqinfo.twfp)
 		  tmpu = pqinfo.twfp;
-                duu = QInt ((tmpu - uu) * inv_l);
+                duu = csQint ((tmpu - uu) * inv_l);
               }
               int tmpv = vv + span_v;
               if (tmpv < 0 || tmpv > pqinfo.thfp)
               {
                 if (tmpv < 0) tmpv = 0; if (tmpv > pqinfo.thfp)
 		  tmpv = pqinfo.thfp;
-                dvv = QInt ((tmpv - vv) * inv_l);
+                dvv = csQint ((tmpv - vv) * inv_l);
               }
 	    }
           }
@@ -3115,22 +3115,22 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
             int span_r = R.r - L.r;
             int span_g = R.g - L.g;
             int span_b = R.b - L.b;
-            rr = L.r, drr = QInt (span_r * inv_l);
-            gg = L.g, dgg = QInt (span_g * inv_l);
-            bb = L.b, dbb = QInt (span_b * inv_l);
+            rr = L.r, drr = csQint (span_r * inv_l);
+            gg = L.g, dgg = csQint (span_g * inv_l);
+            bb = L.b, dbb = csQint (span_b * inv_l);
 
             if (rr < 0) rr = 0;
             if (gg < 0) gg = 0;
             if (bb < 0) bb = 0;
 
             int tmp = rr + span_r;
-            if (tmp < 0) drr = - QInt (rr * inv_l);
+            if (tmp < 0) drr = - csQint (rr * inv_l);
             clamp |= (rr > pqinfo.max_r) || (tmp > pqinfo.max_r);
             tmp = gg + span_g;
-            if (tmp < 0) dgg = - QInt (gg * inv_l);
+            if (tmp < 0) dgg = - csQint (gg * inv_l);
             clamp |= (gg > pqinfo.max_g) || (tmp > pqinfo.max_g);
             tmp = bb + span_b;
-            if (tmp < 0) dbb = - QInt (bb * inv_l);
+            if (tmp < 0) dbb = - csQint (bb * inv_l);
             clamp |= (bb > pqinfo.max_b) || (tmp > pqinfo.max_b);
           }
 
@@ -3355,11 +3355,11 @@ void csGraphics3DSoftwareCommon::DrawLine (const csVector3& v1,
   }
 
   float iz1 = fov/z1;
-  int px1 = QInt (x1 * iz1 + (width/2));
-  int py1 = height - QInt (y1 * iz1 + (height/2));
+  int px1 = csQint (x1 * iz1 + (width/2));
+  int py1 = height - csQint (y1 * iz1 + (height/2));
   float iz2 = fov/z2;
-  int px2 = QInt (x2 * iz2 + (width/2));
-  int py2 = height - QInt (y2 * iz2 + (height/2));
+  int px2 = csQint (x2 * iz2 + (width/2));
+  int py2 = height - csQint (y2 * iz2 + (height/2));
 
   G2D->DrawLine (px1, py1, px2, py2, color);
 }

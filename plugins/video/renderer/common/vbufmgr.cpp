@@ -22,7 +22,7 @@
 #include "cssysdef.h"
 #include "vbufmgr.h"
 #include "csutil/util.h"
-#include "qint.h"
+#include "csqint.h"
 
 //--------------------------------------------- csPolygonBuffer -----//
 

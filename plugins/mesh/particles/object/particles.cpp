@@ -37,8 +37,8 @@
 #include "csutil/randomgen.h"
 #include "csutil/util.h"
 
-#include "qsqrt.h"
-#include "qint.h"
+#include "cscsQsqrt.h"
+#include "csqint.h"
 
 #include "particles.h"
 #include <limits.h>
@@ -596,7 +596,7 @@ csRenderMesh** csParticlesObject::GetRenderMeshes (int& n, iRenderView* rview,
 
   if (vertnum>0) 
   {
-    radius = qsqrt (new_radius);
+    radius = csQsqrt (new_radius);
     running = true;
   }
   else
@@ -621,7 +621,7 @@ csRenderMesh** csParticlesObject::GetRenderMeshes (int& n, iRenderView* rview,
   }
   else
   {
-    int fov = QInt (cam->GetFOVAngle ());
+    int fov = csQint (cam->GetFOVAngle ());
     int fov_pixels = cam->GetFOV ();
     if (radius_changed || camera_fov != fov || camera_pixels != fov_pixels)
     {

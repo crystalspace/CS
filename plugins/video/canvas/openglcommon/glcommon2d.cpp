@@ -24,7 +24,7 @@
 #include "iutil/objreg.h"
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"
-#include "qint.h"
+#include "csqint.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
 #include "plugins/video/canvas/openglcommon/glstates.h"
@@ -461,7 +461,7 @@ void csGraphics2DGLCommon::DrawLine (
   // compared to software line drawing. This is not exactly a bug (because
   // this is an on-the-edge case) but it's different, thus we'll slightly
   // shift whole coordinates down.
-  // but QInt(y1) == y1 is too coarse a test.
+  // but csQint(y1) == y1 is too coarse a test.
   if (fabs(float(int(y1))-y1) < 0.1f) { y1 += 0.05f; }
   if (fabs(float(int(y2))-y2) < 0.1f) { y2 += 0.05f; }
 

@@ -40,7 +40,7 @@
 #include "igeom/objmodel.h"
 #include "cstool/collider.h"
 #include "cstool/cspixmap.h"
-#include "qint.h"
+#include "csqint.h"
 #include "isound/handle.h"
 #include "isound/source.h"
 #include "isound/listener.h"

@@ -33,7 +33,7 @@
 #include "iutil/objreg.h"
 #include "ball.h"
 
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 #include "iutil/strset.h"
 
 //#define BALL_DEBUG
@@ -858,11 +858,11 @@ void csBallMeshObject::UpdateLighting (const csArray<iLight*>& lights,
     float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, 0);
     if (obj_sq_dist >= li->GetInfluenceRadiusSq ()) continue;
     float in_obj_dist = (obj_sq_dist >= SMALL_EPSILON)
-    	? qisqrt (obj_sq_dist)
+    	? csQisqrt (obj_sq_dist)
 	: 1.0f;
 
     csColor light_color = li->GetColor () * (256.0f / CS_NORMAL_LIGHT_LEVEL)
-      * li->GetBrightnessAtDistance (qsqrt (obj_sq_dist));
+      * li->GetBrightnessAtDistance (csQsqrt (obj_sq_dist));
 
     for (i = 0; i < num_ball_vertices; i++)
     {
@@ -963,7 +963,7 @@ bool csBallMeshObject::HitBeamOutline (const csVector3& start,
     if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],
     	vrt[tr[i].c], seg, isect))
     {
-      if (pr) *pr = qsqrt (csSquaredDist::PointPoint (start, isect) /
+      if (pr) *pr = csQsqrt (csSquaredDist::PointPoint (start, isect) /
         csSquaredDist::PointPoint (start, end));
 
       return true;
@@ -1008,7 +1008,7 @@ bool csBallMeshObject::HitBeamObject(const csVector3& start,
       }
     }
   }
-  if (pr) *pr = qsqrt(dist * itot_dist);
+  if (pr) *pr = csQsqrt(dist * itot_dist);
   if (dist >= tot_dist)
       return false;
   return true;

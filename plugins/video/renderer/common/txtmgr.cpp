@@ -23,7 +23,7 @@
 #include "txtmgr.h"
 #include "csutil/util.h"
 #include "csutil/debug.h"
-#include "qint.h"
+#include "csqint.h"
 #include "igraphic/image.h"
 #include "ivideo/material.h"
 #include "iengine/material.h"

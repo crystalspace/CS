@@ -17,7 +17,7 @@ opposed to @samp{int} which is @emph{signed}.
 in nothing more than simple-looking compiler warnings. However, it may have
 caused @emph{semantics} to change subtly.
 
-This has the greatest impact in the following areas:
+This has the greatest impact in the following areas discussed below.
 
 @subsubheading Iterating Over @code{csArray<>} Contents
 
@@ -58,8 +58,8 @@ If the @samp{int} is changed simply to a @samp{size_t}, this
 @code{for}-loop misbehaves unexpectedly. When @samp{i} becomes 0, the body 
 of the loop is executed correctly. However, decrementing @samp{i} will 
 @strong{not} cause @samp{i} to have a negative value---after all, @samp{size_t}
-is unsigned. Instead, decreasing will make @samp{i} wrap around from 0 to
-something like 0xffffffff (on 32-bit machines). Clearly, this is greater
+is unsigned. Instead, decrementing will make @samp{i} wrap around from 0 to
+0xffffffff (on 32-bit machines). Clearly, this is greater
 than 0, effectively causing an infinite loop. The same thing also happens when
 @samp{a} has no items (i.e. @samp{a.Length() == 0}). Here the
 -1 in the initialization of @samp{i} causes wrap-around.
@@ -121,7 +121,7 @@ else
 @}
 @end example
 
-Has to be replaced with:
+Must be replaced with:
 
 @example
 csArray<@dots{}> a;
@@ -138,23 +138,59 @@ else
 @}
 @end example
 
-@subheading Texture and Material preparation
+@subheading Texture and Material Preparation
 
-Texture and material preparation is now fully automatic. It is no
-longer needed to @emph{prepare} a texture or a material before you can use
-it. It is sufficient to just register the texture or material. This means
-that the following functions are removed (and you can just remove them from
-your applications if you use them):
+Texture and material preparation is now fully automatic. It is no longer
+necessary to @dfn{prepare} a texture or a material before you can use it. It is
+sufficient simply to register the texture or material. This means that the
+following functions have been removed (and you can just remove invocations of
+them from your applications if you used them):
 
-@itemize
-@item
-@code{iTextureHandle::Prepare()}
+@itemize @bullet
 @item
 @code{iMaterialHandle::Prepare()}
 @item
-@code{iTextureManager::PrepareTextures()}
+@code{iTextureHandle::Prepare()}
 @item
 @code{iTextureManager::PrepareMaterials()}
+@item
+@code{iTextureManager::PrepareTextures()}
 @end itemize
 
+@subheading Pollution Reduction
 
+The following global header files have been renamed in order to avoid possible
+conflict with headers installed by other packages.
+
+@itemize @bullet
+@item
+@code{platform.h} @result{} @code{csplatform.h}
+@item
+@code{qint.h} @result{} @code{csqint.h}
+@item
+@code{qsqrt.h} @result{} @code{csqsqrt.h}
+@item
+@code{volatile.h} @result{} @code{csconfig.h}
+@end itemize
+
+The following symbols have been renamed in order to avoid pollution of the
+global namespace.
+
+@itemize @bullet
+@item
+@code{QInt} @result{} @code{csQint()}
+@item
+@code{QInt8} @result{} @code{csQint8()}
+@item
+@code{QInt16} @result{} @code{csQint16()}
+@item
+@code{QInt24} @result{} @code{csQint24()}
+@item
+@code{qisqrt} @result{} @code{csQisqrt()}
+@item
+@code{qsqrt} @result{} @code{csQsqrt()}
+@item
+@code{QRound} @result{} @code{csQround()}
+@item
+@code{WIN32_VOLATILE} @result{} @code{CS_WIN32_CSCONFIG}
+@end itemize

@@ -18,7 +18,7 @@
 
 #include "cssysdef.h"
 #include "walktest.h"
-#include "qint.h"
+#include "csqint.h"
 #include "csgeom/frustum.h"
 #include "ivaria/view.h"
 #include "csgeom/csrect.h"
@@ -129,9 +129,9 @@ void select_object (iRenderView* rview, int type, void* entity)
       if (v.z > SMALL_Z)
       {
         iz = rview->GetFOV ()/v.z;
-        px = QInt (v.x * iz + rview->GetShiftX ());
-        py = csEngine::frame_height - 1 - QInt (v.y * iz + rview->GetShiftY ());
-        r = QInt (.3 * iz);
+        px = csQint (v.x * iz + rview->GetShiftX ());
+        py = csEngine::frame_height - 1 - csQint (v.y * iz + rview->GetShiftY ());
+        r = csQint (.3 * iz);
         if (ABS (coord_check_vector.x - px) < 5 &&
 		ABS (coord_check_vector.y - (csEngine::frame_height-1-py)) < 5)
         {
@@ -256,7 +256,7 @@ void DrawDebugBoxSide (iCamera* cam, bool do3d,
   }
   else
   {
-    int color = Gfx2D->FindRGB (QInt (255.*c1.red*2), 0, QInt (255.*c1.blue*2));
+    int color = Gfx2D->FindRGB (csQint (255.*c1.red*2), 0, csQint (255.*c1.blue*2));
     Gfx2D->DrawLine (poly.vertices[0].x, FRAME_HEIGHT-poly.vertices[0].y, poly.vertices[1].x, FRAME_HEIGHT-poly.vertices[1].y, color);
     Gfx2D->DrawLine (poly.vertices[1].x, FRAME_HEIGHT-poly.vertices[1].y, poly.vertices[2].x, FRAME_HEIGHT-poly.vertices[2].y, color);
     Gfx2D->DrawLine (poly.vertices[2].x, FRAME_HEIGHT-poly.vertices[2].y, poly.vertices[3].x, FRAME_HEIGHT-poly.vertices[3].y, color);
@@ -340,11 +340,11 @@ void DrawLineDepth (const csVector3& v1, const csVector3& v2,
   }
 
   float iz1 = fov/z1;
-  int px1 = QInt (x1 * iz1 + (FRAME_WIDTH/2));
-  int py1 = FRAME_HEIGHT - 1 - QInt (y1 * iz1 + (FRAME_HEIGHT/2));
+  int px1 = csQint (x1 * iz1 + (FRAME_WIDTH/2));
+  int py1 = FRAME_HEIGHT - 1 - csQint (y1 * iz1 + (FRAME_HEIGHT/2));
   float iz2 = fov/z2;
-  int px2 = QInt (x2 * iz2 + (FRAME_WIDTH/2));
-  int py2 = FRAME_HEIGHT - 1 - QInt (y2 * iz2 + (FRAME_HEIGHT/2));
+  int px2 = csQint (x2 * iz2 + (FRAME_WIDTH/2));
+  int py2 = FRAME_HEIGHT - 1 - csQint (y2 * iz2 + (FRAME_HEIGHT/2));
 
   int col = (int)((40.0-z1)*(255./40.));
   if (col < 0) col = 0;

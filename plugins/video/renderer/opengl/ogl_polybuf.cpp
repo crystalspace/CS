@@ -23,7 +23,7 @@
 #include "ogl_polybuf.h"
 #include "csutil/util.h"
 #include "csgeom/transfrm.h"
-#include "qint.h"
+#include "csqint.h"
 #include "ivideo/material.h"
 #include "ivideo/texture.h"
 #include "ivideo/polyrender.h"

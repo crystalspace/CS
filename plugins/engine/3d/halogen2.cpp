@@ -6,7 +6,7 @@
  */
 
 #include "cssysdef.h"
-#include "qint.h"
+#include "csqint.h"
 #include "csutil/randomgen.h"
 
 #include <string.h>
@@ -45,7 +45,7 @@ csGenerateNova (int iSize, int iSeed, int iNumSpokes, float iRoundness)
       // c is a float from 0..iNumSpokes
       float c = (atan2 (u, v) / TWO_PI + 0.5f) * iNumSpokes;
       // i is the spoke number
-      int i = QInt (c);
+      int i = csQint (c);
       // c is the float part of former c
       c -= i;
 
@@ -53,7 +53,7 @@ csGenerateNova (int iSize, int iSeed, int iNumSpokes, float iRoundness)
       float w1 = spoke [i] * (1 - c) + spoke [i + 1] * c;
       float w = 1.1f - pow (l, iRoundness);
       if (w < 0.0f) w = 0.0f; if (w > 1.0f) w = 1.0f;
-      image [x + y * iSize] = QInt (w * (w + (1.0f - w) * w1) * 255.9f);
+      image [x + y * iSize] = csQint (w * (w + (1.0f - w) * w1) * 255.9f);
     }
   }
 

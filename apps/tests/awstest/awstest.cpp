@@ -51,7 +51,7 @@
 #include "iutil/virtclk.h"
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 
 #include "csgeom/csrect.h"
 #include "csgeom/csrectrg.h"

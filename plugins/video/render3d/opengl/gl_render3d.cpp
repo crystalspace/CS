@@ -21,7 +21,7 @@
 
 #include <ctype.h>
 
-#include "qint.h"
+#include "csqint.h"
 
 #include "csgfx/csimgvec.h"
 #include "csgfx/memimage.h"
@@ -1467,11 +1467,11 @@ void csGLGraphics3D::DrawLine (const csVector3 & v1, const csVector3 & v2,
     z2 = SMALL_Z;
   }
   float iz1 = fov / z1;
-  int px1 = QInt (x1 * iz1 + (viewwidth / 2));
-  int py1 = viewheight - 1 - QInt (y1 * iz1 + (viewheight / 2));
+  int px1 = csQint (x1 * iz1 + (viewwidth / 2));
+  int py1 = viewheight - 1 - csQint (y1 * iz1 + (viewheight / 2));
   float iz2 = fov / z2;
-  int px2 = QInt (x2 * iz2 + (viewwidth / 2));
-  int py2 = viewheight - 1 - QInt (y2 * iz2 + (viewheight / 2));
+  int px2 = csQint (x2 * iz2 + (viewwidth / 2));
+  int py2 = viewheight - 1 - csQint (y2 * iz2 + (viewheight / 2));
 
   G2D->DrawLine (px1, py1, px2, py2, color);
 }

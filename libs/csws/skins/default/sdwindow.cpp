@@ -24,7 +24,7 @@
 #include "csws/cswsutil.h"
 #include "csws/sdefault.h"
 #include "ivaria/reporter.h"
-#include "qint.h"
+#include "csqint.h"
 
 #define TITLEBAR_TEXTURE_NAME	"csws::TitlebarButtons"
 
@@ -275,7 +275,7 @@ void csDefaultWindowSkin::Draw (csComponent &This)
   {
     float r, g, b;
     csGetRGB (This.GetColor (CSPAL_WINDOW_BORDER), This.app, r, g, b);
-    csRGBcolor rgb (QInt (r * 255.9), QInt (g * 255.9), QInt (b * 255.9));
+    csRGBcolor rgb (csQint (r * 255.9), csQint (g * 255.9), csQint (b * 255.9));
     Back.SetColor (CSPAL_WINDOW_BORDER);
     Back.SetColor (0, rgb);
     Back.SetColor (1, rgb);

@@ -30,7 +30,7 @@
 #include "imesh/partsys.h"
 #include "imesh/fountain.h"
 #include "ivideo/graph3d.h"
-#include "qint.h"
+#include "csqint.h"
 #include "csutil/csstring.h"
 #include "iutil/vfs.h"
 #include "iutil/object.h"

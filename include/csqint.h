@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_QINT_H__
-#define __CS_QINT_H__
+#ifndef __CS_CSQINT_H__
+#define __CS_CSQINT_H__
 
 #if defined (CS_IEEE_DOUBLE_FORMAT)
 
@@ -100,7 +100,7 @@
     Measurements show that this trick is even faster (at least on P5 and
     above) than FISTP command (even if we use the (correct) presumption
     that FPU is in rounding mode by default, e.g. no need to toggle FPU
-    control word). QRound executes 2 clocks on Celeron while FISTP
+    control word). csQround executes 2 clocks on Celeron while FISTP
     executes 13 clocks, i.e. about 6 times slower.
 
     All said above is true for all CPU types that uses standard IEEE
@@ -123,14 +123,14 @@
  */
 #define FIST_MAGIC_QINT   (65536.0 * 65536.0 * 16.0)
 
-/**\fn static inline long QInt (double inval)
+/**\fn static inline long csQint (double inval)
  * Truncate the fractional part of a floating-point value and convert to integer
- * \internal well, for QInt gcc 2.96 and above compilers (we tested up to 3.0.1) seems to
+ * \internal well, for csQint gcc 2.96 and above compilers (we tested up to 3.0.1) seems to
  * be buggy, we've got a workaround which seems to be buggy in vc :) so we have
  * to differentiate between compilers here (Matze)
  */
 #ifdef CS_QINT_WORKAROUND
-static inline long QInt (double inval)
+static inline long csQint (double inval)
 {
   union { double dtemp; long result; } x;
 
@@ -139,7 +139,7 @@ static inline long QInt (double inval)
   return x.result < 0 ? (x.result >> 1) + 1 : x.result;
 }
 #else
-static inline long QInt (double inval)
+static inline long csQint (double inval)
 {
   double dtemp = FIST_MAGIC_QINT + inval;
   // Note that on both low-endian (x86) and big-endian (m68k) we have
@@ -158,7 +158,7 @@ static inline long QInt (double inval)
 /**
  * Round a floating-point value and convert to integer
  */
-static inline long QRound (double inval)
+static inline long csQround (double inval)
 {
   double dtemp = FIST_MAGIC_QROUND + inval;
   return CS_LONG_AT_BYTE (dtemp, CS_LOWER_WORD_BYTE) - 0x80000000;
@@ -171,7 +171,7 @@ static inline long QRound (double inval)
 #define FIST_MAGIC_QINT8 (((65536.0 * 16.0) + 0.5) * 65536.0 * 256.0)
 
 /// Convert a floating-point number to 24.8 fixed-point value.
-inline long QInt8 (float inval)
+inline long csQint8 (float inval)
 {
   double dtemp = FIST_MAGIC_QINT8 + inval;
   return CS_LONG_AT_BYTE (dtemp, CS_LOWER_WORD_BYTE) - 0x80000000;
@@ -184,7 +184,7 @@ inline long QInt8 (float inval)
 #define FIST_MAGIC_QINT16 (((65536.0 * 16.0) + 0.5) * 65536.0)
 
 /// Convert a floating-point number to 16.16 fixed-point value.
-inline long QInt16 (float inval)
+inline long csQint16 (float inval)
 {
   double dtemp = FIST_MAGIC_QINT16 + inval;
   return CS_LONG_AT_BYTE (dtemp, CS_LOWER_WORD_BYTE) - 0x80000000;
@@ -197,7 +197,7 @@ inline long QInt16 (float inval)
 #define FIST_MAGIC_QINT24 (((65536.0 * 16.0) + 0.5) * 256.0)
 
 /// Convert a floating-point number to 8.24 fixed-point value.
-inline long QInt24 (float inval)
+inline long csQint24 (float inval)
 {
   double dtemp = FIST_MAGIC_QINT24 + inval;
   return CS_LONG_AT_BYTE (dtemp, CS_LOWER_WORD_BYTE) - 0x80000000;
@@ -207,12 +207,12 @@ inline long QInt24 (float inval)
     
 #else /* not CS_IEEE_DOUBLE_FORMAT */
 
-#define QRound(x) (int ((x) + ((x < 0) ? -0.5 : +0.5)))
-#define QInt(x)   (int (x))
-#define QInt8(x)  (int ((x)*256.))
-#define QInt16(x) (int ((x)*65536.))
-#define QInt24(x) (int ((x)*16777216.))
+#define csQround(x) (int ((x) + ((x < 0) ? -0.5 : +0.5)))
+#define csQint(x)   (int (x))
+#define csQint8(x)  (int ((x)*256.))
+#define csQint16(x) (int ((x)*65536.))
+#define csQint24(x) (int ((x)*16777216.))
 
 #endif /* CS_IEEE_DOUBLE_FORMAT */
 
-#endif // __CS_QINT_H__
+#endif // __CS_CSQINT_H__

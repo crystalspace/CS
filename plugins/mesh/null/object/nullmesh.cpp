@@ -32,7 +32,7 @@
 #include "iengine/engine.h"
 #include "iengine/light.h"
 #include "iutil/objreg.h"
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -111,7 +111,7 @@ void csNullmeshMeshObject::SetRadius (float radius)
 void csNullmeshMeshObject::SetBoundingBox (const csBox3& box)
 {
   csNullmeshMeshObject::box = box;
-  radius = qsqrt (csSquaredDist::PointPoint (box.Max (), box.Min ())) / 2.0;
+  radius = csQsqrt (csSquaredDist::PointPoint (box.Max (), box.Min ())) / 2.0;
   scfiObjectModel.ShapeChanged ();
 }
 

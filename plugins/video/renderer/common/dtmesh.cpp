@@ -23,7 +23,7 @@
 #include "ivideo/material.h"
 #include "ivideo/vbufmgr.h"
 #include "iengine/material.h"
-#include "qint.h"
+#include "csqint.h"
 #include "csutil/garray.h"
 #include "csutil/cscolor.h"
 #include "csgeom/math2d.h"

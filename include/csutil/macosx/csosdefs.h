@@ -76,9 +76,9 @@
 
 
 //-----------------------------------------------------------------------------
-// Note by Matt Reda: I did some rough testing of QInt() and friends on the
+// Note by Matt Reda: I did some rough testing of csQint() and friends on the
 // PowerPC.  It appears to work ok, but is actually slower.  Some simple
-// tests show that QInt() is roughly twice as slow as a cast from double
+// tests show that csQint() is roughly twice as slow as a cast from double
 // to long
 //-----------------------------------------------------------------------------
 #define CS_NO_IEEE_OPTIMIZATIONS

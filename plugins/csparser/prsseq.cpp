@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "qint.h"
+#include "csqint.h"
 #include "csloader.h"
 #include "imap/ldrctxt.h"
 #include "csutil/scanstr.h"

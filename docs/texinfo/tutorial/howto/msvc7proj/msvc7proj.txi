@@ -163,7 +163,7 @@ Once done, click on the @emph{OK} button and return to the MSVC IDE.
 
 Crystal Space essentially has three preprocessor definitions which MUST be set
 in-order to successfully compile and link your application.  They are
-@code{WIN32_VOLATILE}, which is added whether the build is release or debug.
+@code{CS_WIN32_CSCONFIG}, which is added whether the build is release or debug.
 @code{__CRYSTAL_SPACE__}, which is also set whether the build is release or
 debug.  And finally @code{CS_RELEASE} or @code{CS_DEBUG}, which is added as you
 may guess @code{CS_RELEASE} in the settings for release builds and
@@ -188,7 +188,7 @@ the @emph{Properties} dialog box, which can be seen in the image below.
 
 Open the C/C++ folder and select @emph{Preprocessor}.  Insert the appropriate
 definitions in the @emph{Preprocessor Definitions} text box i.e.  for a debug
-build @code{WIN32_VOLATILE}, @code{__CRYSTAL_SPACE__} and @code{CS_DEBUG},
+build @code{CS_WIN32_CSCONFIG}, @code{__CRYSTAL_SPACE__} and @code{CS_DEBUG},
 making sure to separate with semi-colons.  Alternatively, you can click the
 elipsis (@dots{}) button to pull up an easier view.  An example of the ones
 entered for a debug build can be seen in the image below.
@@ -199,7 +199,7 @@ entered for a debug build can be seen in the image below.
 
 Open the C/C++ folder and select @emph{Preprocessor}.  Insert the appropriate
 definitions in the @emph{Preprocessor Definitions} text box i.e.  for a release
-build @code{WIN32_VOLATILE}, @code{__CRYSTAL_SPACE__} and @code{CS_RELEASE},
+build @code{CS_WIN32_CSCONFIG}, @code{__CRYSTAL_SPACE__} and @code{CS_RELEASE},
 making sure to separate with semi-colons.  Alternatively, you can click the
 elipsis (@dots{}) button to pull up an easier view.  An example the ones
 entered for a release build can be seen in the image below.
@@ -332,8 +332,8 @@ project.
 ----------Configuration: simple1 - Win32 Release----------
 Compiling...
 simple1.cpp
-C:\CS\INCLUDE\platform.h(26) : fatal error C1083:
-  Cannot open include file: 'volatile.h': No such file or directory
+C:\CS\INCLUDE\csplatform.h(26) : fatal error C1083:
+  Cannot open include file: 'csconfig.h': No such file or directory
 Error executing cl.exe.
 
 simple1.exe - 1 error(s), 0 warning(s)

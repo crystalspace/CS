@@ -651,14 +651,14 @@ extern void* operator new[] (size_t s, void* filename, int line);
  * strict alignment add your CPU to the !defined below to get slightly
  * smaller and faster code in some cases.
  *
- * @@@ In the future, this should be moved to volatile.h and determined as
+ * @@@ In the future, this should be moved to csconfig.h and determined as
  * part of the configuration process.
  */
 #if !defined (PROC_X86)
 #  define CS_STRICT_ALIGNMENT
 #endif
 
-// Adjust some definitions contained in volatile.h
+// Adjust some definitions contained in csconfig.h
 #if defined (PROC_X86) && !defined (DO_NASM)
 #  undef NO_ASSEMBLER
 #  define NO_ASSEMBLER
@@ -669,7 +669,7 @@ extern void* operator new[] (size_t s, void* filename, int line);
 #  undef DO_NASM
 #endif
 
-// Use fast QInt and QRound on CPUs that are known to support it
+// Use fast csQint and csQround on CPUs that are known to support it
 #if !defined (CS_NO_IEEE_OPTIMIZATIONS)
 #  if !defined (CS_IEEE_DOUBLE_FORMAT)
 #    if defined (PROC_X86) || defined (PROC_M68K)

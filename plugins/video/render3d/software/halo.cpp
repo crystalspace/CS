@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "qint.h"
+#include "csqint.h"
 #include "csgeom/math2d.h"
 #include "csutil/util.h"
 #include "soft_g3d.h"
@@ -163,15 +163,15 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
   bool clamp = false;
   const csPixelFormat& pfmt = G3D->pfmt;
 
-  Scan.FogR = QRound (R * ((1 << pfmt.RedBits  ) - 1))
+  Scan.FogR = csQround (R * ((1 << pfmt.RedBits  ) - 1))
       << R8G8B8_SHIFT_ADJUST(pfmt.RedShift);
-  Scan.FogG = QRound (G * ((1 << pfmt.GreenBits) - 1))
+  Scan.FogG = csQround (G * ((1 << pfmt.GreenBits) - 1))
       << R8G8B8_SHIFT_ADJUST(pfmt.GreenShift);
-  Scan.FogB = QRound (B * ((1 << pfmt.BlueBits ) - 1))
+  Scan.FogB = csQround (B * ((1 << pfmt.BlueBits ) - 1))
       << R8G8B8_SHIFT_ADJUST(pfmt.BlueShift);
 
   // halo intensity (0..64)
-  Scan.FogDensity = QRound (iIntensity * 64);
+  Scan.FogDensity = csQround (iIntensity * 64);
   // Detect when the halo will possibly overflow
   clamp = (Scan.FogR > R8G8B8_PIXEL_PREPROC(pfmt.RedMask  ))
          || (Scan.FogG > R8G8B8_PIXEL_PREPROC(pfmt.GreenMask))
@@ -250,7 +250,7 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
 
   sxL = sxR = dxL = dxR = 0;
   scanL2 = scanR2 = min_i;
-  sy = fyL = fyR = QRound (iVertices [scanL2].y); // round down
+  sy = fyL = fyR = csQround (iVertices [scanL2].y); // round down
 
   // Shift amount to get pixel address
   int pixel_shift = csLog2 (pfmt.PixelBytes);
@@ -258,10 +258,10 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
   float scaleX = w / Width;
   float scaleY = h / Height;
   // Compute rounded top-left halo corner coordinate
-  int xTL = QRound (x);
-  int yTL = QRound (y);
+  int xTL = csQround (x);
+  int yTL = csQround (y);
   // Compute horizontal motion delta
-  int delta = QInt16 (scaleX);
+  int delta = csQint16 (scaleX);
 
   // The halo polygon is counterclockwise (since the clipping polygon is
   // counterclockwise). Now we should draw it from top to bottom.
@@ -285,7 +285,7 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
 	  scanR2 = iVertCount - 1;
 
         leave = false;
-        fyR = QInt (iVertices [scanR2].y);
+        fyR = csQint (iVertices [scanR2].y);
         if (sy >= fyR)
           continue;
 
@@ -305,7 +305,7 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
 	  scanL2 = 0;
 
         leave = false;
-        fyL = QInt (iVertices [scanL2].y);
+        fyL = csQint (iVertices [scanL2].y);
         if (sy >= fyL)
           continue;
 
@@ -332,11 +332,11 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
       if ((sy & 1) != G3D->do_interlaced)
       {
         // Compute the rounded screen coordinates of horizontal strip
-        int xL = QRound (sxL);
-        int xR = QRound (sxR);
+        int xL = csQround (sxL);
+        int xR = csQround (sxR);
         unsigned char *d = G3D->line_table [sy] + (xL << pixel_shift);
-        unsigned char *s = Alpha + QRound (scaleY * (sy - yTL)) * Width +
-          QRound (scaleX * (xL - xTL));
+        unsigned char *s = Alpha + csQround (scaleY * (sy - yTL)) * Width +
+          csQround (scaleX * (xL - xTL));
         dscan (s, d, xR - xL, delta);
       }
 

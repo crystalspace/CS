@@ -30,7 +30,7 @@
 
 #include <math.h>
 #include "cstypes.h"
-#include "qint.h"
+#include "csqint.h"
 
 struct swap_4
 {
@@ -153,7 +153,7 @@ static inline float little_endian_float (float f)
 static inline int32 float2long (float f)
 {
   int exp;
-  int32 mant = QRound (frexp (f, &exp) * 0x1000000);
+  int32 mant = csQround (frexp (f, &exp) * 0x1000000);
   int32 sign = mant & 0x80000000;
   if (mant < 0) mant = -mant;
   if (exp > 63) exp = 63; else if (exp < -64) exp = -64;
@@ -203,7 +203,7 @@ static inline double longlong2double (int64 i)
 static inline short float2short (float f)
 {
   int exp;
-  long mant = QRound (frexp (f, &exp) * 0x1000);
+  long mant = csQround (frexp (f, &exp) * 0x1000);
   long sign = mant & 0x8000;
   if (mant < 0) mant = -mant;
   if (exp > 7) mant = 0x7ff, exp = 7; else if (exp < -8) mant = 0, exp = -8;

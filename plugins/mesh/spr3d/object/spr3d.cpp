@@ -41,7 +41,7 @@
 #include "iengine/mesh.h"
 #include "csutil/csendian.h"
 #include "cstool/rbuflock.h"
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 
 CS_IMPLEMENT_STATIC_CLASSVAR (csSprite3DMeshObject, mesh, GetLODMesh, csTriangleMesh, ())
 
@@ -435,9 +435,9 @@ void csSprite3DMeshObjectFactory::ComputeBoundingBox ()
 
     GetFrame (frame)->SetBoundingBox (box);
     GetFrame (frame)->SetRadius (csVector3 (
-    	qsqrt (max_sq_radius.x),
-	qsqrt (max_sq_radius.y),
-	qsqrt (max_sq_radius.z)));
+    	csQsqrt (max_sq_radius.x),
+	csQsqrt (max_sq_radius.y),
+	csQsqrt (max_sq_radius.z)));
   }
 }
 
@@ -747,7 +747,7 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
 
 int csSprite3DMeshObjectFactory::GetLODPolygonCount (float lod) const
 {
-  return QInt (GetTriangleCount ()*lod);
+  return csQint (GetTriangleCount ()*lod);
 }
 
 void csSprite3DMeshObjectFactory::ClearLODListeners ()
@@ -817,9 +817,9 @@ void csSprite3DMeshObjectFactory::HardTransform (const csReversibleTransform& t)
     }
     GetFrame (i)->SetBoundingBox (box);
     GetFrame (i)->SetRadius (csVector3 (
-    	qsqrt (max_sq_radius.x),
-	qsqrt (max_sq_radius.y),
-	qsqrt (max_sq_radius.z)));
+    	csQsqrt (max_sq_radius.x),
+	csQsqrt (max_sq_radius.y),
+	csQsqrt (max_sq_radius.z)));
 
   }
   scfiObjectModel.ShapeChanged ();
@@ -1035,7 +1035,7 @@ csSprite3DMeshObject::~csSprite3DMeshObject ()
 
 int csSprite3DMeshObject::GetLODPolygonCount (float lod) const
 {
-  return QInt (factory->GetTriangleCount () * lod);
+  return csQint (factory->GetTriangleCount () * lod);
 }
 
 void csSprite3DMeshObject::ClearLODListeners ()
@@ -1438,7 +1438,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable,
       wor_center = movable->GetFullTransform ().This2Other (obj_center);
     csVector3 cam_origin = camera->GetTransform ().GetOrigin ();
     float wor_sq_dist = csSquaredDist::PointPoint (cam_origin, wor_center);
-    level_of_detail = GetLodLevel (qsqrt (wor_sq_dist));
+    level_of_detail = GetLodLevel (csQsqrt (wor_sq_dist));
 
     // reduce LOD based on field-of-view
     float aspect = 2 * (float) tan (camera->GetFOVAngle () * PI / 360);
@@ -1715,7 +1715,7 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n,
       wor_center = movable->GetFullTransform ().This2Other (obj_center);
     csVector3 cam_origin = camera->GetTransform ().GetOrigin ();
     float wor_sq_dist = csSquaredDist::PointPoint (cam_origin, wor_center);
-    level_of_detail = GetLodLevel (qsqrt (wor_sq_dist));
+    level_of_detail = GetLodLevel (csQsqrt (wor_sq_dist));
 
     // reduce LOD based on field-of-view
     float aspect = 2 * (float) tan (camera->GetFOVAngle () * PI / 360);
@@ -1886,7 +1886,7 @@ bool csSprite3DMeshObject::OldNextFrame (csTicks current_time,
    */
 
   // Calculate distance moved by sprite since last frame drawn.
-  float cur_displacement = qsqrt (csSquaredDist::PointPoint (last_pos, cur_pos));
+  float cur_displacement = csQsqrt (csSquaredDist::PointPoint (last_pos, cur_pos));
   last_pos = cur_pos;
 
   // If the sprite has only one frame we disable tweening here.
@@ -2228,8 +2228,8 @@ void csSprite3DMeshObject::UpdateLightingFast (const csArray<iLight*>& lights,
     else
       obj_light_pos = movtrans.Other2This (wor_light_pos);
     float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, obj_center);
-    float inv_obj_dist = qisqrt (obj_sq_dist);
-    float wor_dist = qsqrt (wor_sq_dist);
+    float inv_obj_dist = csQisqrt (obj_sq_dist);
+    float wor_dist = csQsqrt (wor_sq_dist);
 
     csVector3 obj_light_dir = (obj_light_pos - obj_center);
     light_bright_wor_dist = lights[light_num]->GetBrightnessAtDistance (
@@ -2333,13 +2333,13 @@ void csSprite3DMeshObject::UpdateLightingLQ (const csArray<iLight*>& lights,
 
     // FIX: Check for divide by zero
     if (obj_sq_dist > SMALL_EPSILON)
-      in_obj_dist = qisqrt (obj_sq_dist);
+      in_obj_dist = csQisqrt (obj_sq_dist);
 
     csVector3 obj_light_dir = (obj_light_pos - obj_center);
 
     csColor light_color = lights[i]->GetColor ()
     	* (256. / CS_NORMAL_LIGHT_LEVEL)
-	* lights[i]->GetBrightnessAtDistance (qsqrt (wor_sq_dist));
+	* lights[i]->GetBrightnessAtDistance (csQsqrt (wor_sq_dist));
 
     for (j = 0 ; j < num_texels ; j++)
     {
@@ -2421,7 +2421,7 @@ void csSprite3DMeshObject::UpdateLightingHQ (const csArray<iLight*>& lights,
       // can be optimized somewhat.
       float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, obj_vertex);
       float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, wor_vertex);
-      float obj_dist = qsqrt (obj_sq_dist);
+      float obj_dist = csQsqrt (obj_sq_dist);
 
       csVector3 normal = factory->GetNormal (tf_idx, j);
       if (tween_ratio)
@@ -2464,7 +2464,7 @@ bool csSprite3DMeshObject::HitBeamOutline (const csVector3& start,
     if (csIntersect3::IntersectTriangle (verts[tr.a], verts[tr.b],
     	verts[tr.c], seg, isect))
     {
-      if (pr) *pr = qsqrt (csSquaredDist::PointPoint (start, isect) /
+      if (pr) *pr = csQsqrt (csSquaredDist::PointPoint (start, isect) /
 	                     csSquaredDist::PointPoint (start, end));
       return true;
     }
@@ -2499,7 +2499,7 @@ bool csSprite3DMeshObject::HitBeamObject (const csVector3& start,
       }
     }
   }
-  if (pr) *pr = qsqrt (dist / max);
+  if (pr) *pr = csQsqrt (dist / max);
   if (dist >= max) return false;
   return true;
 }

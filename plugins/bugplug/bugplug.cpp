@@ -72,7 +72,7 @@
 #include "iengine/material.h"
 #include "iengine/rview.h"
 #include "cstool/csview.h"
-#include "qint.h"
+#include "csqint.h"
 
 CS_IMPLEMENT_PLUGIN
 

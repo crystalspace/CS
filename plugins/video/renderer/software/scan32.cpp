@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "qint.h"
+#include "csqint.h"
 #include "scan.h"
 
 #include "sttest.h"
@@ -49,8 +49,8 @@ void csScan_32_scan_fog (int xx, unsigned char* d,
   (void)u_div_z; (void)v_div_z;
   uint32* _dest = (uint32*)d;
   uint32* _destend = _dest + xx;
-  uint32 izz = QInt24 (inv_z);
-  int dzz = QInt24 (Scan.M);
+  uint32 izz = csQint24 (inv_z);
+  int dzz = csQint24 (Scan.M);
   uint32 fog_pix = R8G8B8_PIXEL_POSTPROC(Scan.FogR | Scan.FogG | Scan.FogB);
   uint32 fog_dens = Scan.FogDensity;
 

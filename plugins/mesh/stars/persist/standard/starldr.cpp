@@ -29,7 +29,7 @@
 #include "iutil/plugin.h"
 #include "iutil/document.h"
 #include "ivideo/graph3d.h"
-#include "qint.h"
+#include "csqint.h"
 #include "iutil/object.h"
 #include "iengine/material.h"
 #include "ivaria/reporter.h"

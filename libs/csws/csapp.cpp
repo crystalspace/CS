@@ -21,7 +21,7 @@
 #include <limits.h>
 #include <stdarg.h>
 #include "cssysdef.h"
-#include "qint.h"
+#include "csqint.h"
 #include "csutil/scanstr.h"
 #include "csutil/csstring.h"
 #include "csutil/cseventq.h"
@@ -433,7 +433,7 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
 
   csWSTexture *tex = new csWSTexture (iTexName, image, iFlags);
   if (tb >= 0)
-    tex->SetKeyColor (QInt (tr * 255.), QInt (tg * 255.), QInt (tb * 255.));
+    tex->SetKeyColor (csQint (tr * 255.), csQint (tg * 255.), csQint (tb * 255.));
   Textures.Push (tex);
 
   return true;

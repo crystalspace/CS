@@ -17,7 +17,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 #include "csgeom/sphere.h"
 #include "csgeom/poly3d.h"
 #include "csgeom/poly2d.h"
@@ -179,7 +179,7 @@ void csPortalContainer::Prepare ()
     object_bbox.AddBoundingVertex (vertices[i]);
 
   object_radius = object_bbox.Max () - object_bbox.GetCenter ();
-  max_object_radius = qsqrt (csSquaredDist::PointPoint (
+  max_object_radius = csQsqrt (csSquaredDist::PointPoint (
   	object_bbox.Max (), object_bbox.Min ())) * 0.5f;
 
 }

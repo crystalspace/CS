@@ -34,7 +34,7 @@
 #include "iengine/light.h"
 #include "iutil/objreg.h"
 #include "spr2d.h"
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -125,7 +125,7 @@ void csSprite2DMeshObject::SetupObject ()
       float sqdist = v.pos.x*v.pos.x + v.pos.y*v.pos.y;
       if (sqdist > max_sq_dist) max_sq_dist = sqdist;
     }
-    float max_dist = qsqrt (max_sq_dist);
+    float max_dist = csQsqrt (max_sq_dist);
     radius.Set (max_dist, max_dist, max_dist);
 
 #ifdef CS_USE_NEW_RENDERER
@@ -207,7 +207,7 @@ void csSprite2DMeshObject::UpdateLighting (const csArray<iLight*>& lights,
     float wor_sq_dist =
       csSquaredDist::PointPoint (wor_light_pos, pos);
     if (wor_sq_dist >= sq_light_radius) continue;
-    float wor_dist = qsqrt (wor_sq_dist);
+    float wor_dist = csQsqrt (wor_sq_dist);
     float cosinus = 1.;
     cosinus /= wor_dist;
     light_color *= cosinus * lights [i]->GetBrightnessAtDistance (wor_dist);
@@ -937,10 +937,10 @@ void csSprite2DMeshObject::CheckBeam (const csVector3& start,
   // The transformation matrix is stored and used again if the
   // start vector for the beam is in the same position. MHV.
 
-  csVector3 pl2 = pl * qisqrt (sqr);
+  csVector3 pl2 = pl * csQisqrt (sqr);
   csVector3 v1( pl2.z, 0, -pl2.x);
   sqr = v1*v1;
-  v1 *= qisqrt(sqr);
+  v1 *= csQisqrt(sqr);
   csVector3 v2(pl2.y * v1.z, pl2.z * v1.x - pl2.x * v1.z, -pl2.y * v1.x);
   o2t.Set (v1.x, v2.x, pl2.x,
            v1.y, v2.y, pl2.y,

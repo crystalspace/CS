@@ -18,8 +18,8 @@
 */
 
 #include "cssysdef.h"
-#include "qint.h"
-#include "qsqrt.h"
+#include "csqint.h"
+#include "cscsQsqrt.h"
 #include "csutil/csstring.h"
 #include "csutil/hashmap.h"
 #include "csutil/csppulse.h"
@@ -323,7 +323,7 @@ public:
     csStaticLODMesh* static_lod = cmesh->GetStaticLODMesh ();
     if (static_lod)
     {
-      float distance = qsqrt (cmesh->GetSquaredDistance (rview));
+      float distance = csQsqrt (cmesh->GetSquaredDistance (rview));
       float lod = static_lod->GetLODValue (distance);
       csArray<iMeshWrapper*>& meshes = static_lod->GetMeshesForLOD (lod);
       size_t i;

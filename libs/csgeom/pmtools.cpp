@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 #include "csutil/hash.h"
 #include "csgeom/vector3.h"
 #include "csgeom/plane3.h"
@@ -67,7 +67,7 @@ void csPolygonMeshTools::CalculateNormals (iPolygonMesh* mesh,
     if (sqd < SMALL_EPSILON)
       invd = 1.0f / SMALL_EPSILON;
     else
-      invd = qisqrt (sqd);
+      invd = csQisqrt (sqd);
     normals[p].Set (ayz * invd, azx * invd, axy * invd);
 
     poly++;
@@ -116,7 +116,7 @@ void csPolygonMeshTools::CalculatePlanes (iPolygonMesh* mesh,
     if (sqd < SMALL_EPSILON)
       invd = 1.0f / SMALL_EPSILON;
     else
-      invd = qisqrt (sqd);
+      invd = csQisqrt (sqd);
     planes[p].norm.Set (ayz * invd, azx * invd, axy * invd);
     planes[p].DD = - planes[p].norm * verts[vi[0]];
 

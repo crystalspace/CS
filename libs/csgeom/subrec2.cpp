@@ -26,7 +26,7 @@
 
 #ifdef DUMP_TO_IMAGES
 // csSubRectangles2::Dump () writes an image, stuff needed for that
-#include "qint.h"
+#include "csqint.h"
 #include "csutil/csstring.h"
 #include "csutil/ref.h"
 #include "csutil/array.h"
@@ -610,11 +610,11 @@ void csSubRectangles2::Dump ()
   int i;
   for (i = 0; i < 256; i++)
   {
-    pal[i].red = QInt ((((i & 0x01) << 2) + ((i & 0x08) >> 2) +
+    pal[i].red = csQint ((((i & 0x01) << 2) + ((i & 0x08) >> 2) +
       ((i & 0x40) >> 6)) * (255.0f / 7.0f));
-    pal[i].green = QInt ((((i & 0x02) << 1) + ((i & 0x10) >> 3) +
+    pal[i].green = csQint ((((i & 0x02) << 1) + ((i & 0x10) >> 3) +
       ((i & 0x80) >> 7)) * (255.0f / 7.0f));
-    pal[i].blue = QInt ((((i & 0x04) >> 1) + ((i & 0x20) >> 5)) *
+    pal[i].blue = csQint ((((i & 0x04) >> 1) + ((i & 0x20) >> 5)) *
       (255.0f / 3.0f));
   }
 

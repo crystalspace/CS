@@ -25,8 +25,8 @@
 #include "iengine/rview.h"
 #include "iengine/camera.h"
 #include "iengine/movable.h"
-#include "qsqrt.h"
-#include "qint.h"
+#include "cscsQsqrt.h"
+#include "csqint.h"
 #include "csgeom/math3d.h"
 #include "csutil/garray.h"
 #include "emit.h"
@@ -458,7 +458,7 @@ void csEmitCylinder::GetValue(csVector3& value, csVector3 & /*given*/)
 
   // distance from cylinder line
   float amount = GetRandomFloat(min*min, max*max);
-  amount = qsqrt(amount); // cause even spread of points in the circle
+  amount = csQsqrt(amount); // cause even spread of points in the circle
   value += oncirc * amount;
 }
 
@@ -559,7 +559,7 @@ void csEmitSphereTangent::GetValue(csVector3& value, csVector3 & given)
 
   // size of direction
   float amount = GetRandomFloat(min*min, max*max);
-  amount = qsqrt(amount); // cause even spread of points in the circle
+  amount = csQsqrt(amount); // cause even spread of points in the circle
   value = oncirc * amount;
 }
 
@@ -621,7 +621,7 @@ void csEmitMeshObject::SetupObject ()
         lighted_particles);
       StartParticle(i);
       /// age each particle randomly, to spread out particles over ages.
-      int elapsed = QInt(GetRandomFloat(0,timetolive));
+      int elapsed = csQint(GetRandomFloat(0,timetolive));
       MoveAgeParticle(i, elapsed, elapsed/1000.);
     }
     SetupColor ();

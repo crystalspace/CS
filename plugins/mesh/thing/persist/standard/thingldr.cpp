@@ -49,7 +49,7 @@
 #include "imap/parser.h"
 #include "ivaria/reporter.h"
 #include "thingldr.h"
-#include "qint.h"
+#include "csqint.h"
 
 CS_IMPLEMENT_PLUGIN
 

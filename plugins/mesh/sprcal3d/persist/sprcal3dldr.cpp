@@ -30,7 +30,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iutil/plugin.h"
 #include "imesh/spritecal3d.h"
 #include "ivideo/graph3d.h"
-#include "qint.h"
+#include "csqint.h"
 #include "iutil/vfs.h"
 #include "csutil/csstring.h"
 #include "iutil/object.h"

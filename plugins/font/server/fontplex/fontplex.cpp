@@ -20,7 +20,7 @@
 
 #include <stdlib.h>
 #include "cssysdef.h"
-#include "qint.h"
+#include "csqint.h"
 #include "csutil/csuctransform.h"
 #include "csutil/util.h"
 #include "iutil/plugin.h"
@@ -68,7 +68,7 @@ iFont* csFontLoadOrderEntry::GetFont (csFontPlexer* parent)
   if (!loaded)
   {
     font = server->LoadFont (fontName,
-      QRound ((float)parent->size * scale));
+      csQround ((float)parent->size * scale));
     loaded = true;
   }
   return font;

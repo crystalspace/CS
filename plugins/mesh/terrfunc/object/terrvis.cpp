@@ -24,8 +24,8 @@
 #include "csgeom/vector3.h"
 #include "csutil/garray.h"
 #include "terrvis.h"
-#include "qint.h"
-#include "qsqrt.h"
+#include "csqint.h"
+#include "cscsQsqrt.h"
 
 //------------------------------------------------------------------------
 
@@ -93,7 +93,7 @@ static void BuildHorIndexTable (int horsize)
     int idx;
     if (invcos < k*0.5) idx = 0;
     else if (invcos > PI - k*0.5) idx = horsize/2;
-    else idx = QInt ((invcos + k*0.5)/k);
+    else idx = csQint ((invcos + k*0.5)/k);
     horidx_table[i+128] = idx;
     CS_ASSERT (idx >= 0 && idx < horsize);
   }
@@ -111,9 +111,9 @@ int csTerrainQuad::GetHorIndex(const csVector3& campos, float x, float z,
 
   x -= campos.x;
   z -= campos.z;
-  float invlen = qisqrt (x*x + z*z);
+  float invlen = csQisqrt (x*x + z*z);
   float cosinus = x * invlen;
-  int icos = QInt (cosinus * 127.0);
+  int icos = csQint (cosinus * 127.0);
   CS_ASSERT (icos >= -128 && icos <= 128);
   int idx = horidx_table[icos+128];
   if (z < 0 && idx) idx = horsize - idx;
@@ -225,27 +225,27 @@ void csTerrainQuad::ComputeMinMaxDY(const csVector3& campos, const csBox3& bbox,
   {
     /// below zero, smallest height at minimal distance is the steepest down
     if(mindist == 0.0f) mindy = MININF;
-    else mindy = minh * qisqrt(mindist);
+    else mindy = minh * csQisqrt(mindist);
   }
   else
   {
     /// above zero, the smallest height at maximal distance is the smallest
     /// upslope
     if(maxdist == 0.0f) mindy = MAXINF;
-    else mindy = minh * qisqrt(maxdist);
+    else mindy = minh * csQisqrt(maxdist);
   }
 
   if(maxh < 0.0)
   {
     /// below zero, biggest height at maximal distance is the least downslope
     if(maxdist == 0.0f) maxdy = MININF;
-    else maxdy = maxh * qisqrt(maxdist);
+    else maxdy = maxh * csQisqrt(maxdist);
   }
   else
   {
     /// above zero, the biggest height at minimum distance is steepest upslope
     if(mindist == 0.0f) maxdy = MAXINF;
-    else maxdy = maxh * qisqrt(mindist);
+    else maxdy = maxh * csQisqrt(mindist);
   }
 
 //printf ("sqdist[0]=%g\n", sqdist[0]);

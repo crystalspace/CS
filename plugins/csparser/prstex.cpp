@@ -18,7 +18,7 @@
 */
 
 #include "cssysdef.h"
-#include "qint.h"
+#include "csqint.h"
 #include "ivideo/graph3d.h"
 #include "csloader.h"
 #include "imap/ldrctxt.h"
@@ -424,8 +424,8 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
     tex->QueryObject ()->SetName (txtname);
     tex->SetKeepImage (keep_image);
     if (do_transp)
-      tex->SetKeyColor (QInt (transp.red * 255.99),
-        QInt (transp.green * 255.99), QInt (transp.blue * 255.99));
+      tex->SetKeyColor (csQint (transp.red * 255.99),
+        csQint (transp.green * 255.99), csQint (transp.blue * 255.99));
 
     csRef<iProcTexture> ipt = csPtr<iProcTexture>
       (SCF_QUERY_INTERFACE (tex, iProcTexture));
@@ -507,9 +507,9 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
 	  csColor color;
           if (!SyntaxService->ParseColor (child, color))
 	    return 0;
-	  col.red = QInt (color.red * 255.99f);
-	  col.green = QInt (color.green * 255.99f);
-	  col.blue = QInt (color.blue * 255.99f);
+	  col.red = csQint (color.red * 255.99f);
+	  col.green = csQint (color.green * 255.99f);
+	  col.blue = csQint (color.blue * 255.99f);
 	}
         break;
       case XMLTOKEN_DIFFUSE:

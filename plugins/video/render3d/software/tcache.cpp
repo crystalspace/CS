@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "qint.h"
+#include "csqint.h"
 #include "csutil/util.h"
 #include "tcache.h"
 #include "soft_g3d.h"

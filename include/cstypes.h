@@ -28,7 +28,7 @@
 #error "cssysdef.h must be included in EVERY source file!"
 #endif
 
-#include "platform.h"
+#include "csplatform.h"
 #include <float.h>
 
 /**\name Specific sized types.

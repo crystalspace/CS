@@ -32,7 +32,7 @@
 #include "iengine/light.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 
 #include "lghtng.h"
 

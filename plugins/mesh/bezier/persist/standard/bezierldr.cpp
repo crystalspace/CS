@@ -44,7 +44,7 @@
 #include "imap/parser.h"
 #include "ivaria/reporter.h"
 #include "bezierldr.h"
-#include "qint.h"
+#include "csqint.h"
 
 CS_IMPLEMENT_PLUGIN
 

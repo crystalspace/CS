@@ -30,7 +30,7 @@
 #include "imesh/genmesh.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
-#include "qint.h"
+#include "csqint.h"
 #include "iutil/object.h"
 #include "iengine/material.h"
 #include "ivaria/reporter.h"

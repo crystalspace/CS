@@ -19,7 +19,7 @@
 
 #include "cssysdef.h"
 
-#include "qint.h"
+#include "csqint.h"
 #include "csgfx/gradient.h"
 
 csGradientShade::csGradientShade() :
@@ -116,9 +116,9 @@ bool csGradient::Render (csRGBcolor* pal, size_t count,
       }
     }
 
-    pal[i].red = QInt (CLAMP (color.red) * 255.99f);
-    pal[i].green = QInt (CLAMP (color.green) * 255.99f);
-    pal[i].blue = QInt (CLAMP (color.blue) * 255.99f);
+    pal[i].red = csQint (CLAMP (color.red) * 255.99f);
+    pal[i].green = csQint (CLAMP (color.green) * 255.99f);
+    pal[i].blue = csQint (CLAMP (color.blue) * 255.99f);
 
     color += delta;
     gradpos += step;

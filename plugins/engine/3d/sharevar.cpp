@@ -16,7 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "qint.h"
+#include "csqint.h"
 #include "plugins/engine/3d/sharevar.h"
 #include "csutil/csstring.h"
 #include "csutil/hashmap.h"

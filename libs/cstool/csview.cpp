@@ -18,7 +18,7 @@
 */
 
 #include "cssysdef.h"
-#include "qint.h"
+#include "csqint.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/poly2d.h"
 #include "ivideo/graph3d.h"
@@ -149,10 +149,10 @@ void csView::UpdateView ()
   }
   else if (RectView)
   {
-    RectView->Set (QRound (scale_x * RectView->MinX()),
-		   QRound (scale_y * RectView->MinY()),
-		   QRound (scale_x * RectView->MaxX()),
-		   QRound (scale_y * RectView->MaxY()) );
+    RectView->Set (csQround (scale_x * RectView->MinX()),
+		   csQround (scale_y * RectView->MinY()),
+		   csQround (scale_x * RectView->MaxX()),
+		   csQround (scale_y * RectView->MaxY()) );
   }
 
   Clipper = 0;

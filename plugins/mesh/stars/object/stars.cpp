@@ -30,8 +30,8 @@
 #include "igeom/clip2d.h"
 #include "iengine/engine.h"
 #include "iengine/light.h"
-#include "qsqrt.h"
-#include "qint.h"
+#include "cscsQsqrt.h"
+#include "csqint.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -113,8 +113,8 @@ void csStarsMeshObject::DrawPoint(iRenderView *rview,
 {
   iGraphics2D *g2d = rview->GetGraphics2D();
   iGraphics3D *g3d = rview->GetGraphics3D();
-  int x = QInt(pos.x);
-  int y = QInt(pos.y);
+  int x = csQint(pos.x);
+  int y = csQint(pos.y);
   // clip to screen and to clipper
   if(x < 0.0 || y < 0.0 || x >= g2d->GetWidth() || y >= g2d->GetHeight())
     return;
@@ -129,8 +129,8 @@ void csStarsMeshObject::DrawPoint(iRenderView *rview,
   }
 
   // draw
-  int colidx = g2d->FindRGB(QInt(col.red * 255),
-    QInt(col.green*255), QInt(col.blue*255));
+  int colidx = g2d->FindRGB(csQint(col.red * 255),
+    csQint(col.green*255), csQint(col.blue*255));
   g2d->DrawPixel(x, y, colidx);
 
 }
@@ -159,14 +159,14 @@ void csStarsMeshObject::DrawStarBox (iRenderView* rview,
     )
     return;
 
-  unsigned int starseed = seed ^ QInt(starbox.Min().x) ^ QInt(starbox.Min().y)
-    ^ QInt(starbox.Min().z);
+  unsigned int starseed = seed ^ csQint(starbox.Min().x) ^ csQint(starbox.Min().y)
+    ^ csQint(starbox.Min().z);
   srand(starseed);
 
   csVector3 boxsize = starbox.Max() - starbox.Min();
   int number = 100; // number of stars is volume * density
   //printf("boxsize.x %g %g %g\n", boxsize.x, boxsize.y, boxsize.z);
-  number = QInt(
+  number = csQint(
     boxsize.x * boxsize.y * boxsize.z * density
     * ( GetRandom(0.4f) + 0.8f ) /// * 0.8 ... * 1.2, so +- 20%
     );
@@ -241,15 +241,15 @@ bool csStarsMeshObject::Draw (iRenderView* rview, iMovable* movable,
   /// snap boxes to a grid
   const float gridsize = 20;
   csVector3 boxsize = box.Max() - box.Min();
-  int nr_x = QInt(gridsize * max_dist / boxsize.x)+1;
-  int nr_y = QInt(gridsize * max_dist / boxsize.y)+1;
-  int nr_z = QInt(gridsize * max_dist / boxsize.z)+1;
+  int nr_x = csQint(gridsize * max_dist / boxsize.x)+1;
+  int nr_y = csQint(gridsize * max_dist / boxsize.y)+1;
+  int nr_z = csQint(gridsize * max_dist / boxsize.z)+1;
   csVector3 starboxsize( boxsize.x / gridsize, boxsize.y / gridsize,
     boxsize.z / gridsize );
   csVector3 starmin = box.Min();
-  starmin.x += QInt((origin.x-box.Min().x)/starboxsize.x)*starboxsize.x;
-  starmin.y += QInt((origin.y-box.Min().y)/starboxsize.y)*starboxsize.y;
-  starmin.z += QInt((origin.z-box.Min().z)/starboxsize.z)*starboxsize.z;
+  starmin.x += csQint((origin.x-box.Min().x)/starboxsize.x)*starboxsize.x;
+  starmin.y += csQint((origin.y-box.Min().y)/starboxsize.y)*starboxsize.y;
+  starmin.z += csQint((origin.z-box.Min().z)/starboxsize.z)*starboxsize.z;
   csBox3 starbox(starmin, starmin+starboxsize);
   csBox3 passbox;
 

@@ -19,7 +19,7 @@
 #include <math.h>
 #include <float.h>
 #include "cssysdef.h"
-#include "qint.h"
+#include "csqint.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/quaterni.h"
 

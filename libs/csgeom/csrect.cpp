@@ -18,7 +18,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "qint.h"
+#include "csqint.h"
 #include "csgeom/csrect.h"
 
 csRect::csRect ()
@@ -360,26 +360,26 @@ bool csRect::ClipLineSafe (int& x1, int& y1, int& x2, int& y2)
   if ((p11<=p&&p<=p12) || (p12<=p&&p<=p11))
   {
     inside = true;
-    if      (x1<xmin) { x1 = xmin; y1 = QInt ((p + deltay_m_xmin)/deltax);}
-    else if (x2<xmin) { x2 = xmin; y2 = QInt ((p + deltay_m_xmin)/deltax);}
+    if      (x1<xmin) { x1 = xmin; y1 = csQint ((p + deltay_m_xmin)/deltax);}
+    else if (x2<xmin) { x2 = xmin; y2 = csQint ((p + deltay_m_xmin)/deltax);}
   }
   if ((p12<=p&&p<=p22) || (p22<=p&&p<=p12))
   {
     inside = true;
-    if      (y1>ymax) { y1 = ymax; x1 = QInt ((deltax_m_ymax - p)/deltay);}
-    else if (y2>ymax) { y2 = ymax; x2 = QInt ((deltax_m_ymax - p)/deltay);}
+    if      (y1>ymax) { y1 = ymax; x1 = csQint ((deltax_m_ymax - p)/deltay);}
+    else if (y2>ymax) { y2 = ymax; x2 = csQint ((deltax_m_ymax - p)/deltay);}
   }
   if ((p22<=p&&p<=p21) || (p21<=p&&p<=p22))
   {
     inside = true;
-    if      (x1>xmax) { x1 = xmax; y1 = QInt ((p + deltay_m_xmax)/deltax);}
-    else if (x2>xmax) { x2 = xmax; y2 = QInt ((p + deltay_m_xmax)/deltax);}
+    if      (x1>xmax) { x1 = xmax; y1 = csQint ((p + deltay_m_xmax)/deltax);}
+    else if (x2>xmax) { x2 = xmax; y2 = csQint ((p + deltay_m_xmax)/deltax);}
   }
   if ((p21<=p&&p<=p11) || (p11<=p&&p<=p21))
   {
     inside = true;
-    if      (y1<ymin) { y1 = ymin; x1 = QInt ((deltax_m_ymin - p)/deltay);}
-    else if (y2<ymin) { y2 = ymin; x2 = QInt ((deltax_m_ymin - p)/deltay);}
+    if      (y1<ymin) { y1 = ymin; x1 = csQint ((deltax_m_ymin - p)/deltay);}
+    else if (y2<ymin) { y2 = ymin; x2 = csQint ((deltax_m_ymin - p)/deltay);}
   }
   return inside;
 }

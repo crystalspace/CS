@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include "cssysdef.h"
 #include "graph2d.h"
-#include "qint.h"
+#include "csqint.h"
 #include "scrshot.h"
 #include "iutil/plugin.h"
 #include "ivideo/graph3d.h"
@@ -495,8 +495,8 @@ void csGraphics2D::DrawLine (float x1, float y1, float x2, float y2, int color)
   if (ClipLine (x1, y1, x2, y2, ClipX1, ClipY1, ClipX2, ClipY2))
     return;
 
-  int fx1 = QInt (x1), fx2 = QInt (x2),
-      fy1 = QInt (y1), fy2 = QInt (y2);
+  int fx1 = csQint (x1), fx2 = csQint (x2),
+      fy1 = csQint (y1), fy2 = csQint (y2);
 
 
   // Adjust the farthest margin
@@ -537,7 +537,7 @@ void csGraphics2D::DrawLine (float x1, float y1, float x2, float y2, int color)
   else if (abs (fx2 - fx1) > abs (fy2 - fy1))
   {
     // Transform floating-point format to 16.16 fixed-point
-    fy1 = QInt16 (y1); fy2 = QInt16 (y2);
+    fy1 = csQint16 (y1); fy2 = csQint16 (y2);
 
     if (fx1 > fx2)
     {
@@ -579,7 +579,7 @@ void csGraphics2D::DrawLine (float x1, float y1, float x2, float y2, int color)
   else
   {
     // Transform floating-point format to 16.16 fixed-point
-    fx1 = QInt16 (x1); fx2 = QInt16 (x2);
+    fx1 = csQint16 (x1); fx2 = csQint16 (x2);
 
     if (fy1 > fy2)
     {

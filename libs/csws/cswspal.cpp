@@ -18,7 +18,7 @@
 */
 
 #include "cssysdef.h"
-#include "qint.h"
+#include "csqint.h"
 #include "csws/cswspal.h"
 #include "csws/cscomp.h"
 #include "csws/csapp.h"
@@ -380,7 +380,7 @@ void csSetColorScheme (csApp *iApp, csColorScheme &Scheme)
         csHLS2RGB (h, l, s, r, g, b);
 
         cswsPalette [i].Palette [j] =
-          iApp->FindColor (QInt (r * 255), QInt (g * 255), QInt (b * 255));
+          iApp->FindColor (csQint (r * 255), csQint (g * 255), csQint (b * 255));
       }
     }
   }

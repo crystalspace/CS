@@ -21,7 +21,7 @@
    halo renderer */
 
 #include "cssysdef.h"
-#include "qint.h"
+#include "csqint.h"
 #include "csgeom/math2d.h"
 #include "csutil/util.h"
 #include "ogl_g3dcom.h"

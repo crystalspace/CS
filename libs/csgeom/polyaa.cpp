@@ -19,7 +19,7 @@
 #include <math.h>
 
 #include "cssysdef.h"
-#include "qint.h"
+#include "csqint.h"
 #include "csgeom/vector2.h"
 #include "csgeom/polyaa.h"
 
@@ -215,12 +215,12 @@ void csAntialiasedPolyFill (
   int i;
   for (i = 0; i < ivertscount; i++)
   {
-    int x = QInt (iverts[i].x);
-    int y = QInt (iverts[i].y);
+    int x = csQint (iverts[i].x);
+    int y = csQint (iverts[i].y);
     if (Grid->xmin > x) Grid->xmin = x;
     if (Grid->ymin > y) Grid->ymin = y;
-    x = QRound (ceil (iverts[i].x));
-    y = QRound (ceil (iverts[i].y));
+    x = csQround (ceil (iverts[i].x));
+    y = csQround (ceil (iverts[i].y));
     if (Grid->xmax < x) Grid->xmax = x;
     if (Grid->ymax < y) Grid->ymax = y;
   }

@@ -508,10 +508,10 @@ void CsBench::PerformTests ()
   Report ("Compiler '%s', platform '%s', processor '%s'",
   	CS_COMPILER_NAME, CS_PLATFORM_NAME, CS_PROCESSOR_NAME);
 #ifdef CS_QINT_WORKAROUND
-  Report ("QInt() workaround enabled!");
+  Report ("csQint() workaround enabled!");
 #endif
 #ifdef CS_NO_QSQRT
-  Report ("qsqrt() disabled!");
+  Report ("csQsqrt() disabled!");
 #endif
   Report ("Big object in test has %d triangles.",
   	2*(BIGOBJECT_DIM-1)*(BIGOBJECT_DIM-1));

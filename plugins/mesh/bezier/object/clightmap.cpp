@@ -465,9 +465,9 @@ bool csCurveLightMap::UpdateRealLightMap (float dyn_ambient_r,
   if (dyn_ambient_r || dyn_ambient_g || dyn_ambient_b)
   {
     csRGBpixel ambient;
-    int dr = QInt (dyn_ambient_r * 128);
-    int dg = QInt (dyn_ambient_g * 128);
-    int db = QInt (dyn_ambient_b * 128);
+    int dr = csQint (dyn_ambient_r * 128);
+    int dg = csQint (dyn_ambient_g * 128);
+    int db = csQint (dyn_ambient_b * 128);
     if (dr > 255) dr = 255;
     if (dg > 255) dg = 255;
     if (db > 255) db = 255;
@@ -524,9 +524,9 @@ bool csCurveLightMap::UpdateRealLightMap (float dyn_ambient_r,
       p = smap->GetArray ();
       last_p = p + lm_size;
 
-      int tm_r = temp_max_color_values.red   + QInt (smap->max_shadow * red);
-      int tm_g = temp_max_color_values.green + QInt (smap->max_shadow * green);
-      int tm_b = temp_max_color_values.blue  + QInt (smap->max_shadow * blue);
+      int tm_r = temp_max_color_values.red   + csQint (smap->max_shadow * red);
+      int tm_g = temp_max_color_values.green + csQint (smap->max_shadow * green);
+      int tm_b = temp_max_color_values.blue  + csQint (smap->max_shadow * blue);
 
       if (tm_r < 256  && tm_g < 256  && tm_b < 256)
       {
@@ -535,9 +535,9 @@ bool csCurveLightMap::UpdateRealLightMap (float dyn_ambient_r,
         {
           s = *p++;
 
-          map->red   += QRound (red * s);
-          map->green += QRound (green * s);
-          map->blue  += QRound (blue * s);
+          map->red   += csQround (red * s);
+          map->green += csQround (green * s);
+          map->blue  += csQround (blue * s);
           map++;
         } while (p < last_p);
 
@@ -552,11 +552,11 @@ bool csCurveLightMap::UpdateRealLightMap (float dyn_ambient_r,
         {
           s = *p++;
 
-          l = map->red + QRound (red * s);
+          l = map->red + csQround (red * s);
           map->red = l < 255 ? l : 255;
-          l = map->green + QRound (green * s);
+          l = map->green + csQround (green * s);
           map->green = l < 255 ? l : 255;
-          l = map->blue + QRound (blue * s);
+          l = map->blue + csQround (blue * s);
           map->blue = l < 255 ? l : 255;
 
           map++;

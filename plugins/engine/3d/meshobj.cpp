@@ -16,7 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 #include "csgeom/sphere.h"
 #include "igeom/objmodel.h"
 #include "plugins/engine/3d/sector.h"
@@ -702,7 +702,7 @@ void csMeshWrapper::DrawIntFull (iRenderView *rview, uint32 frustum_mask)
   if (static_lod)
   {
     // If we have static lod we only draw the children for the right LOD level.
-    float distance = qsqrt (GetSquaredDistance (rview));
+    float distance = csQsqrt (GetSquaredDistance (rview));
     float lod = static_lod->GetLODValue (distance);
     csArray<iMeshWrapper*>& meshes = static_lod->GetMeshesForLOD (lod);
     for (i = 0 ; i < meshes.Length () ; i++)
@@ -937,7 +937,7 @@ void csMeshWrapper::PlaceMesh ()
           // Plane of portal is close enough.
           // If N is the normal of the portal plane then we
           // can use that to calculate the point on the portal plane.
-          csVector3 testpoint = sphere.GetCenter () + pl.Normal () * qsqrt (
+          csVector3 testpoint = sphere.GetCenter () + pl.Normal () * csQsqrt (
                   sqdist);
           if (portal->PointOnPolygon (testpoint))
             movable_sectors->Add (dest_sector);

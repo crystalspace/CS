@@ -18,7 +18,7 @@
 
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
-#include "qint.h"
+#include "csqint.h"
 #include "walktest.h"
 #include "bot.h"
 #include "infmaze.h"

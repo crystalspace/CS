@@ -44,9 +44,9 @@ struct iRendererLightmap;
 // A coefficient for planar fog density: bigger is denser
 #define PLANAR_FOG_DENSITY_COEF	6
 
-/// At this point QRound (255 * exp (-float (i) / 256.)) reaches zero
+/// At this point csQround (255 * exp (-float (i) / 256.)) reaches zero
 #define EXP_256_SIZE			1420
-/// Same for QRound (32 * exp (-float (i) / 256.))
+/// Same for csQround (32 * exp (-float (i) / 256.))
 #define EXP_32_SIZE			1065
 
 /// Blending table indices

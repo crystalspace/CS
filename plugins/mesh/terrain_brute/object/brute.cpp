@@ -36,7 +36,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iutil/objreg.h"
 #include "iutil/vfs.h"
 #include "brute.h"
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -1202,7 +1202,7 @@ bool csTerrainObject::HitBeam (csTerrBlock* block,
 	}
       }
     }
-    if (pr) *pr = qsqrt (dist * itot_dist);
+    if (pr) *pr = csQsqrt (dist * itot_dist);
     if (dist >= tot_dist)
       return false;
     return true;

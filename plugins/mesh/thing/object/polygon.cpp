@@ -31,8 +31,8 @@
 #include "iutil/cache.h"
 #include "csgeom/matrix2.h"
 #include "csgeom/poly3d.h"
-#include "qint.h"
-#include "qsqrt.h"
+#include "csqint.h"
+#include "cscsQsqrt.h"
 #include "iengine/texture.h"
 #include "iengine/material.h"
 #include "iengine/light.h"
@@ -534,10 +534,10 @@ bool csPolygon3DStatic::CreateBoundingTextureBox ()
     ww = hh = 64;
     rc = false;
   }
-  polygon_data.tmapping->SetIMinUV (QRound (min_u * ww),
-    QRound (min_v * hh));
-  int Imax_u = QRound (max_u * ww);
-  int Imax_v = QRound (max_v * hh);
+  polygon_data.tmapping->SetIMinUV (csQround (min_u * ww),
+    csQround (min_v * hh));
+  int Imax_u = csQround (max_u * ww);
+  int Imax_v = csQround (max_v * hh);
 
   int h = Imax_v - polygon_data.tmapping->GetIMinV ();
   int w_orig = Imax_u - polygon_data.tmapping->GetIMinU ();
@@ -843,7 +843,7 @@ void csPolygon3DStatic::PlaneNormal (float *yz, float *zx, float *xy)
   if (sqd < SMALL_EPSILON)
     invd = 1.0f / SMALL_EPSILON;
   else
-    invd = qisqrt (sqd);
+    invd = csQisqrt (sqd);
 
   *yz = ayz * invd;
   *zx = azx * invd;

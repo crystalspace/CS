@@ -21,8 +21,8 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
-#include "qsqrt.h"
-#include "qint.h"
+#include "cscsQsqrt.h"
+#include "csqint.h"
 #include "csgeom/matrix3.h"
 #include "iutil/objreg.h"
 
@@ -331,7 +331,7 @@ bool csProcSky::SphereIntersect(const csVector3& point, csVector3& isect)
   float discrim = b * b - 4.0f * a * c;
   if(discrim < 0.0f) return false;
   float div = 1.0f / (2.0f * a); /// do the div only once
-  float sqdis = qsqrt(discrim); /// and the sqrt only once.
+  float sqdis = csQsqrt(discrim); /// and the sqrt only once.
   /// the positive mu solution is in the direction viewed.
   float mu = div * (-b + sqdis);
   if(mu < 0.0f) mu = div * (-b - sqdis);
@@ -383,7 +383,7 @@ csRGBcolor csProcSky::GetSkyBlue(const csVector3& spot, float& haze,
     if (r > 255.0) r = 255.0;
     if (g > 255.0) g = 255.0;
     if (b > 255.0) b = 255.0;
-    res.Set(QRound(r), QRound(g), QRound(b));
+    res.Set(csQround(r), csQround(g), csQround(b));
     return res;
   }
   haze = (spot.y-cam.y) / (radius - (cam.y - center.y));
@@ -411,7 +411,7 @@ csRGBcolor csProcSky::GetSkyBlue(const csVector3& spot, float& haze,
     if (r > 255.0) r = 255.0;
     if (g > 255.0) g = 255.0;
     if (b > 255.0) b = 255.0;
-    res.Set(QRound(r), QRound(g), QRound(b));
+    res.Set(csQround(r), csQround(g), csQround(b));
   return res;
 }
 

@@ -17,8 +17,8 @@
 */
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
-#include "qint.h"
-#include "qsqrt.h"
+#include "csqint.h"
+#include "cscsQsqrt.h"
 #include "csgeom/math3d.h"
 #include "csgeom/tri.h"
 #include "csgeom/bsptree.h"

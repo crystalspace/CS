@@ -29,7 +29,7 @@
 
 #include "csgeom/math3d.h"
 #include "csgeom/matrix3.h"
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 
 /**
  * Class for a quaternion.
@@ -140,7 +140,7 @@ public:
     float dist, square;
     square = x * x + y * y + z * z + r * r;
 
-    if (square > 0.0) dist = (float)qisqrt(square);
+    if (square > 0.0) dist = (float)csQisqrt(square);
     else dist = 1;
 
     x *= dist;
@@ -160,7 +160,7 @@ public:
     }
     else
     {
-      r = qsqrt(1.0f - x*x - y*y - z*z);
+      r = csQsqrt(1.0f - x*x - y*y - z*z);
       }*/
   }
 

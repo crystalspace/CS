@@ -19,9 +19,9 @@
 #include <stdarg.h>
 
 
-// Include platform.h here. Otherwise we don't get the CS_EXTENSIVE_MEMDEBUG
+// Include csplatform.h here. Otherwise we don't get the CS_EXTENSIVE_MEMDEBUG
 // or CS_MEMORY_TRACKER definitions.
-#include "platform.h"
+#include "csplatform.h"
 
 #ifdef CS_EXTENSIVE_MEMDEBUG
   // in cssysdef.h is a "#define new" which affects the operator

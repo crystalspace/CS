@@ -29,13 +29,13 @@
 #include "csgeom/vector3.h"
 #include "csgeom/frustum.h"
 #include "csutil/csppulse.h"
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 #include "igraphic/image.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 #include "ivaria/pmeter.h"
 #include <math.h>
-#include "qint.h"
+#include "csqint.h"
 
 #if 0
 // TOTALLY DISABLED FOR NOW
@@ -192,7 +192,7 @@ void csRadElement::CopyAndClearDelta ()
   for (uv = 0; uv < size; uv++)
   {
     // Red
-    res = lm[uv].red + QRound (dm[uv]);
+    res = lm[uv].red + csQround (dm[uv]);
     if (res > 255)
       res = 255;
     else if (res < 0)
@@ -201,7 +201,7 @@ void csRadElement::CopyAndClearDelta ()
     dm[uv] = 0.0;
 
     // Green
-    res = lm[uv].green + QRound (dm[uv + size]);
+    res = lm[uv].green + csQround (dm[uv + size]);
     if (res > 255)
       res = 255;
     else if (res < 0)
@@ -210,7 +210,7 @@ void csRadElement::CopyAndClearDelta ()
     dm[uv + size] = 0.0;
 
     // Blue
-    res = lm[uv].blue + QRound (dm[uv + size + size]);
+    res = lm[uv].blue + csQround (dm[uv + size + size]);
     if (res > 255)
       res = 255;
     else if (res < 0)
@@ -273,19 +273,19 @@ csRGBMap *csRadElement::ComputeTextureLumelSized ()
   map->Alloc (size);
 
   // fill map with flat color
-  int flatr = QRound (GetFlatColor ().red * 255.0);
+  int flatr = csQround (GetFlatColor ().red * 255.0);
   if (flatr > 255)
     flatr = 255;
   else if (flatr < 0)
     flatr = 0;
 
-  int flatg = QRound (GetFlatColor ().green * 255.0);
+  int flatg = csQround (GetFlatColor ().green * 255.0);
   if (flatg > 255)
     flatg = 255;
   else if (flatg < 0)
     flatg = 0;
 
-  int flatb = QRound (GetFlatColor ().blue * 255.0);
+  int flatb = csQround (GetFlatColor ().blue * 255.0);
   if (flatb > 255)
     flatb = 255;
   else if (flatb < 0)
@@ -1132,7 +1132,7 @@ csRadElement *csRadiosity::FetchNext ()
 
   if (meter)
   {
-    int ticks_now = QRound (val * meter->GetTotal ());
+    int ticks_now = csQround (val * meter->GetTotal ());
     while (meter->GetCurrent () < ticks_now)
     {
       meter->Step ();
@@ -1232,8 +1232,8 @@ void csRadiosity::StartFrustum ()
   // And this leads to sharper shadows as well.
   shoot_src->Lumel2World (
       center,
-      QInt (shoot_src->GetWidth () / 2.0),
-      QInt (shoot_src->GetHeight () / 2.0));
+      csQint (shoot_src->GetWidth () / 2.0),
+      csQint (shoot_src->GetHeight () / 2.0));
 
   center -= shoot_src->GetAvgNormal () * 0.1f;
 
@@ -1531,8 +1531,8 @@ void csRadiosity::PrepareShootSourceLumel (int sx, int sy, int suv)
   src_y = sy;
   shoot_src->Lumel2World (
       src_lumel,
-      QInt (sx + srcp_width / 2.0),
-      QInt (sy + srcp_height / 2.0));
+      csQint (sx + srcp_width / 2.0),
+      csQint (sy + srcp_height / 2.0));
 
   /// use the size of a lumel in the source poly *
   //  /// the amount of the lumel visible to compute area of sender.
@@ -1711,7 +1711,7 @@ void csRadiosity::ShootPatch (int rx, int ry, int ruv)
 
   // really represents a cosinus.
   if (distance < 0.1f) return ;         // also prevents divide by zero
-  float inv_distance = qisqrt (distance);
+  float inv_distance = csQisqrt (distance);
   path *= inv_distance;
   cosdestangle *= inv_distance;
 
@@ -1778,17 +1778,17 @@ static void calc_ambient_func (csRadElement *p)
 static void add_ambient_sec_func (csRadElement *p)
 {
   p->ApplyAmbient (
-      QRound ((float)total_delta_color_red),
-      QRound ((float)total_delta_color_green),
-      QRound ((float)total_delta_color_blue));
+      csQround ((float)total_delta_color_red),
+      csQround ((float)total_delta_color_green),
+      csQround ((float)total_delta_color_blue));
 }
 
 static void apply_ambient_func (csRadElement *p)
 {
   p->ApplyAmbient (
-      QRound ((float)total_delta_color_red * p->GetDiffuse ()),
-      QRound ((float)total_delta_color_green * p->GetDiffuse ()),
-      QRound ((float)total_delta_color_blue * p->GetDiffuse ()));
+      csQround ((float)total_delta_color_red * p->GetDiffuse ()),
+      csQround ((float)total_delta_color_green * p->GetDiffuse ()),
+      csQround ((float)total_delta_color_blue * p->GetDiffuse ()));
 }
 
 static void add_delta_func (csRadElement *p)

@@ -26,8 +26,8 @@
  * make sure this really is the problem.
  */
 
-#ifndef __CS_QSQRT_H__
-#define __CS_QSQRT_H__
+#ifndef __CS_CSQSQRT_H__
+#define __CS_CSQSQRT_H__
 
 /**
  * \addtogroup floating_point
@@ -36,16 +36,16 @@
 /**
  * This routine computes sqrt(x) very quickly on Intel and PowerPC platforms.
  */
-static inline float qsqrt (float x);
+static inline float csQsqrt (float x);
 
 /**
- * This routine is basically equivalent to qsqrt() except that it returns
+ * This routine is basically equivalent to csQsqrt() except that it returns
  * 1/sqrt(x) rather than the proper square root. It should be used anywhere
  * you need the inverse root (in 3D graphics it is a common situation),
- * because the routine is a little faster than qsqrt() and also you avoid
+ * because the routine is a little faster than csQsqrt() and also you avoid
  * a division.
  */
-static inline float qisqrt (float x);
+static inline float csQisqrt (float x);
 
 /** @} */
 
@@ -68,7 +68,7 @@ static inline float qisqrt (float x);
  * approximatively 50 clocks, while a division is 42 clocks.
  */
  
-static inline float qsqrt (float x)
+static inline float csQsqrt (float x)
 {
   float ret;
   static float c1=0.5f;
@@ -116,13 +116,13 @@ static inline float qsqrt (float x)
 }
 
 /**
- * This routine is basically equivalent to qsqrt() except that it returns
+ * This routine is basically equivalent to csQsqrt() except that it returns
  * 1/sqrt(x) rather than the proper square root. It should be used anywhere
  * you need the inverse root (in 3D graphics it is a common situation),
- * because the routine is a little faster than qsqrt() and also you avoid
+ * because the routine is a little faster than csQsqrt() and also you avoid
  * a division (which gives you an overall 2X speedup).
  */
-static inline float qisqrt (float x)
+static inline float csQisqrt (float x)
 {
   float ret;
   static float c1=0.5f;
@@ -166,7 +166,7 @@ static inline float qisqrt (float x)
  * to get a more accurate result.  Zero is treated as a special case, otherwise
  * we end up returning NaN (Not a Number).
  */
-static inline float qsqrt(float x)
+static inline float csQsqrt(float x)
 {
   float y0 = 0.0;
 
@@ -184,10 +184,10 @@ static inline float qsqrt(float x)
 };
 
 /**
- * Similar to qsqrt() above, except we do not multiply by x at the end, and
+ * Similar to csQsqrt() above, except we do not multiply by x at the end, and
  * return 1/sqrt(x).
  */
-static inline float qisqrt(float x)
+static inline float csQisqrt(float x)
 {
   float x0 = x * 0.5f;
   float y0;
@@ -202,15 +202,15 @@ static inline float qisqrt(float x)
 #elif (!defined (CS_NO_QSQRT)) && defined (PROC_X86) && defined (COMP_VC)
 
 #include <math.h>
-static inline float qsqrt (float x) { return sqrtf(x); }
-static inline float qisqrt(float x) { return 1.0f / sqrtf(x); }
+static inline float csQsqrt (float x) { return sqrtf(x); }
+static inline float csQisqrt(float x) { return 1.0f / sqrtf(x); }
 
 #else
 
 #include <math.h>
-static inline float qsqrt (float x) { return (float)sqrt(x); }
-static inline float qisqrt(float x) { return (float)(1.0 / sqrt(x)); }
+static inline float csQsqrt (float x) { return (float)sqrt(x); }
+static inline float csQisqrt(float x) { return (float)(1.0 / sqrt(x)); }
 
 #endif
 
-#endif // __CS_QSQRT_H__
+#endif // __CS_CSQSQRT_H__

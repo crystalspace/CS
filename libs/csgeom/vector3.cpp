@@ -19,14 +19,14 @@
 #include <math.h>
 #include <float.h>
 #include "cssysdef.h"
-#include "qint.h"
-#include "qsqrt.h"
+#include "csqint.h"
+#include "cscsQsqrt.h"
 #include "csgeom/vector3.h"
 
 //---------------------------------------------------------------------------
 float csVector3::Norm () const
 {
-  return qsqrt (x * x + y * y + z * z);
+  return csQsqrt (x * x + y * y + z * z);
 }
 
 void csVector3::Normalize ()
@@ -34,7 +34,7 @@ void csVector3::Normalize ()
   float sqlen = x * x + y * y + z * z;
   if (sqlen < SMALL_EPSILON) return ;
 
-  float invlen = qisqrt (sqlen);
+  float invlen = csQisqrt (sqlen);
   *this *= invlen;
 }
 

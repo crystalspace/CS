@@ -25,7 +25,7 @@
 #include "ivideo/material.h"
 #include "iengine/material.h"
 #include "iengine/engine.h"
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 #include <math.h>
 #include <stdlib.h>
 
@@ -78,11 +78,11 @@ void csExploMeshObject::SetupObject ()
     }
     startbox = bbox;
     radiusnow = 1.0;
-    maxspeed = qsqrt (sqmaxspeed);
-    maxaccel = qsqrt (sqmaxaccel);
+    maxspeed = csQsqrt (sqmaxspeed);
+    maxaccel = csQsqrt (sqmaxaccel);
     SetupColor ();
     SetupMixMode ();
-    float r = qsqrt (csSquaredDist::PointPoint (bbox.Max (), bbox.Min ())) / 2;
+    float r = csQsqrt (csSquaredDist::PointPoint (bbox.Max (), bbox.Min ())) / 2;
     radius.Set (r, r, r);
   }
 }

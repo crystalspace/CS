@@ -23,7 +23,7 @@
 #ifndef __CS_CSDEF_H__
 #define __CS_CSDEF_H__
 
-#include "platform.h"
+#include "csplatform.h"
 #include "cstypes.h"
 
 #include <stdio.h>

@@ -32,7 +32,7 @@
 #include "cstool/collider.h"
 #include "cstool/cspixmap.h"
 #include "cstool/mdltool.h"
-#include "qint.h"
+#include "csqint.h"
 #include "isound/handle.h"
 #include "isound/source.h"
 #include "isound/listener.h"
@@ -2315,8 +2315,8 @@ bool CommandHandler (const char *cmd, const char *arg)
         csBox2 bbox;
         BoundingBoxForView(Sys->view, &bbox);
         
-        int width = QInt(bbox.MaxX() - bbox.MinX());
-        int height = QInt(bbox.MaxY() - bbox.MinY());
+        int width = csQint(bbox.MaxX() - bbox.MinX());
+        int height = csQint(bbox.MaxY() - bbox.MinY());
         Sys->views[0]->SetRectangle((int)bbox.MinX(), (int)bbox.MinY(), width / 2, height);
         Sys->views[0]->GetCamera()->SetPerspectiveCenter(bbox.MinX() + (width / 4),
                                                         bbox.MinY() + (height / 2));
@@ -2336,8 +2336,8 @@ bool CommandHandler (const char *cmd, const char *arg)
         BoundingBoxForView(Sys->views[0], &bbox1);
         BoundingBoxForView(Sys->views[1], &bbox2);
 
-        int width = QInt(bbox2.MaxX() - bbox1.MinX());
-        int height = QInt(bbox1.MaxY() - bbox1.MinY());
+        int width = csQint(bbox2.MaxX() - bbox1.MinX());
+        int height = csQint(bbox1.MaxY() - bbox1.MinY());
         Sys->view->SetRectangle((int)bbox1.MinX(), (int)bbox1.MinY(), width, height);
         Sys->view->GetCamera()->SetPerspectiveCenter(bbox1.MinX() + (width / 2), 
                                                     bbox2.MinY() + (height / 2));

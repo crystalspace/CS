@@ -18,18 +18,18 @@
 */
 #include <math.h>
 #include "cssysdef.h"
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 #include "csgeom/vector2.h"
 
 //---------------------------------------------------------------------------
 float csVector2::Norm (const csVector2 &v)
 {
-  return qsqrt (v * v);
+  return csQsqrt (v * v);
 }
 
 float csVector2::Norm () const
 {
-  return qsqrt (x * x + y * y);
+  return csQsqrt (x * x + y * y);
 }
 
 void csVector2::Rotate (float angle)

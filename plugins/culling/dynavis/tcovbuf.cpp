@@ -21,8 +21,8 @@
 #include "csutil/scfstr.h"
 #include "iutil/string.h"
 #include "ivaria/bugplug.h"
-#include "qint.h"
-#include "qsqrt.h"
+#include "csqint.h"
+#include "cscsQsqrt.h"
 #include "csgeom/box.h"
 #include "csgeom/math3d.h"
 #include "csgeom/csrect.h"
@@ -1447,7 +1447,7 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
       // the line vertically in which case we will use y=y1.
       int y = 0;
       if (y1 > y) y = y1;
-      int x = QInt (x1 + float (y-y1) * float (x2 - x1)
+      int x = csQint (x1 + float (y-y1) * float (x2 - x1)
       		/ float (y2-y1));
       right_side = (x > 0);
     }
@@ -1768,14 +1768,14 @@ bool csTiledCoverageBuffer::DrawPolygon (csVector2* verts, int num_verts,
   //@@@ TODO: pre-shift x with 16
   //---------
   int xa[128], ya[128];
-  xa[0] = QRound (verts[0].x);
-  ya[0] = QRound (verts[0].y);
+  xa[0] = csQround (verts[0].x);
+  ya[0] = csQround (verts[0].y);
   bbox.minx = bbox.maxx = xa[0];
   bbox.miny = bbox.maxy = ya[0];
   for (i = 1 ; i < num_verts ; i++)
   {
-    xa[i] = QRound (verts[i].x);
-    ya[i] = QRound (verts[i].y);
+    xa[i] = csQround (verts[i].x);
+    ya[i] = csQround (verts[i].y);
 
     if (xa[i] < bbox.minx) bbox.minx = xa[i];
     else if (xa[i] > bbox.maxx) bbox.maxx = xa[i];
@@ -1923,8 +1923,8 @@ bool csTiledCoverageBuffer::DrawOutline (const csReversibleTransform& trans,
         Perspective (camv[i], tr_vert, fov, sx, sy);
       }
 
-      xa[i] = QRound (tr_vert.x);
-      ya[i] = QRound (tr_vert.y);
+      xa[i] = csQround (tr_vert.x);
+      ya[i] = csQround (tr_vert.y);
 
       if (xa[i] < bbox.minx) bbox.minx = xa[i];
       if (xa[i] > bbox.maxx) bbox.maxx = xa[i];
@@ -1986,8 +1986,8 @@ bool csTiledCoverageBuffer::DrawOutline (const csReversibleTransform& trans,
         csVector3 isect;
         csIntersect3::ZPlane (0.2f, camv[vt1], camv[vt2], isect);
         PerspectiveWrong (isect, tr_vert, fov, sx, sy);
-        int isect_xa = QRound (tr_vert.x);
-        int isect_ya = QRound (tr_vert.y);
+        int isect_xa = csQround (tr_vert.x);
+        int isect_ya = csQround (tr_vert.y);
         COV_DRAW_LINE (xa[vt1], ya[vt1], isect_xa, isect_ya);
         COV_DRAW_LINE (isect_xa, isect_ya, xa[vt2], ya[vt2]);
       }
@@ -2198,27 +2198,27 @@ bool csTiledCoverageBuffer::PrepareTestRectangle (const csBox2& rect,
   else
   {
     if (rect.MaxX () <= 0) return false;
-    data.bbox.maxx = QRound (rect.MaxX ());
+    data.bbox.maxx = csQround (rect.MaxX ());
   }
   if (rect.MaxY () > 10000.0) data.bbox.maxy = 10000;
   else
   {
     if (rect.MaxY () <= 0) return false;
-    data.bbox.maxy = QRound (rect.MaxY ());
+    data.bbox.maxy = csQround (rect.MaxY ());
   }
 
   if (rect.MinX () < -10000.0) data.bbox.minx = -10000;
   else
   {
     if (rect.MinX () > 10000.0) return false;
-    data.bbox.minx = QRound (rect.MinX ());
+    data.bbox.minx = csQround (rect.MinX ());
     if (data.bbox.minx >= width) return false;
   }
   if (rect.MinY () < -10000.0) data.bbox.miny = -10000;
   else
   {
     if (rect.MinY () > 10000.0) return false;
-    data.bbox.miny = QRound (rect.MinY ());
+    data.bbox.miny = csQround (rect.MinY ());
     if (data.bbox.miny >= height) return false;
   }
 
@@ -2501,8 +2501,8 @@ int csTiledCoverageBuffer::AddWriteQueueTest (const csTestRectData& maindata,
 bool csTiledCoverageBuffer::TestPoint (const csVector2& point, float min_depth)
 {
   int xi, yi;
-  xi = QRound (point.x);
-  yi = QRound (point.y);
+  xi = csQround (point.x);
+  yi = csQround (point.y);
 
   if (xi < 0) return false;
   if (yi < 0) return false;

@@ -21,7 +21,7 @@
 #include "csgeom/obb.h"
 #include "obb_priv.h"
 #include "csgeom/transfrm.h"
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 #include "csutil/indprint.h"
 
 //=============================================================================
@@ -125,7 +125,7 @@ csOBBLine3::csOBBLine3 (const csVector3 &a, const csVector3 &b)
   if (ABS (mLength) < 0.0001)
     mDir.Set (1, 0, 0);
   else
-    mDir /= qsqrt (mLength);
+    mDir /= csQsqrt (mLength);
 }
 
 csOBBTreeNode::csOBBTreeNode (csVector3 **left, csVector3 **right)

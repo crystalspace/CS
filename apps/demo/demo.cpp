@@ -66,7 +66,7 @@
 #include "csutil/stringarray.h"
 #include "igraphic/imageio.h"
 #include "ivaria/reporter.h"
-#include "qsqrt.h"
+#include "cscsQsqrt.h"
 #include "csutil/event.h"
 
 CS_IMPLEMENT_APPLICATION
@@ -638,7 +638,7 @@ void Demo::DrawEditInfo ()
     {
       csVector3 v1;
       np->GetPositionVector (map_selpoint-1, v1);
-      float d = qsqrt (csSquaredDist::PointPoint (v, v1));
+      float d = csQsqrt (csSquaredDist::PointPoint (v, v1));
       float t1 = np->GetTimeValue (map_selpoint-1);
       float dr = t-t1;
       float speed = (float) fabs (dr) / d;
@@ -656,7 +656,7 @@ void Demo::DrawEditInfo ()
       np->GetPositionVector (map_selpoint+1, v1);
       float t1 = np->GetTimeValue (map_selpoint+1);
       float dr = t1-t;
-      float d = qsqrt (csSquaredDist::PointPoint (v, v1));
+      float d = csQsqrt (csSquaredDist::PointPoint (v, v1));
       float speed = (float) fabs (dr) / d;
       csTicks tms1 = int (t1*total);
       GfxWrite (ww+20, hh, col_black, col_white, "len %g", d); hh += fh;
@@ -1128,7 +1128,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
 	    for (i = 1 ; i < num ; i++)
 	    {
 	      v1.Set (xv[i], yv[i], zv[i]);
-	      float d = qsqrt (csSquaredDist::PointPoint (v0, v1));
+	      float d = csQsqrt (csSquaredDist::PointPoint (v0, v1));
 	      totlen += d;
 	      v0 = v1;
 	    }
@@ -1141,7 +1141,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
 	    for (i = 1 ; i < num ; i++)
 	    {
 	      v1.Set (xv[i], yv[i], zv[i]);
-	      float d = qsqrt (csSquaredDist::PointPoint (v0, v1));
+	      float d = csQsqrt (csSquaredDist::PointPoint (v0, v1));
 	      tot += d;
 	      list[i] = tot / totlen;
 	      v0 = v1;

@@ -470,7 +470,7 @@ With the new mesh object plugin system the @samp{iParticle} interface
 also changed a little. Check out the header to see the changes.
 
 @code{FastSqrt()} is gone. Use @code{qsqrt()} instead. If you want
-to calculate @code{1/sqrt()} then use @code{qisqrt()}.
+to calculate @code{1/sqrt()} then use @code{csQisqrt()}.
 
 @samp{csRenderView} has no public members anymore.  You need to access
 everything through @code{GetFoo()} and @code{SetFoo()} methods Check out the

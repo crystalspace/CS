@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "qint.h"
-#include "qsqrt.h"
+#include "csqint.h"
+#include "cscsQsqrt.h"
 #include "plugins/engine/3d/camera.h"
 #include "plugins/engine/3d/sector.h"
 #include "plugins/engine/3d/engine.h"
@@ -185,8 +185,8 @@ void csCamera::Correct (int n, float *vals[])
   }
 
   angle = (float)atan2 (*vals[1], *vals[0]);
-  angle = (TWO_PI / n) * QRound (n * angle / TWO_PI);
-  *vals[1] = qsqrt ((*vals[0]) * (*vals[0]) + (*vals[1]) * (*vals[1]));
+  angle = (TWO_PI / n) * csQround (n * angle / TWO_PI);
+  *vals[1] = csQsqrt ((*vals[0]) * (*vals[0]) + (*vals[1]) * (*vals[1]));
   Correct (n, vals + 1);
   r = *vals[1];
   *vals[0] = r * (float)cos (angle);
@@ -228,7 +228,7 @@ void csCamera::ComputeAngle (int width)
 {
   float rview_fov = (float)GetFOV () * 0.5f;
   float disp_width = (float)width * 0.5f;
-  float inv_disp_radius = qisqrt (
+  float inv_disp_radius = csQisqrt (
       rview_fov * rview_fov + disp_width * disp_width);
   fov_angle = 2.0f * (float)acos (disp_width * inv_disp_radius)
   	* (360.0f / TWO_PI);
@@ -238,7 +238,7 @@ void csCamera::ComputeDefaultAngle (int width)
 {
   float rview_fov = (float)GetDefaultFOV () * 0.5f;
   float disp_width = (float)width * 0.5f;
-  float inv_disp_radius = qisqrt (
+  float inv_disp_radius = csQisqrt (
       rview_fov * rview_fov + disp_width * disp_width);
   default_fov_angle = 2.0f * (float)acos (disp_width * inv_disp_radius)
   	* (360.0f / TWO_PI);

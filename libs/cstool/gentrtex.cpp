@@ -22,7 +22,7 @@
 #include "igraphic/image.h"
 #include "csgfx/rgbpixel.h"
 #include "csgfx/memimage.h"
-#include "qint.h"
+#include "csqint.h"
 
 
 
@@ -186,8 +186,8 @@ void csGenerateImageTextureSingle::ComputeLayerColor(
   /// imagepos is now a pixel, floating valued.
   csRGBpixel pix;
   csColor col1, col2; /// left & right linear interpolation
-  int x = QInt(imagepos.x);
-  int y = QInt(imagepos.y);
+  int x = csQint(imagepos.x);
+  int y = csQint(imagepos.y);
 
   //GetImagePixel(layer->image, x, y, pix);
   //col1.Set(pix.red, pix.green, pix.blue);
@@ -271,7 +271,7 @@ iImage *csGenerateImage::Generate(int totalw, int totalh,
     {
       /// compute color
       tex->GetColor(col, pos.x, pos.y);
-      pix.Set(QInt(col.red*255.),QInt(col.green*255.),QInt(col.blue*255.));
+      pix.Set(csQint(col.red*255.),csQint(col.green*255.),csQint(col.blue*255.));
       //if(x==0)printf("Set pixel %3d, %3d to %3d %3d %3d\n", x, y,
         //col.red, col.green, col.blue);
       /// set pixel

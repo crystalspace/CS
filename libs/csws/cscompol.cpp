@@ -21,7 +21,7 @@
 #include "csws/cscomp.h"
 #include "csws/csapp.h"
 #include "csgeom/polyclip.h"
-#include "qint.h"
+#include "csqint.h"
 
 /*
  * Since polygon drawing in windowing system is kind of complicated, it is
@@ -66,11 +66,11 @@ void csComponent::Polygon3D (G3DPolygonDPFX &poly, uint mode)
   * all resulting rectangles.
   */
   cswsRectVector rect (8, 4);
-  int x = QInt (poly.vertices[0].x), y = QInt (poly.vertices[0].y);
+  int x = csQint (poly.vertices[0].x), y = csQint (poly.vertices[0].y);
   int p;
   csRect *lb = new csRect (x, y, x, y);
   for (p = 1; p < poly.num; p++)
-    lb->Extend (QInt (poly.vertices[p].x), QInt (poly.vertices[p].y));
+    lb->Extend (csQint (poly.vertices[p].x), csQint (poly.vertices[p].y));
 
   lb->xmax++;
   lb->ymax++;

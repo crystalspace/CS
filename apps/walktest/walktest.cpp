@@ -43,7 +43,7 @@
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
 #include "csver.h"
-#include "qint.h"
+#include "csqint.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/cmdline.h"
 #include "ivideo/graph2d.h"

@@ -18,7 +18,7 @@
 */
 
 #include "cssysdef.h"
-#include "qint.h"
+#include "csqint.h"
 
 #include "iutil/document.h"
 #include "ivideo/rndbuf.h"
@@ -316,7 +316,7 @@ csPtr<iTextureHandle> csLightIterRenderStep::GetAttenuationTexture (
 	float yv = 3.0f * ((y + 0.5f)/CS_HALF_ATTTABLE_SIZE - 1.0f);
 	float xv = 3.0f * ((x + 0.5f)/CS_HALF_ATTTABLE_SIZE - 1.0f);
 	float i = exp (-0.7 * (xv*xv + yv*yv));
-	unsigned char v = i>1.0f ? 255 : QInt (i*255.99f);
+	unsigned char v = i>1.0f ? 255 : csQint (i*255.99f);
 	(data++)->Set (v, v, v, v);
       }
     }
