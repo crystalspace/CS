@@ -63,7 +63,8 @@ struct VisTest_Front2BackData;
 /**
  * This object is a wrapper for an iVisibilityObject from the engine.
  */
-class csVisibilityObjectWrapper : public iObjectModelListener, iMovableListener
+class csVisibilityObjectWrapper : public iObjectModelListener,
+	public iMovableListener
 {
 public:
   csDynaVis* dynavis;

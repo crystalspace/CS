@@ -40,7 +40,8 @@ struct FrustTest_Front2BackData;
 /**
  * This object is a wrapper for an iVisibilityObject from the engine.
  */
-class csFrustVisObjectWrapper : public iObjectModelListener, iMovableListener
+class csFrustVisObjectWrapper : public iObjectModelListener,
+	public iMovableListener
 {
 public:
   csFrustumVis* frustvis;
