@@ -10,10 +10,6 @@
 #
 
 INSTALL_DIR=$1
-
-CC=gcc
-CXX=gcc
-
 BIN_DIR=bin
 
 # Helper function for finding apps
@@ -23,7 +19,7 @@ BIN_DIR=bin
 . ${BIN_DIR}/arch.sh
 
 # Check for compiler
-#. ${BIN_DIR}/comptest.sh
+. ${BIN_DIR}/comptest.sh
 
 # Check for tools
 . ${BIN_DIR}/chktools.sh
@@ -37,12 +33,31 @@ BIN_DIR=bin
 # Check for python
 . ${BIN_DIR}/haspythn.sh
 
+
+#------------------------------------------------------------------------------
+# Check if the compiler recognizes -fvtable-thunks.  As of gcc 3.x, this option
+# is no longer supported.  Unfortunately, rather than returning an error code,
+# the compiler merely prints a warning message, so we need to capture the error
+# output as well.
+#------------------------------------------------------------------------------
+
+echo "int main() { return 0; }" > comptest.cpp
+${CXX} -c -fvtable-thunks comptest.cpp 2>comptest.log
+if [ $? -eq 0 ]; then
+    if [ ! -s "comptest.log" ]; then
+	echo "CFLAGS.SYSTEM += -fvtable-thunks"
+    fi
+fi
+
+
+#------------------------------------------------------------------------------
 # Test if we need to link explicitly with libmingex.a.  Older versions of MinGW
 # did not have this library, whereas newer interim verions supply it but do not
 # link automatically with it.  The very newest versions (presumably) link with
 # libmingex.a automatically.  To see if libmingex.a is required, we try using
 # opendir(), which exists in libming32.a for older releases, and in libmingex.a
 # for newer releases.
+#------------------------------------------------------------------------------
 
 cat << EOF > comptest.cpp
 #include <dirent.h>
@@ -56,6 +71,9 @@ else
         echo "MINGW_LIBS += -lmingwex"
 fi
 
-rm -f comptest.cpp comptest.o comptest.obj comptest.exe comptest
 
+#------------------------------------------------------------------------------
+# Clean up.
+#------------------------------------------------------------------------------
+rm -f comptest.cpp comptest.o comptest.obj comptest.exe comptest comptest.log
 exit 0

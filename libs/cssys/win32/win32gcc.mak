@@ -100,7 +100,7 @@ CFLAGS.INCLUDE=$(CFLAGS.I)/usr/include/directx \
 # $(CFLAGS.I)/dx7asdk/dxf/include
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM) -fvtable-thunks -pipe
+CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM) -pipe
 
 # Flags for the compiler which are used when optimizing.
 CFLAGS.optimize=-s -O3 -ffast-math

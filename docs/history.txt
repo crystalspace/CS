@@ -3,6 +3,11 @@ The history order is reversed so that new features are at the top.
 25-Sep-2002
 	- Eric Sunshine fixed spoofdir.php so that synthesis valid URLs for
 	  pathnames containing embedded spaces and other special characters.
+	- Eric Sunshine augmented the Mingw port so that it determines
+	  dynamically if the -fvtable-thunks compiler option should be used,
+	  rather than hard-coding it into the makefile.  Although this option
+	  was recommended for earlier versions of Mingw, in the most recent
+	  Mingw (gcc 3.2) it is deprecated.
 24-Sep-2002
 	- Relaxed the sequence and trigger loader so that you can now refer to
 	  triggers and sequences that haven't been defined yet.
