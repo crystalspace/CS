@@ -1,22 +1,45 @@
-#!/bin/sh
+#! /bin/sh
+#==============================================================================
+# Auto-detect the endianess of the host platform.
 #
-# This script file is used to autodetect the endianess of the host platform.
+# IMPORTS
+#    LINK
+#	Shell or environment variable used to link an executable.
+#    msg_*()
+#	Functions for reporting progress to users.
 #
-# Arguments: $1 is the name of the C++ compiler (gcc, c++, etc.)
-#
-# The output of this script (a makefile fragment) is configuration
-# information needed for building Crystal Space.  It is pipied to stdout,
-# and errors are piped to stderr.
+# EXPORTS
+#    CS_BIG_ENDIAN
+#	Makefile variable emitted to the standard output stream if the current
+#	host stores numbers in big-endian format.
+#    CS_LITTLE_ENDIAN
+#	Makefile variable emitted to the standard output stream if the current
+#	host stores numbers in little-endian format.
+#==============================================================================
 
-echo "int main() { long x = 0x12; return *(unsigned char *)&x == 0x12; }" > comptest.cpp
+precondition '-n "${LINK}"'
 
-${CXX} -o comptest comptest.cpp 2>/dev/null || echo "endtest.sh: cannot compile testcase" >&2
-if test -f ./comptest; then
-    if ./comptest; then
-	echo "CS_BIG_ENDIAN = 1"
-    else
-	echo "CS_LITTLE_ENDIAN = 1"
-    fi
+msg_checking "byte order"
+
+cat << EOF > endtest.cpp
+int main()
+{
+  long x = 0x12;
+  return *(unsigned char*)&x == 0x12;
+}
+EOF
+
+${CXX} -o endtest endtest.cpp 2>/dev/null
+if [ $? -eq 0 ]; then
+  if ./endtest; then
+    echo "CS_BIG_ENDIAN = 1"
+    msg_result "big-endian"
+  else
+    echo "CS_LITTLE_ENDIAN = 1"
+    msg_result "little-endian"
+  fi
+else
+  msg_result "unknown"
 fi
 
-rm -f comptest.cpp comptest comptest.exe
+rm -f endtest.cpp endtest.o endtest.obj endtest.exe endtest

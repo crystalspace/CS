@@ -180,7 +180,7 @@ config.tmp:
 	@echo EXTENSIVE_MEMDEBUG = $(EXTENSIVE_MEMDEBUG)>>config.tmp
 	@echo FORCEBUCK = $(FORCEBUCK)>>config.tmp
 	@$(SYSCONFIG)
-	$(subst DEST,config.mak,$(UPD))
+	@$(subst DEST,config.mak,$(UPD))
 
 endif
 ifeq ($(ROOTCONFIG),volatile)
@@ -191,7 +191,7 @@ configure: volatile.tmp
 
 volatile.tmp: config.mak
 	@$(DO.MAKE.VOLATILE)
-	$(subst DEST,include/volatile.h,$(UPD))
+	@$(subst DEST,include/volatile.h,$(UPD))
 
 endif
 

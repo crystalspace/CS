@@ -8,6 +8,89 @@ The history order is reversed so that new features are at the top.
 	- Added an assert in OpenGL to check for a case that should
 	  never happen but which apparently occurs on some systems (texture
 	  dimensions 0).
+	- Eric Sunshine made the following changes to the project configuration
+	  mechanism:
+	    - Dynamic configuration is now verbose.  The user is notified as to
+	      which checks are being performed, as well as the result of each
+	      check.
+	    - Added CS/bin/confutil.sh which provides configuration utility
+	      functions.  These functions are used by all of the other dynamic
+	      checks.  This script publishes the following functions.
+		- msg_checking()
+		    Reports that a check is in progress.
+		- msg_result()
+		    Reports the result of a check.
+		- msg_inform()
+		    Provides an informational message to the user.
+		- precondition()
+		    Asserts that the specified condition is true upon entry to
+		    a block.
+		- postcondition()
+		    Asserts that the specified condition is true upon exit from
+		    a block.
+		- checkprog()
+		    Checks for the presence of a program in the PATH.
+		- checktool()
+		    Same as checkprog(), but also reports its results to the
+		    user.
+	    - The precondition() and postcondition() scripts are now employed
+	      by many of the configuration scripts to ensure that the scripts
+	      are run in the correct order.  For example, chkheadr.sh relies
+	      upon CXX being properly defined, so it specifies that requirement
+	      as a precondition.  If the precondition assertion ever fails,
+	      this means that someone forgot to run comptest.sh first -- or
+	      they forgot to manually provide a value for CXX.
+	    - Removed CS/bin/checkprog.sh since its functionality was
+	      incorporated into confutil.sh and enhanced.
+	    - Renamed CS/bin/haspythn.sh to chkpythn.sh and greatly enhanced
+	      its functionality.  In addition to locating the Python header and
+	      library directories, it now recognizes corrupt/incomplete Python
+	      installations (such as the MacOS/X Jaguar installation which is
+	      missing the static link library), and discovers the exact
+	      compiler and linker flags needed to build a Python program or
+	      plugin.  The dynamically-determined compiler and linker flags are
+	      now published to the makefile system, thus relieving the
+	      makefiles of the duty of determining this information on their
+	      own, and freeing the user from having to manually edit the
+	      makefiles when things go wrong.
+	    - Added CS/bin/chkpthrd.sh which determines if pthread support is
+	      available, and figures out necessary compiler and linker flags.
+	      This is used by chkpythn.sh, for instance, since some Python
+	      builds require pthread.
+	    - Added CS/bin/chkrdlin.sh which determines if readline/history
+	      support is available, and figures out the necessary compiler and
+	      linker flags.  This is used by chkpythn.sh since some Python
+	      builds require readline/history.
+	    - Made the qint() check in comptest.sh more robust to avoid the
+	      problem that, on some platforms, the test program would simply
+	      crash with a bus error.  Also, in the case of cross-compilation,
+	      the test program would fail to run.  These cases were difficult
+	      to catch, and they messed up the output from the configuration
+	      scripts.  The new approach properly handles both classes of
+	      problems.
+	    - Augmented CS/bin/arch.sh so that it handles the following
+	      additional cases:
+		- Recgonizes the apparent inverted `uname -m' and `uname -p'
+		  output from MacOS/X.
+		- Now recognizes both upper- and lower-case, instead of only
+		  lower-case, for the the following CPU types: ppc, ix86,
+		  i86pc, m68k.
+		- Now recognizes CPU type "powerpc" (in addition to "ppc" which
+		  it already recognized).
+	    - Merged cygconf.sh and msysconf.sh into win32conf.sh.  Generalized
+	      win32conf.sh so that it is suitable for both environments.
+	    - Augmented chkxfree.sh so that it is no longer a fatal
+	      configuration error if X11 is missing.  It is conceivable that a
+	      user might have only SVGA installed, rather than X11, so it
+	      doesn't make sense to bomb out if X11 is absent.  It is further
+	      conceivable that a user might simply want to build some of the
+	      libraries and non-GUI programs, therefore it is insensible to
+	      penalize a user for lack of X11.
+	    - Simplified cspython.mak considerably since chkpythn.sh now
+	      determines necessary compiler and linker flags automatically and
+	      dynamically, thus this is no longer the responsibility of
+	      cspython.mak.
+	    - Added copious documentation to all of the configuration scripts.
 28-Sep-2002
 	- Fixed a new bug with iSector->HitBeam() in octree based
 	  levels.

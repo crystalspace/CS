@@ -145,7 +145,7 @@ ifndef DO.DEP
   else
     ifeq ($(DEPEND_TOOL),mkdep)
       # If mkdep is already installed, don't build it
-      ifneq ($(MAKEDEP.INSTALLED),yes)
+      ifneq ($(MAKEDEP.AVAILABLE),yes)
 dep: build.makedep
         MAKEDEP := ./makedep
       else

@@ -53,7 +53,7 @@ O=.o
 LIB_PREFIX=lib
 
 # Extra libraries needed on this system (beside drivers)
-# MINGW_LIBS comes from the local config.mak and is set up by msysconf.sh.
+# MINGW_LIBS comes from the local config.mak and is set up by win32conf.sh.
 LIBS.EXE= $(LFLAGS.l)gdi32 $(MINGW_LIBS) $(LFLAGS.l)shell32 
 
 # OpenGL settings for use with OpenGL Drivers...untested
@@ -286,7 +286,7 @@ ifeq ($(MAKESECTION),rootdefines) # Makefile includes us twice with valid
 ifeq ($(ROOTCONFIG),config)	  # ROOTCONFIG, but we only need to run once.
 
 ifneq (,$(MSYSTEM))
-SYSCONFIG += $(NEWLINE)sh libs/cssys/win32/msysconf.sh $(INSTALL_DIR)>>config.tmp
+SYSCONFIG += $(NEWLINE)sh libs/cssys/win32/win32conf.sh $(INSTALL_DIR)>>config.tmp
 else
 SYSCONFIG=libs\cssys\win32\winconf.bat mingw32
 endif

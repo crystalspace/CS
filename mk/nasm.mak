@@ -4,15 +4,15 @@
 
 # NASM works only on x86
 ifneq ($(PROC),X86)
-override NASM.INSTALLED = no
+override NASM.AVAILABLE = no
 endif
 
 # If we don't want assembly, disable NASM
 ifeq ($(DO_ASM),no)
-override NASM.INSTALLED = no
+override NASM.AVAILABLE = no
 endif
 
-ifeq ($(NASM.INSTALLED),yes)
+ifeq ($(NASM.AVAILABLE),yes)
 
 # The executable name
 NASM.BIN = nasm

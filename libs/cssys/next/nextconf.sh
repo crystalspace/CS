@@ -1,4 +1,4 @@
-#!/bin/sh
+#! /bin/sh
 #==============================================================================
 # A compiler capability testing script for Apple/NeXT.
 # Copyright (C)2001,2002 by Eric Sunshine <sunshine@sunshineco.com>
@@ -10,8 +10,8 @@
 
 BIN_DIR=bin
 
-# Helper function for finding programs.
-. ${BIN_DIR}/checkprog.sh
+# Configuration helper functions.
+. ${BIN_DIR}/confutil.sh
 
 # Check for compiler and compiler capabilities.
 . ${BIN_DIR}/comptest.sh
@@ -26,8 +26,14 @@ echo "OBJCXX = ${CXX} -c"
 # Analyze system header files.
 . ${BIN_DIR}/chkheadr.sh
 
+# Check for Pthread (required by some Python installations).
+. ${BIN_DIR}/chkpthrd.sh
+
+# Check for Readline (required by some Python installations).
+. ${BIN_DIR}/chkrdlin.sh
+
 # Check for Phyton.
-. ${BIN_DIR}/haspythn.sh
+. ${BIN_DIR}/chkpythn.sh
 
 
 #------------------------------------------------------------------------------
@@ -36,14 +42,20 @@ echo "OBJCXX = ${CXX} -c"
 # with "-framework Foundation" if that program does not actually employ any
 # Objective-C.
 #------------------------------------------------------------------------------
+msg_checking "for Apple/NeXT linker flags"
 echo "int main(void) { return 0; }" > conftest.c
 ${CC} -c conftest.c && \
-${LINK} -o conftest conftest.o -multiply_defined suppress 2>/dev/null && \
+${LINK} -o conftest conftest.o -multiply_defined suppress 2>/dev/null
+if [ $? -eq 0 ]; then
   echo "NEXT.LFLAGS.CONFIG += -multiply_defined suppress"
+  msg_result "-multiply_defined suppress"
+else
+  msg_result "no"
+fi
 
 
 #------------------------------------------------------------------------------
 # Clean up.
 #------------------------------------------------------------------------------
-rm -f conftest*
+rm -f conftest.c conftest.cpp conftest.o conftest.obj conftest.exe conftest
 exit 0

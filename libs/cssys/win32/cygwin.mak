@@ -93,12 +93,7 @@ CFLAGS.INCLUDE= $(CFLAGS.I)/usr/include/directx
 #$(CFLAGS.I)/dx7asdk/dxf/include
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM) -pipe -fvtable-thunks
-ifneq ($(shell gcc --version),3.1)
-# -fvtable-thunks is no longer supported by GCC 3.1 so
-# we will test remove it until GCC 3.1 final is in Cygwin
-CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM) -pipe -fvtable-thunks
-endif
+CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM) -pipe
 
 # Flags for the compiler which are used when optimizing.
 CFLAGS.optimize=-s -O3 -ffast-math
@@ -228,6 +223,6 @@ endif # ifeq ($(MAKESECTION),confighelp)
 #--------------------------------------------------------------- configure ---#
 ifeq ($(ROOTCONFIG),config)
 
-SYSCONFIG += $(NEWLINE)sh libs/cssys/win32/cygconf.sh $(INSTALL_DIR)>>config.tmp
+SYSCONFIG += $(NEWLINE)sh libs/cssys/win32/win32conf.sh $(INSTALL_DIR)>>config.tmp
 
 endif # ifeq ($(ROOTCONFIG),config)
