@@ -273,6 +273,8 @@ public:
   void SetFileName (const char *iName);
   // build path from directory listbox and set it
   bool BuildAndSetPath ();
+  // returns the selected filename
+  bool GetFileName(char *buf,size_t bufsize);
 };
 
 #define CSFDI_PATHCOMPONENT 0x9999
@@ -580,6 +582,34 @@ void cspFileDialog::Reread ()
   if (activate)
     activate->SendCommand (cscmdListBoxItemSet, (void *)true);
 }
+
+bool cspFileDialog::GetFileName(char *buf, size_t bufsize)
+{
+  csComponent *f = GetChild (CSWID_FILENAME);
+  csComponent *p = GetChild (CSWID_PATHNAME);
+  
+  if (f && p && buf)
+  {
+    p->GetText (buf, bufsize);
+    size_t sl = strlen (buf);
+
+    char separator = usevfs ? VFS_PATH_SEPARATOR : PATH_SEPARATOR;
+    
+    if (sl < bufsize)
+    {
+      if ((buf [sl - 1] != '/')
+ 	  && (buf [sl - 1] != separator))
+      {
+	buf [sl++] = PATH_SEPARATOR;
+	buf [sl] = 0;
+      }
+      
+      f->GetText (&buf [sl], bufsize - sl);
+    }
+    return true;
+  }
+  return false;
+}
   
 csWindow *csFileDialog (csComponent *iParent, const char *iTitle,
     const char *iFileName, const char *iOpenButtonText, bool vfspaths)
@@ -659,28 +689,10 @@ void csQueryFileDialog (csWindow *iFileDialog, char *iFileName,
   if (iFileName && iFileNameSize)
     iFileName [0] = 0;
 
-  csComponent *d = iFileDialog->GetChild (CSWID_CLIENT);
+  cspFileDialog *d = (cspFileDialog *) iFileDialog->GetChild (CSWID_CLIENT);
   if (d)
   {
-    csComponent *f = d->GetChild (CSWID_FILENAME);
-    csComponent *p = d->GetChild (CSWID_PATHNAME);
-
-    if (f && p && iFileName)
-    {
-      p->GetText (iFileName, iFileNameSize);
-      size_t sl = strlen (iFileName);
-      if (sl < iFileNameSize)
-      {
-        if ((iFileName [sl - 1] != '/')
-         && (iFileName [sl - 1] != PATH_SEPARATOR))
-        {
-          iFileName [sl++] = PATH_SEPARATOR;
-          iFileName [sl] = 0;
-        } /* endif */
-
-        f->GetText (&iFileName [sl], iFileNameSize - sl);
-      } /* endif */
-    } /* endif */
+    d->GetFileName(iFileName, iFileNameSize);
   } /* endif */
 }
 
