@@ -347,6 +347,8 @@ protected:
 
   /// Current render target.
   csRef<iTextureHandle> render_target;
+  /// If true then the current render target has been put on screen.
+  bool render_target_onscreen;
 
   /**
    * handle of a local 1D alpha-blend texture; this texture holds an

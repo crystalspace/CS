@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+15-Oct-2002
+	- Started work on the OpenGL implementation of SetRenderTarget().
+	  Added code in BeginDraw() to copy the texture to the display.
+	  Added code in FinishDraw() to copy the display back to the
+	  texture. This is all untested for now.
 14-Oct-2002
 	- Added SetRenderTarget() and GetRenderTarget() to the
 	  iGraphics3D API. Also added default (empty) implementations
