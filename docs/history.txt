@@ -3,6 +3,8 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+23-Jun-2003
+	- Jorrit fixed formatting with the csQuaternion class.
 22-Jun-2003
 	- Luca did the following:
 	  - Fixed a bug in the label component of AWS: in fact the method

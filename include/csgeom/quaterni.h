@@ -50,22 +50,33 @@ public:
   csQuaternion (const csVector3& q) { Init (0, q.x, q.y, q.z); }
 
   /// Construct quaternion from a matrix
-      csQuaternion (const csMatrix3& smat);
+  csQuaternion (const csMatrix3& smat);
 
-  ///
-  inline friend csQuaternion operator+ (const csQuaternion& q1, const csQuaternion& q2)
-  { return csQuaternion (q1.r + q2.r, q1.x + q2.x, q1.y + q2.y, q1.z + q2.z ); }
-  ///
-  inline friend csQuaternion operator- (const csQuaternion& q1, const csQuaternion& q2)
-  { return csQuaternion (q1.r - q2.r, q1.x - q2.x, q1.y - q2.y, q1.z - q2.z ); }
-  ///
-  inline friend csQuaternion operator* (const csQuaternion& q1, const csQuaternion& q2)
-  { return csQuaternion (q1.r*q2.r -  q1.x*q2.x - q1.y*q2.y - q1.z*q2.z,
+  /// Add two quaternions.
+  inline friend csQuaternion operator+ (const csQuaternion& q1,
+  	const csQuaternion& q2)
+  {
+    return csQuaternion (q1.r + q2.r, q1.x + q2.x, q1.y + q2.y, q1.z + q2.z );
+  }
+
+  /// Subtract two quaternions.
+  inline friend csQuaternion operator- (const csQuaternion& q1,
+  	const csQuaternion& q2)
+  {
+    return csQuaternion (q1.r - q2.r, q1.x - q2.x, q1.y - q2.y, q1.z - q2.z );
+  }
+
+  /// Multiply two quaternions.
+  inline friend csQuaternion operator* (const csQuaternion& q1,
+  	const csQuaternion& q2)
+  {
+    return csQuaternion (q1.r*q2.r -  q1.x*q2.x - q1.y*q2.y - q1.z*q2.z,
              q1.y*q2.z -  q1.z*q2.y + q1.r*q2.x + q1.x*q2.r,
              q1.z*q2.x -  q1.x*q2.z + q1.r*q2.y + q1.y*q2.r,
-             q1.x*q2.y -  q1.y*q2.x + q1.r*q2.z + q1.z*q2.r); }
+             q1.x*q2.y -  q1.y*q2.x + q1.r*q2.z + q1.z*q2.r);
+  }
 
-  ///
+  /// Multiply two quaternions.
   csQuaternion& operator*= (const csQuaternion& q2)
   {
     Init (r*q2.r -  x*q2.x - y*q2.y - z*q2.z,
@@ -78,33 +89,36 @@ public:
   ///
   void Conjugate () { Init (r, -x, -y, -z); }
 
-    /// Negate all parameters of the quaternion
-    void Negate () { Init(-r, -x, -y, -z); }
+  /// Negate all parameters of the quaternion.
+  void Negate () { Init(-r, -x, -y, -z); }
 
-    /** Invert the orientation of this quaternion */
-    void Invert();
+  /// Invert the orientation of this quaternion.
+  void Invert();
 
-    /** Get an axis-angle representation of this orientation.
-        @param axis this vector specifies the axis on which to make a rotation
-        @param phi the angle (in radians) about this axis
-     */
-    void GetAxisAngle(csVector3& axis, float& phi) const;
+  /**
+   * Get an axis-angle representation of this orientation.
+   * @param axis this vector specifies the axis on which to make a rotation
+   * @param phi the angle (in radians) about this axis
+   */
+  void GetAxisAngle(csVector3& axis, float& phi) const;
 
-    /** Set the quaternion using an axis-angle representation.
-        @param axis this vector specifies the axis on which to make a rotation
-        @param phi the angle (in radians) about this axis
-     */
-    void SetWithAxisAngle(csVector3 axis, float phi);
+  /**
+   * Set the quaternion using an axis-angle representation.
+   * @param axis this vector specifies the axis on which to make a rotation
+   * @param phi the angle (in radians) about this axis
+   */
+  void SetWithAxisAngle(csVector3 axis, float phi);
 
   /**
    * Prepare a rotation quaternion, we do a rotation around vec by
    * an angle of "angle". Note that vec needs to be a normalized
-   * vector ( we don't check this ).
+   * vector (we don't check this).
    */
   void PrepRotation (float angle, csVector3 vec)
   {
     double theSin = sin (angle / 2.0f);
-    Init ((float) cos (angle / 2.0f), vec.x * theSin, vec.y * theSin, vec.z * theSin);
+    Init ((float) cos (angle / 2.0f), vec.x * theSin, vec.y * theSin,
+    	vec.z * theSin);
   }
 
   /// rotated = q * vec * qConj.
@@ -121,12 +135,10 @@ public:
   /// Normalize this quaternion.
   void Normalize ()
   {
-    float     dist, square;
-
+    float dist, square;
     square = x * x + y * y + z * z + r * r;
 
-    if (square > 0.0)
-        dist = (float)(1.0 / sqrt(square));
+    if (square > 0.0) dist = (float)qisqrt(square);
     else dist = 1;
 
     x *= dist;
@@ -151,11 +163,11 @@ public:
   }
 
   /**
-   * Convert a set of Euler angles to a Quaternion
+   * Convert a set of Euler angles to a Quaternion.
    * Takes a (X,Y,Z) rather than Yaw-Pitch-Roll (Y,X,Z)
    * The output is NOT Normalized, if you wish to do so, normalize it yourself.
    */
-  void SetWithEuler(const csVector3 &rot);
+  void SetWithEuler (const csVector3 &rot);
 
   /**
    * Convert a Quaternion to a set of Euler angles.
@@ -164,9 +176,9 @@ public:
   void GetEulerAngles (csVector3& angles);
 
   /**
-   * Return an Axis Angle representation of this Quaternion
+   * Return an Axis Angle representation of this Quaternion.
    */
-  csQuaternion ToAxisAngle() const;
+  csQuaternion ToAxisAngle () const;
 
   /**
    * Spherical Linear Interpolation between two quaternions
@@ -175,7 +187,7 @@ public:
    */
   csQuaternion Slerp (const csQuaternion &quat2, float slerp) const;
 
-//csQuaternion Lerp(const csQuaternion& quat2, float ratio) const;
+  //csQuaternion Lerp(const csQuaternion& quat2, float ratio) const;
 
   float r,x,y,z;
 };
@@ -183,3 +195,4 @@ public:
 /** @} */
 
 #endif // __CS_QUATERNION_H__
+
