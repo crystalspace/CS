@@ -1283,7 +1283,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     char tname[100];
     char sname[100];
-    float size;
+    float size = 9;
     int cnt = 0;
     if (arg) cnt = ScanStr (arg, "%s,%s,%f", tname, sname, &size);
     if(cnt != 3)

@@ -324,7 +324,7 @@ void csLODTerrain::drawTriangle (int x1, int z1, int x2, int z2, int x3, int z3)
     g3dmesh->num_triangles += 1;
 }
 
-bool csLODTerrain::Initialize (const void *vheightMapFile, unsigned long size)
+bool csLODTerrain::Initialize (const void *vheightMapFile, unsigned long /*size*/)
 {
     const char* heightMapFile = (const char*)vheightMapFile;
     unsigned char red, green, blue;
@@ -510,6 +510,7 @@ void csLODTerrain::Draw (csRenderView& rview, bool use_z_buf)
 int csLODTerrain::CollisionDetect (csTransform* transform)
 {
   // @@@ To be implemented
+  (void) transform;
   return false;
 #if 0
     float height1;

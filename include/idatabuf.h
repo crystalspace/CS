@@ -41,10 +41,10 @@ struct iDataBuffer : public iBase
   inline char *operator * () const
   { return (char *)GetData (); }
   /// Get as an int8 *
-  inline int8 *_int8 ()
+  inline int8* GetInt8 ()
   { return (int8 *)GetData (); }
   /// Get as an uint8 *
-  inline uint8 *_uint8 ()
+  inline uint8* GetUint8 ()
   { return (uint8 *)GetData (); }
 };
 

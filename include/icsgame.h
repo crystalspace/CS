@@ -33,6 +33,8 @@ struct iAttributeArray;
 struct iAttributeList;
 struct iAttributeIterator;
 struct iCollider;
+struct iDataLoader;
+struct iDataSaver; 
 
 //---------------------------------------------------------------------------
 
@@ -122,7 +124,7 @@ struct iPosition : public iBase
    * the linked objects new relative coordinates.
    */
   virtual iPosition* CreateLinkedPosition(const csTransform& Transform, 
-                                          DWORD LinkFlags);
+                                          DWORD LinkFlags) = 0;
 };
 
 //---------------------------------------------------------------------------

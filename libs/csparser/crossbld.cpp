@@ -428,7 +428,7 @@ csTextureWrapper *csCrossBuild_Quake2Importer::Import_Quake2Textures (
     {
       iDataBuffer *imagedata = localVFS.ReadFile(skinfilename);
 
-      iImage *newskin = csImageLoader::Load(imagedata->_uint8 (),
+      iImage *newskin = csImageLoader::Load(imagedata->GetUint8 (),
         imagedata->GetSize (), importdestination->GetTextureFormat ());
 
       imagedata->DecRef ();

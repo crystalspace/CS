@@ -41,7 +41,7 @@
 #if defined(COMP_GCC)
 //#	define DO_DINPUT_KEYBOARD
 #else
-#	define DO_DINPUT_KEYBOARD
+#	undef DO_DINPUT_KEYBOARD
 #endif
 
 #if defined(COMP_VC)

@@ -1860,7 +1860,7 @@ bool csWorld::CreateTexture (const char *iName, const char *iFileName,
     return false;
   }
 
-  iImage *ifile = csImageLoader::Load (data->_uint8 (), data->GetSize (),
+  iImage *ifile = csImageLoader::Load (data->GetUint8 (), data->GetSize (),
     CS_IMGFMT_TRUECOLOR);// GetTextureFormat ());
   data->DecRef ();
 

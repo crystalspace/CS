@@ -55,7 +55,7 @@ iMaterialHandle* PerfTest::LoadMaterial (char* file)
     Printf (MSG_FATAL_ERROR, "Error loading texture '%s'!\n", file);
     exit (-1);
   }
-  image = csImageLoader::Load (buf->_uint8 (), buf->GetSize (),
+  image = csImageLoader::Load (buf->GetUint8 (), buf->GetSize (),
   	txtmgr->GetTextureFormat ());
   buf->DecRef ();
   if (!image) exit (-1);

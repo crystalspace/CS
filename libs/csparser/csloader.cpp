@@ -1987,9 +1987,9 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
   poly3d->SetParent (parent);
 
   bool tx_uv_given = false;
-  int tx_uv_i1;
-  int tx_uv_i2;
-  int tx_uv_i3;
+  int tx_uv_i1 = 0;
+  int tx_uv_i2 = 0;
+  int tx_uv_i3 = 0;
   csVector2 tx_uv1;
   csVector2 tx_uv2;
   csVector2 tx_uv3;
@@ -2422,7 +2422,7 @@ iImage* csLoader::load_image (const char* name)
     return NULL;
   }
 
-  ifile = csImageLoader::Load (buf->_uint8 (), buf->GetSize (), World->GetTextureFormat ());
+  ifile = csImageLoader::Load (buf->GetUint8 (), buf->GetSize (), World->GetTextureFormat ());
   buf->DecRef ();
 
   if (!ifile)
@@ -3940,7 +3940,7 @@ csSoundDataObject* csLoader::load_sound(char* name, const char* filename)
   }
 
   /* load the sound */
-  iSoundData *Sound = SoundLoader->LoadSound(buf->_uint8 (), buf->GetSize (), Format);
+  iSoundData *Sound = SoundLoader->LoadSound(buf->GetUint8 (), buf->GetSize (), Format);
   buf->DecRef ();
   /* ### */SoundLoader->DecRef();
 
