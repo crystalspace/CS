@@ -9,7 +9,7 @@
       <buffer name="normals" destination="normal"/>
       <vp plugin="glfixed">
         <fixedvp>  
-          <environment type="reflection" mapping="cube" />
+          <texgen type="reflection" mapping="cube" />
           <!--<ambient/>-->
         </fixedvp>
       </vp>

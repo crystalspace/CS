@@ -38,16 +38,17 @@ private:
   {
     XMLTOKEN_FIXEDVP = 1,
     XMLTOKEN_DECLARE,
+    XMLTOKEN_VERTEX_COLOR,
+    XMLTOKEN_CONSTANT_COLOR,
     XMLTOKEN_LIGHT,
     XMLTOKEN_AMBIENT,
-    XMLTOKEN_ENVIRONMENT,
-    XMLTOKEN_REFLECT
+    XMLTOKEN_TEXGEN
   };
 
-  enum ENVMODE
+  enum TEXGENMODE
   {
-    ENVIRON_NONE = 0,
-    ENVIRON_REFLECT_CUBE
+    TEXGEN_NONE = 0,
+    TEXGEN_REFLECT_CUBE
   };
 
   struct lightingentry
@@ -66,14 +67,25 @@ private:
     int lightnum;
   };
 
-  
+  csGLStateCache* statecache;  
 
   csStringID ambientvar;
   csRef<csShaderVariable> ambientVarRef;
   csArray<lightingentry> lights;
   bool do_lighting;
 
-  ENVMODE environment;
+  struct layerentry
+  {
+    TEXGENMODE texgen;
+    csStringID constcolorvar; csRef<csShaderVariable> constcolorVarRef;
+    layerentry () : texgen(TEXGEN_NONE), 
+                    constcolorvar (csInvalidStringID) {}
+  };
+
+  csArray<layerentry> layers;
+
+  csStringID primcolvar;
+  csRef<csShaderVariable> primcolVarRef;
 
   csRef<iObjectRegistry> object_reg;
 

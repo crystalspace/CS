@@ -100,23 +100,12 @@ void csGLShader_ARB::Open()
   if(!object_reg)
     return;
 
-  csRef<iGraphics3D> r = CS_QUERY_REGISTRY(object_reg,iGraphics3D);
-  csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r,
-	iShaderRenderInterface);
-
-  csRef<iFactory> f = SCF_QUERY_INTERFACE (r, iFactory);
-  if (f != 0 && strcmp ("crystalspace.graphics3d.opengl", 
-	f->QueryClassID ()) == 0)
-    enable = true;
-  else
-    return;
-
-  r->GetDriver2D()->PerformExtension ("getextmanager", &ext);
   if (ext)
   {
     ext->InitGL_ARB_vertex_program ();
     ext->InitGL_ARB_fragment_program ();
-  }
+  } else return;
+
   isOpen = true;
 }
 
@@ -126,6 +115,19 @@ void csGLShader_ARB::Open()
 bool csGLShader_ARB::Initialize(iObjectRegistry* reg)
 {
   object_reg = reg;
+
+  csRef<iGraphics3D> r = CS_QUERY_REGISTRY(object_reg,iGraphics3D);
+  csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r,
+    iShaderRenderInterface);
+
+  csRef<iFactory> f = SCF_QUERY_INTERFACE (r, iFactory);
+  if (f != 0 && strcmp ("crystalspace.graphics3d.opengl", 
+    f->QueryClassID ()) == 0)
+    enable = true;
+  else
+    return false;
+
+  r->GetDriver2D()->PerformExtension ("getextmanager", &ext);
   return true;
 }
 

@@ -11,6 +11,11 @@ chronological order.
 	  They should get along well with stencil clipping.
 	  Possible todo: Not assume 8-bit stencil, but allow different
 	  bitcounts. Also somehow avoid glClear of the stencil buffer.
+	- Anders Stenberg updated shader plugins to actually not load
+	  if the wrong renderer (software) is used. Todo is to give a 
+	  better error message.
+	  Also changed the "environment" syntax of FixedVP a bit to 
+	  allow for future texgen modes. Look at water shader for reference.
 22-Mar-2004
 	- Anders Stenberg fixed several places where mesh objects would
 	  return "false" from GetRenderMeshes (which is supposed to return

@@ -86,6 +86,7 @@ void csGLShader_FIXED::Report (int severity, const char* msg, ...)
 ////////////////////////////////////////////////////////////////////
 bool csGLShader_FIXED::SupportType(const char* type)
 {
+  Open ();
   if (!enable)
     return false;
   if ((strcasecmp(type, "fp") == 0) && ext->CS_GL_ARB_multitexture)
@@ -116,18 +117,6 @@ void csGLShader_FIXED::Open()
   if (isOpen) return;
 
   config.AddConfig (object_reg, "/config/glshader_fixed.cfg");
-
-  csRef<iGraphics3D> r = CS_QUERY_REGISTRY(object_reg, iGraphics3D);
-  csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r,
-  	iShaderRenderInterface);
-
-  csRef<iFactory> f = SCF_QUERY_INTERFACE (r, iFactory);
-  if (f != 0 && strcmp ("crystalspace.graphics3d.opengl", 
-    f->QueryClassID ()) == 0)
-    enable = true;
-
-  ext = 0;
-  r->GetDriver2D()->PerformExtension ("getextmanager", &ext);
 
   if (!(enable && ext)) return;
 
@@ -183,5 +172,19 @@ void csGLShader_FIXED::Open()
 bool csGLShader_FIXED::Initialize(iObjectRegistry* reg)
 {
   object_reg = reg;
+
+  csRef<iGraphics3D> r = CS_QUERY_REGISTRY(object_reg, iGraphics3D);
+  csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r,
+    iShaderRenderInterface);
+
+  csRef<iFactory> f = SCF_QUERY_INTERFACE (r, iFactory);
+  if (f != 0 && strcmp ("crystalspace.graphics3d.opengl", 
+    f->QueryClassID ()) == 0)
+    enable = true;
+  else
+    return false;
+
+  ext = 0;
+  r->GetDriver2D()->PerformExtension ("getextmanager", &ext);
   return true;
 }

@@ -39,6 +39,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/shader/shader.h"
 
 #include "video/canvas/openglcommon/glextmanager.h"
+#include "video/canvas/openglcommon/glstates.h"
 
 #include "glshader_fvp.h"
 #include "glshader_fixed.h"
@@ -54,7 +55,6 @@ csGLShaderFVP::csGLShaderFVP (csGLShader_FIXED* shaderPlug)
   csGLShaderFVP::shaderPlug = shaderPlug;
   csGLShaderFVP::object_reg = shaderPlug->object_reg;
 
-  environment = ENVIRON_NONE;
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
     object_reg, "crystalspace.shared.stringset", iStringSet);
@@ -81,6 +81,8 @@ void csGLShaderFVP::SetupState (
   //csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
     //object_reg, "crystalspace.shared.stringset", iStringSet);
 
+  csRef<csShaderVariable> var;
+
   if (do_lighting)
   {
     glMatrixMode (GL_MODELVIEW_MATRIX);
@@ -100,8 +102,6 @@ void csGLShaderFVP::SetupState (
 
       int l = lights[i].lightnum;
       glEnable (GL_LIGHT0+l);
-
-      csRef<csShaderVariable> var = 0;
 
       var = lights[i].positionVarRef;
       if (!var && lights[i].positionvar < (csStringID)stacks.Length ()
@@ -178,7 +178,7 @@ void csGLShaderFVP::SetupState (
     glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, (float*)&v);
     glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, (float*)&v);
 
-    csRef<csShaderVariable> var = ambientVarRef;
+    var = ambientVarRef;
     if (!var && ambientvar < (csStringID)stacks.Length ()
         && stacks[ambientvar].Length () > 0)
       var = stacks[ambientvar].Top ();
@@ -192,45 +192,79 @@ void csGLShaderFVP::SetupState (
     glDisable (GL_COLOR_MATERIAL);
   }
 
-  if (environment == ENVIRON_REFLECT_CUBE)
+  for (i=0; i<layers.Length (); i++)
   {
-    //setup for environmental cubemapping
-    glTexGeni(GL_S,GL_TEXTURE_GEN_MODE,GL_REFLECTION_MAP_ARB);
-    glTexGeni(GL_T,GL_TEXTURE_GEN_MODE,GL_REFLECTION_MAP_ARB);
-    glTexGeni(GL_R,GL_TEXTURE_GEN_MODE,GL_REFLECTION_MAP_ARB);
+    statecache->SetActiveTU (i);
+    if (layers[i].texgen == TEXGEN_REFLECT_CUBE)
+    {
+      //setup for environmental cubemapping
+      glTexGeni (GL_S, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP_ARB);
+      glTexGeni (GL_T, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP_ARB);
+      glTexGeni (GL_R, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP_ARB);
 
-    glEnable(GL_TEXTURE_GEN_S);
-    glEnable(GL_TEXTURE_GEN_T);
-    glEnable(GL_TEXTURE_GEN_R);
+      glEnable (GL_TEXTURE_GEN_S);
+      glEnable (GL_TEXTURE_GEN_T);
+      glEnable (GL_TEXTURE_GEN_R);
 
-    csReversibleTransform *t = &mesh->object2camera;
-    const csMatrix3 &orientation = t->GetO2T();
+      csReversibleTransform *t = &mesh->object2camera;
+      const csMatrix3 &orientation = t->GetO2T();
 
-    float mAutoTextureMatrix[16];
-    // Transpose 3x3 in order to invert matrix (rotation)
-    // Note that we need to invert the Z _before_ the rotation
-    // No idea why we have to invert the Z at all, but reflection
-    // is wrong without it
-    mAutoTextureMatrix[0] = orientation.m11; 
-    mAutoTextureMatrix[1] = orientation.m12; 
-    mAutoTextureMatrix[2] = orientation.m13;
+      float mAutoTextureMatrix[16];
+      // Transpose 3x3 in order to invert matrix (rotation)
+      // Note that we need to invert the Z _before_ the rotation
+      // No idea why we have to invert the Z at all, but reflection
+      // is wrong without it
+      mAutoTextureMatrix[0] = orientation.m11; 
+      mAutoTextureMatrix[1] = orientation.m12; 
+      mAutoTextureMatrix[2] = orientation.m13;
 
-    mAutoTextureMatrix[4] = orientation.m21;
-    mAutoTextureMatrix[5] = orientation.m22;
-    mAutoTextureMatrix[6] = orientation.m23;
+      mAutoTextureMatrix[4] = orientation.m21;
+      mAutoTextureMatrix[5] = orientation.m22;
+      mAutoTextureMatrix[6] = orientation.m23;
 
-    mAutoTextureMatrix[8] = orientation.m31; 
-    mAutoTextureMatrix[9] = orientation.m32; 
-    mAutoTextureMatrix[10] = orientation.m33;
+      mAutoTextureMatrix[8] = orientation.m31; 
+      mAutoTextureMatrix[9] = orientation.m32; 
+      mAutoTextureMatrix[10] = orientation.m33;
 
-    mAutoTextureMatrix[3] =
-      mAutoTextureMatrix[7] = mAutoTextureMatrix[11] = 0.0f;
-    mAutoTextureMatrix[12] =
-      mAutoTextureMatrix[13] = mAutoTextureMatrix[14] = 0.0f;
-    mAutoTextureMatrix[15] = 1.0f;  
+      mAutoTextureMatrix[3] =
+        mAutoTextureMatrix[7] = mAutoTextureMatrix[11] = 0.0f;
+      mAutoTextureMatrix[12] =
+        mAutoTextureMatrix[13] = mAutoTextureMatrix[14] = 0.0f;
+      mAutoTextureMatrix[15] = 1.0f;  
 
-    glMatrixMode(GL_TEXTURE);
-    glLoadMatrixf(mAutoTextureMatrix);
+      glMatrixMode (GL_TEXTURE);
+      glLoadMatrixf (mAutoTextureMatrix);
+    } 
+
+    var = layers[i].constcolorVarRef;
+    if (!var && layers[i].constcolorvar != csInvalidStringID &&
+        layers[i].constcolorvar < (csStringID)stacks.Length () && 
+        stacks[layers[i].constcolorvar].Length () > 0)
+      var = stacks[layers[i].constcolorvar].Top ();
+
+    if (var)
+    {
+      csVector4 col;
+      var->GetValue (col);
+      GLfloat glcol[] = {col.x, col.y, col.z, col.w};
+
+      glTexEnvfv (GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, glcol);
+    }
+  }
+
+  statecache->SetActiveTU (0);
+
+  var = primcolVarRef;
+  if (!var && primcolvar != csInvalidStringID &&
+    primcolvar < (csStringID)stacks.Length () && 
+    stacks[primcolvar].Length () > 0)
+    var = stacks[primcolvar].Top ();
+
+  if (var)
+  {
+    csVector4 col;
+    var->GetValue (col);
+    glColor4f (col.x, col.y, col.z, col.w);
   }
 }
 
@@ -245,25 +279,31 @@ void csGLShaderFVP::ResetState ()
     glDisable (GL_LIGHTING);
   }
 
-  if (environment == ENVIRON_REFLECT_CUBE)
+  for (i=0; i<layers.Length (); i++)
   {
-    glDisable(GL_TEXTURE_GEN_S);
-    glDisable(GL_TEXTURE_GEN_T);
-    glDisable(GL_TEXTURE_GEN_R);
+    statecache->SetActiveTU (i);
+    if (layers[i].texgen != TEXGEN_NONE)
+    {
+      glDisable (GL_TEXTURE_GEN_S);
+      glDisable (GL_TEXTURE_GEN_T);
+      glDisable (GL_TEXTURE_GEN_R);
 
-    glMatrixMode (GL_TEXTURE);
-    glLoadIdentity ();
+      glMatrixMode (GL_TEXTURE);
+      glLoadIdentity ();
+    }
   }
+  statecache->SetActiveTU (0);
 }
 
 void csGLShaderFVP::BuildTokenHash()
 {
   xmltokens.Register("fixedvp",XMLTOKEN_FIXEDVP);
   xmltokens.Register("declare",XMLTOKEN_DECLARE);
+  xmltokens.Register("constantcolor", XMLTOKEN_CONSTANT_COLOR);
   xmltokens.Register("light", XMLTOKEN_LIGHT);
   xmltokens.Register("ambient", XMLTOKEN_AMBIENT);
-  xmltokens.Register("environment", XMLTOKEN_ENVIRONMENT);
-  xmltokens.Register("reflect", XMLTOKEN_REFLECT);
+  xmltokens.Register("texgen", XMLTOKEN_TEXGEN);
+
 
   xmltokens.Register("integer", 100+csShaderVariable::INT);
   xmltokens.Register("float", 100+csShaderVariable::FLOAT);
@@ -346,6 +386,25 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
             }
           }
           break;
+        case XMLTOKEN_VERTEX_COLOR:
+          {
+            const char* str;
+            if (str = child->GetContentsValue ())
+              primcolvar = strings->Request (str);
+          }
+          break;
+        case XMLTOKEN_CONSTANT_COLOR:
+          {
+            const char* str;
+            if (str = child->GetContentsValue ())
+            {
+              int layer = child->GetAttributeValueAsInt ("layer");
+              if (layers.Length ()<=layer)
+                layers.SetLength (layer+1);
+              layers[layer].constcolorvar = strings->Request (str);
+            }
+          }
+          break;
         case XMLTOKEN_AMBIENT:
           {
             const char* str;
@@ -357,7 +416,7 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
             do_lighting = true;
           }
           break;
-        case XMLTOKEN_ENVIRONMENT:
+        case XMLTOKEN_TEXGEN:
           {
             const char* str;
             if ((str = child->GetAttributeValue ("type")))
@@ -368,7 +427,10 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
                 {
                   if (!strcasecmp(str, "cube"))
                   {
-                    environment = ENVIRON_REFLECT_CUBE;
+                    int layer = child->GetAttributeValueAsInt ("layer");
+                    if (layers.Length ()<=layer)
+                      layers.SetLength (layer+1);
+                    layers[layer].texgen = TEXGEN_REFLECT_CUBE;
                   }
                 }
               }
@@ -389,16 +451,32 @@ bool csGLShaderFVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
 {
   shaderPlug->Open ();
 
+  //get a statecache
+  csRef<iGraphics2D> g2d = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
+  g2d->PerformExtension ("getstatecache", &statecache);
+
   int i, j;
 
-  if ((environment == ENVIRON_REFLECT_CUBE) &&
-    !shaderPlug->ext->CS_GL_ARB_texture_cube_map)
-    return false;
+  for (i=0; i<layers.Length (); i++)
+    if ((layers[i].texgen == TEXGEN_REFLECT_CUBE) &&
+      !shaderPlug->ext->CS_GL_ARB_texture_cube_map)
+      return false;
 
   for (j=0; j<staticContexts.Length(); j++)
   {
     ambientVarRef = staticContexts[j]->GetVariable (ambientvar);
     if (ambientVarRef) break;
+  }
+
+  for (i = 0; i < layers.Length (); i++)
+  {
+    layers[i].constcolorVarRef = 0;
+    for (j=0; j<staticContexts.Length(); j++)
+    {
+      if (!layers[i].constcolorVarRef)
+        layers[i].constcolorVarRef = 
+        staticContexts[j]->GetVariable (layers[i].constcolorvar);
+    }
   }
 
   for (i = 0; i < lights.Length (); i++)
@@ -424,6 +502,14 @@ bool csGLShaderFVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
         lights[i].attenuationVarRef = 
           staticContexts[j]->GetVariable (lights[i].attenuationvar);
     }
+  }
+
+  primcolVarRef = 0;
+  for (j=0; j<staticContexts.Length(); j++)
+  {
+    if (!primcolVarRef)
+      primcolVarRef = 
+        staticContexts[j]->GetVariable (primcolvar);
   }
 
   return true;
