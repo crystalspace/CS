@@ -18,8 +18,9 @@
 
 #define SYSDEF_ACCESS
 #include "sysdef.h"
-#include "walktest.h"
-#include "infmaze.h"
+#include "walktest/walktest.h"
+#include "walktest/infmaze.h"
+#include "walktest/hugeroom.h"
 #include "version.h"
 #include "qint.h"
 #include "cssys/common/system.h"
@@ -509,11 +510,12 @@ void WalkTest::DrawFrame (long elapsed_time, long current_time)
     } /* endif */
     if (do_stats)
     {
-      char buffer[30];
-      sprintf (buffer, "pc=%d pd=%d po=%d", Stats::polygons_considered,
-        Stats::polygons_drawn, Stats::portals_drawn);
-      GfxWrite(FRAME_WIDTH-24*8-1, FRAME_HEIGHT-11, 0, -1, "%s", buffer);
-      GfxWrite(FRAME_WIDTH-24*8, FRAME_HEIGHT-10, scon->get_fg (), -1, "%s", buffer);
+      char buffer[50];
+      sprintf (buffer, "pc=%d pd=%d po=%d pa=%d pr=%d", Stats::polygons_considered,
+        Stats::polygons_drawn, Stats::portals_drawn, Stats::polygons_accepted,
+	Stats::polygons_rejected);
+      GfxWrite(FRAME_WIDTH-30*8-1, FRAME_HEIGHT-11, 0, -1, "%s", buffer);
+      GfxWrite(FRAME_WIDTH-30*8, FRAME_HEIGHT-10, scon->get_fg (), -1, "%s", buffer);
     }
     else if (do_show_coord)
     {
@@ -524,26 +526,6 @@ void WalkTest::DrawFrame (long elapsed_time, long current_time)
       Gfx2D->Write(FRAME_WIDTH-24*8-1, FRAME_HEIGHT-11, 0, -1, buffer);
       Gfx2D->Write(FRAME_WIDTH-24*8, FRAME_HEIGHT-10, scon->get_fg (), -1, buffer);
     }
-    else if (do_cd)
-    {/*
-      char buffer[200], names[30];
-      sprintf (buffer,"CD %d cam pos %2.2f,%2.2f,%2.2f %c %c",
-         collcount,
-         view->GetCamera ()->GetW2CTranslation ().x, view->GetCamera ()->GetW2CTranslation ().y,
-         view->GetCamera ()->GetW2CTranslation ().z,
-         csBeing::player->falling?'F':' ', csBeing::player->climbing?'C':' ');
-      for (int i = 0; i < collcount; i++)
-      {
-        csCollider *id1, *id2;
-        if (csCollider::Report(&id1, &id2))
-	{
-          sprintf(names,"[%s,%s] ",id1->GetName (),id2->GetName ());
-          strcat(buffer,names);
-	}
-      }
-      Gfx2D->Write(8-1, FRAME_HEIGHT-21, 0, -1, buffer);
-      Gfx2D->Write(8, FRAME_HEIGHT-20, scon->get_fg (), -1, buffer);*/
-    } /* endif */
 
     if (cslogo)
     {
@@ -838,8 +820,6 @@ int FindSectors (csVector3 v, csVector3 d, csSector *s, csSector **sa)
         sa[c] = portal->GetSector ();
         c++;
       }
-//    sa[c] = portal->GetSector();
-//    c++;
     }
   }
   return c;
@@ -1393,25 +1373,19 @@ int main (int argc, char* argv[])
   // option is given. Otherwise we load the given world.
   csSector* room;
 
-  if (Sys->do_infinite)
+  if (Sys->do_infinite || Sys->do_huge)
   {
     // The infinite maze.
 
     Sys->Printf (MSG_INITIALIZATION, "Creating initial room!...\n");
     world->EnableLightingCache (false);
 
-#if 0
-    // Disable collision detection for the infinite maze because
-    // it does not work here yet.
-    Sys->do_cd = false;
-#else
     // Unfortunately the current movement system does not allow the user to
     // move around the maze unless collision detection is enabled, even
     // though collision detection does not really make sense in this context.
     // Hopefully the movement system will be fixed some day so that the user
     // can move around even with collision detection disabled.
     Sys->do_cd = true;
-#endif
 
     // Load the standard library.
     CSLoader::LoadLibrary (world, "standard", "standard.zip");
@@ -1420,37 +1394,46 @@ int main (int argc, char* argv[])
     CSLoader::LoadTexture (world, "txt", "stone4.gif");
     CSLoader::LoadTexture (world, "txt2", "mystone2.gif");
 
-    // Create the initial (non-random) part of the maze.
-    CHK (Sys->infinite_maze = new InfiniteMaze ());
-    room = Sys->infinite_maze->create_six_room (world, 0, 0, 0)->sector;
-    Sys->infinite_maze->create_six_room (world, 0, 0, 1);
-    Sys->infinite_maze->create_six_room (world, 0, 0, 2);
-    Sys->infinite_maze->create_six_room (world, 1, 0, 2);
-    Sys->infinite_maze->create_six_room (world, 0, 1, 2);
-    Sys->infinite_maze->create_six_room (world, 1, 1, 2);
-    Sys->infinite_maze->create_six_room (world, 0, 0, 3);
-    Sys->infinite_maze->create_six_room (world, 0, 0, 4);
-    Sys->infinite_maze->create_six_room (world, -1, 0, 4);
-    Sys->infinite_maze->create_six_room (world, -2, 0, 4);
-    Sys->infinite_maze->create_six_room (world, 0, -1, 3);
-    Sys->infinite_maze->create_six_room (world, 0, -2, 3);
-    Sys->infinite_maze->create_six_room (world, 0, 1, 3);
-    Sys->infinite_maze->create_six_room (world, 0, 2, 3);
-    Sys->infinite_maze->connect_infinite (0, 0, 0, 0, 0, 1);
-    Sys->infinite_maze->connect_infinite (0, 0, 1, 0, 0, 2);
-    Sys->infinite_maze->connect_infinite (0, 0, 2, 0, 0, 3);
-    Sys->infinite_maze->connect_infinite (0, 0, 2, 1, 0, 2);
-    Sys->infinite_maze->connect_infinite (0, 0, 2, 0, 1, 2);
-    Sys->infinite_maze->connect_infinite (1, 1, 2, 0, 1, 2);
-    Sys->infinite_maze->connect_infinite (1, 1, 2, 1, 0, 2);
-    Sys->infinite_maze->connect_infinite (0, 0, 3, 0, 0, 4);
-    Sys->infinite_maze->connect_infinite (-1, 0, 4, 0, 0, 4);
-    Sys->infinite_maze->connect_infinite (-2, 0, 4, -1, 0, 4);
-    Sys->infinite_maze->connect_infinite (0, 0, 3, 0, -1, 3);
-    Sys->infinite_maze->connect_infinite (0, -1, 3, 0, -2, 3);
-    Sys->infinite_maze->connect_infinite (0, 0, 3, 0, 1, 3);
-    Sys->infinite_maze->connect_infinite (0, 1, 3, 0, 2, 3);
-    Sys->infinite_maze->create_loose_portal (-2, 0, 4, -2, 1, 4);
+    if (Sys->do_infinite)
+    {
+      // Create the initial (non-random) part of the maze.
+      CHK (Sys->infinite_maze = new InfiniteMaze ());
+      room = Sys->infinite_maze->create_six_room (world, 0, 0, 0)->sector;
+      Sys->infinite_maze->create_six_room (world, 0, 0, 1);
+      Sys->infinite_maze->create_six_room (world, 0, 0, 2);
+      Sys->infinite_maze->create_six_room (world, 1, 0, 2);
+      Sys->infinite_maze->create_six_room (world, 0, 1, 2);
+      Sys->infinite_maze->create_six_room (world, 1, 1, 2);
+      Sys->infinite_maze->create_six_room (world, 0, 0, 3);
+      Sys->infinite_maze->create_six_room (world, 0, 0, 4);
+      Sys->infinite_maze->create_six_room (world, -1, 0, 4);
+      Sys->infinite_maze->create_six_room (world, -2, 0, 4);
+      Sys->infinite_maze->create_six_room (world, 0, -1, 3);
+      Sys->infinite_maze->create_six_room (world, 0, -2, 3);
+      Sys->infinite_maze->create_six_room (world, 0, 1, 3);
+      Sys->infinite_maze->create_six_room (world, 0, 2, 3);
+      Sys->infinite_maze->connect_infinite (0, 0, 0, 0, 0, 1);
+      Sys->infinite_maze->connect_infinite (0, 0, 1, 0, 0, 2);
+      Sys->infinite_maze->connect_infinite (0, 0, 2, 0, 0, 3);
+      Sys->infinite_maze->connect_infinite (0, 0, 2, 1, 0, 2);
+      Sys->infinite_maze->connect_infinite (0, 0, 2, 0, 1, 2);
+      Sys->infinite_maze->connect_infinite (1, 1, 2, 0, 1, 2);
+      Sys->infinite_maze->connect_infinite (1, 1, 2, 1, 0, 2);
+      Sys->infinite_maze->connect_infinite (0, 0, 3, 0, 0, 4);
+      Sys->infinite_maze->connect_infinite (-1, 0, 4, 0, 0, 4);
+      Sys->infinite_maze->connect_infinite (-2, 0, 4, -1, 0, 4);
+      Sys->infinite_maze->connect_infinite (0, 0, 3, 0, -1, 3);
+      Sys->infinite_maze->connect_infinite (0, -1, 3, 0, -2, 3);
+      Sys->infinite_maze->connect_infinite (0, 0, 3, 0, 1, 3);
+      Sys->infinite_maze->connect_infinite (0, 1, 3, 0, 2, 3);
+      Sys->infinite_maze->create_loose_portal (-2, 0, 4, -2, 1, 4);
+    }
+    else
+    {
+      // Create the huge world.
+      CHK (Sys->huge_room = new HugeRoom ());
+      room = Sys->huge_room->create_huge_world (world);
+    }
 
     // Prepare the world. This will calculate all lighting and
     // prepare the lightmaps for the 3D rasterizer.
@@ -1515,7 +1498,7 @@ int main (int argc, char* argv[])
   }
 
   // Initialize collision detection system (even if disabled so that we can enable it later).
-  Sys->InitWorld (Sys->world,Sys->view->GetCamera());
+  Sys->InitWorld (Sys->world, Sys->view->GetCamera ());
 
   Sys->Printf (MSG_INITIALIZATION, "--------------------------------------\n");
 

@@ -29,12 +29,13 @@ class Polygon3D;
 class WalkTest;
 class LanguageLayer;
 class csView;
-class InfiniteMaze;
 class csSoundBuffer;
 class csWorld;
 class csSprite2D;
 class csWireFrameCam;
 class PhysicsLibrary;
+class InfiniteMaze;
+class HugeRoom;
 
 // Several map modes.
 #define MAP_OFF 0
@@ -134,6 +135,9 @@ public:
   /// Our infinite maze object if used.
   InfiniteMaze* infinite_maze;
 
+  /// Our huge room object if used.
+  HugeRoom* huge_room;
+
   /// Some sounds.
   csSoundBuffer* wMissile_boom;
   csSoundBuffer* wMissile_whoosh;
@@ -148,6 +152,7 @@ public:
   bool busy_perf_test;
   bool do_show_z;
   bool do_infinite;
+  bool do_huge;
   bool do_cd;
   bool do_freelook;
   bool do_gravity;

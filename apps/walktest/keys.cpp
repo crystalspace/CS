@@ -22,6 +22,7 @@
 #include "walktest/walktest.h"
 #include "walktest/bot.h"
 #include "walktest/infmaze.h"
+#include "walktest/hugeroom.h"
 #include "apps/support/command.h"
 #include "cstools/simpcons.h"
 #include "csengine/camera.h"
@@ -1455,6 +1456,7 @@ WalkTest::WalkTest () : SysSystemDriver (), pos (0, 0, 0), velocity (0, 0, 0)
   layer = NULL;
   view = NULL;
   infinite_maze = NULL;
+  huge_room = NULL;
   wMissile_boom = NULL;
   wMissile_whoosh = NULL;
   cslogo = NULL;
@@ -1470,6 +1472,7 @@ WalkTest::WalkTest () : SysSystemDriver (), pos (0, 0, 0), velocity (0, 0, 0)
   busy_perf_test = false;
   do_show_z = false;
   do_infinite = false;
+  do_huge = false;
   do_cd = true;
   do_freelook = false;
   player_spawned = false;
@@ -1494,9 +1497,9 @@ WalkTest::~WalkTest ()
   CHK (delete layer);
   CHK (delete view);
   CHK (delete infinite_maze);
+  CHK (delete huge_room);
   CHK (delete cslogo);
   CHK (delete world);
-//  CHK (delete pl);
 }
 
 bool WalkTest::ParseArg (int argc, char* argv[], int& i)
@@ -1539,6 +1542,10 @@ bool WalkTest::ParseArg (int argc, char* argv[], int& i)
   {
     do_infinite = true;
   }
+  else if (strcasecmp ("-huge", argv[i]) == 0)
+  {
+    do_huge = true;
+  }
   else if (strcasecmp ("-bots", argv[i]) == 0)
   {
     do_bots = true;
@@ -1577,6 +1584,7 @@ void WalkTest::Help ()
   Sys->Printf (MSG_STDOUT, "  -fps/nofps         frame rate printing (default '%sfps')\n", do_fps ? "" : "no");
   Sys->Printf (MSG_STDOUT, "  -colldet/nocolldet collision detection system (default '%scolldet')\n", do_cd ? "" : "no");
   Sys->Printf (MSG_STDOUT, "  -infinite          special infinite level generation (ignores world file!)\n");
+  Sys->Printf (MSG_STDOUT, "  -huge              special huge level generation (ignores world file!)\n");
   Sys->Printf (MSG_STDOUT, "  -bots              allow random generation of bots\n");
   Sys->Printf (MSG_STDOUT, "  <filename>         load world file from <filename> (default '%s')\n", world_file);
 }
