@@ -522,17 +522,25 @@ void move_ghost (csSprite3D* spr)
   GhostSpriteInfo* gh_info = (GhostSpriteInfo*)spr->GetObj (GhostSpriteInfo::Type ());
   if (rand () % 40 == 1) gh_info->dir = -gh_info->dir;
 
+  // OpenStep compiler bug prevents Transform(GetYRotation()), which is why
+  // the expressions are split across two statements below.
   if (vel < 0.01)
   {
     // We did not move much. Turn around quickly.
-    spr->Transform (csMatrix3::GetYRotation (gh_info->dir*.2));
+    csMatrix3 m = csMatrix3::GetYRotation (gh_info->dir*.2);
+    spr->Transform (m);
   }
   else if (vel < 0.05)
   {
     // We did a bit. Turn around slightly.
-    spr->Transform (csMatrix3::GetYRotation (gh_info->dir*.1));
+    csMatrix3 m = csMatrix3::GetYRotation (gh_info->dir*.1);
+    spr->Transform (m);
   }
-  else spr->Transform (csMatrix3::GetYRotation (gh_info->dir*.01));
+  else
+  {
+    csMatrix3 m = csMatrix3::GetYRotation (gh_info->dir*.01);
+    spr->Transform (m);
+  }
 }
 
 //===========================================================================

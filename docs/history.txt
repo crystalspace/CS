@@ -49,6 +49,10 @@ Short-term cleanups that need to be done:
 	  "platforms" target gets around this limitation by only performing
 	  the extra work needed to generate the platform list if the user
 	  explicitly requests it.
+	- Eric Sunshine worked around some "const versus non-const" warnings
+	  from the OpenStep compiler which turned up when the ghost was added
+	  to keys.cpp.  The offending code actually looked fine, which leads
+	  me to believe that this is another compiler bug.
 21-Jul-1999
 	- Eric Sunshine uploaded new archives of zlib, libpng, and libjpeg
 	  to the Crystal Space ftp site which conform to the new beta 13
