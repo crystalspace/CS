@@ -40,7 +40,8 @@ private:
   ddgHeightMap* height;
   ///
   ddgBBox* clipbox;
-
+  /// World to camera transformation matrix.
+  double wtoc[16];
 public:
   /**
    * Create an empty terrain.
@@ -57,7 +58,7 @@ public:
   ///
   ddgBBox* GetBBox () { return clipbox; }
 
-  ///
+  /// Load the heightmap.
   bool Initialize (char* heightmap);
 
   /**
