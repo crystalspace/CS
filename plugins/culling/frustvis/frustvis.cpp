@@ -254,8 +254,7 @@ void csFrustumVis::RegisterVisObject (iVisibilityObject* visobj)
   visobj_wrap->mesh = mesh;
   if (mesh)
   {
-    visobj_wrap->caster = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-    	iShadowCaster);
+    visobj_wrap->caster = mesh->GetShadowCaster ();
   }
 
   // Only add the listeners at the very last moment to prevent them to

@@ -213,12 +213,14 @@ private:
    * multiplexes in case of static lod.
    */
   csRef<iShadowReceiver> shadow_receiver;
+  bool shadow_receiver_valid;
   /**
    * For optimization purposes we keep the iShadowCaster interface here.
    * Also for maintaining the special version of the shadow caster that
    * multiplexes in case of static lod.
    */
   csRef<iShadowCaster> shadow_caster;
+  bool shadow_caster_valid;
 
   /**
    * For optimization purposes we keep the portal container interface here
@@ -278,8 +280,8 @@ public:
   void ClearFromSectorPortalLists ();
   /// Add this object to all sector portal lists.
   void AddToSectorPortalLists ();
-protected:
 
+protected:
   /// Get the bounding box in world space and correct in hierarchy.
   void GetFullBBox (csBox3& box);
 
@@ -331,6 +333,8 @@ public:
   iMeshObject* GetMeshObject () const { return meshobj; }
 
   iPortalContainer* GetPortalContainer () const { return portal_container; }
+  iShadowReceiver* GetShadowReceiver ();
+  iShadowCaster* GetShadowCaster ();
 
   /// For iVisibilityObject: Get the object model.
   virtual iObjectModel* GetObjectModel ()
@@ -648,13 +652,13 @@ public:
     {
       return scfParent->light_info;
     }
-    virtual iShadowReceiver* GetShadowReceiver () const
+    virtual iShadowReceiver* GetShadowReceiver ()
     {
-      return scfParent->shadow_receiver;
+      return scfParent->GetShadowReceiver ();
     }
-    virtual iShadowCaster* GetShadowCaster () const
+    virtual iShadowCaster* GetShadowCaster ()
     {
-      return scfParent->shadow_caster;
+      return scfParent->GetShadowCaster ();
     }
     virtual uint GetVisibilityNumber () const
     {

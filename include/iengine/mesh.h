@@ -226,7 +226,7 @@ struct iMeshWrapper : public iBase
    * a shadow receiver that automatically multiplexes the receiving shadows
    * to all child meshes.
    */
-  virtual iShadowReceiver* GetShadowReceiver () const = 0;
+  virtual iShadowReceiver* GetShadowReceiver () = 0;
 
   /**
    * Get the optional shadow caster that is implemented
@@ -238,7 +238,7 @@ struct iMeshWrapper : public iBase
    * hierarchy that is used for static lod) then this will return a
    * shadow caster that gets shadows from the highest detail objects.
    */
-  virtual iShadowCaster* GetShadowCaster () const = 0;
+  virtual iShadowCaster* GetShadowCaster () = 0;
 
   /**
    * Optimization to avoid having to do SCF_QUERY_INTERFACE for

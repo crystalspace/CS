@@ -24,6 +24,10 @@ chronological order.
 	      ApplicationIconOSX rules.  Instead, macosx.jam now respect icons
 	      assigned by the generic ApplicationIconDefault and
 	      ApplicationIcon.
+	- Jorrit changed iMeshWrapper->GetShadowCaster() and GetShadowReceiver()
+	  so that they now only query for the respective interfaces when
+	  being called. That will make it easier later to build those
+	  multiplexing versions for static lod on demand.
 3-May-2004
 	- Eric Sunshine augmented all the "build" instructions in the user
 	  manual to indicate that the project can be built with both Jam and

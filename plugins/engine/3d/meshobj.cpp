@@ -74,16 +74,17 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent, iMeshObject *meshobj) :
 
   last_anim_time = 0;
 
+  shadow_receiver_valid = false;
+  shadow_caster_valid = false;
   csMeshWrapper::meshobj = meshobj;
   if (meshobj)
   {
     light_info = SCF_QUERY_INTERFACE (meshobj, iLightingInfo);
-    shadow_receiver = SCF_QUERY_INTERFACE (meshobj, iShadowReceiver);
-    shadow_caster = SCF_QUERY_INTERFACE (meshobj, iShadowCaster);
     portal_container = SCF_QUERY_INTERFACE (meshobj, iPortalContainer);
-    // Only if we have a parent can it possibly be useful to call AddToSectorPortalLists.
-    // Because if we don't have a parent yet then we cannot have a sector either.
-    // If we have a parent then the parent can have a sector.
+    // Only if we have a parent can it possibly be useful to call
+    // AddToSectorPortalLists. Because if we don't have a parent yet then
+    // we cannot have a sector either. If we have a parent then the parent
+    // can have a sector.
     if (csParent)
       AddToSectorPortalLists ();
   }
@@ -107,6 +108,28 @@ void csMeshWrapper::SetParentContainer (iMeshWrapper* newParent)
     csParent = ((csMeshWrapper::MeshWrapper*)Parent)->scfParent;
   else
     csParent = 0;
+}
+
+iShadowReceiver* csMeshWrapper::GetShadowReceiver ()
+{
+  if (!shadow_receiver_valid)
+  {
+    if (!meshobj) return 0;
+    shadow_receiver_valid = true;
+    shadow_receiver = SCF_QUERY_INTERFACE (meshobj, iShadowReceiver);
+  }
+  return shadow_receiver;
+}
+
+iShadowCaster* csMeshWrapper::GetShadowCaster ()
+{
+  if (!shadow_caster_valid)
+  {
+    if (!meshobj) return 0;
+    shadow_caster_valid = true;
+    shadow_caster = SCF_QUERY_INTERFACE (meshobj, iShadowCaster);
+  }
+  return shadow_caster;
 }
 
 void csMeshWrapper::AddToSectorPortalLists ()
@@ -148,19 +171,20 @@ void csMeshWrapper::SetMeshObject (iMeshObject *meshobj)
   ClearFromSectorPortalLists ();
 
   csMeshWrapper::meshobj = meshobj;
+  shadow_receiver_valid = false;
+  shadow_caster_valid = false;
+  shadow_receiver = 0;
+  shadow_caster = 0;
+
   if (meshobj)
   {
     light_info = SCF_QUERY_INTERFACE (meshobj, iLightingInfo);
-    shadow_receiver = SCF_QUERY_INTERFACE (meshobj, iShadowReceiver);
-    shadow_caster = SCF_QUERY_INTERFACE (meshobj, iShadowCaster);
     portal_container = SCF_QUERY_INTERFACE (meshobj, iPortalContainer);
     AddToSectorPortalLists ();
   }
   else
   {
     light_info = 0;
-    shadow_receiver = 0;
-    shadow_caster = 0;
     portal_container = 0;
   }
 }
@@ -478,6 +502,8 @@ void csMeshWrapper::RemoveMeshFromStaticLOD (iMeshWrapper* mesh)
     csArray<iMeshWrapper*>& meshes_for_lod = static_lod->GetMeshesForLOD (lod);
     meshes_for_lod.Delete (mesh);
   }
+  shadow_receiver_valid = false;
+  shadow_caster_valid = false;
 }
 
 void csMeshWrapper::AddMeshToStaticLOD (int lod, iMeshWrapper* mesh)
@@ -485,6 +511,8 @@ void csMeshWrapper::AddMeshToStaticLOD (int lod, iMeshWrapper* mesh)
   if (!static_lod) return;	// No static lod, nothing to do here.
   csArray<iMeshWrapper*>& meshes_for_lod = static_lod->GetMeshesForLOD (lod);
   meshes_for_lod.Push (mesh);
+  shadow_receiver_valid = false;
+  shadow_caster_valid = false;
 }
 
 //---------------------------------------------------------------------------
