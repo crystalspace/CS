@@ -42,8 +42,7 @@ endif
 DESCRIPTION.$(SOFT3D) = $(DESCRIPTION.soft)
 SRC.SOFT3D = $(wildcard libs/cs3d/software/*.cpp) \
   libs/cs3d/common/txtmgr.cpp libs/cs3d/common/memheap.cpp \
-  libs/cs3d/common/inv_cmap.cpp libs/cs3d/common/imgtools.cpp \
-#  libs/cs3d/common/halogen.cpp
+  libs/cs3d/common/inv_cmap.cpp libs/cs3d/common/imgtools.cpp
 ifeq ($(USE_NASM),yes)
 SRC.SOFT3D += $(wildcard libs/cs3d/software/i386/*.asm)
 endif

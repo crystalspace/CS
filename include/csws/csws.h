@@ -20,14 +20,14 @@
 #ifndef __CSWS_H__
 #define __CSWS_H__
 
-/*
- * Current CrystalSpace Windowing System class hierarchy:<p>
+/**
+ * Current CrystalSpace Windowing System class hierarchy:
  * <pre>
  * [ csBase ]
+ *   |--[ csRect ]			// Rectangle
  *   |--[ csVector ]            	// Vector of some objects (FreeItem = NOP)
  *   |    |--[ csStrVector ]    	// Vector of strings (FreeItem = delete[])
  *   |    +--[ csObjVector ]    	// ... csBase heirs (FreeItem = delete (csBase *))
- *   |--[ csSprite2D ]			// A 2D sprite
  *   |--[ csEvent ]             	// Windowing System event
  *   |--[ csEventQueue ]        	// Event queue class
  *   |--[ csGraphicsPipeline ]  	// Deferred drawing pipeline
@@ -47,8 +47,6 @@
  *        |--[ csInputLine ]		// input line control
  *        |    +--[ csSpinBox ]		// spin box control
  *        +--[ csListBox ]		// list box control
- *
- * [ csRect ]				// Rectangle (not related to above hierarchy)
  * </pre>
  */
 

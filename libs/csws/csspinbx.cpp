@@ -300,6 +300,8 @@ void csSpinBox::SetValue (int iValue)
   } /* endif */
   SetCursorPos (strlen (text), 0);
   Value = iValue;
+  if (parent)
+    parent->SendCommand (cscmdSpinBoxValueChanged, (void *)this);
   Invalidate ();
 }
 

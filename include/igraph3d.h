@@ -31,6 +31,7 @@ struct iGraphics2D;
 struct iPolygonTexture;
 struct iTextureManager;
 struct iTextureHandle;
+struct iHalo;
 
 #define CS_FOG_FRONT		0
 #define CS_FOG_BACK		1
@@ -113,7 +114,7 @@ public:
 };
 
 
-///Structure containing all info needed by DrawPolygonFX (DPFX)
+/// Structure containing all info needed by DrawPolygonFX (DPFX)
 struct G3DPolygonDPFX
 {
   /// Current number of vertices.
@@ -137,7 +138,7 @@ struct G3DPolygonDPFX
   float flat_color_b;
 };
 
-///Structure containing all info needed by DrawPolygon (DP)
+/// Structure containing all info needed by DrawPolygon (DP)
 struct G3DPolygonDP
 {
   /// Current number of vertices.
@@ -181,10 +182,10 @@ struct G3DPolygonDP
   float z_value;
 };
 
-///Structure containing all info needed by DrawPolygonFlat (DPF)
+/// Structure containing all info needed by DrawPolygonFlat (DPF)
 typedef G3DPolygonDP G3DPolygonDPF;
 
-///Structure containing all info needed by AddFogPolygon (AFP)
+/// Structure containing all info needed by AddFogPolygon (AFP)
 struct G3DPolygonAFP
 {
   /// Current number of vertices.
@@ -333,7 +334,7 @@ struct csFog
   float blue;
 };
 
-SCF_VERSION (iGraphics3D, 0, 0, 1);
+SCF_VERSION (iGraphics3D, 0, 0, 2);
 
 /**
  * This is the standard 3D graphics interface.
@@ -510,6 +511,13 @@ struct iGraphics3D : public iPlugIn
 
   /// Get the texture manager: do NOT increment the refcount of texture manager
   virtual iTextureManager *GetTextureManager () = 0;
+
+  /// Get Z-buffer value at given X,Y position
+  virtual float GetZbuffValue (int x, int y) = 0;
+
+  /// Create a halo of the specified color and return a handle.
+  virtual iHalo *CreateHalo (float iR, float iG, float iB,
+    unsigned char *iAlpha, int iWidth, int iHeight) = 0;
 };
 
 #endif // __IGRAPH3D_H__

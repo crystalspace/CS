@@ -55,7 +55,6 @@ csLight::csLight (float x, float y, float z, float d,
 
   halo_intensity = 0.0f;
   halo_max_intensity = 1.0f;
-  halo_ref_count = 0;
   in_halo_queue = false;
 
   attenuation = CS_ATTN_LINEAR;

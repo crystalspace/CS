@@ -54,7 +54,7 @@ typedef struct
 } MyGrVertex;
 
 /// the Glide implementation of the Graphics3D class.
-class csGraphics3DGlide3x : public iGraphics3D, public iHaloRasterizer
+class csGraphics3DGlide3x : public iGraphics3D
 {
 private:
   /// the texture cache.
@@ -184,6 +184,15 @@ public:
   /// Set center of projection.
   virtual void SetPerspectiveCenter (int x, int y);
 
+  /// Get Z-buffer value at given X,Y position
+  virtual float GetZbuffValue (int x, int y)
+  { return 0; }
+
+  /// Create a halo of the specified color and return a handle.
+  virtual iHalo *CreateHalo (float iR, float iG, float iB,
+    unsigned char *iAlpha, int iWidth, int iHeight)
+  { return NULL; }
+
   ///
   virtual bool NeedsPO2Maps () { return true; }
   ///
@@ -201,18 +210,6 @@ public:
   virtual void OpenFogObject (CS_ID id, csFog* fog) { }
   virtual void AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype) { }
   virtual void CloseFogObject (CS_ID id) { }
-
-  virtual csHaloHandle CreateHalo (float iR, float iG, float iB,
-    float iFactor, float iCross)
-  { return NULL; }
-  virtual void DestroyHalo (csHaloHandle iHalo)
-  { }
-  virtual bool DrawHalo (csVector3 *iCenter, float iIntensity, csHaloHandle iHalo)
-  { }
-  virtual bool TestHalo (csVector3 *iCenter)
-  { }
-  virtual void SetHaloClipper (csVector2 *iClipper, int iCount)
-  { }
 
 private:
   // print to the system's device

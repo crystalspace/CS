@@ -26,7 +26,6 @@
 
 #include "types.h"	// for bool
 
-class csVector2;
 class csBox;
 
 /**

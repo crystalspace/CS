@@ -99,7 +99,7 @@ struct csScanSetup
   /// The fog pixel (R|G|B for true/hicolor) or index into palette of fog color
   int FogPix;
   /// Fog density
-  unsigned long FogDensity;
+  unsigned int FogDensity;
   /// The fog table for paletted (currently only 8-bit) modes
   unsigned char *Fog8;
 

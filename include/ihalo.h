@@ -20,42 +20,40 @@
 #define __IHALO_H__
 
 #include "csutil/scf.h"
+#include "csgeom/math2d.h"
 
-class csVector2;
-class csVector3;
+SCF_VERSION (iHalo, 0, 0, 1);
 
-/// This is a handle to a halo
-typedef void *csHaloHandle;
-
-SCF_VERSION (iHaloRasterizer, 1, 0, 1);
-
-/// iHaloRasterizer: used to render halos (aka "light globes").
-struct iHaloRasterizer : public iBase
+/**
+ * iHalo: used to render halos (aka "light globes").
+ * This interface can be used as well for any scalable semi-transparent
+ * 2D sprites. The "halo" is really just an alpha map; the sprite is a
+ * single-colored rectangle with more or less transparent portions
+ * (depends on alpha map).
+ */
+struct iHalo : public iBase
 {
-  /**
-   * Create a halo of the specified color and return a handle.
-   * The iFactor parameter specifies the light fading speed; the bigger
-   * is it (normal range is 0..1) brighter is halo.
-   * the iCross parameter is an 0..1 value that shows how much the
-   * halo ressembles a cross (0) or an ideal circle (1).
-   */
-  virtual csHaloHandle CreateHalo (float iR, float iG, float iB, float iFactor,
-    float iCross) = 0;
-  /// Destroy the halo
-  virtual void DestroyHalo (csHaloHandle iHalo) = 0;
-  /// Test to see if a halo would be visible (but don't attempt to draw it)
-  virtual bool TestHalo (csVector3 *iCenter) = 0;
+  /// Query halo width
+  virtual int GetWidth () = 0;
+
+  /// Query halo height
+  virtual int GetHeight () = 0;
+
+  /// Change halo color
+  virtual void SetColor (float &iR, float &iG, float &iB) = 0;
+
+  /// Query halo color
+  virtual void GetColor (float &oR, float &oG, float &oB) = 0;
 
   /**
    * Draw the halo given a center point and an intensity. 
-   * The function returns "true" if the halo *center* is still visible.
-   * If the function will return "false", the halo will slowly fade away
-   * and will be destroyed when the intensity will reach zero.
+   * If either w and/or h is negative, the native width and/or height
+   * is used instead. If the halo should be clipped against some
+   * polygon, that polygon should be given, otherwise if a NULL pointer
+   * is passed, the halo is clipped just against screen bounds.
    */
-  virtual bool DrawHalo (csVector3 *iCenter, float iIntensity, csHaloHandle iHalo) = 0;
-
-  /// Set up the 2D clipping polygon for DrawHalo and TestHalo.
-  virtual void SetHaloClipper (csVector2 *iClipper, int iCount) = 0;
+  virtual void Draw (float x, float y, float w, float h, float iIntensity,
+    csVector2 *iVertices, int iVertCount) = 0;
 };
 
 #endif

@@ -107,8 +107,6 @@ protected:
   float halo_intensity;
   /// the maximum intensity of the attached halo.
   float halo_max_intensity;
-  /// the reference count (for halo fading purposes).
-  int halo_ref_count;
   /// whether this light is in the halo queue or not.
   bool in_halo_queue;
   /// Halo intensity factor
@@ -216,25 +214,6 @@ public:
    * Get the intensity of the halo.
    */
   float GetHaloIntensity () const { return halo_intensity; }
-
-  /**
-   * Return the reference count. This counter keeps track
-   * of the number of times a halo is visible. If 0 the
-   * halo will slowly fade away.
-   */
-  int GetReferenceCount () const { return halo_ref_count; }
-
-  /**
-   * Add a reference to the halo. As long as there are references
-   * to the halo it is visible.
-   */
-  void AddReference () { halo_ref_count++; }
-
-  /**
-   * Remove a reference to the halo. When all references
-   * are gone the halo will slowly fade away.
-   */
-  void RemoveReference () { if (halo_ref_count > 0) halo_ref_count--; }
 
   /**
    * Set whether or not the halo is in the queue.

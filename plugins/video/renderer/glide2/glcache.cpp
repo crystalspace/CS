@@ -365,7 +365,7 @@ HighColorCacheAndManage_Data * GlideTextureCache::LoadHalo(char *data)
 
 void GlideTextureCache::UnloadHalo(HighColorCacheAndManage_Data *d)
 {
-      manager->freeSpaceMem(d->mempos);
+  manager->freeSpaceMem(d->mempos);
 }
 
 GlideLightmapCache::GlideLightmapCache(TMUInfo *t,TextureMemoryManager*man)

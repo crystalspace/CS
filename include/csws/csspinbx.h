@@ -77,7 +77,14 @@ enum
    * IN: (csSpinBoxLimits *)Limits
    * </pre>
    */
-  cscmdSpinBoxSetLimits
+  cscmdSpinBoxSetLimits,
+  /**
+   * Passed to parent control as spinbox value changes
+   * <pre>
+   * IN: (csSpinBox *)Source
+   * </pre>
+   */
+  cscmdSpinBoxValueChanged
 };
 
 /**

@@ -20,30 +20,42 @@
 #define HALO_H
 
 #include "csgeom/math3d.h"
+#include "light.h"
 #include "ihalo.h"
 
-/// This is used to keep track of halo information.
-class csHaloInformation
+/**
+ * This is used to keep track of halos.<p>
+ * When the engine detects that a light that is marked to have an halo
+ * is directly visible, an object of this type is created and put into
+ * a global queue maintained within the world object. The light starts
+ * to brighten until it reaches maximal intensity; when the halo becomes
+ * obscured by something or goes out of view the intensity starts to
+ * decrease until it reaches zero; upon this event the halo object is
+ * destroyed and removed from halo queue.
+ */
+class csLightHalo
 {
 public:
-  ///
-  csVector3 v;
-  ///
-  csLight* pLight;
+  /// The light this halo is attached to
+  csLight *Light;
 
-  ///
-  float r, g, b;
-  ///
-  float intensity;
-  ///
-  csHaloHandle haloinfo;
+  /// Halo handle as returned by 3D rasterizer
+  iHalo *Handle;
 
-  ///
-  csHaloInformation() : v (0, 0, 0)
+  /// Create an light halo object
+  csLightHalo (csLight *iLight, iHalo *iHandle)
   {
-    pLight = NULL;
-    r = g = b = intensity = 0.0f;
-    haloinfo = NULL;
+    Handle = iHandle;
+    (Light = iLight)->SetHaloInQueue (true);
+  }
+
+  /// Destroy the light halo object
+  ~csLightHalo ()
+  {
+    if (Handle)
+      Handle->DecRef ();
+    if (Light)
+      Light->SetHaloInQueue (false);
   }
 };
 

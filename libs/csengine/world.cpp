@@ -17,6 +17,7 @@
 */
 
 #include "sysdef.h"
+#include "qint.h"
 #include "csutil/scf.h"
 #include "csengine/sysitf.h"
 #include "csengine/world.h"
@@ -45,6 +46,7 @@
 #include "csgeom/polypool.h"
 #include "csinput/csevent.h"
 #include "csutil/util.h"
+#include "csutil/halogen.h"
 #include "iimage.h"
 #include "ivfs.h"
 #include "ihalo.h"
@@ -202,14 +204,13 @@ csWorld::csWorld (iBase *iParent) : csObject (), start_vec (0, 0, 0)
   System = NULL;
   VFS = NULL;
   G3D = NULL;
-  HaloRast = NULL;
   textures = NULL;
   c_buffer = NULL;
   quadtree = NULL;
   quadcube = NULL;
   current_camera = NULL;
   current_world = this;
-  
+
   CHK (quadcube = new csQuadcube (8));
   CHK (textures = new csTextureList ());
 
@@ -225,7 +226,6 @@ csCamera* camera_hack = NULL;
 csWorld::~csWorld ()
 {
   Clear ();
-  if (HaloRast) HaloRast->DecRef ();
   if (G3D) G3D->DecRef ();
   if (VFS) VFS->DecRef ();
   CHK (delete textures);
@@ -515,8 +515,6 @@ bool csWorld::Prepare ()
   if (sectors.Length ())
     ShineLights ();
 
-  HaloRast = QUERY_INTERFACE (G3D, iHaloRasterizer);
-
   CheckConsistency ();
 
   return true;
@@ -791,10 +789,6 @@ void csWorld::Draw (csCamera* c, csClipper* view)
   current_camera = c;
   top_clipper = view;
 
-  // Set up halo clipping polygon
-  if (HaloRast)
-    HaloRast->SetHaloClipper (view->GetClipPoly (), view->GetNumVertices ());
-
   iGraphics2D *G2D = G3D->GetDriver2D ();
   csRenderView rview (*c, view, G3D, G2D);
   rview.clip_plane.Set (0, 0, 1, -1);   //@@@CHECK!!!
@@ -818,68 +812,9 @@ void csWorld::Draw (csCamera* c, csClipper* view)
   s->Draw (rview);
 
   // draw all halos on the screen
-  csHaloInformation* pinfo;
   for (int halo = halos.Length () - 1; halo >= 0; halo--)
-  {
-    bool halo_drawn = false;
-    pinfo = halos.Get (halo);
-
-    float hintensity = pinfo->pLight->GetHaloIntensity ();
-
-    if (pinfo->pLight->GetReferenceCount () == 0)
-    {
-      hintensity -= .15f;
-
-      // this halo is completely invisible. kill it.
-      if (hintensity <= 0)
-      {
-        pinfo->pLight->SetHaloInQueue (false);
-        HaloRast->DestroyHalo (pinfo->haloinfo);
-        halos.Delete (halo);
-        continue;
-      }
-
-      pinfo->pLight->SetHaloIntensity (hintensity);
-    }
-    else
-    {
-      if (hintensity < pinfo->pLight->GetHaloMaxIntensity ())
-        hintensity += .15f;
-
-      if (hintensity > pinfo->pLight->GetHaloMaxIntensity ())
-        hintensity = pinfo->pLight->GetHaloMaxIntensity ();
-
-      pinfo->pLight->SetHaloIntensity (hintensity);
-    }
-
-    if (HaloRast)
-    {
-      // project the halo.
-      pinfo->v = rview.World2Camera (pinfo->pLight->GetCenter ());
-
-      if (pinfo->v.z > SMALL_Z)
-      {
-        float iz = rview.aspect/pinfo->v.z;
-        pinfo->v.x = pinfo->v.x * iz + rview.shift_x;
-        pinfo->v.y = frame_height - 1 - (pinfo->v.y * iz + rview.shift_y);
-
-        pinfo->intensity = pinfo->pLight->GetHaloIntensity ();
-
-        halo_drawn = HaloRast->DrawHalo (&pinfo->v, pinfo->intensity, pinfo->haloinfo);
-      }
-    }
-
-    // was this halo actually drawn?
-    if (!halo_drawn)
-      pinfo->pLight->RemoveReference ();
-    else
-      if (!pinfo->pLight->GetReferenceCount ())
-        pinfo->pLight->AddReference();
-  }
-
-  // Free halo clipping polygon
-  if (HaloRast)
-    HaloRast->SetHaloClipper (NULL, 0);
+    if (!ProcessHalo (halos.Get (halo)))
+      halos.Delete (halo);
 }
 
 void csWorld::DrawFunc (csCamera* c, csClipper* view,
@@ -900,16 +835,131 @@ void csWorld::DrawFunc (csCamera* c, csClipper* view,
   s->Draw (rview);
 }
 
-void csWorld::AddHalo (csHaloInformation* iHalo)
+void csWorld::AddHalo (csLight* Light)
 {
-  iHalo->pLight->AddReference ();
-  iHalo->pLight->SetHaloInQueue (true);
-  halos.Push(iHalo);
+  if (!Light->CheckFlags (CS_LIGHT_HALO)
+   || Light->GetHaloInQueue ())
+    return;
+
+  // Transform light pos into camera space and see if it is directly visible
+  csVector3 v = current_camera->World2Camera (Light->GetCenter ());
+
+  // Check if light is behind us
+  if (v.z <= SMALL_Z)
+    return;
+
+  // Project X,Y into screen plane
+  float iz = current_camera->aspect / v.z;
+  v.x = v.x * iz + current_camera->shift_x;
+  v.y = frame_height - 1 - (v.y * iz + current_camera->shift_y);
+
+  // If halo is not inside visible region, return
+  if (!top_clipper->IsInside (v.x, v.y))
+    return;
+
+  // Check if light is not obscured by anything
+  float zv = G3D->GetZbuffValue (QRound (v.x), QRound (v.y));
+  if (v.z > zv)
+    return;
+
+  // Halo size is 1/4 of the screen height; also we make sure its odd
+  int hs = (frame_height / 4) | 1;
+  float hi, hc;
+  Light->GetHaloType (hi, hc);
+  unsigned char *Alpha = GenerateHalo (hs, hi, hc);
+
+  // Okay, put the light into the queue: first we generate the alphamap
+  iHalo *handle = G3D->CreateHalo (Light->GetColor ().red,
+    Light->GetColor ().green, Light->GetColor ().blue, Alpha, hs, hs);
+
+  // We don't need alpha map anymore
+  delete [] Alpha;
+
+  // Does 3D rasterizer support halos?
+  if (!handle)
+    return;
+
+  halos.Push (new csLightHalo (Light, handle));
 }
 
-bool csWorld::HasHalo (csLight* pLight)
+bool csWorld::HasHalo (csLight* Light)
 {
-  return halos.FindKey (pLight) >= 0;
+  return halos.FindKey (Light) >= 0;
+}
+
+#define HALO_INTENSITY_STEP	0.15f
+
+bool csWorld::ProcessHalo (csLightHalo *Halo)
+{
+  // Whenever the center of halo (the light) is directly visible
+  bool halo_vis = false;
+  // Whenever at least a piece of halo is visible
+  bool draw_halo = false;
+  // top-left coordinates of halo rectangle
+  float xtl = 0, ytl = 0;
+
+  // Project the halo.
+  csVector3 v = current_camera->World2Camera (Halo->Light->GetCenter ());
+  // The clipped halo polygon
+  csVector2 HaloClip [32];
+  // Number of vertices in HaloClip array
+  int HaloVCount = 32;
+
+  if (v.z > SMALL_Z)
+  {
+    float iz = current_camera->aspect / v.z;
+    v.x = v.x * iz + current_camera->shift_x;
+    v.y = frame_height - 1 - (v.y * iz + current_camera->shift_y);
+
+    if (top_clipper->IsInside (v.x, v.y))
+    {
+      float zv = G3D->GetZbuffValue (QRound (v.x), QRound (v.y));
+      halo_vis = (v.z <= zv);
+    }
+
+    // Create a rectangle containing the halo and clip it against screen
+    int hw = Halo->Handle->GetWidth ();
+    int hh = Halo->Handle->GetHeight ();
+    float hw2 = float (hw) / 2.0;
+    float hh2 = float (hh) / 2.0;
+    csVector2 HaloPoly [4] =
+    {
+      csVector2 (v.x - hw2, v.y - hh2),
+      csVector2 (v.x - hw2, v.y + hh2),
+      csVector2 (v.x + hw2, v.y + hh2),
+      csVector2 (v.x + hw2, v.y - hh2)
+    };
+    // Clip the halo against clipper
+    if (top_clipper->Clip (HaloPoly, HaloClip, 4, HaloVCount))
+    {
+      xtl = HaloPoly [0].x;
+      ytl = HaloPoly [0].y;
+      draw_halo = true;
+    }
+  }
+
+  float hintensity = Halo->Light->GetHaloIntensity ();
+  if (halo_vis)
+  {
+    float maxintensity = Halo->Light->GetHaloMaxIntensity ();
+    if (hintensity < maxintensity - HALO_INTENSITY_STEP)
+      hintensity += HALO_INTENSITY_STEP;
+    else
+      hintensity = maxintensity;
+  }
+  else
+  {
+    hintensity -= HALO_INTENSITY_STEP;
+
+    // this halo is completely invisible. kill it.
+    if (hintensity <= 0)
+      return false;
+  }
+  Halo->Light->SetHaloIntensity (hintensity);
+
+  if (draw_halo)
+    Halo->Handle->Draw (xtl, ytl, -1, -1, hintensity, HaloClip, HaloVCount);
+  return true;
 }
 
 csStatLight* csWorld::FindLight (float x, float y, float z, float dist)

@@ -118,9 +118,6 @@ EXPORT_CLASS_TABLE_END
 IMPLEMENT_IBASE (csGraphics3DSoftware)
   IMPLEMENTS_INTERFACE (iPlugIn)
   IMPLEMENTS_INTERFACE (iGraphics3D)
-#ifdef REMOVE_ME_IF_YOU_HAVE_HALOGEN_CPP
-  IMPLEMENTS_EMBEDDED_INTERFACE (iHaloRasterizer)
-#endif REMOVE_ME_IF_YOU_HAVE_HALOGEN_CPP
   IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
 IMPLEMENT_IBASE_END
 
@@ -2638,6 +2635,12 @@ void csGraphics3DSoftware::SysPrintf (int mode, char* szMsg, ...)
   System->Print (mode, buf);
 }
 
+float csGraphics3DSoftware::GetZbuffValue (int x, int y)
+{
+  unsigned long zbf = z_buffer [x + y * width];
+  return 16777216.0 / float (zbf);
+}
+
 //---------------------------------------------------------------------------
 
 IMPLEMENT_EMBEDDED_IBASE (csGraphics3DSoftware::csSoftConfig)
@@ -2726,8 +2729,8 @@ bool csGraphics3DSoftware::csSoftConfig::GetOption (int id, csVariant* value)
   return true;
 }
 
-bool csGraphics3DSoftware::csSoftConfig::GetOptionDescription (
-  int idx, csOptionDescription* option)
+bool csGraphics3DSoftware::csSoftConfig::GetOptionDescription
+  (int idx, csOptionDescription* option)
 {
   if (idx < 0 || idx >= NUM_OPTIONS)
     return false;

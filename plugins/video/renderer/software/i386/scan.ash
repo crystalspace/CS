@@ -136,7 +136,7 @@ struc csScanSetup
   ; The pixel value of fog (FogR|FogG|FogB for truecolor modes)
   int FogPix;
   ; Fog density
-  unsigned_long FogDensity;
+  unsigned_int FogDensity;
   ; The fog table for paletted (currently only 8-bit) modes
   unsigned_char_P Fog8;
 

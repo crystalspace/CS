@@ -44,7 +44,6 @@ class TextureCache16;
 
 struct iGraphics2D;
 class csIniFile;
-class csPolygonClipper;
 
 /// This structure is used to hold references to all current fog objects.
 struct FogBuffer
@@ -58,7 +57,8 @@ struct FogBuffer
 ///
 class csGraphics3DSoftware : public iGraphics3D
 {
-private:
+  friend class csSoftHalo;
+
   /// Z buffer for software renderer only. Hardware rendering uses own Z buffer.
   unsigned long* z_buffer;
   /// Size of Z buffer for software renderer.
@@ -380,26 +380,14 @@ public:
 
   /// Use to printf through system driver
   void SysPrintf (int mode, char* str, ...);
-#ifdef REMOVE_ME_IF_YOU_HAVE_HALOGEN_CPP
-  ///------------ iHaloRasterizer interface implementation ------------------
-  class csSoftHalo : public iHaloRasterizer
-  {
-    csPolygonClipper *Clipper;
-  public:
-    csSoftHalo ();
-    virtual ~csSoftHalo ();
 
-    DECLARE_EMBEDDED_IBASE (csGraphics3DSoftware);
-    virtual csHaloHandle CreateHalo (float iR, float iG, float iB,
-      float iFactor, float iCross);
-    virtual void DestroyHalo (csHaloHandle iHalo);
-    virtual bool DrawHalo (csVector3 *iCenter, float iIntensity, csHaloHandle iHalo);
-    virtual bool TestHalo (csVector3 *iCenter);
-    virtual void SetHaloClipper (csVector2 *iClipper, int iCount);
-  } scfiHaloRasterizer;
-  friend class  csSoftHalo;
-  friend struct csSoftHaloHandle;
-#endif // REMOVE_ME_IF_YOU_HAVE_HALOGEN_CPP
+  /// Get Z-buffer value at given X,Y position
+  virtual float GetZbuffValue (int x, int y);
+
+  /// Create a halo of the specified color and return a handle.
+  virtual iHalo *CreateHalo (float iR, float iG, float iB,
+    unsigned char *iAlpha, int iWidth, int iHeight);
+
   ///------------------- iConfig interface implementation -------------------
   struct csSoftConfig : public iConfig
   {

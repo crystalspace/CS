@@ -39,7 +39,7 @@ class GlideTextureCache;
 class GlideLightmapCache;
 
 /// the Glide implementation of the Graphics3D class.
-class csGraphics3DGlide2x : public iGraphics3D, public iHaloRasterizer
+class csGraphics3DGlide2x : public iGraphics3D
 {
 private:
   /// the texture cache.
@@ -104,9 +104,6 @@ private:
 
   /// use 16 bit texture else 8 bit
   bool use16BitTexture;
-
-  /// use halo effect
-  bool m_bHaloEffect;
 
   /// Our private config file
   csIniFile *config;
@@ -204,6 +201,15 @@ public:
   virtual iTextureManager *GetTextureManager ()
   { return txtmgr; }
 
+  /// Get Z-buffer value at given X,Y position
+  virtual float GetZbuffValue (int x, int y)
+  { return 0; }
+
+  /// Create a halo of the specified color and return a handle.
+  virtual iHalo *CreateHalo (float iR, float iG, float iB,
+    unsigned char *iAlpha, int iWidth, int iHeight)
+  { return NULL; }
+
   /// Set the camera object.
   virtual void SetCamera (iCamera *pCamera)
   { return pCamera; }
@@ -219,54 +225,6 @@ public:
   virtual void OpenFogObject (CS_ID id, csFog* fog);
   virtual void AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype);
   virtual void CloseFogObject (CS_ID id);
-
-  virtual csHaloHandle CreateHalo (float iR, float iG, float iB,
-    float iFactor, float iCross)
-  virtual void DestroyHalo (csHaloHandle iHalo);
-  virtual bool DrawHalo (csVector3 *iCenter, float iIntensity, csHaloHandle iHalo);
-  virtual bool TestHalo (csVector3 *iCenter);
-  virtual void SetHaloClipper (csVector2 *iClipper, int iCount);
-
-  /// Our internal representation of halos.
-  struct csG3DHardwareHaloInfo
-  {
-    HighColorCacheAndManage_Data *halo;
-  };
-
-  /// Actually draws a halo the the screen.
-  class csHaloDrawer
-  {
-  public:
-    ///
-    csHaloDrawer(iGraphics2D* iG2D, float r, float g, float b);
-    ///
-    ~csHaloDrawer();
-
-    unsigned long* GetBuffer() { return mpBuffer; }
-    
-  private:
-
-    /// the width and height of the graphics context
-    int mWidth, mHeight;
-    /// the 2D graphics context.
-    iGraphics2D* m_piG2D;
-    /// the size to be drawn (the diameter of the halo)
-    int mDim;
-    /// the color of the halo
-    float mRed, mGreen, mBlue;
-    /// the ratio of the color intensity vs the radius
-    float mRatioRed, mRatioGreen, mRatioBlue;
-    /// the center coords.
-    int mx, my;
-    /// the buffer.
-    unsigned long* mpBuffer;
-    /// the width of the buffer.
-    int mBufferWidth;
-
-    void drawline_vertical(int x, int y1, int y2);
-    void drawline_outerrim(int x1, int x2, int y);
-    void drawline_innerrim(int x1, int x2, int y);
-  };
 
 private:
   // print to the system's device

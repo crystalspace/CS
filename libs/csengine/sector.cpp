@@ -1,16 +1,16 @@
 /*
     Copyright (C) 1998 by Jorrit Tyberghein
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -30,7 +30,6 @@
 #include "csengine/light.h"
 #include "csengine/camera.h"
 #include "csengine/world.h"
-#include "csengine/halo.h"
 #include "csengine/stats.h"
 #include "csengine/csppulse.h"
 #include "csengine/cbuffer.h"
@@ -39,7 +38,6 @@
 #include "csengine/quadcube.h"
 #include "csgeom/bsp.h"
 #include "csgeom/octree.h"
-#include "ihalo.h"
 #include "igraph3d.h"
 #include "igraph2d.h"
 #include "itxtmgr.h"
@@ -633,7 +631,7 @@ void csSector::Draw (csRenderView& rview)
     // needs to be merged with the bsp). But the csThing need not be convex in
     // that case. If you don't use a static bsp then you can use portals in
     // moving csThings but the csThings containing portals need to be convex.
-    // a static bsp then you can only use portals 
+    // a static bsp then you can only use portals
     //
     // We should see if there are better alternatives to Z-sort which are
     // more accurate in more cases (@@@).
@@ -762,51 +760,10 @@ void csSector::Draw (csRenderView& rview)
   }
 
   // queue all halos in this sector to be drawn.
-  iHaloRasterizer* HaloRast = csWorld::current_world->GetHaloRastizer ();
-  if (!rview.callback && HaloRast)
-  {
-    int numlights = lights.Length();
-    
-    for (i = 0; i<numlights; i++)
-    {
-      csStatLight* light = (csStatLight*)(lights[i]);
-      if (!light->CheckFlags (CS_LIGHT_HALO)) continue;
-
-      // this light is already in the queue.
-      if (light->GetHaloInQueue ())
-        continue;
-
-      CHK (csHaloInformation* cshaloinfo = new csHaloInformation);
-
-      cshaloinfo->v = rview.World2Camera (light->GetCenter ());
-
-      if (cshaloinfo->v.z > SMALL_Z)
-      {
-        float iz = rview.aspect/cshaloinfo->v.z;
-        cshaloinfo->v.x = cshaloinfo->v.x * iz + rview.shift_x;
-        cshaloinfo->v.y = csWorld::frame_height - 1 -
-		(cshaloinfo->v.y * iz + rview.shift_y);
-
-        cshaloinfo->pLight = light;
-
-        cshaloinfo->r = light->GetColor ().red;
-        cshaloinfo->g = light->GetColor ().green;
-        cshaloinfo->b = light->GetColor ().blue;
-        cshaloinfo->intensity = 0.0f;
-
-        if (HaloRast->TestHalo(&cshaloinfo->v))
-        {
-          float hi, hc;
-          light->GetHaloType (hi, hc);
-          cshaloinfo->haloinfo = HaloRast->CreateHalo (cshaloinfo->r,
-            cshaloinfo->g, cshaloinfo->b, hi, hc);
-          csWorld::current_world->AddHalo (cshaloinfo);
-        }
-      }
-      else
-        CHKB (delete cshaloinfo);
-    }
-  }
+  if (!rview.callback)
+    for (i = lights.Length () - 1; i >= 0; i--)
+      // Tell the world to try to add this light into the halo queue
+      csWorld::current_world->AddHalo ((csLight *)lights.Get (i));
 
   if (fogmethod != G3DFOGMETHOD_NONE)
   {
@@ -971,7 +928,7 @@ void* CalculateLightingPolygonsFB (csPolygonParentInt*,
         frust->AddVertex (p->Vwor (j)-center);
       lview->shadows.AddLast (frust);
       frust_cnt--;
-      if (frust_cnt < 0) 
+      if (frust_cnt < 0)
       {
         frust_cnt = 200;
 	CompressShadowFrustrums (&(lview->shadows));

@@ -1239,20 +1239,6 @@ void csTextureManagerSoftware::MergeTexture (iTextureHandle* handle)
     }
   }
 
-#if 0
-  // compute light tables
-  if (txtMode == TXT_PRIVATE)
-    create_lt_truergb_private ();
-  else if (mixing == MIX_TRUE_RGB)
-    create_lt_truergb ();
-  if (truecolor)
-    create_lt_white16 ();
-  else
-    create_lt_white8 ();
-  if (!truecolor)
-    create_lt_alpha ();
-#endif
-
   // Remap all textures according to the new colormap.
   txt->remap_texture (this);
 

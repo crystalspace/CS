@@ -49,7 +49,6 @@ class csCBuffer;
 class csQuadtree;
 class csPoly2DPool;
 class csLightPatchPool;
-struct iHaloRasterizer;
 struct iGraphics3D;
 struct iSystem;
 struct iVFS;
@@ -143,7 +142,7 @@ class csWorld : public iWorld, public csObject
 {
   friend class Dumper;
 
-  // Private class for keeping an array of halo infos
+  // Private class for keeping an array of halos
   class csHaloVector : public csVector
   {
   public:
@@ -153,13 +152,13 @@ class csWorld : public iWorld, public csObject
     virtual ~csHaloVector () { DeleteAll (); }
     // Free an item from array
     virtual bool FreeItem (csSome Item)
-    { CHK (delete (csHaloInformation *)Item); return true; }
+    { CHK (delete (csLightHalo *)Item); return true; }
     // Find a halo by referenced light
     virtual int CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
-    { return ((csHaloInformation *)Item)->pLight == (csLight *)Key ? 0 : -1; }
+    { return ((csLightHalo *)Item)->Light == (csLight *)Key ? 0 : -1; }
     // Return an reference to Nth halo info
-    inline csHaloInformation *Get (int n) const
-    { return (csHaloInformation *)csVector::Get (n); }
+    inline csLightHalo *Get (int n) const
+    { return (csLightHalo *)csVector::Get (n); }
   };
 
 public:
@@ -255,8 +254,6 @@ private:
   csDynLight* first_dyn_lights;
   /// List of halos (csHaloInformation).
   csHaloVector halos;  
-  /// The Halo rasterizer. If NULL halo's are not supported by the rasterizer.
-  iHaloRasterizer* HaloRast;
   /// If true then the lighting cache is enabled.
   bool do_lighting_cache;
 
@@ -396,11 +393,6 @@ public:
   void StartWorld ();
 
   /**
-   * Get the Halo Rasterizer SCF interface if supported (NULL if not).
-   */
-  iHaloRasterizer* GetHaloRastizer () { return HaloRast; }
-
-  /**
    * Clear everything in the world.
    */
   void Clear ();
@@ -473,14 +465,22 @@ public:
   	csLight** lights, int max_num_lights);
 
   /**
-   * Add a halo to the world.
+   * Add a halo attached to given light to the world.
    */
-  void AddHalo (csHaloInformation* iHalo);
+  void AddHalo (csLight* Light);
 
   /**
    * Check if a light has a halo attached.
    */
-  bool HasHalo (csLight* pLight);
+  bool HasHalo (csLight* Light);
+
+  /**
+   * Process a existing light halo. The function changes halo brightness
+   * in dependence whenever the halo is obscured or not and returns "false"
+   * if halo has reached zero intensity and should be removed from halo queue.
+   * The function also actually projects, clips and draws the halo.
+   */
+  bool ProcessHalo (csLightHalo *Halo);
 
   /**
    * Draw the world given a camera and a clipper. Note that

@@ -366,6 +366,15 @@ public:
   { return G3DCOLORFORMAT_24BIT; }
 
   void SysPrintf (int mode, char* str, ...);
+
+  /// Get Z-buffer value at given X,Y position
+  virtual float GetZbuffValue (int x, int y)
+  { return 0; }
+
+  /// Create a halo of the specified color and return a handle.
+  virtual iHalo *CreateHalo (float iR, float iG, float iB,
+    unsigned char *iAlpha, int iWidth, int iHeight)
+  { return NULL; }
 };
 
 #endif
