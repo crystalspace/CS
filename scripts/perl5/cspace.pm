@@ -3134,6 +3134,7 @@ package cspace::iAws;
 *GetObjectRegistry = *cspacec::iAws_GetObjectRegistry;
 *AllWindowsHidden = *cspacec::iAws_AllWindowsHidden;
 *ComponentIsInTransition = *cspacec::iAws_ComponentIsInTransition;
+*ComponentDestroyed = *cspacec::iAws_ComponentDestroyed;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -6381,6 +6382,9 @@ package cspace::iSpriteCal3DState;
 *SetMaterial = *cspacec::iSpriteCal3DState_SetMaterial;
 *SetTimeFactor = *cspacec::iSpriteCal3DState_SetTimeFactor;
 *GetTimeFactor = *cspacec::iSpriteCal3DState_GetTimeFactor;
+*GetAnimationTime = *cspacec::iSpriteCal3DState_GetAnimationTime;
+*GetAnimationDuration = *cspacec::iSpriteCal3DState_GetAnimationDuration;
+*SetAnimationTime = *cspacec::iSpriteCal3DState_SetAnimationTime;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
