@@ -3,72 +3,92 @@
 @cindex Perl
 @cindex @code{csPerl}
 
-CS has extensive bindings for Perl version 5.
+Crystal Space has extensive bindings for Perl version 5.
 
 @subheading Getting Started
 
-To make use of CS classes from a Perl script, first make sure that the file
-cspace.pm (found in your CS/scripts/perl5 directory) is available to Perl.
-The easiest way to do this is with this code near the top of your script:
+To make use of Crystal Space classes from a Perl script, first make sure that
+the file @samp{cspace.pm} is available to Perl.  This file is installed at
+@file{$@{prefix@}/share/crystalspace/perl5}, where @file{$@{prefix@}} is the
+location at which Crystal Space was installed (typically,
+@file{/usr/local}). You may also find a copy of this file in the
+@file{CS/scripts/perl5} source directory.  The easiest way to tell Perl where this file resides is via the @samp{lib} pragma:
+
 @example
-BEGIN @{ push @@INC, "$ENV@{CRYSTAL@}/scripts/perl5" @}
+use lib "$ENV@{CRYSTAL@}/share/crystalspace/perl5";
 @end example
 
-Also make sure that the cspace.so (Unix/Linux/MacOSX) or cspace.dll (Windows)
-file is in the same directory as the cspace.pm file.
+You can also use Perl's @samp{-I} command-line option to tell it the location
+of this file.
 
-Then add this line near the top of the script:
+The @file{cspace.so} (Unix, Linux, MacOS/X) or @file{cspace.dll} (Windows)
+shared library file should reside the same directory as the @file{cspace.pm}
+file. This happens automatically when you install Crystal Space (via @samp{make
+instal} or @samp{jam install}).
+
+To actually utilize Crystal Space from within your script, begin with:
+
 @example
 use cspace;
 @end example
 
 @subheading Quick Start
 
-To get started with pure Perl scripts right away, you probably want to know
-how to initialize CS and get an iObjectRegistry pointer:
+To get started with pure Perl scripts, you probably want to know how to
+initialize Crystal Space and obtain an @samp{iObjectRegistry} pointer:
+
 @example
-$object_reg = cspace::csInitializer::CreateEnvironment([ $0, @ARGV ]);
+my $object_reg =
+  cspace::csInitializer::CreateEnvironment([$0, @@ARGV]);
 @end example
 
 @subheading Functions and Classes
 
-CS has several global functions, which can be accessed easily from Perl.
-For instance, in C++, one might do:
+Crystal Space has several global functions which can be accessed easily from
+Perl.  For instance, in C++, one might say:
+
 @example
-const char *str = "Hello, world!";
-int key = csHashCompute (str);
+char const* str = "Hello, world!";
+int key = csHashCompute(str);
 @end example
+
 Perl is almost exactly the same, the most notable difference being the
 @code{cspace::} prefix:
+
 @example
-$str = "Hello, world!";
-$key = cspace::csHashCompute ($str);
+my $str = "Hello, world!";
+my $key = cspace::csHashCompute($str);
 @end example
 
-To create an object instance, we use the @code{new} "keyword":
+To create an object instance, use the @samp{new} method:
+
 @example
-$vect = new cspace::csVector3 (1, 2, 3);
+my $vect = new cspace::csVector3(1, 2, 3);
 @end example
-The object will be deleted automatically when it goes out of scope.
-Perl also has built-in reference counting, so if the object is still referenced
-in some other Perl code when it goes out of scope, it will still exist until
-there are no more references to it in Perl.
+
+The object will be deleted automatically when it goes out of scope.  Perl also
+has built-in reference counting, so if the object is still referenced in some
+other Perl code when one reference goes out of scope, it will continue to exist
+until there are no more references to it in Perl.
 
 There are three ways to access object properties:
+
 @example
-print $vect->x;		# Preferred way, conforms to Perl convention
-print $vect->@{"x"@};	# Swig's generated primary way
-print $vect->get_x();	# Swig's generated secondary way
+print $vect->x;       # Preferred way, conforms to Perl convention
+print $vect->@{"x"@}; # Swig's generated primary way
+print $vect->get_x(); # Swig's generated secondary way
 @end example
 
-And three ways to modify object properties:
+And, three ways to modify object properties:
+
 @example
-$vect->x(123);		# Preferred way, conforms to Perl convention
-$vect->@{"x"@} = 123;	# Swig's generated primary way
-$vect->set_x(123);	# Swig's generated secondary way
+$vect->x(123);        # Preferred way, conforms to Perl convention
+$vect->@{"x"@} = 123; # Swig's generated primary way
+$vect->set_x(123);    # Swig's generated secondary way
 @end example
 
 Calling methods works as you might expect:
+
 @example
 $vect->Norm();
 @end example
@@ -76,7 +96,7 @@ $vect->Norm();
 @subheading Arrays
 
 Wherever an array is expected, or wherever an array is returned, in or from
-a CS C++ call, a Perl array reference is used.
+a Crystal Space C++ function, a Perl array reference is used.
 
 @subheading Operator Overloading
 
@@ -100,112 +120,116 @@ You can store the returned value in a variable, and use it similarly to how
 objects are used in Perl (see above). You can call their methods in the same
 way, and pass them on to further functions as parameters where appropriate.
 
-The Perl bindings automatically correctly handle csRef and csPtr.
+The Perl bindings automatically correctly handle @code{csRef<>} and
+@code{csPtr<>}.
 
 @subheading Implementing Interfaces
 
-You can write your own Perl class and have it inherit from a CS interface,
-then use instances of that class wherever an implementation of that interface
-is expected. Currently the interfaces that support this feature are
-@code{iEventHandler iEventPlug iAwsSink} but it is easy to add more.
+You can write your own Perl class and have it inherit from a Crystal Space
+interface, then use instances of that class wherever an implementation of that
+interface is expected. Currently the interfaces that support this feature are
+@samp{iEventHandler}, @samp{iEventPlug}, and @samp{iAwsSink}, but it is easy to
+add more.
 
 @example
 package MyPerlEventHandler;
 @@ISA = qw@{ cspace::iEventHandler @};
 sub new
 @{
-  $x = @{@};
-  bless ($x, "MyPerlEventHandler");
+  my $x = @{@};
+  bless($x, "MyPerlEventHandler");
   return $x;
 @}
 sub HandleEvent
 @{
-  ($self, $event) = @@_;
+  my ($self, $event) = @@_;
   # your event handler here...
 @}
 
 package main;
-$eventq = cspace::CS_QUERY_REGISTRY ($object_reg, "iEventQueue");
-$handler = new MyPerlEventHandler;
-$eventq->RegisterListener ($handler);
+my $eventq = cspace::CS_QUERY_REGISTRY($object_reg, "iEventQueue");
+my $handler = new MyPerlEventHandler;
+$eventq->RegisterListener($handler);
 @end example
 
 @subheading Special Cases
 
-@subsubheading Macros that take Interfaces as Parameters
+Take note of these special cases.
 
-In Perl, CS macros that take interface names as parameters, for instance
-@code{CS_QUERY_REGISTRY()}, take those interface names as strings:
+@subsubheading Macros Accepting Interfaces as Parameters
+
+In Perl, Crystal Space macros that take interface names as parameters---for
+instance @code{CS_QUERY_REGISTRY()}---take those interface names as strings:
 
 @example
-$engine = cspace::CS_QUERY_REGISTRY($object_reg, "iEngine");
+my $engine = cspace::CS_QUERY_REGISTRY($object_reg, "iEngine");
 @end example
 
 @subsubheading @code{csRGBpixel}
 
-To convert a @code{csRGBpixel} to a @code{csRGBcolor}, use the
-@code{asRGBcolor} method:
+To convert a @samp{csRGBpixel} to a @samp{csRGBcolor}, use the
+@code{csRGBpixel::asRGBcolor()} method:
 
 @example
-$color = $pixel->asRGBcolor();
+my $color = $pixel->asRGBcolor();
 @end example
 
 @subsubheading @code{iSprite2DState}
 
-@code{iSprite2DState} has an extra method in Perl, @code{GetVertexByIndex},
-which takes a single integer parameter, an array index, and returns a
-@code{csSprite2DVertex} from the sprite's array of vertices.
+@samp{iSprite2DState} has an extra method in Perl, @code{GetVertexByIndex()},
+which accepts a single integer parameter (an array index) and returns a
+@samp{csSprite2DVertex} from the sprite's array of vertices.
 
 @subsubheading @code{iEvent}
 
-The overloaded @code{Add} and @code{Find} methods in @code{iEvent} are
-replaced in Perl with ones with names which explicitly specify the types
-of their parameters (since otherwise Perl wouldn't know which C++ function to
+The overloaded @code{iEvent::Add()} and @code{Find()} methods are
+replaced in Perl with ones given names which explicitly specify the types
+of their parameters (since otherwise Perl would not know which C++ function to
 call):
 
 @itemize @bullet
 @item
-@code{AddInt8}
+@code{AddInt8()}
 @item
-@code{AddInt16}
+@code{AddInt16()}
 @item
-@code{AddInt32}
+@code{AddInt32()}
 @item
-@code{AddUInt8}
+@code{AddUInt8()}
 @item
-@code{AddUInt16}
+@code{AddUInt16()}
 @item
-@code{AddUInt32}
+@code{AddUInt32()}
 @item
-@code{AddFloat}
+@code{AddFloat()}
 @item
-@code{AddDouble}
+@code{AddDouble()}
 @item
-@code{AddString}
+@code{AddString()}
 @item
-@code{AddBool}
+@code{AddBool()}
 @item
-@code{AddVoidPtr}
+@code{AddVoidPtr()}
 @item
-@code{FindInt8}
+@code{FindInt8()}
 @item
-@code{FindInt16}
+@code{FindInt16()}
 @item
-@code{FindInt32}
+@code{FindInt32()}
 @item
-@code{FindUInt8}
+@code{FindUInt8()}
 @item
-@code{FindUInt16}
+@code{FindUInt16()}
 @item
-@code{FindUInt32}
+@code{FindUInt32()}
 @item
-@code{FindFloat}
+@code{FindFloat()}
 @item
-@code{FindDouble}
+@code{FindDouble()}
 @item
-@code{FindString}
+@code{FindString()}
 @item
-@code{FindBool}
+@code{FindBool()}
 @item
-@code{FindVoidPtr}
+@code{FindVoidPtr()}
 @end itemize

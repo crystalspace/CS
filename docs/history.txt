@@ -7,9 +7,15 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 13-Aug-2004
-	- Jorrit added new versions of csPoly3D::ComputeNormal() and ComputePlane()
-	  that accept a csArray<csVector3>.
+	- Jorrit added new versions of csPoly3D::ComputeNormal() and
+	  ComputePlane() that accept a csArray<csVector3>.
 	- Jorrit did further work on the lighter app. Added 'litPolygon' class.
+	- Eric Sunshine made the following changes:
+	    - Updated apimod100.txi to mention that installation location of
+	      the Crystal Space header tree has changed.
+	    - Re-wrote portions of perl.txi to be clearer and more polished.
+	    - Fixed a bunch of Texinfo mark-up problems and 'hbox' warnings in
+	      recently added material.
 12-Aug-2004
 	- Jorrit temporarily put back the old inpnames.h and inpnames.cpp
 	  until the new csInputDefinition class works well for normal keys

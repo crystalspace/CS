@@ -159,52 +159,65 @@ them from your applications if you used them):
 
 @subheading Input Definitions
 
-The file @code{inpnames.h} in @code{csutil} has been renamed to
-@code{inputdef.h} and the following functions have been removed:
+The file @file{csutil/inpnames.h} has been renamed to
+@file{inputdef.h} and the following functions have been removed:
 
 @itemize @bullet
 @item
-@code{csTypeOfInputDef}
+@code{csTypeOfInputDef()}
 @item
-@code{csParseKeyDef}
+@code{csParseKeyDef()}
 @item
-@code{csGetKeyDesc}
+@code{csGetKeyDesc()}
 @item
-@code{csParseMouseDef}
+@code{csParseMouseDef()}
 @item
-@code{csGetMouseDesc}
+@code{csGetMouseDesc()}
 @item
-@code{csParseJoystickDef}
+@code{csParseJoystickDef()}
 @item
-@code{csGetJoystickDesc}
+@code{csGetJoystickDesc()}
 @end itemize
 
-These functions allowed you to convert a string such as @code{"Ctrl+A"},
-@code{"JoystickX"} or @code{"Alt+Mouse1"} into values describing input events
+These functions allowed you to convert a string such as @kbd{@key{Ctrl}+A},
+@samp{JoystickX} or @samp{Alt+Mouse1} into values describing input events
 and vice versa.
 
-The correct way to do this is now to use @code{csInputDefinition} which is
-defined in @code{inputdef.h}. The preferred way to convert a string to a
-definition is to construct a @code{csInputDefinition} from a
-@code{const char *}, and the preferred way to convert a definition back to a
-string (perhaps constructed some other way) is with the @code{ToString} method.
+The way to do this is now, however, is to use @samp{csInputDefinition}, which
+resides in @file{csutil/inputdef.h}. The preferred way to convert a string to a
+definition is to construct a @samp{csInputDefinition} from a @samp{char
+const*}; and the preferred way to convert a definition back to a string
+(perhaps constructed some other way) is via
+@code{csInputDefinition::ToString()}.
 
-However, there are static helper methods in @code{csInputDefinition} which
-accept arguments in a similar way to the old functions, which perform the
+There are also static helper methods in @samp{csInputDefinition} which
+accept arguments in a similar way to the old functions. These are
+convenience methods which perform the
 work of instantiating the object for you:
 
-@itemize
+@itemize @bullet
 @item
-@code{csInputDefinition::ParseKey}
+@code{csInputDefinition::ParseKey()}
 @item
-@code{csInputDefinition::GetKeyString}
+@code{csInputDefinition::GetKeyString()}
 @item
-@code{csInputDefinition::ParseOther}
+@code{csInputDefinition::ParseOther()}
 @item
-@code{csInputDefinition::GetOtherString}
+@code{csInputDefinition::GetOtherString()}
 @end itemize
 
 @subheading Pollution Reduction
+
+In order to avoid polluting the top-level system include directory, the Crystal
+Space header tree is now installed (by @samp{make install} or
+@samp{jam install}) in a subdirectory named @file{crystalspace}, rather than
+being installed directly in top-level system directory. For example, assuming
+the default installation location, the Crystal Space headers are now installed
+in @file{/usr/local/include/crystalspace}. Previously, they would have been
+installed directly in @file{/usr/local/include}. The @samp{cs-config} utility
+script properly returns the new header location in response to the
+@samp{--includedir}, @samp{--cflags}, and @samp{--cxxflags} options, so this
+relocation should be mostly transparent to external projects.
 
 The following global header files have been renamed in order to avoid possible
 conflict with headers installed by other packages.
