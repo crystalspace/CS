@@ -25,11 +25,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/impexp/3ds
 
 ifeq ($(USE_PLUGINS),yes)
-  IEPLEX = $(OUTDLL)ieplex$(DLL)
+  IE3DS = $(OUTDLL)ie3ds$(DLL)
   LIB.IE3DS = $(foreach d,$(DEP.IE3DS),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(IE3DS)
 else
-  IEPLEX = $(OUT)$(LIB_PREFIX)ie3ds$(LIB)
+  IE3DS = $(OUT)$(LIB_PREFIX)ie3ds$(LIB)
   DEP.EXE += $(IE3DS)
   SCF.STATIC += ie3ds
   TO_INSTALL.STATIC_LIBS += $(IE3DS)
@@ -38,7 +38,7 @@ endif
 INC.IE3DS = $(wildcard plugins/mesh/impexp/3ds/*.h)
 SRC.IE3DS = $(wildcard plugins/mesh/impexp/3ds/*.cpp)
 OBJ.IE3DS = $(addprefix $(OUT),$(notdir $(SRC.IE3DS:.cpp=$O)))
-DEP.IE3DS = CSGEOM CSUTIL CSSYS CSTOOL CSUTIL
+DEP.IE3DS = CSUTIL CSSYS CSTOOL CSUTIL CSGEOM 
 
 MSVC.DSP += IE3DS
 DSP.IE3DS.NAME = ie3ds
@@ -53,7 +53,7 @@ ifeq ($(MAKESECTION),targets)
 ie3ds: $(OUTDIRS) $(IE3DS)
 
 $(IE3DS): $(OBJ.IE3DS) $(LIB.IE3DS)
-	$(DO.PLUGIN)
+	$(DO.PLUGIN) -l3ds
 
 clean: ie3dsclean
 ie3dsclean:
