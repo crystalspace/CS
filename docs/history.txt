@@ -16,6 +16,16 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine updated the comments in configure.ac to more fully
 	  inform the reader about the Autoconf bugs which configure.ac works
 	  around.
+	- Eric Sunshine made the following changes to the new csArray template:
+	    - Fixed bad bug: Public SetLength() allowed client to
+	      indiscriminately add and remove elements from the array without
+	      proper construction/deletion.  This unsafe method has been
+	      replaced with safe methods Truncate() and SetCapacity().
+	    - Fixed bad bug: Pop() was returning a destroyed object.
+	    - Fixed non-portable constructs which would fail with some
+	      compilers.
+	    - Added several new useful methods.
+	    - Generally cleaned up and unified the code.
 1-Feb-2003
 	- Marten Svanfeldt completly rewrote the renderbuffer manager using
 	  the VAR extension on Nvidia-cards

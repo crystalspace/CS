@@ -1,5 +1,5 @@
 /*
-  Crystal Space Template Arrays
+  Crystal Space Generic Array Template
   Copyright (C) 2003 by Matze Braun
 
   This library is free software; you can redistribute it and/or
@@ -20,89 +20,105 @@
 #define __CSUTIL_ARRAY_H__
 
 #include <new>
-#include "csutil/ref.h"
 
 /**
- * A templated array class. The objects in this class are constructed via
- * copy-constructor and are delete when they're removed from the array or the
- * array goes.
- * Note: If you want to store iSomething*, then you should look at csRefArray
- * instead of this class! csRefArray additionally takes care of the
- * refcounting.
+ * A templated array class.  The objects in this class are constructed via
+ * copy-constructor and are destroyed when they are removed from the array or
+ * the array is destroyed.  Note: If you want to store reference-counted object
+ * pointers (such as iSomething*), then you should look at csRefArray instead
+ * of this class.
  */
 template <class T>
 class csArray
 {
 private:
-  int count, limit, threshold;
+  int count;
+  int capacity;
+  int threshold;
   T* root;
 
-  void ConstructElement (int n, const T& elem)
+  void ConstructElement (int n, T const& src)
   {
-    new (static_cast<void*>(root+n)) T(elem);
+    new (static_cast<void*>(root + n)) T(src);
   }
-  void DestructElement (int n)
+  void DestroyElement (int n)
   {
-    (root+n)->~T ();
+    (root + n)->~T::T();
+  }
+
+  // Set array length.  NOTE: Do not make this public since it does not
+  // properly construct/destroy elements.  To safely truncate the array, use
+  // Truncate().  To safely set the capacity, use SetCapacity().
+  void SetLengthUnsafe (int n)
+  {
+    count = n;
+    if (n > capacity || (capacity > threshold && n < capacity - threshold))
+    {
+      n = ((n + threshold - 1) / threshold ) * threshold;
+      if (root == 0)
+        root = (T*)malloc (n * sizeof(T));
+      else
+        root = (T*)realloc (root, n * sizeof(T));
+      capacity = n;
+    }
   }
 
 public:
   /**
-   * Initialize object to hold initially 'ilimit' elements, and increase
-   * storage by 'ithreshold' each time the upper bound is exceeded.
+   * Initialize object to have initial capacity of 'icapacity' elements, and to
+   * increase storage by 'ithreshold' each time the upper bound is exceeded.
    */
-  csArray (int ilimit = 0, int ithreshold = 0)
+  csArray (int icapacity = 0, int ithreshold = 0)
   {
     count = 0;
-    limit = (ilimit > 0 ? ilimit : 0);
+    capacity = (icapacity > 0 ? icapacity : 0);
     threshold = (ithreshold > 0 ? ithreshold : 16);
-    if (limit != 0)
-      root = (T*)malloc (limit * sizeof(T));
+    if (capacity != 0)
+      root = (T*)malloc (capacity * sizeof(T));
     else
-      root = NULL;
+      root = 0;
   }
 
-  /**
-   * Clear entire vector.
-   */
+  /// Clear entire vector, releasing all memory.
   void DeleteAll ()
   {
-    for (int i=0; i<count; i++)
-    {
-      DestructElement (i);
-    }
-    if (root)
+    for (int i = 0; i < count; i++)
+      DestroyElement (i);
+    if (root != 0)
     {
       free (root);
-      root = NULL;
-      limit = count = 0;
+      root = 0;
+      capacity = 0;
+      count = 0;
+    }
+  }
+
+  /// Truncate array to specified number of elements.
+  void Truncate(int n)
+  {
+    CS_ASSERT(n >= 0);
+    CS_ASSERT(n <= count);
+    if (n < count)
+    {
+      for (int i = n; i < count; i++)
+        DestroyElement(i);
+      SetLengthUnsafe(n);
     }
   }
 
   /**
-   * Destroy the container.
+   * Remove all elements.  Similar to DeleteAll(), but does not release memory
+   * used by the array itself, thus making it more efficient for cases when the
+   * number of contained elements will fluctuate.
    */
+  void Empty()
+  { Truncate(0); }
+
+
+  /// Destroy the container.
   ~csArray ()
   {
     DeleteAll ();
-  }
-
-  /// Set vector length to n.
-  void SetLength (int n)
-  {
-    count = n;
-
-    if (n > limit || (limit > threshold && n < limit - threshold))
-    {
-      n = ((n + threshold - 1) / threshold ) * threshold;
-      if (!n)
-        DeleteAll ();
-      else if (root == NULL)
-        root = (T*)malloc (n * sizeof(T));
-      else
-        root = (T*)realloc (root, n * sizeof(T));
-      limit = n;
-    }
   }
 
   /// Query vector length.
@@ -111,63 +127,90 @@ public:
     return count;
   }
 
-  /// Query vector limit.
-  int Limit () const
+  /// Query vector capacity.  Note that you should rarely need to do this.
+  int Capacity () const
   {
-    return limit;
+    return capacity;
   }
 
-  /// Get an element
-  const T& Get (int n) const
+  /*
+   * Set vector capacity to approximately 'n' elements.  Never sets the
+   * capacity to fewer than the current number of elements in the array.  See
+   * Truncate() if you need to adjust the number of actual array elements.
+   */
+  void SetCapacity (int n)
+  {
+    if (n > Length())
+      SetLengthUnsafe(n);
+  }
+
+  /// Get an element (const).
+  T const& Get (int n) const
   {
     CS_ASSERT (n >= 0 && n < count);
     return root[n];
   }
 
-  /// Get a const reference.
-  const T& operator [] (int n) const
+  /// Get an element (non-const).
+  T& Get (int n)
+  {
+    CS_ASSERT (n >= 0 && n < count);
+    return root[n];
+  }
+
+  /// Get an element (const).
+  T const& operator [] (int n) const
+  {
+    return Get(n);
+  }
+
+  /// Get an element (non-const).
+  T& operator [] (int n)
   {
     return Get(n);
   }
 
   /// Find a element in array and return its index (or -1 if not found).
-  int Find (T which) const
+  int Find (T const& which) const
   {
-    int i;
-    for (i = 0 ; i < Length () ; i++)
+    for (int i = 0, n = Length(); i < n; i++)
       if (root[i] == which)
         return i;
     return -1;
   }
 
-  /// Push a element on 'top' of vector.
-  int Push (const T& what)
+  /// Push an element onto the tail end of the array. Returns index of element.
+  int Push (T const& what)
   {
-    SetLength (count + 1);
-    ConstructElement (count-1, what);
+    SetLengthUnsafe (count + 1);
+    ConstructElement (count - 1, what);
     return (count - 1);
   }
 
-  /// Push a element on 'top' of vector if it is not already there.
-  int PushSmart (const T& what)
+  /*
+   * Push a element onto the tail end of the array if not already present.
+   * Returns index of newly pushed element or index of already present element.
+   */
+  int PushSmart (T const& what)
   {
-    int n = Find (what);
-    return (n == -1) ? Push (what) : n;
+    int const n = Find (what);
+    return (n < 0) ? Push (what) : n;
   }
 
-  /// Pop an element from vector 'top'.
+  /// Pop an element from tail end of array.
   T Pop ()
   {
-    CS_ASSERT (length>0);
-    const T& ret = root [count - 1];
-    DestructElement (count-1);
-    SetLength (count - 1);
+    CS_ASSERT (length > 0);
+    T ret(root [count - 1]);
+    DestroyElement (count - 1);
+    SetLengthUnsafe (count - 1);
     return ret;
   }
 
-  /// Return the top element but don't remove it.
-  const T& Top () const
+  /// Return the top element but do not remove it.
+  T const& Top () const
   {
+    CS_ASSERT (length > 0);
     return root [count - 1];
   }
 
@@ -176,14 +219,12 @@ public:
   {
     if (n >= 0 && n < count)
     {
-      const int ncount = count - 1;
-      const int nmove = ncount - n;
-      DestructElement (n);
+      int const ncount = count - 1;
+      int const nmove = ncount - n;
+      DestroyElement (n);
       if (nmove > 0)
-      {
-        memmove (&root [n], &root [n + 1], nmove * sizeof (T));
-      }
-      SetLength (ncount);
+        memmove (root + n, root + n + 1, nmove * sizeof(T));
+      SetLengthUnsafe (ncount);
       return true;
     }
     else
@@ -191,31 +232,29 @@ public:
   }
 
   /// Delete the given element from vector.
-  bool Delete (const T& item)
+  bool Delete (T const& item)
   {
-    int n = Find (item);
-    if (n == -1) return false;
-    else return Delete (n);
+    int const n = Find (item);
+    if (n >= 0)
+      return Delete(n);
+    return false;
   }
 
-  /// Insert element 'Item' before element 'n'.
-  bool Insert (int n, const T& item)
+  /// Insert element 'item' before element 'n'.
+  bool Insert (int n, T const& item)
   {
     if (n <= count)
     {
-      SetLength (count + 1); // Increments 'count' as a side-effect.
-      const int nmove = (count - n - 1);
+      SetLengthUnsafe (count + 1); // Increments 'count' as a side-effect.
+      int const nmove = (count - n - 1);
       if (nmove > 0)
-      {
-        memmove (&root [n + 1], &root [n], nmove * sizeof (T));
-      }
+        memmove (root + n + 1, root + n, nmove * sizeof(T));
       ConstructElement (n, item);
       return true;
     }
     else
-     return false;
+      return false;
   }
 };
 
 #endif
-
