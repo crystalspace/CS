@@ -1,6 +1,15 @@
 The history order has been reversed so that new features are at the top.
 
 20-Jun-2000
+	- Changed default halo parameters a bit to more resemble a
+	  cross.
+	- Added SNOW, RAIN, and FOUNTAIN keywords to the world file format.
+	  For a simple fountain use: FOUNTAIN 'fount1' (ORIGIN (x,y,z)
+	  	TEXTURE ('green.gif'))
+	  For snow use: SNOW 'snow' (BOX (x1,y1,z1,x2,y2,z2)
+	  	TEXTURE ('snow.jpg'))
+	  There are many more options. See docs/incoming/worldfmt.tex
+	  for a list.
 	- Wouter Wijngaards added a fountain particle system. Under
 	  construction still...
 	- Added 'fountain' console command to create a fountain.
