@@ -13,6 +13,9 @@ chronological order.
 	  and new renderer enabled and while using profile mode???
 	- Jorrit modified csMovableSectorList so it no longer uses
 	  embedding to implement iSectorList.
+	- Jorrit reverted the Jamfile modification for dynavis to add a new
+	  dynavis_debug target. It conflicts somehow with the standard
+	  dynavis target.
 21-Oct-2003
 	- Rhad added UI for Initial Speed and Initial Acceleration to partedit.
 	- Eric Sunshine made the following configuration-related changes:
