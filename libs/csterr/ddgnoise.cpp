@@ -271,7 +271,7 @@ void ddgNoise::init(void)
 		normalize3(g3[i]);
 	}
 
-	while (--i) {
+	while (--i != 0) {
 		k = p[i];
 		p[i] = p[j = rand() % B];
 		p[j] = k;
