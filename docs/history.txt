@@ -33,6 +33,8 @@ chronological order.
 	    fix). 
 	  - Patched in changes suggested by Dentoid to increase frame
 	    update speed.
+	- res fixed the crash bug when using '-mode' cmdline parameter with
+	  GL canvases.
 12-Aug-2003
 	- Jorrit fixed a compile error in the OpenGL Windows canvas after the
 	  changes from res yesterday.

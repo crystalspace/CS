@@ -41,6 +41,7 @@ csGraphics2DGLCommon::csGraphics2DGLCommon (iBase *iParent) :
   screen_shot = 0;
   multiSamples = 0;
   multiFavorQuality = false;
+  fontCache = 0;
 
   ssPool = 0;
 }
@@ -670,7 +671,6 @@ bool csGraphics2DGLCommon::Resize (int width, int height)
   {
     Width = width;
     Height = height;
-    SetClipRect (0, 0, Width, Height);
     return true;
   }
   if (!AllowResizing)
