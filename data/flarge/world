@@ -98,7 +98,7 @@
             <file>/lib/std/seagull.gif</file>
         </texture>
         <texture name="flickernote">
-            <file>flicker-note1.png</file>
+            <file>/lib/stdtex/flicker-note1.png</file>
         </texture>
     </textures>
     <settings>

@@ -6,6 +6,8 @@ The history order is reversed so that new features are at the top.
   - Philip Wyett also moved changes by jorrit which remove misleading
     texture not found messages and res's change to add texture which lets
     people know that the outdoor flickering is intentional.
+  - Philip Wyett moved the flicker-note texture into 'stdtex.zip', updated the
+    world accordingly and removed the texture from the 'data/flarge' directory.
 9-Feb-2003
   - Philip Wyett extended Cygwin docs to cover installation of MNG
     and the Open Dynamics Engine (ODE) libraries.
