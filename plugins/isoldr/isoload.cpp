@@ -65,6 +65,8 @@
 #include "ivaria/iso.h"
 #include "ivaria/isoldr.h"
 
+#include "qint.h"
+
 #include "isoload.h"
 
 // ---------- Plugin Stuff -------------
@@ -328,7 +330,7 @@ bool csIsoLoader::LoadMap (char* buf)
   CS_TOKEN_TABLE_END
 
   CS_TOKEN_TABLE_START (commands)
-	  CS_TOKEN_TABLE (GRIDS)
+    CS_TOKEN_TABLE (GRIDS)
     CS_TOKEN_TABLE (MATERIALS)
     CS_TOKEN_TABLE (PLUGINS)
     CS_TOKEN_TABLE (MESHFACT)
@@ -796,10 +798,10 @@ bool csIsoLoader::ParseTile2D (char* buf, const char* prefix)
 
   if (start.y == end.y)
   {
-    y = start.y;
-    for(z=start.z; z<end.z; z++)
+    y = QInt(start.y);
+    for(z=QInt(start.z); z<end.z; z++)
 	  {
-      for(x=start.x; x<end.x; x++)
+      for(x=QInt(start.x); x<end.x; x++)
 	    {
 //        ReportNotify("Tiling at %d %d %d",x,y,z);
 
@@ -817,10 +819,10 @@ bool csIsoLoader::ParseTile2D (char* buf, const char* prefix)
   } 
   else if (start.x == end.x)
   {  
-    x = start.x;
-    for(z=start.z; z<end.z; z++)
+    x = QInt(start.x);
+    for(z=QInt(start.z); z<end.z; z++)
     {
-      for(y=start.y; y<end.y; y++)
+      for(y=QInt(start.y); y<end.y; y++)
       {
 //        ReportNotify("Tiling at %d %d %d",x,y,z);
 
@@ -838,10 +840,10 @@ bool csIsoLoader::ParseTile2D (char* buf, const char* prefix)
   }
   else if (start.z == end.z)
   {
-    z = start.z;
-    for(x=start.x; x<end.x; x++)
+    z = QInt(start.z);
+    for(x=QInt(start.x); x<end.x; x++)
     {
-      for(y=start.y; y<end.y; y++)
+      for(y=QInt(start.y); y<end.y; y++)
       {		
 //        ReportNotify("Tiling at %d %d %d",x,y,z);
         
@@ -925,7 +927,6 @@ bool csIsoLoader::ParseMeshFactory(char *buf, const char *prefix)
 
   char classId[255];
   iLoaderPlugin* plug = NULL;
-  iMaterialWrapper* mat = NULL;
 
   iMeshFactoryWrapper* mfw = Engine->CreateMeshFactory(prefix);
 
@@ -986,7 +987,7 @@ bool csIsoLoader::ParseMeshFactory(char *buf, const char *prefix)
         break;
 
       case CS_TOKEN_MESHFACT:
-	    case CS_TOKEN_MATERIAL:
+      case CS_TOKEN_MATERIAL:
       case CS_TOKEN_FILE:
       case CS_TOKEN_MOVE:
 	      {
@@ -1032,7 +1033,6 @@ bool csIsoLoader::ParseMeshObject (char* buf, const char* prefix)
   iLoaderPlugin* plug = NULL;
   csMatrix3 m;
   csVector3 v;
-  int zmode=CS_ZBUF_TEST;
 
   SCF_DEC_REF (ldr_context); ldr_context = NULL;
 
@@ -1152,6 +1152,7 @@ bool csIsoLoader::ParseMeshObject (char* buf, const char* prefix)
 	          return false;
           }
           meshspr->SetMeshObject(meshobj);
+          mo->DecRef();
         }
         break;
 
@@ -1219,6 +1220,7 @@ csIsoLoader::csIsoLoader(iBase *p)
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 
   world = NULL;
+  view = NULL;
   current_grid = NULL;
   plugin_mgr = NULL;
   object_reg = NULL;
@@ -1233,9 +1235,12 @@ csIsoLoader::~csIsoLoader()
 {
   SCF_DEC_REF(ldr_context);
   SCF_DEC_REF(plugin_mgr);
+  SCF_DEC_REF(world);
+  SCF_DEC_REF(view);
   SCF_DEC_REF(Engine);
   SCF_DEC_REF(VFS);
   SCF_DEC_REF(G3D);
+  SCF_DEC_REF(Syntax);
   SCF_DEC_REF(Reporter);
 }
 
@@ -1275,7 +1280,7 @@ bool csIsoLoader::Initialize(iObjectRegistry *object_Reg)
   }
 
   // Use the most excellent syntax services to parse
-  // matrices, vectors and other genric stuff
+  // matrices, vectors and other generic stuff
   Syntax = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   if (!Syntax)
   {
