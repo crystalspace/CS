@@ -38,6 +38,8 @@ IMPLEMENT_UNKNOWN_NODELETE (csGraphics2DGlideX)
   // replace this with config stuff...
 bool DoGlideInWindow=true; 
 
+bool locked;
+
 // csGraphics2DGLX functions
 csGraphics2DGlideX::csGraphics2DGlideX(ISystem* piSystem) :
   csGraphics2D (piSystem), xim (NULL), cmap (0)

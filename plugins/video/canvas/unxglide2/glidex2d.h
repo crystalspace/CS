@@ -72,7 +72,6 @@ private:
   bool bPaletteChanged;
   int glDrawMode;
   GrLfbInfo_t lfbInfo;
-  bool locked;	
   bool m_DoGlideInWindow;
 
   // Window colormap
@@ -119,7 +118,7 @@ public:
 
   virtual void DrawLine (int x1, int y1, int x2, int y2, int color);
   
-  void DrawPixelGlide (int x, int y, int color);
+  static void DrawPixelGlide (int x, int y, int color);
   static void WriteCharGlide (int x, int y, int fg, int bg, char c);
   static void DrawSpriteGlide (ITextureHandle *hTex, int sx, int sy, 
                         int sw, int sh, int tx, int ty, int tw, int th);
