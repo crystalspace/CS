@@ -208,7 +208,7 @@ struct iSyntaxService : public iBase
    * Report an error and also gives a path in the XML tree.
    */
   virtual void ReportError (const char* msgid, iDocumentNode* errornode,
-	const char* msg, ...) = 0;
+	const char* msg, ...) CS_GNUC_PRINTF(4,5) = 0;
 
   /**
    * Report a bad token. This is a conveniance function which will
@@ -220,7 +220,7 @@ struct iSyntaxService : public iBase
    * Report something, also gives a path in the XML tree.
    */
   virtual void Report (const char* msgid, int severity, 
-    iDocumentNode* errornode, const char* msg, ...) = 0;
+    iDocumentNode* errornode, const char* msg, ...) CS_GNUC_PRINTF(5,6) = 0;
 };
 
 /** @} */
