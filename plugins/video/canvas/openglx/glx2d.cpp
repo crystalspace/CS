@@ -367,10 +367,10 @@ bool csGraphics2DGLX::Open(const char *Title)
   XMapRaised (dpy, wm_window);
 
   // Create mouse cursors
+  char zero = 0;
+  EmptyPixmap = XCreatePixmapFromBitmapData (dpy, window, &zero, 1, 1, 0, 0, 1);
   XColor Black;
   memset (&Black, 0, sizeof (Black));
-  memset (MouseCursor, 0, sizeof (Cursor) * (int(csmcWait)+1));
-  EmptyPixmap = XCreatePixmap (dpy, window, 1, 1, 1);
   EmptyMouseCursor = XCreatePixmapCursor (dpy, EmptyPixmap, EmptyPixmap,
     &Black, &Black, 0, 0);
   MouseCursor [csmcArrow] = XCreateFontCursor (dpy, XC_left_ptr);

@@ -119,8 +119,6 @@ public:
   csComponent *FocusOwner;
   /// The global skin repository
   csSkin *skin;
-  /// If this flag is set, there are still unrefreshed components
-  bool RedrawFlag;
   /// This is set to TRUE each time top-level window list changes
   bool WindowListChanged;
   /// Global "Insert" key state

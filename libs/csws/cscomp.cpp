@@ -439,27 +439,16 @@ bool csComponent::HandleEvent (iEvent &Event)
   switch (Event.Type)
   {
     case csevBroadcast:
-      switch (Event.Command.Code)
+      if (Event.Command.Code == cscmdSkinChanged)
       {
-        // If this is a post-process broadcast, redraw and pass it to children
-        case cscmdRedraw:
-        {
-          Redraw ();                              // redraw invalidated rectangle
-          ForEach (do_handle_event, &Event);
-          return false;
-        }
-        case cscmdSkinChanged:
-        {
-	  const char *name = GetSkinName ();
-          if (name)
-            if (!ApplySkin ((csSkin *)Event.Command.Info))
-            {
-              app->System->Printf (MSG_FATAL_ERROR,
-                "The skin does not contain a slice for component `%s'\n", name);
-              abort ();
-            }
-          break;
-        }
+        const char *name = GetSkinName ();
+        if (name)
+          if (!ApplySkin ((csSkin *)Event.Command.Info))
+          {
+            app->System->Printf (MSG_FATAL_ERROR,
+              "The skin does not contain a slice for component `%s'\n", name);
+            abort ();
+          }
       }
       break;
     case csevCommand:
@@ -497,22 +486,24 @@ AbortDrag:
           app->CaptureMouse (NULL);
         return true;
       case csevMouseMove:
-      {
-        int dX = Event.Mouse.x, dY = Event.Mouse.y;
-        LocalToGlobal (dX, dY);
-        dX -= dragX; dY -= dragY;
-        int newXmin = dragBound.xmin, newXmax = dragBound.xmax;
-        int newYmin = dragBound.ymin, newYmax = dragBound.ymax;
+        if (GetState (CSS_FOCUSED))
+        {
+          int dX = Event.Mouse.x, dY = Event.Mouse.y;
+          LocalToGlobal (dX, dY);
+          dX -= dragX; dY -= dragY;
+          int newXmin = dragBound.xmin, newXmax = dragBound.xmax;
+          int newYmin = dragBound.ymin, newYmax = dragBound.ymax;
 
-        if (dragMode & CS_DRAG_XMIN) newXmin += dX;
-        if (dragMode & CS_DRAG_XMAX) newXmax += dX;
-        if (dragMode & CS_DRAG_YMIN) newYmin += dY;
-        if (dragMode & CS_DRAG_YMAX) newYmax += dY;
+          if (dragMode & CS_DRAG_XMIN) newXmin += dX;
+          if (dragMode & CS_DRAG_XMAX) newXmax += dX;
+          if (dragMode & CS_DRAG_YMIN) newYmin += dY;
+          if (dragMode & CS_DRAG_YMAX) newYmax += dY;
 
-        SetDragRect (newXmin, newYmin, newXmax, newYmax);
-        SetSizingCursor (dragMode);
-        return true;
-      }
+          SetDragRect (newXmin, newYmin, newXmax, newYmax);
+          SetSizingCursor (dragMode);
+          return true;
+        }
+        break;
     } /* endswitch */
   } /* endif */
 
@@ -530,7 +521,7 @@ AbortDrag:
       // Pass mouse events to 'clip children'
       for (int i = clipchildren.Length () - 1; i >= 0; i--)
       {
-        csComponent *child = (csComponent *)clipchildren [i];
+        csComponent *child = (csComponent *)clipchildren.Get (i);
         // If child is not visible, skip it
         if (child->GetState (CSS_VISIBLE))
         {
@@ -860,14 +851,153 @@ bool csComponent::FixFocused ()
   }
 }
 
+void csComponent::CheckDirtyTD (csRect &ioR)
+{
+  if (!GetState (CSS_VISIBLE))
+    return;
+
+  // Transform rectangle from parent's coordinate system to ours
+  csRect r (ioR);
+  if (!r.IsEmpty ())
+  {
+    r.Move (-bound.xmin, -bound.ymin);
+    // Clip to our bounds
+    if (r.xmin < 0) r.xmin = 0;
+    if (r.ymin < 0) r.ymin = 0;
+    if (r.xmax > bound.Width ())  r.xmax = bound.Width ();
+    if (r.ymax > bound.Height ()) r.ymax = bound.Height ();
+  }
+
+  if (!r.IsEmpty () || GetState (CSS_DIRTY))
+  {
+    // Loop through all child components from top - down in Z order,
+    // and see if any of the dirty chids are transparent; if so, we
+    // should mark as dirty the respective area on their neightbours.
+
+    // "Clip children" are always topmost, so start from them
+    for (int i = clipchildren.Length () - 1; i >= 0; i--)
+      ((csComponent *)clipchildren.Get (i))->CheckDirtyTD (r);
+
+    // Loop through all "direct" children top-down
+    csComponent *c = top;
+    if (c)
+      do
+      {
+        if (c->clipparent == this)
+          c->CheckDirtyTD (r);
+        c = c->prev;
+      } while (c != top);
+
+    // Add the rectangle - after processing by all childs - to our dirty rectangle
+    dirty.Union (r);
+    if (!dirty.IsEmpty ())
+      SetState (CSS_DIRTY, true);
+  }
+
+  // If we are transparent, add our dirty rectangle to output rectangle.
+  if (GetState (CSS_TRANSPARENT))
+  {
+    // Transfer rectangle to parent's coordinate system
+    r.Set (dirty);
+    r.Move (bound.xmin, bound.ymin);
+    ioR.Union (r);
+  }
+  else
+    // If we are not transparent subtract our bounds from output rectangle.
+    ioR.Exclude (bound);
+}
+
+void csComponent::CheckDirtyBU (csRect &ioR)
+{
+  if (!GetState (CSS_VISIBLE))
+    return;
+
+  // Add the rectangle to our dirty area if we're transparent
+  if (!ioR.IsEmpty ())
+  {
+    if (GetState (CSS_TRANSPARENT))
+    {
+      csRect r (ioR);
+      r.Intersect (bound);
+      // Transform rectangle from parent's coordinate system to ours
+      r.Move (-bound.xmin, -bound.ymin);
+      dirty.Union (r);
+      if (!dirty.IsEmpty ())
+        SetState (CSS_DIRTY, true);
+    }
+    else
+      ioR.Exclude (bound);
+  }
+
+  if (!GetState (CSS_DIRTY))
+    return;
+
+  // Loop through all child components from bottom - up in Z order,
+  // and see if any of the dirty chids are transparent; if so, we
+  // should propagate our dirty area to them.
+  csRect r (dirty);
+
+  // Loop through all "direct" children bottom-up
+  if (top)
+  {
+    csComponent *bottom = top->next;
+    csComponent *c = bottom;
+    do
+    {
+      if (c->clipparent == this)
+        c->CheckDirtyBU (r);
+      c = c->next;
+    } while (c != bottom);
+  }
+
+  // Continue with "clip children" bottom-up
+  for (int i = 0; i < clipchildren.Length (); i++)
+    ((csComponent *)clipchildren.Get (i))->CheckDirtyBU (r);
+
+  // Add the dirty rectangle into output rectangle
+  r.Move (bound.xmin, bound.ymin);
+  ioR.Union (r);
+}
+
 void csComponent::Redraw ()
 {
-  if (!dirty.IsEmpty ())
+  if (GetState (CSS_DIRTY))
   {
-    SetClipRect ();
-    Draw ();
-    dirty.MakeEmpty ();
+    if (!dirty.IsEmpty ())
+    {
+#if 0
+// for debugging: type the title of the component, the bounds and the dirty area
+printf ("%s: %d,%d (%d,%d) -- dirty: %d,%d (%d,%d)\n", text,
+  bound.xmin, bound.ymin, bound.Width(), bound.Height(),
+  dirty.xmin, dirty.ymin, dirty.Width(), dirty.Height());
+#endif
+      // Disable any additional clipping
+      SetClipRect ();
+      // Compute the visible region
+      visregion.Push (new csRect (dirty));
+      Clip (visregion, this);
+      // Perform drawing, if it makes sense
+      if (visregion.Length ())
+        Draw ();
+      // Free the visible region
+      visregion.DeleteAll ();
+    }
+    // Okay, now clear the dirty flag
+    SetState (CSS_DIRTY, false);
   }
+
+  // Now redraw all child components, from bottom to top in Z-order
+  if (top)
+  {
+    csComponent *cur = top->next;
+    csComponent *last = cur;
+    do
+    {
+      if (cur->GetState (CSS_DIRTY))
+        cur->Redraw ();
+      cur = cur->next;
+    } while (cur != last);
+  } /* endif */
 }
 
 void csComponent::Draw ()
@@ -921,12 +1051,41 @@ bool csComponent::SetRect (int xmin, int ymin, int xmax, int ymax)
     return false;
   csRect inv (bound);
   bound.Set (xmin, ymin, xmax, ymax);
+
+  // Invalidate all children if we were moved
+  bool moved = (inv.xmin != bound.xmin) || (inv.ymin != bound.ymin);
+  Invalidate (moved);
+
+  // If we were not moved, but were resized we should invalidate all the
+  // child components who were perhaps exposed a little more (because of
+  // clipping some components may be shown partially; when the window grows,
+  // the exposed part of those components has to be invalidated).
+  if (!moved && focused)
+  {
+    csRect br (0, inv.Height (), inv.Width (), bound.Height ());
+    csRect rr (inv.Width (), 0, bound.Width (), bound.Height ());
+    if (!br.IsEmpty () || !rr.IsEmpty ())
+    {
+      csComponent *cur = focused;
+      do
+      {
+        if (br.Intersects (cur->bound))
+          cur->Invalidate (br.xmin - cur->bound.xmin, br.ymin - cur->bound.ymin,
+            br.xmax - cur->bound.xmin, br.ymax - cur->bound.ymin, true);
+        if (rr.Intersects (cur->bound))
+          cur->Invalidate (rr.xmin - cur->bound.xmin, rr.ymin - cur->bound.ymin,
+            rr.xmax - cur->bound.xmin, rr.ymax - cur->bound.ymin, true);
+        cur = cur->next;
+      } while (cur != focused);
+    }
+  }
+
   if (parent)
   {
     inv.Exclude (xmin, ymin, xmax, ymax);
     parent->Invalidate (inv, true, this);
   }
-  Invalidate (true);
+
   return true;
 }
 
@@ -948,68 +1107,46 @@ bool csComponent::SetDragRect (int xmin, int ymin, int xmax, int ymax)
   return SetRect (xmin, ymin, xmax, ymax);
 }
 
-// private structure used when invalidating child windows
-struct inv_struct
-{
-  csRect inv;
-  csComponent *below;
-  inv_struct (int w, int h, csComponent *b) : inv (0, 0, w, h), below (b)
-  { }
-};
-
-static bool do_invalidate (csComponent *child, void *param)
-{
-  inv_struct *is = (inv_struct *)param;
-  if (is->below)
-  {
-    if (is->below == child)
-      is->below = NULL;
-    return false;
-  }
-  csRect dr (is->inv);
-  dr.Move (-child->bound.xmin, -child->bound.ymin);
-  child->Invalidate (dr, true);
-  return false;
-}
-
 void csComponent::Invalidate (csRect &area, bool fIncludeChildren,
   csComponent *below)
 {
   if (!GetState (CSS_VISIBLE))
     return;
 
-  inv_struct is (bound.Width (), bound.Height (), below);
-  is.inv.Intersect (area);
-  if (is.inv.IsEmpty ())
+  csRect inv (0, 0, bound.Width (), bound.Height ());
+  inv.Intersect (area);
+  if (inv.IsEmpty ())
     return;
 
-  dirty.Union (is.inv);
-  if (app)
-    app->RedrawFlag = true;
-
-  csRect dr;
-  if (parent && GetState (CSS_TRANSPARENT))
-  {
-    // Invalidate a rectangle in parent component as well (since
-    // we are semi-transparent) and all neightbour components
-    // that are below us in Z-order.
-    is.inv.Move (bound.xmin, bound.ymin);
-    parent->Invalidate (is.inv, true, this);
-    is.inv.Move (-bound.xmin, -bound.ymin);
-  } /* endif */
+  dirty.Union (inv);
+  SetState (CSS_DIRTY, true);
 
   if (fIncludeChildren)
   {
-    ForEach (do_invalidate, &is, true);
+    // Now invalidate all direct chidren
+    csComponent *child = below ? below : top;
+    if (child)
+      do
+      {
+        if ((child != below) && inv.Intersects (child->bound))
+        {
+          csRect dr (inv);
+          dr.Move (-child->bound.xmin, -child->bound.ymin);
+          child->Invalidate (dr, true);
+        }
+        child = child->prev;
+      } while (child != top);
+
+    // Now invalidate all "clip childs"
     for (int i = clipchildren.Length () - 1; i >= 0; i--)
     {
-      csComponent *child = (csComponent *)clipchildren [i];
+      child = (csComponent *)clipchildren.Get (i);
       if (child->GetState (CSS_VISIBLE))
       {
         int dX = 0, dY = 0;
         LocalToGlobal (dX, dY);
         child->GlobalToLocal (dX, dY);
-        dr.Set (is.inv);
+        csRect dr (inv);
         dr.Move (dX, dY);
         child->Invalidate (dr, true);
       } /* endif */
@@ -1017,171 +1154,177 @@ void csComponent::Invalidate (csRect &area, bool fIncludeChildren,
   } /* endif */
 }
 
-void csComponent::ClipAlienChildren (csObjVector &rect, csComponent *child)
+void csComponent::ClipChild (csObjVector &rect, csComponent *child)
 {
-  int i;
+  if (!child->GetState (CSS_VISIBLE))
+    return;
 
-  for (int c = clipchildren.Length () - 1; c >= 0; c--)
+  if (child->GetState (CSS_TRANSPARENT))
   {
-    csComponent *nb = (csComponent *)clipchildren [c];
+    // If this child is transparent, clip against all non-transparent
+    // children of `child' component.
 
-    if (nb == child)
-      break;
-
-    if (nb->GetState (CSS_TRANSPARENT))
+    // transform all rectangles to child coordinate system
+    int dX, dY;
+    if (child->parent != this)
     {
-      // if given children is transparent, invalidate
-      // its areas covered by rect[]
-      csRect inv;
-      for (i = rect.Length () - 1; i >= 0; i--)
-      {
-        inv.Set (*((csRect *)rect[i]));
-        int dX = 0, dY = 0;
-        LocalToGlobal (dX, dY);
-        nb->GlobalToLocal (dX, dY);
-        inv.Move (dX, dY);
-        nb->Invalidate (inv, true);
-      } /* endfor */
+      child->LocalToGlobal (dX, dY);
+      GlobalToLocal (dX, dY);
     }
-    else if (nb->GetState (CSS_VISIBLE))
-      for (i = rect.Length () - 1; i >= 0; i--)
-      {
-        csRect *cur = (csRect *)rect[i];
-        csRect childbound (nb->bound);
-        if (nb->parent)
-        {
-          nb->parent->LocalToGlobal (childbound.xmin, childbound.ymin);
-          nb->parent->LocalToGlobal (childbound.xmax, childbound.ymax);
-        } /* endif */
-        GlobalToLocal (childbound.xmin, childbound.ymin);
-        GlobalToLocal (childbound.xmax, childbound.ymax);
-        if (childbound.Intersects (*cur))
-        {
-          csRect r (cur->xmin, cur->ymin, cur->xmax, childbound.ymin);
-          r.Intersect (*cur);
-          if (!r.IsEmpty ())
-            rect.Push (new csRect (r));
+    else
+    {
+      dX = child->bound.xmin;
+      dY = child->bound.ymin;
+    }
+    for (int i = (int)rect.Length () - 1; i >= 0; i--)
+      ((csRect *)rect[i])->Move (-dX, -dY);
 
-          r.Set (cur->xmin, childbound.ymax, cur->xmax, cur->ymax);
-          r.Intersect (*cur);
-          if (!r.IsEmpty ())
-            rect.Push (new csRect (r));
+    child->Clip (rect, child, true);
 
-          r.Set (cur->xmin, childbound.ymin, childbound.xmin, childbound.ymax);
-          r.Intersect (*cur);
-          if (!r.IsEmpty ())
-            rect.Push (new csRect (r));
+    return;
+  }
 
-          r.Set (childbound.xmax, childbound.ymin, cur->xmax, childbound.ymax);
-          r.Intersect (*cur);
-          if (!r.IsEmpty ())
-            rect.Push (new csRect (r));
-
-          rect.Delete (i);
-        } /* endif */
-      } /* endfor */
+  csRect childbound (child->bound);
+  if (child->parent != this)
+  {
+    int dX = 0, dY = 0;
+    if (child->parent)
+      child->parent->LocalToGlobal (dX, dY);
+    GlobalToLocal (dX, dY);
+    // Transform child's bound to our coordinate system
+    childbound.Move (dX, dY);
   } /* endif */
+
+  // Clip child's bound against our bound (in the case child exceeds us)
+  csRect relbound (0, 0, bound.Width (), bound.Height ());
+  childbound.Intersect (relbound);
+
+  // Now clip all the rectangles against this child's bound
+  for (int i = rect.Length () - 1; i >= 0; i--)
+  {
+    csRect *cur = (csRect *)rect[i];
+    if (childbound.Intersects (*cur))
+    {
+      csRect r (cur->xmin, cur->ymin, cur->xmax, childbound.ymin);
+      r.Intersect (*cur);
+      if (!r.IsEmpty ())
+        rect.Push (new csRect (r));
+
+      r.Set (cur->xmin, childbound.ymax, cur->xmax, cur->ymax);
+      r.Intersect (*cur);
+      if (!r.IsEmpty ())
+        rect.Push (new csRect (r));
+
+      r.Set (cur->xmin, childbound.ymin, childbound.xmin, childbound.ymax);
+      r.Intersect (*cur);
+      if (!r.IsEmpty ())
+        rect.Push (new csRect (r));
+
+      r.Set (childbound.xmax, childbound.ymin, cur->xmax, childbound.ymax);
+      r.Intersect (*cur);
+      if (!r.IsEmpty ())
+        rect.Push (new csRect (r));
+
+      rect.Delete (i);
+    } /* endif */
+  } /* endfor */
 }
 
-void csComponent::Clip (csObjVector &rect, csComponent *last)
+void csComponent::Clip (csObjVector &rect, csComponent *last, bool forchild)
 {
-  int i; // for dumb compilers that doesn't understand ANSI C++ "for" scoping
+  int i; // for dumb compilers that don't understand ANSI C++ "for" scoping
 
   if (GetState (CSS_VISIBLE) == 0)
   {
     rect.DeleteAll ();
     return;
   }
-  // Clip all rectangles against this window
-  csRect relbound (0, 0, bound.xmax - bound.xmin, bound.ymax - bound.ymin);
-  for (i = rect.Length () - 1; i >= 0; i--)
-  {
-    ((csRect *)rect[i])->Intersect (relbound);
-    if (((csRect *)rect[i])->IsEmpty ())
-      rect.Delete (i);
-  } /* endfor */
 
-  // Clip against children if this component is child's real parent
+  if (!forchild)
+  {
+    // Clip all rectangles against this window
+    csRect relbound (0, 0, bound.xmax - bound.xmin, bound.ymax - bound.ymin);
+    for (i = rect.Length () - 1; i >= 0; i--)
+    {
+      ((csRect *)rect[i])->Intersect (relbound);
+      if (((csRect *)rect[i])->IsEmpty ())
+        rect.Delete (i);
+    } /* endfor */
+  }
+
+  // Clip against children if this component is child's clip parent
   if ((last == this) || (last->parent == this))
     if (top && top != last)             // If component has children
     {
       csComponent *nb = top;
       do
       {
-        if (nb->GetState (CSS_TRANSPARENT))
-        {
-          // if given children is transparent, invalidate
-          // its areas covered by rect[]
-          csRect inv;
-          // Trick: to avoid being invalidated by invalidated children,
-          // we'll drop the visibility flag, so that Invalidate () will exit.
-          int oldstate = state;
-          state &= ~CSS_VISIBLE;
-          for (i = rect.Length () - 1; i >= 0; i--)
-          {
-            inv.Set (*((csRect *)rect[i]));
-            inv.Move (-nb->bound.xmin, -nb->bound.ymin);
-            nb->Invalidate (inv, true);
-          } /* endfor */
-          state = oldstate;
-        }
-        else if ((nb->GetState (CSS_VISIBLE)) && (nb->clipparent == this))
-          for (i = rect.Length () - 1; i >= 0; i--)
-          {
-            csRect *cur = (csRect *)rect[i];
-            if (nb->bound.Intersects (*cur))
-            {
-              csRect r (cur->xmin, cur->ymin, cur->xmax, nb->bound.ymin);
-              r.Intersect (*cur);
-              if (!r.IsEmpty ())
-                rect.Push (new csRect (r));
-
-              r.Set (cur->xmin, nb->bound.ymax, cur->xmax, cur->ymax);
-              r.Intersect (*cur);
-              if (!r.IsEmpty ())
-                rect.Push (new csRect (r));
-
-              r.Set (cur->xmin, nb->bound.ymin, nb->bound.xmin, nb->bound.ymax);
-              r.Intersect (*cur);
-              if (!r.IsEmpty ())
-                rect.Push (new csRect (r));
-
-              r.Set (nb->bound.xmax, nb->bound.ymin, cur->xmax, nb->bound.ymax);
-              r.Intersect (*cur);
-              if (!r.IsEmpty ())
-                rect.Push (new csRect (r));
-
-              rect.Delete (i);
-            } /* endif */
-          } /* endfor */
+        if (nb->clipparent == this)
+          ClipChild (rect, nb);
         nb = nb->prev;
       } while ((nb != top) && (nb != last)); /* enddo */
     } /* endif */
 
-  // Search for 'clip children' and clip rectangls against their bounds
-  // (see the remark upon definition of csComponent::parentclip)
-  ClipAlienChildren (rect, last);
+  // Clip rectangles against 'clip children' bounds.
+  // (see the remark at definition of csComponent::parentclip)
+  for (int c = clipchildren.Length () - 1; c >= 0; c--)
+  {
+    csComponent *nb = (csComponent *)clipchildren.Get (c);
+    if (nb == last)
+      break;
+    ClipChild (rect, nb);
+  } /* endif */
 
+  int dX = bound.xmin, dY = bound.ymin;
   if (clipparent != parent)
   {
     // transfer rectangles from parent's coordinates to clip parent's
-    int dX = bound.xmin, dY = bound.ymin;
     if (parent)
       parent->LocalToGlobal (dX, dY);
     if (clipparent)
       clipparent->GlobalToLocal (dX, dY);
-    for (i = (int)rect.Length () - 1; i >= 0; i--)
-      ((csRect *)rect[i])->Move (dX, dY);
-  } else
-  {
-    // transform all rectangles from local window coordinates
-    // to parent window coordinates
-    for (i = (int)rect.Length () - 1; i >= 0; i--)
-      ((csRect *)rect[i])->Move (bound.xmin, bound.ymin);
-  } /* endif */
+  }
 
-  if (clipparent)
+  // transform all rectangles from local window coordinates
+  // to parent window coordinates
+  for (i = (int)rect.Length () - 1; i >= 0; i--)
+    ((csRect *)rect[i])->Move (dX, dY);
+
+  // Now tell our clip parent to perform further clipping
+  if (!forchild && clipparent)
     clipparent->Clip (rect, this);
+}
+
+csObjVector csComponent::visregion (8, 8);
+
+void csComponent::FastClip (csObjVector &rect)
+{
+  int dX = 0, dY = 0;
+  LocalToGlobal (dX, dY);
+  // Clip all the rectangles in "rect" against all the rectangles in "visregion"
+  for (int i = rect.Length () - 1; i >= 0; i--)
+  {
+    csRect *r = (csRect *)rect.Get (i);
+    // Transform rectangle to global coordinates
+    csRect cr (*r);
+    cr.Move (dX, dY);
+    bool used = false;
+    for (int j = visregion.Length () - 1; j >= 0; j--)
+    {
+      csRect vis (*(csRect *)visregion.Get (j));
+      vis.Intersect (cr);
+      if (!vis.IsEmpty ())
+        if (used)
+          rect.Push (new csRect (vis));
+        else
+        {
+          r->Set (vis);
+          used = true;
+        }
+    }
+    if (!used)
+      rect.Delete (i);
+  }
 }
 
 void csComponent::LocalToGlobal (int &x, int &y)
@@ -1236,16 +1379,15 @@ void csComponent::Box (int xmin, int ymin, int xmax, int ymax, int colindx)
     return;
   csObjVector rect (8, 4);
   csRect *bb = new csRect (xmin, ymin, xmax, ymax);
-  bb->Intersect (dirty);
   if (!clip.IsEmpty ())
     bb->Intersect (clip);
   rect.Push (bb);
-  Clip (rect, this);
+  FastClip (rect);
   for (int i = rect.Length () - 1; i >= 0; i--)
   {
     csRect *cur = (csRect *)rect[i];
     app->pplBox (cur->xmin, cur->ymin, cur->xmax, cur->ymax,
-                 GetColor (colindx));
+      GetColor (colindx));
   } /* endfor */
 }
 
@@ -1263,13 +1405,12 @@ void csComponent::Line (float x1, float y1, float x2, float y2, int colindx)
   csObjVector rect (8, 4);
   csRect *lb = new csRect (QInt (x1), QInt (y1), QInt (x2), QInt (y2));
   lb->Normalize ();
-  lb->xmax += 2;
-  lb->ymax += 2;
-  lb->Intersect (dirty);
+  lb->xmax += 1;
+  lb->ymax += 1;
   if (!clip.IsEmpty ())
     lb->Intersect (clip);
   rect.Push (lb);
-  Clip (rect, this);
+  FastClip (rect);
 
   int dx = 0; int dy = 0;
   LocalToGlobal (dx, dy);
@@ -1283,7 +1424,7 @@ void csComponent::Line (float x1, float y1, float x2, float y2, int colindx)
     float xx1 = x1, xx2 = x2, yy1 = y1, yy2 = y2;
 
     if (!app->ClipLine (xx1, yy1, xx2, yy2,
-        cur->xmin, cur->ymin, cur->xmax, cur->ymax))
+           cur->xmin, cur->ymin, cur->xmax, cur->ymax))
       app->pplLine (xx1, yy1, xx2, yy2, color);
   }
 }
@@ -1296,11 +1437,10 @@ void csComponent::Pixel (int x, int y, int colindx)
 
   csObjVector rect (8, 4);
   csRect *lb = new csRect (x, y, x + 1, y + 1);
-  lb->Intersect (dirty);
   if (!clip.IsEmpty ())
     lb->Intersect (clip);
   rect.Push (lb);
-  Clip (rect, this);
+  FastClip (rect);
 
   LocalToGlobal (x, y);
 
@@ -1323,11 +1463,10 @@ void csComponent::Text (int x, int y, int fgindx, int bgindx, const char *s)
   */
   csObjVector rect (8, 4);
   csRect tb (x, y, x + TextWidth (s), y + TextHeight ());
-  tb.Intersect (dirty);
   if (!clip.IsEmpty ())
     tb.Intersect (clip);
   rect.Push (new csRect (tb));
-  Clip (rect, this);
+  FastClip (rect);
 
   int ox = x, oy = y;
   LocalToGlobal (x, y);
@@ -1358,11 +1497,10 @@ void csComponent::Pixmap (csPixmap *s2d, int x, int y, int w, int h)
   */
   csObjVector rect (8, 4);
   csRect *sb = new csRect (x, y, x + w, y + h);
-  sb->Intersect (dirty);
   if (!clip.IsEmpty ())
     sb->Intersect (clip);
   rect.Push (sb);
-  Clip (rect, this);
+  FastClip (rect);
 
   LocalToGlobal (x, y);
   bool restoreclip = false;
@@ -1387,11 +1525,10 @@ void csComponent::Pixmap (csPixmap *s2d, int x, int y, int w, int h, int orgx, i
   */
   csObjVector rect (8, 4);
   csRect *sb = new csRect (x, y, x + w, y + h);
-  sb->Intersect (dirty);
   if (!clip.IsEmpty ())
     sb->Intersect (clip);
   rect.Push (sb);
-  Clip (rect, this);
+  FastClip (rect);
 
   for (int i = rect.Length () - 1; i >= 0; i--)
   {
@@ -1409,11 +1546,10 @@ void csComponent::Texture (iTextureHandle *tex, int x, int y, int w, int h,
 
   csObjVector rect (8, 4);
   csRect *sb = new csRect (x, y, x + w, y + h);
-  sb->Intersect (dirty);
   if (!clip.IsEmpty ())
     sb->Intersect (clip);
   rect.Push (sb);
-  Clip (rect, this);
+  FastClip (rect);
 
   LocalToGlobal (orgx, orgy);
   for (int i = rect.Length () - 1; i >= 0; i--)
@@ -1501,6 +1637,18 @@ void csComponent::SetState (int mask, bool enable)
       parent->SetFocused (parent->PrevChild ());
     else if (!parent->focused->GetState (CSS_SELECTABLE))
       parent->focused = this;
+
+  // If dirty flag is set, propagate to parent component
+  if (mask & CSS_DIRTY)
+  {
+    if (enable)
+    {
+      if (parent && !parent->GetState (CSS_DIRTY))
+        parent->SetState (CSS_DIRTY, true);
+    }
+    else
+      dirty.MakeEmpty ();
+  }
 }
 
 void csComponent::SetMouse (csMouseCursorID Cursor)
@@ -1565,7 +1713,8 @@ bool csComponent::HandleDragEvent (iEvent &Event, int BorderW, int BorderH)
         } /* endif */
       } /* endif */
     case csevMouseMove:
-      if (bound.ContainsRel (Event.Mouse.x, Event.Mouse.y))
+      if (GetState (CSS_FOCUSED)
+       && bound.ContainsRel (Event.Mouse.x, Event.Mouse.y))
       {
         int cursortype = 0;
         if (DragStyle & CS_DRAG_SIZEABLE)

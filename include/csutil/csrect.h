@@ -66,7 +66,8 @@ public:
   void Intersect (int ixmin, int iymin, int ixmax, int iymax);
 
   /// Intersect with another rectangle.
-  void Intersect (const csRect &target);
+  inline void Intersect (const csRect &other)
+  { Intersect (other.xmin, other.ymin, other.xmax, other.ymax); }
 
   /// Return true if rectangle intersects with target.
   bool Intersects (const csRect &target) const;
@@ -81,7 +82,8 @@ public:
    * Add a rectangle: find minimal rectangle
    * that embeds both given rectangles.
    */
-  void Union (const csRect &target);
+  inline void Union (const csRect &other)
+  { Union (other.xmin, other.ymin, other.xmax, other.ymax); }
 
   /**
    * Subtract rectangle: find the minimal rectangle which embeds all
@@ -90,6 +92,10 @@ public:
    */
   void Exclude (int ixmin, int iymin, int ixmax, int iymax);
 
+  /// Same but works on a csRect argument
+  inline void Exclude (csRect &other)
+  { Exclude (other.xmin, other.ymin, other.xmax, other.ymax); }
+
   /**
    * Alternative subtraction: find maximal area of this rectangle that
    * is not covered by argument.
@@ -97,67 +103,67 @@ public:
   void Subtract (const csRect &rect);
 
   /// Return true if rectangle is empty.
-  bool IsEmpty () const
+  inline bool IsEmpty () const
   { return (xmin >= xmax) || (ymin >= ymax); }
 
   /// Make rectangle empty.
-  void MakeEmpty ()
+  inline void MakeEmpty ()
   { xmin = xmax = 0; }
 
   /// Set rectangle to given ixmin,iymin,ixmax,iymax position.
-  void Set (int ixmin, int iymin, int ixmax, int iymax)
+  inline void Set (int ixmin, int iymin, int ixmax, int iymax)
   {
     xmin = ixmin; xmax = ixmax;
     ymin = iymin; ymax = iymax;
   }
 
   /// Copy rectangle.
-  void Set (const csRect &target)
+  inline void Set (const csRect &target)
   {
     xmin = target.xmin; xmax = target.xmax;
     ymin = target.ymin; ymax = target.ymax;
   }
 
   /// Set rectangle xmin,ymin position.
-  void SetPos (int x, int y)
+  inline void SetPos (int x, int y)
   { xmin = x; ymin = y; }
 
   /// Set rectangle size.
-  void SetSize (int w, int h)
+  inline void SetSize (int w, int h)
   { xmax = xmin + w; ymax = ymin + h; }
 
   /// Move rectangle by deltaX, deltaY.
-  void Move (int dX, int dY)
+  inline void Move (int dX, int dY)
   { xmin += dX; xmax += dX; ymin += dY; ymax += dY; }
 
   /// Return the width of rectangle.
-  int Width () const { return xmax - xmin; }
+  inline int Width () const { return xmax - xmin; }
 
   /// Return the height of rectangle.
-  int Height () const { return ymax - ymin; }
+  inline int Height () const { return ymax - ymin; }
 
   /// Return true if a point lies within rectangle bounds.
-  bool Contains (int x, int y) const
+  inline bool Contains (int x, int y) const
   { return (x >= xmin) && (x < xmax) && (y >= ymin) && (y < ymax); }
 
   /// Return true if a relative point lies within rectangle bounds.
-  bool ContainsRel (int x, int y) const
+  inline bool ContainsRel (int x, int y) const
   { return (x >= 0) && (x < Width ()) && (y >= 0) && (y < Height ()); }
 
   /// Return true if rectangle is the same.
-  bool Equal (int ixmin, int iymin, int ixmax, int iymax) const
+  inline bool Equal (int ixmin, int iymin, int ixmax, int iymax) const
   { return (xmin == ixmin) && (ymin == iymin) &&
            (xmax == ixmax) && (ymax == iymax); }
 
   /// Normalize a rectangle such that xmin <= xmax and ymin <= ymax.
-  void Normalize ()
+  inline void Normalize ()
   {
     if (xmin > xmax) { int tmp = xmin; xmin = xmax; xmax = tmp; }
     if (ymin > ymax) { int tmp = ymin; ymin = ymax; ymax = tmp; }
   }
 
   /// Return area of this rectangle.
-  int Area () const
+  inline int Area () const
   {
     if (IsEmpty ())
       return 0;
@@ -169,14 +175,14 @@ public:
   void AddAdjanced (const csRect &rect);
 
   /// Test inequality of two rectangles.
-  bool operator != (const csRect &rect) const
+  inline bool operator != (const csRect &rect) const
   {
     return (xmin != rect.xmin) || (ymin != rect.ymin)
         || (xmax != rect.xmax) || (ymax != rect.ymax);
   }
 
   /// Extend rectangle so that it will include given point
-  void Extend (int x, int y)
+  inline void Extend (int x, int y)
   {
     if (xmin > x) xmin = x; if (xmax < x) xmax = x;
     if (ymin > y) ymin = y; if (ymax < y) ymax = y;

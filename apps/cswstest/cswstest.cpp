@@ -174,6 +174,30 @@ bool csWsTest::Initialize (const char *iConfigName)
   printf (MSG_INITIALIZATION, "Crystal Space Windowing System test version %s (%s).\n", VERSION, RELEASE_DATE);
   printf (MSG_INITIALIZATION, "Created by Andrew Zabolotny and others...\n\n");
 
+#if 0
+  //@@ A small group of controls for fine-level debugging
+  {
+    csWindow *window = new csWindow (this, "-- Drag me --", CSWS_TITLEBAR);
+    window->SetAlpha (160);
+    window->SetRect (100, 100, 300, 140);
+
+    csButton *but = new csButton (window, cscmdNothing, CSBS_DEFAULTVALUE, csbfsThickRect);
+    but->SetText ("-* test *-"); but->SetRect (40, 30, 140, 60);
+
+    window = new csWindow (this, "-- help me --", CSWS_TITLEBAR);
+//  window->SetState (CSS_TOPSELECT, false);
+    window->SetAlpha (160);
+    window->SetRect (200, 200, 500, 400);
+
+    but = new csButton (this, cscmdNothing, CSBS_DEFAULTVALUE, csbfsThickRect);
+    but->SetText ("Button one"); but->SetRect (10, 10, 100, 30);
+
+    but = new csButton (this, cscmdNothing, CSBS_DEFAULTVALUE, csbfsThickRect);
+    but->SetText ("Button two"); but->SetRect (210, 10, 300, 30);
+    return true;
+  }
+#endif
+
   // create a window
   csComponent *window = new csWindow (this, "-- Drag me --",
     CSWS_DEFAULTVALUE | CSWS_TOOLBAR | CSWS_CLIENTBORDER);

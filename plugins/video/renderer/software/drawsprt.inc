@@ -180,6 +180,7 @@ static void DP_NAME (iGraphics2D *G2D, iTextureHandle *hTex,
           for (int w = sw; w; w--)
           {
             ALPHA_MIX (*VRAM, data [tx >> 16]);
+            VRAM++;
             tx += dx;
           } /* endfor */
       } /* endfor */

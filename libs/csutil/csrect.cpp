@@ -43,34 +43,22 @@ csRect::~csRect ()
 
 void csRect::Intersect (int ixmin, int iymin, int ixmax, int iymax)
 {
-  if (IsEmpty ())
+  if (IsEmpty () || ixmin >= ixmax || iymin >= iymax)
+  {
+    MakeEmpty ();
     return;
+  }
 
-  if (ixmin > ixmax) { int _tmp_ = ixmin; ixmin = ixmax; ixmax = _tmp_; }
-  if (iymin > iymax) { int _tmp_ = iymin; iymin = iymax; iymax = _tmp_; }
   if (xmin < ixmin) xmin = ixmin;
   if (ymin < iymin) ymin = iymin;
   if (xmax > ixmax) xmax = ixmax;
   if (ymax > iymax) ymax = iymax;
 }
 
-void csRect::Intersect (const csRect &target)
-{
-  if (IsEmpty () || target.IsEmpty ())
-  {
-    MakeEmpty ();
-    return;
-  }
-
-  if (xmin < target.xmin) xmin = target.xmin;
-  if (ymin < target.ymin) ymin = target.ymin;
-  if (xmax > target.xmax) xmax = target.xmax;
-  if (ymax > target.ymax) ymax = target.ymax;
-}
-
 bool csRect::Intersects (const csRect &target) const
 {
-  if (IsEmpty () || target.IsEmpty ()
+  if (IsEmpty ()
+   || target.IsEmpty ()
    || (xmin >= target.xmax)
    || (xmax <= target.xmin)
    || (ymin >= target.ymax)
@@ -82,8 +70,8 @@ bool csRect::Intersects (const csRect &target) const
 
 void csRect::Union (int ixmin, int iymin, int ixmax, int iymax)
 {
-  if (ixmin > ixmax) { int _tmp_ = ixmin; ixmin = ixmax; ixmax = _tmp_; }
-  if (iymin > iymax) { int _tmp_ = iymin; iymin = iymax; iymax = _tmp_; }
+  if (ixmin >= ixmax || iymin >= iymax)
+    return;
 
   if (IsEmpty ())
     Set (ixmin, iymin, ixmax, iymax);
@@ -96,29 +84,10 @@ void csRect::Union (int ixmin, int iymin, int ixmax, int iymax)
   }
 }
 
-void csRect::Union (const csRect &target)
-{
-  if (target.IsEmpty ())
-    return;
-
-  if (IsEmpty ())
-    Set (target);
-  else
-  {
-    if (xmin > target.xmin) xmin = target.xmin;
-    if (ymin > target.ymin) ymin = target.ymin;
-    if (xmax < target.xmax) xmax = target.xmax;
-    if (ymax < target.ymax) ymax = target.ymax;
-  }
-}
-
 void csRect::Exclude (int ixmin, int iymin, int ixmax, int iymax)
 {
   if (IsEmpty ())
     return;
-
-  if (ixmin > ixmax) { int _tmp_ = ixmin; ixmin = ixmax; ixmax = _tmp_; }
-  if (iymin > iymax) { int _tmp_ = iymin; iymin = iymax; iymax = _tmp_; }
 
   if ((ymin >= iymin) && (ymax <= iymax))
   {
@@ -128,7 +97,8 @@ void csRect::Exclude (int ixmin, int iymin, int ixmax, int iymax)
         return;		// no overlap
       else if (xmax <= ixmax)
         xmax = ixmin;
-    } else
+    }
+    else // xmin >= ixmin
     {
       if (xmin >= ixmax)
         return;		// no overlap
@@ -140,16 +110,17 @@ void csRect::Exclude (int ixmin, int iymin, int ixmax, int iymax)
       else
         xmin = ixmax;
     } /* endif */
-  } else
-  if ((xmin >= ixmin) && (xmax <= ixmax))
+  }
+  else if ((xmin >= ixmin) && (xmax <= ixmax))
   {
-    if (ymin <= iymin)
+    if (ymin < iymin)
     {
       if (ymax <= iymin)
         return;		// no overlap
       else if (ymax <= iymax)
         ymax = iymin;
-    } else
+    }
+    else // ymin >= iymin
     {
       if (ymin >= iymax)
         return;		// no overlap

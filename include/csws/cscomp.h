@@ -40,17 +40,19 @@ class csSkinSlice;
 /// Component is disabled
 #define CSS_DISABLED		0x00000004
 /// Component can be selected
-#define CSS_SELECTABLE		0x00010000
+#define CSS_SELECTABLE		0x00000008
 /// Component is the beginning of a group of components
-#define CSS_GROUP		0x00020000
+#define CSS_GROUP		0x00000010
 /// Move component to top Z-order when selected
-#define CSS_TOPSELECT		0x00040000
+#define CSS_TOPSELECT		0x00000020
 /// Exclude component from clipping process
-#define CSS_TRANSPARENT		0x00080000
+#define CSS_TRANSPARENT		0x00000040
 /// Component is modally executing
-#define CSS_MODAL		0x00100000
+#define CSS_MODAL		0x00000080
 /// Component is maximized (NEVER change this manually!)
-#define CSS_MAXIMIZED		0x00200000
+#define CSS_MAXIMIZED		0x00000100
+/// Component or (some of) his children components are dirty
+#define CSS_DIRTY		0x00000200
 
 /**
  * csApp contains a static array with indexes of all colors
@@ -123,10 +125,6 @@ enum
 enum
 {
   /**
-   * This event is broadcasted to refresh invalidated components.
-   */
-  cscmdRedraw = 0x100,
-  /**
    * Query a control if it would like to be the default control in a dialog.<p>
    * The control is 'default' if it has a 'default' attribute (this is
    * control-specific, for example buttons have the CSBSTY_DEFAULT style).
@@ -135,7 +133,7 @@ enum
    * OUT: (csComponent *) or NULL;
    * </pre>
    */
-  cscmdAreYouDefault,
+  cscmdAreYouDefault = 0x80,
   /**
    * This message is sent by parent to its active child to activate
    * whatever action it does. For example, this message is sent by a
@@ -294,6 +292,8 @@ protected:
   int FontSize;
   /// An array of 'clip children', i.e. components which are clipped inside our bounds
   csVector clipchildren;
+  /// This field is used to cache current clipping region during every Redraw()
+  static csObjVector visregion;
 
 public:
   /// The focused child window
@@ -499,8 +499,9 @@ public:
    * Invalidate a area of component (force a redraw of this area).
    * If fIncludeChildren is true, all child components that covers
    * this area of parent will be partially invalidated as well.
-   * Additionaly, if 'below' is non-NULL, only the child components
-   * that are below 'below' in Z-order will be invalidated.
+   * Additionaly, if 'below' is not NULL, only the child components
+   * that are below 'below' in Z-order or CSS_TRANSPARENT components
+   * that are 'above' in Z-order will be invalidated.
    */
   void Invalidate (csRect &area, bool IncludeChildren = false,
     csComponent *below = NULL);
@@ -699,10 +700,18 @@ protected:
    * uncovered by other windows. Initial rectangles are in local coordinates,
    * final rectangles are in global coordinates.
    */
-  void Clip (csObjVector &rect, csComponent *last);
+  void Clip (csObjVector &rect, csComponent *last, bool forchild = false);
 
-  /// Clip a set of rectangles against 'clip children'
-  void ClipAlienChildren (csObjVector &rect, csComponent *child);
+  /// Clip the rectangle set against given child
+  void ClipChild (csObjVector &rect, csComponent *child);
+
+  /**
+   * Perform fast clipping by using the pre-cached visible region
+   * initialized at start of Redraw(). This has the side effect that
+   * any drawing operation that happens outside the Draw() method
+   * is effectively clipped away.
+   */
+  void FastClip (csObjVector &rect);
 
   /**
    * Prepare a label. Search for '~' in iLabel, and copy text without '~'
@@ -721,6 +730,24 @@ protected:
 
   /// Apply a skin <b>only</b> to this component: returns true on success
   bool ApplySkin (csSkin *Skin);
+
+  /**
+   * Perform a check of this component and all dirty children'
+   * dirty areas: if child component is transparent, unify his
+   * dirty area with this component's dirty area. You will never
+   * need to call this function manually; this is done automatically.
+   * The `TD' prefix stands for `top-doen', that is the Z-order in
+   * which the check is performed.
+   */
+  void CheckDirtyTD (csRect &ioR);
+  /**
+   * Same as CheckDirtyTD but the check is performed in the inverse
+   * direction - from bottom up (`BU'). This routine checks if the
+   * transparent child components are covered by this component's
+   * dirty area; if so, the respective areas of child windows are
+   * marked as dirty as well.
+   */
+  void CheckDirtyBU (csRect &ioR);
 
 private:
   static bool do_handle_event (csComponent *child, void *param);

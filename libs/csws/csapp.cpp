@@ -92,7 +92,6 @@ csApp::csApp (iSystem *System, csSkin &Skin)
   MouseOwner = NULL;		// no mouse owner
   KeyboardOwner = NULL;		// no keyboard owner
   FocusOwner = NULL;		// no focus owner
-  RedrawFlag = true;
   WindowListChanged = false;
   LoopLevel = 0;
   BackgroundStyle = csabsSolid;
@@ -457,14 +456,23 @@ void csApp::FinishFrame ()
     StartFrame ();
 
   // Consider ourselves idle if we don't have anything to redraw in this frame
-  bool do_idle = !RedrawFlag;
+  bool do_idle = true;
 
   // Redraw all changed windows
-  while (RedrawFlag)
+  if (GetState (CSS_DIRTY))
   {
-    RedrawFlag = false;
-    csEvent ev (0, csevBroadcast, cscmdRedraw);
-    HandleEvent (ev);
+    // Check windows from bottom-up for propagated changes
+    csRect r (dirty);
+    CheckDirtyBU (r);
+    // Now propagate dirty areas through transparent windows top-down
+    r.MakeEmpty ();
+    CheckDirtyTD (r);
+    // Check from bottom-up once again in the case we need it after top-down
+    r.Set (dirty);
+    CheckDirtyBU (r);
+
+    do_idle = false;
+    Redraw ();
   }
 
   // Now update screen
