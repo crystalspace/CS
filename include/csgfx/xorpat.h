@@ -20,8 +20,11 @@
 #ifndef __XORPAT_H__
 #define __XORPAT_H__
 
-/// Create an iImage with a nice XOR pattern.
-extern iImage* csCreateXORPatternImage(int width, int height, int patsize);
+/**
+ * Create an iImage with a nice XOR pattern.
+ * recdepth - "recursion depth", clamped to range 1-8
+ */
+extern iImage* csCreateXORPatternImage(int width, int height, int recdepth);
 
 #endif
 
