@@ -934,16 +934,20 @@ bool csEngine::HandleEvent (iEvent &Event)
             // Load a default shader for OR compatibility
             csRef<iDocumentSystem> docsys (
               CS_QUERY_REGISTRY(object_reg, iDocumentSystem));
-            if (docsys == 0)
+            if (!docsys.IsValid())
               docsys.AttachNew (new csTinyDocumentSystem ());
             csRef<iDocument> shaderDoc = docsys->CreateDocument ();
 
             csRef<iShaderCompiler> shcom (ShaderManager->
               GetCompiler ("XMLShader"));
 
-            csRef<iFile> shaderFile = VFS->Open (
-              "/shader/or_lighting.xml", VFS_FILE_READ);
-            shaderDoc->Parse (shaderFile);
+	    char const* const shaderPath = "/shader/or_lighting.xml";
+            csRef<iFile> shaderFile = VFS->Open (shaderPath, VFS_FILE_READ);
+	    if (shaderFile.IsValid())
+              shaderDoc->Parse (shaderFile);
+	    else
+	      Report("WARNING: Shader %s not available  Failure imminent!",
+	        shaderPath);
             default_shader = shcom->CompileShader (shaderDoc->GetRoot ()->
               GetNode ("shader"));
             ShaderManager->RegisterShader (default_shader);

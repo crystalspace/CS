@@ -17,6 +17,11 @@ chronological order.
 	- Eric Sunshine augmented iVFS::PushDir() so that, as a convenience, it
 	  optionally accepts a path as an argument and invokes ChDir() for that
 	  path after pushing the current working directory.
+	- Eric Sunshine fixed engine.mak so that it also installs
+	  data/shader/or_lighting.xml, since this is required by the engine
+	  when configured for the old renderer.  Also upgraded
+	  csEngine::HandleEvent() so that it deals more gracefully with
+	  failure to load or_lighting.xml (rather than crashing outright).
 27-Mar-2004
 	- Anders Stenberg did the following NR changes:
 	    - Added the possibility to route Cg programs through
