@@ -5860,6 +5860,8 @@ package cspace::iGeneralFactoryState;
 *GenerateBox = *cspacec::iGeneralFactoryState_GenerateBox;
 *SetBack2Front = *cspacec::iGeneralFactoryState_SetBack2Front;
 *IsBack2Front = *cspacec::iGeneralFactoryState_IsBack2Front;
+*SetAnimationControl = *cspacec::iGeneralFactoryState_SetAnimationControl;
+*GetAnimationControl = *cspacec::iGeneralFactoryState_GetAnimationControl;
 *AddRenderBuffer = *cspacec::iGeneralFactoryState_AddRenderBuffer;
 *SetRenderBufferComponent = *cspacec::iGeneralFactoryState_SetRenderBufferComponent;
 *SetRenderBuffer = *cspacec::iGeneralFactoryState_SetRenderBuffer;
@@ -5880,6 +5882,73 @@ sub DESTROY {
 *GetNormalByIndex = *cspacec::iGeneralFactoryState_GetNormalByIndex;
 *GetTriangleByIndex = *cspacec::iGeneralFactoryState_GetTriangleByIndex;
 *GetColorByIndex = *cspacec::iGeneralFactoryState_GetColorByIndex;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iGenMeshAnimationControl ##############
+
+package cspace::iGenMeshAnimationControl;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*UpdateVertices = *cspacec::iGenMeshAnimationControl_UpdateVertices;
+*UpdateTexels = *cspacec::iGenMeshAnimationControl_UpdateTexels;
+*UpdateNormals = *cspacec::iGenMeshAnimationControl_UpdateNormals;
+*UpdateColors = *cspacec::iGenMeshAnimationControl_UpdateColors;
+*Load = *cspacec::iGenMeshAnimationControl_Load;
+*Save = *cspacec::iGenMeshAnimationControl_Save;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iGenMeshAnimationControl($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iGenMeshAnimationControlFactory ##############
+
+package cspace::iGenMeshAnimationControlFactory;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*CreateAnimationControl = *cspacec::iGenMeshAnimationControlFactory_CreateAnimationControl;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iGenMeshAnimationControlFactory($self);
+        delete $OWNER{$self};
+    }
+}
+
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -7060,6 +7129,7 @@ package cspace::iLoader;
 *LoadLibraryFile = *cspacec::iLoader_LoadLibraryFile;
 *LoadMeshObjectFactory = *cspacec::iLoader_LoadMeshObjectFactory;
 *LoadMeshObject = *cspacec::iLoader_LoadMeshObject;
+*Load = *cspacec::iLoader_Load;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -11926,6 +11996,9 @@ package cspace::iDynamicSystem;
 *GetLinearDampener = *cspacec::iDynamicSystem_GetLinearDampener;
 *SetRollingDampener = *cspacec::iDynamicSystem_SetRollingDampener;
 *GetRollingDampener = *cspacec::iDynamicSystem_GetRollingDampener;
+*EnableAutoDisable = *cspacec::iDynamicSystem_EnableAutoDisable;
+*AutoDisableEnabled = *cspacec::iDynamicSystem_AutoDisableEnabled;
+*SetAutoDisableParams = *cspacec::iDynamicSystem_SetAutoDisableParams;
 *Step = *cspacec::iDynamicSystem_Step;
 *CreateBody = *cspacec::iDynamicSystem_CreateBody;
 *RemoveBody = *cspacec::iDynamicSystem_RemoveBody;
