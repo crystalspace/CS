@@ -41,6 +41,8 @@ The history order is reversed so that new features are at the top.
 	  cases, the rows were not introduced with <tr>.  Also fixed the colors
 	  so that the text can be read.  Finally, made some formatting
 	  improvements.
+	- Eric Sunshine augmented annotate.php so that it now stores and
+	  displays the date/time of annotations.
 20-Jan-2002
 	- Tobias Brueckner did the following:
 	    - Fixed a potential initialization bug in the GLX OpenGL
