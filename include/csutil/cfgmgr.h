@@ -27,15 +27,27 @@ class csConfigManager : public iConfigManager
 public:
   DECLARE_IBASE;
 
-  /// create a new config manager object
-  csConfigManager(iConfigFileNew *DynamicDomain);
+  /**
+   * Create a new config manager object. If 'Optimize' is set to 'true', then
+   * the config manager will enable some optimizations, which you may or may
+   * not want: <ul>
+   * <li> When a config file is added via Add(name, vfs), the config manager
+   * first looks through all registered config files. If a file with the same
+   * name and vfs pointer are found, it is added a second time, so the file is
+   * not loaded twice.
+   * <li> When a config file is removed, the config manager keeps a reference
+   * to it until Flush() is called. If you add the file again in the meantime
+   * with Add(name, vfs), this reference is used instead.
+   * </ul>
+   */
+  csConfigManager(iConfigFileNew *DynamicDomain, bool Optimize);
   /// delete this config manager
   virtual ~csConfigManager();
 
   /// add a configuration domain
   virtual void AddDomain(iConfigFileNew*, int priority);
   /// add a configuration domain
-  virtual void AddDomain(char const* path, iVFS*, int priority);
+  virtual iConfigFileNew *AddDomain(char const* path, iVFS*, int priority);
   /// remove a configuration domain
   virtual void RemoveDomain(iConfigFileNew*);
   /// remove a configuration domain
@@ -62,6 +74,9 @@ public:
   virtual void SetDynamicDomainPriority(int priority);
   /// return the priority of the dynamic config domain
   virtual int GetDynamicDomainPriority() const;
+
+  /// flush all removed config files (only required in optimize mode)
+  virtual void FlushRemoved();
 
   /**
    * Get configuration file name.  Also consult GetVFS() to determine which
@@ -165,10 +180,14 @@ public:
 
 private:
   friend class csConfigManagerIterator;
+  // optimize mode?
+  bool Optimize;
   // pointer to the dynamic config domain
   class csConfigDomain *DynamicDomain;
   // list of all domains (including the dynamic domain)
   class csConfigDomain *FirstDomain, *LastDomain;
+  // list of all removed config files (only used in optimize mode)
+  csVector Removed;
   // list of all iterators
   csVector Iterators;
 
@@ -176,6 +195,9 @@ private:
   csConfigDomain *FindConfig(const char *name, iVFS *vfs) const;
   void ClearKeyAboveDynamic(const char *Key);
   void RemoveIterator(csConfigManagerIterator *it);
+  void FlushRemoved(int n);
+  int FindRemoved(const char *Filename, iVFS *vfs) const;
+  void RemoveDomain(class csConfigDomain *cfg);
 };
 
 #endif // __CFGMGR_H__

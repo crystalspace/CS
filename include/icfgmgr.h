@@ -73,8 +73,11 @@ struct iConfigManager : public iConfigFileNew
 
   /// add a configuration domain
   virtual void AddDomain(iConfigFileNew*, int priority) = 0;
-  /// add a configuration domain
-  virtual void AddDomain(char const* path, iVFS*, int priority) = 0;
+  /**
+   * Add a configuration domain. The new config file is also returned. If you
+   * want to store the pointer yourself, you must first IncRef it.
+   */
+  virtual iConfigFileNew *AddDomain(char const* path, iVFS*, int priority) = 0;
   /// remove a configuration domain
   virtual void RemoveDomain(iConfigFileNew*) = 0;
   /// remove a configuration domain
@@ -101,6 +104,9 @@ struct iConfigManager : public iConfigFileNew
   virtual void SetDynamicDomainPriority(int priority) = 0;
   /// return the priority of the dynamic config domain
   virtual int GetDynamicDomainPriority() const = 0;
+
+  /// flush all removed config files (only required in optimize mode)
+  virtual void FlushRemoved() = 0;
 };
 
 #endif // __ICFGMGR_H__

@@ -388,7 +388,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   // config file the dynamic one.
 
   iConfigFileNew *cfg = new csConfigFile();
-  Config = new csConfigManager(cfg);
+  Config = new csConfigManager(cfg, true);
   Config->SetDomainPriority(cfg, ConfigPriorityApplication);
   VFS = LOAD_PLUGIN (this, "crystalspace.kernel.vfs", CS_FUNCID_VFS, iVFS);
 
@@ -515,6 +515,9 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   // Check if the minimal required drivers are loaded
   if (!CheckDrivers ())
     return false;
+
+  // flush all removed config files
+  Config->FlushRemoved();
 
   return true;
 }
@@ -1132,10 +1135,7 @@ iConfigManager *csSystemDriver::GetConfig ()
 
 iConfigFileNew *csSystemDriver::AddConfig(const char *iFileName, bool iVFS, int Priority)
 {
-  iConfigFileNew *cfg = CreateSeparateConfig(iFileName, iVFS);
-  Config->AddDomain(cfg, Priority);
-  cfg->DecRef();
-  return cfg;
+  return Config->AddDomain(iFileName, iVFS ? VFS : NULL, Priority);
 }
 
 void csSystemDriver::RemoveConfig(iConfigFileNew *cfg)

@@ -163,9 +163,10 @@ IMPLEMENT_IBASE(csConfigManager);
   IMPLEMENTS_INTERFACE(iConfigFileNew);
 IMPLEMENT_IBASE_END;
 
-csConfigManager::csConfigManager(iConfigFileNew *dyn)
+csConfigManager::csConfigManager(iConfigFileNew *dyn, bool opt)
 {
   CONSTRUCT_IBASE(NULL);
+  Optimize = opt;
   FirstDomain = new csConfigDomain(NULL, PriorityMin);
   LastDomain = new csConfigDomain(NULL, PriorityMax);
   LastDomain->InsertAfter(FirstDomain);
@@ -175,6 +176,8 @@ csConfigManager::csConfigManager(iConfigFileNew *dyn)
 
 csConfigManager::~csConfigManager()
 {
+  FlushRemoved();
+
   csConfigDomain *i, *Next;
   for (i=FirstDomain; i!=NULL; i=Next) {
     Next = i->Next;
@@ -193,9 +196,28 @@ void csConfigManager::AddDomain(iConfigFileNew *Config, int Priority)
   }
 }
 
-void csConfigManager::AddDomain(char const* path, iVFS* vfs, int priority)
+iConfigFileNew *csConfigManager::AddDomain(char const* path, iVFS* vfs, int priority)
 {
-  AddDomain(new csConfigFile(path, vfs), priority);
+  if (Optimize) {
+    csConfigDomain *d = FindConfig(path, vfs);
+    if (d) {
+      AddDomain(d->Cfg, priority);
+      return d->Cfg;
+    }
+
+    int n = FindRemoved(path, vfs);
+    if (n != -1) {
+      iConfigFileNew *cfg = (iConfigFileNew*)Removed.Get(n);
+      AddDomain(cfg, priority);
+      FlushRemoved(n);
+      return cfg;
+    }
+  }
+
+  iConfigFileNew *cfg = new csConfigFile(path, vfs);
+  AddDomain(cfg, priority);
+  cfg->DecRef();
+  return cfg;
 }
 
 void csConfigManager::RemoveDomain(iConfigFileNew *cfg)
@@ -203,7 +225,7 @@ void csConfigManager::RemoveDomain(iConfigFileNew *cfg)
   // prevent removal of dynamic domain
   if (cfg == DynamicDomain->Cfg) return;
   csConfigDomain *d = FindConfig(cfg);
-  if (d) delete d;
+  if (d) RemoveDomain(d);
 }
 
 void csConfigManager::RemoveDomain(char const *path, iVFS *vfs)
@@ -211,7 +233,7 @@ void csConfigManager::RemoveDomain(char const *path, iVFS *vfs)
   csConfigDomain *d = FindConfig(path, vfs);
   // prevent removal of dynamic domain
   if (d == NULL || d == DynamicDomain) return;
-  delete d;
+  RemoveDomain(d);
 }
 
 iConfigFileNew* csConfigManager::LookupDomain(char const *path, iVFS *vfs) const
@@ -460,4 +482,40 @@ void csConfigManager::RemoveIterator(csConfigManagerIterator *it)
   int n = Iterators.Find(it);
   CS_ASSERT(n != -1);
   Iterators.Delete(n);
+}
+
+void csConfigManager::FlushRemoved()
+{
+  for (long i=0; i<Removed.Length(); i++) {
+    iConfigFileNew *cfg = (iConfigFileNew*)Removed.Get(i);
+    cfg->DecRef();
+  }
+  Removed.DeleteAll();
+}
+
+void csConfigManager::FlushRemoved(int n)
+{
+  iConfigFileNew *cfg = (iConfigFileNew*)Removed.Get(n);
+  cfg->DecRef();
+  Removed.Delete(n);
+}
+
+int csConfigManager::FindRemoved(const char *Name, iVFS *vfs) const
+{
+  for (long i=0; i<Removed.Length(); i++) {
+    iConfigFileNew *cfg = (iConfigFileNew*)Removed.Get(i);
+    if (strcmp(cfg->GetFileName(), Name)==0 && cfg->GetVFS()==vfs)
+      return i;
+  }
+  return -1;
+}
+
+void csConfigManager::RemoveDomain(csConfigDomain *d)
+{
+  d->Remove();
+  if (Optimize && FindConfig(d->Cfg)==NULL) {
+    d->Cfg->IncRef();
+    Removed.Push(d->Cfg);
+  }
+  delete d;
 }
