@@ -11,6 +11,8 @@ chronological order.
 	  Darius Dawidowski. Darius also reported a warning in spr2d
 	  which turned out to be a potentially dangerous uninitialized
 	  local variable.
+	- Jorrit fixed a bug in the bruteblock plugin. Sometimes when walking
+	  around the border the material map would get accessed out of bounds.
 6-Jul-2004
 	- Reed changed VOSA3DL to load required plugins on demand rather than 
 	  assume they were already loaded.

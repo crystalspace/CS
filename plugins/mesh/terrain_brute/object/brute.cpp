@@ -568,6 +568,10 @@ bool csTerrBlock::IsMaterialUsed (int index)
     int mmBottom = 
       (int)ceil ((heightmapSpace.MaxY() - terrRegion.MinY()) * hm);
 
+    // Jorrit: for some reason we must cap mmRight and mmBottom.
+    if (mmRight >= terr->materialMapW) mmRight = terr->materialMapW-1;
+    if (mmBottom >= terr->materialMapH) mmBottom = terr->materialMapH-1;
+
     bool matUsed = false;
     for (int y = mmTop; y <= mmBottom; y++)
     {
