@@ -1385,20 +1385,22 @@ AS_IF([test "$cs_cv_libvorbis" = yes],
 # Check for lib3ds.  In addition to the standard installed locations, we
 # also search CS/libs/lib3ds*.
 #------------------------------------------------------------------------------
-AC_DEFUN([CS_CHECK_LIB3DS],
+AC_DEFUN([CS_CHECK_LIB3DS_PREPARE],
     [AC_REQUIRE([CS_CHECK_COMMON_LIBS])
     AS_IF([test $cs_cv_libm = yes],
-	[cs_3ds_libs_test='-lm'], [cs_3ds_libs_test=''])
-    CS_CHECK_LIB_WITH([3ds],
-	[AC_LANG_PROGRAM(
-	    [#include <lib3ds/file.h>
-	    #include <lib3ds/io.h>],
-	    [lib3ds_file_new(); lib3ds_io_free(0);])],
-	[libs/lib3ds*], [],
-	[CS_MAKEFILE_BUILD_RESULT([cs_cv_lib3ds], [3DS])], [],
-	[], [], [$cs_3ds_libs_test])])
+	[cs_3ds_libs_test='-lm'], [cs_3ds_libs_test=''])])
 
-CS_CHECK_LIB3DS
+CS_CHECK_LIB3DS_PREPARE
+
+CS_CHECK_LIB_WITH([3ds],
+    [AC_LANG_PROGRAM([#include <lib3ds/file.h>],[lib3ds_file_new();])],
+    [libs/lib3ds*], [], [], [], [], [], [$cs_3ds_libs_test])
+
+AS_IF([test $cs_cv_lib3ds = yes],
+    [CS_CHECK_BUILD([if lib3ds is sufficiently recent], [cs_cv_lib3ds_recent],
+	[AC_LANG_PROGRAM([#include <lib3ds/io.h>], [lib3ds_io_free(0);])],
+	[], [], [CS_MAKEFILE_BUILD_RESULT([cs_cv_lib3ds], [3DS])], [], [],
+	[$cs_cv_lib3ds_cflags], [$cs_cv_lib3ds_lflags], [$cs_cv_lib3ds_libs])])
 
 
 

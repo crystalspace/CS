@@ -20,6 +20,11 @@ The history order is reversed so that new features are at the top.
 	    - Updated Mingw build instructions to mention that csmingwlibs must
 	      be re-installed whenever a newer version of MSYS is installed.
 	    - Fixed `hbox' warnings from TeX.
+	- Eric Sunshine augmented the lib3ds check in configure.ac so that it
+	  works in two phases.  First it checks for lib3ds.  Second, it checks
+	  if the installed lib3ds is sufficiently recent.  This approach will
+	  provide better feedback and debugging information for a user than the
+	  old approach where the checks were combined.
 6-Feb-2002
 	- Eric Sunshine added FT_UINT_MAX and FT_ULONG_MAX defines to freefont2
 	  "make depend" flags to work around problem reported by David Calkins
