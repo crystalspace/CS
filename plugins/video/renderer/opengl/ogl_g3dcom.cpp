@@ -542,6 +542,8 @@ void csGraphics3DOGLCommon::PerfTest ()
     mesh.vertices[0][i].z = z;
   for (i = 0 ; i < test_mode_cnt ; i++)
   {
+    if (test_modes[i].mode == 'z') test_modes[i].mode = 'n';
+    else if (test_modes[i].mode == 'Z') test_modes[i].mode = 'N';
     clip_optional[0] = test_modes[i].mode;
     int cnt = 0;
     cs_time end = System->GetTime () + 1000;
