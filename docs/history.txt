@@ -1,9 +1,6 @@
 The history order has been reversed so that new features are at the top.
 
-17-Feb-2001
-	- Eric Sunshine defined the missing DESCRIPTION.OS.beos variable in
-	  lib/cssys/beos/beos.mak.
-	- Eric Sunshine eliminated a compilation error in cfgfile.cpp on BeOS.
+18-Feb-2001
 	- Eric Sunshine eliminated a compilation warning in levtool.cpp on
 	  BeOS.
 	- Eric Sunshine finished the conversion of the Glide 3D driver to the
@@ -16,6 +13,22 @@ The history order has been reversed so that new features are at the top.
 	  port:
 	    - Mentions new (untested) MacOS/X port.
 	    - Major changes in code and file organization.
+	- Eric Sunshine fixed a problem on MacOS/X Server 1.0 (Rhapsody) where
+	  a system header was defining a macro named Free().  Unfortunately,
+	  this macro was conflicting with several Crystal Space classes which
+	  have methods named Free().  This problem only manifested when certain
+	  facilities were requested via the SYSDEF_* macros and <libc.h> was
+	  imported.
+	- Eric Sunshine fixed the default setting of INSTALL_DIR in install.mak
+	  so that it now works correctly with the GNU make shipped with
+	  MacOS/X Server 1.0 (Rhapsody).
+	- Eric Sunshine changed next/csosdefs.h so that it only fakes up the
+	  strdup() function on OpenStep and NextStep.  It is no longer faked
+	  up for MacOS/X or MacOS/X Server 1.0 (Rhapsody).
+17-Feb-2001
+	- Eric Sunshine defined the missing DESCRIPTION.OS.beos variable in
+	  lib/cssys/beos/beos.mak.
+	- Eric Sunshine eliminated a compilation error in cfgfile.cpp on BeOS.
 16-Feb-2001
 	- Dynamic lights do not traverse through mirroring portals anymore.
 	  This caused a bug because the dynamic lighting routine can't handle

@@ -15,9 +15,8 @@
 // csosdefs.h
 //
 //	Platform-specific interface to common functionality.  Compatible
-//	with MacOS/X Server, OpenStep, and NextStep.
+//	with MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep, and NextStep.
 //
-// *NOTE* This file is included by include/cssysdef.h and must not be renamed.
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
@@ -82,6 +81,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#if defined(OS_NEXT_NEXTSTEP) || defined(OS_NEXT_OPENSTEP)
+
 static inline char* strdup( char const* s )
     {
     if (s == 0) s = "";
@@ -90,15 +91,22 @@ static inline char* strdup( char const* s )
     return p;
     }
 
+#endif
+
 
 //-----------------------------------------------------------------------------
 // Pull in definitions for getwd(), ntohl(), htonl(), select(), etc.
+// *NOTE* On MacOS/X Server 1.0, libc.h pulls in sys/mount.h which pulls in
+// net/radix.h which defines a macro named Free().  This macro interferes with
+// several Crystal Space classes which have methods named Free(), so we must
+// #undef it.
 //-----------------------------------------------------------------------------
 #if defined(SYSDEF_GETCWD)  || \
     defined(SYSDEF_SOCKETS) || \
     defined(SYSDEF_SELECT)  || \
     defined(SYSDEF_ACCESS)
 #include <libc.h>
+#undef Free
 #endif
 
 #if defined(SYSDEF_SOCKETS)
