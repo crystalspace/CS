@@ -5,5 +5,3 @@ Library xalert_xaw
 	: [ Wildcard *.cpp *.h *.c ]
 	: noinstall ;
 ExternalLibs xalert_xaw : XAW ;
-
-# LibDepends canvascommon : cstool csgfx csgeom csutil ;

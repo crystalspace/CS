@@ -31,6 +31,9 @@ chronological order.
 	  cscursor plugin.
 	- res fixed a memory overwrite and a double-delete in the win32 cursor
 	  code.
+	- res made the xalert_null lib depend on X11, as it includes 
+	  "../xwindow.h" which in turn includes some X headers. This caused
+	  problems on some systems.
 8-Jan-2005
 	- Marten completly rewrote the way renderbuffers are sent from the
 	  mesh into renderer. Also changed the syntax of buffermappings a bit.
