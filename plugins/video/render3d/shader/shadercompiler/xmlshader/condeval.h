@@ -85,6 +85,8 @@ class csConditionEvaluator
     { memset (this, 0, sizeof (*this)); }
   };
   /// An operation.
+  struct CondOperation;
+  friend struct CondOperation;
   struct CondOperation
   {
     ConditionOp operation;

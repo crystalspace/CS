@@ -45,6 +45,10 @@ chronological order.
 	      `lflags' reported by these modules: cs-win32libs, Java,
 	      FreeType2, SDL, VOS, wxWidgets, AAlib.  (Flags for Perl and
 	      Python have been normalized since 15-Feb-2004.
+	- Luca fixed another compilation error (in xmlshader) that was 
+	  happening on the VisualC++ 6.0 "compiler". The error is always 
+	  related to an inner class not being declared friend by the outer
+	  class.
 19-Oct-2004
 	- Jorrit worked further on foliage mesh. Added support for
 	  specifying LOD control in a foliage object.
