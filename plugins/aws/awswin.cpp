@@ -671,7 +671,10 @@ awsWindow::OnDraw(csRect clip)
         if (btxt==NULL) 
           g2d->DrawBox(r.xmin, r.ymin, r.Width(), r.Height(), fill);
         else
-          g3d->DrawPixmap(btxt, r.xmin, r.ymin, r.Width(), r.Height(), 0,0, r.Width(), r.Height(), 0);
+          g3d->DrawPixmap(btxt, 
+                          r.xmin, r.ymin, r.Width(), r.Height(), 
+                          r.xmin-Frame().xmin, r.ymin-Frame().ymin, 
+                          r.Width(), r.Height(), 0);
       }
 
       // Draw a beveled border, fill-hi on top and left, black-shadow on bot and right
@@ -702,8 +705,12 @@ awsWindow::OnDraw(csRect clip)
         if (btxt==NULL) 
           g2d->DrawBox(r.xmin, r.ymin, r.Width(), r.Height(), fill);
         else
-          g3d->DrawPixmap(btxt, r.xmin, r.ymin, r.Width(), r.Height(), 0,0, r.Width(), r.Height(), 0);
+          g3d->DrawPixmap(btxt, 
+                          r.xmin, r.ymin, r.Width(), r.Height(), 
+                          r.xmin-Frame().xmin, r.ymin-Frame().ymin, 
+                          r.Width(), r.Height(), 0);
       }
+
       
       if (frame_options & foTitle)
       {
@@ -789,7 +796,6 @@ awsWindow::OnDraw(csRect clip)
           }
 
       }
-
       
       // Draw min/max/close buttons
       int mtw, mth, mxtw, mxth, ctw, cth;

@@ -126,8 +126,37 @@ awsGroupFrame::OnDraw(csRect clip)
       g2d->DrawLine(Frame().xmin+3, Frame().ymin+3, Frame().xmax-4, Frame().ymin+3, black);
       g2d->DrawLine(Frame().xmin+3, Frame().ymin+3, Frame().xmin+3, Frame().ymax-4, black);
 
-      if (bkg)
-       g3d->DrawPixmap(bkg, Frame().xmin+4, Frame().ymin+4, Frame().Width()-7, Frame().Height()-7, 0, 0, Frame().Width(), Frame().Height(), 0);
+      if (bkg) {
+       g3d->DrawPixmap(bkg, Frame().xmin+4, Frame().ymin+4, 
+                       Frame().Width()-7, Frame().Height()-7, 
+                       Frame().xmin+4-Window()->Frame().xmin, 
+                       Frame().ymin+4-Window()->Frame().ymin, 
+                       Frame().Width()-7, Frame().Height()-7, 0);
+       
+       g3d->DrawPixmap(bkg, Frame().xmin, Frame().ymin, 
+                       Frame().Width(), 4, 
+                       Frame().xmin-Window()->Frame().xmin, 
+                       Frame().ymin-Window()->Frame().ymin, 
+                       Frame().Width(), 4, alpha_level);
+
+       g3d->DrawPixmap(bkg, Frame().xmin, Frame().ymin+4, 
+                       4, Frame().Height(), 
+                       Frame().xmin-Window()->Frame().xmin, 
+                       Frame().ymin+4-Window()->Frame().ymin, 
+                       4, Frame().Height(), alpha_level);
+
+       g3d->DrawPixmap(bkg, Frame().xmax-4, Frame().ymin+4, 
+                       4, Frame().Height(), 
+                       Frame().xmax-4-Window()->Frame().xmin, 
+                       Frame().ymin+4-Window()->Frame().ymin, 
+                       4, Frame().Height(), alpha_level);
+
+       g3d->DrawPixmap(bkg, Frame().xmin+4, Frame().ymax-4, 
+                       Frame().Width()-4, 4, 
+                       Frame().xmin+4-Window()->Frame().xmin, 
+                       Frame().ymax-4-Window()->Frame().ymin, 
+                       Frame().Width()-4, 4, alpha_level);
+      }
       else
        g2d->DrawBox(Frame().xmin+4, Frame().ymin+4, Frame().Width()-7, Frame().Height()-7, fill);
 
@@ -149,8 +178,11 @@ awsGroupFrame::OnDraw(csRect clip)
       g2d->DrawBox(Frame().xmin+3, Frame().ymin+3, Frame().Width()-3, Frame().Height()-3, dfill);
 
       if (bkg)
-       g3d->DrawPixmap(bkg, Frame().xmin, Frame().ymin, Frame().Width()+1, Frame().Height()+1, 0, 0, Frame().Width()+1, Frame().Height()+1, alpha_level);
-
+        g3d->DrawPixmap(bkg, Frame().xmin, Frame().ymin, 
+                       Frame().Width()+1, Frame().Height()+1, 
+                       Frame().xmin-Window()->Frame().xmin, 
+                       Frame().ymin-Window()->Frame().ymin, 
+                       Frame().Width()+1, Frame().Height()+1, alpha_level);
       break;
       
   case fsRaised:
@@ -169,8 +201,11 @@ awsGroupFrame::OnDraw(csRect clip)
       g2d->DrawBox(Frame().xmin+2, Frame().ymin+2, Frame().Width()-3, Frame().Height()-3, fill);
 
       if (bkg)
-       g3d->DrawPixmap(bkg, Frame().xmin, Frame().ymin, Frame().Width()+1, Frame().Height()+1, 0, 0, Frame().Width()+1, Frame().Height()+1, alpha_level);
-
+                g3d->DrawPixmap(bkg, Frame().xmin, Frame().ymin, 
+                       Frame().Width()+1, Frame().Height()+1, 
+                       Frame().xmin-Window()->Frame().xmin, 
+                       Frame().ymin-Window()->Frame().ymin, 
+                       Frame().Width()+1, Frame().Height()+1, alpha_level);
       break;
 
     case fsSimple:

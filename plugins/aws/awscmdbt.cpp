@@ -226,9 +226,12 @@ awsCmdButton::OnDraw(csRect clip)
     }
 
     if (tex[0])
-       g3d->DrawPixmap(tex[0], Frame().xmin, Frame().ymin, Frame().Width()+1, Frame().Height()+1, 0, 0, Frame().Width()+1, Frame().Height()+1, alpha_level);
-
-        
+      g3d->DrawPixmap(tex[0], Frame().xmin, Frame().ymin, 
+                       Frame().Width()+1, Frame().Height()+1, 
+                       Frame().xmin-Window()->Frame().xmin, 
+                       Frame().ymin-Window()->Frame().ymin, 
+                       Frame().Width()+1, Frame().Height()+1, alpha_level);
+              
     // Draw the caption, if there is one and the style permits it.
     if (caption && frame_style==fsNormal)
     {     

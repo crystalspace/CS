@@ -399,7 +399,11 @@ awsListBox::OnDraw(csRect clip)
       g2d->DrawLine(Frame().xmin+3, Frame().ymin+3, Frame().xmin+3, Frame().ymax-4, black);
 
       if (bkg)
-       g3d->DrawPixmap(bkg, Frame().xmin+4, Frame().ymin+4, Frame().Width()-7, Frame().Height()-7, 0, 0, Frame().Width(), Frame().Height(), 0);
+       g3d->DrawPixmap(bkg, Frame().xmin+4, Frame().ymin+4, 
+                       Frame().Width()-7, Frame().Height()-7, 
+                       Frame().xmin+4-Window()->Frame().xmin, 
+                       Frame().ymin+4-Window()->Frame().ymin, 
+                       Frame().Width()-7, Frame().Height()-7, 0);
       else
        g2d->DrawBox(Frame().xmin+4, Frame().ymin+4, Frame().Width()-7, Frame().Height()-7, fill);
 
@@ -423,8 +427,11 @@ awsListBox::OnDraw(csRect clip)
       g2d->DrawBox(Frame().xmin+3, Frame().ymin+3, Frame().Width()-3, Frame().Height()-3, dfill);
 
       if (bkg)
-       g3d->DrawPixmap(bkg, Frame().xmin, Frame().ymin, Frame().Width()+1, Frame().Height()+1, 0, 0, Frame().Width()+1, Frame().Height()+1, alpha_level);
-
+       g3d->DrawPixmap(bkg, Frame().xmin, Frame().ymin, 
+                       Frame().Width()+1, Frame().Height()+1, 
+                       Frame().xmin-Window()->Frame().xmin, 
+                       Frame().ymin-Window()->Frame().ymin, 
+                       Frame().Width()+1, Frame().Height()+1, alpha_level);
       break;
       
   case fsRaised:
@@ -443,8 +450,11 @@ awsListBox::OnDraw(csRect clip)
       g2d->DrawBox(Frame().xmin+2, Frame().ymin+2, Frame().Width()-3, Frame().Height()-3, fill);
 
       if (bkg)
-       g3d->DrawPixmap(bkg, Frame().xmin, Frame().ymin, Frame().Width()+1, Frame().Height()+1, 0, 0, Frame().Width()+1, Frame().Height()+1, alpha_level);
-
+       g3d->DrawPixmap(bkg, Frame().xmin, Frame().ymin, 
+                       Frame().Width()+1, Frame().Height()+1, 
+                       Frame().xmin-Window()->Frame().xmin, 
+                       Frame().ymin-Window()->Frame().ymin, 
+                       Frame().Width()+1, Frame().Height()+1, alpha_level);
       break;
 
     case fsSimple:
@@ -794,7 +804,7 @@ awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int border, in
   }
 
     // next row.
-    y+=ith+2;
+    y+=ith+(ith>>2);
 
     // Draw children
     if (row->children && row->expanded)
@@ -818,37 +828,6 @@ awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int border, in
 bool 
 awsListBox::OnMouseDown(int button, int x, int y)
 {
-  was_down=is_down;
-
-  if (!is_switch || is_down==false)
-    is_down=true;
-  
-  Invalidate();
-  return true;
-}
-    
-bool 
-awsListBox::OnMouseUp(int button, int x, int y)
-{
-  /*
-  if (!is_switch)
-  {
-    if (is_down)
-      Broadcast(signalSelected);
-
-    is_down=false;
-  }
-  else
-  {
-    if (was_down)
-      is_down=false;
-    else
-      ClearGroup();
-
-    Broadcast(signalSelected);
-  }
-  */
-  
   int i;
   for(i=0; i<hotspots.Length(); ++i)
   {
@@ -896,8 +875,14 @@ awsListBox::OnMouseUp(int button, int x, int y)
       } // end switch type
     } // end if contains
   } // end for
-  
-  return true;
+
+  return false;
+}
+    
+bool 
+awsListBox::OnMouseUp(int button, int x, int y)
+{  
+  return false;
 }
     
 bool
