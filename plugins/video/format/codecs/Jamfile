@@ -2,4 +2,3 @@ SubDir TOP plugins video format codecs ;
 
 SubInclude TOP plugins video format codecs divx4 ;
 SubInclude TOP plugins video format codecs opendivx ;
-SubInclude TOP plugins video format codecs rle ;

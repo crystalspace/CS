@@ -1,8 +1,0 @@
-SubDir TOP plugins video format codecs rle ;
-
-Description rlecodec : "RLE codec" ;
-
-Plugin rlecodec
-	: [ Wildcard *.cpp *.h ]
-;
-LinkWith rlecodec : csutil ;

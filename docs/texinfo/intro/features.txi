@@ -112,7 +112,7 @@ Crystal Space native windowing system(s). @xref{AWS}. @xref{CSWS}.
 3D renderers (OpenGL, software, null). @xref{Graphics Drivers}.
 
 @item
-Playing @sc{avi} streams (@sc{rle}, DivX 4, OpenDivX) on a texture.
+Playing @sc{avi} streams (DivX 4, OpenDivX) on a texture.
 
 @item
 Various image loaders (@sc{bmp}, @sc{gif}, @sc{jpg}, @sc{png}, @sc{sgi},
