@@ -57,7 +57,7 @@ class csListBoxItem : public csComponent
 
 public:
   /// Listbox item constructor: text item with optional style
-  csListBoxItem (csComponent *iParent, char *iText, int iID = 0,
+  csListBoxItem (csComponent *iParent, const char *iText, int iID = 0,
     csListBoxItemStyle iStyle = cslisNormal);
 
   /// Listbox item destructor

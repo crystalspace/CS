@@ -141,7 +141,7 @@ csGraphics2DGlideX::~csGraphics2DGlideX ()
 }
 
 // Used to printf through system driver
-void csGraphics2DGlideX::CsPrintf (int msgtype, char *format, ...)
+void csGraphics2DGlideX::CsPrintf (int msgtype, const char *format, ...)
 {
   va_list arg;
   char buf[256];
@@ -153,7 +153,7 @@ void csGraphics2DGlideX::CsPrintf (int msgtype, char *format, ...)
   System->Print (msgtype, buf);
 }
 
-bool csGraphics2DGlideX::Open(char *Title)
+bool csGraphics2DGlideX::Open(const char *Title)
 { 
 
   // Open your graphic interface

@@ -106,7 +106,7 @@ public:
   bool insert;
 
   /// Initialize windowing system
-  csApp (char *AppTitle, csAppBackgroundStyle iBackgroundStyle = csabsSolid);
+  csApp (const char *AppTitle, csAppBackgroundStyle iBackgroundStyle = csabsSolid);
   /// Deinitialize windowing system
   virtual ~csApp ();
 
@@ -221,7 +221,7 @@ public:
   { GfxPpl->Pixel (x, y, Pal [color]); }
 
   /// Draw a text string: if bg < 0 background is not drawn
-  void pplText (int x, int y, int fg, int bg, int Font, char *s)
+  void pplText (int x, int y, int fg, int bg, int Font, const char *s)
   { GfxPpl->Text (x, y, Pal[fg], bg >= 0 ? Pal[bg] : bg, Font, s); }
 
   /// Draw a (scaled) 2D sprite
@@ -255,7 +255,7 @@ public:
   { GfxPpl->RestoreClipRect (); }
 
   /// Return the width of given text using currently selected font
-  int TextWidth (char *text, int Font)
+  int TextWidth (const char *text, int Font)
   { return GfxPpl->TextWidth (text, Font); }
   /// Return the height of currently selected font
   int TextHeight (int Font)

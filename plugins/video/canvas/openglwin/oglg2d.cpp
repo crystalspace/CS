@@ -263,7 +263,7 @@ void csGraphics2DOpenGL::CalcPixelFormat ()
     sys_fatalerror("DescribePixelFormat failed.");
 }
 
-bool csGraphics2DOpenGL::Open(char *Title)
+bool csGraphics2DOpenGL::Open(const char *Title)
 {
   DEVMODE dmode;
   LONG ti;

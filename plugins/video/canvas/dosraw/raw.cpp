@@ -134,7 +134,7 @@ csGraphics2DDOSRAW::~csGraphics2DDOSRAW ()
   FINAL_RELEASE (DosSystem);
 }
 
-void csGraphics2DDOSRAW::CsPrintf (int msgtype, char *format, ...)
+void csGraphics2DDOSRAW::CsPrintf (int msgtype, const char *format, ...)
 {
   va_list arg;
   char buf[256];
@@ -168,7 +168,7 @@ void csGraphics2DDOSRAW::Initialize ()
   complete_pixel_format();
 }
 
-bool csGraphics2DDOSRAW::Open (char* Title)
+bool csGraphics2DDOSRAW::Open (const char* Title)
 {
   if (!csGraphics2D::Open (Title))
     return false;

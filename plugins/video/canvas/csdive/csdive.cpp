@@ -359,7 +359,7 @@ void csGraphics2DOS2DIVE::Initialize ()
   }
 }
 
-bool csGraphics2DOS2DIVE::Open (char *Title)
+bool csGraphics2DOS2DIVE::Open (const char *Title)
 {
   if (!csGraphics2D::Open (Title))
     return false;

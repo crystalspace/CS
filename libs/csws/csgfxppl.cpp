@@ -70,7 +70,7 @@ void csGraphicsPipeline::Pixel (int x, int y, int color)
   pe->Pixel.color = color;
 }
 
-void csGraphicsPipeline::Text (int x, int y, int fg, int bg, int font, char *s)
+void csGraphicsPipeline::Text (int x, int y, int fg, int bg, int font, const char *s)
 {
   csPipeEntry *pe = AllocOp (pipeopTEXT);
   if (!pe) return;
@@ -342,7 +342,7 @@ sync:
   } /* endwhile */
 }
 
-int csGraphicsPipeline::TextWidth (char *text, int Font)
+int csGraphicsPipeline::TextWidth (const char *text, int Font)
 {
   int Width;
   System->piGI->GetTextWidth (Width, Font, text);

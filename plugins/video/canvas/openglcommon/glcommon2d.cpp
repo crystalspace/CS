@@ -55,7 +55,7 @@ csGraphics2DGLCommon::~csGraphics2DGLCommon ()
   Close ();
 }
 
-bool csGraphics2DGLCommon::Open(char *Title)
+bool csGraphics2DGLCommon::Open(const char *Title)
 {
   if (glGetString (GL_RENDERER))
     CsPrintf (MSG_INITIALIZATION, "Renderer %s ", glGetString(GL_RENDERER) );
@@ -274,7 +274,7 @@ unsigned char* csGraphics2DGLCommon::GetPixelAtGL (int /*x*/, int /*y*/)
 }
 
 // Used to printf through system driver
-void csGraphics2DGLCommon::CsPrintf (int msgtype, char *format, ...)
+void csGraphics2DGLCommon::CsPrintf (int msgtype, const char *format, ...)
 {
   va_list arg;
   char buf[256];

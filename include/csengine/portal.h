@@ -135,6 +135,11 @@ public:
   bool IsSpaceWarped () { return do_warp_space; }
 
   /**
+   * Check if space warp transformation is mirroring
+   */
+  bool IsMirroring () { return do_mirror; }
+
+  /**
    * Disable space warping.
    */
   void DisableSpaceWarping () { do_warp_space = false; }

@@ -65,7 +65,7 @@ public:
   csGraphics2DOpenGL(ISystem* piSystem, bool bUses3D);
   virtual ~csGraphics2DOpenGL(void);
   
-  virtual bool Open (char *Title);
+  virtual bool Open (const char *Title);
   virtual void Close ();
   
   virtual void Initialize();

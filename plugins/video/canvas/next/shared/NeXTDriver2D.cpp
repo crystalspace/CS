@@ -106,7 +106,7 @@ void NeXTDriver2D::setup_rgb_32()
 //-----------------------------------------------------------------------------
 // Open
 //-----------------------------------------------------------------------------
-bool NeXTDriver2D::Open( char* title )
+bool NeXTDriver2D::Open( const char* title )
     {
     bool okay = false;
     if (proxy->get_frame_buffer() == 0)

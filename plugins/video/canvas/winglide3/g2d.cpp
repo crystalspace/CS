@@ -137,7 +137,7 @@ csGraphics2DGlide3x::~csGraphics2DGlide3x(void)
 #endif
 }
 
-bool csGraphics2DGlide3x::Open(char *Title)
+bool csGraphics2DGlide3x::Open(const char *Title)
 {
   if (!csGraphics2D::Open (Title))
 		return false;

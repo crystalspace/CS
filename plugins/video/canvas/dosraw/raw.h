@@ -54,8 +54,8 @@ public:
   virtual ~csGraphics2DDOSRAW ();
 
   virtual void Initialize ();
-  virtual bool Open(char* Title);
-  virtual void Close(void);
+  virtual bool Open (const char* Title);
+  virtual void Close (void);
 
   virtual void Print (csRect *area = NULL);
 
@@ -74,7 +74,7 @@ public:
 #endif // USE_ALLEGRO
 
 private:
-  void CsPrintf (int msgtype, char *format, ...);
+  void CsPrintf (int msgtype, const char *format, ...);
   void FillEvents ();
   void printf_Enable (bool Enable);
 

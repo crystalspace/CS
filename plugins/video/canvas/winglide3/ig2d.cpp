@@ -24,7 +24,7 @@
 
 IMPLEMENT_COMPOSITE_UNKNOWN(csGraphics2DGlide3x, XGlide3xGraphicsInfo)
 
-STDMETHODIMP IXGlide3xGraphicsInfo::Open(char* szTitle)
+STDMETHODIMP IXGlide3xGraphicsInfo::Open(const char* szTitle)
 {
   METHOD_PROLOGUE( csGraphics2DGlide3x, XGlide3xGraphicsInfo);
   

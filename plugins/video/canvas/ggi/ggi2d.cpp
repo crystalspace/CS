@@ -174,7 +174,7 @@ csGraphics2DGGI::~csGraphics2DGGI(void)
 }
 
 // Used to printf through system driver
-void csGraphics2DGGI::CsPrintf (int msgtype, char *format, ...)
+void csGraphics2DGGI::CsPrintf (int msgtype, const char *format, ...)
 {
   va_list arg;
   char buf[256];
@@ -186,7 +186,7 @@ void csGraphics2DGGI::CsPrintf (int msgtype, char *format, ...)
   System->Print (msgtype, buf);
 }
 
-bool csGraphics2DGGI::Open(char *Title)
+bool csGraphics2DGGI::Open(const char *Title)
 {
   // Open your graphic interface
   if (!csGraphics2D::Open (Title)) return false;

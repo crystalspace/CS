@@ -81,7 +81,7 @@ void CrystGLView::AttachedToWindow()
 	UnlockGL();
 }
 
-CrystGLWindow::CrystGLWindow(BRect frame, char const* name, CrystGLView *v,
+CrystGLWindow::CrystGLWindow(BRect frame, const char* name, CrystGLView *v,
 	csGraphics2DGLBe *piBeG2D, ISystem* isys, IBeLibSystemDriver* bsys) :
 //	BWindow(frame,name, B_TITLED_WINDOW, B_NOT_RESIZABLE,0),
 //	BGLScreen(name, B_16_BIT_640x480, 0, &res, 0),

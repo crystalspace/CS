@@ -71,7 +71,7 @@ void CrystView::MouseUp(BPoint point)
 	ProcessUserEvent();
 }
 
-CrystWindow::CrystWindow(BRect frame, char const* name, CrystView* v,
+CrystWindow::CrystWindow(BRect frame, const char* name, CrystView* v,
 	csGraphics2DBeLib* piBeG2D, ISystem* isys, IBeLibSystemDriver* bsys) :
 	BDirectWindow(frame,name, B_TITLED_WINDOW, B_NOT_RESIZABLE|B_NOT_ZOOMABLE),
 	view(v), cs_system(isys), be_system(bsys)

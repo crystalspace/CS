@@ -52,7 +52,7 @@ struct PMrq
   {
     struct
     {
-      char *Title;
+      const char *Title;
       HWND Handle;
     } CreateWindow;
     struct

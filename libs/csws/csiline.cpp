@@ -44,7 +44,7 @@ csInputLine::csInputLine (csComponent *iParent, int iMaxLen,
   CHK ((void)new csTimer (this, CURSOR_FLASHING_INTERVAL));
 }
 
-void csInputLine::SetText (char *iText)
+void csInputLine::SetText (const char *iText)
 {
   int sl = strlen (iText);
   if (sl > maxlen)
@@ -252,12 +252,12 @@ bool csInputLine::HandleEvent (csEvent &Event)
           return true;
         }
         case CSKEY_HOME:
-          if (Event.Key.ShiftKeys & CSMASK_ALLSHIFTS)
+          if (Event.Key.ShiftKeys & CSMASK_ALT)
             break;
           SetCursorPos (0, (Event.Key.ShiftKeys & CSMASK_SHIFT) != 0);
           return true;
         case CSKEY_END:
-          if (Event.Key.ShiftKeys & CSMASK_ALLSHIFTS)
+          if (Event.Key.ShiftKeys & CSMASK_ALT)
             break;
           SetCursorPos (strlen (text), (Event.Key.ShiftKeys & CSMASK_SHIFT) != 0);
           return true;
@@ -432,7 +432,7 @@ bool csInputLine::IsValidPos (int NewPos)
   return (NewPos >= 0) && (NewPos <= (int)strlen (text));
 }
 
-bool csInputLine::IsValidString (char *iText)
+bool csInputLine::IsValidString (const char *iText)
 {
   (void)iText;
   return true;

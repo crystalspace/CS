@@ -82,7 +82,7 @@ csGraphics2DBeGlide::~csGraphics2DBeGlide ()
     FINAL_RELEASE (BeSystem);
 }
 
-bool csGraphics2DBeGlide::Open(char *Title)
+bool csGraphics2DBeGlide::Open(const char *Title)
 { 
 
   // Open your graphic interface

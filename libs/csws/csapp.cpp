@@ -39,9 +39,19 @@
 // Archive path of CSWS.CFG
 #define CSWS_CFG "csws.cfg"
 
+TOKEN_DEF_START
+  TOKEN_DEF (MOUSECURSORIMAGEFILE)
+  TOKEN_DEF (MOUSECURSOR)
+  TOKEN_DEF (TITLEBUTTONIMAGEFILE)
+  TOKEN_DEF (TITLEBUTTON)
+  TOKEN_DEF (DIALOGBUTTONIMAGEFILE)
+  TOKEN_DEF (DIALOGBUTTON)
+  TOKEN_DEF (CUSTOMTEXTURE)
+TOKEN_DEF_END
+
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//- csApp  -//--
 
-csApp::csApp (char *AppTitle, csAppBackgroundStyle iBackgroundStyle) : csComponent (NULL)
+csApp::csApp (const char *AppTitle, csAppBackgroundStyle iBackgroundStyle) : csComponent (NULL)
 {
   app = this;           // so that all inserted windows will inherit it
   World = NULL;         // No world so far
@@ -128,6 +138,9 @@ bool csApp::InitialSetup (int argc, char *argv[],
 {
   System->Initialize (argc, argv, ConfigName, VfsConfigName, World->GetEngineConfigCOM ());
 
+  // For GUI apps double buffering is a serious performance hit
+  System->piG2D->DoubleBuffer (false);
+
   // Change to the directory on VFS where we keep our data
   System->Vfs->ChDir (dataDir);
 
@@ -188,27 +201,15 @@ void csApp::Update ()
 
 void csApp::LoadConfig ()
 {
-  enum
-  {
-    tkMouseCursorImageFile = 1,
-    tkMouseCursor,
-    tkTitleButtonImageFile,
-    tkTitleButton,
-    tkDialogButtonImageFile,
-    tkDialogButton,
-    tkCustomTexture
-  };
-  static csTokenDesc commands[] =
-  {
-    {tkMouseCursorImageFile,  "MOUSECURSORIMAGEFILE"},
-    {tkMouseCursor,           "MOUSECURSOR"},
-    {tkTitleButtonImageFile,  "TITLEBUTTONIMAGEFILE"},
-    {tkTitleButton,           "TITLEBUTTON"},
-    {tkDialogButtonImageFile, "DIALOGBUTTONIMAGEFILE"},
-    {tkDialogButton,          "DIALOGBUTTON"},
-    {tkCustomTexture,         "CUSTOMTEXTURE"},
-    {0,                       NULL}
-  };
+  TOKEN_TABLE_START (commands)
+    TOKEN_TABLE (MOUSECURSORIMAGEFILE)
+    TOKEN_TABLE (MOUSECURSOR)
+    TOKEN_TABLE (TITLEBUTTONIMAGEFILE)
+    TOKEN_TABLE (TITLEBUTTON)
+    TOKEN_TABLE (DIALOGBUTTONIMAGEFILE)
+    TOKEN_TABLE (DIALOGBUTTON)
+    TOKEN_TABLE (CUSTOMTEXTURE)
+  TOKEN_TABLE_END
 
   if (!customtexturename)
     CHKB (customtexturename = new csStrVector (16, 16));
@@ -222,62 +223,64 @@ void csApp::LoadConfig ()
   size_t cswscfglen;
   char *cswscfg = System->Vfs->ReadFile (CSWS_CFG, cswscfglen);
   if (!cswscfg)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "ERROR: CSWS config file `%s' not found\n", CSWS_CFG);
+    fatal_exit (0, true);			// cfg file not found
     return;
+  }
 
   int cmd;
   char *oldcfg = cswscfg, *name, *params;
   while ((cmd = csGetObject (&cswscfg, commands, &name, &params)) > 0)
-  {
     switch (cmd)
     {
-      case tkMouseCursorImageFile:
+      case TOKEN_MOUSECURSORIMAGEFILE:
       {
         mousetexturename = strdup (name);
         mousetextureparm = strdup (params);
         break;
       }
-      case tkMouseCursor:
+      case TOKEN_MOUSECURSOR:
       {
         Mouse->NewPointer (name, params);
         break;
       }
-      case tkTitleButtonImageFile:
+      case TOKEN_TITLEBUTTONIMAGEFILE:
       {
         titletexturename = strdup (name);
         titletextureparm = strdup (params);
         break;
       }
-      case tkTitleButton:
+      case TOKEN_TITLEBUTTON:
       {
         CHK (char *tmp = new char [strlen (name) + 1 + strlen (params) + 1]);
         sprintf (tmp, "%s %s", name, params);
         titlebardefs->Push (tmp);
         break;
       }
-      case tkDialogButtonImageFile:
+      case TOKEN_DIALOGBUTTONIMAGEFILE:
       {
         dialogtexturename = strdup (name);
         dialogtextureparm = strdup (params);
         break;
       }
-      case tkDialogButton:
+      case TOKEN_DIALOGBUTTON:
       {
         CHK (char *tmp = new char [strlen (name) + 1 + strlen (params) + 1]);
         sprintf (tmp, "%s %s", name, params);
         dialogdefs->Push (tmp);
         break;
       }
-      case tkCustomTexture:
+      case TOKEN_CUSTOMTEXTURE:
       {
         customtexturename->Push (strdup (name));
         customtextureparm->Push (strdup (params));
         break;
       }
       default:
-        CsPrintf (MSG_DEBUG_0, "Unknown token in csws.cfg! (%s)\n", cswscfg);
+        CsPrintf (MSG_FATAL_ERROR, "Unknown token in csws.cfg! (%s)\n", cswscfg);
         fatal_exit (0, false);			// Unknown token
     }
-  }
   CHK (delete[] oldcfg);
 }
 

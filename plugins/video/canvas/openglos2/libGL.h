@@ -62,7 +62,7 @@ public:
 
   glApp ();
   ~glApp ();
-  HWND CreateWindow (char *Title, HMODULE ModID, ULONG ResID, ULONG Flags);
+  HWND CreateWindow (const char *Title, HMODULE ModID, ULONG ResID, ULONG Flags);
   void Run ();
   bool ProcessQueuedMessages ();
 };

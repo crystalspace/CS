@@ -143,7 +143,7 @@ private:
   void Pixel (int x, int y, int color);
 
   /// Draw a text string: if bg < 0 background is not drawn
-  void Text (int x, int y, int fg, int bg, int font, char *s);
+  void Text (int x, int y, int fg, int bg, int font, const char *s);
 
   /// Draw a 2D sprite
   void Sprite2D (csSprite2D *s2d, int x, int y, int w, int h);
@@ -179,7 +179,7 @@ private:
   }
 
   /// Return the width of given text using selected font
-  int TextWidth (char *text, int Font);
+  int TextWidth (const char *text, int Font);
 
   /// Return the height of selected font
   int TextHeight (int Font);

@@ -51,7 +51,7 @@ public:
   csGraphics2DGlide3x(ISystem* piSystem);
   virtual ~csGraphics2DGlide3x(void);
   
-  virtual bool Open (char *Title);
+  virtual bool Open (const char *Title);
   virtual void Close ();
   
   virtual void Print (csRect *area = NULL);
@@ -69,7 +69,7 @@ public:
   
 protected:
   // print to the system's device
-  void SysPrintf(int mode, char* str, ...);
+  void SysPrintf(int mode, conat char* str, ...);
 
 #if defined(OS_WIN32)
   HWND m_hWnd;

@@ -44,6 +44,7 @@
 #include "csgeom/fastsqrt.h"
 #include "csgeom/polypool.h"
 #include "csobject/nameobj.h"
+#include "csutil/util.h"
 #include "csutil/inifile.h"
 #include "csutil/vfs.h"
 #include "csgfxldr/csimage.h"
@@ -286,6 +287,24 @@ void csWorld::PrepareTextures (IGraphics3D* g3d)
   for (int i = 0 ; i < textures->GetNumTextures () ; i++)
   {
     csTextureHandle* th = textures->GetTextureMM (i);
+    ImageFile *image = th->GetImageFile ();
+
+    // Now we check the size of the loaded image. Having an image, that
+    // is not a power of two will result in strange errors while
+    // rendering. It is by far better to check the format of all textures
+    // already while loading them.
+    if (th->for_3d)
+    {
+      int Width  = image->get_width ();
+      int Height = image->get_height ();
+
+      if (!IsPowerOf2(Width) || !IsPowerOf2(Height))
+        CsPrintf (MSG_WARNING,
+          "Invalid texture image '%s' dimenstions!\n"
+          "The width (%d) and height (%d) should be a power of two.\n",
+          csNameObject::GetName (*th), Width, Height);
+    }
+
     ITextureHandle* handle;
     txtmgr->RegisterTexture (GetIImageFileFromImageFile (th->GetImageFile ()),
       &handle, th->for_3d, th->for_2d);
@@ -308,8 +327,8 @@ void csWorld::PrepareSectors()
 
 bool csWorld::Prepare (IGraphics3D* g3d)
 {
-  PrepareTextures(g3d);
-  PrepareSectors();
+  PrepareTextures (g3d);
+  PrepareSectors ();
 
   // The images are no longer needed by the 3D engine.
   ITextureManager* txtmgr;
@@ -317,8 +336,13 @@ bool csWorld::Prepare (IGraphics3D* g3d)
   txtmgr->FreeImages ();
 
   g3d->ClearCache ();
-  ShineLights ();
-  CreateLightMaps (g3d);
+
+  // Prepare lightmaps if we have any sectors
+  if (sectors.Length ())
+  {
+    ShineLights ();
+    CreateLightMaps (g3d);
+  }
 
 #if defined(OS_NEXT)
 // FIXME: NextStep: Multiple Inheritence broken (IID_IHaloRasterizer)

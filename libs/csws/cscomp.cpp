@@ -1074,7 +1074,7 @@ int csComponent::GetFont ()
     return csFontCourier;
 }
 
-int csComponent::TextWidth (char *text)
+int csComponent::TextWidth (const char *text)
 {
   return app->TextWidth (text, GetFont ());
 }
@@ -1165,7 +1165,7 @@ void csComponent::Pixel (int x, int y, int colindx)
   }
 }
 
-void csComponent::Text (int x, int y, int fgindx, int bgindx, char *s)
+void csComponent::Text (int x, int y, int fgindx, int bgindx, const char *s)
 {
  /* Do clipping as follows: create a minimal rectangle which fits the string,
   * clip the rectangle against children & parents, then clip the string against
@@ -1398,7 +1398,7 @@ void csComponent::Close ()
     CHKB (delete this);
 }
 
-void csComponent::PrepareLabel (char *iLabel, char * &oLabel,
+void csComponent::PrepareLabel (const char *iLabel, char * &oLabel,
   int &oUnderlinePos)
 {
   if (oLabel)
@@ -1428,7 +1428,7 @@ void csComponent::PrepareLabel (char *iLabel, char * &oLabel,
   } /* endif */
 }
 
-void csComponent::DrawUnderline (int iX, int iY, char *iText, int iUnderlinePos,
+void csComponent::DrawUnderline (int iX, int iY, const char *iText, int iUnderlinePos,
   int iColor)
 {
   if ((iUnderlinePos >= 0) && (iUnderlinePos < (int)strlen (iText)))
@@ -1447,7 +1447,7 @@ void csComponent::DrawUnderline (int iX, int iY, char *iText, int iUnderlinePos,
   } /* endif */
 }
 
-int csComponent::WordLeft (char *iText, int StartPos)
+int csComponent::WordLeft (const char *iText, int StartPos)
 {
   while ((StartPos > 0) && (!isalnum (iText [StartPos - 1])))
     StartPos--;
@@ -1456,7 +1456,7 @@ int csComponent::WordLeft (char *iText, int StartPos)
   return StartPos;
 }
 
-int csComponent::WordRight (char *iText, int StartPos)
+int csComponent::WordRight (const char *iText, int StartPos)
 {
   int sl = strlen (iText);
 
@@ -1468,7 +1468,7 @@ int csComponent::WordRight (char *iText, int StartPos)
   return StartPos;
 }
 
-void csComponent::SetText (char *iText)
+void csComponent::SetText (const char *iText)
 {
   if (!text)
     CHKB (delete[] text);

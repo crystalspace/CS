@@ -52,7 +52,7 @@ protected:
 class CrystGLWindow : public BDirectWindow { // BGLScreen { //BWindow { // BWindowScreen {
 
 public:
-		CrystGLWindow(BRect, char const*, CrystGLView*,
+		CrystGLWindow(BRect, const char*, CrystGLView*,
 			csGraphics2DGLBe*, ISystem*, IBeLibSystemDriver*); 
 virtual	~CrystGLWindow();
 

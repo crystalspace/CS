@@ -147,7 +147,7 @@ STDMETHODIMP IXGraphics2D::Initialize ()
   return S_OK;
 }
 
-STDMETHODIMP IXGraphics2D::Open(char* Title)
+STDMETHODIMP IXGraphics2D::Open(const char* Title)
 {
   METHOD_PROLOGUE( csGraphics2D, XGraphics2D );
   if (!pThis->Open(Title))
@@ -209,7 +209,7 @@ STDMETHODIMP IXGraphics2D::SetRGB( int i, int r, int g, int b )
   return S_OK;
 }
 
-STDMETHODIMP IXGraphics2D::Write(int x, int y, int fg, int bg, char* str)
+STDMETHODIMP IXGraphics2D::Write(int x, int y, int fg, int bg, const char* str)
 {
   METHOD_PROLOGUE( csGraphics2D, XGraphics2D );
   pThis->Write(x, y, fg, bg, str);
@@ -307,7 +307,7 @@ STDMETHODIMP IXGraphicsInfo::GetPalette(RGBpaletteEntry** pPalette)
   return S_OK;
 }
 
-STDMETHODIMP IXGraphicsInfo::GetTextWidth (int &Width, int Font, char *text)
+STDMETHODIMP IXGraphicsInfo::GetTextWidth (int &Width, int Font, const char *text)
 {
   METHOD_PROLOGUE (csGraphics2D, XGraphicsInfo);
   Width = pThis->GetTextWidth (Font, text);

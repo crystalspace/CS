@@ -196,6 +196,8 @@ char *expandname (char *iName)
             outname [outp++] = ':';
           else
             outp += __getcwd (iName [inp - 1], outname + outp - 1, sizeof (outname) - outp + 1) - 1;
+        if ((outname [outp - 1] != '/')
+         && (outname [outp - 1] != PATH_SEPARATOR))
 #endif
         outname [outp++] = PATH_SEPARATOR;
       }
@@ -319,9 +321,7 @@ int FindNearestPowerOf2 (int n)
 // returns true if n is a power of two
 bool IsPowerOf2 (int n)
 {
-//int i;
-//int po2 = 1;
-
-  if (n<=0) return false; 
-  return !(n&(n-1)) ;//(n-1)^n >= n;
+  if (n <= 0)
+    return false; 
+  return !(n & (n - 1));	// (n-1) ^ n >= n;
 }

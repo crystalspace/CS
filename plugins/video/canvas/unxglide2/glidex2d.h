@@ -104,7 +104,7 @@ public:
   virtual ~csGraphics2DGlideX ();
 
   virtual void Initialize ();   
-  virtual bool Open (char *Title);
+  virtual bool Open (const char *Title);
   virtual void Close ();
   
   virtual bool BeginDraw ();
@@ -126,7 +126,7 @@ public:
 
 protected:
   /// This function is functionally equivalent to csSystemDriver::CsPrintf
-  void CsPrintf (int msgtype, char *format, ...);
+  void CsPrintf (int msgtype, const char *format, ...);
 
   /// This routine is called once per event loop
   static void ProcessEvents (void *Param);

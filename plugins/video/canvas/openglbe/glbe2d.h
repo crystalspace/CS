@@ -58,7 +58,7 @@ public:
   virtual ~csGraphics2DGLBe();
   
   virtual void Initialize ();
-  virtual bool Open (char* title);
+  virtual bool Open (const char* title);
   virtual void Close ();
   
   virtual bool BeginDraw ();

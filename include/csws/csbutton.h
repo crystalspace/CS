@@ -143,7 +143,7 @@ public:
   virtual ~csButton ();
 
   /// Set button text
-  virtual void SetText (char *iText)
+  virtual void SetText (const char *iText)
   { PrepareLabel (iText, text, underline_pos); }
 
   /**

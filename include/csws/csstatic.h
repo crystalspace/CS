@@ -120,7 +120,7 @@ public:
   virtual ~csStatic ();
 
   /// Set static component text
-  virtual void SetText (char *iText);
+  virtual void SetText (const char *iText);
 
   /// Draw the static component
   virtual void Draw ();

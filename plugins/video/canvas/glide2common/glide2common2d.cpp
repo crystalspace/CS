@@ -74,7 +74,7 @@ csGraphics2DGlideCommon::~csGraphics2DGlideCommon ()
 //  texture_cache = NULL;
 }
 
-bool csGraphics2DGlideCommon::Open(char *Title)
+bool csGraphics2DGlideCommon::Open(const char *Title)
 {
   // Open your graphic interface
   if (!csGraphics2D::Open (Title))
@@ -174,7 +174,7 @@ unsigned char* csGraphics2DGlideCommon::GetPixelAtGlide (int /*x*/, int /*y*/)
 }
 
 // Used to printf through system driver
-void csGraphics2DGlideCommon::CsPrintf (int msgtype, char *format, ...)
+void csGraphics2DGlideCommon::CsPrintf (int msgtype, const char *format, ...)
 {
   va_list arg;
   char buf[256];

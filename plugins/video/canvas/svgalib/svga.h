@@ -66,7 +66,7 @@ public:
   csGraphics2DSVGALib (ISystem* piSystem);
   virtual ~csGraphics2DSVGALib ();
 
-  virtual bool Open (char *Title);
+  virtual bool Open (const char *Title);
   virtual void Close ();
   virtual void Initialize ();
 
@@ -79,7 +79,7 @@ public:
 
 protected:
   /// This function is functionally equivalent to csSystemDriver::CsPrintf
-  void CsPrintf (int msgtype, char *format, ...);
+  void CsPrintf (int msgtype, const char *format, ...);
 
   DECLARE_IUNKNOWN ()
   DECLARE_INTERFACE_TABLE (csGraphics2DSVGALib)

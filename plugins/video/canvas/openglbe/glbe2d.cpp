@@ -63,7 +63,7 @@ void csGraphics2DGLBe::Initialize ()
   ApplyDepthInfo(curr_color_space);
 }
 
-bool csGraphics2DGLBe::Open(char* title)
+bool csGraphics2DGLBe::Open(const char* title)
 {
   int const INSET = 32;
   int const sw = screen_frame.IntegerWidth();

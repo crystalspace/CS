@@ -258,11 +258,11 @@ public:
    * routines are used to access this field in a component-independent
    * manner.
    */
-  virtual void SetText (char *iText);
+  virtual void SetText (const char *iText);
   /// Query component text
   virtual void GetText (char *oText, int iTextSize);
   /// Same, but you cannot change returned value
-  virtual char *GetText () { return text; }
+  virtual const char *GetText () { return text; }
 
   /**
    * For each child component call a function with a optional arg
@@ -463,7 +463,7 @@ public:
   void Pixel (int x, int y, int colindx);
 
   /// Draw a text string: if bg < 0 background is not drawn
-  void Text (int x, int y, int fgindx, int bgindx, char *s);
+  void Text (int x, int y, int fgindx, int bgindx, const char *s);
 
   /// Draw a (scaled) 2D sprite
   void Sprite2D (csSprite2D *s2d, int x, int y, int w, int h);
@@ -472,7 +472,7 @@ public:
   { Sprite2D (s2d, x, y, s2d->Width (), s2d->Height ()); }
 
   /// Return the width of given text using currently selected font
-  int TextWidth (char *text);
+  int TextWidth (const char *text);
   /// Return the height of currently selected font
   int TextHeight ();
 
@@ -499,15 +499,15 @@ protected:
    * into oLabel. Former underline position is stored into oUnderlinePos.
    * This is used by labels, menuitems, static components etc.
    */
-  static void PrepareLabel (char *iLabel, char * &oLabel, int &oUnderlinePos);
+  static void PrepareLabel (const char *iLabel, char * &oLabel, int &oUnderlinePos);
   /// Draw a underline under iText drawn at iX,iY with iColor
-  void DrawUnderline (int iX, int iY, char *iText, int iUnderlinePos,
+  void DrawUnderline (int iX, int iY, const char *iText, int iUnderlinePos,
     int iColor);
 
   /// Utility functions: return position one word left from StartPos
-  static int WordLeft (char *iText, int StartPos);
+  static int WordLeft (const char *iText, int StartPos);
   /// Return position one word right from StartPos
-  static int WordRight (char *iText, int StartPos);
+  static int WordRight (const char *iText, int StartPos);
 
 private:
   static bool do_handle_event (csComponent *child, void *param);

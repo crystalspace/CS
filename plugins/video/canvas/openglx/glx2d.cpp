@@ -150,7 +150,7 @@ csGraphics2DGLX::~csGraphics2DGLX ()
   CHKB (delete [] Memory);
 }
 
-bool csGraphics2DGLX::Open(char *Title)
+bool csGraphics2DGLX::Open(const char *Title)
 {
   CsPrintf (MSG_INITIALIZATION, "Video driver GL/X version ");
   if (glXIsDirect(dpy,active_GLContext))

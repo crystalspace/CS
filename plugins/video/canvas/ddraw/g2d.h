@@ -65,7 +65,7 @@ public:
   csGraphics2DDDraw3(ISystem* piSystem, bool bUses3D=false);
   virtual ~csGraphics2DDDraw3(void);
   
-  virtual bool Open (char *Title);
+  virtual bool Open (const char *Title);
   virtual void Close ();
   
   virtual void Print (csRect *area = NULL);

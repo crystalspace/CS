@@ -83,7 +83,7 @@ void csGraphics2DBeLib::Initialize ()
   	CHK (cryst_bitmap[i] = new BBitmap(r, curr_color_space));
 }
 
-bool csGraphics2DBeLib::Open(char* title)
+bool csGraphics2DBeLib::Open(const char* title)
 {
   if (!csGraphics2D::Open (title)) return false;
 

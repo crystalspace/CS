@@ -97,7 +97,7 @@ public:
   virtual ~csGraphics2DGLX ();
 
   virtual void Initialize ();
-  virtual bool Open (char *Title);
+  virtual bool Open (const char *Title);
   virtual void Close ();
 
   virtual bool BeginDraw () { return (Memory != NULL); }

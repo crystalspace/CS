@@ -1694,26 +1694,16 @@ void csLoader::txt_process (char *name, char* buf, csTextureList* textures, csWo
   if (!image)
     return;
 
-  // Now we check the size of the loaded image. Having an image, that
-  // is not a power of two will result in strange errors while
-  // rendering. It is by far better to check the format of all textures
-  // already while loading them.
-  //@@todo: this check is not needed for 2D images
-  int Width  = image->get_width ();
-  int Height = image->get_height ();
-
-  if (!IsPowerOf2(Width) || !IsPowerOf2(Height))
-    CsPrintf (MSG_WARNING, "Texture '%s' probably has an illegal format!\n"
-                           "The Width and Height should be a power of two.\n"
-                           "actual size is w:%d h:%d\n",
-                           filename, Width, Height);
+  // The size of image should be checked before registering it with
+  // the 3D or 2D driver... if the texture is used for 2D only, it can
+  // not have power-of-two dimensions...
 
   csTextureHandle *tex = textures->NewTexture (image);
   csNameObject::AddName (*tex,name);
 
   if (do_transp)
-    tex->SetTransparent (QRound (transp.red * 255.),
-      QRound (transp.green * 255.), QRound (transp.blue * 255.));
+    tex->SetTransparent (QInt (transp.red * 255.),
+      QInt (transp.green * 255.), QInt (transp.blue * 255.));
 }
 
 //---------------------------------------------------------------------------

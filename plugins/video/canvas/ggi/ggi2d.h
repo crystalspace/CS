@@ -74,7 +74,7 @@ public:
   virtual ~csGraphics2DGGI ();
 
   virtual void Initialize ();
-  virtual bool Open (char *Title);
+  virtual bool Open (const char *Title);
   virtual void Close ();
 
   virtual bool BeginDraw () { return (Memory != NULL); }
@@ -84,7 +84,7 @@ public:
 
 protected:
   /// Used to printf through the system driver
-  void CsPrintf (int msgtype, char *format, ...);
+  void CsPrintf (int msgtype, const char *format, ...);
 
   DECLARE_IUNKNOWN ()
   DECLARE_INTERFACE_TABLE (csGraphics2DGGI)

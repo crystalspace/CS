@@ -240,7 +240,7 @@ csGraphics2DXLib::~csGraphics2DXLib(void)
 }
 
 // Used to printf through system driver
-void csGraphics2DXLib::CsPrintf (int msgtype, char *format, ...)
+void csGraphics2DXLib::CsPrintf (int msgtype, const char *format, ...)
 {
   va_list arg;
   char buf[256];
@@ -252,7 +252,7 @@ void csGraphics2DXLib::CsPrintf (int msgtype, char *format, ...)
   System->Print (msgtype, buf);
 }
   
-bool csGraphics2DXLib::Open(char *Title)
+bool csGraphics2DXLib::Open(const char *Title)
 {
   CsPrintf (MSG_INITIALIZATION, "Crystal Space X windows driver");
   if (do_shm)

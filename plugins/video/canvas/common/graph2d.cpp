@@ -96,7 +96,7 @@ csGraphics2D::~csGraphics2D ()
   Close ();
 }
 
-bool csGraphics2D::Open (char *Title)
+bool csGraphics2D::Open (const char *Title)
 {
   (void)Title;
 
@@ -319,7 +319,7 @@ void csGraphics2D::DrawBox (int x, int y, int w, int h, int color)
   } /* endswitch */
 }
 
-void csGraphics2D::Write (int x, int y, int fg, int bg, char *text)
+void csGraphics2D::Write (int x, int y, int fg, int bg, const char *text)
 {
   for (; *text; ++text)
   {
@@ -717,7 +717,7 @@ bool csGraphics2D::PerformExtension (char* args)
   return false;
 }
 
-void csGraphics2D::SysPrintf(int mode, char* text, ...)
+void csGraphics2D::SysPrintf(int mode, const char* text, ...)
 {
   char buf[1024];
   va_list arg;
@@ -729,7 +729,7 @@ void csGraphics2D::SysPrintf(int mode, char* text, ...)
   system->Print(mode, buf);
 }
 
-int csGraphics2D::GetTextWidth (int Font, char *text)
+int csGraphics2D::GetTextWidth (int Font, const char *text)
 {
   if (FontList [Font].IndividualWidth)
   {

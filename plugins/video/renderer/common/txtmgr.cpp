@@ -210,7 +210,6 @@ void csTextureMM::alloc_2dtexture (csTextureManager* tex)
   int w, h;
   ifile->GetWidth (w);
   ifile->GetHeight (h);
-
   t2d = tex->factory_2d->new_texture (this, w, h);
 }
 

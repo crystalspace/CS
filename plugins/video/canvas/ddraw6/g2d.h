@@ -53,7 +53,7 @@ public:
   csGraphics2DDDraw6(ISystem* piSystem, bool bUses3D);
   virtual ~csGraphics2DDDraw6(void);
   
-  virtual bool Open (char *Title);
+  virtual bool Open (const char *Title);
   virtual void Close ();
   
   virtual void Print (csRect *area = NULL);

@@ -347,7 +347,7 @@ csGraphics2DDDraw6::~csGraphics2DDDraw6(void)
   m_nGraphicsReady=0;
 }
 
-bool csGraphics2DDDraw6::Open(char *Title)
+bool csGraphics2DDDraw6::Open(const char *Title)
 {
   if (!csGraphics2D::Open (Title))
     return false;

@@ -90,7 +90,7 @@ public:
   virtual ~csGraphics2DOS2DIVE ();
 
   virtual void Initialize ();
-  virtual bool Open (char *Title);
+  virtual bool Open (const char *Title);
   virtual void Close ();
 
   virtual void Print (csRect *area = NULL);

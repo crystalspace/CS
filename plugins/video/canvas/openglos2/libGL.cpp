@@ -69,7 +69,7 @@ bool glApp::ProcessQueuedMessages ()
   return true;
 }
 
-HWND glApp::CreateWindow (char *Title, HMODULE ModID, ULONG ResID, ULONG Flags)
+HWND glApp::CreateWindow (const char *Title, HMODULE ModID, ULONG ResID, ULONG Flags)
 {
 #define GL_WINDOW_CLASS	(PSZ)"OpenGLview"
   ULONG flStyle;

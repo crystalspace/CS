@@ -50,7 +50,7 @@ protected:
 class CrystWindow : public BDirectWindow { // BWindowScreen {
 
 public:
-		CrystWindow(BRect, char const*, CrystView*,
+		CrystWindow(BRect, const char*, CrystView*,
 			csGraphics2DBeLib*, ISystem*, IBeLibSystemDriver*);
 virtual	~CrystWindow();
 

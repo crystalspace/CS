@@ -223,7 +223,7 @@ void csGraphics2DAA::Initialize ()
   complete_pixel_format ();
 }
 
-bool csGraphics2DAA::Open (char *Title)
+bool csGraphics2DAA::Open (const char *Title)
 {
   context = aa_autoinit (&aa_defparams);
   if (context == NULL)

@@ -37,7 +37,7 @@
 // Horizontal large scrolling step
 #define LISTBOX_HORIZONTAL_PAGESTEP     8
 
-csListBoxItem::csListBoxItem (csComponent *iParent, char *iText, int iID,
+csListBoxItem::csListBoxItem (csComponent *iParent, const char *iText, int iID,
   csListBoxItemStyle iStyle) : csComponent (iParent)
 {
   state |= CSS_SELECTABLE | CSS_TRANSPARENT;

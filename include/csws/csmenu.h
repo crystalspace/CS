@@ -83,7 +83,7 @@ public:
   virtual void SuggestSize (int &w, int &h);
 
   /// Set menu item text
-  virtual void SetText (char *iText);
+  virtual void SetText (const char *iText);
 
   /// Handle input events
   virtual bool HandleEvent (csEvent &Event);

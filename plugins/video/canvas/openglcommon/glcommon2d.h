@@ -81,7 +81,7 @@ public:
    *  may or may not be calling this method at the beginning of your own
    *  class Open(), since the GL context may not have been bound yet...
    * check the GLX class for an example */
-  virtual bool Open (char *Title);
+  virtual bool Open (const char *Title);
 
   virtual void Close ();
 
@@ -113,7 +113,7 @@ public:
   static unsigned char* GetPixelAtGL (int x, int y);
 
 protected:
-  void CsPrintf(int msgtype, char *format, ...);
+  void CsPrintf(int msgtype, const char *format, ...);
 };
 
 #endif

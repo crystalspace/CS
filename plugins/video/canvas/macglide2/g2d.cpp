@@ -169,7 +169,7 @@ csGraphics2DGlide2x::~csGraphics2DGlide2x(void)
 #endif
 }
 
-bool csGraphics2DGlide2x::Open(char *Title)
+bool csGraphics2DGlide2x::Open(const char *Title)
 {
   if (!csGraphics2D::Open (Title))
 		return false;

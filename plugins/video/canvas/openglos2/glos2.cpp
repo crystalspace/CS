@@ -231,7 +231,7 @@ void csGraphics2DOS2GL::Initialize ()
   DrawSprite = DrawSpriteGL;
 }
 
-bool csGraphics2DOS2GL::Open (char *Title)
+bool csGraphics2DOS2GL::Open (const char *Title)
 {
   // Create backing store
   CHK (Memory = new unsigned char [Width * Height * pfmt.PixelBytes]);

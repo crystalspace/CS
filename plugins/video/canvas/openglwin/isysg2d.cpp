@@ -24,7 +24,7 @@
 
 IMPLEMENT_COMPOSITE_UNKNOWN (csGraphics2DOpenGL, XOpenGLGraphicsInfo)
 
-STDMETHODIMP IXOpenGLGraphicsInfo::Open(char* szTitle)
+STDMETHODIMP IXOpenGLGraphicsInfo::Open(const char* szTitle)
 {
   METHOD_PROLOGUE( csGraphics2DOpenGL, XOpenGLGraphicsInfo);
 

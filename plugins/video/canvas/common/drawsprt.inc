@@ -26,10 +26,6 @@
 
     DRAWSPRITE_NAME - The name of routine (DrawSprite8 etc).
     DRAWSPRITE_PIXTYPE - The type of a pixel (UByte, UShort, ULong)
-
-    If some specific port provides his own DrawSpriteXX routines, it can
-    create a file (in his 2d driver directory) with same name (drawsprt.inc)
-    and with a empty routine body to avoid including dead code into 2d driver.
 */
 
 void csGraphics2D::DRAWSPRITE_NAME (ITextureHandle *hTex, int sx, int sy,

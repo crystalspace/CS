@@ -204,7 +204,7 @@ void csGraphics2DOpenGL::Initialize(void)
 
 }
 
-bool csGraphics2DOpenGL::Open(char *Title)
+bool csGraphics2DOpenGL::Open(const char *Title)
 {
 	Str255			theTitle;
 	Rect			theBounds;

@@ -166,11 +166,11 @@ public:
   void SetMenuBarHeight (int iHeight);
 
   /// Change titlebar text
-  virtual void SetText (char *iText);
+  virtual void SetText (const char *iText);
   /// Query window title text
   virtual void GetText (char *oText, int iTextSize);
   /// Same, but returns a readonly value
-  virtual char *GetText ();
+  virtual const char *GetText ();
 
   /// Get window border width and height
   void GetBorderSize (int &bw, int &bh)

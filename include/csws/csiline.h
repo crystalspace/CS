@@ -75,7 +75,7 @@ public:
     csInputLineFrameStyle iFrameStyle = csifsThickRect);
 
   /// Set text field
-  virtual void SetText (char *iText);
+  virtual void SetText (const char *iText);
 
   /// Draw the input line
   virtual void Draw ();
@@ -99,7 +99,7 @@ public:
   virtual bool IsValidChar (char iChar);
 
   /// Check if string after modification is valid
-  virtual bool IsValidString (char *iText);
+  virtual bool IsValidString (const char *iText);
 
   /// Delete selection
   void DeleteSelection ();

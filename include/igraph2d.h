@@ -213,7 +213,7 @@ interface IGraphics2D : public IUnknown
   /// (*) Set a color index to given R,G,B (0..255) values
   STDMETHOD (SetRGB) (int i, int r, int g, int b) PURE;
   /// Write a text string into the back buffer
-  STDMETHOD (Write) (int x, int y, int fg, int bg, char* str) PURE;
+  STDMETHOD (Write) (int x, int y, int fg, int bg, const char *str) PURE;
   /// Write a single character.
   STDMETHOD (WriteChar) (int x, int y, int fg, int bg, char c) PURE;
 
@@ -223,7 +223,7 @@ interface IGraphics2D : public IUnknown
   STDMETHOD (SetFontID) (int id) PURE;
 
   /// Open the device.
-  STDMETHOD (Open) (char *Title) PURE;
+  STDMETHOD (Open) (const char *Title) PURE;
   /// Close the device.
   STDMETHOD (Close) () PURE;
 
@@ -232,7 +232,7 @@ interface IGraphics2D : public IUnknown
   * This is probably not the good way to do this but I see no other
   * way currently.
   */
-  STDMETHOD (PerformExtension) (char* args) PURE;
+  STDMETHOD (PerformExtension) (char *args) PURE;
 };
 
 /**
@@ -279,10 +279,10 @@ interface IGraphicsInfo : public IUnknown
   STDMETHOD (GetPalette) (RGBpaletteEntry** pPalette) PURE;
 
   /// Get the string equivilent of the HRESULT.
-  STDMETHOD (GetStringError) (HRESULT hRes, char* szErrorString) PURE;
+  STDMETHOD (GetStringError) (HRESULT hRes, char *szErrorString) PURE;
 
   /// Get the width of a string if it would be drawn with given font
-  STDMETHOD (GetTextWidth) (int &Width, int Font, char *text) PURE;
+  STDMETHOD (GetTextWidth) (int &Width, int Font, const char *text) PURE;
   /// Get the height of given font
   STDMETHOD (GetTextHeight) (int &Height, int Font) PURE;
 };

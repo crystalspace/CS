@@ -86,7 +86,7 @@ public:
   virtual void Initialize ();
 
   /// (*) Open graphics system (set videomode, open window etc)
-  virtual bool Open (char *Title);
+  virtual bool Open (const char *Title);
   /// (*) Close graphics system
   virtual void Close ();
 
@@ -131,11 +131,11 @@ public:
   /// (*) Set a color index to given R,G,B (0..255) values
   virtual void SetRGB (int i, int r, int g, int b);
   /// Write a text string into the back buffer
-  virtual void Write (int x, int y, int fg, int bg, char *text);
+  virtual void Write (int x, int y, int fg, int bg, const char *text);
   /// Write a single character
   static void (*WriteChar) (int x, int y, int fg, int bg, char c);
   /// Get the width of a string if it would be drawn with given font
-  virtual int GetTextWidth (int Font, char *text);
+  virtual int GetTextWidth (int Font, const char *text);
   /// Get the height of given font
   virtual int GetTextHeight (int Font);
   /**
@@ -207,7 +207,7 @@ public:
   virtual bool PerformExtension (char* args);
 
   ///
-  void SysPrintf(int mode, char* text, ...);
+  void SysPrintf(int mode, const char* text, ...);
 
   ///
   virtual void GetStringError (HRESULT hRes, char* szValue);

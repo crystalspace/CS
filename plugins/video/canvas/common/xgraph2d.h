@@ -100,7 +100,7 @@ interface IXGraphics2D : public IGraphics2D
   /// (*) Set a color index to given R,G,B (0..255) values
   STDMETHODIMP SetRGB (int i, int r, int g, int b);
   /// Write a text string into the back buffer
-  STDMETHODIMP Write (int x, int y, int fg, int bg, char* str);
+  STDMETHODIMP Write (int x, int y, int fg, int bg, const char* str);
   /// Write a single character.
   STDMETHODIMP WriteChar (int x, int y, int fg, int bg, char c);
 
@@ -113,7 +113,7 @@ interface IXGraphics2D : public IGraphics2D
   STDMETHODIMP GetStringError( HRESULT hRes, char* szErrorString );
 
   /// Open the device.
-  STDMETHODIMP Open (char *Title);
+  STDMETHODIMP Open (const char *Title);
 
  /**
   * Clip a line against given rectangle.
@@ -182,7 +182,7 @@ interface IXGraphicsInfo : public IGraphicsInfo
   STDMETHODIMP GetPalette(RGBpaletteEntry**);
 
   /// Get the width of a string if it would be drawn with given font
-  STDMETHODIMP GetTextWidth (int &Width, int Font, char *text);
+  STDMETHODIMP GetTextWidth (int &Width, int Font, const char *text);
   /// Get the height of given font
   STDMETHODIMP GetTextHeight (int &Height, int Font);
 };

@@ -347,7 +347,7 @@ void csGraphics2DDDraw3::Initialize ()
 #endif
 }
 
-bool csGraphics2DDDraw3::Open(char *Title)
+bool csGraphics2DDDraw3::Open(const char *Title)
 {
   if (!csGraphics2D::Open (Title))
     return false;
