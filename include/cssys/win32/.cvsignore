@@ -1,6 +1,3 @@
-freetype.h
-fterrid.h
-ftnameid.h
 iconv.h
 ioapi.h
 jconfig.h
