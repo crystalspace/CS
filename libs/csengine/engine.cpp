@@ -435,6 +435,7 @@ csEngine::csEngine (iBase *iParent) : csObject (), camera_positions (16, 16)
   resize = false;
 
   thing_type = new csThingObjectType (NULL);
+  ClearRenderPriorities ();
 }
 
 // @@@ Hack
@@ -629,6 +630,53 @@ void csEngine::Clear ()
   // Clear all regions.
   region = NULL;
   regions.DeleteAll ();
+
+  // Clear all render priorities.
+  ClearRenderPriorities ();
+}
+
+void csEngine::RegisterRenderPriority (const char* name, long priority)
+{
+  int i;
+  // If our priority goes over the number of defined priorities
+  // then we have to initialize.
+  for (i = render_priorities.Length () ; i <= priority ; i++)
+    render_priorities[i] = NULL;
+
+  char* n = (char*)render_priorities[priority];
+  delete[] n;
+  n = strnew (name);
+  render_priorities[priority] = n;
+  if (!strcmp (name, "sky")) render_priority_sky = priority;
+  else if (!strcmp (name, "wall")) render_priority_wall = priority;
+  else if (!strcmp (name, "object")) render_priority_object = priority;
+  else if (!strcmp (name, "alpha")) render_priority_alpha = priority;
+}
+
+long csEngine::GetRenderPriority (const char* name)
+{
+  int i;
+  for (i = 0 ; i < render_priorities.Length () ; i++)
+  {
+    char* n = (char*)render_priorities[i];
+    if (n && !strcmp (name, n)) return i;
+  }
+  return 0;
+}
+
+void csEngine::ClearRenderPriorities ()
+{
+  int i;
+  for (i = 0 ; i < render_priorities.Length () ; i++)
+  {
+    char* n = (char*)render_priorities[i];
+    delete[] n;
+  }
+  render_priorities.DeleteAll ();
+  RegisterRenderPriority ("sky", 2);
+  RegisterRenderPriority ("wall", 4);
+  RegisterRenderPriority ("object", 6);
+  RegisterRenderPriority ("alpha", 8);
 }
 
 void csEngine::ResolveEngineMode ()

@@ -41,6 +41,12 @@ WORLD (
     MATERIAL 'sky' (TEXTURE ('sky.gif'))
     MATERIAL 'misty' (TEXTURE ('misty.gif'))
   )
+  RENDERPRIORITIES (
+    PRIORITY 'sky' (1)
+    PRIORITY 'wall' (2)
+    PRIORITY 'object' (3)
+    PRIORITY 'alpha' (4)
+  )
   PLUGINS (
     PLUGIN 'thing' ('crystalspace.mesh.loader.thing')
     PLUGIN 'thingFact' ('crystalspace.mesh.loader.factory.thing')

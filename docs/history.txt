@@ -35,6 +35,35 @@ The history order has been reversed so that new features are at the top.
 	  This is all broken now.
 	- Removed the 'things' console command. It is broken now and needs
 	  to be replaced with something more general.
+	- Renamed STATBSP to CULLER. This is more accurate.
+	- Renamed csSector::UseStaticTree() to UseCuller().
+	- Stared work on render priority system. The engine will keep a list
+	  of all named render priorities (to avoid using numbers by the
+	  objects). Internally every render priority name corresponds with
+	  a number. In every sector objects are rendered sorting on this
+	  render priority (low numbers first). In future it will also be
+	  possible to render all objects of the same priority using some
+	  other sorting criterium (like material or distance to camera for
+	  transparent objects). There are always four predefined named
+	  render queues. They are called 'sky' (2), 'wall' (4), 'object' (6),
+	  and 'alpha' (8). The values between the brackets are the default
+	  values of those queues.
+	- Added SetRenderPriority() and GetRenderPriority() to iMeshWrapper.
+	- Added RegisterRenderPriority(), GetRenderPriority(), and
+	  ClearRenderPriorities() to csEngine.
+	- Added RENDERPRIORITIES section in world file. There you can define
+	  the names of priority queus which can then be used for all objects.
+	  This command causes all previously defined render priority queues
+	  to be undefined except for sky, wall, object, and alpha. These
+	  will be preset to the default values of (2, 4, 6, or 8).
+	- Added support for PRIORITY keyword in MESHOBJ. For a MESHOBJ
+	  the default depends on other settings. If ZFILL is given for the
+	  object the default will be 'wall'. If ZNONE or CAMERA is given
+	  the default will be 'sky'. If ZTEST is given the default is
+	  'alpha'. Otherwise the default is 'object'.
+	- Other than all the support above render priorities are still not
+	  used by the engine.
+	- Fixed csclear library so that it compiles.
 8-Apr-2001
 	- Extended iPortal with SetPortalSectorCallback() to set a callback
 	  that is called whenever a sector for a portal is missing. This

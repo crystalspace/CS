@@ -469,7 +469,7 @@ csSector* HugeRoom::create_huge_world (csEngine* engine)
   thing_state->DecRef ();
 
   Sys->Printf (MSG_INITIALIZATION, "Number of polygons: %d\n", pol_nr);
-  room->UseStaticTree ("@@@ (NOT WORKING!!!)");
+  room->UseCuller ("@@@ (NOT WORKING!!!)");
   return room;
 }
 

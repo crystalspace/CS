@@ -231,7 +231,7 @@ csTerrainWrapper* csSector::GetTerrain (const char* name)
 
 //----------------------------------------------------------------------
 
-void csSector::UseStaticTree (const char* meshname)
+void csSector::UseCuller (const char* meshname)
 {
   if (culler_mesh) return;
   culler_mesh = GetMesh (meshname);

@@ -305,10 +305,10 @@ public:
   csMeshWrapper* GetCullerMesh () { return culler_mesh; }
 
   /**
-   * This function will generate a polygon tree from the given mesh
-   * object. This mesh object needs to implement iVisibilityCuller.
+   * Look for the mesh object and see if it implements iVisibilityCuller.
+   * If so then use it for visibility culling in this sector.
    */
-  void UseStaticTree (const char* meshname);
+  void UseCuller (const char* meshname);
 
   /**
    * Get the visibility culler that is used for this sector.

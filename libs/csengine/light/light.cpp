@@ -340,8 +340,7 @@ csLightPatch::csLightPatch ()
 csLightPatch::~csLightPatch ()
 {
   delete [] vertices;
-  if (light_frustum)
-    delete light_frustum;
+  if (light_frustum) light_frustum->DecRef ();
   RemovePatch ();
 }
 
@@ -353,7 +352,7 @@ void csLightPatch::RemovePatch ()
   shadows.DeleteShadows ();
   if (light_frustum)
   {
-    delete light_frustum;
+    light_frustum->DecRef ();
     light_frustum = NULL;
   }
 }

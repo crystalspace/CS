@@ -36,7 +36,7 @@ struct iLight;
 typedef void (csDrawCallback) (iMeshWrapper* spr, iRenderView* rview,
 	void* callbackData);
 
-SCF_VERSION (iMeshWrapper, 0, 0, 3);
+SCF_VERSION (iMeshWrapper, 0, 0, 4);
 
 /**
  * This interface corresponds to the object in the engine
@@ -102,6 +102,28 @@ struct iMeshWrapper : public iBase
 
   /// Set the parent factory.
   virtual void SetFactory (iMeshFactoryWrapper* factory) = 0;
+
+  /**
+   * The renderer will render all objects in a sector based on this
+   * number. Low numbers get rendered first. High numbers get rendered
+   * later. There are a few often used slots:
+   * <ul>
+   * <li>1. Sky objects are rendered before
+   *     everything else. Usually they are rendered using ZFILL (or ZNONE).
+   * <li>2. Walls are rendered after that. They
+   *     usually use ZFILL.
+   * <li>3. After that normal objects are
+   *     rendered using the Z-buffer (ZUSE).
+   * <li>4. Alpha transparent objects or objects
+   *     using some other transparency system are rendered after that. They
+   *     are usually rendered using ZTEST.
+   * </ul>
+   */
+  virtual void SetRenderPriority (long rp) = 0;
+  /**
+   * Get the render priority.
+   */
+  virtual long GetRenderPriority () = 0;
 };
 
 SCF_VERSION (iMeshFactoryWrapper, 0, 0, 2);

@@ -139,6 +139,14 @@ protected:
    */
   csMovable movable;
 
+  /**
+   * The renderer will render all objects in a sector based on this
+   * number. Low numbers get rendered first. High numbers get rendered
+   * later. There are a few predefined slots which the application is
+   * free to use or not.
+   */
+  long render_priority;
+
   /// Update defered lighting.
   void UpdateDeferedLighting (const csVector3& pos);
 
@@ -360,6 +368,17 @@ public:
    */
   void ScaleBy (float factor);
 
+  /// Set the render priority for this object.
+  void SetRenderPriority (long rp)
+  {
+    render_priority = rp;
+  }
+  /// Get the render priority for this object.
+  long GetRenderPriority ()
+  {
+    return render_priority;
+  }
+
   CSOBJTYPE;
   DECLARE_IBASE_EXT (csPObject);
 
@@ -402,6 +421,14 @@ public:
       return scfParent->GetDrawCallback ();
     }
     virtual void SetFactory (iMeshFactoryWrapper* factory);
+    virtual void SetRenderPriority (long rp)
+    {
+      scfParent->SetRenderPriority (rp);
+    }
+    virtual long GetRenderPriority ()
+    {
+      return scfParent->GetRenderPriority ();
+    }
   } scfiMeshWrapper;
   friend struct MeshWrapper;
 

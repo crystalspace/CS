@@ -66,6 +66,7 @@ csMeshWrapper::csMeshWrapper (csObject* theParent, iMeshObject* mesh)
   draw_cb = NULL;
   factory = NULL;
   zbufMode = CS_ZBUF_USE;
+  render_priority = 0;
 }
 
 csMeshWrapper::csMeshWrapper (csObject* theParent)
@@ -93,6 +94,7 @@ csMeshWrapper::csMeshWrapper (csObject* theParent)
   draw_cb = NULL;
   factory = NULL;
   zbufMode = CS_ZBUF_USE;
+  render_priority = 0;
 }
 
 void csMeshWrapper::SetMeshObject (iMeshObject* mesh)

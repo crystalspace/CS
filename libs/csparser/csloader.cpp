@@ -121,6 +121,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (COLLECTION)
   CS_TOKEN_DEF (COLOR)
   CS_TOKEN_DEF (CONVEX)
+  CS_TOKEN_DEF (CULLER)
   CS_TOKEN_DEF (DETAIL)
   CS_TOKEN_DEF (DIFFUSE)
   CS_TOKEN_DEF (DITHER)
@@ -155,10 +156,12 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (PLUGIN)
   CS_TOKEN_DEF (PLUGINS)
   CS_TOKEN_DEF (POSITION)
+  CS_TOKEN_DEF (PRIORITY)
   CS_TOKEN_DEF (PROCEDURAL)
   CS_TOKEN_DEF (RADIUS)
   CS_TOKEN_DEF (REFLECTION)
   CS_TOKEN_DEF (REGION)
+  CS_TOKEN_DEF (RENDERPRIORITIES)
   CS_TOKEN_DEF (ROT)
   CS_TOKEN_DEF (ROT_X)
   CS_TOKEN_DEF (ROT_Y)
@@ -171,7 +174,6 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (SOUND)
   CS_TOKEN_DEF (SOUNDS)
   CS_TOKEN_DEF (START)
-  CS_TOKEN_DEF (STATBSP)
   CS_TOKEN_DEF (TERRAINFACTORY)
   CS_TOKEN_DEF (TERRAINOBJ)
   CS_TOKEN_DEF (TEXTURE)
@@ -832,8 +834,8 @@ csSector* csLoader::load_sector (char* secname, char* buf)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (ADDON)
+    CS_TOKEN_TABLE (CULLER)
     CS_TOKEN_TABLE (FOG)
-    CS_TOKEN_TABLE (STATBSP)
     CS_TOKEN_TABLE (LIGHT)
     CS_TOKEN_TABLE (MESHOBJ)
     CS_TOKEN_TABLE (TERRAINOBJ)
@@ -845,7 +847,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
   long cmd;
   char* params;
 
-  bool do_stat_bsp = false;
+  bool do_culler = false;
   char bspname[100];
 
   csSector* sector = new csSector (Engine) ;
@@ -865,12 +867,12 @@ csSector* csLoader::load_sector (char* secname, char* buf)
       case CS_TOKEN_ADDON:
 	LoadAddOn (params, &(sector->scfiSector));
       	break;
-      case CS_TOKEN_STATBSP:
-        do_stat_bsp = true;
+      case CS_TOKEN_CULLER:
+        do_culler = true;
 	if (!ScanStr (params, "%s", bspname))
 	{
           CsPrintf (MSG_FATAL_ERROR,
-	  	"STATBSP expects the name of a mesh object!\n");
+	  	"CULLER expects the name of a mesh object!\n");
           fatal_exit (0, false);
 	}
         break;
@@ -920,7 +922,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
   }
 
   if (!(flags & CS_LOADER_NOBSP))
-    if (do_stat_bsp) sector->UseStaticTree (bspname);
+    if (do_culler) sector->UseCuller (bspname);
   return sector;
 }
 
@@ -1049,6 +1051,7 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
     CS_TOKEN_TABLE (MOTION)
     CS_TOKEN_TABLE (REGION)
     CS_TOKEN_TABLE (TERRAINFACTORY)
+    CS_TOKEN_TABLE (RENDERPRIORITIES)
     CS_TOKEN_TABLE (PLUGINS)
   CS_TOKEN_TABLE_END
 
@@ -1077,6 +1080,10 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
       }
       switch (cmd)
       {
+        case CS_TOKEN_RENDERPRIORITIES:
+	  Engine->ClearRenderPriorities ();
+	  LoadRenderPriorities (params);
+	  break;
         case CS_TOKEN_ADDON:
 	  LoadAddOn (params, (iEngine*)Engine);
       	  break;
@@ -1787,6 +1794,7 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
     CS_TOKEN_TABLE (ZTEST)
     CS_TOKEN_TABLE (CAMERA)
     CS_TOKEN_TABLE (CONVEX)
+    CS_TOKEN_TABLE (PRIORITY)
   CS_TOKEN_TABLE_END
 
   CS_TOKEN_TABLE_START (tok_matvec)
@@ -1799,6 +1807,7 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
   char* params;
   char str[255];
   str[0] = 0;
+  char priority[255]; priority[0] = 0;
 
   csLoaderStat::meshes_loaded++;
   iLoaderPlugIn* plug = NULL;
@@ -1812,6 +1821,9 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
     }
     switch (cmd)
     {
+      case CS_TOKEN_PRIORITY:
+	ScanStr (params, "%s", priority);
+	break;
       case CS_TOKEN_ADDON:
 	LoadAddOn (params, &(mesh->scfiMeshWrapper));
       	break;
@@ -1831,18 +1843,23 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
         mesh->flags.Set (CS_ENTITY_DETAIL);
         break;
       case CS_TOKEN_ZFILL:
+        if (!priority[0]) strcpy (priority, "wall");
         mesh->SetZBufMode (CS_ZBUF_FILL);
         break;
       case CS_TOKEN_ZUSE:
+        if (!priority[0]) strcpy (priority, "object");
         mesh->SetZBufMode (CS_ZBUF_USE);
         break;
       case CS_TOKEN_ZNONE:
+        if (!priority[0]) strcpy (priority, "sky");
         mesh->SetZBufMode (CS_ZBUF_NONE);
         break;
       case CS_TOKEN_ZTEST:
+        if (!priority[0]) strcpy (priority, "alpha");
         mesh->SetZBufMode (CS_ZBUF_TEST);
         break;
       case CS_TOKEN_CAMERA:
+        if (!priority[0]) strcpy (priority, "sky");
         mesh->flags.Set (CS_ENTITY_CAMERA);
         break;
       case CS_TOKEN_CONVEX:
@@ -1967,6 +1984,9 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
 	csGetLastOffender ());
     fatal_exit (0, false);
   }
+
+  if (!priority[0]) strcpy (priority, "object");
+  mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
 
   return true;
 }
@@ -2208,6 +2228,47 @@ bool csLoader::LoadAddOn (char* buf, iBase* context)
   {
     CsPrintf (MSG_FATAL_ERROR,
     	"Token '%s' not found while parsing the plugin!\n",
+	csGetLastOffender ());
+    fatal_exit (0, false);
+  }
+
+  return true;
+}
+
+//---------------------------------------------------------------------------
+
+bool csLoader::LoadRenderPriorities (char* buf)
+{
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (PRIORITY)
+  CS_TOKEN_TABLE_END
+
+  char* name;
+  long cmd;
+  char* params;
+
+  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  {
+    if (!params)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
+    switch (cmd)
+    {
+      case CS_TOKEN_PRIORITY:
+      {
+        long pri;
+	ScanStr (params, "%d", &pri);
+	Engine->RegisterRenderPriority (name, pri);
+        break;
+      }
+    }
+  }
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+  {
+    CsPrintf (MSG_FATAL_ERROR,
+    	"Token '%s' not found while parsing the render priorities!\n",
 	csGetLastOffender ());
     fatal_exit (0, false);
   }

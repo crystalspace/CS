@@ -165,6 +165,11 @@ class csLoader : public iLoaderNew
   static bool LoadAddOn (char* buf, iBase* context);
 
   /**
+   * Load the render priority section.
+   */
+  static bool LoadRenderPriorities (char* buf);
+
+  /**
    * Load sounds from a SOUNDS(...) argument.
    * This function is normally called automatically by the parser.
    */

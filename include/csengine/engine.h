@@ -434,6 +434,23 @@ public:
   /// The list of all regions currently loaded.
   csNamedObjVector regions;
 
+  /// The list of all named render priorities.
+  csVector render_priorities;
+  /**
+   * The engine knows about the following render priorities and keeps
+   * them here:
+   * <ul>
+   * <li>"sky": usually rendered using ZFILL or ZNONE
+   * <li>"wall": usually rendered using ZFILL
+   * <li>"object": usually rendered using ZUSE
+   * <li>"alpha": usually rendered using ZTEST
+   * </ul>
+   */
+  long render_priority_sky;
+  long render_priority_wall;
+  long render_priority_object;
+  long render_priority_alpha;
+
   /// Option variable: inhibit lightmap recalculation?
   static bool do_not_force_relight;
   /// Option variable: force lightmap recalculation?
@@ -991,6 +1008,13 @@ public:
   csTextureWrapper* FindCsTexture (const char* iName, bool regionOnly = false);
   /// Find a loaded material by name.
   csMaterialWrapper* FindCsMaterial (const char* iName, bool regionOnly = false);
+
+  /// Register a new render priority.
+  void RegisterRenderPriority (const char* name, long priority);
+  /// Get a render priority by name.
+  long GetRenderPriority (const char* name);
+  /// Clear all render priorities.
+  void ClearRenderPriorities ();
 
   /// @@@ Temporary until things move to their own mesh plugin system.
   csThingObjectType* thing_type;
