@@ -5,6 +5,7 @@
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "iaws/aws.h"
+#include "iaws/awscnvs.h"
 
 struct iEngine;
 struct iSector;
@@ -33,6 +34,7 @@ private:
   iEngine* engine;
   iAws *aws;
   iAwsPrefManager *awsprefs;
+  iAwsCanvas *awsCanvas;
   iSector* room;
   iView* view;
   iGraphics3D *myG3D;

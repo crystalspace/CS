@@ -132,6 +132,7 @@ awsTest::~awsTest()
   SCF_DEC_REF (myG2D);
   SCF_DEC_REF (myVFS);
   SCF_DEC_REF (myConsole);
+//  SCF_DEC_REF (awsCanvas);
 }
 
 static bool AwsEventHandler (iEvent& ev)
@@ -152,6 +153,7 @@ static bool AwsEventHandler (iEvent& ev)
   }
 }
 
+//#define AWSTEST_SINGLEPROCTEXCANVAS
 
 bool 
 awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
@@ -376,9 +378,14 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   col_cyan = txtmgr->FindRGB (0, 255, 255);
   col_green = txtmgr->FindRGB (0, 255, 0);
   
-  /// 
-  aws->SetContext(myG2D, myG3D);
-  aws->SetDefaultContext(engine, myG3D->GetTextureManager());
+  
+
+#ifdef AWSTEST_SINGLEPROCTEXCANVAS
+  awsCanvas = aws->CreateDefaultCanvas(engine, myG3D->GetTextureManager(), 512, 512, NULL);
+#else
+  awsCanvas = aws->CreateDefaultCanvas(engine, myG3D->GetTextureManager());
+#endif
+  aws->SetCanvas(awsCanvas);
 
   // next, setup sinks before loading any preferences
   awsTestSink *s    = new awsTestSink();
@@ -445,6 +452,19 @@ awsTest::SetupFrame()
   
   aws->Redraw();
   aws->Print(myG3D);
+
+#ifdef AWSTEST_SINGLEPROCTEXCANVAS
+  iTextureWrapper *tex = SCF_QUERY_INTERFACE(awsCanvas, iTextureWrapper);
+  if (tex)
+  {
+    myG3D->DrawPixmap(tex->GetTextureHandle(),
+                    0,0,512,512,
+                    0,0,512,512,
+                    0);
+
+    SCF_DEC_REF(tex);
+  }
+#endif
 }
   
 void 
