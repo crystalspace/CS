@@ -1,53 +1,72 @@
-#ifndef __CS_AWS_STANDARD_SINK_H__
-#define __CS_AWS_STANDARD_SINK_H__
+/*
+    Copyright (C) 2000-2001 by Christopher Nelson
+  
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+  
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+  
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
 
-/************************************************************************************
-  This sink provides the ability to trigger certain standard mechanisms in components,
- such as hiding and showing, from other components in a simple, straightforeward
- manner.  Imitating the design of awsStandardSink is not encouraged, since it may make
- assumptions based on the internal architecture of AWS that other components and sinks
- may not be privy to.
- ************************************************************************************/
-# include "iaws/aws.h"
-# include "awsslot.h"
+#ifndef __CS_AWS_STDSK_H__
+#define __CS_AWS_STDSK_H__
+ 
+#include "iaws/aws.h"
+#include "awsslot.h"
 
-class awsStandardSink :
-  public awsSink
+/**
+ * This sink provides the ability to trigger certain standard mechanisms
+ * in components, such as hiding and showing, from other components in a
+ * simple, straightforeward manner.  Imitating the design of awsStandardSink
+ * is not encouraged, since it may make assumptions based on the internal
+ * architecture of AWS that other components and sinks may not be privy to.
+ */
+
+class awsStandardSink : public awsSink
 {
+private:
   iAws *wmgr;
 
-  /// Hides the source component
+  /// Hides the source component.
   static void Hide (void *sink, iAwsSource *source);
 
-  /// Shows the source component
+  /// Shows the source component.
   static void Show (void *sink, iAwsSource *source);
 
-  /// Hides the window that the source component belongs to
+  /// Hides the window that the source component belongs to.
   static void HideWindow (void *sink, iAwsSource *source);
 
-  /// Maximizes the window that the source component belongs to
+  /// Maximizes the window that the source component belongs to.
   static void MaximizeWindow (void* sink, iAwsSource *source);
 
-  /// UnMaximizes the window that the source component belongs to
+  /// UnMaximizes the window that the source component belongs to.
   static void UnMaximizeWindow (void* sink, iAwsSource *source);
 
-  /// Invalidates the source component
+  /// Invalidates the source component.
   static void Invalidate (void *sink, iAwsSource *source);
 
-  /// Slides a window down and out
+  /// Slides a window down and out.
   static void WindowSlideOutDown (void *sink, iAwsSource *source);
 
-  /// Slides a window up and out
+  /// Slides a window up and out.
   static void WindowSlideOutUp (void *sink, iAwsSource *source);
 
-  /// Slides a window left and out
+  /// Slides a window left and out.
   static void WindowSlideOutLeft (void *sink, iAwsSource *source);
   
-  /// Slides a window right and out
+  /// Slides a window right and out.
   static void WindowSlideOutRight (void *sink, iAwsSource *source);
-
 public:
   awsStandardSink (iAws *_wmgr);
   virtual ~awsStandardSink ();
 };
-#endif // __CS_AWS_STANDARD_SINK_H__
+
+#endif // __CS_AWS_STDSK_H__

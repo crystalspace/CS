@@ -1,7 +1,25 @@
-#ifndef __CS_AWS_TEXTURE_MANAGER_H__
-#define __CS_AWS_TEXTURE_MANAGER_H__
+/*
+    Copyright (C) ???
+  
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+  
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+  
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
 
-# include "csutil/parray.h"
+#ifndef __CS_AWS_TEX_H__
+#define __CS_AWS_TEX_H__
+
+#include "csutil/parray.h"
 
 struct iString;
 struct iObjectRegistry;
@@ -12,25 +30,26 @@ struct iVFS;
 struct iImage;
 
 /**
- *
- *  This class embeds a normal texture manager, and keeps track of all the textures currently
- * in use by the windowing system.  This includes bitmaps for buttons, etc.  When the skin
- * changes, it unloads all the skin textures currently being used.  Then it is ready to demand-load
+ * This class embeds a normal texture manager, and keeps track of all the
+ * textures currently in use by the windowing system.  This includes
+ * bitmaps for buttons, etc.  When the skin changes, it unloads all the
+ * skin textures currently being used.  Then it is ready to demand-load
  * new ones.
- *
  */
+ 
 class awsTextureManager
 {
-  /// this contains a reference to our loader.
+private:
+  /// This contains a reference to our loader.
   csRef<iImageIO> loader;
 
-  /// this contains a reference to our texture manager
+  /// This contains a reference to our texture manager.
   csRef<iTextureManager> txtmgr;
 
-  /// this contains a reference to the VFS plugin
+  /// This contains a reference to the VFS plugin.
   csRef<iVFS> vfs;
 
-  /// contains a reference to the object registry
+  /// Contains a reference to the object registry.
   iObjectRegistry *object_reg;
 
   struct awsTexture
@@ -41,55 +60,61 @@ class awsTextureManager
     unsigned long id;
   };
 
-  /// list of textures loaded
+  /// List of textures loaded
   csPDelArray<awsTexture> textures;
 
-private:
-  /// registers all currently loaded textures with the texture manager
+  /// Registers all currently loaded textures with the texture manager.
   void RegisterTextures ();
 
-  /// unregisters all currently loaded textures with the texture manager
+  /// Unregisters all currently loaded textures with the texture manager.
   void UnregisterTextures ();
 public:
-  /// empty constructor
+  /// Empty constructor.
   awsTextureManager ();
 
-  /// de-inits
+  /// Destructor.
   ~awsTextureManager ();
 
-  /** Get's a reference to and iLoader. */
+  /// Get's a reference to and iLoader.
   void Initialize (iObjectRegistry *object_reg);
 
-  /** Get's a texture.  If the texture is already cached, it returns the cached texture.
-   * If the texture has not been cached, and a filename is specified, the file is loaded.
-   * If the file cannot be found, or no file was specified, 0 is returned. */
+  /**
+   * Get's a texture.  If the texture is already cached, it returns
+   * the cached texture. If the texture has not been cached, and a
+   * filename is specified, the file is loaded. If the file cannot be
+   * found, or no file was specified, 0 is returned.
+   */
   iTextureHandle *GetTexture (
-                    const char *name,
-                    const char *filename = 0,
-                    bool replace = false,
-                    unsigned char key_r = 255,
-                    unsigned char key_g = 0,
-                    unsigned char key_b = 255
-                    );
+    const char *name,
+    const char *filename = 0,
+    bool replace = false,
+    unsigned char key_r = 255,
+    unsigned char key_g = 0,
+    unsigned char key_b = 255);
 
-  /** Get's a texture.  If the texture is already cached, it returns the cached texture.
-  * If the texture has not been cached, and a filename is specified, the file is loaded.
-  * If the file cannot be found, or no file was specified, 0 is returned. This variety
-    uses the id directly, in case you have it.  Mostly used internally by AWSPrefManager. */
+  /**
+   * Get's a texture.  If the texture is already cached, it returns the
+   * cached texture. If the texture has not been cached, and a filename
+   * is specified, the file is loaded. If the file cannot be found, or no
+   * file was specified, 0 is returned. This variety uses the id directly,
+   * in case you have it.  Mostly used internally by AWSPrefManager.
+   */
   iTextureHandle *GetTexturebyID (
-                    unsigned long id,
-                    const char *filename = 0,
-                    bool replace = false,
-                    unsigned char key_r = 255,
-                    unsigned char key_g = 0,
-                    unsigned char key_b = 255
-                    );
+    unsigned long id,
+    const char *filename = 0,
+    bool replace = false,
+    unsigned char key_r = 255,
+    unsigned char key_g = 0,
+    unsigned char key_b = 255);
 
-  /** Changes the texture manager: unregisters all current textures, and then re-registers them
-   * with the new manager */
+  /**
+   * Changes the texture manager: unregisters all current textures, and
+   * then re-registers them with the new manager.
+   */
   void SetTextureManager (iTextureManager *txtmgr);
 
-  /** Retrieves the texture manager that we are currently using */
+  /// Retrieves the texture manager that we are currently using.
   iTextureManager *GetTextureManager () { return txtmgr; }
 };
-#endif // __CS_AWS_TEXTURE_MANAGER_H__
+
+#endif // __CS_AWS_TEX_H__
