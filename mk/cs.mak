@@ -250,7 +250,7 @@ maintainerclean: distclean
 # since that directory was created by the configure script (for volatile.h).
 distclean: clean
 	-$(RM) Makefile config.mak config.cache config.status \
-	include/volatile.h Jamfile Jamconfige
+	include/volatile.h Jamfile Jamconfig
 	-$(RMDIR) $(SRCDIR)/autom4te.cache
 ifneq ($(SRCDIR),.)
 	-$(RMDIR) include
