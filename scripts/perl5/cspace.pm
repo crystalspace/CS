@@ -4430,6 +4430,7 @@ package cspace::iSector;
 *GetPortalMeshes = *cspacec::iSector_GetPortalMeshes;
 *RegisterPortalMesh = *cspacec::iSector_RegisterPortalMesh;
 *UnregisterPortalMesh = *cspacec::iSector_UnregisterPortalMesh;
+*UnlinkObjects = *cspacec::iSector_UnlinkObjects;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
