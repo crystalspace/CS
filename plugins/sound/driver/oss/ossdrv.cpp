@@ -311,7 +311,7 @@ void csSoundDriverOSS::Close()
 {
   if (bTimerInstalled) setitimer (ITIMER_VIRTUAL, &otime, NULL);
   if (bSignalInstalled) sigaction (SIGVTALRM, &oldact, NULL);
-  if (soundbuffer) { delete soundbuffer; soundbuffer=NULL; }
+  if (soundbuffer) { delete[] soundbuffer; soundbuffer=NULL; }
   device.Close();
   memory=NULL;
   memorysize=0;
