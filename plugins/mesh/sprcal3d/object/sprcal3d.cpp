@@ -206,7 +206,7 @@ bool csSpriteCal3DMeshObjectFactory::LoadCoreMesh(const char *filename,const cha
 const char *csSpriteCal3DMeshObjectFactory::GetMeshName(int idx)
 {
     if (idx >= submeshes.Length())
-	return NULL;
+	return 0;
 
     return submeshes[idx]->name;
 }
@@ -214,7 +214,7 @@ const char *csSpriteCal3DMeshObjectFactory::GetMeshName(int idx)
 bool csSpriteCal3DMeshObjectFactory::IsMeshDefault(int idx)
 {
     if (idx >= submeshes.Length())
-	return NULL;
+	return 0;
 
     return submeshes[idx]->attach_by_default;
 }
@@ -610,7 +610,7 @@ void csSpriteCal3DMeshObject::SetupObjectSubmesh(int index)
 	sample.num_vertices_pool = 1;  // no blending
 	sample.buffers[0]  = 0; // NULL
 	meshes[index].Push(sample);
-	meshes_colors[index].Push(NULL);
+	meshes_colors[index].Push(0);
     }
 }
 
@@ -1009,42 +1009,39 @@ bool csSpriteCal3DMeshObject::DetachCoreMesh(const char *meshname)
     return DetachCoreMesh(factory->submeshes[idx]->index);
 }
 
-bool csSpriteCal3DMeshObject::DetachCoreMesh(int mesh_id)
+bool csSpriteCal3DMeshObject::DetachCoreMesh (int mesh_id)
 {
-    if (!calModel.detachMesh(mesh_id))
-	return false;
+  if (!calModel.detachMesh(mesh_id))
+    return false;
 
-    // Now that the submesh is removed from the model, we must
-    // remove all the CS rendering structures as well.
-    int i;
-    for (i=0; i<attached_ids.Length(); i++)
+  // Now that the submesh is removed from the model, we must
+  // remove all the CS rendering structures as well.
+  int i;
+  for (i=0; i<attached_ids.Length(); i++)
+  {
+    if (attached_ids[i] == mesh_id)
     {
-	if (attached_ids[i] == mesh_id)
-	{
-	    meshes[i].DeleteAll();
-	    is_initialized[i].DeleteAll();
-	    meshes_colors[i].DeleteAll();
+      meshes[i].DeleteAll();
+      is_initialized[i].DeleteAll();
+      meshes_colors[i].DeleteAll();
 
-	    for (int j=i+1; j<attached_ids.Length(); j++)
-	    {
-              meshes[j-1] = meshes[j];
-	      is_initialized[j-1] = is_initialized[j];
-	      meshes_colors[j-1]  = meshes_colors[j];
-	    }
-	    meshes[j-1].DeleteAll();
-	    is_initialized[j-1].DeleteAll();
-	    meshes_colors[j-1].DeleteAll();
+      int j;
+      for (j=i+1; j<attached_ids.Length(); j++)
+      {
+        meshes[j-1] = meshes[j];
+	is_initialized[j-1] = is_initialized[j];
+	meshes_colors[j-1]  = meshes_colors[j];
+      }
+      meshes[j-1].DeleteAll();
+      is_initialized[j-1].DeleteAll();
+      meshes_colors[j-1].DeleteAll();
 
-	    attached_ids.DeleteIndex(i);
-	    break;
-	}
+      attached_ids.DeleteIndex(i);
+      break;
     }
-    return true;
+  }
+  return true;
 }
-
-
-
-
 
 //----------------------------------------------------------------------
 

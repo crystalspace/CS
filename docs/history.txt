@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+9-Aug-2003
+        - Philip Wyett moved int j out of 'for' loop within
+          csSpriteCal3DMeshObject::DetachCoreMesh () and fixed compile error.
+          Also for the second time changed instances of NULL for 0!
 8-Aug-2003
         - Philip Wyett changed instances of NULL for 0 in sprcal3d plugins.
             - Added 3ds2lev and makedep to CS/ root .cvsignore.
