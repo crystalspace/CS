@@ -30,6 +30,33 @@ chronological order.
 	  it makes it impossible to use csString in csArray which is a bad
 	  problem. We have to find a better solution for this. This fix is
 	  only temporary.
+	- Eric Sunshine made the following changes to csString and cousins:
+	    - Fixed bugs where missing copy-constructors and assignment
+	      operators led to nasty aliasing problems. The compiler was
+	      performing memberwise copying, which resulted in multiple
+	      csStrings referencing the same data buffers. This manifested as
+	      the usual crashes and other foul behaviors.
+	    - Fixed design problem which made it impossible (dangerous) to use
+	      csString's in container classes, such as csArray<>, which
+	      relocate the csString object in memory. The `Data' member no
+	      longer ever points at csStringFast's internal buffer.
+	    - Fixed bug introduced yesterday into
+	      csStringBase::SetCapacityInternal() where its handling of buffer
+	      expansion was borked. When configured for exponential expansion
+	      (i.e. double the buffer size), it should have grown the buffer
+	      like this (4, 8, 16, ...), but was instead growing it like this
+	      (4, 9, 19, ...).
+	    - Fixed bugs in csStringBase's and csStringFast's
+	      SetCapacityInternal() where they were not properly taking the
+	      implicit null terminator into account in all code paths when
+	      computing the final capacity.
+	    - Fixed csStringFast::SetCapacityInternal() so that it never
+	      implicitly frees the dynamic buffer once it has been allocated,
+	      since this was sub-optimal time-wise. Once we have paid the cost
+	      of allocating it, we may as well continue using it, rather than
+	      repeatedly throwing it away and reallocating it. As with
+	      csStringBase, csStringFast now only frees the dynamic buffer upon
+	      explicit request via Free() or ShrinkBestFit().
 13-Mar-2005
 	- res made the following changes to csStringBase:
 	    - Removed static Pad*() methods. Provided nothing that can't 

@@ -81,28 +81,30 @@ protected:
   void ExpandIfNeeded (size_t NewSize);
 
   /**
-   * Set the buffer to hold NewSize bytes. If \a extraSpace is true it means
-   * the buffer can be larger to reduce the number of allocations needed.
+   * Set the buffer to hold NewSize bytes. If \a soft is true it means
+   * the buffer can be rounded up to reduce the number of allocations needed.
    */
-  virtual void SetCapacityInternal (size_t NewSize, bool extraSpace);
+  virtual void SetCapacityInternal (size_t NewSize, bool soft);
 
   /// Compute a new buffer size. Takes GrowBy into consideration.
   size_t ComputeNewSize (size_t NewSize);
 
 public:
   /**
-   * Advise the string that it should allocate enough space to hold at least
-   * \p NewSize characters.
-   * \remarks After calling this method, the string's capacity will be at least
-   *   \p NewSize + 1 (one for the implicit null terminator).  Never shrinks
-   *   capacity.  If you need to actually reclaim memory, then use Free() or
-   *   ShrinkBestFit().
+   * Ask the string to allocate enough space to hold \p NewSize characters.
+   * \remarks After calling this method, the string's internal capacity will be
+   *   at least \p NewSize + 1 (one for the implicit null terminator).  Never
+   *   shrinks capacity.  If you need to actually reclaim memory, then use
+   *   Free() or ShrinkBestFit().
    */
   void SetCapacity (size_t NewSize);
 
-  /// Return the current capacity.
-  size_t GetCapacity() const
-  { return MaxSize; }
+  /**
+   * Return the current capacity, not including the space for the implicit null
+   * terminator.
+   */
+  virtual size_t GetCapacity() const
+  { return MaxSize > 0 ? MaxSize - 1 : 0; }
 
   /**
    * Append a null-terminated C-string to this one.
@@ -291,7 +293,7 @@ public:
    *   that GetData() and 'operator char const*' will return a null pointer
    *   after reclamation.
    */
-  csStringBase& ShrinkBestFit ();
+  virtual void ShrinkBestFit ();
 
   /**
    * Set string buffer capacity to hold exactly the current content.
@@ -303,7 +305,8 @@ public:
    *   after reclamation.
    * \deprecated Use ShrinkBestFit() instead.
    */
-  /*CS_DEPRECATED_METHOD*/ csStringBase& Reclaim () { return ShrinkBestFit(); }
+  /*CS_DEPRECATED_METHOD*/
+  csStringBase& Reclaim () { ShrinkBestFit(); return *this; }
 
   /**
    * Clear the string (so that it contains only a null terminator).
@@ -326,7 +329,7 @@ public:
    */
   /*CS_DEPRECATED_METHOD*/ 
   // @@@ GCC and VC always seem to prefer this GetData() and barf "deprecated".
-  char* GetData ()
+  virtual char* GetData ()
   { return Data; }
 
   /**
@@ -336,7 +339,7 @@ public:
    * \remarks See the class description for a discussion about how and when the
    *   string will represent a null-pointer.
    */
-  char const* GetData () const
+  virtual char const* GetData () const
   { return Data; }
 
   /**
@@ -349,7 +352,7 @@ public:
    *   directly without having to perform a null check first.
    */
    char const* GetDataSafe() const
-   { return Data != 0 ? Data : ""; }
+   { char const* p = GetData(); return p != 0 ? p : ""; }
 
   /**
    * Query string length.
@@ -371,14 +374,14 @@ public:
   char& operator [] (size_t n)
   {
     CS_ASSERT (n < Size);
-    return Data [n];
+    return GetData()[n];
   }
 
   /// Get n'th character.
   char operator [] (size_t n) const
   {
     CS_ASSERT (n < Size);
-    return Data[n];
+    return GetData()[n];
   }
 
   /**
@@ -390,14 +393,14 @@ public:
   void SetAt (size_t n, const char c)
   {
     CS_ASSERT (n < Size);
-    Data [n] = c;
+    GetData() [n] = c;
   }
 
   /// Get the n'th character.
   char GetAt (size_t n) const
   {
     CS_ASSERT (n < Size);
-    return Data [n];
+    return GetData() [n];
   }
 
   /**
@@ -581,7 +584,7 @@ public:
       return false;
     if (Size == 0 && n == 0)
       return true;
-    return (memcmp (Data, iStr.GetData (), Size) == 0);
+    return (memcmp (GetDataSafe(), iStr.GetDataSafe (), Size) == 0);
   }
 
   /**
@@ -591,7 +594,7 @@ public:
    * \remarks The comparison is case-sensitive.
    */
   bool Compare (const char* iStr) const
-  { return (strcmp (Data ? Data : "", iStr) == 0); }
+  { return (strcmp (GetDataSafe(), iStr) == 0); }
 
   /**
    * Check if another string is equal to this one.
@@ -608,7 +611,7 @@ public:
       return false;
     if (Size == 0 && n == 0)
       return true;
-    return (csStrNCaseCmp (Data, iStr.GetData (), Size) == 0);
+    return (csStrNCaseCmp (GetDataSafe(), iStr.GetDataSafe(), Size) == 0);
   }
 
   /**
@@ -618,7 +621,7 @@ public:
    * \remarks The comparison is case-insensitive.
    */
   bool CompareNoCase (const char* iStr) const
-  { return (csStrNCaseCmp (Data ? Data : "", iStr, Size) == 0); }
+  { return (csStrNCaseCmp (GetDataSafe(), iStr, Size) == 0); }
 
   /**
    * Check if this string starts with another one.
@@ -628,6 +631,7 @@ public:
    */
   bool StartsWith (const csStringBase& iStr, bool ignore_case = false) const
   {
+    char const* p = GetDataSafe();
     if (&iStr == this)
       return true;
     size_t const n = iStr.Length();
@@ -635,11 +639,11 @@ public:
       return true;
     if (n > Size)
       return false;
-    CS_ASSERT(Data != 0);
+    CS_ASSERT(p != 0);
     if (ignore_case)
-      return (csStrNCaseCmp (Data, iStr.GetData (), n) == 0);
+      return (csStrNCaseCmp (p, iStr.GetDataSafe (), n) == 0);
     else
-      return (strncmp (Data, iStr.GetData (), n) == 0);
+      return (strncmp (p, iStr.GetDataSafe (), n) == 0);
   }
 
   /**
@@ -650,6 +654,7 @@ public:
    */
   bool StartsWith (const char* iStr, bool ignore_case = false) const
   {
+    char const* p = GetDataSafe();
     if (iStr == 0)
       return false;
     size_t const n = strlen (iStr);
@@ -657,11 +662,11 @@ public:
       return true;
     if (n > Size)
       return false;
-    CS_ASSERT(Data != 0);
+    CS_ASSERT(p != 0);
     if (ignore_case)
-      return (csStrNCaseCmp (Data, iStr, n) == 0);
+      return (csStrNCaseCmp (p, iStr, n) == 0);
     else
-      return (strncmp (Data, iStr, n) == 0);
+      return (strncmp (p, iStr, n) == 0);
   }
 
   /**
@@ -761,7 +766,7 @@ public:
    *   string will represent a null-pointer.
    */
   operator const char* () const
-  { return Data; }
+  { return GetData(); }
 
   /**
    * Check if another string is equal to this one.
@@ -891,81 +896,137 @@ template<int LEN = 36>
 class csStringFast : public csStringBase
 {
 protected:
-  char internalBuffer[LEN];
-  virtual void SetCapacityInternal (size_t NewSize, bool extraSpace)
-  {
-    // @@@ TEMPORARILY DISABLED!
-    //char* oldBuf = (MaxSize > LEN) ? Data : 0;
-    char* oldBuf = Data;
+  /// Internal buffer; used when capacity fits within LEN bytes.
+  char minibuff[LEN];
+  /**
+   * Amount of minibuff allocated by SetCapacityInternal(); not necessarily
+   * same as Size. This is analogous to MaxSize in csStringBase. We need it to
+   * determine if minibuff was ever used in order to return NULL if not (to
+   * emulate the NULL returned by csStringBase when no buffer has been
+   * allocated). We also use minibuff to emulate GetCapacity(), which is a
+   * predicate of several memory management methods, such as ExpandIfNeeded().
+   */
+  size_t miniused;
 
-    char* newBuf;
-    // @@@ TEMPORARILY DISABLED!
-    if (false) //(NewSize < LEN)
-    {
-      newBuf = internalBuffer;
-      /* No need to honor extraSpace; later "reallocations" are free when
-       * using the internal buffer, so no need to "allocate" more than
-       * necessary. */
-    }
+  virtual void SetCapacityInternal (size_t NewSize, bool soft)
+  {
+    if (Data != 0) // If dynamic buffer already allocated, just re-use it.
+      csStringBase::SetCapacityInternal(NewSize, soft);
     else
     {
-      if (extraSpace)
-	NewSize = ComputeNewSize (NewSize) + 1;
-      newBuf = new char[NewSize];
-    }
-    if (newBuf != Data)
-    {
-      if (Data == 0 || Size == 0)
-	newBuf[0] = '\0';
+      NewSize++; // Plus one for implicit null byte.
+      if (NewSize <= LEN)
+	miniused = NewSize;
       else
-	memcpy(newBuf, Data, Size + 1);
+      {
+	CS_ASSERT(MaxSize == 0);
+	if (soft)
+	  NewSize = ComputeNewSize (NewSize);
+	Data = new char[NewSize];
+	MaxSize = NewSize;
+	if (Size == 0)
+	  Data[0] = '\0';
+	else
+	  memcpy(Data, minibuff, Size + 1);
+      }
     }
-
-    MaxSize = NewSize;
-    Data = newBuf;
-    delete[] oldBuf;
   }
+
 public:
   /**
    * Create an empty csStringFast object.
    */
-  csStringFast () : csStringBase() { }
+  csStringFast () : csStringBase(), miniused(0) { }
   /**
    * Create a csStringFast object and reserve space for at least Length 
    * characters.
    */
-  csStringFast (size_t Length) : csStringBase() { SetCapacity (Length); }
+  csStringFast (size_t Length) : csStringBase(), miniused(0)
+  { SetCapacity (Length); }
   /**
    * Copy constructor.
    */
-  csStringFast (const csStringBase& copy) : csStringBase () 
+  csStringFast (const csStringBase& copy) : csStringBase (), miniused(0) 
   { Append (copy); }
   /**
    * Copy constructor.
    */
-  csStringFast (const csStringFast& copy) : csStringBase () 
+  csStringFast (const csStringFast& copy) : csStringBase (), miniused(0)
   { Append (copy); }
   /**
    * Create a csStringFast object from a null-terminated C string.
    */
-  csStringFast (const char* src) : csStringBase() 
+  csStringFast (const char* src) : csStringBase(), miniused(0)
   { Append (src); }
   /// Create a csStringFast object from a single signed character.
-  csStringFast (char c) : csStringBase()
+  csStringFast (char c) : csStringBase(), miniused(0)
   { Append (c); }
   /// Create a csStringFast object from a single unsigned character.
-  csStringFast (unsigned char c) : csStringBase()
+  csStringFast (unsigned char c) : csStringBase(), miniused(0)
   { Append ((char)c); }
   /// Destroy the csStringFast.
-  virtual ~csStringFast () { /*if (MaxSize <= LEN) Data = 0;*/ }
-  virtual void Free ()
-  { /*if (MaxSize <= LEN) Data = 0;*/ csStringBase::Free(); }
+  virtual ~csStringFast () { }
+
+  /** @{ */
+  /// Assign a value to this string.
+  const csStringFast& operator = (const csStringBase& copy)
+  { Replace(copy); return *this; }
+  template <int N> const csStringFast& operator = (const csStringFast<N>& copy)
+  { Replace(copy); return *this; }
+  /** @} */
+
+  /// Assign a formatted value to this string.
+  template<typename T>
+  const csStringFast& operator = (T s) { return Replace (s); }
+
+  virtual char* GetData ()
+  { return (miniused == 0 && Data == 0 ? 0 : (Data != 0 ? Data : minibuff)); }
+  virtual char const* GetData () const
+  { return (miniused == 0 && Data == 0 ? 0 : (Data != 0 ? Data : minibuff)); }
+
+  virtual size_t GetCapacity() const
+  { return Data != 0 ? csStringBase::GetCapacity() : miniused - 1; }
+
+  virtual void ShrinkBestFit ()
+  {
+    if (Size == 0)
+    {
+      csStringBase::ShrinkBestFit();
+      miniused = 0;
+    }
+    else
+    {
+      size_t needed = Size + 1;
+      if (needed > LEN)
+	csStringBase::ShrinkBestFit();
+      else
+      {
+	miniused = needed;
+	if (Data != 0)
+	{
+	  memcpy(minibuff, Data, needed); // Includes implicit null byte.
+	  csStringBase::Free();
+	}
+      }
+    }
+  }
+
+  virtual void Free () { miniused = 0; csStringBase::Free(); }
 
   virtual char* Detach ()
   { 
-    //char* d = (MaxSize <= LEN) ? csStrNew (Data) : Data; 
-    char* d = Data; 
-    Data = 0; Size = 0; MaxSize = 0; return d; }
+    if (Data != 0)
+      return csStringBase::Detach();
+    else if (miniused == 0)
+      return 0; // Emulate NULL return of csStringBase in this case.
+    else
+    {
+      CS_ASSERT(MaxSize == 0);
+      char* d = csStrNew (minibuff);
+      Size = 0; miniused = 0;
+      return d;
+    }
+  }
 };
 
 CS_SPECIALIZE_TEMPLATE
@@ -975,9 +1036,41 @@ public:
   csStringFast () : csStringBase() { }
   csStringFast (size_t Length) : csStringBase(Length) { }
   csStringFast (const csStringBase& copy) : csStringBase (copy) { }
+  template <int N> csStringFast (const csStringFast<N>& copy) :
+    csStringFast<> ((const csStringBase&)copy) {}
   csStringFast (const char* src) : csStringBase(src) { }
   csStringFast (char c) : csStringBase(c) { }
   csStringFast (unsigned char c) : csStringBase(c) { }
+  const csStringFast& operator = (const csStringBase& copy)
+  { Replace(copy); return *this; }
+  template <int N> const csStringFast& operator = (const csStringFast<N>& copy)
+  { Replace(copy); return *this; }
+  const csStringFast& operator = (char x)
+  { Replace(x); return *this; }
+  const csStringFast& operator = (unsigned char x)
+  { Replace(x); return *this; }
+  const csStringFast& operator = (bool x)
+  { Replace(x); return *this; }
+  const csStringFast& operator = (short x)
+  { Replace(x); return *this; }
+  const csStringFast& operator = (unsigned short x)
+  { Replace(x); return *this; }
+  const csStringFast& operator = (int x)
+  { Replace(x); return *this; }
+  const csStringFast& operator = (unsigned int x)
+  { Replace(x); return *this; }
+  const csStringFast& operator = (long x)
+  { Replace(x); return *this; }
+  const csStringFast& operator = (unsigned long x)
+  { Replace(x); return *this; }
+  const csStringFast& operator = (longlong x)
+  { Replace(x); return *this; }
+  const csStringFast& operator = (ulonglong x)
+  { Replace(x); return *this; }
+  const csStringFast& operator = (float x)
+  { Replace(x); return *this; }
+  const csStringFast& operator = (double x)
+  { Replace(x); return *this; }
 };
 
 /**
@@ -993,14 +1086,56 @@ public:
    * characters.
    */
   csString (size_t Length) : csStringFast<> (Length) { }
+  /** @{ */
   /// Copy constructor.
+  csString (const csString& copy) :
+    csStringFast<> ((const csStringBase&)copy) { }
   csString (const csStringBase& copy) : csStringFast<> (copy) { }
+  template <int N> csString (const csStringFast<N>& copy) :
+    csStringFast<> ((const csStringBase&)copy) { }
+  /** @} */
   /// Create a csString object from a null-terminated C string.
   csString (const char* src) : csStringFast<> (src) { }
   /// Create a csString object from a single signed character.
   csString (char c) : csStringFast<> (c) { }
   /// Create a csString object from a single unsigned character.
   csString (unsigned char c) : csStringFast<> (c) { }
+
+  /** @{ */
+  /// Assign a value to this string.
+  const csString& operator = (const csString& copy)
+  { Replace(copy); return *this; }
+  const csString& operator = (const csStringBase& copy)
+  { Replace(copy); return *this; }
+  template <int N> const csString& operator = (const csStringFast<N>& copy)
+  { Replace(copy); return *this; }
+  const csString& operator = (char x)
+  { Replace(x); return *this; }
+  const csString& operator = (unsigned char x)
+  { Replace(x); return *this; }
+  const csString& operator = (bool x)
+  { Replace(x); return *this; }
+  const csString& operator = (short x)
+  { Replace(x); return *this; }
+  const csString& operator = (unsigned short x)
+  { Replace(x); return *this; }
+  const csString& operator = (int x)
+  { Replace(x); return *this; }
+  const csString& operator = (unsigned int x)
+  { Replace(x); return *this; }
+  const csString& operator = (long x)
+  { Replace(x); return *this; }
+  const csString& operator = (unsigned long x)
+  { Replace(x); return *this; }
+  const csString& operator = (longlong x)
+  { Replace(x); return *this; }
+  const csString& operator = (ulonglong x)
+  { Replace(x); return *this; }
+  const csString& operator = (float x)
+  { Replace(x); return *this; }
+  const csString& operator = (double x)
+  { Replace(x); return *this; }
+  /** @} */
 };
 
 #endif // __CS_CSSTRING_H__
