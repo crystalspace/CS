@@ -13,6 +13,8 @@ The history order has been reversed so that new features are at the top.
 	  faster since lighting is now cached with the tesselated curve
 	  and is only recalculated when either lighting or the tesselation
 	  changes.
+	- Removed AddBoundingPolygons from csCurve because it is obsolete
+	  and needs to be implemented otherwise.
 20-Jun-2000
 	- Changed csDynLight::SetColor() so that it will work without
 	  having to call Setup() later. This is MUCH more efficient if you
