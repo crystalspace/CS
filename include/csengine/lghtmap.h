@@ -254,7 +254,12 @@ public:
   ///
   virtual void SetCacheData (void *d)
   { cachedata = d; }
-  /// calculate (if needed) and return mean color
+  /** 
+   * calculate (if needed) and return mean lightmap color
+   * Note: won't include true dynamic lights
+   * until RecalculateDynamicLights() of the owning
+   * csPolyTexture is called
+   */
   virtual void GetMeanLighting (int &r, int &g, int &b);
   /// Get size of one lightmap
   virtual long GetSize ()
