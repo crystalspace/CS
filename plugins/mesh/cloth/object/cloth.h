@@ -67,15 +67,16 @@ class ClothIntegrator
 	      // for this to be effective,  
 	         STRfields= 2*Xsize*Ysize - Xsize - Ysize ;
 		 SHRfields= 2*(Xsize-1)*(Ysize-1) ;
-                EquilbDist= 0.05;
-              structural_k= 45.0;
-	           shear_k= 45.0;
-		   density= 5.1;
+                EquilbDist= 0.01;
+              structural_k= 35.0;
+	           shear_k= 35.0;
+		   density= 3.1;
+                  friction= 0.7;  // 1.0 is no friction at all
          // structural_field=new float[ STRfields ];
           //     shear_field=new float[ SHRfields ];
 	    
 	       object_bbox=&box;
-	                dt=0.02;
+	                dt=0.07;
 		};   //\ this class doesnt know anything
 	              //\ about memory allocation, (just on physical-only variables)  =(
 	               //\  this class only cares about
@@ -102,6 +103,7 @@ class ClothIntegrator
 		     float structural_k;
 		     float shear_k;
 		     float density;
+		     float friction;
                  csVector3 gravity;     
 		csVector3* shift;
 		   csBox3* object_bbox;
@@ -114,26 +116,55 @@ class ClothIntegrator
 
 	             float dt;  //time interval
 
+		     /*
+		      * Numerical Methods implemented in this integrator:
+		      *
+		      *     Euler integrator 
+		      *     (recommended only for startup timesteps and switch then to Adams-Moulton)
+		      *
+		      *     Related methods:
+		      *                   ComputeInitial();
+		      *        
+		      *                       
+		      *     4th order Adams-Moulton predictor-corrector
+		      *     Related methods:
+		      *                          Compute();
+		      *
+		      *     Verlet-Constrain
+		      *     Related methods:
+		      *                       VerletSwap();
+		      *                    ComputeVerlet();
+		      *         ComputeConstrainedForces();         
+		      *         
+		      *      Common methods:
+		      *         
+		      *            Swap();   timesteps swapping
+		      *   ComputeForces();   evaluate force field for a structural + shear spring system        
+		      *     
+		      *      */
+
       void Swap() 
       {
-	           aux=forces3;
-               forces3=forces2;
-	       forces2=forces1;
-	       forces1=forces;
-	        forces=aux;
+	           aux = forces3;
+               forces3 = forces2;
+	       forces2 = forces1;
+	       forces1 = forces;
+	        forces = aux;
 
-	           aux=velocities3;
-           velocities3=velocities2;
-	   velocities2=velocities1;
-	   velocities1=velocities;
-            velocities=aux;
+	           aux = velocities3;
+           velocities3 = velocities2;
+	   velocities2 = velocities1;
+	   velocities1 = velocities;
+            velocities = aux;
+      };
 
-	          /*   aux=vertices;
-	          vertices=old_vertices;
-	      old_vertices=aux;
-	          */
-	      
-      };	
+     void VerletSwap()
+     {
+	           aux = vertices;
+              vertices = tempvertices;
+          tempvertices = aux;
+	          
+     };      
   
      csVector3* GetVerticeBuffer()
      {
@@ -262,13 +293,16 @@ void ComputeInitial() {
       //structural_field[ j ]=( vertices[ j + 1 ]-vertices[ j ] ).Norm();
       temp=vertices[j+1]-vertices[j];
       N=temp.Norm();
+      //N*=N*N;
       N=structural_k*((N-EquilbDist)/N);
       temp*=N;
       forces[j]+=temp;   //action -
       forces[j+1]-=temp;  //reaction -  At Work     
+     
 	   
    };
-      
+     
+ 
    for (i=1;i<Ysize;i++)
    {
       k = ( 2*Xsize -1 )*i - Xsize;   
@@ -278,11 +312,12 @@ void ComputeInitial() {
        // structural_field[ j + k ]=( vertices[ j + Xsize*(i-1) ] - vertices[ j + Xsize*i ] ).Norm();
 	  temp=vertices[j + Xsize*(i-1) ]-vertices[ j + Xsize*i ];
 	  N=temp.Norm();
+          //N*=N*N;
 	  N=structural_k*((N-EquilbDist)/N);
 	  temp*=N;
 	  forces[ j + Xsize*i ]+=temp;
 	  forces[ j + Xsize*(i-1) ]-=temp;
-	  //printf(" %f \n",N);
+	 	  //printf(" %f \n",N);
        };
       k += Xsize;	 
       for (j=0;j<Xsize-1;j++)
@@ -290,38 +325,77 @@ void ComputeInitial() {
         //structural_field[ j + k ]=( vertices[ j + Xsize*i ] - vertices[ j + Xsize*i + 1] ).Norm();
 	temp=vertices[ j + Xsize*i ]-vertices[ j + Xsize*i + 1 ];
 	N=temp.Norm();
+        //N*=N*N;
 	N=structural_k*((N-EquilbDist)/N);
 	temp*=N;
 	forces[ j + Xsize*i + 1 ]+=temp;
 	forces[ j + Xsize*i ]-=temp;
-	
+
         //shear_field[ 2*((i-1)*(Xsize-1) + j) ]=( vertices[ j + Xsize*i + 1 ] - vertices[ j + Xsize*(i-1) ] ).Norm();
 	temp= vertices[ j + Xsize*i + 1 ] - vertices[ j + Xsize*(i-1) ];
 	N=temp.Norm();
+	//N*=N*N;
 	N=shear_k*((N-EquilbDist)/N);
 	temp*=N;
 	forces[ j + Xsize*(i-1) ]+=temp;
 	forces[ j + Xsize*i + 1 ]-=temp;
-
+	
 	//shear_field[ 2*((i-1)*(Xsize-1) + j) + 1 ]=( vertices[ j + Xsize*i ] - vertices[ j + Xsize*(i-1) + 1 ] ).Norm();
         temp= vertices[ j + Xsize*(i-1) + 1 ] - vertices[ j + Xsize*i ];
 	N=temp.Norm();
+	//N*=N*N;
 	N=shear_k*((N-EquilbDist)/N);
 	temp*=N;
 	forces[ j + Xsize*i ]+=temp;
 	forces[ j + Xsize*(i-1) + 1 ]-=temp;
+
       };
-   }; 
+   };
+        for (i=0;i<Xsize-8;i++) {
+  forces[i]= 0.0;
+  //vertices[1].Set(0.1,0,0);
+   };
+    for (i=nverts-Ysize+1;i<nverts;i++) {
+  forces[i]= 0.0;   
+ // vertices[i].Set(2.0*(i-nverts+Xsize)/Xsize,2.0,0);
+  //vertices[1].Set(0.1,0,0);
+   };
+
+ //  ComputeConstrainConditionsForces();
  };
 
-void Compute() {   
-   
-	ComputeForces();
+void ComputeConstrainConditionsForces()
+{
+	int i; 
 	
-    
+      for (i=0;i<Xsize-8;i++) {
+  forces[i]= 0.0;
+  //vertices[1].Set(0.1,0,0);
+   };
+    for (i=nverts-Ysize+1;i<nverts;i++) {
+  forces[i]= 0.0;   
+ // vertices[i].Set(2.0*(i-nverts+Xsize)/Xsize,2.0,0);
+  //vertices[1].Set(0.1,0,0);
+   };
+
+};
+void Compute() {   
+      int i;   
+	ComputeForces();
+/*	
+      for (i=0;i<Xsize-8;i++) {
+  forces[i]+= -(Xsize*Ysize)*density*gravity;
+  //vertices[1].Set(0.1,0,0);
+   };
+    for (i=nverts-Ysize+1;i<nverts;i++) {
+  forces[i]+= -(Xsize*Ysize)*density*gravity;   
+ // vertices[i].Set(2.0*(i-nverts+Xsize)/Xsize,2.0,0);
+  //vertices[1].Set(0.1,0,0);
+   };*/
+
      csVector3* aux2;  //swapping variables
      csVector3* aux3;
-            int i;   
+         
    for (i=0;i<nverts;i++)
    {
 	   //let apply here Adams-Moulton predictor
@@ -333,7 +407,7 @@ void Compute() {
 	//IMPORTANT: note that velocities holds at this moment the value holded from velocities3 (t - 3h) which was swapped   
     tempvertices[i] = vertices[i]+(dt/24)*( 55*velocities1[i] - 59*velocities2[i] + 37*velocities3[i] - 9*velocities[i] ); 
       //predicted velocities 
-      velocities[i] = velocities1[i]+(dt/(24*density))*( 55*forces[i] - 59*forces1[i] + 37*forces2[i] - 9*forces3[i] );
+      velocities[i] = friction*velocities1[i]+(dt/(24*density))*( 55*forces[i] - 59*forces1[i] + 37*forces2[i] - 9*forces3[i] );
           
          forces3[i] = density*gravity;
 
@@ -367,7 +441,39 @@ void Compute() {
 	//	 if ( ((i+1)%(Xsize+1))==0 ) { xindex=0.0; yindex+=5.0/Ysize;  };
 		 	 };
   // Swap();   //swap timebuffers             
-   for (i=0;i<Xsize-8;i++) {
+ 
+  // vertices[Xsize-1].Set(0,0,0);
+
+    };
+
+ void ComputeVerlet() 
+ {
+	 
+	ComputeConstrainedForces( 1.0 );
+        int i;     
+   for (i=0;i<nverts;i++)
+   {
+	   //let apply here Verlet integration
+           velocities[i] = 2*vertices[i] - tempvertices[i] + forces[i]*(dt/density); 
+         tempvertices[i] = vertices[i];
+	     vertices[i] = velocities[i];
+	  
+	      forces[i] = density*gravity;              //clean what is going to be the new timestep buffer 
+	                                      //after the Swap() call and set to default gravity 
+	
+	//	 vertices[i].z=cos(1./(cos(pow( xindex-3 , 2 )+pow( yindex-3 ,2)-time*time)+2.1) );
+	//	 vertices[i].x=xindex;
+	//	 vertices[i].y=yindex;
+       object_bbox->AddBoundingVertexSmart ( vertices[i] + *shift );
+		 //texels[i].Set(xindex/5.1f , yindex/5.1f );
+		 //colors[i].Set (1.0f, 1.0f, 1.0f);
+	//	 xindex+=5.0/Xsize;
+	//	 if ( ((i+1)%(Xsize+1))==0 ) { xindex=0.0; yindex+=5.0/Ysize;  };
+		 	 };
+      // VerletSwap();                        //swap timebuffer   
+
+       // some boundary condition. Here for now
+    for (i=0;i<Xsize-8;i++) {
   vertices[i].Set(2.0*i/Xsize,0,0);
   //vertices[1].Set(0.1,0,0);
    };
@@ -380,6 +486,93 @@ void Compute() {
 
     };
 
+
+ void  ComputeConstrainedForces(float stiffness)
+	
+   {
+   float softness= 1.0 - stiffness;	   
+   //the purpose of this routine is evaluate how off are satisfied distance constrains
+   //for rigid edges and apply relaxation  ( i wonder if there is a way to induce critical relaxation)
+   //
+   //
+	//float xindex=0.0;
+	//float yindex=0.0;
+	int i;
+	int j;
+	int k;
+	csVector3 temp;
+	float N;
+		
+ object_bbox->StartBoundingBox ( *shift );
+    
+   //here we loop over structural fields
+   for (j=0;j<Xsize-1;j++)
+   { //the first row of Horizontal structural fields
+      //structural_field[ j ]=( vertices[ j + 1 ]-vertices[ j ] ).Norm();
+      temp=vertices[j+1]-vertices[j];
+      N=temp.Norm();
+      N=((N-EquilbDist)/N);
+      temp*=N;
+      forces[j]+=softness*temp;   //action -
+      vertices[j]+=0.5*temp;
+      forces[j+1]-=softness*temp;  //reaction -  At Work     
+      vertices[j+1]-=0.5*temp;
+	   
+   };
+      
+   for (i=1;i<Ysize;i++)
+   {
+      k = ( 2*Xsize -1 )*i - Xsize;   
+      //ahh this are array offsets related to the way of storing fields
+      for (j=0;j<Xsize;j++) 
+      { //Vertical structural fields
+       // structural_field[ j + k ]=( vertices[ j + Xsize*(i-1) ] - vertices[ j + Xsize*i ] ).Norm();
+	  temp=vertices[j + Xsize*(i-1) ]-vertices[ j + Xsize*i ];
+	  N=temp.Norm();
+	  N=structural_k*((N-EquilbDist)/N);
+	  temp*=N;
+	  forces[ j + Xsize*i ]+=softness*temp;
+	  vertices[ j + Xsize*i ]+=0.5*temp;
+	  forces[ j + Xsize*(i-1) ]-=softness*temp;
+	  vertices[ j + Xsize*(i-1) ]-=0.5*temp;
+	  //printf(" %f \n",N);
+       };
+      k += Xsize;	 
+      for (j=0;j<Xsize-1;j++)
+      { 
+        //structural_field[ j + k ]=( vertices[ j + Xsize*i ] - vertices[ j + Xsize*i + 1] ).Norm();
+	temp=vertices[ j + Xsize*i ]-vertices[ j + Xsize*i + 1 ];
+	N=temp.Norm();
+	N=structural_k*((N-EquilbDist)/N);
+	temp*=N;
+	forces[ j + Xsize*i + 1 ]+=softness*temp;
+	vertices[ j + Xsize*i + 1 ]+=.5*temp;
+	forces[ j + Xsize*i ]-=softness*temp;
+	vertices[ j + Xsize*i ]-=.5*temp;
+
+        //shear_field[ 2*((i-1)*(Xsize-1) + j) ]=( vertices[ j + Xsize*i + 1 ] - vertices[ j + Xsize*(i-1) ] ).Norm();
+	temp= vertices[ j + Xsize*i + 1 ] - vertices[ j + Xsize*(i-1) ];
+	N=temp.Norm();
+	N=shear_k*((N-EquilbDist)/N);
+	temp*=N;
+	forces[ j + Xsize*(i-1) ]+=softness*temp;
+	forces[ j + Xsize*i + 1 ]-=softness*temp;
+	vertices[ j + Xsize*(i-1) ]+=.5*temp;
+	vertices[ j + Xsize*i + 1 ]-=.5*temp;
+
+	//shear_field[ 2*((i-1)*(Xsize-1) + j) + 1 ]=( vertices[ j + Xsize*i ] - vertices[ j + Xsize*(i-1) + 1 ] ).Norm();
+        temp= vertices[ j + Xsize*(i-1) + 1 ] - vertices[ j + Xsize*i ];
+	N=temp.Norm();
+	N=shear_k*((N-EquilbDist)/N);
+	temp*=N;
+	forces[ j + Xsize*i ]+=softness*temp;
+	forces[ j + Xsize*(i-1) + 1 ]-=softness*temp;
+	vertices[ j + Xsize*i ]+=.5*temp;
+	vertices[ j + Xsize*(i-1) + 1 ]-=.5*temp;
+	
+      };
+   }; 
+ };
 
 
 };
