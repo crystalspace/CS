@@ -16,8 +16,7 @@
   goto nothing
 
 :mingw32
-  echo ### MinGW32 not earlier than 2.95.2 (try gcc -v)
-  echo ### zlib/libpng/libjpeg ($(lib)-win32-bin-$(version).zip)
+  echo ### - Crystal Space MinGW32 Package 0.4 or later
   goto nothing
 
 :msvc
@@ -26,13 +25,11 @@
   goto nothing
 
 :nothing
-  echo ### makedep (optional)
-  echo ### nasm (optional, nasm-0.98E-bin-w32.zip)
-  echo ### GNU make (GNU.make-win32-bin-0.79.1.zip)
-  echo ### GNU diff utilites (GNU.diffut-win32-bin-2.7.1.zip)
-  echo ### GNU file utilites, sed, grep (GNU.tools-win32-bin-0.0.1.zip)
-  echo ### GNU text utilites (GNU.textut-win32-bin-1.19.zip)
-  echo ### GNU shell utilites (GNU.shut-win32-bin-1.12.zip)
+  echo ###
+  echo ### - makedep (optional)
+  echo ###
+  echo ### - nasm (optional, nasm-0.98E-bin-w32.zip)
+  echo ###
   echo ###------------------------------------------------------------
   echo ###      ... press any alphanumeric key to continue ...
   echo.
