@@ -420,8 +420,6 @@ bool csGenmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 
 #ifndef CS_USE_NEW_RENDERER
   iGraphics3D* g3d = rview->GetGraphics3D ();
-#else
-  iRender3D* r3d = rview->GetGraphics3D ();
 #endif
   iCamera* camera = rview->GetCamera ();
 
@@ -431,7 +429,7 @@ bool csGenmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   // ->
   //   C = Mwc * (Mow * O - Vow - Vwc)
   //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
-  csReversibleTransform tr_o2c = camera->GetTransform ();
+  tr_o2c = camera->GetTransform ();
   if (!movable->IsFullTransformIdentity ())
     tr_o2c /= movable->GetFullTransform ();
 
@@ -455,7 +453,6 @@ bool csGenmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   m.clip_z_plane = clip_z_plane;
   m.do_mirror = camera->IsMirrored ();
 #else
-  r3d->SetObjectToCamera (&tr_o2c);
   mesh.clip_portal = clip_portal;
   mesh.clip_plane = clip_plane;
   mesh.clip_z_plane = clip_z_plane;
@@ -671,6 +668,7 @@ bool csGenmeshMeshObject::DrawZ (iRenderView* rview, iMovable* /*movable*/,
   // Prepare for rendering.
   mesh.z_buf_mode = mode;
 
+  r3d->SetObjectToCamera (&tr_o2c);
   mesh.SetIndexRange (0, factory->GetTriangleCount () * 3);
   mesh.SetMaterialHandle (NULL);
   csRef<iStreamSource> stream = SCF_QUERY_INTERFACE (factory, iStreamSource);
@@ -700,6 +698,7 @@ bool csGenmeshMeshObject::DrawShadow (iRenderView* rview, iMovable* /*movable*/,
   mesh.SetStreamSource (stream);
   mesh.SetType (csRenderMesh::MESHTYPE_TRIANGLES);
 
+  r3d->SetObjectToCamera (&tr_o2c);
   r3d->SetShadowState (CS_SHADOW_VOLUME_PASS1);
   r3d->DrawMesh (&mesh);
   r3d->SetShadowState (CS_SHADOW_VOLUME_PASS2);
@@ -733,6 +732,7 @@ bool csGenmeshMeshObject::DrawLight (iRenderView* rview, iMovable* /*movable*/,
   mesh.z_buf_mode = CS_ZBUF_TEST;
   mesh.mixmode = CS_FX_ADD;
 
+  r3d->SetObjectToCamera (&tr_o2c);
   mesh.SetIndexRange (0, factory->GetTriangleCount () * 3);
   mesh.SetMaterialHandle (mater->GetMaterialHandle ());
   csRef<iStreamSource> stream = SCF_QUERY_INTERFACE (factory, iStreamSource);

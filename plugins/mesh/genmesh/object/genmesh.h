@@ -84,6 +84,7 @@ private:
   csColor color;
   float current_lod;
   uint32 current_features;
+  csReversibleTransform tr_o2c;
 
   bool do_shadows;
   bool do_shadow_rec;
