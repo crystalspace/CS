@@ -138,7 +138,7 @@ aws3DFrame::Draw(iAws *wmgr, iAwsWindow *window, csRect &frame, int frame_style,
     break;
 
   case fsFlat:
-    g2d->DrawBox(frame.xmin+3, frame.ymin+3, frame.Width()-3, frame.Height()-3, fill);
+    g2d->DrawBox(frame.xmin, frame.ymin, frame.Width(), frame.Height(), fill);
 
     if (bkg)
       g3d->DrawPixmap(bkg, frame.xmin, frame.ymin, 

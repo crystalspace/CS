@@ -91,12 +91,12 @@ awsScrollBar::Setup(iAws *_wmgr, awsComponentNode *settings)
       incimg->GetOriginalDimensions(img_w, img_h);
 
       decinfo.AddRectKey(new scfString("Frame"), 
-                         csRect(3, 0,
-                                Frame().Width()-1, img_h));
+                         csRect(0, 0,
+                                Frame().Width(), img_h));
 
       incinfo.AddRectKey(new scfString("Frame"), 
-                         csRect(3, Frame().Height()-img_h,
-                                Frame().Width()-1, Frame().Height()));
+                         csRect(0, Frame().Height()-img_h,
+                                Frame().Width(), Frame().Height()));
     } break;
 
 
@@ -240,8 +240,41 @@ void
 awsScrollBar::OnDraw(csRect clip)
 {
   aws3DFrame frame3d;
+  int height=10, width=10;
 
-  frame3d.Draw(WindowManager(), Window(), Frame(), aws3DFrame::fsFlat, tex, alpha_level);
+    
+  csRect f(Frame());
+
+  if (frame_style==fsVertical)
+  {
+    // Get the bar height
+    f.ymin+=decVal->Frame().Height()+1;
+    f.ymax-=incVal->Frame().Height()+1;
+
+    // Get the knob height
+    if (amntvis==0)
+      WindowManager()->GetPrefMgr()->LookupIntKey("ScrollBarHeight", height);
+
+    // Get the actual height that we can traverse with the knob
+    int bh = f.Height()-height;
+
+    // Get the knob's position
+    int kx = (value*bh)/max;
+
+    f.ymin+=kx;
+    f.ymax=f.ymin+height;
+  }
+  else
+  {
+    f.xmin+=decVal->Frame().Width()+1;
+    f.xmax-=incVal->Frame().Width()+1;
+
+    if (amntvis==0)
+      WindowManager()->GetPrefMgr()->LookupIntKey("ScrollBarWidth", width);
+
+  }
+  
+  frame3d.Draw(WindowManager(), Window(), f, aws3DFrame::fsRaised, tex, alpha_level);
 }
 
 bool 
