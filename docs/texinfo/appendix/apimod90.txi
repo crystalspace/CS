@@ -1,9 +1,9 @@
 @c -*-texinfo-*-
-@node API Modifications 19, API Modifications 18, API Modifications, API Modifications
-@appendixsec @sc{api} Changes from 0.18 to 0.19
+@node API Modifications 90, API Modifications 18, API Modifications, API Modifications
+@appendixsec @sc{api} Changes from 0.18 to 0.90
 @cindex @sc{api} Changes
 
-This section documents the major changes between versions 0.18 and 0.19 of of
+This section documents the major changes between versions 0.18 and 0.90 of of
 Crystal Space.
 
 @subheading @sc{scf}
@@ -175,6 +175,52 @@ No longer required to link plugin modules with the @file{dllentry.o} object
 file.
 @end itemize
 
+@subheading System Driver Removal and Application Structure
+@cindex @code{SysSystemDriver}
+@cindex @code{csSystemDriver}
+@cindex @code{iSystem}
+@cindex @code{csInitializer}
+@cindex @code{iObjectRegistry}
+@cindex object registry
+@cindex @code{CS_QUERY_REGISTRY}
+@cindex @code{CS_QUERY_PLUGIN}
+
+The classes @code{SysSystemDriver}, and @code{csSystemDriver}, and
+the interface @code{iSystem} have been removed. All the functionality
+that used to be present in the system driver has moved to smaller
+components (plugin manager, event queue, config manager, commandline parser,
+virtual clock, ...).
+
+There is now a new concept called the @dfn{object registry} which is
+the central repository where all objects can register themselves.
+When you used to do @code{CS_QUERY_PLUGIN} you now have to do
+@code{CS_QUERY_REGISTRY} instead.
+
+Applications can no longer inherit from @code{SysSystemDriver}. Instead
+there is now a new @code{csInitializer} class which helps in the
+initialization of an application. Check out the simple tutorial
+(@pxref{Tutorial Simple}) to see how this works. This tutorial also explains
+all the new concepts very clearly.
+
+@subheading Removal of Function ID's
+
+Function ID's (a concept of the old plugin system) have been removed.
+This has an effect on config files where you now must replace things
+like:
+
+@example
+  System.PlugIns.LevelLoader = crystalspace.level.loader
+@end example
+
+with:
+
+@example
+  System.PlugIns.iLoader = crystalspace.level.loader
+@end example
+
+So in general use the interface name. This interface name will be the
+tag with which the loaded plugin is registered in the object registry.
+
 @subheading Image Loading
 @cindex @code{csImageLoader}
 @cindex @code{iImageIO}
@@ -203,23 +249,22 @@ The level loader is now a plugin. Make sure you have it loaded by putting the
 following in your config file:
 
 @example
-System.PlugIns.LevelLoader = crystalspace.level.loader
+System.PlugIns.iLoader = crystalspace.level.loader
 @end example
 
 @noindent
-Or else put the following line in your @code{main} routine right
-before calling @code{csSystemDriver}'s @code{Initialize()} method:
+Or else put the following line in your @code{main} routine in the
+call to @code{csInitializer::RequestPlugins()}:
 
 @example
-System->RequestPlugin("crystalspace.level.loader:LevelLoader");
+  CS_REQUEST_LEVELLOADER,
 @end example
 
 @noindent
 Then you can get the level loader with:
 
 @example
-iLoader* level_loader =
-  CS_QUERY_PLUGIN_ID (System, CS_FUNCID_LVLLOADER, iLoader);
+iLoader* level_loader = CS_QUERY_REGISTRY (object_reg, iLoader);
 @end example
 
 When you don't need it anymore you must call @code{level_loader->DecRef ()}.
@@ -233,12 +278,14 @@ these functions have been renamed as well.
 @cindex @code{iThing}
 @cindex @code{iThingState}
 
+Things are now mesh objects which means that you can no longer access
+@code{csThing} directly.
 @code{iThing} has been removed. Instead there is @code{iThingState}.
-@@@@@@ TODO
+Check out the simple tutorial (@pxref{Tutorial Simple}) for more information
+about this.
 
 @subheading Map File Changes
 
-@@@@@@ TODO
 @itemize @bullet
 @item
 @code{PLANE} @result{} @code{ADDON}
@@ -260,7 +307,9 @@ these functions have been renamed as well.
 
 @subheading Sky Objects Gone
 
-@@@@@@ TODO
+Sky objects must now be created the same as normal mesh objects
+but you need to give them a low render priority (i.e. 'sky' render
+priority).
 
 @subheading Using the Engine as a Plugin
 @cindex Engine Plugin
@@ -274,10 +323,10 @@ Using the engine as a plugin means in the first loading the engine plugin
 instead of linking to the @file{csengine} library.  You can do this with:
 
 @example
-System->RequestPlugin ("crystalspace.engine.3d:Engine");
-System->Initialize (argc, argv, NULL);
-@dots{}
-iEngine* engine = CS_QUERY_PLUGIN (System, iEngine);
+  csInitializer::RequestPlugins (object_reg,
+    CS_REQUEST_ENGINE,
+  @dots{}
+  iEngine* engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 @end example
 
 You then use the engine through @sc{scf} interfaces.  Therefore, your programs
@@ -472,50 +521,16 @@ polluting the global namespace.
 @code{REGISTER_STATIC_LIBRARY} @result{} @code{SCF_REGISTER_STATIC_LIBRARY}
 @end itemize
 
-Macro names related to @code{iSystem::Printf()} are now prefixed with
-@samp{CS_} in order to avoid polluting the global namespace.
-
-@itemize
-@item
-@code{MSG_INTERNAL_ERROR} @result{} @code{CS_MSG_INTERNAL_ERROR}
-@item
-@code{MSG_FATAL_ERROR} @result{} @code{CS_MSG_FATAL_ERROR}
-@item
-@code{MSG_WARNING} @result{} @code{CS_MSG_WARNING}
-@item
-@code{MSG_INITIALIZATION} @result{} @code{CS_MSG_INITIALIZATION}
-@item
-@code{MSG_CONSOLE} @result{} @code{CS_MSG_CONSOLE}
-@item
-@code{MSG_STDOUT} @result{} @code{CS_MSG_STDOUT}
-@item
-@code{MSG_DEBUG_0} @result{} @code{CS_MSG_DEBUG_0}
-@item
-@code{MSG_DEBUG_1} @result{} @code{CS_MSG_DEBUG_1}
-@item
-@code{MSG_DEBUG_2} @result{} @code{CS_MSG_DEBUG_2}
-@item
-@code{MSG_DEBUG_0F} @result{} @code{CS_MSG_DEBUG_0F}
-@item
-@code{MSG_DEBUG_1F} @result{} @code{CS_MSG_DEBUG_1F}
-@item
-@code{MSG_DEBUG_2F} @result{} @code{CS_MSG_DEBUG_2F}
-@end itemize
-
 Plugin management macro names are now prefixed with @samp{CS_} in order to
 avoid polluting the global namespace.
 
 @itemize
 @item
-@code{QUERY_PLUGIN} @result{} @code{CS_QUERY_PLUGIN}
-@item
-@code{QUERY_PLUGIN_ID} @result{} @code{CS_QUERY_PLUGIN_ID}
-@item
 @code{QUERY_PLUGIN_CLASS} @result{} @code{CS_QUERY_PLUGIN_CLASS}
 @item
 @code{LOAD_PLUGIN} @result{} @code{CS_LOAD_PLUGIN}
 @item
-@code{_LOAD_PLUGIN} @result{} @code{_CS_LOAD_PLUGIN}
+@code{_LOAD_PLUGIN} @result{} @code{CS_LOAD_PLUGIN_ALWAYS}
 @end itemize
 
 Macros for classifying events are now prefixed with @samp{CS_} in order to
@@ -787,46 +802,6 @@ The @samp{csKeyValuePair} and @samp{csMapNode} classes moved from
 
 The @samp{csView} class moved from @samp{csengine} to @samp{cstool}.
 
-@subheading System Driver Variables
-
-The following instance variables in @samp{csSystemDriver} are now private and
-are slated for removal:
-
-@itemize @bullet
-@item
-@code{Config}
-@item
-@code{VFS}
-@item
-@code{G3D}
-@item
-@code{G2D}
-@item
-@code{Sound}
-@item
-@code{NetDrv}
-@item
-@code{Console}
-@item
-@code{MotionMan}
-@end itemize
-
-In most cases, applications should now maintain these variables themselves
-rather than relying upon the system driver to do so.  Currently, in the case of
-@samp{VFS}, code can invoke the @code{CS_QUERY_PLUGIN_ID()} macro to obtain a
-pointer to the shared @sc{vfs} instance.  For example:
-
-@example
-iSystem* sys = @dots{};
-iVFS* vfs = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_VFS, iVFS);
-@end example
-
-@subheading Global @samp{System} Variable Removed
-
-The global system driver variable, called @samp{System} and defined in
-@samp{cssys}, has been removed. If your application wants to use a global
-system driver variable anyway, you have to define it yourself.
-
 @subheading @sc{ddg} Terrain Engine Removed
 @cindex @sc{ddg} Terrain Engine
 
@@ -1001,5 +976,7 @@ They were replaced by these methods:
 @end itemize
 
 @code{FrameWidth} and @code{FrameHeight} are no longer available
-in @code{SysSystemDriver}. Instead you have to call @code{GetWidth()}
-and @code{GetHeight()} on the pointer to the canvas (@code{iGraphics2D}).
+in @code{SysSystemDriver} (entire system driver is gone in fact). Instead
+you have to call @code{GetWidth()} and @code{GetHeight()} on the pointer
+to the canvas (@code{iGraphics2D}).
+
