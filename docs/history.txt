@@ -37,6 +37,9 @@ The history order is reversed so that new features are at the top.
 	      they appear as libgl.a, libglu.a, and libglx.a.
 	    - Moved config.guess, config.sub, and install-sh from CS/bin to
 	      CS/mk/autoconf.
+	- Eric Sunshine added missing forward reference for csPlane3 to
+	  ivaria/dynamics.h.  Ben Thomas <trickster@wickedstudios.com> noted
+	  this omission.
 23-Mar-2003
 	- Jonathan Tarbox Added initial Flatten/Unflatten code, don't
 	  expect it to work just yet.
