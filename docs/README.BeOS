@@ -106,6 +106,7 @@ This is the list of BeOS-specific bugs compiled by Eric Sunshine <sunshine@sunsh
 - Glide driver does not compile.
 - It is probably not safe to be inserting mouse and keyboard events into CS's event queue from the main thread while the queue is being processed by a secondary thread.  It is also probably unsafe to cascade mouse moved events from inside "LoopThread" thread.
 - Should auto-detect buggy egcs compiler.
+- Ked Shayer <c.shayer2@ukonline.co.uk> suggests using NASM for the assembler code.
 
 This is the list of problems which have recently been fixed.
 
