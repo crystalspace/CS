@@ -19,54 +19,53 @@
 
 /* ViewMesh: tool for displaying mesh objects (3d sprites) */
 #include "cssysdef.h"
-#include "csutil/sysfunc.h"
-#include "csutil/cscolor.h"
+#include "viewmesh.h"
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
 #include "csutil/cmdhelp.h"
+#include "csutil/cscolor.h"
+#include "csutil/event.h"
+#include "csutil/nulcache.h"
+#include "csutil/sysfunc.h"
 #include "csutil/util.h"
-#include "viewmesh.h"
-#include "iutil/eventq.h"
-#include "iutil/eventh.h"
-#include "iutil/comp.h"
-#include "iutil/cmdline.h"
-#include "iutil/event.h"
-#include "iutil/objreg.h"
-#include "iutil/csinput.h"
-#include "iutil/virtclk.h"
-#include "iengine/sector.h"
-#include "iengine/engine.h"
 #include "iengine/camera.h"
+#include "iengine/engine.h"
 #include "iengine/light.h"
-#include "iengine/texture.h"
+#include "iengine/material.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
-#include "iengine/material.h"
 #include "iengine/region.h"
-#include "imesh/thing.h"
-#include "imesh/object.h"
-#include "imesh/sprite3d.h"
-#include "imesh/spritecal3d.h"
-#include "imesh/fountain.h"
-#include "imesh/partsys.h"
-#include "ivideo/graph3d.h"
-#include "ivideo/graph2d.h"
-#include "ivideo/natwin.h"
-#include "ivideo/txtmgr.h"
-#include "ivideo/texture.h"
-#include "ivideo/material.h"
-#include "ivideo/fontserv.h"
+#include "iengine/sector.h"
+#include "iengine/texture.h"
 #include "igraphic/imageio.h"
 #include "imap/parser.h"
+#include "imap/writer.h"
+#include "imesh/fountain.h"
+#include "imesh/object.h"
+#include "imesh/partsys.h"
+#include "imesh/sprite3d.h"
+#include "imesh/spritecal3d.h"
+#include "imesh/thing.h"
+#include "iutil/cache.h"
+#include "iutil/cmdline.h"
+#include "iutil/comp.h"
+#include "iutil/csinput.h"
+#include "iutil/event.h"
+#include "iutil/eventh.h"
+#include "iutil/eventq.h"
+#include "iutil/objreg.h"
+#include "iutil/plugin.h"
+#include "iutil/vfs.h"
+#include "iutil/virtclk.h"
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
-#include "iutil/vfs.h"
-#include "iutil/cache.h"
-#include "csutil/nulcache.h"
-#include "csutil/event.h"
-
-#include "iutil/plugin.h"
-#include "imap/writer.h"
+#include "ivideo/fontserv.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/material.h"
+#include "ivideo/natwin.h"
+#include "ivideo/texture.h"
+#include "ivideo/txtmgr.h"
 
 // Hack: work around problems caused by #defining 'new'
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
@@ -74,7 +73,9 @@
 #endif
 #include <new>
 
+#ifdef CS_HAS_CAL3D
 #include <cal3d/animcallback.h>
+#endif
 
 CS_IMPLEMENT_APPLICATION
 
@@ -103,10 +104,7 @@ CS_IMPLEMENT_APPLICATION
 #define DEFAULT_SOCKET_Y_ROTATION 0.0f
 #define DEFAULT_SOCKET_Z_ROTATION 0.0f
 
-
-
-
-
+#ifdef CS_HAS_CAL3D
 struct vmAnimCallback : public CalAnimationCallback
 {
     vmAnimCallback() {}
@@ -121,9 +119,9 @@ struct vmAnimCallback : public CalAnimationCallback
         printf("Anim Completed!\n");
     }
 };
+#endif
 
 //-----------------------------------------------------------------------------
-
 
 ViewMesh::ViewMesh (iObjectRegistry *object_reg, csSkin &Skin)
     : csApp (object_reg, Skin)
@@ -665,31 +663,32 @@ bool ViewMesh::LoadSprite (const char *filename, float scale)
       	SCF_QUERY_INTERFACE(imeshfact, iSpriteCal3DFactoryState));
       if (factstate)
       {
+#ifdef CS_HAS_CAL3D
         vmAnimCallback *callback = new vmAnimCallback;
         factstate->RegisterAnimCallback("walk",callback,.5);
-
+#endif
         factstate->RescaleFactory(scale);
-	  for (int i=0; i<factstate->GetMeshCount(); i++)
-	  {
-	      csString push;
-	      if (factstate->IsMeshDefault(i))
-		push.Append("x"); // This is used as a flag to determine
-		// whether the item should be initially checked or not.
-	      else
-		push.Append(" ");
-	      push.Append(factstate->GetMeshName(i));
-	      meshlist.Push(push);
-	  }
-	  int j;
-          for (j=0;j<factstate->GetMorphAnimationCount();j++)
-          {
-            morphanimationlist.Push(csStrNew (
-	    	factstate->GetMorphAnimationName(j)));
-	  }
-	  for(j=0;j< factstate->GetSocketCount();j++)
-	  {
-	    socketlist.Push(factstate->GetSocket(j)->GetName());
-	  }
+	for (int i=0; i<factstate->GetMeshCount(); i++)
+	{
+	  csString push;
+	  if (factstate->IsMeshDefault(i))
+	    push.Append("x"); // This is used as a flag to determine whether
+	  		      // the item should be initially checked or not.
+	  else
+	    push.Append(" ");
+	  push.Append(factstate->GetMeshName(i));
+	  meshlist.Push(push);
+	}
+	int j;
+        for (j=0;j<factstate->GetMorphAnimationCount();j++)
+        {
+          morphanimationlist.Push(
+            csStrNew (factstate->GetMorphAnimationName(j)));
+	}
+	for(j=0;j< factstate->GetSocketCount();j++)
+	{
+	  socketlist.Push(factstate->GetSocket(j)->GetName());
+	}
       }
     }
   }
@@ -709,17 +708,11 @@ bool ViewMesh::SaveSprite(const char *filename)
 {
   csRef<iPluginManager> plugin_mgr (
   	CS_QUERY_REGISTRY (object_reg, iPluginManager));
-
   csRef<iBinarySaverPlugin> saver (CS_LOAD_PLUGIN (plugin_mgr,
     "crystalspace.mesh.saver.factory.sprite.3d.binary", iBinarySaverPlugin));
-	
-	
   csRef<iVFS> VFS (CS_QUERY_REGISTRY (object_reg, iVFS));
-
   csRef<iFile> cf (VFS->Open (filename, VFS_FILE_WRITE));
-  
   saver->WriteDown(imeshfact, cf);
-
   return true;
 }
 

@@ -34,6 +34,8 @@ chronological order.
 	  configure.ac to demand the very latest CVS version of cal3d since
 	  these changes are needed by Keith's 9-Dec-2004 enhancements to
 	  sprcal3d.
+	- Eric Sunshine fixed `viewmesh' so that it builds cleanly even when
+	  cal3d is not available.
 9-Dec-2004
 	- Keith Fulton added support for new animation callback system in
 	  cal3d.  See viewmesh.cpp for very simple example of how to use this.
