@@ -28,7 +28,7 @@
  */
 typedef uint32 csStringID;
 /// this ID is the 'invalid' value
-const int csInvalidStringID = (uint32)-1;
+csStringID const csInvalidStringID = ~0;
 
 /**
  * The string set is a list of strings, all with different content. Each

@@ -34,6 +34,8 @@ The history order is reversed so that new features are at the top.
 	  instances in SCF.  Shawn Carroll <spanky@aci.on.ca> put Eric onto the
 	  scent of this leak, but after investigation, it turned out to be much
 	  more obfuscated and convoluted than originally suspected.
+	- Eric Sunshine fixed the bizarre declaration of csInvalidStringID
+	  in strset.h which was pointed out by Heiko Jakob <buffalo@the7lg.de>.
 10-Oct-2001
 	- Slight optimization in csSector::IntersectSegment() where it
 	  would transform back the intersection point even if there
