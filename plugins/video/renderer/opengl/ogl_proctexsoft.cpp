@@ -450,11 +450,31 @@ void csOpenGLProcSoftware::DrawTriangleMesh (G3DTriangleMesh& mesh)
 
 void csOpenGLProcSoftware::DrawPolygonMesh (G3DPolygonMesh& mesh)
 { 
-  G3DPolygonMesh cmesh;
-  memcpy (&cmesh, &mesh, sizeof(G3DPolygonMesh));
-  // @@@ Here we need to find a way to replace the materials in the
-  // buffer!!!
-  g3d->DrawPolygonMesh (cmesh);
+  iPolygonBuffer* pb = mesh.polybuf;
+  iMaterialHandle** old_materials = new iMaterialHandle* [
+  	pb->GetMaterialCount ()];
+  dummyMaterial* dmat = new dummyMaterial[pb->GetMaterialCount ()];
+  int i;
+  for (i = 0 ; i < pb->GetMaterialCount () ; i++)
+  {
+    iMaterialHandle* oldmat = pb->GetMaterial (i);
+    old_materials[i] = oldmat;
+    int idx = txts_vector->FindKey ((void*)oldmat->GetTexture ());
+    if (idx == -1)
+      dmat[i].handle = txts_vector->RegisterAndPrepare (oldmat->GetTexture ());
+    else
+      dmat[i].handle =(iTextureHandle*) txts_vector->Get (idx)->soft_txt;
+    pb->SetMaterial (i, &dmat[i]);
+  }
+
+  g3d->DrawPolygonMesh (mesh);
+
+  // Restore
+  for (i = 0 ; i < pb->GetMaterialCount () ; i++)
+    pb->SetMaterial (i, old_materials[i]);
+
+  delete[] old_materials;
+  delete[] dmat;
 }
 
 void csOpenGLProcSoftware::OpenFogObject (CS_ID id, csFog* fog)

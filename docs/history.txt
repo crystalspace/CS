@@ -24,6 +24,9 @@ The history order is reversed so that new features are at the top.
 	- Set G3DPolygonMesh::mixmode to CS_FX_COPY for now. This fixes a bug
 	  with the mixmode not being initialized correctly resulting
 	  (sometimes) in semi-transparent things.
+	- Fixed the OpenGL renderer so that DrawPolygonMesh correctly
+	  replaces the texture handles when going to the software renderer
+	  for a procedural texture.
 26-Aug-2001
 	- Removed G3DVertex class since this is equivalent to using
 	  csVector2 instead.
