@@ -18,6 +18,7 @@
 */
 #include "util/ddgerror.h"
 #include "struct/ddgcolor.h"
+#include <stdio.h>
 
 // ----------------------------------------------------------------------
 
