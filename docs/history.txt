@@ -47,6 +47,12 @@ chronological order.
 	  for a while before the cssys sources had been merged physically into
 	  the csutil sources.
 	- Duhprey fixed a couple bugs with the shader vars change.
+	- Eric Sunshine fixed bug in bison.jam where it was not
+	  variant-friendly (variant.jam).  When the Bison rule was invoked
+	  indirectly via the Plugin rule, this problem would cause generated
+	  non-variant files to depend incorrectly upon generated files in the
+	  "static" variant.  Also corrected some other inconsistencies and
+	  strangeness in bison.jam.
 24-Feb-2004
 	- Fritz Elfert fixed conversion of bezier mesh factories in map2cs
 	  and re-enabled them (With wrong cvs log-message: "Before big
