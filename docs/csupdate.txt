@@ -56,6 +56,10 @@ platform-processor.html (e.g. linux-i386.html) file are created to log the
 build process, for your convenience.  Oh yeah, it's a Perl script, so you'll
 need Perl installed to make it work.
 
+One thing to note, since csupdate always creates new versions of cvs.log and
+bin/cvslog.py each time it's run, it's best to add those to your .cvsignore
+file for the root and bin directories, respectively.
+
 Finally, here are some bash aliases I use to make my CS life easier:
 
 alias update-cs="cd <wherever CS is> ; ./bin/csupdate.py"
@@ -67,6 +71,8 @@ Todo:
 * Add a --silence option?
 * Add a --no-log option?
 These might come in handy in some case, I don't know.
+* If a changed file is encountered ("C", conflicting merge),
+  disable --build and warn the user
 
 -ML
 Created 12/20/1999
