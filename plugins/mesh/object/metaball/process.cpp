@@ -27,9 +27,9 @@
 
 #define X_LEFT  -10.5
 #define X_RIGHT 10.5
-#define Y_LEFT  -7.5
-#define Y_RIGHT 7.5
-#define Z_LEFT  4
+#define Y_LEFT  -10.5
+#define Y_RIGHT 10.5
+#define Z_LEFT  -4.0
 #define Z_RIGHT 16.5
 
 #define RES_X   26
@@ -50,7 +50,7 @@ static char visited[RES_X][RES_Y][RES_Z];
 static float p_c[RES_X+1][RES_Y+1][RES_Z+1];
 static char where[RES_X+1][RES_Y+1][RES_Z+1];
 
-float csMetaBalls::potential(const csVector3 &p)
+float csMetaBall::potential(const csVector3 &p)
 { 
   int i;
   float res = -mp.iso_level;
@@ -87,9 +87,9 @@ csVector3 VertexInterp(const csVector3 &p1,const csVector3 &p2,float valp1,float
   return p;
 }
 
-int csMetaBalls::Tesselate(const GridCell &grid,Triangle *triangles)
+int csMetaBall::Tesselate(const GridCell &grid,csVector3 *verts)
 {
-  int i,ntriang;
+  int i, vrtx;
   int cubeindex;
   csVector3 vertlist[12];
 
@@ -134,16 +134,15 @@ int csMetaBalls::Tesselate(const GridCell &grid,Triangle *triangles)
   if(edgeTable[cubeindex]&2048)
     vertlist[11]=VertexInterp(grid.p[3],grid.p[7],grid.val[3],grid.val[7]);
 
-  ntriang=0;
+  vrtx = 0;
+
   for(i=0;triTable[cubeindex][i]!=-1;i+=3)
   {
-    triangles[ntriang].p[0]=vertlist[triTable[cubeindex][i]];
-    triangles[ntriang].p[1]=vertlist[triTable[cubeindex][i+1]];
-    triangles[ntriang].p[2]=vertlist[triTable[cubeindex][i+2]];
-    ntriang++;
+    verts[vrtx++]=vertlist[triTable[cubeindex][i]];
+    verts[vrtx++]=vertlist[triTable[cubeindex][i+1]];
+    verts[vrtx++]=vertlist[triTable[cubeindex][i+2]];
   }
-
-  return ntriang;
+  return vrtx;
 }
 
 void _2int(const csVector3 &pos,int &x,int &y,int &z)
@@ -177,7 +176,7 @@ void GenCell(int x,int y,int z,GridCell &c)
     c.p[i]=base+csVector3(f_shift_x[i],f_shift_y[i],f_shift_z[i]);
 }
 
-void csMetaBalls::FillCell(int _x,int _y,int _z,GridCell &c)
+void csMetaBall::FillCell(int _x,int _y,int _z,GridCell &c)
 {
   for(int i=0;i<8;i++)
   {
@@ -195,7 +194,7 @@ void csMetaBalls::FillCell(int _x,int _y,int _z,GridCell &c)
   }
 }
 
-int csMetaBalls::check_cell_assume_inside(const GridCell &c)
+int csMetaBall::check_cell_assume_inside(const GridCell &c)
 {
   int i,flag;
 
@@ -212,7 +211,7 @@ int csMetaBalls::check_cell_assume_inside(const GridCell &c)
 static int _x,_y,_z;
 static GridCell _cell;
 
-void csMetaBalls::CalculateBlob(int dx,int dy,int dz)
+void csMetaBall::CalculateBlob(int dx,int dy,int dz)
 {
   _x+=dx;
   _y+=dy;
@@ -222,7 +221,7 @@ void csMetaBalls::CalculateBlob(int dx,int dy,int dz)
     goto ret_back;
   if (_y == -1 || _y == RES_Y)
     goto ret_back;
-  if (_z == -1 || _z > z_crit)
+  if (_z == -1 || _z > RES_Z)
     goto ret_back;
 
   // already done this blob
@@ -231,7 +230,7 @@ void csMetaBalls::CalculateBlob(int dx,int dy,int dz)
 
   visited[_x][_y][_z] = frame;
 
-  if(triangles_tesselated < max_triangles - 5)
+  if(vertices_tesselated < max_vertices - 15)
   {
     csVector3 dv(dx * step_x, dy * step_y, dz * step_z);
 
@@ -241,12 +240,12 @@ void csMetaBalls::CalculateBlob(int dx,int dy,int dz)
     
     FillCell(_x,_y,_z,_cell);
 
-    int num=Tesselate(_cell,triangles_array + triangles_tesselated);
+    int num=Tesselate(_cell, mesh->vertices[0] + vertices_tesselated);
 
     if(!num)
       goto skip;
 
-    triangles_tesselated+=num;
+    vertices_tesselated+=num;
 
     CalculateBlob(-1,0,0);
     CalculateBlob(+1,0,0);
@@ -266,10 +265,10 @@ ret_back:
   _z-=dz;
 }
 
-void csMetaBalls::CalculateMetaBalls(void)
+void csMetaBall::CalculateMetaBalls(void)
 {
   frame++;
-  triangles_tesselated=0;
+  vertices_tesselated=0;
 
   int i,j;
 
@@ -278,8 +277,6 @@ void csMetaBalls::CalculateMetaBalls(void)
     int x,y,z;
 
     _2int(meta_balls[i].center,x,y,z);
-
-    z_crit=z;
 
     GridCell cell;
     GenCell(x,y,z,cell);

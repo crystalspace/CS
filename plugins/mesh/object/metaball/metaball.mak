@@ -2,7 +2,7 @@
 # to build the metaball plug-in.
 
 # Plug-in description
-DESCRIPTION.metaball = Crystal Space MetaBall renderer plug-in
+DESCRIPTION.metaball = Crystal Space MetaBall mesh object plug-in
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/metaball
+vpath %.cpp plugins/mesh/object/metaball
 
 ifeq ($(USE_PLUGINS),yes)
   METABALL = $(OUTDLL)metaball$(DLL)
@@ -42,8 +42,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(METABALL)
 endif
 
-INC.METABALL = $(wildcard plugins/metaball/*.h)
-SRC.METABALL = $(wildcard plugins/metaball/*.cpp)
+INC.METABALL = $(wildcard plugins/mesh/object/metaball/*.h)
+SRC.METABALL = $(wildcard plugins/mesh/object/metaball/*.cpp)
 OBJ.METABALL = $(addprefix $(OUT),$(notdir $(SRC.METABALL:.cpp=$O)))
 DEP.METABALL = CSGEOM CSUTIL CSSYS CSUTIL
 

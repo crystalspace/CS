@@ -431,6 +431,8 @@ void csBallMeshObject::SetupObject ()
 
 bool csBallMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 {
+  printf("Ball draw test\n");
+
   SetupObject ();
   iGraphics3D* g3d = rview->GetGraphics3D ();
   iCamera* camera = rview->GetCamera ();
@@ -534,6 +536,7 @@ bool csBallMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 {
 // @@@ TODO:
 //     - Z fill vs Z use
+  printf("Ball draw\n");
   if (!material)
   {
     printf ("INTERNAL ERROR: ball used without material!\n");

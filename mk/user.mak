@@ -48,6 +48,7 @@ PLUGINS += mesh/object/surf        mesh/loader/surf
 PLUGINS += mesh/object/emit        mesh/loader/emit
 PLUGINS += mesh/object/stars
 PLUGINS +=                         mesh/loader/thing
+PLUGINS += mesh/object/metaball    mesh/loader/metaball
 PLUGINS += terrain/object/terrfunc terrain/loader/terrfunc
 PLUGINS += motion/object/default   motion/loader/default
 
