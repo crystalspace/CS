@@ -137,7 +137,7 @@ static void InitializeFogTable ()
 }
 #endif
 
-#define SMALL_D 0.01
+#define SMALL_D 0.01f
 void csRenderView::CalculateFogPolygon (G3DPolygonDP& poly)
 {
   if (!ctxt->fog_info || poly.num < 3) { poly.use_fog = false; return; }

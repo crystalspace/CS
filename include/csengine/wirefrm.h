@@ -27,7 +27,7 @@ struct iGraphics3D;
 struct iTextureManager;
 class csCamera;
 
-#define PLANE_VERTEX_RADIUS .1
+#define PLANE_VERTEX_RADIUS 0.1f
 
 #define WF_ORTHO_PERSP -1
 #define WF_ORTHO_X 0

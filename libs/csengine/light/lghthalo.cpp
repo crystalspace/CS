@@ -33,7 +33,7 @@
 // The speed at which halo brightens/vanishes in milliseconds per frame
 #define HALO_FRAME_TIME        20
 // The speed at which halo brightens/vanishes in 0..1 units
-#define HALO_INTENSITY_STEP    0.05
+#define HALO_INTENSITY_STEP    0.05f
 
 //--------------------------------------------------------------+ csHalo +---//
 

@@ -856,12 +856,12 @@ void csPolygon3D::SetupHWUV()
 
 float csPolygon3D::GetArea()
 {
-  float area = 0.0;
+  float area = 0.0f;
   // triangulize the polygon, triangles are (0,1,2), (0,2,3), (0,3,4), etc..
   int i;
   for (i = 0 ; i<vertices.GetVertexCount()-2 ; i++)
     area += ABS(csMath3::Area3 (Vobj(0), Vobj(i+1), Vobj(i+2)));
-  return area / 2.0;
+  return area / 2.0f;
 }
 
 void csPolygon3D::SetTextureSpace (csPolyTxtPlane* txt_pl)
@@ -1105,7 +1105,7 @@ void csPolygon3D::PlaneNormal (float* yz, float* zx, float* xy)
   float sqd = ayz*ayz + azx*azx + axy*axy;
   float invd;
   if (sqd < SMALL_EPSILON)
-    invd = 1./SMALL_EPSILON;
+    invd = 1.0f / SMALL_EPSILON;
   else
     invd = qisqrt (sqd);
 

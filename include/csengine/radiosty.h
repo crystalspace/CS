@@ -191,7 +191,7 @@ public:
   inline float GetArea() const { return area; }
 
   /// Get diffuse reflection value for element. 0.55-0.75 is nice.
-  inline float GetDiffuse() const { return 0.7; }
+  inline float GetDiffuse() const { return 0.7f; }
 
   /// get width of lightmap and deltamap
   inline int GetWidth() const{ return width; }

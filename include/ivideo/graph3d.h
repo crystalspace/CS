@@ -65,7 +65,7 @@ struct csPixelFormat;
 // Fog (distance*density) is mapped to a texture coordinate and then
 // clamped.  This determines the clamp value.  Some drivers don't
 // like clamping textures so we must do it ourself
-#define CS_FOGTABLE_CLAMPVALUE 0.85
+#define CS_FOGTABLE_CLAMPVALUE 0.85f
 #define CS_FOG_MAXVALUE (CS_FOGTABLE_MAXDISTANCE * CS_FOGTABLE_CLAMPVALUE)
 //======================================================================
 

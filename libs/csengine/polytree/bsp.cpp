@@ -131,13 +131,13 @@ int csBspTree::SelectSplitter (csPolygonInt** polygons, int num)
   {
     cur_mode = BSP_BALANCE_AND_SPLITS;
     balance_factor = 1;
-    split_factor = .1;	// Don't completely ignore splitting.
+    split_factor = 0.1f;	// Don't completely ignore splitting.
   }
   else if (cur_mode == BSP_ALMOST_BALANCED)
   {
     cur_mode = BSP_ALMOST_BALANCE_AND_SPLITS;
     balance_factor = 1;
-    split_factor = .1;
+    split_factor = 0.1f;
   }
   else if (cur_mode == BSP_MINIMIZE_SPLITS)
   {
