@@ -275,4 +275,4 @@ private:
 #define GetICameraFromCamera(a)  &a->m_xCamera
 #define GetCameraFromICamera(a)  ((csCamera*)((size_t)a - offsetof(csCamera, m_xCamera)))
 
-#endif __CAMERA_H__
+#endif // __CAMERA_H__
