@@ -39,12 +39,10 @@ configure-stamp:
 	# Temp? remove of openal
 	#perl -pi -e "s/^PLUGINS(.*openal.*$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
 	# --disable-qsqrt was added for a gcc3.2 bug
-	cd CS; cs_cv_cxx_qsqrt_ok=no ./configure --prefix=/usr --disable-cpu-specific-instructions 
-	# --disable-qsqrt
-	# Force -fPIC as compiling/linking option
-	echo "CFLAGS.SYSTEM += -fPIC"  >> $(CURDIR)/CS/config.mak 
-	echo "LFLAGS.EXE += -fPIC"  >> $(CURDIR)/CS/config.mak 
-	echo "LFLAGS.DLL += -fPIC"  >> $(CURDIR)/CS/config.mak 
+	#  then removed and I had to replace with cs_cv_cxx_qsqrt_ok=no ./configure
+	#  then a correct test was added in configure
+	#  this is adding #define CS_NO_QSQRT in CS/include/volatile.h
+	cd CS; ./configure --prefix=/usr --disable-cpu-specific-instructions 
 
 	# Install as much as possible
 #	perl -pi -e "s/#TO_INSTALL/TO_INSTALL/" $(CURDIR)/CS/cache.mak
@@ -64,9 +62,15 @@ build-arch: build-arch-stamp
 build-arch-stamp: configure-stamp
 
 	# Add here commands to compile the package.
-	cd CS; $(MAKE) all
-	# should be something like this $(MAKE) all USE_SHARED_LIBS=yes
-	# if compile fails with gcc3.2 edit CS/include/volatile.h with #define CS_NO_QSQRT
+	# Compile static libs without -fPIC
+	cd $(CURDIR)/CS; $(MAKE) csengine  csgeom  csgfx  cssys  cstool  csutil  csws
+	# Force -fPIC as compiling/linking option
+	echo "CFLAGS.SYSTEM += -fPIC"  >> $(CURDIR)/CS/config.mak 
+	echo "LFLAGS.EXE += -fPIC"  >> $(CURDIR)/CS/config.mak 
+	echo "LFLAGS.DLL += -fPIC"  >> $(CURDIR)/CS/config.mak 
+	# Build the rest
+	cd $(CURDIR)/CS; $(MAKE) all
+	# should be too something like this $(MAKE) all USE_SHARED_LIBS=yes
 
 build-indep: build-indep-stamp
 build-indep-stamp: configure-stamp
