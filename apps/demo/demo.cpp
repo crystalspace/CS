@@ -39,6 +39,8 @@
 #include "iengine/statlght.h"
 #include "iengine/movable.h"
 #include "iengine/halo.h"
+#include "imesh/particle.h"
+#include "imesh/sprite2d.h"
 #include "imesh/sprite3d.h"
 #include "imesh/ball.h"
 #include "imesh/surf.h"
@@ -121,8 +123,21 @@ void Demo::SetupFactories ()
     Printf (MSG_FATAL_ERROR, "Could not open sprite 3d factory loader!\n");
     exit (0);
   }
-  LoadFactory ("fighter", "/data/demo/fighter", "crystalspace.mesh.object.sprite.3d",
-	plug);
+  LoadFactory ("fighter", "/data/demo/spr_fighter",
+  	"crystalspace.mesh.object.sprite.3d", plug);
+  LoadFactory ("laser", "/data/demo/spr_laser",
+  	"crystalspace.mesh.object.sprite.3d", plug);
+  plug->DecRef ();
+
+  plug = LOAD_PLUGIN (this, "crystalspace.mesh.loader.factory.sprite.2d",
+  	"MeshLdr", iLoaderPlugIn);
+  if (!plug)
+  {
+    Printf (MSG_FATAL_ERROR, "Could not open sprite 2d factory loader!\n");
+    exit (0);
+  }
+  LoadFactory ("photonTorpedo", "/data/demo/spr_photon",
+  	"crystalspace.mesh.object.sprite.2d", plug);
   plug->DecRef ();
 }
 
@@ -144,7 +159,7 @@ void Demo::SetupMaterials ()
   LoadMaterial ("flare_spark4", "/lib/stdtex/flare_grcir.jpg");
   LoadMaterial ("flare_spark5", "/lib/stdtex/flare_pink.jpg");
   LoadMaterial ("stone", "/lib/std/stone4.gif");
-  LoadMaterial ("sun", "/lib/std/white.gif");
+  LoadMaterial ("white", "/lib/std/white.gif");
   LoadMaterial ("jupiter", "/data/demo/jup0vtt2.jpg");
   LoadMaterial ("saturn", "/data/demo/Saturn.jpg");
   LoadMaterial ("earth", "/data/demo/Earth.jpg");
@@ -156,6 +171,7 @@ void Demo::SetupMaterials ()
   LoadMaterial ("nebula_r", "/data/demo/nebula_r.png");
   LoadMaterial ("nebula_u", "/data/demo/nebula_u.png");
   LoadMaterial ("stars", "/data/demo/stars.png");
+  LoadMaterial ("starcross", "/data/demo/starcross2.jpg");
 }
 
 static void SetTexSpace (iPolygon3D* poly, 
@@ -178,6 +194,76 @@ static void SetTexSpace (iPolygon3D* poly,
   texulen += ulen * 2. / float(size);
   texvlen += vlen * 2. / float(size);
   poly->SetTextureSpace (texorig, texu, texulen, texv, texvlen);
+}
+
+void Demo::CreateStarWall (csTransform* trans)
+{
+  iMeshWrapper* stars;
+  iSurfaceState* ss;
+
+  stars = engine->CreateMeshObject (
+  	engine->FindMeshFactory ("surf_factory"), "StarsF00",
+  	room, csVector3 (0, 0, 0));
+  stars->GetFlags ().Set (CS_ENTITY_CAMERA);
+  stars->SetRenderPriority (engine->GetRenderPriority ("starLevel2"));
+  stars->SetZBufMode (CS_ZBUF_NONE);
+  ss = QUERY_INTERFACE (stars->GetMeshObject (), iSurfaceState);
+  ss->SetTopLeftCorner (csVector3 (-200, -200, 200));
+  ss->SetScale (200, 200);
+  ss->SetResolution (4, 4);
+  ss->SetMaterialWrapper (engine->FindMaterial ("stars"));
+  ss->SetLighting (false);
+  ss->SetMixMode (CS_FX_ADD);
+  ss->DecRef ();
+  if (trans) stars->HardTransform (*trans);
+
+  stars = engine->CreateMeshObject (
+  	engine->FindMeshFactory ("surf_factory"), "StarsF10",
+  	room, csVector3 (0, 0, 0));
+  stars->GetFlags ().Set (CS_ENTITY_CAMERA);
+  stars->SetRenderPriority (engine->GetRenderPriority ("starLevel2"));
+  stars->SetZBufMode (CS_ZBUF_NONE);
+  ss = QUERY_INTERFACE (stars->GetMeshObject (), iSurfaceState);
+  ss->SetTopLeftCorner (csVector3 (0, -200, 200));
+  ss->SetScale (200, 200);
+  ss->SetResolution (4, 4);
+  ss->SetMaterialWrapper (engine->FindMaterial ("stars"));
+  ss->SetLighting (false);
+  ss->SetMixMode (CS_FX_ADD);
+  ss->DecRef ();
+  if (trans) stars->HardTransform (*trans);
+
+  stars = engine->CreateMeshObject (
+  	engine->FindMeshFactory ("surf_factory"), "StarsF01",
+  	room, csVector3 (0, 0, 0));
+  stars->GetFlags ().Set (CS_ENTITY_CAMERA);
+  stars->SetRenderPriority (engine->GetRenderPriority ("starLevel2"));
+  stars->SetZBufMode (CS_ZBUF_NONE);
+  ss = QUERY_INTERFACE (stars->GetMeshObject (), iSurfaceState);
+  ss->SetTopLeftCorner (csVector3 (-200, 0, 200));
+  ss->SetScale (200, 200);
+  ss->SetResolution (4, 4);
+  ss->SetMaterialWrapper (engine->FindMaterial ("stars"));
+  ss->SetLighting (false);
+  ss->SetMixMode (CS_FX_ADD);
+  ss->DecRef ();
+  if (trans) stars->HardTransform (*trans);
+
+  stars = engine->CreateMeshObject (
+  	engine->FindMeshFactory ("surf_factory"), "StarsF11",
+  	room, csVector3 (0, 0, 0));
+  stars->GetFlags ().Set (CS_ENTITY_CAMERA);
+  stars->SetRenderPriority (engine->GetRenderPriority ("starLevel2"));
+  stars->SetZBufMode (CS_ZBUF_NONE);
+  ss = QUERY_INTERFACE (stars->GetMeshObject (), iSurfaceState);
+  ss->SetTopLeftCorner (csVector3 (0, 0, 200));
+  ss->SetScale (200, 200);
+  ss->SetResolution (4, 4);
+  ss->SetMaterialWrapper (engine->FindMaterial ("stars"));
+  ss->SetLighting (false);
+  ss->SetMixMode (CS_FX_ADD);
+  ss->DecRef ();
+  if (trans) stars->HardTransform (*trans);
 }
 
 void Demo::SetupSector ()
@@ -254,105 +340,22 @@ void Demo::SetupSector ()
 
   walls_state->DecRef ();
 
+  //====================================================================
   // Create the stars.
-  iMeshWrapper* stars;
-  iSurfaceState* ss;
-
-  // Create the stars.
-  stars = engine->CreateMeshObject (
-  	engine->FindMeshFactory ("surf_factory"), "StarsF",
-  	room, csVector3 (0, 0, 0));
-  stars->GetFlags ().Set (CS_ENTITY_CAMERA);
-  stars->SetRenderPriority (engine->GetRenderPriority ("starLevel2"));
-  stars->SetZBufMode (CS_ZBUF_NONE);
-  ss = QUERY_INTERFACE (stars->GetMeshObject (), iSurfaceState);
-  ss->SetTopLeftCorner (csVector3 (-100, -100, 100));
-  ss->SetScale (200, 200);
-  ss->SetResolution (8, 8);
-  ss->SetMaterialWrapper (engine->FindMaterial ("stars"));
-  ss->SetLighting (false);
-  ss->SetMixMode (CS_FX_ADD);
-  ss->DecRef ();
-
-  stars = engine->CreateMeshObject (
-  	engine->FindMeshFactory ("surf_factory"), "StarsB",
-  	room, csVector3 (0, 0, 0));
-  stars->GetFlags ().Set (CS_ENTITY_CAMERA);
-  stars->SetRenderPriority (engine->GetRenderPriority ("starLevel2"));
-  stars->SetZBufMode (CS_ZBUF_NONE);
-  ss = QUERY_INTERFACE (stars->GetMeshObject (), iSurfaceState);
-  ss->SetTopLeftCorner (csVector3 (-100, -100, 100));
-  ss->SetScale (200, 200);
-  ss->SetResolution (8, 8);
-  ss->SetMaterialWrapper (engine->FindMaterial ("stars"));
-  ss->SetLighting (false);
-  ss->SetMixMode (CS_FX_ADD);
-  ss->DecRef ();
-  stars->HardTransform (csTransform (csYRotMatrix3 (M_PI), csVector3 (0)));
-
-  stars = engine->CreateMeshObject (
-  	engine->FindMeshFactory ("surf_factory"), "StarsR",
-  	room, csVector3 (0, 0, 0));
-  stars->GetFlags ().Set (CS_ENTITY_CAMERA);
-  stars->SetRenderPriority (engine->GetRenderPriority ("starLevel2"));
-  stars->SetZBufMode (CS_ZBUF_NONE);
-  ss = QUERY_INTERFACE (stars->GetMeshObject (), iSurfaceState);
-  ss->SetTopLeftCorner (csVector3 (-100, -100, 100));
-  ss->SetScale (200, 200);
-  ss->SetResolution (8, 8);
-  ss->SetMaterialWrapper (engine->FindMaterial ("stars"));
-  ss->SetLighting (false);
-  ss->SetMixMode (CS_FX_ADD);
-  ss->DecRef ();
-  stars->HardTransform (csTransform (csYRotMatrix3 (M_PI/2), csVector3 (0)));
-
-  stars = engine->CreateMeshObject (
-  	engine->FindMeshFactory ("surf_factory"), "StarsL",
-  	room, csVector3 (0, 0, 0));
-  stars->GetFlags ().Set (CS_ENTITY_CAMERA);
-  stars->SetRenderPriority (engine->GetRenderPriority ("starLevel2"));
-  stars->SetZBufMode (CS_ZBUF_NONE);
-  ss = QUERY_INTERFACE (stars->GetMeshObject (), iSurfaceState);
-  ss->SetTopLeftCorner (csVector3 (-100, -100, 100));
-  ss->SetScale (200, 200);
-  ss->SetResolution (8, 8);
-  ss->SetMaterialWrapper (engine->FindMaterial ("stars"));
-  ss->SetLighting (false);
-  ss->SetMixMode (CS_FX_ADD);
-  ss->DecRef ();
-  stars->HardTransform (csTransform (csYRotMatrix3 (-M_PI/2), csVector3 (0)));
-
-  stars = engine->CreateMeshObject (
-  	engine->FindMeshFactory ("surf_factory"), "StarsU",
-  	room, csVector3 (0, 0, 0));
-  stars->GetFlags ().Set (CS_ENTITY_CAMERA);
-  stars->SetRenderPriority (engine->GetRenderPriority ("starLevel2"));
-  stars->SetZBufMode (CS_ZBUF_NONE);
-  ss = QUERY_INTERFACE (stars->GetMeshObject (), iSurfaceState);
-  ss->SetTopLeftCorner (csVector3 (-100, -100, 100));
-  ss->SetScale (200, 200);
-  ss->SetResolution (8, 8);
-  ss->SetMaterialWrapper (engine->FindMaterial ("stars"));
-  ss->SetLighting (false);
-  ss->SetMixMode (CS_FX_ADD);
-  ss->DecRef ();
-  stars->HardTransform (csTransform (csXRotMatrix3 (M_PI/2), csVector3 (0)));
-
-  stars = engine->CreateMeshObject (
-  	engine->FindMeshFactory ("surf_factory"), "StarsD",
-  	room, csVector3 (0, 0, 0));
-  stars->GetFlags ().Set (CS_ENTITY_CAMERA);
-  stars->SetRenderPriority (engine->GetRenderPriority ("starLevel2"));
-  stars->SetZBufMode (CS_ZBUF_NONE);
-  ss = QUERY_INTERFACE (stars->GetMeshObject (), iSurfaceState);
-  ss->SetTopLeftCorner (csVector3 (-100, -100, 100));
-  ss->SetScale (200, 200);
-  ss->SetResolution (8, 8);
-  ss->SetMaterialWrapper (engine->FindMaterial ("stars"));
-  ss->SetLighting (false);
-  ss->SetMixMode (CS_FX_ADD);
-  ss->DecRef ();
-  stars->HardTransform (csTransform (csXRotMatrix3 (-M_PI/2), csVector3 (0)));
+  //====================================================================
+  csTransform trans;
+  CreateStarWall (NULL);	// Front
+  trans = csTransform (csYRotMatrix3 (M_PI), csVector3 (0));
+  CreateStarWall (&trans);	// Back
+  trans = csTransform (csYRotMatrix3 (M_PI/2), csVector3 (0));
+  CreateStarWall (&trans);	// Right
+  trans = csTransform (csYRotMatrix3 (-M_PI/2), csVector3 (0));
+  CreateStarWall (&trans);	// Left
+  trans = csTransform (csXRotMatrix3 (M_PI/2), csVector3 (0));
+  CreateStarWall (&trans);	// Up
+  trans = csTransform (csXRotMatrix3 (-M_PI/2), csVector3 (0));
+  CreateStarWall (&trans);	// Down
+  //====================================================================
 
   iStatLight* light;
   light = engine->CreateLight (csVector3 (-500, 300, 900), 1000000,
@@ -389,21 +392,6 @@ void Demo::SetupSector ()
 void Demo::SetupObjects ()
 {
   iBallState* bs;
-
-  // Create the sun.
-  iMeshWrapper* sun = engine->CreateMeshObject (
-  	engine->FindMeshFactory ("ball_factory"), "Sun",
-  	NULL, csVector3 (0));
-  sun->SetRenderPriority (engine->GetRenderPriority ("object"));
-  sun->SetZBufMode (CS_ZBUF_USE);
-  bs = QUERY_INTERFACE (sun->GetMeshObject (), iBallState);
-  bs->SetRadius (500, 500, 500);
-  bs->SetMaterialWrapper (engine->FindMaterial ("sun"));
-  bs->SetCylindricalMapping (true);
-  bs->SetRimVertices (6);
-  bs->SetLighting (false);
-  bs->SetColor (csColor (1., 1., 1.));
-  bs->DecRef ();
 
   // Create saturn.
   iMeshWrapper* sat = engine->CreateMeshObject (
@@ -463,20 +451,71 @@ void Demo::SetupObjects ()
   bs->DecRef ();
  
   // Create fighters.
-  iMeshWrapper* fighter;
-  fighter = engine->CreateMeshObject (
+  iMeshWrapper* spr3d;
+  iSprite3DState* s3d;
+  spr3d = engine->CreateMeshObject (
   	engine->FindMeshFactory ("fighter"), "Fighter1",
   	NULL, csVector3 (0));
-  fighter->SetRenderPriority (engine->GetRenderPriority ("object"));
-  fighter->SetZBufMode (CS_ZBUF_USE);
-  fighter->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+  spr3d->SetRenderPriority (engine->GetRenderPriority ("object"));
+  spr3d->SetZBufMode (CS_ZBUF_USE);
+  spr3d->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
 
-  fighter = engine->CreateMeshObject (
+  spr3d = engine->CreateMeshObject (
   	engine->FindMeshFactory ("fighter"), "Fighter2",
   	NULL, csVector3 (0));
-  fighter->SetRenderPriority (engine->GetRenderPriority ("object"));
-  fighter->SetZBufMode (CS_ZBUF_USE);
-  fighter->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+  spr3d->SetRenderPriority (engine->GetRenderPriority ("object"));
+  spr3d->SetZBufMode (CS_ZBUF_USE);
+  spr3d->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+
+  // Create laser.
+  spr3d = engine->CreateMeshObject (
+  	engine->FindMeshFactory ("laser"), "LaserBeam1",
+  	NULL, csVector3 (0));
+  spr3d->SetRenderPriority (engine->GetRenderPriority ("alpha"));
+  spr3d->SetZBufMode (CS_ZBUF_TEST);
+  s3d = QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
+  s3d->SetMixMode (CS_FX_ADD);
+  s3d->SetLighting (false);
+  s3d->SetBaseColor (csColor (.1, .1, 1));
+  s3d->DecRef ();
+
+  spr3d = engine->CreateMeshObject (
+  	engine->FindMeshFactory ("laser"), "LaserBeam2",
+  	NULL, csVector3 (0));
+  spr3d->SetRenderPriority (engine->GetRenderPriority ("alpha"));
+  spr3d->SetZBufMode (CS_ZBUF_TEST);
+  s3d = QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
+  s3d->SetMixMode (CS_FX_ADD);
+  s3d->SetLighting (false);
+  s3d->SetBaseColor (csColor (.1, .1, 1));
+  s3d->DecRef ();
+
+  spr3d = engine->CreateMeshObject (
+  	engine->FindMeshFactory ("laser"), "LaserBeam3",
+  	NULL, csVector3 (0));
+  spr3d->SetRenderPriority (engine->GetRenderPriority ("alpha"));
+  spr3d->SetZBufMode (CS_ZBUF_TEST);
+  s3d = QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
+  s3d->SetMixMode (CS_FX_ADD);
+  s3d->SetLighting (false);
+  s3d->SetBaseColor (csColor (.1, .1, 1));
+  s3d->DecRef ();
+
+  iMeshWrapper* spr2d;
+  iSprite2DState* s2d;
+  iParticle* part;
+  spr2d = engine->CreateMeshObject (
+  	engine->FindMeshFactory ("photonTorpedo"), "PhotonTorpedo1",
+  	NULL, csVector3 (0));
+  spr2d->SetRenderPriority (engine->GetRenderPriority ("alpha"));
+  spr2d->SetZBufMode (CS_ZBUF_TEST);
+  s2d = QUERY_INTERFACE (spr2d->GetMeshObject (), iSprite2DState);
+  s2d->CreateRegularVertices (4, true);
+  //csColoredVertices& verts = s2d->GetVertices ();
+  s2d->DecRef ();
+  part = QUERY_INTERFACE (spr2d->GetMeshObject (), iParticle);
+  part->ScaleBy (10);
+  part->DecRef ();
 }
 
 bool Demo::Initialize (int argc, const char* const argv[],
@@ -650,7 +689,9 @@ void Demo::NextFrame ()
   }
 
   if (map_enabled < MAP_EDIT_FORWARD)
-    seqmgr->ControlPaths (view->GetCamera (), current_time);
+    seqmgr->ControlPaths (view->GetCamera (), current_time, elapsed_time);
+  else if (map_enabled == MAP_EDIT_FORWARD)
+    seqmgr->DebugPositionObjects (view->GetCamera ());
 
   if (map_enabled == MAP_EDIT_FORWARD)
   {
@@ -739,17 +780,25 @@ void Demo::DrawEditInfo ()
   font->GetMaxSize (fw, fh);
   fh += 2;
   int dim = G2D->GetHeight ()-10;
-  G2D->DrawBox (dim+10, 0, G2D->GetWidth ()-dim-10,
+  G2D->DrawBox (dim+5, 0, G2D->GetWidth ()-dim-5,
   	G2D->GetHeight (), col_white);
   cs_time start, total;
   csNamedPath* np = seqmgr->GetSelectedPath (map_selpath, start, total);
   if (np)
   {
-    int ww = dim+20;
+    int ww = dim+10;
     int hh = 10;
     GfxWrite (ww, hh, col_black, col_white, "Point %d", map_selpoint); hh += fh;
-    csVector3 v;
+    csVector3 v, fwd, up;
     np->GetPositionVector (map_selpoint, v);
+    np->GetForwardVector (map_selpoint, fwd);
+    np->GetUpVector (map_selpoint, up);
+    GfxWrite (ww, hh, col_black, col_white, "P(%g,%g,%g)",
+    	v.x, v.y, v.z); hh += fh;
+    GfxWrite (ww, hh, col_black, col_white, "F(%.2g,%.2g,%.2g)",
+    	fwd.x, fwd.y, fwd.z); hh += fh;
+    GfxWrite (ww, hh, col_black, col_white, "U(%.2g,%.2g,%.2g)",
+    	up.x, up.y, up.z); hh += fh;
     float t = np->GetTimeValue (map_selpoint);
     cs_time tms = int (t*total);
     GfxWrite (ww, hh, col_black, col_white, "tot time %d ms", total); hh += fh;
@@ -821,6 +870,7 @@ bool Demo::HandleEvent (iEvent &Event)
 	  np->GetPositionVector (map_selpoint, v);
           v.y += speed;
 	  np->SetPositionVector (map_selpoint, v);
+	  ShowMessage ("Y location set at '%g'", v.y);
           return true;
         }
         if (Event.Key.Code == CSKEY_DOWN)
@@ -829,6 +879,7 @@ bool Demo::HandleEvent (iEvent &Event)
 	  np->GetPositionVector (map_selpoint, v);
           v.y -= speed;
 	  np->SetPositionVector (map_selpoint, v);
+	  ShowMessage ("Y location set at '%g'", v.y);
           return true;
         }
         if (Event.Key.Code == CSKEY_LEFT)
@@ -839,8 +890,9 @@ bool Demo::HandleEvent (iEvent &Event)
 	  csReversibleTransform trans = view->GetCamera ()->GetTransform ();
           trans.LookAt (forward.Unit (), up.Unit ());
 	  trans.RotateThis (csVector3 (0, 0, 1), -.1);
-	  np->SetUpVector (map_selpoint,
-		  trans.This2Other (csVector3 (0, 1, 0)) - trans.GetOrigin ());
+	  up = trans.This2Other (csVector3 (0, 1, 0)) - trans.GetOrigin ();
+	  np->SetUpVector (map_selpoint, up);
+	  ShowMessage ("Up vector set at '%.3g,%.3g,%.3g'", up.x, up.y, up.z);
           return true;
         }
         if (Event.Key.Code == CSKEY_RIGHT)
@@ -851,8 +903,9 @@ bool Demo::HandleEvent (iEvent &Event)
 	  csReversibleTransform trans = view->GetCamera ()->GetTransform ();
           trans.LookAt (forward.Unit (), up.Unit ());
 	  trans.RotateThis (csVector3 (0, 0, 1), .1);
-	  np->SetUpVector (map_selpoint,
-		  trans.This2Other (csVector3 (0, 1, 0)) - trans.GetOrigin ());
+	  up = trans.This2Other (csVector3 (0, 1, 0)) - trans.GetOrigin ();
+	  np->SetUpVector (map_selpoint, up);
+	  ShowMessage ("Up vector set at '%.3g,%.3g,%.3g'", up.x, up.y, up.z);
           return true;
         }
       }
@@ -861,6 +914,129 @@ bool Demo::HandleEvent (iEvent &Event)
         case 'c':
           map_enabled = MAP_EDIT;
 	  return true;
+	case 'y':
+	  // Average the 'y' of this point so that it is on a line
+	  // with the previous and next point.
+	  // Make the forward vector look along the path. i.e. let it look
+	  // to an average direction as specified by next and previous point.
+	  if (map_selpoint <= 0 || map_selpoint >= np->GetNumPoints ()-1)
+	  {
+	    ShowMessage ("The 'y' operation can't work on this point!\n");
+	  }
+	  else
+	  {
+            csVector3 v1, v2, v3;
+	    np->GetPositionVector (map_selpoint-1, v1);
+	    np->GetPositionVector (map_selpoint, v2);
+	    np->GetPositionVector (map_selpoint+1, v3);
+	    if (ABS (v1.x-v3.x) > ABS (v1.z-v3.z))
+	      v2.y = v1.y + (v3.y-v1.y) * (v1.x-v2.x) / (v1.x-v3.x);
+	    else
+	      v2.y = v1.y + (v3.y-v1.y) * (v1.z-v2.z) / (v1.z-v3.z);
+	    ShowMessage ("Y location set at '%g'", v2.y);
+	    np->SetPositionVector (map_selpoint, v2);
+	  }
+	  break;
+	case '0':
+	  // Let the up vector point really upwards.
+	  {
+	    csVector3 forward;
+	    np->GetForwardVector (map_selpoint, forward);
+            csVector3 up;
+	    up = csVector3 (0, 1, 0) % forward;
+	    up = - (up % forward);
+	    np->SetUpVector (map_selpoint, up);
+	  }
+	  break;
+	case CSKEY_BACKSPACE:
+	  // Change direction of the forward vector.
+	  {
+	    csVector3 forward;
+	    np->GetForwardVector (map_selpoint, forward);
+	    np->SetForwardVector (map_selpoint, -forward);
+	  }
+	  break;
+        case '=':
+	  // Make the forward vector look along the path. i.e. let it look
+	  // to an average direction as specified by next and previous point.
+	  if (map_selpoint <= 0 || map_selpoint >= np->GetNumPoints ()-1)
+	  {
+	    ShowMessage ("The '=' operation can't work on this point!\n");
+	  }
+	  else
+	  {
+            csVector3 v1, v2;
+	    np->GetPositionVector (map_selpoint-1, v1);
+	    np->GetPositionVector (map_selpoint+1, v2);
+	    csVector3 forward = (v2-v1).Unit ();
+	    np->SetForwardVector (map_selpoint, forward);
+            csVector3 up;
+	    np->GetUpVector (map_selpoint, up);
+	    up = up % forward;
+	    up = - (up % forward);
+	    np->SetUpVector (map_selpoint, up);
+	  }
+	  break;
+        case '-':
+	  // Make the forward vector look along the path. i.e. let it look
+	  // backward to the previous point in the path if there is one.
+	  if (map_selpoint <= 0)
+	  {
+            csVector3 v1, v2;
+	    np->GetPositionVector (map_selpoint+1, v1);
+	    np->GetPositionVector (map_selpoint, v2);
+	    csVector3 forward = (v2-v1).Unit ();
+	    np->SetForwardVector (map_selpoint, forward);
+            csVector3 up;
+	    np->GetUpVector (map_selpoint, up);
+	    up = up % forward;
+	    up = - (up % forward);
+	    np->SetUpVector (map_selpoint, up);
+	  }
+	  else
+	  {
+            csVector3 v1, v2;
+	    np->GetPositionVector (map_selpoint, v1);
+	    np->GetPositionVector (map_selpoint-1, v2);
+	    csVector3 forward = (v2-v1).Unit ();
+	    np->SetForwardVector (map_selpoint, forward);
+            csVector3 up;
+	    np->GetUpVector (map_selpoint, up);
+	    up = up % forward;
+	    up = - (up % forward);
+	    np->SetUpVector (map_selpoint, up);
+	  }
+	  break;
+        case '+':
+	  // Make the forward vector look along the path. i.e. let it look
+	  // to the next point in the path if there is one.
+	  if (map_selpoint >= np->GetNumPoints ()-1)
+	  {
+            csVector3 v1, v2;
+	    np->GetPositionVector (map_selpoint-1, v1);
+	    np->GetPositionVector (map_selpoint, v2);
+	    csVector3 forward = (v2-v1).Unit ();
+	    np->SetForwardVector (map_selpoint, forward);
+            csVector3 up;
+	    np->GetUpVector (map_selpoint, up);
+	    up = up % forward;
+	    up = - (up % forward);
+	    np->SetUpVector (map_selpoint, up);
+	  }
+	  else
+	  {
+            csVector3 v1, v2;
+	    np->GetPositionVector (map_selpoint, v1);
+	    np->GetPositionVector (map_selpoint+1, v2);
+	    csVector3 forward = (v2-v1).Unit ();
+	    np->SetForwardVector (map_selpoint, forward);
+            csVector3 up;
+	    np->GetUpVector (map_selpoint, up);
+	    up = up % forward;
+	    up = - (up % forward);
+	    np->SetUpVector (map_selpoint, up);
+	  }
+	  break;
       }
     }
     else if (map_enabled == MAP_EDIT)
@@ -1218,16 +1394,16 @@ bool Demo::HandleEvent (iEvent &Event)
           else seqmgr->Suspend ();
 	  break;
         case '.':
-          seqmgr->TimeWarp (100);
+          seqmgr->TimeWarp (20);
 	  break;
         case ',':
-          seqmgr->TimeWarp (-100);
+          seqmgr->TimeWarp (-20);
 	  break;
         case '>':
-          seqmgr->TimeWarp (3000);
+          seqmgr->TimeWarp (1500);
 	  break;
         case '<':
-          seqmgr->TimeWarp (-3000);
+          seqmgr->TimeWarp (-1500);
 	  break;
         case 'm':
 	  map_enabled++;

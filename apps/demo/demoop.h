@@ -82,6 +82,22 @@ public:
 };
 
 /**
+ * A rotate particle operation.
+ */
+class RotatePartOp : public StandardOp
+{
+private:
+  cs_time total_rotate_time;
+  float angle_speed;
+  iMeshWrapper* mesh;
+
+public:
+  RotatePartOp (const char* meshname, cs_time total, float aspeed);
+
+  virtual void Do (cs_time dt);
+};
+
+/**
  * An operation to attach a path to the camera.
  */
 class CameraPathOp : public StandardOp
@@ -98,7 +114,7 @@ public:
 /**
  * An operation to show and move a mesh object.
  */
-class ShowMeshOp : public StandardOp
+class SetupMeshOp : public StandardOp
 {
 private:
   iMeshWrapper* mesh;
@@ -106,7 +122,33 @@ private:
   csVector3 pos;
 
 public:
-  ShowMeshOp (const char* meshName, const char* sectName, const csVector3& p);
+  SetupMeshOp (const char* meshName, const char* sectName, const csVector3& p);
+  virtual void Do (cs_time dt);
+};
+
+/**
+ * An operation to show a mesh object.
+ */
+class ShowMeshOp : public StandardOp
+{
+private:
+  iMeshWrapper* mesh;
+
+public:
+  ShowMeshOp (const char* meshName);
+  virtual void Do (cs_time dt);
+};
+
+/**
+ * An operation to hide a mesh object.
+ */
+class HideMeshOp : public StandardOp
+{
+private:
+  iMeshWrapper* mesh;
+
+public:
+  HideMeshOp (const char* meshName);
   virtual void Do (cs_time dt);
 };
 

@@ -32,6 +32,7 @@ struct iFile;
 struct iImageLoader;
 struct iLoaderPlugIn;
 class DemoSequenceManager;
+class csTransform;
 
 class Demo : public SysSystemDriver
 {
@@ -57,6 +58,7 @@ private:
   void FileWrite (iFile* file, char *str, ...);
 
   void DrawEditInfo ();
+  void CreateStarWall (csTransform* trans);
 
 public:
   Demo ();

@@ -34,6 +34,7 @@ struct iGraphics2D;
 struct iCamera;
 struct iSector;
 struct iMeshWrapper;
+struct iParticle;
 
 /**
  * A subclass of csPath so that paths can have a name.
@@ -62,6 +63,19 @@ public:
   iMeshWrapper* mesh;
   cs_time total_path_time;
   cs_time start_path_time;
+};
+
+/**
+ * A rotation for a mesh as a particle.
+ */
+class MeshRotation
+{
+public:
+  iMeshWrapper* mesh;
+  iParticle* particle;
+  cs_time total_time;
+  cs_time start_time;
+  float angle_speed;
 };
 
 /**
@@ -100,6 +114,11 @@ private:
   csNamedPath* camera_path;
   cs_time total_camera_path_time;
   cs_time start_camera_path_time;
+
+  //=====
+  // For rotation.
+  //=====
+  csVector meshRotation;
 
 private:
   void DebugDrawPath (csNamedPath* np, bool hi,
@@ -151,7 +170,14 @@ public:
    * Control all paths (including the one for the camera).
    * This should be called from within NextFrame().
    */
-  void ControlPaths (iCamera* camera, cs_time current_time);
+  void ControlPaths (iCamera* camera, cs_time current_time,
+  	cs_time elapsed_time);
+
+  /**
+   * Correctly position all objects (including the camera)
+   * while in suspended mode.
+   */
+  void DebugPositionObjects (iCamera* camera);
 
   /**
    * For debugging, draw all active paths on screen. Draw the
@@ -182,6 +208,11 @@ public:
    */
   void SelectNextPath (char* hilight);
 
+  /**
+   * Start a rotating particle effect.
+   */
+  void SetupRotatePart (iMeshWrapper* mesh, float angle_speed,
+  	cs_time total_rotate_time, cs_time already_elapsed);
   /**
    * Start a fade effect.
    */

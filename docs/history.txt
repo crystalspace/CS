@@ -11,6 +11,9 @@ The history order is reversed so that new features are at the top.
 	  GetBaseColor(). This color is added to the color of all vertices.
 	  This works both with or without lighting. Also added BASECOLOR()
 	  keyword for the loader of 3D sprites.
+	- Further improved csdemo with new path editing capabilities.
+	  Added laser beams for the fighers. Added photon torpedo.
+	  Increased the resolution of the star-field...
 24-Apr-2001
 	- Martin Geisse possibly fixed the lockup that Philip get when
 	  exiting Blocks. The bug was in the WaveOut sound driver.

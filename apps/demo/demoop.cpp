@@ -45,6 +45,24 @@ void FadeOp::Do (cs_time dt)
   	end_fade, total_fade_time, dt);
 }
 
+RotatePartOp::RotatePartOp (const char* meshName, cs_time total,
+	float aspeed) : total_rotate_time (total), angle_speed (aspeed)
+{
+  mesh = DemoSequenceManager::demo->engine->FindMeshObject (meshName);
+  if (!mesh)
+  {
+    DemoSequenceManager::demo->Printf (MSG_FATAL_ERROR,
+    	"Can't find mesh '%s'\n", meshName);
+    exit (0);
+  }
+}
+
+void RotatePartOp::Do (cs_time dt)
+{
+  DemoSequenceManager::demoseq->SetupRotatePart (mesh, angle_speed,
+  	total_rotate_time, dt);
+}
+
 CameraPathOp::CameraPathOp (cs_time t, const char* pathName) :
 	total_camera_path_time (t)
 {
@@ -88,7 +106,7 @@ void MeshPathOp::Do (cs_time dt)
   	total_path_time, dt);
 }
 
-ShowMeshOp::ShowMeshOp (const char* meshName, const char* sectName,
+SetupMeshOp::SetupMeshOp (const char* meshName, const char* sectName,
 	const csVector3& p)
 {
   pos = p;
@@ -108,7 +126,7 @@ ShowMeshOp::ShowMeshOp (const char* meshName, const char* sectName,
   }
 }
 
-void ShowMeshOp::Do (cs_time dt)
+void SetupMeshOp::Do (cs_time dt)
 {
   if (mesh)
   {
@@ -117,6 +135,45 @@ void ShowMeshOp::Do (cs_time dt)
     movable->SetPosition (pos);
     movable->UpdateMove ();
     mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+  }
+}
+
+ShowMeshOp::ShowMeshOp (const char* meshName)
+{
+  mesh = DemoSequenceManager::demo->engine->FindMeshObject (meshName);
+  if (!mesh)
+  {
+    DemoSequenceManager::demo->Printf (MSG_FATAL_ERROR,
+    	"Can't find mesh '%s'\n", meshName);
+    exit (0);
+  }
+}
+
+void ShowMeshOp::Do (cs_time dt)
+{
+  if (mesh)
+  {
+    mesh->GetFlags ().Reset (CS_ENTITY_INVISIBLE);
+    mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+  }
+}
+
+HideMeshOp::HideMeshOp (const char* meshName)
+{
+  mesh = DemoSequenceManager::demo->engine->FindMeshObject (meshName);
+  if (!mesh)
+  {
+    DemoSequenceManager::demo->Printf (MSG_FATAL_ERROR,
+    	"Can't find mesh '%s'\n", meshName);
+    exit (0);
+  }
+}
+
+void HideMeshOp::Do (cs_time dt)
+{
+  if (mesh)
+  {
+    mesh->GetFlags ().Set (CS_ENTITY_INVISIBLE);
   }
 }
 

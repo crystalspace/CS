@@ -1025,6 +1025,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
     g3dmesh.mat_handle[0] = factory->cstxt->GetMaterialHandle ();
     factory->cstxt->Visit ();
   }
+  if (!vertex_colors) AddVertexColor (0, csColor (0, 0, 0));
   g3dmesh.num_vertices = num_verts_for_lod;
   g3dmesh.vertices[0] = verts;
   g3dmesh.texels[0][0] = real_uv_verts;

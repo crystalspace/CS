@@ -35,7 +35,9 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (SEQUENCE)
   CS_TOKEN_DEF (SEQUENCES)
   CS_TOKEN_DEF (RECURSE)
+  CS_TOKEN_DEF (SETUPMESH)
   CS_TOKEN_DEF (SHOWMESH)
+  CS_TOKEN_DEF (HIDEMESH)
   CS_TOKEN_DEF (PATHMESH)
   CS_TOKEN_DEF (PATHCAMERA)
   CS_TOKEN_DEF (PATH)
@@ -49,6 +51,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (UP)
   CS_TOKEN_DEF (TIMES)
   CS_TOKEN_DEF (UNIFORMSPEED)
+  CS_TOKEN_DEF (ROTPART)
   CS_TOKEN_DEF (SPEED)
   CS_TOKEN_DEF (V)
 CS_TOKEN_DEF_END
@@ -100,12 +103,15 @@ iSequence* DemoSequenceLoader::GetSequence (const char* name)
 void DemoSequenceLoader::LoadSequence (char* buf, iSequence* seq)
 {
   CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (SETUPMESH)
     CS_TOKEN_TABLE (SHOWMESH)
+    CS_TOKEN_TABLE (HIDEMESH)
     CS_TOKEN_TABLE (PATHMESH)
     CS_TOKEN_TABLE (PATHCAMERA)
     CS_TOKEN_TABLE (TEST)
     CS_TOKEN_TABLE (DELAY)
     CS_TOKEN_TABLE (FADE)
+    CS_TOKEN_TABLE (ROTPART)
     CS_TOKEN_TABLE (SEQUENCE)
     CS_TOKEN_TABLE (RUNSEQUENCE)
     CS_TOKEN_TABLE (RECURSE)
@@ -126,14 +132,43 @@ void DemoSequenceLoader::LoadSequence (char* buf, iSequence* seq)
     }
     switch (cmd)
     {
-      case CS_TOKEN_SHOWMESH:
+      case CS_TOKEN_ROTPART:
+      {
+        char meshName[100];
+	cs_time t;
+	float angle_speed;
+	ScanStr (params, "%d,%s,%f", &t, meshName, &angle_speed);
+        RotatePartOp* op = new RotatePartOp (meshName, t, angle_speed);
+	seq->AddOperation (cur_time, op);
+	op->DecRef ();
+	break;
+      }
+      case CS_TOKEN_SETUPMESH:
       {
         char meshName[100];
 	char sectName[100];
 	csVector3 p;
 	ScanStr (params, "%s,%s,%f,%f,%f", meshName, sectName,
 		&p.x, &p.y, &p.z);
-        ShowMeshOp* op = new ShowMeshOp (meshName, sectName, p);
+        SetupMeshOp* op = new SetupMeshOp (meshName, sectName, p);
+	seq->AddOperation (cur_time, op);
+	op->DecRef ();
+	break;
+      }
+      case CS_TOKEN_SHOWMESH:
+      {
+        char meshName[100];
+	ScanStr (params, "%s", meshName);
+        ShowMeshOp* op = new ShowMeshOp (meshName);
+	seq->AddOperation (cur_time, op);
+	op->DecRef ();
+	break;
+      }
+      case CS_TOKEN_HIDEMESH:
+      {
+        char meshName[100];
+	ScanStr (params, "%s", meshName);
+        HideMeshOp* op = new HideMeshOp (meshName);
 	seq->AddOperation (cur_time, op);
 	op->DecRef ();
 	break;

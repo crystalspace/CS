@@ -35,6 +35,7 @@
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
 #include "imesh/object.h"
+#include "imesh/particle.h"
 #include "csutil/cscolor.h"
 #include "csgeom/path.h"
 #include "csfx/csfxscr.h"
@@ -77,6 +78,12 @@ DemoSequenceManager::~DemoSequenceManager ()
     PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
     delete pfm;
   }
+  for (i = 0 ; i < meshRotation.Length () ; i++)
+  {
+    MeshRotation* mrot = (MeshRotation*)meshRotation[i];
+    if (mrot->particle) mrot->particle->DecRef ();
+    delete mrot;
+  }
 }
 
 void DemoSequenceManager::Setup (const char* sequenceFileName)
@@ -118,6 +125,11 @@ void DemoSequenceManager::Resume ()
       PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
       pfm->start_path_time += dt;
     }
+    for (i = 0 ; i < meshRotation.Length () ; i++)
+    {
+      MeshRotation* mrot = (MeshRotation*)meshRotation[i];
+      mrot->start_time += dt;
+    }
   }
 }
 
@@ -137,6 +149,13 @@ void DemoSequenceManager::Restart (const char* sequenceFileName)
     delete pfm;
   }
   pathForMesh.DeleteAll ();
+  for (i = 0 ; i < meshRotation.Length () ; i++)
+  {
+    MeshRotation* mrot = (MeshRotation*)meshRotation[i];
+    if (mrot->particle) mrot->particle->DecRef ();
+    delete mrot;
+  }
+  meshRotation.DeleteAll ();
   do_camera_path = false;
   do_fade = false;
   fade_value = 0;
@@ -157,6 +176,17 @@ void DemoSequenceManager::TimeWarp (cs_time dt)
     PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
     pfm->start_path_time -= dt;
   }
+  for (i = 0 ; i < meshRotation.Length () ; i++)
+  {
+    MeshRotation* pfm = (MeshRotation*)meshRotation[i];
+    pfm->start_time -= dt;
+  }
+
+  if (suspended)
+  {
+    Resume ();
+    suspend_one_frame = true;
+  }
 
   seqmgr->TimeWarp (dt, false);
   if (seqmgr->IsEmpty ())
@@ -164,12 +194,6 @@ void DemoSequenceManager::TimeWarp (cs_time dt)
     // If the sequence manager is empty we insert the main sequence
     // again.
     seqmgr->RunSequence (0, main_sequence);
-  }
-
-  if (suspended)
-  {
-    Resume ();
-    suspend_one_frame = true;
   }
 }
 
@@ -243,7 +267,8 @@ void DemoSequenceManager::SetupMeshPath (csNamedPath* path,
   pathForMesh.Push (pfm);
 }
 
-void DemoSequenceManager::ControlPaths (iCamera* camera, cs_time current_time)
+void DemoSequenceManager::ControlPaths (iCamera* camera, cs_time current_time,
+	cs_time elapsed_time)
 {
   if (suspended) return;
   int i = 0;
@@ -294,7 +319,68 @@ void DemoSequenceManager::ControlPaths (iCamera* camera, cs_time current_time)
     camera->SetPosition (pos);
     camera->GetTransform ().LookAt (forward.Unit (), up.Unit ());
   }
+
+  i = 0;
+  len = meshRotation.Length ();
+  while (i < len)
+  {
+    MeshRotation* mrot = (MeshRotation*)meshRotation[i];
+    if (current_time > mrot->start_time + mrot->total_time)
+    {
+      if (mrot->particle) mrot->particle->DecRef ();
+      delete mrot;
+      meshRotation.Delete (i);
+      len--;
+    }
+    else
+    {
+      mrot->particle->Rotate (mrot->angle_speed * float (elapsed_time/1000.));
+      i++;
+    }
+  }
+
   if (suspend_one_frame) { Suspend (); suspend_one_frame = false; }
+}
+
+void DemoSequenceManager::DebugPositionObjects (iCamera* camera)
+{
+  int i = 0;
+  int len = pathForMesh.Length ();
+  while (i < len)
+  {
+    PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
+    float r = float (suspend_time - pfm->start_path_time)
+    	/ float (pfm->total_path_time);
+    if (r >= 0 && r <= 1)
+    {
+      pfm->path->Calculate (r);
+      csVector3 pos, up, forward;
+      pfm->path->GetInterpolatedPosition (pos);
+      pfm->path->GetInterpolatedUp (up);
+      pfm->path->GetInterpolatedForward (forward);
+      iMovable* movable = pfm->mesh->GetMovable ();
+      movable->SetPosition (pos);
+      movable->GetTransform ().LookAt (forward.Unit (), up.Unit ());
+      movable->UpdateMove ();
+      pfm->mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+    }
+    i++;
+  }
+
+  if (do_camera_path)
+  {
+    float r = GetCameraIndex (suspend_time);
+    if (r >= 0 && r <= 1)
+    {
+      camera_path->Calculate (r);
+      csVector3 pos, up, forward;
+      camera_path->GetInterpolatedPosition (pos);
+      camera_path->GetInterpolatedUp (up);
+      camera_path->GetInterpolatedForward (forward);
+      camera->SetPosition (pos);
+      camera->GetTransform ().LookAt (forward.Unit (), up.Unit ());
+    }
+  }
 }
 
 void DemoSequenceManager::DebugDrawPath (csNamedPath* np, bool hi,
@@ -476,7 +562,6 @@ void DemoSequenceManager::DebugDrawPaths (cs_time current_time,
     csVector3 pos, forward;
     camera_path->GetInterpolatedPosition (pos);
     camera_path->GetInterpolatedForward (forward);
-    int col = demo->col_yellow;
     DrawSelPoint (pos, forward, tl, br, dim, demo->col_yellow, 20);
 
     // If there is a hilighted path and we are not busy drawing the hilighted
@@ -606,6 +691,23 @@ csNamedPath* DemoSequenceManager::GetSelectedPath (const char* hilight,
     i++;
   }
   return NULL;
+}
+
+void DemoSequenceManager::SetupRotatePart (iMeshWrapper* mesh,
+	float angle_speed, cs_time total_rotate_time, cs_time already_elapsed)
+{
+  MeshRotation* mrot = new MeshRotation ();
+  mrot->particle = QUERY_INTERFACE (mesh->GetMeshObject (), iParticle);
+  if (!mrot->particle)
+  {
+    delete mrot;
+    return;
+  }
+  mrot->mesh = mesh;
+  mrot->total_time = total_rotate_time;
+  mrot->start_time = demo->GetTime ()-already_elapsed;
+  mrot->angle_speed = angle_speed;
+  meshRotation.Push (mrot);
 }
 
 //-----------------------------------------------------------------------------
