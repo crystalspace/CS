@@ -219,7 +219,7 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
   emitter = csVector3(0.0f, 0.0f, 0.0f);
   radius = 1.0f;
   dead_particles = 0;
-  point_sprites = false;//p->g3d->GetCaps ()->SupportsPointSprites;
+  point_sprites = p->g3d->GetCaps ()->SupportsPointSprites;
 
   dynDomain = new csShaderVariableContext ();
 
@@ -445,11 +445,11 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
   }
   if (name == vertex_name)
   {
-    i_vertex *data;
+    void *data;
     int size;
     if (point_sprites)
     {
-      data = (i_vertex*)point_data.GetArray ();
+      data = point_data.GetArray ();
       size = point_data.Length () * (sizeof(csParticlesData));
     }
     else
