@@ -21,6 +21,7 @@ chronological order.
 	  mode.
 	- Jorrit optimized the simpleformer weight function a bit.
 	- Jorrit fixed a few string memory leaks in walktest.
+	- Jorrit fixed protomesh to compile with OR.
 7-Oct-2004
 	- Jorrit added a new 'proto' mesh. This is a basic mesh that can
 	  be used to start creating a new mesh. It supports the following
