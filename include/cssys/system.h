@@ -412,8 +412,7 @@ public:
   /// Remove a plugin from system driver's plugin list
   virtual bool UnloadPlugIn (iPlugIn *iObject);
   /// Register a object that implements the iPlugIn interface as a plugin
-  virtual bool csSystemDriver::RegisterPlugIn (const char *iClassID,
-    const char *iFuncID, iPlugIn *iObject);
+  virtual bool RegisterPlugIn (const char *iClassID, const char *iFuncID, iPlugIn *iObject);
 
   /// Get a integer configuration value
   virtual int ConfigGetInt (const char *Section, const char *Key, int Default = 0);
