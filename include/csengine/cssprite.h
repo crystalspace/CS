@@ -32,6 +32,7 @@
 #include "csengine/material.h"
 #include "csengine/tranman.h"
 #include "csengine/triangle.h"
+#include "csengine/movable.h"
 #include "igraph3d.h"
 #include "iparticl.h"
 #include "ipolmesh.h"
@@ -387,19 +388,13 @@ protected:
   /// Update defered lighting.
   void UpdateDeferedLighting (const csVector3& pos);
 
-private:
-  /**
-   * List of sectors where this sprite is.
-   * This list is only valid if the sprite is connected directly
-   * to the world (i.e. parent is a csWorld object).
-   */
-  csVector sectors;
-
 protected:
   /**
-   * World->object transformation for this sprite.
+   * Position in the world.
+   * The list of sectors in this object is only valid
+   * if the sprite is connected directly to the world (ugly!@@@).
    */
-  csReversibleTransform obj;
+  csMovable movable;
 
 public:
   /// Constructor.
@@ -530,29 +525,35 @@ public:
    */
   virtual void Draw (csRenderView& rview) = 0;
 
-  /// Get the location of the sprite.
-  virtual const csVector3& GetPosition () const = 0;
+  /**
+   * Get the movable instance for this sprite.
+   * It is very important to call UpdateMove()
+   * after doing any kind of modification to this movable
+   * to make sure that internal data structures are
+   * correctly updated.
+   */
+  csMovable& GetMovable () { return movable; }
 
   /**
-   * Relative move of this sprite.
-   * Note that this does not check if the sector is left.
+   * Update transformations after the sprite has moved
+   * (through updating the movable instance).
+   * This MUST be done after you change the movable otherwise
+   * some of the internal data structures will not be updated
+   * correctly.
    */
-  virtual void MovePosition (const csVector3& delta) = 0;
-
-  /// Move this sprite to some location.
-  virtual void SetPosition (const csVector3& location) = 0;
+  void UpdateMove ();
 
   /// Set the color of this sprite.
-  virtual void SetColor(const csColor&) = 0;
+  virtual void SetColor (const csColor&) = 0;
 
   /// Add color to the color of the sprite.
-  virtual void AddColor(const csColor& col) = 0;
+  virtual void AddColor (const csColor& col) = 0;
 
   /// Scale sprite by this factor. 
-  virtual void ScaleBy(float factor) = 0;
+  virtual void ScaleBy (float factor) = 0;
 
   /// Rotate sprite in some manner (as defined by subclass), in radians.
-  virtual void Rotate(float angle) = 0;
+  virtual void Rotate (float angle) = 0;
 
   //------------------------- iParticle implementation -----------------------//
   struct Particle : public iParticle
@@ -743,37 +744,6 @@ public:
   ///
   void UnsetTexture ()
   { force_otherskin = false; }
-
-  /**
-   * Move the sprite to an absolute position.
-   */
-  virtual void SetPosition (const csVector3& p);
-
-  /**
-   * Get the position of the sprite.
-   */
-  virtual const csVector3& GetPosition () const { return obj.GetOrigin (); }
-
-  /**
-   * Get the transformation.
-   */
-  const csReversibleTransform& GetTransform () const { return obj; }
-
-  /**
-   * Relative move.
-   */
-  virtual void MovePosition (const csVector3& rel);
-
-  /**
-   * Set the transformation matrix to rotate the sprite in some
-   * orientation
-   */
-  void SetTransform (const csMatrix3& matrix);
-
-  /**
-   * Relative transform.
-   */
-  void Transform (const csMatrix3& matrix);
 
   /**
    * Fill the static mesh with the current sprite

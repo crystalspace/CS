@@ -72,7 +72,7 @@ csPolyIt::csPolyIt (csWorld* w) : world(w)
 void csPolyIt::Restart ()
 {
   sector_idx = -1;
-  thing = NULL;
+  thing_idx = -1;
   polygon_idx = 0;
 }
 
@@ -82,7 +82,7 @@ csPolygon3D* csPolyIt::Fetch ()
   if (sector_idx == -1)
   {
     sector_idx = 0;
-    thing = NULL;
+    thing_idx = -1;
     polygon_idx = -1;
   }
 
@@ -92,23 +92,28 @@ csPolygon3D* csPolyIt::Fetch ()
   // Try next polygon.
   polygon_idx++;
 
-  if (thing)
+  if (thing_idx != -1)
   {
     // We are busy scanning the things of this sector.
     // See if the current thing has the indicated polygon number.
     // If not then we try the next thing.
-    while (thing && polygon_idx >= thing->GetNumPolygons ())
+    while (polygon_idx >= ((csThing*)(sector->things[thing_idx]))->GetNumPolygons ())
     {
-      thing = (csThing*)(thing->GetNext ());
+      thing_idx++;
+      if (thing_idx >= sector->things.Length ())
+      {
+        thing_idx = -1;
+	break;
+      }
       polygon_idx = 0;
     }
-    if (!thing)
+    if (thing_idx == -1)
     {
       // There are no more things left. Go to the next sector.
       sector_idx++;
       if (sector_idx >= world->sectors.Length ()) return NULL;
       // Initialize iterator to start of sector and recurse.
-      thing = NULL;
+      thing_idx = -1;
       polygon_idx = -1;
       return Fetch ();
     }
@@ -118,19 +123,21 @@ csPolygon3D* csPolyIt::Fetch ()
     // We are not scanning things but we have no more polygons in
     // this sector. Start scanning things.
     polygon_idx = -1;
-    thing = sector->GetFirstThing ();
+    thing_idx = 0;
     // Recurse.
-    if (thing) return Fetch ();
+    if (thing_idx < sector->things.Length ())
+      return Fetch ();
     // No things. Go to next sector.
     sector_idx++;
     if (sector_idx >= world->sectors.Length ()) return NULL;
     // Initialize iterator to start of sector and recurse.
-    thing = NULL;
+    thing_idx = -1;
     return Fetch ();
   }
 
-  return thing ?
-    thing->GetPolygon3D (polygon_idx) : sector->GetPolygon3D (polygon_idx);
+  return thing_idx != -1 ?
+    ((csThing*)(sector->things[thing_idx]))->GetPolygon3D (polygon_idx) :
+    sector->GetPolygon3D (polygon_idx);
 }
 
 csSector* csPolyIt::GetLastSector ()
@@ -148,7 +155,7 @@ csCurveIt::csCurveIt (csWorld* w) : world(w)
 void csCurveIt::Restart ()
 {
   sector_idx = -1;
-  thing = NULL;
+  thing_idx = -1;
   curve_idx = 0;
 }
 
@@ -158,7 +165,7 @@ csCurve* csCurveIt::Fetch ()
   if (sector_idx == -1)
   {
     sector_idx = 0;
-    thing = NULL;
+    thing_idx = -1;
     curve_idx = -1;
   }
 
@@ -168,23 +175,28 @@ csCurve* csCurveIt::Fetch ()
   // Try next polygon.
   curve_idx++;
 
-  if (thing)
+  if (thing_idx != -1)
   {
     // We are busy scanning the things of this sector.
     // See if the current thing has the indicated curve number.
     // If not then we try the next thing.
-    while (thing && curve_idx >= thing->GetNumCurves ())
+    while (curve_idx >= ((csThing*)(sector->things[thing_idx]))->GetNumCurves ())
     {
-      thing = (csThing*)(thing->GetNext ());
+      thing_idx++;
+      if (thing_idx >= sector->things.Length ())
+      {
+        thing_idx = -1;
+	break;
+      }
       curve_idx = 0;
     }
-    if (!thing)
+    if (thing_idx == -1)
     {
       // There are no more things left. Go to the next sector.
       sector_idx++;
       if (sector_idx >= world->sectors.Length ()) return NULL;
       // Initialize iterator to start of sector and recurse.
-      thing = NULL;
+      thing_idx = -1;
       curve_idx = -1;
       return Fetch ();
     }
@@ -194,10 +206,11 @@ csCurve* csCurveIt::Fetch ()
     // We are not scanning things but we have no more polygons in
     // this sector. Start scanning things.
     curve_idx = -1;
-    thing = sector->GetFirstThing ();
+    thing_idx = 0;
 
     // Recurse.
-    if (thing) return Fetch ();
+    if (thing_idx < sector->things.Length ())
+      return Fetch ();
 
     // No things. Go to next sector.
     sector_idx++;
@@ -205,13 +218,13 @@ csCurve* csCurveIt::Fetch ()
     if (sector_idx >= world->sectors.Length ()) return NULL;
 
     // Initialize iterator to start of sector and recurse.
-    thing = NULL;
-
+    thing_idx = -1;
     return Fetch ();
   }
 
-  return thing ?
-    thing->GetCurve (curve_idx) : sector->GetCurve (curve_idx);
+  return thing_idx != -1 ?
+    ((csThing*)(sector->things[thing_idx]))->GetCurve (curve_idx) :
+    sector->GetCurve (curve_idx);
 }
 
 //---------------------------------------------------------------------------
@@ -378,7 +391,7 @@ void csObjectIt::Restart ()
 void csObjectIt::StartThings ()
 {
   cur_type = &csThing::Type;
-  cur_object = cur_sector->GetFirstThing ();
+  cur_idx = 0;
 }
 
 void csObjectIt::StartStatLights ()
@@ -452,12 +465,12 @@ csObject* csObjectIt::Fetch ()
   {
     if (CheckType (cur_type))
     {
-      if (cur_object == NULL)
+      if (cur_idx >= cur_sector->things.Length ())
         StartStatLights ();
       else
       {
-        csObject* rc = cur_object;
-        cur_object = ((csThing*)cur_object)->GetNext ();
+        csObject* rc = (csObject*)cur_sector->things[cur_idx];
+	cur_idx++;
         return rc;
       }
     }
@@ -1859,7 +1872,7 @@ iThing *csWorld::CreateThing (const char *iName, iSector *iParent)
   thing->SetName (iName);
   csSector *sector = iParent->GetPrivateObject ();
   thing->GetMovable ().SetSector (sector);
-  sector->AddThing (thing);
+  sector->things.Push (thing);
   iThing *p = QUERY_INTERFACE (thing, iThing);
   thing->DecRef ();
   return p;

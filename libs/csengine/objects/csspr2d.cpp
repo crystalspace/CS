@@ -29,7 +29,7 @@
 
 IMPLEMENT_CSOBJTYPE (csSprite2D, csSprite)
 
-csSprite2D::csSprite2D (csObject* theParent) : csSprite (theParent), position (0, 0, 0)
+csSprite2D::csSprite2D (csObject* theParent) : csSprite (theParent)
 {
   cstxt = NULL;
   lighting = true;
@@ -140,7 +140,7 @@ void csSprite2D::UpdateLighting (csLight** lights, int num_lights)
     float sq_light_radius = lights [i]->GetSquaredRadius ();
     // Compute light position.
     csVector3 wor_light_pos = lights [i]->GetCenter ();
-    float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, position);
+    float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, GetPosition ());
     if (wor_sq_dist >= sq_light_radius) continue;
     float wor_dist = sqrt (wor_sq_dist);
     float cosinus = 1.;
@@ -165,10 +165,10 @@ void csSprite2D::Draw (csRenderView& rview)
   }
 
   // Camera transformation for the single 'position' vector.
-  csVector3 cam = rview.Other2This (position);
+  csVector3 cam = rview.Other2This (GetPosition ());
   if (cam.z < SMALL_Z) return;
 
-  UpdateDeferedLighting (position);
+  UpdateDeferedLighting (GetPosition ());
 
   rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_USE);
 

@@ -704,9 +704,9 @@ void move_ghost (csSprite3D* spr)
 
   // Create a transformation 'test' which indicates where the ghost
   // is moving too.
-  const csVector3& pos = spr->GetPosition ();
+  const csVector3& pos = spr->GetMovable ().GetPosition ();
   csVector3 vel (0, 0, .1);
-  vel = spr->GetTransform ().GetO2T () * vel;
+  vel = spr->GetMovable ().GetTransform ().GetO2T () * vel;
   csVector3 new_pos = pos+vel;
   csMatrix3 m;
   csOrthoTransform test (m, new_pos);
@@ -742,7 +742,7 @@ void move_ghost (csSprite3D* spr)
     bool mirror = true;
     first_sector = first_sector->FollowSegment (test, new_pos, mirror);
     spr->MoveToSector (first_sector);
-    spr->SetPosition (new_pos);
+    spr->GetMovable ().SetPosition (new_pos);
   }
 
   // Turn around at random intervals.
@@ -756,19 +756,20 @@ void move_ghost (csSprite3D* spr)
   {
     // We did not move much. Turn around quickly.
     csMatrix3 m = csYRotMatrix3 (gh_info->dir*.2);
-    spr->Transform (m);
+    spr->GetMovable ().Transform (m);
   }
   else if (vel < 0.05f)
   {
     // We did a bit. Turn around slightly.
     csMatrix3 m = csYRotMatrix3 (gh_info->dir*.1);
-    spr->Transform (m);
+    spr->GetMovable ().Transform (m);
   }
   else
   {
     csMatrix3 m = csYRotMatrix3 (gh_info->dir*.01);
-    spr->Transform (m);
+    spr->GetMovable ().Transform (m);
   }
+  spr->UpdateMove ();
 }
 
 //===========================================================================
@@ -801,9 +802,10 @@ void add_bot (float size, csSector* where, csVector3 const& pos,
   Sys->view->GetWorld ()->sprites.Push (bot);
   bot->MoveToSector (where);
   csMatrix3 m; m.Identity (); m = m * size;
-  bot->SetTransform (m);
+  bot->GetMovable ().SetTransform (m);
   bot->set_bot_move (pos);
   bot->set_bot_sector (where);
+  bot->UpdateMove ();
   bot->SetAction ("default");
   bot->InitSprite ();
   bot->next = first_bot;
@@ -1013,10 +1015,11 @@ void fire_missile ()
     Sys->view->GetWorld ()->sprites.Push (sp);
     sp->MoveToSector (Sys->view->GetCamera ()->GetSector ());
     ms->sprite = sp;
-    sp->SetPosition (pos);
+    sp->GetMovable ().SetPosition (pos);
     csMatrix3 m = ms->dir.GetT2O ();
-    sp->SetTransform (m);
+    sp->GetMovable ().SetTransform (m);
     move_sprite (sp, Sys->view->GetCamera ()->GetSector (), pos);
+    sp->UpdateMove ();
   } 
 }
 

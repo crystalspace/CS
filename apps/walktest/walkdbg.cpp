@@ -924,7 +924,7 @@ void CreateSolidThings (csWorld* world, csSector* room, csOctreeNode* node, int 
   	    gs->SetUV (0, 0, 0); gs->SetUV (1, 1, 0); gs->SetUV (2, 1, 1);
 	    gs->AddColor (0, 1, 0, 0); gs->AddColor (1, 0, 1, 0); gs->AddColor (2, 0, 0, 1);
 
-	    room->AddThing (thing);
+	    room->things.Push (thing);
 	  }
 	}
     }

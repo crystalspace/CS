@@ -14,6 +14,35 @@ The history order has been reversed so that new features are at the top.
 	  needs to be implemented in csMovable and using a better
 	  algorithm. It wasn't used anyway.
 	- Fixed documentation for csCamera::LookAt() a little.
+	- Added csMovable to csSprite. Added GetMovable() and UpdateMove().
+	  Similar to how it works with things.
+	- Removed SetPosition, MovePosition, GetTransform, and GetPosition
+	  from csSprite since that is now in csMovable. IMPORTANT NOTE! You
+	  should now call sprite->UpdateMove() after updating the position
+	  in the csMovable returned by GetMovable(). If you don't do this
+	  then important information in the sprite structure may not be
+	  updated. Note that this change makes movement of sprites more
+	  efficient since UpdateMove() has some cost. In the past it was
+	  called on every movement/transformation call which means it was
+	  called too often sometimes.
+	- Fixed all the CS apps for the new csMovable change for sprites.
+	- Changed csSprite2D to use the position from csMovable.
+	- Added csMovable/iMovable SetPosition() with only a position
+	  as a parameter.
+	- Added csMovable SetParent() and GetParent() which are going
+	  to be used for hierarchical transformations later. This is
+	  not done yet though.
+	- Changed the list of sprites in a sector from csNamedObjVector
+	  to csVector. This is a big bug. If a sprite got deleted it
+	  could delete its parent sector with it.
+	- Made the list of things and sky objects a csVector instead of
+	  a double linked list. Also removed the GetFirstSky()
+	  and GetFirstThing() calls from csSector (and GetNumSkyThings(),
+	  GetNumThings(), AddThing(), and AddSky()).
+	- Also removed GetParent/SetParent and GetNext/SetNext for polygon
+	  sets since that is no longer needed now.
+	- Note that Blocks is broken now (crashes when you return to menu).
+	  I will fix this later.
 	- Andrew Zabolotny did the following:
 	    - Fixed unlighted textures in 32 bit videomodes.
 	    - Fixed halo drawing in 32-bit modes. Halos with R > 1 used

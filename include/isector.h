@@ -26,7 +26,7 @@ class csSector;
 struct iThing;
 struct iStatLight;
 
-SCF_VERSION (iSector, 0, 1, 1);
+SCF_VERSION (iSector, 0, 1, 2);
 
 /**
  * The iSector interface is used to work with "sectors". A "sector"
@@ -45,8 +45,6 @@ struct iSector : public iBase
 
   /// Find a sky with the given name.
   virtual iThing *GetSkyThing (const char *name) = 0;
-  /// Remove a sky from this sector.
-  virtual bool RemoveSkyThing (iThing *thing) = 0;
   /// Get the number of sky things in this sector.
   virtual int GetNumSkyThings () = 0;
   /// Get a sky thing by index
@@ -54,8 +52,6 @@ struct iSector : public iBase
 
   /// Find a thing with the given name.
   virtual iThing *GetThing (const char *name) = 0;
-  /// Remove a thing from this sector.
-  virtual bool RemoveThing (iThing* thing) = 0;
   /// Get the number of things in this sector.
   virtual int GetNumThings () = 0;
   /// Get a thing by index

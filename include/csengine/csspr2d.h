@@ -51,9 +51,6 @@ TYPEDEF_GROWING_ARRAY (csColoredVertices, csSprite2DVertex);
 class csSprite2D : public csSprite
 {
 private:
-  /// Position for sprite.
-  csVector3 position;
-
   /**
    * Array of 3D vertices.
    */
@@ -107,15 +104,15 @@ public:
   /**
    * Move the sprite.
    */
-  virtual void SetPosition (const csVector3& v) { position = v; }
+  virtual void SetPosition (const csVector3& v) { movable.SetPosition (v); }
 
   /**
    * Relative move
    */
-  virtual void MovePosition (const csVector3& rel) { position += rel; }
+  virtual void MovePosition (const csVector3& rel) { movable.MovePosition (rel); }
 
   /// Get position of this sprite.
-  virtual const csVector3& GetPosition () const { return position; }
+  virtual const csVector3& GetPosition () const { return movable.GetPosition (); }
 
   /**
    * Scale the vertices of the sprite by factor.

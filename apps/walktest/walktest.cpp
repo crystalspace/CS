@@ -1049,12 +1049,12 @@ void WalkTest::InitWorld (csWorld* world, csCamera* /*camera*/)
     mesh = QUERY_INTERFACE (sp, iPolygonMesh);
     (void)new csCollider (*sp, collide_system, mesh);
     // Initialize the things in this sector.
-    csThing* tp = sp->GetFirstThing ();
-    while (tp)
+    int i;
+    for (i = 0 ; i < sp->things.Length () ; i++)
     {
+      csThing* tp = (csThing*)sp->things[i];
       mesh = QUERY_INTERFACE (tp, iPolygonMesh);
       (void)new csCollider (*tp, collide_system, mesh);
-      tp = (csThing*)(tp->GetNext ());
     }
   }
   // Initialize all sprites for collision detection.

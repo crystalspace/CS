@@ -15,11 +15,7 @@ mail the Crystal Space mailing list and ask for help.
 
 This version explains how to go from 0.16 to 0.17.
 
-@menu
-@end menu
-
-@node API NextFrame, API HandleEvent, ,
-@subsection NextFrame Prototype (elapsed_time/current_time)
+@heading NextFrame Prototype (elapsed_time/current_time)
 @cindex NextFrame
 @cindex elapsed time
 @cindex current time
@@ -39,8 +35,7 @@ void ...::NextFrame ()
   ...
 @end example
 
-@node API HandleEvent, API Materials, API NextFrame,
-@subsection HandleEvent Prototype (csEvent -> iEvent)
+@heading HandleEvent Prototype (csEvent -> iEvent)
 @cindex HandleEvent
 @cindex csEvent
 @cindex iEvent
@@ -49,8 +44,7 @@ The prototype of @code{csSystemDriver::HandleEvent} has changed
 from a @code{csEvent} parameter to a @code{iEvent} parameter. Update your
 subclassed versions if you have any.
 
-@node API Materials, API CD, API HandleEvent,
-@subsection Materials versus Textures
+@heading Materials versus Textures
 @cindex materials
 @cindex textures
 
@@ -78,6 +72,11 @@ and is what you should use.
 @code{csWorld} also has a @code{GetMaterials} function which you probably should
 use wherever you used @code{GetTextures} in the past.
 
+In the loader you can find a new function @code{csLoader::FindMaterial(char*)}
+which will find a material with the given name. If not found it tries
+to find a texture with this name and will then create a default material
+from that texture.
+
 The @code{csLoader::LoadTexture} routine is a bit special. As before it
 loads a texture (and returns a @code{csTextureWrapper}) but it also adds
 a material with the same name to the material list. You can then fetch
@@ -88,8 +87,7 @@ csLoader::LoadTexture (world, "myTexture", "/lib/std/stone4.gif");
 csMaterialWrapper* m = world->GetMaterials ()->FindByName ("myTexture");
 @end example
 
-@node API CD, API Texture Mapping, API Materials,
-@subsection Collision Detection Plugin
+@heading Collision Detection Plugin
 @cindex collision detection
 @cindex RAPID
 
@@ -174,8 +172,7 @@ So you have to reset it if you are no longer interested in that.
 Note that @code{csRAPIDCollider::Report} is gone. If you want that
 functionality you have to do it on your own (which is not difficult).
 
-@node API Texture Mapping, API Sound, API CD,
-@subsection Texture Mapping Changes
+@heading Texture Mapping Changes
 @cindex texture mapping
 
 Changed the way engine defines and uses texturing. There are
@@ -198,8 +195,7 @@ In practice this means that @code{csGouraudShaded} has gone and is
 now replaced with @code{csPolyTexGouraud}. @code{csLightMapped} has also
 gone and is replaced with @code{csPolyTexLightMap}.
 
-@node API Sound, , API Texture Mapping,
-@subsection Sound Changes
+@heading Sound Changes
 @cindex sound
 
 Merged sound buffers into sound sources. We now have 3d and non-3d sound
@@ -235,4 +231,57 @@ Pass both the file data and the format to the sound loader, using
 @samp{false} for streaming (default). After that, you may delete the file
 data.
 @end itemize
+
+@heading Thing and sprite changes (csMovable)
+@cindex thing
+@cindex sprite
+@cindex csMovable
+
+The movement system of things and sprites has been merged
+into one class called @code{csMovable}. So all functions like
+@code{SetPosition}, @code{SetTransform}, and so on have been removed
+from @code{csThing} and @code{csSprite}. Instead there is a
+function @code{GetMovable()} (both for things and sprites) which returns
+the @code{csMovable} for that object. And there is also a new function
+called @code{UpdateMove()} (which resembles the original
+@code{csThing::Transform()} somewhat) which you MUST call after updating
+the position and/or transformation of the movable which belongs to the
+object. In summary. If you would do:
+
+@example
+thing->SetPosition (csVector3 (0,0,3));
+thing->SetTransform (csMatrix3 ());
+thing->Transform ();
+@end example
+
+then this will now become:
+
+@example
+thing->GetMovable ().SetPosition (csVector3 (0,0,3));
+thing->GetMovable ().SetTransform (csMatrix3 ());
+thing->UpdateMove ();
+@end example
+
+The old behaviour for sprites:
+
+@example
+sprite->SetPosition (csVector3 (0,0,3));
+sprite->SetTransform (csMatrix3 ());
+@end example
+
+becomes (note the new @code{UpdateMove}):
+
+@example
+sprite->GetMovable ().SetPosition (csVector3 (0,0,3));
+sprite->GetMovable ().SetTransform (csMatrix3 ());
+sprite->UpdateMove ();
+@end example
+
+In addition to the changes related to @code{csMovable} the linked list of
+sky and thing objects in a sector has also been replaced by a @code{csVector}.
+This means that functions like @code{AddThing}, @code{GetNumThings}, and
+@code{GetFirstThing} are gone now (similar for the
+sky versions). Instead you should work through the new public @code{skies}
+and @code{things} vectors. In addition to this the @code{GetNext} and @code
+{GetParent} functions have been removed from @code{csPolygonSet}.
 

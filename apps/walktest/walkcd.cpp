@@ -208,33 +208,33 @@ int FindSectors (csVector3 v, csVector3 d, csSector *s, csSector **sa)
 int CollisionDetect (csCollider *c, csSector* sp, csTransform *cdt)
 {
   int hit = 0;
+  int i;
 
   // Check collision with this sector.
   Sys->collide_system->ResetCollisionPairs ();
   if (c->Collide (*sp, cdt)) hit++;
   csCollisionPair* CD_contact = Sys->collide_system->GetCollisionPairs ();
 
-  for (int i=0 ; i<Sys->collide_system->GetNumCollisionPairs () ; i++)
+  for (i=0 ; i<Sys->collide_system->GetNumCollisionPairs () ; i++)
     our_cd_contact[num_our_cd++] = CD_contact[i];
 
   if (Sys->collide_system->GetOneHitOnly () && hit)
     return 1;
 
   // Check collision with the things in this sector.
-  csThing *tp = sp->GetFirstThing ();
-  while (tp)
+  for (i = 0 ; i < sp->things.Length () ; i++)
   {
+    csThing* tp = (csThing*)(sp->things[i]);
     // TODO, if and when Things can move, their transform must be passed in.
     Sys->collide_system->ResetCollisionPairs ();
     if (c->Collide (*tp, cdt)) hit++;
 
     CD_contact = Sys->collide_system->GetCollisionPairs ();
-    for (int i=0 ; i<Sys->collide_system->GetNumCollisionPairs () ; i++)
-      our_cd_contact[num_our_cd++] = CD_contact[i];
+    for (int j=0 ; j<Sys->collide_system->GetNumCollisionPairs () ; j++)
+      our_cd_contact[num_our_cd++] = CD_contact[j];
 
     if (Sys->collide_system->GetOneHitOnly () && hit)
       return 1;
-    tp = (csThing*)(tp->GetNext ());
     // TODO, should test which one is the closest.
   }
 

@@ -26,7 +26,7 @@ class csMatrix3;
 class csThing;
 struct iSector;
 
-SCF_VERSION (iMovable, 0, 0, 2);
+SCF_VERSION (iMovable, 0, 0, 3);
 
 /**
  * This interface describes a movable entity. It is usually
@@ -35,26 +35,34 @@ SCF_VERSION (iMovable, 0, 0, 2);
  */
 struct iMovable : public iBase
 {
+  /// Get the parent movable.
+  virtual iMovable* GetParent () = 0;
+
   /**
    * Initialize the list of sectors to one sector where
    * this thing is. This is a conveniance funcion.
    * This function does not update the corresponding list in
    * the sector. It only does a local update here.
+   * This function does not do anything if the parent is not NULL.
    */
   virtual void SetSector (iSector* sector) = 0;
 
   /**
    * Clear the list of sectors.
+   * This function does not do anything if the parent is not NULL.
    */
   virtual void ClearSectors () = 0;
 
   /**
    * Add a sector to the list of sectors.
+   * This function does not do anything if the parent is not NULL.
    */
   virtual void AddSector (iSector* sector) = 0;
 
   /**
    * Get list of sectors for this entity.
+   * This will return the sectors of the parent if there
+   * is a parent.
    */
   virtual csVector& GetSectors () = 0;
 
@@ -74,6 +82,12 @@ struct iMovable : public iBase
    * some position.
    */
   virtual void SetPosition (iSector* home, const csVector3& v) = 0;
+
+  /**
+   * Set the transformation vector for this object. Note
+   * that the sectors are unchanged.
+   */
+  virtual void SetPosition (const csVector3& v) = 0;
 
   /**
    * Get the current position.

@@ -104,8 +104,9 @@ csSprite3D *add_test_sprite( csSpriteTemplate *tmpl, csSector *aroom, csView *vi
   view->GetWorld ()->sprites.Push (tsprt);
   tsprt->MoveToSector (aroom);
   csMatrix3 m; m.Identity ();
-  tsprt->SetTransform (m);
-  tsprt->SetPosition (csVector3( 0, 10, 0 ));    // only matters for root in chain demo
+  tsprt->GetMovable ().SetTransform (m);
+  tsprt->GetMovable ().SetPosition (csVector3( 0, 10, 0 ));    // only matters for root in chain demo
+  tsprt->UpdateMove ();
   tsprt->SetAction ("default");
   tsprt->InitSprite ();
 
@@ -351,8 +352,9 @@ void Phyztest::NextFrame ()
     view->GetWorld ()->sprites.Push (bot);
     bot->MoveToSector (room);
     m.Identity (); //m = m * 2.0;
-    bot->SetTransform (m);
-    bot->SetPosition (csVector3( 0, 10, 0 ));
+    bot->GetMovable ().SetTransform (m);
+    bot->GetMovable ().SetPosition (csVector3( 0, 10, 0 ));
+    bot->UpdateMove ();
     bot->SetAction ("default");
     bot->InitSprite ();
 
@@ -411,7 +413,7 @@ void Phyztest::NextFrame ()
         new_p = chain[i]->rb->get_pos();
   //      CsPrintf (MSG_DEBUG_0, "chain pos %d = %f, %f, %f\n",
     //      i, new_p.x, new_p.y, new_p.z);
-        chain[i]->sprt->SetPosition ( new_p );
+        chain[i]->sprt->GetMovable ().SetPosition ( new_p );
         
         M = chain[i]->rb->get_R();   // get orientation for this link
         // ctMatrix3 and csMatrix3 not directly compatable yet
@@ -422,7 +424,8 @@ void Phyztest::NextFrame ()
         M_scale.Identity();
         M_scale *= 0.5;
         m *= M_scale;
-        chain[i]->sprt->SetTransform(m);
+        chain[i]->sprt->GetMovable ().SetTransform(m);
+	chain[i]->sprt->UpdateMove ();
         num_lights = world->GetNearbyLights (room, new_p, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
               chain[i]->sprt->UpdateLighting (lights, num_lights);      
       }

@@ -88,9 +88,6 @@ csPolygonSet::csPolygonSet (csWorld* world) : csObject(),
 
   cam_verts_set.SetTransformationManager (&world->tr_manager);
 
-  next = NULL;
-  parent = NULL;
-  //sector = NULL;
   csPolygonSet::world = world;
 }
 

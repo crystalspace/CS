@@ -380,12 +380,17 @@ csSprite::~csSprite ()
   }
 }
 
+void csSprite::UpdateMove ()
+{
+  UpdateInPolygonTrees ();
+}
+
 void csSprite::MoveToSector (csSector* s)
 {
   RemoveFromSectors ();
   if (parent->GetType () == csWorld::Type)
   {
-    sectors.Push (s);
+    movable.AddSector (s);
     s->sprites.Push (this);
   }
   UpdateInPolygonTrees ();
@@ -396,6 +401,7 @@ void csSprite::RemoveFromSectors ()
   if (GetPolyTreeObject ())
     GetPolyTreeObject ()->RemoveFromTree ();
   if (parent->GetType () != csWorld::Type) return;
+  csVector& sectors = movable.GetSectors ();
   while (sectors.Length () > 0)
   {
     csSector* ss = (csSector*)sectors.Pop ();
@@ -413,13 +419,13 @@ void csSprite::RemoveFromSectors ()
 
 csVector& csSprite::GetSectors ()
 {
-  if (parent->GetType () == csWorld::Type) return sectors;
+  if (parent->GetType () == csWorld::Type) return movable.GetSectors ();
   else if (parent->GetType () >= csSprite::Type)
   {
     csSprite* sppar = (csSprite*)parent;
     return sppar->GetSectors ();
   }
-  else return sectors;	// @@@ Not valid!
+  else return movable.GetSectors ();	// @@@ Not valid!
 }
 
 /// The list of lights that hit the sprite
@@ -467,9 +473,9 @@ void csSprite::AddDynamicLight (csLightHitsSprite* lp)
 void csSprite::Particle::MoveToSector(csSector* s)
   { scfParent->MoveToSector(s); }
 void csSprite::Particle::SetPosition(const csVector3& v)
-  { scfParent->SetPosition(v); }
+  { scfParent->GetMovable().SetPosition(v); scfParent->UpdateMove (); }
 void csSprite::Particle::MovePosition(const csVector3& v)
-  { scfParent->MovePosition(v); }
+  { scfParent->GetMovable().MovePosition(v); scfParent->UpdateMove (); }
 void csSprite::Particle::SetColor(const csColor& c)
   { scfParent->SetColor(c); }
 void csSprite::Particle::AddColor(const csColor& c)
@@ -546,30 +552,6 @@ csSprite3D::~csSprite3D ()
   delete skeleton_state;
 }
 
-void csSprite3D::SetPosition (const csVector3& p)
-{
-  obj.SetOrigin (p);
-  UpdateInPolygonTrees ();
-}
-
-void csSprite3D::SetTransform (const csMatrix3& matrix)
-{
-  obj.SetT2O (matrix);
-  UpdateInPolygonTrees ();
-}
-
-void csSprite3D::MovePosition (const csVector3& rel)
-{
-  obj.Translate (rel);
-  UpdateInPolygonTrees ();
-}
-
-void csSprite3D::Transform (const csMatrix3& matrix)
-{
-  obj.SetT2O (matrix * obj.GetT2O ());
-  UpdateInPolygonTrees ();
-}
-
 void csSprite3D::SetTemplate (csSpriteTemplate* tmpl)
 {
   tpl = tmpl;
@@ -589,20 +571,22 @@ void csSprite3D::SetMaterial (csMaterialWrapper *material)
 
 void csSprite3D::ScaleBy (float factor)
 {
-  csMatrix3 trans = obj.GetT2O ();
+  csMatrix3 trans = movable.GetTransform ().GetT2O ();
   trans.m11 *= factor;
   trans.m22 *= factor;
   trans.m33 *= factor;
-  SetTransform (trans);
+  movable.SetTransform (trans);
+  UpdateMove ();
 }
 
 
 void csSprite3D::Rotate (float angle)
 {
   csZRotMatrix3 rotz(angle);
-  Transform (rotz);
+  movable.Transform (rotz);
   csXRotMatrix3 rotx(angle);
-  Transform (rotx);
+  movable.Transform (rotx);
+  UpdateMove ();
 }
 
 
@@ -731,8 +715,7 @@ void csSprite3D::UpdateInPolygonTrees ()
 
   // This transform should be part of the sprite class and not just calculated
   // every time we need it. @@@!!!
-  //csTransform trans = csTransform (m_obj2world, m_world2obj * -v_obj2world);
-  csTransform trans = obj.GetInverse ();
+  csTransform trans = movable.GetTransform ().GetInverse ();
 
   bbox.Update (b, trans, this);
 
@@ -780,7 +763,7 @@ void csSprite3D::GetCameraBoundingBox (const csCamera& camtrans, csBox3& cbox)
   }
   camera_cookie = cur_cookie;
 
-  csTransform trans = camtrans * obj.GetInverse ();
+  csTransform trans = camtrans * movable.GetTransform ().GetInverse ();
   if (skeleton_state)
   {
     skeleton_state->ComputeBoundingBox (trans, camera_bbox);
@@ -896,7 +879,7 @@ void csSprite3D::Draw (csRenderView& rview)
   }
 
   UpdateWorkTables (tpl->GetNumTexels());
-  UpdateDeferedLighting (GetPosition ());
+  UpdateDeferedLighting (movable.GetPosition ());
 
   csFrame * cframe = cur_action->GetFrame (cur_frame);
 
@@ -913,8 +896,7 @@ void csSprite3D::Draw (csRenderView& rview)
   // ->
   //   C = Mwc * (Mow * O - Vow - Vwc)
   //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
-  csReversibleTransform tr_o2c = rview * obj.GetInverse ();
-  //csReversibleTransform tr_o2c = rview * csTransform (m_obj2world, m_world2obj * -v_obj2world);
+  csReversibleTransform tr_o2c = rview * movable.GetTransform ().GetInverse ();
   rview.g3d->SetObjectToCamera (&tr_o2c);
   rview.g3d->SetClipper (rview.view->GetClipPoly (), rview.view->GetNumVertices ());
   // @@@ This should only be done when aspect changes...
@@ -1206,7 +1188,7 @@ void csSprite3D::UpdateLightingLQ (csLight** lights, int num_lights, csVector3* 
   csBox3 obox;
   GetObjectBoundingBox (obox);
   csVector3 obj_center = (obox.Min () + obox.Max ()) / 2;
-  csVector3 wor_center = obj.This2Other (obj_center);
+  csVector3 wor_center = movable.GetTransform ().This2Other (obj_center);
   csColor color;
 
   for (i = 0 ; i < num_lights ; i++)
@@ -1219,7 +1201,7 @@ void csSprite3D::UpdateLightingLQ (csLight** lights, int num_lights, csVector3* 
     float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, wor_center);
     if (wor_sq_dist >= sq_light_radius) continue;
 
-    csVector3 obj_light_pos = obj.Other2This (wor_light_pos);
+    csVector3 obj_light_pos = movable.GetTransform ().Other2This (wor_light_pos);
     float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, obj_center);
     float obj_dist = FastSqrt (obj_sq_dist);
     float wor_dist = FastSqrt (wor_sq_dist);
@@ -1264,12 +1246,12 @@ void csSprite3D::UpdateLightingHQ (csLight** lights, int num_lights, csVector3* 
 
     // Compute light position in object coordinates
     csVector3 wor_light_pos = lights [i]->GetCenter ();
-    csVector3 obj_light_pos = obj.Other2This (wor_light_pos);
+    csVector3 obj_light_pos = movable.GetTransform ().Other2This (wor_light_pos);
 
     for (j = 0 ; j < tpl->GetNumTexels () ; j++)
     {
       csVector3& obj_vertex = object_vertices[j];
-      csVector3 wor_vertex = obj.This2Other (obj_vertex);
+      csVector3 wor_vertex = movable.GetTransform ().This2Other (obj_vertex);
 
       // @@@ We have the distance in object space. Can't we use
       // that to calculate the distance in world space as well?

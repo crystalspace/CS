@@ -286,8 +286,9 @@ bool LoadCamera (iVFS* vfs, const char *fName)
 
 void move_sprite (csSprite3D* sprite, csSector* where, csVector3 const& pos)
 {
-  sprite->SetPosition (pos);
+  sprite->GetMovable ().SetPosition (pos);
   sprite->MoveToSector (where);
+  sprite->UpdateMove ();
 }
 
 // Load a sprite from a general format (3DS, MD2, ...)
@@ -338,9 +339,10 @@ csSprite3D* add_sprite (char* tname, char* sname, csSector* where,
   spr->SetName (sname);
   Sys->view->GetWorld ()->sprites.Push (spr);
   spr->MoveToSector (where);
-  spr->SetPosition (pos);
+  spr->GetMovable ().SetPosition (pos);
   csMatrix3 m; m.Identity (); m = m * size;
-  spr->SetTransform (m);
+  spr->GetMovable ().SetTransform (m);
+  spr->UpdateMove ();
 
   spr->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   return spr;
@@ -473,12 +475,11 @@ void WalkTest::ParseKeyCmds ()
     csSector* sector = (csSector*)world->sectors[i];
     ParseKeyCmds (sector);
 
-    csThing* thing;
-    thing = sector->GetFirstThing ();
-    while (thing)
+    int j;
+    for (j = 0 ; j < sector->things.Length () ; j++)
     {
+      csThing* thing = (csThing*)(sector->things[j]);
       ParseKeyCmds (thing);
-      thing = (csThing*)(thing->GetNext ());
     }
   }
 }

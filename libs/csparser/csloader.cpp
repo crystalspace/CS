@@ -3908,7 +3908,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
         sector->AddLight ( load_statlight(name, params) );
         break;
       case TOKEN_SIXFACE:
-        sector->AddThing (load_sixface (name,params,sector));
+        sector->things.Push (load_sixface (name,params,sector));
         break;
       case TOKEN_FOG:
         {
@@ -3955,10 +3955,10 @@ csSector* csLoader::load_room (char* secname, char* buf)
         }
         break;
       case TOKEN_SKY:
-        sector->AddSky (load_thing (name,params,sector));
+        sector->skies.Push (load_thing (name,params,sector));
         break;
       case TOKEN_THING:
-        sector->AddThing (load_thing (name,params,sector));
+        sector->things.Push (load_thing (name,params,sector));
         break;
       case TOKEN_PORTAL:
         {
@@ -4326,10 +4326,10 @@ csSector* csLoader::load_sector (char* secname, char* buf)
 	partsys->MoveToSector (sector);
         break;
       case TOKEN_SKY:
-        sector->AddSky (load_thing (name,params,sector));
+        sector->skies.Push (load_thing (name,params,sector));
         break;
       case TOKEN_THING:
-        sector->AddThing (load_thing (name,params,sector));
+        sector->things.Push (load_thing (name,params,sector));
         break;
       case TOKEN_SPRITE:
         {
@@ -4350,7 +4350,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
         }
         break;
       case TOKEN_SIXFACE:
-        sector->AddThing ( load_sixface(name,params,sector) );
+        sector->things.Push ( load_sixface(name,params,sector) );
         break;
       case TOKEN_LIGHT:
         sector->AddLight ( load_statlight(name, params) );
@@ -4856,8 +4856,14 @@ bool csLoader::LoadWorld (char* buf)
   {
     sn--;
     csSector* s = (csSector*)(World->sectors)[sn];
-    for (csPolygonSet *ps = s;  ps;
-         (ps==s) ? (ps = s->GetFirstThing ()) : (ps = ps->GetNext ()) )
+    int st = s->things.Length ();
+    int j = -1;
+    while (j < st)
+    {
+      csPolygonSet* ps;
+      if (j == -1) ps = s;
+      else ps = (csPolygonSet*)(s->things[j]);
+      j++;
       for (int i=0;  i < ps->GetNumPolygons ();  i++)
       {
         csPolygon3D* p = ps->GetPolygon3D (i);
@@ -4878,6 +4884,7 @@ bool csLoader::LoadWorld (char* buf)
           delete stmp;
         }
       }
+    }
   }
 
   return true;
@@ -5685,8 +5692,8 @@ bool csLoader::LoadSprite (csSprite3D* spr, char* buf)
       case TOKEN_MOVE:
         {
           char* params2;
-          spr->SetTransform (csMatrix3 ());     // Identity matrix.
-          spr->SetPosition (csVector3 (0, 0, 0));
+          spr->GetMovable ().SetTransform (csMatrix3 ());     // Identity matrix.
+          spr->GetMovable ().SetPosition (csVector3 (0, 0, 0));
           while ((cmd = csGetObject (&params, tok_matvec, &name, &params2)) > 0)
           {
             if (!params2)
@@ -5700,18 +5707,19 @@ bool csLoader::LoadSprite (csSprite3D* spr, char* buf)
               {
                 csMatrix3 m;
                 load_matrix (params2, m);
-                spr->SetTransform (m);
+                spr->GetMovable ().SetTransform (m);
                 break;
               }
               case TOKEN_V:
               {
                 csVector3 v;
                 load_vector (params2, v);
-                spr->SetPosition (v);
+                spr->GetMovable ().SetPosition (v);
                 break;
               }
             }
           }
+	  spr->UpdateMove ();
         }
         break;
 

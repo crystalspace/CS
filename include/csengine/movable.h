@@ -39,6 +39,14 @@ private:
   csReversibleTransform obj;
   /// List of sectors.
   csVector sectors;
+  /**
+   * Parent (for hierachical transformations).
+   * Note that if the parent is not NULL then the list of
+   * sectors is ignored for this movable (the parent list is
+   * returned) and the 'obj' transformation is relative to
+   * the parent one.
+   */
+  csMovable* parent;
 
 public:
   /**
@@ -49,40 +57,61 @@ public:
   /// Destructor.
   virtual ~csMovable ();
 
+  /// Set the parent movable.
+  void SetParent (csMovable* parent)
+  {
+    csMovable::parent = parent;
+  }
+
+  /// Get the parent movable.
+  csMovable* GetParent ()
+  {
+    return parent;
+  }
+
   /**
    * Initialize the list of sectors to one sector where
    * this thing is. This is a conveniance funcion.
    * This function does not update the corresponding list in
    * the sector. It only does a local update here.
+   * This function does not do anything if the parent is not NULL.
    */
   void SetSector (csSector* sector)
   {
-    sectors.SetLength (0);
-    sectors.Push (sector);
+    if (parent == NULL)
+    {
+      sectors.SetLength (0);
+      sectors.Push (sector);
+    }
   }
 
   /**
    * Clear the list of sectors.
+   * This function does not do anything if the parent is not NULL.
    */
   void ClearSectors ()
   {
-    sectors.SetLength (0);
+    if (parent == NULL) sectors.SetLength (0);
   }
 
   /**
    * Add a sector to the list of sectors.
+   * This function does not do anything if the parent is not NULL.
    */
   void AddSector (csSector* sector)
   {
-    sectors.Push (sector);
+    if (parent == NULL) sectors.Push (sector);
   }
 
   /**
    * Get list of sectors for this entity.
+   * This will return the sectors of the parent if there
+   * is a parent.
    */
   csVector& GetSectors ()
   {
-    return sectors;
+    if (parent) return parent->GetSectors ();
+    else return sectors;
   }
 
   /**
@@ -96,7 +125,7 @@ public:
    */
   bool InSector ()
   {
-    return sectors.Length () > 0;
+    return GetSectors ().Length () > 0;
   }
 
   /**
@@ -104,6 +133,15 @@ public:
    * some position.
    */
   void SetPosition (csSector* home, const csVector3& v);
+
+  /**
+   * Set the transformation vector for this object. Note
+   * that the sectors are unchanged.
+   */
+  void SetPosition (const csVector3& v)
+  {
+    obj.SetOrigin (v);
+  }
 
   /**
    * Get the current position.
@@ -141,6 +179,7 @@ public:
   struct eiMovable : public iMovable
   {
     DECLARE_EMBEDDED_IBASE (csMovable);
+    virtual iMovable* GetParent ();
     virtual void SetSector (iSector* sector);
     virtual void ClearSectors ()
     {
@@ -157,6 +196,10 @@ public:
       return scfParent->InSector ();
     }
     virtual void SetPosition (iSector* home, const csVector3& v);
+    virtual void SetPosition (const csVector3& v)
+    {
+      scfParent->SetPosition (v);
+    }
     virtual const csVector3& GetPosition ()
     {
       return scfParent->GetPosition ();

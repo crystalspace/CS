@@ -577,7 +577,7 @@ void Blocks::add_pillar (int x, int y)
   pillar->GetMovable ().SetSector (room);
   pillar->flags.Set (CS_ENTITY_MOVEABLE, 0);
   pillar->MergeTemplate (pillar_tmpl, pillar_mat, 1);
-  room->AddThing (pillar);
+  room->things.Push (pillar);
   csVector3 v ( (x-(player1->zone_dim)/2)*CUBE_DIM, 0,
 	       (y-(player1->zone_dim)/2)*CUBE_DIM);
   pillar->GetMovable ().SetPosition (room, v);
@@ -592,7 +592,7 @@ void Blocks::add_vrast (int x, int y, float dx, float dy, float rot_z)
   vrast->GetMovable ().SetSector (room);
   vrast->flags.Set (CS_ENTITY_MOVEABLE, 0);
   vrast->MergeTemplate (vrast_tmpl, raster_mat, 1);
-  room->AddThing (vrast);
+  room->things.Push (vrast);
   csVector3 v ((x-(player1->zone_dim)/2)*CUBE_DIM+dx, 0,
 	       (y-(player1->zone_dim)/2)*CUBE_DIM+dy);
   csMatrix3 rot = create_rotate_y (rot_z);
@@ -609,7 +609,7 @@ void Blocks::add_hrast (int x, int y, float dx, float dy, float rot_z)
   hrast->GetMovable ().SetSector (room);
   hrast->flags.Set (CS_ENTITY_MOVEABLE, 0);
   hrast->MergeTemplate (hrast_tmpl, raster_mat, 1);
-  room->AddThing (hrast);
+  room->things.Push (hrast);
   csVector3 v ((x-(player1->zone_dim)/2)*CUBE_DIM+dx, 0,
 	       (y-(player1->zone_dim)/2)*CUBE_DIM+dy);
   csMatrix3 rot = create_rotate_y (rot_z);
@@ -741,7 +741,7 @@ csThing* Blocks::add_cube_thing (csSector* sect, float dx, float dy, float dz,
 	float x, float y, float z, csThingTemplate* tmpl)
 {
   csThing* cube = create_cube_thing (dx, dy, dz, tmpl);
-  sect->AddThing (cube);
+  sect->things.Push (cube);
   csVector3 v (x, y, z);
   cube->GetMovable ().SetPosition (sect, v);
   cube->UpdateMove ();
@@ -1815,8 +1815,8 @@ void Blocks::DrawMenu (float menu_trans, float menu_hor_trans, int old_menu,
     float y = 3. + sin (angle)*3.;
     float z = 5. - cos (angle)*3.;
     csVector3 v (x, y, z);
-    demo_room->AddThing (arrow_left);
-    demo_room->AddThing (arrow_right);
+    demo_room->things.Push (arrow_left);
+    demo_room->things.Push (arrow_right);
     arrow_left->GetMovable ().SetPosition (demo_room, v);
     arrow_right->GetMovable ().SetPosition (demo_room, v);
     arrow_left->UpdateMove ();
@@ -1920,14 +1920,14 @@ void Blocks::AddMenuItem (int menu_nr, bool leftright)
   idx_menus[num_menus] = menu_nr;
   leftright_menus[num_menus] = leftright;
   num_menus++;
-  demo_room->AddThing (src_menus[menu_nr]);
+  demo_room->things.Push (src_menus[menu_nr]);
 }
 
 void Blocks::ReplaceMenuItem (int idx, int menu_nr)
 {
   menus[idx] = src_menus[menu_nr];
   idx_menus[idx] = menu_nr;
-  demo_room->AddThing (src_menus[menu_nr]);
+  demo_room->things.Push (src_menus[menu_nr]);
 }
 
 void Blocks::ChangePlaySize (int new_size)
@@ -2157,13 +2157,14 @@ void Blocks::StartNewGame ()
   delete dynlight; dynlight = NULL;
 
   // First delete all cubes that may still be in the world.
-  csThing* cube = room->GetFirstThing ();
-  while (cube)
+  int i = 0;
+  while (i < room->things.Length ())
   {
-    csThing* next_cube = (csThing*)cube->GetNext ();
+    csThing* cube = (csThing*)room->things[i];
     if (!strncmp (cube->GetName (), "cube", 4))
       room->RemoveThing (cube);
-    cube = next_cube;
+    else
+      i++;
   }
 
   Sys->InitGame ();

@@ -103,13 +103,6 @@ class csPolygonSet : public csObject, public iBase
   friend class Dumper;
 
 protected:
-  /**
-   * PolygonSets are linked either in a csWorld object or in another
-   * PolygonSet (Thing in csSector for example).
-   */
-  csPolygonSet* next;
-  /// Parent object (sector or world) in which this object is linked.
-  csObject* parent;
   /// The pointer to the world.
   csWorld* world;
 
@@ -132,9 +125,6 @@ protected:
 
   /// The array of curves forming the outside of the set
   csCurvesArray curves;
-
-  /// csSector where this polyset belongs (pointer to 'this' if it is a sector).
-  //csSector* sector;
 
   /// Optional oriented bounding box.
   csPolygonSetBBox* bbox;
@@ -399,29 +389,8 @@ public:
     return cam_verts;
   }
 
-  /// Get the next polygonset in its linked list.
-  csPolygonSet* GetNext () { return next; }
-  /// Get the parent for this polygonset.
-  csObject* GetParent () { return parent; }
   /// Get the world for this polygonset.
   csWorld* GetWorld () { return world; }
-
-  /// Set the next polygonset and parent in its linked list.
-  void SetNext (csObject* parent, csPolygonSet* next)
-  {
-    csPolygonSet::parent = parent;
-    csPolygonSet::next = next;
-  }
-
-  /**
-   * Set the sector that this polygonset belongs to.
-   * This is either the polygonset itself if it is a sector
-   * or else the sector that this thing is in.
-   */
-  //virtual void SetSector (csSector* sector) { csPolygonSet::sector = sector; }
-
-  /// Return the sector that this polygonset belongs to.
-  //csSector* GetSector () { return sector; }
 
   /**
    * Return a list of shadow frustums which extend from

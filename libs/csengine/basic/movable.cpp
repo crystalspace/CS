@@ -38,6 +38,7 @@ csMovable::csMovable ()
 {
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiMovable);
+  parent = NULL;
 }
 
 csMovable::~csMovable ()
@@ -66,6 +67,13 @@ void csMovable::Transform (csMatrix3& matrix)
 }
 
 //--------------------------------------------------------------------------
+
+iMovable* csMovable::eiMovable::GetParent ()
+{
+  csMovable* par = scfParent->GetParent ();
+  if (!par) return NULL;
+  return QUERY_INTERFACE (par, iMovable);
+}
 
 void csMovable::eiMovable::SetSector (iSector* sector)
 {

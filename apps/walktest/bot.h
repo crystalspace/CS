@@ -53,10 +53,6 @@ public:
   /// Destructor.
   virtual ~Bot ();
 
-  // NextStep compiler botches multiple-inheritence, so we must call correct
-  // implementation manually.
-  virtual void SetPosition(const csVector3& p) { csSprite3D::SetPosition(p); }
-
   /// Time-base move.
   void move (cs_time elapsed_time);
 

@@ -44,13 +44,14 @@ Bot::~Bot ()
 
 void Bot::set_bot_move (const csVector3& v)
 {
-  SetPosition (v);
+  GetMovable ().SetPosition (v);
   follow = v;
+  UpdateMove ();
 }
 
 void Bot::move (cs_time elapsed_time)
 {
-  csOrthoTransform old_pos (GetTransform ().GetO2T (), follow);
+  csOrthoTransform old_pos (GetMovable ().GetTransform ().GetO2T (), follow);
   csVector3 rd = (8.*(float)elapsed_time)/1000. * d;
   follow += rd;
   csVector3 new_pos = follow;
@@ -78,15 +79,15 @@ void Bot::move (cs_time elapsed_time)
     d = d.Unit ();
   }
 
-  csVector3 old_p = GetPosition ();
+  csVector3 old_p = GetMovable ().GetPosition ();
   csVector3 dir = follow-old_p;
   dir.Normalize ();
   csVector3 new_p = old_p + ((3.*(float)elapsed_time)/1000.)*dir;
-  SetPosition (new_p);
+  GetMovable ().SetPosition (new_p);
 
-  s = GetSector (0);
+  s = GetMovable ().GetSector (0);
   mirror = false;
-  csOrthoTransform old_pos2 (GetTransform ().GetO2T (), old_p);
+  csOrthoTransform old_pos2 (GetMovable ().GetTransform ().GetO2T (), old_p);
   s = s->FollowSegment (old_pos2, new_p, mirror);
   if (s)
   {
@@ -100,4 +101,5 @@ void Bot::move (cs_time elapsed_time)
       light->Setup ();
     }
   }
+  UpdateMove ();
 }

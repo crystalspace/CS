@@ -191,11 +191,15 @@ void Dumper::dump (csSector* s)
       dump (sp3d);
     }
   }
-  csThing* th = s->first_thing;
-  while (th)
+  for (i = 0 ; i < s->things.Length () ; i++)
   {
+    csThing* th = (csThing*)s->things[i];
     dump ((csPolygonSet*)th);
-    th = (csThing*)(th->next);
+  }
+  for (i = 0 ; i < s->skies.Length () ; i++)
+  {
+    csThing* th = (csThing*)s->skies[i];
+    dump ((csPolygonSet*)th);
   }
 }
 
@@ -850,26 +854,24 @@ long Dumper::Memory (csSector* sect, int verbose_level, csHashSet* done)
   bool alloc = false;
   if (!done) { done = new csHashSet (3541); alloc = true; }
   long memory = sizeof (*sect), itemmem;
-  csThing* thing;
-  thing = sect->first_thing;
-  while (thing)
+  int i;
+  for (i = 0 ; i < sect->things.Length () ; i++)
   {
+    csThing* thing = (csThing*)sect->things[i];
     itemmem = Memory (thing, verbose_level-1, done);
     memory += itemmem;
     if (verbose_level > 0) CsPrintf (MSG_DEBUG_0, "(sect '%s') thing '%s' (%ld bytes)\n",
     	sect->GetName () ? sect->GetName () : "<noname>",
     	thing->GetName () ? thing->GetName () : "<noname>", itemmem);
-    thing = (csThing*)(thing->GetNext ());
   }
-  thing = sect->first_sky;
-  while (thing)
+  for (i = 0 ; i < sect->skies.Length () ; i++)
   {
+    csThing* thing = (csThing*)sect->skies[i];
     itemmem = Memory (thing, verbose_level-1, done);
     memory += itemmem;
     if (verbose_level > 0) CsPrintf (MSG_DEBUG_0, "(sect '%s') sky '%s' (%ld bytes)\n",
     	sect->GetName () ? sect->GetName () : "<noname>",
     	thing->GetName () ? thing->GetName () : "<noname>", itemmem);
-    thing = (csThing*)(thing->GetNext ());
   }
   // Subtract csPolygonSet size because that will be counted in the next call.
   itemmem = Memory ((csPolygonSet*)sect, verbose_level, done) - sizeof (csPolygonSet);

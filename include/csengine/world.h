@@ -144,8 +144,8 @@ private:
   csWorld* world;
   // Current sector index.
   int sector_idx;
-  // Current thing.
-  csThing* thing;
+  // Current thing index.
+  int thing_idx;
   // Current polygon index.
   int polygon_idx;
 
@@ -176,8 +176,8 @@ private:
   csWorld* world;
   // Current sector index.
   int sector_idx;
-  // Current thing.
-  csThing* thing;
+  // Current thing index.
+  int thing_idx;
   // Current polygon index.
   int curve_idx;
 

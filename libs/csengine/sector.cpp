@@ -74,131 +74,53 @@ IMPLEMENT_EMBEDDED_IBASE_END
 csSector::csSector (csWorld* world) : csPolygonSet (world)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiSector);
-  first_thing = NULL;
-  first_sky = NULL;
-  //sector = this;
   beam_busy = 0;
   level_r = level_g = level_b = 0;
   static_tree = NULL;
   static_thing = NULL;
-  num_sky_things = 0;
-  num_things = 0;
 }
 
 csSector::~csSector ()
 {
-  while (first_thing)
-  {
-    csThing* n = (csThing*)(first_thing->GetNext ());
-    delete first_thing;
-    first_thing = n;
-  }
-  delete static_tree;
-  while (first_sky)
-  {
-    csThing* n = (csThing*)(first_sky->GetNext ());
-    delete first_sky;
-    first_sky = n;
-  }
-
-  // The sprites are not deleted here because they can occur in more
-  // than one sector at the same time. Therefor we first clear the list.
   int i;
-  for (i = 0 ; i < sprites.Length (); i++) sprites[i] = NULL;
+  for (i = 0 ; i < things.Length () ; i++)
+  {
+    csThing* n = (csThing*)(things[i]);
+    things[i] = NULL;
+    delete n;
+  }
+  things.DeleteAll ();
+  delete static_tree;
+  for (i = 0 ; i < skies.Length () ; i++)
+  {
+    csThing* n = (csThing*)(skies[i]);
+    skies[i] = NULL;
+    delete n;
+  }
+  skies.DeleteAll ();
+
+  // Sprites are not deleted by the call below. Sprites
+  // belong to csWorld.
   sprites.DeleteAll ();
 
   lights.DeleteAll ();
-
   terrains.DeleteAll ();
 }
 
 void csSector::Prepare (csSector*)
 {
   csPolygonSet::Prepare (this);
-  csThing* th = first_thing;
-  while (th)
+  int i;
+  for (i = 0 ; i < things.Length () ; i++)
   {
+    csThing* th = (csThing*)things[i];
     th->Prepare (this);
-    th = (csThing*)(th->GetNext ());
   }
-  th = first_sky;
-  while (th)
+  for (i = 0 ; i < skies.Length () ; i++)
   {
+    csThing* th = (csThing*)skies[i];
     th->Prepare (this);
-    th = (csThing*)(th->GetNext ());
   }
-}
-
-void csSector::AddSky (csThing* thing)
-{
-  if (thing->GetParent ()) return;
-  thing->SetNext (this, first_sky);
-  first_sky = thing;
-  num_sky_things++;
-}
-
-bool csSector::RemoveSky (csThing* thing)
-{
-  if (first_sky == thing)
-  {
-    first_sky = (csThing*)thing->GetNext();
-    thing->SetNext (NULL, NULL);
-    num_sky_things--;
-    return true;
-  }
-  else
-  {
-    csThing* th = first_sky;
-    while (th)
-    {
-      csThing* next = (csThing*)th->GetNext();
-      if (next == thing)
-      {
-        th->SetNext (this, next->GetNext());
-        thing->SetNext (NULL, NULL);
-        num_sky_things--;
-        return true;
-      }
-      th = next;
-    }
-  }
-  return false; //Thing was not found
-}
-
-void csSector::AddThing (csThing* thing)
-{
-  if (thing->GetParent ()) return;
-  thing->SetNext (this, first_thing);
-  first_thing = thing;
-  num_things++;
-}
-
-bool csSector::RemoveThing (csThing* thing)
-{
-  if (first_thing == thing)
-  {
-    first_thing = (csThing*)thing->GetNext();
-    thing->SetNext (NULL, NULL);
-    num_things--;
-    return true;
-  }
-  else
-  {
-    csThing* th = first_thing;
-    while (th)
-    {
-      csThing* next = (csThing*)th->GetNext();
-      if (next == thing)
-      {
-        th->SetNext (this, next->GetNext());
-        thing->SetNext (NULL, NULL);
-        num_things--;
-        return true;
-      }
-      th = next;
-    }
-  }
-  return false; //Thing was not found
 }
 
 void csSector::AddLight (csStatLight* light)
@@ -218,26 +140,22 @@ void csSector::UseStaticTree (int mode, bool /*octree*/)
   static_thing->SetName ("__static__");
 
   static_thing->GetMovable ().SetSector (this);
-  csThing* sp = first_thing;
-  csThing* sp_prev = NULL;
-  while (sp)
+  int i;
+  i = 0;
+  while (i < things.Length ())
   {
-    csThing* n = (csThing*)(sp->GetNext ());
+    csThing* sp = (csThing*)things[i];
     if (!sp->flags.Check (CS_ENTITY_MOVEABLE | CS_ENTITY_DETAIL) && !sp->GetFog ().enabled
     	&& sp->GetNumCurves () == 0)
     {
       static_thing->Merge (sp);
       delete sp;
-      if (sp_prev) sp_prev->SetNext (this, n);
-      else first_thing = n;
-      num_things--;
+      things[i] = NULL;
+      things.Delete (i);
     }
-    else sp_prev = sp;
-    sp = n;
+    else i++;
   }
-  static_thing->SetNext (this, first_thing);
-  first_thing = static_thing;
-  num_things++;
+  things.Push (static_thing);
   static_thing->CreateBoundingBox ();
 
   csBox3 bbox;
@@ -302,11 +220,10 @@ void csSector::UseStaticTree (int mode, bool /*octree*/)
 
   // Loop through all things and update their bounding box in the
   // polygon trees.
-  csThing* th = GetFirstThing ();
-  while (th)
+  for (i = 0 ; i < things.Length () ; i++)
   {
+    csThing* th = (csThing*)things[i];
     th->UpdateMove ();
-    th = (csThing*)(th->GetNext ());
   }
   
   CsPrintf (MSG_INITIALIZATION, "DONE!\n");
@@ -341,17 +258,15 @@ void csSector::CreateLightMaps (iGraphics3D* g3d)
     p->CreateLightMaps (g3d);
   }
 
-  csThing* sp = first_thing;
-  while (sp)
+  for (i = 0 ; i < things.Length () ; i++)
   {
+    csThing* sp = (csThing*)things[i];
     sp->CreateLightMaps (g3d);
-    sp = (csThing*)(sp->GetNext ());
   }
-  sp = first_sky;
-  while (sp)
+  for (i = 0 ; i < skies.Length () ; i++)
   {
+    csThing* sp = (csThing*)skies[i];
     sp->CreateLightMaps (g3d);
-    sp = (csThing*)(sp->GetNext ());
   }
 }
 
@@ -411,9 +326,10 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
   csVector3 cur_isect;
   csPolygon3D* best_p = NULL;
 
-  csThing* sp = first_thing;
-  while (sp)
+  int i;
+  for (i = 0 ; i < things.Length () ; i++)
   {
+    csThing* sp = (csThing*)things[i];
     if (sp != static_thing)
     {
       csPolygon3D* p = sp->IntersectSegment (start, end, cur_isect, &r);
@@ -424,7 +340,6 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
 	isect = cur_isect;
       }
     }
-    sp = (csThing*)(sp->GetNext ());
   }
 
   if (static_tree)
@@ -522,16 +437,15 @@ csPolygon3D* csSector::IntersectSphere (csVector3& center, float radius,
     }
   }
 
-  csThing* sp = first_thing;
-  while (sp)
+  for (i = 0 ; i < things.Length () ; i++)
   {
+    csThing* sp = (csThing*)things[i];
     p = sp->IntersectSphere (center, radius, &d);
     if (p && d < min_d)
     {
       min_d = d;
       min_p = p;
     }
-    sp = (csThing*)(sp->GetNext ());
   }
 
   if (pr) *pr = min_d;
@@ -894,11 +808,10 @@ void csSector::Draw (csRenderView& rview)
   }
 
   // First draw all 'sky' things using Z-fill.
-  csThing* th = first_sky;
-  while (th)
+  for (i = 0 ; i < skies.Length () ; i++)
   {
+    csThing* th = (csThing*)skies[i];
     th->Draw (rview, false);
-    th = (csThing*)(th->GetNext ());
   }
 
   // In some cases this queue will be filled with all visible
@@ -943,16 +856,15 @@ void csSector::Draw (csRenderView& rview)
         }
       // Similarly mark all things as invisible and clear the camera
       // transformation for their bounding boxes.
-      th = first_thing;
-      while (th)
+      for (i = 0 ; i < things.Length () ; i++)
       {
+        csThing* th = (csThing*)things[i];
 	csPolyTreeObject* pt = th->GetPolyTreeObject ();
 	if (pt->GetWorldBoundingBox ().In (rview.GetOrigin ()))
 	  th->MarkVisible ();
 	else
 	  th->MarkInvisible ();
 	th->VisTestReset ();
-	th = (csThing*)(th->GetNext ());
       }
 
       // Using the PVS, mark all sectors and polygons that are visible
@@ -999,17 +911,16 @@ void csSector::Draw (csRenderView& rview)
 	  if (sp->IsVisible ()) sprite_queue[num_sprite_queue++] = sp;
 	}
       }
-      if (num_things > 0)
+      if (things.Length () > 0)
       {
         // Push all visible things in a queue.
 	// @@@ Avoid memory allocation?
-	thing_queue = new csThing* [num_things];
+	thing_queue = new csThing* [things.Length ()];
 	num_thing_queue = 0;
-	th = first_thing;
-	while (th)
+	for (i = 0 ; i < things.Length () ; i++)
 	{
+	  csThing* th = (csThing*)things[i];
 	  if (th->IsVisible ()) thing_queue[num_thing_queue++] = th;
-	  th = (csThing*)(th->GetNext ());
 	}
       }
     }
@@ -1065,13 +976,12 @@ void csSector::Draw (csRenderView& rview)
     // just to make the code below easier.
     if (!use_object_queues)
     {
-      thing_queue = new csThing* [num_things];
+      thing_queue = new csThing* [things.Length ()];
       num_thing_queue = 0;
-      th = first_thing;
-      while (th)
+      for (i = 0 ; i < things.Length () ; i++)
       {
+        csThing* th = (csThing*)things[i];
         thing_queue[num_thing_queue++] = th;
-        th = (csThing*)(th->GetNext ());
       }
     }
 
@@ -1091,7 +1001,7 @@ void csSector::Draw (csRenderView& rview)
     // the z-buffer.
     for (i = 0 ; i < num_thing_queue ; i++)
     {
-      th = thing_queue[i];
+      csThing* th = thing_queue[i];
       if (th != static_thing)
         if (th->GetFog ().enabled) sort_list[sort_idx++] = th;
         else th->Draw (rview);
@@ -1105,7 +1015,7 @@ void csSector::Draw (csRenderView& rview)
       // Draw them back to front.
       for (i = 0 ; i < sort_idx ; i++)
       {
-        th = sort_list[i];
+        csThing* th = sort_list[i];
         if (th->GetFog ().enabled) th->DrawFoggy (rview);
         else th->Draw (rview, false);
       }
@@ -1471,25 +1381,19 @@ csThing** csSector::GetVisibleThings (csFrustumView& lview, int& num_things)
   csFrustum* lf = lview.light_frustum;
   bool infinite = lf->IsInfinite ();
   csVector3& center = lf->GetOrigin ();
-  csThing* sp;
   csPolygonSetBBox* bbox;
   bool vis;
   int i, i1;
+  int j;
 
-  /**
-   * First count all things to see how big we should allocate
-   * our array.
-   */
-  num_things = 0;
-  sp = first_thing;
-  while (sp) { num_things++; sp = (csThing*)(sp->GetNext ()); }
+  num_things = things.Length ();
   if (!num_things) { return NULL; }
   csThing** visible_things = new csThing* [num_things];
 
   num_things = 0;
-  sp = first_thing;
-  while (sp)
+  for (j = 0 ; j < things.Length () ; j++)
   {
+    csThing* sp = (csThing*)things[j];
     // If the light frustum is infinite then every thing
     // in this sector is of course visible.
     if (infinite) vis = true;
@@ -1559,7 +1463,6 @@ csThing** csSector::GetVisibleThings (csFrustumView& lview, int& num_things)
     }
 
     if (vis) visible_things[num_things++] = sp;
-    sp = (csThing*)(sp->GetNext ());
   }
   return visible_things;
 }
@@ -1691,17 +1594,15 @@ void csSector::InitLightMaps (bool do_cache)
   for (i = 0; i < polygons.Length (); i++)
     polygons.Get (i)->InitLightMaps (this, do_cache, i);
 
-  csThing* sp = first_thing;
-  while (sp)
+  for (i = 0 ; i < things.Length () ; i++)
   {
+    csThing* sp = (csThing*)things[i];
     sp->InitLightMaps (do_cache);
-    sp = (csThing*)(sp->GetNext ());
   }
-  sp = first_sky;
-  while (sp)
+  for (i = 0 ; i < skies.Length () ; i++)
   {
+    csThing* sp = (csThing*)skies[i];
     sp->InitLightMaps (do_cache);
-    sp = (csThing*)(sp->GetNext ());
   }
 }
 
@@ -1711,42 +1612,58 @@ void csSector::CacheLightMaps ()
   for (i = 0 ; i < polygons.Length (); i++)
     polygons.Get (i)->CacheLightMaps (this, i);
 
-  csThing* sp = first_thing;
-  while (sp)
+  for (i = 0 ; i < things.Length () ; i++)
   {
+    csThing* sp = (csThing*)things[i];
     sp->CacheLightMaps ();
-    sp = (csThing*)(sp->GetNext ());
   }
-  sp = first_sky;
-  while (sp)
+  for (i = 0 ; i < skies.Length () ; i++)
   {
+    csThing* sp = (csThing*)skies[i];
     sp->CacheLightMaps ();
-    sp = (csThing*)(sp->GetNext ());
   }
 }
 
 csThing* csSector::GetThing (const char* name)
 {
-  csThing* s = first_thing;
-  while (s)
+  int i;
+  for (i = 0 ; i < things.Length () ; i++)
   {
+    csThing* s = (csThing*)things[i];
     if (!strcmp (name, s->GetName ()))
       return s;
-    s = (csThing*)(s->GetNext ());
   }
   return NULL;
 }
 
 csThing* csSector::GetSky (const char* name)
 {
-  csThing* s = first_sky;
-  while (s)
+  int i;
+  for (i = 0 ; i < skies.Length () ; i++)
   {
+    csThing* s = (csThing*)skies[i];
     if (!strcmp (name, s->GetName ()))
       return s;
-    s = (csThing*)(s->GetNext ());
   }
   return NULL;
+}
+
+void csSector::RemoveThing (csThing* thing)
+{
+  int idx = things.Find (thing);
+  if (idx == -1) return;
+  things[idx] = NULL;
+  things.Delete (idx);
+  delete thing;
+}
+
+void csSector::RemoveSky (csThing* thing)
+{
+  int idx = skies.Find (thing);
+  if (idx == -1) return;
+  skies[idx] = NULL;
+  skies.Delete (idx);
+  delete thing;
 }
 
 void csSector::ShineLights (csProgressPulse* pulse)
@@ -1797,11 +1714,6 @@ csStatLight* csSector::FindLight (CS_ID id)
 
 //---------------------------------------------------------------------------
 
-bool csSector::eiSector::RemoveSkyThing (iThing *thing)
-{
-  return scfParent->RemoveSky (thing->GetPrivateObject ());
-}
-
 iThing *csSector::eiSector::GetSkyThing (const char *name)
 {
   return &scfParent->GetSky (name)->scfiThing;
@@ -1809,14 +1721,7 @@ iThing *csSector::eiSector::GetSkyThing (const char *name)
 
 iThing *csSector::eiSector::GetSkyThing (int iIndex)
 {
-  csThing *t = scfParent->GetFirstSky ();
-  while (iIndex--) t = (csThing *)t->GetNext ();
-  return &t->scfiThing;
-}
-
-bool csSector::eiSector::RemoveThing (iThing* thing)
-{
-  return scfParent->RemoveThing (thing->GetPrivateObject ());
+  return &((csThing*)(scfParent->skies[iIndex]))->scfiThing;
 }
 
 iThing *csSector::eiSector::GetThing (const char *name)
@@ -1826,9 +1731,7 @@ iThing *csSector::eiSector::GetThing (const char *name)
 
 iThing *csSector::eiSector::GetThing (int iIndex)
 {
-  csThing *t = scfParent->GetFirstThing ();
-  while (iIndex--) t = (csThing *)t->GetNext ();
-  return &t->scfiThing;
+  return &((csThing*)(scfParent->things[iIndex]))->scfiThing;
 }
 
 void csSector::eiSector::AddLight (iStatLight *light)

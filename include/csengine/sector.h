@@ -57,7 +57,17 @@ public:
    * need to be in the world list. This vector contains objects
    * of type csSprite*.
    */
-  csNamedObjVector sprites;
+  csVector sprites;
+
+  /**
+   * List of things in this sector.
+   */
+  csVector things;
+
+  /**
+   * List of sky objects in this sector.
+   */
+  csVector skies;
 
   /**
    * All static and pseudo-dynamic lights in this sector.
@@ -72,16 +82,6 @@ public:
   csNamedObjVector terrains;
 
 private:
-  /// First thing in this sector.
-  csThing* first_thing;
-  /// Number of things in this sector.
-  int num_things;
-
-  /// First sky in this sector.
-  csThing* first_sky;
-  /// Number of sky things in this sector.
-  int num_sky_things;
-
   /// Ambient light level for red in this sector.
   int level_r;
   /// Ambient light level for green in this sector.
@@ -191,36 +191,6 @@ public:
   virtual void Prepare (csSector* sector);
 
   /**
-   * Add a sky to this sector.
-   */
-  void AddSky (csThing* thing);
-
-  /**
-   * Remove a sky from this sector.
-   */
-  bool RemoveSky (csThing* thing);
-
-  /**
-   * Get the number of sky things in this sector.
-   */
-  int GetNumSkyThings () { return num_sky_things; }
-
-  /**
-   * Add a thing to this sector.
-   */
-  void AddThing (csThing* thing);
-
-  /**
-   * Remove a thing from this sector.
-   */
-  bool RemoveThing (csThing* thing);
-
-  /**
-   * Get the number of things in this sector.
-   */
-  int GetNumThings () { return num_things; }
-
-  /**
    * Add a static or pseudo-dynamic light to this sector.
    */
   void AddLight (csStatLight* light);
@@ -241,9 +211,9 @@ public:
   csThing* GetThing (const char* name);
 
   /**
-   * Get the first thing in this sector.
+   * Remove a thing from this sector.
    */
-  csThing* GetFirstThing () { return first_thing; }
+  void RemoveThing (csThing* thing);
 
   /**
    * Find a sky with the given name.
@@ -251,9 +221,9 @@ public:
   csThing* GetSky (const char* name);
 
   /**
-   * Get the first sky in this sector.
+   * Remove a sky thing from this sector.
    */
-  csThing* GetFirstSky () { return first_sky; }
+  void RemoveSky (csThing* thing);
 
   /**
    * Get the thing representing all non-moving things (all
@@ -432,21 +402,17 @@ public:
 
     /// Find a sky with the given name.
     virtual iThing *GetSkyThing (const char *name);
-    /// Remove a sky from this sector.
-    virtual bool RemoveSkyThing (iThing *thing);
     /// Get the number of sky things in this sector.
     virtual int GetNumSkyThings ()
-    { return scfParent->GetNumSkyThings (); }
+    { return scfParent->skies.Length (); }
     /// Get a sky thing by index
     virtual iThing *GetSkyThing (int iIndex);
 
     /// Find a thing with the given name.
     virtual iThing *GetThing (const char *name);
-    /// Remove a thing from this sector.
-    virtual bool RemoveThing (iThing* thing);
     /// Get the number of things in this sector.
     virtual int GetNumThings ()
-    { return scfParent->GetNumThings (); }
+    { return scfParent->things.Length (); }
     /// Get a thing by index
     virtual iThing *GetThing (int iIndex);
 

@@ -203,7 +203,7 @@ csThing* HugeRoom::create_thing (csSector* sector, const csVector3& pos)
 
   csMovable& move = thing->GetMovable ();
   move.SetSector (sector);
-  sector->AddThing (thing);
+  sector->things.Push (thing);
   csReversibleTransform obj;
   obj.SetT2O (csMatrix3 ());
   obj.SetOrigin (pos);
@@ -240,7 +240,7 @@ csThing* HugeRoom::create_building (csSector* sector, const csVector3& pos,
 
   csMovable& move = thing->GetMovable ();
   move.SetSector (sector);
-  sector->AddThing (thing);
+  sector->things.Push (thing);
   csReversibleTransform obj;
   obj.SetT2O (csYRotMatrix3 (angle_y));
   obj.SetOrigin (pos);
@@ -408,7 +408,7 @@ csSector* HugeRoom::create_huge_world (csWorld* world)
   	csVector3 (wall_dim, -wall_dim+1, -wall_dim),
 	csVector3 (-wall_dim, -wall_dim+1, -wall_dim), 40, 40, 0);
   floorthing->GetMovable ().SetSector (room);
-  room->AddThing (floorthing);
+  room->things.Push (floorthing);
   floorthing->UpdateMove ();
 #elif !defined(ROOM_SMALL)
   csThing* floorthing = new csThing (world);
@@ -418,7 +418,7 @@ csSector* HugeRoom::create_huge_world (csWorld* world)
   create_wall (room, floorthing, csVector3 (-3, -1, -3), csVector3 (3, -1, -3),
   	csVector3 (3, -1, 3), csVector3 (-3, -1, 3), 4, 4, 0);
   floorthing->GetMovable ().SetSector (room);
-  room->AddThing (floorthing);
+  room->things.Push (floorthing);
   floorthing->UpdateMove ();
 #endif
 
