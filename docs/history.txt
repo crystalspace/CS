@@ -57,6 +57,10 @@ The history order has been reversed so that new features are at the top.
 	  steps in a fashion analogous to the DO.DEP1/DO.DEP2 solution of yore.
 	  Also repaired glrender.mak, cspython.mak, csjava.mak, and cslua.mak;
 	  all of which experienced the same problem.
+	- Eric Sunshine added assignment operators for object duplication to
+	  csFrustumContext and csLightingInfo in order to appease the NextStep
+	  compiler which had difficulty synthesizing default assignment
+	  operators for these objects.
 16-Apr-2001
 	- Added iEngine::CreateSectorWallsMesh().
 	- Fixed simplep (plugin version of simple) so that it works

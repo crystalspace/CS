@@ -80,6 +80,13 @@ public:
     gouraud_only = false;
   }
 
+  /// Assignment operator.
+  csLightingInfo& operator= (csLightingInfo const& i)
+  {
+    color = i.color;
+    gouraud_only = i.gouraud_only;
+    gouraud_color_reset = i.gouraud_color_reset;
+  }
   /// Set gouraud only.
   void SetGouraudOnly (bool go) { gouraud_only = go; }
   /// Get gouraud_only.
@@ -141,6 +148,16 @@ public:
   	first_time (false),
 	mirror (false)
   { }
+
+  csFrustumContext& operator= (csFrustumContext const& c)
+  {
+    shadows = c.shadows;
+    shared = c.shared;
+    cleanup = c.cleanup;
+    mirror = c.mirror;
+    light_frustum = c.light_frustum;
+    lighting_info = c.lighting_info;
+  }
 
   /// Get the list of shadows.
   iShadowBlockList* GetShadows () { return shadows; }
