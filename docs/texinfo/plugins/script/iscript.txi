@@ -1,4 +1,4 @@
-@node The iScript Interface, , Python Bindings, Scripting Languages
+@node The iScript Interface, Python Bindings, Scripting Languages, Scripting Languages
 @subsection The iScript Interface
 @cindex @code{iScript}
 

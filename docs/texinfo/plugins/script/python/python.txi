@@ -1,4 +1,4 @@
-@node Python Bindings, , Perl Bindings, Scripting Languages
+@node Python Bindings, Perl Bindings, The iScript Interface, Scripting Languages
 @subsection Python Bindings
 @cindex Python
 @cindex @code{csPython}
