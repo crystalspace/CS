@@ -20,15 +20,8 @@
 #include "sysdef.h"
 #include "cssys/common/system.h"
 #include "csinput/csinput.h"
-#include "cscom/com.h"
+#include "NeXTSystemInterface.h"
 class NeXTSystemProxy;
-
-//-----------------------------------------------------------------------------
-// A pure COM-compatible interface to the NeXT-specific csSystemDriver.
-//-----------------------------------------------------------------------------
-extern IID const IID_INeXTSystemDriver;
-interface INeXTSystemDriver : public IUnknown {};
-
 
 //-----------------------------------------------------------------------------
 // NeXT-specific keyboard and mouse drivers.
@@ -48,15 +41,25 @@ class SysSystemDriver : public csSystemDriver
 
 private:
     NeXTSystemProxy* proxy; // Interface to Objective-C world; see README.NeXT.
+    int simulated_depth;
+
+protected:
+    virtual bool ParseArg( int argc, char* argv[], int& i );
 
 public:
     SysSystemDriver();
     virtual ~SysSystemDriver();
     virtual bool Initialize( int argc, char *argv[], IConfig* cfg_engine );
+    virtual void SetSystemDefaults();
+    virtual void Help();
     virtual void Loop ();
 
     // Conform to INeXTSystemDriver via composition.
-    class XNeXTSystemDriver : public INeXTSystemDriver { DECLARE_IUNKNOWN() };
+    class XNeXTSystemDriver : public INeXTSystemDriver
+	{
+	DECLARE_IUNKNOWN()
+	STDMETHOD(GetSimulatedDepth)( int& );
+	};
     DECLARE_IUNKNOWN()
     DECLARE_INTERFACE_TABLE(SysSystemDriver)
     DECLARE_COMPOSITE_INTERFACE_EMBEDDED(NeXTSystemDriver);

@@ -3,7 +3,7 @@
 
     This document was written by Eric Sunshine <sunshine@sunshineco.com>
     Copyright (C)1999 by Eric Sunshine
-    1999/08/03
+    1999/08/06
 
     Also see INSTALL.NeXT for installation details.
 ===============================================================================
@@ -199,6 +199,10 @@ AppKit's Application class.  The files comprising this module are:
     NeXTSystemProxyCom.cpp  The implementation of the COM-specific
                             functionality used by SysSystemDriver.  Does not
                             include Objective-C headers.
+
+    NeXTSystemInterface.h   A pure COM interface to NeXTSystemDriver.  This
+                            defines the NeXTSystemDriver interface which is
+                            accessible to other modules via COM.
 
     NeXTDelegate.cpp        An Objective-C class which acts as the delegate to
     NeXTDelegate.h          both the Application object and the animation
@@ -534,10 +538,6 @@ efficient.
 ---------------
 This is a list of items which are planned for future releases of this project.
 
-    o Respect the VideoDriver/DEPTH (-depth) option.  This will make it
-      possible to test depth-related code under all configurations, rather
-      than only those depths which are detected automatically.  Update
-      docs/config.txt as appropriate.
     o Re-write event handling so that it no longer relies on a timer to drive
       animation.  The problem with using the timer is that (1) it places an
       upper limit on the frame rate, and (2) on slow machines it can fire
@@ -585,6 +585,11 @@ This is a list of known problems with the current release of this project.
 
 10. History
 -----------
+1999/08/06 (14r000+CVS)
+    Added "simulated depth" support via the VideoDriver/SIMULATE_DEPTH
+        configuration option and the -simdepth command line argument.  This
+	allows testing of 32-bit depth on 15-bit displays, and vice-versa.
+
 1999/07/26 (13r012+CVS)
     Now supports 16-bit and 32-bit RGB instead of being limited to 8-bit, 256
         color palette.  Not only does this improve display quality, but it

@@ -13,6 +13,13 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+6-Aug-1999
+	- Eric Sunshine added a "simulated depth" option (-simdepth and
+	  VideoDriver/SIMULATE_DEPTH) to the MacOS/X Server, OpenStep, and
+	  NextStep ports.
+	- Eric Sunshine fixed bugs in a few platform-specific csSystemDriver
+	  subclasses where config->GetYesNo() was used instead of
+	  config->GetInt() to determine simulated depth.
 5-Aug-1999
 	- Eric Sunshine fixed a compilation warning in djvidsys.cpp where
 	  XModeCount was declared without a type.  It is now declared as int.
@@ -47,7 +54,7 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine fixed oodles of new compilation warnings and a few
 	  compilation errors in MazeD.  Also fixed a link error caused by a
 	  second definition of csTextureMM::fIgnoreLoadingErrors which
-	  incorrectly appeared in me_world.cpp for some unknown reason.
+	  incorrectly materialized in me_world.cpp for an unknown reason.
 	- Robert Bate fixed compile errors for CodeWarrior (Macintosh).
 	- Changed glOrtho again. This fixes the problem of the walls
 	  disappearing when you come to close. Unfortunatelly this means

@@ -104,12 +104,28 @@ static int best_bits_per_sample()
 
 
 //-----------------------------------------------------------------------------
+// determine_bits_per_sample
+//-----------------------------------------------------------------------------
+static int determine_bits_per_sample( int simulate_depth )
+    {
+    int bps;
+    switch (simulate_depth)
+	{
+	case 15: bps = 4; break;
+	case 32: bps = 8; break;
+	default: bps = best_bits_per_sample(); break;
+	}
+    return bps;
+    }
+
+
+//-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-NeXTProxy2D::NeXTProxy2D( unsigned int w, unsigned int h ) :
+NeXTProxy2D::NeXTProxy2D( unsigned int w, unsigned int h, int simulate_depth ):
     window(0), view(0), width(w), height(h), frame_buffer(0)
     {
-    switch (best_bits_per_sample())
+    switch (determine_bits_per_sample( simulate_depth ))
 	{
 	case 4: frame_buffer = new NeXTFrameBuffer15( width, height ); break;
 	case 8: frame_buffer = new NeXTFrameBuffer32( width, height ); break;

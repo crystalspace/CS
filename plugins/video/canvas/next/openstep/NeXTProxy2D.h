@@ -35,7 +35,7 @@ private:
     NeXTFrameBuffer* frame_buffer;
 
 public:
-    NeXTProxy2D( unsigned int width, unsigned int height );
+    NeXTProxy2D( unsigned int width, unsigned int height, int simulate_depth );
     ~NeXTProxy2D();
     NeXTFrameBuffer* get_frame_buffer() const { return frame_buffer; }
     bool open( char const* title );

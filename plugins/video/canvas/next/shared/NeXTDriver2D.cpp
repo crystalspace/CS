@@ -22,6 +22,22 @@
 #include "isystem.h"
 
 //-----------------------------------------------------------------------------
+// Constructor
+//-----------------------------------------------------------------------------
+NeXTDriver2D::NeXTDriver2D( ISystem* s ) :
+    csGraphics2D(s), next_system(0), proxy(0)
+    {
+    if (FAILED(system->QueryInterface( IID_INeXTSystemDriver,
+	(void**)&next_system )))
+	{
+	system->Print( MSG_FATAL_ERROR, "FATAL: The system driver does not "
+		"support the INeXTSystemDriver interface\n" );
+	exit(1);
+	}
+    }
+
+
+//-----------------------------------------------------------------------------
 // Destructor
 //-----------------------------------------------------------------------------
 NeXTDriver2D::~NeXTDriver2D()
@@ -40,7 +56,9 @@ NeXTDriver2D::~NeXTDriver2D()
 void NeXTDriver2D::Initialize()
     {
     superclass::Initialize();
-    proxy = new NeXTProxy2D( Width, Height );
+    int simulated_depth;
+    next_system->GetSimulatedDepth( simulated_depth );
+    proxy = new NeXTProxy2D( Width, Height, simulated_depth );
     NeXTFrameBuffer const* const frame_buffer = proxy->get_frame_buffer();
     if (frame_buffer != 0)
 	{

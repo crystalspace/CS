@@ -21,6 +21,7 @@
 #include "sysdef.h"	// Defines wchar_t required by com.h below.
 #include "cscom/com.h"
 #include "cs2d/common/graph2d.h"
+#include "cssys/next/shared/NeXTSystemInterface.h"
 class NeXTProxy2D;
 
 class NeXTDriver2D : public csGraphics2D
@@ -28,13 +29,14 @@ class NeXTDriver2D : public csGraphics2D
     typedef csGraphics2D superclass;
 
 private:
+    INeXTSystemDriver* next_system;
     NeXTProxy2D* proxy;	// Interface to Objective-C world; see README.NeXT.
 
     void setup_rgb_15();
     void setup_rgb_32();
 
 public:
-    NeXTDriver2D::NeXTDriver2D( ISystem* s ) : csGraphics2D(s), proxy(0) {}
+    NeXTDriver2D::NeXTDriver2D( ISystem* );
     virtual ~NeXTDriver2D();
     virtual void Initialize();
     virtual bool Open( char* title );
