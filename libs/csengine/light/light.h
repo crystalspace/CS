@@ -22,6 +22,7 @@
 #include "csgeom/transfrm.h"
 #include "csobject/csobj.h"
 #include "csengine/cscolor.h"
+#include "csengine/rview.h"
 #include "lightdef.h"
 
 class csSector;
@@ -29,6 +30,13 @@ class csPolygon3D;
 class csDynLight;
 class Dumper;
 class csThing;
+
+/**
+ * If CS_LIGHT_THINGSHADOWS is set for a light then things will also
+ * cast shadows. This flag is set by default for static lights and unset
+ * for dynamic lights.
+ */
+#define CS_LIGHT_THINGSHADOWS 1
 
 /**
  * Superclass of all positional lights.
@@ -80,7 +88,10 @@ protected:
   int halo_ref_count;
   /// whether this light is in the halo queue or not.
   bool in_halo_queue;
-  
+
+  /// Set of flags
+  ULong flags;
+
 public:
   /// Config value: ambient red value.
   static int ambient_red;
@@ -107,6 +118,12 @@ public:
    * update those lightmaps as that is a time-consuming process.
    */
   virtual ~csLight ();
+
+  /// Set flags for this light.
+  void SetFlags (ULong mask, ULong value) { flags = (flags & ~mask) | value; }
+
+  /// Get flags for this light.
+  ULong GetFlags () { return flags; }
 
   /**
    * Set the current sector for this light.
@@ -349,6 +366,9 @@ private:
   csPolygon3D* polygon;
   /// Light that this light patch originates from.
   csDynLight* light;
+
+  /// List of shadow frustrums.
+  csFrustrumList shadows;
 
 public:
   /**

@@ -44,6 +44,7 @@ csLight::csLight (float x, float y, float z, float dist,
   color.red = red;
   color.green = green;
   color.blue = blue;
+  flags = 0;
 
   halo_enabled = false;
   halo_intensity = 0.0f;
@@ -145,6 +146,7 @@ csStatLight::csStatLight (float x, float y, float z, float dist,
 {
   csStatLight::dynamic = dynamic;
   polygons = NULL;
+  flags = CS_LIGHT_THINGSHADOWS;
 }
 
 csStatLight::~csStatLight ()
@@ -237,6 +239,7 @@ csLightPatch::~csLightPatch ()
   CHK (delete [] vertices);
   if (polygon) polygon->UnlinkLightpatch (this);
   if (light) light->UnlinkLightpatch (this);
+  shadows.DeleteFrustrums ();
 }
 
 //---------------------------------------------------------------------------
