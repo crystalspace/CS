@@ -57,6 +57,9 @@ chronological order.
 	- Luca fixed an INTERNAL COMPILER ERROR that happens as usually on the
 	  VisualC++ 6 compiler. He made a fix only for that compiler, wrapping
 	  around the fix with an #ifdef.
+	- Luca fixed a problem VisualC++6 users have with inner classes,
+	  which by default cannot access to any non-public member 
+	  of the containing class.
 27-Jun-2004
 	- res worked around a possible VC7 64bit warning in 
 	  csIntegralHashKeyHandler<>.
