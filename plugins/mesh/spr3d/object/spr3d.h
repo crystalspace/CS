@@ -1464,6 +1464,10 @@ public:
   bool SetAction (const char * name, bool loop = true, float speed = 1)
   {
     speedfactor = speed;
+    // If SetAction is called while an OverrideAction is in progress,
+    // this NULL overrides the override, so this action will keep going.
+    last_action = NULL;
+
     loopaction = loop;
     fullstop = false;
     single_step = false;
@@ -1496,12 +1500,16 @@ public:
 
   bool SetOverrideAction (const char *name,float speed = 1)
   {
-    last_action = cur_action;
-    last_loop   = loopaction;
-    last_speed  = speedfactor;
+    csSpriteAction2* save_last;
+    
+    save_last    = cur_action;
+    last_loop    = loopaction;
+    last_speed   = speedfactor;
     last_reverse = (frame_increment==-1)?true:false;
 
-    return SetAction (name,false,speed);
+    bool flag = SetAction (name,false,speed);
+    last_action = save_last;
+    return flag;
   }
 
   /**

@@ -9,6 +9,12 @@ The history order is reversed so that new features are at the top.
 	- Anders Stenberg fixed a bug on win32 where the main output window 
 	  wasn't shown sometimes because of a badly initialized variable 
 	  (cmdshow).
+	- Keith Fulton fixed the OverrideAction problem, which was that if
+	  Action A was running, and OverrideAction B was called, then SetAction
+	  was again called with Action C while Action B was still active, when
+	  Action B ended, Action A would be restored instead of C.  Now,
+	  when SetAction(C) is called, the Override is cleared out, so only
+	  Action C will run until further notice.
 30-May-2003
 	- Philip Wyett added the CS copyright notice and moved the includes to
 	  the correct place in 'iddetect.h'.
