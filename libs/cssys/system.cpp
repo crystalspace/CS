@@ -901,7 +901,7 @@ iBase *csSystemDriver::QueryPlugIn (const char *iFuncID, const char *iInterface,
 {
   int idx = PlugIns.FindKey (iFuncID, 1);
   if (idx < 0)
-    return false;
+    return NULL;
 
   return (iBase *)PlugIns.Get (idx)->PlugIn->QueryInterface (iInterface, iVersion);
 }
