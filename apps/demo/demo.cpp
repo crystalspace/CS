@@ -47,7 +47,7 @@
 #include "imesh/surf.h"
 #include "imesh/object.h"
 #include "imap/reader.h"
-#include "igraphic/loader.h"
+#include "igraphic/imageio.h"
 #include "qsqrt.h"
 
 CS_IMPLEMENT_APPLICATION

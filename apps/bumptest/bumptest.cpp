@@ -50,7 +50,7 @@
 #include "iengine/light.h"
 #include "iengine/dynlight.h"
 #include "iengine/camera.h"
-#include "igraphic/loader.h"
+#include "igraphic/imageio.h"
 #include "imesh/object.h"
 #include "imesh/lighting.h"
 
