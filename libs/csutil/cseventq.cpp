@@ -180,20 +180,8 @@ void csEventQueue::Process ()
   notification.Command.Code = cscmdProcess;
   Notify (notification);
 
-  while ((ev = Get ()) != 0)
-  {
-    Dispatch (*ev);
-    ev->DecRef ();
-  }
-
   notification.Command.Code = cscmdPostProcess;
   Notify (notification);
-
-  while ((ev = Get ()) != 0)
-  {
-    Dispatch (*ev);
-    ev->DecRef ();
-  }
 
   notification.Command.Code = cscmdFinalProcess;
   Notify (notification);

@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+2-Aug-2002
+	- Eric Sunshine eliminated several unnecessary, and inadvertently
+	  inserted, event dispatch loops from csEventQueue::Process().
 1-Aug-2002
 	- Added == and != operators to compare csRef& and T* instances.
 31-Jul-2002
