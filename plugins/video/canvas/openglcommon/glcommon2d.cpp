@@ -217,7 +217,7 @@ bool csGraphics2DGLCommon::Open ()
   glClearColor (0., 0., 0., 0.);
   glClearDepth (-1.0);
 
-  glMatrixMode (GL_MODELVIEW);
+  statecache->SetMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
 
   glViewport (0, 0, Width, Height);
@@ -249,7 +249,7 @@ bool csGraphics2DGLCommon::BeginDraw ()
   if (FrameBufferLocked != 1)
     return true;
 
-  glMatrixMode (GL_PROJECTION);
+  statecache->SetMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
   glOrtho (0, Width, 0, Height, -1.0, 10.0);
   glViewport (0, 0, Width, Height);
@@ -258,7 +258,7 @@ bool csGraphics2DGLCommon::BeginDraw ()
   //statecache->Enable_GL_SCISSOR_TEST ();
   //glScissor (ClipX1, Height - ClipY2, ClipX2 - ClipX1, ClipY2 - ClipY1);
 
-  glMatrixMode (GL_MODELVIEW);
+  statecache->SetMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
   glColor3f (1., 0., 0.);
   glClearColor (0., 0., 0., 0.);

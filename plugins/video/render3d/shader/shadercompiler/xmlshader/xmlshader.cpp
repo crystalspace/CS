@@ -706,7 +706,8 @@ csPtr<iShaderProgram> csXMLShaderCompiler::LoadProgram (
   }
   else
     programNode = node;
-  program->Load (programNode);
+  if (!program->Load (programNode))
+    return 0;
 
   csArray<iShaderVariableContext*> staticContexts;
   staticContexts.Push (&pass->svcontext);

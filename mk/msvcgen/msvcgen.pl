@@ -546,7 +546,7 @@ sub synthesize_pattern {
 sub collect_variables {
     my $tuple;
     foreach $tuple (@main::opt_set) {
-	my ($key, $val) = split(/\s*=\s*/, $tuple);
+	my ($key, $val) = split(/\s*=\s*/, $tuple, 2);
 	$key =~ s/^\s*// if $key;
 	next unless $key;
 	$val = '' unless $val;

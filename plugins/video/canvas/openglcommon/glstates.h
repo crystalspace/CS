@@ -262,6 +262,7 @@ public:
     glGetIntegerv (GL_STENCIL_FAIL, (GLint*)&parameter_stencil_fail);
     glGetIntegerv (GL_STENCIL_PASS_DEPTH_FAIL, (GLint*)&parameter_stencil_zfail);
     glGetIntegerv (GL_STENCIL_PASS_DEPTH_PASS, (GLint*)&parameter_stencil_zpass);
+    glGetIntegerv (GL_MATRIX_MODE, (GLint*)&parameter_matrixMode);
     GLboolean writemask[4];
     glGetBooleanv (GL_COLOR_WRITEMASK, writemask);
     parameter_wmRed = writemask[0];
@@ -335,6 +336,7 @@ public:
   IMPLEMENT_CACHED_CLIENT_STATE_LAYER (GL_TEXTURE_COORD_ARRAY)
   IMPLEMENT_CACHED_CLIENT_STATE (GL_COLOR_ARRAY)
   IMPLEMENT_CACHED_CLIENT_STATE (GL_NORMAL_ARRAY)
+  IMPLEMENT_CACHED_PARAMETER_1 (glMatrixMode, MatrixMode, GLenum, matrixMode)
 
   // Special caches
   GLuint boundtexture[CS_GL_MAX_LAYER]; // 32 max texture layers

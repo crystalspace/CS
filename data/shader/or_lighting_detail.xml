@@ -128,14 +128,6 @@
 		</texmatrix>
 	      </fixedvp>
 	    </vp>
-	    <fp plugin="glfixed">
-		<fixedfp>
-		    <layer>
-			<colorsource num="0" source="texture" modifier="color"/>
-			<coloroperation operation="replace" />
-		    </layer>
-		</fixedfp>
-	    </fp>
 	</pass>
     </technique>
     

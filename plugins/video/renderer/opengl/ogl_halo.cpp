@@ -170,7 +170,7 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
   /// The inverse width and height of the halo
   float inv_W = Wfact / w, inv_H = Hfact / h;
 
-  //???@@@glMatrixMode (GL_MODELVIEW);
+  //???@@@statecache->SetMatrixMode (GL_MODELVIEW);
   glPushMatrix ();
   glTranslatef (0, 0, 0);
 

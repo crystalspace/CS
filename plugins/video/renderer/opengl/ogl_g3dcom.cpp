@@ -1269,7 +1269,7 @@ bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
       G2D->SetClipRect (-1, -1, txt_w+1, txt_h+1);
       rt_cliprectset = true;
 
-      glMatrixMode (GL_PROJECTION);
+      statecache->SetMatrixMode (GL_PROJECTION);
       glLoadIdentity ();
       if ((DrawFlags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS)) == 
 	CSDRAW_2DGRAPHICS)
@@ -1285,7 +1285,7 @@ bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
 	// Same, but for 2D.
         SetGlOrtho (true);
       }
-      glMatrixMode (GL_MODELVIEW);
+      statecache->SetMatrixMode (GL_MODELVIEW);
       inverted = true;
       glViewport (1, -1, width+1, height+1);
     }
@@ -1348,7 +1348,7 @@ void csGraphics3DOGLCommon::FinishDraw ()
     {
       rt_cliprectset = false;
       G2D->SetClipRect (rt_old_minx, rt_old_miny, rt_old_maxx, rt_old_maxy);
-      glMatrixMode (GL_PROJECTION);
+      statecache->SetMatrixMode (GL_PROJECTION);
       glLoadIdentity ();
       glOrtho (0., width, 0., height, -1.0, 10.0);
       glViewport (0, 0, width, height);
@@ -4175,7 +4175,7 @@ void csGraphics3DOGLCommon::SetupDTMTransforms (int vertex_mode)
   //glPushAttrib( GL_ALL_ATTRIB_BITS );
   //glPushClientAttrib(GL_CLIENT_ALL_ATTRIB_BITS);
 
-  glMatrixMode (GL_MODELVIEW);
+  statecache->SetMatrixMode (GL_MODELVIEW);
   glPushMatrix ();
   glLoadIdentity ();
 
@@ -4208,7 +4208,7 @@ void csGraphics3DOGLCommon::SetupDTMTransforms (int vertex_mode)
     glTranslatef (-translation.x, -translation.y, -translation.z);
   }
 
-  glMatrixMode (GL_PROJECTION);
+  statecache->SetMatrixMode (GL_PROJECTION);
   glPushMatrix ();
   glLoadIdentity ();
 
@@ -4228,9 +4228,9 @@ void csGraphics3DOGLCommon::SetupDTMTransforms (int vertex_mode)
 
 void csGraphics3DOGLCommon::RestoreDTMTransforms ()
 {
-  glMatrixMode (GL_PROJECTION);
+  statecache->SetMatrixMode (GL_PROJECTION);
   glPopMatrix ();
-  glMatrixMode (GL_MODELVIEW);
+  statecache->SetMatrixMode (GL_MODELVIEW);
   glPopMatrix ();
 }
 
@@ -5234,7 +5234,7 @@ bool csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
 // Conclusion: it seems to be slower for some reason (but not much).
 #define EXP_SCALE_MATRIX 0
 #if EXP_SCALE_MATRIX
-	glMatrixMode (GL_TEXTURE);
+	statecache->SetMatrixMode (GL_TEXTURE);
 	glPushMatrix ();
 	glLoadIdentity ();
 	GLfloat scalematrix[16];
@@ -5263,7 +5263,7 @@ bool csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
       if (mat->TextureLayerTranslated (j))
       {
 	glPopMatrix ();
-	glMatrixMode (GL_MODELVIEW);
+	statecache->SetMatrixMode (GL_MODELVIEW);
       }
 #endif
     }

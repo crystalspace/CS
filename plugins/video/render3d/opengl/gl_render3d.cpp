@@ -388,7 +388,7 @@ void csGLGraphics3D::SetupStencil ()
 #if 0  
     /*
      * @@@ Does not work correctly. 
-     * [res: I suspect it inteferes with SetupClipPortals()]
+     * [res: I suspect it interferes with SetupClipPortals()]
      */
     if (clipper->GetClipperType() == iClipper2D::clipperBox)
     {
@@ -401,11 +401,10 @@ void csGLGraphics3D::SetupStencil ()
     }
 #endif
 
-    //glMatrixMode (GL_PROJECTION);
+    statecache->SetMatrixMode (GL_PROJECTION);
     glPushMatrix ();
     glLoadIdentity ();
-    glMatrixMode (GL_MODELVIEW);
-    //glMatrixMode (GL_PROJECTION);
+    statecache->SetMatrixMode (GL_MODELVIEW);
     glPushMatrix ();
     glLoadIdentity ();
     // First set up the stencil area.
@@ -459,8 +458,7 @@ void csGLGraphics3D::SetupStencil ()
     statecache->SetStencilMask (127);
 
     glPopMatrix ();
-    glMatrixMode (GL_MODELVIEW);
-    //glMatrixMode (GL_PROJECTION);
+    statecache->SetMatrixMode (GL_PROJECTION);
     glPopMatrix ();
     if (oldz) statecache->Enable_GL_DEPTH_TEST ();
     if (tex2d) statecache->Enable_GL_TEXTURE_2D ();
@@ -475,7 +473,7 @@ int csGLGraphics3D::SetupClipPlanes (bool add_clipper,
 {
   if (!(add_clipper || add_near_clip || add_z_clip)) return 0;
 
-  glMatrixMode (GL_MODELVIEW);
+  statecache->SetMatrixMode (GL_MODELVIEW);
   glPushMatrix ();
   glLoadIdentity ();
 
@@ -655,7 +653,7 @@ void csGLGraphics3D::ApplyObjectToCamera ()
   matrixholder[14] = 0.0f;
   matrixholder[15] = 1.0f;
 
-  glMatrixMode (GL_MODELVIEW);
+  statecache->SetMatrixMode (GL_MODELVIEW);
   glLoadMatrixf (matrixholder);
   glTranslatef (-translation.x, -translation.y, -translation.z);
 }
@@ -664,7 +662,7 @@ void csGLGraphics3D::SetupProjection ()
 {
   if (!needProjectionUpdate) return;
 
-  glMatrixMode (GL_PROJECTION);
+  statecache->SetMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
   SetGlOrtho (render_target);
   if (render_target)
@@ -691,7 +689,7 @@ void csGLGraphics3D::SetupProjection ()
   matrixholder[14] = -matrixholder[11];
   glMultMatrixf (matrixholder);
 
-  glMatrixMode (GL_MODELVIEW);
+  statecache->SetMatrixMode (GL_MODELVIEW);
   needProjectionUpdate = false;
 }
 
@@ -1128,11 +1126,11 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
 
     if (!rt_onscreen)
     {
-      glMatrixMode (GL_PROJECTION);
+      statecache->SetMatrixMode (GL_PROJECTION);
       glLoadIdentity ();
       SetGlOrtho (false);
       glViewport (0, 0, viewwidth, viewheight);
-      glMatrixMode (GL_MODELVIEW);
+      statecache->SetMatrixMode (GL_MODELVIEW);
       glLoadIdentity ();
 
       statecache->SetShadeModel (GL_FLAT);
@@ -1170,7 +1168,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
 
     glCullFace (render_target ? GL_BACK : GL_FRONT);
 
-    glMatrixMode (GL_MODELVIEW);
+    statecache->SetMatrixMode (GL_MODELVIEW);
     glLoadIdentity ();
     object2camera = csReversibleTransform();
     return true;
@@ -1193,7 +1191,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
       if (ext->CS_GL_ARB_multitexture)
 	statecache->SetActiveTU (0);
 
-      glMatrixMode (GL_PROJECTION);
+      statecache->SetMatrixMode (GL_PROJECTION);
       glLoadIdentity ();
       if (render_target)
       {
@@ -1211,7 +1209,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
       //glViewport (0, 0, viewwidth, viewheight);
       glViewport (0, 0, viewwidth, viewheight);
 
-      glMatrixMode (GL_MODELVIEW);
+      statecache->SetMatrixMode (GL_MODELVIEW);
       glLoadIdentity ();
 
       SetZMode (CS_ZBUF_NONE);
@@ -1239,7 +1237,7 @@ void csGLGraphics3D::FinishDraw ()
     {
       rt_cliprectset = false;
       G2D->SetClipRect (rt_old_minx, rt_old_miny, rt_old_maxx, rt_old_maxy);
-      glMatrixMode (GL_PROJECTION);
+      statecache->SetMatrixMode (GL_PROJECTION);
       glLoadIdentity ();
       glOrtho (0., viewwidth, 0., viewheight, -1.0, 10.0);
       glViewport (0, 0, viewwidth, viewheight);
@@ -1671,6 +1669,8 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     const csRenderMeshModes& modes,
     const csArray< csArray<csShaderVariable*> > &stacks)
 {
+  if (cliptype == CS_CLIPPER_NONE) return;
+
   SetupProjection ();
 
   SetupClipPortals ();
@@ -2066,6 +2066,8 @@ void csGLGraphics3D::SetupClipPortals ()
   }
 }
 
+const int CS_CLIPPER_EMPTY = 0xf008412;
+
 void csGLGraphics3D::SetClipper (iClipper2D* clipper, int cliptype)
 {
   //clipper = new csBoxClipper (10, 10, 200, 200);
@@ -2095,6 +2097,11 @@ void csGLGraphics3D::SetClipper (iClipper2D* clipper, int cliptype)
     for (i=1; i<clipper->GetVertexCount (); i++)
       scissorbox.AddBoundingVertexSmart (clippoly[i]);
     scissorbox *= csBox2 (old2dClip);
+    if (scissorbox.Empty())
+    {
+      csGLGraphics3D::cliptype = CS_CLIPPER_EMPTY;
+      return;
+    }
 
     const csRect scissorRect ((int)floorf (scissorbox.MinX ()), 
       (int)floorf (scissorbox.MinY ()), (int)ceilf (scissorbox.MaxX ()), 
@@ -2369,20 +2376,19 @@ csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha,
   Width = csFindNearestPowerOf2 (iWidth);
   Height = csFindNearestPowerOf2 (iHeight);
 
-  uint8 *Alpha = iAlpha;
-  if ((Width != iWidth) || (Height != iHeight))
+  uint8* rgba = new uint8 [Width * Height * 4];
+  memset (rgba, 0, Width * Height * 4);
+  uint8* rgbaPtr = rgba;
+  for (int y = 0; y < iHeight; y++)
   {
-    // Allocate our copy of the scanline which is power-of-two
-    Alpha = new uint8 [Width * Height];
-    int i;
-    for (i = 0; i < iHeight; i++)
+    for (int x = 0; x < iWidth; x++)
     {
-      // Copy a scanline from the supplied alphamap
-      memcpy (Alpha + (i * Width), iAlpha + (i * iWidth), iWidth);
-      // Clear the tail of the scanline
-      memset (Alpha + (i * Width) + iWidth, 0, Width - iWidth);
+      *rgbaPtr++ = 0xff;
+      *rgbaPtr++ = 0xff;
+      *rgbaPtr++ = 0xff;
+      *rgbaPtr++ = *iAlpha++;
     }
-    memset (Alpha + iHeight * Width, 0, (Height - iHeight) * Width);
+    rgbaPtr += (Width - iWidth) * 4;
   }
 
   glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
@@ -2395,11 +2401,9 @@ csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha,
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexImage2D (GL_TEXTURE_2D, 0, GL_ALPHA, Width, Height, 0, GL_ALPHA,
-    GL_UNSIGNED_BYTE, Alpha);
+  glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGBA,
+    GL_UNSIGNED_BYTE, rgba);
 
-  if (Alpha != iAlpha)
-    delete [] Alpha;
   (G3D = iG3D)->IncRef ();
 
   Wfact = float (iWidth) / Width;
@@ -2474,7 +2478,7 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
   csGLGraphics3D::statecache->SetTexture (GL_TEXTURE_2D, halohandle);
   G3D->SetAlphaType (csAlphaMode::alphaSmooth);
 
-  //???@@@glMatrixMode (GL_MODELVIEW);
+  //???@@@statecache->SetMatrixMode (GL_MODELVIEW);
   glPushMatrix ();
   glLoadIdentity();
   G3D->SetGlOrtho (false);

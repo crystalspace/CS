@@ -31,6 +31,13 @@ chronological order.
 	  4-register boundaries (as needed by TrackMatrixNV()). Can be turned
 	  off by disabling the "Video.OpenGL.Shader.Cg.NvVpRealign" config
 	  setting.
+	- res added glMatrixMode to the state cache.
+	- res fixed the Fixed FP to better work when no combine ext is present.
+	  In this case, a fixed FP will only refuse to load if texture layers
+	  are used.
+	- res fixed NR halos.
+	- res fixed msvcgen to properly handle template variable assignments
+	  with '='s (e.g. --set=%cflags%='/D foo=bar').
 5-Jun-2004
 	- res made the following changes:
 	    - Added the *f versions of floor and ceil to csdef.h.

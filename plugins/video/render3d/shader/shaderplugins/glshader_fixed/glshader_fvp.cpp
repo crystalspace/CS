@@ -74,7 +74,7 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
 
   if (do_lighting)
   {
-    glMatrixMode (GL_MODELVIEW_MATRIX);
+    statecache->SetMatrixMode (GL_MODELVIEW_MATRIX);
     glPushMatrix ();
     glLoadIdentity ();
 
@@ -221,12 +221,12 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
         mAutoTextureMatrix[13] = mAutoTextureMatrix[14] = 0.0f;
       mAutoTextureMatrix[15] = 1.0f;  
 
-      glMatrixMode (GL_TEXTURE);
+      statecache->SetMatrixMode (GL_TEXTURE);
       glLoadMatrixf (mAutoTextureMatrix);
     }
     if (layers[i].texMatrixOps.Length() > 0)
     {
-      glMatrixMode (GL_TEXTURE);
+      statecache->SetMatrixMode (GL_TEXTURE);
 
       for (int j = 0; j < layers[i].texMatrixOps.Length(); j++)
       {
@@ -329,7 +329,7 @@ void csGLShaderFVP::ResetState ()
       statecache->Disable_GL_TEXTURE_GEN_T ();
       statecache->Disable_GL_TEXTURE_GEN_R ();
 
-      glMatrixMode (GL_TEXTURE);
+      statecache->SetMatrixMode (GL_TEXTURE);
       glLoadIdentity ();
     }
   }

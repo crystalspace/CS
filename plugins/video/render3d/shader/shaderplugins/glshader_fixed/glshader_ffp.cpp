@@ -53,14 +53,14 @@ csGLShaderFFP::csGLShaderFFP(csGLShader_FIXED* shaderPlug) :
   csShaderProgram (shaderPlug->object_reg)
 {
   csGLShaderFFP::shaderPlug = shaderPlug;
-  validProgram = true;
+  validProgram = false;
 
   BuildTokenHash();
 }
 
 csGLShaderFFP::~csGLShaderFFP ()
 {
-  Deactivate();
+  if (validProgram) Deactivate();
 }
 
 void csGLShaderFFP::Report (int severity, const char* msg, ...)
@@ -362,28 +362,32 @@ bool csGLShaderFFP::Compile(csArray<iShaderVariableContext*> &staticContexts)
   if (texlayers.Length () > maxlayers)
     return false;
 
+  // Don't support layers if the COMBINE ext isn't present
+  if ((!shaderPlug->enableCombine) && (texlayers.Length() > 0))
+    return false;
+
+  const bool hasDOT3 = ext->CS_GL_ARB_texture_env_dot3 || 
+    ext->CS_GL_EXT_texture_env_dot3;
+
   for(int i = 0; i < texlayers.Length(); ++i)
   {
-    mtexlayer* layer = &texlayers[i];
-    if (((layer->colorp == GL_DOT3_RGB_ARB) || 
-        (layer->colorp == GL_DOT3_RGBA_ARB)) && 
-        !(ext->CS_GL_ARB_texture_env_dot3 || ext->CS_GL_EXT_texture_env_dot3))
+    const mtexlayer& layer = texlayers[i];
+    if (((layer.colorp == GL_DOT3_RGB_ARB) || 
+        (layer.colorp == GL_DOT3_RGBA_ARB)) && 
+        !(hasDOT3))
       return false;
-    if (((layer->alphap == GL_DOT3_RGB_ARB) || 
-        (layer->alphap == GL_DOT3_RGBA_ARB)) && 
-        !(ext->CS_GL_ARB_texture_env_dot3 || ext->CS_GL_EXT_texture_env_dot3))
+    if (((layer.alphap == GL_DOT3_RGB_ARB) || 
+        (layer.alphap == GL_DOT3_RGBA_ARB)) && 
+        !(hasDOT3))
       return false;
-
-    /*
-     @@@ Check for features that require texture_env_combine,
-	 and reject if such are used, but ARB_t_e_c isn't present.
-     */
   }
 
   ResolveParamStatic (fog.density, staticContexts);
   ResolveParamStatic (fog.start, staticContexts);
   ResolveParamStatic (fog.end, staticContexts);
   ResolveParamStatic (fog.color, staticContexts);
+
+  validProgram = true;
 
   return true;
 }
@@ -392,39 +396,39 @@ void csGLShaderFFP::Activate ()
 {
   for(int i = 0; i < texlayers.Length(); ++i)
   {
-    mtexlayer* layer = &texlayers[i];
     statecache->SetActiveTU (i);
 
-    if(ext->CS_GL_ARB_texture_env_combine || 
-      ext->CS_GL_EXT_texture_env_combine)
+    if (shaderPlug->enableCombine)
     {
-      glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, layer->colorsource[0]);
-      glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, layer->colormod[0]);
-      glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, layer->colorsource[1]);
-      glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_RGB_ARB, layer->colormod[1]);
-      if (layer->colorsource[2] != -1)
+      const mtexlayer& layer = texlayers[i];
+
+      glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, layer.colorsource[0]);
+      glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, layer.colormod[0]);
+      glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, layer.colorsource[1]);
+      glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_RGB_ARB, layer.colormod[1]);
+      if (layer.colorsource[2] != -1)
       {
-        glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_RGB_ARB, layer->colorsource[2]);
-        glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_RGB_ARB, layer->colormod[2]);
+        glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_RGB_ARB, layer.colorsource[2]);
+        glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_RGB_ARB, layer.colormod[2]);
       }
 
-      glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, layer->colorp );
+      glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, layer.colorp );
 
-      glTexEnvf(GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, layer->scale_rgb);
+      glTexEnvf(GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, layer.scale_rgb);
 
-      glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_ALPHA_ARB, layer->alphasource[0]);
-      glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA_ARB, layer->alphamod[0]);
-      glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_ALPHA_ARB, layer->alphasource[1]);
-      glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_ALPHA_ARB, layer->alphamod[1]);
-      if (layer->alphasource[2] != -1)
+      glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_ALPHA_ARB, layer.alphasource[0]);
+      glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA_ARB, layer.alphamod[0]);
+      glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_ALPHA_ARB, layer.alphasource[1]);
+      glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_ALPHA_ARB, layer.alphamod[1]);
+      if (layer.alphasource[2] != -1)
       {
-        glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_ALPHA_ARB, layer->alphasource[2]);
-        glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_ALPHA_ARB, layer->alphamod[2]);
+        glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_ALPHA_ARB, layer.alphasource[2]);
+        glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_ALPHA_ARB, layer.alphamod[2]);
       }
 
-      glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, layer->alphap);
+      glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, layer.alphap);
 
-      glTexEnvf(GL_TEXTURE_ENV, GL_ALPHA_SCALE, layer->scale_alpha);
+      glTexEnvf(GL_TEXTURE_ENV, GL_ALPHA_SCALE, layer.scale_alpha);
     }
   }
 }
