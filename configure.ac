@@ -1095,7 +1095,7 @@ AS_IF([test $cs_cv_sys_pthread = yes],
 	    pthread_mutexattr_t attr;
 	    pthread_mutexattr_init (&attr);
 	    pthread_mutexattr_settype (&attr, PTHREAD_MUTEX_RECURSIVE_NP);])],
-	[], [], [CS_HEADER_PROPERTY([PTHREAD_MUTEX_HAS_RECURSIVE_NP])], [], [],
+	[], [C++], [CS_HEADER_PROPERTY([PTHREAD_MUTEX_HAS_RECURSIVE_NP])], [], [],
 	[$cs_cv_sys_pthread_cflags],
 	[$cs_cv_sys_pthread_lflags],
 	[$cs_cv_sys_pthread_libs])])
