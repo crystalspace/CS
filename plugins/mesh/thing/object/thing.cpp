@@ -255,7 +255,6 @@ void csThingStatic::Prepare ()
   
   if (prepared)
   {
-    UnprepareLMLayout ();
     PrepareLMLayout ();
   }
 }
@@ -310,7 +309,7 @@ void csThingStatic::PrepareLMLayout ()
     }
 
     csPolyLightMapMapping* lm = sp->GetLightMapMapping ();
-    if (lm != 0)
+    if ((lm != 0) && (sp->flags.Check (CS_POLY_LIGHTING)))
     {
       lp->numLitPolys++;
 
@@ -440,7 +439,7 @@ void csThingStatic::DistributePolyLMs (const csStaticPolyGroup& inputPolys,
     csPolygon3DStatic* sp = static_polygons[polyIdx];
 
     csPolyLightMapMapping* lm = sp->GetLightMapMapping ();
-    if (lm == 0)
+    if ((lm == 0) || (!sp->flags.Check (CS_POLY_LIGHTING)))
     {
       rejectedPolys->polys.Push (polyIdx);
       continue;
@@ -1391,6 +1390,7 @@ csThing::csThing (iBase *parent, csThingStatic* static_data) : polygons(32, 64)
   current_visnr = 1;
 
   lightmapsPrepared = false;
+  lightmapsDirty = true;
 }
 
 csThing::~csThing ()
@@ -2643,6 +2643,15 @@ csRenderMesh **csThing::GetRenderMeshes (int &num)
 }
 #endif
 
+struct PolyGroupSLM
+{
+  csRef<iSuperLightmap> SLM;
+  bool slmCreated;
+
+  // ctor has a parameter so csHash<> can construct this struct from 0
+  PolyGroupSLM (int x = 0) { (void)x; slmCreated = false; }
+};
+
 void csThing::PrepareLMs ()
 {
   if (lightmapsPrepared) return;
@@ -2650,48 +2659,71 @@ void csThing::PrepareLMs ()
   csThingObjectType* thing_type = static_data->thing_type;
   iTextureManager* txtmgr = thing_type->G3D->GetTextureManager ();
 
-  csHash<csRef<iSuperLightmap> > superLMs;
+  csHash<PolyGroupSLM> superLMs;
 
   int i;
   for (i = 0; i < static_data->litPolys.Length(); i++)
   {
     const csThingStatic::csStaticLitPolyGroup& slpg = 
       *(static_data->litPolys[i]);
-    csLitPolyGroup* lpg = new csLitPolyGroup;
-    lpg->material = FindRealMaterial (slpg.material);
-    if (lpg->material == 0) lpg->material = slpg.material;
+
+    //csPolygon3D
 
     csRef<iSuperLightmap> SLM;
 
     // @@@ 64-bit portability!
     uint32 hashKey = (uint32)slpg.staticSLM;
-    if ((SLM = superLMs.Get (hashKey)) == 0)
+    PolyGroupSLM pgSLM = superLMs.Get (hashKey);
+
+    if (!pgSLM.slmCreated)
     {
-      SLM = txtmgr->CreateSuperLightmap (slpg.staticSLM->width, 
-        slpg.staticSLM->height);
-      superLMs.Put (hashKey, SLM);
+      pgSLM.SLM = txtmgr->CreateSuperLightmap (slpg.staticSLM->width, 
+        slpg.staticSLM->height);;
+      pgSLM.slmCreated = true;
+      superLMs.Put (hashKey, pgSLM);
     }
 
-    lpg->SLM = SLM;
-
-    int j;
-    for (j = 0; j < slpg.polys.Length(); j++)
+    // SLM creation failed for some reason. The polys will be drawn unlit.
+    if ((SLM = pgSLM.SLM) == 0)
     {
-      csPolygon3D* poly = polygons[slpg.polys[j]];
+      csPolyGroup* pg = new csPolyGroup;
+      pg->material = FindRealMaterial (slpg.material);
+      if (pg->material == 0) pg->material = slpg.material;
 
-      lpg->polys.Push (poly);
-      const csRect& r = slpg.lmRects[j];
-      csRef<iRendererLightmap> rlm = 
-	SLM->RegisterLightmap (r.xmin, r.ymin, r.Width (), r.Height ());
-      
-      csPolyTexture* polytxt = poly->GetPolyTexture ();
-      rlm->SetLightCellSize (polytxt->GetLightCellSize ());
-      polytxt->SetRendererLightmap (rlm);
+      int j;
+      for (j = 0; j < slpg.polys.Length(); j++)
+      {
+	pg->polys.Push (polygons[slpg.polys[j]]);
+      }
 
-      lpg->lightmaps.Push (rlm);
+      unlitPolys.Push (pg);
     }
+    else
+    {
+      csLitPolyGroup* lpg = new csLitPolyGroup;
+      lpg->material = FindRealMaterial (slpg.material);
+      if (lpg->material == 0) lpg->material = slpg.material;
+      lpg->SLM = SLM;
 
-    litPolys.Push (lpg);
+      int j;
+      for (j = 0; j < slpg.polys.Length(); j++)
+      {
+	csPolygon3D* poly = polygons[slpg.polys[j]];
+
+	lpg->polys.Push (poly);
+	const csRect& r = slpg.lmRects[j];
+	csRef<iRendererLightmap> rlm = 
+	  SLM->RegisterLightmap (r.xmin, r.ymin, r.Width (), r.Height ());
+        
+	csPolyTexture* polytxt = poly->GetPolyTexture ();
+	rlm->SetLightCellSize (polytxt->GetLightCellSize ());
+	polytxt->SetRendererLightmap (rlm);
+
+	lpg->lightmaps.Push (rlm);
+      }
+
+      litPolys.Push (lpg);
+    }
   }
 
   for (i = 0; i < static_data->unlitPolys.Length(); i++)

@@ -213,12 +213,6 @@ void csTextureHandle::AdjustSizePo2 ()
   CalculateNextBestPo2Size (image->GetWidth(), image->GetHeight(),
     newwidth, newheight);
 
-  if (!csIsPowerOf2(newwidth))
-    newwidth = csFindNearestPowerOf2 (image->GetWidth ()) / 2;
-
-  if (!csIsPowerOf2 (newheight))
-    newheight = csFindNearestPowerOf2 (image->GetHeight ()) / 2;
-
   if (newwidth != image->GetWidth () || newheight != image->GetHeight ())
     image->Rescale (newwidth, newheight);
 }

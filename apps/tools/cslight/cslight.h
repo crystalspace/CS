@@ -33,23 +33,35 @@ struct iVirtualClock;
 struct iEvent;
 
 /**
- * Graphical progress meter.
+ * Combined graphical and text progress meter.
  */
-class csGfxProgressMeter : public iProgressMeter
+class csCsLightProgressMeter : public iProgressMeter
 {
 private:
   int granularity;
   int total;
   int current;
   char cur_description[256];
+  int tick_scale;
+  int anchor;
 
 public:
   /// Constructs a new progress meter.
-  csGfxProgressMeter (int total = 100);
+  csCsLightProgressMeter (int total = 100);
   /// Destroys the progress meter.
-  virtual ~csGfxProgressMeter () {}
+  virtual ~csCsLightProgressMeter () {}
 
   SCF_DECLARE_IBASE;
+
+  /**
+   * Set the tick scale.  Valid values are 1-100, inclusive.  Default is 2.  A
+   * value of 1 means that each printed tick represents one unit, thus a total
+   * of 100 ticks will be printed.  A value of 2 means that each tick
+   * represents two units, thus a total of 50 ticks will be printed, etc.
+   */
+  void SetTickScale (int);
+  /// Get the tick scale.
+  int GetTickScale () const { return tick_scale; }
 
   /**
    * Set the id and description of what we are currently monitoring.
@@ -61,7 +73,7 @@ public:
   /// Increment the meter by one unit and print a tick mark.
   virtual void Step ();
   /// Reset the meter to 0%.
-  virtual void Reset () { current = 0; }
+  virtual void Reset () { current = 0; anchor = 0; }
   /// Reset the meter and print the initial tick mark ("0%").
   virtual void Restart ();
   /// Abort the meter.

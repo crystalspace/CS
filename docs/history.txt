@@ -14,6 +14,17 @@ chronological order.
 	  is ERROR or BUG. That way error messages sent to the reporter
 	  will not get lost even if the standard reporter listener didn't
 	  have a chance yet to register itself to the reporter.
+	- res made the following changes:
+	    - Thing is more robust (i.e. no crash) is case the renderer
+	      returns a 0 super ligthmap. (As Null3d does.)
+	    - The Thing LM layouter did not honor a polygons 'lighting' flag.
+	      It assumed all polys were lit.
+	    - Fixed a misplaced call to a cleanup function Thing, causing
+	      lightmap layouts to be discarded and recalculated way too often.
+	    - Null3d now adjusts texture dimensions the same way Soft3d and GL
+	      do.
+	    - cslight now displays a text progress meter on the console, in
+	      addition to the graphical meter.
 27-Aug-2003
 	- Eric Sunshine fixed problem in csHash where non-friend classes
 	  csHash::Iterator and GlobalIterator were accessing protected csHash

@@ -424,6 +424,7 @@ void csSoftRendererLightmap::GetSLMCoords (int& left, int& top,
     
 void csSoftRendererLightmap::SetData (csRGBpixel* data)
 {
+  CS_ASSERT(data != 0);
   csSoftRendererLightmap::data = data;
   dirty = true;
 }

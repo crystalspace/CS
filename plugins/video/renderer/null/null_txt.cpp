@@ -76,6 +76,9 @@ csTextureHandleNull::csTextureHandleNull (csTextureManagerNull *txtmgr,
 {
   pal2glob = 0;
   (texman = txtmgr)->IncRef ();
+
+  if (flags & CS_TEXTURE_3D)
+    AdjustSizePo2 ();
 }
 
 csTextureHandleNull::~csTextureHandleNull ()

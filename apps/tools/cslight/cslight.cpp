@@ -38,6 +38,7 @@
 #include "iutil/virtclk.h"
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"
+#include "ivaria/stdrep.h"
 #include "igraphic/imageio.h"
 
 CS_IMPLEMENT_APPLICATION
@@ -47,17 +48,18 @@ Lighter* System;
 
 //-----------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csGfxProgressMeter)
+SCF_IMPLEMENT_IBASE (csCsLightProgressMeter)
   SCF_IMPLEMENTS_INTERFACE (iProgressMeter)
 SCF_IMPLEMENT_IBASE_END
 
-csGfxProgressMeter::csGfxProgressMeter (int n)
-	: granularity(10), total(n), current(0)
+csCsLightProgressMeter::csCsLightProgressMeter (int n)
+	: granularity(10), total(n), current(0), tick_scale(2),
+	  anchor(0)
 {
   SCF_CONSTRUCT_IBASE (0);
 }
 
-void csGfxProgressMeter::SetProgressDescription (const char* id,
+void csCsLightProgressMeter::SetProgressDescription (const char* id,
 	const char* description, ...)
 {
   va_list arg;
@@ -66,17 +68,45 @@ void csGfxProgressMeter::SetProgressDescription (const char* id,
   va_end (arg);
 }
 
-void csGfxProgressMeter::SetProgressDescriptionV (const char* /*id*/,
+void csCsLightProgressMeter::SetProgressDescriptionV (const char* /*id*/,
 	const char* description, va_list list)
 {
   vsprintf (cur_description, description, list);
 }
 
-void csGfxProgressMeter::Step()
+void csCsLightProgressMeter::Step()
 {
   if (current < total)
   {
     current++;
+
+    int const units = (current == total ? 100 :
+      (((100 * current) / total) / granularity) * granularity);
+    int const extent = units / tick_scale;
+    if (anchor < extent)
+    {
+      char buff [256]; // Batch the update here before emitting it.
+      char const* safety_margin = buff + sizeof(buff) - 5;
+      char* p = buff;
+	  int i;
+      for (i = anchor + 1; i <= extent && p < safety_margin; i++)
+      {
+        if (i % (10 / tick_scale) != 0)
+	  *p++ = '.';
+	else
+	{
+          int n;
+	  sprintf(p, "%d%%%n", i * tick_scale, &n );
+	  p += n;
+	}
+      }
+      *p = '\0';
+      printf ("%s", buff);
+      anchor = extent;
+    }
+    if (current == total)
+      printf ("\n");
+
     int fw = System->g2d->GetWidth ();
     int fh = System->g2d->GetHeight ();
     int where = current * (fw-20) / total;
@@ -98,22 +128,25 @@ void csGfxProgressMeter::Step()
   }
 }
 
-void csGfxProgressMeter::Restart()
+void csCsLightProgressMeter::Restart()
 {
   Reset();
+  printf ("0%%");
 }
 
-void csGfxProgressMeter::Abort ()
+void csCsLightProgressMeter::Abort ()
 {
   current = total;
+  printf ("\n");
 }
 
-void csGfxProgressMeter::Finalize ()
+void csCsLightProgressMeter::Finalize ()
 {
   current = total;
+  printf ("\n");
 }
 
-void csGfxProgressMeter::SetGranularity(int n)
+void csCsLightProgressMeter::SetGranularity(int n)
 {
   if (n >= 1 && n <= 100)
     granularity = n;
@@ -208,13 +241,33 @@ bool Lighter::Initialize (int argc, const char* const argv[],
 	CS_REQUEST_SOFTWARE3D,
 	CS_REQUEST_ENGINE,
 	CS_REQUEST_FONTSERVER,
-	CS_REQUEST_PLUGIN("crystalspace.font.server.freetype", iFontServer),
+	CS_REQUEST_PLUGIN("crystalspace.font.server.freetype2", iFontServer),
 	CS_REQUEST_IMAGELOADER,
 	CS_REQUEST_LEVELLOADER,
+	CS_REQUEST_REPORTERLISTENER,
+	CS_REQUEST_REPORTER,
 	CS_REQUEST_END))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Can't init app!");
     return false;
+  }
+
+  csRef<iStandardReporterListener> repl (CS_QUERY_REGISTRY (object_reg, iStandardReporterListener));
+  if (repl)
+  {
+    // tune the reporter to be a bit more chatty
+    repl->SetMessageDestination (
+  	  CS_REPORTER_SEVERITY_BUG, false, true, true, true, true);
+    repl->SetMessageDestination (
+  	  CS_REPORTER_SEVERITY_ERROR, false, true, true, true, true);
+    repl->SetMessageDestination (
+  	  CS_REPORTER_SEVERITY_WARNING, true, false, true, false, true);
+    repl->SetMessageDestination (
+  	  CS_REPORTER_SEVERITY_NOTIFY, true, false, true, false, true);
+    repl->SetMessageDestination (
+  	  CS_REPORTER_SEVERITY_DEBUG, true, false, true, false, true);
+    repl->ShowMessageID (CS_REPORTER_SEVERITY_WARNING, true);
+    repl->ShowMessageID (CS_REPORTER_SEVERITY_NOTIFY, true);
   }
 
   // Check for commandline help.
@@ -369,7 +422,7 @@ bool Lighter::Initialize (int argc, const char* const argv[],
     map_idx++;
   }
 
-  csGfxProgressMeter* meter = new csGfxProgressMeter (320);
+  csCsLightProgressMeter* meter = new csCsLightProgressMeter (320);
   engine->Prepare (meter);
   delete meter;
 
