@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-Aug-2003
+	- Jorrit fixed a compile error in freefnt2 font server related to the
+	  csRefArray->csArray change.
 5-Aug-2003
 	- Jorrit fixed metaball.mak. Was missing a CSUTIL dependency after
 	  CSSYS.

@@ -185,10 +185,7 @@ class csFreeType2Server : public iFontServer
   class csFontVector : public csRefArray<csFreeType2Font>
   {
   public:
-    static int Compare (csFreeType2Font const* Item1,
-    	csFreeType2Font const* Item2)
-    { return strcmp (Item1->name, Item2->name); }
-    static int CompareKey (csFreeType2Font* Item1, void* Key)
+    static int CompareKey (const csRef<csFreeType2Font>& Item1, void* Key)
     {
       // compare the font names
       const char *id1 = Item1->name;
