@@ -23,6 +23,7 @@
 #include <math.h>
 
 #include "cssysdef.h"
+#include "cssys/sysfunc.h"
 
 #include "iutil/strset.h"
 #include "iutil/document.h"
@@ -33,9 +34,9 @@
 #include "csutil/symtable.h"
 
 #if defined(CS_DEBUG)
-#define DEBUG_PRINTF(x...) printf(x)
+#define DEBUG_PRINTF csPrintf
 #else
-#define DEBUG_PRINTF(x...) 
+#define DEBUG_PRINTF while(0) csPrintf
 #endif
 
 enum {

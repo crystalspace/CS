@@ -53,6 +53,11 @@ chronological order.
 	- Anders Stenberg made the buffer and texture activation in NR more
 	  efficient. Also made sure render mesh lists are sorted on material
 	  to minimize state switches.
+	- DeSigna:
+	  - fixed compilation error for VC6, the debug macro's use of
+	    variable arguments isn't valid
+	  - Macro now uses csPrintf (not a big issue, since it'll all be removed 
+	    once the shaderexps are complete).
 16-Oct-2003
 	- Jorrit fixed a big memory leak related to the engine sequence
 	  manager. There are actually three fixes to solve this bug:
