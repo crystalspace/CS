@@ -9,6 +9,10 @@ The history order is reversed so that new features are at the top.
 	- Extended the unit tester for CalculateOutline().
 	- Replaced the normals with planes in the csObjectModelManager from
 	  Dynavis.
+	- Fixed a bug in CS which caused problems with portals that go
+	  between sectors that contain static polygon trees. The c-buffer
+	  was not cleared properly when the portal was on a mesh that itself
+	  doesn't have the static tree.
 22-May-2002
 	- Updated apimod96 for new csParser class.
 	- Some minor code cleanup in the new csParser class. It was already

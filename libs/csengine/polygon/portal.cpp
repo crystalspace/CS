@@ -278,7 +278,6 @@ bool csPortal::Draw (
   }
 
   // When going through a portal we first remember the old clipper
-
   // and clip plane (if any). Then we set a new one. Later we restore.
   iGraphics3D *G3D = rview->GetGraphics3D ();
   iClipper2D *old_clipper = G3D->GetClipper ();

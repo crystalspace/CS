@@ -1418,7 +1418,6 @@ void csThing::DrawOnePolygon (
     // do this because the c-buffer algo for this sector has finished
     // anyway.
     if (
-      p->GetParent ()->GetStaticTree () &&
       csEngine::current_engine->GetEngineMode () == CS_ENGINE_FRONT2BACK)
     {
       csCBuffer *c_buffer = csEngine::current_engine->GetCBuffer ();
@@ -3035,14 +3034,10 @@ void csThing::DrawPolygonsFromQueue (
 }
 
 void *csThing::DrawPolygons (
-  csThing *
-
-  /*thing*/,
+  csThing * /*thing*/,
   csPolygonInt **polygon,
   int num,
-  bool
-
-  /*same_plane*/,
+  bool /*same_plane*/,
   void *data)
 {
   iRenderView *d = (iRenderView *)data;
