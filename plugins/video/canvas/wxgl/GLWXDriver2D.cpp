@@ -126,7 +126,7 @@ wxWindow* csGraphics2DWX::GetWindow()
 void* csGraphics2DWX::GetProcAddress (const char *funcname)
 {
 #ifdef WIN32
-  return wglGetProcAddress (funcname);
+  return (void*)wglGetProcAddress (funcname);
 #elif defined(USE_GLX)
   #if !defined(GLX_VERSION_1_4)
     return (void*) glXGetProcAddressARB ((const GLubyte*) funcname);
