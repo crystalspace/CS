@@ -91,9 +91,6 @@ protected:
   csRef<iRenderBuffer> index_buffer;
 
   csRef<iGraphics3D> g3d;
-
-  csRef<csShaderVariableContext> dynDomain;
-  csStringID vertex_name, texel_name, normal_name, color_name, index_name;
 #else
   /// The vertex buffer.
   csRef<iVertexBuffer> vbuf;
