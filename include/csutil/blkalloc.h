@@ -21,6 +21,12 @@
 
 #include "csutil/array.h"
 
+// hack: work around problems caused by #defining 'new'
+#ifdef CS_EXTENSIVE_MEMDEBUG
+# undef new
+#endif
+#include <new>
+
 /**
  * This class implements a memory allocator which can efficiently allocate
  * objects that all have the same size. It has NO memory overhead per allocation
@@ -318,6 +324,10 @@ public:
     fflush (stdout);
   }
 };
+
+#ifdef CS_EXTENSIVE_MEMDEBUG
+# define new CS_EXTENSIVE_MEMDEBUG_NEW
+#endif
 
 #endif
 
