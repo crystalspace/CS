@@ -12,10 +12,11 @@
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_%Name%;
     allclear = true;
-%FunctionsInit%
     if (init)
     {
+%FunctionsInit%
       EXTMGR_REPORT_INIT_RESULT("WGL", %Name%)
+      CS_%Name% &= allclear;
     }
     else
     {

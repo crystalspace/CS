@@ -120,26 +120,31 @@ CS_IMPLEMENT_PLUGIN
 # define CS_WINDOW_Z_ORDER HWND_TOPMOST
 #endif
 
-static void SystemFatalError (wchar_t* str, HRESULT hRes = S_OK)
+static void SystemFatalError (wchar_t* str, HRESULT hRes = ~0)
 {
-  wchar_t* lpMsgBuf;
+  wchar_t* newMsg = 0;
   wchar_t* szMsg;
   wchar_t szStdMessage[] = L"Last Error: ";
 
-  lpMsgBuf = cswinGetErrorMessageW (hRes);
+  if (hRes != ~0)
+  {
+    wchar_t* lpMsgBuf = cswinGetErrorMessageW (hRes);
 
-  szMsg = new wchar_t[wcslen (lpMsgBuf) + wcslen (str)
-    + wcslen (szStdMessage) + 1];
-  wcscpy (szMsg, str);
-  wcscat (szMsg, szStdMessage);
-  wcscat (szMsg, lpMsgBuf);
-
-  delete[] lpMsgBuf ;
+    szMsg = newMsg = new wchar_t[wcslen (lpMsgBuf) + wcslen (str)
+      + wcslen (szStdMessage) + 1];
+    wcscpy (szMsg, str);
+    wcscat (szMsg, szStdMessage);
+    wcscat (szMsg, lpMsgBuf);
+  
+    delete[] lpMsgBuf ;
+  }
+  else
+    szMsg = str;
 
   MessageBoxW (0, szMsg, L"Fatal Error in glwin32.dll", 
     MB_OK | MB_ICONERROR);
 
-  delete[] szMsg;
+  delete[] newMsg;
 
   exit(1);
 }

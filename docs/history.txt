@@ -13,7 +13,8 @@ chronological order.
 	  tag in the .map)
 	- Aren Blondahl patched map2cs's light format to comply with <radius> tag,
 	  and added in brightness / influence radius support.
-
+	- res fixed a crash bug in the Win32 GL canvas when the WGL "extension
+	  string" extension was not present.
 16-Apr-2004
 	- Jorrit fixed a crash at exit for genmesh with NR.
 	- Eric Sunshine fixed bug in Jam build system where msvcgen target

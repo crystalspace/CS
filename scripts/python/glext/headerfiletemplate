@@ -127,16 +127,13 @@ typedef uint32 GLhandleARB;
 #endif
 
 #define EXTMGR_FUNC_INIT(nameNC, nameUC) \
-      if (init) \
+      funcTest = ((nameNC = (cs##nameUC) gl->GetProcAddress (#nameNC)) != 0); \
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", \
+	REPORT_MISSING_ENTRIES)) \
       { \
-        funcTest = ((nameNC = (cs##nameUC) gl->GetProcAddress (#nameNC)) != 0); \
-        if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", \
-          REPORT_MISSING_ENTRIES)) \
-        { \
-          Report (msgExtRetrieveFail, #nameNC); \
-        } \
-        allclear &= funcTest; \
-      }
+	Report (msgExtRetrieveFail, #nameNC); \
+      } \
+      allclear &= funcTest; \
 
 #define EXTMGR_REPORT_INIT_RESULT(exttype, nameNC) \
       if (CS_##nameNC = allclear) \

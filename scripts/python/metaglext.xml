@@ -1598,7 +1598,7 @@
     <function name="glGetVertexAttribPointervARB" return="GLvoid" pointer="false">
       <arg name="index" type="GLuint" const="false" pointer="false" />
       <arg name="pname" type="GLenum" const="false" pointer="false" />
-      <arg name="pointer" type="GLvoid" const="false" pointer="true" />
+      <arg name="pointer" type="GLvoid*" const="false" pointer="true" />
     </function>
     <function name="glIsProgramARB" return="GLboolean" pointer="false">
       <arg name="program" type="GLuint" const="false" pointer="false" />
@@ -5802,171 +5802,171 @@
     <token name="GL_FLOAT_MAT2_ARB" value="0x8B5A" />
     <token name="GL_FLOAT_MAT3_ARB" value="0x8B5B" />
     <token name="GL_FLOAT_MAT4_ARB" value="0x8B5C" />
-    <function name="DeleteObjectARB" return="GLvoid" pointer="false">
+    <function name="glDeleteObjectARB" return="GLvoid" pointer="false">
       <arg name="obj" type="GLhandleARB" const="false" pointer="false" />
     </function>
-    <function name="GetHandleARB" return="GLhandleARB" pointer="false">
+    <function name="glGetHandleARB" return="GLhandleARB" pointer="false">
       <arg name="pname" type="GLenum" const="false" pointer="false" />
     </function>
-    <function name="DetachObjectARB" return="GLvoid" pointer="false">
+    <function name="glDetachObjectARB" return="GLvoid" pointer="false">
       <arg name="containerObj" type="GLhandleARB" const="false" pointer="false" />
       <arg name="attachedObj" type="GLhandleARB" const="false" pointer="false" />
     </function>
-    <function name="CreateShaderObjectARB" return="GLhandleARB" pointer="false">
+    <function name="glCreateShaderObjectARB" return="GLhandleARB" pointer="false">
       <arg name="shaderType" type="GLenum" const="false" pointer="false" />
     </function>
-    <function name="ShaderSourceARB" return="GLvoid" pointer="false">
+    <function name="glShaderSourceARB" return="GLvoid" pointer="false">
       <arg name="shaderObj" type="GLhandleARB" const="false" pointer="false" />
       <arg name="count" type="GLsizei" const="false" pointer="false" />
       <arg name="string" type="GLcharARB*" const="true" pointer="true" />
       <arg name="length" type="GLint" const="true" pointer="true" />
     </function>
-    <function name="CompileShaderARB" return="GLvoid" pointer="false">
+    <function name="glCompileShaderARB" return="GLvoid" pointer="false">
       <arg name="shaderObj" type="GLhandleARB" const="false" pointer="false" />
     </function>
-    <function name="CreateProgramObjectARB" return="GLhandleARB" pointer="false" />
-    <function name="AttachObjectARB" return="GLvoid" pointer="false">
+    <function name="glCreateProgramObjectARB" return="GLhandleARB" pointer="false" />
+    <function name="glAttachObjectARB" return="GLvoid" pointer="false">
       <arg name="containerObj" type="GLhandleARB" const="false" pointer="false" />
       <arg name="Obj" type="GLhandleARB" const="false" pointer="false" />
     </function>
-    <function name="LinkProgramARB" return="GLvoid" pointer="false">
+    <function name="glLinkProgramARB" return="GLvoid" pointer="false">
       <arg name="programObj" type="GLhandleARB" const="false" pointer="false" />
     </function>
-    <function name="UseProgramObjectARB" return="GLvoid" pointer="false">
+    <function name="glUseProgramObjectARB" return="GLvoid" pointer="false">
       <arg name="programObj" type="GLhandleARB" const="false" pointer="false" />
     </function>
-    <function name="ValidateProgramARB" return="GLvoid" pointer="false">
+    <function name="glValidateProgramARB" return="GLvoid" pointer="false">
       <arg name="programObj" type="GLhandleARB" const="false" pointer="false" />
     </function>
-    <function name="Uniform1fARB" return="GLvoid" pointer="false">
+    <function name="glUniform1fARB" return="GLvoid" pointer="false">
       <arg name="location" type="GLint" const="false" pointer="false" />
       <arg name="v0" type="GLfloat" const="false" pointer="false" />
     </function>
-    <function name="Uniform2fARB" return="GLvoid" pointer="false">
+    <function name="glUniform2fARB" return="GLvoid" pointer="false">
       <arg name="location" type="GLint" const="false" pointer="false" />
       <arg name="v0" type="GLfloat" const="false" pointer="false" />
       <arg name="v1" type="GLfloat" const="false" pointer="false" />
     </function>
-    <function name="Uniform3fARB" return="GLvoid" pointer="false">
+    <function name="glUniform3fARB" return="GLvoid" pointer="false">
       <arg name="location" type="GLint" const="false" pointer="false" />
       <arg name="v0" type="GLfloat" const="false" pointer="false" />
       <arg name="v1" type="GLfloat" const="false" pointer="false" />
       <arg name="v2" type="GLfloat" const="false" pointer="false" />
     </function>
-    <function name="Uniform4fARB" return="GLvoid" pointer="false">
+    <function name="glUniform4fARB" return="GLvoid" pointer="false">
       <arg name="location" type="GLint" const="false" pointer="false" />
       <arg name="v0" type="GLfloat" const="false" pointer="false" />
       <arg name="v1" type="GLfloat" const="false" pointer="false" />
       <arg name="v2" type="GLfloat" const="false" pointer="false" />
       <arg name="v3" type="GLfloat" const="false" pointer="false" />
     </function>
-    <function name="Uniform1iARB" return="GLvoid" pointer="false">
+    <function name="glUniform1iARB" return="GLvoid" pointer="false">
       <arg name="location" type="GLint" const="false" pointer="false" />
       <arg name="v0" type="GLint" const="false" pointer="false" />
     </function>
-    <function name="Uniform2iARB" return="GLvoid" pointer="false">
+    <function name="glUniform2iARB" return="GLvoid" pointer="false">
       <arg name="location" type="GLint" const="false" pointer="false" />
       <arg name="v0" type="GLint" const="false" pointer="false" />
       <arg name="v1" type="GLint" const="false" pointer="false" />
     </function>
-    <function name="Uniform3iARB" return="GLvoid" pointer="false">
+    <function name="glUniform3iARB" return="GLvoid" pointer="false">
       <arg name="location" type="GLint" const="false" pointer="false" />
       <arg name="v0" type="GLint" const="false" pointer="false" />
       <arg name="v1" type="GLint" const="false" pointer="false" />
       <arg name="v2" type="GLint" const="false" pointer="false" />
     </function>
-    <function name="Uniform4iARB" return="GLvoid" pointer="false">
+    <function name="glUniform4iARB" return="GLvoid" pointer="false">
       <arg name="location" type="GLint" const="false" pointer="false" />
       <arg name="v0" type="GLint" const="false" pointer="false" />
       <arg name="v1" type="GLint" const="false" pointer="false" />
       <arg name="v2" type="GLint" const="false" pointer="false" />
       <arg name="v3" type="GLint" const="false" pointer="false" />
     </function>
-    <function name="Uniform1fvARB" return="GLvoid" pointer="false">
+    <function name="glUniform1fvARB" return="GLvoid" pointer="false">
       <arg name="location" type="GLint" const="false" pointer="false" />
       <arg name="count" type="GLsizei" const="false" pointer="false" />
       <arg name="value" type="GLfloat" const="false" pointer="true" />
     </function>
-    <function name="Uniform2fvARB" return="GLvoid" pointer="false">
+    <function name="glUniform2fvARB" return="GLvoid" pointer="false">
       <arg name="location" type="GLint" const="false" pointer="false" />
       <arg name="count" type="GLsizei" const="false" pointer="false" />
       <arg name="value" type="GLfloat" const="false" pointer="true" />
     </function>
-    <function name="Uniform3fvARB" return="GLvoid" pointer="false">
+    <function name="glUniform3fvARB" return="GLvoid" pointer="false">
       <arg name="location" type="GLint" const="false" pointer="false" />
       <arg name="count" type="GLsizei" const="false" pointer="false" />
       <arg name="value" type="GLfloat" const="false" pointer="true" />
     </function>
-    <function name="Uniform4fvARB" return="GLvoid" pointer="false">
+    <function name="glUniform4fvARB" return="GLvoid" pointer="false">
       <arg name="location" type="GLint" const="false" pointer="false" />
       <arg name="count" type="GLsizei" const="false" pointer="false" />
       <arg name="value" type="GLfloat" const="false" pointer="true" />
     </function>
-    <function name="Uniform1ivARB" return="GLvoid" pointer="false">
+    <function name="glUniform1ivARB" return="GLvoid" pointer="false">
       <arg name="location" type="GLint" const="false" pointer="false" />
       <arg name="count" type="GLsizei" const="false" pointer="false" />
       <arg name="value" type="GLint" const="false" pointer="true" />
     </function>
-    <function name="Uniform2ivARB" return="GLvoid" pointer="false">
+    <function name="glUniform2ivARB" return="GLvoid" pointer="false">
       <arg name="location" type="GLint" const="false" pointer="false" />
       <arg name="count" type="GLsizei" const="false" pointer="false" />
       <arg name="value" type="GLint" const="false" pointer="true" />
     </function>
-    <function name="Uniform3ivARB" return="GLvoid" pointer="false">
+    <function name="glUniform3ivARB" return="GLvoid" pointer="false">
       <arg name="location" type="GLint" const="false" pointer="false" />
       <arg name="count" type="GLsizei" const="false" pointer="false" />
       <arg name="value" type="GLint" const="false" pointer="true" />
     </function>
-    <function name="Uniform4ivARB" return="GLvoid" pointer="false">
+    <function name="glUniform4ivARB" return="GLvoid" pointer="false">
       <arg name="location" type="GLint" const="false" pointer="false" />
       <arg name="count" type="GLsizei" const="false" pointer="false" />
       <arg name="value" type="GLint" const="false" pointer="true" />
     </function>
-    <function name="UniformMatrix2fvARB" return="GLvoid" pointer="false">
+    <function name="glUniformMatrix2fvARB" return="GLvoid" pointer="false">
       <arg name="location" type="GLint" const="false" pointer="false" />
       <arg name="count" type="GLsizei" const="false" pointer="false" />
       <arg name="transpose" type="GLboolean" const="false" pointer="false" />
       <arg name="value" type="GLfloat" const="false" pointer="true" />
     </function>
-    <function name="UniformMatrix3fvARB" return="GLvoid" pointer="false">
+    <function name="glUniformMatrix3fvARB" return="GLvoid" pointer="false">
       <arg name="location" type="GLint" const="false" pointer="false" />
       <arg name="count" type="GLsizei" const="false" pointer="false" />
       <arg name="transpose" type="GLboolean" const="false" pointer="false" />
       <arg name="value" type="GLfloat" const="false" pointer="true" />
     </function>
-    <function name="UniformMatrix4fvARB" return="GLvoid" pointer="false">
+    <function name="glUniformMatrix4fvARB" return="GLvoid" pointer="false">
       <arg name="location" type="GLint" const="false" pointer="false" />
       <arg name="count" type="GLsizei" const="false" pointer="false" />
       <arg name="transpose" type="GLboolean" const="false" pointer="false" />
       <arg name="value" type="GLfloat" const="false" pointer="true" />
     </function>
-    <function name="GetObjectParameterfvARB" return="GLvoid" pointer="false">
+    <function name="glGetObjectParameterfvARB" return="GLvoid" pointer="false">
       <arg name="obj" type="GLhandleARB" const="false" pointer="false" />
       <arg name="pname" type="GLenum" const="false" pointer="false" />
       <arg name="params" type="GLfloat" const="false" pointer="true" />
     </function>
-    <function name="GetObjectParameterivARB" return="GLvoid" pointer="false">
+    <function name="glGetObjectParameterivARB" return="GLvoid" pointer="false">
       <arg name="obj" type="GLhandleARB" const="false" pointer="false" />
       <arg name="pname" type="GLenum" const="false" pointer="false" />
       <arg name="params" type="GLint" const="false" pointer="true" />
     </function>
-    <function name="GetInfoLogARB" return="GLvoid" pointer="false">
+    <function name="glGetInfoLogARB" return="GLvoid" pointer="false">
       <arg name="obj" type="GLhandleARB" const="false" pointer="false" />
       <arg name="maxLength" type="GLsizei" const="false" pointer="false" />
       <arg name="length" type="GLsizei" const="false" pointer="true" />
       <arg name="infoLog" type="GLcharARB" const="false" pointer="true" />
     </function>
-    <function name="GetAttachedObjectsARB" return="GLvoid" pointer="false">
+    <function name="glGetAttachedObjectsARB" return="GLvoid" pointer="false">
       <arg name="containerObj" type="GLhandleARB" const="false" pointer="false" />
       <arg name="maxCount" type="GLsizei" const="false" pointer="false" />
       <arg name="count" type="GLsizei" const="false" pointer="true" />
       <arg name="obj" type="GLhandleARB" const="false" pointer="true" />
     </function>
-    <function name="GetUniformLocationARB" return="GLint" pointer="false">
+    <function name="glGetUniformLocationARB" return="GLint" pointer="false">
       <arg name="programObj" type="GLhandleARB" const="false" pointer="false" />
       <arg name="name" type="GLcharARB" const="true" pointer="true" />
     </function>
-    <function name="GetActiveUniformARB" return="GLvoid" pointer="false">
+    <function name="glGetActiveUniformARB" return="GLvoid" pointer="false">
       <arg name="programObj" type="GLhandleARB" const="false" pointer="false" />
       <arg name="index" type="GLuint" const="false" pointer="false" />
       <arg name="maxLength" type="GLsizei" const="false" pointer="false" />
@@ -5975,21 +5975,262 @@
       <arg name="type" type="GLenum" const="false" pointer="true" />
       <arg name="name" type="GLcharARB" const="false" pointer="true" />
     </function>
-    <function name="GetUniformfvARB" return="GLint" pointer="false">
+    <function name="glGetUniformfvARB" return="GLint" pointer="false">
       <arg name="programObj" type="GLhandleARB" const="false" pointer="false" />
       <arg name="location" type="GLint" const="false" pointer="false" />
       <arg name="params" type="GLfloat" const="false" pointer="true" />
     </function>
-    <function name="GetUniformivARB" return="GLint" pointer="false">
+    <function name="glGetUniformivARB" return="GLint" pointer="false">
       <arg name="programObj" type="GLhandleARB" const="false" pointer="false" />
       <arg name="location" type="GLint" const="false" pointer="false" />
       <arg name="params" type="GLint" const="false" pointer="true" />
     </function>
-    <function name="GetShaderSourceARB" return="GLvoid" pointer="false">
+    <function name="glGetShaderSourceARB" return="GLvoid" pointer="false">
       <arg name="obj" type="GLhandleARB" const="false" pointer="false" />
       <arg name="maxLength" type="GLsizei" const="false" pointer="false" />
       <arg name="length" type="GLsizei" const="false" pointer="true" />
       <arg name="source" type="GLcharARB" const="false" pointer="true" />
+    </function>
+  </extension>
+  <extension name="GL_ARB_fragment_shader" type="GL">
+    <token name="GL_FRAGMENT_SHADER_ARB" value="0x8B30" />
+    <token name="GL_MAX_FRAGMENT_UNIFORM_COMPONENTS_ARB" value="0x8B49" />
+    <token name="GL_MAX_TEXTURE_COORDS_ARB" value="0x8871" />
+    <token name="GL_MAX_TEXTURE_IMAGE_UNITS_ARB" value="0x8872" />
+    <token name="GL_OBJECT_TYPE_ARB" value="0x8B4E" />
+    <token name="GL_OBJECT_SUBTYPE_ARB" value="0x8B4F" />
+    <token name="GL_SHADER_OBJECT_ARB" value="0x8B48" />
+  </extension>
+  <extension name="GL_ARB_vertex_shader" type="GL">
+    <token name="GL_VERTEX_SHADER_ARB" value="0x8B31" />
+    <token name="GL_MAX_VERTEX_UNIFORM_COMPONENTS_ARB" value="0x8B4A" />
+    <token name="GL_MAX_VARYING_FLOATS_ARB" value="0x8B4B" />
+    <token name="GL_MAX_VERTEX_ATTRIBS_ARB" value="0x8869" />
+    <token name="GL_MAX_TEXTURE_IMAGE_UNITS_ARB" value="0x8872" />
+    <token name="GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS_ARB" value="0x884C" />
+    <token name="GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS_ARB" value="0x884D" />
+    <token name="GL_MAX_TEXTURE_COORDS_ARB" value="0x8871" />
+    <token name="GL_VERTEX_PROGRAM_POINT_SIZE_ARB" value="0x8642" />
+    <token name="GL_VERTEX_PROGRAM_TWO_SIDE_ARB" value="0x8643" />
+    <token name="GL_OBJECT_TYPE_ARB" value="0x8B4E" />
+    <token name="GL_OBJECT_SUBTYPE_ARB" value="0x8B4F" />
+    <token name="GL_OBJECT_ACTIVE_ATTRIBUTES_ARB" value="0x8B89" />
+    <token name="GL_OBJECT_ACTIVE_ATTRIBUTE_MAX_LENGTH_ARB" value="0x8B8A" />
+    <token name="GL_SHADER_OBJECT_ARB" value="0x8B48" />
+    <token name="GL_VERTEX_ATTRIB_ARRAY_ENABLED_ARB" value="0x8622" />
+    <token name="GL_VERTEX_ATTRIB_ARRAY_SIZE_ARB" value="0x8623" />
+    <token name="GL_VERTEX_ATTRIB_ARRAY_STRIDE_ARB" value="0x8624" />
+    <token name="GL_VERTEX_ATTRIB_ARRAY_TYPE_ARB" value="0x8625" />
+    <token name="GL_VERTEX_ATTRIB_ARRAY_NORMALIZED_ARB" value="0x886A" />
+    <token name="GL_CURRENT_VERTEX_ATTRIB_ARB" value="0x8626" />
+    <token name="GL_VERTEX_ATTRIB_ARRAY_POINTER_ARB" value="0x8645" />
+    <token name="GL_FLOAT_VEC2_ARB" value="0x8B50" />
+    <token name="GL_FLOAT_VEC3_ARB" value="0x8B51" />
+    <token name="GL_FLOAT_VEC4_ARB" value="0x8B52" />
+    <token name="GL_FLOAT_MAT2_ARB" value="0x8B5A" />
+    <token name="GL_FLOAT_MAT3_ARB" value="0x8B5B" />
+    <token name="GL_FLOAT_MAT4_ARB" value="0x8B5C" />
+    <function name="glVertexAttrib1sARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="x" type="GLshort" const="false" pointer="false" />
+    </function>
+    <function name="glVertexAttrib1fARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="x" type="GLfloat" const="false" pointer="false" />
+    </function>
+    <function name="glVertexAttrib1dARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="x" type="GLdouble" const="false" pointer="false" />
+    </function>
+    <function name="glVertexAttrib2sARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="x" type="GLshort" const="false" pointer="false" />
+      <arg name="y" type="GLshort" const="false" pointer="false" />
+    </function>
+    <function name="glVertexAttrib2fARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="x" type="GLfloat" const="false" pointer="false" />
+      <arg name="y" type="GLfloat" const="false" pointer="false" />
+    </function>
+    <function name="glVertexAttrib2dARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="x" type="GLdouble" const="false" pointer="false" />
+      <arg name="y" type="GLdouble" const="false" pointer="false" />
+    </function>
+    <function name="glVertexAttrib3sARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="x" type="GLshort" const="false" pointer="false" />
+      <arg name="y" type="GLshort" const="false" pointer="false" />
+      <arg name="z" type="GLshort" const="false" pointer="false" />
+    </function>
+    <function name="glVertexAttrib3fARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="x" type="GLfloat" const="false" pointer="false" />
+      <arg name="y" type="GLfloat" const="false" pointer="false" />
+      <arg name="z" type="GLfloat" const="false" pointer="false" />
+    </function>
+    <function name="glVertexAttrib3dARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="x" type="GLdouble" const="false" pointer="false" />
+      <arg name="y" type="GLdouble" const="false" pointer="false" />
+      <arg name="z" type="GLdouble" const="false" pointer="false" />
+    </function>
+    <function name="glVertexAttrib4sARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="x" type="GLshort" const="false" pointer="false" />
+      <arg name="y" type="GLshort" const="false" pointer="false" />
+      <arg name="z" type="GLshort" const="false" pointer="false" />
+      <arg name="w" type="GLshort" const="false" pointer="false" />
+    </function>
+    <function name="glVertexAttrib4fARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="x" type="GLfloat" const="false" pointer="false" />
+      <arg name="y" type="GLfloat" const="false" pointer="false" />
+      <arg name="z" type="GLfloat" const="false" pointer="false" />
+      <arg name="w" type="GLfloat" const="false" pointer="false" />
+    </function>
+    <function name="glVertexAttrib4dARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="x" type="GLdouble" const="false" pointer="false" />
+      <arg name="y" type="GLdouble" const="false" pointer="false" />
+      <arg name="z" type="GLdouble" const="false" pointer="false" />
+      <arg name="w" type="GLdouble" const="false" pointer="false" />
+    </function>
+    <function name="glVertexAttrib4NubARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="x" type="GLubyte" const="false" pointer="false" />
+      <arg name="y" type="GLubyte" const="false" pointer="false" />
+      <arg name="z" type="GLubyte" const="false" pointer="false" />
+      <arg name="w" type="GLubyte" const="false" pointer="false" />
+    </function>
+    <function name="glVertexAttrib1svARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLshort" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib1fvARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLfloat" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib1dvARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLdouble" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib2svARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLshort" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib2fvARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLfloat" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib2dvARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLdouble" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib3svARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLshort" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib3fvARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLfloat" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib3dvARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLdouble" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib4bvARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLbyte" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib4svARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLshort" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib4ivARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLint" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib4ubvARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLubyte" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib4usvARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLushort" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib4uivARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLuint" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib4fvARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLfloat" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib4dvARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLdouble" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib4NbvARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLbyte" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib4NsvARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLshort" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib4NivARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLint" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib4NubvARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLubyte" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib4NusvARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLushort" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib4NuivARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLuint" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttribPointerARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="size" type="GLint" const="false" pointer="false" />
+      <arg name="type" type="GLenum" const="false" pointer="false" />
+      <arg name="normalized" type="GLboolean" const="false" pointer="false" />
+      <arg name="stride" type="GLsizei" const="false" pointer="false" />
+      <arg name="pointer" type="GLvoid" const="true" pointer="true" />
+    </function>
+    <function name="glEnableVertexAttribArrayARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+    </function>
+    <function name="glDisableVertexAttribArrayARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+    </function>
+    <function name="glBindAttribLocationARB" return="GLvoid" pointer="false">
+      <arg name="programObj" type="GLhandleARB" const="false" pointer="false" />
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="name" type="GLcharARB" const="true" pointer="true" />
+    </function>
+    <function name="glGetActiveAttribARB" return="GLvoid" pointer="false">
+      <arg name="programObj" type="GLhandleARB" const="false" pointer="false" />
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="maxLength" type="GLsizei" const="false" pointer="false" />
+      <arg name="length" type="GLsizei" const="false" pointer="true" />
+      <arg name="size" type="GLint" const="false" pointer="true" />
+      <arg name="type" type="GLenum" const="false" pointer="true" />
+      <arg name="name" type="GLcharARB" const="false" pointer="true" />
+    </function>
+    <function name="glGetAttribLocationARB" return="GLint" pointer="false">
+      <arg name="programObj" type="GLhandleARB" const="false" pointer="false" />
+      <arg name="name" type="GLcharARB" const="true" pointer="true" />
+    </function>
+    <function name="glGetVertexAttribPointervARB" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="pname" type="GLenum" const="false" pointer="false" />
+      <arg name="pointer" type="GLvoid*" const="false" pointer="true" />
     </function>
   </extension>
 </extensionlist>

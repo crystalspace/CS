@@ -11,9 +11,9 @@
     (void)funcTest; // shut up "variable unused" warnings
     bool init = CS_%Name%;
     allclear = true;
-%FunctionsInit%
-    if (init)
+    if (init)	// Don't check the functions if ext isn't reported anyway
     {
+%FunctionsInit%
       EXTMGR_REPORT_INIT_RESULT("GL", %Name%)
     }
     else
