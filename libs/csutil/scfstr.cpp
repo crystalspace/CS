@@ -131,10 +131,10 @@ bool scfString::CompareNoCase (const iString* iStr) const
 { return s.CompareNoCase (iStr->GetData ()); }
 
 void scfString::operator += (const iString& iStr)
-{ return Append (&iStr); }
+{ Append (&iStr); }
 
 void scfString::operator += (const char* iStr)
-{ return Append (iStr); }
+{ Append (iStr); }
 
 csRef<iString> scfString::operator + (const iString& iStr) const
 {
