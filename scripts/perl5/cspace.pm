@@ -9433,6 +9433,7 @@ package cspace::iGraphics2D;
 *SetRGB = *cspacec::iGraphics2D_SetRGB;
 *FindRGB = *cspacec::iGraphics2D_FindRGB;
 *GetRGB = *cspacec::iGraphics2D_GetRGB;
+*GetRGBA = *cspacec::iGraphics2D_GetRGBA;
 *SetClipRect = *cspacec::iGraphics2D_SetClipRect;
 *GetClipRect = *cspacec::iGraphics2D_GetClipRect;
 *BeginDraw = *cspacec::iGraphics2D_BeginDraw;
