@@ -235,41 +235,6 @@
 #include "csgeom/crysball.h"
 #endif
 
-// CS Engine
-#ifndef NO_CSENGINE
-#include "csengine/arrays.h"
-#include "csengine/bezier.h"
-#include "csengine/camera.h"
-#include "csengine/campos.h"
-#include "csengine/cscoll.h"
-#include "csengine/curve.h"
-#include "csengine/engine.h"
-#include "csengine/halo.h"
-#include "csengine/lghtmap.h"
-#include "csengine/light.h"
-#include "csengine/lppool.h"
-#include "csengine/lview.h"
-#include "csengine/material.h"
-#include "csengine/meshobj.h"
-#include "csengine/movable.h"
-#include "csengine/pol2d.h"
-#include "csengine/poledges.h"
-#include "csengine/polygon.h"
-#include "csengine/polyplan.h"
-#include "csengine/polytext.h"
-#include "csengine/polytmap.h"
-#include "csengine/portal.h"
-#include "csengine/radiosty.h"
-#include "csengine/rdrprior.h"
-#include "csengine/region.h"
-#include "csengine/rview.h"
-#include "csengine/sector.h"
-#include "csengine/stats.h"
-#include "csengine/texture.h"
-#include "csengine/thing.h"
-#include "csengine/wirefrm.h"
-#endif
-
 // CS Tool
 #ifndef NO_CSTOOL
 #include "cstool/collider.h"

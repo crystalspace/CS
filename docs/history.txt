@@ -22,6 +22,9 @@ The history order is reversed so that new features are at the top.
 	- csPolygon3D class no longer requires access to csEngine and csLight
 	  classes.
 	- csPolygon3D now uses iMaterialWrapper instead of csMaterialWrapper.
+	- Removed all includes from from the include/csengine dir from css.h.
+	  Nothing (except for the engine) is supposed to include from
+	  include/csengine.
 	- Eric Sunshine removed the unmaintained, unfinished and unused
 	  scripts/swig directory.  Tagged the files with "UNMAINTAINED" in
 	  order to simplify the task of recovering them from the Attic if
