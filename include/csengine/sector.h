@@ -238,6 +238,12 @@ public:
   void UseCuller (const char* meshname);
 
   /**
+   * Use the given plugin as a visibility culler (should implement
+   * iVisibilityCuller).
+   */
+  void UseCullerPlugin (const char* plugname);
+
+  /**
    * Get the visibility culler that is used for this sector.
    * NULL if none.
    */
@@ -427,6 +433,8 @@ public:
       { return scfParent->draw_busy; }
     virtual void SetVisibilityCuller (const char *Name)
       { scfParent->UseCuller (Name); }
+    virtual void SetVisibilityCullerPlugin (const char *Name)
+      { scfParent->UseCullerPlugin (Name); }
     virtual iVisibilityCuller* GetVisibilityCuller () const
       { return scfParent->GetVisibilityCuller (); }
     virtual iMeshList* GetMeshes ()

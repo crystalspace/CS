@@ -22,6 +22,8 @@
 #include "csutil/csppulse.h"
 #include "csutil/debug.h"
 #include "iutil/vfs.h"
+#include "iutil/plugin.h"
+#include "iutil/objreg.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/txtmgr.h"
@@ -195,18 +197,18 @@ void csSector::RelinkMesh (iMeshWrapper *mesh)
 //----------------------------------------------------------------------
 void csSector::UseCuller (const char *meshname)
 {
-  // if there is already a culler in use, do nothing
-  if (culler_mesh) return ;
+  // If there is already a culler in use, do nothing.
+  if (culler) return;
 
-  // find the culler with the given name
+  // Find the culler with the given name.
   culler_mesh = meshes.FindByName (meshname);
-  if (!culler_mesh) return ;
+  if (!culler_mesh) return;
 
-  // query the culler interface from it
+  // Query the culler interface from it.
   culler = SCF_QUERY_INTERFACE_FAST (
       culler_mesh->GetMeshObject (),
       iVisibilityCuller);
-  if (!culler) return ;
+  if (!culler) { culler_mesh = NULL; return; }
 
   // load cache data
   char cachename[256];
@@ -223,8 +225,39 @@ void csSector::UseCuller (const char *meshname)
     th->GetMovable ()->UpdateMove ();
 
     iVisibilityObject *vo = SCF_QUERY_INTERFACE_FAST (th, iVisibilityObject);
-    vo->DecRef ();
     culler->RegisterVisObject (vo);
+    vo->DecRef ();
+  }
+}
+
+void csSector::UseCullerPlugin (const char *plugname)
+{
+  // If there is already a culler in use, do nothing.
+  if (culler) return;
+
+  culler_mesh = NULL;
+
+  // Load the culler plugin.
+  iPluginManager* plugmgr = CS_QUERY_REGISTRY (
+  	csEngine::object_reg, iPluginManager);
+  culler = CS_LOAD_PLUGIN (plugmgr, plugname, iVisibilityCuller);
+  if (!culler) return;
+
+  // load cache data
+  char cachename[256];
+  sprintf (cachename, "%s_%s", GetName (), plugname);
+  culler->Setup (cachename);
+
+  // Loop through all meshes and register them to the visibility culler.
+  int i;
+  for (i = 0; i < meshes.Length (); i++)
+  {
+    iMeshWrapper *th = meshes.Get (i);
+    th->GetMovable ()->UpdateMove ();
+
+    iVisibilityObject *vo = SCF_QUERY_INTERFACE_FAST (th, iVisibilityObject);
+    culler->RegisterVisObject (vo);
+    vo->DecRef ();
   }
 }
 
@@ -331,10 +364,10 @@ csPolygon3D *csSector::IntersectSegment (
   csVector3 obj_start, obj_end, obj_isect;
   csReversibleTransform movtrans;
 
+  //@@@ Should use 'culler' and not 'culler_mesh'!
   if (culler_mesh && !only_portals)
   {
     // culler_mesh has option CS_THING_MOVE_NEVER so
-
     // object space == world space.
     iMeshWrapper *mesh;
     iPolygon3D *ip = culler->IntersectSegment (start, end, isect, &r, &mesh);
@@ -353,6 +386,7 @@ csPolygon3D *csSector::IntersectSegment (
   {
     iMeshWrapper *mesh = meshes.Get (i);
     if (mesh->GetFlags ().Check (CS_ENTITY_INVISIBLE)) continue;
+    //@@@ Should use 'culler' and not 'culler_mesh'!
     if (culler_mesh && !only_portals && mesh == culler_mesh)
       continue;  // Already handled above.
 

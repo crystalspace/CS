@@ -40,7 +40,7 @@ struct iGraphics3D;
 struct iPolygon3D;
 struct iRenderView;
 
-SCF_VERSION (iSector, 0, 4, 1);
+SCF_VERSION (iSector, 0, 4, 2);
 
 /**
  * The iSector interface is used to work with "sectors". A "sector"
@@ -90,6 +90,11 @@ struct iSector : public iBase
    * this sector.
    */
   virtual void SetVisibilityCuller (const char *Name) = 0;
+  /**
+   * Use the specified plugin as the visibility culler for
+   * this sector.
+   */
+  virtual void SetVisibilityCullerPlugin (const char *Name) = 0;
   /**
    * Get the visibility culler that is used for this sector.
    * NULL if none.

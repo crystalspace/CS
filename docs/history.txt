@@ -11,6 +11,9 @@ The history order is reversed so that new features are at the top.
 	  It used the kdtree for traversal and will cull octree nodes
 	  against the view frustum. But that's all for now. This is also
 	  untested.
+	- Added new CULLERP command in a sector. With this command you can
+	  associate to a sector a visibility culler from a plugin instead
+	  of from a mesh (with the CULLER command).
 7-May-2002
 	- Implemented csKDTree::RemoveObject().
 	- Added lazy obj_bbox calculation in csKDTree. This is useful

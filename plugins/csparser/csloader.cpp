@@ -182,6 +182,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (COLOR)
   CS_TOKEN_DEF (CONVEX)
   CS_TOKEN_DEF (CULLER)
+  CS_TOKEN_DEF (CULLERP)
   CS_TOKEN_DEF (DETAIL)
   CS_TOKEN_DEF (DYNAMIC)
   CS_TOKEN_DEF (FACTORY)
@@ -2866,6 +2867,7 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (ADDON)
     CS_TOKEN_TABLE (CULLER)
+    CS_TOKEN_TABLE (CULLERP)
     CS_TOKEN_TABLE (FOG)
     CS_TOKEN_TABLE (LIGHT)
     CS_TOKEN_TABLE (MESHOBJ)
@@ -2880,7 +2882,8 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
   char* params;
 
   bool do_culler = false;
-  char bspname[100];
+  char bspname[100]; *bspname = 0;
+  char culplugname[100]; *culplugname = 0;
 
   iSector *sector = Engine->CreateSector (secname);
   Stats->sectors_loaded++;
@@ -2912,7 +2915,24 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
 	  return NULL;
 	}
 	else
+	{
           do_culler = true;
+	  *culplugname = 0;
+	}
+        break;
+      case CS_TOKEN_CULLERP:
+	if (!csScanStr (params, "%s", culplugname))
+	{
+	  ReportError (
+		"crystalspace.maploader.parse.sector",
+	  	"CULLERP expects the name of a visibility culling plugin!");
+	  return NULL;
+	}
+	else
+	{
+          do_culler = true;
+	  *bspname = 0;
+	}
         break;
       case CS_TOKEN_MESHREF:
         {
@@ -3030,7 +3050,13 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
     TokenError ("a sector");
 
   if (!(flags & CS_LOADER_NOBSP))
-    if (do_culler) sector->SetVisibilityCuller (bspname);
+    if (do_culler)
+    {
+      if (*bspname)
+        sector->SetVisibilityCuller (bspname);
+      else
+        sector->SetVisibilityCullerPlugin (culplugname);
+    }
   return sector;
 }
 
