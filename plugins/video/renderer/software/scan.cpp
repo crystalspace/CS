@@ -837,8 +837,8 @@ void Scan::init_draw (csGraphics3DSoftware* g3d, IPolygon3D* p, IPolygonTexture*
 void Scan::dump (csGraphics3DSoftware* pG3D)
 {
   IPolygonSet* piPS;
-  char* szName;
-  char* szParentName;
+  const char* szName;
+  const char* szParentName;
 
   poly->GetName(&szName);
   poly->GetParent(&piPS);
