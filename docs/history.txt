@@ -2,8 +2,13 @@ The history order is reversed so that new features are at the top.
 
 
 7-Feb-2002
-	- Philip Wyett fixed -fs switch under Windows GL and poor fps
-	  in fullscreen mode.
+	- Philip Wyett fixed -fs switch under Windows GL and poor fps in
+	  fullscreen mode.
+	- Eric Sunshine augmented the qsqrt() test in configure.ac so that it
+	  also now checks for bogus results from qsqrt() in optimize mode,
+	  rather than only testing if it compiles.  This is needed because some
+	  versions of gcc 3.2.x return incorrect results in optimize mode, such
+	  as qsqrt(1)=0.
 6-Feb-2002
 	- Eric Sunshine added FT_UINT_MAX and FT_ULONG_MAX defines to freefont2
 	  "make depend" flags to work around problem reported by David Calkins

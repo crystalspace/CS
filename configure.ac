@@ -526,7 +526,8 @@ AC_DEFUN([CS_MAKEFILE_BUILD_RESULT],
 
 #------------------------------------------------------------------------------
 # CS_MAKEFILE_BUILD_FLAGS(MESSAGE, CACHE-VAR, FLAGS, [LANGUAGE],
-#                         MAKEFILE-VARIABLE, [APPEND], [CACHE-VALUE])
+#                         MAKEFILE-VARIABLE, [APPEND], [CACHE-VALUE],
+#                         [ACTION-IF-RECOGNIED], [ACTION-IF-NOT-RECOGNIED])
 #	Check if the compiler or linker recognizes a command-line option.
 #	MESSAGE is the "checking" message.  CACHE-VAR is the shell cache
 #	variable which receives the flag recognized by the compiler or linker,
@@ -543,13 +544,18 @@ AC_DEFUN([CS_MAKEFILE_BUILD_RESULT],
 #	checking linker flags, rather than compiler flags, then you should
 #	specify $cs_build_lflags for this argument.  If APPEND is not the empty
 #	string, then CACHE-VALUE is appended to the existing value of the
-#	makefile variable.
+#	makefile variable.  If the command-line option was recognized, then
+#	ACTION-IF-RECOGNIZED is invoked, otherwise ACTION-IF-NOT-RECOGNIZED is
+#	invoked.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_MAKEFILE_BUILD_FLAGS],
     [AC_CACHE_CHECK([$1], [$2],
 	[CS_BUILD_IFELSE([], [$3], [$4],
 	    [$2=m4_default([$7],[$cs_build_cflags])], [$2=no])])
-    AS_IF([test "$$2" != no], [CS_MAKEFILE_PROPERTY([$5], [$$2], [$6])])])
+    AS_IF([test "$$2" != no],
+	[$8
+	CS_MAKEFILE_PROPERTY([$5], [$$2], [$6])],
+	[m4_default([$9],[:])])])
 
 
 
@@ -994,18 +1000,30 @@ AS_IF([test $enable_cpu_specific_instructions = yes],
 #------------------------------------------------------------------------------
 # Check for compiler optimization flags.
 #------------------------------------------------------------------------------
-CS_MAKEFILE_BUILD_FLAGS([how to enable optimizations],
-    [cs_cv_prog_cxx_optimize],
-    [CS_CREATE_TUPLE([-O3]) CS_CREATE_TUPLE([-O2]) CS_CREATE_TUPLE([-O])],
-    [C++], [CFLAGS.optimize], [+])
+AC_DEFUN([CS_CHECK_OPTIMIZE_FLAGS],
+    [AC_REQUIRE([AC_PROG_CC])
+    AC_REQUIRE([AC_PROG_CXX])
 
-CS_MAKEFILE_BUILD_FLAGS([if $CXX recognizes -fomit-frame-pointer],
-    [cs_cv_prog_cxx_omit_frame_pointer],
-    [CS_CREATE_TUPLE([-fomit-frame-pointer])], [C++], [CFLAGS.optimize], [+])
+    cs_optimize_flags=''
 
-CS_MAKEFILE_BUILD_FLAGS([if $CXX recognizes -ffast-math],
-    [cs_cv_prog_cxx_fast_math],
-    [CS_CREATE_TUPLE([-ffast-math])], [C++], [CFLAGS.optimize], [+])
+    CS_MAKEFILE_BUILD_FLAGS([how to enable optimizations],
+	[cs_cv_prog_cxx_optimize],
+	[CS_CREATE_TUPLE([-O3]) CS_CREATE_TUPLE([-O2]) CS_CREATE_TUPLE([-O])],
+	[C++], [CFLAGS.optimize], [+], [],
+	[cs_optimize_flags="$cs_optimize_flags $cs_build_cflags"])
+
+    CS_MAKEFILE_BUILD_FLAGS([if $CXX recognizes -fomit-frame-pointer],
+	[cs_cv_prog_cxx_omit_frame_pointer],
+	[CS_CREATE_TUPLE([-fomit-frame-pointer])],
+	[C++], [CFLAGS.optimize], [+], [],
+	[cs_optimize_flags="$cs_optimize_flags $cs_build_cflags"])
+
+    CS_MAKEFILE_BUILD_FLAGS([if $CXX recognizes -ffast-math],
+	[cs_cv_prog_cxx_fast_math],
+	[CS_CREATE_TUPLE([-ffast-math])], [C++], [CFLAGS.optimize], [+], [],
+	[cs_optimize_flags="$cs_optimize_flags $cs_build_cflags"])])
+
+CS_CHECK_OPTIMIZE_FLAGS
 
 
 
@@ -1091,25 +1109,22 @@ AS_IF([test $cs_cv_sys_pthread = yes],
 	[cs_cv_sys_pthread_recursive],
 	[CS_BUILD_IFELSE(
 	    [AC_LANG_PROGRAM(
-		[#ifndef _GNU_SOURCE
-		 #define _GNU_SOURCE
-		 #endif
-		 #include <pthread.h>
-		 ],
+		[#include <pthread.h>],
 		[pthread_mutexattr_t attr;
 		pthread_mutexattr_settype (&attr, CS_RECURSIVE);])],
-	    [CS_CREATE_TUPLE([-D_GNU_SOURCE -DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE]) \
-	    CS_CREATE_TUPLE([-D_GNU_SOURCE -DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE_NP])],
+	    [CS_CREATE_TUPLE([-DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE]) \
+	    CS_CREATE_TUPLE([-DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE_NP])],
 	    [C++],
 	    [cs_cv_sys_pthread_recursive=`echo $cs_build_cflags | \
 		sed 's/.*\(PTHREAD_MUTEX_RECURSIVE_*N*P*\).*/\1/'`],
 	    [cs_cv_sys_pthread_recursive=no],
-	    [$cs_cv_sys_pthread_cflags],
+	    [$cs_cv_sys_pthread_cflags -D_GNU_SOURCE],
 	    [$cs_cv_sys_pthread_lflags],
 	    [$cs_cv_sys_pthread_libs])])
     AS_IF([test $cs_cv_sys_pthread_recursive != no],
 	[CS_HEADER_PROPERTY([CS_PTHREAD_MUTEX_RECURSIVE],
 	    [$cs_cv_sys_pthread_recursive])])])
+
 
 
 #------------------------------------------------------------------------------
@@ -1780,59 +1795,65 @@ AS_IF([test $cs_cv_cxx_new_casts = no],
 #	Check if gcc is able to understand CS/include/qsqrt.h.  This test will
 #	catch not only versions of gcc which do not understand the assembly
 #	content, but also buggy versions which fail with an internal error on
-#	this file (such as the RedHat 7 gcc).  Sets the shell variable
-#	cs_cv_cxx_qsqrt_ok to "yes" if qsqrt.h is compilable, otherwise "no".
+#	this file (such as the RedHat 7 gcc).  Furthermore, check if qsqrt()
+#	actually returns reasonable results with compiler optimizations
+#	enabled, since it is reported that some versions of gcc 3.2.x return
+#	incorrect results, such as qsqrt(1)=0.  Sets the shell variable
+#	cs_cv_cxx_qsqrt_ok to "yes" if qsqrt.h is usable, otherwise "no".
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_QSQRT],
     [AC_REQUIRE([CS_CHECK_HOST_CPU])
     AC_REQUIRE([AC_PROG_CXX])
+    AC_REQUIRE([CS_CHECK_OPTIMIZE_FLAGS])
     AS_IF([test $ac_compiler_gnu = yes],
-	[AC_CACHE_CHECK([if qsqrt() compiles], [cs_cv_cxx_qsqrt_ok],
-	    [CS_BUILD_IFELSE(
+	[AC_CACHE_CHECK([if qsqrt() is usable], [cs_cv_cxx_qsqrt_ok],
+	    [AC_LANG_PUSH([C++])
+	    cs_cflags_save="$CXXFLAGS"
+	    CXXFLAGS="$CXXFLAGS $cs_optimize_flags"
+	    AC_RUN_IFELSE(
 		[AC_LANG_PROGRAM(
 		    [#define PROC_$cs_host_cpu_normalized
 		    #define COMP_GCC
 		    #include "include/qsqrt.h"],
-		    [float n = qsqrt(1.0f); (void)n;])],
-		[], [C++],
-		[cs_cv_cxx_qsqrt_ok=yes], [cs_cv_cxx_qsqrt_ok=no])])],
+		    [float n = qsqrt(1); exit (n == 0);])],
+		[cs_cv_cxx_qsqrt_ok=yes],
+		[cs_cv_cxx_qsqrt_ok=no],
+		[cs_cv_cxx_qsqrt_ok=no])
+	    CXXFLAGS="$cs_cflags_save"
+	    AC_LANG_POP([C++])])],
 	[cs_cv_cxx_qsqrt_ok=no])])
 
-AC_ARG_ENABLE([qsqrt],
-    [AC_HELP_STRING([--disable-qsqrt],
-      [disable qsqrt optimisation (sometimes triggers compiler bugs) (default
-	NO)])],
-    [enable_qsqrt=$enableval], [enable_qsqrt="yes"])
+CS_CHECK_QSQRT
+AS_IF([test $cs_cv_cxx_qsqrt_ok = no],
+    [CS_HEADER_PROPERTY([CS_NO_QSQRT])])
 
 
-AS_IF([test "$enable_qsqrt" = "yes" ],
-    [CS_CHECK_QSQRT],
-    [cs_cv_cxx_qsqrt_ok="no"])
-
-AS_IF([test "$cs_cv_cxx_qsqrt_ok" = "no"], [CS_HEADER_PROPERTY([CS_NO_QSQRT])])
 
 #------------------------------------------------------------------------------
 # Check if a compiler bug discovered in gcc 2.96 (RedHat and other unstable
 # versions) and gcc 3.0.1 causes qint() to misbehave.
 # -----------------------------------------------------------------------------
-AC_CACHE_CHECK([if qint() functions correctly], [cs_cv_cxx_qint_ok],
-    [AC_LANG_PUSH([C++])
-    cs_cflags_save="$CXXFLAGS"
-    AS_IF([test $ac_compiler_gnu = yes], [CXXFLAGS="$CXXFLAGS -O2"])
-    AC_RUN_IFELSE(
-	[AC_LANG_PROGRAM(
-	    [static inline long double2int(double val) {
-		long* l;
-		val += 68719476736.0;
-		l = (long*)((char*)&val + 2);
-		return *l; }],
-	    [exit(double2int(255.99) != 255);])],
+AC_DEFUN([CS_CHECK_QINT],
+    [AC_REQUIRE([CS_CHECK_OPTIMIZE_FLAGS])
+    AC_CACHE_CHECK([if qint() functions correctly], [cs_cv_cxx_qint_ok],
+	[AC_LANG_PUSH([C++])
+	cs_cflags_save="$CXXFLAGS"
+	CXXFLAGS="$CXXFLAGS $cs_optimize_flags"
+	AC_RUN_IFELSE(
+	    [AC_LANG_PROGRAM(
+		[static inline long double2int(double val) {
+		    long* l;
+		    val += 68719476736.0;
+		    l = (long*)((char*)&val + 2);
+		    return *l; }],
+		[exit(double2int(255.99) != 255);])],
 	    [cs_cv_cxx_qint_ok=yes],
 	    [cs_cv_cxx_qint_ok=no],
 	    [cs_cv_cxx_qint_ok=no])
-    CXXFLAGS="$cs_cflags_save"
-    AC_LANG_POP([C++])])
+	CXXFLAGS="$cs_cflags_save"
+	AC_LANG_POP([C++])])])
 
+CS_CHECK_QINT
 AS_IF([test $cs_cv_cxx_qint_ok = no],
     [CS_HEADER_PROPERTY([CS_QINT_WORKAROUND])])
 
