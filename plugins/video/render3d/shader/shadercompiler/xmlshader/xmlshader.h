@@ -228,7 +228,7 @@ public:
   csXMLShaderCompiler* compiler;
   csXMLShaderTech* activeTech;
   csRef<iGraphics3D> g3d;
-  const char* filename;
+  char* filename;
 };
 
 class csXMLShaderCompiler : public iShaderCompiler, public iComponent
