@@ -8,6 +8,10 @@ cat $5/cs-config.temppre	> cs-config
 echo "#	WARNING: This script is automatic generated! " >> cs-config
 echo				>> cs-config
 echo "prefix=$1" 		>> cs-config
+echo "#tweak if CRYSTAL var is set" >> cs-config
+echo "if test -n \"\$CRYSTAL\"; then" >> cs-config
+echo "	prefix=\"\$CRYSTAL\""	>> cs-config
+echo "fi"			>> cs-config
 echo "exec_prefix=\${prefix}"	>> cs-config
 echo "version=0.19"		>> cs-config
 echo "includedir=\${prefix}/include"	>> cs-config

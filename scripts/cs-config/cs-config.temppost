@@ -1,17 +1,17 @@
-# tweak if CRYSTAL var is set
-if test -n "$CRYSTAL"; then 
-	prefix="$CRYSTAL"
 #	is it a source distribution?
-	if test -e "$prefix"; then
-#		look for the lib files...
-#		a more or less dirty hack...
-#		FIXME: what if there are multiple libcssys.a???
-		libdir=`find "$CRYSTAL" -name "libcssys.a" -printf "%h"`
-		if test -z "$libdir"; then
-			echo "Couldn't detect dir with lib files, aborting!"
-			echo "  Did you already compile CS?"
-			exit 1
-		fi
+if test -e "$prefix"; then
+#	look for the lib files...
+#	a more or less dirty hack...
+#	FIXME: what if there are multiple libcssys.a???
+	if test -e "$prefix/lib/libcssys.a"; then
+	    libdir="$prefix/lib"
+	else
+	    libdir=`find "$CRYSTAL" -name "libcssys.a" -printf "%h"`
+	    if test -z "$libdir"; then
+	        echo "Couldn't detect dir with lib files, aborting!"
+		echo "  Did you already compile CS?"
+		exit 1
+	    fi  
 	fi
 fi
 
