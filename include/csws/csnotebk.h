@@ -123,7 +123,7 @@ enum
 class cspNotebookButton;
 
 /**
- * A notebook (OS/2 term, Windows term "property shit") is a collection
+ * A notebook (also called "property sheet") is a collection
  * of dialogs enclosed in a single window. The dialogs are divided into
  * several groups, each group gets its own "tab" on one of the sides
  * of the notebook. By clicking the "tab" you switch to that group of

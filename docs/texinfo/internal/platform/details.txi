@@ -11,8 +11,6 @@ you should read.
 
 @menu
 * NeXT Details:: MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep, NextStep
-* OS2 Details:: OS/2
 @end menu
 
 @importss{internal,platform,next.txi}
-@importss{internal,platform,os2.txi}

@@ -21,6 +21,19 @@ The history order is reversed so that new features are at the top.
 	  iEngine->GetMaxLightmapAspectRatio().
 	- csPolygon3D class no longer requires access to csEngine and csLight
 	  classes.
+	- Eric Sunshine removed the unmaintained, unfinished and unused
+	  scripts/swig directory.  Tagged the files with "UNMAINTAINED" in
+	  order to simplify the task of recovering them from the Attic if
+	  necessary.
+	- Eric Sunshine removed the unmaintained OS/2 port.  Tagged the
+	  following files and directories with "OS2_OBSOLETE" in order to
+	  simplify the task of recovering them from the Attic if necessary.
+	    docs/texinfo/build/platform/os2.txi
+	    docs/texinfo/internal/platform/os2.txi
+	    include/cssys/os2 libs/cssys/os2
+	    plugins/video/canvas/common/os2-keys.h
+	    plugins/video/canvas/csdive
+	    plugins/video/canvas/openglos2
 19-Dec-2002
 	- Added iDynLight->AddAffectedLightingInfo(). The plan is to make
 	  dynamic lights work on a base of meshes instead of curves and

@@ -16,9 +16,8 @@ architecture is one of the i586 family (Pentium).
 
 @item
 Operating System: You will need to be running a supported Operating System.
-Currently Crystal Space supports: Windows (32 bit), Linux, FreeBSD, NetBSD,
-MacOS/X, MacOS/X Server, @sc{openstep}, NeXTSTEP, @sc{os/2}, BeOS, Irix,
-@sc{gnu/hurd}, and @sc{ms-dos}.
+Currently Crystal Space supports: Windows (32 bit), Unix (Linux, FreeBSD,
+etc.), and MacOS/X.
 
 @item
 Development Environment: If you plan to use Crystal Space it is recommended

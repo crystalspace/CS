@@ -17,28 +17,13 @@ system is listed here it does not necessarily mean that it is 100% supported:
 
 @itemize @bullet
 @item
-BeOS (unmaintained)
+Windows (Windows 9x/NT/ME/2000/XP)
 
 @item
-@sc{dos} (unmaintained)
+Unix (Linux, FreeBSD, etc.)
 
 @item
-win32 (Windows 9x/NT/ME/2000/XP)
-
-@item
-FreeBSD, NetBSD
-
-@item
-Linux, @sc{gnu/hurd}
-
-@item
-MacOS/X, MacOS/X Server 1.0 (Rhapsody)
-
-@item
-OPENSTEP, NeXTSTEP
-
-@item
-@sc{os/2} (unmaintained)
+MacOS/X
 @end itemize
 
 @noindent

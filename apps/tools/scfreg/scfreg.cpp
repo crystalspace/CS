@@ -201,10 +201,6 @@ static bool RegisterServer (char *SharedLibraryFilename, csConfigFile &cfg,
 
 int main (int argc, char *argv[])
 {
-#if defined (__EMX__)	// Expand wildcards on OS/2+GCC+EMX
-  _wildcard (&argc, &argv);
-#endif
-
   int operation = 1;
   programname = argv [0];
 

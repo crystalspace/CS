@@ -1,5 +1,5 @@
 /*
-  OS/2 support for Crystal Space 3D library
+  Scan code support for Crystal Space 3D library
   Copyright (C) 1998 by Jorrit Tyberghein
   Written by Andrew Zabolotny <bit@eltech.ru>
 

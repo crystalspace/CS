@@ -58,10 +58,10 @@ struct GLProtoGlyphSet
  * of the font cache class, one "mainstream" suitable for most OpenGL
  * implementations using a texture (the font is cached on a texture),
  * and the second version which uses glBitmap() for text drawing, which
- * is meant for OpenGL's with either buggy or slow alpha-textures support,
- * such as OS/2 software OpenGL or MacOS OpenGL. To use the second version
- * of font cache, you should #define OPENGL_BITMAP_FONT in the cssysdef.h
- * header file for the respective platform.
+ * is meant for OpenGL's with either buggy or slow alpha-textures support.
+ * To use the second version of font cache, you should
+ * #define OPENGL_BITMAP_FONT in the cssysdef.h header file for the respective
+ * platform.
  */
 class GLFontCache
 {

@@ -134,8 +134,6 @@ Code which may be shared between system drivers that can make use of it.
 @sc{dos} using the @sc{djgpp} compiler
 @item CS/libs/cssys/next
 MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep, and NextStep
-@item CS/libs/cssys/os2
-@sc{os/2}
 @item CS/libs/cssys/unix
 Unix, Linux, FreeBSD, NetBSD, Solaris, Irix, etc.
 @item CS/libs/cssys/win32
@@ -384,9 +382,6 @@ Allegro Game driver
 @item CS/plugins/video/canvas/common
 Common code for 2D drivers
 
-@item CS/plugins/video/canvas/csdive
-@sc{os/2} @sc{dive} driver
-
 @item CS/plugins/video/canvas/ddraw
 Windows DirectDraw driver
 
@@ -416,9 +411,6 @@ MacOS/X Server 1.0 (Rhapsody), OpenStep, and NextStep drivers
 
 @item CS/plugins/video/canvas/openglcommon
 Common code for all OpenGL 2D drivers
-
-@item CS/plugins/video/canvas/openglos2
-OpenGL 2D driver for @sc{os/2}
 
 @item CS/plugins/video/canvas/openglwin
 OpenGL 2D driver for Windows

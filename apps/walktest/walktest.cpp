@@ -81,7 +81,7 @@
 #include "csengine/stats.h"
 #include "csengine/light.h"
 
-#if defined(OS_DOS) || defined(OS_WIN32) || defined (OS_OS2)
+#if defined(OS_DOS) || defined(OS_WIN32)
 #  include <io.h>
 #elif defined(OS_UNIX)
 #  include <unistd.h>

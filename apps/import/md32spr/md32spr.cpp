@@ -45,7 +45,7 @@
 
 CS_IMPLEMENT_APPLICATION
 
-#if defined (OS_OS2) || defined (OS_DOS)
+#if defined (OS_DOS)
   #define IS_A_PATH_SEPARATOR(c)	\
     (((c) == PATH_SEPARATOR) || ((c) == '/') || ((c) == ':'))
 #else

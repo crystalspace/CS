@@ -71,7 +71,7 @@ This will allow you to view the model in Walktest.  The @file{world} file
 defines a sample map and the @dfn{mesh objects} that make up the model.  If you
 are curious, you can use a text editor to look at the @file{world} for more
 information.  The sample @file{world} file is also reproduced below for
-convenience (@pxref{Sample ``World'' file}).
+convenience (@pxref{Conni Output,Sample ``World'' file}).
 
 @strong{Note}: The model here is loaded into walktest for testing purposes.
 Normally in your application there won't be a @file{world} file for each of

@@ -66,20 +66,19 @@ filenames, so if you're sure that you will never have to place some file on a
 
 @item
 Different platforms use different filename comparison criteria.  On Unix
-filenames are case-sensitive, while on @sc{dos}, @sc{os/2}, Windows, and
-Macintosh (HFS) they are case-insensitive.  To avoid problems always refer to
-files by their exact names.  For example, if you have a file on @sc{vfs} called
+filenames are case-sensitive, while on Windows, @sc{dos}, and Macintosh (HFS)
+they are case-insensitive.  To avoid problems always refer to files by their
+exact names.  For example, if you have a file on @sc{vfs} called
 @file{GaMe.DaT} you should open it exactly as @file{GaMe.DaT} and not as
 @file{game.dat} or @file{GAME.DAT}.  On @sc{dos}, the file will appear to be
 entirely upper-case @file{GAME.DAT}, but you should still use the correct name,
 @file{GaMe.DaT}, when opening it.
 
 @item
-Keep in mind that Unix @emph{can} delete currently opened files while
-@sc{dos}, @sc{os/2}, Windows and possibly others can not. So you should avoid
-deleting open files.  (@emph{Technical Note}: Actually this should work for
-files which are located in archives but is not advisable to do so---and has
-not been tested.)
+Keep in mind that Unix @emph{can} delete currently opened files while Windows,
+@sc{dos}, and possibly others can not.  So you should avoid deleting open
+files.  (@emph{Technical Note}: Actually this should work for files which are
+located in archives but is not advisable to do so---and has not been tested.)
 @end itemize
 
 @node VFS Configuration File, , VFS Details, VFS
@@ -194,11 +193,9 @@ VFS.Alias.Irix            = VFS.Unix
 VFS.Alias.NextStep        = VFS.Unix
 VFS.Alias.OpenStep        = VFS.Unix
 VFS.Alias.MacOS/X Server  = VFS.Unix
-VFS.Alias.BeOS            = VFS.Unix
 
 ; CP/M-style filesystems
 VFS.Alias.DOS             = VFS.CP/M
-VFS.Alias.OS/2            = VFS.CP/M
 VFS.Alias.Win32           = VFS.CP/M
 
 ; strange key names follow:

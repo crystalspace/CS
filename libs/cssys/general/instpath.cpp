@@ -36,7 +36,7 @@ bool csGetInstallPath (char *oInstallPath, size_t iBufferSize)
   size_t pl = strlen (path);
   // See if we have to add an ending path separator to the directory
   bool addsep = (path [pl - 1] != PATH_SEPARATOR)
-#if defined (OS_DOS) || defined (OS_OS2) || defined (OS_WIN32)
+#if defined (OS_DOS) || defined (OS_WIN32)
              && (path [pl - 1] != '/')
 #endif
     ;

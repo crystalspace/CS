@@ -199,10 +199,6 @@ Global Additions and Stuff:
 	[**] Remove Squawk after implementing a multi-view demo
 	     in WalkTest.
 
-Things to Check:
-	[O]  Does CS Still work on ports like OS/2, BeOS, MacOS/X,
-	     NextStep, OpenStep, DOS, ...
-
 Documentation Updates:
 	- Update the 'Configuration Files Section'.
 	- Write docs and/or HOWTO on the Python and LUA plugins.

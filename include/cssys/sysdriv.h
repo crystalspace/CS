@@ -27,8 +27,6 @@
 #  include "cssys/unix/unix.h"
 #elif defined(OS_WIN32)
 #  include "cssys/win32/win32.h"
-#elif defined(OS_OS2)
-#  include "cssys/os2/csos2.h"
 #elif defined(OS_DOS) && defined(COMP_GCC)
 #  include "cssys/djgpp/djgpp.h"
 #else

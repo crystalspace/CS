@@ -21,10 +21,9 @@ the @code{-mode} commandline option.
 @item Video.ScreenDepth = <depth>
 This option is for all ports of Crystal Space where it is possible to control
 the depth of the display from within Crystal Space itself (currently
-@sc{svgalib}, Windows (fullscreen), @sc{ggi}, @sc{os/2}, and @sc{djgpp} (with
-Allegro) support this option).  Use 8, 15, or 16 here (default is 8).  Note
-that 15 is not supported by the Windows version.  Note that the Windows
-version ignores the given depth if it is running in windowed mode. Note also
+@sc{svgalib}, Windows (fullscreen).  Use 8, 15, or 16 here (default is 8).
+Note that 15 is not supported by the Windows version.  Note that the Windows
+version ignores the given depth if it is running in windowed mode.  Note also
 that there is also an equivalent commandline option -depth.
 
 Special note for the X11 version: normally the X11 version will also
@@ -45,21 +44,22 @@ extension can also be enabled/disabled with the @code{-shm}/@code{-noshm}
 commandline options.
 
 @item Video.FullScreen = <yes/no>
-This option is only for the Windows and @sc{os/2} versions of Crystal Space
-and is @samp{yes} by default.  It is used to set the Crystal Space window to
-fullscreen.
+This option is available with some drivers.  It is used to set the Crystal
+Space window to fullscreen.
 
 @item Video.WindowX = <windowx>
-For @sc{os/2} only.  Window X position relative to bottom-left corner
-(percentage of total screen size).
+Window X position relative to bottom-left corner (percentage of total screen
+size).  Only available with some drivers.
 
 @item Video.WindowY = <windowy>
-For @sc{os/2} only.  Window Y position relative to bottom-left corner
-(percentage of total screen size).
+Window Y position relative to bottom-left corner (percentage of total screen
+size).  Only available with some drivers.
 
 @item Video.WindowW = <width>
-For @sc{os/2} only. Absolute window size (without frame and titlebar).
+Absolute window size (without frame and titlebar).  Only available with some
+drivers.
 
 @item Video.WindowH = <height>
-For @sc{os/2} only. Absolute window size (without frame and titlebar).
+Absolute window size (without frame and titlebar).  Only available with some
+drivers.
 @end table

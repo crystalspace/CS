@@ -5,7 +5,7 @@
 @sc{n}e@sc{xt}
 @end macro
 
-@node NeXT Details, OS2 Details, Platform Details, Platform Details
+@node NeXT Details, , Platform Details, Platform Details
 @subsection MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep, NextStep
 @cindex @sc{n}e@sc{xt} Details
 @cindex MacOS/X Details

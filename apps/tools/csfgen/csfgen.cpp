@@ -255,10 +255,6 @@ static bool Convert (const char *fontfile)
 
 int main (int argc, char* argv[])
 {
-#if defined (__EMX__)	// Expand wildcards on OS/2+GCC+EMX
-  _wildcard (&argc, &argv);
-#endif
-
   object_reg = csInitializer::CreateEnvironment (argc, argv);
   if (!object_reg) return -1;
 
