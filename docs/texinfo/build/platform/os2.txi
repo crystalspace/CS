@@ -4,7 +4,7 @@
 @sc{os}/2
 @end macro
 
-@node OS2, BeOS, MacOS/9, Platform Instructions
+@node OS2, BeOS, MacOS/9, Windows
 @subsection @sc{os}/2
 @cindex @sc{os}/2
 

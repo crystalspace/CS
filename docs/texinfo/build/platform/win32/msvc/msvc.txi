@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MSVC, Mingw, Unix, Platform Instructions
+@node MSVC, MSVC5, Windows, Windows
 @subsection Microsoft Visual C++ 
 @cindex Windows, Building
 
@@ -10,8 +10,6 @@ version you wish to compile CS with for info, compile
 instructions and FAQ.
 
 @menu
-* MSVC5::
-* MSVC6::
 @end menu
 
 @importssss{build,platform,win32,msvc,msvc5.txi}

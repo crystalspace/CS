@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MS-DOS, , BeOS, Platform Instructions
+@node MS-DOS, , BeOS, Windows
 @subsection @sc{ms-dos} - Using @sc{djgpp} Compiler
 @cindex @sc{ms-dos}
 

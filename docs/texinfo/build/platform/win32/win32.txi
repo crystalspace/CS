@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Windows, Problems, External Libraries, Building
+@node Windows, Problems, Platform Instructions, Building
 @section Windows (Win32)
 
 Crystal Space can be compiled for Windows (Win32) on both
@@ -11,8 +11,15 @@ The Windows port of Crystal Space is currently maintained by Philip
 Wyett @email{philipwyett@@dsl.pipex.com}.
 
 @menu
-* MSVC::
-* MINGW::
+* MSVC:: Microsoft Visual C++
+* MSVC5:: Microsoft Visual C++ 5
+* MSVC6:: Microsoft Visual C++ 6
+* MINGW:: CS MingW Free Compiler Package
+* NeXT:: MacOS/X, MacOS/X Server 1.0, OpenStep, NextStep
+* MacOS/9::
+* OS2:: @sc{os}/2
+* BeOS:: @sc{b}e@sc{os}
+* MS-DOS:: @sc{ms-dos} - Using @sc{djgpp} Compiler
 @end menu
 
 @importssss{build,platform,win32,msvc,msvc.txi}

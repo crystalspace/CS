@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MINGW, NeXT, Win32, Platform Instructions
+@node MINGW, NeXT, MSVC6, Windows
 @subsection CS MingW Free Compiler Package
 
 @noindent

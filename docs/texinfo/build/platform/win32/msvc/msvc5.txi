@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MSVC5, Mingw, Unix, Platform Instructions
+@node MSVC5, MSVC6, MSVC, Windows
 @subsection Microsoft Visual C++ 5
 @cindex Windows, Building
 
@@ -14,7 +14,7 @@
 * MSVC5 CREDIT:: Credits
 @end menu
 
-@node MSVC5 Intro, MSVC5 Required, Windows, MSVC5
+@node MSVC5 Intro, MSVC5 Required, MSVC5, MSVC5
 @subsubsection Introduction
 
 Compiling Crystal Space with @emph{Microsoft Developer Studio 5}
@@ -36,7 +36,7 @@ Alternatively you can email the Win32 port maintainer directly at the following:
 
 @email{philipwyett@@dsl.pipex.com}.
 
-@node MSVC5 Required, MSVC6 MSVC6, MSVC5 Intro, MSVC5
+@node MSVC5 Required, MSVC5 Compile, MSVC5 Intro, MSVC5
 @subsubsection Required/Optional External Libraries and Software
 
 All the following libraries and Software Development Kits (@sc{sdk}) unless
@@ -154,7 +154,7 @@ want to use DirectX (DDRAW/D3D) for graphics or have Python scripting support,
 then you don't have to compile it.  See the compilation instructions on how to
 remove the projects.
 
-@node MSVC5 Compile, MSVC5 Rundemo, MSVC5 MSVC6, MSVC6
+@node MSVC5 Compile, MSVC5 Rundemo, MSVC5 Required, MSVC5
 @subsubsection Compiling Crystal Space
 
 To compile Crystal Space, you'll have to perform the following steps.  If
@@ -191,7 +191,7 @@ grpall.lib - 0 error(s), 0 warning(s)
 @end example
 @end enumerate
 
-@node MSVC5 Rundemo, MSVC5 Workspace, MSVC5 Compile, MSVC6
+@node MSVC5 Rundemo, MSVC5 Workspace, MSVC5 Compile, MSVC5
 @subsubsection Running the Demonstration Applications
 
 The first app you should try is Walktest.  This program shows many of the
@@ -210,7 +210,7 @@ You can now continue with the next platform-independent step.  The remaining
 Windows-specific sections are only important when you want to compile your own
 application using Crystal Space.
 
-@node MSVC5 Workspace, MSVC5 User App, MSVC5 Rundemo, MSVC6
+@node MSVC5 Workspace, MSVC5 User App, MSVC5 Rundemo, MSVC5
 @subsubsection Structure of the Workspace
 
 @emph{Note}: If you find bugs in the @sc{msvc} project or workspace files
@@ -246,7 +246,7 @@ section of this manual dealing with plug-in modules.  @xref{Plug-In Drivers}.
 The @emph{Applications} are programs using some of these libraries, so they
 produce @file{.exe} files.
 
-@node MSVC5 User App, MSVC5 FAQ, MSVC5 Workspace, MSVC6
+@node MSVC5 User App, MSVC5 FAQ, MSVC5 Workspace, MSVC5
 @subsubsection Compiling Your Own Program Using Crystal Space
 
 It is assumed that you have set up @sc{msvc} projects before.  If you want to
@@ -286,7 +286,7 @@ They can be added just like the Crystal Space libraries, except that you can
 not use project dependencies.
 @end itemize
 
-@node MSVC5 FAQ, , MSVC5 User App, MSVC6
+@node MSVC5 FAQ, MSVC5 CREDIT, MSVC5 User App, MSVC5
 @subsubsection Frequently Asked Questions (@sc{faq})
 
 This is the list of frequently asked questions for the Win32 port of Crsytal
@@ -472,7 +472,7 @@ information, such as the operating system you are using, the compiler, which
 version of Crystal Space, and any special configuration information.
 @end itemize
 
-@node MSVC5 CREDIT, , MSVC5 User App, MSVC6
+@node MSVC5 CREDIT, , MSVC5 FAQ, MSVC5
 @subsubsection Credits
 
 The author would like to acknowledge the assistance of the following person(s)

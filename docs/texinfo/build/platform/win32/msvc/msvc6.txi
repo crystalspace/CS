@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MSVC6, Mingw, Unix, Platform Instructions
+@node MSVC6, MINGW, MSVC5, Windows
 @subsection Microsoft Visual C++ 6
 @cindex Windows, Building
 
@@ -13,7 +13,7 @@
 * MSVC6 FAQ:: Frequently Asked Questions (@sc{faq})
 @end menu
 
-@node MSVC6 Intro, MSVC6 Required, Windows, MSVC6
+@node MSVC6 Intro, MSVC6 Required, MSVC6, MSVC6
 @subsubsection Introduction
 
 In order to successfully compile the Crystal Space 3D Software Development
@@ -33,7 +33,7 @@ Alternatively you can email the Win32 port maintainer directly at the following:
 
 @email{philipwyett@@dsl.pipex.com}.
 
-@node MSVC6 Required, Windows MSVC5, MSVC6 Intro, MSVC6
+@node MSVC6 Required, MSVC6 Compile, MSVC6 Intro, MSVC6
 @subsubsection Required/Optional External Libraries and Software
 
 All the following libraries and Software Development Kits (@sc{sdk}) unless
@@ -150,7 +150,7 @@ want to use DirectX (DDRAW/D3D) for graphics or have Python scripting support,
 then you don't have to compile it.  See the compilation instructions on how to
 remove the projects.
 
-@node MSVC6 Compile, MSVC6 Rundemo, Windows MSVC5, MSVC6
+@node MSVC6 Compile, MSVC6 Rundemo, MSVC6 Required, MSVC6
 @subsubsection Compiling Crystal Space
 
 To compile Crystal Space, you'll have to perform the following steps.  If
@@ -206,7 +206,7 @@ You can now continue with the next platform-independent step.  The remaining
 Windows-specific sections are only important when you want to compile your own
 application using Crystal Space.
 
-@node MSVC6 Workspace, Win32 User App, Win32 Rundemo, Win32
+@node MSVC6 Workspace, MSVC6 User App, MSVC6 Rundemo, MSVC6
 @subsubsection Structure of the Workspace
 
 @emph{Note}: If you find bugs in the @sc{msvc} project or workspace files
