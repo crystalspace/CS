@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Feb-2005
+	- Chris made the minimum polygon UV determinant into a #define
+	  so that it would be more amenable to experimentation. 
 13-Feb-2005
 	- Peter Amstutz reorganized loading in the csVosA3DL plugin so
 	  that texture, material or geometry changes to 3D objects are

@@ -62,6 +62,14 @@ struct iMaterialWrapper;
 #define CS_POLY_LM_REFUSED	0x10000000
 
 /**
+ * This specifies the minimum allowed determinant for UV coordinate mapping
+ * on the polygon.  Lower this to allow polygon that use a very small portion
+ * of a texture map.  This cannot be made zero, otherwise division errors
+ * will occur.
+ */
+#define CS_POLY_MIN_UV_DET  0.0001f
+
+/**
  * This is our main static 3D polygon class. Polygons are used to construct the
  * faces of things.
  *<p>

@@ -686,7 +686,7 @@ void csPolygon3DStatic::SetTextureSpace (
   csMatrix2 m (uv2.x - uv1.x, uv3.x - uv1.x, uv2.y - uv1.y, uv3.y - uv1.y);
   float det = m.Determinant ();
 
-  if (ABS (det) < 0.0001f)
+  if (ABS (det) < CS_POLY_MIN_UV_DET)
   {
     bad_poly_counter++;
     if (csThingObjectType::do_verbose || bad_poly_counter < 10)
