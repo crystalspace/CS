@@ -123,7 +123,7 @@ static void SystemFatalError (char *str, HRESULT hRes = S_OK)
       LocalFree( lpMsgBuf );
 
       MessageBox (NULL, szMsg, "Fatal Error in glwin32.dll", 
-	MB_OK | MB_ICONERROR);
+        MB_OK | MB_ICONERROR);
       delete szMsg;
 
       exit(1);
@@ -226,12 +226,12 @@ static void CreateIdentityPalette (csRGBpixel *p)
 }
 
 csGraphics2DOpenGL::csGraphics2DOpenGL (iBase *iParent) :
-                   csGraphics2DGLCommon (iParent),
-                   m_nGraphicsReady (true),
-                   m_hWnd (NULL),
-                   m_bPalettized (false),
-                   m_bPaletteChanged (false),
-		   modeSwitched (true)
+  csGraphics2DGLCommon (iParent),
+  m_nGraphicsReady (true),
+  m_hWnd (NULL),
+  m_bPalettized (false),
+  m_bPaletteChanged (false),
+  modeSwitched (true)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiOpenGLInterface);
 }
@@ -392,7 +392,7 @@ bool csGraphics2DOpenGL::Open ()
 
   Report (CS_REPORTER_SEVERITY_NOTIFY,
     "Using %d bits per pixel (%d color mode), %d bits depth buffer.", 
-      Depth, 1 << (Depth == 32 ? 24 : Depth), m_nDepthBits);
+    Depth, 1 << (Depth == 32 ? 24 : Depth), m_nDepthBits);
 
   hGLRC = wglCreateContext (hDC);
   wglMakeCurrent (hDC, hGLRC);
@@ -626,15 +626,6 @@ void csGraphics2DOpenGL::SwitchDisplayMode (bool userMode)
     EnumDisplaySettings (NULL, ENUM_CURRENT_SETTINGS, &curdmode);
     memcpy (&dmode, &curdmode, sizeof (DEVMODE));
 
-    // check if we already are in the desired display mode
-    if (((int)curdmode.dmBitsPerPel == Depth) &&
-      ((int)curdmode.dmPelsWidth == Width) &&
-      ((int)curdmode.dmPelsHeight == Height) &&
-      (!m_nDisplayFrequency || (dmode.dmDisplayFrequency == m_nDisplayFrequency)))
-    {
-      // no action necessary
-      return;
-    }
     dmode.dmBitsPerPel = Depth;
     dmode.dmPelsWidth = Width;
     dmode.dmPelsHeight = Height;
@@ -648,11 +639,11 @@ void csGraphics2DOpenGL::SwitchDisplayMode (bool userMode)
       // so try without setting it.
       // but first check resolution/depth w/o refresh rate
       if (((int)curdmode.dmBitsPerPel == Depth) &&
-	((int)curdmode.dmPelsWidth == Width) &&
-	((int)curdmode.dmPelsHeight == Height))
+        ((int)curdmode.dmPelsWidth == Width) &&
+        ((int)curdmode.dmPelsHeight == Height))
       {
-	// no action necessary
-	return;
+        // no action necessary
+        return;
       }
       dmode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
       ti = ChangeDisplaySettings(&dmode, CDS_FULLSCREEN);
@@ -662,31 +653,31 @@ void csGraphics2DOpenGL::SwitchDisplayMode (bool userMode)
       //The cases below need error handling, as they are errors.
       switch (ti)
       {
-	case DISP_CHANGE_RESTART:
-	  //computer must restart for mode to work.
-	  Report (CS_REPORTER_SEVERITY_WARNING,
-	    "gl2d error: must restart for display change.");
-	  break;
-	case DISP_CHANGE_BADFLAGS:
-	  //Bad Flag settings
-	  Report (CS_REPORTER_SEVERITY_WARNING,
-		"gl2d error: display change bad flags.");
-	  break;
-	case DISP_CHANGE_FAILED:
-	  //Failure to display
-	  Report (CS_REPORTER_SEVERITY_WARNING,
-	    "gl2d error: display change failed.");
-	  break;
-	case DISP_CHANGE_NOTUPDATED:
-	  //No Reg Write Error
-	  Report (CS_REPORTER_SEVERITY_WARNING,
-	    "gl2d error: display change could not write registry.");
-	  break;
-	default:
-	  //Unknown Error
-	  Report (CS_REPORTER_SEVERITY_WARNING,
-	    "gl2d error: display change gave unknown error.");
-	  break;
+        case DISP_CHANGE_RESTART:
+          //computer must restart for mode to work.
+          Report (CS_REPORTER_SEVERITY_WARNING,
+            "gl2d error: must restart for display change.");
+          break;
+        case DISP_CHANGE_BADFLAGS:
+          //Bad Flag settings
+          Report (CS_REPORTER_SEVERITY_WARNING,
+            "gl2d error: display change bad flags.");
+          break;
+        case DISP_CHANGE_FAILED:
+          //Failure to display
+          Report (CS_REPORTER_SEVERITY_WARNING,
+            "gl2d error: display change failed.");
+          break;
+        case DISP_CHANGE_NOTUPDATED:
+          //No Reg Write Error
+          Report (CS_REPORTER_SEVERITY_WARNING,
+            "gl2d error: display change could not write registry.");
+          break;
+        default:
+          //Unknown Error
+          Report (CS_REPORTER_SEVERITY_WARNING,
+            "gl2d error: display change gave unknown error.");
+          break;
       }
     }
     else
@@ -719,9 +710,9 @@ void csGraphics2DOpenGL::CheckWGLExtensions ()
     if (checkExtension ("WGL_EXT_swap_control", wglExtensions))
     {
       wglSwapIntervalEXT = (csPFNWGLSWAPINTERVALEXTPROC)
-	wglGetProcAddress ("wglSwapIntervalEXT");
+        wglGetProcAddress ("wglSwapIntervalEXT");
       wglGetSwapIntervalEXT = (csPFNWGLGETSWAPINTERVALEXTPROC)
-	wglGetProcAddress ("wglGetSwapIntervalEXT");
+        wglGetProcAddress ("wglGetSwapIntervalEXT");
       HasWGL_EXT_swap_control = wglSwapIntervalEXT && wglGetSwapIntervalEXT;
     }
   }
