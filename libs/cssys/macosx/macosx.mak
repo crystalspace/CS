@@ -109,10 +109,10 @@ CFLAGS.GLRENDER3D = $(CFLAGS.GL3D)
 LIBS.OPENGL.SYSTEM = -framework OpenGL
 
 # Flags for the compiler which are used when optimizing.
-CFLAGS.optimize = -O3 -finline-functions
+CFLAGS.optimize = -O3
 
 # Flags for the compiler which are used when debugging.
-CFLAGS.debug = -g -finline-functions
+CFLAGS.debug = -g
 
 # Flags for the compiler which are used when profiling.
 CFLAGS.profile = -pg -O -g
