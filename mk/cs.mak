@@ -87,7 +87,11 @@ DO.COMPILE.ASM = $(NASM) $(NASM.@) $(NASMFLAGS) $(<<)
 # How to make a static library
 DO.STATIC.LIBRARY = $(AR) $(ARFLAGS) $(ARFLAGS.@) $(^^)
 # How to make a dynamic library
+ifeq ($(INHIBIT_DLL_LIBS),yes)
+DO.DYNAMIC.LIBRARY = $(LINK) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(LFLAGS)
+else
 DO.DYNAMIC.LIBRARY = $(LINK) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS)
+endif
 # How to link a console executable
 DO.LINK.CONSOLE.EXE = $(LINK) $(LFLAGS) $(LFLAGS.CONSOLE.EXE) $(LFLAGS.@) $(^^) $(L^) $(LIBS)
 # How to link a graphical executable
