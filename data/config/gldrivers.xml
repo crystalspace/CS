@@ -25,6 +25,15 @@
   -->
 <gldriverdb>
   <configs>
+    <config name="novbo">
+      <Video>
+	<OpenGL>
+	  <UseExtension>
+	    <GL_ARB_vertex_buffer_object>no</GL_ARB_vertex_buffer_object>
+	  </UseExtension>
+	</OpenGL>
+      </Video>
+    </config>
     <config name="noavp">
       <Video>
 	<OpenGL>
@@ -86,6 +95,16 @@
       <notapplicable>
       </notapplicable>
     </rule -->
+    <rule description="Disable VBO for Linux ATI drivers 3.2.8">
+      <conditions fulfill="all">
+	<regexp string="platform" pattern="Unix" />
+	<regexp string="vendor" pattern="^ATI" />
+	<regexp string="glversion" pattern="X4.3.0-3.2.8" />
+      </conditions>
+      <applicable>
+	<usecfg>novbo</usecfg>
+      </applicable>
+    </rule>
     <rule description="Work around broken ATI point sprites">
       <conditions>
 	<!-- Point sprite activation messes up all other geometry -->
