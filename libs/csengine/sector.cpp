@@ -34,6 +34,7 @@
 #include "csengine/stats.h"
 #include "csengine/csppulse.h"
 #include "csengine/cbuffer.h"
+#include "csengine/bspbbox.h"
 #include "csgeom/bsp.h"
 #include "csobject/nameobj.h"
 #include "ihalo.h"
@@ -331,6 +332,7 @@ void csSector::Draw (csRenderView& rview)
   draw_busy++;
   UpdateTransformation (rview);
   Stats::polygons_considered += num_polygon;
+  int i;
 
   G3D_FOGMETHOD fogmethod = G3DFOGMETHOD_NONE;
 
@@ -363,6 +365,11 @@ void csSector::Draw (csRenderView& rview)
     }
   }
 
+  // In some cases this queue will be filled with all visible
+  // sprites.
+  csSprite3D** sprite_queue = NULL;
+  int num_sprite_queue = 0;
+
   csCBuffer* c_buffer = csWorld::current_world->GetCBuffer ();
   if (c_buffer)
   {
@@ -371,11 +378,45 @@ void csSector::Draw (csRenderView& rview)
     // pool would be ideal.
     if (static_thing && do_things)
     {
+      // Add all bounding boxes for all sprites to the BSP tree dynamically.
+      // @@@ Avoid memory allocation?
+      csBspContainer* spr_container = NULL;
+      if (sprites.Length () > 0)
+      {
+        CHK (spr_container = new csBspContainer ());
+        for (i = 0 ; i < sprites.Length () ; i++)
+        {
+          csSprite3D* sp3d = (csSprite3D*)sprites[i];
+	  sp3d->MarkInvisible ();
+	  sp3d->AddBoundingBox (spr_container);
+        }
+	static_bsp->AddDynamicPolygons (spr_container->GetPolygons (),
+		spr_container->GetNumPolygons ());
+	spr_container->World2Camera (rview);
+      }
+
       CHK (poly_queue = new csPolygon2DQueue (GetNumPolygons ()+
       	static_thing->GetNumPolygons ()));
       static_thing->UpdateTransformation (rview);
       static_bsp->Front2Back (rview.GetOrigin (), &TestQueuePolygons,
       	(void*)&rview);
+
+      if (sprites.Length () > 0)
+      {
+        // Clean up the dynamically added BSP polygons.
+	static_bsp->RemoveDynamicPolygons ();
+        CHK (delete spr_container);
+
+	// Push all visible sprites in a queue.
+	// @@@ Avoid memory allocation?
+	CHK (sprite_queue = new csSprite3D* [sprites.Length ()]);
+	num_sprite_queue = 0;
+        for (i = 0 ; i < sprites.Length () ; i++)
+        {
+          csSprite3D* sp3d = (csSprite3D*)sprites[i];
+	  if (sp3d->IsVisible ()) sprite_queue[num_sprite_queue++] = sp3d;
+	}
+      }
     }
     else
     {
@@ -495,9 +536,17 @@ void csSector::Draw (csRenderView& rview)
     // done.
     csSector* previous_sector = rview.portal_polygon ?
     	rview.portal_polygon->GetSector () : (csSector*)NULL;
-    for (i = 0 ; i < sprites.Length () ; i++)
+
+    int spr_num;
+    if (sprite_queue) spr_num = num_sprite_queue;
+    else spr_num = sprites.Length ();
+
+    for (i = 0 ; i < spr_num ; i++)
     {
-      csSprite3D* sp3d = (csSprite3D*)sprites[i];
+      csSprite3D* sp3d;
+      if (sprite_queue) sp3d = sprite_queue[i];
+      else sp3d = (csSprite3D*)sprites[i];
+
       if (!previous_sector || sp3d->sectors.Find (previous_sector) == -1)
       {
         // Sprite is not in the previous sector or there is no previous sector.
@@ -518,6 +567,7 @@ void csSector::Draw (csRenderView& rview)
 	}
       }
     }
+    CHK (delete [] sprite_queue);
   }
 
   // queue all halos in this sector to be drawn.
@@ -526,7 +576,7 @@ void csSector::Draw (csRenderView& rview)
   {
     int numlights = lights.Length();
     
-    for (int i = 0; i<numlights; i++)
+    for (i = 0; i<numlights; i++)
     {
       csStatLight* light = (csStatLight*)(lights[i]);
       if (!light->CheckFlags (CS_LIGHT_HALO)) continue;

@@ -22,32 +22,6 @@
 
 //---------------------------------------------------------------------------
 
-csVertexArray::csVertexArray ()
-{
-  max_vertices = 10;
-  CHK (vertices = new csVector3 [max_vertices]);
-  num_vertices = 0;
-  cookie = 0;
-}
-
-csVertexArray::~csVertexArray ()
-{
-  CHK (delete [] vertices);
-}
-
-void csVertexArray::SetSize (int s)
-{
-  num_vertices = s;
-  if (num_vertices > max_vertices)
-  {
-    max_vertices = num_vertices;
-    CHK (delete [] vertices);
-    CHK (vertices = new csVector3 [max_vertices]);
-  }
-}
-
-//---------------------------------------------------------------------------
-
 csTransformationManager::csTransformationManager ()
 {
   freed = NULL;
@@ -180,7 +154,7 @@ void csTransformedSet::Transform (csVector3* wor_verts, int num_vertices,
 {
   Update ();
   int i;
-  current_array->SetSize (num_vertices);
+  current_array->SetNumVertices (num_vertices);
   csVector3* cam_verts = current_array->GetVertices ();
 
 #if 1
@@ -237,7 +211,7 @@ void csTransformedSet::Translate (csVector3* wor_verts, int num_vertices,
 {
   Update ();
   int i;
-  current_array->SetSize (num_vertices);
+  current_array->SetNumVertices (num_vertices);
   csVector3* cam_verts = current_array->GetVertices ();
 
   for (i = 0 ; i < num_vertices ; i++)

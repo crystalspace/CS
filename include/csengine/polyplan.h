@@ -146,7 +146,7 @@ public:
    * world space coordinates (it only checks on the component
    * values. The planes are not normalized).
    */
-  int NearlyEqual (csPolyPlane* plane)
+  bool NearlyEqual (csPolyPlane* plane)
   {
     return csMath3::PlanesEqual (plane_wor, plane->plane_wor);
   }

@@ -102,7 +102,8 @@ void Dumper::dump (csPolygon3D* p)
   csPolygonSet* ps = (csPolygonSet*)p->GetParent ();
   CsPrintf (MSG_DEBUG_0, "Dump polygon '%s/%s' id=%ld:\n", csNameObject::GetName(*ps),
   	csNameObject::GetName(*p), p->GetID ());
-  CsPrintf (MSG_DEBUG_0, "    num_vertices=%d  max_vertices=%d\n", p->num_vertices, p->max_vertices);
+  CsPrintf (MSG_DEBUG_0, "    num_vertices=%d  max_vertices=%d\n",
+  	p->GetVertices ().GetNumVertices (), p->GetVertices ().max_vertices);
   if (p->portal)
   {
     csPortal* portal = p->portal;
@@ -111,7 +112,7 @@ void Dumper::dump (csPolygon3D* p)
     CsPrintf (MSG_DEBUG_0, "    Alpha=%d\n", p->GetAlpha ());
   }
   int i;
-  for (i = 0 ; i < p->num_vertices ; i++)
+  for (i = 0 ; i < p->GetVertices ().GetNumVertices () ; i++)
     CsPrintf (MSG_DEBUG_0, "        v[%d]: (%f,%f,%f)  camera:(%f,%f,%f)\n",
     	i,
     	p->Vwor (i).x, p->Vwor (i).y, p->Vwor (i).z,

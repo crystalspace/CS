@@ -202,6 +202,7 @@ void csCBuffer::Initialize ()
 
 bool csCBuffer::InsertSpan (int s_spanx, int e_spanx, int y)
 {
+  if (y < 0 || y >= num_lines) return false;
   bool rc = lines[y].InsertSpan (s_spanx, e_spanx);
   if (rc)
   {

@@ -60,7 +60,7 @@ csCollider::csCollider (csPolygonSet *ps)
     csPolygon3D *p = (csPolygon3D *)_ps->polygons [i];
     // Handle solid walls and mirrors.
     if (!p->GetPortal () || p->GetPortal ()->IsSpaceWarped ())
-      tri_count += p->GetNumVertices () - 2;
+      tri_count += p->GetVertices ().GetNumVertices () - 2;
   }
 
   if (tri_count)
@@ -76,8 +76,8 @@ csCollider::csCollider (csPolygonSet *ps)
       if (!p->GetPortal () || p->GetPortal ()->IsSpaceWarped ())
       {
         // Collision detection only works with triangles.
-        int *vt = p->GetVerticesIdx ();
-        for (int v = 2; v < p->GetNumVertices (); v++)
+        int *vt = p->GetVertices ().GetVertexIndices ();
+        for (int v = 2; v < p->GetVertices ().GetNumVertices (); v++)
           _rm->AddTriangle (v - 2, _ps->wor_verts [vt [v - 1]],
             _ps->wor_verts [vt [v]],_ps->wor_verts [vt [0]]);
       }

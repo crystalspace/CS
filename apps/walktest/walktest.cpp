@@ -320,8 +320,9 @@ void draw_map (csRenderView* /*rview*/, int type, void* entity)
     int j;
     csWfPolygon* po = wf->AddPolygon ();
     po->SetVisColor (wf->GetYellow ());
-    po->SetNumVertices (poly->GetNumVertices ());
-    for (j = 0 ; j < poly->GetNumVertices () ; j++) po->SetVertex (j, poly->Vwor (j));
+    po->SetNumVertices (poly->GetVertices ().GetNumVertices ());
+    for (j = 0 ; j < poly->GetVertices ().GetNumVertices () ; j++)
+      po->SetVertex (j, poly->Vwor (j));
     po->Prepare ();
   }
   else if (type == CALLBACK_SECTOR)
@@ -361,7 +362,7 @@ void dump_visible (csRenderView* /*rview*/, int type, void* entity)
     if (poly->GetPortal ())
       Sys->Printf (MSG_DEBUG_0, "%03d%s   | Polygon has a portal.\n",
         dump_visible_indent, indent_spaces);
-    for (i = 0 ; i < poly->GetNumVertices () ; i++)
+    for (i = 0 ; i < poly->GetVertices ().GetNumVertices () ; i++)
     {
       csVector3& vw = poly->Vwor (i);
       csVector3& vc = poly->Vcam (i);
@@ -1581,11 +1582,11 @@ int main (int argc, char* argv[])
 #if 0
 void* operator new (size_t s)
 {
-  if (s <= 0)
+  printf ("Alloc with size %d\n", s);
+  if (Sys && Sys->do_edges && s > 100)
   {
-    printf ("ILLEGAL %d!\n", s);
-    int* a = 0, b = 0;
-    *a = b;
+    int a;
+    a=1;
   }
   return (void*)malloc (s);
 }

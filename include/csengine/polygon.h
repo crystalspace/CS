@@ -23,6 +23,7 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/polyint.h"
 #include "csgeom/polyclip.h"
+#include "csgeom/polyidx.h"
 #include "csengine/polyplan.h"
 #include "csengine/polyset.h"
 #include "csengine/portal.h"
@@ -335,11 +336,7 @@ class csPolygon3D : public csObject, public csPolygonInt
 
 private:
   /// A table of indices into the vertices of the parent csPolygonSet (container).
-  int* vertices_idx;
-  /// Number of vertices.
-  int num_vertices;
-  /// Maximum number of vertices.
-  int max_vertices;
+  csPolyIndexed vertices;
 
   /**
    * The following two fields are somewhat related. 'poly_set' is the real
@@ -617,18 +614,9 @@ public:
   csPlane* GetPolyPlane () { return &plane->GetWorldPlane (); }
 
   /**
-   * Return the current number of vertices in this polygon.
+   * Get the vertices.
    */
-  int GetNumVertices () { return num_vertices; }
-
-  /**
-   * Get the table with all indeces of the vertices.
-   * These indices can be used to retrieve the correct
-   * vertex from the parent container (csPolygonSet)
-   * which holds the shared vertices for all polygons
-   * in the set.
-   */
-  int* GetVerticesIdx () { return vertices_idx; }
+  csPolyIndexed& GetVertices () { return vertices; }
 
   /**
    * Set the warping transformation for the portal.
@@ -650,21 +638,21 @@ public:
    * This index is translated to the index in the parent container and
    * a reference to the vertex in world-space is returned.
    */
-  csVector3& Vwor (int idx) { return poly_set->Vwor (vertices_idx[idx]); }
+  csVector3& Vwor (int idx) { return poly_set->Vwor (vertices.GetVertexIndices ()[idx]); }
 
   /**
    * 'idx' is a local index into the vertices table of the polygon.
    * This index is translated to the index in the parent container and
    * a reference to the vertex in object-space is returned.
    */
-  csVector3& Vobj (int idx) { return poly_set->Vobj (vertices_idx[idx]); }
+  csVector3& Vobj (int idx) { return poly_set->Vobj (vertices.GetVertexIndices ()[idx]); }
 
   /**
    * 'idx' is a local index into the vertices table of the polygon.
    * This index is translated to the index in the parent container and
    * a reference to the vertex in camera-space is returned.
    */
-  csVector3& Vcam (int idx) { return poly_set->Vcam (vertices_idx[idx]); }
+  csVector3& Vcam (int idx) { return poly_set->Vcam (vertices.GetVertexIndices ()[idx]); }
 
   /**
    * Before calling a series of Vcam() you should call
@@ -1042,6 +1030,12 @@ public:
    * to test for equality.
    */
   bool SamePlane (csPolygonInt* p);
+
+  /**
+   * Return 1 to indicate to the BSP tree routines that
+   * this is a csPolygon3D.
+   */
+  int GetType () { return 1; }
 
   /**
    * Intersect world-space segment with this polygon. Return

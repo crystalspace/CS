@@ -333,11 +333,8 @@ const INTERFACE_ENTRY *csPolygon3D::GetInterfaceTable ()
 CSOBJTYPE_IMPL(csPolygon3D,csObject);
 
 csPolygon3D::csPolygon3D (csTextureHandle* texture)
-	: csObject (), csPolygonInt ()
+	: csObject (), csPolygonInt (), vertices (4)
 {
-  vertices_idx = NULL;
-  max_vertices = num_vertices = 0;
-
   txtMM = texture;
   if (texture) SetTexture (texture);
 
@@ -363,13 +360,11 @@ csPolygon3D::csPolygon3D (csTextureHandle* texture)
   SetTextureType (POLYTXT_LIGHTMAP);
 }
 
-csPolygon3D::csPolygon3D (csPolygon3D& poly) : csObject (), csPolygonInt ()
+csPolygon3D::csPolygon3D (csPolygon3D& poly) : csObject (), csPolygonInt (),
+	vertices (4)
 {
   const char* tname = csNameObject::GetName(poly);
   if (tname) csNameObject::AddName(*this, tname);
-
-  vertices_idx = NULL;
-  max_vertices = num_vertices = 0;
 
   poly_set = poly.poly_set;
   sector = poly.sector;
@@ -400,7 +395,6 @@ csPolygon3D::csPolygon3D (csPolygon3D& poly) : csObject (), csPolygonInt ()
 
 csPolygon3D::~csPolygon3D ()
 {
-  CHK (delete [] vertices_idx);
   if (delete_tex_info)
     CHKB (delete txt_info);
   txt_info = NULL;
@@ -427,9 +421,7 @@ void csPolygon3D::SetTextureType (int type)
 
 void csPolygon3D::Reset ()
 {
-  num_vertices = max_vertices = 0;
-  CHK (delete [] vertices_idx);
-  vertices_idx = NULL;
+  vertices.MakeEmpty ();
 }
 
 void csPolygon3D::SetCSPortal (csSector* sector)
@@ -465,10 +457,10 @@ void csPolygon3D::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
 
   csVector3 ptB;
   float sideA, sideB;
-  csVector3 ptA = Vwor (num_vertices - 1);
+  csVector3 ptA = Vwor (GetVertices ().GetNumVertices () - 1);
   sideA = plane.Classify (ptA);
 
-  for (int i = -1 ; ++i < num_vertices ; )
+  for (int i = -1 ; ++i < GetVertices ().GetNumVertices () ; )
   {
     ptB = Vwor (i);
     sideB = plane.Classify (ptB);
@@ -538,8 +530,8 @@ bool csPolygon3D::IsTransparent ()
 
 bool csPolygon3D::SamePlane (csPolygonInt* p)
 {
-  if (((csPolygon3D*)p)->plane == plane) return true;
-  return ((csPolygon3D*)p)->plane->NearlyEqual (plane);
+  if (GetPolyPlane () == p->GetPolyPlane ()) return true;
+  return csMath3::PlanesEqual (*p->GetPolyPlane (), *GetPolyPlane ());
 }
 
 int csPolygon3D::Classify (csPolygonInt* spoly)
@@ -548,10 +540,9 @@ int csPolygon3D::Classify (csPolygonInt* spoly)
 
   int i;
   int front = 0, back = 0;
-  csPolygon3D* poly = (csPolygon3D*)spoly;
-  csPolyPlane* pl = poly->GetPlane ();
+  csPlane* pl = spoly->GetPolyPlane ();
 
-  for (i = 0 ; i < num_vertices ; i++)
+  for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
   {
     float dot = pl->Classify (Vwor (i));
     if (ABS (dot) < SMALL_EPSILON) dot = 0;
@@ -798,22 +789,8 @@ int csPolygon3D::AddVertex (int v)
     CsPrintf (MSG_FATAL_ERROR, "Bad negative vertex index %d!\n", v);
     fatal_exit (0, false);
   }
-  if (!vertices_idx)
-  {
-    max_vertices = 4;
-    CHK (vertices_idx = new int [max_vertices]);
-  }
-  while (num_vertices >= max_vertices)
-  {
-    max_vertices += 2;
-    CHK (int* new_vertices_idx = new int [max_vertices]);
-    memcpy (new_vertices_idx, vertices_idx, sizeof (int)*num_vertices);
-    CHK (delete [] vertices_idx);
-    vertices_idx = new_vertices_idx;
-  }
-
-  vertices_idx[num_vertices++] = v;
-  return num_vertices-1;
+  vertices.AddVertex (v);
+  return vertices.GetNumVertices ()-1;
 }
 
 int csPolygon3D::AddVertex (const csVector3& v)
@@ -841,8 +818,8 @@ void csPolygon3D::PlaneNormal (float* yz, float* zx, float* xy)
   int i, i1;
   float x1, y1, z1, x, y, z;
 
-  i1 = num_vertices-1;
-  for (i = 0 ; i < num_vertices ; i++)
+  i1 = GetVertices ().GetNumVertices ()-1;
+  for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
   {
     x = Vwor (i).x;
     y = Vwor (i).y;
@@ -870,6 +847,7 @@ bool csPolygon3D::ClipPoly (csVector3* frustrum, int m, bool mirror,
 	csVector3** dest, int* num_dest)
 {
   int i, i1;
+  int num_vertices = GetVertices ().GetNumVertices ();
   if (!frustrum)
   {
     // Infinite frustrum.
@@ -1009,7 +987,7 @@ bool csPolygon3D::ClipToPlane (csPlane* portal_plane, const csVector3& v_w2c,
   // vertices has been done earlier).
   // If there are no visible vertices this polygon need not be drawn.
   cnt_vis = 0;
-  for (i = 0 ; i < num_vertices ; i++)
+  for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
     if (Vcam (i).z >= 0) cnt_vis++;
     //if (Vcam (i).z >= SMALL_Z) cnt_vis++;
   if (cnt_vis == 0) return false;
@@ -1021,6 +999,7 @@ bool csPolygon3D::ClipToPlane (csPlane* portal_plane, const csVector3& v_w2c,
     return false;
 
   // Copy the vertices to verts.
+  int num_vertices = GetVertices ().GetNumVertices ();
   for (i = 0 ; i < num_vertices ; i++) verts[i] = Vcam (i);
   pverts = verts;
 
@@ -1175,7 +1154,7 @@ bool csPolygon3D::DoPerspective (const csTransform& trans,
      if (ABS(ex) < SMALL_EPSILON && ABS(ey) < SMALL_EPSILON)
      {
       // Uncommon special case:  polygon passes through origin.
-      plane->WorldToCamera (trans, source[0]);
+      plane->WorldToCamera (trans, source[0]); //@@@ Why is this needed???
       ex = plane->GetCameraPlane ().A();
       ey = plane->GetCameraPlane ().B();
       if (ABS(ex) < SMALL_EPSILON && ABS(ey) < SMALL_EPSILON)
@@ -1217,7 +1196,7 @@ bool csPolygon3D::DoPerspective (const csTransform& trans,
      if (ABS(rx) < SMALL_EPSILON && ABS(ry) < SMALL_EPSILON)
      {
       // Uncommon special case:  polygon passes through origin.
-      plane->WorldToCamera (trans, source[0]);
+      plane->WorldToCamera (trans, source[0]); //@@@ Why is this needed?
       rx = plane->GetCameraPlane ().A();
       ry = plane->GetCameraPlane ().B();
       if (ABS(rx) < SMALL_EPSILON && ABS(ry) < SMALL_EPSILON)
@@ -1339,8 +1318,8 @@ bool csPolygon3D::IntersectRay (const csVector3& start, const csVector3& end)
   relend -= start;
 
   int i, i1;
-  i1 = num_vertices-1;
-  for (i = 0 ; i < num_vertices ; i++)
+  i1 = GetVertices ().GetNumVertices ()-1;
+  for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
   {
     csMath3::CalcNormal (normal, start, Vwor (i1), Vwor (i));
     if ( (relend * normal) > 0) return false;
@@ -1394,7 +1373,7 @@ void csPolygon3D::UpdateVertexLighting (csLight* light, const csColor& lcol,
   if (cosfact == -1) cosfact = csPolyTexture::cfg_cosinus_factor;
   csGouraudShaded* gs = GetGouraudInfo ();
 
-  for (i = 0 ; i < num_vertices ; i++)
+  for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
   {
     if (reset)
     {
@@ -1594,6 +1573,7 @@ void csPolygon3D::CalculateLighting (csLightView* lview)
     csWorld::current_world->cleanup.Push (cleanable);
   }
 
+  int num_vertices = GetVertices ().GetNumVertices ();
   if (num_vertices > cleanable->size)
   {
     CHK (delete [] cleanable->array);

@@ -23,6 +23,7 @@
 #include "csgeom/math3d.h"
 #include "csgeom/transfrm.h"
 #include "csengine/sysitf.h"
+#include "csgeom/poly3d.h"
 
 /**
  * A cookie for the transformation manager.
@@ -35,7 +36,7 @@ class csTransformedSet;
 /**
  * An array of vertices.
  */
-class csVertexArray
+class csVertexArray : public csVector3Array
 {
   friend class csTransformationManager;
   friend class csTransformedSet;
@@ -47,33 +48,13 @@ private:
   csVertexArray* next_set;
   /// Cookie used when generating this set.
   csTranCookie cookie;
-  /// The array.
-  csVector3* vertices;
-  /// Number of vertices.
-  int num_vertices;
-  /// Maximum number of vertices.
-  int max_vertices;
 
 public:
   /// Construct an empty vertex array.
-  csVertexArray ();
+  csVertexArray () { cookie = 0; }
 
   /// Destruct.
-  ~csVertexArray ();
-
-  /// Get pointer to first vertex.
-  csVector3* GetVertices () { return vertices; }
-
-  /// Get number of vertices.
-  int GetNumVertices () { return num_vertices; }
-
-  /**
-   * Set the size of the vertex array. If needed the
-   * maximum size will be extended to make room.
-   * Note that SetSize() is not guaranteed to keep the current
-   * contents of the array.
-   */
-  void SetSize (int s);
+  ~csVertexArray () { }
 };
 
 /**
@@ -90,9 +71,9 @@ public:
  * We define two states in the session manager:<br>
  * <ul>
  * <li>Frame: this is everything that goes on during drawing of one frame.
- * <li>Camera Frame: this is part of a frame which depends on camera configuration.
- *     There is always at least one Camera Frame for every Frame but space warping
- *     portals will add more.
+ * <li>Camera Frame: this is part of a frame which depends on camera
+ *     configuration. There is always at least one Camera Frame for every
+ *     Frame but space warping portals will add more.
  * </ul><br>
  * Cookies for camera frames are guaranteed to be larger than the current frame
  * cookie. Also they are guaranteed to be lower than the next frame cookie. This
@@ -112,7 +93,7 @@ private:
   csTranCookie cookie;
   /// Maximum frame/camera frame cookie used upto now.
   csTranCookie max_cookie;
-  /// Current frame cookie. This is the cookie indicating the start of this frame.
+  /// Current frame cookie. This cookie indicates the start of this frame.
   csTranCookie frame_cookie;
 
 public:
@@ -203,7 +184,8 @@ public:
   /// Destructor.
   ~csTransformedSet ();
   /// Set the transformation manager (required).
-  void SetTransformationManager (csTransformationManager* manager) { tr_manager = manager; }
+  void SetTransformationManager (csTransformationManager* manager)
+  { tr_manager = manager; }
 
   /**
    * Get the current vertex array. This function does not check
@@ -230,14 +212,16 @@ public:
    * multiple times during a session. The session manager will only
    * really redo the transformation if needed.
    */
-  void Transform (csVector3* wor_verts, int num_vertices, const csTransform& w2c);
+  void Transform (csVector3* wor_verts, int num_vertices,
+  	const csTransform& w2c);
 
   /**
    * Translate (if needed). This function can safely be called
    * multiple times during a session. The session manager will only
    * really redo the transformation if needed.
    */
-  void Translate (csVector3* wor_verts, int num_vertices, const csVector3& trans);
+  void Translate (csVector3* wor_verts, int num_vertices,
+  	const csVector3& trans);
 };
 
 #endif /*TRANMAN_H*/

@@ -364,7 +364,7 @@ void set_uv (csPolygon3D* p, float u1, float v1, float u2, float v2,
 {
   p->SetTextureType (POLYTXT_GOURAUD);
   csGouraudShaded* gs = p->GetGouraudInfo ();
-  gs->Setup (p->GetNumVertices ());
+  gs->Setup (p->GetVertices ().GetNumVertices ());
   gs->EnableGouraud (true);
   gs->SetUV (0, u1, v1);
   gs->SetUV (1, u2, v2);

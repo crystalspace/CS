@@ -16,44 +16,39 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef POLY2D_H
-#define POLY2D_H
+#ifndef POLY3D_H
+#define POLY3D_H
 
-#include "csgeom/math2d.h"
+#include "csgeom/math3d.h"
 
-class csClipper;
 class Dumper;
 
 /**
- * The following class represents a general 2D polygon with
- * a bounding box.
+ * The following class represents a general 3D polygon.
  */
-class csPoly2D
+class csPoly3D
 {
   friend class Dumper;
 
 protected:
-  /// The 2D vertices.
-  csVector2* vertices;
+  /// The 3D vertices.
+  csVector3* vertices;
   ///
   int num_vertices;
   ///
   int max_vertices;
 
-  /// A 2D bounding box that is maintained automatically.
-  csBox bbox;
-
 public:
   /**
    * Make a new empty polygon.
    */
-  csPoly2D (int start_size = 10);
+  csPoly3D (int start_size = 10);
 
   /// Copy constructor.
-  csPoly2D (csPoly2D& copy);
+  csPoly3D (csPoly3D& copy);
 
   /// Destructor.
-  virtual ~csPoly2D ();
+  virtual ~csPoly3D ();
 
   /**
    * Initialize the polygon to empty.
@@ -68,12 +63,12 @@ public:
   /**
    * Get the array with all vertices.
    */
-  csVector2* GetVertices () { return vertices; }
+  csVector3* GetVertices () { return vertices; }
 
   /**
    * Get the specified vertex.
    */
-  csVector2* GetVertex (int i) 
+  csVector3* GetVertex (int i) 
   {
     if (i<0 || i>=num_vertices) return NULL;
     return &vertices[i];
@@ -82,7 +77,7 @@ public:
   /**
    * Get the specified vertex.
    */
-  csVector2& operator[] (int i)
+  csVector3& operator[] (int i)
   {
     return vertices[i];
   }
@@ -90,13 +85,13 @@ public:
   /**
    * Get the first vertex.
    */
-  csVector2* GetFirst ()
+  csVector3* GetFirst ()
   { if (num_vertices<=0) return NULL;  else return vertices; }
 
   /**
    * Get the last vertex.
    */
-  csVector2* GetLast ()
+  csVector3* GetLast ()
   { if (num_vertices<=0) return NULL;  else return &vertices[num_vertices-1]; }
 
   /**
@@ -105,48 +100,48 @@ public:
   void MakeRoom (int new_max);
 
   /**
-   * Add a vertex (2D) to the polygon.
+   * Set the number of vertices.
    */
-  void AddVertex (const csVector2& v) { AddVertex (v.x, v.y); }
+  void SetNumVertices (int n) { num_vertices = n; MakeRoom (n); }
 
   /**
-   * Add a vertex (2D) to the polygon.
+   * Add a vertex (3D) to the polygon.
    */
-  void AddVertex (float x, float y);
+  void AddVertex (const csVector3& v) { AddVertex (v.x, v.y, v.z); }
+
+  /**
+   * Add a vertex (3D) to the polygon.
+   */
+  void AddVertex (float x, float y, float z);
 
   /**
    * Set all polygon vertices at once.
    */
-  void SetVertices (csVector2 *v, int num)
-  { memcpy (vertices, v, (num_vertices = num) * sizeof (csVector2)); }
-
-  /// Get the bounding box (in 2D space) for this polygon.
-  csBox& GetBoundingBox () { return bbox; }
-
-  /**
-   * Clipping routines. They return false if the resulting polygon is not
-   * visible for some reason.
-   * Note that these routines must not be called if the polygon is not visible.
-   * These routines will not check that.
-   * Note that these routines will put the resulting clipped 2D polygon
-   * in place of the original 2D polygon.
-   */
-  bool ClipAgainst (csClipper* view);
+  void SetVertices (csVector3 *v, int num)
+  { memcpy (vertices, v, (num_vertices = num) * sizeof (csVector3)); }
 };
 
 /**
- * This factory is responsible for creating csPoly2D objects or subclasses
- * of csPoly2D. To create a new factory which can create subclasses of csPoly2D
- * you should create a subclass of this factory.
+ * This is actually the same class as csPoly3D. But it has been
+ * renamed to make it clear that it is for other uses. It also
+ * adds some functionality specific to that use. In particular
+ * this class is more used to hold an unordered collection of 3D vectors.
  */
-class csPoly2DFactory
+class csVector3Array : public csPoly3D
 {
 public:
-  /// A shared factory that you can use.
-  static csPoly2DFactory* SharedFactory();
+  /**
+   * Add a vertex but first check if it isn't already present
+   * in the array. Return the index that the vertex was added too.
+   */
+  int AddVertexSmart (const csVector3& v)
+  { return AddVertexSmart (v.x, v.y, v.z); }
 
-  /// Create a poly2d.
-  virtual csPoly2D* Create () { CHK (csPoly2D* p = new csPoly2D ()); return p; }
+  /**
+   * Add a vertex but first check if it isn't already present
+   * in the array. Return the index that the vertex was added too.
+   */
+  int AddVertexSmart (float x, float y, float z);
 };
 
-#endif /*POLY2D_H*/
+#endif /*POLY3D_H*/

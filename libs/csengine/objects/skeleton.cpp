@@ -21,6 +21,8 @@
 #include "csengine/skeleton.h"
 #include "csengine/cssprite.h"
 
+//---------------------------------------------------------------------------
+
 csSkeletonLimb::~csSkeletonLimb ()
 {
   CHK (delete [] vertices);
@@ -63,6 +65,7 @@ void csSkeletonLimb::UpdateState (csSkeletonLimbState* limb)
 {
   limb->vertices = vertices;
   limb->num_vertices = num_vertices;
+  limb->tmpl = this;
   csSkeletonLimb* c = children;
   while (c)
   {
@@ -88,6 +91,33 @@ void csSkeletonLimb::RemapVertices (int* mapping)
   }
 }
 
+void csSkeletonLimb::ComputeBoundingBox (csFrame* source)
+{
+  if (num_vertices)
+  {
+    csVector3* verts = source->GetVertices ();
+    box_min = box_max = verts[vertices[0]];
+    int i;
+    for (i = 1 ; i < num_vertices ; i++)
+    {
+      csVector3 v = verts[vertices[i]];
+      if (v.x < box_min.x) box_min.x = v.x;
+      else if (v.x > box_max.x) box_max.x = v.x;
+      if (v.y < box_min.y) box_min.y = v.y;
+      else if (v.y > box_max.y) box_max.y = v.y;
+      if (v.z < box_min.z) box_min.z = v.z;
+      else if (v.z > box_max.z) box_max.z = v.z;
+    }
+  }
+
+  csSkeletonLimb* c = children;
+  while (c)
+  {
+    c->ComputeBoundingBox (source);
+    c = c->GetNext ();
+  }
+}
+
 csSkeletonLimbState* csSkeletonLimb::CreateState ()
 {
   CHK (csSkeletonLimbState* limb = new csSkeletonLimbState ());
@@ -109,6 +139,8 @@ csSkeletonLimbState* csSkeleton::CreateState ()
   UpdateState ((csSkeletonLimbState*)skel);
   return (csSkeletonLimbState*)skel;
 }
+
+//---------------------------------------------------------------------------
 
 CSOBJTYPE_IMPL(csSkeletonLimbState,csObject);
 CSOBJTYPE_IMPL(csSkeletonConnectionState,csSkeletonLimbState);
@@ -138,8 +170,60 @@ void csSkeletonLimbState::Transform (const csTransform& tr, csFrame* source, csV
     dest [vertices [i]] = tr * src_verts [vertices [i]];
 }
 
-void csSkeletonConnectionState::Transform (const csTransform& tr, csFrame* source, csVector3* dest)
+void csSkeletonConnectionState::Transform (const csTransform& tr, csFrame* source,
+	csVector3* dest)
 {
   csTransform tr_new = tr * trans;
   csSkeletonLimbState::Transform (tr_new, source, dest);
 }
+
+void csSkeletonLimbState::ComputeBoundingBox (const csTransform& tr,
+	csVector3& bbox_min, csVector3& bbox_max)
+{
+  if (num_vertices)
+  {
+    csVector3 v, b_min, b_max;
+    tmpl->GetBoundingBox (b_min, b_max);
+    v = b_min;
+    if (v.x < bbox_min.x) bbox_min.x = v.x;
+    if (v.x > bbox_max.x) bbox_max.x = v.x;
+    if (v.y < bbox_min.y) bbox_min.y = v.y;
+    if (v.y > bbox_max.y) bbox_max.y = v.y;
+    if (v.z < bbox_min.z) bbox_min.z = v.z;
+    if (v.z > bbox_max.z) bbox_max.z = v.z;
+    v = b_max;
+    if (v.x < bbox_min.x) bbox_min.x = v.x;
+    if (v.x > bbox_max.x) bbox_max.x = v.x;
+    if (v.y < bbox_min.y) bbox_min.y = v.y;
+    if (v.y > bbox_max.y) bbox_max.y = v.y;
+    if (v.z < bbox_min.z) bbox_min.z = v.z;
+    if (v.z > bbox_max.z) bbox_max.z = v.z;
+  }
+
+  csSkeletonLimbState* c = children;
+  while (c)
+  {
+    c->ComputeBoundingBox (tr, bbox_min, bbox_max);
+    c = c->GetNext ();
+  }
+}
+
+void csSkeletonConnectionState::ComputeBoundingBox (const csTransform& tr,
+	csVector3& bbox_min, csVector3& bbox_max)
+{
+  csTransform tr_new = tr * trans;
+  csSkeletonLimbState::ComputeBoundingBox (tr_new, bbox_min, bbox_max);
+}
+
+void csSkeletonState::ComputeBoundingBox (const csTransform& tr,
+	csVector3& bbox_min, csVector3& bbox_max)
+{
+  bbox_min.x = 10000000.;
+  bbox_min.y = 10000000.;
+  bbox_min.z = 10000000.;
+  bbox_max.x = -10000000.;
+  bbox_max.y = -10000000.;
+  bbox_max.z = -10000000.;
+  csSkeletonLimbState::ComputeBoundingBox (tr, bbox_min, bbox_max);
+}
+

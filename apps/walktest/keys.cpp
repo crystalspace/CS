@@ -301,6 +301,7 @@ void add_skeleton_tree (csSector* where, csVector3 const& pos, int depth, int wi
     act->AddFrame (fr, 100);
     tmpl->SetSkeleton (create_skeltree (tmpl, fr, vertex_idx, depth, width));
     tmpl->GenerateLOD ();
+    tmpl->ComputeBoundingBox ();
   }
   csSprite3D* spr = add_sprite (skelname, "__skeltree__", where, pos-csVector3 (0, Sys->cfg_body_height, 0), 1);
   spr->SetDrawCallback (animate_skeleton_tree_cb);
@@ -485,6 +486,7 @@ void add_skeleton_ghost (csSector* where, csVector3 const& pos, int maxdepth, in
     act->AddFrame (fr, 100);
     tmpl->SetSkeleton (create_skelghost (tmpl, fr, vertex_idx, maxdepth, width));
     tmpl->GenerateLOD ();
+    tmpl->ComputeBoundingBox ();
   }
   csSprite3D* spr = add_sprite (skelname, "__skelghost__", where, pos, 1);
   spr->SetMixmode (CS_FX_SETALPHA (0.75));

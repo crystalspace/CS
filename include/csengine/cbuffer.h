@@ -155,6 +155,7 @@ public:
    */
   bool TestSpan (int s_spanx, int e_spanx, int y)
   {
+    if (y < 0 || y >= num_lines) return false;
     return lines[y].TestSpan (s_spanx, e_spanx);
   }
 

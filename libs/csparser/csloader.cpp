@@ -1288,14 +1288,14 @@ csPolygon3D* CSLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
         break;
       case kTokenPolGouraud:
         poly3d->SetTextureType (POLYTXT_GOURAUD);
-	poly3d->GetGouraudInfo ()->Setup (poly3d->GetNumVertices ());
+	poly3d->GetGouraudInfo ()->Setup (poly3d->GetVertices ().GetNumVertices ());
 	poly3d->GetGouraudInfo ()->EnableGouraud (true);
         break;
       case kTokenPolUV:
         {
           poly3d->SetTextureType (POLYTXT_GOURAUD);
 	  csGouraudShaded* gs = poly3d->GetGouraudInfo ();
-	  gs->Setup (poly3d->GetNumVertices ());
+	  gs->Setup (poly3d->GetVertices ().GetNumVertices ());
           float list[6];
           int num;
           ScanStr (params, "%F", list, &num);
@@ -1308,7 +1308,7 @@ csPolygon3D* CSLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
         {
           poly3d->SetTextureType (POLYTXT_GOURAUD);
 	  csGouraudShaded* gs = poly3d->GetGouraudInfo ();
-	  gs->Setup (poly3d->GetNumVertices ());
+	  gs->Setup (poly3d->GetVertices ().GetNumVertices ());
           float list[9];
           int num;
           ScanStr (params, "%F", list, &num);
@@ -1321,7 +1321,7 @@ csPolygon3D* CSLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
         {
           poly3d->SetTextureType (POLYTXT_GOURAUD);
 	  csGouraudShaded* gs = poly3d->GetGouraudInfo ();
-	  gs->Setup (poly3d->GetNumVertices ());
+	  gs->Setup (poly3d->GetVertices ().GetNumVertices ());
           float list[9];
           int num;
           ScanStr (params, "%F", list, &num);
@@ -3311,7 +3311,7 @@ void CSLoader::skydome_process (csSector& sector, char* name, char* buf,
       p->AddVertex (new_vertices[j]);
       p->SetTextureType (POLYTXT_GOURAUD);
       gs = p->GetGouraudInfo ();
-      gs->Setup (p->GetNumVertices ());
+      gs->Setup (p->GetVertices ().GetNumVertices ());
       gs->EnableGouraud (true);
       gs->SetUV (0, prev_u[j], prev_v[j]);
       gs->SetUV (1, new_u[(j+1)%num], new_v[(j+1)%num]);
@@ -3332,7 +3332,7 @@ void CSLoader::skydome_process (csSector& sector, char* name, char* buf,
       p->AddVertex (new_vertices[(j+1)%num]);
       p->SetTextureType (POLYTXT_GOURAUD);
       gs = p->GetGouraudInfo ();
-      gs->Setup (p->GetNumVertices ());
+      gs->Setup (p->GetVertices ().GetNumVertices ());
       gs->EnableGouraud (true);
       gs->SetUV (0, prev_u[j], prev_v[j]);
       gs->SetUV (1, prev_u[(j+1)%num], prev_v[(j+1)%num]);
@@ -3375,7 +3375,7 @@ void CSLoader::skydome_process (csSector& sector, char* name, char* buf,
     p->AddVertex (prev_vertices[(j+1)%num]);
     p->SetTextureType (POLYTXT_GOURAUD);
     gs = p->GetGouraudInfo ();
-    gs->Setup (p->GetNumVertices ());
+    gs->Setup (p->GetVertices ().GetNumVertices ());
     gs->EnableGouraud (true);
     gs->SetUV (0, top_u, top_v);
     gs->SetUV (1, prev_u[j], prev_v[j]);
@@ -4194,6 +4194,7 @@ bool CSLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf, csTexture
   }
 
   stemp->GenerateLOD ();
+  stemp->ComputeBoundingBox ();
 
   return true;
 }

@@ -88,7 +88,8 @@ public:
    * mimic the behaviour of the parent polygon as good as possible.
    * This function is mainly used by the BSP splitter.
    */
-  virtual void SplitWithPlane (csPolygonInt** front, csPolygonInt** back, csPlane& plane) = 0;
+  virtual void SplitWithPlane (csPolygonInt** front, csPolygonInt** back,
+  	csPlane& plane) = 0;
 
   /**
    * Return true if this polygon and the given polygon are on the same
@@ -97,6 +98,14 @@ public:
    * to test for equality.
    */
   virtual bool SamePlane (csPolygonInt* p) = 0;
+
+  /**
+   * Return some type-id which BSP visitors can use for their
+   * own purpose. The purpose of this is to allow several different
+   * types of polygons to be added to the same tree. With this number
+   * you can recognize them.
+   */
+  virtual int GetType () = 0;
 };
 
 #endif /*POLYINT_H*/

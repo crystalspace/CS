@@ -511,8 +511,8 @@ void csThing::Merge (csThing* other)
   for (i = 0 ; i < other->GetNumPolygons () ; i++)
   {
     csPolygon3D* p = (csPolygon3D*)(other->GetPolygon (i));
-    int* idx = p->GetVerticesIdx ();
-    for (j = 0 ; j < p->GetNumVertices () ; j++)
+    int* idx = p->GetVertices ().GetVertexIndices ();
+    for (j = 0 ; j < p->GetVertices ().GetNumVertices () ; j++)
       idx[j] = merge_vertices[idx[j]];
     p->SetParent (this);
     AddPolygon (p);
@@ -566,7 +566,7 @@ void csThing::MergeTemplate (csThingTemplate* tpl,
     {
       p->SetTextureType (POLYTXT_GOURAUD);
       csGouraudShaded* gs = p->GetGouraudInfo ();
-      gs->Setup (p->GetNumVertices ());
+      gs->Setup (p->GetVertices ().GetNumVertices ());
       for (j = 0 ; j < pt->GetNumVertices () ; j++)
         gs->SetUV (j, pt->GetUVCoords ()[j].x, pt->GetUVCoords ()[j].y);
       if (pt->UseGouraud ())

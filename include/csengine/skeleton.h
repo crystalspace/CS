@@ -47,6 +47,9 @@ private:
   /// Children of this limb.
   csSkeletonLimb* children;
 
+  /// Bounding box in object space for this limb.
+  csVector3 box_min, box_max;
+
 protected:
   /// Update state information.
   void UpdateState (csSkeletonLimbState* limb);
@@ -67,6 +70,9 @@ public:
   /// Get the number of vertices.
   int GetNumVertices () { return num_vertices; }
 
+  /// Get the bounding box.
+  void GetBoundingBox (csVector3& b_min, csVector3& b_max) { b_min = box_min; b_max = box_max; }
+
   /// Add a child limb.
   void AddChild (csSkeletonLimb* child);
 
@@ -80,6 +86,11 @@ public:
 
   /// For LOD. Remap vertices.
   void RemapVertices (int* mapping);
+
+  /**
+   * Compute the object space bounding box for this limb.
+   */
+  void ComputeBoundingBox (csFrame* source);
 };
 
 /**
@@ -140,6 +151,9 @@ private:
   /// Next in the list.
   csSkeletonLimbState* next;
 
+  /// Pointer to original skeleton node.
+  csSkeletonLimb* tmpl;
+
   /// The vertices from the parent sprite that it controls.
   int* vertices;
 
@@ -169,6 +183,12 @@ public:
    * a combined transformation along the way.
    */
   virtual void Transform (const csTransform& tr, csFrame* source, csVector3* dest);
+
+  /**
+   * Calculate the real bounding box for the given state.
+   */
+  virtual void ComputeBoundingBox (const csTransform& tr, csVector3& bbox_min,
+  	csVector3& bbox_max);
 
   /// Get first child.
   csSkeletonLimbState* GetChildren () { return children; }
@@ -203,6 +223,10 @@ public:
   /// Transform the vertices in the given frame to the destination frame.
   virtual void Transform (const csTransform& tr, csFrame* source, csVector3* dest);
 
+  /// Calculate the real bounding box for the given state.
+  virtual void ComputeBoundingBox (const csTransform& tr, csVector3& bbox_min,
+  	csVector3& bbox_max);
+
   /// Set the transformation.
   void SetTransformation (csTransform& tr) { trans = tr; }
 
@@ -235,6 +259,10 @@ protected:
 public:
   /// Destructor.
   virtual ~csSkeletonState () { }
+
+  /// Calculate the real bounding box for the given state.
+  virtual void ComputeBoundingBox (const csTransform& tr, csVector3& bbox_min,
+  	csVector3& bbox_max);
 
   CSOBJTYPE;
 };

@@ -21,6 +21,7 @@
 
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"
+#include "csgeom/polyint.h"
 #include "csengine/csobjvec.h"
 #include "csengine/rview.h"
 #include "csengine/cscolor.h"
@@ -34,6 +35,8 @@ class csTriangleMesh;
 class csLightHitsSprite;
 class csSkeleton;
 class csSkeletonState;
+class csSprite3D;
+class csBspContainer;
 interface ITextureHandle;
 
 /**
@@ -47,6 +50,8 @@ private:
   csVector3* normals;
   char* name;
   int max_vertex;
+  /// Bounding box in object space for this frame.
+  csVector3 box_min, box_max;
 
 public:
   ///
@@ -61,20 +66,26 @@ public:
     vertices[i].y = y;
     vertices[i].z = z;
   }
+
+  ///
   void SetVertex (int i, const csVector3& v)
   {
     vertices[i].x = v.x;
     vertices[i].y = v.y;
     vertices[i].z = v.z;
   }
+
   ///
   void SetTexel (int i, float u, float v)
   {
     texels[i].x = u;
     texels[i].y = v;
   }
+
   ///
   void SetName (char * n);
+  ///
+  char* GetName () { return name; }
 
   ///
   csVector3& GetVertex (int i) { return vertices[i]; }
@@ -87,9 +98,6 @@ public:
   csVector3& GetNormal (int i) { return normals[i]; }
   /// Return true if this frame has calculated normals.
   bool HasNormals () { return normals != NULL; }
-
-  ///
-  char* GetName () { return name; }
 
   ///
   void AddVertex (int num_vertices);
@@ -113,6 +121,19 @@ public:
    * that the vertices are computed using a skeleton.
    */
   void ComputeNormals (csTriangleMesh* mesh, csVector3* object_verts, int num_vertices);
+
+  /**
+   * Compute the object space bounding box for this frame.
+   * This has to be called after setting up the frame and before
+   * using it.
+   */
+  void ComputeBoundingBox (int num_vertices);
+
+  /**
+   * Get the bounding box in object space.
+   */
+  void GetBoundingBox (csVector3& bbox_min, csVector3& bbox_max)
+  { bbox_min = box_min; bbox_max = box_max; }
 };
 
 /**
@@ -224,6 +245,13 @@ public:
    */
   void GenerateLOD ();
 
+  /**
+   * Compute the object space bounding box for all frames in this
+   * template. This has to be called after setting up the template and before
+   * using it.
+   */
+  void ComputeBoundingBox ();
+
   /// Set the number of vertices.
   void SetNumVertices (int v) { num_vertices = v; }
 
@@ -304,7 +332,8 @@ public:
 
   /**
    * Configuration value for global LOD. 0 is lowest detail, 1 is maximum.
-   * If negative then the base mesh is used and no LOD reduction/computation is done.
+   * If negative then the base mesh is used and no LOD reduction/computation
+   * is done.
    */
   static float cfg_lod_detail;
 
@@ -367,6 +396,14 @@ private:
   /// The callback which is called just before drawing.
   csSpriteCallback* draw_callback;
 
+  /**
+   * Flag which is set to true when the sprite is visible.
+   * This is used by the c-buffer/bsp routines. The sprite itself
+   * will not use this flag in any way at all. It is simply intended
+   * for external visibility culling routines.
+   */
+  bool is_visible;
+
 public:
   ///
   csSprite3D ();
@@ -384,6 +421,15 @@ public:
 
   /// force a new texture skin other than default
   void SetTexture (char * name, csTextureList* textures);
+
+  /// Mark this sprite as visible.
+  void MarkVisible () { is_visible = true; }
+
+  /// Mark this sprite as invisible.
+  void MarkInvisible () { is_visible = false; }
+
+  /// Return if this sprite is visible.
+  bool IsVisible () { return is_visible; }
 
   /**
    * Set a color for a vertex.
@@ -481,6 +527,12 @@ public:
   void Transform (csMatrix3& matrix);
 
   /**
+   * Calculate a bounding box for this sprite in world space and add
+   * the resulting polygons to the given container.
+   */
+  void AddBoundingBox (csBspContainer* container);
+
+  /**
    * Fill the static mesh with the current sprite
    * for a given LOD level.
    */
@@ -488,6 +540,8 @@ public:
 
   /**
    * Draw this sprite given a camera transformation.
+   * If needed the skeleton state will first be updated.
+   * Optionally update lighting if needed (DeferUpdateLighting()).
    */
   void Draw (csRenderView& rview);
 

@@ -99,6 +99,7 @@ csBase *csCrossBuild_SpriteTemplateFactory::CrossBuild(converter &buildsource)
   CHK (csSpriteTemplate *newtemplate = new csSpriteTemplate());
   CrossBuild ((csBase*)newtemplate, buildsource);
   newtemplate->GenerateLOD ();
+  newtemplate->ComputeBoundingBox ();
   return newtemplate;
 }
 
@@ -319,7 +320,8 @@ void ivconload_Quake2ModelPack(csWorld *world, char *packfilename)
   			   const_cast<char *>( csNameObject::GetName(*defaultskin))
 			   );*/
 
-  newtemplate->GenerateLOD();
+  newtemplate->GenerateLOD ();
+  newtemplate->ComputeBoundingBox ();
 }
 
 

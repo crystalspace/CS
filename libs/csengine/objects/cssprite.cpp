@@ -27,10 +27,13 @@
 #include "csengine/world.h"
 #include "csengine/texture.h"
 #include "csengine/sector.h"
+#include "csengine/bspbbox.h"
 #include "csengine/dumper.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/fastsqrt.h"
 #include "igraph3d.h"
+
+//--------------------------------------------------------------------------
 
 csFrame::csFrame (int num_vertices)
 {
@@ -107,10 +110,10 @@ void csFrame::ComputeNormals (csTriangleMesh *mesh, csVector3* object_verts, int
 {
   CHK (delete [] normals);
   CHK (normals = new csVector3 [num_vertices]);
-  CHK (csTriangleVertices *tr_verts = new csTriangleVertices (mesh, object_verts, num_vertices));
+  CHK (csTriangleVertices *tri_verts = new csTriangleVertices (mesh, object_verts, num_vertices));
   for (int i = 0; i < num_vertices; i++)
   {
-    csTriangleVertex &vt = tr_verts->GetVertex (i);
+    csTriangleVertex &vt = tri_verts->GetVertex (i);
     if (vt.num_con_vertices)
     {
       csVector3 &v = object_verts [i];
@@ -124,9 +127,25 @@ void csFrame::ComputeNormals (csTriangleMesh *mesh, csVector3* object_verts, int
         n /= norm;
     }
   }
-  CHK (delete tr_verts);
+  CHK (delete tri_verts);
 }
 
+void csFrame::ComputeBoundingBox (int num_vertices)
+{
+  int i;
+  box_min = box_max = vertices[0];
+  for (i = 1 ; i < num_vertices ; i++)
+  {
+    if (vertices[i].x < box_min.x) box_min.x = vertices[i].x;
+    else if (vertices[i].x > box_max.x) box_max.x = vertices[i].x;
+    if (vertices[i].y < box_min.y) box_min.y = vertices[i].y;
+    else if (vertices[i].y > box_max.y) box_max.y = vertices[i].y;
+    if (vertices[i].z < box_min.z) box_min.z = vertices[i].z;
+    else if (vertices[i].z > box_max.z) box_max.z = vertices[i].z;
+  }
+}
+
+//--------------------------------------------------------------------------
 
 csSpriteAction::csSpriteAction() : frames (8, 8), delays (8, 8)
 {
@@ -155,6 +174,8 @@ void csSpriteAction::AddFrame (csFrame * f, int d)
   frames.Push (f);
   delays.Push ((csSome)d);
 }
+
+//--------------------------------------------------------------------------
 
 CSOBJTYPE_IMPL (csSpriteTemplate, csObject)
 
@@ -217,6 +238,15 @@ void csSpriteTemplate::GenerateLOD ()
   CHK (delete [] translate);
   CHK (delete verts);
   CHK (delete new_mesh);
+}
+
+void csSpriteTemplate::ComputeBoundingBox ()
+{
+  int i;
+  for (i = 0 ; i < GetNumFrames () ; i++)
+    GetFrame (i)->ComputeBoundingBox (num_vertices);
+  if (skeleton)
+    skeleton->ComputeBoundingBox (GetFrame (0));
 }
 
 csFrame* csSpriteTemplate::AddFrame ()
@@ -289,6 +319,7 @@ csSprite3D::csSprite3D () : csObject ()
   defered_num_lights = 0;
   defered_lighting_flags = 0;
   draw_callback = NULL;
+  is_visible = false;
 }
 
 csSprite3D::~csSprite3D ()
@@ -498,6 +529,97 @@ void csSprite3D::UpdateDeferedLighting ()
   }
 }
 
+void csSprite3D::AddBoundingBox (csBspContainer* container)
+{
+  csVector3 b_min, b_max;
+  if (skeleton_state)
+  {
+    skeleton_state->ComputeBoundingBox (csTransform (), b_min, b_max);
+  }
+  else
+  {
+    csFrame* cframe = cur_action->GetFrame (cur_frame);
+    cframe->GetBoundingBox (b_min, b_max);
+  }
+
+  // This transform should be part of the sprite class and not just calculated
+  // every time we need it. @@@!!!
+  csTransform trans = csTransform (m_obj2world, m_world2obj * v_obj2world);
+  csBspPolygon* poly;
+
+  // Add the eight corner points of the bounding box to the container.
+  // Transform from object to world space here.
+  csVector3Array& va = container->GetVertices ();
+  int pt_xyz = va.AddVertexSmart (trans.Other2This (csVector3 (b_min.x, b_min.y, b_min.z)));
+  int pt_Xyz = va.AddVertexSmart (trans.Other2This (csVector3 (b_max.x, b_min.y, b_min.z)));
+  int pt_xYz = va.AddVertexSmart (trans.Other2This (csVector3 (b_min.x, b_max.y, b_min.z)));
+  int pt_XYz = va.AddVertexSmart (trans.Other2This (csVector3 (b_max.x, b_max.y, b_min.z)));
+  int pt_xyZ = va.AddVertexSmart (trans.Other2This (csVector3 (b_min.x, b_min.y, b_max.z)));
+  int pt_XyZ = va.AddVertexSmart (trans.Other2This (csVector3 (b_max.x, b_min.y, b_max.z)));
+  int pt_xYZ = va.AddVertexSmart (trans.Other2This (csVector3 (b_min.x, b_max.y, b_max.z)));
+  int pt_XYZ = va.AddVertexSmart (trans.Other2This (csVector3 (b_max.x, b_max.y, b_max.z)));
+
+  CHK (poly = new csBspPolygon ());
+  container->AddPolygon (poly);
+  poly->SetOriginator (this);
+  poly->GetPolygon ().AddVertex (pt_xYz);
+  poly->GetPolygon ().AddVertex (pt_XYz);
+  poly->GetPolygon ().AddVertex (pt_Xyz);
+  poly->GetPolygon ().AddVertex (pt_xyz);
+  poly->SetPolyPlane (csPlane (0, 0, 1, -b_min.z));
+  poly->Transform (trans);
+
+  CHK (poly = new csBspPolygon ());
+  container->AddPolygon (poly);
+  poly->SetOriginator (this);
+  poly->GetPolygon ().AddVertex (pt_XYz);
+  poly->GetPolygon ().AddVertex (pt_XYZ);
+  poly->GetPolygon ().AddVertex (pt_XyZ);
+  poly->GetPolygon ().AddVertex (pt_Xyz);
+  poly->SetPolyPlane (csPlane (1, 0, 0, -b_max.x));
+  poly->Transform (trans);
+
+  CHK (poly = new csBspPolygon ());
+  container->AddPolygon (poly);
+  poly->SetOriginator (this);
+  poly->GetPolygon ().AddVertex (pt_XYZ);
+  poly->GetPolygon ().AddVertex (pt_xYZ);
+  poly->GetPolygon ().AddVertex (pt_xyZ);
+  poly->GetPolygon ().AddVertex (pt_XyZ);
+  poly->SetPolyPlane (csPlane (0, 0, 1, -b_max.z));
+  poly->Transform (trans);
+
+  CHK (poly = new csBspPolygon ());
+  container->AddPolygon (poly);
+  poly->SetOriginator (this);
+  poly->GetPolygon ().AddVertex (pt_xYZ);
+  poly->GetPolygon ().AddVertex (pt_xYz);
+  poly->GetPolygon ().AddVertex (pt_xyz);
+  poly->GetPolygon ().AddVertex (pt_xyZ);
+  poly->SetPolyPlane (csPlane (1, 0, 0, -b_min.x));
+  poly->Transform (trans);
+
+  CHK (poly = new csBspPolygon ());
+  container->AddPolygon (poly);
+  poly->SetOriginator (this);
+  poly->GetPolygon ().AddVertex (pt_xYZ);
+  poly->GetPolygon ().AddVertex (pt_XYZ);
+  poly->GetPolygon ().AddVertex (pt_XYz);
+  poly->GetPolygon ().AddVertex (pt_xYz);
+  poly->SetPolyPlane (csPlane (0, 1, 0, -b_max.y));
+  poly->Transform (trans);
+
+  CHK (poly = new csBspPolygon ());
+  container->AddPolygon (poly);
+  poly->SetOriginator (this);
+  poly->GetPolygon ().AddVertex (pt_xyz);
+  poly->GetPolygon ().AddVertex (pt_Xyz);
+  poly->GetPolygon ().AddVertex (pt_XyZ);
+  poly->GetPolygon ().AddVertex (pt_xyZ);
+  poly->SetPolyPlane (csPlane (0, 1, 0, -b_min.y));
+  poly->Transform (trans);
+}
+
 void csSprite3D::Draw (csRenderView& rview)
 {
   if (draw_callback) draw_callback (this, &rview);
@@ -694,10 +816,6 @@ void csSprite3D::InitSprite ()
 
   if (!cur_action) { SetFrame (0); cur_action = tpl->GetFirstAction (); }
 
-  //CHK (tr_frame = new csFrame (tpl->num_vertices));
-  //CHK (persp = new csVector2 [tpl->num_vertices]);
-  //CHK (visible = new bool [tpl->num_vertices]);
-
   time_t tm;
   csWorld::isys->GetTime (tm);
   last_time = tm;
@@ -801,7 +919,7 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
   defered_num_lights = 0;
 
   csFrame* this_frame = tpl->GetFrame (cur_frame);
-  csVector3* object_vertices = GetObjectVerts (this_frame);;
+  csVector3* object_vertices = GetObjectVerts (this_frame);
 
   if (!this_frame->HasNormals ())
     this_frame->ComputeNormals (tpl->GetBaseMesh (), object_vertices, tpl->GetNumVertices ());

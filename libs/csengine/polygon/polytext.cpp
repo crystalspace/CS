@@ -101,7 +101,7 @@ void csPolyTexture::CreateBoundingTextureBox ()
   int i;
   csVector3 v1, v2;
   DB ((MSG_DEBUG_0, "  Vertices in world-space:\n"));
-  for (i = 0 ; i < polygon->GetNumVertices () ; i++)
+  for (i = 0 ; i < polygon->GetVertices ().GetNumVertices () ; i++)
   {
     v1 = polygon->Vwor (i);   // Coordinates of vertex in world space.
     DB ((MSG_DEBUG_0, "      %d:(%f,%f,%f)\n", i, v1.x, v1.y, v1.z));
@@ -699,7 +699,7 @@ void csPolyTexture::FillLightMap (csLightView& lview)
   int mi;
   CHK (f_uv = new csVector2 [num_frustrum]);
 
-  rpv=polygon->GetNumVertices();
+  rpv=polygon->GetVertices ().GetNumVertices();
   CHK (rp = new csVector2 [rpv]);
 
   csVector3 projector;

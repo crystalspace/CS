@@ -17,68 +17,49 @@
 */
 
 #include "sysdef.h"
-#include "csgeom/poly2d.h"
-#include "csgeom/polyclip.h"
+#include "csgeom/polyidx.h"
 
-csPoly2DFactory* csPoly2DFactory::SharedFactory()
-{
-  static csPoly2DFactory* p = 0;
-  if (p == 0)
-    CHK (p = new csPoly2DFactory);
-  return p;
-}
-
-csPoly2D::csPoly2D (int start_size)
+csPolyIndexed::csPolyIndexed (int start_size)
 {
   max_vertices = start_size;
-  CHK (vertices = new csVector2 [max_vertices]);
+  CHK (vertices_idx = new int [max_vertices]);
   MakeEmpty ();
 }
 
-csPoly2D::csPoly2D (csPoly2D& copy)
+csPolyIndexed::csPolyIndexed (csPolyIndexed& copy)
 {
   max_vertices = copy.max_vertices;
-  CHK (vertices = new csVector2 [max_vertices]);
+  CHK (vertices_idx = new int [max_vertices]);
   num_vertices = copy.num_vertices;
-  memcpy (vertices, copy.vertices, sizeof (csVector2)*num_vertices);
-  bbox = copy.bbox;
+  memcpy (vertices_idx, copy.vertices_idx, sizeof (int)*num_vertices);
 }
 
-csPoly2D::~csPoly2D ()
+csPolyIndexed::~csPolyIndexed ()
 {
-  CHK (delete [] vertices);
+  CHK (delete [] vertices_idx);
 }
 
-void csPoly2D::MakeEmpty ()
+void csPolyIndexed::MakeEmpty ()
 {
   num_vertices = 0;
-  bbox.StartBoundingBox ();
 }
 
-void csPoly2D::MakeRoom (int new_max)
+void csPolyIndexed::MakeRoom (int new_max)
 {
   if (new_max <= max_vertices) return;
-  CHK (csVector2* new_vertices = new csVector2 [new_max]);
-  memcpy (new_vertices, vertices, num_vertices*sizeof (csVector2));
-  CHK (delete [] vertices);
-  vertices = new_vertices;
+  CHK (int* new_vertices_idx = new int [new_max]);
+  memcpy (new_vertices_idx, vertices_idx, num_vertices*sizeof (int));
+  CHK (delete [] vertices_idx);
+  vertices_idx = new_vertices_idx;
   max_vertices = new_max;
 }
 
-void csPoly2D::AddVertex (float x, float y)
+void csPolyIndexed::AddVertex (int i)
 {
   if (num_vertices >= max_vertices)
     MakeRoom (max_vertices+5);
-  vertices[num_vertices].x = x;
-  vertices[num_vertices].y = y;
+  vertices_idx[num_vertices] = i;
   num_vertices++;
-  bbox.AddBoundingVertex (x, y);
-}
-
-bool csPoly2D::ClipAgainst (csClipper* view)
-{
-  MakeRoom (num_vertices+view->GetNumVertices ()+1);
-  return view->Clip (vertices, num_vertices, max_vertices, &bbox);
 }
 
 //---------------------------------------------------------------------------

@@ -30,6 +30,8 @@
 #include "csengine/stats.h"
 #include "csengine/dumper.h"
 #include "csengine/cbuffer.h"
+#include "csengine/bspbbox.h"
+#include "csengine/cssprite.h"
 #include "csobject/nameobj.h"
 #include "csgeom/bsp.h"
 #include "csgeom/polypool.h"
@@ -443,32 +445,59 @@ void csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
   
   for (i = 0 ; i < num ; i++)
   {
-    clip = (csPolygon2D*)(render_pool->Alloc ());
-    visible = false;
-    p = (csPolygon3D*)polygon[i];
-    if ( !p->dont_draw &&
-         p->ClipToPlane (d->do_clip_plane ? &d->clip_plane : (csPlane*)NULL,
-	 	d->GetOrigin (), verts, num_verts) &&
-         p->DoPerspective (*d, verts, num_verts, clip, NULL,
-	 	d->IsMirrored ())  &&
-         clip->ClipAgainst (d->view) )
+    if (polygon[i]->GetType () == 2)
     {
-      po = p->GetPortal ();
-      if (csSector::do_portals && po)
+      // We're dealing with a csBspPolygon.
+      csBspPolygon* bsppol = (csBspPolygon*)polygon[i];
+      csSprite3D* sp3d = (csSprite3D*)(bsppol->GetOriginator ());
+      // If the sprite is already marked visible then we don't have
+      // to do any of the other processing for this polygon.
+      if (!sp3d->IsVisible ())
       {
-        visible = c_buffer->TestPolygon (clip->GetVertices (),
-		clip->GetNumVertices ());
-      }
-      else
-      {
-        visible = c_buffer->InsertPolygon (clip->GetVertices (),
-		clip->GetNumVertices ());
+        // Transform it to screen space and perform clipping to Z plane.
+        // Then test against the c-buffer to see if it is visible.
+        clip = (csPolygon2D*)(render_pool->Alloc ());
+        if ( bsppol->ClipToPlane (d->do_clip_plane ? &d->clip_plane : (csPlane*)NULL,
+	 	    d->GetOrigin (), verts, num_verts) &&
+             bsppol->DoPerspective (*d, verts, num_verts, clip,
+	 	    d->IsMirrored ()))
+        {
+          if (c_buffer->TestPolygon (clip->GetVertices (), clip->GetNumVertices ()))
+            sp3d->MarkVisible ();
+        }
+        render_pool->Free (clip);
       }
     }
-    if (visible)
-      poly_queue->Push (p, clip);
     else
-      render_pool->Free (clip);
+    {
+      // We're dealing with a csPolygon3D.
+      clip = (csPolygon2D*)(render_pool->Alloc ());
+      visible = false;
+      p = (csPolygon3D*)polygon[i];
+      if ( !p->dont_draw &&
+           p->ClipToPlane (d->do_clip_plane ? &d->clip_plane : (csPlane*)NULL,
+	 	  d->GetOrigin (), verts, num_verts) &&
+           p->DoPerspective (*d, verts, num_verts, clip, NULL,
+	 	  d->IsMirrored ())  &&
+           clip->ClipAgainst (d->view) )
+      {
+        po = p->GetPortal ();
+        if (csSector::do_portals && po)
+        {
+          visible = c_buffer->TestPolygon (clip->GetVertices (),
+		  clip->GetNumVertices ());
+        }
+        else
+        {
+          visible = c_buffer->InsertPolygon (clip->GetVertices (),
+		  clip->GetNumVertices ());
+        }
+      }
+      if (visible)
+        poly_queue->Push (p, clip);
+      else
+        render_pool->Free (clip);
+    }
   }
 }
 
@@ -514,7 +543,7 @@ csFrustrumList* csPolygonSet::GetShadows (csVector3& origin)
     pl.Invert ();
     frust->SetBackPlane (pl);
     frust->polygon = p;
-    for (j = 0 ; j < p->GetNumVertices () ; j++)
+    for (j = 0 ; j < p->GetVertices ().GetNumVertices () ; j++)
       frust->AddVertex (p->Vwor (j)-origin);
   }
   return list;
@@ -691,8 +720,8 @@ csVector2* csPolygonSet::IntersectCameraZPlane (float z,csVector2* /*clipper*/,
   for (i=0 ; i<num_polygon ; i++)
   {
     csPolygon3D *p=(csPolygon3D*)polygons[i];
-    int nv=p->GetNumVertices ();
-    int *v_i=p->GetVerticesIdx ();
+    int nv = p->GetVertices ().GetNumVertices ();
+    int *v_i = p->GetVertices ().GetVertexIndices ();
 
     for (j=0,n=1 ; j<nv ; j++,n=(n+1)%nv)
     {
