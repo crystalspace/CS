@@ -143,9 +143,7 @@ csPtr<iImage> csDDSImageFile::MipMap (int step, csRGBpixel* transp)
 {
   if (step == 0 || step > mipmapcount || transp)
     return csImageFile::MipMap (step, transp);
-  iImage* m = mipmaps[step-1];
-  m->IncRef();
-  return csPtr<iImage>(m);
+  return csPtr<iImage> (mipmaps[step-1]->Clone ());
 }
 
 int csDDSImageFile::HasMipmaps ()

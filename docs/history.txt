@@ -16,6 +16,14 @@ chronological order.
 	  (as done by the original code).  The difference now, however, is that
 	  the reference counting logic is obvious and clear rather than obscure
 	  and hidden.  Also, the Clone() was unnecessarily expensive.
+	- Luca reverted the last change of Eric to the DDS loader, and put 
+	  again his C++ code which were creating a new image using the Clone()
+	  method. 
+	  The problem is with the Eric code is that a new image was not 
+	  created, but the method MipMap must return a new image, so that the
+	  method caller could work on it without affecting the original image: 
+	  in fact subsequent MipMap calls must return the original image, not
+	  the modified one.
 22-Oct-2004
 	- Eric Sunshine fixed a bug in the replacement MakeLocate rule in
 	  subdir.jam where it failed to set the LOCATE variable for the target
