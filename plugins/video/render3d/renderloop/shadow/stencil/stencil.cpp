@@ -21,6 +21,7 @@
 #include "csutil/garray.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/vector4.h"
+#include "cstool/polymeshtools.h"
 
 #include "iengine/rview.h"
 #include "iengine/camera.h"
@@ -35,9 +36,8 @@
 #include "iutil/document.h"
 #include "ivideo/rendermesh.h"
 
-//#define SHADOW_CULL 1
-
 #include "stencil.h"
+#include "polymesh.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -93,7 +93,8 @@ void csStencilShadowCacheEntry::SetActiveLight (iLight *light,
   csLightCacheEntry *entry = 
     (csLightCacheEntry*)lightcache.Get ((csHashKey)light);
 
-  if (entry == 0) {
+  if (entry == 0) 
+  {
     entry = new csLightCacheEntry ();
     entry->light = light;
     entry->meshLightPos = meshlightpos; 
@@ -109,7 +110,8 @@ void csStencilShadowCacheEntry::SetActiveLight (iLight *light,
       (entry->meshLightPos - meshlightpos).SquaredNorm () > 0.02) 
   {
     entry->meshLightPos = meshlightpos;
-    if (entry->shadow_index_buffer == 0) { 
+    if (entry->shadow_index_buffer == 0) 
+    { 
       entry->shadow_index_buffer = g3d->CreateRenderBuffer (
         sizeof (unsigned int)*triangle_count*12, CS_BUF_STATIC/*CS_BUF_INDEX*/,
         CS_BUFCOMP_UNSIGNED_INT, 1, true);
@@ -218,9 +220,11 @@ void csStencilShadowCacheEntry::HandleEdge (EdgeInfo *e, csHashMap& edge_stack)
 
   csHashIterator it (&edge_stack, hash);
   bool found = false;
-  while (it.HasNext()) {
+  while (it.HasNext()) 
+  {
     EdgeInfo *t = (EdgeInfo *)it.Next();
-    if (e->a == t->b && e->b == t->a) {
+    if (e->a == t->b && e->b == t->a) 
+    {
       found = true;
       edge_indices[edge_count*3 + 0] = e->ind_a;
       edge_indices[edge_count*3 + 1] = t->ind_b;
@@ -247,7 +251,8 @@ void csStencilShadowCacheEntry::HandleEdge (EdgeInfo *e, csHashMap& edge_stack)
 
 void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
 {
-  if (csStencilShadowCacheEntry::model != model) {
+  if (csStencilShadowCacheEntry::model != model) 
+  {
     printf ("New model %8.8x, old model %8.8x\n", model, csStencilShadowCacheEntry::model);
     csStencilShadowCacheEntry::model = model;	
   }
@@ -255,11 +260,39 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
   //first try to use a MeshShadow polygonmesh
   //but if we don't get any, attempt to use collidemesh
   csRef<iPolygonMesh> mesh = model->GetPolygonMeshShadows ();
+  // Shadow meshed are "trusted" to be closed.
   if (!mesh)
   {
-    mesh = model->GetPolygonMeshColldet (); //@@@ CHECK IF WE WANT TO DO THIS
-    if (!mesh)
-      return; 
+    bool isClosed = false;
+    mesh = model->GetPolygonMeshViscull (); 
+    if (mesh)
+    {
+      // @@@ Check closed flag
+    }
+    else
+    {
+      mesh = model->GetPolygonMeshColldet (); 
+      if (!mesh)
+      {
+	mesh = model->GetPolygonMeshBase (); 
+	if (!mesh)
+	{
+	  return;
+	}
+      }
+    }
+    // @@@ Not good when the object model changes often.
+    if (!(isClosed || csPolyMeshTools::IsMeshClosed (mesh)))
+    {
+      csStencilPolygonMesh* newMesh = new csStencilPolygonMesh;
+      newMesh->CopyFrom (mesh);
+
+      csArray<csMeshedPolygon> newPolys;
+      csPolyMeshTools::CloseMesh (mesh, newPolys);
+      newMesh->AddPolys (newPolys);
+
+      mesh.AttachNew (newMesh);
+    }
   }
 
   csVector3 *verts = mesh->GetVertices ();

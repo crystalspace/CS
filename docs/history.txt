@@ -28,6 +28,20 @@ chronological order.
 	- res fixed a cut'n'paste error in metaglext.xml.
 	- res removed his EXT_stencil_two_side definition - there already was
 	  one in metaglext.xml.
+	- res added some tools to deal with 'closedness' of polygon meshes
+	  (csPolyMeshTools.)
+	- res changed how the stencil plugin retrieves the shadow mesh.
+	  First, the shadow polygon mesh is tried. If it's present, it's used.
+	  No testing for closedness is done - the shadow mesh is "trusted" to
+	  be closed. Next the viscull mesh is used. A check for the 'closed'
+	  flag of the mesh object will be added later. If it's set, the mesh
+	  will be treated as closed. If the viscull mesh isn't present, the
+	  colldet resp. base meshes are tried. If, either due the missing flag 
+	  or a test, the mesh is found 'unclosed', it'll be naively closed
+	  (by duplicating faces & flipping their normals.)
+	- res modified the Thing static data to not set the shadow poly mesh.
+	- res changed r3dtest so that the viewer doesn't stare at a wall at
+	  startup.
 3-Sep-2003
 	- Peter Amstutz changed nullmesh to properly initialize it's
 	  bounding box to a legal (albeit extremely small) value.

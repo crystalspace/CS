@@ -39,7 +39,7 @@
     <start>
         <sector>room</sector>
         <position x="-5" y="-12.6" z="0" />
-        <forward x="0" y="0" z="1" />
+        <forward x="0.7071" y="0" z="-0.7071" />
         <up x="0" y="1" z="0" />
     </start>
     <textures>
