@@ -29,6 +29,8 @@ chronological order.
 	  and xmlshader.h.
 	- Anders Stenberg modified standard reporter to give a more easy to 
 	  read output to the console and to the yellow popup.
+	- Anders Stenberg fixed one more off-by-one problem in GL canvas with 
+	  NR. Blit was off one pixel along Y.
 17-Dec-2003
 	- Jorrit fixed an initialition bug in the xmlshader compiler.
 	  It would not initialize the writemask which means that you could

@@ -468,7 +468,11 @@ void csGraphics2DGLCommon::Blit (int x, int y, int w, int h,
   if (gl_alphaTest) statecache->Disable_GL_ALPHA_TEST ();
 
   glColor3f (0., 0., 0.);
+#ifndef CS_USE_NEW_RENDERER
   glRasterPos2i (x, Height-y-h+1);
+#else
+  glRasterPos2i (x, Height-y-h);
+#endif // CS_USE_NEW_RENDERER
   glDrawPixels (w, h, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
   if (gl_texture2d) statecache->Enable_GL_TEXTURE_2D ();
