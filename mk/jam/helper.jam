@@ -80,6 +80,8 @@ rule Filter
       result += $(i) ;
     }
   }
+
+  return $(result) ;
 }
 
 ##  Prefix list : prefix
