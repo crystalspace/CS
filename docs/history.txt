@@ -9,6 +9,16 @@ The history order is reversed so that new features are at the top.
 	  crippled. (Results in lighting failure.)
 	- Keith Fulton committed some additional accessor functions to
 	  iPath and csPath.
+	- Jorrit added a new csRadixSorter class. This class implements the
+	  radix sort algorithm which is O(n) but only works on integers.
+	  It needs up to 4 passes to sort a table of integers. I did some
+	  benchmarks to compare radix with qsort. Here are some results:
+	    - 100000 random numbers no greater than 65535: radix roughly 9
+	      times faster.
+	    - 100000 random numbers: radix roughly 6 times faster.
+	    - 100000 almost sorted numbers: radix roughly 3 times faster.
+	    - 100000 almost equal numbers: radix roughly 2 times slower.
+	  So in almost all cases radix clearly beats qsort.
 17-Jul-2003
         - Philip Wyett fixed broken glrender3d makefile. OBJ.GLRENDER3D should
           have had OUT.GLRENDER3D not DIR.GLRENDER3D.
