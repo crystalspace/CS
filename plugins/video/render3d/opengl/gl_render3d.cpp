@@ -2830,5 +2830,149 @@ bool csGLGraphics3D::DebugCommand (const char* cmdstr)
 
     return true;
   }
+  else if (strcasecmp (cmd, "dump_zbuf") == 0)
+  {
+    const char* dir = 
+      ((param != 0) && (*param != 0)) ? param : "/tmp/zbufdump/";
+    DumpZBuffer (dir);
+
+    return true;
+  }
   return false;
+}
+
+void csGLGraphics3D::DumpZBuffer (const char* path)
+{
+  csRef<iImageIO> imgsaver = CS_QUERY_REGISTRY (object_reg, iImageIO);
+  if (!imgsaver)
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING,
+      "Could not get image saver.");
+    return;
+  }
+
+  csRef<iVFS> vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+  if (!vfs)
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING, 
+      "Could not get VFS.");
+    return;
+  }
+
+  static int zBufDumpNr = 0;
+  csString filenameZ;
+  csString filenameScr;
+  do
+  {
+    int nr = zBufDumpNr++;
+    filenameZ.Format ("%s%d_z.png", path, nr);
+    filenameScr.Format ("%s%d_scr.png", path, nr);
+  }
+  while (vfs->Exists (filenameZ) && vfs->Exists (filenameScr));
+
+  {
+    csRef<iImage> screenshot = G2D->ScreenShot ();
+    csRef<iDataBuffer> buf = imgsaver->Save (screenshot, "image/png");
+    if (!buf)
+    {
+      Report (CS_REPORTER_SEVERITY_WARNING,
+	"Could not save screen.");
+    }
+    else
+    {
+      if (!vfs->WriteFile (filenameScr, (char*)buf->GetInt8 (), 
+	buf->GetSize ()))
+      {
+	Report (CS_REPORTER_SEVERITY_WARNING,
+	  "Could not write to %s.", filenameScr.GetData ());
+      }
+      else
+      {
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "Dumped screen to %s", filenameScr.GetData ());
+      }
+    }
+  }
+  {
+    csRef<csImageMemory> zImage;
+    zImage.AttachNew (new csImageMemory (viewwidth, viewheight));
+
+    static const uint8 zBufColors[][3] = {
+      {  0,   0,   0},
+      {  0, 255,   0},
+      {255, 255,   0},
+      {255,   0,   0},
+      {255,   0, 255},
+      {  0,   0, 255},
+      {255, 255, 255},
+    };
+    const int colorMax = (sizeof (zBufColors) / sizeof (zBufColors[0])) - 1;
+
+    int num = viewwidth * viewheight;
+    GLfloat* zvalues = new GLfloat[num];
+    glReadPixels (0, 0, viewwidth, viewheight, GL_DEPTH_COMPONENT, GL_FLOAT, 
+      zvalues);
+    GLfloat minValue = 1.0f;
+    GLfloat maxValue = 0.0f;
+    for (int i = 0; i < num; i++)
+    {
+      if (zvalues[i] < minValue)
+	minValue = zvalues[i];
+      else if (zvalues[i] > maxValue)
+	maxValue = zvalues[i];
+    }
+    float zMul = 1.0f;
+    if (maxValue - minValue > 0)
+      zMul /= (maxValue - minValue);
+    csRGBpixel* imgPtr = (csRGBpixel*)zImage->GetImageData ();
+    for (int y = 0; y < viewheight; y++)
+    {
+      GLfloat* zPtr = zvalues + (viewheight - y - 1) * viewwidth;
+      for (int x = 0; x < viewwidth; x++)
+      {
+	GLfloat zv = *zPtr++; 
+	zv -= minValue;
+	zv *= zMul;
+	float cif = zv * (float)colorMax;
+	int ci = csQint (cif);
+	if (ci == colorMax)
+	{
+	  (imgPtr++)->Set (zBufColors[ci][0], zBufColors[ci][1],
+	    zBufColors[ci][2]);
+	}
+	else
+	{
+	  float ratio = cif - (float)ci;
+	  float invRatio = 1.0f - ratio;
+	  (imgPtr++)->Set (
+	    csQint (zBufColors[ci][0] * ratio + zBufColors[ci+1][0] * invRatio), 
+	    csQint (zBufColors[ci][1] * ratio + zBufColors[ci+1][1] * invRatio), 
+	    csQint (zBufColors[ci][2] * ratio + zBufColors[ci+1][2] * invRatio));
+
+	}
+      }
+    }
+    delete[] zvalues;
+
+    csRef<iDataBuffer> buf = imgsaver->Save (zImage, "image/png");
+    if (!buf)
+    {
+      Report (CS_REPORTER_SEVERITY_WARNING,
+	"Could not save Z buffer.");
+    }
+    else
+    {
+      if (!vfs->WriteFile (filenameZ, (char*)buf->GetInt8 (), 
+	buf->GetSize ()))
+      {
+	Report (CS_REPORTER_SEVERITY_WARNING,
+	  "Could not write to %s.", filenameZ.GetData ());
+      }
+      else
+      {
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "Dumped Z buffer to %s", filenameZ.GetData ());
+      }
+    }
+  }
 }

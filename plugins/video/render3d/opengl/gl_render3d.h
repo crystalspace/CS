@@ -580,6 +580,7 @@ public:
   ////////////////////////////////////////////////////////////////////
   /// Execute a debug command.
   virtual bool DebugCommand (const char* cmd);
+  void DumpZBuffer (const char* path);
 
   struct eiDebugHelper : public iDebugHelper
   {
