@@ -1,5 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
+8-Sep-2000
+	- Received patched VC project files from Philip Wyett
+	  <philipwyett@leedsalumni.org.uk>.
 7-Sep-2000
 	- Eric Sunshine updated the documentation-related URLs in the User's
 	  Manual Texinfo files.  Also added several new links to resource.txi.
