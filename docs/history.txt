@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+11-Nov-2004
+	- Eric Sunshine augmented configure.ac/cstypes.h so that they also
+	  consult <inttypes.h> (in addition to <stdint.h>) when checking for
+	  intptr_t and uintptr_t since these types are declared in <inttypes.h>
+	  on BSD platforms.
 9-Nov-2004
 	- Jorrit did some further work on foliage.
 	- Eric Sunshine added a number of CS_ASSERT()'s to csList<> to catch
