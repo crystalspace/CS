@@ -1664,7 +1664,7 @@ texr_done:
       {
         // Check first if polygon has been finished
         if (scanR2 == min_i)
-          goto finish;
+          return; //goto finish;
         scanR1 = scanR2;
 	if (++scanR2 >= poly.num)
 	  scanR2 = 0;
@@ -1764,9 +1764,9 @@ texr_done:
     } /* endwhile */
   } /* endfor */
 
-finish:
-  if ((tex_mm->GetFlags () & CS_TEXTURE_PROC) == CS_TEXTURE_PROC)
-    tcache->uncache_texture (0, tex);
+//  finish:
+//    if ((tex_mm->GetFlags () & CS_TEXTURE_PROC) == CS_TEXTURE_PROC)
+//      tcache->uncache_texture (0, tex);
 }
 
 void csGraphics3DSoftwareCommon::DrawPolygonDebug (G3DPolygonDP& poly)

@@ -23,7 +23,7 @@
 #include "isprotex.h"
 
 class csTextureMMSoftware;
-
+class csTextureCacheSoftware;
 
 class csSoftProcTexture3D : public csGraphics3DSoftwareCommon, 
 			    public iSoftProcTexture
@@ -43,6 +43,8 @@ private:
 public:
   csTextureMMSoftware *soft_tex_mm;
   csTextureMMSoftware *parent_tex_mm;
+  csTextureCacheSoftware *parent_tcache;
+
   DECLARE_IBASE;
 
   csSoftProcTexture3D (iBase *iParent);

@@ -21,6 +21,7 @@
 #include "isystem.h"
 #include "igraph2d.h"
 #include "soft_txt.h"
+#include "tcache.h"
 #include "csgfxldr/memimage.h"
 #include "csgfxldr/rgbpixel.h"
 #include "itexture.h"
@@ -68,6 +69,10 @@ void csSoftProcTexture3D::Print (csRect *area)
 
   if (reprepare)
     soft_tex_mm->ReprepareProcTexture ();
+
+  // As we've printed something we need to uncache it so the effects will be 
+  // registered next frame.
+  parent_tcache->uncache_texture (0, (iTextureHandle*)parent_tex_mm);
 }
 
 bool csSoftProcTexture3D::Prepare 
@@ -75,6 +80,7 @@ bool csSoftProcTexture3D::Prepare
      csSoftProcTexture3D *first_texG3D, void *buffer,  uint8 *bitmap, 
      csPixelFormat *ipfmt, RGBPixel *palette, bool alone_hint)
 {
+  parent_tcache = parent_g3d->tcache;
   parent_tex_mm = tex_mm;
   tex_mm->GetMipMapDimensions (0, width, height);
   (System = parent_g3d->System)->IncRef ();

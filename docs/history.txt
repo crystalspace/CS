@@ -9,6 +9,15 @@ The history order has been reversed so that new features are at the top.
             - Added a conditional to the delete [] Scan.GlobalCMap to prevent
               destruction if this resource is shared in the software renderer
               texture manager.
+	    - Added a new function to the software texture cache which removes
+              all cached_textures dependent on a texture handle
+            - Commented out last reference to proc textures within soft3dcom.cpp 
+	      as now protex3d.cpp takes care of uncaching and only when the proc 
+              texture is updated. Dtsimple suffers slight performance degradation,
+              ..perhaps add another proc_texture flag
+              i.e. CS_TEXTURE_PROC_UNCACHE_ALWAYS.. or would this be an unwanted
+              complication? An app which utilises and benefits from this is 
+              forthcoming.
 28-Jul-2000
 	- Norman Kramer fixes the x2d canvas so that the title is set
 	  to the right window.

@@ -124,6 +124,33 @@ void csTextureCacheSoftware::uncache_texture (int MipMap, iPolygonTexture* pt)
   delete cached_texture;
 }
 
+void csTextureCacheSoftware::uncache_texture (int MipMap, iTextureHandle *itexh)
+{
+  SoftwareCachedTexture *cached_texture, *next_cached_texture;
+  cached_texture = next_cached_texture = head;
+  while (cached_texture)
+  {
+    next_cached_texture = cached_texture->next;
+    if ((cached_texture->mipmap == MipMap) && 
+	(cached_texture->source->GetTextureHandle () == itexh))
+    {
+      if (cached_texture->next)
+	cached_texture->next->prev = cached_texture->prev;
+      else
+	tail = cached_texture->prev;
+      if (cached_texture->prev)
+	cached_texture->prev->next = cached_texture->next;
+      else
+	head = cached_texture->next;
+      total_textures--;
+      total_size -= cached_texture->size;
+
+      delete cached_texture;
+    }
+    cached_texture = next_cached_texture;
+  }   
+}
+
 SoftwareCachedTexture *csTextureCacheSoftware::cache_texture 
   (int MipMap, iPolygonTexture* pt)
 {
