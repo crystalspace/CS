@@ -3853,6 +3853,7 @@ package cspace::iObjectModel;
 *SetPolygonMeshShadows = *cspacec::iObjectModel_SetPolygonMeshShadows;
 *CreateLowerDetailPolygonMesh = *cspacec::iObjectModel_CreateLowerDetailPolygonMesh;
 *GetObjectBoundingBox = *cspacec::iObjectModel_GetObjectBoundingBox;
+*SetObjectBoundingBox = *cspacec::iObjectModel_SetObjectBoundingBox;
 *GetRadius = *cspacec::iObjectModel_GetRadius;
 *AddListener = *cspacec::iObjectModel_AddListener;
 *RemoveListener = *cspacec::iObjectModel_RemoveListener;
@@ -12646,9 +12647,6 @@ sub CS_CLIP_CLIPPED () { $cspacec::CS_CLIP_CLIPPED }
 sub CS_VERTEX_ORIGINAL () { $cspacec::CS_VERTEX_ORIGINAL }
 sub CS_VERTEX_ONEDGE () { $cspacec::CS_VERTEX_ONEDGE }
 sub CS_VERTEX_INSIDE () { $cspacec::CS_VERTEX_INSIDE }
-sub CS_BBOX_NORMAL () { $cspacec::CS_BBOX_NORMAL }
-sub CS_BBOX_ACCURATE () { $cspacec::CS_BBOX_ACCURATE }
-sub CS_BBOX_MAX () { $cspacec::CS_BBOX_MAX }
 sub CS_POLYMESH_CLOSED () { $cspacec::CS_POLYMESH_CLOSED }
 sub CS_POLYMESH_NOTCLOSED () { $cspacec::CS_POLYMESH_NOTCLOSED }
 sub CS_POLYMESH_CONVEX () { $cspacec::CS_POLYMESH_CONVEX }
