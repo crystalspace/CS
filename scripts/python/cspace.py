@@ -9222,6 +9222,9 @@ class iFont(iBase):
     def GetDescent(*args): return _cspace.iFont_GetDescent(*args)
     def GetAscent(*args): return _cspace.iFont_GetAscent(*args)
     def HasGlyph(*args): return _cspace.iFont_HasGlyph(*args)
+    def GetTextHeight(*args): return _cspace.iFont_GetTextHeight(*args)
+    def GetUnderlinePosition(*args): return _cspace.iFont_GetUnderlinePosition(*args)
+    def GetUnderlineThickness(*args): return _cspace.iFont_GetUnderlineThickness(*args)
     def __del__(self, destroy=_cspace.delete_iFont):
         try:
             if self.thisown: destroy(self)
