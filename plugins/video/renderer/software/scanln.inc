@@ -68,12 +68,6 @@ void SCANFUNC (int xx, unsigned char* d, uint32* z_buf, float inv_z,
   int uu1, vv1, duu, dvv, uu, vv;
   uint32 izz, dzz;
 
-  // does not really belong here...
-  // but there doesn't seem to be a better place
-#ifdef A_MAP
-  int a_uofs = Scan.amap_uofs;
-  int a_vofs = Scan.amap_vofs;
-#endif
   z = 1 / inv_z;
   u = u_div_z * z;
   v = v_div_z * z;

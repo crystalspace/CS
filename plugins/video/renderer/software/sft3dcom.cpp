@@ -2136,7 +2136,7 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
 #undef CHECK
     }
 texr_done:
-    tcache->fill_texture (mipmap, tex, tex_mm, u_min, v_min, u_max, v_max);
+    tcache->fill_texture (mipmap, tex, tex_mm,  u_min, v_min, u_max, v_max);
   }
   csScan_InitDraw (mipmap, this, tex, tex_mm, txt_unl);
 
@@ -2199,7 +2199,6 @@ texr_done:
     else if (z_buf_mode == CS_ZBUF_USE) scan_index += 2;
     else if (z_buf_mode == CS_ZBUF_TEST) scan_index += 3;
     if (do_alpha)
-    {
       if (tex_keycolor)
         scan_index += 4;
       else if ((Scan.AlphaMap = txt_unl->get_alphamap ()))
@@ -2211,26 +2210,16 @@ texr_done:
         else if (z_buf_mode == CS_ZBUF_USE) scan_index += 2;
         else if (z_buf_mode == CS_ZBUF_TEST) scan_index += 3;
       }
-    }
     dscan = ScanProc [scan_index];
   }
   else
-  {
     dscan = ScanProc_Alpha (this, alpha, tex_keycolor, (Scan.AlphaMap = txt_unl->get_alphamap ()));
-  }
 
   if (!dscan) return;
 
   sxL = sxR = dxL = dxR = 0; // Avoid warnings about "uninitialized variables"
   scanL2 = scanR2 = max_i;
   sy = fyL = fyR = QRound (poly.vertices [scanL2].y);
-
-  if (do_alpha) 
-  {
-    // cached texture has different coords than original tex.
-    Scan.amap_uofs = tex->GetIMinU() >> mipmap; 
-    Scan.amap_vofs = tex->GetIMinV() >> mipmap; 
-  }
 
   for ( ; ; )
   {

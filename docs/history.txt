@@ -24,6 +24,9 @@ The history order is reversed so that new features are at the top.
 	  If the parent object is invisible then the children were not
 	  rendered. This should now be solved.
 	- Eric Sunshine eliminated compilation warnings in ieplex.cpp.
+	- Eric Sunshine reverted Frank Richter's changes to the software
+	  renderer since they were causing bizarre texture mapping problems
+	  for some people and caused frequent crashes.
 27-Feb-2003
 	- res fixed the "shifted alpha map" bug in the software renderer.
 	- Marten Svanfeldt once again fiddled with the light/shadow culling. 
