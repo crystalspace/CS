@@ -41,6 +41,14 @@ public:
   STDMETHOD (Play) (SoundBufferPlayMethod playMethod = SoundBufferPlay_Normal) PURE;
   /// Stop the sound
   STDMETHOD (Stop) () PURE;
+  // Set volume
+  STDMETHOD (SetVolume) (float volume) PURE;
+  // Get volume
+  STDMETHOD (GetVolume) (float &volume) PURE;
+  // Set frequency factor : 1 = normal, >1 more speed, <1 more slow
+  STDMETHOD (SetFrequencyFactor) (float factor) PURE;
+  // Get frequency factor
+  STDMETHOD (GetFrequencyFactor) (float &factor) PURE;
   // Create a 3d 
   STDMETHOD (CreateSource) (ISoundSource **source) PURE;
 };
