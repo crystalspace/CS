@@ -52,11 +52,15 @@ csGlideTextureCache::~csGlideTextureCache()
 void csGlideTextureCache::Add(iTextureHandle *texture, bool alpha)
 {
   int size = 0;
+  int nMM=0;
   for (int c =0; c<4; c++)
   {
     int width, height;
     if (texture->GetMipMapDimensions( c, width, height ))
+    {
       size += width * height;
+      nMM++;
+    };  
   }
 
   size *= alpha ? 1 : bpp/8;
@@ -86,6 +90,7 @@ void csGlideTextureCache::Add(iTextureHandle *texture, bool alpha)
       printf( "Knock knock, you try to load a texture of size %d (incl. mipmaps) but your TMU can only handle %ld\n", size, cache_size );
       exit(1);
     }
+
     // unit is not in memory. load it into the cache
     while ((total_size + size >= cache_size) || !manager->hasFreeSpace(size))
     {
@@ -105,8 +110,7 @@ void csGlideTextureCache::Add(iTextureHandle *texture, bool alpha)
     cached_texture->pSource = texture;
     cached_texture->lSize = size;
     cached_texture->texhnd.type = alpha ? CS_GLIDE_ALPHACACHE : CS_GLIDE_TEXCACHE;
-
-    Load(cached_texture);       // load it.
+    Load (cached_texture,nMM);       // load it.
     if ( cached_texture->texhnd.loaded )
     {
       // now load the unit.
@@ -381,7 +385,7 @@ void csGlideTextureCache::Unload ( csGlideCacheData *d )
   delete d;
 }
  
-void csGlideTextureCache::LoadTex(csGlideCacheData *d)
+void csGlideTextureCache::LoadTex(csGlideCacheData *d, int nMM)
 {
 
   iTextureHandle* txt_handle = (iTextureHandle*)d->pSource;
@@ -391,10 +395,10 @@ void csGlideTextureCache::LoadTex(csGlideCacheData *d)
   int width = txt_unl->get_width ();
   int height = txt_unl->get_height ();
 
-  GrLOD_t lod[4];
+  GrLOD_t lod[nMM];
   d->texhnd.loaded = false;
  
-  if (CalculateTexData ( width, height, 1.0, 1.0, lod, 4, d ))
+  if (CalculateTexData ( width, height, 1.0, 1.0, lod, nMM, d ))
   {
     d->texhnd.info.format=GR_TEXFMT_RGB_565;
     d->texhnd.tmu = m_tmu;
@@ -411,7 +415,7 @@ void csGlideTextureCache::LoadTex(csGlideCacheData *d)
 
     unsigned char* src=NULL;
     // Download all mipmaps
-    for( i=0; i<4; i++)
+    for( i=0; i<nMM; i++)
     {
       if (lod[i]!=-1)
       {
@@ -536,12 +540,12 @@ void csGlideTextureCache::LoadAlpha (csGlideCacheData *d)
   }
 }
 
-void csGlideTextureCache::Load (csGlideCacheData *d)
+void csGlideTextureCache::Load (csGlideCacheData *d, int nMM)
 {
   switch ( d->texhnd.type )
   {
   case CS_GLIDE_TEXCACHE:
-    LoadTex ( d );
+    LoadTex ( d, nMM );
     break;
   case CS_GLIDE_LITCACHE:
     LoadLight ( d );

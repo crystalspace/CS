@@ -119,13 +119,13 @@ protected:
   TextureMemoryManager * manager;
 
   ///
-  virtual void Load (csGlideCacheData *d);
+  virtual void Load (csGlideCacheData *d, int nMM = 1);
   ///
   virtual void Unload (csGlideCacheData *d);
   /// Calculate AspectRatio, LOD numbers and final width and size
   bool CalculateTexData( int width, int height, float wfak, float hfak, GrLOD_t *lod, int nLod, 
                         csGlideCacheData *d );
-  virtual void LoadTex (csGlideCacheData *d);
+  virtual void LoadTex (csGlideCacheData *d, int nMM);
   virtual void LoadLight (csGlideCacheData *d);
   virtual void LoadAlpha (csGlideCacheData *d);
   
