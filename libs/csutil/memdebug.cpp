@@ -628,12 +628,12 @@ void operator delete[] (void* p)
 
 #elif defined(MEMDEBUG_MEMORY_TRACKER)
 
-#undef new
-
 #include "csutil/scf.h"
 #include "csutil/ref.h"
 #include "iutil/objreg.h"
 #include "iutil/memdebug.h"
+
+#undef new
 
 // This structure is used per file to keep track of allocations.
 // ModuleMemTracker maintains an array of them per module.
@@ -646,7 +646,8 @@ struct MemTrackerInfo
   int current_count;
   void Init (char* filename)
   {
-    file = filename;
+    file = (char*)malloc (strlen (filename)+1);
+    strcpy (file, filename);
     max_alloc = 0;
     current_alloc = 0;
     max_count = 0;
@@ -747,7 +748,7 @@ public:
     int i;
     printf ("-----------------------------------------------------\n");
     printf ("Module: %s\n", Class);
-    printf ("current  max      current# max#     file\n");
+    printf (" current      max current#     max# file\n");
     for (i = 0 ; i < mti_table_count ; i++)
     {
       MemTrackerInfo* mti = mti_table[0];
@@ -801,7 +802,7 @@ SCF_IMPLEMENT_IBASE (MemTrackerRegistry)
   SCF_IMPLEMENTS_INTERFACE (iMemoryTracker)
 SCF_IMPLEMENT_IBASE_END
 
-static MemTrackerModule* mti_this_module = 0;
+MemTrackerModule* mti_this_module = 0;
 
 void RegisterMemoryTrackerModule (char* Class)
 {

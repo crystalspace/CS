@@ -334,7 +334,7 @@ public:
   }
 };
 
-#ifdef CS_EXTENSIVE_MEMDEBUG
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
 # define new CS_EXTENSIVE_MEMDEBUG_NEW
 #endif
 
