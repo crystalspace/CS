@@ -307,7 +307,6 @@ void csTextureManagerDirect3D::PrepareTextures ()
   for (int i = 0; i < textures.Length (); i++)
   {
     csTextureMM *txt = textures.Get (i);
-    txt->ApplyGamma ();
     txt->CreateMipmaps ();
   }
 }

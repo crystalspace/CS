@@ -148,7 +148,6 @@ void csTextureManagerGlide::PrepareTextures ()
   for (i = 0 ; i < textures.Length () ; i++)
   {
     csTextureMM* txt = textures.Get (i);
-    txt->ApplyGamma ();
     txt->CreateMipmaps ();
     ((csTextureMMGlide *)txt)->remap_mm();
   }
