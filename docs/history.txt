@@ -1,23 +1,24 @@
 The history order has been reversed so that new features are at the top.
 
 17-May-2000
-	- Thomas Riemer added scaffolding functions to allow loading world
-	  into NetSpace world.
+	- Thomas Riemer added scaffolding functions to allow loading world 
+	  into NetSpace world.  
 	- Paul Garceau updated jpgimage.cpp for Win32/GCC.
-	- Added csPolygon3D::PointOnPolygon to test if a point is on
-	  a polygon.
-	- Added csBox3::GetSide() with corresponding BOX_SIDE_??? defines
-	  to get the side of a box as a 2D box.
-	- Added csBspNode/csOctreeNode::CountPolygons() that will be used
-	  to gather statistics about the quality of the generated PVS.
-	- Added and printed additional statistics gathering for the PVS.
-	  You can now see the percentage of polygons culled.
+	- Added csPolygon3D::PointOnPolygon to test if a point is on a 
+	  polygon.  
+	- Added csBox3::GetSide() with corresponding BOX_SIDE_??? defines to 
+	  get the side of a box as a 2D box.  
+	- Added csBspNode/csOctreeNode::CountPolygons() that will be used to 
+	  gather statistics about the quality of the generated PVS.  
+	- Added and printed additional statistics gathering for the PVS.  You 
+	  can now see the percentage of polygons culled.  
 	- Did a few compile fixes on terrain engine.
 	- Paul Garceau did a few additional fixes on terrain engine.
-	- Reverted a few problematic changes from Paul Garceau (mk/user.mak
-	  and terrain engine).
-	- Wouter Wijngaards fixed the depend target of the terrain
-	  engine.
+	- Reverted a few problematic changes from Paul Garceau (mk/user.mak 
+	  and terrain engine).  
+	- Wouter Wijngaards fixed the depend target of the terrain engine.
+	- Eric Sunshine reverted more problematic changes and fixed errors or 
+	  potential problems which Paul Garceau introduced.  
 16-May-2000
 	- Alex Pfaffe did some minor changes/cleanup to the terrain engine.
 	- Removed a few warnings in terrain.cpp.
