@@ -129,7 +129,7 @@ bool csSoundRenderDS3D::Open()
   float vol = Config->GetFloat("Sound.Volume",-1);
   if (vol>=0) SetVolume(vol);
   if (reporter)
-    reporter (CS_REPORTER_SEVERITY_NOTIFY,
+    reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
 	"crystalspace.sound.ds3d",
     	"  Volume: %g\n", GetVolume());
 
