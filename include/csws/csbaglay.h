@@ -17,33 +17,23 @@
 
 class csGridBagConstraint : public csLayoutConstraint
 {
- public:
+public:
   csGridBagConstraint (csComponent *comp);
   csGridBagConstraint (const csGridBagConstraint &c);
-  csGridBagConstraint (csComponent *comp,
-			int _gridx,
-			int _gridy,
-			int _gridwidth,
-			int _gridheight,
-			double _weightx,
-			double _weighty,
-			int _anchor,
-			int _fill,
-			csInsets _insets,
-			int _ipadx,
-			int _ipady );
-
+  csGridBagConstraint (csComponent *comp, int _gridx, int _gridy,
+    int _gridwidth, int _gridheight, float _weightx, float _weighty,
+    int _anchor, int _fill, csRect _insets, int _ipadx, int _ipady);
   csLayoutConstraint *Clone ();
- public:
+public:
   int gridx;
   int gridy;
   int gridwidth;
   int gridheight;
-  double weightx;
-  double weighty;
+  float weightx;
+  float weighty;
   int anchor;
   int fill;
-  csInsets insets;
+  csRect insets;
   int ipadx;
   int ipady;
 
@@ -89,8 +79,7 @@ class csGridBagConstraint : public csLayoutConstraint
 
   // for internal uses
   bool bSized;
-  csVector2 mPrefCompSize;
-
+  csPoint mPrefCompSize;
 };
 
 struct CellInfo
@@ -107,22 +96,20 @@ struct CellInfo
   int fill;
   int anchor;
 
-  double extraSpace;
-
-  double weight;
+  float extraSpace;
+  float weight;
 
   int finalSize;
   int finalPos;
   int finalCompSize;
   int finalCompPos;
-
 };
 
 struct CellHolder
 {
   csGridBagConstraint* constr;
-  double weightx;
-  double weighty;
+  float weightx;
+  float weighty;
 
   int gridwidth;
   int gridheight;
@@ -139,7 +126,7 @@ DECLARE_TYPED_VECTOR(CellHolderArrayT, CellHolder);
 
 class csGridBagLayout : public csLayout2
 {
- public:
+public:
   csGridBagLayout (csComponent *pParent);
   ~csGridBagLayout ();
 
@@ -148,12 +135,12 @@ class csGridBagLayout : public csLayout2
   virtual void LayoutContainer ();
 
   virtual void MaximumLayoutSize (int &w, int &h);
-  virtual double GetLayoutAlignmentX ();
-  virtual double GetLayoutAlignmentY ();
+  virtual float GetLayoutAlignmentX ();
+  virtual float GetLayoutAlignmentY ();
 
   csGridBagConstraint c;
 
- protected:
+protected:
   int CalcPrefSize (CellInfo* cells, int xCnt, int yCnt, int _arrayWidth);
   void LayoutCells (CellInfo* cells, int xCnt, int yCnt, 
 		    int outterSize, int outterPos, int _arrayWidth );
@@ -167,8 +154,7 @@ class csGridBagLayout : public csLayout2
   bool HasCashedInfo ();
   void SetComponentLocations ();
 
- protected:
-
+protected:
   CellInfo* mpHorizCellInfos;
   CellInfo* mpVertCellInfos;
   int mColCount;

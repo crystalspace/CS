@@ -11,12 +11,18 @@
 #include "cslayout.h"
 
 /**
- * In a flow layout components are displayed in a row and wraped at parents boundaries.
+ * In a flow layout components are displayed in a row
+ * and wraped at parents boundaries.
  */
-
 class csFlowLayout : public csLayout
 {
- public:
+protected:
+  int mAlign;
+  int mHgap;
+  int mVgap;
+
+  csPoint mPrefDimOfPhase1;
+public:
   csFlowLayout (csComponent *pParent);
   csFlowLayout (csComponent *pParent, int align);
   csFlowLayout (csComponent *pParent, int align, int hgap, int vgap);
@@ -35,7 +41,7 @@ class csFlowLayout : public csLayout
 
   virtual void LayoutContainer ();
 
- public: 
+public: 
 
   enum ALIGNMNET_ENUM
   {
@@ -46,13 +52,6 @@ class csFlowLayout : public csLayout
     LEADING  = LEFT,  // for Western, Europian text-orientation
     TRAILING = RIGHT  // -/-
   };
-
- protected:
-  int mAlign;
-  int mHgap;
-  int mVgap;
-
-  csVector2 mPrefDimOfPhase1;
 };
 
 #endif // __FLOWLAYOUT_G__

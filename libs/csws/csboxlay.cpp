@@ -10,8 +10,10 @@
 
 /***** Implementation for class BoxLayout *****/
 
-csBoxLayout::csBoxLayout (csComponent* pParent, int axis): csLayout (pParent), mAxis (axis)
-{}
+csBoxLayout::csBoxLayout (csComponent* pParent, int axis)
+  : csLayout (pParent), mAxis (axis)
+{
+}
 
 void csBoxLayout::SuggestSize (int &sugw, int& sugh)
 {
@@ -20,7 +22,7 @@ void csBoxLayout::SuggestSize (int &sugw, int& sugh)
   int x, y;
   int i, cnt = vConstraints.Length ();
 
-  for (i=0; i < cnt; i++)
+  for (i = 0; i < cnt; i++)
   {
     x = y = 0;
     vConstraints.Get (i)->comp->SuggestSize (x, y);
@@ -38,16 +40,14 @@ void csBoxLayout::SuggestSize (int &sugw, int& sugh)
 
   if (mAxis == X_AXIS)
   {
-    sugw = width     + insets.left + insets.right;
-    sugh = maxHeight + insets.top  + insets.bottom;
+    sugw = width     + insets.xmin + insets.xmax;
+    sugh = maxHeight + insets.ymin + insets.ymax;
   }
   else
   {
-    sugw = maxHeight + insets.left + insets.right, 
-    sugh = width     + insets.top  + insets.bottom;
+    sugw = maxHeight + insets.xmin + insets.xmax, 
+    sugh = width     + insets.ymin + insets.ymax;
   }
-		      
-
 }
 
 void csBoxLayout::LayoutContainer ()
@@ -72,17 +72,15 @@ void csBoxLayout::LayoutContainer ()
   int parentWidth = bound.Width ();
   int parentHeight = bound.Height ();
   x = 0, y =0;
-  x += insets.left;
-  y += insets.top;
-  parentWidth  -= insets.left + insets.right;
-  parentHeight -= insets.top  + insets.bottom;
-
+  x += insets.xmin;
+  y += insets.ymin;
+  parentWidth  -= insets.xmin + insets.xmax;
+  parentHeight -= insets.ymin + insets.ymax;
 
   int widthUsed = 0;
-
-  for (i=0; i<cnt; i++)
+  for (i = 0; i < cnt; i++)
   {
-    int w=0, h=0;
+    int w = 0, h = 0;
     vConstraints.Get (i)->comp->SuggestSize (w, h);
 
     // squeez it if there is less space then preferred
@@ -91,7 +89,7 @@ void csBoxLayout::LayoutContainer ()
     {
       if (parentWidth < prefTotalWidth)
       {
-	w  = (int)((double)parentWidth * ((double)w / (double)prefTotalWidth));
+	w  = (int)((float)parentWidth * ((float)w / (float)prefTotalWidth));
 	if (i+1 == cnt) 
 	  w = parentWidth - widthUsed;
       }
@@ -103,7 +101,7 @@ void csBoxLayout::LayoutContainer ()
     {
       if (parentHeight < prefTotalWidth)
       {
-	h  = (int)((double)parentHeight * ((double)h / (double)prefTotalWidth));
+	h  = (int)((float)parentHeight * ((float)h / (float)prefTotalWidth));
 	if (i+1 == cnt) 
 	  h = parentHeight - widthUsed;
       }
@@ -117,6 +115,5 @@ void csBoxLayout::LayoutContainer ()
       x += w;
     else 
       y += h;
-
   }
 }

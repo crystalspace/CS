@@ -13,9 +13,13 @@
 /**
  * Components are displayed in a grid fashion.
  */
-
 class csGridLayout : public csLayout
 {
+protected:
+  int mRows;
+  int mCols;
+  int mHgap;
+  int mVgap;
 public:
   csGridLayout (csComponent *pParent);
 
@@ -36,12 +40,6 @@ public:
   virtual void SuggestSize (int &sugw, int &sugh);
 
   virtual void LayoutContainer ();
-
- protected:
-  int mRows;
-  int mCols;
-  int mHgap;
-  int mVgap;
 };
 
 #endif // __GRIDLAYOUT_G__

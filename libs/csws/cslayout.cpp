@@ -31,9 +31,8 @@ int csLayout::mCurrentLayoutingPhase = csLayout::PHASE_1;
 csLayout::csLayout (csComponent *pParent) : csComponent (pParent)
 {
   bRecalcLayout = true;
-  SetPalette (CSPAL_DIALOG);
   lc = &c;
-  state |= CSS_SELECTABLE;
+  state |= CSS_SELECTABLE | CSS_TRANSPARENT;
 }
 
 int csLayout::GetLayoutingPhase ()
@@ -46,9 +45,9 @@ void csLayout::SetLayoutingPhase (int phase)
   mCurrentLayoutingPhase = phase;
 }
 
-csVector2 csLayout::GetPhase0Size ()
+csPoint csLayout::GetPhase0Size ()
 {
-  return csVector2 (bound.Width (), bound.Height ());
+  return csPoint (bound.Width (), bound.Height ());
 }
 
 bool csLayout::TwoPhaseLayoutingEnabled ()
@@ -102,7 +101,6 @@ void csLayout::Draw ()
     LayoutContainer ();
     bRecalcLayout = false;
   }
-  Box (0, 0, bound.Width (), bound.Height (), CSPAL_DIALOG_BACKGROUND);
   csComponent::Draw ();
 }
 
@@ -132,4 +130,3 @@ void csLayout::Insert (csComponent *child)
 csLayout2::csLayout2 (csComponent *pParent) : csLayout (pParent)
 {
 }
-

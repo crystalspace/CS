@@ -30,25 +30,25 @@ void csGridLayout::SuggestSize (int &sugw, int &sugh)
 
   if (!cnt) return;
 
-  for (i=0; i<cnt; i++)
+  for (i = 0; i < cnt; i++)
   {
-    int w=0, h=0;
+    int w = 0, h = 0;
     vConstraints.Get (i)->comp->SuggestSize (w, h);
 
-    if ( w  > sugw  ) sugw  = w;
-    if ( h  > sugh  ) sugh  = w;
+    if (w > sugw) sugw = w;
+    if (h > sugh) sugh = w;
   }
 
-  int nRows = cnt / mCols + ( ( cnt % mCols ) ? 1 : 0 );
-  int nCols = ( nRows != 0 ) ? mCols : cnt;
+  int nRows = cnt / mCols + ((cnt % mCols) ? 1 : 0);
+  int nCols = (nRows != 0) ? mCols : cnt;
 
   if (nRows > mRows) nRows = mRows;
 
-  int hgaps = ( nCols > 1 ) ? ( nCols - 1 ) * mHgap : 0;
-  int vgaps = ( nRows > 1 ) ? ( nRows - 1 ) * mVgap : 0;
+  int hgaps = (nCols > 1) ? (nCols - 1) * mHgap : 0;
+  int vgaps = (nRows > 1) ? (nRows - 1) * mVgap : 0;
 
-  sugw = sugw * nCols  + hgaps + insets.left + insets.right;
-  sugh =sugh* nRows  + vgaps + insets.top  + insets.bottom;
+  sugw = sugw * nCols + hgaps + insets.xmin + insets.xmax;
+  sugh = sugh * nRows + vgaps + insets.ymin + insets.ymax;
 }
 
 void csGridLayout::LayoutContainer ()
@@ -56,13 +56,13 @@ void csGridLayout::LayoutContainer ()
   int i=0, cnt=vConstraints.Length ();
   if (!cnt) return;
 
-  int nRows = cnt / mCols + ( ( cnt % mCols ) ? 1 : 0 );
-  int nCols = ( nRows != 0 ) ? mCols : cnt;
+  int nRows = cnt / mCols + ((cnt % mCols) ? 1 : 0);
+  int nCols = (nRows != 0) ? mCols : cnt;
 
-  if ( nRows > mRows ) nRows = mRows;
+  if (nRows > mRows) nRows = mRows;
 
-  int hgaps = ( nCols > 1 ) ? ( nCols - 1 ) * mHgap : 0;
-  int vgaps = ( nRows > 1 ) ? ( nRows - 1 ) * mVgap : 0;
+  int hgaps = (nCols > 1) ? (nCols - 1) * mHgap : 0;
+  int vgaps = (nRows > 1) ? (nRows - 1) * mVgap : 0;
 
   // actual layouting
 
@@ -71,21 +71,21 @@ void csGridLayout::LayoutContainer ()
   dimWidth = bound.Width ();
   dimHeight = bound.Height ();
 
-  x += insets.left;
-  y += insets.top;
+  x += insets.xmin;
+  y += insets.ymin;
 
   if (dimWidth < 0) { dimWidth = 0;  hgaps = 0; }
   if (dimHeight < 0) { dimHeight = 0; vgaps = 0; }
 
-  dimWidth  -= insets.left + insets.right;
-  dimHeight -= insets.top  + insets.bottom;
+  dimWidth  -= insets.xmin + insets.xmax;
+  dimHeight -= insets.ymin + insets.ymax;
 
-  int colWidth  = ( dimWidth  - hgaps ) / nCols;
-  int rowHeight = ( dimHeight - vgaps ) / nRows;
+  int colWidth  = (dimWidth  - hgaps) / nCols;
+  int rowHeight = (dimHeight - vgaps) / nRows;
 
   i = 0;
 
-  for (int row=0; row != nRows; ++row, y += (rowHeight + ((row == 0) ? 0 : mVgap)))
+  for (int row = 0; row != nRows; ++row, y += (rowHeight + ((row == 0) ? 0 : mVgap)))
     for (int col = 0; col != nCols; ++col)
     {
       if ( i < cnt )

@@ -42,8 +42,8 @@ class csBorderLayout : public csLayout2
   virtual csLayoutConstraint *AddLayoutComponent (csComponent* comp);
   virtual void MaximumLayoutSize (int &w, int &h);
 
-  virtual double GetLayoutAlignmentX ();
-  virtual double GetLayoutAlignmentY ();
+  virtual float GetLayoutAlignmentX ();
+  virtual float GetLayoutAlignmentY ();
 
  public:
 

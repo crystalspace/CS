@@ -502,10 +502,10 @@ void CreateButton (csComponent *parent, int id, const char *text, int xpos, int 
 void csWsTest::LayoutDialog ()
 {
   csComponent *window = new csWindow (this, "Layout test",
-    CSWS_BUTSYSMENU | CSWS_TITLEBAR | CSWS_BUTHIDE | CSWS_BUTCLOSE |
-    CSWS_BUTMAXIMIZE | CSWS_TOOLBAR | CSWS_TBPOS_BOTTOM);
+    CSWS_DEFAULTVALUE & ~CSWS_MENUBAR);
   window->SetSize (400, 300);
   window->Center ();
+  window->Select ();
   
   csGridBagLayout *gb = new csGridBagLayout (window);
 
@@ -565,8 +565,8 @@ void csWsTest::LayoutDialog ()
     b->SetText (text);
   }
   
-  Execute (window);
-  delete window;
+//  Execute (window);
+//  delete window;
 }
 
 void csWsTest::ThemeDialog ()

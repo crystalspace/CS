@@ -15,48 +15,43 @@ csLayoutConstraint *csBorderConstraint::Clone ()
 
 /***** Implementation for class BorderLayout *****/
 
-csBorderConstraint csBorderLayout::mCENTER( csBorderLayout::_CENTER );
-csBorderConstraint csBorderLayout::mEAST  ( csBorderLayout::_EAST   );
-csBorderConstraint csBorderLayout::mNORTH ( csBorderLayout::_NORTH  );
-csBorderConstraint csBorderLayout::mSOUTH ( csBorderLayout::_SOUTH  );
-csBorderConstraint csBorderLayout::mWEST  ( csBorderLayout::_WEST   );
+csBorderConstraint csBorderLayout::mCENTER (csBorderLayout::_CENTER);
+csBorderConstraint csBorderLayout::mEAST (csBorderLayout::_EAST);
+csBorderConstraint csBorderLayout::mNORTH (csBorderLayout::_NORTH);
+csBorderConstraint csBorderLayout::mSOUTH (csBorderLayout::_SOUTH);
+csBorderConstraint csBorderLayout::mWEST (csBorderLayout::_WEST);
 
-csBorderConstraint csBorderLayout::mAFTER_LAST_LINE   ( csBorderLayout::_AFTER_LAST_LINE    );
-csBorderConstraint csBorderLayout::mAFTER_LINE_ENDS   ( csBorderLayout::_AFTER_LINE_ENDS    );
-csBorderConstraint csBorderLayout::mBEFORE_FIRST_LINE ( csBorderLayout::_BEFORE_FIRST_LINE  );
-csBorderConstraint csBorderLayout::mBEFORE_LINE_BEGINS( csBorderLayout::_BEFORE_LINE_BEGINS );
+csBorderConstraint csBorderLayout::mAFTER_LAST_LINE (csBorderLayout::_AFTER_LAST_LINE);
+csBorderConstraint csBorderLayout::mAFTER_LINE_ENDS (csBorderLayout::_AFTER_LINE_ENDS);
+csBorderConstraint csBorderLayout::mBEFORE_FIRST_LINE (csBorderLayout::_BEFORE_FIRST_LINE);
+csBorderConstraint csBorderLayout::mBEFORE_LINE_BEGINS (csBorderLayout::_BEFORE_LINE_BEGINS);
 
 csBorderConstraint* csBorderLayout::CENTER = &csBorderLayout::mCENTER;
-csBorderConstraint* csBorderLayout::EAST   = &csBorderLayout::mEAST;
-csBorderConstraint* csBorderLayout::NORTH  = &csBorderLayout::mNORTH;
-csBorderConstraint* csBorderLayout::SOUTH  = &csBorderLayout::mSOUTH;
-csBorderConstraint* csBorderLayout::WEST   = &csBorderLayout::mWEST;
+csBorderConstraint* csBorderLayout::EAST = &csBorderLayout::mEAST;
+csBorderConstraint* csBorderLayout::NORTH = &csBorderLayout::mNORTH;
+csBorderConstraint* csBorderLayout::SOUTH = &csBorderLayout::mSOUTH;
+csBorderConstraint* csBorderLayout::WEST = &csBorderLayout::mWEST;
 
-csBorderConstraint* csBorderLayout::AFTER_LAST_LINE    = &csBorderLayout::mAFTER_LAST_LINE;
-csBorderConstraint* csBorderLayout::AFTER_LINE_ENDS    = &csBorderLayout::mAFTER_LINE_ENDS;
-csBorderConstraint* csBorderLayout::BEFORE_FIRST_LINE  = &csBorderLayout::mBEFORE_FIRST_LINE;
+csBorderConstraint* csBorderLayout::AFTER_LAST_LINE = &csBorderLayout::mAFTER_LAST_LINE;
+csBorderConstraint* csBorderLayout::AFTER_LINE_ENDS = &csBorderLayout::mAFTER_LINE_ENDS;
+csBorderConstraint* csBorderLayout::BEFORE_FIRST_LINE = &csBorderLayout::mBEFORE_FIRST_LINE;
 csBorderConstraint* csBorderLayout::BEFORE_LINE_BEGINS = &csBorderLayout::mBEFORE_LINE_BEGINS;
 
 csBorderLayout::csBorderLayout (csComponent *pParent)
-  : csLayout2 (pParent),
-    c (0),
-    mHgap (0),
-    mVgap (0)
+  : csLayout2 (pParent), c (0), mHgap (0), mVgap (0)
 {
   lc = &c;
 }
 
 csBorderLayout::csBorderLayout (csComponent *pParent, int hgap, int vgap)
-  : csLayout2 (pParent),
-    c (0),
-    mHgap (hgap),
-    mVgap (vgap)
+  : csLayout2 (pParent), c (0), mHgap (hgap), mVgap (vgap)
 {
   lc = &c;
 }
 
-csBorderLayout::~csBorderLayout()
-{}
+csBorderLayout::~csBorderLayout ()
+{
+}
 
 void csBorderLayout::SuggestSize (int &w, int &h)
 {
@@ -68,11 +63,11 @@ void csBorderLayout::SuggestSize (int &w, int &h)
   if (mSOUTH.comp) mSOUTH.comp->SuggestSize (sw, sh);
   if (mWEST.comp) mWEST.comp->SuggestSize (ww, wh);
 
-  w = GetWidthSum (ww, cw, ew, mHgap, mWEST.comp != NULL, mCENTER.comp != NULL, mEAST.comp != NULL);
+  w = GetWidthSum (ww, cw, ew, mHgap,
+    mWEST.comp != NULL, mCENTER.comp != NULL, mEAST.comp != NULL);
   //  h = GetWidthSum (nh, ch, sh, mVgap, mNORT.comp != NULL, mCENTER.comp != NULL, mEAST.comp != NULL);
 
   h = nh + ch + sh;
-  
 }
 
 void csBorderLayout::LayoutContainer ()
@@ -90,20 +85,20 @@ void csBorderLayout::LayoutContainer ()
   int parentWidth = bound.Width ();
   int parentHeight = bound.Height ();
 
-  x += insets.left;
-  y += insets.top;
-  parentWidth  -= insets.left + insets.right;
-  parentHeight -= insets.top  + insets.bottom;
+  x += insets.xmin;
+  y += insets.ymin;
+  parentWidth  -= insets.xmin + insets.xmax;
+  parentHeight -= insets.ymin + insets.ymax;
 
   DistributeSizes (ww, cw, ew, parentWidth, mHgap,
-		   mWEST.comp != NULL, mCENTER.comp != NULL, mEAST.comp != NULL);
+    mWEST.comp != NULL, mCENTER.comp != NULL, mEAST.comp != NULL);
   DistributeSizes (nh, ch, sh, parentHeight, mVgap,
-		   mNORTH.comp != NULL, mCENTER.comp != NULL, mSOUTH.comp != NULL);
+    mNORTH.comp != NULL, mCENTER.comp != NULL, mSOUTH.comp != NULL);
 
   eh = wh = ch;
   nw = sw = parentWidth;
 
-  if ( mCENTER.comp )
+  if (mCENTER.comp)
   {
     mCENTER.comp->SetPos (x + ww + Hgap (mWEST.comp), y + nh + Vgap (mNORTH.comp));
     mCENTER.comp->SetSize (cw, ch);
@@ -111,8 +106,8 @@ void csBorderLayout::LayoutContainer ()
 
   if (mEAST.comp)
   {
-    mEAST.comp->SetPos ( x + ww + cw + Hgap (mWEST.comp) + Hgap (mCENTER.comp), 
-			 y + nh + Vgap (mNORTH.comp) );
+    mEAST.comp->SetPos (x + ww + cw + Hgap (mWEST.comp) + Hgap (mCENTER.comp),
+      y + nh + Vgap (mNORTH.comp));
     mEAST.comp->SetSize (ew, eh);
   }
 	
@@ -124,14 +119,14 @@ void csBorderLayout::LayoutContainer ()
 	
   if (mSOUTH.comp)
   {
-    mSOUTH.comp->SetPos(x, y + nh + ch + Vgap (mNORTH.comp) + Vgap (mCENTER.comp));
+    mSOUTH.comp->SetPos (x, y + nh + ch + Vgap (mNORTH.comp) + Vgap (mCENTER.comp));
     mSOUTH.comp->SetSize (sw, sh);
   }
 
   if (mWEST.comp)
   {
     mWEST.comp->SetPos (x, y + nh + Vgap (mNORTH.comp));
-    mWEST.comp->SetSize  (ww, wh);
+    mWEST.comp->SetSize (ww, wh);
   }
 }
 
@@ -139,14 +134,14 @@ csLayoutConstraint *csBorderLayout::AddLayoutComponent (csComponent* comp)
 {
   csBorderConstraint *c = (csBorderConstraint*)csLayout2::AddLayoutComponent (comp);
 
-  switch( c->mAlign )
+  switch (c->mAlign)
   {
-  case _CENTER : mCENTER.comp = comp; break;
-  case _EAST   : mEAST.comp   = comp; break;
-  case _NORTH  : mNORTH.comp  = comp; break;
-  case _SOUTH  : mSOUTH.comp  = comp; break;
-  case _WEST   : mWEST.comp   = comp; break;
-  default: break;
+    case _CENTER : mCENTER.comp = comp; break;
+    case _EAST   : mEAST.comp   = comp; break;
+    case _NORTH  : mNORTH.comp  = comp; break;
+    case _SOUTH  : mSOUTH.comp  = comp; break;
+    case _WEST   : mWEST.comp   = comp; break;
+    default: break;
   }
   return c;
 }
@@ -157,14 +152,14 @@ void csBorderLayout::RemoveLayoutComponent (csComponent* comp)
   if (idx != -1)
   {
     csBorderConstraint *c = (csBorderConstraint*)vConstraints.Get (idx);
-    switch( c->mAlign )
+    switch (c->mAlign)
     {
-    case _CENTER : mCENTER.comp = NULL; break;
-    case _EAST   : mEAST.comp   = NULL; break;
-    case _NORTH  : mNORTH.comp  = NULL; break;
-    case _SOUTH  : mSOUTH.comp  = NULL; break;
-    case _WEST   : mWEST.comp   = NULL; break;
-    default: break;
+      case _CENTER : mCENTER.comp = NULL; break;
+      case _EAST   : mEAST.comp   = NULL; break;
+      case _NORTH  : mNORTH.comp  = NULL; break;
+      case _SOUTH  : mSOUTH.comp  = NULL; break;
+      case _WEST   : mWEST.comp   = NULL; break;
+      default: break;
     }
   }
   csLayout2::RemoveLayoutComponent (comp);
@@ -175,23 +170,23 @@ void csBorderLayout::MaximumLayoutSize (int &w, int &h)
   if (parent) 
     w = parent->bound.Width (), h = parent->bound.Height ();
   else
-    w = h = (int)(1 << 31);
+    w = h = 1 << 31;
 }
 
-double csBorderLayout::GetLayoutAlignmentX ()
+float csBorderLayout::GetLayoutAlignmentX ()
 {
   return 0;
 }
 
-double csBorderLayout::GetLayoutAlignmentY ()
+float csBorderLayout::GetLayoutAlignmentY ()
 {
   return 0;
 }
 
 /*** protected methods ***/
 
-void csBorderLayout::DistributeSizes (int& left, int& center, int& right, int totalWidth, int gap,
-				      bool hasLeft, bool hasCenter, bool hasRight)
+void csBorderLayout::DistributeSizes (int& left, int& center, int& right,
+  int totalWidth, int gap, bool hasLeft, bool hasCenter, bool hasRight)
 {
   if (hasLeft && hasCenter) totalWidth  -= gap;
   if (hasCenter && hasRight) totalWidth -= gap;
@@ -201,18 +196,18 @@ void csBorderLayout::DistributeSizes (int& left, int& center, int& right, int to
     center = totalWidth - left - right;
   else
   {
-    double sum = (double)( left + center + right );
+    int sum = left + center + right;
 
-    left   = (int) ( (double)totalWidth * ( (double)left   / sum ) );
-    center = (int) ( (double)totalWidth * ( (double)center / sum ) );
+    left   = (totalWidth * left)   / sum;
+    center = (totalWidth * center) / sum;
 
     // compensate round-off errros at the expense of right element
     right  = totalWidth - left - center;
   }
 }
 
-int csBorderLayout::GetWidthSum (int left, int center, int right, int gap, 
-				 bool hasLeft, bool hasCenter, bool hasRight )
+int csBorderLayout::GetWidthSum (int left, int center, int right, int gap,
+  bool hasLeft, bool hasCenter, bool hasRight)
 {
   int sum = left + center + right;
 

@@ -11,43 +11,43 @@
 /***** Implementation for class csFlowLayout *****/
 
 csFlowLayout::csFlowLayout (csComponent *pParent)
-  : csLayout (pParent), mAlign( CENTER ), mHgap( 5 ), mVgap( 5 )
+  : csLayout (pParent), mAlign (CENTER), mHgap (5), mVgap (5)
 {}
 
 csFlowLayout::csFlowLayout (csComponent *pParent,int align)	
-  : csLayout (pParent), mAlign( align ), mHgap( 5 ), mVgap( 5 )
+  : csLayout (pParent), mAlign (align), mHgap (5), mVgap (5)
 {}
 
 csFlowLayout::csFlowLayout (csComponent *pParent, int align, int hgap, int vgap)
-  : csLayout (pParent), mAlign( align ), mHgap( hgap ), mVgap( vgap )
+  : csLayout (pParent), mAlign (align), mHgap (hgap), mVgap (vgap)
 {}
 
-int csFlowLayout::GetAlignment()
+int csFlowLayout::GetAlignment ()
 {
   return mAlign;
 }
 
-int csFlowLayout::GetHgap()
+int csFlowLayout::GetHgap ()
 {
   return mHgap;
 }
 
-int csFlowLayout::GetVgap()
+int csFlowLayout::GetVgap ()
 {
   return mVgap;
 }
 
-void csFlowLayout::SetAlignment( int align )
+void csFlowLayout::SetAlignment (int align)
 {
   mAlign = align;
 }
 
-void csFlowLayout::SetHgap( int hgap )
+void csFlowLayout::SetHgap (int hgap)
 {
   mHgap = hgap;
 }
 
-void csFlowLayout::SetVgap( int vgap )
+void csFlowLayout::SetVgap (int vgap)
 {
   mVgap = vgap;
 }
@@ -56,7 +56,7 @@ void csFlowLayout::SetVgap( int vgap )
 
 void csFlowLayout::SuggestSize (int &sugw, int& sugh)
 {
-  if (TwoPhaseLayoutingEnabled() && GetLayoutingPhase() == csLayout::PHASE_1)
+  if (TwoPhaseLayoutingEnabled () && GetLayoutingPhase () == csLayout::PHASE_1)
   {
     sugw = (int)mPrefDimOfPhase1.x;
     sugh = (int)mPrefDimOfPhase1.y;
@@ -79,8 +79,8 @@ void csFlowLayout::SuggestSize (int &sugw, int& sugh)
       maxHeight = h;
   }
 
-  sugw = width + insets.left + insets.right;
-  sugh = maxHeight + insets.top  + insets.bottom;
+  sugw = width + insets.xmin + insets.xmax;
+  sugh = maxHeight + insets.ymin + insets.ymax;
 }
 
 void csFlowLayout::LayoutContainer ()
@@ -92,18 +92,18 @@ void csFlowLayout::LayoutContainer ()
 
   int parentWidth = bound.Width (), parentHeight = bound.Height ();
 
-  x += insets.left;
-  y += insets.top;
-  parentWidth  -= insets.left + insets.right;
-  parentHeight -= insets.top  + insets.bottom;
+  x += insets.xmin;
+  y += insets.ymin;
+  parentWidth  -= insets.xmin + insets.xmax;
+  parentHeight -= insets.ymin + insets.ymax;
 
   // used later in 2nd phase of 2-phase layouing
 
-  mPrefDimOfPhase1 = csVector2 (0,0);
+  mPrefDimOfPhase1.Set (0,0);
 
   int row = 0;
 
-  for (i=0; i < cnt; i++)
+  for (i = 0; i < cnt; i++)
   {
     int rowWidth = 0;
     int col = 0;
@@ -122,28 +122,30 @@ void csFlowLayout::LayoutContainer ()
       vConstraints.Get (i)->comp->SuggestSize (w, h);
       if ( rowWidth + w <= parentWidth )
       {
-	rowWidth += w;
-	if (h > maxHeight) maxHeight = h;
-	++col;
-	i++;
+        rowWidth += w;
+        if (h > maxHeight) maxHeight = h;
+        ++col;
+        i++;
       }
       else
-	break;
+        break;
     }
     
-    if (mPrefDimOfPhase1.x < rowWidth) mPrefDimOfPhase1.x = rowWidth; 
-    if (col == 0) break; // cannot fit component into the row
+    if (mPrefDimOfPhase1.x < rowWidth)
+      mPrefDimOfPhase1.x = rowWidth; 
+    if (col == 0)
+      break; // cannot fit component into the row
 
     // posion items in current row
     int pos = x; // left-alignend
-    if (mAlign == CENTER) 
-      pos = x + ( parentWidth - rowWidth ) / 2;
+    if (mAlign == CENTER)
+      pos = x + (parentWidth - rowWidth) / 2;
     else
       if (mAlign == RIGHT) 
-	pos = x + ( parentWidth - rowWidth );
+	pos = x + (parentWidth - rowWidth);
     
     col = 0;
-    if ( row != 0 ) 
+    if (row != 0)
     {
       y += mVgap;
       mPrefDimOfPhase1.y += mVgap;
@@ -151,11 +153,11 @@ void csFlowLayout::LayoutContainer ()
 
     while (i1 < i)
     {
-      int w=0, h=0;
+      int w = 0, h = 0;
       vConstraints.Get (i1)->comp->SuggestSize (w, h);;
       if (col != 0) pos += mHgap;
-      vConstraints.Get (i1)->comp->SetRect (pos, y + (maxHeight - h) / 2, 
-				      pos+w, y + (maxHeight + h) / 2); // centered vertically
+      vConstraints.Get (i1)->comp->SetRect (pos, y + (maxHeight - h) / 2,
+        pos + w, y + (maxHeight + h) / 2); // centered vertically
       pos += w; ++col; 
       i1++;
     }
@@ -163,10 +165,9 @@ void csFlowLayout::LayoutContainer ()
     if (i<cnt) i--;
 
     y += maxHeight; ++row;
-    mPrefDimOfPhase1.y += maxHeight; 
+    mPrefDimOfPhase1.y += maxHeight;
+  }
 
-  } 
-
-  mPrefDimOfPhase1.x  += insets.left + insets.right;
-  mPrefDimOfPhase1.y  += insets.top  + insets.bottom;
+  mPrefDimOfPhase1.x  += insets.xmin + insets.xmax;
+  mPrefDimOfPhase1.y  += insets.ymin + insets.ymax;
 }

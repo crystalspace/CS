@@ -8,12 +8,9 @@
 #include "cssysdef.h"
 #include "csws/csabslay.h"
 
-/***** Implementation for class csAbsoluteLayout *****/
-
 csAbsoluteLayout::csAbsoluteLayout (csComponent *pParent) : csLayout (pParent)
 {
 }
-// impl. of LayoutManager interface
 
 void csAbsoluteLayout::SuggestSize (int &sugw, int& sugh)
 {
@@ -26,7 +23,6 @@ void csAbsoluteLayout::SuggestSize (int &sugw, int& sugh)
     sugw = MAX (sugw, vConstraints.Get (i)->comp->bound.xmax);
     sugh = MAX (sugh, vConstraints.Get (i)->comp->bound.ymax);
   }
-
 }
 
 void csAbsoluteLayout::LayoutContainer ()
