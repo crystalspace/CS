@@ -617,7 +617,7 @@ enum { kTokenSixMove = 1, kTokenSixTexture, kTokenSixTexCeil,
 
 typedef char ObName[30];
 
-csThing* CSLoader::load_sixface (char* name, csWorld* w, char* buf,
+csThing* CSLoader::load_sixface (char* name, csWorld* /*w*/, char* buf,
                                csTextureList* textures, csSector* sec)
 {
   static tokenDesc commands[] = {
