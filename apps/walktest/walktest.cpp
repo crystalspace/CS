@@ -668,7 +668,6 @@ void WalkTest::DrawFrame3D (int drawflags, csTicks /*current_time*/)
   //------------
   if (!do_covtree_dump)
   {
-printf ("================================\n");
     if (split == -1)
       view->Draw ();
     else 
