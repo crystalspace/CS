@@ -62,7 +62,6 @@ struct csFrameSet {
 
   unsigned int name;
   int numframes;
-  int totaltime;
   csMotionFrame *frames;
   
 };
@@ -105,7 +104,7 @@ public:
   ///
   virtual bool AddAnim (const csVector3 &vec);
   
-  virtual void AddFrameSet( const char *name, int time );
+  virtual void AddFrameSet( const char *name );
   
   virtual int AddFrame (int frametime);
   ///
@@ -143,7 +142,6 @@ struct csAppliedMotion
   int numframes;
   int curframe;
   int nextframe;
-  bool Reverse;
   bool Loop;
   bool Sweep;
   float Rate;
@@ -185,7 +183,7 @@ public:
   /// If the cache flag is set then the compiled motion is cached rather than being
   /// active.
   virtual int ApplyMotion(iSkeletonBone *skel, const char* motion, 
-	const char *frameset, bool reverse, bool loop, bool sweep, float rate, 
+	const char *frameset, bool loop, bool sweep, float rate, 
 	int start_time, bool cache);
 	
   /// If the skeletal structure for a sprite is modified, then the compiled
@@ -202,23 +200,21 @@ public:
   /// otherwise it is deleted from the active motions list. 
   virtual void DeleteAppliedMotion( int motion_index, bool cache);
   
-  virtual void SetActiveMotion( int idx, bool reverse, bool loop, bool sweep, float rate ) 
+  virtual void SetActiveMotion( int idx, bool loop, bool sweep, float rate ) 
   { 
-	skels[idx]->Reverse = reverse; 
 	skels[idx]->Loop = loop;
 	skels[idx]->Sweep = sweep;
 	skels[idx]->Rate = rate;
   }
-  virtual void SetCachedMotion( int idx, bool reverse, bool loop, bool sweep, float rate, int time )
+  virtual void SetCachedMotion( int idx, bool loop, bool sweep, float rate, int time )
   {
-	cache[idx]->Reverse = reverse;
 	cache[idx]->Loop = loop;
 	cache[idx]->Sweep = sweep;
 	cache[idx]->Rate = rate;
 	cache[idx]->curtime = time;
   }
   
-  virtual void SetReverse( int idx, bool reverse ) { skels[idx]->Reverse = reverse; }
+  virtual void SetReverse( int idx ) { skels[idx]->Rate = -skels[idx]->Rate; }
   
   virtual void SetLoop( int idx, bool loop ) { skels[idx]->Loop = loop; }
 
@@ -228,8 +224,6 @@ public:
   
   virtual void SetTime( int idx, int time) { skels[idx]->curtime = time; }
 
-  virtual bool GetReverse( int idx ) { return skels[idx]->Reverse; }
-  
   virtual bool GetLoop( int idx ) { return skels[idx]->Loop; }
   
   virtual bool GetSweep( int idx ) { return skels[idx]->Sweep; }

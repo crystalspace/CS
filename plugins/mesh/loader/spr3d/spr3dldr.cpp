@@ -916,8 +916,8 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
 		printf("The skeleton has no bones!\n");
 		return NULL;
 	  }
-	  motman->ApplyMotion( bone, name, str, false, true, false, 1.0, 0, false);
-	} // ApplyMotion ( skelbone, motion name, frameset name, reverse, loop, sweep, rate, time_offset, cached )
+	  motman->ApplyMotion( bone, name, str, true, false, 1.0, 0, false);
+	} // ApplyMotion ( skelbone, motion name, frameset name, loop, sweep, rate, time_offset, cached )
 	break;
       case CS_TOKEN_TWEEN:
 	{

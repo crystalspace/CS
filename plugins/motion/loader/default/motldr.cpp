@@ -294,6 +294,7 @@ bool csMotionLoader::LoadMotion (iMotion* mot, char* buf)
   long cmd;
   char* params;
   char* params2;
+  char buffer[255];
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
@@ -347,9 +348,8 @@ bool csMotionLoader::LoadMotion (iMotion* mot, char* buf)
         break;
 	  case CS_TOKEN_ACTIONSET:
 	{
-	  int ttim;
-	  ScanStr( params, "%d", &ttim );
-	  mot->AddFrameSet(name, ttim);	   
+	  ScanStr( params, "%s", &buffer );
+	  mot->AddFrameSet(buffer);	   
 	}
 	break;
       case CS_TOKEN_FRAME:

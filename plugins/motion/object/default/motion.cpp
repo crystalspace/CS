@@ -45,7 +45,13 @@ csMotionManager::csMotionManager(iBase *iParent)
 
 csMotionManager::~csMotionManager()
 {
-
+  motions.DeleteAll();
+  for ( int i = 0; i < skels.Length(); i++ )
+	DeleteAppliedMotion( i, false );
+  for ( int i = 0; i < cache.Length(); i++ )
+	DeleteAppliedMotion( i, true );
+  skels.DeleteAll();
+  cache.DeleteAll();
 }
 
 bool csMotionManager::Initialize (iSystem* TiSys)
@@ -84,12 +90,13 @@ void csMotionManager::DeleteMotion( const char *name )
   {
 	int len = skels.Length();
 	for (int i = 0; i < len; i++ )
-	{
 	  if (skels[i]->curmotion == mot )
 		DeleteAppliedMotion( i, false );
+
+	len = cache.Length();
+	for (int i = 0; i < len; i++ )
 	  if (cache[i]->curmotion == mot )
 		DeleteAppliedMotion( i, true );
-	}
 	delete mot;
   }
 }
@@ -128,7 +135,6 @@ void csMotionManager::CompileMotion ( csAppliedMotion *mot )
   
   csFrameSet *frs = mot->curmotion->framesets[mot->curframeset];
   mot->numframes = frs->numframes;
-  mot->totaltime = frs->totaltime;
   int numlink;
   int i, j;
 
@@ -233,7 +239,7 @@ void csMotionManager::CompileMotion ( csAppliedMotion *mot )
 
 //TODO Azverkan use a sorted array
 int csMotionManager::ApplyMotion(iSkeletonBone *skel, const char* motion, const char *frameset, 
-	  bool dir, bool loop, bool sweep, float rate, int time, bool iscached)
+	  bool loop, bool sweep, float rate, int time, bool iscached)
 {
   int fs_num;
   
@@ -257,6 +263,17 @@ int csMotionManager::ApplyMotion(iSkeletonBone *skel, const char* motion, const 
 	return -1;
   }
 
+// I have added this so that I do not have to check for single frame action sets on every
+// UpdateAll(). If you want this then tell me about it, oterwise thats the way it is for now. Mik.
+
+  if ( newmotion->framesets[fs_num]->numframes < 2 )
+  {
+	printf("Single frame actionset found : `%s' ( motion : `%s' skelbone `%s')\n", 
+	  frameset, motion, skel->GetName());	
+	printf("These are no longer supported. Hassle Michael if you want this feature\n");
+	return -1;
+  }
+
 // behavior changed to always create a new applied motion. If you want to delete / recompile
 // a motion then use the relevant calls. Apply always applies a new motion ( even if it is on top
 // of another ). This is a feature, not a bug. ;) Mik.
@@ -271,7 +288,6 @@ int csMotionManager::ApplyMotion(iSkeletonBone *skel, const char* motion, const 
   am->totaltime = 0;
   am->numframes = 0;
   am->curframe = 0;
-  am->Reverse = dir;
   am->Rate = rate;
   am->Loop = loop;
   am->Sweep = sweep;
@@ -280,7 +296,6 @@ int csMotionManager::ApplyMotion(iSkeletonBone *skel, const char* motion, const 
   printf("Apply motion frames length %d\n", am->frames.Length());
 #endif
   CompileMotion(am);
-  printf("Returning %d\n", (iscached) ? cache.Length() -1 : skels.Length() -1);
   return (iscached) ? cache.Length() - 1 :  skels.Length() - 1;
 }
 
@@ -378,79 +393,59 @@ void csMotionManager::UpdateAppliedFrame(csAppliedFrame *fr, csAppliedFrame * /*
 bool csMotionManager::UpdateAppliedMotion(csAppliedMotion *am, cs_time elapsedtime)
 {
 #ifdef MOTION_DEBUG
-  printf("Updating motion on Reverse : %d, Loop: %d, Sweep: %d, Rate: %f\n",
-		  am->Reverse, am->Loop, am->Sweep, am->Rate); 
+  printf("Updating motion on Loop: %d, Sweep: %d, Rate: %f\n",
+		  am->Loop, am->Sweep, am->Rate); 
 #endif
   if (!am->Rate) return true;
   
-  int size = am->numframes, t_elapse;
+  int size = am->numframes, keyf = am->frames[size-1]->keyframe, t_elapse;
+  bool set=false;
+  t_elapse = int( am->Rate * elapsedtime);
+  if ( t_elapse >= keyf ) return true; // Going too fast.
 
   if (!(am->Loop))
   {
-	if ( am->Reverse ) 
-	{
-	  if ( am->curframe == 0 ) {
-		if (am->Sweep) am->Reverse = false ; else return true;
-		}
-	} 
-	else
-	  if ( am->curframe ==  size - 1 ) {
-		if (am->Sweep) am->Reverse = true ; else return true;
-		}
+	  if ( am->curtime + t_elapse <= 0 )
+	  {
+		if (!am->Sweep) return true;
+		am->Rate = -am->Rate ;
+		am->curtime += t_elapse;
+		am->curtime = -am->curtime;
+		set = true;
+	  } 
+	  else
+	  if ( am->curtime + t_elapse >= keyf )
+	  {
+		if (!am->Sweep) return true;
+	    am->Rate = -am->Rate ;
+		am->curtime += t_elapse;
+		am->curtime = ( keyf << 1 ) - am->curtime;
+		set = true;
+	  }
   }
-  
-  t_elapse = int( am->Rate * elapsedtime);
-  if ( t_elapse >= am->totaltime ) return true; // Going too fast.
-  am->curtime += ( am->Reverse ) ? -t_elapse : t_elapse;
 
-  int keyf = am->totaltime;
+  if (!set)
+	am->curtime += t_elapse;
+
   if ( am->curtime < 0 ) am->curtime += keyf;
 	else am->curtime %= keyf;
-
-  int i; bool set = false;
-  for ( i = 1; i < size; i++ )
+	
+  int i;
+  for ( i = 0; i < size; i++ )
   {
 	keyf = am->frames[i]->keyframe;
     if (keyf >= am->curtime)
     {
-	  if ( am->Reverse ) 
-	  {
-		am->curframe = i ;
-		am->nextframe = i - 1;
-	  }
-	  else
-	  {
-		am->curframe = i - 1 ;
-		am->nextframe = i;
-	  }
-	  
-	  if (!i)
-	  {
-		if (am->Reverse) am->nextframe = (am->Loop) ? size - 1 : 0;
-		else
-		{
-		  am->curframe = size - 1; 
-		  am->nextframe = (am->Loop) ? 0 : size - 1;
-		}
-	  }
-	  set = true;
+	  am->curframe = i;
+	  am->nextframe = ( am->Rate > 0 ) ?  i + 1 : i - 1;
       break;
     }
   }
-  if (!set)
-  {
-	if (am->Reverse)
-	  {
-		am->curframe = 0;
-		am->nextframe = (am->Loop) ? size - 1 : 0;
-	  }
-	  else
-	  {
-		am->curframe = size - 1;
-		am->nextframe = (am->Loop) ? 0 : size - 1;
-	  }
-  }	
-  if (!am->curframe) return false;
+
+  if (!i && (am->Rate < 0)) am->nextframe = (am->Loop) ? size - 1 : 0;
+  else
+	if ((i == size - 1) && (am->Rate > 0)) 
+	  am->nextframe = (am->Loop) ? 0 : size - 1;
 
 #ifdef MOTION_DEBUG
   printf("UpdateAppliedMotion %d %d\n", am->curtime, am->frames[am->curframe]->keyframe); 
@@ -479,10 +474,9 @@ void csMotionManager::UpdateAll( int time )
   for (i = 0; i < size; i++)
   {
 #ifdef MOTION_DEBUG
-	printf("skel: curfs %d curt %d tot %d num %d curf %d next %d rev %d Loop %d Sweep %d Rate %f\n",
+	printf("skel: curfs %d curt %d tot %d num %d curf %d next %d Loop %d Sweep %d Rate %f\n",
 	  skels[i]->curframeset, skels[i]->curtime, skels[i]->totaltime, skels[i]->numframes,
-		skels[i]->curframe, skels[i]->nextframe, skels[i]->Reverse, skels[i]->Loop, skels[i]->Sweep,
-		  skels[i]->Rate);
+		skels[i]->curframe, skels[i]->nextframe, skels[i]->Loop, skels[i]->Sweep, skels[i]->Rate);
 #endif
 	UpdateAppliedMotion( skels[i], elapsed_time);
   }
@@ -533,8 +527,6 @@ csMotion::~csMotion()
 		free (framesets[j]->frames[i].vaffector);
 	  }
     }
-    free (framesets[j]->frames);
-	free (framesets[j]);
   }
   framesets.DeleteAll();
 }
@@ -598,15 +590,14 @@ bool csMotion::AddAnim ( const csVector3 &vec )
   return true;
 }
 
-void csMotion::AddFrameSet( const char* name, int time )
+void csMotion::AddFrameSet( const char* name )
 {
 #ifdef MOTION_DEBUG
-	printf("AddFrameSet '%s' (%d)\n", name, time);
+	printf("AddFrameSet(%s)\n", name);
 #endif
   csFrameSet *fr = new csFrameSet;
   fr->name = csHashCompute( name );
   fr->numframes = 0;
-  fr->totaltime = time;
   fr->frames = NULL;
   framesets.Push(fr);
 #ifdef MOTION_DEBUG

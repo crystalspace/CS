@@ -27,7 +27,7 @@ class csMatrix3;
 class csQuaternion;
 class csVector3;
 
-SCF_VERSION (iMotion, 0, 1, 0);
+SCF_VERSION (iMotion, 0, 9, 1);
 
 /**
  * A motion.
@@ -45,7 +45,7 @@ struct iMotion : public iBase
   ///
   virtual bool AddAnim (const csVector3 &vec) = 0;
   ///
-  virtual void AddFrameSet( const char *name, int total_time ) = 0;
+  virtual void AddFrameSet( const char *name ) = 0;
 
   virtual int AddFrame (int framenumber) = 0;
   ///
@@ -57,7 +57,7 @@ struct iMotion : public iBase
   
 };
 
-SCF_VERSION (iMotionManager, 0, 1, 1);
+SCF_VERSION (iMotionManager, 0, 9, 2);
 
 /**
  * The motion manager.
@@ -74,7 +74,7 @@ struct iMotionManager : public iPlugIn
   virtual void DeleteMotion (const char* name) = 0;
   ///
   virtual int ApplyMotion (iSkeletonBone *skel, const char* motion, 
-	const char *frameset, bool reverse, bool loop, bool sweep, float rate, 
+	const char *frameset, bool loop, bool sweep, float rate, 
 	  int time, bool cache) = 0;
 	  
   /// If the skeletal structure for a sprite is modified, then the compiled
@@ -89,13 +89,13 @@ struct iMotionManager : public iPlugIn
   
   virtual void DeleteAppliedMotion ( int idx, bool cached ) = 0;
   
-  virtual void SetActiveMotion ( int idx, bool reverse, bool loop, 
-									bool sweep, float rate ) = 0;
+  virtual void SetActiveMotion ( int idx, bool loop, bool sweep, 
+									float rate ) = 0;
 						
-  virtual void SetCachedMotion ( int idx, bool reverse, bool loop, 
-							bool sweep, float rate, int time ) = 0;
+  virtual void SetCachedMotion ( int idx, bool loop, bool sweep, 
+								  float rate, int time ) = 0;
 	
-  virtual void SetReverse ( int idx, bool reverse ) = 0;
+  virtual void SetReverse ( int idx ) = 0;
   
   virtual void SetLoop ( int idx, bool loop ) = 0;
   
@@ -104,8 +104,6 @@ struct iMotionManager : public iPlugIn
   virtual void SetRate ( int idx, float rate ) = 0;
   
   virtual void SetTime ( int idx, int time ) = 0;
-  
-  virtual bool GetReverse ( int idx ) = 0;
   
   virtual bool GetLoop ( int idx ) = 0;
   
