@@ -80,9 +80,10 @@ csTextureWrapper::~csTextureWrapper ()
 
 void csTextureWrapper::SetImageFile (iImage *Image)
 {
+  Image->IncRef ();
   if (image)
     image->DecRef ();
-  (image = Image)->IncRef ();
+  image = Image;
 
   UpdateKeyColorFromImage ();
 }
