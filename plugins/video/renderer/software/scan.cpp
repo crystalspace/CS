@@ -564,14 +564,15 @@ void Scan::draw_scanline_flat (int xx, unsigned char* d,
   int color = flat_color;
   long izz = QInt24 (inv_z);
   long dzz = QInt24 (M);
-  while (xx > 0)
+  UByte* _dest = (UByte*)d;
+  UByte* _destend = _dest + xx-1;
+  do
   {
-
-    *d++ = color;
-    xx--;
+    *_dest++ = color;
     *z_buf++ = izz;
     izz += dzz;
   }
+  while (_dest <= _destend);
 }
 
 #endif // NO_draw_scanline_flat
@@ -585,38 +586,26 @@ void Scan::draw_scanline_z_buf_flat (int xx, unsigned char* d,
 			       float inv_z, float u_div_z, float v_div_z)
 {
   (void)u_div_z; (void)v_div_z;
-  int i;
-  int izz1, dzz, izz;
-  int color = flat_color;
-
-  izz = QInt24 (inv_z);
-
-  while (xx > 0)
+  int color = Scan::flat_color;
+  long izz = QInt24 (inv_z);
+  long dzz = QInt24 (Scan::M);
+  UByte* _dest = (UByte*)d;
+  UByte* _destend = _dest + xx-1;
+  do
   {
-    inv_z += dM;
-
-    i = INTERPOL_STEP;
-    if (xx < i) i = xx;
-    xx -= i;
-
-    izz1 = QInt24 (inv_z);
-    dzz = (izz1-izz)/INTERPOL_STEP;
-
-    while (i-- > 0)
+    if (izz >= (int)(*z_buf))
     {
-      if (izz >= (int)(*z_buf))
-      {
-	*d++ = color;
-	*z_buf++ = izz;
-      }
-      else
-      {
-        d++;
-        z_buf++;
-      }
-      izz += dzz;
+      *_dest++ = color;
+      *z_buf++ = izz;
     }
+    else
+    {
+      _dest++;
+      z_buf++;
+    }
+    izz += dzz;
   }
+  while (_dest <= _destend);
 }
 
 #endif // NO_draw_scanline_z_buf_flat

@@ -132,10 +132,10 @@ private:
   FogBuffer* find_fog_buffer (CS_ID id);
 
   /**
-   * Draw the projected polygon with light and texture.
-   * Dirty version.
+   * Same as DrawPolygon but no texture mapping.
+   * (Flat drawing).
    */
-  HRESULT DrawPolygonDirty (G3DPolygon& poly);
+  HRESULT DrawPolygonFlat (G3DPolygon& poly);
 
 public:
 #if defined (DO_MMX)

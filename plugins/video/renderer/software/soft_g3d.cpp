@@ -389,7 +389,7 @@ struct
   { 8, 3, 8, 3, 8, 3, 8, 3 }       	// 8-steps
 };
 
-HRESULT csGraphics3DSoftware::DrawPolygonDirty (G3DPolygon& poly)
+HRESULT csGraphics3DSoftware::DrawPolygonFlat (G3DPolygon& poly)
 {
   int i;
   int max_i, min_i;
@@ -494,19 +494,21 @@ HRESULT csGraphics3DSoftware::DrawPolygonDirty (G3DPolygon& poly)
   {
     // Lighted polygon
     int lr, lg, lb;
-    int r, g, b;
     lm->GetMeanLighting (lr, lg, lb);
     FINAL_RELEASE (lm);
     FINAL_RELEASE (tex);
-    if (gi_pixelbytes == 4)
+    if (gi_pixelbytes >= 2)
     {
-      //@@@ Implementation missing
-    }
-    else if (gi_pixelbytes == 2)
-    {
-      r = (mean_color_idx>>pfmt.RedShift) & pfmt.RedMask;
-      g = (mean_color_idx>>pfmt.GreenShift) & pfmt.GreenMask;
-      b = (mean_color_idx>>pfmt.BlueShift) & pfmt.BlueMask;
+      // Make lighting a little bit brighter because average
+      // lighting is really dark otherwise.
+      lr = lr<<2; if (lr > 255) lr = 255;
+      lg = lg<<2; if (lg > 255) lg = 255;
+      lb = lb<<2; if (lb > 255) lb = 255;
+
+      int r, g, b;
+      r = (mean_color_idx&pfmt.RedMask)>>pfmt.RedShift;
+      g = (mean_color_idx&pfmt.GreenMask)>>pfmt.GreenShift;
+      b = (mean_color_idx&pfmt.BlueMask)>>pfmt.BlueShift;
       r = (r*lr)>>8;
       g = (g*lg)>>8;
       b = (b*lb)>>8;
@@ -514,7 +516,29 @@ HRESULT csGraphics3DSoftware::DrawPolygonDirty (G3DPolygon& poly)
     }
     else
     {
-      //@@@ Implementation missing
+      // Make lighting a little bit brighter because average
+      // lighting is really dark otherwise.
+      lr = lr<<1; if (lr > 255) lr = 255;
+      lg = lg<<1; if (lg > 255) lg = 255;
+      lb = lb<<1; if (lb > 255) lb = 255;
+
+      PalIdxLookup* lt_light = txtmgr->lt_light;
+      TextureTablesPalette* lt_pal = txtmgr->lt_pal;
+      unsigned char* true_to_pal = lt_pal->true_to_pal;
+
+      if (txtmgr->txtMode == TXT_GLOBAL)
+      {
+        PalIdxLookup* pil = lt_light+mean_color_idx;
+        mean_color_idx = true_to_pal[pil->red[lr] | pil->green[lg] | pil->blue[lb]];
+      }
+      else
+      {
+        unsigned char * rgb, * rgb_values = txt_mm->get_colormap_private ();
+        rgb = rgb_values + (mean_color_idx << 2);
+        mean_color_idx = true_to_pal[lt_light[*rgb].red[lr] |
+		   lt_light[*(rgb+1)].green[lg] |
+		   lt_light[*(rgb+2)].blue[lb]];
+      }
     }
   }
 
@@ -524,29 +548,33 @@ HRESULT csGraphics3DSoftware::DrawPolygonDirty (G3DPolygon& poly)
   // Select the right scanline drawing function.
   dscan = NULL;
 
-  if (!do_textured)
+  int tex_transp, poly_alpha;
+  tex_transp = Scan::texture->get_transparent ();
+  poly.polygon->GetAlpha (poly_alpha);
+
+  // No texture mapping.
+  if (do_transp && (tex_transp != -1) || poly_alpha)
+    dscan = NULL;    
+  else if (gi_pixelbytes == 4)
   {
-    if (gi_pixelbytes == 4)
-    {
-      //if (z_buf_mode == ZBuf_Use)
-        //dscan = Scan16::draw_scanline_z_buf_flat;
-      //else
-        //dscan = Scan16::draw_scanline_flat;
-    }
-    else if (gi_pixelbytes == 2)
-    {
-      if (z_buf_mode == ZBuf_Use)
-        dscan = Scan16::draw_scanline_z_buf_flat;
-      else
-        dscan = Scan16::draw_scanline_flat;
-    }
+    if (z_buf_mode == ZBuf_Use)
+      dscan = Scan32::draw_scanline_z_buf_flat;
     else
-    {
-      if (z_buf_mode == ZBuf_Use)
-        dscan = Scan::draw_scanline_z_buf_flat;
-      else
-        dscan = Scan::draw_scanline_flat;
-    }
+      dscan = Scan32::draw_scanline_flat;
+  }
+  else if (gi_pixelbytes == 2)
+  {
+    if (z_buf_mode == ZBuf_Use)
+      dscan = Scan16::draw_scanline_z_buf_flat;
+    else
+      dscan = Scan16::draw_scanline_flat;
+  }
+  else
+  {
+    if (z_buf_mode == ZBuf_Use)
+      dscan = Scan::draw_scanline_z_buf_flat;
+    else
+      dscan = Scan::draw_scanline_flat;
   }
 
   if (!dscan) goto finish;   // Nothing to do.
@@ -670,9 +698,9 @@ finish:
 
 STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygon& poly)
 {
-  if (do_debug)
+  if (!do_textured)
   {
-    return DrawPolygonDirty (poly);
+    return DrawPolygonFlat (poly);
   }
 
   int i;
@@ -884,38 +912,10 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygon& poly)
   dscan = NULL;
 
   int tex_transp, poly_alpha;
-
   tex_transp = Scan::texture->get_transparent ();
   poly.polygon->GetAlpha (poly_alpha);
 
-  if (!do_textured)
-  {
-    // No texture mapping.
-    if (do_transp && (tex_transp != -1) || poly_alpha)
-      dscan = NULL;    
-    else if (gi_pixelbytes == 4)
-    {
-      //if (z_buf_mode == ZBuf_Use)
-        //dscan = Scan16::draw_scanline_z_buf_flat;
-      //else
-        //dscan = Scan16::draw_scanline_flat;
-    }
-    else if (gi_pixelbytes == 2)
-    {
-      if (z_buf_mode == ZBuf_Use)
-        dscan = Scan16::draw_scanline_z_buf_flat;
-      else
-        dscan = Scan16::draw_scanline_flat;
-    }
-    else
-    {
-      if (z_buf_mode == ZBuf_Use)
-        dscan = Scan::draw_scanline_z_buf_flat;
-      else
-        dscan = Scan::draw_scanline_flat;
-    }
-  }
-  else if (gi_pixelbytes == 2)
+  if (gi_pixelbytes == 2)
   {
     // Truecolor mode
     if (Scan::tmap2)
@@ -998,6 +998,13 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygon& poly)
       }
       else
         dscan = Scan32::draw_scanline_map;
+    }
+    else
+    {
+      if (z_buf_mode == ZBuf_Use)
+        dscan = Scan32::draw_scanline_z_buf;
+      else
+        dscan = Scan32::draw_scanline;
     }
   }
   else

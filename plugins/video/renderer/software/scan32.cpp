@@ -28,6 +28,125 @@
 
 extern unsigned char* priv_to_global;
 
+//------------------------------------------------------------------
+
+#ifndef NO_draw_scanline_flat
+
+void Scan32::draw_scanline_flat (int xx, unsigned char* d,
+			       unsigned long* z_buf,
+			       float inv_z, float u_div_z, float v_div_z)
+{
+  (void)u_div_z; (void)v_div_z;
+  int color = Scan::flat_color;
+  long izz = QInt24 (inv_z);
+  long dzz = QInt24 (Scan::M);
+  ULong* _dest = (ULong*)d;
+  ULong* _destend = _dest + xx-1;
+  do
+  {
+    *_dest++ = color;
+    *z_buf++ = izz;
+    izz += dzz;
+  }
+  while (_dest <= _destend);
+}
+
+#endif // NO_draw_scanline_flat
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_scanline_z_buf_flat
+
+void Scan32::draw_scanline_z_buf_flat (int xx, unsigned char* d,
+			       unsigned long* z_buf,
+			       float inv_z, float u_div_z, float v_div_z)
+{
+  (void)u_div_z; (void)v_div_z;
+  int color = Scan::flat_color;
+  long izz = QInt24 (inv_z);
+  long dzz = QInt24 (Scan::M);
+  ULong* _dest = (ULong*)d;
+  ULong* _destend = _dest + xx-1;
+  do
+  {
+    if (izz >= (int)(*z_buf))
+    {
+      *_dest++ = color;
+      *z_buf++ = izz;
+    }
+    else
+    {
+      _dest++;
+      z_buf++;
+    }
+    izz += dzz;
+  }
+  while (_dest <= _destend);
+}
+
+#endif // NO_draw_scanline_z_buf_flat
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_scanline
+
+#undef SCANFUNC
+#undef SCANEND
+#undef SCANLOOP
+#undef SCANMAP
+#define SCANFUNC draw_scanline
+#define SCANLOOP \
+    do									\
+    {									\
+      *_dest++ = srcTex[((uu>>16)&ander_w) + ((vv>>shifter_h)&ander_h)];\
+      uu += duu;							\
+      vv += dvv;							\
+    }									\
+    while (_dest <= _destend)
+#define SCANEND \
+    do									\
+    {									\
+      *z_buffer++ = izz;						\
+      izz += dzz;							\
+    }									\
+    while (z_buffer <= lastZbuf)
+#include "scanln32.inc"
+
+#endif // NO_draw_scanline
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_scanline_z_buf
+
+#undef SCANFUNC
+#undef SCANEND
+#undef SCANLOOP
+#undef SCANMAP
+#define SCANFUNC draw_scanline_z_buf
+#define SCANLOOP \
+    do									\
+    {									\
+      if (izz >= (int)(*z_buffer))					\
+      {									\
+        *_dest++ = srcTex[((uu>>16)&ander_w) + ((vv>>shifter_h)&ander_h)];\
+	*z_buffer++ = izz;						\
+      }									\
+      else								\
+      {									\
+        _dest++;							\
+        z_buffer++;							\
+      }									\
+      uu += duu;							\
+      vv += dvv;							\
+      izz += dzz;							\
+    }									\
+    while (_dest <= _destend)
+#include "scanln32.inc"
+
+#endif // NO_draw_scanline_z_buf
+
+//------------------------------------------------------------------
+
 #ifndef NO_draw_scanline_map
 
 #undef SCANFUNC

@@ -25,7 +25,6 @@
 class Scan32
 {
 public:
-#if 0
   /// Draw one horizontal scanline (no texture mapping).
   static void draw_scanline_flat (int xx, unsigned char* d, unsigned long* z_buf,
   			  float inv_z, float u_div_z, float v_div_z);
@@ -35,10 +34,6 @@ public:
   /// Draw one horizontal scanline (no lighting).
   static void draw_scanline (int xx, unsigned char* d, unsigned long* z_buf,
   			  float inv_z, float u_div_z, float v_div_z);
-  /// Draw one horizontal scanline (no lighting, private mode).
-  static void draw_scanline_private (int xx, unsigned char* d, unsigned long* z_buf,
-  			  float inv_z, float u_div_z, float v_div_z);
-#endif
   /// Draw one horizontal scanline for fog.
   static void draw_scanline_fog (int xx, unsigned char* d, unsigned long* z_buf,
   			  float inv_z, float u_div_z, float v_div_z);
@@ -67,17 +62,14 @@ public:
   /// Draw one horizontal scanline (transparent with lighting).
   static void draw_scanline_transp_map (int xx, unsigned char* d, unsigned long* z_buf,
 			  float inv_z, float u_div_z, float v_div_z);
+#endif
   /// Draw one horizontal scanline (Z buffer and no lighting).
   static void draw_scanline_z_buf (int xx, unsigned char* d, unsigned long* z_buf,
 			  float inv_z, float u_div_z, float v_div_z);
-#endif
   /// Draw one horizontal scanline (Z buffer and lighting).
   static void draw_scanline_z_buf_map (int xx, unsigned char* d, unsigned long* z_buf,
 			  float inv_z, float u_div_z, float v_div_z);
 #if 0
-  /// Draw one horizontal scanline (no lighting, private mode).
-  static void draw_scanline_z_buf_private (int xx, unsigned char* d, unsigned long* z_buf,
-  			  float inv_z, float u_div_z, float v_div_z);
   /// Draw one horizontal scanline (lighting and uniform lighting).
   static void draw_scanline_map_light (int xx, unsigned char* d, unsigned long* z_buf,
 			  float inv_z, float u_div_z, float v_div_z);
