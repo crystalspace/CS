@@ -37,6 +37,7 @@
 #include "iobject/object.h"
 #include "iengine/material.h"
 #include "csengine/material.h"
+#include "iengine/motion.h"
 
 CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ADD)
@@ -48,6 +49,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (TRANSPARENT)
 
   CS_TOKEN_DEF (ACTION)
+  CS_TOKEN_DEF (APPLY_MOTION)
   CS_TOKEN_DEF (BASECOLOR)
   CS_TOKEN_DEF (F)
   CS_TOKEN_DEF (FACTORY)
@@ -803,6 +805,7 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (ACTION)
+	CS_TOKEN_TABLE (APPLY_MOTION)
     CS_TOKEN_TABLE (FACTORY)
     CS_TOKEN_TABLE (BASECOLOR)
     CS_TOKEN_TABLE (LIGHTING)
@@ -884,6 +887,40 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
 	break;
       case CS_TOKEN_MIXMODE:
         spr3dLook->SetMixMode (ParseMixmode (params));
+	break;
+	  case CS_TOKEN_APPLY_MOTION:
+	{
+	  ScanStr( params, "%s", str );
+	  iMotionManager *motman = QUERY_PLUGIN_CLASS( sys, 
+		"crystalspace.motion.manager.default","MotionManager",iMotionManager);
+	  if (!motman) 
+	  { 
+		printf("Motion manager not loaded...\n"); 
+		return NULL; 
+	  }
+	  motman->DecRef();
+	  if (!spr3dLook) 
+	  { 
+		printf("No Factory! Please define 'FACTORY' before 'MOTION'\n"); 
+		return NULL; 
+	  }
+	  iSkeletonState *skel_state = spr3dLook->GetSkeletonState();
+	  iSkeletonLimbState *limb = QUERY_INTERFACE( skel_state, iSkeletonLimbState );
+	  limb->DecRef();
+	  if (!(limb = limb->GetChildren()))
+	  { 
+		printf("Skeleton has no libs -- cannot apply motion\n");
+		return NULL;
+	  }
+	  iSkeletonConnectionState *con = QUERY_INTERFACE( limb, iSkeletonConnectionState );
+	  iSkeletonBone *bone = QUERY_INTERFACE ( con, iSkeletonBone );
+	  if (!bone)
+	  {
+		printf("The skeleton has no bones!\n");
+		return NULL;
+	  }
+	  motman->ApplyMotion( bone, str );
+	}
 	break;
       case CS_TOKEN_TWEEN:
 	{
