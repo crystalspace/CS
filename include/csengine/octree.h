@@ -81,9 +81,6 @@ private:
    */
   virtual ~csOctreeNode ();
 
-  /// Remove all dynamically added polygons from the node.
-  void RemoveDynamicPolygons ();
-
   /// Set box.
   void SetBox (const csVector3& bmin, const csVector3& bmax)
   {
@@ -146,13 +143,6 @@ private:
   void Build (csOctreeNode* node, const csVector3& bmin, const csVector3& bmax,
   	csPolygonInt** polygons, int num);
 
-  /**
-   * Build the tree from the given node and number of polygons.
-   * This is a dynamic version. It will add the polygons to an already built
-   * octree and add the polygons so that they can easily be removed later.
-   */
-  void BuildDynamic (csOctreeNode* node, csPolygonInt** polygons, int num);
-
   /// Traverse the tree from back to front starting at 'node' and 'pos'.
   void* Back2Front (csOctreeNode* node, const csVector3& pos,
   	csTreeVisitFunc* func, void* data, csTreeCullFunc* cullfunc,
@@ -202,22 +192,6 @@ public:
    * Create the tree with a given set of polygons.
    */
   void Build (const csPolygonArray& polygons);
-
-  /**
-   * Add a bunch of polygons to the octree. They will be marked
-   * as dynamic polygons so that you can remove them from the tree again
-   * with RemoveDynamicPolygons(). Note that adding polygons dynamically
-   * will not modify the existing tree and splits but instead continue
-   * splitting in the leaves where the new polygons arrive.
-   */
-  void AddDynamicPolygons (csPolygonInt** polygons, int num);
-
-  /**
-   * Remove all dynamically added polygons from the node. Note that
-   * the polygons are not really destroyed. Only unlinked from the
-   * tree.
-   */
-  void RemoveDynamicPolygons ();
 
   /// Traverse the tree from back to front starting at the root and 'pos'.
   void* Back2Front (const csVector3& pos, csTreeVisitFunc* func, void* data,

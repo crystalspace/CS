@@ -27,7 +27,6 @@
 csBspNode::csBspNode ()
 {
   front = back = NULL;
-  dynamic_idx = -1;
 }
 
 csBspNode::~csBspNode ()
@@ -36,37 +35,9 @@ csBspNode::~csBspNode ()
   CHK (delete back);
 }
 
-void csBspNode::AddPolygon (csPolygonInt* poly, bool dynamic)
+void csBspNode::AddPolygon (csPolygonInt* poly)
 {
   polygons.AddPolygon (poly);
-  if (dynamic && dynamic_idx == -1) dynamic_idx = polygons.GetNumPolygons ()-1;
-}
-
-void csBspNode::RemoveDynamicPolygons ()
-{
-  if (dynamic_idx != -1)
-  {
-    polygons.SetNumPolygons (dynamic_idx);
-    dynamic_idx = -1;
-  }
-  if (front)
-  {
-    front->RemoveDynamicPolygons ();
-    if (front->IsEmpty ())
-    {
-      CHK (delete front);
-      front = NULL;
-    }
-  }
-  if (back)
-  {
-    back->RemoveDynamicPolygons ();
-    if (back->IsEmpty ())
-    {
-      CHK (delete back);
-      back = NULL;
-    }
-  }
 }
 
 int csBspNode::CountVertices ()
@@ -119,16 +90,7 @@ csBspTree::~csBspTree ()
 
 void csBspTree::Build ()
 {
-  int i;
-  int num = sector->GetNumPolygons ();
-  CHK (csPolygonInt** polygons = new csPolygonInt* [num]);
-  for (i = 0 ; i < num ; i++) polygons[i] = sector->GetPolygon (i);
-
-  CHK (root = new csBspNode);
-
-  Build ((csBspNode*)root, polygons, num);
-
-  CHK (delete [] polygons);
+  Build (sector->GetPolygonArray ());
 }
 
 void csBspTree::Build (csPolygonInt** polygons, int num)
@@ -136,143 +98,72 @@ void csBspTree::Build (csPolygonInt** polygons, int num)
   CHK (root = new csBspNode);
 
   CHK (csPolygonInt** new_polygons = new csPolygonInt* [num]);
+  CHK (bool* was_splitter = new bool [num]);
   int i;
-  for (i = 0 ; i < num ; i++) new_polygons[i] = polygons[i];
-  Build ((csBspNode*)root, new_polygons, num);
-  CHK (delete [] new_polygons);
-}
-
-void csBspTree::AddDynamicPolygons (csPolygonInt** polygons, int num)
-{
-  // @@@ We should only do this copy if there is a split in the first level.
-  // Now it is just overhead.
-  if (!root) { CHK (root = new csBspNode); }
-  CHK (csPolygonInt** new_polygons = new csPolygonInt* [num]);
-  int i;
-  for (i = 0 ; i < num ; i++) new_polygons[i] = polygons[i];
-  BuildDynamic ((csBspNode*)root, new_polygons, num);
-  CHK (delete [] new_polygons);
-}
-
-void csBspTree::RemoveDynamicPolygons ()
-{
-  if (root)
+  for (i = 0 ; i < num ; i++)
   {
-    root->RemoveDynamicPolygons ();
-    if (root->IsEmpty ())
-    {
-      CHK (delete root);
-      root = NULL;
-    }
+    new_polygons[i] = polygons[i];
+    was_splitter[i] = false;
   }
+  Build ((csBspNode*)root, new_polygons, was_splitter, num);
+  CHK (delete [] new_polygons);
+  CHK (delete [] was_splitter);
 }
 
-int csBspTree::SelectSplitter (csPolygonInt** polygons, int num)
+int csBspTree::SelectSplitter (csPolygonInt** polygons, bool* was_splitter, int num)
 {
   int i, j, poly_idx;
 
   poly_idx = -1;
-  if (mode == BSP_RANDOM)
+
+  // Several modes in the end come down to BSP_BALANCE_AND_SPLITS
+  // with a different balance_factor and split_factor. Those two
+  // factors determine how important the balance or split quality
+  // is for the total quality factor.
+  float balance_factor, split_factor;
+  int cur_mode = mode;
+  if (cur_mode == BSP_BALANCED)
+  {
+    cur_mode = BSP_BALANCE_AND_SPLITS;
+    balance_factor = 1;
+    split_factor = .1;	// Don't completely ignore splitting.
+  }
+  else if (cur_mode == BSP_ALMOST_BALANCED)
+  {
+    cur_mode = BSP_ALMOST_BALANCE_AND_SPLITS;
+    balance_factor = 1;
+    split_factor = .1;
+  }
+  else if (cur_mode == BSP_MINIMIZE_SPLITS)
+  {
+    cur_mode = BSP_BALANCE_AND_SPLITS;
+    balance_factor = 0;
+    split_factor = 1;
+  }
+  else if (cur_mode == BSP_ALMOST_MINIMIZE_SPLITS)
+  {
+    cur_mode = BSP_ALMOST_BALANCE_AND_SPLITS;
+    balance_factor = 0;
+    split_factor = 1;
+  }
+  else
+  {
+    balance_factor = 1;
+    split_factor = 4;
+  }
+
+  if (cur_mode == BSP_RANDOM)
   {
     poly_idx = rand () % num;
   }
-  else if (mode == BSP_MINIMIZE_SPLITS)
-  {
-    // Choose the polygon which generates the least number of splits.
-    int min_splits = 32767;
-    for (i = 0 ; i < num ; i++)
-    {
-      int cnt = 0;
-      for (j = 0 ; j < num ; j++)
-        if (polygons[j]->Classify (*polygons[i]->GetPolyPlane ()) == POL_SPLIT_NEEDED) cnt++;
-      if (cnt < min_splits) { min_splits = cnt; poly_idx = i; }
-    }
-  }
-  else if (mode == BSP_ALMOST_MINIMIZE_SPLITS)
-  {
-    // Choose the polygon which generates the least number of splits.
-    int min_splits = 32767;
-    int n = num;
-    if (n > 20) n = 20;
-    for (i = 0 ; i < n ; i++)
-    {
-      int ii = rand () % num;
-      int cnt = 0;
-      for (j = 0 ; j < n ; j++)
-      {
-        int jj = rand () % num;
-        if (polygons[jj]->Classify (*polygons[ii]->GetPolyPlane ()) == POL_SPLIT_NEEDED) cnt++;
-      }
-      if (cnt < min_splits) { min_splits = cnt; poly_idx = ii; }
-    }
-  }
-  else if (mode == BSP_BALANCED)
-  {
-    // Choose the polygon which generates a balanced tree.
-    int min_front_back_diff = 32767;
-    int min_splits = 32767;
-    for (i = 0 ; i < num ; i++)
-    {
-      int front = 0, back = 0;
-      int splits = 0;
-      for (j = 0 ; j < num ; j++)
-      {
-        int c = polygons[j]->Classify (*polygons [i]->GetPolyPlane ());
-	if (c == POL_FRONT) front++;
-	else if (c == POL_BACK) back++;
-	else if (c == POL_SPLIT_NEEDED) splits++;
-      }
-      if (ABS (front-back) < min_front_back_diff)
-      {
-        min_splits = 32767;
-        min_front_back_diff = ABS (front-back);
-	poly_idx = i;
-      }
-      else if (ABS (front-back) == min_front_back_diff)
-      {
-        if (splits < min_splits) { min_splits = splits; poly_idx = i; }
-      }
-    }
-  }
-  else if (mode == BSP_ALMOST_BALANCED)
-  {
-    // Choose the polygon which generates a balanced tree.
-    int min_front_back_diff = 32767;
-    int min_splits = 32767;
-    int n = num;
-    if (n > 20) n = 20;
-    for (i = 0 ; i < n ; i++)
-    {
-      int ii = rand () % num;
-      int front = 0, back = 0;
-      int splits = 0;
-      for (j = 0 ; j < n ; j++)
-      {
-        int jj = rand () % num;
-        int c = polygons[jj]->Classify (*polygons [ii]->GetPolyPlane ());
-	if (c == POL_FRONT) front++;
-	else if (c == POL_BACK) back++;
-	else if (c == POL_SPLIT_NEEDED) splits++;
-      }
-      if (ABS (front-back) < min_front_back_diff)
-      {
-        min_splits = 32767;
-        min_front_back_diff = ABS (front-back);
-	poly_idx = ii;
-      }
-      else if (ABS (front-back) == min_front_back_diff)
-      {
-        if (splits < min_splits) { min_splits = splits; poly_idx = ii; }
-      }
-    }
-  }
-  else if (mode == BSP_MOST_ON_SPLITTER)
+  else if (cur_mode == BSP_MOST_ON_SPLITTER)
   {
     // First choose a polygon which shares its plane with the highest
     // number of other polygons.
     int same_poly = 0;
     for (i = 0 ; i < num ; i++)
     {
+      if (was_splitter[i]) continue;
       csPlane* plane_i = polygons[i]->GetPolyPlane ();
       int cnt = 1;
       for (j = i+1 ; j < num ; j++)
@@ -284,113 +175,137 @@ int csBspTree::SelectSplitter (csPolygonInt** polygons, int num)
       if (cnt > same_poly) { same_poly = cnt; poly_idx = i; }
     }
   }
+  else if (cur_mode == BSP_ALMOST_BALANCE_AND_SPLITS || cur_mode == BSP_BALANCE_AND_SPLITS)
+  {
+    // Combine balancing and least nr of splits.
+    float least_penalty = 1000000;
+    int n = num;
+    if (cur_mode == BSP_ALMOST_BALANCE_AND_SPLITS && n > 20) n = 20;
+    int ii, jj;
+    for (i = 0 ; i < n ; i++)
+    {
+      if (cur_mode == BSP_ALMOST_BALANCE_AND_SPLITS)
+        ii = rand () % num;
+      else
+        ii = i;
+      if (was_splitter[ii]) continue;
+      int front = 0, back = 0;
+      int splits = 0;
+      for (j = 0 ; j < n ; j++)
+      {
+        if (cur_mode == BSP_ALMOST_BALANCE_AND_SPLITS)
+          jj = rand () % num;
+	else
+	  jj = j;
+        int c = polygons[jj]->Classify (*polygons [ii]->GetPolyPlane ());
+	if (c == POL_FRONT) front++;
+	else if (c == POL_BACK) back++;
+	else if (c == POL_SPLIT_NEEDED) splits++;
+      }
+      // balance_penalty is 0 for a very good balanced tree and
+      // 1 for a very bad one.
+      float balance_penalty = ((float)ABS (front+splits-back))/(float)num;
+      // split_penalty is 0 for a very good tree with regards to splitting
+      // and 1 for a very bad one.
+      float split_penalty = (float)splits/(float)num;
+      // Total penalty is a combination of both penalties. 0 is very good,
+      float penalty = balance_factor * balance_penalty + split_factor * split_penalty;
+
+      if (penalty < least_penalty)
+      {
+        least_penalty = penalty;
+	poly_idx = ii;
+      }
+    }
+  }
   return poly_idx;
 }
 
-void csBspTree::Build (csBspNode* node, csPolygonInt** polygons, int num)
+void csBspTree::Build (csBspNode* node, csPolygonInt** polygons,
+	bool* was_splitter, int num)
 {
   int i;
   if (!Covers (polygons, num))
   {
     // We have a convex set.
-    printf ("CONVEX %d\n", num);
     for (i = 0 ; i < num ; i++)
       node->AddPolygon (polygons[i]);
     return;
   }
 
-  csPolygonInt* split_poly = polygons[SelectSplitter (polygons, num)];
-  csPlane* split_plane = split_poly->GetPolyPlane ();
+  // If the set is not convex and all polygons have
+  // been used as splitters then we temporarily
+  // consider this a convex node too. This is not right@@@@@@
+  bool all_splitter = true;
+  for (i = 0 ; i < num ; i++)
+  {
+    if (!was_splitter[i]) { all_splitter = false; break; }
+  }
+  if (all_splitter)
+  {
+    // @@@@@
+    printf ("FALSE CONVEX %d\n", num);
+    for (i = 0 ; i < num ; i++)
+      node->AddPolygon (polygons[i]);
+    return;
+  }
+
+  csPolygonInt* split_poly = polygons[SelectSplitter (polygons, was_splitter, num)];
+  node->splitter = *(split_poly->GetPolyPlane ());
 
   // Now we split the node according to the plane of that polygon.
   CHK (csPolygonInt** front_poly = new csPolygonInt* [num]);
   CHK (csPolygonInt** back_poly = new csPolygonInt* [num]);
+  CHK (bool* front_splitter = new bool [num]);
+  CHK (bool* back_splitter = new bool [num]);
   int front_idx = 0, back_idx = 0;
 
   for (i = 0 ; i < num ; i++)
   {
-    int c = polygons[i]->Classify (*split_plane);
+    int c = polygons[i]->Classify (node->splitter);
     switch (c)
     {
-      case POL_SAME_PLANE: node->AddPolygon (polygons[i]); break;
-      case POL_FRONT: front_poly[front_idx++] = polygons[i]; break;
-      case POL_BACK: back_poly[back_idx++] = polygons[i]; break;
+      case POL_SAME_PLANE:
+      	node->AddPolygon (polygons[i]);
+	//front_splitter[front_idx] = true;
+	//front_poly[front_idx++] = polygons[i];
+	break;
+      case POL_FRONT:
+	front_splitter[front_idx] = was_splitter[i];
+        front_poly[front_idx++] = polygons[i];
+	break;
+      case POL_BACK:
+	back_splitter[back_idx] = was_splitter[i];
+        back_poly[back_idx++] = polygons[i];
+	break;
       case POL_SPLIT_NEEDED:
 	{
 	  csPolygonInt* np1, * np2;
-	  polygons[i]->SplitWithPlane (&np1, &np2, *split_plane);
+	  polygons[i]->SplitWithPlane (&np1, &np2, node->splitter);
+	  front_splitter[front_idx] = false;
 	  front_poly[front_idx++] = np1;
+	  back_splitter[back_idx] = false;
 	  back_poly[back_idx++] = np2;
 	}
 	break;
-
     }
   }
 
   if (front_idx)
   {
     CHK (node->front = new csBspNode);
-    Build (node->front, front_poly, front_idx);
+    Build (node->front, front_poly, front_splitter, front_idx);
   }
   if (back_idx)
   {
     CHK (node->back = new csBspNode);
-    Build (node->back, back_poly, back_idx);
+    Build (node->back, back_poly, back_splitter, back_idx);
   }
 
   CHK (delete [] front_poly);
   CHK (delete [] back_poly);
-}
-
-void csBspTree::BuildDynamic (csBspNode* node, csPolygonInt** polygons, int num)
-{
-  int i;
-  csPolygonInt* split_poly;
-  if (node->polygons.GetNumPolygons ()) split_poly = node->polygons.GetPolygon (0);
-  else split_poly = polygons[SelectSplitter (polygons, num)];
-  csPlane* split_plane = split_poly->GetPolyPlane ();
-
-  // Now we split the list of polygons according to the plane of that polygon.
-  CHK (csPolygonInt** front_poly = new csPolygonInt* [num]);
-  CHK (csPolygonInt** back_poly = new csPolygonInt* [num]);
-  int front_idx = 0, back_idx = 0;
-
-  for (i = 0 ; i < num ; i++)
-  {
-    int c = polygons[i]->Classify (*split_plane);
-    switch (c)
-    {
-      case POL_SAME_PLANE: node->AddPolygon (polygons[i], true); break;
-      case POL_FRONT: front_poly[front_idx++] = polygons[i]; break;
-      case POL_BACK: back_poly[back_idx++] = polygons[i]; break;
-      case POL_SPLIT_NEEDED:
-	{
-    	  // In case of dynamic polygon adding we don't split the polygon.
-	  //csPolygonInt* np1, * np2;
-	  //polygons[i]->SplitWithPlane (&np1, &np2, *split_plane);
-	  //front_poly[front_idx++] = np1;
-	  //back_poly[back_idx++] = np2;
-	  front_poly[front_idx++] = polygons[i];
-	  back_poly[back_idx++] = polygons[i];
-	}
-	break;
-
-    }
-  }
-
-  if (front_idx)
-  {
-    if (!node->front) CHKB (node->front = new csBspNode);
-    BuildDynamic (node->front, front_poly, front_idx);
-  }
-  if (back_idx)
-  {
-    if (!node->back) CHKB (node->back = new csBspNode);
-    BuildDynamic (node->back, back_poly, back_idx);
-  }
-
-  CHK (delete [] front_poly);
-  CHK (delete [] back_poly);
+  CHK (delete [] front_splitter);
+  CHK (delete [] back_splitter);
 }
 
 void csBspTree::ProcessTodo (csBspNode* node)
@@ -419,7 +334,7 @@ void csBspTree::ProcessTodo (csBspNode* node)
     node->UnlinkStub (stub);	// Unlink from todo list.
     csPolygonStub* stub_on, * stub_front, * stub_back;
     stub->GetObject ()->SplitWithPlane (stub, &stub_on, &stub_front, &stub_back,
-    	*(node->polygons.GetPolygon (0)->GetPolyPlane ()));
+    	node->splitter);
     // Link the stub with the polygons on this splitter plane to the current node.
     if (stub_on) node->LinkStub (stub_on);	// Relink to normal list.
     // Link the stub with polygons in front to the todo list of the front node.
@@ -460,7 +375,7 @@ void* csBspTree::Back2Front (csBspNode* node, const csVector3& pos,
 
   // Check if some polygon (just take the first) of the polygons array
   // is visible from the given point. If so, we are in front of this node.
-  if (csMath3::Visible (pos, *(node->polygons.GetPolygon (0)->GetPolyPlane ())))
+  if (csMath3::Visible (pos, node->splitter))
   {
     // Front.
     rc = Back2Front (node->back, pos, func, data, cullfunc, culldata);
@@ -498,7 +413,7 @@ void* csBspTree::Front2Back (csBspNode* node, const csVector3& pos,
 
   // Check if some polygon (just take the first) of the polygons array
   // is visible from the given point. If so, we are in front of this node.
-  if (csMath3::Visible (pos, *(node->polygons.GetPolygon (0)->GetPolyPlane ())))
+  if (csMath3::Visible (pos, node->splitter))
   {
     // Front.
     rc = Front2Back (node->front, pos, func, data, cullfunc, culldata);

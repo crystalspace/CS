@@ -82,9 +82,6 @@ public:
    */
   virtual ~csPolygonTreeNode ();
 
-  /// Remove all dynamic added polygons.
-  virtual void RemoveDynamicPolygons () = 0;
-
   /// Return true if node is empty.
   virtual bool IsEmpty () = 0;
 
@@ -166,22 +163,6 @@ public:
   {
     Build (polygons.GetArray (), polygons.Length ());
   }
-
-  /**
-   * Add a bunch of polygons to the tree. They will be marked
-   * as dynamic polygons so that you can remove them from the tree again
-   * with RemoveDynamicPolygons(). Note that adding polygons dynamically
-   * will not modify the existing tree and splits but instead continue
-   * splitting in the leaves where the new polygons arrive.
-   */
-  virtual void AddDynamicPolygons (csPolygonInt** polygons, int num) = 0;
-
-  /**
-   * Remove all dynamically added polygons from the node. Note that
-   * the polygons are not really destroyed. Only unlinked from the BSP
-   * tree.
-   */
-  virtual void RemoveDynamicPolygons () = 0;
 
   /**
    * Add a dynamic object to the tree.

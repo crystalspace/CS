@@ -22,6 +22,7 @@
 #include "csgeom/math3d.h"
 #include "csengine/polytree.h"
 #include "csengine/polyint.h"
+#include "csengine/arrays.h"
 
 class csBspTree;
 class Dumper;
@@ -33,6 +34,8 @@ class Dumper;
 #define BSP_ALMOST_MINIMIZE_SPLITS 4	// Select a number of polygons and choose minimal split
 #define BSP_BALANCED 5			// Try to create a balanced tree
 #define BSP_ALMOST_BALANCED 6		// Try to create an approximation of a balanced tree
+#define BSP_BALANCE_AND_SPLITS 7	// Combine balanced tree and few splits.
+#define BSP_ALMOST_BALANCE_AND_SPLITS 8	// Combine balanced tree and few splits.
 
 /**
  * A BSP node.
@@ -50,11 +53,9 @@ private:
    * by that plane.
    */
   csPolygonIntArray polygons;
-  /**
-   * If not -1 then this is the index of the first dynamic
-   * polygon in the list of polygons.
-   */
-  int dynamic_idx;
+
+  /// The splitter plane.
+  csPlane splitter;
 
   /// The front node.
   csBspNode* front;
@@ -73,15 +74,8 @@ private:
 
   /**
    * Add a polygon to this BSP node.
-   * If 'dynamic' is true it will be a dynamic polygon.
-   * Dynamic polygons can be removed all at once with RemoveDynamicPolygons().
    */
-  void AddPolygon (csPolygonInt* poly, bool dynamic = false);
-
-  /**
-   * Remove all dynamic polygons.
-   */
-  void RemoveDynamicPolygons ();
+  void AddPolygon (csPolygonInt* poly);
 
   /**
    * Count all vertices used by polygons in this bsp node
@@ -123,20 +117,17 @@ private:
   int mode;
 
 private:
-  /// Build the tree from the given node and number of polygons.
-  void Build (csBspNode* node, csPolygonInt** polygons, int num);
-
   /**
    * Build the tree from the given node and number of polygons.
-   * This is a dynamic version. It will add the polygons to an already built
-   * BSP tree and add the polygons so that they can easily be removed later.
+   * The 'was_splitter' array contains 'true' for all polygons that
+   * have already been used as a splitter previously.
    */
-  void BuildDynamic (csBspNode* node, csPolygonInt** polygons, int num);
+  void Build (csBspNode* node, csPolygonInt** polygons, bool* was_splitter, int num);
 
   /**
    * Select a splitter from a list of polygons and return the index.
    */
-  int SelectSplitter (csPolygonInt** polygons, int num);
+  int SelectSplitter (csPolygonInt** polygons, bool* was_splitter, int num);
 
   /// Traverse the tree from back to front starting at 'node' and 'pos'.
   void* Back2Front (csBspNode* node, const csVector3& pos,
@@ -175,11 +166,6 @@ public:
   virtual ~csBspTree ();
 
   /**
-   * Create the tree for the default parent set.
-   */
-  void Build ();
-
-  /**
    * Create the tree with a given set of polygons.
    */
   void Build (csPolygonInt** polygons, int num);
@@ -187,23 +173,15 @@ public:
   /**
    * Create the tree with a given set of polygons.
    */
-  void Build (const csPolygonArray& polygons);
+  void Build (csPolygonArray& polygons)
+  {
+    Build (polygons.GetArray (), polygons.Length ());
+  }
 
   /**
-   * Add a bunch of polygons to the BSP tree. They will be marked
-   * as dynamic polygons so that you can remove them from the tree again
-   * with RemoveDynamicPolygons(). Note that adding polygons dynamically
-   * will not modify the existing tree and splits but instead continue
-   * splitting in the leaves where the new polygons arrive.
+   * Create the tree for the default parent set.
    */
-  void AddDynamicPolygons (csPolygonInt** polygons, int num);
-
-  /**
-   * Remove all dynamically added polygons from the node. Note that
-   * the polygons are not really destroyed. Only unlinked from the BSP
-   * tree.
-   */
-  void RemoveDynamicPolygons ();
+  void Build ();
 
   /// Traverse the tree from back to front starting at the root and 'pos'.
   void* Back2Front (const csVector3& pos, csTreeVisitFunc* func, void* data,

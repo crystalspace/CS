@@ -144,6 +144,7 @@ void csSector::UseStaticTree (int mode, bool octree)
 {
   // @@@ Always use octrees now.
   octree = true;
+  //mode = BSP_BALANCE_AND_SPLITS;
 
   CHK (delete static_tree); static_tree = NULL;
 
