@@ -30,6 +30,7 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine patched win32gcc.mak to work around problem on Win9x
 	  and WinME where "dllwrap --driver-name=g++" results in the error
 	  "dllwrap.exe: installation problem, cannot exec g++".
+	- Eric Sunshine removed the unused libs/cssys/general/instpath.cpp.
 25-Feb-2003
 	- Marten Svanfeldt made these changes:
 	    - Fixed a bug in the light/shadow culling.
