@@ -134,8 +134,8 @@ void csStatic::Draw ()
       // count the lines
       char s[2], *t, *p = strnew(text);
       int i;
-      int rowstart, rowend; // area within bound we gonna write in
-      int line; // runs through the lines we write
+      int rowstart = 0, rowend = 0; // area within bound we gonna write in
+      int line = 0; // runs through the lines we write
       int lines = 0; // total number of lines in text
       int len;
       t = strtok (p, "\n");
