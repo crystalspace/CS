@@ -166,20 +166,10 @@ csSector::~csSector ()
   // sector is destructed.
   CS_ASSERT (references.Length () == 0);
 
-  // Meshes are not deleted by the calls below. They
-  // belong to csEngine.
-  meshes.DeleteAll ();
-  int i;
-  for (i = 0 ; i < mesh_priority_queues.Length () ; i++)
-  {
-    csVector* m = (csVector*)mesh_priority_queues[i];
-    if (m) m->DeleteAll ();
-    delete m;
-  }
-  mesh_priority_queues.DeleteAll ();
-
   lights.DeleteAll ();
   if (culler) culler->DecRef ();
+
+  // rendering queues are deleted automatically.
 }
 
 void csSector::CleanupReferences ()
@@ -202,21 +192,7 @@ void csSector::AddMesh (csMeshWrapper* mesh)
 {
   meshes.Push (&(mesh->scfiMeshWrapper));
 
-  //-----
-  // Place the mesh in the right priority queue.
-  //-----
-  long pri = mesh->GetRenderPriority ();
-  int i;
-  // First initialize all uninitialized queues.
-  for (i = mesh_priority_queues.Length () ; i <= pri ; i++)
-    mesh_priority_queues[i] = NULL;
-  csVector* queue = (csVector*)mesh_priority_queues[pri];
-  if (queue == NULL)
-  {
-    queue = new csVector ();
-    mesh_priority_queues[pri] = queue;
-  }
-  queue->Push ((csSome)mesh);
+  RenderQueues.Add (&(mesh->scfiMeshWrapper));
 
   if (culler)
   {
@@ -228,22 +204,9 @@ void csSector::AddMesh (csMeshWrapper* mesh)
 
 void csSector::UnlinkMesh (csMeshWrapper* mesh)
 {
-  //-----
-  // First remove the mesh from the right priority queue.
-  //-----
-  long pri = mesh->GetRenderPriority ();
-  int i, idx;
-  // First initialize all uninitialized queues.
-  for (i = mesh_priority_queues.Length () ; i <= pri ; i++)
-    mesh_priority_queues[i] = NULL;
-  csVector* queue = (csVector*)mesh_priority_queues[pri];
-  if (queue != NULL)
-  {
-    idx = queue->Find ((csSome)mesh);
-    queue->Delete (idx);
-  }
+  RenderQueues.Remove (&(mesh->scfiMeshWrapper));
 
-  idx = meshes.Find (&(mesh->scfiMeshWrapper));
+  int idx = meshes.Find (&(mesh->scfiMeshWrapper));
   if (idx != -1)
   {
     meshes.Delete (idx);
@@ -259,38 +222,11 @@ void csSector::UnlinkMesh (csMeshWrapper* mesh)
 
 void csSector::RelinkMesh (csMeshWrapper* mesh)
 {
-  //-----
-  // Try to find the mesh in some render priority queue.
-  //-----
-  int i;
-  for (i = 0 ; i < mesh_priority_queues.Length () ; i++)
-  {
-    csVector* queue = (csVector*)mesh_priority_queues[i];
-    if (queue != NULL)
-    {
-      int idx = queue->Find ((csSome)mesh);
-      if (idx != -1)
-      {
-        queue->Delete (idx);
-	break;
-      }
-    }
-  }
+  // @@@ this function would be a lot faster of the previous
+  // priority was known!
 
-  //-----
-  // Place the mesh in the right priority queue.
-  //-----
-  long pri = mesh->GetRenderPriority ();
-  // First initialize all uninitialized queues.
-  for (i = mesh_priority_queues.Length () ; i <= pri ; i++)
-    mesh_priority_queues[i] = NULL;
-  csVector* queue = (csVector*)mesh_priority_queues[pri];
-  if (queue == NULL)
-  {
-    queue = new csVector ();
-    mesh_priority_queues[pri] = queue;
-  }
-  queue->Push ((csSome)mesh);
+  RenderQueues.RemoveUnknownPriority (&(mesh->scfiMeshWrapper));
+  RenderQueues.Add (&(mesh->scfiMeshWrapper));
 }
 
 //----------------------------------------------------------------------
@@ -765,13 +701,13 @@ void csSector::Draw (iRenderView* rview)
 	// @@@ Avoid memory allocation?
 	mesh_queue = new csMeshWrapper* [meshes.Length ()];
 	num_mesh_queue = 0;
-        for (i = 0 ; i < mesh_priority_queues.Length () ; i++)
+        for (i = 0 ; i < RenderQueues.GetQueueCount () ; i++)
         {
-	  csVector* v = (csVector*)mesh_priority_queues[i];
+	  csMeshVectorNodelete *v = RenderQueues.GetQueue (i);
 	  if (v)
 	    for (j = 0 ; j < v->Length () ; j++)
 	    {
-              csMeshWrapper* sp = (csMeshWrapper*)(*v)[j];
+              csMeshWrapper* sp = v->Get (j)->GetPrivateObject ();
 	      if (sp->IsVisible ()) mesh_queue[num_mesh_queue++] = sp;
 	    }
 	}
@@ -793,13 +729,13 @@ void csSector::Draw (iRenderView* rview)
     if (meshes.Length ())
     {
       mesh_queue = new csMeshWrapper* [meshes.Length ()];
-      for (i = 0 ; i < mesh_priority_queues.Length () ; i++)
+      for (i = 0 ; i < RenderQueues.GetQueueCount () ; i++)
       {
-        csVector* v = (csVector*)mesh_priority_queues[i];
+        csMeshVectorNodelete *v = RenderQueues.GetQueue (i);
 	if (v)
 	  for (j = 0 ; j < v->Length () ; j++)
 	  {
-            csMeshWrapper* sp = (csMeshWrapper*)(*v)[j];
+            csMeshWrapper* sp = v->Get (j)->GetPrivateObject ();
             mesh_queue[num_mesh_queue++] = sp;
 	  }
       }

@@ -24,6 +24,7 @@
 #include "csgeom/math3d.h"
 #include "csengine/bsp.h"
 #include "csengine/meshobj.h"
+#include "csengine/rdrprior.h"
 #include "csutil/cscolor.h"
 #include "iutil/objref.h"
 #include "iengine/movable.h"
@@ -121,7 +122,7 @@ private:
    * The same meshes above but each mesh in their own render priority
    * queue. This is a vector of vectors.
    */
-  csVector mesh_priority_queues;
+  csRenderQueueSet RenderQueues;
 
   /**
    * List of references (portals?) to this sector.
