@@ -46,8 +46,7 @@ csEventQueue::~csEventQueue ()
   Clear();
   if (EventQueue)
     delete[] EventQueue;
-  for (int i = Listeners.Length() - 1; i >= 0; i--)
-    Listeners[i].object->DecRef();
+  RemoveAllListeners ();
   EventOutlets.Get(0)->DecRef(); // The default event outlet which we created.
   while (EventPool) 
   {
@@ -234,7 +233,7 @@ void csEventQueue::Dispatch (iEvent& e)
   {
     Listener const& l = Listeners[i];
     if ((l.trigger & evmask) != 0 && l.object && l.object->HandleEvent(e)
-    	&& canstop)
+      && canstop)
       break;
   }
   EndLoop ();
@@ -253,7 +252,7 @@ int csEventQueue::FindListener (iEventHandler* listener) const
 }
 
 void csEventQueue::RegisterListener (iEventHandler* listener,
-	unsigned int trigger)
+  unsigned int trigger)
 {
   int const n = FindListener (listener);
   if (n >= 0)
@@ -283,8 +282,26 @@ void csEventQueue::RemoveListener (iEventHandler* listener)
   }
 }
 
+void csEventQueue::RemoveAllListeners ()
+{
+  for (int i = Listeners.Length() - 1; i >= 0; i--)
+  {
+    Listeners[i].object->DecRef();
+    if (busy_looping <= 0)
+    {
+      Listeners.Delete (i);
+    }
+    else
+    {
+      Listeners[i].object = NULL;
+      delete_occured = true;
+    }
+  }
+}
+
+
 void csEventQueue::ChangeListenerTrigger (iEventHandler* l,
-	unsigned int trigger)
+  unsigned int trigger)
 {
   int const n = FindListener(l);
   if (n >= 0)
