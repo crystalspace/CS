@@ -932,8 +932,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "bugplug"))
   {
-    LOAD_PLUGIN (System, "crystalspace.utilities.bugplug",
-    	"BugPlug", iPlugIn);
+    (void)LOAD_PLUGIN (System, "crystalspace.utilities.bugplug", "BugPlug", iPlugIn);
   }
   else if (!strcasecmp (cmd, "fps"))
     csCommandProcessor::change_boolean (arg, &Sys->do_fps, "fps");

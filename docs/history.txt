@@ -88,6 +88,8 @@ The history order is reversed so that new features are at the top.
 	  NASM flags, thus preventing NASM assembly files from appearing in
 	  generated DSP files even if the environment which is generating the
 	  DSP files has NASM enabled.
+	- Eric Sunshine eliminated a compilation warning in walkcmd.cpp
+	  regarding "computed value not used."
 10-Jun-2001
 	- Norman Kramer did the following:
 	    - Blocks now decrefs its queried soundwrapper, releases/stops the
