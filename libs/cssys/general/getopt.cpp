@@ -274,7 +274,7 @@ exchange (char **argv)
 
 /* Initialize the internal data when the first call is made.  */
 
-static const char *_getopt_initialize (int argc, char *const *argv,
+static const char *_getopt_initialize (int /*argc*/, char* const* /*argv*/,
     const char *optstring)
 {
   /* Start processing options with ARGV-element 1 (since ARGV-element 0
