@@ -441,7 +441,6 @@ LRESULT CALLBACK csGraphics2DOpenGL::DummyWindow (HWND hWnd, UINT message,
       ext.InitWGL_ARB_pixel_format (dwi->this_->hDC);
       if (ext.CS_WGL_ARB_pixel_format)
       {
-	BOOL status;
 	unsigned int numFormats = 0;
 	int iAttributes[20];
 	float fAttributes[] = {0.0f, 0.0f};

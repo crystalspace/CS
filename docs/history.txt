@@ -4,30 +4,30 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 27-May-2003
-	- Boyan made the following:
+	- Boyan made the following changes:
 	    - Fixed kyboard focusing component bug in AWS 
 	    - Added awsWindow::Show() and awsWindow::Hide() in AWS. 
-	    - This features allows triger these events in .def file (using signalWindowShown 
-	      and signalWindowHidden) 
-	- Philip Wyett added *.pyd (Python DLL's) and *.csplugin to the
-          CS root directory .cvsignore file.
-	- Philip Wyett Corrected MSVC 6 docs build requirement of minimum Python
-          version for CS. Now specifies minimum of 2.2.
-	- Jorrit reverted a fix from res to the sequence manager which was
-	  done about two weeks ago. This fix unfortunatelly makes csdemo
-	  crash so I had to remove it.
-	- Matze added a workaround for jam 2.4 which contained a bug which
-	  made the recently changed HeaderRule have strange side effects. As
-	  soon as jam 2.5 is out we can remove all these hacks.
-	- res overhauled the GL extension manager generator; instead 
-	  concatenating string in source, templates are read from the disk,
-	  containing placeholders for the actual stuff. This makes maintenance
-	  of the generator code somewhat easier.
-	- groton (groton@gmx.net) added the including of the file multimon.h
-	  to the file directdetection.cpp for MSVC6 compiler (so that ddraw canvas
-	  plugin compiles fine also if no DirectX SDK has been installed, ie on a
-	  plain MSVC6 installation).
-	
+	    - This features allows triger these events in .def file (using
+	      signalWindowShown and signalWindowHidden)
+	- Philip Wyett added *.pyd (Python DLL's) and *.csplugin to the CS root
+          directory .cvsignore file.
+	- Philip Wyett Corrected MSVC 6 docs build requirement of minimum
+          Python version for CS.  Now specifies minimum of 2.2.
+	- Jorrit reverted a fix from res to the sequence manager which was done
+          about two weeks ago.  This fix unfortunatelly makes csdemo crash so I
+          had to remove it.
+	- Matze added a workaround for jam 2.4 which contained a bug which made
+          the recently changed HeaderRule have strange side effects.  As soon
+          as jam 2.5 is out we can remove all these hacks.
+	- res overhauled the GL extension manager generator; instead
+          concatenating string in source, templates are read from the disk,
+          containing placeholders for the actual stuff.  This makes maintenance
+          of the generator code somewhat easier.
+	- groton (groton@gmx.net) added the including of the file multimon.h to
+          the file directdetection.cpp for MSVC6 compiler (so that ddraw canvas
+          plugin compiles fine also if no DirectX SDK has been installed, ie on
+          a plain MSVC6 installation).
+	- Eric Sunshine eliminated compilation warning in Win32 OpenGL canvas.
 26-May-2003
 	- Eric Sunshine eliminated compilation warning about implicit
 	  conversion of (int*) to (GLint*) in glcommon2d.cpp.
