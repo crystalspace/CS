@@ -700,7 +700,7 @@ csEngine::csEngine (iBase *iParent) :
 }
 
 // @@@ Hack
-csRef<iCamera> camera_hack = NULL;
+iCamera* camera_hack = NULL;
 
 csEngine::~csEngine ()
 {
