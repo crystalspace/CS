@@ -223,7 +223,7 @@ csSector* HugeRoom::create_huge_world (csWorld* world)
 
 #ifdef ROOM_CITYBLOCKS
   float x, y;
-  float cnt = wall_dim/thing_cityblock_dim;
+  //float cnt = wall_dim/thing_cityblock_dim;
   //for (x = -cnt/2 ; x < cnt/2 ; x++)
     //for (y = -cnt/2 ; y < cnt/2 ; y++)
   for (x = -3 ; x < 3 ; x++)
