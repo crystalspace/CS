@@ -29,6 +29,8 @@ chronological order.
 	  not especially useful on the scripting side anyhow. Note that the
 	  corresponding var-arg (...) functions, such as csPrintf(),
 	  PerformExtension(), PutText(), are still exported.
+	- Eric Sunshine fixed bug in macosx.jam where it was emitting a
+	  slightly bogus PkgInfo file to the generated Cocoa .app wrapper.
 11-Aug-2004
 	- Oktal fixed a problem in the console input plugin where a '%' sign in
 	  the input would cause problems because of iConsoleOutput::PutText's

@@ -227,7 +227,7 @@ actions AppExe bind NEEDLIBS bind EXTRAOBJECTS
 # AppPkgInfo file
 actions AppPkgInfo
 {
-    echo 'APPL???' > $(<) ;
+    echo 'APPL????' > $(<) ;
 }
 
 # AppInfoPlistStrings file
