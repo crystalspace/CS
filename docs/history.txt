@@ -263,7 +263,8 @@ chronological order.
 	- Jorrit fixed the GetFactory() in the thing mesh object so that
 	  it actually works now.
 18-Jul-2004
-	- PK changed iSaver and iSaverPlugin to support the iDocumentNode system
+	- PK changed iSaver and iSaverPlugin to support the iDocumentNode
+	  system
 	- PK added iBinarySaverPlugin and changed SprCal3dbinldr to support it
 	- PK implemented saving of sectors and meshes
 	- hangman implemented saving of camera positions
@@ -6459,7 +6460,8 @@ chronological order.
 	  Randall Foreman <eidpers@comcast.net>.
 	- duhprey updated ODE so it now optionally updates on
 	  cscmdPreProcess instead of calling Step
-	- duhprey attemped to fix the sky in terrain on ATI cards (from thebolt)
+	- duhprey attemped to fix the sky in terrain on ATI cards (from
+	  thebolt)
 4-Jan-2004
 	- Luca fixed a compilation error for the VC6 compiler.
 	- res added the creation of a global string set to InitApplication().

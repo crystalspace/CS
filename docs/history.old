@@ -1720,9 +1720,9 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Rhad changed the SetProperty() calls to awsScrollBar to expect floats
 	  instead of ints.  PLEASE NOTE THAT THIS MAY BREAK EXISTING FUNCTIONAL
 	  PROGRAMS WITHOUT COMPILER WARNINGS. (Thanks to void * cast calling
-	  convention) However, I have doubts that anyone is using this since the
-	  internal values in the scrollbar have been floats for some time and
-	  the GetProperty() call has always presumed it was filling in a
+	  convention) However, I have doubts that anyone is using this since
+	  the internal values in the scrollbar have been floats for some time
+	  and the GetProperty() call has always presumed it was filling in a
 	  float * .
 	- Rhad added some "experimental" UI to partedit.  Rather than adding a
 	  scrollbar for each element, there is currently one scroll bar in a
@@ -2664,7 +2664,8 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Jorrit changed GetNearbyObjects() and GetNearbyMeshes() to support
 	  the new portal objects. This still leaves functions like
 	  FollowSegment() and IntersectSegment().
-	- Jorrit added a test standalone portal to flarge (in comments for now).
+	- Jorrit added a test standalone portal to flarge (in comments for
+	  now).
 	- Jorrit fixed a bug in csSector::HitBeam(). It wasn't correctly
 	  using GetFullTransform().
 	- Eric Sunshine upgraded a bunch of outdated information in the
@@ -3273,9 +3274,9 @@ This history is "historical".  See "history.txt" for more recent entries.
 	      It is correct when just culling against a rview. Functions to
 	      cull properly against lightvolumes and portals is still work
 	      in progress.
-	- Marten Svanfeldt changed GL_CLAMP into GL_CLAMP_TO_EDGE in glrender3ds
-	  texturecache. They should be identical, but ATI does not work as
-	  expected when using GL_CLAMP.
+	- Marten Svanfeldt changed GL_CLAMP into GL_CLAMP_TO_EDGE in
+	  glrender3ds texturecache. They should be identical, but ATI does not
+	  work as expected when using GL_CLAMP.
 	- res hardcoded the texture format for cubemaps to RGB8 to fix visual
 	  glitches on ATI cards.
 7-Sep-2003
@@ -3353,17 +3354,17 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  shadower wants to have closed objects so if an object is not closed
 	  it will have to close it itself.
 	- Jorrit added <closed />, <notclosed />, <convex />, and <notconvex />
-	  keywords to <polymesh> parser so that you can set the hints to be used
-	  for culler, CD, and shadow manager. Note that <box> is closed and
-	  convex by default so there is no need to add the hints then.
+	  keywords to <polymesh> parser so that you can set the hints to be
+	  used for culler, CD, and shadow manager. Note that <box> is closed
+	  and convex by default so there is no need to add the hints then.
 	- Jorrit also added <default /> to <polymesh> parsing so that you can
 	  change the closed/convex flags for the default polymesh of
 	  some object.
 	- Jorrit removed CS_ENTITY_CONVEX. This flag was not used and
 	  is now made obsolete by the flags in iPolygonMesh.
-	- Jorrit reports: the old <convex> and <closed> keywords that you
-	  could use in a mesh will now also set the equivalent
-	  CS_POlYMESH_... flags in all polygon meshes associated with that mesh.
+	- Jorrit reports: the old <convex> and <closed> keywords that you could
+	  use in a mesh will now also set the equivalent CS_POlYMESH_... flags
+	  in all polygon meshes associated with that mesh.
 	- Jorrit added support for <closed> and <convex> to factories too.
 	- Jorrit changed api mod documentation for latest polymesh change.
 	- Jorrit removed CS_CULLER_HINT_CONVEX and CS_CULLER_HINT_CLOSED.
@@ -3373,7 +3374,8 @@ This history is "historical".  See "history.txt" for more recent entries.
 	    - Loading the shadow shader now happens upon a 'system load' event,
 	      not when a render step is created. The old way was problematic,
 	      as it required certain shader plugins that don't work well with
-	      unopened systems (e.g. the GL shaders need the extension manager.)
+	      unopened systems (e.g. the GL shaders need the extension
+	      manager.)
 	    - The hashes used now take advantage of templated key types.
 	    - There were circular references between csStencilShadowStep and
 	      csStencilShadowCacheEntry. Now only csStencilShadowStep holds
@@ -3845,9 +3847,9 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  anything at this moment.
 	- Jorrit changed Jamrules so that the list of static plugins is
 	  extended with the new renderer plugins if new renderer is selected.
-	- Jorrit fixed a bug with thing and the new renderer. FillRenderMeshes()
-	  did not properly call Prepare() which caused obj_normals not to be
-	  set in case smoothing was enabled.
+	- Jorrit fixed a bug with thing and the new
+	  renderer. FillRenderMeshes() did not properly call Prepare() which
+	  caused obj_normals not to be set in case smoothing was enabled.
 	- Jorrit fixed all GetRenderMeshes() calls in meshes that don't yet
 	  support the new renderer so that they at least set 'num' to 0
 	  correctly. That way they will work with the new renderer (but
@@ -4386,8 +4388,8 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  assumed that the array would grow automatically.
 	- Jorrit fixed another equivalent bug in DrawPolygonMesh for the
 	  software renderer.
-	- Jorrit added the <nullmesh> keyword in the parser. This is a short-cut
-	  to create a null mesh. Use it like this:
+	- Jorrit added the <nullmesh> keyword in the parser. This is a
+	  short-cut to create a null mesh. Use it like this:
 	    <nullmesh>
 		<min x="12.8" y="-1" z="11" />
 		<max x="13.2" y="3" z="13" />
@@ -5067,7 +5069,8 @@ This history is "historical".  See "history.txt" for more recent entries.
 	      csRefArray<iParticle>.
 	- res removed csVector from the Win32 WaveOut plugin.
 	- Jorrit replaced various occurrences of csVector:
-	    - Replaced 'frames' in csSpriteAction2 with csArray<csSpriteFrame*>.
+	    - Replaced 'frames' in csSpriteAction2 with
+	      csArray<csSpriteFrame*>.
 	    - Replaced 'delays' in csSpriteAction2 with csArray<int>.
 	    - Replaced 'displacements' in csSpriteAction2 with csArray<float>.
 	    - Replaced 'frames' in csSprite3DMeshObjectFactory with
@@ -6056,8 +6059,8 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- res fixed Win32 csLoadLibrary() which has been messed up by himself.
 	- Philip Wyett fixed a compile error in cmdline.cpp.
 	- Marten made the following changes:
-	    - Changed duhpreys shadowcode to use GetPolygonMeshShadows at first,
-	      then fallback to GetPolygonMeshColldet.
+	    - Changed duhpreys shadowcode to use GetPolygonMeshShadows at
+	      first, then fallback to GetPolygonMeshColldet.
 	    - Added setting of PolygonMeshShadows in genmesh.
 	    - Added stencil to user.mk
 	- res started working on converting thing for NR. You already can see
@@ -6640,17 +6643,17 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  CS iterator standard which means there is a HasNext() function
 	  and a Next() (and optionally a Reset() if the iterator supports
 	  that).
-	      - iVisibilityObjectIterator
-	      - iLightIterator
-	      - iSectorIterator
-	      - iObjectIterator
-	      - iObjectRegistryIterator
-	      - csTypedObjectIterator
-	      - csModelDataActionIterator
-	      - csModelDataPolygonIterator
-	      - csModelDataTextureIterator
-	      - csModelDataMaterialIterator
-	      - csModelDataObjectIterator
+	    - iVisibilityObjectIterator
+	    - iLightIterator
+	    - iSectorIterator
+	    - iObjectIterator
+	    - iObjectRegistryIterator
+	    - csTypedObjectIterator
+	    - csModelDataActionIterator
+	    - csModelDataPolygonIterator
+	    - csModelDataTextureIterator
+	    - csModelDataMaterialIterator
+	    - csModelDataObjectIterator
 	- Jorrit additionally updated the iStreamIterator.
 	- Eric Sunshine corrected ddraw/g2d.cpp so that it uses a fixed SCF
 	  class identifier in SCF_EXPORT_CLASS_DEP() rather than using the
@@ -6872,8 +6875,8 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  Not all usages could be removed however. The ones that were removed
 	  now were the easy ones.
 	- Jorrit removed GetPrivateObject() in iMaterialWrapper and
-	  iMeshWrapper. They were no longer used. Also removed a few addditional
-	  GetPrivateObject() calls.
+	  iMeshWrapper. They were no longer used. Also removed a few
+	  addditional GetPrivateObject() calls.
 	- Jorrit removed a GetPrivateObject() from csTextureWrapper that
 	  wasn't even reachable.
 	- Eric Sunshine eliminated several compilation warnings from
@@ -8561,16 +8564,14 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Oktal fixed some non-ANSI code in pythpre.i that could cause
 	  compilation of the Python cspace module to fail on some compilers.
 16-Apr-2003
-	- Rene Jager updated Python scripting.
-	  The cspython plugin can now access CS almost completely.
-	  A python module can be built by "make pythmod" which allows for
-	  writing CS application python.
-	  Base on Python 2.2.x and SWIG 1.3.17. For platforms where Python 2.2.x
-	  is run by the command "python2", use "PYTHON=python2" before
-	  "./configure" and "make *" commands.
-	  Changes made to include/igraphic/imageio.h, include/iutil/event.h and
-	  include/ivideo/graph3d.h to make struct's usable for SWIG, without
-	  breaking existing code.
+	- Rene Jager updated Python scripting.  The cspython plugin can now
+	  access CS almost completely.  A python module can be built by "make
+	  pythmod" which allows for writing CS application python.  Base on
+	  Python 2.2.x and SWIG 1.3.17. For platforms where Python 2.2.x is run
+	  by the command "python2", use "PYTHON=python2" before "./configure"
+	  and "make *" commands.  Changes made to include/igraphic/imageio.h,
+	  include/iutil/event.h and include/ivideo/graph3d.h to make struct's
+	  usable for SWIG, without breaking existing code.
 	- Rhad altered the rapid triangle collision test to ignore
 	  degenerate triangles.
 	    - Added a couple tests for degenerate tris that should
@@ -8743,8 +8744,8 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  rather than a single file.  We can remove this hack once
 	  LinkApplication for MacOS/X is updated so that Jam has full knowledge
 	  of the generated .app wrapper.
-	- Added csColliderHelper::InitializeCollisionWrapper() which initializes
-	  collision detection for a mesh and all children.
+	- Added csColliderHelper::InitializeCollisionWrapper() which
+	  initializes collision detection for a mesh and all children.
 	- Added iMeshObjectFactory->GetObjectModel(). This is an optional
 	  method which factories can implement similar to the GetObjectModel()
 	  in iMeshObject. If the factory contains the geometry for a model
@@ -8840,12 +8841,11 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Removed broken support for material sets ('materialselect' and
 	  'matset' keywords).
 	- Added new 'replacematerial' keyword which you can use in a thing
-	  instance to replace the material used in the factory with another one.
-	  Using this feature you can still reuse a factory even if the
-	  materials are different. Note that the materials MUST have the
-	  same size! i.e. if the factory uses a 64x64 material then you can
-	  only replace it with another 64x64 material.
-	  Currently unimplemented!!!
+	  instance to replace the material used in the factory with another
+	  one.  Using this feature you can still reuse a factory even if the
+	  materials are different. Note that the materials MUST have the same
+	  size! i.e. if the factory uses a 64x64 material then you can only
+	  replace it with another 64x64 material.  Currently unimplemented!!!
 	- Fixed a bug with collision detection and HardTransform of a thing
 	  mesh object. This is a new bug introduced with my changes yesterday
 	  and it was visible in the partsys level (when traversing a portal).
@@ -9006,10 +9006,10 @@ This history is "historical".  See "history.txt" for more recent entries.
 	    - Added implicit reference cast definition for static class member
 	      functions.
 	    - Added AttachNew() method to csRef<T>.
-	    - Added RemoveAllListeners() method to iEventQueue and csEventQueue.
-	      Fix for potential memory leak should a user store a reference
-	      to the event queue in an event handler, or the user is relying
-	      on the queue to explicitly release an event handler.
+	    - Added RemoveAllListeners() method to iEventQueue and
+	      csEventQueue.  Fix for potential memory leak should a user store
+	      a reference to the event queue in an event handler, or the user
+	      is relying on the queue to explicitly release an event handler.
 	    - Modified csInitializer::DestroyApplication to call
 	      RemoveAllListeners() method of system event queue.
 	- Philip Wyett eliminated some more MSVC compiler warnings.
@@ -9295,9 +9295,9 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  float2long and long2float. Commented out for now because it doesn't
 	  work on all compilers.
 	- Removed world space warping transformation in portals. Instead this
-	  is now calculated as needed. This part is less optimal but in addition
-	  I optimized the fact that the warp matrix is no longer transformed
-	  if a thing moves and there is no warping.
+	  is now calculated as needed. This part is less optimal but in
+	  addition I optimized the fact that the warp matrix is no longer
+	  transformed if a thing moves and there is no warping.
 	- Physically split csPolygon3D into csPolygon3DStatic and csPolygon3D.
 	  This is the next step into separating static thing and mesh objects.
 	- Several internal orginizations are caused by this in the thing
@@ -9885,7 +9885,8 @@ This history is "historical".  See "history.txt" for more recent entries.
 	      causes heavy z-fighting
 	    - the size of textures in zip/pk3 files is now determined correctly
 	    - converted HalfLife textures are written out as PNG instead of BMP
-	- res changed csImageMemory so it isn't limited to truecolor images only
+	- res changed csImageMemory so it isn't limited to truecolor images
+	  only.
 4-Mar-2003
 	- Andrew Craig fixed coordshow text drawing in walktest.  If you had
 	  a long sector name it was often cut off.
@@ -9902,8 +9903,8 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  will report accurate errors explaining why the lightmaps failed to
 	  load.
 	- If the -verbose commandline option is given then the genmesh plugin
-	  will report accurate errors explaining why the lighting info failed to
-	  load.
+	  will report accurate errors explaining why the lighting info failed
+	  to load.
 	- The thing object type now maintains a real reference to G3D. This
 	  is needed because when polygons are removed they clear themselves
 	  from the G3D cache so G3D has to stay in memory until the thing
@@ -9961,12 +9962,11 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Eric Sunshine moved crystal.fgd from scripts/worldcraft to
 	  scripts/hammer at the request of its author.
 	- Extended iLoader->LoadMapFile() with a fourth 'checkDupes' parameter.
-	  By default this is false. But when it is set to true the loader
-	  will not load textures, materials, and mesh factories for which
-	  another same-named object is already in the engine (ignoring regions).
-	  This can be useful in cases where you have multiple map files
-	  which need to share objects but which also need to be able to
-	  work standalone.
+	  By default this is false. But when it is set to true the loader will
+	  not load textures, materials, and mesh factories for which another
+	  same-named object is already in the engine (ignoring regions).  This
+	  can be useful in cases where you have multiple map files which need
+	  to share objects but which also need to be able to work standalone.
 	- Added '-dupes' commandline option to walktest which enables this
 	  option.
 	- Fixed an uninitialized variable in the OpenGL benchmark routine.
@@ -10191,8 +10191,8 @@ This history is "historical".  See "history.txt" for more recent entries.
 	      other canvases.
 	    - Fixed some errors in shader loading. Shaders wasn't prepared
 	      correctly.
-	    - Added possibility to override blendmode per shader pass, and a new
-	      blendmode in new renderer. (DESTALPHAADD)
+	    - Added possibility to override blendmode per shader pass, and a
+	      new blendmode in new renderer. (DESTALPHAADD)
 	    - Added two example PPL-shaders. They both need some special
 	      attenuationmaps and material setup.
 	    - Fixed a bug in genmesh anonymous stream loading.
@@ -10501,8 +10501,9 @@ This history is "historical".  See "history.txt" for more recent entries.
 	    - Field accel EmitGen3D can be given, as above, but for the
 	      acceleration.
 	    - ContainerBox can be specified: particles outside this box are not
-	      rendered. They are also not respawned, because I'm afraid it would
-	      create too many short-aged particles, and destroy the look of it.
+	      rendered. They are also not respawned, because I'm afraid it
+	      would create too many short-aged particles, and destroy the look
+	      of it.
 	    - The loader has XML format for these features.
 	    - The saver writes something sensible, but since the loader
 	      does not read this format at all, and any old converter would not
@@ -10641,8 +10642,8 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  which classes are preferred, and which should be avoided.
 	- Eric Sunshine eliminated `hbox' warnings from the Texinfo files
 	  reported by TeX.
-	- Marten Svanfeldt changed render3d so that Philipp Aumayr's new texture
-	  manager is default.
+	- Marten Svanfeldt changed render3d so that Philipp Aumayr's new
+	  texture manager is default.
 	- Marten also fixed a loading bug in shadermgr.cpp.
 	- Marten fixed multi-texturing in new shader plugin.
 	- Marten did a small fix for constants in texture.h and fixed a missing
@@ -11801,7 +11802,8 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  csNamedObjVector.
 	- Iso engine uses csRefArray instead of csNamedObjVector.
 	- Removed csNamedObjVector.
-	- Fixed a small bug in the Insert() function of csRefArray and csPArray.
+	- Fixed a small bug in the Insert() function of csRefArray and
+	  csPArray.
 	- Added csGrowingArray. This will be a replacement for
 	  CS_DECLARE_GROWING_ARRAY. csGrowingArray is only for objects that
 	  don't require constructors and not for pointers (for pointers use
@@ -12441,10 +12443,10 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  previously private to the csFrustumView class.
 	- Added iEngine->CreateFrustumView() function with which an application
 	  can create a frustum view that can be used with
-	  iVisibilityCuller->CastShadows(). The user can use SetObjectFunction()
-	  and other functions to initialize the frustum view and by doing
-	  that get called for every object that is visible from the given
-	  frustum.
+	  iVisibilityCuller->CastShadows(). The user can use
+	  SetObjectFunction() and other functions to initialize the frustum
+	  view and by doing that get called for every object that is visible
+	  from the given frustum.
 	- First attempts at implementing shadow receiving for genmeshes.
 	  Not fully operational yet and also not enabled by default.
 	- Eric Sunshine added to the user manual an `md32spr' tutorial written
@@ -13451,7 +13453,8 @@ This history is "historical".  See "history.txt" for more recent entries.
 	    - Win-specific VFS vars work again.
 	- Mike Handverger  did the following:
 	    - Adding some methods to safely remove defs from awsPrefManager
-	      Added awsKeyContainer::RemoveAll(), awsPrefManager::FindSkinDef(),
+	      Added awsKeyContainer::RemoveAll(),
+	      awsPrefManager::FindSkinDef(),
 	      awsPrefManager::RemoveWeindowDef(),
 	      awsPrefManager::RemoveSkinDef(),
 	      awsPrefManager::RemoveAllWindowDefs(), and
@@ -13512,7 +13515,8 @@ This history is "historical".  See "history.txt" for more recent entries.
 21-Oct-2002
 	- Matthias Braun did the following:
 	    - Removed lexan from user.mak.
-	    - Removed the cs syntax loader plugin, as noone was using this code.
+	    - Removed the cs syntax loader plugin, as noone was using this
+	      code.
 	- Anders Stenberg did the following:
 	    - Work on implementing new render3d. No output yet except from
 	      the 2D-driver. :(
@@ -13874,8 +13878,9 @@ This history is "historical".  See "history.txt" for more recent entries.
 	    - Folded out a small amount of redundant code (but in reality, the
 	      bulk of the code implementing this class is redundant and should
 	      be folded out).
-	- Fixed a bug in lighting in combination with DrawPolygonMesh (fastmesh)
-	  things. Apparently the super lightmaps were not marked as dirty.
+	- Fixed a bug in lighting in combination with DrawPolygonMesh
+	  (fastmesh) things. Apparently the super lightmaps were not marked as
+	  dirty.
 	- Eric Sunshine eliminated several compilation warnings from the OpenGL
 	  renderer.
 9-Oct-2002
@@ -14170,10 +14175,11 @@ This history is "historical".  See "history.txt" for more recent entries.
 	      out of function input params (haze).
 	    - Changed engseq to allow correct access and prevent crasher
 	      under Windows.
-	- Toni added a patch from Oriol Esteve: add Smoothing for things...
-	  to enable it just set the <smooth /> in the params section of the
+	- Toni added a patch from Oriol Esteve: add Smoothing for things... to
+	  enable it just set the <smooth /> in the params section of the
 	  thing. It takes a bit more to recalc the lights, but i think it it
-	  worth it. This code is stable but experimental, but feel free to play.
+	  worth it. This code is stable but experimental, but feel free to
+	  play.
 	- Added the notion of parameters to the base sequence manager.
 	  A parameter is a generic iBase* parameter which can be any
 	  SCF interface internally.
@@ -14574,8 +14580,8 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  part. Added the checkprog function instead which I found in
 	  configure scripts.
 	- Charlls Al'Quarra reorganized the cloth plugin a little.
-	- Keith Fulton added optimization to dynamic lightmap recalculation
-	  to use tighter loops when overflow protection is not necessary.  These
+	- Keith Fulton added optimization to dynamic lightmap recalculation to
+	  use tighter loops when overflow protection is not necessary.  These
 	  faster loops get called about 96% of the time in flarge, so dynamic
 	  and pseudo-dynamic lighting should be noticeably faster.
 20-Sep-2002
@@ -15125,9 +15131,10 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Philipp Aumayr started working on the new OpenGL renderer.
 	- Philip Wyett did the following:
 	    - Eliminated class vs. struct warnings under MSVC (xmltiny.h).
-	    - Casted away a few compiler warnings in OPCODE plugin - tons to go.
-	    - Eliminated a few compiler warnings and a no newline at end of file
-	      of effect plugin.
+	    - Casted away a few compiler warnings in OPCODE plugin - tons to
+	      go.
+	    - Eliminated a few compiler warnings and a no newline at end of
+	      file of effect plugin.
 	    - Fixed constructor ordering in OPCODE plugin.
 	- Fixed a very subtle bug in the csRef assignement operators.
 	  It is very important FIRST to assign the new value to the
@@ -15743,7 +15750,8 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Fixed unittest of syntax services. It was performing a bad
 	  test with the 'scale' token.
 	- Added iString::Format() and FormatV() (similar to csString versions).
-	- Renamed ParseXML() and WriteXML() to Parse() and Write() in iDocument.
+	- Renamed ParseXML() and WriteXML() to Parse() and Write() in
+	  iDocument.
 	- Implemented a VERY dirty hack in the TinyXML source code. We would
 	  like to avoid modifying those sources too much (to make it easier
 	  to upgrade if that is needed). However I needed a function to write
@@ -16487,15 +16495,14 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Renamed new ogl_g3dext.hpp to ogl_g3dext.h.
 	- Added a new feature to walktest. You can now say:
 	    walktest room maze sydney
-	  and walktest will load all specified levels in memory.
-	  Sectors with the same name will be merged (so objects from
-	  same-named sectors in different map files will be joined in one
-	  sector). You can also define world files that connect to sectors
-	  in other world files.	 Using this technique you can easily make
-	  huge worlds from smaller zip files (easier for artists to manage).
-	  One problem at this moment: CS will try to find and recalculate
-	  all lightmap information from the last level given on the commandline.
-	  So if you do:
+	  and walktest will load all specified levels in memory.  Sectors with
+	  the same name will be merged (so objects from same-named sectors in
+	  different map files will be joined in one sector). You can also
+	  define world files that connect to sectors in other world files.
+	  Using this technique you can easily make huge worlds from smaller zip
+	  files (easier for artists to manage).  One problem at this moment: CS
+	  will try to find and recalculate all lightmap information from the
+	  last level given on the commandline.  So if you do:
 	    walktest flarge room
 	  it will not be able to load lights from flarge cache but only the
 	  lights from room. I will try to find a solution for this later.
@@ -16650,9 +16657,9 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  common/graph2d.cpp.
 	- Peter Amstutz fixed a bug in instantiating a second copy of a textbox
 	  in AWS.
-	- Noah Falk made fixes to aws embedded components. They should now
-	  be usable again. Also added a sample embedded component to awstest
-	  to make future testing easier and as a very simple instructive sample.
+	- Noah Falk made fixes to aws embedded components. They should now be
+	  usable again. Also added a sample embedded component to awstest to
+	  make future testing easier and as a very simple instructive sample.
 	- Matt Reda reverted his earlier changes to the clipping rect, but also
 	  fixed the calls in csGraphics2D::Resize().
 	- Matt fixed two clipping calls in OpenGL's Resize() function.
@@ -16808,11 +16815,11 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  that point. The other has a frustum to restrict visibility.
 	- Updated the documentation with regards to the SCF _FAST macros
 	  that are now removed.
-	- Significantly updated the map format documentation. Now it should
-	  be about 95% up-to-date. However! Keep in mind that this is ONLY
-	  the documentation for the basic map format. It does NOT contain
-	  documentation for the loader plugins. This means that everything
-	  that is INSIDE a PARAMS block is not documented by this documentation.
+	- Significantly updated the map format documentation. Now it should be
+	  about 95% up-to-date. However! Keep in mind that this is ONLY the
+	  documentation for the basic map format. It does NOT contain
+	  documentation for the loader plugins. This means that everything that
+	  is INSIDE a PARAMS block is not documented by this documentation.
 	- Matze did some aws cleanups:
 	    - Reindented some stuff
 	    - Rewrote some parts of the parser
@@ -17404,8 +17411,9 @@ This history is "historical".  See "history.txt" for more recent entries.
 	      be either 'option' or 'option=value'.
 	      supported options:
 		compress=# - image compression, 0..100 higher values give
-		smaller files, but take longer to encode or give uglier results.
-		progressive - progressive(jpg)/interlaced(png) output.
+		smaller files, but take longer to encode or give uglier
+		results.  progressive - progressive(jpg)/interlaced(png)
+		output.
 	      examples:
 		compress=50
 		progressive,compress=30
@@ -17747,8 +17755,8 @@ updated3-Jun-2002
 	    - Fixed mkdir command in CS so msys can deal with directory
 	      creation. Note: This is very hacked and early support and is
 	      subject to change.
-	- Philip also fixed a link problem in freefnt2. This requires you update
-	  to latest msvc_libs 0.94a.
+	- Philip also fixed a link problem in freefnt2. This requires you
+	  update to latest msvc_libs 0.94a.
 21-May-2002
 	- Added include/igeom/polymesh.h to css.h.
 	- Fixed bug with csEvCord not calling SCF_CONSTRUCT_IBASE in
@@ -17993,7 +18001,8 @@ updated3-Jun-2002
 	    - Added Jorrit's plugin howto from the mailing list.
 	- Res added MSVC project file generator for version MSVC7.
 10-May-2002
-	- Matze Braun added a unix/linux section on 'howto setting CRYSTAL var'.
+	- Matze Braun added a unix/linux section on 'howto setting CRYSTAL
+	  var'.
 	- Philip Wyett updated links to ssh in the wincvs documentation.
 	- Philip added ddraw.lib to it's makefile and removed refs to
 	  ddraw.lib and zlib.lib from the MSVC project file templates. Now it
@@ -18003,7 +18012,8 @@ updated3-Jun-2002
 	- Philip Wyett added a HOWTO on creating the CRYSTAL enviroment
 	  variable at the request of other CS developers as some folks don't
 	  seem to know howto do it. I have done the Windows ones. Others may
-	  wish to fill in the currently blank sections for Linux and Mac OSX? ;)
+	  wish to fill in the currently blank sections for Linux and Mac OSX?
+	  ;)
 8-May-2002
 	- Fixed a few bugs in csCoverageBuffer::TestPolygon() and
 	  InsertPolygon(). Added a few additional tests to the unit tester.
@@ -18211,8 +18221,8 @@ updated3-Jun-2002
 	      now notice if you do this from the commandline i.e. "command"
 	      or "cmd" output will be now fed back to the calling console and
 	      not generate a new console window anymore.
-	    - Now use only use "appcon" in makefiles for "DSP.APP_NAME.TYPE = ".
-	      Use of "appgui" is now deprecated for MSVC project files.
+	    - Now use only use "appcon" in makefiles for "DSP.APP_NAME.TYPE =
+	      ".  Use of "appgui" is now deprecated for MSVC project files.
 	      Note: "appgui" "appcon" should be removed from MVSC project file
 	      generation and replaced with just "app" as a generic option.
 	    - Manually modified MSVC project files.
@@ -19577,7 +19587,8 @@ updated3-Jun-2002
 	      glXChooseVisual failed.
 	    - Also added a test for generic RGBA+Doublebuffer+DEPTH
 	      with help from Christophe Cavalaria.
-	- Wyatt Miler updated libpng version that is available in documentation.
+	- Wyatt Miler updated libpng version that is available in
+	  documentation.
 19-Feb-2002
 	- Toni Asco' Gonzalez implemented a faster version of DrawPolygonMesh()
 	  for OpenGL. This code is still experimental but it seems to work.
@@ -19813,7 +19824,8 @@ updated3-Jun-2002
 	      by inset, since layouts automatically assume zero space.
 	    - Fixed additional bugs related to ScrollBar and ListBox because
 	      of layouts.
-	    - Slight re-adjustment of space for scrollbar so it doesn't overlap.
+	    - Slight re-adjustment of space for scrollbar so it doesn't
+	      overlap.
 	- res added ugly workaround to mingw dllwrap bug (functions with
 	  _declspec(dllexport) are not auto-exported from libraries).
 	- res modified lens flares so that they fade away.
@@ -20258,8 +20270,8 @@ updated3-Jun-2002
 	    - Fixed Windows hardware memory-mapped I/O code. I was under the
 	      impression that I should use one function when, in reality, I
 	      needed to use another. Instead of simply using OpenFileMapping,
-	      you must CreateFile(), then CreateMapping(), then MapViewOfFile().
-	      This code has been tested and works.
+	      you must CreateFile(), then CreateMapping(), then
+	      MapViewOfFile().  This code has been tested and works.
 24-Jan-2002
 	- Jorge Acereda relaxed a limit in 3ds2lev that made it crash
 	  with scenes with more than 100 textures.
@@ -20598,7 +20610,8 @@ updated3-Jun-2002
 	- Philip Wyett added 'required' to the msvc documentation for the
 	  BisonFlex library as it is needed for successful linking.
 9-Jan-2002
-	- RedEye Entertainment fixed make errors introduced by Andrew yesterday.
+	- RedEye Entertainment fixed make errors introduced by Andrew
+	  yesterday.
 	- Eric Sunshine applied a much saner patch to the makefiles to combat
 	  the breakage caused by AndyZ's makefile change.  Reverted a patch
 	  which Philip Wyett made to cygwin.mak since the new saner patch
@@ -22224,10 +22237,11 @@ updated3-Jun-2002
 	      CS/bin directory have execute-permission.
 	- res fixed demo.mak which he modified yesterday.
 	- Wouter Wijngaards did the following with regards to cs-config:
-	    - Added --makevars option to cs-config, this will echo a portion
-	      of a makefile with settings that the user can use. With these
+	    - Added --makevars option to cs-config, this will echo a portion of
+	      a makefile with settings that the user can use. With these
 	      settings more platforms should be supported by the cs-config
-	      makefiles, such as linux, mingw, next, without making any changes.
+	      makefiles, such as linux, mingw, next, without making any
+	      changes.
 	    - Updated the Template makefile in scripts/cs-config so that it
 	      supports compiling shared plugins as well.
 	    - Small fixes to the template makefile as well.
@@ -23749,8 +23763,8 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  was not called. This resulted in a non-initialized csPoly3D which
 	  could cause big problems in some cases.
 	- Norman Kramer added new options in opengl.cfg for selecting internal
-	  RGB format (RGB/RGB16/compressed). compressed is only working if
-	  you enable the USE_EXTENSIONS define. This is for the OpenGL renderer.
+	  RGB format (RGB/RGB16/compressed). compressed is only working if you
+	  enable the USE_EXTENSIONS define. This is for the OpenGL renderer.
 	- Christopher Nelson did the following:
 	    - Did some fixes in awstest.cpp for changes to iLightList.
 	    - Added iAwsComponentFactory as an interface so that
@@ -28927,9 +28941,9 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Philip Wyett changed to remove sub of apps to a wildcard "*"
 	  for msvcxgen process rather than "tests" which was before. Now can
 	  generate any "app/../../" projects with msvcgen process.
-	- Philip Wyett extended previous commit by changing "TESTS_SUBMAKEFILES"
-	  to "SUBAPPLICATION_SUBMAKEFILES" as now it is searching both
-	  "apps/tutor/*" as well as the old "apps/tests/*".
+	- Philip Wyett extended previous commit by changing
+	  "TESTS_SUBMAKEFILES" to "SUBAPPLICATION_SUBMAKEFILES" as now it is
+	  searching both "apps/tutor/*" as well as the old "apps/tests/*".
 	- Eric Sunshine eliminated the new SUBAPPLICATION_SUBMAKEFILES variable
 	  from subs.mak and replaced it with TESTS_SUBMAKEFILES and
 	  TUTORIAL_SUBMAKEFILES.
@@ -29138,7 +29152,8 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  predeclare anything, since there are no interdependencies.  I may
 	  add an include statement which will allow a single file to include
 	  other files that it may depend upon.
-	  I am thinking through the ramifications of allowing modular code, e.g.
+	  I am thinking through the ramifications of allowing modular code,
+	  e.g.:
 	    component "Sex Frame" is "Frame"
 	    {
 	      component "Male" is "Radio Button"
@@ -35183,9 +35198,9 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  of the options. For example 'conflist 3' will list all the config
 	  options and values for the plugin with number 3 (from the list
 	  given by 'plugins').
-	- Added 'confset' console command to WalkTest with which you can
-	  set a config option to some value. Arguments are <plugnr>,<name>,<val>
-	  with <plugnr> the number you get from the 'plugins' command.
+	- Added 'confset' console command to WalkTest with which you can set a
+	  config option to some value. Arguments are <plugnr>,<name>,<val> with
+	  <plugnr> the number you get from the 'plugins' command.
 	- Eric Sunshine eliminated a compilation warning from walkcmd.cpp.
 1-Jan-2001
 	- Added 'children' array to csMeshWrapper. By this we will support
@@ -41230,8 +41245,8 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  DrawTriangleMesh friendly format.
 	- Did first attempt to use DrawTriangleMesh for curved surfaces. Not
 	  enabled now because it doesn't work very optimal due to the way
-	  lightmaps and lighting for curves work. We need to find a solution for
-	  this. Maybe putting lighting in the tesselated curve might help.
+	  lightmaps and lighting for curves work. We need to find a solution
+	  for this. Maybe putting lighting in the tesselated curve might help.
 	- Eric Sunshine made a pass through the makefiles for all plug-in
 	  modules to ensure that every plug-in defines an SCL_* flag and
 	  defines the correct parameters for use with static linking.
@@ -41771,8 +41786,9 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 2-Jun-2000
 	- Samuel Humphreys added some further options to dtsimple and fixed
 	  cleaning up. Dynamic textures clean up after themselves properly now.
-	- Samuel also did some changes which gets the metaballs texture working.
-	  Mainly to do with many iGraphics3D refering to one iGraphics2D
+	- Samuel also did some changes which gets the metaballs texture
+	  working.  Mainly to do with many iGraphics3D refering to one
+	  iGraphics2D
 	    - The engine now keys of iGraphics3D rather than iGraphics2D,
 	      to determine whether it needs to swap states.
 	    - Metaball plugin now queries iGraphics3D for width and height of
@@ -48802,9 +48818,10 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  I don't want to allocate/deallocate them every time they
 	  are used. The object pool can do that. There are other places in
 	  CS where this object pool could be useful. That's for the future.
-	- Added new 'cbuffer' command to WalkTest that you can use to experiment
-	  with the new c-buffer mode. It is disabled by default. Jorrit also
-	  added a key binding for 'cbuffer toggle' on key 'd'.
+	- Added new 'cbuffer' command to WalkTest that you can use to
+	  experiment with the new c-buffer mode. It is disabled by
+	  default. Jorrit also added a key binding for 'cbuffer toggle' on key
+	  'd'.
 	- The c-buffer system works fairly well right now. The current
 	  implementation is written specifically with hardware acceleration in
 	  mind. It works best for hardware accelerated renderers. But even so
@@ -48818,15 +48835,15 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  have a static bsp (STATBSP() option in sector) and a number of
 	  non-moving things which are then merged in that static bsp. Only
 	  in this case do you gain anything.
-	- Provided a temporary fix so that collisoin detection works if a static
-	  thing is used (BSP for non-moving things in a sector). I'm not sure
-	  why it didn't work before. This needs more investigation.
-	- Because of the need to use STATBSP() more (an option which is not used
-	  in any of the current levels) Jorrit noticed a few shortcomings of
-	  the STATBSP implementation. The most important one being that gouraud
-	  shaded polygons are not handled well. After a little thinking Jorrit
-	  decided that it is best to rewrite BSP handling a bit. The current
-	  way is too clumsy. Ok, let's start...
+	- Provided a temporary fix so that collisoin detection works if a
+	  static thing is used (BSP for non-moving things in a sector). I'm not
+	  sure why it didn't work before. This needs more investigation.
+	- Because of the need to use STATBSP() more (an option which is not
+	  used in any of the current levels) Jorrit noticed a few shortcomings
+	  of the STATBSP implementation. The most important one being that
+	  gouraud shaded polygons are not handled well. After a little thinking
+	  Jorrit decided that it is best to rewrite BSP handling a bit. The
+	  current way is too clumsy. Ok, let's start...
 	- Added a new class csPolygonBsp. This is a proxy polygon class
 	  which will be used in the new BSP trees. A csPolygonBsp is basically
 	  just a collection of vertices and a pointer back to the original
@@ -48857,9 +48874,9 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  list instead of an unused list for every scanline.
 	- Continued work on the c-buffer stuff. Note that it is still not
 	  enabled and the current queue stuff that I added is already obsolete
-	  before being used even once :-)  I'm going to implement it in a much
-	  better and more general (and less error prone) method using the object
-	  pool design pattern.
+	  before being used even once :-) I'm going to implement it in a much
+	  better and more general (and less error prone) method using the
+	  object pool design pattern.
 	- The CACHE option for the software renderer was mistakenly
 	  put in the Hardware config section. Moved to the TextureManager
 	  section where it belongs.
@@ -52509,7 +52526,8 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  unlighted textures which was not present in the past.
 	- Changed missile code so that it now stops a little sooner when
 	  detecting a collision. Before this patch the missile often exploded
-	  just behind the polygon that was hit, giving strange and ugly results.
+	  just behind the polygon that was hit, giving strange and ugly
+	  results.
 13-Nov-1998
 	- Ryan J. Evans found a bug in operator< for the Box class.
 	- Added port to BeOS from Xavier Pianet <xavier@planet.dk>! His
@@ -53035,7 +53053,8 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  key.	The 'capture' command has been moved to the alt-a key.	By the
 	  way, the missile will explode when it touches a wall.	 So be careful
 	  :-)
-	- Received new texmem.* from Xavier Trochu and a small patch to win32.h.
+	- Received new texmem.* from Xavier Trochu and a small patch to
+	  win32.h.
 	- *** Release of 0.11_025 ***
 24-Sep-1998
 	- Fixed a bug in Matrix3::gettranspose () so that I can really use
