@@ -111,6 +111,92 @@ The history order is reversed so that new features are at the top.
 	  which means that the constructor from the parent csPoly3D
 	  was not called. This resulted in a non-initialized csPoly3D which
 	  could cause big problems in some cases.
+	- Norman Kramer added new options in opengl.cfg for selecting internal
+	  RGB format (RGB/RGB16/compressed). compressed is only working if
+	  you enable the USE_EXTENSIONS define. This is for the OpenGL renderer.
+	- Christopher Nelson did the following:
+	    - Did some fixes in awstest.cpp for changes to iLightList.
+	    - Added iAwsComponentFactory as an interface so that
+	      it works correctly with the SCF stuff. Note that components CAN
+	      be loaded from any library (shared or static, of course), but
+	      they don't necessarily HAVE to be. Probably the best thing would
+	      be if you had all the components in a specific plugin or
+	      something, and you called one function to load the plugin and
+	      give you an interface to it, then passed in the handle to the
+	      window manager so that it could in turn register all of it's
+	      components. Currently, all the components that come stock with
+	      Aws are all in the same library and are registered by the
+	      window manager since it knows that they exist.
+	    - Made a bunch of changes to fix awsComponentFactory bugs that
+	      cropped up the first time I made a new component that actually
+	      has to be built the normal way. (Windows are exceptional.)  
+	    - Added the awsCmdButton class as a component. Also as an example
+	      of how to do a component correctly. Don't look at awsWindow,
+	      because it's a very unusual component.  
+	    - Added the awsCmdButtonFactory class to build buttons. Also
+	      serves as an example of a proper component factory.
+	      (awsWindow doesn't even HAVE a factory.)
+	- Norman Kramer fixed initapp.cpp so it returns false if VFS could
+	  not be loaded (spotted by Matze Braun).
+	- Norman fixed g2dtest where a destructor was returning false.
+	- Norman added a fix to line_g3d.cpp submitted by Jorge Acereda.
+	- Norman fixed vsh where the call to Initialize() contained an
+	  invalid NULL entry.
+	- Philip Wyett fixed csfgen where the call to Initialize() contained an
+	  invalid NULL entry.
+	- Justin Miller added patch for NetBSD from Jorge Acereda.
+	- Philip Wyett updated ext_w32.inc to take account of Normans changes.
+	- Philip Wyett updated win32gcc.txi to take account of new 0.70
+	  release of CS MingW.
+	- Wyatt Miler did various typo corrections to the documentation.
+	  Also updated version.txi.
+7-Oct-2001
+	- Wouter Wijngaards removed a warning in isomesh.cpp.
+	- Norman Kramer added several fixes submitted by Jorge Acereda
+	  <al004046@alumail.uji.es>:
+	    - Added netbsd makefile.
+	    - Added another patch for netbsd and a general fix.
+	    - Bug in csparser. Returns NULL instead of false.
+	- Wouter Wijngaards fixed a bug in csparser where it returned false
+	  when a pointer was expected. Changed to return NULL instead.
+	- Norman Kramer changed SoundRenderer to SoundRender in blocks.cfg.
+	- Norman also added a new version of 3ds2lev contributed by
+	  Luca Pancallo. Check out the readme.1st for more info.
+	- Norman added code to make sure the mp3 loader sees input last (if
+	  there is any mp3 loader). Reason for this is that the mp3 loader
+	  scans for valid mp3 headers until it finds some and the bigger the
+	  input the more likely it will find some.
+	- Norman says he added some more sanity chacks to mp3data.cpp. I
+	  wonder if he meant 'snack' instead of chacks :-)
+	- Philip Wyett moved int64_t to the Win32 OS def file from the Ogg
+	  Vorbis plugin where I origionally placed it. This version wil
+	  cover both MSVC and GCC compilers on the Win32 platform.
+6-Oct-2001
+	- Martin Geisse made the following changes:
+	    - Modified iLightList, iMeshList, iMeshFactoryList,
+	      iCameraPositionList and iCollectionList to the new standard
+	      list interface.
+	    - Removed the custom FreeItem from some of these lists where it
+	      was not needed. The function just DecRef'ed the removed objects,
+	      which is already done by the parent object vector class.
+	    - Removed the custom destructor in some of these lists where it
+	      was not needed. These destructors did nothing but a DeleteAll(),
+	      which is only needed if a custom FreeItem() is present.
+	      Otherwise they can rely on the parent object vector class to
+	      call DeleteAll().
+	    - Removed special AddBla() and RemoveBla() functions from the
+	      actual vector classes. They co-existed with the normal Push(),
+	      Delete() and other functions and contained special code that was
+	      not invoked by the normal vector methods. The special code was
+	      moved to PrepareItem() and FreeItem().
+	    - Fixed some bugs in the typed vector code.
+	    - Added csBasicVector::Top() which works like Pop() but does not
+	      remove the object. Also added Top() to typed vectors.
+	    - Removed the PopItem() function from csRestrictedAccessVector.
+	      FreeItem() is now also called for items that are removed with
+	      Pop(). csIBaseVector achieves its special Pop() behaviour by
+	      overriding Pop() directly.
+	- Philip Wyett fixed several apps after Martin's changes.
 5-Oct-2001
 	- Removed csInitializer::SetupObjectRegistry(). Instead
 	  csInitializer::Initialize() will now setup the object registry
@@ -218,6 +304,15 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshined added a implementation of csSleep() to the BeOS port.
 	- Eric Sunshine eliminated an "unused variable" warning from
 	  ogl_g3dcom.cpp.
+	- Norman Kramer removed the "old" mp3 parts (which only played layer
+	  3 frames) and replaced it with a strip-off from the mpg123 package.
+	- Norman fixed wrong targetname for the ogg .dep file.
+	- Philip Wyett did the following:
+	    - Removed ref to old win32itf.h and added winhelp.h (libcssys.dsp).
+	    - Reverted Erics changes due to it breaking csStrNew and the
+	      entire MSVC port.
+	    - Modified mp3.mak so unix specific files are *not* added to
+	      MSVC project files for attempted compilation.
 4-Oct-2001
 	- Removed support for old and obsolete 'debug_level' in system
 	  driver.
@@ -284,6 +379,8 @@ The history order is reversed so that new features are at the top.
 	- Converted Bumptest so it no longer inherits from SysSystemDriver.
 	- Converted WalkTest so it no longer inherits from SysSystemDriver.
 	- Converted Squawk so it no longer inherits from SysSystemDriver.
+	- Justin Miller added static csString::Format() methods for safely
+	  formatting integral types.
 3-Oct-2001
 	- Added the following functions to csInitializer:
 	    - InitializeSCF()
@@ -299,6 +396,42 @@ The history order is reversed so that new features are at the top.
 	  of the above new functions and also calls CreateObjectRegistry()
 	  (and returns it). Since most apps will want to call those functions
 	  anyway it makes sense to have one call to do all that.
+	- Christopher Nelson did the following:
+	    - Updated AWS for bug help.
+	    - Slightly modified interface in aws.h.
+	    - Added support for MouseEnter and MouseExit messages.
+	    - Fixed awsPrefManager so that it properly cleans up registered
+	      constants.
+	- Martin Geisse made the following changes:
+	    - Renamed the following methods in iSectorList, iMaterialList and
+	      iTextureList: AddBlah() to Add(), RemoveBlah() to Remove()
+	      and GetBlahCount() to GetCount()
+	    - Fixed an old bug that was present in many sub-subclasses of
+	      csVector. If a subclass of csVector calls DeleteAll() in the
+	      destructor, and a subclass of that class overrides FreeItem(),
+	      it must also override the destructor again and call DeleteAll()
+	      there.
+	    - Added a new kind of typed vector called 'restricted access
+	      vector'. These vectors do not allow to assign elements
+	      directly, but only through methods like Push() and Replace().
+	      They also contain three virtual methods, PrepareItem() which is
+	      called for every added element, FreeItem() which is called for
+	      every deleted element, and PopItem() which is called for every
+	      item that was removed with the Pop() function.
+	    - Re-implemented iBase-vectors with this new kind of typed vector,
+	      since they are actually a subset.
+	- Norman Kramer did the following:
+	    - Updated iso engine for latest changes to iMaterialList.
+	    - Additional readme to point to the ogg vorbis package on the net.
+	    - MP3 playing for CS based on mpg123 by Michael Hipp. I used the
+	      mpglib from that package, which imposes some restriction
+	      currently (for instance no 192kbit resolution). Also there
+	      is a problem that playing starts to stutter after a while and
+	      application becomes unresponsive - this can be, however, a bug
+	      in the oss driver, we'll see.
+	- Philip Wyett fixed Win32 GL canvas so it correctly clips to screen
+	  in fullscreen mode.
+	- Philip also fixed the python and lua plugins.
 2-Oct-2001
 	- Changed the csInitialize... functions in cstool to static member
 	  functions of the class csInitializer. There are now the following
