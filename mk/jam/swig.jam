@@ -50,6 +50,9 @@ if $(CMD.SWIG)
   }
   RegisterFileType SimpleSwig : .i ;
 
-  SWIG.HDRPATTERN = "^[ 	]*[%#][ 	]*include[ 	]*[<\"]([^\">]*)[\">].*$" ;
-  RegisterHeaderRule HeaderRule : $(SWIG.HDRPATTERN) : .i ;
+  if ! $(NO_SWIG_HEADER_SCANNING)
+  {
+    SWIG.HDRPATTERN = "^[ 	]*[%#][ 	]*include[ 	]*[<\"]([^\">]*)[\">].*$" ;
+    RegisterHeaderRule HeaderRule : $(SWIG.HDRPATTERN) : .i ;
+  }
 }
