@@ -160,10 +160,12 @@ public:
   csStringBase& Append (unsigned int v) { return AppendFmt ("%u", v); }
   csStringBase& Append (long v) { return AppendFmt ("%ld", v); }
   csStringBase& Append (unsigned long v) { return AppendFmt ("%lu", v); }
-  csStringBase& Append (longlong);
-  csStringBase& Append (ulonglong);
   csStringBase& Append (float v) { return AppendFmt ("%g", v); }
   csStringBase& Append (double v) { return AppendFmt ("%g", v); }
+#ifndef __STRICT_ANSI__
+  csStringBase& Append (longlong);
+  csStringBase& Append (ulonglong);
+#endif
   /** @} */
 
   /**
@@ -1063,14 +1065,16 @@ public:
   { Replace(x); return *this; }
   const csStringFast& operator = (unsigned long x)
   { Replace(x); return *this; }
-  const csStringFast& operator = (longlong x)
-  { Replace(x); return *this; }
-  const csStringFast& operator = (ulonglong x)
-  { Replace(x); return *this; }
   const csStringFast& operator = (float x)
   { Replace(x); return *this; }
   const csStringFast& operator = (double x)
   { Replace(x); return *this; }
+#ifndef __STRICT_ANSI__
+  const csStringFast& operator = (longlong x)
+  { Replace(x); return *this; }
+  const csStringFast& operator = (ulonglong x)
+  { Replace(x); return *this; }
+#endif
 };
 
 /**
@@ -1127,14 +1131,16 @@ public:
   { Replace(x); return *this; }
   const csString& operator = (unsigned long x)
   { Replace(x); return *this; }
-  const csString& operator = (longlong x)
-  { Replace(x); return *this; }
-  const csString& operator = (ulonglong x)
-  { Replace(x); return *this; }
   const csString& operator = (float x)
   { Replace(x); return *this; }
   const csString& operator = (double x)
   { Replace(x); return *this; }
+#ifndef __STRICT_ANSI__
+  const csString& operator = (longlong x)
+  { Replace(x); return *this; }
+  const csString& operator = (ulonglong x)
+  { Replace(x); return *this; }
+#endif
   /** @} */
 };
 

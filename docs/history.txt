@@ -23,6 +23,8 @@ chronological order.
 	  caused csutil/formatter.h to complain about not knowing how to format
 	  floating point as hexadecimal. (Anyhow, this override is no longer
 	  needed since csQint() should now work correctly on 64-bit platforms.)
+	- Eric Sunshine performed some more -ansi -pedantic sanitation on
+	  csstring.h for 64-bit platforms.
 14-Mar-2005
 	- Eric Sunshine propagated yesterday's csString ShrinkBestFit() and
 	  Empty() additions to iString and scfString for API consistency.
