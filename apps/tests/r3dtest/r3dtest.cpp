@@ -77,9 +77,9 @@ public:
     texcoords = r3d->GetBufferManager ()->GetBuffer (
       sizeof (csVector2)*8, CS_BUF_STATIC);
     indices = r3d->GetBufferManager ()->GetBuffer (
-      sizeof (unsigned int)*36, CS_BUF_STATIC);
+      sizeof (unsigned int)*36, CS_BUF_INDEX);
 
-    csVector3* vbuf = vertices->GetVector3Buffer ();
+    csVector3* vbuf = (csVector3*)vertices->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
     vbuf[0] = csVector3 (-1,  1, -1);
     vbuf[1] = csVector3 ( 1,  1, -1);
     vbuf[2] = csVector3 (-1,  1,  1);
@@ -88,18 +88,9 @@ public:
     vbuf[5] = csVector3 ( 1, -1, -1);
     vbuf[6] = csVector3 (-1, -1,  1);
     vbuf[7] = csVector3 ( 1, -1,  1);
+    vertices->Release();
 
-    csVector2* tcbuf = texcoords->GetVector2Buffer ();
-    tcbuf[0] = csVector2 (0, 0);
-    tcbuf[1] = csVector2 (1, 0);
-    tcbuf[2] = csVector2 (0, 1);
-    tcbuf[3] = csVector2 (1, 1);
-    tcbuf[4] = csVector2 (0, 0);
-    tcbuf[5] = csVector2 (1, 0);
-    tcbuf[6] = csVector2 (0, 1);
-    tcbuf[7] = csVector2 (1, 1);
-
-    unsigned int* ibuf = indices->GetUIntBuffer ();
+    unsigned int* ibuf = (unsigned int*)indices->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
     ibuf[ 0] = 0;  ibuf[ 1] = 4;  ibuf[ 2] = 1;
     ibuf[ 3] = 1;  ibuf[ 4] = 4;  ibuf[ 5] = 5;
     ibuf[ 6] = 0;  ibuf[ 7] = 1;  ibuf[ 8] = 3;
@@ -112,6 +103,19 @@ public:
     ibuf[27] = 0;  ibuf[28] = 6;  ibuf[29] = 4;
     ibuf[30] = 2;  ibuf[31] = 3;  ibuf[32] = 6;
     ibuf[33] = 3;  ibuf[34] = 7;  ibuf[35] = 6;
+    indices->Release();
+
+    csVector2* tcbuf = (csVector2*)texcoords->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+    tcbuf[0] = csVector2 (0, 0);
+    tcbuf[1] = csVector2 (1, 0);
+    tcbuf[2] = csVector2 (0, 1);
+    tcbuf[3] = csVector2 (1, 1);
+    tcbuf[4] = csVector2 (0, 0);
+    tcbuf[5] = csVector2 (1, 0);
+    tcbuf[6] = csVector2 (0, 1);
+    tcbuf[7] = csVector2 (1, 1);
+    texcoords->Release();
+
 
     vertices_name = r3d->GetStringContainer ()->Request ("vertices");
     indices_name = r3d->GetStringContainer ()->Request ("indices");
@@ -155,18 +159,20 @@ void R3DTest::SetupFrame ()
 
 
   // Now rotate the camera according to keyboard state
+
   float speed = (elapsed_time / 1000.0) * (0.03 * 20);
   static int FPS = 0;
   static int framecount = 0;
   static int timeaccum = 0;
   framecount++;
   timeaccum += elapsed_time;
-  if (framecount == 10)
+  if (framecount == 100)
   {
-    FPS = 10000.0/(float)timeaccum;
+    FPS = 100000.0/(float)timeaccum;
     framecount = 0;
     timeaccum = 0;
   }
+
 
   iFontServer* fntsvr = r3d->GetDriver2D ()->GetFontServer ();
   CS_ASSERT (fntsvr != NULL);
@@ -180,8 +186,10 @@ void R3DTest::SetupFrame ()
     return;
 
   char asdf[1024];
+
   sprintf (asdf, "Ah, it iz le test!      Le FPS c'est cyrrentlee %d", FPS);
   r3d->GetDriver2D ()->Write (fnt, 10, 50, 0x00FF0000, -1, asdf);
+
   r3d->FinishDraw ();
 
   // Tell 3D driver we're going to display 3D things.
@@ -199,6 +207,7 @@ void R3DTest::SetupFrame ()
 
   csReversibleTransform trans;
   static float a = 0;
+
   a += speed;
   trans.RotateThis (csVector3 (1,0,0), a*2.0);
   trans.RotateThis (csVector3 (0,1,0), a*1.5);
@@ -206,6 +215,7 @@ void R3DTest::SetupFrame ()
   trans.SetOrigin (csVector3 (0,0,5));
   r3d->SetWVMatrix (&trans);
   r3d->DrawMesh (&mesh);
+
 }
 
 void R3DTest::FinishFrame ()
@@ -301,6 +311,7 @@ bool R3DTest::Initialize ()
     return false;
   }
 
+
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (engine == NULL)
   {
@@ -309,6 +320,7 @@ bool R3DTest::Initialize ()
     	"No iEngine plugin!");
     return false;
   }
+
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!csInitializer::OpenApplication (object_reg))

@@ -25,6 +25,7 @@
 struct iEngine;
 struct iObjectRegistry;
 struct iEvent;
+struct iVirtualClock;
 struct iMaterialWrapper;
 struct iVFS;
 
@@ -37,9 +38,11 @@ private:
   iObjectRegistry* object_reg;
   csRef<iEngine> engine;
   csRef<iRender3D> r3d;
+
   csRef<iVFS> vfs;
   csRef<iVirtualClock> vc;
   csRef<iMaterialWrapper> matwrap;
+
   iSector* room;
 
   csTestMesh* testmesh;
