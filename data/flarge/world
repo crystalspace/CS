@@ -118,7 +118,7 @@
             <texture>oldmetal.gif</texture>
             <layer>
                 <texture>spark</texture>
-                <scale x="20" y="20" />
+                <scale u="20" v="20" />
                 <mixmode>
                     <add />
                     <tiling />
@@ -135,7 +135,7 @@
             <texture>bricks.gif</texture>
             <layer>
                 <texture>spark</texture>
-                <scale x="10" y="10" />
+                <scale u="10" v="10" />
                 <mixmode>
                     <alpha>0.75</alpha>
                     <tiling />
