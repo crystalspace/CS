@@ -9,10 +9,11 @@
 %Extcheck%
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
-    if (CS_%Name%)
-    {
-      allclear = true;
+    bool init = CS_%Name%;
+    allclear = true;
 %FunctionsInit%
+    if (init)
+    {
       EXTMGR_REPORT_INIT_RESULT("GL", %Name%)
     }
     else

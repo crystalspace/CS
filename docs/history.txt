@@ -34,6 +34,9 @@ chronological order.
 	  well as a little bit of additional Doxygen documentation.  Eric
 	  also fixed several other problems, such as numerous missing
 	  inline keywords, and performed additional documentation cleanup.
+	- Jorrit applied the same fixes he did to glextmanager.h to the
+	  Python scripts that generate that file. That way his fix will not
+	  be overwritten.
 17-Sep-2003
 	- Eric Sunshine documented cssys+csutil merge in apimod98.txi.
 	- Eric Sunshine documented csHash<> and csSet<> in apimod98.txi.

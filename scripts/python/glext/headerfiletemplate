@@ -115,13 +115,17 @@
 #endif
 
 #define EXTMGR_FUNC_INIT(nameNC, nameUC) \
-      funcTest = ((nameNC = (cs##nameUC) gl->GetProcAddress (#nameNC)) != 0); \
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", \
-        REPORT_MISSING_ENTRIES)) \
+      if (!init) nameNC = 0; \
+      else \
       { \
-        Report (msgExtRetrieveFail, #nameNC); \
-      } \
-      allclear &= funcTest;
+        funcTest = ((nameNC = (cs##nameUC) gl->GetProcAddress (#nameNC)) != 0); \
+        if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", \
+          REPORT_MISSING_ENTRIES)) \
+        { \
+          Report (msgExtRetrieveFail, #nameNC); \
+        } \
+        allclear &= funcTest; \
+      }
 
 #define EXTMGR_REPORT_INIT_RESULT(exttype, nameNC) \
       if (CS_##nameNC = allclear) \
