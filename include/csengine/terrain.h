@@ -50,7 +50,7 @@ private:
   ///
   ddgContext *context;
   /// Terrain handle.
-  csTextureHandle *_textureMap;
+  csTextureHandle **_textureMap;
   /// World to camera transformation matrix.
   double wtoc[16];
   /// Texture scale factor.
@@ -84,8 +84,10 @@ public:
    */
   void Draw (csRenderView& rview, bool use_z_buf = true);
 
-  /// Set the texture for this surface.
-  void SetTexture (csTextureHandle *texture) { _textureMap = texture; }
+  /// Set a texture for this surface.
+  void SetTexture (int i, csTextureHandle *texture) { _textureMap[i] = texture; }
+  /// Get the number of textures required.
+  int GetNumTextures ();
   /// Set the amount of triangles
   void SetDetail(unsigned int detail);
   /// Put a triangle into the vertex buffer.

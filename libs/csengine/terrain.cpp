@@ -42,6 +42,7 @@ csTerrain::csTerrain () : csObject()
   heightMap = NULL;
   mesh = NULL;
   vbuf = NULL;
+  _textureMap = NULL;
 }
 
 csTerrain::~csTerrain ()
@@ -51,6 +52,7 @@ csTerrain::~csTerrain ()
   delete heightMap;
   delete clipbox;
   delete vbuf;
+  delete _textureMap;
 #endif
 }
 
@@ -63,6 +65,14 @@ void csTerrain::SetDetail( unsigned int detail)
   mesh->nearClip(1.0);
   mesh->farClip(150.0);
 #endif
+}
+
+int csTerrain::GetNumTextures ()
+{
+#if DDG_FIXME
+  return mesh->getBinTreeNo ()/2;
+#endif
+  return 0;
 }
 
 #if DDG_FIXME
@@ -155,6 +165,10 @@ JORRIT:  Create mesh->getBinTreeNo()/2  CS textures
   _pos = csVector3(0,0,0);
   _size = csVector3(heightMap->cols(),mesh->wheight(mesh->absMaxHeight()),heightMap->rows());
 #endif
+
+  // (15 May 2000) To Alex: This is new code that allocates the
+  // texture array for the terrain.
+  _textureMap = new csTextureHandle* [GetNumTextures ()];
   return true;
 }
 

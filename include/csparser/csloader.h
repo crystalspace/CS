@@ -80,8 +80,7 @@ class csLoader
   static void skydome_process (csSector& sector, char* name, char* buf,
     csTextureHandle* texture);
   /// Parse the terrain engine's parameters
-  static void terrain_process (csSector& sector, char* name, char* buf,
-    csTextureHandle* texture);
+  static void terrain_process (csSector& sector, char* name, char* buf);
   /// Load a sixface (i.e. box) definition (obsolete, should not be used)
   static csThing* load_sixface (char* name, char* buf, csSector* sec);
   /// Parse the definition for a thing and create a thing object

@@ -3628,7 +3628,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
         skydome_process (*sector, name, params, info.default_texture);
         break;
       case TOKEN_TERRAIN:
-        terrain_process (*sector, name, params, info.default_texture);
+        terrain_process (*sector, name, params);
         break;
       case TOKEN_STATBSP:
         do_stat_bsp = true;
@@ -3882,17 +3882,18 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
 
 //---------------------------------------------------------------------------
 
-void csLoader::terrain_process (csSector& sector, char* name, char* buf,
-        csTextureHandle* texture)
+void csLoader::terrain_process (csSector& sector, char* name, char* buf)
 {
   TOKEN_TABLE_START (commands)
     TOKEN_TABLE (HEIGHTMAP)
     TOKEN_TABLE (DETAIL)
+    TOKEN_TABLE (TEXTURE)
   TOKEN_TABLE_END
 
   long cmd;
   char* params;
   char heightmapname[256];	// @@@ Hardcoded.
+  char texturebasename[256];	// @@@ Hardcoded.
   unsigned int detail = 3000;
 
   while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
@@ -3901,6 +3902,9 @@ void csLoader::terrain_process (csSector& sector, char* name, char* buf,
     {
       case TOKEN_HEIGHTMAP:
         ScanStr (params, "%s", heightmapname);
+        break;
+      case TOKEN_TEXTURE:
+        ScanStr (params, "%s", texturebasename);
         break;
       case TOKEN_DETAIL:
         ScanStr (params, "%d", &detail);
@@ -3929,7 +3933,6 @@ void csLoader::terrain_process (csSector& sector, char* name, char* buf,
 
   csTerrain* terr = new csTerrain ();
   terr->SetName (name);
-  terr->SetTexture (texture);
 
   // Otherwise read file, if that fails generate a random map.
   if (!terr->Initialize (heightmap, heightmapsize))
@@ -3937,6 +3940,21 @@ void csLoader::terrain_process (csSector& sector, char* name, char* buf,
     delete[] heightmap;
     CsPrintf (MSG_FATAL_ERROR, "Error creating height field from: %s\n", heightmapname);
     fatal_exit (0, false);
+  }
+
+  // Initialize all textures. The first texture is reused for all
+  // texture entries that fail (cannot be found).
+  int num_txt = terr->GetNumTextures ();
+  int i;
+  char txtname[256];
+  csTextureHandle* first_txt = NULL;
+  for (i = 0 ; i < num_txt ; i++)
+  {
+    sprintf (txtname, texturebasename, i);
+    csTextureHandle* tex = World->GetTextures ()->FindByName (txtname);
+    if (tex == NULL) tex = first_txt;
+    first_txt = tex;
+    terr->SetTexture (i, tex);
   }
 
   terr->SetDetail(detail);
