@@ -287,12 +287,14 @@ void csSimpleConsole::PutTextV (const char *iText2, va_list args)
   if (iText2 == 0 || *iText2 == 0)
     goto Done;
 
-  csString& iText = *GetTextBuf();
-  iText.FormatV (iText2, args);
+  {
+    csString& iText = *GetTextBuf();
+    iText.FormatV (iText2, args);
 
-  len = strlen (Line [LineNumber]);
-  dst = Line [LineNumber] + len;
-  src = iText;
+    len = strlen (Line [LineNumber]);
+    dst = Line [LineNumber] + len;
+    src = iText;
+  }
   for (c = *src; c != '\0'; c = *++src)
   {
     if (ClearInput)
