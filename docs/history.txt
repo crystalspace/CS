@@ -6,6 +6,7 @@ The history order has been reversed so that new features are at the top.
 	- Made csEntityList a csVector. It appears that csPObject's can
 	  only safely have one parent.
 	- Updated apimod17.txi documentation.
+	- Fixed 'new view' in levtool app.
 31-Aug-2000
 	- Martin Geisse fixed two compiler warnings.
 	- Added csView::SetWorld() to change the world that is used
