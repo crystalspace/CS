@@ -152,15 +152,13 @@ bool csOpenGLProcBackBuffer::BeginDraw (int DrawFlags)
   {
     if (do_quad)
     {
-      glDisable (GL_DEPTH_TEST);
+      csGraphics3DOGLCommon::SetGLZBufferFlags (CS_ZBUF_NONE);
       glDisable (GL_BLEND);
     }
   }
   else
   {
-    glEnable (GL_DEPTH_TEST);
-    glDepthFunc (GL_ALWAYS);
-    glDepthMask (GL_TRUE);
+    csGraphics3DOGLCommon::SetGLZBufferFlags (CS_ZBUF_FILL);
     if (!do_quad)
     {
       glDisable (GL_TEXTURE_2D);
@@ -206,7 +204,7 @@ void csOpenGLProcBackBuffer::Print (csRect *area)
   (void)area;
   glEnable (GL_TEXTURE_2D);
   glDisable (GL_BLEND);
-  glDisable (GL_DEPTH_TEST);
+  csGraphics3DOGLCommon::SetGLZBufferFlags (CS_ZBUF_NONE);
   glDisable (GL_DITHER);
   glDisable (GL_ALPHA_TEST);
 
@@ -308,7 +306,7 @@ void csOpenGLProcBackBuffer2D::Clear (int color)
 #endif
   glDisable (GL_TEXTURE_2D);
   glDisable (GL_BLEND);
-  glDisable (GL_DEPTH_TEST);
+  csGraphics3DOGLCommon::SetGLZBufferFlags (CS_ZBUF_NONE);
   glColor3f (float (color & pfmt->RedMask  ) / pfmt->RedMask,
 	     float (color & pfmt->GreenMask) / pfmt->GreenMask,
 	     float (color & pfmt->BlueMask ) / pfmt->BlueMask);

@@ -180,16 +180,12 @@ class csGraphics3DOGLCommon : public iGraphics3D
 {
   friend class OpenGLLightmapCache;
 
-private:
+public:
   /**
-   * Set proper GL flags based on ZBufMode.  This is usually
-   * utilized just before a polygon is drawn; it is not
-   * done when the Z-buffer mode is set in SetRenderState because
-   * other routines may modify the GL flags between a call
-   * to SetRenderState and the call to the polygon
-   * drawing routine
+   * Set proper GL flags based on ZBufMode.
+   * This is the ONLY legal way to set the z-buffer flags!
    */
-  void SetGLZBufferFlags (csZBufMode flags);
+  static void SetGLZBufferFlags (csZBufMode flags);
 
   /**
    * Set proper GL flags based on ZBufMode.
@@ -201,6 +197,7 @@ private:
    * <li>ZFILL -> ZNONE or ZEQUAL
    * <li>ZTEST -> ZTEST
    * <li>ZUSE  -> ZEQUAL
+   * <li>ZEQUAL-> ZEQUAL
    * </ul>
    * The result for ZFILL depends on the multiPol flag. If
    * multiPol == true this means that multiple polygons will
@@ -208,14 +205,15 @@ private:
    * we will first render five polygon for first pass, then five for
    * second pass). In that case we need ZEQUAL mode.
    */
-  void SetGLZBufferFlagsPass2 (csZBufMode flags, bool multiPol);
+  static void SetGLZBufferFlagsPass2 (csZBufMode flags, bool multiPol);
 
+private:
   /**
    * Return true if two z-buf modes are compatible.
    * Two z-buf modes can be compatible even if they are different
    * because we are only interested in second pass rendering here.
    */
-  bool CompatibleZBufModes (csZBufMode m1, csZBufMode m2);
+  static bool CompatibleZBufModes (csZBufMode m1, csZBufMode m2);
 
   // Some common shortcut functions that may or may not apply, depending
   // on the underlying hardware

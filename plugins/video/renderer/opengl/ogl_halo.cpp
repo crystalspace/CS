@@ -169,7 +169,7 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
   glPushMatrix ();
   glTranslatef (0, 0, 0);
 
-  glDisable (GL_DEPTH_TEST);
+  csGraphics3DOGLCommon::SetGLZBufferFlags (CS_ZBUF_NONE);
   glEnable (GL_BLEND);
   glEnable (GL_TEXTURE_2D);
 

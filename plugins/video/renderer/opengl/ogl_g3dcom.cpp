@@ -827,8 +827,8 @@ void csGraphics3DOGLCommon::SetupStencil ()
     csVector2* v = clipper->GetClipPoly ();
     glColor4f (0, 0, 0, 0);
     glShadeModel (GL_FLAT);
+    SetGLZBufferFlags (CS_ZBUF_NONE);
     glDisable (GL_TEXTURE_2D);
-    glDisable (GL_DEPTH_TEST);
     glEnable (GL_BLEND);
     glBlendFunc (GL_ZERO, GL_ONE);
     glBegin (GL_TRIANGLE_FAN);
@@ -2855,30 +2855,43 @@ bool csGraphics3DOGLCommon::CompatibleZBufModes (csZBufMode m1, csZBufMode m2)
 
 void csGraphics3DOGLCommon::SetGLZBufferFlags (csZBufMode flags)
 {
+  static csZBufMode old_flags = CS_ZBUF_NONE;
+  if (old_flags == flags) return;
   switch (flags)
   {
     case CS_ZBUF_NONE:
       glDisable (GL_DEPTH_TEST);
+      //glDepthMask (GL_FALSE);@@@ Is this needed or not?
       break;
     case CS_ZBUF_FILL:
     case CS_ZBUF_FILLONLY:
-      glEnable (GL_DEPTH_TEST);
+      if (old_flags == CS_ZBUF_NONE)
+	glEnable (GL_DEPTH_TEST);
       glDepthFunc (GL_ALWAYS);
       glDepthMask (GL_TRUE);
       break;
+    case CS_ZBUF_EQUAL:
+      if (old_flags == CS_ZBUF_NONE)
+	glEnable (GL_DEPTH_TEST);
+      glDepthFunc (GL_EQUAL);
+      glDepthMask (GL_FALSE);
+      break;
     case CS_ZBUF_TEST:
-      glEnable (GL_DEPTH_TEST);
+      if (old_flags == CS_ZBUF_NONE)
+	glEnable (GL_DEPTH_TEST);
       glDepthFunc (GL_GREATER);
       glDepthMask (GL_FALSE);
       break;
     case CS_ZBUF_USE:
-      glEnable (GL_DEPTH_TEST);
+      if (old_flags == CS_ZBUF_NONE)
+	glEnable (GL_DEPTH_TEST);
       glDepthFunc (GL_GREATER);
       glDepthMask (GL_TRUE);
       break;
     default:
       break;
   }
+  old_flags = flags;
 }
 
 void csGraphics3DOGLCommon::SetGLZBufferFlagsPass2 (csZBufMode flags,
@@ -2887,30 +2900,19 @@ void csGraphics3DOGLCommon::SetGLZBufferFlagsPass2 (csZBufMode flags,
   switch (flags)
   {
     case CS_ZBUF_NONE:
-      glDisable (GL_DEPTH_TEST);
+    case CS_ZBUF_TEST:
+    case CS_ZBUF_EQUAL:
+      SetGLZBufferFlags (flags);
       break;
     case CS_ZBUF_FILL:
     case CS_ZBUF_FILLONLY:
       if (multiPol)
-      {
-        glEnable (GL_DEPTH_TEST);
-        glDepthFunc (GL_EQUAL);
-        glDepthMask (GL_FALSE);
-      }
+	SetGLZBufferFlags (CS_ZBUF_EQUAL);
       else
-      {
-        glDisable (GL_DEPTH_TEST);
-      }
-      break;
-    case CS_ZBUF_TEST:
-      glEnable (GL_DEPTH_TEST);
-      glDepthFunc (GL_GREATER);
-      glDepthMask (GL_FALSE);
+	SetGLZBufferFlags (CS_ZBUF_NONE);
       break;
     case CS_ZBUF_USE:
-      glEnable (GL_DEPTH_TEST);
-      glDepthFunc (GL_EQUAL);
-      glDepthMask (GL_FALSE);
+      SetGLZBufferFlags (CS_ZBUF_EQUAL);
       break;
     default:
       break;
@@ -3214,8 +3216,8 @@ void csGraphics3DOGLCommon::DrawPixmap (iTextureHandle *hTex,
   // as we are drawing in 2D, we disable some of the commonly used features
   // for fancy 3D drawing
   glShadeModel (GL_FLAT);
-  glDisable (GL_DEPTH_TEST);
-  glDepthMask (GL_FALSE);
+  SetGLZBufferFlags (CS_ZBUF_NONE);
+  //@@@???glDepthMask (GL_FALSE);
 
   // if the texture has transparent bits, we have to tweak the
   // OpenGL blend mode so that it handles the transparent pixels correctly

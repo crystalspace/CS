@@ -21,6 +21,11 @@ The history order is reversed so that new features are at the top.
 	  to the maximum allowed texture size. So you can safely set it
 	  to 10000000x10000000 :-) Also note that this size should be a power
 	  of two.
+	- I have been told that state changes in OpenGL are expensive.
+	  So I started implementing buffering on state changes and indeed
+	  it seems to improver performance a bit even by doing
+	  only simple changes. At this moment only the z-buffer state
+	  is cached like this.
 22-May-2001
 	- Implemented improved OpenGL lightmap cache. There is now the notion
 	  of a super-lightmap which is a collection of smaller lightmaps.
