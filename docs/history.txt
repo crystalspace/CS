@@ -45,6 +45,12 @@ The history order is reversed so that new features are at the top.
 	  it to a timer's fixed interval.
 	- Wouter Wijngaards fixed the bug where perftest incorrectly reported
 	  the fps when spacebar was pressed to advance to the next test.
+	- Fixed SCF stuff in csMaterialWrapper, csTextureWrapper,
+	  csCameraPosition, and csMapNode. Please don't use
+	  CONSTRUCT_IBASE (NULL) for classes that get iBase from
+	  a superclass.
+	- csPortal now also extends csObject and embeds iPortal instead
+	  of inheriting from it. Added iPortal::QueryObject().
 19-Jun-2001
 	- Removed verbose output of lightmap calculation if recalculation
 	  of lighting is not enabled. Now the progress bars are only

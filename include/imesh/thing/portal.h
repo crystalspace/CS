@@ -82,7 +82,7 @@ struct iFrustumView;
 typedef bool (*csPortalSectorCallback) (iPortal* portal,
 	iBase* context, void* callbackData);
 
-SCF_VERSION (iPortal, 0, 0, 5);
+SCF_VERSION (iPortal, 0, 0, 6);
 
 /**
  * This is the interface to the Portal objects. Polygons that are
@@ -93,7 +93,8 @@ SCF_VERSION (iPortal, 0, 0, 5);
  */
 struct iPortal : public iReference
 {
-  //---- misc. manipulation functions ---------------------------------------
+  /// Get the iObject for this portal.
+  virtual iObject *QueryObject () = 0;
 
   /// Return the sector that this portal points too.
   virtual iSector* GetSector () const = 0;

@@ -436,7 +436,7 @@ void csPolygon3D::SetCSPortal (csSector* sector, bool null)
   if (portal && flags.Check (CS_POLY_DELETE_PORTAL))
   { delete portal; portal = NULL; }
   if (!null && !sector) return;
-  portal = new csPortal;
+  portal = new csPortal ();
   flags.Set (CS_POLY_DELETE_PORTAL);
   portal->flags.Reset (CS_PORTAL_WARP);
   if (sector)
@@ -450,7 +450,7 @@ void csPolygon3D::SetCSPortal (csSector* sector, bool null)
 void csPolygon3D::SetPortal (csPortal* prt)
 {
   if (portal && flags.Check (CS_POLY_DELETE_PORTAL))
-  { delete portal; portal = NULL; }
+  { portal->SetSector (NULL); delete portal; portal = NULL; }
   portal = prt;
   flags.Set (CS_POLY_DELETE_PORTAL);
   flags.Reset (CS_POLY_COLLDET); // Disable CD by default for portals.

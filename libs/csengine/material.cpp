@@ -137,9 +137,7 @@ IMPLEMENT_EMBEDDED_IBASE_END
 csMaterialWrapper::csMaterialWrapper (iMaterial* m) :
   csObject (), handle (NULL)
 {
-  CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
-
   material = m;
   material->IncRef ();
 
@@ -150,7 +148,6 @@ csMaterialWrapper::csMaterialWrapper (iMaterial* m) :
 csMaterialWrapper::csMaterialWrapper (iMaterialHandle *ith) :
   csObject (), material (NULL)
 {
-  CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
 
   handle = ith;

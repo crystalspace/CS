@@ -31,14 +31,18 @@
 #include "iengine/rview.h"
 #include "iengine/fview.h"
 
-IMPLEMENT_IBASE (csPortal)
-  IMPLEMENTS_INTERFACE (iReference)
+IMPLEMENT_IBASE_EXT (csPortal)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iPortal)
+IMPLEMENT_IBASE_EXT_END
+
+IMPLEMENT_EMBEDDED_IBASE (csPortal::Portal)
   IMPLEMENTS_INTERFACE (iPortal)
-IMPLEMENT_IBASE_END
+  IMPLEMENTS_INTERFACE (iReference)
+IMPLEMENT_EMBEDDED_IBASE_END
 
 csPortal::csPortal ()
 {
-  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiPortal);
   filter_texture = NULL;
   filter_r = 1;
   filter_g = 1;
@@ -93,7 +97,7 @@ void csPortal::SetSector (iSector* s)
       // First unlink from the previous sector.
       iReferencedObject* refobj = QUERY_INTERFACE (sector, iReferencedObject);
       CS_ASSERT (refobj != NULL);
-      refobj->RemoveReference (this);
+      refobj->RemoveReference (&scfiPortal);
       refobj->DecRef ();
     }
     sector = s;
@@ -102,7 +106,7 @@ void csPortal::SetSector (iSector* s)
       // Link to the new sector.
       iReferencedObject* refobj = QUERY_INTERFACE (sector, iReferencedObject);
       CS_ASSERT (refobj != NULL);
-      refobj->AddReference (this);
+      refobj->AddReference (&scfiPortal);
       refobj->DecRef ();
     }
   }

@@ -125,7 +125,7 @@ public:
    */
   inline void Visit ();
 
-  DECLARE_IBASE;
+  DECLARE_IBASE_EXT (csObject);
 
   //-------------------- iTextureWrapper implementation -----------------------
   struct TextureWrapper : public iTextureWrapper

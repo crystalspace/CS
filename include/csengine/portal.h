@@ -21,6 +21,7 @@
 
 #include "csgeom/transfrm.h"
 #include "csutil/flags.h"
+#include "csutil/csobject.h"
 #include "imesh/thing/portal.h"
 
 class csPolygon2D;
@@ -34,7 +35,7 @@ struct iFrustumView;
  * This class represents a portal. It belongs to some polygon
  * which is then considered a portal to another sector.
  */
-class csPortal : public iPortal
+class csPortal : public csObject
 {
 private:
   /// The sector that this portal points to.
@@ -75,19 +76,19 @@ public:
   //---- misc. manipulation functions ---------------------------------------
 
   /// For iReference.
-  virtual iReferencedObject* GetReferencedObject () const;
+  iReferencedObject* GetReferencedObject () const;
 
   /// For iReference.
-  virtual void SetReferencedObject (iReferencedObject* b);
+  void SetReferencedObject (iReferencedObject* b);
 
   /// Return the sector that this portal points too.
-  virtual iSector* GetSector () const;
+  iSector* GetSector () const;
 
   /**
    * Set the sector that this portal points too. To avoid circular
    * references, the sector is not IncRef'ed!
    */
-  virtual void SetSector (iSector* s);
+  void SetSector (iSector* s);
 
   /// Set portal flags (see CS_PORTAL_XXX values)
   csFlags& GetFlags ();
@@ -210,7 +211,91 @@ public:
    */
   void CheckFrustum (iFrustumView* lview, int alpha);
 
-  DECLARE_IBASE;
+  DECLARE_IBASE_EXT (csPortal);
+
+  //------------------- iPortal implementation -----------------------
+  struct Portal : public iPortal
+  {
+    DECLARE_EMBEDDED_IBASE (csPortal);
+    virtual iReferencedObject* GetReferencedObject () const
+    { return scfParent->GetReferencedObject (); }
+    virtual void SetReferencedObject (iReferencedObject* b)
+    { scfParent->SetReferencedObject (b); }
+    virtual iObject *QueryObject () { return scfParent; }
+    virtual iSector* GetSector () const { return scfParent->GetSector (); }
+    virtual void SetSector (iSector* s) { scfParent->SetSector (s); }
+    virtual csFlags& GetFlags () { return scfParent->GetFlags (); }
+    virtual void SetPortalSectorCallback (csPortalSectorCallback cb,
+      void* cbData)
+    {
+      scfParent->SetPortalSectorCallback (cb, cbData);
+    }
+    virtual csPortalSectorCallback GetPortalSectorCallback () const
+    {
+      return scfParent->GetPortalSectorCallback ();
+    }
+    virtual void* GetPortalSectorCallbackData () const
+    {
+      return scfParent->GetPortalSectorCallbackData ();
+    }
+    virtual void SetFilter (iTextureHandle* ft)
+    {
+      scfParent->SetFilter (ft);
+    }
+    virtual iTextureHandle* GetTextureFilter () const
+    {
+      return scfParent->GetTextureFilter ();
+    }
+    virtual void SetFilter (float r, float g, float b)
+    {
+      scfParent->SetFilter (r, g, b);
+    }
+    virtual void GetColorFilter (float &r, float &g, float &b) const
+    {
+      return scfParent->GetColorFilter (r, g, b);
+    }
+    virtual void SetWarp (const csMatrix3 &m_w, const csVector3 &v_w_before,
+      const csVector3 &v_w_after)
+    {
+      scfParent->SetWarp (m_w, v_w_before, v_w_after);
+    }
+    virtual void SetWarp (const csTransform& t)
+    {
+      scfParent->SetWarp (t);
+    }
+    virtual void SetMirror (iPolygon3D *iPoly)
+    {
+      scfParent->SetMirror (iPoly);
+    }
+    virtual const csReversibleTransform &GetWarp () const
+    {
+      return scfParent->GetWarp ();
+    }
+    virtual void ObjectToWorld (const csReversibleTransform& t)
+    {
+      scfParent->ObjectToWorld (t);
+    }
+    virtual void HardTransform (const csReversibleTransform& t)
+    {
+      scfParent->HardTransform (t);
+    }
+    virtual csVector3 Warp (const csVector3& pos) const
+    {
+      return scfParent->Warp (pos);
+    }
+    virtual void WarpSpace (csReversibleTransform& t, bool& mirror) const
+    {
+      scfParent->WarpSpace (t, mirror);
+    }
+    virtual bool CompleteSector (iBase* context)
+    {
+      return scfParent->CompleteSector (context);
+    }
+    virtual void CheckFrustum (iFrustumView* lview, int alpha)
+    {
+      scfParent->CheckFrustum (lview, alpha);
+    }
+  } scfiPortal;
 };
 
 #endif // __CS_PORTAL_H__

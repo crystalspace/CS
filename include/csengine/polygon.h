@@ -1298,16 +1298,20 @@ public:
     virtual iPortal* CreateNullPortal ()
     {
       scfParent->SetCSPortal (NULL, true);
-      return scfParent->GetPortal ();
+      return &(scfParent->GetPortal ()->scfiPortal);
     }
     virtual iPortal* CreatePortal (iSector *iTarget)
     {
       scfParent->SetCSPortal (iTarget->GetPrivateObject ());
-      return scfParent->GetPortal ();
+      return &(scfParent->GetPortal ()->scfiPortal);
     }
     virtual iPortal* GetPortal ()
     {
-      return scfParent->GetPortal ();
+      csPortal* prt = scfParent->GetPortal ();
+      if (prt)
+        return &(prt->scfiPortal);
+      else
+        return NULL;
     }
 
     virtual void SetTextureSpace (
