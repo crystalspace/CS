@@ -82,11 +82,7 @@
     }									\
     Type &operator [] (int n)						\
     { return root [n]; }						\
-    const Type &operator [] (int n) const				\
-    { return root [n]; }						\
     Type &Get (int n)							\
-    { return root [n]; }						\
-    const Type &Get (int n) const					\
     { return root [n]; }						\
     void Delete (int n)							\
     { memmove (root + n, root + n + 1, (limit - n - 1) * sizeof (Type)); }\
