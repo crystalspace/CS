@@ -322,9 +322,12 @@ void csSoundSourceSoftware::AddToBufferStatic(void *mem, long size)
 
       NumSamples -= Num;
       mem = ((unsigned char *)mem) + Num * OutBPS;
-
       if (NumSamples == 0) break;
-      if (!(PlayMethod & SOUND_LOOP)) break;
+      if (!(PlayMethod & SOUND_LOOP))
+      {
+	Active = (SoundPos  < snd->GetStaticSampleCount()); 
+	break;
+      }
       Restart();
     }
   else // streamed sound
