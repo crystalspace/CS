@@ -9,6 +9,9 @@ The history order is reversed so that new features are at the top.
 	  by calling QueryLight().
 	- Fixed a bad bug with terrain engine and the new vertex buffers.
 	  This bug would cause crashes in various cases.
+	- Eric Sunshine fixed a problem in csutil.mak where CFG.CSUTIL was
+	  incorrectly given the value "scf.cfg mouse.cfg", rather than the
+	  correct value of "scf.cfg data/config/mouse.cfg".
 27-Aug-2001
 	- Fixed a linking error in povie.mak.
 	- Did a new change to iPolygonBuffer.  Materials for polygons are now
