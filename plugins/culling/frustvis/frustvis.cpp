@@ -480,7 +480,7 @@ bool csFrustumVis::VisTest (iRenderView* rview,
 
   // First get the current view frustum from the rview.
   csRenderContext* ctxt = rview->GetRenderContext ();
-  csPlane3* frust = ctxt->iview_frustum->frustum;
+  csPlane3* frust = ctxt->frustum;
 
   const csReversibleTransform& trans = rview->GetCamera ()->GetTransform ();
   csVector3 o2tmult = trans.GetO2T () * trans.GetO2TTranslation ();

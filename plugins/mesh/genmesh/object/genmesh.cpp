@@ -1183,7 +1183,8 @@ bool csGenmeshMeshObject::HitBeamObject (const csVector3& start,
       if (temp < dist)
       {
         isect = tmp;
-    dist = temp;
+	dist = temp;
+	if (polygon_idx) *polygon_idx = i;
       }
     }
   }

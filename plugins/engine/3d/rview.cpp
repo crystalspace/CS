@@ -34,7 +34,6 @@ SCF_IMPLEMENT_IBASE(csRenderView)
 SCF_IMPLEMENT_IBASE_END
 
 csRenderView::csRenderView () :
-  ctxt(0),
   engine(0),
   g3d(0),
   g2d(0),
@@ -43,12 +42,11 @@ csRenderView::csRenderView () :
   SCF_CONSTRUCT_IBASE (0);
   ctxt = new csRenderContext ();
   memset (ctxt, 0, sizeof (csRenderContext));
-  top_frustum = 0;
+  top_ctxt = ctxt;
   context_id = 0;
 }
 
 csRenderView::csRenderView (iCamera *c) :
-  ctxt(0),
   engine(0),
   g3d(0),
   g2d(0),
@@ -57,9 +55,9 @@ csRenderView::csRenderView (iCamera *c) :
   SCF_CONSTRUCT_IBASE (0);
   ctxt = new csRenderContext ();
   memset (ctxt, 0, sizeof (csRenderContext));
+  top_ctxt = ctxt;
   c->IncRef ();
   ctxt->icamera = c;
-  top_frustum = 0;
   context_id = 0;
 }
 
@@ -68,7 +66,6 @@ csRenderView::csRenderView (
   iClipper2D *v,
   iGraphics3D *ig3d,
   iGraphics2D *ig2d) :
-    ctxt(0),
     engine(0),
     g3d(ig3d),
     g2d(ig2d),
@@ -77,29 +74,25 @@ csRenderView::csRenderView (
   SCF_CONSTRUCT_IBASE (0);
   ctxt = new csRenderContext ();
   memset (ctxt, 0, sizeof (csRenderContext));
+  top_ctxt = ctxt;
   c->IncRef ();
   ctxt->icamera = c;
   ctxt->iview = v;
   if (v)
   {
     v->IncRef ();
-    ctxt->iview_frustum = new csRenderContextFrustum ();
-    UpdateFrustum (ctxt->iview, ctxt->iview_frustum);
+    UpdateFrustum ();
   }
 
-  top_frustum = 0;
   context_id = 0;
 }
 
 csRenderView::~csRenderView ()
 {
-  if (top_frustum)
-    top_frustum->DecRef ();
   if (ctxt)
   {
     if (ctxt->icamera) ctxt->icamera->DecRef ();
     if (ctxt->iview) ctxt->iview->DecRef ();
-    if (ctxt->iview_frustum) ctxt->iview_frustum->DecRef ();
     delete ctxt;
   }
   SCF_DESTRUCT_IBASE ();
@@ -122,9 +115,7 @@ void csRenderView::SetClipper (iClipper2D *view)
   view->IncRef ();
   if (ctxt->iview) ctxt->iview->DecRef ();
   ctxt->iview = view;
-  if (ctxt->iview_frustum) ctxt->iview_frustum->DecRef ();
-  ctxt->iview_frustum = new csRenderContextFrustum ();
-  UpdateFrustum (ctxt->iview, ctxt->iview_frustum);
+  UpdateFrustum ();
 }
 
 void csRenderView::SetEngine (csEngine *engine)
@@ -207,10 +198,8 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDP &poly)
     csVector3 v;
     v.z = 1.0f /
       (
-        M *
-        (poly.vertices[i].x - shift_x) +
-        N *
-        (poly.vertices[i].y - shift_y) +
+        M * (poly.vertices[i].x - shift_x) +
+        N * (poly.vertices[i].y - shift_y) +
         O
       );
     v.x = (poly.vertices[i].x - shift_x) * v.z * inv_aspect;
@@ -281,37 +270,22 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDP &poly)
         float fact = 1.0f / I;
         poly.fog_info[i].r =
           (
-            I2 *
-            fi->fog->red +
-            I1 *
-            poly.fog_info[i].r +
-            I1 *
-            I2 *
-            poly.fog_info[i].r
-          ) *
-          fact;
+            I2 * fi->fog->red +
+            I1 * poly.fog_info[i].r +
+            I1 * I2 * poly.fog_info[i].r
+          ) * fact;
         poly.fog_info[i].g =
           (
-            I2 *
-            fi->fog->green +
-            I1 *
-            poly.fog_info[i].g +
-            I1 *
-            I2 *
-            poly.fog_info[i].g
-          ) *
-          fact;
+            I2 * fi->fog->green +
+            I1 * poly.fog_info[i].g +
+            I1 * I2 * poly.fog_info[i].g
+          ) * fact;
         poly.fog_info[i].b =
           (
-            I2 *
-            fi->fog->blue +
-            I1 *
-            poly.fog_info[i].b +
-            I1 *
-            I2 *
-            poly.fog_info[i].b
-          ) *
-          fact;
+            I2 * fi->fog->blue +
+            I1 * poly.fog_info[i].b +
+            I1 * I2 * poly.fog_info[i].b
+          ) * fact;
       }
       else
       {
@@ -428,37 +402,22 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDPFX &poly)
         float fact = 1.0f / I;
         poly.fog_info[i].r =
           (
-            I2 *
-            fi->fog->red +
-            I1 *
-            poly.fog_info[i].r +
-            I1 *
-            I2 *
-            poly.fog_info[i].r
-          ) *
-          fact;
+            I2 * fi->fog->red +
+            I1 * poly.fog_info[i].r +
+            I1 * I2 * poly.fog_info[i].r
+          ) * fact;
         poly.fog_info[i].g =
           (
-            I2 *
-            fi->fog->green +
-            I1 *
-            poly.fog_info[i].g +
-            I1 *
-            I2 *
-            poly.fog_info[i].g
-          ) *
-          fact;
+            I2 * fi->fog->green +
+            I1 * poly.fog_info[i].g +
+            I1 * I2 * poly.fog_info[i].g
+          ) * fact;
         poly.fog_info[i].b =
           (
-            I2 *
-            fi->fog->blue +
-            I1 *
-            poly.fog_info[i].b +
-            I1 *
-            I2 *
-            poly.fog_info[i].b
-          ) *
-          fact;
+            I2 * fi->fog->blue +
+            I1 * poly.fog_info[i].b +
+            I1 * I2 * poly.fog_info[i].b
+          ) * fact;
       }
       else
       {
@@ -583,37 +542,22 @@ void csRenderView::CalculateFogMesh (
         float fact = 1.0f / I;
         mesh.vertex_fog[i].r =
           (
-            I2 *
-            finfo->fog->red +
-            I1 *
-            mesh.vertex_fog[i].r +
-            I1 *
-            I2 *
-            mesh.vertex_fog[i].r
-          ) *
-          fact;
+            I2 * finfo->fog->red +
+            I1 * mesh.vertex_fog[i].r +
+            I1 * I2 * mesh.vertex_fog[i].r
+          ) * fact;
         mesh.vertex_fog[i].g =
           (
-            I2 *
-            finfo->fog->green +
-            I1 *
-            mesh.vertex_fog[i].g +
-            I1 *
-            I2 *
-            mesh.vertex_fog[i].g
-          ) *
-          fact;
+            I2 * finfo->fog->green +
+            I1 * mesh.vertex_fog[i].g +
+            I1 * I2 * mesh.vertex_fog[i].g
+          ) * fact;
         mesh.vertex_fog[i].b =
           (
-            I2 *
-            finfo->fog->blue +
-            I1 *
-            mesh.vertex_fog[i].b +
-            I1 *
-            I2 *
-            mesh.vertex_fog[i].b
-          ) *
-          fact;
+            I2 * finfo->fog->blue +
+            I1 * mesh.vertex_fog[i].b +
+            I1 * I2 * mesh.vertex_fog[i].b
+          ) * fact;
       }
       else
       {
@@ -738,37 +682,22 @@ void csRenderView::CalculateFogMesh (
         float fact = 1.0f / I;
         mesh.vertex_fog[i].r =
           (
-            I2 *
-            finfo->fog->red +
-            I1 *
-            mesh.vertex_fog[i].r +
-            I1 *
-            I2 *
-            mesh.vertex_fog[i].r
-          ) *
-          fact;
+            I2 * finfo->fog->red +
+            I1 * mesh.vertex_fog[i].r +
+            I1 * I2 * mesh.vertex_fog[i].r
+          ) * fact;
         mesh.vertex_fog[i].g =
           (
-            I2 *
-            finfo->fog->green +
-            I1 *
-            mesh.vertex_fog[i].g +
-            I1 *
-            I2 *
-            mesh.vertex_fog[i].g
-          ) *
-          fact;
+            I2 * finfo->fog->green +
+            I1 * mesh.vertex_fog[i].g +
+            I1 * I2 * mesh.vertex_fog[i].g
+          ) * fact;
         mesh.vertex_fog[i].b =
           (
-            I2 *
-            finfo->fog->blue +
-            I1 *
-            mesh.vertex_fog[i].b +
-            I1 *
-            I2 *
-            mesh.vertex_fog[i].b
-          ) *
-          fact;
+            I2 * finfo->fog->blue +
+            I1 * mesh.vertex_fog[i].b +
+            I1 * I2 * mesh.vertex_fog[i].b
+          ) * fact;
       }
       else
       {
@@ -784,20 +713,19 @@ void csRenderView::CalculateFogMesh (
   }
 }
 
-void csRenderView::UpdateFrustum (
-  iClipper2D *clip,
-  csRenderContextFrustum *frust)
+void csRenderView::UpdateFrustum ()
 {
   int i;
   csBox2 bbox;
   csVector2 shift (ctxt->icamera->GetShiftX (), ctxt->icamera->GetShiftY ());
   float inv_fov = ctxt->icamera->GetInvFOV ();
+  iClipper2D* clip = ctxt->iview;
   csVector2 *poly = clip->GetClipPoly ();
   bbox.StartBoundingBox ((poly[0] - shift) * inv_fov);
   for (i = 1; i < clip->GetVertexCount (); i++)
     bbox.AddBoundingVertexSmart ((poly[i] - shift) * inv_fov);
 
-  csPlane3 *frustum = frust->frustum;
+  csPlane3 *frustum = ctxt->frustum;
   csVector3 v1 (bbox.MinX (), bbox.MinY (), 1);
   csVector3 v2 (bbox.MaxX (), bbox.MinY (), 1);
   frustum[0].Set (v1 % v2, 0);
@@ -819,10 +747,8 @@ void csRenderView::SetFrustum (float lx, float rx, float ty, float by)
   rightx = rx;
   topy = ty;
   boty = by;
-  if (top_frustum) top_frustum->DecRef ();
-  top_frustum = new csRenderContextFrustum ();
 
-  csPlane3 *frustum = top_frustum->frustum;
+  csPlane3 *frustum = top_ctxt->frustum;
   csVector3 v1 (leftx, topy, 1);
   csVector3 v2 (rightx, topy, 1);
   frustum[0].Set (v1 % v2, 0);
@@ -839,14 +765,14 @@ void csRenderView::SetFrustum (float lx, float rx, float ty, float by)
 }
 
 void csRenderView::TestSphereFrustum (
-  csRenderContextFrustum *frustum,
+  csRenderContext *ctxt,
   const csVector3 &center,
   float radius,
   bool &inside,
   bool &outside)
 {
   float dist;
-  csPlane3 *frust = frustum->frustum;
+  csPlane3 *frust = ctxt->frustum;
   outside = true;
   inside = true;
 
@@ -911,11 +837,10 @@ bool csRenderView::TestBSphere (
   // Test if there is a chance we must clip to current portal.
   //------
   bool outside, inside;
-  CS_ASSERT (ctxt->iview_frustum != 0);
   if (!fully_inside)
   {
     TestSphereFrustum (
-      ctxt->iview_frustum,
+      ctxt,
       tr_center,
       radius,
       inside,
@@ -980,7 +905,6 @@ bool csRenderView::ClipBSphere (
   // Test if there is a chance we must clip to current portal.
   //------
   bool outside, inside;
-  CS_ASSERT (ctxt->iview_frustum != 0);
   if (fully_inside)
   {
     clip_portal = CS_CLIP_NEEDED;
@@ -988,7 +912,7 @@ bool csRenderView::ClipBSphere (
   else
   {
     TestSphereFrustum (
-      ctxt->iview_frustum,
+      ctxt,
       camera_origin,
       radius,
       inside,
@@ -1040,9 +964,9 @@ bool csRenderView::ClipBSphere (
     }
     else
     {
-      CS_ASSERT (GetTopFrustum () != 0);
+      CS_ASSERT (top_ctxt != 0);
       TestSphereFrustum (
-        GetTopFrustum (),
+        top_ctxt,
         camera_origin,
         radius,
         inside,
@@ -1082,8 +1006,7 @@ bool csRenderView::ClipBBox (
   // Test if there is a chance we must clip to current portal.
   //------
   uint32 outClipMask;
-  if (!csIntersect3::BoxFrustum (cbox, ctxt->iview_frustum->frustum, 0xf,
-  	outClipMask))
+  if (!csIntersect3::BoxFrustum (cbox, ctxt->frustum, 0xf, outClipMask))
     return false;	// Not visible.
   if (outClipMask == 0xf)
     clip_portal = CS_CLIP_NOT;
@@ -1144,8 +1067,7 @@ bool csRenderView::ClipBBox (
   {
     csRenderView* top_rview = engine->GetCsTopLevelClipper ();
     csRenderContext* top_ctxt = top_rview->ctxt;
-    if (!csIntersect3::BoxFrustum (cbox, top_ctxt->iview_frustum->frustum, 0xf,
-  	outClipMask))
+    if (!csIntersect3::BoxFrustum (cbox, top_ctxt->frustum, 0xf, outClipMask))
     {
       CS_ASSERT (false);	// This is not possible!
       return false;
@@ -1160,7 +1082,7 @@ void csRenderView::SetupClipPlanes (const csReversibleTransform& tr_o2c,
   	csPlane3* planes, uint32& frustum_mask,
 	csPlane3* top_planes)
 {
-  csPlane3* frust = ctxt->iview_frustum->frustum;
+  csPlane3* frust = ctxt->frustum;
   csVector3 o2tmult = tr_o2c.GetO2T () * tr_o2c.GetO2TTranslation ();
   planes[0].Set (tr_o2c.GetT2O() * frust[0].norm, -frust[0].norm*o2tmult);
   planes[1].Set (tr_o2c.GetT2O() * frust[1].norm, -frust[1].norm*o2tmult);
@@ -1191,7 +1113,7 @@ void csRenderView::SetupClipPlanes (const csReversibleTransform& tr_o2c,
 
   csRenderView* top_rview = engine->GetCsTopLevelClipper ();
   csRenderContext* top_ctxt = top_rview->ctxt;
-  frust = top_ctxt->iview_frustum->frustum;
+  frust = top_ctxt->frustum;
   top_planes[0].Set (tr_o2c.GetT2O()*frust[0].norm, -frust[0].norm*o2tmult);
   top_planes[1].Set (tr_o2c.GetT2O()*frust[1].norm, -frust[1].norm*o2tmult);
   top_planes[2].Set (tr_o2c.GetT2O()*frust[2].norm, -frust[2].norm*o2tmult);
@@ -1351,7 +1273,6 @@ void csRenderView::CreateRenderContext ()
   *ctxt = *old_ctxt;
   if (ctxt->icamera) ctxt->icamera->IncRef ();
   if (ctxt->iview) ctxt->iview->IncRef ();
-  if (ctxt->iview_frustum) ctxt->iview_frustum->IncRef ();
   // The camera transform id is copied from the old
   // context. Only when we do space warping on the camera
   // do we have to change it (CreateNewCamera() function).
@@ -1366,7 +1287,6 @@ void csRenderView::RestoreRenderContext (csRenderContext *original)
 
   if (old_ctxt->icamera) old_ctxt->icamera->DecRef ();
   if (old_ctxt->iview) old_ctxt->iview->DecRef ();
-  if (old_ctxt->iview_frustum) old_ctxt->iview_frustum->DecRef ();
   delete old_ctxt;
 }
 

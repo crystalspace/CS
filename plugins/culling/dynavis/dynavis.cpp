@@ -1642,7 +1642,7 @@ bool csDynaVis::VisTest (iRenderView* rview,
   VisTest_Front2BackData data;
 
   csRenderContext* ctxt = rview->GetRenderContext ();
-  csPlane3* frust = ctxt->iview_frustum->frustum;
+  csPlane3* frust = ctxt->frustum;
 
   // Setup the five frustum planes made out of the four boundaries of
   // the portal bounding box and the portal plane itself.

@@ -163,7 +163,6 @@ public:
   virtual iGraphics3D* GetGraphics3D () {return isorview->GetG3D();}
   virtual void SetFrustum (float, float, float, float) {}
   virtual void GetFrustum (float&, float&, float&, float&) {}
-  virtual csRenderContextFrustum* GetTopFrustum () { return 0; }
   virtual iClipper2D* GetClipper () {return isorview->GetClipper();}
   virtual void SetClipper (iClipper2D*) {}
   virtual bool IsClipperRequired () {return false;}

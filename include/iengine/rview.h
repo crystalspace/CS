@@ -81,29 +81,6 @@ public:
 };
 
 /**
- * This structure holds the current render context frustum.
- * It is basically a bounding frustum for the current clipper.
- */
-class csRenderContextFrustum
-{
-  class csRenderContext;
-  friend class csRenderContext;	// To avoid gcc warning!
-
-private:
-  int ref_count;
-
-  ~csRenderContextFrustum () { }
-
-public:
-  // Planes always go through the origin (plane[4] == optional near plane).
-  csPlane3 frustum[5];
-
-  csRenderContextFrustum () : ref_count (1) { }
-  void IncRef () { ref_count++; }
-  void DecRef () { --ref_count; if (ref_count <= 0) delete this; }
-};
-
-/**
  * This structure keeps track of the current render context.
  * It is used by iRenderView. When recursing through a portal
  * a new render context will be created and set in place of the
@@ -119,7 +96,7 @@ public:
   /// The 2D polygon describing how everything drawn inside should be clipped.
   iClipper2D* iview;
   /// The frustum corresponding with iview.
-  csRenderContextFrustum* iview_frustum;
+  csPlane3 frustum[5];
 
   /// The last portal we traversed through (or 0 if first sector).
   iPortal* last_portal;
@@ -224,8 +201,6 @@ struct iRenderView : public iBase
   virtual void SetFrustum (float lx, float rx, float ty, float by) = 0;
   /// Get the frustum.
   virtual void GetFrustum (float& lx, float& rx, float& ty, float& by) = 0;
-  /// Get the top level frustum (corresponding with SetFrustum()).
-  virtual csRenderContextFrustum* GetTopFrustum () = 0;
 
   //-----------------------------------------------------------------
   // The following functions operate on the current render context.

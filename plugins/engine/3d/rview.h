@@ -64,20 +64,19 @@ private:
 
   /// The view frustum as defined at z=1.
   float leftx, rightx, topy, boty;
-  /// The frustum corresponding with this.
-  csRenderContextFrustum* top_frustum;
+  /// The top render context corresponding with this initial view frustum.
+  csRenderContext* top_ctxt;
 
   /**
-   * Update the csRenderContextFrustum to the given clipper.
+   * Update the frustum of the current context to the current clipper.
    */
-  void UpdateFrustum (iClipper2D* clip, csRenderContextFrustum*
-    frust);
+  void UpdateFrustum ();
 
   /**
-   * Given a csRenderContextFrustum and a bounding sphere calculate if
+   * Given a csRenderContext (with frustum) and a bounding sphere calculate if
    * the sphere is fully inside and fully outside that frustum.
    */
-  static void TestSphereFrustum (csRenderContextFrustum* frust,
+  static void TestSphereFrustum (csRenderContext* frust,
     const csVector3& center, float radius, bool& inside, bool& outside);
 
 public:
@@ -143,11 +142,6 @@ public:
     rx = rightx;
     ty = topy;
     by = boty;
-  }
-  /// Get the top level frustum (corresponding with SetFrustum()).
-  virtual csRenderContextFrustum* GetTopFrustum ()
-  {
-    return top_frustum;
   }
 
   //-----------------------------------------------------------------
