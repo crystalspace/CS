@@ -31,14 +31,14 @@ Crystal Space Package: The latest release of Crystal Space can be downloaded
 from:
 
 @noindent
-@url{http://crystal.sourceforge.net/download.html}
+@url{http://crystal.sourceforge.net/tikiwiki/tiki-index.php?page=Download}
 
 The release includes all of the source code, some pre-generated documentation,
 and a few example data files.  Or, if you're feeling brave you can download the
 latest @sc{cvs} snapshot:
 
 @noindent
-@url{http://crystal.sourceforge.net/cvs.html}
+@url{http://crystal.sourceforge.net/cvs-snapshots/}
 
 You can also checkout the source directly from the @sc{cvs} repository.
 Directions for doing this can be found here:
@@ -48,14 +48,8 @@ Directions for doing this can be found here:
 
 @item
 External Dependencies: Crystal Space can use a number of optional libraries and
-tools to provide a more robust set of features.  A comprehensive list can be
-found at:
-
-@noindent
-@url{http://crystal.sourceforge.net/dlsrc.html}
-
-A brief list of the current dependencies is also presented here.
-@xref{External Libraries}.
+tools to provide a more robust set of features.  A brief list of the current
+dependencies is presented here.  @xref{External Libraries}.
 
 @table @emph
 @item Z Library
@@ -98,8 +92,4 @@ Maps and such are needed if you want to see examples of Crystal Space at work.
 A few data files are provided in the Crystal Space release itself, but more can
 be downloaded from @url{ftp://ftp.sunsite.dk/pub/projects/crystal/}. Most files
 can just be placed in the CS/data directory and left alone.
-
-@item
-A load of patience and powerful wetware are required to make good use of
-Crystal Space. Often these are the hardest to benchmark.
 @end itemize

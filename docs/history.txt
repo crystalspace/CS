@@ -52,6 +52,8 @@ chronological order.
 	  rgbpixel.h reported by MSVC regarding implicit conversion from int to
 	  unsigned char.  Also eliminated extremely dangerous code which
 	  assumed 32-bit architecture.
+	- Eric Sunshine fixed some invalid URLs in sysreq.txi pointed out by
+	  Roland Schulz <mail@r2s2.de>.
 23-Sep-2003
 	- Jorrit changed the default display depth in video.cfg from 16
 	  to 32. On 3D cards, CS performs awfully bad with 16-bit displays
