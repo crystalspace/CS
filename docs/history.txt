@@ -11,6 +11,7 @@ chronological order.
  	  hint_goodoccluder flag before setting the value of that.
 	- Jorrit fixed a crash bug in walktest/flarge when you tried to jump
 	  on the car.
+        - Philip Wyett fixed an OR build compile error in genmesh.cpp.
 23-Aug-2004
 	- Jorrit fixed a big memory leak in sprcal3d. The csCal3DAnimation
 	  and csCal3DMesh structures where never freed and csCal3DMesh
