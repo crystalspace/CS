@@ -16,6 +16,9 @@ The history order is reversed so that new features are at the top.
           the plugin scan found them.
         - Philip Wyett initialized the un-initialized 'clipportal_dirty'
           at construction in csGraphics3DOGLCommon.
+	- Keith Fulton added iRegion->Add(iObject*) function to make
+	  adding objects to regions cleaner and easier.
+	  Also committed several compiler errors and warnings.
 20-Jun-2003
 	- Marten fixed an error in the inline assembly in tcovbuf.cpp 
 	  which prevented it from compiling on msvc6
