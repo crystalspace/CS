@@ -4,13 +4,13 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 20-Apr-2003
-	- Micah added a little error handling to the picogui server plugin
 	- Micah updated the .cvsignore files to include flarge's cache and
 	  the completed binaries without a special extension.
 	- Micah fixed some compile errors in the pgserver plugin due to 'or'
 	  being a reserved symbol in g++ version 3.2.2
 	- Eric Sunshine corrected the WinCVS URL in the tutorial based upon
 	  report by <squee@tdzk.net>.
+	- Micah added a little error handling to the picogui server plugin
 18-Apr-2003
 	- Started a document describing which parts of Crystal Space are
 	  thread-safe and which are not.
