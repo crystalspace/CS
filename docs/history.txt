@@ -84,7 +84,6 @@ The history order is reversed so that new features are at the top.
 	    meshes in this sector. Currently, the loop isn't doing much more 
 	    than the old stuff, and has to be activated by uncommenting a line
 	    in renderloop.h.
-<<<<<<< history.txt
 	- res fixed a compiling error he introduced in ogl_txtmgr.cpp earlier.
 	- res changed csShaderGLAVP so that shader variables are fetched in
 	  SetupState() instead of Activate().
@@ -92,12 +91,9 @@ The history order is reversed so that new features are at the top.
 	  steps contained in classes.
 	- res changed the common GL canvas code to not initialize GL 1.2/1.3
 	  pseudo-extensions as this seems to cause warnings for some drivers.
-=======
-	- res fixed a compile error he introduced in ogl_txtmgr.cpp earlier.
 	- Eric Sunshine removed the now obsolete SCF references for line and
 	  infinite renderers from scf.cfg.  Also fixed problem where entry for
 	  sndoal plugin was commented out.
->>>>>>> 1.4003
 18-May-2003
 	- res made the following changes in and around render3d:
 	    - ATI/NV only exts can be disabled all at once via cfg.
