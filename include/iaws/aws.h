@@ -395,6 +395,12 @@ struct iAwsComponent : public iAwsSource
   /// Sets the parent component of this component;
   virtual void SetParent(iAwsComponent *parent)=0;
 
+  /// Gets the preferred size of the component
+  virtual csRect getPreferredSize()=0;
+
+  /// Gets the minimum size that the component can be
+  virtual csRect getMinimumSize()=0;
+
   /// Returns true if this window overlaps the given rect.
   virtual bool Overlaps(csRect &r)=0;
 
