@@ -71,12 +71,12 @@ Some scripts to support the build process on various platforms.
 Here you should place your levels like large.zip. You can use any directory
 for this, so this is only a suggestion.
 
+    [CS/data/Models/Test]
+    Directory containing testdata for the built in converter classes.
+
 [CS/docs]
 Various docs concerning Crystal Space are here. Though not complete, they 
 will answer a lot of questions.
-
-    [CS/data/Models/Test]
-    Directory containing testdata for the built in converter classes.
 
 [CS/include]
 Here are the headers that can be used from other modules. The path for the
@@ -197,12 +197,19 @@ subdirectories.
     dynamically ba attached to objects at runtime.
 
     [CS/libs/csparser]
-    World Parser
+    World Parser.
     A library which parses ASCII world files and creates a world in the 
     3D Engine. 
 
+    [CS/libs/csscript]
+    Scripting Engine.
+    This library contains a very primitive scripting engine. It is not
+    very powerful and needs to be replaced by something better. However,
+    it is still used by some of the current levels. It stays until we
+    got better scripting.
+
     [CS/libs/cssnddrv]
-    Sound Driver 
+    Sound Driver.
     System dependent sound drivers. There are currently drivers for 
     Macintosh, OSS (Linux), and Windows. There is also a Null driver for systems 
     without sound. 
@@ -326,6 +333,7 @@ level4 (engine - binds togehter all the engines components):
   csengine
   csinput
   csparser
+  csscript
 
 level5 (application support - adds a common layer of engine abstraction):
   csws
