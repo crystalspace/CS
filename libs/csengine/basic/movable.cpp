@@ -20,6 +20,8 @@
 #include "qint.h"
 #include "csengine/movable.h"
 #include "csengine/sector.h"
+#include "csengine/thing.h"
+#include "csengine/cssprite.h"
 #include "isector.h"
 
 //---------------------------------------------------------------------------
@@ -64,6 +66,56 @@ void csMovable::MovePosition (const csVector3& rel)
 void csMovable::Transform (csMatrix3& matrix)
 {
   obj.SetT2O (matrix * obj.GetT2O ());
+}
+
+void csMovable::ClearSectors ()
+{
+  if (parent == NULL)
+  {
+    if (object->GetType () >= csThing::Type)
+    {
+      csThing* th = (csThing*)object;
+      th->RemoveFromSectors ();
+    }
+    else
+    {
+      csSprite* sp = (csSprite*)object;
+      sp->RemoveFromSectors ();
+    }
+    sectors.SetLength (0);
+  }
+}
+
+void csMovable::AddSector (csSector* sector)
+{
+  if (parent == NULL)
+  {
+    sectors.Push (sector);
+    if (object->GetType () >= csThing::Type)
+    {
+      csThing* th = (csThing*)object;
+      th->MoveToSector (sector);
+    }
+    else
+    {
+      csSprite* sp = (csSprite*)object;
+      sp->MoveToSector (sector);
+    }
+  }
+}
+
+void csMovable::UpdateMove ()
+{
+  if (object->GetType () >= csThing::Type)
+  {
+    csThing* th = (csThing*)object;
+    th->UpdateMove ();
+  }
+  else
+  {
+    csSprite* sp = (csSprite*)object;
+    sp->UpdateMove ();
+  }
 }
 
 //--------------------------------------------------------------------------

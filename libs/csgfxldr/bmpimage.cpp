@@ -25,11 +25,6 @@
 #include "csgfxldr/bmpimage.h"
 #include "cssys/csendian.h"
 
-#ifndef OS_PS2
-//TODO Azverkan is this really needed?
-# include <memory.h>
-#endif
-
 bool RegisterBMP ()
 {
   static csBMPImageLoader loader;

@@ -38,7 +38,7 @@ void csCollection::Transform ()
 {
   for (int i = 0 ; i < objects.Length() ; i++)
     if ( ((csObject*)(objects[i]))->GetType () == csThing::Type)
-      ((csThing*)(objects[i]))->UpdateMove ();
+      ((csThing*)(objects[i]))->GetMovable ().UpdateMove ();
 }
 
 void csCollection::SetPosition (csSector* home, const csVector3& pos)

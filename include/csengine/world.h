@@ -422,6 +422,26 @@ public:
   csNamedObjVector sprites;
 
   /**
+   * List of all things in the world. This vector contains objects
+   * of type csThing*. Use UnlinkThing() and RemoveThing() to
+   * unlink and/or remove things from this list. These functions
+   * take care of correctly removing the things from all sectors
+   * as well. Note that after you add a thing to the list you still
+   * need to add it to all sectors that you want it to be visible in.
+   */
+  csNamedObjVector things;
+
+  /**
+   * List of all skies in the world. This vector contains objects
+   * of type csThing*. Use UnlinkSky() and RemoveSky() to
+   * unlink and/or remove skies from this list. These functions
+   * take care of correctly removing the skies from all sectors
+   * as well. Note that after you add a sky to the list you still
+   * need to add it to all sectors that you want it to be visible in.
+   */
+  csNamedObjVector skies;
+
+  /**
    * The list of all camera position objects.
    */
   csNamedObjVector camera_positions;
@@ -951,6 +971,30 @@ public:
    * It is also removed from all sectors.
    */
   void RemoveSprite (csSprite* sprite);
+
+  /**
+   * Unlink a thing from the world (but do not delete it).
+   * It is also removed from all sectors.
+   */
+  void UnlinkThing (csThing* thing);
+
+  /**
+   * Unlink and delete a thing from the world.
+   * It is also removed from all sectors.
+   */
+  void RemoveThing (csThing* thing);
+
+  /**
+   * Unlink a sky from the world (but do not delete it).
+   * It is also removed from all sectors.
+   */
+  void UnlinkSky (csThing* thing);
+
+  /**
+   * Unlink and delete a sky from the world.
+   * It is also removed from all sectors.
+   */
+  void RemoveSky (csThing* thing);
 
   /**
    * Create an iterator to iterate over all polygons of the world.

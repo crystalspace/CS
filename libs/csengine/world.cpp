@@ -715,6 +715,10 @@ void csWorld::Clear ()
   collections.DeleteAll ();
   while (sprites.Length () > 0)
     delete (csSprite*)sprites[0];
+  while (things.Length () > 0)
+    delete (csThing*)things[0];
+  while (skies.Length () > 0)
+    delete (csThing*)skies[0];
   sprite_templates.DeleteAll ();
   thing_templates.DeleteAll ();
   sectors.DeleteAll ();
@@ -1561,7 +1565,7 @@ void csWorld::ReadConfig ()
 
 void csWorld::UnlinkSprite (csSprite* sprite)
 {
-  sprite->RemoveFromSectors ();
+  sprite->GetMovable ().ClearSectors ();
   int idx = sprites.Find (sprite);
   if (idx == -1) return;
   sprites[idx] = NULL;
@@ -1570,12 +1574,50 @@ void csWorld::UnlinkSprite (csSprite* sprite)
 
 void csWorld::RemoveSprite (csSprite* sprite)
 {
-  sprite->RemoveFromSectors ();
+  sprite->GetMovable ().ClearSectors ();
   int idx = sprites.Find (sprite);
   if (idx == -1) return;
   sprites[idx] = NULL;
   sprites.Delete (idx);
   delete sprite;
+}
+
+void csWorld::UnlinkThing (csThing* thing)
+{
+  thing->GetMovable ().ClearSectors ();
+  int idx = things.Find (thing);
+  if (idx == -1) return;
+  things[idx] = NULL;
+  things.Delete (idx);
+}
+
+void csWorld::RemoveThing (csThing* thing)
+{
+  thing->GetMovable ().ClearSectors ();
+  int idx = things.Find (thing);
+  if (idx == -1) return;
+  things[idx] = NULL;
+  things.Delete (idx);
+  delete thing;
+}
+
+void csWorld::UnlinkSky (csThing* thing)
+{
+  thing->GetMovable ().ClearSectors ();
+  int idx = skies.Find (thing);
+  if (idx == -1) return;
+  skies[idx] = NULL;
+  skies.Delete (idx);
+}
+
+void csWorld::RemoveSky (csThing* thing)
+{
+  thing->GetMovable ().ClearSectors ();
+  int idx = things.Find (thing);
+  if (idx == -1) return;
+  skies[idx] = NULL;
+  skies.Delete (idx);
+  delete thing;
 }
 
 struct LightAndDist

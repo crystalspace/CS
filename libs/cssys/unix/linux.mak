@@ -9,9 +9,10 @@ PLUGINS+=video/canvas/softx video/renderer/software
 PLUGINS+=video/renderer/opengl video/canvas/openglx
 PLUGINS+=video/canvas/linex
 
-# uncomment the following to build SVGALIB and/or GGI 2D drivers
+# uncomment the following to build SVGALIB, GGI 2D, and/or SDL drivers
 PLUGINS+=video/canvas/svgalib
 #PLUGINS+=video/canvas/ggi 
+#PLUGINS+=video/canvas/sdl 
 
 # uncomment the following to build sound drivers
 #PLUGINS+=sound/driver/oss sound/renderer/software

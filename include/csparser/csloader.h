@@ -98,7 +98,7 @@ class csLoader
   /// Load a sixface (i.e. box) definition (obsolete, should not be used)
   static csThing* load_sixface (char* name, char* buf, csSector* sec);
   /// Parse the definition for a thing and create a thing object
-  static csThing* load_thing (char* name, char* buf, csSector* sec);
+  static csThing* load_thing (char* name, char* buf, csSector* sec, bool is_sky);
   /// Parse a 3D polygon definition and return a new object
   static csPolygon3D* load_poly3d (char* polyname, char* buf,
     csMaterialWrapper* default_material, float default_texlen,

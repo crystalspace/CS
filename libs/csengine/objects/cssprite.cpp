@@ -357,6 +357,7 @@ csSprite::csSprite (csObject* theParent) : csObject ()
 {
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiParticle);
+  movable.scfParent = this;
   dynamiclights = NULL;
   MixMode = CS_FX_COPY;
   defered_num_lights = 0;
@@ -368,6 +369,7 @@ csSprite::csSprite (csObject* theParent) : csObject ()
   ptree_obj = NULL;
   myOwner = NULL;
   parent = theParent;
+  movable.SetObject (this);
 }
 
 csSprite::~csSprite ()
@@ -387,13 +389,7 @@ void csSprite::UpdateMove ()
 
 void csSprite::MoveToSector (csSector* s)
 {
-  RemoveFromSectors ();
-  if (parent->GetType () == csWorld::Type)
-  {
-    movable.AddSector (s);
-    s->sprites.Push (this);
-  }
-  UpdateInPolygonTrees ();
+  s->sprites.Push (this);
 }
 
 void csSprite::RemoveFromSectors ()
@@ -401,10 +397,11 @@ void csSprite::RemoveFromSectors ()
   if (GetPolyTreeObject ())
     GetPolyTreeObject ()->RemoveFromTree ();
   if (parent->GetType () != csWorld::Type) return;
+  int i;
   csVector& sectors = movable.GetSectors ();
-  while (sectors.Length () > 0)
+  for (i = 0 ; i < sectors.Length () ; i++)
   {
-    csSector* ss = (csSector*)sectors.Pop ();
+    csSector* ss = (csSector*)sectors[i];
     if (ss)
     {
       int idx = ss->sprites.Find (this);
@@ -471,11 +468,11 @@ void csSprite::AddDynamicLight (csLightHitsSprite* lp)
 }
 
 void csSprite::Particle::MoveToSector(csSector* s)
-  { scfParent->MoveToSector(s); }
+  { scfParent->GetMovable ().SetSector (s); scfParent->GetMovable ().UpdateMove (); }
 void csSprite::Particle::SetPosition(const csVector3& v)
-  { scfParent->GetMovable().SetPosition(v); scfParent->UpdateMove (); }
+  { scfParent->GetMovable().SetPosition(v); scfParent->GetMovable ().UpdateMove (); }
 void csSprite::Particle::MovePosition(const csVector3& v)
-  { scfParent->GetMovable().MovePosition(v); scfParent->UpdateMove (); }
+  { scfParent->GetMovable().MovePosition(v); scfParent->GetMovable ().UpdateMove (); }
 void csSprite::Particle::SetColor(const csColor& c)
   { scfParent->SetColor(c); }
 void csSprite::Particle::AddColor(const csColor& c)

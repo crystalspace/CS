@@ -46,7 +46,7 @@ void Bot::set_bot_move (const csVector3& v)
 {
   GetMovable ().SetPosition (v);
   follow = v;
-  UpdateMove ();
+  GetMovable ().UpdateMove ();
 }
 
 void Bot::move (cs_time elapsed_time)
@@ -91,7 +91,7 @@ void Bot::move (cs_time elapsed_time)
   s = s->FollowSegment (old_pos2, new_p, mirror);
   if (s)
   {
-    MoveToSector (s);
+    GetMovable ().SetSector (s);
     csLight* lights[2];
     int num_lights = world->GetNearbyLights (s, new_p, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
     UpdateLighting (lights, num_lights);
@@ -101,5 +101,5 @@ void Bot::move (cs_time elapsed_time)
       light->Setup ();
     }
   }
-  UpdateMove ();
+  GetMovable ().UpdateMove ();
 }

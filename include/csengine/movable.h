@@ -24,6 +24,7 @@
 #include "imovable.h"
 
 class csSector;
+class csObject;
 
 /**
  * This class represents an entity that can move in the world.
@@ -39,6 +40,7 @@ private:
   csReversibleTransform obj;
   /// List of sectors.
   csVector sectors;
+
   /**
    * Parent (for hierachical transformations).
    * Note that if the parent is not NULL then the list of
@@ -48,6 +50,12 @@ private:
    */
   csMovable* parent;
 
+  /**
+   * Object on which this movable operates (csThing or
+   * csSprite currently).
+   */
+  csObject* object;
+
 public:
   /**
    * Create a default movable.
@@ -56,6 +64,9 @@ public:
 
   /// Destructor.
   virtual ~csMovable ();
+
+  /// Set object on which this movable operates.
+  void SetObject (csObject* obj) { object = obj; }
 
   /// Set the parent movable.
   void SetParent (csMovable* parent)
@@ -78,30 +89,21 @@ public:
    */
   void SetSector (csSector* sector)
   {
-    if (parent == NULL)
-    {
-      sectors.SetLength (0);
-      sectors.Push (sector);
-    }
+    ClearSectors ();
+    AddSector (sector);
   }
 
   /**
    * Clear the list of sectors.
    * This function does not do anything if the parent is not NULL.
    */
-  void ClearSectors ()
-  {
-    if (parent == NULL) sectors.SetLength (0);
-  }
+  void ClearSectors ();
 
   /**
    * Add a sector to the list of sectors.
    * This function does not do anything if the parent is not NULL.
    */
-  void AddSector (csSector* sector)
-  {
-    if (parent == NULL) sectors.Push (sector);
-  }
+  void AddSector (csSector* sector);
 
   /**
    * Get list of sectors for this entity.
@@ -173,6 +175,13 @@ public:
    */
   void Transform (csMatrix3& matrix);
 
+  /**
+   * After all movement has been done you need to
+   * call UpdateMove() to make the final changes to the entity
+   * that is controlled by this movable. This is very important!
+   */
+  void UpdateMove ();
+
   DECLARE_IBASE;
 
   //------------------------- iMovable interface -------------------------------
@@ -223,6 +232,10 @@ public:
     virtual void Transform (csMatrix3& matrix)
     {
       scfParent->Transform (matrix);
+    }
+    virtual void UpdateMove ()
+    {
+      scfParent->UpdateMove ();
     }
   } scfiMovable;
 };

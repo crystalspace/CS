@@ -64,10 +64,10 @@ public:
   csWorld* world;
 
 public:
-  Simple();
-  virtual ~Simple();
+  Simple ();
+  virtual ~Simple ();
 
-  virtual bool Initialize(int argc, char const* const argv[],
+  virtual bool Initialize (int argc, char const* const argv[],
     char const *iConfigName);
 @};
 
@@ -93,59 +93,59 @@ In the source file @file{simple.cpp} we place the following:
 #include "iconsole.h"
 
 // We need the VFS plugin and the 3D engine
-REGISTER_STATIC_LIBRARY(vfs)
-REGISTER_STATIC_LIBRARY(engine)
+REGISTER_STATIC_LIBRARY (vfs)
+REGISTER_STATIC_LIBRARY (engine)
 
-Simple::Simple()
+Simple::Simple ()
 @{
   world = NULL;
 @}
 
-Simple::~Simple()
+Simple::~Simple ()
 @{
 @}
 
-void cleanup()
+void cleanup ()
 @{
   delete System;
 @}
 
-bool Simple::Initialize(int argc, char const* const argv[],
+bool Simple::Initialize (int argc, char const* const argv[],
   char const* iConfigName)
 @{
-  if (!superclass::Initialize(argc, argv, iConfigName))
+  if (!superclass::Initialize (argc, argv, iConfigName))
     return false;
 
   // Find the pointer to world plugin
-  iWorld* World = QUERY_PLUGIN(this, iWorld);
+  iWorld* World = QUERY_PLUGIN (this, iWorld);
   if (!World)
   @{
-    CsPrintf(MSG_FATAL_ERROR, "No iWorld plugin!\n");
-    abort();
+    CsPrintf (MSG_FATAL_ERROR, "No iWorld plugin!\n");
+    exit (1);
   @}
-  world = World->GetCsWorld();
-  World->DecRef();
+  world = World->GetCsWorld ();
+  World->DecRef ();
 
   // Open the main system. This will open all
   // the previously loaded plug-ins.
-  if (!Open("Simple Crystal Space Application"))
+  if (!Open ("Simple Crystal Space Application"))
   @{
-    Printf(MSG_FATAL_ERROR, "Error opening system!\n");
-    cleanup();
-    exit(1);
+    Printf (MSG_FATAL_ERROR, "Error opening system!\n");
+    cleanup ();
+    exit (1);
   @}
 
-  Printf(MSG_INITIALIZATION,
+  Printf (MSG_INITIALIZATION,
     "Simple Crystal Space Application.\n");
 
   // First disable the lighting cache.
   // Our app is simple enough not to need this.
-  world->EnableLightingCache(false);
+  world->EnableLightingCache (false);
 
   // Create our world.
-  Printf(MSG_INITIALIZATION, "Creating world...\n");
-  world->Prepare();
-  Printf(MSG_INITIALIZATION, "Created.\n");
+  Printf (MSG_INITIALIZATION, "Creating world...\n");
+  world->Prepare ();
+  Printf (MSG_INITIALIZATION, "Created.\n");
 
   return true;
 @}
@@ -153,33 +153,33 @@ bool Simple::Initialize(int argc, char const* const argv[],
 /*---------------*
  * Main function *
  *---------------*/
-int main(int argc, char* argv[])
+int main (int argc, char* argv[])
 @{
-  srand(time(NULL));
+  srand (time (NULL));
 
   // Create our main class.
-  System = new Simple();
+  System = new Simple ();
 
   // We want at least the minimal set of plugins
-  System->RequestPlugin("crystalspace.kernel.vfs:VFS");
-  System->RequestPlugin("crystalspace.graphics3d.software:VideoDriver");
-  System->RequestPlugin("crystalspace.engine.core:Engine");
+  System->RequestPlugin ("crystalspace.kernel.vfs:VFS");
+  System->RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
+  System->RequestPlugin ("crystalspace.engine.core:Engine");
 
   // Initialize the main system. This will load all needed
   // plug-ins (3D, 2D, network, etc.) and initialize them.
-  if (!System->Initialize(argc, argv, NULL))
+  if (!System->Initialize (argc, argv, NULL))
   @{
-    System->Printf(MSG_FATAL_ERROR,
+    System->Printf (MSG_FATAL_ERROR,
       "Error initializing system.\n");
-    cleanup();
-    exit(1);
+    cleanup ();
+    exit (1);
   @}
 
   // Main loop.
-  System->Loop();
+  System->Loop ();
 
   // Cleanup.
-  cleanup();
+  cleanup ();
   return 0;
 @}
 @end example
@@ -223,23 +223,23 @@ application by responding to the @key{ESC} key.  Add the following public
 method to our class in @file{simple.h}:
 
 @example
-virtual bool HandleEvent(csEvent&);
+virtual bool HandleEvent (iEvent&);
 @end example
 
 HandleEvent() is inherited from the system driver and is automatically called
 as each event is received, several of which can accumulate between frames.
-Our version checks if the @key{ESC} key has been pressed, and calls
-StartShutdown() if so.  Now add this code to @file{simple.cpp}:
+Our version checks if the @key{ESC} key has been pressed, and sets
+Shutdown to true if so.  Now add this code to @file{simple.cpp}:
 
 @example
-bool Simple::HandleEvent(csEvent& Event)
+bool Simple::HandleEvent (iEvent& Event)
 @{
-  if (superclass::HandleEvent(Event))
+  if (superclass::HandleEvent (Event))
     return true;
 
   if (Event.Type == csevKeyDown && Event.Key.Code == CSKEY_ESC)
   @{
-    StartShutdown();
+    Shutdown = true;
     return true;
   @}
 
@@ -288,83 +288,83 @@ Now add these chunks of code (texture manager, room, lights) to
 @file{simple.cpp}:
 
 @example
-bool Simple::Initialize(int argc, char const* const argv[],
+bool Simple::Initialize (int argc, char const* const argv[],
   char const* iConfigName)
 @{
   @dots{}
   // Open the main system. This will open all
   // the previously loaded plug-ins.
-  if (!Open("Simple Crystal Space Application"))
+  if (!Open ("Simple Crystal Space Application"))
     @dots{}
 
   // Setup the texture manager
-  iTextureManager* txtmgr = G3D->GetTextureManager();
-  txtmgr->SetVerbose(true);
+  iTextureManager* txtmgr = G3D->GetTextureManager ();
+  txtmgr->SetVerbose (true);
 
   // Initialize the texture manager
-  txtmgr->ResetPalette();
+  txtmgr->ResetPalette ();
   @dots{}
   // Create the world.
-  Printf(MSG_INITIALIZATION, "Creating world...\n");
+  Printf (MSG_INITIALIZATION, "Creating world...\n");
 
-  csTextureHandle* tm = csLoader::LoadTexture(
-    world, "stone", "/lib/std/stone4.gif");
+  csLoader::LoadTexture (world, "stone", "/lib/std/stone4.gif");
+  csMaterialWrapper* tm = world->GetMaterials ()->FindByName ("stone");
 
-  room = world->NewSector();
-  room->SetName("room");
+  room = world->NewSector ();
+  room->SetName ("room");
   csPolygon3D* p;
-  p = room->NewPolygon(tm);
-  p->AddVertex(-5, 0,  5);
-  p->AddVertex( 5, 0,  5);
-  p->AddVertex( 5, 0, -5);
-  p->AddVertex(-5, 0, -5);
-  p->SetTextureSpace(p->Vobj(0), p->Vobj(1), 3);
+  p = room->NewPolygon (tm);
+  p->AddVertex (-5, 0,  5);
+  p->AddVertex ( 5, 0,  5);
+  p->AddVertex ( 5, 0, -5);
+  p->AddVertex (-5, 0, -5);
+  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
-  p = room->NewPolygon(tm);
-  p->AddVertex(-5, 20, -5);
-  p->AddVertex( 5, 20, -5);
-  p->AddVertex( 5, 20,  5);
-  p->AddVertex(-5, 20,  5);
-  p->SetTextureSpace(p->Vobj(0), p->Vobj(1), 3);
+  p = room->NewPolygon (tm);
+  p->AddVertex (-5, 20, -5);
+  p->AddVertex ( 5, 20, -5);
+  p->AddVertex ( 5, 20,  5);
+  p->AddVertex (-5, 20,  5);
+  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
-  p = room->NewPolygon(tm);
-  p->AddVertex(-5, 20, 5);
-  p->AddVertex( 5, 20, 5);
-  p->AddVertex( 5,  0, 5);
-  p->AddVertex(-5,  0, 5);
-  p->SetTextureSpace(p->Vobj(0), p->Vobj(1), 3);
+  p = room->NewPolygon (tm);
+  p->AddVertex (-5, 20, 5);
+  p->AddVertex ( 5, 20, 5);
+  p->AddVertex ( 5,  0, 5);
+  p->AddVertex (-5,  0, 5);
+  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
-  p = room->NewPolygon(tm);
-  p->AddVertex(5, 20,  5);
-  p->AddVertex(5, 20, -5);
-  p->AddVertex(5,  0, -5);
-  p->AddVertex(5,  0,  5);
-  p->SetTextureSpace(p->Vobj(0), p->Vobj(1), 3);
+  p = room->NewPolygon (tm);
+  p->AddVertex (5, 20,  5);
+  p->AddVertex (5, 20, -5);
+  p->AddVertex (5,  0, -5);
+  p->AddVertex (5,  0,  5);
+  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
-  p = room->NewPolygon(tm);
-  p->AddVertex(-5, 20, -5);
-  p->AddVertex(-5, 20,  5);
-  p->AddVertex(-5,  0,  5);
-  p->AddVertex(-5,  0, -5);
-  p->SetTextureSpace(p->Vobj(0), p->Vobj(1), 3);
+  p = room->NewPolygon (tm);
+  p->AddVertex (-5, 20, -5);
+  p->AddVertex (-5, 20,  5);
+  p->AddVertex (-5,  0,  5);
+  p->AddVertex (-5,  0, -5);
+  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
-  p = room->NewPolygon(tm);
-  p->AddVertex( 5, 20, -5);
-  p->AddVertex(-5, 20, -5);
-  p->AddVertex(-5,  0, -5);
-  p->AddVertex( 5,  0, -5);
-  p->SetTextureSpace(p->Vobj(0), p->Vobj(1), 3);
+  p = room->NewPolygon (tm);
+  p->AddVertex ( 5, 20, -5);
+  p->AddVertex (-5, 20, -5);
+  p->AddVertex (-5,  0, -5);
+  p->AddVertex ( 5,  0, -5);
+  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
   csStatLight* light;
-  light = new csStatLight(-3, 5,  0, 10, 1, 0, 0, false);
-  room->AddLight(light);
-  light = new csStatLight( 3, 5,  0, 10, 0, 0, 1, false);
-  room->AddLight(light);
-  light = new csStatLight( 0, 5, -3, 10, 0, 1, 0, false);
-  room->AddLight(light);
+  light = new csStatLight (-3, 5,  0, 10, 1, 0, 0, false);
+  room->AddLight (light);
+  light = new csStatLight ( 3, 5,  0, 10, 0, 0, 1, false);
+  room->AddLight (light);
+  light = new csStatLight ( 0, 5, -3, 10, 0, 1, 0, false);
+  room->AddLight (light);
 
-  world->Prepare();
-  Printf(MSG_INITIALIZATION, "Created.\n");
+  world->Prepare ();
+  Printf (MSG_INITIALIZATION, "Created.\n");
 
   txtmgr->SetPalette ();
   return true;
@@ -376,9 +376,9 @@ parameter is the world into which to load the texture; the second parameter is
 the name of the texture as it will be known in the world; and the third is the
 actual filename on the @sc{vfs} volume (@pxref{VFS}).  Note, if you don't have
 the @file{stone4.gif} texture you can use another one.  The only requirement
-is that it must have sizes which are a power of 2 (e.g.  64x64).  The
-resulting @file{csTextureHandle} can be handed to polygons or other engine
-objects which require textures.
+is that it must have sizes which are a power of 2 (e.g.  64x64). This functions
+returns a @code{csTextureWrapper} which we don't use. Instead we use
+the @code{csMaterialWrapper} which is created automatically with @code{LoadTexture}.
 
 Then we create our room with @samp{NewSector()}.  This room will initially be
 empty.  A room in Crystal Space is represented by @samp{csSector} which is
@@ -386,7 +386,7 @@ basicly a convex set of polygons.
 
 Now we create the six walls of our room.  To do this we call
 @code{NewPolygon()} for every wall.  This call expects one parameter: the
-texture to use.  @code{NewPolygon()} returns a pointer to a
+material to use.  @code{NewPolygon()} returns a pointer to a
 @samp{csPolygon3D}.  This polygon will be empty so you need to add vertices
 and also define how the texture should be mapped on that polygon.  To add
 vertices we use @code{AddVertex()} which expects a location in object space.
@@ -457,7 +457,7 @@ Then edit @file{simple.cpp} and make the following changes to the constructor
 and destructor of @samp{Simple}:
 
 @example
-Simple::Simple()
+Simple::Simple ()
 @{
   @dots{}
   view = NULL;
@@ -465,7 +465,7 @@ Simple::Simple()
   world = NULL;
 @}
 
-Simple::~Simple()
+Simple::~Simple ()
 @{
   @dots{}
   delete view;
@@ -476,18 +476,18 @@ Simple::~Simple()
 At the end of our Initialize() function we add the following:
 
 @example
-bool Simple::Initialize(int argc, char const* const argv[],
+bool Simple::Initialize (int argc, char const* const argv[],
   char const* iConfigName)
 @{
   @dots{}
-  Printf(MSG_INITIALIZATION, "Created.\n");
+  Printf (MSG_INITIALIZATION, "Created.\n");
 
-  view = new csView(world, G3D);
-  view->SetSector(room);
-  view->GetCamera()->SetPosition(csVector3(0, 5, 0));
-  view->SetRectangle(0, 0, FrameWidth, FrameHeight);
+  view = new csView (world, G3D);
+  view->SetSector (room);
+  view->GetCamera ()->SetPosition (csVector3 (0, 5, 0));
+  view->SetRectangle (0, 0, FrameWidth, FrameHeight);
 
-  txtmgr->SetPalette();
+  txtmgr->SetPalette ();
   return true;
 @}
 @end example
@@ -509,20 +509,20 @@ actually render the 3D image at each animation frame.  Implement NextFrame()
 as follows:
 
 @example
-void Simple::NextFrame(time_t elapsed_time, time_t current_time)
+void Simple::NextFrame ()
 @{
-  superclass::NextFrame(elapsed_time, current_time);
+  superclass::NextFrame ();
 
   // Tell 3D driver we're going to display 3D things.
   if (!G3D->BeginDraw (world->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS)) return;
 
   // Tell the camera to render into the frame buffer.
-  view->Draw();
+  view->Draw ();
 
   // Drawing code ends here.
-  G3D->FinishDraw();
+  G3D->FinishDraw ();
   // Display the final output.
-  G3D->Print(NULL);
+  G3D->Print (NULL);
 @}
 @end example
 
@@ -555,17 +555,21 @@ to do exactly this.  Edit @file{simple.cpp} again and change
 @file{NextFrame()} as follows:
 
 @example
-void Simple::NextFrame(time_t elapsed_time, time_t current_time)
+void Simple::NextFrame ()
 @{
-  superclass::NextFrame(elapsed_time, current_time);
+  superclass::NextFrame ();
   @dots{}
+  // First get elapsed time from the system driver.
+  cs_time elapsed_time, current_time;
+  GetElapsedTime (elapsed_time, current_time);
+  
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.0) * (0.03 * 20);
 
-  if (GetKeyState(CSKEY_RIGHT))
-    view->GetCamera()->Rotate(VEC_ROT_RIGHT, speed);
-  if (GetKeyState(CSKEY_LEFT))
-    view->GetCamera()->Rotate(VEC_ROT_LEFT, speed);
+  if (GetKeyState (CSKEY_RIGHT))
+    view->GetCamera ()->Rotate (VEC_ROT_RIGHT, speed);
+  if (GetKeyState (CSKEY_LEFT))
+    view->GetCamera ()->Rotate (VEC_ROT_LEFT, speed);
   @dots{}
 @}
 @end example

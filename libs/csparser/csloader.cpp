@@ -1080,6 +1080,7 @@ csStatLight* csLoader::load_statlight (char* name, char* buf)
 
   csLoaderStat::lights_loaded++;
   float x, y, z, dist = 0, r, g, b;
+  int cnt;
   int dyn, attenuation = CS_ATTN_LINEAR;
   char str [100];
   struct csHaloDef
@@ -1133,8 +1134,9 @@ csStatLight* csLoader::load_statlight (char* name, char* buf)
           dyn = 1;
           break;
         case TOKEN_HALO:
-          ScanStr (params, "%s", str);
-          if (!strncmp (str, "CROSS", 5))
+	  str[0] = 0;
+          cnt = ScanStr (params, "%s", str);
+          if (cnt == 0 || !strncmp (str, "CROSS", 5))
           {
             params = strchr (str, ',');
             if (params) params++;
@@ -1695,12 +1697,12 @@ csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
   if (!(flags & CS_LOADER_NOCOMPRESS))
     thing->CompressVertices ();
   if (!(flags & CS_LOADER_NOTRANSFORM))
-    thing->UpdateMove ();
+    thing->GetMovable ().UpdateMove ();
 
   return thing;
 }
 
-csThing* csLoader::load_thing (char* name, char* buf, csSector* sec)
+csThing* csLoader::load_thing (char* name, char* buf, csSector* sec, bool is_sky)
 {
   TOKEN_TABLE_START (commands)
     TOKEN_TABLE (VERTEX)
@@ -1733,7 +1735,7 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec)
 
   char* xname;
 
-  csThing* thing = new csThing (World) ;
+  csThing* thing = new csThing (World, is_sky);
   thing->SetName (name);
 
   csLoaderStat::things_loaded++;
@@ -1839,7 +1841,7 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec)
   if (!(flags & CS_LOADER_NOCOMPRESS))
     thing->CompressVertices ();
   if (!(flags & CS_LOADER_NOTRANSFORM))
-    thing->UpdateMove ();
+    thing->GetMovable ().UpdateMove ();
   if (is_convex || thing->GetFog ().enabled)
     thing->flags.Set (CS_ENTITY_CONVEX, CS_ENTITY_CONVEX);
 
@@ -3918,19 +3920,23 @@ csSector* csLoader::load_room (char* secname, char* buf)
         break;
       case TOKEN_FIRE:
         partsys = load_fire (name, params);
-	partsys->MoveToSector (sector);
+	partsys->GetMovable ().SetSector (sector);
+	partsys->GetMovable ().UpdateMove ();
         break;
       case TOKEN_FOUNTAIN:
         partsys = load_fountain (name, params);
-	partsys->MoveToSector (sector);
+	partsys->GetMovable ().SetSector (sector);
+	partsys->GetMovable ().UpdateMove ();
         break;
       case TOKEN_RAIN:
         partsys = load_rain (name, params);
-	partsys->MoveToSector (sector);
+	partsys->GetMovable ().SetSector (sector);
+	partsys->GetMovable ().UpdateMove ();
         break;
       case TOKEN_SNOW:
         partsys = load_snow (name, params);
-	partsys->MoveToSector (sector);
+	partsys->GetMovable ().SetSector (sector);
+	partsys->GetMovable ().UpdateMove ();
         break;
       case TOKEN_SPRITE:
         {
@@ -3938,7 +3944,8 @@ csSector* csLoader::load_room (char* secname, char* buf)
           sp->SetName (name);
           LoadSprite (sp, params);
           World->sprites.Push (sp);
-          sp->MoveToSector (sector);
+          sp->GetMovable ().SetSector (sector);
+	  sp->GetMovable ().UpdateMove ();
         }
         break;
       case TOKEN_SPRITE2D:
@@ -3947,14 +3954,15 @@ csSector* csLoader::load_room (char* secname, char* buf)
           sp->SetName (name);
           LoadSprite (sp, params);
           World->sprites.Push (sp);
-          sp->MoveToSector (sector);
+          sp->GetMovable ().SetSector (sector);
+	  sp->GetMovable ().UpdateMove ();
         }
         break;
       case TOKEN_SKY:
-        sector->skies.Push (load_thing (name,params,sector));
+        sector->skies.Push (load_thing (name, params, sector, true));
         break;
       case TOKEN_THING:
-        sector->things.Push (load_thing (name,params,sector));
+        sector->things.Push (load_thing (name, params, sector, false));
         break;
       case TOKEN_PORTAL:
         {
@@ -4307,25 +4315,29 @@ csSector* csLoader::load_sector (char* secname, char* buf)
         break;
       case TOKEN_FIRE:
         partsys = load_fire (name, params);
-	partsys->MoveToSector (sector);
+	partsys->GetMovable ().SetSector (sector);
+	partsys->GetMovable ().UpdateMove ();
         break;
       case TOKEN_FOUNTAIN:
         partsys = load_fountain (name, params);
-	partsys->MoveToSector (sector);
+	partsys->GetMovable ().SetSector (sector);
+	partsys->GetMovable ().UpdateMove ();
         break;
       case TOKEN_RAIN:
         partsys = load_rain (name, params);
-	partsys->MoveToSector (sector);
+	partsys->GetMovable ().SetSector (sector);
+	partsys->GetMovable ().UpdateMove ();
         break;
       case TOKEN_SNOW:
         partsys = load_snow (name, params);
-	partsys->MoveToSector (sector);
+	partsys->GetMovable ().SetSector (sector);
+	partsys->GetMovable ().UpdateMove ();
         break;
       case TOKEN_SKY:
-        sector->skies.Push (load_thing (name,params,sector));
+        sector->skies.Push (load_thing (name, params, sector, true));
         break;
       case TOKEN_THING:
-        sector->things.Push (load_thing (name,params,sector));
+        sector->things.Push (load_thing (name, params, sector, false));
         break;
       case TOKEN_SPRITE:
         {
@@ -4333,7 +4345,8 @@ csSector* csLoader::load_sector (char* secname, char* buf)
           sp->SetName (name);
           LoadSprite (sp, params);
           World->sprites.Push (sp);
-          sp->MoveToSector (sector);
+          sp->GetMovable ().SetSector (sector);
+	  sp->GetMovable ().UpdateMove ();
         }
         break;
       case TOKEN_SPRITE2D:
@@ -4342,7 +4355,8 @@ csSector* csLoader::load_sector (char* secname, char* buf)
           sp->SetName (name);
           LoadSprite (sp, params);
           World->sprites.Push (sp);
-          sp->MoveToSector (sector);
+          sp->GetMovable ().SetSector (sector);
+	  sp->GetMovable ().UpdateMove ();
         }
         break;
       case TOKEN_SIXFACE:
@@ -5715,7 +5729,7 @@ bool csLoader::LoadSprite (csSprite3D* spr, char* buf)
               }
             }
           }
-	  spr->UpdateMove ();
+	  spr->GetMovable ().UpdateMove ();
         }
         break;
 

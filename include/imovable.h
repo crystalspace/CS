@@ -26,7 +26,7 @@ class csMatrix3;
 class csThing;
 struct iSector;
 
-SCF_VERSION (iMovable, 0, 0, 3);
+SCF_VERSION (iMovable, 0, 0, 4);
 
 /**
  * This interface describes a movable entity. It is usually
@@ -118,6 +118,13 @@ struct iMovable : public iBase
    * Relative transform.
    */
   virtual void Transform (csMatrix3& matrix) = 0;
+
+  /**
+   * After all movement has been done you need to
+   * call UpdateMove() to make the final changes to the entity
+   * that is controlled by this movable. This is very important!
+   */
+  virtual void UpdateMove () = 0;
 };
 
 #endif

@@ -50,18 +50,21 @@ IMPLEMENT_EMBEDDED_IBASE (csThing::eiThing)
   IMPLEMENTS_INTERFACE (iThing)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-csThing::csThing (csWorld* world) : csPolygonSet (world), movable (),
-	tree_bbox (NULL)
+csThing::csThing (csWorld* world, bool is_sky) :
+	csPolygonSet (world), tree_bbox (NULL), movable ()
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiThing);
   movable.scfParent = &scfiThing;
   center_idx = -1;
   ParentTemplate = NULL;
   tree_bbox.SetOwner (this);
+  csThing::is_sky = is_sky;
+  movable.SetObject (this);
 }
 
 csThing::~csThing ()
 {
+  world->UnlinkThing (this);
 }
 
 void csThing::SetConvex (bool c)
@@ -101,6 +104,47 @@ void csThing::UpdateMove ()
   }
   UpdateCurveTransform ();
   UpdateInPolygonTrees ();
+}
+
+void csThing::MoveToSector (csSector* s)
+{
+  if (is_sky)
+    s->skies.Push (this);
+  else
+    s->things.Push (this);
+}
+
+void csThing::RemoveFromSectors ()
+{
+  if (GetPolyTreeObject ())
+    GetPolyTreeObject ()->RemoveFromTree ();
+  int i;
+  csVector& sectors = movable.GetSectors ();
+  for (i = 0 ; i < sectors.Length () ; i++)
+  {
+    csSector* ss = (csSector*)sectors[i];
+    if (ss)
+    {
+      if (is_sky)
+      {
+        int idx = ss->skies.Find (this);
+        if (idx >= 0)
+        {
+          ss->skies[idx] = NULL;
+          ss->skies.Delete (idx);
+        }
+      }
+      else
+      {
+        int idx = ss->things.Find (this);
+        if (idx >= 0)
+        {
+          ss->things[idx] = NULL;
+          ss->things.Delete (idx);
+        }
+      }
+    }
+  }
 }
 
 void csThing::UpdateCurveTransform()

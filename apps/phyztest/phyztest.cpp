@@ -102,11 +102,11 @@ csSprite3D *add_test_sprite( csSpriteTemplate *tmpl, csSector *aroom, csView *vi
   tsprt = new csSprite3D(view->GetWorld ());
   tsprt->SetTemplate( tmpl );
   view->GetWorld ()->sprites.Push (tsprt);
-  tsprt->MoveToSector (aroom);
+  tsprt->GetMovable ().SetSector (aroom);
   csMatrix3 m; m.Identity ();
   tsprt->GetMovable ().SetTransform (m);
   tsprt->GetMovable ().SetPosition (csVector3( 0, 10, 0 ));    // only matters for root in chain demo
-  tsprt->UpdateMove ();
+  tsprt->GetMovable ().UpdateMove ();
   tsprt->SetAction ("default");
   tsprt->InitSprite ();
 
@@ -350,11 +350,11 @@ void Phyztest::NextFrame ()
     bot = new csSprite3D(view->GetWorld ());
     bot->SetTemplate( tmpl );
     view->GetWorld ()->sprites.Push (bot);
-    bot->MoveToSector (room);
+    bot->GetMovable ().SetSector (room);
     m.Identity (); //m = m * 2.0;
     bot->GetMovable ().SetTransform (m);
     bot->GetMovable ().SetPosition (csVector3( 0, 10, 0 ));
-    bot->UpdateMove ();
+    bot->GetMovable ().UpdateMove ();
     bot->SetAction ("default");
     bot->InitSprite ();
 
@@ -425,7 +425,7 @@ void Phyztest::NextFrame ()
         M_scale *= 0.5;
         m *= M_scale;
         chain[i]->sprt->GetMovable ().SetTransform(m);
-	chain[i]->sprt->UpdateMove ();
+	chain[i]->sprt->GetMovable ().UpdateMove ();
         num_lights = world->GetNearbyLights (room, new_p, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
               chain[i]->sprt->UpdateLighting (lights, num_lights);      
       }

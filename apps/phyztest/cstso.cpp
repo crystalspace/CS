@@ -79,7 +79,7 @@ csRigidSpaceTimeObj *sto;
          M[1][0], M[1][1], M[1][2],
          M[2][0], M[2][1], M[2][2]);    // set orientation of sprite
     sto->sprt->GetMovable ().SetTransform(m);
-    sto->sprt->UpdateMove ();
+    sto->sprt->GetMovable ().UpdateMove ();
   }
 }
 

@@ -70,6 +70,8 @@ protected:
 protected:
   /// Update this sprite in the polygon trees.
   virtual void UpdateInPolygonTrees ();
+  /// Move all particles to a sector, virtual so subclass can move more.
+  virtual void MoveToSector (csSector *sector);
 
 public:
   /**
@@ -165,8 +167,6 @@ public:
    */
   iParticle* GetAsParticle() { return QUERY_INTERFACE(this, iParticle); }
 
-  /// Move all particles to a sector, virtual so subclass can move more.
-  virtual void MoveToSector (csSector *sector);
   /// Move all particles to this position
   virtual void SetPosition(const csVector3& pos);
   /// Move all particles by given delta.
@@ -263,6 +263,9 @@ protected:
   csMaterialWrapper* mat;
   csSector* this_sector;
 
+  /// Move all particles to a sector, virtual so subclass can move more.
+  virtual void MoveToSector (csSector *sector);
+
 public:
   /// Specify max number of particles.
   csSpiralParticleSystem (csObject* theParent, int max, const csVector3& source,
@@ -271,9 +274,6 @@ public:
 
   /// Moves the particles depending on their acceleration and speed.
   virtual void Update (cs_time elapsed_time);
-
-  /// Move all particles to a sector, virtual so subclass can move more.
-  virtual void MoveToSector (csSector *sector);
 
   CSOBJTYPE;
 };
@@ -300,6 +300,9 @@ protected:
   csBox3 startbox;
   float maxspeed, maxaccel, radiusnow;
 
+  /// Move particles and light(if any) to a sector.
+  virtual void MoveToSector (csSector *sector);
+
 public:
   /**
    * Give number of particles and center. 
@@ -323,9 +326,6 @@ public:
    * Update and light is flickered as well. particles will be scaled.
    */
   virtual void Update (cs_time elapsed_time);
-
-  /// Move particles and light(if any) to a sector.
-  virtual void MoveToSector (csSector *sector);
 
   /// Get the center of the explosion.
   csVector3& GetCenter () { return center; }

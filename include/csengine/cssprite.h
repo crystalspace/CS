@@ -326,6 +326,7 @@ typedef void (csSpriteCallback2) (csSprite3D* spr, csRenderView* rview, csObject
 class csSprite : public csObject, public iBase
 {
   friend class Dumper;
+  friend class csMovable;
 
 protected:
   /// Points to Actor class which "owns" this sprite.
@@ -395,6 +396,21 @@ protected:
    * if the sprite is connected directly to the world (ugly!@@@).
    */
   csMovable movable;
+
+  /// Move this sprite to the specified sector. Can be called multiple times.
+  virtual void MoveToSector (csSector* s);
+
+  /// Remove this sprite from all sectors it is in (but not from the world).
+  virtual void RemoveFromSectors ();
+
+  /**
+   * Update transformations after the sprite has moved
+   * (through updating the movable instance).
+   * This MUST be done after you change the movable otherwise
+   * some of the internal data structures will not be updated
+   * correctly. This function is called by movable.UpdateMove();
+   */
+  virtual void UpdateMove ();
 
 public:
   /// Constructor.
@@ -484,12 +500,6 @@ public:
    */
   csSpriteCallback2* GetDrawCallback2 () { return draw_callback2; }
 
-  /// Move this sprite to one sector (conveniance function).
-  virtual void MoveToSector (csSector* s);
-
-  /// Remove this sprite from all sectors it is in (but not from the world).
-  void RemoveFromSectors ();
-
   /**
    * Unlink a light-hits-sprite from the list.
    * Warning! This function does not test if it
@@ -527,21 +537,12 @@ public:
 
   /**
    * Get the movable instance for this sprite.
-   * It is very important to call UpdateMove()
+   * It is very important to call GetMovable().UpdateMove()
    * after doing any kind of modification to this movable
    * to make sure that internal data structures are
    * correctly updated.
    */
   csMovable& GetMovable () { return movable; }
-
-  /**
-   * Update transformations after the sprite has moved
-   * (through updating the movable instance).
-   * This MUST be done after you change the movable otherwise
-   * some of the internal data structures will not be updated
-   * correctly.
-   */
-  void UpdateMove ();
 
   /// Set the color of this sprite.
   virtual void SetColor (const csColor&) = 0;

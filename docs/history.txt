@@ -1,6 +1,55 @@
 The history order has been reversed so that new features are at the top.
 
+29-Aug-2000
+	- Integrated a new SDL canvas made by George Yohng
+	  <cspace@mmts.nsys.by>.
+	- Fixed default HALO parsing. If a NOVA halo was used in a level
+	  all following halo's would be NOVA too.
+	- Fixed a bug in csSector::RemoveThing. This function didn't
+	  delete the thing in the past but it did now. I changed it back
+	  to the old behaviour. This fixes Blocks again.
+	- Added two new vectors 'things' and 'skies' to csWorld. The plan
+	  is to make things and skies have almost exactly the same API with
+	  regards to movement and placement in sectors. The move to csMovable
+	  is one step. But this list is another one.
+	- Removed csSector::RemoveThing/RemoveSky since that happens the
+	  same way as with sprites now. Added csThing::RemoveFromSectors()
+	  and csThing::MoveToSector().
+	- Added csMovable and iMovable::UpdateMove(). Made RemoveFromSectors(),
+	  MoveToSector(), and UpdateMove in csThing and csSprite private
+	  since this will now be called by the csMovable. This means
+	  that when you did:
+	    sprite->UpdateMove ()
+	  you have to change this to:
+	    sprite->GetMovable ().UpdateMove ();
+	  Also instead of calling RemoveFromSectors() you now need to
+	  call GetMovable ().ClearSectors() and instead of calling
+	  MoveToSector() you need to call GetMovable ().SetSector().
+	  And don't forget the UpdateMove()!
+	- The change above allow application developers to make movement
+	  routines based only on a csMovable without having to care about
+	  what object is being moved (csThing or csSprite).
+	- Made MoveToSector, UpdateMove, and RemoveFromSectors in
+	  csSprite and csThing virtual so that subclasses can override
+	  them. This happens for csParticle for example. It overrides
+	  MoveToSector for its specific purposes.
+	- Added is_sky parameter to the csThing constructor so that a
+	  thing knows it is a sky object or a normal thing.
+	- Fixed all the apps with regards to the above changes.
+	- Update the apidoc17.txi documentation with regards to the above
+	  changes.
+	- Update simple.txi and simple2.txi tutorials.
+	- Norman updated worldfmt.txi for TEX_SET_* to MAT_SET_* change.
 28-Aug-2000
+	- Martin Geisse added movable.cpp to the MSVC project files.
+	- Norman Kramer added a 'const' modifier to csMovable.
+	- Norman changed TEX_SET_* to MAT_SET_*, tex set was broken after
+	  recent changes.
+	- Norman fixed another instance of thing First/NextThing calls
+	  which Jorrit forgot to update.
+	- Update from Brandon Ehle to the PS2 port:
+	  PS2 completely compiles in static mode, need to fix the
+	  unresolved externals now.
 	- Added GetPosition() to csMovable and iMovable.
 	- Fixed a bad bug in sprites. When a sprite was deleted it
 	  could potentially delete it's parent sector with it. Not very

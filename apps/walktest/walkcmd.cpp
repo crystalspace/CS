@@ -287,8 +287,8 @@ bool LoadCamera (iVFS* vfs, const char *fName)
 void move_sprite (csSprite3D* sprite, csSector* where, csVector3 const& pos)
 {
   sprite->GetMovable ().SetPosition (pos);
-  sprite->MoveToSector (where);
-  sprite->UpdateMove ();
+  sprite->GetMovable ().SetSector (where);
+  sprite->GetMovable ().UpdateMove ();
 }
 
 // Load a sprite from a general format (3DS, MD2, ...)
@@ -338,11 +338,11 @@ csSprite3D* add_sprite (char* tname, char* sname, csSector* where,
   csSprite3D* spr = tmpl->NewSprite (Sys->view->GetWorld ());
   spr->SetName (sname);
   Sys->view->GetWorld ()->sprites.Push (spr);
-  spr->MoveToSector (where);
+  spr->GetMovable ().SetSector (where);
   spr->GetMovable ().SetPosition (pos);
   csMatrix3 m; m.Identity (); m = m * size;
   spr->GetMovable ().SetTransform (m);
-  spr->UpdateMove ();
+  spr->GetMovable ().UpdateMove ();
 
   spr->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   return spr;

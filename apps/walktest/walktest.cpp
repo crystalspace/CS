@@ -345,7 +345,7 @@ void WalkTest::MoveSystems (cs_time elapsed_time, cs_time current_time)
 	  break;
 	}
     }
-    anim_sky->UpdateMove ();
+    move.UpdateMove ();
   }
 
   // Update all busy entities.

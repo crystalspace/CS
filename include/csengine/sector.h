@@ -211,19 +211,9 @@ public:
   csThing* GetThing (const char* name);
 
   /**
-   * Remove a thing from this sector.
-   */
-  void RemoveThing (csThing* thing);
-
-  /**
    * Find a sky with the given name.
    */
   csThing* GetSky (const char* name);
-
-  /**
-   * Remove a sky thing from this sector.
-   */
-  void RemoveSky (csThing* thing);
 
   /**
    * Get the thing representing all non-moving things (all

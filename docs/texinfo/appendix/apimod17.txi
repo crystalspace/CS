@@ -243,28 +243,61 @@ into one class called @code{csMovable}. So all functions like
 from @code{csThing} and @code{csSprite}. Instead there is a
 function @code{GetMovable()} (both for things and sprites) which returns
 the @code{csMovable} for that object. And there is also a new function
-called @code{UpdateMove()} (which resembles the original
+called @code{csMovable::UpdateMove()} (which resembles the original
 @code{csThing::Transform()} somewhat) which you MUST call after updating
 the position and/or transformation of the movable which belongs to the
-object. In summary. If you would do:
+object.
+
+In addition to the changes related to @code{csMovable} the linked list of
+sky and thing objects in a sector has also been replaced by a @code{csVector}
+and things are now also kept in a global list in the @code{csWorld} just
+like sprites. This means that sprites and things look a lot more like
+each other now with regards to movement and placement in sectors.
+This means that functions like @code{AddThing}, @code{GetNumThings},
+@code{RemoveThing} and @code{GetFirstThing} are gone now (similar for the
+sky versions). Instead you should work through the new public @code{skies}
+and @code{things} vectors. In addition to this the @code{GetNext} and @code
+{GetParent} functions have been removed from @code{csPolygonSet}.
+
+Here is some old code to operate on things:
 
 @example
+sector->AddThing (thing);
 thing->SetPosition (csVector3 (0,0,3));
 thing->SetTransform (csMatrix3 ());
 thing->Transform ();
+...
+sector->RemoveThing (thing);
+delete thing;
 @end example
 
 then this will now become:
 
 @example
+thing->GetMovable ().SetSector (sector);
 thing->GetMovable ().SetPosition (csVector3 (0,0,3));
 thing->GetMovable ().SetTransform (csMatrix3 ());
-thing->UpdateMove ();
+thing->GetMovable ().UpdateMove ();
+...
+world->RemoveThing (thing);
+@end example
+
+or even:
+
+@example
+csMovable& move = thing->GetMovable ();
+move.SetSector (sector);
+move.SetPosition (csVector3 (0,0,3));
+move.SetTransform (csMatrix3 ());
+move.UpdateMove ();
+...
+world->RemoveThing (thing);
 @end example
 
 The old behaviour for sprites:
 
 @example
+sprite->MoveToSector (sector);
 sprite->SetPosition (csVector3 (0,0,3));
 sprite->SetTransform (csMatrix3 ());
 @end example
@@ -272,16 +305,10 @@ sprite->SetTransform (csMatrix3 ());
 becomes (note the new @code{UpdateMove}):
 
 @example
-sprite->GetMovable ().SetPosition (csVector3 (0,0,3));
-sprite->GetMovable ().SetTransform (csMatrix3 ());
-sprite->UpdateMove ();
+csMovable& move = sprite->GetMovable ();
+move.SetSector (sector);
+move.SetPosition (csVector3 (0,0,3));
+move.SetTransform (csMatrix3 ());
+move.UpdateMove ();
 @end example
-
-In addition to the changes related to @code{csMovable} the linked list of
-sky and thing objects in a sector has also been replaced by a @code{csVector}.
-This means that functions like @code{AddThing}, @code{GetNumThings}, and
-@code{GetFirstThing} are gone now (similar for the
-sky versions). Instead you should work through the new public @code{skies}
-and @code{things} vectors. In addition to this the @code{GetNext} and @code
-{GetParent} functions have been removed from @code{csPolygonSet}.
 

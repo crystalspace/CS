@@ -82,26 +82,13 @@ csSector::csSector (csWorld* world) : csPolygonSet (world)
 
 csSector::~csSector ()
 {
-  int i;
-  for (i = 0 ; i < things.Length () ; i++)
-  {
-    csThing* n = (csThing*)(things[i]);
-    things[i] = NULL;
-    delete n;
-  }
-  things.DeleteAll ();
-  delete static_tree;
-  for (i = 0 ; i < skies.Length () ; i++)
-  {
-    csThing* n = (csThing*)(skies[i]);
-    skies[i] = NULL;
-    delete n;
-  }
-  skies.DeleteAll ();
-
-  // Sprites are not deleted by the call below. Sprites
+  // Sprites and things are not deleted by the call below. They
   // belong to csWorld.
+  things.DeleteAll ();
+  skies.DeleteAll ();
   sprites.DeleteAll ();
+
+  delete static_tree;
 
   lights.DeleteAll ();
   terrains.DeleteAll ();
@@ -223,7 +210,7 @@ void csSector::UseStaticTree (int mode, bool /*octree*/)
   for (i = 0 ; i < things.Length () ; i++)
   {
     csThing* th = (csThing*)things[i];
-    th->UpdateMove ();
+    th->GetMovable ().UpdateMove ();
   }
   
   CsPrintf (MSG_INITIALIZATION, "DONE!\n");
@@ -976,13 +963,18 @@ void csSector::Draw (csRenderView& rview)
     // just to make the code below easier.
     if (!use_object_queues)
     {
-      thing_queue = new csThing* [things.Length ()];
       num_thing_queue = 0;
-      for (i = 0 ; i < things.Length () ; i++)
+      if (things.Length ())
       {
-        csThing* th = (csThing*)things[i];
-        thing_queue[num_thing_queue++] = th;
+        thing_queue = new csThing* [things.Length ()];
+        for (i = 0 ; i < things.Length () ; i++)
+        {
+          csThing* th = (csThing*)things[i];
+          thing_queue[num_thing_queue++] = th;
+        }
       }
+      else
+        thing_queue = NULL;
     }
 
     // All csThings which are not merged with the static bsp still need to
@@ -1646,24 +1638,6 @@ csThing* csSector::GetSky (const char* name)
       return s;
   }
   return NULL;
-}
-
-void csSector::RemoveThing (csThing* thing)
-{
-  int idx = things.Find (thing);
-  if (idx == -1) return;
-  things[idx] = NULL;
-  things.Delete (idx);
-  delete thing;
-}
-
-void csSector::RemoveSky (csThing* thing)
-{
-  int idx = skies.Find (thing);
-  if (idx == -1) return;
-  skies[idx] = NULL;
-  skies.Delete (idx);
-  delete thing;
 }
 
 void csSector::ShineLights (csProgressPulse* pulse)

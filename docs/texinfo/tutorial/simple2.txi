@@ -60,7 +60,7 @@ bool Simple::Initialize(int argc, char const* const argv[],
   @dots{}
   txtmgr->SetPalette ();
 
-  // Load a texture for our sprite.
+  // Load a texture for our sprite and fetch the material.
   csTextureHandle* txt = csLoader::LoadTexture (world, "spark",
   	"/lib/std/spark.png");
   if (txt == NULL)
@@ -71,6 +71,10 @@ bool Simple::Initialize(int argc, char const* const argv[],
   @}
   txt->Register (txtmgr);
   txtmgr->PrepareTexture (txt->GetTextureHandle ());
+
+  csMaterialWrapper* mat = world->GetMaterials ()->FindByName ("spark");
+  mat->Register (txtmgr);
+  txtmgr->PrepareMaterial (mat->GetMaterialHandle ());
 @}
 @end example
 
@@ -93,6 +97,10 @@ it to the internal format used by the 3D rasterizer. If you plan to
 dynamically add a lot of textures in one step then you should call
 @code{Register()} once for every texture and then do
 @code{txtmgr->PrepareTextures()} instead. This will be more efficient.
+
+After the texture has been created we still have to create and register
+a material. The engine works with materials. The material in this case
+is simply a wrapper on top of the texture.
 
 @node Simple Loading Sprite Template, Simple Creating Sprite, Simple Loading Texture, Tutorial Simple 2
 @subsection Loading a Sprite Template in Memory
@@ -150,10 +158,11 @@ bool Simple::Initialize (int argc, const char* const argv[],
   csSprite3D* sprite = spritetmpl->NewSprite (world);
   sprite->SetName ("MySprite");
   world->sprites.Push (sprite);
-  sprite->MoveToSector (room);
+  sprite->GetMovable ().SetSector (room);
   csMatrix3 m; m.Identity (); m *= 5.;
-  sprite->SetTransform (m);
-  sprite->SetPosition (csVector3 (-3, 5, 3));
+  sprite->GetMovable ().SetTransform (m);
+  sprite->GetMovable ().SetPosition (csVector3 (-3, 5, 3));
+  sprite->GetMovable ().UpdateMove ();
   sprite->SetAction ("default");
   sprite->InitSprite ();
 
@@ -168,18 +177,22 @@ game logic you sometimes might want to refer to objects by their name.
 
 The @code{world->sprites.Push (sprite)} line is important. It registers
 the sprite with the world. If you don't do this then CS will not know
-about this sprite. The @code{sprite->MoveToSector (room)} is equally
+about this sprite. The @code{sprite->GetMovable ().SetSector (room)} is equally
 important as it actually places the sprite in a sector (our room).
-@code{MoveToSector()} is a conveniance function to quickly position a
+@code{SetSector()} is a conveniance function to quickly position a
 sprite in some sector. In reality it is possible for a sprite to be
 in multiple sectors at the same time (i.e. when it crosses a portal).
 There is some support for this in CS at the moment but not very much.
 
+Moving sprites (and things) is done through the @code{csMovable} class
+of which you can get an instance by doing @code{sprite->GetMovable()}.
 The lines @code{SetTransform} and @code{SetPosition} setup a transformation
 matrix and vector to correctly place the sprite in the room. In this
 particular case we use the identity matrix as a transform and scale it
 with five to make the sprite five times bigger. Then we place the
-sprite at position -3,5,3 in world coordinates.
+sprite at position -3,5,3 in world coordinates. After doing movement
+(either updating the sectors or the position) you MUST call
+@code{csMovable::UpdateMove()} to change internal data structures.
 
 The @code{SetAction} will set the action for the sprite. An action is
 a set of frames and controls animation. In our simple example the sprite

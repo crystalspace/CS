@@ -83,14 +83,13 @@ struct iGraphics3D;
  */
 class csThing : public csPolygonSet
 {
-private:
-  /// Position in the world.
-  csMovable movable;
+  friend class csMovable;
 
+private:
   /// If convex, this holds the index to the center vertex.
   int center_idx;
 
-  /// Pointer to the Thing Template which it derived from
+  /// Pointer to the Thing Template which it derived from.
   csThingTemplate* ParentTemplate;
 
   /**
@@ -108,10 +107,32 @@ private:
   /// If true this thing is visible.
   bool is_visible;
 
+  /// If true this thing is a 'sky' object.
+  bool is_sky;
+
   /**
    * Update this thing in the polygon trees.
    */
   void UpdateInPolygonTrees ();
+
+  /// Position in the world.
+  csMovable movable;
+
+protected:
+  /// Move this thing to the specified sector. Can be called multiple times.
+  virtual void MoveToSector (csSector* s);
+
+  /// Remove this thing from all sectors it is in (but not from the world).
+  virtual void RemoveFromSectors ();
+
+  /**
+   * Update transformations after the thing has moved
+   * (through updating the movable instance).
+   * This MUST be done after you change the movable otherwise
+   * some of the internal data structures will not be updated
+   * correctly. This function is called by movable.UpdateMove().
+   */
+  virtual void UpdateMove ();
 
 public:
   /// Set of flags
@@ -121,28 +142,19 @@ public:
   /**
    * Create an empty thing.
    */
-  csThing (csWorld* world);
+  csThing (csWorld* world, bool is_sky = false);
 
   /// Destructor.
   virtual ~csThing ();
 
   /**
    * Get the movable instance for this thing.
-   * It is very important to call UpdateMove()
+   * It is very important to call GetMovable().UpdateMove()
    * after doing any kind of modification to this movable
    * to make sure that internal data structures are
    * correctly updated.
    */
   csMovable& GetMovable () { return movable; }
-
-  /**
-   * Update transformations after the thing has moved
-   * (through updating the movable instance).
-   * This MUST be done after you change the movable otherwise
-   * some of the internal data structures will not be updated
-   * correctly.
-   */
-  void UpdateMove ();
 
   /**
    * Set convexity flag of this thing. You should call this instead

@@ -130,7 +130,7 @@ void add_particles_rain (csSector* sector, char* matname, int num, float speed)
   	  mat, CS_FX_ADD, false, .3/50., .3,
 	  bbox.Min (), bbox.Max (),
 	  csVector3 (0, -speed, 0));
-    exp->MoveToSector (sector);
+    exp->GetMovable ().SetSector (sector);
     exp->SetColor (csColor (.25,.25,.25));
   }
 }
@@ -189,7 +189,7 @@ void add_particles_snow (csSector* sector, char* matname, int num, float speed)
   	  mat, CS_FX_ADD, false, .07, .07,
 	  bbox.Min (), bbox.Max (),
 	  csVector3 (0, -speed, 0), .2);
-    exp->MoveToSector (sector);
+    exp->GetMovable ().SetSector (sector);
     exp->SetColor (csColor (.25,.25,.25));
   }
 }
@@ -214,7 +214,7 @@ void add_particles_fire (csSector* sector, char* matname, int num,
      CS_FX_ADD, false, 0.1, 0.1,
      3.0, csVector3(0,0.5,0), origin,
      0.3, 0.40);
-  exp->MoveToSector (sector);
+  exp->GetMovable ().SetSector (sector);
 }
 
 //===========================================================================
@@ -238,7 +238,7 @@ void add_particles_fountain (csSector* sector, char* matname, int num,
       origin, csVector3(0, -1.0, 0), 5.0,
       3.0, 0.2,
       0.0, 3.1415926/2.);
-  exp->MoveToSector (sector);
+  exp->GetMovable ().SetSector (sector);
   exp->SetChangeRotation(7.5);
   //exp->SetColor (csColor (.25,.25,.25));
   exp->SetColor (csColor (.25,.35,.55));
@@ -261,7 +261,7 @@ void add_particles_explosion (csSector* sector, const csVector3& center, char* m
   csParSysExplosion* exp = new csParSysExplosion (
   	Sys->view->GetWorld (), 100,
   	center, csVector3 (0, 0, 0), mat, 6, 0.15, true, .6, 2., 2.);
-  exp->MoveToSector (sector);
+  exp->GetMovable ().SetSector (sector);
   exp->SetSelfDestruct (3000);
   exp->SetMixmode (CS_FX_SETALPHA (0.50));
   exp->SetChangeRotation(5.0);
@@ -289,7 +289,7 @@ void add_particles_spiral (csSector* sector, const csVector3& bottom, char* matn
   csSpiralParticleSystem* exp = new csSpiralParticleSystem (
   	Sys->view->GetWorld (), 500,
   	bottom, mat);
-  exp->MoveToSector (sector);
+  exp->GetMovable ().SetSector (sector);
   //exp->SetSelfDestruct (3000);
   exp->SetMixmode (CS_FX_SETALPHA (0.50));
   //exp->SetChangeRotation(5.0);
@@ -741,7 +741,7 @@ void move_ghost (csSprite3D* spr)
     test = csReversibleTransform (csMatrix3 (), pos);
     bool mirror = true;
     first_sector = first_sector->FollowSegment (test, new_pos, mirror);
-    spr->MoveToSector (first_sector);
+    spr->GetMovable ().SetSector (first_sector);
     spr->GetMovable ().SetPosition (new_pos);
   }
 
@@ -769,7 +769,7 @@ void move_ghost (csSprite3D* spr)
     csMatrix3 m = csYRotMatrix3 (gh_info->dir*.01);
     spr->GetMovable ().Transform (m);
   }
-  spr->UpdateMove ();
+  spr->GetMovable ().UpdateMove ();
 }
 
 //===========================================================================
@@ -800,12 +800,12 @@ void add_bot (float size, csSector* where, csVector3 const& pos,
   bot = new Bot (tmpl, Sys->view->GetWorld());
   bot->SetName ("bot");
   Sys->view->GetWorld ()->sprites.Push (bot);
-  bot->MoveToSector (where);
+  bot->GetMovable ().SetSector (where);
   csMatrix3 m; m.Identity (); m = m * size;
   bot->GetMovable ().SetTransform (m);
   bot->set_bot_move (pos);
   bot->set_bot_sector (where);
-  bot->UpdateMove ();
+  bot->GetMovable ().UpdateMove ();
   bot->SetAction ("default");
   bot->InitSprite ();
   bot->next = first_bot;
@@ -902,7 +902,7 @@ void HandleDynLight (csDynLight* dyn)
 	      for (i = 0 ; i < 40 ; i++)
             add_bot (1, dyn->GetSector (), dyn->GetCenter (), 0);
 	  }
-	  ms->sprite->RemoveFromSectors ();
+	  ms->sprite->GetMovable ().ClearSectors ();
 	  Sys->view->GetWorld ()->RemoveSprite (ms->sprite);
 	}
         dyn->ObjRemove(dyn->GetChild (csDataObject::Type));
@@ -1013,13 +1013,13 @@ void fire_missile ()
     csSprite3D* sp = tmpl->NewSprite (Sys->view->GetWorld ());
     sp->SetName ("missile");
     Sys->view->GetWorld ()->sprites.Push (sp);
-    sp->MoveToSector (Sys->view->GetCamera ()->GetSector ());
+    sp->GetMovable ().SetSector (Sys->view->GetCamera ()->GetSector ());
     ms->sprite = sp;
     sp->GetMovable ().SetPosition (pos);
     csMatrix3 m = ms->dir.GetT2O ();
     sp->GetMovable ().SetTransform (m);
     move_sprite (sp, Sys->view->GetCamera ()->GetSector (), pos);
-    sp->UpdateMove ();
+    sp->GetMovable ().UpdateMove ();
   } 
 }
 
