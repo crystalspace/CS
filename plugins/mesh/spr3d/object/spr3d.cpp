@@ -623,7 +623,7 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
 
 csSprite3DMeshObject::~csSprite3DMeshObject ()
 {
-  if (!vis_cb) vis_cb->DecRef ();
+  if (vis_cb) vis_cb->DecRef ();
   uv_verts.DecRef ();
   tr_verts.DecRef ();
   fog_verts.DecRef ();
