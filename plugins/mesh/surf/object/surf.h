@@ -27,12 +27,12 @@
 #include "ivideo/graph3d.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "ivideo/vbufmgr.h"
 
 #define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING)
 
 struct iMaterialWrapper;
 struct iObjectRegistry;
-struct iVertexBuffer;
 class csSurfMeshObjectFactory;
 
 /**
@@ -58,6 +58,7 @@ private:
   csColor* surf_colors;
   int num_surf_vertices;
   iVertexBuffer* vbuf;
+  iVertexBufferManager* vbufmgr;
   G3DTriangleMesh mesh;
 
   bool initialized;
@@ -90,6 +91,17 @@ private:
   void RecalcObjectBBox ();
   /// Recalculate the surface normal.
   void RecalcSurfaceNormal ();
+
+  /// retrieve a vertexbuffer from the manager if not done already
+  void SetupVertexBuffer ();
+
+  /// interface to receive state of vertexbuffermanager
+  struct eiVertexBufferManagerClient : public iVertexBufferManagerClient
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csSurfMeshObject);
+    virtual void ManagerClosing ();
+  }scfiVertexBufferManagerClient;
+  friend struct eiVertexBufferManagerClient;
 
 public:
   /// Constructor.

@@ -29,13 +29,13 @@
 #include "imesh/metaball.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "ivideo/vbufmgr.h"
 
 #define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING|CS_OBJECT_FEATURE_ANIMATION)
 
 class csMaterialHandle;
 struct G3DTriangleMesh;
 struct iObjectRegistry;
-struct iVertexBuffer;
 struct iGraphics3D;
 struct iGraphics2D;
 struct iMaterialWrapper;
@@ -61,6 +61,7 @@ class csMetaBall : public iMeshObject
   iMaterialWrapper *th;
 
   iVertexBuffer* vbuf;
+  iVertexBufferManager* vbufmgr;
   csVector3* mesh_vertices;
   csVector2* mesh_texels;
   csColor* mesh_colors;
@@ -83,6 +84,17 @@ class csMetaBall : public iMeshObject
   csVector3 rad;
   float current_lod;
   uint32 current_features;
+
+  /// retrieve a vertexbuffer from the manager if not done already
+  void SetupVertexBuffer ();
+
+  /// interface to receive state of vertexbuffermanager
+  struct eiVertexBufferManagerClient : public iVertexBufferManagerClient
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csMetaBall);
+    virtual void ManagerClosing ();
+  }scfiVertexBufferManagerClient;
+  friend struct eiVertexBufferManagerClient;
 
 public:
   SCF_DECLARE_IBASE;

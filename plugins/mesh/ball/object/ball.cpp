@@ -40,16 +40,23 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_IBASE (csBallMeshObject)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iBallState)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVertexBufferManagerClient)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csBallMeshObject::BallState)
   SCF_IMPLEMENTS_INTERFACE (iBallState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+SCF_IMPLEMENT_EMBEDDED_IBASE (csBallMeshObject::eiVertexBufferManagerClient)
+  SCF_IMPLEMENTS_INTERFACE (iVertexBufferManagerClient)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+
 csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiBallState);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
   csBallMeshObject::factory = factory;
   initialized = false;
   cur_cameranr = -1;
@@ -78,11 +85,13 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   current_lod = 1;
   current_features = ALL_FEATURES;
   vbuf = NULL;
+  vbufmgr = NULL;
 }
 
 csBallMeshObject::~csBallMeshObject ()
 {
   if (vis_cb) vis_cb->DecRef ();
+  if (vbufmgr) vbufmgr->RemoveClient (&scfiVertexBufferManagerClient);
   if (vbuf) vbuf->DecRef ();
   delete[] top_normals;
   delete[] ball_vertices;
@@ -417,14 +426,7 @@ void csBallMeshObject::SetupObject ()
   if (!initialized)
   {
     initialized = true;
-    if (!vbuf)
-    {
-      iObjectRegistry* object_reg = ((csBallMeshObjectFactory*)factory)
-      	->object_reg;
-      iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-      // @@@ priority should be a parameter.
-      vbuf = g3d->GetVertexBufferManager ()->CreateBuffer (0);
-    }
+    SetupVertexBuffer ();
     delete[] top_normals;
     delete[] ball_vertices;
     delete[] ball_colors;
@@ -433,7 +435,6 @@ void csBallMeshObject::SetupObject ()
     delete[] top_mesh.vertex_fog;
     top_normals = NULL;
     ball_vertices = NULL;
-    top_mesh.buffers[0] = vbuf;
     ball_colors = NULL;
     ball_texels = NULL;
     top_mesh.triangles = NULL;
@@ -450,6 +451,21 @@ void csBallMeshObject::SetupObject ()
     top_mesh.do_morph_colors = false;
     top_mesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
   }
+}
+
+void csBallMeshObject::SetupVertexBuffer ()
+{
+ if (!vbuf)
+ {
+   iObjectRegistry* object_reg = ((csBallMeshObjectFactory*)factory)
+     ->object_reg;
+   iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+   // @@@ priority should be a parameter.
+   vbufmgr = g3d->GetVertexBufferManager ();
+   vbuf = vbufmgr->CreateBuffer (0);
+   vbufmgr->AddClient (&scfiVertexBufferManagerClient);
+   top_mesh.buffers[0] = vbuf;
+ }
 }
 
 bool csBallMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
@@ -575,16 +591,17 @@ bool csBallMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   // Prepare for rendering.
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);
 
+  SetupVertexBuffer ();
   material->Visit ();
   top_mesh.mat_handle = mat;
   top_mesh.use_vertex_color = true;
   top_mesh.mixmode = MixMode | CS_FX_GOURAUD;
   CS_ASSERT (!vbuf->IsLocked ());
-  g3d->GetVertexBufferManager ()->LockBuffer (vbuf,
+  vbufmgr->LockBuffer (vbuf,
   	ball_vertices, ball_texels, ball_colors, num_ball_vertices, 0);
   rview->CalculateFogMesh (g3d->GetObjectToCamera (), top_mesh);
   g3d->DrawTriangleMesh (top_mesh);
-  g3d->GetVertexBufferManager ()->UnlockBuffer (vbuf);
+  vbufmgr->UnlockBuffer (vbuf);
 
   return true;
 }
@@ -659,6 +676,16 @@ bool csBallMeshObject::HitBeamObject(const csVector3& start,
   if (dist == tot_dist)
       return false;
   return true;
+}
+
+void csBallMeshObject::eiVertexBufferManagerClient::ManagerClosing ()
+{
+  if (scfParent->vbuf)
+  {
+    scfParent->vbuf->DecRef ();
+    scfParent->vbuf = NULL;
+    scfParent->vbufmgr = NULL;
+  }
 }
 
 

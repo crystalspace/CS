@@ -45,10 +45,15 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_IBASE (csMetaBall)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iMetaBallState)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVertexBufferManagerClient)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csMetaBall::MetaBallState)
   SCF_IMPLEMENTS_INTERFACE (iMetaBallState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csMetaBall::eiVertexBufferManagerClient)
+  SCF_IMPLEMENTS_INTERFACE (iVertexBufferManagerClient)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 #define MAP_RESOLUTION  256
@@ -58,6 +63,7 @@ csMetaBall::csMetaBall (iMeshObjectFactory *fact)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiMetaBallState);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
   th = NULL;
   alpha = frame = 0;
   meta_balls = NULL;
@@ -82,11 +88,13 @@ csMetaBall::csMetaBall (iMeshObjectFactory *fact)
   current_lod = 1;
   current_features = ALL_FEATURES;
   vbuf = NULL;
+  vbufmgr = NULL;
 }
 
 csMetaBall::~csMetaBall ()
 {
   if (vbuf) vbuf->DecRef ();
+  if (vbufmgr) vbufmgr->RemoveClient (&scfiVertexBufferManagerClient);
   if (vis_cb) vis_cb->DecRef ();
   delete [] meta_balls;
   delete [] mesh.triangles;
@@ -127,13 +135,7 @@ bool csMetaBall::Initialize (iObjectRegistry* object_reg)
     initialize = true;
     meta_balls = new MetaBall[num_meta_balls];
     memset(&mesh,0,sizeof(G3DTriangleMesh));
-    if (!vbuf)
-    {
-      iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-      // @@@ priority should be a parameter.
-      vbuf = g3d->GetVertexBufferManager ()->CreateBuffer (0);
-    }
-    mesh.buffers[0] = vbuf;
+    SetupVertexBuffer ();
     mesh.num_vertices_pool = 1;
     mesh.triangles = new csTriangle[int(max_vertices/3)];
     mesh_vertices = new csVector3[max_vertices];
@@ -155,6 +157,19 @@ bool csMetaBall::Initialize (iObjectRegistry* object_reg)
     NextFrame(0);
   }
   return true;
+}
+
+void csMetaBall::SetupVertexBuffer ()
+{
+ if (!vbuf)
+ {
+   iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+   // @@@ priority should be a parameter.
+   vbufmgr = g3d->GetVertexBufferManager ();
+   vbuf = vbufmgr->CreateBuffer (0);
+   vbufmgr->AddClient (&scfiVertexBufferManagerClient);
+   mesh.buffers[0] = vbuf;
+ }
 }
 
 void csMetaBall::SetMetaBallCount (int number)
@@ -495,8 +510,8 @@ bool csMetaBall::Draw( iRenderView* rview, iMovable* /* movable */,
 
   if (vis_cb) if (!vis_cb->BeforeDrawing ( this, rview )) return false;
   iGraphics3D* G3D = rview->GetGraphics3D();
-  iVertexBufferManager* vbufmgr = G3D->GetVertexBufferManager ();
   G3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);
+  SetupVertexBuffer ();
   mesh.mixmode = MixMode | CS_FX_GOURAUD;
   CS_ASSERT (!vbuf->IsLocked ());
   vbufmgr->LockBuffer (vbuf, mesh_vertices, mesh_texels,
@@ -505,6 +520,16 @@ bool csMetaBall::Draw( iRenderView* rview, iMovable* /* movable */,
   G3D->DrawTriangleMesh(mesh);
   vbufmgr->UnlockBuffer (vbuf);
   return true;
+}
+
+void csMetaBall::eiVertexBufferManagerClient::ManagerClosing ()
+{
+  if (scfParent->vbuf)
+  {
+    scfParent->vbuf->DecRef ();
+    scfParent->vbuf = NULL;
+    scfParent->vbufmgr = NULL;
+  }
 }
 
 SCF_IMPLEMENT_IBASE(csMetaBallFactory)

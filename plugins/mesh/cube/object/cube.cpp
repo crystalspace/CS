@@ -37,11 +37,17 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csCubeMeshObject)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVertexBufferManagerClient)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csCubeMeshObject::eiVertexBufferManagerClient)
+  SCF_IMPLEMENTS_INTERFACE (iVertexBufferManagerClient)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csCubeMeshObject::csCubeMeshObject (csCubeMeshObjectFactory* factory)
 {
   SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
   csCubeMeshObject::factory = factory;
   ifactory = SCF_QUERY_INTERFACE (factory, iMeshObjectFactory);
   initialized = false;
@@ -63,11 +69,13 @@ csCubeMeshObject::csCubeMeshObject (csCubeMeshObjectFactory* factory)
   current_lod = 1;
   current_features = ALL_FEATURES;
   vbuf = NULL;
+  vbufmgr = NULL;
 }
 
 csCubeMeshObject::~csCubeMeshObject ()
 {
   if (vis_cb) vis_cb->DecRef ();
+  if (vbufmgr) vbufmgr->RemoveClient (&scfiVertexBufferManagerClient);
   if (vbuf) vbuf->DecRef ();
   if (ifactory) ifactory->DecRef ();
 }
@@ -194,15 +202,7 @@ void csCubeMeshObject::SetupObject ()
     triangles[9].a = 6; triangles[9].b = 3; triangles[9].c = 2;
     triangles[10].a = 0; triangles[10].b = 1; triangles[10].c = 4;
     triangles[11].a = 1; triangles[11].b = 5; triangles[11].c = 4;
-    if (!vbuf)
-    {
-      iObjectRegistry* object_reg = ((csCubeMeshObjectFactory*)factory)
-      	->object_reg;
-      iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-      // @@@ priority should be a parameter.
-      vbuf = g3d->GetVertexBufferManager ()->CreateBuffer (0);
-    }
-    mesh.buffers[0] = vbuf;
+    SetupVertexBuffer ();
     mesh.morph_factor = 0;
     mesh.num_vertices_pool = 1;
     mesh.num_triangles = 12;
@@ -349,7 +349,7 @@ bool csCubeMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
 
   iGraphics3D* g3d = rview->GetGraphics3D ();
-  iVertexBufferManager* vbufmgr = g3d->GetVertexBufferManager ();
+  SetupVertexBuffer ();
 
   // Prepare for rendering.
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);
@@ -396,6 +396,30 @@ bool csCubeMeshObject::HitBeamObject(const csVector3& start,
   	false : true;
 }
 
+void csCubeMeshObject::SetupVertexBuffer ()
+{
+ if (!vbuf)
+ {
+   iObjectRegistry* object_reg = ((csCubeMeshObjectFactory*)factory)
+     ->object_reg;
+   iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+   // @@@ priority should be a parameter.
+   vbufmgr = g3d->GetVertexBufferManager ();
+   vbuf = vbufmgr->CreateBuffer (0);
+   vbufmgr->AddClient (&scfiVertexBufferManagerClient);
+   mesh.buffers[0] = vbuf;
+ }
+}
+
+void csCubeMeshObject::eiVertexBufferManagerClient::ManagerClosing ()
+{
+  if (scfParent->vbuf)
+  {
+    scfParent->vbuf->DecRef ();
+    scfParent->vbuf = NULL;
+    scfParent->vbufmgr = NULL;
+  }
+}
 
 //----------------------------------------------------------------------
 

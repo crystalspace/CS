@@ -27,11 +27,11 @@
 #include "imesh/terrfunc.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "ivideo/vbufmgr.h"
 
 struct iEngine;
 struct iMaterialWrapper;
 struct iObjectRegistry;
-struct iVertexBuffer;
 class csTerrainQuad;
 
 #define LOD_LEVELS 4
@@ -91,6 +91,7 @@ private:
   iObjectRegistry* object_reg;
   iMeshObjectFactory* pFactory;
   iMeshObjectDrawCallback* vis_cb;
+  iVertexBufferManager *vbufmgr;
   float current_lod;
   uint32 current_features;
   csColor base_color;
@@ -225,6 +226,18 @@ private:
    */
   bool BBoxVisible (const csBox3& bbox, iRenderView* rview, iCamera* camera,
 	int& clip_portal, int& clip_plane, int& clip_z_plane);
+
+  /// retrieve a vertexbuffer from the manager if not done already
+  void SetupVertexBuffer (iVertexBuffer *&vbuf1, iVertexBuffer *&vbuf2)
+
+  /// interface to receive state of vertexbuffermanager
+  struct eiVertexBufferManagerClient : public iVertexBufferManagerClient
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csTerrFuncObject);
+    virtual void ManagerClosing ();
+  }scfiVertexBufferManagerClient;
+  friend struct eiVertexBufferManagerClient;
+
 
 public:
   /// Constructor.

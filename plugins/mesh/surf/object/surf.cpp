@@ -40,16 +40,22 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_IBASE (csSurfMeshObject)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSurfaceState)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVertexBufferManagerClient)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSurfMeshObject::SurfaceState)
   SCF_IMPLEMENTS_INTERFACE (iSurfaceState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSurfMeshObject::eiVertexBufferManagerClient)
+  SCF_IMPLEMENTS_INTERFACE (iVertexBufferManagerClient)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
 csSurfMeshObject::csSurfMeshObject (iMeshObjectFactory* factory)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSurfaceState);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
   csSurfMeshObject::factory = factory;
   initialized = false;
   cur_cameranr = -1;
@@ -74,11 +80,13 @@ csSurfMeshObject::csSurfMeshObject (iMeshObjectFactory* factory)
   current_lod = 1;
   current_features = ALL_FEATURES;
   vbuf = NULL;
+  vbufmgr = NULL;
 }
 
 csSurfMeshObject::~csSurfMeshObject ()
 {
   if (vis_cb) vis_cb->DecRef ();
+  if (vbufmgr) vbufmgr->RemoveClient (&scfiVertexBufferManagerClient);
   if (vbuf) vbuf->DecRef ();
   delete[] surf_vertices;
   delete[] surf_colors;
@@ -241,14 +249,7 @@ void csSurfMeshObject::SetupObject ()
   if (!initialized)
   {
     initialized = true;
-    if (!vbuf)
-    {
-      iObjectRegistry* object_reg = ((csSurfMeshObjectFactory*)factory)
-      	->object_reg;
-      iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-      // @@@ priority should be a parameter
-      vbuf = g3d->GetVertexBufferManager ()->CreateBuffer (0);
-    }
+    SetupVertexBuffer ();
     delete[] surf_vertices;
     delete[] surf_colors;
     delete[] surf_texels;
@@ -268,10 +269,25 @@ void csSurfMeshObject::SetupObject ()
     mesh.do_morph_texels = false;
     mesh.do_morph_colors = false;
     mesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
-    mesh.buffers[0] = vbuf;
 
   }
 }
+
+void csSurfMeshObject::SetupVertexBuffer ()
+{
+ if (!vbuf)
+ {
+   iObjectRegistry* object_reg = ((csSurfMeshObjectFactory*)factory)
+     ->object_reg;
+   iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+   // @@@ priority should be a parameter.
+   vbufmgr = g3d->GetVertexBufferManager ();
+   vbuf = vbufmgr->CreateBuffer (0);
+   vbufmgr->AddClient (&scfiVertexBufferManagerClient);
+   mesh.buffers[0] = vbuf;
+ }
+}
+
 
 bool csSurfMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 {
@@ -395,8 +411,7 @@ bool csSurfMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
 
   iGraphics3D* g3d = rview->GetGraphics3D ();
-  iVertexBufferManager* vbufmgr = g3d->GetVertexBufferManager ();
-
+  SetupVertexBuffer ();
   // Prepare for rendering.
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);
 
@@ -452,6 +467,16 @@ bool csSurfMeshObject::HitBeamObject(const csVector3& start,
       return true;
     }
   return false;
+}
+
+void csSurfMeshObject::eiVertexBufferManagerClient::ManagerClosing ()
+{
+  if (scfParent->vbuf)
+  {
+    scfParent->vbuf->DecRef ();
+    scfParent->vbuf = NULL;
+    scfParent->vbufmgr = NULL;
+  }
 }
 
 

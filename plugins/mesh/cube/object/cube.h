@@ -28,10 +28,10 @@
 #include "iutil/config.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "ivideo/vbufmgr.h"
 
 struct iMaterialWrapper;
 struct iObjectRegistry;
-struct iVertexBuffer;
 class csCubeMeshObjectFactory;
 
 #define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING)
@@ -52,6 +52,7 @@ private:
   G3DFogInfo fog[8];
   G3DTriangleMesh mesh;
   iVertexBuffer* vbuf;
+  iVertexBufferManager* vbufmgr;
   bool initialized;
   csBox3 object_bbox;
   iMeshObjectDrawCallback* vis_cb;
@@ -78,6 +79,17 @@ private:
    * Setup this object. This function will check if setup is needed.
    */
   void SetupObject ();
+
+  /// retrieve a vertexbuffer from the manager if not done already
+  void SetupVertexBuffer ();
+
+  /// interface to receive state of vertexbuffermanager
+  struct eiVertexBufferManagerClient : public iVertexBufferManagerClient
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csCubeMeshObject);
+    virtual void ManagerClosing ();
+  }scfiVertexBufferManagerClient;
+  friend struct eiVertexBufferManagerClient;
 
 public:
   /// Constructor.

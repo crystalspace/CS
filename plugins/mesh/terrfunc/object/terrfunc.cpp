@@ -46,10 +46,15 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_IBASE (csTerrFuncObject)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iTerrFuncState)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVertexBufferManagerClient)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csTerrFuncObject::TerrFuncState)
   SCF_IMPLEMENTS_INTERFACE (iTerrFuncState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csTerrFuncObject::eiVertexBufferManagerClient)
+  SCF_IMPLEMENTS_INTERFACE (iVertexBufferManagerClient)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 //------------------------------------------------------------------------
@@ -171,6 +176,7 @@ csTerrFuncObject::csTerrFuncObject (iObjectRegistry* object_reg,
 {
   SCF_CONSTRUCT_IBASE (NULL)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTerrFuncState);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
   csTerrFuncObject::object_reg = object_reg;
   csTerrFuncObject::pFactory = pFactory;
   initialized = false;
@@ -205,10 +211,12 @@ csTerrFuncObject::csTerrFuncObject (iObjectRegistry* object_reg,
   vis_cb = NULL;
   current_lod = 1;
   current_features = ALL_FEATURES;
+  vbufmgr = NULL;
 }
 
 csTerrFuncObject::~csTerrFuncObject ()
 {
+  if (vbufmgr) vbufmgr->RemoveClient (&scfiVertexBufferManagerClient);
   delete[] blocks;
   if (vis_cb) vis_cb->DecRef ();
   if (height_func) height_func->DecRef ();
@@ -1182,18 +1190,9 @@ void csTerrFuncObject::SetupObject ()
 	  int blidx = by*blockxy+bx;
 	  csTerrBlock& block = blocks[blidx];
 	  block.dirlight_numbers[lod] = -1;
-	  if (!block.vbuf[lod])
-	  {
-	    iObjectRegistry* object_reg = ((csTerrFuncObjectFactory*)pFactory)
-	    	->object_reg;
-	    iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-	    // @@@ priority should be a parameter.
-	    block.vbuf[lod] = g3d->GetVertexBufferManager ()
-	    	->CreateBuffer (1);
-	  }
+	  SetupVertexBuffer (block.vbuf[lod], block.mesh[lod].buffers[0]);
 	  InitMesh (block.mesh[lod], block.mesh_vertices[lod],
 	  	block.mesh_texels[lod], block.mesh_colors[lod]);
-	  block.mesh[lod].buffers[0] = block.vbuf[lod];
 	  if (lod == 0)
 	    SetupBaseMesh (block.mesh[lod],
 	    	block.mesh_vertices[lod],
@@ -1227,6 +1226,26 @@ void csTerrFuncObject::SetupObject ()
     SetupVisibilityTree ();
   }
 }
+
+void csSurfMeshObject::SetupVertexBuffer (iVertexBuffer *&vbuf1, 
+					  iVertexBuffer *&vbuf2)
+{
+ if (!vbuf1)
+ {
+   if (!vbufmgr)
+   {
+     iObjectRegistry* object_reg = ((csTerrFuncObjectFactory*)pFactory)
+       ->object_reg;
+     iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+     // @@@ priority should be a parameter.
+     vbufmgr = g3d->GetVertexBufferManager ();
+     vbufmgr->AddClient (&scfiVertexBufferManagerClient);
+   }
+   vbuf1 = vbufmgr->CreateBuffer (1);
+   vbuf2 = vbuf1;
+ }
+}
+
 
 void csTerrFuncObject::RecomputeShadowMap ()
 {
@@ -1354,7 +1373,6 @@ bool csTerrFuncObject::Draw (iRenderView* rview, iMovable* /*movable*/,
     TestVisibility (rview);
 
   iGraphics3D* pG3D = rview->GetGraphics3D ();
-  iVertexBufferManager* vbufmgr = pG3D->GetVertexBufferManager ();
   iCamera* pCamera = rview->GetCamera ();
 
   csReversibleTransform& camtrans = pCamera->GetTransform ();
@@ -1393,6 +1411,7 @@ bool csTerrFuncObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 	m->clip_portal = clip_portal;
 	m->clip_plane = clip_plane;
 	m->clip_z_plane = clip_z_plane;
+	SetupVertexBuffer (block.vbuf[lod], block.vbuf[lod]);
 	CS_ASSERT (block.vbuf[lod]);
 	CS_ASSERT (!block.vbuf[lod]->IsLocked ());
 	CS_ASSERT (block.mesh_vertices[lod] != NULL);
@@ -1579,6 +1598,25 @@ bool csTerrFuncObject::HitBeamObject (const csVector3& start,
       return false;
   return true;
 }
+
+void csTerrFuncObject::eiVertexBufferManagerClient::ManagerClosing ()
+{
+  if (scfParent->vbufmgr)
+  {
+    int n = scfParent->blockxy * scfParent->blockxy;
+    for (int i = 0 ; i < n; i++)
+    {
+      csTerrBlock& block = scfParent->blocks[i];
+      for (int lod = 0; lod < 4; lod++)
+      {
+	block.vbuf[lod]->DecRef ();
+	block.vbuf[lod] = NULL;
+      }
+    }
+    scfParent->vbufmgr = NULL;
+  }
+}
+
 
 
 //----------------------------------------------------------------------

@@ -27,9 +27,9 @@
 #include "ivideo/graph3d.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "ivideo/vbufmgr.h"
 
 struct iMaterialWrapper;
-struct iVertexBuffer;
 struct iObjectRegistry;
 class csBallMeshObjectFactory;
 class csColor;
@@ -60,6 +60,7 @@ private:
 
   int verts_circle;
   iVertexBuffer* vbuf;
+  iVertexBufferManager* vbufmgr;
 
   G3DTriangleMesh top_mesh;
   csVector3* ball_vertices;
@@ -93,6 +94,17 @@ private:
   /// Generate a mesh with a sphere.
   void GenerateSphere (int num_circle, G3DTriangleMesh& mesh,
       	csVector3*& normals);
+
+  /// retrieve a vertexbuffer from the manager if not done already
+  void SetupVertexBuffer ();
+
+  /// interface to receive state of vertexbuffermanager
+  struct eiVertexBufferManagerClient : public iVertexBufferManagerClient
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csBallMeshObject);
+    virtual void ManagerClosing ();
+  }scfiVertexBufferManagerClient;
+  friend struct eiVertexBufferManagerClient;
 
 public:
   /// Constructor.
