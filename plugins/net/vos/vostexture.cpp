@@ -1,21 +1,22 @@
-/*  $Id$
+/* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+   $Id$
 
-    This file is part of Ter'Angreal, a 3D VR application
-    using VOS and CrystalSpace from interreality.org
+    This file is part of Crystal Space Virtual Object System Abstract
+    3D Layer plugin (csvosa3dl).
 
-    Copyright (C) 2002 Peter Amstutz
+    Copyright (C) 2004 Peter Amstutz
 
     This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
+    it under the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
     (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
+    This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    GNU Lesser General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
+    You should have received a copy of the GNU Lesser General Public License
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
@@ -67,23 +68,27 @@ void ConstructTextureTask::doTask()
     csRef<iLoader> loader = CS_QUERY_REGISTRY (object_reg, iLoader);
     csRef<iVFS> VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
 
-    if(! loader) {
+    if(! loader)
+    {
         LOG("ConstructTextureTask", 1, "Error: Could not get the iLoader plugin from object registry!");
         return;
     }
-    if(!txtmgr)  {
+    if(!txtmgr)
+    {
         LOG("ConstructTextureTask", 1, "No texture manager");
         return;
     }
 
-    if(! VFS->WriteFile (cachefilename.c_str(), texturedata.c_str(), texturedata.size()) ) {
+    if(! VFS->WriteFile (cachefilename.c_str(), texturedata.c_str(), texturedata.size()) )
+    {
         LOG("ConstructTextureTask", 1, "Error writing " << cachefilename << "!");
         return;
     }
 
     csRef<iTextureWrapper> texture = loader->LoadTexture (texturename.c_str(), cachefilename.c_str());
 
-    if(!texture) {
+    if(!texture)
+    {
         LOG("ConstructTextureTask", 1, "Error: could not load texture from cache file \"" << cachefilename << "\"!");
         return;
     }
@@ -111,14 +116,15 @@ void csMetaTexture::setup(csVosA3DL* vosa3dl)
     char cachefilename[256];
     vRef<Site> site = imagedata->getSite();
     /*snprintf(cachefilename, sizeof(cachefilename), "/csvosa3dl_cache/%s/%s",
-             site->getURL().getHost().c_str(),
-             imagedata->getSiteName().c_str());*/
+      site->getURL().getHost().c_str(),
+      imagedata->getSiteName().c_str());*/
     snprintf(cachefilename, sizeof(cachefilename), "/tmp/%s_%s",
              site->getURL().getHost().c_str(),
              imagedata->getSiteName().c_str());
 
     // VFS uses ':' as a seperator
-    for (int i=0; cachefilename[i]; i++) {
+    for (int i=0; cachefilename[i]; i++)
+    {
         if ((cachefilename[i] == ':'))
             cachefilename[i] = '_';
     }
@@ -141,7 +147,8 @@ void csMetaTexture::setup(csVosA3DL* vosa3dl)
 
         g3d->SetRenderTarget (texture->GetTextureHandle(), false);
 
-        if(g3d->BeginDraw (CSDRAW_2DGRAPHICS)) {
+        if(g3d->BeginDraw (CSDRAW_2DGRAPHICS))
+        {
             csRef<iFont> font = g3d->GetDriver2D()->GetFontServer()->LoadFont(CSFONT_LARGE);
             int fg = g3d->GetDriver2D()->FindRGB(255, 255, 255);
             int bg = g3d->GetDriver2D()->FindRGB(0, 0, 0);
@@ -163,22 +170,27 @@ void csMetaTexture::setup(csVosA3DL* vosa3dl)
         }
     } else
 #endif
-}
+        }
 
 void csMetaTexture::notifyPropertyChange(const PropertyEvent& event)
 {
-    try {
+    try
+    {
         vRef<ParentChildRelation> pcr = event.getProperty()->findParent(*this);
-        if(pcr->getContextualName() == "a3dl:image") {
+        if(pcr->getContextualName() == "a3dl:image")
+        {
             // XXX reload the image and stuff
         }
-    } catch(NoSuchObjectError) {
-    } catch(AccessControlError) {
-    } catch(RemoteError) { }
+    }
+    catch(NoSuchObjectError) { }
+    catch(AccessControlError) { }
+    catch(RemoteError) { }
 }
 
 csRef<iTextureWrapper> csMetaTexture::getTextureWrapper()
-{ return texturewrapper; }
+{
+    return texturewrapper;
+}
 
 void csMetaTexture::notifyChildInserted(VobjectEvent& event)
 {
