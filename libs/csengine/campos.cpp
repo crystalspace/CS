@@ -22,17 +22,23 @@
 #include "csgeom/matrix3.h"
 #include "csutil/util.h"
 
-IMPLEMENT_CSOBJTYPE (csCameraPosition,csObject);
+IMPLEMENT_IBASE (csCameraPosition)
+  IMPLEMENTS_INTERFACE (iCameraPosition)
+IMPLEMENT_IBASE_END
+
+IMPLEMENT_CSOBJTYPE (csCameraPosition,csPObject);
 
 csCameraPosition::csCameraPosition (const char *iName, const char *iSector,
   const csVector3 &iPosition, const csVector3 &iForward,
   const csVector3 &iUpward)
 {
+  CONSTRUCT_IBASE (NULL);
   SetName (iName);
   Sector = strnew (iSector);
   Position = iPosition;
   Forward = iForward;
   Upward = iUpward;
+  csEngine::current_engine->AddToCurrentRegion (this);
 }
 
 csCameraPosition::~csCameraPosition ()

@@ -35,11 +35,12 @@ struct iSprite;
 struct iSpriteTemplate;
 struct iMaterialWrapper;
 struct iTextureWrapper;
+struct iCameraPosition;
 struct iRegion;
 struct iView;
 struct iGraphics3D;
 
-SCF_VERSION (iEngine, 0, 1, 5);
+SCF_VERSION (iEngine, 0, 1, 6);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -179,6 +180,14 @@ struct iEngine : public iPlugIn
    * engine.
    */
   virtual iMaterialWrapper* FindMaterial (const char* iName, bool regionOnly = false) = 0;
+  /**
+   * Find a camera position by name. If regionOnly is true then the returned
+   * campos will belong to the current region. Note that this is different
+   * from calling iRegion::FindCameraPosition() because the latter will also
+   * return camera positions that belong in a region but are not connected
+   * to the engine.
+   */
+  virtual iCameraPosition* FindCameraPosition (const char* iName, bool regionOnly = false) = 0;
 
   /// Enable/disable the lighting cache.
   virtual void EnableLightingCache (bool do_cache) = 0;

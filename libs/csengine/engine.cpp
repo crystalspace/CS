@@ -2080,6 +2080,16 @@ iTextureWrapper* csEngine::FindTexture (const char* iName, bool regionOnly)
   return (iTextureWrapper*)wr;
 }
 
+iCameraPosition* csEngine::FindCameraPosition (const char* iName, bool regionOnly)
+{
+  csCameraPosition* wr;
+  if (regionOnly && region)
+    wr = (csCameraPosition*)FindObjectInRegion (region, camera_positions, iName);
+  else
+    wr = (csCameraPosition*)camera_positions.FindByName (iName);
+  return (iCameraPosition*)wr;
+}
+
 iView* csEngine::CreateView (iGraphics3D* g3d)
 {
   csView* view = new csView (this, g3d);

@@ -29,6 +29,7 @@
 #include "csgeom/frustum.h"
 #include "csengine/dumper.h"
 #include "csengine/campos.h"
+#include "csengine/region.h"
 #include "csengine/csview.h"
 #include "csengine/stats.h"
 #include "csengine/light.h"
@@ -1036,7 +1037,7 @@ void WalkTest::EndEngine ()
   delete view; view = NULL;
 }
 
-void WalkTest::InitEngine (csEngine* engine, csCamera* /*camera*/)
+void WalkTest::InitCollDet (csEngine* engine, csRegion* region)
 {
   Sys->Printf (MSG_INITIALIZATION, "Computing OBBs ...\n");
 
@@ -1046,6 +1047,7 @@ void WalkTest::InitEngine (csEngine* engine, csCamera* /*camera*/)
   {
     sn--;
     csSector* sp = (csSector*)engine->sectors[sn];
+    if (region && !region->IsInRegion (sp)) continue;
     // Initialize the sector itself.
     mesh = QUERY_INTERFACE (sp, iPolygonMesh);
     (void)new csCollider (*sp, collide_system, mesh);
@@ -1065,6 +1067,7 @@ void WalkTest::InitEngine (csEngine* engine, csCamera* /*camera*/)
   for (i = 0 ; i < engine->sprites.Length () ; i++)
   {
     csSprite* sp = (csSprite*)engine->sprites[i];
+    if (region && !region->IsInRegion (sp)) continue;
     if (sp->GetType () != csSprite3D::Type) continue;
     spp = (csSprite3D*)sp;
     mesh = QUERY_INTERFACE (spp, iPolygonMesh);
@@ -1365,7 +1368,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   }
 
   // Initialize collision detection system (even if disabled so that we can enable it later).
-  InitEngine (engine, view->GetCamera ());
+  InitCollDet (engine, NULL);
 
   // Create a wireframe object which will be used for debugging.
   wf = new csWireFrameCam (txtmgr);

@@ -33,7 +33,7 @@
 #include "ivfs.h"
 #include "ifontsrv.h"
 
-class Polygon3D;
+class csRegion;
 class WalkTest;
 class csView;
 class csEngine;
@@ -392,7 +392,7 @@ public:
   virtual void Help ();
 
   /// Inits all the collision detection stuff
-  virtual void InitEngine(csEngine* engine, csCamera* /*camera*/);
+  virtual void InitCollDet (csEngine* engine, csRegion* region);
 
   /// Destroys all the collision detection stuff
   virtual void EndEngine();

@@ -20,9 +20,11 @@
 #define __CS_CAMPOS_H__
 
 #include "csobject/csobject.h"
+#include "csobject/pobject.h"
 #include "csobject/nobjvec.h"
 #include "csgeom/vector3.h"
 #include "csengine/camera.h"
+#include "icampos.h"
 
 class csEngine;
 
@@ -33,7 +35,7 @@ class csEngine;
  * and so on. In the map file you can use CAMERA (...) keyword to
  * define such points.
  */
-class csCameraPosition : public csObject
+class csCameraPosition : public csPObject, public iCameraPosition
 {
 public:
   /// The sector this camera points to
@@ -44,8 +46,6 @@ public:
   csVector3 Forward;
   /// Camera orientation: upward vector
   csVector3 Upward;
-
-  CSOBJTYPE;
 
   /// Initialize the camera position object
   csCameraPosition (const char *iName, const char *iSector,
@@ -61,6 +61,9 @@ public:
 
   /// Load the camera position into a camera object
   bool Load (csCamera&, csEngine*);
+
+  CSOBJTYPE;
+  DECLARE_IBASE;
 };
 
 #endif // __CS_CAMPOS_H__

@@ -1,5 +1,57 @@
 The history order has been reversed so that new features are at the top.
 
+15-Dec-2000
+	- Bugfix in csPolygon3D::ClipToPlane(). If the portal has a clipping
+	  plane (can happen with floating portals) then it was possible that
+	  this clipper would result in badly formed polygons generating
+	  crashes or at least render errors in some cases. This problem
+	  was visible with the new 'portal' console command. Note that
+	  the problem is numerical. I'm not sure that my current fix will
+	  eliminate the problem completely but at least I wasn't able to
+	  reproduce it anymore.
+	- Fixed the portal command so that the created portal always
+	  faces the camera (at creation time only). The portal itself also
+	  has the correct space warping transformation so that it appears
+	  again at the starting point of the loaded world.
+	- Changed csCameraPosition so that it inherits from csPObject
+	  instead of csObject.
+	- Added iCameraPosition and let csCameraPosition inherit from this.
+	- Added iRegion/csRegion::FindCameraPosition().
+	- Added iEngine/csEngine::FindCameraPosition().
+	- csCameraPosition objects are now also supported by csRegion.
+	- The portal command now correctly uses the real start position of
+	  the loaded level (instead of just room,0,0,0) as given by the
+	  'START' command.
+	- The portal console command will now check if a region is already
+	  loaded. If so then it will just open a new portal to the already
+	  existing region.
+	- The portal command will now also generate a portal back to the
+	  world from which you created a portal. This only happens once though.
+	  i.e. if you do 'portal maze' then you will get a portal from the
+	  current position towards maze and a portal back from maze towards
+	  the current position. If you then move to another position and
+	  again do 'portal maze' you will only get a portal to maze and
+	  not one back.
+	- Renamed WalkTest::InitEngine() to InitCollDet() because that's
+	  what it is doing.
+	- If a new map file is loaded with the portal command the collision
+	  detection stuff will be correctly initialized.
+	- Moved the portal so that it is standing on the ground (relative
+	  to the position of the player).
+	- Known remaining issues with portal command:
+	    - If you move through the portal your direction will not be
+	      correct. This is caused by WalkTest having its own angle
+	      vector which is not yet updated when passing a space
+	      warping portal.
+	    - If you started WalkTest from flarge (for example) then
+	      typing 'portal flarge' will load a new instance. The reason
+	      is that the default world is not placed in a region so the
+	      portal command can't see that it is already loaded.
+	    - Missiles can't penetrate the portal.
+	    - Dynamic lights don't shine through the portal.
+	    - Sector-by-sector engine mode.
+	    - The WalkTest collision detection function to find all nearby
+	      sectors does not take warping transformation into account.
 14-Dec-2000
 	- Optimized csRegion::IsInRegion(). Replaced the loop over all
 	  the objects in the region with a single test if the parent

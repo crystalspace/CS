@@ -24,6 +24,7 @@
 #include "command.h"
 #include "csengine/dumper.h"
 #include "csengine/camera.h"
+#include "csengine/campos.h"
 #include "csengine/octree.h"
 #include "csengine/engine.h"
 #include "csengine/csview.h"
@@ -1075,59 +1076,62 @@ void light_statics ()
 
 //===========================================================================
 
-void OpenPortal (csView* view, char* lev)
+csThing* CreatePortalThing (const char* name, csSector* room,
+    	csMaterialWrapper* tm, csPolygon3D*& portalPoly)
 {
-  csSector* room = view->GetCamera ()->GetSector ();
-  csVector3 pos = view->GetCamera ()->Camera2World (csVector3 (0, 0, 1));
-  csMaterialWrapper* tm = Sys->engine->GetMaterials ()->FindByName ("spark");
   csThing* thing = new csThing (Sys->engine);
   Sys->engine->things.Push (thing);
-  thing->SetName ("portal");
+  thing->SetName (name);
   thing->GetMovable ().SetSector (room);
   float dx = 1, dy = 3, dz = .3;
 
-  csPolygon3D* portalPoly;
   csPolygon3D* p;
   p = thing->NewPolygon (tm);
-  p->AddVertex (-dx, -1, -dz);
-  p->AddVertex (dx, -1, -dz);
-  p->AddVertex (dx, -1, dz);
-  p->AddVertex (-dx, -1, dz);
+  p->flags.Reset (CS_POLY_COLLDET);
+  p->AddVertex (-dx, 0, -dz);
+  p->AddVertex (dx, 0, -dz);
+  p->AddVertex (dx, 0, dz);
+  p->AddVertex (-dx, 0, dz);
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
   p = thing->NewPolygon (tm);
-  p->AddVertex (-dx, dy-1, dz);
-  p->AddVertex (dx, dy-1, dz);
-  p->AddVertex (dx, dy-1, -dz);
-  p->AddVertex (-dx, dy-1, -dz);
+  p->flags.Reset (CS_POLY_COLLDET);
+  p->AddVertex (-dx, dy, dz);
+  p->AddVertex (dx, dy, dz);
+  p->AddVertex (dx, dy, -dz);
+  p->AddVertex (-dx, dy, -dz);
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
   p = thing->NewPolygon (tm);
-  p->AddVertex (-dx, -1, dz);
-  p->AddVertex (dx, -1, dz);
-  p->AddVertex (dx, dy-1, dz);
-  p->AddVertex (-dx, dy-1, dz);
+  p->flags.Reset (CS_POLY_COLLDET);
+  p->AddVertex (-dx, 0, dz);
+  p->AddVertex (dx, 0, dz);
+  p->AddVertex (dx, dy, dz);
+  p->AddVertex (-dx, dy, dz);
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
   p = thing->NewPolygon (tm);
-  p->AddVertex (dx, -1, dz);
-  p->AddVertex (dx, -1, -dz);
-  p->AddVertex (dx, dy-1, -dz);
-  p->AddVertex (dx, dy-1, dz);
+  p->flags.Reset (CS_POLY_COLLDET);
+  p->AddVertex (dx, 0, dz);
+  p->AddVertex (dx, 0, -dz);
+  p->AddVertex (dx, dy, -dz);
+  p->AddVertex (dx, dy, dz);
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
   p = thing->NewPolygon (tm);
-  p->AddVertex (-dx, -1, -dz);
-  p->AddVertex (-dx, -1, dz);
-  p->AddVertex (-dx, dy-1, dz);
-  p->AddVertex (-dx, dy-1, -dz);
+  p->flags.Reset (CS_POLY_COLLDET);
+  p->AddVertex (-dx, 0, -dz);
+  p->AddVertex (-dx, 0, dz);
+  p->AddVertex (-dx, dy, dz);
+  p->AddVertex (-dx, dy, -dz);
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
   p = thing->NewPolygon (tm);
-  p->AddVertex (dx, -1, -dz);
-  p->AddVertex (-dx, -1, -dz);
-  p->AddVertex (-dx, dy-1, -dz);
-  p->AddVertex (dx, dy-1, -dz);
+  p->flags.Reset (CS_POLY_COLLDET);
+  p->AddVertex (dx, 0, -dz);
+  p->AddVertex (-dx, 0, -dz);
+  p->AddVertex (-dx, dy, -dz);
+  p->AddVertex (dx, dy, -dz);
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
   portalPoly = p;
 
@@ -1136,28 +1140,73 @@ void OpenPortal (csView* view, char* lev)
   room->ShineLights (thing);
   thing->CreateLightMaps (Sys->G3D);
 
-  thing->GetMovable ().SetPosition (pos);
+  return thing;
+}
+
+void OpenPortal (csView* view, char* lev)
+{
+  csSector* room = view->GetCamera ()->GetSector ();
+  csVector3 pos = view->GetCamera ()->Camera2World (csVector3 (0, 0, 1));
+  csMaterialWrapper* tm = Sys->engine->GetMaterials ()->FindByName ("spark");
+
+  csPolygon3D* portalPoly;
+  csThing* thing = CreatePortalThing ("portalTo", room, tm, portalPoly);
+
+  bool regionExists = (Sys->engine->regions.FindByName (lev) != NULL);
+  Sys->engine->SelectRegion (lev);
+  // If the region did not already exist then we load the level in it.
+  if (!regionExists)
+  {
+    // @@@ No error checking!
+    char buf[255];
+    sprintf (buf, "/lev/%s", lev);
+    Sys->VFS->ChDir (buf);
+    csLoader::AppendMapFile (Sys->engine, "world");
+    Sys->engine->GetCsCurrentRegion ()->Prepare ();
+  }
+
+  thing->GetMovable ().SetPosition (pos + csVector3 (0, Sys->cfg_legs_offset, 0));
+  thing->GetMovable ().Transform (view->GetCamera ()->GetC2W ());
   thing->GetMovable ().UpdateMove ();
 
-  Sys->engine->SelectRegion (lev);
-  // @@@ No error checking!
-  char buf[255];
-  sprintf (buf, "/lev/%s", lev);
-  Sys->VFS->ChDir (buf);
-  csLoader::AppendMapFile (Sys->engine, "world");
-  Sys->engine->GetCsCurrentRegion ()->Prepare ();
-
   // First make a portal to the new level.
-  iSector* start_sector = Sys->engine->GetCsCurrentRegion ()->FindSector ("room");
+  csCameraPosition* cp = (csCameraPosition*)
+    	Sys->engine->GetCsCurrentRegion ()->FindCameraPosition ("Start");
+  const char* room_name;
+  csVector3 topos;
+  if (cp) { room_name = cp->Sector; topos = cp->Position; }
+  else { room_name = "room"; topos.Set (0, 0, 0); }
+  topos.y -= Sys->cfg_eye_offset;
+  iSector* start_sector = Sys->engine->GetCsCurrentRegion ()->FindSector (room_name);
   if (start_sector)
   {
     portalPoly->SetCSPortal (start_sector->GetPrivateObject ());
     csPortal* portal = portalPoly->GetPortal ();
     portal->flags.Set (CS_PORTAL_ZFILL);
     portal->flags.Set (CS_PORTAL_CLIPDEST);
-    portal->SetWarp (csMatrix3 (), csVector3 (0), pos);
+    portal->SetWarp (view->GetCamera ()->GetC2W (), topos, pos);
+
+    if (!regionExists)
+    {
+      // Only if the region did not already exist do we create a portal
+      // back. So even if multiple portals go to the region we only have
+      // one portal back.
+      csPolygon3D* portalPolyBack;
+      csThing* thingBack = CreatePortalThing ("portalFrom",
+	  	start_sector->GetPrivateObject (), tm, portalPolyBack);
+      thingBack->GetMovable ().SetPosition (topos + csVector3 (0, Sys->cfg_legs_offset, -.1));
+      thingBack->GetMovable ().Transform (csYRotMatrix3 (M_PI));//view->GetCamera ()->GetW2C ());
+      thingBack->GetMovable ().UpdateMove ();
+      portalPolyBack->SetCSPortal (room);
+      csPortal* portalBack = portalPolyBack->GetPortal ();
+      portalBack->flags.Set (CS_PORTAL_ZFILL);
+      portalBack->flags.Set (CS_PORTAL_CLIPDEST);
+      portalBack->SetWarp (view->GetCamera ()->GetW2C (), pos, topos);
+    }
   }
 
+  if (!regionExists)
+    Sys->InitCollDet (Sys->engine, Sys->engine->GetCsCurrentRegion ());
   Sys->engine->SelectRegion (NULL);
 }
 

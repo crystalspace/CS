@@ -25,6 +25,7 @@
 #include "csengine/texture.h"
 #include "csengine/sector.h"
 #include "csengine/engine.h"
+#include "csengine/campos.h"
 #include "csengine/material.h"
 #include "csengine/polytmap.h"
 #include "csengine/curve.h"
@@ -174,6 +175,18 @@ void csRegion::DeleteAll ()
       int idx = engine->GetTextures ()->Find (o);
       if (idx != -1)
         engine->GetTextures ()->Delete (idx);
+      else
+        delete o;
+      copy[i] = NULL;
+    }
+
+  for (i = 0 ; i < copy.Length () ; i++)
+    if (copy[i] && ((csObject*)copy[i])->GetType () == csCameraPosition::Type)
+    {
+      csCameraPosition* o = (csCameraPosition*)copy[i];
+      int idx = engine->camera_positions.Find (o);
+      if (idx != -1)
+        engine->camera_positions.Delete (idx);
       else
         delete o;
       copy[i] = NULL;
@@ -378,6 +391,15 @@ iMaterialWrapper* csRegion::FindMaterial (const char *iName)
   // Cast two times to avoid problems with multi-inherit.
   csMaterialWrapper* wrapper = (csMaterialWrapper*)obj;
   return (iMaterialWrapper*)wrapper;
+}
+
+iCameraPosition* csRegion::FindCameraPosition (const char *iName)
+{
+  csObject* obj = FindObject (iName, csCameraPosition::Type, false);
+  if (!obj) return NULL;
+  // Cast two times to avoid problems with multi-inherit.
+  csCameraPosition* campos = (csCameraPosition*)obj;
+  return (iCameraPosition*)campos;
 }
 
 bool csRegion::IsInRegion (iObject* iobj)

@@ -28,9 +28,10 @@ struct iSprite;
 struct iSpriteTemplate;
 struct iTextureWrapper;
 struct iMaterialWrapper;
+struct iCameraPosition;
 struct iObject;
 
-SCF_VERSION (iRegion, 0, 1, 2);
+SCF_VERSION (iRegion, 0, 1, 3);
 
 /**
  * A region. A region is basically a collection of objects in the
@@ -88,6 +89,8 @@ struct iRegion : public iBase
   virtual iTextureWrapper *FindTexture (const char *iName) = 0;
   /// Find a material in this region by name
   virtual iMaterialWrapper *FindMaterial (const char *iName) = 0;
+  /// Find a camera position in this region by name
+  virtual iCameraPosition *FindCameraPosition (const char *iName) = 0;
 
   /**
    * Check if some object is in this region.
