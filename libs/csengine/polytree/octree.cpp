@@ -634,7 +634,7 @@ bool BuildPVSOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
   if (!node) return false;
   if (node->Type () != NODE_OCTREE) return true;
 
-  csOctree* otree = (csOctree*)tree;
+//   csOctree* otree = (csOctree*)tree;
   csOctreeNode* onode = (csOctreeNode*)node;
 
   PVSBuildData2* pvsdata = (PVSBuildData2*)data;
@@ -643,8 +643,8 @@ bool BuildPVSOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
   // Test this node against all polygons in all leafs in the
   // queue already. If there is a polygon in there that completely
   // shadows the original leaf then this node is not visible.
-  int leaf_num, poly_num, cor_num, i, i1;
-  bool invisible = false;
+  int leaf_num, poly_num, cor_num, i = 0, i1;
+//   bool invisible = false;
   for (leaf_num = 0 ; i < leaf_queue.Length () ; i++)
   {
     csOctreeNode* leaf = (csOctreeNode*)leaf_queue[leaf_num];
@@ -666,8 +666,8 @@ bool BuildPVSOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
 	    i1 = p->GetNumVertices ()-1;
 	    for (i = 0 ; i < p->GetNumVertices () ; i++)
 	    {
-	      csVector3& v1 = p->Vwor (i1);
-	      csVector3& v2 = p->Vwor (i);
+// 	      csVector3& v1 = p->Vwor (i1);
+// 	      csVector3& v2 = p->Vwor (i);
 
 	      i1 = i;
 	    }
