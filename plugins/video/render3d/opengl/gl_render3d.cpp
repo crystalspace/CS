@@ -705,7 +705,7 @@ bool csGLRender3D::Open ()
   // a call to Init<ext> first.
   ext->InitGL_ARB_multitexture ();
   ext->InitGL_ARB_texture_compression ();
-  ext->InitGL_ARB_vertex_buffer_object ();
+  //ext->InitGL_ARB_vertex_buffer_object ();
   ext->InitGL_ARB_vertex_program ();
   ext->InitGL_SGIS_generate_mipmap ();
   ext->InitGL_EXT_texture_filter_anisotropic ();
@@ -1086,17 +1086,43 @@ bool csGLRender3D::ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer)
   void* data = ((csGLRenderBuffer*)buffer)->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY); //buffer->Lock (CS_BUF_LOCK_RENDER);
   if (data != (void*)-1)
   {
-    if (ext->glEnableVertexAttribArrayARB) ext->glEnableVertexAttribArrayARB (attrib);
-    if (bind)
+    if (ext->glEnableVertexAttribArrayARB)
     {
-      if (use_hw_render_buffers)
+      ext->glEnableVertexAttribArrayARB (attrib);
+      if (bind)
       {
-        ext->glVertexAttribPointerARB(attrib, buffer->GetComponentCount (),
-          ((csGLRenderBuffer*)buffer)->compGLType, true, 0, 0);
+        if (use_hw_render_buffers)
+        {
+          ext->glVertexAttribPointerARB(attrib, buffer->GetComponentCount (),
+            ((csGLRenderBuffer*)buffer)->compGLType, true, 0, 0);
+        }
+        else
+          ext->glVertexAttribPointerARB(attrib, buffer->GetComponentCount (),
+            ((csGLRenderBuffer*)buffer)->compGLType, true, 0, data);
       }
-      else
-        ext->glVertexAttribPointerARB(attrib, buffer->GetComponentCount (),
-          ((csGLRenderBuffer*)buffer)->compGLType, true, 0, data);
+    }
+    else
+    {
+      switch (attrib)
+      {
+      case CS_VATTRIB_POSITION:
+        glVertexPointer (buffer->GetComponentCount (),
+          ((csGLRenderBuffer*)buffer)->compGLType, 0, data);
+        glEnableClientState (GL_VERTEX_ARRAY);
+        break;
+      case CS_VATTRIB_NORMAL:
+        glNormalPointer (((csGLRenderBuffer*)buffer)->compGLType, 0, data);
+        glEnableClientState (GL_NORMAL_ARRAY);
+        break;
+      case CS_VATTRIB_PRIMARY_COLOR:
+        glColorPointer (buffer->GetComponentCount (),
+          ((csGLRenderBuffer*)buffer)->compGLType, 0, data);
+        glEnableClientState (GL_COLOR_ARRAY);
+      case CS_VATTRIB_TEXCOORD:
+        glTexCoordPointer (buffer->GetComponentCount (), 
+          ((csGLRenderBuffer*)buffer)->compGLType, 0, data);
+        glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+      }
     }
     vertattrib[attrib] = buffer;
     vertattribenabled[attrib] = true;
@@ -1108,7 +1134,24 @@ void csGLRender3D::DeactivateBuffer (csVertexAttrib attrib)
 {
   if (vertattrib[attrib])
   {
-    if (ext->glDisableVertexAttribArrayARB) ext->glDisableVertexAttribArrayARB (attrib);
+    if (ext->glDisableVertexAttribArrayARB) 
+      ext->glDisableVertexAttribArrayARB (attrib);
+    else
+    {
+      switch (attrib)
+      {
+      case CS_VATTRIB_POSITION:
+        glDisableClientState (GL_VERTEX_ARRAY);
+        break;
+      case CS_VATTRIB_NORMAL:
+        glDisableClientState (GL_NORMAL_ARRAY);
+        break;
+      case CS_VATTRIB_PRIMARY_COLOR:
+        glDisableClientState (GL_COLOR_ARRAY);
+      case CS_VATTRIB_TEXCOORD:
+        glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+      }
+    }
     vertattrib[attrib]->Release ();
     vertattribenabled[attrib] = false;
   }
