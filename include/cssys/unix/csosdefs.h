@@ -32,7 +32,7 @@
 #  if defined (OS_LINUX)
      if (getenv ("DISPLAY"))
 #  endif
-       return "crystalspace.graphics2d.xlib";
+       return "crystalspace.graphics2d.x2d";
 #  if defined (OS_LINUX)
      else
        return "crystalspace.graphics2d.svgalib";

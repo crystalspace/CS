@@ -9,6 +9,46 @@ The history order has been reversed so that new features are at the top.
 	  some polygons not to be reached by a light even though they
 	  should have been affected. Turned out the distance between the
 	  light and the polygon was not computed right.
+	- Fixed another severe bug in CheckFrustum which affects both
+	  lighting and radiosity. It appeared that back-face culling
+	  of polygons was done too late with the effect that even
+	  invisible polygons would fill up the c-buffer (c-buffer does
+	  not care about orientation of polygons). This bugfix seems
+	  to remove the last lighting errors from dmburg. There are still
+	  a few black borders here and there but I see no more real
+	  lighting errors.
+	- Norman Kramer added csFrustum::BatchClassify() which is meant
+	  to be used if you plan to do a number of classifies with the
+	  same frustum. It is faster that way.
+	- Andrew Zabolotny did the following changes:
+	    - Added detection of XFree86/OS2. Now softx driver compiles
+	      and works well on OS/2 with shm and vidmode extensions! :-)
+	    - Added a command-line option: "-canvas=xxx" will tell the
+	      renderer which canvas plugin to use. If "xxx" does not
+	      contain dots (e.g. something like "x2d", "dive" and so on)
+	      "crystalspace.graphics2d." is prepended.
+	    - Fixed a bug in softx driver related to fullscreen extensions.
+	      Close() calls LeaveFullScreen() but if we close the driver
+	      due to a failed initialization dpy and window variables were
+	      not initialized.
+	    - Removed GetVFS method from iSystem. Use QUERY_PLUGIN_ID instead.
+	      I have fixed all drivers to use QUERY_PLUGIN_ID.
+	    - Removed iUnixSystem interface. Moved the functionality needed
+	      to decide whenever to use shm, simdepth etc to the respective
+	      X11 drivers (moved to a new file video/canvas/common/x11comm.cpp
+	      which is included in all X11 drivers that really need it). In
+	      general, system-dependent part of csSystemDriver becomes thinner
+	      and thinner. This is good :-)
+	      Due to extensive changes through many canvas plugins some may
+	      encounter syntax errors during compilation. Use the softx
+	      driver for reference, which compiles and works fine.
+	    - Fixed the linex2d driver (it wasn't working properly after
+	      the last fullscreen change).
+	    - Changed TEX_2D, TEX_3D and TEX_2D3D into FOR_2D(yes|no)
+	      FOR3D(yes|no). Using these two keywords you can achieve same
+	      effect as with older three. Besides, csstdldr plugin supports
+	      them for a long time.
+	- Fixed two bugs for compiling in Unix after Andrew's changes.
 27-Jul-2000
 	- Martin Geisse converted some more docs to texinfo format
 	  (including the much asked for worldfmt.tex file).

@@ -38,8 +38,7 @@ void SysSystemDriver::Help ()
 {
   csSystemDriver::Help ();
   Printf (MSG_STDOUT, "  -sdepth=<depth>    set simulated depth (8, 15, 16, or 32) (default=none)\n");
-  Printf (MSG_STDOUT, "  -shm/noshm         SHM extension (default '%sshm')\n",
-    UseSHM ? "" : "no");
+  Printf (MSG_STDOUT, "  -shm/noshm         SHM extension (default 'yes')\n");
 }
 
 void SysSystemDriver::Loop(void)
