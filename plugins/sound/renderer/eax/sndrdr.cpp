@@ -100,7 +100,9 @@ void csSoundRenderEAX::PlayEphemeral(csSoundData *snd)
 	iSoundBuffer *played = CreateSoundBuffer(snd);
 	if(played)
 	{
-		played->Play(SoundBufferPlay_DestroyAtEnd);
+	    //to loop or not, defaults to not
+	    if (loop == true) played->Play(SoundBufferPlay_InLoop);
+	    if (!loop) played->Play(SoundBufferPlay_DestroyAtEnd);
 	}
 }
 
