@@ -6,7 +6,7 @@
 
 @emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.  Copyright
 @copyright{} 1999, 2000, 2001, 2002 by Eric Sunshine.  Last updated
-21 December 2002.}
+14 October 2003.}
 
 Crystal Space was ported to MacOS/X by Eric Sunshine.  If you have questions or
 comments about this port, please contact Eric Sunshine at
@@ -194,9 +194,9 @@ Utility functions for manipulation of page-aligned memory blocks for the
 @cindex MacOS/X Run-Loop
 
 The typical Crystal Space application assumes that the programmer has full
-control over the application's run-loop.  With most ports of Crystal Space,
-this is not a problem since the main run-loop is generally implemented in this
-fashion:
+control over the application's run-loop.  For many platforms to which Crystal
+Space has been ported, this is not a problem since the main run-loop is
+generally implemented in this fashion:
 
 @example
 bool csDefaultRunLoop(iObjectRegistry*)
@@ -250,13 +250,15 @@ not employ lower-level facilities, such as OpenGL or CoreGraphics, it is slower
 than those alternatives but it is also more likely to function correctly in
 unexpected configurations or in the unusual event that the other two drivers
 can not be used.  The pure Cocoa driver is used together with the software
-renderer, and only when explicitly requested with the command-line option
+renderer, but only when requested explicitly with the command-line option
 @samp{--canvas=crystalspace.graphics2d.cocoa}.  It is never used by default.
-Alternately, it can be requested via the configuration file
-@file{CS/data/config/user.cfg} with the following property entry.
+Alternately, it can be requested via a Cocoa @dfn{defaults} setting.  For
+example, to force all applications to use this canvas, you could invoke the
+following command from the command-line:
 
 @example
-Global.Video.Software.Canvas = crystalspace.graphics2d.cocoa
+defaults write CrystalSpace.Global Video.Software.Canvas \
+  crystalspace.graphics2d.cocoa
 @end example
 
 The Cocoa-based graphics driver had its origins on the NextStep operating

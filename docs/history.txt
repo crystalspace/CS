@@ -22,6 +22,12 @@ chronological order.
 	- res fixed a few 'signed/unsigned mismatch' compiler warnings in
 	  cssys/csuctransform.h.
 	- res re-enabled 'signed/unsigned mismatch' compiler warnings for MSVC.
+	- Eric Sunshine made the following changes to the user manual:
+	    - Updated MacOS/X usage instructions to reflect that settings are
+	      now stored via NSUserDefaults, rather than user.cfg.
+	    - Generally upgraded MacOS/X build instructions.
+	    - Eliminated some obsolete engine and lighting options from
+	      documentation and configuration files.
 13-Oct-2003
 	- Eric Sunshine eliminated several compilation warnings from Walktest.
 	- Jorrit fixed phystut for the latest polygon changes.

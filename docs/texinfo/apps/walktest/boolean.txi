@@ -78,8 +78,7 @@ freelook is disabled.
 Change quality setting of sprite lighting.  If yes every vertex will be lit
 according to the correct distance with the light.  If no then the distances
 for all vertices are calculated to the center of the sprite.  Default is
-@samp{no}.  This option can also be set with the
-@samp{Engine.Lighting.SpriteQuality} option in the configuration file.
+@samp{no}.
 
 @item fullscreen
 Toggle fullscreen mode on/off.

@@ -833,8 +833,6 @@ draw as the default texture on the polygon
 Change quality setting of sprite lighting.  If yes every vertex will be lit
 according to the correct distance with the light.  If no then the distances for
 all vertices are calculated to the center of the sprite.  Default is `no'.
-This option can also be set with the `Engine.Lighting.SpriteQuality' option in
-the configuration file.
 
 @item hi Boolean
 This is intended to hilight the active polygon, but is currently disabled.

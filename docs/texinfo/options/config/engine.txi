@@ -8,20 +8,12 @@ The default values are stored in @file{CS/data/config/engine.cfg}.
 @subsubheading Lighting Options
 
 @table @code
-@item Engine.Lighting.Ambient.White = [0..255]
-@itemx Engine.Lighting.Ambient.Red = [0..255]
+@item Engine.Lighting.Ambient.Red = [0..255]
 @itemx Engine.Lighting.Ambient.Green = [0..255]
 @itemx Engine.Lighting.Ambient.Blue = [0..255]
 These keys set the amount of ambient light that is used when lighting is
 calculated. This amount of light is present on all textures even if no light
-source shines on them. The @samp{White} key is a added to all three color
-channels. Default values are 40 units of white and 0 units for all others.
-
-@item Engine.Lighting.LightmapSize = <power of 2>
-Sets the size of the lightmap texels. The smaller this value, the more
-accurate are the lighting calculations. This also increases memory
-consumption and decreases the speed of the texture cache. Lighting information
-will be recalculated automatically when you change this value. (default: 16)
+source shines on them.  Default values are 20 luminosity units.
 
 @item Engine.Lighting.CosinusFactor = [-1..1]
 Control how much the angle of the light with the polygon it hits affects
@@ -31,10 +23,6 @@ cosine is ignored and it will be like CrystalSpace was in the past. Note
 that changing this value at runtime only has an effect on dynamic lights.
 This option corresponds to the @code{-cosfact} commandline option and the
 @samp{cosfact} console command. (default: 0)
-
-@item Engine.Lighting.SpriteQuality = [0..3]
-Set the quality of lighting for sprites, ranging from 0 (high quality) to 3
-(random). (default: 1)
 
 @item Engine.Lighting.Radiosity = <yes/no>
 If this option is set to yes, the pseudo-radiosity system will be enabled.
@@ -110,4 +98,3 @@ when lighting. Try between 0 and 1. (Default: 0.70)
 tightness of the specular highlight.  a power of 2 of this variable is 
 used for speed. Thus try 0-10. (Default: 4)
 @end table
-
