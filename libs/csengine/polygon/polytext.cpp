@@ -670,6 +670,7 @@ void csPolyTexture::FillLightmap (csLightView& lview)
     mapG = lm->GetStaticMap ().mapG;
     mapB = lm->GetStaticMap ().mapB;
   }
+  long lm_size = lm->lm_size;
 
   float miny = 1000000, maxy = -1000000;
   int MaxIndex = -1, MinIndex = -1;
@@ -738,6 +739,10 @@ void csPolyTexture::FillLightmap (csLightView& lview)
   {
     for (u=0;u<lw;u++,uv++)
     {
+	//@@@ (Note from Jorrit): The following test should not be needed
+	// but it appears to be anyway. 'uv' can get too large.
+	if (uv >= lm_size) continue;
+
         float usual_value=1.0;
 
 //      __uv=uv;
@@ -796,37 +801,19 @@ void csPolyTexture::FillLightmap (csLightView& lview)
             v1.z = - (txt_D + txt_A*v1.x + txt_B*v1.y) / txt_C;
           v2 = vv + m_t2w * v1;
 
-          // Use the original center of the light here because we need to check
-          // for blocking things starting in the original sector before
-          // any space warping occured.
-#	  if 1
+	  // Check if the point on the polygon is shadowed. To do this
+	  // we traverse all shadow frustrums and see if it is contained in any of them.
 	  csShadowFrustrum* shadow_frust;
 	  shadow_frust = lview.shadows.GetFirst ();
 	  bool shadow = false;
-	  //CsPrintf (MSG_DEBUG_0, "-----------------\n");
 	  while (shadow_frust)
 	  {
-	    //Dumper::dump (shadow_frust, "lf");
-	    if (shadow_frust->polygon != polygon)
+	    if (shadow_frust->relevant && shadow_frust->polygon != polygon)
 	      if (shadow_frust->Contains (v2-shadow_frust->GetOrigin ()))
-	      { shadow = true; break; }
+	        { shadow = true; break; }
 	    shadow_frust = shadow_frust->next;
 	  }
 	  if (!shadow) { rc = false; break; }
-#	  else
-          csPolygon3D* p;
-          // Perform the inverse warping transformation required
-          // to transform the end point back to original world space
-          // coordinates.
-	  csVector3 path_end = lview.beam2source * v2;
-          rc = light->GetSector ()->BlockingThings (light->GetCenter (),
-	          path_end, &p, light->GetSector () == polygon->GetSector ());
-          if (!rc || p == polygon || p->GetParent () == polygon->GetParent ())
-	  {
-	    rc = false;
-	    break;
-	  }
-#	  endif
 
 	  if (!do_accurate_things) break;
 	  rc = true;
@@ -970,6 +957,7 @@ void csPolyTexture::ShineDynLightmap (csLightPatch* lp)
   unsigned char* mapR = remap.mapR;
   unsigned char* mapG = remap.mapG;
   unsigned char* mapB = remap.mapB;
+  long lm_size = lm->lm_size;
 
   int i;
   float miny = 1000000, maxy = -1000000;
@@ -1114,6 +1102,10 @@ b:      if (scanL2 == MinIndex) goto finish;
       {
         uv = sy*new_lw+u;
 
+	//@@@ (Note from Jorrit): The following test should not be needed
+	// but it appears to be anyway. 'uv' can get both negative and too large.
+	if (uv < 0 || uv >= lm_size) continue;
+
         ru = u  << mipmap_shift;
         rv = sy << mipmap_shift;
 
@@ -1125,14 +1117,20 @@ b:      if (scanL2 == MinIndex) goto finish;
           v1.z = - (txt_D + txt_A*v1.x + txt_B*v1.y) / txt_C;
         v2 = vv + m_t2w * v1;
 
-        // Use the original center of the light here because we need to check
-        // for blocking things starting in the original sector before
-        // any space warping occured.
-        //csPolygon3D* p;
-        //bool rc = light->GetSector ()->BlockingThings (light->GetCenter (), v2, &p,
-      	  //light->GetSector () == polygon->GetSector ());
+	// Check if the point on the polygon is shadowed. To do this
+	// we traverse all shadow frustrums and see if it is contained in any of them.
+	csShadowFrustrum* shadow_frust;
+	shadow_frust = lp->shadows.GetFirst ();
+	bool shadow = false;
+	while (shadow_frust)
+	{
+	  if (shadow_frust->relevant && shadow_frust->polygon != polygon)
+	    if (shadow_frust->Contains (v2-shadow_frust->GetOrigin ()))
+	      { shadow = true; break; }
+	  shadow_frust = shadow_frust->next;
+	}
 
-        //if (!rc || p == polygon || p->get_parent () == polygon->get_parent ())
+	if (!shadow)
         {
 	  //@@@ This is only right if we don't allow reflections for dynamic lights
           d = csSquaredDist::PointPoint (light->GetCenter (), v2);
