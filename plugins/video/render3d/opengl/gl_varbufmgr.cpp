@@ -235,7 +235,7 @@ void csBuddyAllocator::PrintStats()
   }
 }
 
-#define CS_VAR_ALLOC_SIZE (500*1024)
+#define CS_VAR_ALLOC_SIZE (16*1024*1024) //16MB as default for now
 
 bool csVARRenderBufferManager::Initialize(csGLRender3D* render3d)
 {
@@ -277,9 +277,12 @@ csPtr<iRenderBuffer> csVARRenderBufferManager::CreateBuffer(int size, CS_RENDERB
 {
   csVARRenderBuffer* buffer = new csVARRenderBuffer( NULL, size, location, this);
 
-  printf("Created buffer at: %X\n", (long)buffer);
-  buffer->IncRef();
-  return buffer;
+  //printf("Created buffer at: %X\n", (long)buffer);
+  //buffer->IncRef();
+  if(false)
+	  myalloc->PrintStats();
+
+  return csPtr<iRenderBuffer>(buffer);
 }
 
 void csVARRenderBufferManager::AddBlockInLRU(csVARRenderBuffer* buf)
@@ -298,7 +301,7 @@ void csVARRenderBufferManager::AddBlockInLRU(csVARRenderBuffer* buf)
 
 void csVARRenderBufferManager::RemoveBlockInLRU(csVARRenderBuffer* buf)
 {
-  if ((*buf->listEl) == NULL) return;
+  if (buf->listEl == NULL) return;
 
   if (buf->type == CS_BUF_STATIC)
   {
@@ -314,7 +317,7 @@ void csVARRenderBufferManager::RemoveBlockInLRU(csVARRenderBuffer* buf)
 
 void csVARRenderBufferManager::TouchBlockInLRU(csVARRenderBuffer* buf)
 {
-  if ((*buf->listEl) == NULL) return;
+  if (buf->listEl == NULL) return;
 
   if (buf->type == CS_BUF_STATIC)
   {
@@ -371,10 +374,12 @@ csVARRenderBuffer::csVARRenderBuffer(void *buffer, int size, CS_RENDERBUFFER_TYP
 
   csVARRenderBuffer::bm = bm;
   locked = false;
-  discarded = false;
+  discarded = true;
   discardable = true;
 
   memblock = new csVARMemoryBlock[MAXMEMORYBLOCKS];
+
+
   int i;
   for(i = 0; i < MAXMEMORYBLOCKS; ++i)
   {
@@ -386,6 +391,7 @@ csVARRenderBuffer::csVARRenderBuffer(void *buffer, int size, CS_RENDERBUFFER_TYP
 csVARRenderBuffer::~csVARRenderBuffer()
 {
   bm->RemoveBlockInLRU(this);
+
   if( type == CS_BUF_INDEX)
   {
     int i;
@@ -441,9 +447,8 @@ void* csVARRenderBuffer::Lock(CS_BUFFER_LOCK_TYPE lockType)
       if(memblock[currentBlock].buffer)
       {
         locked = true;
-        discarded = false;
+        discarded = true;
         lastlock = lockType;
-        bm->AddBlockInLRU(this);
         bm->render3d->ext.glGenFencesNV(1, &(memblock[currentBlock].fence_id));
       }
       return memblock[currentBlock].buffer;
@@ -482,9 +487,7 @@ void* csVARRenderBuffer::Lock(CS_BUFFER_LOCK_TYPE lockType)
       currentBlock %= MAXMEMORYBLOCKS;
       return Lock(lockType);
     }
-
   }
-  
   return NULL;
 }
 
@@ -502,8 +505,9 @@ void csVARRenderBuffer::Release()
 
 bool csVARRenderBuffer::Discard()
 {
+
   //never discard a locked buffer, or a non-discardable buffer
-  if (locked || !discardable) return false;
+  if (locked || !discardable || type==CS_BUF_INDEX) return false;
 
   int i;
   for(i = 0; i < MAXMEMORYBLOCKS; ++i)
@@ -517,7 +521,6 @@ bool csVARRenderBuffer::Discard()
     }
   }
   discarded = true;
-  bm->RemoveBlockInLRU(this);
   return true;
 }
 

@@ -45,6 +45,8 @@
 #include "glextmanager.h"
 #include "gl_sysbufmgr.h"
 #include "gl_varbufmgr.h"
+#include "gl_vaobufmgr.h"
+#include "gl_helper.h"
 
 class csGLTextureCache;
 class csGLTextureHandle;
@@ -77,6 +79,7 @@ private:
   friend class csVARRenderBufferManager;
   friend class csSysRenderBufferManager;
   friend class csVARRenderBuffer;
+  friend class csVaoRenderBuffer;
   friend class csGLTextureHandle;
   friend class csGLTextureCache;
   friend class csGLTextureManager;
@@ -92,6 +95,7 @@ private:
   static csGLStateCache* statecache;
 
   csGLExtensionManager ext;
+  csGLVertexArrayHelper varr;
   csGLTextureCache *txtcache;
   csGLTextureManager *txtmgr;
 
@@ -441,6 +445,8 @@ public:
     virtual bool HandleEvent (iEvent& ev) 
       { return parent->HandleEvent (ev); }
   } * scfiEventHandler;
+
+
 
 };
 

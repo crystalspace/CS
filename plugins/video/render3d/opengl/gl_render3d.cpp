@@ -695,6 +695,11 @@ bool csGLRender3D::Open ()
   object_reg->Register (effectserver, "iEffectServer");
   }*/
 
+  csRef<iOpenGLInterface> gl = SCF_QUERY_INTERFACE (G2D, iOpenGLInterface);
+  ext.InitExtensions (gl);
+  varr.ext = &ext;
+
+
   shadermgr = CS_QUERY_REGISTRY(object_reg, iShaderManager);
   if( !shadermgr )
   {
@@ -721,15 +726,20 @@ bool csGLRender3D::Open ()
   shadermgr->AddVariable(shvar_light_0_attenuation);
 
 
-  csRef<iOpenGLInterface> gl = SCF_QUERY_INTERFACE (G2D, iOpenGLInterface);
-  ext.InitExtensions (gl);
-
-  if ( false && ext.CS_GL_NV_vertex_array_range && ext.CS_GL_NV_fence)
+  if ( ext.CS_GL_NV_vertex_array_range && ext.CS_GL_NV_fence)
   {
     csVARRenderBufferManager * bm = new csVARRenderBufferManager();
     bm->Initialize(this);
     buffermgr = bm;
-  } else
+  } 
+  else if ( ext.CS_GL_ATI_vertex_array_object && ext.CS_GL_ATI_vertex_attrib_array_object)
+  {
+    csVaoRenderBufferManager* bm = new csVaoRenderBufferManager();
+    bm->Initialize(this);
+    buffermgr = bm;
+    varr.IsATI = true;
+  }
+  else
   {
     buffermgr = new csSysRenderBufferManager();
   }
@@ -833,7 +843,7 @@ bool csGLRender3D::BeginDraw (int drawflags)
 
 void csGLRender3D::FinishDraw ()
 {
-  //printf ("Number of tris: %i\n", tricnt);
+  printf ("Number of tris: %i\n", tricnt);
   tricnt = 0;
   SetMirrorMode (false);
 
@@ -1101,30 +1111,30 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
     csRef<iRenderBuffer> indexbuf =
       source->GetBuffer (string_indices);
 
-    if (!vertexbuf)
+    if (!vertexbuf || vertexbuf->IsDiscarded())
       return;
     if (!indexbuf)
       return;
 
-    glVertexPointer (3, GL_FLOAT, 0,
+    varr.VertexPointer (3, GL_FLOAT, 0,
       (float*)vertexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER));
     glEnableClientState (GL_VERTEX_ARRAY);
 
-    if (texcoordbuf)
+    if (texcoordbuf && !texcoordbuf->IsDiscarded())
     {
-      glTexCoordPointer (2, GL_FLOAT, 0, (float*)
+      varr.TexCoordPointer (2, GL_FLOAT, 0, (float*)
         texcoordbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER));
       glEnableClientState (GL_TEXTURE_COORD_ARRAY);
     }
-    if (normalbuf)
+    if (normalbuf && !normalbuf->IsDiscarded())
     {
-      glNormalPointer (GL_FLOAT, 0, (float*)
+      varr.NormalPointer (GL_FLOAT, 0, (float*)
         normalbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER));
       glEnableClientState (GL_NORMAL_ARRAY);
     }
-    if (colorbuf)
+    if (colorbuf && !colorbuf->IsDiscarded())
     {
-      glColorPointer (4, GL_FLOAT, 0, (float*)
+      varr.ColorPointer (4, GL_FLOAT, 0, (float*)
         colorbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER));
       glEnableClientState (GL_COLOR_ARRAY);
     }
@@ -1359,6 +1369,8 @@ csSome csGLRender3D::eiShaderRenderInterface::GetPrivateObject(const char* name)
     return (void*) (&scfParent->ext);
   if(strcasecmp(name, "txtcache") == 0)
     return (void*) (scfParent->txtcache);
+  if(strcasecmp(name, "varr") == 0)
+    return (void*) (&scfParent->varr);
   return NULL;
 }
 
