@@ -638,29 +638,32 @@ void csGLRender3D::ApplyObjectToCamera ()
 {
   GLfloat matrixholder[16];
   const csMatrix3 &orientation = object2camera.GetO2T();
+  const csVector3 &translation = object2camera.GetO2TTranslation();
 
   matrixholder[0] = orientation.m11;
   matrixholder[1] = orientation.m21;
   matrixholder[2] = orientation.m31;
+  matrixholder[3] = 0.0f;
 
   matrixholder[4] = orientation.m12;
   matrixholder[5] = orientation.m22;
   matrixholder[6] = orientation.m32;
+  matrixholder[7] = 0.0f;
 
   matrixholder[8] = orientation.m13;
   matrixholder[9] = orientation.m23;
   matrixholder[10] = orientation.m33;
+  matrixholder[11] = 0.0f;
 
-  const csVector3 &translation = object2camera.GetO2TTranslation();
+  matrixholder[12] = orientation.m11*-translation.x + orientation.m12*-translation.y + orientation.m13*-translation.z;
+  matrixholder[13] = orientation.m21*-translation.x + orientation.m22*-translation.y + orientation.m23*-translation.z;
+  matrixholder[14] = orientation.m31*-translation.x + orientation.m32*-translation.y + orientation.m33*-translation.z;
+  matrixholder[15] = 1.0f;
 
-  matrixholder[3] = matrixholder[7] = matrixholder[11] = 
-  matrixholder[12] = matrixholder[13] = matrixholder[14] = 0.0;
-  matrixholder[15] = 1.0;
-
-
+  
   glMatrixMode (GL_MODELVIEW);
   glLoadMatrixf (matrixholder);
-  glTranslatef (-translation.x, -translation.y, -translation.z);
+  //glTranslatef (-translation.x, -translation.y, -translation.z);
 }
 
 
@@ -1376,10 +1379,10 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
   if(shader && shader->IsValid())
   {
     useshader = true;
-    csRef<iShaderTechnique> tech = shader->GetBestTechnique();
+    iShaderTechnique* tech = shader->GetBestTechnique();
 
-    csRef<iStreamSource> source = mymesh->GetStreamSource ();
-    csRef<iRenderBuffer> indexbuf =
+    iStreamSource* source = mymesh->GetStreamSource ();
+    iRenderBuffer* indexbuf =
       source->GetBuffer (string_indices);
     if (!indexbuf)
       return;
@@ -1403,8 +1406,9 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
       }
       pass->SetupState (mymesh);
 
-      /*if (bugplug)
-        bugplug->AddCounter ("Triangle Count", (mymesh->GetIndexEnd ()-mymesh->GetIndexStart ())/3);*/
+      if (bugplug)
+        bugplug->AddCounter ("Triangle Count", (mymesh->GetIndexEnd ()-mymesh->GetIndexStart ())/3);
+
       glDrawElements (
         primitivetype,
         mymesh->GetIndexEnd ()-mymesh->GetIndexStart (),
@@ -1465,6 +1469,9 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
       glEnableClientState (GL_COLOR_ARRAY);
     }
 
+    if (bugplug)
+        bugplug->AddCounter ("Triangle Count", (mymesh->GetIndexEnd ()-mymesh->GetIndexStart ())/3);
+
     glDrawElements (
       primitivetype,
       mymesh->GetIndexEnd ()-mymesh->GetIndexStart (),
@@ -1513,9 +1520,9 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
         // @@@ Shift is ignored for now.
         glLoadMatrixf (scalematrix);
 
-        /*if (bugplug)
-          bugplug->AddCounter ("Triangle Count", 
-            (mymesh->GetIndexEnd ()-mymesh->GetIndexStart ())/3);*/
+        if (bugplug)
+          bugplug->AddCounter ("Triangle Count", (mymesh->GetIndexEnd ()-mymesh->GetIndexStart ())/3);
+
         glDrawElements (
           primitivetype,
           mymesh->GetIndexEnd ()-mymesh->GetIndexStart (),

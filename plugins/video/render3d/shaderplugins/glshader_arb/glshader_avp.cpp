@@ -225,7 +225,7 @@ bool csShaderGLAVP::Load(iDocumentNode* program)
           programstring = new char[strlen(child->GetContentsValue())+1];
           strcpy(programstring, child->GetContentsValue());
         }
-        break;
+          break;
       case XMLTOKEN_DECLARE:
         {
           //create a new variable
