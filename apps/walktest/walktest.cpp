@@ -37,7 +37,6 @@
 #include "csengine/texture.h"
 #include "csengine/thing.h"
 #include "csengine/wirefrm.h"
-#include "csengine/library.h"
 #include "csengine/polytext.h"
 #include "csengine/pol2d.h"
 #include "csscript/csscript.h"
@@ -1178,7 +1177,8 @@ void start_demo ()
   ITextureManager* txtmgr;
   Gfx3D->GetTextureManager (&txtmgr);
 //Gfx2D->DoubleBuffer (false);
-  demo_info->world->Initialize (GetISystemFromSystem (System), Gfx3D, config);
+  demo_info->world->Initialize (GetISystemFromSystem (System), Gfx3D,
+    Sys->Config, Sys->Vfs);
 
   // Initialize the texture manager
   txtmgr->Initialize ();
@@ -1259,65 +1259,34 @@ void WalkTest::InitWorld (csWorld* world, csCamera* /*camera*/)
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
+  // Initialize the random number generator
   srand (time (NULL));
 
   // Create our main class which is the driver for WalkTest.
   CHK (Sys = new WalkTest ());
 
-  // Open our configuration file and read the configuration values
-  // specific for WalkTest.
-  //@@@Config should belong to WalkTest.
-  CHK (config = new csIniFile ("cryst.cfg"));
-
-  // create the converter class for testing
-  CHK (ImportExport = new converter());
-
-  // process import/export files from config and print log for testing
-
-  ImportExport->ProcessConfig (config);
-
-  // free memory - delete this if you want to use the data in the buffer
-
-  CHK (delete ImportExport);
-  // end converter test
-
-  Sys->do_fps = config->GetYesNo ("WalkTest", "FPS", true);
-  Sys->do_stats = config->GetYesNo ("WalkTest", "STATS", false);
-  Sys->do_cd = config->GetYesNo ("WalkTest", "COLLDET", true);
-  strcpy (WalkTest::world_file, config->GetStr ("World", "WORLDFILE", "world"));
-
-  // Get all collision detection and movement config file parameters.
-  Sys->cfg_jumpspeed = config->GetFloat ("CD", "JUMPSPEED", 0.08);
-  Sys->cfg_walk_accelerate = config->GetFloat ("CD", "WALKACCELERATE", 0.007);
-  Sys->cfg_walk_maxspeed = config->GetFloat ("CD", "WALKMAXSPEED", 0.1);
-  Sys->cfg_walk_brake = config->GetFloat ("CD", "WALKBRAKE", 0.014);
-  Sys->cfg_rotate_accelerate = config->GetFloat ("CD", "ROTATEACCELERATE", 0.005);
-  Sys->cfg_rotate_maxspeed = config->GetFloat ("CD", "ROTATEMAXSPEED", 0.03);
-  Sys->cfg_rotate_brake = config->GetFloat ("CD", "ROTATEBRAKE", 0.015);
-  Sys->cfg_look_accelerate = config->GetFloat ("CD", "LOOKACCELERATE", 0.028);
-  Sys->cfg_body_height = config->GetFloat ("CD", "BODYHEIGHT", 1.4);
-  Sys->cfg_body_width = config->GetFloat ("CD", "BODYWIDTH", 0.5);
-  Sys->cfg_body_depth = config->GetFloat ("CD", "BODYDEPTH", 0.5);
-  Sys->cfg_eye_offset = config->GetFloat ("CD", "EYEOFFSET", -0.7);
-  Sys->cfg_legs_width = config->GetFloat ("CD", "LEGSWIDTH", 0.4);
-  Sys->cfg_legs_depth = config->GetFloat ("CD", "LEGSDEPTH", 0.4);
-  Sys->cfg_legs_offset = config->GetFloat ("CD", "LEGSOFFSET", -1.1);
-
-  // Create our world. The world is the representation of
-  // the 3D engine.
+  // Create our world. The world is the representation of the 3D engine.
   CHK (csWorld* world = new csWorld ());
 
   // Initialize the main system. This will load all needed
   // COM drivers (3D, 2D, network, sound, ...) and initialize them.
-  if (!Sys->Initialize (argc, argv, world->GetEngineConfigCOM ()))
+  if (!Sys->Initialize (argc, argv, "cryst.cfg", "VFS.cfg", world->GetEngineConfigCOM ()))
   {
     Sys->Printf (MSG_FATAL_ERROR, "Error initializing system!\n");
     cleanup ();
     fatal_exit (0, false);
   }
 
+  //--- create the converter class for testing
+  CHK (ImportExport = new converter());
+  // process import/export files from config and print log for testing
+  ImportExport->ProcessConfig (Sys->Config);
+  // free memory - delete this if you want to use the data in the buffer
+  CHK (delete ImportExport);
+  //--- end converter test
+
 #ifdef DEBUG
-  // enable all kinds of useful exceptions on a x86
+  // enable all kinds of useful FPU exceptions on a x86
   // note that we can't do it above since at least on OS/2 each dynamic
   // library on loading/initialization resets the control word to default
   _control87 (0x33, 0x3f);
@@ -1336,7 +1305,7 @@ int main (int argc, char* argv[])
   }
 
   // Create console object for text and commands.
-  CHK (System->Console = new csSimpleConsole (Command::SharedInstance()));
+  CHK (System->Console = new csSimpleConsole (Sys->Config, Command::SharedInstance()));
 
   // Start the 'demo'. This is currently nothing more than
   // the display of all startup messages on the console.
@@ -1351,7 +1320,7 @@ int main (int argc, char* argv[])
 
   // Initialize our world now that the system is ready.
   Sys->world = world;
-  world->Initialize (GetISystemFromSystem (System), Gfx3D, config);
+  world->Initialize (GetISystemFromSystem (System), Gfx3D, Sys->Config, Sys->Vfs);
 
   // csView is a view encapsulating both a camera and a clipper.
   // You don't have to use csView as you can do the same by
@@ -1377,6 +1346,13 @@ int main (int argc, char* argv[])
   {
     // The infinite maze.
 
+    if (!Sys->Vfs->ChDir ("/tmp"))
+    {
+      Sys->Printf (MSG_FATAL_ERROR, "Temporary directory not mounted on VFS!\n");
+      cleanup ();
+      fatal_exit (0, false);
+    }
+
     Sys->Printf (MSG_INITIALIZATION, "Creating initial room!...\n");
     world->EnableLightingCache (false);
 
@@ -1387,12 +1363,9 @@ int main (int argc, char* argv[])
     // can move around even with collision detection disabled.
     Sys->do_cd = true;
 
-    // Load the standard library.
-    CSLoader::LoadLibrary (world, "standard", "standard.zip");
-
     // Load two textures that are used in the maze.
-    CSLoader::LoadTexture (world, "txt", "stone4.gif");
-    CSLoader::LoadTexture (world, "txt2", "mystone2.gif");
+    csLoader::LoadTexture (world, "txt", "stone4.gif");
+    csLoader::LoadTexture (world, "txt2", "mystone2.gif");
 
     if (Sys->do_infinite)
     {
@@ -1442,24 +1415,24 @@ int main (int argc, char* argv[])
   else
   {
     // Load from a world file.
-
-    Sys->Printf (MSG_INITIALIZATION, "Loading world '%s'...\n", WalkTest::world_file);
+    Sys->Printf (MSG_INITIALIZATION, "Loading world '%s'...\n", WalkTest::world_dir);
+    if (!Sys->Vfs->ChDir (WalkTest::world_dir))
+    {
+      Sys->Printf (MSG_FATAL_ERROR, "The directory on VFS for world file does not exist!\n");
+      cleanup ();
+      fatal_exit (0, false);
+    }
 
     // Load the world from the file.
-    if (!CSLoader::LoadWorldFile (world, Sys->layer, WalkTest::world_file))
+    if (!csLoader::LoadWorldFile (world, Sys->layer, "world"))
     {
       Sys->Printf (MSG_FATAL_ERROR, "Loading of world failed!\n");
       cleanup ();
       fatal_exit (0, false);
     }
 
-    // Load the standard library.
-    if (!CSLoader::LoadLibrary (world, "standard", "standard.zip"))
-    {
-      //Error message was already printed by CSLoader...
-      cleanup ();
-      fatal_exit (0, false);
-    }
+    // Load the "standard" library
+    csLoader::LoadLibrary (world, "/lib/std/library");
 
     //Find the Crystal Space logo and set the renderer Flag to for_2d, to allow
     //the use in the 2D part.

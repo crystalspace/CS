@@ -145,16 +145,6 @@ void SysSystemDriver::Close(void)
 }
 
 
-void SysSystemDriver::SetSystemDefaults()
-{
-	csSystemDriver::SetSystemDefaults ();
-
-	System->FullScreen = false;
-	if (config)
-		System->FullScreen = config->GetYesNo ("VideoDriver", "FULL_SCREEN", System->FullScreen);
-}
-
-
 static void NLtoCR( UInt8 *theString )
 {
 	int i = *theString++;

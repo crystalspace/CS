@@ -48,8 +48,9 @@ void GfxWrite (int x, int y, int fg, int bg, char *str, ...)
   Gfx2D->Write (x, y, fg, bg, buf);
 }
 
-csSimpleConsole::csSimpleConsole (csSimpleCommand* pc) : command_handler(pc)
+csSimpleConsole::csSimpleConsole (csIniFile *iConfig, csSimpleCommand* pc) : command_handler(pc)
 {
+  config = iConfig;
   LineMessageMax = config->GetInt ("SimpleConsole", "LINEMAX", 4);
   HistoryMax = config->GetInt ("SimpleConsole", "LINEHISTORY", SIZE_HISTORY);
   console_transparent_bg = config->GetYesNo ("SimpleConsole", "TRANSPBG", 1);

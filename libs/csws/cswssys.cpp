@@ -1,21 +1,21 @@
 /*
-  Crystal Space Windowing System: Windowing System client system driver
-  Copyright (C) 1998 by Jorrit Tyberghein
-  Written by Andrew Zabolotny <bit@eltech.ru>
+    Crystal Space Windowing System: Windowing System client system driver
+    Copyright (C) 1998 by Jorrit Tyberghein
+    Written by Andrew Zabolotny <bit@eltech.ru>
 
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Library General Public
-  License as published by the Free Software Foundation; either
-  version 2 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
 
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Library General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
 
-  You should have received a copy of the GNU Library General Public
-  License along with this library; if not, write to the Free
-  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "sysdef.h"
@@ -58,9 +58,10 @@ appSystemDriver::~appSystemDriver ()
   world = NULL;
 }
 
-bool appSystemDriver::Initialize (int argc, char *argv[], IConfig *config)
+bool appSystemDriver::Initialize (int argc, char *argv[],
+  const char *iConfigName, const char *iVfsConfigName, IConfig *config)
 {
-  if (!SysSystemDriver::Initialize (argc, argv, config))
+  if (!SysSystemDriver::Initialize (argc, argv, iConfigName, iVfsConfigName, config))
     return false;
 
   int Width, Height;
@@ -82,7 +83,7 @@ bool appSystemDriver::Initialize (int argc, char *argv[], IConfig *config)
   } /* endfor */
 
   // Now open temporary console
-  world->Initialize (GetISystemFromSystem (System), piG3D, ::config);
+  world->Initialize (GetISystemFromSystem (System), piG3D, Config, Vfs);
 
   // Open the visual, initialize keyboard and mouse
   Open (application->GetText ());
@@ -108,7 +109,7 @@ bool appSystemDriver::Initialize (int argc, char *argv[], IConfig *config)
     for (g = 0; g < 8; g++)
       for (b = 0; b < 4; b++)
         txtmgr->ReserveColor (r * 32, g * 32, b * 64);
-  
+
   txtmgr->Prepare ();
   txtmgr->AllocPalette ();
   application->SetupPalette ();

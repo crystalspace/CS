@@ -25,7 +25,9 @@
 #include "cssys/common/sysdriv.h"
 #include "cssys/common/console.h"
 #include "csgeom/csrect.h"
+#include "csutil/util.h"
 #include "csutil/inifile.h"
+#include "csutil/vfs.h"
 #include "csinput/csinput.h"
 #include "isndrdr.h"
 #include "inetdrv.h"
@@ -43,11 +45,8 @@ bool csSystemDriver::Shutdown = false;
 bool csSystemDriver::ExitLoop = false;
 bool csSystemDriver::DemoReady = false;
 
-// Global configuration file
-csIniFile *config = NULL;
-
 // Forced driver name.
-char override_driver[100] = { 0 };
+char *override_driver = NULL;
 
 // Global debugging level.
 int csSystemDriver::debug_level = 0;
@@ -108,6 +107,13 @@ csSystemDriver::~csSystemDriver ()
 {
   Close ();
 
+  if (Vfs)
+    CHKB (delete Vfs);
+  if (VfsConfig)
+    CHKB (delete VfsConfig);
+  if (Config)
+    CHKB (delete Config);
+
   System = NULL;
   
   CHK (delete Mouse);
@@ -126,55 +132,52 @@ csSystemDriver::~csSystemDriver ()
   CHK (delete com_options);
 }
 
-bool csSystemDriver::Initialize (int argc, char *argv[], IConfig* pconfig)
+bool csSystemDriver::Initialize (int argc, char *argv[],
+  const char *iConfigName, const char *iVfsConfigName, IConfig* iOptions)
 {
-  cfg_engine = pconfig;
-  HRESULT hRes;
+  // Initialize configuration file
+  if (iConfigName)
+    Config = new csIniFile (iConfigName);
+  else
+    Config = new csIniFile ();
+  // Initialize VFS configuration file
+  if (iVfsConfigName)
+    VfsConfig = new csIniFile (iVfsConfigName);
+  else
+    VfsConfig = new csIniFile ();
+  // Create the Virtual File System object
+  Vfs = new csVFS (VfsConfig);
 
-  SetSystemDefaults ();
+  cfg_engine = iOptions;
+
+  SetSystemDefaults (Config);
   if (!ParseCmdLineDriver (argc, argv))
     return false;
 
-  // DAN 9.29.98 - the DRIVER variable is now the ProgID for the comclass to use to
-  // retrieve the IGraphics3D, IGraphics2D, and IGraphicsInfo interfaces. 
-  char *pn = "crystalspace.graphics3d.software";
-  if (*override_driver) 
-    pn = override_driver;
-  else if (config) 
-    pn = config->GetStr ("VideoDriver", "DRIVER", pn);
-
-  hRes = csCLSIDFromProgID (&pn, &clsidRenderSystem);
-  if (FAILED(hRes))
+  char *pn = Config->GetStr ("VideoDriver", "DRIVER",
+    override_driver ? override_driver : "crystalspace.graphics3d.software");
+  if (FAILED (csCLSIDFromProgID (&pn, &clsidRenderSystem)))
   {
     Printf (MSG_FATAL_ERROR, "Bad value '%s' for DRIVER in configuration file\n", pn);
     return false;
   }
 
-  pn = "crystalspace.network.driver.null";
-  if (config) pn = config->GetStr ("Network", "NetDriver", pn);
-
-  hRes = csCLSIDFromProgID (&pn, &clsidNetworkDriverSystem);
-  if (FAILED(hRes))
+  pn = Config->GetStr ("Network", "NetDriver", "crystalspace.network.driver.null");
+  if (FAILED (csCLSIDFromProgID (&pn, &clsidNetworkDriverSystem)))
   {
     Printf (MSG_FATAL_ERROR, "Bad value '%s' for network driver in configuration file\n", pn);
     return false;
   }
 
-  pn = "crystalspace.network.manager.null";
-  if (config) pn = config->GetStr ("Network", "NetManager", pn);
-
-  hRes = csCLSIDFromProgID (&pn, &clsidNetworkManagerSystem);
-  if (FAILED(hRes))
+  pn = Config->GetStr ("Network", "NetManager", "crystalspace.network.manager.null");
+  if (FAILED (csCLSIDFromProgID (&pn, &clsidNetworkManagerSystem)))
   {
     Printf(MSG_FATAL_ERROR, "Bad value '%s' for network manager in configuration file\n", pn);
     return false;
   }
 
-  pn = "crystalspace.sound.render.null";
-  if (config) pn = config->GetStr ("Sound", "SoundRender", pn);
-
-  hRes = csCLSIDFromProgID (&pn, &clsidSoundRenderSystem);
-  if (FAILED(hRes))
+  pn = Config->GetStr ("Sound", "SoundRender", "crystalspace.sound.render.null");
+  if (FAILED (csCLSIDFromProgID (&pn, &clsidSoundRenderSystem)))
   {
     Printf(MSG_FATAL_ERROR, "Bad value '%s' for [Sound].SoundRender in configuration file\n", pn);
     return false;
@@ -347,11 +350,12 @@ void csSystemDriver::NextFrame (long /*elapsed_time*/, long /*current_time*/)
   if (piSound) piSound->Update ();
 }
 
-void csSystemDriver::SetSystemDefaults ()
+void csSystemDriver::SetSystemDefaults (csIniFile *Config)
 {
-  FrameWidth = 640; if (config) FrameWidth = config->GetInt ("VideoDriver", "WIDTH", FrameWidth);
-  FrameHeight = 480; if (config) FrameHeight = config->GetInt ("VideoDriver", "HEIGHT", FrameHeight);
-  Depth = 8; if (config) Depth = config->GetInt ("VideoDriver", "DEPTH", Depth);
+  FrameWidth = Config->GetInt ("VideoDriver", "WIDTH", 640);
+  FrameHeight = Config->GetInt ("VideoDriver", "HEIGHT", 480);
+  Depth = Config->GetInt ("VideoDriver", "DEPTH", 16);
+  FullScreen = Config->GetYesNo ("VideoDriver", "FULL_SCREEN", false);
 }
 
 bool csSystemDriver::ParseCmdLineDriver (int argc, char* argv[])
@@ -371,40 +375,42 @@ bool csSystemDriver::ParseArgDriver (int argc, char* argv[], int& i)
     i++;
     if (i < argc)
     {
-      sprintf (override_driver, "crystalspace.graphics3d.%s", argv[i]);
-      Printf (MSG_INITIALIZATION, "Use 3D driver '%s'.\n", override_driver);
+      char temp [100];
+      sprintf (temp, "crystalspace.graphics3d.%s", argv[i]);
+      override_driver = strnew (temp);
+      Printf (MSG_INITIALIZATION, "Using 3D driver '%s'.\n", override_driver);
     }
   }
   return true;
 }
 
-csColOption* csSystemDriver::CollectOptions (IConfig* config, csColOption* already_collected)
+csColOption* csSystemDriver::CollectOptions (IConfig* Config, csColOption* already_collected)
 {
   int i, num;
   csOptionDescription option;
-  config->GetNumberOptions (num);
+  Config->GetNumberOptions (num);
   char buf[100];
   for (i = 0 ; i < num ; i++)
   {
-    config->GetOptionDescription (i, &option);
+    Config->GetOptionDescription (i, &option);
     switch (option.type)
     {
       case CSVAR_BOOL:
         CHK (already_collected = new csColOption (already_collected, option.type, option.id, option.name,
-		true, config));
+		true, Config));
 	strcpy (buf, "no");
 	strcat (buf, option.name);
         CHK (already_collected = new csColOption (already_collected, option.type, option.id, buf,
-		false, config));
+		false, Config));
 	break;
       case CSVAR_CMD:
         CHK (already_collected = new csColOption (already_collected, option.type, option.id, option.name,
-		true, config));
+		true, Config));
 	break;
       case CSVAR_LONG:
       case CSVAR_FLOAT:
         CHK (already_collected = new csColOption (already_collected, option.type, option.id, option.name,
-		false, config));
+		false, Config));
 	break;
     }
   }
@@ -878,21 +884,24 @@ STDMETHODIMP csSystemDriver::XSystem::GetSubSystemPtr(void **retval, int iSubSys
 STDMETHODIMP csSystemDriver::XSystem::ConfigGetInt (char *Section, char *Key,
   int &Value, int Default)
 {
-  Value = Default; if (config) Value = config->GetInt (Section, Key, Default);
+  METHOD_PROLOGUE (csSystemDriver, System);
+  Value = pThis->Config->GetInt (Section, Key, Default);
   return S_OK;
 }
 
 STDMETHODIMP csSystemDriver::XSystem::ConfigGetStr (char *Section, char *Key,
   char *&Value, char *Default)
 {
-  Value = Default; if (config) Value = config->GetStr (Section, Key, Default);
+  METHOD_PROLOGUE (csSystemDriver, System);
+  Value = pThis->Config->GetStr (Section, Key, Default);
   return S_OK;
 }
 
 STDMETHODIMP csSystemDriver::XSystem::ConfigGetYesNo (char *Section, char *Key,
   bool &Value, bool Default)
 {
-  Value = Default; if (config) Value = config->GetYesNo (Section, Key, Default);
+  METHOD_PROLOGUE (csSystemDriver, System);
+  Value = pThis->Config->GetYesNo (Section, Key, Default);
   return S_OK;
 }
 

@@ -21,7 +21,6 @@
 #include "csgeom/math3d.h"
 #include "cssys/common/system.h"
 #include "cssys/win32/win32.h"
-#include "csutil/archive.h"
 #include "csutil/inifile.h"
 #include "igraph3d.h"
 #include "cssys/win32/DirectDetection.h"
@@ -72,13 +71,6 @@ extern csSystemDriver* System; // Global pointer to system that can be used by e
 long FAR PASCAL WindowProc( HWND hWnd, UINT message,WPARAM wParam, LPARAM lParam );
 
 //-----------------------------------------------// The System Driver //------//
-
-void SysSystemDriver::SetSystemDefaults ()
-{
-  csSystemDriver::SetSystemDefaults ();
-  
-  System->FullScreen = 1; if (config) System->FullScreen = config->GetYesNo ("VideoDriver", "FULL_SCREEN", System->FullScreen);
-}
 
 void SysSystemDriver::Alert (const char* s)
 {

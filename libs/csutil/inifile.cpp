@@ -25,15 +25,19 @@
 #include "csutil/inifile.h"
 #include "csutil/archive.h"
 
-// Use 8-bit characters in INI files
-#define CS_8BITINIFILES
+// Maximal INI line length
+#define CS_MAXINILINELEN	1024
+// Maximal line length for lines containing BASE64 encoded data
+#define CS_B64INILINELEN	76
 // Characters ignored in INI files (except in middle of section & key names)
-#define INISPACE   " \t"
+#define CS_INISPACE		" \t"
+// Use 8-bit characters in INI files
+#define CS_8BITCFGFILES
 
 // branch->Type values
-#define TYPE_SECTION    1
-#define TYPE_DATA       2
-#define TYPE_COMMENT    3
+#define TYPE_SECTION		1
+#define TYPE_DATA		2
+#define TYPE_COMMENT		3
 
 static char *INIbase64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
@@ -179,7 +183,7 @@ bool csIniFile::Load (bool (*ReadLine) (csSome Stream, void *data, size_t size),
       break;
     LineNo++;
 
-    cur += strspn (cur, INISPACE);
+    cur += strspn (cur, CS_INISPACE);
 
     if (b64mode)                        // Base64 mode
     {
@@ -237,7 +241,8 @@ bool csIniFile::Load (bool (*ReadLine) (csSome Stream, void *data, size_t size),
         b64init = true;
         b64mode = false;
       }
-    } else
+    }
+    else
     {
 plain:
       PSkipComment = SkipComment;
@@ -268,13 +273,13 @@ plain:
         int i;
 
         cur++;
-        cur += strspn (cur, INISPACE);
+        cur += strspn (cur, CS_INISPACE);
         cb = strchr (cur, ']');
         if (!cb)
           goto error;
 
         strncpy (tmp, cur, i = int (cb - cur));
-        while (i && strchr (INISPACE, tmp[i - 1]))
+        while (i && strchr (CS_INISPACE, tmp[i - 1]))
           i--;
         tmp[i] = 0;
 
@@ -310,18 +315,19 @@ error:    if (Error (LineNo, buff, int (cur - buff)))
         branch->Data.Name = strdup (tmp);
 
         cur = eq + 1;
-        cur += strspn (cur, INISPACE);
+        cur += strspn (cur, CS_INISPACE);
 
         strcpy (tmp, cur);
         i = strlen (cur);
         if (i)
         {
-          while (i && strchr (INISPACE, tmp[i - 1]))
+          while (i && strchr (CS_INISPACE, tmp[i - 1]))
             i--;
           tmp[i] = 0;
           branch->Data.Pointer = malloc ((branch->Data.Size = i) + 1);
           strcpy ((char *) branch->Data.Pointer, tmp);
-        } else
+        }
+        else
         {
           branch->Data.Size = 0;
           branch->Data.Pointer = NULL;
@@ -386,7 +392,7 @@ bool csIniFile::SaveEnumData (csSome struc, char *Name, size_t DataSize, csSome 
     else
       for (i = 0; i < DataSize; i++)
         if ((data[i] < ' ')
-#if !defined(CS_8BITINIFILES)
+#if !defined(CS_8BITCFGFILES)
           || (data[i] > 127)
 #endif
           )
@@ -660,7 +666,8 @@ bool csIniFile::SetData (const char *SectionPath, const char *KeyName,
       {
         free (branch->Data.Pointer);
         goto setval;
-      } else
+      }
+      else
         Sec->Delete (i);
       return (true);
     }

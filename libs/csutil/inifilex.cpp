@@ -24,16 +24,16 @@
 #include "sysdef.h"
 #include "types.h"
 #include "csutil/inifile.h"
-#include "csutil/archive.h"
+#include "csutil/vfs.h"
 
-csIniFile::csIniFile (Archive *ar, const char *fName, char iCommentChar)
+csIniFile::csIniFile (csVFS *vfs, const char *fName, char iCommentChar)
 {
   CommentChar = iCommentChar;
   Dirty = true;
-  if (ar)
+  if (vfs)
   {
     size_t size;
-    char *data = ar->read (fName, &size);
+    char *data = vfs->ReadFile (fName, size);
     if (data)
     {
       Load (data, size);

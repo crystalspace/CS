@@ -25,7 +25,6 @@
 #include "igraph2d.h"
 
 class csWorld;
-class Archive;
 class ImageFile;
 interface ITextureHandle;
 

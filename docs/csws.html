@@ -6,14 +6,15 @@
 
 <BODY TEXT=#FFFFFF LINK=#00D0D0 VLINK=#00FFFF BGCOLOR=#003050 BACKGROUND="img/texture6.gif">
 
-<H1>Goals</H1>
+<H1>Overview</H1>
+<H2>The Goal</H2>
 <P>
   The main goal of Crystal Space Windowing System (<I>CSWS</I>) is to provide
   a clean, effective and cross-platform base for creating CrystalSpace-related
   utilites. Currently there is only one such utility under development:
   CrystalSpace maze editor.
 </P>
-<H1>Overall concepts</H1>
+<H2>Overall concepts</H2>
 <P>
   There is nothing new in CSWS regarding the window system. All base conceptions
   for building such an system were invented far ago, at least when first X-windows
@@ -43,7 +44,9 @@
   image is blitted onto the screen.
 </P>
 <HR>
-<H1>Coordinate system</H1>
+<H1>Basic concepts</H1>
+<HR>
+<H2>Coordinate system</H2>
 <P>
   Coordinate system is based on most-used (wrong :-) system when top-left
   corner is (0,0) and bottom-right corner is (width, height). It would be
@@ -73,7 +76,7 @@
   two windows: (0, 0) - (3, 2) and (3, 0) - (6, 2) they do NOT overlap.
 </P>
 <HR>
-<H1>Palette</H1>
+<H2>Palette</H2>
 <P>
   CSWS has been designed to operate transparently independent of screen
   geometry or number of colors. To allow normal operation in different
@@ -103,7 +106,7 @@
   methods, which are described below. Other methods are described as
   needed during this document.
 </P>
-<H2>csComponent::Draw ()</H2>
+<H3>csComponent::Draw ()</H3>
 <P>
   Each component should know how to paint itself. When windowing system thinks
   a part of a component image or entire component image is invalid (for example,
@@ -218,7 +221,7 @@
         rectangle (SetClipRect (0, 0, 0, 0));
   </UL>
 </P>
-<H2>csComponent::HandleEvent (csEvent &Event)</H2>
+<H3>csComponent::HandleEvent (csEvent &Event)</H3>
 <P>
   This is the main component's entry point for handling windowing system
   events. Each time user presses a key, moves mouse etc windowing system
@@ -274,7 +277,7 @@
   input text, while if active component is a non text-hungry component (for example,
   a listbox) the 'A' key can be used by some button to activate itself).
 </P>
-<H2>Data csComponent fields</H2>
+<H3>Data csComponent fields</H3>
 <P>
   csComponent class has a number of data fields. The most important is
   <PRE>
@@ -463,7 +466,7 @@
   against all its neightbours, then against "clip parent" window and all its
   neightbours and so on.
 </P>
-<H2>Clip parents</H2>
+<H3>Clip parents</H3>
 <P>
   All components have a "parent" component and a "clipparent" component. What
   they are used for? Usually "clipparent" is equal to "parent" so there is
@@ -482,19 +485,70 @@
   "clip child" into component's clip child list, removes component from
   former clipparent's "clip child" list and so on.
 </P>
-<A NAME="transpcomp"><H2>Partialy transparent components</H2></A>
+<A NAME="transpcomp"><H3>Partialy transparent components</H3></A>
 <P>
   You can set a state flag called CSS_TRANSPARENT to mark semi-transparent components.
   Transparent components works differently in the following ways:
   <UL>
     <LI>When a part of such a component is invalidated, the same area of parent
-        component is invalidated too.
+        component is invalidated as well.
     <LI>Mouse events for such components are considered "eaten" only if component's
         HandleEvent method returned TRUE. Otherwise, the event is sent to the component
-        placed one level below transparent area.
+        placed one level below the transparent area.
     <LI>Parent's window output is not clipped against transparent childs. Instead of
         this, child's area covered by output is invalidated.
   </UL>
 </P>
+<HR>
+<H1>Quick Tutorial<H1>
+In the following I will try to explain how to build simple applications using
+Crystal Space Windowing System. I hope you will understand enough to start
+writing your own applications; I also hope you will get a deeper knowledge of
+CSWS during your development (or lab) sessions.
+<HR>
+<H2>A simple application</H2>
+The simplest possible application should do the following:
+<UL>
+  <LI>Create an application object (csApp)
+  <LI>Run the application (run the main event processing loop)
+  <LI>Finish the application (delete the object)
+</UL>
+Let's try:
+<CODE>
+#include "csws/csws.h"
+
+int main (int argc, char* argv[])
+{
+  csApp app ("CSWS test application", argc, argv);
+
+  if (app.InitialSetup ())
+    app.Loop ();
+}
+</CODE>
+Pretty simple, eh? So the result is as well :-) We got a gray background, a
+mouse and nothing more. What the program does:
+<P>
+First, it creates a csApp object called "app". To initialize the application
+you pass three parameters: the window title (for system that support a window
+title) and argument vector passed to main() so that Crystal Space low-level
+layer can eat such arguments as "-mode", "-depth" and so on.
+<P>
+The next step is to call InitialSetup() method. The csApp's InitialSetup()
+method does nothing except returning true, but you probably will want to
+override it to initialize your application there. Create a popup menu, insert
+it into the desktop, add some windows, read configuration files etc.
+<P>
+And finally we run the main application loop. The event consuming loop does
+the following: while there are events in input queue: read an event, pass it
+to HandleEvent method. If there weren't any events in the loop, call Idle()
+method to give some time slices to other running applications (if
+csSystemDriver::Sleep() method is implemented properly). If some window needs
+redrawing, it is redrawn. After this the screen is updated and everything starts
+again from the beginning.
+<P>
+If you observe, our above program does not delete the csApp object. That's
+because it is a automatic variable and not a pointer, so its automatically
+deleted when program finishes. If you would use a pointer, you should
+explicitely delete the app pointer with delete() command.
 </BODY>
 </HTML>

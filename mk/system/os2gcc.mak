@@ -15,8 +15,7 @@ DESCRIPTION.os2gcc = OS/2 with GCC/EMX
 DRIVERS=\
   csnetdrv/null csnetdrv/sockets csnetman/null csnetman/simple \
   cssnddrv/null cssndrdr/null cssndrdr/software \
-  cs2d/csdive cs3d/software \
-# cs2d/openglos2 cs3d/opengl
+  cs2d/csdive cs3d/software
 
 #---------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
@@ -97,7 +96,7 @@ LFLAGS.GENERAL=-Zmt
 # Flags for the linker which are used when optimizing.
 LFLAGS.optimize=-s
 ifeq ($(USE_OMF)/$(USE_CRTDLL),yes/no)
-  LFLAGS.optimize+=-Zsmall-conv -Zsys
+  LFLAGS.optimize+=-Zsmall-conv -Zsys -lemx
 else
   LFLAGS.optimize+=-Zcrtdll
 endif

@@ -66,11 +66,10 @@ bool SysSystemDriver::Initialize( int argc, char* argv[], IConfig* pconfig )
 //-----------------------------------------------------------------------------
 // SetSystemDefaults
 //-----------------------------------------------------------------------------
-void SysSystemDriver::SetSystemDefaults()
+void SysSystemDriver::SetSystemDefaults(csIniFile *config)
     {
-    superclass::SetSystemDefaults();
-    if (config != 0)
-	simulated_depth = config->GetInt( "VideoDriver", "SIMULATE_DEPTH", 0 );
+    superclass::SetSystemDefaults(config);
+    simulated_depth = config->GetInt( "VideoDriver", "SIMULATE_DEPTH", 0 );
     }
 
 

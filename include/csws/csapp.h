@@ -1,21 +1,21 @@
 /*
-  Crystal Space Windowing System: Windowing System Application class interface
-  Copyright (C) 1998 by Jorrit Tyberghein
-  Written by Andrew Zabolotny <bit@eltech.ru>
+    Crystal Space Windowing System: Windowing System Application class interface
+    Copyright (C) 1998 by Jorrit Tyberghein
+    Written by Andrew Zabolotny <bit@eltech.ru>
 
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Library General Public
-  License as published by the Free Software Foundation; either
-  version 2 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
 
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Library General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
 
-  You should have received a copy of the GNU Library General Public
-  License along with this library; if not, write to the Free
-  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #ifndef __CSAPP_H__
@@ -34,7 +34,7 @@
  */
 enum csAppBackgroundStyle
 {
-  /// Nothing: use only if csApp is not visible to speed up drawing
+  /// Nothing: use only if desktop is not visible to avoid extra drawing
   csabsNothing = 0,
   /// Solid background of palette[0] color
   csabsSolid
@@ -59,7 +59,7 @@ protected:
   /// The event queue
   csEventQueue *EventQueue;
   /// The world object
-  csWorld *world;
+  csWorld *World;
   /// Application background style
   csAppBackgroundStyle BackgroundStyle;
   /// Window list width and height
@@ -71,8 +71,9 @@ protected:
   /// The code that dialog passed to Dismiss ()
   int DismissCode;
 
-  /// Set up initial application layout (create windows, menus etc)
-  virtual bool InitialSetup ();
+  /// Set up initial application layout (read configs, create windows, menus etc)
+  virtual bool InitialSetup (int argc, char *argv[],
+    const char *ConfigName, const char *VfsConfigName);
 
 public:
   /// Application's adaptive palette
@@ -105,8 +106,7 @@ public:
   bool insert;
 
   /// Initialize windowing system
-  csApp (char *AppTitle, int argc, char *argv[],
-    csAppBackgroundStyle iBackgroundStyle = csabsSolid);
+  csApp (char *AppTitle, csAppBackgroundStyle iBackgroundStyle = csabsSolid);
   /// Deinitialize windowing system
   virtual ~csApp ();
 
@@ -127,18 +127,14 @@ public:
   virtual void SetWorld (csWorld *AppWorld);
 
   /// Get world for textures, config files etc.
-  csWorld* GetWorld () { return world; }
+  csWorld* GetWorld () { return World; }
 
   /// Start endless event loop
   virtual void Loop ();
 
-  /// Return application's data archive
-  Archive *GetArchive ()
-  { return world->GetWorldFile (); }
-
   /// Return application's texture list
   csTextureList *GetTextures ()
-  { return world->GetTextures (); }
+  { return World->GetTextures (); }
 
   /// Find a texture by name
   csTextureHandle *GetTexture (char *Name)

@@ -41,7 +41,6 @@ public:
 	virtual void Close();
 
 	virtual bool Initialize (int argc, char *argv[], IConfig* cfg_engine);
-	virtual void SetSystemDefaults(void);
 	virtual bool ParseArg(int argc, char* argv[], int &i);
 	virtual void SystemHelp(void);
 	virtual void Loop();

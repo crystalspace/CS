@@ -21,8 +21,8 @@
 #include "cssys/common/system.h"
 #include "csparser/csloader.h"
 #include "apps/blocks/blocks.h"
-#include "csutil/archive.h"
 #include "csutil/inifile.h"
+#include "csutil/vfs.h"
 #include "csgfxldr/csimage.h"
 #include "csgfxldr/gifimage.h"
 #include "csengine/dumper.h"
@@ -30,7 +30,6 @@
 #include "csengine/sector.h"
 #include "csengine/polytext.h"
 #include "csengine/polygon.h"
-#include "csengine/library.h"
 #include "csengine/world.h"
 #include "csengine/light.h"
 #include "csengine/lghtmap.h"
@@ -827,7 +826,6 @@ void cleanup ()
   pprintf ("Cleaning up...\n");
   CHK (delete view);
   CHK (delete Sys);
-  CHK (delete config);
   pprintf_close();              // DAN: this closes the pprintf routine
 }
 
@@ -841,16 +839,13 @@ int main (int argc, char* argv[])
   // Create our main class which is the driver for Blocks.
   CHK (Sys = new Blocks ());
 
-  // Open our configuration file.
-  CHK (config = new csIniFile ("blocks.cfg"));
-
   // Create our world. The world is the representation of
   // the 3D engine.
   CHK (Sys->world = new csWorld ());
 
   // Initialize the main system. This will load all needed
   // COM drivers (3D, 2D, network, sound, ...) and initialize them.
-  if (!Sys->Initialize (argc, argv, Sys->world->GetEngineConfigCOM ()))
+  if (!Sys->Initialize (argc, argv, "blocks.cfg", "VFS.cfg", Sys->world->GetEngineConfigCOM ()))
   {
     Sys->Printf (MSG_FATAL_ERROR, "Error initializing system!\n");
     cleanup ();
@@ -877,7 +872,7 @@ int main (int argc, char* argv[])
   txtmgr->SetVerbose (true);
 
   // Initialize our world.
-  Sys->world->Initialize (GetISystemFromSystem (System), Gfx3D, config);
+  Sys->world->Initialize (GetISystemFromSystem (System), Gfx3D, Sys->Config, Sys->Vfs);
 
   // csView is a view encapsulating both a camera and a clipper.
   // You don't have to use csView as you can do the same by
@@ -890,14 +885,12 @@ int main (int argc, char* argv[])
   Sys->Printf (MSG_INITIALIZATION, "Creating world!...\n");
   Sys->world->EnableLightingCache (false);
 
-  char const* path = config->GetStr ("Blocks", "ARCHIVE", "data/blocks.zip");
-  Archive* archive = new Archive (path, true);
+  // Change to virtual directory where Blocks data is stored
+  Sys->Vfs->ChDir (Sys->Config->GetStr ("Blocks", "DATA", "/data/blocks"));
 
-  Sys->set_pilar_texture (CSLoader::LoadTexture (Sys->world, "txt", "stone4.gif", archive));
-  Sys->set_cube_texture (CSLoader::LoadTexture (Sys->world, "txt", "cube.gif", archive));
-  csTextureHandle* tm = CSLoader::LoadTexture (Sys->world, "txt2", "mystone2.gif", archive);
-
-  delete archive; archive = 0;
+  Sys->set_pilar_texture (csLoader::LoadTexture (Sys->world, "txt1", "stone4.gif"));
+  Sys->set_cube_texture (csLoader::LoadTexture (Sys->world, "txt2", "cube.gif"));
+  csTextureHandle* tm = csLoader::LoadTexture (Sys->world, "txt3", "mystone2.gif");
 
   room = Sys->world->NewSector ();
   csNameObject::AddName (*room, "room");

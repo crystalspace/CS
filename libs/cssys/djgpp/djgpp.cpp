@@ -202,9 +202,7 @@ SysMouseDriver::SysMouseDriver () : csMouseDriver ()
   MouseExists = !!(regs.x.ax);
   MouseOpened = false;
 
-  SensivityFactor = 1.0;
-  if (config)
-    SensivityFactor = config->GetFloat ("MouseDriver", "MouseSensivity", SensivityFactor);
+  SensivityFactor = config->GetFloat ("MouseDriver", "MouseSensivity", 1.0);
 }
 
 SysMouseDriver::~SysMouseDriver ()

@@ -41,7 +41,6 @@
 #include "csengine/thing.h"
 #include "csengine/cssprite.h"
 #include "csengine/thingtpl.h"
-#include "csutil/archive.h"
 
 
 //////////////////////////////////////////////////////////////////////

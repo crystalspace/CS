@@ -25,12 +25,13 @@ class csWsTest : public csApp
 {
 public:
   /// Initialize maze editor
-  csWsTest (char *AppTitle, int argc, char *argv[]);
+  csWsTest (char *AppTitle);
 
   ///
   virtual bool HandleEvent (csEvent &Event);
 
-  virtual bool InitialSetup ();
+  virtual bool InitialSetup (int argc, char *argv[],
+    const char *ConfigName, const char *VfsConfigName);
 };
 
 csWsTest *app;                        // The main Windowing System object
@@ -46,16 +47,25 @@ static int palette_csWsTest[] =
   cs_Color_White			// Start points
 };
 
-csWsTest::csWsTest (char *AppTitle, int argc, char *argv[]) :
-  csApp (AppTitle, argc, argv)
+csWsTest::csWsTest (char *AppTitle) : csApp (AppTitle)
 {
   SetPalette (palette_csWsTest, sizeof (palette_csWsTest) / sizeof (int));
 }
 
-bool csWsTest::InitialSetup ()
+bool csWsTest::InitialSetup (int argc, char *argv[],
+  const char *ConfigName, const char *VfsConfigName)
 {
-  if (!csApp::InitialSetup ())
+  if (!csApp::InitialSetup (argc, argv, ConfigName, VfsConfigName))
     return false;
+
+  // Change to the directory on VFS where we keep our data
+  System->Vfs->ChDir ("/lib/MazeD");
+
+  // For GUI apps double buffering is a performance hit
+  System->piG2D->DoubleBuffer (false);
+
+  CsPrintf (MSG_INITIALIZATION, "Crystal Space Windowing System test version %s (%s).\n", VERSION, RELEASE_DATE);
+  CsPrintf (MSG_INITIALIZATION, "Created by Andrew Zabolotny and others...\n\n");
 
   // create a window
   csComponent *window = new csWindow (this, "-- Drag me --",
@@ -295,17 +305,9 @@ bool csWsTest::HandleEvent (csEvent &Event)
  */
 int main (int argc, char* argv[])
 {
-  config = new csIniFile ("MazeD.cfg");
+  app = new csWsTest ("Crystal Space 3D maze editor");
 
-  app = new csWsTest ("Crystal Space 3D maze editor", argc, argv);
-
-  CsPrintf (MSG_INITIALIZATION, "Crystal Space Windowing System test version %s (%s).\n", VERSION, RELEASE_DATE);
-  CsPrintf (MSG_INITIALIZATION, "Created by Andrew Zabolotny and others...\n\n");
-
-  // For GUI apps double buffering is a performance hit
-  System->piG2D->DoubleBuffer (false);
-
-  if (app->InitialSetup ())
+  if (app->InitialSetup (argc, argv, "MazeD.cfg", "VFS.cfg"))
     app->Loop ();
 
   return (0);

@@ -47,7 +47,7 @@ public:
   SysSystemDriver ();
 
   /// Check for system-specific INI entries
-  void SetSystemDefaults ();
+  virtual void SetSystemDefaults (csIniFile *config);
   // Main event loop
   virtual void Loop ();
   // Parse an unknown argument on command-line

@@ -43,7 +43,7 @@ public:
   SysSystemDriver ();
 
   /// Check if configuration files requests 16 bits per pixel
-  void SetSystemDefaults ();
+  virtual void SetSystemDefaults (csIniFile *config);
 
   /**
    * This is a function that prints the commandline help text.

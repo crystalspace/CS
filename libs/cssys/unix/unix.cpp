@@ -91,18 +91,12 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver (), Callback (NULL)
   init_sig ();
 }
 
-void SysSystemDriver::SetSystemDefaults ()
+void SysSystemDriver::SetSystemDefaults (csIniFile *config)
 {
-  csSystemDriver::SetSystemDefaults ();
-  SimDepth = 0;
-  UseSHM = true;
-  HardwareCursor = true;
-  if (config)
-  {
-    SimDepth = config->GetInt ("VideoDriver", "SIMULATE_DEPTH", SimDepth);
-    UseSHM = config->GetYesNo ("VideoDriver", "XSHM", UseSHM);
-    HardwareCursor = config->GetYesNo ("VideoDriver", "SYS_MOUSE_CURSOR", HardwareCursor);
-  }
+  csSystemDriver::SetSystemDefaults (config);
+  SimDepth = Config->GetInt ("VideoDriver", "SIMULATE_DEPTH", 0);
+  UseSHM = Config->GetYesNo ("VideoDriver", "XSHM", true);
+  HardwareCursor = Config->GetYesNo ("VideoDriver", "SYS_MOUSE_CURSOR", true);
 }
 
 bool SysSystemDriver::ParseArg (int argc, char* argv[], int &i)

@@ -94,7 +94,6 @@ public:
   
   virtual void Close ();
   virtual void Loop ();
-  virtual void SetSystemDefaults ();
   virtual void Alert (const char* s);
   virtual void Warn (const char* s);
 

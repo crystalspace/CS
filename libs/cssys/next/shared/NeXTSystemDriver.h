@@ -50,7 +50,7 @@ public:
     SysSystemDriver();
     virtual ~SysSystemDriver();
     virtual bool Initialize( int argc, char *argv[], IConfig* cfg_engine );
-    virtual void SetSystemDefaults();
+    virtual void SetSystemDefaults(csIniFile *config);
     virtual void Help();
     virtual void Loop ();
 

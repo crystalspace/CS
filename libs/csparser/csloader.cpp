@@ -1,17 +1,17 @@
 /*
     Copyright (C) 1998 by Jorrit Tyberghein
     Written by Ivan Avramovic <ivan@avramovic.com>
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -31,7 +31,6 @@
 #include "csengine/skeleton.h"
 #include "csengine/polygon.h"
 #include "csengine/dynlight.h"
-#include "csengine/library.h"
 #include "csengine/textrans.h"
 #include "csengine/world.h"
 #include "csengine/light.h"
@@ -41,7 +40,7 @@
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "csutil/token.h"
-#include "csutil/archive.h"
+#include "csutil/vfs.h"
 #include "csutil/inifile.h"
 #include "csutil/util.h"
 #include "cssndldr/sndload.h"
@@ -51,27 +50,138 @@
 #include "csscript/objtrig.h"
 #include "csscript/scripts.h"
 
+typedef char ObName[30];
 
 //---------------------------------------------------------------------------
 
-int CSLoader::LoadStat::polygons_loaded = 0;
-int CSLoader::LoadStat::portals_loaded = 0;
-int CSLoader::LoadStat::sectors_loaded = 0;
-int CSLoader::LoadStat::things_loaded = 0;
-int CSLoader::LoadStat::lights_loaded = 0;
-int CSLoader::LoadStat::curves_loaded = 0;
-int CSLoader::LoadStat::sprites_loaded = 0;
+int csLoader::LoadStat::polygons_loaded = 0;
+int csLoader::LoadStat::portals_loaded = 0;
+int csLoader::LoadStat::sectors_loaded = 0;
+int csLoader::LoadStat::things_loaded = 0;
+int csLoader::LoadStat::lights_loaded = 0;
+int csLoader::LoadStat::curves_loaded = 0;
+int csLoader::LoadStat::sprites_loaded = 0;
+
+// Define all tokens used through this file
+TOKEN_DEF_START
+  TOKEN_DEF (ACTION)
+  TOKEN_DEF (ACTIVATE)
+  TOKEN_DEF (ACTIVE)
+  TOKEN_DEF (ALPHA)
+  TOKEN_DEF (BECOMING_ACTIVE)
+  TOKEN_DEF (BECOMING_INACTIVE)
+  TOKEN_DEF (BEZIER)
+  TOKEN_DEF (BSP)
+  TOKEN_DEF (CEILING)
+  TOKEN_DEF (CEIL_TEXTURE)
+  TOKEN_DEF (CENTER)
+  TOKEN_DEF (CIRCLE)
+  TOKEN_DEF (CLIP)
+  TOKEN_DEF (COLLECTION)
+  TOKEN_DEF (COLOR)
+  TOKEN_DEF (COLORS)
+  TOKEN_DEF (CONVEX)
+  TOKEN_DEF (COSFACT)
+  TOKEN_DEF (CURVECENTER)
+  TOKEN_DEF (CURVECONTROL)
+  TOKEN_DEF (CURVESCALE)
+  TOKEN_DEF (DIM)
+  TOKEN_DEF (DYNAMIC)
+  TOKEN_DEF (F)
+  TOKEN_DEF (FILE)
+  TOKEN_DEF (FILTER)
+  TOKEN_DEF (FIRST)
+  TOKEN_DEF (FIRST_LEN)
+  TOKEN_DEF (FLATCOL)
+  TOKEN_DEF (FLOOR)
+  TOKEN_DEF (FLOOR_CEIL)
+  TOKEN_DEF (FLOOR_HEIGHT)
+  TOKEN_DEF (FLOOR_TEXTURE)
+  TOKEN_DEF (FOG)
+  TOKEN_DEF (FRAME)
+  TOKEN_DEF (GOURAUD)
+  TOKEN_DEF (HALO)
+  TOKEN_DEF (HEIGHT)
+  TOKEN_DEF (LEN)
+  TOKEN_DEF (LIBRARY)
+  TOKEN_DEF (LIGHT)
+  TOKEN_DEF (LIGHTING)
+  TOKEN_DEF (LIGHTX)
+  TOKEN_DEF (LIMB)
+  TOKEN_DEF (MATRIX)
+  TOKEN_DEF (MAX_TEXTURES)
+  TOKEN_DEF (MIPMAP)
+  TOKEN_DEF (MIRROR)
+  TOKEN_DEF (MOVE)
+  TOKEN_DEF (MOVEABLE)
+  TOKEN_DEF (ORIG)
+  TOKEN_DEF (PLANE)
+  TOKEN_DEF (POLYGON)
+  TOKEN_DEF (PORTAL)
+  TOKEN_DEF (PRIMARY_ACTIVE)
+  TOKEN_DEF (PRIMARY_INACTIVE)
+  TOKEN_DEF (RADIUS)
+  TOKEN_DEF (ROOM)
+  TOKEN_DEF (ROT_X)
+  TOKEN_DEF (ROT_Y)
+  TOKEN_DEF (ROT_Z)
+  TOKEN_DEF (SCRIPT)
+  TOKEN_DEF (SECOND)
+  TOKEN_DEF (SECONDARY_ACTIVE)
+  TOKEN_DEF (SECONDARY_INACTIVE)
+  TOKEN_DEF (SECOND_LEN)
+  TOKEN_DEF (SECTOR)
+  TOKEN_DEF (SIXFACE)
+  TOKEN_DEF (SKELETON)
+  TOKEN_DEF (SKYDOME)
+  TOKEN_DEF (SOUND)
+  TOKEN_DEF (SOUNDS)
+  TOKEN_DEF (SPLIT)
+  TOKEN_DEF (SPRITE)
+  TOKEN_DEF (START)
+  TOKEN_DEF (STATBSP)
+  TOKEN_DEF (STATELESS)
+  TOKEN_DEF (STATIC)
+  TOKEN_DEF (TEMPLATE)
+  TOKEN_DEF (TEX)
+  TOKEN_DEF (TEXLEN)
+  TOKEN_DEF (TEXNR)
+  TOKEN_DEF (TEXTURE)
+  TOKEN_DEF (TEXTURES)
+  TOKEN_DEF (TEXTURE_LIGHTING)
+  TOKEN_DEF (TEXTURE_MIPMAP)
+  TOKEN_DEF (TEXTURE_SCALE)
+  TOKEN_DEF (THING)
+  TOKEN_DEF (TRANSFORM)
+  TOKEN_DEF (TRANSPARENT)
+  TOKEN_DEF (TRIANGLE)
+  TOKEN_DEF (TRIGGER)
+  TOKEN_DEF (UV)
+  TOKEN_DEF (UVA)
+  TOKEN_DEF (UV_SHIFT)
+  TOKEN_DEF (V)
+  TOKEN_DEF (VERTEX)
+  TOKEN_DEF (VERTICES)
+  TOKEN_DEF (W)
+  TOKEN_DEF (WARP)
+  TOKEN_DEF (WORLD)
+TOKEN_DEF_END
 
 //---------------------------------------------------------------------------
 
-csMatrix3 CSLoader::load_matrix (char* buf)
+csMatrix3 csLoader::load_matrix (char* buf)
 {
-  if (!strcmp (buf, "IDENTITY")) return csMatrix3(); /* return the identity */
+  if (!strcmp (buf, "IDENTITY"))
+    return csMatrix3 (); /* return the identity */
 
   if (!strncmp (buf, "ROT", 3))
   {
-    static tokenDesc tok_cmd[] = {{1, "ROT_X"}, {2, "ROT_Y"}, 
-                                  {3, "ROT_Z"}, {0,0}};
+    TOKEN_TABLE_START(tok_cmd)
+      TOKEN_TABLE (ROT_X)
+      TOKEN_TABLE (ROT_Y)
+      TOKEN_TABLE (ROT_Z)
+    TOKEN_TABLE_END
+
     char* params;
     int cmd;
     csMatrix3 M;
@@ -80,15 +190,15 @@ csMatrix3 CSLoader::load_matrix (char* buf)
     {
       switch (cmd)
       {
-        case 1:
+        case TOKEN_ROT_X:
           ScanStr (params, "%f", &angle);
           M *= csXRotMatrix3 (angle);
           break;
-        case 2:
+        case TOKEN_ROT_Y:
           ScanStr (params, "%f", &angle);
           M *= csYRotMatrix3 (angle);
           break;
-        case 3:
+        case TOKEN_ROT_Z:
           ScanStr (params, "%f", &angle);
           M *= csZRotMatrix3 (angle);
           break;
@@ -119,35 +229,32 @@ csMatrix3 CSLoader::load_matrix (char* buf)
 }
 
 
-csVector3 CSLoader::load_vector (char* buf)
-{ 
+csVector3 csLoader::load_vector (char* buf)
+{
   float x,y,z;
-  ScanStr (buf, "%f,%f,%f", &x, &y, &z); 
+  ScanStr (buf, "%f,%f,%f", &x, &y, &z);
   return csVector3(x,y,z);
 }
 
 //---------------------------------------------------------------------------
 
-enum { kTokenPlaneOrig = 1, kTokenPlaneFirst, kTokenPlaneFirstLen,
-       kTokenPlaneSecond, kTokenPlaneSecondLen, kTokenPlaneMatrix,
-       kTokenPlaneVector };
-
-csPolyPlane* CSLoader::load_polyplane (char* buf, char* name)
+csPolyPlane* csLoader::load_polyplane (char* buf, char* name)
 {
-  static tokenDesc commands[] = {
-        {kTokenPlaneOrig, "ORIG"},
-        {kTokenPlaneFirstLen, "FIRST_LEN"},
-        {kTokenPlaneFirst, "FIRST"},
-        {kTokenPlaneSecondLen, "SECOND_LEN"},
-        {kTokenPlaneSecond, "SECOND"},
-        {kTokenPlaneMatrix, "MATRIX"},
-        {kTokenPlaneVector, "V"},
-        {0,0}};
+  TOKEN_TABLE_START(commands)
+    TOKEN_TABLE (ORIG)
+    TOKEN_TABLE (FIRST_LEN)
+    TOKEN_TABLE (FIRST)
+    TOKEN_TABLE (SECOND_LEN)
+    TOKEN_TABLE (SECOND)
+    TOKEN_TABLE (MATRIX)
+    TOKEN_TABLE (V)
+  TOKEN_TABLE_END
+
   char* xname;
   long cmd;
   char* params;
   CHK( csPolyPlane* ppl = new csPolyPlane() );
-  csNameObject::AddName(*ppl, name); 
+  csNameObject::AddName(*ppl, name);
 
   bool tx1_given = false, tx2_given = false;
   csVector3 tx1_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
@@ -164,31 +271,31 @@ csPolyPlane* CSLoader::load_polyplane (char* buf, char* name)
     }
     switch (cmd)
     {
-      case kTokenPlaneOrig:
+      case TOKEN_ORIG:
         tx1_given = true;
-        tx1_orig = CSLoader::load_vector (params);
+        tx1_orig = load_vector (params);
         break;
-      case kTokenPlaneFirst:
+      case TOKEN_FIRST:
         tx1_given = true;
-        tx1 = CSLoader::load_vector (params);
+        tx1 = load_vector (params);
         break;
-      case kTokenPlaneFirstLen:
+      case TOKEN_FIRST_LEN:
         ScanStr (params, "%f", &tx1_len);
         tx1_given = true;
         break;
-      case kTokenPlaneSecond:
+      case TOKEN_SECOND:
         tx2_given = true;
-        tx2 = CSLoader::load_vector (params);
+        tx2 = load_vector (params);
         break;
-      case kTokenPlaneSecondLen:
+      case TOKEN_SECOND_LEN:
         ScanStr (params, "%f", &tx2_len);
         tx2_given = true;
         break;
-      case kTokenPlaneMatrix:
-        tx_matrix = CSLoader::load_matrix (params);
+      case TOKEN_MATRIX:
+        tx_matrix = load_matrix (params);
         break;
-      case kTokenPlaneVector:
-        tx_vector = CSLoader::load_vector (params);
+      case TOKEN_V:
+        tx_vector = load_vector (params);
         break;
     }
   }
@@ -210,70 +317,68 @@ csPolyPlane* CSLoader::load_polyplane (char* buf, char* name)
 
 //---------------------------------------------------------------------------
 
-enum { kTokenNone, kTokenActive, kTokenStateless, kTokenPrimActive,
-       kTokenSecActive, kTokenBecActive, kTokenPrimInactive,
-       kTokenSecInactive, kTokenBecInactive };
-
-void CSLoader::load_light (char* name, char* buf)
+void csLoader::load_light (char* name, char* buf)
 {
-  static tokenDesc commands[] = {{kTokenActive, "ACTIVE"},
-                                 {kTokenStateless, "STATELESS"},
-                                 {kTokenPrimActive, "PRIMARY_ACTIVE"},
-                                 {kTokenSecActive, "SECONDARY_ACTIVE"},
-                                 {kTokenBecActive, "BECOMING_ACTIVE"},
-                                 {kTokenPrimInactive, "PRIMARY_INACTIVE"},
-                                 {kTokenSecInactive, "SECONDARY_INACTIVE"},
-                                 {kTokenBecInactive, "BECOMING_INACTIVE"},
-                                 {0,0}};
+  TOKEN_TABLE_START(commands)
+    TOKEN_TABLE (ACTIVE)
+    TOKEN_TABLE (STATELESS)
+    TOKEN_TABLE (PRIMARY_ACTIVE)
+    TOKEN_TABLE (SECONDARY_ACTIVE)
+    TOKEN_TABLE (BECOMING_ACTIVE)
+    TOKEN_TABLE (PRIMARY_INACTIVE)
+    TOKEN_TABLE (SECONDARY_INACTIVE)
+    TOKEN_TABLE (BECOMING_INACTIVE)
+  TOKEN_TABLE_END
+
   CHK (CLights *theLite = new CLights());
   csNameObject::AddName(*theLite,name);
 
-  long    cmd;
-  char    *params;
-  int             state, theType, thePeriod, dp, intensity, di;
+  long cmd;
+  char *params;
+  int state, theType, thePeriod, dp, intensity, di;
   while ((cmd = csGetCommand(&buf, commands, &params)) > 0)
   {
     switch (cmd)
     {
-      case kTokenActive:
+      case TOKEN_ACTIVE:
         sscanf(params, "%d", &state);
         theLite->SetInitallyActive(state);
         break;
-      case kTokenStateless:
+      case TOKEN_STATELESS:
         sscanf(params, "%d", &state);
         theLite->SetStateType(state);
         break;
-      case kTokenPrimActive:
+      case TOKEN_PRIMARY_ACTIVE:
         sscanf(params, "%d,%d,%d,%d,%d", &theType, &thePeriod,
                                          &dp, &intensity, &di);
         theLite->SetFunctionData(CLights::kStatePrimaryActive, theType,
                                  thePeriod, dp, intensity, di);
         break;
-      case kTokenSecActive:
+      case TOKEN_SECONDARY_ACTIVE:
         sscanf(params, "%d,%d,%d,%d,%d", &theType, &thePeriod,
                                          &dp, &intensity, &di);
         theLite->SetFunctionData(CLights::kStateSecondaryActive, theType,
                                  thePeriod, dp, intensity, di);
         break;
-      case kTokenBecActive:
+      case TOKEN_BECOMING_ACTIVE:
         sscanf(params, "%d,%d,%d,%d,%d", &theType, &thePeriod,
                                          &dp, &intensity, &di);
         theLite->SetFunctionData(CLights::kStateBecomingActive, theType,
                                  thePeriod, dp, intensity, di);
         break;
-      case kTokenPrimInactive:
+      case TOKEN_PRIMARY_INACTIVE:
         sscanf(params, "%d,%d,%d,%d,%d", &theType, &thePeriod,
                                          &dp, &intensity, &di);
         theLite->SetFunctionData(CLights::kStatePrimaryInactive, theType,
                                  thePeriod, dp, intensity, di);
         break;
-      case kTokenSecInactive:
+      case TOKEN_SECONDARY_INACTIVE:
         sscanf(params, "%d,%d,%d,%d,%d", &theType, &thePeriod,
                                          &dp, &intensity, &di);
         theLite->SetFunctionData(CLights::kStateSecondaryInactive, theType,
                                  thePeriod, dp, intensity, di);
         break;
-      case kTokenBecInactive:
+      case TOKEN_BECOMING_INACTIVE:
         sscanf(params, "%d,%d,%d,%d,%d", &theType, &thePeriod,
                                         &dp, &intensity, &di);
         theLite->SetFunctionData(CLights::kStateBecomingInactive, theType,
@@ -287,23 +392,21 @@ void CSLoader::load_light (char* name, char* buf)
 
 //---------------------------------------------------------------------------
 
-enum { kTokenColThing = 1, kTokenColCol, kTokenColLight,
-       kTokenColTrigger, kTokenColSector };
-
-csCollection* CSLoader::load_collection (char* name, csWorld* w, char* buf)
+csCollection* csLoader::load_collection (char* name, csWorld* w, char* buf)
 {
-  static tokenDesc commands[] = {
-        {kTokenColThing, "THING"},
-        {kTokenColCol, "COLLECTION"},
-        {kTokenColLight, "LIGHT"},
-        {kTokenColTrigger, "TRIGGER"},
-        {kTokenColSector, "SECTOR"},
-        {0,0}};
+  TOKEN_TABLE_START(commands)
+    TOKEN_TABLE (THING)
+    TOKEN_TABLE (COLLECTION)
+    TOKEN_TABLE (LIGHT)
+    TOKEN_TABLE (TRIGGER)
+    TOKEN_TABLE (SECTOR)
+  TOKEN_TABLE_END
+
   char* xname;
   long cmd;
   char* params;
 
-  CHK( csCollection* collection = new csCollection() ); 
+  CHK( csCollection* collection = new csCollection() );
   csNameObject::AddName(*collection, name);
 
   char str[255];
@@ -316,7 +419,7 @@ csCollection* CSLoader::load_collection (char* name, csWorld* w, char* buf)
     }
     switch (cmd)
     {
-      case kTokenColThing:
+      case TOKEN_THING:
         {
           ScanStr (params, "%s", str);
           csThing* th = w->GetThing (str);
@@ -328,7 +431,7 @@ csCollection* CSLoader::load_collection (char* name, csWorld* w, char* buf)
           collection->AddObject ((csObject*)th);
         }
         break;
-      case kTokenColLight:
+      case TOKEN_LIGHT:
         {
           int nr;
           ScanStr (params, "%s,%d", str, &nr);
@@ -342,7 +445,7 @@ csCollection* CSLoader::load_collection (char* name, csWorld* w, char* buf)
           collection->AddObject ((csObject*)l);
         }
         break;
-      case kTokenColSector:
+      case TOKEN_SECTOR:
         {
           int nr;
           ScanStr (params, "%s,%d", str, &nr);
@@ -355,7 +458,7 @@ csCollection* CSLoader::load_collection (char* name, csWorld* w, char* buf)
           collection->AddObject ((csObject*)s);
         }
         break;
-      case kTokenColCol:
+      case TOKEN_COLLECTION:
         {
           ScanStr (params, "%s", str);
           csCollection* th = (csCollection*)w->collections.FindByName (str);
@@ -366,7 +469,8 @@ csCollection* CSLoader::load_collection (char* name, csWorld* w, char* buf)
           }
           collection->AddObject (th);
         }
-      case kTokenColTrigger:
+        break;
+      case TOKEN_TRIGGER:
         {
           char str2[255];
           char str3[255];
@@ -396,7 +500,7 @@ csCollection* CSLoader::load_collection (char* name, csWorld* w, char* buf)
           }
           else
           {
-            CsPrintf (MSG_FATAL_ERROR, 
+            CsPrintf (MSG_FATAL_ERROR,
                       "Trigger '%s' not supported or known for object '%s'!\n",
                       str2, xname);
             fatal_exit (0, false);
@@ -416,18 +520,16 @@ csCollection* CSLoader::load_collection (char* name, csWorld* w, char* buf)
 
 //---------------------------------------------------------------------------
 
-enum { kTokenLightCenter = 1, kTokenLightRadius, kTokenLightDynamic,
-       kTokenLightColor, kTokenLightHalo };
-
-csStatLight* CSLoader::load_statlight (char* buf)
+csStatLight* csLoader::load_statlight (char* buf)
 {
-  static tokenDesc commands[] = {
-        {kTokenLightCenter, "CENTER"},
-        {kTokenLightRadius, "RADIUS"},
-        {kTokenLightDynamic, "DYNAMIC"},
-        {kTokenLightColor, "COLOR"},
-        {kTokenLightHalo, "HALO"},
-        {0,0}};
+  TOKEN_TABLE_START(commands)
+    TOKEN_TABLE (CENTER)
+    TOKEN_TABLE (RADIUS)
+    TOKEN_TABLE (DYNAMIC)
+    TOKEN_TABLE (COLOR)
+    TOKEN_TABLE (HALO)
+  TOKEN_TABLE_END
+
   long cmd;
   char* params;
 
@@ -454,19 +556,19 @@ csStatLight* CSLoader::load_statlight (char* buf)
     {
       switch (cmd)
       {
-        case kTokenLightRadius:
+        case TOKEN_RADIUS:
           ScanStr (params, "%f", &dist);
           break;
-        case kTokenLightCenter:
+        case TOKEN_CENTER:
           ScanStr (params, "%f,%f,%f", &x, &y, &z);
           break;
-        case kTokenLightColor:
+        case TOKEN_COLOR:
           ScanStr (params, "%f,%f,%f", &r, &g, &b);
           break;
-        case kTokenLightDynamic:
+        case TOKEN_DYNAMIC:
           dyn = 1;
           break;
-        case kTokenLightHalo:
+        case TOKEN_HALO:
           halo = true;
           break;
       }
@@ -485,20 +587,20 @@ csStatLight* CSLoader::load_statlight (char* buf)
 
 //---------------------------------------------------------------------------
 
-csPolygonSet& CSLoader::ps_process (csPolygonSet& ps, PSLoadInfo& info, int cmd, 
+csPolygonSet& csLoader::ps_process (csPolygonSet& ps, PSLoadInfo& info, int cmd,
                                   char* name, char* params)
 {
   char str[255], str2[255];
   switch (cmd)
   {
-    case kTokenPSetVertex:
+    case TOKEN_VERTEX:
       {
         float x, y, z;
         ScanStr (params, "%f,%f,%f", &x, &y, &z);
         ps.AddVertex (x, y, z);
       }
       break;
-    case kTokenPSetCircle:
+    case TOKEN_CIRCLE:
       {
         float x, y, z, rx, ry, rz;
         int num, dir;
@@ -521,29 +623,29 @@ csPolygonSet& CSLoader::ps_process (csPolygonSet& ps, PSLoadInfo& info, int cmd,
         }
       }
       break;
-    case kTokenPSetFog:
+    case TOKEN_FOG:
       {
         csFog& f = ps.GetFog ();
         f.enabled = true;
         ScanStr (params, "%f,%f,%f,%f", &f.red, &f.green, &f.blue, &f.density);
       }
       break;
-    case kTokenPSetPolygon:
-      ps.AddPolygon ( CSLoader::load_poly3d(name, info.w, params,
+    case TOKEN_POLYGON:
+      ps.AddPolygon ( load_poly3d(name, info.w, params,
                       info.textures, info.default_texture, info.default_texlen,
                       info.default_lightx, ps.GetSector (), &ps) );
       LoadStat::polygons_loaded++;
       break;
 
-    case kTokenPSetBezier:
+    case TOKEN_BEZIER:
       //CsPrintf(MSG_WARNING,"Encountered curve!\n");
-      ps.AddCurve ( CSLoader::load_bezier(name, info.w, params,
+      ps.AddCurve ( load_bezier(name, info.w, params,
                       info.textures, info.default_texture, info.default_texlen,
                       info.default_lightx, ps.GetSector (), &ps) );
       LoadStat::curves_loaded++;
       break;
 
-    case kTokenPSetTexNr:
+    case TOKEN_TEXNR:
       ScanStr (params, "%s", str);
       info.default_texture = info.textures->GetTextureMM (str);
       if (info.default_texture == NULL)
@@ -552,14 +654,14 @@ csPolygonSet& CSLoader::ps_process (csPolygonSet& ps, PSLoadInfo& info, int cmd,
         fatal_exit (0, false);
       }
       break;
-    case kTokenPSetTexlen:
+    case TOKEN_TEXLEN:
       ScanStr (params, "%f", &info.default_texlen);
       break;
-    case kTokenPSetLightX:
+    case TOKEN_LIGHTX:
       ScanStr (params, "%s", str);
       info.default_lightx = CLights::FindByName (str);
       break;
-    case kTokenPSetActivate:
+    case TOKEN_ACTIVATE:
       ScanStr (params, "%s", str);
       {
         csScript* s = csScriptList::GetScript(str);
@@ -578,7 +680,7 @@ csPolygonSet& CSLoader::ps_process (csPolygonSet& ps, PSLoadInfo& info, int cmd,
         objtrig->DoActivateTriggers ();
       }
       break;
-    case kTokenPSetTrigger:
+    case TOKEN_TRIGGER:
       ScanStr (params, "%s,%s", str, str2);
       if (!strcmp (str, "activate"))
       {
@@ -589,7 +691,7 @@ csPolygonSet& CSLoader::ps_process (csPolygonSet& ps, PSLoadInfo& info, int cmd,
           fatal_exit (0, false);
         }
         csObjectTrigger *objtrig = csObjectTrigger::GetTrigger(ps);
-        if (!objtrig) 
+        if (!objtrig)
         {
           CHK(objtrig = new csObjectTrigger());
           ps.ObjAdd(objtrig);
@@ -598,13 +700,13 @@ csPolygonSet& CSLoader::ps_process (csPolygonSet& ps, PSLoadInfo& info, int cmd,
       }
       else
       {
-        CsPrintf (MSG_FATAL_ERROR, 
-                  "Trigger '%s' not supported or known for object '%s'!\n", 
+        CsPrintf (MSG_FATAL_ERROR,
+                  "Trigger '%s' not supported or known for object '%s'!\n",
                   str, csNameObject::GetName(ps));
         fatal_exit (0, false);
       }
       break;
-    case kTokenPSetBsp:
+    case TOKEN_BSP:
       info.use_bsp = true;
       break;
   }
@@ -613,41 +715,37 @@ csPolygonSet& CSLoader::ps_process (csPolygonSet& ps, PSLoadInfo& info, int cmd,
 
 //---------------------------------------------------------------------------
 
-enum { kTokenSixMove = 1, kTokenSixTexture, kTokenSixTexCeil,
-       kTokenSixTexFloor, kTokenSixTexScale, kTokenSixDim,
-       kTokenSixFlHeight, kTokenSixHeight, kTokenSixFloor,
-       kTokenSixFloorCeil, kTokenSixCeil, kTokenSixTrigger,
-       kTokenSixActivate, kTokenSixMoveable, kTokenSixFog,
-       kTokenSixConvex };
-
-typedef char ObName[30];
-
-csThing* CSLoader::load_sixface (char* name, csWorld* /*w*/, char* buf,
-                               csTextureList* textures, csSector* sec)
+csThing* csLoader::load_sixface (char* name, csWorld* /*w*/, char* buf,
+  csTextureList* textures, csSector* sec)
 {
-  static tokenDesc commands[] = {
-        {kTokenSixMoveable, "MOVEABLE"},
-        {kTokenSixMove, "MOVE"},
-        {kTokenSixTexScale, "TEXTURE_SCALE"}, 
-        {kTokenSixTexture, "TEXTURE"}, 
-        {kTokenSixTexCeil, "CEIL_TEXTURE"}, 
-        {kTokenSixDim, "DIM"}, 
-        {kTokenSixHeight, "HEIGHT"}, 
-        {kTokenSixFlHeight, "FLOOR_HEIGHT"}, 
-        {kTokenSixFloorCeil, "FLOOR_CEIL"}, 
-        {kTokenSixTexFloor, "FLOOR_TEXTURE"}, 
-        {kTokenSixFloor, "FLOOR"}, 
-        {kTokenSixCeil, "CEILING"}, 
-        {kTokenSixTrigger, "TRIGGER"}, 
-        {kTokenSixActivate, "ACTIVATE"},
-        {kTokenSixFog, "FOG"},
-        {kTokenSixConvex, "CONVEX"},
-        {0,0}};
-  static tokenDesc tok_matvec[] = {{1, "MATRIX"}, {2, "V"}, {0,0}};
+  TOKEN_TABLE_START (commands)
+    TOKEN_TABLE (MOVEABLE)
+    TOKEN_TABLE (MOVE)
+    TOKEN_TABLE (TEXTURE_SCALE)
+    TOKEN_TABLE (TEXTURE)
+    TOKEN_TABLE (CEIL_TEXTURE)
+    TOKEN_TABLE (DIM)
+    TOKEN_TABLE (HEIGHT)
+    TOKEN_TABLE (FLOOR_HEIGHT)
+    TOKEN_TABLE (FLOOR_CEIL)
+    TOKEN_TABLE (FLOOR_TEXTURE)
+    TOKEN_TABLE (FLOOR)
+    TOKEN_TABLE (CEILING)
+    TOKEN_TABLE (TRIGGER)
+    TOKEN_TABLE (ACTIVATE)
+    TOKEN_TABLE (FOG)
+    TOKEN_TABLE (CONVEX)
+  TOKEN_TABLE_END
+
+  TOKEN_TABLE_START (tok_matvec)
+    TOKEN_TABLE (MATRIX)
+    TOKEN_TABLE (V)
+  TOKEN_TABLE_END
+
   char* xname;
 
-  CHK( csThing* thing = new csThing() );
-  csNameObject::AddName(*thing,name);
+  CHK (csThing* thing = new csThing ());
+  csNameObject::AddName (*thing, name);
 
   LoadStat::things_loaded++;
 
@@ -660,7 +758,7 @@ csThing* CSLoader::load_sixface (char* name, csWorld* /*w*/, char* buf,
 
   csVector3 v[8];
   for (i = 0;  i < 8;  i++)
-   v[i] = csVector3( (i&1 ? 1 : -1), (i&2 ? -1 : 1), (i&4 ? -1 : 1) );
+    v [i] = csVector3 ((i & 1 ? 1 : -1), (i & 2 ? -1 : 1), (i & 4 ? -1 : 1));
   float r;
 
   char str[255];
@@ -675,22 +773,23 @@ csThing* CSLoader::load_sixface (char* name, csWorld* /*w*/, char* buf,
       CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
       fatal_exit (0, false);
     }
+
     switch (cmd)
     {
-      case kTokenSixConvex:
+      case TOKEN_CONVEX:
         is_convex = true;
         break;
-      case kTokenSixFog:
+      case TOKEN_FOG:
         {
           csFog& f = thing->GetFog ();
           f.enabled = true;
           ScanStr (params, "%f,%f,%f,%f", &f.red, &f.green, &f.blue, &f.density);
         }
         break;
-      case kTokenSixMoveable:
+      case TOKEN_MOVEABLE:
         thing->SetFlags (CS_ENTITY_MOVEABLE, CS_ENTITY_MOVEABLE);
         break;
-      case kTokenSixMove:
+      case TOKEN_MOVE:
         {
           char* params2;
           obj = csReversibleTransform(); // identity transform
@@ -703,15 +802,17 @@ csThing* CSLoader::load_sixface (char* name, csWorld* /*w*/, char* buf,
     	    }
             switch (cmd)
             {
-              case 1: 
-                obj.SetT2O ( CSLoader::load_matrix(params2) );  break;
-              case 2:
-                obj.SetOrigin ( CSLoader::load_vector(params2) );  break;
+              case TOKEN_MATRIX:
+                obj.SetT2O (load_matrix (params2));
+                break;
+              case TOKEN_V:
+                obj.SetOrigin (load_vector (params2));
+                break;
             }
           }
         }
         break;
-      case kTokenSixTexture:
+      case TOKEN_TEXTURE:
         ScanStr (params, "%s", str);
         texture = textures->GetTextureMM (str);
         if (texture == NULL)
@@ -720,10 +821,10 @@ csThing* CSLoader::load_sixface (char* name, csWorld* /*w*/, char* buf,
           fatal_exit (0, false);
         }
         break;
-      case kTokenSixTexScale:
+      case TOKEN_TEXTURE_SCALE:
         ScanStr (params, "%f", &tscale);
         break;
-      case kTokenSixDim:
+      case TOKEN_DIM:
         {
           float rx, ry, rz;
           ScanStr (params, "%f,%f,%f", &rx, &ry, &rz);
@@ -732,7 +833,7 @@ csThing* CSLoader::load_sixface (char* name, csWorld* /*w*/, char* buf,
            v[i] = csVector3((i&1 ? rx : -rx),(i&2 ? -ry : ry),(i&4 ? -rz : rz));
         }
         break;
-      case kTokenSixFlHeight:
+      case TOKEN_FLOOR_HEIGHT:
         ScanStr (params, "%f", &r);
         v[0].y = r+v[0].y-v[2].y;
         v[1].y = r+v[1].y-v[3].y;
@@ -743,33 +844,33 @@ csThing* CSLoader::load_sixface (char* name, csWorld* /*w*/, char* buf,
         v[6].y = r;
         v[7].y = r;
         break;
-      case kTokenSixHeight:
+      case TOKEN_HEIGHT:
         ScanStr (params, "%f", &r);
         v[0].y = r+v[2].y;
         v[1].y = r+v[3].y;
         v[4].y = r+v[6].y;
         v[5].y = r+v[7].y;
         break;
-      case kTokenSixFloorCeil:
+      case TOKEN_FLOOR_CEIL:
         ScanStr (params, "(%f,%f) (%f,%f) (%f,%f) (%f,%f)",
-                 &v[2].x, &v[2].z, &v[3].x, &v[3].z, 
+                 &v[2].x, &v[2].z, &v[3].x, &v[3].z,
                  &v[7].x, &v[7].z, &v[6].x, &v[6].z);
         v[0] = v[2];
         v[1] = v[3];
         v[5] = v[7];
         v[4] = v[6];
         break;
-      case kTokenSixFloor:
+      case TOKEN_FLOOR:
         ScanStr (params, "(%f,%f,%f) (%f,%f,%f) (%f,%f,%f) (%f,%f,%f)",
-                 &v[2].x, &v[2].y, &v[2].z, &v[3].x, &v[3].y, &v[3].z, 
+                 &v[2].x, &v[2].y, &v[2].z, &v[3].x, &v[3].y, &v[3].z,
                  &v[7].x, &v[7].y, &v[7].z, &v[6].x, &v[6].y, &v[6].z);
         break;
-      case kTokenSixCeil:
+      case TOKEN_CEILING:
         ScanStr (params, "(%f,%f,%f) (%f,%f,%f) (%f,%f,%f) (%f,%f,%f)",
-                 &v[0].x, &v[0].y, &v[0].z, &v[1].x, &v[1].y, &v[1].z, 
+                 &v[0].x, &v[0].y, &v[0].z, &v[1].x, &v[1].y, &v[1].z,
                  &v[5].x, &v[5].y, &v[5].z, &v[4].x, &v[4].y, &v[4].z);
         break;
-      case kTokenSixActivate:
+      case TOKEN_ACTIVATE:
         ScanStr (params, "%s", str);
         {
           csScript* s = csScriptList::GetScript(str);
@@ -788,7 +889,7 @@ csThing* CSLoader::load_sixface (char* name, csWorld* /*w*/, char* buf,
           objtrig->DoActivateTriggers ();
         }
         break;
-      case kTokenSixTrigger:
+      case TOKEN_TRIGGER:
         ScanStr (params, "%s,%s", str, str2);
         if (!strcmp (str, "activate"))
         {
@@ -799,7 +900,7 @@ csThing* CSLoader::load_sixface (char* name, csWorld* /*w*/, char* buf,
             fatal_exit (0, false);
           }
           csObjectTrigger *objtrig = csObjectTrigger::GetTrigger(*thing);
-          if (!objtrig) 
+          if (!objtrig)
           {
             CHK(objtrig = new csObjectTrigger());
             thing->ObjAdd(objtrig);
@@ -901,12 +1002,13 @@ csThing* CSLoader::load_sixface (char* name, csWorld* /*w*/, char* buf,
     p->AddVertex (todo[done].v3);
     p->AddVertex (todo[done].v2);
     p->AddVertex (todo[done].v1);
-    p->SetTextureSpace (thing->Vobj (todo[done].tv2), 
+    p->SetTextureSpace (thing->Vobj (todo[done].tv2),
                           thing->Vobj (todo[done].tv1), tscale);
     done++;
   }
 
-  if (is_convex || thing->GetFog ().enabled) thing->SetFlags (CS_ENTITY_CONVEX, CS_ENTITY_CONVEX);
+  if (is_convex || thing->GetFog ().enabled)
+    thing->SetFlags (CS_ENTITY_CONVEX, CS_ENTITY_CONVEX);
   thing->SetTransform (obj);
   thing->Transform ();
   thing->CompressVertices ();
@@ -914,34 +1016,36 @@ csThing* CSLoader::load_sixface (char* name, csWorld* /*w*/, char* buf,
   return thing;
 }
 
-enum { kTokenThingMove = kTokenPSetLast, kTokenThingTemplate, kTokenThingMoveable,
-       kTokenThingConvex };
-
-csThing* CSLoader::load_thing (char* name, csWorld* w, char* buf, 
-                             csTextureList* textures, csSector* sec)
+csThing* csLoader::load_thing (char* name, csWorld* w, char* buf,
+  csTextureList* textures, csSector* sec)
 {
-  static tokenDesc commands[] = {
-        {kTokenPSetVertex, "VERTEX"},
-        {kTokenPSetCircle, "CIRCLE"},
-        {kTokenPSetPolygon, "POLYGON"},
-        {kTokenPSetBezier, "BEZIER"},
-        {kTokenPSetTexNr, "TEXNR"},
-        {kTokenPSetTexlen, "TEXLEN"},
-        {kTokenPSetTrigger, "TRIGGER"},
-        {kTokenPSetActivate, "ACTIVATE"},
-        {kTokenPSetLightX, "LIGHTX"},
-        {kTokenPSetBsp, "BSP"},
-        {kTokenPSetFog, "FOG"},
-        {kTokenThingMoveable, "MOVEABLE"},
-        {kTokenThingConvex, "CONVEX"},
-        {kTokenThingMove, "MOVE"},
-        {kTokenThingTemplate, "TEMPLATE"},
-        {0,0}};
-  static tokenDesc tok_matvec[] = {{1, "MATRIX"}, {2, "V"}, {0,0}};
+  TOKEN_TABLE_START (commands)
+    TOKEN_TABLE (VERTEX)
+    TOKEN_TABLE (CIRCLE)
+    TOKEN_TABLE (POLYGON)
+    TOKEN_TABLE (BEZIER)
+    TOKEN_TABLE (TEXNR)
+    TOKEN_TABLE (TEXLEN)
+    TOKEN_TABLE (TRIGGER)
+    TOKEN_TABLE (ACTIVATE)
+    TOKEN_TABLE (LIGHTX)
+    TOKEN_TABLE (BSP)
+    TOKEN_TABLE (FOG)
+    TOKEN_TABLE (MOVEABLE)
+    TOKEN_TABLE (CONVEX)
+    TOKEN_TABLE (MOVE)
+    TOKEN_TABLE (TEMPLATE)
+  TOKEN_TABLE_END
+
+  TOKEN_TABLE_START (tok_matvec)
+    TOKEN_TABLE (MATRIX)
+    TOKEN_TABLE (V)
+  TOKEN_TABLE_END
+
   char* xname;
 
   CHK( csThing* thing = new csThing() );
-  csNameObject::AddName(*thing,name); 
+  csNameObject::AddName(*thing,name);
 
   LoadStat::things_loaded++;
   PSLoadInfo info(w, textures);
@@ -962,13 +1066,13 @@ csThing* CSLoader::load_thing (char* name, csWorld* w, char* buf,
     }
     switch (cmd)
     {
-      case kTokenThingMoveable:
+      case TOKEN_MOVEABLE:
         thing->SetFlags (CS_ENTITY_MOVEABLE, CS_ENTITY_MOVEABLE);
         break;
-      case kTokenThingConvex:
+      case TOKEN_CONVEX:
         is_convex = true;
         break;
-      case kTokenThingMove:
+      case TOKEN_MOVE:
         {
           char* params2;
           while ((cmd=csGetObject(&params, tok_matvec, &xname, &params2)) > 0)
@@ -980,30 +1084,32 @@ csThing* CSLoader::load_thing (char* name, csWorld* w, char* buf,
     	    }
             switch (cmd)
             {
-              case 1: 
-                obj.SetT2O ( CSLoader::load_matrix(params2) );  break;
-              case 2:
-                obj.SetOrigin ( CSLoader::load_vector(params2) );  break;
+              case TOKEN_MATRIX:
+                obj.SetT2O (load_matrix (params2));
+                break;
+              case TOKEN_V:
+                obj.SetOrigin (load_vector (params2));
+                break;
             }
           }
         }
         break;
-      case kTokenThingTemplate:
+      case TOKEN_TEMPLATE:
         {
           ScanStr (params, "%s", str);
-          csThingTemplate* t = w->GetThingTemplate (str, true);
+          csThingTemplate* t = w->GetThingTemplate (str);
           if (!t)
           {
             CsPrintf (MSG_FATAL_ERROR, "Can't find template '%s'!\n", str);
             fatal_exit (0, false);
           }
           thing->MergeTemplate (t, info.default_texture, info.default_texlen,
-                                 info.default_lightx);
+            info.default_lightx);
           LoadStat::polygons_loaded += t->GetNumPolygon ();
         }
         break;
       default:
-        CSLoader::ps_process(*thing, info, cmd, xname, params);
+        ps_process (*thing, info, cmd, xname, params);
         break;
     }
   }
@@ -1018,7 +1124,7 @@ csThing* CSLoader::load_thing (char* name, csWorld* w, char* buf,
   thing->CompressVertices ();
   if (is_convex || thing->GetFog ().enabled) thing->SetFlags (CS_ENTITY_CONVEX, CS_ENTITY_CONVEX);
   if (info.use_bsp) thing->UseBSP ();
- 
+
   return thing;
 }
 
@@ -1026,67 +1132,57 @@ csThing* CSLoader::load_thing (char* name, csWorld* w, char* buf,
 
 //---------------------------------------------------------------------------
 
-enum { kTokenPolTexNr = 1, kTokenPolLighting, kTokenPolMipmap,
-       kTokenPolPortal, kTokenPolWarp, kTokenPolLightX,
-       kTokenPolTexture, kTokenPolVertices, kTokenPolAlpha,
-       kTokenPolFog, kTokenPolUV, kTokenPolUVA, kTokenPolColors,
-       kTokenPolFlatCol, kTokenPolCosFact, kTokenPolGouraud,
-       kTokenPolClip };
-
-enum { kTokenPTexOrig = 1, kTokenPTexFirst, kTokenPTexFirstLen,
-       kTokenPTexSecond, kTokenPTexSecondLen, kTokenPTexLen,
-       kTokenPTexMatrix, kTokenPTexVector, kTokenPTexVectorAfter,
-       kTokenPTexPlane, kTokenPTexMirror, kTokenPTexStatic,
-       kTokenPTexUVShift };
-
-csPolygon3D* CSLoader::load_poly3d (char* polyname, csWorld* w, char* buf, 
-        csTextureList* textures, csTextureHandle* default_texture, float default_texlen,
-        CLights* default_lightx, csSector* sec, csPolygonSet* parent)
+csPolygon3D* csLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
+  csTextureList* textures, csTextureHandle* default_texture, float default_texlen,
+  CLights* default_lightx, csSector* sec, csPolygonSet* parent)
 {
-  static tokenDesc commands[] = {
-        {kTokenPolTexNr, "TEXNR"},
-        {kTokenPolLighting, "LIGHTING"},
-        {kTokenPolMipmap, "MIPMAP"},
-        {kTokenPolPortal, "PORTAL"},
-        {kTokenPolWarp, "WARP"},
-        {kTokenPolLightX, "LIGHTX"},
-        {kTokenPolTexture, "TEXTURE"},
-        {kTokenPolVertices, "VERTICES"},
-        {kTokenPolUVA, "UVA"},
-        {kTokenPolUV, "UV"},
-        {kTokenPolColors, "COLORS"},
-        {kTokenPolFlatCol, "FLATCOL"},
-        {kTokenPolAlpha, "ALPHA"},
-        {kTokenPolFog, "FOG"},
-        {kTokenPolCosFact, "COSFACT"},
-        {kTokenPolGouraud, "GOURAUD"},
-        {kTokenPolClip, "CLIP"},
-        {0,0}};
-  static tokenDesc tCommands[] = {
-        {kTokenPTexOrig, "ORIG"},
-        {kTokenPTexFirstLen, "FIRST_LEN"},
-        {kTokenPTexFirst, "FIRST"},
-        {kTokenPTexSecondLen, "SECOND_LEN"},
-        {kTokenPTexSecond, "SECOND"},
-        {kTokenPTexLen, "LEN"},
-        {kTokenPTexMatrix, "MATRIX"},
-        {kTokenPTexPlane, "PLANE"},
-        {kTokenPTexVector, "V"},
-        {kTokenPTexUVShift, "UV_SHIFT"},
-        {0,0}};
-  static tokenDesc pCommands[] = {
-        {kTokenPTexMatrix, "MATRIX"},
-        {kTokenPTexVector, "V"},
-        {kTokenPTexVectorAfter, "W"},
-        {kTokenPTexMirror, "MIRROR"},
-        {kTokenPTexStatic, "STATIC"},
-        {0,0}};
+  TOKEN_TABLE_START (commands)
+    TOKEN_TABLE (TEXNR)
+    TOKEN_TABLE (LIGHTING)
+    TOKEN_TABLE (MIPMAP)
+    TOKEN_TABLE (PORTAL)
+    TOKEN_TABLE (WARP)
+    TOKEN_TABLE (LIGHTX)
+    TOKEN_TABLE (TEXTURE)
+    TOKEN_TABLE (VERTICES)
+    TOKEN_TABLE (UVA)
+    TOKEN_TABLE (UV)
+    TOKEN_TABLE (COLORS)
+    TOKEN_TABLE (FLATCOL)
+    TOKEN_TABLE (ALPHA)
+    TOKEN_TABLE (FOG)
+    TOKEN_TABLE (COSFACT)
+    TOKEN_TABLE (GOURAUD)
+    TOKEN_TABLE (CLIP)
+  TOKEN_TABLE_END
+
+  TOKEN_TABLE_START (tex_commands)
+    TOKEN_TABLE (ORIG)
+    TOKEN_TABLE (FIRST_LEN)
+    TOKEN_TABLE (FIRST)
+    TOKEN_TABLE (SECOND_LEN)
+    TOKEN_TABLE (SECOND)
+    TOKEN_TABLE (LEN)
+    TOKEN_TABLE (MATRIX)
+    TOKEN_TABLE (PLANE)
+    TOKEN_TABLE (V)
+    TOKEN_TABLE (UV_SHIFT)
+  TOKEN_TABLE_END
+
+  TOKEN_TABLE_START (portal_commands)
+    TOKEN_TABLE (MATRIX)
+    TOKEN_TABLE (V)
+    TOKEN_TABLE (W)
+    TOKEN_TABLE (MIRROR)
+    TOKEN_TABLE (STATIC)
+  TOKEN_TABLE_END
+
   char* name;
   int i;
   long cmd;
   char* params, * params2;
 
-  CHK(csPolygon3D *poly3d = new csPolygon3D(default_texture) );
+  CHK(csPolygon3D *poly3d = new csPolygon3D (default_texture));
   csNameObject::AddName(*poly3d,polyname);
 
   csTextureHandle* tex = NULL;
@@ -1119,7 +1215,7 @@ csPolygon3D* CSLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
     }
     switch (cmd)
     {
-      case kTokenPolTexNr:
+      case TOKEN_TEXNR:
         ScanStr (params, "%s", str);
         tex = textures->GetTextureMM (str);
         if (tex == NULL)
@@ -1129,40 +1225,40 @@ csPolygon3D* CSLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
         }
         poly3d->SetTexture (tex);
         break;
-      case kTokenPolLighting:
+      case TOKEN_LIGHTING:
         {
           int do_lighting;
           ScanStr (params, "%b", &do_lighting);
           poly3d->SetFlags (CS_POLY_LIGHTING, do_lighting ? CS_POLY_LIGHTING : 0);
         }
         break;
-      case kTokenPolMipmap:
+      case TOKEN_MIPMAP:
         {
           int do_mipmap;
           ScanStr (params, "%b", &do_mipmap);
           poly3d->SetFlags (CS_POLY_MIPMAP, do_mipmap ? CS_POLY_MIPMAP : 0);
         }
         break;
-      case kTokenPolCosFact:
+      case TOKEN_COSFACT:
         {
           float cosfact;
           ScanStr (params, "%f", &cosfact);
           poly3d->SetCosinusFactor (cosfact);
         }
         break;
-      case kTokenPolAlpha:
+      case TOKEN_ALPHA:
         {
           int alpha;
           ScanStr (params, "%d", &alpha);
           poly3d->SetAlpha (alpha);
         }
         break;
-      case kTokenPolFog:
+      case TOKEN_FOG:
         {
           //@@@ OBSOLETE
         }
         break;
-      case kTokenPolPortal:
+      case TOKEN_PORTAL:
         {
           ScanStr (params, "%s", str);
           CHK(csSector *s = new csSector());
@@ -1171,17 +1267,17 @@ csPolygon3D* CSLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
           LoadStat::portals_loaded++;
         }
         break;
-      case kTokenPolClip:
+      case TOKEN_CLIP:
 	if (poly3d->GetPortal ()) poly3d->GetPortal ()->SetClippingPortal (true);
         break;
-      case kTokenPolWarp:
+      case TOKEN_WARP:
         if (poly3d->GetPortal ())
         {
           csMatrix3 m_w; m_w.Identity ();
           csVector3 v_w_before (0, 0, 0);
           csVector3 v_w_after (0, 0, 0);
           bool do_static = false;
-          while ((cmd = csGetObject (&params, pCommands, &name, &params2)) > 0)
+          while ((cmd = csGetObject (&params, portal_commands, &name, &params2)) > 0)
           {
     	    if (!params2)
     	    {
@@ -1190,23 +1286,23 @@ csPolygon3D* CSLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
     	    }
             switch (cmd)
             {
-              case kTokenPTexMatrix:
-                m_w = CSLoader::load_matrix (params2);
+              case TOKEN_MATRIX:
+                m_w = load_matrix (params2);
                 do_mirror = false;
                 break;
-              case kTokenPTexVector:
-                v_w_before = CSLoader::load_vector (params2);
+              case TOKEN_V:
+                v_w_before = load_vector (params2);
                 v_w_after = v_w_before;
                 do_mirror = false;
                 break;
-              case kTokenPTexVectorAfter:
-                v_w_after = CSLoader::load_vector (params2);
+              case TOKEN_W:
+                v_w_after = load_vector (params2);
                 do_mirror = false;
                 break;
-              case kTokenPTexMirror:
+              case TOKEN_MIRROR:
                 do_mirror = true;
                 break;
-              case kTokenPTexStatic:
+              case TOKEN_STATIC:
                 do_static = true;
                 break;
             }
@@ -1216,13 +1312,13 @@ csPolygon3D* CSLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
           poly3d->GetPortal ()->SetStaticDest (do_static);
         }
         break;
-      case kTokenPolLightX:
+      case TOKEN_LIGHTX:
         ScanStr (params, "%s", str);
   	pol_lm = poly3d->GetLightMapInfo ();
         if (pol_lm) pol_lm->SetUniformDynLight (CLights::FindByName (str));
         break;
-      case kTokenPolTexture:
-        while ((cmd = csGetObject (&params, tCommands, &name, &params2)) > 0)
+      case TOKEN_TEXTURE:
+        while ((cmd = csGetObject (&params, tex_commands, &name, &params2)) > 0)
         {
     	  if (!params2)
     	  {
@@ -1231,69 +1327,69 @@ csPolygon3D* CSLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
 	  }
           switch (cmd)
           {
-            case kTokenPTexOrig:
+            case TOKEN_ORIG:
               tx1_given = true;
-              tx1_orig = CSLoader::load_vector (params2);
+              tx1_orig = load_vector (params2);
               break;
-            case kTokenPTexFirst:
+            case TOKEN_FIRST:
               tx1_given = true;
-              tx1 = CSLoader::load_vector (params2);
+              tx1 = load_vector (params2);
               break;
-            case kTokenPTexFirstLen:
+            case TOKEN_FIRST_LEN:
               ScanStr (params2, "%f", &tx1_len);
               tx1_given = true;
               break;
-            case kTokenPTexSecond:
+            case TOKEN_SECOND:
               tx2_given = true;
-              tx2 = CSLoader::load_vector (params2);
+              tx2 = load_vector (params2);
               break;
-            case kTokenPTexSecondLen:
+            case TOKEN_SECOND_LEN:
               ScanStr (params2, "%f", &tx2_len);
               tx2_given = true;
               break;
-            case kTokenPTexLen:
+            case TOKEN_LEN:
               ScanStr (params2, "%f", &tx_len);
               break;
-            case kTokenPTexMatrix:
-              tx_matrix = CSLoader::load_matrix (params2);
+            case TOKEN_MATRIX:
+              tx_matrix = load_matrix (params2);
               tx_len = 0;
               break;
-            case kTokenPTexVector:
-              tx_vector = CSLoader::load_vector (params2);
+            case TOKEN_V:
+              tx_vector = load_vector (params2);
               tx_len = 0;
               break;
-            case kTokenPTexPlane:
+            case TOKEN_PLANE:
               ScanStr (params2, "%s", str);
               strcpy (plane_name, str);
               tx_len = 0;
               break;
-            case kTokenPTexUVShift:
+            case TOKEN_UV_SHIFT:
               uv_shift_given = true;
               ScanStr (params2, "%f,%f", &u_shift, &v_shift);
               break;
           }
         }
         break;
-      case kTokenPolVertices:
+      case TOKEN_VERTICES:
         {
           int list[100], num;
           ScanStr (params, "%D", list, &num);
           for (i = 0 ; i < num ; i++) poly3d->AddVertex (list[i]);
         }
         break;
-      case kTokenPolFlatCol:
+      case TOKEN_FLATCOL:
         {
           float r, g, b;
           ScanStr (params, "%f,%f,%f", &r, &g, &b);
           poly3d->SetFlatColor (r, g, b);
         }
         break;
-      case kTokenPolGouraud:
+      case TOKEN_GOURAUD:
         poly3d->SetTextureType (POLYTXT_GOURAUD);
 	poly3d->GetGouraudInfo ()->Setup (poly3d->GetVertices ().GetNumVertices ());
 	poly3d->GetGouraudInfo ()->EnableGouraud (true);
         break;
-      case kTokenPolUV:
+      case TOKEN_UV:
         {
           poly3d->SetTextureType (POLYTXT_GOURAUD);
 	  csGouraudShaded* gs = poly3d->GetGouraudInfo ();
@@ -1306,7 +1402,7 @@ csPolygon3D* CSLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
           gs->SetUV (2, list[4], list[5]);
         }
         break;
-      case kTokenPolColors:
+      case TOKEN_COLORS:
         {
           poly3d->SetTextureType (POLYTXT_GOURAUD);
 	  csGouraudShaded* gs = poly3d->GetGouraudInfo ();
@@ -1319,7 +1415,7 @@ csPolygon3D* CSLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
           gs->SetColor (2, list[6], list[7], list[8]);
         }
         break;
-      case kTokenPolUVA:
+      case TOKEN_UVA:
         {
           poly3d->SetTextureType (POLYTXT_GOURAUD);
 	  csGouraudShaded* gs = poly3d->GetGouraudInfo ();
@@ -1345,13 +1441,13 @@ csPolygon3D* CSLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
   }
 
   if (tx1_given)
-    if (tx2_given) 
+    if (tx2_given)
          poly3d->SetTextureSpace (tx1_orig.x, tx1_orig.y, tx1_orig.z,
                                       tx1.x, tx1.y, tx1.z, tx1_len,
                                       tx2.x, tx2.y, tx2.z, tx2_len);
     else poly3d->SetTextureSpace (tx1_orig.x, tx1_orig.y, tx1_orig.z,
                             tx1.x, tx1.y, tx1.z, tx1_len);
-  else if (plane_name[0]) 
+  else if (plane_name[0])
            poly3d->SetTextureSpace ((csPolyPlane*)w->planes.FindByName (plane_name));
   else if (tx_len)
   {
@@ -1381,35 +1477,36 @@ csPolygon3D* CSLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
 }
 
 
-csCurve* CSLoader::load_bezier (char* polyname, csWorld* w, char* buf, 
+csCurve* csLoader::load_bezier (char* polyname, csWorld* w, char* buf,
         csTextureList* textures, csTextureHandle* default_texture, float default_texlen,
         CLights* default_lightx, csSector* sec, csPolygonSet* parent)
 {
-  static tokenDesc commands[] = {
-        {kTokenPolTexNr, "TEXNR"},
-        {kTokenPolTexture, "TEXTURE"},
-        {kTokenPolVertices, "VERTICES"},
-        {0,0}};
+  TOKEN_TABLE_START (commands)
+    TOKEN_TABLE (TEXNR)
+    TOKEN_TABLE (TEXTURE)
+    TOKEN_TABLE (VERTICES)
+  TOKEN_TABLE_END
 
-  static tokenDesc tCommands[] = {
-        {kTokenPTexOrig, "ORIG"},
-        {kTokenPTexFirstLen, "FIRST_LEN"},
-        {kTokenPTexFirst, "FIRST"},
-        {kTokenPTexSecondLen, "SECOND_LEN"},
-        {kTokenPTexSecond, "SECOND"},
-        {kTokenPTexLen, "LEN"},
-        {kTokenPTexMatrix, "MATRIX"},
-        {kTokenPTexPlane, "PLANE"},
-        {kTokenPTexVector, "V"},
-        {kTokenPTexUVShift, "UV_SHIFT"},
-        {0,0}};
+  TOKEN_TABLE_START (tex_commands)
+    TOKEN_TABLE (ORIG)
+    TOKEN_TABLE (FIRST_LEN)
+    TOKEN_TABLE (FIRST)
+    TOKEN_TABLE (SECOND_LEN)
+    TOKEN_TABLE (SECOND)
+    TOKEN_TABLE (LEN)
+    TOKEN_TABLE (MATRIX)
+    TOKEN_TABLE (PLANE)
+    TOKEN_TABLE (V)
+    TOKEN_TABLE (UV_SHIFT)
+  TOKEN_TABLE_END
+
   char* name;
   long cmd;
   char* params, * params2;
 
   (void)w; (void)default_lightx; (void)sec; (void)parent;
 
-  CHK(csBezier *poly3d = new csBezier() );
+  CHK (csBezier *poly3d = new csBezier ());
   csNameObject::AddName(*poly3d,polyname);
   poly3d->SetTextureHandle (default_texture);
   csTextureHandle* tex = NULL;
@@ -1438,7 +1535,7 @@ csCurve* CSLoader::load_bezier (char* polyname, csWorld* w, char* buf,
     }
     switch (cmd)
     {
-      case kTokenPolTexNr:
+      case TOKEN_TEXNR:
         ScanStr (params, "%s", str);
         tex = textures->GetTextureMM (str);
         if (tex == NULL)
@@ -1448,8 +1545,8 @@ csCurve* CSLoader::load_bezier (char* polyname, csWorld* w, char* buf,
         }
         poly3d->SetTextureHandle (tex);
         break;
-      case kTokenPolTexture:
-        while ((cmd = csGetObject (&params, tCommands, &name, &params2)) > 0)
+      case TOKEN_TEXTURE:
+        while ((cmd = csGetObject (&params, tex_commands, &name, &params2)) > 0)
         {
           if (!params2)
           {
@@ -1458,50 +1555,50 @@ csCurve* CSLoader::load_bezier (char* polyname, csWorld* w, char* buf,
           }
           switch (cmd)
           {
-            case kTokenPTexOrig:
+            case TOKEN_ORIG:
               tx1_given = true;
-              tx1_orig = CSLoader::load_vector (params2);
+              tx1_orig = load_vector (params2);
               break;
-            case kTokenPTexFirst:
+            case TOKEN_FIRST:
               tx1_given = true;
-              tx1 = CSLoader::load_vector (params2);
+              tx1 = load_vector (params2);
               break;
-            case kTokenPTexFirstLen:
+            case TOKEN_FIRST_LEN:
               ScanStr (params2, "%f", &tx1_len);
               tx1_given = true;
               break;
-            case kTokenPTexSecond:
+            case TOKEN_SECOND:
               tx2_given = true;
-              tx2 = CSLoader::load_vector (params2);
+              tx2 = load_vector (params2);
               break;
-            case kTokenPTexSecondLen:
+            case TOKEN_SECOND_LEN:
               ScanStr (params2, "%f", &tx2_len);
               tx2_given = true;
               break;
-            case kTokenPTexLen:
+            case TOKEN_LEN:
               ScanStr (params2, "%f", &tx_len);
               break;
-            case kTokenPTexMatrix:
-              tx_matrix = CSLoader::load_matrix (params2);
+            case TOKEN_MATRIX:
+              tx_matrix = load_matrix (params2);
               tx_len = 0;
               break;
-            case kTokenPTexVector:
-              tx_vector = CSLoader::load_vector (params2);
+            case TOKEN_V:
+              tx_vector = load_vector (params2);
               tx_len = 0;
               break;
-            case kTokenPTexPlane:
+            case TOKEN_PLANE:
               ScanStr (params2, "%s", str);
               strcpy (plane_name, str);
               tx_len = 0;
               break;
-            case kTokenPTexUVShift:
+            case TOKEN_UV_SHIFT:
               uv_shift_given = true;
               ScanStr (params2, "%f,%f", &u_shift, &v_shift);
               break;
           }
         }
         break;
-      case kTokenPolVertices:
+      case TOKEN_VERTICES:
         {
           int list[100], num;
           ScanStr (params, "%D", list, &num);
@@ -1530,138 +1627,130 @@ csCurve* CSLoader::load_bezier (char* polyname, csWorld* w, char* buf,
 
 //---------------------------------------------------------------------------
 
-ImageFile* CSLoader::load_image(char* name, csWorld* w, Archive* ar)
+ImageFile* csLoader::load_image (char* name, csWorld* w)
 {
-  Archive* world_file = NULL;
-  if (w) world_file = w->GetWorldFile ();
-  ImageFile* ifile = NULL;
-
   size_t size;
-  if (ar && ar->file_exists (name, &size))
-    world_file = ar;
+  ImageFile *ifile = NULL;
+  char *buf = VFS->ReadFile (name, size);
 
-  if (world_file && world_file->file_exists (name, &size))
+  if (!buf || !size)
   {
-    char* buf;
-    buf = world_file->read (name);
-    if (!buf)
-    {
-      CsPrintf (MSG_FATAL_ERROR,
-        "Can't load file '%s' from archive although it should be there!\n"
-        "Maybe the archive is corrupt?\n", name);
-      return NULL;
-    }
-    ifile = ImageLoader::load ((UByte*)buf, size);
-    if (ifile)
-    {
-     if (ifile->get_status() & IFE_Corrupt)
-     {
-       CsPrintf(MSG_FATAL_ERROR, "'%s': %s!\n",name,ifile->get_status_mesg());
-       CHK (delete ifile);  ifile = NULL;
-     }
-    } else CsPrintf (MSG_INTERNAL_ERROR, 
-               "ENGINE FAILURE! Couldn't open '%s' from archive!\n", name);
-    CHK (delete [] buf); 
+    CsPrintf (MSG_FATAL_ERROR,
+      "Cannot read image file \"%s\" from VFS\n", name);
+    return NULL;
   }
-  else
+
+  ifile = ImageLoader::load ((UByte *)buf, size);
+  CHK (delete [] buf);
+
+  if (ifile && (ifile->get_status () & IFE_Corrupt))
   {
-    FILE* fp;
-    w->isys->FOpen (name, "rb", &fp);
-    if (!fp)
-    {
-      CsPrintf (MSG_FATAL_ERROR, 
-        "Can't find file '%s' in data directory or in archive!\n", name);
-      return NULL;
-    }
-    ifile = ImageLoader::load (fp);
-    if (ifile)
-    {
-     if (ifile->get_status() & IFE_Corrupt)
-     {
-       CsPrintf(MSG_FATAL_ERROR, "'%s': %s!\n",name,ifile->get_status_mesg());
-       CHK (delete ifile);  ifile = NULL;
-     }
-    } else CsPrintf (MSG_INTERNAL_ERROR, 
-               "ENGINE FAILURE! Couldn't open '%s' from disk!\n", name);
-    w->isys->FClose (fp);
+    CsPrintf(MSG_FATAL_ERROR, "'%s': %s!\n",name,ifile->get_status_mesg());
+    CHK (delete ifile);
+    ifile = NULL;
   }
+
   return ifile;
 }
 
-enum { kTokenTexTrans = 1, kTokenTexFilter };
-
-void CSLoader::txt_process (csTextureHandle* txt_handle, char* buf)
+void csLoader::txt_process (char *name, char* buf, csTextureList* textures, csWorld *world)
 {
-  static tokenDesc commands[] = {
-        {kTokenTexTrans, "TRANSPARENT"},
-        {kTokenTexFilter, "FILTER"},
-        {0,0}};
+  TOKEN_TABLE_START (commands)
+    TOKEN_TABLE (TRANSPARENT)
+    TOKEN_TABLE (FILTER)
+    TOKEN_TABLE (FILE)
+  TOKEN_TABLE_END
+
   long cmd;
-  char* params;
+  char *filename = name;
+  char *params;
+  csColor transp;
+  bool do_transp = false;
 
   while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
   {
     switch (cmd)
     {
-      case kTokenTexTrans:
-        {
-          float r, g, b;
-          ScanStr (params, "%f,%f,%f", &r, &g, &b);
-          txt_handle->SetTransparent ((int)(r*255.), (int)(g*255.), (int)(b*255.));
-        }
+      case TOKEN_TRANSPARENT:
+        do_transp = true;
+        ScanStr (params, "%f,%f,%f", &transp.red, &transp.green, &transp.blue);
         break;
-      case kTokenTexFilter:
+      case TOKEN_FILTER:
         CsPrintf (MSG_WARNING, "Warning! TEXTURE/FILTER statement is obsolete"
                                " and does not do anything!\n");
         break;
+      case TOKEN_FILE:
+        filename = params;
+        break;
     }
   }
+
   if (cmd == PARSERR_TOKENNOTFOUND)
   {
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a texture specification!\n", csGetLastOffender ());
     fatal_exit (0, false);
   }
+
+  ImageFile *image = load_image (filename, world);
+  if (!image)
+    return;
+
+  // Now we check the size of the loaded image. Having an image, that
+  // is not a power of two will result in strange errors while
+  // rendering. It is by far better to check the format of all textures
+  // already while loading them.
+  //@@todo: this check is not needed for 2D images
+  int Width  = image->get_width ();
+  int Height = image->get_height ();
+
+  if (!IsPowerOf2(Width) || !IsPowerOf2(Height))
+    CsPrintf (MSG_WARNING, "Texture '%s' probably has an illegal format!\n"
+                           "The Width and Height should be a power of two.\n"
+                           "actual size is w:%d h:%d\n",
+                           filename, Width, Height);
+
+  csTextureHandle *tex = textures->NewTexture (image);
+  csNameObject::AddName (*tex,name);
+
+  if (do_transp)
+    tex->SetTransparent (QRound (transp.red * 255.),
+      QRound (transp.green * 255.), QRound (transp.blue * 255.));
 }
 
 //---------------------------------------------------------------------------
 
-enum { kTokenPolTTexNr = 1, kTokenPolTLighting, kTokenPolTMipmap,
-       kTokenPolTTexture, kTokenPolTVertices, kTokenPolTFlatCol, kTokenPolTGouraud };
-
-enum { kTokenPTTexOrig = 1, kTokenPTTexFirst, kTokenPTTexFirstLen,
-       kTokenPTTexSecond, kTokenPTTexSecondLen, kTokenPTTexLen,
-       kTokenPTTexMatrix, kTokenPTTexVector, kTokenPTTexUVShift };
-
-csPolygonTemplate* CSLoader::load_ptemplate (char* ptname, char* buf, 
-        csTextureList* textures, csTextureHandle* default_texture, float default_texlen,
-        csThingTemplate* parent)
+csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
+  csTextureList* textures, csTextureHandle* default_texture,
+  float default_texlen, csThingTemplate* parent)
 {
-  static tokenDesc commands[] = {
-        {kTokenPolTTexNr, "TEXNR"},
-        {kTokenPolTLighting, "LIGHTING"},
-        {kTokenPolTMipmap, "MIPMAP"},
-        {kTokenPolTTexture, "TEXTURE"},
-        {kTokenPolTVertices, "VERTICES"},
-        {kTokenPolTFlatCol, "FLATCOL"},
-        {kTokenPolTGouraud, "GOURAUD"},
-        {0,0}};
-  static tokenDesc tCommands[] = {
-        {kTokenPTTexOrig, "ORIG"},
-        {kTokenPTTexFirstLen, "FIRST_LEN"},
-        {kTokenPTTexFirst, "FIRST"},
-        {kTokenPTTexSecondLen, "SECOND_LEN"},
-        {kTokenPTTexSecond, "SECOND"},
-        {kTokenPTTexLen, "LEN"},
-        {kTokenPTTexMatrix, "MATRIX"},
-        {kTokenPTTexVector, "V"},
-        {kTokenPTTexUVShift, "UV_SHIFT"},
-        {0,0}};
+  TOKEN_TABLE_START (commands)
+    TOKEN_TABLE (TEXNR)
+    TOKEN_TABLE (LIGHTING)
+    TOKEN_TABLE (MIPMAP)
+    TOKEN_TABLE (TEXTURE)
+    TOKEN_TABLE (VERTICES)
+    TOKEN_TABLE (FLATCOL)
+    TOKEN_TABLE (GOURAUD)
+  TOKEN_TABLE_END
+
+  TOKEN_TABLE_START (tex_commands)
+    TOKEN_TABLE (ORIG)
+    TOKEN_TABLE (FIRST_LEN)
+    TOKEN_TABLE (FIRST)
+    TOKEN_TABLE (SECOND_LEN)
+    TOKEN_TABLE (SECOND)
+    TOKEN_TABLE (LEN)
+    TOKEN_TABLE (MATRIX)
+    TOKEN_TABLE (V)
+    TOKEN_TABLE (UV_SHIFT)
+  TOKEN_TABLE_END
+
   char* name;
   int i;
   long cmd;
   char* params, * params2;
 
-  CHK(csPolygonTemplate *ptemplate = 
+  CHK(csPolygonTemplate *ptemplate =
               new csPolygonTemplate(parent, ptname, default_texture));
   csTextureHandle* tex;
   if (default_texture == NULL) tex = NULL;
@@ -1688,43 +1777,43 @@ csPolygonTemplate* CSLoader::load_ptemplate (char* ptname, char* buf,
     }
     switch (cmd)
     {
-      case kTokenPolTTexNr:
+      case TOKEN_TEXNR:
         ScanStr (params, "%s", str);
         tex = textures->GetTextureMM (str);
         if (tex == NULL)
         {
-          CsPrintf (MSG_FATAL_ERROR, 
+          CsPrintf (MSG_FATAL_ERROR,
                     "Couldn't find texture named '%s'!\n", str);
           fatal_exit (0, false);
         }
         ptemplate->SetTexture (tex);
         break;
-      case kTokenPolTGouraud:
+      case TOKEN_GOURAUD:
         ptemplate->SetGouraud ();
         break;
-      case kTokenPolTFlatCol:
+      case TOKEN_FLATCOL:
         {
           float r, g, b;
           ScanStr (params, "%f,%f,%f", &r, &g, &b);
           ptemplate->SetFlatColor (r, g, b);
         }
         break;
-      case kTokenPolTLighting:
+      case TOKEN_LIGHTING:
         {
           int do_lighting;
-          ScanStr (params, "%b", &do_lighting); 
+          ScanStr (params, "%b", &do_lighting);
           ptemplate->SetLighting (do_lighting);
         }
         break;
-      case kTokenPolTMipmap:
+      case TOKEN_MIPMAP:
         {
           int do_mipmap;
-          ScanStr (params, "%b", &do_mipmap); 
+          ScanStr (params, "%b", &do_mipmap);
           ptemplate->SetMipmapping (do_mipmap);
         }
         break;
-      case kTokenPolTTexture:
-        while ((cmd = csGetObject (&params, tCommands, &name, &params2)) > 0)
+      case TOKEN_TEXTURE:
+        while ((cmd = csGetObject (&params, tex_commands, &name, &params2)) > 0)
         {
           if (!params2)
           {
@@ -1733,45 +1822,45 @@ csPolygonTemplate* CSLoader::load_ptemplate (char* ptname, char* buf,
           }
           switch (cmd)
           {
-            case kTokenPTTexOrig:
+            case TOKEN_ORIG:
               tx1_given = true;
-              tx1_orig = CSLoader::load_vector (params2);
+              tx1_orig = load_vector (params2);
               break;
-            case kTokenPTTexFirst:
+            case TOKEN_FIRST:
               tx1_given = true;
-              tx1 = CSLoader::load_vector (params2);
+              tx1 = load_vector (params2);
               break;
-            case kTokenPTTexFirstLen:
+            case TOKEN_FIRST_LEN:
               ScanStr (params2, "%f", &tx1_len);
               tx1_given = true;
               break;
-            case kTokenPTTexSecond:
+            case TOKEN_SECOND:
               tx2_given = true;
-              tx2 = CSLoader::load_vector (params2);
+              tx2 = load_vector (params2);
               break;
-            case kTokenPTTexSecondLen:
+            case TOKEN_SECOND_LEN:
               ScanStr (params2, "%f", &tx2_len);
               tx2_given = true;
               break;
-            case kTokenPTTexLen:
+            case TOKEN_LEN:
               ScanStr (params2, "%f", &tx_len);
               break;
-            case kTokenPTTexMatrix:
-              tx_matrix = CSLoader::load_matrix (params2);
+            case TOKEN_MATRIX:
+              tx_matrix = load_matrix (params2);
               tx_len = 0;
               break;
-            case kTokenPTTexVector:
-              tx_vector = CSLoader::load_vector (params2);
+            case TOKEN_V:
+              tx_vector = load_vector (params2);
               tx_len = 0;
               break;
-            case kTokenPTTexUVShift:
+            case TOKEN_UV_SHIFT:
               uv_shift_given = true;
               ScanStr (params2, "%f,%f", &u_shift, &v_shift);
               break;
           }
         }
         break;
-      case kTokenPolTVertices:
+      case TOKEN_VERTICES:
         {
           int list[100], num;
           ScanStr (params, "%D", list, &num);
@@ -1827,36 +1916,37 @@ csPolygonTemplate* CSLoader::load_ptemplate (char* ptname, char* buf,
   return ptemplate;
 }
 
-csCurveTemplate* CSLoader::load_beziertemplate (char* ptname, char* buf, 
+csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
         csTextureList* textures, csTextureHandle* default_texture, float default_texlen,
         csThingTemplate* parent)
 {
-  static tokenDesc commands[] = {
-        {kTokenPolTTexNr, "TEXNR"},
-        {kTokenPolTTexture, "TEXTURE"},
-        {kTokenPolTVertices, "VERTICES"},
-        {0,0}};
-  static tokenDesc tCommands[] = {
-        {kTokenPTTexOrig, "ORIG"},
-        {kTokenPTTexFirstLen, "FIRST_LEN"},
-        {kTokenPTTexFirst, "FIRST"},
-        {kTokenPTTexSecondLen, "SECOND_LEN"},
-        {kTokenPTTexSecond, "SECOND"},
-        {kTokenPTTexLen, "LEN"},
-        {kTokenPTTexMatrix, "MATRIX"},
-        {kTokenPTTexVector, "V"},
-        {kTokenPTTexUVShift, "UV_SHIFT"},
-        {0,0}};
-  char* name;
+  TOKEN_TABLE_START (commands)
+    TOKEN_TABLE (TEXNR)
+    TOKEN_TABLE (TEXTURE)
+    TOKEN_TABLE (VERTICES)
+  TOKEN_TABLE_END
+
+  TOKEN_TABLE_START (tex_commands)
+    TOKEN_TABLE (ORIG)
+    TOKEN_TABLE (FIRST_LEN)
+    TOKEN_TABLE (FIRST)
+    TOKEN_TABLE (SECOND_LEN)
+    TOKEN_TABLE (SECOND)
+    TOKEN_TABLE (LEN)
+    TOKEN_TABLE (MATRIX)
+    TOKEN_TABLE (V)
+    TOKEN_TABLE (UV_SHIFT)
+  TOKEN_TABLE_END
+
+  char *name;
   long cmd;
   int i;
-  char* params, * params2;
+  char *params, *params2;
 
-  CHK(csBezierTemplate *ptemplate = 
-              new csBezierTemplate());
-  csNameObject::AddName(*ptemplate,ptname);
-  
-  ptemplate->SetParent  (parent);
+  CHK(csBezierTemplate *ptemplate = new csBezierTemplate());
+  csNameObject::AddName(*ptemplate, ptname);
+
+  ptemplate->SetParent (parent);
 
   csTextureHandle* tex;
   if (default_texture == NULL) tex = NULL;
@@ -1883,19 +1973,19 @@ csCurveTemplate* CSLoader::load_beziertemplate (char* ptname, char* buf,
     }
     switch (cmd)
     {
-      case kTokenPolTTexNr:
+      case TOKEN_TEXNR:
         ScanStr (params, "%s", str);
         tex = textures->GetTextureMM (str);
         if (tex == NULL)
         {
-          CsPrintf (MSG_FATAL_ERROR, 
+          CsPrintf (MSG_FATAL_ERROR,
                     "Couldn't find texture named '%s'!\n", str);
           fatal_exit (0, false);
         }
         ptemplate->SetTextureHandle (tex);
         break;
-      case kTokenPolTTexture:
-        while ((cmd = csGetObject (&params, tCommands, &name, &params2)) > 0)
+      case TOKEN_TEXTURE:
+        while ((cmd = csGetObject (&params, tex_commands, &name, &params2)) > 0)
         {
           if (!params2)
           {
@@ -1904,45 +1994,45 @@ csCurveTemplate* CSLoader::load_beziertemplate (char* ptname, char* buf,
           }
           switch (cmd)
           {
-            case kTokenPTTexOrig:
+            case TOKEN_ORIG:
               tx1_given = true;
-              tx1_orig = CSLoader::load_vector (params2);
+              tx1_orig = load_vector (params2);
               break;
-            case kTokenPTTexFirst:
+            case TOKEN_FIRST:
               tx1_given = true;
-              tx1 = CSLoader::load_vector (params2);
+              tx1 = load_vector (params2);
               break;
-            case kTokenPTTexFirstLen:
+            case TOKEN_FIRST_LEN:
               ScanStr (params2, "%f", &tx1_len);
               tx1_given = true;
               break;
-            case kTokenPTTexSecond:
+            case TOKEN_SECOND:
               tx2_given = true;
-              tx2 = CSLoader::load_vector (params2);
+              tx2 = load_vector (params2);
               break;
-            case kTokenPTTexSecondLen:
+            case TOKEN_SECOND_LEN:
               ScanStr (params2, "%f", &tx2_len);
               tx2_given = true;
               break;
-            case kTokenPTTexLen:
+            case TOKEN_LEN:
               ScanStr (params2, "%f", &tx_len);
               break;
-            case kTokenPTTexMatrix:
-              tx_matrix = CSLoader::load_matrix (params2);
+            case TOKEN_MATRIX:
+              tx_matrix = load_matrix (params2);
               tx_len = 0;
               break;
-            case kTokenPTTexVector:
-              tx_vector = CSLoader::load_vector (params2);
+            case TOKEN_V:
+              tx_vector = load_vector (params2);
               tx_len = 0;
               break;
-            case kTokenPTTexUVShift:
+            case TOKEN_UV_SHIFT:
               uv_shift_given = true;
               ScanStr (params2, "%f,%f", &u_shift, &v_shift);
               break;
           }
         }
         break;
-      case kTokenPolTVertices:
+      case TOKEN_VERTICES:
         {
           int list[100], num;
           ScanStr (params, "%D", list, &num);
@@ -1964,39 +2054,34 @@ csCurveTemplate* CSLoader::load_beziertemplate (char* ptname, char* buf,
   return ptemplate;
 }
 
-
-
 //---------------------------------------------------------------------------
 
-enum { 
-  kTokenThingTMove = kTokenPSetLast,
-  kTokenThingCurveCenter, 
-  kTokenThingCurveScale,
-  kTokenThingFile,
-  kTokenTSetCurveVertex
- };
-
-csThingTemplate* CSLoader::load_thingtpl (char* tname, char* buf, 
+csThingTemplate* csLoader::load_thingtpl (char* tname, char* buf,
                                         csTextureList* textures)
 {
-  static tokenDesc commands[] = {
-        {kTokenPSetVertex, "VERTEX"},
-        {kTokenPSetCircle, "CIRCLE"},
-        {kTokenPSetPolygon, "POLYGON"},
-        {kTokenPSetBezier, "BEZIER"},
-        {kTokenPSetTexNr, "TEXNR"},
-        {kTokenPSetTexlen, "TEXLEN"},
-        {kTokenPSetFog, "FOG"},
-        {kTokenThingTMove, "MOVE"},
-        {kTokenThingFile, "FILE"},
+  TOKEN_TABLE_START (commands)
+    TOKEN_TABLE (VERTEX)
+    TOKEN_TABLE (CIRCLE)
+    TOKEN_TABLE (POLYGON)
+    TOKEN_TABLE (BEZIER)
+    TOKEN_TABLE (TEXNR)
+    TOKEN_TABLE (TEXLEN)
+    TOKEN_TABLE (FOG)
+    TOKEN_TABLE (MOVE)
+    TOKEN_TABLE (FILE)
+    TOKEN_TABLE (CURVECENTER)
+    TOKEN_TABLE (CURVESCALE)
+    TOKEN_TABLE (CURVECONTROL)
+  TOKEN_TABLE_END
 
-        {kTokenThingCurveCenter, "CURVECENTER"},
-        {kTokenThingCurveScale, "CURVESCALE"},
-        {kTokenTSetCurveVertex, "CURVECONTROL"},
+  TOKEN_TABLE_START (tok_matrix)
+    TOKEN_TABLE (MATRIX)
+  TOKEN_TABLE_END
 
-        {0,0}};
-  static tokenDesc tok_matrix[] = {{1, "MATRIX"}, {0,0}};
-  static tokenDesc tok_vector[] = {{1, "V"}, {0,0}};
+  TOKEN_TABLE_START (tok_vector)
+    TOKEN_TABLE (V)
+  TOKEN_TABLE_END
+
   char* name;
   char str[255];
   int i;
@@ -2020,14 +2105,14 @@ csThingTemplate* CSLoader::load_thingtpl (char* tname, char* buf,
     }
     switch (cmd)
     {
-      case kTokenPSetVertex:
+      case TOKEN_VERTEX:
         {
           float x, y, z;
           ScanStr (params, "%f,%f,%f", &x, &y, &z);
           tmpl->AddVertex (x, y, z);
         }
         break;
-      case kTokenPSetCircle:
+      case TOKEN_CIRCLE:
         {
           float x, y, z, rx, ry, rz;
           int num, dir;
@@ -2050,36 +2135,36 @@ csThingTemplate* CSLoader::load_thingtpl (char* tname, char* buf,
           }
         }
         break;
-      case kTokenPSetFog:
+      case TOKEN_FOG:
         {
           csFog& f = tmpl->GetFog ();
           f.enabled = true;
           ScanStr (params, "%f,%f,%f,%f", &f.red, &f.green, &f.blue, &f.density);
         }
         break;
-      case kTokenPSetPolygon:
-        tmpl->AddPolygon ( CSLoader::load_ptemplate(name, params, textures,
+      case TOKEN_POLYGON:
+        tmpl->AddPolygon ( load_ptemplate(name, params, textures,
                             default_texture, default_texlen, tmpl) );
         break;
-      case kTokenPSetBezier:
+      case TOKEN_BEZIER:
         //CsPrintf(MSG_WARNING,"Encountered template curve!\n");
-        tmpl->AddCurve ( 
-              CSLoader::load_beziertemplate(name, params, textures,
+        tmpl->AddCurve (
+              load_beziertemplate(name, params, textures,
                         default_texture, default_texlen, tmpl)  );
         break;
 
-      case kTokenThingCurveCenter:
+      case TOKEN_CURVECENTER:
         {
           csVector3 c;
           ScanStr (params, "%f,%f,%f", &c.x, &c.y, &c.z);
           tmpl->curves_center = c;
         }
         break;
-      case kTokenThingCurveScale:
+      case TOKEN_CURVESCALE:
         ScanStr (params, "%f", &tmpl->curves_scale);
         break;
 
-      case kTokenTSetCurveVertex:
+      case TOKEN_CURVECONTROL:
         {
           csVector3 v;
           csVector2 t;
@@ -2088,29 +2173,32 @@ csThingTemplate* CSLoader::load_thingtpl (char* tname, char* buf,
         }
         break;
 
-      case kTokenPSetTexNr:
+      case TOKEN_TEXNR:
         ScanStr (params, "%s", str);
         default_texture = textures->GetTextureMM (str);
         if (default_texture == NULL)
         {
-          CsPrintf (MSG_FATAL_ERROR, 
+          CsPrintf (MSG_FATAL_ERROR,
                     "Couldn't find texture named '%s'!\n", str);
           fatal_exit (0, false);
         }
         break;
-      case kTokenPSetTexlen:
+
+      case TOKEN_TEXLEN:
         ScanStr (params, "%f", &default_texlen);
         break;
-      case kTokenThingTMove:
+
+      case TOKEN_MOVE:
         {
           char* params2;
           csGetObject (&params, tok_matrix, &name, &params2);
-          m_move = CSLoader::load_matrix(params2);
+          m_move = load_matrix(params2);
           csGetObject (&params, tok_vector, &name, &params2);
-          v_move = CSLoader::load_vector(params2);
+          v_move = load_vector(params2);
         }
         break;
-      case kTokenThingFile:
+
+      case TOKEN_FILE:
         {
           ScanStr (params, "%s", str);
 	  CHK (converter* filedata = new converter);
@@ -2140,34 +2228,35 @@ csThingTemplate* CSLoader::load_thingtpl (char* tname, char* buf,
 
 //---------------------------------------------------------------------------
 
-enum { kTokenTSixMove = 1, kTokenTSixTexture, kTokenTSixTexCeil,
-       kTokenTSixTexFloor, kTokenTSixTexScale, kTokenTSixDim,
-       kTokenTSixFlHeight, kTokenTSixHeight, kTokenTSixFloor,
-       kTokenTSixFloorCeil, kTokenTSixCeil, kTokenTSixTrigger,
-       kTokenTSixFog };
-
-csThingTemplate* CSLoader::load_sixtpl(char* tname,char* buf,csTextureList* textures)
+csThingTemplate* csLoader::load_sixtpl(char* tname,char* buf,csTextureList* textures)
 {
-  static tokenDesc commands[] = {
-        {kTokenTSixMove, "MOVE"},
-        {kTokenTSixTexScale, "TEXTURE_SCALE"}, 
-        {kTokenTSixTexture, "TEXTURE"}, 
-        {kTokenTSixTexCeil, "CEIL_TEXTURE"}, 
-        {kTokenTSixDim, "DIM"}, 
-        {kTokenTSixHeight, "HEIGHT"}, 
-        {kTokenTSixFlHeight, "FLOOR_HEIGHT"}, 
-        {kTokenTSixFloorCeil, "FLOOR_CEIL"}, 
-        {kTokenTSixTexFloor, "FLOOR_TEXTURE"}, 
-        {kTokenTSixFloor, "FLOOR"}, 
-        {kTokenTSixCeil, "CEILING"}, 
-        {kTokenTSixFog, "FOG"}, 
-        {0,0}};
-  static tokenDesc tok_matrix[] = {{1, "MATRIX"}, {0,0}};
-  static tokenDesc tok_vector[] = {{1, "V"}, {0,0}};
+  TOKEN_TABLE_START (commands)
+    TOKEN_TABLE (MOVE)
+    TOKEN_TABLE (TEXTURE_SCALE)
+    TOKEN_TABLE (TEXTURE)
+    TOKEN_TABLE (CEIL_TEXTURE)
+    TOKEN_TABLE (DIM)
+    TOKEN_TABLE (HEIGHT)
+    TOKEN_TABLE (FLOOR_HEIGHT)
+    TOKEN_TABLE (FLOOR_CEIL)
+    TOKEN_TABLE (FLOOR_TEXTURE)
+    TOKEN_TABLE (FLOOR)
+    TOKEN_TABLE (CEILING)
+    TOKEN_TABLE (FOG)
+  TOKEN_TABLE_END
+
+  TOKEN_TABLE_START (tok_matrix)
+    TOKEN_TABLE (MATRIX)
+  TOKEN_TABLE_END
+
+  TOKEN_TABLE_START (tok_vector)
+    TOKEN_TABLE (V)
+  TOKEN_TABLE_END
+
   char* name;
   int i;
 
-  CHK( csThingTemplate* tmpl = new csThingTemplate() );
+  CHK (csThingTemplate* tmpl = new csThingTemplate ());
   csNameObject::AddName(*tmpl,tname);
 
   csTextureHandle* texture = NULL;
@@ -2199,36 +2288,36 @@ csThingTemplate* CSLoader::load_sixtpl(char* tname,char* buf,csTextureList* text
     }
     switch (cmd)
     {
-      case kTokenTSixFog:
+      case TOKEN_FOG:
         {
           csFog& f = tmpl->GetFog ();
           f.enabled = true;
           ScanStr (params, "%f,%f,%f,%f", &f.red, &f.green, &f.blue, &f.density);
         }
         break;
-      case kTokenTSixMove:
+      case TOKEN_MOVE:
         {
           char* params2;
           csGetObject (&params, tok_matrix, &name, &params2);
-          m_move = CSLoader::load_matrix (params2);
+          m_move = load_matrix (params2);
           csGetObject (&params, tok_vector, &name, &params2);
-          v_move = CSLoader::load_vector (params2);
+          v_move = load_vector (params2);
         }
         break;
-      case kTokenTSixTexture:
+      case TOKEN_TEXTURE:
         ScanStr (params, "%s", str);
         texture = textures->GetTextureMM (str);
         if (texture == NULL)
         {
-          CsPrintf (MSG_FATAL_ERROR, 
+          CsPrintf (MSG_FATAL_ERROR,
                     "Couldn't find texture named '%s'!\n", str);
           fatal_exit (0, false);
         }
         break;
-      case kTokenTSixTexScale:
+      case TOKEN_TEXTURE_SCALE:
         ScanStr (params, "%f", &tscale);
         break;
-      case kTokenTSixDim:
+      case TOKEN_DIM:
         {
           float rx, ry, rz;
           ScanStr (params, "%f,%f,%f", &rx, &ry, &rz);
@@ -2243,7 +2332,7 @@ csThingTemplate* CSLoader::load_sixtpl(char* tname,char* buf,csTextureList* text
           v7.x =  rx; v7.y = -ry; v7.z = -rz;
         }
         break;
-      case kTokenTSixFlHeight:
+      case TOKEN_FLOOR_HEIGHT:
         ScanStr (params, "%f", &r);
         v0.y = r+v0.y-v2.y;
         v1.y = r+v1.y-v3.y;
@@ -2254,14 +2343,14 @@ csThingTemplate* CSLoader::load_sixtpl(char* tname,char* buf,csTextureList* text
         v6.y = r;
         v7.y = r;
         break;
-      case kTokenTSixHeight:
+      case TOKEN_HEIGHT:
         ScanStr (params, "%f", &r);
         v0.y = r+v2.y;
         v1.y = r+v3.y;
         v4.y = r+v6.y;
         v5.y = r+v7.y;
         break;
-      case kTokenTSixFloorCeil:
+      case TOKEN_FLOOR_CEIL:
         ScanStr (params, "(%f,%f) (%f,%f) (%f,%f) (%f,%f)",
                 &v2.x, &v2.z, &v3.x, &v3.z, &v7.x, &v7.z, &v6.x, &v6.z);
         v0 = v2;
@@ -2269,14 +2358,14 @@ csThingTemplate* CSLoader::load_sixtpl(char* tname,char* buf,csTextureList* text
         v5 = v7;
         v4 = v6;
         break;
-      case kTokenTSixFloor:
+      case TOKEN_FLOOR:
         ScanStr (params, "(%f,%f,%f) (%f,%f,%f) (%f,%f,%f) (%f,%f,%f)",
-                 &v2.x, &v2.y, &v2.z, &v3.x, &v3.y, &v3.z, 
+                 &v2.x, &v2.y, &v2.z, &v3.x, &v3.y, &v3.z,
                  &v7.x, &v7.y, &v7.z, &v6.x, &v6.y, &v6.z);
         break;
-      case kTokenTSixCeil:
+      case TOKEN_CEILING:
         ScanStr (params, "(%f,%f,%f) (%f,%f,%f) (%f,%f,%f) (%f,%f,%f)",
-                 &v0.x, &v0.y, &v0.z, &v1.x, &v1.y, &v1.z, 
+                 &v0.x, &v0.y, &v0.z, &v1.x, &v1.y, &v1.z,
                  &v5.x, &v5.y, &v5.z, &v4.x, &v4.y, &v4.z);
         break;
     }
@@ -2484,21 +2573,20 @@ void add_to_todo (Todo* todo, int& todo_end, char* poly,
   todo_end++;
 }
 
-enum { kTokenRTexTexture = 1, kTokenRTexPlane, kTokenRTexLen };
-
 void load_tex (char** buf, Color* colors, int num_colors, csTextureList* textures,
                char* name)
 {
-  static tokenDesc commands[] = {
-        {kTokenRTexTexture, "TEXTURE"},
-        {kTokenRTexPlane, "PLANE"},
-        {kTokenRTexLen, "LEN"},
-        {0,0}};
-  long cmd;
-  char* params;
-  char str[255];
+  TOKEN_TABLE_START (commands)
+    TOKEN_TABLE (TEXTURE)
+    TOKEN_TABLE (PLANE)
+    TOKEN_TABLE (LEN)
+  TOKEN_TABLE_END
 
-  strcpy (colors[num_colors].poly, name);
+  long cmd;
+  char *params;
+  char str [255];
+
+  strcpy (colors [num_colors].poly, name);
   colors[num_colors].plane[0] = 0;
   colors[num_colors].texture = NULL;
   colors[num_colors].len = 0;
@@ -2507,7 +2595,7 @@ void load_tex (char** buf, Color* colors, int num_colors, csTextureList* texture
   {
     switch (cmd)
     {
-      case kTokenRTexTexture:
+      case TOKEN_TEXTURE:
         ScanStr (params, "%s", str);
         colors[num_colors].texture = textures->GetTextureMM (str);
         if (colors[num_colors].texture == NULL)
@@ -2517,11 +2605,11 @@ void load_tex (char** buf, Color* colors, int num_colors, csTextureList* texture
           fatal_exit (0, false);
         }
         break;
-      case kTokenRTexPlane:
+      case TOKEN_PLANE:
         ScanStr (params, "%s", str);
         strcpy (colors[num_colors].plane, str);
         break;
-      case kTokenRTexLen:
+      case TOKEN_LEN:
         ScanStr (params, "%f", &colors[num_colors].len);
         break;
     }
@@ -2533,68 +2621,61 @@ void load_tex (char** buf, Color* colors, int num_colors, csTextureList* texture
   }
 }
 
-enum { kTokenRoomMove = 1, kTokenRoomTexture, kTokenRoomTexLight,
-       kTokenRoomTexMM, kTokenRoomTexCeil, kTokenRoomTexFloor,
-       kTokenRoomLightX, kTokenRoomTex, kTokenRoomTexScale,
-       kTokenRoomDim, kTokenRoomFlHeight, kTokenRoomHeight,
-       kTokenRoomFloor, kTokenRoomFloorCeil, kTokenRoomCeil,
-       kTokenRoomLight, kTokenRoomSixface, kTokenRoomThing,
-       kTokenRoomOcclus, kTokenRoomPortal, kTokenRoomSplit,
-       kTokenRoomTrigger, kTokenRoomActivate, kTokenRoomStatBsp,
-       kTokenRoomBsp, kTokenRoomSprite, kTokenRoomFog };
-
-enum { kTokenPortPoly = 1, kTokenPortSector, kTokenPortAlpha,
-       kTokenPortWarp };
-
-enum { kTokenWarpMatrix = 1, kTokenWarpVector, kTokenWarpVectorAfter, 
-       kTokenWarpMirror, kTokenWarpStatic };
-
-csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf, 
-                             csTextureList* textures)
+csSector* csLoader::load_room (char* secname, csWorld* w, char* buf,
+  csTextureList* textures)
 {
-  static tokenDesc commands[] = {
-        {kTokenRoomMove, "MOVE"},
-        {kTokenRoomTexLight, "TEXTURE_LIGHTING"}, 
-        {kTokenRoomTexMM, "TEXTURE_MIPMAP"}, 
-        {kTokenRoomTexScale, "TEXTURE_SCALE"}, 
-        {kTokenRoomTexture, "TEXTURE"}, 
-        {kTokenRoomTex, "TEX"}, 
-        {kTokenRoomTexCeil, "CEIL_TEXTURE"}, 
-        {kTokenRoomLightX, "LIGHTX"}, 
-        {kTokenRoomLight, "LIGHT"}, 
-        {kTokenRoomDim, "DIM"}, 
-        {kTokenRoomHeight, "HEIGHT"}, 
-        {kTokenRoomFlHeight, "FLOOR_HEIGHT"}, 
-        {kTokenRoomFloorCeil, "FLOOR_CEIL"}, 
-        {kTokenRoomTexFloor, "FLOOR_TEXTURE"}, 
-        {kTokenRoomFloor, "FLOOR"}, 
-        {kTokenRoomCeil, "CEILING"}, 
-        {kTokenRoomSixface, "SIXFACE"}, 
-        {kTokenRoomThing, "THING"}, 
-        {kTokenRoomPortal, "PORTAL"}, 
-        {kTokenRoomSplit, "SPLIT"}, 
-        {kTokenRoomTrigger, "TRIGGER"}, 
-        {kTokenRoomActivate, "ACTIVATE"}, 
-        {kTokenRoomBsp, "BSP"},
-        {kTokenRoomStatBsp, "STATBSP"},
-        {kTokenRoomSprite, "SPRITE"},
-        {kTokenRoomFog, "FOG"},
-        {0,0}};
-  static tokenDesc pCommands[] = {
-        {kTokenPortPoly, "POLYGON"},
-        {kTokenPortSector, "SECTOR"},
-        {kTokenPortAlpha, "ALPHA"},
-        {kTokenPortWarp, "WARP"},
-        {0,0}};
-  static tokenDesc mCommands[] = {
-        {kTokenWarpMatrix, "MATRIX"},
-        {kTokenWarpVector, "V"},
-        {kTokenWarpVectorAfter, "W"},
-        {kTokenWarpMirror, "MIRROR"},
-        {kTokenWarpStatic, "MIRROR"},
-        {0,0}};
-  static tokenDesc tok_matrix[] = {{1, "MATRIX"}, {0,0}};
-  static tokenDesc tok_vector[] = {{1, "V"}, {0,0}};
+  TOKEN_TABLE_START (commands)
+    TOKEN_TABLE (MOVE)
+    TOKEN_TABLE (TEXTURE_LIGHTING)
+    TOKEN_TABLE (TEXTURE_MIPMAP)
+    TOKEN_TABLE (TEXTURE_SCALE)
+    TOKEN_TABLE (TEXTURE)
+    TOKEN_TABLE (TEX)
+    TOKEN_TABLE (CEIL_TEXTURE)
+    TOKEN_TABLE (FLOOR_TEXTURE)
+    TOKEN_TABLE (LIGHTX)
+    TOKEN_TABLE (LIGHT)
+    TOKEN_TABLE (DIM)
+    TOKEN_TABLE (HEIGHT)
+    TOKEN_TABLE (FLOOR_HEIGHT)
+    TOKEN_TABLE (FLOOR_CEIL)
+    TOKEN_TABLE (FLOOR)
+    TOKEN_TABLE (CEILING)
+    TOKEN_TABLE (SIXFACE)
+    TOKEN_TABLE (THING)
+    TOKEN_TABLE (PORTAL)
+    TOKEN_TABLE (SPLIT)
+    TOKEN_TABLE (TRIGGER)
+    TOKEN_TABLE (ACTIVATE)
+    TOKEN_TABLE (BSP)
+    TOKEN_TABLE (STATBSP)
+    TOKEN_TABLE (SPRITE)
+    TOKEN_TABLE (FOG)
+  TOKEN_TABLE_END
+
+  TOKEN_TABLE_START (portal_commands)
+    TOKEN_TABLE (POLYGON)
+    TOKEN_TABLE (SECTOR)
+    TOKEN_TABLE (ALPHA)
+    TOKEN_TABLE (WARP)
+  TOKEN_TABLE_END
+
+  TOKEN_TABLE_START (mCommands)
+    TOKEN_TABLE (MATRIX)
+    TOKEN_TABLE (V)
+    TOKEN_TABLE (W)
+    TOKEN_TABLE (MIRROR)
+    TOKEN_TABLE (STATIC)
+  TOKEN_TABLE_END
+
+  TOKEN_TABLE_START (tok_matrix)
+    TOKEN_TABLE (MATRIX)
+  TOKEN_TABLE_END
+
+  TOKEN_TABLE_START (tok_vector)
+    TOKEN_TABLE (V)
+  TOKEN_TABLE_END
+
   char* name;
   long cmd;
   char* params, * params2;
@@ -2650,24 +2731,24 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
     }
     switch (cmd)
     {
-      case kTokenRoomBsp:
+      case TOKEN_BSP:
         do_bsp = true;
         do_stat_bsp = false;
         break;
-      case kTokenRoomStatBsp:
+      case TOKEN_STATBSP:
         do_stat_bsp = true;
         do_bsp = false;
         break;
-      case kTokenRoomMove:
+      case TOKEN_MOVE:
         {
           char* params2;
           csGetObject (&params, tok_matrix, &name, &params2);
-          mm = CSLoader::load_matrix (params2);
+          mm = load_matrix (params2);
           csGetObject (&params, tok_vector, &name, &params2);
-          vm = CSLoader::load_vector (params2);
+          vm = load_vector (params2);
         }
         break;
-      case kTokenRoomTexture:
+      case TOKEN_TEXTURE:
         ScanStr (params, "%s", str);
         texture = textures->GetTextureMM (str);
         if (texture == NULL)
@@ -2678,14 +2759,14 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
           fatal_exit (0, false);
         }
         break;
-      case kTokenRoomTexLight:
+      case TOKEN_TEXTURE_LIGHTING:
         ScanStr (params, "%b", &no_lighting); no_lighting = !no_lighting;
         break;
-      case kTokenRoomTexMM:
+      case TOKEN_TEXTURE_MIPMAP:
         ScanStr (params, "%b", &no_mipmap); no_mipmap = !no_mipmap;
         break;
-      case kTokenRoomTexCeil:
-      case kTokenRoomTexFloor:
+      case TOKEN_CEIL_TEXTURE:
+      case TOKEN_FLOOR_TEXTURE:
         ScanStr (params, "%s", str);
         colors[num_colors].texture = textures->GetTextureMM (str);
         if (colors[num_colors].texture == NULL)
@@ -2695,8 +2776,8 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
                     "for this texture.\n", str);
           fatal_exit (0, false);
         }
-        strcpy (colors[num_colors].poly, 
-                cmd == kTokenRoomTexCeil ? "up" : "down");
+        strcpy (colors[num_colors].poly,
+                cmd == TOKEN_CEIL_TEXTURE ? "up" : "down");
         colors[num_colors].plane[0] = 0;
         if (num_colors >= MAX_ROOM_COLORS)
         {
@@ -2705,20 +2786,20 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
         }
         num_colors++;
         break;
-      case kTokenRoomLightX:
+      case TOKEN_LIGHTX:
         ScanStr (params, "%s,%s", str, str2);
         strcpy (dlights[num_light].poly, str);
         strcpy (dlights[num_light].light, str2);
         num_light++;
         break;
-      case kTokenRoomTex:
+      case TOKEN_TEX:
         load_tex (&params, colors, num_colors, textures, name);
         num_colors++;
         break;
-      case kTokenRoomTexScale:
+      case TOKEN_TEXTURE_SCALE:
         ScanStr (params, "%f", &tscale);
         break;
-      case kTokenRoomDim:
+      case TOKEN_DIM:
         {
           float rx, ry, rz;
           ScanStr (params, "%f,%f,%f", &rx, &ry, &rz);
@@ -2733,7 +2814,7 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
           v7.x =  rx; v7.y = -ry; v7.z = -rz;
         }
         break;
-      case kTokenRoomFlHeight:
+      case TOKEN_FLOOR_HEIGHT:
         ScanStr (params, "%f", &r);
         v0.y = r+v0.y-v2.y;
         v1.y = r+v1.y-v3.y;
@@ -2744,14 +2825,14 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
         v6.y = r;
         v7.y = r;
         break;
-      case kTokenRoomHeight:
+      case TOKEN_HEIGHT:
         ScanStr (params, "%f", &r);
         v0.y = r+v2.y;
         v1.y = r+v3.y;
         v4.y = r+v6.y;
         v5.y = r+v7.y;
         break;
-      case kTokenRoomFloorCeil:
+      case TOKEN_FLOOR_CEIL:
         ScanStr (params, "(%f,%f) (%f,%f) (%f,%f) (%f,%f)",
                  &v2.x, &v2.z, &v3.x, &v3.z, &v7.x, &v7.z, &v6.x, &v6.z);
         v0 = v2;
@@ -2759,52 +2840,52 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
         v5 = v7;
         v4 = v6;
         break;
-      case kTokenRoomFloor:
+      case TOKEN_FLOOR:
         ScanStr (params, "(%f,%f,%f) (%f,%f,%f) (%f,%f,%f) (%f,%f,%f)",
-                 &v2.x, &v2.y, &v2.z, &v3.x, &v3.y, &v3.z, 
+                 &v2.x, &v2.y, &v2.z, &v3.x, &v3.y, &v3.z,
                  &v7.x, &v7.y, &v7.z, &v6.x, &v6.y, &v6.z);
         break;
-      case kTokenRoomCeil:
+      case TOKEN_CEILING:
         ScanStr (params, "(%f,%f,%f) (%f,%f,%f) (%f,%f,%f) (%f,%f,%f)",
-                 &v0.x, &v0.y, &v0.z, &v1.x, &v1.y, &v1.z, 
+                 &v0.x, &v0.y, &v0.z, &v1.x, &v1.y, &v1.z,
                  &v5.x, &v5.y, &v5.z, &v4.x, &v4.y, &v4.z);
         break;
-      case kTokenRoomLight:
+      case TOKEN_LIGHT:
         sector->AddLight ( load_statlight(params) );
         break;
-      case kTokenRoomSixface:
+      case TOKEN_SIXFACE:
         sector->AddThing ( load_sixface(name,w,params,textures,sector) );
         break;
-      case kTokenRoomFog:
+      case TOKEN_FOG:
         {
           csFog& f = sector->GetFog ();
           f.enabled = true;
           ScanStr (params, "%f,%f,%f,%f", &f.red, &f.green, &f.blue, &f.density);
         }
         break;
-      case kTokenRoomSprite:
+      case TOKEN_SPRITE:
         {
           CHK (csSprite3D* sp = new csSprite3D ());
           csNameObject::AddName(*sp,name);
-          CSLoader::LoadSprite (sp, w, params, textures);
+          LoadSprite (sp, w, params, textures);
           w->sprites.Push (sp);
           sp->MoveToSector (sector);
         }
         break;
-      case kTokenRoomThing:
+      case TOKEN_THING:
         sector->AddThing ( load_thing(name,w,params,textures,sector) );
         break;
-      case kTokenRoomPortal:
-        {  
+      case TOKEN_PORTAL:
+        {
           if (num_portals >= MAX_ROOM_PORTALS)
           {
-            CsPrintf (MSG_FATAL_ERROR, 
+            CsPrintf (MSG_FATAL_ERROR,
                       "OVERFLOW with number of portals in room!\n");
             fatal_exit (0, false);
           }
           portals[num_portals].is_warp = false;
           portals[num_portals].alpha = 0;
-          while ((cmd = csGetObject (&params, pCommands, &name, &params2)) > 0)
+          while ((cmd = csGetObject (&params, portal_commands, &name, &params2)) > 0)
           {
             if (!params2)
             {
@@ -2813,16 +2894,16 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
             }
             switch (cmd)
             {
-              case kTokenPortPoly:
+              case TOKEN_POLYGON:
                 ScanStr (params2, "%s", portals[num_portals].poly);
                 break;
-              case kTokenPortSector:
+              case TOKEN_SECTOR:
                 ScanStr (params2, "%s", portals[num_portals].sector);
                 break;
-              case kTokenPortAlpha:
+              case TOKEN_ALPHA:
                 ScanStr (params2, "%d", &portals[num_portals].alpha);
                 break;
-              case kTokenPortWarp:
+              case TOKEN_WARP:
                 {
                   portals[num_portals].do_static = false;
                   char* params3;
@@ -2835,27 +2916,27 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
                     }
                     switch (cmd)
                     {
-                      case kTokenWarpMatrix:
-                        portals[num_portals].m_warp 
-                                          = CSLoader::load_matrix (params3);
+                      case TOKEN_MATRIX:
+                        portals[num_portals].m_warp
+                                          = load_matrix (params3);
                         portals[num_portals].do_mirror = false;
                         break;
-                      case kTokenWarpVector:
-                        portals[num_portals].v_warp_before 
-                                          = CSLoader::load_vector (params3);
-                        portals[num_portals].v_warp_after 
+                      case TOKEN_V:
+                        portals[num_portals].v_warp_before
+                                          = load_vector (params3);
+                        portals[num_portals].v_warp_after
                                           = portals[num_portals].v_warp_before;
                         portals[num_portals].do_mirror = false;
                         break;
-                      case kTokenWarpVectorAfter:
-                        portals[num_portals].v_warp_after 
-                                          = CSLoader::load_vector (params3);
+                      case TOKEN_W:
+                        portals[num_portals].v_warp_after
+                                          = load_vector (params3);
                         portals[num_portals].do_mirror = false;
                         break;
-                      case kTokenWarpMirror:
+                      case TOKEN_MIRROR:
                         portals[num_portals].do_mirror = true;
                         break;
-                      case kTokenWarpStatic:
+                      case TOKEN_STATIC:
                         portals[num_portals].do_static = true;
                         break;
                     }
@@ -2868,16 +2949,16 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
         }
         num_portals++;
         break;
-      case kTokenRoomSplit:
+      case TOKEN_SPLIT:
         {
-          ScanStr (params, "%s,%s(%F)", 
+          ScanStr (params, "%s,%s(%F)",
                    to_split[num_splits].poly, str, to_split[num_splits].widA,
                    &to_split[num_splits].cnt);
           if (!strcmp (str, "VER")) to_split[num_splits].dir = 0;
           else if (!strcmp (str, "HOR")) to_split[num_splits].dir = 1;
           else
           {
-            CsPrintf (MSG_FATAL_ERROR, 
+            CsPrintf (MSG_FATAL_ERROR,
                       "Expected 'VER' or 'HOR' in SPLIT statement!\n");
             fatal_exit (0, false);
           }
@@ -2889,7 +2970,7 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
           num_splits++;
         }
         break;
-      case kTokenRoomActivate:
+      case TOKEN_ACTIVATE:
         ScanStr (params, "%s", str);
         {
           csScript* s = csScriptList::GetScript(str);
@@ -2908,7 +2989,7 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
           objtrig->DoActivateTriggers ();
         }
         break;
-      case kTokenRoomTrigger:
+      case TOKEN_TRIGGER:
         ScanStr (params, "%s,%s", str, str2);
         if (!strcmp (str, "activate"))
         {
@@ -2919,7 +3000,7 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
             fatal_exit (0, false);
           }
           csObjectTrigger* objtrig = csObjectTrigger::GetTrigger(*sector);
-          if (!objtrig) 
+          if (!objtrig)
           {
             CHK(objtrig = new csObjectTrigger());
             sector->ObjAdd(objtrig);
@@ -2928,7 +3009,7 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
         }
         else
         {
-          CsPrintf (MSG_FATAL_ERROR, 
+          CsPrintf (MSG_FATAL_ERROR,
                     "Trigger '%s' not supported or known for object!\n", str2);
           fatal_exit (0, false);
         }
@@ -2961,17 +3042,17 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
   int done = 0;
   int todo_end = 0;
 
-  add_to_todo (todo, todo_end, "north", 0, 1, 3, 2, 0, 1, 
+  add_to_todo (todo, todo_end, "north", 0, 1, 3, 2, 0, 1,
                texture, -1, NULL, colors, num_colors, dlights, num_light);
-  add_to_todo (todo, todo_end, "east", 1, 5, 7, 3, 1, 5, 
+  add_to_todo (todo, todo_end, "east", 1, 5, 7, 3, 1, 5,
                texture, -1, NULL, colors, num_colors, dlights, num_light);
-  add_to_todo (todo, todo_end, "south", 5, 4, 6, 7, 5, 4, 
+  add_to_todo (todo, todo_end, "south", 5, 4, 6, 7, 5, 4,
                texture, -1, NULL, colors, num_colors, dlights, num_light);
-  add_to_todo (todo, todo_end, "west", 4, 0, 2, 6, 4, 0, 
+  add_to_todo (todo, todo_end, "west", 4, 0, 2, 6, 4, 0,
                texture, -1, NULL, colors, num_colors, dlights, num_light);
-  add_to_todo (todo, todo_end, "up", 4, 5, 1, 0, 4, 5, 
+  add_to_todo (todo, todo_end, "up", 4, 5, 1, 0, 4, 5,
                texture, -1, NULL, colors, num_colors, dlights, num_light);
-  add_to_todo (todo, todo_end, "down", 2, 3, 7, 6, 2, 3, 
+  add_to_todo (todo, todo_end, "down", 2, 3, 7, 6, 2, 3,
                texture, -1, NULL, colors, num_colors, dlights, num_light);
 
   int split;
@@ -2998,24 +3079,24 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
 
         for (l = 0 ; l < to_split[i].cnt ; l++)
         {
-          csMath3::Between (sector->Vwor (i1), sector->Vwor (i2), 
+          csMath3::Between (sector->Vwor (i1), sector->Vwor (i2),
                             v, -1, to_split[i].widA[l]);
           sector->AddVertex (v);
-          csMath3::Between (sector->Vwor (i4), sector->Vwor (i3), 
+          csMath3::Between (sector->Vwor (i4), sector->Vwor (i3),
                             v, -1, to_split[i].widA[l]);
           sector->AddVertex (v);
 
           sprintf (pname, "%s%c", todo[done].poly, l+'A');
-          add_to_todo(todo, todo_end, pname, i1, sector->GetNumVertices ()-2, 
-                      sector->GetNumVertices ()-1, i4, todo[done].tv1, 
-                      todo[done].tv2, todo[done].texture, todo[done].col_idx, 
+          add_to_todo(todo, todo_end, pname, i1, sector->GetNumVertices ()-2,
+                      sector->GetNumVertices ()-1, i4, todo[done].tv1,
+                      todo[done].tv2, todo[done].texture, todo[done].col_idx,
                       todo[done].light, colors, num_colors, dlights,num_light);
           i1 = sector->GetNumVertices () - 2;
           i4 = sector->GetNumVertices () - 1;
         }
 
         sprintf (pname, "%s%c", todo[done].poly, l+'A');
-        add_to_todo (todo, todo_end, pname, i1, i2, i3, i4, todo[done].tv1, 
+        add_to_todo (todo, todo_end, pname, i1, i2, i3, i4, todo[done].tv1,
                      todo[done].tv2, todo[done].texture, todo[done].col_idx,
                      todo[done].light, colors, num_colors, dlights, num_light);
       }
@@ -3029,16 +3110,16 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
 
         for (l = 0 ; l < to_split[i].cnt ; l++)
         {
-          csMath3::Between (sector->Vwor (i4), sector->Vwor (i1), v, -1, 
+          csMath3::Between (sector->Vwor (i4), sector->Vwor (i1), v, -1,
                             to_split[i].widA[l]);
           sector->AddVertex (v);
-          csMath3::Between (sector->Vwor (i3), sector->Vwor (i2), v, -1, 
+          csMath3::Between (sector->Vwor (i3), sector->Vwor (i2), v, -1,
                             to_split[i].widA[l]);
           sector->AddVertex (v);
 
           sprintf (pname, "%s%d", todo[done].poly, l+1);
-          add_to_todo(todo, todo_end, pname, sector->GetNumVertices () - 2, 
-                      sector->GetNumVertices () - 1, 
+          add_to_todo(todo, todo_end, pname, sector->GetNumVertices () - 2,
+                      sector->GetNumVertices () - 1,
                       i3, i4, todo[done].tv1, todo[done].tv2,
                       todo[done].texture, todo[done].col_idx, todo[done].light,
                       colors, num_colors, dlights, num_light);
@@ -3047,8 +3128,8 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
         }
 
         sprintf (pname, "%s%d", todo[done].poly, l+1);
-        add_to_todo (todo, todo_end, pname, i1, i2, i3, i4, todo[done].tv1, 
-                     todo[done].tv2, todo[done].texture, todo[done].col_idx, 
+        add_to_todo (todo, todo_end, pname, i1, i2, i3, i4, todo[done].tv1,
+                     todo[done].tv2, todo[done].texture, todo[done].col_idx,
                      todo[done].light, colors, num_colors, dlights, num_light);
       }
     }
@@ -3056,7 +3137,7 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
     {
       float len;
       int idx = todo[done].col_idx;
-      if (idx == -1 || colors[idx].texture == NULL) 
+      if (idx == -1 || colors[idx].texture == NULL)
         texture = todo[done].texture;
       else texture = colors[idx].texture;
 
@@ -3069,7 +3150,7 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
       len = tscale;
       if (idx != -1 && colors[idx].len) len = colors[idx].len;
       if (idx == -1 || colors[idx].plane[0] == 0)
-        p->SetTextureSpace (sector->Vwor (todo[done].tv1), 
+        p->SetTextureSpace (sector->Vwor (todo[done].tv1),
                               sector->Vwor (todo[done].tv2), len);
       else
         p->SetTextureSpace ((csPolyPlane*)w->planes.FindByName (colors[idx].plane));
@@ -3094,7 +3175,7 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
     }
 
     // This will later be defined correctly
-    CHK( portal = new csSector () );  
+    CHK( portal = new csSector () );
     csNameObject::AddName(*portal,portals[i].sector);
     p->SetCSPortal (portal);
     LoadStat::portals_loaded++;
@@ -3102,7 +3183,7 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
     {
       if (portals[i].do_mirror)
         p->SetWarp (csTransform::GetReflect ( *(p->GetPolyPlane ()) ));
-      else p->SetWarp (portals[i].m_warp, portals[i].v_warp_before, 
+      else p->SetWarp (portals[i].m_warp, portals[i].v_warp_before,
                         portals[i].v_warp_after);
       p->GetPortal  ()->SetStaticDest (portals[i].do_static);
     }
@@ -3116,31 +3197,28 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
   return sector;
 }
 
-enum { kTokenSectorThing = kTokenPSetLast, kTokenSectorSixface,
-       kTokenSectorLight, kTokenSectorOcclus, kTokenSectorSprite,
-       kTokenSectorStatBsp, kTokenSectorSkyDome };
-
-csSector* CSLoader::load_sector (char* secname, csWorld* w, char* buf, 
-                               csTextureList* textures)
+csSector* csLoader::load_sector (char* secname, csWorld* w, char* buf,
+  csTextureList* textures)
 {
-  static tokenDesc commands[] = {
-        {kTokenPSetVertex, "VERTEX"},
-        {kTokenPSetCircle, "CIRCLE"},
-        {kTokenPSetPolygon, "POLYGON"},
-        {kTokenPSetTexNr, "TEXNR"},
-        {kTokenPSetTexlen, "TEXLEN"},
-        {kTokenPSetTrigger, "TRIGGER"},
-        {kTokenPSetActivate, "ACTIVATE"},
-        {kTokenPSetLightX, "LIGHTX"},
-        {kTokenPSetFog, "FOG"},
-        {kTokenPSetBsp, "BSP"},
-        {kTokenSectorStatBsp, "STATBSP"},
-        {kTokenSectorThing, "THING"},
-        {kTokenSectorSixface, "SIXFACE"},
-        {kTokenSectorLight, "LIGHT"},
-        {kTokenSectorSprite, "SPRITE"},
-        {kTokenSectorSkyDome, "SKYDOME"},
-        {0,0}};
+  TOKEN_TABLE_START (commands)
+    TOKEN_TABLE (VERTEX)
+    TOKEN_TABLE (CIRCLE)
+    TOKEN_TABLE (POLYGON)
+    TOKEN_TABLE (TEXNR)
+    TOKEN_TABLE (TEXLEN)
+    TOKEN_TABLE (TRIGGER)
+    TOKEN_TABLE (ACTIVATE)
+    TOKEN_TABLE (LIGHTX)
+    TOKEN_TABLE (FOG)
+    TOKEN_TABLE (BSP)
+    TOKEN_TABLE (STATBSP)
+    TOKEN_TABLE (THING)
+    TOKEN_TABLE (SIXFACE)
+    TOKEN_TABLE (LIGHT)
+    TOKEN_TABLE (SPRITE)
+    TOKEN_TABLE (SKYDOME)
+  TOKEN_TABLE_END
+
   char* name;
   long cmd;
   char* params;
@@ -3163,33 +3241,33 @@ csSector* CSLoader::load_sector (char* secname, csWorld* w, char* buf,
     }
     switch (cmd)
     {
-      case kTokenSectorSkyDome:
-        CSLoader::skydome_process (*sector, name, params, info.default_texture);
+      case TOKEN_SKYDOME:
+        skydome_process (*sector, name, params, info.default_texture);
         break;
-      case kTokenSectorStatBsp:
+      case TOKEN_STATBSP:
         do_stat_bsp = true;
         info.use_bsp = false;
         break;
-      case kTokenSectorThing:
+      case TOKEN_THING:
         sector->AddThing ( load_thing(name,w,params,textures,sector) );
         break;
-      case kTokenSectorSprite:
+      case TOKEN_SPRITE:
         {
           CHK (csSprite3D* sp = new csSprite3D ());
           csNameObject::AddName(*sp,name);
-          CSLoader::LoadSprite (sp, w, params, textures);
+          LoadSprite (sp, w, params, textures);
           w->sprites.Push (sp);
           sp->MoveToSector (sector);
         }
         break;
-      case kTokenSectorSixface:
+      case TOKEN_SIXFACE:
         sector->AddThing ( load_sixface(name,w,params,textures,sector) );
         break;
-      case kTokenSectorLight:
+      case TOKEN_LIGHT:
         sector->AddLight ( load_statlight(params) );
         break;
       default:
-        CSLoader::ps_process (*sector, info, cmd, name, params);
+        ps_process (*sector, info, cmd, name, params);
         break;
     }
   }
@@ -3205,15 +3283,14 @@ csSector* CSLoader::load_sector (char* secname, csWorld* w, char* buf,
   return sector;
 }
 
-enum { kTokenSkyRadius = 1, kTokenSkyVertices };
-
-void CSLoader::skydome_process (csSector& sector, char* name, char* buf,
+void csLoader::skydome_process (csSector& sector, char* name, char* buf,
         csTextureHandle* texture)
 {
-  static tokenDesc commands[] = {
-        {kTokenSkyRadius, "RADIUS"},
-        {kTokenSkyVertices, "VERTICES"},
-        {0,0}};
+  TOKEN_TABLE_START (commands)
+    TOKEN_TABLE (RADIUS)
+    TOKEN_TABLE (VERTICES)
+  TOKEN_TABLE_END
+
   long cmd;
   char* params;
   float radius = 0.0f;
@@ -3234,10 +3311,10 @@ void CSLoader::skydome_process (csSector& sector, char* name, char* buf,
   {
     switch (cmd)
     {
-      case kTokenSkyRadius:
+      case TOKEN_RADIUS:
         ScanStr (params, "%f", &radius);
         break;
-      case kTokenSkyVertices:
+      case TOKEN_VERTICES:
         ScanStr (params, "%D", prev_vertices, &num);
         break;
     }
@@ -3392,205 +3469,59 @@ void CSLoader::skydome_process (csSector& sector, char* name, char* buf,
 
 //---------------------------------------------------------------------------
 
-bool CSLoader::load_library_def (csLibrary* library, csWorld* w, char* file, csTextureList* textures)
+csSoundBufferObject* csLoader::load_sound(char* name, csWorld* w)
 {
-  library->Clear ();
-
-  FILE* fp;
-  fp = fopen (file, "rb");
-  if (!fp)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "Could not open library file '%s'!\n", file);
-    return false;
-  }
-
-  char* buf;
-
-  Archive* ar;
-
-  // First check if the library file is a ZIP archive.
-  char hdr[5];
-  fread (hdr, 4, 1, fp);
-  hdr[4] = 0;
-  if (!strcmp (hdr, "PK\003\004"))
-  {
-    fclose (fp);
-    fp = NULL;
-    CHK (ar = new Archive (file));
-    buf = ar->read ("library");
-    if (!buf)
-    {
-      CsPrintf (MSG_FATAL_ERROR, "Could not find 'library' file inside ZIP archive '%s'!\n\
-Are you sure '%s' is a valid Crystal Space library?\n", file, file);
-      CHK (delete ar);
-      return false;
-    }
-  }
-  else
-  {
-    CsPrintf (MSG_FATAL_ERROR, "'%s' is not a valid ZIP archive!\n", file);
-    return false;
-  }
-
-  CsPrintf (MSG_INITIALIZATION, "Loading library '%s' from '%s'.\n", 
-            csNameObject::GetName(*library), file);
-  bool rc = load_library_def (library, w, ar, buf, textures);
-
-  library->SetArchive (ar);
-
-  CHK (delete [] buf);
-  if (fp) fclose (fp);
-
-  return rc;
-}
-
-enum { kTokenLibDefThing = 1, kTokenLibDefSprite, kTokenLibDefTexs, kTokenLibDefSounds };
-
-bool CSLoader::load_library_def (csLibrary* library, csWorld* w, Archive* ar, char* buf, csTextureList* textures)
-{
-  static tokenDesc tokens[] = {{1, "LIBRARY"}, {0,0}};
-  static tokenDesc commands[] = {
-        {kTokenLibDefTexs, "TEXTURES"},
-        {kTokenLibDefThing, "THING"},
-        {kTokenLibDefSprite, "SPRITE"},
-        {kTokenLibDefSounds, "SOUNDS"},
-        {0,0}};
-  char* name, * data;
-
-  if (csGetObject (&buf, tokens, &name, &data))
-  {
-    if (!data)
-    {
-      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
-      fatal_exit (0, false);
-    }
-    long cmd;
-    char* params;
-
-    while ((cmd = csGetObject (&data, commands, &name, &params)) > 0)
-    {
-      if (!params)
-      {
-        CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", data);
-        fatal_exit (0, false);
-      }
-      switch (cmd)
-      {
-        case kTokenLibDefTexs:
-          // Append textures to world.
-          if (!CSLoader::LoadTextures (w->GetTextures (), params, w, ar))
-            return false;
-          break;
-        case kTokenLibDefSounds:
-          if (!CSLoader::LoadSounds (w, params, ar))
-            return false;
-          break;
-        case kTokenLibDefSprite:
-          {
-            csSpriteTemplate* t = (csSpriteTemplate*)library->sprite_templates.FindByName (name);
-            if (!t)
-            {
-              CHK (t = new csSpriteTemplate ());
-              csNameObject::AddName(*t, name);
-              library->sprite_templates.Push (t);
-            }
-            CSLoader::LoadSpriteTemplate (t, params, textures);
-          }
-        case kTokenLibDefThing:
-          if (!library->thing_templates.FindByName (name))
-            library->thing_templates.Push (CSLoader::load_thingtpl (name, params, textures));
-          break;
-      }
-    }
-    if (cmd == PARSERR_TOKENNOTFOUND)
-    {
-      CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a library definition!\n", csGetLastOffender ());
-      fatal_exit (0, false);
-    }
-  }
-  return true;
-}
-
-csSoundBufferObject* CSLoader::load_sound(char* name, csWorld* w, Archive* ar)
-{
-  Archive* world_file = NULL;
-  if (w) world_file = w->GetWorldFile ();
   csSoundBufferObject* sndobj = NULL;
   csSoundBuffer* snd = NULL;
 
   size_t size;
-  if (ar && ar->file_exists (name, &size))
-    world_file = ar;
+  char* buf = VFS->ReadFile (name, size);
 
-  if (world_file && world_file->file_exists (name, &size))
+  if (!buf || !size)
   {
-    char* buf;
-    buf = world_file->read (name);
-    if (!buf)
-    {
-      CsPrintf (MSG_FATAL_ERROR,
-        "Can't load file '%s' from archive although it should be there!\n"
-        "Maybe the archive is corrupt?\n", name);
-      return NULL;
-    }
-    snd = csSoundBufferLoader::load ((UByte*)buf, size);
-    if (!snd)
-    {
-      CsPrintf (MSG_INTERNAL_ERROR, 
-               "ENGINE FAILURE! Couldn't open '%s' from archive!\n", name);
-    }
-    CHK (delete [] buf); 
+    CsPrintf (MSG_FATAL_ERROR,
+      "Cannot read sound file \"%s\" from VFS\n", name);
+    return NULL;
   }
-  else
+
+  snd = csSoundBufferLoader::load ((UByte*)buf, size);
+  CHK (delete [] buf);
+  if (!snd)
   {
-    FILE* fp;
-    w->isys->FOpen (name, "rb", &fp);
-    if (!fp)
-    {
-      CsPrintf (MSG_FATAL_ERROR, 
-        "Can't find file '%s' in data directory or in archive!\n", name);
-      return NULL;
-    }
-    snd = csSoundBufferLoader::load (fp);
-    if (!snd)
-    {
-      CsPrintf (MSG_INTERNAL_ERROR, 
-               "ENGINE FAILURE! Couldn't open '%s' from disk!\n", name);
-    }
-    w->isys->FClose (fp);
+    CsPrintf (MSG_FATAL_ERROR, "The sound file \"%s\" is corrupt!\n", name);
+    return NULL;
   }
-  CHK(sndobj = new csSoundBufferObject(snd));
-  csNameObject::AddName(*sndobj,name);
+
+  CHK (sndobj = new csSoundBufferObject (snd));
+  csNameObject::AddName (*sndobj, name);
   return sndobj;
 }
 
 //---------------------------------------------------------------------------
 
-enum { kTokenWorldSector = 1, kTokenWorldPlane, kTokenWorldCol,
-       kTokenWorldScript, kTokenWorldTexs, kTokenWorldLightX,
-       kTokenWorldRoom, kTokenWorldThing, kTokenWorldSixface,
-       kTokenWorldSpriteTmp, kTokenWorldLibrary, kTokenWorldStart,
-       kTokenWorldSounds };
-
-bool CSLoader::LoadWorld (csWorld* world, LanguageLayer* layer, char* buf)
+bool csLoader::LoadWorld (csWorld* world, LanguageLayer* layer, char* buf)
 {
-  static tokenDesc tokens[] = {{1, "WORLD"}, {0,0}};
-  static tokenDesc commands[] = {
-        {kTokenWorldSector, "SECTOR"},
-        {kTokenWorldRoom, "ROOM"},
-        {kTokenWorldPlane, "PLANE"},
-        {kTokenWorldCol, "COLLECTION"},
-        {kTokenWorldScript, "SCRIPT"},
-        {kTokenWorldTexs, "TEXTURES"},
-        {kTokenWorldLightX, "LIGHTX"},
-        {kTokenWorldThing, "THING"},
-        {kTokenWorldSixface, "SIXFACE"},
-        {kTokenWorldSpriteTmp, "SPRITE"},
-        {kTokenWorldLibrary, "LIBRARY"},
-        {kTokenWorldStart, "START"},
-        {kTokenWorldSounds, "SOUNDS"},
-        {0,0}};
-  char* name, * data;
+  TOKEN_TABLE_START (tokens)
+    TOKEN_TABLE (WORLD)
+  TOKEN_TABLE_END
+
+  TOKEN_TABLE_START (commands)
+    TOKEN_TABLE (SECTOR)
+    TOKEN_TABLE (ROOM)
+    TOKEN_TABLE (PLANE)
+    TOKEN_TABLE (COLLECTION)
+    TOKEN_TABLE (SCRIPT)
+    TOKEN_TABLE (TEXTURES)
+    TOKEN_TABLE (LIGHTX)
+    TOKEN_TABLE (THING)
+    TOKEN_TABLE (SIXFACE)
+    TOKEN_TABLE (SPRITE)
+    TOKEN_TABLE (LIBRARY)
+    TOKEN_TABLE (START)
+    TOKEN_TABLE (SOUNDS)
+  TOKEN_TABLE_END
+
+  char *name, *data;
 
   if (csGetObject (&buf, tokens, &name, &data))
   {
@@ -3611,7 +3542,7 @@ bool CSLoader::LoadWorld (csWorld* world, LanguageLayer* layer, char* buf)
       }
       switch (cmd)
       {
-        case kTokenWorldSpriteTmp:
+        case TOKEN_SPRITE:
           {
             csSpriteTemplate* t = world->GetSpriteTemplate (name);
             if (!t)
@@ -3620,63 +3551,51 @@ bool CSLoader::LoadWorld (csWorld* world, LanguageLayer* layer, char* buf)
               csNameObject::AddName(*t,name);
               world->sprite_templates.Push (t);
             }
-            CSLoader::LoadSpriteTemplate (t, params, world->GetTextures ());
+            LoadSpriteTemplate (t, params, world->GetTextures ());
           }
           break;
-        case kTokenWorldThing:
+        case TOKEN_THING:
           if (!world->GetThingTemplate (name))
-            world->thing_templates.Push ( CSLoader::load_thingtpl(name, params, world->GetTextures ()) );
+            world->thing_templates.Push ( load_thingtpl(name, params, world->GetTextures ()) );
           break;
-        case kTokenWorldSixface:
+        case TOKEN_SIXFACE:
           if (!world->GetThingTemplate (name))
-            world->thing_templates.Push ( CSLoader::load_sixtpl(name, params, world->GetTextures ()) );
+            world->thing_templates.Push ( load_sixtpl(name, params, world->GetTextures ()) );
           break;
-        case kTokenWorldSector:
+        case TOKEN_SECTOR:
           if (!world->sectors.FindByName (name))
-            world->sectors.Push( CSLoader::load_sector(name, world, params, world->GetTextures ()) );
+            world->sectors.Push( load_sector(name, world, params, world->GetTextures ()) );
           break;
-        case kTokenWorldPlane:
-          world->planes.Push ( CSLoader::load_polyplane (params, name) );
+        case TOKEN_PLANE:
+          world->planes.Push ( load_polyplane (params, name) );
           break;
-        case kTokenWorldCol:
-          world->collections.Push ( CSLoader::load_collection(name,world,params) );
+        case TOKEN_COLLECTION:
+          world->collections.Push ( load_collection(name,world,params) );
           break;
-        case kTokenWorldScript:
+        case TOKEN_SCRIPT:
           csScriptList::NewScript (layer, name, params);
           break;
-        case kTokenWorldTexs:
+        case TOKEN_TEXTURES:
           {
             world->GetTextures ()->Clear ();
-            if (!CSLoader::LoadTextures (world->GetTextures (), params, world)) return false;
+            if (!LoadTextures (world->GetTextures (), params, world)) return false;
           }
           break;
-        case kTokenWorldSounds:
-          if (!CSLoader::LoadSounds (world, params)) return false;
+        case TOKEN_SOUNDS:
+          if (!LoadSounds (world, params)) return false;
           break;
-        case kTokenWorldRoom:
+        case TOKEN_ROOM:
           // Not an object but it is translated to a special sector.
           if (!world->sectors.FindByName (name))
-            world->sectors.Push ( load_room(name, world, params, world->GetTextures ()) );
+            world->sectors.Push (load_room (name, world, params, world->GetTextures ()));
           break;
-        case kTokenWorldLightX:
+        case TOKEN_LIGHTX:
           load_light (name, params);
           break;
-        case kTokenWorldLibrary:
-          {
-            char str[255];
-            ScanStr (params, "%s", str);
-            csLibrary* lib = (csLibrary*)(world->libraries).FindByName (name);
-            if (!lib)
-            {
-              // Library was not already loaded.
-              CHK (lib = new csLibrary ());
-              csNameObject::AddName(*lib,name);
-              world->libraries.Push (lib);
-              load_library_def (lib, world, str, world->GetTextures ());
-            }
-          }
+        case TOKEN_LIBRARY:
+          LoadLibraryFile (world, name);
           break;
-        case kTokenWorldStart:
+        case TOKEN_START:
           {
             char str[255];
             ScanStr (params, "%s,%f,%f,%f", str, &world->start_vec.x, &world->start_vec.y, &world->start_vec.z);
@@ -3699,7 +3618,7 @@ bool CSLoader::LoadWorld (csWorld* world, LanguageLayer* layer, char* buf)
   {
     sn--;
     csSector* s = (csSector*)(world->sectors)[sn];
-    for (csPolygonSet *ps = s;  ps;  
+    for (csPolygonSet *ps = s;  ps;
          (ps==s) ? (ps = s->GetFirstThing ()) : (ps = ps->GetNext ()) )
       for (int i=0;  i < ps->GetNumPolygons ();  i++)
       {
@@ -3723,59 +3642,25 @@ bool CSLoader::LoadWorld (csWorld* world, LanguageLayer* layer, char* buf)
         }
       }
   }
-  
+
   return true;
 }
 
-bool CSLoader::LoadWorldFile (csWorld* world, LanguageLayer* layer, char* file)
+bool csLoader::LoadWorldFile (csWorld* world, LanguageLayer* layer, char* file)
 {
   world->StartWorld ();
   LoadStat::Init ();
 
-  FILE* fp;
-  fp = fopen (file, "rb");
-  if (!fp)
+  size_t size;
+  char *buf = VFS->ReadFile (file, size);
+
+  if (!buf || !size)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Could not open world file '%s'!\n\
-The world file should either be a .ZIP level file or else an ASCII\n\
-file describing how the world looks.\n", file);
+    CsPrintf (MSG_FATAL_ERROR, "Could not open world file \"%s\" on VFS!\n", file);
     return false;
   }
 
-  char* buf;
-
-  // First check if the world file is a ZIP archive.
-  char hdr[5];
-  fread (hdr, 4, 1, fp);
-  hdr[4] = 0;
-  Archive* wf = NULL;
-  if (!strcmp (hdr, "PK\003\004"))
-  {
-    fclose (fp);
-    fp = NULL;
-    wf = world->OpenWorldFile (file);
-    buf = wf->read ("world");
-    if (!buf)
-    {
-      CsPrintf (MSG_FATAL_ERROR, "Could not find 'world' file inside ZIP archive '%s'!\n"
-                "Are you sure '%s' is a valid Crystal Space level archive?\n", file, file);
-      world->CloseWorldFile ();
-      return false;
-    }
-  }
-  else
-  {
-    wf = world->OpenWorldFile ("precalc.zip");
-    fseek (fp, 0, SEEK_END);
-    long off = ftell (fp);
-    fseek (fp, 0, SEEK_SET);
-    CHK (buf = new char [off+1]);
-    fread (buf, 1, off, fp);
-    buf[off] = 0;
-  }
-
-  csIniFile* cfg = NULL;
-  if (wf) CHKB (cfg = new csIniFile (wf, "cryst.cfg"));
+  csIniFile* cfg = new csIniFile ("world.cfg");
   if (cfg)
   {
     csPolygon3D::def_mipmap_size = cfg->GetInt ("TextureMapper", "LIGHTMAP_SIZE", csPolygon3D::def_mipmap_size);
@@ -3799,26 +3684,21 @@ file describing how the world looks.\n", file);
 
   CHK (delete [] buf);
 
-  if (fp) fclose (fp);
-  if (world->GetWorldFile ()) world->GetWorldFile ()->write_archive ();
-
   return true;
 }
 
 //---------------------------------------------------------------------------
 
-enum { kTokenTexsMaxT = 1, kTokenTexsTex };
-
-bool CSLoader::LoadTextures (csTextureList* textures, char* buf, csWorld* world, Archive* ar)
+bool csLoader::LoadTextures (csTextureList* textures, char* buf, csWorld* world)
 {
-  static tokenDesc commands[] = {
-        {kTokenTexsMaxT, "MAX_TEXTURES"},
-        {kTokenTexsTex, "TEXTURE"},
-        {0,0}};
+  TOKEN_TABLE_START (commands)
+    TOKEN_TABLE (MAX_TEXTURES)
+    TOKEN_TABLE (TEXTURE)
+  TOKEN_TABLE_END
+
   char* name;
   long cmd;
   char* params;
-  csTextureHandle* tex;
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
@@ -3829,35 +3709,11 @@ bool CSLoader::LoadTextures (csTextureList* textures, char* buf, csWorld* world,
     }
     switch (cmd)
     {
-      case kTokenTexsMaxT:
+      case TOKEN_MAX_TEXTURES:
         // ignored for backward compatibility
         break;
-      case kTokenTexsTex:
-        {
-          ImageFile *image = CSLoader::load_image (name, world, ar);
-
-          //Now we check the size of the loaded image. Having an image, that
-          //is not a power of two will result in strange errors while 
-          //rendering. It is by far better to check the format of all textures
-          //already while loading them.
-          int Width  = image->get_width();
-          int Height = image->get_height();
-
-          if (!IsPowerOf2(Width) || !IsPowerOf2(Height))
-          {
-            CsPrintf (MSG_WARNING, 
-                      "Texture '%s' probably has an illegal format!\n" 
-                      "The Width and Height should be a power of two.\n"
-                      "actual size is w:%d h:%d\n",
-                      name, Width, Height);
-          }
-
-          tex = textures->NewTexture (image);
-          csNameObject::AddName(*tex,name);
-          //if (!tex->loaded_correctly ())
-            //return false;
-          CSLoader::txt_process (tex, params);
-        }
+      case TOKEN_TEXTURE:
+        txt_process (name, params, textures, world);
         break;
     }
   }
@@ -3872,45 +3728,108 @@ bool CSLoader::LoadTextures (csTextureList* textures, char* buf, csWorld* world,
 
 //---------------------------------------------------------------------------
 
-csLibrary* CSLoader::LoadLibrary (csWorld* world, char* name, char* fname)
+bool csLoader::LoadLibrary (csWorld* world, char* buf)
 {
-  CHK (csLibrary* lib = new csLibrary ());
-  csNameObject::AddName(*lib,name);
+  TOKEN_TABLE_START (tokens)
+    TOKEN_TABLE (LIBRARY)
+  TOKEN_TABLE_END
 
-  //try to load the given library
-  if (CSLoader::load_library_def (lib, world, fname, world->GetTextures ()))
+  TOKEN_TABLE_START (commands)
+    TOKEN_TABLE (TEXTURES)
+    TOKEN_TABLE (THING)
+    TOKEN_TABLE (SPRITE)
+    TOKEN_TABLE (SOUNDS)
+  TOKEN_TABLE_END
+
+  char *name, *data;
+  if (csGetObject (&buf, tokens, &name, &data))
   {
-    //Loading was ok. Now we add the library to the world.
-    world->libraries.Push (lib);
-    return lib;
+    // Empty LIBRARY () directive?
+    if (!data)
+      return false;
+
+    long cmd;
+    char* params;
+
+    while ((cmd = csGetObject (&data, commands, &name, &params)) > 0)
+    {
+      if (!params)
+      {
+        CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", data);
+        return false;
+      }
+
+      switch (cmd)
+      {
+        case TOKEN_TEXTURES:
+          // Append textures to world.
+          if (!LoadTextures (world->GetTextures (), params, world))
+            return false;
+          break;
+        case TOKEN_SOUNDS:
+          if (!LoadSounds (world, params))
+            return false;
+          break;
+        case TOKEN_SPRITE:
+          {
+            csSpriteTemplate* t = world->GetSpriteTemplate (name);
+            if (!t)
+            {
+              CHK (t = new csSpriteTemplate ());
+              csNameObject::AddName(*t, name);
+              world->sprite_templates.Push (t);
+            }
+            LoadSpriteTemplate (t, params, world->GetTextures ());
+          }
+          break;
+        case TOKEN_THING:
+          if (!world->GetThingTemplate (name))
+            world->thing_templates.Push (load_thingtpl (name, params, world->GetTextures ()));
+          break;
+      }
+    }
+    if (cmd == PARSERR_TOKENNOTFOUND)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a library file!\n", csGetLastOffender ());
+      return false;
+    }
   }
-  else
-  {
-    //Something went wrong loading the lib. So we do some cleanup now
-    CHK (delete lib);
-    return NULL;
-  }
+  return true;
 }
 
-csTextureHandle* CSLoader::LoadTexture (csWorld* world, char* name, char* fname, Archive* ar)
+bool csLoader::LoadLibraryFile (csWorld* world, char* fname)
 {
-  if (!ar && world->libraries.Length () >= 1)
-    ar = ((csLibrary*)(world->libraries)[0])->GetArchive ();
-  ImageFile* image = CSLoader::load_image (fname, world, ar);
-  csTextureHandle* tm = world->GetTextures ()->NewTexture (image);
-  csNameObject::AddName(*tm,name);
+  size_t size;
+  char *buf = VFS->ReadFile (fname, size);
+
+  if (!buf || !size)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "Could not open library file \"%s\" on VFS!\n", fname);
+    return false;
+  }
+
+  bool retcode = LoadLibrary (world, buf);
+
+  CHK (delete [] buf);
+  return retcode;
+}
+
+csTextureHandle* csLoader::LoadTexture (csWorld* world, char* name, char* fname)
+{
+  ImageFile *image = load_image (fname, world);
+  csTextureHandle *tm = world->GetTextures ()->NewTexture (image);
+  csNameObject::AddName(*tm, name);
   return tm;
 }
 
 //---------------------------------------------------------------------------
 
-bool CSLoader::LoadSounds (csWorld* world, char* buf, Archive* ar)
+bool csLoader::LoadSounds (csWorld* world, char* buf)
 {
-  enum { kTokenSoundsSound = 1 };
+  TOKEN_TABLE_START (commands)
+    TOKEN_TABLE (SOUND)
+  TOKEN_TABLE_END
 
-  static tokenDesc commands[] = {
-        {kTokenSoundsSound, "SOUND"},
-        {0,0}};
   char* name;
   long cmd;
   char* params;
@@ -3924,12 +3843,12 @@ bool CSLoader::LoadSounds (csWorld* world, char* buf, Archive* ar)
     }
     switch (cmd)
     {
-      case kTokenSoundsSound:
+      case TOKEN_SOUND:
         {
           csSoundBuffer *snd = csSoundBufferObject::GetSound(*world,name);
           if (!snd)
           {
-            csSoundBufferObject *s = CSLoader::load_sound (name, world, ar);
+            csSoundBufferObject *s = load_sound (name, world);
             if (s) world->ObjAdd(s);
           }
         }
@@ -3947,19 +3866,22 @@ bool CSLoader::LoadSounds (csWorld* world, char* buf, Archive* ar)
 
 //---------------------------------------------------------------------------
 
-enum { kTokenSkelLimb = 1, kTokenSkelVertices, kTokenSkelTransform };
-
-bool CSLoader::LoadSkeleton (csSkeletonLimb* limb, char* buf, bool is_connection)
+bool csLoader::LoadSkeleton (csSkeletonLimb* limb, char* buf, bool is_connection)
 {
-  static tokenDesc commands[] = {
-    {kTokenSkelLimb, "LIMB"},
-    {kTokenSkelVertices, "VERTICES"},
-    {kTokenSkelTransform, "TRANSFORM"},
-    {0,0}};
-  static tokenDesc tok_matvec[] = {{1, "MATRIX"}, {2, "V"}, {0,0}};
+  TOKEN_TABLE_START (commands)
+    TOKEN_TABLE (LIMB)
+    TOKEN_TABLE (VERTICES)
+    TOKEN_TABLE (TRANSFORM)
+  TOKEN_TABLE_END
+
+  TOKEN_TABLE_START (tok_matvec)
+    TOKEN_TABLE (MATRIX)
+    TOKEN_TABLE (V)
+  TOKEN_TABLE_END
+
   char* name;
   char* xname;
-    
+
   long cmd;
   char* params;
 
@@ -3972,14 +3894,14 @@ bool CSLoader::LoadSkeleton (csSkeletonLimb* limb, char* buf, bool is_connection
     }
     switch (cmd)
     {
-      case kTokenSkelLimb:
+      case TOKEN_LIMB:
         {
           CHK (csSkeletonConnection* con = new csSkeletonConnection ());
 	  if (!LoadSkeleton (con, params, true)) return false;
 	  limb->AddChild (con);
 	}
         break;
-      case kTokenSkelTransform:
+      case TOKEN_TRANSFORM:
         if (is_connection)
         {
           char* params2;
@@ -3994,11 +3916,11 @@ bool CSLoader::LoadSkeleton (csSkeletonLimb* limb, char* buf, bool is_connection
     	    }
             switch (cmd)
             {
-              case 1: 
-                m = CSLoader::load_matrix (params2);
+              case TOKEN_MATRIX:
+                m = load_matrix (params2);
 		break;
-              case 2:
-                v = CSLoader::load_vector (params2);
+              case TOKEN_V:
+                v = load_vector (params2);
 		break;
             }
           }
@@ -4011,7 +3933,7 @@ bool CSLoader::LoadSkeleton (csSkeletonLimb* limb, char* buf, bool is_connection
 	  fatal_exit (0, false);
 	}
 	break;
-      case kTokenSkelVertices:
+      case TOKEN_VERTICES:
         {
           int list[1000], num;	//@@@ HARDCODED!!!
           ScanStr (params, "%D", list, &num);
@@ -4032,24 +3954,26 @@ bool CSLoader::LoadSkeleton (csSkeletonLimb* limb, char* buf, bool is_connection
 
 //---------------------------------------------------------------------------
 
-enum { kTokenSTplTexNr = 1, kTokenSTplFrame,
-       kTokenSTplTriangle, kTokenSTplAction,
-       kTokenSTplSkeleton, kTokenSTplFile };
-
-bool CSLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf, csTextureList* textures)
+bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf, csTextureList* textures)
 {
-  static tokenDesc commands[] = {
-    {kTokenSTplTexNr, "TEXNR"},
-    {kTokenSTplFrame, "FRAME"},
-    {kTokenSTplAction, "ACTION"},
-    {kTokenSTplTriangle, "TRIANGLE"},
-    {kTokenSTplSkeleton, "SKELETON"},
-    {kTokenSTplFile, "FILE"},
-    {0,0}};
-  static tokenDesc tok_frame[] = {{2, "V"}, {0,0}};
-  static tokenDesc tok_frameset[] = {{2, "F"}, {0,0}};
+  TOKEN_TABLE_START (commands)
+    TOKEN_TABLE (TEXNR)
+    TOKEN_TABLE (FRAME)
+    TOKEN_TABLE (ACTION)
+    TOKEN_TABLE (TRIANGLE)
+    TOKEN_TABLE (SKELETON)
+    TOKEN_TABLE (FILE)
+  TOKEN_TABLE_END
+
+  TOKEN_TABLE_START (tok_frame)
+    TOKEN_TABLE (V)
+  TOKEN_TABLE_END
+
+  TOKEN_TABLE_START (tok_frameset)
+    TOKEN_TABLE (F)
+  TOKEN_TABLE_END
+
   char* name;
-    
   long cmd;
   char* params;
   char* params2;
@@ -4064,14 +3988,14 @@ bool CSLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf, csTexture
     }
     switch (cmd)
     {
-      case kTokenSTplTexNr:
+      case TOKEN_TEXNR:
         {
           ScanStr (params, "%s", str);
           stemp->SetTexture (textures, str);
         }
         break;
 
-      case kTokenSTplSkeleton:
+      case TOKEN_SKELETON:
 	{
           CHK (csSkeleton* skeleton = new csSkeleton ());
 	  if (!LoadSkeleton (skeleton, params, false)) return false;
@@ -4079,7 +4003,7 @@ bool CSLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf, csTexture
 	}
         break;
 
-      case kTokenSTplAction:
+      case TOKEN_ACTION:
         {
           csSpriteAction* act = stemp->AddAction ();
           act->SetName (name);
@@ -4094,7 +4018,7 @@ bool CSLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf, csTexture
             }
             switch (cmd)
             {
-              case 2:
+              case TOKEN_F:
                 ScanStr (params2, "%s,%d", fn, &d);
                 csFrame * ff = stemp->FindFrame (fn);
                 if(!ff)
@@ -4110,7 +4034,7 @@ bool CSLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf, csTexture
         }
         break;
 
-      case kTokenSTplFrame:
+      case TOKEN_FRAME:
         {
           csFrame* fr = stemp->AddFrame ();
           fr->SetName (name);
@@ -4125,29 +4049,29 @@ bool CSLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf, csTexture
             }
             switch (cmd)
             {
-            case 2:
-              ScanStr (params2, "%f,%f,%f:%f,%f", &x, &y, &z, &u, &v);
-              // check if it's the first frame
-              if (stemp->GetNumFrames () == 1)
-              {
-                // add vertice/texel in current frame
-                if (stemp->GetNumVertices () >= fr->GetMaxVertices ())
+              case TOKEN_V:
+                ScanStr (params2, "%f,%f,%f:%f,%f", &x, &y, &z, &u, &v);
+                // check if it's the first frame
+                if (stemp->GetNumFrames () == 1)
                 {
-                  int more = 1;
-                  stemp->SetNumVertices (stemp->GetNumVertices ()+more);
-                  fr->AddVertex (more);
+                  // add vertice/texel in current frame
+                  if (stemp->GetNumVertices () >= fr->GetMaxVertices ())
+                  {
+                    int more = 1;
+                    stemp->SetNumVertices (stemp->GetNumVertices ()+more);
+                    fr->AddVertex (more);
+                  }
                 }
-              }
-              else if (i >= stemp->GetNumVertices ())
-              {
-                CsPrintf (MSG_FATAL_ERROR, "Error! Trying to add too many vertices in frame '%s'!\n",
-                        fr->GetName ());
-                fatal_exit (0, false);
-              }
-              fr->SetVertex (i, x, y, z);
-              fr->SetTexel (i, u, v);
-              i++;
-              break;
+                else if (i >= stemp->GetNumVertices ())
+                {
+                  CsPrintf (MSG_FATAL_ERROR, "Error! Trying to add too many vertices in frame '%s'!\n",
+                          fr->GetName ());
+                  fatal_exit (0, false);
+                }
+                fr->SetVertex (i, x, y, z);
+                fr->SetTexel (i, u, v);
+                i++;
+                break;
             }
           }
           if (cmd == PARSERR_TOKENNOTFOUND)
@@ -4165,7 +4089,7 @@ bool CSLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf, csTexture
         }
         break;
 
-      case kTokenSTplTriangle:
+      case TOKEN_TRIANGLE:
         {
           int a, b, c;
           ScanStr (params, "%d,%d,%d", &a, &b, &c);
@@ -4173,7 +4097,7 @@ bool CSLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf, csTexture
         }
         break;
 
-      case kTokenSTplFile:
+      case TOKEN_FILE:
         {
           ScanStr (params, "%s", str);
 	  CHK (converter* filedata = new converter);
@@ -4205,24 +4129,26 @@ bool CSLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf, csTexture
 
 //---------------------------------------------------------------------------
 
-enum { kTokenSpriteTemplate = 1, kTokenSpriteMove, kTokenSpriteTexnr};
-
-bool CSLoader::LoadSprite (csSprite3D* spr, csWorld* w, char* buf, csTextureList* textures)
+bool csLoader::LoadSprite (csSprite3D* spr, csWorld* w, char* buf, csTextureList* textures)
 {
-  static tokenDesc commands[] = {
-        {kTokenSpriteTemplate, "TEMPLATE"},
-  {kTokenSpriteTexnr, "TEXNR"},
-        {kTokenSpriteMove, "MOVE"},
-        {0,0}};
-  static tokenDesc tok_matvec[] = {{1, "MATRIX"}, {2, "V"}, {0,0}};
+  TOKEN_TABLE_START (commands)
+    TOKEN_TABLE (TEMPLATE)
+    TOKEN_TABLE (TEXNR)
+    TOKEN_TABLE (MOVE)
+  TOKEN_TABLE_END
+
+  TOKEN_TABLE_START (tok_matvec)
+    TOKEN_TABLE (MATRIX)
+    TOKEN_TABLE (V)
+  TOKEN_TABLE_END
+
   char* name;
-
-  LoadStat::sprites_loaded++;
-
   long cmd;
   char* params;
   char str[255], str2[255];
   csSpriteTemplate* tpl;
+
+  LoadStat::sprites_loaded++;
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
@@ -4233,7 +4159,7 @@ bool CSLoader::LoadSprite (csSprite3D* spr, csWorld* w, char* buf, csTextureList
     }
     switch (cmd)
     {
-      case kTokenSpriteMove:
+      case TOKEN_MOVE:
         {
           char* params2;
           spr->SetTransform (csMatrix3 ());     // Identity matrix.
@@ -4247,18 +4173,22 @@ bool CSLoader::LoadSprite (csSprite3D* spr, csWorld* w, char* buf, csTextureList
             }
             switch (cmd)
             {
-             case 1: spr->SetTransform (CSLoader::load_matrix (params2));  break;
-             case 2: spr->SetMove (CSLoader::load_vector (params2));  break;
+              case TOKEN_MATRIX:
+                spr->SetTransform (load_matrix (params2));
+                break;
+              case TOKEN_MOVE:
+                spr->SetMove (load_vector (params2));
+                break;
             }
           }
         }
         break;
 
-      case kTokenSpriteTemplate:
+      case TOKEN_TEMPLATE:
         memset (str, 0, 255);
         memset (str2, 0, 255);
         ScanStr (params, "%s,%s", str, str2);
-        tpl = w->GetSpriteTemplate (str, true);
+        tpl = w->GetSpriteTemplate (str);
         if (tpl == NULL)
         {
           CsPrintf (MSG_FATAL_ERROR, "Couldn't find template named '%s'!\n", str);
@@ -4269,7 +4199,7 @@ bool CSLoader::LoadSprite (csSprite3D* spr, csWorld* w, char* buf, csTextureList
           spr->SetAction (str2);
         break;
 
-      case kTokenSpriteTexnr:
+      case TOKEN_TEXNR:
         memset (str, 0, 255);
         ScanStr (params, "%s", str);
         spr->SetTexture (str, textures);

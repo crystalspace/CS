@@ -30,7 +30,7 @@ char* csGetLastOffender ()
   return last_offender;
 }
 
-long csGetObject (char **buf, tokenDesc * tokens, char **name, char **data)
+long csGetObject (char **buf, csTokenDesc * tokens, char **name, char **data)
 {
   SkipCharacters (buf, kWhiteSpace);
 
@@ -81,7 +81,7 @@ long csGetObject (char **buf, tokenDesc * tokens, char **name, char **data)
   return tokens->id;
 }
 
-long csGetCommand (char **buf, tokenDesc * tokens, char **params)
+long csGetCommand (char **buf, csTokenDesc * tokens, char **params)
 {
   char *name;
   return csGetObject (buf, tokens, &name, params);

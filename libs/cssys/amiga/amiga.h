@@ -30,7 +30,6 @@ public:
 	~SysSystemDriver ();
 
 	virtual void Loop ();
-	virtual void SetSystemDefaults ();
 	virtual bool ParseArg(int argc, char* argv[], int& i);
 	virtual void Help ();
 };

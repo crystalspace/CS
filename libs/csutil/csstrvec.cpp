@@ -34,7 +34,14 @@ csStrVector::~csStrVector ()
   DeleteAll ();
 }
 
-bool csStrVector::Equal (csSome Item, csConstSome Key) const
+int csStrVector::Compare (csSome Item1, csSome Item2, int Mode) const
 {
-  return (strcmp ((char *)Item, (char *)Key) == 0);
+  (void)Mode;
+  return strcmp ((char *)Item1, (char *)Item2);
+}
+
+int csStrVector::CompareKey (csSome Item, csConstSome Key, int Mode) const
+{
+  (void)Mode;
+  return strcmp ((char *)Item, (char *)Key);
 }

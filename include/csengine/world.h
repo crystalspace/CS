@@ -37,9 +37,7 @@ class csThingTemplate;
 class csCollection;
 class csStatLight;
 class csDynLight;
-class Archive;
 class csSpriteTemplate;
-class csLibrary;
 class csClipper;
 class Dumper;
 class csLight;
@@ -49,6 +47,7 @@ class csEngineConfig;
 class csCBuffer;
 class csPoly2DPool;
 class csLightPatchPool;
+class csVFS;
 interface IHaloRasterizer;
 interface IGraphics3D;
 interface IGraphicsInfo;
@@ -90,6 +89,16 @@ class csWorld : public csObject
 
 public:
   /**
+   * This is the Virtual File System object where all the files
+   * used in this world live. Textures, models, data, everything -
+   * reside on this virtual disk volume. You should avoid using
+   * the standard file functions (such as fopen(), fread() and so on)
+   * since they are highly system-dependent (for example, DOS uses
+   * '\' as path separator, Mac uses ':' and Unix uses '/').
+   */
+  static csVFS *vfs;
+
+  /**
    * This is a vector which holds objects of type 'csCleanable'.
    * They will be destroyed when the world is destroyed. That's
    * the only special thing. This is useful for holding memory
@@ -108,13 +117,6 @@ public:
    * to the world.
    */
   csObjVector sectors;
-
-  /**
-   * List of libraries. This vector contains objects of type
-   * csLibrary*. You can use CSLoader::LoadLibrary() to add a new library
-   * or manipulate this vector yourselves.
-   */
-  csObjVector libraries;
 
   /**
    * List of planes. This vector contains objects of type
@@ -176,11 +178,6 @@ private:
   csTextureList* textures;
   /// Linked list of dynamic lights.
   csDynLight* first_dyn_lights;
-  /**
-   * If world file was loaded from a ZIP archive.
-   * If not this points to the 'precalc.zip' archive.
-   */
-  Archive* world_file;
   /// List of halos (csHaloInformation).
   csVector halos;  
   /// The Halo rasterizer. If NULL halo's are not supported by the rasterizer.
@@ -234,7 +231,7 @@ public:
    * you do anything else with this world. It will read the configuration
    * file (ReadConfig()) and start a new empty world (StartWorld()).
    */
-  bool Initialize (ISystem* sys, IGraphics3D* g3d, csIniFile* config);
+  bool Initialize (ISystem* sys, IGraphics3D* g3d, csIniFile* config, csVFS *vfs);
 
   /**
    * Prepare the textures. It will initialise all loaded textures
@@ -314,22 +311,6 @@ public:
   IConfig* GetEngineConfigCOM ();
 
   /**
-   * Get the default world archive. If there is none this function
-   * will open precalc.zip and use that.
-   */
-  Archive* GetWorldFile ();
-
-  /**
-   * Open a file as the world file.
-   */
-  Archive* OpenWorldFile (const char* filename);
-
-  /**
-   * Close the world file.
-   */
-  void CloseWorldFile ();
-
-  /**
    * Clear everything in the world.
    */
   void Clear ();
@@ -344,14 +325,14 @@ public:
    * optionally in all loaded libraries. This template can then
    * be used to create sprites.
    */
-  csSpriteTemplate* GetSpriteTemplate (const char* name, bool use_libs = false);
+  csSpriteTemplate* GetSpriteTemplate (const char* name);
 
   /**
    * Find a named thing template in the loaded world and
    * optionally in all loaded libraries. This template can then
    * be used to create things.
    */
-  csThingTemplate* GetThingTemplate (const char* name, bool use_libs = false);
+  csThingTemplate* GetThingTemplate (const char* name);
 
   /**
    * Find a thing with a given name. This function will scan all sectors
@@ -454,5 +435,8 @@ public:
 
   CSOBJTYPE;
 };
+
+/// Since the global VFS object is often used, it is easier to use a shortcut
+#define VFS	csWorld::vfs
 
 #endif /*WORLD_H*/

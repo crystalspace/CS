@@ -33,7 +33,6 @@
 #include "csengine/cssprite.h"
 #include "csengine/cscoll.h"
 #include "csengine/sector.h"
-#include "csengine/library.h"
 #include "csengine/texture.h"
 #include "csengine/lghtmap.h"
 #include "csengine/stats.h"
@@ -45,8 +44,8 @@
 #include "csgeom/fastsqrt.h"
 #include "csgeom/polypool.h"
 #include "csobject/nameobj.h"
-#include "csutil/archive.h"
 #include "csutil/inifile.h"
+#include "csutil/vfs.h"
 #include "csgfxldr/csimage.h"
 #include "ihalo.h"
 #include "itxtmgr.h"
@@ -60,6 +59,7 @@ int csWorld::frame_width;
 int csWorld::frame_height;
 ISystem* csWorld::isys = NULL;
 csWorld* csWorld::current_world = NULL;
+csVFS *csWorld::vfs = NULL;
 
 CSOBJTYPE_IMPL(csWorld,csObject);
 
@@ -67,7 +67,6 @@ csWorld::csWorld () : csObject (), start_vec (0, 0, 0)
 {
   do_lighting_cache = true;
   first_dyn_lights = NULL;
-  world_file = NULL;
   start_sector = NULL;
   piHR = NULL;
   textures = NULL;
@@ -91,7 +90,6 @@ csWorld::~csWorld ()
 void csWorld::Clear ()
 {
   sectors.DeleteAll ();
-  libraries.DeleteAll ();
   planes.DeleteAll ();
   collections.DeleteAll ();
   sprite_templates.DeleteAll ();
@@ -104,7 +102,6 @@ void csWorld::Clear ()
     CHK (delete first_dyn_lights);
     first_dyn_lights = dyn;
   }
-  CHK (delete world_file); world_file = NULL;
   CHK (delete [] start_sector); start_sector = NULL;
   CHK (delete textures); textures = NULL;
   CHK (textures = new csTextureList ());
@@ -140,10 +137,8 @@ IConfig* csWorld::GetEngineConfigCOM ()
   return GetIConfigFromcsEngineConfig (cfg_engine);
 }
 
-csSpriteTemplate* csWorld::GetSpriteTemplate (const char* name, bool use_libs)
+csSpriteTemplate* csWorld::GetSpriteTemplate (const char* name)
 {
-  // if use_libs == true we should support qualified names (like standard.bullet).
-  // with the library first and then the name of the object.
   int sn = sprite_templates.Length ();
   while (sn > 0)
   {
@@ -152,22 +147,10 @@ csSpriteTemplate* csWorld::GetSpriteTemplate (const char* name, bool use_libs)
     if (!strcmp (name, csNameObject::GetName(*s))) return s;
   }
 
-  if (use_libs)
-  {
-    int nl = libraries.Length ();
-    while (nl > 0)
-    {
-      nl--;
-      csLibrary* lib = (csLibrary*)libraries[nl];
-      csSpriteTemplate* s = (csSpriteTemplate*)lib->sprite_templates.FindByName (name);
-      if (s) return s;
-    }
-  }
-
   return NULL;
 }
 
-csThingTemplate* csWorld::GetThingTemplate (const char* name, bool use_libs)
+csThingTemplate* csWorld::GetThingTemplate (const char* name)
 {
   int tn = thing_templates.Length ();
   while (tn > 0)
@@ -175,18 +158,6 @@ csThingTemplate* csWorld::GetThingTemplate (const char* name, bool use_libs)
     tn--;
     csThingTemplate* s = (csThingTemplate*)thing_templates[tn];
     if (!strcmp (name, csNameObject::GetName(*s))) return s;
-  }
-
-  if (use_libs)
-  {
-    int nl = libraries.Length ();
-    while (nl > 0)
-    {
-      nl--;
-      csLibrary* lib = (csLibrary*)libraries[nl];
-      csThingTemplate* s = (csThingTemplate*)lib->thing_templates.FindByName (name);
-      if (s) return s;
-    }
   }
   return NULL;
 }
@@ -212,7 +183,7 @@ csThing* csWorld::GetThing (const char* name)
   return NULL;
 }
 
-bool csWorld::Initialize (ISystem* sys, IGraphics3D* g3d, csIniFile* config)
+bool csWorld::Initialize (ISystem* sys, IGraphics3D* g3d, csIniFile* config, csVFS *vfs)
 {
   g3d->GetWidth (frame_width);
   g3d->GetHeight (frame_height);
@@ -220,6 +191,7 @@ bool csWorld::Initialize (ISystem* sys, IGraphics3D* g3d, csIniFile* config)
   shift_y = (float)(frame_height/2);
   isys = sys;
   current_world = this;
+  VFS = vfs;
 
   CHK (textures = new csTextureList ());
   ReadConfig (config);
@@ -287,29 +259,6 @@ piHR = 0;
   return true;
 }
 
-Archive* csWorld::GetWorldFile ()
-{
-  if (do_lighting_cache)
-  {
-    if (!world_file) CHKB (world_file = new Archive ("precalc.zip"));
-  }
-  else world_file = NULL;
-  return world_file;
-}
-
-Archive* csWorld::OpenWorldFile (const char* filename)
-{
-  CloseWorldFile ();
-  CHK (world_file = new Archive (filename));
-  return world_file;
-}
-
-void csWorld::CloseWorldFile ()
-{
-  CHK (delete world_file);
-}
-
-
 void csWorld::ShineLights ()
 {
   tr_manager.NewFrame ();
@@ -317,9 +266,9 @@ void csWorld::ShineLights ()
   if (!csPolygon3D::do_not_force_recalc)
   {
     // If recalculation is not forced then we check if the 'precalc_info'
-    // file exists in the archive. If not then we will recalculate in any
-    // case. If the file exists but is not valid (some flags are different)
-    // then we recalculate again.
+    // file exists on the VFS. If not then we will recalculate in any case.
+    // If the file exists but is not valid (some flags are different) then
+    // we recalculate again.
     // If we recalculate then we also update this 'precalc_info' file with
     // the new settings.
     struct PrecalcInfo
@@ -355,14 +304,15 @@ void csWorld::ShineLights ()
     bool force = false;
     char* reason = NULL;
 
-    Archive* ar = GetWorldFile ();
-    char* data = ar ? ar->read ("precalc_info") : (char*)NULL;
+    size_t size;
+    char *data = VFS->ReadFile ("precalc_info", size);
     if (data)
     {
       char* p1, * p2;
       int i;
       float f;
-      p1 = data; p2 = strchr (p1, '='); sscanf (p2+1, "%d", &i); if (i != current.lm_version) { force = true; reason = "lightmap format changed"; }
+      p1 = data; p2 = strchr (p1, '='); sscanf (p2+1, "%d", &i);
+      if (i != current.lm_version) { force = true; reason = "lightmap format changed"; }
       else { p1 = p2+1; p2 = strchr (p1, '='); sscanf (p2+1, "%d", &i); if (i != current.normal_light_level) { force = true; reason = "normal light level changed"; }
       //@@@
       //else { p1 = p2+1; p2 = strchr (p1, '='); sscanf (p2+1, "%d", &i); if (i != current.ambient_white) { force = true; reason = "ambient white level changed"; }
@@ -382,20 +332,27 @@ void csWorld::ShineLights ()
       }}}}}}}}}}
       CHK (delete [] data);
     }
-    else { force = true; reason = "no 'precalc_info' found"; }
-
-    if (ar && force)
+    else
     {
-      CHK (data = new char [5000]);
-      sprintf (data, "LMVERSION=%d\nNORMALLIGHTLEVEL=%d\nAMBIENT_WHITE=%d\nAMBIENT_RED=%d\nAMBIENT_GREEN=%d\n\
-AMBIENT_BLUE=%d\nREFLECT=%d\nRADIOSITY=%d\nACCURATE_THINGS=%d\nCOSINUS_FACTOR=%f\nLIGHTMAP_SIZE=%d\n",
+      force = true;
+      reason = "no 'precalc_info' found";
+    }
+
+    if (force)
+    {
+      char data [1000];
+      sprintf (data,
+        "LMVERSION=%d\n"        "NORMALLIGHTLEVEL=%d\n"
+        "AMBIENT_WHITE=%d\n"    "AMBIENT_RED=%d\n"
+        "AMBIENT_GREEN=%d\n"    "AMBIENT_BLUE=%d\n"
+        "REFLECT=%d\n"          "RADIOSITY=%d\n"
+        "ACCURATE_THINGS=%d\n"  "COSINUS_FACTOR=%f\n"
+        "LIGHTMAP_SIZE=%d\n",
         current.lm_version, current.normal_light_level, current.ambient_white, current.ambient_red, current.ambient_green,
         current.ambient_blue, current.reflect, current.radiosity, current.accurate_things, current.cosinus_factor,
         current.lightmap_size);
-      void* entry = ar->new_file ("precalc_info", strlen (data));
-      ar->write (entry, data, strlen (data));
-      CHK (delete [] data);
-      CsPrintf (MSG_INITIALIZATION, "Lightmap data in archive is not up to date (reason: %s).\n", reason);
+      VFS->WriteFile ("precalc_info", data, strlen (data));
+      CsPrintf (MSG_INITIALIZATION, "Lightmap data is not up to date (reason: %s).\n", reason);
       csPolygon3D::do_force_recalc = true;
     }
   }
@@ -422,7 +379,7 @@ AMBIENT_BLUE=%d\nREFLECT=%d\nRADIOSITY=%d\nACCURATE_THINGS=%d\nCOSINUS_FACTOR=%f
 
   for (sn = 0; sn < total; sn++)
   {
-    csSector* s = (csSector*)sectors[sn];
+    csSector* s = (csSector*)sectors [sn];
     s->InitLightMaps ();
     meter.Step();
   }
@@ -449,10 +406,8 @@ AMBIENT_BLUE=%d\nREFLECT=%d\nRADIOSITY=%d\nACCURATE_THINGS=%d\nCOSINUS_FACTOR=%f
 
   csPolygonSet::current_light_frame_number++;
 
-  Archive* ar = GetWorldFile ();
-  if (ar)
-    if (!ar->write_archive ())
-      CsPrintf (MSG_WARNING, "WARNING: error updating lighttable cache in archive %s!\n", ar->GetFilename ());
+  if (!VFS->Sync ())
+    CsPrintf (MSG_WARNING, "WARNING: error updating lighttable cache!\n");
 }
 
 void csWorld::CreateLightMaps (IGraphics3D* g3d)

@@ -45,24 +45,14 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
   DosSetPriority (PRTYS_THREAD, PRTYC_IDLETIME, PRTYD_MAXIMUM, 0L);
 }
 
-void SysSystemDriver::SetSystemDefaults ()
+void SysSystemDriver::SetSystemDefaults (csIniFile *config)
 {
-  csSystemDriver::SetSystemDefaults ();
-  FullScreen = false;
-  WindowX = INT_MIN;
-  WindowY = INT_MIN;
-  WindowWidth = -1;
-  WindowHeight = -1;
-  HardwareCursor = true;
-  if (config)
-  {
-    FullScreen = config->GetYesNo ("VideoDriver", "FULL_SCREEN", FullScreen);
-    WindowX = config->GetInt ("VideoDriver", "WINDOWX", WindowX);
-    WindowY = config->GetInt ("VideoDriver", "WINDOWY", WindowY);
-    WindowWidth = config->GetInt ("VideoDriver", "WINDOWWIDTH", WindowWidth);
-    WindowHeight = config->GetInt ("VideoDriver", "WINDOWHEIGHT", WindowHeight);
-    HardwareCursor = config->GetYesNo ("VideoDriver", "SYS_MOUSE_CURSOR", HardwareCursor);
-  }
+  csSystemDriver::SetSystemDefaults (config);
+  WindowX = config->GetInt ("VideoDriver", "WINDOWX", INT_MIN);
+  WindowY = config->GetInt ("VideoDriver", "WINDOWY", INT_MIN);
+  WindowWidth = config->GetInt ("VideoDriver", "WINDOWWIDTH", -1);
+  WindowHeight = config->GetInt ("VideoDriver", "WINDOWHEIGHT", -1);
+  HardwareCursor = config->GetYesNo ("VideoDriver", "SYS_MOUSE_CURSOR", true);
 }
 
 void SysSystemDriver::Help ()

@@ -1,26 +1,27 @@
 /*
-  Crystal Space Windowing System: Windowing System Application class
-  Copyright (C) 1998 by Jorrit Tyberghein
-  Written by Andrew Zabolotny <bit@eltech.ru>
+    Crystal Space Windowing System: Windowing System Application class
+    Copyright (C) 1998 by Jorrit Tyberghein
+    Written by Andrew Zabolotny <bit@eltech.ru>
 
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Library General Public
-  License as published by the Free Software Foundation; either
-  version 2 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
 
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Library General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
 
-  You should have received a copy of the GNU Library General Public
-  License along with this library; if not, write to the Free
-  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "sysdef.h"
 #include "csparser/csloader.h"
 #include "csutil/inifile.h"
+#include "csutil/vfs.h"
 #include "csutil/csstrvec.h"
 #include "csinput/cseventq.h"
 #include "csengine/sysitf.h"
@@ -36,15 +37,14 @@
 #include "itxtmgr.h"
 
 // Archive path of CSWS.CFG
-#define CSWS_CFG "sys/csws.cfg"
+#define CSWS_CFG "csws.cfg"
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//- csApp  -//--
 
-csApp::csApp (char *AppTitle, int argc, char *argv[],
-  csAppBackgroundStyle iBackgroundStyle) : csComponent (NULL)
+csApp::csApp (char *AppTitle, csAppBackgroundStyle iBackgroundStyle) : csComponent (NULL)
 {
   app = this;           // so that all inserted windows will inherit it
-  world = NULL;         // No world so far
+  World = NULL;         // No world so far
   text = NULL;
   SetText (AppTitle);   // application title string
   MouseOwner = NULL;    // no mouse owner
@@ -72,24 +72,8 @@ csApp::csApp (char *AppTitle, int argc, char *argv[],
   CHK (GfxPpl = new csGraphicsPipeline ());
 
   // Create the world
-  CHK (world = new csWorld ());
-  CHK (System = new appSystemDriver (this, world));
-  System->Initialize (argc, argv, world->GetEngineConfigCOM ());
-  if (!CSLoader::LoadWorldFile (world, NULL, config->GetStr ("World", "WORLDFILE", "csws.zip")))
-    exit (0);
-
-  EventQueue = System->EventQueue;
-
-  int Width, Height;
-  System->piGI->GetWidth (Width);
-  System->piGI->GetHeight (Height);
-  bound.Set (0, 0, Width, Height);
-  dirty.Set (bound);
-  WindowListWidth = Width / 3;
-  WindowListHeight = Width / 6;
-
-  // Tell CsPrintf() console is ready
-  System->DemoReady = true;
+  CHK (World = new csWorld ());
+  CHK (System = new appSystemDriver (this, World));
 }
 
 csApp::~csApp ()
@@ -97,8 +81,8 @@ csApp::~csApp ()
   // Delete all children prior to shutting down the system
   DeleteAll ();
 
-  if (world)
-    CHKB (delete world);
+  if (World)
+    CHKB (delete World);
   if (mousetexturename)
     CHKB (free (mousetexturename));
   if (mousetextureparm)
@@ -131,16 +115,32 @@ csApp::~csApp ()
 
 void csApp::SetWorld (csWorld *AppWorld)
 {
-  world = AppWorld;
-  world->Prepare (System->piG3D);
+  World = AppWorld;
+  World->Prepare (System->piG3D);
   ITextureManager* txtmgr;
   System->piG3D->GetTextureManager (&txtmgr);
   txtmgr->AllocPalette ();
   SetupPalette ();
 }
 
-bool csApp::InitialSetup ()
+bool csApp::InitialSetup (int argc, char *argv[],
+  const char *ConfigName, const char *VfsConfigName)
 {
+  System->Initialize (argc, argv, ConfigName, VfsConfigName, World->GetEngineConfigCOM ());
+
+  EventQueue = System->EventQueue;
+
+  int Width, Height;
+  System->piGI->GetWidth (Width);
+  System->piGI->GetHeight (Height);
+  bound.Set (0, 0, Width, Height);
+  dirty.Set (bound);
+  WindowListWidth = Width / 3;
+  WindowListHeight = Width / 6;
+
+  // Tell CsPrintf() console is ready
+  System->DemoReady = true;
+
   LoadConfig ();
   LoadTextures ();
   // Close the debug console (and set up new palette)
@@ -195,7 +195,7 @@ void csApp::LoadConfig ()
     tkDialogButton,
     tkCustomTexture
   };
-  static tokenDesc commands[] =
+  static csTokenDesc commands[] =
   {
     {tkMouseCursorImageFile,  "MOUSECURSORIMAGEFILE"},
     {tkMouseCursor,           "MOUSECURSOR"},
@@ -217,7 +217,7 @@ void csApp::LoadConfig ()
     CHKB (dialogdefs = new csStrVector (16, 16));
 
   size_t cswscfglen;
-  char *cswscfg = GetArchive ()->read (CSWS_CFG, &cswscfglen);
+  char *cswscfg = System->Vfs->ReadFile (CSWS_CFG, cswscfglen);
   if (!cswscfg)
     return;
 
@@ -313,9 +313,9 @@ void csApp::LoadTextures ()
   texcfg [txfil] = 0;
 #undef ADD_TEX
 
-  CSLoader::LoadTextures (world->GetTextures (), texcfg, world);
+  csLoader::LoadTextures (World->GetTextures (), texcfg, World);
   CHK (delete [] texcfg);
-  
+
   // Now mark all textures for 2D usage and unmark for 3D usage
   csTextureList *texlist = GetTextures ();
   if (texlist)
@@ -330,7 +330,7 @@ void csApp::LoadTextures ()
       }
     }
   }
-  
+
   Mouse->Setup ();
 }
 

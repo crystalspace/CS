@@ -24,6 +24,8 @@
 #include "csgeom/math3d.h"
 #include "cssys/common/sysdriv.h"
 #include "csengine/collider.h"
+#include "csutil/inifile.h"
+#include "csutil/vfs.h"
 
 class Polygon3D;
 class WalkTest;
@@ -55,8 +57,8 @@ struct csKeyMap
 class WalkTest : public SysSystemDriver
 {
 public:
-  /// The world file to load
-  static char world_file[100];
+  /// The startup directory on VFS with needed world file
+  static char world_dir [100];
   /// A script to execute at startup.
   char* auto_script;
 
@@ -121,7 +123,7 @@ public:
   bool do_edges;
 
   /// The world.
-  csWorld* world;
+  csWorld *world;
 
   /// For scripting.
   LanguageLayer* layer;
@@ -180,6 +182,10 @@ public:
 
   ///
   ~WalkTest ();
+
+  /// Perform some initialization work
+  virtual bool Initialize (int argc, char *argv[], const char *iConfigName,
+    const char *iVfsConfigName, IConfig* iOptions);
 
   ///
   virtual void NextFrame (long elapsed_time, long current_time);

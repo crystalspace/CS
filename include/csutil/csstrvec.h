@@ -41,8 +41,11 @@ public:
   /// FreeItem deletes Item as if it was allocated by 'new char *[]'
   virtual bool FreeItem (csSome Item);
 
+  /// Compare two array elements in given Mode
+  virtual int Compare (csSome Item1, csSome Item2, int Mode) const;
+
   /// Compare two strings for equality (case-sensitive)
-  virtual bool Equal (csSome Item, csConstSome Key) const;
+  virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
 };
 
 #endif // __CSSTRVEC_H__

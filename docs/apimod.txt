@@ -3,18 +3,100 @@ was released. This file may help you convert your application
 to 0.16 when that will be released. It can also help you convert
 to 0.15 if you want to do that.
 
-csSector::UseStaticBSP(int mode = BSP_MINIMIZE_SPLITS) has changed to
-csSector::UseStaticTree(int mode = BSP_MINIMIZE_SPLITS, bool octree = false).
+-*- Changed
+	csSector::UseStaticBSP(int mode = BSP_MINIMIZE_SPLITS)
+    to
+	csSector::UseStaticTree(int mode = BSP_MINIMIZE_SPLITS, bool octree = false).
 
-Added void csPolygonSet::GetBoundingBox(csVector3& min_bbox, csVector3& max_bbox).
+-*- Added
+	void csPolygonSet::GetBoundingBox(csVector3& min_bbox, csVector3& max_bbox).
 
-Added const csReversibleTransform& csPortal::GetWarp ().
+-*- Added
+	const csReversibleTransform& csPortal::GetWarp ().
 
-csBspTree inherits from new class csPolygonTree.
-Added csOctree which also inherits from csPolygonTree.
+-*- csBspTree inherits from new class csPolygonTree.
 
-csPolygonSet::AddVertexSmart() is no longer recommended (too slow). Instead
-use plain AddVertex() and call CompressVertices() afterwards.
+-*- Added csOctree which also inherits from csPolygonTree.
 
-New csSector::RemoveThing().
+-*- csPolygonSet::AddVertexSmart() is no longer recommended (too slow). Instead
+    use plain AddVertex() and call CompressVertices() afterwards.
 
+-*- New csSector::RemoveThing().
+
+==== VFS ====
+
+-*- Added the Virtual File System class. Every file operation is going to
+    flow through one global VFS object. It has transparent support for ZIP
+    archives, so forget the Archive class.
+
+-*- Removed the "bool fromlibrary" parameter from LoadSpriteTemplate() and
+    LoadThingTemplate(). Libraries are now read directly into world object.
+
+-*- Renamed Archive -> csArchive class.
+
+-*- Removed readonly archive support from csArchive - with Virtual File
+    System it looks like a kludge (which it really is, or was :-)
+
+-*- Removed csArchive::Append method; I've left only Write method which
+    appends by itself. I don't understand why I made two separate methods
+    for this...
+
+-*- Renamed csArchive::WriteArchive() to csArchive::Flush()
+
+-*- New methods in csVector: QuickSort(), FindKey(), Find(), FindSortedKey(),
+    Compare(), CompareKey(). QuickSort() sorts the csVector using Compare()
+    virtual method which compares two elements of array (and returns
+    -1,0 or +1). FindKey() scans entire array for a element matching specific
+    key in specific Mode using the virtual CompareKey() method (for example,
+    if csVector contains a kind of records, Mode can specify which record
+    field should be checked against Key). FindSortedKey() does the same but
+    works on pre-sorted arrays (using a binary tree algorythm). Removed the
+    obsolete Equal() method that is replaced by Compare()
+
+-*- Added Compare() and CompareKey() methods to csStrVector class. Now string
+    vector can be sorted and scanned for strings (Mode parameter is ignored).
+
+-*- Removed the global "csIniFile *config" variable. Now its up to you to
+    create the corresponding variable and to pass it when initializing
+    objects (i.e. system driver and world)
+
+-*- Renamed LoadLibrary into LoadLibraryFile to comply with
+    LoadWorldFile - LoadWorld pair. LoadLibrary now reads the library
+    directly from given data buffer.
+
+-*- Added the FILE() keyword to TEXTURE() and SOUNDS() statements.
+    Now you can give texture a different name from filename. Example:
+
+	TEXTURES
+	(
+	  TEXTURE 'Crystal Space logo' (TRANSPARENT (0,0,1) FILE (/lib/std/cslogo.gif))
+	)
+
+	SPRITE 'missile2'
+	(
+	  TEXNR ('Crystal Space logo')
+	  ...
+	)
+
+-*- Renamed CSLoader class into csLoader to comply with standard Crystal
+    Space naming convention.
+
+-*- Added the LIBRARY keyword to the WORLD file. Now you can read libraries
+    directly from world files, this way:
+
+	WORLD
+	(
+	  LIBRARY '/lib/std/library' ()
+	  ...
+	)
+
+    All objects from that library are read directly into world object,
+    so you can reference them as usual. You can imagine LIBRARY keyword
+    as C's preprocessor #include directive, although it works a bit
+    differently.
+
+-*- Additional parameter to SystemDriver::SetSystemDefaults - csIniFile *.
+    Usually you will want to pass Sys->Config variable here.
+
+-*- Additional parameter to world->Initialize: csVfs *.
+    Usually you will want to pass Sys->Vfs variable here.

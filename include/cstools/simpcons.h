@@ -26,6 +26,7 @@
 interface ITextureManager;
 
 class csRect;
+class csIniFile;
 
 /**
  * An abstract command interpreter.  Console calls upon this object when it
@@ -67,10 +68,12 @@ protected:
   int console_font;
   /// The command handler
   csSimpleCommand* command_handler;
+  /// The configuration file
+  csIniFile *config;
 
 public:
   /// Create console object
-  csSimpleConsole (csSimpleCommand* = 0);
+  csSimpleConsole (csIniFile *iConfig, csSimpleCommand* = 0);
   /// Destroy console object
   virtual ~csSimpleConsole ();
 

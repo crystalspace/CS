@@ -31,11 +31,9 @@ class csPolyPlane;
 class csCollection;
 class csStatLight;
 class csThing;
-class csLibrary;
 class ImageFile;
 class csWorld;
 class LanguageLayer;
-class Archive;
 class csCurveTemplate;
 class csSoundBufferObject;
 class csSpriteTemplate;
@@ -50,7 +48,7 @@ enum { kTokenPSetVertex = 1, kTokenPSetPolygon, kTokenPSetBezier,
 /**
  * The loader for CS worlds.
  */
-class CSLoader
+class csLoader
 {
 protected:
   ///
@@ -113,9 +111,9 @@ public:
         CLights* default_lightx, csSector* sec, csPolygonSet* parent);
 
   ///
-  static ImageFile* load_image(char* name, csWorld* w, Archive* ar = NULL);
+  static ImageFile* load_image(char* name, csWorld* w);
   ///
-  static void txt_process (csTextureHandle* txt_handle, char* buf);
+  static void txt_process (char *name, char* buf, csTextureList* textures, csWorld *world);
   ///
   static csPolygonTemplate* load_ptemplate (char* ptname, char* buf,
         csTextureList* textures, csTextureHandle* default_texture, float default_texlen,
@@ -140,13 +138,8 @@ public:
   ///
   static void load_light (char* name, char* buf);
 
-  /// Load a library definition.
-  static bool load_library_def (csLibrary* lib, csWorld* w, char* file, csTextureList* textures);
-  /// Load a library definition.
-  static bool load_library_def (csLibrary* lib, csWorld* w, Archive* ar, char* buf, csTextureList* textures);
-
   ///
-  static csSoundBufferObject* load_sound (char* name, csWorld* w, Archive* ar);
+  static csSoundBufferObject* load_sound (char* name, csWorld* w);
 
   /// Load data into a world.
   static bool LoadWorld (csWorld* world, LanguageLayer* layer, char* buf);
@@ -155,36 +148,33 @@ public:
   static bool LoadWorldFile (csWorld* world, LanguageLayer* layer, char* filename);
 
   /**
-   * Load all the texture descriptions from the world
-   * file (no actual images).
-   * If the optional 'ar' is given, that archive is checked
-   * first before the others are checked.
+   * Load a library into given world.<p>
+   * A library is just a world file that contains just sprite templates,
+   * thing templates, sounds and textures.
    */
-  static bool LoadTextures (csTextureList* textures, char* buf, csWorld* world, Archive* ar = NULL);
+  static bool LoadLibrary (csWorld* world, char* buf);
+
+  /// Load library from a VFS file
+  static bool LoadLibraryFile (csWorld* world, char* filename);
 
   /**
-   * Load a library and add it to the world.
-   * the library is automatically added to the world, if loading was successful.
-   *
-   * Parameters:
-   * name:   a symbolic name for that library. usefull for later references
-   * fname:  name of the file that contains the library (for instance "standard.zip")
-   * return: a pointer to the loaded library, or NULL, if loading was not possible.
+   * Load all the texture descriptions from the world
+   * file (no actual images).
    */
-  static csLibrary* LoadLibrary (csWorld* world, char* name, char* fname);
+  static bool LoadTextures (csTextureList* textures, char* buf, csWorld* world);
 
   /**
    * Load a texture and add it to the world.
    * The texture will be registered for 3d use only.
    */
-  static csTextureHandle* LoadTexture (csWorld* world, char* name, char* fname, Archive* ar = NULL);
+  static csTextureHandle* LoadTexture (csWorld* world, char* name, char* fname);
 
   /**
    * Load sounds from a SOUNDS(...) argument.
    * If 'ar' is given optionally load from that archive as well.
    * This function is normally called automatically by the parser.
    */
-  static bool LoadSounds (csWorld* world, char* buf, Archive* ar = NULL);
+  static bool LoadSounds (csWorld* world, char* buf);
 
   /// Load a skeleton part.
   static bool LoadSkeleton (csSkeletonLimb* limb, char* buf, bool is_connection);

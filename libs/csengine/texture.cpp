@@ -28,7 +28,7 @@
 
 CSOBJTYPE_IMPL(csTextureHandle,csObject);
 
-csTextureHandle::csTextureHandle (ImageFile* image) : 
+csTextureHandle::csTextureHandle (ImageFile* image) :
   csObject (), for_2d (false), for_3d (true)
 {
   ifile = image;

@@ -25,8 +25,8 @@
 #include "csengine/light.h"
 #include "csengine/world.h"
 #include "csengine/sysitf.h"
-#include "csutil/archive.h"
 #include "csutil/util.h"
+#include "csutil/vfs.h"
 #include "csobject/nameobj.h"
 
 //---------------------------------------------------------------------------
@@ -292,10 +292,10 @@ void CacheName (char* buf, csPolygonSet* owner, int index, char* suffix)
     const char* pname = csNameObject::GetName (*(owner->GetSector ()));
     if (!pname)
       CsPrintf (MSG_WARNING, "Lighting cache is used while some objects don't have names!\n");
-    sprintf (buf, "LM_%s_%s_%d%s", pname ? pname : ".", name ? name : ".", index, suffix);
+    sprintf (buf, "lm/%s_%s_%d%s", pname ? pname : ".", name ? name : ".", index, suffix);
   }
   else
-    sprintf (buf, "LM_%s_%d%s", name ? name : ".", index, suffix);
+    sprintf (buf, "lm/%s_%d%s", name ? name : ".", index, suffix);
 }
 
 bool csLightMap::ReadFromCache (int w, int h, int lms, csPolygonSet* owner, csPolygon3D* poly, int index, csWorld* world)
@@ -306,16 +306,16 @@ bool csLightMap::ReadFromCache (int w, int h, int lms, csPolygonSet* owner, csPo
   LightSave ls;
   csLight* light;
   int i;
-  Archive* ar = world->GetWorldFile ();
 
   SetSize (w, h, lms);
 
   CacheName (buf, owner, index, "");
 
-  char* data = ar->read (buf);
+  size_t size;
+  char* data = VFS->ReadFile (buf, size);
   if (!data) return false;
 
-  char* d = data;
+  char *d = data;
   memcpy (ps.header, d, 4); d += 4;
   memcpy (&ps.x1, d, 4); d += 4;
   memcpy (&ps.y1, d, 4); d += 4;
@@ -376,7 +376,7 @@ bool csLightMap::ReadFromCache (int w, int h, int lms, csPolygonSet* owner, csPo
   // Now load the dynamic data.
   //-------------------------------
   CacheName (buf, owner, index, "_d");
-  data = ar->read (buf);
+  data = VFS->ReadFile (buf, size);
   if (!data) return true;	// No dynamic data. @@@ Recalculate dynamic data?
 
   d = data;
@@ -415,10 +415,8 @@ void csLightMap::Cache (csPolygonSet* owner, csPolygon3D* poly, int index, csWor
 {
   char buf[200];
   PolySave ps;
-  void* entry;
   long l;
   float f;
-  Archive* ar = world->GetWorldFile ();
 
   strcpy (ps.header, "MAPL");
   if (poly)
@@ -440,20 +438,23 @@ void csLightMap::Cache (csPolygonSet* owner, csPolygon3D* poly, int index, csWor
   // Write the normal lightmap data.
   //-------------------------------
   CacheName (buf, owner, index, "");
-  entry = ar->new_file (buf, POLYSAVE_LEN+lm_size*3);
-  ar->write (entry, ps.header, 4);
-  f = convert_endian (ps.x1); ar->append (entry, (char*)&f, 4);
-  f = convert_endian (ps.y1); ar->append (entry, (char*)&f, 4);
-  f = convert_endian (ps.z1); ar->append (entry, (char*)&f, 4);
-  f = convert_endian (ps.x2); ar->append (entry, (char*)&f, 4);
-  f = convert_endian (ps.y2); ar->append (entry, (char*)&f, 4);
-  f = convert_endian (ps.z2); ar->append (entry, (char*)&f, 4);
-  l = convert_endian (ps.lm_size); ar->append (entry, (char*)&l, 4);
-  l = convert_endian (ps.lm_cnt); ar->append (entry, (char*)&l, 4);
+  csFile *cf = VFS->Open (buf, VFS_FILE_WRITE);
+  cf->Write (ps.header, 4);
+  f = convert_endian (ps.x1);      cf->Write ((char*)&f, 4);
+  f = convert_endian (ps.y1);      cf->Write ((char*)&f, 4);
+  f = convert_endian (ps.z1);      cf->Write ((char*)&f, 4);
+  f = convert_endian (ps.x2);      cf->Write ((char*)&f, 4);
+  f = convert_endian (ps.y2);      cf->Write ((char*)&f, 4);
+  f = convert_endian (ps.z2);      cf->Write ((char*)&f, 4);
+  l = convert_endian (ps.lm_size); cf->Write ((char*)&l, 4);
+  l = convert_endian (ps.lm_cnt);  cf->Write ((char*)&l, 4);
 
-  if (static_lm.mapR) ar->append (entry, (char*)static_lm.mapR, lm_size);
-  if (static_lm.mapG) ar->append (entry, (char*)static_lm.mapG, lm_size);
-  if (static_lm.mapB) ar->append (entry, (char*)static_lm.mapB, lm_size);
+  if (static_lm.mapR) cf->Write ((char*)static_lm.mapR, lm_size);
+  if (static_lm.mapG) cf->Write ((char*)static_lm.mapG, lm_size);
+  if (static_lm.mapB) cf->Write ((char*)static_lm.mapB, lm_size);
+
+  // close the file
+  delete cf;
 
   //-------------------------------
   // Write the dynamic data.
@@ -469,9 +470,10 @@ void csLightMap::Cache (csPolygonSet* owner, csPolygon3D* poly, int index, csWor
     smap = first_smap;
 
     CacheName (buf, owner, index, "_d");
-    entry = ar->new_file (buf, LIGHTHDR_LEN+lh.dyn_cnt*(LIGHTSAVE_LEN+lm_size));
-    ar->write (entry, lh.header, 4);
-    l = convert_endian (lh.dyn_cnt); ar->append (entry, (char*)&l, 4);
+    cf = VFS->Open (buf, VFS_FILE_WRITE);
+    cf->Write (lh.header, 4);
+    l = convert_endian (lh.dyn_cnt);
+    cf->Write ((char*)&l, 4);
   }
   while (smap)
   {
@@ -483,11 +485,11 @@ void csLightMap::Cache (csPolygonSet* owner, csPolygon3D* poly, int index, csWor
       ls.y = light->GetCenter ().y;
       ls.z = light->GetCenter ().z;
       ls.dist = light->GetRadius ();
-      f = convert_endian (ls.x); ar->append (entry, (char*)&f, 4);
-      f = convert_endian (ls.y); ar->append (entry, (char*)&f, 4);
-      f = convert_endian (ls.z); ar->append (entry, (char*)&f, 4);
-      f = convert_endian (ls.dist); ar->append (entry, (char*)&f, 4);
-      ar->append (entry, (char*)(smap->map), lm_size);
+      f = convert_endian (ls.x);    cf->Write ((char*)&f, 4);
+      f = convert_endian (ls.y);    cf->Write ((char*)&f, 4);
+      f = convert_endian (ls.z);    cf->Write ((char*)&f, 4);
+      f = convert_endian (ls.dist); cf->Write ((char*)&f, 4);
+      cf->Write ((char*)(smap->map), lm_size);
     }
     smap = smap->next;
   }

@@ -29,6 +29,8 @@ class csEventQueue;
 class csKeyboardDriver;
 class csMouseDriver;
 class csConsole;
+class csIniFile;
+class csVFS;
 
 interface IGraphics3D;
 interface IGraphics2D;
@@ -106,6 +108,12 @@ public:
   csKeyboardDriver *Keyboard;
   /// Mouse driver
   csMouseDriver *Mouse;
+  /// The Configuration File object
+  csIniFile *Config;
+  /// The Virtual File System configuration file object
+  csIniFile *VfsConfig;
+  /// The Virtual File System object
+  csVFS *Vfs;
   /// Set to non-zero to exit csSystemDriver::Loop()
   static bool Shutdown;
   /// Same as Shutdown but set manually by windowing system
@@ -132,7 +140,8 @@ public:
    * This is usually called right after object creation.
    * 'cfg_engine' is an instance of IConfig for the engine settings.
    */
-  virtual bool Initialize (int argc, char *argv[], IConfig* cfg_engine);
+  virtual bool Initialize (int argc, char *argv[], const char *iConfigName,
+    const char *iVfsConfigName, IConfig* iOptions);
 
   /// Initialize 3D Graphics context object
   virtual bool InitGraphics ();
@@ -179,7 +188,7 @@ public:
    * -mode 640x480 everytime you can set this in the config file
    * and this routine should read that).
    */
-  virtual void SetSystemDefaults ();
+  virtual void SetSystemDefaults (csIniFile *config);
 
   /**
    * This is a system-independent function used to parse a
@@ -334,11 +343,8 @@ protected:
 #define SysOpen		csSystemDriver::fopen
 #define SysGetTime	csSystemDriver::Time
 
-class csIniFile;
-
 // CrystalSpace global variables
 extern csSystemDriver *System;
-extern csIniFile *config;
 
 // Fatal exit routine (which can be replaced if neccessary)
 extern void (*fatal_exit) (int errorcode, bool canreturn);

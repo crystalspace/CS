@@ -173,9 +173,9 @@ csGraphics2DAA::csGraphics2DAA (ISystem* piSystem) :
 
 #define SETFLAG(s, m)				\
   if (config->GetYesNo ("Console", s, true))	\
-    aa_defparams.supported |= m;		\
+    aa_defparams.supported |= (m);		\
   else						\
-    aa_defparams.supported &= ~m;
+    aa_defparams.supported &= ~(m);
 
   SETFLAG ("Normal",	AA_NORMAL_MASK);
   SETFLAG ("Dim",	AA_DIM_MASK);
@@ -184,6 +184,9 @@ csGraphics2DAA::csGraphics2DAA (ISystem* piSystem) :
   SETFLAG ("Reverse",	AA_REVERSE_MASK);
   SETFLAG ("All",	AA_ALL);
   SETFLAG ("EightBit",	AA_EIGHT);
+  SETFLAG ("GenFont",	AA_GENFONT);
+  if (aa_defparams.supported & AA_GENFONT)
+    aa_defparams.supported |= AA_EXTENDED;
 
 #undef SETFLAG
 

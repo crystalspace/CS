@@ -112,7 +112,7 @@ void load_sprite (char *filename, char *templatename, char* txtname)
 
 csSprite3D* add_sprite (char* tname, char* sname, csSector* where, csVector3 const& pos, float size)
 {
-  csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate (tname, true);
+  csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate (tname);
   if (!tmpl)
   {
     Sys->Printf (MSG_CONSOLE, "Unknown sprite template '%s'!\n", tname);
@@ -286,7 +286,7 @@ void add_skeleton_tree (csSector* where, csVector3 const& pos, int depth, int wi
 {
   char skelname[50];
   sprintf (skelname, "__skeltree__%d,%d\n", depth, width);
-  csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate (skelname, true);
+  csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate (skelname);
   if (!tmpl)
   {
     CHK (tmpl = new csSpriteTemplate ());
@@ -471,7 +471,7 @@ void add_skeleton_ghost (csSector* where, csVector3 const& pos, int maxdepth, in
 {
   char skelname[50];
   sprintf (skelname, "__skelghost__\n");
-  csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate (skelname, true);
+  csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate (skelname);
   if (!tmpl)
   {
     CHK (tmpl = new csSpriteTemplate ());
@@ -597,7 +597,7 @@ void add_bot (float size, csSector* where, csVector3 const& pos, float dyn_radiu
     dyn->SetSector (where);
     dyn->Setup ();
   }
-  csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate ("bot", true);
+  csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate ("bot");
   if (!tmpl) return;
   Bot* bot;
   CHK (bot = new Bot (tmpl));
@@ -1283,7 +1283,7 @@ static bool CommandHandler (char *cmd, char *arg)
     char misname[10];
     sprintf (misname, "missile%d", ((rand () >> 3) & 1)+1);
 
-    csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate (misname, true);
+    csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate (misname);
     if (!tmpl)
       Sys->Printf (MSG_CONSOLE, "Could not find '%s' sprite template!\n", misname);
     else
@@ -1446,10 +1446,11 @@ static bool CommandHandler (char *cmd, char *arg)
 
 //-----------------------------------------------------------------------------
 
-char WalkTest::world_file[100];
+char WalkTest::world_dir [100];
 bool WalkTest::move_3d = false;
 
-WalkTest::WalkTest () : SysSystemDriver (), pos (0, 0, 0), velocity (0, 0, 0)
+WalkTest::WalkTest () :
+  SysSystemDriver (), pos (0, 0, 0), velocity (0, 0, 0)
 {
   Command::ExtraHandler = CommandHandler;
   auto_script = NULL;
@@ -1486,7 +1487,7 @@ WalkTest::WalkTest () : SysSystemDriver (), pos (0, 0, 0), velocity (0, 0, 0)
   angle.Set (0, 0, 0);
   angle_velocity.Set (0, 0, 0);
 
-//  pl=new PhysicsLibrary;
+//pl=new PhysicsLibrary;
 
   timeFPS = 0.0;
 }
@@ -1503,11 +1504,42 @@ WalkTest::~WalkTest ()
   CHK (delete world);
 }
 
+bool WalkTest::Initialize (int argc, char *argv[], const char *iConfigName,
+    const char *iVfsConfigName, IConfig* iOptions)
+{
+  if (!SysSystemDriver::Initialize (argc, argv, iConfigName, iVfsConfigName, iOptions))
+    return false;
+
+  // Read values from config file
+  do_fps = Config->GetYesNo ("WalkTest", "FPS", true);
+  do_stats = Config->GetYesNo ("WalkTest", "STATS", false);
+  do_cd = Config->GetYesNo ("WalkTest", "COLLDET", true);
+  sprintf (world_dir, "/lev/%s", Config->GetStr ("World", "WORLDFILE", "world"));
+
+  // Get all collision detection and movement config file parameters.
+  cfg_jumpspeed = Config->GetFloat ("CD", "JUMPSPEED", 0.08);
+  cfg_walk_accelerate = Config->GetFloat ("CD", "WALKACCELERATE", 0.007);
+  cfg_walk_maxspeed = Config->GetFloat ("CD", "WALKMAXSPEED", 0.1);
+  cfg_walk_brake = Config->GetFloat ("CD", "WALKBRAKE", 0.014);
+  cfg_rotate_accelerate = Config->GetFloat ("CD", "ROTATEACCELERATE", 0.005);
+  cfg_rotate_maxspeed = Config->GetFloat ("CD", "ROTATEMAXSPEED", 0.03);
+  cfg_rotate_brake = Config->GetFloat ("CD", "ROTATEBRAKE", 0.015);
+  cfg_look_accelerate = Config->GetFloat ("CD", "LOOKACCELERATE", 0.028);
+  cfg_body_height = Config->GetFloat ("CD", "BODYHEIGHT", 1.4);
+  cfg_body_width = Config->GetFloat ("CD", "BODYWIDTH", 0.5);
+  cfg_body_depth = Config->GetFloat ("CD", "BODYDEPTH", 0.5);
+  cfg_eye_offset = Config->GetFloat ("CD", "EYEOFFSET", -0.7);
+  cfg_legs_width = Config->GetFloat ("CD", "LEGSWIDTH", 0.4);
+  cfg_legs_depth = Config->GetFloat ("CD", "LEGSDEPTH", 0.4);
+  cfg_legs_offset = Config->GetFloat ("CD", "LEGSOFFSET", -1.1);
+  return true;
+}
+
 bool WalkTest::ParseArg (int argc, char* argv[], int& i)
 {
   if (argv[i][0] != '-')
   {
-    strcpy (world_file, argv[i]);
+    sprintf (world_dir, "/lev/%s", argv[i]);
   }
   if (strcasecmp ("-clear", argv[i]) == 0)
   {
@@ -1587,7 +1619,7 @@ void WalkTest::Help ()
   Sys->Printf (MSG_STDOUT, "  -infinite          special infinite level generation (ignores world file!)\n");
   Sys->Printf (MSG_STDOUT, "  -huge              special huge level generation (ignores world file!)\n");
   Sys->Printf (MSG_STDOUT, "  -bots              allow random generation of bots\n");
-  Sys->Printf (MSG_STDOUT, "  <filename>         load world file from <filename> (default '%s')\n", world_file);
+  Sys->Printf (MSG_STDOUT, "  <name>             load world file from VFS directory <name> (default '%s')\n", world_dir);
 }
 
 /*------------------------------------------------------------------
@@ -1961,7 +1993,7 @@ void WalkTest::NextFrame (long elapsed_time, long current_time)
     if (first_time == -1) { first_time = current_time; next_bot_at = current_time+1000*3; }
     if (current_time > next_bot_at)
     {
-      csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate ("bot", true);
+      csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate ("bot");
       if (tmpl)
       {
         csSprite3D *sp = tmpl->NewSprite ();

@@ -23,12 +23,7 @@
 
 #include "csutil/csvector.h"
 
-class Archive;
-
-/// Maximal INI line length
-#define CS_MAXINILINELEN 1024
-/// Maximal line length for lines containing BASE64 encoded data
-#define CS_B64INILINELEN 76
+class csVFS;
 
 class csIniFile : public csBase
 {
@@ -76,10 +71,10 @@ private:
 public:
   /// Initialize INI file object
   csIniFile (char iCommentChar = ';');
-  /// Initialize INI file object and load it from file
+  /// Initialize INI file object and load it from a file
   csIniFile (const char *fName, char iCommentChar = ';');
-  /// Initialize INI file object and load it from archive
-  csIniFile (Archive *ar, const char *fName, char iCommentChar = ';');
+  /// Initialize INI file object and load it from a file on VFS volume
+  csIniFile (csVFS *vfs, const char *fName, char iCommentChar);
   /// Destroy the object
   virtual ~csIniFile ();
 
