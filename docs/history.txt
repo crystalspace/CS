@@ -190,8 +190,9 @@ chronological order.
 	  getting the vertices should not make it dirty.
 	- Eric Sunshine fixed a problem in win32.jam which prevented the
 	  USE_DLLWRAP=yes option from working correctly.  Specifically, the
-	  -shared flag which was discovered by configure was being sent to
-	  dllwrap, and dllwrap was not at all happy about it.
+	  -shared flag which was discovered by configure for use in "gcc
+	  -shared" was being sent to dllwrap, and dllwrap was not at all happy
+	  about it.
 	- Eric Sunshine fixed bug in cspython.mak where SRC.CSPYTHON
 	  incorrectly included cs_pyth.cpp from both the source directory and
 	  from $(OUTDERIVED).  It was supposed to include only the one from
@@ -326,7 +327,8 @@ chronological order.
 	      objects so that the iIsoMeshSprite is set on the mesh.
 	    - Iso engine also implements iLightManager now so that mesh
 	      lighting works the same as in the 3D engine.
-	    - Removed the obsolete flag parameter on iEngine->GetNearbyLights().
+	    - Removed the obsolete flag parameter on
+	      iEngine->GetNearbyLights().
 	    - Updated the documentation for these changes.
 	- Eric Sunshine fixed bug in msvcgen.mak introduced on 28-Jan-2004
 	  (during csutil/cssys merge) where it neglected to ensure that
@@ -346,10 +348,10 @@ chronological order.
 	      when they think the object is visible instead of all the time.
 	      This is more optimal.
 	- Jorrit changed csArray<Bot> to the safer csPDelArray<Bot>.
-	- Jorrit fixed a bug in one of the engine CreateMeshWrapper() functions.
-	  It would set the logical parent of the created mesh to the iBase
-	  of the csObject instead of the iMeshWrapper. This caused the bots
-	  to crash with the new lighting system.
+	- Jorrit fixed a bug in one of the engine CreateMeshWrapper()
+	  functions.  It would set the logical parent of the created mesh to
+	  the iBase of the csObject instead of the iMeshWrapper. This caused
+	  the bots to crash with the new lighting system.
 	- res fixed a few 64bit portability issues in csutil reported by VC7.
 	- res removed the unused csSymbolTable class.
 	- Jorrit updated the MeshAnim HOWTO about automatic lighting.
