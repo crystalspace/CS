@@ -159,6 +159,8 @@ awsTextBox::SetProperty(char *name, void *parm)
       text=s;
       text->IncRef();
       Invalidate();
+      start=0;
+      cursor=0;
     }
 
     return true;
