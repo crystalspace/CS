@@ -360,8 +360,11 @@ iEventCord* csEventQueue::GetEventCord (int cat, int subcat)
 size_t csEventQueue::EventCordsFind (int cat, int subcat)
 {
   size_t i;
-  for (i = EventCords.Length() - 1; i >= 0; i--)
+  int counterLoop = EventCords.Length() - 1;
+
+  for (; counterLoop >= 0; counterLoop--)
   {
+    i = counterLoop;
     csEventCord *cord = EventCords[i];
     if (cat == cord->GetCategory() && subcat == cord->GetSubcategory())
       return i;

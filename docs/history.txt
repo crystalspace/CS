@@ -27,6 +27,9 @@ chronological order.
 	    - Fixed some 64-bit warnings in VFS.
 	- res fixed ivaria/cspace.i for the recent iEvent changes.
 	- Vincent Knecht added instruction for building RPMs in User Manual.
+	- Luca fixed a loop in the file CS\libs\csutil\cseventq.cpp. The loop
+	  was behaving not properly after the change of the management of the
+	  index in the csArray class.
 10-Jul-2004
 	- res fixed the Win32 manifest resource generation code to not emit
 	  non-numerical characters when writing the version number - Windows
