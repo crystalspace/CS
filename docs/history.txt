@@ -54,8 +54,8 @@ chronological order.
 	      subdirectory.
 	    - Augmented msvcgen.jam so that it now also overrides the
 	      IncludeDir rule.  It collects the specified directories and
-	      applies them automatically to (via /I directives) to the
-	      generated project files.
+	      applies them automatically (via /I directives) to the generated
+	      project files.
 	- Eric Sunshine added example to the jamtemplate-synthesized Jamfile.in
 	  which shows how to set additional compiler and linker options for
 	  msvcgen.
@@ -190,7 +190,7 @@ chronological order.
 	      fully resolved library list.
 	    - Fixed LinkWith so that it removes duplicates from the library
 	      list which it assigns to DEPEND.
-	- Eric Sunshine disable MSVC6 warning C4503 "'identifier' : decorated
+	- Eric Sunshine disabled MSVC6 warning C4503 "'identifier' : decorated
 	  name length exceeded" which is triggered by thing.cpp/ref.h.
 	- Eric Sunshine augmented the ODE check in configure.ac so that it also
 	  determines if `extern "C"' should be used for the functions exported
@@ -213,7 +213,7 @@ chronological order.
 	- Eric Sunshine made the following msvcgen-related changes:
 	    - Added --source-root and --build-root options to msvcgen.pl, as
 	      well as %sourceroot% and %buildroot% substitutions.  If
-	      specified, these should be path (typically relative) pointing at
+	      specified, these should be paths (typically relative) pointing at
 	      the roots of the source and build trees. Template files can
 	      utilize these values rather than hardcoding those paths. For
 	      instance, %sourceroot% might be used to compose /I directives
@@ -232,9 +232,10 @@ chronological order.
 	    - Augmented the CS msvcgen templates to utilize %sourceroot% and
 	      %buildroot%.
 	- Eric Sunshine fixed CS_CHECK_PTHREAD (checkpthread.m4) so that it
-	  sets cs_cv_sys_pthread_recursive=no if cs_cv_sys_pthread == no. This
-	  fixes problem where AS_IF() configure.ac emitted error about missing
-	  argument to 'test' binary operator if pthread was absent.
+	  sets cs_cv_sys_pthread_recursive=no if cs_cv_sys_pthread==no.  This
+	  fixes problem where AS_IF() in configure.ac following invocation of
+	  CS_CHECK_PTHREAD() resulted in a shell error if pthread was not
+	  found.
 	- Eric Sunshine made Jam test and usage in configure.ac more tolerant
 	  of whitepsace in Jam path.
 	- Eric Sunshine worked around BoostJam incompatibility triggered by the
