@@ -129,13 +129,13 @@ csSparseGrid::GridRowEntry* csSparseGrid::csGridRow::Get (int index)
   return (csSparseGrid::GridRowEntry*)csVector::Get (index); 
 }
 
-int csSparseGrid::csGridRow::Compare (csSome Item1, csSome Item2, int Mode=0) const{
+int csSparseGrid::csGridRow::Compare (csSome Item1, csSome Item2, int Mode) const{
   (void)Mode;
   csSparseGrid::GridRowEntry *e1 = (csSparseGrid::GridRowEntry*)Item1, *e2 = (csSparseGrid::GridRowEntry*)Item2;
   return (e1->col<e2->col ? -1 : e1->col>e2->col ? 1 : 0);
 }
 
-int csSparseGrid::csGridRow::CompareKey (csSome Item1, csConstSome Key, int Mode=0) const{
+int csSparseGrid::csGridRow::CompareKey (csSome Item1, csConstSome Key, int Mode) const{
   (void)Mode;
   csSparseGrid::GridRowEntry *e1 = (csSparseGrid::GridRowEntry*)Item1;
   return (e1->col<(int)Key ? -1 : e1->col>(int)Key ? 1 : 0);

@@ -98,6 +98,7 @@ class csSparseGrid
     virtual int CompareKey (csSome Item1, csConstSome Key, int Mode=0) const;
     virtual bool FreeItem (csSome Item);
   };
+  friend class csSparseGrid::csGridRow;
 
   class csGridRowSet : public csGridRow{
   public:
