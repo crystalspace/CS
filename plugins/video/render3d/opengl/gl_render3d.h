@@ -32,29 +32,29 @@ class csRender3dCaps;
 class csGLRender3D : public iRender3D
 {
 private:
-	csRef<iObjectRegistry> object_reg;
-	csRef<iGraphics2D> g2d;
-	csRef<iTextureManager> texturemgr;
-	csRef<iRenderBufferManager> buffermgr;
-	csRef<iLightingManager> lightmgr;
-	csRef<iEffectServer> effectserver;
+  iObjectRegistry* object_reg;
+  csRef<iGraphics2D> g2d;
+  csRef<iTextureManager> texturemgr;
+  csRef<iRenderBufferManager> buffermgr;
+  csRef<iLightingManager> lightmgr;
+  csRef<iEffectServer> effectserver;
 
-	float fov;
-	int viewwidth, viewheight;
+  float fov;
+  int viewwidth, viewheight;
 
-	csRender3dCaps rendercaps;
+  csRender3dCaps rendercaps;
 
-	csStringHash strings;
-	
+  csStringHash strings;
+  
 public:
-	SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
-	csGLRender3D (iBase *parent);
-	~csGLRender3D ();
+  csGLRender3D (iBase *parent);
+  ~csGLRender3D ();
 
-	////////////////////////////////////////////////////////////////////
-	//                            iRender3d
-	////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////
+  //                            iRender3d
+  ////////////////////////////////////////////////////////////////////
 
   /// Open 3d renderer.
   bool Open();
@@ -62,37 +62,41 @@ public:
   /// Close renderer and release all resources used
   void Close();
 
-  /// Get a pointer to our 2d canvas driver. NOTE: It's not increfed,
-  /// and therefore it shouldn't be decref-ed by caller.
-	iGraphics2d* Get2DDriver() 
-		{ return g2d; }
+  /**
+   * Get a pointer to our 2d canvas driver. NOTE: It's not increfed,
+   * and therefore it shouldn't be decref-ed by caller.
+   */
+  iGraphics2d* Get2DDriver() 
+    { return g2d; }
 
   /// Get a pointer to our texture manager
-	iTextureManager* GetTextureManager() 
-		{ return texturemgr; }
+  iTextureManager* GetTextureManager() 
+    { return texturemgr; }
 
-  /// Get a pointer to the VB-manager
-  /// Always use the manager referenced here to get VBs
-	iRenderBufferManager* GetBufferManager() 
-		{ return buffermgr; }
+  /**
+   * Get a pointer to the VB-manager
+   * Always use the manager referenced here to get VBs
+   */
+  iRenderBufferManager* GetBufferManager() 
+    { return buffermgr; }
 
   /// Get a pointer to lighting manager
-	iLightingManager* GetLightingManager() 
-		{ return lightmgr; }
+  iLightingManager* GetLightingManager() 
+    { return lightmgr; }
 
   /// Dimensions of window
   void SetDimension(int width, int height);
-	void GetDimension(int &width, int &height) 
-		{ width = viewwidth; height = viewheight; }
+  void GetDimension(int &width, int &height) 
+    { width = viewwidth; height = viewheight; }
 
   /// Capabilities of the driver
-	csRender3dCaps* GetCaps() 
-		{ return &rendercaps; }
+  csRender3dCaps* GetCaps() 
+    { return &rendercaps; }
 
   /// Field of view
   void SetFOV(float fov);
-	float GetFOV() 
-		{ return fov; }
+  float GetFOV() 
+    { return fov; }
 
   /// Set world to view transform
   void SetWVMatrix(csReversibleTransform* wvmatrix);
@@ -111,56 +115,56 @@ public:
   void DrawMesh(csRenderMesh* mymesh);
 
   /// Get a stringhash to be used by our streamsources etc.
-	csStringHash *GetStringContainer() 
-		{ return strings; }
+  csStringHash *GetStringContainer() 
+    { return strings; }
 
-	////////////////////////////////////////////////////////////////////
-	//                         iEffectClient
-	////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////
+  //                         iEffectClient
+  ////////////////////////////////////////////////////////////////////
 
-	bool Validate (iEffectDefinition* effect, iEffectTechnique* technique);
+  bool Validate (iEffectDefinition* effect, iEffectTechnique* technique);
 
-	struct eiEffectClient : public iEffectClient
-	{
-		SCF_DECLARE_EMBEDDED_IBASE(csGLRender3D);
-		virtual bool Validate (
-			iEffectDefinition* effect, iEffectTechnique* technique)
-			{ return scfParent->Validate (effect, technique); }
-	} scfiEffectClient;
+  struct eiEffectClient : public iEffectClient
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csGLRender3D);
+    virtual bool Validate (
+      iEffectDefinition* effect, iEffectTechnique* technique)
+      { return scfParent->Validate (effect, technique); }
+  } scfiEffectClient;
 
-	////////////////////////////////////////////////////////////////////
-	//                          iComponent
-	////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////
+  //                          iComponent
+  ////////////////////////////////////////////////////////////////////
 
-	bool Initialize (iObjectRegistry reg);
+  bool Initialize (iObjectRegistry reg);
 
-	struct eiComponent : public iComponent
-	{
-		SCF_DECLARE_EMBEDDED_IBASE(csGLRender3D);
-		virtual bool Initialize (iObjectRegistry* reg)
-			{ return scfParent->Initialize (reg); }
-	} scfiComponent;
-	
-	////////////////////////////////////////////////////////////////////
-	//                         iEventHandler
-	////////////////////////////////////////////////////////////////////
-	
-	bool HandleEvent (iEvent& Event);
+  struct eiComponent : public iComponent
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csGLRender3D);
+    virtual bool Initialize (iObjectRegistry* reg)
+      { return scfParent->Initialize (reg); }
+  } scfiComponent;
+  
+  ////////////////////////////////////////////////////////////////////
+  //                         iEventHandler
+  ////////////////////////////////////////////////////////////////////
+  
+  bool HandleEvent (iEvent& Event);
 
-	struct EventHandler : public iEventHandler
-	{
-	private:
-		csGLRender3D* parent;
-	public:
-		EventHandler (csGLRender3D* parent)
-		{
-			SCF_CONSTRUCT_IBASE (NULL);
-			EventHandler::parent = parent;
-		}
-		SCF_DECLARE_IBASE;
-		virtual bool HandleEvent (iEvent& ev) 
-			{ return parent->HandleEvent (ev); }
-	} * scfiEventHandler;
+  struct EventHandler : public iEventHandler
+  {
+  private:
+    csGLRender3D* parent;
+  public:
+    EventHandler (csGLRender3D* parent)
+    {
+      SCF_CONSTRUCT_IBASE (NULL);
+      EventHandler::parent = parent;
+    }
+    SCF_DECLARE_IBASE;
+    virtual bool HandleEvent (iEvent& ev) 
+      { return parent->HandleEvent (ev); }
+  } * scfiEventHandler;
 };
 
 #endif // __GL_RENDER3D_H__

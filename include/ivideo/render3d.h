@@ -20,7 +20,9 @@
 #ifndef __IVIDEO_RENDER3D_H__
 #define __IVIDEO_RENDER3D_H__
 
-
+/**
+ * New 3D Interface. Work in progress!
+ */
 struct iRender3D : public iBase
 {
   /// Open 3d renderer.
@@ -29,15 +31,19 @@ struct iRender3D : public iBase
   /// Close renderer and release all resources used
   virtual void Close() = 0;
 
-  /// Get a pointer to our 2d canvas driver. NOTE: It's not increfed,
-  /// and therefore it shouldn't be decref-ed by caller.
+  /**
+   * Get a pointer to our 2d canvas driver. NOTE: It's not increfed,
+   * and therefore it shouldn't be decref-ed by caller.
+   */
   virtual iGraphic2d* Get2DDriver() = 0;
 
   /// Get a pointer to our texture manager
   virtual iTextureManager* GetTextureManager() = 0;
 
-  /// Get a pointer to the VB-manager
-  /// Always use the manager referenced here to get VBs
+  /**
+   * Get a pointer to the VB-manager
+   * Always use the manager referenced here to get VBs
+   */
   virtual iRenderBufferManager* GetBufferManager() = 0;
 
   /// Get a pointer to lighting manager

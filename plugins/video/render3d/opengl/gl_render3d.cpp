@@ -64,8 +64,8 @@ bool csGLRender3D::Open ()
     return false;
   }
 
-	effectserver = CS_QUERY_REGISTRY(object_reg, iEffectServer);
-	if( !effectserver )
+  effectserver = CS_QUERY_REGISTRY(object_reg, iEffectServer);
+  if( !effectserver )
   {
     csRef<iPluginManager> plugin_mgr (
       CS_QUERY_REGISTRY (object_reg, iPluginManager));
@@ -83,7 +83,7 @@ void csGLRender3D::Close ()
 
 bool csGLRender3D::BeginDraw (int drawflags)
 {
-	return false;
+  return false;
 }
 
 void csGLRender3D::FinishDraw ()
@@ -92,7 +92,7 @@ void csGLRender3D::FinishDraw ()
 
 void csGLRender3D::Print (csRect* area)
 {
-	G2D->Print (area);
+  G2D->Print (area);
 }
 
 
@@ -106,7 +106,7 @@ void csGLRender3D::Print (csRect* area)
 
 bool csGLRender3D::Validate (iEffectDefinition* effect, iEffectTechnique* technique);
 {
-	return false;
+  return false;
 }
 
 
@@ -123,10 +123,10 @@ bool csGLRender3D::Initialize (iObjectRegistry* p)
 {
   object_reg = p;
   
-	if (!scfiEventHandler)
+  if (!scfiEventHandler)
     scfiEventHandler = new EventHandler (this);
   
-	csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q)
     q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
 
@@ -134,13 +134,13 @@ bool csGLRender3D::Initialize (iObjectRegistry* p)
   csRef<iPluginManager> plugin_mgr (
     CS_QUERY_REGISTRY (object_reg, iPluginManager));
 
-	// @@@ Should check what canvas to load
+  // @@@ Should check what canvas to load
   g2d = CS_LOAD_PLUGIN (plugin_mgr, 
-		"crystalspace.graphics2d.glwin32", iGraphics2D);
+    "crystalspace.graphics2d.glwin32", iGraphics2D);
   if (!g2d)
     return false;
 
-	return true;
+  return true;
 }
 
 
