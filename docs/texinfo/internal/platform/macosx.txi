@@ -5,7 +5,7 @@
 @sc{n}e@sc{xt}
 @end macro
 
-@node NeXT Details, , Platform Details, Platform Details
+@node MacOS/X Details, , Platform Details, Platform Details
 @subsection MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep, NextStep
 @cindex @sc{n}e@sc{xt} Details
 @cindex MacOS/X Details
@@ -27,7 +27,7 @@ contact Matt Reda at @email{mreda@@mac.com} or Eric Sunshine.
 This section contains comprehensive and detailed implementation information
 about the MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep 4.2, and NextStep
 3.3 ports of Crystal Space.  Configuration, compilation, installation, and
-usage instructions are also available, @ref{NeXT}.
+usage instructions are also available, @ref{MacOS/X}.
 
 This project may be built for any of the architectures which are supported by
 the standard developer tools, as summarized below.
@@ -45,7 +45,7 @@ the standard developer tools, as summarized below.
 It is possible to build multi-architecture binaries (@sc{mab}) by utilizing the
 standard Apple/@NeXT{} makefile variable @samp{TARGET_ARCHS}.  For a full
 discussion of this facility see the compilation instructions,
-@ref{NeXT Architectures}.
+@ref{MacOS/X Architectures}.
 
 This implementation makes use of public AppKit @sc{api} (also known as
 @dfn{Cocoa}) to interface with the display server for all animation and event
@@ -59,17 +59,17 @@ MacOS/X, however, drivers are available for OpenGL and CoreGraphics, both of
 which improve rendering speed.  This is especially true of the OpenGL driver.
 
 @menu
-* NeXT Directories:: Directories
-* NeXT Files:: Files
-* NeXT Run-Loop:: Run-Loop
-* NeXT Video Optimization:: Video Optimization
-* NeXT Frame Buffer:: Frame Buffer
-* NeXT Dynamic Linking:: Dynamic Linking
-* NeXT Keymapping:: Key Mapping
-* NeXT Notes:: Final Notes
+* MacOS/X Directories:: Directories
+* MacOS/X Files:: Files
+* MacOS/X Run-Loop:: Run-Loop
+* MacOS/X Video Optimization:: Video Optimization
+* MacOS/X Frame Buffer:: Frame Buffer
+* MacOS/X Dynamic Linking:: Dynamic Linking
+* MacOS/X Keymapping:: Key Mapping
+* MacOS/X Notes:: Final Notes
 @end menu
 
-@node NeXT Directories, NeXT Files, NeXT Details, NeXT Details
+@node MacOS/X Directories, MacOS/X Files, MacOS/X Details, MacOS/X Details
 @subsubsection Directories
 @cindex @sc{n}e@sc{xt} Directories
 
@@ -131,7 +131,7 @@ OpenGL and CoreGraphics files are located in
 @file{CS/plugins/sound/driver/coreaudio}.
 @end itemize
 
-@node NeXT Files, NeXT Run-Loop, NeXT Directories, NeXT Details
+@node MacOS/X Files, MacOS/X Run-Loop, MacOS/X Directories, MacOS/X Details
 @subsubsection Files
 @cindex @sc{n}e@sc{xt} Files
 
@@ -211,7 +211,7 @@ linking facility.
 @itemx NeXTKeymap.h
 A utility class which parses the raw @NeXT{} key-mapping resource which drives
 keystroke interpretation by the WindowServer and the AppKit.  This class is
-specific to the NextStep port.  @xref{NeXT Keymapping}.
+specific to the NextStep port.  @xref{MacOS/X Keymapping}.
 
 @item NeXTMenu.m
 @itemx NeXTMenu.h
@@ -290,7 +290,7 @@ Utility functions for manipulation of page-aligned memory blocks for the
 @samp{NeXTFrameBuffer} subclasses.
 @end table
 
-@node NeXT Run-Loop, NeXT Video Optimization, NeXT Files, NeXT Details
+@node MacOS/X Run-Loop, MacOS/X Video Optimization, MacOS/X Files, MacOS/X Details
 @subsubsection Run-Loop
 @cindex @sc{n}e@sc{xt} Run-Loop
 
@@ -333,7 +333,7 @@ run-loop should not invoke @code{csDefaultRunLoop()}; but should instead
 arrange to have @code{iEventQueue::Process()} invoked on a periodic basis via
 some other mechanism.
 
-@node NeXT Video Optimization, NeXT Frame Buffer, NeXT Run-Loop, NeXT Details
+@node MacOS/X Video Optimization, MacOS/X Frame Buffer, MacOS/X Run-Loop, MacOS/X Details
 @subsubsection Video Optimization
 @cindex @sc{n}e@sc{xt} Video Optimization
 
@@ -471,7 +471,7 @@ though, that the majority of OpenStep and NextStep installations on Intel and
 @NeXT{} hardware use either 12- or 24-bit @sc{rgb} frame buffers so the actual
 impact of this limitation may not be particularly severe.
 
-@node NeXT Frame Buffer, NeXT Dynamic Linking, NeXT Video Optimization, NeXT Details
+@node MacOS/X Frame Buffer, MacOS/X Dynamic Linking, MacOS/X Video Optimization, MacOS/X Details
 @subsubsection Frame Buffer
 @cindex @sc{n}e@sc{xt} Frame Buffer
 
@@ -509,7 +509,7 @@ opaque color value from which no further interpretation can be made.
 
 To further complicate matters, in order to achieve decent video performance,
 image data sent to the WindowServer needs to be specially formatted, as
-discussed in the video optimizations section, @ref{NeXT Video Optimization}.
+discussed in the video optimizations section, @ref{MacOS/X Video Optimization}.
 In particular, for optimal performance, 12-bit and 24-bit data must include an
 alpha channel and all alpha bits must be set to one.
 
@@ -597,7 +597,7 @@ by the AppKit and WindowServer is encapsulated in the class
 display, @samp{NeXTFrameBuffer32} transmutes the pixel data into a format
 suitable for the AppKit.  It also ensures that the alpha byte is set to
 @code{0xff}, as explained in the video optimizations section,
-@ref{NeXT Video Optimization}.
+@ref{MacOS/X Video Optimization}.
 
 The 2D driver is automatically configured to generate 15-bit @sc{rgb} image
 data when running on machines configured for 12-, 15-, or 16-bit @sc{rgba}
@@ -608,13 +608,13 @@ manipulation of image data, this class generates a translation table which
 equates each possible @sc{rgb}:555 color value with the corresponding
 @sc{rgba}:4444 color.  The alpha nybble of the translated color contains
 @code{0x0f} as explained in the video optimizations section,
-@ref{NeXT Video Optimization}.  To translate incoming @sc{rgb}:555 data to
+@ref{MacOS/X Video Optimization}.  To translate incoming @sc{rgb}:555 data to
 @sc{rgba}:4444, @samp{NeXTFrameBuffer15} enumerates over each color value in
 the incoming image data, looks up its corresponding @sc{rgba}:4444 value in the
 translation table and outputs that color.  This technique is both simple and
 reasonably efficient.
 
-@node NeXT Dynamic Linking, NeXT Keymapping, NeXT Frame Buffer, NeXT Details
+@node MacOS/X Dynamic Linking, MacOS/X Keymapping, MacOS/X Frame Buffer, MacOS/X Details
 @subsubsection Dynamic Linking
 @cindex @sc{n}e@sc{xt} Dynamic Linking
 
@@ -726,7 +726,7 @@ time as is done with the NextStep port.  This approach has the advantage that
 symbolic debugging capability of plug-in modules is retained.
 @end itemize
 
-@node NeXT Keymapping, NeXT Notes, NeXT Dynamic Linking, NeXT Details
+@node MacOS/X Keymapping, MacOS/X Notes, MacOS/X Dynamic Linking, MacOS/X Details
 @subsubsection Key Mapping
 @cindex @sc{n}e@sc{xt} Key Mapping
 
@@ -766,7 +766,7 @@ for @samp{dumpkeymap} are available at
 @file{CS/libs/cssys/next/support/dumpkeymap}.  @samp{dumpkeymap} was written by
 Eric Sunshine, @email{sunshine@@sunshineco.com}.
 
-@node NeXT Notes, , NeXT Keymapping, NeXT Details
+@node MacOS/X Notes, , MacOS/X Keymapping, MacOS/X Details
 @subsubsection Final Notes
 @cindex @sc{n}e@sc{xt} Notes
 

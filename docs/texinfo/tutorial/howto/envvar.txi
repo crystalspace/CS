@@ -95,4 +95,4 @@ be launched from the Finder.  As with the @samp{CRYSTAL} environment variable,
 the @samp{CrystalSpaceRoot} default should point at the root of the Crystal
 Space directory hierarchy, such as @samp{/usr/local/CS}.  See the build
 instructions for MacOS/X for a more detailed description.
-@xref{NeXT Running Programs}.
+@xref{MacOS/X Running Programs}.
