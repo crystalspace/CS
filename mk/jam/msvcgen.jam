@@ -195,6 +195,8 @@ MSVCGEN_SILENT ?= no ;
 JAM ?= jam ;
 if $(MSVCGEN_SILENT) = yes { JAM += -d0 ; }
 
+JAM += -dx ;
+
 ## MsvcGenConfig variable : value
 ##   (See documentation above.)
 rule MsvcGenConfig1
@@ -306,6 +308,16 @@ RUN_MSVCGEN ?= $(PERL) $(MSVCGEN) ;
 # it would invalidate the following --strip-root option since TOP is a prefix
 # of MSVCGEN_BUILD_ROOT.
 MSVCGEN_STRIP_ROOT = $(MSVCGEN_BUILD_ROOT)/ $(TOP)/ ;
+
+# When generating the icon file .rc, we compose a 'sed' expression out of
+# MSVCGEN_BUILD_ROOT in order to ensure that the referenced icon paths are
+# correct. However, we must take care to protect characters in
+# MSVCGEN_BUILD_ROOT which have special meaning to 'sed'.  For instance, in
+# MSVCGEN_BUILD_ROOT, if $(TOP)/ is "./", then we want it to match a literal
+# period followed by a slash, not 'any character' followed by a slash, so it
+# must be transformed to "\./". (Presently we take the simple-minded approach
+# of protecting only "." since it arises frequently.)
+MSVCGEN_SED_PROTECT = "$(SED) 's:\\.:\\\\\\.:g'" ;
 
 MSVC_VERSION ?= 7 ;
 if $(MSVC_VERSION) = 6
@@ -770,7 +782,8 @@ actions together MergeResources
 # sed commands automatically.
 actions GenerateIconRc
 {
-  icon=`echo "$(>)" | sed ' s^$(MSVCGEN_STRIP_ROOT)^^; '`
+  sedexpr=`echo 's^$(MSVCGEN_STRIP_ROOT)^^;' | $(MSVCGEN_SED_PROTECT)`
+  icon=`echo "$(>)" | sed "$sedexpr"`
   echo "1 ICON \"$(RELPATH)$icon\"" > $(<)
 }
 

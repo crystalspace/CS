@@ -50,6 +50,13 @@ chronological order.
 	- res augmented the generated Win32 resources with a manifest.
 	- res replaced the SetLODDistance() and SetErrorTolerance() terrain
 	  options with the more flexible SetLODValue() mechanism.
+	- Eric Sunshine fixed bug in msvcgen.jam where tokens the 'sed'
+	  expression which transformed path references in the generated icon
+	  .rc file were not properly protected. For instance, if the generated
+	  'sed' expression was supposed to strip "$(TOP)/" from the emitted
+	  icon reference, and TOP was ".", then "./" would unexpectedly match
+	  any character followed by a slash, rather than matching a period
+	  followed by a slash (as intended).
 4-May-2004
 	- Eric Sunshine made the following changes to the build system:
 	    - Added ApplicationIconDefault and ApplicationIcon rules to
@@ -466,7 +473,7 @@ chronological order.
 	  x = [(A,B,C) * U + D ] / (A,B,C) * (U - V) and NOT got by
 	  x = [(A,B,C) * U + D ] / (A,B,C) * (V - U). Look to the comments in 
 	  the code for more clarifications. He also set some default values 
-	 (and documented it) for the output arguments.
+	  (and documented it) for the output arguments.
 	- res changed the walktest Make-/Jamfile to link against zlib (needed
 	  by the minidump code).
 25-Apr-2004
