@@ -204,6 +204,7 @@
 		  </force>
 		  <dampener>0.1</dampener>
 		  <mass>5</mass>
+		  <massvariation>2.5</massvariation>
 		  <pps>50</pps>
 		  <initial>0</initial>
 		  <gravity x="0" y="-1" z="0"/>

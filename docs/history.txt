@@ -16,6 +16,10 @@ chronological order.
 	  is useless. If application code needs to know if values are
 	  going to be deleted it can call GetSize() right before calling
 	  DeleteAll().
+	- John Harger comitted Daniel Duhprey's patch for particles, changing
+	  the internal update loop a bit. Also a few new features were added
+	  such as variable mass and improved start/stop features including
+	  an option to turn of autostarting.
 11-Jan-2004
 	- Jorrit fixed a compile error and some warnings in the new particles
 	  system.

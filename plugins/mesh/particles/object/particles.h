@@ -79,6 +79,7 @@ private:
 
   csRef<iGraphics3D> g3d;
   csRef<iShaderManager> shmgr;
+  csRef<iMaterialWrapper> material;
 
   csParticleEmitType emit_type;
   float emit_size_1;
@@ -95,7 +96,10 @@ private:
 
   float force_amount;
   float particle_mass;
+  float mass_variation;
   float dampener;
+
+  bool autostart;
 
   int particles_per_second;
   int initial_particles;
@@ -129,6 +133,8 @@ public:
   iBase* GetLogicalParent () const { return parent; }
   iObjectModel* GetObjectModel () { return 0; }
 
+  void SetMaterial (iMaterialWrapper *mat)
+  { material = mat; }
   void SetParticlesPerSecond (int count)
   { particles_per_second = count; }
   void SetInitialParticleCount (int count)
@@ -211,12 +217,20 @@ public:
   { return dampener; }
   void SetMass(float mass)
   { particle_mass = mass; }
+  void SetMassVariation (float variation)
+  { mass_variation = variation; }
   float GetMass()
   { return particle_mass; }
+  float GetMassVariation ()
+  { return mass_variation; }
+  void SetAutoStart (bool a)
+  { autostart = a; }
 
   struct eiParticlesFactoryState : public iParticlesFactoryState
   {
     SCF_DECLARE_EMBEDDED_IBASE (csParticlesFactory);
+    virtual void SetMaterial (iMaterialWrapper *material)
+    { scfParent->SetMaterial (material); }
     virtual void SetParticlesPerSecond (int count)
     { scfParent->SetParticlesPerSecond (count); }
     virtual void SetInitialParticleCount (int count)
@@ -268,8 +282,14 @@ public:
     { return scfParent->GetDampener (); }
     virtual void SetMass(float mass)
     { scfParent->SetMass (mass); }
+    virtual void SetMassVariation (float variation)
+    { scfParent->SetMassVariation (variation); }
     virtual float GetMass()
     { return scfParent->GetMass (); }
+    virtual void SetAutoStart (bool autostart)
+    { scfParent->SetAutoStart (autostart); }
+    virtual float GetMassVariation ()
+    { return scfParent->GetMassVariation (); }
   } scfiParticlesFactoryState;
   friend struct eiParticlesFactoryState;
 };
@@ -333,7 +353,10 @@ private:
   float time_variation;
 
   float particle_mass;
+  float mass_variation;
   float dampener;
+
+  bool autostart;
 
   float diffusion;
 
@@ -558,12 +581,17 @@ public:
   { return dampener; }
   void SetMass(float mass)
   { particle_mass = mass; }
+  void SetMassVariation (float variation)
+  { mass_variation = variation; }
+  float GetMassVariation ()
+  { return mass_variation; }
   float GetMass()
   { return particle_mass; }
+  void SetAutoStart (bool a)
+  { autostart = a; }
 
   void Start ();
-  void Stop ()
-  {}
+  void Stop ();
 
   bool Update (float elapsed_time);
 
@@ -656,8 +684,14 @@ public:
     { return scfParent->GetDampener (); }
     virtual void SetMass(float mass)
     { scfParent->SetMass (mass); }
+    virtual void SetMassVariation (float variation)
+    { scfParent->SetMassVariation (variation); }
     virtual float GetMass()
     { return scfParent->GetMass (); }
+    virtual float GetMassVariation ()
+    { return scfParent->GetMassVariation (); }
+    virtual void SetAutoStart (bool autostart)
+    { scfParent->SetAutoStart (autostart); }
     virtual void Start ()
     { scfParent->Start (); }
     virtual void Stop ()

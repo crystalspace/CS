@@ -34,6 +34,8 @@
 #include "csutil/refarr.h"
 #include "csutil/scf.h"
 
+#include "iengine/material.h"
+
 class csColor;
 
 /// Particle force falloff type
@@ -74,6 +76,7 @@ struct csParticlesData
   csVector3 position;
   csVector4 color;
   csVector3 velocity;
+  float mass;
   float time_to_live;
 };
 
@@ -196,10 +199,19 @@ struct iParticlesObjectState : public iBase
   virtual float GetDampener () = 0;
 
   /// Set the individual particle mass
-  virtual void SetMass(float mass) = 0;
+  virtual void SetMass (float mass) = 0;
+
+  /// Set the random variation in particle mass
+  virtual void SetMassVariation (float variation) = 0;
 
   /// Get the particle mass
-  virtual float GetMass() = 0;
+  virtual float GetMass () = 0;
+
+  /// Get the random variation in particle mass
+  virtual float GetMassVariation () = 0;
+
+  /// Set whether the emitter automatically starts (default: true)
+  virtual void SetAutoStart (bool autostart) = 0;
 
   /**
    * (Re)Start the particle emitter. This is automatically called when
@@ -222,6 +234,9 @@ SCF_VERSION (iParticlesFactoryState, 0, 0, 1);
 
 struct iParticlesFactoryState : public iBase
 {
+  /// Set the material to use for this particle factory
+  virtual void SetMaterial (iMaterialWrapper *material) = 0;
+
   /// Sets the particles to be emitted per second
   virtual void SetParticlesPerSecond (int count) = 0;
 
@@ -291,8 +306,17 @@ struct iParticlesFactoryState : public iBase
   /// Set the individual particle mass
   virtual void SetMass(float mass) = 0;
 
+  /// Set the random variation in particle mass
+  virtual void SetMassVariation (float variation) = 0;
+
   /// Get the particle mass
-  virtual float GetMass() = 0;
+  virtual float GetMass () = 0;
+
+  /// Get the random variation in particle mass
+  virtual float GetMassVariation () = 0;
+
+  /// Set whether the emitter automatically starts (default: true)
+  virtual void SetAutoStart (bool autostart) = 0;
 };
 
 

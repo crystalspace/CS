@@ -65,7 +65,9 @@ enum
   XMLTOKEN_GRADIENT,
   XMLTOKEN_RADIUS,
   XMLTOKEN_DAMPENER,
-  XMLTOKEN_MASS
+  XMLTOKEN_MASS,
+  XMLTOKEN_MASSVARIATION,
+  XMLTOKEN_AUTOSTART
 };
 
 SCF_IMPLEMENT_IBASE (csParticlesFactoryLoader)
@@ -98,6 +100,7 @@ bool csParticlesFactoryLoader::Initialize (iObjectRegistry* objreg)
 
   xmltokens.Register ("color", XMLTOKEN_COLOR);
   xmltokens.Register ("emitter", XMLTOKEN_EMITTER);
+  xmltokens.Register ("material", XMLTOKEN_MATERIAL);
   xmltokens.Register ("innerradius", XMLTOKEN_INNER_RADIUS);
   xmltokens.Register ("outerradius", XMLTOKEN_OUTER_RADIUS);
   xmltokens.Register ("size", XMLTOKEN_SIZE);
@@ -120,6 +123,8 @@ bool csParticlesFactoryLoader::Initialize (iObjectRegistry* objreg)
   xmltokens.Register ("radius", XMLTOKEN_RADIUS);
   xmltokens.Register ("dampener", XMLTOKEN_DAMPENER);
   xmltokens.Register ("mass", XMLTOKEN_MASS);
+  xmltokens.Register ("massvariation", XMLTOKEN_MASSVARIATION);
+  xmltokens.Register ("autostart", XMLTOKEN_AUTOSTART);
   return true;
 }
 
@@ -171,6 +176,19 @@ csPtr<iBase> csParticlesFactoryLoader::Parse (iDocumentNode* node,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
+      case XMLTOKEN_MATERIAL:
+      {
+        const char* matname = child->GetContentsValue ();
+        iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+        if (!mat)
+        {
+          synldr->ReportError ("crystalspace.ballloader.parse.unknownmaterial",
+	    child, "Couldn't find material '%s'!", matname);
+          return 0;
+        }
+        state->SetMaterial (mat);
+        break;
+      }
       case XMLTOKEN_EMITTER:
         ParseEmitter (child, state);
         break;
@@ -208,6 +226,16 @@ csPtr<iBase> csParticlesFactoryLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_MASS:
         state->SetMass (child->GetContentsValueAsFloat ());
         break;
+      case XMLTOKEN_MASSVARIATION:
+        state->SetMassVariation (child->GetContentsValueAsFloat ());
+        break;
+      case XMLTOKEN_AUTOSTART:
+      {
+        const char *autostart = child->GetContentsValue ();
+        if(!strcmp(autostart, "false")) state->SetAutoStart (false);
+        else state->SetAutoStart (true);
+        break;
+      }
       case XMLTOKEN_DAMPENER:
         state->SetDampener (child->GetContentsValueAsFloat ());
         break;
@@ -530,6 +558,8 @@ bool csParticlesObjectLoader::Initialize (iObjectRegistry* objreg)
   xmltokens.Register ("radius", XMLTOKEN_RADIUS);
   xmltokens.Register ("dampener", XMLTOKEN_DAMPENER);
   xmltokens.Register ("mass", XMLTOKEN_MASS);
+  xmltokens.Register ("massvariation", XMLTOKEN_MASSVARIATION);
+  xmltokens.Register ("autostart", XMLTOKEN_AUTOSTART);
   return true;
 }
 
@@ -619,6 +649,21 @@ csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_MASS:
         state->SetMass (child->GetContentsValueAsFloat ());
         break;
+      case XMLTOKEN_MASSVARIATION:
+        state->SetMassVariation (child->GetContentsValueAsFloat ());
+        break;
+      case XMLTOKEN_AUTOSTART:
+      {
+        const char *autostart = child->GetContentsValue ();
+        if(!strcmp(autostart, "no")) state->SetAutoStart (false);
+        else if(!strcmp(autostart, "yes")) state->SetAutoStart (true);
+        else 
+        {
+          synldr->ReportError ("crystalspace.particles.object.loader",
+            child, "Unknown autostart parameter '%s'!", autostart);
+        }
+        break;
+      }
       case XMLTOKEN_DAMPENER:
         state->SetDampener (child->GetContentsValueAsFloat ());
         break;
@@ -633,11 +678,11 @@ csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
           return false;
         }
         if (!strcmp (str, "constant"))
-	  heat = CS_PART_HEAT_CONSTANT;
+	        heat = CS_PART_HEAT_CONSTANT;
         else if (!strcmp (str, "time_linear"))
-	  heat = CS_PART_HEAT_TIME_LINEAR;
+	        heat = CS_PART_HEAT_TIME_LINEAR;
         else if (!strcmp (str, "speed"))
-	  heat = CS_PART_HEAT_SPEED;
+	        heat = CS_PART_HEAT_SPEED;
         else
         {
           synldr->ReportError ("crystalspace.particles.object.loader",

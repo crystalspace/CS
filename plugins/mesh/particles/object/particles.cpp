@@ -120,7 +120,10 @@ csParticlesFactory::csParticlesFactory (csParticlesType* p,
 
   particle_radius = 0.05f;
   particle_mass = 1.0f;
+  mass_variation = 0.0f;
   dampener = 0.01f;
+
+  autostart = true;
 
   heat_function = CS_PART_HEAT_SPEED;
 
@@ -176,6 +179,8 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
   radius_name = strings->Request ("point radius");
   scale_name = strings->Request ("point scale");
 
+  matwrap = p->material;
+
   camera_fov = -1;
 
   emit_type = p->emit_type;
@@ -193,6 +198,7 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
 
   force_amount = p->force_amount;
   particle_mass = p->particle_mass;
+  mass_variation = p->mass_variation;
   dampener = p->dampener;
 
   particles_per_second = p->particles_per_second;
@@ -206,6 +212,8 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
   time_variation = p->time_variation;
 
   diffusion = p->diffusion;
+
+  autostart = p->autostart;
 
   particle_radius = p->particle_radius;
 
@@ -239,7 +247,7 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
 
   LoadPhysicsPlugin ("crystalspace.particles.physics.simple");
 
-  Start();
+  if(autostart) Start();
 }
 
 csParticlesObject::~csParticlesObject ()
@@ -557,26 +565,37 @@ void csParticlesObject::GetRadius(csVector3 &rad, csVector3 &c)
 
 void csParticlesObject::Start ()
 {
-  int start_size = 1000;
-  if (initial_particles > start_size) start_size = initial_particles;
-
-  buffer_length = 0;
-
-  point_data.SetLength (start_size);
-  for (int i = 0; i < start_size; i++)
+  if(point_data.Length () < 1)
   {
-    csParticlesData &p = point_data.Get (i);
-    p.position.z = FLT_MAX;
-    p.color.w = 0.0f;
-    p.time_to_live = -1.0f;
+    int start_size = 1000;
+    if (initial_particles > start_size) start_size = initial_particles;
+
+    buffer_length = 0;
+
+    point_data.SetLength (start_size);
+    for (int i = 0; i < start_size; i++)
+    {
+      csParticlesData &p = point_data.Get (i);
+      p.position.z = FLT_MAX;
+      p.color.w = 0.0f;
+      p.time_to_live = -1.0f;
+    }
+    dead_particles = start_size;
   }
 
   new_particles = (float)initial_particles;
   total_elapsed_time = 0.0f;
 }
 
+void csParticlesObject::Stop ()
+{
+  total_elapsed_time = emit_time + 50.0f;
+  new_particles = 0.0f;
+}
+
 bool csParticlesObject::Update (float elapsed_time)
 {
+  if (elapsed_time <= 0.0) return true;
   float new_radius = 0.0f;
 
   if (total_elapsed_time < emit_time)
@@ -585,56 +604,76 @@ bool csParticlesObject::Update (float elapsed_time)
     new_particles += elapsed_time * (float)particles_per_second;
   }
 
-  dead_particles = 0;
-
-  for (int i = 0; i < point_data.Length(); i++)
+  if(dead_particles-new_particles >= point_data.Length())
   {
-    csParticlesData &point = point_data[i];
+    return true;
+  }
 
-    if (point.time_to_live < 0.0f)
+  if ((dead_particles-new_particles) < point_data.Length () * 0.30f)
+  {
+    int oldlen = point_data.Length ();
+    int newlen = (oldlen > (int)new_particles) ? oldlen << 1 : (int)new_particles << 1;
+    point_data.SetLength (newlen);
+    dead_particles += point_data.Length() - oldlen;
+    for(int i=oldlen;i<point_data.Length ();i++) {
+      csParticlesData &p = point_data.Get (i);
+      p.position.z = FLT_MAX;
+      p.color.w = 0.0f;
+      p.time_to_live = -1.0f;
+    }
+  }
+  else if (dead_particles > point_data.Length () * 0.70f && 
+           point_data.Length() > 1)
     {
-      if (new_particles >= 1.0f)
-      {
-        // Emission
-        csVector3 start;
+    int oldlen = point_data.Length();
+    point_data.Truncate ((point_data.Length () >> 1));
+    dead_particles -= oldlen - point_data.Length();
+  }
 
-        switch (emit_type)
-        {
-        case CS_PART_EMIT_SPHERE:
-          start = csVector3((rng.Get() - 0.5) * 2,(rng.Get() - 0.5) * 2,
-	    (rng.Get() - 0.5) * 2);
-          start.Normalize ();
-          start = emitter + (start * ((rng.Get() *
-	    (emit_size_1 - emit_size_2)) + emit_size_2));
-          break;
-        case CS_PART_EMIT_PLANE:
-          break;
-        case CS_PART_EMIT_BOX:
-          break;
-        }
+  int i;
+  int dead_offset = point_data.Length() - dead_particles;
+  for (i = 0; i < (int)new_particles; i++)
+  {
+    csParticlesData &point = point_data[i + dead_offset];
+    // Emission
+    csVector3 start;
 
-        point.position = start;
-        point.color = csVector4 (0.0f, 0.0f, 0.0f, 0.0f);
-        point.velocity = csVector3 (0.0f, 0.0f, 0.0f);
-        point.time_to_live = time_to_live + (time_variation * rng.Get());
-
-        new_particles -= 1.0f;
-      }
-      else
-      {
-        // Deletion :(
-        point.color.x = 0.0f;
-        point.color.y = 0.0f;
-        point.color.z = 0.0f;
-        point.color.w = 0.0f;
-        point.position.z = FLT_MAX;
-        dead_particles ++;
-        continue;
-      }
+    switch (emit_type)
+    {
+    case CS_PART_EMIT_SPHERE:
+      start = csVector3((rng.Get() - 0.5) * 2,(rng.Get() - 0.5) * 2,(rng.Get() - 0.5) * 2);
+      start.Normalize ();
+      start = emitter + (start * ((rng.Get() * (emit_size_1 - emit_size_2)) + emit_size_2));
+      break;
+    case CS_PART_EMIT_PLANE:
+      break;
+    case CS_PART_EMIT_BOX:
+      break;
     }
 
+    point.position = start;
+    point.color = csVector4 (0.0f, 0.0f, 0.0f, 0.0f);
+    point.velocity = csVector3 (0.0f, 0.0f, 0.0f);
+    point.time_to_live = time_to_live + (time_variation * rng.Get());
+    point.mass = particle_mass + (rng.Get() * mass_variation);
+  }
+  dead_offset += (int)new_particles;
+  dead_particles -= (int)new_particles;
+  new_particles -= (int)new_particles;
+  for (i = 0; i < dead_offset; i++)
+  {
+    csParticlesData &point = point_data[i];
+    
     // Time until death
     point.time_to_live -= elapsed_time;
+    if (point.time_to_live < 0.0f)
+    {
+      // Deletion :(
+      point.color.w = 0.0f;
+      point.position.z = FLT_MAX;
+      dead_particles ++;
+      continue;
+    }
 
     float heat = 1.0f;
     switch (heat_function)
@@ -692,26 +731,7 @@ bool csParticlesObject::Update (float elapsed_time)
       new_radius = dist_vect.SquaredNorm();
   }
   point_data.Sort (ZSort);
-
-  if (dead_particles > (int)((float)point_data.Length () * 0.70f))
-  {
-    point_data.Truncate ((point_data.Length () >> 1));
-  }
-  else if (dead_particles < (int)((float)point_data.Length () * 0.30f))
-  {
-    int oldlen = point_data.Length ();
-    point_data.SetLength ((oldlen << 1));
-    for (int i = oldlen; i < point_data.Length(); i++)
-    {
-      csParticlesData &p = point_data.Get (i);
-      p.position.z = FLT_MAX;
-      p.color.w = 0.0f;
-      p.time_to_live = -1.0f;
-    }
-  }
-
   radius = qsqrt(new_radius);
-
   return true;
 }
 

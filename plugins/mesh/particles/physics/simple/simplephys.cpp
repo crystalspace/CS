@@ -180,7 +180,7 @@ void csParticlesPhysicsSimple::StepPhysics (float elapsed_time,
 
     part.velocity += dir * (((particles->GetForce() * falloff -
       fabs(part.velocity.Norm()) * particles->GetDampener ()) /
-      particles->GetMass ()) * elapsed_time) + gravity * elapsed_time;
+      part.mass) * elapsed_time) + gravity * elapsed_time;
     part.position += part.velocity * elapsed_time;
   }
 }
