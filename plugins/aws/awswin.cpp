@@ -691,6 +691,7 @@ awsWindow::OnDraw(csRect clip)
   {  
      view->SetRectangle(Frame().xmin, g3d->GetHeight()-Frame().Height()-Frame().ymin, Frame().Width(), Frame().Height());
      view->GetCamera()->SetPerspectiveCenter(Frame().xmin+(Frame().Width()>>1), (g3d->GetHeight()-Frame().Height()-Frame().ymin)+(Frame().Height()>>1));
+     view->GetCamera()->SetFOV(view->GetCamera()->GetFOV(), Frame().Width());
   }
   
   // Get the size of the text
