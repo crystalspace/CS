@@ -46,21 +46,34 @@ public:
   virtual ~csRegion ();
 
   /**
-   * Add an object to this region.
-   */
-  void AddToRegion (iObject* obj);
-
-  /**
-   * Release an object from this region.
-   */
-  void ReleaseFromRegion (iObject* obj);
-
-  /**
    * Check if some object is in this region.
    * The speed of this function is independent of the number of
    * objects in this region (i.e. very fast).
    */
   virtual bool IsInRegion (iObject* obj);
+
+  /**
+   * Delete all entities in this region.
+   */
+  virtual void DeleteAll ();
+
+  /**
+   * Prepare all textures and materials in this region.
+   */
+  virtual bool PrepareTextures ();
+
+  /**
+   * Do lighting calculations (or read from cache).
+   */
+  virtual bool ShineLights ();
+
+  /**
+   * Prepare all objects in this region. This has to be called
+   * directly after loading new objects.
+   * This function is equivalent to calling PrepareTextures(),
+   * followed by ShineLights().
+   */
+  virtual bool Prepare ();
 
   SCF_DECLARE_IBASE_EXT (csObject);
 
@@ -69,14 +82,8 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csRegion);
 
-    /// @@@ Ugly
-    virtual void* GetPrivateObject () { return (void*)scfParent; }
-
     /// Query the iObject.
-    virtual iObject *QueryObject()
-    {
-      return scfParent;
-    }
+    virtual iObject *QueryObject();
 
     /**
      * Clear this region without removing the entities in it. The entities

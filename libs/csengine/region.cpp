@@ -55,19 +55,14 @@ csRegion::~csRegion ()
   scfiRegion.Clear ();
 }
 
-void csRegion::Region::Clear ()
-{
-  scfParent->ObjRemoveAll ();
-}
-
-void csRegion::Region::DeleteAll ()
+void csRegion::DeleteAll ()
 {
   iObjectIterator *iter;
 
   // First we need to copy the objects to a csVector to avoid
   // messing up the iterator while we are deleting them.
   csObjectVectorNodelete copy;
-  for (iter = scfParent->GetIterator ();
+  for (iter = GetIterator ();
   	!iter->IsFinished () ; iter->Next ())
   {
     iObject* o = iter->GetObject ();
@@ -90,8 +85,8 @@ void csRegion::Region::DeleteAll ()
       iCollection* o = SCF_QUERY_INTERFACE_FAST (obj, iCollection);
       if (!o) continue;
 
-      scfParent->engine->GetCollections ()->Remove (o);
-      scfParent->ObjRemove (obj);
+      engine->GetCollections ()->Remove (o);
+      ObjRemove (obj);
       copy[i] = NULL;
       o->DecRef ();
     }
@@ -103,8 +98,8 @@ void csRegion::Region::DeleteAll ()
       iMeshWrapper* o = SCF_QUERY_INTERFACE_FAST (obj, iMeshWrapper);
       if (!o) continue;
 
-      scfParent->engine->GetMeshes ()->Remove (o);
-      scfParent->ObjRemove (obj);
+      engine->GetMeshes ()->Remove (o);
+      ObjRemove (obj);
       copy[i] = NULL;
       o->DecRef ();
     }
@@ -116,8 +111,8 @@ void csRegion::Region::DeleteAll ()
       iMeshFactoryWrapper* o = SCF_QUERY_INTERFACE_FAST (obj, iMeshFactoryWrapper);
       if (!o) continue;
 
-      scfParent->engine->GetMeshFactories ()->Remove (o);
-      scfParent->ObjRemove (obj);
+      engine->GetMeshFactories ()->Remove (o);
+      ObjRemove (obj);
       copy[i] = NULL;
       o->DecRef ();
     }
@@ -130,8 +125,8 @@ void csRegion::Region::DeleteAll ()
       if (!o) continue;
 
       o->GetPrivateObject ()->CleanupReferences ();
-      scfParent->engine->GetSectors ()->Remove (o);
-      scfParent->ObjRemove (obj);
+      engine->GetSectors ()->Remove (o);
+      ObjRemove (obj);
       copy[i] = NULL;
       o->DecRef ();
     }
@@ -143,8 +138,8 @@ void csRegion::Region::DeleteAll ()
       iMaterialWrapper* o = SCF_QUERY_INTERFACE_FAST (obj, iMaterialWrapper);
       if (!o) continue;
 
-      scfParent->engine->GetMaterialList ()->Remove (o);
-      scfParent->ObjRemove (obj);
+      engine->GetMaterialList ()->Remove (o);
+      ObjRemove (obj);
       copy[i] = NULL;
       o->DecRef ();
     }
@@ -156,8 +151,8 @@ void csRegion::Region::DeleteAll ()
       iTextureWrapper* o = SCF_QUERY_INTERFACE_FAST (obj, iTextureWrapper);
       if (!o) continue;
 
-      scfParent->engine->GetTextureList ()->Remove (o);
-      scfParent->ObjRemove (obj);
+      engine->GetTextureList ()->Remove (o);
+      ObjRemove (obj);
       copy[i] = NULL;
       o->DecRef ();
     }
@@ -169,8 +164,8 @@ void csRegion::Region::DeleteAll ()
       iCameraPosition* o = SCF_QUERY_INTERFACE_FAST (obj, iCameraPosition);
       if (!o) continue;
 
-      scfParent->engine->GetCameraPositions ()->Remove (o);
-      scfParent->ObjRemove (obj);
+      engine->GetCameraPositions ()->Remove (o);
+      ObjRemove (obj);
       copy[i] = NULL;
       o->DecRef ();
     }
@@ -181,7 +176,7 @@ void csRegion::Region::DeleteAll ()
       iObject* obj = copy[i];
       iCurveTemplate* o = SCF_QUERY_INTERFACE_FAST (obj, iCurveTemplate);
       if (!o) continue;
-      scfParent->ObjRemove (obj);
+      ObjRemove (obj);
       copy[i] = NULL;
       o->DecRef ();
     }
@@ -192,7 +187,7 @@ void csRegion::Region::DeleteAll ()
       iObject* obj = copy[i];
       iPolyTxtPlane* o = SCF_QUERY_INTERFACE_FAST (obj, iPolyTxtPlane);
       if (!o) continue;
-      scfParent->ObjRemove (obj);
+      ObjRemove (obj);
       copy[i] = NULL;
       o->DecRef ();
     }
@@ -213,7 +208,7 @@ Object name is '%s'",
 #endif // CS_DEBUG
 }
 
-bool csRegion::Region::PrepareTextures ()
+bool csRegion::PrepareTextures ()
 {
   iObjectIterator *iter;
   iTextureManager* txtmgr = csEngine::current_engine->G3D->GetTextureManager();
@@ -221,7 +216,7 @@ bool csRegion::Region::PrepareTextures ()
 
   // First register all textures to the texture manager.
   {
-    for (iter = scfParent->GetIterator ();
+    for (iter = GetIterator ();
   	!iter->IsFinished () ; iter->Next())
     {
       iTextureWrapper* csth =
@@ -239,7 +234,7 @@ bool csRegion::Region::PrepareTextures ()
   // Prepare all the textures.
   //@@@ Only prepare new textures: txtmgr->PrepareTextures ();
   {
-    for (iter = scfParent->GetIterator ();
+    for (iter = GetIterator ();
   	!iter->IsFinished () ; iter->Next())
     {
       iTextureWrapper* csth =
@@ -255,7 +250,7 @@ bool csRegion::Region::PrepareTextures ()
 
   // Then register all materials to the texture manager.
   {
-    for (iter = scfParent->GetIterator ();
+    for (iter = GetIterator ();
   	!iter->IsFinished () ; iter->Next())
     {
       iMaterialWrapper* csmh =
@@ -273,7 +268,7 @@ bool csRegion::Region::PrepareTextures ()
   // Prepare all the materials.
   //@@@ Only prepare new materials: txtmgr->PrepareMaterials ();
   {
-    for (iter = scfParent->GetIterator ();
+    for (iter = GetIterator ();
   	!iter->IsFinished () ; iter->Next())
     {
       iMaterialWrapper* csmh =
@@ -290,29 +285,32 @@ bool csRegion::Region::PrepareTextures ()
   return true;
 }
 
-bool csRegion::Region::ShineLights ()
+bool csRegion::ShineLights ()
 {
-  scfParent->engine->ShineLights (this);
+  engine->ShineLights (&scfiRegion);
   return true;
 }
 
-bool csRegion::Region::Prepare ()
+bool csRegion::Prepare ()
 {
   if (!PrepareTextures ()) return false;
   if (!ShineLights ()) return false;
   return true;
 }
 
-void csRegion::AddToRegion (iObject* obj)
-{
-  ObjAdd (obj);
-}
-
-void csRegion::ReleaseFromRegion (iObject* obj)
-{
-  ObjRemove (obj);
-}
-
+iObject *csRegion::Region::QueryObject()
+  { return scfParent; }
+void csRegion::Region::Clear ()
+  { scfParent->ObjRemoveAll (); }
+void csRegion::Region::DeleteAll ()
+  { scfParent->DeleteAll (); }
+bool csRegion::Region::PrepareTextures ()
+  { return scfParent->PrepareTextures (); }
+bool csRegion::Region::ShineLights ()
+  { return scfParent->ShineLights (); }
+bool csRegion::Region::Prepare ()
+  { return scfParent->Prepare (); }
+ 
 iSector* csRegion::Region::FindSector (const char *iName)
 {
   return CS_GET_NAMED_CHILD_OBJECT_FAST(scfParent, iSector, iName);

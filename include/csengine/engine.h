@@ -107,7 +107,7 @@ private:
   // The engine for this iterator.
   csEngine* engine;
   // The region we are iterating in (optional).
-  csRegion* region;
+  iRegion* region;
   // Current sector index.
   int sector_idx;
   // Current light index.
@@ -118,7 +118,7 @@ private:
 
 public:
   /// Construct an iterator and initialize to start.
-  csLightIt (csEngine*, csRegion* region = NULL);
+  csLightIt (csEngine*, iRegion* region = NULL);
 
   /// Restart iterator.
   void Restart ();
@@ -422,7 +422,7 @@ public:
   /// Maximum texture aspect ratio
   int MaxAspectRatio;
   /// A pointer to the current region.
-  csRegion* region;
+  iRegion* region;
   /// The list of all regions currently loaded.
   csNamedObjVector regions;
 
@@ -925,20 +925,11 @@ public:
   /**
    * Create an iterator to iterate over all static lights of the engine.
    */
-  csLightIt* NewLightIterator (csRegion* region = NULL)
+  csLightIt* NewLightIterator (iRegion* region = NULL)
   {
     csLightIt* it;
     it = new csLightIt (this, region);
     return it;
-  }
-
-  /**
-   * Get a reference to the current region (or NULL if the default main
-   * region is selected).
-   */
-  csRegion* GetCsCurrentRegion () const
-  {
-    return region;
   }
 
   /**

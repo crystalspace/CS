@@ -233,7 +233,7 @@ void csEngineMeshList::RemoveMesh (iMeshWrapper* mesh)
 
 //---------------------------------------------------------------------------
 
-csLightIt::csLightIt (csEngine* e, csRegion* r) : engine (e), region (r)
+csLightIt::csLightIt (csEngine* e, iRegion* r) : engine (e), region (r)
 {
   Restart ();
 }
@@ -1094,9 +1094,7 @@ void csEngine::ShineLights (iRegion* iregion, iProgressMeter* meter)
     csSector::cfg_reflections = 1;
   }
 
-  csRegion* region = NULL;
-  if (iregion) region = (csRegion*)(iregion->GetPrivateObject ());
-  csLightIt* lit = NewLightIterator (region);
+  csLightIt* lit = NewLightIterator (iregion);
 
   // Count number of lights to process.
   csLight* l;
@@ -1707,24 +1705,25 @@ void csEngine::SelectRegion (const char *iName)
     return;
   }
 
-  region = (csRegion*)regions.FindByName (iName);
+  region = &((csRegion*)regions.FindByName (iName))->scfiRegion;
   if (!region)
   {
-    region = new csRegion (this);
-    region->SetName (iName);
-    regions.Push (region);
+    csRegion *r = new csRegion (this);
+    region = &r->scfiRegion;
+    r->SetName (iName);
+    regions.Push (r);
   }
 }
 
 void csEngine::SelectRegion (iRegion* region)
 {
   if (!region) { csEngine::region = NULL; return; }
-  csEngine::region = (csRegion*)(region->GetPrivateObject ());
+  csEngine::region = region;
 }
 
 iRegion* csEngine::GetCurrentRegion () const
 {
-  return region ? &region->scfiRegion : NULL;
+  return region;
 }
 
 iRegion* csEngine::FindRegion (const char *name) const
@@ -1737,7 +1736,7 @@ void csEngine::AddToCurrentRegion (csObject* obj)
 {
   if (region)
   {
-    region->AddToRegion (obj);
+    region->QueryObject ()->ObjAdd (obj);
   }
 }
 
