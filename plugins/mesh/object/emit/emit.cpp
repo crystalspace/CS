@@ -796,7 +796,7 @@ void csEmitMeshObject::GetAgingMoment(int i, int& time, csColor& color,
 {
   int n = 0;
   if(i >= nr_aging_els) return;
-  csEmitAge *p;
+  csEmitAge *p = aging;
   while(n < i)
   {
     n++;
