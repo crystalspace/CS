@@ -109,7 +109,8 @@ LFLAGS.profile=-pg
 DFLAGS.optimize = -s
 
 # Flags for linking DLLs in debug mode
-DFLAGS.debug = -Xlinker --export-all-symbols
+DFLAGS.debug = 
+#DFLAGS.debug = -Xlinker --export-all-symbols
 
 # Flags for the linker which are used when building a shared library.
 LFLAGS.DLL=$(DFLAGS.$(MODE)) -shared
@@ -150,12 +151,16 @@ endif
 SYS_SED_DEPEND=-e "s/\.ob*j*\:/\$$O:/g"
 
 # Flags for linking a GUI and a console executable
-LFLAGS.EXE=-mwindows
+ifeq ($(MODE),debug)
+  LFLAGS.EXE=-mconsole
+else
+  LFLAGS.EXE=-mwindows
+endif
 # commenting out the following line will make the -noconsole option work
 # but the only way to redirect output will be WITH -noconsole (wacky :-)
 # and the console will not start minimized if a shortcut says it should
-LFLAGS.EXE+=-mconsole
-LFLAGS.CONSOLE.EXE=
+#LFLAGS.EXE+=-mconsole
+LFLAGS.CONSOLE.EXE=-mconsole
 
 # Use makedep to build dependencies
 DEPEND_TOOL=mkdep
@@ -204,7 +209,7 @@ DO.SHARED.PLUGIN.CORE = \
 # Commenting out the following line will make the -noconsole option work
 # but the only way to redirect output will be WITH -noconsole (wacky :-)
 # and the console will not start minimized if a shortcut says it should
-DO.SHARED.PLUGIN.CORE += -mconsole
+#DO.SHARED.PLUGIN.CORE += -mconsole
 
 DO.LINK.EXE = \
   $(MAKEVERSIONINFO) $(OUT)/$(@:$(EXE)=-version.rc) \
@@ -216,7 +221,15 @@ DO.LINK.EXE = \
   $(LINK) $(LFLAGS) $(LFLAGS.EXE) $(LFLAGS.@) $(^^) \
     $(OUT)/$(@:$(EXE)=-rsrc.o) $(L^) $(LIBS) $(LIBS.EXE.PLATFORM)
 
-DO.LINK.CONSOLE.EXE = $(DO.LINK.EXE)
+DO.LINK.CONSOLE.EXE = \
+  $(MAKEVERSIONINFO) $(OUT)/$(@:$(EXE)=-version.rc) \
+    "$(DESCRIPTION.$*)" $(COMMAND_DELIM) \
+  $(MERGERES) $(OUT)/$(@:$(EXE)=-rsrc.rc) ./ \
+    $(OUT)/$(@:$(EXE)=-version.rc) $($@.WINRSRC) $(COMMAND_DELIM) \
+  $(COMPILE_RES) -i $(OUT)/$(@:$(EXE)=-rsrc.rc) \
+    -o $(OUT)/$(@:$(EXE)=-rsrc.o) $(COMMAND_DELIM) \
+  $(LINK) $(LFLAGS) $(LFLAGS.CONSOLE.EXE) $(LFLAGS.@) $(^^) \
+    $(OUT)/$(@:$(EXE)=-rsrc.o) $(L^) $(LIBS) $(LIBS.EXE.PLATFORM)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

@@ -1527,11 +1527,11 @@ void csGraphics3DOGLCommon::DrawTriangleMeshEdges (G3DTriangleMesh& mesh)
   csVector3* f1 = mesh.buffers[0]->GetVertices ();
   csVector3* work_verts;
 
-  if (num_vertices > tr_verts->Limit ())
+  if (num_vertices > tr_verts->Length ())
   {
-    tr_verts->SetLimit (num_vertices);
-    uv_verts->SetLimit (num_vertices);
-    color_verts->SetLimit (num_vertices);
+    tr_verts->SetLength (num_vertices);
+    uv_verts->SetLength (num_vertices);
+    color_verts->SetLength (num_vertices);
   }
 
   if (mesh.num_vertices_pool > 1)
@@ -2953,22 +2953,22 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
 
   // Make sure our worktables are big enough for the clipped mesh.
   int num_tri = num_triangles*2+50;
-  if (num_tri > clipped_triangles->Limit ())
+  if (num_tri > clipped_triangles->Length ())
   {
     // Use two times as many triangles. Hopefully this is enough.
-    clipped_triangles->SetLimit (num_tri);
+    clipped_triangles->SetLength (num_tri);
   }
-  if (num_vertices > clipped_translate->Limit ())
-    clipped_translate->SetLimit (num_vertices); // Used for original vertices.
+  if (num_vertices > clipped_translate->Length ())
+    clipped_translate->SetLength (num_vertices); // Used for original vertices.
   int num_vts = num_vertices*2+100;
-  if (num_vts > clipped_vertices->Limit ())
+  if (num_vts > clipped_vertices->Length ())
   {
-    clipped_vertices->SetLimit (num_vts);
-    clipped_texels->SetLimit (num_vts);
-    clipped_colors->SetLimit (num_vts);
-    clipped_fog->SetLimit (num_vts);
+    clipped_vertices->SetLength (num_vts);
+    clipped_texels->SetLength (num_vts);
+    clipped_colors->SetLength (num_vts);
+    clipped_fog->SetLength (num_vts);
     for( i=0; i<CS_VBUF_TOTAL_USERA; i++ )
-      clipped_user[i]->SetLimit (num_vts);
+      clipped_user[i]->SetLength (num_vts);
   }
 
   num_clipped_triangles = 0;
@@ -3791,11 +3791,11 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
   //===========
   // Update work tables.
   //===========
-  if (num_vertices > tr_verts->Limit ())
+  if (num_vertices > tr_verts->Length ())
   {
-    tr_verts->SetLimit (num_vertices);
-    uv_verts->SetLimit (num_vertices);
-    color_verts->SetLimit (num_vertices);
+    tr_verts->SetLength (num_vertices);
+    uv_verts->SetLength (num_vertices);
+    color_verts->SetLength (num_vertices);
   }
 
   //===========
@@ -4360,11 +4360,11 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh)
   // Update work tables.
   //===========
   int num_triangles = mesh.num_triangles;
-  if (num_vertices > tr_verts->Limit ())
+  if (num_vertices > tr_verts->Length ())
   {
-    tr_verts->SetLimit (num_vertices);
-    uv_verts->SetLimit (num_vertices);
-    color_verts->SetLimit (num_vertices);
+    tr_verts->SetLength (num_vertices);
+    uv_verts->SetLength (num_vertices);
+    color_verts->SetLength (num_vertices);
   }
 
   //===========
@@ -4396,8 +4396,8 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh)
       if (mesh.do_morph_colors)
       {
         (*color_verts)[i].red = tr * col2[i].red + remainder * col1[i].red;
-  (*color_verts)[i].green = tr * col2[i].green + remainder * col1[i].green;
-  (*color_verts)[i].blue = tr * col2[i].blue + remainder * col1[i].blue;
+	(*color_verts)[i].green = tr * col2[i].green + remainder * col1[i].green;
+	(*color_verts)[i].blue = tr * col2[i].blue + remainder * col1[i].blue;
       }
     }
     work_verts = tr_verts->GetArray ();
@@ -4636,8 +4636,8 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh)
     // special hack for transparent meshes
     if (mesh.mixmode & CS_FX_ALPHA)
     {
-      if ((num_vertices*4) > rgba_verts->Limit ())
-        rgba_verts->SetLimit (num_vertices*4);
+      if ((num_vertices*4) > rgba_verts->Length ())
+        rgba_verts->SetLength (num_vertices*4);
       if (do_multiply_color)
       {
         for (k=0, i=0; i<num_vertices; i++)
@@ -4675,8 +4675,8 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh)
       else
       {
         csColor* old = work_colors;
-	if (num_vertices > color_verts->Limit())
-	  color_verts->SetLimit(num_vertices);
+	if (num_vertices > color_verts->Length())
+	  color_verts->SetLength(num_vertices);
 	work_colors = color_verts->GetArray ();
 	for (i = 0 ; i < num_vertices ; i++)
 	{
@@ -4725,8 +4725,8 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh)
   {
     statecache->SetShadeModel (GL_FLAT);
     SetClientStates (CS_CLIENTSTATE_VT);
-    if (num_vertices > uv_mul_verts->Limit ())
-      uv_mul_verts->SetLimit (num_vertices);
+    if (num_vertices > uv_mul_verts->Length ())
+      uv_mul_verts->SetLength (num_vertices);
 
     int j;
     for (j = 0 ; j < mat->GetTextureLayerCount () ; j++)
