@@ -258,6 +258,7 @@ void csChunkLodTerrainFactory::SetSamplerRegion (
   float error = pow (2.0, max_error);*/
   float error = datamap[(hm_x*hm_y)>>1].error/16;
   root = new MeshTreeNode (this, 0, 0, hm_x, hm_y, error);
+  fullsample->Cleanup ();
 }
 
 const csBox2& csChunkLodTerrainFactory::GetSamplerRegion ()

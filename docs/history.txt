@@ -18,6 +18,8 @@ chronological order.
 	  in wkstypical).  Anyhow, experimental modules ought probably populate
 	  a wksexperimental workspace, which would be much less confusing for
 	  non-manual-reading users.
+	- Jorrit fixed chunklod terrain engine so it calls Cleanup() on the
+	  terraformer sampler after using it. This cleans up a lot of memory.
 24-May-2004
 	- Jorrit added a proper copy constructor to csHashMapReversible.
 	  Without that copy constructor doing a copy of such a hashmap
