@@ -31,6 +31,10 @@ chronological order.
 	  since it is more reliable and safer.]
 	- Eric Sunshine updated movierec.txi HOWTO.  It still had a reference
 	  to the obsolete user.cfg.
+	- Jorrit added a new section in the documentation that tries to explain
+	  how to build levels for Crystal Space. It discusses various techniques
+	  and tells people what tricks they can use to get most optimal
+	  performance.
 10-Feb-2004
 	- Eric Sunshine fixed CS/data/Jamfile so that it no longer tries to
 	  install the non-existent unifont.csf file.  (Bug reported by Frank

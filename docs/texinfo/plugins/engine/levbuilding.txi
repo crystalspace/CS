@@ -1,0 +1,307 @@
+@c -*-texinfo-*-
+@node Level Building, Rendering Loop, Texture Mapping, csEngine
+@subsection How to create optimal levels for Crystal Space
+@cindex Visibility Culling
+@cindex Culling, Visibility
+@cindex Level Building
+
+@noindent
+@emph{Written by Jorrit Tyberghein,
+@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
+
+@emph{Note}: Building optimal levels is not very easy as there are
+a lot of factors to consider. Crystal Space has a lot of tools to offer
+(like sectors, portals, visibility cullers, @dots{}) but using those
+effectively is an art. In this chapter we will not talk about how to create
+levels. For that you use external tools like Blender, Quark, or other.
+This chapter focuses on how you should partition your level in sectors,
+the kind of mesh objects you should use, the visibility cullers, @dots{}.
+
+For a good discussion about sectors and visibility cullers you should
+have a look at @xref{Visibility Culling}.
+
+@menu
+* LEV sectors and portals:: Sectors and Portals
+* LEV Visibility Cullers:: Visibility Cullers
+* LEV Object Types:: Object types
+* LEV Helping Renderer:: Helping the Renderer
+* LEV Lighting Considerations:: Lighting Considerations
+@end menu
+
+@node LEV Sectors and Portals, VIS cullers, Visibility Culling, Visibility Culling
+@subsubsection Sectors and Portals
+@cindex portals
+@cindex sectors
+
+As explained in @xref{Visibility Culling} a sector is the basic building
+block in a level. When you create a level you should decide on how to partition
+your level in sectors. The easiest solution is to use a single sector. In
+many cases that may even be acceptible. Here are some points to think about
+when deciding on how to partition your level into sectors:
+@itemize
+@item
+Creating multiple sectors complicates level design a bit since you have to
+think about placing portals between the sectors. On the other hand it can
+easy level design since you can pass different parts of the level to other
+people.
+@item
+It is easier to implement dynamic loading when you use more sectors as you
+can easily load/unload a sector.
+@item
+Portals help with visibility culling in two ways. When a portal is not visible
+the destination sector of that portal is ignored completely. i.e. the complexity
+of the portal destination is totally ignored if the portal is invisible.
+Even if the portal is visible, the portal still restricts the view frustum (i.e.
+you can only see what is inside the portal outline) and this will cause many
+objects to be culled away in a very easy way.
+This means that one reason to use more sectors may
+be to improve on visibility culling. This works mostly if the portals are
+small (i.e. doorways or windows).
+@item
+Open space levels are hard to partition in sectors. There is also little
+benefit in portal culling and dynamic loading. So in general, it is probably
+best to use a single sector for your outdoor world.
+@item
+The insides of buildings are best represented using seperate sectors. This
+makes it possible to design them seperatelly and it is also very good for
+the visibility culler. Doorways and windows make very good portals.
+@item
+Wether or not you should further partition an indoor world into multiple
+sectors is hard to say and really depends on the complexity of the level.
+@end itemize
+
+@node LEV Visibility Cullers, VIS cullers, Visibility Culling, Visibility Culling
+@subsubsection Visibility Cullers
+
+Every sector has its own visibility culler.
+Crystal Space currently supports two kinds of visibility cullers:
+@samp{Frustvis} and @samp{Dynavis}. @samp{Dynavis} attempts to work more
+on culling but it also has more overhead. So you should use @samp{Frustvis} in
+case you have the following kinds of levels:
+
+@itemize
+@item
+Simple sectors that only contain a few objects.
+@item
+Large sectors that are mostly open-space (i.e. for a space game).
+@samp{Dynavis} works by finding which objects occlude (cover) other objects.
+In open space sectors this is rare so the extra work needed for this
+coverage test is usually wasted.
+@item
+Complex sectors that nevertheless don't have sufficient objects that
+can occlude other objects. This is because of the same reason as with the
+previous case.
+@end itemize
+
+So if you have a complex level with lots of large objects then you should
+consider using @samp{Dynavis}.
+
+So if you decided on using @samp{Dynavis} for a sector you should follow
+the following guidelines for that sector:
+
+@itemize
+@item
+@samp{Dynavis} works best with closed and mostly convex large occluder objects
+that don't have a lot of polygons. For example, a big wall is usually a good
+occluder. However, it is possible that the wall is created using lots of
+detailed polygons. That doesn't make the wall a bad occluder but it increases
+the cost of using that wall as an occluder. To help that you should add
+dummy polygon mesh (this is called @samp{occlusion mesh}) for visibility
+culling to that object. That occlusion mesh should have roughly the shape
+of the wall but it will only have a few polygons
+which means that @samp{Dynavis} can use it in a more efficient manner. Below
+follows an example on how to set another mesh for visibility culling in a
+map file. Note that you should not replace the visibility culling mesh if the
+base mesh is already good enough.
+@item
+If you have complex objects that have very little chance of occluding
+other objects (like for example a star shaped object) then you should disable
+the visibility culling mesh (see below for example). This is called
+@samp{disabling occlusion writing}. @samp{Dynavis} will
+still cull the object away if needed but it will not use the object for
+culling other objects. This improves performance of @samp{Dynavis} again.
+@item
+For culling objects @samp{Dynavis} prefers small objects. Keep in mind that
+culling always happens on entire objects. i.e. either the object is (partially)
+visible and it will be rendered completely or else the object is invisible.
+So a large object has less chance of being culled away since it needs to
+be covered entirely before it can be considered invisible.
+@item
+For occluding other objects @samp{Dynavis} prefers large objects. Large
+objects are also prefered for other reasons (i.e. OpenGL is most efficient
+at rendering large objects, more on this later).
+@item
+There is a special optimization that follows from the previous two items.
+If you have a number of smaller objects that are themselves not very good
+occluders, but together they are very good (like for example a wall made
+out of seperate segments) then it would be best to disable occlusion writing
+for the individual wall segments and add a new null object with a single
+occlusion mesh that represents the entire wall.
+@item
+It is sometimes useful to add dummy occluders to help with occlusion.
+For example, if you have a large dungeon like level then you can put
+large simple occluding objects in the @samp{void space} between the dungeon
+corridors (this is space where the camera should normally not be able
+to see). When used right this optimization can gain you a lot of performance.
+You can use standalone @samp{polymesh} objects (see example below) to construct
+this so you don't need to make a real mesh for it.
+This optimization can also be used when you have a complex multi-part
+object. You can then put a dummy occluder inside that object which will help
+with visibility culling.
+@end itemize
+
+Here is an example on how you can replace the occlusion mesh of some mesh
+object in a map file:
+
+@example
+<meshobj name="complexWall">
+    <plugin>thing</plugin>
+    <params>
+    	@dots{}
+    </params>
+    <polymesh>
+	<mesh>
+	    <v x="-1" y="-1" z="-1" />
+	    <v x="1" y="-1" z="-1" />
+	    <v x="1" y="4" z="-1" />
+	    <v x="-1" y="4" z="-1" />
+	    <t v1="0" v2="1" v3="2" />
+	    <t v1="0" v2="2" v3="3" />
+	</mesh>
+	<viscull />
+    </polymesh>
+</meshobj>
+@end example
+
+And here is an example of how you can disable the occlusion mesh for
+an object:
+
+@example
+<meshobj name="wallSegment">
+    <plugin>thing</plugin>
+    <params>
+    	@dots{}
+    </params>
+    <polymesh>
+	<viscull />
+    </polymesh>
+</meshobj>
+@end example
+
+@node LEV Object Types, VIS cullers, Visibility Culling, Visibility Culling
+@subsubsection Object types
+
+Regardless of sector partitioning and visibility culling requirements the
+choice of objects you use can also be important for performance. Crystal
+Space supports many mesh objects but the most important ones are:
+
+@itemize
+@item
+@samp{thing}: a @samp{thing} is a polygon mesh object that supports multiple
+materials and lightmapped, vertex based, or stencil based lighting. It is not
+easy to animate them internally so they are usually used for static
+objects. If you use lightmaps then these will also not be updated if the
+object moves so that's another consideration. @samp{thing} objects are
+heavy-weight (use some memory). Their main advantage is the support of lightmaps
+which means that they can represent shadows even if they only have a few
+polygons. In contrast, an object that only supports vertex lighting can
+not have shadows on a single polygon or triangle (except if stencil based
+lighting is used).
+@item
+@samp{genmesh}: a @samp{genmesh} is a triangle mesh object with a single
+material. It only supports vertex or stencil based lighting and it is also
+not designed for internal animation (although it is possible). Genmeshes
+are very efficient with regards to memory usage and rendering speed.
+@item
+@samp{sprite3d}: a @samp{sprite3d} is similar to a @samp{genmesh} except
+that it also supports frame based animation.
+@item
+@samp{sprcal3d}: a @samp{sprcal3d} is similar to a @samp{sprite3d} except
+that skeletal or bone based animation is supported.
+@end itemize
+
+Here are some guidelines on using these objects:
+
+@itemize
+@item
+For static geometry, @samp{thing} or @samp{genmesh} are ideal. @samp{genmesh}
+is typically used for high-detail objects that only need a single material
+(every triangle can use other parts of the texture) and where there is no
+need for detailed shadows on the individual triangles (usually a @samp{genmesh}
+object is either small or high detailed so that shadows are accuratelly
+represented using vertex lighting only). @samp{thing} is used in case you
+want large objects that have little detail but required detailed lighting.
+@item
+If you plan on using stencil lighting only then it is probably best to
+use @samp{genmesh} more.
+@item
+For moving objects you can also use @samp{thing} or @samp{genmesh} as long
+as there is no need to change the object appearance itself (i.e. no internal
+animation is required). You have to be aware of lighting problems as mentioned
+above though.
+@item
+Game actors and creatures should use @samp{sprite3d} or @samp{sprcal3d}.
+@end itemize
+
+@node LEV Helping Renderer, VIS cullers, Visibility Culling, Visibility Culling
+@subsubsection Helping the Renderer
+
+When considering on how to design your objects you should keep in mind
+what the renderer prefers to get. For the renderer a @samp{mesh} is defined
+as a polygon or triangle mesh with a single material and/or shader. So if
+you are using a @samp{thing} mesh that uses multiple materials then this is
+actually a set of different meshes for the renderer. To avoid confusion we
+will call the single-material mesh that the renderer uses a @samp{render-mesh}.
+
+With OpenGL and especially if you have a 3D card that supports the @samp{VBO}
+(Vertex Buffer Objects) extension the renderer prefers render-meshes that have
+a lot of polygons. So for the renderer it is better to use 10 render-meshes
+with 10000 polygons as opposed to 100 render-meshes with 1000 polygons even
+though the total number of polygons is the same.
+
+On the other hand, this requirement conflicts with some of the guidelines
+for the visibility culler. Getting an optimal setup depends on the minimum
+hardware you want to support. If you are writing a game for the future and
+decide to require @samp{VBO} support in the 3D card then you should use
+fewer but larger objects. For the current crop of 3D cards that are in use
+right now finding a good compromize is best.
+
+One other technique you can use to help increase the size of render-meshes
+is to try to fit several materials on one material. For example, if you have
+a house with three textures: wall, roof, and doorway then you can create
+a new texture that contains those three textures. The end result of this is
+that every house will be a single render-mesh instead of three which is
+more optimal for OpenGL. There are four disadvantages to this technique:
+
+@enumerate
+@item
+You have to be able to fit the smaller textures in the big texture without
+too much waste. Fitting four 64x64 textures in one 128x128 texture is easy
+but fitting three 64x64 textures in one 128x128 texture is going to waste
+one some precious texture memory. Of course you could try to use the
+remaining 64x64 space for textures on other objects.
+@item
+It is possible that you have lower quality textures because combining them
+on a bigger texture may otherwise overflow hardware limitations.
+@item
+It is harder for the artist to create models with this technique.
+@item
+This technique is not possible if you have a tiling texture. i.e. a wall
+texture that is repeated accross a large surface.
+@end enumerate
+
+@node LEV Lighting Considerations, VIS cullers, Visibility Culling, Visibility Culling
+@subsubsection Lighting Considerations
+
+When designing a level you also have to think about where to place lights.
+If you plan to use stencil based lighting or hardware based vertex lighting
+then you must be very careful not to exagerate in the number of lights.
+Runtime performance with those two techniques depends on the number of lights
+and their influence radius. For this reason you are probably better off using
+lightmapped lighting in case you have a big level with lots of lights.
+
+With lightmapped lighting there is no runtime cost associated with having
+multiple lights (there is a slight memory cost associated with having many
+pseudo-dynamic lightmaps). A higher number of lights simply means that
+recalculating lighting will take longer.
+

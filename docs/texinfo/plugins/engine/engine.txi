@@ -20,6 +20,7 @@ Currently only some separate documents about the engine are available:
 * Dynamic Worlds::
 * Level of Detail::
 * Sequence Manager::
+* Level Building:: How to create optimal levels for Crystal Space
 @end menu
 
 @importss{plugins,engine,worldcmp.txi}
@@ -34,4 +35,5 @@ Currently only some separate documents about the engine are available:
 @importss{plugins,engine,dynworld.txi}
 @importss{plugins,engine,lod.txi}
 @importss{plugins,engine,sequence.txi}
+@importss{plugins,engine,levbuilding.txi}
 
