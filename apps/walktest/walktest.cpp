@@ -959,7 +959,19 @@ void DoGravity (csVector3& pos, csVector3& vel)
   }
 
   new_pos -= Sys->view->GetCamera ()->GetOrigin ();
-  Sys->view->GetCamera ()->MoveWorld (new_pos);
+  if (Sys->world->sectors.Length()==1)
+  {
+    //This is a workaround until sector->FollowSegment() will use the
+    //octree system. In worlds created by map2cs, walking will be
+    //very slow, because of the search for a new sector. This is
+    //not really necessarey, because there is only 1 sector. This
+    //optimisation here is sane in all cases, so it won't hurt anyway.
+    Sys->view->GetCamera ()->MoveWorldUnrestricted(new_pos);
+  }
+  else
+  {
+    Sys->view->GetCamera ()->MoveWorld (new_pos);
+  }
 
   Sys->velocity = Sys->view->GetCamera ()->GetO2T ()*vel;
 
