@@ -528,7 +528,7 @@ bool csIntersect3::BoxSegment (const csBox3& box, const csSegment3& seg,
 {
   const csVector3& u = seg.Start ();
   const csVector3& v = seg.End ();
-  float r, plane_pos;
+  float r, plane_pos = 0;
   int sides[3];
   int num_sides = box.GetVisibleSides (u, sides);
   int i;
