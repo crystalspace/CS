@@ -414,7 +414,7 @@ void csSector::Draw (csRenderView& rview)
       if (light->GetHaloInQueue ())
 	continue;
       
-      csHaloInformation* cshaloinfo = new csHaloInformation; 
+      CHK (csHaloInformation* cshaloinfo = new csHaloInformation);
       
       cshaloinfo->v = rview.World2Camera (light->GetCenter ());
       
@@ -439,7 +439,7 @@ void csSector::Draw (csRenderView& rview)
       }
       else
       {
-	delete cshaloinfo;
+	CHK (delete cshaloinfo);
       }
     }
   }
@@ -529,7 +529,7 @@ void csSector::Draw (csRenderView& rview)
 	{
 	  // Perspective projection and copy to structure for 3D rasterizer.
 	  g3dpoly.num = num_pts;
-	  for (int i = 0 ; i < num_pts ; i++)
+	  for (i = 0 ; i < num_pts ; i++)
 	  {
 	    g3dpoly.vertices[num_pts-i-1].sx = pts[i].x * iz + csWorld::shift_x;
 	    g3dpoly.vertices[num_pts-i-1].sy = pts[i].y * iz + csWorld::shift_y;
@@ -627,15 +627,20 @@ void* csSector::CalculateLightingPolygons (csPolygonParentInt*, csPolygonInt** p
 
 void csSector::CalculateLighting (csLightView& lview)
 {
-  if (draw_busy >= cfg_reflections) return;
+  if (draw_busy > cfg_reflections) return;
 
   draw_busy++;
   csVector3* old;
-  NewTransformation (old);
+  csThing* sp;
 
+  // Translate this sector so that it is oriented around
+  // the position of the light (position of the light becomes
+  // the new origin).
   csVector3& center = lview.light_frustrum->GetOrigin ();
+  NewTransformation (old);
   TranslateVector (center);
 
+  // Check if gouraud shading needs to be updated.
   if (light_frame_number != current_light_frame_number)
   {
     light_frame_number = current_light_frame_number;
@@ -643,19 +648,69 @@ void csSector::CalculateLighting (csLightView& lview)
   }
   else lview.gouroud_color_reset = false;
 
+  // If we are not doing a dynamic light then we also calculate
+  // a list of all shadow frustrums which is going to be used
+  // in the lighting calculations. This list is appended to the
+  // one given in 'lview'. After returning the list in 'lview'
+  // will be restored.
+  csShadowFrustrum* previous_last = lview.shadows.GetLast ();
+  csFrustrumList* shadows;
+  if (!lview.dynamic)
+  {
+    sp = first_thing;
+    while (sp)
+    {
+      csVector3* old_sp;
+      sp->NewTransformation (old_sp);	//@@@ NOT EFFICIENT! CAN WE AVOID THIS?
+      sp->TranslateVector (center);
+
+      shadows = sp->GetShadows (center);
+      lview.shadows.AppendList (shadows);
+      CHK (delete shadows);
+
+      sp->RestoreTransformation (old_sp);
+
+      sp = (csThing*)(sp->GetNext ());
+    }
+  }
+
+  // @@@ Here we would like to do an optimization pass on all
+  // the generated shadow frustrums. In essence this pass would try to
+  // find all shadow frustrums which are:
+  //	- outside the current light frustrum and thus are not relevant
+  //	- completely inside another shadow frustrum and thus do not
+  //	  contribute to the shadow
+
+  // Calculate lighting for all polygons in this sector.
   if (bsp)
     bsp->Back2Front (center, &CalculateLightingPolygons, (void*)&lview);
   else
     CalculateLightingPolygons ((csPolygonParentInt*)this, polygons, num_polygon, (void*)&lview);
 
+  // Calculate lighting for all things in the current sector.
   if (static_thing) static_thing->CalculateLighting (lview);
-  csThing* sp = first_thing;
+  sp = first_thing;
   while (sp)
   {
     if (!sp->IsMerged ()) sp->CalculateLighting (lview);
     sp = (csThing*)(sp->GetNext ());
   }
 
+  // Restore the shadow list in 'lview' and then delete
+  // all the shadow frustrums that were added in this recursion
+  // level.
+  csShadowFrustrum* frustrum;
+  if (previous_last) frustrum = previous_last->next;
+  else frustrum = lview.shadows.GetFirst ();
+  lview.shadows.SetLast (previous_last);
+  while (frustrum)
+  {
+    csShadowFrustrum* sf = frustrum->next;
+    CHK (delete frustrum);
+    frustrum = sf;
+  }
+
+  // Restore the old transformation.
   RestoreTransformation (old);
   draw_busy--;
 }
@@ -840,72 +895,6 @@ void* csSector::BeamPolygons (csPolygonParentInt*, csPolygonInt** polygon, int n
   return NULL;
 }
 
-void* csSector::CheckForThings (csPolygonParentInt*, csPolygonInt** polygon, int num, void* data)
-{
-  BeamInfo* d = (BeamInfo*)data;
-  int i;
-  csPortal* po;
-  csPolygon3D* p;
-  bool block = false;
-  csPolygon3D* block_poly;
-  bool noblock = false;
-
-  for (i = 0 ; i < num ; i++)
-  {
-    p = (csPolygon3D*)polygon[i];
-    void* rc = NULL;
-    bool isc = p->IntersectRay (d->start, d->end);
-    if (isc)
-    {
-      po = p->GetPortal ();
-      if (po)
-      {
-         rc = (void*)po->BlockingThings (d->start, d->end, &(d->poly));
-         if (rc) return rc;
-         // Set noblock to true to indicate that there is no block (no
-         // matter what 'block' says).
-         noblock = true;
-      }
-      else if (do_radiosity)
-      {
-        // If there is no portal we simulate radiosity by creating
-	// a dummy portal for this polygon which reflects light.
-	csPortalCS mirror;
-	mirror.SetSector (p->GetSector ());
-	mirror.SetAlpha (10);
-	float r, g, b;
-	p->GetTextureHandle ()->GetMeanColor (r, g, b);
-	mirror.SetFilter (r/4, g/4, b/4);
-	mirror.SetWarp (csTransform::GetReflect ( *(p->GetPolyPlane ()) ));
-	rc = (void*)mirror.BlockingThings (d->start, d->end, &(d->poly));
-        if (rc) return rc;
-        // Set noblock to true to indicate that there is no block (no
-        // matter what 'block' says).
-        noblock = true;
-      }
-      else
-      {
-        // There is an intersection but it is not with a portal.
-        // Remember this for later. If we find no other portals to go through
-        // we will return true that there is something blocking our path.
-        block = true;
-	block_poly = p;
-      }
-    }
-  }
-#if 0
-  if (noblock)
-    return NULL;
-  else if (block)
-  {
-    d->poly = block_poly;
-    return (void*)true;
-  }
-#endif
-  return NULL;
-}
-
-
 csPolygon3D* csSector::FollowBeam (csVector3& start, csVector3& end, csPolygon3D* poly,
 				float* sqdist)
 {
@@ -1003,59 +992,6 @@ bool csSector::HitBeam (csVector3& start, csVector3& end, csPolygon3D* poly, flo
 
   return false;
 }
-
-bool csSector::BlockingThings (csVector3& start, csVector3& end, csPolygon3D** poly, bool same_sector)
-{
-  // Check all the things in the current sector.
-  csVector3 isect2;
-  csPolygon3D* p;
-  csPortal* po;
-  void* rc = NULL;
-  csThing* sp = first_thing;
-  while (sp)
-  {
-    p = sp->IntersectSegment (start, end, isect2);
-    if (p)
-    {
-      po = p->GetPortal ();
-      if (po)
-      {
-        rc = (void*)po->BlockingThings (start, end, poly);
-        if (rc) return true;
-      }
-      else
-      {
-        if (poly) *poly = p;
-	return true;
-      }
-    }
-    sp = (csThing*)(sp->GetNext ());
-  }
-
-  // If no things are blocking the path then check in the other sectors.
-  BeamInfo beam;
-  beam.start = start;
-  beam.end = end;
-
-  beam_busy++;
-
-  // Verify here if the maximum cfg_reflections have been reached to avoid
-  // to loose time to find the portal from which the light is coming
-  // for nothing.
-  if (beam_busy < cfg_reflections)
-  {
-    if (bsp) rc = bsp->Front2Back (start, &CheckForThings, (void*)&beam);
-    else if (!same_sector)
-      rc = CheckForThings ((csPolygonParentInt*)this, polygons, num_polygon, (void*)&beam);
-  }
-
-  beam_busy--;
-
-  if (rc) { if (poly) *poly = beam.poly; return true; }
-
-  return false;
-}
-
 
 void csSector::ShineLights ()
 {

@@ -27,6 +27,7 @@ class csClipper;
 class csMatrix3;
 class csVector3;
 class csLight;
+class csPolygon3D;
 interface IGraphics3D;
 interface IGraphics2D;
 
@@ -79,6 +80,151 @@ public:
 };
 
 /**
+ * This class is a csFrustrum especially used for the lighting calculations.
+ * It represents a shadow. It extends csFrustrum by adding 'next' and 'prev' for
+ * living in a linked list and it adds the 'polygon' member so that we can find
+ * for which polygon this frustrum was generated.
+ */
+class csShadowFrustrum : public csFrustrum
+{
+public:
+  csShadowFrustrum* next, * prev;
+  csPolygon3D* polygon;
+
+public:
+  /// Create empty frustrum.
+  csShadowFrustrum (csVector3& origin) : csFrustrum (origin), next (NULL), prev (NULL), polygon (NULL) { }
+};
+
+/**
+ * A list of frustrums.
+ */
+class csFrustrumList
+{
+private:
+  csShadowFrustrum* first, * last;
+
+public:
+  /// Create an empty list.
+  csFrustrumList () : first (NULL), last (NULL) { }
+
+  /// Destroy the list but do not destroy the individual elements!
+  virtual ~csFrustrumList () { }
+
+  void CheckList (char* msg)
+  {
+    if (first && !last) { printf ("###%s### first && !last\n", msg); return; }
+    if (!first && last) { printf ("###%s### !first && last\n", msg); return; }
+    if (!first) return;
+    csShadowFrustrum* f;
+    f = first;
+    while (f)
+    {
+      if (f->prev == NULL && f != first) { printf ("###%s### 'prev' pointer is NULL!\n", msg); return; }
+      if (f->next == NULL && f != last) { printf ("###%s### 'next' pointer is NULL!\n", msg); return; }
+      if (f->prev && f->prev->next != f) { printf ("###%s### prev->next points wrong!\n", msg); return; }
+      if (f->next && f->next->prev != f) { printf ("###%s### next->prev points wrong!\n", msg); return; }
+      f = f->next;
+    }
+  }
+
+  /// Destroy all frustrums in the list.
+  void DeleteFrustrums ()
+  {
+    csShadowFrustrum* sf;
+    while (first)
+    {
+      sf = first->next;
+      CHK (delete first);
+      first = sf;
+    }
+    last = NULL;
+  }
+
+  /// Clear the list (make empty but don't delete elements).
+  void Clear () { first = last = NULL; }
+
+  /// Get the first element in this list (or NULL if empty).
+  csShadowFrustrum* GetFirst () { return first; }
+
+  /// Get the last element in this list (or NULL if empty).
+  csShadowFrustrum* GetLast () { return last; }
+
+  /**
+   * Append a list to this one. Note that you
+   * should not do any modifications on the other list
+   * after this is done.
+   */
+  void AppendList (csFrustrumList* list)
+  {
+    if (last)
+    {
+      last->next = list->GetFirst ();
+      if (list->GetFirst ()) list->GetFirst ()->prev = last;
+      if (list->GetLast ()) last = list->GetLast ();
+    }
+    else
+    {
+      first = list->GetFirst ();
+      last = list->GetLast ();
+    }
+  }
+
+  /**
+   * Set the last element in this list. This basicly has
+   * the effect of truncating the list to some specific element.
+   * Note that this function only works if the frustrum is actually
+   * part of the list. No checking is done. The elements which
+   * are clipped of the list are unchanged (not deleted). You
+   * can relink or delete them if you want. If the given frustrum
+   * is NULL then this function has the same effect as making
+   * the list empty.
+   */
+  void SetLast (csShadowFrustrum* frust)
+  {
+    if (frust)
+    {
+      frust->next = NULL;
+      last = frust;
+    }
+    else { first = last = NULL; }
+  }
+
+  /// Add a new frustrum to the front of the list.
+  void AddFirst (csShadowFrustrum* fr)
+  {
+    fr->prev = NULL;
+    fr->next = first;
+    if (first) first->prev = fr;
+    first = fr;
+    if (!last) last = fr;
+  }
+
+  /// Add a new frustrum to the back of the list.
+  void AddLast (csShadowFrustrum* fr)
+  {
+    fr->next = NULL;
+    fr->prev = last;
+    if (last) last->next = fr;
+    last = fr;
+    if (!first) first = fr;
+  }
+
+  /**
+   * Apply a transformation to all frustrums in this list.
+   */
+  void Transform (csTransform* trans)
+  {
+    csShadowFrustrum* sf = first;
+    while (sf)
+    {
+      sf->Transform (trans);
+      sf = sf->next;
+    }
+  }
+};
+
+/**
  * This structure represents all information needed for static lighting.
  * It is the basic information block that is passed between the various
  * static lighting routines.
@@ -121,6 +267,13 @@ public:
    * is lit unless it also is in a shadow frustrum.
    */
   csFrustrum* light_frustrum;
+
+  /**
+   * The list of shadow frustrums. Note that this list will be
+   * expanded with every traversal through a portal but it needs
+   * to be restored to original state again before returning.
+   */
+  csFrustrumList shadows;
 
   /**
   @@@ Soon will be OBSOLETE!

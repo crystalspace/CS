@@ -328,21 +328,6 @@ public:
   bool HitBeam (csVector3& start, csVector3& end, csPolygon3D* poly, float* sqdist);
 
   /**
-   * Check for csThings along the way. This function assumes that there
-   * is valid path from 'start' to 'end' through portals (and it will
-   * follow that path). It will return false if there are no csThings
-   * blocking the path, otherwise it will return true and put the first polygon
-   * that is found to be blocking the beam in 'poly' (only Polygons of csThings
-   * are considered).<br>
-   * This function also returns true (but with 'poly' set to NULL) if it
-   * could not go through a portal before it reached 'end' (there was
-   * an error in the path somewhere).
-   * If same_sector is true we know that we are looking for a hit in the
-   * same sector only.
-   */
-  bool BlockingThings (csVector3& start, csVector3& end, csPolygon3D** poly, bool same_sector = false);
-
-  /**
    * Follow a beam of light with a given start and end point and return
    * the first polygon that is hit. Also return the squared distance of the
    * path that was followed to get at the polygon (this correctly takes care
@@ -355,12 +340,6 @@ private:
    * BSP function used by follow_beam which does the actual work.
    */
   static void* BeamPolygons (csPolygonParentInt*, csPolygonInt** polygon,
-  	int num, void* data);
-
-  /**
-   * BSP function used by blocking_things which does the actual work.
-   */
-  static void* CheckForThings (csPolygonParentInt*, csPolygonInt** polygon,
   	int num, void* data);
 
   CSOBJTYPE;
