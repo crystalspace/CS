@@ -61,6 +61,9 @@ chronological order.
 	- Jorrit added some initialization code to Data in the chunklod
 	  terrain engine in an attempt to fix the strange texture swaps.
 	  Didn't help though.
+	- Jorrit temporarily disabled one of the NR GL optimizations he
+	  did earlier. Have to rethink it. Walktest is now down to 160 fps
+	  (still better than 87!).
 15-Apr-2004
 	- Eric Sunshine added a blurb to the Unix and MacOS/X build
 	  instructions cautioning about potential problems caused by
