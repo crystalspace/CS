@@ -109,6 +109,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (HEIGHTMAP)
   CS_TOKEN_DEF (IDENTITY)
   CS_TOKEN_DEF (KEY)
+  CS_TOKEN_DEF (LIBRARY)
   CS_TOKEN_DEF (LIGHT)
   CS_TOKEN_DEF (LOD)
   CS_TOKEN_DEF (LODCOST)
@@ -2104,6 +2105,24 @@ void Cs2Xml::ParseType (char const* parent_token, csParser* parser,
   delete[] tt;
 }
 
+void Cs2Xml::ParseLibrary (char const* parent_token, csParser* parser,
+	csRef<iDocumentNode>& parent, char*& name, char* params,
+	char const* tokname)
+{
+
+  if (IsEmpty (params))
+  {
+    if (name && *name) 
+      CreateValueNode (parent, tokname, name);
+  }
+  else
+  {
+    csRef<iDocumentNode> child = parent->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+    child->SetValue (tokname);
+    ParseGeneral (tokname, parser, child, params);
+  }
+}
+
 void Cs2Xml::ParseOther (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
@@ -2202,6 +2221,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (HAZECONE)
     CS_TOKEN_TABLE (HEIGHTMAP)
     CS_TOKEN_TABLE (KEY)
+    CS_TOKEN_TABLE (LIBRARY)
     CS_TOKEN_TABLE (LIGHT)
     CS_TOKEN_TABLE (LOD)
     CS_TOKEN_TABLE (LODCOST)
@@ -2536,6 +2556,9 @@ void Cs2Xml::ParseGeneral1 (long cmd, char const* parent_token,
       break;
     case CS_TOKEN_DIRLIGHT:
       ParseDirLight (parent_token, parser, parent, name, params, tokname);
+      break;
+    case CS_TOKEN_LIBRARY:
+      ParseLibrary (parent_token, parser, parent, name, params, tokname);
       break;
     case CS_TOKEN_LIGHT:
       ParseLight (parent_token, parser, parent, name, params, tokname);
