@@ -3061,7 +3061,7 @@ void csGraphics3DOGLCommon::DrawPolygonZFill (csVector2* vertices,
   statecache->Disable_GL_TEXTURE_2D ();
   statecache->SetShadeModel (GL_FLAT);
   SetGLZBufferFlags (z_buf_mode);
-  SetupBlend (CS_FX_TRANSPARENT, 0, false);
+  glColorMask (false, false, false, false);
 
   // First copy all data in an array so that we can minimize
   // the amount of code that goes between glBegin/glEnd. This
@@ -3091,6 +3091,7 @@ void csGraphics3DOGLCommon::DrawPolygonZFill (csVector2* vertices,
     glVertex4fv (p_glverts); p_glverts += 4;
   }
   glEnd ();
+  glColorMask (true, true, true, true);
 }
 
 void csGraphics3DOGLCommon::DrawPolygonDebug (G3DPolygonDP &/* poly */ )
@@ -5550,8 +5551,6 @@ void csGraphics3DOGLCommon::SetupClipPortals ()
         glClear (GL_STENCIL_BUFFER_BIT);
         statecache->SetStencilFunc (GL_ALWAYS, 1, 0);
         statecache->SetStencilOp (GL_KEEP, GL_REPLACE, GL_KEEP);
-        glColor4f (0, 0, 0, 0);
-        statecache->SetShadeModel (GL_FLAT);
         // USE OR FILL@@@?
 	csZBufMode old_mode = z_buf_mode;
 	z_buf_mode = CS_ZBUF_USE;
@@ -5561,15 +5560,21 @@ void csGraphics3DOGLCommon::SetupClipPortals ()
         statecache->SetStencilFunc (GL_EQUAL, 1, 1);
         statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
 
+#if 1
 	// First clear the z-buffer here.
 	z_buf_mode = CS_ZBUF_FILLONLY;
-	csVector2 screen_poly[4];
-	screen_poly[0].Set (0, 0);
-	screen_poly[1].Set (width-1, 0);
-	screen_poly[2].Set (width-1, height-1);
-	screen_poly[3].Set (0, height-1);
-	csPlane3 screen_normal (0, 0, 1, -10000000);
-	DrawPolygonZFill (screen_poly, 4, screen_normal);
+	SetGLZBufferFlags (z_buf_mode);
+	glColorMask (false, false, false, false);
+
+	glBegin (GL_QUADS);
+	glVertex4f (0.0*100000.0, 0.0*100000.0, -1.0, 100000.0);
+	glVertex4f (float (width-1)*100000.0, 0.0*100000.0, -1.0, 100000.0);
+	glVertex4f (float (width-1)*100000.0, float (height-1)*100000.0,
+		-1.0, 100000.0);
+	glVertex4f (0.0*100000.0, float (height-1)*100000.0, -1.0, 100000.0);
+	glEnd ();
+	glColorMask (true, true, true, true);
+#endif
 
 	z_buf_mode = old_mode;
       }
