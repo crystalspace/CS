@@ -60,6 +60,50 @@
 
 extern WalkTest* Sys;
 
+/// Save recording
+void SaveRecording (iVFS* vfs, const char* fName)
+{
+  iFile* cf;
+  cf = vfs->Open (fName, VFS_FILE_WRITE);
+  int l = Sys->recording.Length ();
+  cf->Write ((char*)&l, sizeof (l));
+  int i;
+  for (i = 0 ; i < Sys->recording.Length () ; i++)
+  {
+    csRecordedCamera* reccam = (csRecordedCamera*)Sys->recording[i];
+    cf->Write ((char*)reccam, sizeof (*reccam));
+    unsigned char len;
+    len = strlen (reccam->sector->GetName ());
+    cf->Write ((char*)&len, 1);
+    cf->Write (reccam->sector->GetName (), 1+strlen (reccam->sector->GetName ()));
+  }
+  cf->DecRef ();
+}
+
+/// Load recording
+void LoadRecording (iVFS* vfs, const char* fName)
+{
+  iFile* cf;
+  cf = vfs->Open (fName, VFS_FILE_READ);
+  Sys->recording.SetLength (0);
+  int l;
+  cf->Read ((char*)&l, sizeof (l));
+  int i;
+  for (i = 0 ; i < l ; i++)
+  {
+    csRecordedCamera* reccam = new csRecordedCamera ();
+    cf->Read ((char*)reccam, sizeof (*reccam));
+    unsigned char len;
+    cf->Read ((char*)&len, 1);
+    char buf[100];
+    cf->Read (buf, 1+len);
+    csSector* s = (csSector*)Sys->world->sectors.FindByName (buf);
+    reccam->sector = s;
+    Sys->recording.Push ((void*)reccam);
+  }
+  cf->DecRef ();
+}
+
 /// Save/load camera functions
 void SaveCamera (iVFS* vfs, const char *fName)
 {
@@ -233,7 +277,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("Various:\n");
     CONPRI("  coordsave coordload bind capture map p_alpha s_fog\n");
     CONPRI("  snd_play snd_volume loadsprite addsprite delsprite\n");
-    CONPRI("  record play\n");
+    CONPRI("  record play saverec loadrec\n");
 #   undef CONPRI
   }
   else if (!strcasecmp (cmd, "coordsave"))
@@ -245,6 +289,14 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     Sys->Printf (MSG_CONSOLE, "LOAD COORDS\n");
     LoadCamera (Sys->VFS, "/this/coord");
+  }
+  else if (!strcasecmp (cmd, "saverec"))
+  {
+    SaveRecording (Sys->VFS, "/this/record");
+  }
+  else if (!strcasecmp (cmd, "loadrec"))
+  {
+    LoadRecording (Sys->VFS, "/this/record");
   }
   else if (!strcasecmp (cmd, "record"))
   {
