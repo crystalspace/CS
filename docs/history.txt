@@ -1,5 +1,11 @@
 The history order has been reversed so that new features are at the top.
 
+30-Jan-2001
+	- Eric Sunshine changed the behavior of the -simdepth option in the
+	  AppKit-based Apple/NeXT 2D driver.  If the user specifies an illegal
+	  depth, then a suitable warning message is issued and the request is
+	  ignored.  Previously, it would return a failure status from
+	  iGraphics2D::Initialize() in this circumstance.
 29-Jan-2001
 	- Philip Wyett added a divide by zero check in csSprite3D.  This fixes
 	  ptlab on Windows.

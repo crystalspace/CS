@@ -123,6 +123,10 @@ bool NeXTDriver2D::init_driver( int desired_depth )
 // get_desired_depth()
 //	Check if default device depth setting is overriden with a command-line
 //	switch or via a configuration file setting.
+//
+//	Only depths of 15- and 32-bit are supported.  16-bit is treated as an
+//	alias for 15-bit.  See CS/docs/texinfo/internal/platform/next.txi for
+//	complete details concerning this limitation.
 //-----------------------------------------------------------------------------
 int NeXTDriver2D::get_desired_depth() const
     {
@@ -135,6 +139,14 @@ int NeXTDriver2D::get_desired_depth() const
 	iConfigFileNew* cfg = System->GetConfig();
 	if (cfg != 0)
 	    depth = cfg->GetInt( "Video.SimulateDepth", 0 );
+	}
+    if (depth != 0 && depth != 15 && depth != 16 && depth != 32)
+	{
+	System->Printf( MSG_WARNING,
+	    "WARNING: Ignoring request to simulate %d-bit RGB depth.\n"
+	    "WARNING: Can only simulate 15-, 16-, or 32-bit RGB depth.\n\n",
+	    depth );
+	depth = 0;
 	}
     return depth;
     }
