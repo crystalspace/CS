@@ -293,7 +293,7 @@ private:
   /**
    * Build PVS for this leaf.
    */
-  void BuildPVSForLeaf (csThing* thing,
+  void BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
   	csOctreeNode* leaf, csCovcube* cube);
 
   /**

@@ -39,7 +39,7 @@ public:
   // Constructor
   SysSystemDriver ();
 
-  DECLARE_IBASE_EXT (csSystemDriver)
+  DECLARE_IBASE_EXT (csSystemDriver);
 
   /// Check for system-specific INI entries
   virtual void SetSystemDefaults (csIniFile *config);

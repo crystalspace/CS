@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998,1999 by Jorrit Tyberghein
+    Copyright (C) 1998,1999,2000 by Jorrit Tyberghein
     Largely rewritten by Ivan Avramovic <ivan@avramovic.com>
   
     This library is free software; you can redistribute it and/or
@@ -23,12 +23,19 @@
 #include "types.h"	// for bool
 #include "vector2.h"
 #include "vector3.h"
+#include "segment.h"
 
 /**
  * The maximum value that a coordinate in the bounding box can use.
  * This is considered the 'infinity' value used for empty bounding boxes.
  */
 #define CS_BOUNDINGBOX_MAXVALUE 1000000000.
+
+/// For csBox2::GetCorner().
+#define BOX_CORNER_xy 0
+#define BOX_CORNER_xY 1
+#define BOX_CORNER_Xy 2
+#define BOX_CORNER_XY 3
 
 /**
  * A bounding box in 2D space.
@@ -63,8 +70,16 @@ public:
    * Return every corner of this bounding box from 0
    * to 3. This contrasts with Min() and Max() because
    * those are only the min and max corners.
+   * Corner 0 = xy, 1 = xY, 2 = Xy, 3 = XY.
    */
   csVector2 GetCorner (int corner) const;
+
+  /**
+   * Return every edge (segment) of this bounding box
+   * from 0 to 3. The returned edge is undefined for any
+   * other index.
+   */
+  csSegment2 GetEdge (int edge) const;
 
   /**
    * Test if a polygon if visible in the box. This
@@ -242,6 +257,16 @@ public:
   friend bool operator< (const csVector2& point, const csBox2& box);
 };
 
+/// For csBox3::GetCorner().
+#define BOX_CORNER_xyz 0
+#define BOX_CORNER_xyZ 1
+#define BOX_CORNER_xYz 2
+#define BOX_CORNER_xYZ 3
+#define BOX_CORNER_Xyz 4
+#define BOX_CORNER_XyZ 5
+#define BOX_CORNER_XYz 6
+#define BOX_CORNER_XYZ 7
+
 /**
  * A bounding box in 3D space.
  * In order to operate correctly, this bounding box assumes that all values
@@ -279,8 +304,17 @@ public:
    * Return every corner of this bounding box from 0
    * to 7. This contrasts with Min() and Max() because
    * those are only the min and max corners.
+   * Corner 0 = xyz, 1 = xyZ, 2 = xYz, 3 = xYZ,
+   *        4 = Xyz, 5 = XyZ, 6 = XYz, 7 = XYZ.
    */
   csVector3 GetCorner (int corner) const;
+
+  /**
+   * Return every edge (segment) of this bounding box
+   * from 0 to 11. The returned edge is undefined for any
+   * other index.
+   */
+  csSegment3 GetEdge (int edge) const;
 
   /// Test if the given coordinate is in this box.
   bool In (float x, float y, float z) const
@@ -420,6 +454,29 @@ public:
       minbox.x = x1; minbox.y = y1; minbox.z = z1;
       maxbox.x = x2; maxbox.y = y2; maxbox.z = z2;
     }
+  }
+
+  /**
+   * Test if this box is adjacent to the other on the X side.
+   */
+  bool AdjacentX (const csBox3& other) const;
+
+  /**
+   * Test if this box is adjacent to the other on the Y side.
+   */
+  bool AdjacentY (const csBox3& other) const;
+
+  /**
+   * Test if this box is adjacent to the other on the Z side.
+   */
+  bool AdjacentZ (const csBox3& other) const;
+
+  /**
+   * Test if this box is adjacent to the other one.
+   */
+  bool Adjacent (const csBox3& other) const
+  {
+    return AdjacentX (other) || AdjacentY (other) || AdjacentZ (other);
   }
 
   /**

@@ -191,6 +191,91 @@ bool csMath3::PlanesClose (const csPlane3& p1, const csPlane3& p2)
   return PlanesEqual (p1n, p2n);
 }
 
+int csMath3::OuterPlanes (const csBox3& box1, const csBox3& box2,
+	csPlane3* planes)
+{
+  int i, j, k;
+  // @@@ This is a HIGHLY INEFFICIENT routine.
+  // However, I haven't yet found something better.
+  int num_planes = 0;
+  for (i = 0 ; i < 8 ; i++)
+  {
+    csVector3 v1 = box1.GetCorner (i);
+    for (j = 0 ; j < 12 ; j++)
+    {
+      csSegment3 seg = box2.GetEdge (j);
+      const csVector3 v2a = seg.Start ();
+      const csVector3 v2b = seg.End ();
+      csPlane3 pl (v1, v2a, v2b);
+      pl.Normalize ();
+      // Check if we already have this plane.
+      bool equal = false;
+      for (k = 0 ; k < num_planes ; k++)
+      {
+        if (csMath3::PlanesEqual (planes[k], pl))
+	{
+	  equal = true;
+	  break;
+	}
+	pl.Invert (); // We don't restore Invert(). It is not needed.
+        if (csMath3::PlanesEqual (planes[k], pl))
+	{
+	  equal = true;
+	  break;
+	}
+      }
+      if (equal) continue;
+      // Count how many vertices of the two boxes are inside or outside
+      // the plane. We need planes with all vertices either
+      // on the plane or inside.
+      int cnt_in = 0, cnt_out = 0;
+      for (k = 0 ; k < 8 ; k++)
+      {
+        float cl = pl.Classify (box1.GetCorner (k));
+        if (cl < -EPSILON) cnt_out++;
+	else if (cl > EPSILON) cnt_in++;
+        cl = pl.Classify (box2.GetCorner (k));
+        if (cl < -EPSILON) cnt_out++;
+	else if (cl > EPSILON) cnt_in++;
+      }
+      // If all vertices are outside then we invert the plane
+      // to make them all inside instead.
+      if (cnt_in == 0) { pl.Invert (); cnt_in = cnt_out; cnt_out = 0; }
+      // If no vertices are outside then we have a good plane.
+      if (cnt_out == 0)
+      {
+        if (num_planes >= 8)
+	{
+	  printf ("INTERNAL ERROR! OuterPlanes returns too many planes!\n");
+	  fatal_exit (0, false);
+	}
+	planes[num_planes++] = pl;
+      }
+    }
+  }
+  return num_planes;
+}
+
+int csMath3::FindObserverSides (const csBox3& box1, const csBox3& box2,
+  	int* sides)
+{
+  int num_sides = 0;
+  csPlane3 pl;
+  pl.Set (1, 0, 0, -box1.MinX ());
+  if (pl.Classify (box2.GetCorner (BOX_CORNER_xyz)) < 0) sides[num_sides++] = 0;
+  pl.Set (-1, 0, 0, box1.MaxX ());
+  if (pl.Classify (box2.GetCorner (BOX_CORNER_Xyz)) < 0) sides[num_sides++] = 1;
+  pl.Set (0, 1, 0, -box1.MinY ());
+  if (pl.Classify (box2.GetCorner (BOX_CORNER_xyz)) < 0) sides[num_sides++] = 2;
+  pl.Set (0, -1, 0, box1.MaxY ());
+  if (pl.Classify (box2.GetCorner (BOX_CORNER_xYz)) < 0) sides[num_sides++] = 3;
+  pl.Set (0, 0, 1, -box1.MinZ ());
+  if (pl.Classify (box2.GetCorner (BOX_CORNER_xyz)) < 0) sides[num_sides++] = 4;
+  pl.Set (0, 0, -1, box1.MaxZ ());
+  if (pl.Classify (box2.GetCorner (BOX_CORNER_xyZ)) < 0) sides[num_sides++] = 5;
+  return num_sides;
+}
+
 //---------------------------------------------------------------------------
 
 float csSquaredDist::PointLine (const csVector3& p, 

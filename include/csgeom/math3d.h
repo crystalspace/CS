@@ -31,6 +31,7 @@
 #include "csgeom/vector3.h"
 #include "csgeom/plane3.h"
 #include "csgeom/segment.h"
+#include "csgeom/box.h"
 
 class csDVector3;
 class csPoly3D;
@@ -149,7 +150,7 @@ public:
 
   /**
    * Compute the normal given two (u,v) vectors.
-   * This function will calculat the normal to a polygon with two edges
+   * This function will calculate the normal to a polygon with two edges
    * represented by v and u.  The result is stored in norm.
    */
   static void CalcNormal (csVector3& norm,
@@ -187,6 +188,26 @@ public:
    * the normalized versions are almost equal.
    */
   static bool PlanesClose (const csPlane3& p1, const csPlane3& p2);
+
+  /**
+   * Calculate the set of outer planes between the two boxes. Is something
+   * does not intersect this set of planes then it will not be between
+   * the two boxes. The given array of planes should have place for at
+   * least eight planes. This function returns the number of planes
+   * that are put in 'planes'.
+   */
+  static int OuterPlanes (const csBox3& box1, const csBox3& box2,
+    csPlane3* planes);
+
+  /**
+   * Find all observer sides on the first box that can see the
+   * other box. Sides are numbered like this: 0=MinX(), 1=MaxX(),
+   * 2=MinY(), 3=MaxY(), 4=MinZ(), 5=MaxZ().
+   * The given array should have place for 6 sides.
+   * This function returns the number of observer sides.
+   */
+  static int FindObserverSides (const csBox3& box1, const csBox3& box2,
+  	int* sides);
 };
 
 /**

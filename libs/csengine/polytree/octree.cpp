@@ -950,6 +950,57 @@ void csOctree::AddToPVS (csPVS& pvs, csOctreeNode* node)
 }
 
 #if 1
+void csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
+	csOctreeNode* leaf, csCovcube* cube)
+{
+  if (!occludee) return;
+  int i;
+  bool visible = false;
+  if (occludee->GetBox ().In (leaf->GetCenter ()))
+    visible = true;
+  else if (leaf->GetBox ().Adjacent (occludee->GetBox ()))
+    // @@@ It would be nice if we could also include adjacent
+    // nodes in the PVS by testing if the shared plane between
+    // the two nodes is completely solid.
+    visible = true;
+  else
+  {
+    csPlane3 planes[8];
+    int num_planes;
+    num_planes = csMath3::OuterPlanes (occludee->GetBox (), leaf->GetBox (),
+    	planes);
+    int relevant_sides[6];
+    int num_relevant_sides;
+    num_relevant_sides = csMath3::FindObserverSides (leaf->GetBox (),
+    	occludee->GetBox (), relevant_sides);
+    for (i = 0 ; i < num_relevant_sides ; i++)
+      cube->GetFace (relevant_sides[i])->MakeEmpty ();
+    //@@@ BuildPVSAddShadows ();
+    for (i = 0 ; i < num_relevant_sides ; i++)
+      if (!cube->GetFace (relevant_sides[i])->IsFull ())
+      {
+        visible = true;
+	break;
+      }
+  }
+
+  // If visible then we add to the PVS and build the PVS for
+  // the polygons in the node as well.
+  // Also traverse to the children.
+  if (visible)
+  {
+    csPVS& pvs = leaf->GetPVS ();
+    csOctreeVisible* ovis = pvs.Add ();
+    ovis->SetOctreeNode (occludee);
+    //@@@ PVS NOT YET IMPLEMENTED FOR POLYGONS
+    //if (occludee->IsLeaf ())
+      //BuildPVSForLeafPolygons (occludee, ovis, ...);
+    for (i = 0 ; i < 8 ; i++)
+      BuildPVSForLeaf ((csOctreeNode*)occludee->children[i],
+      	thing, leaf, cube);
+  }
+}
+#elif 0
 void csOctree::BuildPVSForLeaf (csThing* thing,
 	csOctreeNode* leaf, csCovcube* /*cube*/)
 {
@@ -1048,7 +1099,9 @@ void csOctree::BuildPVS (csThing* thing,
     // extra smaller octree leafs so that our granularity
     // for the PVS is better. Those octree leafs are ignored
     // by the normal polygon/node traversal process.
-    BuildPVSForLeaf (thing, node, cube);
+    csPVS& pvs = node->GetPVS ();
+    pvs.Clear ();
+    BuildPVSForLeaf ((csOctreeNode*)root, thing, node, cube);
   }
   else
   {

@@ -53,6 +53,9 @@ public:
   /// Initialize the plane.
   csPlane3 (float a, float b, float c, float d=0) : norm(a,b,c), DD(d) {}
 
+  /// Initialize the plane through the three given points.
+  csPlane3 (const csVector3& v1, const csVector3& v2, const csVector3& v3);
+
   /// Return the normal vector of this plane.
   inline csVector3& Normal () { return norm; }
 

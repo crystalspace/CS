@@ -114,6 +114,14 @@ public:
    * Test for point visibility with the cube.
    */
   int TestPoint (const csVector3& point);
+
+  /**
+   * Get the pointer to one of the trees in the cube.
+   */
+  csCoverageMaskTreePersp* GetFace (int idx)
+  {
+    return trees[idx];
+  }
 };
 
 #endif /*COVCUBE_H*/

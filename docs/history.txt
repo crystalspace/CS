@@ -1,11 +1,117 @@
 The history order has been reversed so that new features are at the top.
 
+27-Apr-2000
+	- Frank O'Connor updated VC project files for NetComm and
+	  the scfTutor apps (zoo, dog, worm).
+	- Frank also modified zoo.cpp so that it compiles on Win32.
+	- Fixed a small compile error in libs/cssys/unix/unix.h which
+	  prevent compilation on Unix.
 26-Apr-2000
-    - Desmond Fletcher added new classnames and keys to map2cs to extend
-      map editing capabilities.  Updated documentation for map2cs.
+	- Fixed csMath3::FindObserverSides().
+	- Added csBox2 and csBox3::GetEdge() to iterate over all edges
+	  of a bounding box.
+	- Fixed csMath3::OuterPlanes() to work with the new GetEdge().
+	- Continued work on PVS.
+	- Desmond Fletcher added option to change world zipfile extension.
+	- Desmond Fletcher added new classnames and keys to map2cs to extend
+	  map editing capabilities.  Updated documentation for map2cs.
+	- Thomas Riemer did some fixes to NSTP.
+	- Thomas also removed obsolete code: Refresh/StartServer from
+	  the network manager, and also added preliminary error handling
+	  via GetLastError() at each level.
+	- Chris Bruner did a fix for Borland (doesn't know _getpid()).
+	- Andrew Zabolotny removed the above fix for _getpid(). The fix
+	  is now applied to include/cssys/win32/csosdefs.h.
+	- Frank O'Connor updated VC project files for csnstp project and
+	  cswstest.
+25-Apr-2000
+	- Added csBox3::Adjacent() function to test if two boxes
+	  are adjacent.
+	- Added csMath3::FindObserverSides() to find all sides of one
+	  box that can see another box.
+	- Added BOX_CORNER_xyz and BOX_CORNER_xy defines for csBox3 and
+	  csBox2::GetCorner().
+	- Andrew Zabolotny added functionality for testing line clipping
+	  in cswstest (Ctrl+mouse click).
+	- Chris Bruner fixed 'makedep' so that it compiles for Borland.
+	- Michael Dale Long wrote a dnapp.mpk (for the Python Makefile
+	  generator) for the dungeon app. Michael also made a few simple
+	  fixes in dnapp.cpp (i.e. use cross platform functions in cssys).
+	  Some other dungeon changes.
+	- Denis Oliver Kropp <dok@master.fischlustig.de> did a small fix
+	  to Map2CS (itoa is missing).
+	- Frank O'Connor updated many VC project files for the new networking
+	  code and NSTP.
+	- Robert Bate did a small fix on the phyztest app.
+	- Robert also worked on DrawSprockets code for the Macintosh port.
+	- Robert did the first step to adding support for InputSprockets
+	  for the Mac port.
+	- Robert also updated the Mac project files.
+	- Thomas Riemer redefined code to connect objects in network manager.
+	- Gary Haussmann cleaned out some commented code in the OpenGL
+	  2D driver for X. Added some more diagnostic messages in the code
+	  that tries to find a good X Visual. Changed the visual selection
+	  code so that it accepts only visuals with depth buffers with
+	  precision >= 8 bits.
+	- Gary finished converting DrawTriangleMesh() to use OpenGL
+	  transforms; the entire transform (both the world->camera
+	  transform and the perspective projection) is embodied in OpenGL
+	  matrices so it will be hardware accelerated if the Graphics
+	  hardware supports such things.
+	- Gary also added glViewport() calls provided by Denis Oliver Kropp
+	  to get the driver working on certain platforms (such as
+	  the current utah-glx builds).  Some drivers work fine without
+	  calls to glViewPort(). Is this required by the standard?
 24-Apr-2000
-    - Martin Geisse added the first working version of the DUNGEON
-      plugin (random level generator).
+	- Martin Geisse added the first working version of the DUNGEON
+	  plugin (random level generator).
+	- Frank O'Connor did a RequestPlugin fix for NetSpace test apps.
+	- Frank also removed dnapp project (leaving only the dnappc console
+	  version).
+	- Frank fixed infinite loop in walktest.cpp (in DO_SOUND ifdef).
+	- Eric Sunshine added another official revision of texi2html 1.62
+	  from the maintainer containing the patches which I sent to him.
+	- Robert Bate fixed an include for the Macintosh in the network
+	  driver code.
+23-Apr-2000
+	- Added csPlane3 constructor with three points.
+	- Added csMath3::OuterPlanes() function which calculates the
+	  outer planes between two axis aligned boxes.
+	- Continued work on PVS.
+	- Frank O'Connor added new networking model by Thomas Riemer
+	  <triemer@apt4g.a3nyc.com>. Foundation work for protocol
+	  independent network communication infrastracture. The begining of
+	  the NSTP is also in this update (via NSTP protocol plugin).
+	  The structure is as such:
+	  	csnsmgr (Command Manager)
+		csnstp (Protocol Layer)
+		csnetman (Network Management Layer)
+		csnetdrv (Network Driver Level)
+	- Also added 'demonets' and 'nstp' applications to demonstrate
+	  the new networking code.
+	- Frank readded cleanup() and debug_dump() to the above test
+	  applications.
+	- Frank created a console mode VC project for dnapp (Dungeon App).
+	- Desmond Fletcher added code to Map2CS to write sprites (code
+	  from Pete Mistich).
+	- Desmond also added WriteSounds (accessed from zipfile; registered
+	  in vfs.cfg in lib/sounds).
+	- Desmond also did various other changes to Map2CS (added gif in
+	  CreateTexture, added textures for all 2D cs_sprite entities).
+	- Desmond added 2D Sound iterator.
+	- Desmond added sounds_loaded to csLoaderStat to report sounds
+	  loading.
+	- Martin Geisse did a fix for memcpy() with MSVC and enabled it
+	  for all VC users.
+	- Martin did a massive update to the Dungeon plugin.
+	- Eric Sunshine fixed the MingW makefile (CRLF->LF) and disabled
+	  the -kb sticky flag.
+22-Apr-2000
+	- Made csTextureTrans a little bit more robust for badly specified
+	  texture coordinates. In fact this is a level error and probably
+	  something that should be detected by CS at load time.
+	- Wouter Wijngaards changed radiosity with slightly better
+	  quality loop detection code.
 21-Apr-2000
 	- Andrew Zabolotny changed 'int' back to 'ceil' in CompressVertices()
 	  (i.e. change from Frank O'Connor).
@@ -23,6 +129,10 @@ The history order has been reversed so that new features are at the top.
 	- Wouter Wijngaards made a speed improvement to radiosity (several
 	  factors faster now). It also works for bsp levels and has no more
 	  black borders. White borders on lightmaps are still there though.
+	- Paul Garceau eliminated a warning from the Mingw build which was
+	  generated by a malformed (syntax) comment statement.
+	- Paul also updated to fully support build differences between
+	  COMP_GCC and COMP_VC/COMP_BC.
 20-Apr-2000
 	- Andrew Zabolotny did another try to fix the Windows port
 	  by adding an assembly version of memcpy.

@@ -35,6 +35,18 @@ csVector2 csBox2::GetCorner (int corner) const
   return csVector2 (0, 0);
 }
 
+csSegment2 csBox2::GetEdge (int edge) const
+{
+  switch (edge)
+  {
+    case 0: return csSegment2 (GetCorner (0), GetCorner (1));
+    case 1: return csSegment2 (GetCorner (0), GetCorner (2));
+    case 2: return csSegment2 (GetCorner (1), GetCorner (3));
+    case 3: return csSegment2 (GetCorner (2), GetCorner (3));
+  }
+  return csSegment2 ();
+}
+
 csBox2& csBox2::operator+= (const csBox2& box)
 {
   if (box.minbox.x < minbox.x) minbox.x = box.minbox.x;
@@ -231,8 +243,64 @@ csVector3 csBox3::GetCorner (int corner) const
   return csVector3 (0, 0, 0);
 }
 
+csSegment3 csBox3::GetEdge (int edge) const
+{
+  switch (edge)
+  {
+    case 0: return csSegment3 (GetCorner (0), GetCorner (1));
+    case 1: return csSegment3 (GetCorner (0), GetCorner (2));
+    case 2: return csSegment3 (GetCorner (0), GetCorner (4));
+    case 3: return csSegment3 (GetCorner (4), GetCorner (5));
+    case 4: return csSegment3 (GetCorner (4), GetCorner (6));
+    case 5: return csSegment3 (GetCorner (1), GetCorner (5));
+    case 6: return csSegment3 (GetCorner (1), GetCorner (3));
+    case 7: return csSegment3 (GetCorner (5), GetCorner (7));
+    case 8: return csSegment3 (GetCorner (3), GetCorner (7));
+    case 9: return csSegment3 (GetCorner (6), GetCorner (7));
+    case 10: return csSegment3 (GetCorner (2), GetCorner (3));
+    case 11: return csSegment3 (GetCorner (2), GetCorner (6));
+  }
+  return csSegment3 ();
+}
+
+bool csBox3::AdjacentX (const csBox3& other) const
+{
+  if (ABS (other.MinX () - MaxX ()) < SMALL_EPSILON ||
+      ABS (other.MaxX () - MinX ()) < SMALL_EPSILON)
+  {
+    if (MaxY () < other.MinY () || MinY () > other.MaxY ()) return false;
+    if (MaxZ () < other.MinZ () || MinZ () > other.MaxZ ()) return false;
+    return true;
+  }
+  return false;
+}
+
+bool csBox3::AdjacentY (const csBox3& other) const
+{
+  if (ABS (other.MinY () - MaxY ()) < SMALL_EPSILON ||
+      ABS (other.MaxY () - MinY ()) < SMALL_EPSILON)
+  {
+    if (MaxX () < other.MinX () || MinX () > other.MaxX ()) return false;
+    if (MaxZ () < other.MinZ () || MinZ () > other.MaxZ ()) return false;
+    return true;
+  }
+  return false;
+}
+
+bool csBox3::AdjacentZ (const csBox3& other) const
+{
+  if (ABS (other.MinZ () - MaxZ ()) < SMALL_EPSILON ||
+      ABS (other.MaxZ () - MinZ ()) < SMALL_EPSILON)
+  {
+    if (MaxX () < other.MinX () || MinX () > other.MaxX ()) return false;
+    if (MaxY () < other.MinY () || MinY () > other.MaxY ()) return false;
+    return true;
+  }
+  return false;
+}
+
 void csBox3::GetConvexOutline (const csVector3& pos,
-	csVector3* array, int& num_array)
+	csVector3* ar, int& num_array)
 {
   const csVector3& bmin = Min ();
   const csVector3& bmax = Max ();
@@ -257,14 +325,14 @@ void csBox3::GetConvexOutline (const csVector3& pos,
   {
     switch (ol.vertices[i])
     {
-      case 0: array[i].x = bmin.x; array[i].y = bmin.y; array[i].z = bmin.z; break;
-      case 1: array[i].x = bmin.x; array[i].y = bmin.y; array[i].z = bmax.z; break;
-      case 2: array[i].x = bmin.x; array[i].y = bmax.y; array[i].z = bmin.z; break;
-      case 3: array[i].x = bmin.x; array[i].y = bmax.y; array[i].z = bmax.z; break;
-      case 4: array[i].x = bmax.x; array[i].y = bmin.y; array[i].z = bmin.z; break;
-      case 5: array[i].x = bmax.x; array[i].y = bmin.y; array[i].z = bmax.z; break;
-      case 6: array[i].x = bmax.x; array[i].y = bmax.y; array[i].z = bmin.z; break;
-      case 7: array[i].x = bmax.x; array[i].y = bmax.y; array[i].z = bmax.z; break;
+      case 0: ar[i].x = bmin.x; ar[i].y = bmin.y; ar[i].z = bmin.z; break;
+      case 1: ar[i].x = bmin.x; ar[i].y = bmin.y; ar[i].z = bmax.z; break;
+      case 2: ar[i].x = bmin.x; ar[i].y = bmax.y; ar[i].z = bmin.z; break;
+      case 3: ar[i].x = bmin.x; ar[i].y = bmax.y; ar[i].z = bmax.z; break;
+      case 4: ar[i].x = bmax.x; ar[i].y = bmin.y; ar[i].z = bmin.z; break;
+      case 5: ar[i].x = bmax.x; ar[i].y = bmin.y; ar[i].z = bmax.z; break;
+      case 6: ar[i].x = bmax.x; ar[i].y = bmax.y; ar[i].z = bmin.z; break;
+      case 7: ar[i].x = bmax.x; ar[i].y = bmax.y; ar[i].z = bmax.z; break;
     }
   }
 }
