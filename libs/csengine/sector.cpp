@@ -883,8 +883,8 @@ void* CalculateLightingPolygonsFB (csPolygonParentInt*,
 
 // @@@ This routine need to be cleaned up!!! It needs to
 // be part of the class.
-bool CullOctreeNodeLighting (csPolygonTree* tree, csPolygonTreeNode* node,
-	const csVector3& pos, void* data)
+bool CullOctreeNodeLighting (csPolygonTree* /*tree*/, csPolygonTreeNode* node,
+	const csVector3& /*pos*/, void* data)
 {
   if (!node) return false;
   if (node->Type () != NODE_OCTREE) return true;

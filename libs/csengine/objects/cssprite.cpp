@@ -903,7 +903,7 @@ void csSprite3D::Draw (csRenderView& rview)
       // Clip triangle. Note that the clipper doesn't care about the
       // orientation of the triangle vertices. It works just as well in
       // mirrored mode.
-      int rescount;
+      int rescount = 0;
       if (do_clip)
       {
         if (!rview.view->Clip (triangle, clipped_triangle, 3, rescount)) continue;

@@ -223,6 +223,9 @@ class csCrossBuild_Quake2Importer
     // has frames with names that start with the proper action names
     void              Build_Quake2Actions(csSpriteTemplate &frameholder) const;
 
+    /// Dummy asignment operator to get rid of a MSVC warning.
+    void operator= (const csCrossBuild_Quake2Importer&) {};
+
   public:
     /// Constructor needs a VFS to map from the WAD, sprite respository,
     /// or whatever, to files.   If no VFS is supplied it will use

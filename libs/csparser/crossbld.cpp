@@ -367,7 +367,11 @@ csSpriteTemplate *csCrossBuild_Quake2Importer::Import_Quake2File(
 
   newtemplate->GenerateLOD ();
   newtemplate->ComputeBoundingBox ();
-
+#else
+  (void) md2filebase;
+  (void) skinpath;
+  (void) modelname;
+  (void) importdestination;
 #endif
 
   return NULL;
@@ -401,6 +405,8 @@ csSpriteTemplate *csCrossBuild_Quake2Importer::Import_Quake2SpriteTemplate(
   csSpriteTemplate * newtemplate = (csSpriteTemplate *)localfactory.CrossBuild(modeldata);
 
   return newtemplate;
+#else
+  (void) modelfile;
 #endif
   return NULL;
 }
