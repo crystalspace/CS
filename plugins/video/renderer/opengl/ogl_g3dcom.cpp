@@ -676,7 +676,7 @@ static float SetupBlend (UInt mode, float m_alpha, bool has_alpha)
       // Color = SRC * DEST +   0 * SRC = DEST * SRC
       m_alpha = 1.0f;
       glBlendFunc (GL_ZERO, GL_SRC_COLOR);
-      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
       break;
     case CS_FX_MULTIPLY2:
       // Color = SRC * DEST + DEST * SRC = 2 * DEST * SRC

@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+7-May-2001
+	- Added 'strserv' to walkall target.
+	- Fixed OpenGL multiply mode. It was using GL_DECAL when it should
+	  use GL_MODULATE.
 6-May-2001
 	- Martin Geisse made the following changes:
 	    - csengine now depends on the string server. All apps have
