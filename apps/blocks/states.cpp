@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "cssys/sysfunc.h"
 #include "states.h"
 
 States::States ()
@@ -199,10 +200,10 @@ bool States::DecodeStates ()
 
 bool States::PrintData (const char* fileName) const
 {
-  printf("\n--------------------------------------------------\n");
-  printf("%s\n",encodedData);
-  printf("\n--------------------------------------------------\n");
-  printf("%f,%f,%d,%d,%d,%d,%d,%d\n",
+  csPrintf("\n--------------------------------------------------\n");
+  csPrintf("%s\n",encodedData);
+  csPrintf("\n--------------------------------------------------\n");
+  csPrintf("%f,%f,%d,%d,%d,%d,%d,%d\n",
     speed, cur_speed, score, cube_x, cube_y, cube_z, zone_dim, new_zone_dim);
   int k, j, i;
   for (k = 0; k < ZONE_SAFETY + ZONE_HEIGHT + ZONE_SAFETY ; k++)
