@@ -3424,7 +3424,7 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
   for (i = 0 ; i < num_triangles ; i++)
   {
     csTriangle& tri = triangles[i];
-    bool isect = (ct[tri.a] == -1) | (ct[tri.b] == -1) | (ct[tri.c] == -1);
+    bool isect = (ct[tri.a] == -1) || (ct[tri.b] == -1) || (ct[tri.c] == -1);
     if (!isect)
     {
       //=====
