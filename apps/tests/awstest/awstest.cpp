@@ -427,7 +427,7 @@ awsTest::SetupFrame()
   if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
     
   sprintf(message, "awsTest(%d)", counter);
-  myG2D->Write(font, 5,5, col_black, col_green, message);
+  myG2D->Write(font, 5,5, col_green, -1, message);
   
   aws->Redraw();
   aws->Print(myG3D);

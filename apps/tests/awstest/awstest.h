@@ -32,7 +32,7 @@ public:
 private:
   iEngine* engine;
   iAws *aws;
-  iAwsPrefs *awsprefs;
+  iAwsPrefManager *awsprefs;
   iSector* room;
   iView* view;
   iGraphics3D *myG3D;

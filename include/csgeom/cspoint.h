@@ -33,7 +33,7 @@ struct csPoint
   /// Constructor: initialize the object with given values
   csPoint (int iX, int iY):x(iX), y(iY)
   { }
-  /// Constructor: initialize the object vy copying
+  /// Constructor: initialize the object by copying
   csPoint (const csPoint &v):x(v.x), y(v.y)
   { }
   /// Set the coordinates of this point
