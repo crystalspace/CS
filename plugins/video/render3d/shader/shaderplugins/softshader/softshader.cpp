@@ -72,6 +72,7 @@ csSoftShader::~csSoftShader()
 ////////////////////////////////////////////////////////////////////
 bool csSoftShader::SupportType(const char* type)
 {
+  Open();
   if (!enable)
     return false;
   if( strcasecmp(type, "vp") == 0)
@@ -83,6 +84,7 @@ bool csSoftShader::SupportType(const char* type)
 
 csPtr<iShaderProgram> csSoftShader::CreateProgram(const char* type)
 {
+  Open();
   if (!enable)
     return 0;
   if( strcasecmp(type, "vp") == 0)
