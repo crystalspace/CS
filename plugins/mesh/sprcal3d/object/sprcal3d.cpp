@@ -2075,7 +2075,7 @@ bool csSpriteCal3DMeshObject::ClearAnimCycle(const char *name, float delay)
   int const pos = FindAnimCycleNamePos(name);
   bool const ok = (pos != -1);
   if (ok)
-    ClearAnimCycle(pos,delay);
+    ClearAnimCyclePos(pos,delay);
   return ok;
 }
 

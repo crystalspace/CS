@@ -11,6 +11,10 @@ chronological order.
 	  csSpriteCal3DMeshObject::FindAnimCycleNamePos() which generally
 	  failed (though it would succeed if the input argument was the return
 	  value of GetAnimName()).
+	- Eric Sunshine fixed bug in the (char const*) overload of
+	  csSpriteCal3DMeshObject::ClearAnimCycle() where it incorrectly
+	  invoked ClearAnimCycle() rather than ClearAnimCyclePos(). This caused
+	  it to be entirely dysfunctional.
 16-Nov-2004
 	- Eric Sunshine enhanced CS_CHECK_LIB_WITH() in checklib.m4 so that it
 	  knows about MacOS/X frameworks, and automatically tests for the
