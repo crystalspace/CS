@@ -319,8 +319,9 @@ csInputDefinition::csInputDefinition (const char *_s, uint32 mods, bool cook)
   else
   {
     containedType = csevKeyboard;
-    keyboard.code = cook ? NameToCooked (str.GetData ())
-			 : NameToRaw (str.GetData ());
+    if (str.Length () == 1) keyboard.code = str.GetAt (0);
+    else keyboard.code = cook ? NameToCooked (str.GetData ())
+			      : NameToRaw (str.GetData ());
   }
 }
 
@@ -361,12 +362,11 @@ csString csInputDefinition::ToString (bool distinguishMods) const
   switch (containedType)
   {
     case csevKeyboard:
-    {
-      const char *name = keyboard.isCooked ? CookedToName (keyboard.code)
-					   : RawToName (keyboard.code);
-      if (! name) return csString ();
-      str.Append (name);
-    }
+    if (CSKEY_IS_SPECIAL (keyboard.code) || keyboard.code <= 0x20)
+      str.Append (keyboard.isCooked ? CookedToName (keyboard.code)
+				    : RawToName (keyboard.code));
+    else
+      str.Append ((char) keyboard.code);
     break;
 
     case csevMouseDown:
