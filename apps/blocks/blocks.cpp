@@ -483,6 +483,7 @@ void Blocks::InitGame ()
   move_down_dx = dest_move_down_dx[cur_hor_dest];
   move_down_dy = dest_move_down_dy[cur_hor_dest];
   cam_move_dest = destinations[cur_hor_dest][cur_ver_dest];
+  cam_move_src.Set (0, 0, 0);
 
   pause = false;
 }
