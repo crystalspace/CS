@@ -227,11 +227,14 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
   if (meshCreated)
   {
     rm->meshtype = CS_MESHTYPE_TRIANGLEFAN;
-    rm->material = material;
     rm->buffers = bufferHolder;
     rm->geometryInstance = this;
   }
   
+  rm->material = material;//Moved this statement out of the above 'if'
+    //to make the change of the material possible at any time
+    //(thru a call to either iSprite2DState::SetMaterialWrapper () or
+    //csSprite2DMeshObject::SetMaterialWrapper (). Luca
   rm->mixmode = MixMode;
   rm->clip_portal = clip_portal;
   rm->clip_plane = clip_plane;

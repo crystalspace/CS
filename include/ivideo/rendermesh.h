@@ -133,7 +133,10 @@ struct csCoreRenderMesh
   /// Start of the range of indices to use
   unsigned int indexstart;
 
-  /// End of the range of indices to use
+  /// End of the range of indices to use. Actually the
+  /// indices are used in the range from \a indexstart to \a indexend,
+  /// but not including the latter, i.e. a range of 0 to 24 will
+  /// get the indices from 0 to 23 used.
   unsigned int indexend;
 
   /// Transform to use for this mesh (object->camera)
