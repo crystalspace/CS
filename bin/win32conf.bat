@@ -62,6 +62,17 @@
 :nomakedep
   del conftest.* >nul
 
+  echo ### Checking if you use cmd.exe or some fancy shell...
+  echo testing>conftest.o
+  make testecho
+  cat conftest.o
+  cat conftest.tmp
+  cmp conftest.o conftest.tmp
+  if not errorlevel 1 goto noremovequote
+  echo $$$ O.K. Setting to use cmd.exe settings
   type bin\win32conf.var >>config.tmp
+
+:noremovequote
+  del conftest.* >nul
 
 :exit

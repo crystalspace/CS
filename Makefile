@@ -93,6 +93,9 @@ depend: cleandep dep
 clean cleanlib cleandep distclean:
 	@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@
 
+testecho:
+	echo $"testing$">>conftest.tmp
+
 unknown:
 	$(RM) config.mak
 	$(RM) include/volatile.h
