@@ -1,5 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
+27-Feb-2001
+	- Eric Sunshine eliminated numerous mark-up (and other) errors which
+	  were reported by Doxygen throughout the headers.
 26-Feb-2001
 	- Eric Sunshine moved specification of the special EAX sound libraries
 	  from mk/msvcgen/plugin.tpl to sndeax.mak.

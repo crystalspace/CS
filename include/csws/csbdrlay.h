@@ -104,6 +104,7 @@ class csBorderLayout : public csLayout2
    * IN:  the component to add
    * OUT: the constraint that is used to layout the component 
    *      (a copy of variable c  see above)
+   * </pre>
    */
   virtual csLayoutConstraint *AddLayoutComponent (csComponent* comp);
   /// remove a component from the layout

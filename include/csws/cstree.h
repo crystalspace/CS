@@ -133,7 +133,7 @@ enum
    * with the right mouse button.
    * <pre>
    * IN: (csTreeItem *)item;
-   * <?pre>
+   * </pre>
    */
   cscmdTreeItemRightClick,
   /**

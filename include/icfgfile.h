@@ -44,7 +44,7 @@ SCF_VERSION (iConfigSectionIterator, 0, 0, 1);
  * while (s && s->Next ())
  *   printf ("Section: [%s]\n", s->GetSection ());
  * s->DecRef ();
- *<pre>
+ *</pre>
  */
 struct iConfigSectionIterator : public iBase
 {
