@@ -1403,6 +1403,8 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
   // compute formfactors.
   csVector3 path = dest_lumel - src_lumel;
   dest_normal = shoot_dest->GetNormal(rx, ry);
+  csVector3 pathangle = path;
+  pathangle.Normalize();
 
   // Since 'path' is not normalized the cosinus calculated below
   // is not really a cosinus. But it doesn't matter for our calculations.
@@ -1417,11 +1419,14 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
 
   if(source_patch_size == 1)
   {
-    cossrcangle = src_normal * path;
-    cosdestangle = - (dest_normal * path);
+    cossrcangle = src_normal * pathangle;
+    cosdestangle = - (dest_normal * pathangle);
     distance = path.SquaredNorm ();
   } else
   {
+    /// this code is bad!
+    /// need to take .Unit() of paths, not add up distances...
+
     /// average over the source area
     /// take the 4 corners.
     csVector3 pos;
@@ -1458,7 +1463,7 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
   // This function calculates radiosity with linear light attenuation
   // because that is what CS uses internally as well.
   float totalfactor = cossrcangle * cosdestangle * 
-    source_patch_area * visibility / (sqdistance*sqdistance);
+    source_patch_area * visibility / (sqdistance);
 
   //if(totalfactor > 10.0f) totalfactor = 10.0f;
 
@@ -1470,7 +1475,7 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
 #if 1
   //if(totalfactor > 10.0f)
   //if(totalfactor > 0.001f)
-  if(rand()%255==0)
+  if(rand()%100000==0)
     CsPrintf(MSG_STDOUT, "totalfactor %g = "
   	"cosshoot %g * cosdest %g * area %g * vis %g / sqdis %g.  "
 	"srclumelcolor (%g, %g, %g), deltacolor (%g, %g, %g)\n", 
