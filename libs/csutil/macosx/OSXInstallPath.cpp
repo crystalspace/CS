@@ -74,7 +74,24 @@ csString csGetConfigPath()
   if (OSXGetInstallPath(buff, FILENAME_MAX, CS_PATH_SEPARATOR))
     candidates.Push(buff);
   if ((env = getenv("CRYSTAL")) != 0 && *env != '\0')
-    candidates.Push(env);
+  {
+    csString crystalPath (env);
+
+    size_t pos = 0;
+    while (pos < crystalPath.Length())
+    {
+      size_t colon = crystalPath.FindFirst (':', pos);
+      size_t subStrLen;
+      if (colon == 0)
+	subStrLen = crystalPath.Length() - pos;
+      else
+	subStrLen = colon - pos;
+
+      candidates.Push (crystalPath.Slice (pos, subStrLen));
+      
+      pos = colon + 1;
+    }
+  }
   candidates.Push(".");
 #if defined(CS_CONFIGDIR)
   candidates.Push(CS_CONFIGDIR);

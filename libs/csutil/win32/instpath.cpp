@@ -105,7 +105,22 @@ static inline char* FindConfigPath ()
   // called.
   char *envpath = getenv ("CRYSTAL");
   if (envpath && *envpath)
-    if ((retPath = NewPathWOTrailingDelim (envpath)) != 0) return retPath;
+  {
+    // Multiple paths. Take first one...
+    // @@@ Check for vfs.cfg?
+    csString crystalPath (envpath);
+
+    size_t colon = crystalPath.FindFirst (';'); 
+      // MSYS converts :-separated paths to ;-separation in Win32 style.
+    size_t subStrLen;
+    if (colon == 0)
+      subStrLen = crystalPath.Length();
+    else
+      subStrLen = colon;
+    
+    if ((retPath = NewPathWOTrailingDelim (
+      crystalPath.Slice (0, subStrLen))) != 0) return retPath;
+  }
 
   // try the registry
   char path[1024];

@@ -55,27 +55,42 @@ csString csGetConfigPath ()
   if (crystal)
   {
     csString path, file;
+    csString crystalPath (crystal);
 
-    path = crystal;
-    path << "/etc/" CS_PACKAGE_NAME;
-    file = path;
-    file << "/vfs.cfg";
-    if (!access(file, F_OK))
-      return path;
+    size_t pos = 0;
 
-    path = crystal;
-    path << "/etc";
-    file = path;
-    file << "/vfs.cfg";
-    if (!access(file, F_OK))
-      return path;
+    while (pos < crystalPath.Length())
+    {
+      size_t colon = crystalPath.FindFirst (':', pos);
+      size_t subStrLen;
+      if (colon == 0)
+	subStrLen = crystalPath.Length() - pos;
+      else
+	subStrLen = colon - pos;
 
-    path = crystal;
-    file = path;
-    file << "/vfs.cfg";
-    if (!access(file, F_OK))
-      return path;
-
+      path = crystalPath.Slice (pos, subStrLen);
+      path << "/etc/" CS_PACKAGE_NAME;
+      file = path;
+      file << "/vfs.cfg";
+      if (!access(file, F_OK))
+	return path;
+  
+      path = crystalPath.Slice (pos, subStrLen);
+      path << "/etc";
+      file = path;
+      file << "/vfs.cfg";
+      if (!access(file, F_OK))
+	return path;
+  
+      path = crystalPath.Slice (pos, subStrLen);
+      file = path;
+      file << "/vfs.cfg";
+      if (!access(file, F_OK))
+	return path;
+      
+      pos = colon + 1;
+    }
+    
     fprintf (stderr,
         "Failed to find vfs.cfg in '%s' (defined by CRYSTAL var).\n", crystal);
     return "";
@@ -105,12 +120,28 @@ csPluginPaths* csGetPluginPaths (const char* argv0)
   const char* crystal = getenv("CRYSTAL");
   if (crystal)
   {
+    csString crystalPath (crystal);
     csString libpath1, libpath2;
-    libpath1 << crystal << "/lib";
-    libpath2 << libpath1 << "/" CS_PACKAGE_NAME;
-    paths->AddOnce(libpath2, DO_SCAN_RECURSION, "plugins");
-    paths->AddOnce(libpath1, DO_SCAN_RECURSION, "plugins");
-    paths->AddOnce(crystal,  DO_SCAN_RECURSION, "plugins");
+
+    size_t pos = 0;
+
+    while (pos < crystalPath.Length())
+    {
+      size_t colon = crystalPath.FindFirst (':', pos);
+      size_t subStrLen;
+      if (colon == 0)
+	subStrLen = crystalPath.Length() - pos;
+      else
+	subStrLen = colon - pos;
+
+      libpath1 << crystalPath.Slice (pos, subStrLen) << "/lib";
+      libpath2 << libpath1 << "/" CS_PACKAGE_NAME;
+      paths->AddOnce(libpath2, DO_SCAN_RECURSION, "plugins");
+      paths->AddOnce(libpath1, DO_SCAN_RECURSION, "plugins");
+      paths->AddOnce(crystal,  DO_SCAN_RECURSION, "plugins");
+      
+      pos = colon + 1;
+    }
   }
 
   const char* crystal_plugin = getenv("CRYSTAL_PLUGIN");

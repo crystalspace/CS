@@ -28,6 +28,7 @@ chronological order.
 	  needed to create a call stack. It uses exception handling and is
 	  only used if the program is not debugged.
 	- res changed csRefCount to also use the ref tracker.
+	- res made CRYSTAL be treated like a list of paths.
 17-Feb-2005
 	- Jorrit added csPoly3D::ClassifyAxis().
 	- Jorrit added constants CS_AXIS_X, CS_AXIS_Y, and CS_AXIS_Z, to

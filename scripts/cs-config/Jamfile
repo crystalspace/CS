@@ -58,18 +58,41 @@ actions csConfigGen
   cat $(SUBDIR)/cs-config.temppre > $(<)
 
   cat >> $(<) << __END__
+# From autoconf:
+# The user is always right.
+if test "\${PATH_SEPARATOR+set}" != set; then
+  echo "#! /bin/sh" >conf\$\$.sh
+  echo  "exit 0"   >>conf\$\$.sh
+  chmod +x conf\$\$.sh
+  if (PATH="/nonexistent;."; conf$$.sh) >/dev/null 2>&1; then
+    PATH_SEPARATOR=';'
+  else
+    PATH_SEPARATOR=:
+  fi
+  rm -f conf\$\$.sh
+fi
+
 CRYSTAL="\${CRYSTAL-$(prefix)}"
-prefix="\${CRYSTAL}"
-exec_prefix="\${prefix}"
-makeout="$(LOCATE.OBJECTS)"
-version="$(PACKAGE_VERSION)"
-longversion="$(PACKAGE_STRING)"
-# try to determine if we're in a source or installed CS version
-if [ -r \${prefix}/include/$(PACKAGE_NAME)/cssysdef.h ] ; then
-  includedir="\${prefix}/include/$(PACKAGE_NAME)"
-elif [ -r \${prefix}/include/cssysdef.h ] ; then
-  includedir="\${prefix}/include"
-else
+my_IFS=\$IFS; IFS=\$PATH_SEPARATOR
+for p in \$CRYSTAL
+do
+  prefix="\${p}"
+  exec_prefix="\${prefix}"
+  makeout="$(LOCATE.OBJECTS)"
+  version="$(PACKAGE_VERSION)"
+  longversion="$(PACKAGE_STRING)"
+  # try to determine if we're in a source or installed CS version
+  if [ -r \${prefix}/include/$(PACKAGE_NAME)/cssysdef.h ] ; then
+    includedir="\${prefix}/include/$(PACKAGE_NAME)"
+    break
+  elif [ -r \${prefix}/include/cssysdef.h ] ; then
+    includedir="\${prefix}/include"
+    break
+  fi
+done
+IFS=\$my_IFS
+if test "x\$includedir" = "x"
+then
   includedir="$(appincdir)"
 fi
 syslibs=" $(LINKLIBS) "

@@ -46,18 +46,28 @@ dnl line above.
 
 if test "x$CRYSTAL" != "x"
 then
-   if test -f $CRYSTAL/cs-config
+   my_IFS=$IFS; IFS=$PATH_SEPARATOR
+   for cs_dir in $CRYSTAL 
+   do
+     if test -f ${cs_dir}/cs-config
+     then
+	CSCONF="${cs_dir}/cs-config"
+	break
+     else
+	if test -f ${cs_dir}/bin/cs-config
+	then
+	   CSCONF="${cs_dir}/bin/cs-config"
+	   break
+	fi
+     fi	
+   done
+   IFS=$my_IFS
+
+   if test "x$CSCONF" = "x"
    then
-      CSCONF="$CRYSTAL/cs-config"
-   else
-      if test -f $CRYSTAL/bin/cs-config
-      then
-         CSCONF="$CRYSTAL/bin/cs-config"
-      else
-         AC_MSG_WARN([Can not find cs-config in path you provided])
-	 no_cs=yes
-      fi
-   fi	
+     AC_MSG_WARN([Can not find cs-config in path you provided])
+     no_cs=yes
+   fi
 fi
 
 if test "x$CRYSTAL" = "x"
@@ -81,7 +91,7 @@ fi
 
 if test "x$no_cs" = "x"
 then
-    min_cs_version=ifelse([$1],[],[0.94],[$1])
+    min_cs_version=ifelse([$1],[],[0.99],[$1])
     AC_MSG_CHECKING([for Crystal Space - version >= $min_cs_version])
 
     CRYSTAL_CFLAGS=CS_RUN_PATH_NORMALIZE([$CSCONF $csconf_args --cxxflags $4])

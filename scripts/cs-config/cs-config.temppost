@@ -10,6 +10,22 @@ if test -r "$prefix/Jamfile" && \
 elif test -z "$libdir" && test -r "${exec_prefix}/lib/libcsutil.a"; then
     libdir="${exec_prefix}/lib"
     lflags="-L${exec_prefix}/lib"
+else
+    my_IFS=$IFS; IFS=$PATH_SEPARATOR
+    for p in $CRYSTAL
+    do
+	if test -r "$p/Jamfile" && \
+	    test -r "$p/$makeout/libs/csutil/libcsutil.a"; then
+	    libdir="$p/$makeout/libs"
+	    lflags="-L$libdir/csutil -L$libdir/cstool -L$libdir/csgfx -L$libdir/csgeom -L$libdir/csws"
+	    break
+	elif test -z "$libdir" && test -r "${p}/lib/libcsutil.a"; then
+	    libdir="${exec_prefix}/lib"
+	    lflags="-L${exec_prefix}/lib"
+	    break
+	fi
+    done
+    IFS=$my_IFS
 fi
 
 usage()
