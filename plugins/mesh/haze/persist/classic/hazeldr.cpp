@@ -53,6 +53,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (DIRECTIONAL)
   CS_TOKEN_DEF (FACTORY)
   CS_TOKEN_DEF (HAZEBOX)
+  CS_TOKEN_DEF (HAZECONE)
   CS_TOKEN_DEF (LAYER)
   CS_TOKEN_DEF (MATERIAL)
   CS_TOKEN_DEF (MIXMODE)
@@ -188,6 +189,7 @@ static iHazeHull* ParseHull (char* buf, iHazeFactoryState *fstate, float &s)
 {
   CS_TOKEN_TABLE_START (emits)
     CS_TOKEN_TABLE (HAZEBOX)
+    CS_TOKEN_TABLE (HAZECONE)
     CS_TOKEN_TABLE (SCALE)
   CS_TOKEN_TABLE_END
 
@@ -197,6 +199,8 @@ static iHazeHull* ParseHull (char* buf, iHazeFactoryState *fstate, float &s)
 
   iHazeHull* result = 0;
   csVector3 a,b;
+  int number;
+  float p,q;
 
   iHazeHullCreation *hullcreate = SCF_QUERY_INTERFACE(fstate, 
     iHazeHullCreation);
@@ -218,6 +222,16 @@ static iHazeHull* ParseHull (char* buf, iHazeFactoryState *fstate, float &s)
 	  result = SCF_QUERY_INTERFACE(ebox, iHazeHull);
 	  CS_ASSERT(result);
           ebox->DecRef();
+	}
+	break;
+      case CS_TOKEN_HAZECONE:
+        {
+          csScanStr (params, "%d, %f,%f,%f,%f,%f,%f, %f, %f", &number,
+	    &a.x, &a.y, &a.z, &b.x, &b.y, &b.z, &p, &q);
+	  iHazeHullCone *econe = hullcreate->CreateCone(number, a, b, p, q);
+	  result = SCF_QUERY_INTERFACE(econe, iHazeHull);
+	  CS_ASSERT(result);
+          econe->DecRef();
 	}
 	break;
       case CS_TOKEN_SCALE:
@@ -364,6 +378,8 @@ static void WriteHull(iStrVector *str, iHazeHull *hull)
 {
   char buf[MAXLINE];
   csVector3 a,b;
+  int nr;
+  float p,q;
   iHazeHullBox *ebox = SCF_QUERY_INTERFACE(hull, iHazeHullBox);
   if(ebox)
   {
@@ -371,6 +387,16 @@ static void WriteHull(iStrVector *str, iHazeHull *hull)
     sprintf(buf, "  HAZEBOX(%g,%g,%g, %g,%g,%g)\n", a.x,a.y,a.z, b.x,b.y,b.z);
     str->Push(csStrNew(buf));
     ebox->DecRef();
+    return;
+  }
+  iHazeHullCone *econe = SCF_QUERY_INTERFACE(hull, iHazeHullCone);
+  if(econe)
+  {
+    econe->GetSettings(nr, a, b, p, q);
+    sprintf(buf, "  HAZEBOX(%d, %g,%g,%g, %g,%g,%g, %g, %g)\n", nr, 
+      a.x,a.y,a.z, b.x,b.y,b.z, p, q);
+    str->Push(csStrNew(buf));
+    econe->DecRef();
     return;
   }
   printf ("Unknown hazehull type, cannot writedown!\n");

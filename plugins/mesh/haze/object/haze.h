@@ -145,6 +145,31 @@ public:
   friend HazeHullBox;
 };
 
+/** cone haze hull */
+class csHazeHullCone : public csHazeHull {
+  int nr_sides;
+  csVector3 start, end;
+  float start_radius, end_radius;
+public:
+  SCF_DECLARE_IBASE;
+  /// create new.
+  csHazeHullCone(int nr, const csVector3& a, const csVector3& b, float ra,
+    float rb);
+  ///
+  virtual ~csHazeHullCone();
+  //------------------------- iHazeHullCone implementation ----------------
+  class HazeHullCone : public iHazeHullCone
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csHazeHullCone);
+    /// get settings
+    virtual void GetSettings(int &nr, csVector3& a, csVector3& b, float &ra,
+      float &rb) 
+    {nr = scfParent->nr_sides; a=scfParent->start; b=scfParent->end;
+     ra = scfParent->start_radius; rb = scfParent->end_radius;}
+  } scfiHazeHullCone;
+  friend HazeHullCone;
+};
+
 
 /**
  * haze layer vector
@@ -409,6 +434,11 @@ class csHazeMeshObjectFactory : public iMeshObjectFactory
     SCF_DECLARE_EMBEDDED_IBASE (csHazeMeshObjectFactory);
     virtual iHazeHullBox* CreateBox(const csVector3& a, const csVector3& b)
       const { return &(new csHazeHullBox(a, b))->scfiHazeHullBox; }
+    virtual iHazeHullCone* CreateCone(int nr_sides, const csVector3& start,
+      const csVector3& end, float srad, float erad) const 
+      { return &(new csHazeHullCone(nr_sides, start, end, srad, erad))->
+        scfiHazeHullCone; }
+
   } scfiHazeHullCreation;
   friend class HazeHullCreation;
 };

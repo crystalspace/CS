@@ -82,6 +82,18 @@ struct iHazeHullBox : public iBase
   virtual void GetSettings(csVector3& min, csVector3& max) = 0;
 };
 
+SCF_VERSION (iHazeHullCone, 0, 0, 1);
+
+/**
+ *  A predefined hull. 
+ */
+struct iHazeHullCone : public iBase
+{
+  /// get Cone settings, nr_sides, start, end and radii of those
+  virtual void GetSettings(int &nr, csVector3& a, csVector3& b, float &ra,
+        float &rb) = 0;
+};
+
 SCF_VERSION (iHazeHullCreation, 0, 0, 1);
 
 /**
@@ -93,6 +105,9 @@ struct iHazeHullCreation : public iBase
   /// create a predefined hull: a box given min and max.
   virtual iHazeHullBox* CreateBox(const csVector3& min, 
     const csVector3& max) const = 0;
+  /// create a predefined hull: a cone 
+  virtual iHazeHullCone* CreateCone(int nr_sides, const csVector3& start, 
+    const csVector3& end, float srad, float erad) const = 0;
 };
 
 SCF_VERSION (iHazeFactoryState, 0, 0, 1);

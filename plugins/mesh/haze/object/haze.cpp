@@ -234,7 +234,15 @@ void csHazeHull::ComputeOutline(iHazeHull *hull, const csVector3& campos,
   {
     pts[numv++] = pt;
     pt = nextvert[pt];
-    CS_ASSERT(pt != -1);
+    if(pt == -1)
+    {
+      printf("Error: pt==-1 in Outline.\n");
+      delete[] use_edge;
+      delete[] use_start;
+      delete[] use_end;
+      delete[] nextvert;
+      return;
+    }
   }
   while( pt != startpt );
 
@@ -301,6 +309,103 @@ csHazeHullBox::csHazeHullBox(const csVector3& a, const csVector3& b)
 }
 
 csHazeHullBox::~csHazeHullBox()
+{
+}
+
+//------------ csHazeHullCone -----------------------------------
+
+SCF_IMPLEMENT_IBASE (csHazeHullCone)
+  SCF_IMPLEMENTS_INTERFACE (iHazeHull)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iHazeHullCone)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csHazeHullCone::HazeHullCone)
+  SCF_IMPLEMENTS_INTERFACE (iHazeHullCone)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+/// static helper to fill 
+static void ConeFillVerts(csVector3 *verts, int nr_sides, 
+  const csVector3& pos, float radius)
+{
+  for(int i=0; i<nr_sides; i++)
+  {
+    float angle = (float(i)*PI*2.0) / float(nr_sides);
+    verts[i] = pos;
+    verts[i].x += sin(angle) * radius;
+    verts[i].z += cos(angle) * radius;
+  }
+}
+
+csHazeHullCone::csHazeHullCone(int nr_sides, const csVector3& start,
+    const csVector3& end, float srad, float erad)
+  : csHazeHull()
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiHazeHullCone);
+  csHazeHullCone::nr_sides = nr_sides;
+  csHazeHullCone::start = start;
+  csHazeHullCone::end = end;
+  start_radius = srad;
+  end_radius = erad;
+
+  /// fill with data
+  total_vert = nr_sides*2;
+  total_poly = nr_sides + 2;
+  verts = new csVector3 [total_vert];
+  pol_num = new int [total_poly];
+  pol_verts = new int* [total_poly];
+  int i;
+
+  pol_num[0] = nr_sides;
+  pol_num[1] = nr_sides;
+  for(i=2; i<total_poly; i++)
+  {
+    pol_num[i] = 4;
+  }
+
+  for(i=0; i<total_poly; i++)
+  {
+    pol_verts[i] = new int [ pol_num[i] ];
+  }
+
+  /// fill each circle in turn
+  ConeFillVerts(&verts[0], nr_sides, start, start_radius);
+  ConeFillVerts(&verts[nr_sides], nr_sides, end, end_radius);
+
+  /// fill pol_verts
+  // caps
+  for(i=0; i<nr_sides; i++)
+  {
+    pol_verts[0][i] = nr_sides + i;
+    pol_verts[1][i] = nr_sides-i-1;
+  }
+  // sides
+  int pnum = 2;
+  for(i=0; i<nr_sides; i++)
+  {
+    int nexti = (i+1)%nr_sides;
+
+    pol_verts[pnum][0] = i;
+    pol_verts[pnum][1] = nexti;
+    pol_verts[pnum][2] = nexti + nr_sides;
+    pol_verts[pnum][3] = i + nr_sides;
+    pnum++;
+    /*
+    pol_verts[pnum][0] = i;
+    pol_verts[pnum][1] = nexti + nr_sides;
+    pol_verts[pnum][2] = i + nr_sides;
+    pnum++;
+    pol_verts[pnum][0] = i;
+    pol_verts[pnum][1] = nexti;
+    pol_verts[pnum][2] = nexti + nr_sides;
+    pnum++;
+    */
+  }
+
+  ComputeEdges();
+}
+
+csHazeHullCone::~csHazeHullCone()
 {
 }
 
@@ -457,11 +562,17 @@ bool csHazeMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   if (GetScreenBoundingBox (camera->GetCameraNumber (),
         movable->GetUpdateNumber (), fov, shiftx, shifty,
         tr_o2c, sbox, cbox) < 0)
+  {
+    printf("No draw\n");
     return false;
+  }
   int clip_portal, clip_plane, clip_z_plane;
   if (rview->ClipBBox (sbox, cbox, clip_portal, clip_plane,
         clip_z_plane) == false)
+  {
+    printf("No draw(2)\n");
     return false;
+  }
 
   return true;
 }
@@ -678,15 +789,18 @@ bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
 #if 0
     // debug drawing of the outline 
     iGraphics2D *g2d = g3d->GetDriver2D();
-    g2d->DrawLine(scr_orig.x, scr_orig.y, scr_orig.x+1, scr_orig.y+1, -1);
+    int m2dy = g2d->GetHeight();
+    g2d->DrawLine(scr_orig.x, m2dy-scr_orig.y, scr_orig.x+1, 
+      m2dy-scr_orig.y+1, -1);
     // only outline
     //g2d->DrawLine( layer_pts[i].x, layer_pts[i].y, 
       //layer_pts[nexti].x, layer_pts[nexti].y, -1);
     // show direction of lines (from black to white)
     float midx = (layer_pts[i].x + layer_pts[nexti].x)*0.5;
     float midy = (layer_pts[i].y + layer_pts[nexti].y)*0.5;
-    g2d->DrawLine( layer_pts[i].x, layer_pts[i].y, midx, midy, 0);
-    g2d->DrawLine( midx, midy, layer_pts[nexti].x, layer_pts[nexti].y, -1);
+    g2d->DrawLine( layer_pts[i].x, m2dy-layer_pts[i].y, midx, m2dy-midy, 0);
+    g2d->DrawLine( midx, m2dy-midy, layer_pts[nexti].x, 
+      m2dy-layer_pts[nexti].y, -1);
 #endif
   }
 
