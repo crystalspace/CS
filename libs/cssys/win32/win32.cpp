@@ -30,6 +30,11 @@
 
 #include <windowsx.h>
 #include <ddraw.h>
+
+#ifdef DO_DINPUT_KEYBOARD
+#include <dinput.h>
+#endif
+
 #include <stdio.h>
 #include <time.h>
 

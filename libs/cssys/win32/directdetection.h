@@ -26,7 +26,6 @@
 #endif
 
 #include <windowsx.h>
-#include <dinput.h>
 #include <ddraw.h>
 #include <d3d.h>
 #include <d3dcaps.h>
