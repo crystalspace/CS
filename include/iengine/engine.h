@@ -28,7 +28,7 @@ class csEngine;
 class csVector3;
 class csMatrix3;
 class csColor;
-class csTextureLayer;
+struct csTextureLayer;
 
 struct iSector;
 struct iStatLight;
