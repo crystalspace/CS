@@ -274,6 +274,7 @@ csODERigidBody::csODERigidBody (csODEDynamicSystem* sys)
   SCF_INC_REF (dynsys);
 
   bodyID = dBodyCreate (dynsys->GetWorldID());
+  bodyIDbackup = 0;
   groupID = dCreateGeomGroup (dynsys->GetSpaceID());
 
   mesh = NULL;
@@ -283,7 +284,37 @@ csODERigidBody::csODERigidBody (csODEDynamicSystem* sys)
 csODERigidBody::~csODERigidBody ()
 {
   SCF_DEC_REF (dynsys);
-  dBodyDestroy (bodyID);
+  if (bodyID == 0) {
+    dBodyDestroy (bodyIDbackup);
+  } else {
+    dBodyDestroy (bodyID);
+  }
+}
+
+bool csODERigidBody::MakeStatic ()
+{
+  if (bodyID != 0) {
+    bodyIDbackup = bodyID;
+    bodyID = 0;
+    dBodyDisable (bodyIDbackup);
+    for (long i = 0; i < ids.Length(); i ++) {
+      dGeomSetBody (ids.Get(i), bodyID);
+    }
+  }
+  return true; 
+}
+
+bool csODERigidBody::MakeDynamic ()
+{
+  if (bodyID == 0) {
+    bodyID = bodyIDbackup;
+    bodyIDbackup = 0;
+    dBodyEnable (bodyID);
+    for (long i = 0; i < ids.Length(); i ++) {
+     dGeomSetBody (ids.Get(i), bodyID);
+    }
+  }
+  return true; 
 }
 
 bool csODERigidBody::AttachColliderMesh (iPolygonMesh *mesh,
@@ -296,6 +327,7 @@ bool csODERigidBody::AttachColliderMesh (iPolygonMesh *mesh,
   /*
   dGeomID id = dCreateGeom (csODEDynamics::GetGeomClassNum());
   dGeomSetBody (id, bodyID);
+  ids.Push (id);
   dGeomGroupAdd (groupID, id);
   dSpaceAdd (dynsys->GetSpaceID(),id);
 
@@ -358,6 +390,7 @@ bool csODERigidBody::AttachColliderBox (csVector3 size,
   dBodySetMass (bodyID, &om);
 
   dGeomSetBody (id, bodyID);
+  ids.Push (id);
 
   float *f = new float[2];
   f[0] = friction;

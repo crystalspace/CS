@@ -22,6 +22,7 @@
 
 #include "csgeom/vector3.h"
 #include "csutil/csobjvec.h"
+#include "csutil/garray.h"
 #include "csgeom/transfrm.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
@@ -68,6 +69,8 @@ public:
   }
 };
 
+CS_TYPEDEF_GROWING_ARRAY (csGeomList, dGeomID);
+
 /**
  * This is the implementation for the actual plugin.
  * It is responsible for creating iDynamicSystem.
@@ -76,7 +79,7 @@ class csODEDynamics : public iDynamics
 {
 private:
   iObjectRegistry* object_reg;
-	
+
   static int geomclassnum;
   static dJointGroupID contactjoints;
 
@@ -93,7 +96,7 @@ public:
 
   iDynamicSystem* CreateSystem ();
   void RemoveSystem (iDynamicSystem* system);
-	
+
   void Step (float stepsize);
 
   static void NearCallback (void *data, dGeomID o1, dGeomID o2);
@@ -163,7 +166,9 @@ class csODERigidBody : public iRigidBody
 {
 private:
   dBodyID bodyID;
+  dBodyID bodyIDbackup;
   dGeomID groupID;
+  csGeomList ids;
 
   csODEDynamicSystem* dynsys;
 
@@ -177,6 +182,9 @@ public:
   virtual ~csODERigidBody ();
 
   dBodyID GetID() { return bodyID; }
+
+  bool MakeStatic (void);
+  bool MakeDynamic (void);
 
   bool AttachColliderMesh (iPolygonMesh* mesh,
   	csOrthoTransform& trans, float friction, float density,

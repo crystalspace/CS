@@ -87,6 +87,9 @@ SCF_VERSION (iRigidBody, 0, 0, 1);
  */
 struct iRigidBody : public iBase
 {
+  virtual bool MakeStatic (void) = 0;
+  virtual bool MakeDynamic (void) = 0;
+
   /// Add a collider with a associated friction coefficient
   virtual bool AttachColliderMesh (iPolygonMesh* mesh,
   	csOrthoTransform& trans, float friction, float density,
