@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Rendering Loop, 3D Sprites, Visibility Culling, Concepts
+@node Rendering Loop, 3D Sprites, Visibility Culling, csEngine
 @subsection Rendering Loop
 @cindex Rendering Loop
 

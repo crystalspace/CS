@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Lighting, Visibility Culling, Texture Mapping, Concepts
+@node Lighting, Cameras and Matrices, Portal Engine, csEngine
 @subsection Lighting
 @cindex Lighting
 

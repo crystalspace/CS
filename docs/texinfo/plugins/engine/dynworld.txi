@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Dynamic Worlds, , 3D Sprites, Concepts
+@node Dynamic Worlds, , 3D Sprites, csEngine
 @subsection Dynamic Worlds
 @cindex Dynamic Worlds
 

@@ -99,7 +99,7 @@ version @value{VERSION}, last updated @value{UPDATED}.
 @menu
 * CS Introduction:: Introduction
 * Building:: Configure, Build, and Install
-* Options::
+* Options:: Configuring Crystal Space
 * Applications::
 * Tutorials::
 * Anatomy:: Project Anatomy

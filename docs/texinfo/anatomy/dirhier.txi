@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Directory Hierarchy, SCF, Dependencies, Anatomy
+@node Directory Hierarchy, World File Format, Dependencies, Anatomy
 @section Directory Hierarchy
 @cindex Directory Hierarchy
 @cindex Hierarchy, Directory

@@ -80,7 +80,7 @@
 @token{)}
 @end macro
 
-@node World File Format, Memory Debugger, World Components, Anatomy
+@node World File Format, Memory Debugger, Directory Hierarchy, Anatomy
 @section Format of World File
 @cindex Format of World File
 @cindex World File Format

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Visibility Culling, Rendering Loop, Lighting, Concepts
+@node Visibility Culling, Rendering Loop, Texture Mapping, csEngine
 @subsection Visibility Culling In Detail
 @cindex Visibility Culling
 @cindex Culling, Visibility

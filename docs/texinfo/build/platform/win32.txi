@@ -33,7 +33,7 @@ are real problems and which are caused by this version conflict, so it is
 recommended to use version 6.
 
 In addition to @file{zlib}, @file{libjpeg} and @file{libpng} you also need
-the DirectX @sc{SDK} and/or the OpenGL @sc{SDK} (Note that the @sc{SDK} is
+the DirectX @sc{sdk} and/or the OpenGL @sc{sdk} (Note that the @sc{sdk} is
 more than the runtime libraries usually bundles with games):
 
 @itemize @bullet
@@ -49,7 +49,7 @@ OpenGL also allows hardware acceleration, but you still need DirectX 5.0 or
 higher for the system driver and for sound output.
 @end itemize
 
-The DirectX 5.0 and OpenGL @sc{SDK}s are included in @sc{msvc} version 6. You
+The DirectX 5.0 and OpenGL @sc{sdk}s are included in @sc{msvc} version 6. You
 still have to download DirectX 6.1 yourself. If you're using @sc{msvc}
 version 5, you have none of the above @sc{sdk}s, so you have to download them.
 

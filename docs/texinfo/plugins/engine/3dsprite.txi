@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node 3D Sprites, Dynamic Worlds, Rendering Loop, Concepts
+@node 3D Sprites, Dynamic Worlds, Rendering Loop, csEngine
 @subsection 3D Sprites
 @cindex 3D Sprites
 

@@ -1,28 +1,29 @@
 @c -*-texinfo-*-
-@node Sound Drivers
+@node Sound Drivers, Network Drivers, Graphics Drivers, Plug-In Drivers
 @section Sound Drivers
 @cindex Sound Drivers
 
-The sound system consists of three drivers:
+The sound system consists of three components.
 
-@itemize @bullet
-@item
-@emph{Sound Driver}: System dependent sound drivers. This driver is used to
-pass one audio stream to the sound hardware (it does not mix several streams),
-and is only used by the software sound renderer. The other renderers do not
-need this driver. There are currently drivers for Macintosh, @sc{oss} (Linux)
-and WaveOut (Windows). @*
-Note: You need not load the sound driver yourself. It is loaded automatically
-by the software sound renderer.
+@table @emph
+@item Sound Driver
+System dependent sound drivers.  This driver is used to pass one audio stream
+to the sound hardware (it does not mix several streams), and is only used by
+the software sound renderer.  The other renderers do not need this driver.
+There are currently drivers for Macintosh, @sc{oss} (Linux) and WaveOut
+(Windows).
 
-@item
-@emph{Sound Renderer}: System dependent sound renderers. This driver can be
-used to play sound. There are currently renderers for DirectSound3d and
-software.
+@emph{Note}: You need not load the sound driver yourself.  It is loaded
+automatically by the software sound renderer.
 
-@item
-@emph{Sound Loader}: This module is used to load sound files. There is only
-one implementation for this module. Supported file formats are:
+@item Sound Renderer
+System dependent sound renderers.  This driver can be used to play sound.
+There are currently renderers for DirectSound3D and software.
+
+@item Sound Loader
+This module is used to load sound files.  There is only one implementation for
+this module.  It supports the following sound formats:
+
 @itemize @bullet
 @item
 Sun standard @file{.au} (or @file{.snd}), 8- and 16-bit @sc{pcm} and 8-bit
@@ -34,25 +35,24 @@ Amiga @file{.8svx} and @file{.iff}, 8-bit @sc{pcm}.
 @item
 Macintosh @file{.aiff}, 8- and 16-bit @sc{pcm}.
 @end itemize
-@end itemize
+@end table
 
-The options for all these modules must be set in the (virtual) file
+The options for all sound modules must be set in the (virtual) file
 @file{/config/sound.cfg}.
 
-@node Sound Data
-@subsection Sound Data and Sound Streams
+@subheading Sound Data and Sound Streams
 
 When a sound is loaded, it is represented as a sound data object (using the
-@code{iSoundData} interface). Internally this can be raw sample data,
+@samp{iSoundData} interface). Internally this can be raw sample data,
 @sc{mp3} encoded music, or anything. Every time you want to play the sound,
-a @emph{sound stream} (@code{iSoundStream}) is created from it and this
+a @dfn{sound stream} (@samp{iSoundStream}) is created from it and this
 stream is used by the renderer. The stream is an instance of the sound. For
 example, if you have five cars and five trucks driving around in your level,
 you would have two sound data objects, one containing the car sound and one
 containing the truck sound, and ten sound streams.
 
 This is important as the sound loader also contains methods that return a
-sound stream directly. Some ways to load sounds do not allow several
+sound stream directly. Some ways to load sounds do not allow multiple
 instances, for example if a very big file is loaded in small parts while it
 is played. In this case you directly get a sound stream, so you can play only
 one instance of the sound. This can be useful for example for playing
@@ -64,48 +64,45 @@ contains methods that take a sound data object, create a stream from it and
 play this stream. But in the end it is the stream that is played.
 
 Looking at the sound loader's methods, you have probably noticed that it
-takes an object of @code{csSoundFormat} type. This object tells the sound
-loader in what format (frequency, 8 or 16 bits, stereo or mono) the samples
+takes an object of @samp{csSoundFormat} type. This object tells the sound
+loader in what format (frequency, 8- or 16-bits, stereo or mono) the samples
 should be supplied by the stream. You can get this from the sound renderer.
 
-@node Playing Sound
-@subsection Playing Sound
+@subheading Playing Sound
 
-The simple way to play a sound is the @code{PlaySound} method. This plays the
-sound without 3d effects and without further control. So it is useful to play
-a sound when the user selects something in the menu. The sound cannot be
+The simple way to play a sound is the @code{PlaySound()} method.  This plays
+the sound without 3D effects and without further control.  So it is useful to
+play a sound when the user selects something in the menu.  The sound cannot be
 stopped anymore and will play until it is finished.
 
-If you want 3d effects or more control over the sound, you have to use
-@emph{sound sources} (@code{iSoundSource}). A sound source represents one
-instance of a sound. Now you're totally confused: You thought that sound
-streams are instances of a sound. That's right. Sound streams and sound
-sources are 1-to-1 related. When a sound stream is played, it is attached
-to a sound source. Think of it this way: The sound stream supplied the sound
-information and the sound source pushes this information to the speakers.
+If you want 3D effects or more control over the sound, you have to use
+@dfn{sound sources} (@samp{iSoundSource}).  A sound source represents one
+instance of a sound.  Now you're totally confused: You thought that sound
+streams are instances of a sound.  That's right.  Sound streams and sound
+sources are have a 1-to-1 relationship.  When a sound stream is played, it is
+attached to a sound source.  Think of it this way: The sound stream supplied
+the sound information and the sound source pushes this information to the
+speakers.
 
-When creating a sound source, you have to choose whether you want a 3d or
-non-3d source. A non-3d source will always be at your own position, while a
-3d source can be set to any position. Non-3d sources will ignore the
-@code{SetPosition} and @code{SetVelocity} methods.
+When creating a sound source, you have to choose whether you want a 3D or
+non-3D source. A non-3D source will always be at your own position, while a
+3D source can be set to any position. Non-3D sources will ignore the
+@code{SetPosition()} and @code{SetVelocity()} methods.
 
 Sound sources also allow more control over the sound: You can begin and stop
 playing the sound at any time. Note that one sound source is still one
 instance of the sound. If you play the source twice with the
-@code{SOUND_RESTART} option, the source will start playing, then suddenly
+@samp{SOUND_RESTART} option, the source will start playing, then suddenly
 stop and restart from the beginning. You won't hear the sound twice at the
 same time. To do this, you must create another sound source.
 
-@node Sound Listener
-@subsection The Sound Listener
+@subheading The Sound Listener
 
 The sound renderer uses one global listener object. It controls how you hear
-sounds. This includes your own position and velocity (only for 3d sounds),
-and environmental effects.
-@@@@@@ do env effects affect non-3d sounds?
+sounds. This includes your own position and velocity (only for 3D sounds),
+and environmental effects.  @@@@@@FIXME do env effects affect non-3D sounds?
 
-@node Advanced Sound FX
-@subsection Advanced Sound Effects
+@subheading Advanced Sound Effects
 
 The environmental effects of the listener are not enough for you? You want to
 dynamically generate the sound? This is possible. You have to create your own
@@ -116,45 +113,44 @@ create this data, or modify data they read from another stream. Note that
 if you modify data from another stream, you must copy it before doing this.
 You may not modify the buffer returned by @code{Read()}.
 
-The methods of @code{iSoundStream} are:
+The methods of @samp{iSoundStream} are:
 
 @table @code
 @item Read()
 This function should return a block of sample data. This can be memory
-created with @code{new} or not, as you can get rid of it in
-@code{DiscardBuffer}. The sound must be given in the format returned by
-@code{GetFormat()}. The @code{NumSamples} parameter sets the number of
-samples to read, or @code{-1} to read as much as possible. You must set this
-to the number of samples actually read. If it wasn't @code{-1} before the
+created with @samp{new} or not, as you can get rid of it in
+@code{DiscardBuffer()}. The sound must be given in the format returned by
+@code{GetFormat()}. The @samp{NumSamples} parameter sets the number of
+samples to read, or -1 to read as much as possible. You must set this
+to the number of samples actually read. If it wasn't -1 before the
 call, it may not be altered unless the sound is finished, in which case it
 may be set to a lower number.
 
 @item DiscardBuffer()
 This function should discard a buffer returned by @code{Read()}, for example
-@code{delete} a buffer created by @code{new}.
+@samp{delete} a buffer created by @samp{new}.
 
 @item GetFormat()
 This method should return the format (frequency, bits, channels) of the
-sound data returned by @code{Read}. This must match the format returned by
+sound data returned by @code{Read()}. This must match the format returned by
 the @code{GetLoadFormat()} method of the sound renderer. This means that all
-three elements of the @code{csSoundFormat} must be the same. The only
+three elements of the @samp{csSoundFormat} must be the same. The only
 exception are elements set to -1 by the sound renderer, where you can choose
 the format. If the sound renderer tells you the sound's frequency must be -1,
 it can be anything, but it must be the format returned by @code{Read()}.
 
 @item Restart()
 This function should restart the stream to the beginning. If your stream
-cannot be reset, implement this function as a NOP, but then the
-@code{SOUND_RESTART} option for playing sounds will not work. Don't abuse
+cannot be reset, implement this as a do-nothing function, but then the
+@samp{SOUND_RESTART} option for playing sounds will not work. Don't abuse
 this method and do anything else than restarting! The renderer is not forced
 to use this function to restart the sound. If you're reading data from
 another stream to produce your output, you should reset that stream as well.
 
 @item MayPrecache()
-This function should return @code{true} if the sound renderer may read the
-sound data in advance. So if you don't know all data at this moment (for
+This function should return a true value if the sound renderer may read the
+sound data in advance.  So if you don't know all data at this moment (for
 runtime generated speech, or special effects that can be reconfigured later),
-this is @code{false}. Otherwise return @code{true}, this makes hardware
-mixing possible on some soundcards (faster).
+this should return a value of false.  Otherwise return a true value.  This
+makes hardware mixing possible on some soundcards (faster).
 @end table
-

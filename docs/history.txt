@@ -1,5 +1,12 @@
 The history order has been reversed so that new features are at the top.
 
+20-Nov-2000
+	- Eric Sunshine removed a bunch of files left over in the 'concepts'
+	  directory after Martin moved them to 'plugins/engine'.
+	- Eric Sunshine removed a duplicate @menu block from
+	  plugins/chapter.txi.
+	- Eric Sunshine fixed a bunch of Texinfo mark-up errors in win32.txi
+	  and sound.txi.
 19-Nov-2000
 	- Martin Geisse did various documentation updates:
 	    - Moved sections from the 'concepts' and 'anatomy' chapters of

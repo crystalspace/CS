@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Portal Engine, Space Warping, Cameras and Matrices, Concepts
+@node Portal Engine, Lighting, World Components, csEngine
 @subsection Portal Engine
 @cindex Portal Engine
 

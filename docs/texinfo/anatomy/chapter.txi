@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Anatomy, Libraries, Concepts, Top
+@node Anatomy, Libraries, Tutorials, Top
 @chapter Project Anatomy
 @cindex Anatomy
 
