@@ -133,7 +133,7 @@ rule Recurse
   {
     if [ IsElem $(i:S) : $(types) ]
     {
-      visited += $(i) ;
+      visited += [ FDirName $(prefix) $(i:BS) ] ;
       if $(innerrule)
       {
         $(innerrule) $(i:BS) : $(prefix) ;
