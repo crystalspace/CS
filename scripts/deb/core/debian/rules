@@ -83,7 +83,7 @@ clean:
 
 	dh_clean
 
-DEVBIN=map2cs mdl2spr scfreg vsh cs-config
+DEVBIN=map2cs mdl2spr scfreg vsh cs-config 3ds2lev cs2xml csfgen cslight maya2spr md32spr milk2spr python.cex tbconvert
 
 install: install-indep install-arch
 install-indep:

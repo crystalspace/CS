@@ -11,10 +11,7 @@ LEVELS=cs096/levels/demodata.zip \
 	cs096/levels/mazedex.zip \
 	cs096/levels/newsky.zip \
 	cs096/levels/room.zip \
-	cs096/levels/sydney.zip \
-	cs094/levels/demodata.zip \
-	cs094/levels/castle.zip \
-	cs094/levels/video.avi
+	cs096/levels/sydney.zip
 
 default: start wget debcopy debbuild
 

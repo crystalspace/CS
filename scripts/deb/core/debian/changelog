@@ -1,8 +1,14 @@
 crystalspace (0.96-20030205) unstable; urgency=low
 
-  * New upstream version from R0_96 branch
+  * New upstream version from R0_96 branch (Closes: bug#180419)
+  * -fno-rtti and -fno-exceptions removed from cs-config (Closes: bug#147818)
+  * Fails to build on hppa made obsolete by new upstream (Closes: bug#146076)
+  will have to be reopen with more info if this fails again 
+  * Isomap re-added (Closes: bug#178464)
+  * Added new targets in rules, not completly satisfying, should be better in 
+  next upstream (Closes: bug#179528)
 
- -- Christian Bayle <bayle@debian.org>  Wed,  5 Feb 2003 23:16:25 +0100
+ -- Christian Bayle <bayle@debian.org>  Thu, 13 Feb 2003 21:34:25 +0100
 
 crystalspace (0.94-20020502-4) unstable; urgency=low
 
