@@ -52,7 +52,7 @@ Bugs to fix:
 	     using either renderer.  To reproduce: 1) Launch walktest with
 	     flarge.  2) Go to main hall.  3) Add a light (shift-L).  4) Quit
 	     (press Q).  5) Crash (7 out of 10 times).  (optimize mode)
-	[S]  About 50% of the rockets fired in walktest fail to collide with a
+	[**] About 50% of the rockets fired in walktest fail to collide with a
 	     wall; and instead pass right through the wall.  Consequently, the
 	     rocket object is never removed from the world, nor is its dynamic
 	     light removed. (optimize mode)
@@ -63,7 +63,7 @@ Bugs to fix:
 	     exploding, press shift-1.  to delete the dynamic light.  d) Wait
 	     momentarily for the rocket to delete its own light.  e) Crash.
 	     (optimize mode)
-	[S]  cswseng crashes dereferencing a null pointer.  To reproduce: 1)
+	[**] cswseng crashes dereferencing a null pointer.  To reproduce: 1)
 	     Launch cswseng.  2) Press "New View".  3) Press "Quit".  4) Crash.
 	     (optimize and debug mode)
 	[**] cswstest crashes with dereference of null pointer.  To reproduce:
@@ -92,7 +92,8 @@ Bugs to fix:
 	     but the fix is not yet in CVS.  Dan Mahoney
 	     <domahoneyii@users.sourceforget.net> reports that the crash is on
 	     line 95 of scanp2.inc.
-	[S]  Starting walktest with infinite renderer leads to direct crash
+	[**] Starting walktest with infinite renderer leads to direct crash
+	     (infinte renderer is removed now)
 	[**] simpvs crashes immediately at startup dereferencing a null pointer.
 	     (optimize mode)
 	[S]  tbtut crashes after moving a bit in software mode.  Also, the
@@ -116,9 +117,9 @@ Bugs to fix:
 	[S]  Line drawing in software renderer is not stable (overwriting
 	     memory).  This shows with BugPlug and also with AWS in some cases.
 	     Is this related to incorrect clipping?  (See above item.)
-	[S]  cs2xml crashes when trying to convert castle.zip.  (optimize mode)
+	[**] cs2xml crashes when trying to convert castle.zip.  (optimize mode)
 	     (note by Jorrit: cannot reproduce).
-	[O]  levtool fails to convert castle.zip (after it has been converted
+	[**] levtool fails to convert castle.zip (after it has been converted
 		with cs2xml)  Matze: Please clarify this item.
 	[S]  unittest crashes and/or hangs:
 		./unittest -video=software
