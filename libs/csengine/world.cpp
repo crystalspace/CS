@@ -17,6 +17,9 @@
 */
 
 #include "sysdef.h"
+#define CS_DISABLE_MODULE_LOCKING
+#include "cscom/com.h"
+#undef  CS_DISABLE_MODULE_LOCKING
 #include "csengine/sysitf.h"
 #include "csengine/world.h"
 #include "csengine/dumper.h"
@@ -183,6 +186,9 @@ csVFS *csWorld::vfs = NULL;
 
 CSOBJTYPE_IMPL(csWorld,csObject);
 
+IMPLEMENT_DEFAULT_COM(World)
+IMPLEMENT_OBJECT(csWorld)
+
 csWorld::csWorld () : csObject (), start_vec (0, 0, 0)
 {
   do_lighting_cache = true;
@@ -194,11 +200,14 @@ csWorld::csWorld () : csObject (), start_vec (0, 0, 0)
 
   csVector3 min_qbox (-10, -10, -10);
   csVector3 max_qbox (10, 10, 10);
-  CHK (quadcube = new csQuadcube (min_qbox, max_qbox, 8));
+  CHK (quadcube = new csQuadcube (min_qbox, max_qbox, 5)); //@@@ SET HIGHER
 
   CHK (render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory()));
   CHK (lightpatch_pool = new csLightPatchPool ());
   CHK (cfg_engine = new csEngineConfig ());
+	CHK (cs = new csClassSpawner());
+	CHK (plugins=new csLoaderExtensions(this));
+
   BuildSqrtTable ();
 }
 
@@ -211,6 +220,8 @@ csWorld::~csWorld ()
   CHK (delete render_pol2d_pool);
   CHK (delete lightpatch_pool);
   CHK (delete quadcube);
+  cs->Release();
+  plugins->Release();
 }
 
 void csWorld::Clear ()
@@ -317,6 +328,8 @@ bool csWorld::Initialize (ISystem* sys, IGraphics3D* g3d, csIniFile* config, csV
   current_world = this;
   VFS = vfs;
 
+	plugins->EnumExtensions();
+
   CHK (textures = new csTextureList ());
   ReadConfig (config);
 
@@ -327,11 +340,6 @@ bool csWorld::Initialize (ISystem* sys, IGraphics3D* g3d, csIniFile* config, csV
 
 //quadcube->MakeEmpty ();
 //csVector3 poly[10];
-//poly[0] = csVector3 (10, 5, 5);
-//poly[1] = csVector3 (10, 5, -5);
-//poly[2] = csVector3 (10, -5, -5);
-//poly[3] = csVector3 (10, -5, 5);
-
 //poly[0] = csVector3 (-50, 50, 10);
 //poly[1] = csVector3 (50, 50, 10);
 //poly[2] = csVector3 (50, -50, 10);
@@ -341,12 +349,6 @@ bool csWorld::Initialize (ISystem* sys, IGraphics3D* g3d, csIniFile* config, csV
 //poly[1] = csVector3 (5, -5, -10);
 //poly[2] = csVector3 (5, 5, -10);
 //poly[3] = csVector3 (-5, 5, -10);
-
-//poly[0] = csVector3 (-15, 15, 10);
-//poly[1] = csVector3 (15, 15, 10);
-//poly[2] = csVector3 (15, -15, 10);
-//poly[3] = csVector3 (-15, -15, 10);
-
 //quadcube->InsertPolygon (poly, 4);
 //Dumper::dump (quadcube);
 
@@ -988,3 +990,14 @@ int csWorld::GetNearbyLights (csSector* sector, const csVector3& pos, ULong flag
 
 //---------------------------------------------------------------------------
 
+STDMETHODIMP csWorld::GetSpriteTemplate(IString *name, ISpriteTemplate** itmpl) {
+//	*itmpl=GetSpriteTemplate(csSTR(name))->GetISpriteTemplate();
+
+	return S_OK;
+}
+
+STDMETHODIMP csWorld::PushSpriteTemplate(ISpriteTemplate* itmpl) {
+//	sprite_templates.Push(GET_PARENT(SpriteTemplate, tmpl));
+
+	return S_OK;
+}

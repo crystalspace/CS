@@ -26,6 +26,9 @@
 #include "csengine/tranman.h"
 #include "csobject/csobj.h"
 #include "csutil/cleanup.h"
+#include "csutil/ibase.h"
+#include "csutil/newclass.h"
+#include "csutil/iextensn.h"
 
 class csSector;
 class csTextureList;
@@ -37,6 +40,7 @@ class csThingTemplate;
 class csCollection;
 class csStatLight;
 class csDynLight;
+class csLoaderExtensions;
 class csSpriteTemplate;
 class csClipper;
 class csQuadcube;
@@ -55,6 +59,7 @@ interface IGraphics3D;
 interface IGraphicsInfo;
 interface ISystem;
 interface IConfig;
+interface ISpriteTemplate;
 
 /**
  * Flag for GetNearbyLights().
@@ -141,7 +146,7 @@ public:
  * The world! This class basicly represents the 3D engine.
  * It is the main anchor class for working with Crystal Space.
  */
-class csWorld : public csObject
+class csWorld : public csObject, IWorld
 {
   friend class Dumper;
 
@@ -155,6 +160,17 @@ public:
    * '\' as path separator, Mac uses ':' and Unix uses '/').
    */
   static csVFS *vfs;
+
+  /**
+   * This is the Class Spawner, you use it to allow other processes
+	 * to create objects in this process for speed and compatibility
+   */
+  csClassSpawner *cs;
+
+  /**
+   * This is the Plugin Loader, you use it to load files by plugins
+   */
+ 	csLoaderExtensions *plugins;
 
   /**
    * This is a vector which holds objects of type 'csCleanable'.
@@ -526,6 +542,13 @@ public:
     CHK (it = new csLightIt (this));
     return it;
   }
+
+	DEFAULT_COM(World);
+	DECLARE_IOBJECT();
+
+	STDMETHODIMP GetSpriteTemplate(IString *name, ISpriteTemplate** itmpl);
+
+	STDMETHODIMP PushSpriteTemplate(ISpriteTemplate* itmpl);
 
   CSOBJTYPE;
 };
