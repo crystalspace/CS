@@ -17,14 +17,13 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
+#include "csutil/scf.h"
 #include "csutil/csshlib.h"
 #include "csutil/sysfunc.h"
 #include "csutil/syspath.h"
 #include "csutil/csstring.h"
 #include "csutil/parray.h"
 #include "csutil/memfile.h"
-#include "csutil/ref.h"
-#include "csutil/scf.h"
 #include "csutil/scfstringarray.h"
 #include "csutil/scopedmutexlock.h"
 #include "csutil/strset.h"
@@ -82,6 +81,7 @@ public:
     const char *iInterfaceID, int iVersion);
   virtual const char *GetClassDescription (const char *iClassID);
   virtual const char *GetClassDependencies (const char *iClassID);
+  virtual csRef<iDocument> GetPluginMetadata (char const *iClassID);
   virtual bool UnregisterClass (const char *iClassID);
   virtual void UnloadUnusedModules ();
   virtual void ScanPluginsPath (const char* path, bool recursive = false,
@@ -89,7 +89,7 @@ public:
   virtual char const* GetInterfaceName (scfInterfaceID) const;
   virtual scfInterfaceID GetInterfaceID (const char *iInterface);
   virtual void Finish ();
-  virtual iStringArray* QueryClassList (char const* pattern);
+  virtual csRef<iStringArray> QueryClassList (char const* pattern);
   virtual bool RegisterPlugin (const char* path);
 };
 
@@ -601,8 +601,8 @@ static char const* get_node_value(csRef<iDocumentNode> parent, char const* key)
   return node.IsValid() ? node->GetContentsValue() : "";
 }
 
-void csSCF::RegisterClassesInt (char const* pluginPath, iDocumentNode* scfnode, 
-				const char* context)
+void csSCF::RegisterClassesInt(char const* pluginPath, iDocumentNode* scfnode, 
+			       const char* context)
 {
   csRef<iDocumentNode> classesnode = scfnode->GetNode("classes");
   if (classesnode)
@@ -715,9 +715,8 @@ bool csSCF::RegisterClass (const char *iClassID, const char *iLibraryName,
     scfFactory *cf = (scfFactory *)ClassRegistry->Get (idx);
     if (ContextClash (cf->classContext, contextID))
     {
-      fprintf (stderr,
-	"SCF_WARNING: class %s has already been registered in the same context ('%s')\n", 
-	iClassID, context);
+      fprintf (stderr, "SCF_WARNING: class %s has already been registered in "
+        "the same context ('%s')\n", iClassID, context);
     }
     else
     {
@@ -732,11 +731,11 @@ bool csSCF::RegisterClass (const char *iClassID, const char *iLibraryName,
       if (cf->classContext != staticContextID)
       {
 	// @@@ some way to have this warning in non-debug builds would be nice.
-	fprintf (stderr,
-	  "SCF_NOTIFY: class %s has already been registered in a different context ('%s' vs '%s') "
-	  "(this message appears only in debug builds)\n", 
-	  iClassID, context, 
-	  (cf->classContext != csInvalidStringID) ? contexts.Request (cf->classContext) : 0);
+	fprintf (stderr, "SCF_NOTIFY: class %s has already been registered in "
+	  "a different context ('%s' vs '%s') (this message appears only in "
+	  "debug builds)\n", iClassID, context, 
+	  (cf->classContext != csInvalidStringID) ?
+	  contexts.Request (cf->classContext) : 0);
       }
     #endif
     }
@@ -762,9 +761,8 @@ bool csSCF::RegisterClass (scfFactoryFunc Func, const char *iClassID,
     scfFactory *cf = (scfFactory *)ClassRegistry->Get (idx);
     if (ContextClash (cf->classContext, contextID))
     {
-      fprintf (stderr,
-	"SCF_WARNING: class %s has already been registered in the same context (%s)\n", 
-	iClassID, context);
+      fprintf (stderr, "SCF_WARNING: class %s has already been registered in "
+	"the same context (%s)\n", iClassID, context);
     }
     else
     {
@@ -779,10 +777,10 @@ bool csSCF::RegisterClass (scfFactoryFunc Func, const char *iClassID,
       if (cf->classContext != staticContextID)
       {
 	// @@@ some way to have this warning in non-debug builds would be nice.
-	fprintf (stderr,
-	  "SCF_NOTIFY: class %s has already been registered in a different context (%s vs %s) "
-	  "(this message appears only in debug builds)\n", 
-	  iClassID, context, contexts.Request (cf->classContext));
+	fprintf (stderr, "SCF_NOTIFY: class %s has already been registered "
+	  "in a different context (%s vs %s) (this message appears only in "
+	  "debug builds)\n", iClassID, context,
+	  contexts.Request (cf->classContext));
       }
     #endif
     }
@@ -829,7 +827,7 @@ bool csSCF::UnregisterClass (const char *iClassID)
   if (!ClassRegistry)
     return false;
 
-  int idx = ClassRegistry->FindKey ((void*)iClassID, ClassRegistry->CompareKey);
+  int idx = ClassRegistry->FindKey((void*)iClassID, ClassRegistry->CompareKey);
 
   if (idx < 0)
     return false;
@@ -869,7 +867,7 @@ const char *csSCF::GetClassDescription (const char *iClassID)
 {
   csScopedMutexLock lock (mutex);
 
-  int idx = ClassRegistry->FindKey ((void*)iClassID, ClassRegistry->CompareKey);
+  int idx = ClassRegistry->FindKey((void*)iClassID, ClassRegistry->CompareKey);
   if (idx >= 0)
   {
     iFactory *cf = (iFactory *)ClassRegistry->Get (idx);
@@ -883,7 +881,7 @@ const char *csSCF::GetClassDependencies (const char *iClassID)
 {
   csScopedMutexLock lock (mutex);
 
-  int idx = ClassRegistry->FindKey ((void*)iClassID, ClassRegistry->CompareKey);
+  int idx = ClassRegistry->FindKey((void*)iClassID, ClassRegistry->CompareKey);
   if (idx >= 0)
   {
     iFactory *cf = (iFactory *)ClassRegistry->Get (idx);
@@ -891,6 +889,23 @@ const char *csSCF::GetClassDependencies (const char *iClassID)
   }
 
   return 0;
+}
+
+csRef<iDocument> csSCF::GetPluginMetadata (char const *iClassID)
+{
+  csRef<iDocument> metadata;
+#ifndef CS_STATIC_LINKED
+  csScopedMutexLock lock (mutex);
+  int idx = ClassRegistry->FindKey((void*)iClassID, ClassRegistry->CompareKey);
+  if (idx >= 0)
+  {
+    scfFactory *cf = ClassRegistry->Get (idx);
+    if (cf->LibraryName != 0)
+      csGetPluginMetadata(cf->LibraryName, metadata);
+  }
+
+#endif
+  return metadata;
 }
 
 bool csSCF::ClassRegistered (const char *iClassID)
@@ -913,9 +928,9 @@ scfInterfaceID csSCF::GetInterfaceID (const char *iInterface)
   return (scfInterfaceID)InterfaceRegistry.Request (iInterface);
 }
 
-iStringArray* csSCF::QueryClassList (char const* pattern)
+csRef<iStringArray> csSCF::QueryClassList (char const* pattern)
 {
-  scfStringArray* v = new scfStringArray();
+  csRef<iStringArray> v = new scfStringArray();
 
   csScopedMutexLock lock (mutex);
   int const rlen = ClassRegistry->Length();
@@ -929,6 +944,5 @@ iStringArray* csSCF::QueryClassList (char const* pattern)
         v->Push (s);
     }
   }
-  csRef<iStringArray> iv (SCF_QUERY_INTERFACE(v, iStringArray));
-  return iv;	// Will do DecRef() but that's ok in this case.
+  return v;
 }

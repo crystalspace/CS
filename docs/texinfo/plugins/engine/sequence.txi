@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Sequence Manager, , Level of Detail, csEngine
+@node Sequence Manager, Level Building, Level of Detail, csEngine
 @subsection Sequence Manager
 @cindex Sequence Manager
 

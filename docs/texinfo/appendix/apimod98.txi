@@ -824,6 +824,12 @@ raw image data.
 If the hypothetical multiplexor identifies the image as @sc{png}, only then
 will it actually request the @sc{png} loader plugin.
 
+If you know the physical pathname of a plugin module, then you can retrieve its
+meta-information via @code{csGetPluginMetadata()} (@file{csutil/csshlib.h}),
+which returns an @samp{iDocument}.  Alternately, if you know the name of an
+@sc{scf} class which a plugin exports, then you can retrieve the plugin's
+meta-information, by calling @code{iSCF::GetPluginMetadata()}.
+
 At program launch time, @sc{scf} discovers plugins automatically by searching a
 set of directories, and creates an internal database associating available
 @sc{scf} class names with the plugin modules which implement them.  The
@@ -969,6 +975,10 @@ The @code{SCF_CREATE_INSTANCE()} macro now returns @code{csPtr<>} to be
 consistent with the other @sc{scf} instantiation and query macros.  This means
 that you should now assign the result of @code{SCF_CREATE_INSTANCE()} to a
 @code{csRef<>}.
+
+The method @code{iSCF::QueryClassList()}, which used to return a raw
+@samp{iStringArray*} that the client had to dispose of manually, now returns a
+@code{csRef<iStringArray>}.
 
 The macros @code{SCF_SET_REF()}, @code{SCF_INC_REF()}, and @code{SCF_DEC_REF()}
 have been removed. Instead you should use @code{csRef<>}.

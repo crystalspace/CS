@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Level Building, Rendering Loop, Texture Mapping, csEngine
+@node Level Building, , Sequence Manager, csEngine
 @subsection How to create optimal levels for Crystal Space
 @cindex Visibility Culling
 @cindex Culling, Visibility
@@ -17,27 +17,27 @@ levels. For that you use external tools like Blender, Quark, or other.
 This chapter focuses on how you should partition your level in sectors,
 the kind of mesh objects you should use, the visibility cullers, @dots{}.
 
-For a good discussion about sectors and visibility cullers you should
-have a look at @xref{Visibility Culling}.
+For a good discussion about sectors and visibility cullers, see
+@ref{Visibility Culling}.
 
 @menu
-* LEV sectors and portals:: Sectors and Portals
+* LEV Sectors and Portals:: Sectors and Portals
 * LEV Visibility Cullers:: Visibility Cullers
 * LEV Object Types:: Object types
 * LEV Helping Renderer:: Helping the Renderer
 * LEV Lighting Considerations:: Lighting Considerations
 @end menu
 
-@node LEV Sectors and Portals, VIS cullers, Visibility Culling, Visibility Culling
+@node LEV Sectors and Portals, LEV Visibility Cullers, Level Building, Level Building
 @subsubsection Sectors and Portals
 @cindex portals
 @cindex sectors
 
-As explained in @xref{Visibility Culling} a sector is the basic building
-block in a level. When you create a level you should decide on how to partition
-your level in sectors. The easiest solution is to use a single sector. In
-many cases that may even be acceptible. Here are some points to think about
-when deciding on how to partition your level into sectors:
+A sector is the basic building block in a level (@pxref{Visibility Culling}).
+When you create a level you should decide on how to partition your level in
+sectors. The easiest solution is to use a single sector. In many cases that may
+even be acceptible. Here are some points to think about when deciding on how to
+partition your level into sectors:
 @itemize
 @item
 Creating multiple sectors complicates level design a bit since you have to
@@ -70,7 +70,7 @@ Wether or not you should further partition an indoor world into multiple
 sectors is hard to say and really depends on the complexity of the level.
 @end itemize
 
-@node LEV Visibility Cullers, VIS cullers, Visibility Culling, Visibility Culling
+@node LEV Visibility Cullers, LEV Object Types, LEV Sectors and Portals, Level Building
 @subsubsection Visibility Cullers
 
 Every sector has its own visibility culler.
@@ -158,18 +158,18 @@ object in a map file:
 <meshobj name="complexWall">
     <plugin>thing</plugin>
     <params>
-    	@dots{}
+        @dots{}
     </params>
     <polymesh>
-	<mesh>
-	    <v x="-1" y="-1" z="-1" />
-	    <v x="1" y="-1" z="-1" />
-	    <v x="1" y="4" z="-1" />
-	    <v x="-1" y="4" z="-1" />
-	    <t v1="0" v2="1" v3="2" />
-	    <t v1="0" v2="2" v3="3" />
-	</mesh>
-	<viscull />
+        <mesh>
+            <v x="-1" y="-1" z="-1" />
+            <v x="1" y="-1" z="-1" />
+            <v x="1" y="4" z="-1" />
+            <v x="-1" y="4" z="-1" />
+            <t v1="0" v2="1" v3="2" />
+            <t v1="0" v2="2" v3="3" />
+        </mesh>
+        <viscull />
     </polymesh>
 </meshobj>
 @end example
@@ -181,10 +181,10 @@ an object:
 <meshobj name="wallSegment">
     <plugin>thing</plugin>
     <params>
-    	@dots{}
+        @dots{}
     </params>
     <polymesh>
-	<viscull />
+        <viscull />
     </polymesh>
 </meshobj>
 @end example
@@ -228,7 +228,7 @@ will probably be better since the cost of writing the object to the coverage
 buffer will probably be higher then the cost of rendering the object inside
 the sphere. But we don't know where exactly the thresshold is.
 
-@node LEV Object Types, VIS cullers, Visibility Culling, Visibility Culling
+@node LEV Object Types, LEV Helping Renderer, LEV Visibility Cullers, Level Building
 @subsubsection Object types
 
 Regardless of sector partitioning and visibility culling requirements the
@@ -284,7 +284,7 @@ above though.
 Game actors and creatures should use @samp{sprite3d} or @samp{sprcal3d}.
 @end itemize
 
-@node LEV Helping Renderer, VIS cullers, Visibility Culling, Visibility Culling
+@node LEV Helping Renderer, LEV Lighting Considerations, LEV Object Types, Level Building
 @subsubsection Helping the Renderer
 
 When considering on how to design your objects you should keep in mind
@@ -331,7 +331,7 @@ This technique is not possible if you have a tiling texture. i.e. a wall
 texture that is repeated accross a large surface.
 @end enumerate
 
-@node LEV Lighting Considerations, VIS cullers, Visibility Culling, Visibility Culling
+@node LEV Lighting Considerations, , LEV Helping Renderer, Level Building
 @subsubsection Lighting Considerations
 
 When designing a level you also have to think about where to place lights.
@@ -345,4 +345,3 @@ With lightmapped lighting there is no runtime cost associated with having
 multiple lights (there is a slight memory cost associated with having many
 pseudo-dynamic lightmaps). A higher number of lights simply means that
 recalculating lighting will take longer.
-

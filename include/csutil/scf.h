@@ -645,13 +645,13 @@ void* CS_EXPORTED_NAME(Class,_Create)(iBase *iParent)			\
 //--------------------------------------------- Class factory interface -----//
 
 /**
- * iFactory is a interface that is used to create instances of shared classes.
+ * iFactory is an interface that is used to create instances of shared classes.
  * Any object supports the iFactory interface; a QueryInterface about iFactory
  * will return a valid pointer to the factory that was used to create that
  * object. Thus you can clone objects without even knowing their types.
  * <p>
- * NOTE: Currently you cannot add factories to the class factory list
- * internally maintained by SCF. That is, you can use an existing factory
+ * NOTE: Currently you cannot add factories to the class factory list since it
+ * is internally maintained by SCF. That is, you can use an existing factory
  * but cannot create objects that implements this interface (well, you can
  * but its pointless since you won't be able to add it to the factory list).
  * Instead, you should register new class factories through the normal class
@@ -816,9 +816,15 @@ static inline bool scfCompatibleVersion (int iVersion, int iItfVersion)
 struct iSCF : public iBase
 {
   /**
-   * This is the global instance of iSCF.  On most platforms, this instance is
-   * module-global (for instance, the application has an iSCF::SCF variable,
-   * and each plugin module has an iSCF::SCF variable).
+   * This is the global instance of iSCF.  On most platforms, this variable is
+   * module-global; for instance, the application has an iSCF::SCF variable,
+   * and each plugin module has an iSCF::SCF variable, all of which point at
+   * the same shared instance of iSCF.  On other platforms, though, the
+   * variable might truly be global, in which case the variable itself is
+   * shared by application and all plugin modules.  In actual practice,
+   * however, whether the variable's scope is global or only module-global,
+   * makes no difference since clients access the shared instance uniformly as
+   * iSCF::SCF.
    */
   static iSCF* SCF;
 
@@ -895,6 +901,34 @@ struct iSCF : public iBase
   virtual const char *GetClassDependencies (const char *iClassID) = 0;
 
   /**
+   * Given a registered class name, returns the meta information associated
+   * with the plugin module in which the class is implemented.  Since the meta
+   * information associated with a plugin is extensible, plugin authors are
+   * free to attach any additional information they desire, beyond that which
+   * is used by SCF itself.  This function provides a way for clients to access
+   * the additional meta information which plugin authors might choose to
+   * publish.
+   * <p>
+   * If the specified class is not implemented by a plugin module (for
+   * instance, it might be implemented directly by the application), or if
+   * plugin module is lacking meta information for some reason, then the
+   * returned csRef<> will be <em>invalid</em>.  You should check for this
+   * condition by invoking csRef<>::IsValid() or simply by using the returned
+   * reference in a boolean conditional expression.
+   * <p>
+   * Note that it is possible for a single plugin module to export multiple,
+   * named SCF classes.  The meta information returned by this function belongs
+   * to the plugin itself, not to any individual class exported by that plugin.
+   * Therefore, if you invoke this method twice for two different classes, and
+   * those classes are exported by the same plugin, then the same meta
+   * information will be returned by both queries.
+   * <p>
+   * If you know the physical path of a plugin, then you can instead invoke
+   * csGetPluginMetadata() (csutil/csshlib.h) to retrieve its meta information.
+   */
+  virtual csRef<iDocument> GetPluginMetadata (char const *iClassID) = 0;
+
+  /**
    * Unload all unused shared libraries (also called inside scfCreateInstance).
    * If you want to be sure that all unused shared libraries are unloaded, call
    * this function.  It is automatically invoked inside scfCreateInstance(),
@@ -930,9 +964,9 @@ struct iSCF : public iBase
   /**
    * Associate a factory function (the function which instantiates a class)
    * with an implementation name (the value in the <implementation> node of the
-   * meta info; also the name of the iFactoryClass in RegisterClass).  Returns
-   * true upon sucess, or false if the class does not exist or already has an
-   * associated creation function.
+   * meta information; also the name of the iFactoryClass in RegisterClass).
+   * Returns true upon sucess, or false if the class does not exist or already
+   * has an associated creation function.
    */
   virtual bool RegisterFactoryFunc (scfFactoryFunc, const char *FactClass) = 0;
 
@@ -971,11 +1005,10 @@ struct iSCF : public iBase
    * of class names which begin with the string "crystalspace.sound.loader.".
    * If pattern is zero length or the null pointer, then all registered class
    * names are returned.  If any class names match the pattern, then the return
-   * value is a list strings.  If no class names match the pattern string, then
-   * the returned list is empty.  It is the caller's responsibility to invoke
-   * DecRef() on the returned list when the list is no longer needed.
+   * value is a list of strings.  If no class names match the pattern string,
+   * then the returned list is empty.
    */
-  virtual iStringArray* QueryClassList (char const* pattern) = 0;
+  virtual csRef<iStringArray> QueryClassList (char const* pattern) = 0;
 
   /**
    * Scan a specified native path for plugins and auto-register them.

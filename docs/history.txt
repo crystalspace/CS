@@ -32,11 +32,22 @@ chronological order.
 	- Eric Sunshine updated movierec.txi HOWTO.  It still had a reference
 	  to the obsolete user.cfg.
 	- Jorrit added a new section in the documentation that tries to explain
-	  how to build levels for Crystal Space. It discusses various techniques
-	  and tells people what tricks they can use to get most optimal
-	  performance.
+	  how to build levels for Crystal Space. It discusses various
+	  techniques and tells people what tricks they can use to get most
+	  optimal performance.
 	- Jorrit extended the new documentation about level building with a
 	  note about closed vs non-closed objects and Dynavis.
+	- Eric Sunshine added iSCF::GetPluginMetadata() which, given an SCF
+	  class name, returns an iDocument containing the meta-information for
+	  the plugin module which exports the named class.  This complements
+	  the existing csGetPluginMetadata() which returns the same information
+	  but expects the physical pathname of the plugin module.
+	- Eric Sunshine fixed iSCF::QueryClassList() so that it returns
+	  csRef<iStringArray> rather than a raw `iStringArray*'.
+	- Eric Sunshine fixed a few Texinfo mark-up errors in levbuilding.txi
+	  and untabified the @examples in order to ensure that they display
+	  properly when formatted.  (Fixing other Texinfo mark-up problems will
+	  have to wait until this document stabilizes.)
 10-Feb-2004
 	- Eric Sunshine fixed CS/data/Jamfile so that it no longer tries to
 	  install the non-existent unifont.csf file.  (Bug reported by Frank
