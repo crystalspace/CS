@@ -54,6 +54,7 @@ static void Test (iBase* obj, const char* name)
   if (!obj)
   {
     printf ("Object '%s' is missing!\n", name);
+    fflush (stdout);
     return;
   }
   iDebugHelper* dbghelp = SCF_QUERY_INTERFACE (obj, iDebugHelper);
@@ -74,6 +75,7 @@ static void Test (iBase* obj, const char* name)
   }
   else
     printf ("%s unit test not performed (object doesn't support it).\n", name);
+  fflush (stdout);
 }
 
 static void Benchmark (iBase* obj, const char* name, int num_iterations)
@@ -81,6 +83,7 @@ static void Benchmark (iBase* obj, const char* name, int num_iterations)
   if (!obj)
   {
     printf ("Object '%s' is missing!\n", name);
+    fflush (stdout);
     return;
   }
   iDebugHelper* dbghelp = SCF_QUERY_INTERFACE (obj, iDebugHelper);
@@ -92,6 +95,7 @@ static void Benchmark (iBase* obj, const char* name, int num_iterations)
   }
   else
     printf ("%s benchmark not performed (object doesn't support it).\n", name);
+  fflush (stdout);
 }
 
 /*---------------------------------------------------------------------*

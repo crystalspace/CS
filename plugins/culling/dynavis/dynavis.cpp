@@ -21,7 +21,9 @@
 #include "csver.h"
 #include "csutil/scf.h"
 #include "csutil/util.h"
+#include "csutil/scfstr.h"
 #include "dynavis.h"
+#include "kdtree.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -35,16 +37,22 @@ SCF_EXPORT_CLASS_TABLE_END
 SCF_IMPLEMENT_IBASE (csDynaVis)
   SCF_IMPLEMENTS_INTERFACE (iVisibilityCuller)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iDebugHelper)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csDynaVis::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+SCF_IMPLEMENT_EMBEDDED_IBASE (csDynaVis::DebugHelper)
+  SCF_IMPLEMENTS_INTERFACE (iDebugHelper)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
 csDynaVis::csDynaVis (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
   object_reg = NULL;
 }
 
@@ -56,5 +64,24 @@ bool csDynaVis::Initialize (iObjectRegistry *object_reg)
 {
   csDynaVis::object_reg = object_reg;
   return true;
+}
+
+iString* csDynaVis::Debug_UnitTest ()
+{
+  csKDTree* kdtree = new csKDTree ();
+  iDebugHelper* dbghelp = SCF_QUERY_INTERFACE (kdtree, iDebugHelper);
+  if (dbghelp)
+  {
+    iString* rc = dbghelp->UnitTest ();
+    dbghelp->DecRef ();
+    if (rc)
+    {
+      delete kdtree;
+      return rc;
+    }
+  }
+  delete kdtree;
+
+  return NULL;
 }
 

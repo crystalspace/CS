@@ -4,6 +4,14 @@ The history order is reversed so that new features are at the top.
 	- Removed a warning in win32.cpp.
 	- Enabled console in debug mode again for Windows. I think that
 	  when you are debugging you certainly want to have that console.
+	- Added iDebugHelper implementation of Dynavis plugin.
+	- Added new csKDTree class to the Dynavis plugin. This class will
+	  manage the geometrical distribution of objects in 3D space.
+	  At this moment the class only supports adding objects. It will
+	  not try to reorganize the tree if the quality of the tree starts
+	  degrading.
+	- Added UnitTest() implementation of csKDTree for the current
+	  supported operations.
 30-Apr-2002
 	- Added a new iDebugHelper interface in iutil. This interface defines
 	  a consistant interface for debugging CS modules. It has the following

@@ -21,6 +21,7 @@
 
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/dbghelp.h"
 #include "csutil/scf.h"
 #include "iengine/viscull.h"
 
@@ -52,12 +53,46 @@ public:
   virtual void RegisterShadowReceiver (iShadowReceiver* /*receiver*/) { }
   virtual void UnregisterShadowReceiver (iShadowReceiver* /*receiver*/) { }
 
+  iString* Debug_UnitTest ();
+
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE (csDynaVis);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize (p); }
   } scfiComponent;
+
+  struct DebugHelper : public iDebugHelper
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csDynaVis);
+    virtual int GetSupportedTests () const
+    {
+      return CS_DBGHELP_UNITTEST;
+    }
+    virtual iString* UnitTest ()
+    {
+      return scfParent->Debug_UnitTest ();
+    }
+    virtual iString* StateTest ()
+    {
+      return NULL;
+    }
+    virtual csTicks Benchmark (int /*num_iterations*/)
+    {
+      return 0;
+    }
+    virtual iString* Dump ()
+    {
+      return NULL;
+    }
+    virtual void Dump (iGraphics3D* /*g3d*/)
+    {
+    }
+    virtual bool DebugCommand (const char*)
+    {
+      return false;
+    }
+  } scfiDebugHelper;
 };
 
 #endif // __CS_DYNAVIS_H__
