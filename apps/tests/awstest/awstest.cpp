@@ -63,10 +63,7 @@
 #include "csgeom/csrect.h"
 #include "csgeom/csrectrg.h"
 
-
-
 #include "awstest.h"
-#include "plugins/aws/awswin.h"
 #include <stdio.h>
 
 
@@ -390,8 +387,8 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   aws->GetPrefMgr()->SelectDefaultSkin("Normal Windows");
   
   printf("aws-debug: Creating splash window...\n");
-  awsWindow *test = aws->CreateWindowFrom("Splash");
-  awsWindow *test2 = aws->CreateWindowFrom("Another");
+  iAwsWindow *test = aws->CreateWindowFrom("Splash");
+  iAwsWindow *test2 = aws->CreateWindowFrom("Another");
 
 
   if (test)  test->Show();
