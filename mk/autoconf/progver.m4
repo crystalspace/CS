@@ -132,14 +132,13 @@ m4_define([CS_VCHK_PATCOUNT], [m4_len(m4_bpatsubst(CS_VCHK_PATTERNLIST([$1]), [[
 # ** CS_VCHK_EXTRACTVERSION(EXTRACT_CALL, MIN_VERSION, PATTERN, PRGPREFIX, COMPARISION) **
 # ****************************************************************************************
 m4_define([CS_VCHK_EXTRACTVERSION],
-[
-cs_prog_$4_is_version=
+[cs_prog_$4_is_version=
 cs_prog_$4_min_version=
 cs_prog_$4_is_suffix=
 cs_prog_$4_min_suffix=
 cs_prog_$4_is_suffix_done=
 cs_prog_$4_min_suffix_done=
-CS_VCHK_CYCLEOPT([$3], , 
+CS_VCHK_CYCLEOPT([$3], [], 
 [test -z $cs_prog_$4_is_version && cs_prog_$4_is_version=`$1 | sed 'CS_VCHK_SEDEXPRALL([i])'`
 test -n "$cs_prog_$4_is_version" && test -z $cs_prog_$4_is_suffix_done  && { cs_prog_$4_is_suffix_done=yes ; cs_prog_$4_is_suffix=j ; }
 ])
@@ -149,19 +148,19 @@ test -n "$cs_prog_$4_min_version" && test -z $cs_prog_$4_min_suffix_done  && { c
 ])
 CS_VCHK_RUNTH([CS_VCHK_PATCOUNT([$3])],
     [cs_prog_$4_is_ver_[]i=`echo ${cs_prog_$4_is_version}${cs_prog_$4_is_suffix} | sed 'CS_VCHK_SEDEXPRNTH([CS_VCHK_RMALL([$3])], [i])'`
-])dnl
+])
 CS_VCHK_RUNTH([CS_VCHK_PATCOUNT([$3])],
     [cs_prog_$4_min_ver_[]i=`echo $cs_prog_$4_min_version${cs_prog_$4_min_suffix} | sed 'CS_VCHK_SEDEXPRNTH([CS_VCHK_RMALL([$3])], [i])'`
-])dnl
+])
 cs_cv_prog_$4_version_ok=''
 CS_VCHK_RUNTH([CS_VCHK_PATCOUNT([$3])],
 [test -z "$cs_cv_prog_$4_version_ok" && { expr "$cs_prog_$4_is_ver_[]i" "$5" "$cs_prog_$4_min_ver_[]i" >/dev/null || cs_cv_prog_$4_version_ok=no ; }
 test -z "$cs_cv_prog_$4_version_ok" && { expr "$cs_prog_$4_min_ver_[]i" "$5" "$cs_prog_$4_is_ver_[]i" >/dev/null || cs_cv_prog_$4_version_ok=yes ; }
-])dnl
-AS_IF([test -z "$cs_cv_prog_$4_version_ok"],
-    [cs_cv_prog_$4_version_ok=yes],
-    [AS_IF([test $cs_cv_prog_$4_version_ok = no && test -n "$cs_prog_$4_is_version"],
-	[cs_cv_prog_$4_version_ok="no (version $cs_prog_$4_is_version)"])])
+])
+AS_IF([test -z "$cs_cv_prog_$4_version_ok"], [cs_cv_prog_$4_version_ok=yes])
+cs_cv_prog_$4_version_ok_annotated="$cs_cv_prog_$4_version_ok"
+AS_IF([test -n "$cs_prog_$4_is_version"],
+    [cs_cv_prog_$4_version_ok_annotated="$cs_cv_prog_$4_version_ok_annotated (version $cs_prog_$4_is_version)"])
 ])
 
 ##############################################################################
@@ -187,7 +186,7 @@ AS_IF([test -z "$cs_cv_prog_$4_version_ok"],
 ##############################################################################
 AC_DEFUN([CS_CHECK_PROG_VERSION],
 [AC_CACHE_CHECK([if $1 version m4_default([$7],[>=]) $3],
-    [cs_cv_prog_$1_version_ok],
+    [cs_cv_prog_$1_version_ok_annotated],
     [CS_VCHK_EXTRACTVERSION([$2], [$3], [$4], [$1], m4_default([$7],[>=]))])
 AS_IF([test "$cs_cv_prog_$1_version_ok" = yes],
     [m4_default([$5],[:])], [m4_default([$6],[:])])])

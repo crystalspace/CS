@@ -6,6 +6,20 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-Jan-2004
+	- Eric Sunshine changed the libbfd check in configure.ac so that it is
+	  not performed on Windows.  Newer versions of Mingw supply libbfd and
+	  libiberty, and people did not like seeing these GPL-licensed
+	  libraries mentioned in the link statement for plugin modules.  (Note,
+	  however, that in reality these libraries were not actually being
+	  linked into plugin modules on Windows since there are no symbolic
+	  references to libbfd or libiberty within the CS object files when
+	  building on Windows, and linkers are smart enough to ignore libraries
+	  which to which there are no symbolic references.)
+	- Eric Sunshine changed the CS_CHECK_PROG_VERSION() Autoconf macro so
+	  that it reports the discovered program's version in all cases.
+	  Previously, it only reported the version number if the version check
+	  failed.
 5-Jan-2004
 	- res fixed sprcal3d so render buffers are created correctly for 
 	  multi-mesh models.

@@ -1604,7 +1604,8 @@ AS_IF([test $cs_cv_libcal3d = yes],
 	    [[#include <cal3d/cal3d.h>]],
 	    [CalCoreModel m;
 	    m.addCoreMorphAnimation(new CalCoreMorphAnimation());
-	    CalLoader::setLoadingMode(LOADER_INVERT_V_COORD | LOADER_ROTATE_X_AXIS);])],
+	    CalLoader::setLoadingMode(
+	      LOADER_INVERT_V_COORD|LOADER_ROTATE_X_AXIS);])],
 	[], [C++],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libcal3d], [CAL3D])
 	    CS_MAKEFILE_PROPERTY([HAS_CAL3D], [yes])],
@@ -2118,16 +2119,32 @@ AS_IF([test $enable_meta_info_embedding = yes],
 # libiberty.  It turns out that it is possible to make the linker prefer the
 # binutils version by specifying -L/usr/lib, thus the extensive test attempts
 # to do so in an effort to resolve this unfortunate issue.
+#
+# Furthermore, recent versions of Mingw supply libbfd and libiberty.  Since
+# Crystal Space uses native Win32 API for meta-information embedding on
+# Windows, we do not require these libraries on Windows.  More importantly,
+# users do not want to see these GPL-licensed libraries appear in the link
+# statement for plugin modules, thus we explicitly disable this test on
+# Windows.
 #------------------------------------------------------------------------------
-AC_DEFUN([CS_CHECK_LIBBFD],
+AC_DEFUN([CS_CHECK_ENABLE_LIBBFD_TEST],
     [AC_REQUIRE([CS_CHECK_ENABLE_META_EMBEDDING])
+    AC_REQUIRE([AC_CANONICAL_HOST])
     AS_IF([test $enable_meta_info_embedding = yes],
-	[CS_CHECK_LIB_WITH([bfd],
-	    [AC_LANG_PROGRAM([[#include <bfd.h>]], [bfd_init();])],
-	    [], [], [], [], [], [], [-liberty])],
-	[cs_cv_libbfd=no])])
+	[case $host_os in
+	    mingw*|cygwin*) cs_check_libbfd=no ;;
+	    *) cs_check_libbfd=yes ;;
+	esac],
+	[cs_check_libbfd=no])])
 
-CS_CHECK_LIBBFD
+CS_CHECK_ENABLE_LIBBFD_TEST
+
+AS_IF([test $cs_check_libbfd = yes],
+    [CS_CHECK_LIB_WITH([bfd],
+	[AC_LANG_PROGRAM([[#include <bfd.h>]], [bfd_init();])],
+	[], [], [], [], [], [], [-liberty])],
+    [cs_cv_libbfd=no])
+
 AS_IF([test $cs_cv_libbfd = yes],
     [CS_CHECK_BUILD([if libbfd is usable], [cs_cv_libbfd_ok],
 	[AC_LANG_PROGRAM([[#include <bfd.h>]],
