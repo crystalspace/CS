@@ -438,20 +438,8 @@ struct iEngine : public iBase
   virtual int GetLightmapCellSize () const = 0;
   /// Set lightmap cell size
   virtual void SetLightmapCellSize (int Size) = 0;
-
-  /// Create a new camera.
-  virtual iCamera* CreateCamera () = 0;
-  /// Create a static/pseudo-dynamic light. name can be NULL.
-  virtual iStatLight* CreateLight (const char* name, const csVector3& pos,
-  	float radius, const csColor& color, bool pseudoDyn) = 0;
-  /// Find a static/pseudo-dynamic light by name.
-  virtual iStatLight* FindLight (const char *Name, bool RegionOnly = false)
-    const = 0;
-  /// Create a dynamic light.
-  virtual iDynLight* CreateDynLight (const csVector3& pos, float radius,
-  	const csColor& color) = 0;
-  /// Remove a dynamic light.
-  virtual void RemoveDynLight (iDynLight*) = 0;
+  /// Return default lightmap cell size
+  virtual int GetDefaultLightmapCellSize () const = 0;
 
   /**
    * Require that the Z-buffer is cleared every frame. The engine
@@ -469,6 +457,41 @@ struct iEngine : public iBase
    * Get the value of the clear Z-buffer flag set with SetClearZBuf().
    */
   virtual bool GetClearZBuf () const = 0;
+  /// Get default clear z-buffer flag
+  virtual bool GetDefaultClearZBuf () const = 0;
+
+  /**
+   * Set the maximum lightmap dimensions. Polys with lightmaps larger than
+   * this are not lit.
+   */
+  virtual void SetMaxLightmapSize(int w, int h) = 0;
+  /// Retrieve maximum lightmap size
+  virtual void GetMaxLightmapSize(int& w, int& h) = 0;
+  /// Retrieve default maximum lightmap size
+  virtual void GetDefaultMaxLightmapSize(int& w, int& h) = 0;
+  
+  /**
+   * Reset a subset of flags/settings (which may differ from one world/map to 
+   * another) to its defaults. This currently includes:
+   *   - clear z buffer flag
+   *   - lightmap cell size
+   *   - maximum lighmap size
+   */
+  virtual void ResetWorldSpecificSettings() = 0;  
+
+  /// Create a new camera.
+  virtual iCamera* CreateCamera () = 0;
+  /// Create a static/pseudo-dynamic light. name can be NULL.
+  virtual iStatLight* CreateLight (const char* name, const csVector3& pos,
+  	float radius, const csColor& color, bool pseudoDyn) = 0;
+  /// Find a static/pseudo-dynamic light by name.
+  virtual iStatLight* FindLight (const char *Name, bool RegionOnly = false)
+    const = 0;
+  /// Create a dynamic light.
+  virtual iDynLight* CreateDynLight (const csVector3& pos, float radius,
+  	const csColor& color) = 0;
+  /// Remove a dynamic light.
+  virtual void RemoveDynLight (iDynLight*) = 0;
 
   /**
    * Get the required flags for 3D->BeginDraw() which should be called

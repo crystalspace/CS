@@ -352,6 +352,9 @@ public:
   static bool do_force_revis;
   /// Option variable: radiosity debugging (step by step)?
   static bool do_rad_debug;
+  /// Maximum lightmap dimensions
+  static int max_lightmap_w;
+  static int max_lightmap_h;
 
 private:
   /// Texture and color information objects.
@@ -400,6 +403,15 @@ private:
 
   /// Clear the Z-buffer every frame.
   bool clear_zbuf;
+
+  /// default buffer clear flag
+  bool default_clear_zbuf;
+
+  /// default lightmap cell size
+  int default_lightmap_cell_size;
+
+  /// default maximum lightmap width/height
+  int default_max_lightmap_w, default_max_lightmap_h;
 
   /**
    * If this nextframe_pending is not 0 then a call of NextFrame
@@ -603,13 +615,6 @@ public:
    */
   virtual int GetEngineMode () const { return engine_mode; }
 
-  virtual void SetClearZBuf (bool yesno)
-  {
-    clear_zbuf = yesno;
-  }
-
-  virtual bool GetClearZBuf () const { return clear_zbuf; }
-
   /**
    * Get the required flags for 3D->BeginDraw() which should be called
    * from the application. These flags must be or-ed with optional other
@@ -706,6 +711,42 @@ public:
   virtual int GetLightmapCellSize () const;
   /// Set lightmap cell size
   virtual void SetLightmapCellSize (int Size);
+  /// Return default lightmap cell size
+  virtual int GetDefaultLightmapCellSize () const { return default_lightmap_cell_size; }
+
+  /// Set clear z buffer flag
+  virtual void SetClearZBuf (bool yesno)
+  {
+    clear_zbuf = yesno;
+  }
+
+  /// Get clear z buffer flag
+  virtual bool GetClearZBuf () const { return clear_zbuf; }
+
+  /// Get default clear z-buffer flag
+  virtual bool GetDefaultClearZBuf () const { return default_clear_zbuf; }
+
+  /**
+   * Set the maximum lightmap dimensions. Polys with lightmaps larger than
+   * this are not lit.
+   */
+  virtual void SetMaxLightmapSize(int w, int h) 
+  { max_lightmap_w = w; max_lightmap_h = h; }
+  /// Retrieve maximum lightmap size
+  virtual void GetMaxLightmapSize(int& w, int& h)
+  { w = max_lightmap_w; h = max_lightmap_h; }
+  /// Retrieve default maximum lightmap size
+  virtual void GetDefaultMaxLightmapSize(int& w, int& h)
+  { w = default_max_lightmap_w; h = default_max_lightmap_h; }
+  
+  /**
+   * Reset a subset of flags/settings (which may differ from one world/map to 
+   * another) to its defaults. This currently includes:
+   *   - clear z buffer flag
+   *   - lightmap cell size
+   *   - maximum lighmap size
+   */
+  virtual void ResetWorldSpecificSettings();  
 
   /**
    * Read configuration file (using the system driver) for all engine
