@@ -148,6 +148,8 @@ class csPolyIt
 private:
   // The engine for this iterator.
   csEngine* engine;
+  // The region we are iterating in (optional).
+  csRegion* region;
   // Current sector index.
   int sector_idx;
   // Current thing index.
@@ -155,9 +157,12 @@ private:
   // Current polygon index.
   int polygon_idx;
 
+  // Go to next sector. Return false if finished.
+  bool NextSector ();
+
 public:
   /// Construct an iterator and initialize to start.
-  csPolyIt (csEngine*);
+  csPolyIt (csEngine*, csRegion* region = NULL);
 
   /// Restart iterator.
   void Restart ();
@@ -180,6 +185,8 @@ class csCurveIt
 private:
   // The engine for this iterator.
   csEngine* engine;
+  // The region we are iterating in (optional).
+  csRegion* region;
   // Current sector index.
   int sector_idx;
   // Current thing index.
@@ -187,15 +194,21 @@ private:
   // Current polygon index.
   int curve_idx;
 
+  // Go to next sector. Return false if finished.
+  bool NextSector ();
+
 public:
   /// Construct an iterator and initialize to start.
-  csCurveIt (csEngine*);
+  csCurveIt (csEngine*, csRegion* region = NULL);
 
   /// Restart iterator.
   void Restart ();
 
   /// Get curve from iterator. Return NULL at end.
   csCurve* Fetch ();
+
+  /// Get the sector for the last fetched curve.
+  csSector* GetLastSector ();
 };
 
 /**
@@ -209,20 +222,28 @@ class csLightIt
 private:
   // The engine for this iterator.
   csEngine* engine;
+  // The region we are iterating in (optional).
+  csRegion* region;
   // Current sector index.
   int sector_idx;
   // Current light index.
   int light_idx;
 
+  // Go to next sector. Return false if finished.
+  bool NextSector ();
+
 public:
   /// Construct an iterator and initialize to start.
-  csLightIt (csEngine*);
+  csLightIt (csEngine*, csRegion* region = NULL);
 
   /// Restart iterator.
   void Restart ();
 
   /// Get light from iterator. Return NULL at end.
   csLight* Fetch ();
+
+  /// Get the sector for the last fetched light.
+  csSector* GetLastSector ();
 };
 
 /**
@@ -618,8 +639,10 @@ public:
   /**
    * Calculate all lighting information. Normally you shouldn't call
    * this function directly, because it will be called by Prepare().
+   * If the optional 'region' parameter is given then only lights will
+   * be recalculated for the given region.
    */
-  void ShineLights ();
+  void ShineLights (csRegion* region = NULL);
 
   /**
    * Prepare the engine. This function must be called after
@@ -1013,20 +1036,20 @@ public:
   /**
    * Create an iterator to iterate over all polygons of the engine.
    */
-  csPolyIt* NewPolyIterator ()
+  csPolyIt* NewPolyIterator (csRegion* region = NULL)
   {
     csPolyIt* it;
-    it = new csPolyIt (this);
+    it = new csPolyIt (this, region);
     return it;
   }
 
   /**
    * Create an iterator to iterate over all static lights of the engine.
    */
-  csLightIt* NewLightIterator ()
+  csLightIt* NewLightIterator (csRegion* region = NULL)
   {
     csLightIt* it;
-    it = new csLightIt (this);
+    it = new csLightIt (this, region);
     return it;
   }
 

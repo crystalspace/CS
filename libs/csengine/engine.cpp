@@ -64,9 +64,9 @@
 
 //---------------------------------------------------------------------------
 
-csPolyIt::csPolyIt (csEngine* e) : engine(e)
+csPolyIt::csPolyIt (csEngine* e, csRegion* r) : engine (e), region (r)
 {
-  Restart();
+  Restart ();
 }
 
 void csPolyIt::Restart ()
@@ -76,12 +76,23 @@ void csPolyIt::Restart ()
   polygon_idx = 0;
 }
 
+bool csPolyIt::NextSector ()
+{
+  sector_idx++;
+  if (region)
+    while (sector_idx < engine->sectors.Length ()
+	  && !region->IsInRegion (GetLastSector ()))
+      sector_idx++;
+  if (sector_idx >= engine->sectors.Length ()) return false;
+  return true;
+}
+
 csPolygon3D* csPolyIt::Fetch ()
 {
   csSector* sector;
   if (sector_idx == -1)
   {
-    sector_idx = 0;
+    if (!NextSector ()) return NULL;
     thing_idx = -1;
     polygon_idx = -1;
   }
@@ -110,8 +121,7 @@ csPolygon3D* csPolyIt::Fetch ()
     if (thing_idx == -1)
     {
       // There are no more things left. Go to the next sector.
-      sector_idx++;
-      if (sector_idx >= engine->sectors.Length ()) return NULL;
+      if (!NextSector ()) return NULL;
       // Initialize iterator to start of sector and recurse.
       thing_idx = -1;
       polygon_idx = -1;
@@ -128,8 +138,7 @@ csPolygon3D* csPolyIt::Fetch ()
     if (thing_idx < sector->things.Length ())
       return Fetch ();
     // No things. Go to next sector.
-    sector_idx++;
-    if (sector_idx >= engine->sectors.Length ()) return NULL;
+    if (!NextSector ()) return NULL;
     // Initialize iterator to start of sector and recurse.
     thing_idx = -1;
     return Fetch ();
@@ -147,9 +156,20 @@ csSector* csPolyIt::GetLastSector ()
 
 //--------------------- csCurveIt -------------------------------------------
 
-csCurveIt::csCurveIt (csEngine* e) : engine(e)
+csCurveIt::csCurveIt (csEngine* e, csRegion* r) : engine (e), region (r)
 {
-  Restart();
+  Restart ();
+}
+
+bool csCurveIt::NextSector ()
+{
+  sector_idx++;
+  if (region)
+    while (sector_idx < engine->sectors.Length ()
+	  && !region->IsInRegion (GetLastSector ()))
+      sector_idx++;
+  if (sector_idx >= engine->sectors.Length ()) return false;
+  return true;
 }
 
 void csCurveIt::Restart ()
@@ -164,7 +184,7 @@ csCurve* csCurveIt::Fetch ()
   csSector* sector;
   if (sector_idx == -1)
   {
-    sector_idx = 0;
+    if (!NextSector ()) return NULL;
     thing_idx = -1;
     curve_idx = -1;
   }
@@ -193,8 +213,7 @@ csCurve* csCurveIt::Fetch ()
     if (thing_idx == -1)
     {
       // There are no more things left. Go to the next sector.
-      sector_idx++;
-      if (sector_idx >= engine->sectors.Length ()) return NULL;
+      if (!NextSector ()) return NULL;
       // Initialize iterator to start of sector and recurse.
       thing_idx = -1;
       curve_idx = -1;
@@ -213,9 +232,7 @@ csCurve* csCurveIt::Fetch ()
       return Fetch ();
 
     // No things. Go to next sector.
-    sector_idx++;
-
-    if (sector_idx >= engine->sectors.Length ()) return NULL;
+    if (!NextSector ()) return NULL;
 
     // Initialize iterator to start of sector and recurse.
     thing_idx = -1;
@@ -227,11 +244,27 @@ csCurve* csCurveIt::Fetch ()
     sector->GetCurve (curve_idx);
 }
 
+csSector* csCurveIt::GetLastSector ()
+{
+  return (csSector*)(engine->sectors[sector_idx]);
+}
+
 //---------------------------------------------------------------------------
 
-csLightIt::csLightIt (csEngine* e) : engine(e)
+csLightIt::csLightIt (csEngine* e, csRegion* r) : engine (e), region (r)
 {
-  Restart();
+  Restart ();
+}
+
+bool csLightIt::NextSector ()
+{
+  sector_idx++;
+  if (region)
+    while (sector_idx < engine->sectors.Length ()
+	  && !region->IsInRegion (GetLastSector ()))
+      sector_idx++;
+  if (sector_idx >= engine->sectors.Length ()) return false;
+  return true;
 }
 
 void csLightIt::Restart ()
@@ -245,7 +278,7 @@ csLight* csLightIt::Fetch ()
   csSector* sector;
   if (sector_idx == -1)
   {
-    sector_idx = 0;
+    if (!NextSector ()) return NULL;
     light_idx = -1;
   }
 
@@ -259,8 +292,7 @@ csLight* csLightIt::Fetch ()
   {
     // Go to next sector.
     light_idx = -1;
-    sector_idx++;
-    if (sector_idx >= engine->sectors.Length ()) return NULL;
+    if (!NextSector ()) return NULL;
     // Initialize iterator to start of sector and recurse.
     return Fetch ();
   }
@@ -268,6 +300,11 @@ csLight* csLightIt::Fetch ()
   csLight* light;
   light = (csLight*)(sector->lights[light_idx]);
   return light;
+}
+
+csSector* csLightIt::GetLastSector ()
+{
+  return (csSector*)(engine->sectors[sector_idx]);
 }
 
 //---------------------------------------------------------------------------
@@ -949,7 +986,7 @@ bool csEngine::Prepare ()
   return true;
 }
 
-void csEngine::ShineLights ()
+void csEngine::ShineLights (csRegion* region)
 {
   tr_manager.NewFrame ();
 
@@ -1056,8 +1093,8 @@ void csEngine::ShineLights ()
     csSector::cfg_reflections = 1;
   }
 
-  csPolyIt* pit = NewPolyIterator ();
-  csLightIt* lit = NewLightIterator ();
+  csPolyIt* pit = NewPolyIterator (region);
+  csLightIt* lit = NewLightIterator (region);
 
   // Reinit all lightmaps. This loop also counts all polygons.
   csPolygon3D* p;
@@ -1082,7 +1119,8 @@ void csEngine::ShineLights ()
   for (sn = 0; sn < num_sectors ; sn++)
   {
     csSector* s = (csSector*)sectors [sn];
-    s->InitLightMaps ();
+    if (!region || region->IsInRegion (s))
+      s->InitLightMaps ();
     meter.Step();
   }
 
@@ -1124,7 +1162,8 @@ void csEngine::ShineLights ()
   for (sn = 0; sn < num_sectors ; sn++)
   {
     csSector* s = (csSector*)sectors[sn];
-    s->CacheLightMaps ();
+    if (!region || region->IsInRegion (s))
+      s->CacheLightMaps ();
     meter.Step();
   }
 

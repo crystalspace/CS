@@ -256,10 +256,17 @@ bool csRegion::PrepareSectors ()
   return true;
 }
 
+bool csRegion::ShineLights ()
+{
+  engine->ShineLights (this);
+  return true;
+}
+
 bool csRegion::Prepare ()
 {
   if (!PrepareTextures ()) return false;
   if (!PrepareSectors ()) return false;
+  if (!ShineLights ()) return false;
   return true;
 }
 
@@ -362,5 +369,17 @@ iMaterialWrapper* csRegion::FindMaterial (const char *iName)
   // Cast two times to avoid problems with multi-inherit.
   csMaterialWrapper* wrapper = (csMaterialWrapper*)obj;
   return (iMaterialWrapper*)wrapper;
+}
+
+bool csRegion::IsInRegion (iObject* iobj)
+{
+  csObject* obj = (csObject*)iobj;
+  for (csObjIterator iter = GetIterator (obj->GetType (), false);
+  	!iter.IsFinished () ; ++iter)
+  {
+    csObject* o = iter.GetObj ();
+    if (o == obj) return true;
+  }
+  return false;
 }
 

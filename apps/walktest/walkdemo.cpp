@@ -1149,6 +1149,9 @@ void OpenPortal (csView* view, char* lev)
   if (start_sector)
   {
     portalPoly->SetCSPortal (start_sector->GetPrivateObject ());
+    csPortal* portal = portalPoly->GetPortal ();
+    portal->flags.Set (CS_PORTAL_ZFILL);
+    portal->flags.Set (CS_PORTAL_CLIPDEST);
   }
 
   Sys->engine->SelectRegion (NULL);

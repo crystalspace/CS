@@ -8,6 +8,23 @@ The history order has been reversed so that new features are at the top.
 	  'Blocks' in Windows.
 	- Rene Dudfield made sprite lighting settings local to sprites so
 	  that different sprites can use different settings.
+	- Added ShineLights to iRegion/csRegion.
+	- Added IsInRegion to iRegion/csRegion to check if some object
+	  is in a region.
+	- Extended csEngine::ShineLights with an optional csRegion
+	  parameter to restrict recalculating lighting for some region.
+	- Extended csPolyIt, csCurveIt, and csLightIt (iterators that
+	  are defined in csEngine) with an optional csRegion parameter
+	  to restrict iteration over the objects in that region.
+	  Also extended csEngine::NewPolyIterator() and NewLightIterator()
+	  functions.
+	- Added GetLastSector() to csCurveIt and csLightIt (like csPolyIt).
+	- The 'portal' console command works better now. In some cases
+	  it 'almost' seems to be doing what it should. But it is still not
+	  good enough. It crashes while trying to load some levels and
+	  the portals in the other levels don't seem to be correct.
+	  'portal sydney' is the only one which seems to work nicely
+	  from flarge.
 10-Dec-2000
 	- Eric Sunshine made the following changes to the project:
 	    - Finally eliminated the evil monolithic apps/support/static.cpp

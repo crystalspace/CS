@@ -27,8 +27,9 @@ struct iThing;
 struct iSprite;
 struct iSpriteTemplate;
 struct iMaterialWrapper;
+struct iObject;
 
-SCF_VERSION (iRegion, 0, 1, 1);
+SCF_VERSION (iRegion, 0, 1, 2);
 
 /**
  * A region. A region is basically a collection of objects in the
@@ -58,6 +59,11 @@ struct iRegion : public iBase
   virtual bool PrepareSectors () = 0;
 
   /**
+   * Do lighting calculations (or read from cache).
+   */
+  virtual bool ShineLights () = 0;
+
+  /**
    * Prepare all objects in this region. This has to be called
    * directly after loading new objects.
    * This function is equivalent to calling PrepareTextures()
@@ -79,6 +85,9 @@ struct iRegion : public iBase
   virtual iSpriteTemplate *FindSpriteTemplate (const char *iName) = 0;
   /// Find a material in this region by name
   virtual iMaterialWrapper *FindMaterial (const char *iName) = 0;
+
+  /// Check if some object is in this region.
+  virtual bool IsInRegion (iObject* obj) = 0;
 };
 
 #endif // __IREGION_H__

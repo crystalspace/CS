@@ -92,10 +92,15 @@ public:
   virtual bool PrepareSectors ();
 
   /**
+   * Do lighting calculations (or read from cache).
+   */
+  virtual bool ShineLights ();
+
+  /**
    * Prepare all objects in this region. This has to be called
    * directly after loading new objects.
-   * This function is equivalent to calling PrepareTextures()
-   * followed by PrepareSectors().
+   * This function is equivalent to calling PrepareTextures(),
+   * followed by PrepareSectors(), followed by ShineLights().
    */
   virtual bool Prepare ();
 
@@ -113,6 +118,9 @@ public:
   virtual iSpriteTemplate *FindSpriteTemplate (const char *iName);
   /// Find a material in this region by name
   virtual iMaterialWrapper *FindMaterial (const char *iName);
+
+  /// Check if some object is in this region.
+  virtual bool IsInRegion (iObject* obj);
 };
 
 #endif // __CS_REGION_H__
