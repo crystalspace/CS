@@ -39,6 +39,8 @@ protected:
   csRenderBufferComponentType comptype;
   GLenum compGLType;
   bool nodelete;
+  size_t rangeStart;
+  size_t rangeEnd;
 public:
   SCF_DECLARE_IBASE;
 
@@ -79,6 +81,11 @@ public:
   { offset = o; }
 
   void SetInterleaved () { nodelete = true; }
+
+  void SetRange (size_t start, size_t end)
+  {
+    rangeStart = start; rangeEnd = end;
+  }
 };
 
 
@@ -110,7 +117,8 @@ public:
   * Lock the buffer to allow writing and give us a pointer to the data
   * The pointer will be 0 if there was some error
   */
-  virtual void* Lock(csRenderBufferLockType lockType)
+  virtual void* Lock(csRenderBufferLockType lockType, 
+    bool samePointer = false)
   {
     locked = true;
     return buffer;
@@ -136,14 +144,15 @@ SCF_VERSION(csVBORenderBuffer, 0,0,2);
 class csVBORenderBuffer : public csGLRenderBuffer
 {
 private:
-  char* tempbuf;
   GLuint bufferId;
   csRenderBufferType buftype;
   bool locked;
   csRenderBufferLockType lastLock;
   csGLRenderBufferLockType lastRLock;
   csGLExtensionManager *ext;
-  bool index;
+
+  GLenum bufferTarget;
+  GLenum bufferUsage;
 public:
   csVBORenderBuffer (int size, csRenderBufferType type,
     csRenderBufferComponentType comptype, int compcount, 
@@ -151,27 +160,40 @@ public:
     csGLRenderBuffer (size, type, comptype, compcount)
   {
     csVBORenderBuffer::ext = ext;
-    csVBORenderBuffer::index = index;
     csVBORenderBuffer::buftype = type;
     locked = false;
+
+    bufferTarget = index ? GL_ELEMENT_ARRAY_BUFFER_ARB : GL_ARRAY_BUFFER_ARB;
+    switch (type)
+    {
+      case CS_BUF_DYNAMIC:
+	bufferUsage = GL_DYNAMIC_DRAW_ARB;
+	break;
+      case CS_BUF_STREAM:
+	bufferUsage = GL_STREAM_DRAW_ARB;
+	break;
+      case CS_BUF_STATIC:
+      default:
+	bufferUsage = GL_STATIC_DRAW_ARB;
+    }
+
     ext->glGenBuffersARB (1, &bufferId);
-    const GLenum bufferType = 
-      index ? GL_ELEMENT_ARRAY_BUFFER_ARB : GL_ARRAY_BUFFER_ARB;
-    ext->glBindBufferARB (bufferType, bufferId);
-    ext->glBufferDataARB (bufferType, size, 0, 
-      (type==CS_BUF_STATIC) ? GL_STATIC_DRAW_ARB : GL_DYNAMIC_DRAW_ARB);
+    ext->glBindBufferARB (bufferTarget, bufferId);
+    ext->glBufferDataARB (bufferTarget, size, 0, bufferUsage);
     lastLock = CS_BUF_LOCK_NOLOCK;
-    ext->glBindBufferARB (bufferType, 0);
+    ext->glBindBufferARB (bufferTarget, 0);
   }
+
   csVBORenderBuffer (csVBORenderBuffer *copy) :
     csGLRenderBuffer (copy->size, copy->type, copy->comptype, copy->compcount)
   {
     ext = copy->ext;
-    index = copy->index;
     buftype = copy->buftype;
     bufferId = copy->bufferId;
     locked = false;
     lastLock = CS_BUF_LOCK_NOLOCK;
+    bufferTarget = copy->bufferTarget;
+    bufferUsage = copy->bufferUsage;
   }
 
   virtual ~csVBORenderBuffer ()
@@ -184,7 +206,8 @@ public:
   * Lock the buffer to allow writing and give us a pointer to the data
   * The pointer will be 0 if there was some error
   */
-  virtual void* Lock(csRenderBufferLockType lockType)
+  virtual void* Lock(csRenderBufferLockType lockType, 
+    bool samePointer = false)
   {
     if (!locked)
     {
@@ -193,8 +216,9 @@ public:
 	case CS_BUF_LOCK_NORMAL:
 	  RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
 	  lastLock = CS_BUF_LOCK_NORMAL;
-          return ext->glMapBufferARB (index?
-                      GL_ELEMENT_ARRAY_BUFFER_ARB:GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB);
+	  if (!samePointer)
+	    ext->glBufferDataARB (bufferTarget, size, 0, bufferUsage);
+          return ext->glMapBufferARB (bufferTarget, GL_WRITE_ONLY_ARB);
 	case CS_BUF_LOCK_NOLOCK:
 	  break;
       }
@@ -205,26 +229,21 @@ public:
   /// Releases the buffer. After this all writing to the buffer is illegal
   virtual void Release() 
   {
-    const GLenum bufferType = 
-      index ? GL_ELEMENT_ARRAY_BUFFER_ARB : GL_ARRAY_BUFFER_ARB;
     if (lastLock == CS_BUF_LOCK_NORMAL)
     {
-      ext->glBindBufferARB (bufferType, bufferId);
+      ext->glBindBufferARB (bufferTarget, bufferId);
       // @@@ Should be real error check.
-      ext->glUnmapBufferARB (bufferType);
+      ext->glUnmapBufferARB (bufferTarget);
     }
-    ext->glBindBufferARB (bufferType, 0);
+    ext->glBindBufferARB (bufferTarget, 0);
     locked = false;
     lastLock = CS_BUF_LOCK_NOLOCK;
   }
 
   virtual void CopyToBuffer(const void *data, int length)
   {
-    ext->glBindBufferARB (index?
-      GL_ELEMENT_ARRAY_BUFFER_ARB:GL_ARRAY_BUFFER_ARB, bufferId);
-    ext->glBufferDataARB (index?
-      GL_ELEMENT_ARRAY_BUFFER_ARB:GL_ARRAY_BUFFER_ARB, length, data, 
-      (buftype==CS_BUF_STATIC) ? GL_STATIC_DRAW_ARB : GL_DYNAMIC_DRAW_ARB);
+    ext->glBindBufferARB (bufferTarget, bufferId);
+    ext->glBufferDataARB (bufferTarget, length, data, bufferUsage);
   }
 
   virtual void* RenderLock (csGLRenderBufferLockType type);

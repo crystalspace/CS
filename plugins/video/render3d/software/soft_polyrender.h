@@ -58,7 +58,9 @@ public:
   virtual void Clear ();
   virtual void AddPolygon (csPolygonRenderData* poly);
 
-  virtual void* Lock(csRenderBufferLockType lockType) { return 0; }
+  virtual void* Lock(csRenderBufferLockType lockType, 
+    bool samePointer = false) 
+  { return 0; }
   virtual void Release() {}
   virtual void CopyToBuffer(const void *data, int length) {}
   virtual void SetComponentCount (int count) {}

@@ -176,6 +176,9 @@ private:
 
   /// Should we use special buffertype (VBO) or just systemmeory
   bool use_hw_render_buffers;
+  csGLDRAWRANGEELEMENTS glDrawRangeElements;
+  static GLvoid csAPIENTRY myDrawRangeElements (GLenum mode, GLuint start, 
+    GLuint end, GLsizei count, GLenum type, const GLvoid* indices);
 
   // for simple mesh drawing
   uint scrapIndicesSize;
@@ -281,11 +284,14 @@ public:
   /// Create a renderbuffer
   virtual csPtr<iRenderBuffer> CreateRenderBuffer (int size, 
     csRenderBufferType type, csRenderBufferComponentType componentType, 
-    int componentCount, bool index);
+    int componentCount);
+  virtual csPtr<iRenderBuffer> CreateIndexRenderBuffer (int size, 
+    csRenderBufferType type, csRenderBufferComponentType componentType,
+    size_t rangeStart, size_t rangeEnd);
 
   /// Create interleaved renderbuffers
   virtual void CreateInterleavedRenderBuffers (int size, 
-    csRenderBufferType type, int count, csArray<iRenderBuffer*> &buffers);
+    csRenderBufferType type, int count, csRefArray<iRenderBuffer>& buffers);
 
   /// Activate a vertex buffer
   bool ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer);

@@ -776,7 +776,7 @@ struct csSimpleRenderMesh
   };
 };
 
-SCF_VERSION (iGraphics3D, 5, 4, 1);
+SCF_VERSION (iGraphics3D, 5, 5, 0);
 
 /**
  * This is the standard 3D graphics interface.
@@ -969,16 +969,30 @@ struct iGraphics3D : public iBase
   virtual bool SetOption (const char*, const char*) = 0;
 
   /**
-   * Create a renderbuffer.
+   * Create a render buffer.
    * \param size Size of the buffer in bytes.
-   * \param type Type of buffer; CS_BUF_DYNAMIC or CS_BUF_STATIC
-   * \param componentType Components Types; CS_BUFCOMP_BYTE, CS_BUFCOMP_INT, etc
+   * \param type Type of buffer; CS_BUF_DYNAMIC, CS_BUF_STATIC or 
+   *  CS_BUF_STREAM.
+   * \param componentType Components Types; CS_BUFCOMP_FLOAT, CS_BUFCOMP_INT, etc
    * \param componentCount Number of components per element (e.g. 4 for RGBA)
-   * \param index True if this buffer will contain indices. (Triangle buffer)
    */
   virtual csPtr<iRenderBuffer> CreateRenderBuffer (int size, 
     csRenderBufferType type, csRenderBufferComponentType componentType, 
-    int componentCount, bool index) = 0;
+    int componentCount) = 0;
+  /**
+   * Create an index buffer.
+   * \param size Size of the buffer in bytes.
+   * \param type Type of buffer; CS_BUF_DYNAMIC, CS_BUF_STATIC or 
+   *  CS_BUF_STREAM.
+   * \param componentType Components Types; usually CS_BUFCOMP_UNSIGNED_INT
+   * \param rangeStart Minimum index value that is expected to be written to 
+   *  the created buffer.
+   * \param rangeEnd Maximum index value that is expected to be written to 
+   *  the created buffer.
+   */
+  virtual csPtr<iRenderBuffer> CreateIndexRenderBuffer (int size, 
+    csRenderBufferType type, csRenderBufferComponentType componentType,
+    size_t rangeStart, size_t rangeEnd) = 0;
 
   /**
    * Create an interleaved renderbuffer (You would use this then set stride to
@@ -987,7 +1001,7 @@ struct iGraphics3D : public iBase
    * \param count Number of renderbuffers you want
    */
   virtual void CreateInterleavedRenderBuffers (int size, 
-    csRenderBufferType type, int count, csArray<iRenderBuffer*> &buffers) = 0;
+    csRenderBufferType type, int count, csRefArray<iRenderBuffer>& buffers) = 0;
 
   /**
    * Activate or deactivate all given buffers depending on the value of

@@ -2629,7 +2629,7 @@ void csSprite3DMeshObject::PreGetShaderVariableValue (
     {
       vertices = factory->g3d->CreateRenderBuffer (
         sizeof (csVector3)*final_num_vertices, CS_BUF_DYNAMIC,
-		CS_BUFCOMP_FLOAT, 3, false);
+		CS_BUFCOMP_FLOAT, 3);
     }
     if (tween_ratio > EPSILON)
     {
@@ -2654,7 +2654,7 @@ void csSprite3DMeshObject::PreGetShaderVariableValue (
     {
       normals = factory->g3d->CreateRenderBuffer (
         sizeof (csVector3)*final_num_vertices, CS_BUF_DYNAMIC,
-		CS_BUFCOMP_FLOAT, 3, false);
+		CS_BUFCOMP_FLOAT, 3);
     }
     /*int tf_idx = cur_action->GetCsFrame (cur_frame)->GetAnmIndex ();
     factory->ComputeNormals (cur_action->GetCsFrame (cur_frame));*/
@@ -2698,7 +2698,7 @@ void csSprite3DMeshObject::PreGetShaderVariableValue (
     {
       texcoords = factory->g3d->CreateRenderBuffer (
         sizeof (csVector2)*final_num_vertices, CS_BUF_DYNAMIC,
-		    CS_BUFCOMP_FLOAT, 2, false);
+		    CS_BUFCOMP_FLOAT, 2);
     }
     texcoords->CopyToBuffer (final_texcoords, sizeof (csVector2)*final_num_vertices);
     variable->SetValue (texcoords);
@@ -2709,7 +2709,7 @@ void csSprite3DMeshObject::PreGetShaderVariableValue (
     {
       colors = factory->g3d->CreateRenderBuffer (
         sizeof (csColor)*final_num_vertices, CS_BUF_DYNAMIC,
-		    CS_BUFCOMP_FLOAT, 3, false);
+		    CS_BUFCOMP_FLOAT, 3);
     }
     colors->CopyToBuffer (final_colors, sizeof (csColor)*final_num_vertices);
     variable->SetValue (colors);
@@ -2718,9 +2718,9 @@ void csSprite3DMeshObject::PreGetShaderVariableValue (
   {
     if (!indices)
     {
-      indices = factory->g3d->CreateRenderBuffer (
+      indices = factory->g3d->CreateIndexRenderBuffer (
         sizeof (csTriangle)*final_num_triangles*12, CS_BUF_STATIC,
-		    CS_BUFCOMP_UNSIGNED_INT, 1, true);
+		    CS_BUFCOMP_UNSIGNED_INT, 0, final_num_vertices - 1);
     }
     indices->CopyToBuffer (final_triangles, sizeof (csTriangle)*final_num_triangles);
     variable->SetValue (indices);

@@ -786,6 +786,11 @@ bool csGLGraphics3D::Open ()
 
   // The extension manager requires to initialize all used extensions with
   // a call to Init<ext> first.
+  ext->InitGL_version_1_2 ();
+  if (ext->CS_GL_version_1_2)
+    glDrawRangeElements = ext->glDrawRangeElements;
+  else
+    glDrawRangeElements = myDrawRangeElements;
   ext->InitGL_ARB_multitexture ();
   ext->InitGL_ARB_texture_cube_map();
   ext->InitGL_EXT_texture3D ();
@@ -1695,6 +1700,12 @@ void csGLGraphics3D::SetTextureState (int* units, iTextureHandle** textures,
   }
 }
 
+GLvoid csGLGraphics3D::myDrawRangeElements (GLenum mode, GLuint start, 
+    GLuint end, GLsizei count, GLenum type, const GLvoid* indices)
+{
+  glDrawElements (mode, count, type, indices);
+}
+
 void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     const csRenderMeshModes& modes,
     const csArray< csArray<csShaderVariable*> > &stacks)
@@ -1720,7 +1731,9 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   CS_ASSERT(iIndexbuf);
   csGLRenderBuffer* indexbuf = (csGLRenderBuffer*)iIndexbuf;
   
-  const size_t indexCompsBytes = indexbuf->compcount * indexbuf->compSize;
+  const size_t indexCompsBytes = indexbuf->compSize;
+  CS_ASSERT_MSG("Expecting index buffers to have only 1 component",
+    (indexbuf->compcount == 1));
   CS_ASSERT((indexCompsBytes * mymesh->indexstart) <= indexbuf->size);
   CS_ASSERT((indexCompsBytes * mymesh->indexend) <= indexbuf->size);
 
@@ -1876,12 +1889,10 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     if ((mixmode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)
       alpha = (float)(mixmode & CS_FX_MASK_ALPHA) / 255.0f;
     glColor4f (1.0f, 1.0f, 1.0f, alpha);
-    glDrawElements (
-      primitivetype,
-      mymesh->indexend - mymesh->indexstart,
-      indexbuf->compGLType,
-      ((uint8*)bufData) +
-	(indexCompsBytes * mymesh->indexstart));
+    glDrawRangeElements (primitivetype, indexbuf->rangeStart, 
+      indexbuf->rangeEnd, mymesh->indexend - mymesh->indexstart,
+      indexbuf->compGLType, 
+      ((uint8*)bufData) + (indexCompsBytes * mymesh->indexstart));
 
     indexbuf->Release();
   }
@@ -2309,21 +2320,22 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
 {
   if (scrapIndicesSize < mesh.indexCount)
   {
-    scrapIndices = CreateRenderBuffer (mesh.indexCount * sizeof (uint),
-      CS_BUF_DYNAMIC, CS_BUFCOMP_UNSIGNED_INT, 1, true);
+    scrapIndices = CreateIndexRenderBuffer (mesh.indexCount * sizeof (uint),
+      CS_BUF_STREAM, CS_BUFCOMP_UNSIGNED_INT,
+      0, mesh.vertexCount - 1);
     scrapIndicesSize = mesh.indexCount;
   }
   if (scrapVerticesSize < mesh.vertexCount)
   {
     scrapVertices = CreateRenderBuffer (
       mesh.vertexCount * sizeof (float) * 3,
-      CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 3, false);
+      CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
     scrapTexcoords = CreateRenderBuffer (
       mesh.vertexCount * sizeof (float) * 2,
-      CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 2, false);
+      CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 2);
     scrapColors = CreateRenderBuffer (
       mesh.vertexCount * sizeof (float) * 4,
-      CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 4, false);
+      CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 4);
 
     scrapVerticesSize = mesh.vertexCount;
   }

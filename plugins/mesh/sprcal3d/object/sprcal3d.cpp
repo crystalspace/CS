@@ -2316,34 +2316,34 @@ void csSpriteCal3DMeshObject::BaseAccessor::PreGetValue (
       render->beginRendering();
       render->selectMeshSubmesh (mesh, submesh);
 
+      int vertexCount = render->getVertexCount ();
       int indexCount = render->getFaceCount() * 3;
       if ((index_buffer == 0) || (index_size < indexCount))
       {
 	// @@@ How often do those change?
-	index_buffer = meshobj->G3D->CreateRenderBuffer (
+	index_buffer = meshobj->G3D->CreateIndexRenderBuffer (
 	  sizeof (uint) * indexCount, CS_BUF_DYNAMIC,
-	  CS_BUFCOMP_UNSIGNED_INT, 1, true);
+	  CS_BUFCOMP_UNSIGNED_INT, 0, vertexCount - 1);
 	index_size = indexCount;
       }
       uint* indices = (uint*)index_buffer->Lock (CS_BUF_LOCK_NORMAL);
       render->getFaces ((CalIndex*)indices);
       index_buffer->Release ();
 
-      int vertexCount = render->getVertexCount ();
       if ((vertex_buffer == 0) || (vertex_size < vertexCount))
       {
 	vertex_buffer = meshobj->G3D->CreateRenderBuffer (
 	  sizeof (float) * vertexCount * 3, CS_BUF_DYNAMIC,
-	  CS_BUFCOMP_FLOAT, 3, false);
+	  CS_BUFCOMP_FLOAT, 3);
 	normal_buffer = meshobj->G3D->CreateRenderBuffer (
 	  sizeof (float) * vertexCount * 3, CS_BUF_DYNAMIC,
-	  CS_BUFCOMP_FLOAT, 3, false);
+	  CS_BUFCOMP_FLOAT, 3);
 	texel_buffer = meshobj->G3D->CreateRenderBuffer (
 	  sizeof (float) * vertexCount * 2, CS_BUF_DYNAMIC,
-	  CS_BUFCOMP_FLOAT, 2, false);
+	  CS_BUFCOMP_FLOAT, 2);
 	color_buffer = meshobj->G3D->CreateRenderBuffer (
 	  sizeof (float) * vertexCount * 3, CS_BUF_DYNAMIC,
-	  CS_BUFCOMP_FLOAT, 3, false);
+	  CS_BUFCOMP_FLOAT, 3);
 	vertex_size = vertexCount;
       }
       float* vertices = (float*)vertex_buffer->Lock (CS_BUF_LOCK_NORMAL);

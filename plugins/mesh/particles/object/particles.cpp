@@ -415,7 +415,7 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
   if (!vertex_buffer || buffer_length != point_data->Length ())
   {
     buffer_length = point_data->Length ();
-    csArray<iRenderBuffer*> buffers;
+    csRefArray<iRenderBuffer> buffers;
     int bufsize = (point_sprites ? buffer_length : buffer_length * 4);
     pFactory->g3d->CreateInterleavedRenderBuffers (bufsize
       * sizeof(csParticlesData), CS_BUF_DYNAMIC, 2, buffers);
@@ -429,7 +429,7 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
     color_buffer->SetComponentCount (4);
     texcoord_buffer = pFactory->g3d->CreateRenderBuffer (
       sizeof (csVector2) * bufsize, CS_BUF_DYNAMIC,
-      CS_BUFCOMP_FLOAT, 2, false);
+      CS_BUFCOMP_FLOAT, 2);
     csVector2 *texcoords = new csVector2 [bufsize];
     if (point_sprites)
     {
@@ -441,9 +441,10 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
       {
         indices[i] = i;
       }
-      index_buffer = pFactory->g3d->CreateRenderBuffer (
+      index_buffer = pFactory->g3d->CreateIndexRenderBuffer (
         sizeof (unsigned int) * buffer_length, CS_BUF_STATIC,
-        CS_BUFCOMP_UNSIGNED_INT, 1, true);
+        CS_BUFCOMP_UNSIGNED_INT, 0, 
+	point_data->Length () * (point_sprites ? 1 : 4));
       index_buffer->CopyToBuffer(indices, sizeof(unsigned int)*buffer_length);
       delete [] indices;
     }
@@ -476,9 +477,9 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
         indices[j+4] = i + 2;
         indices[j+5] = i + 3;
       }
-      index_buffer = pFactory->g3d->CreateRenderBuffer (
+      index_buffer = pFactory->g3d->CreateIndexRenderBuffer (
         sizeof (unsigned int) * buffer_length * 6, CS_BUF_STATIC,
-        CS_BUFCOMP_UNSIGNED_INT, 1, true);
+        CS_BUFCOMP_UNSIGNED_INT, 0, bufsize - 1);
       index_buffer->CopyToBuffer(
         indices, sizeof(unsigned int) * buffer_length * 6);
       delete [] indices;

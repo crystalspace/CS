@@ -1022,9 +1022,9 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
   {
     if (!sorted_index_buffer)
     {
-      sorted_index_buffer = g3d->CreateRenderBuffer (
+      sorted_index_buffer = g3d->CreateIndexRenderBuffer (
       	sizeof (unsigned int)*factory->GetTriangleCount()*3,
-	CS_BUF_DYNAMIC, CS_BUFCOMP_UNSIGNED_INT, 1, true);
+	CS_BUF_DYNAMIC, CS_BUFCOMP_UNSIGNED_INT, 0, factory->GetVertexCount() - 1);
     }
     if (num_sorted_mesh_triangles != factory->GetTriangleCount ())
     {
@@ -1214,7 +1214,7 @@ void csGenmeshMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
           color_buffer = g3d->CreateRenderBuffer (
               sizeof (csColor) * num_lit_mesh_colors, 
 	      do_lighting ? CS_BUF_DYNAMIC : CS_BUF_STATIC,
-              CS_BUFCOMP_FLOAT, 3, false);
+              CS_BUFCOMP_FLOAT, 3);
         }
         mesh_colors_dirty_flag = false;
         color_buffer->CopyToBuffer (
@@ -1231,7 +1231,7 @@ void csGenmeshMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
           //  the existing buffer.
           color_buffer = g3d->CreateRenderBuffer (
               sizeof (csColor) * factory->GetVertexCount(), CS_BUF_STATIC,
-              CS_BUFCOMP_FLOAT, 3, false);
+              CS_BUFCOMP_FLOAT, 3);
         }
         mesh_colors_dirty_flag = false;
         color_buffer->CopyToBuffer ( factory->GetColors(),
@@ -1618,7 +1618,7 @@ void csGenmeshMeshObjectFactory::PreGetShaderVariableValue (
       if (!vertex_buffer)
         vertex_buffer = g3d->CreateRenderBuffer (
           sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC,
-          CS_BUFCOMP_FLOAT, 3, false);
+          CS_BUFCOMP_FLOAT, 3);
       mesh_vertices_dirty_flag = false;
       vertex_buffer->CopyToBuffer (
         mesh_vertices, sizeof(csVector3)*num_mesh_vertices);
@@ -1633,7 +1633,7 @@ void csGenmeshMeshObjectFactory::PreGetShaderVariableValue (
       if (!texel_buffer)
         texel_buffer = g3d->CreateRenderBuffer (
           sizeof (csVector2)*num_mesh_vertices, CS_BUF_STATIC,
-          CS_BUFCOMP_FLOAT, 2, false);
+          CS_BUFCOMP_FLOAT, 2);
       mesh_texels_dirty_flag = false;
       texel_buffer->CopyToBuffer (
         mesh_texels, sizeof (csVector2)*num_mesh_vertices);
@@ -1648,7 +1648,7 @@ void csGenmeshMeshObjectFactory::PreGetShaderVariableValue (
       if (!normal_buffer)
         normal_buffer = g3d->CreateRenderBuffer (
           sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC,
-          CS_BUFCOMP_FLOAT, 3, false);
+          CS_BUFCOMP_FLOAT, 3);
       mesh_normals_dirty_flag = false;
       normal_buffer->CopyToBuffer (
         mesh_normals, sizeof (csVector3)*num_mesh_vertices);
@@ -1676,9 +1676,9 @@ void csGenmeshMeshObjectFactory::PreGetShaderVariableValue (
     if (mesh_triangle_dirty_flag)
     {
       if (!index_buffer)
-        index_buffer = g3d->CreateRenderBuffer (
+	index_buffer = g3d->CreateIndexRenderBuffer (
           sizeof (unsigned int)*num_mesh_triangles*3, CS_BUF_STATIC,
-          CS_BUFCOMP_UNSIGNED_INT, 1, true);
+          CS_BUFCOMP_UNSIGNED_INT, 0, num_mesh_vertices - 1);
       mesh_triangle_dirty_flag = false;
       index_buffer->CopyToBuffer (
         //ibuf, sizeof (unsigned int)*num_mesh_triangles*3);

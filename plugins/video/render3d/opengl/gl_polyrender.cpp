@@ -109,31 +109,31 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
     }
 
     vertex_buffer = parent->CreateRenderBuffer (num_verts * sizeof (csVector3), 
-      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3, false);
+      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
     csVector3* vertices = (csVector3*)vertex_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
     normal_buffer = parent->CreateRenderBuffer (num_verts * sizeof (csVector3), 
-      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3, false);
+      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
     csVector3* normals = (csVector3*)normal_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
     texel_buffer = parent->CreateRenderBuffer (num_verts * sizeof (csVector2), 
-      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2, false);
+      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
     csVector2* texels = (csVector2*)texel_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
-    index_buffer = parent->CreateRenderBuffer (num_indices  * sizeof (int), 
-      CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 1, true);
+    index_buffer = parent->CreateIndexRenderBuffer (num_indices  * sizeof (int), 
+      CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 0, num_verts - 1);
     int* indices = (int*)index_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
     tangent_buffer = parent->CreateRenderBuffer (num_verts * sizeof (csVector3), 
-      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3, false);
+      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
     csVector3* tangents = (csVector3*)tangent_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
     binormal_buffer = parent->CreateRenderBuffer (num_verts * sizeof (csVector3), 
-      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3, false);
+      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
     csVector3* binormals = (csVector3*)binormal_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
     lmcoords_buffer = parent->CreateRenderBuffer (num_verts * sizeof (csVector2), 
-      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2, false);
+      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
     csVector2* lmcoords = (csVector2*)lmcoords_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
     int vindex = 0, iindex = 0;
@@ -362,7 +362,7 @@ void csGLPolygonRenderer::FogAccesor::PreGetValue (csShaderVariable *variable)
 
     fog_buffer = renderer->parent->CreateRenderBuffer (
     	num_verts * sizeof (csVector3), 
-        CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3, false);
+        CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
     void *buf = fog_buffer->Lock(CS_BUF_LOCK_NORMAL);
     memset (buf,0,num_verts*sizeof(csVector3));
     fog_buffer->Release();

@@ -248,22 +248,22 @@ void csNewParticleSystem::SetupObject ()
     TriangleCount = ParticleCount * 2;
     vertices = new csVector3 [VertexCount];
     vertex_buffer = g3d->CreateRenderBuffer (
-        sizeof (csVector3)*VertexCount, CS_BUF_STATIC, 
-        CS_BUFCOMP_FLOAT, 3, false);
+        sizeof (csVector3)*VertexCount, CS_BUF_DYNAMIC, 
+        CS_BUFCOMP_FLOAT, 3);
     texel_buffer = g3d->CreateRenderBuffer (
-        sizeof (csVector2)*VertexCount, CS_BUF_STATIC, 
-        CS_BUFCOMP_FLOAT, 2, false);
+        sizeof (csVector2)*VertexCount, CS_BUF_DYNAMIC, 
+        CS_BUFCOMP_FLOAT, 2);
 #if 0
     normal_buffer = g3d->CreateRenderBuffer (
-        sizeof (csVector3)*VertexCount, CS_BUF_STATIC,
-        CS_BUFCOMP_FLOAT, 3, false);
+        sizeof (csVector3)*VertexCount, CS_BUF_DYNAMIC,
+        CS_BUFCOMP_FLOAT, 3);
 #endif
     color_buffer = g3d->CreateRenderBuffer (
-        sizeof (csColor)*VertexCount, CS_BUF_STATIC,
-        CS_BUFCOMP_FLOAT, 3, false);
-    index_buffer = g3d->CreateRenderBuffer (
-        sizeof (unsigned int)*TriangleCount*3, CS_BUF_STATIC,
-        CS_BUFCOMP_UNSIGNED_INT, 1, true);
+        sizeof (csColor)*VertexCount, CS_BUF_DYNAMIC,
+        CS_BUFCOMP_FLOAT, 3);
+    index_buffer = g3d->CreateIndexRenderBuffer (
+        sizeof (unsigned int)*TriangleCount*3, CS_BUF_DYNAMIC,
+        CS_BUFCOMP_UNSIGNED_INT, 0, VertexCount - 1);
     csShaderVariable *sv;
     sv = svcontext->GetVariableAdd (vertex_name);
     sv->SetValue (vertex_buffer);

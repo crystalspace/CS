@@ -112,9 +112,12 @@ public:
   bool SetOption (const char*, const char*);
   csPtr<iRenderBuffer> CreateRenderBuffer (int size,
     csRenderBufferType type, csRenderBufferComponentType componentType,
-    int componentCount, bool index);
+    int componentCount);
+  virtual csPtr<iRenderBuffer> CreateIndexRenderBuffer (int size, 
+    csRenderBufferType type, csRenderBufferComponentType componentType,
+    size_t rangeStart, size_t rangeEnd);
   void CreateInterleavedRenderBuffers (int size, csRenderBufferType type,
-    int count, csArray<iRenderBuffer*> &buffers);
+    int count, csRefArray<iRenderBuffer>& buffers);
   void SetBufferState (csVertexAttrib* attribs, iRenderBuffer** buffers, 
     int count);
   void SetTextureState (int* units, iTextureHandle** textures, int count);

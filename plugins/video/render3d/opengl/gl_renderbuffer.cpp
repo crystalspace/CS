@@ -86,8 +86,7 @@ void* csVBORenderBuffer::RenderLock (csGLRenderBufferLockType type)
   if (locked && (lastRLock != type)) return (void*)-1;
   
   locked = true; 
-  ext->glBindBufferARB (index?GL_ELEMENT_ARRAY_BUFFER_ARB:GL_ARRAY_BUFFER_ARB, 
-    bufferId);
+  ext->glBindBufferARB (bufferTarget, bufferId);
   lastRLock = type;
 
   return (void*)offset; // Offset for an interleaved buffer
@@ -97,12 +96,12 @@ void* csVBORenderBuffer::RenderLock (csGLRenderBufferLockType type)
 
 csPtr<iRenderBuffer> csGLGraphics3D::CreateRenderBuffer (int size, 
   csRenderBufferType type, csRenderBufferComponentType componentType,
-  int componentCount, bool index)
+  int componentCount)
 {
   if (use_hw_render_buffers)
   {
     csVBORenderBuffer *buffer = new csVBORenderBuffer 
-      (size, type, componentType, componentCount, index, ext);
+      (size, type, componentType, componentCount, false, ext);
     return csPtr<iRenderBuffer> (buffer);
   }
   else
@@ -114,20 +113,44 @@ csPtr<iRenderBuffer> csGLGraphics3D::CreateRenderBuffer (int size,
   return csPtr<iRenderBuffer> (0);
 }
 
-void csGLGraphics3D::CreateInterleavedRenderBuffers (int size,
-  csRenderBufferType type, int count, csArray<iRenderBuffer*> &buffers)
+csPtr<iRenderBuffer> csGLGraphics3D::CreateIndexRenderBuffer (int size, 
+    csRenderBufferType type, csRenderBufferComponentType componentType,
+    size_t rangeStart, size_t rangeEnd)
 {
+  if (use_hw_render_buffers)
+  {
+    csVBORenderBuffer *buffer = new csVBORenderBuffer 
+      (size, type, componentType, 1, true, ext);
+    buffer->SetRange (rangeStart, rangeEnd);
+    return csPtr<iRenderBuffer> (buffer);
+  }
+  else
+  {
+    csSysRenderBuffer *buffer = new csSysRenderBuffer (
+      new char[size], size, type, componentType, 1);
+    buffer->SetRange (rangeStart, rangeEnd);
+    return csPtr<iRenderBuffer> (buffer);
+  }
+  return csPtr<iRenderBuffer> (0);
+}
+
+void csGLGraphics3D::CreateInterleavedRenderBuffers (int size,
+  csRenderBufferType type, int count, csRefArray<iRenderBuffer>& buffers)
+{
+  csRef<iRenderBuffer> buf;
   if(use_hw_render_buffers)
   {
-    csVBORenderBuffer *master = new csVBORenderBuffer (size, type,
+    csVBORenderBuffer* master = new csVBORenderBuffer (size, type,
       CS_BUFCOMP_BYTE, 1, false, ext);
-    buffers.Push (master);
+    buf.AttachNew (master);
+    buffers.Push (buf);
     for(int i=1;i<count;i++)
     {
       csVBORenderBuffer *interleaved = new csVBORenderBuffer (
         master);
       interleaved->SetInterleaved ();
-      buffers.Push (interleaved);
+      buf.AttachNew (interleaved);
+      buffers.Push (buf);
     }
   }
   else
@@ -136,14 +159,16 @@ void csGLGraphics3D::CreateInterleavedRenderBuffers (int size,
     csSysRenderBuffer *master = new csSysRenderBuffer (mem,
       size, type, CS_BUFCOMP_BYTE, 1);
     
-    buffers.Push(master);
+    buf.AttachNew (master);
+    buffers.Push (buf);
 
     for(int i=1;i<count;i++) 
     {
       csSysRenderBuffer *interleaved = new csSysRenderBuffer (mem,
         size, type, CS_BUFCOMP_BYTE, 1);
       interleaved->SetInterleaved ();
-      buffers.Push (interleaved);
+      buf.AttachNew (interleaved);
+      buffers.Push (buf);
     }
   }
 }

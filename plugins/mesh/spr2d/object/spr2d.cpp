@@ -522,9 +522,9 @@ void csSprite2DMeshObject::PreGetShaderVariableValue (csShaderVariable* variable
     if (!index_buffer.IsValid() || 
       (indicesSize != indexSize))
     {
-      index_buffer.AttachNew (factory->g3d->CreateRenderBuffer (
+      index_buffer.AttachNew (factory->g3d->CreateIndexRenderBuffer (
 	indexSize, CS_BUF_DYNAMIC, 
-	CS_BUFCOMP_UNSIGNED_INT, 1, true));
+	CS_BUFCOMP_UNSIGNED_INT, 0, vertices.Length() - 1));
       variable->SetValue (index_buffer);
 
       csRenderBufferLock<uint> indexLock (index_buffer);
@@ -554,7 +554,7 @@ void csSprite2DMeshObject::PreGetShaderVariableValue (csShaderVariable* variable
       {
 		texel_buffer.AttachNew (factory->g3d->CreateRenderBuffer (
 		texelSize, CS_BUF_STATIC, 
-		CS_BUFCOMP_FLOAT, 2, false));
+		CS_BUFCOMP_FLOAT, 2));
 		variable->SetValue (texel_buffer);
       }
 
@@ -587,7 +587,7 @@ void csSprite2DMeshObject::PreGetShaderVariableValue (csShaderVariable* variable
       {
 	color_buffer.AttachNew (factory->g3d->CreateRenderBuffer (
 	  color_size, CS_BUF_STATIC, 
-	  CS_BUFCOMP_FLOAT, 3, false));
+	  CS_BUFCOMP_FLOAT, 3));
 	variable->SetValue (color_buffer);
       }
 
@@ -610,7 +610,7 @@ void csSprite2DMeshObject::PreGetShaderVariableValue (csShaderVariable* variable
       {
 	vertex_buffer.AttachNew (factory->g3d->CreateRenderBuffer (
 	  vertices_size, CS_BUF_STATIC, 
-	  CS_BUFCOMP_FLOAT, 3, false));
+	  CS_BUFCOMP_FLOAT, 3));
 	variable->SetValue (vertex_buffer);
       }
 

@@ -476,23 +476,34 @@ bool csNullGraphics3D::SetOption (const char*, const char*)
 
 csPtr<iRenderBuffer> csNullGraphics3D::CreateRenderBuffer (int size,
   csRenderBufferType type, csRenderBufferComponentType componentType,
-  int componentCount, bool index)
+  int componentCount)
 {
   return csPtr<iRenderBuffer> (new csSysRenderBuffer (
     new char[size], size, type, componentType, componentCount));
 }
 
-void csNullGraphics3D::CreateInterleavedRenderBuffers (int size, 
-  csRenderBufferType type, int count, csArray<iRenderBuffer*> &buffers)
+csPtr<iRenderBuffer> csNullGraphics3D::CreateIndexRenderBuffer (int size, 
+  csRenderBufferType type, csRenderBufferComponentType componentType,
+  size_t rangeStart, size_t rangeEnd)
 {
-  buffers.Push (new csSysRenderBuffer 
+  return csPtr<iRenderBuffer> (new csSysRenderBuffer (
+    new char[size], size, type, componentType, 1));
+}
+
+void csNullGraphics3D::CreateInterleavedRenderBuffers (int size, 
+  csRenderBufferType type, int count, csRefArray<iRenderBuffer>& buffers)
+{
+  csRef<iRenderBuffer> buf;
+  buf.AttachNew (new csSysRenderBuffer 
     (new char[size], size, type, CS_BUFCOMP_BYTE, 1));
+  buffers.Push (buf);
   for (int i = 1; i < count; i ++)
   {
     csSysRenderBuffer *interleaved = new csSysRenderBuffer (new char[size],
       size, type, CS_BUFCOMP_BYTE, 1);
     // interleaved->SetInterleaved ();
-    buffers.Push (interleaved);
+    buf.AttachNew (interleaved);
+    buffers.Push (buf);
   }
 }
 

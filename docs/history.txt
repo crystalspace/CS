@@ -20,6 +20,14 @@ chronological order.
 	- Jorrit started working on support for real iPolygonMesh support
 	  (for collision detection) in bruteblock terrain mesh. Not functional
 	  yet.
+	- res changed the render buffer creation to use two distinct methods 
+	  for render resp. index buffer creation. When locking a buffer, the
+	  previous data is now thrown away; however, this can be explicitly
+	  disabled. Also, the expected range of index values has to be 
+	  specified upon index buffer creation. These values are later passed 
+	  to glDrawRangeElements(). All those changes are supposed to make VBO 
+	  implementations a bit happier (so they hopefully deliver a bit more 
+	  performance).
 22-Jun-2004
 	- Jorrit corrected the fps timings for csbench to use a constant.
 	- Eric Sunshine augmented jamtemplate so that it creates a

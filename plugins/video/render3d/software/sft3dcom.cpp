@@ -4324,21 +4324,21 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
 {
   if (scrapIndicesSize < mesh.indexCount)
   {
-    scrapIndices = CreateRenderBuffer (mesh.indexCount * sizeof (uint),
-      CS_BUF_DYNAMIC, CS_BUFCOMP_UNSIGNED_INT, 1, true);
+    scrapIndices = CreateIndexRenderBuffer (mesh.indexCount * sizeof (uint),
+      CS_BUF_DYNAMIC, CS_BUFCOMP_UNSIGNED_INT, 0, 0);
     scrapIndicesSize = mesh.indexCount;
   }
   if (scrapVerticesSize < mesh.vertexCount)
   {
     scrapVertices = CreateRenderBuffer (
       mesh.vertexCount * sizeof (float) * 3,
-      CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 3, false);
+      CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 3);
     scrapTexcoords = CreateRenderBuffer (
       mesh.vertexCount * sizeof (float) * 2,
-      CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 2, false);
+      CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 2);
     scrapColors = CreateRenderBuffer (
       mesh.vertexCount * sizeof (float) * 4,
-      CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 4, false);
+      CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 4);
 
     scrapVerticesSize = mesh.vertexCount;
   }

@@ -577,7 +577,7 @@ iRenderBuffer* csBallMeshObject::GetRenderBuffer (csStringID name)
     {
       vertex_buffer = g3d->CreateRenderBuffer (
         sizeof (csVector3)*num_ball_vertices, CS_BUF_STATIC, 
-        CS_BUFCOMP_FLOAT, 3, false);
+        CS_BUFCOMP_FLOAT, 3);
       ball_vertices_dirty_flag = false;
       vertex_buffer->CopyToBuffer(ball_vertices, sizeof(csVector3)*num_ball_vertices);
     }
@@ -593,7 +593,7 @@ iRenderBuffer* csBallMeshObject::GetRenderBuffer (csStringID name)
     {
       texel_buffer = g3d->CreateRenderBuffer (
         sizeof (csVector2)*num_ball_vertices, CS_BUF_STATIC, 
-        CS_BUFCOMP_FLOAT, 2, false);
+        CS_BUFCOMP_FLOAT, 2);
       ball_texels_dirty_flag = false;
       texel_buffer->CopyToBuffer (ball_texels,
       	sizeof (csVector2) * num_ball_vertices);
@@ -606,7 +606,7 @@ iRenderBuffer* csBallMeshObject::GetRenderBuffer (csStringID name)
     {
       normal_buffer = g3d->CreateRenderBuffer (
         sizeof (csVector3)*num_ball_vertices, CS_BUF_STATIC,
-        CS_BUFCOMP_FLOAT, 3, false);
+        CS_BUFCOMP_FLOAT, 3);
       ball_normals_dirty_flag = false;
       normal_buffer->CopyToBuffer (top_normals,
       	sizeof (csVector3)*num_ball_vertices);
@@ -619,7 +619,7 @@ iRenderBuffer* csBallMeshObject::GetRenderBuffer (csStringID name)
     {
       color_buffer = g3d->CreateRenderBuffer (
         sizeof (csColor)*num_ball_vertices, CS_BUF_STATIC,
-        CS_BUFCOMP_FLOAT, 3, false);
+        CS_BUFCOMP_FLOAT, 3);
       ball_colors_dirty_flag = false;
       color_buffer->CopyToBuffer (ball_colors,
       	sizeof (csColor) * num_ball_vertices);
@@ -630,9 +630,9 @@ iRenderBuffer* csBallMeshObject::GetRenderBuffer (csStringID name)
   {
     if (ball_triangle_dirty_flag)
     {
-      index_buffer = g3d->CreateRenderBuffer (
+      index_buffer = g3d->CreateIndexRenderBuffer (
         sizeof (unsigned int)*ball_triangles*3, CS_BUF_STATIC,
-        CS_BUFCOMP_UNSIGNED_INT, 1, true);
+        CS_BUFCOMP_UNSIGNED_INT, 0, num_ball_vertices - 1);
       ball_triangle_dirty_flag = false;
       index_buffer->CopyToBuffer (ball_indices,
       	sizeof (unsigned int) * ball_triangles *3);

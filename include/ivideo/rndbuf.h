@@ -39,14 +39,18 @@ struct iMaterialWrapper;
 
 
 /**
- * Where the buffer is placed
- * CS_BUF_INDEX is special and only to be used by indexbuffers
+ * Buffer usage type.
+ * Drivers may do some optimizations based on this value. Use a type that most
+ * closely matches the intended use.
  */
 enum csRenderBufferType
 {
+  /// Data that changes every couple of frames and is drawn repeatedly.
   CS_BUF_DYNAMIC,
-  CS_BUF_STATIC
-  // @@@ what about CS_BUF_STREAM ? ...
+  /// Data that is seldom modified and often drawn.
+  CS_BUF_STATIC,
+  /// Data that changes every time it is drawn.
+  CS_BUF_STREAM
 };
 
 /// Type of components
@@ -74,7 +78,7 @@ enum csRenderBufferLockType
   //CS_BUF_LOCK_RENDER
 };
 
-SCF_VERSION (iRenderBuffer, 0, 0, 2);
+SCF_VERSION (iRenderBuffer, 0, 0, 3);
 
 /**
  * This is a general buffer to be used by the renderer. It can ONLY be
@@ -85,8 +89,14 @@ struct iRenderBuffer : public iBase
   /**
    * Lock the buffer to allow writing and give us a pointer to the data.
    * The pointer will be (void*)-1 if there was some error.
+   * \param discardPrevious Specifies whether the same pointer as last time
+   *  should be returned (all the data will be still there, useful if only
+   *  a part of the data is changed). However, setting this to 'true' may 
+   *  cause a performance penalty - specifically, if the data is currently in
+   *  use, the driver may have to wait until the buffer is available again.
    */
-  virtual void* Lock(csRenderBufferLockType lockType) = 0;
+  virtual void* Lock(csRenderBufferLockType lockType, 
+    bool samePointer = false) = 0;
 
   /// Releases the buffer. After this all writing to the buffer is illegal
   virtual void Release() = 0;

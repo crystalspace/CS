@@ -88,7 +88,7 @@ bool csAnonRenderBufferManager::AddRenderBuffer (const char *name, csRenderBuffe
   }
   newrb->buf = g3d->CreateRenderBuffer (
         size*component_size*(numverts), CS_BUF_STATIC,
-        component_type, component_size, false);
+        component_type, component_size);
  
   newrb->name = strings->Request (name);
   newrb->size = component_size;

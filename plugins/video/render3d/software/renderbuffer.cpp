@@ -76,25 +76,37 @@ void csSoftRenderBuffer::SetComponentType (csRenderBufferComponentType type)
 
 csPtr<iRenderBuffer> csSoftwareGraphics3DCommon::CreateRenderBuffer (int size, 
   csRenderBufferType type, csRenderBufferComponentType componentType,
-  int componentCount, bool index)
+  int componentCount)
 {
   csSoftRenderBuffer *buffer = new csSoftRenderBuffer (
     new char[size], size, type, componentType, componentCount);
   return csPtr<iRenderBuffer> (buffer);
 }
 
+csPtr<iRenderBuffer> csSoftwareGraphics3DCommon::CreateIndexRenderBuffer (
+  int size, csRenderBufferType type, csRenderBufferComponentType componentType,
+  size_t rangeStart, size_t rangeEnd)
+{
+  csSoftRenderBuffer *buffer = new csSoftRenderBuffer (
+    new char[size], size, type, componentType, 1);
+  return csPtr<iRenderBuffer> (buffer);
+}
+
 void csSoftwareGraphics3DCommon::CreateInterleavedRenderBuffers (int size,
-  csRenderBufferType type, int count, csArray<iRenderBuffer*> &buffers)
+  csRenderBufferType type, int count, csRefArray<iRenderBuffer>& buffers)
 {
   char *mem = new char[size];
+  csRef<iRenderBuffer> buf;
   csSoftRenderBuffer *master = new csSoftRenderBuffer (
     mem, size, type, CS_BUFCOMP_BYTE, 1);
-  buffers.Push (master);
+  buf.AttachNew (master);
+  buffers.Push (buf);
 
   for (int i = 0; i < count; i ++) 
   {
     csSoftRenderBuffer *interleaved = new csSoftRenderBuffer (mem,
       size, type, CS_BUFCOMP_BYTE, 1);
-    buffers.Push (interleaved);
+    buf.AttachNew (interleaved);
+    buffers.Push (buf);
   }
 }

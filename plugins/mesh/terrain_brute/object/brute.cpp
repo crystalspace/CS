@@ -416,7 +416,7 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
     mesh_vertices = 
       g3d->CreateRenderBuffer (
       sizeof(csVector3)*num_mesh_vertices, CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
-      3, false);
+      3);
     mesh_vertices->CopyToBuffer (vertex_data,
       sizeof(csVector3)*num_mesh_vertices);
     delete[] vertex_data;
@@ -434,7 +434,7 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
     mesh_normals = 
       g3d->CreateRenderBuffer (sizeof(csVector3)*num_mesh_vertices,
       CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
-      3, false);
+      3);
     mesh_normals->CopyToBuffer (normal_data,
       sizeof(csVector3)*num_mesh_vertices);
     delete[] normal_data;
@@ -452,7 +452,7 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
     mesh_texcoords = 
     g3d->CreateRenderBuffer (sizeof(csVector2)*num_mesh_vertices,
       CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
-      2, false);
+      2);
     mesh_texcoords->CopyToBuffer (texcoord_data,
       sizeof(csVector2)*num_mesh_vertices);
     delete[] texcoord_data;
@@ -461,7 +461,7 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
     mesh_colors = 
       g3d->CreateRenderBuffer (sizeof(csVector3)*num_mesh_vertices,
       CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
-      3, false);
+      3);
     mesh_colors->CopyToBuffer (color_data,
       sizeof(csVector3)*num_mesh_vertices);
     delete[] color_data;
@@ -715,10 +715,10 @@ void csTerrainObject::SetupObject ()
           {
             int idx = t+(r<<1)+(l<<2)+(b<<3);
             mesh_indices[idx] = 
-              g3d->CreateRenderBuffer (
+	      g3d->CreateIndexRenderBuffer (
               sizeof(unsigned int)*block_res*block_res*2*3, 
               CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_SHORT,
-              1, true);
+              0, (block_res+1) * (block_res+1) - 1);
             uint16 *indices = 
               (uint16*)mesh_indices[idx]->Lock (CS_BUF_LOCK_NORMAL);
 
