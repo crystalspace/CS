@@ -122,10 +122,10 @@ bool csBasicVector::DeleteChunk (int n, int size)
 void csVector::DeleteAll (bool FreeThem)
 {
   if (FreeThem)
-    for (int i = 0; i < count; i++)
-      FreeItem (root [i]);
-  
-  SetLength (0);
+    for (int i = count-1; i >= 0; i--)
+      Delete (i);
+  else
+    SetLength (0);
 }
 
 bool csVector::FreeItem (csSome Item)
@@ -139,13 +139,15 @@ bool csVector::Delete (int n, bool FreeIt)
   if (n < 0 || n >= count)
     return false;
 
-  if (FreeIt)
-  {
-    if (!FreeItem (root [n]))
-      return false;
-  }
+  csSome obj = root[n];
 
-  return csBasicVector::Delete(n);
+  if (!csBasicVector::Delete(n))
+      return false;
+
+  if (FreeIt && !FreeItem (obj))
+      return false;
+
+  return true;
 }
 
 bool csVector::Replace (int n, csSome what, bool FreePrevious)
