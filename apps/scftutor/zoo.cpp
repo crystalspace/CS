@@ -70,7 +70,7 @@ void Clone (iBase *iObject)
   newobj->DecRef ();
 }
 
-int main(int argc,char *argv[])
+int main(int,char **)
 {
 #if 0
   // This method requires you register dlls with scfreg (or manually) in scf.cfg
