@@ -1,5 +1,18 @@
 The history order is reversed so that new features are at the top.
 
+18-Jan-2003
+	- Fixed the engine so it no longer tries to load the thing_type
+	  immediatelly in initialization. Instead it tries to load it
+	  the first time really required. This solves a bug with awstest
+	  which loaded the engine plugin manually.
+	- Fixed a problem in cslight. It would not request the fontserver
+	  at init time. This caused a crash when cslight was used with
+	  the OpenGL renderer since the OpenGL renderer requires the font
+	  server.
+	- Fixed the sky procedural texture so that the sky is back in the
+	  sky where it belongs (demosky app).
+	- Fixed an assert error at exit when cleaning up materials in the
+	  iso engine. This fixes crash at exit for isotest and isomap.
 17-Jan-2003
 	- Fixed a bug in the OpenGL renderer where attempts were made to
 	  clip fog information even if no fog is present. This resulted

@@ -209,7 +209,7 @@ void csIsoMaterialList::RemoveIndex(int i)
 
   if(i==Length()-1)
   {
-    (void)Pop(); // pop last element from the list
+    csRef<csIsoMaterialWrapper> w = Pop(); // pop last element from the list
     if(Length()<lastindex) lastindex = Length();
     return;
   }

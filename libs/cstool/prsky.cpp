@@ -572,7 +572,7 @@ void csProcSky::DrawToTexture (csProcSkyTexture *skytex, csTicks current_time,
       g = (blue.green+ clcol.green*(255-hazefact)/64);
       b = (blue.blue+ clcol.blue*(255-hazefact)/64);
       int col = g2d->FindRGB(r, g, b);
-      g2d->DrawPixel(x,y,col);
+      g2d->DrawPixel(x,height-y-1,col);
     }
 
   g3d->FinishDraw();

@@ -687,17 +687,6 @@ bool csEngine::Initialize (iObjectRegistry *object_reg)
   virtual_clock = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   if (!virtual_clock) return false;
 
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
-  	iPluginManager);
-  thing_type = CS_QUERY_PLUGIN_CLASS (
-      plugin_mgr, "crystalspace.mesh.object.thing",
-      iMeshObjectType);
-  if (!thing_type)
-  {
-    thing_type = CS_LOAD_PLUGIN (plugin_mgr,
-    	"crystalspace.mesh.object.thing", iMeshObjectType);
-  }
-
 #ifndef CS_USE_NEW_RENDERER
   G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 #else
@@ -810,6 +799,25 @@ bool csEngine::HandleEvent (iEvent &Event)
   return false;
 }
 
+iMeshObjectType* csEngine::GetThingType ()
+{
+  if (!thing_type)
+  {
+    csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
+  	  iPluginManager);
+    thing_type = CS_QUERY_PLUGIN_CLASS (
+        plugin_mgr, "crystalspace.mesh.object.thing",
+        iMeshObjectType);
+    if (!thing_type)
+    {
+      thing_type = CS_LOAD_PLUGIN (plugin_mgr,
+    	  "crystalspace.mesh.object.thing", iMeshObjectType);
+    }
+  }
+
+  return (iMeshObjectType*)thing_type;
+}
+
 void csEngine::DeleteAll ()
 {
   nextframe_pending = 0;
@@ -850,11 +858,14 @@ void csEngine::DeleteAll ()
   delete shared_variables;
   shared_variables = new csSharedVariableList();
 
-  CS_ASSERT (((iMeshObjectType*)thing_type) != NULL);
-  csRef<iThingEnvironment> te (
+  GetThingType ();
+  if (thing_type != NULL)
+  {
+    csRef<iThingEnvironment> te (
   	SCF_QUERY_INTERFACE (thing_type, iThingEnvironment));
-  CS_ASSERT (((iThingEnvironment*)te) != NULL);
-  te->Clear ();
+    CS_ASSERT (((iThingEnvironment*)te) != NULL);
+    te->Clear ();
+  }
 
   render_context = NULL;
 

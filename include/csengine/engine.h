@@ -352,6 +352,8 @@ private:
   csSharedVariableList* shared_variables;
   /// List of halos (csHaloInformation).
   csPDelArray<csLightHalo> halos;
+  /// Thing mesh object type for conveniance.
+  csRef<iMeshObjectType> thing_type;
   /// Debugging: maximum number of polygons to process in one frame.
   static int max_process_polygons;
   /// Current number of processed polygons.
@@ -813,11 +815,7 @@ public:
   /// Clear all render priorities.
   virtual void ClearRenderPriorities ();
 
-  csRef<iMeshObjectType> thing_type;
-  iMeshObjectType* GetThingType () const
-  {
-    return (iMeshObjectType*)thing_type;
-  }
+  iMeshObjectType* GetThingType ();
 
   SCF_DECLARE_IBASE;
 
