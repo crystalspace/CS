@@ -86,7 +86,7 @@ AS_IF([test $enable_debug = yes],
 # Output Installpaths/package info
 #-----------------------------------------------------------------------------
 CS_OUTPUT_INSTALLDIRS
-CS_EMIT_PACKAGEINFO([jam])
+CS_EMIT_PACKAGEINFO
 
 #----------------------------------------------------------------------------
 # Output generated files.  Also create a Jamfile when compiling outside
