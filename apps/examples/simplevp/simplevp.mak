@@ -1,5 +1,5 @@
 # Application description
-DESCRIPTION.simplevp = Effects (vertex programs) demonstration
+DESCRIPTION.simplevp = Effects and vertex programs demonstration
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
