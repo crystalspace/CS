@@ -1630,7 +1630,7 @@ The history order is reversed so that new features are at the top.
 		- Augment static linking to work with the new facility.
 		- Eliminate the hard-coded SCF registration information in each
 		  plugin's source code.
-	- Eric Sunshine eliminated several comilation warnings from
+	- Eric Sunshine eliminated several compilation warnings from
 	  clothldr.cpp.
 	- Jorrit removed several usages of GetPrivateObject() in the engine.
 	  Not all usages could be removed however. The ones that were removed
