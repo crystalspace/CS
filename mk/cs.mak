@@ -20,7 +20,7 @@ endif
 include mk/user.mak
 include mk/common.mak
 
-.PHONY: depend clean cleanlib cleandep distclean show
+.PHONY: depend clean cleanlib cleandep distclean maintainerclean show
 
 # Remove all standard suffixes to speed up make lookups
 .SUFFIXES:
@@ -202,10 +202,17 @@ all: $(OUTDIRS)
 
 dep: $(OUTBASE) $(OUTOS)
 
+maintainerclean: distclean
+	-$(RMDIR) configure autom4te.cache
+
 distclean: clean
-	-$(RM) config.mak include/volatile.h
+	-$(RM) config.mak config.cache config.status include/volatile.h
+# Enable this after old configuration facility is removed, and `configure'
+# creates Makefile.
+#	-$(RM) Makefile
 
 clean:
+	-$(RM) config.log
 	-$(RMDIR) $(OUTBASE)
 ifneq (.,$(OUTDLL))
 	-$(RMDIR) $(OUTDLL)

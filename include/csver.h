@@ -23,7 +23,10 @@
  * Crystal Space Version Information
  */
 
-/* NOTE: Also update docs/texinfo/version.txi when updating these values. */
+// *** NOTE ***
+// Also update configure.ac and docs/texinfo/version.txi when updating the
+// version number.
+
 /// Major version
 #define CS_VERSION_MAJOR CS_VER_QUOTE(0.95)
 /// Minor version (release, or "dev" for CVS version)

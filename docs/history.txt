@@ -5,6 +5,11 @@ The history order is reversed so that new features are at the top.
 	  the kdtree when objects moved. The reason was that UpdateObjects()
 	  wasn't called when needed. Frustvis didn't suffer from this
 	  problem.
+	- Eric Sunshine added an Autoconf `configure' script to CS.  This is
+	  now the preferred way to configure the project.  The old
+	  configuration mechanism ("make platform") will continue to exist in
+	  parallel with the new mechanism for a short time as a fallback in
+	  case some problems are detected with the new mechanism.
 5-Jan-2002
 	- Applied a patch from Rene Jager (renej.frog@yucom.be) which does
 	  the following:
