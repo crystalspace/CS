@@ -208,6 +208,7 @@ error:
 
 bool ddgHeightMap::readTGN(const void *buf, unsigned long size)
 {
+	bool done = false;
 	unsigned char ch1, ch2;
 	char name[9],type[9], segment[5];
 	const char* ptr = (const char*)buf;
@@ -222,101 +223,108 @@ bool ddgHeightMap::readTGN(const void *buf, unsigned long size)
 	type[8] = '\0';
 	if (strcmp(name,"TERRAGEN") || strcmp(type,"TERRAIN "))
 	{
-		return true;
+		return ddgFailure;
 	}
 
-	// Segment 4 bytes.
-	segment[4] = '\0';
-	memcpy(segment, ptr, 4);
-	ptr += 4;
-
-	if (strcmp(segment,"SIZE")==0)
+	while (!done)
 	{
-		// SIZE 2 bytes.
-		ch1 = *ptr++;
-		ch2 = *ptr++;
-		_rows = _cols = ch2*256+ch1 +1;
-		// Padding 2 bytes.
-		ptr += 2;
-		memcpy(segment, ptr, 4);
+		// Segment 4 bytes.
+		segment[4] = '\0';
+		memcpy(segment,ptr,4);
 		ptr += 4;
-	}
 
-	if (strcmp(segment,"XPTS")==0)
-	{
-		// XPTS.
-		ch1 = *ptr++;
-		ch2 = *ptr++;
-		_cols = ch2*256+ch1;
-		// Padding 2 bytes.
-		ptr += 2;
-
-		memcpy(segment, ptr, 4);
-		ptr += 4;
-		// YPTS.
-		if (strcmp(segment,"YPTS")==0)
+		if (!strcmp(segment,"SIZE"))
 		{
+			// SIZE 2 bytes.
+			ch1 = *ptr++;
+			ch2 = *ptr++;
+			_rows = _cols = ch2*256+ch1 +1;
+			// Padding 2 bytes.
+			ptr += 2;
+		}
+		else if (!strcmp(segment,"XPTS"))
+		{
+			// XPTS.
+			ch1 = *ptr++;
+			ch2 = *ptr++;
+			_cols = ch2*256+ch1;
+			// Padding 2 bytes.
+			ptr += 2;
+		}
+		else if (!strcmp(segment,"YPTS"))
+		{
+			// YPTS.
 			ch1 = *ptr++;
 			ch2 = *ptr++;
 			_rows = ch2*256+ch1;
 			// Padding 2 bytes.
 			ptr += 2;
-			memcpy(segment, ptr, 4);
-			ptr += 4;
 		}
-		else
+		else if (!strcmp(segment,"SCAL"))
 		{
-			return true;
-		}
-	}
-
-	// ALTW.
-	// Absolute elevation for a given point is
-	// BaseHeight + elevation* Scale / 65536.
-	if (strcmp(segment,"ALTW")==0)
-	{
-		ch1 = *ptr++;
-		ch2 = *ptr++;
-		_scale = (ch2*256+ch1)/ 65536.0;
-
-		ch1 = *ptr++;
-		ch2 = *ptr++;
-		_base = ch2*256+ch1;
-	}
-	else
-	{
-		return true;
-	}
-
-	// Read height data
-	// The absolute altitude of a particular point (in the same scale as x and y)
-	// is equal to BaseHeight + Elevation * HeightScale / 65536
-	allocate(_cols,_rows);
-	int r = 0;
-	while (r < _rows)
-	{
-		if (ptr + _cols * 2 > bufend)
-			return true;	// Not enough data to fill column
-		memcpy(_pixbuffer + r * _cols, ptr, _cols * 2);
-		ptr += _cols * 2;
-		r++;
-	}
-	// Swap byte order for machines with different endian.
-	if  (*((unsigned char*)&ddgEndianTest) == 0x12)
-	{
-		char s;
-		int i;
-		char* _pixchar = (char*)_pixbuffer;
-
-		for (i = 0; i < 2 * _rows * _cols; i=i+2)
+			// Ignore
+			ptr += 3*sizeof(float);
+ 		}
+		else if (!strcmp(segment,"CRAD"))
 		{
-			s = _pixchar[i];
-			_pixchar[i] = _pixchar[i+1];
-			_pixchar[i+1] = s;
+			// Ignore
+			ptr += 1*sizeof(float);
 		}
-	}
+		else if (!strcmp(segment,"CRVM"))
+		{
+			// Ignore
+			ptr += 1*sizeof(unsigned int);
+		}
+		else if (!strcmp(segment,"ALTW"))
+		{
+			// ALTW.
+			// Absolute elevation for a given point is
+			// BaseHeight + elevation* Scale / 65536.
+			ch1 = *ptr++;
+			ch2 = *ptr++;
+			_scale = (ch2*256+ch1)/ 65536.0;
 
-	return false;
+			ch1 = *ptr++;
+			ch2 = *ptr++;
+			_base = ch2*256+ch1;
+
+			// Read height data
+			// The absolute altitude of a particular point (in the same scale as x and y)
+			// is equal to BaseHeight + Elevation * HeightScale / 65536
+			if (allocate(_cols,_rows) != ddgSuccess)
+				goto error;
+
+			int r = 0;
+			while (r < _rows)
+			{
+				if (ptr + _cols * 2 > bufend)
+					return ddgFailure;	// Not enough data to fill column
+				memcpy(_pixbuffer + r * _cols, ptr, _cols * 2);
+				ptr += _cols * 2;
+				r++;
+			}
+			// Swap byte order for machines with different endian.
+			if  (*((unsigned char*)&ddgEndianTest) == 0x12)
+			{
+				char s;
+				int i;
+				char* _pixchar = (char*)_pixbuffer;
+
+				for (i = 0; i < 2 * _rows * _cols; i=i+2)
+				{
+					s = _pixchar[i];
+					_pixchar[i] = _pixchar[i+1];
+					_pixchar[i+1] = s;
+				}
+			}
+			done = true;
+		} // ALTW
+	} // End while
+
+	return ddgSuccess;
+
+error:
+	return ddgFailure;
 }
 
 /*
