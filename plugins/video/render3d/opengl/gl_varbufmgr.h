@@ -20,6 +20,8 @@
 #ifndef __CS_GL_VARBUFMGR_H__
 #define __CS_GL_VARBUFMGR_H__
 
+#include "csutil/csvector.h"
+
 #include "ivideo/rndbuf.h"
 
 //#include "gl_render3d.h"

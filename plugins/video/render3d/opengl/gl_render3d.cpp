@@ -644,6 +644,8 @@ bool csGLRender3D::Open ()
     Report (CS_REPORTER_SEVERITY_ERROR, "Error opening Graphics2D context.");
     return false;
   }
+  
+  object_reg->Register( G2D, "iGraphics2D");
 
   G2D->PerformExtension("getstatecache", &statecache);
 
@@ -915,9 +917,8 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
   SetZMode (mymesh->z_buf_mode);
   SetMirrorMode (mymesh->do_mirror);
 
-  csMaterialHandle* mathandle = NULL;
-  if (mymesh->GetMaterialWrapper ())
-    mathandle = (csMaterialHandle*)(mymesh->GetMaterialWrapper ()->GetMaterialHandle ());
+  csMaterialHandle* mathandle = 
+    (csMaterialHandle*)(mymesh->GetMaterialHandle ());
 
   glVertexPointer (3, GL_FLOAT, 0,
     (float*)vertexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER));
@@ -990,7 +991,10 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
 
   glColor4f (red, green, blue, alpha);
 
-  csRef<iShader> shader = mymesh->GetMaterialWrapper()->GetMaterial()->GetShader();
+  csRef<iShader> shader;
+  if (mathandle)
+     shader = mathandle->GetMaterial()->GetShader();
+
   bool useshader = false;
   if(shader)
   {
@@ -1017,50 +1021,52 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
       ((unsigned int*)indexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER))
       +mymesh->GetIndexStart ());
 
-    csMaterialHandle* handle = (csMaterialHandle*)mymesh->GetMaterialWrapper ()->GetMaterialHandle ();
-    for (int l=0; l<handle->GetTextureLayerCount (); l++)
+    if (mathandle)
     {
-      csTextureLayer* layer = handle->GetTextureLayer (l);
-      txthandle = layer->txt_handle;
-      if (txthandle)
+      for (int l=0; l<mathandle->GetTextureLayerCount (); l++)
       {
-        txtcache->Cache (txthandle);
-        csGLTextureHandle *gltxthandle = (csGLTextureHandle *)
-          txthandle->GetPrivateObject ();
-        csTxtCacheData *cachedata =
-          (csTxtCacheData *)gltxthandle->GetCacheData ();
+        csTextureLayer* layer = mathandle->GetTextureLayer (l);
+        txthandle = layer->txt_handle;
+        if (txthandle)
+        {
+          txtcache->Cache (txthandle);
+          csGLTextureHandle *gltxthandle = (csGLTextureHandle *)
+            txthandle->GetPrivateObject ();
+          csTxtCacheData *cachedata =
+            (csTxtCacheData *)gltxthandle->GetCacheData ();
 
-        statecache->SetTexture (GL_TEXTURE_2D, cachedata->Handle);
-        statecache->EnableState (GL_TEXTURE_2D);
-      } else continue;
+          statecache->SetTexture (GL_TEXTURE_2D, cachedata->Handle);
+          statecache->EnableState (GL_TEXTURE_2D);
+        } else continue;
 
-      alpha = 1.0f - BYTE_TO_FLOAT (layer->mode & CS_FX_MASK_ALPHA);
-      alpha = SetMixMode (layer->mode, alpha, 
-        txthandle->GetKeyColor () || txthandle->GetAlphaMap ());
-      glColor4f (1, 1, 1, alpha);
+        alpha = 1.0f - BYTE_TO_FLOAT (layer->mode & CS_FX_MASK_ALPHA);
+        alpha = SetMixMode (layer->mode, alpha, 
+          txthandle->GetKeyColor () || txthandle->GetAlphaMap ());
+        glColor4f (1, 1, 1, alpha);
 
-      glMatrixMode (GL_TEXTURE);
-      glPushMatrix ();
-      glLoadIdentity ();
-      GLfloat scalematrix[16];
-      for (int k = 0 ; k < 16 ; k++) scalematrix[k] = 0.0;
-      scalematrix[0] = layer->uscale;
-      scalematrix[5] = layer->vscale;
-      scalematrix[10] = 1;
-      scalematrix[15] = 1;
-      scalematrix[12] = layer->ushift*layer->uscale; 
-      scalematrix[13] = layer->vshift*layer->vscale;
-      // @@@ Shift is ignored for now.
-      glMultMatrixf (scalematrix);
+        glMatrixMode (GL_TEXTURE);
+        glPushMatrix ();
+        glLoadIdentity ();
+        GLfloat scalematrix[16];
+        for (i = 0 ; i < 16 ; i++) scalematrix[i] = 0.0;
+        scalematrix[0] = layer->uscale;
+        scalematrix[5] = layer->vscale;
+        scalematrix[10] = 1;
+        scalematrix[15] = 1;
+        scalematrix[12] = layer->ushift*layer->uscale; 
+        scalematrix[13] = layer->vshift*layer->vscale;
+        // @@@ Shift is ignored for now.
+        glMultMatrixf (scalematrix);
 
-      glDrawElements (
-        GL_TRIANGLES,
-        mymesh->GetIndexEnd ()-mymesh->GetIndexStart (),
-        GL_UNSIGNED_INT,
-        ((unsigned int*)indexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER))
-        +mymesh->GetIndexStart ());
+        glDrawElements (
+          GL_TRIANGLES,
+          mymesh->GetIndexEnd ()-mymesh->GetIndexStart (),
+          GL_UNSIGNED_INT,
+          ((unsigned int*)indexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER))
+          +mymesh->GetIndexStart ());
 
-      glPopMatrix ();
+        glPopMatrix ();
+      }
     }
   }
 

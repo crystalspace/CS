@@ -1432,11 +1432,9 @@ void csEngine::Draw (iCamera *c, iClipper2D *view)
   rview.SetCallback (NULL);
 
   // First initialize G3D with the right clipper.
-#ifndef CS_USE_NEW_RENDERER
   G3D->SetClipper (view, CS_CLIPPER_TOPLEVEL);  // We are at top-level.
   G3D->ResetNearPlane ();
   G3D->SetPerspectiveAspect (c->GetFOV ());
-#endif // CS_USE_NEW_RENDERER
 
   iSector *s = c->GetSector ();
   s->Draw (&rview);
@@ -1449,9 +1447,7 @@ void csEngine::Draw (iCamera *c, iClipper2D *view)
       if (!halos[halo]->Process (elapsed, *this)) halos.Delete (halo);
   }
 
-#ifndef CS_USE_NEW_RENDERER
   G3D->SetClipper (NULL, CS_CLIPPER_NONE);
-#endif // CS_USE_NEW_RENDERER
 }
 
 void csEngine::DrawFunc (
@@ -1466,18 +1462,14 @@ void csEngine::DrawFunc (
   rview.SetCallback (callback);
 
   // First initialize G3D with the right clipper.
-#ifndef CS_USE_NEW_RENDERER
   G3D->SetClipper (view, CS_CLIPPER_TOPLEVEL);  // We are at top-level.
   G3D->ResetNearPlane ();
   G3D->SetPerspectiveAspect (c->GetFOV ());
-#endif // CS_USE_NEW_RENDERER
 
   iSector *s = c->GetSector ();
   s->Draw (&rview);
 
-#ifndef CS_USE_NEW_RENDERER
   G3D->SetClipper (NULL, CS_CLIPPER_NONE);
-#endif // CS_USE_NEW_RENDERER
 }
 
 void csEngine::AddHalo (csLight *Light)
@@ -2278,9 +2270,7 @@ csPtr<iMeshWrapper> csEngine::CreateThingMesh (
 {
   csRef<iMeshWrapper> thing_wrap (CreateMeshWrapper (
   	"crystalspace.mesh.object.thing", name, sector));
-#ifndef CS_USE_NEW_RENDERER
   thing_wrap->SetZBufMode (CS_ZBUF_USE);
-#endif // CS_USE_NEW_RENDERER
   thing_wrap->SetRenderPriority (GetObjectRenderPriority ());
   return csPtr<iMeshWrapper> (thing_wrap);
 }
@@ -2292,9 +2282,7 @@ csPtr<iMeshWrapper> csEngine::CreateSectorWallsMesh (
   csRef<iMeshWrapper> thing_wrap (CreateMeshWrapper (
   	"crystalspace.mesh.object.thing", name, sector));
   thing_wrap->GetFlags ().Set (CS_ENTITY_CONVEX);
-#ifndef CS_USE_NEW_RENDERER
   thing_wrap->SetZBufMode (CS_ZBUF_FILL);
-#endif // CS_USE_NEW_RENDERER
   thing_wrap->SetRenderPriority (GetWallRenderPriority ());
   return csPtr<iMeshWrapper> (thing_wrap);
 }
