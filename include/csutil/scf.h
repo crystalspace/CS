@@ -678,8 +678,9 @@ typedef void* (*scfFactoryFunc)(iBase*);
  * This is a simple wrapper around scfCreateInstance.
  */
 #define SCF_CREATE_INSTANCE(ClassID,Interface)				\
-  (Interface *)iSCF::SCF->CreateInstance (				\
-  ClassID, #Interface, Interface##_VERSION)
+  csPtr<Interface> (                                                    \
+    (Interface *)iSCF::SCF->CreateInstance (				\
+    ClassID, #Interface, Interface##_VERSION))
 
 /**
  * SCF_VERSION can be used as a shorter way to define an interface version;
