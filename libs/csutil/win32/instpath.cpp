@@ -94,7 +94,7 @@ static inline char* FindConfigPath ()
   // 2. this machine's system registry
   // 3. if current working directory contains 'vfs.cfg' use this dir.
   // 4. The dir where the app is
-  // 5. A "Crystal" subfolder under the "Program Files" dir.
+  // 5. A "CrystalSpace" subfolder under the "Program Files" dir.
   // 6. hard-wired default path
 
   // try env variable first
@@ -143,21 +143,21 @@ static inline char* FindConfigPath ()
   }
 
   // retrieve the path of the Program Files folder and append 
-  // a "\Crystal".
+  // a "\CrystalSpace".
   {
     char programpath [MAX_PATH+1];
 
     if (GetShellFolderPath (CSIDL_PROGRAM_FILES, programpath))
     {
       strncpy (path, programpath, MIN(sizeof(programpath), 1024-30));
-      strcat (path, "\\Crystal");
+      strcat (path, "\\" CS_PACKAGE_NAME);
       return csStrNew (path);
     }
   }
 
   // nothing helps, use default
-  // which is "C:\Program Files\Crystal"
-  strncpy(path, "C:\\Program Files\\Crystal", 1024);
+  // which is "C:\Program Files\CrystalSpace"
+  strncpy(path, "C:\\Program Files\\" CS_PACKAGE_NAME, 1024);
 
   return csStrNew (path);
 }

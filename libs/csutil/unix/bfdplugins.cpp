@@ -67,7 +67,7 @@ csRef<iString> csGetPluginMetadata (const char* fullPath,
   {
     if (bfd_check_format (abfd, bfd_object))
     {
-      asection *sect = bfd_get_section_by_name (abfd, ".crystal");
+      asection *sect = bfd_get_section_by_name (abfd, "." CS_PACKAGE_NAME);
       if (sect)
       {
         int size = bfd_section_size (abfd, sect);
@@ -75,7 +75,8 @@ csRef<iString> csGetPluginMetadata (const char* fullPath,
         if (buf)
         {
           if (! bfd_get_section_contents (abfd, sect, buf, 0, size))
-            errmsg = "libbfd can't get '.crystal' section contents";
+            errmsg = "libbfd can't get '." CS_PACKAGE_NAME
+	             "' section contents";
           else
           {
             usebfd = true;

@@ -44,21 +44,23 @@ csPluginPaths* csGetPluginPaths (const char* argv0)
   {
     csString tmp;
     tmp << configPath << PATH_SEPARATOR << "lib";
-    paths->AddOnce (tmp, DO_SCAN_RECURSION, "crystal");
+    paths->AddOnce (tmp, DO_SCAN_RECURSION, CS_PACKAGE_NAME);
 
     tmp.Clear();
-    tmp << configPath << PATH_SEPARATOR << "lib" << PATH_SEPARATOR << "crystal";
-    paths->AddOnce (tmp, DO_SCAN_RECURSION, "crystal");
+    tmp << configPath << PATH_SEPARATOR << "lib" << PATH_SEPARATOR
+	<< CS_PACKAGE_NAME;
+    paths->AddOnce (tmp, DO_SCAN_RECURSION, CS_PACKAGE_NAME);
 
     tmp.Clear();
-    tmp << configPath << PATH_SEPARATOR << "crystal" << PATH_SEPARATOR << "lib";
-    paths->AddOnce (tmp, DO_SCAN_RECURSION, "crystal");
+    tmp << configPath << PATH_SEPARATOR << CS_PACKAGE_NAME << PATH_SEPARATOR
+	<< "lib";
+    paths->AddOnce (tmp, DO_SCAN_RECURSION, CS_PACKAGE_NAME);
 
     tmp.Clear();
-    tmp << configPath << PATH_SEPARATOR << "crystal";
-    paths->AddOnce (tmp, DO_SCAN_RECURSION, "crystal");
+    tmp << configPath << PATH_SEPARATOR << CS_PACKAGE_NAME;
+    paths->AddOnce (tmp, DO_SCAN_RECURSION, CS_PACKAGE_NAME);
 
-    paths->AddOnce (configPath, false, "crystal");
+    paths->AddOnce (configPath, false, CS_PACKAGE_NAME);
   }
     
   return paths;

@@ -12,7 +12,7 @@ AC_PREREQ([2.56])
 # cs_version_number
 #	Keep this value synchronized with CS/include/csver.h.
 #------------------------------------------------------------------------------
-m4_define([cs_version_number], [0.98])
+m4_define([cs_version_number], [0.99])
 
 
 
@@ -2208,6 +2208,10 @@ CS_HEADER_PREPEND(
 #define __CS_VOLATILE_H__
 ])
 
+CS_HEADER_PROPERTY([CS_PACKAGE_NAME],
+    [AS_ESCAPE(["])$PACKAGE_NAME[]AS_ESCAPE(["])])
+CS_HEADER_PROPERTY([CS_PACKAGE_VERSION],
+    [AS_ESCAPE(["])$PACKAGE_VERSION[]AS_ESCAPE(["])])
 CS_HEADER_APPEND(
 [#endif // __CS_VOLATILE_H__
 ])
