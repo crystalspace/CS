@@ -1249,10 +1249,10 @@ bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
   }
 
   // If we go to 2D mode then we do as if several modes are disabled.
-  // 2D operations don't like blending nor the z-buffer.
+  // 2D operations needs blending but not the z-buffer.
   if (DrawFlags & CSDRAW_2DGRAPHICS)
   {
-    SetupBlend (CS_FX_COPY, 0, false);
+    SetupBlend (CS_FX_COPY, 0, true);
     SetGLZBufferFlags (CS_ZBUF_NONE);
   }
 
@@ -5919,12 +5919,20 @@ void csGraphics3DOGLCommon::DrawPixmap (iTextureHandle *hTex,
   SetGLZBufferFlags (CS_ZBUF_NONE);
   //@@@???statecache->SetDepthMask (GL_FALSE);
 
-  // if the texture has transparent bits, we have to tweak the
-  // OpenGL blend mode so that it handles the transparent pixels correctly
-  if (hTex->GetKeyColor () || hTex->GetAlphaMap () || Alpha)
-    SetupBlend (CS_FX_ALPHA, 0, false);
+  if (DrawMode & CSDRAW_2DGRAPHICS)
+  {
+    // In 2D mode we always want to blend
+    SetupBlend (CS_FX_COPY, 0, true);
+  }
   else
-    SetupBlend (CS_FX_COPY, 0, false);
+  {
+    // if the texture has transparent bits, we have to tweak the
+    // OpenGL blend mode so that it handles the transparent pixels correctly
+    if (hTex->GetKeyColor () || hTex->GetAlphaMap () || Alpha) 
+      SetupBlend (CS_FX_ALPHA, 0, false);
+    else
+      SetupBlend (CS_FX_COPY, 0, false);
+  }
 
   statecache->Enable_GL_TEXTURE_2D ();
   glColor4f (1.0, 1.0, 1.0, Alpha ? (1.0 - BYTE_TO_FLOAT (Alpha)) : 1.0);

@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+23-Oct-2004
+	- res fixed the GL iGraphics3D::DrawPixmap() disabling blendin, which
+	  subsequently messed up text writing.
 22-Oct-2004
 	- Eric Sunshine fixed a bug in the replacement MakeLocate rule in
 	  subdir.jam where it failed to set the LOCATE variable for the target

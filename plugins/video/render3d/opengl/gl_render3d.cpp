@@ -1963,7 +1963,8 @@ void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
 
   // if the texture has transparent bits, we have to tweak the
   // OpenGL blend mode so that it handles the transparent pixels correctly
-  if (hTex->GetKeyColor () || hTex->GetAlphaMap () || Alpha)
+  if ((hTex->GetKeyColor () || hTex->GetAlphaMap () || Alpha) ||
+    (current_drawflags & CSDRAW_2DGRAPHICS)) // In 2D mode we always want to blend
     SetMixMode (CS_FX_ALPHA);
   else
     SetMixMode (CS_FX_COPY);
