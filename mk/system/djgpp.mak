@@ -2,9 +2,6 @@
 #                       This is the makefile for DOS/DJGPP
 ################################################################################
 
-# Enable for GCC later than 2.7.2 (2.8.0 and up)
-#NO_EXCEPTIONS=-fno-exceptions
-
 DRIVERS=cs2d/dosraw cs3d/software csnetdrv/null csnetman/null \
   cssnddrv/null cssndrdr/null
 
@@ -65,7 +62,7 @@ SOUND_LIBS=
 CFLAGS.INCLUDE=-Ilibs/zlib -Ilibs/libpng -Ilibs/libjpeg
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL=-Wall -m486 -fno-rtti $(NO_EXCEPTIONS)
+CFLAGS.GENERAL=-Wall -m486 -fno-rtti $(CFLAGS.SYSTEM)
 
 # Flags for the compiler which are used when optimizing.
 CFLAGS.optimize=-O6 -s -fomit-frame-pointer -mno-ieee-fp \
@@ -138,8 +135,6 @@ endif # ifeq ($(MAKESECTION),defines)
 ifeq ($(MAKESECTION),configure)
 
 configure:
-	@echo "If you have GCC >= 2.8.0 you can uncomment the"
-	@echo "NO_EXCEPTIONS variable at start of mk/system/djgpp.mak"
-	@echo "since this will make executable files much smaller"
+	@bin/dosconf.bat
 
 endif # ifeq ($(MAKESECTION),configure)
