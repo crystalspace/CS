@@ -16,6 +16,7 @@ SPACE=$(EMPTY) $(EMPTY)
 SEPARATOR=\
 $"*-------------------------------------------------------------------------*$"
 
+# <cs-config>
 # Transliterate $@ to uppercase.
 UPCASE = \
     $(subst a,A,\
@@ -44,6 +45,7 @@ UPCASE = \
     $(subst x,X,\
     $(subst y,Y,\
     $(subst z,Z,$@))))))))))))))))))))))))))
+# </cs-config>
 
 # Transliterate $r to uppercase.  Typically, $r would be the iterator variable
 # in a $(foreach) invocation.
