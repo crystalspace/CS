@@ -8,18 +8,22 @@ ifeq ($(MAKESECTION),rootdefines)
 PLUGINHELP += \
   $(NEWLINE)echo $"  make imgplex      Make the $(DESCRIPTION.imgplex)$"
 
+PSEUDOHELP += $(NEWLINE) \
+  echo $"  make imgplexall   Make imgplex and all graphic format loaders at once$"
+
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: imgplex imgplexclean
+.PHONY: imgplex imgplexclean imgplexall
 all plugins: imgplex
 
 imgplex:
 	$(MAKE_TARGET) MAKE_DLL=yes
 imgplexclean:
 	$(MAKE_CLEAN)
+imgplexall: imgplex bmpimg gifimg jpgimg pngimg sgiimg tgaimg walimg
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
