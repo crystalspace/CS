@@ -854,18 +854,30 @@ AS_IF([test "$no_x" != yes],
 
 #------------------------------------------------------------------------------
 # Check for OpenGL and companions.  Also check if GLX extensions are supported
-# and define the header property CSGL_EXT_STATIC_ASSERTION if they are _not_
-# supported.  Apparently, some Mesa installations require pthread, so pthread
-# flags are used if available.  We check for Windows opengl32 first because
-# Cygwin users often have Mesa installed, and Mesa's OpenGL library is compiled
-# without the __stdcall flags which results in link errors, whereas Microsoft's
-# native opengl32 works fine.  Many OpenGL libraries on Unix already contain
-# GLX, so there is no separate GLX library, thus we first check for GLX using
-# the discovered OpenGL library before attempting to locate a separate
-# GLX-specific library.  The same logic is also applied to GLU and GLUT checks.
-# Finally, at least one user (Jorrit) has a strange installation in which
-# inclusion of <windows.h> fails if an int32 is not present, thus we must take
-# this into account.
+# and define the (backward) header property CSGL_EXT_STATIC_ASSERTION if they
+# are _not_ supported.
+#
+# IMPLEMENTATION NOTES
+#
+# Some Mesa installations require pthread, so pthread flags are employed if
+# available.
+#
+# The check for opengl32 needs to precede other checks because Cygwin users
+# often have Mesa installed, and Mesa's OpenGL library is compiled without the
+# __stdcall flags which results in link errors, whereas Microsoft's native
+# opengl32 works fine.  Conversely, some Unix implementations have Wine
+# installed (Windows emulation layer) which includes an opengl32.so library.
+# We need to avoid detection of this library on Unix since it would cause an
+# undesirable dependence upon Wine.
+#
+# Many OpenGL libraries on Unix already contain GLX, so there is no separate
+# GLX library, thus we first check for GLX using the discovered OpenGL library
+# before attempting to locate a separate GLX-specific library.  The same logic
+# is also applied to GLU and GLUT checks.
+#
+# At least one user (Jorrit) has a strange installation in which inclusion of
+# <windows.h> fails if an int32 is not present, thus we must take this into
+# account.
 #------------------------------------------------------------------------------
 m4_define([cs_define_int32],
     [@%:@if !HAVE_TYPE_INT32
@@ -930,10 +942,18 @@ AS_IF([test $with_mesa != no],
     cs_mesa_glu=CS_CREATE_TUPLE([],[],[-lMesaGLU])
     cs_mesa_glx=CS_CREATE_TUPLE([],[],[-lMesaGLX])])
 
+case $host_os in
+    mingw*|cygwin*)
+	cs_win32_gl=CS_CREATE_TUPLE([],[],[-lopengl32])
+	cs_win32_glu=CS_CREATE_TUPLE([],[],[-lglu32])
+	cs_win32_glut=CS_CREATE_TUPLE([],[],[-lglut32])
+    ;;
+esac
+
 # Check for OpenGL.
 CS_CHECK_BUILD([for OpenGL], [cs_cv_libgl],
     [AC_LANG_PROGRAM([CS_GL_INCLUDE([CS_OPENGL_PATH],[GL],[gl.h])],[glEnd()])],
-    [CS_CREATE_TUPLE([],[],[-lopengl32]) \
+    [$cs_win32_gl \
     CS_CREATE_TUPLE([-DCS_OPENGL_PATH=OpenGL],[],[-framework OpenGL]) \
     CS_CREATE_TUPLE([],[],[-lGL]) \
     CS_CREATE_TUPLE([],[],[-lgl]) \
@@ -947,7 +967,7 @@ AS_IF([test $cs_cv_libgl = yes],
 	[AC_LANG_PROGRAM(
 	    [CS_GL_INCLUDE([CS_GL_PATH],[GL],[glu.h])], [gluNewQuadric()])],
 	[CS_CREATE_TUPLE() \
-	CS_CREATE_TUPLE([],[],[-lglu32]) \
+	$cs_win32_glu \
 	CS_CREATE_TUPLE([-DCS_GL_PATH=OpenGL],[],[-framework OpenGL]) \
 	CS_CREATE_TUPLE([],[],[-lGLU]) \
 	CS_CREATE_TUPLE([],[],[-lglu]) \
@@ -960,7 +980,7 @@ AS_IF([test $cs_cv_libgl = yes],
 	[AC_LANG_PROGRAM(
 	    [CS_GL_INCLUDE([CS_GLUT_PATH],[GL],[glut.h])], [glutSwapBuffers])],
 	[CS_CREATE_TUPLE() \
-	CS_CREATE_TUPLE([],[],[-lglut32]) \
+	$cs_win32_glut \
 	CS_CREATE_TUPLE([-DCS_GLUT_PATH=GLUT],[],[-framework GLUT]) \
 	CS_CREATE_TUPLE([],[],[-lGLUT]) \
 	CS_CREATE_TUPLE([],[],[-lglut])], [],

@@ -18,6 +18,10 @@ chronological order.
 	  in the constructor!
 	- res reverted an accidential commit of msvcgen.mak and committed the
 	  originally intended win32.mak.
+	- Eric Sunshine changed configure.ac so that it only checks for
+	  opengl32 and cousins on Windows platforms.  This will eliminate
+	  problem where Wine's opengl32.so was being detected on Unix
+	  platforms, thus causing an unwanted dependency between CS and Wine.
 30-Aug-2003
 	- Old_Belge added the morph target support to sprcal3d.
 	- Eric Sunshine augmented configure.ac so that it emits the appropriate

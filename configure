@@ -9941,18 +9941,30 @@ fi
 
 #------------------------------------------------------------------------------
 # Check for OpenGL and companions.  Also check if GLX extensions are supported
-# and define the header property CSGL_EXT_STATIC_ASSERTION if they are _not_
-# supported.  Apparently, some Mesa installations require pthread, so pthread
-# flags are used if available.  We check for Windows opengl32 first because
-# Cygwin users often have Mesa installed, and Mesa's OpenGL library is compiled
-# without the __stdcall flags which results in link errors, whereas Microsoft's
-# native opengl32 works fine.  Many OpenGL libraries on Unix already contain
-# GLX, so there is no separate GLX library, thus we first check for GLX using
-# the discovered OpenGL library before attempting to locate a separate
-# GLX-specific library.  The same logic is also applied to GLU and GLUT checks.
-# Finally, at least one user (Jorrit) has a strange installation in which
-# inclusion of <windows.h> fails if an int32 is not present, thus we must take
-# this into account.
+# and define the (backward) header property CSGL_EXT_STATIC_ASSERTION if they
+# are _not_ supported.
+#
+# IMPLEMENTATION NOTES
+#
+# Some Mesa installations require pthread, so pthread flags are employed if
+# available.
+#
+# The check for opengl32 needs to precede other checks because Cygwin users
+# often have Mesa installed, and Mesa's OpenGL library is compiled without the
+# __stdcall flags which results in link errors, whereas Microsoft's native
+# opengl32 works fine.  Conversely, some Unix implementations have Wine
+# installed (Windows emulation layer) which includes an opengl32.so library.
+# We need to avoid detection of this library on Unix since it would cause an
+# undesirable dependence upon Wine.
+#
+# Many OpenGL libraries on Unix already contain GLX, so there is no separate
+# GLX library, thus we first check for GLX using the discovered OpenGL library
+# before attempting to locate a separate GLX-specific library.  The same logic
+# is also applied to GLU and GLUT checks.
+#
+# At least one user (Jorrit) has a strange installation in which inclusion of
+# <windows.h> fails if an int32 is not present, thus we must take this into
+# account.
 #------------------------------------------------------------------------------
 
 
@@ -10354,6 +10366,14 @@ if test $with_mesa != no; then
 fi
 
 
+case $host_os in
+    mingw*|cygwin*)
+	cs_win32_gl=`echo @@@-lopengl32 | sed 'y% %#%'`
+	cs_win32_glu=`echo @@@-lglu32 | sed 'y% %#%'`
+	cs_win32_glut=`echo @@@-lglut32 | sed 'y% %#%'`
+    ;;
+esac
+
 # Check for OpenGL.
 if test "" != yes; then
   echo "$as_me:$LINENO: checking for OpenGL" >&5
@@ -10372,7 +10392,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_libs_save="$LIBS"
     cs_build_ok=no
 
-    for cs_build_item in `echo @@@-lopengl32 | sed 'y% %#%'` \
+    for cs_build_item in $cs_win32_gl \
     `echo @-DCS_OPENGL_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'` \
     `echo @@@-lGL | sed 'y% %#%'` \
     `echo @@@-lgl | sed 'y% %#%'` \
@@ -10527,7 +10547,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_libs_save="$LIBS"
     cs_build_ok=no
 
-    for cs_build_item in `echo @@@-lopengl32 | sed 'y% %#%'` \
+    for cs_build_item in $cs_win32_gl \
     `echo @-DCS_OPENGL_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'` \
     `echo @@@-lGL | sed 'y% %#%'` \
     `echo @@@-lgl | sed 'y% %#%'` \
@@ -10721,7 +10741,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_build_ok=no
 
     for cs_build_item in `echo @@@ | sed 'y% %#%'` \
-	`echo @@@-lglu32 | sed 'y% %#%'` \
+	$cs_win32_glu \
 	`echo @-DCS_GL_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'` \
 	`echo @@@-lGLU | sed 'y% %#%'` \
 	`echo @@@-lglu | sed 'y% %#%'` \
@@ -10877,7 +10897,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_build_ok=no
 
     for cs_build_item in `echo @@@ | sed 'y% %#%'` \
-	`echo @@@-lglu32 | sed 'y% %#%'` \
+	$cs_win32_glu \
 	`echo @-DCS_GL_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'` \
 	`echo @@@-lGLU | sed 'y% %#%'` \
 	`echo @@@-lglu | sed 'y% %#%'` \
@@ -11070,7 +11090,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_build_ok=no
 
     for cs_build_item in `echo @@@ | sed 'y% %#%'` \
-	`echo @@@-lglut32 | sed 'y% %#%'` \
+	$cs_win32_glut \
 	`echo @-DCS_GLUT_PATH=GLUT@@-framework GLUT | sed 'y% %#%'` \
 	`echo @@@-lGLUT | sed 'y% %#%'` \
 	`echo @@@-lglut | sed 'y% %#%'`
@@ -11225,7 +11245,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_build_ok=no
 
     for cs_build_item in `echo @@@ | sed 'y% %#%'` \
-	`echo @@@-lglut32 | sed 'y% %#%'` \
+	$cs_win32_glut \
 	`echo @-DCS_GLUT_PATH=GLUT@@-framework GLUT | sed 'y% %#%'` \
 	`echo @@@-lGLUT | sed 'y% %#%'` \
 	`echo @@@-lglut | sed 'y% %#%'`
