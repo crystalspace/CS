@@ -77,7 +77,7 @@ CS_IMPLEMENT_PLUGIN
 #define DISP_CHANGE_BADPARAM        -5
 #endif
 
-#define WINDOW_STYLE (WS_POPUP | WS_MINIMIZEBOX | WS_POPUP | WS_SYSMENU)
+#define WINDOW_STYLE (WS_POPUP | WS_MINIMIZEBOX | WS_SYSMENU | WS_OVERLAPPEDWINDOW)
 
 static void SystemFatalError (char *str, HRESULT hRes = S_OK)
 {
@@ -316,8 +316,6 @@ bool csGraphics2DOpenGL::Open()
   // create the window.
   DWORD exStyle = 0;
   DWORD style = WINDOW_STYLE;
-  if (!FullScreen)
-    style |= WS_OVERLAPPEDWINDOW;
   if (FullScreen)
   {
     ChangeDisplaySettings(NULL,0);
@@ -363,18 +361,18 @@ bool csGraphics2DOpenGL::Open()
     }
   }
 
-  int wwidth,wheight;
-  wwidth=Width+2*GetSystemMetrics(SM_CXSIZEFRAME);
-  wheight=Height+2*GetSystemMetrics(SM_CYSIZEFRAME)+GetSystemMetrics(SM_CYCAPTION);
 
   if (FullScreen)
   {
 	  m_hWnd = CreateWindowEx(exStyle, CS_WIN32_WINDOW_CLASS_NAME, win_title, 
-		style, CW_USEDEFAULT, CW_USEDEFAULT, wwidth, wheight,
+		WS_POPUP, 0, 0, Width, Height,
 		NULL, NULL, m_hInstance, NULL);
   }
   else
   {
+	  int wwidth,wheight;
+	  wwidth=Width+2*GetSystemMetrics(SM_CXSIZEFRAME);
+	  wheight=Height+2*GetSystemMetrics(SM_CYSIZEFRAME)+GetSystemMetrics(SM_CYCAPTION);
 	  m_hWnd = CreateWindowEx(exStyle, CS_WIN32_WINDOW_CLASS_NAME, win_title, style,
 		(GetSystemMetrics(SM_CXSCREEN)-wwidth)/2,
 		(GetSystemMetrics(SM_CYSCREEN)-wheight)/2,
