@@ -6,4 +6,4 @@ Plugin fountldr
 LinkWith fountldr : csgeom cssys csutil ;
 
 Help fountldr : "Fountain mesh object loader" ;
-
+CompileGroups fountldr : meshes ;
