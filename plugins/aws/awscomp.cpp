@@ -84,7 +84,7 @@ awsComponent::Overlaps(csRect &r)
 }
 
 void 
-awsComponent::AddChild(awsComponent *child, bool owner=true)
+awsComponent::AddChild(awsComponent *child, bool owner)
 {
    // Only grab a reference if we are not the owner.
    if (owner==false)
