@@ -53,6 +53,13 @@ chronological order.
 	  cspython.mak by slightly reorganizing the rules.
 	- Eric Sunshine eliminated need for DO_SWIGPERL5INST conditional from
 	  csperl5.mak by slightly reorganizing the rules.
+	- Eric Sunshine added check to configure.ac which determines how to
+	  disable warnings about unused variables.  The result of this check is
+	  used by a few Jamfiles and makefiles when building auto-generated
+	  code (such as that from Flex, Bison, Swig) which often contains many
+	  unused variables.  Previously, these Jamfiles and makefiles made the
+	  potentially bogus assumption that all compilers understand
+	  -Wno-unused.
 1-Feb-2004
 	- Eric Sunshine applied a couple small patches from Randall Foreman
 	  <eidpers@comcast.net> for Borland C++Builder which fix re-declaration

@@ -89,6 +89,7 @@ AC_DEFUN([_CS_TRANSLATE_MAKE_TO_JAM],
 	[CXXFLAGS.SYSTEM.MANDATORY], [COMPILER.C++FLAGS.MANDATORY],
 	[CXXFLAGS.EXCEPTIONS.ENABLE], [COMPILER.C++FLAGS.EXCEPTIONS.ENABLE],
 	[CXXFLAGS.EXCEPTIONS.DISABLE], [COMPILER.C++FLAGS.EXCEPTIONS.DISABLE],
+	[CXXFLAGS.WARNING.NO_UNUSED], [COMPILER.C++FLAGS.WARNING.NO_UNUSED],
 	[MACOSX.LFLAGS.CONFIG], [COMPILER.LFLAGS],
 	[CFLAGS.optimize], [COMPILER.CFLAGS.optimize],
 	[CFLAGS.debug], [COMPILER.CFLAGS.debug],
@@ -683,11 +684,20 @@ CS_CHECK_BUILD_FLAGS([how to treat warnings as errors],
 
 
 #------------------------------------------------------------------------------
+# Check how to make compiler ignore unused variables and arguments.
+#------------------------------------------------------------------------------
+CS_EMIT_BUILD_FLAGS([how to ignore unused variables],
+    [cs_cv_prog_cxx_ignore_unused_variables],
+    [CS_CREATE_TUPLE([-Wno-unused])], [C++], [CXXFLAGS.WARNING.NO_UNUSED])
+
+
+
+#------------------------------------------------------------------------------
 # Check if warnings about unknown #pragmas can be disabled.  (MSVC and Borland
 # use a number of pragmas not understood by GCC, for instance.)
 #------------------------------------------------------------------------------
-CS_EMIT_BUILD_FLAGS([[how to disable unknown #pragma warnings]],
-    [cs_cv_prog_cxx_disable_pragma_warnings],
+CS_EMIT_BUILD_FLAGS([[how to ignore unknown #pragma directives]],
+    [cs_cv_prog_cxx_ignore_unknown_pragmas],
     [CS_CREATE_TUPLE([-Wno-unknown-pragmas])], [C++], [CFLAGS.SYSTEM], [+])
 
 

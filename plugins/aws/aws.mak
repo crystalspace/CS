@@ -91,13 +91,14 @@ aws: $(OUTDIRS) $(AWS)
 
 # Auto-generated files (skinlex.cpp and skinpars.cpp) are compiled from within
 # $(OUTDERIVED), so we need to use -I to let them know where the AWS headers
-# are.  Also silence compiler warnings via -Wno-unused in auto-generated code,
-# over which we have no control.  @@@ FIXME: Configure script should check if
-# compiler recognizes -Wno-unused, rather than blatently assuming that it does.
+# are.  Also silence compiler warnings via -Wno-unused (if available) in
+# auto-generated code, over which we have no control.
 $(OUT.AWS)/skinpars$O: $(AWS.DERIVED.DIR)/skinpars.cpp
-	$(DO.COMPILE.CPP) -Wno-unused $(CFLAGS.I)$(SRCDIR)/$(DIR.AWS)
+	$(DO.COMPILE.CPP) $(CXXFLAGS.WARNING.NO_UNUSED) \
+	$(CFLAGS.I)$(SRCDIR)/$(DIR.AWS)
 $(OUT.AWS)/skinlex$O: $(AWS.DERIVED.DIR)/skinlex.cpp
-	$(DO.COMPILE.CPP) -Wno-unused $(CFLAGS.I)$(SRCDIR)/$(DIR.AWS)
+	$(DO.COMPILE.CPP) $(CXXFLAGS.WARNING.NO_UNUSED) \
+	$(CFLAGS.I)$(SRCDIR)/$(DIR.AWS)
 
 $(OUT.AWS)/%$O: $(SRCDIR)/$(DIR.AWS)/%.cpp
 	$(DO.COMPILE.CPP)

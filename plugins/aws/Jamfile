@@ -15,11 +15,12 @@ Plugin aws :
 	$(FILES)
 ;
 
+if "$(COMPILER.C++FLAGS.WARNING.NO_UNUSED)"
+{
 # Silence the compiler (we can't avoid the warnings in auto-generated code).
-# @@@ FIXME: The configure script should check if compiler recognizes
-# -Wno-unused rather than hard-coding it here.
 C++FLAGS on [ DoObjectGrist skinlex$(SUFOBJ) skinpars$(SUFOBJ) ] +=
-  -Wno-unused ;
+  $(COMPILER.C++FLAGS.WARNING.NO_UNUSED) ;
+}
 
 # Work around bizarre bug on older CompileFarm MacOS/X installation and
 # CompileFarm Linux 2.2 (Alpha) installation where preprocessor fails to search

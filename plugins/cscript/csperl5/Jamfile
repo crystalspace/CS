@@ -59,7 +59,8 @@ if $(PERL5.AVAILABLE) = "yes"
   Plugin csperl5
 	  : $(FILES)
   ;
-  CFlags csperl5 : -I$(TOP)/scripts/perl5 -Wno-unused ;
+  CFlags csperl5 :
+    -I$(TOP)/scripts/perl5 $(COMPILER.C++FLAGS.WARNING.NO_UNUSED) ;
   LinkWith csperl5 : cstool csgeom csutil ;
   ExternalLibs csperl5 : PERL5 ;
   Clean clean : $(perlxs) ;
