@@ -381,7 +381,7 @@ void Blocks::add_cube (int dx, int dy, int dz, int x, int y, int z)
   cube->SetName ("cube");
   cube->SetSector (room);
   cube->SetFlags (CS_ENTITY_MOVEABLE, CS_ENTITY_MOVEABLE);
-  csVector3 shift (dx*BLOCK_DIM, dy*BLOCK_DIM, dz*BLOCK_DIM);
+  csVector3 shift (dx*BLOCK_DIM, dz*BLOCK_DIM, dy*BLOCK_DIM);
   cube->MergeTemplate (cube_tmpl, cube_txt, 1, NULL, &shift, NULL);
 
   csPolygon3D* p;
