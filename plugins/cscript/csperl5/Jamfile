@@ -3,7 +3,7 @@ SubDir TOP plugins cscript csperl5 ;
 if $(PERL5.AVAILABLE) = "yes"
 {
   Plugin csperl5 : [ Wildcard *.cpp *.h ] ;
-  LinkWith csperl5 : $(dep.csperl5) ;
+  LinkWith csperl5 : cstool csgeom cssys csutil cssys ;
   ExternalLibs csperl5 : PERL5 ;
   Help csperl5 : "Crystal Script Perl5 plug-in" ;
 }
