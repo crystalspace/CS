@@ -24,9 +24,24 @@ WORLD (
     MATERIAL 'spark' (TEXTURE ('spark'))
     MATERIAL 'mosholes' (TEXTURE ('mosholes.gif'))
     MATERIAL 'robot' (TEXTURE ('oldmetal.gif'))
+    MATERIAL 'robotMulti' (
+      TEXTURE ('oldmetal.gif')
+      LAYER (
+	TEXTURE ('spark')
+	SCALE (20,20)
+	MIXMODE (ADD ())
+      )
+    )
     MATERIAL 'raindrop' (TEXTURE ('raindrop'))
     MATERIAL 'white' (TEXTURE ('white.gif'))
-    MATERIAL 'bricks' (TEXTURE ('bricks.gif'))
+    MATERIAL 'bricks' (
+      TEXTURE ('bricks.gif')
+      LAYER (
+	TEXTURE ('spark')
+	SCALE (10,10)
+	MIXMODE (ALPHA (.25))
+      )
+    )
     MATERIAL 'mosaic' (TEXTURE ('mosaic.gif'))
     MATERIAL 'oldmetal' (TEXTURE ('oldmetal.gif'))
     MATERIAL 'parket' (TEXTURE ('parket.gif'))
@@ -182,7 +197,7 @@ WORLD (
   MESHFACT 'sprFrameFact' (
     PLUGIN ('spr3dFact')
     PARAMS (
-      MATERIAL ('robot')
+      MATERIAL ('robotMulti')
       FRAME 'f1' (
       	V (-.1,-1, .1:.5,.5)
       	V ( .1,-1, .1:0,.5)
