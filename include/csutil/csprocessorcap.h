@@ -91,7 +91,7 @@ private:
   /// The name of the processor
   static char processorName[16];
 
-  #ifdef CS_PROCESSOR_X86
+#if defined(CS_PROCESSOR_X86) && (CS_PROCESSOR_SIZE == 32)
   /**
   * Check for x86 features. This function is written twice due to different
   * syntax for inline assembly on MSVC and GCC
@@ -221,15 +221,14 @@ end_detect:
     : "g" (procName), "2" (maxEax)
     : "eax", "ebx", "ecx", "edx", "esi");
 
-    #endif //CS_COMPILER_
+    #endif //CS_COMPILER_MSVC/GCC
     mmxSupported = capFlags & (1<<23);
     sseSupported = capFlags & (1<<25);
     //AMD3dnowSupported = capFlags & (1<<31);
   }
-  #else //CS_PROCESSOR_X86
-  void csProcessorCapability::CheckX86Processor () {}
-  #endif //CS_PROCESSOR_X86
-
+#else //CS_PROCESSOR_X86
+  static inline void csProcessorCapability::CheckX86Processor() {}
+#endif //CS_PROCESSOR_X86
 };
 
 #endif //__CS_PROCESSORCAP_H__
