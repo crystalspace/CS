@@ -93,33 +93,75 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   // Create our world.
   Printf (MSG_INITIALIZATION, "Creating world!...\n");
 
-  csTextureWrapper* tm = csLoader::LoadTexture (world, "stone", "/lib/std/stone4.gif");
-
+  // Initialize the python plugin.
   iScript* is = LOAD_PLUGIN (this, "crystalspace.script.python", "Python", iScript);
 
-  if(!is->LoadModule("unrmap"))
+  csLoader::LoadTexture (world, "stone", "/lib/std/stone4.gif");
+  csMaterialWrapper* tm = world->GetMaterials ()->FindByName ("stone");
+
+  // Load a python module (scripts/python/pysimp.py).
+  if (!is->LoadModule ("pysimp"))
     return 0;
 
-//TODO Python HACK
-  csSector *room=world->CreateCsSector ("room");
-  view = new csView (world, G3D);
+  // Set up our room.
+  csSector *room = world->CreateCsSector ("room");
 
-  if(!is->RunText("unrmap.Load('data/entry')"))
+  csPolygon3D* p;
+  //p = room->NewPolygon (tm);
+  //p->AddVertex (-5, 0, 5);
+  //p->AddVertex (5, 0, 5);
+  //p->AddVertex (5, 0, -5);
+  //p->AddVertex (-5, 0, -5);
+  //p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+
+  p = room->NewPolygon (tm);
+  p->AddVertex (-5, 20, -5);
+  p->AddVertex (5, 20, -5);
+  p->AddVertex (5, 20, 5);
+  p->AddVertex (-5, 20, 5);
+  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+
+  p = room->NewPolygon (tm);
+  p->AddVertex (-5, 20, 5);
+  p->AddVertex (5, 20, 5);
+  p->AddVertex (5, 0, 5);
+  p->AddVertex (-5, 0, 5);
+  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+
+  p = room->NewPolygon (tm);
+  p->AddVertex (5, 20, 5);
+  p->AddVertex (5, 20, -5);
+  p->AddVertex (5, 0, -5);
+  p->AddVertex (5, 0, 5);
+  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+
+  p = room->NewPolygon (tm);
+  p->AddVertex (-5, 20, -5);
+  p->AddVertex (-5, 20, 5);
+  p->AddVertex (-5, 0, 5);
+  p->AddVertex (-5, 0, -5);
+  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+
+  p = room->NewPolygon (tm);
+  p->AddVertex (5, 20, -5);
+  p->AddVertex (-5, 20, -5);
+  p->AddVertex (-5, 0, -5);
+  p->AddVertex (5, 0, -5);
+  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+
+  // Execute one method defined in pysimp.py
+  if (!is->RunText ("pysimp.TestMe('data/entry')"))
     return 0;
 
-  is->DecRef();
+  is->DecRef ();
 
-  room->CompressVertices();
+  room->CompressVertices ();
 
   csStatLight* light;
-  light = new csStatLight (0, 0, 0, 10, 1, 0, 0, false);
+  light = new csStatLight (0, 5, 0, 10, 1, 0, 0, false);
   room->AddLight(light);
-  light = new csStatLight (127, 127, 127, 100, 0, 0, 1, false);
-  room->AddLight (light);
-	
-  world->Prepare ();
 
-	Dumper::dump(world);
+  world->Prepare ();
 
   Printf (MSG_INITIALIZATION, "--------------------------------------\n");
 
@@ -127,8 +169,9 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   // You don't have to use csView as you can do the same by
   // manually creating a camera and a clipper but it makes things a little
   // easier.
+  view = new csView (world, G3D);
   view->SetSector((csSector*)world->sectors[0]);
-  view->GetCamera()->SetPosition (csVector3 (0, 0, 0));
+  view->GetCamera()->SetPosition (csVector3 (0, 2, 0));
   view->SetRectangle (2, 2, FrameWidth - 4, FrameHeight - 4);
 
   txtmgr->SetPalette ();

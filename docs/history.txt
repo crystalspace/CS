@@ -10,6 +10,9 @@ The history order has been reversed so that new features are at the top.
 	  iPlugIn).
 	- Fixed a bug in the cspython plugin which would initialize
 	  System to NULL. I have no idea why that code was there.
+	- Some experimentation with pysimple. Tried to update it so that
+	  it works more like the normal simple but instead it creates
+	  part of the geometry in python. However it does not work yet.
 3-Oct-2000
 	- Fixed a bug in the 3dslev convertor where it would accidently
 	  remove small polygons.
