@@ -29,15 +29,15 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
+# We need also the X libs
+CFLAGS.LINEX2D += -I$(X11_PATH)/include
+LIB.LINEX2D.SYSTEM += -L$(X11_PATH)/lib -lXext -lX11 $(X11_EXTRA_LIBS)
+
 ifeq ($(USE_XFREE86VM),yes)
   CFLAGS.LINEX2D += -DXFREE86VM
   LIB.LINEX2D.SYSTEM += -lXxf86vm
 endif
  
-# We need also the X libs
-CFLAGS.LINEX2D += -I$(X11_PATH)/include
-LIB.LINEX2D.SYSTEM += -L$(X11_PATH)/lib -lXext -lX11 $(X11_EXTRA_LIBS)
-
 # The 2D Xlib driver
 ifeq ($(USE_PLUGINS),yes)
   LINEX2D = $(OUTDLL)linex2d$(DLL)
