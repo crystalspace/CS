@@ -31,6 +31,9 @@ chronological order.
 	- Jorrit changed the lightmap size in bruteblock to 257x257 by
 	  default. In addition added a 'lightmap resolution' LOD value
 	  with which you can set this size.
+	- Jorrit changed the static lighting calculator so that it picks
+	  the highest detail object for shadow casting instead of the
+	  lowest detail object. This will be slower but looks a LOT better.
 5-Oct-2004
 	- Rhad fixed a long standing bug in the Ogg loader.
 	  - Per specs, SEEK_END must seek 1 byte past the end of data

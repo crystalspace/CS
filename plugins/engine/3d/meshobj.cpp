@@ -65,8 +65,8 @@ public:
   {
     const csMeshMeshList& c = static_lod_mesh->GetChildren ();
     int cnt = c.GetCount ();
-    int i = 0;
-    while (i < cnt)
+    int i = cnt-1;
+    while (i >= 0)
     {
       iMeshWrapper* child = c.Get (i);
       if (child && child->GetShadowCaster ())
@@ -74,7 +74,7 @@ public:
         child->GetShadowCaster ()->AppendShadows (movable, shadows, origin);
 	return;
       }
-      i++;
+      i--;
     }
   }
 };
