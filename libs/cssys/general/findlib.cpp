@@ -60,6 +60,7 @@ public:
     if (stat (file, &st) == 0)
     {
       _handle = csLoadLibrary (file);
+      if (!_handle) return CALLBACK_CONTINUE;
       _file_found++;
       return CALLBACK_STOP;
     }
