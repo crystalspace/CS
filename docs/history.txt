@@ -1,8 +1,32 @@
 The history order has been reversed so that new features are at the top.
 
 3-May-2000
-	- Fixed bug in Blocks which caused the menu not to work properly
-	  (left/right arrows were gone).
+	- Fixed bug in Blocks which caused the menu not to work
+	  properly (left/right arrows were gone).
+	- Andrew Zabolotny did a large update:
+	    - Removed all stuff related to the old way to do high-quality
+	      lightmaps. Removed csPolygon3D::ScaleLightmaps2X,
+	      csPolygon3D::UpdateLightmapSize, csLightMap::Scale2X.
+	      Removed all stuff required to support 2x lightmaps from csWorld.
+	    - Implemented a totally new way to do high quality lightmaps.
+	      It is supposed to produce more high quality lightmaps. Last
+	      but not least the new algorithm removes both infamous Black
+	      Borders {tm} problem as well as the old White Borders {tm}
+	      problem (WB were resolved in the previous implementation,
+	      but my new approach allows to resolve WBs even for dynamic
+	      lightmaps! Not done yet though...). My measurements also
+	      shows it is a lot faster... maybe it is a result of some bugs
+	      that are still left. dmburg level -recalc's with the old
+	      algorithm on my machine for 118 seconds, with the new
+	      algorithm it takes just 49 seconds. This could be due to bugs
+	      that are still existing though (very likely).
+	    - Fixed typo: frustrum replaced with frustum. There were
+	      thousands of such errors. The only thing left is to rename
+	      frustrum.cpp and frustrum.h.
+	    - "fclear on" in walktest now will clear zbuffer on every frame.
+	    - Separated the "antialiased polygon" code from polytext.cpp
+	      into a separate file in libs/csgeom. Now it is useable from
+	      any application/library.
 	- Eric Sunshine changed the CVS snapshot script (bin/snapshot.py) so
 	  that it now uses /tmp as its working directory rather than polluting
 	  the snapshot directory with temporary files.
@@ -23,6 +47,8 @@ The history order has been reversed so that new features are at the top.
 	      sequence would fail to emit a new INI file ("b.cfg"):
 	          cfg.Load("a.cfg"); cfg.Save("b.cfg");
 	    - Added IsDirty() and ClearDirty() for finer control by client.
+	- Andrew Zabolotny fixed the first of the many lighting bugs that
+	  are left after his changes.
 2-May-2000
 	- Added csPoly3D::ProjectAxisPlane() which is similar to
 	  ProjectXPlane() but for a general axis aligned plane.
