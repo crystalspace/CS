@@ -22,6 +22,7 @@ chronological order.
 	- Eric Sunshine fixed bug in csString::Replace(char const*,count) where
 	  it was documented as accepting -1 for `count', but did not correctly
 	  handle the case.
+	- Wouter Wijngaards fixed compile errors in csbench.
 19-Aug-2004
 	- Jorrit added support for key/value pairs to materials and textures
 	  in the loader.
