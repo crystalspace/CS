@@ -34,6 +34,23 @@ The history order is reversed so that new features are at the top.
 	- Added a new command 'debuggraph' to bugplug. This will call
 	  csDebuggingGraph::Dump() so you can use it to dump the graph
 	  that is in memory. It is assigned to the ctrl-g key.
+	- WARNING! Dirty hack ahead!
+	  To make the new csDebuggingGraph debugging tool work nicely in
+	  all places (and especially the place where I plan to use it:
+	  csObject) I need a global pointer to the object registry (csObject
+	  has no access to the object registry). I see no other solution at
+	  this moment then to add this global pointer to the only other
+	  global object we already have: iSCF::SCF. This is of course very
+	  very dirty so I only make this pointer available in debug mode.
+	  This means that it is not possible to misuse this pointer because
+	  it will not be there in release/optimize mode. To initialize
+	  this pointer you must call csDebuggingGraph::SetupGraph() with
+	  a correct object registry. Later on you can then use
+	  csDebuggingGraph methods with a NULL object_reg pointer in which
+	  case it will get it from iSCF::SCF.
+	  I also added new DB_... macros which don't have an object_reg
+	  pointer. These macros will only work in debug mode. In optimize
+	  or release mode they will produce no code.
 13-Nov-2001
 	- Small comment fix in vfs.h.
 	- Fixed a bad bug in csObject destructor. It appears that it could

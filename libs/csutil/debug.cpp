@@ -24,6 +24,7 @@
 #include "csutil/scf.h"
 #include "csutil/util.h"
 #include "csutil/debug.h"
+#include "csutil/scf.h"
 #include "iutil/objreg.h"
 
 //-----------------------------------------------------------------------------
@@ -226,16 +227,23 @@ static csDebugGraph* SetupDebugGraph (iObjectRegistry* object_reg)
 
 //-----------------------------------------------------------------------------
 
-void csDebuggingGraph::GraphMode (iObjectRegistry* object_reg, bool exact)
+void csDebuggingGraph::SetupGraph (iObjectRegistry* object_reg, bool exact)
 {
   csDebugGraph* dg = SetupDebugGraph (object_reg);
   dg->exact = exact;
+#ifdef CS_DEBUG
+  iSCF::SCF->object_reg = object_reg;
+#endif
 }
 
 void csDebuggingGraph::AddObject (iObjectRegistry* object_reg,
 	void* object, char* file, int linenr,
   	char* description, ...)
 {
+#ifdef CS_DEBUG
+  if (!object_reg) object_reg = iSCF::SCF->object_reg;
+#endif
+  CS_ASSERT (object_reg != NULL);
   csDebugGraph* dg = SetupDebugGraph (object_reg);
   csDGEL* el = dg->FindEl (object);
   CS_ASSERT (el == NULL);	// Object should not occur!
@@ -260,6 +268,10 @@ void csDebuggingGraph::AddObject (iObjectRegistry* object_reg,
 void csDebuggingGraph::RemoveObject (iObjectRegistry* object_reg,
 	void* object, char* file, int linenr)
 {
+#ifdef CS_DEBUG
+  if (!object_reg) object_reg = iSCF::SCF->object_reg;
+#endif
+  CS_ASSERT (object_reg != NULL);
   (void)file;
   (void)linenr;
   csDebugGraph* dg = SetupDebugGraph (object_reg);
@@ -289,6 +301,10 @@ void csDebuggingGraph::RemoveObject (iObjectRegistry* object_reg,
 void csDebuggingGraph::AddParent (iObjectRegistry* object_reg,
 	void* child, void* parent)
 {
+#ifdef CS_DEBUG
+  if (!object_reg) object_reg = iSCF::SCF->object_reg;
+#endif
+  CS_ASSERT (object_reg != NULL);
   csDebugGraph* dg = SetupDebugGraph (object_reg);
   csDGEL* p_el = dg->FindEl (parent);
   csDGEL* c_el = dg->FindEl (child);
@@ -300,6 +316,10 @@ void csDebuggingGraph::AddParent (iObjectRegistry* object_reg,
 void csDebuggingGraph::AddChild (iObjectRegistry* object_reg,
 	void* parent, void* child)
 {
+#ifdef CS_DEBUG
+  if (!object_reg) object_reg = iSCF::SCF->object_reg;
+#endif
+  CS_ASSERT (object_reg != NULL);
   csDebugGraph* dg = SetupDebugGraph (object_reg);
   csDGEL* p_el = dg->FindEl (parent);
   csDGEL* c_el = dg->FindEl (child);
@@ -311,6 +331,10 @@ void csDebuggingGraph::AddChild (iObjectRegistry* object_reg,
 void csDebuggingGraph::RemoveParent (iObjectRegistry* object_reg,
 	void* child, void* parent)
 {
+#ifdef CS_DEBUG
+  if (!object_reg) object_reg = iSCF::SCF->object_reg;
+#endif
+  CS_ASSERT (object_reg != NULL);
   csDebugGraph* dg = SetupDebugGraph (object_reg);
   csDGEL* p_el = dg->FindEl (parent);
   csDGEL* c_el = dg->FindEl (child);
@@ -322,6 +346,10 @@ void csDebuggingGraph::RemoveParent (iObjectRegistry* object_reg,
 void csDebuggingGraph::RemoveChild (iObjectRegistry* object_reg,
 	void* parent, void* child)
 {
+#ifdef CS_DEBUG
+  if (!object_reg) object_reg = iSCF::SCF->object_reg;
+#endif
+  CS_ASSERT (object_reg != NULL);
   csDebugGraph* dg = SetupDebugGraph (object_reg);
   csDGEL* p_el = dg->FindEl (parent);
   csDGEL* c_el = dg->FindEl (child);
@@ -332,12 +360,20 @@ void csDebuggingGraph::RemoveChild (iObjectRegistry* object_reg,
 
 void csDebuggingGraph::Clear (iObjectRegistry* object_reg)
 {
+#ifdef CS_DEBUG
+  if (!object_reg) object_reg = iSCF::SCF->object_reg;
+#endif
+  CS_ASSERT (object_reg != NULL);
   csDebugGraph* dg = SetupDebugGraph (object_reg);
   dg->Clear ();
 }
 
 void csDebuggingGraph::Dump (iObjectRegistry* object_reg)
 {
+#ifdef CS_DEBUG
+  if (!object_reg) object_reg = iSCF::SCF->object_reg;
+#endif
+  CS_ASSERT (object_reg != NULL);
   csDebugGraph* dg = SetupDebugGraph (object_reg);
 
   csDGEL* els = dg->els;
@@ -429,6 +465,10 @@ static int compare_el (const void* vel1, const void* vel2)
 void csDebuggingGraph::Dump (iObjectRegistry* object_reg, void* object,
 	bool find_root, bool reset_mark)
 {
+#ifdef CS_DEBUG
+  if (!object_reg) object_reg = iSCF::SCF->object_reg;
+#endif
+  CS_ASSERT (object_reg != NULL);
   csDebugGraph* dg = SetupDebugGraph (object_reg);
   int i;
   if (reset_mark)

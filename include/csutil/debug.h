@@ -21,24 +21,57 @@
 
 struct iObjectRegistry;
 
-#define DG_ADD(object_reg,obj,desc) \
+#define DG_ADD_O(object_reg,obj,desc) \
   csDebuggingGraph::AddObject(object_reg,(void*)(obj),__FILE__,__LINE__,desc)
-#define DG_REM(object_reg,obj) \
+#define DG_REM_O(object_reg,obj) \
   csDebuggingGraph::RemoveObject(object_reg,(void*)(obj),__FILE__,__LINE__)
-#define DG_ADDCHILD(object_reg,parent,child) \
+#define DG_ADDCHILD_O(object_reg,parent,child) \
   csDebuggingGraph::AddChild(object_reg,(void*)(parent),(void*)(child))
-#define DG_ADDPARENT(object_reg,child,parent) \
+#define DG_ADDPARENT_O(object_reg,child,parent) \
   csDebuggingGraph::AddParent(object_reg,(void*)(child),(void*)(parent))
-#define DG_REMCHILD(object_reg,parent,child) \
+#define DG_REMCHILD_O(object_reg,parent,child) \
   csDebuggingGraph::RemoveChild(object_reg,(void*)(parent),(void*)(child))
-#define DG_REMPARENT(object_reg,child,parent) \
+#define DG_REMPARENT_O(object_reg,child,parent) \
   csDebuggingGraph::RemoveParent(object_reg,(void*)(child),(void*)(parent))
-#define DG_LINK(object_reg,parent,child) \
+#define DG_LINK_O(object_reg,parent,child) \
   csDebuggingGraph::AddChild(object_reg,(void*)(parent),(void*)(child)); \
   csDebuggingGraph::AddParent(object_reg,(void*)(child),(void*)(parent))
-#define DG_UNLINK(object_reg,parent,child) \
+#define DG_UNLINK_O(object_reg,parent,child) \
   csDebuggingGraph::RemoveChild(object_reg,(void*)(parent),(void*)(child)); \
   csDebuggingGraph::RemoveParent(object_reg,(void*)(child),(void*)(parent))
+
+// The following versions of the defines are only available in
+// debug mode. In release mode they do nothing. They expect SetupGraph()
+// to be called with a valid object registry.
+#ifdef CS_DEBUG
+#define DG_ADD(obj,desc) \
+  csDebuggingGraph::AddObject(NULL,(void*)(obj),__FILE__,__LINE__,desc)
+#define DG_REM(obj) \
+  csDebuggingGraph::RemoveObject(NULL,(void*)(obj),__FILE__,__LINE__)
+#define DG_ADDCHILD(parent,child) \
+  csDebuggingGraph::AddChild(NULL,(void*)(parent),(void*)(child))
+#define DG_ADDPARENT(child,parent) \
+  csDebuggingGraph::AddParent(NULL,(void*)(child),(void*)(parent))
+#define DG_REMCHILD(parent,child) \
+  csDebuggingGraph::RemoveChild(NULL,(void*)(parent),(void*)(child))
+#define DG_REMPARENT(child,parent) \
+  csDebuggingGraph::RemoveParent(NULL,(void*)(child),(void*)(parent))
+#define DG_LINK(parent,child) \
+  csDebuggingGraph::AddChild(NULL,(void*)(parent),(void*)(child)); \
+  csDebuggingGraph::AddParent(NULL,(void*)(child),(void*)(parent))
+#define DG_UNLINK(parent,child) \
+  csDebuggingGraph::RemoveChild(NULL,(void*)(parent),(void*)(child)); \
+  csDebuggingGraph::RemoveParent(NULL,(void*)(child),(void*)(parent))
+#else
+#define DG_ADD(obj,desc)
+#define DG_REM(obj)
+#define DG_ADDCHILD(parent,child)
+#define DG_ADDPARENT(child,parent)
+#define DG_REMCHILD(parent,child)
+#define DG_REMPARENT(child,parent)
+#define DG_LINK(parent,child)
+#define DG_UNLINK(parent,child)
+#endif
 
 /**
  * This is a static class that helps with debugging.
@@ -60,9 +93,13 @@ public:
    * operations requested. i.e. removing an object will not automatically
    * remove the links. RemoveParent() has to be called explicitely. In this
    * mode it is possible that the tree will not be correct and the
-   * dump will show this.
+   * dump will show this.<p>
+   * Special note! In debug mode (CS_DEBUG) this function will put the
+   * pointer to the object registry in iSCF::object_reg. That way we
+   * can use this debugging functionality in places where the object
+   * registry is not available.
    */
-  static void GraphMode (iObjectRegistry* object_reg, bool exact);
+  static void SetupGraph (iObjectRegistry* object_reg, bool exact);
 
   /**
    * Add a new object to the debug graph and link to its parent.

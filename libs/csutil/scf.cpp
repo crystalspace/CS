@@ -401,6 +401,9 @@ void scfInitialize (iConfigFile *iConfig)
 csSCF::csSCF ()
 {
   SCF = PrivateSCF = this;
+#ifdef CS_DEBUG
+  object_reg = NULL;
+#endif
 
   if (!ClassRegistry)
     ClassRegistry = new scfClassRegistry ();

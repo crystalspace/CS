@@ -679,6 +679,10 @@ static inline bool scfCompatibleVersion (int iVersion, int iItfVersion)
       && ((iVersion & 0x00ffffff) <= (iItfVersion & 0x00ffffff));
 }
 
+#ifdef CS_DEBUG
+  struct iObjectRegistry;
+#endif
+
 SCF_VERSION (iSCF, 0, 0, 1);
 
 /**
@@ -691,6 +695,18 @@ struct iSCF : public iBase
 {
   /// This is the global instance of iSCF
   static iSCF *SCF;
+
+#ifdef CS_DEBUG
+  // This is EXTREMELY dirty but I see no other solution for now.
+  // For debugging reasons I must have a global (global over the application
+  // and all plugins)pointer to the object registry. I have no other
+  // global object to tag this pointer on that except for iSCF.
+  // This pointer is only here in debug mode though. That ensures that it
+  // cannot be misused in real code.
+  // If you know another solution for this problem? This global pointer
+  // will be used by csDebuggingGraph in csutil.
+  iObjectRegistry* object_reg;
+#endif
 
   /**
    * Read additional class descriptions from the given config file. This does
