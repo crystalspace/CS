@@ -60,9 +60,10 @@ void csShaderGLAVP::Deactivate(iShaderPass* current)
 
 void csShaderGLAVP::SetupState (iShaderPass *current, csRenderMesh *mesh)
 {
+#if 0
     // set variables
   int i;
-  /*for(i = 0; i < variablemap.Length(); ++i)
+  for(i = 0; i < variablemap.Length(); ++i)
   {
     variablemapentry* e = (variablemapentry*)variablemap.Get(i);
     iShaderVariable* lvar = GetVariable(e->namehash );
@@ -110,7 +111,8 @@ void csShaderGLAVP::SetupState (iShaderPass *current, csRenderMesh *mesh)
 	break;
       }
     }
-  }*/
+  }
+#endif
 }
 
 void csShaderGLAVP::ResetState ()
@@ -225,6 +227,7 @@ bool csShaderGLAVP::Load(iDocumentNode* program)
           break;
       case XMLTOKEN_DECLARE:
         {
+#if 0
           //create a new variable
           /*csRef<iShaderVariable> var = 
             shadermgr->CreateVariable (child->GetAttributeValue ("name"));
@@ -253,8 +256,10 @@ bool csShaderGLAVP::Load(iDocumentNode* program)
           var->IncRef (); 
           variables.Put( csHashCompute(var->GetName()), var);*/
         }
+#endif
         break;
       case XMLTOKEN_VARIABLEMAP:
+#if 0
         {
           //create a varable<->register mapping
           /*variablemapentry * map = new variablemapentry();
@@ -270,6 +275,7 @@ bool csShaderGLAVP::Load(iDocumentNode* program)
           //save it for later
           variablemap.Push( map );*/
         }
+#endif
         break;
       default:
         return false;

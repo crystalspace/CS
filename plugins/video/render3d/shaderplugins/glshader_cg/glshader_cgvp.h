@@ -37,16 +37,6 @@ private:
     XMLTOKEN_PROGRAM
   };
 
-  struct variablemapentry
-  {
-    variablemapentry() { name = 0; }
-    ~variablemapentry() { if(name) delete name; if(cgvarname) delete cgvarname; }
-    char* name;
-    char* cgvarname;
-    int namehash;
-    CGparameter parameter;
-  };
-
   csArray<csSymbolTable> symtabs;
   csSymbolTable *symtab;
 
@@ -62,7 +52,6 @@ private:
 
   CGprogram program;
 
-  csHashMap variables;
   csBasicVector matrixtrackers;
   csStringHash xmltokens;
 
@@ -112,33 +101,14 @@ public:
 
   virtual void ResetState () {}
 
-  /* Propertybag - get property, return false if no such property found
-  * Which properties there is is implementation specific
-  */
-  virtual bool GetProperty(const char* name, iString* string) {return false;};
-  virtual bool GetProperty(const char* name, int* string) {return false;};
-  virtual bool GetProperty(const char* name, csVector3* string) {return false;};
-  //  virtual bool GetProperty(const char* name, csVector4* string) {};
-
-  /* Propertybag - set property.
-  * Which properties there is is implementation specific
-  */
-  virtual bool SetProperty(const char* name, iString* string) {return false;};
-  virtual bool SetProperty(const char* name, int* string) {return false;};
-  virtual bool SetProperty(const char* name, csVector3* string) {return false;};
-  //  virtual bool SetProperty(const char* name, csVector4* string) {return false;};
-
-  virtual void AddChild(iShaderBranch *c)
-    { symtab->AddChild(c->GetSymbolTable()); }
-  virtual void AddVariable(iShaderVariable* variable) 
-    { return; } // Don't allow externals to add variables
-  virtual iShaderVariable* GetVariable(csStringID name)
-    { return (iShaderVariable *) symtab->GetSymbol(name); }
-  virtual csSymbolTable* GetSymbolTable()
-    { return symtab; }
-  virtual void SelectSymbolTable(int index) {
-    if (symtabs.Length() < index) symtabs.SetLength(index + 1, 0);
-    symtab = & symtabs[index];
+  virtual void AddChild(iShaderBranch *b) {}
+  virtual void AddVariable(iShaderVariable* variable) {}
+  virtual iShaderVariable* GetVariable(csStringID s)
+    { return (iShaderVariable *) symtab->GetSymbol(s); }
+  virtual csSymbolTable* GetSymbolTable() { return symtab; }
+  virtual void SelectSymbolTable(int i) {
+    if (symtabs.Length () <= i) symtabs.SetLength (i + 1, csSymbolTable ());
+    symtab = & symtabs[i];
   }
 
   /// Check if valid

@@ -123,20 +123,3 @@ csPtr<iString> csSoftShader_VP::GetProgramID()
   str->Append((const char*)d.data[0], 16);
   return csPtr<iString>(str);
 }
-
-csBasicVector csSoftShader_VP::GetAllVariableNames()
-{
-  csBasicVector res;
-
-  return res;
-}
-
-csSymbolTable* csSoftShader_VP::GetSymbolTable()
-{
-  return 0;
-}
-
-iShaderVariable* csSoftShader_VP::GetVariable(int namehash)
-{
-  return 0;
-}

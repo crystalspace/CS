@@ -96,17 +96,14 @@ public:
   /// Reset states to original
   virtual void ResetState ();
 
-  virtual void AddChild(iShaderBranch *c)
-    { symtab->AddChild(c->GetSymbolTable()); }
-  virtual void AddVariable(iShaderVariable* variable) 
-    { return; } // Don't allow externals to add variables
-  virtual iShaderVariable* GetVariable(csStringID name)
-    { return (iShaderVariable *) symtab->GetSymbol(name); }
-  virtual csSymbolTable* GetSymbolTable()
-    { return symtab; }
-  virtual void SelectSymbolTable(int index) {
-    if (symtabs.Length() < index) symtabs.SetLength(index + 1, 0);
-    symtab = & symtabs[index];
+  virtual void AddChild(iShaderBranch *b) {}
+  virtual void AddVariable(iShaderVariable* variable) {}
+  virtual iShaderVariable* GetVariable(csStringID s)
+    { return (iShaderVariable *) symtab->GetSymbol(s); }
+  virtual csSymbolTable* GetSymbolTable() { return symtab; }
+  virtual void SelectSymbolTable(int i) {
+    if (symtabs.Length () <= i) symtabs.SetLength (i + 1, csSymbolTable ());
+    symtab = & symtabs[i];
   }
 
   /// Check if valid

@@ -217,6 +217,7 @@ private:
   csShaderManager* parent;
   char* name;
 
+  csRefArray<iShaderBranch> children;
   csSymbolTable *symtab;
   csArray<csSymbolTable> symtabs;
 
@@ -263,16 +264,22 @@ public:
   /// Retrieve the best technique in this shader
   virtual iShaderTechnique* GetBestTechnique();
 
-  virtual void AddChild(iShaderBranch *b)
-    { symtab->AddChild(b->GetSymbolTable()); }
-  virtual void AddVariable(iShaderVariable* variable)
-    { symtab->SetSymbol(variable->GetName(), variable); }
+  virtual void AddChild(iShaderBranch *b) {
+    children.Push (b);
+    symtab->AddChild (b->GetSymbolTable ());
+  }
+  virtual void AddVariable(iShaderVariable* variable) {
+    for (int i = 0; i < symtabs.Length (); i++)
+      symtabs[i].SetSymbol (variable->GetName (), variable);
+  }
   virtual iShaderVariable* GetVariable(csStringID s)
-    { return (iShaderVariable *) symtab->GetSymbol(s); }
+    { return (iShaderVariable *) symtab->GetSymbol (s); }
   virtual csSymbolTable* GetSymbolTable() { return symtab; }
   virtual void SelectSymbolTable(int i) {
     if (symtabs.Length () < i) symtabs.SetLength (i, csSymbolTable ());
     symtab = & symtabs[i];
+    for (int i = 0; i < children.Length (); i++)
+      children[i]->SelectSymbolTable (i);
   }
 
   /// Private variable to get the variable without virtual call
@@ -297,6 +304,7 @@ private:
   csShader* parent;
   csRef<iObjectRegistry> objectreg;
 
+  csRefArray<iShaderBranch> children;
   csSymbolTable *symtab;
   csArray<csSymbolTable> symtabs;
 
@@ -335,16 +343,22 @@ public:
   /// Retrieve a pass
   virtual iShaderPass* GetPass( int pass );
 
-  virtual void AddChild(iShaderBranch *b)
-    { symtab->AddChild(b->GetSymbolTable()); }
-  virtual void AddVariable(iShaderVariable* variable)
-    { symtab->SetSymbol(variable->GetName(), variable); }
+  virtual void AddChild(iShaderBranch *b) {
+    children.Push (b);
+    symtab->AddChild (b->GetSymbolTable ());
+  }
+  virtual void AddVariable(iShaderVariable* variable) {
+    for (int i = 0; i < symtabs.Length (); i++)
+      symtabs[i].SetSymbol (variable->GetName (), variable);
+  }
   virtual iShaderVariable* GetVariable(csStringID s)
-    { return (iShaderVariable *) symtab->GetSymbol(s); }
+    { return (iShaderVariable *) symtab->GetSymbol (s); }
   virtual csSymbolTable* GetSymbolTable() { return symtab; }
   virtual void SelectSymbolTable(int i) {
     if (symtabs.Length () < i) symtabs.SetLength (i, csSymbolTable ());
     symtab = & symtabs[i];
+    for (int i = 0; i < children.Length (); i++)
+      children[i]->SelectSymbolTable (i);
   }
 
   /// Check if valid (normaly a shader is valid if there is at least one valid technique)
@@ -368,6 +382,7 @@ private:
   csRef<iObjectRegistry> objectreg;
   csShaderTechnique* parent;
 
+  csRefArray<iShaderBranch> children;
   csArray<csSymbolTable> symtabs;
   csSymbolTable *symtab;
 
@@ -479,16 +494,22 @@ public:
   /// Reset states to original
   virtual void ResetState ();
 
-  virtual void AddChild(iShaderBranch *b)
-    { symtab->AddChild(b->GetSymbolTable()); }
-  virtual void AddVariable(iShaderVariable* variable)
-    { symtab->SetSymbol(variable->GetName(), variable); }
+  virtual void AddChild(iShaderBranch *b) {
+    children.Push (b);
+    symtab->AddChild (b->GetSymbolTable ());
+  }
+  virtual void AddVariable(iShaderVariable* variable) {
+    for (int i = 0; i < symtabs.Length (); i++)
+      symtabs[i].SetSymbol (variable->GetName (), variable);
+  }
   virtual iShaderVariable* GetVariable(csStringID s)
-    { return (iShaderVariable *) symtab->GetSymbol(s); }
+    { return (iShaderVariable *) symtab->GetSymbol (s); }
   virtual csSymbolTable* GetSymbolTable() { return symtab; }
   virtual void SelectSymbolTable(int i) {
     if (symtabs.Length () < i) symtabs.SetLength (i, csSymbolTable ());
     symtab = & symtabs[i];
+    for (int i = 0; i < children.Length (); i++)
+      children[i]->SelectSymbolTable (i);
   }
 
   /// Private variable to get the variable without virtual call
