@@ -17,13 +17,13 @@
 */
 
 #include "cssysdef.h"
-#include "wentity.h"
 #include "walktest.h"
 #include "csgeom/matrix3.h"
 #include "iengine/light.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
 #include "iengine/portal.h"
+#include "wentity.h"
 
 extern WalkTest* Sys;
 

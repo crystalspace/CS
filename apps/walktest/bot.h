@@ -20,7 +20,7 @@
 #define __BOT_H__
 
 #include "csgeom/math3d.h"
-#include "csengine/meshobj.h"
+#include "iengine/mesh.h"
 
 struct iMeshObject;
 struct iSector;

@@ -37,6 +37,9 @@
 #include "cstool/cspixmap.h"
 #include "ivaria/collider.h"
 #include "iengine/movable.h"
+#include "iengine/sector.h"
+#include "iengine/camera.h"
+#include "imesh/object.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
 

@@ -39,8 +39,11 @@
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/config.h"
 #include "imesh/object.h"
 #include "iengine/mesh.h"
+#include "iengine/camera.h"
+#include "iengine/sector.h"
 #include "ivaria/reporter.h"
 #include "iutil/plugin.h"
 

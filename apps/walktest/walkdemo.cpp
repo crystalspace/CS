@@ -27,6 +27,12 @@
 #include "iengine/campos.h"
 #include "iengine/region.h"
 #include "iengine/material.h"
+#include "iengine/sector.h"
+#include "iengine/camera.h"
+#include "iengine/movable.h"
+#include "iengine/sharevar.h"
+#include "csgeom/poly3d.h"
+#include "imesh/object.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
 #include "csutil/scanstr.h"
@@ -55,8 +61,6 @@
 #include "imesh/sprite3d.h"
 #include "imesh/skeleton.h"
 #include "imap/parser.h"
-
-#include "csengine/light.h"
 
 extern WalkTest* Sys;
 

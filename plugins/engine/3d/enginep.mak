@@ -41,7 +41,7 @@ INF.ENGINE = $(SRCDIR)/plugins/engine/3d/engine.csplugin
 INC.ENGINE = $(wildcard $(addprefix $(SRCDIR)/,plugins/engine/3d/*.h))
 SRC.ENGINE = $(wildcard $(addprefix $(SRCDIR)/,plugins/engine/3d/*.cpp))
 OBJ.ENGINE = $(addprefix $(OUT)/,$(notdir $(SRC.ENGINE:.cpp=$O)))
-DEP.ENGINE = CSENGINE CSTOOL CSGFX CSGEOM CSUTIL
+DEP.ENGINE = CSTOOL CSGFX CSGEOM CSUTIL
 
 MSVC.DSP += ENGINE
 DSP.ENGINE.NAME = engine

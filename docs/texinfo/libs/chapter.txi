@@ -18,13 +18,6 @@ Space. More detailed descriptions of these facilities may be found in later
 sections.
 
 @table @code
-@item csEngine
-The 3d engine is currently moved to a separate plug-in. For documentation on
-the engine, have a look at @ref{csEngine}. In the future the preferred way
-to access the engine will be to use the engine plugin. At this moment
-this is still not fully possible because the @sc{scf} interfaces for the
-engine plugin are not complete yet.
-
 @item csTool
 This library contains various things that are useful for Crystal Space
 but are too specialized in order to be placed in @sc{csEngine}. Currently

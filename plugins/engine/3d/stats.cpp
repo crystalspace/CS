@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Statistics collection variables
+    Copyright (C) 1998 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -15,21 +16,11 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #include "cssysdef.h"
-#include "plugins/engine/3d/engine.h"
+#include "plugins/engine/3d/stats.h"
 
-CS_IMPLEMENT_PLUGIN
-
-/*
- * Package the engine library into a plug-in module.
- * Since the engine is already entirely plug-in compatible (that is, it already
- * implements all necessary SCF goop), all we need to do here is to create a
- * dummy reference to it in order to force the linker to include the engine
- * library in the generated plug-in file.
- */
-void EnginePluginDummyReference()
-{
-  csEngine* p = new csEngine(0);
-  delete p;
-}
+int Stats:: polygons_considered = 0;
+int Stats:: polygons_drawn = 0;
+int Stats:: polygons_accepted = 0;
+int Stats:: polygons_rejected = 0;
+int Stats:: portals_drawn = 0;

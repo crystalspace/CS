@@ -18,7 +18,8 @@
 
 #include "cssysdef.h"
 #include "bot.h"
-#include "csengine/engine.h"
+#include "iengine/engine.h"
+#include "iengine/movable.h"
 #include "iengine/light.h"
 #include "iengine/sector.h"
 

@@ -5,4 +5,4 @@ Help engine : "Crystal Space 3D engine plug-in" ;
 Plugin engine
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith engine : csengine csgeom csgfx cstool csutil ;
+LinkWith engine : csgeom csgfx cstool csutil ;

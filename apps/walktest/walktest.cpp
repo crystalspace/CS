@@ -33,6 +33,8 @@
 #include "iengine/region.h"
 #include "iengine/light.h"
 #include "iengine/motion.h"
+#include "iengine/camera.h"
+#include "iengine/sector.h"
 #include "csgeom/csrect.h"
 #include "csutil/scanstr.h"
 #include "csutil/dataobj.h"
@@ -77,9 +79,6 @@
 #include "iengine/movable.h"
 #include "iengine/campos.h"
 #include "iutil/plugin.h"
-
-#include "csengine/stats.h"
-#include "csengine/light.h"
 
 #if defined(OS_DOS) || defined(OS_WIN32)
 #  include <io.h>

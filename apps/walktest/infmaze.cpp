@@ -28,6 +28,8 @@
 #include "igeom/objmodel.h"
 #include "iengine/light.h"
 #include "iengine/material.h"
+#include "iengine/sector.h"
+#include "iengine/movable.h"
 
 #include "infmaze.h"
 #include "walktest.h"

@@ -44,10 +44,12 @@
 #include "imesh/mdldata.h"
 #include "imesh/crossbld.h"
 #include "iengine/skelbone.h"
+#include "iengine/camera.h"
 #include "iengine/material.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "iutil/vfs.h"
+#include "iutil/config.h"
 #include "iengine/motion.h"
 #include "iengine/light.h"
 #include "ivaria/perfstat.h"
@@ -58,8 +60,12 @@
 #include "igeom/clip2d.h"
 
 
-#include "csengine/radiosty.h"
-#include "csengine/light.h"
+#include "iengine/light.h"
+#include "iengine/sector.h"
+#include "iengine/movable.h"
+#include "iengine/portalcontainer.h"
+#include "iengine/sharevar.h"
+#include "imesh/object.h"
 #include "imap/parser.h"
 
 #include "ivaria/mapnode.h"

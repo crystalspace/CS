@@ -36,7 +36,7 @@
 #include "ivideo/fontserv.h"
 #include "bot.h"
 
-#include "csengine/engine.h"
+#include "iengine/engine.h"
 
 class WalkTest;
 class csPixmap;
