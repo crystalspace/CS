@@ -394,23 +394,30 @@ struct iSectorList : public iBase
   virtual iSector *FindByName (const char *name) = 0;
 };
 
+struct iMaterialList : public iBase
+{
+  virtual iMaterialWrapper *FindByName (const char *name) = 0;
+};
+
+struct iTextureList : public iBase
+{
+  virtual iTextureWrapper *FindByName (const char *name) = 0;
+};
+
 struct iEngine : public iBase
 {
   virtual int GetTextureFormat () = 0;
   virtual void DeleteAll () = 0;
   virtual iTextureWrapper* CreateTexture (const char *iName,
   	const char *iFileName, csColor *iTransp, int iFlags) = 0;
-  virtual iCameraPosition* CreateCameraPosition (const char *iName,
-  	const char *iSector, const csVector3 &iPos, const csVector3 &iForward,
-    const csVector3 &iUpward) = 0;
   virtual bool CreatePlane (const char *iName, const csVector3 &iOrigin,
     const csMatrix3 &iMatrix) = 0;
   virtual iSector *CreateSector (const char *iName, bool link = true) = 0;
-  virtual iMaterialWrapper *FindMaterial (const char *iName,
-  	bool regionOnly = false) = 0;
   virtual iMeshWrapper* CreateSectorWallsMesh (iSector* sector,
       const char* name) = 0;
   virtual iSectorList *GetSectors () = 0;
+  virtual iMaterialList *GetMaterialList () = 0;
+  virtual iTextureList *GetTextureList () = 0;
 };
 
 //****** System Interface

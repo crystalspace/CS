@@ -21,11 +21,12 @@
 
 #include "csutil/scf.h"
 
+class csVector3;
 struct iObject;
 struct iEngine;
 struct iCamera;
 
-SCF_VERSION (iCameraPosition, 0, 0, 1);
+SCF_VERSION (iCameraPosition, 0, 0, 2);
 
 /**
  * A camera position.
@@ -45,6 +46,28 @@ struct iCameraPosition : public iBase
 
   /// Load the camera position into a camera object
   virtual bool Load (iCamera*, iEngine*) = 0;
+
+  virtual void Set (const char *sector, const csVector3 &pos,
+      const csVector3 &forward, const csVector3 &upward) = 0;
+};
+
+SCF_VERSION (iCameraPositionList, 0, 0, 1);
+
+struct iCameraPositionList : public iBase
+{
+  /// Return the number of camera positions in this list.
+  virtual int GetCameraPositionCount () const = 0;
+  /// Return a single camera position.
+  virtual iCameraPosition *GetCameraPosition (int idx) const = 0;
+  /// Create a new empty camera position.
+  virtual iCameraPosition* NewCameraPosition (const char* name) = 0;
+  /// Remove a camera position
+  virtual void RemoveCameraPosition (iCameraPosition *campos) = 0;
+  /// Find a camera position by name
+  virtual iCameraPosition *FindByName (const char *name) const = 0;
+  /// Find a camera position and return its index
+  virtual int Find (iCameraPosition *campos) const = 0;
 };
 
 #endif
+

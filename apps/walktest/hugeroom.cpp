@@ -23,6 +23,7 @@
 #include "imesh/thing/ptextype.h"
 #include "iengine/movable.h"
 #include "iengine/statlght.h"
+#include "iengine/material.h"
 #include "ivaria/reporter.h"
 
 extern WalkTest* Sys;
@@ -103,8 +104,8 @@ iPolygon3D* HugeRoom::create_polygon (iThingState* thing_state,
   switch (txt)
   {
     case 0: tm = NULL; break;
-    case 1: tm = engine->FindMaterial ("txt"); break;
-    case 2: tm = engine->FindMaterial ("txt2"); break;
+    case 1: tm = engine->GetMaterialList ()->FindByName ("txt"); break;
+    case 2: tm = engine->GetMaterialList ()->FindByName ("txt2"); break;
   }
 
   char polname[10];

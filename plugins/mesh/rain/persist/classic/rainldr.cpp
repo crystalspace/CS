@@ -354,7 +354,8 @@ iBase* csRainLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_MATERIAL:
 	{
           csScanStr (params, "%s", str);
-          iMaterialWrapper* mat = engine->FindMaterial (str);
+          iMaterialWrapper* mat = engine->GetMaterialList ()->
+	  	FindByName (str);
 	  if (!mat)
 	  {
             // @@@ Error handling!

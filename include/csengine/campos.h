@@ -82,6 +82,11 @@ public:
     { return scfParent->Forward; }
     virtual bool Load (iCamera *c, iEngine *e)
     { return scfParent->Load (c, e); }
+    virtual void Set (const char *sector, const csVector3 &pos,
+      const csVector3 &forward, const csVector3 &upward)
+    {
+      scfParent->Set (sector, pos, forward, upward);
+    }
   } scfiCameraPosition;
   friend struct CameraPosition;
 };

@@ -9,6 +9,24 @@ The history order is reversed so that new features are at the top.
 	  by calling QueryLight().
 	- Fixed a bad bug with terrain engine and the new vertex buffers.
 	  This bug would cause crashes in various cases.
+	- Added iCollectionList and iCameraPositionList.
+	- Added iCameraPosition::Set().
+	- Removed the following functions from iEngine:
+	    - FindTexture() (either use iRegion::FindTexture() or else
+	      GetTextureList()->FindByName())
+	    - FindMaterial() (same)
+	    - FindCameraPosition() (same)
+	    - FindCollection() (same)
+	    - FindLight() (same)
+	    - CreateCollection() (use new iCollectionList::NewCollection())
+	    - GetCollectionCount() (same)
+	    - GetCollection() (same)
+	    - GetCameraPositionCount() (use new iCameraPositionList)
+	    - GetCameraPosition() (same)
+	    - CreateCameraPosition() (same)
+	  Added the following two functions:
+	    - GetCollections() (returns new iCollectionList)
+	    - GetCameraPositions() (returns new iCameraPositionList)
 	- Eric Sunshine fixed a problem in csutil.mak where CFG.CSUTIL was
 	  incorrectly given the value "scf.cfg mouse.cfg", rather than the
 	  correct value of "scf.cfg data/config/mouse.cfg".

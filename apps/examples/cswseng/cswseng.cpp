@@ -38,6 +38,7 @@
 #include "iengine/mesh.h"
 #include "iengine/light.h"
 #include "iengine/statlght.h"
+#include "iengine/material.h"
 #include "imesh/object.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
@@ -273,11 +274,11 @@ void ceCswsEngineApp::SetupDefaultWorld ()
   engine->DeleteAll ();
   engine->SetLightingCacheMode (0);
 
-  iMaterialWrapper* tm = engine->FindMaterial ("stone");
+  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
   if (!tm)
   {
     LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif");
-    tm = engine->FindMaterial ("stone");
+    tm = engine->GetMaterialList ()->FindByName ("stone");
   }
 
   iSector* room = engine->CreateSector ("room");
@@ -516,7 +517,7 @@ void ceCswsEngineApp::LoadNewMap (const char* filename)
   engine->Prepare ();
 
   // Look for the start sector in this map.
-  iCameraPosition *cp = engine->FindCameraPosition ("Start");
+  iCameraPosition *cp = engine->GetCameraPositions ()->FindByName ("Start");
   const char* room_name;
   start_pos.Set (0, 0, 0);
   if (cp)

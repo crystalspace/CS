@@ -121,7 +121,8 @@ void Cleanup ()
 bool BumpTest::InitProcDemo ()
 {
   iTextureManager* txtmgr = myG3D->GetTextureManager ();
-  iMaterialWrapper* itm = engine->FindMaterial ("wood");
+  iMaterialWrapper* itm = engine->GetMaterialList ()->
+  	FindByName ("wood");
 
   //char *vfsfilename = "/lib/std/mystone2.gif";
   char *vfsfilename = "/lib/std/stone4.gif";
@@ -415,7 +416,8 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
 
   LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif");
   LevelLoader->LoadTexture ("wood", "/lib/std/andrew_wood.gif");
-  iMaterialWrapper* tm = engine->FindMaterial ("stone");
+  iMaterialWrapper* tm = engine->GetMaterialList ()->
+  	FindByName ("stone");
 
   room = engine->CreateSector ("room");
   iMeshWrapper* walls = engine->CreateSectorWallsMesh (room, "walls");
@@ -474,9 +476,11 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
 
 #if 0
   LevelLoader->LoadTexture ("flare_center", "/lib/std/snow.jpg");
-  iMaterialWrapper* fmc = engine->FindMaterial ("flare_center");
+  iMaterialWrapper* fmc = engine->GetMaterialList ()->
+  	FindByName ("flare_center");
   LevelLoader->LoadTexture ("flare_spark", "/lib/std/spark.png");
-  iMaterialWrapper* fms = engine->FindMaterial ("flare_spark");
+  iMaterialWrapper* fms = engine->GetMaterialList ()->
+  	FindByName ("flare_spark");
 #endif
 
   /*

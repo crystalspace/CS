@@ -38,6 +38,7 @@
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
 #include "iengine/halo.h"
+#include "iengine/material.h"
 #include "imesh/thing/thing.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/ptextype.h"
@@ -320,7 +321,8 @@ void Demo::SetupSector ()
   float size = 500.0; /// Size of the skybox -- around 0,0,0 for now.
   iPolygon3D* p;
   p = walls_state->CreatePolygon ("d");
-  p->SetMaterial (engine->FindMaterial ("nebula_d"));
+  p->SetMaterial (engine->GetMaterialList ()->
+  	FindByName ("nebula_d"));
   p->CreateVertex (csVector3 (-size, -size, size));
   p->CreateVertex (csVector3 (size, -size, size));
   p->CreateVertex (csVector3 (size, -size, -size));
@@ -330,7 +332,8 @@ void Demo::SetupSector ()
   p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
 
   p = walls_state->CreatePolygon ("u");
-  p->SetMaterial (engine->FindMaterial ("nebula_u"));
+  p->SetMaterial (engine->GetMaterialList ()->
+  	FindByName ("nebula_u"));
   p->CreateVertex (csVector3 (-size, size, -size));
   p->CreateVertex (csVector3 (size, size, -size));
   p->CreateVertex (csVector3 (size, size, size));
@@ -340,7 +343,8 @@ void Demo::SetupSector ()
   p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
 
   p = walls_state->CreatePolygon ("f");
-  p->SetMaterial (engine->FindMaterial ("nebula_f"));
+  p->SetMaterial (engine->GetMaterialList ()->
+  	FindByName ("nebula_f"));
   p->CreateVertex (csVector3 (-size, size, size));
   p->CreateVertex (csVector3 (size, size, size));
   p->CreateVertex (csVector3 (size, -size, size));
@@ -350,7 +354,8 @@ void Demo::SetupSector ()
   p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
 
   p = walls_state->CreatePolygon ("r");
-  p->SetMaterial (engine->FindMaterial ("nebula_r"));
+  p->SetMaterial (engine->GetMaterialList ()->
+  	FindByName ("nebula_r"));
   p->CreateVertex (csVector3 (size, size, size));
   p->CreateVertex (csVector3 (size, size, -size));
   p->CreateVertex (csVector3 (size, -size, -size));
@@ -360,7 +365,8 @@ void Demo::SetupSector ()
   p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
 
   p = walls_state->CreatePolygon ("l");
-  p->SetMaterial (engine->FindMaterial ("nebula_l"));
+  p->SetMaterial (engine->GetMaterialList ()->
+  	FindByName ("nebula_l"));
   p->CreateVertex (csVector3 (-size, size, -size));
   p->CreateVertex (csVector3 (-size, size, size));
   p->CreateVertex (csVector3 (-size, -size, size));
@@ -370,7 +376,8 @@ void Demo::SetupSector ()
   p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
 
   p = walls_state->CreatePolygon ("b");
-  p->SetMaterial (engine->FindMaterial ("nebula_b"));
+  p->SetMaterial (engine->GetMaterialList ()->
+  	FindByName ("nebula_b"));
   p->CreateVertex (csVector3 (size, size, -size));
   p->CreateVertex (csVector3 (-size, size, -size));
   p->CreateVertex (csVector3 (-size, -size, -size));
@@ -392,7 +399,8 @@ void Demo::SetupSector ()
 
   size = 200.0; /// Size of the skybox -- around 0,0,0 for now.
   p = walls_state->CreatePolygon ("d");
-  p->SetMaterial (engine->FindMaterial ("stars"));
+  p->SetMaterial (engine->GetMaterialList ()->
+  	FindByName ("stars"));
   p->CreateVertex (csVector3 (-size, -size, size));
   p->CreateVertex (csVector3 (size, -size, size));
   p->CreateVertex (csVector3 (size, -size, -size));
@@ -404,7 +412,8 @@ void Demo::SetupSector ()
   pt->SetMixMode (CS_FX_ADD);
 
   p = walls_state->CreatePolygon ("u");
-  p->SetMaterial (engine->FindMaterial ("stars"));
+  p->SetMaterial (engine->GetMaterialList ()->
+  	FindByName ("stars"));
   p->CreateVertex (csVector3 (-size, size, -size));
   p->CreateVertex (csVector3 (size, size, -size));
   p->CreateVertex (csVector3 (size, size, size));
@@ -416,7 +425,8 @@ void Demo::SetupSector ()
   pt->SetMixMode (CS_FX_ADD);
 
   p = walls_state->CreatePolygon ("f");
-  p->SetMaterial (engine->FindMaterial ("stars"));
+  p->SetMaterial (engine->GetMaterialList ()->
+  	FindByName ("stars"));
   p->CreateVertex (csVector3 (-size, size, size));
   p->CreateVertex (csVector3 (size, size, size));
   p->CreateVertex (csVector3 (size, -size, size));
@@ -428,7 +438,8 @@ void Demo::SetupSector ()
   pt->SetMixMode (CS_FX_ADD);
 
   p = walls_state->CreatePolygon ("r");
-  p->SetMaterial (engine->FindMaterial ("stars"));
+  p->SetMaterial (engine->GetMaterialList ()->
+  	FindByName ("stars"));
   p->CreateVertex (csVector3 (size, size, size));
   p->CreateVertex (csVector3 (size, size, -size));
   p->CreateVertex (csVector3 (size, -size, -size));
@@ -440,7 +451,8 @@ void Demo::SetupSector ()
   pt->SetMixMode (CS_FX_ADD);
 
   p = walls_state->CreatePolygon ("l");
-  p->SetMaterial (engine->FindMaterial ("stars"));
+  p->SetMaterial (engine->GetMaterialList ()->
+  	FindByName ("stars"));
   p->CreateVertex (csVector3 (-size, size, -size));
   p->CreateVertex (csVector3 (-size, size, size));
   p->CreateVertex (csVector3 (-size, -size, size));
@@ -452,7 +464,8 @@ void Demo::SetupSector ()
   pt->SetMixMode (CS_FX_ADD);
 
   p = walls_state->CreatePolygon ("b");
-  p->SetMaterial (engine->FindMaterial ("stars"));
+  p->SetMaterial (engine->GetMaterialList ()->
+  	FindByName ("stars"));
   p->CreateVertex (csVector3 (size, size, -size));
   p->CreateVertex (csVector3 (-size, size, -size));
   p->CreateVertex (csVector3 (-size, -size, -size));
@@ -471,12 +484,18 @@ void Demo::SetupSector ()
   	csColor (1, 1, 1), false);
   iLight* il = SCF_QUERY_INTERFACE (light, iLight);
   iFlareHalo* flare = il->CreateFlareHalo ();
-  iMaterialWrapper* ifmc = engine->FindMaterial ("flare_center");
-  iMaterialWrapper* ifm1 = engine->FindMaterial ("flare_spark1");
-  iMaterialWrapper* ifm2 = engine->FindMaterial ("flare_spark2");
-  iMaterialWrapper* ifm3 = engine->FindMaterial ("flare_spark3");
-  iMaterialWrapper* ifm4 = engine->FindMaterial ("flare_spark4");
-  iMaterialWrapper* ifm5 = engine->FindMaterial ("flare_spark5");
+  iMaterialWrapper* ifmc = engine->GetMaterialList ()->
+  	FindByName ("flare_center");
+  iMaterialWrapper* ifm1 = engine->GetMaterialList ()->
+  	FindByName ("flare_spark1");
+  iMaterialWrapper* ifm2 = engine->GetMaterialList ()->
+  	FindByName ("flare_spark2");
+  iMaterialWrapper* ifm3 = engine->GetMaterialList ()->
+  	FindByName ("flare_spark3");
+  iMaterialWrapper* ifm4 = engine->GetMaterialList ()->
+  	FindByName ("flare_spark4");
+  iMaterialWrapper* ifm5 = engine->GetMaterialList ()->
+  	FindByName ("flare_spark5");
   flare->AddComponent (0.0, 1.2, 1.2, CS_FX_ADD, ifmc); // pos, w, h, mixmode
   flare->AddComponent (0.3, 0.1, 0.1, CS_FX_ADD, ifm3);
   flare->AddComponent (0.6, 0.4, 0.4, CS_FX_ADD, ifm4);
@@ -510,7 +529,8 @@ void Demo::SetupObjects ()
   sat->SetZBufMode (CS_ZBUF_USE);
   bs = SCF_QUERY_INTERFACE (sat->GetMeshObject (), iBallState);
   bs->SetRadius (50, 50, 50);
-  bs->SetMaterialWrapper (engine->FindMaterial ("saturn"));
+  bs->SetMaterialWrapper (engine->GetMaterialList ()->
+  	FindByName ("saturn"));
   bs->SetCylindricalMapping (true);
   bs->SetRimVertices (16);
   sat->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
@@ -524,7 +544,8 @@ void Demo::SetupObjects ()
   jup->SetZBufMode (CS_ZBUF_USE);
   bs = SCF_QUERY_INTERFACE (jup->GetMeshObject (), iBallState);
   bs->SetRadius (50, 50, 50);
-  bs->SetMaterialWrapper (engine->FindMaterial ("jupiter"));
+  bs->SetMaterialWrapper (engine->GetMaterialList ()->
+  	FindByName ("jupiter"));
   bs->SetCylindricalMapping (true);
   bs->SetRimVertices (16);
   jup->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
@@ -538,7 +559,8 @@ void Demo::SetupObjects ()
   earth->SetZBufMode (CS_ZBUF_USE);
   bs = SCF_QUERY_INTERFACE (earth->GetMeshObject (), iBallState);
   bs->SetRadius (25, 25, 25);
-  bs->SetMaterialWrapper (engine->FindMaterial ("earth"));
+  bs->SetMaterialWrapper (engine->GetMaterialList ()->
+  	FindByName ("earth"));
   bs->SetCylindricalMapping (true);
   bs->SetRimVertices (16);
   earth->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
@@ -552,7 +574,8 @@ void Demo::SetupObjects ()
   clouds->SetZBufMode (CS_ZBUF_TEST);
   bs = SCF_QUERY_INTERFACE (clouds->GetMeshObject (), iBallState);
   bs->SetRadius (27.5, 27.5, 27.5);
-  bs->SetMaterialWrapper (engine->FindMaterial ("earthclouds"));
+  bs->SetMaterialWrapper (engine->GetMaterialList ()->
+  	FindByName ("earthclouds"));
   bs->SetCylindricalMapping (true);
   bs->SetRimVertices (16);
   bs->SetMixMode (CS_FX_ADD);

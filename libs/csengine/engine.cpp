@@ -124,6 +124,103 @@ void csEngine::ReportBug (const char* description, ...)
 
 //---------------------------------------------------------------------------
 
+SCF_IMPLEMENT_IBASE (csCameraPositionList)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iCameraPositionList)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csCameraPositionList::CameraPositionList)
+  SCF_IMPLEMENTS_INTERFACE (iCameraPositionList)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+csCameraPositionList::csCameraPositionList ()
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCameraPositionList);
+}
+
+bool csCameraPositionList::FreeItem (csSome Item)
+{
+  iCameraPosition* campos = (iCameraPosition*)Item;
+  campos->DecRef ();
+  return true;
+}
+
+iCameraPosition* csCameraPositionList::NewCameraPosition (const char* name)
+{
+  csVector3 v (0);
+  csCameraPosition* newcp = new csCameraPosition (name, "", v, v, v);
+  iCameraPosition* cp = &(newcp->scfiCameraPosition);
+  Push (cp);
+  return cp;
+}
+
+void csCameraPositionList::RemoveCameraPosition (iCameraPosition *campos)
+{
+  int n = Find (campos);
+  if (n >= 0) Delete (n); 
+}
+
+int csCameraPositionList::CameraPositionList::GetCameraPositionCount () const
+{ return scfParent->Length (); }
+iCameraPosition *csCameraPositionList::CameraPositionList::
+	GetCameraPosition (int idx) const
+{ return scfParent->Get (idx); }
+iCameraPosition *csCameraPositionList::CameraPositionList::FindByName
+	(const char *name) const
+{ return scfParent->FindByName (name); }
+int csCameraPositionList::CameraPositionList::Find
+	(iCameraPosition *campos) const
+{ return scfParent->Find (campos); }
+
+//---------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE (csCollectionList)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iCollectionList)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csCollectionList::CollectionList)
+  SCF_IMPLEMENTS_INTERFACE (iCollectionList)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+csCollectionList::csCollectionList ()
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCollectionList);
+}
+
+bool csCollectionList::FreeItem (csSome Item)
+{
+  iCollection* collection = (iCollection*)Item;
+  collection->DecRef ();
+  return true;
+}
+
+iCollection* csCollectionList::NewCollection (const char* name)
+{
+  csCollection* c = new csCollection (csEngine::current_engine);
+  c->SetName (name);
+  Push (&(c->scfiCollection));
+  return &(c->scfiCollection);
+}
+
+void csCollectionList::RemoveCollection (iCollection *collection)
+{
+  int n = Find (collection);
+  if (n >= 0) Delete (n); 
+}
+
+int csCollectionList::CollectionList::GetCollectionCount () const
+{ return scfParent->Length (); }
+iCollection *csCollectionList::CollectionList::GetCollection (int idx) const
+{ return scfParent->Get (idx); }
+iCollection *csCollectionList::CollectionList::FindByName
+	(const char *name) const
+{ return scfParent->FindByName (name); }
+int csCollectionList::CollectionList::Find (iCollection *collection) const
+{ return scfParent->Find (collection); }
+
+//---------------------------------------------------------------------------
+
 bool csEngineMeshList::FreeItem (csSome Item)
 {
   iMeshWrapper* mesh = (iMeshWrapper*)Item;
@@ -452,7 +549,7 @@ SCF_EXPORT_CLASS_TABLE (engine)
       "crystalspace.graphic.image.io.")
 SCF_EXPORT_CLASS_TABLE_END
 
-csEngine::csEngine (iBase *iParent) : sectors (true), camera_positions (16, 16)
+csEngine::csEngine (iBase *iParent) : sectors (true)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
@@ -660,15 +757,13 @@ void csEngine::DeleteAll ()
   nextframe_pending = 0;
   if (G3D) G3D->ClearCache ();
   halos.DeleteAll ();
-  int i;
-  for (i = collections.Length () -1; i >= 0 ; i--)
-    RemoveCollection ((csCollection*)collections.Get (i));
-
+  collections.DeleteAll ();
   meshes.DeleteAll ();
   mesh_factories.DeleteAll ();
   curve_templates.DeleteAll ();
 
 // @@@ I suppose the loop below is no longer needed?
+  int i;
   for (i = 0 ; i < sectors.Length () ; i++)
   {
     csSector* sect = sectors[i]->GetPrivateObject ();
@@ -1447,13 +1542,6 @@ void csEngine::ReadConfig (iConfigFile* Config)
         ("Engine.Lighting.Radiosity.SourcePatchSize", csRadiosity::source_patch_size);
 }
 
-void csEngine::RemoveCollection (csCollection* collection)
-{
-  int idx = collections.Find (collection);
-  if (idx == -1) return;
-  collections.Delete (idx);
-}
-
 struct LightAndDist
 {
   iLight* light;
@@ -1706,21 +1794,6 @@ iMaterialWrapper* csEngine::CreateMaterial (const char *iName, iTextureWrapper* 
   return wrapper;
 }
 
-iCameraPosition *csEngine::CreateCameraPosition (const char *iName, const char *iSector,
-  const csVector3 &iPos, const csVector3 &iForward, const csVector3 &iUpward)
-{
-  csCameraPosition *cp = (csCameraPosition *)camera_positions.FindByName (iName);
-  if (cp)
-    cp->Set (iSector, iPos, iForward, iUpward);
-  else
-  {
-    cp = new csCameraPosition (iName, iSector, iPos, iForward, iUpward);
-    camera_positions.Push (cp);
-  }
-
-  return &(cp->scfiCameraPosition);
-}
-
 bool csEngine::CreatePlane (const char *iName, const csVector3 &iOrigin,
   const csMatrix3 &iMatrix)
 {
@@ -1836,75 +1909,9 @@ iMaterialList* csEngine::GetMaterialList () const
   return &(GetMaterials ()->scfiMaterialList);
 }
 
-iMaterialWrapper* csEngine::FindMaterial (const char* iName,
-  bool regionOnly) const
-{
-  iMaterialWrapper* wr;
-  if (regionOnly && region)
-  {
-    iObject* obj = FindObjectInRegion (region, *materials->GetObjectVector (), iName);
-    if (!obj) return NULL;
-    wr = SCF_QUERY_INTERFACE_FAST (obj, iMaterialWrapper);
-  }
-  else
-    wr = materials->FindByName (iName);
-  return wr;
-}
-
-iTextureWrapper* csEngine::FindTexture (const char* iName,
-  bool regionOnly) const
-{
-  iTextureWrapper* wr;
-  if (regionOnly && region)
-  {
-    iObject* obj = FindObjectInRegion (region, *textures->GetObjectVector (), iName);
-    if (!obj) return NULL;
-    wr = SCF_QUERY_INTERFACE_FAST (obj, iTextureWrapper);
-  }
-  else
-    wr = textures->FindByName (iName);
-  return wr;
-}
-
-iCameraPosition* csEngine::FindCameraPosition (const char* iName,
-  bool regionOnly) const
-{
-  csCameraPosition* wr;
-  if (regionOnly && region)
-    wr = (csCameraPosition*)FindObjectInRegion (region, camera_positions, iName);
-  else
-    wr = (csCameraPosition*)camera_positions.FindByName (iName);
-  if (!wr) return NULL;
-  return &wr->scfiCameraPosition;
-}
-
-iCollection* csEngine::FindCollection (const char* iName,
-  bool regionOnly) const
-{
-  csCollection* c;
-  if (regionOnly && region)
-    c = (csCollection*)FindObjectInRegion (region, collections, iName);
-  else
-    c = (csCollection*)collections.FindByName (iName);
-  if (!c) return NULL;
-  return &c->scfiCollection;
-}
-
 iCamera* csEngine::CreateCamera ()
 {
   return &(new csCamera ())->scfiCamera;
-}
-
-iCollection* csEngine::CreateCollection (const char* iName)
-{
-  csCollection *c = (csCollection *)collections.FindByName (iName);
-  if (c)
-    return &(c->scfiCollection);
-
-  c = new csCollection(this);
-  c->SetName(iName);
-  collections.Push(c);
-  return &(c->scfiCollection);
 }
 
 iStatLight* csEngine::CreateLight (const char* name,
@@ -2258,32 +2265,6 @@ iGraphics3D *csEngine::GetContext () const
 iClipper2D* csEngine::GetTopLevelClipper () const
 {
   return top_clipper;
-}
-
-int csEngine::GetCollectionCount () const
-{
-  return collections.Length ();
-}
-
-iCollection* csEngine::GetCollection (int idx) const
-{
-  return &((csCollection*)collections.Get(idx))->scfiCollection;
-}
-
-int csEngine::GetCameraPositionCount () const
-{
-  return camera_positions.Length ();
-}
-
-iCameraPosition* csEngine::GetCameraPosition (int idx) const
-{
-  return &((csCameraPosition*)camera_positions.Get (idx))->scfiCameraPosition;
-}
-
-iCameraPosition* csEngine::GetCameraPosition (const char* name) const
-{
-  return &((csCameraPosition*)camera_positions.FindByName (name))
-  	->scfiCameraPosition;
 }
 
 void csEngine::SetAmbientLight (const csColor &c)

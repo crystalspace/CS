@@ -193,7 +193,8 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
 	{
 	  int i;
           csScanStr (pParams, "%d,%s", &i, pStr);
-          iMaterialWrapper* mat = iEngine->FindMaterial (pStr);
+          iMaterialWrapper* mat = iEngine->GetMaterialList ()->
+	  	FindByName (pStr);
 	  if (!mat)
 	  {
             // @@@ Error handling!
@@ -208,7 +209,8 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
 		int i, j = iTerrainState->GetXResolution();
 		j = j * j;
 		csScanStr( pParams, "%s", pStr);
-		iMaterialWrapper *mat = iEngine->FindMaterial(pStr);
+		iMaterialWrapper *mat = iEngine->GetMaterialList ()->
+			FindByName (pStr);
 		if (!mat) 
 		{
 		  printf("Terrain func loader: Cant find requested material '%s'\n",pStr);

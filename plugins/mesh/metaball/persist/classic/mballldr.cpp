@@ -352,7 +352,8 @@ iBase* csMetaBallLoader::Parse (const char* string, iEngine* engine,
 	{
 	  if (!ballstate) { printf("Please set FACTORY before MATERIAL\n"); return NULL; }
           csScanStr (params, "%s", str);
-          iMaterialWrapper* mat = engine->FindMaterial (str);
+          iMaterialWrapper* mat = engine->GetMaterialList ()->
+	  	FindByName (str);
 	  if (!mat)
 	  {
             // @@@ Error handling!

@@ -32,6 +32,8 @@
 #include "iutil/comp.h"
 #include "isys/system.h"
 #include "iengine/engine.h"
+#include "iengine/collectn.h"
+#include "iengine/campos.h"
 #include "iutil/config.h"
 
 class csRegion;
@@ -42,7 +44,6 @@ class csTextureList;
 class csMaterialList;
 class csPolygon3D;
 class csCamera;
-class csCollection;
 class csStatLight;
 class csDynLight;
 class csCBufferCube;
@@ -231,6 +232,83 @@ public:
   iObject* Fetch ();
 };
 
+CS_DECLARE_OBJECT_VECTOR (csCollectionListHelper, iCollection);
+
+/**
+ * List of collections for the engine. This class implements iCollectionList.
+ */
+class csCollectionList : public csCollectionListHelper
+{
+public:
+  SCF_DECLARE_IBASE;
+
+  /// constructor
+  csCollectionList ();
+
+  /// Override FreeItem
+  virtual bool FreeItem (csSome Item);
+  /// Create a new collection.
+  virtual iCollection* NewCollection (const char* name);
+  /// Remove a collection.
+  virtual void RemoveCollection (iCollection* collection);
+
+  class CollectionList : public iCollectionList
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csCollectionList);
+    virtual int GetCollectionCount () const;
+    virtual iCollection *GetCollection (int idx) const;
+    virtual iCollection* NewCollection (const char* name)
+    {
+      return scfParent->NewCollection (name);
+    }
+    virtual void RemoveCollection (iCollection *collection)
+    {
+      scfParent->RemoveCollection (collection);
+    }
+    virtual iCollection *FindByName (const char *name) const;
+    virtual int Find (iCollection *collection) const;
+  } scfiCollectionList;
+};
+
+CS_DECLARE_OBJECT_VECTOR (csCameraPositionListHelper, iCameraPosition);
+
+/**
+ * List of camera positions for the engine. This class implements
+ * iCameraPosition.
+ */
+class csCameraPositionList : public csCameraPositionListHelper
+{
+public:
+  SCF_DECLARE_IBASE;
+
+  /// constructor
+  csCameraPositionList ();
+
+  /// Override FreeItem
+  virtual bool FreeItem (csSome Item);
+  /// New camera position.
+  virtual iCameraPosition* NewCameraPosition (const char* name);
+  /// Remove a camera position.
+  virtual void RemoveCameraPosition (iCameraPosition* campos);
+
+  class CameraPositionList : public iCameraPositionList
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csCameraPositionList);
+    virtual int GetCameraPositionCount () const;
+    virtual iCameraPosition *GetCameraPosition (int idx) const;
+    virtual iCameraPosition* NewCameraPosition (const char* name)
+    {
+      return scfParent->NewCameraPosition (name);
+    }
+    virtual void RemoveCameraPosition (iCameraPosition *campos)
+    {
+      scfParent->RemoveCameraPosition (campos);
+    }
+    virtual iCameraPosition *FindByName (const char *name) const;
+    virtual int Find (iCameraPosition *campos) const;
+  } scfiCameraPositionList;
+};
+
 /**
  * A list of meshes for the engine.
  */
@@ -313,13 +391,9 @@ public:
 
   /**
    * List of all collections in the engine. This vector contains objects
-   * of type csCollection*. Use RemoveCollection()
-   * to remove collections from this list. These functions
-   * take care of correctly removing the collections from all sectors
-   * as well. Note that after you add a collection to the list you still
-   * need to add it to all sectors that you want it to be visible in.
+   * of type iCollection*.
    */
-  csNamedObjVector collections;
+  csCollectionList collections;
 
   /**
    * List of mesh object factories. This vector contains objects of
@@ -345,7 +419,7 @@ public:
   /**
    * The list of all camera position objects.
    */
-  csNamedObjVector camera_positions;
+  csCameraPositionList camera_positions;
 
   /// Remember dimensions of display.
   static int frame_width, frame_height;
@@ -891,12 +965,6 @@ public:
   csStatLight* FindCsLight (const char* name, bool regionOnly = false) const;
 
   /**
-   * Unlink and delete a collection from the engine.
-   * It is also removed from all sectors.
-   */
-  void RemoveCollection (csCollection* collection);
-
-  /**
    * Create an iterator to iterate over all static lights of the engine.
    */
   csLightIt* NewLightIterator (csRegion* region = NULL)
@@ -1007,9 +1075,6 @@ public:
     csColor *iTransp, int iFlags);
   /// Register a material to be loaded during Prepare()
   virtual iMaterialWrapper* CreateMaterial (const char *iName, iTextureWrapper* texture);
-  /// Create a named camera position object
-  virtual iCameraPosition* CreateCameraPosition (const char *iName, const char *iSector,
-    const csVector3 &iPos, const csVector3 &iForward, const csVector3 &iUpward);
   /// Create a texture plane
   virtual bool CreatePlane (const char *iName, const csVector3 &iOrigin,
     const csMatrix3 &iMatrix);
@@ -1026,21 +1091,12 @@ public:
   /// Return the list of meshes
   virtual iMeshList *GetMeshes ()
     { return &meshes.scfiMeshList; }
-
-  /// Find a loaded texture by name.
-  virtual iTextureWrapper* FindTexture (const char* iName,
-  	bool regionOnly = false) const;
-  /// Find a loaded material by name.
-  virtual iMaterialWrapper* FindMaterial (const char* iName,
-  	bool regionOnly = false) const;
-  /// Find a loaded camera position by name.
-  virtual iCameraPosition* FindCameraPosition (const char* iName,
-  	bool regionOnly = false) const;
-  /// Find a collection by name
-  virtual iCollection* FindCollection (const char* iName,
-  	bool regionOnly = false) const;
-  /// Create a new collection.
-  virtual iCollection* CreateCollection (const char* iName);
+  /// Return the list of collections
+  virtual iCollectionList *GetCollections ()
+    { return &collections.scfiCollectionList; }
+  /// Return the list of camera positions.
+  virtual iCameraPositionList *GetCameraPositions ()
+    { return &camera_positions.scfiCameraPositionList; }
 
   /// Create a new camera.
   virtual iCamera* CreateCamera ();
@@ -1096,18 +1152,6 @@ public:
   	bool regionOnly = false) const;
 
   virtual iClipper2D* GetTopLevelClipper () const;
-
-  /// Get the number of collections in the engine
-  virtual int GetCollectionCount () const;
-  /// Get a collection by its index
-  virtual iCollection* GetCollection (int idx) const;
-
-  /// Get the number of camera positions in the engine.
-  virtual int GetCameraPositionCount () const;
-  /// Get a camera position by its index.
-  virtual iCameraPosition* GetCameraPosition (int idx) const;
-  /// Get a camera position by its name.
-  virtual iCameraPosition* GetCameraPosition (const char* name) const;
 
   /// Set the amount of ambient light
   virtual void SetAmbientLight (const csColor &c);

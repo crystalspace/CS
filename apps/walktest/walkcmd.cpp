@@ -299,7 +299,7 @@ void move_mesh (iMeshWrapper* sprite, iSector* where, csVector3 const& pos)
 void load_meshobj (char *filename, char *templatename, char* txtname)
 {
   // First check if the texture exists.
-  if (!Sys->view->GetEngine ()->FindMaterial (txtname))
+  if (!Sys->view->GetEngine ()->GetMaterialList ()->FindByName (txtname))
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
     	"Can't find material '%s' in memory!", txtname);
@@ -315,7 +315,7 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
 
     // Add this sprite template to the engine.
     iSprite3DFactoryState* fstate = SCF_QUERY_INTERFACE (result, iSprite3DFactoryState);
-    fstate->SetMaterialWrapper (Sys->Engine->FindMaterial (txtname));
+    fstate->SetMaterialWrapper (Sys->Engine->GetMaterialList ()->FindByName (txtname));
     fstate->DecRef ();
     Sys->Engine->CreateMeshFactory (result, templatename);
   } else {
@@ -342,7 +342,7 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
     csModelDataTools::MergeObjects (Model, false);
     iMeshFactoryWrapper *wrap =
       Sys->CrossBuilder->BuildSpriteFactoryHierarchy (Model, Sys->Engine,
-      Sys->Engine->FindMaterial (txtname));
+      Sys->Engine->GetMaterialList ()->FindByName (txtname));
     Model->DecRef ();
     wrap->QueryObject ()->SetName (templatename);
   }
@@ -1374,7 +1374,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       char buf[255];
       *buf = 0;
       if (arg) csScanStr (arg, "%s", buf);
-      iMaterialWrapper* mat = Sys->view->GetEngine ()->FindMaterial (buf);
+      iMaterialWrapper* mat = Sys->view->GetEngine ()->GetMaterialList ()->FindByName (buf);
       if (mat)
       {
         Sys->fs_fadetxt_mat = mat->GetMaterialHandle ();

@@ -88,8 +88,7 @@ void csRegion::Region::DeleteAll ()
       iCollection* o = SCF_QUERY_INTERFACE_FAST (obj, iCollection);
       if (!o) continue;
       o->DecRef ();
-      scfParent->engine->RemoveCollection (
-      	((csCollection::Collection*)o)->scfParent);
+      scfParent->engine->GetCollections ()->RemoveCollection (o);
       scfParent->ObjRemove (obj);	// Remove from this region.
       copy[i] = NULL;
     }
@@ -189,10 +188,9 @@ void csRegion::Region::DeleteAll ()
       iCameraPosition* o = SCF_QUERY_INTERFACE_FAST (obj, iCameraPosition);
       if (!o) continue;
       o->DecRef ();
-      int idx = scfParent->engine->camera_positions.Find (
-        ((csCameraPosition::CameraPosition*)o)->scfParent);
+      int idx = scfParent->engine->GetCameraPositions ()->Find (o);
       if (idx != -1)
-        scfParent->engine->camera_positions.Delete (idx);
+        scfParent->engine->GetCameraPositions ()->RemoveCameraPosition (o);
       else
         o->DecRef ();
       scfParent->ObjRemove (obj);	// Remove from this region.

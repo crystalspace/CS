@@ -63,6 +63,7 @@
 #include "iengine/light.h"
 #include "iengine/statlght.h"
 #include "iengine/dynlight.h"
+#include "iengine/material.h"
 #include "iengine/engine.h"
 #include "iengine/mesh.h"
 #include "iengine/camera.h"
@@ -1850,24 +1851,25 @@ void Blocks::InitTextures ()
 {
   if (engine) engine->DeleteAll ();
 
+  iMaterialList* ml = engine->GetMaterialList ();
   LevelLoader->LoadTexture ("pillar", "stone4.png");
-  Sys->set_pillar_material (engine->FindMaterial ("pillar"));
+  Sys->set_pillar_material (ml->FindByName ("pillar"));
 
   LevelLoader->LoadTexture ("cube", "cube.png");
-  Sys->set_cube_material (engine->FindMaterial ("cube"));
+  Sys->set_cube_material (ml->FindByName ("cube"));
   LevelLoader->LoadTexture ("raster", "clouds_thick1.jpg");
-  Sys->set_raster_material (engine->FindMaterial ("raster"));
+  Sys->set_raster_material (ml->FindByName ("raster"));
   LevelLoader->LoadTexture ("room", "mystone2.png");
   LevelLoader->LoadTexture ("clouds", "clouds.jpg");
 
   LevelLoader->LoadTexture ("cubef1", "cubef1.png");
-  Sys->set_cube_f1_material (engine->FindMaterial ("cubef1"));
+  Sys->set_cube_f1_material (ml->FindByName ("cubef1"));
   LevelLoader->LoadTexture ("cubef2", "cubef2.png");
-  Sys->set_cube_f2_material (engine->FindMaterial ("cubef2"));
+  Sys->set_cube_f2_material (ml->FindByName ("cubef2"));
   LevelLoader->LoadTexture ("cubef3", "cubef3.png");
-  Sys->set_cube_f3_material (engine->FindMaterial ("cubef3"));
+  Sys->set_cube_f3_material (ml->FindByName ("cubef3"));
   LevelLoader->LoadTexture ("cubef4", "cubef4.png");
-  Sys->set_cube_f4_material (engine->FindMaterial ("cubef4"));
+  Sys->set_cube_f4_material (ml->FindByName ("cubef4"));
 
   LevelLoader->LoadTexture ("menu_novice", "novice.png");
   LevelLoader->LoadTexture ("menu_back", "back.png");
@@ -1963,7 +1965,7 @@ void Blocks::DrawMenu (float menu_trans, float menu_hor_trans, int old_menu,
 
 void Blocks::CreateMenuEntry (const char* mat, int menu_nr)
 {
-  iMaterialWrapper* tm_front = engine->FindMaterial (mat);
+  iMaterialWrapper* tm_front = engine->GetMaterialList ()->FindByName (mat);
 
   iMeshWrapper* thing_wrap = CreateMeshWrapper ("menu");
   iThingState* thing_state = SCF_QUERY_INTERFACE (thing_wrap->GetMeshObject (),
@@ -2002,7 +2004,7 @@ void Blocks::CreateMenuEntry (const char* mat, int menu_nr)
 
 iMeshWrapper* Blocks::CreateMenuArrow (bool left)
 {
-  iMaterialWrapper* tm_front = engine->FindMaterial ("menu_back");
+  iMaterialWrapper* tm_front = engine->GetMaterialList ()->FindByName ("menu_back");
 
   iMeshWrapper* thing_wrap = CreateMeshWrapper ("menu");
   iThingState* thing_state = SCF_QUERY_INTERFACE (thing_wrap->GetMeshObject (),
@@ -2148,7 +2150,7 @@ void Blocks::StartKeyConfig ()
 
 void Blocks::InitGameRoom ()
 {
-  iMaterialWrapper* tm = engine->FindMaterial ("room");
+  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("room");
   room = Sys->engine->CreateSector ("room");
   iMeshWrapper* walls = Sys->engine->CreateSectorWallsMesh (room, "walls");
   iThingState* walls_state = SCF_QUERY_INTERFACE (walls->GetMeshObject (),
@@ -2237,7 +2239,7 @@ void Blocks::InitGameRoom ()
 
 void Blocks::InitDemoRoom ()
 {
-  iMaterialWrapper* demo_tm = engine->FindMaterial ("clouds");
+  iMaterialWrapper* demo_tm = engine->GetMaterialList ()->FindByName ("clouds");
   demo_room = Sys->engine->CreateSector ("room");
   iMeshWrapper* walls = Sys->engine->CreateSectorWallsMesh (demo_room, "walls");
   iThingState* walls_state = SCF_QUERY_INTERFACE (walls->GetMeshObject (),

@@ -1514,7 +1514,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     Create2DSprites ();
 
     // Look for the start sector in this map.
-    iCameraPosition *cp = Engine->FindCameraPosition ("Start");
+    iCameraPosition *cp = Engine->GetCameraPositions ()->FindByName ("Start");
     const char *room_name;
     if (cp)
     {

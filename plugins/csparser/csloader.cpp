@@ -46,6 +46,7 @@
 #include "iengine/sector.h"
 #include "iengine/movable.h"
 #include "iengine/halo.h"
+#include "iengine/campos.h"
 #include "iengine/light.h"
 #include "iengine/statlght.h"
 #include "iengine/mesh.h"
@@ -181,11 +182,19 @@ void csLoader::ReportNotify (const char* description, ...)
 
 iMaterialWrapper *csLoader::FindMaterial (const char *iName)
 {
-  iMaterialWrapper *mat = Engine->FindMaterial (iName, ResolveOnlyRegion);
+  iMaterialWrapper* mat;
+  if (ResolveOnlyRegion && Engine->GetCurrentRegion ())
+    mat = Engine->GetCurrentRegion ()->FindMaterial (iName);
+  else
+    mat = Engine->GetMaterialList ()->FindByName (iName);
   if (mat)
     return mat;
 
-  iTextureWrapper *tex = Engine->FindTexture (iName, ResolveOnlyRegion);
+  iTextureWrapper* tex;
+  if (ResolveOnlyRegion && Engine->GetCurrentRegion ())
+    tex = Engine->GetCurrentRegion ()->FindTexture (iName);
+  else
+    tex = Engine->GetTextureList ()->FindByName (iName);
   if (tex)
   {
     // Add a default material with the same name as the texture
@@ -371,8 +380,10 @@ bool csLoader::LoadMap (char* buf)
           char start_sector [100];
           csVector3 pos (0, 0, 0);
           csScanStr (params, "%s,%f,%f,%f", &start_sector, &pos.x, &pos.y, &pos.z);
-          Engine->CreateCameraPosition("Start", start_sector, pos,
-	    csVector3 (0, 0, 1), csVector3 (0, 1, 0));
+	  iCameraPosition* campos = Engine->GetCameraPositions ()->
+	  	NewCameraPosition ("Start");
+	  campos->Set (start_sector, pos, csVector3 (0, 0, 1),
+	  	csVector3 (0, 1, 0));
           break;
         }
         case CS_TOKEN_KEY:
@@ -1825,7 +1836,7 @@ iCollection* csLoader::ParseCollection (char* name, char* buf)
   long cmd;
   char* params;
 
-  iCollection* collection = Engine->CreateCollection(name);
+  iCollection* collection = Engine->GetCollections ()->NewCollection (name);
 
   char str[255];
   while ((cmd = csGetObject (&buf, commands, &xname, &params)) > 0)
@@ -1864,7 +1875,19 @@ iCollection* csLoader::ParseCollection (char* name, char* buf)
       case CS_TOKEN_LIGHT:
         {
           csScanStr (params, "%s", str);
-	  iStatLight* l = Engine->FindLight (str, ResolveOnlyRegion);
+	  iLight* l = NULL;
+	  iSectorList* sl = Engine->GetSectors ();
+	  int i;
+	  for (i = 0 ; i < sl->GetSectorCount () ; i++)
+	  {
+	    iSector* sect = sl->GetSector (i);
+	    if ((!ResolveOnlyRegion) || (!Engine->GetCurrentRegion ()) ||
+	      Engine->GetCurrentRegion ()->IsInRegion (sect->QueryObject ()))
+	    {
+	      l = sect->GetLights ()->FindByName (str);
+	      if (l) break;
+	    }
+	  }
           if (!l)
 	  {
 	    ReportError (
@@ -1895,7 +1918,11 @@ iCollection* csLoader::ParseCollection (char* name, char* buf)
         {
           csScanStr (params, "%s", str);
 	  //@@@$$$ TODO: Collection in regions.
-          iCollection* th = Engine->FindCollection(str, ResolveOnlyRegion);
+	  iCollection* th;
+	  if (ResolveOnlyRegion && Engine->GetCurrentRegion ())
+	    th = Engine->GetCurrentRegion ()->FindCollection (str);
+	  else
+            th = Engine->GetCollections ()->FindByName (str);
           if (!th)
 	  {
 	    ReportError (

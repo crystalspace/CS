@@ -44,6 +44,7 @@ struct iMaterialList;
 struct iTextureWrapper;
 struct iTextureList;
 struct iCameraPosition;
+struct iCameraPositionList;
 struct iRegion;
 struct iGraphics3D;
 struct iClipper2D;
@@ -51,6 +52,7 @@ struct iPolyTxtPlane;
 struct iCurveTemplate;
 struct iObject;
 struct iCollection;
+struct iCollectionList;
 struct iDataBuffer;
 struct iCamera;
 struct iRenderView;
@@ -144,7 +146,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 4, 0);
+SCF_VERSION (iEngine, 0, 5, 0);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -247,10 +249,6 @@ struct iEngine : public iBase
   /// Register a material to be loaded during Prepare()
   virtual iMaterialWrapper* CreateMaterial (const char *iName,
   	iTextureWrapper* texture) = 0;
-  /// Create a named camera position object
-  virtual iCameraPosition* CreateCameraPosition (const char *iName,
-	const char *iSector, const csVector3 &iPos,
-	const csVector3 &iForward, const csVector3 &iUpward) = 0;
   /// Create a texture plane
   virtual bool CreatePlane (const char *iName, const csVector3 &iOrigin,
 	const csMatrix3 &iMatrix) = 0;
@@ -275,46 +273,14 @@ struct iEngine : public iBase
   virtual iMeshFactoryList* GetMeshFactories () = 0;
   /// Get the list of meshes
   virtual iMeshList* GetMeshes () = 0;
-
-  /**
-   * Find a texture by name. If regionOnly is true then the returned
-   * texture will belong to the current region. Note that this is different
-   * from calling iRegion::FindTexture() because the latter will also
-   * return textures that belong in a region but are not connected to the
-   * engine.
-   */
-  virtual iTextureWrapper* FindTexture (const char* iName,
-  	bool regionOnly = false) const = 0;
-  /**
-   * Find a material by name. If regionOnly is true then the returned
-   * material will belong to the current region. Note that this is different
-   * from calling iRegion::FindMaterial() because the latter will also
-   * return materials that belong in a region but are not connected to the
-   * engine.
-   */
-  virtual iMaterialWrapper* FindMaterial (const char* iName,
-  	bool regionOnly = false) const = 0;
-  /**
-   * Find a camera position by name. If regionOnly is true then the returned
-   * campos will belong to the current region. Note that this is different
-   * from calling iRegion::FindCameraPosition() because the latter will also
-   * return camera positions that belong in a region but are not connected
-   * to the engine.
-   */
-  virtual iCameraPosition* FindCameraPosition (const char* iName,
-  	bool regionOnly = false) const = 0;
-  /**
-   * Find a collection by name. If regionOnly is true then the returned
-   * collection will belong to the current region. Note that this is different
-   * from calling iRegion::FindCollection() because the latter will also
-   * return collections that belong in a region but are not connected
-   * to the engine.
-   */
-  virtual iCollection* FindCollection (const char* iName,
-  	bool regionOnly = false) const = 0;
-
-  /// Create a new collection.
-  virtual iCollection* CreateCollection (const char* iName) = 0;
+  /// Get the list of collections.
+  virtual iCollectionList* GetCollections () = 0;
+  /// Get the list of camera positions.
+  virtual iCameraPositionList* GetCameraPositions () = 0;
+  /// Get the list of all textures.
+  virtual iTextureList* GetTextureList () const = 0;
+  /// Get the list of all materials.
+  virtual iMaterialList* GetMaterialList () const = 0;
 
   /**
    * Set the mode for the lighting cache (combination of CS_ENGINE_CACHE_???).
@@ -334,9 +300,6 @@ struct iEngine : public iBase
   /// Create a static/pseudo-dynamic light. name can be NULL.
   virtual iStatLight* CreateLight (const char* name, const csVector3& pos,
   	float radius, const csColor& color, bool pseudoDyn) = 0;
-  /// Find a static/pseudo-dynamic light by name.
-  virtual iStatLight* FindLight (const char *Name, bool RegionOnly = false)
-    const = 0;
   /// Create a dynamic light.
   virtual iDynLight* CreateDynLight (const csVector3& pos, float radius,
   	const csColor& color) = 0;
@@ -441,27 +404,6 @@ struct iEngine : public iBase
 
   /// @@@ Temporary function until things are moved to a plugin.
   virtual iMeshObjectType* GetThingType () const = 0;
-
-  /// Get the number of collections in the engine
-  virtual int GetCollectionCount () const = 0;
-  /// Get a collection by its index
-  virtual iCollection* GetCollection (int idx) const = 0;
-
-  /// Get the number of camera positions in the engine
-  virtual int GetCameraPositionCount () const = 0;
-  /// Get a camera position by its index
-  virtual iCameraPosition* GetCameraPosition (int idx) const = 0;
-  /// Get a camera position by its name.
-  virtual iCameraPosition* GetCameraPosition (const char* name) const = 0;
-
-  /**
-   * Get the list of all textures.
-   */
-  virtual iTextureList* GetTextureList () const = 0;
-  /**
-   * Get the list of all materials.
-   */
-  virtual iMaterialList* GetMaterialList () const = 0;
 
   /**
    * Draw the 3D world given a camera and a clipper. Note that

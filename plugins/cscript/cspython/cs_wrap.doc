@@ -660,7 +660,17 @@ RemoveSector(sec)
 
 FindByName(name)
 
-1.31.  class iEngine
+1.31.  class iMaterialList
+--------------------------
+
+FindByName(name)
+
+1.32.  class iTextureList
+-------------------------
+
+FindByName(name)
+
+1.33.  class iEngine
 --------------------
 
 GetTextureFormat()
@@ -669,19 +679,19 @@ DeleteAll()
 
 CreateTexture(iName,iFileName,iTransp,iFlags)
 
-CreateCameraPosition(iName,iSector,iPos,iForward,iUpward)
-
 CreatePlane(iName,iOrigin,iMatrix)
 
 CreateSector(iName,link)
-
-FindMaterial(iName,regionOnly)
 
 CreateSectorWallsMesh(sector,name)
 
 GetSectors()
 
-1.32.  class iObjectRegistry
+GetMaterialList()
+
+GetTextureList()
+
+1.34.  class iObjectRegistry
 ----------------------------
 
 Query_iEngine()

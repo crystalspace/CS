@@ -33,6 +33,7 @@
 #include "iengine/engine.h"
 #include "iengine/texture.h"
 #include "iengine/material.h"
+#include "iengine/region.h"
 
 CS_TOKEN_DEF_START
   CS_TOKEN_DEF (AMBIENT)
@@ -357,7 +358,10 @@ iMaterialWrapper* csLoader::ParseMaterial (char *name, char* buf, const char *pr
       case CS_TOKEN_TEXTURE:
       {
         csScanStr (params, "%s", str);
-        texh = Engine->FindTexture (str, ResolveOnlyRegion);
+	if (ResolveOnlyRegion && Engine->GetCurrentRegion ())
+	  texh = Engine->GetCurrentRegion ()->FindTexture (str);
+	else
+          texh = Engine->GetTextureList ()->FindByName (str);
         if (!texh)
         {
 	  ReportError (
@@ -406,8 +410,11 @@ iMaterialWrapper* csLoader::ParseMaterial (char *name, char* buf, const char *pr
 	      case CS_TOKEN_TEXTURE:
 		{
                   csScanStr (params2, "%s", str);
-                  iTextureWrapper *texh = Engine->FindTexture (str,
-		  	ResolveOnlyRegion);
+		  iTextureWrapper* texh;
+		  if (ResolveOnlyRegion && Engine->GetCurrentRegion ())
+		    texh = Engine->GetCurrentRegion ()->FindTexture (str);
+		  else
+                    texh = Engine->GetTextureList ()->FindByName (str);
                   if (texh)
                     txt_layers[num_txt_layer] = texh;
                   else

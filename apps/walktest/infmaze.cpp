@@ -28,6 +28,7 @@
 #include "imesh/thing/polygon.h"
 #include "iengine/light.h"
 #include "iengine/statlght.h"
+#include "iengine/material.h"
 
 InfiniteMaze::InfiniteMaze ()
 {
@@ -132,8 +133,8 @@ InfRoomData* InfiniteMaze::create_six_room (iEngine* engine, int x, int y, int z
   dx = 2.0*(float)x;
   dy = 2.0*(float)y;
   dz = 2.0*(float)z;
-  iMaterialWrapper* t = engine->FindMaterial ("txt");
-  iMaterialWrapper* t2 = engine->FindMaterial ("txt2");
+  iMaterialWrapper* t = engine->GetMaterialList ()->FindByName ("txt");
+  iMaterialWrapper* t2 = engine->GetMaterialList ()->FindByName ("txt2");
   float s = 1;
 
   create_one_side (walls_state, "n", t, t2, dx-s,dy+s,dz+s,  dx+s,dy+s,dz+s,  dx+s,dy-s,dz+s,  dx-s,dy-s,dz+s, 0,0,-.1);

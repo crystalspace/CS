@@ -27,6 +27,7 @@
 #include "iengine/light.h"
 #include "iengine/campos.h"
 #include "iengine/region.h"
+#include "iengine/material.h"
 #include "imesh/thing/polygon.h"
 #include "csutil/scanstr.h"
 #include "cstool/impexp.h"
@@ -87,7 +88,8 @@ extern void move_mesh (iMeshWrapper* sprite, iSector* where,
 void add_particles_rain (iSector* sector, char* matname, int num, float speed)
 {
   // First check if the material exists.
-  iMaterialWrapper* mat = Sys->view->GetEngine ()->FindMaterial (matname);
+  iMaterialWrapper* mat = Sys->view->GetEngine ()->GetMaterialList ()->
+  	FindByName (matname);
   if (!mat)
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Can't find material '%s' in memory!", matname);
@@ -133,7 +135,8 @@ void add_particles_rain (iSector* sector, char* matname, int num, float speed)
 void add_particles_snow (iSector* sector, char* matname, int num, float speed)
 {
   // First check if the material exists.
-  iMaterialWrapper* mat = Sys->view->GetEngine ()->FindMaterial (matname);
+  iMaterialWrapper* mat = Sys->view->GetEngine ()->GetMaterialList ()->
+  	FindByName (matname);
   if (!mat)
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Can't find material '%s' in memory!", matname);
@@ -182,7 +185,8 @@ void add_particles_fire (iSector* sector, char* matname, int num,
 	const csVector3& origin)
 {
   // First check if the material exists.
-  iMaterialWrapper* mat = Sys->view->GetEngine ()->FindMaterial (matname);
+  iMaterialWrapper* mat = Sys->view->GetEngine ()->GetMaterialList ()->
+  	FindByName (matname);
   if (!mat)
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Can't find material '%s' in memory!", matname);
@@ -229,7 +233,8 @@ void add_particles_fountain (iSector* sector, char* matname, int num,
 	const csVector3& origin)
 {
   // First check if the material exists.
-  iMaterialWrapper* mat = Sys->view->GetEngine ()->FindMaterial (matname);
+  iMaterialWrapper* mat = Sys->view->GetEngine ()->GetMaterialList ()->
+  	FindByName (matname);
   if (!mat)
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Can't find material '%s' in memory!", matname);
@@ -277,7 +282,8 @@ void add_particles_fountain (iSector* sector, char* matname, int num,
 void add_particles_explosion (iSector* sector, const csVector3& center, char* matname)
 {
   // First check if the material exists.
-  iMaterialWrapper* mat = Sys->view->GetEngine ()->FindMaterial (matname);
+  iMaterialWrapper* mat = Sys->view->GetEngine ()->GetMaterialList ()->
+  	FindByName (matname);
   if (!mat)
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Can't find material '%s' in memory!", matname);
@@ -329,7 +335,8 @@ void add_particles_explosion (iSector* sector, const csVector3& center, char* ma
 void add_particles_spiral (iSector* sector, const csVector3& bottom, char* matname)
 {
   // First check if the material exists.
-  iMaterialWrapper* mat = Sys->view->GetEngine ()->FindMaterial (matname);
+  iMaterialWrapper* mat = Sys->view->GetEngine ()->GetMaterialList ()->
+  	FindByName (matname);
   if (!mat)
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Can't find material '%s' in memory!", matname);
@@ -569,7 +576,8 @@ void add_skeleton_tree (iSector* where, csVector3 const& pos, int depth,
     }
     iMeshObjectFactory* fact = tmpl->GetMeshObjectFactory ();
     iSprite3DFactoryState* state = SCF_QUERY_INTERFACE (fact, iSprite3DFactoryState);
-    state->SetMaterialWrapper (Sys->Engine->FindMaterial ("white"));
+    state->SetMaterialWrapper (Sys->Engine->GetMaterialList ()->
+    	FindByName ("white"));
     int vertex_idx = 0;
     iSpriteFrame* fr = state->AddFrame ();
     fr->SetName ("f");
@@ -805,7 +813,8 @@ void add_skeleton_ghost (iSector* where, csVector3 const& pos, int maxdepth,
     }
     iMeshObjectFactory* fact = tmpl->GetMeshObjectFactory ();
     iSprite3DFactoryState* state = SCF_QUERY_INTERFACE (fact, iSprite3DFactoryState);
-    state->SetMaterialWrapper (Sys->Engine->FindMaterial ("green"));
+    state->SetMaterialWrapper (Sys->Engine->GetMaterialList ()->
+    	FindByName ("green"));
     int vertex_idx = 0;
     iSpriteFrame* fr = state->AddFrame ();
     fr->SetName ("f");
@@ -1449,7 +1458,8 @@ void OpenPortal (iLoader *LevelLoader, iView* view, char* lev)
 {
   iSector* room = view->GetCamera ()->GetSector ();
   csVector3 pos = view->GetCamera ()->GetTransform ().This2Other (csVector3 (0, 0, 1));
-  iMaterialWrapper* tm = Sys->Engine->FindMaterial ("portal");
+  iMaterialWrapper* tm = Sys->Engine->GetMaterialList ()->
+  	FindByName ("portal");
 
   iPolygon3D* portalPoly;
   iMeshWrapper* thing = CreatePortalThing ("portalTo", room, tm, portalPoly);

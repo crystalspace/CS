@@ -255,7 +255,7 @@ void csTerrFuncObject::LoadMaterialGroup (iEngine* engine, const char *pName,
   for (i = iStart ; i <= iEnd ; i++)
   {
     sprintf (pMatName, pName, i);
-    iMaterialWrapper* mat = engine->FindMaterial (pMatName);
+    iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName (pMatName);
 	Index2Block(i, bx, by);
     Block2Index(by, bx, newi);
     blocks[newi].material = mat;

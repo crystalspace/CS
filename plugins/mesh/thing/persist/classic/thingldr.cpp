@@ -515,7 +515,8 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
       case CS_TOKEN_MATERIAL:
         csScanStr (params, "%s", str);
 	//@@@ REGION SUPPORT? (below)
-        mat = engine->FindMaterial (str/*@@@, onlyRegion*/);
+        mat = engine->GetMaterialList ()->
+		FindByName (str/*@@@, onlyRegion*/);
         if (mat == NULL)
         {
           printf ("Couldn't find material named '%s'!\n", str);
@@ -1138,7 +1139,8 @@ Nag to Jorrit about this feature if you want it.\n");
 
       case CS_TOKEN_MATERIAL:
         csScanStr (params, "%s", str);
-        info.default_material = engine->FindMaterial (str
+        info.default_material = engine->GetMaterialList ()->
+		FindByName (str
 		/*@@@ REGIONS?, onlyRegion*/);
         if (info.default_material == NULL)
         {
@@ -1444,7 +1446,8 @@ iBase* csBezierLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_MATERIAL:
         csScanStr (params, "%s", str);
 	//@@@ REGION SUPPORT? (below)
-        mat = engine->FindMaterial (str/*@@@, onlyRegion*/);
+        mat = engine->GetMaterialList ()->
+		FindByName (str/*@@@, onlyRegion*/);
         if (mat == NULL)
         {
           printf ("Couldn't find material named '%s'!\n", str);

@@ -114,9 +114,12 @@ void Simple::Report (int severity, const char* msg, ...)
 
 iModelData *Simple::CreateDefaultModel ()
 {
-  iMaterialWrapper *m1 = engine->FindMaterial ("material1");
-  iMaterialWrapper *m2 = engine->FindMaterial ("material2");
-  iMaterialWrapper *m3 = engine->FindMaterial ("material3");
+  iMaterialWrapper *m1 = engine->GetMaterialList ()
+  	->FindByName ("material1");
+  iMaterialWrapper *m2 = engine->GetMaterialList ()
+  	->FindByName ("material2");
+  iMaterialWrapper *m3 = engine->GetMaterialList ()
+  	->FindByName ("material3");
 
   iModelData *Model = new csModelData ();
 
