@@ -731,8 +731,8 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
     {
     case XMLTOKEN_T:
       {
-        unsigned int tri = child->GetContentsValueAsInt ();
-        if (tri>factstate->GetTriangleCount ())
+        int tri = child->GetContentsValueAsInt ();
+        if (tri > factstate->GetTriangleCount ())
         {
           synldr->ReportError (
             "crystalspace.genmeshloader.parse.invalidindex",
