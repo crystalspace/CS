@@ -26,15 +26,31 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
+# COMP_GCC Linker assumes static libs have extension '.a'.  Mingw/Cygwin both
+# use libdsound.a (static lib) as the place from which to get MS DirectSound.
+ifeq ($(OS),WIN32)
+  ifeq ($(COMP),GCC)
+    LIBS.DSOUND += $(LFLAGS.l)dsound
+  else
+    LIBS.DSOUND += $(LFLAGS.l)dsound$(LIB)
+  endif
+endif
+
 ifeq ($(USE_PLUGINS),yes)
   SNDDS3D = $(OUTDLL)/sndds3d$(DLL)
   LIB.SNDDS3D = $(foreach d,$(DEP.SNDDS3D),$($d.LIB))
-  LIB.SNDDS3D.SPECIAL = $(DIRECTX.LFLAGS)
+  LIB.SNDDS3D.SPECIAL = $(LIBS.SOUND.SYSTEM)
   TO_INSTALL.DYNAMIC_LIBS += $(SNDDS3D)
 else
   SNDDS3D = $(OUT)/$(LIB_PREFIX)sndds3d$(LIB)
   DEP.EXE += $(SNDDS3D)
-  LIB.EXE += $(DIRECTX.LFLAGS)
+  ifeq ($(OS),WIN32)
+    ifeq ($(COMP),GCC)
+      LIBS.EXE += $(LIBS.DSOUND)
+    else
+      LIBS.EXE += $(LIBS.DSOUND)$(LIB)
+    endif
+  endif
   SCF.STATIC += sndds3d
   TO_INSTALL.STATIC_LIBS += $(SNDDS3D)
 endif
