@@ -24,10 +24,10 @@
 class csEffectStrings
 {
 public:
-  #define REGISTER_STRING( name, string ) \
+# define REGISTER_STRING( name, string ) \
   static csStringID name;
-  #include "effectstrings.h"
-  #undef REGISTER_STRING
+# include "effectstrings.h"
+# undef REGISTER_STRING
 
   static void InitStrings (iEffectServer* server);
 };

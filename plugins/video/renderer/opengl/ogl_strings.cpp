@@ -28,8 +28,9 @@
 
 void csEffectStrings::InitStrings (iEffectServer* server)
 {
-  #define REGISTER_STRING( name, string ) \
+#  define REGISTER_STRING( name, string ) \
     name = server->RequestString( string );
-  #include "effectstrings.h"
-  #undef REGISTER_STRING
+#  include "effectstrings.h"
+#  undef REGISTER_STRING
 }
+

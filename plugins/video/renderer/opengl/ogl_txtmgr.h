@@ -44,7 +44,6 @@ enum csGLProcTexType
 class csTextureOpenGL : public csTexture
 {
 public:
-
   /// The actual image
   uint8 *image_data;
   GLint compressed;
@@ -74,7 +73,6 @@ public:
   virtual bool Compressable (){ return false;}
 };
 
-
 /**
  * This is a class derived from csTextureHandle that performs additional
  * functions required for texture management with OpenGL renderer.
@@ -85,7 +83,7 @@ class csTextureHandleOpenGL : public csTextureHandle
   csTextureManagerOpenGL *txtmgr;
   int formatidx;
   GLenum sourceFormat, targetFormat;
-  GLenum sourceType; // what size does each fragment have ? e.g. GL_UNSIGNED_BYTE
+  GLenum sourceType; // what size does each fragment have? e.g. GL_UNSIGNED_BYTE
   int bpp;
   bool FindFormatType ();
   bool transform (iImage *Image, csTextureOpenGL *tex);
@@ -94,7 +92,8 @@ class csTextureHandleOpenGL : public csTextureHandle
   class texVector : public csVector
   {
   public:
-    csTextureOpenGL* operator [] (int idx) const { return (csTextureOpenGL*)csVector::Get (idx);}
+    csTextureOpenGL* operator [] (int idx) const
+    { return (csTextureOpenGL*)csVector::Get (idx);}
     int Push (csTexture *t){ return csVector::Push ((csSome)t);}
   };
 
@@ -161,8 +160,7 @@ public:
  */
 class csTextureManagerOpenGL : public csTextureManager
 {
-
- protected:
+protected:
   struct formatDescription
   {
     GLenum targetFormat;
@@ -177,7 +175,7 @@ class csTextureManagerOpenGL : public csTextureManager
   void AlterTargetFormat (const char *oldTarget, const char *newTarget);
   void DetermineStorageSizes ();
 
- public:
+public:
   /// A pointer to the 3D driver object
   csGraphics3DOGLCommon *G3D;
   int max_tex_size;

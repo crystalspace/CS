@@ -155,21 +155,19 @@ struct csLMCacheData
 
 class csLMCacheDataQueue: public iLMCache
 {
-
-  public:
-    csLMCacheData* head;
-    csLMCacheData* tail;
-    virtual void* Alloc(int w, int h, SourceData s, csSubRectangles* r, GLuint Handle);
-    virtual void Clear();
-    csLMCacheDataQueue();
-    virtual bool IsPrecalcSuperlightmap() 
-    {
-      return false;
-    };
-    virtual bool HasFog() { return false; };
-    virtual bool IsUnlit() { return false; };
-
-
+public:
+  csLMCacheData* head;
+  csLMCacheData* tail;
+  virtual void* Alloc(
+  	int w, int h, SourceData s, csSubRectangles* r, GLuint Handle);
+  virtual void Clear();
+  csLMCacheDataQueue();
+  virtual bool IsPrecalcSuperlightmap()
+  {
+    return false;
+  };
+  virtual bool HasFog() { return false; };
+  virtual bool IsUnlit() { return false; };
 };
 
 /**
@@ -178,21 +176,21 @@ class csLMCacheDataQueue: public iLMCache
 
 class csSLMCacheData: public iLMCache
 {
-  public:
-    csTrianglesPerSuperLightmap* source;
-    GLuint Handle;
-    GLuint FogHandle;
-    bool hasFog;
-    bool isUnlit;
-    virtual void* Alloc(int w, int h, SourceData s, csSubRectangles* r, GLuint Handle);
-    virtual void Clear();
-    virtual bool IsPrecalcSuperlightmap()
-    {
-      return true;
-    };
-    virtual bool HasFog() { return hasFog; };
-    virtual bool IsUnlit(){return isUnlit;};
-
+public:
+  csTrianglesPerSuperLightmap* source;
+  GLuint Handle;
+  GLuint FogHandle;
+  bool hasFog;
+  bool isUnlit;
+  virtual void* Alloc(
+  	int w, int h, SourceData s, csSubRectangles* r, GLuint Handle);
+  virtual void Clear();
+  virtual bool IsPrecalcSuperlightmap()
+  {
+    return true;
+  };
+  virtual bool HasFog() { return hasFog; };
+  virtual bool IsUnlit(){return isUnlit;};
 };
 
 /**
@@ -201,9 +199,6 @@ class csSLMCacheData: public iLMCache
  */
 class csLightMapQueue
 {
-
- 
-
 public:
   /// Triangles.
   int num_triangles, max_triangles;
@@ -217,14 +212,16 @@ public:
   GLfloat* glcolorsFog;
   GLfloat* gltxtFog;
 
-  /** The Lightmap Queue can have a copy of the data or a
-  * reference (a pointer to) the original triangle array.
-  * If it has a reference we have to be careful when
-  * clean or destroy the lightmap
-  */
+  /**
+   * The Lightmap Queue can have a copy of the data or a
+   * reference (a pointer to) the original triangle array.
+   * If it has a reference we have to be careful when
+   * clean or destroy the lightmap
+   */
   bool ownsData;
 
-  /** When a superlightmap swaps between owning or not data 
+  /**
+   * When a superlightmap swaps between owning or not data
    * it can lose references. Here we keep the last arrays
    * to avoid unnecessary mallocs
    */
@@ -245,12 +242,9 @@ public:
 
   /// Reset the queue to empty.
   void Reset ();
-  
+
   GLfloat* GetGLVerts (int idx) { return &glverts[idx<<2]; }
   GLfloat* GetGLTxt (int idx) { return &gltxt[idx<<1]; }
-
-
-  
 
   /// Adds a whole triangle array
   void AddTrianglesArray(csTriangle* indices, int numTriangles);
@@ -258,7 +252,6 @@ public:
   void AddVerticesArray(csVector4* verts, int numVerts);
   /// Adds a whole texel array
   void AddTexelsArray(csVector2* uvs, int numUV);
-
 
   /// Adds a whole triangle array (Fast Version)
   void AddTrianglesArrayFast(csTriangle* indices, int numTriangles);
@@ -285,7 +278,7 @@ public:
   /// Flush the queue (renders the fog)
 
   void FlushFog (GLuint HandleFog);
-  
+
   ///Sets the state of ownsData attribute;
   //void SetOwnsData(bool value) {ownsData = value;};
 
@@ -304,9 +297,9 @@ public:
     num_vertices (0), max_vertices (0), glverts (NULL), gltxt (NULL),
     num_fog_colors (0), max_fog_colors (0),
     glcolorsFog(NULL), gltxtFog(NULL),
-    ownsData (true), 
+    ownsData (true),
     trisCached (NULL), glvertsCached (NULL), gltxtCached (NULL),
-    num_trianglesCached (0), max_trianglesCached (0), 
+    num_trianglesCached (0), max_trianglesCached (0),
     num_verticesCached (0), max_verticesCached (0),
     num_fog_colorsCached (0), max_fog_colorsCached (0),
     glcolorsFogCached(NULL), gltxtFogCached(NULL)
@@ -314,7 +307,6 @@ public:
   /// Destructor.
   ~csLightMapQueue ()
   {
-
     if (!ownsData)
     {
       delete[] gltxtCached;

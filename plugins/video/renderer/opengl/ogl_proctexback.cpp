@@ -94,7 +94,8 @@ void csOpenGLProcBackBuffer::Prepare (csGraphics3DOGLCommon *g3d,
   SharedInitialize (g3d);
   SharedOpen (g3d);
 
-  rstate_bilinearmap = g3d->GetRenderState(G3DRENDERSTATE_BILINEARMAPPINGENABLE);
+  rstate_bilinearmap = g3d->GetRenderState(
+  	G3DRENDERSTATE_BILINEARMAPPINGENABLE);
 
   // We are going to use an inverted orthographic projection matrix
   inverted = true;
@@ -117,35 +118,35 @@ bool csOpenGLProcBackBuffer::BeginDraw (int DrawFlags)
   bool do_quad = false;
 
   // if 2D graphics is not locked, lock it
- if ((DrawFlags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
+  if ((DrawFlags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
       && (!(DrawMode & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))))
  {
-    if (!G2D->BeginDraw ())
-      return false;
+   if (!G2D->BeginDraw ())
+     return false;
 
-    g3d->FlushDrawPolygon ();
-    g3d->lightmap_cache->Flush ();
-    g3d->FlushDrawFog ();
+   g3d->FlushDrawPolygon ();
+   g3d->lightmap_cache->Flush ();
+   g3d->FlushDrawFog ();
 
 /*    GLenum format, type;
     switch (pixel_bytes)
     {
       case 1:
-  format = GL_COLOR_INDEX;
-  type = GL_UNSIGNED_BYTE;
-  break;
-  #ifdef GL_VERSION_1_2
+	format = GL_COLOR_INDEX;
+	type = GL_UNSIGNED_BYTE;
+	break;
+#ifdef GL_VERSION_1_2
       case 2:
-  format = GL_RGB;
-  type = GL_UNSIGNED_SHORT_5_6_5;
-  break;
-  #endif
+	format = GL_RGB;
+	type = GL_UNSIGNED_SHORT_5_6_5;
+	break;
+#endif
       case 4:
-  format = GL_RGBA;
-  type = GL_UNSIGNED_BYTE;
-  break;
+	format = GL_RGBA;
+	type = GL_UNSIGNED_BYTE;
+	break;
       default:
-  return false; // invalid format
+	return false; // invalid format
     }
     glReadPixels (0, 0, width, height,
       format, type, backbuffercopy);  */
@@ -177,8 +178,8 @@ bool csOpenGLProcBackBuffer::BeginDraw (int DrawFlags)
       texture_cache->Cache (tex_mm);
 
       // Get texture handle
-      GLuint texturehandle =
-  ((csTxtCacheData *)tex_mm->GetCacheData ())->Handle;
+      GLuint texturehandle = ((csTxtCacheData *)tex_mm->GetCacheData ())
+      	->Handle;
       statecache->SetShadeModel (GL_FLAT);
       statecache->EnableState (GL_TEXTURE_2D);
       glColor4f (1.0f,1.0f,1.0f,1.0f);
@@ -231,7 +232,9 @@ bool csOpenGLProcBackBuffer::BeginDraw (int DrawFlags)
     glTexCoord2f (1, 1);
     glVertex3i (width, 0, 0);
     glEnd ();
-  } else {
+  }
+  else
+  {
     csGraphics3DOGLCommon::SetGLZBufferFlags (CS_ZBUF_NONE);
     csGraphics3DOGLCommon::SetupBlend (CS_FX_COPY, 0, false);
   }
@@ -307,12 +310,12 @@ void csOpenGLProcBackBuffer::Print (csRect *area)
       uint16 gb = 8 - pfmt.GreenBits;
       uint16 rb = 8 - pfmt.RedBits;
       uint16 *src = (uint16*) buffer;
-    int i;
+      int i;
       for (i = 0; i < width*height; i++, src++, dst++)
       {
-  dst->red = ((*src & pfmt.RedMask) >> pfmt.RedShift) << rb;
-  dst->green = ((*src & pfmt.GreenMask) >> pfmt.GreenShift) << gb;
-  dst->blue = ((*src & pfmt.BlueMask) >> pfmt.BlueShift) << bb;
+	dst->red = ((*src & pfmt.RedMask) >> pfmt.RedShift) << rb;
+	dst->green = ((*src & pfmt.GreenMask) >> pfmt.GreenShift) << gb;
+	dst->blue = ((*src & pfmt.BlueMask) >> pfmt.BlueShift) << bb;
       }
     }
     else
@@ -345,8 +348,7 @@ void csOpenGLProcBackBuffer::Print (csRect *area)
       return; // invalid format
   }
   glRasterPos2i(0, 0);
-  glDrawPixels(width, height,
-      format, type, backbuffercopy);*/
+  glDrawPixels(width, height, format, type, backbuffercopy);*/
 }
 
 float csOpenGLProcBackBuffer::GetZBuffValue (int x, int y)
@@ -462,3 +464,4 @@ void csOpenGLProcBackBuffer2D::GetPixel (int x, int y,
 {
   g2d->GetPixel (x, frame_height - height + y, oR, oG, oB);
 }
+

@@ -25,20 +25,18 @@
  */
 
 #define INITMORE_ARB_multitexture \
-    GLint maxtextures;									\
-    glGetIntegerv (GL_MAX_TEXTURE_UNITS_ARB, &maxtextures);				\
-    if (maxtextures > 1)								\
-    {											\
-      m_config_options.do_multitexture_level = maxtextures;				\
-      Report (CS_REPORTER_SEVERITY_NOTIFY,						\
-      "Using multitexture extension with %d texture units", maxtextures);		\
-    }											\
-    else										\
-    {											\
-      ARB_multitexture = false;								\
+    GLint maxtextures;							\
+    glGetIntegerv (GL_MAX_TEXTURE_UNITS_ARB, &maxtextures);		\
+    if (maxtextures > 1)						\
+    {									\
+      m_config_options.do_multitexture_level = maxtextures;		\
+      Report (CS_REPORTER_SEVERITY_NOTIFY,				\
+      "Using multitexture extension with %d texture units", maxtextures);\
+    }									\
+    else								\
+    {									\
+      ARB_multitexture = false;						\
       Report (CS_REPORTER_SEVERITY_NOTIFY, "WARNING: driver supports multitexture"	\
-	" extension but only allows one texture unit!");				\
-    }											
-    
-    
+	" extension but only allows one texture unit!");		\
+    }
 

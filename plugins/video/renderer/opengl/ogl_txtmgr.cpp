@@ -158,98 +158,97 @@ bool csTextureHandleOpenGL::FindFormatType ()
     {
       if (!transp)
       {
-  if (!(image->GetFormat () & CS_IMGFMT_ALPHA))
-  {
-    sourceFormat = GL_RGB;
-    // Again determine the formatidx and possible change it if we
-    // have a forced targetformat
-    for (i=0; csTextureManagerOpenGL::glformats[i].sourceFormat
-      != sourceFormat; i++);
-    formatidx = i;
-    if (csTextureManagerOpenGL::glformats[i].forcedFormat != 0)
-    {
-      targetFormat = csTextureManagerOpenGL::glformats[i].forcedFormat;
-      for (i=0; csTextureManagerOpenGL::glformats[i].targetFormat
-        != targetFormat; i++);
-      if (csTextureManagerOpenGL::glformats[i].targetFormat
-        != targetFormat)
-        formatidx = i;
-    }
-    targetFormat = csTextureManagerOpenGL::glformats[formatidx]
-      .targetFormat;
-  }
-  else
-  {
-    // With a histogram we now could determine how many alpha values
-    // we have here to possibly select a better targetFormat but due
-    // to laziness we leave it as is.
-  }
+	if (!(image->GetFormat () & CS_IMGFMT_ALPHA))
+	{
+	  sourceFormat = GL_RGB;
+	  // Again determine the formatidx and possible change it if we
+	  // have a forced targetformat
+	  for (i=0; csTextureManagerOpenGL::glformats[i].sourceFormat
+	     != sourceFormat; i++);
+	  formatidx = i;
+	  if (csTextureManagerOpenGL::glformats[i].forcedFormat != 0)
+	  {
+	    targetFormat = csTextureManagerOpenGL::glformats[i].forcedFormat;
+	    for (i=0; csTextureManagerOpenGL::glformats[i].targetFormat
+	      != targetFormat; i++);
+	    if (csTextureManagerOpenGL::glformats[i].targetFormat
+	        != targetFormat)
+	      formatidx = i;
+	  }
+	  targetFormat = csTextureManagerOpenGL::glformats[formatidx]
+		.targetFormat;
+	}
+	else
+	{
+	  // With a histogram we now could determine how many alpha values
+	  // we have here to possibly select a better targetFormat but due
+	  // to laziness we leave it as is.
+	}
       }
       else
       {
-  targetFormat = (bpp == 8 ? GL_RGBA : bpp < 32 ? GL_RGB5_A1 : GL_RGBA8);
-  for (i=0; csTextureManagerOpenGL::glformats[i].targetFormat
-    != targetFormat; i++);
-  formatidx = i;
+	targetFormat = (bpp == 8 ? GL_RGBA : bpp < 32 ? GL_RGB5_A1 : GL_RGBA8);
+	for (i=0; csTextureManagerOpenGL::glformats[i].targetFormat
+	  != targetFormat; i++);
+	formatidx = i;
 
-  int pixels = image->GetWidth () * image->GetHeight ();
-  csRGBpixel *_src = (csRGBpixel *)image->GetImageData ();
+	int pixels = image->GetWidth () * image->GetHeight ();
+	csRGBpixel *_src = (csRGBpixel *)image->GetImageData ();
 
-  while (pixels--)
-  {
-    // By default, every csRGBpixel initializes its alpha component to
-    // 255. Thus, we should just drop to zero alpha for transparent
-    // pixels, if any.
-    if (transp_color.eq (*_src))
-      _src->alpha = 0;
-    _src++;
-  }
+	while (pixels--)
+	{
+	  // By default, every csRGBpixel initializes its alpha component to
+	  // 255. Thus, we should just drop to zero alpha for transparent
+	  // pixels, if any.
+	  if (transp_color.eq (*_src)) _src->alpha = 0;
+	  _src++;
+	}
 
-  // Now we draw borders inside all keycolored areas.
-  // This removes the halos of keycolor when using bilinear filtering
-  int h, rows, w, cols;
-  h = rows = image->GetHeight ();
-  w = image->GetWidth();
-  _src = (csRGBpixel *)image->GetImageData ();
-  while (rows--)
-  {
-    cols = w;
-    while (cols--) {
-        if (!_src[(rows*w)+cols].alpha)
-      {
-        int n=0, r=0, g=0, b=0, xl, xr, yt, yb;
+	// Now we draw borders inside all keycolored areas.
+	// This removes the halos of keycolor when using bilinear filtering
+	int h, rows, w, cols;
+	h = rows = image->GetHeight ();
+	w = image->GetWidth();
+	_src = (csRGBpixel *)image->GetImageData ();
+	while (rows--)
+	{
+	  cols = w;
+	  while (cols--)
+	  {
+	    if (!_src[(rows*w)+cols].alpha)
+	    {
+	      int n=0, r=0, g=0, b=0, xl, xr, yt, yb;
+	      if (!cols)
+	      {
+		xl = w-1;
+		xr = 1;
+	      }
+	      else if (cols==w-1)
+	      {
+		xl = cols-1;
+		xr = 0;
+	      }
+	      else
+	      {
+		xl = cols-1;
+		xr = cols+1;
+	      }
 
-        if (!cols)
-        {
-    xl = w-1;
-    xr = 1;
-        }
-        else if (cols==w-1)
-        {
-    xl = cols-1;
-    xr = 0;
-        }
-        else
-        {
-    xl = cols-1;
-    xr = cols+1;
-        }
-
-        if (!rows)
-        {
-    yt = h-1;
-    yb = 1;
-        }
-        else if (rows==h-1)
-        {
-    yt = rows-1;
-    yb = 0;
-        }
-        else
-        {
-    yt = rows-1;
-    yb = rows+1;
-        }
+	      if (!rows)
+	      {
+		yt = h-1;
+		yb = 1;
+	      }
+	      else if (rows==h-1)
+	      {
+		yt = rows-1;
+		yb = 0;
+	      }
+	      else
+	      {
+		yt = rows-1;
+		yb = rows+1;
+	      }
 
 #define CHECK_PIXEL(d) { \
   if (_src[(d)].alpha) \
@@ -260,32 +259,31 @@ bool csTextureHandleOpenGL::FindFormatType ()
     b+=_src[(d)].blue; \
         } \
 }
-        CHECK_PIXEL((yt*w)+xl);
-        CHECK_PIXEL((yt*w)+cols);
-        CHECK_PIXEL((yt*w)+xr);
-        CHECK_PIXEL((rows*w)+xl);
-        CHECK_PIXEL((rows*w)+xr);
-        CHECK_PIXEL((yb*w)+xl);
-        CHECK_PIXEL((yb*w)+cols);
-        CHECK_PIXEL((yb*w)+xr);
+	      CHECK_PIXEL((yt*w)+xl);
+	      CHECK_PIXEL((yt*w)+cols);
+	      CHECK_PIXEL((yt*w)+xr);
+	      CHECK_PIXEL((rows*w)+xl);
+	      CHECK_PIXEL((rows*w)+xr);
+	      CHECK_PIXEL((yb*w)+xl);
+	      CHECK_PIXEL((yb*w)+cols);
+	      CHECK_PIXEL((yb*w)+xr);
 #undef CHECK_PIXEL
-        if (n)
-        {
-    _src[(rows*w)+cols].red = r / n;
-    _src[(rows*w)+cols].green = g / n;
-    _src[(rows*w)+cols].blue = b / n;
-        }
-      }
-    }
-  }
+	      if (n)
+	      {
+		_src[(rows*w)+cols].red = r / n;
+		_src[(rows*w)+cols].green = g / n;
+		_src[(rows*w)+cols].blue = b / n;
+	      }
+	    }
+	  }
+	}
       }
     }
 
     int d;
     for (i=0; i < 12; i++)
     {
-      if (targetFormat == formats[i][0])
-  break;
+      if (targetFormat == formats[i][0]) break;
     }
     d = (bpp == 32 ? 24 : bpp) >> 3;
     sourceType = formats[i][d];
@@ -339,52 +337,52 @@ bool csTextureHandleOpenGL::transform (iImage *Image, csTextureOpenGL *tex)
       switch (sourceType)
       {
         case GL_UNSIGNED_BYTE:
-    nCompo = csTextureManagerOpenGL::glformats[formatidx].components;
-    h = image_data = new uint8 [n*nCompo];
-    for (i=0; i<n; i++, data++, h+=nCompo)
-      memcpy (h, data, nCompo);
-    break;
+	  nCompo = csTextureManagerOpenGL::glformats[formatidx].components;
+	  h = image_data = new uint8 [n*nCompo];
+	  for (i=0; i<n; i++, data++, h+=nCompo)
+	    memcpy (h, data, nCompo);
+	  break;
         case GL_UNSIGNED_BYTE_3_3_2:
-    h = image_data = new uint8 [n];
-    for (i=0; i<n; i++, data++)
-      *h++ = (data->red & 0xe0) | (data->green & 0xe0)>>5
-        | (data->blue >> 6);
-    break;
+	  h = image_data = new uint8 [n];
+	  for (i=0; i<n; i++, data++)
+	    *h++ = (data->red & 0xe0) | (data->green & 0xe0)>>5
+	      | (data->blue >> 6);
+	  break;
         case GL_UNSIGNED_SHORT_4_4_4_4:
-    {
-      image_data = new uint8 [n*2];
-      unsigned short *ush = (unsigned short *)image_data;
-      for (i=0; i<n; i++, data++)
-        *ush++ = ((unsigned short)(data->red & 0xf0))<<8
-          | ((unsigned short)(data->green & 0xf0))<<4
-    | (unsigned short)(data->blue & 0xf0)
-    | (unsigned short)(data->alpha >> 4) ;
-    }
-    break;
+	  {
+	    image_data = new uint8 [n*2];
+	    unsigned short *ush = (unsigned short *)image_data;
+	    for (i=0; i<n; i++, data++)
+	      *ush++ = ((unsigned short)(data->red & 0xf0))<<8
+		| ((unsigned short)(data->green & 0xf0))<<4
+		| (unsigned short)(data->blue & 0xf0)
+		| (unsigned short)(data->alpha >> 4) ;
+	  }
+	  break;
         case GL_UNSIGNED_SHORT_5_5_5_1:
-    {
-      image_data = new uint8 [n*2];
-      unsigned short *ush = (unsigned short *)image_data;
-      for (i=0; i<n; i++, data++)
-        *ush++ = ((unsigned short)(data->red & 0xf8))<<8
-          | ((unsigned short)(data->green & 0xf8))<<3
-    | ((unsigned short)(data->blue & 0xf8))>>2
-    | (unsigned short)(data->alpha >> 7) ;
-    }
-    break;
+	  {
+	    image_data = new uint8 [n*2];
+	    unsigned short *ush = (unsigned short *)image_data;
+	    for (i=0; i<n; i++, data++)
+	    *ush++ = ((unsigned short)(data->red & 0xf8))<<8
+		| ((unsigned short)(data->green & 0xf8))<<3
+		| ((unsigned short)(data->blue & 0xf8))>>2
+		| (unsigned short)(data->alpha >> 7) ;
+	  }
+	  break;
         case GL_UNSIGNED_SHORT_5_6_5:
-    {
-      image_data = new uint8 [n*2];
-      unsigned short *ush = (unsigned short *)image_data;
-      for (i=0; i<n; i++, data++)
-        *ush++ = ((unsigned short)(data->red & 0xf8))<<8
-          | ((unsigned short)(data->green & 0xfc))<<3
-    | (unsigned short)(data->blue >> 3);
-    }
-    break;
+	  {
+	    image_data = new uint8 [n*2];
+	    unsigned short *ush = (unsigned short *)image_data;
+	    for (i=0; i<n; i++, data++)
+	      *ush++ = ((unsigned short)(data->red & 0xf8))<<8
+		| ((unsigned short)(data->green & 0xfc))<<3
+		| (unsigned short)(data->blue >> 3);
+	  }
+	  break;
         default:
-      printf ("OpenGL Warning: no sourceType %x\n",
-        (unsigned int)sourceType);
+	  printf ("OpenGL Warning: no sourceType %x\n",
+	  	(unsigned int)sourceType);
       }
   }
 
@@ -396,9 +394,9 @@ bool csTextureHandleOpenGL::transform (iImage *Image, csTextureOpenGL *tex)
     csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D, t);
     glTexImage2D (GL_TEXTURE_2D, 0,
       csTextureManagerOpenGL::glformats[formatidx].compressedFormat,
-  Image->GetWidth (), Image->GetHeight (), 0,
-  csTextureManagerOpenGL::glformats[formatidx].sourceFormat,
-  sourceType, image_data);
+      Image->GetWidth (), Image->GetHeight (), 0,
+      csTextureManagerOpenGL::glformats[formatidx].sourceFormat,
+      sourceType, image_data);
     glGetTexLevelParameteriv (GL_TEXTURE_2D, 0, GL_TEXTURE_COMPRESSED_ARB,
       &tex->compressed);
 
@@ -413,13 +411,18 @@ bool csTextureHandleOpenGL::transform (iImage *Image, csTextureOpenGL *tex)
       image_data = new uint8 [tex->size];
       csGraphics3DOGLCommon::glGetCompressedTexImageARB (GL_TEXTURE_2D, 0,
         image_data);
-    } else
+    }
+    else
+    {
       tex->size = n * csTextureManagerOpenGL::glformats[formatidx].texelbytes;
+    }
 
     glDeleteTextures (1, &t);
   }
   else
+  {
     tex->size = n * csTextureManagerOpenGL::glformats[formatidx].texelbytes;
+  }
 
   size += tex->size;
   return true;
@@ -521,30 +524,30 @@ void csTextureHandleOpenGL::InitTexture (csTextureManagerOpenGL *texman,
     {
       case BACK_BUFFER_TEXTURE:
       {
-  csOpenGLProcBackBuffer *bbtexG3D = new csOpenGLProcBackBuffer(NULL);
-  bool persistent = (flags & CS_TEXTURE_PROC_PERSISTENT) ==
+	csOpenGLProcBackBuffer *bbtexG3D = new csOpenGLProcBackBuffer(NULL);
+	bool persistent = (flags & CS_TEXTURE_PROC_PERSISTENT) ==
                      CS_TEXTURE_PROC_PERSISTENT;
-  // already shares the texture cache/manager
-  bbtexG3D->Prepare (texman->G3D, this, pfmt, persistent);
-  ((csTextureProcOpenGL*)vTex[0])->texG3D = (iGraphics3D*) bbtexG3D;
-  break;
+	// already shares the texture cache/manager
+	bbtexG3D->Prepare (texman->G3D, this, pfmt, persistent);
+	((csTextureProcOpenGL*)vTex[0])->texG3D = (iGraphics3D*) bbtexG3D;
+	break;
       }
       case SOFTWARE_TEXTURE:
       {
-  // This is always in 32bit no matter what the pfmt.
-  csOpenGLProcSoftware *stexG3D = new csOpenGLProcSoftware (NULL);
-  if (stexG3D->Prepare (texman->G3D, texman->head_soft_proc_tex,
+	// This is always in 32bit no matter what the pfmt.
+	csOpenGLProcSoftware *stexG3D = new csOpenGLProcSoftware (NULL);
+	if (stexG3D->Prepare (texman->G3D, texman->head_soft_proc_tex,
             this, pfmt, image->GetImageData (), alone_hint))
-  {
-    ((csTextureProcOpenGL*)vTex[0])->texG3D = (iGraphics3D*) stexG3D;
-    if (!texman->head_soft_proc_tex)
-      texman->head_soft_proc_tex = stexG3D;
-  }
-  break;
+	{
+	  ((csTextureProcOpenGL*)vTex[0])->texG3D = (iGraphics3D*) stexG3D;
+	  if (!texman->head_soft_proc_tex)
+	    texman->head_soft_proc_tex = stexG3D;
+	}
+	break;
       }
       case AUXILIARY_BUFFER_TEXTURE:
       default:
-  break;
+	break;
     }
   }
   //  printf ("init done\n");
@@ -603,9 +606,9 @@ void csTextureHandleOpenGL::CreateMipmaps ()
       thisImage = prevImage->MipMap (1, tc);
       if (txtmgr->sharpen_mipmaps)
       {
-  iImage *nimg = thisImage->Sharpen (tc, txtmgr->sharpen_mipmaps);
-  thisImage->DecRef ();
-  thisImage = nimg;
+	iImage *nimg = thisImage->Sharpen (tc, txtmgr->sharpen_mipmaps);
+	thisImage->DecRef ();
+	thisImage = nimg;
       }
       //  printf ("push %d\n", nTex);
       csTexture* ntex = NewTexture (thisImage, true);
@@ -727,26 +730,26 @@ void csTextureManagerOpenGL::AlterTargetFormat (const char *oldTarget, const cha
       switch (glformats[theOld].sourceFormat)
       {
       case GL_RGB:
-  compressedFormat = GL_COMPRESSED_RGB_ARB;
-  break;
+	compressedFormat = GL_COMPRESSED_RGB_ARB;
+	break;
       case GL_RGBA:
-  compressedFormat = GL_COMPRESSED_RGBA_ARB;
-  break;
+	compressedFormat = GL_COMPRESSED_RGBA_ARB;
+	break;
       case GL_ALPHA:
-  compressedFormat = GL_COMPRESSED_ALPHA_ARB;
-  break;
+	compressedFormat = GL_COMPRESSED_ALPHA_ARB;
+	break;
       case GL_LUMINANCE:
-  compressedFormat = GL_COMPRESSED_LUMINANCE_ARB;
-  break;
+	compressedFormat = GL_COMPRESSED_LUMINANCE_ARB;
+	break;
       case GL_LUMINANCE_ALPHA:
-  compressedFormat = GL_COMPRESSED_LUMINANCE_ALPHA_ARB;
-  break;
+	compressedFormat = GL_COMPRESSED_LUMINANCE_ALPHA_ARB;
+	break;
       case GL_INTENSITY:
-  compressedFormat = GL_COMPRESSED_INTENSITY_ARB;
-  break;
+	compressedFormat = GL_COMPRESSED_INTENSITY_ARB;
+	break;
       default:
-  printf ("%s is not compressable !\n", oldTarget);
-  return;
+	printf ("%s is not compressable !\n", oldTarget);
+	return;
       }
       glformats[theOld].compressedFormat = compressedFormat;
     }
@@ -754,17 +757,18 @@ void csTextureManagerOpenGL::AlterTargetFormat (const char *oldTarget, const cha
     {
       // does the new format exist ?
       int theNew=0;
-      while (glformats[theNew].name && strcmp (glformats[theNew].name, newTarget))
-  theNew++;
+      while (glformats[theNew].name
+      		&& strcmp (glformats[theNew].name, newTarget))
+	theNew++;
 
       if (glformats[theNew].name)
-  if (glformats[theNew].sourceFormat == glformats[theOld].sourceFormat)
-    glformats[theOld].forcedFormat = glformats[theNew].targetFormat;
-  else
-  {
-    printf ("You can only force a new targetFormat if both, old and new targetFormat,"
-      " have the same sourceFormat\n");
-  }
+	if (glformats[theNew].sourceFormat == glformats[theOld].sourceFormat)
+	  glformats[theOld].forcedFormat = glformats[theNew].targetFormat;
+	else
+	{
+	  printf ("You can only force a new targetFormat if both, old and new targetFormat,"
+	    " have the same sourceFormat\n");
+	}
     }
   }
 }
@@ -779,8 +783,7 @@ void csTextureManagerOpenGL::DetermineStorageSizes ()
     {
       //glformats[i].texelbytes = glformats[i].components * 8; // @@@ why *8?
       glformats[i].texelbytes = glformats[i].components;
-      if (glformats[i].texelbytes > d)
-  glformats[i].texelbytes = d;
+      if (glformats[i].texelbytes > d) glformats[i].texelbytes = d;
     }
   }
 }
@@ -800,7 +803,8 @@ void csTextureManagerOpenGL::PrepareTextures ()
     textures.Get (i)->Prepare ();
 }
 
-iTextureHandle *csTextureManagerOpenGL::RegisterTexture (iImage* image, int flags)
+iTextureHandle *csTextureManagerOpenGL::RegisterTexture (
+	iImage* image, int flags)
 {
   if (!image)
   {
@@ -810,7 +814,8 @@ iTextureHandle *csTextureManagerOpenGL::RegisterTexture (iImage* image, int flag
     image = csCreateXORPatternImage(32, 32, 5);
   }
 
-  csTextureHandleOpenGL* txt = new csTextureHandleOpenGL (image, flags, GL_RGBA, pfmt.PixelBytes*8, G3D);
+  csTextureHandleOpenGL* txt = new csTextureHandleOpenGL (
+  	image, flags, GL_RGBA, pfmt.PixelBytes*8, G3D);
   textures.Push (txt);
   return txt;
 }
@@ -832,8 +837,9 @@ void csTextureManagerOpenGL::Clear ()
 void csTextureManagerOpenGL::FreeImages()
 {
   /*
-     We are pushing all known textures into software proctex renderers before freeing images.
-     This is not optimal, but better than either not freeing the images or having the software 
+     We are pushing all known textures into software proctex renderers
+     before freeing images. This is not optimal, but better than either
+     not freeing the images or having the software 
      proctexes register NULL images with their renderer.
    */
   int i;
@@ -851,3 +857,4 @@ void csTextureManagerOpenGL::FreeImages()
     textures.Get (i)->FreeImage ();
   }
 }
+

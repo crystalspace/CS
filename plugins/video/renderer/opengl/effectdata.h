@@ -32,56 +32,56 @@ class csOpenGlEffectLayerData : public iBase
 {
 public:
 
-	//constant colorsource
-	//ed_source macros
-	int ccsource;
+  //constant colorsource
+  //ed_source macros
+  int ccsource;
 
-	//vertex coordinate source
-	//ed_source macro
-	int vcord_source;
+  //vertex coordinate source
+  //ed_source macro
+  int vcord_source;
 
-	//texture to use
-	int inputtex;
+  //texture to use
+  int inputtex;
 
-	//colorsource
-	int colorsource[4];
-	//color modifier
-	int colormod[4];
-	//color operation
-	int colorp;
+  //colorsource
+  int colorsource[4];
+  //color modifier
+  int colormod[4];
+  //color operation
+  int colorp;
 
-	//alphasource
-	int alphasource[4];
-	//alpha modifier
-	int alphamod[4];
-	//alpha operation
-	int alphap;
+  //alphasource
+  int alphasource[4];
+  //alpha modifier
+  int alphamod[4];
+  //alpha operation
+  int alphap;
 
-	SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
-	csOpenGlEffectLayerData()
-	{
-		SCF_CONSTRUCT_IBASE(NULL);
+  csOpenGlEffectLayerData()
+  {
+    SCF_CONSTRUCT_IBASE(NULL);
 
-		ccsource = ED_SOURCE_NONE;
+    ccsource = ED_SOURCE_NONE;
 
-		vcord_source = ED_SOURCE_NONE;
+    vcord_source = ED_SOURCE_NONE;
 
-		inputtex = 0;
+    inputtex = 0;
 
-		colorsource[0] = GL_PREVIOUS_ARB; colorsource[1] = GL_TEXTURE; colorsource[2] = -1; colorsource[3] = -1;
-		colormod[0] = GL_SRC_COLOR; colormod[1] = GL_SRC_COLOR; colormod[2] = GL_SRC_COLOR; colormod[3] = GL_SRC_COLOR;
-		colorp = GL_MODULATE;
+    colorsource[0] = GL_PREVIOUS_ARB; colorsource[1] = GL_TEXTURE; colorsource[2] = -1; colorsource[3] = -1;
+    colormod[0] = GL_SRC_COLOR; colormod[1] = GL_SRC_COLOR; colormod[2] = GL_SRC_COLOR; colormod[3] = GL_SRC_COLOR;
+    colorp = GL_MODULATE;
 
-		alphasource[0] = GL_PREVIOUS_ARB; alphasource[1] = GL_TEXTURE; alphasource[2] = -1; alphasource[3] = -1;
-		alphamod[0] = GL_SRC_ALPHA; alphamod[1] = GL_SRC_ALPHA; alphamod[2] = GL_SRC_ALPHA; alphamod[3] = GL_SRC_ALPHA;
-		alphap = GL_MODULATE;
-	}
+    alphasource[0] = GL_PREVIOUS_ARB; alphasource[1] = GL_TEXTURE; alphasource[2] = -1; alphasource[3] = -1;
+    alphamod[0] = GL_SRC_ALPHA; alphamod[1] = GL_SRC_ALPHA; alphamod[2] = GL_SRC_ALPHA; alphamod[3] = GL_SRC_ALPHA;
+    alphap = GL_MODULATE;
+  }
 };
 
 SCF_IMPLEMENT_IBASE(csOpenGlEffectLayerData)
-	SCF_IMPLEMENTS_INTERFACE(iBase)
-	SCF_IMPLEMENTS_INTERFACE(csOpenGlEffectLayerData)
+  SCF_IMPLEMENTS_INTERFACE(iBase)
+  SCF_IMPLEMENTS_INTERFACE(csOpenGlEffectLayerData)
 SCF_IMPLEMENT_IBASE_END
 
 ///OpenGL specific effectdata stored per pass
@@ -94,43 +94,43 @@ class csOpenGlEffectPassData : public iBase
 {
 public:
 
-	//datavariables
-	//blending-vars
-	bool doblending;
-	int sblend; //sourceblend
-	int dblend;
+  //datavariables
+  //blending-vars
+  bool doblending;
+  int sblend; //sourceblend
+  int dblend;
 
-	//shademode
-	GLenum shade_state;
+  //shademode
+  GLenum shade_state;
 
-	//vertex color source
-	//one of ED_VC_SOURCE*
-	int vcsource; 
+  //vertex color source
+  //one of ED_VC_SOURCE*
+  int vcsource; 
 
-	//id of initiated vertex program
-	GLuint vertex_program;
+  //id of initiated vertex program
+  GLuint vertex_program;
 
-	SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
-	csOpenGlEffectPassData()
-	{
-		SCF_CONSTRUCT_IBASE(NULL);
+  csOpenGlEffectPassData()
+  {
+    SCF_CONSTRUCT_IBASE(NULL);
 
-		doblending = false;
-		sblend = GL_ONE;
-		dblend = GL_ZERO;
+    doblending = false;
+    sblend = GL_ONE;
+    dblend = GL_ZERO;
 
-		shade_state = GL_SMOOTH;
+    shade_state = GL_SMOOTH;
 
-		vcsource = ED_VC_SOURCE_MESH;
+    vcsource = ED_VC_SOURCE_MESH;
 
-		vertex_program = 0;
-	}
+    vertex_program = 0;
+  }
 };
 
 SCF_IMPLEMENT_IBASE(csOpenGlEffectPassData)
-	SCF_IMPLEMENTS_INTERFACE(iBase)
-	SCF_IMPLEMENTS_INTERFACE(csOpenGlEffectPassData)
+  SCF_IMPLEMENTS_INTERFACE(iBase)
+  SCF_IMPLEMENTS_INTERFACE(csOpenGlEffectPassData)
 SCF_IMPLEMENT_IBASE_END
 
 #endif //__EFFECTDATA_H__

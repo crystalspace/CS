@@ -62,7 +62,8 @@ public:
   { return handle; }
   virtual void GetFlatColor (csRGBpixel &oColor)
   { oColor.Set (0,0,0); }
-  virtual void GetReflection (float &oDiffuse, float &oAmbient, float &oReflection)
+  virtual void GetReflection (float &oDiffuse, float &oAmbient,
+  	float &oReflection)
   { oDiffuse = oAmbient = oReflection = 0; }
   virtual void Prepare ()
   { }
@@ -81,7 +82,8 @@ dummyMaterial::dummyMaterial ()
 
 iTextureHandle *csOpenGLProcSoftware::TxtHandleVector::RegisterAndPrepare (iTextureHandle *ogl_txt)
 {
-  csTextureHandleOpenGL *txtmm = (csTextureHandleOpenGL*)ogl_txt->GetPrivateObject();
+  csTextureHandleOpenGL *txtmm = (csTextureHandleOpenGL*)
+  	ogl_txt->GetPrivateObject();
   iImage *image = txtmm->get_image();
 
   int flags = txtmm->GetFlags ();
@@ -108,8 +110,8 @@ iTextureHandle *csOpenGLProcSoftware::TxtHandleVector::RegisterAndPrepare (iText
   return hstxt;
 }
 
-void csOpenGLProcSoftware::TxtHandleVector::AddTextureHandles (iTextureHandle *soft,
-           iTextureHandle *ogl)
+void csOpenGLProcSoftware::TxtHandleVector::AddTextureHandles (
+	iTextureHandle *soft, iTextureHandle *ogl)
 {
   Push (new txt_handles (soft, ogl));
 }
@@ -223,8 +225,8 @@ bool csOpenGLProcSoftware::Prepare(
   if (!soft_proc_g3d)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.graphics3d.opengl",
-  "Error creating offscreen software renderer");
+	"crystalspace.graphics3d.opengl",
+	"Error creating offscreen software renderer");
     return false;
   }
   plugin_mgr->DecRef();
@@ -234,8 +236,8 @@ bool csOpenGLProcSoftware::Prepare(
   if (!isoft_proc)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-  "crystalspace.graphics3d.opengl",
-      "Error creating offscreen software renderer");
+	"crystalspace.graphics3d.opengl",
+	"Error creating offscreen software renderer");
     soft_proc_g3d->DecRef ();
     return false;
   }
@@ -302,7 +304,8 @@ void csOpenGLProcSoftware::Print (csRect *area)
   {
     // Texture is in tha cache, update texture directly.
     //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-    csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D, tex_data->Handle);
+    csGraphics3DOGLCommon::statecache->SetTexture (
+    	GL_TEXTURE_2D, tex_data->Handle);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
         width, height,
         GL_RGBA, GL_UNSIGNED_BYTE, buffer);
@@ -339,8 +342,10 @@ void csOpenGLProcSoftware::DrawPolygon (G3DPolygonDP& poly)
   if (idx == -1)
   {
     /// @@@ this will grow unrestricted
-    dmat.handle = txts_vector->RegisterAndPrepare (poly.mat_handle->GetTexture ());
-    handles = txts_vector->Get(txts_vector->FindKey ((void*)poly.mat_handle->GetTexture ()));
+    dmat.handle = txts_vector->RegisterAndPrepare (
+    	poly.mat_handle->GetTexture ());
+    handles = txts_vector->Get(txts_vector->FindKey (
+    	(void*)poly.mat_handle->GetTexture ()));
   }
   else
   {
@@ -366,7 +371,8 @@ void csOpenGLProcSoftware::DrawPolygonDebug (G3DPolygonDP& poly)
 #endif
 }
 
-void csOpenGLProcSoftware::DrawLine (const csVector3& v1, const csVector3& v2, float fov, int color)
+void csOpenGLProcSoftware::DrawLine (const csVector3& v1, const csVector3& v2,
+	float fov, int color)
 {
   g3d->DrawLine (v1, v2, fov, color);
 }
@@ -434,7 +440,8 @@ void csOpenGLProcSoftware::OpenFogObject (CS_ID id, csFog* fog)
   g3d->OpenFogObject (id, fog);
 }
 
-void csOpenGLProcSoftware::DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, int fogtype)
+void csOpenGLProcSoftware::DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly,
+	int fogtype)
 {
   g3d->DrawFogPolygon (id, poly, fogtype);
 }
@@ -543,3 +550,4 @@ void csOpenGLProcSoftware::DrawPixmap (iTextureHandle *hTex, int sx,
     soft_txt_handle = (iTextureHandle*)txts_vector->Get (idx)->soft_txt;
   g3d->DrawPixmap (soft_txt_handle, sx, sy, sw, sh, tx, ty, tw, th, Alpha);
 }
+

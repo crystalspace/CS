@@ -407,7 +407,7 @@ private:
     bool z_plane_clipping,
     bool frustum_clipping);
 
-    void ClipTriangleLightmapMesh (
+  void ClipTriangleLightmapMesh (
     int num_triangles,
     int num_vertices,
     csTriangle* triangles,
@@ -422,10 +422,7 @@ private:
     csPlane3* planes, int num_planes,
     csPlane3* diag_planes, int num_diag_planes);
 
-
-
-
-    void ClipUnlitPolys (
+  void ClipUnlitPolys (
     int num_triangles,
     int num_vertices,
     csTriangle* triangles,
@@ -441,8 +438,7 @@ private:
     bool z_plane_clipping,
     bool frustum_clipping);
 
-
-    void ClipUnlitPolys (
+  void ClipUnlitPolys (
     int num_triangles,
     int num_vertices,
     csTriangle* triangles,
@@ -455,10 +451,6 @@ private:
     const csVector3& frust_origin,
     csPlane3* planes, int num_planes,
     csPlane3* diag_planes, int num_diag_planes);
-
-
-
-
 
   /**
    * Draw the outlines of all triangles. This function accepts
