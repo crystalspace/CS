@@ -800,9 +800,8 @@ void csPortalContainer::DrawOnePortal (
   {
     keep_camera_z = camera_vertices[po->GetVertexIndices ()[0]].z;
   }
-  // First call OpenPortal() if needed.
+  // First call OpenPortal().
   bool use_float_portal = po->flags.Check (CS_PORTAL_FLOAT);
-  
   g3d->OpenPortal (poly.GetVertexCount(), poly.GetVertices(),
       camera_plane, use_float_portal);
 
@@ -830,7 +829,8 @@ void csPortalContainer::DrawOnePortal (
   }
 
   // Make sure to close the portal again.
-  g3d->ClosePortal ();
+  bool use_zfill_portal = po->flags.Check (CS_PORTAL_ZFILL);
+  g3d->ClosePortal (use_zfill_portal);
 }
 
 //------------------- For iShadowReceiver ----------------------------//

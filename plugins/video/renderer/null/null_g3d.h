@@ -135,7 +135,7 @@ public:
   virtual void OpenPortal (size_t, const csVector2*, const csPlane3&, bool) { }
 
   /// Close a portal previously opened with OpenPortal().
-  virtual void ClosePortal () { }
+  virtual void ClosePortal (bool) { }
 
   /// Draw a line in camera space.
   virtual void DrawLine (const csVector3& v1, const csVector3& v2,

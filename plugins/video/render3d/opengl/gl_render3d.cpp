@@ -464,7 +464,7 @@ int csGLGraphics3D::SetupClipPlanes (bool add_clipper,
   glPushMatrix ();
   glLoadIdentity ();
 
-  int i = 0;
+  int planes = 0;
   GLdouble plane_eq[4];
 
   // This routine assumes the hardware planes can handle the
@@ -484,6 +484,7 @@ int csGLGraphics3D::SetupClipPlanes (bool add_clipper,
     if (numfrustplanes > maxfrustplanes)
       numfrustplanes = maxfrustplanes;
 
+    int i;
     for (i = 0 ; i < numfrustplanes ; i++)
     {
       pl.Set (csVector3 (0), frustum[i], frustum[i1]);
@@ -491,31 +492,33 @@ int csGLGraphics3D::SetupClipPlanes (bool add_clipper,
       plane_eq[1] = pl.B ();
       plane_eq[2] = pl.C ();
       plane_eq[3] = pl.D ();
-      glClipPlane ((GLenum)(GL_CLIP_PLANE0+i), plane_eq);
+      glClipPlane ((GLenum)(GL_CLIP_PLANE0+planes), plane_eq);
+      planes++;
       i1 = i;
-    }
-    if (add_near_clip)
-    {
-      plane_eq[0] = -near_plane.A ();
-      plane_eq[1] = -near_plane.B ();
-      plane_eq[2] = -near_plane.C ();
-      plane_eq[3] = -near_plane.D ();
-      glClipPlane ((GLenum)(GL_CLIP_PLANE0+i), plane_eq);
-      i++;
-    }
-    if (add_z_clip)
-    {
-      plane_eq[0] = 0;
-      plane_eq[1] = 0;
-      plane_eq[2] = 1;
-      plane_eq[3] = -.001;
-      glClipPlane ((GLenum)(GL_CLIP_PLANE0+i), plane_eq);
-      i++;
     }
   }
 
+  if (add_near_clip)
+  {
+    plane_eq[0] = -near_plane.A ();
+    plane_eq[1] = -near_plane.B ();
+    plane_eq[2] = -near_plane.C ();
+    plane_eq[3] = -near_plane.D ();
+    glClipPlane ((GLenum)(GL_CLIP_PLANE0+planes), plane_eq);
+    planes++;
+  }
+  if (add_z_clip)
+  {
+    plane_eq[0] = 0;
+    plane_eq[1] = 0;
+    plane_eq[2] = 1;
+    plane_eq[3] = -.001;
+    glClipPlane ((GLenum)(GL_CLIP_PLANE0+planes), plane_eq);
+    planes++;
+  }
+
   glPopMatrix ();
-  return i;
+  return planes;
 }
 
 void csGLGraphics3D::SetupClipper (int clip_portal,
@@ -2077,14 +2080,73 @@ void csGLGraphics3D::OpenPortal (size_t numVertices,
     clipportal_floating = 1;
 }
 
-void csGLGraphics3D::ClosePortal ()
+void csGLGraphics3D::ClosePortal (bool use_zfill_portal)
 {
   if (clipportal_stack.Length () <= 0) return;
   csClipPortal* cp = clipportal_stack.Pop ();
+
+  if (use_zfill_portal)
+  {
+    GLboolean wmRed, wmGreen, wmBlue, wmAlpha;
+    statecache->GetColorMask (wmRed, wmGreen, wmBlue, wmAlpha);
+    statecache->SetColorMask (false, false, false, false);
+
+    GLenum oldcullface;
+    statecache->GetCullFace (oldcullface);
+    statecache->SetCullFace (GL_FRONT);
+    bool tex2d = statecache->IsEnabled_GL_TEXTURE_2D ();
+    statecache->Disable_GL_TEXTURE_2D ();
+    statecache->SetShadeModel (GL_FLAT);
+
+    SetZModeInternal (CS_ZBUF_FILLONLY);
+    Draw2DPolygon (cp->poly, cp->num_poly, cp->normal);
+    SetZModeInternal (current_zmode);
+
+    statecache->SetColorMask (wmRed, wmGreen, wmBlue, wmAlpha);
+    statecache->SetCullFace (oldcullface);
+    if (tex2d)
+      statecache->Enable_GL_TEXTURE_2D ();
+  }
+  
   delete cp;
   clipportal_dirty = true;
   if (clipportal_floating > 0)
     clipportal_floating--;
+}
+
+void csGLGraphics3D::Draw2DPolygon (csVector2* poly, int num_poly,
+	const csPlane3& normal)
+{
+  // Get the plane normal of the polygon. Using this we can calculate
+  // '1/z' at every screen space point.
+  float M, N, O;
+  float Dc = normal.D ();
+  if (ABS (Dc) < 0.01f)
+  {
+    M = N = 0;
+    O = 1;
+  }
+  else
+  {
+    float inv_Dc = 1.0f / Dc;
+    M = -normal.A () * inv_Dc * inv_aspect;
+    N = -normal.B () * inv_Dc * inv_aspect;
+    O = -normal.C () * inv_Dc;
+  }
+
+  int v;
+  glBegin (GL_TRIANGLE_FAN);
+  csVector2* vt = poly;
+  for (v = 0 ; v < num_poly ; v++)
+  {
+    float sx = vt->x - asp_center_x;
+    float sy = vt->y - asp_center_y;
+    float one_over_sz = M * sx + N * sy + O;
+    float sz = 1.0f / one_over_sz;
+    glVertex4f (vt->x * sz, vt->y * sz, -1.0f, sz);
+    vt++;
+  }
+  glEnd ();
 }
 
 void csGLGraphics3D::SetupClipPortals ()
@@ -2116,38 +2178,9 @@ void csGLGraphics3D::SetupClipPortals ()
   statecache->Disable_GL_TEXTURE_2D ();
   statecache->SetShadeModel (GL_FLAT);
 
-  SetZModeInternal (CS_ZBUF_USE);	// @@@ TEST?
-  // Get the plane normal of the polygon. Using this we can calculate
-  // '1/z' at every screen space point.
+  SetZModeInternal (CS_ZBUF_TEST);
 
-  float M, N, O;
-  float Dc = cp->normal.D ();
-  if (ABS (Dc) < 0.01f)
-  {
-    M = N = 0;
-    O = 1;
-  }
-  else
-  {
-    float inv_Dc = 1.0f / Dc;
-    M = -cp->normal.A () * inv_Dc * inv_aspect;
-    N = -cp->normal.B () * inv_Dc * inv_aspect;
-    O = -cp->normal.C () * inv_Dc;
-  }
-
-  int v;
-  glBegin (GL_TRIANGLE_FAN);
-  csVector2* vt = cp->poly;
-  for (v = 0 ; v < cp->num_poly ; v++)
-  {
-    float sx = vt->x - asp_center_x;
-    float sy = vt->y - asp_center_y;
-    float one_over_sz = M * sx + N * sy + O;
-    float sz = 1.0f / one_over_sz;
-    glVertex4f (vt->x * sz, vt->y * sz, -1.0f, sz);
-    vt++;
-  }
-  glEnd ();
+  Draw2DPolygon (cp->poly, cp->num_poly, cp->normal);
 
   // Use the stencil area.
   statecache->SetStencilFunc (GL_EQUAL, 128, 128);

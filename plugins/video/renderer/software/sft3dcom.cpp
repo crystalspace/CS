@@ -2647,7 +2647,7 @@ void csGraphics3DSoftwareCommon::OpenPortal (size_t /*numVertices*/,
 {
 }
 
-void csGraphics3DSoftwareCommon::ClosePortal ()
+void csGraphics3DSoftwareCommon::ClosePortal (bool /*use_zfill_portal*/)
 {
 }
 

@@ -329,8 +329,12 @@
             <level>4</level>
             <sort>NONE</sort>
         </priority>
-        <priority name="alpha">
+        <priority name="specialportal">
             <level>5</level>
+            <sort>NONE</sort>
+        </priority>
+        <priority name="alpha">
+            <level>6</level>
             <sort>BACK2FRONT</sort>
         </priority>
     </renderpriorities>
@@ -4609,12 +4613,10 @@
 	</light>
         <meshobj name="rot_door1">
             <plugin>thing</plugin>
-	    <priority>wall</priority>
+	    <priority>object</priority>
             <zuse />
 	    <meshobj name="door_overlay">
                 <plugin>thing</plugin>
-	        <priority>object</priority>
-                <zfill />
 		<params>
                     <v x="-2.5" y="0" z="-0.1" />
                     <v x="-2.5" y="3.4" z="-0.1" />
@@ -4640,10 +4642,26 @@
                             </matrix>
                             <v x="-2.5" y="3.4" z="-0.1" />
                         </texmap>
+		        <lighting>no</lighting>
                     </p>
                     <mixmode><alpha>0.75</alpha></mixmode>
 	        </params>
+		<priority>alpha</priority>
+                <ztest />
 	    </meshobj>
+	    <portals name="south_portal">
+                <portal name="south">
+                    <v x="0" y="0" z="-0.1" />
+                    <v x="-2.5" y="0" z="-0.1" />
+                    <v x="-2.5" y="3.4" z="-0.1" />
+                    <v x="0" y="3.4" z="-0.1" />
+                    <sector>large</sector>
+                    <mirror />
+                    <clip />
+                    <float />
+                </portal>
+		<priority>specialportal</priority>
+            </portals>
             <params>
                 <v x="-2.5" y="0" z="-0.1" />
                 <v x="-2.5" y="0" z="0.1" />
@@ -4701,34 +4719,6 @@
                         </matrix>
                         <v x="0" y="3.4" z="-0.1" />
                     </texmap>
-                </p>
-                <p name="south">
-                    <v>4</v>
-                    <v>0</v>
-                    <v>2</v>
-                    <v>6</v>
-                    <texmap>
-                        <matrix>
-                            <m11>0.5</m11>
-                            <m12>0</m12>
-                            <m13>0</m13>
-                            <m21>0</m21>
-                            <m22>-0.5</m22>
-                            <m23>0</m23>
-                            <m31>0</m31>
-                            <m32>0</m32>
-                            <m33>0.5</m33>
-                        </matrix>
-                        <v x="-2.5" y="3.4" z="-0.1" />
-                    </texmap>
-                    <!--<alpha>75</alpha>-->
-                    <portal>
-                        <sector>large</sector>
-                        <mirror />
-                        <clip />
-                        <float />
-                        <zfill />
-                    </portal>
                 </p>
                 <p name="west">
                     <v>0</v>

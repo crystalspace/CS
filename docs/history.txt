@@ -6,6 +6,20 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-Jun-2004
+	- Jorrit changed g3d->ClosePortal() to also have a new use_zfill_portal
+	  flag. When this flag is set the renderer will zfill the portal area.
+	  Only the NR renderers do this. With OR it is the engine itself
+	  that will zfill the portal area so the OR renderers ignore this
+	  flag.
+	- Jorrit fixed a compilation error with OR GL renderer.
+	- Jorrit fixed several issues with the rotating door in flarge so that
+	  it now works perfectly in OR (these issues have to do with
+	  setting up the correct render priorities and zmode flags).
+	- Jorrit fixed a bug in the NR OpenGL clipper which prevented
+	  z-plane clipping from working correctly in case the plane clipper
+	  was not selected for the portal. This fixes the rotating door in
+	  flarge for NR too.
 16-Jun-2004
 	- Jorrit cleaned up stencil clipping in the NR/OpenGL renderer.
 	  Now mask 128 is used for both stencil clipping and floating portals

@@ -1117,8 +1117,9 @@ struct iGraphics3D : public iBase
 
   /**
    * Close a portal previously opened with OpenPortal().
+   * If 'zfill_portal' then the portal area will be zfilled.
    */
-  virtual void ClosePortal () = 0;
+  virtual void ClosePortal (bool zfill_portal) = 0;
 
   /// Create a halo of the specified color and return a handle.
   virtual iHalo *CreateHalo (float iR, float iG, float iB,

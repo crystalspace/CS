@@ -238,6 +238,10 @@ private:
   bool texunitenabled[16]; // @@@ Hardcoded max number of units
   GLuint texunittarget[16]; // @@@ Hardcoded max number of units
 
+  // Draw a 2D polygon (screen space coordinates) with correct Z information
+  // given the plane. This function will not set up any texture mapping,
+  // shading, or color.
+  void Draw2DPolygon (csVector2* poly, int num_poly, const csPlane3& normal);
 
 public:
   static csGLStateCache* statecache;
@@ -417,7 +421,7 @@ public:
     const csPlane3& normal, bool floating);
 
   /// Close a portal previously opened with OpenPortal().
-  virtual void ClosePortal ();
+  virtual void ClosePortal (bool use_zfill_portal);
 
   void SetupClipPortals ();
 

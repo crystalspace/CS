@@ -236,6 +236,19 @@ protected:
   iRenderBuffer* activebuffers[CS_VATTRIB_SPECIFIC_LAST - 
     CS_VATTRIB_SPECIFIC_FIRST + 1];
 
+  // Structure used for maintaining a stack of clipper portals.
+  struct csClipPortal
+  {
+    csVector2* poly;
+    int num_poly;
+    csPlane3 normal;
+    csClipPortal () : poly (0) { }
+    ~csClipPortal () { delete[] poly; }
+  };
+  csPDelArray<csClipPortal> clipportal_stack;
+  bool clipportal_dirty;
+  int clipportal_floating;
+
 public:
   SCF_DECLARE_IBASE;
 
@@ -698,8 +711,9 @@ public:
 
   virtual csPtr<iPolygonRenderer> CreatePolygonRenderer ();
 
-  virtual void OpenPortal (size_t, const csVector2*, const csPlane3&, bool) {  }
-  virtual void ClosePortal () {  }
+  virtual void OpenPortal (size_t, const csVector2*, const csPlane3&, bool);
+  virtual void ClosePortal (bool use_zfill_portal);
+  void DrawPolygonZFill (G3DPolygonDFP&);
 
   //=========================================================================
   // Below this line are all functions that are not yet implemented by

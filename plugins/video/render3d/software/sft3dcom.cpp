@@ -288,6 +288,9 @@ csSoftwareGraphics3DCommon::csSoftwareGraphics3DCommon (iBase* parent)
   object_reg = 0;
 
   memset (activebuffers, 0, sizeof (activebuffers));
+
+  clipportal_dirty = true;
+  clipportal_floating = 0;
 }
 
 csSoftwareGraphics3DCommon::~csSoftwareGraphics3DCommon ()
@@ -1169,6 +1172,10 @@ bool csSoftwareGraphics3DCommon::BeginDraw (int DrawFlags)
 {
   dpfx_valid = false;
 
+  clipportal_dirty = true;
+  clipportal_floating = 0;
+  CS_ASSERT (clipportal_stack.Length () == 0);
+
   if ((G2D->GetWidth() != display_width) ||
       (G2D->GetHeight() != display_height))
     SetDimensions (G2D->GetWidth(), G2D->GetHeight());
@@ -1719,11 +1726,212 @@ void csSoftwareGraphics3DCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
   } /* endfor */
 }
 
+void csSoftwareGraphics3DCommon::DrawPolygonZFill (G3DPolygonDFP& poly)
+{
+  int i;
+  int max_i, min_i;
+  float max_y, min_y;
+  unsigned char *d;
+  uint32 *z_buf;
+
+  if (poly.num < 3)
+    return;
+
+  float M, N, O;
+  // Get the plane normal of the polygon. Using this we can calculate
+  // '1/z' at every screen space point.
+  float Ac, Bc, Cc, Dc, inv_Dc;
+  Ac = poly.normal.A ();
+  Bc = poly.normal.B ();
+  Cc = poly.normal.C ();
+  Dc = poly.normal.D ();
+
+  if (ABS (Dc) < SMALL_D)
+  {
+    // The Dc component of the plane normal is too small. This means that
+    // the plane of the polygon is almost perpendicular to the eye of the
+    // viewer. In this case, nothing much can be seen of the plane anyway
+    // so we just take one value for the entire polygon.
+    M = 0;
+    N = 0;
+    // For O choose the transformed z value of one vertex.
+    // That way Z buffering should at least work.
+    O = 1;
+  }
+  else
+  {
+    inv_Dc = 1 / Dc;
+    M = -Ac * inv_Dc * inv_aspect;
+    N = -Bc * inv_Dc * inv_aspect;
+    O = -Cc * inv_Dc;
+  }
+
+  // Compute the min_y and max_y for this polygon in screen space coordinates.
+  // We are going to use these to scan the polygon from top to bottom.
+  min_i = max_i = 0;
+  min_y = max_y = poly.vertices[0].y;
+  // count 'real' number of vertices
+  int num_vertices = 1;
+  for (i = 1 ; i < poly.num ; i++)
+  {
+    if (poly.vertices[i].y > max_y)
+    {
+      max_y = poly.vertices[i].y;
+      max_i = i;
+    }
+    else if (poly.vertices[i].y < min_y)
+    {
+      min_y = poly.vertices[i].y;
+      min_i = i;
+    }
+    // theoretically we should do here sqrt(dx^2+dy^2), but
+    // we can approximate it just by abs(dx)+abs(dy)
+    if ((ABS (poly.vertices [i].x - poly.vertices [i - 1].x)
+       + ABS (poly.vertices [i].y - poly.vertices [i - 1].y))
+       	> VERTEX_NEAR_THRESHOLD)
+      num_vertices++;
+  }
+
+  // if this is a 'degenerate' polygon, skip it
+  if (num_vertices < 3)
+    return;
+
+  SelectInterpolationStep (M);
+
+  // Steps for interpolating horizontally accross a scanline.
+  Scan.M = M;
+  Scan.dM = M*Scan.InterpolStep;
+
+  // Select the right scanline drawing function.
+  csDrawScanline* dscan = 0;
+  int scan_index = SCANPROC_ZFIL;
+  if ((scan_index < 0) || !(dscan = ScanProc [scan_index]))
+    return;   // Nothing to do.
+
+  // Scan both sides of the polygon at once.
+  // We start with two pointers at the top (as seen in y-inverted
+  // screen-space: bottom of display) and advance them until both
+  // join together at the bottom. The way this algorithm works, this
+  // should happen automatically; the left pointer is only advanced
+  // when it is further away from the bottom than the right pointer
+  // and vice versa.
+  // Using this we effectively partition our polygon in trapezoids
+  // with at most two triangles (one at the top and one at the bottom).
+
+  int scanL1, scanL2, scanR1, scanR2; // scan vertex left/right start/final
+  float sxL, sxR, dxL, dxR;           // scanline X left/right and deltas
+  int sy, fyL, fyR;                   // scanline Y, final Y left, final Y right
+  int xL, xR;
+  int screenY;
+
+  sxL = sxR = dxL = dxR = 0; // Avoid warnings about "uninitialized variables"
+  scanL2 = scanR2 = max_i;
+  sy = fyL = fyR = QRound (poly.vertices [scanL2].y);
+
+  for ( ; ; )
+  {
+    //-----
+    // We have reached the next segment. Recalculate the slopes.
+    //-----
+    bool leave;
+    do
+    {
+      leave = true;
+      if (sy <= fyR)
+      {
+        // Check first if polygon has been finished
+        if (scanR2 == min_i)
+          return;
+        scanR1 = scanR2;
+	if (++scanR2 >= poly.num)
+	  scanR2 = 0;
+
+        leave = false;
+        fyR = QRound (poly.vertices [scanR2].y);
+        if (sy <= fyR)
+          continue;
+
+        float dyR = (poly.vertices [scanR1].y - poly.vertices [scanR2].y);
+        if (dyR)
+        {
+          sxR = poly.vertices [scanR1].x;
+          dxR = (poly.vertices [scanR2].x - sxR) / dyR;
+          // horizontal pixel correction
+          sxR += dxR * (poly.vertices [scanR1].y - (float (sy) - 0.5));
+        } /* endif */
+      } /* endif */
+      if (sy <= fyL)
+      {
+        scanL1 = scanL2;
+	if (--scanL2 < 0)
+	  scanL2 = poly.num - 1;
+
+        leave = false;
+        fyL = QRound (poly.vertices [scanL2].y);
+        if (sy <= fyL)
+          continue;
+
+        float dyL = (poly.vertices [scanL1].y - poly.vertices [scanL2].y);
+        if (dyL)
+        {
+          sxL = poly.vertices [scanL1].x;
+          dxL = (poly.vertices [scanL2].x - sxL) / dyL;
+          // horizontal pixel correction
+          sxL += dxL * (poly.vertices [scanL1].y - (float (sy) - 0.5));
+        } /* endif */
+      } /* endif */
+    } while (!leave); /* enddo */
+
+    // Steps for interpolating vertically over scanlines.
+    float vd_inv_z = - dxL * M + N;
+
+    float cx = (sxL - float (width2));
+    float cy = (float (sy) - 0.5 - float (height2));
+    float inv_z = M * cx + N * cy + O;
+
+    // Find the trapezoid top (or bottom in inverted Y coordinates)
+    int fin_y;
+    if (fyL > fyR)
+      fin_y = fyL;
+    else
+      fin_y = fyR;
+
+    screenY = height - sy;
+
+    while (sy > fin_y)
+    {
+      if ((sy & 1) != do_interlaced)
+      {
+        // Compute the rounded screen coordinates of horizontal strip
+        xL = QRound (sxL);
+        xR = QRound (sxR);
+
+        // Sub-pixel U & V correction
+        float deltaX = (float)xL - sxL;
+
+        //G2D->GetPixelAt(xL, screenY, &d);
+        d = line_table[screenY] + (xL << pixel_shift);
+        z_buf = z_buffer + width * screenY + xL;
+
+        // do not draw the rightmost pixel - it will be covered
+        // by neightbour polygon's left bound
+        dscan (xR - xL, d, z_buf, inv_z + deltaX * M, 0, 0);
+      }
+
+      sxL += dxL;
+      sxR += dxR;
+      inv_z -= vd_inv_z;
+      sy--;
+      screenY++;
+    } /* endwhile */
+  } /* endfor */
+}
+
 void csSoftwareGraphics3DCommon::DrawPolygon (G3DPolygonDP& poly)
 {
   if (z_buf_mode == CS_ZBUF_FILLONLY)
   {
-    DrawFogPolygon (0, poly, CS_FOG_BACK);
+    DrawPolygonZFill (poly);
     return;
   }
 
@@ -2689,6 +2897,51 @@ void csSoftwareGraphics3DCommon::ClosePortal ()
 {
 }
 #endif
+
+void csSoftwareGraphics3DCommon::OpenPortal (size_t numVertices, 
+				 const csVector2* vertices,
+				 const csPlane3& normal,
+				 bool floating)
+{
+  csClipPortal* cp = new csClipPortal ();
+  cp->poly = new csVector2[numVertices];
+  memcpy (cp->poly, vertices, numVertices * sizeof (csVector2));
+  cp->num_poly = numVertices;
+  cp->normal = normal;
+  clipportal_stack.Push (cp);
+  clipportal_dirty = true;
+
+  // If we already have a floating portal then we increase the
+  // number. Otherwise we start at one.
+  if (clipportal_floating)
+    clipportal_floating++;
+  else if (floating)
+    clipportal_floating = 1;
+}
+
+void csSoftwareGraphics3DCommon::ClosePortal (bool use_zfill_portal)
+{
+  if (clipportal_stack.Length () <= 0) return;
+  csClipPortal* cp = clipportal_stack.Pop ();
+
+  if (use_zfill_portal)
+  {
+    SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_FILLONLY);
+    static G3DPolygonDP g3dpoly;
+    g3dpoly.mixmode = CS_FX_COPY;
+    int num_vertices = cp->num_poly;
+    g3dpoly.num = num_vertices;
+    memcpy (g3dpoly.vertices, cp->poly, num_vertices * sizeof (csVector2));
+    g3dpoly.z_value = 10.0;	// @@@ Just a bad guess!
+    g3dpoly.normal = cp->normal;
+    DrawPolygonZFill (g3dpoly);
+  }
+  
+  delete cp;
+  clipportal_dirty = true;
+  if (clipportal_floating > 0)
+    clipportal_floating--;
+}
 
 // Calculate round (f) of a 16:16 fixed pointer number
 // and return a long integer.

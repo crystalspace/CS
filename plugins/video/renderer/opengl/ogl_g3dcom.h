@@ -435,6 +435,7 @@ protected:
   };
   csPDelArray<csClipPortal> clipportal_stack;
   bool clipportal_dirty;
+  int clipportal_floating;
 
   /**
    * If true the frustum below is valid. If false
@@ -795,7 +796,7 @@ public:
   virtual void OpenPortal (size_t numVertices, const csVector2* vertices,
     const csPlane3& normal, bool floating);
   /// Close a portal previously opened with OpenPortal().
-  virtual void ClosePortal ();
+  virtual void ClosePortal (bool use_zfill_portal);
 
   /// Get Z-buffer value at given X,Y position
   virtual float GetZBuffValue (int x, int y);

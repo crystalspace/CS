@@ -5472,8 +5472,10 @@ void csGraphics3DOGLCommon::OpenPortal (size_t numVertices,
     clipportal_floating = 1;
 }
 
-void csGraphics3DOGLCommon::ClosePortal ()
+void csGraphics3DOGLCommon::ClosePortal (bool /*use_zfill_portal*/)
 {
+  // @@@ OR doesn't use use_zfill_portal flag since in OR the
+  // portal area is z-filled in the engine itself.
   if (clipportal_stack.Length () <= 0) return;
   csClipPortal* cp = clipportal_stack.Pop ();
   delete cp;
@@ -5489,7 +5491,7 @@ void csGraphics3DOGLCommon::SetupClipPortals ()
     clipportal_dirty = false;
     if (GLCaps.use_stencil)
     {
-      if (clipportal_floating)
+      if (!clipportal_floating)
       {
         statecache->Disable_GL_STENCIL_TEST ();
       }

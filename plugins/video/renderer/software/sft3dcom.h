@@ -338,7 +338,7 @@ public:
   virtual void OpenPortal (size_t numVertices, const csVector2* vertices,
     const csPlane3& normal, bool floating);
   /// Close a portal previously opened with OpenPortal().
-  virtual void ClosePortal ();
+  virtual void ClosePortal (bool use_zfill_portal);
 
   /// Draw a line in camera space.
   virtual void DrawLine (const csVector3& v1, const csVector3& v2,
