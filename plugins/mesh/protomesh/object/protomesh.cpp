@@ -450,7 +450,9 @@ void csProtoMeshObjectFactory::SetupFactory ()
   {
     initialized = true;
     object_bbox_valid = false;
+#ifdef CS_USE_NEW_RENDERER
     PrepareBuffers ();
+#endif
   }
 }
 
