@@ -215,6 +215,22 @@ Note that if you have enabled @samp{STRICT_SMART_POINTERS} and you
 are in debug mode then CS will add a runtime test for this bad usage
 (i.e. your program will crash when you use something like the above).
 
+@subsubheading Warning About IncRef and DecRef!
+
+When using smart pointers (i.e. @code{csRef}) correctly you should
+be careful when using @code{IncRef()} and @code{DecRef()} manually.
+Avoid constructs like this:
+
+@example
+  csRef<iMeshWrapper> mesh = @dots{};
+  @dots{}
+  mesh->DecRef ();
+  mesh = NULL;
+@end example
+
+As this will cause @em{two} references to be decremented! And that is
+most likely not what you want.
+
 @subsubheading Warning About DestroyApplication!
 
 Due to the way the current implementation of
