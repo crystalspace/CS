@@ -169,6 +169,9 @@ public:
 
 class WWQuadTree;
 
+/**
+ *  Wouter's Wild QuadTree
+ */
 class WWQuadTree {
 private:
   /// bounding box of the quadtree
@@ -178,36 +181,42 @@ private:
   /// the state of the root node.
   int root_state;
 
-  /// state of all children, and their children.
-  /// they are ordered like this:
-  /// root has children in byte 0.
-  /// nodes in byte 0 have children in byte 0+node_nr(1,2,3,4).
-  /// nodes in byte 1 have children in byte 4+node_nr.
-  /// nodes in byte n have children in byte 4*n+node_nr
-  /// So for byte 0, take 0+node_nr as the new byte
-  /// for byte n, take 4*n + node_nr as the new byte
+  /** state of all children, and their children.
+   *  they are ordered like this:
+   *  root has children in byte 0.
+   *  nodes in byte 0 have children in byte 0+node_nr(1,2,3,4).
+   *  nodes in byte 1 have children in byte 4+node_nr.
+   *  nodes in byte n have children in byte 4*n+node_nr
+   *  So for byte 0, take 0+node_nr as the new byte
+   *  for byte n, take 4*n + node_nr as the new byte
+   */
   unsigned char* states;
   /// convenience variable: how many bytes alloced in states
   int state_size;
 
 
-  /// this function is used for traversing the quadtree.
-  /// it will get the nodes bounding box, state, byte offset and node_nr and 
-  /// custom clientdata.
+  /** this function is used for traversing the quadtree.
+   *  it will get the nodes bounding box, state, byte offset and node_nr and 
+   *  custom clientdata.
+   */
   typedef int WWQuadTree::quad_traverse_func(csBox2& node_bbox, 
     int node_state, int offset, int node_nr, void* data);
-  /// private functions to help dealing with quadtree
-  /// call all four children of node at offset and node_nr
-  /// each will be passed the data.
-  /// returns return values of children in rc1,rc2,rc3,rc4
-  /// note that theoretically the state of the caller could be changed.
+
+  /** private functions to help dealing with quadtree
+   *  call all four children of node at offset and node_nr
+   *  each will be passed the data.
+   *  returns return values of children in rc1,rc2,rc3,rc4
+   *  note that theoretically the state of the caller could be changed.
+   */
   void CallChildren(quad_traverse_func func, int offset, int node_nr, 
     void *data, int& rc1, int& rc2, int& rc3, int& rc4);
 
 public:
-  /// create a quadtree of depth, using about 2**twice depth bytes. depth >= 1
-  /// depth=1 is only the root.
+  /** create a quadtree of depth, using about 2**twice depth bytes. depth >= 1
+   *  depth=1 is only the root.
+   */
   WWQuadTree(const csBox2& the_box, int the_depth);
+
   /// destroy quadtree
   ~WWQuadTree();
 
