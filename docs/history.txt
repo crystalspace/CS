@@ -31,6 +31,10 @@ chronological order.
 	- Jorrit optimized the csPoly3D::ProjectXPlane() and other functions
 	  so that they avoid calling csPoly2D::AddVertex() in a loop.
 	  This speeds up those routines a lot.
+	- res fixed the mesh count not being 0 if 
+	  csMeshWrapper::GetRenderMeshes() did not return meshes because of
+	  a draw callback call, as reported by Marek Prerovsky 
+	  <marek.prerovsky@seznam.cz>.
 13-Feb-2005
 	- Peter Amstutz reorganized loading in the csVosA3DL plugin so
 	  that texture, material or geometry changes to 3D objects are

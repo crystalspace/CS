@@ -534,7 +534,11 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
   {
     i--;
     iMeshDrawCallback* cb = draw_cb_vector.Get (i);
-    if (!cb->BeforeDrawing (&scfiMeshWrapper, rview)) return 0;
+    if (!cb->BeforeDrawing (&scfiMeshWrapper, rview)) 
+    {
+      n = 0;
+      return 0;
+    }
   }
 
   /*draw_test = meshobj->DrawTest (rview, &movable.scfiMovable);
