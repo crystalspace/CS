@@ -292,7 +292,7 @@ static csColorBox *box = NULL;
 // Number of valid color boxes
 static int boxcount;
 // The storage for color indices
-static UByte *index = NULL;
+static UByte *color_index = NULL;
 
 static int compare_boxes (const void *i1, const void *i2)
 {
@@ -329,7 +329,7 @@ void csQuantizeBegin ()
 
 void csQuantizeEnd ()
 {
-  delete [] index; index = NULL;
+  delete [] color_index; color_index = NULL;
   delete [] box; box = NULL;
   delete [] hist; hist = NULL;
 }
@@ -538,11 +538,11 @@ void csQuantizePalette (RGBPixel *&outpalette, int &maxcolors, RGBPixel *transp)
 
   // Assign successive palette indices to all boxes
   int count, delta = transp ? 1 : 0;
-  index = new UByte [boxcount + delta];
+  color_index = new UByte [boxcount + delta];
   for (count = 0; count < boxcount; count++)
-    index [count] = count;
+    color_index [count] = count;
   // Sort palette indices by usage (a side bonus to quantization)
-  qsort (index, boxcount, sizeof (UByte), compare_boxes);
+  qsort (color_index, boxcount, sizeof (UByte), compare_boxes);
 
   // Allocate the palette, if not already allocated
   if (!outpalette)
@@ -554,14 +554,14 @@ void csQuantizePalette (RGBPixel *&outpalette, int &maxcolors, RGBPixel *transp)
 
   // Now compute the mean color for each box
   for (count = 0; count < boxcount; count++)
-    box [index [count]].GetMeanColor (outpalette [count + delta]);
+    box [color_index [count]].GetMeanColor (outpalette [count + delta]);
 
   // If we have a transparent color, set colormap entry 0 to it
   if (delta)
   {
     for (count = boxcount; count; count--)
-      index [count] = index [count - 1] + 1;
-    index [0] = 0;
+      color_index [count] = color_index [count - 1] + 1;
+    color_index [0] = 0;
     outpalette [0] = RGBPixel (0, 0, 0);
   }
 
@@ -587,7 +587,7 @@ void csQuantizeRemap (RGBPixel *image, int pixels, UByte *&outimage, RGBPixel *t
   {
     // Now, fill inverse colormap with color indices
     for (count = 0; count < boxcount; count++)
-      box [index [count + delta] - delta].FillInverseCMap (icmap, count + delta);
+      box [color_index [count + delta] - delta].FillInverseCMap (icmap, count + delta);
     qState = qsRemap;
   }
 
