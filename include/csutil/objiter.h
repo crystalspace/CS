@@ -16,11 +16,20 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+/**
+ * \file
+ */
+
 #ifndef __OBJITER_H__
 #define __OBJITER_H__
 
 #include "iutil/object.h"
 
+/**
+ * Defines a typed objectiterator class, descending from 
+ * csTypedObjectIterator. This macro assumes that the requested interface 
+ * is already declared as a fast interface.
+ */
 #define CS_DECLARE_OBJECT_ITERATOR(NAME,INTERFACE)			\
   class NAME : public csTypedObjectIterator				\
   {									\
@@ -35,9 +44,7 @@
   };
 
 /**
- * Helper class for CS_DECLARE_OBJECT_ITERATOR defining a typed objectiterator 
- * class. The macro assumes that the requested interface is already declared as 
- * a fast interface.
+ * Helper class for #CS_DECLARE_OBJECT_ITERATOR macro.
  */
 class csTypedObjectIterator
 {

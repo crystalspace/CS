@@ -21,7 +21,7 @@
 
 #if defined (CS_IEEE_DOUBLE_FORMAT)
 
-/**
+/** \file
     Quick floating point to integer conversions.
     <p>
     There is a general trick that can be used on all FPUs that uses IEEE
@@ -111,7 +111,7 @@
 
 #define CS_LONG_AT_BYTE(x,b)	*(long *)(((char *)&x) + b)
 
-/**
+/**\internal
  * We'll add 2^36 to create a 32.16 fixed-point value and then will pick
  * just the integer part from that. This will allow us to work correctly
  * with numbers up to 1 - 1/2^16 fractional part; numbers above will be
@@ -119,9 +119,9 @@
  */
 #define FIST_MAGIC_QINT   (65536.0 * 65536.0 * 16.0)
 
-/// Truncate the fractional part of a floating-point value and convert to integer
-/**
- * well, for QInt gcc 2.96 and above compilers (we tested up to 3.0.1) seems to
+/**\fn static inline long QInt (double inval)
+ * Truncate the fractional part of a floating-point value and convert to integer
+ * \internal well, for QInt gcc 2.96 and above compilers (we tested up to 3.0.1) seems to
  * be buggy, we've got a workaround which seems to be buggy in vc :) so we have
  * to differentiate between compilers here (Matze)
  */
@@ -145,20 +145,22 @@ static inline long QInt (double inval)
 }
 #endif
 
-/**
+/**\internal
  * To round an floating-point value we'll add 2^52+0.5*2^32 to it,
  * and will subtract 2^32 back after taking the required bits out.
  */
 #define FIST_MAGIC_QROUND (((65536.0 * 65536.0 * 16.0) + (65536.0 * 0.5)) * 65536.0)
 
-/// Round a floating-point value and convert to integer
+/**
+ * Round a floating-point value and convert to integer
+ */
 static inline long QRound (double inval)
 {
   double dtemp = FIST_MAGIC_QROUND + inval;
   return CS_LONG_AT_BYTE (dtemp, CS_LOWER_WORD_BYTE) - 0x80000000;
 }
 
-/**
+/**\internal
  * Add this constant to convert a floating-point value to 24.8
  * fixed-point value.
  */
@@ -171,7 +173,7 @@ inline long QInt8 (float inval)
   return CS_LONG_AT_BYTE (dtemp, CS_LOWER_WORD_BYTE) - 0x80000000;
 }
 
-/**
+/**\internal
  * Add this constant to convert a floating-point value to 16.16
  * fixed-point value.
  */
@@ -184,12 +186,13 @@ inline long QInt16 (float inval)
   return CS_LONG_AT_BYTE (dtemp, CS_LOWER_WORD_BYTE) - 0x80000000;
 }
 
-/**
+/**\internal
  * Add this constant to convert a floating-point value to 8.24
  * fixed-point value.
  */
 #define FIST_MAGIC_QINT24 (((65536.0 * 16.0) + 0.5) * 256.0)
 
+/// Convert a floating-point number to 8.24 fixed-point value.
 inline long QInt24 (float inval)
 {
   double dtemp = FIST_MAGIC_QINT24 + inval;

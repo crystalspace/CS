@@ -26,13 +26,13 @@
 
 SCF_VERSION (iAwsParmList, 0, 0, 1);
 
-/***********************************************************************************
+/**
  * Provides support for safely passing named parameters through to different functions
  * in a portable manner.  Note that awsParmList does not utilize copy semantics.  In
  * the interests of space and speed, it simply takes a reference to the pointers passed
  * in.  This means that you should NOT use an awsParmList if any parm it references
  * has gone out of scope!
- ***********************************************************************************/
+ */
 struct iAwsParmList : public iBase
 {
   /// Adds an integer to the parmeter list

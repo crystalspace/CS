@@ -18,8 +18,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-// The queen of all include files.  Good for being a precompiled header, by
-// utilizing the NO_* macros, while stop a complete build
+/**\file
+ * The queen of all include files.  Good for being a precompiled header, by
+ * utilizing the NO_* macros, while stop a complete build
+ */
 
 #ifndef __CSS_H__
 #define __CSS_H__

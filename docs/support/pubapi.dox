@@ -56,7 +56,7 @@ EXTRACT_PRIVATE        = NO
 # If the EXTRACT_STATIC tag is set to YES all static members of a file 
 # will be included in the documentation. 
 
-EXTRACT_STATIC         = NO
+EXTRACT_STATIC         = YES
 
 # If the HIDE_UNDOC_MEMBERS tag is set to YES, Doxygen will hide all 
 # undocumented members of documented classes, files or namespaces. 
@@ -64,14 +64,14 @@ EXTRACT_STATIC         = NO
 # various overviews, but no documentation section is generated. 
 # This option has no effect if EXTRACT_ALL is enabled. 
 
-HIDE_UNDOC_MEMBERS     = NO
+HIDE_UNDOC_MEMBERS     = YES
 
 # If the HIDE_UNDOC_CLASSES tag is set to YES, Doxygen will hide all 
 # undocumented classes that are normally visible in the class hierarchy. 
 # If set to NO (the default) these class will be included in the various 
 # overviews. This option has no effect if EXTRACT_ALL is enabled. 
 
-HIDE_UNDOC_CLASSES     = NO
+HIDE_UNDOC_CLASSES     = YES
 
 # If the BRIEF_MEMBER_DESC tag is set to YES (the default) Doxygen will 
 # include brief member descriptions after the members that are listed in 
@@ -304,7 +304,7 @@ RECURSIVE              = YES
 # excluded from the INPUT source files. This way you can easily exclude a 
 # subdirectory from a directory tree whose root is specified with the INPUT tag. 
 
-EXCLUDE                = include/cssys/win32 include/cssys/unix include/cssys/ps2 include/cssys/os2
+EXCLUDE                = include/cssys/win32 include/cssys/unix include/cssys/os2
 
 # If the value of the INPUT tag contains directories, you can use the 
 # EXCLUDE_PATTERNS tag to specify one or more wildcard patterns to exclude 
@@ -354,7 +354,7 @@ FILTER_SOURCE_FILES    = NO
 # of all compounds will be generated. Enable this if the project 
 # contains a lot of classes, structs, unions or interfaces. 
 
-ALPHABETICAL_INDEX     = NO
+ALPHABETICAL_INDEX     = YES
 
 # If the alphabetical index is enabled (see ALPHABETICAL_INDEX) then 
 # the COLS_IN_ALPHA_INDEX tag can be used to specify the number of columns 
@@ -605,7 +605,13 @@ INCLUDE_FILE_PATTERNS  =
 # omitted =1 is assumed. 
 
 PREDEFINED             = "CS_GNUC_PRINTF(a,b)=" \
-			 "CS_GNUC_SCANF(a,b)="
+			 "CS_GNUC_SCANF(a,b)=" \
+			 CS_SYSDEF_PROVIDE_CASE \
+			 CS_SYSDEF_PROVIDE_PATH \
+			 CS_SYSDEF_PROVIDE_TEMP \
+			 CS_SYSDEF_PROVIDE_MKDIR \
+			 CS_SYSDEF_PROVIDE_ALLOCA \
+			 CS_IEEE_DOUBLE_FORMAT \
 
 # If the MACRO_EXPANSION and EXPAND_PREDEF_ONLY tags are set to YES then 
 # this tag can be used to specify a list of macro names that should be expanded. 

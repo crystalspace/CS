@@ -17,10 +17,9 @@ class csTwoBitArray : private csBitArray
    
 public:
 
-   //
-   // Two bit proxy (for operator[])
-   //
-   
+   /**
+    * \internal Two bit proxy (for csTwoBitArray::operator[])
+    */
    class TwoBitProxy
    {
    private:
@@ -55,9 +54,11 @@ public:
    // Constructors
    //
    
+   /// construct with <code>size</code> two bit entries.
    explicit csTwoBitArray(unsigned size) : super(2 * size)
    {}
    
+   /// construct as duplicate of <code>that</code>.
    csTwoBitArray(const csTwoBitArray &that) : super(that)
    {}
    
@@ -65,65 +66,77 @@ public:
    // Operators
    //
    
+   /// copy from other array
    csTwoBitArray &operator=(const csTwoBitArray &that)
    {
       super::operator=(that);
       return *this;
    }
 
+   /// return bit pair at position <code>pos</code>
    TwoBitProxy operator[](unsigned pos)
    {
       return TwoBitProxy(*this, pos);
    }
 
+   /// return bit pair at position <code>pos</code>
    const TwoBitProxy operator[](unsigned pos) const
    {
       return TwoBitProxy(CONST_CAST(csTwoBitArray&,*this), pos);
    }
    
+   /// equal to other array
    bool operator==(const csTwoBitArray &that) const
    {
       return super::operator==(that);
    }
 
+   /// not equal to other array
    bool operator!=(const csTwoBitArray &that) const
    {
       return !(*this == that);
    }
 
+   /// bit-wise and
    csTwoBitArray &operator&=(const csTwoBitArray &that)
    {
       super::operator&=(that);
       return *this;
    }
 
+   /// bit-wise or
    csTwoBitArray operator|=(const csTwoBitArray &that)
    {
       super::operator|=(that);
       return *this;
    }
 
+   /// bit-wise xor
    csTwoBitArray operator^=(const csTwoBitArray &that)
    {
       super::operator^=(that);
       return *this;
    }
 
+   /// Flip all bits
    csTwoBitArray operator~() const
    {
       return csTwoBitArray(*this).FlipAllBits();
    }
 
+   /// bit-wise and
    friend csTwoBitArray operator&(const csTwoBitArray &a1, const csTwoBitArray &a2)
    {
       return csTwoBitArray(a1) &= a2;
    }
 
+   /// bit-wise or
    friend csTwoBitArray operator|(const csTwoBitArray &a1, const csTwoBitArray &a2)
    {
       return csTwoBitArray(a1) |= a2;
    }
 
+   /// bit-wise xor
    friend csTwoBitArray operator^(const csTwoBitArray &a1, const csTwoBitArray &a2)
    {
       return csTwoBitArray(a1) ^= a2;

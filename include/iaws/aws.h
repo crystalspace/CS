@@ -18,6 +18,9 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
 
+/**\file
+ */
+
 #include "csutil/scf.h"
 #include "csgeom/csrect.h"
 #include "csgeom/cspoint.h"
@@ -55,14 +58,19 @@ struct  iEvent;
 
 const   bool aws_debug=false;  // set to true to turn on debugging printf's
 
+/**
+ * \defgroup AwsSystemFlags AWS window manager flags
+ * @{ */
 
-/** This flag makes the windowing system perform erases before drawing.  This slows
+/**
+ * This flag makes the windowing system perform erases before drawing.  This slows
  * the engine down somewhat, but is necessary in some circumstances (such as when using
  * the single proctex mode as a surface, or to draw to the high level visible context.)
  */
 const int AWSF_AlwaysEraseWindows=1;
 
-/** This flag makes the windowing system redraw every time, which is necessary when
+/** 
+ * This flag makes the windowing system redraw every time, which is necessary when
  * drawing to the screen context since this gets erased every frame by the engine.
  * Note that this flag is NOT necessary if the engine will not be drawing to the
  * background with AWS.  In other words, if AWS has complete control of the screen
@@ -70,6 +78,7 @@ const int AWSF_AlwaysEraseWindows=1;
  */
 const int AWSF_AlwaysRedrawWindows=2;
 
+/* @} */
 
 SCF_VERSION (iAws, 0, 1, 0);
 
@@ -159,19 +168,34 @@ public:
   /// Creates a new parameter list
   virtual iAwsParmList *CreateParmList()=0;
 
-  /// Creates and enables a transition for a window
+  /**
+   * Creates and enables a transition for a window.
+   * see \link AwsWindowTransitions AWS window transitions\endlink.
+   */
   virtual void CreateTransition(iAwsWindow *win, unsigned transition_type, float step_size=0.1)=0;
 
-  /// Creates and enables a transition for a window, using a user specified start or finish (transition type defines which)
+  /**
+   * Creates and enables a transition for a window, using a user specified start or finish (transition type defines which).
+   * see \link AwsWindowTransitions AWS window transitions\endlink.
+   */
   virtual void CreateTransitionEx(iAwsWindow *win, unsigned transition_type, float step_size, csRect &user)=0;
 
-  /// Sets one or more flags for different operating modes
+  /**
+   * Sets one or more flags for different operating modes. 
+   * see \link AwsSystemFlags AWS window manager flags\endlink.
+   */
   virtual void SetFlag(unsigned int flags)=0;
 
-  /// Clears one or more flags for different operating modes
+  /**
+   * Clears one or more flags for different operating modes.
+   * see \link AwsSystemFlags AWS window manager flags\endlink.
+   */
   virtual void ClearFlag(unsigned int flags)=0;
 
-  /// Returns the current flags
+  /**
+   * Returns the current flags
+   * see \link AwsSystemFlags AWS window manager flags\endlink.
+   */
   virtual unsigned int GetFlags()=0;
   
   /// Return object registry
@@ -331,7 +355,10 @@ struct iAwsSink : public iBase
   /// A sink should call this to register trigger events
   virtual void RegisterTrigger(char *name, void (*Trigger)(void *, iAwsSource *))=0;
 
-  /// Returns the last error code set.  This code is good until the next call to this sink.
+  /**
+   * Returns the last error code set.  This code is good until the next call to this sink.
+   * see \link AwsSinkErrors AWS sink error codes\endlink.
+   */
   virtual unsigned int GetError()=0;
 };
 
@@ -408,13 +435,22 @@ struct iAwsComponent : public iAwsSource
   /// Returns the named TYPE of the component, like "Radio Button", etc.
   virtual char *Type()=0;
 
-  /// Sets the flag (can handle multiple simultaneous sets)
+  /**
+   * Sets the flag (can handle multiple simultaneous sets). 
+   * see \link AwsComponentFlags AWS component flags\endlink.
+   */
   virtual void SetFlag(unsigned int flag)=0;
 
-  /// Clears the flag (can handle multiple simultaneous clears)
+  /**
+   * Clears the flag (can handle multiple simultaneous clears).
+   * see \link AwsComponentFlags AWS component flags\endlink.
+   */
   virtual void ClearFlag(unsigned int flag)=0;
 
-  /// Returns the current state of the flags
+  /**
+   * Returns the current state of the flags.
+   * see \link AwsComponentFlags AWS component flags\endlink.
+   */
   virtual unsigned int Flags()=0;
 
   /** Should be used ONLY by this component, or an embedding object. */

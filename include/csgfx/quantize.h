@@ -20,6 +20,10 @@
 #ifndef __CS_QUANTIZE_H__
 #define __CS_QUANTIZE_H__
 
+/** \file
+ * RGB to paletted image quantization routine
+ */
+
 #include "csgfx/rgbpixel.h"
 
 /**

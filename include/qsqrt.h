@@ -18,15 +18,30 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-// Uncomment the following line to define CS_NO_QSQRT if you experience
-// mysterious problems with CS which you think are related to this
-// version of sqrt not behaving properly. If you find something like
-// that I'd like to be notified of this so we can make sure this really
-// is the problem.
-//#define CS_NO_QSQRT
+/**\file
+ * Fast computation of sqrt(x) and 1/sqrt(x).<p>
+ * Define CS_NO_QSQRT if you experience mysterious problems with CS which 
+ * you think are related to this version of sqrt not behaving properly. If 
+ * you find something like that I'd like to be notified of this so we can 
+ * make sure this really is the problem.
+ */
 
 #ifndef __QSQRT_H__
 #define __QSQRT_H__
+
+/**
+ * This routine computes sqrt(x) very quickly on Intel and PowerPC platforms.
+ */
+static inline float qsqrt (float x);
+
+/**
+ * This routine is basically equivalent to qsqrt() except that it returns
+ * 1/sqrt(x) rather than the proper square root. It should be used anywhere
+ * you need the inverse root (in 3D graphics it is a common situation),
+ * because the routine is a little faster than qsqrt() and also you avoid
+ * a division.
+ */
+static inline float qisqrt (float x);
 
 #if (!defined (CS_NO_QSQRT)) && defined (PROC_X86) && defined (COMP_GCC)
 

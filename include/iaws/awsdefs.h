@@ -18,30 +18,64 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
 
+/**\file
+ */
 
-const unsigned int AWSF_CMP_DEAF        = 32; // set if  component should not receive events
-const unsigned int AWSF_CMP_INVISIBLE   = 16; // set by window manager when a component gets too small during resize
-const unsigned int AWSF_CMP_HIDDEN      = 8;  // set if component is hidden
-const unsigned int AWSF_CMP_TRANSPARENT = 2;  // set if component is transparent
-const unsigned int AWSF_CMP_ALWAYSERASE = 4;  // set if component always needs erased by parent first
+/**
+ * \defgroup AwsComponentFlags AWS component flags
+ * @{ */
+/// set if component is transparent
+const unsigned int AWSF_CMP_TRANSPARENT = 2;  
+/// set if component always needs erased by parent first
+const unsigned int AWSF_CMP_ALWAYSERASE = 4;  
+/// set if component is hidden
+const unsigned int AWSF_CMP_HIDDEN      = 8;  
+/// set by window manager when a component gets too small during resize
+const unsigned int AWSF_CMP_INVISIBLE   = 16; 
+/// set if component should not receive events
+const unsigned int AWSF_CMP_DEAF        = 32; 
+/* @} */
 
-const unsigned int AWS_TRANSITION_SLIDE_IN_LEFT  = 0;  ///! window slides left (start out to curframe)
-const unsigned int AWS_TRANSITION_SLIDE_IN_RIGHT = 1;  ///! window slides right
-const unsigned int AWS_TRANSITION_SLIDE_IN_UP    = 2;  ///! window slides up
-const unsigned int AWS_TRANSITION_SLIDE_IN_DOWN  = 3;  ///! window slides down
+/**
+ * \defgroup AwsWindowTransitions AWS window transitions
+ * @{ */
+/// window slides left (start out to curframe)
+const unsigned int AWS_TRANSITION_SLIDE_IN_LEFT  = 0;  
+/// window slides right
+const unsigned int AWS_TRANSITION_SLIDE_IN_RIGHT = 1;  
+/// window slides up
+const unsigned int AWS_TRANSITION_SLIDE_IN_UP    = 2;  
+/// window slides down
+const unsigned int AWS_TRANSITION_SLIDE_IN_DOWN  = 3;  
 
-const unsigned int AWS_TRANSITION_SLIDE_OUT_LEFT  = 4;  ///! window slides left (start curframe to out, and window disappears)
-const unsigned int AWS_TRANSITION_SLIDE_OUT_RIGHT = 5;  ///! window slides right
-const unsigned int AWS_TRANSITION_SLIDE_OUT_UP    = 6;  ///! window slides up
-const unsigned int AWS_TRANSITION_SLIDE_OUT_DOWN  = 7;  ///! window slides down
+/// window slides left (start curframe to out, and window disappears)
+const unsigned int AWS_TRANSITION_SLIDE_OUT_LEFT  = 4;  
+/// window slides right
+const unsigned int AWS_TRANSITION_SLIDE_OUT_RIGHT = 5;  
+/// window slides up
+const unsigned int AWS_TRANSITION_SLIDE_OUT_UP    = 6;  
+/// window slides down
+const unsigned int AWS_TRANSITION_SLIDE_OUT_DOWN  = 7;  
 
-const unsigned int AWS_TRANSITION_SLIDE_LEFT  = 8;  ///! window slides left (start out with cur frame, end with user frame)
-const unsigned int AWS_TRANSITION_SLIDE_RIGHT = 9;  ///! window slides right
-const unsigned int AWS_TRANSITION_SLIDE_UP    = 10;  ///! window slides up
-const unsigned int AWS_TRANSITION_SLIDE_DOWN  = 11;  ///! window slides down
+/// window slides left (start out with cur frame, end with user frame)
+const unsigned int AWS_TRANSITION_SLIDE_LEFT  = 8;  
+/// window slides right
+const unsigned int AWS_TRANSITION_SLIDE_RIGHT = 9;  
+/// window slides up
+const unsigned int AWS_TRANSITION_SLIDE_UP    = 10;  
+///! window slides down
+const unsigned int AWS_TRANSITION_SLIDE_DOWN  = 11;  
+/* @} */
 
-const unsigned int AWS_ERR_SINK_NONE	      = 0;  ///! no error
-const unsigned int AWS_ERR_SINK_TRIGGER_NOT_FOUND   = 1;  ///! the requested trigger was not found
-const unsigned int AWS_ERR_SINK_NO_TRIGGERS         = 2;  ///! could not handle trigger, because there are none.
+/**
+ * \defgroup AwsSinkErrors AWS sink error codes
+ * @{ */
+/// no error
+const unsigned int AWS_ERR_SINK_NONE	      = 0;  
+/// the requested trigger was not found
+const unsigned int AWS_ERR_SINK_TRIGGER_NOT_FOUND   = 1;  
+/// could not handle trigger, because there are none.
+const unsigned int AWS_ERR_SINK_NO_TRIGGERS         = 2;  
+/* @} */
 
 #endif

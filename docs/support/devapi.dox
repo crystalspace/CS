@@ -51,7 +51,7 @@ EXTRACT_ALL            = NO
 # If the EXTRACT_PRIVATE tag is set to YES all private members of a class 
 # will be included in the documentation. 
 
-EXTRACT_PRIVATE        = NO
+EXTRACT_PRIVATE        = YES
 
 # If the EXTRACT_STATIC tag is set to YES all static members of a file 
 # will be included in the documentation. 
@@ -111,7 +111,7 @@ STRIP_FROM_PATH        =
 # to NO (the default) then the documentation will be excluded. 
 # Set it to YES to include the internal documentation. 
 
-INTERNAL_DOCS          = NO
+INTERNAL_DOCS          = YES
 
 # If the CLASS_DIAGRAMS tag is set to YES (the default) Doxygen will 
 # generate a class diagram (in Html and LaTeX) for classes with base or 
@@ -308,7 +308,7 @@ RECURSIVE              = YES
 # excluded from the INPUT source files. This way you can easily exclude a 
 # subdirectory from a directory tree whose root is specified with the INPUT tag. 
 
-EXCLUDE                = include/cssys/win32 include/cssys/unix include/cssys/ps2 include/cssys/os2
+EXCLUDE                = 
 
 # If the value of the INPUT tag contains directories, you can use the 
 # EXCLUDE_PATTERNS tag to specify one or more wildcard patterns to exclude 
@@ -358,7 +358,7 @@ FILTER_SOURCE_FILES    = NO
 # of all compounds will be generated. Enable this if the project 
 # contains a lot of classes, structs, unions or interfaces. 
 
-ALPHABETICAL_INDEX     = NO
+ALPHABETICAL_INDEX     = YES
 
 # If the alphabetical index is enabled (see ALPHABETICAL_INDEX) then 
 # the COLS_IN_ALPHA_INDEX tag can be used to specify the number of columns 
@@ -609,7 +609,13 @@ INCLUDE_FILE_PATTERNS  =
 # omitted =1 is assumed. 
 
 PREDEFINED             = "CS_GNUC_PRINTF(a,b)=" \
-			 "CS_GNUC_PRINTF(a,b)="
+			 "CS_GNUC_SCANF(a,b)=" \
+			 CS_SYSDEF_PROVIDE_CASE \
+			 CS_SYSDEF_PROVIDE_PATH \
+			 CS_SYSDEF_PROVIDE_TEMP \
+			 CS_SYSDEF_PROVIDE_MKDIR \
+			 CS_SYSDEF_PROVIDE_ALLOCA \
+			 CS_IEEE_DOUBLE_FORMAT
 
 # If the MACRO_EXPANSION and EXPAND_PREDEF_ONLY tags are set to YES then 
 # this tag can be used to specify a list of macro names that should be expanded. 

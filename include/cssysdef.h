@@ -26,7 +26,8 @@
 #include "csdef.h"
 #undef CSDEF_FRIEND
 
-/*
+/** \file
+
     This include file should be included from every source file.
     Just before #include directive it can contain several #define's
     that specify what the source file requires.
@@ -103,19 +104,28 @@
  * configuration files may override these.
  */
 
+/**\def UPPERCASE(c)
+ * Convert a character to upper case
+ */
+/**\def LOWERCASE(c)
+ * Convert a character to lower case
+ */
 #ifdef CS_SYSDEF_PROVIDE_CASE
-// Convert a character to upper case
 #  ifndef UPPERCASE
 #    define UPPERCASE(c) ((c >= 'a' && c <= 'z') ? c - ('a' - 'A') : c)
 #  endif
-// Convert a character to lower case
 #  ifndef LOWERCASE
 #    define LOWERCASE(c) ((c >= 'A' && c <= 'Z') ? c + ('a' - 'A') : c)
 #  endif
 #endif // CS_SYSDEF_PROVIDE_CASE
 
+/**\def PATH_SEPARATOR
+ * Path separator character
+ */
+/**\def CS_MAXPATHLEN
+ * Maximal path length
+ */
 #ifdef CS_SYSDEF_PROVIDE_PATH
-// Path separator character
 #  ifndef PATH_SEPARATOR
 #    if defined(__CYGWIN32__)
 #      define PATH_SEPARATOR '/'
@@ -125,7 +135,6 @@
 #      define PATH_SEPARATOR '/'
 #    endif
 #  endif
-// Maximal path length
 #  ifndef CS_MAXPATHLEN
 #    ifdef _MAX_FNAME
 #      define CS_MAXPATHLEN _MAX_FNAME
@@ -143,8 +152,10 @@
      } /* endif */
 #endif // CS_SYSDEF_PROVIDE_PATH
 
+/**\def TEMP_DIR
+ * Directory for temporary files
+ */
 #ifdef CS_SYSDEF_PROVIDE_TEMP
-// Directory for temporary files
 #  ifndef TEMP_DIR
 #    if defined(OS_UNIX)
 #      define TEMP_DIR "/tmp/"
@@ -152,19 +163,22 @@
 #      define TEMP_DIR ""
 #    endif
 #  endif
-// Name for temporary file
 #  ifndef TEMP_FILE
 #    if defined(OS_UNIX)
 #      include <unistd.h>
+/// Name for temporary file
 #      define TEMP_FILE "cs%lud.tmp", (unsigned long)getpid()
 #    else
+/// Name for temporary file
 #      define TEMP_FILE "$cs$.tmp"
 #    endif
 #  endif
 #endif // CS_SYSDEF_PROVIDE_TEMP
 
+/**\def MKDIR(path)
+ * How to make a directory (not entire path, only the last on the path)
+ */
 #ifdef CS_SYSDEF_PROVIDE_MKDIR
-// How to make a directory (not entire path, only the last on the path)
 #  ifndef MKDIR
 #    if defined(OS_WIN32) || (defined(OS_DOS) && !defined(COMP_GCC))
 #      define MKDIR(path) _mkdir (path)
@@ -228,6 +242,9 @@
 #  endif
 #endif
 
+/**\def ALLOC_STACK_ARRAY(var,type,size)
+ * Dynamic stack memory allocation
+ */
 #ifdef CS_SYSDEF_PROVIDE_ALLOCA
 // Prototypes for dynamic stack memory allocation
 #  if defined (COMP_VC) || defined(COMP_BC) || \
@@ -343,8 +360,8 @@
 #define CS_HEADER_LOCAL_COMPOSE2(X) #X
 
 
-/*
- * A macro to export a function from a shared library.
+/**\def CS_EXPORTED_FUNCTION
+ * \internal A macro to export a function from a shared library.
  * Some platforms may need to override this.  For instance, Windows requires
  * extra `__declspec' goop when exporting a function from a plug-in module.
  */
@@ -352,8 +369,8 @@
 #  define CS_EXPORTED_FUNCTION extern "C"
 #endif
 
-/*
- * A macro used to build exported function names.
+/**\def CS_EXPORTED_NAME(Prefix, Suffix)
+ * \internal A macro used to build exported function names.
  * Usually "Prefix" is derived from shared library name, thus for each library
  * we'll have different exported names.  This prevents naming collisions when
  * static linking is used, and on platforms where plug-in symbols are exported
@@ -421,7 +438,7 @@ void CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)())        \
    CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION   
 #endif
 
-/**
+/**\def CS_IMPLEMENT_PLUGIN
  * The CS_IMPLEMENT_PLUGIN macro should be placed at the global scope in
  * exactly one compilation unit comprising a plugin module.  For maximum
  * portability, each plugin module must employ this macro.  Platforms may
@@ -445,7 +462,7 @@ void CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)())        \
 #  endif
 
 #endif
-/**
+/**\def CS_IMPLEMENT_APPLICATION
  * The CS_IMPLEMENT_APPLICATION macro should be placed at the global scope in
  * exactly one compilation unit comprising an application.  For maximum
  * portability, each application should employ this macro.  Platforms may
@@ -459,7 +476,7 @@ void CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)())        \
    CS_IMPLEMENT_PLATFORM_APPLICATION 
 #endif
 
-/**
+/**\def CS_REGISTER_STATIC_FOR_DESTRUCTION
  * Register a method that will destruct one static variable.
  */
 #ifndef CS_REGISTER_STATIC_FOR_DESTRUCTION
@@ -467,7 +484,7 @@ void CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)())        \
         CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (getterFunc);
 #endif
 
-/**
+/**\def CS_STATIC_VARIABLE_CLEANUP
  * Invoke the function that will call all destruction functions
  */
 #ifndef CS_STATIC_VARIABLE_CLEANUP
@@ -475,7 +492,7 @@ void CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)())        \
         CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (0);
 #endif
 
-/**
+/**\def CS_IMPLEMENT_STATIC_VAR(getterFunc,Type,initParam,kill_how)
  * Create a global variable thats created on demand. Create a Getter function to access 
  * the variable and a destruction function. The Getter function will register
  * the destruction function on first invocation.
@@ -525,7 +542,7 @@ Type* getterFunc ()                                                     \
  CS_IMPLEMENT_STATIC_VAR_EXT(getterFunc,Type,initParam,_kill_array)    
 #endif
 
-/**
+/**\def CS_DECLARE_STATIC_CLASSVAR(var,getterFunc,Type)
  * Declare a static variable inside a class. This will also declare a Getter function.
  * Example:
  * CS_DECLARE_STATIC_CLASSVAR (pool, GetVertexPool, csVertexPool)
@@ -542,7 +559,7 @@ static Type *var;                                             \
 static Type &getterFunc ();                                   
 #endif
 
-/**
+/**\def CS_IMPLEMENT_STATIC_CLASSVAR(Class,var,getterFunc,Type,initParam)
  * Create the static class variable that has been declared with 
  * CS_DECLARE_STATIC_CLASSVAR.
  * This will also create the Getter function and the destruction function. 
