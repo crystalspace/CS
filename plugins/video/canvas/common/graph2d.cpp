@@ -46,7 +46,7 @@ bool csGraphics2D::Initialize (iSystem* pSystem)
   System->GetSettings (Width, Height, Depth, FullScreen);
 
   // get the fontrenderer
-  const char *p = pSystem->ConfigGetStr ("FontRender", CS_FUNCID_FONT, "crystalspace.font.render.default");
+  const char *p = pSystem->ConfigGetStr ("FontRender", CS_FUNCID_FONT, "crystalspace.font.render.csfont");
   FontRenderer = LOAD_PLUGIN (pSystem, p, CS_FUNCID_FONT, iFontRender);
 //  FontRenderer = QUERY_PLUGIN_ID (pSystem, CS_FUNCID_FONT, iFontRender);
   Font = 0;
