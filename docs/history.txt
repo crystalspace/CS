@@ -96,6 +96,12 @@ The history order has been reversed so that new features are at the top.
 	  return transform.
 	- Removed RotateWorld() and Rotate() from csCamera and iCamera.
 	  Use RotateOther() and RotateThis() in csReversibleTransform.
+	- Added csPath to csgeom library. This is a subclass of
+	  csCubicSpline that will interpolate over 9 dimensions (position,
+	  up-vector, and forward-vector). This is ideal in combination with
+	  csReversibleTransform::LookAt() to have an object or camera move
+	  along a path. This code (as well as the cubic spline code) is
+	  totally untested at this moment.
 16-Apr-2001
 	- Added iEngine::CreateSectorWallsMesh().
 	- Fixed simplep (plugin version of simple) so that it works again.
