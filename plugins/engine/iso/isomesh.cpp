@@ -351,6 +351,8 @@ SCF_IMPLEMENT_IBASE (csIsoMeshSprite)
   SCF_IMPLEMENTS_INTERFACE (iIsoSprite)
 SCF_IMPLEMENT_IBASE_END
 
+CS_IMPLEMENT_STATIC_CLASSVAR (csIsoMeshSprite, pos, GetVertexPosition, csVector3, 0)
+
 csIsoMeshSprite::csIsoMeshSprite (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
@@ -514,8 +516,7 @@ void csIsoMeshSprite::SetAllColors(const csColor& /*color*/)
 
 const csVector3& csIsoMeshSprite::GetVertexPosition(int /*i*/)
 {
-  static csVector3 pos(0,0,0);
-  return pos;
+  return *GetVertexPosition ();;
 }
 
 void csIsoMeshSprite::AddToVertexColor(int /*i*/, const csColor& /*color*/)

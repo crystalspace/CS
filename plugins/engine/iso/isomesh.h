@@ -51,6 +51,9 @@ private:
   csZBufMode zbufmode;
 
 public:
+  CS_DECLARE_STATIC_CLASSVAR (pos, GetVertexPosition, csVector3)
+
+public:
   SCF_DECLARE_IBASE;
 
   ///
