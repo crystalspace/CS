@@ -112,9 +112,8 @@ public:
 
     inline T* Next ()
     {
-      csListElement* p;
       ptr = ptr->next;
-      return &p->data;
+      return *this;
     }
 
     inline Iterator& operator++()

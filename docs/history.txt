@@ -13,6 +13,7 @@ for each given day, however, are in normal (ascending) chronological order.
 	    - Added a check for VBO before trying to use it in DeactivateBuffer
 	- Keith Fulton changed thing.cpp so that deallocation of lightmaps
           doesn't crash the system when using a null renderer.
+	- Keith also committed a fix to csutil/list.h to fix an obvious bug there.
 	- Jorrit cleaned up the public header files of AWS. Performed
 	  proper indentation, added missing doxygen comments, fixed several
 	  wrong doxygen comments, added missing LGPL notice, added missing
