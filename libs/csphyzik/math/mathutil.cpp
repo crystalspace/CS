@@ -23,10 +23,13 @@
 #include "csphyzik/math3d.h"
 #include <math.h>
 
-#define VEC_X_NORM_THRESHOLD 0.01
+#define VEC_X_NORM_THRESHOLD 0.05
 
-//!me from graphic gems.  faster, but may have discontinuity...
-/*void R_from_vector_and_angle( ctVector3 pvec, real theta, ctMatrix3 &pR )
+// I didn't write this code... I got it from an on-line tutorial.
+// not conviced it doesn't have discontinuity...
+// the un-simplified formula was really strange and they didn't really
+// explain it.  Kind of looked like it could have come from quaternion theory.
+void R_from_vector_and_angle( ctVector3 pvec, real theta, ctMatrix3 &pR )
 {
     double  angleRad = theta,
 	    c = cos(angleRad),
@@ -43,10 +46,51 @@
 		t * pvec[0] * pvec[1] - s * pvec[1],
 		     t * pvec[1] * pvec[2] + s * pvec[0],
 		     t * pvec[2] * pvec[2] + c);
- // pR = pR.get_transpose();
+
+}
+
+
+/*
+void R_from_vector_and_angle( ctVector3 pvec, real theta, ctMatrix3 &pR )
+{
+ctVector3 Tz = pvec/pvec.Norm();
+ctVector3 Tx;
+ctVector3 Ty;
+
+  
+  // if Tz ~=( 0,1,0 ) then Y%Tz will be erroneous 
+if( fabs( Tz[1] - 1.0 ) < VEC_X_NORM_THRESHOLD ){
+  Ty = Tz % ctVector3( 1,0,0 );
+  Ty.Normalize();
+  Tx = Ty%Tz;
+  Ty *= -1.0;
+}else{
+  // Tx = (0,1,0) % Tz
+  Tx = ctVector3( 0,1,0) % Tz;
+  Tx.Normalize();
+  Ty = Tz%Tx;
+}
+
+// rotation to line up zxy? axis with vector 
+// transform from vector body space to world space
+ctMatrix3 T_vw(	Tx[0], Ty[0], Tz[0],
+                  Tx[1], Ty[1], Tz[1],
+                  Tx[2], Ty[2], Tz[2] );  
+
+
+real cs = cos( theta );
+real ss = sin( theta );
+ctMatrix3 ZRot( cs, -ss, 0,
+                ss, cs , 0,
+                0 , 0  , 1 );
+
+  // transform rotation into world space
+  pR = T_vw * ZRot;
 }
 */
+
 // not convinced this is bug free...
+/*
 void R_from_vector_and_angle( ctVector3 pvec, real theta, ctMatrix3 &pR )
 {
 ctVector3 Tx = pvec/pvec.Norm();
@@ -82,7 +126,7 @@ ctMatrix3 TRot;
 	pR = T.get_transpose() * TRot * T; 
 
 }
-
+*/
 
 // use dot product to find the angle between two vectors
 real angle_diff( ctVector3 v1, ctVector3 v2 )

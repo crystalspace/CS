@@ -18,6 +18,8 @@
 
 */
 
+//!me last readable version before optimization in Crystal Space 15.002
+
 #include "sysdef.h"
 #include "csphyzik/feathers.h"
 #include "csphyzik/articula.h"
@@ -40,6 +42,7 @@ void ctFeatherstoneAlgorithm::fsolve_grounded( real t )
 {
 ctArticulatedBody *out_link;
 ctArticulatedBody *out_link2;
+//ctArticulatedBody *current_ab;
 ctFeatherstoneAlgorithm *out_link_solver;
 
 	// calc forces applied to this handle.  Doesn't include forces from other links
@@ -50,7 +53,28 @@ ctFeatherstoneAlgorithm *out_link_solver;
   ab.compute_link_velocities();
 
 	// initialize values for each articulated body/joint
-	init_link();
+  
+  init_link();
+  //!me it's questionable if I got better performance from this interation scheme
+  //!me only like 1% which is definitly within standard deviation of tests
+ /* ctLinkList <ctArticulatedBody> call_stack;
+  call_stack.push( &ab );
+  while( call_stack.get_size() > 0 ){
+    current_ab = call_stack.pop();
+    out_link_solver = (ctFeatherstoneAlgorithm *)current_ab->solver;
+    out_link_solver->init_link();
+
+    //!me this is kind of reverse order than in Mirtch's thesis.
+    //!me should have a queu here then add queu to stack.
+    //!me shouldn't matter, except that Mirtch specifically used 
+    //!me that order....
+    out_link = current_ab->outboard_links.get_first();
+	  while( out_link ){
+      call_stack.push( out_link );
+		  out_link = current_ab->outboard_links.get_next();
+	  }
+  }*/
+//!me opt end
 
 	// only modify Ia and Za for links 2 to n 
 	// ugh, this is a bit ugly with this nested while, should be a better way
@@ -84,6 +108,7 @@ void ctFeatherstoneAlgorithm::fsolve_floating( real t )
 {
 ctArticulatedBody *out_link;
 ctFeatherstoneAlgorithm *out_link_solver;
+//ctArticulatedBody *current_ab;
 
 	// calc forces applied to this handle. Doesn't include forces from other links
 	ab.apply_forces( t );
@@ -94,6 +119,26 @@ ctFeatherstoneAlgorithm *out_link_solver;
 	
   // initialize values for each articulated body/joint
 	init_link();
+//!me opt init_link();
+/*  ctLinkList <ctArticulatedBody> call_stack;
+  call_stack.push( &ab );
+  while( call_stack.get_size() > 0 ){
+    current_ab = call_stack.pop();
+    out_link_solver = (ctFeatherstoneAlgorithm *)current_ab->solver;
+    out_link_solver->init_link();
+
+    //!me this is kind of reverse order than in Mirtch's thesis.
+    //!me should have a queu here then add queu to stack.
+    //!me shouldn't matter, except that Mirtch specifically used 
+    //!me that order....
+    out_link = current_ab->outboard_links.get_first();
+	  while( out_link ){
+      call_stack.push( out_link );
+		  out_link = current_ab->outboard_links.get_next();
+	  }
+  }*/
+//!me opt end
+
 
 	// modify Ia and Za for all links ( start by calling compute_Ia_Za on 
 	// link 1 ( not 0 ) )
@@ -168,13 +213,15 @@ ctFeatherstoneAlgorithm *out_link_solver;
 
 	}
 
+
 	// iterate to next link
 	out_link = ab.outboard_links.get_first();
 	while( out_link ){
 		out_link_solver = (ctFeatherstoneAlgorithm *)out_link->solver;
 		out_link_solver->init_link();
 		out_link = ab.outboard_links.get_next();
-	}	
+	}
+
 }
 
 // featherstone algorithm first step
@@ -186,6 +233,11 @@ ctArticulatedBody *out_link;
 ctArticulatedBody *ab_f;
 ctFeatherstoneAlgorithm *out_link_solver;
 ctFeatherstoneAlgorithm *svr_f;
+//ctMatrix3 Mwork;
+ctVector3 vwork;
+ctSpatialVector svwork;
+//ctSpatialMatrix sMwork;
+//ctSpatialVector ZaIac;
 
 	// recurse to end, then unwind and do the work
 	out_link = ab.outboard_links.get_first();
@@ -198,7 +250,11 @@ ctFeatherstoneAlgorithm *svr_f;
 	// from link n to link 2
 
 	ctSpatialMatrix fXg;
-	fXg.form_spatial_transformation( ab.T_fg.get_transpose(), ab.T_fg.get_transpose()*ab.r_fg * -1 );
+  // fXg.form_spatial_transformation( ab.T_fg.get_transpose(), ab.T_fg.get_transpose()*ab.r_fg * -1 );
+  ab.T_fg.put_transpose( Mwork );
+  Mwork.mult_v( vwork, ab.r_fg );
+  vwork *= -1.0; 
+  fXg.form_spatial_transformation( Mwork, vwork );
 
 	jnt = ab.inboard_joint;
 	if( jnt == NULL )
@@ -213,20 +269,39 @@ ctFeatherstoneAlgorithm *svr_f;
 
 	ctSpatialVector s = jnt->get_spatial_joint_axis();
 
-	sIs = (!s)*(Ia*s);
- 
+  // sIs = (!s)*(Ia*s);
+  Ia.mult_v( svwork, s );
+  sIs = s.spatial_dot( svwork );
+
 	ctSpatialMatrix innerM;
-	innerM = ( Ia*s*(!s)*Ia )*(1.0L/sIs);
+  // innerM = ( Ia*s*(!s)*Ia )*(1.0L/sIs);
+  Ia.mult_v( svwork, s );
+  sMwork = svwork*(!s);
+  sMwork.mult_M( innerM, Ia );
+  innerM *= (1.0L/sIs);
+
 	// calc Ia for parent link
-	svr_f->Ia = svr_f->Ia + fXg*( Ia - innerM )*gXf;
+  // svr_f->Ia += fXg*( Ia - innerM )*gXf;
+  sMwork.subtract2( Ia, innerM );
+  fXg.mult_M( innerM, sMwork );
+  innerM *= gXf;
+  svr_f->Ia += innerM; 
 
 	// force from any robot motors are factored in here.  also joint friction
-	real external_f = -((!s)*(Za + Ia*c ));
+  // external_f = -((!s)*(Za + Ia*c ));
+  Ia.mult_v( ZaIac, c );
+  ZaIac += Za;
+  real external_f = -(s.spatial_dot( ZaIac ));
 	QsZIc = ( jnt->get_actuator_magnitude( external_f, sIs ) + external_f );
 	sIsQsZIc_computed = true;
 
 	// calc Za for parent link
-	svr_f->Za = svr_f->Za + fXg*( Za + Ia*c + ( Ia*s*(QsZIc/sIs) ) );
+  // svr_f->Za = svr_f->Za + fXg*( Za + Ia*c + ( Ia*s*(QsZIc/sIs) ) );
+  Ia.mult_v( svwork, s );
+  svwork *= (QsZIc/sIs);
+  ZaIac += svwork;
+  fXg.mult_v( svwork, ZaIac );
+  svr_f->Za += svwork;
 
 	// unwind recursive stack
 	return;
@@ -239,6 +314,7 @@ ctJoint *jnt;
 ctArticulatedBody *out_link;
 ctFeatherstoneAlgorithm *prev_link_solver;
 ctFeatherstoneAlgorithm *out_link_solver;
+ctSpatialVector svwork, gXfa;
 
 	jnt = ab.inboard_joint;
 	prev_link_solver = (ctFeatherstoneAlgorithm *)jnt->inboard->solver;
@@ -255,8 +331,13 @@ ctFeatherstoneAlgorithm *out_link_solver;
 	sIsQsZIc_computed = false;
 
 	// Alright! finaly we get the result all that code was for.
-	jnt->qa = ( QsZIc - (!s)*( (Ia*gXf)*prev_link_solver->a ) )/sIs;
-	a = gXf*prev_link_solver->a + c + s*jnt->qa;
+  // jnt->qa = ( QsZIc - (!s)*( (Ia*gXf)*prev_link_solver->a ) )/sIs;
+  gXf.mult_v( gXfa, prev_link_solver->a );
+  Ia.mult_v( svwork, gXfa );
+  jnt->qa = ( QsZIc - s.spatial_dot( svwork ) ) / sIs;
+  // a = gXf*prev_link_solver->a + c + s*jnt->qa;
+  gXfa += c;
+  a.add2( gXfa, s*jnt->qa );
 
 	// iterate to next link
 	out_link = ab.outboard_links.get_first();

@@ -152,6 +152,28 @@ ctVector3 xross = joint_axis % outboard_offset;
 
 void ctRevoluteJoint::calc_coriolus( const ctVector3 &r, const ctVector3 &w_f, ctSpatialVector &c ){
 	ctVector3 V = ( joint_axis*qv );
-	c.set_a( w_f % V);
-	c.set_b( w_f % ( w_f % r ) + (w_f*2.0) % ( V % outboard_offset ) + V % ( V % outboard_offset ));
+//  c.set_a( w_f % V);
+//  c.set_b( w_f % ( w_f % r ) + (w_f*2.0) % ( V % outboard_offset ) + 
+//           V % ( V % outboard_offset ));
+
+  c[0] = w_f[1]*V[2] - w_f[2]*V[1];
+  c[1] = w_f[2]*V[0] - w_f[0]*V[2];
+  c[2] = w_f[0]*V[1] - w_f[1]*V[0];
+
+  ctVector3 Vo(
+    V[1]*outboard_offset[2] - V[2]*outboard_offset[1],
+    V[2]*outboard_offset[0] - V[0]*outboard_offset[2],
+    V[0]*outboard_offset[1] - V[1]*outboard_offset[0]
+  );
+   
+  ctVector3 vwork(
+    w_f[1]*(w_f[0]*r[1] - w_f[1]*r[0]) - w_f[2]*(w_f[2]*r[0] - w_f[0]*r[2]),
+    w_f[2]*(w_f[1]*r[2] - w_f[2]*r[1]) - w_f[0]*(w_f[0]*r[1] - w_f[1]*r[0]),
+    w_f[0]*(w_f[2]*r[0] - w_f[0]*r[2]) - w_f[1]*(w_f[1]*r[2] - w_f[2]*r[1])
+  );
+
+  c[3] = vwork[0] + 2.0*(w_f[1]*Vo[2] - w_f[2]*Vo[1]) + (V[1]*Vo[2] - V[2]*Vo[1]);
+  c[4] = vwork[1] + 2.0*(w_f[2]*Vo[0] - w_f[0]*Vo[2]) + (V[2]*Vo[0] - V[0]*Vo[2]);
+  c[5] = vwork[2] + 2.0*(w_f[0]*Vo[1] - w_f[1]*Vo[0]) + (V[0]*Vo[1] - V[1]*Vo[0]);
+
 }
