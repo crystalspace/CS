@@ -18,6 +18,8 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bad bug in the exact clipper used by DrawPolygonMesh. This
 	  bug was introduced yesterday and caused lightmaps to be wrong
 	  if exact clipping was needed.
+	- res fixed MSVC assertion in csString::Collapse() if the string
+	  contains characters >= 0x80
 30-Jan-2003
 	- Greatly modified the DrawPolygonMesh and polygon buffer
 	  code in the OpenGL renderer. This is still very experimental
