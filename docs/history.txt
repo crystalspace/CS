@@ -1,6 +1,18 @@
 The history order has been reversed so that new features are at the top.
 
+27-Sep-2000
+	- Thomas Hieber did some cosmetic updates to icsgame.h.
+	- Further cosmetic changes to icsgame.h. I also added Doxygen
+	  comments to the methods.
 26-Sep-2000
+	- Jerry A. Segler Jr did the following changes to theme code:
+	    - Added different size font test on the theme window.
+	    - Added Set5 to the freetype.cfg (X Windows TTF fonts)
+	      Did not change default from Set1 (windows TTF fonts).
+	    - Added font manager plugin. This allows csfont and freetype
+	      to be used simultaneously. Technically any number of font
+	      servers but we only have 2 at the moment.
+	    - Fix: cstheme was using the wrong pallet entries for borders.
 	- Did a few small fixes to the makefiles and csgame so that the apps
 	  link again after Andrew's changes.
 	- Added thing saving to levtool.
