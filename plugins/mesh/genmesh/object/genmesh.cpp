@@ -911,8 +911,6 @@ bool csGenmeshMeshObject::DrawShadow (iRenderView* rview, iMovable* movable,
   else 
     mesh.SetIndexRange (edge_start, index_ranges[current_light_index]);
 
-printf ("index_range %d\n", index_ranges[current_light_index]);
-
   r3d->SetObjectToCamera (&tr_o2c);
   if (shadow_caps)
     r3d->SetShadowState (CS_SHADOW_VOLUME_FAIL1);
