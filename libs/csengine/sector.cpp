@@ -611,16 +611,15 @@ void csSector::Draw (csRenderView& rview)
   draw_busy--;
 }
 
-
 void* csSector::CalculateLightingPolygons (csPolygonParentInt*, csPolygonInt** polygon, int num, void* data)
 {
   csPolygon3D* p;
-  csLightView* d = (csLightView*)data;
+  csLightView* lview = (csLightView*)data;
   int i;
   for (i = 0 ; i < num ; i++)
   {
     p = (csPolygon3D*)polygon[i];
-    p->CalculateLighting (d);
+    p->CalculateLighting (lview);
   }
   return NULL;
 }
@@ -655,21 +654,14 @@ void csSector::CalculateLighting (csLightView& lview)
   // will be restored.
   csShadowFrustrum* previous_last = lview.shadows.GetLast ();
   csFrustrumList* shadows;
-  if (!lview.dynamic)
+  if (lview.l->GetFlags () & CS_LIGHT_THINGSHADOWS)
   {
     sp = first_thing;
     while (sp)
     {
-      csVector3* old_sp;
-      sp->NewTransformation (old_sp);	//@@@ NOT EFFICIENT! CAN WE AVOID THIS?
-      sp->TranslateVector (center);
-
       shadows = sp->GetShadows (center);
       lview.shadows.AppendList (shadows);
       CHK (delete shadows);
-
-      sp->RestoreTransformation (old_sp);
-
       sp = (csThing*)(sp->GetNext ());
     }
   }

@@ -610,7 +610,7 @@ csFrustrumList* csPolygonSet::GetShadows (csVector3& origin)
     frust->SetBackPlane (pl);
     frust->polygon = p;
     for (j = 0 ; j < p->GetNumVertices () ; j++)
-      frust->AddVertex (p->Vcam (j));
+      frust->AddVertex (p->Vwor (j)-origin);
   }
   return list;
 }
