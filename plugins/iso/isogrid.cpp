@@ -19,6 +19,8 @@
 #include "cssysdef.h"
 #include "isogrid.h"
 #include "isocell.h"
+#include "qsqrt.h"
+#include "qint.h"
 
 IMPLEMENT_IBASE (csIsoGrid)
   IMPLEMENTS_INTERFACE (iIsoGrid)
@@ -315,9 +317,33 @@ bool csIsoGroundMap::HitBeam(const csVector3& src, const csVector3& dest)
 {
   /// go through each mapcell and keep track of visibility.
   csVector3 delta = dest-src; // src + delta = dest
-  float dheight = delta.y;
   int mingridx = 0, mingridy = 0;
   grid->GetGridOffset(mingridx, mingridy);
+
+  /// check each square along groundsquare size steps...
+  if(delta.IsZero()) return true;
+  float len = qsqrt(delta.z*delta.z*float(multx*multx) + 
+    delta.x*delta.x*float(multy*multy));
+  csVector3 m = delta/len;
+  int steps = QInt(len);
+  csVector3 pos = src;
+  int x,y;
+  for(int i=0; i<steps; pos+=m, i++)
+  {
+    x = QInt(pos.z*float(multx)) - mingridx*multx;
+    y = QInt(pos.x*float(multy)) - mingridy*multy;
+    //printf("Checking %d,%d (%g,%g,%g) %g\n", x,y, pos.x, pos.y, pos.z,
+      //GetGround(x,y));
+    if(x<0) continue;
+    if(x>=width) continue;
+    if(y<0) continue;
+    if(y>=height) continue;
+    if(pos.y <= GetGround(x,y)) return false;
+  }
+  return true;
+#if 0
+  /// old discreet
+  float dheight = delta.y;
   int x0 = QInt(src.z*float(multx)) - mingridx;
   int y0 = QInt(src.x*float(multy)) - mingridy;
   int x1 = QInt(dest.z*float(multx)) - mingridx;
@@ -358,6 +384,7 @@ bool csIsoGroundMap::HitBeam(const csVector3& src, const csVector3& dest)
     }
   }
   return true;
+#endif
 }
 
 

@@ -195,7 +195,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
     for(mx=0; mx<multx; mx++)
       grid->SetGroundValue(5, 15, mx, my, 0.8);
 
-  bool res = grid->GroundHitBeam(csVector3(10,1,5), csVector3(15,0,8));
+  bool res = grid->GroundHitBeam(csVector3(10,1,5), csVector3(15,-2,8));
   printf("Hitbeam gave %d\n", (int)res);
   res = grid->GroundHitBeam(csVector3(10,1,5), csVector3(20,0,10));
   printf("Hitbeam gave %d\n", (int)res);
