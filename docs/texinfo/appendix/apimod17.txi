@@ -322,7 +322,7 @@ move.UpdateMove ();
 @end example
 
 @heading Some API changes to csCamera
-@index csCamera
+@cindex csCamera
 
 The function @code{SetFOV} now needs an extra parameter which is the
 width of the display. This is needed for calculating the angle of the
@@ -336,16 +336,20 @@ Here are a few API changes that have happened in csWorld itself.
 
 @itemize @bullet
 @item
-Added csWorld::FindLight(char* name)
+Added @code{csWorld::FindLight(char* name)}.
 @item
-Removed csWorld::NewSector(). Use world->CreateCsSector(name) instead.
+Removed @code{csWorld::NewSector()}. Use @code{world->CreateCsSector(name)} instead.
 @item
-Removed csWorld::GetThing(). Use world->things.FindByName() instead.
+Removed @code{csWorld::GetThing()}. Use @code{world->things.FindByName()} instead.
 @item
-Removed csWorld::GetSpriteTemplate(). Use world->sprite_templates.FindByName() isntead.
+Removed @code{csWorld::GetSpriteTemplate()}. Use @code{world->sprite_templates.FindByName()} instead.
 @item
-Removed csWorld::GetThingTemplate(). Use world->thing_templates.FindByName() instead.
+Removed @code{csWorld::GetThingTemplate()}. Use @code{world->thing_templates.FindByName()} instead.
 @item
-Added csWorld::UnlinkCollection() and csWorld::RemoveCollection().
+Added @code{csWorld::UnlinkCollection()} and @code{csWorld::RemoveCollection()}.
+@item
+Added @code{csWorld::GetBeginDrawFlags()}. This is a very important function that you
+MUST call in the call to @code{g3d->BeginDraw} that you do in your application
+just before you give control to the engine for drawing.
 @end itemize
 

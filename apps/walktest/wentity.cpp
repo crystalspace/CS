@@ -24,7 +24,6 @@
 
 extern WalkTest* Sys;
 
-IMPLEMENT_CSOBJTYPE (csEntityList, csObject);
 IMPLEMENT_CSOBJTYPE (csWalkEntity, csObject);
 IMPLEMENT_CSOBJTYPE (csDoor, csWalkEntity);
 IMPLEMENT_CSOBJTYPE (csRotatingObject, csWalkEntity);
@@ -36,7 +35,7 @@ csDoor::csDoor (csThing* p)
 {
   is_open = false;
   transition = 0;
-  parent = p;
+  tparent = p;
 }
 
 void csDoor::Activate ()
@@ -48,15 +47,17 @@ printf ("Activate Door!\n");
   // just go back from that point.
   transition = 1-transition;
   // Push ourselves on to the busy list if we're not already there.
-  Sys->busy_entities.ObjRelease (this);
-  Sys->busy_entities.ObjAdd (this);
+  int idx = Sys->busy_entities.Find (this);
+  if (idx != -1) Sys->busy_entities.Delete (idx);
+  Sys->busy_entities.Push (this);
 }
 
 void csDoor::NextFrame (float elapsed_time)
 {
   if (!transition)
   {
-    Sys->busy_entities.ObjRelease (this);
+    int idx = Sys->busy_entities.Find (this);
+    if (idx != -1) Sys->busy_entities.Delete (idx);
 printf ("Done opening door.\n");
     return;
   }
@@ -64,8 +65,8 @@ printf ("Done opening door.\n");
   if (transition < 0) transition = 0;
   csYRotMatrix3 mat ((M_PI/2.)*transition);
   mat.Invert ();
-  parent->GetMovable ().SetTransform (mat);
-  parent->GetMovable ().UpdateMove ();
+  tparent->GetMovable ().SetTransform (mat);
+  tparent->GetMovable ().UpdateMove ();
 }
 
 //--------------------------------------------------------------------------
@@ -74,7 +75,7 @@ printf ("Done opening door.\n");
 csRotatingObject::csRotatingObject (csThing* p)
 {
   always = true;
-  parent = p;
+  tparent = p;
   angles.Set (90, 0, 0);
   remaining = 0;
 }
@@ -83,8 +84,9 @@ void csRotatingObject::Activate ()
 {
   if (always) return;
   // Push ourselves on to the busy list if we're not already there.
-  Sys->busy_entities.ObjRelease (this);
-  Sys->busy_entities.ObjAdd (this);
+  int idx = Sys->busy_entities.Find (this);
+  if (idx != -1) Sys->busy_entities.Delete (idx);
+  Sys->busy_entities.Push (this);
   remaining = 10000;
 }
 
@@ -96,7 +98,8 @@ void csRotatingObject::NextFrame (float elapsed_time)
     if (remaining <= 0)
     {
       remaining = 0;
-      Sys->busy_entities.ObjRelease (this);
+      int idx = Sys->busy_entities.Find (this);
+      if (idx != -1) Sys->busy_entities.Delete (idx);
     }
   }
   else if (!always) return;
@@ -106,8 +109,8 @@ void csRotatingObject::NextFrame (float elapsed_time)
   csYRotMatrix3 maty (angles.y * trans);
   csZRotMatrix3 matz (angles.z * trans);
   csMatrix3 mat = matz * maty * matx;
-  parent->GetMovable ().Transform (mat);
-  parent->GetMovable ().UpdateMove ();
+  tparent->GetMovable ().Transform (mat);
+  tparent->GetMovable ().UpdateMove ();
 }
 
 //--------------------------------------------------------------------------
@@ -122,8 +125,9 @@ csLightObject::csLightObject (csLight* p)
 void csLightObject::Activate ()
 {
   // Push ourselves on to the busy list if we're not already there.
-  Sys->busy_entities.ObjRelease (this);
-  Sys->busy_entities.ObjAdd (this);
+  int idx = Sys->busy_entities.Find (this);
+  if (idx != -1) Sys->busy_entities.Delete (idx);
+  Sys->busy_entities.Push (this);
   cur_time = act_time;
 }
 
@@ -134,7 +138,8 @@ void csLightObject::NextFrame (float elapsed_time)
   if (cur_time <= 0)
   {
     cur_time = 0;
-    Sys->busy_entities.ObjRelease (this);
+    int idx = Sys->busy_entities.Find (this);
+    if (idx != -1) Sys->busy_entities.Delete (idx);
   }
 
   csColor s_color (start_color);

@@ -421,7 +421,7 @@ void WalkTest::ParseKeyCmds (csObject* src)
 	rotobj->SetAlways (always);
         src->ObjAdd (rotobj);
 	if (always)
-	  Sys->busy_entities.ObjAdd (rotobj);
+	  Sys->busy_entities.Push (rotobj);
       }
     }
     else if (!strcmp (kp->GetKey (), "entity_Light"))

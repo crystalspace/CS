@@ -19,28 +19,19 @@
 #ifndef __WENTITY_H
 #define __WENTITY_H
 
+#include "csobject/pobject.h"
 #include "csobject/dataobj.h"
 #include "csgeom/vector3.h"
 #include "csutil/cscolor.h"
+#include "csutil/csvector.h"
 
 class csThing;
 class csLight;
 
 /**
- * This is a global object that holds all 'busy' entities.
- * An entity can push itself onto this list when it wants something
- * to happen for a time. Then it can remove itself.
- */
-class csEntityList : public csObject
-{
-  CSOBJTYPE;
-};
-
-
-/**
  * A general WalkTest entity.
  */
-class csWalkEntity : public csObject
+class csWalkEntity : public csPObject
 {
 public:
   /// Activate this entity.
@@ -50,6 +41,11 @@ public:
   virtual void NextFrame (float elapsed_time) = 0;
 
   CSOBJTYPE;
+
+  virtual ~csWalkEntity ()
+  {
+    if (parent) parent->ObjRelease (this);
+  }
 };
 
 /**
@@ -68,7 +64,7 @@ private:
    */
   float transition;
   /// Parent thing.
-  csThing* parent;
+  csThing* tparent;
 
 public:
   /// Create this door.
@@ -97,7 +93,7 @@ private:
   /// The rotation angles.
   csVector3 angles;
   /// Parent thing.
-  csThing* parent;
+  csThing* tparent;
   /// Time remaining before we stop rotating (if always == false).
   float remaining;
 

@@ -351,15 +351,13 @@ void WalkTest::MoveSystems (cs_time elapsed_time, cs_time current_time)
   // Update all busy entities.
   // We first push all entities in a vector so that NextFrame() can safely
   // remove it self from the busy_entities list (or add other entities).
-  csObjIterator it = busy_entities.GetIterator (csWalkEntity::Type, true);
-  busy_vector.SetLength (0);
-  while (!it.IsFinished ())
-  {
-    csWalkEntity* wentity = (csWalkEntity*)it.GetObj ();
-    busy_vector.Push (wentity);
-    it.Next ();
-  }
   int i;
+  busy_vector.SetLength (0);
+  for (i = 0 ; i < busy_entities.Length () ; i++)
+  {
+    csWalkEntity* wentity = (csWalkEntity*)busy_entities[i];
+    busy_vector.Push (wentity);
+  }
   for (i = 0 ; i < busy_vector.Length () ; i++)
   {
     csWalkEntity* wentity = (csWalkEntity*)busy_vector[i];

@@ -137,7 +137,7 @@ public:
   csVector3 body_radius, legs_radius;
 
   /// A list with all busy entities.
-  csEntityList busy_entities;
+  csVector busy_entities;
   /// A vector that is used to temporarily store references to busy entities.
   csVector busy_vector;
   /// Plugin which calculates fps and records statistics
