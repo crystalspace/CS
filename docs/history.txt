@@ -40,6 +40,9 @@ The history order is reversed so that new features are at the top.
 	      to specify their configuration and data files for installation.
 	      Also fixed a few makefiles which placed their configuration and
 	      script files in the wrong locations.
+	- Greatly cleaned up the OpenGL polygon buffer implementation.
+	  Also reduced memory usage (removed unused colors array) and
+	  fixed a memory leak.
 7-Oct-2002
 	- Removed some obsolete texmem.{cpp|h} files in the 3D renderer
 	  directories.

@@ -248,15 +248,11 @@ public:
 
   /// Adds a whole triangle array
   void AddTrianglesArray(csTriangle* indices, int numTriangles);
-  /// Adds a whole vertex array
-  void AddVerticesArray(csVector4* verts, int numVerts);
   /// Adds a whole texel array
   void AddTexelsArray(csVector2* uvs, int numUV);
 
   /// Adds a whole triangle array (Fast Version)
   void AddTrianglesArrayFast(csTriangle* indices, int numTriangles);
-  /// Adds a whole vertex array (Fast Version)
-  void AddVerticesArrayFast(csVector4* verts, int numVerts);
   /// Adds a whole texel array (Fast Version)
   void AddTexelsArrayFast(csVector2* uvs);
 

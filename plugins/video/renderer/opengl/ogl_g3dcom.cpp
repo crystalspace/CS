@@ -132,9 +132,6 @@ CS_IMPLEMENT_STATIC_VAR (Get_clipped_user15, ogl_g3dcom_clipped_user, ())
 ///Array for clipping polygon meshes with lightmaps
 CS_TYPEDEF_GROWING_ARRAY (ogl_g3dcom_clipped_lightmaps, iPolyTex_p);
 CS_IMPLEMENT_STATIC_VAR (Get_clipped_lightmaps, ogl_g3dcom_clipped_lightmaps, ())
-///Array for clipping
-CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_clipped_lightmap_vertices, csVector4);
-CS_IMPLEMENT_STATIC_VAR (Get_clipped_lightmap_vertices, ogl_g3dcom_clipped_lightmap_vertices, ())
 /// Array for clipping.
 CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_clipped_lightmap_triangles, csTriangle);
 CS_IMPLEMENT_STATIC_VAR (Get_clipped_lightmap_triangles, ogl_g3dcom_clipped_lightmap_triangles, ())
@@ -172,7 +169,6 @@ static ogl_g3dcom_clipped_user *clipped_user[CS_VBUF_TOTAL_USERA] = {
   NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
 
 static ogl_g3dcom_clipped_lightmaps *clipped_lightmaps = NULL;
-static ogl_g3dcom_clipped_lightmap_vertices *clipped_lightmap_vertices = NULL;
 static ogl_g3dcom_clipped_lightmap_triangles *clipped_lightmap_triangles = NULL;
 static ogl_g3dcom_clipped_lightmap_translate *clipped_lightmap_translate = NULL;
 static ogl_g3dcom_clipped_lightmap_texels *clipped_lightmap_texels = NULL;
@@ -298,7 +294,6 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
     clipped_user[15] = Get_clipped_user15();
 
     clipped_lightmaps = Get_clipped_lightmaps ();
-    clipped_lightmap_vertices = Get_clipped_lightmap_vertices();
     clipped_lightmap_triangles = Get_clipped_lightmap_triangles();
     clipped_lightmap_translate = Get_clipped_lightmap_translate();
     clipped_lightmap_texels = Get_clipped_lightmap_texels();

@@ -31,13 +31,6 @@
 #include "ogl_txtcache.h"
 
 
-csVector3& csVector4::GetcsVector3()
-{
-  csVector3* v = new csVector3(x,y,z);
-  return *v;
-}
-
-
 TrianglesNode::TrianglesNode()
 {
   info = NULL;
@@ -343,230 +336,154 @@ csTrianglesPerSuperLightmap* csTriangleArrayPolygonBuffer::
   return curr->info;
 }
 
-
-void csTriangleArrayPolygonBuffer::AddTriangles(csTrianglesPerMaterial* pol,
-    csTrianglesPerSuperLightmap* triSuperLM, int* verts, int num_vertices,
-    const csMatrix3& m_obj2tex, const csVector3& v_obj2tex,
-    iPolygonTexture* poly_texture, int mat_index, const csPlane3& /*poly_normal*/)
+int csTriangleArrayPolygonBuffer::AddSingleVertex (csTrianglesPerMaterial* pol,
+	int* verts, int i, const csVector2& uv)
 {
-  csVector3 aux;
-  csVector2 uv[3];
-  csVector2 uvLightmap[3];
-  int i;
-  csTriangle triangle;
-  unsigned char r,g,b;
-  csColor col;
-
-  csTransform *transform  = new csTransform(m_obj2tex, v_obj2tex);
-  aux = transform->Other2This(vertices[verts[0]]);
-  uv[0].x = aux.x;
-  uv[0].y = aux.y;
-
-  if(pol->vertices[verts[0]] != NULL)
+  int indexVert = -1;
+  if (pol->vertices[verts[i]] != NULL)
   {
-    //Let's see if the vertex is already in the vertices array
-    /* A vertex is in the vertices array if:
-     * - pol->vertices[verts[0]] != NULL AND
-     * - In pol->vertices[verts[0]] array exists an index that points
+    /*
+     * Let's see if the vertex is already in the vertices array.
+     * A vertex is in the vertices array if:
+     * - pol->vertices[verts[i]] != NULL AND
+     * - In pol->vertices[verts[i]] array exists an index that points
      * to a vertex that has the same uv's
      */
     int j;
-    int indexVert = -1;
-    for(j = 0; j < pol->vertices[verts[0]]->indices.Length(); j++)
+    for(j = 0; j < pol->vertices[verts[i]]->indices.Length(); j++)
     {
-      indexVert = pol->vertices[verts[0]]->indices[j].vertex;
-      int uvIndex = pol->vertices[verts[0]]->indices[j].uv;
+      indexVert = pol->vertices[verts[i]]->indices[j].vertex;
+      int uvIndex = pol->vertices[verts[i]]->indices[j].uv;
       //let's see if this vertex has the same uv's
-      if(uv[0] == pol->texels[uvIndex]) break;
+      if (uv == pol->texels[uvIndex]) break;
       indexVert = -1;
     }
-    if(indexVert < 0)
-    {
-      // It wasn't in the previous vertices.
-      // We have to create a new vertex.
-      // Where? We're going to push it in the verticesPoints
-      // that position will give us an index, and that index is
-      // the one we will push in the vertices array, position verts[0]
-      Indexes ind;
-      pol->verticesPoints.Push(vertices[verts[0]]);
-      ind.vertex = pol->verticesPoints.Length() - 1; // this is the index!!
-      pol->texels.Push(uv[0]);
-      ind.uv = pol->texels.Length() - 1;
-      pol->vertices[verts[0]]->indices.Push(ind);
-      triangle.a = ind.vertex;
-
-      materials[mat_index]->GetTexture()->GetMeanColor(r,g,b);
-      pol->colors.Push(col);
-      pol->numVertices++;
-    }
-    else triangle.a = indexVert;
   }
   else
   {
     /*
      * It's is null, we have to create
-     * the vertices[verts[0]] array and we can push it directly in
+     * the vertices[verts[i]] array and we can push it directly in
+     * the verticesPoints array and the uv's can be pushed directly too
+     */
+    pol->vertices[verts[i]] = new csVertexIndexArrayNode;
+  }
+
+  if (indexVert < 0)
+  {
+    Indexes ind;
+    pol->verticesPoints.Push(vertices[verts[i]]);
+    ind.vertex = pol->verticesPoints.Length() - 1; // this is the index!!
+    pol->texels.Push (uv);
+    ind.uv = pol->texels.Length() - 1;
+    pol->vertices[verts[i]]->indices.Push(ind);
+    indexVert = ind.vertex;
+    pol->numVertices++;
+  }
+  return indexVert;
+}
+
+int csTriangleArrayPolygonBuffer::AddSingleVertexLM (
+	csTrianglesPerSuperLightmap* triSuperLM,
+	int* verts, int i)
+{
+  if (triSuperLM->vertexIndices[verts[i]] != NULL)
+    return triSuperLM->vertexIndices[verts[i]]->indices[0].vertex;
+  else
+  {
+    /*
+     * It's is null, we have to create
+     * the vertices[verts[i]] array and we can push it directly in
      * the verticesPoints array and the uv's can be pushed directly too
      */
     Indexes ind;
-    pol->vertices[verts[0]] = new csVertexIndexArrayNode;
-    pol->verticesPoints.Push(vertices[verts[0]]);
-    ind.vertex = pol->verticesPoints.Length() - 1;
-    pol->texels.Push(uv[0]);
-    ind.uv = pol->texels.Length()-1;
-    pol->vertices[verts[0]]->indices.Push(ind);
-    triangle.a = ind.vertex;
-    materials[mat_index]->GetTexture()->GetMeanColor(r,g,b);
-    col.red = float(r)/255.;
-    col.green = float(g)/255.;
-    col.blue = float(b)/255.;
-    pol->colors.Push(col);
-    pol->numVertices++;
+    triSuperLM->vertexIndices[verts[i]] = new csVertexIndexArrayNode;
+    triSuperLM->vertices.Push (vertices[verts[i]]);
+    ind.vertex = triSuperLM->vertices.Length() - 1; // this is the index!!
+    triSuperLM->vertexIndices[verts[i]]->indices.Push (ind);
+    triSuperLM->fogInfo.Push(verts[i]);
+    triSuperLM->numVertices++;
+    return ind.vertex;
+  }
+}
+
+int csTriangleArrayPolygonBuffer::AddSingleVertexLM (
+	csTrianglesPerSuperLightmap* triSuperLM,
+	int* verts, int i, const csVector2& uvLightmap)
+{
+  int indexVert = -1;
+  if (triSuperLM->vertexIndices[verts[i]] != NULL)
+  {
+    int j;
+    for (j = 0; j < triSuperLM->vertexIndices[verts[i]]->indices.Length();
+        j++)
+    {
+      indexVert = triSuperLM->vertexIndices[verts[i]]->indices[j].vertex;
+      int uvIndex = triSuperLM->vertexIndices[verts[i]]->indices[j].uv;
+      //let's see if this vertex has the same uv's
+      if (uvLightmap == triSuperLM->texels[uvIndex]) break;
+      indexVert = -1;
+    }
+  }
+  else
+  {
+    /*
+     * It's is null, we have to create
+     * the vertices[verts[i]] array and we can push it directly in
+     * the verticesPoints array and the uv's can be pushed directly too
+     */
+    triSuperLM->vertexIndices[verts[i]] = new csVertexIndexArrayNode;
   }
 
-  for(i = 1; i < num_vertices-1; i++)
+  if (indexVert < 0)
   {
-    aux = transform->Other2This(vertices[verts[i]]);
+    Indexes ind;
+    triSuperLM->vertices.Push (vertices[verts[i]]);
+    ind.vertex = triSuperLM->vertices.Length () - 1; // this is the index!!
+    triSuperLM->texels.Push (uvLightmap);
+    ind.uv = triSuperLM->texels.Length() - 1;
+    triSuperLM->vertexIndices[verts[i]]->indices.Push(ind);
+    triSuperLM->fogInfo.Push (verts[i]);
+    triSuperLM->numVertices++;
+    triSuperLM->numTexels++;
+    indexVert = ind.vertex;
+  }
+  return indexVert;
+}
+
+void csTriangleArrayPolygonBuffer::AddTriangles (csTrianglesPerMaterial* pol,
+    csTrianglesPerSuperLightmap* triSuperLM, int* verts, int num_vertices,
+    const csMatrix3& m_obj2tex, const csVector3& v_obj2tex,
+    iPolygonTexture* poly_texture, int mat_index,
+    const csPlane3& /*poly_normal*/)
+{
+  csVector3 aux;
+  csVector2 uv[3];
+  int i;
+  csTriangle triangle;
+
+  // Triangulate the polygon and add all vertices with correct uv
+  // index.
+  csTransform transform (m_obj2tex, v_obj2tex);
+  aux = transform.Other2This (vertices[verts[0]]);
+  uv[0].x = aux.x;
+  uv[0].y = aux.y;
+  triangle.a = AddSingleVertex (pol, verts, 0, uv[0]);
+
+  for (i = 1; i < num_vertices-1; i++)
+  {
+    aux = transform.Other2This (vertices[verts[i]]);
     uv[1].x = aux.x;
     uv[1].y = aux.y;
+    triangle.b = AddSingleVertex (pol, verts, i, uv[1]);
 
-    aux = transform->Other2This(vertices[verts[i+1]]);
+    aux = transform.Other2This (vertices[verts[i+1]]);
     uv[2].x = aux.x;
     uv[2].y = aux.y;
+    triangle.c = AddSingleVertex (pol, verts, i+1, uv[2]);
 
-    if(pol->vertices[verts[i]] != NULL)
-    {
-      //Let's see if the vertex is already in the vertices array
-      /*
-       * A vertex is in the vertices array if:
-       * - pol->vertices[verts[0]] != NULL AND
-       * - In pol->vertices[verts[0]] array exists an index that points
-       * to a vertex that has the same uv's
-       */
-      int j;
-      int indexVert = -1;
-      for(j = 0; j < pol->vertices[verts[i]]->indices.Length(); j++)
-      {
-        indexVert = pol->vertices[verts[i]]->indices[j].vertex;
-        int uvIndex = pol->vertices[verts[i]]->indices[j].uv;
-        //let's see if this vertex has the same uv's
-        if(uv[1] == pol->texels[uvIndex]) break;
-        indexVert = -1;
-      }
-      if(indexVert < 0)
-      {
-        // It wasn't in the previous vertices.
-        // We have to create a new vertex.
-        // Where? We're going to push it in the verticesPoints
-        // that position will give us an index, and that index is
-        // the one we will push in the vertices array, position verts[0]
-        Indexes ind;
-        pol->verticesPoints.Push(vertices[verts[i]]);
-        ind.vertex = pol->verticesPoints.Length() - 1; // this is the index!!
-        pol->texels.Push(uv[1]);
-        ind.uv = pol->texels.Length() - 1;
-        pol->vertices[verts[i]]->indices.Push(ind);
-        triangle.b = ind.vertex;
-        materials[mat_index]->GetTexture()->GetMeanColor(r,g,b);
-        col.red = float(r)/255.;
-        col.green = float(g)/255.;
-        col.blue = float(b)/255.;
-        pol->colors.Push(col);
-        pol->numVertices++;
-      }
-      else triangle.b = indexVert;
-    }
-    else
-    {
-      /*
-       * It's is null, we have to create
-       * the vertices[verts[0]] array and we can push it directly in
-       * the verticesPoints array and the uv's can be pushed directly too
-       */
-      Indexes ind;
-      pol->vertices[verts[i]] = new csVertexIndexArrayNode;
-      pol->verticesPoints.Push(vertices[verts[i]]);
-      ind.vertex = pol->verticesPoints.Length() - 1; // this is the index!!
-      pol->texels.Push(uv[1]);
-      ind.uv = pol->texels.Length() - 1;
-      pol->vertices[verts[i]]->indices.Push(ind);
-      triangle.b = ind.vertex;
-      materials[mat_index]->GetTexture()->GetMeanColor(r,g,b);
-      col.red = float(r)/255.;
-      col.green = float(g)/255.;
-      col.blue = float(b)/255.;
-      pol->colors.Push(col);
-      pol->numVertices++;
-    }
-
-    if(pol->vertices[verts[i+1]]!= NULL)
-    {
-     //Let's see if the vertex is already in the vertices array
-     /*
-      * A vertex is in the vertices array if:
-      * - pol->vertices[verts[0]] != NULL AND
-      * - In pol->vertices[verts[0]] array exists an index that points
-      * to a vertex that has the same uv's
-      */
-     int j;
-     int indexVert = -1;
-     for(j = 0; j < pol->vertices[verts[i+1]]->indices.Length(); j++)
-     {
-        indexVert = pol->vertices[verts[i+1]]->indices[j].vertex;
-        int uvIndex = pol->vertices[verts[i+1]]->indices[j].uv;
-        //let's see if this vertex has the same uv's
-        if(uv[2] == pol->texels[uvIndex]) break;
-        indexVert = -1;
-     }
-     if(indexVert < 0)
-     {
-
-       // It wasn't in the previous vertices.
-       // We have to create a new vertex.
-       // Where? We're going to push it in the verticesPoints
-       // that position will give us an index, and that index is
-       // the one we will push in the vertices array, position verts[0]
-       Indexes ind;
-       pol->verticesPoints.Push(vertices[verts[i+1]]);
-       ind.vertex = pol->verticesPoints.Length() - 1; // this is the index!!
-       pol->texels.Push(uv[2]);
-       ind.uv = pol->texels.Length() - 1;
-       pol->vertices[verts[i+1]]->indices.Push(ind);
-       triangle.c = ind.vertex;
-       materials[mat_index]->GetTexture()->GetMeanColor(r,g,b);
-       col.red = float(r)/255.;
-       col.green = float(g)/255.;
-       col.blue = float(b)/255.;
-       pol->colors.Push(col);
-       pol->numVertices++;
-     }
-     else triangle.c = indexVert;
-    }
-    else
-    {
-      /*
-       * It's is null, we have to create
-       * the vertices[verts[0]] array and we can push it directly in
-       * the verticesPoints array and the uv's can be pushed directly too
-       */
-      Indexes ind;
-      pol->vertices[verts[i+1]] = new csVertexIndexArrayNode;
-      pol->verticesPoints.Push(vertices[verts[i+1]]);
-      ind.vertex = pol->verticesPoints.Length() - 1;
-      pol->texels.Push(uv[2]);
-      ind.uv = pol->texels.Length() -1;
-      pol->vertices[verts[i+1]]->indices.Push(ind);
-      triangle.c = ind.vertex;
-      materials[mat_index]->GetTexture()->GetMeanColor(r,g,b);
-      col.red = float(r)/255.;
-      col.green = float(g)/255.;
-      col.blue = float(b)/255.;
-      pol->colors.Push(col);
-      pol->numVertices++;
-    }
-
-    pol->triangles.Push(triangle);
-    pol->infoPolygons.Push(poly_texture);
+    pol->triangles.Push (triangle);
+    pol->infoPolygons.Push (poly_texture);
     if (poly_texture) poly_texture->IncRef();
 
     pol->numTriangles++;
@@ -574,11 +491,10 @@ void csTriangleArrayPolygonBuffer::AddTriangles(csTrianglesPerMaterial* pol,
 
   pol->matIndex = mat_index;
 
-  //Lightmap handling
-
+  // Lightmap handling.
   csRect rect;
-  triSuperLM = SearchFittingSuperLightmap(poly_texture, rect,verticesCount);
-  CS_ASSERT(triSuperLM != NULL);
+  triSuperLM = SearchFittingSuperLightmap (poly_texture, rect, verticesCount);
+  CS_ASSERT (triSuperLM != NULL);
 
   /*
    * We have the superlightmap where the poly_texture fits
@@ -588,11 +504,11 @@ void csTriangleArrayPolygonBuffer::AddTriangles(csTrianglesPerMaterial* pol,
   /*
    * Let's check if it's the unlitPolySL
    */
-  if(triSuperLM == unlitPolysSL)
+  if (triSuperLM == unlitPolysSL)
   {
     // It is, we can avoid most of this stuff, no
-    //lightmap is needed, only the triangles, vertex
-    // and vertex indices are needed
+    // lightmap is needed, only the triangles, vertex
+    // and vertex indices are needed.
 
     /*
      * It's easier than the lightmap case.
@@ -604,85 +520,23 @@ void csTriangleArrayPolygonBuffer::AddTriangles(csTrianglesPerMaterial* pol,
      * 3) We don't need to comapare with uv's
      *
      */
-    if (triSuperLM->vertexIndices[verts[0]] != NULL)
-      //The vertex already exists
-      triangle.a = triSuperLM->vertexIndices[verts[0]]->indices[0].vertex;
-    else
+    triangle.a = AddSingleVertexLM (triSuperLM, verts, 0);
+
+    for (i = 1; i < num_vertices - 1; i++)
     {
-      //There is no vertices in the index. We have to create it.
-      csVector3 point;
-      Indexes ind;
+      triangle.b = AddSingleVertexLM (triSuperLM, verts, i);
+      triangle.c = AddSingleVertexLM (triSuperLM, verts, i+1);
 
-      point.x = vertices[verts[0]].x;
-      point.y = vertices[verts[0]].y;
-      point.z = vertices[verts[0]].z;
-
-
-      triSuperLM->vertexIndices[verts[0]] = new csVertexIndexArrayNode;
-      triSuperLM->vertices.Push(point);
-      ind.vertex = triSuperLM->vertices.Length() - 1;
-      triSuperLM->vertexIndices[verts[0]]->indices.Push(ind);
-
-      triSuperLM->fogInfo.Push(verts[0]);
-      triSuperLM->numVertices++;
-      triangle.a = ind.vertex;
-    }
-
-    for(i = 1; i < num_vertices - 1; i++)
-    {
-      if(triSuperLM->vertexIndices[verts[i]] != NULL)
-        triangle.b = triSuperLM->vertexIndices[verts[i]]->indices[0].vertex;
-      else
-      {
-        /* It's is null, we have to create
-        * the vertices[verts[i]] array and we can push it directly in
-        * the verticesPoints array and the uv's can be pushed directly too
-        */
-        Indexes ind;
-        csVector3 point;
-
-        point.x = vertices[verts[i]].x;
-        point.y = vertices[verts[i]].y;
-        point.z = vertices[verts[i]].z;
-
-        triSuperLM->vertexIndices[verts[i]] = new csVertexIndexArrayNode;
-        triSuperLM->vertices.Push(point);
-        ind.vertex = triSuperLM->vertices.Length() - 1; // this is the index!!
-        triSuperLM->vertexIndices[verts[i]]->indices.Push(ind);
-        triSuperLM->fogInfo.Push(verts[i]);
-        triSuperLM->numVertices++;
-        triangle.b = ind.vertex;
-      }
-
-      if(triSuperLM->vertexIndices[verts[i+1]] != NULL)
-        triangle.c = triSuperLM->vertexIndices[verts[i+1]]->indices[0].vertex;
-      else
-      {
-        Indexes ind;
-        csVector3 point;
-        point.x = vertices[verts[i+1]].x;
-        point.y = vertices[verts[i+1]].y;
-        point.z = vertices[verts[i+1]].z;
-
-        triSuperLM->vertexIndices[verts[i+1]] = new csVertexIndexArrayNode;
-        triSuperLM->vertices.Push(point);
-        ind.vertex = triSuperLM->vertices.Length() - 1;
-        triSuperLM->vertexIndices[verts[i+1]]->indices.Push(ind);
-        triSuperLM->fogInfo.Push(verts[i+1]);
-        triSuperLM->numVertices++;
-        triangle.c = ind.vertex;
-      }
-      triSuperLM->triangles.Push(triangle);
-      if (poly_texture) poly_texture->IncRef();
+      triSuperLM->triangles.Push (triangle);
       triSuperLM->numTriangles++;
     }
     return;
   }
 
-  float lm_low_u,lm_low_v,lm_high_u,lm_high_v;
+  float lm_low_u, lm_low_v, lm_high_u, lm_high_v;
   float lm_scale_u, lm_scale_v, lm_offset_u, lm_offset_v;
 
-  poly_texture->GetTextureBox(lm_low_u,lm_low_v,lm_high_u,lm_high_v);
+  poly_texture->GetTextureBox (lm_low_u,lm_low_v,lm_high_u,lm_high_v);
   lm_low_u -= 0.125;
   lm_low_v -= 0.125;
   lm_high_u += 0.125;
@@ -710,8 +564,7 @@ void csTriangleArrayPolygonBuffer::AddTriangles(csTrianglesPerMaterial* pol,
   lm_offset_u = lm_low_u - sup_u / lm_scale_u;
   lm_offset_v = lm_low_v - sup_v / lm_scale_v;
 
-
-  //Ok, we have the values, let's generate the triangles
+  // Ok, we have the values, let's generate the triangles
 
   /*
    * Vertices for lightmap triangles have four coordinates
@@ -720,210 +573,30 @@ void csTriangleArrayPolygonBuffer::AddTriangles(csTrianglesPerMaterial* pol,
    * same coordinates but different uv's a new vertex is
    * created)
    */
+  csVector2 uvLightmap;
+  uvLightmap.x = (uv[0].x - lm_offset_u) * lm_scale_u;
+  uvLightmap.y = (uv[0].y - lm_offset_v) * lm_scale_v;
+  triangle.a = AddSingleVertexLM (triSuperLM, verts, 0, uvLightmap);
 
-  uvLightmap[0].x = (uv[0].x - lm_offset_u) * lm_scale_u;
-  uvLightmap[0].y = (uv[0].y - lm_offset_v) * lm_scale_v;
-  int k;
-
-
-  if(triSuperLM->vertexIndices[verts[0]] != NULL)
+  for (i = 1; i < num_vertices - 1; i++)
   {
-    //The vertices could exist already, let's check
-    int indexVertex = -1;
-    for(k = 0; k < triSuperLM->vertexIndices[verts[0]]->indices.Length(); k++)
-    {
-      indexVertex = triSuperLM->vertexIndices[verts[0]]->indices[k].vertex;
-      int indexUV = triSuperLM->vertexIndices[verts[0]]->indices[k].uv;
-      if(uvLightmap[0] == triSuperLM->texels[indexUV]) break;
-      indexVertex = -1;
-    }
-    if (indexVertex < 0)
-    {
-      /*
-       * The vertex isn't in the previous stored vertices, so let's
-       * create it
-       */
-      Indexes ind;
-      csVector3 point;
-      point.x = vertices[verts[0]].x;
-      point.y = vertices[verts[0]].y;
-      point.z = vertices[verts[0]].z;
+    uvLightmap.x = (uv[1].x - lm_offset_u) * lm_scale_u;
+    uvLightmap.y = (uv[1].y - lm_offset_v) * lm_scale_v;
+    triangle.b = AddSingleVertexLM (triSuperLM, verts, i, uvLightmap);
 
-      triSuperLM->vertices.Push(point);
-      ind.vertex = triSuperLM->vertices.Length() - 1; // this is the index!!
-      triSuperLM->texels.Push(uvLightmap[0]);
-      ind.uv = triSuperLM->texels.Length() - 1;
-      triSuperLM->vertexIndices[verts[0]]->indices.Push(ind);
-      triSuperLM->numTexels++;
-      triSuperLM->numVertices++;
-      triSuperLM->fogInfo.Push(verts[0]);
-      triangle.a = ind.vertex;
+    uvLightmap.x = (uv[2].x - lm_offset_u) * lm_scale_u;
+    uvLightmap.y = (uv[2].y - lm_offset_v) * lm_scale_v;
+    triangle.c = AddSingleVertexLM (triSuperLM, verts, i+1, uvLightmap);
 
-    }
-    else
-    {
-      //The vertex already exists
-      triangle.a = indexVertex;
-    }
-  }
-  else
-  {
-    //There is no vertices in the index. We have to create it.
-    csVector3 point;
-    Indexes ind;
-
-    point.x = vertices[verts[0]].x;
-    point.y = vertices[verts[0]].y;
-    point.z = vertices[verts[0]].z;
-
-    triSuperLM->vertexIndices[verts[0]] = new csVertexIndexArrayNode;
-    triSuperLM->vertices.Push(point);
-    ind.vertex = triSuperLM->vertices.Length() - 1;
-    triSuperLM->texels.Push(uvLightmap[0]);
-    ind.uv = triSuperLM->texels.Length() -1;
-    triSuperLM->vertexIndices[verts[0]]->indices.Push(ind);
-
-    triSuperLM->fogInfo.Push(verts[0]);
-    triSuperLM->numVertices++;
-    triSuperLM->numTexels++;
-    triangle.a = ind.vertex;
-  }
-
-  for(i = 1; i < num_vertices - 1; i++)
-  {
-    aux = transform->Other2This(vertices[verts[i]]);
-    uvLightmap[1].x = (aux.x - lm_offset_u) * lm_scale_u;
-    uvLightmap[1].y = (aux.y - lm_offset_v) * lm_scale_v;
-
-    aux = transform->Other2This(vertices[verts[i+1]]);
-    uvLightmap[2].x = (aux.x - lm_offset_u) * lm_scale_u;
-    uvLightmap[2].y = (aux.y - lm_offset_v) * lm_scale_v;
-
-    if(triSuperLM->vertexIndices[verts[i]] != NULL)
-    {
-      int j;
-      int indexVert = -1;
-      for(j = 0; j < triSuperLM->vertexIndices[verts[i]]->indices.Length();
-          j++)
-      {
-        indexVert = triSuperLM->vertexIndices[verts[i]]->indices[j].vertex;
-        int uvIndex = triSuperLM->vertexIndices[verts[i]]->indices[j].uv;
-        //let's see if this vertex has the same uv's
-        if(uvLightmap[1] == triSuperLM->texels[uvIndex]) break;
-        indexVert = -1;
-      }
-      if(indexVert < 0)
-      {
-        Indexes ind;
-        csVector3 point;
-
-        point.x = vertices[verts[i]].x;
-        point.y = vertices[verts[i]].y;
-        point.z = vertices[verts[i]].z;
-
-        triSuperLM->vertices.Push(point);
-        ind.vertex = triSuperLM->vertices.Length() - 1; // this is the index!!
-        triSuperLM->texels.Push(uvLightmap[1]);
-        ind.uv = triSuperLM->texels.Length() - 1;
-        triSuperLM->vertexIndices[verts[i]]->indices.Push(ind);
-        triSuperLM->fogInfo.Push(verts[i]);
-        triSuperLM->numVertices++;
-        triSuperLM->numTexels++;
-        triangle.b = ind.vertex;
-      }
-      else triangle.b = indexVert;
-    }
-    else
-    {
-      /*
-       * It's is null, we have to create
-       * the vertices[verts[i]] array and we can push it directly in
-       * the verticesPoints array and the uv's can be pushed directly too
-       */
-      Indexes ind;
-      csVector3 point;
-
-      point.x = vertices[verts[i]].x;
-      point.y = vertices[verts[i]].y;
-      point.z = vertices[verts[i]].z;
-
-      triSuperLM->vertexIndices[verts[i]] = new csVertexIndexArrayNode;
-      triSuperLM->vertices.Push(point);
-      ind.vertex = triSuperLM->vertices.Length() - 1; // this is the index!!
-      triSuperLM->texels.Push(uvLightmap[1]);
-      ind.uv = triSuperLM->texels.Length() - 1;
-      triSuperLM->vertexIndices[verts[i]]->indices.Push(ind);
-      triSuperLM->fogInfo.Push(verts[i]);
-      triSuperLM->numVertices++;
-      triSuperLM->numTexels++;
-      triangle.b = ind.vertex;
-    }
-
-    if(triSuperLM->vertexIndices[verts[i+1]] != NULL)
-    {
-     int j;
-     int indexVert = -1;
-     for(j = 0; j < triSuperLM->vertexIndices[verts[i+1]]->indices.Length(); j++)
-     {
-       indexVert = triSuperLM->vertexIndices[verts[i+1]]->indices[j].vertex;
-       int uvIndex = triSuperLM->vertexIndices[verts[i+1]]->indices[j].uv;
-       //let's see if this vertex has the same uv's
-       if(uvLightmap[2] == triSuperLM->texels[uvIndex]) break;
-       indexVert = -1;
-     }
-     if(indexVert < 0)
-     {
-       // It wasn't in the previous vertices.
-       // We have to create a new vertex.
-       // Where? We're going to push it in the verticesPoints
-       // that position will give us an index, and that index is
-       // the one we will push in the vertices array, position verts[i+1]
-       Indexes ind;
-       csVector3 point;
-
-       point.x = vertices[verts[i+1]].x;
-       point.y = vertices[verts[i+1]].y;
-       point.z = vertices[verts[i+1]].z;
-
-       triSuperLM->vertices.Push(point);
-       ind.vertex = triSuperLM->vertices.Length() - 1; // this is the index!!
-       triSuperLM->texels.Push(uvLightmap[2]);
-       ind.uv = triSuperLM->texels.Length() - 1;
-       triSuperLM->vertexIndices[verts[i+1]]->indices.Push(ind);
-       triSuperLM->fogInfo.Push(verts[i+1]);
-       triSuperLM->numVertices++;
-       triSuperLM->numTexels++;
-       triangle.c = ind.vertex;
-     }
-     else triangle.c = indexVert;
-    }
-    else
-    {
-      Indexes ind;
-      csVector3 point;
-      point.x = vertices[verts[i+1]].x;
-      point.y = vertices[verts[i+1]].y;
-      point.z = vertices[verts[i+1]].z;
-
-      triSuperLM->vertexIndices[verts[i+1]] = new csVertexIndexArrayNode;
-      triSuperLM->vertices.Push(point);
-      ind.vertex = triSuperLM->vertices.Length() - 1;
-      triSuperLM->texels.Push(uvLightmap[2]);
-      ind.uv = triSuperLM->texels.Length() -1;
-      triSuperLM->vertexIndices[verts[i+1]]->indices.Push(ind);
-      triSuperLM->fogInfo.Push(verts[i+1]);
-      triSuperLM->numVertices++;
-      triSuperLM->numTexels++;
-      triangle.c = ind.vertex;
-    }
-    triSuperLM->triangles.Push(triangle);
-    poly_texture->IncRef();
+    triSuperLM->triangles.Push (triangle);
+    poly_texture->IncRef ();
     triSuperLM->numTriangles++;
   }
-  triSuperLM->rectangles.Push(rect);
+
+  triSuperLM->rectangles.Push (rect);
   triSuperLM->numLightmaps++;
-  triSuperLM->lightmaps.Push(poly_texture);
-  poly_texture->IncRef();
+  triSuperLM->lightmaps.Push (poly_texture);
+  poly_texture->IncRef ();
 }
 
 void csTriangleArrayPolygonBuffer::MarkLightmapsDirty()
@@ -933,7 +606,7 @@ void csTriangleArrayPolygonBuffer::MarkLightmapsDirty()
 
 void csTriangleArrayPolygonBuffer::AddPolygon (int* verts, int num_verts,
   const csPlane3& poly_normal,
-    int mat_index,
+  int mat_index,
   const csMatrix3& m_obj2tex, const csVector3& v_obj2tex,
   iPolygonTexture* poly_texture)
 {
@@ -967,12 +640,15 @@ void csTriangleArrayPolygonBuffer::AddPolygon (int* verts, int num_verts,
 
   csTrianglesPerSuperLightmap* triSuperLM = NULL;
 
-  if (polygons.GetLastMaterial() < 0)
+  int last_mat_index = polygons.GetLastMaterial ();
+  if (last_mat_index != mat_index)
   {
-    csTrianglesPerMaterial* pol = new csTrianglesPerMaterial(verticesCount);
-    AddTriangles(pol,triSuperLM,verts,num_verts,m_obj2tex,v_obj2tex,
-      poly_texture,mat_index,poly_normal);
-    TrianglesNode* tNode = new TrianglesNode();
+    // First polygon or material of this polygon is different from
+    // last material.
+    csTrianglesPerMaterial* pol = new csTrianglesPerMaterial (verticesCount);
+    AddTriangles (pol, triSuperLM, verts, num_verts, m_obj2tex, v_obj2tex,
+      poly_texture, mat_index, poly_normal);
+    TrianglesNode* tNode = new TrianglesNode ();
     tNode->info = pol;
     polygons.Add(tNode);
 
@@ -980,24 +656,10 @@ void csTriangleArrayPolygonBuffer::AddPolygon (int* verts, int num_verts,
   }
   else
   {
-    if(polygons.GetLastMaterial() == mat_index)
-    { //we can add the triangles in the last PolygonPerMaterial
-      // as long they share the same material
-     AddTriangles(polygons.last->info,triSuperLM,verts,num_verts,m_obj2tex,
-       v_obj2tex, poly_texture,mat_index,poly_normal);
-    }
-    else
-    {
-      // It is a new material. It's the same code that if it was the first
-      //We have to triangularizate it
-      csTrianglesPerMaterial* pol = new csTrianglesPerMaterial(verticesCount);
-      AddTriangles(pol,triSuperLM,verts,num_verts,m_obj2tex,
-        v_obj2tex,poly_texture,mat_index,poly_normal);
-      TrianglesNode* tNode = new TrianglesNode();
-      tNode->info = pol;
-      polygons.Add(tNode);
-      matCount ++;
-    }
+    // We can add the triangles in the last PolygonPerMaterial
+    // as long they share the same material.
+    AddTriangles (polygons.last->info, triSuperLM, verts, num_verts, m_obj2tex,
+      v_obj2tex, poly_texture, mat_index, poly_normal);
   }
 }
 
@@ -1146,11 +808,6 @@ csVector3* csTriangleArrayPolygonBuffer::GetVerticesPerMaterial(
   TrianglesNode* t)
 {
   return t->info->verticesPoints.GetArray();
-}
-
-csColor* csTriangleArrayPolygonBuffer::GetColors(TrianglesNode*t)
-{
-  return t->info->colors.GetArray();
 }
 
 csTriangleArrayVertexBufferManager::csTriangleArrayVertexBufferManager

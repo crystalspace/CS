@@ -358,25 +358,11 @@ void csLightMapQueue::AddTexelsArray(csVector2* uvs, int numUV)
   memcpy(aux,(float*)uvs,sizeof(GLfloat)*2*numUV);
 }
 
-void csLightMapQueue::AddVerticesArray(csVector4 * verts,int numVerts)
-{
-  GLfloat* aux = glverts + (num_vertices - numVerts)*4;
-  //aux = (float*)verts;
-  memcpy(aux,(float*)verts,sizeof(GLfloat)*4*numVerts);
-}
-
 void csLightMapQueue::AddTrianglesArrayFast(csTriangle* indices,
   int numTriangles)
 {
   tris = (int*)indices;
   num_triangles = numTriangles;
-}
-
-void csLightMapQueue::AddVerticesArrayFast(csVector4* verts, int numVerts)
-{
-  glverts = (GLfloat*)verts;
-  num_vertices = numVerts;
-
 }
 
 void csLightMapQueue::AddTexelsArrayFast(csVector2* uvs)

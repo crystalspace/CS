@@ -30,17 +30,6 @@
 
 class csSLMCacheData;
 
-class csVector4
-{
-public:
-  float x;
-  float y;
-  float z;
-  float w;
-
-  csVector3& GetcsVector3();
-};
-
 struct Indexes
 {
   int vertex;
@@ -52,19 +41,6 @@ class csVertexIndexArrayNode
   public:
     CS_DECLARE_GROWING_ARRAY(indices,Indexes);
 };
-
-/*class csTriangleInfo
-{
-  public:
-    csPlane3 normal;
-    csMatrix3 m_obj2tex;
-    csVector3 v_obj2tex;
-    int matIndex;
-    iPolygonTexture* poly_texture;
-
-    csTriangleInfo();
-};
-*/
 
 typedef iPolygonTexture* iPolyTex_p;
 typedef csVertexIndexArrayNode* csIndexVertex;
@@ -86,7 +62,6 @@ public:
   CS_DECLARE_GROWING_ARRAY(infoPolygons,iPolyTex_p);
   CS_DECLARE_GROWING_ARRAY(texels, csVector2);
   CS_DECLARE_GROWING_ARRAY(verticesPoints, csVector3);
-  CS_DECLARE_GROWING_ARRAY(colors, csColor);
 
   csTrianglesPerMaterial();
   csTrianglesPerMaterial(int numVertex);
@@ -243,6 +218,22 @@ public:
  */
 class csTriangleArrayPolygonBuffer : public csPolygonBuffer
 {
+private:
+  // Add a single vertex to the given tri/mat buffer.
+  // Returns vertex index.
+  int AddSingleVertex (csTrianglesPerMaterial* pol,
+	int* verts, int i, const csVector2& uv);
+  // Add a single vertex to the given suplm.
+  // Returns vertex index. This version is for when there is
+  // actually no lightmapping needed but the suplm is only
+  // there for fog.
+  int AddSingleVertexLM (csTrianglesPerSuperLightmap* triSuperLM,
+	int* verts, int i);
+  // Add a single vertex to the given suplm.
+  // Returns vertex index.
+  int AddSingleVertexLM (csTrianglesPerSuperLightmap* triSuperLM,
+	int* verts, int i, const csVector2& uvLightmap);
+
 public:
   //SuperLightMap list
   TrianglesSuperLightmapList superLM;
@@ -305,9 +296,6 @@ public:
 
   /// Gets the vertices for a given node (by super lightmap)
   csVector3* GetVerticesPerSuperLightmap(TrianglesSuperLightmapNode* t);
-
-  /// Gets the vertices' colors for a given node (per material)
-  csColor* GetColors(TrianglesNode *t);
 
   TrianglesNode* GetFirst();
   TrianglesNode* GetNext(TrianglesNode* t);
