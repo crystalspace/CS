@@ -4,6 +4,8 @@ The history order is reversed so that new features are at the top.
 	- Steven Geens fixed a bad bug in the RAPID collision detection
 	  plugin. It now seems to work properly in all cases regardless
 	  of the transforms that are given.
+	- Jonathan Tarbox suggested a minor optimization in
+	  csGraphics2DGLCommon::Write().
 17-Jul-2002
 	- Added unittest for RAPID plugin. Extended unittest app so that it
 	  calls this unittest. This test now fails but I don't know why.

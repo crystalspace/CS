@@ -277,17 +277,17 @@ void csGraphics2DGLCommon::DrawPixel (int x, int y, int color)
 void csGraphics2DGLCommon::Write (iFont *font, int x, int y, int fg, int bg,
   const char *text)
 {
-  bool gl_texture2d = glIsEnabled(GL_TEXTURE_2D);
-  if (gl_texture2d) glDisable (GL_TEXTURE_2D);
-
   if (bg >= 0)
   {
+    bool gl_texture2d = glIsEnabled(GL_TEXTURE_2D);
+    if (gl_texture2d) glDisable (GL_TEXTURE_2D);
+
     int fw, fh;
     font->GetDimensions (text, fw, fh);
     DrawBox (x, y, fw, fh, bg);
-  }
 
-  if (gl_texture2d) glEnable (GL_TEXTURE_2D);
+    if (gl_texture2d) glEnable (GL_TEXTURE_2D);
+  }
 
   setGLColorfromint (fg);
   FontCache->Write (font, x, Height - y, text);
