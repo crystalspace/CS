@@ -1,8 +1,0 @@
-SubDir TOP libs cssys unix ;
-
-Application unix
-	: [ Wildcard *.cpp *.h ]
-;
-
-Help unix : "Unix" ;
-

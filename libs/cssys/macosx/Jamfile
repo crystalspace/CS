@@ -1,8 +1,0 @@
-SubDir TOP libs cssys macosx ;
-
-Application macosx
-	: [ Wildcard *.cpp *.h ]
-;
-
-Help macosx : "MacOS/X" ;
-

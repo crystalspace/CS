@@ -1,8 +1,0 @@
-SubDir TOP libs cssys win32 ;
-
-Application win32gcc
-	: [ Wildcard *.cpp *.h ]
-;
-
-Help win32gcc : "Windows with Mingw+MSYS or Cygwin" ;
-
