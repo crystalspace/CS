@@ -65,6 +65,26 @@ chronological order.
 	  of strcasecmp() and strncasecmp() from inline methods since these are
 	  not available under gcc's -ansi and -pedantic switches (at least on
 	  Windows).
+	- Eric Sunshine refined the fakement of `typename' for compilers for
+	  which CS_USE_FAKE_TYPENAME_KEYWORD is defined. For such compilers,
+	  `typename' is now defined as `class', which means that it can safely
+	  be used when declaring template arguments, such as:
+	    template<typename T> struct A {...};'
+	  For the other case, where `typename' is used to qualify a typename
+	  within a template itself, we now fake up a `typename_qualifier'
+	  keyword which is defined as nothing for compilers which do provide
+	  `typename', and as `typename' for compilers which do support it.
+	  Usage example:
+	    template<typename T> struct A {
+	      typedef int B;
+	      typename_qualifier A::B var;
+	      typename_qualifier T::Functor get_functor() const;
+	    };
+	- Eric Sunshine fixed a couple bugs introduced recently into
+	  configure.ac. (1) Numeric comparisons of $cs_long_bits incorrectly
+	  used = rather than -eq. (2) $cs_cv_prog_cxx_fpic had been renamed to
+	  $cs_cv_prog_cxx_pic, but not all references to that variable were
+	  updated.
 3-Mar-2005
 	- Jorrit fixed a compile error in spr2d. ||= is not a valid
 	  C++ operator. So put the original |= back.

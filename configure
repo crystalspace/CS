@@ -54544,10 +54544,10 @@ echo $ECHO_N "checking if csQsqrt() compiles... $ECHO_C" >&6
 if test "${cs_cv_cxx_qsqrt_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test $cs_long_bits = 32 && test $ac_compiler_gnu = yes; then
+  if test $cs_long_bits -eq 32 && test $ac_compiler_gnu = yes; then
   cs_qsqrt_cflags="$cs_optimize_flags"
-	    if test $cs_cv_prog_cxx_fpic != no; then
-  cs_qsqrt_cflags="$cs_qsqrt_cflags $cs_cv_prog_cxx_fpic"
+	    if test $cs_cv_prog_cxx_pic != no; then
+  cs_qsqrt_cflags="$cs_qsqrt_cflags $cs_cv_prog_cxx_pic"
 fi
 
 	    if test $cs_cv_prog_cxx_force_cpusubtype_all != no; then
@@ -54729,7 +54729,7 @@ echo $ECHO_N "checking if csQint() functions correctly... $ECHO_C" >&6
 if test "${cs_cv_cxx_qint_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test $cs_long_bits = 32; then
+  if test $cs_long_bits -eq 32; then
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'

@@ -124,12 +124,26 @@
 #endif
 
 // Platforms with compilers which do not understand the new C++ keyword
-// `typename' should define CS_USE_FAKE_TYPENAME_KEYWORD. Note, however, that
-// this faked-up `typename' should be used only to pacify a modern compiler
-// about a type name within a template. Do not use this fake keyword when
-// specifying template arguments; instead, use `class'.
+// `typename' should define CS_USE_FAKE_TYPENAME_KEYWORD. For such compilers,
+// we fake up a `typename' keyword which can be used to declare template
+// arguments, such as:
+//
+//   template<typename T> class A {...};
+//
+// Furthermore, we fake up a synthesized `typename_qualifier' keyword which
+// should be used to qualify types within a template declaration rather than
+// using `typename'. Usage example:
+//
+// template<typename T> struct A {
+//   typedef int B;
+//   typename_qualifier C::B var;
+//   typename_qualifier T::Functor get_functor() const;
+// };
 #if defined(CS_USE_FAKE_TYPENAME_KEYWORD)
-  #define typename /* nothing */
+  #define typename class
+  #define typename_qualifier
+#else
+  #define typename_qualifier typename
 #endif
 
 // Platforms with compilers which do not undersatnd the new C++ explicit

@@ -2186,10 +2186,10 @@ AC_DEFUN([CS_CHECK_QSQRT],
     AC_REQUIRE([CS_CHECK_FORCE_CPUSUBTYPE_ALL])
     AC_REQUIRE([CS_CHECK_LONG_BITS])
     AC_CACHE_CHECK([if csQsqrt() compiles], [cs_cv_cxx_qsqrt_ok],
-	[AS_IF([test $cs_long_bits = 32 && test $ac_compiler_gnu = yes],
+	[AS_IF([test $cs_long_bits -eq 32 && test $ac_compiler_gnu = yes],
 	    [cs_qsqrt_cflags="$cs_optimize_flags"
-	    AS_IF([test $cs_cv_prog_cxx_fpic != no],
-		[cs_qsqrt_cflags="$cs_qsqrt_cflags $cs_cv_prog_cxx_fpic"])
+	    AS_IF([test $cs_cv_prog_cxx_pic != no],
+		[cs_qsqrt_cflags="$cs_qsqrt_cflags $cs_cv_prog_cxx_pic"])
 	    AS_IF([test $cs_cv_prog_cxx_force_cpusubtype_all != no],
 		[cs_qsqrt_cflags="$cs_cv_prog_cxx_force_cpusubtype_all"])
 	    CS_BUILD_IFELSE(
@@ -2219,7 +2219,7 @@ AC_DEFUN([CS_CHECK_QINT],
     [AC_REQUIRE([CS_CHECK_OPTIMIZE_FLAGS])
     AC_REQUIRE([CS_CHECK_LONG_BITS])
     AC_CACHE_CHECK([if csQint() functions correctly], [cs_cv_cxx_qint_ok],
-	[AS_IF([test $cs_long_bits = 32],
+	[AS_IF([test $cs_long_bits -eq 32],
 	    [AC_LANG_PUSH([C++])
 	    cs_cflags_save="$CXXFLAGS"
 	    CXXFLAGS="$CXXFLAGS $cs_optimize_flags"
