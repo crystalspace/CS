@@ -1,6 +1,6 @@
 skin "Normal Windows"
 {
-  Texture: 		"/lib/windows/texture.png"
+  Texture: 		"/aws/texture.png"
   WindowMin:		"/aws/minimize.png"
   WindowZoom:		"/aws/zoom.png"
   WindowClose:		"/aws/close.png"
