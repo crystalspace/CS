@@ -13,6 +13,11 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+7-Nov-1999
+	- Eric Sunshine re-engineered the Python detection code in haspyth.sh
+	  so that it deals gracefully with the case where multiple Python
+	  header and library directories are found.  Problem was reported by
+	  Donald Ryan Willhoit <willhoit@mail1.andrew.cmu.edu>.
 3-Nov-1999
 	- Jorrit eliminated initialization of four function pointers in OpenGL
 	  driver because gcc fails on them.
