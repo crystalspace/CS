@@ -11,6 +11,9 @@ The history order is reversed so that new features are at the top.
 	  - put back csSchedul, seems this class was used.
 	- Fixed BugPlug so that it compiles again without the new renderer
 	  enabled.
+	- res changed csendian.h to utilize CONST_INT64() again. The missing 
+	  identifiers are fixed with a #define __STDC_LIMIT_MACROS in cstypes.h
+	  prior to the inclusion of <stdint.h>.
 8-Apr-2003
         - Boyan fixed error in lightning plugin.
 	- Anders Stenberg fixed two cases where WaitForSingleObject used a 
