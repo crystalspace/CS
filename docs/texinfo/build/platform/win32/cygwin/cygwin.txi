@@ -190,9 +190,9 @@ In order to successfully compile, you will need to do a couple of things.  Open
 a Cygwin Bash prompt and navigate to where you extracted the files (that is,
 the directory which contains the @file{Makefile}).
 
-Sadly, unlike on other platforms, during configurarion the @emph{lib} directory
-would be created for you.  However, under Cygwin it will not be, so you must to
-id yourself.  At the command prompt enter the following command and hit return.
+Sadly, unlike on other platforms, during configuration the @emph{lib} directory
+would be created for you.  However, under Cygwin it will not be, so you must do
+it yourself.  At the command prompt enter the following command and hit return.
 
 @example
 mkdir lib
