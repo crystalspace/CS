@@ -230,7 +230,7 @@ public:
       if (cosfact > 0)
       {
         attn (distance, dp);
-        return lightCol*dp*costfact;
+        return lightCol*dp*cosfact;
       }
     }
     return nullColor;
