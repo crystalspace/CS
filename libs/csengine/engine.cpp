@@ -1912,7 +1912,13 @@ iMeshFactoryWrapper* csEngine::CreateMeshFactory (const char* classId,
   if (name != NULL)
   {
     iMeshFactoryWrapper* factwrap = GetMeshFactories ()->FindByName (name);
-    if (factwrap != NULL) return factwrap;
+    if (factwrap != NULL)
+    {
+      // in the "creation" case below we also return an already incref'ed
+      // instance to the caller so we incref'ing this one too
+      factwrap->IncRef ();
+      return factwrap;
+    }
   }
 
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr, classId, "MeshObj",
@@ -1935,7 +1941,13 @@ iMeshFactoryWrapper* csEngine::CreateMeshFactory (iMeshObjectFactory *fact,
   if (name != NULL)
   {
     iMeshFactoryWrapper* factwrap = GetMeshFactories ()->FindByName (name);
-    if (factwrap != NULL) return factwrap;
+    if (factwrap != NULL)
+    {
+      // in the "creation" case below we also return an already incref'ed
+      // instance to the caller so we incref'ing this one too
+      factwrap->DecRef ();
+      return factwrap;
+    }
   }
 
   csMeshFactoryWrapper* mfactwrap = new csMeshFactoryWrapper (fact);
@@ -1949,7 +1961,13 @@ iMeshFactoryWrapper* csEngine::CreateMeshFactory (const char* name)
   if (name != NULL)
   {
     iMeshFactoryWrapper* factwrap = GetMeshFactories ()->FindByName (name);
-    if (factwrap != NULL) return factwrap;
+    if (factwrap != NULL)
+    {
+      // in the "creation" case below we also return an already incref'ed
+      // instance to the caller so we incref'ing this one too
+      factwrap->IncRef ();
+      return factwrap;
+    }
   }
 
   csMeshFactoryWrapper* mfactwrap = new csMeshFactoryWrapper ();
@@ -1997,20 +2015,19 @@ iMeshWrapper* csEngine::LoadMeshWrapper (
 
   csMeshWrapper* meshwrap = new csMeshWrapper (NULL);
   if (name) meshwrap->SetName (name);
-  meshwrap->IncRef ();
-  GetMeshes ()->AddMesh (&(meshwrap->scfiMeshWrapper));
+  iMeshWrapper* imw = &(meshwrap->scfiMeshWrapper);
+  GetMeshes ()->AddMesh (imw);
   if (sector)
   {
     meshwrap->GetMovable ().SetSector (sector);
     meshwrap->GetMovable ().SetPosition (pos);
     meshwrap->GetMovable ().UpdateMove ();
   }
-  iMeshWrapper* imw = &(meshwrap->scfiMeshWrapper);
 
   char* buf = **input;
   iBase* mof = plug->Parse (buf, this, imw);
   plug->DecRef ();
-  if (!mof) { meshwrap->DecRef(); return NULL; }
+  if (!mof) {GetMeshes ()->RemoveMesh (imw); meshwrap->DecRef(); return NULL; }
   meshwrap->SetMeshObject ((iMeshObject*)mof);
 
   return imw;

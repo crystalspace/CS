@@ -216,6 +216,7 @@ inline iObject *csNamedObjectVector::Pop ()
     if (!objbase) return 0;
     iObject *obj = SCF_QUERY_INTERFACE_FAST (objbase, iObject);
     CS_ASSERT (obj);
+    obj->DecRef ();
     return obj;
   }
 inline bool csNamedObjectVector::Delete (int n)
@@ -225,12 +226,16 @@ inline void csNamedObjectVector::DeleteAll ()
 inline iObject *csNamedObjectVector::Get (int n) const
   { 
     iBase *objbase = (iBase*)Vector->Get (n);
-    return objbase ? SCF_QUERY_INTERFACE_FAST (objbase, iObject) : 0;
+    iObject *o = objbase ? SCF_QUERY_INTERFACE_FAST (objbase, iObject) : 0;
+    if (o) o->DecRef ();
+    return o;
   }
 inline iObject *csNamedObjectVector::operator[] (int n) const
   { 
     iBase *objbase = (iBase*)Vector->Get (n);
-    return objbase ? SCF_QUERY_INTERFACE_FAST (objbase, iObject) : 0;
+    iObject *o = objbase ? SCF_QUERY_INTERFACE_FAST (objbase, iObject) : 0;
+    if (o) o->DecRef ();
+    return o;
   }
 
 #endif // __NOBJVEC_H__

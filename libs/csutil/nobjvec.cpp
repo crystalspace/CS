@@ -61,7 +61,6 @@ int csNamedObjectVector::GetIndexByName (const char *name) const
     iObject *o = Get (i);
     if (!o) continue;
     const char* oname = o->GetName ();
-    o->DecRef ();
     if (name == oname || (name && oname && !strcmp (oname, name)))
       return i;
   }
@@ -81,11 +80,7 @@ int csNamedObjectVector::Find (iObject *obj) const
   {
     iObject *o = Get (i);
     if (obj == o)
-    {
-      o->DecRef ();
       return i;
-    }
-    o->DecRef ();
   }
   return -1;
 }

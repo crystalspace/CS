@@ -33,6 +33,7 @@
 #include "iengine/material.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/material.h"
+#include "ivideo/texture.h"
 
 iImage* csLoader::LoadImage (const char* name, int Format)
 {
@@ -133,7 +134,8 @@ iTextureWrapper *csLoader::LoadTexture (const char *name, const char *fname,
   iTextureWrapper *TexWrapper =
 	Engine->GetTextureList ()->NewTexture(TexHandle);
   TexWrapper->QueryObject ()->SetName (name);
-
+  TexHandle->DecRef ();
+  
   iMaterial* material = Engine->CreateBaseMaterial (TexWrapper);
 
   iMaterialWrapper *MatWrapper = Engine->GetMaterialList ()->
