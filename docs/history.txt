@@ -13,6 +13,25 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+19-Sep-1999
+	- Moved LIGHTMAP_SIZE config value from softrdnr.cfg to cryst.cfg
+	  where it belongs. It now works again.
+	- Scaling of lightmaps works very well! You can now optionally request
+	  that lightmaps are calculated in a higher resolution and then finally
+	  scaled down to normal resolution. The result is much better quality
+	  lightmaps. Note that the current scaling works by averaging. We have
+	  have to see if a box filter will be better or not.
+	  The new high quality lightmap renderer is enabled with
+	  LIGHTMAP_HIGHQUAL=yes in cryst.cfg. This new optoin is also available
+	  from within the cryst.cfg that lives in the level directory.
+	- Fixed handling of commandline 'driver' option so that it works again.
+	- Added csPolyIt iterator which can be used to iterate over all
+	  polygons of the world. I made this to avoid having to add routines
+	  to csThing and csSector which are only used to be able to handle
+	  all polygons in a level (like InitLightmaps() ...).
+18-Sep-1999
+	- Started work on calculating lightmaps in high resolution and then
+	  downsampling them later.
 16-Sep-1999
 	- Fix to console printing in system stuff from Stephan Goetter.
 	- Siu-Hang Or implemented MergeTexture for the software renderer.
@@ -34,13 +53,14 @@ Short-term cleanups that need to be done:
 	  new DX6.1 renderer.  The bugs prevented the application from
 	  launching on all non-Windows platforms.
 15-Sep-1999
-        - Ivan Avramovic fixed a few spots where "sysdef.h" was not included,
-          but should have been.
+	- Ivan Avramovic fixed a few spots where "sysdef.h" was not included,
+	  but should have been.
 14-Sep-1999
 	- Eric Sunshine fixed a bug in VFS where csFile::GetSize() was
 	  incorrectly reporting the file's size for "real" disk-based files.
 	- Eric Sunshine fixed a bug in VFS where csFile::GetStatus() would
 	  crash with a BUS error if the file had failed to open.
+	- Robert Bate added VFS support for Macintosh.
 13-Sep-1999
 	- Added djgpp.html doc from Seth Galbraith.  Seth also updated
 	  tutorial.html.
@@ -48,6 +68,8 @@ Short-term cleanups that need to be done:
 	- Added sprite selection code from David Durant.  Use mouse button 3
 	  to select a sprite.
 	- Andrew Zabolotny added a wildcard expansion feature to VFS.
+	- Thomas Hieber fixed parser.h so that it compiles with VC.
+	- Thomas also removed a new bunch of warnings.
 	- Eric Sunshine fixed a bug in csVFS::FindFiles() which was introduced
 	  when wildcard expansion capability was added.  The bug frequently
 	  caused FindFiles() to return a list of files from the root (/)

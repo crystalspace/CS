@@ -153,17 +153,6 @@ in the config file.
   TextureMapper/DMIPMAP3=<distance>
 	Identical to DMIPMAP1 for mipmap level 3 (default is 60).
 	This option corresponds to the -dmipmap3 commandline option.
-  TextureMapper/LIGHTMAP_SIZE=<size>
-  	Set the size of the lightmap boxes. Default is 16.
-	Use 4 or 8 for more accurate lightmaps (but lightmap size will
-	increase and texture cache speed will decrease). Use 32
-	for very blocky textures.
-	Note that LIGHTMAP_SIZE should be a power of 2.
-	Note that Crystal Space will automatically recompute all
-	the lightmaps when this value changes (this make take a long
-	time).
-  	Note that you can also specify this option in the local cryst.cfg
-	file.
   TextureMapper/CACHE=<size>
 	Set the size of the texture cache. By default this is equal
 	to 4000000 texels. If you have lots of memory you can increase
@@ -336,6 +325,25 @@ in the config file.
 	was in the past. Note that changing this value at runtime only has an
 	effect on dynamic lights. This option corresponds to the -cosfact commandline
 	option and the 'cosfact' console command.
+  Lighting/LIGHTMAP_SIZE=<size>
+  	Set the size of the lightmap boxes. Default is 16.
+	Use 4 or 8 for more accurate lightmaps (but lightmap size will
+	increase and texture cache speed will decrease). Use 32
+	for very blocky textures.
+	Note that LIGHTMAP_SIZE should be a power of 2.
+	Note that Crystal Space will automatically recompute all
+	the lightmaps when this value changes (this make take a long
+	time).
+  	Note that you can also specify this option in the local cryst.cfg
+	file.
+  Lighting/LIGHTMAP_HIGHQUAL=<yesno>
+	With this option enabled (default yet) lightmaps are calculated
+	at a higher resolution internally and then scaled back to the value
+	specified with LIGHTMAP_SIZE. This results in much nicer lightmaps
+	but calculation takes somewhat longer. Note that dynamic lights
+	don't use this feature.
+  	Note that you can also specify this option in the local cryst.cfg
+	file.
 
   SoundDriver/MAX_CHANNELS=<number>
 	Set the maximum number of channels we can mix.
