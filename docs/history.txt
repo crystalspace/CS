@@ -11,6 +11,14 @@ The history order is reversed so that new features are at the top.
 	  to work with Jorrit's eerie hybrid installation on Windows where he
 	  has mismatched headers.  Now ensures that int32 is known prior to the
 	  windows.h test.
+	- Eric Sunshine added the new makefile variable MSVC.MAKE.FLAGS to
+	  CS/mk/msvcgen/required.mak and msvcgen.mak.  This variable allows one
+	  to give additional options to the child "make" invocation during the
+	  synthesis process.  It is most useful for providing additional make
+	  variable definitions.
+	- Eric Sunshine set MSVC.MAKE.FLAGS in required.mak to define HAS_CAL3D
+	  to "yes".  This will allow the synthesis process to build the
+	  `caltocs' application.
 6-Jan-2002
 	- Fixed a stupid bug in Dynavis. Dynavis wasn't correctly updating
 	  the kdtree when objects moved. The reason was that UpdateObjects()

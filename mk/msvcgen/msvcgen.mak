@@ -116,11 +116,15 @@
 #	  specific to Windows or which are not otherwise represented by
 #	  stand-alone makefiles within the project hierarchy.
 #
-#	o required.mak -- Sets the value of the MSVC.PLUGINS.REQUIRED variable.
-#	  This variable supplements the list of plug-in modules defined by the
-#	  PLUGINS variable (see CS/mk/user.mak) and ensures that the correct
-#	  set of DSP files are generated even when invoking the project file
-#	  generation process from a non-Windows platform such as Unix.
+#	o required.mak -- Sets the value of the MSVC.PLUGINS.REQUIRED and
+#	  MSVC.MAKE.FLAGS variables.  MSVC.PLUGINS.REQUIRED supplements the
+#	  list of plug-in modules defined by the PLUGINS variable (see
+#	  CS/mk/user.mak) and ensures that the correct set of DSP files are
+#	  generated even when invoking the project file generation process from
+#	  a non-Windows platform such as Unix.  MSVC.MAKE.FLAGS allows
+#	  additional flags to be sent to the child "make" invocation.  This is
+#	  useful when one needs to define additional make variables which
+#	  affect the synthesis process.
 #
 # EXPORTS
 #	The following files are exported by this makefile:
@@ -176,8 +180,10 @@ PSEUDOHELP += \
   $(NEWLINE)echo $"  make msvc7inst    Install the $(DESCRIPTION.msvc7inst)$"
 
 # Set MSVC.PLUGINS.REQUIRED to a list of plug-ins for which DSP files must be
-# generated even if the current makefile target (i.e. 'linux') would not
+# generated even if the current makefile target (i.e.  'linux') would not
 # normally build those plug-ins.  This list augments the normal PLUGINS list.
+# Also set MSVC.MAKE.FLAGS for additional flags for the child "make"
+# invocation.
 include mk/msvcgen/required.mak
 
 endif # ifeq ($(MAKESECTION),rootdefines)
@@ -192,7 +198,7 @@ define MSVCGEN_BUILD
   @echo $"  Generating $(DESCRIPTION.$@)$"
   @echo $(SEPARATOR)
   @$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak msvcgen \
-  DO_MSVCGEN=yes DO_ASM=no USE_MAKEFILE_CACHE=no \
+  DO_MSVCGEN=yes DO_ASM=no USE_MAKEFILE_CACHE=no $(MSVC.MAKE.FLAGS) \
   PLUGINS='$(PLUGINS) $(PLUGINS.DYNAMIC) $(MSVC.PLUGINS.REQUIRED)'
 endef
 

@@ -24,6 +24,9 @@
 #	This makefile component sets the value of the MSVC.PLUGINS.REQUIRED
 #	variable.  MSVC.PLUGINS.REQUIRED supplements the list of plug-in
 #	modules defined by its brother variable PLUGINS (see CS/mk/user.mak).
+#	It also sets MSVC.MAKE.FLAGS which specifies additional flags to pass
+#	to the child "make" invocation.  This is useful when one needs to set
+#	additional make variables specially for the synthesis process.
 #
 #	Like the PLUGINS variable, MSVC.PLUGINS.REQUIRED defines a list of
 #	plug-in modules.  Unlike PLUGINS, however, MSVC.PLUGINS.REQUIRED
@@ -38,6 +41,8 @@
 #	normally process Windows-specific modules.
 #
 #------------------------------------------------------------------------------
+MSVC.MAKE.FLAGS = \
+  HAS_CAL3D=yes
 
 MSVC.PLUGINS.REQUIRED =         \
   apps/import/caltocs		\
