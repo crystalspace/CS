@@ -45,7 +45,7 @@ NEXT.PLUGINS+=video/canvas/macosx/opengl
 NEXT.PLUGINS+=sound/driver/coreaudio
 NEXT.PLUGINS+=sound/renderer/software
 
-NEXT.SYSCONFIG=$(NEWLINE)sh libs/cssys/next/macosx.sh $(NEXT.CC)>>config.tmp
+NEXT.SYSCONFIG=$(NEWLINE)sh libs/cssys/next/macosx.sh "$(NEXT.CC)">>config.tmp
 
 NEXT.FRIEND=yes
 include libs/cssys/next/next.mak

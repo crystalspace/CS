@@ -280,10 +280,10 @@ ifneq ($(strip $(TARGET_ARCHS)),)
 endif
 
 SYSCONFIG += $(NEXT.SYSCONFIG) \
-  $(NEWLINE)CC=$(NEXT.CC) CXX=$(NEXT.CXX) sh bin/comptest.sh>>config.tmp \
-  $(NEWLINE)CC=$(NEXT.CC) CXX=$(NEXT.CXX) sh bin/chkheadr.sh>>config.tmp \
-  $(NEWLINE)CC=$(NEXT.CC) CXX=$(NEXT.CXX) sh bin/chktools.sh>>config.tmp \
-  $(NEWLINE)CC=$(NEXT.CC) CXX=$(NEXT.CXX) sh bin/haspythn.sh>> config.tmp \
+  $(NEWLINE)CC="$(NEXT.CC)" CXX="$(NEXT.CXX)" sh bin/comptest.sh>>config.tmp \
+  $(NEWLINE)CC="$(NEXT.CC)" CXX="$(NEXT.CXX)" sh bin/chkheadr.sh>>config.tmp \
+  $(NEWLINE)CC="$(NEXT.CC)" CXX="$(NEXT.CXX)" sh bin/chktools.sh>>config.tmp \
+  $(NEWLINE)CC="$(NEXT.CC)" CXX="$(NEXT.CXX)" sh bin/haspythn.sh>> config.tmp \
   $(NEWLINE)echo override DO_ASM = $(DO_ASM)>>config.tmp
 
 NEXT.DIR.ZLIB    = $(wildcard libs/zlib*)
