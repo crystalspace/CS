@@ -310,9 +310,9 @@ chronological order.
 	- Eric Sunshine added a CS_CHECK_COMPILER_PIC() macro in checkpic.m4.
 	  This macro figures out how to enable PIC generation (position
 	  independent code) in the specified compiler.
-	- Eric Sunshine removed TemplateToolkit2 and AppConfig Perl modules
-	  re-distributions from CS/mk/perl5.  Very few people need to generate
-	  MSVC project files for CS, so this extra bulk is hardly warranted.
+	- Eric Sunshine removed redistributed TemplateToolkit2 and AppConfig
+	  Perl modules from CS/mk/perl5.  Very few people need to generate MSVC
+	  project files for CS, so this extra bulk was hardly warranted.
 	  Developers wanting to generate project files can install these Perl
 	  packages locally using normal Perl package installation mechanisms,
 	  such as CPAN (Unix) or PPM (Windows).
