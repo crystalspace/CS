@@ -1359,7 +1359,7 @@ void csPolygon3D::InitLightMaps (csPolygonSet* owner, bool do_cache, int index)
   csLightMapped* lmi = GetLightMapInfo ();
   if (!lmi || lmi->tex->lm == NULL) return;
   if (!do_cache) { lmi->lightmap_up_to_date = false; return; }
-  if (csWorld::do_force_recalc || !csWorld::current_world->IsLightingCacheEnabled ())
+  if (csWorld::do_force_relight || !csWorld::current_world->IsLightingCacheEnabled ())
   {
     lmi->tex->InitLightMaps ();
     lmi->lightmap_up_to_date = false;

@@ -351,7 +351,7 @@ suitable.
 @end quotation
 
 The first time you explore a map after changing the @samp{AMBIENT_WHITE}
-value, you should run WalkTest with the @samp{-recalc} option.  This causes
+value, you should run WalkTest with the @samp{-relight} option.  This causes
 Crystal Space to recalculate the lighting information in the map in order to
 take advantage of the new ambient light value.
 
@@ -360,7 +360,7 @@ sizable levels such as @file{large.zip}, so be patient.  In other cases,
 Crystal Space may determine, on its own, that lighting needs to be
 recalculated.  This is a normal occurrence and should not cause alarm.
 
-You may find it useful to specify the @samp{-recalc} option with newly
+You may find it useful to specify the @samp{-relight} option with newly
 downloaded maps, or at any time the lighting in a map seems incorrect in some
 fashion.
 
@@ -368,10 +368,10 @@ To run WalkTest with a particular map (for instance, @file{large.zip}) for the
 very first time, type:
 
 @example
-% ./walktest -recalc large
+% ./walktest -relight large
 @end example
 
-Subsequent uses of the map file do not require @samp{-recalc}, in which case
+Subsequent uses of the map file do not require @samp{-relight}, in which case
 you can type:
 
 @example

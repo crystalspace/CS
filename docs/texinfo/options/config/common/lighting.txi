@@ -7,7 +7,7 @@
 The number of reflections that are allowed for static lighting. The default
 for this is 1 which means that light is not reflected by mirrors. This
 number is actually the number of times that some light may affect the same
-sector. This option only has effect in combination with the @code{-recalc}
+sector. This option only has effect in combination with the @code{-relight}
 commandline option.
 
 @item RADIOSITY=<yesno>
@@ -16,7 +16,7 @@ normal polygons (and not only on mirrors). The number of allowed
 reflections depends on the @samp{REFLECT} variable. Using this flag you get
 a sort of simulation of radiosity. Note that it greatly increases the time
 needed for precalculated lighting. This option only has effect in
-combination with the @code{-recalc} commandline option.
+combination with the @code{-relight} commandline option.
 
 @item NEWRADIOSITY=<yesno>
 Real radiosity system that operates on the lightmaps. This system is

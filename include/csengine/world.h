@@ -278,9 +278,9 @@ public:
   /// Option variable: high quality lightmap rendering.
   static bool do_lightmap_highqual;
   /// Option variable: inhibit lightmap recalculation?
-  static bool do_not_force_recalc;
+  static bool do_not_force_relight;
   /// Option variable: force lightmap recalculation?
-  static bool do_force_recalc;
+  static bool do_force_relight;
 
 private:
   /// Texture and color information object.

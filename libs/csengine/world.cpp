@@ -186,8 +186,8 @@ int csWorld::max_process_polygons = 2000000000;
 int csWorld::cur_process_polygons = 0;
 bool csWorld::do_lightmap_highqual = true;
 bool csWorld::do_lighting_cache = true;
-bool csWorld::do_not_force_recalc = false;
-bool csWorld::do_force_recalc = false;
+bool csWorld::do_not_force_relight = false;
+bool csWorld::do_force_relight = false;
 
 IMPLEMENT_CSOBJTYPE (csWorld,csObject);
 
@@ -372,7 +372,7 @@ void csWorld::Clear ()
 void csWorld::EnableLightingCache (bool en)
 {
   do_lighting_cache = en;
-  if (!do_lighting_cache) do_force_recalc = true;
+  if (!do_lighting_cache) do_force_relight = true;
 }
 
 void csWorld::EnableSolidBsp (bool en)
@@ -555,7 +555,7 @@ void csWorld::ShineLights ()
 
   tr_manager.NewFrame ();
 
-  if (!do_not_force_recalc)
+  if (!do_not_force_relight)
   {
     // If recalculation is not forced then we check if the 'precalc_info'
     // file exists on the VFS. If not then we will recalculate in any case.
@@ -654,11 +654,11 @@ void csWorld::ShineLights ()
         current.lightmap_size, current.lightmap_highqual);
       VFS->WriteFile ("precalc_info", data, strlen (data));
       CsPrintf (MSG_INITIALIZATION, "Lightmap data is not up to date (reason: %s).\n", reason);
-      do_force_recalc = true;
+      do_force_relight = true;
     }
   }
 
-  if (do_force_recalc)
+  if (do_force_relight)
   {
     CsPrintf (MSG_INITIALIZATION, "Recalculation of lightmaps forced.\n");
     CsPrintf (MSG_INITIALIZATION, "  Pseudo-radiosity system %s.\n", csSector::do_radiosity ? "enabled" : "disabled");
@@ -680,12 +680,12 @@ void csWorld::ShineLights ()
   // This loop also counts all polygons.
   csPolygon3D* p;
   int polygon_count = 0;
-  if (do_lightmap_highqual && do_force_recalc)
+  if (do_lightmap_highqual && do_force_relight)
     csLightMap::SetLightCellSize (csLightMap::lightcell_size / 2, 2);
   pit->Restart ();
   while ((p = pit->Fetch ()) != NULL)
   {
-    if (do_lightmap_highqual && do_force_recalc)
+    if (do_lightmap_highqual && do_force_relight)
       p->UpdateLightMapSize ();
     polygon_count++;
   }
@@ -726,7 +726,7 @@ void csWorld::ShineLights ()
 
   // Restore lumel size from 'High Quality Mode'
   // and remap all lightmaps.
-  if (do_lightmap_highqual && do_force_recalc)
+  if (do_lightmap_highqual && do_force_relight)
   {
     CsPrintf (MSG_INITIALIZATION, "\nScaling lightmaps (%d maps):\n  ", polygon_count);
     csLightMap::SetLightCellSize (csLightMap::lightcell_size * 2, 1);
@@ -742,7 +742,7 @@ void csWorld::ShineLights ()
 
   // Render radiosity
   // -- could put his before scaling to have high quality radiosity
-  if (use_new_radiosity && !do_not_force_recalc && do_force_recalc)
+  if (use_new_radiosity && !do_not_force_relight && do_force_relight)
   {
     start = System->GetTime ();
     csRadiosity *rad = new csRadiosity(this);

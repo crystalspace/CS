@@ -175,11 +175,11 @@ walktest flarge
 
 You may have to adjust the @samp{AMBIENT_WHITE} level in @file{cryst.cfg} if
 the maps appear too dark.  After adjusting the ambient level, specify
-@samp{-recalc} on the command-line to instruct Crystal Space to recalculate
+@samp{-relight} on the command-line to instruct Crystal Space to recalculate
 the lighting information.
 
 @example
-walktest -recalc flarge
+walktest -relight flarge
 @end example
 
 Other interesting example applications which you can run are @file{blocks},

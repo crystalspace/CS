@@ -1060,7 +1060,7 @@ resource 'STR#' (1024, purgeable) {
 
 	{
 
-	"-recalc"
+	"-relight"
 
 	}
 

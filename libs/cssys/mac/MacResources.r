@@ -528,7 +528,7 @@ data 'CURS' (138) {
 /*
 resource 'STR#' (1024, purgeable) {
 	{
-	"-recalc"
+	"-relight"
 	}
 };
 */

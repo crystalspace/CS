@@ -28,6 +28,21 @@ The history order has been reversed so that new features are at the top.
 	  least one) problem with compiling network socket driver on Solaris.
 	- Eric Sunshine renamed NEED_FAKE_BOOL/NO_BOOL_TYPE to DO_FAKE_BOOL in
 	  booltest.sh, volatile.mak, and types.h for consistency's sake.
+	- Eric Sunshine made the following changes to the engine's command-
+	  line options:
+	    - Renamed the -recalc and -inhrecalc options to -relight and
+	      -norelight, respectively.  This was done in preparation of
+	      caching of other types of information per level (such as
+	      visibility data), at which time it will be important to be able
+	      to selectively distinguish between which portions of cached
+	      information should be recalculated.
+	    - Added -revis and -norevis options which force and inhibit
+	      recalculation of cached visibility data, respectively.  (Note:
+	      This information is not yet cached.)
+	    - Added (new) -recalc and -norecalc options which perform the
+	      composite operations of forcing and inhibiting, respectively,
+	      recalculation of all cached information (such as visibility and
+	      lighting data).
 30-Apr-2000
 	- More work on the PVS.
 	- Added csBox2 and csBox3::GetCenter().
