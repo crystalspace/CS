@@ -7,9 +7,11 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 20-Jun-2004
-	- Christian Bayle adapted debian scripts to the new configuration options
+	- Christian Bayle adapted debian scripts to the new configuration
+	  options
 	- Rhad added a radius_changed flag to csParticlesObject which allows
 	  radius changes to have an effect without recreating the system.
+	- Eric Sunshine made some small corrections to the Plugin HOWTO.
 19-Jun-2004
 	- Rhad fixed a typo in the ode and simple physics plugins for particles
 	  that was swapping the green and blue components of constant colors.
