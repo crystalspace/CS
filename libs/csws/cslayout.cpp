@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 #include "csws/cslayout.h"
+#include "csws/cswindow.h"
 #include "ievent.h"
 
 csLayoutConstraint *csLayoutConstraint::Clone ()
@@ -28,11 +29,15 @@ csLayoutConstraint *csLayoutConstraint::Clone ()
 bool csLayout::mUseTwoPhaseLayoutingGlobally = true;
 int csLayout::mCurrentLayoutingPhase = csLayout::PHASE_1;
 
-csLayout::csLayout (csComponent *pParent) : csComponent (pParent)
+csLayout::csLayout (csComponent *iParent, csDialogFrameStyle iFrameStyle)
+  : csDialog (iParent, iFrameStyle)
 {
   bRecalcLayout = true;
   lc = &c;
-  state |= CSS_SELECTABLE | CSS_TRANSPARENT;
+  // If our parent is a dialog as well, mark ourselves as transparent
+  // to avoid untiled textures as backgrounds.
+  if (parent && !strcmp (parent->GetSkinName (), "Dialog"))
+    state |= CSS_TRANSPARENT;
 }
 
 int csLayout::GetLayoutingPhase ()
@@ -88,7 +93,7 @@ void csLayout::InvalidateLayout ()
 
 bool csLayout::HandleEvent (iEvent &Event)
 {
-  bool bHandled = csComponent::HandleEvent (Event);
+  bool bHandled = csDialog::HandleEvent (Event);
   if (!bHandled && Event.Type == csevCommand)
     bHandled = (parent ? parent->HandleEvent (Event) : false);
   return bHandled;
@@ -101,12 +106,13 @@ void csLayout::Draw ()
     LayoutContainer ();
     bRecalcLayout = false;
   }
-  csComponent::Draw ();
+  if (!GetState (CSS_TRANSPARENT))
+    csDialog::Draw ();
 }
 
 bool csLayout::SetRect (int xmin, int ymin, int xmax, int ymax)
 {
-  if (csComponent::SetRect (xmin, ymin, xmax, ymax))
+  if (csDialog::SetRect (xmin, ymin, xmax, ymax))
   {
     InvalidateLayout ();
     return true;
@@ -123,7 +129,7 @@ void csLayout::FixSize (int &newWidth, int &newHeight)
 
 void csLayout::Insert (csComponent *child)
 {
-  csComponent::Insert (child);
+  csDialog::Insert (child);
   AddLayoutComponent (child);
 }
 

@@ -2378,8 +2378,6 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
   } L,R;
   L.fv = R.fv = top;
   int sy = L.fy = R.fy = QRound (poly.vertices [top].sy);
-  // The span of Z/U/V/R/G/B for current scanline
-  int span_z = 0, span_u = 0, span_v = 0, span_r = 0, span_g = 0, span_b = 0;
 
   // Decide whenever we should use Gouraud or flat (faster) routines
   bool do_gouraud = (pqinfo.drawline_gouraud != NULL)
@@ -2525,16 +2523,6 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
     else
       fin_y = R.fy;
 
-    int dszdy = 0, dsudy = 0, dsvdy = 0, dsrdy = 0, dsbdy = 0, dsgdy = 0;
-    span_z = R.z - L.z;
-    dszdy = R.dzdy - L.dzdy;
-    if (pqinfo.textured)
-      span_u = R.u - L.u, span_v = R.v - L.v,
-      dsudy = R.dudy - L.dudy, dsvdy = R.dvdy - L.dvdy;
-    if (pqinfo.mixmode & CS_FX_GOURAUD)
-      span_r = R.r - L.r, span_g = R.g - L.g, span_b = R.b - L.b,
-      dsrdy = R.drdy - L.drdy, dsgdy = R.dgdy - L.dgdy, dsbdy = R.dbdy - L.dbdy;
-
     int screenY = height - sy;
     while (sy > fin_y)
     {
@@ -2551,10 +2539,12 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
           int l = xr - xl;
           float inv_l = 1. / l;
 
-          int dzz = QRound (span_z * inv_l);
+          int dzz = QRound ((R.z - L.z) * inv_l);
           int uu = 0, duu = 0, vv = 0, dvv = 0;
           if (pqinfo.textured)
           {
+            int span_u = R.u - L.u;
+            int span_v = R.v - L.v;
             uu = L.u; duu = QInt (span_u * inv_l);
             vv = L.v; dvv = QInt (span_v * inv_l);
 
@@ -2583,6 +2573,9 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
           bool clamp = false;
           if (pqinfo.mixmode & CS_FX_GOURAUD)
           {
+            int span_r = R.r - L.r;
+            int span_g = R.g - L.g;
+            int span_b = R.b - L.b;
             rr = L.r, drr = QInt (span_r * inv_l);
             gg = L.g, dgg = QInt (span_g * inv_l);
             bb = L.b, dbb = QInt (span_b * inv_l);
@@ -2615,13 +2608,13 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
       }
 
       L.x += L.dxdy; R.x += R.dxdy;
-      L.z += L.dzdy; span_z += dszdy;
+      L.z += L.dzdy; R.z += R.dzdy;
       if (pqinfo.textured)
         L.u += L.dudy, L.v += L.dvdy,
-        span_u += dsudy, span_v += dsvdy;
+        R.u += R.dudy, R.v += R.dvdy;
       if (pqinfo.mixmode & CS_FX_GOURAUD)
         L.r += L.drdy, L.g += L.dgdy, L.b += L.dbdy,
-        span_r += dsrdy, span_g += dsgdy, span_b += dsbdy;
+        R.r += R.drdy, R.g += R.dgdy, R.b += R.dbdy;
 
       sy--;
       screenY++;

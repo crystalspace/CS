@@ -25,7 +25,8 @@
 
 class csWsTest : public csApp
 {
-  void ThemeDialog ();
+  void MiscDialog ();
+  void TranspDialog ();
   void NotebookDialog ();
   void GridDialog ();
   void TreeDialog ();
@@ -124,10 +125,18 @@ class csThemeTestWindow : public csWindow
 protected:
   csWindow *colordialog;
 public:
-  csThemeTestWindow (csComponent *iParent,char * iTitle,int iWindowStyle);
-  ///
-  virtual bool HandleEvent (iEvent &Event);
-  void Draw ();
+  csThemeTestWindow (csComponent *iParent,char * iTitle,int iWindowStyle)
+   : csWindow (iParent, iTitle, iWindowStyle) {}
+  virtual void Draw ()
+  {
+    csWindow::Draw();
+    SetFont (((csWsTest *)app)->LucidiaFont, 12);
+    Text (BorderWidth+8, BorderHeight+100, CSPAL_WINDOW_LIGHT3D, -1,
+      "This is a font 12 test");
+    SetFont (((csWsTest *)app)->LucidiaFont, 8);
+    Text (BorderWidth+8, BorderHeight+140, CSPAL_WINDOW_LIGHT3D, -1,
+      "This is a font 8 test");
+  }
 };
 
 //-----------------------------------------------------------------------------
@@ -191,6 +200,52 @@ bool csWsTest::Initialize (const char *iConfigName)
   }
 #endif
 
+  // Create a menu for all test dialogs we implement
+  csMenu *menu = new csMenu (this, csmfs3D, 0);
+  csMenu *submenu = new csMenu (NULL);
+  new csMenuItem (menu, "~Standard dialogs", submenu);
+    new csMenuItem (submenu, "~File open", 66600);
+    new csMenuItem (submenu, "~Color choice", 66601);
+
+  submenu = new csMenu (NULL);
+  new csMenuItem (menu, "~Windows", submenu);
+    new csMenuItem (submenu, "No top when selected", 66610);
+    new csMenuItem (submenu, "Complex dialog", 66611);
+    new csMenuItem (submenu, "Semi-transparent window", 66612);
+
+  submenu = new csMenu (NULL);
+  new csMenuItem (menu, "~Tests", submenu);
+    new csMenuItem (submenu, "Notebook", 66620);
+    new csMenuItem (submenu, "Grid", 66621);
+    new csMenuItem (submenu, "Tree", 66622);
+    new csMenuItem (submenu, "Layouts", 66623);
+
+  submenu = new csMenu (NULL);
+  new csMenuItem (menu, "~Color scheme", submenu);
+    new csMenuItem (submenu, "Green", 66630);
+    new csMenuItem (submenu, "Red", 66631);
+    new csMenuItem (submenu, "White", 66632);
+    new csMenuItem (submenu, "Black", 66633);
+    new csMenuItem (submenu);
+    new csMenuItem (submenu, "Default", 66639);
+
+  new csMenuItem (menu);
+  new csMenuItem (menu, "~Window list", 66699);
+  csMenuItem *mi = new csMenuItem (menu, "~Quit\tQ", cscmdQuit);
+
+  // Show that a hint can be added to absolutely any component
+  HintAdd ("Choose this menu item to quit the program", mi);
+
+  menu->SetPos (30, 30);
+
+  csKeyboardAccelerator *ka = new csKeyboardAccelerator (this);
+  ka->Command ('q', CSMASK_SHIFT, cscmdQuit);
+
+  return true;
+}
+
+void csWsTest::MiscDialog ()
+{
   // create a window
   csComponent *window = new csWindow (this, "-- Drag me --",
     CSWS_DEFAULTVALUE | CSWS_TOOLBAR | CSWS_CLIENTBORDER);
@@ -323,49 +378,6 @@ bool csWsTest::Initialize (const char *iConfigName)
       (void)new csListBoxItem (lb, tmp, i);
     }
   }
-
-  window = new csWindow (this, "SetState (CSS_TOPSELECT, false)",
-    CSWS_DEFAULTVALUE, cswfsThin);
-  window->SetState (CSS_TOPSELECT, false);
-  window->SetRect (20, 20, 400, 80);
-
-  {
-    csButton *but = new csButton (this, 9999);
-    but->SetText ("File dialog"); but->SetRect (10, 10, 100, 30);
-    HintAdd ("Press this button for a test file dialog", but);
-
-    but = new csButton (this, 9998);
-    but->SetText ("Color dialog"); but->SetRect (210, 10, 360, 30);
-
-    but = new csButton (this, 9997);
-    but->SetText ("Notebook"); but->SetRect (400, 15, 500, 35);
-
-    but = new csButton (this, 9996);
-    but->SetText ("Grid"); but->SetRect (400, 45, 500, 65);
-
-    but = new csButton (this, 9995);
-    but->SetText ("Tree"); but->SetRect (520, 45, 620, 65);
-
-    but = new csButton (this, 9994);
-    but->SetText ("Theme"); but->SetRect (400, 75, 500, 95);
-
-    but = new csButton (this, 9993);
-    but->SetText ("~Black scheme"); but->SetRect (20, 120, 190, 140);
-
-    but = new csButton (this, 9992);
-    but->SetText ("~White scheme"); but->SetRect (20, 180, 190, 200);
-
-    but = new csButton (this, 9991);
-    but->SetText ("~Red scheme"); but->SetRect (20, 240, 190, 260);
-
-    but = new csButton (this, 9990);
-    but->SetText ("~Green scheme"); but->SetRect (20, 280, 190, 300);
-
-    but = new csButton (this, 9989);
-    but->SetText ("Layout"); but->SetRect (20, 340, 190, 360);
-  }
-
-  return true;
 }
 
 void csWsTest::TreeDialog ()
@@ -420,10 +432,6 @@ void csWsTest::TreeDialog ()
   
   csComponent *sd = new csTreeItem (li, "SoundDriver");
   (void)new csTreeItem (sd, "OSS");
-  
-  //  ti->SetState (CSS_FOCUSED|CSS_TREEITEM_SELECTED, true);
-  Execute (window);
-  delete window;
 }
 
 void csWsTest::GridDialog ()
@@ -485,10 +493,6 @@ void csWsTest::GridDialog ()
   but->SetRect (5, 5, 45, 25);
   but->SetText ("blah");
   grid->CreateRegion (rc, gc);
-
-  window->Select ();
-//Execute (window);
-//delete window;
 }
 
 void CreateButton (csComponent *parent, int id, const char *text, int xpos, int ypos)
@@ -505,11 +509,8 @@ void csWsTest::LayoutDialog ()
     CSWS_DEFAULTVALUE & ~CSWS_MENUBAR);
   window->SetSize (400, 300);
   window->Center ();
-  window->Select ();
   
   csGridBagLayout *gb = new csGridBagLayout (window);
-
-  window->SendCommand (cscmdWindowSetClient, (void*)gb);
 
   csBorderConstraint *blc[5] = {csBorderLayout::CENTER, 
 				csBorderLayout::EAST, 
@@ -564,19 +565,15 @@ void csWsTest::LayoutDialog ()
     sprintf (text, "Test %d", j);
     b->SetText (text);
   }
-  
-//  Execute (window);
-//  delete window;
 }
 
-void csWsTest::ThemeDialog ()
+void csWsTest::TranspDialog ()
 {
   // create a window
   csWindow *window = new csThemeTestWindow (this, "Theme test",
     CSWS_BUTSYSMENU | CSWS_TITLEBAR | CSWS_BUTCLOSE);
   window->SetSize (400, 300);
   window->Center ();
-  window->Select ();
   window->SetAlpha (uint8 (0.5 * 255));
 }
 
@@ -585,17 +582,9 @@ void csWsTest::NotebookDialog ()
   // create a window
   csComponent *window = new csWindow (this, "Notebook test",
     CSWS_BUTSYSMENU | CSWS_TITLEBAR | CSWS_BUTHIDE | CSWS_BUTCLOSE |
-    CSWS_BUTMAXIMIZE | CSWS_TOOLBAR | CSWS_TBPOS_BOTTOM);
+    CSWS_BUTMAXIMIZE);
   window->SetSize (400, 300);
   window->Center ();
-
-  csDialog *toolbar = (csDialog *)window->GetChild (CSWID_TOOLBAR);
-  if (toolbar)
-  {
-    toolbar->SetFrameStyle (csdfsNone);
-    csNewToolbarButton (toolbar, cscmdOK, "~Ok");
-    csNewToolbarButton (toolbar, cscmdCancel, "Cancel");
-  }
 
   // Now create the notebook window
   csNotebook *nb = new csNotebook (window, CSNBS_TABPOS_TOP);
@@ -671,9 +660,6 @@ void csWsTest::NotebookDialog ()
   iTextureHandle *tex = GetTexture ("csws::FileDialog");
   nb->AddPrimaryTab (page, new csPixmap (tex, 16, 0, 16, 13),
     true, "Page four");
-
-  Execute (window);
-  delete window;
 }
 
 bool csWsTest::HandleEvent (iEvent &Event)
@@ -696,7 +682,7 @@ bool csWsTest::HandleEvent (iEvent &Event)
     case csevCommand:
       switch (Event.Command.Code)
       {
-        case 9999:
+        case 66600:
         {
           csWindow *d = csFileDialog (this, "test file dialog");
           if (d)
@@ -713,7 +699,7 @@ bool csWsTest::HandleEvent (iEvent &Event)
           }
           return true;
         }
-        case 9998:
+        case 66601:
         {
           csWindow *d = csColorDialog (this, "test color dialog");
           if (d)
@@ -732,59 +718,53 @@ bool csWsTest::HandleEvent (iEvent &Event)
           }
           return true;
         }
-        case 9997:
+        case 66610:
         {
+          csWindow *window = new csWindow (this, "SetState (CSS_TOPSELECT, false)",
+            CSWS_DEFAULTVALUE, cswfsThin);
+          window->SetState (CSS_TOPSELECT, false);
+          window->SetRect (20, 20, 400, 80);
+          return true;
+        }
+        case 66611:
+          MiscDialog ();
+          return true;
+        case 66612:
+          TranspDialog ();
+          return true;
+        case 66620:
           NotebookDialog ();
           return true;
-        }
-        case 9996:
-        {
+        case 66621:
           GridDialog ();
           return true;
-        }
-        case 9995:
-        {
+        case 66622:
           TreeDialog ();
           return true;
-        }
-        case 9994:
-        {
-          ThemeDialog ();
-          return true;
-        }
-        case 9993:
-	{
-	  //black
-	  csColorScheme Scheme = { cs_Color_Black, 100, -50, 10 };
-          csSetColorScheme (this, Scheme);
-          return true;
-	}
-        case 9992:
-	{
-	  //white
-	  csColorScheme Scheme = { cs_Color_White, 100, -50, 10 };
-          csSetColorScheme (this, Scheme);
-          return true;
-	}
-        case 9991:
-	{
-	  //red
-	  csColorScheme Scheme = { cs_Color_Red_D, 100, 0, 10 };
-          csSetColorScheme (this, Scheme);
-          return true;
-	}
-        case 9990:
-	{
-	  //green
-	  csColorScheme Scheme = { cs_Color_Green_D, 100, 0, 10 };
-          csSetColorScheme (this, Scheme);
-          return true;
-	}
-        case 9989:
-        {
+        case 66623:
           LayoutDialog ();
           return true;
-        }
+        case 66630:
+        case 66631:
+        case 66632:
+        case 66633:
+        {
+          static csColorScheme Schemes [4] =
+          {
+            { cs_Color_Green_D, 100, 0, 10 },
+            { cs_Color_Red_D, 100, 0, 10 },
+            { cs_Color_White, 100, -50, 10 },
+            { cs_Color_Black, 100, -50, 10 },
+          };
+          csSetColorScheme (this, Schemes [Event.Command.Code - 66630]);
+          return true;
+	}
+        case 66639:
+          csSetColorScheme (this, *(csColorScheme *)NULL);
+          return true;
+        case 66699:
+          WindowList ();
+          return true;
       }
       break;
 
@@ -846,77 +826,6 @@ drawline:
 
   return false;
 }
-
-//-----
-
-csThemeTestWindow::csThemeTestWindow (csComponent *iParent, char * iTitle,
-  int iWindowStyle) : csWindow (iParent, iTitle, iWindowStyle)
-{
-#if 0
-  csButton *but = new csButton (this, 0x8f000000);
-  but->SetText ("Select Background Color"); but->SetRect (20, 20, 190, 40);
-  but = new csButton (this, 0x8f000001);
-  but->SetText ("Select Dark Border Color"); but->SetRect (20, 40, 190, 60);
-  but = new csButton (this, 0x8f000002);
-  but->SetText ("Select Light Border Color"); but->SetRect (20, 60, 190, 80);
-  colordialog  = csColorDialog (this, "Theme Color Dialog", GetColor (CSPAL_WINDOW_BORDER));
-  colordialog->SetPos(240,40);
-#endif
-}
-
-void csThemeTestWindow::Draw()
-{
-  csWindow::Draw();
-  SetFont (((csWsTest *)app)->LucidiaFont, 12);
-  Text (BorderWidth+8, BorderHeight+100, CSPAL_WINDOW_LIGHT3D, -1,
-    "This is a font 12 test");
-  SetFont (((csWsTest *)app)->LucidiaFont, 8);
-  Text (BorderWidth+8, BorderHeight+140, CSPAL_WINDOW_LIGHT3D, -1,
-    "This is a font 8 test");
-}
-
-bool csThemeTestWindow::HandleEvent (iEvent &Event)
-{
-  if (Event.Type == csevCommand)
-  {
-    switch (Event.Command.Code)
-    {
-      case cscmdButtonDown:
-      {
-        switch (((csButton *)Event.Command.Info)->id)
-        {
-          case 0x8f000000:
-            if (colordialog)
-            {
-              int color;
-              csQueryColorDialog (colordialog, color);
-	      //...
-            }
-            return true;
-          case 0x8f000001:
-            if (colordialog)
-            {
-              int color;
-              csQueryColorDialog (colordialog, color);;
-	      //...
-            }
-            return true;
-          case 0x8f000002:
-            if (colordialog)
-            {
-              int color;
-              csQueryColorDialog (colordialog, color);
-	      //...
-            }
-            return true;
-        }
-      }
-    }
-  }
-  return csWindow::HandleEvent (Event);
-}
-
-//---------------------------------------------------------------------------
 
 // Define the skin for windowing system
 SKIN_DECLARE_DEFAULT (DefaultSkin);

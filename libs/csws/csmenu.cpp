@@ -887,7 +887,8 @@ void csMenu::PlaceItems ()
       // Set width of preceeding items
       SetItemWidth (colstart, colcount, colw);
       colw = 0; colcount = 0; colstart = cur;
-    } else
+    }
+    else
     {
       // Start a new row
       cury += prevh;
@@ -1025,4 +1026,36 @@ void csMenu::Delete (csComponent *comp)
 {
   fPlaceItems = true;
   csComponent::Delete (comp);
+}
+
+void csMenu::SuggestSize (int &w, int &h)
+{
+  if (fPlaceItems)
+    PlaceItems ();
+
+  w = h = 0;
+  csComponent *cur = first;
+  do
+  {
+    int maxw = cur->bound.xmax;
+    int maxh = cur->bound.ymax;
+    if (w < maxw) w = maxw;
+    if (h < maxh) h = maxh;
+    cur = cur->next;
+  } while (cur != first);
+
+  switch (FrameStyle)
+  {
+    case csmfsNone:
+      break;
+    case csmfsThin:
+      w += 1; h += 1;
+      break;
+    case csmfsBar:
+      h += 2;
+      break;
+    case csmfs3D:
+      w += 2; h += 2;
+      break;
+  } /* endswitch */
 }

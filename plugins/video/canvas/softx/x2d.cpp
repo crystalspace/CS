@@ -16,6 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#define XK_XKB_KEYS
 #include <stdarg.h>
 #include "cssysdef.h"
 #include "csutil/scf.h"
@@ -1275,6 +1276,10 @@ bool csGraphics2DXLib::HandleEvent (iEvent &Event)
 	  case XK_KP_1:
           case XK_End:        key = CSKEY_END; break;
           case XK_Escape:     key = CSKEY_ESC; break;
+#ifdef XK_ISO_Left_Tab
+          case XK_ISO_Left_Tab:
+#endif
+          case XK_KP_Tab:
           case XK_Tab:        key = CSKEY_TAB; break;
           case XK_F1:         key = CSKEY_F1; break;
           case XK_F2:         key = CSKEY_F2; break;

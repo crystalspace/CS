@@ -205,20 +205,77 @@ enum
  * new window coordinates when dragging window with mouse
  */
 /// Drag left window border
-#define CS_DRAG_XMIN		0x00000001
+#define CS_DRAG_XMIN		0x01
 /// Drag right window border
-#define CS_DRAG_XMAX		0x00000002
+#define CS_DRAG_XMAX		0x02
 /// Drag top window border
-#define CS_DRAG_YMIN		0x00000004
+#define CS_DRAG_YMIN		0x04
 /// Drag bottom window border
-#define CS_DRAG_YMAX		0x00000008
+#define CS_DRAG_YMAX		0x08
 /// Window is moveable
-#define CS_DRAG_MOVEABLE	0x00000010
+#define CS_DRAG_MOVEABLE	0x10
 /// Window is sizeable
-#define CS_DRAG_SIZEABLE	0x00000020
+#define CS_DRAG_SIZEABLE	0x20
 /// All flags above combined (used when dragging with titlebar)
-#define CS_DRAG_ALL	(CS_DRAG_XMIN | CS_DRAG_XMAX | \
-			 CS_DRAG_YMIN | CS_DRAG_YMAX)
+#define CS_DRAG_ALL		(CS_DRAG_XMIN | CS_DRAG_XMAX | \
+				 CS_DRAG_YMIN | CS_DRAG_YMAX)
+
+/**
+ * Bound resize flags.
+ * When the size of certain component changes, it checks all his children
+ * what they want to do with their own size. You can lock the distance
+ * between certain margin of the component and respective margin of
+ * the parent component to stay the same when this happens, using the
+ * ResizeMode field (or SetResizeMode() method).
+ */
+/// Lock component's left margin with parent's left margin
+#define CS_LOCK_XMIN		0x01
+/// Lock component's right margin with parent's right margin
+#define CS_LOCK_XMAX		0x02
+/// Lock component's top margin with parent's top margin
+#define CS_LOCK_YMIN		0x04
+/// Lock component's bottom margin with parent's bottom margin
+#define CS_LOCK_YMAX		0x08
+/// Lock all four margins
+#define CS_LOCK_ALL		(CS_LOCK_XMIN | CS_LOCK_XMAX | \
+				 CS_LOCK_YMIN | CS_LOCK_YMAX)
+/**
+ * An alternative way for child repositioning consist of the following:
+ * independently of each other in both X and Y direction the child can
+ * keep its size, and be placed either at the start, center, or end strip
+ * of the reserved for childs space of the parent component. These values
+ * are stored also in the ResizeMode field and occupies same bits as the
+ * CS_LOCK_XXX constants; thus these modes are reciprocaly exclusive.
+ * You can still use locks for top and bottom margins and use automatic
+ * repositioning for left and right margins or vice versa. That is,
+ * CS_LOCK_XMIN and CS_LOCK_XMAX are reciprocally exclusive with
+ * CS_REPOS_{LEFT|RIGHT|HCENTER} modes, but they are compatible with
+ * CS_REPOS_{TOP|BOTTOM|VCENTER} modes.
+ */
+/// Used to distinguish when component is repositioned or bound locked horizontally
+#define CS_REPOS_HORIZONTAL	0x10
+/// Used to distinguish when component is repositioned or bound locked vertically
+#define CS_REPOS_VERTICAL	0x20
+/// The mask for extracting the horizontal automatic position
+#define CS_REPOS_H_MASK		(CS_REPOS_HORIZONTAL | 0x3)
+/// The mask for extracting the vertical automatic position
+#define CS_REPOS_V_MASK		(CS_REPOS_VERTICAL | 0xc)
+/// The component is automatically placed at the left of the parent window
+#define CS_REPOS_LEFT		(CS_REPOS_HORIZONTAL | 0x0)
+/// The component is automatically placed at the right of the parent window
+#define CS_REPOS_RIGHT		(CS_REPOS_HORIZONTAL | 0x1)
+/// The component is automatically horizontally centered in the parent window
+#define CS_REPOS_HCENTER	(CS_REPOS_HORIZONTAL | 0x2)
+/// Same as HCENTER but the component is resized by the same amount as parent
+#define CS_REPOS_HCENTERSIZE	(CS_REPOS_HORIZONTAL | 0x3)
+/// The component is automatically placed at the top of the parent window
+#define CS_REPOS_TOP		(CS_REPOS_VERTICAL | 0x0)
+/// The component is automatically placed at the bottom of the parent window
+#define CS_REPOS_BOTTOM		(CS_REPOS_VERTICAL | 0x4)
+/// The component is automatically vertically centered in the parent window
+#define CS_REPOS_VCENTER	(CS_REPOS_VERTICAL | 0x8)
+/// Same as VCENTER but the component is resized by the same amount as parent
+#define CS_REPOS_VCENTERSIZE	(CS_REPOS_VERTICAL | 0xc)
 
 /**
  * Graphics system component: a menu, window etc.<p>
@@ -255,7 +312,9 @@ protected:
   /// Original bound when window is maximized
   csRect OrgBound;
   /// Window drag style (see CS_DRAG_XXX above)
-  int DragStyle;
+  char DragStyle;
+  /// What to do when parent size changes (see CS_LOCK_XXX flags)
+  char ResizeMode;
   /// Used on drag operations
   static int dragX, dragY, dragMode;
   /// The component bound before drag started
@@ -510,6 +569,14 @@ public:
   /// Query drag style flags
   int GetDragStyle ()
   { return DragStyle; }
+
+  /// Set resize mode flags
+  void SetResizeMode (int iResizeMode)
+  { ResizeMode = iResizeMode; }
+
+  /// Query resize mode flags
+  int GetResizeMode ()
+  { return ResizeMode; }
 
   /// Convert a pair of X,Y coordinates from local to global coordinate system
   void LocalToGlobal (int &x, int &y);

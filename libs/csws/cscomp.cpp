@@ -1147,7 +1147,8 @@ bool csComponent::SetRect (int xmin, int ymin, int xmax, int ymax)
     int delta [2];
     delta [0] = inv.xmin - xmin;
     delta [1] = inv.ymin - ymin;
-    SendBroadcast (cscmdMoveClipChildren, &delta);
+    if (delta [0] || delta [1])
+      SendBroadcast (cscmdMoveClipChildren, &delta);
   }
 
   if (parent)
@@ -1155,18 +1156,22 @@ bool csComponent::SetRect (int xmin, int ymin, int xmax, int ymax)
     csRect r (inv);
     if (!GetState (CSS_TRANSPARENT))
       r.Exclude (xmin, ymin, xmax, ymax);
-    parent->Invalidate (r, true, this);
+    if (!r.IsEmpty ())
+      parent->Invalidate (r, true, this);
   }
   if (clipparent && clipparent != parent)
   {
     csRect r (inv);
     if (!GetState (CSS_TRANSPARENT))
       r.Exclude (xmin, ymin, xmax, ymax);
-    int dX = 0, dY = 0;
-    parent->LocalToGlobal (dX, dY);
-    clipparent->GlobalToLocal (dX, dY);
-    r.Move (dX, dY);
-    clipparent->Invalidate (r, true, this);
+    if (!r.IsEmpty ())
+    {
+      int dX = 0, dY = 0;
+      parent->LocalToGlobal (dX, dY);
+      clipparent->GlobalToLocal (dX, dY);
+      r.Move (dX, dY);
+      clipparent->Invalidate (r, true, this);
+    }
   }
 
   return true;
@@ -1647,6 +1652,7 @@ void csComponent::ObliqueRect3D (int xmin, int ymin, int xmax, int ymax,
 {
   if ((xmax <= xmin) || (ymax <= ymin))
     return;
+
   Line (xmax - 1, ymin + 1, xmax - 1, ymax - cornersize, darkindx);
   Line (xmax, ymax - cornersize, xmax - cornersize, ymax, darkindx);
   Line (xmax - cornersize, ymax - 1, xmin + 1, ymax - 1, darkindx);

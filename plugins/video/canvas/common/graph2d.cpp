@@ -410,20 +410,19 @@ bool csGraphics2D::ClipLine (float &x1, float &y1, float &x2, float &y2,
     }
     else if (ocu1 & CLIP_RIGHT)         // clip right
     {
-      float newx = fxmax;// - 0.0001; // smgh experimental fix
-      y1 = y1 + ((y2 - y1) * (newx - x1)) / (x2 - x1);
-      x1 = newx;
+      y1 = y1 + ((y2 - y1) * (fxmax - x1)) / (x2 - x1);
+      x1 = fxmax;
     }
     else if (ocu1 & CLIP_BOTTOM)        // clip below
     {
-      float newy = fymax;// - 0.0001; // smgh experimental fix
-      x1 = x1 + ((x2 - x1) * (newy - y1)) / (y2 - y1);
-      y1 = newy;
+      x1 = x1 + ((x2 - x1) * (fymax - y1)) / (y2 - y1);
+      y1 = fymax;
     }
     SetOutCodes (ocu1, x1, y1);         // update for (x1,y1)
     Inside  = (ocu1 | ocu2) == 0;
     Outside = (ocu1 & ocu2) != 0;
   }
+
   return Outside;
 }
 

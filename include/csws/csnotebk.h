@@ -206,6 +206,11 @@ public:
   bool SelectTab (csComponent *iComponent);
 
 protected:
+  /// Secondary data (can be derived from other data but is cached for speed)
+  int tabx, taby, tabw, tabh, lasttab, lastpos, primary;
+
+  /// Reposition current page, forward/backward buttons etc
+  void PlaceGadgets ();
   /// Common part for AddXXXTab ()
   bool AddTab (cspPageData *iPageData, const char *iInfo,
     csComponent *iBefore);

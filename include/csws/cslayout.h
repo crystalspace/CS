@@ -20,7 +20,7 @@
 #ifndef __CSLAYOUT_H__
 #define __CSLAYOUT_H__
 
-#include "csws/cscomp.h"
+#include "csws/csdialog.h"
 
 /**
  * A 2D point object
@@ -120,7 +120,7 @@ public:
  * deeply nested they are.
  */
 
-class csLayout : public csComponent
+class csLayout : public csDialog
 {
 protected:
   /**
@@ -148,7 +148,7 @@ public:
   csLayoutConstraint c;
 
 public:
-  csLayout (csComponent *pParent);
+  csLayout (csComponent *iParent, csDialogFrameStyle iFrameStyle = csdfsNone);
 
   /**
    * A components is added to a layout by creating it and passing

@@ -202,12 +202,6 @@ void csNotebook::Draw ()
 {
   csComponent::Draw ();
 
-  csRect rect;
-  GetClientRect (rect);
-
-  if (focused && focused->id == ID_NOTEBOOK_PAGE)
-    focused->SetRect (rect);
-
   /*   __________________ tabw _________________
    *  /                                         \
    *      +----------------+   +--------------    -\  <- taby
@@ -228,121 +222,8 @@ void csNotebook::Draw ()
    *  +-------------------------------------+
    */
 
-  // Compute the position for tabs
-  int infoh = InfoHeight ();
-  int taby, tabh;
-  if ((style & CSNBS_TABPOS_MASK) == CSNBS_TABPOS_BOTTOM)
-  {
-    taby = rect.ymax + infoh;
-    tabh = bound.Height () - taby;
-  }
-  else
-  {
-    taby = 0;
-    if ((style & CSNBS_TABPOS_MASK) == CSNBS_TABPOS_TOP)
-      tabh = rect.ymin - infoh;
-    else
-      tabh = bound.Height ();
-  }
-
-  int tabx, tabw;
-  if ((style & CSNBS_TABPOS_MASK) < CSNBS_TABPOS_LEFT)
-  {
-    tabx = 0;
-    tabw = bound.Width ();
-  }
-  else if ((style & CSNBS_TABPOS_MASK) == CSNBS_TABPOS_RIGHT)
-  {
-    tabx = rect.xmax;
-    tabw = bound.Width () - rect.xmax;
-  }
-  else
-  {
-    tabx = 0;
-    tabw = rect.xmin;
-  }
-
-  // Compute the position of all buttons
-  int bx = 0, by = 0, fx = 0, fy =0, ww, hh;
-
-  ww = sprites [0]->Width () + 6;
-  if ((style & CSNBS_TABPOS_MASK) < CSNBS_TABPOS_LEFT)
-    hh = tabh;
-  else
-    hh = sprites [0]->Height () + 6;
-
-  switch (style & CSNBS_TABPOS_MASK)
-  {
-    case CSNBS_TABPOS_TOP:
-      bx = 0; fx = bound.Width () - ww;
-      by = fy = 0;
-      break;
-    case CSNBS_TABPOS_BOTTOM:
-      bx = 0; fx = bound.Width () - ww;
-      by = fy = bound.Height () - hh;
-      break;
-    case CSNBS_TABPOS_LEFT:
-      bx = fx = rect.xmin - ww;
-      by = 0; fy = bound.Height () - hh;
-      break;
-    case CSNBS_TABPOS_RIGHT:
-      bx = fx = rect.xmax;
-      by = 0; fy = bound.Height () - hh;
-      break;
-  }
-
-  if (fReposition)
-  {
-    fReposition = false;
-
-    taback->border = tabfor->border = style & CSNBS_TABPOS_MASK;
-    taback->SetRect (bx, by, bx + ww, by + hh);
-    tabfor->SetRect (fx, fy, fx + ww, fy + hh);
-
-    int px = (style & CSNBS_TABPOS_MASK) < CSNBS_TABPOS_LEFT ? 4 : 0;
-    taback->SetBitmap (sprites [px + 0], sprites [px + 2], false);
-    tabfor->SetBitmap (sprites [px + 1], sprites [px + 3], false);
-
-    if (!(style & CSNBS_PAGEINFO))
-      infoh = nextpage->bound.Height () + 4;
-    int xx = rect.xmax - nextpage->bound.Width () - 2;
-    int yy = taby + (infoh - nextpage->bound.Height ()) / 2;
-    if ((style & CSNBS_TABPOS_MASK) == CSNBS_TABPOS_TOP)
-      yy += tabh;
-    else if ((style & CSNBS_TABPOS_MASK) == CSNBS_TABPOS_BOTTOM)
-      yy -= infoh - 1;
-    nextpage->SetPos (xx, yy);
-    xx -= prevpage->bound.Width () + 2;
-    prevpage->SetPos (xx, yy);
-  }
-
-  // If current page is a secondary one, find the corresponding primary
-  int primary = activetab;
-  while (primary && !IS_PRIMARY_PAGE (primary))
-    primary--;
-
-  // Count forward starting from first tab, which is the last visible tab
-  int lasttab, curpos = TABPOS_SKIP;
-  int pos = ((style & CSNBS_TABPOS_MASK) < CSNBS_TABPOS_LEFT) ?
-    bound.Width () : bound.Height ();
-  for (lasttab = firsttab; lasttab < pages.Length (); lasttab++)
-    if (IS_PRIMARY_PAGE (lasttab))
-    {
-      int w, h;
-      GetTabSize (lasttab, w, h);
-      curpos += ((style & CSNBS_TABPOS_MASK) < CSNBS_TABPOS_LEFT) ?
-        w - tabh / 2 : h + 3;
-      if (curpos >= pos)
-        break;
-    }
-
-  // Hide the tab scrolling knobs if needed
-  tabfor->SetState (CSS_VISIBLE, lasttab < pages.Length ());
-  taback->SetState (CSS_VISIBLE, firsttab > 0);
-
-  // lasttab can exceed the number of pages
-  if (lasttab >= pages.Length ())
-    lasttab = pages.Length () - 1;
+  csRect rect;
+  GetClientRect (rect);
 
   // Draw the background
   Clear (CSPAL_NOTEBOOK_BACKGROUND);
@@ -355,10 +236,10 @@ void csNotebook::Draw ()
   // Display current page information
   if (style & CSNBS_PAGEINFO)
   {
+    int hh = InfoHeight ();
     int yy = ((style & CSNBS_TABPOS_MASK) == CSNBS_TABPOS_TOP) ? taby + tabh :
-      ((style & CSNBS_TABPOS_MASK) == CSNBS_TABPOS_BOTTOM) ? taby - infoh + 1 :
+      ((style & CSNBS_TABPOS_MASK) == CSNBS_TABPOS_BOTTOM) ? taby - hh + 1 :
       taby + 1;
-    int hh = infoh;
     if (style & CSNBS_PAGEFRAME)
     {
       hh--;
@@ -414,7 +295,7 @@ void csNotebook::Draw ()
   int zorder = 0;
   for (int selected = 0; selected < 2; selected++)
   {
-    pos = (((style & CSNBS_TABPOS_MASK) < CSNBS_TABPOS_LEFT) ? tabx : taby) + curpos;
+    int pos = (((style & CSNBS_TABPOS_MASK) < CSNBS_TABPOS_LEFT) ? tabx : taby) + lastpos;
     for (int tab = lasttab; tab >= firsttab; tab--)
       if (IS_PRIMARY_PAGE (tab))
       {
@@ -558,6 +439,127 @@ void csNotebook::Draw ()
   }
 }
 
+void csNotebook::PlaceGadgets ()
+{
+  if (!fReposition)
+    return;
+  fReposition = false;
+
+  csRect rect;
+  GetClientRect (rect);
+
+  if (focused && focused->id == ID_NOTEBOOK_PAGE)
+    focused->SetRect (rect);
+
+  // Compute the position for tabs
+  int infoh = InfoHeight ();
+  if ((style & CSNBS_TABPOS_MASK) == CSNBS_TABPOS_BOTTOM)
+  {
+    taby = rect.ymax + infoh;
+    tabh = bound.Height () - taby;
+  }
+  else
+  {
+    taby = 0;
+    if ((style & CSNBS_TABPOS_MASK) == CSNBS_TABPOS_TOP)
+      tabh = rect.ymin - infoh;
+    else
+      tabh = bound.Height ();
+  }
+
+  if ((style & CSNBS_TABPOS_MASK) < CSNBS_TABPOS_LEFT)
+  {
+    tabx = 0;
+    tabw = bound.Width ();
+  }
+  else if ((style & CSNBS_TABPOS_MASK) == CSNBS_TABPOS_RIGHT)
+  {
+    tabx = rect.xmax;
+    tabw = bound.Width () - rect.xmax;
+  }
+  else
+  {
+    tabx = 0;
+    tabw = rect.xmin;
+  }
+
+  int bx = 0, by = 0, fx = 0, fy = 0, ww, hh;
+
+  ww = sprites [0]->Width () + 6;
+  if ((style & CSNBS_TABPOS_MASK) < CSNBS_TABPOS_LEFT)
+    hh = tabh;
+  else
+    hh = sprites [0]->Height () + 6;
+
+  switch (style & CSNBS_TABPOS_MASK)
+  {
+    case CSNBS_TABPOS_TOP:
+      bx = 0; fx = bound.Width () - ww;
+      by = fy = 0;
+      break;
+    case CSNBS_TABPOS_BOTTOM:
+      bx = 0; fx = bound.Width () - ww;
+      by = fy = bound.Height () - hh;
+      break;
+    case CSNBS_TABPOS_LEFT:
+      bx = fx = rect.xmin - ww;
+      by = 0; fy = bound.Height () - hh;
+      break;
+    case CSNBS_TABPOS_RIGHT:
+      bx = fx = rect.xmax;
+      by = 0; fy = bound.Height () - hh;
+      break;
+  }
+
+  taback->border = tabfor->border = style & CSNBS_TABPOS_MASK;
+  taback->SetRect (bx, by, bx + ww, by + hh);
+  tabfor->SetRect (fx, fy, fx + ww, fy + hh);
+
+  int px = (style & CSNBS_TABPOS_MASK) < CSNBS_TABPOS_LEFT ? 4 : 0;
+  taback->SetBitmap (sprites [px + 0], sprites [px + 2], false);
+  tabfor->SetBitmap (sprites [px + 1], sprites [px + 3], false);
+
+  if (!(style & CSNBS_PAGEINFO))
+    infoh = nextpage->bound.Height () + 4;
+  int xx = rect.xmax - nextpage->bound.Width () - 2;
+  int yy = taby + (infoh - nextpage->bound.Height ()) / 2;
+  if ((style & CSNBS_TABPOS_MASK) == CSNBS_TABPOS_TOP)
+    yy += tabh;
+  else if ((style & CSNBS_TABPOS_MASK) == CSNBS_TABPOS_BOTTOM)
+    yy -= infoh - 1;
+  nextpage->SetPos (xx, yy);
+  xx -= prevpage->bound.Width () + 2;
+  prevpage->SetPos (xx, yy);
+
+  // If current page is a secondary one, find the corresponding primary
+  primary = activetab;
+  while (primary && !IS_PRIMARY_PAGE (primary))
+    primary--;
+
+  // Count forward starting from first tab, which is the last visible tab
+  lastpos = TABPOS_SKIP;
+  int pos = ((style & CSNBS_TABPOS_MASK) < CSNBS_TABPOS_LEFT) ?
+    bound.Width () : bound.Height ();
+  for (lasttab = firsttab; lasttab < pages.Length (); lasttab++)
+    if (IS_PRIMARY_PAGE (lasttab))
+    {
+      int w, h;
+      GetTabSize (lasttab, w, h);
+      lastpos += ((style & CSNBS_TABPOS_MASK) < CSNBS_TABPOS_LEFT) ?
+        w - tabh / 2 : h + 3;
+      if (lastpos >= pos)
+        break;
+    }
+
+  // Hide the tab scrolling knobs if needed
+  tabfor->SetState (CSS_VISIBLE, lasttab < pages.Length ());
+  taback->SetState (CSS_VISIBLE, firsttab > 0);
+
+  // lasttab can exceed the number of pages
+  if (lasttab >= pages.Length ())
+    lasttab = pages.Length () - 1;
+}
+
 bool csNotebook::SetRect (int xmin, int ymin, int xmax, int ymax)
 {
   bool rc = csComponent::SetRect (xmin, ymin, xmax, ymax);
@@ -657,6 +659,7 @@ bool csNotebook::HandleEvent (iEvent &Event)
            && (pages.Get (np)->flags & NOTEBOOK_PAGE_PRIMARY))
           {
             firsttab = np;
+            fReposition = true;
             Invalidate ();
           }
           return true;
@@ -671,11 +674,21 @@ bool csNotebook::HandleEvent (iEvent &Event)
            && (pages.Get (np)->flags & NOTEBOOK_PAGE_PRIMARY))
           {
             firsttab = np;
+            fReposition = true;
             Invalidate ();
           }
           return true;
         }
       }
+      break;
+    case csevBroadcast:
+      switch (Event.Command.Code)
+      {
+        case cscmdPostProcess:
+          PlaceGadgets ();
+          break;
+      }
+      break;
   }
   return csComponent::HandleEvent (Event);
 }
@@ -698,6 +711,7 @@ bool csNotebook::SelectTab (int iIndex)
     pages.Get (activetab)->page->SetState (CSS_VISIBLE, false);
     activetab = iIndex;
     pages.Get (activetab)->page->Select ();
+    fReposition = true;
     Invalidate ();
   }
   return true;
@@ -710,11 +724,13 @@ bool csNotebook::SelectTab (csComponent *iComponent)
 
 bool csNotebook::DeleteTab (csComponent *iComponent)
 {
+  fReposition = true;
   return pages.Delete (FindPage (iComponent));
 }
 
 bool csNotebook::DeleteTab (int iIndex)
 {
+  fReposition = true;
   return pages.Delete (iIndex);
 }
 
@@ -743,6 +759,7 @@ bool csNotebook::AddTab (cspPageData *iPageData, const char *iInfo,
     pages.Insert (idx, iPageData);
 
   // And of course repaint
+  fReposition = true;
   Invalidate ();
 
   return true;

@@ -319,47 +319,49 @@ void csSetColorScheme (csApp *iApp, csColorScheme &Scheme)
   {
     csRestorePalette ();
     csFreePalette ();
-    return;
   }
-
-  csSavePalette ();
-
-  // Get the HLS for scheme's base tone
-  float sch_r, sch_g, sch_b;
-  csGetRGB (Scheme.BaseTone, iApp, sch_r, sch_g, sch_b);
-  float sch_h, sch_l, sch_s;
-  csRGB2HLS (sch_r, sch_g, sch_b, sch_h, sch_l, sch_s);
-
-  // Scheme color,contrast and blend values as floating-point values
-  float sch_color = Scheme.Color / 100.;
-  float sch_contrast = -Scheme.Contrast / 100.;
-  float sch_blend = Scheme.Blend / 100.;
-
-  for (int i = 0; i < cswsPaletteSize; i++)
+  else
   {
-    int *pal = savedPalette [i];
-    for (int j = 0; j < cswsPalette [i].Size; j++)
+    csSavePalette ();
+
+    // Get the HLS for scheme's base tone
+    float sch_r, sch_g, sch_b;
+    csGetRGB (Scheme.BaseTone, iApp, sch_r, sch_g, sch_b);
+    float sch_h, sch_l, sch_s;
+    csRGB2HLS (sch_r, sch_g, sch_b, sch_h, sch_l, sch_s);
+
+    // Scheme color,contrast and blend values as floating-point values
+    float sch_color = Scheme.Color / 100.;
+    float sch_contrast = -Scheme.Contrast / 100.;
+    float sch_blend = Scheme.Blend / 100.;
+
+    for (int i = 0; i < cswsPaletteSize; i++)
     {
-      float r, g, b;
-      csGetRGB (pal [j], iApp, r, g, b);
-      float h, l, s;
-      csRGB2HLS (r, g, b, h, l, s);
+      int *pal = savedPalette [i];
+      for (int j = 0; j < cswsPalette [i].Size; j++)
+      {
+        float r, g, b;
+        csGetRGB (pal [j], iApp, r, g, b);
+        float h, l, s;
+        csRGB2HLS (r, g, b, h, l, s);
 
-      if (sch_s > 1/32.)
-        h = h + (sch_h - h) * sch_color;
-      l = l + (sch_l - l) * sch_contrast;
-      s = s + (sch_s - s) * sch_blend;
+        if (sch_s > 1/32.)
+          h = h + (sch_h - h) * sch_color;
+        l = l + (sch_l - l) * sch_contrast;
+        s = s + (sch_s - s) * sch_blend;
 
-      if (h < 0.) h += 1.; if (h > 1.) h -= 1.;
-      if (l < 0.) l = 0.; if (l > 1.) l = 1.;
-      if (s < 0.) s = 0.; if (s > 1.) s = 1.;
+        if (h < 0.) h += 1.; if (h > 1.) h -= 1.;
+        if (l < 0.) l = 0.; if (l > 1.) l = 1.;
+        if (s < 0.) s = 0.; if (s > 1.) s = 1.;
 
-      csHLS2RGB (h, l, s, r, g, b);
+        csHLS2RGB (h, l, s, r, g, b);
 
-      cswsPalette [i].Palette [j] =
-        iApp->FindColor (QInt (r * 255), QInt (g * 255), QInt (b * 255));
+        cswsPalette [i].Palette [j] =
+          iApp->FindColor (QInt (r * 255), QInt (g * 255), QInt (b * 255));
+      }
     }
   }
+
   iApp->Invalidate (true);
   iApp->SendBroadcast (cscmdColorSchemeChanged);
 }

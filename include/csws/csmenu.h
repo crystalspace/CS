@@ -282,6 +282,9 @@ public:
   /// Set fPlaceItems since a item has been removed
   virtual void Delete (csComponent *comp);
 
+  /// Suggest the size of the menu
+  virtual void SuggestSize (int &w, int &h);
+
 private:
   /// Set 'width' for 'count' items from 'start'
   void SetItemWidth (csComponent *start, int count, int width);

@@ -58,6 +58,8 @@ void csDefaultButtonSkin::Draw (csComponent &This)
       if (This.bound.Height () >= 6)
       {
         int aw = This.bound.Height () / 3;
+        if (aw > This.bound.Width () - 4)
+          aw = This.bound.Width () - 4;
         if (DefaultBorder)
           This.ObliqueRect3D (0, 0, This.bound.Width (), This.bound.Height (), aw,
             CSPAL_BUTTON_DEFFRAME, CSPAL_BUTTON_DEFFRAME);
