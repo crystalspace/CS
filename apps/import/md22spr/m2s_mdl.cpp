@@ -337,7 +337,8 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
     fprintf(stderr, "Warning: no skin in this model\n");
   else
   {
-    if (mdl2spr_imageio == 0)
+    //if (mdl2spr_imageio == 0)
+    if (!mdl2spr_imageio.IsValid ())
     {
       mdl2spr_imageio =
         SCF_CREATE_INSTANCE ("crystalspace.graphic.image.io.png", iImageIO);

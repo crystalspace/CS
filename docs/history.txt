@@ -19,6 +19,23 @@ chronological order.
 	- Jorrit added a new pvstest world file. This simple world will
 	  be used to test the efficiency of the PVS calculator and PVS
 	  visibility culler.
+	- Jorrit reports a mystery. In md22spr/m2s_mdl.cpp there was
+	  a line 'if (mdl2spr_imageio == 0)' with mdl2spr_imageio a
+	  csRef<iImageIO>. The compiler complained about this line with
+	  the following error:
+		apps/import/md22spr/m2s_mdl.cpp:340: ambiguous overload for
+			`csRef<iImageIO>& == int' operator
+		apps/import/md22spr/m2s_mdl.cpp:340: candidates are:
+			operator==(iImageIO*, iImageIO*) <built-in>
+		include/csutil/ref.h:295: bool operator==(const csRef<iImage>&,
+			iImage*)
+		include/csutil/ref.h:285: bool operator==(const csRef<iImage>&, 
+			const csRef<iImage>&)
+	  If I change that line to 'if (!mdl2spr_imageio.IsValid())' then
+	  the compiler is happens. The really weird thing is that there
+	  is another 'if (mdl2spr_imageio == 0)' line a few lines below
+	  this and that one doesn't give an error!!! Who can unwrap this
+	  mystery?
 	- Eric Sunshine augmented the joystick drivers so that they support and
 	  scan for up to sixteen joysticks.
 24-Jan-2005
