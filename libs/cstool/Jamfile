@@ -2,6 +2,7 @@ SubDir TOP libs cstool ;
 
 Library cstool
 	: [ Wildcard *.cpp *.h ]
+          [ Wildcard ../../include/cstool : *.h ]
 ;
 
 LibDepends cstool : csgfx csgeom csutil ;

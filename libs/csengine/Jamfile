@@ -5,6 +5,7 @@ Library csengine :
 	[ Wildcard basic : *.cpp *.h ]
 	[ Wildcard light : *.cpp *.h ]
 	[ Wildcard objects : *.cpp *.h ]
+        [ Wildcard ../../include/csengine : *.h ]
 ;
 
 Help csengine : "Crystal Space 3D engine" ;

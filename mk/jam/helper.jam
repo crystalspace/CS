@@ -35,17 +35,9 @@ rule IncludeDir
   }   
 }
 
-##  SearchSubdir subdirectories
-##    Description: Tells jam where to find additional sourcefiles. This is
-##    useful when your target has files in subdirectories. In this case set
-##    SearchSubdir to these subdirectories and just mention the sourcefiles
-##    without path in your other rules.
-##    Implementation: This rule sets the SEARCH_SOURCE variable to
-##    $(SUBDIR)/subdir, so this rule will only work with rules which respect
-##    the SEARCH_SOURCE variable. (All CS rules do so.)
 rule SearchSubdir
 {
-  SEARCH_SOURCE += $(SUBDIR)/$(<) ;
+    echo Warning: SearchSubDir is deprecated now (just delete it from your Jamfile) ;
 }
 
 ##  Wildcard [ dir : ] patterns

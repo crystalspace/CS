@@ -2,6 +2,7 @@ SubDir TOP libs csappframe ;
 
 Library csappframe
 	: [ Wildcard *.cpp *.h ]
+          [ Wildcard ../../include/csappframe : *.h ]
 ;
 
 Help csappframe : "Crystal Space application framework" ;

@@ -2,6 +2,7 @@ SubDir TOP libs csgeom ;
 
 Library csgeom
 	: [ Wildcard *.cpp *.h ]
+          [ Wildcard ../../include/csgeom : *.h ]
 ;
 
 Help csgeom : "Crystal Space geometry library" ;

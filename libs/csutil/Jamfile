@@ -4,6 +4,7 @@ CSSYS_SRC = $(CSSYS_SRC:R=../cssys) ;
 Library csutil
 	: [ Wildcard *.cpp *.h ] $(CSSYS_SRC)
           [ Wildcard ../../include/csutil : *.h ]
+          [ Wildcard ../../include/cssys : *.h ]
 	:
 ;
 CFlags csutil :

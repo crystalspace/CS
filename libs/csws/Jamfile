@@ -3,6 +3,7 @@ SubDir TOP libs csws ;
 Library csws :
 	[ Wildcard *.cpp *.h ]
 	[ Wildcard skins/default : *.cpp *.h ]
+        [ Wildcard ../../include/csws : *.h ]
 ;
 
 LibDepends csws : cstool csgfx csgeom csutil ;
