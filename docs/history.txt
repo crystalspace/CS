@@ -12,6 +12,9 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+14-Feb-2000
+	- Fixed a bug in highscore handling of Blocks.
+	- Fixed rotation center of a few shapes in Blocks.
 13-Feb-2000
 	- Eric Sunshine performed a fairly extensive overhaul of csIniFile.
 	  Except for the lowest level I/O functionality, most methods have
@@ -45,7 +48,47 @@ Short-term cleanups that need to be done:
 	  global CS/mk/system directory and placing them in the proper and
 	  respective subdirectories of CS/libs/cssys, thus achieving a more
 	  modular configuration.
+	- Norman Kramer added code to the clippers to find out wether or
+	  not a polygon was actually clipped.
+	- Norman also added code to better support hardware renderers. He
+	  added code to precalculate u,v coordinates for all polygon
+	  vertices. Currently this code is optional (enclosed in defines).
+	- Thomas Hieber started documenting the collision detection stuff.
+	  This also includes renaming of various member function and
+	  attributes.
+	- Thomas also removed some dependencies between Crystal Shooter
+	  and csgame (csgame contained Crystal Shooter specific code).
+	- Thomas also adjusted the license of csgame to LGPL (instead of GPL).
+	- Thomas moved a testroutine for triangle intersection from walktest
+	  to csMath3 (I think this routine is of general interest).
+	- Thomas also did a small cleanup of the VC project files.
+	- Simon Boily re-enabled multitexturing and fixed some problem with
+	  fog.
+12-Feb-2000
+	- Key config menu scrolls so that it works in low resolution too.
+	- Dimension of play area in Blocks is saved in config too.
+	- Depending on the height of a block it will change color. This
+	  helps for seeing the difference in height if you're looking
+	  from top to down.
+	- Added first primitive highscore handling to Blocks. Highscore
+	  information is also saved to 'blocks.cfg'. There is no GUI
+	  yet to view the highscores.
+	- Thomas Hieber did some changes to DX5 renderer to make
+	  DrawPolygonFX work again (part of the fix was to disable
+	  multitexturing, because the renderer does not completely switch
+	  back to singletexturing).
 11-Feb-2000
+	- Made keys in Blocks configurable through blocks.cfg.
+	  However, there is still no GUI to change them.
+	  Also changed the default keys (qweasd to rotate shape,
+	  cursor keys to move shape, del/home/end/pgdn/ins/pgup to
+	  manipulate camera, space to drop shape, p to pause, esc
+	  to return to menu).
+	- Started work on GUI to change keys. Not functional yet.
+	- Bad bug fixed in Blocks. When multiple planes were removed
+	  at the same time the behaviour of the blocks above was not
+	  right.
+	- Keys can now be configured at run-time in Blocks.
 	- Eric Sunshine eliminated several compilation warnings in csPhyziks.
 	- Eric Sunshine eliminated some unsigned versus signed warnings in
 	  csClear.
@@ -68,13 +111,6 @@ Short-term cleanups that need to be done:
 	- Thomas also fixed software renderer so that DrawPolygonFX
 	  supports all blending modes.
 	- Some changes to Glide StartPolygonFX from Norman Kramer.
-	- Made keys in Blocks configurable through blocks.cfg.
-	  However, there is still no GUI to change them.
-	  Also changed the default keys (qweasd to rotate shape,
-	  cursor keys to move shape, del/home/end/pgdn/ins/pgup to
-	  manipulate camera, space to drop shape, p to pause, esc
-	  to return to menu).
-	- Started work on GUI to change keys. Not functional yet.
 9-Feb-2000
 	- Andrew Zabolotny did some changes:
 	    - Renamed DEBUG to CS_DEBUG. On various systems many

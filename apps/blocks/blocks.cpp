@@ -20,14 +20,16 @@
   TODO:
     Make nice startup screen with moving blocks as demo.
     Better textures.
-    Make keys configurable.
     Add highscore list.
     Add 'nightmare' level.
     'pause' should temporarily remove visible blocks (or fog area).
     Solve rotation problem by defining main axis or something.
       Or else look at bounding box and rotate that (even/odd).
     Mark game-over height so that you can see it.
-    Different colors for frozen shapes at different heights.
+    Improve 'Game Over' screen!
+    Cleanup of several 'Screens' in Blocks (code cleanup).
+    Psuedo-AI module to play automatically.
+    Extra score if all blocks are removed.
  */
 
 #define SYSDEF_ACCESS
@@ -69,6 +71,75 @@ int Blocks::white, Blocks::black, Blocks::red;
 
 //-----------------------------------------------------------------------------
 
+HighScore::HighScore ()
+{
+  int i;
+  for (i = 0 ; i < 10 ; i++)
+  {
+    scores[i] = -1;
+    names[i] = NULL;
+  }
+}
+
+HighScore::~HighScore ()
+{
+  int i;
+  for (i = 0 ; i < 10 ; i++)
+    delete names[i];
+}
+
+bool HighScore::RegisterScore (const char* name, int score)
+{
+  int i, j;
+  for (i = 0 ; i < 10 ; i++)
+  {
+    if (score > scores[i])
+    {
+      delete names[9];
+      for (j = 9 ; j > i ; j--)
+      {
+        scores[j] = scores[j-1];
+	names[j] = names[j-1];
+      }
+      scores[i] = score;
+      names[i] = NULL;
+      SetName (i, name);
+      return true;
+    }
+  }
+  return false;
+}
+
+bool HighScore::CheckScore (int score)
+{
+  int i;
+  for (i = 0 ; i < 10 ; i++)
+  {
+    if (score > scores[i]) return true;
+  }
+  return false;
+}
+
+void HighScore::SetName (int i, const char* name)
+{
+  delete names[i];
+  names[i] = NULL;
+  if (!name) return;
+  names[i] = new char [strlen (name)+1];
+  strcpy (names[i], name);
+}
+
+//-----------------------------------------------------------------------------
+
+TextEntryMenu::TextEntryMenu ()
+{
+  entries = last = NULL;
+  num_entries = 0;
+  selected = 0;
+  hisel = false;
+  time_left = 0;
+}
+
 TextEntryMenu::~TextEntryMenu ()
 {
   Clear ();
@@ -86,12 +157,15 @@ void TextEntryMenu::Clear ()
   }
   last = NULL;
   num_entries = 0;
+  hisel = false;
+  selected = 0;
+  time_left = 0;
 }
 
 void TextEntryMenu::Add (const char* txt, const char* entry, void* userdata)
 {
   TextEntry* n = new TextEntry;
-  n->txt = new char [strlen (txt+1)];
+  n->txt = new char [strlen (txt)+1];
   strcpy (n->txt, txt);
   n->entry = new char [strlen (entry)+1];
   strcpy (n->entry, entry);
@@ -109,18 +183,78 @@ void TextEntryMenu::Add (const char* txt, const char* entry, void* userdata)
   num_entries++;
 }
 
-void TextEntryMenu::Draw ()
+void TextEntryMenu::ReplaceSelected (const char* txt, const char* entry, void* userdata)
 {
+  TextEntry* n = GetEntry (selected);
+  // Make sure to delete old pointers to text AFTER allocating new ones.
+  char* old_txt = n->txt;
+  char* old_entry = n->entry;
+  n->txt = new char [strlen (txt)+1];
+  strcpy (n->txt, txt);
+  n->entry = new char [strlen (entry)+1];
+  strcpy (n->entry, entry);
+  n->userdata = userdata;
+  delete old_txt;
+  delete old_entry;
+}
+
+void TextEntryMenu::Draw (time_t elapsed_time)
+{
+  float elapsed = (float)elapsed_time/1000.;
+  if (elapsed > time_left) elapsed = time_left;
+  time_left -= elapsed;
+  if (time_left <= 0) time_left = 1;
+
+  int tot_lines = (Sys->FrameHeight-20)/12;
+
   Gfx2D->Clear (0);
   int i;
   TextEntry* entry = entries;
-  for (i = 0 ; i < num_entries ; i++)
+  for (i = selected-tot_lines/2 ; i < selected+tot_lines/2 ; i++)
   {
-    Gfx2D->Write (10, 10+i*12, Blocks::white,
-    	selected == i ? Blocks::red : Blocks::black, entry->txt);
-    Gfx2D->Write (200, 10+i*12, Blocks::black, Blocks::white, entry->entry);
-    entry = entry->next;
+    if (i < 0 || i >= num_entries) continue;
+    entry = GetEntry (i);
+
+    int selcol = selected == i ? Blocks::red : Blocks::black;
+    int y = 10+(i-selected+tot_lines/2)*12;
+    Gfx2D->DrawBox (10, y-2, 300, 12, selcol);
+    Gfx2D->Write (10, y, Blocks::white, selcol, entry->txt);
+    if (hisel && selected == i)
+    {
+      int col;
+      if (time_left < .5) col = Blocks::white;
+      else col = Blocks::red;
+      Gfx2D->DrawBox (190, y-2, 120, 12, col);
+      Gfx2D->Write (200, y, Blocks::black, col, entry->entry);
+    }
+    else
+    {
+      Gfx2D->Write (200, y, Blocks::white, selcol, entry->entry);
+    }
   }
+}
+
+TextEntryMenu::TextEntry* TextEntryMenu::GetEntry (int num)
+{
+  int i;
+  TextEntry* entry = entries;
+  for (i = 0 ; i < num ; i++) entry = entry->next;
+  return entry;
+}
+
+void* TextEntryMenu::GetSelectedData ()
+{
+  return GetEntry (selected)->userdata;
+}
+
+char* TextEntryMenu::GetSelectedText ()
+{
+  return GetEntry (selected)->txt;
+}
+
+char* TextEntryMenu::GetSelectedEntry ()
+{
+  return GetEntry (selected)->entry;
 }
 
 //-----------------------------------------------------------------------------
@@ -216,7 +350,6 @@ void Blocks::InitGame ()
   cam_move_dest = destinations[cur_hor_dest][cur_ver_dest];
 
   pause = false;
-  gameover = false;
   cur_speed = MIN_SPEED;
 }
 
@@ -442,6 +575,16 @@ void Blocks::add_hrast (int x, int y, float dx, float dy, float rot_z)
   hrast->Transform ();
 }
 
+void Blocks::ChangeThingTexture (csThing* thing, csTextureHandle* txt)
+{
+  int i;
+  for (i = 0 ; i < thing->GetNumPolygons () ; i++)
+  {
+    csPolygon3D* p = thing->GetPolygon3D (i);
+    p->SetTexture (txt);
+  }
+}
+
 void Blocks::add_cube_template ()
 {
   float dim = CUBE_DIM/2.;
@@ -506,7 +649,8 @@ void set_uv (csPolygon3D* p, float u1, float v1, float u2, float v2,
 }
 
 // dx,dy,dz are logical coordinates (Z vertical).
-csThing* Blocks::create_cube_thing (float dx, float dy, float dz)
+csThing* Blocks::create_cube_thing (float dx, float dy, float dz,
+	csThingTemplate* tmpl)
 {
   csThing* cube;
   cube = new csThing ();
@@ -517,7 +661,7 @@ csThing* Blocks::create_cube_thing (float dx, float dy, float dz)
   	(dx-shift_rotate.x)*CUBE_DIM,
   	(dz-shift_rotate.z)*CUBE_DIM,
 	(dy-shift_rotate.y)*CUBE_DIM);
-  cube->MergeTemplate (cube_tmpl, cube_txt, 1, NULL, &shift, NULL);
+  cube->MergeTemplate (tmpl, cube_txt, 1, NULL, &shift, NULL);
 
   csPolygon3D* p;
 
@@ -537,12 +681,13 @@ csThing* Blocks::create_cube_thing (float dx, float dy, float dz)
 }
 
 // dx,dy,dz and x,y,z are logical coordinates (Z vertical).
-void Blocks::add_cube (float dx, float dy, float dz, float x, float y, float z)
+void Blocks::add_cube (float dx, float dy, float dz, float x, float y, float z,
+	csThingTemplate* tmpl)
 {
   csThing* cube = add_cube_thing (room, dx, dy, dz,
   	(x-zone_dim/2+shift_rotate.x)*CUBE_DIM,
 	(z+shift_rotate.z)*CUBE_DIM+CUBE_DIM/2,
-  	(y-zone_dim/2+shift_rotate.y)*CUBE_DIM);
+  	(y-zone_dim/2+shift_rotate.y)*CUBE_DIM, tmpl);
   cube_info[num_cubes].thing = cube;
   cube_info[num_cubes].dx = dx;
   cube_info[num_cubes].dy = dy;
@@ -553,9 +698,9 @@ void Blocks::add_cube (float dx, float dy, float dz, float x, float y, float z)
 // dx,dy,dz are logical coordinates (Z vertical).
 // x,y,z are physical coordinates (Y vertical).
 csThing* Blocks::add_cube_thing (csSector* sect, float dx, float dy, float dz,
-	float x, float y, float z)
+	float x, float y, float z, csThingTemplate* tmpl)
 {
-  csThing* cube = create_cube_thing (dx, dy, dz);
+  csThing* cube = create_cube_thing (dx, dy, dz, tmpl);
   sect->AddThing (cube);
   csVector3 v (x, y, z);
   cube->SetMove (sect, v);
@@ -581,110 +726,112 @@ again:
   switch (type)
   {
     case SHAPE_R1:
-      add_cube (0, 0, 0, x, y, z);
+      add_cube (0, 0, 0, x, y, z, cube_tmpl);
       break;
     case SHAPE_R2:
-      add_cube (0, 0, 0, x, y, z);
-      add_cube (1, 0, 0, x, y, z);
+      add_cube (0, 0, 0, x, y, z, cube_tmpl);
+      add_cube (1, 0, 0, x, y, z, cube_tmpl);
       break;
     case SHAPE_R3:
-      add_cube (-1, 0, 0, x, y, z);
-      add_cube (0, 0, 0, x, y, z);
-      add_cube (1, 0, 0, x, y, z);
+      add_cube (-1, 0, 0, x, y, z, cube_tmpl);
+      add_cube (0, 0, 0, x, y, z, cube_tmpl);
+      add_cube (1, 0, 0, x, y, z, cube_tmpl);
       break;
     case SHAPE_R4:
       if (zone_dim <= 3) goto again;
-      add_cube (-1, 0, 0, x, y, z);
-      add_cube (0, 0, 0, x, y, z);
-      add_cube (1, 0, 0, x, y, z);
-      add_cube (2, 0, 0, x, y, z);
+      add_cube (-1, 0, 0, x, y, z, cube_tmpl);
+      add_cube (0, 0, 0, x, y, z, cube_tmpl);
+      add_cube (1, 0, 0, x, y, z, cube_tmpl);
+      add_cube (2, 0, 0, x, y, z, cube_tmpl);
       break;
     case SHAPE_L1:
-      add_cube (-1, 0, 1, x, y, z);
-      add_cube (-1, 0, 0, x, y, z);
-      add_cube (0, 0, 0, x, y, z);
+      shift_rotate.Set (.5, .5, .5);
+      add_cube (0, 0, 1, x, y, z, cube_tmpl);
+      add_cube (0, 0, 0, x, y, z, cube_tmpl);
+      add_cube (1, 0, 0, x, y, z, cube_tmpl);
       break;
     case SHAPE_L2:
-      add_cube (-1, 0, 1, x, y, z);
-      add_cube (-1, 0, 0, x, y, z);
-      add_cube (0, 0, 0, x, y, z);
-      add_cube (1, 0, 0, x, y, z);
+      add_cube (-1, 0, 1, x, y, z, cube_tmpl);
+      add_cube (-1, 0, 0, x, y, z, cube_tmpl);
+      add_cube (0, 0, 0, x, y, z, cube_tmpl);
+      add_cube (1, 0, 0, x, y, z, cube_tmpl);
       break;
     case SHAPE_T1:
-      add_cube (0, 0, 1, x, y, z);
-      add_cube (-1, 0, 0, x, y, z);
-      add_cube (0, 0, 0, x, y, z);
-      add_cube (1, 0, 0, x, y, z);
+      add_cube (0, 0, 1, x, y, z, cube_tmpl);
+      add_cube (-1, 0, 0, x, y, z, cube_tmpl);
+      add_cube (0, 0, 0, x, y, z, cube_tmpl);
+      add_cube (1, 0, 0, x, y, z, cube_tmpl);
       break;
     case SHAPE_T2:
-      add_cube (0, 0, 1, x, y, z);
-      add_cube (0, 0, 0, x, y, z);
-      add_cube (-1, 0, -1, x, y, z);
-      add_cube (0, 0, -1, x, y, z);
-      add_cube (1, 0, -1, x, y, z);
+      add_cube (0, 0, 1, x, y, z, cube_tmpl);
+      add_cube (0, 0, 0, x, y, z, cube_tmpl);
+      add_cube (-1, 0, -1, x, y, z, cube_tmpl);
+      add_cube (0, 0, -1, x, y, z, cube_tmpl);
+      add_cube (1, 0, -1, x, y, z, cube_tmpl);
       break;
     case SHAPE_FLAT:
-      add_cube (0, 0, 0, x, y, z);
-      add_cube (1, 0, 0, x, y, z);
-      add_cube (0, 1, 0, x, y, z);
-      add_cube (1, 1, 0, x, y, z);
+      shift_rotate.Set (.5, .5, .5);
+      add_cube (0, 0, 0, x, y, z, cube_tmpl);
+      add_cube (1, 0, 0, x, y, z, cube_tmpl);
+      add_cube (0, 1, 0, x, y, z, cube_tmpl);
+      add_cube (1, 1, 0, x, y, z, cube_tmpl);
       break;
     case SHAPE_CUBE:
       shift_rotate.Set (.5, .5, .5);
-      add_cube (0, 0, 0, x, y, z);
-      add_cube (1, 0, 0, x, y, z);
-      add_cube (0, 1, 0, x, y, z);
-      add_cube (1, 1, 0, x, y, z);
-      add_cube (0, 0, 1, x, y, z);
-      add_cube (1, 0, 1, x, y, z);
-      add_cube (0, 1, 1, x, y, z);
-      add_cube (1, 1, 1, x, y, z);
+      add_cube (0, 0, 0, x, y, z, cube_tmpl);
+      add_cube (1, 0, 0, x, y, z, cube_tmpl);
+      add_cube (0, 1, 0, x, y, z, cube_tmpl);
+      add_cube (1, 1, 0, x, y, z, cube_tmpl);
+      add_cube (0, 0, 1, x, y, z, cube_tmpl);
+      add_cube (1, 0, 1, x, y, z, cube_tmpl);
+      add_cube (0, 1, 1, x, y, z, cube_tmpl);
+      add_cube (1, 1, 1, x, y, z, cube_tmpl);
       break;
     case SHAPE_U:
-      add_cube (-1, 0, 1, x, y, z);
-      add_cube (-1, 0, 0, x, y, z);
-      add_cube (0, 0, 0, x, y, z);
-      add_cube (1, 0, 0, x, y, z);
-      add_cube (1, 0, 1, x, y, z);
+      add_cube (-1, 0, 1, x, y, z, cube_tmpl);
+      add_cube (-1, 0, 0, x, y, z, cube_tmpl);
+      add_cube (0, 0, 0, x, y, z, cube_tmpl);
+      add_cube (1, 0, 0, x, y, z, cube_tmpl);
+      add_cube (1, 0, 1, x, y, z, cube_tmpl);
       break;
     case SHAPE_S:
-      add_cube (-1, 0, 1, x, y, z);
-      add_cube (-1, 0, 0, x, y, z);
-      add_cube (0, 0, 0, x, y, z);
-      add_cube (1, 0, 0, x, y, z);
-      add_cube (1, 0, -1, x, y, z);
+      add_cube (-1, 0, 1, x, y, z, cube_tmpl);
+      add_cube (-1, 0, 0, x, y, z, cube_tmpl);
+      add_cube (0, 0, 0, x, y, z, cube_tmpl);
+      add_cube (1, 0, 0, x, y, z, cube_tmpl);
+      add_cube (1, 0, -1, x, y, z, cube_tmpl);
       break;
     case SHAPE_L3:
       if (zone_dim <= 3) goto again;
-      add_cube (-1, 0, 1, x, y, z);
-      add_cube (-1, 0, 0, x, y, z);
-      add_cube (0, 0, 0, x, y, z);
-      add_cube (1, 0, 0, x, y, z);
-      add_cube (2, 0, 0, x, y, z);
+      add_cube (-1, 0, 1, x, y, z, cube_tmpl);
+      add_cube (-1, 0, 0, x, y, z, cube_tmpl);
+      add_cube (0, 0, 0, x, y, z, cube_tmpl);
+      add_cube (1, 0, 0, x, y, z, cube_tmpl);
+      add_cube (2, 0, 0, x, y, z, cube_tmpl);
       break;
     case SHAPE_T1X:
-      add_cube (0, 0, 1, x, y, z);
-      add_cube (-1, 0, 0, x, y, z);
-      add_cube (0, 0, 0, x, y, z);
-      add_cube (1, 0, 0, x, y, z);
-      add_cube (0, 1, 0, x, y, z);
+      add_cube (0, 0, 1, x, y, z, cube_tmpl);
+      add_cube (-1, 0, 0, x, y, z, cube_tmpl);
+      add_cube (0, 0, 0, x, y, z, cube_tmpl);
+      add_cube (1, 0, 0, x, y, z, cube_tmpl);
+      add_cube (0, 1, 0, x, y, z, cube_tmpl);
       break;
     case SHAPE_FLATX:
       shift_rotate.Set (.5, .5, .5);
-      add_cube (0, 0, 0, x, y, z);
-      add_cube (1, 0, 0, x, y, z);
-      add_cube (0, 1, 0, x, y, z);
-      add_cube (1, 1, 0, x, y, z);
-      add_cube (0, 0, 1, x, y, z);
+      add_cube (0, 0, 0, x, y, z, cube_tmpl);
+      add_cube (1, 0, 0, x, y, z, cube_tmpl);
+      add_cube (0, 1, 0, x, y, z, cube_tmpl);
+      add_cube (1, 1, 0, x, y, z, cube_tmpl);
+      add_cube (0, 0, 1, x, y, z, cube_tmpl);
       break;
     case SHAPE_FLATXX:
       shift_rotate.Set (.5, .5, .5);
-      add_cube (0, 0, 0, x, y, z);
-      add_cube (1, 0, 0, x, y, z);
-      add_cube (0, 1, 0, x, y, z);
-      add_cube (1, 1, 0, x, y, z);
-      add_cube (0, 0, 1, x, y, z);
-      add_cube (1, 1, 1, x, y, z);
+      add_cube (0, 0, 0, x, y, z, cube_tmpl);
+      add_cube (1, 0, 0, x, y, z, cube_tmpl);
+      add_cube (0, 1, 0, x, y, z, cube_tmpl);
+      add_cube (1, 1, 0, x, y, z, cube_tmpl);
+      add_cube (0, 0, 1, x, y, z, cube_tmpl);
+      add_cube (1, 1, 1, x, y, z, cube_tmpl);
       break;
     default: break;
   }
@@ -709,70 +856,70 @@ void Blocks::start_demo_shape (BlShapeType type, float x, float y, float z)
   switch (type)
   {
     case SHAPE_DEMO_B:
-      add_cube_thing (demo_room, -1, 0, -2, x, y, z);
-      add_cube_thing (demo_room, -1, 0, -1, x, y, z);
-      add_cube_thing (demo_room, -1, 0,  0, x, y, z);
-      add_cube_thing (demo_room, -1, 0,  1, x, y, z);
-      add_cube_thing (demo_room, -1, 0,  2, x, y, z);
-      add_cube_thing (demo_room,  0, 0, -2, x, y, z);
-      add_cube_thing (demo_room,  0, 0,  0, x, y, z);
-      add_cube_thing (demo_room,  0, 0,  2, x, y, z);
-      add_cube_thing (demo_room,  1, 0, -1, x, y, z);
-      add_cube_thing (demo_room,  1, 0,  1, x, y, z);
+      add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0,  2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  0, 0, -2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  0, 0,  0, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  0, 0,  2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  1, 0, -1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  1, 0,  1, x, y, z, cube_tmpl);
       break;
     case SHAPE_DEMO_L:
-      add_cube_thing (demo_room, -1, 0, -2, x, y, z);
-      add_cube_thing (demo_room, -1, 0, -1, x, y, z);
-      add_cube_thing (demo_room, -1, 0,  0, x, y, z);
-      add_cube_thing (demo_room, -1, 0,  1, x, y, z);
-      add_cube_thing (demo_room, -1, 0,  2, x, y, z);
-      add_cube_thing (demo_room,  0, 0,  -2, x, y, z);
-      add_cube_thing (demo_room,  1, 0,  -2, x, y, z);
+      add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0,  2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  0, 0,  -2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  1, 0,  -2, x, y, z, cube_tmpl);
       break;
     case SHAPE_DEMO_O:
-      add_cube_thing (demo_room, -1, 0, -2, x, y, z);
-      add_cube_thing (demo_room, -1, 0, -1, x, y, z);
-      add_cube_thing (demo_room, -1, 0,  0, x, y, z);
-      add_cube_thing (demo_room, -1, 0,  1, x, y, z);
-      add_cube_thing (demo_room, -1, 0,  2, x, y, z);
-      add_cube_thing (demo_room,  0, 0, -2, x, y, z);
-      add_cube_thing (demo_room,  0, 0,  2, x, y, z);
-      add_cube_thing (demo_room,  1, 0, -2, x, y, z);
-      add_cube_thing (demo_room,  1, 0, -1, x, y, z);
-      add_cube_thing (demo_room,  1, 0,  0, x, y, z);
-      add_cube_thing (demo_room,  1, 0,  1, x, y, z);
-      add_cube_thing (demo_room,  1, 0,  2, x, y, z);
+      add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0,  2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  0, 0, -2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  0, 0,  2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  1, 0, -2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  1, 0, -1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  1, 0,  0, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  1, 0,  1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  1, 0,  2, x, y, z, cube_tmpl);
       break;
     case SHAPE_DEMO_C:
-      add_cube_thing (demo_room, -1, 0, -1, x, y, z);
-      add_cube_thing (demo_room, -1, 0,  0, x, y, z);
-      add_cube_thing (demo_room, -1, 0,  1, x, y, z);
-      add_cube_thing (demo_room,  0, 0, -2, x, y, z);
-      add_cube_thing (demo_room,  0, 0,  2, x, y, z);
-      add_cube_thing (demo_room,  1, 0, -2, x, y, z);
-      add_cube_thing (demo_room,  1, 0,  2, x, y, z);
+      add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  0, 0, -2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  0, 0,  2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  1, 0, -2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  1, 0,  2, x, y, z, cube_tmpl);
       break;
     case SHAPE_DEMO_K:
-      add_cube_thing (demo_room, -1, 0, -2, x, y, z);
-      add_cube_thing (demo_room, -1, 0, -1, x, y, z);
-      add_cube_thing (demo_room, -1, 0,  0, x, y, z);
-      add_cube_thing (demo_room, -1, 0,  1, x, y, z);
-      add_cube_thing (demo_room, -1, 0,  2, x, y, z);
-      add_cube_thing (demo_room,  0, 0, -1, x, y, z);
-      add_cube_thing (demo_room,  0, 0,  1, x, y, z);
-      add_cube_thing (demo_room,  1, 0, -2, x, y, z);
-      add_cube_thing (demo_room,  1, 0,  2, x, y, z);
+      add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0,  2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  0, 0, -1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  0, 0,  1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  1, 0, -2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  1, 0,  2, x, y, z, cube_tmpl);
       break;
     case SHAPE_DEMO_S:
-      add_cube_thing (demo_room,  1, 0, -1, x, y, z);
-      add_cube_thing (demo_room,  1, 0,  0, x, y, z);
-      add_cube_thing (demo_room,  1, 0,  2, x, y, z);
-      add_cube_thing (demo_room,  0, 0, -2, x, y, z);
-      add_cube_thing (demo_room,  0, 0,  0, x, y, z);
-      add_cube_thing (demo_room,  0, 0,  2, x, y, z);
-      add_cube_thing (demo_room, -1, 0, -2, x, y, z);
-      add_cube_thing (demo_room, -1, 0,  0, x, y, z);
-      add_cube_thing (demo_room, -1, 0,  1, x, y, z);
+      add_cube_thing (demo_room,  1, 0, -1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  1, 0,  0, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  1, 0,  2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  0, 0, -2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  0, 0,  0, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  0, 0,  2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl);
       break;
     default: break;
   }
@@ -931,8 +1078,22 @@ void Blocks::HandleGameKey (int key, bool shift, bool alt, bool ctrl)
   }
 }
 
-void Blocks::HandleKeyConfigKey (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/)
+void Blocks::HandleKeyConfigKey (int key, bool shift, bool alt, bool ctrl)
 {
+  if (waiting_for_key)
+  {
+    if (!key || key == CSKEY_SHIFT || key == CSKEY_ALT || key == CSKEY_CTRL) return;
+    KeyMapping* map = (KeyMapping*)(keyconf_menu->GetSelectedData ());
+    map->key = key;
+    map->shift = shift;
+    map->alt = alt;
+    map->ctrl = ctrl;
+    keyconf_menu->ReplaceSelected (keyconf_menu->GetSelectedText (),
+    	KeyName (*map), map);
+    waiting_for_key = false;
+    keyconf_menu->HilightSelected (false);
+    return;
+  }
   switch (key)
   {
     case CSKEY_UP:
@@ -942,9 +1103,12 @@ void Blocks::HandleKeyConfigKey (int key, bool /*shift*/, bool /*alt*/, bool /*c
       keyconf_menu->SelDown ();
       break;
     case CSKEY_ENTER:
+      waiting_for_key = true;
+      keyconf_menu->HilightSelected (true);
       break;
     case CSKEY_ESC:
       screen = SCREEN_STARTUP;
+      WriteConfig ();
       break;
   }
 }
@@ -1036,7 +1200,7 @@ void Blocks::HandleKey (int key, bool shift, bool alt, bool ctrl)
     HandleKeyConfigKey (key, shift, alt, ctrl);
   else if (screen == SCREEN_STARTUP)
     HandleDemoKey (key, shift, alt, ctrl);
-  else
+  else // GAME and GAMEOVER
     HandleGameKey (key, shift, alt, ctrl);
 }
 
@@ -1084,6 +1248,18 @@ void Blocks::rotate_shape_internal (const csMatrix3& rot)
   shift_rotate = new_shift_rot;
 }
 
+csTextureHandle* Blocks::GetTextureForHeight (int z)
+{
+  switch (z % 4)
+  {
+    case 0: return cubef1_txt;
+    case 1: return cubef2_txt;
+    case 2: return cubef3_txt;
+    case 3: return cubef4_txt;
+  }
+  return cube_txt;
+}
+
 void Blocks::freeze_shape ()
 {
   int i;
@@ -1100,7 +1276,17 @@ void Blocks::freeze_shape ()
     // Before we let go of the shape (lose the pointer to it) we set it's
     // name according to it's position.
     cube_info[i].thing->SetName (cubename); 
-    if (z >= GAMEOVER_HEIGHT) gameover = true;
+    ChangeThingTexture (cube_info[i].thing, GetTextureForHeight (z));
+    if (z >= GAMEOVER_HEIGHT)
+    {
+      screen = SCREEN_GAMEOVER;
+      int level;
+      if (difficulty == NUM_EASY_SHAPE) level = 0;
+      else if (difficulty == NUM_MEDIUM_SHAPE) level = 1;
+      else level = 2;
+      highscores[level][zone_dim-3].RegisterScore ("me", score);
+      WriteConfig ();
+    }
   }
 }
 
@@ -1188,7 +1374,7 @@ void Blocks::updateScore (void)
     if (filled_planes[i])
     {
       increase++;
-      cur_speed += .05;
+      cur_speed += .03;
       if (cur_speed > MAX_SPEED) cur_speed = MAX_SPEED;
     }
   }
@@ -1367,7 +1553,7 @@ void Blocks::HandleMovement (time_t elapsed_time)
   if (transition) { HandleTransition (elapsed_time); return; }
 
   if (pause) return;
-  if (gameover) return;
+  if (screen == SCREEN_GAMEOVER) return;
 
   HandleGameMovement (elapsed_time);
 }
@@ -1384,6 +1570,15 @@ void Blocks::InitTextures ()
     csLoader::LoadTexture (Sys->world, "raster", "clouds_thick1.jpg"));
   csLoader::LoadTexture (Sys->world, "room", "mystone2.gif");
   csLoader::LoadTexture (Sys->world, "clouds", "clouds.gif");
+
+  Sys->set_cube_f1_texture (
+    csLoader::LoadTexture (Sys->world, "cubef1", "cubef1.gif"));
+  Sys->set_cube_f2_texture (
+    csLoader::LoadTexture (Sys->world, "cubef2", "cubef2.gif"));
+  Sys->set_cube_f3_texture (
+    csLoader::LoadTexture (Sys->world, "cubef3", "cubef3.gif"));
+  Sys->set_cube_f4_texture (
+    csLoader::LoadTexture (Sys->world, "cubef4", "cubef4.gif"));
 
   csLoader::LoadTexture (Sys->world, "menu_back", "back.gif");
   csLoader::LoadTexture (Sys->world, "menu_novice", "novice.gif");
@@ -1491,6 +1686,7 @@ void Blocks::ChangePlaySize (int new_size)
   int idx = Sys->world->sectors.Find ((csSome)room);
   Sys->world->sectors.Delete (idx);
   zone_dim = new_size;
+  WriteConfig ();
   InitGameRoom ();
   room->Prepare ();
   room->InitLightMaps (false);
@@ -1501,11 +1697,28 @@ void Blocks::ChangePlaySize (int new_size)
 void Blocks::StartKeyConfig ()
 {
   initscreen = false;
+  waiting_for_key = false;
   delete keyconf_menu;
   keyconf_menu = new TextEntryMenu ();
-  keyconf_menu->Add ("text1", "entry1", NULL);
-  keyconf_menu->Add ("text2", "entry2", NULL);
-  keyconf_menu->Add ("text3", "entry3", NULL);
+  keyconf_menu->Add ("shape up", KeyName (key_up), (void*)&key_up);
+  keyconf_menu->Add ("shape down", KeyName (key_down), (void*)&key_down);
+
+  keyconf_menu->Add ("shape left", KeyName (key_left), (void*)&key_left);
+  keyconf_menu->Add ("shape right", KeyName (key_right), (void*)&key_right);
+  keyconf_menu->Add ("rotate pos x", KeyName (key_rotpx), (void*)&key_rotpx);
+  keyconf_menu->Add ("rotate min x", KeyName (key_rotmx), (void*)&key_rotmx);
+  keyconf_menu->Add ("rotate pos y", KeyName (key_rotpy), (void*)&key_rotpy);
+  keyconf_menu->Add ("rotate min y", KeyName (key_rotmy), (void*)&key_rotmy);
+  keyconf_menu->Add ("rotate pos z", KeyName (key_rotpz), (void*)&key_rotpz);
+  keyconf_menu->Add ("rotate min z", KeyName (key_rotmz), (void*)&key_rotmz);
+  keyconf_menu->Add ("camera left", KeyName (key_viewleft), (void*)&key_viewleft);
+  keyconf_menu->Add ("camera right", KeyName (key_viewright), (void*)&key_viewright);
+  keyconf_menu->Add ("camera up", KeyName (key_viewup), (void*)&key_viewup);
+  keyconf_menu->Add ("camera down", KeyName (key_viewdown), (void*)&key_viewdown);
+  keyconf_menu->Add ("zoom in", KeyName (key_zoomin), (void*)&key_zoomin);
+  keyconf_menu->Add ("zoom out", KeyName (key_zoomout), (void*)&key_zoomout);
+  keyconf_menu->Add ("drop", KeyName (key_drop), (void*)&key_drop);
+  keyconf_menu->Add ("pause", KeyName (key_pause), (void*)&key_pause);
   keyconf_menu->SetSelected (0);
 }
 
@@ -1717,19 +1930,18 @@ void Blocks::checkForPlane ()
       for (y=0 ; y<zone_dim ; y++)
       {
 	// If one cube is missing we don't have a plane.
-	if (!get_cube (x,y,z)) plane_hit = false; 
+	if (!get_cube (x,y,z)) { plane_hit = false; break; }
       }
-      if (plane_hit)
-      {
-	// We've got at least one plane, switch to transition mode.
-	transition = true;
-	filled_planes[z] = true;
-        removePlane (z);
-        // That's how much all the cubes above the plane will lower.
-        move_down_todo = CUBE_DIM;
-        updateScore ();
-        Sys->Printf (MSG_DEBUG_0, "\nthe score is %i", score);
-      }
+    if (plane_hit)
+    {
+      // We've got at least one plane, switch to transition mode.
+      transition = true;
+      filled_planes[z] = true;
+      removePlane (z);
+      // That's how much all the cubes above the plane will lower.
+      move_down_todo = CUBE_DIM;
+      updateScore ();
+    }
   }
 }
 
@@ -1741,20 +1953,17 @@ void Blocks::removePlane (int z)
   for (x=0 ; x<zone_dim ; x++)
     for (y=0 ; y<zone_dim ; y++)
     {
-      sprintf (temp, "cubeAt%d%d%d", x, y, z);
       // Physically remove it.
+      sprintf (temp, "cubeAt%d%d%d", x, y, z);
       room->RemoveThing (room->GetThing (temp));
-    }
-
-  for (x=0 ; x<zone_dim ; x++)
-    for (y=0 ; y<zone_dim ; y++)
       // And then remove it from game_cube[][][].
       set_cube (x, y, z, false);
+    }
 }
 
 void Blocks::HandleTransition (time_t elapsed_time)
 {
-  if (gameover) return;
+  if (screen == SCREEN_GAMEOVER) return;
   int i;
   transition = false;
 
@@ -1768,7 +1977,11 @@ void Blocks::HandleTransition (time_t elapsed_time)
       break;
     }
   }
-  if (!transition) StartNewShape ();
+  if (!transition)
+  {
+    move_down_todo = 0;
+    StartNewShape ();
+  }
 }
 
 
@@ -1789,10 +2002,9 @@ void Blocks::HandleLoweringPlanes (time_t elapsed_time)
   if (!move_down_todo)
   {
     // We finished handling this plane.
-    filled_planes[gone_z] = false;
 
     // We lower the planes (in case the player made more then one plane).
-    for (i=gone_z+1 ; i<ZONE_HEIGHT-1 ; i++)
+    for (i=gone_z ; i<ZONE_HEIGHT-1 ; i++)
       filled_planes[i] = filled_planes[i+1];
     filled_planes[ZONE_HEIGHT] = false; // And the last one.
 
@@ -1809,6 +2021,7 @@ void Blocks::HandleLoweringPlanes (time_t elapsed_time)
 	  {
             sprintf (temp, "cubeAt%d%d%d", x, y, z-1);
 	    t->SetName (temp);
+	    ChangeThingTexture (t, GetTextureForHeight (z-1));
 	  }
 	}
 
@@ -1816,6 +2029,9 @@ void Blocks::HandleLoweringPlanes (time_t elapsed_time)
     for (x=0 ; x<zone_dim ; x++)
       for (y=0 ; y<zone_dim ; y++)
         set_cube (x, y, ZONE_HEIGHT-1, false);
+    // Set movement for next plane (if needed).
+    move_down_todo = CUBE_DIM;
+    return;
   }
 
   if (elapsed_fall > move_down_todo) elapsed_fall = move_down_todo;
@@ -1865,9 +2081,8 @@ void Blocks::NextFrame (time_t elapsed_time, time_t current_time)
   if (screen == SCREEN_KEYCONFIG)
   {
     if (initscreen) StartKeyConfig ();
-    HandleMovement (elapsed_time);
     if (!Gfx3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
-    keyconf_menu->Draw ();
+    keyconf_menu->Draw (elapsed_time);
     Gfx3D->FinishDraw ();
     Gfx3D->Print (NULL);
     return;
@@ -1889,7 +2104,7 @@ void Blocks::NextFrame (time_t elapsed_time, time_t current_time)
   Gfx2D->Write (10, Sys->FrameHeight-20, white, black, scorebuf);
 
   // Game over!
-  if (gameover)
+  if (screen == SCREEN_GAMEOVER)
   {
     Gfx2D->Write (10, Sys->FrameHeight/2, white, black, "GAME OVER!");
   }
@@ -2052,6 +2267,20 @@ void Blocks::ReadConfig ()
   NamedKey (keys.GetStr ("Keys", "VIEWDOWN", "end"), key_viewdown);
   NamedKey (keys.GetStr ("Keys", "ZOOMIN", "ins"), key_zoomin);
   NamedKey (keys.GetStr ("Keys", "ZOOMOUT", "pgup"), key_zoomout);
+  zone_dim = keys.GetInt ("Game", "PLAYSIZE", 5);
+  int level, size, i;
+  for (level = 0 ; level <= 2 ; level++)
+    for (size = 3 ; size <= 6 ; size++)
+    {
+      char key[50];
+      for (i = 0 ; i < 10 ; i++)
+      {
+        sprintf (key, "Score%d_%dx%d_%d", level, size, size, i);
+        highscores[level][size-3].Set (i, keys.GetInt ("HighScores", key, -1));
+        sprintf (key, "Name%d_%dx%d_%d", level, size, size, i);
+        highscores[level][size-3].SetName (i, keys.GetStr ("HighScores", key, NULL));
+      }
+    }
 }
 
 void Blocks::WriteConfig ()
@@ -2076,6 +2305,21 @@ void Blocks::WriteConfig ()
   keys.SetStr ("Keys", "VIEWDOWN", KeyName (key_viewdown));
   keys.SetStr ("Keys", "ZOOMIN", KeyName (key_zoomin));
   keys.SetStr ("Keys", "ZOOMOUT", KeyName (key_zoomout));
+  keys.SetInt ("Game", "PLAYSIZE", zone_dim);
+  int level, size, i;
+  for (level = 0 ; level <= 2 ; level++)
+    for (size = 3 ; size <= 6 ; size++)
+    {
+      char key[50];
+      for (i = 0 ; i < 10 ; i++)
+        if (highscores[level][size-3].Get (i) != -1)
+        {
+          sprintf (key, "Score%d_%dx%d_%d", level, size, size, i);
+          keys.SetInt ("HighScores", key, highscores[level][size-3].Get (i));
+          sprintf (key, "Name%d_%dx%d_%d", level, size, size, i);
+	  keys.SetStr ("HighScores", key, highscores[level][size-3].GetName (i));
+        }
+    }
   keys.Save ("blocks.cfg");
 }
 

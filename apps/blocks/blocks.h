@@ -61,15 +61,15 @@ enum BlShapeType
   SHAPE_R1,
   SHAPE_R2,
   SHAPE_R3,
-  SHAPE_R4,
   SHAPE_L1,
   SHAPE_L2,
   SHAPE_T1,
-  SHAPE_T2,
   SHAPE_FLAT,
   SHAPE_CUBE,
   SHAPE_L3,
+  SHAPE_R4,
   SHAPE_U,
+  SHAPE_T2,
   SHAPE_S,
   SHAPE_T1X,
   SHAPE_FLATX,
@@ -130,6 +130,7 @@ enum BlShapeType
 #define SCREEN_STARTUP 1
 #define SCREEN_GAME 2
 #define SCREEN_KEYCONFIG 3
+#define SCREEN_GAMEOVER 4
 
 struct CubeInfo
 {
@@ -151,18 +152,45 @@ private:
   TextEntry* last;
   int num_entries;
   int selected;
+  bool hisel;
+  float time_left;
+
+  TextEntry* GetEntry (int num);
 
 public:
-  TextEntryMenu () { entries = last = NULL; num_entries = 0; selected = 0; }
+  TextEntryMenu ();
   ~TextEntryMenu ();
   void Clear ();
   void Add (const char* txt, const char* entry, void* userdata);
-  void Draw ();
+  void ReplaceSelected (const char* txt, const char* entry, void* userdata);
+  void HilightSelected (bool sel) { hisel = sel; }
+  void Draw (time_t elapsed_time);
   int GetSelected () { return selected; }
+  void* GetSelectedData ();
+  char* GetSelectedText ();
+  char* GetSelectedEntry ();
   int GetNumEntries () { return num_entries; }
   void SetSelected (int sel) { selected = sel; }
   void SelDown () { selected++; if (selected >= num_entries) selected = num_entries-1; }
   void SelUp () { selected--; if (selected < 0) selected = 0; }
+};
+
+class HighScore
+{
+public:
+  char* names[10];
+  int scores[10];
+
+public:
+  HighScore ();
+  ~HighScore ();
+
+  int Get (int i) { return scores[i]; }
+  void Set (int i, int value) { scores[i] = value; }
+  char* GetName (int i) { return names[i]; }
+  void SetName (int i, const char* name);
+  bool RegisterScore (const char* name, int score);
+  bool CheckScore (int score);
 };
 
 class Blocks : public SysSystemDriver
@@ -173,6 +201,10 @@ private:
   csThingTemplate* vrast_tmpl;
   csThingTemplate* hrast_tmpl;
   csTextureHandle* cube_txt;
+  csTextureHandle* cubef1_txt;
+  csTextureHandle* cubef2_txt;
+  csTextureHandle* cubef3_txt;
+  csTextureHandle* cubef4_txt;
   csTextureHandle* pillar_txt;
   csTextureHandle* raster_txt;
   csSector* room;
@@ -190,6 +222,11 @@ private:
   csMatrix3 full_rotate_z;
   csMatrix3 full_rotate_z_reverse;
 
+  // First dimension is level (0=novice, 1=average, 2=expert).
+  // Second dimension is play size (0=3x3, 1=4x4, 2=5x5, 3=6x6).
+  HighScore highscores[3][4];
+  int score;
+
   // For the menu.
   csThing* menus[MAX_MENUS];
   int idx_menus[MAX_MENUS];
@@ -198,7 +235,9 @@ private:
   int old_cur_menu;
   float menu_todo;
   int num_menus;	// Current number of active menu entries.
+
   TextEntryMenu* keyconf_menu;
+  bool waiting_for_key;
 
   csVector3 view_origin;
 
@@ -289,9 +328,6 @@ private:
   // 'cause we are playing.
   bool initscreen;
 
-  // If true we have Game Over.
-  bool gameover;
-
   // Type of screen we are using (one of SCREEN_xxx).
   int screen;
 
@@ -313,8 +349,6 @@ private:
 
   // This is the z of the plane which's dissapearance is handled right now.
   int gone_z;
-
-  int score;
 
   // Keys...
   KeyMapping key_up;
@@ -379,10 +413,12 @@ public:
   void HandleKeyConfigKey (int key, bool shift, bool alt, bool ctrl);
 
   // Creating cubes and other geometry.
-  csThing* create_cube_thing (float dx, float dy, float dz);
+  csThing* create_cube_thing (float dx, float dy, float dz,
+  	csThingTemplate* tmpl);
   csThing* add_cube_thing (csSector* sect, float dx, float dy, float dz,
-  	float x, float y, float z);
-  void add_cube (float dx, float dy, float dz, float x, float y, float z);
+  	float x, float y, float z, csThingTemplate* tmpl);
+  void add_cube (float dx, float dy, float dz, float x, float y, float z,
+  	csThingTemplate* tmpl);
   void add_pillar (int x, int y);
   void add_vrast (int x, int y, float dx, float dy, float rot_z);
   void add_hrast (int x, int y, float dx, float dy, float rot_z);
@@ -395,8 +431,14 @@ public:
 
   // Default textures for geometry.
   void set_cube_texture (csTextureHandle* ct) { cube_txt = ct; }
+  void set_cube_f1_texture (csTextureHandle* ct) { cubef1_txt = ct; }
+  void set_cube_f2_texture (csTextureHandle* ct) { cubef2_txt = ct; }
+  void set_cube_f3_texture (csTextureHandle* ct) { cubef3_txt = ct; }
+  void set_cube_f4_texture (csTextureHandle* ct) { cubef4_txt = ct; }
   void set_pillar_texture (csTextureHandle* ct) { pillar_txt = ct; }
   void set_raster_texture (csTextureHandle* ct) { raster_txt = ct; }
+  void ChangeThingTexture (csThing* thing, csTextureHandle* txt);
+  csTextureHandle* GetTextureForHeight (int z);
 
   // Handle all time dependent movement of the game and menu.
   // This function will call some of the Handle... routines below.
