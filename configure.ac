@@ -169,12 +169,14 @@ AC_CHECK_PROGS([MAKE], [gnumake gmake make])
 # MSVC, Mingw/MSYS, and Cygwin users.
 #------------------------------------------------------------------------------
 AC_CHECK_TOOLS([CSLIBS_CONFIG], [cslibs-config])
+AS_IF([test $ac_compiler_gnu = yes],
+    [cs_cv_csconfig_compileflag="--compiler gcc-`$CXX -dumpversion`"])
 AC_CACHE_CHECK([for cslibs package], [cs_cv_cslibs],
     [AS_IF([test -n "$CSLIBS_CONFIG"],
 	[cs_cv_cslibs=yes
-	cs_cv_cslibs_cflags=`AC_RUN_LOG([$CSLIBS_CONFIG --cflags])`
-	cs_cv_cslibs_lflags=`AC_RUN_LOG([$CSLIBS_CONFIG --lflags])`
-	cs_cv_cslibs_binpath=`AC_RUN_LOG([$CSLIBS_CONFIG --binpath])`],
+	cs_cv_cslibs_cflags=`AC_RUN_LOG([$CSLIBS_CONFIG --cflags $cs_cv_csconfig_compileflag])`
+	cs_cv_cslibs_lflags=`AC_RUN_LOG([$CSLIBS_CONFIG --lflags $cs_cv_csconfig_compileflag])`
+	cs_cv_cslibs_binpath=`AC_RUN_LOG([$CSLIBS_CONFIG --binpath $cs_cv_csconfig_compileflag])`],
 	[cs_cv_cslibs=no])])
 AS_IF([test $cs_cv_cslibs = yes],
     [CFLAGS="$CFLAGS $cs_cv_cslibs_cflags"

@@ -14,6 +14,10 @@ chronological order.
 	- res made some small comment changes in ivideo/shader/shader.h and
 	  csutil/csuctransform.h.
 	- Remi Bonnet added DeleteElement and NextNoAdvance to csHash.
+	- res augmented the cslibs configure check to pass a "--compiler" flag
+	  along to cslibs-config. This will be utilized by the next
+	  cs-win32libs version to choose correct compiler-specific libs.
+	- res updated the docs for a new cs-win32libs release.
 13-Jun-2004
 	- res changed the Win32 thread error reporting to be less 
 	  macro-centric.
