@@ -197,18 +197,18 @@ struct iRigidBody : public iBase
   /// Add a collider with a associated friction coefficient
   virtual bool AttachColliderMesh (iMeshWrapper* mesh,
   	const csOrthoTransform& trans, float friction, float density,
-	float elasticity, float softness) = 0;
+	float elasticity, float softness = 0.316f) = 0;
   /// Cylinder orientated along its local z axis
   virtual bool AttachColliderCylinder (float length, float radius,
   	const csOrthoTransform& trans, float friction, float density,
-	float elasticity, float softness) = 0;
+	float elasticity, float softness = 0.316f) = 0;
   virtual bool AttachColliderBox (const csVector3 &size,
   	const csOrthoTransform& trans, float friction, float density,
-	float elasticity, float softness) = 0;
+	float elasticity, float softness = 0.316f) = 0;
   virtual bool AttachColliderSphere (float radius, const csVector3 &offset,
-  	float friction, float density, float elasticity, float softness) = 0;
+  	float friction, float density, float elasticity, float softness = 0.316f) = 0;
   virtual bool AttachColliderPlane (const csPlane3 &plane, float friction,
-    float density, float elasticity, float softness) = 0;
+    float density, float elasticity, float softness = 0.316f) = 0;
 
   /// Set the position
   virtual void SetPosition (const csVector3& trans) = 0;
