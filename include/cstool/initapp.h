@@ -28,6 +28,9 @@
  * @{ */
 
 #include "cstypes.h"
+#include "csutil/array.h"
+#include "csutil/csstring.h"
+#include "csutil/scf.h"
 #include "iutil/evdefs.h"
 
 struct iObjectRegistry;
@@ -91,6 +94,39 @@ struct iVFS;
  * Function to handle events for apps.
  */
 typedef bool (*csEventHandlerFunc) (iEvent&);
+
+
+/**
+ * This class represents a single plugin request for
+ * csInitializer::RequestPlugins().  As a shortcut, rather than constructing a
+ * csPluginRequest with individual arguments, you can use CS_REQUEST_PLUGIN()
+ * or one of its derivatives, such as CS_REQUEST_VFS.  For example:
+ * \code
+ * csPluginRequest r1(CS_REQUEST_VFS);
+ * csPluginRequest r2(CS_REQUEST_PLUGIN("myproj.foobar",iFoobar));
+ * \endcode
+ */
+class csPluginRequest
+{
+private:
+  csString class_name;
+  csString interface_name;
+  scfInterfaceID interface_id;
+  int interface_version;
+  void set(csPluginRequest const&);
+public:
+  csPluginRequest(csString class_name, csString interface_name,
+    scfInterfaceID interface_id, int interface_version);
+  csPluginRequest(csPluginRequest const& r) { set(r); }
+  csPluginRequest& operator=(csPluginRequest const& r) {set(r); return *this;}
+  bool operator==(csPluginRequest const&) const;
+  bool operator!=(csPluginRequest const& r) const { return !operator==(r); }
+  csString GetClassName() const { return class_name; }
+  csString GetInterfaceName() const { return interface_name; }
+  scfInterfaceID GetInterfaceID() const { return interface_id; }
+  int GetInterfaceVersion() const { return interface_version; }
+};
+
 
 /**
  * This class contains several static member functions that can help
@@ -217,16 +253,38 @@ public:
           const char* pluginID = "crystalspace.kernel.vfs");
 
   /**
-   * Request a few widely used standard plugins and also read
-   * the standard config file and command line for potential other plugins.
-   * This routine must be called before Initialize().
+   * Request a few widely used standard plugins and also read the standard
+   * configuration file and command line for potential other plugins.  This
+   * routine must be called before Initialize().
    * <p>
-   * The variable arguments should contain three entries for every
-   * plugin you want to load: name, scfID, and version. To make this
-   * easier it is recommended you use one of the CS_REQUEST_xxx macros
-   * above. <b>WARNING</b> Make sure to end the list with #CS_REQUEST_END!
+   * The variable arguments should contain four entries for every plugin you
+   * want to load: SCF class name, SCF interface name, inteface ID, and
+   * interface version. To make this easier it is recommended you use one of
+   * the CS_REQUEST_xxx macros above. <b>WARNING</b> Make sure to end the list
+   * with CS_REQUEST_END!
    */
   static bool RequestPlugins (iObjectRegistry*, ...);
+
+  /**
+   * Request a few widely used standard plugins and also read the standard
+   * configuration file and command line for potential other plugins.  This
+   * routine must be called before Initialize().
+   * <p>
+   * Unlike the variable-argument RequestPlugins(...) method which expects you
+   * to know the list of requested plugins at compile-time, this overload
+   * allows you to construct an array of plugins at run-time.  You do this by
+   * constructing a csArray<> of csPluginRequest records.  For example:
+   * \code
+   * csArray<csPluginRequest> a;
+   * a.Push(csPluginRequest(CS_REQUEST_VFS));
+   * a.Push(csPluginRequest(CS_REQUEST_ENGINE));
+   * a.Push(csPluginRequest(CS_REQUEST_PLUGIN("myproj.foobar",iFoobar)));
+   * csInitializer::RequestPlugins(registry,a);
+   * \endcode
+   * <b>WARNING</b> csArray<> already knows its own size, so do <b>not</b>
+   * terminate the list with CS_REQUEST_END.
+   */
+  static bool RequestPlugins(iObjectRegistry*,csArray<csPluginRequest> const&);
 
   /**
    * Send the cscmdSystemOpen command to all loaded plugins.

@@ -72,6 +72,35 @@
 static bool config_done = false;
 static iEventHandler* installed_event_handler = 0;
 
+csPluginRequest::csPluginRequest(
+  csString cname, csString iname, scfInterfaceID iid, int iver) :
+  class_name(cname),
+  interface_name(iname),
+  interface_id(iid),
+  interface_version(iver)
+{
+}
+
+void csPluginRequest::set(csPluginRequest const& r)
+{
+  if (&r != this)
+  {
+    class_name = r.class_name;
+    interface_name = r.interface_name;
+    interface_id = r.interface_id;
+    interface_version = r.interface_version;
+  }
+}
+
+bool csPluginRequest::operator==(csPluginRequest const& r) const
+{
+  return (&r == this) ||
+    (class_name == r.class_name &&
+    interface_name == r.interface_name &&
+    interface_id == r.interface_id &&
+    interface_version == r.interface_version);
+}
+
 iObjectRegistry* csInitializer::CreateEnvironment (
   int argc, char const* const argv[])
 {
@@ -250,37 +279,46 @@ bool csInitializer::SetupConfigManager (
 
 bool csInitializer::RequestPlugins (iObjectRegistry* r, ...)
 {
-  SetupConfigManager (r, 0);
-  SetupPluginLoadErrVerbosity(r);
-
-  csPluginLoader* plugldr = new csPluginLoader (r);
-
   va_list arg;
   va_start (arg, r);
-  char* plugName = va_arg (arg, char*);
+  csArray<csPluginRequest> reqs;
+  char const* plugName = va_arg (arg, char*);
   while (plugName != 0)
   {
     char* intName = va_arg (arg, char*);
     int scfId = va_arg (arg, scfInterfaceID);
     int version = va_arg (arg, int);
-    // scfId and version are unused for now.
-    (void)scfId; (void)version;
-    char* colon = strchr (plugName, ':');
-    if (colon)
-    {
-      // We have a special tag name.
-      char newPlugName[512];
-      strcpy (newPlugName, plugName);
-      *strchr (newPlugName, ':') = 0;
-      plugldr->RequestPlugin (newPlugName, colon+1);
-    }
-    else
-    {
-      plugldr->RequestPlugin (plugName, intName);
-    }
+    csPluginRequest req(plugName, intName, scfId, version);
+    reqs.Push(req);
     plugName = va_arg (arg, char*);
   }
   va_end (arg);
+  return RequestPlugins(r, reqs);
+}
+
+bool csInitializer::RequestPlugins (
+  iObjectRegistry* r, csArray<csPluginRequest> const& a)
+{
+  SetupConfigManager (r, 0);
+  SetupPluginLoadErrVerbosity(r);
+
+  csPluginLoader* plugldr = new csPluginLoader (r);
+
+  csArray<csPluginRequest>::Iterator i(a.GetIterator());
+  while (i.HasNext())
+  {
+    csPluginRequest const req(i.Next());
+    csString plugName = req.GetClassName();
+    csString intName = req.GetInterfaceName();
+    size_t const colon = plugName.FindFirst(':');
+    if (colon != (size_t)-1)
+    {
+      // We have a special tag name.
+      intName = plugName.Slice(colon + 1, plugName.Length() - colon);
+      plugName.Truncate(colon);
+    }
+    plugldr->RequestPlugin (plugName, intName);
+  }
 
   bool rc = plugldr->LoadPlugins ();
   delete plugldr;

@@ -6,6 +6,19 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+19-Dec-2003
+	- Eric Sunshine added the new method
+	  csInitializer::RequestPlugins(csArray<csPluginRequest> const&) to
+	  complement the existing variable-argument RequestPlugins(...).  The
+	  new method allows the list of plugins to be composed at run-time,
+	  whereas the old method required the list to be known at compile-time,
+	  which was not always convenient or possible.  For example, the
+	  scripting interfaces can not know the list of plugins at
+	  compile-time, so they have been forced to invoke RequestPlugins()
+	  once per plugin, which is semantically incorrect and causes plugin
+	  dependency logic to fail.  The new method will allow scripting
+	  interfaces to correctly invoke RequestPlugins() once only with the
+	  full list of requested plugins.
 18-Dec-2003
 	- Jorrit added two new methods to iAwsComponent. One to set the
 	  preferred size and one to clear it again. This way one can forcibly
@@ -25,14 +38,14 @@ chronological order.
 	  it didn't have some ingenious significance and I botched it up.
 	- Anders Stenberg made GL extension manager only print extension info
 	  when verbose mode is enabled.
-	- Philip Wyett added missing newline at the end of the file to shadermgr.cpp
-	  and xmlshader.h.
+	- Philip Wyett added missing newline at the end of the file to
+	  shadermgr.cpp and xmlshader.h.
 	- Anders Stenberg modified standard reporter to give a more easy to 
 	  read output to the console and to the yellow popup.
 	- Anders Stenberg fixed one more off-by-one problem in GL canvas with 
 	  NR. Blit was off one pixel along Y.
-	- res added GL_ARB_shading_language_100 and GL_ARB_shader_objects exts
-	  to the GL extension manager.
+	- res added GL_ARB_shading_language_100 and GL_ARB_shader_objects
+	  extensions to the GL extension manager.
 17-Dec-2003
 	- Jorrit fixed an initialition bug in the xmlshader compiler.
 	  It would not initialize the writemask which means that you could

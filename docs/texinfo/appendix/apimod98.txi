@@ -885,6 +885,9 @@ that you should now assign the result of @code{SCF_CREATE_INSTANCE()} to a
 The macros @code{SCF_SET_REF()}, @code{SCF_INC_REF()}, and @code{SCF_DEC_REF()}
 have been removed. Instead you should use @code{csRef<>}.
 
+The method @code{iSCF::GetInterfaceName(scfInterfaceID)} has been added to
+complement the existing @code{iSCF::GetInterfaceID()}.
+
 The query template class @code{scfInterface<>} has been introduced.  This class
 provides a means to query static information about @sc{scf} interfaces, such as
 an interface's version number.  Presently, this class allows access to the
@@ -1214,3 +1217,11 @@ The functionality provided by @code{WriteBaseline()} is now available by
 specifying the @samp{CS_WRITE_BASELINE} flag when calling 
 @code{iGraphics2D::Write()}. Hence, @code{WriteBaseline()} is superfluous and
 has been deprecated.
+
+@subheading csInitializer Changes
+
+@code{csInitializer::RequestPlugins(csArray<csPluginRequest>)} has been added
+to complement the existing @code{RequestPlugins(...)} which accepts a variable
+number of arguments.  The new overload allows the list of requested plugins to
+be composed at run-time, whereas the older variable-argument method required
+the list be known at compile-time, which was not always convenient or possible.
