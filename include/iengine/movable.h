@@ -54,38 +54,40 @@ struct iMovableListener : public iBase
 SCF_VERSION (iMovable, 0, 1, 2);
 
 /**
- * This interface describes the transformation between local object space
- * of some model and world space (i.e. where it is in the world). Movables
- * are attached to mesh objects (use iMeshWrapper->GetMovable()) to get
- * the movable belonging to some mesh.
+ * This interface represents the position and orientation of an object
+ * relative to its parent (this is the transformation between local object
+ * space of the model and world space (i.e. where it is in the world)).
+ * Movables are attached to objects (like meshes). For example, use
+ * iMeshWrapper->GetMovable()) to get the movable belonging to some mesh.
+ * <p>
+ * The parent of an object can be null in which case it is positioned
+ * relative to world space coordinates. The parent of an object can also
+ * be another object in which case the transformation is relative to that
+ * other object (and possible other objects from which that parent is itself
+ * a child).
  * <p>
  * Usually models are defined with the local origin (0,0,0) somewhere in
  * the model. Sometimes in the center or the center-bottom depending on what
  * is easiest. It is important to realize that all position setting routines
  * below operate relative to the local origin of the object.
- * <p>
- * Common problem: some mesh objects (in particular thing) don't allow
- * movement by default for optimization purposes. Changing the movable
- * will not do a lot in that case. To enable moving you have to
- * set the CS_THING_MOVE_OCCASIONAL flags using iThingState->SetMovingOption().
  */
 struct iMovable : public iBase
 {
   /**
-   * Get the parent movable. This is relevant in case the mesh belonging
+   * Get the parent movable. This is relevant in case the object belonging
    * to this movable is part of a hierarchical transformation.
    */
   virtual iMovable* GetParent () const = 0;
   /**
    * Set the parent movable. Usually you don't need to call this function
-   * yourselves as it is called automatically whenever you add some mesh
-   * to another mesh parent (using iMeshWrapper->GetChildren ()->Add()).
+   * yourselves as it is called automatically whenever you add some object
+   * to another parent (using iMeshWrapper->GetChildren ()->Add() for meshes).
    */
   virtual void SetParent (iMovable* parent) = 0;
 
   /**
    * Initialize the list of sectors to one sector where
-   * this thing is. This is a convenience funcion. Calling this function
+   * this object is. This is a convenience funcion. Calling this function
    * makes the object visible in this sector. Use GetSectors() if you want
    * to have more control over where the object really is.
    * This function does not do anything if the parent is not 0.
@@ -96,8 +98,8 @@ struct iMovable : public iBase
 
   /**
    * Clear the list of sectors. This basically makes the object invisible
-   * as it will not be present in any sector. The mesh will still be present
-   * in the engine list of meshes though.
+   * as it will not be present in any sector. The object will still be present
+   * in the engine though.
    * This function does not do anything if the parent is not 0.
    * You have to call UpdateMove() after changing the sector
    * information.
@@ -105,7 +107,7 @@ struct iMovable : public iBase
   virtual void ClearSectors () = 0;
 
   /**
-   * Get the list of sectors for this entity. Using this list you can get
+   * Get the list of sectors for this object. Using this list you can get
    * and set all sectors that this object is in. Note that if an object
    * crosses a portal then you should in theory add every touched sector
    * to this list of sectors. If objects are small then you can get away
@@ -248,7 +250,7 @@ struct iMovable : public iBase
 
   /**
    * After all movement has been done you need to
-   * call UpdateMove() to make the final changes to the entity
+   * call UpdateMove() to make the final changes to the object
    * that is controlled by this movable. This is very important!
    * This function is responsible for calling all movement listeners.
    * If you do not call this function then the visibility cullers
