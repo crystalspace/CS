@@ -324,8 +324,6 @@ void csGraphics2DOpenGL::CalcPixelFormat ()
 bool csGraphics2DOpenGL::Open ()
 {
   if (is_open) return true;
-  DEVMODE dmode;
-  LONG ti;
   DWORD exStyle;
   DWORD style;
 
@@ -334,50 +332,14 @@ bool csGraphics2DOpenGL::Open ()
   {
     ChangeDisplaySettings (NULL, 0);
 
-    EnumDisplaySettings (NULL, 0, &dmode);
-
-    dmode.dmBitsPerPel = Depth;
-    dmode.dmPelsWidth = Width;
-    dmode.dmPelsHeight = Height;
-    dmode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
-
-    if ((ti = ChangeDisplaySettings(&dmode, CDS_FULLSCREEN)) != DISP_CHANGE_SUCCESSFUL)
-    {
-      //The cases below need error handling, as they are errors.
-      switch (ti)
-      {
-        case DISP_CHANGE_RESTART:
-          //computer must restart for mode to work.
-          Report (CS_REPORTER_SEVERITY_WARNING,
-            "gl2d error: must restart for display change.");
-          break;
-        case DISP_CHANGE_BADFLAGS:
-          //Bad Flag settings
-          Report (CS_REPORTER_SEVERITY_WARNING,
-	  	"gl2d error: display change bad flags.");
-          break;
-        case DISP_CHANGE_FAILED:
-          //Failure to display
-          Report (CS_REPORTER_SEVERITY_WARNING,
-            "gl2d error: display change failed.");
-          break;
-        case DISP_CHANGE_NOTUPDATED:
-          //No Reg Write Error
-          Report (CS_REPORTER_SEVERITY_WARNING,
-            "gl2d error: display change could not write registry.");
-          break;
-        default:
-          //Unknown Error
-          Report (CS_REPORTER_SEVERITY_WARNING,
-            "gl2d error: display change gave unknown error.");
-          break;
-      }
-    }
+    SwitchDisplayMode ();
   }
+
+  m_bActivated = true;
 
   if (FullScreen)
   {
-    exStyle = WS_EX_TOPMOST;
+    exStyle = 0;/*WS_EX_TOPMOST;*/
     style = WS_POPUP | WS_VISIBLE | WS_SYSMENU;
     m_hWnd = CreateWindowEx (exStyle, CS_WIN32_WINDOW_CLASS_NAME, win_title, style, 0, 0, 
       Width, Height, NULL, NULL, m_hInstance, NULL);
@@ -396,6 +358,10 @@ bool csGraphics2DOpenGL::Open ()
   if (!m_hWnd)
     SystemFatalError ("Cannot create Crystal Space window", GetLastError());
 
+  // Subclass the window
+  m_OldWndProc = (WNDPROC)SetWindowLong (m_hWnd, GWL_WNDPROC, (LONG) WindowProc);
+  SetWindowLong (m_hWnd, GWL_USERDATA, (LONG)this);
+
   hDC = GetDC (m_hWnd);
   CalcPixelFormat ();
 
@@ -406,10 +372,22 @@ bool csGraphics2DOpenGL::Open ()
   hGLRC = wglCreateContext (hDC);
   wglMakeCurrent (hDC, hGLRC);
 
-  ShowWindow (m_hWnd, m_nCmdShow);
+  ShowWindow (m_hWnd, m_nCmdShow); // @@@ this does weird things when starting
+				   // the app windowed and "maximized"
   UpdateWindow (m_hWnd);
   SetForegroundWindow (m_hWnd);
   SetFocus (m_hWnd);
+
+  if (FullScreen)
+  {
+    /* 
+     * from the Windows Shell docs:
+     * "It is possible to cover the taskbar by explicitly setting the size 
+     * of the window rectangle equal to the size of the screen with 
+     * SetWindowPos."
+     */
+    SetWindowPos (m_hWnd, HWND_TOPMOST, 0, 0, Width, Height, 0);
+  }
 
   if (!csGraphics2DGLCommon::Open ())
     return false;
@@ -453,8 +431,8 @@ void csGraphics2DOpenGL::Close (void)
 
 void csGraphics2DOpenGL::Print (csRect* /*area*/)
 {
-  SwapBuffers(hDC);
   glFlush();
+  SwapBuffers(hDC);
 }
 
 HRESULT csGraphics2DOpenGL::SetColorPalette ()
@@ -554,4 +532,115 @@ void csGraphics2DOpenGL::AlertV (int type, const char* title, const char* okMsg,
 	const char* msg, va_list arg)
 {
   m_piWin32Assistant->AlertV (m_hWnd, type, title, okMsg, msg, arg);
+}
+
+LRESULT CALLBACK csGraphics2DOpenGL::WindowProc (HWND hWnd, UINT message,
+  WPARAM wParam, LPARAM lParam)
+{
+  csGraphics2DOpenGL *This = (csGraphics2DOpenGL *)GetWindowLong (hWnd, GWL_USERDATA);
+  switch (message)
+  {
+    case WM_ACTIVATE:
+      This->Activate (!(wParam == WA_INACTIVE));
+    break;
+  }
+/*  switch (message)
+  {
+    case WM_PAINT:
+      if (!This->FullScreen || !This->m_bDoubleBuffer)
+      {
+        RECT rect;
+        if (GetUpdateRect (hWnd, &rect, FALSE))
+        {
+          PAINTSTRUCT ps;
+          BeginPaint (hWnd, &ps);
+          This->Refresh (rect);
+          EndPaint (hWnd, &ps);
+          return TRUE;
+        }
+      }
+      break;
+    case WM_SYSKEYDOWN:
+      // Catch Alt+Enter
+      if ((TCHAR)wParam == VK_RETURN)
+      {
+        This->PerformExtension ("fullscreen", !This->FullScreen);
+        return TRUE;
+      }
+      break;
+    case WM_SYSCOMMAND:
+      // For some strange reason if we don't intercept this message
+      // the system produces an ugly beep when switching from fullscreen
+      if (wParam == SC_KEYMENU)
+        return TRUE;
+      break;
+  }*/
+  return CallWindowProc (This->m_OldWndProc, hWnd, message, wParam, lParam);
+}
+
+void csGraphics2DOpenGL::Activate (bool activated)
+{
+  if (FullScreen && (activated != m_bActivated))
+  {
+    m_bActivated = activated;
+    if (m_bActivated)
+    {
+      SwitchDisplayMode ();
+      ShowWindow (m_hWnd, SW_SHOWNORMAL);
+      SetWindowPos (m_hWnd, HWND_TOPMOST, 0, 0, Width, Height, 0);
+    }
+    else
+    {
+      ShowWindow (m_hWnd, SW_SHOWMINIMIZED);
+      SetWindowPos (m_hWnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE |
+	SWP_NOSIZE | SWP_NOACTIVATE);
+      ChangeDisplaySettings (NULL, 0);
+    }
+  }
+}
+
+void csGraphics2DOpenGL::SwitchDisplayMode ()
+{
+  DEVMODE dmode;
+  LONG ti;
+
+  EnumDisplaySettings (NULL, 0, &dmode);
+
+  dmode.dmBitsPerPel = Depth;
+  dmode.dmPelsWidth = Width;
+  dmode.dmPelsHeight = Height;
+  dmode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
+
+  if ((ti = ChangeDisplaySettings(&dmode, CDS_FULLSCREEN)) != DISP_CHANGE_SUCCESSFUL)
+  {
+    //The cases below need error handling, as they are errors.
+    switch (ti)
+    {
+      case DISP_CHANGE_RESTART:
+        //computer must restart for mode to work.
+        Report (CS_REPORTER_SEVERITY_WARNING,
+          "gl2d error: must restart for display change.");
+        break;
+      case DISP_CHANGE_BADFLAGS:
+        //Bad Flag settings
+        Report (CS_REPORTER_SEVERITY_WARNING,
+	      "gl2d error: display change bad flags.");
+        break;
+      case DISP_CHANGE_FAILED:
+        //Failure to display
+        Report (CS_REPORTER_SEVERITY_WARNING,
+          "gl2d error: display change failed.");
+        break;
+      case DISP_CHANGE_NOTUPDATED:
+        //No Reg Write Error
+        Report (CS_REPORTER_SEVERITY_WARNING,
+          "gl2d error: display change could not write registry.");
+        break;
+      default:
+        //Unknown Error
+        Report (CS_REPORTER_SEVERITY_WARNING,
+          "gl2d error: display change gave unknown error.");
+        break;
+    }
+  }
 }

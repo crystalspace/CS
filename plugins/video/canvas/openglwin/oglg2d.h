@@ -79,7 +79,7 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csGraphics2DOpenGL);
     virtual void *GetProcAddress (const char *funcname)
-    { return wglGetProcAddress ((const char *)funcname); }
+    { return (void*)(wglGetProcAddress ((const char *)funcname)); }
   } scfiOpenGLInterface;
 
 protected:
@@ -99,8 +99,17 @@ protected:
 
   int DepthBits;
 
-  HRESULT RestoreAll();
-  unsigned char *LockBackBuf();
+  // Old window procedure (the one in win32.cpp)
+  WNDPROC m_OldWndProc;
+
+  static LRESULT CALLBACK WindowProc (HWND hWnd, UINT message,
+    WPARAM wParam, LPARAM lParam);
+
+  bool m_bActivated;
+
+  void Activate (bool activate);
+  // Setup fullscreen display mode
+  void SwitchDisplayMode ();
 };
 
 #endif
