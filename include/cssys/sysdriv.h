@@ -32,10 +32,6 @@
 #  include "cssys/win32/win32.h"
 #endif
 
-#if defined(COMP_WCC) && defined(OS_DOS)
-#  include "cssys/wcc/csdoswat.h"
-#endif
-
 #if defined(COMP_GCC) && defined(OS_DOS)
 #  include "cssys/djgpp/djgpp.h"
 #endif
