@@ -22,6 +22,12 @@
 
 %javaconst(1);
 
+// We still support Swig versions older than 1.3.22, so regress to the 'enum'
+// style used in earlier versions.
+#if (SWIG_VERSION >= 0x010322)
+%include "enumsimple.swg"
+#endif
+
 // Following are declared as constants here to prevent javac
 // complaining about finding a 'long' where an 'int' is expected.
 %constant int CS_CRYSTAL_PROTOCOL = 0x43533030;

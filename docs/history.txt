@@ -22,6 +22,10 @@ chronological order.
 	  in several exported classes.
 	- Jorrit added a patch from Andrew Dai which adds support for
 	  color cursors in the Win32 canvas.
+	- Eric Sunshine worked around problem caused by Swig 1.3.22's new
+	  'enum' emulation mechanism for Java which is incompatible with its
+	  pre-1.3.22 emulation. This caused compilation errors in existing
+	  code, such as SimpleRoom.java.
 20-Oct-2004
 	- Jorrit fixed a critical bug in VFS. In case you tried to
 	  call VFS->Sync() while there were still references to open files
