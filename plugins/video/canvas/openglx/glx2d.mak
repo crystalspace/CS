@@ -4,6 +4,8 @@
 # Driver description
 DESCRIPTION.glx2d = Crystal Space GL/X 2D driver
 
+include libs/cs2d/openglcommon/glcommon2d.mak
+
 #-------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
@@ -60,6 +62,7 @@ else
 endif
 DESCRIPTION.$(GLX2D) = $(DESCRIPTION.glx2d)
 SRC.GLX2D = $(wildcard libs/cs2d/openglx/*.cpp \
+  libs/cs2d/openglcommon/*.cpp \
   libs/cs3d/opengl/ogl_*cache.cpp libs/cs3d/opengl/ogl_txtmgr.cpp \
   libs/cs3d/opengl/itexture.cpp \
   libs/cs3d/common/txtmgr.cpp libs/cs3d/common/memheap.cpp \

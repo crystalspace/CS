@@ -19,7 +19,6 @@
 #include <stdarg.h>
 #include "sysdef.h"
 #include "cs2d/openglx/glx2d.h"
-#include "cs3d/opengl/ogl_txtmgr.h"
 #include "cscom/com.h"
 #include "csinput/csevent.h"
 #include "csinput/csinput.h"
@@ -35,14 +34,10 @@ END_INTERFACE_TABLE ()
 
 IMPLEMENT_UNKNOWN_NODELETE (csGraphics2DGLX)
 
-csGraphics2DOpenGLFontServer *csGraphics2DGLX::LocalFontServer = NULL;
-OpenGLTextureCache *csGraphics2DGLX::texture_cache = NULL;
-
 // csGraphics2DGLX function
 csGraphics2DGLX::csGraphics2DGLX (ISystem* piSystem) :
-  csGraphics2D (piSystem), xim (NULL), cmap (0)
+  csGraphics2DGLCommon (piSystem), xim (NULL), cmap (0)
 {
-  System = piSystem;
   if (FAILED (System->QueryInterface (IID_IUnixSystemDriver, (void**)&UnixSystem)))
   {
     CsPrintf (MSG_FATAL_ERROR, "FATAL: The system driver does not support "
@@ -53,7 +48,7 @@ csGraphics2DGLX::csGraphics2DGLX (ISystem* piSystem) :
 
 void csGraphics2DGLX::Initialize ()
 {
-  csGraphics2D::Initialize ();
+  csGraphics2DGLCommon::Initialize ();
   Screen* screen_ptr;
 
   // Query system settings
@@ -76,7 +71,14 @@ void csGraphics2DGLX::Initialize ()
   // Determine visual information.
   Visual* visual = DefaultVisual (dpy, screen_num);
 
-  int desired_attributes[] = { GLX_RGBA, GLX_DOUBLEBUFFER, GLX_DEPTH_SIZE, 1, None };
+  int desired_attributes[] = { 
+  	GLX_RGBA, 
+  	GLX_DOUBLEBUFFER, 
+	GLX_DEPTH_SIZE, 1, 
+	GLX_RED_SIZE, 4,
+	GLX_BLUE_SIZE, 4,
+	GLX_GREEN_SIZE, 4,
+	None };
  
   active_GLVisual = glXChooseVisual(dpy, screen_num, desired_attributes);
   if (active_GLVisual)
@@ -85,6 +87,12 @@ void csGraphics2DGLX::Initialize ()
     cmap = XCreateColormap (dpy, RootWindow (dpy, active_GLVisual->screen),
            active_GLVisual->visual, AllocNone);
     visual = active_GLVisual->visual;
+  }
+  else
+  {
+    CsPrintf (MSG_FATAL_ERROR, "FATAL: Could not find a GLX visual that "
+                               "supports at least 12 bit RGBA color, double buffering, and depth buffer\n");
+    exit (-1);
   }
  
   pfmt.RedMask = 0xf00;//visual->red_mask;
@@ -115,31 +123,11 @@ csGraphics2DGLX::~csGraphics2DGLX ()
   CHKB (delete [] Memory);
 }
 
-// Used to printf through system driver
-void csGraphics2DGLX::CsPrintf (int msgtype, char *format, ...)
-{
-  va_list arg;
-  char buf[256];
-
-  va_start (arg, format);
-  vsprintf (buf, format, arg);
-  va_end (arg);
-
-  System->Print (msgtype, buf);
-}
-
 bool csGraphics2DGLX::Open(char *Title)
 {
   CsPrintf (MSG_INITIALIZATION, "Video driver GL/X version ");
-  if (glGetString (GL_RENDERER))
-    CsPrintf (MSG_INITIALIZATION, "(Renderer v%s) ", glGetString(GL_RENDERER) );
-  if (glGetString (GL_VERSION))
-    CsPrintf (MSG_INITIALIZATION, "(OpenGL v%s)", glGetString(GL_VERSION));
-  CsPrintf (MSG_INITIALIZATION, "\n");
-
-  // Open your graphic interface
-  if (!csGraphics2D::Open (Title))
-    return false;
+  if (glXIsDirect(dpy,active_GLContext))
+    CsPrintf (MSG_INITIALIZATION, "(direct renderer) ");
 
   // Set loop callback
   UnixSystem->SetLoopCallback (ProcessEvents, this);
@@ -228,20 +216,9 @@ bool csGraphics2DGLX::Open(char *Title)
 
   glXMakeCurrent(dpy, window, active_GLContext);
 
-
-  if (LocalFontServer == NULL)
-  {
-       LocalFontServer = new csGraphics2DOpenGLFontServer(&FontList[0]);
-       for (int fontindex=1; 
-       		fontindex < 8;
-		fontindex++)
-	   LocalFontServer->AddFont(FontList[fontindex]);
-  }
-
-  if (texture_cache == NULL)
-  {
-    CHK (texture_cache = new OpenGLTextureCache(1<<24,24));
-  }
+  // Open your graphic interface
+  if (!csGraphics2DGLCommon::Open (Title))
+    return false;
 
   Clear (0);
   return true;
@@ -268,28 +245,9 @@ void csGraphics2DGLX::Close(void)
     window = 0;
   }
   // Close your graphic interface
-  csGraphics2D::Close ();
+  csGraphics2DGLCommon::Close ();
 }
 
-void csGraphics2DGLX::Clear(int color)
-{
-  switch (pfmt.PixelBytes)
-  {
-  case 1: // paletted colors
-    glClearColor(Palette[color].red,
-    		Palette[color].green,
-		Palette[color].blue,0.);
-    break;
-  case 2: // 16bit color
-  case 4: // truecolor
-    glClearColor( ( (color & pfmt.RedMask) >> pfmt.RedShift )     / (float)pfmt.RedBits,
-               ( (color & pfmt.GreenMask) >> pfmt.GreenShift ) / (float)pfmt.GreenBits,
-               ( (color & pfmt.BlueMask) >> pfmt.BlueShift )   / (float)pfmt.BlueBits,
-	       0. );
-    break;
-  }
-  glClear(GL_COLOR_BUFFER_BIT);
-}
 
 void csGraphics2DGLX::Print (csRect *area)
 {
@@ -319,11 +277,6 @@ void csGraphics2DGLX::Print (csRect *area)
 //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glXSwapBuffers (dpy,window);
   glFlush ();
-}
-
-void csGraphics2DGLX::SetRGB(int i, int r, int g, int b)
-{
-  csGraphics2D::SetRGB (i, r, g, b);
 }
 
 bool csGraphics2DGLX::SetMousePosition (int x, int y)
@@ -436,136 +389,5 @@ void csGraphics2DGLX::ProcessEvents (void *Param)
         //if (event.type == CompletionType) shm_busy = 0;
         break;
     }
-}
-
-void csGraphics2DGLX::setGLColorfromint(int color)
-{
-  switch (pfmt.PixelBytes)
-  {
-  case 1: // paletted colors
-    glColor3i(Palette[color].red,
-    		Palette[color].green,
-		Palette[color].blue);
-    break;
-  case 2: // 16bit color
-  case 4: // truecolor
-    glColor3f( ( (color & pfmt.RedMask) >> pfmt.RedShift )     / (float)pfmt.RedBits,
-               ( (color & pfmt.GreenMask) >> pfmt.GreenShift ) / (float)pfmt.GreenBits,
-               ( (color & pfmt.BlueMask) >> pfmt.BlueShift )   / (float)pfmt.BlueBits);
-    break;
-  }
-}
-
-void csGraphics2DGLX::DrawLine (int x1, int y1, int x2, int y2, int color)
-{
-  // prepare for 2D drawing--so we need no fancy GL effects!
-  glDisable (GL_TEXTURE_2D);
-  glDisable (GL_BLEND);
-  glDisable (GL_DEPTH_TEST);
-  glBegin (GL_LINES);
-  //glColor3f (1., 1., 1.);
-  setGLColorfromint(color);
-  glVertex2i (x1, Height-y1-1);
-  glVertex2i (x2, Height-y2-1);
-  glEnd ();
-}
-
-void csGraphics2DGLX::DrawHorizLine (int x1, int x2, int y, int color)
-{
-  // prepare for 2D drawing--so we need no fancy GL effects!
-  glDisable (GL_TEXTURE_2D);
-  glDisable (GL_BLEND);
-  glDisable (GL_DEPTH_TEST);
-  //glColor3f (1., 1., 1.);
-  setGLColorfromint(color);
-  glBegin (GL_LINES);
-  glVertex2i (x1, Height-y-1);
-  glVertex2i (x2, Height-y-1);
-  glEnd ();
-}
-
-void csGraphics2DGLX::DrawPixelGL (int x, int y, int color)
-{
-  // prepare for 2D drawing--so we need no fancy GL effects!
-  glDisable (GL_TEXTURE_2D);
-  glDisable (GL_BLEND);
-  glDisable (GL_DEPTH_TEST);
-  //glColor3f (1., 1., 1.);
-  setGLColorfromint(color);
-  glBegin (GL_POINTS);
-  glVertex2i (x, Height-y-1);
-  glEnd ();
-}
-
-void csGraphics2DGLX::WriteCharGL (int x, int y, int fg, int bg, char c)
-{
-  // prepare for 2D drawing--so we need no fancy GL effects!
-  glDisable (GL_TEXTURE_2D);
-  glDisable (GL_BLEND);
-  glDisable (GL_DEPTH_TEST);
-  
-  setGLColorfromint(fg);
-
-  // FIXME: without the 0.5 shift rounding errors in the
-  // openGL renderer can misalign text!
-  // maybe we should modify the glOrtho() in glrender to avoid
-  // having to does this fractional shift?
-  //glRasterPos2i (x, Height-y-1-FontList[Font].Height);
-  glRasterPos2f (x+0.5, Height-y-0.5-FontList[Font].Height);
-
-  LocalFontServer->WriteCharacter(c,Font);
-}
-
-void csGraphics2DGLX::DrawSpriteGL (ITextureHandle *hTex, int sx, int sy,
-  int sw, int sh, int tx, int ty, int tw, int th)
-{
-  texture_cache->Add (hTex);
-
-  // cache the texture if we haven't already.
-  csTextureMMOpenGL* txt_mm = (csTextureMMOpenGL*)GetcsTextureMMFromITextureHandle (hTex);
-
-  HighColorCache_Data *cachedata;
-  cachedata = txt_mm->get_hicolorcache ();
-  GLuint texturehandle = *( (GLuint *) (cachedata->pData) );
-
-  glShadeModel(GL_FLAT);
-  glEnable(GL_TEXTURE_2D);
-  glColor4f(1.,1.,1.,1.);
-  if (txt_mm->get_transparent())
-  {
-    glEnable (GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-  }
-  else
-    glDisable (GL_BLEND);
-  glDisable (GL_DEPTH_TEST);
-  glBindTexture(GL_TEXTURE_2D,texturehandle);
-  
-  int bitmapwidth=0, bitmapheight=0;
-  hTex->GetBitmapDimensions(bitmapwidth,bitmapheight);
-
-  // convert texture coords given above to normalized (0-1.0) texture coordinates
-  float ntx1,nty1,ntx2,nty2;
-  ntx1 = tx/bitmapwidth;
-  ntx2 = (tx+tw)/bitmapwidth;
-  nty1 = ty/bitmapheight;
-  nty2 = (ty+th)/bitmapheight;
-
-  // draw the bitmap
-  glBegin(GL_TRIANGLE_FAN);
-  glTexCoord2f(ntx1,nty1);
-  glVertex2i(sx,Height-sy-1);
-  glTexCoord2f(ntx2,nty1);
-  glVertex2i(sx+sw,Height-sy-1);
-  glTexCoord2f(ntx2,nty2);
-  glVertex2i(sx+sw,Height-sy-sh-1);
-  glTexCoord2f(ntx1,nty2);
-  glVertex2i(sx,Height-sy-sh-1);
-  glEnd();
-}
-
-unsigned char* csGraphics2DGLX::GetPixelAtGL (int /*x*/, int /*y*/)
-{
-  return NULL;
 }
 

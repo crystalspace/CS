@@ -22,9 +22,7 @@
 #include "cscom/com.h"
 #include "cs2d/common/graph2d.h"
 #include "cssys/unix/iunix.h"
-#include "cs2d/openglx/gl2d_font.h"
-#include "cs3d/opengl/ogl_txtmgr.h"
-#include "cs3d/opengl/ogl_txtcache.h"
+#include "cs2d/openglcommon/glcommon2d.h"
 
 #include <GL/glx.h>
 
@@ -60,7 +58,7 @@ public:
 ///
 
 /// XLIB version.
-class csGraphics2DGLX : public csGraphics2D
+class csGraphics2DGLX : public csGraphics2DGLCommon
 {
   // The display context
   Display* dpy;
@@ -74,9 +72,6 @@ class csGraphics2DGLX : public csGraphics2D
 
   // Window colormap
   Colormap cmap;
-
-  // my own private texture cache--for sprites!
-  static OpenGLTextureCache *texture_cache; 
 
   // Use SHM or not?
   bool do_shm;
@@ -94,12 +89,8 @@ class csGraphics2DGLX : public csGraphics2D
   /// A empty pixmap
   Pixmap EmptyPixmap;
 
-  /// Pointer to system driver interface
-  ISystem* System;
   /// Pointer to DOS-specific interface
   IUnixSystemDriver* UnixSystem;
-
-  static csGraphics2DOpenGLFontServer *LocalFontServer;
 
 public:
   csGraphics2DGLX (ISystem* piSystem);
@@ -111,29 +102,9 @@ public:
 
   virtual bool BeginDraw () { return (Memory != NULL); }
 
-  virtual void Clear(int color);
   virtual void Print (csRect *area = NULL);
-  virtual void SetRGB (int i, int r, int g, int b);
 
-  /// Draw a line
-  virtual void DrawLine (int x1, int y1, int x2, int y2, int color);
-  /// Draw a horizontal line
-  virtual void DrawHorizLine (int x1, int x2, int y, int color);
-  /// Draw a pixel
-  static void DrawPixelGL (int x, int y, int color);
-  /// Write a single character
-  static void WriteCharGL (int x, int y, int fg, int bg, char c);
-  /// Draw a 2D sprite
-  static void DrawSpriteGL (ITextureHandle *hTex, int sx, int sy,
-    int sw, int sh, int tx, int ty, int tw, int th);
-  /// Figure out GL RGB color from a packed color format
-  static void setGLColorfromint(int color);
-
-  /**
-   * Get address of video RAM at given x,y coordinates.
-   * The OpenGL version of this function just returns NULL.
-   */
-  static unsigned char* GetPixelAtGL (int x, int y);
+  // All graphics functions are inherited from csGraphics2DGLCommon
 
   /// Set mouse position.
   virtual bool SetMousePosition (int x, int y);
@@ -142,9 +113,6 @@ public:
   virtual bool SetMouseCursor (int iShape, ITextureHandle *iBitmap);
 
 protected:
-  /// This function is functionally equivalent to csSystemDriver::CsPrintf
-  void CsPrintf (int msgtype, char *format, ...);
-
   /// This routine is called once per event loop
   static void ProcessEvents (void *Param);
 
