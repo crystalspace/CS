@@ -541,7 +541,7 @@ the OpenGL renderer.  First, you may instruct a program to use OpenGL from the
 command-line:
 
 @example
-./walktest --video=opengl flarge
+./walktest.app/Contents/MacOS/walktest --video=opengl flarge
 @end example
 
 Second, you can enable OpenGL on a permanent basis for all applications by
