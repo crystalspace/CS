@@ -1190,6 +1190,9 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
         trinormal_buffer->Release ();
         mesh_tri_normals_dirty_flag = false;
       } else {/* computed without autonormal */
+        if (mesh_tri_normals)
+          delete[] mesh_tri_normals;
+        mesh_tri_normals = new csVector3[num_mesh_triangles];
         trinormal_buffer = r3d->GetBufferManager ()->CreateBuffer (
           sizeof (csVector3)*(num_mesh_triangles*3+1), CS_BUF_STATIC);
         csVector3 *tbuf = (csVector3*)trinormal_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
@@ -1197,13 +1200,14 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
         for (int i = 0; i < num_mesh_triangles; i ++) {
           csVector3 ab = mesh_vertices [mesh_triangles[i].b] - mesh_vertices [mesh_triangles[i].a];
           csVector3 bc = mesh_vertices [mesh_triangles[i].c] - mesh_vertices [mesh_triangles[i].b];
-          csVector3 face_normal = ab % bc;
-          tbuf[tbuf_index++] = face_normal;
-          tbuf[tbuf_index++] = face_normal;
-          tbuf[tbuf_index++] = face_normal;
+          mesh_tri_normals[i] = ab % bc;
+          tbuf[tbuf_index++] = mesh_tri_normals[i];
+          tbuf[tbuf_index++] = mesh_tri_normals[i];
+          tbuf[tbuf_index++] = mesh_tri_normals[i];
         }
         tbuf[tbuf_index] = csVector3 (0,0,0);
         trinormal_buffer->Release ();
+        autonormals = true;
         mesh_tri_normals_dirty_flag = false;
       }
     }
@@ -1243,25 +1247,37 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
       index_buffer = r3d->GetBufferManager ()->CreateBuffer (
         sizeof (unsigned int)*num_mesh_triangles*3, CS_BUF_INDEX);
 #else
+      if (!autonormals)
+      {
+        if (mesh_tri_normals)
+          delete[] mesh_tri_normals;
+        mesh_tri_normals = new csVector3[num_mesh_triangles];
+        for (int i = 0; i < num_mesh_triangles; i ++) {
+          csVector3 ab = mesh_vertices [mesh_triangles[i].b] - mesh_vertices [mesh_triangles[i].a];
+          csVector3 bc = mesh_vertices [mesh_triangles[i].c] - mesh_vertices [mesh_triangles[i].b];
+          mesh_tri_normals[i] = ab % bc;
+        }
+      }
+
       index_buffer = r3d->GetBufferManager ()->CreateBuffer (
         sizeof (unsigned int)*num_mesh_triangles*12, CS_BUF_INDEX);
-	  if (edge_normals) delete [] edge_normals;
-	  edge_normals = new csVector3[num_mesh_triangles*3];
-	  if (edge_midpts) delete [] edge_midpts;
-	  edge_midpts = new csVector3[num_mesh_triangles*3];
+      if (edge_normals) delete [] edge_normals;
+        edge_normals = new csVector3[num_mesh_triangles*3];
+      if (edge_midpts) delete [] edge_midpts;
+        edge_midpts = new csVector3[num_mesh_triangles*3];
 #endif
       unsigned int *ibuf = (unsigned int *)index_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
 
 #ifdef CS_USE_SHADOW_VOLUMES
       struct Edge {
-		csVector3 a, b;
-		csVector3 norm;
+        csVector3 a, b;
+        csVector3 norm;
         int ind_a, ind_b;
       };
       csBasicVector EdgeStack;
       int QuadsIndex = num_mesh_triangles * 3;
-	  int TriIndex = 0;
-	  int EdgeNormal = 0;
+      int TriIndex = 0;
+      int EdgeNormal = 0;
 #endif
 	  int i;
       for (i = 0; i < num_mesh_triangles; i ++) 
@@ -1287,12 +1303,12 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
               ibuf[QuadsIndex ++] = TriIndex - 2;
               ibuf[QuadsIndex ++] = e->ind_b;
               ibuf[QuadsIndex ++] = e->ind_a;
-			  edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
-			  edge_normals[EdgeNormal++] = e->norm;
-			  edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
-			  edge_normals[EdgeNormal++] = mesh_tri_normals[i];
+              edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
+              edge_normals[EdgeNormal++] = e->norm;
+              edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
+              edge_normals[EdgeNormal++] = mesh_tri_normals[i];
               EdgeStack.Delete (j);
-			  delete e;
+              delete e;
               found_a = true;
               continue;
             }
@@ -1304,12 +1320,12 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
               ibuf[QuadsIndex ++] = TriIndex - 3;
               ibuf[QuadsIndex ++] = e->ind_b;
               ibuf[QuadsIndex ++] = e->ind_a;
-			  edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
-			  edge_normals[EdgeNormal++] = e->norm;
-			  edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
-			  edge_normals[EdgeNormal++] = mesh_tri_normals[i];
+              edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
+              edge_normals[EdgeNormal++] = e->norm;
+              edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
+              edge_normals[EdgeNormal++] = mesh_tri_normals[i];
               EdgeStack.Delete (j);
-			  delete e;
+              delete e;
               found_a = true;
               continue;
             }
@@ -1323,12 +1339,12 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
               ibuf[QuadsIndex ++] = TriIndex - 1; 
               ibuf[QuadsIndex ++] = e->ind_a; 
               ibuf[QuadsIndex ++] = e->ind_b;
-			  edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
-			  edge_normals[EdgeNormal++] = e->norm;
-			  edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
-			  edge_normals[EdgeNormal++] = mesh_tri_normals[i];
+              edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
+              edge_normals[EdgeNormal++] = e->norm;
+              edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
+              edge_normals[EdgeNormal++] = mesh_tri_normals[i];
               EdgeStack.Delete (j);
-			  delete e;
+              delete e;
               found_b = true;
               continue;
             }
@@ -1340,12 +1356,12 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
               ibuf[QuadsIndex ++] = TriIndex - 2;
               ibuf[QuadsIndex ++] = e->ind_b; 
               ibuf[QuadsIndex ++] = e->ind_a;
-			  edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
-			  edge_normals[EdgeNormal++] = e->norm;
-			  edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
-			  edge_normals[EdgeNormal++] = mesh_tri_normals[i];
+              edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
+              edge_normals[EdgeNormal++] = e->norm;
+              edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
+              edge_normals[EdgeNormal++] = mesh_tri_normals[i];
               EdgeStack.Delete (j);
-			  delete e;
+              delete e;
               found_b = true;
               continue;
             }
@@ -1359,12 +1375,12 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
               ibuf[QuadsIndex ++] = TriIndex - 3; 
               ibuf[QuadsIndex ++] = e->ind_b; 
               ibuf[QuadsIndex ++] = e->ind_a;
-			  edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
-			  edge_normals[EdgeNormal++] = e->norm;
-			  edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
-			  edge_normals[EdgeNormal++] = mesh_tri_normals[i];
+              edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
+              edge_normals[EdgeNormal++] = e->norm;
+              edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
+              edge_normals[EdgeNormal++] = mesh_tri_normals[i];
               EdgeStack.Delete (j);
-			  delete e;
+              delete e;
               found_c = true;
               continue;
             }
@@ -1376,12 +1392,12 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
               ibuf[QuadsIndex ++] = TriIndex - 1; 
               ibuf[QuadsIndex ++] = e->ind_b; 
               ibuf[QuadsIndex ++] = e->ind_a;
-			  edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
-			  edge_normals[EdgeNormal++] = e->norm;
-			  edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
-			  edge_normals[EdgeNormal++] = mesh_tri_normals[i];
+              edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
+              edge_normals[EdgeNormal++] = e->norm;
+              edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
+              edge_normals[EdgeNormal++] = mesh_tri_normals[i];
               EdgeStack.Delete (j);
-			  delete e;
+              delete e;
               found_c = true;
               continue;
             }
@@ -1393,7 +1409,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
           a->b = mesh_vertices[mesh_triangles[i].b];
           a->ind_a = TriIndex - 3;
           a->ind_b = TriIndex - 2;
-		  a->norm = mesh_tri_normals[i];
+          a->norm = mesh_tri_normals[i];
           EdgeStack.Push (a);
         }
         if (!found_b) {
@@ -1402,7 +1418,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
           b->b = mesh_vertices[mesh_triangles[i].c];
           b->ind_a = TriIndex - 2;
           b->ind_b = TriIndex - 1;
-		  b->norm = mesh_tri_normals[i];
+          b->norm = mesh_tri_normals[i];
           EdgeStack.Push (b);
         }
         if (!found_c) {
@@ -1411,7 +1427,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
           c->b = mesh_vertices[mesh_triangles[i].a];
           c->ind_a = TriIndex - 1;
           c->ind_b = TriIndex - 3;
-		  c->norm = mesh_tri_normals[i];
+          c->norm = mesh_tri_normals[i];
           EdgeStack.Push (c);
         }
 #endif
