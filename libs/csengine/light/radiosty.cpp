@@ -27,6 +27,10 @@
 #include "csengine/csppulse.h"
 #include "csengine/polytmap.h"
 #include "csengine/texture.h"
+#include "csengine/rview.h"
+#include "csgeom/math3d.h"
+#include "csgeom/vector3.h"
+#include "csgeom/frustrum.h"
 #include "iimage.h"
 #include "ilghtmap.h"
 #include "itexture.h"
@@ -43,8 +47,10 @@ csRadPoly :: csRadPoly(csPolygon3D *original)
   polygon->ObjAdd(this); // attach to original
   area = original->GetArea();
   total_unshot_light = area;
+  last_shoot_priority = 0.0f;
+  num_repeats = 0;
   //lightmap = polygon->GetLightMapInfo()->GetLightMap(); // returns the
-  // 'real' lightmap, which will later get dynamic lights included.
+  // 'real' lightmap, which includes dynamic lights.
   // but we need the static lightmap
   csmap = polygon->GetLightMapInfo()->GetPolyTex()->GetCSLightMap();
   width = csmap->GetRealWidth();
@@ -132,11 +138,9 @@ void csRadPoly :: SetupQuickLumel2World()
 
 void csRadPoly :: ComputePriority()
 {
-  //@@@ should take in the fact that not all lumels are covered by polygon
-  //but a bit of imprecision here doesn't matter too much, compute longer :)
-  int sum = 0;
+  float sum = 0;
   for(int x=0; x<size*3; x++)
-    sum += deltamap->GetMap()[x];
+    sum += deltamap->GetMap()[x] * lumel_coverage_map[x%size];
   float mean_lightval = sum / (float)(size*3);
   total_unshot_light = GetDiffuse() * area * mean_lightval;
   //CsPrintf(MSG_STDOUT, "RP %s, pri %g, area %g, sum %d, meanval %g ",
@@ -173,6 +177,7 @@ void csRadPoly :: CopyAndClearDelta()
   int res;
   for(int uv=0; uv<size*3; uv++)
   {
+    if(lumel_coverage_map[uv%size] == 0.0) continue;
     res = lightmap->GetMap()[uv] + deltamap->GetMap()[uv];
     if(res > 255) res = 255;
     else if(res < 0) res = 0;
@@ -189,6 +194,7 @@ void csRadPoly :: GetDeltaSums(int &red, int &green, int &blue)
   blue = 0;
   for(int uv=0; uv<size; uv++)
   {
+    if(lumel_coverage_map[uv] == 0.0f) continue;
     red += deltamap->GetRed()[uv];
     green += deltamap->GetGreen()[uv];
     blue += deltamap->GetBlue()[uv];
@@ -200,6 +206,8 @@ void csRadPoly :: ApplyAmbient(int red, int green, int blue)
   int res;
   for(int uv=0; uv<size; uv++)
   {
+    if(lumel_coverage_map[uv] == 0.0) continue;
+
     res = lightmap->GetRed()[uv] + red;
     if(res>255)res=255; else if(res<0) res=0;
     lightmap->GetRed()[uv] = res;
@@ -253,8 +261,8 @@ float* csRadPoly :: ComputeLumelCoverage()
   for (i = 0; i < rpv; i++)
   {
     projector = (*m_world2tex) * (polygon->Vwor (i) - (*v_world2tex));
-    rp [i].x = (projector.x * ww - Imin_u) * inv_lightcell_size + 0.5;
-    rp [i].y = (projector.y * hh - Imin_v) * inv_lightcell_size + 0.5;
+    rp [i].x = (projector.x * ww - Imin_u) * inv_lightcell_size;
+    rp [i].y = (projector.y * hh - Imin_v) * inv_lightcell_size;
   }
   // draw the polygon in lumel space.
   csPolyTexture::SetupPolyFill( draw_lumel_cov );
@@ -272,6 +280,8 @@ float* csRadPoly :: ComputeLumelCoverage()
   //    printf("%4.2f ", covmap[i]);
   //  printf("\n");
   //}
+
+  FixCoverageMap(covmap, width, height);
 
   delete rp;
   return covmap;
@@ -361,6 +371,23 @@ csRGBLightMap * csRadPoly :: ComputeTextureLumelSized()
   return map;
 }
 
+
+void csRadPoly :: FixCoverageMap(float* map, int width, int height)
+{
+  int x,y, uv = 0;
+  float fix_val = 0.00001;
+  for(y=0; y<height; y++)
+    for(x=0; x<width; x++,uv++)
+    {
+      if(map[uv] > 0.0f) continue;
+      if(x>0 && map[uv-1] > fix_val)
+        map[uv] = fix_val;
+      else if(y>0 && map[uv-width] > fix_val)
+        map[uv] = fix_val;
+      else if(x>0 && y>0 && map[uv-width-1] > fix_val)
+        map[uv] = fix_val;
+    }
+}
 
 
 csRadPoly* csRadPoly :: GetRadPoly(csPolygon3D &object)
@@ -615,6 +642,7 @@ csRadiosity :: csRadiosity(csWorld *current_world)
   world = current_world;
   meter = new csProgressMeter(world->System, 1000);
   meter->SetGranularity(1);
+  pulse = new csProgressPulse();
   // copy data needed, create list and all radpolys
   list = new csRadList();
   // fill list
@@ -628,11 +656,14 @@ csRadiosity :: csRadiosity(csWorld *current_world)
   /// remove ambient light from maps.
   RemoveAmbient();
   texturemap = 0;
+  shadow_map = 0;
 }
 
 csRadiosity :: ~csRadiosity()
 {
   delete texturemap;
+  if(shadow_map) delete[] shadow_map;
+  delete pulse;
   delete meter;
   // remove data needed.
   delete list;
@@ -641,13 +672,11 @@ csRadiosity :: ~csRadiosity()
 void csRadiosity :: DoRadiosity()
 {
   csRadPoly *shoot;
-  csRadPoly *dest; csPolygon3D *destpoly3d;
 
   CsPrintf (MSG_INITIALIZATION, "Calculating radiosity (%d lightmaps):\n",
     list->GetNumElements());
   CsPrintf(MSG_INITIALIZATION, "  ");
   meter->Restart();
-  csProgressPulse *pulse = new csProgressPulse();
   shoot = list->PopHighest();
   if(shoot) {
     start_priority = shoot->GetPriority();
@@ -658,37 +687,23 @@ void csRadiosity :: DoRadiosity()
   // Take RadPoly with highest unshot light amount, and distribute
   // the light to other polys (incrementing their unshot amount).
   // until stability, in theory, in practice some stop-condition.
-  csPolyIt *poly_list = new csPolyIt(world);
+
   while( (shoot = FetchNext()) != NULL)
   {
     iterations++;
     // shoot the light off of RadPoly.
-    CsPrintf(MSG_STDOUT, "(priority at %f).\n", shoot->GetPriority() );
-    // make a list of polygons that might be partly visible.
-    poly_list->Restart(); //@@@ could be smarter than 'all'.
+    //CsPrintf(MSG_STDOUT, "(priority at %f).\n", shoot->GetPriority() );
+    pulse->Step();
     // prepare to shoot from source (visibility, precompute, etc)
     PrepareShootSource(shoot);
-    while( (destpoly3d = poly_list->Fetch()) != NULL)
-    {
-      // If dest is wholly invisible from shoot, we can skip dest.
-      dest = csRadPoly::GetRadPoly(*destpoly3d); // obtain radpoly
-      if(!dest) continue; // polygon not lightmapped / radiosity rendered.
-      if(shoot == dest) continue; // different polys required. or we 
-      			//might requeue 'shoot', and corrupt the list.
-      if(!VisiblePoly(shoot, dest)) continue;
-      pulse->Step();
-      ShootRadiosityToPolygon(dest);
-      list->DeleteElement(dest); // get out of tree
-      dest->ComputePriority(); // recompute dest's unshot light
-      list->InsertElement(dest); // and requeue dest
-    }
+    // start the frustrum calcs.
+    StartFrustrum();
     // have shot all from shootrad.
     shoot->CopyAndClearDelta();
     list->InsertElement(shoot); 
     pulse->Erase();
   }
   ApplyDeltaAndAmbient();
-  delete pulse;
 }
 
 
@@ -699,10 +714,11 @@ csRadPoly* csRadiosity :: FetchNext()
   // ambient light
   bool stop_now = false;
   char reason[80];
-  float stop_value = 1.0000; // the amount of unshot light, where we can stop
+  float stop_value = 1.0000; // the amount of unshot light, where we can stop.
   /// possibly a ''medium quality fast mode' could be:
   stop_value = start_priority / 1000.0;
-  int max_iterations = 1000; // after this amount of shoot src's we stop
+  int max_iterations = 1000; // after this amount of shoot src's we stop.
+  int max_repeats = 4; // after n loops, stop.
 
   csRadPoly *p = list->PopHighest();
 
@@ -731,6 +747,11 @@ csRadPoly* csRadiosity :: FetchNext()
     stop_now = true;
     sprintf(reason, "%d iterations reached", iterations);
   }
+  else if(p->GetNumRepeats() > max_repeats)
+  {
+    stop_now = true;
+    sprintf(reason, "loop detected");
+  }
   /// more stop conditions can be put here.
 
   if(stop_now)
@@ -742,7 +763,90 @@ csRadPoly* csRadiosity :: FetchNext()
     list->InsertElement(p); // to prevent memory leak.
     return NULL;
   }
+
+  if(nextpriority == p->GetLastShootingPriority())
+    p->IncNumRepeats();
+  p->SetLastShootingPriority(nextpriority);
   return p;
+}
+
+static void frustrum_polygon_report_func (csObject *obj, csFrustrumView* lview);
+static void frustrum_curve_report_func (csObject *obj, csFrustrumView* lview);
+static csVector3 plane_origin, plane_v1, plane_v2;
+void csRadiosity :: StartFrustrum()
+{
+  csFrustrumView *lview = new csFrustrumView();
+  lview->userdata = (void*) this;
+  lview->curve_func = frustrum_curve_report_func;
+  lview->poly_func = frustrum_polygon_report_func;
+  lview->radius = 10000000.0; // should be enough
+  lview->sq_radius = lview->radius * lview->radius;
+  lview->things_shadow = csPolyTexture::do_accurate_things; 
+  lview->mirror = false;
+  lview->gouraud_only = false;
+  lview->gouraud_color_reset = false;
+  lview->r = 1.0; // the resulting color can be used as a filter
+  lview->g = 1.0;
+  lview->b = 1.0;
+  lview->dynamic = false;
+  csVector3 center; // start from the center of the shooting poly.
+  // this will lead to inaccuracy as each lumel of the shooting
+  // poly is it's own center. But that is too slow.
+  // And this leads to sharper shadows as well.
+  shoot_src->QuickLumel2World(center, shoot_src->GetWidth()/2.,
+    shoot_src->GetHeight()/2.);
+  lview->light_frustrum = new csFrustrum (center);
+  lview->light_frustrum->MakeInfinite ();
+  // add a backplane to frustrum to clip to it... But which plane?
+  //csPlane3 *src_plane = shoot_src->GetPolygon3D()->GetPolyPlane();
+  //lview->light_frustrum->SetBackPlane(* src_plane);
+  
+  /// setup some vectors so we can test on plane location
+  plane_origin = shoot_src->GetPolygon3D()->Vwor(0);
+  plane_v1 = shoot_src->GetPolygon3D()->Vwor(1) - plane_origin;
+  plane_v2 = shoot_src->GetPolygon3D()->Vwor(2) - plane_origin;
+  shoot_src->GetPolygon3D()->GetSector()->CheckFrustrum (*lview);
+
+  delete lview;
+}
+
+
+static void frustrum_curve_report_func (csObject *obj, csFrustrumView* lview)
+{ 
+  (void)obj;
+  (void)lview;
+  // empty for now
+}
+
+static void frustrum_polygon_report_func (csObject *obj, csFrustrumView* lview)
+{
+  csPolygon3D *destpoly3d = (csPolygon3D*)obj;
+  csRadPoly *dest = csRadPoly::GetRadPoly(*destpoly3d); // obtain radpoly
+  if(!dest) return; // polygon not lightmapped / radiosity rendered.
+  // check poly -- on right side of us?
+  csVector3 center;
+  dest->QuickLumel2World(center, dest->GetWidth()/2., dest->GetHeight()/2.);
+  //printf("Found poly3d %x radpoly %x, whichside %d \n", (int)obj, (int)dest,
+  //  csMath3::WhichSide3D(center - plane_origin, plane_v1, plane_v2) );
+  if( csMath3::WhichSide3D(center - plane_origin, plane_v1, plane_v2) >= 0)
+    return; // when on the plane or behind, skip.
+  // use poly
+  csRadiosity *rad = (csRadiosity*)lview->userdata;
+  rad->ProcessDest(dest, lview);
+}
+
+
+void csRadiosity :: ProcessDest(csRadPoly *dest, csFrustrumView *lview)
+{
+  if(shoot_src == dest) return; // different polys required. or we 
+    			//might requeue 'shoot', and corrupt the list.
+  //if(!VisiblePoly(shoot_src, dest)) continue; // done by frustrum already
+  // prepare to send/receive light.
+  PrepareShootDest(dest, lview);
+  ShootRadiosityToPolygon(dest);
+  list->DeleteElement(dest); // get out of tree
+  dest->ComputePriority(); // recompute dest's unshot light
+  list->InsertElement(dest); // and requeue dest
 }
 
 
@@ -751,8 +855,6 @@ void csRadiosity :: ShootRadiosityToPolygon(csRadPoly* dest)
   // shoot from each lumel, also a radiosity patch, to each lumel on other.
   //CsPrintf(MSG_STDOUT, "Shooting from RadPoly %x to %x.\n", 
   //	(int)shoot, (int)dest);
-  // prepare to send/receive light.
-  PrepareShootDest(dest);
 
   int sx, sy, rx, ry; // shoot x,y, receive x,y
   int suv = 0, ruv = 0; // shoot uv index, receive uv index.
@@ -786,11 +888,27 @@ void csRadiosity :: PrepareShootSource(csRadPoly *src)
 }
 
 
-void csRadiosity :: PrepareShootDest(csRadPoly *dest)
+static float *static_shadow_map = 0;
+static int static_shadow_width = 0;
+static void draw_light_frustrum(int x, int y, float density)
+{
+  int addr = x + y*static_shadow_width;
+  static_shadow_map[addr] = density;
+}
+static void draw_shadow_frustrum(int x, int y, float density)
+{
+  int addr = x + y*static_shadow_width;
+  float res = static_shadow_map[addr] - density;
+  if(res < 0.0) res = 0.0;
+  static_shadow_map[addr] = res;
+}
+
+void csRadiosity :: PrepareShootDest(csRadPoly *dest, csFrustrumView *lview)
 {
   shoot_dest = dest;
   // compute the factor for the light getting through. The same for
   // every lumel. This factor is expanded to be the formfactor * areafraction
+
   // * diffusereflection.
   factor = shoot_dest->GetDiffuse() / (float)PI;
 
@@ -808,6 +926,30 @@ void csRadiosity :: PrepareShootDest(csRadPoly *dest)
   // The Normal must have length 1, in order to work here.
 
   dest_normal = - shoot_dest->GetNormal();
+  // use filter colour from lview
+  trajectory_color.Set(lview->r, lview->g, lview->b);
+  // use shadows and light from lview
+  if(shadow_map) delete[] shadow_map;
+  shadow_map = new float[dest->GetSize()];
+  for(int i=0; i<dest->GetSize(); i++)
+    shadow_map[i] = 0.0; // start with none visible.
+  // factor in light frustrum
+  static_shadow_map = shadow_map;
+  static_shadow_width = shoot_dest->GetWidth();
+  MapFrustrum(lview->light_frustrum, draw_light_frustrum);
+  csRadPoly::FixCoverageMap(shadow_map, shoot_dest->GetWidth(),
+    shoot_dest->GetHeight());
+
+  // remove shadows
+  csShadowFrustrum *shadow = lview->shadows.GetFirst();
+  while(shadow)
+  {
+    // put shadow in map
+    if(shadow->relevant && shadow->polygon != shoot_dest->GetPolygon3D() &&
+      shadow->polygon != shoot_src ->GetPolygon3D() )
+        MapFrustrum(shadow, draw_shadow_frustrum);
+    shadow = shadow->next;
+  }
 }
 
 
@@ -819,20 +961,26 @@ void csRadiosity :: PrepareShootSourceLumel(int sx, int sy, int suv)
   /// the amount of the lumel visible to compute area of sender.
   source_patch_area = source_poly_lumel_area * 
     shoot_src->GetLumelCoverage(suv); 
-  src_lumel_color.red = texturemap->GetRed()[suv] / 255.0;
-  src_lumel_color.green = texturemap->GetGreen()[suv] / 255.0;
-  src_lumel_color.blue = texturemap->GetBlue()[suv] / 255.0;
+  // color is texture color filtered by trajectory (i.e. half-transparent-
+  // portals passed by from source to dest poly)
+  src_lumel_color.red = texturemap->GetRed()[suv] / 255.0 
+    * trajectory_color.red;
+  src_lumel_color.green = texturemap->GetGreen()[suv] / 255.0 
+    * trajectory_color.green;
+  src_lumel_color.blue = texturemap->GetBlue()[suv] / 255.0 
+    * trajectory_color.blue;
 }
 
 
 void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
 {
-  // get dest lumel info
-  shoot_dest->QuickLumel2World(dest_lumel, rx, ry);
-
   // check visibility
-  float visibility = GetVisibility(shoot_src, src_lumel, shoot_dest, dest_lumel);
+  // old use was: GetVisibility(shoot_src, src_lumel, shoot_dest, dest_lumel);
+  float visibility = shadow_map[ruv];
   if(visibility == 0.0) return;
+
+  // prepare dest lumel info
+  shoot_dest->QuickLumel2World(dest_lumel, rx, ry);
 
   // compute formfactors.
   csVector3 path = dest_lumel - src_lumel;
@@ -847,12 +995,16 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
 
   float totalfactor = factor * cossrcangle * cosdestangle * 
     source_patch_area * visibility / distance;
+  if(totalfactor < 0.5f/256.f) // cannot make a difference in unsigned chars
+    return;
 
   if(0)
     CsPrintf(MSG_STDOUT, "totalfactor %g = factor %g * "
-  	"cosshoot %g * cosdest %g * area %g * vis %g * sqdis %g\n", 
+  	"cosshoot %g * cosdest %g * area %g * vis %g * sqdis %g\n"
+	"srclumelcolor (%g, %g, %g)\n", 
   	totalfactor, factor, cossrcangle, cosdestangle,
- 	source_patch_area, visibility, distance);
+ 	source_patch_area, visibility, distance,
+	src_lumel_color.red, src_lumel_color.green, src_lumel_color.blue);
 
   // add delta
   shoot_dest->AddDelta(shoot_src, src_uv, ruv, totalfactor, src_lumel_color);
@@ -929,8 +1081,8 @@ void csRadiosity :: ApplyDeltaAndAmbient()
   total_delta_color.red += csLight::ambient_red;
   total_delta_color.green += csLight::ambient_green;
   total_delta_color.blue += csLight::ambient_blue;
-  //CsPrintf(MSG_INITIALIZATION, "Setting ambient (%g, %g, %g).\n",
-  // total_delta_color.red, total_delta_color.green, total_delta_color.blue);
+  CsPrintf(MSG_INITIALIZATION, "Setting ambient (%g, %g, %g).\n",
+   total_delta_color.red, total_delta_color.green, total_delta_color.blue);
 
   /// then apply delta & ambient
   list->Traverse(apply_ambient_func);
@@ -942,7 +1094,55 @@ bool csRadiosity :: VisiblePoly(csRadPoly *src, csRadPoly *dest)
   // for now check the center (u,v) of lightmap hitbeam.
   // thus if the center is shadowed it is still skipped, wrongly.
   csVector3 start, end;
-  src->GetLumelWorldCoords(start, src->GetWidth()/2, src->GetHeight()/2);
-  dest->GetLumelWorldCoords(end, dest->GetWidth()/2, dest->GetHeight()/2);
+  src->GetLumelWorldCoords(start, src->GetWidth()/2., src->GetHeight()/2.);
+  dest->GetLumelWorldCoords(end, dest->GetWidth()/2., dest->GetHeight()/2.);
   return GetVisibility(src, start, dest, end) > 0.0;
 }
+
+
+void csRadiosity :: MapFrustrum(csFrustrum *shad, 
+     void (*drawfunc)(int, int, float))
+{
+  int i;
+  int destnum = shoot_dest->GetPolygon3D()->GetNumVertices();
+  csVector3 *destpol = new csVector3[ destnum ];
+  for(i=0; i<destnum; i++)
+    destpol[i] = shoot_dest->GetPolygon3D()->Vwor(i) - shad->GetOrigin();
+  // maps using dest, onto shadow_map
+  csFrustrum* frust = shad->Intersect(destpol, destnum);
+  delete destpol;
+  if(!frust) return;
+  /// the frust polygon is coplanar with us, so project onto lumel space
+  /// and paint into our shadowmap
+  int rpv= frust->GetNumVertices ();
+  csVector2* rp = new csVector2[rpv];
+  // get polygon projected to texture space
+  int ww, hh;
+  csPolygon3D *polygon = shoot_dest->GetPolygon3D();
+  polygon->GetTextureHandle()->GetMipMapDimensions (0, ww, hh);
+  csPolyTxtPlane* txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
+  csPolyTexture *polytext = polygon->GetLightMapInfo()->GetPolyTex();
+  int Imin_u = polytext->GetIMinU();
+  int Imin_v = polytext->GetIMinV();
+  csMatrix3 *m_world2tex;
+  csVector3 *v_world2tex;
+  txt_pl->GetWorldToTexture(m_world2tex, v_world2tex);
+
+  csVector3 projector;
+  float inv_lightcell_size = 1.0 / csPolygon3D::lightcell_size;
+  for (i = 0; i < rpv; i++)
+  {
+    projector = (*m_world2tex) * (frust->GetVertex (i) + frust->GetOrigin() 
+      - (*v_world2tex));
+    rp [i].x = (projector.x * ww - Imin_u) * inv_lightcell_size;
+    rp [i].y = (projector.y * hh - Imin_v) * inv_lightcell_size;
+  }
+
+  // paint onto shadow map
+  csPolyTexture::SetupPolyFill( drawfunc );
+  csPolyTexture::DoPolyFill( 0,0, shoot_dest->GetWidth(), 
+    shoot_dest->GetHeight(), rpv, rp);
+
+  delete frust;
+}
+

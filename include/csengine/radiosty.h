@@ -30,6 +30,9 @@ class csPolygon3D;
 class csLightMap;
 class csRGBLightMap;
 class csProgressMeter;
+class csProgressPulse;
+class csFrustrumView;
+class csShadowFrustrum;
 
 /**
  *  A radiosity polygon, containing lightmap patches, the lumels.
@@ -52,6 +55,8 @@ private:
   csVector3 lumel_origin, lumel_x_axis, lumel_y_axis;
   /// the area of one lumel of the polygon
   float one_lumel_area;
+  /// values for loop detection, last shooting priority and repeats
+  float last_shoot_priority; int num_repeats;
 
 public:
   csRadPoly(csPolygon3D *original);
@@ -85,12 +90,21 @@ public:
   inline float GetLumelCoverage(int suv)
   { return lumel_coverage_map[suv]; }
 
+  /// Get last shooting priority of this radpoly
+  inline float GetLastShootingPriority() { return last_shoot_priority;}
+  /// Set last shooting priority
+  inline void SetLastShootingPriority(float val) {last_shoot_priority=val;}
+  /// Get number of repeats shooting at the same priority for this poly.
+  inline int GetNumRepeats() { return num_repeats; }
+  /// Increment the number of repeats of shooting at same priority by one.
+  inline void IncNumRepeats() {num_repeats++;}
+
   /// Get world coordinates for a lumel -- slow method
   void GetLumelWorldCoords(csVector3& res, int x, int y);
   /// Setup fast lumel to world coords - uses GetLumelWorldCoords
   void SetupQuickLumel2World();
   /// Quick getting lumel to world coords;
-  inline void QuickLumel2World(csVector3& res, int x, int y)
+  inline void QuickLumel2World(csVector3& res, float x, float y)
   { res = lumel_origin + x* lumel_x_axis + y * lumel_y_axis; }
   /// get area of one lumel in world space
   inline float GetOneLumelArea() const { return one_lumel_area; }
@@ -136,6 +150,12 @@ public:
    *  Gets the texture, and scales down. You must delete the map.
    */
   csRGBLightMap *ComputeTextureLumelSized();
+
+  /**
+   *  Fix a float* map with a polygon or lightfrustrum projected onto
+   *  it, for laterinterpolation.
+   */
+  static void FixCoverageMap(float* map, int width, int height);
   
   /// Get a RadPoly when you have a csPolygon3D (only type we attach to)
   static csRadPoly* GetRadPoly(csPolygon3D &object);
@@ -220,6 +240,8 @@ private:
 
   /// progress meter of the work
   csProgressMeter *meter;
+  /// pulse to see polygon shootings
+  csProgressPulse *pulse;
   /// the probably highest priority, starting priority.
   float start_priority;
   /// the number of iterations done.
@@ -243,8 +265,12 @@ private:
   /// texture map of source polygon - reasonably quick to compute, saves
   /// a lot of space.
   csRGBLightMap *texturemap;
+  /// the shadows lying on the dest polygon, 1=full visible, 0=all shadow
+  float *shadow_map;
   /// color of source lumel for multiplying delta's with.
   csColor src_lumel_color;
+  /// color from passing portals between source and dest polygon.
+  csColor trajectory_color;
 
 public:
   /// create all radiosity data.
@@ -256,12 +282,16 @@ public:
 
   /// get next best poly to shoot, or NULL if we should stop.
   csRadPoly* FetchNext();
+  /// Start a sector frustrum to shoot from the source. callback is used.
+  void StartFrustrum();
+  /// found a destination polygon, test and process it
+  void ProcessDest(csRadPoly *dest, csFrustrumView *lview);
   /// Shoot light from one polygon to another
   void ShootRadiosityToPolygon(csRadPoly* dest);
   /// Prepare to shoot from source poly
-  void PrepareShootSource(csRadPoly*src);
+  void PrepareShootSource(csRadPoly* src);
   /// Prepare to shoot from source to dest 
-  void PrepareShootDest(csRadPoly*dest);
+  void PrepareShootDest(csRadPoly* dest, csFrustrumView *lview);
   /// Prepare to shoot from a lumel
   void PrepareShootSourceLumel(int sx, int sy, int suv);
   /// Shoot it, dest lumel given.
@@ -280,6 +310,8 @@ public:
   void RemoveAmbient();
   /// check if dest poly is visible to source poly
   bool VisiblePoly(csRadPoly *src, csRadPoly *dest);
+  /// map a frustrum using given drawfunc.
+  void MapFrustrum(csFrustrum *shad, void (*drawfunc)(int, int, float));
 
 };
 
