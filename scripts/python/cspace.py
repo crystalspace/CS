@@ -8466,6 +8466,7 @@ class iGraphics3D(iBase):
     def HasNearPlane(*args): return _cspace.iGraphics3D_HasNearPlane(*args)
     def SetRenderState(*args): return _cspace.iGraphics3D_SetRenderState(*args)
     def GetRenderState(*args): return _cspace.iGraphics3D_GetRenderState(*args)
+    def SetOption(*args): return _cspace.iGraphics3D_SetOption(*args)
     def CreateRenderBuffer(*args): return _cspace.iGraphics3D_CreateRenderBuffer(*args)
     def CreateInterleavedRenderBuffers(*args): return _cspace.iGraphics3D_CreateInterleavedRenderBuffers(*args)
     def SetBufferState(*args): return _cspace.iGraphics3D_SetBufferState(*args)
