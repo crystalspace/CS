@@ -608,7 +608,7 @@ void csTerrFuncObject::LoadMaterialGroup (iLoaderContext* ldr_context,
 
 //---------------------------------------------------------------------------
 
-class csTriangleVertices;
+class TerrFuncTriangleVertices;
 
 /*
  * A class which holds vertices and connectivity information for a triangle
@@ -616,7 +616,7 @@ class csTriangleVertices;
  * for LOD generation since every vertex contains information which
  * helps selecting the best vertices for collapsing.
  */
-class csTriangleVertices
+class TerrFuncTriangleVertices
 {
 public:
   /*
@@ -672,7 +672,7 @@ public:
      * Calculate the minimal cost of collapsing this vertex to some other.
      * Also remember which other vertex was selected for collapsing to.
      */
-    void CalculateCost(csTriangleVertices* vertices, csTerrFuncObject* terrfunc);
+    void CalculateCost(TerrFuncTriangleVertices* vertices, csTerrFuncObject* terrfunc);
   };
 
 private:
@@ -682,11 +682,11 @@ private:
 
 public:
   // Build vertex table for a triangle mesh.
-  csTriangleVertices (const G3DTriangleMesh& mesh,
+  TerrFuncTriangleVertices (const G3DTriangleMesh& mesh,
   	csVector3* mesh_vertices, int num_mesh_vertices,
   	csTerrFuncObject* terrfunc);
   ///
-  ~csTriangleVertices ();
+  ~TerrFuncTriangleVertices ();
   // Update vertex table for a given set of vertices
   // (with the same number as at init).
   void UpdateVertices (csVector3* verts);
@@ -698,7 +698,7 @@ public:
   int GetMinimalCostVertex ();
 };
 
-void csTriangleVertices::csTriangleVertex::AddTriangle (int idx)
+void TerrFuncTriangleVertices::csTriangleVertex::AddTriangle (int idx)
 {
   int i;
   for (i = 0 ; i < num_con_triangles ; i++)
@@ -719,7 +719,7 @@ void csTriangleVertices::csTriangleVertex::AddTriangle (int idx)
   num_con_triangles++;
 }
 
-void csTriangleVertices::csTriangleVertex::AddVertex (int idx)
+void TerrFuncTriangleVertices::csTriangleVertex::AddVertex (int idx)
 {
   int i;
   for (i = 0 ; i < num_con_vertices ; i++)
@@ -740,7 +740,7 @@ void csTriangleVertices::csTriangleVertex::AddVertex (int idx)
   num_con_vertices++;
 }
 
-bool csTriangleVertices::csTriangleVertex::DelVertex (int idx)
+bool TerrFuncTriangleVertices::csTriangleVertex::DelVertex (int idx)
 {
   int i;
   for (i = 0 ; i < num_con_vertices ; i++)
@@ -755,12 +755,12 @@ bool csTriangleVertices::csTriangleVertex::DelVertex (int idx)
   return false;
 }
 
-void csTriangleVertices::csTriangleVertex::ReplaceVertex (int old, int replace)
+void TerrFuncTriangleVertices::csTriangleVertex::ReplaceVertex (int old, int replace)
 {
   if (DelVertex (old)) AddVertex (replace);
 }
 
-void csTriangleVertices::csTriangleVertex::CalculateCost (csTriangleVertices* vertices,
+void TerrFuncTriangleVertices::csTriangleVertex::CalculateCost (TerrFuncTriangleVertices* vertices,
 	csTerrFuncObject* terrfunc)
 {
   int i;
@@ -948,7 +948,7 @@ void csTriangleVertices::csTriangleVertex::CalculateCost (csTriangleVertices* ve
   cost = min_dheight;
 }
 
-csTriangleVertices::csTriangleVertices (const G3DTriangleMesh& mesh,
+TerrFuncTriangleVertices::TerrFuncTriangleVertices (const G3DTriangleMesh& mesh,
 	csVector3* mesh_vertices,
 	int num_mesh_vertices,
 	csTerrFuncObject* terrfunc)
@@ -998,19 +998,19 @@ csTriangleVertices::csTriangleVertices (const G3DTriangleMesh& mesh,
   }
 }
 
-csTriangleVertices::~csTriangleVertices ()
+TerrFuncTriangleVertices::~TerrFuncTriangleVertices ()
 {
   delete [] vertices;
 }
 
-void csTriangleVertices::UpdateVertices (csVector3* verts)
+void TerrFuncTriangleVertices::UpdateVertices (csVector3* verts)
 {
   int i;
   for (i = 0 ; i < num_vertices ; i++)
     vertices[i].pos = verts[i];
 }
 
-int csTriangleVertices::GetMinimalCostVertex ()
+int TerrFuncTriangleVertices::GetMinimalCostVertex ()
 {
   int i;
   int min_idx = -1;
@@ -1024,7 +1024,7 @@ int csTriangleVertices::GetMinimalCostVertex ()
   return min_idx;
 }
 
-void csTriangleVertices::CalculateCost (csTerrFuncObject* terrfunc)
+void TerrFuncTriangleVertices::CalculateCost (csTerrFuncObject* terrfunc)
 {
   int i;
   for (i = 0 ; i < num_vertices ; i++)
@@ -1079,7 +1079,7 @@ void csTerrFuncObject::ComputeLODLevel (
 
   int i;
   // Calculate connectivity information.
-  csTriangleVertices* verts = new csTriangleVertices (source,
+  TerrFuncTriangleVertices* verts = new TerrFuncTriangleVertices (source,
   	source_vertices, num_source_vertices, this);
 
   // First copy the triangles table. While doing the lod we will
@@ -1092,11 +1092,11 @@ void csTerrFuncObject::ComputeLODLevel (
   while (true)
   {
     int from = verts->GetMinimalCostVertex ();
-    csTriangleVertices::csTriangleVertex& vt_from = verts->GetVertex (from);
+    TerrFuncTriangleVertices::csTriangleVertex& vt_from = verts->GetVertex (from);
     float cost = vt_from.cost;
     if (cost > maxcost) break;
     int to = vt_from.to_vertex;
-    csTriangleVertices::csTriangleVertex& vt_to = verts->GetVertex (to);
+    TerrFuncTriangleVertices::csTriangleVertex& vt_to = verts->GetVertex (to);
 
     // First update all triangles to replace the 'from' vertex with the
     // 'to' vertex. This can basically collapse triangles to a flat triangle.
