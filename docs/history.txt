@@ -63,6 +63,7 @@ chronological order.
 	      distinguish between left/right modifiers or keypad and 
 	      non-keypad keys.
 	- res fixed a few files to compile again after his latest changes.
+	- res reverted an accidential change to md32spr.
 15-Oct-2003
 	- Eric Sunshine fixed a bug in RemoveDups from helper.jam.  It was
 	  trying to dereference a variable using an 8-bit character instead of

@@ -242,21 +242,6 @@ void MD32spr::Main()
    */
   basename(name.GetData(), fileName);
 
-/*  if (cmdline->GetOption("o")) {
-    outZipName = cmdline->GetOption("o");
-  }
-  else
-  {
-    outZipName.Append (fileName);
-    outZipName.Append ("-spr.zip");
-  }
-
-  if (cmdline->GetOption("scale")) {
-    scaleFactor = atof(cmdline->GetOption("scale"));
-  }*/
-
-  //printf("%d %s\n", strlen(fileName), fileName);
-
   /* This doesn't seem to work if you have the name as /tmp/%s_data, but works when
      there is an ending slash, like /tmp/%s_data/. It mounts the zip file but vfs->FindFiles(char *dirname)
      doesn't work without the ending slash.
