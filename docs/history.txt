@@ -13,6 +13,8 @@ chronological order.
 	  iMeshObject->HitBeamObject(). Currently only thing supports this.
 	  The intention is that you can get the index of the polygon that is
 	  hit.
+	- Eric Sunshine protected the new terrain item in user.mak inside
+	  USE_NEW_RENDERER conditional.
 25-Sep-2003
 	- Jorrit removed iCamera->GetHit(). This function is only a very
 	  thin wrapper on top of iSector->HitBeamPortals() so it is not
