@@ -1266,6 +1266,8 @@ void csEngine::ForceRelight (iLight* light, iRegion* region)
   for (sn = 0; sn < num_meshes; sn++)
   {
     iMeshWrapper *s = meshes.Get (sn);
+    if (s->GetMovable ()->GetSectors ()->GetCount () <= 0)
+      continue;	// No sectors, don't process lighting.
     if (!region || region->IsInRegion (s->QueryObject ()))
     {
       iLightingInfo* linfo = s->GetLightingInfo ();
@@ -1283,6 +1285,8 @@ void csEngine::ForceRelight (iLight* light, iRegion* region)
   for (sn = 0 ; sn < num_meshes ; sn++)
   {
     iMeshWrapper *s = meshes.Get (sn);
+    if (s->GetMovable ()->GetSectors ()->GetCount () <= 0)
+      continue;	// No sectors, don't process lighting.
     if (!region || region->IsInRegion (s->QueryObject ()))
     {
       iLightingInfo* linfo = s->GetLightingInfo ();
@@ -1514,6 +1518,8 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
   for (sn = 0; sn < num_meshes; sn++)
   {
     iMeshWrapper *s = meshes.Get (sn);
+    if (s->GetMovable ()->GetSectors ()->GetCount () <= 0)
+      continue;	// No sectors, don't process lighting.
     if (!region || region->IsInRegion (s->QueryObject ()))
     {
       iLightingInfo* linfo = s->GetLightingInfo ();
@@ -1623,6 +1629,8 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
   for (sn = 0; sn < num_meshes; sn++)
   {
     iMeshWrapper *s = meshes.Get (sn);
+    if (s->GetMovable ()->GetSectors ()->GetCount () <= 0)
+      continue;	// No sectors, don't process lighting.
     if (!region || region->IsInRegion (s->QueryObject ()))
     {
       iLightingInfo* linfo = s->GetLightingInfo ();

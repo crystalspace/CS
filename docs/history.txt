@@ -28,6 +28,14 @@ chronological order.
 	  so that they now only query for the respective interfaces when
 	  being called. That will make it easier later to build those
 	  multiplexing versions for static lod on demand.
+	- Jorrit fixed a bug in the engine when it would try to do lighting.
+	  It would also attempt to init and cache lighting for meshes that
+	  were not in any sector. This could cause crashes as some meshes
+	  assumed that they were in a sector. This fixes a bug when relighting
+	  a level that defines 'meshobj' outside sectors (this is useful in
+	  combination with libraries) and where you use 'meshlib' to pull
+	  the object in a sector. If the 'meshlib' was not used then the
+	  'meshobj' would remain in the engine without any sector.
 3-May-2004
 	- Eric Sunshine augmented all the "build" instructions in the user
 	  manual to indicate that the project can be built with both Jam and
