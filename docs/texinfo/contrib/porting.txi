@@ -10,7 +10,7 @@ Before undertaking the job of porting Crystal Space to a new platform one
 should, at least marginally, familiarize one's self with the various modules
 which comprise the package. A good way to gain such an overview is to read
 the Chapter about the internal structure of Crystal Space (@pxref{Internals}),
-as well as the Libraries (@pxref{Libraries}) and Plug-in
+as well as the Libraries (@pxref{Facilities}) and Plug-in
 (@pxref{Plug-In Drivers}) chapters.
 
 Once you have gained an overview of structure of Crystal Space, the first step

@@ -31,7 +31,7 @@
  * A spline superclass.
  * This spline can control several dimensions at once.
  */
-class CS_CSGEOM_EXPORT csSpline
+class CS_CRYSTALSPACE_EXPORT csSpline
 {
 protected:
   int dimensions;
@@ -147,7 +147,7 @@ public:
 /**
  * A cubic spline.
  */
-class CS_CSGEOM_EXPORT csCubicSpline : public csSpline
+class CS_CRYSTALSPACE_EXPORT csCubicSpline : public csSpline
 {
 private:
   bool derivatives_valid;
@@ -183,7 +183,7 @@ public:
 /**
  * A B-spline.
  */
-class CS_CSGEOM_EXPORT csBSpline : public csSpline
+class CS_CRYSTALSPACE_EXPORT csBSpline : public csSpline
 {
 private:
   // The following values are calculated by Calculate() and
@@ -216,7 +216,7 @@ public:
 /**
  * A CatmullRom spline.
  */
-class CS_CSGEOM_EXPORT csCatmullRomSpline : public csBSpline
+class CS_CRYSTALSPACE_EXPORT csCatmullRomSpline : public csBSpline
 {
 protected:
   /// Base function for a cubic CatmullRom spline (i=-2..1).

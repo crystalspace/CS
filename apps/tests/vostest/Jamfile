@@ -6,6 +6,6 @@ Description vostest : "VOS support test" ;
 Application vostest : [ Wildcard *.cpp *.h ] : noinstall ;
 CFlags vostest :
   [ FDefines _REENTRANT ] $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
-LinkWith vostest : csgeom csgfx cstool csutil ;
+LinkWith vostest : crystalspace ;
 ExternalLibs vostest : VOS  ;
 }

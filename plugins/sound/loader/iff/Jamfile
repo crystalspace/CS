@@ -5,7 +5,7 @@ Description sndiff : "iff sound loader" ;
 Plugin sndiff
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith sndiff : csplugincommon csutil ;
+LinkWith sndiff : crystalspace ;
 
 CompileGroups sndiff :  soundloaders ;
 

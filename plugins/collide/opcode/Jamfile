@@ -5,4 +5,4 @@ Description opcode : "OPCODE collision detection plugin" ;
 Plugin opcode
 	: [ Wildcard *.cpp *.h ] [ Wildcard Ice : *.cpp *.h ]
 ;
-LinkWith opcode : csgeom csutil ;
+LinkWith opcode : crystalspace ;

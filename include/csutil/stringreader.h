@@ -25,7 +25,7 @@
  * This is a convenience class that reads an input buffer line by line.
  * It takes care of OS specific line endings (CR or CR/LF).
  */
-class CS_CSUTIL_EXPORT csStringReader
+class CS_CRYSTALSPACE_EXPORT csStringReader
 {
 private:
   const char* input;

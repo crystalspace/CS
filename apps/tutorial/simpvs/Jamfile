@@ -2,4 +2,4 @@ SubDir TOP apps tutorial simpvs ;
 
 Description simpvs : "tutorial, video selector" ;
 Application simpvs : [ Wildcard *.cpp *.h ] : noinstall ;
-LinkWith simpvs : csgeom csgfx cstool csutil ;
+LinkWith simpvs : crystalspace ;

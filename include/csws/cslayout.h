@@ -34,7 +34,7 @@
  * csLayoutConstraint is a basic constraint used for positioning a control
  * in a csLayout derived component.
  */
-class CS_CSWS_EXPORT csLayoutConstraint
+class CS_CRYSTALSPACE_EXPORT csLayoutConstraint
 {
 public:
   /// the attached component
@@ -57,7 +57,7 @@ public:
  * The constraints (and thus the components to place) are
  * taken into account in the sequence they are added to this vector.
  */
-class CS_CSWS_EXPORT csConstraintVector :
+class CS_CRYSTALSPACE_EXPORT csConstraintVector :
   public csPDelArray<csLayoutConstraint>
 {
 public:
@@ -100,7 +100,7 @@ public:
  * csLayout is our baseclass for various derived classes like
  * csFlowLayout, csBoxLayout, csGridBagLayout and others.
  */
-class CS_CSWS_EXPORT csLayout : public csDialog
+class CS_CRYSTALSPACE_EXPORT csLayout : public csDialog
 {
 protected:
   /**
@@ -177,7 +177,7 @@ public:
  * csLayout2 extends csLayout to take the maximum layout size and
  * aligning along the x and y axis into account.
  */
-class CS_CSWS_EXPORT csLayout2 : public csLayout
+class CS_CRYSTALSPACE_EXPORT csLayout2 : public csLayout
 {
  public:
   csLayout2 (csComponent *pParent);

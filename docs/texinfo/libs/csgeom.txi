@@ -1,10 +1,10 @@
-@node csGeom, CSWS, SCF, Libraries
-@section Geometry Library (@code{csGeom})
+@node csGeom, CSWS, SCF, Facilities
+@section Geometry Module (@code{csGeom})
 @cindex csGeom
-@cindex Libraries,csGeom
-@cindex Geometry Library
+@cindex Module, csGeom
+@cindex Geometry Module
 
-This library is used to perform any calculations dealing with 2D or 3D
+This facility is used to perform any calculations dealing with 2D or 3D
 geometry. It contains several more or less independent classes. The most
 important classes are:
 

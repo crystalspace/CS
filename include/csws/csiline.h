@@ -58,7 +58,7 @@ class csTimer;
  * checks the just-modified string for correctness. If method decides
  * that string is incorrect, the changes are undone.
  */
-class CS_CSWS_EXPORT csInputLine : public csComponent
+class CS_CRYSTALSPACE_EXPORT csInputLine : public csComponent
 {
   /// Input line frame style
   csInputLineFrameStyle FrameStyle;

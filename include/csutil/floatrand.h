@@ -25,7 +25,7 @@
 /**
  * Fast simple random number generator for a floating point values.
  */
-class CS_CSUTIL_EXPORT csRandomFloatGen
+class CS_CRYSTALSPACE_EXPORT csRandomFloatGen
 {
 private:
   unsigned int seed;

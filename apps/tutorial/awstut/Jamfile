@@ -2,4 +2,4 @@ SubDir TOP apps tutorial awstut ;
 
 Description awstut : "Alternate Windowing System Tutorial" ;
 Application awstut : [ Wildcard *.cpp *.h ] : noinstall ;
-LinkWith awstut : csgeom csgfx cstool csutil ;
+LinkWith awstut : crystalspace ;

@@ -27,7 +27,7 @@
 #include "isound/wrapper.h"
 
 /// Document me and possible move me to some sound manager! @@@
-class CS_CSTOOL_EXPORT csSoundWrapper : public csObject
+class CS_CRYSTALSPACE_EXPORT csSoundWrapper : public csObject
 {
 protected:
   ///

@@ -25,7 +25,7 @@
  * This class is used to identify capabilities in the processor such as 
  * support for MMX and SSE
  */
-class CS_CSUTIL_EXPORT csProcessorCapability
+class CS_CRYSTALSPACE_EXPORT csProcessorCapability
 {
 public:
 

@@ -5,4 +5,4 @@ Description frustvis : "Frustum Visibility System" ;
 Plugin frustvis
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith frustvis : csgeom csutil ;
+LinkWith frustvis : crystalspace ;

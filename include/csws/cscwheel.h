@@ -46,7 +46,7 @@ enum
 };
 
 /// Color wheel static control
-class CS_CSWS_EXPORT csColorWheel : public csStatic
+class CS_CRYSTALSPACE_EXPORT csColorWheel : public csStatic
 {
   // Current H & S values (L is separate)
   float h,s;

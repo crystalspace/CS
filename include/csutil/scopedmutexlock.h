@@ -36,7 +36,7 @@
  *      return;
  *  }
  */
-class CS_CSUTIL_EXPORT csScopedMutexLock
+class CS_CRYSTALSPACE_EXPORT csScopedMutexLock
 {
 public:
   csScopedMutexLock (csMutex* newmutex)

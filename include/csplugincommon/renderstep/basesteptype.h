@@ -26,7 +26,7 @@
 #include "iutil/objreg.h"
 #include "iengine/rendersteps/irsfact.h"
 
-class CS_CSPLUGINCOMMON_EXPORT csBaseRenderStepType : public iComponent, 
+class CS_CRYSTALSPACE_EXPORT csBaseRenderStepType : public iComponent, 
 						       public iRenderStepType
 {
 protected:

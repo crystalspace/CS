@@ -5,6 +5,6 @@ Description nullmeshldr : "Null mesh object loader" ;
 Plugin nullmeshldr
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith nullmeshldr : csgeom csutil ;
+LinkWith nullmeshldr : crystalspace ;
 
 CompileGroups nullmeshldr :  meshes ;

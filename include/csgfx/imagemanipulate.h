@@ -35,7 +35,7 @@
  * Helper class to manipulate iImage objects.
  * The methods in this class generally return new images.
  */
-class CS_CSGFX_EXPORT csImageManipulate
+class CS_CRYSTALSPACE_EXPORT csImageManipulate
 {
   static csRef<iImage> Mipmap2D (iImage* source, int step, 
     csRGBpixel* transp = 0);

@@ -2,4 +2,4 @@ SubDir TOP apps tools heightmapgen ;
 
 Description heightmapgen : "Convert object to heightmap" ;
 Application heightmapgen : [ Wildcard *.cpp *.h ] ;
-LinkWith heightmapgen : csgeom csgfx cstool csutil ;
+LinkWith heightmapgen : crystalspace ;

@@ -37,7 +37,7 @@
 /**
  * The csClipper class is an abstract parent to all 2D clipping objects.
  */
-class CS_CSGEOM_EXPORT csClipper : public iClipper2D
+class CS_CRYSTALSPACE_EXPORT csClipper : public iClipper2D
 {
 protected:
   /// This variable holds a pool for 2D polygons as used by the clipper.
@@ -70,7 +70,7 @@ public:
  * The csBoxClipper class is able to clip convex polygons to a rectangle
  * (such as the screen).
  */
-class CS_CSGEOM_EXPORT csBoxClipper : public csClipper
+class CS_CRYSTALSPACE_EXPORT csBoxClipper : public csClipper
 {
   /// The clipping region
   csBox2 region;
@@ -134,7 +134,7 @@ public:
  * The clipping polygon *should* be convex since the routine does not
  * expect any line to intersect the edge of clipping polygon more than twice.
  */
-class CS_CSGEOM_EXPORT csPolygonClipper : public csClipper
+class CS_CRYSTALSPACE_EXPORT csPolygonClipper : public csClipper
 {
   /// Equation for all edges of clipping polygon
   csVector2 *ClipData;

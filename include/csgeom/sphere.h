@@ -35,7 +35,7 @@ class csTransform;
 /**
  * This class represents a sphere.
  */
-class CS_CSGEOM_EXPORT csSphere
+class CS_CRYSTALSPACE_EXPORT csSphere
 {
 private:
   csVector3 center;

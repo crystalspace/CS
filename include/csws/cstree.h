@@ -246,7 +246,7 @@ enum csTreeItemStyle
  * something other than a csTreeItem into another csTreeItem will crash,
  * since csTreeItem often does unconditional typecasts to csTreeItem.
  */
-class CS_CSWS_EXPORT csTreeItem : public csComponent
+class CS_CRYSTALSPACE_EXPORT csTreeItem : public csComponent
 {
   friend class csTreeBox;
 
@@ -428,7 +428,7 @@ enum csTreeFrameStyle
  *     top; if there is no such item at all, the cursor stays still.</li>
  * </ul>
  */
-class CS_CSWS_EXPORT csTreeBox : public csComponent
+class CS_CRYSTALSPACE_EXPORT csTreeBox : public csComponent
 {
   /**
    * A private class used to insert all tree items into.

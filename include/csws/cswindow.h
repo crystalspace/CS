@@ -124,7 +124,7 @@ enum
  * component. The client window is the rectangle where the actual
  * window contents (a dialog, a picture etc) are drawn.
  */
-class CS_CSWS_EXPORT csWindow : public csComponent
+class CS_CRYSTALSPACE_EXPORT csWindow : public csComponent
 {
 protected:
   /// Window style

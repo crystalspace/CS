@@ -22,7 +22,7 @@
 
 // Must appear first after cssysdef.h
 
-#include "csextern.h"
+#include "csextern_dx.h"
 #include <windows.h>
 
 #ifdef CS_BUILD_SHARED_LIBS

@@ -37,7 +37,7 @@ class csStringHashIterator;
  * comparing strings.  You can fetch a string's ID via Request().
  * \sa csStringSet
  */
-class CS_CSUTIL_EXPORT csStringHash
+class CS_CRYSTALSPACE_EXPORT csStringHash
 {
 private:
   friend class csStringHashIterator;
@@ -101,7 +101,7 @@ public:
  * When you have an open iterator you should not alter the
  * string hash that this object iterates over. 
  */
-class CS_CSUTIL_EXPORT csStringHashIterator
+class CS_CRYSTALSPACE_EXPORT csStringHashIterator
 {
   friend class csStringHash;
 

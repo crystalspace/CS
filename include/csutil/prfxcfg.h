@@ -29,7 +29,7 @@
  * returned instead of the real file name. The real name will still be
  * used for loading and saving.
  */
-class CS_CSUTIL_EXPORT csPrefixConfig : public csConfigFile
+class CS_CRYSTALSPACE_EXPORT csPrefixConfig : public csConfigFile
 {
 public:
   /// constructor

@@ -32,7 +32,7 @@
  * This is just for completeness. Set absolute positions just like you
  * normally do with SetPos, SetSize and SetRect.
  */
-class CS_CSWS_EXPORT csAbsoluteLayout : public csLayout
+class CS_CRYSTALSPACE_EXPORT csAbsoluteLayout : public csLayout
 {
  public:
 

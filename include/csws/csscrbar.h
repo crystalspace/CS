@@ -109,7 +109,7 @@ enum
  * Parent can set scroll bar's position/range using command
  * messages.
  */
-class CS_CSWS_EXPORT csScrollBar : public csComponent
+class CS_CRYSTALSPACE_EXPORT csScrollBar : public csComponent
 {
   /// Scroll bar frame style
   csScrollBarFrameStyle FrameStyle;

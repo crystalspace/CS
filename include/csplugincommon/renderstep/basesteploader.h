@@ -29,7 +29,7 @@
 #include "csutil/ref.h"
 #include "csutil/leakguard.h"
 
-class CS_CSPLUGINCOMMON_EXPORT csBaseRenderStepLoader : public iLoaderPlugin, 
+class CS_CRYSTALSPACE_EXPORT csBaseRenderStepLoader : public iLoaderPlugin, 
 							 public iComponent
 {
 protected:

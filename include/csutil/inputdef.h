@@ -37,7 +37,7 @@ class csInputBinder;
  * This class holds a description of a physical source of input events, such
  * as a keyboard key, mouse or joystick button, or a mouse or joystick axis.
  */
-class CS_CSUTIL_EXPORT csInputDefinition
+class CS_CRYSTALSPACE_EXPORT csInputDefinition
 {
 protected:
   int containedType;

@@ -1,30 +1,25 @@
 SubDir TOP libs csplugincommon ;
 
+if $(CSLIB.DECLARED) != yes
 {
-  Description csplugincommon : "common plugin classes library" ;
-  
-  local subs = 
-    canvas
-    imageloader
-    particlesys
-    render3d
-    renderstep
-    shader
-    soundloader 
-    soundrenderer ;
-  local subinc = $(DOTDOT) $(DOTDOT) include csplugincommon ;
-  local i files ;
-  for i in $(subs)
-  {
-    files +=
-      [ Wildcard $(i) : *.cpp *.h ]
-      [ Wildcard [ ConcatDirs $(subinc) $(i) ] : *.h ] ;
-  }
-  Library csplugincommon : $(files) : shared ;
-  LibDepends csplugincommon : cstool csgfx csgeom csutil ;
+SubInclude TOP libs csplugincommon canvas ;
+SubInclude TOP libs csplugincommon imageloader ;
+SubInclude TOP libs csplugincommon particlesys ;
+SubInclude TOP libs csplugincommon render3d ;
+SubInclude TOP libs csplugincommon renderstep ;
+SubInclude TOP libs csplugincommon shader ;
+SubInclude TOP libs csplugincommon soundloader  ;
+SubInclude TOP libs csplugincommon soundrenderer ;
 }
-
+else
+{
+# NOTE: Currently shared libs require that the "Library" statements appear in
+# depedency order (ie when Y depends on X, the directory for X must be stated
+# before Y's). Certain subdirectories of csplugincommon depend upon the main
+# Crystal Space library built above. Therefore, we include these Jamfiles on
+# the second pass.
 SubInclude TOP libs csplugincommon directx ;
 SubInclude TOP libs csplugincommon macosx ;
 SubInclude TOP libs csplugincommon opengl ;
 SubInclude TOP libs csplugincommon win32 ;
+}

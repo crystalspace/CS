@@ -28,13 +28,13 @@
 #include "csutil/hash.h"
 #include "csutil/thread.h"
 
-class CS_CSUTIL_EXPORT csRefTracker : public iRefTracker
+class CS_CRYSTALSPACE_EXPORT csRefTracker : public iRefTracker
 {
   enum RefActionType
   {
     Increased, Decreased, Destructed
   };
-  struct CS_CSUTIL_EXPORT RefAction
+  struct CS_CRYSTALSPACE_EXPORT RefAction
   {
     RefActionType type;
     int refCount;
@@ -50,7 +50,7 @@ class CS_CSUTIL_EXPORT csRefTracker : public iRefTracker
       if (stack) stack->Free();
     }
   };
-  struct CS_CSUTIL_EXPORT RefInfo
+  struct CS_CRYSTALSPACE_EXPORT RefInfo
   {
     csArray<RefAction> actions;
     int refCount;
@@ -62,7 +62,7 @@ class CS_CSUTIL_EXPORT csRefTracker : public iRefTracker
   csBlockAllocator<RefInfo> riAlloc;
   csHash<void*, void*> aliases;
   csHash<RefInfo*, void*> trackedRefs;
-  struct CS_CSUTIL_EXPORT OldRefInfo
+  struct CS_CRYSTALSPACE_EXPORT OldRefInfo
   {
     void* obj;
     RefInfo* ri;

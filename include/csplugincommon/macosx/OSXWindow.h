@@ -7,7 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
-
+#include "csextern_osx.h"
 
 @interface OSXWindow : NSWindow
 

@@ -39,7 +39,7 @@
  * \param green Maximum value of green component
  * \param blue Maximum value of blue component
  */
-extern CS_CSGFX_EXPORT csPtr<iImage> csCreateXORPatternImage(int width, 
+extern CS_CRYSTALSPACE_EXPORT csPtr<iImage> csCreateXORPatternImage(int width, 
   int height, int recdepth, float red = 1.0f, float green = 1.0f,
   float blue = 1.0f);
 

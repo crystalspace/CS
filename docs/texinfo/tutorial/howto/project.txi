@@ -136,8 +136,11 @@ program or plugin module.
 
 @item
 @samp{LINKFLAGS} should be modified to list all the Crystal Space libraries
-that you want to use.  The typical list is @samp{cstool}, @samp{gsgfx},
-@samp{csgeom}, and @samp{csutil}.
+that you want to use.  Typically, you need only the @samp{crystalspace}
+library, though plugin modules which want to inherit some common functionality
+from pre-written classes might also need to link with
+@samp{crystalspace_directx}, @samp{crystalspace_macosx}, 
+@samp{crystalspace_opengl}, and/or @samp{crystalspace_windows}.
 
 @item
 @samp{VERSION} should indicate your product's version number (for example,

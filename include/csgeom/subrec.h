@@ -50,7 +50,7 @@ public:
  * a rectangular region from which a client can allocate smaller rectangles
  * until the region is full.
  */
-class CS_CSGEOM_EXPORT csSubRectangles
+class CS_CRYSTALSPACE_EXPORT csSubRectangles
 {
 protected:
   /// Dimensions of this region.

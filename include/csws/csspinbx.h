@@ -106,7 +106,7 @@ enum
  * arrow button which can be used to switch input line contents back and
  * forth between a set of predefined values.
  */
-class CS_CSWS_EXPORT csSpinBox : public csInputLine
+class CS_CRYSTALSPACE_EXPORT csSpinBox : public csInputLine
 {
   /// Current spin box value
   int Value;

@@ -91,7 +91,7 @@ enum csCheckBoxState
  * The check boxes contains a fixed bitmap which changes depending on
  * checkbox state and no text.
  */
-class CS_CSWS_EXPORT csCheckBox : public csButton
+class CS_CRYSTALSPACE_EXPORT csCheckBox : public csButton
 {
   /// Checkbox state
   csCheckBoxState CheckBoxState;

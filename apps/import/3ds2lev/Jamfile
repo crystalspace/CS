@@ -8,7 +8,7 @@ Application 3ds2lev
 	: [ Wildcard *.cpp *.h ]
 	: console
 ;
-LinkWith 3ds2lev : csgeom csutil ;
+LinkWith 3ds2lev : crystalspace ;
 ExternalLibs 3ds2lev :  3DS ;
 
 }

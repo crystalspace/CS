@@ -4,10 +4,10 @@ libdir=""
 lflags=""
 
 if test -r "$prefix/Jamfile" && \
-    test -r "$prefix/$makeout/libs/libcsutil.a"; then
+    test -r "$prefix/$makeout/libs/libcrystalspace.a"; then
     libdir="$prefix/$makeout/libs"
     lflags="-L$libdir"
-elif test -z "$libdir" && test -r "${exec_prefix}/lib/libcsutil.a"; then
+elif test -z "$libdir" && test -r "${exec_prefix}/lib/libcrystalspace.a"; then
     libdir="${exec_prefix}/lib"
     lflags="-L${exec_prefix}/lib"
 else
@@ -15,11 +15,11 @@ else
     for p in $CRYSTAL
     do
 	if test -r "$p/Jamfile" && \
-	    test -r "$p/$makeout/libs/csutil/libcsutil.a"; then
+	    test -r "$p/$makeout/libs/libcrystalspace.a"; then
 	    libdir="$p/$makeout/libs"
-	    lflags="-L$libdir/csutil -L$libdir/cstool -L$libdir/csgfx -L$libdir/csgeom -L$libdir/csws"
+	    lflags="-L$libdir"
 	    break
-	elif test -z "$libdir" && test -r "${p}/lib/libcsutil.a"; then
+	elif test -z "$libdir" && test -r "${p}/lib/libcrystalspace.a"; then
 	    libdir="${exec_prefix}/lib"
 	    lflags="-L${exec_prefix}/lib"
 	    break
@@ -157,7 +157,6 @@ addexlib()
     fi
 }
 
-common_libs="csgfx csgeom cstool csutil csws csplugincommon"
 raw_names=""
 the_libs=""
 show_libs=""
@@ -260,7 +259,7 @@ fi
 if test -n "$show_libs"; then
     # If user specified no libraries, then emit commonly needed ones.
     if test -z "$raw_names"; then
-	raw_names="$common_libs"
+	raw_names="$liblist"
     fi
     for do_lib in $raw_names; do
 	checklibname $do_lib
@@ -271,7 +270,9 @@ fi
 if test -n "$show_availlibs"; then
     # If user specified no libraries, then emit all.
     if test -z "$raw_names"; then
-	lib_names="$liblist"
+	for x in $liblist; do
+	    echo $x
+	done
     else
 	# Filter the user-supplied list down to valid entries. It is not an
 	# error for the user-supplied list to contain unknown library names;
@@ -281,17 +282,15 @@ if test -n "$show_availlibs"; then
 	# request is made on Linux; we just want to return a usable subset of
 	# those requested. Other options, such as --cflags, --libs, etc., will
 	# emit an appropriate error for unknown library requests.
-	lib_names=''
 	for x in $raw_names; do
 	    for z in $liblist; do
 		if test "_$x" = "_$z"; then
-		    lib_names="$x $lib_names"
+		    echo $x
 		    break
 		fi
 	    done
         done
     fi
-    echo "$lib_names"
 fi
 
 exit 0

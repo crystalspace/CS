@@ -5,4 +5,4 @@ Description spr3dbin : "Sprite 3D mesh object loader" ;
 Plugin spr3dbin
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith spr3dbin : csgeom csutil ;
+LinkWith spr3dbin : crystalspace ;

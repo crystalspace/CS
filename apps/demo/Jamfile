@@ -2,4 +2,4 @@ SubDir TOP apps demo ;
 
 Description csdemo : "Demo" ;
 Application csdemo : [ Wildcard *.cpp *.h ] ;
-LinkWith csdemo : csgeom csgfx cstool csutil ;
+LinkWith csdemo : crystalspace ;

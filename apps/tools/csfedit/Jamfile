@@ -5,5 +5,5 @@ Description csfedit : "font editor" ;
 Application csfedit
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith csfedit : csgeom csgfx cstool csutil csws ;
+LinkWith csfedit : crystalspace ;
 

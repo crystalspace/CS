@@ -31,7 +31,7 @@
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
 
-class CS_CSPLUGINCOMMON_EXPORT csRenderStepParser
+class CS_CRYSTALSPACE_EXPORT csRenderStepParser
 {
 private:
   iObjectRegistry* object_reg;

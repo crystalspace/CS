@@ -31,7 +31,7 @@ class csPixmap;
 class csAnimatedPixmap;
 
 /// A 2d animation template. This class is used to create animated pixmaps.
-class CS_CSTOOL_EXPORT csAnimationTemplate
+class CS_CRYSTALSPACE_EXPORT csAnimationTemplate
 {
 private:
   /// sprite frames
@@ -82,7 +82,7 @@ public:
 
 
 /// A pixmap with a 2d animation.
-class CS_CSTOOL_EXPORT csAnimatedPixmap : public csPixmap
+class CS_CRYSTALSPACE_EXPORT csAnimatedPixmap : public csPixmap
 {
 public:
   /// Create an animated pixmap.

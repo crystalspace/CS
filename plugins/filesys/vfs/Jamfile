@@ -4,7 +4,7 @@ if $(ZLIB.AVAILABLE) = "yes"
 {
 Description vfs : "Virtual File System plugin" ;
 Plugin vfs : [ Wildcard *.cpp *.h ] ;
-LinkWith vfs : csutil ;
+LinkWith vfs : crystalspace ;
 
 rule VfsCfgGen
 {

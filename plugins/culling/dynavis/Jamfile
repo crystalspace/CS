@@ -2,14 +2,14 @@ SubDir TOP plugins culling dynavis ;
 
 Description dynavis : "Dynamic Visibility System" ;
 Plugin dynavis : [ Wildcard *.cpp *.h ] ;
-LinkWith dynavis : csgeom csutil ;
+LinkWith dynavis : crystalspace ;
 
 if ! [ Property build : projgen ]
 {
   SubVariant debug ;
   Plugin dynavis_debug : [ Wildcard *.cpp *.h ] :
     independent noinstall nohelp ;
-  LinkWith dynavis_debug : csgeom csutil ;
+  LinkWith dynavis_debug : crystalspace ;
   CFlags dynavis_debug : [ FDefines DYNAVIS_DEBUG ] ;
   SubVariant ;
 }

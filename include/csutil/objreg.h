@@ -32,7 +32,7 @@
  * This is an implementation of iObjectRegistry.
  * Thread-safe!
  */
-class CS_CSUTIL_EXPORT csObjectRegistry : public iObjectRegistry
+class CS_CRYSTALSPACE_EXPORT csObjectRegistry : public iObjectRegistry
 {
 private:
   csRef<csMutex> mutex;

@@ -5,7 +5,7 @@ Description sndsoft : "software sound renderer" ;
 Plugin sndsoft
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith sndsoft : csplugincommon csgeom csutil ;
+LinkWith sndsoft : crystalspace ;
 
 CompileGroups sndsoft :  sounddrivers ;
 

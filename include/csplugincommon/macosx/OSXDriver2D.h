@@ -1,11 +1,9 @@
 //
 //  OSXDriver2D.h
 //
-//
 //  Created by mreda on Wed Oct 31 2001.
 //  Copyright (c) 2001 Matt Reda. All rights reserved.
 //
-
 
 // This code must be callable from the ObjC delegate.  Since that uses the
 // standard C compiler, it doesn't like C++ classes, so we create a C API to
@@ -16,6 +14,7 @@
 
 #if defined(__cplusplus)
 
+#include "csextern_osx.h"
 #include "OSXDelegate2D.h"
 
 #include "csgeom/csrect.h"
@@ -37,6 +36,7 @@ struct GammaTable
 };
 
 
+CS_CSPLUGINCOMMON_OSX_EXPORT
 class OSXDriver2D
 {
 public:

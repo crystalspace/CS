@@ -48,13 +48,13 @@ struct iObjectRegistry;
  * iEventQueue for a detailed description of each method.  One instance of this
  * class is usually shared via iObjectRegistry.  Event queues are thread-safe.
  */
-class CS_CSUTIL_EXPORT csEventQueue : public iEventQueue
+class CS_CRYSTALSPACE_EXPORT csEventQueue : public iEventQueue
 {
   friend class csEventOutlet;
   friend class csPoolEvent;
 
 private:
-  struct CS_CSUTIL_EXPORT Listener
+  struct CS_CRYSTALSPACE_EXPORT Listener
   {
     iEventHandler* object;
     unsigned int trigger;

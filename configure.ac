@@ -24,7 +24,7 @@ AC_INIT([crystalspace], [cs_version_number],
 CS_PACKAGEINFO([Crystal Space],
     [Copyright (C)1998-2005 Jorrit Tyberghein and others],
     [http://www.crystalspace3d.org/])
-AC_CONFIG_SRCDIR([libs/csutil/Jamfile])
+AC_CONFIG_SRCDIR([libs/Jamfile])
 AC_CONFIG_AUX_DIR([mk/autoconf])
 AC_CANONICAL_HOST
 

@@ -4,7 +4,7 @@ if $(GL.AVAILABLE) = "yes"
 {
 Description glshader_fixed : "fixed function pipeline shader" ;
 Plugin glshader_fixed : [ Wildcard *.cpp *.h ] ;
-LinkWith glshader_fixed : csplugincommon csgeom csgfx csutil ;
+LinkWith glshader_fixed : crystalspace ;
 ExternalLibs glshader_fixed : GL ;
 CompileGroups glshader_fixed : shaders renderers renderall ;
 }

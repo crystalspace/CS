@@ -2,4 +2,4 @@ SubDir TOP apps tools pvscalc ;
 
 Description pvscalc : "PVS calculator tool (for PVSvis)" ;
 Application pvscalc : [ Wildcard *.cpp *.h ] ;
-LinkWith pvscalc : csgeom csgfx cstool csutil ;
+LinkWith pvscalc : crystalspace ;

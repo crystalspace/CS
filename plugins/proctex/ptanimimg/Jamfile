@@ -5,6 +5,6 @@ Description ptanimimg : "animated image procedural texture" ;
 Plugin ptanimimg
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith ptanimimg : cstool csgfx csgeom csutil ;
+LinkWith ptanimimg : crystalspace ;
 
 CompileGroups ptanimimg : proctexes ;

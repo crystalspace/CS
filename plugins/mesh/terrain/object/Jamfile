@@ -5,7 +5,7 @@ Description chunklod : "CLOD Terrain plugin" ;
 Plugin chunklod
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith chunklod : cstool csgfx csgeom csutil ;
+LinkWith chunklod : crystalspace ;
 
 CompileGroups chunklod :  meshes ;
 

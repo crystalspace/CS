@@ -243,30 +243,34 @@ For release builds you need to select @emph{Multithreaded DLL} from the
 
 Once done, click on the @emph{OK} button and return to the MSVC IDE.
 
-@subsubheading Step 6 - Setting the Crystal Space static libs to link with.
+@subsubheading Step 6 - Linking with the Crystal Space libraries.
 
 When compiling Crystal Space in release and debug mode, you will end up with
 the following static libs, some of which you may require at some point in your
 own applications if you use the functionality contained within a given library.
 
+@noindent
 Crystal Space debug library names (the @emph{_d} indicates a debug CS library):
 
+@noindent
 @iftex
-@code{libcsutil_d.lib libcsgeom_d.lib libcsgfx_d.lib}@*
-@code{libcstool_d.lib libcsws_d.lib}
+@code{libcrystalspace_d.lib libcrystalspace_directx_d.lib}@*
+@code{libcrystalspace_opengl_d.lib libcrystalspace_windows_d.lib}
 @end iftex
 @ifnottex
-@code{libcsutil_d.lib libcsgeom_d.lib libcsgfx_d.lib libcstool_d.lib libcsws_d.lib}
+@code{libcrystalspace_d.lib libcrystalspace_directx_d.lib libcrystalspace_opengl_d.lib libcrystalspace_windows_d.lib}
 @end ifnottex
 
+@noindent
 Crystal Space release library names:
 
+@noindent
 @iftex
-@code{libcsutil.lib libcsgeom.lib libcsgfx.lib}@*
-@code{libcstool.lib libcsws.lib}
+@code{libcrystalspace.lib libcrystalspaceirectx.lib}@*
+@code{libcrystalspace_opengl.lib libcrystalspace_windows.lib}
 @end iftex
 @ifnottex
-@code{libcsutil.lib libcsgeom.lib libcsgfx.lib libcstool.lib libcsws.lib}
+@code{libcrystalspace.lib libcrystalspaceirectx.lib libcrystalspace_opengl.lib libcrystalspace_windows.lib}
 @end ifnottex
 
 To add the necessary libraries to link our application.  As in step 4 we need
@@ -280,37 +284,32 @@ on @emph{Properties} - both ways work.
 @picturesss{tutorial,howto,msvc7proj,snap5}
 @end ifnotinfo
 
-For our application we need only need link with a few of the available Crystal
-Space static libraries.  Open the @emph{Linker} folder and select @emph{Input}.
-In the text box @emph{Additional Dependencies} add the Crystal Space libraries
-as named below into the box with those already there.
+For applications we need only link with the primary Crystal Space library.  The
+other libraries provide support for custom plugin modules. Open the
+@emph{Linker} folder and select @emph{Input}.  In the text box @emph{Additional
+Dependencies} add the Crystal Space libraries as named below into the box with
+those already there.
 
+@noindent
 Debug:
 
-@iftex
-@code{libcsutil_d.lib libcsgeom_d.lib libcsgfx_d.lib}@*
-@code{libcstool_d.lib}
-@end iftex
-@ifnottex
-@code{libcsutil_d.lib libcsgeom_d.lib libcsgfx_d.lib libcstool_d.lib}
-@end ifnottex
+@noindent
+@code{libcrystalspace_d.lib}
 
+@noindent
 See image below for example of debug build link settings.
 
 @ifnotinfo
 @picturesss{tutorial,howto,msvc7proj,snap15}
 @end ifnotinfo
 
+@noindent
 Release:
 
-@iftex
-@code{libcsutil.lib libcsgeom.lib libcsgfx.lib}@*
-@code{libcstool.lib}
-@end iftex
-@ifnottex
-@code{libcsutil.lib libcsgeom.lib libcsgfx.lib libcstool.lib}
-@end ifnottex
+@noindent
+@code{libcrystalspace.lib}
 
+@noindent
 See image below for example of release build link settings.
 
 @ifnotinfo

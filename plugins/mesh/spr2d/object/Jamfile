@@ -5,7 +5,7 @@ Description spr2d : "2D Sprite mesh object plugin" ;
 Plugin spr2d
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith spr2d : cstool csgfx csgeom csutil ;
+LinkWith spr2d : crystalspace ;
 
 CompileGroups spr2d :  meshes ;
 

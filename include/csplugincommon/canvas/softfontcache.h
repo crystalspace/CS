@@ -37,7 +37,7 @@ class csGraphics2D;
  * Font cache base class for software canvases.
  * \sa csSoftFontCacheImpl
  */
-class CS_CSPLUGINCOMMON_EXPORT csSoftFontCache : public csFontCache
+class CS_CRYSTALSPACE_EXPORT csSoftFontCache : public csFontCache
 {
 public:
   struct SoftGlyphCacheData : public csFontCache::GlyphCacheData

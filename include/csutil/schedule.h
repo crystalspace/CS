@@ -73,7 +73,7 @@ class csSchedulePart;
  * class cannot give callbacks inside a single frame, it will behave as best as
  * possible using callbacks every frame.
  */
-class CS_CSUTIL_EXPORT csSchedule
+class CS_CRYSTALSPACE_EXPORT csSchedule
 {
 private:
   /// first part of the scheduled callbacks

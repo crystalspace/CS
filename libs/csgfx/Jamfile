@@ -1,9 +1,3 @@
 SubDir TOP libs csgfx ;
 
-Description csgfx : "graphics utility library" ;
-Library csgfx :
-  [ Wildcard *.cpp *.h ]
-  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csgfx ] : *.h ] :
-  shared ;
-LibDepends csgfx : csgeom csutil ;
-MsvcDefine csgfx : CS_CSGFX_LIB ;
+CsLibAddModule ;

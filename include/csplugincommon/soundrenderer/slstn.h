@@ -22,7 +22,7 @@
 #include "csextern.h"
 #include "isound/listener.h"
 
-class CS_CSPLUGINCOMMON_EXPORT csSoundListener : public iSoundListener
+class CS_CRYSTALSPACE_EXPORT csSoundListener : public iSoundListener
 {
 public:
   SCF_DECLARE_IBASE;

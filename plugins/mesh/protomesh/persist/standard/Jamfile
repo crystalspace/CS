@@ -2,5 +2,5 @@ SubDir TOP plugins mesh protomesh persist standard ;
 
 Description protomeshldr : "Proto mesh object loader" ;
 Plugin protomeshldr : [ Wildcard *.cpp *.h ] ;
-LinkWith protomeshldr : csgeom csutil ;
+LinkWith protomeshldr : crystalspace ;
 CompileGroups protomeshldr : meshes ;

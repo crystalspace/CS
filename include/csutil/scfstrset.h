@@ -29,7 +29,7 @@
  * string, which means to return the ID for the string, adding it to the
  * list if it is not already there.
  */
-class CS_CSUTIL_EXPORT csScfStringSet : public iStringSet
+class CS_CRYSTALSPACE_EXPORT csScfStringSet : public iStringSet
 {
   csStringSet set;
 

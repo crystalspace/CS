@@ -359,7 +359,7 @@ struct dirent
 
 # if defined(CS_WIN32_USE_CUSTOM_OPENDIR)
   struct DIR;
-# ifdef CS_CSUTIL_LIB
+# ifdef CS_CRYSTALSPACE_LIB
   extern "C" CS_EXPORT_SYM DIR *opendir (const char *name);
   extern "C" CS_EXPORT_SYM dirent *readdir (DIR *dirp);
   extern "C" CS_EXPORT_SYM int closedir (DIR *dirp);

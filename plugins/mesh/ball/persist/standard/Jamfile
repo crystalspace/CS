@@ -5,7 +5,7 @@ Description ballldr : "Ball mesh object loader" ;
 Plugin ballldr
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith ballldr : csgeom csutil ;
+LinkWith ballldr : crystalspace ;
 
 CompileGroups ballldr :  meshes ;
 

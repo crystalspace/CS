@@ -126,7 +126,7 @@ typedef bool (*csEventHandlerFunc) (iEvent&);
  * csPluginRequest r2(CS_REQUEST_PLUGIN("myproj.foobar",iFoobar));
  * \endcode
  */
-class CS_CSTOOL_EXPORT csPluginRequest
+class CS_CRYSTALSPACE_EXPORT csPluginRequest
 {
 private:
   csString class_name;
@@ -153,7 +153,7 @@ public:
  * setup an application. It is possible to do all the setup on your own
  * but using the functions below will help considerably.
  */
-class CS_CSTOOL_EXPORT csInitializer
+class CS_CRYSTALSPACE_EXPORT csInitializer
 {
 public:
   /**

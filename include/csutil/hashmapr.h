@@ -22,7 +22,7 @@
 #include "csextern.h"
 #include "hashmap.h"
 
-class CS_CSUTIL_EXPORT csHashIteratorReversible;
+class CS_CRYSTALSPACE_EXPORT csHashIteratorReversible;
 
 /// A csHashMap that maintains a reverse hash for indexing key strings by keys.
 class csHashMapReversible : public csHashMap
@@ -69,7 +69,7 @@ public:
 };
 
 /// A csHashIterator that knows about csHashMapReversible's reverse hash.
-class CS_CSUTIL_EXPORT csGlobalHashIteratorReversible : public csGlobalHashIterator
+class CS_CRYSTALSPACE_EXPORT csGlobalHashIteratorReversible : public csGlobalHashIterator
 {
   friend class csHashMapReversible;
 
@@ -92,7 +92,7 @@ public:
 };
 
 /// A csHashIterator that knows about csHashMapReversible's reverse hash.
-class CS_CSUTIL_EXPORT csHashIteratorReversible : public csHashIterator
+class CS_CRYSTALSPACE_EXPORT csHashIteratorReversible : public csHashIterator
 {
   friend class csHashMapReversible;
 

@@ -8,7 +8,7 @@ Plugin csvosa3dl : [ Wildcard *.cpp *.h ] ;
 
 CFlags csvosa3dl :
   [ FDefines _REENTRANT ] $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
-LinkWith csvosa3dl : csutil csgeom csgfx cstool ;
+LinkWith csvosa3dl : crystalspace ;
 
 ExternalLibs csvosa3dl : VOS  ;
 }

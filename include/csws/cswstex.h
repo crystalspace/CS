@@ -37,7 +37,7 @@ struct iTextureManager;
  * The application keeps an array of such objects, and they are registered
  * with the 3D and 2D drivers as soon as app->RegisterTextures() is called.
  */
-class CS_CSWS_EXPORT csWSTexture
+class CS_CRYSTALSPACE_EXPORT csWSTexture
 {
   // Reference count
   int RefCount;
@@ -113,7 +113,7 @@ public:
 };
 
 /// This class is a vector of csWSTexture's
-class CS_CSWS_EXPORT csWSTexVector : public csPDelArray<csWSTexture>
+class CS_CRYSTALSPACE_EXPORT csWSTexVector : public csPDelArray<csWSTexture>
 {
 public:
   /// Initialize the texture vector

@@ -25,7 +25,7 @@
 /**
  * A debugging class to help print out indented messages.
  */
-class CS_CSUTIL_EXPORT csIndPrint
+class CS_CRYSTALSPACE_EXPORT csIndPrint
 {
 private:
   int cur_indent_level;
@@ -61,7 +61,7 @@ public:
  * So you can use it to keep track of indentation without the risk
  * of miscounting Up() and Down() calls.
  */
-class CS_CSUTIL_EXPORT csIndPrintDown
+class CS_CRYSTALSPACE_EXPORT csIndPrintDown
 {
 private:
   csIndPrint& indprint;

@@ -36,7 +36,7 @@
  * in a random terrain generator I made after I switched to
  * this RNG.
  */
-class CS_CSUTIL_EXPORT csRandomGen
+class CS_CRYSTALSPACE_EXPORT csRandomGen
 {
   int i97, j97;
   float u [98];

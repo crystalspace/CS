@@ -37,7 +37,7 @@
 /**
  * This is Andrew's monotone chain 2D convex hull algorithm.
  */
-class CS_CSGEOM_EXPORT csChainHull2D
+class CS_CRYSTALSPACE_EXPORT csChainHull2D
 {
 public:
   /**

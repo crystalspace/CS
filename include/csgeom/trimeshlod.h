@@ -32,7 +32,7 @@ class csTriangleVerticesCost;
  * This is basically used as a temporary structure to be able to
  * calculate the cost of collapsing this vertex more quickly.
  */
-class CS_CSGEOM_EXPORT csTriangleVertexCost : public csTriangleVertex
+class CS_CRYSTALSPACE_EXPORT csTriangleVertexCost : public csTriangleVertex
 {
 public:
   /// True if already deleted.
@@ -56,7 +56,7 @@ public:
 /**
  * Algorithm class that calculates the cost of a vertex.
  */
-class CS_CSGEOM_EXPORT csTriangleLODAlgo
+class CS_CRYSTALSPACE_EXPORT csTriangleLODAlgo
 {
 public:
   virtual ~csTriangleLODAlgo () { }
@@ -74,7 +74,7 @@ public:
  * cost metric to calculate the vertex cost. It will basically
  * just consider the length of the edge.
  */
-class CS_CSGEOM_EXPORT csTriangleLODAlgoEdge : public csTriangleLODAlgo
+class CS_CRYSTALSPACE_EXPORT csTriangleLODAlgoEdge : public csTriangleLODAlgo
 {
 public:
   virtual ~csTriangleLODAlgoEdge () { }
@@ -86,7 +86,7 @@ public:
  * This class works closely with csTriangleVerticesCost
  * and maintains a sorted (on cost) view of the vertices.
  */
-class CS_CSGEOM_EXPORT csTriangleVerticesSorted
+class CS_CRYSTALSPACE_EXPORT csTriangleVerticesSorted
 {
 private:
   int num_vertices;
@@ -121,7 +121,7 @@ public:
  * for LOD generation since every vertex contains information which
  * helps selecting the best vertices for collapsing.
  */
-class CS_CSGEOM_EXPORT csTriangleVerticesCost
+class CS_CRYSTALSPACE_EXPORT csTriangleVerticesCost
 {
 private:
   csTriangleVertexCost* vertices;
@@ -172,7 +172,7 @@ public:
  * A static class which performs the calculation
  * of the best order to do the collapsing.
  */
-class CS_CSGEOM_EXPORT csTriangleMeshLOD
+class CS_CRYSTALSPACE_EXPORT csTriangleMeshLOD
 {
 public:
   /**

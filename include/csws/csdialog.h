@@ -66,7 +66,7 @@ enum csDialogFrameStyle
  * specify its frame style to csdfsAround: in this case it will
  * look like a usual window but without titlebar.
  */
-class CS_CSWS_EXPORT csDialog : public csComponent
+class CS_CRYSTALSPACE_EXPORT csDialog : public csComponent
 {
 protected:
   /// Dialog frame style

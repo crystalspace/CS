@@ -294,7 +294,7 @@ order to coordinate your efforts with those of other people.
 @strong{Q}: How does Crystal Space work?
 
 @strong{A1} If you want to know how you can use CS, you can look at the
-chapters describing the libraries of which CS consists, @xref{Libraries}.  Or
+chapters describing the libraries of which CS consists, @xref{Facilities}.  Or
 you can look at the plug-ins, @xref{Plug-In Drivers}.  If you want to know how
 it works internally, @xref{Internals}.
 

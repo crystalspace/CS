@@ -53,7 +53,7 @@ enum csBackgroundType
  * This class is meant for displaying textured or gradiented backgrounds.
  * This is not a component; it is mainly meant for use by skins.
  */
-class CS_CSWS_EXPORT csBackground
+class CS_CRYSTALSPACE_EXPORT csBackground
 {
   /// Background type
   csBackgroundType type;

@@ -1,10 +1,10 @@
 What is VSH?
 
-VSH stands for "Virtual Shell". In short it is a testbed for
-Virtual File System, a part of csutil library. If you can't understand why
-some files are not found by your program, or why some files are taken from
-wrong places, or you want to understand how VFS works at all, VSH is the
-right place to look.
+VSH stands for "Virtual Shell". In short it is a testbed for Virtual File
+System, which resides in the `vfs' plugin. If you can't understand why some
+files are not found by your program, or why some files are taken from wrong
+places, or you want to understand how VFS works at all, VSH is the right place
+to look.
 
 The command-line oriented interface of VSH is quite similar to Unix shells.
 If you're common at least with one Unix-like shell (or even with COMMAND.COM)

@@ -5,7 +5,7 @@ Description spirldr : "Spiral mesh object loader" ;
 Plugin spirldr
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith spirldr : csgeom csutil ;
+LinkWith spirldr : crystalspace ;
 
 CompileGroups spirldr : meshes ;
 

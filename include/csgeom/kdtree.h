@@ -60,7 +60,7 @@ typedef bool (csKDTreeVisitFunc)(csKDTree* treenode, void* userdata,
 /**
  * A child in the KD-tree (usually some object).
  */
-class CS_CSGEOM_EXPORT csKDTreeChild
+class CS_CRYSTALSPACE_EXPORT csKDTreeChild
 {
 private:
   friend class csKDTree;
@@ -129,7 +129,7 @@ public:
  * calculation only once. This is more efficient and it also generates
  * a better tree as more information is available then.
  */
-class CS_CSGEOM_EXPORT csKDTree : public iBase
+class CS_CRYSTALSPACE_EXPORT csKDTree : public iBase
 {
 private:
   static csBlockAllocator<csKDTree> tree_nodes;

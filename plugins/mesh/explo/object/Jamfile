@@ -5,6 +5,6 @@ Description explo : "Explosion mesh object plugin" ;
 Plugin explo
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith explo : csplugincommon cstool csgeom csutil ;
+LinkWith explo : crystalspace ;
 
 CompileGroups explo :  meshes ;

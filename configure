@@ -275,7 +275,7 @@ PACKAGE_VERSION='0.99'
 PACKAGE_STRING='crystalspace 0.99'
 PACKAGE_BUGREPORT='crystal-main@lists.sourceforge.net'
 
-ac_unique_file="libs/csutil/Jamfile"
+ac_unique_file="libs/Jamfile"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>

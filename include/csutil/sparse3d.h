@@ -26,7 +26,7 @@
  * General 3D sparse matrix class. This is an abstract class.
  * Specific implementations are csWideSparse3D and csDenseSparse3D.
  */
-class CS_CSUTIL_EXPORT csSparse3D
+class CS_CRYSTALSPACE_EXPORT csSparse3D
 {
 public:
   ///
@@ -60,7 +60,7 @@ public:
  * are close together. The speed of access is much better (no need
  * to scan lists).
  */
-class CS_CSUTIL_EXPORT csWideSparse3D : public csSparse3D
+class CS_CRYSTALSPACE_EXPORT csWideSparse3D : public csSparse3D
 {
 private:
   ///

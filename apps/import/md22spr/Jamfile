@@ -6,5 +6,5 @@ Application md22spr
 	: [ Wildcard *.cpp *.h ]
 	: console
 ;
-LinkWith md22spr : csgeom csgfx csutil ;
+LinkWith md22spr : crystalspace ;
 

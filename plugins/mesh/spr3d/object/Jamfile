@@ -5,7 +5,7 @@ Description spr3d : "3D Sprite mesh object plugin" ;
 Plugin spr3d
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith spr3d : csgfx csgeom csutil cstool ;
+LinkWith spr3d : crystalspace ;
 
 CompileGroups spr3d :  meshes ;
 

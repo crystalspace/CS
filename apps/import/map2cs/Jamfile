@@ -6,4 +6,4 @@ Application map2cs
 	: [ Wildcard *.cpp *.h ]
 	: console
 ;
-LinkWith map2cs : csgeom csgfx cstool csutil ;
+LinkWith map2cs : crystalspace ;

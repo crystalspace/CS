@@ -28,12 +28,12 @@
 
 #include "csutil/win32/DbgHelpAPI.h"
 
-class CS_CSUTIL_EXPORT cswinCallStack : public csCallStack
+class CS_CRYSTALSPACE_EXPORT cswinCallStack : public csCallStack
 {
 public:
   static csStringSet strings;
 
-  struct CS_CSUTIL_EXPORT StackEntry
+  struct CS_CRYSTALSPACE_EXPORT StackEntry
   {
     uintptr_t instrPtr;
 

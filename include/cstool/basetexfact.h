@@ -35,7 +35,7 @@
  * \remark Descendants must at least implement Generate(). Adding more 
  * parameters should be done via additional interfaces.
  */
-class CS_CSTOOL_EXPORT csBaseTextureFactory : public iTextureFactory
+class CS_CRYSTALSPACE_EXPORT csBaseTextureFactory : public iTextureFactory
 {
 protected:
   /// object registry

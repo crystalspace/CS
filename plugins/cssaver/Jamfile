@@ -5,4 +5,4 @@ Description cssaver : "map file saver" ;
 Plugin cssaver
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith cssaver : cstool csutil ;
+LinkWith cssaver : crystalspace ;

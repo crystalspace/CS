@@ -51,7 +51,7 @@
 class csMenu;
 
 /// This class encapsulates a menu item
-class CS_CSWS_EXPORT csMenuItem : public csComponent
+class CS_CRYSTALSPACE_EXPORT csMenuItem : public csComponent
 {
   /// Menu item info (if not 0) (placed to the right of menu item text)
   char *info;
@@ -222,7 +222,7 @@ enum csMenuFrameStyle
  * it should be cleaned up. However, it works reasonably well, so it is just
  * a matter of taste.
  */
-class CS_CSWS_EXPORT csMenu : public csComponent
+class CS_CRYSTALSPACE_EXPORT csMenu : public csComponent
 {
   friend class csMenuItem;
 

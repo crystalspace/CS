@@ -37,7 +37,7 @@ struct iMeshWrapper;
  * This class is used when we need to store, sort and then render a list of
  * rendermeshes.
  */
-class CS_CSTOOL_EXPORT csRenderMeshList
+class CS_CRYSTALSPACE_EXPORT csRenderMeshList
 {
 public:
   /**

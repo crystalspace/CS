@@ -27,7 +27,7 @@
  * This structure is used per file to keep track of allocations.
  * ModuleMemTracker maintains an array of them per module.
  */
-struct CS_CSUTIL_EXPORT MemTrackerInfo
+struct CS_CRYSTALSPACE_EXPORT MemTrackerInfo
 {
   char* file;
   size_t max_alloc;
@@ -46,9 +46,9 @@ struct CS_CSUTIL_EXPORT MemTrackerInfo
 };
 
 /// 'info' can be filename or some other information to recognize allocation.
-extern CS_CSUTIL_EXPORT MemTrackerInfo* mtiRegisterAlloc (size_t s, void* info);
-extern CS_CSUTIL_EXPORT void mtiRegisterFree (MemTrackerInfo* mti, size_t s);
-extern CS_CSUTIL_EXPORT void mtiUpdateAmount (MemTrackerInfo* mti, int dcount, int dsize);
+extern CS_CRYSTALSPACE_EXPORT MemTrackerInfo* mtiRegisterAlloc (size_t s, void* info);
+extern CS_CRYSTALSPACE_EXPORT void mtiRegisterFree (MemTrackerInfo* mti, size_t s);
+extern CS_CRYSTALSPACE_EXPORT void mtiUpdateAmount (MemTrackerInfo* mti, int dcount, int dsize);
 
 #endif // CS_MEMORY_TRACKER
 

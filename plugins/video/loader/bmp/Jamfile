@@ -5,7 +5,7 @@ Description csbmpimg : "bmp image loader" ;
 Plugin csbmpimg
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith csbmpimg : csgfx csutil ;
+LinkWith csbmpimg : crystalspace ;
 
 CompileGroups csbmpimg :  imageloaders ;
 

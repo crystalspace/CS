@@ -34,7 +34,7 @@
  * knowledge of the actual values of the vertices. It only keeps
  * the indices. So it can actually be used both for 3D and 2D polygons.
  */
-class CS_CSGEOM_EXPORT csPolyIndexed
+class CS_CRYSTALSPACE_EXPORT csPolyIndexed
 {
 protected:
   /// The vertex indices.

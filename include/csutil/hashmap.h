@@ -78,7 +78,7 @@ typedef csArray<csHashBucket> csHashBucketVector;
  * iterator to delete one element from the map. The iterator
  * will correctly point to the next element then.
  */
-class CS_CSUTIL_EXPORT csGlobalHashIterator
+class CS_CRYSTALSPACE_EXPORT csGlobalHashIterator
 {
   friend class csHashMap;
   friend class csGlobalHashIteratorReversible;
@@ -142,7 +142,7 @@ public:
  * iterator to delete one element from the map. The iterator
  * will correctly point to the next element then.
  */
-class CS_CSUTIL_EXPORT csHashIterator
+class CS_CRYSTALSPACE_EXPORT csHashIterator
 {
   friend class csHashMap;
   friend class csHashIteratorReversible;
@@ -205,7 +205,7 @@ public:
  * Keys must not be unique. If a key is not unique then you
  * can iterate over all elements with the same key.
  */
-class CS_CSUTIL_EXPORT csHashMap
+class CS_CRYSTALSPACE_EXPORT csHashMap
 {
   friend class csHashIterator;
   friend class csGlobalHashIterator;
@@ -297,7 +297,7 @@ public:
  * You can basically use this to test for the occurrence
  * of some object quickly.
  */
-class CS_CSUTIL_EXPORT csHashSet
+class CS_CRYSTALSPACE_EXPORT csHashSet
 {
 private:
   csHashMap map;

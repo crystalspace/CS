@@ -41,7 +41,7 @@ struct iConsoleOutput;
  * followed by one more backspace.  Reset() erases the pulse and then resets
  * the state.  Erase() is called automatically by the destructor.
  */
-class CS_CSUTIL_EXPORT csProgressPulse
+class CS_CRYSTALSPACE_EXPORT csProgressPulse
 {
 private:
   iConsoleOutput* console;

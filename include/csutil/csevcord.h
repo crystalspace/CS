@@ -29,7 +29,7 @@ class csEventOutlet;
 /**
  * Event cord.
  */
-class CS_CSUTIL_EXPORT csEventCord : public iEventCord
+class CS_CRYSTALSPACE_EXPORT csEventCord : public iEventCord
 {
 protected:
   /// Pass events to the system queue?

@@ -34,7 +34,7 @@
 /**
  * Class for a quaternion.
  */
-class CS_CSGEOM_EXPORT csQuaternion
+class CS_CRYSTALSPACE_EXPORT csQuaternion
 {
 public:
   /// Initialize a quaternion with specific values.

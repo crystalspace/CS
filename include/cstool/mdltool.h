@@ -40,7 +40,7 @@ struct csModelDataVertexMap
  * This class can be used to construct objects which use a single index for
  * vertex. normal, color and texel lists, from objects that don't.
  */
-class CS_CSTOOL_EXPORT csSingleIndexVertexSet
+class CS_CRYSTALSPACE_EXPORT csSingleIndexVertexSet
 {
 private:
   // delete the lists upon destruction?
@@ -99,7 +99,7 @@ public:
 };
 
 /// A set of utility functions to deal with model data components.
-struct CS_CSTOOL_EXPORT csModelDataTools
+struct CS_CRYSTALSPACE_EXPORT csModelDataTools
 {
   /**
    * Copy the contents of one object into antoher one. Both objects may

@@ -33,7 +33,7 @@
 /**
  * A 2x2 matrix.
  */
-class CS_CSGEOM_EXPORT csMatrix2
+class CS_CRYSTALSPACE_EXPORT csMatrix2
 {
 public:
   float m11, m12;

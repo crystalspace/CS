@@ -4,7 +4,7 @@ if $(WAVEOUT.AVAILABLE) = "yes"
 {
 Description sndwaveout : "WaveOut sound driver" ;
 Plugin sndwaveout : [ Wildcard *.cpp *.h ] ;
-LinkWith sndwaveout : csutil ;
+LinkWith sndwaveout : crystalspace ;
 ExternalLibs sndwaveout : WAVEOUT ;
 CompileGroups sndwaveout : sounddrivers ;
 }

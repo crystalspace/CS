@@ -5,4 +5,4 @@ Description xmltiny : "TinyXML document system" ;
 Plugin xmltiny
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith xmltiny : cstool csutil ;
+LinkWith xmltiny : crystalspace ;

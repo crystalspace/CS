@@ -10,8 +10,8 @@
 
 This section describes how you can load an image and use it on a pixmap.  A
 pixmap is a small graphics class that can be used independently from the
-engine.  It is very useful for @sc{csws} (@pxref{CSWS}), to draw a logo on
-screen or to use for a @dfn{heads-up-display} (@sc{hud}).
+engine.  It may be useful, for instance, to draw a logo on screen or for a
+@dfn{heads-up-display} (@sc{hud}).
 
 @subsubheading Getting the Image Loader Plugin
 

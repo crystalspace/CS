@@ -759,14 +759,10 @@ names were also normalized.
 @end itemize
 
 @subheading Library Renamed: csfx
-@cindex @code{csfx} Library
-@cindex @code{cstool} Library
 
 The @samp{csfx} library was renamed to @samp{cstool}.
 
 @subheading Library Removed: csobject
-@cindex @code{csutil} Library
-@cindex @code{csobject} Library
 
 The @file{csobject} library has been removed. All files in that
 library have moved to @file{csutil}.

@@ -28,7 +28,7 @@ class TiDocumentNode;
 /**
  * This is an SCF compatible wrapper for the TinyXml parser in csutil.
  */
-class CS_CSUTIL_EXPORT csTinyDocumentSystem : public iDocumentSystem
+class CS_CRYSTALSPACE_EXPORT csTinyDocumentSystem : public iDocumentSystem
 {
 public:
   csTinyDocumentSystem ();

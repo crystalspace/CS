@@ -2,4 +2,4 @@ SubDir TOP apps tests awstest ;
 
 Description awstest : "Alternate Windowing System test" ;
 Application awstest : [ Wildcard *.cpp *.h ] : noinstall ;
-LinkWith awstest : csgeom csgfx cstool csutil ;
+LinkWith awstest : crystalspace ;

@@ -5,7 +5,7 @@ Description bruteblock : "Brute Block Terrain plugin" ;
 Plugin bruteblock
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith bruteblock : cstool csgfx csgeom csutil ;
+LinkWith bruteblock : crystalspace ;
 
 CompileGroups bruteblock :  meshes ;
 

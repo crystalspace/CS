@@ -28,7 +28,7 @@
  * clock you can easily keep track of elapsed and current time
  * in a virtual setting.
  */
-class CS_CSUTIL_EXPORT csVirtualClock : public iVirtualClock
+class CS_CRYSTALSPACE_EXPORT csVirtualClock : public iVirtualClock
 {
 private:
   /// Elapsed time between last two frames and absolute time in milliseconds

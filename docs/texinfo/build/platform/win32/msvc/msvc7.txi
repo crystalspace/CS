@@ -170,7 +170,7 @@ The workspace uses a prefix system for naming contained projects:
 
 The @emph{Libraries} are C++ libraries that you can link into your own
 programs.  Some of these libraries are part of the core of Crystal Space.  You
-can find more information about this in @ref{Libraries}.  Their output are
+can find more information about this in @ref{Facilities}.  Their output are
 @file{.lib} files.
 
 The @emph{Plugins} are also programming libraries, but they use a special
@@ -210,19 +210,20 @@ to a directory which name has only Latin characters in it.
 
 @subsubheading Blasting the Past
 
-If you have previously used the @file{msvc_libs} package, it's recommended you
-remove it before installing the @file{cs-win32libs} package as outlined above.
-Unfortunately, the @file{msvc_libs} package was a simple @sc{zip} file with no
-means of uninstalling whatsoever. However, the header and library files were
-located in the @file{include\cssys\win32} resp. @file{libs\cssys\win32\cssys}
-directories, but as the @code{cssys} library has been merged into
-@code{csutil}, CS' files in those directories has been relocated as well, so
-you can safely remove these directories.
+If you have previously used the long-deprecated and ancient @file{msvc_libs}
+package, it's recommended you remove it before installing the
+@file{cs-win32libs} package as outlined above.  Unfortunately, the
+@file{msvc_libs} package was a simple @sc{zip} file with no means of
+uninstalling whatsoever. However, the header and library files were located in
+the @file{include\cssys\win32} and @file{libs\cssys\win32\cssys} directories,
+but as the @code{cssys} library has been merged into @code{csutil}, Crystal
+Space's files in those directories has been relocated as well, so you can
+safely remove these directories.
 
-However, the @file{msvc_libs} package also contained a couple of @sc{dll} 
-files, copied to CS' root directory.  To remove them, use the following batch 
-file that removes all @sc{dll} files contained in the different versions of 
-the @file{msvc_libs} package:
+However, the @file{msvc_libs} package also contained a couple of @sc{dll}
+files, copied to the @file{CS\} root directory.  To remove them, use the
+following batch file that removes all @sc{dll} files contained in the different
+versions of the @file{msvc_libs} package:
 
 @noindent
 @ifnottex

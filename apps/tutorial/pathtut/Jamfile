@@ -2,4 +2,4 @@ SubDir TOP apps tutorial pathtut ;
 
 Description pathtut : "Path Tutorial" ;
 Application pathtut : [ Wildcard *.cpp *.h ] : noinstall ;
-LinkWith pathtut : csgeom csgfx cstool csutil ;
+LinkWith pathtut : crystalspace ;

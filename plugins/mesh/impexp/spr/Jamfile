@@ -2,5 +2,5 @@ SubDir TOP plugins mesh impexp spr ;
 
 Description sprie : "SPR Import/Export plugin" ;
 Plugin sprie : [ Wildcard *.cpp *.h ] ;
-LinkWith sprie : csgeom cstool csutil ;
+LinkWith sprie : crystalspace ;
 CompileGroups sprie : meshimpexp ;

@@ -34,7 +34,7 @@
  * Helper class allowing in debug builds for to quickly dump an iImage 
  * object onto disk for visual inspection.
  */
-class CS_CSTOOL_EXPORT csDebugImageWriter
+class CS_CRYSTALSPACE_EXPORT csDebugImageWriter
 {
   static void Report (int severity, const char* msg, ...)
   {

@@ -5,7 +5,7 @@ Description thingldr : "Thing mesh object loader" ;
 Plugin thingldr
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith thingldr : csgeom csutil ;
+LinkWith thingldr : crystalspace ;
 
 CompileGroups thingldr :  meshes ;
 

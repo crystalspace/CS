@@ -28,7 +28,7 @@ struct iSector;
  * This is a class with static helper functions for working on engine
  * data.
  */
-class CS_CSTOOL_EXPORT csEngineTools
+class CS_CRYSTALSPACE_EXPORT csEngineTools
 {
 private:
   static float FindShortestDistance (

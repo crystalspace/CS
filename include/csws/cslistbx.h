@@ -186,7 +186,7 @@ enum csListBoxItemStyle
 };
 
 /// This class encapsulates a menu item
-class CS_CSWS_EXPORT csListBoxItem : public csComponent
+class CS_CRYSTALSPACE_EXPORT csListBoxItem : public csComponent
 {
   /// List box item style
   csListBoxItemStyle ItemStyle;
@@ -290,7 +290,7 @@ enum csListBoxFrameStyle
  * CSLBS_MULTIPLESEL style is not specified) or have multiple selected
  * items at a time (if that style flag is set).
  */
-class CS_CSWS_EXPORT csListBox : public csComponent
+class CS_CRYSTALSPACE_EXPORT csListBox : public csComponent
 {
   /// List box style
   int ListBoxStyle;

@@ -53,7 +53,7 @@ if ! [ Property build : projgen ]
 
 Description aws : "Alternate Windowing System plugin" ;
 Plugin aws : $(FILES) ;
-LinkWith aws : cstool csgfx csgeom csutil ;
+LinkWith aws : crystalspace ;
 
 if "$(COMPILER.C++FLAGS.WARNING.NO_UNUSED)"
 {

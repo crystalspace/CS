@@ -5,7 +5,7 @@ Description hazeldr : "Haze mesh object loader" ;
 Plugin hazeldr
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith hazeldr : csgeom csutil ;
+LinkWith hazeldr : crystalspace ;
 
 CompileGroups hazeldr :  meshes ;
 

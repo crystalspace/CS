@@ -19,6 +19,22 @@ chronological order.
 	- res fixed a the std_foo shaders for the recent xmlshader changes.
 	- res fixed a crash with the terrain level.
 	- res fixed a crash when using the std_lighting_detail shader.
+	- Eric Sunshine merged the csutil, csgeom, csgfx, cstool, csws, and
+	  csplugincommon libraries into a single physical link library named
+	  `crystalspace' (i.e. libcrystalspace.a). This simplifies end-user
+	  documentation and client usage.  `cs-config', `jamtemplate',
+	  documentation, and all other client-oriented utilities have been
+	  updated appropriately to reflect this change.  (The sources and
+	  headers continue to reside in their separate csutil, csgeom, etc.,
+	  directories; and, importantly, the modules remain conceptually
+	  distinct. This will not change.)
+	- Eric Sunshine renamed the following special-purpose link libraries:
+	    csplugincommon_dx  --> crystalspace_directx
+	    csplugincommon_osx --> crystalspace_macosx
+	    csplugincommon_ogl --> crystalspace_opengl
+	    csplugincommon_w32 --> crystalspace_windows
+	- Eric Sunshine rewrote a bunch of outdated discussion in the Crystal
+	  Space manual.
 24-Mar-2005
 	- res removed a >= 0 comparison with an unsigned var from array.h.
 	- res fixed some wrong ref counting caused by iLoader->LoadTexture()

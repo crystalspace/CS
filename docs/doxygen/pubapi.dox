@@ -643,13 +643,7 @@ PREDEFINED             = DOXYGEN_RUN \
 			 CS_USE_FAKE_WCHAR_TYPE \
 			 "CS_EXPORT_SYM=" \
 			 "CS_IMPORT_SYM=" \
-			 "CS_CSAPPFRAME_EXPORT=" \
-			 "CS_CSGEOM_EXPORT=" \
-			 "CS_CSGFX_EXPORT=" \
-			 "CS_CSTOOL_EXPORT=" \
-			 "CS_CSUTIL_EXPORT=" \
-			 "CS_CSWS_EXPORT=" \
-			 "CS_CSPLUGINCOMMON_EXPORT=" \
+			 "CS_CRYSTALSPACE_EXPORT=" \
 			 "SCF_VERSION(a,b,c,d)=" \
 			 "csArrayTemplate(K)=template <class K>" \
 			 "csArrayCmpDecl(T1,T2)=csArrayCmp<T1,T2>" \

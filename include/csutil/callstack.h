@@ -32,7 +32,7 @@
 #include "csutil/csstring.h"
 
 // @@@ Document me
-class CS_CSUTIL_EXPORT csCallStack
+class CS_CRYSTALSPACE_EXPORT csCallStack
 {
 protected:
   virtual ~csCallStack() {}
@@ -61,7 +61,7 @@ public:
 };
 
 // @@@ Document me
-class CS_CSUTIL_EXPORT csCallStackHelper
+class CS_CRYSTALSPACE_EXPORT csCallStackHelper
 {
 public:
   /**

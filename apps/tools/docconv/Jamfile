@@ -6,4 +6,4 @@ Application docconv
 	: [ Wildcard *.cpp *.h ]
 	: console
 ;
-LinkWith docconv : cstool csutil ;
+LinkWith docconv : crystalspace ;

@@ -1,53 +1,56 @@
 @c -*-texinfo-*-
-@node Libraries, Plug-In Drivers, Tutorials, Top
-@chapter Libraries
-@cindex Libraries
+@node Facilities, Plug-In Drivers, Tutorials, Top
+@chapter Facilities
+@cindex Facilities
 
-This chapter describes the features of the libraries of which Crystal Space
-consists.
+This chapter describes the features of the facilities which are linked into
+typical Crystal Space applications and plugins. For convenience, all of these
+facilities are contained in the primary @file{crystalspace} library, so it is
+not strictly necessary to distinguish them for actual usage, however, for
+developers working on Crystal Space itself, it is helpful to understand how
+these facilities are broken down and the relationship between them.
 
 @menu
-* csUtil:: Utility Library (@code{csUtil})
+* csUtil:: Utility Module (@code{csUtil})
 * SCF:: Shared Class Facility (@sc{scf})
-* csGeom:: Geometry Library (@code{csGeom})
+* csGeom:: Geometry Module (@code{csGeom})
 * CSWS:: Crystal Space Windowing System (@sc{csws})
 @end menu
 
-This section presents a quick overview of the libraries provided by Crystal
+This section presents a quick overview of the facilities provided by Crystal
 Space. More detailed descriptions of these facilities may be found in later
 sections.
 
-@table @code
-@item csTool
-This library contains various things that are useful for Crystal Space
-but are too specialized in order to be placed in @sc{csEngine}. Currently
-it contains the @code{csPixmap} class for simple 2D graphics and
-a number of predefined procedural textures. It also contains basic support
-structures for the model importers, the csColliderWrapper class and the
-notion of key-value pairs (to be attached to csObject's).
+@table @asis
+@item cstool
+This facility contains various high-level classes and utilities. They tend to
+be much more specialized than the general-purpose tools provided elsewhere and
+may even depend upon plugin modules (unlike the other facilities mentioned
+here).
 
-@item csUtil
-This library contains various utilities. There is an Archive class which can
-read/write @sc{zip} archives. There is a vector class, a sparse matrix class
-and some other useful goodies. This library requires the use of the external
-ZLib library which is used to read/write @sc{zip} archives. One module from
-this library is explained in a separate section: @sc{scf}.
+@item csutil
+This facility contains many low-level utilities including string and hash
+classes, to @sc{zip} manipulation tools, plugin management and Unicode support
+modules.
 
-@item SCF @r{(Shared Class Facility)}
-The @sc{scf} is actually part of the @code{csUtil} library. It is explained
-in a separate section as it is both complex (compared to the rest of
-@code{csUtil}) and fundamental to the understanding of plug-ins. @xref{SCF}.
+@item @sc{scf} (Shared Class Facility)
+@sc{scf} is actually a component of ``csutil'', however, it is explained
+separately since it is both complex (compared to the rest of ``csutil'') and
+fundamental to the understanding of plugin modules. @xref{SCF}.
 
-@item csGeom
-A library for 3d geometry operations. It provides 2d and 3d vectors, polygons
-and bounding boxes, 3d matrices and some other useful things. @xref{csGeom}.
+@item csgeom
+A facility for geometric operations. It provides 2D and 3D vectors, polygons
+and bounding boxes, 3D matrices and some other useful tools. @xref{csGeom}.
 
-@item csGfx
-Basic image support.
+@item csgfx
+Basic image support and graphical manipulation tools.
 
-@item csWS
-A window system nicely integrated with Crystal Space. It is also platform
-independent, as it is based on the CS graphics drivers. @xref{CSWS}.
+@item csws
+A window system which integrates well with Crystal Space canvases. It is also
+platform independent since it performs all of its rendering using the abstract
+Crystal Space canvas interfaces. @xref{CSWS}.  @strong{Warning}: @emph{This
+module is heavily deprecated, unmaintained, and no longer developed.  Instead,
+use @sc{aws}.  @xref{AWS}.}
 @end table
 
 @imports{libs,csutil.txi}

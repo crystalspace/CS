@@ -4,7 +4,7 @@ if $(ODE.AVAILABLE) = "yes"
 {
 Description partphys_ode : "Particle ODE-based Physics plugin" ;
 Plugin partphys_ode : [ Wildcard *.cpp *.h ] ;
-LinkWith partphys_ode : csutil csgeom ;
+LinkWith partphys_ode : crystalspace ;
 ExternalLibs partphys_ode : ODE ;
 if $(ODE.EXTERN_C) = "yes"
 {

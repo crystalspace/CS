@@ -27,7 +27,7 @@
   #define csRefTrackerAccess	csRefTrackerAccess_nada
   #define CS_CSUTIL_REFTRACK_EXPORT
 #else
-  #define CS_CSUTIL_REFTRACK_EXPORT	CS_CSUTIL_EXPORT
+  #define CS_CSUTIL_REFTRACK_EXPORT	CS_CRYSTALSPACE_EXPORT
 #endif
 
 /**

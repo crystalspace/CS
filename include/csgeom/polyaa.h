@@ -49,7 +49,7 @@ typedef void (*csAAPFCBBox) (int x, int y, int w, int h, void *arg);
  * and a callback function is called, with the area of sub-polygon
  * passed as argument.
  */
-extern CS_CSGEOM_EXPORT  void csAntialiasedPolyFill (csVector2 *iVertices, 
+extern CS_CRYSTALSPACE_EXPORT  void csAntialiasedPolyFill (csVector2 *iVertices, 
   int iVertexCount, void *iArg, csAAPFCBPixel iPutPixel, 
   csAAPFCBBox iDrawBox = 0);
 

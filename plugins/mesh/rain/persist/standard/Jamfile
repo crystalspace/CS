@@ -5,6 +5,6 @@ Description rainldr : "Rain mesh object loader" ;
 Plugin rainldr
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith rainldr : csgeom csutil ;
+LinkWith rainldr : crystalspace ;
 
 CompileGroups rainldr :  meshes ;

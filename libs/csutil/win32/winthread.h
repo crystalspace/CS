@@ -21,7 +21,7 @@
 #include "csextern.h"
 #include "csutil/thread.h"
 
-class CS_CSUTIL_EXPORT csWinThread : public csThread
+class CS_CRYSTALSPACE_EXPORT csWinThread : public csThread
 {
  public:
   /**
@@ -72,7 +72,7 @@ class CS_CSUTIL_EXPORT csWinThread : public csThread
   bool created;
 };
 
-class CS_CSUTIL_EXPORT csWinMutex : public csMutex
+class CS_CRYSTALSPACE_EXPORT csWinMutex : public csMutex
 {
 public:
   csWinMutex (bool recursive);
@@ -93,7 +93,7 @@ public:
   friend class csWinCondition;
 };
 
-class CS_CSUTIL_EXPORT csWinSemaphore : public csSemaphore
+class CS_CRYSTALSPACE_EXPORT csWinSemaphore : public csSemaphore
 {
 public:
   csWinSemaphore (uint32 value);
@@ -113,7 +113,7 @@ public:
   bool Destroy ();
 };
 
-class CS_CSUTIL_EXPORT csWinCondition : public csCondition
+class CS_CRYSTALSPACE_EXPORT csWinCondition : public csCondition
 {
  public:
   csWinCondition (uint32 conditionAttributes);

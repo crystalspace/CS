@@ -5,4 +5,4 @@ Description stdrep : "Standard Report Listener Plugin" ;
 Plugin stdrep
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith stdrep : csgeom csutil ;
+LinkWith stdrep : crystalspace ;

@@ -53,7 +53,7 @@ const int FRAGMENT_BUFFER_SIZE=64;
  * region.  If used properly, it will result in faster overall painting
  * performance, since several areas will not require overwriting.
  */
-class CS_CSGEOM_EXPORT csRectRegion
+class CS_CRYSTALSPACE_EXPORT csRectRegion
 {
 protected:
   /// The pointer the list of regions
@@ -115,7 +115,7 @@ public:
 
 #define CS_RECT_REG_SIZE 100
 
-class CS_CSGEOM_EXPORT csRectRegionDebug
+class CS_CRYSTALSPACE_EXPORT csRectRegionDebug
 {
 private:
   bool area[CS_RECT_REG_SIZE][CS_RECT_REG_SIZE];

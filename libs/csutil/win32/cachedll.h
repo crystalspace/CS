@@ -38,7 +38,7 @@
  * }
  * \endcode
  */
-class CS_CSUTIL_EXPORT cswinCacheDLL
+class CS_CRYSTALSPACE_EXPORT cswinCacheDLL
 {
   const char* dllName;
   HMODULE dllHandle;

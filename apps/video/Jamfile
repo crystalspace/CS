@@ -2,4 +2,4 @@ SubDir TOP apps video ;
 
 Description csvid : "video example" ;
 Application csvid : [ Wildcard *.cpp *.h ] : noinstall ;
-LinkWith csvid : csgeom csgfx cstool csutil ;
+LinkWith csvid : crystalspace ;

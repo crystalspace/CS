@@ -28,7 +28,7 @@
 /**
  * This is a general cache that doesn't cache anything at all.
  */
-class CS_CSUTIL_EXPORT csNullCacheManager : public iCacheManager
+class CS_CRYSTALSPACE_EXPORT csNullCacheManager : public iCacheManager
 {
 public:
   /**

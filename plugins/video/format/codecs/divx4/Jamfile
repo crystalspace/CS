@@ -4,6 +4,6 @@ if $(DIVX4.AVAILABLE) = "yes"
 {
 Description odivx4 : "DivX4 codec" ;
 Plugin odivx4 : [ Wildcard *.cpp *.h ] ;
-LinkWith odivx4 : csutil ;
+LinkWith odivx4 : crystalspace ;
 ExternalLibs odivx4 : DIVX4 ;
 }

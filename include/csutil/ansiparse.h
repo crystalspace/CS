@@ -28,7 +28,7 @@
  * @{ */
 
 /// Helper to parse a string for ANSI codes.
-class CS_CSUTIL_EXPORT csAnsiParser
+class CS_CRYSTALSPACE_EXPORT csAnsiParser
 {
 public:
   /// Identifier for the ANSI command

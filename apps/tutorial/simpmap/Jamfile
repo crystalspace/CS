@@ -2,4 +2,4 @@ SubDir TOP apps tutorial simpmap ;
 
 Description simpmap : "tutorial part three, map loading" ;
 Application simpmap : [ Wildcard *.cpp *.h ] : noinstall ;
-LinkWith simpmap : csgeom csgfx cstool csutil ;
+LinkWith simpmap : crystalspace ;

@@ -28,7 +28,7 @@
  * An implementation of the abstract iFile interface for real files within
  * the physical filesystem.
  */
-class CS_CSUTIL_EXPORT csPhysicalFile : public iFile
+class CS_CRYSTALSPACE_EXPORT csPhysicalFile : public iFile
 {
 public:
   /**

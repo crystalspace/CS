@@ -6,4 +6,4 @@ Application levtool
 	: [ Wildcard *.cpp *.h ]
 	: console
 ;
-LinkWith levtool : csgeom csgfx cstool csutil ;
+LinkWith levtool : crystalspace ;

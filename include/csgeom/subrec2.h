@@ -36,7 +36,7 @@ class csSubRect2;
  * a rectangular region from which a client can allocate smaller rectangles
  * until the region is full.
  */
-class CS_CSGEOM_EXPORT csSubRectangles2
+class CS_CRYSTALSPACE_EXPORT csSubRectangles2
 {
   friend class csSubRect2;
 protected:

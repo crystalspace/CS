@@ -4,6 +4,6 @@ if $(OPENDIVX.AVAILABLE) = "yes"
 {
 Description odivx : "OpenDivX codec" ;
 Plugin odivx : [ Wildcard *.cpp *.h ] ;
-LinkWith odivx : csutil ;
+LinkWith odivx : crystalspace ;
 ExternalLibs odivx : OPENDIVX ;
 }

@@ -35,7 +35,7 @@
  *  header file should be surrounded by appropriate `#if defined(CS_PLATFORM_WIN32) ... 
  *  #endif' statements.
  */
-class CS_CSUTIL_EXPORT cswinCallStackHelper
+class CS_CRYSTALSPACE_EXPORT cswinCallStackHelper
 {
   friend class csCallStackHelper;
   /// Create a callstack by obtaining the context via a 2nd thread

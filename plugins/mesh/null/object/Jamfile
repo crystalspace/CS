@@ -5,7 +5,7 @@ Description nullmesh : "General mesh object plugin" ;
 Plugin nullmesh
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith nullmesh : csgeom csutil ;
+LinkWith nullmesh : crystalspace ;
 
 CompileGroups nullmesh :  meshes ;
 

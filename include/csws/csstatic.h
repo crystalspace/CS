@@ -125,7 +125,7 @@ enum
  * the first selectable component following the static one will be
  * activated.
  */
-class CS_CSWS_EXPORT csStatic : public csComponent
+class CS_CRYSTALSPACE_EXPORT csStatic : public csComponent
 {
 protected:
   // Character number that should be underlined (-1 == none)

@@ -5,6 +5,6 @@ Description particles : "Particle system plugin" ;
 Plugin particles
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith particles : csgfx csgeom csutil ;
+LinkWith particles : crystalspace ;
 
 CompileGroups particles :  meshes ;

@@ -5,4 +5,4 @@ Description partedit : "particle system editor" ;
 Application partedit
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith partedit : csgeom csgfx cstool csutil  ;
+LinkWith partedit : crystalspace  ;

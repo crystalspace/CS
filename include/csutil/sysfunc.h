@@ -57,7 +57,7 @@ struct iObjectRegistry;
  * able to run.  If there was a problem starting the run-loop, then `false' is
  * returned, otherwise `true' is returned.
  */
-CS_CSUTIL_EXPORT bool csDefaultRunLoop(iObjectRegistry*);
+CS_CRYSTALSPACE_EXPORT bool csDefaultRunLoop(iObjectRegistry*);
 
 /**
  * Platform-specific startup.<p>
@@ -70,7 +70,7 @@ CS_CSUTIL_EXPORT bool csDefaultRunLoop(iObjectRegistry*);
  * yourself.  Returns `true' if startup initialization was successful,
  * otherwise `false'.
  */
-CS_CSUTIL_EXPORT bool csPlatformStartup(iObjectRegistry*);
+CS_CRYSTALSPACE_EXPORT bool csPlatformStartup(iObjectRegistry*);
 
 /**
  * Platform-specific shutdown.<p>
@@ -80,37 +80,37 @@ CS_CSUTIL_EXPORT bool csPlatformStartup(iObjectRegistry*);
  * performing application shutdown manually, you should call it yourself.
  * Returns `true' if shutdown processing was successful, otherwise `false'.
  */
-CS_CSUTIL_EXPORT bool csPlatformShutdown(iObjectRegistry*);
+CS_CRYSTALSPACE_EXPORT bool csPlatformShutdown(iObjectRegistry*);
 
 /**
  * CS version of printf.
  * It accepts UTF-8 strings and converts it, if required, to the platforms
  * native codepage.
  */
-CS_CSUTIL_EXPORT int csPrintf (const char* str, ...) CS_GNUC_PRINTF (1, 2);
+CS_CRYSTALSPACE_EXPORT int csPrintf (const char* str, ...) CS_GNUC_PRINTF (1, 2);
 /**
  * CS version of vprintf.
  * \copydoc csPrintf()
  */
-CS_CSUTIL_EXPORT int csPrintfV (const char* str, va_list arg) CS_GNUC_PRINTF (1, 0);
+CS_CRYSTALSPACE_EXPORT int csPrintfV (const char* str, va_list arg) CS_GNUC_PRINTF (1, 0);
 /**
  * CS version of fputs (&lt;str&gt;, stderr). 
  * \copydoc csPrintf()
  * \remarks Will flush stderr.
  */
-CS_CSUTIL_EXPORT int csFPutErr (const char* str);
+CS_CRYSTALSPACE_EXPORT int csFPutErr (const char* str);
 /**
  * CS version of fprintf (stderr, str, ...). 
  * \copydoc csPrintf()
  * \remarks Will flush stderr.
  */
-CS_CSUTIL_EXPORT int csPrintfErr (const char* str, ...) CS_GNUC_PRINTF (1, 2);
+CS_CRYSTALSPACE_EXPORT int csPrintfErr (const char* str, ...) CS_GNUC_PRINTF (1, 2);
 /**
  * CS version of vfprintf (stderr, str, ...). 
  * \copydoc csPrintf()
  * \remarks Will flush stderr.
  */
-CS_CSUTIL_EXPORT int csPrintfErrV (const char* str, va_list arg) CS_GNUC_PRINTF (1, 0);
+CS_CRYSTALSPACE_EXPORT int csPrintfErrV (const char* str, va_list arg) CS_GNUC_PRINTF (1, 0);
 
 /**
  * Get the current tick count. Warning! Do NOT use this function for
@@ -119,7 +119,7 @@ CS_CSUTIL_EXPORT int csPrintfErrV (const char* str, va_list arg) CS_GNUC_PRINTF 
  * using the virtual clock it will be possible to control the speed of your
  * game and also to pause it if needed.
  */
-CS_CSUTIL_EXPORT csTicks csGetTicks ();
+CS_CRYSTALSPACE_EXPORT csTicks csGetTicks ();
 
 /**
  * This function will freeze your application for given number of 1/1000
@@ -127,14 +127,14 @@ CS_CSUTIL_EXPORT csTicks csGetTicks ();
  * timing. It may be useful when the application is idle, to explicitly
  * release CPU for other tasks in multi-tasking operating systems.
  */
-CS_CSUTIL_EXPORT void csSleep (int /*SleepTime*/);
+CS_CRYSTALSPACE_EXPORT void csSleep (int /*SleepTime*/);
 
 /**
  * Get the username of the account running the program.<p>
  * Returns the username of the owner of the process running the program.
  * If the username can not be determined, then an empty string is returned.
  */
-CS_CSUTIL_EXPORT csString csGetUsername();
+CS_CRYSTALSPACE_EXPORT csString csGetUsername();
 
 /**
  * Get a platform-specific per-user config object.
@@ -145,7 +145,7 @@ CS_CSUTIL_EXPORT csString csGetUsername();
  * \return A config 'file'. Might return 0 on some platforms or in case an
  *   error occured.
  */
-CS_CSUTIL_EXPORT csPtr<iConfigFile> csGetPlatformConfig (const char* key);
+CS_CRYSTALSPACE_EXPORT csPtr<iConfigFile> csGetPlatformConfig (const char* key);
 
 /**
  * Get a platform-specific path to store per-user configuration data.
@@ -159,7 +159,7 @@ CS_CSUTIL_EXPORT csPtr<iConfigFile> csGetPlatformConfig (const char* key);
  * \remarks The returned path may not exist. The caller has to ensure its
  *   existance before using it.
  */
-CS_CSUTIL_EXPORT csString csGetPlatformConfigPath (const char* key);
+CS_CRYSTALSPACE_EXPORT csString csGetPlatformConfigPath (const char* key);
 
 /** @} */
 

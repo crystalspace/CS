@@ -4,7 +4,7 @@ if $(COREAUDIO.AVAILABLE) = "yes"
 {
 Description casnddrv : "MacOS/X CoreAudio sound driver" ;
 Plugin casnddrv : [ Wildcard *.cpp *.h ] ;
-LinkWith casnddrv : csutil ;
+LinkWith casnddrv : crystalspace ;
 ExternalLibs casnddrv : COREAUDIO ;
 CompileGroups casnddrv : sounddrivers ;
 }

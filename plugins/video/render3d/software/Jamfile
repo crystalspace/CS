@@ -13,7 +13,7 @@ else
 }
 
 Plugin soft3d : [ Wildcard *.cpp *.h ] $(SOFT3D_ASMFILES) ;
-LinkWith soft3d : csplugincommon csgeom csgfx csutil ;
+LinkWith soft3d : crystalspace ;
 CompileGroups soft3d : renderers ;
 
 # Historic alias.

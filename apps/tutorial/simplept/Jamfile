@@ -2,4 +2,4 @@ SubDir TOP apps tutorial simplept ;
 
 Description simplept : "procedural textures tutorial" ;
 Application simplept : [ Wildcard *.cpp *.h ] : noinstall ;
-LinkWith simplept : csgeom csgfx cstool csutil ;
+LinkWith simplept : crystalspace ;

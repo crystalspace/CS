@@ -22,7 +22,7 @@
 #include "csextern.h"
 
 // Some helper functions for the sound loaders
-class CS_CSPLUGINCOMMON_EXPORT csSndFunc 
+class CS_CRYSTALSPACE_EXPORT csSndFunc 
 {
 public:
   static unsigned long makeWord(int b0, int b1)

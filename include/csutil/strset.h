@@ -32,7 +32,7 @@ class csStringSet;
  * When you have an open iterator you should not alter the
  * string set that this object iterates over. 
  */
-class CS_CSUTIL_EXPORT csStringSetIterator
+class CS_CRYSTALSPACE_EXPORT csStringSetIterator
 {
   friend class csStringSet;
 
@@ -60,7 +60,7 @@ public:
  * string, which means to return the ID for the string, adding it to the
  * list if it is not already there.
  */
-class CS_CSUTIL_EXPORT csStringSet
+class CS_CRYSTALSPACE_EXPORT csStringSet
 {
   friend class csStringSetIterator;
 

@@ -107,7 +107,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  * This class is not related to csApp or any other class from the deprecated
  * CSWS library.
  */
-class CS_CSTOOL_EXPORT csApplicationFramework : public csInitializer
+class CS_CRYSTALSPACE_EXPORT csApplicationFramework : public csInitializer
 {
 private:
   /**\internal

@@ -190,8 +190,8 @@ bool CCSSector::Write(csRef<iDocumentNode> node, CIWorld* pIWorld)
         for (j=0; j<pPortal->GetPolygonCount(); j++)
         {
 	  csString portalName;
-	  portalName.Format ("%s_%lu_%d", meshname.GetData(),
-			     (unsigned long)i, j);
+	  portalName.Format ("%s_%lu_%lu", meshname.GetData(),
+			     (unsigned long)i, (unsigned long)j);
 
 	  DocNode        portal = CreateNode(meshobj, "portal");
 	  portal->SetAttribute ("name", portalName);
@@ -510,7 +510,8 @@ bool CCSSector::WriteCurves(csRef<iDocumentNode> node, CIWorld* pWorld)
         {
 	  DocNode meshobj = CreateNode (node, "meshobj");
 	  meshobj->SetAttribute ("name",
-	    csString().Format ("%s_e%d_c%d", pEntity->GetName(), i, curve));
+	    csString().Format ("%s_e%lu_c%lu", pEntity->GetName(),
+			       (unsigned long)i, (unsigned long)curve));
 	  CreateNode (meshobj, "plugin", "bezier");
 	  //CreateNode (meshobj, "zuse");
 	  //CreateNode (meshobj, "priority", pEntity->GetValueOfKey("priority", "object"));

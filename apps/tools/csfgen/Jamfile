@@ -6,5 +6,5 @@ Application csfgen
 	: [ Wildcard *.cpp *.h ]
 	: console
 ;
-LinkWith csfgen : csgeom csgfx cstool csutil ;
+LinkWith csfgen : crystalspace ;
 

@@ -25,7 +25,7 @@
 #include "csutil/csstring.h"
 
 /// This is a thin SCF wrapper around csString
-class CS_CSUTIL_EXPORT scfString : public iString
+class CS_CRYSTALSPACE_EXPORT scfString : public iString
 {
   csString s;
 

@@ -1,10 +1,5 @@
 SubDir TOP libs csws ;
 
-Description csws : "Windowing System library" ;
-Library csws :
-  [ Wildcard *.cpp *.h ]
-  [ Wildcard [ ConcatDirs skins default ] : *.cpp *.h ]
-  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csws ] : *.h ] :
-  shared ;
-LibDepends csws : cstool csgfx csgeom csutil ;
-MsvcDefine csws : CS_CSWS_LIB ;
+CsLibAddModule ;
+
+SubInclude TOP libs csws skins ;

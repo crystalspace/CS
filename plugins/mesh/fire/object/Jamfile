@@ -5,6 +5,6 @@ Description fire : "Fire mesh object plugin" ;
 Plugin fire
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith fire : csplugincommon cstool csgeom csutil ;
+LinkWith fire : crystalspace ;
 
 CompileGroups fire :  meshes ;

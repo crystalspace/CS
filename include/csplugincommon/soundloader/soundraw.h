@@ -23,7 +23,7 @@
 #include "csextern.h"
 #include "isound/data.h"
 
-class CS_CSPLUGINCOMMON_EXPORT csSoundDataRaw : public iSoundData 
+class CS_CRYSTALSPACE_EXPORT csSoundDataRaw : public iSoundData 
 {
 public:
   SCF_DECLARE_IBASE;

@@ -53,7 +53,7 @@ struct iObjectRegistry;
  * The texture manager will release its reference to the image when no
  * longer needed.
  */
-class CS_CSPLUGINCOMMON_EXPORT csTextureHandle : public iTextureHandle
+class CS_CRYSTALSPACE_EXPORT csTextureHandle : public iTextureHandle
 {
 protected:
   /// The original image object.
@@ -209,7 +209,7 @@ public:
  * csTexture and implement appropiate backing store (for example, most
  * hardware drivers will store the texture as a texture handle).
  */
-class CS_CSPLUGINCOMMON_EXPORT csTexture
+class CS_CRYSTALSPACE_EXPORT csTexture
 {
 protected:
   /// The parent csTextureHandle object
@@ -251,7 +251,7 @@ public:
 /**
  * This class is the top-level representation of a material.
  */
-class CS_CSPLUGINCOMMON_EXPORT csMaterialHandle : public iMaterialHandle
+class CS_CRYSTALSPACE_EXPORT csMaterialHandle : public iMaterialHandle
 {
 protected:
   /// Original material.
@@ -313,7 +313,7 @@ public:
  * Each 3D driver should derive a texture manager class from this one
  * and implement the missing functionality.
  */
-class CS_CSPLUGINCOMMON_EXPORT csTextureManager : public iTextureManager
+class CS_CRYSTALSPACE_EXPORT csTextureManager : public iTextureManager
 {
 protected:
 

@@ -52,7 +52,7 @@
  * <li>After invocation of csStringBase::Detach().
  * </ul>
  */
-class CS_CSUTIL_EXPORT csStringBase
+class CS_CRYSTALSPACE_EXPORT csStringBase
 {
 protected:
   /**

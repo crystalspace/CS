@@ -5,6 +5,6 @@ Description spr3dldr : "Sprite 3D mesh object loader" ;
 Plugin spr3dldr
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith spr3dldr : csgeom csutil ;
+LinkWith spr3dldr : crystalspace ;
 
 CompileGroups spr3dldr :  meshes ;

@@ -43,10 +43,8 @@ MsvcGenConfig CRYSTAL.AVAILABLE : yes ;
 MsvcGenConfig CRYSTAL.DEFINES ;
 MsvcGenConfig CRYSTAL.CFLAGS ;
 MsvcGenConfig CRYSTAL.LFLAGS ;
-MsvcGenConfig CRYSTAL.LIBS : 
-  "libcstool.lib libcsgfx.lib libcsgeom.lib libcsutil.lib" ;
-MsvcGenConfig CRYSTAL.LIBS.DEBUG : 
-  "libcstool_d.lib libcsgfx_d.lib libcsgeom_d.lib libcsutil_d.lib" ;
+MsvcGenConfig CRYSTAL.LIBS : "libcrystalspace.lib" ;
+MsvcGenConfig CRYSTAL.LIBS.DEBUG : "libcrystalspace_d.lib" ;
 MsvcGenConfig CRYSTAL.INCDIRS :
   [ ConcatDirs .. .. .. CS include ]
   [ ConcatDirs "$(hash)(CRYSTAL)" include ]

@@ -5,7 +5,7 @@ Description bezier : "Bezier mesh object plugin" ;
 Plugin bezier
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith bezier : csgeom csutil cstool ;
+LinkWith bezier : crystalspace ;
 
 CompileGroups bezier :  meshes ;
 

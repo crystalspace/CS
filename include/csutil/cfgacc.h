@@ -37,7 +37,7 @@ struct iObjectRegistry;
  * the '->' operator to access the system configuration. Note that you must
  * use the same iObjectRegistry for all config files you add.
  */
-class CS_CSUTIL_EXPORT csConfigAccess
+class CS_CRYSTALSPACE_EXPORT csConfigAccess
 {
 public:
   /// constructor

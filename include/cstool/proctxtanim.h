@@ -31,7 +31,7 @@
 /**
  * A procedural texture for animated images.
  */
-class CS_CSTOOL_EXPORT csProcAnimated : public csProcTexture
+class CS_CRYSTALSPACE_EXPORT csProcAnimated : public csProcTexture
 {
 private:
   csRef<iImage> image;

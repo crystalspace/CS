@@ -61,17 +61,18 @@ if $(PYTHON.AVAILABLE) = "yes"
   }
   InstallCSPythonPY $(cspacepy) : bindings python ;
 
-  Library cspycommon : $(common) : shared independent ;
-  LibDepends cspycommon : cstool csgfx csgeom csutil ;
-  ExternalLibs cspycommon : PYTHON ;
-  CFlags cspycommon : $(CSPYTHON.CFLAGS) ;
+  Description crystalspace_python : "Python-specific support" ;
+  Library crystalspace_python : $(common) : shared independent ;
+  LibDepends crystalspace_python : crystalspace ;
+  ExternalLibs crystalspace_python : PYTHON ;
+  CFlags crystalspace_python : $(CSPYTHON.CFLAGS) ;
 
   #--------
   # cspython -- Crystal Space plugin
   #--------
   Description cspython : "Python plugin" ;
   Plugin cspython : cspython.h cspython.cpp pytocs.h pytocs.cpp ;
-  LinkWith cspython : cspycommon cstool csgfx csgeom csutil ;
+  LinkWith cspython : crystalspace_python crystalspace ;
   ExternalLibs cspython : PYTHON ;
   CFlags cspython : $(CSPYTHON.CFLAGS) ;
   Depends cspython : $(cspacepy) ;
@@ -99,7 +100,7 @@ if $(PYTHON.AVAILABLE) = "yes"
   pythmod_TARGET = $(pythmod) ;
   pythmod_SOURCES = $(pythmodsrc) ;
   pythmod_OBJECTS = $(pythmodobj) ;
-  LinkWith pythmod : cspycommon cstool csgfx csgeom csutil ;
+  LinkWith pythmod : crystalspace_python crystalspace ;
   ExternalLibs pythmod : PYTHON ;
   CFlags pythmod : $(PLUGIN.CFLAGS) ;
   LFlags pythmod : $(PLUGIN.LFLAGS) $(LINKLIBS) ;

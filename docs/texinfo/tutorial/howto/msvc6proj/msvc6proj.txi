@@ -303,8 +303,9 @@ For release builds you need to select @emph{Multithreaded DLL} from the
 
 Once done, click on the @emph{OK} button and return to the @sc{msvc ide}.
 
-@subsubheading Step 6 - Setting the Crystal Space static libs to link with.
+@subsubheading Step 6 - Linking with the Crystal Space libraries.
 
+@noindent
 Step 6 Video - 1.4Mb zip archive download.
 
 @noindent
@@ -317,27 +318,31 @@ Step 6 Video - 1.4Mb zip archive download.
 @end iftex
 
 When compiling Crystal Space in release and debug mode, you will end up with the
-following static libs, some of which you may require at some point in your own
+following libraries, some of which you may require at some point in your own
 applications if you use the functionality contained within a given library.
 
-Crystal Space debug library names (the @emph{_d} indicates a debug CS library):
+@noindent
+Crystal Space debug library names (the @emph{_d} indicates a debug library):
 
+@noindent
 @iftex
-@code{libcsutil_d.lib libcsgeom_d.lib libcsgfx_d.lib}@*
-@code{libcsgfx_d.lib libcstool_d.lib libcsws_d.lib}
+@code{libcrystalspace_d.lib libcrystalspace_directx_d.lib}@*
+@code{libcrystalspace_opengl_d.lib libcrystalspace_windows_d.lib}
 @end iftex
 @ifnottex
-@code{libcsutil_d.lib libcsgeom_d.lib libcsgfx_d.lib libcstool_d.lib libcsws_d.lib}
+@code{libcrystalspace_d.lib libcrystalspace_directx_d.lib libcrystalspace_opengl_d.lib libcrystalspace_windows_d.lib}
 @end ifnottex
 
+@noindent
 Crystal Space release library names:
 
+@noindent
 @iftex
-@code{libcsutil.lib libcsgeom.lib libcsgfx.lib}@*
-@code{libcstool.lib libcsws.lib}
+@code{libcrystalspace.lib libcrystalspaceirectx.lib}@*
+@code{libcrystalspace_opengl.lib libcrystalspace_windows.lib}
 @end iftex
 @ifnottex
-@code{libcsutil.lib libcsgeom.lib libcsgfx.lib libcstool.lib libcsws.lib}
+@code{libcrystalspace.lib libcrystalspaceirectx.lib libcrystalspace_opengl.lib libcrystalspace_windows.lib}
 @end ifnottex
 
 To add the necessary libraries to link our application.  As in step 4
@@ -345,43 +350,37 @@ we need to change one or more project settings. Select your project in the
 @emph{Workspace} window. See area highlighted in blue in the image below.  Now,
 from the @emph{File} menu select @emph{Projects} then @emph{Settings...}.  
 Alternatively, you can right click on the highlighted area in the
-@emph{Workspace} and then click on @emph{Settings...} - both ways work.
+@emph{Workspace} and then click on @emph{Settings...}--both ways work.
 
 @ifnotinfo
 @picturesss{tutorial,howto,msvc6proj,snap9}
 @end ifnotinfo
 
-For our application we need only need link with a few of the available Crystal
-Space static libraries.  Select the @emph{Link} tab and in the text box
-@emph{Object/library modules} add the Crystal Space libraries as named below
-into the box with those already there.
+For applications we need only link with the primary Crystal Space library.  The
+other libraries provide support for custom plugin modules.  Select the
+@emph{Link} tab and in the text box @emph{Object/library modules} add the
+Crystal Space library into the box with those already there.
 
+@noindent
 Debug:
 
-@iftex
-@code{libcsutil_d.lib libcsgeom_d.lib}@*
-@code{libcsgfx_d.lib libcstool_d.lib}
-@end iftex
-@ifnottex
-@code{libcsutil_d.lib libcsgeom_d.lib libcsgfx_d.lib libcstool_d.lib}
-@end ifnottex
+@noindent
+@code{libcrystalspace_d.lib}
 
+@noindent
 See image below for example of debug build link settings.
 
 @ifnotinfo
 @picturesss{tutorial,howto,msvc6proj,snap15}
 @end ifnotinfo
 
+@noindent
 Release:
 
-@iftex
-@code{libcsutil.lib libcsgeom.lib}@*
-@code{libcsgfx.lib libcstool.lib}
-@end iftex
-@ifnottex
-@code{libcsutil.lib libcsgeom.lib libcsgfx.lib libcstool.lib}
-@end ifnottex
+@noindent
+@code{libcrystalspace.lib}
 
+@noindent
 See image below for example of release build link settings.
 
 @ifnotinfo

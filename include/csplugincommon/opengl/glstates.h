@@ -26,6 +26,7 @@
 #include <GL/gl.h>
 #endif
 
+#include "csextern_gl.h"
 #include "glextmanager.h"
 
 // Set to 'true' to force state changing commands. For debugging.
@@ -352,7 +353,7 @@
   }
 
 
-class csGLStateCacheContext
+CS_CSPLUGINCOMMON_GL_EXPORT class csGLStateCacheContext
 {
 public:
   csGLExtensionManager* extmgr;
@@ -527,7 +528,7 @@ public:
  * deallocations. The functions in this class will only
  * manipulate member variables.
  */
-class csGLStateCache
+CS_CSPLUGINCOMMON_GL_EXPORT class csGLStateCache
 {
 public:
   csGLExtensionManager* extmgr;

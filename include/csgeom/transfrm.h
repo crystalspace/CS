@@ -40,7 +40,7 @@ class csReversibleTransform;
  * and 'this'. The transform defines a transformation from 'other'
  * to 'this'.
  */
-class CS_CSGEOM_EXPORT csTransform
+class CS_CRYSTALSPACE_EXPORT csTransform
 {
 protected:
   /// Transformation matrix from 'other' space to 'this' space.
@@ -191,84 +191,84 @@ public:
    * Apply a transformation to a 3D vector. This corresponds exactly
    * to calling t.Other2This (v).
    */
-  friend CS_CSGEOM_EXPORT csVector3 operator* (const csVector3& v, 
+  friend CS_CRYSTALSPACE_EXPORT csVector3 operator* (const csVector3& v, 
     const csTransform& t);
 
   /**
    * Apply a transformation to a 3D vector. This corresponds exactly
    * to calling t.Other2This (v).
    */
-  friend CS_CSGEOM_EXPORT csVector3 operator* (const csTransform& t, 
+  friend CS_CRYSTALSPACE_EXPORT csVector3 operator* (const csTransform& t, 
     const csVector3& v);
 
   /**
    * Apply a transformation to a 3D vector. This corresponds exactly
    * to calling v = t.Other2This(v).
    */
-  friend CS_CSGEOM_EXPORT csVector3& operator*= (csVector3& v, 
+  friend CS_CRYSTALSPACE_EXPORT csVector3& operator*= (csVector3& v, 
     const csTransform& t);
 
   /**
    * Apply a transformation to a Plane. This corresponds exactly
    * to calling t.Other2This(p).
    */
-  friend CS_CSGEOM_EXPORT csPlane3 operator* (const csPlane3& p, 
+  friend CS_CRYSTALSPACE_EXPORT csPlane3 operator* (const csPlane3& p, 
     const csTransform& t);
 
   /**
    * Apply a transformation to a Plane. This corresponds exactly
    * to calling t.Other2This(p).
    */
-  friend CS_CSGEOM_EXPORT csPlane3 operator* (const csTransform& t, 
+  friend CS_CRYSTALSPACE_EXPORT csPlane3 operator* (const csTransform& t, 
     const csPlane3& p);
 
   /**
    * Apply a transformation to a Plane. This corresponds exactly
    * to calling p = t.Other2This(p).
    */
-  friend CS_CSGEOM_EXPORT csPlane3& operator*= (csPlane3& p, 
+  friend CS_CRYSTALSPACE_EXPORT csPlane3& operator*= (csPlane3& p, 
     const csTransform& t);
 
   /**
    * Apply a transformation to a sphere. This corresponds exactly
    * to calling t.Other2This(p).
    */
-  friend CS_CSGEOM_EXPORT csSphere operator* (const csSphere& p, 
+  friend CS_CRYSTALSPACE_EXPORT csSphere operator* (const csSphere& p, 
     const csTransform& t);
 
   /**
    * Apply a transformation to a sphere. This corresponds exactly
    * to calling t.Other2This(p).
    */
-  friend CS_CSGEOM_EXPORT csSphere operator* (const csTransform& t, 
+  friend CS_CRYSTALSPACE_EXPORT csSphere operator* (const csTransform& t, 
     const csSphere& p);
 
   /**
    * Apply a transformation to a sphere. This corresponds exactly
    * to calling p = t.Other2This(p).
    */
-  friend CS_CSGEOM_EXPORT csSphere& operator*= (csSphere& p, 
+  friend CS_CRYSTALSPACE_EXPORT csSphere& operator*= (csSphere& p, 
     const csTransform& t);
 
   /**
    * Multiply a matrix with the transformation matrix. This will calculate
    * and return m*M.
    */
-  friend CS_CSGEOM_EXPORT csMatrix3 operator* (const csMatrix3& m, 
+  friend CS_CRYSTALSPACE_EXPORT csMatrix3 operator* (const csMatrix3& m, 
     const csTransform& t);
 
   /**
    * Multiply a matrix with the transformation matrix. This will calculate
    * and return M*m.
    */
-  friend CS_CSGEOM_EXPORT csMatrix3 operator* (const csTransform& t, 
+  friend CS_CRYSTALSPACE_EXPORT csMatrix3 operator* (const csTransform& t, 
     const csMatrix3& m);
 
   /**
    * Multiply a matrix with the transformation matrix.
    * This corresponds exactly to m*=M.
    */
-  friend CS_CSGEOM_EXPORT csMatrix3& operator*= (csMatrix3& m, 
+  friend CS_CRYSTALSPACE_EXPORT csMatrix3& operator*= (csMatrix3& m, 
     const csTransform& t);
 
   /**
@@ -282,7 +282,7 @@ public:
    * Then this will return a new transform
    * T=(t1.M*t2.M)*(O-(t2.V+t2.Minv*t1.V)).
    */
-  friend CS_CSGEOM_EXPORT csTransform operator* (const csTransform& t1,
+  friend CS_CRYSTALSPACE_EXPORT csTransform operator* (const csTransform& t1,
                               const csReversibleTransform& t2);
 
   /**
@@ -300,7 +300,7 @@ public:
  * but it is more efficient if you plan to do inverse transformations
  * often.
  */
-class CS_CSGEOM_EXPORT csReversibleTransform : public csTransform
+class CS_CRYSTALSPACE_EXPORT csReversibleTransform : public csTransform
 {
 protected:
   /// Inverse transformation matrix ('this' to 'other' space).
@@ -467,35 +467,35 @@ public:
    * Reverse a transformation on a 3D vector. This corresponds exactly
    * to calling t.This2Other(v).
    */
-  friend CS_CSGEOM_EXPORT csVector3 operator/ (const csVector3& v,
+  friend CS_CRYSTALSPACE_EXPORT csVector3 operator/ (const csVector3& v,
   	const csReversibleTransform& t);
 
   /**
    * Reverse a transformation on a 3D vector. This corresponds exactly
    * to calling v=t.This2Other(v).
    */
-  friend CS_CSGEOM_EXPORT csVector3& operator/= (csVector3& v, 
+  friend CS_CRYSTALSPACE_EXPORT csVector3& operator/= (csVector3& v, 
     const csReversibleTransform& t);
 
   /**
    * Reverse a transformation on a Plane. This corresponds exactly
    * to calling t.This2Other(p).
    */
-  friend CS_CSGEOM_EXPORT csPlane3 operator/ (const csPlane3& p, 
+  friend CS_CRYSTALSPACE_EXPORT csPlane3 operator/ (const csPlane3& p, 
     const csReversibleTransform& t);
 
   /**
    * Reverse a transformation on a Plane. This corresponds exactly to
    * calling p = t.This2Other(p).
    */
-  friend CS_CSGEOM_EXPORT csPlane3& operator/= (csPlane3& p, 
+  friend CS_CRYSTALSPACE_EXPORT csPlane3& operator/= (csPlane3& p, 
     const csReversibleTransform& t);
 
   /**
    * Reverse a transformation on a sphere. This corresponds exactly to
    * calling t.This2Other(p).
    */
-  friend CS_CSGEOM_EXPORT csSphere operator/ (const csSphere& p, 
+  friend CS_CRYSTALSPACE_EXPORT csSphere operator/ (const csSphere& p, 
     const csReversibleTransform& t);
 
   /**
@@ -552,7 +552,7 @@ public:
    * Then this will calculate a new transformation in 't1' as follows:
    * T=(t1.M*t2.M)*(O-(t2.Minv*t1.V+t2.V)).
    */
-  friend CS_CSGEOM_EXPORT csTransform operator* (const csTransform& t1,
+  friend CS_CRYSTALSPACE_EXPORT csTransform operator* (const csTransform& t1,
                               const csReversibleTransform& t2);
 #endif
 
@@ -568,7 +568,7 @@ public:
    * Then this will calculate a new transformation in 't1' as follows:
    * T=(t1.M*t2.Minv)*(O-(t2.M*(t1.V-t2.V))).
    */
-  friend CS_CSGEOM_EXPORT csReversibleTransform& operator/= (
+  friend CS_CRYSTALSPACE_EXPORT csReversibleTransform& operator/= (
     csReversibleTransform& t1, const csReversibleTransform& t2);
 
   /**
@@ -583,7 +583,7 @@ public:
    * Then this will calculate a new transformation in 't1' as follows:
    * T=(t1.M*t2.Minv)*(O-(t2.M*(t1.V-t2.V))).
    */
-  friend CS_CSGEOM_EXPORT csReversibleTransform operator/ (
+  friend CS_CRYSTALSPACE_EXPORT csReversibleTransform operator/ (
     const csReversibleTransform& t1, const csReversibleTransform& t2);
 };
 

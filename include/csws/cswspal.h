@@ -118,24 +118,24 @@ struct csColorScheme
 };
 
 /// A global array containing CSWS palette for all component types
-extern CS_CSWS_EXPORT csPaletteExport *cswsPalette;
+extern CS_CRYSTALSPACE_EXPORT csPaletteExport *cswsPalette;
 /// Total number of palettes
-extern CS_CSWS_EXPORT int cswsPaletteSize;
+extern CS_CRYSTALSPACE_EXPORT int cswsPaletteSize;
 
 /**
  * Register a new color palette (returns the palette index).
  * Registered palettes will be affected by color scheme changes;
  * unregistered won't be.
  */
-extern CS_CSWS_EXPORT int csRegisterPalette (int *Palette, int Size);
+extern CS_CRYSTALSPACE_EXPORT int csRegisterPalette (int *Palette, int Size);
 /// Change the global color scheme (or restore scheme if 0 passed)
-extern CS_CSWS_EXPORT void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
+extern CS_CRYSTALSPACE_EXPORT void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 
 /**
  * Cleanup the global palette array when it is not needed anymore.
  * Must be called to avoid memleaks.
  */
-extern CS_CSWS_EXPORT void csResetPalette (void);
+extern CS_CRYSTALSPACE_EXPORT void csResetPalette (void);
 
 /**
  * \name Palette indices

@@ -36,7 +36,7 @@
 /**
  * Helper class to conveniently deal with keyboard events.
  */
-class CS_CSUTIL_EXPORT csKeyEventHelper
+class CS_CRYSTALSPACE_EXPORT csKeyEventHelper
 {
 public:
   /// Retrieve the key's raw code.

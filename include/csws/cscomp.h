@@ -348,7 +348,7 @@ enum
  * anything you draw inside the Draw() method is overlayed onto parent
  * component's image.
  */
-class CS_CSWS_EXPORT csComponent
+class CS_CRYSTALSPACE_EXPORT csComponent
 {
 protected:
   /// Object state flags (see CSS_XXX flags)

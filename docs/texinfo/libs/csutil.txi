@@ -1,16 +1,17 @@
-@node csUtil, SCF, Libraries, Libraries
-@section Utility Library (@code{csUtil})
+@node csUtil, SCF, Facilities, Facilities
+@section Utility Module (@code{csUtil})
 @cindex csUtil
-@cindex Libraries,csUtil
-@cindex Utility Library
+@cindex Module, csUtil
+@cindex Utility Module
 
-The utility library consists of many smaller modules that are too small to
-live as a separate library. The biggest part of it is the @sc{scf} library.
-@xref{SCF}.
+This utility module consists of many handy tools and classes which depend upon
+no other module within Crystal Space. All other modules and facilities utilize
+the features provided by this module.  An important facility within this module
+is @sc{scf}, the Shared Class Facility, upon which all Crystal Space plugins
+are predicated.  @xref{SCF}.
 
-Then there are a series of classes implementing arrays of some sort.
-There are currently six types of arrays in CS. All are templated and
-type-safe.  See later sections for additional information.
+In addition to the many other useful classes, there are a number of handy
+array templates in this module.
 
 @itemize @bullet
 @item
@@ -25,7 +26,7 @@ type-safe.  See later sections for additional information.
 @code{csPDelArray<T>}
 @end itemize
 
-Also in csutil are the @file{.cfg} file reader and the random
+Also in @file{csutil} are the @file{.cfg} file reader and the random
 number generator.
 
 The other classes might or might not be useful, so if you need some very
@@ -34,34 +35,35 @@ reference to see if it is already implemented. The usage of these classes
 will not be explained further, as most functions are self-explanatory. The
 comments in the @sc{api} reference and the header files should also help.
 
-Exceptions should be made here for the @code{csObject} class and for typed
+Exceptions should be made here for the @samp{csObject} class and for typed
 vectors. They will be explained in the next sections.
 
 @menu
-* csObject:: @code{csObject}
+* csObject:: @samp{csObject}
 * Typed Arrays::
 @end menu
 
 @node csObject, Typed Arrays, csUtil, csUtil
-@subsection @code{csObject}
-@cindex @code{csObject}
+@subsection @samp{csObject}
+@cindex @samp{csObject}
 
-The @code{csObject} class can be used to build object hierarchies. It supports
+The @samp{csObject} class can be used to build object hierarchies. It supports
 building a simple tree structure. To use this functionality, you should derive
-your classes from @code{csObject}. @code{csObject} implements the
-@code{iObject} interface and can store any number of @code{iObject} children.
-Furthermore, every @code{csObject} has a name.
+your classes from @samp{csObject}. @samp{csObject} implements the
+@samp{iObject} interface and can store any number of @samp{iObject} children.
+Furthermore, every @samp{csObject} may have a name.
 
-All child objects are @code{IncRef}'ed when added and @code{DecRef}'ed when
+All child objects are @code{IncRef()}'ed when added and @code{DecRef()}'ed when
 removed. An object also stores a pointer to its parent (which is not
 reference-counted to avoid circular references). Note that this pointer will
 always point to the last parent if the object is added to more than one
 parent. When the object is removed from a parent, the pointer is set to
-@code{0}, even if the object is still a child of another parent!
+null, even if the object is still a child of another parent!
 
-Although the children of an object are only available as @code{iObject}'s,
-you can use @code{SCF_QUERY_INTERFACE} to query other interfaces from them.
-Some convenience macros are also available:
+Although the children of an object are only available as @samp{iObject}
+instances, you can use @code{SCF_QUERY_INTERFACE()} to query other interfaces
+from them.  Some convenience macros are also available:
+
 @table @code
 @item CS_GET_CHILD_OBJECT(object,Interface)
 Get the first child object that implements the given interface.
@@ -77,18 +79,19 @@ Same as the above but stops at the first object with the given name, even if
 it does not implement the requested interface (in that case, @code{0} is
 returned). This is slightly faster.
 @end table
+
 Note that all these macros increase the reference count of the returned
 object by 1.
 
 Note that there are a few HOWTO's describing possible uses for the
-@code{csObject} system (@pxref{HOWTO User Objects} and
+@samp{csObject} system (@pxref{HOWTO User Objects} and
 @pxref{HOWTO User Objects in Maps}).
 
 @node Typed Arrays, , csObject, csUtil
 @subsection Typed Arrays
 @cindex Typed Arrays
 
-Crystal Space currently has several styles of typed Arrays.  These arrays grow
+Crystal Space currently has several styles of typed arrays.  These arrays grow
 as needed to accommodate additions and insertions.
 
 @itemize
@@ -97,43 +100,45 @@ as needed to accommodate additions and insertions.
 suitable for any C++ type, including basic types (such as @samp{int}) and
 user-defined types (such as objects).  This class guarantees proper
 construction and destruction of objects as they are added to, and removed from
-the array.  Include file is @file{csutil/array.h}.
+the array.  See @file{csutil/array.h}.
 
 @item
 @code{csDirtyAccessArray<T>}: Similar to @code{csArray<T>}, this array type can
-be used to store arbitrary objects, with the exception that it @emph{does not
-invoke constructors and destructors} of contained objects.  Use this class at
-your own peril; @code{csArray<T>} is almost always a better choice.  The only
-conceivable instance in which use of this class might be warranted is when
-micro-optimization is required; when you need to avoid the overhead of object
-construction, but this is highly dangerous and should be avoided in almost all
-cases.  This class is mainly useful in cases where you have simple objects
-(structures) and efficiency is of utmost importance.  Also, this array provides
-read access to the actual memory vector, which can be useful if you need to
-communicate with some external @sc{api}.  Include file is
-@file{csutil/garray.h}.
+be used to store arbitrary objects. The difference is that this array allows
+access to the raw memory block, via @code{GetArray()}, in which the elements
+are stored, whereas @code{csArray<T>} keeps its internal state private.
+Accessing the raw memory containing the elements is considered dangerous and
+poor practice, so use of this class should be restricted and avoided.  Its main
+use is when you absolutely need access to the internal memory containing the
+array of items.  This can be useful, for instance, if you need to interface
+with some external @sc{api} (such as OpenGL) which does not understand
+@code{csArray<>}, and which expects a simple pointer to the array elements.
+See @file{csutil/garray.h}.
 
 @item
 @code{csRefArray<T>}: This is the preferred way to store an array of pointers
 to reference-counted objects.  This array type automatically invokes each
 object's @code{IncRef()} method at insertion time, and @code{DecRef()} at
 removal time.  All @sc{scf} objects (@pxref{SCF}) support these methods, as do
-objects derived from @code{csRefCount}.  Since @code{csRefArray<T>} is a
+objects derived from @samp{csRefCount}.  Since @code{csRefArray<T>} is a
 templated class, it will also work with any other object which provides
-@code{IncRef()} and @code{DecRef()} methods.  Include file is
-@file{csutil/refarr.h}.
+@code{IncRef()} and @code{DecRef()} methods.  See @file{csutil/refarr.h}.
 
 @item
 @code{csRefArrayObject<T>}: This is a variant of @code{csRefArray<T>} which can
 hold objects that have a method @code{QueryObject()} which returns something
 from which you can call @code{GetName()}.  In practice it means this is useful
-for all Crystal Space objects that implement @code{iObject}.  In addition to
+for all Crystal Space objects which implement @samp{iObject}.  In addition to
 the features of @code{csRefArray<T>} this class adds the ability to find
-elements by name.  Include file is @file{csutil/nobjvec.h}.
+elements by name.  See @file{csutil/nobjvec.h}.
 
 @item
-@code{csPDelArray<T>}: This is an array class for
-pointers only.  It will invoke @samp{delete} for elements removed from the
-array.  Include file is
-@file{csutil/parray.h}.
+@code{csPDelArray<T>}: This is a convenience array class for pointers only.  It
+will invoke @samp{delete} for elements removed from the array. This is useful
+for cases when you need to store raw pointers to objects which have been
+allocated with @samp{new}, and don't want to worry about having to
+@samp{delete} the objects when removed from the array or when the array is
+destroyed. In other cases where you need to store raw object pointers but don't
+want them deleted upon removal from the array, just use the normal
+@code{csArray<T*>}. See @file{csutil/parray.h}.
 @end itemize

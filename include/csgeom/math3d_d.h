@@ -47,7 +47,7 @@ inline double dSqr (double d)
 /**
  * A 3D vector.
  */
-class CS_CSGEOM_EXPORT csDVector3
+class CS_CRYSTALSPACE_EXPORT csDVector3
 {
 public:
   /// The X component of the vector
@@ -219,7 +219,7 @@ public:
 /**
  * A 3x3 matrix.
  */
-class CS_CSGEOM_EXPORT csDMatrix3
+class CS_CRYSTALSPACE_EXPORT csDMatrix3
 {
 public:
   double m11, m12, m13;
@@ -354,7 +354,7 @@ public:
  * The plane is given by the equation AAx + BBy + CCz + DD = 0,
  * Where (AA,BB,CC) is given by the vector 'norm'.
  */
-class CS_CSGEOM_EXPORT csDPlane
+class CS_CRYSTALSPACE_EXPORT csDPlane
 {
 public:
   /// The normal vector (or the (A,B,C) components).
@@ -432,7 +432,7 @@ public:
  * Various assorted 3D mathematical functions.
  * This is a static class and contains only static member functions.
  */
-class CS_CSGEOM_EXPORT csDMath3
+class CS_CRYSTALSPACE_EXPORT csDMath3
 {
 public:
   /**
@@ -565,7 +565,7 @@ public:
  * Some functions to perform squared distance calculations.
  * This is a static class and contains only static member functions.
  */
-class CS_CSGEOM_EXPORT csDSquaredDist
+class CS_CRYSTALSPACE_EXPORT csDSquaredDist
 {
 public:
   /// Returns the squared distance between two points.
@@ -595,7 +595,7 @@ public:
  * line segments.  This is a static class and contains only static member
  * functions.
  */
-class CS_CSGEOM_EXPORT csDIntersect3
+class CS_CRYSTALSPACE_EXPORT csDIntersect3
 {
 public:
   /**

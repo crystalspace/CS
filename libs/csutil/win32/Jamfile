@@ -1,0 +1,12 @@
+SubDir TOP libs csutil win32 ;
+
+CsLibAddModule ;
+
+CSUTIL.GENERIC +=
+  appdir.cpp
+  csprocessorcap.cpp
+  findlib.cpp
+  getopt.cpp
+  pluginpaths.cpp
+  resdir.cpp
+  runloop.cpp ;

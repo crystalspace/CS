@@ -2,4 +2,4 @@ SubDir TOP apps examples cswseng ;
 
 Description cswseng : "CSWS and 3D engine example" ;
 Application cswseng : [ Wildcard *.cpp *.h ] : noinstall ;
-LinkWith cswseng : csgeom csgfx cstool csutil csws ;
+LinkWith cswseng : crystalspace ;

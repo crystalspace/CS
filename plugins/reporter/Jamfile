@@ -5,4 +5,4 @@ Description reporter : "Reporter plugin" ;
 Plugin reporter
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith reporter : csgeom csutil ;
+LinkWith reporter : crystalspace ;

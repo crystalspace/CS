@@ -4,6 +4,6 @@ if $(PYTHON.AVAILABLE) = yes
 {
   Description pysimp : "Python example" ;
   Application pysimp : [ Wildcard *.cpp *.h ] : noinstall ;
-  LinkWith pysimp : csgeom csgfx cstool csutil ;
+  LinkWith pysimp : crystalspace ;
   ExternalLibs pysimp : PYTHON ;
 }

@@ -3,4 +3,4 @@ SubDir TOP apps tools lighter ;
 Description lighter : "New Renderer Lightmap Calculator" ;
 ApplicationIcon win32 : lighter : lighter.ico ;
 Application lighter : [ Wildcard *.cpp *.h ] ;
-LinkWith lighter : csgeom csgfx cstool csutil ;
+LinkWith lighter : crystalspace ;

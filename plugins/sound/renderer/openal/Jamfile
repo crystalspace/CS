@@ -4,7 +4,7 @@ if $(OPENAL.AVAILABLE) = "yes"
 {
 Description sndoal : "OpenAL sound renderer" ;
 Plugin sndoal : [ Wildcard *.cpp *.h ] ;
-LinkWith sndoal : csplugincommon csgeom csutil ;
+LinkWith sndoal : crystalspace ;
 ExternalLibs sndoal : OPENAL ;
 CompileGroups sndoal : sounddrivers ;
 }

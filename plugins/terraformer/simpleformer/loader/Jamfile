@@ -6,6 +6,6 @@ Plugin simpleformerldr
 	: [ Wildcard *.cpp *.h ]
 ;
 
-LinkWith simpleformerldr : csgeom csutil ;
+LinkWith simpleformerldr : crystalspace ;
 
 CompileGroups simpleformerldr :  meshes ;

@@ -56,7 +56,7 @@ struct iMeshWrapper;
  * Subclasses of this class may be of more interest to users.
  * More specialised particle systems can be found below.
  */
-class CS_CSPLUGINCOMMON_EXPORT csParticleSystem : public iMeshObject
+class CS_CRYSTALSPACE_EXPORT csParticleSystem : public iMeshObject
 {
 protected:
   iObjectRegistry* object_reg;
@@ -469,7 +469,7 @@ public:
  * This class has a set of particles that behave with phsyics.
  * They each have a speed and an acceleration.
  */
-class CS_CSPLUGINCOMMON_EXPORT csNewtonianParticleSystem : public csParticleSystem
+class CS_CRYSTALSPACE_EXPORT csNewtonianParticleSystem : public csParticleSystem
 {
 protected:
   /// Particle speed, m/s.

@@ -22,15 +22,10 @@
 #define __DMATH3D_H__
 
 #include "cstypes.h"
+#include "csgeom/math.h"
 
 class CdVector3;
 class CdMatrix3;
-
-// this is used in inline functions (we can use csSquareFloat from csUtil?)
-inline double fSqr (double f)
-{
-  return f * f;
-}
 
 /**
  * A 3D vector.
@@ -516,7 +511,12 @@ class CdSquaredDist
 public:
   /// Returns the squared distance between two points.
   static double PointPoint (const CdVector3& p1, const CdVector3& p2)
-  { return fSqr (p1.x - p2.x) + fSqr (p1.y - p2.y) + fSqr (p1.z - p2.z); }
+  {
+    return
+      csSquare (p1.x - p2.x) +
+      csSquare (p1.y - p2.y) +
+      csSquare (p1.z - p2.z);
+  }
 
   /// Returns the squared distance between a point and a line.
   static double PointLine (const CdVector3& p,

@@ -41,7 +41,7 @@ struct csAccElement;
  * all events and if it sees a keyboard event which matches one of
  * the predefined combinations it emmits a corresponding event.
  */
-class CS_CSWS_EXPORT csKeyboardAccelerator : public csComponent
+class CS_CRYSTALSPACE_EXPORT csKeyboardAccelerator : public csComponent
 {
   /// The table that contains keyboard event->generated event conversion table
   csPDelArray<csAccElement> Accelerators;

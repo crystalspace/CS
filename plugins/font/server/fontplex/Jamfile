@@ -2,5 +2,5 @@ SubDir TOP plugins font server fontplex ;
 
 Description fontplex : "multiplexing font server" ;
 Plugin fontplex : [ Wildcard *.cpp *.h ] ;
-LinkWith fontplex : csutil ;
+LinkWith fontplex : crystalspace ;
 CompileGroups fontplex : fontservers ;

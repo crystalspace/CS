@@ -2,11 +2,13 @@ SubDir TOP libs csplugincommon macosx ;
 
 if $(TARGET.OS) = MACOS_X
 {
-Description csplugincommon_osx : "MacOS/X-specific common plugin classes" ;
-Library csplugincommon_osx : 
-  [ Wildcard *.cpp *.cxx *.cc *.m *.mm *.M *.h ] 
-  [ Wildcard
-    [ ConcatDirs $(DOTDOT) $(DOTDOT) include csplugincommon macosx ] : *.h ]
-  : shared ;
-LibDepends csplugincommon_osx : csplugincommon csgfx csutil ;
+  Description crystalspace_macosx : "MacOS/X-specific plugin support" ;
+  Library crystalspace_macosx : 
+    [ Wildcard *.cpp *.cxx *.cc *.m *.mm *.M *.h ] 
+    [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) $(DOTDOT) include
+		 csplugincommon macosx ] : *.h ]
+    : shared ;
+  LibDepends crystalspace_macosx : crystalspace ;
+  CFlags crystalspace_macosx : [ FDefines CS_CSPLUGINCOMMON_OSX_LIB ] ;
+  MsvcDefine crystalspace_macosx : CS_CSPLUGINCOMMON_OSX_LIB ;
 }

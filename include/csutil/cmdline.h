@@ -30,7 +30,7 @@
 #include "util.h"
 
 /// Representation of a commandline option.
-struct CS_CSUTIL_EXPORT csCommandLineOption
+struct CS_CRYSTALSPACE_EXPORT csCommandLineOption
 {
   /// Option name
   char *Name;
@@ -49,7 +49,7 @@ struct CS_CSUTIL_EXPORT csCommandLineOption
 
 
 /// Utility class that makes it easier to parse the command line.
-class CS_CSUTIL_EXPORT csCommandLineParser : public iCommandLineParser
+class CS_CRYSTALSPACE_EXPORT csCommandLineParser : public iCommandLineParser
 {
 private:
   /// A vector of command line options

@@ -29,7 +29,7 @@
 /**
  * Memory image.
  */
-class CS_CSGFX_EXPORT csImageMemory : public csImageBase
+class CS_CRYSTALSPACE_EXPORT csImageMemory : public csImageBase
 {
 private:
   /// Common code shared by constructors.

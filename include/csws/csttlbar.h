@@ -32,7 +32,7 @@
  * The TitleBar class represents a bar with a text string written across
  * which is usually drawn at the top of complex windows :-).
  */
-class CS_CSWS_EXPORT csTitleBar : public csComponent
+class CS_CRYSTALSPACE_EXPORT csTitleBar : public csComponent
 {
 public:
   /// Create title bar object

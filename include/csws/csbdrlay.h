@@ -33,7 +33,7 @@
  * of the attached control.
  */
 
-class CS_CSWS_EXPORT csBorderConstraint : public csLayoutConstraint
+class CS_CRYSTALSPACE_EXPORT csBorderConstraint : public csLayoutConstraint
 {
  public:
   int mAlign;
@@ -89,7 +89,7 @@ class CS_CSWS_EXPORT csBorderConstraint : public csLayoutConstraint
  * </p>
  */
  
-class CS_CSWS_EXPORT csBorderLayout : public csLayout2
+class CS_CRYSTALSPACE_EXPORT csBorderLayout : public csLayout2
 {
  public:
   csBorderLayout (csComponent *pParent);

@@ -45,7 +45,7 @@
  * only specific classes or subclasses, e.g. <tt>--verbose=*,-scf</tt> will
  * enable verbosity for everything except the SCF diagnostic information.
  */
-class CS_CSUTIL_EXPORT csVerbosityParser
+class CS_CRYSTALSPACE_EXPORT csVerbosityParser
 {
   struct VerbosityFlag
   {
@@ -91,7 +91,7 @@ public:
  *  registry is not set up yet; otherwise, the iVerbosityManager object should
  *  be obtained and used instead.
  */
-extern CS_CSUTIL_EXPORT bool csCheckVerbosity (int argc,
+extern CS_CRYSTALSPACE_EXPORT bool csCheckVerbosity (int argc,
   const char* const argv[], const char* msgClass,
   const char* msgSubclass = 0);
   
@@ -99,7 +99,7 @@ extern CS_CSUTIL_EXPORT bool csCheckVerbosity (int argc,
  * Default iVerbosityManager implementation. Basically a thin wrapper around 
  * csVerbosityParser.
  */
-class CS_CSUTIL_EXPORT csVerbosityManager : public iVerbosityManager
+class CS_CRYSTALSPACE_EXPORT csVerbosityManager : public iVerbosityManager
 {
   csVerbosityParser vp;
 public:

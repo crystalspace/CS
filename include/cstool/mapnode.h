@@ -30,7 +30,7 @@
  * A node. This is an iObject that is bound to a position and a sector in
  * the world.
  */
-class CS_CSTOOL_EXPORT csMapNode : public csObject, public iMapNode
+class CS_CRYSTALSPACE_EXPORT csMapNode : public csObject, public iMapNode
 {
 public:
   /// The constructor. Requires the Nodes name!
@@ -58,7 +58,7 @@ private:
 /**
  * A node iterator.
  */
-class CS_CSTOOL_EXPORT csNodeIterator
+class CS_CRYSTALSPACE_EXPORT csNodeIterator
 {
 public:
   /**

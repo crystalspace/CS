@@ -4,7 +4,7 @@ if $(ODE.AVAILABLE) = "yes"
 {
   Description odedynam : "ODE physics plugin" ;
   Plugin odedynam : [ Wildcard *.cpp *.h ] ;
-  LinkWith odedynam : csgeom csutil ;
+  LinkWith odedynam : crystalspace ;
   ExternalLibs odedynam : ODE ;
   if $(ODE.EXTERN_C) = "yes"
   {

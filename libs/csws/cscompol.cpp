@@ -29,7 +29,7 @@
  * is implemented as usual (e.g. for lines, boxes etc) - the only difference
  * is that we should adjust per-vertex data (r/g/b/u/v etc) after each
  * clipping. Also since this is the only place in CSWS where we use polygon
- * clipper from libcsgeom if you don't use this function, you won't get
+ * clipper from csgeom if you don't use this function, you won't get
  * the clipper linked into your application.
  */
 

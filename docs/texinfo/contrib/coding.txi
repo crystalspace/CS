@@ -122,12 +122,16 @@ first file included.  The latter is recommended, as it makes headers more
 self-contained.
 
 @item
-@emph{Module and Library Dependencies}
+@emph{Module and Facility Dependencies}
 
-Do not introduce unnecessary dependencies between libraries and modules.
+Although most facilities from @file{CS/libs} end up in the same link library
+(@file{crystalspace.lib}), you should not introduce unnecessary dependencies
+between these facilities. There are clean lines between the various libraries
+and their levels of generality or specialization which we prefer to maintain.
 Absolutely avoid introducing circular dependencies.
 
-For instance, code in the @code{csutil} library should never refer to code
-from the @code{cstool} library.  The other way around is okay, however,
-since @code{cstool} is at a higher level within the dependency hierarchy.
+For instance, code in the ``csutil'' module should never refer to code
+from the ``cstool'' module.  The other way around is okay, however,
+since ``cstool'' is at a higher level within the dependency hierarchy than
+``csutil''.
 @end enumerate

@@ -5,4 +5,4 @@ Description dsplex : "document system multiplexer" ;
 Plugin dsplex
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith dsplex : cstool csutil ;
+LinkWith dsplex : crystalspace ;

@@ -4,7 +4,7 @@ if $(X11.AVAILABLE) = "yes"
 {
 Description xextshm : "X-Extension Shared Memory Plugin" ;
 Plugin xextshm : [ Wildcard *.cpp *.h ] ;
-LinkWith xextshm : csgeom csutil ;
+LinkWith xextshm : crystalspace ;
 ExternalLibs xextshm : X11 ;
 CompileGroups xextshm : canvases softcanvas ;
 }

@@ -41,7 +41,7 @@ struct iObjectRegistry;
 /**
  * Superclass of all the generic input drivers.
  */
-class CS_CSUTIL_EXPORT csInputDriver
+class CS_CRYSTALSPACE_EXPORT csInputDriver
 {
 private:
   bool Registered;
@@ -60,7 +60,7 @@ protected:
   void StopListening();
 };
 
-class CS_CSUTIL_EXPORT csKeyComposer : public iKeyComposer
+class CS_CRYSTALSPACE_EXPORT csKeyComposer : public iKeyComposer
 {
 protected:
   utf32_char lastDead;
@@ -91,7 +91,7 @@ public:
  * Keyboard driver should generate events and put them into
  * an event queue. Also it tracks the current state of all keys.
  */
-class CS_CSUTIL_EXPORT csKeyboardDriver : public csInputDriver,
+class CS_CRYSTALSPACE_EXPORT csKeyboardDriver : public csInputDriver,
   public iKeyboardDriver
 {
 protected:
@@ -179,7 +179,7 @@ public:
   virtual csEventError SynthesizeCooked (iEvent *);
 
   /// iEventHandler implementation
-  struct CS_CSUTIL_EXPORT eiEventHandler : public iEventHandler
+  struct CS_CRYSTALSPACE_EXPORT eiEventHandler : public iEventHandler
   {
     SCF_DECLARE_EMBEDDED_IBASE(csKeyboardDriver);
     virtual bool HandleEvent(iEvent& e) { return scfParent->HandleEvent(e); }
@@ -193,7 +193,7 @@ public:
  * it is responsible for generating double-click events. Mouse button numbers
  * are 1-based.
  */
-class CS_CSUTIL_EXPORT csMouseDriver :
+class CS_CRYSTALSPACE_EXPORT csMouseDriver :
   public csInputDriver, public iMouseDriver
 {
 private:
@@ -253,7 +253,7 @@ public:
   virtual void GainFocus() { }
 
   /// iEventHandler implementation
-  struct CS_CSUTIL_EXPORT eiEventHandler : public iEventHandler
+  struct CS_CRYSTALSPACE_EXPORT eiEventHandler : public iEventHandler
   {
     SCF_DECLARE_EMBEDDED_IBASE(csMouseDriver);
     virtual bool HandleEvent(iEvent& e) { return scfParent->HandleEvent(e); }
@@ -267,7 +267,7 @@ public:
  * joystick state and also for generating joystick events.
  * Joystick numbers and button numbers are 1-based.
  */
-class CS_CSUTIL_EXPORT csJoystickDriver : public csInputDriver,
+class CS_CRYSTALSPACE_EXPORT csJoystickDriver : public csInputDriver,
   public iJoystickDriver
 {
 private:
@@ -314,7 +314,7 @@ public:
   virtual void GainFocus() { }
 
   /// iEventHandler implementation
-  struct CS_CSUTIL_EXPORT eiEventHandler : public iEventHandler
+  struct CS_CRYSTALSPACE_EXPORT eiEventHandler : public iEventHandler
   {
     SCF_DECLARE_EMBEDDED_IBASE (csJoystickDriver);
     virtual bool HandleEvent(iEvent& e) { return scfParent->HandleEvent(e); }

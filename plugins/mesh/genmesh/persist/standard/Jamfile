@@ -5,7 +5,7 @@ Description gmeshldr : "General mesh object loader" ;
 Plugin gmeshldr
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith gmeshldr : csgeom csutil ;
+LinkWith gmeshldr : crystalspace ;
 
 CompileGroups gmeshldr :  meshes ;
 

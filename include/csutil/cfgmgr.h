@@ -33,7 +33,7 @@
  * appear to be a single configuration object.  See the description of the
  * iConfigManager interface for full details.
  */
-class CS_CSUTIL_EXPORT csConfigManager : public iConfigManager
+class CS_CRYSTALSPACE_EXPORT csConfigManager : public iConfigManager
 {
 public:
   SCF_DECLARE_IBASE;

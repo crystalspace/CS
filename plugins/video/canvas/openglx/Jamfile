@@ -4,7 +4,7 @@ if $(GLX.AVAILABLE) = "yes"
 {
 Description glx2d : "GL/X 2D driver" ;
 Plugin glx2d : [ Wildcard *.cpp *.h ] ;
-LinkWith glx2d : csplugincommon_ogl csplugincommon csgeom csutil ;
+LinkWith glx2d : crystalspace_opengl crystalspace ;
 ExternalLibs glx2d : GLX ;
 CompileGroups glx2d : canvases openglcanvas ;
 }

@@ -22,7 +22,7 @@
 
 #include "csextern.h"
 
-class CS_CSUTIL_EXPORT csRadixSorter
+class CS_CRYSTALSPACE_EXPORT csRadixSorter
 {
 private:
   // Element counter table. This is used to count the

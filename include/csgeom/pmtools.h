@@ -37,7 +37,7 @@ struct iPolygonMesh;
 /**
  * A definition of one edge.
  */
-struct CS_CSGEOM_EXPORT csPolygonMeshEdge
+struct CS_CRYSTALSPACE_EXPORT csPolygonMeshEdge
 {
   // Indices of the two vertices forming the edge.
   // vt1 < vt2.
@@ -56,7 +56,7 @@ struct CS_CSGEOM_EXPORT csPolygonMeshEdge
 /**
  * A triangle with minimum/maximum information on x.
  */
-struct CS_CSGEOM_EXPORT csTriangleMinMax : public csTriangle
+struct CS_CRYSTALSPACE_EXPORT csTriangleMinMax : public csTriangle
 {
   float minx, maxx;
 };
@@ -64,7 +64,7 @@ struct CS_CSGEOM_EXPORT csTriangleMinMax : public csTriangle
 /**
  * A set of tools to work with iPolygonMesh instances.
  */
-class CS_CSGEOM_EXPORT csPolygonMeshTools
+class CS_CRYSTALSPACE_EXPORT csPolygonMeshTools
 {
 private:
   static void CalculatePlanes (csVector3* vertices,

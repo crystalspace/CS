@@ -5,7 +5,7 @@ Description sndwav : "wav sound loader" ;
 Plugin sndwav
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith sndwav : csplugincommon csutil ;
+LinkWith sndwav : crystalspace ;
 
 CompileGroups sndwav :  soundloaders ;
 

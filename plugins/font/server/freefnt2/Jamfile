@@ -4,7 +4,7 @@ if $(FT2.AVAILABLE) = "yes"
 {
 Description freefnt2 : "FreeType font server" ;
 Plugin freefnt2 : [ Wildcard *.cpp *.h ] ;
-LinkWith freefnt2 : csutil ;
+LinkWith freefnt2 : crystalspace ;
 ExternalLibs freefnt2 : FT2 ;
 CompileGroups freefnt2 : fontservers ;
 }

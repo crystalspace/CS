@@ -25,7 +25,7 @@
 #include "stringarray.h"
 
 /// This class is a thin wrapper around csStringArray with SCF capability
-class CS_CSUTIL_EXPORT scfStringArray : public iStringArray
+class CS_CRYSTALSPACE_EXPORT scfStringArray : public iStringArray
 {
   csStringArray v;
 

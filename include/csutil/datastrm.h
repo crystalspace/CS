@@ -27,7 +27,7 @@ struct iDataBuffer;
  * This class can be used as a wrapper around a data buffer for easy
  * stream-like access.
  */
-class CS_CSUTIL_EXPORT csDataStream
+class CS_CRYSTALSPACE_EXPORT csDataStream
 {
 private:
   /// Pointer to data.

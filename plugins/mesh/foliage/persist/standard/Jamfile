@@ -5,7 +5,7 @@ Description foliageldr : "Foliage mesh object loader" ;
 Plugin foliageldr
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith foliageldr : csgeom csutil ;
+LinkWith foliageldr : crystalspace ;
 
 CompileGroups foliageldr :  meshes ;
 

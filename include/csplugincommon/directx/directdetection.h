@@ -19,7 +19,7 @@
 #ifndef __CS_DIRECTDETECTION_H__
 #define __CS_DIRECTDETECTION_H__
 
-#include "csextern.h"
+#include "csextern_dx.h"
 
 #if WINVER >= 0x0500
   #define DIRECTINPUT_VERSION 0x0800

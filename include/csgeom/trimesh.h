@@ -31,7 +31,7 @@
  * if used in combination with a vertex or edge table. Every triangle is then
  * a set of three indices in that table.
  */
-class CS_CSGEOM_EXPORT csTriangleMesh
+class CS_CRYSTALSPACE_EXPORT csTriangleMesh
 {
 protected:
   /// The triangles.
@@ -69,7 +69,7 @@ public:
  * This is basically used as a temporary structure to be able to
  * calculate the cost of collapsing this vertex more quickly.
  */
-class CS_CSGEOM_EXPORT csTriangleVertex
+class CS_CRYSTALSPACE_EXPORT csTriangleVertex
 {
 public:
   /// Position of this vertex in 3D space.
@@ -97,7 +97,7 @@ public:
  * A class which holds vertices and connectivity information for a triangle
  * mesh.
  */
-class CS_CSGEOM_EXPORT csTriangleVertices
+class CS_CRYSTALSPACE_EXPORT csTriangleVertices
 {
 protected:
   csTriangleVertex* vertices;

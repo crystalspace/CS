@@ -5,4 +5,4 @@ Description pvsvis : "PVS Visibility System" ;
 Plugin pvsvis
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith pvsvis : csgeom csutil ;
+LinkWith pvsvis : crystalspace ;

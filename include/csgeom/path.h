@@ -39,7 +39,7 @@
  * This is particularly useful in combination with
  * csReversibleTransform::LookAt().
  */
-class CS_CSGEOM_EXPORT csPath : public csCatmullRomSpline, public iPath
+class CS_CRYSTALSPACE_EXPORT csPath : public csCatmullRomSpline, public iPath
 {
 private:
   void SetVectorAsDimensionValues (int dim, csVector3* v)

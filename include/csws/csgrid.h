@@ -56,7 +56,7 @@ class csGridView;
 class csGrid;
 class csSplitter;
 
-class CS_CSWS_EXPORT csRegionTree2D
+class CS_CRYSTALSPACE_EXPORT csRegionTree2D
 {
 public:
   csRect region;
@@ -203,7 +203,7 @@ enum csGridCellBorderStyle
  * and acts as a container for the csComponent (i.e. the
  * thing that lives inside the cell)
  */
-class CS_CSWS_EXPORT csGridCell : public csComponent
+class CS_CRYSTALSPACE_EXPORT csGridCell : public csComponent
 {
   /// The property of a specific border of the cell
   class csCellBorder
@@ -262,7 +262,7 @@ protected:
  * and can contain a horizontal and a vertical scrollbar for scrolling
  * the contents of the grid.
  */
-class CS_CSWS_EXPORT csGridView : public csComponent
+class CS_CRYSTALSPACE_EXPORT csGridView : public csComponent
 {
 protected:
   /// The subcells this view is restricted to
@@ -380,7 +380,7 @@ enum
  * subview may be limited to certain area within the grid
  * itself.
  */
-class CS_CSWS_EXPORT csGrid : public csComponent
+class CS_CRYSTALSPACE_EXPORT csGrid : public csComponent
 {
 protected:
   friend class csGridView;

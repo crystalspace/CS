@@ -2,5 +2,5 @@ SubDir TOP plugins mesh protomesh object ;
 
 Description protomesh : "Mesh prototype object plugin" ;
 Plugin protomesh : [ Wildcard *.cpp *.h ] ;
-LinkWith protomesh : csgfx cstool csgeom csutil ;
+LinkWith protomesh : crystalspace ;
 CompileGroups protomesh : meshes ;

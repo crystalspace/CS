@@ -5,6 +5,6 @@ Description stdpt : "standard procedural textures" ;
 Plugin stdpt
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith stdpt : cstool csgfx csgeom csutil ;
+LinkWith stdpt : crystalspace ;
 
 CompileGroups stdpt : proctexes ;

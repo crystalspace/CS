@@ -37,7 +37,7 @@ class csVector4;
 /**
  * A 4D vector with "double" components.
  */
-class CS_CSGEOM_EXPORT csDVector4
+class CS_CRYSTALSPACE_EXPORT csDVector4
 {
 public:
   /// The X component of the vector
@@ -223,7 +223,7 @@ public:
 /**
  * A 4D vector with "float" components.
  */
-class CS_CSGEOM_EXPORT csVector4
+class CS_CRYSTALSPACE_EXPORT csVector4
 {
 public:
   /// The X component of the vector

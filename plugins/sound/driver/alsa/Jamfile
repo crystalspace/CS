@@ -4,7 +4,7 @@ if $(ALSA.AVAILABLE) = "yes"
 {
 Description alsadrv : "ALSA sound driver" ;
 Plugin alsadrv : [ Wildcard *.cpp *.h ] ;
-LinkWith alsadrv : csutil ;
+LinkWith alsadrv : crystalspace ;
 ExternalLibs alsadrv : ALSA ;
 CompileGroups alsadrv : sounddrivers ;
 }

@@ -25,7 +25,7 @@
 #include <GL/gl.h>
 #endif
 
-#include "csextern.h"
+#include "csextern_gl.h"
 #include "csutil/scf.h"
 #include "csplugincommon/canvas/graph2d.h"
 #include "glfontcache.h"
@@ -49,7 +49,7 @@ class GLFontCache;
  * so that a fix or improvement will be inherited by all platforms
  * instead of percolating via people copying code over. -GJH
  */
-class CS_CSPLUGINCOMMON_OGL_EXPORT csGraphics2DGLCommon : public csGraphics2D, 
+class CS_CSPLUGINCOMMON_GL_EXPORT csGraphics2DGLCommon : public csGraphics2D, 
 							   public iEventPlug
 {
 public:
@@ -70,7 +70,7 @@ protected:
   friend class csGLScreenShot;
   friend class csGLFontCache;
   
-  class CS_CSPLUGINCOMMON_OGL_EXPORT csGLPixelFormatPicker
+  class CS_CSPLUGINCOMMON_GL_EXPORT csGLPixelFormatPicker
   {
     csGraphics2DGLCommon* parent;
 

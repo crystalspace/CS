@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node CSWS, , csGeom, Libraries
+@node CSWS, , csGeom, Facilities
 @section Crystal Space Windowing System (@sc{csws})
 @cindex CSWS
 @cindex Libraries,CSWS
@@ -8,13 +8,15 @@
 @noindent
 @emph{Written by Andrew Zabolotny, @email{bit@@eltech.ru}.}
 
+@noindent
+@strong{Warning}: @emph{This facility is heavily deprecated, unmaintained, and
+no longer developed.  Instead, use @sc{aws}.  @xref{AWS}.}
+
 The main goal of Crystal Space Windowing System (@sc{csws}) is to provide a
 clean, effective and cross-platform base for creating Crystal Space-related
 utilities.  The goal for writing this manual is not to give a extensive overview
 of the windowing system, but rather to give the basic concepts so that you have
-something to start with.  Currently, the windowing system @sc{api} changes too
-quickly to keep an extensive overview complete and up-to-date; however the
-basic concepts are not likely to change.
+something to start with.
 
 @menu
 * CSWS Concepts:: Concepts

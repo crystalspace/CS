@@ -81,7 +81,7 @@ struct iObjectRegistry;
  * track of allocations in a graph. Later on you can add/remove
  * allocations from that graph.
  */
-class CS_CSUTIL_EXPORT csDebuggingGraph
+class CS_CRYSTALSPACE_EXPORT csDebuggingGraph
 {
 public:
   /**

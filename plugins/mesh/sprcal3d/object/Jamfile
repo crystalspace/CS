@@ -4,7 +4,7 @@ if $(CAL3D.AVAILABLE) = "yes"
 {
 Description sprcal3d : "Cal3D Sprite mesh object plugin" ;
 Plugin sprcal3d : [ Wildcard *.cpp *.h ] ;
-LinkWith sprcal3d : cstool csgfx csgeom csutil ;
+LinkWith sprcal3d : crystalspace ;
 ExternalLibs sprcal3d : CAL3D ;
 CompileGroups sprcal3d : meshes ;
 }

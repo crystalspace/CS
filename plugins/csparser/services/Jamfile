@@ -5,5 +5,5 @@ Description cssynldr : "format loader services" ;
 Plugin cssynldr
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith cssynldr : csgfx csgeom cstool csutil ;
+LinkWith cssynldr : crystalspace ;
 

@@ -37,16 +37,16 @@
  * \c filename is a platform-dependent path.
  * Returns true on success, false otherwise.
  */
-extern CS_CSUTIL_EXPORT bool csMemoryMapFile(csMemMapInfo* info, char const* filename);
+extern CS_CRYSTALSPACE_EXPORT bool csMemoryMapFile(csMemMapInfo* info, char const* filename);
 /// Unmap a file from a memory area.
-extern CS_CSUTIL_EXPORT void csUnMemoryMapFile(csMemMapInfo* info);
+extern CS_CRYSTALSPACE_EXPORT void csUnMemoryMapFile(csMemMapInfo* info);
 /**
  * Memory map in part of a file.
  * Provides more control than the standard csMemoryMapFile().
  * The csMemMapInfo struct is compatible, UnMapMemoryFile() should
  * be used to unmap.
  */
-extern CS_CSUTIL_EXPORT bool csMemoryMapWindow(csMemMapInfo*, char const* filename, unsigned int offset, unsigned int len, bool writable);
+extern CS_CRYSTALSPACE_EXPORT bool csMemoryMapWindow(csMemMapInfo*, char const* filename, unsigned int offset, unsigned int len, bool writable);
 /**
  * Memory map in another part of an already mapped file.
  * Provides more control than the standard csMemoryMapFile().
@@ -55,7 +55,7 @@ extern CS_CSUTIL_EXPORT bool csMemoryMapWindow(csMemMapInfo*, char const* filena
  * This struct will reuse filehandles and any other possible resource
  * from the already mapped file.
  */
-extern CS_CSUTIL_EXPORT bool csMemoryMapWindow(csMemMapInfo*, csMemMapInfo * original, unsigned int offset, unsigned int len, bool writable);
+extern CS_CRYSTALSPACE_EXPORT bool csMemoryMapWindow(csMemMapInfo*, csMemMapInfo * original, unsigned int offset, unsigned int len, bool writable);
 #endif
 
 #endif // __CS_CSSYS_CSMMAP_H__

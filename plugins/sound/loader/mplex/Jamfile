@@ -5,7 +5,7 @@ Description sndplex : "sndplex sound loader" ;
 Plugin sndplex
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith sndplex : csutil ;
+LinkWith sndplex : crystalspace ;
 
 CompileGroups sndplex :  soundloaders ;
 

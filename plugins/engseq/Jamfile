@@ -5,4 +5,4 @@ Description engseq : "Engine Sequence Manager plugin" ;
 Plugin engseq
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith engseq : csgeom csutil ;
+LinkWith engseq : crystalspace ;

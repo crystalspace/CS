@@ -54,7 +54,7 @@ to update the entire texture area anyway.
 @subsubheading Using csProcTexture
 @cindex @code{csProcTexture}
 
-In the @samp{cstool} library there is a convenience class you can use
+In the @samp{cstool} module there is a convenience class you can use
 to make updating of procedural textures easier. This class is called
 @code{csProcTexture}. Basically you make a subclass of this class like this:
 

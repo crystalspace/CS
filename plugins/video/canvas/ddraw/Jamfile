@@ -4,7 +4,7 @@ if $(DIRECTX.AVAILABLE) = "yes"
 {
 Description ddraw2d : "DirectDraw 2D driver" ;
 Plugin ddraw2d : [ Wildcard *.cpp *.h ] ;
-LinkWith ddraw2d : csplugincommon_w32 csplugincommon_dx csplugincommon csutil ;
+LinkWith ddraw2d : crystalspace_windows crystalspace_directx crystalspace ;
 ExternalLibs ddraw2d : DIRECTX ;
 CompileGroups ddraw2d : canvases softcanvas ;
 }

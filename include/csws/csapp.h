@@ -78,7 +78,7 @@ enum csAppBackgroundStyle
  * The Crystal Space application is a regular plugin from the
  * system driver's point of view.
  */
-class CS_CSWS_EXPORT csApp : public csComponent
+class CS_CRYSTALSPACE_EXPORT csApp : public csComponent
 {
 protected:
   friend class csMouse;

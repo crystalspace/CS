@@ -4,6 +4,6 @@ if $(LINUXJOYSTICK.AVAILABLE) = "yes"
 {
 Description joylin : "Joystick plugin for Linux" ;
 Plugin joylin : [ Wildcard *.cpp *.h ] ;
-LinkWith joylin : csutil ;
+LinkWith joylin : crystalspace ;
 ExternalLibs joylin : LINUXJOYSTICK ;
 }

@@ -1,0 +1,30 @@
+SubDir TOP libs csutil unix ;
+
+{
+  local rejects ;
+  if $(EMBED_META) != "yes" || $(LIBBFD.AVAILABLE) != "yes"
+  {
+    rejects += bfdplugins.cpp ;
+    CSUTIL.GENERIC += scanplugins.cpp ;
+  }
+  CsLibAddModule $(rejects) ;
+}
+
+CSUTIL.GENERIC +=
+  appdir.cpp
+  apppath.cpp
+  csprocessorcap.cpp
+  cspthrd.cpp
+  cspthrd.h
+  expandname.cpp
+  findlib.cpp
+  getopt.cpp
+  mmap.cpp
+  pathutil.cpp
+  platformconfig.cpp 
+  platformconfigpath.cpp
+  printf.cpp
+  resdir.cpp
+  runloop.cpp 
+  sysroot.cpp 
+  vfsplat.cpp ;

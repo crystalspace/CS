@@ -5,4 +5,4 @@ Description movierecorder : "realtime movie recorder" ;
 Plugin movierecorder
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith movierecorder : cstool csutil ;
+LinkWith movierecorder : crystalspace ;

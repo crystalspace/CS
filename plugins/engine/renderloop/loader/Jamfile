@@ -2,5 +2,5 @@ SubDir TOP plugins engine renderloop loader ;
 
 Description rendloop_loader : "render loop loader" ;
 Plugin rendloop_loader : [ Wildcard *.cpp *.h ] ;
-LinkWith rendloop_loader : csplugincommon csutil ;
+LinkWith rendloop_loader : crystalspace ;
 CompileGroups rendloop_loader : renderall ;

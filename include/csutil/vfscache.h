@@ -31,7 +31,7 @@ struct iVFS;
 /**
  * This is a general cache that can cache data on VFS.
  */
-class CS_CSUTIL_EXPORT csVfsCacheManager : public iCacheManager
+class CS_CRYSTALSPACE_EXPORT csVfsCacheManager : public iCacheManager
 {
 private:
   iObjectRegistry* object_reg;

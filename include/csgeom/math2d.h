@@ -47,7 +47,7 @@ class csPoly2D;
  * Various functions in 2D, such as 2D vector functions.
  * This is a static class and contains only static member functions.
  */
-class CS_CSGEOM_EXPORT csMath2
+class CS_CRYSTALSPACE_EXPORT csMath2
 {
 public:
   /**
@@ -160,7 +160,7 @@ public:
  * line segments.  This is a static class and contains only static member
  * functions.
  */
-class CS_CSGEOM_EXPORT csIntersect2
+class CS_CRYSTALSPACE_EXPORT csIntersect2
 {
 public:
   /**

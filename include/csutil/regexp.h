@@ -128,7 +128,7 @@ enum csRegExpMatchFlags
 /**
  * Information about (sub)expression matches.
  */
-struct CS_CSUTIL_EXPORT csRegExpMatch
+struct CS_CRYSTALSPACE_EXPORT csRegExpMatch
 {
   /// Offset to the match from the beginning of the string to match against.
   size_t startOffset;
@@ -150,7 +150,7 @@ struct CS_CSUTIL_EXPORT csRegExpMatch
  *  previous calls cause a recompilation of the pattern. Thus, to improve 
  *  performance, same \p flags should be used for subsequent calls to Match().
  */
-class CS_CSUTIL_EXPORT csRegExpMatcher
+class CS_CRYSTALSPACE_EXPORT csRegExpMatcher
 {
   void* regex;
   char* pattern;

@@ -4,7 +4,7 @@ if $(OSS.AVAILABLE) = "yes"
 {
 Description ossdrv : "OSS sound driver" ;
 Plugin ossdrv : [ Wildcard *.cpp *.h ] ;
-LinkWith ossdrv : csutil ;
+LinkWith ossdrv : crystalspace ;
 ExternalLibs ossdrv : OSS ;
 CompileGroups ossdrv : sounddrivers ;
 }

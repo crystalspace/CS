@@ -5,6 +5,6 @@ Description particlesldr : "Particle system object loader" ;
 Plugin particlesldr
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith particlesldr : csgeom csutil ;
+LinkWith particlesldr : crystalspace ;
 
 CompileGroups particlesldr :  meshes ;

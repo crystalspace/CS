@@ -40,7 +40,7 @@
 
 struct iDataBuffer;
 
-class CS_CSPLUGINCOMMON_EXPORT csShaderProgram : public iShaderProgram,
+class CS_CRYSTALSPACE_EXPORT csShaderProgram : public iShaderProgram,
 						 public iShaderTUResolver
 {
 protected:

@@ -1,11 +1,79 @@
 SubDir TOP libs ;
 
-# @@@ NOTE: Currently shared libs require that the "Library" statements appear
-# in depedency order (ie when Y depends on X, the directory for X must be
-# stated before Y's). 
+CSLIB.SOURCES = ;
+CSLIB.ROOT = $(SUBDIR_TOKENS) ;
+CSLIB.DECLARED = no ;
+
+## CsLibAddFiles files, reparent
+rule CsLibAddFiles
+{
+  local files = $(1) ;
+  local reparent = [ ConcatDirs $(2) ] ;
+  CSLIB.SOURCES += $(files:R=$(reparent)) ;
+}
+
+## CsLibAddWild patterns, reparent, [ rejects ]
+rule CsLibAddWild
+{
+  local patterns = $(1) ;
+  local reparent = $(2) ;
+  local rejects = $(3) ;
+
+  local files = [ Wildcard $(patterns) ] ;
+  if $(rejects)
+  {
+    files = [ Filter $(files) : $(rejects) ] ;
+  }
+  CsLibAddFiles $(files) : $(reparent) ;
+}
+
+## CsLibAddModule [ rejects ]
+rule CsLibAddModule
+{
+  local rejects = $(1) ;
+  local module = [ StripCommon $(SUBDIR_TOKENS) : $(CSLIB.ROOT) ] ;
+  local incbase = $(DOTDOT) include $(module) ;
+  local srcpat = *.c *.cc *.cpp *.cxx *.C *.m *.mm *.M ;
+  local incpat = *.h *.hpp *.hxx *.H ;
+
+  CsLibAddWild $(srcpat) $(incpat) : $(module) : $(rejects) ;
+
+  local oldsubdir = $(SUBDIR_TOKENS) ;
+  SubDir TOP include $(module) ;
+  CsLibAddWild $(incpat) : $(incbase) : $(rejects) ;
+  SubDir TOP $(oldsubdir) ;
+}
+
 SubInclude TOP libs csutil ;
 SubInclude TOP libs csgeom ;
 SubInclude TOP libs csgfx ;
 SubInclude TOP libs cstool ;
 SubInclude TOP libs csws ;
+SubInclude TOP libs csplugincommon ;
+
+SubDir TOP libs ;
+
+Description crystalspace : "Crystal Space library" ;
+Library crystalspace : $(CSLIB.SOURCES) : shared ;
+CFlags crystalspace : [ FDefines CS_CRYSTALSPACE_LIB ] ;
+MsvcDefine crystalspace : CS_CRYSTALSPACE_LIB $(CSLIB.MSVC_DEFINES) ;
+if $(CSLIB.CFLAGS)
+{
+  CFlags crystalspace : $(CSLIB.CFLAGS) ;
+}
+if $(CSLIB.DEPENDS)
+{
+  LibDepends crystalspace : $(CSLIB.DEPENDS) ;
+}
+if $(CSLIB.EXTERNAL_LIBS)
+{
+  ExternalLibs crystalspace : $(CSLIB.EXTERNAL_LIBS) ;
+}
+
+# NOTE: Currently shared libs require that the "Library" statements appear in
+# depedency order (ie when Y depends on X, the directory for X must be stated
+# before Y's). Certain subdirectories of crystalspace depend upon the main
+# Crystal Space library built above.
+CSLIB.DECLARED = yes ;
+
 SubInclude TOP libs csplugincommon ;

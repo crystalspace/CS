@@ -80,28 +80,28 @@ installed as part of the @sc{sdk} when you invoke @samp{make install} or
 @samp{jam install}.
 
 @item CS/libs
-Here is where the utility-like link libraries reside.  There are relatively few
-such libraries since most of Crystal Space's functionality is provided in the
-form of plugin modules.
+Here is where the utility-like modules reside which you can link into your
+applications or plugins.  There are relatively few such libraries since most of
+Crystal Space's functionality is provided in the form of plugin modules.
 
 @table @code
 @item CS/libs/csgeom
-The geometry library. Various geometry related functions and classes can be
+The geometry module. Various geometry related functions and classes can be
 found here: matrices, vectors, transforms, clipper, planes, etc.
 
 @item CS/libs/csgfx
-The graphics library. Here you will find bumpmapping, mipmapping, quantizers,
+The graphics module. Here you will find bumpmapping, mipmapping, quantizers,
 and routines to support loading an image file (through the various image
 loading plug-ins).
 
 @item CS/libs/cstool
-This library contains high-level utility functions which rely upon the other
-libraries, and possibly upon plugin modules.  It is possible to write programs
-without utilizing this library, but it does provide several convenience classes
+This module contains high-level utility functions which rely upon the other
+modules, and possibly upon plugin modules.  It is possible to write programs
+without utilizing this module, but it does provide several convenience classes
 for common cases and is, therefore, quite valuable.
 
 @item CS/libs/csutil
-This library contains various low-level utilities.  The utilities include an
+This module contains various low-level utilities.  The utilities include an
 archiver, configuration manager, virtual clock, scheduler, strings, hash
 tables, @sc{scf} (@pxref{SCF}), @sc{md5} algorithm, command-line parser, event
 structures, and many others.
@@ -117,10 +117,50 @@ Unix-specific functionality.
 Windows-specific functionality.
 @end table
 
+@item CS/libs/csplugincommon
+A collection of convenience modules which eliminate much of the drudgery
+associated with implementing @sc{scf} interfaces in certain types of common
+plugin modules. For example, the @samp{csGraphics2D} class in
+@file{csplugincommon/canvas} implements the @samp{iGraphics2D} interface and
+provides much of the functionality common to most canvases.  Likewise, the
+@samp{csGraphics3D} class in @file{csplugincommon/render3d} implements the
+@samp{iGraphics3D} interface and provides much functionality common to
+renderers. You are not required to utilize these implementations when authoring
+your own plugins, but they are available for your convenience and may prove to
+be handy time-savers.
+
+@table @code
+@item CS/libs/csplugincommon/canvas
+Common canvas functionality.
+@item CS/libs/csplugincommon/directx
+Common Direct-X functionality.
+@item CS/libs/csplugincommon/imageloader
+Common image loader functionality.
+@item CS/libs/csplugincommon/macosx
+Common MacOS/X functionality.
+@item CS/libs/csplugincommon/opengl
+Common OpenGL functionality.
+@item CS/libs/csplugincommon/particlesys
+Common particle system functionality.
+@item CS/libs/csplugincommon/render3d
+Common renderer functionality.
+@item CS/libs/csplugincommon/renderstep
+Common render-loop functionality.
+@item CS/libs/csplugincommon/shader
+Common shader functionality.
+@item CS/libs/csplugincommon/soundloader
+Common sound loader functionality.
+@item CS/libs/csplugincommon/soundrenderer
+Common sound renderer functionality.
+@item CS/libs/csplugincommon/win32
+Common Microsoft Windows functionality.
+@end table
+
 @item CS/libs/csws
 The Crystal Space Windowing System which is platform-independent and works
-within a Crystal Space window.  @emph{This library is deprecated, unmaintained,
-and no longer developed.  Instead, use @sc{aws}.  @xref{AWS}.}
+within a Crystal Space window.  @strong{Warning}: @emph{This module is heavily
+deprecated, unmaintained, and no longer developed.  Instead, use @sc{aws}.
+@xref{AWS}.}
 @end table
 
 @item CS/mk
@@ -138,7 +178,7 @@ Space.
 Component for automatic generation of Visual C++ project files based upon
 information gleaned from Jamfiles project-wide.
 @item CS/mk/msvc
-Project files for Win32 using @sc{msvc} 6.0 and 7.0.
+Project files for Microsoft Windows using @sc{msvc} 6.0 and 7.0.
 @end table
 
 @item CS/plugins

@@ -48,7 +48,7 @@ enum
  * Abstract interface for objects which can be run in a thread.  Objects which
  * want to be run in a thread must implement this interface.
  */
-class CS_CSUTIL_EXPORT csRunnable
+class CS_CRYSTALSPACE_EXPORT csRunnable
 {
 public:
   /// Implement this method to allow your object to be run in a thread.
@@ -74,7 +74,7 @@ public:
 /**
  * Representation of a thread of executation.
  */
-class CS_CSUTIL_EXPORT csThread : public csRefCount
+class CS_CRYSTALSPACE_EXPORT csThread : public csRefCount
 {
 public:
   /**
@@ -123,7 +123,7 @@ public:
  * successfully locked the mutex; and it should unlock the mutex when it is
  * done accessing the shared resource so that other threads may access it.
  */
-class CS_CSUTIL_EXPORT csMutex : public csRefCount
+class CS_CRYSTALSPACE_EXPORT csMutex : public csRefCount
 {
 public:
   /**
@@ -179,7 +179,7 @@ public:
 /**
  * A semaphore object.
  */
-class CS_CSUTIL_EXPORT csSemaphore : public csRefCount
+class CS_CRYSTALSPACE_EXPORT csSemaphore : public csRefCount
 {
 public:
   /// Create a semaphore with some initial value.
@@ -222,7 +222,7 @@ public:
 /**
  * A condition object.
  */
-class CS_CSUTIL_EXPORT csCondition : public csRefCount
+class CS_CRYSTALSPACE_EXPORT csCondition : public csRefCount
 {
 public:
   /// Create a condition  with specific attributes.

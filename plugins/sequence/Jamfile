@@ -5,4 +5,4 @@ Description sequence : "Sequence Manager plugin" ;
 Plugin sequence
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith sequence : csgeom csutil ;
+LinkWith sequence : crystalspace ;

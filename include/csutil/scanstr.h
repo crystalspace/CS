@@ -56,6 +56,6 @@
  * Returns the number of successfully scanned arguments or -1 if there
  * was a mismatch.
  */
-CS_CSUTIL_EXPORT int csScanStr (const char* in, const char* format, ...);
+CS_CRYSTALSPACE_EXPORT int csScanStr (const char* in, const char* format, ...);
 
 #endif // __CS_SCANSTR_H__

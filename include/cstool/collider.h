@@ -53,7 +53,7 @@ SCF_VERSION (csColliderWrapper, 0, 0, 3);
  * attach itself to the given object. You can use
  * csColliderWrapper::GetCollider() later to get the collider again.
  */
-class CS_CSTOOL_EXPORT csColliderWrapper : public csObject
+class CS_CRYSTALSPACE_EXPORT csColliderWrapper : public csObject
 {
 private:
   csRef<iCollideSystem> collide_system;
@@ -131,7 +131,7 @@ public:
  * This is a class containing a few static member functions to help
  * work with csColliderWrapper and collision detection in general.
  */
-class CS_CSTOOL_EXPORT csColliderHelper
+class CS_CRYSTALSPACE_EXPORT csColliderHelper
 {
 public:
   /**

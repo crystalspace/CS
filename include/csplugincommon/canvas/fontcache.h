@@ -50,7 +50,7 @@
  * associated with a specific glyph of a specific font, as well as means
  * to manage glyphs if only a limited space to store them is present.
  */
-class CS_CSPLUGINCOMMON_EXPORT csFontCache
+class CS_CRYSTALSPACE_EXPORT csFontCache
 {
 public:
   struct KnownFont;

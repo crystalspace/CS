@@ -2,7 +2,7 @@ SubDir TOP apps tutorial simple1 ;
 
 Description simple1 : "tutorial part one" ;
 Application simple1 : [ Wildcard *.cpp *.h ] : noinstall ;
-LinkWith simple1 : csgeom csgfx cstool csutil ;
+LinkWith simple1 : crystalspace ;
 
 # Some external projects use gcc's -ansi and -pedantic options. We need to
 # ensure that CS's public headers are usable when these options are enabled,

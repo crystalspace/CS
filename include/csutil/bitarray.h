@@ -37,7 +37,7 @@ class csBitArrayHashKeyHandler;
 /**
  * A one-dimensional array of bits, similar to STL bitset.
  */
-class CS_CSUTIL_EXPORT csBitArray
+class CS_CRYSTALSPACE_EXPORT csBitArray
 {
 public:
   typedef unsigned long store_type;
@@ -112,7 +112,7 @@ public:
   /**
    * \internal Bit proxy (for csBitArray::operator[])
    */
-  class CS_CSUTIL_EXPORT BitProxy
+  class CS_CRYSTALSPACE_EXPORT BitProxy
   {
   private:
     csBitArray &mArray;

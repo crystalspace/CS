@@ -242,7 +242,7 @@ want to know how to write a plug-in yourself, you should read the complete
 @end itemize
 
 For further information about modules and plug-in drivers, see the sections
-on Libraries (@pxref{Libraries}) and plug-in modules
+on Libraries (@pxref{Facilities}) and plug-in modules
 (@pxref{Plug-In Drivers}).
 
 Now that you have learned some basics about the Crystal Space environment,

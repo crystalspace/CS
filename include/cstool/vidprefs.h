@@ -45,7 +45,7 @@ struct iImageIO;
  * already initialized. This will make all registered textures
  * and materials invalid.
  */
-class CS_CSTOOL_EXPORT csVideoPreferences
+class CS_CRYSTALSPACE_EXPORT csVideoPreferences
 {
 private:
   iObjectRegistry* object_reg;

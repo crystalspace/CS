@@ -5,6 +5,6 @@ Description foliage : "Mesh foliage object plugin" ;
 Plugin foliage
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith foliage : csgfx cstool csgeom csutil ;
+LinkWith foliage : crystalspace ;
 
 CompileGroups foliage :  meshes ;

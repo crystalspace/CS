@@ -28,7 +28,7 @@ class csTinyXmlDocument;
 /**
  * This is an SCF compatible wrapper for an attribute iterator.
  */
-struct CS_CSUTIL_EXPORT csTinyXmlAttributeIterator :
+struct CS_CRYSTALSPACE_EXPORT csTinyXmlAttributeIterator :
   public iDocumentAttributeIterator
 {
 private:
@@ -49,7 +49,7 @@ public:
 /**
  * This is an SCF compatible wrapper for an attribute in TinyXml.
  */
-struct CS_CSUTIL_EXPORT csTinyXmlAttribute : public iDocumentAttribute
+struct CS_CRYSTALSPACE_EXPORT csTinyXmlAttribute : public iDocumentAttribute
 {
 private:
   TiDocumentAttribute* attr;
@@ -136,7 +136,7 @@ public:
 /**
  * This is an SCF compatible wrapper for a node iterator.
  */
-struct CS_CSUTIL_EXPORT csTinyXmlNodeIterator : public iDocumentNodeIterator
+struct CS_CRYSTALSPACE_EXPORT csTinyXmlNodeIterator : public iDocumentNodeIterator
 {
 private:
   csTinyXmlDocument* doc;
@@ -158,7 +158,7 @@ public:
 /**
  * This is an SCF compatible wrapper for a node in TinyXml.
  */
-struct CS_CSUTIL_EXPORT csTinyXmlNode : public iDocumentNode
+struct CS_CRYSTALSPACE_EXPORT csTinyXmlNode : public iDocumentNode
 {
 private:
   friend class csTinyXmlDocument;
@@ -223,7 +223,7 @@ public:
 /**
  * This is an SCF compatible wrapper for a document in TinyXml.
  */
-class CS_CSUTIL_EXPORT csTinyXmlDocument : public iDocument
+class CS_CRYSTALSPACE_EXPORT csTinyXmlDocument : public iDocument
 {
 private:
   TiDocument* root;

@@ -5,6 +5,6 @@ Description emitldr : "Emit mesh object loader" ;
 Plugin emitldr
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith emitldr : csgeom csutil ;
+LinkWith emitldr : crystalspace ;
 
 CompileGroups emitldr :  meshes ;

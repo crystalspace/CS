@@ -5,4 +5,4 @@ Description csavi : "AVI Streamformat" ;
 Plugin csavi
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith csavi : csgeom csgfx csutil ;
+LinkWith csavi : crystalspace ;

@@ -56,7 +56,7 @@
  * </p>
  */
 
-class CS_CSWS_EXPORT csFlowLayout : public csLayout
+class CS_CRYSTALSPACE_EXPORT csFlowLayout : public csLayout
 {
 protected:
   int mAlign;

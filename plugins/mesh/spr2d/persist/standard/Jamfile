@@ -5,7 +5,7 @@ Description spr2dldr : "Sprite 2D mesh object loader" ;
 Plugin spr2dldr
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith spr2dldr : csgeom csutil ;
+LinkWith spr2dldr : crystalspace ;
 
 CompileGroups spr2dldr :  meshes ;
 

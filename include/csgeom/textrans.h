@@ -35,7 +35,7 @@
  * This class makes it easiers to define textures for polygons given
  * various things.
  */
-class CS_CSGEOM_EXPORT csTextureTrans
+class CS_CRYSTALSPACE_EXPORT csTextureTrans
 {
 public:
   /**

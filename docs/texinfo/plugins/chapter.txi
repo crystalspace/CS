@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Plug-In Drivers, Internals, Libraries, Top
+@node Plug-In Drivers, Internals, Facilities, Top
 @chapter Plug-In Modules and Drivers
 @cindex Plug-In Modules and Drivers
 @cindex Modules, Plug-In

@@ -7,6 +7,6 @@ Description physldr : "Physics Loader plugin" ;
 Plugin physldr
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith physldr : csgeom csutil ;
+LinkWith physldr : crystalspace ;
 
 }

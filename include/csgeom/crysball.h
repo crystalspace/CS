@@ -51,7 +51,7 @@
  * belonging to it are either all visible or invisible.
  * If the signs differ then recursively test the subtriangles.
  */
-class CS_CSGEOM_EXPORT csCrystalBall
+class CS_CRYSTALSPACE_EXPORT csCrystalBall
 {
   class csCrystalBallVec : public csVector3
   {

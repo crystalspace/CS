@@ -47,7 +47,7 @@ struct iConsoleOutput;
  * needs a newline printed after 100% has been reached, then it is the
  * client's responsibility to print it.
  */
-class CS_CSUTIL_EXPORT csTextProgressMeter : public iProgressMeter
+class CS_CRYSTALSPACE_EXPORT csTextProgressMeter : public iProgressMeter
 {
 private:
   iConsoleOutput* console;

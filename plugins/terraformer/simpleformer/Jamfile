@@ -6,7 +6,7 @@ Plugin simpleformer
 	: [ Wildcard *.cpp *.h ]
 ;
 
-LinkWith simpleformer : csgeom csutil ;
+LinkWith simpleformer : crystalspace ;
 
 CompileGroups simpleformer :  meshes ;
 

@@ -20,12 +20,12 @@
 #ifndef __CS_CANVAS_OPENGLCOMMON_GLSS_H__
 #define __CS_CANVAS_OPENGLCOMMON_GLSS_H__
 
-#include "csextern.h"
+#include "csextern_gl.h"
 #include "csplugincommon/canvas/scrshot.h"
 
 class csGraphics2DGLCommon;
 
-class CS_CSPLUGINCOMMON_OGL_EXPORT csGLScreenShot : public csImageBase
+class CS_CSPLUGINCOMMON_GL_EXPORT csGLScreenShot : public csImageBase
 {
   csGraphics2DGLCommon* G2D;
   int Format;

@@ -55,7 +55,7 @@ class csPlane3;
  * about how to interpolate additional information that goes
  * with the vertex.
  */
-struct CS_CSGEOM_EXPORT csClipInfo
+struct CS_CRYSTALSPACE_EXPORT csClipInfo
 {
 # define CS_CLIPINFO_ORIGINAL 0
 # define CS_CLIPINFO_ONEDGE 1
@@ -142,7 +142,7 @@ struct CS_CSGEOM_EXPORT csClipInfo
  * case the polygon will be 0 (not specified). The back
  * plane can also be 0.
  */
-class CS_CSGEOM_EXPORT csFrustum
+class CS_CRYSTALSPACE_EXPORT csFrustum
 {
 private:
   /// The origin of this frustum

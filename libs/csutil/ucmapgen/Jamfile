@@ -1,4 +1,4 @@
 SubDir TOP libs csutil ucmapgen ;
 
 Application ucmapgen : [ Wildcard *.cpp *.h ] ;
-LinkWith ucmapgen : csutil ;
+LinkWith ucmapgen : crystalspace ;

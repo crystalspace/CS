@@ -5,6 +5,6 @@ Description genmesh : "General mesh object plugin" ;
 Plugin genmesh
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith genmesh : csgfx cstool csgeom csutil ;
+LinkWith genmesh : crystalspace ;
 
 CompileGroups genmesh :  meshes ;

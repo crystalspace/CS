@@ -29,7 +29,7 @@
  * for use in plugins as a mean to transparently exchange
  * abstract data between plugins.
  */
-class CS_CSUTIL_EXPORT csDataBuffer : public iDataBuffer
+class CS_CRYSTALSPACE_EXPORT csDataBuffer : public iDataBuffer
 {
   /// The data buffer
   char *Data;

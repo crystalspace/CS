@@ -32,7 +32,7 @@
 /**
  * iJobQueue implementation that lets the jobs run in a thread.
  */
-class CS_CSUTIL_EXPORT csThreadJobQueue : public iJobQueue
+class CS_CRYSTALSPACE_EXPORT csThreadJobQueue : public iJobQueue
 {
   typedef csFIFO<csRef<iJob> > JobFifo;
   struct QueueAndRunnableShared
@@ -44,7 +44,7 @@ class CS_CSUTIL_EXPORT csThreadJobQueue : public iJobQueue
     csRef<csMutex> jobXS;
     csRef<csCondition> jobFinish;
   };
-  class CS_CSUTIL_EXPORT QueueRunnable : public csRunnable
+  class CS_CRYSTALSPACE_EXPORT QueueRunnable : public csRunnable
   {
     int refCount;
     QueueAndRunnableShared sharedData;

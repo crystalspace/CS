@@ -47,7 +47,7 @@ struct iTextureHandle;
 /**
  * This is the default skin for buttons.
  */
-class CS_CSWS_EXPORT csDefaultButtonSkin : public csButtonSkin
+class CS_CRYSTALSPACE_EXPORT csDefaultButtonSkin : public csButtonSkin
 {
 public:
   /// Draw the component we are responsible for
@@ -60,7 +60,7 @@ public:
 /**
  * This is the default skin for windows.
  */
-class CS_CSWS_EXPORT csDefaultWindowSkin : public csWindowSkin
+class CS_CRYSTALSPACE_EXPORT csDefaultWindowSkin : public csWindowSkin
 {
   // The texture for titlebar buttons
   iTextureHandle *ButtonTex;
@@ -101,7 +101,7 @@ protected:
 /**
  * This is the default skin for dialogs.
  */
-class CS_CSWS_EXPORT csDefaultDialogSkin : public csDialogSkin
+class CS_CRYSTALSPACE_EXPORT csDefaultDialogSkin : public csDialogSkin
 {
   // The background
   csBackground Back;
@@ -123,7 +123,7 @@ public:
 /**
  * This is the default skin for window titlebars.
  */
-class CS_CSWS_EXPORT csDefaultTitlebarSkin : public csTitlebarSkin
+class CS_CRYSTALSPACE_EXPORT csDefaultTitlebarSkin : public csTitlebarSkin
 {
   // The active window titlebar background
   csBackground ABack;
@@ -146,7 +146,7 @@ public:
 /**
  * This is the default skin for listboxes
  */
-class CS_CSWS_EXPORT csDefaultListBoxSkin : public csListBoxSkin
+class CS_CRYSTALSPACE_EXPORT csDefaultListBoxSkin : public csListBoxSkin
 {
 public:
   /// Draw the component we are responsible for
@@ -159,7 +159,7 @@ public:
 /**
  * This is the default skin for listbox items
  */
-class CS_CSWS_EXPORT csDefaultListBoxItemSkin : public csListBoxItemSkin
+class CS_CRYSTALSPACE_EXPORT csDefaultListBoxItemSkin : public csListBoxItemSkin
 {
 public:
   /// Draw the component we are responsible for
@@ -170,7 +170,7 @@ public:
 /**
  * This is the default skin for scroll bars
  */
- class CS_CSWS_EXPORT csDefaultScrollBarSkin : public csScrollBarSkin
+ class CS_CRYSTALSPACE_EXPORT csDefaultScrollBarSkin : public csScrollBarSkin
  {
  public:
    /// Draw the component we are responsible for

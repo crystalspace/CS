@@ -5,7 +5,7 @@ Description snowldr : "Snow mesh object loader" ;
 Plugin snowldr
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith snowldr : csgeom csutil ;
+LinkWith snowldr : crystalspace ;
 
 CompileGroups snowldr :  meshes ;
 

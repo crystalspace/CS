@@ -23,7 +23,7 @@
 #include "isound/handle.h"
 struct iSoundData;
 
-class CS_CSPLUGINCOMMON_EXPORT csSoundHandle : public iSoundHandle
+class CS_CRYSTALSPACE_EXPORT csSoundHandle : public iSoundHandle
 {
 public:
   SCF_DECLARE_IBASE;

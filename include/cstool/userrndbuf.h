@@ -50,7 +50,7 @@ struct iUserRenderBufferIterator : public iBase
  * Helper class to manage multiple render buffers, usually provided by the
  * user.
  */
-class CS_CSTOOL_EXPORT csUserRenderBufferManager
+class CS_CRYSTALSPACE_EXPORT csUserRenderBufferManager
 {
   struct userbuffer
   {

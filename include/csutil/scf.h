@@ -862,14 +862,14 @@ public:
  *   scanned and each plugin queried.
  * \remark The path list is ignored for static builds.
  */
-extern CS_CSUTIL_EXPORT void scfInitialize(csPluginPaths* pluginPaths,
+extern CS_CRYSTALSPACE_EXPORT void scfInitialize(csPluginPaths* pluginPaths,
   bool verbose = false);
 
 /**
  * This function should be called to initialize client SCF library.
  * It uses the default plugin paths provided by csGetPluginPaths().
  */
-extern CS_CSUTIL_EXPORT void scfInitialize(int argc, const char* const argv[]);
+extern CS_CRYSTALSPACE_EXPORT void scfInitialize(int argc, const char* const argv[]);
 
 /**
  * This function checks whenever an interface is compatible with given version.
@@ -906,7 +906,7 @@ struct iSCF : public iBase
    * makes no difference since clients access the shared instance uniformly as
    * iSCF::SCF.
    */
-  static CS_CSUTIL_EXPORT iSCF* SCF;
+  static CS_CRYSTALSPACE_EXPORT iSCF* SCF;
 
 #if defined(CS_DEBUG) || defined(CS_MEMORY_TRACKER)
   // This is EXTREMELY dirty but I see no other solution for now.

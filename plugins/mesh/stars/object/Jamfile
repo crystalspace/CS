@@ -5,7 +5,7 @@ Description stars : "Stars mesh object plugin" ;
 Plugin stars
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith stars : csgeom csutil ;
+LinkWith stars : crystalspace ;
 
 CompileGroups stars :  meshes ;
 

@@ -19,7 +19,7 @@
 /**
  * Components are displayed in a grid fashion.
  */
-class CS_CSWS_EXPORT csGridLayout : public csLayout
+class CS_CRYSTALSPACE_EXPORT csGridLayout : public csLayout
 {
 protected:
   size_t mRows;

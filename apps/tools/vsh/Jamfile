@@ -6,7 +6,7 @@ Application vsh
 	: [ Wildcard *.cpp *.h ]
 	: console
 ;
-LinkWith vsh : cstool csutil ;
+LinkWith vsh : crystalspace ;
 
 Description vsh_static : "Virtual Shell tool (static build)" ;
 
@@ -15,6 +15,6 @@ Application vsh_static : [ Wildcard *.cpp *.h ] :
   console independent noinstall nohelp ;
 CFlags vsh_static : [ FDefines CS_STATIC_LINKED ] : nostatic ;
 MsvcDefine vsh_static : CS_STATIC_LINKED ;
-LinkWith vsh_static : cstool csutil ;
+LinkWith vsh_static : crystalspace ;
 LinkStaticPlugins vsh_static : vfs ;
 SubVariant ;

@@ -5,6 +5,6 @@ Description csddsimg : "dds image loader" ;
 Plugin csddsimg
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith csddsimg : csgfx csutil ;
+LinkWith csddsimg : crystalspace ;
 
 CompileGroups csddsimg :  imageloaders ;

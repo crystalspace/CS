@@ -43,7 +43,7 @@ struct csPluginLoadRec
 /** \internal
  * Helper class for csPluginLoader.
  */
-class CS_CSUTIL_EXPORT csPluginList : public csPDelArray<csPluginLoadRec>
+class CS_CRYSTALSPACE_EXPORT csPluginList : public csPDelArray<csPluginLoadRec>
 {
 public:
   bool Sort (iObjectRegistry* object_reg);
@@ -56,7 +56,7 @@ private:
  * This utility class helps to load plugins based on request,
  * config file, and commandline.
  */
-class CS_CSUTIL_EXPORT csPluginLoader
+class CS_CRYSTALSPACE_EXPORT csPluginLoader
 {
   friend class csPluginList;
 

@@ -16,16 +16,16 @@ Recurse InstallHeader : .h .i .inc .fun .tok ;
 # they are specialized polymorphic files intended for inclusion several times
 # under different contexts, or because they are deprecated.
 CS_MASTER_HEADER_REJECTS =
-  [ Wildcard [ ConcatDirs csplugincommon directx ] : *.h ]
-  [ Wildcard [ ConcatDirs csplugincommon macosx ] : *.h ]
-  [ Wildcard [ ConcatDirs csplugincommon opengl ] : *.h ]
-  [ Wildcard [ ConcatDirs csplugincommon win32 ] : *.h ]
-  [ ConcatDirs cstool tokenlist.h ]
-  [ ConcatDirs csutil archive.h ]
-  [ ConcatDirs csutil csosdefs.h ]
-  [ ConcatDirs csutil garray.h ]
-  [ ConcatDirs csutil getopt.h ]
-  [ ConcatDirs csutil zip.h ]
+  [ Wildcard [ ConcatDirs crystalspace directx ] : *.h ]
+  [ Wildcard [ ConcatDirs crystalspace macosx ] : *.h ]
+  [ Wildcard [ ConcatDirs crystalspace opengl ] : *.h ]
+  [ Wildcard [ ConcatDirs crystalspace win32 ] : *.h ]
+  [ ConcatDirs crystalspace tokenlist.h ]
+  [ ConcatDirs crystalspace archive.h ]
+  [ ConcatDirs crystalspace csosdefs.h ]
+  [ ConcatDirs crystalspace garray.h ]
+  [ ConcatDirs crystalspace getopt.h ]
+  [ ConcatDirs crystalspace zip.h ]
   [ ConcatDirs inetwork vosapi.h ]
   [ ConcatDirs ivaria ode.h ]
   [ ConcatDirs ivideo wxwin.h ]
@@ -63,9 +63,9 @@ rule MasterHeaderCsUtil
   {
     local files =
       [ Filter
-        [ Sort [ Wildcard [ ConcatDirs csutil $(p) ] : *.h ] ] :
-          [ ConcatDirs csutil $(p) csosdefs.h ]
-          [ ConcatDirs csutil $(p) csconfig.h ] ] ;
+        [ Sort [ Wildcard [ ConcatDirs crystalspace $(p) ] : *.h ] ] :
+          [ ConcatDirs crystalspace $(p) csosdefs.h ]
+          [ ConcatDirs crystalspace $(p) csconfig.h ] ] ;
     if $(files)
     {
       lines +=
@@ -78,8 +78,8 @@ rule MasterHeaderCsUtil
   {
     lines += "#endif" ;
   }
-  return [ MasterHeader csutil :
-    [ Filter [ Wildcard csutil : *.h ] : $(CS_MASTER_HEADER_REJECTS) ] :
+  return [ MasterHeader crystalspace :
+    [ Filter [ Wildcard crystalspace : *.h ] : $(CS_MASTER_HEADER_REJECTS) ] :
     $(CS_MASTER_HEADER_BOILERPLATE) :
     $(lines) ] ;
 }
@@ -87,11 +87,11 @@ rule MasterHeaderCsUtil
 CS_MASTER_HEADERS =
   [ MasterHeaderCsUtil ]
   [ DirectoryMasterHeaders
-      csgeom
-      csgfx
-      csplugincommon
-      cstool
-      csws
+      crystalspace
+      crystalspace
+      crystalspace
+      crystalspace
+      crystalspace
       iaws
       iengine
       igeom

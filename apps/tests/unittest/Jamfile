@@ -2,4 +2,4 @@ SubDir TOP apps tests unittest ;
 
 Description unittest : "unittest tester" ;
 Application unittest : [ Wildcard *.cpp *.h ] : console noinstall ;
-LinkWith unittest : csgeom csgfx cstool csutil ;
+LinkWith unittest : crystalspace ;

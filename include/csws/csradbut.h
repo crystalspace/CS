@@ -70,7 +70,7 @@ enum
  * user selects one previous selection automatically deselects.
  * The first radio button in group should have the CSS_GROUP flag set.
  */
-class CS_CSWS_EXPORT csRadioButton : public csButton
+class CS_CRYSTALSPACE_EXPORT csRadioButton : public csButton
 {
   /// Radio button state
   bool RadioButtonState;

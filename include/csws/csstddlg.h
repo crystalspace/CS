@@ -104,7 +104,7 @@ struct iMessageBoxData : public iBase
  * The pressed button will be given as the 'Info' field in
  * Event.Command.Info (cscmdCancel, cscmdOk, ...).
  */
-extern CS_CSWS_EXPORT  void csMessageBox (csComponent *iParent, 
+extern CS_CRYSTALSPACE_EXPORT  void csMessageBox (csComponent *iParent, 
   const char *iTitle, const char *iMessage, iBase* userdata, 
   int iFlags = CSMBS_INFO | CSMBS_OK, ...) CS_GNUC_PRINTF (3, 6);
 
@@ -118,12 +118,12 @@ extern CS_CSWS_EXPORT  void csMessageBox (csComponent *iParent,
 #define CSWID_FILELIST		0xC50C
 
 /// Create and return a new file open dialog
-extern CS_CSWS_EXPORT csWindow *csFileDialog (csComponent *iParent, 
+extern CS_CRYSTALSPACE_EXPORT csWindow *csFileDialog (csComponent *iParent, 
   const char *iTitle, const char *iFileName = "./", 
   const char *iOpenButtonText = "~Load", bool vfspaths=false);
   
 /// Query full name, filename and pathname from a file dialog
-extern CS_CSWS_EXPORT void csQueryFileDialog (csWindow *iFileDialog, 
+extern CS_CRYSTALSPACE_EXPORT void csQueryFileDialog (csWindow *iFileDialog, 
   char *iFileName, size_t iFileNameSize);
 
 /// Color wheel in color choose dialogs
@@ -142,16 +142,16 @@ extern CS_CSWS_EXPORT void csQueryFileDialog (csWindow *iFileDialog,
 #define CSWID_COLORRGB		0xC513
 
 /// Create and return a new color choose dialog
-extern CS_CSWS_EXPORT csWindow *csColorDialog (csComponent *iParent, 
+extern CS_CRYSTALSPACE_EXPORT csWindow *csColorDialog (csComponent *iParent, 
   const char *iTitle, int iColor = 0);
 /// Same but accepts R/G/B separately
-extern CS_CSWS_EXPORT  csWindow *csColorDialog (csComponent *iParent, 
+extern CS_CRYSTALSPACE_EXPORT  csWindow *csColorDialog (csComponent *iParent, 
   const char *iTitle, float iR, float iG, float iB);
 /// Query color dialog contents as a single color value
-extern CS_CSWS_EXPORT void csQueryColorDialog (csWindow *iColorDialog, 
+extern CS_CRYSTALSPACE_EXPORT void csQueryColorDialog (csWindow *iColorDialog, 
   int &oColor);
 /// Query color dialog contents as R,G,B floating-point numbers
-extern CS_CSWS_EXPORT void csQueryColorDialog (csWindow *iColorDialog, 
+extern CS_CRYSTALSPACE_EXPORT void csQueryColorDialog (csWindow *iColorDialog, 
   float &oR, float &oG, float &oB);
 
 /** @} */

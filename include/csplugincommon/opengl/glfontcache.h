@@ -20,7 +20,7 @@
 #ifndef __CS_CANVAS_OPENGLCOMMON_GLFONTCACHE_H__
 #define __CS_CANVAS_OPENGLCOMMON_GLFONTCACHE_H__
 
-#include "csextern.h"
+#include "csextern_gl.h"
 #include "csgeom/subrec2.h"
 #include "csgeom/vector2.h"
 #include "csutil/dirtyaccessarray.h"
@@ -31,7 +31,7 @@ class csGLStateCache;
 
 class csGraphics2DGLCommon;
 
-class CS_CSPLUGINCOMMON_OGL_EXPORT csGLFontCache : public csFontCache
+class CS_CSPLUGINCOMMON_GL_EXPORT csGLFontCache : public csFontCache
 {
   struct GLGlyphCacheData : public csFontCache::GlyphCacheData
   {

@@ -36,7 +36,7 @@
  * Wrapper class to create a volume aka 3D texture from a number of 2D images
  * as the volume slices. 
  */
-class CS_CSGFX_EXPORT csImageVolumeMaker : public csImageBase
+class CS_CRYSTALSPACE_EXPORT csImageVolumeMaker : public csImageBase
 {
 protected:
   bool manualName;

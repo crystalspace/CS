@@ -5,5 +5,5 @@ Description fancycon : "fancy output console" ;
 Plugin fancycon
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith fancycon : csgeom csutil ;
+LinkWith fancycon : crystalspace ;
 

@@ -5,4 +5,4 @@ Description csconout : "standard output console" ;
 Plugin csconout
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith csconout : csgeom csutil ;
+LinkWith csconout : crystalspace ;

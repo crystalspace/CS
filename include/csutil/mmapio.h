@@ -75,7 +75,7 @@ const unsigned csmmioDefaultHashSize = 211;//1559;
    does consume about 4k more memory, I think the slight memory usage 
    is worth it, considering the massive speedup.
  */  
-class CS_CSUTIL_EXPORT csMemoryMappedIO
+class CS_CRYSTALSPACE_EXPORT csMemoryMappedIO
 {
 private:
   /// Minimum size of a single block 

@@ -5,7 +5,7 @@ Description bezierldr : "Bezier mesh object loader" ;
 Plugin bezierldr
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith bezierldr : csgeom csutil ;
+LinkWith bezierldr : crystalspace ;
 
 CompileGroups bezierldr :  meshes ;
 

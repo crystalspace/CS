@@ -35,7 +35,7 @@ class csBSPTree;
  * This tree will not split triangles. If a triangle needs to be split
  * then it will be put in the two nodes.
  */
-class CS_CSGEOM_EXPORT csBSPTree
+class CS_CRYSTALSPACE_EXPORT csBSPTree
 {
 private:
   static csBlockAllocator<csBSPTree> tree_nodes;

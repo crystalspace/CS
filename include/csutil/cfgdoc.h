@@ -36,7 +36,7 @@ class csConfigDocumentIterator;
  * iConfigFile implementation for configurations stored in documents.
  * \todo Write support
  */
-class CS_CSUTIL_EXPORT csConfigDocument : public iConfigFile
+class CS_CRYSTALSPACE_EXPORT csConfigDocument : public iConfigFile
 {
   friend class csConfigDocumentIterator;
 
@@ -44,7 +44,7 @@ class CS_CSUTIL_EXPORT csConfigDocument : public iConfigFile
   csRef<iDocument> document;
   csRef<iVFS> fileVFS;
 
-  struct CS_CSUTIL_EXPORT KeyInfo
+  struct CS_CRYSTALSPACE_EXPORT KeyInfo
   {
     csRef<iDocumentNode> comment;
     csRef<iDocumentNode> node;

@@ -1,0 +1,3 @@
+SubDir TOP libs csws skins default ;
+
+CsLibAddModule ;

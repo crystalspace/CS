@@ -36,7 +36,7 @@ class csVector2;
 /**
  * Some helpers for stuff related to normal maps.
  */
-class CS_CSGFX_EXPORT csNormalMappingTools
+class CS_CRYSTALSPACE_EXPORT csNormalMappingTools
 {
 public:
   /**

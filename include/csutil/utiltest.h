@@ -26,7 +26,7 @@
  * This is a class that does unit testing (and other debug stuff) for some
  * of csutil classes.
  */
-class CS_CSUTIL_EXPORT csUtilDebugHelper : public iDebugHelper
+class CS_CRYSTALSPACE_EXPORT csUtilDebugHelper : public iDebugHelper
 {
 public:
   csUtilDebugHelper ();

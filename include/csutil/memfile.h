@@ -26,7 +26,7 @@
  * Essentially a raw memory buffer which implements the abstract iFile
  * interface.
  */
-class CS_CSUTIL_EXPORT csMemFile : public iFile
+class CS_CRYSTALSPACE_EXPORT csMemFile : public iFile
 {
 public:
   /// Disposition of memory buffer at destruction time.

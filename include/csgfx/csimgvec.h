@@ -29,7 +29,7 @@
 
 SCF_VERSION (csImageVector, 0, 0, 1);
 
-struct CS_CSGFX_EXPORT csImageVector : public iImageVector
+struct CS_CRYSTALSPACE_EXPORT csImageVector : public iImageVector
 {
 private:
   csRefArray<iImage> image;

@@ -2,5 +2,5 @@ SubDir TOP plugins mesh impexp ase ;
 
 Description aseie : "ASE Import/Export plugin" ;
 Plugin aseie : [ Wildcard *.cpp *.h ] ;
-LinkWith aseie : csgeom cstool csutil ;
+LinkWith aseie : crystalspace ;
 CompileGroups aseie : meshimpexp ;

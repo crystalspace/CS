@@ -5,7 +5,7 @@ Description partphys_simple : "Particle Simple Physics plugin" ;
 Plugin partphys_simple
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith partphys_simple : csutil csgeom ;
+LinkWith partphys_simple : crystalspace ;
 
 CompileGroups partphys_simple :  meshes ;
 

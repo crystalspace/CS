@@ -38,7 +38,7 @@
 /**
  * A 3D vector.
  */
-class CS_CSGEOM_EXPORT csVector3
+class CS_CRYSTALSPACE_EXPORT csVector3
 {
 public:
   /// The X component of the vector

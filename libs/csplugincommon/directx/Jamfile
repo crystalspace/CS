@@ -2,12 +2,14 @@ SubDir TOP libs csplugincommon directx ;
 
 if $(DIRECTX.AVAILABLE) = "yes"
 {
-Description csplugincommon_dx : "DirectX-specific common plugin classes" ;
-Library csplugincommon_dx : 
-  [ Wildcard *.cpp *.h ] 
-  [ Wildcard
-    [ ConcatDirs $(DOTDOT) $(DOTDOT) include csplugincommon directx ] : *.h ]
-  : shared ;
-LibDepends csplugincommon_dx : csplugincommon csgfx csutil ;
-ExternalLibs csplugincommon_dx : DIRECTX ;
+  Description crystalspace_directx : "DirectX-specific plugin support" ;
+  Library crystalspace_directx : 
+    [ Wildcard *.cpp *.h ] 
+    [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) $(DOTDOT) include
+		 csplugincommon directx ] : *.h ]
+    : shared ;
+  LibDepends crystalspace_directx : crystalspace ;
+  ExternalLibs crystalspace_directx : DIRECTX ;
+  CFlags crystalspace_directx : [ FDefines CS_CSPLUGINCOMMON_DX_LIB ] ;
+  MsvcDefine crystalspace_directx : CS_CSPLUGINCOMMON_DX_LIB ;
 }

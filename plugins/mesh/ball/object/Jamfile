@@ -5,7 +5,7 @@ Description ball : "Ball mesh object plugin" ;
 Plugin ball
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith ball : cstool csgeom csutil csgfx ;
+LinkWith ball : crystalspace ;
 
 CompileGroups ball :  meshes ;
 

@@ -399,31 +399,53 @@ recommended, to include @file{cssysdef.h} in header files (@file{.h}). Doing so
 helps to make header files more self-contained, thus reducing the burden of
 clients of those headers.
 
-@subheading Convenience Libraries
+@subheading Library Consolidation
 
-Crystal Space now publishes several convenience libraries which eliminate much
-of the drudgery associated with implementing @sc{scf} interfaces in certain
-types of common plugin modules. For example, the @samp{csGraphics2D} class in
-the new @file{csplugincommon} library implements the @samp{iGraphics2D}
-interface and provides much of the functionality common to most canvases.
-Likewise, the @samp{csGraphics3D} class implements the @samp{iGraphics3D}
-interface and provides much functionality common to renderers. You are not
-required to utilize these implementations when authoring your own plugins, but
-they are available for your convenience.
+In order to simplify end-user documentation and client usage, the Crystal Space
+link libraries @file{csutil}, @file{csgeom}, @file{csgfx}, @file{cstool}, and
+@file{csws} have been merged into a single master library named
+@file{crystalspace} (i.e. @file{libcrystalspace.a} or @samp{crystalspace.lib}).
 
-The new convenience libraries are:
+The tools @samp{cs-config} and @samp{jamtemplate} (@pxref{HOWTO CS Project}),
+documentation, and all other client-oriented utilities have been updated
+appropriately to reflect this change. If you had installed Crystal Space
+previously, you should manually removed the now obsolete installed libraries
+from the installation location (typically, @file{$@{prefix@}/lib}).
+
+Developers of Crystal Space itself should note that the sources and headers
+continue to reside in their separate @file{csutil}, @file{csgeom}, etc.,
+directories; and (importantly) the modules themselves remain conceptually
+distinct. This will not change. The consolidation of the physical link library
+was an end-user convenience.
+
+@subheading Convenience Classes and Libraries
+
+Crystal Space now publishes several convenience classes and libraries which
+eliminate much of the drudgery associated with implementing @sc{scf} interfaces
+in certain types of common plugin modules. For example, the @samp{csGraphics2D}
+class implements the @samp{iGraphics2D} interface and provides much of the
+functionality common to most canvases.  Likewise, the @samp{csGraphics3D} class
+implements the @samp{iGraphics3D} interface and provides much functionality
+common to renderers. You are not required to utilize these implementations when
+authoring your own plugins, but they are available for your convenience.
+
+Most of these newly published facilities are bundled in the consolidated master
+@file{crystalspace} library, but a few are provided in separate libraries
+because they rely upon external resources which may not be present on all
+platforms or in all installations. The convenience libraries are:
 
 @table @code
-@item csplugincommon
-Canvas, image loader, particle system, renderer, shader, sound loader,
-and sound renderer support.
-@item csplugincommon_dx
+@item crystalspace
+Canvas, image loader, particle system, renderer, shader, sound loader, and
+sound renderer support, in addition to the normal Crystal Space classes and
+utilities.
+@item crystalspace_directx
 DirectX support.
-@item csplugincommon_osx
+@item crystalspace_macosx
 MacOS/X canvas support.
-@item csplugincommon_ogl
+@item crystalspace_opengl
 OpenGL support.
-@item csplugincommon_w32
+@item crystalspace_windows
 Windows support.
 @end table
 
@@ -538,7 +560,7 @@ settings or globally, to ensure that @sc{msvc} will be able to find them.
 Implementations of the standard procedural textures (dots, fire, plasma, etc.)
 now reside directly in the @file{stdpt} plugin
 (@file{CS/plugins/proctex/standard}), rather than in the @file{cstool}
-library. Consequently, the following previously public headers are no longer
+module. Consequently, the following previously public headers are no longer
 available:
  
 @itemize @bullet
@@ -1214,7 +1236,7 @@ dispose manually via @code{DecRef()}.
 
 The @samp{iRenderBuffer} interface was made renderer-independant. Consequently,
 creation was moved out of @samp{iGraphics3D} and into @samp{csRenderBuffer} in
-the @file{csgfx} library (see @file{csgfx/renderbuffer.h}).  The semantics of
+the @file{csgfx} module (see @file{csgfx/renderbuffer.h}).  The semantics of
 the parameters have changed too: notably, instead of specifying the byte size
 of a buffer, the element count is specified. The same change has been made to
 @code{CopyToBuffer()} (which has been renamed to @code{CopyInto()} to enforce
@@ -1395,10 +1417,10 @@ for the opaque ``info'' member of @code{csevCommand}-type events.
 @code{iEventOutlet::ImmediateBroadcast()}
 @end itemize
 
-The deprecated @sc{csws} module (Crystal Space Windowing System) has also been
-converted. Specifically, the following methods now deal with @samp{intptr_t}
-rather than @samp{void*} for all of @sc{csws}'s opaque data needs. @sc{csws}
-callback functions are likewise impacted.
+The heavily deprecated @sc{csws} module (Crystal Space Windowing System) has
+also been converted. Specifically, the following methods now deal with
+@samp{intptr_t} rather than @samp{void*} for all of @sc{csws}'s opaque data
+needs. @sc{csws} callback functions are likewise impacted.
 
 @itemize @bullet
 @item
@@ -1472,13 +1494,14 @@ methods will result in compilation errors. Alternately, defining
 supports such deprecation warnings. (Presently, only modern version of the
 @sc{gnu} compiler are so configured.)
 
-@subheading Cg matrix bindings
+@subheading Cg Matrix Bindings
 
-The semantics of a Cg vertex program matrix parameter were determined through
-the variable name; e.g. a name of @samp{ModelViewProj} bound the combined 
-model view and projection matrix to the variable. This is still supported but
-deprecated. CrystalSpace now requires Cg 1.3 which allows the matrix semantics 
-specification in a way similar to other semantics specification. For example:
+Previously, the semantics of a Cg vertex program matrix parameter were
+determined through the variable name; e.g. a name of @samp{ModelViewProj} bound
+the combined model view and projection matrix to the variable. This is still
+supported but deprecated. CrystalSpace now requires Cg 1.3 which allows the
+matrix semantics specification in a way similar to other semantics
+specification. For example:
 
 @example
 uniform float4x4 ModelViewProj
@@ -1491,5 +1514,6 @@ Becomes:
 uniform float4x4 ModelViewProj : state.matrix.mvp
 @end example
 
-Check the @file{data/shaders/} directory for more examples. For more detailed 
-information, consult the Cg and @samp{ARB_vertex_program} documentations.
+Check the @file{data/shaders/} directory for further examples. For more
+detailed information, consult the Cg and @samp{ARB_vertex_program}
+documentations.

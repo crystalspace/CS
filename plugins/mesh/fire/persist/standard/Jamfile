@@ -5,6 +5,6 @@ Description fireldr : "Fire mesh object loader" ;
 Plugin fireldr
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith fireldr : csgeom csutil ;
+LinkWith fireldr : crystalspace ;
 
 CompileGroups fireldr :  meshes ;

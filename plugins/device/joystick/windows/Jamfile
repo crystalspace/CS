@@ -4,6 +4,6 @@ if $(DIRECTX.AVAILABLE) = "yes"
 {
 Description joywin : "Joystick plugin for Windows" ;
 Plugin joywin : [ Wildcard *.cpp *.h ] ;
-LinkWith joywin : csutil ;
+LinkWith joywin : crystalspace ;
 ExternalLibs joywin : DIRECTX ;
 }

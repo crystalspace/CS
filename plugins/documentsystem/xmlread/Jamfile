@@ -5,4 +5,4 @@ Description xmlread : "XMLRead document system" ;
 Plugin xmlread
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith xmlread : cstool csutil ;
+LinkWith xmlread : crystalspace ;

@@ -35,7 +35,7 @@
  *  header file should be surrounded by appropriate `#if defined(CS_PLATFORM_WIN32) ... 
  *  #endif' statements.
  */
-class CS_CSUTIL_EXPORT cswinMinidumpWriter
+class CS_CRYSTALSPACE_EXPORT cswinMinidumpWriter
 {
 public:
   /**

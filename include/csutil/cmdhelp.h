@@ -36,7 +36,7 @@ struct iConfig;
  * This class requires the iPluginManager and iCommandLineParser to be
  * in the object registry (or else you give it as a parameter).
  */
-class CS_CSUTIL_EXPORT csCommandLineHelper
+class CS_CRYSTALSPACE_EXPORT csCommandLineHelper
 {
 private:
   static void Help (iConfig* config);

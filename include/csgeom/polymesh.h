@@ -36,7 +36,7 @@
  * with vertices and polygons from another source. It will automatically
  * calculate the triangles if requested.
  */
-class CS_CSGEOM_EXPORT csPolygonMesh : public iPolygonMesh
+class CS_CRYSTALSPACE_EXPORT csPolygonMesh : public iPolygonMesh
 {
 private:
   uint32 change_nr;
@@ -204,7 +204,7 @@ public:
 /**
  * A convenience polygon mesh implementation that represents a cube.
  */
-class CS_CSGEOM_EXPORT csPolygonMeshBox : public iPolygonMesh
+class CS_CRYSTALSPACE_EXPORT csPolygonMeshBox : public iPolygonMesh
 {
 private:
   csVector3 vertices[8];

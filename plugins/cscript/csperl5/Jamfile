@@ -39,7 +39,7 @@ if $(PERL5.AVAILABLE) = "yes" && ! [ Property build : projgen ]
   {
     actions PerlEmbedGlueFile
     {
-      echo '#include "csutil/csperlxs_fallback.inc"' > $(<)
+      echo '#include "crystalspace/csperlxs_fallback.inc"' > $(<)
     }
   }
 
@@ -96,7 +96,7 @@ if $(PERL5.AVAILABLE) = "yes" && ! [ Property build : projgen ]
   Description csperl5 : "Perl5 plugin" ;
   Includes $(common) : $(target) ;
   Plugin csperl5 : $(common) $(perlxs) csperl5.cpp csperl5.h ;
-  LinkWith csperl5 : cstool csgfx csgeom csutil ;
+  LinkWith csperl5 : crystalspace ;
   ExternalLibs csperl5 : PERL5 ;
   CFlags csperl5 :
     [ FIncludes $(targetdir) ]
@@ -133,7 +133,7 @@ if $(PERL5.AVAILABLE) = "yes" && ! [ Property build : projgen ]
   perl5mod_TARGET = $(perl5mod) ;
   perl5mod_SOURCES = $(perl5modsrc) ;
   perl5mod_OBJECTS = $(perl5modobj) ;
-  LinkWith perl5mod : cstool csgfx csgeom csutil ;
+  LinkWith perl5mod : crystalspace ;
   ExternalLibs perl5mod : PERL5 ;
   CFlags perl5mod : $(PLUGIN.CFLAGS) ;
   LFlags perl5mod : $(PLUGIN.LFLAGS) $(LINKLIBS) ;

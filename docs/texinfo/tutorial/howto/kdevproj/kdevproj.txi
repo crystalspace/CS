@@ -90,10 +90,10 @@ get an error message that your C-compiler cannot create executables.  The
 @subsubheading KDevelop External Step 6
 
 The same applies to the field @emph{Additional flags} in the @emph{Linker
-Flags} tab.  After @samp{`cs-config --libs`} you have to add the Crystal Space
-standard libraries @file{cstool}, @file{gsgfx}, @file{csgeom}, @file{csutil};
-thus, the entire content of the @emph{Additional flags} field should be
-@samp{`./cs-config --libs cstool csgfx csgeom csutil`}.
+Flags} tab.  After @samp{`cs-config --libs`} you may add the Crystal Space
+primary library @file{crystalspace};
+thus, the entire content of the @emph{Additional flags} field might be
+@samp{`./cs-config --libs crystalspace`}.
 @ifnotinfo
 
 @picturesss{tutorial,howto,kdevproj,snap5}
@@ -167,7 +167,7 @@ illustrative purposes only.)
    <CPPFLAGS></CPPFLAGS>
    <CXXFLAGS>-O0 -g3 -Wall</CXXFLAGS>
    <AdditCXXFLAGS>`./cs-config --cxxflags`</AdditCXXFLAGS>
-   <LDFLAGS>`./cs-config --libs`</LDFLAGS>
+   <LDFLAGS>`./cs-config --libs crystalspace`</LDFLAGS>
    <ConfigureArgs>--build=i386-linux --host=i386-linux \
     --target=i386-linux</ConfigureArgs>
   </CrystalSpace>

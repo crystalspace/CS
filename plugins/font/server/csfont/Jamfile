@@ -2,5 +2,5 @@ SubDir TOP plugins font server csfont ;
 
 Description csfont : "default font server" ;
 Plugin csfont : [ Wildcard *.cpp *.h ] ;
-LinkWith csfont : csutil ;
+LinkWith csfont : crystalspace ;
 CompileGroups csfont : fontservers ;

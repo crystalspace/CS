@@ -29,7 +29,7 @@
 /**
  * No attenuation. 
  */
-struct CS_CSGFX_EXPORT csNoAttenuation
+struct CS_CRYSTALSPACE_EXPORT csNoAttenuation
 {
   csNoAttenuation (iLight *light)
   {}
@@ -42,7 +42,7 @@ struct CS_CSGFX_EXPORT csNoAttenuation
  * Linear attenuation.
  * Out = in * (1 - distance/radius)
  */
-struct CS_CSGFX_EXPORT csLinearAttenuation
+struct CS_CRYSTALSPACE_EXPORT csLinearAttenuation
 {
   csLinearAttenuation (iLight *light)
   {
@@ -61,7 +61,7 @@ struct CS_CSGFX_EXPORT csLinearAttenuation
  * Inverse linear attenuation.
  * Out = in * / distance
  */
-struct CS_CSGFX_EXPORT csInverseAttenuation
+struct CS_CRYSTALSPACE_EXPORT csInverseAttenuation
 {
   csInverseAttenuation (iLight *light)
   {}
@@ -77,7 +77,7 @@ struct CS_CSGFX_EXPORT csInverseAttenuation
  * Inverse quadratic attenuation.
  * Out = in * / distance^2
  */
-struct CS_CSGFX_EXPORT csRealisticAttenuation
+struct CS_CRYSTALSPACE_EXPORT csRealisticAttenuation
 {
   csRealisticAttenuation (iLight *light)
   {}
@@ -92,7 +92,7 @@ struct CS_CSGFX_EXPORT csRealisticAttenuation
  * Constant, Linear, Quadratic attenuation
  * Out = in /(const + distance*lin + distance^2*quad)
  */
-struct CS_CSGFX_EXPORT csCLQAttenuation
+struct CS_CRYSTALSPACE_EXPORT csCLQAttenuation
 {
   csCLQAttenuation (iLight *light)
     : attnVec (light->GetAttenuationConstants ())

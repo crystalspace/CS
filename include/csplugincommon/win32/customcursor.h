@@ -20,12 +20,12 @@
 #ifndef __CS_CANVAS_WIN32CANVASCOMMON_CUSTOMCURSOR_H__
 #define __CS_CANVAS_WIN32CANVASCOMMON_CUSTOMCURSOR_H__
 
-#include "csextern.h"
+#include "csextern_win.h"
 #include "csutil/hash.h"
 #include "csutil/hashhandlers.h"
 #include "csgfx/rgbpixel.h"
 
-class CS_CSPLUGINCOMMON_W32_EXPORT csWin32CustomCursors
+class CS_CSPLUGINCOMMON_WIN_EXPORT csWin32CustomCursors
 {
   struct CachedCursor
   {

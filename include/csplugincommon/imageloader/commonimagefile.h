@@ -83,7 +83,7 @@ struct iImageFileLoader : public iBase
 /**
  * Base image loader implementation.
  */
-class CS_CSPLUGINCOMMON_EXPORT csCommonImageFileLoader : public iImageFileLoader
+class CS_CRYSTALSPACE_EXPORT csCommonImageFileLoader : public iImageFileLoader
 {
 protected:
   int Format;
@@ -123,12 +123,12 @@ public:
 /**
  * A base class for image loader plugin iImage implementations.
  */
-class CS_CSPLUGINCOMMON_EXPORT csCommonImageFile : public csImageMemory
+class CS_CRYSTALSPACE_EXPORT csCommonImageFile : public csImageMemory
 {
 protected:
   friend class csCommonImageFileLoader;
   
-  class CS_CSPLUGINCOMMON_EXPORT LoaderJob : public iJob
+  class CS_CRYSTALSPACE_EXPORT LoaderJob : public iJob
   {
   public:
     csRef<iImageFileLoader> currentLoader;

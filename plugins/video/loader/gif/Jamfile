@@ -5,7 +5,7 @@ Description csgifimg : "gif image loader" ;
 Plugin csgifimg
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith csgifimg : csgfx csutil ;
+LinkWith csgifimg : crystalspace ;
 
 CompileGroups csgifimg :  imageloaders ;
 

@@ -5,6 +5,6 @@ Description emit : "Emit mesh object plugin" ;
 Plugin emit
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith emit : csplugincommon cstool csgeom csutil ;
+LinkWith emit : crystalspace ;
 
 CompileGroups emit :  meshes ;

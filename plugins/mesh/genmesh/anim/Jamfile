@@ -5,6 +5,6 @@ Description gmeshanim : "General mesh animation plugin" ;
 Plugin gmeshanim
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith gmeshanim : csgfx cstool csgeom csutil ;
+LinkWith gmeshanim : crystalspace ;
 
 CompileGroups gmeshanim :  meshes ;

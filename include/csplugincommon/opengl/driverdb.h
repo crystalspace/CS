@@ -20,13 +20,13 @@
 #ifndef __CS_CANVAS_OPENGLCOMMON_DRIVERDB_H__
 #define __CS_CANVAS_OPENGLCOMMON_DRIVERDB_H__
 
-#include "csextern.h"
+#include "csextern_gl.h"
 #include "csutil/leakguard.h"
 
 struct iConfigDocument;
 class csGraphics2DGLCommon;
 
-class CS_CSPLUGINCOMMON_OGL_EXPORT csGLDriverDatabase
+class CS_CSPLUGINCOMMON_GL_EXPORT csGLDriverDatabase
 {
 public:
   CS_LEAKGUARD_DECLARE (csGLDriverDatabase);

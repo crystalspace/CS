@@ -5,5 +5,5 @@ Description bugplug : "debugging plugin" ;
 Plugin bugplug
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith bugplug : csgeom cstool csutil ;
+LinkWith bugplug : crystalspace ;
 

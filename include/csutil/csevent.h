@@ -46,7 +46,7 @@ SCF_VERSION (csEvent, 0, 0, 1);
  * as well as by software. There are so much constructors of
  * this class as much different types of events exists.
  */
-class CS_CSUTIL_EXPORT csEvent : public iEvent
+class CS_CRYSTALSPACE_EXPORT csEvent : public iEvent
 {
 private:
   struct attribute
@@ -289,7 +289,7 @@ public:
  * event creation was needed.  Thus, the event pool was born, and
  * there are the events that reside within it.
  */
-class CS_CSUTIL_EXPORT csPoolEvent : public csEvent
+class CS_CRYSTALSPACE_EXPORT csPoolEvent : public csEvent
 {
   typedef csEvent superclass;
   friend class csEventQueue;

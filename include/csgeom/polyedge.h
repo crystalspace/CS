@@ -34,7 +34,7 @@
  * The following class represents a general 2D polygon represented
  * with edges instead of vertices.
  */
-class CS_CSGEOM_EXPORT csPoly2DEdges
+class CS_CRYSTALSPACE_EXPORT csPoly2DEdges
 {
 protected:
   /// The edges.

@@ -42,7 +42,7 @@
  * the mouse is unmoved for some time over some non-focused component
  * that has an associated hint.
  */
-class CS_CSWS_EXPORT csHint : public csComponent
+class CS_CRYSTALSPACE_EXPORT csHint : public csComponent
 {
   /// Old mouse owner (before the hint has popped up). Usually 0.
   csComponent *oldmo;
@@ -69,7 +69,7 @@ public:
  * and creates the appropiate csHint when it detects mouse is not moved
  * for too long time.
  */
-class CS_CSWS_EXPORT csHintManager : public csArray<void*>
+class CS_CRYSTALSPACE_EXPORT csHintManager : public csArray<void*>
 {
 private:
   /** \internal

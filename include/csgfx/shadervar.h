@@ -58,7 +58,7 @@ struct iShaderVariableAccessor : public iBase
  * system. Shader vars are a primary system to transport information from
  * the engine/meshes/etc. to the renderer.
  */
-class CS_CSGFX_EXPORT csShaderVariable : public csRefCount
+class CS_CRYSTALSPACE_EXPORT csShaderVariable : public csRefCount
 {
 public:
   /**

@@ -49,7 +49,7 @@
  * to overload the HandleEvent() method. Always override the specific
  * \c On... trigger function.
  */
-class CS_CSUTIL_EXPORT csBaseEventHandler : public iEventHandler
+class CS_CRYSTALSPACE_EXPORT csBaseEventHandler : public iEventHandler
 {
 private:
   csRef<iEventQueue> queue;

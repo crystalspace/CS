@@ -5,7 +5,7 @@ Description cssgiimg : "sgi image loader" ;
 Plugin cssgiimg
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith cssgiimg : csgfx csutil ;
+LinkWith cssgiimg : crystalspace ;
 
 CompileGroups cssgiimg :  imageloaders ;
 

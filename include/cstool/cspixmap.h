@@ -41,7 +41,7 @@
  * Note that this class is only used as the interface to several
  * implementations of pixmaps, for example csSimplePixmap.
  */
-class CS_CSTOOL_EXPORT csPixmap
+class CS_CRYSTALSPACE_EXPORT csPixmap
 {
 public:
   /// Destructor
@@ -86,7 +86,7 @@ public:
 };
 
 /// This is the simple implementation of csPixmap that uses a single texture
-class CS_CSTOOL_EXPORT csSimplePixmap : public csPixmap
+class CS_CRYSTALSPACE_EXPORT csSimplePixmap : public csPixmap
 {
 protected:
   csRef<iTextureHandle> hTex;

@@ -2,4 +2,4 @@ SubDir TOP apps tools picview ;
 
 Description picview : "Picture Viewer" ;
 Application picview : [ Wildcard *.cpp *.h ] : noinstall ;
-LinkWith picview : csgeom csgfx cstool csutil ;
+LinkWith picview : crystalspace ;

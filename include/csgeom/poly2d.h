@@ -35,7 +35,7 @@ struct iClipper2D;
 /**
  * The following class represents a general 2D polygon.
  */
-class CS_CSGEOM_EXPORT csPoly2D
+class CS_CRYSTALSPACE_EXPORT csPoly2D
 {
 protected:
   /// The 2D vertices.

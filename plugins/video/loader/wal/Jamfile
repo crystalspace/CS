@@ -5,7 +5,7 @@ Description cswalimg : "wal image loader" ;
 Plugin cswalimg
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith cswalimg : csgfx csutil ;
+LinkWith cswalimg : crystalspace ;
 
 CompileGroups cswalimg :  imageloaders ;
 

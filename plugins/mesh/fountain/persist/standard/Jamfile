@@ -5,6 +5,6 @@ Description fountldr : "Fountain mesh object loader" ;
 Plugin fountldr
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith fountldr : csgeom csutil ;
+LinkWith fountldr : crystalspace ;
 
 CompileGroups fountldr : meshes ;

@@ -35,7 +35,7 @@ class csGradient;
 /**
  * An entry in a csGradient gradient.
  */
-struct CS_CSGFX_EXPORT csGradientShade 
+struct CS_CRYSTALSPACE_EXPORT csGradientShade 
 {
   /// Color of the left side
   csColor left;
@@ -93,7 +93,7 @@ struct CS_CSGFX_EXPORT csGradientShade
  * \endcode
  * \todo More shade management (e.g. getting, deleting of single shades.)
  */
-class CS_CSGFX_EXPORT csGradient
+class CS_CRYSTALSPACE_EXPORT csGradient
 {
 protected:
   /// The entries in this gradient.

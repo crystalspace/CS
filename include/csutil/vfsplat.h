@@ -23,6 +23,6 @@
 #include "csextern.h"
 
 /// Hook to resolve certain VFS vars on some platforms. (E.g. HOME on Win32)
-CS_CSUTIL_EXPORT const char* csCheckPlatformVFSVar(const char* VarName);
+CS_CRYSTALSPACE_EXPORT const char* csCheckPlatformVFSVar(const char* VarName);
 
 #endif // __CS_CSUTIL_VFSPLAT_H__

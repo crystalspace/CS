@@ -71,7 +71,7 @@ public:
 /**
  * A databuffer pointing into another databuffer.
  */
-class CS_CSUTIL_EXPORT csParasiticDataBuffer : public csParasiticDataBufferBase
+class CS_CRYSTALSPACE_EXPORT csParasiticDataBuffer : public csParasiticDataBufferBase
 {
 public:
     SCF_DECLARE_IBASE;
@@ -110,11 +110,11 @@ public:
  *  }
  *  \endcode
  */
-class CS_CSUTIL_EXPORT csParasiticDataBufferPooled : 
+class CS_CRYSTALSPACE_EXPORT csParasiticDataBufferPooled : 
   public csParasiticDataBufferBase
 {
 public:
-  SCF_DECLARE_IBASE_POOLED_EXTERN(CS_CSUTIL_EXPORT, 
+  SCF_DECLARE_IBASE_POOLED_EXTERN(CS_CRYSTALSPACE_EXPORT, 
     csParasiticDataBufferPooled);
 
   /**

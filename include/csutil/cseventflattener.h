@@ -51,7 +51,7 @@ enum csEventFlattenerError
  * Converts events from/to a binary representation. Can be used for e.g.
  * disk storage or network transfer.
  */
-class CS_CSUTIL_EXPORT csEventFlattener
+class CS_CRYSTALSPACE_EXPORT csEventFlattener
 {
 public:
   /// Query the size consumed by the flattened event.

@@ -2,4 +2,4 @@ SubDir TOP apps tests consoletest ;
 
 Description consoletest : "console output tester" ;
 Application consoletest : [ Wildcard *.cpp *.h ] : console noinstall ;
-LinkWith consoletest : csutil ;
+LinkWith consoletest : crystalspace ;

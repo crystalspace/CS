@@ -32,7 +32,7 @@
  * Components are scaled to fit in one row or one column of the canvas.
  */
 
-class CS_CSWS_EXPORT csBoxLayout : public csLayout
+class CS_CRYSTALSPACE_EXPORT csBoxLayout : public csLayout
 {
  public:
   /// Set axis to 0 to align the components along the x-axis in the middle

@@ -52,7 +52,7 @@ struct iPluginManager;
  * Functions not marked with an asterisk are optional, but possibly
  * slow since they are too general.
  */
-class CS_CSPLUGINCOMMON_EXPORT csGraphics2D : public iGraphics2D
+class CS_CRYSTALSPACE_EXPORT csGraphics2D : public iGraphics2D
 {
 public:
   /// The configuration file.

@@ -103,7 +103,7 @@ version @value{VERSION}, last updated @value{UPDATED}.
 * Options:: Configuring Crystal Space
 * Applications::
 * Tutorials:: Tutorials and HOWTO's
-* Libraries::
+* Facilities::
 * Plug-In Drivers:: Plug-In Modules and Drivers
 * Internals:: Internal Project Structure
 * Contributing:: Contributing to Crystal Space

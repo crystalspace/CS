@@ -77,7 +77,7 @@ if $(JAVA.AVAILABLE) = "yes" && $(ANT) && $(JAVA) && $(JAVAC) && $(CMD.SWIG) &&
   javamod_TARGET = $(javamod) ;
   javamod_SOURCES = $(javamodsrc) ;
   javamod_OBJECTS = $(javamodobj) ;
-  LinkWith javamod : cstool csgfx csgeom csutil ;
+  LinkWith javamod : crystalspace ;
   ExternalLibs javamod : JAVA ;
   CFlags javamod : $(PLUGIN.CFLAGS) $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
   LFlags javamod : $(PLUGIN.LFLAGS) $(LINKLIBS) $(CSJAVA.LFLAGS) ;

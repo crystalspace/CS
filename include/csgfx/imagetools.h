@@ -34,7 +34,7 @@
 /**
  * Some helper functions to deal with iImage objects.
  */
-class CS_CSGFX_EXPORT csImageTools
+class CS_CRYSTALSPACE_EXPORT csImageTools
 {
 public:
   /// Compute the size of an image data, in bytes.

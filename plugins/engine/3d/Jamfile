@@ -5,4 +5,4 @@ Description engine : "3D engine plugin" ;
 Plugin engine
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith engine : csgeom csgfx cstool csutil ;
+LinkWith engine : crystalspace ;

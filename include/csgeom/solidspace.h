@@ -31,7 +31,7 @@ struct iPolygonMesh;
  * a 3 dimensional sparse bit array which is 1 where space is solid
  * and 0 where not.
  */
-class CS_CSGEOM_EXPORT csSolidSpace
+class CS_CRYSTALSPACE_EXPORT csSolidSpace
 {
 private:
   csBox3 root_bbox;

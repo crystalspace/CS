@@ -136,7 +136,7 @@ enum csButtonFrameStyle
  * The Button class implements different types of push buttons.
  * Buttons can contain a text string and/or a bitmap.
  */
-class CS_CSWS_EXPORT csButton : public csComponent
+class CS_CRYSTALSPACE_EXPORT csButton : public csComponent
 {
 protected:
   /// Button images in normal and pressed state

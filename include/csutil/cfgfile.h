@@ -34,7 +34,7 @@ class csConfigIterator;
 /**
  * Configuration file which implements the iConfigFile SCF interface.
  */
-class CS_CSUTIL_EXPORT csConfigFile : public iConfigFile
+class CS_CRYSTALSPACE_EXPORT csConfigFile : public iConfigFile
 {
 public:
   SCF_DECLARE_IBASE;

@@ -35,7 +35,7 @@
  * One way to attach key value pairs to CS objects is to add the following
  * xml to your object: <key name="somename" value="somevalue" />
  */
-class CS_CSTOOL_EXPORT csKeyValuePair : public csObject, public iKeyValuePair
+class CS_CRYSTALSPACE_EXPORT csKeyValuePair : public csObject, public iKeyValuePair
 {
 private:
   const char *m_Value;	// Points to a string in the hash below.

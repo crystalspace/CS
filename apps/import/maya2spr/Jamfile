@@ -6,5 +6,5 @@ Application maya2spr
 	: [ Wildcard *.cpp *.h ]
 	: console
 ;
-LinkWith maya2spr : csgeom csgfx csutil ;
+LinkWith maya2spr : crystalspace ;
 

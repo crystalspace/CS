@@ -90,7 +90,7 @@ static inline char* cswinWideToAnsi (const wchar_t* wide,
  *  header file should be surrounded by appropriate `#if defined(CS_PLATFORM_WIN32) ... 
  *  #endif' statements.
  */
-struct CS_CSUTIL_EXPORT cswinWtoA
+struct CS_CRYSTALSPACE_EXPORT cswinWtoA
 {
 private:
   char* s;
@@ -115,7 +115,7 @@ public:
  *  header file should be surrounded by appropriate `#if defined(CS_PLATFORM_WIN32) ... 
  *  #endif' statements.
  */
-struct CS_CSUTIL_EXPORT cswinCtoA
+struct CS_CRYSTALSPACE_EXPORT cswinCtoA
 {
 private:
   char* s;
@@ -144,7 +144,7 @@ public:
  *  header file should be surrounded by appropriate `#if defined(CS_PLATFORM_WIN32) ... 
  *  #endif' statements.
  */
-extern CS_CSUTIL_EXPORT char* cswinGetErrorMessage (HRESULT code);
+extern CS_CRYSTALSPACE_EXPORT char* cswinGetErrorMessage (HRESULT code);
 /**
  * Retrieve the system's description for an error code.
  * \param code The error code, usually retrieved through GetLastError().
@@ -155,7 +155,7 @@ extern CS_CSUTIL_EXPORT char* cswinGetErrorMessage (HRESULT code);
  *  header file should be surrounded by appropriate `#if defined(CS_PLATFORM_WIN32) ... 
  *  #endif' statements.
  */
-extern CS_CSUTIL_EXPORT wchar_t* cswinGetErrorMessageW (HRESULT code);
+extern CS_CRYSTALSPACE_EXPORT wchar_t* cswinGetErrorMessageW (HRESULT code);
 
 /// Windows versions cswinIsWinNT() can identify.
 enum cswinWindowsVersion
@@ -181,6 +181,6 @@ enum cswinWindowsVersion
  *  header file should be surrounded by appropriate `#if defined(CS_PLATFORM_WIN32) ... 
  *  #endif' statements.
  */
-extern CS_CSUTIL_EXPORT bool cswinIsWinNT (cswinWindowsVersion* version = 0);
+extern CS_CRYSTALSPACE_EXPORT bool cswinIsWinNT (cswinWindowsVersion* version = 0);
 
 #endif // __CS_CSSYS_WIN32_WINTOOLS_H__

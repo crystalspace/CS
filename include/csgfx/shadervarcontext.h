@@ -32,7 +32,7 @@
 /**
  * Simple implementation for iShaderVariableContext.
  */
-class CS_CSGFX_EXPORT csShaderVariableContext : public iShaderVariableContext
+class CS_CRYSTALSPACE_EXPORT csShaderVariableContext : public iShaderVariableContext
 {
 private:
   csRefArray<csShaderVariable> variables;

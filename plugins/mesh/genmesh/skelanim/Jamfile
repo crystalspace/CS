@@ -5,6 +5,6 @@ Description gmeshskelanim : "General mesh skeletal animation plugin" ;
 Plugin gmeshskelanim
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith gmeshskelanim : csgfx cstool csgeom csutil ;
+LinkWith gmeshskelanim : crystalspace ;
 
 CompileGroups gmeshskelanim :  meshes ;

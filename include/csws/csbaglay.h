@@ -35,7 +35,7 @@
 /**
  * Subclass of csLayoutConstraint for use with csGridBagLayout.
  */
-class CS_CSWS_EXPORT csGridBagConstraint : public csLayoutConstraint
+class CS_CRYSTALSPACE_EXPORT csGridBagConstraint : public csLayoutConstraint
 {
 public:
   csGridBagConstraint (csComponent *comp);
@@ -277,7 +277,7 @@ public:
  * </p>
  */
  
-class CS_CSWS_EXPORT csGridBagLayout : public csLayout2
+class CS_CRYSTALSPACE_EXPORT csGridBagLayout : public csLayout2
 {
   struct CellInfo
   {

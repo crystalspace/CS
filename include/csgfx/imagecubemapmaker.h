@@ -36,7 +36,7 @@
  * faces. Ensures that all faces are available when requested, if necessary
  * by creating a new image (the famous and popular image-no-found-checkerboard).
  */
-class CS_CSGFX_EXPORT csImageCubeMapMaker : public csImageBase
+class CS_CRYSTALSPACE_EXPORT csImageCubeMapMaker : public csImageBase
 {
 protected:
   csRef<iImage> cubeImages[6];

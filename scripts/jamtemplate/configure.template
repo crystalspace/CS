@@ -85,7 +85,7 @@ AS_IF([test $with_cs != no],
 *** always available from http://www.crystalspace3d.org/
 *** Also, be sure that you have either installed Crystal Space or set the
 *** CRYSTAL environment variable properly.
-])], [cstool csgfx csgeom csutil])])
+])], [crystalspace])])
 
 #----------------------------------------------------------------------------
 # Check for Crystal Entity Layer (CEL)

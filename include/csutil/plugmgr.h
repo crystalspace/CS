@@ -33,7 +33,7 @@ struct iObjectRegistry;
  * This is the standard implementation of the plugin manager.
  * The plugin manager is thread-safe.
  */
-class CS_CSUTIL_EXPORT csPluginManager : public iPluginManager
+class CS_CRYSTALSPACE_EXPORT csPluginManager : public iPluginManager
 {
 private:
   /// Mutex to make the plugin manager thread-safe.
@@ -42,7 +42,7 @@ private:
   /**
    * This is a private structure used to keep the list of plugins.
    */
-  class CS_CSUTIL_EXPORT csPlugin
+  class CS_CRYSTALSPACE_EXPORT csPlugin
   {
   public:
     /// The plugin itself
@@ -59,7 +59,7 @@ private:
   /**
    * This is a superset of csPDelArray that can find by pointer a plugin.
    */
-  class CS_CSUTIL_EXPORT csPluginsVector : public csPDelArray<csPlugin>
+  class CS_CRYSTALSPACE_EXPORT csPluginsVector : public csPDelArray<csPlugin>
   {
   public:
     /// Create the vector
@@ -72,7 +72,7 @@ private:
   /**
    * Class to collect all options for all plug-in modules in the system.
    */
-  class CS_CSUTIL_EXPORT csPluginOption
+  class CS_CRYSTALSPACE_EXPORT csPluginOption
   {
   public:
     char *Name;

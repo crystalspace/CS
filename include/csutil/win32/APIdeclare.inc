@@ -20,7 +20,7 @@
 class cswinCacheDLL;
 
 #ifndef CS_API_EXPORT
-#define CS_API_EXPORT CS_CSUTIL_EXPORT
+#define CS_API_EXPORT CS_CRYSTALSPACE_EXPORT
 #define CS_API_EXPORT_UNDEF
 #endif
 

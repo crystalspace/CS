@@ -71,7 +71,7 @@ struct iObjectRegistry;
  * have access to its internals, all graphics pipeline management is done
  * through main application object.
  */
-class CS_CSWS_EXPORT csGraphicsPipeline
+class CS_CRYSTALSPACE_EXPORT csGraphicsPipeline
 {
 public:
   CS_LEAKGUARD_DECLARE (csGraphicsPipeline);

@@ -29,9 +29,9 @@
 #include "csextern.h"
 
 /// declare table of square roots
-extern CS_CSGEOM_EXPORT void BuildSqrtTable ();
+extern CS_CRYSTALSPACE_EXPORT void BuildSqrtTable ();
 /// fast square root, looks up table build by BuildSqrtTable().
-extern CS_CSGEOM_EXPORT float FastSqrt (float n);
+extern CS_CRYSTALSPACE_EXPORT float FastSqrt (float n);
 
 /** @} */
 

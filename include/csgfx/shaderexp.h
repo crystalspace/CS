@@ -40,7 +40,7 @@ struct cons;
 /** 
  * An evaluable expression attached to a shader variable.
  */
-class CS_CSGFX_EXPORT csShaderExpression 
+class CS_CRYSTALSPACE_EXPORT csShaderExpression 
 {
 public:
   CS_LEAKGUARD_DECLARE (csShaderExpression);

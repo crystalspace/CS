@@ -7,14 +7,14 @@
 //
 
 #import <AppKit/AppKit.h>
+#include "csextern_osx.h"
 
 @class OSXDelegate2D;
 
-
 @interface OSXView : NSView
 {
-    // Delegate passes along events
-    OSXDelegate2D *delegate;
+  // Delegate passes along events
+  OSXDelegate2D *delegate;
 }
 
 // Initialize object

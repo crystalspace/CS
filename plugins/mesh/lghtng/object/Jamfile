@@ -5,4 +5,4 @@ Description lghtng : "Lightning mesh object plugin" ;
 Plugin lghtng
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith lghtng : csgeom csutil ;
+LinkWith lghtng : crystalspace ;

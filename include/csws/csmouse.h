@@ -41,7 +41,7 @@ struct iEvent;
 /**
  * This class encapsulates mouse pointer
  */
-class CS_CSWS_EXPORT csMousePointer
+class CS_CRYSTALSPACE_EXPORT csMousePointer
 {
 private:
   friend class csMouse;
@@ -66,7 +66,7 @@ public:
  * This class handles mouse pointer and generates mouse events.<p>
  * Usually there is only one object of this class in each csApp object.
  */
-class CS_CSWS_EXPORT csMouse
+class CS_CRYSTALSPACE_EXPORT csMouse
 {
 private:
   friend class csMousePointer;

@@ -32,7 +32,7 @@
  * @{ */
 
 /// Simple iImage implementation for canvas screenshots.
-class CS_CSPLUGINCOMMON_EXPORT csScreenShot : public csImageBase
+class CS_CRYSTALSPACE_EXPORT csScreenShot : public csImageBase
 {
   int Format;
   void *Data;

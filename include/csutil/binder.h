@@ -32,7 +32,7 @@
  * Use this class to bind input events (keypress, button press, mouse move,
  * etc.) to commands (shoot, jump, walk, etc.)
  */
-class CS_CSUTIL_EXPORT csInputBinder : public iInputBinder
+class CS_CRYSTALSPACE_EXPORT csInputBinder : public iInputBinder
 {
   struct AxisCmd
   {
@@ -70,7 +70,7 @@ public:
   csInputBinder (iBase *parent = 0, int btnSize = 127, int axisSize = 13);
   virtual ~csInputBinder ();
 
-  struct CS_CSUTIL_EXPORT eiEventHandler : public iEventHandler
+  struct CS_CRYSTALSPACE_EXPORT eiEventHandler : public iEventHandler
   {
     SCF_DECLARE_EMBEDDED_IBASE (csInputBinder);
     bool HandleEvent (iEvent &ev) { return scfParent->HandleEvent (ev); }

@@ -48,7 +48,7 @@ struct csInterleavedSubBufferOptions
 /**
  * Basic renderbuffer for OpenGL renderer.
  */
-class CS_CSGFX_EXPORT csRenderBuffer : public iRenderBuffer
+class CS_CRYSTALSPACE_EXPORT csRenderBuffer : public iRenderBuffer
 {
 protected:
   /**

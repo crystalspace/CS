@@ -56,7 +56,7 @@ struct iProcTexCallback : public iBase
  * Generic superclass for procedural textures. This class
  * takes care of scheduling when a procedural texture needs updating.
  */
-class CS_CSTOOL_EXPORT csProcTexture : public csObject
+class CS_CRYSTALSPACE_EXPORT csProcTexture : public csObject
 {
   friend struct csProcTexCallback;
   friend class ProcEventHandler;

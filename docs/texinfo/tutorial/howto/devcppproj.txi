@@ -64,20 +64,13 @@ that no special @samp{--prefix} was used, the libraries will usually be in
 @file{c:\msys\1.0\local\lib} if @sc{msys} was installed in @file{c:\msys}, 
 adjust the path(s) as necessary. If not, then you can access the directories 
 from the build location with a path that looks somewhat like this: 
-@file{..\CS\out\msysx86\optimize\libs\cstool}. Substitute @file{debug} for 
+@file{..\CS\out\msysx86\optimize\libs}. Substitute @file{debug} for 
 @file{optimize} if you build the project in debug mode.
 
 If you installed the Crystal Space @sc{sdk}, add the following libraries:
 
 @example
-..\CS\lib\libcsgeom.a
-..\CS\lib\libcsgfx.a
-..\CS\lib\libcstool.a
-..\CS\lib\libcsutil.a
-..\CS\lib\libcsgeom.a
-..\CS\lib\libcsgfx.a
-..\CS\lib\libcstool.a
-..\CS\lib\libcsutil.a
+..\CS\lib\libcrystalspace.a
 @end example
 
 @noindent
@@ -86,19 +79,8 @@ directory (subtituting @samp{debug} for @samp{optimize} if you build in debug
 mode):
 
 @example
-..\CS\out\msysx86\debug\libs\csgeom\libcsgeom.a
-..\CS\out\msysx86\debug\libs\csgfx\libcsgfx.a
-..\CS\out\msysx86\debug\libs\cstool\libcstool.a
-..\CS\out\msysx86\debug\libs\csutil\libcsutil.a
-..\CS\out\msysx86\debug\libs\csgeom\libcsgeom.a
-..\CS\out\msysx86\debug\libs\csgfx\libcsgfx.a
-..\CS\out\msysx86\debug\libs\cstool\libcstool.a
-..\CS\out\msysx86\debug\libs\csutil\libcsutil.a
+..\CS\out\msysx86\optimize\libs\libcrystalspace.a
 @end example
-
-It is important to add the libraries two times! The reason for this
-is to make sure everything is loaded when there are dependencies
-between the libraries themselves.
 
 Finally, you have to add the @sc{gdi} library. This can be found
 in the MinGW directory. For example:

@@ -5,7 +5,7 @@ Description terrainldr : "CLOD Terrain object loader" ;
 Plugin terrainldr
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith terrainldr : csgeom csutil ;
+LinkWith terrainldr : crystalspace ;
 
 CompileGroups terrainldr :  meshes ;
 

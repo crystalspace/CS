@@ -82,8 +82,8 @@ mesh. In that case you can easily store the collider in that entity class.
 
 However, you can also use the @samp{iObject} system to attach your collider
 to the mesh itself. An easy way to do this is to use the
-@samp{csColliderWrapper} class that you can find in the @file{cstool}
-library. @samp{csColliderWrapper} is a subclass of @samp{csObject} which
+@samp{csColliderWrapper} class that you can find in @file{cstool/collider.h}.
+@samp{csColliderWrapper} is a subclass of @samp{csObject} which
 means that you can attach this object to any other @samp{csObject}.
 @samp{csColliderWrapper} additionally holds a pointer to an @samp{iCollider}.
 This means that you can create a @samp{csColliderWrapper} to hold your

@@ -2,4 +2,4 @@ SubDir TOP apps tests g2dtest ;
 
 Description g2dtest : "canvas plugin test" ;
 Application g2dtest : [ Wildcard *.cpp *.h ] : noinstall ;
-LinkWith g2dtest : csgeom csgfx cstool csutil ;
+LinkWith g2dtest : crystalspace ;

@@ -36,7 +36,7 @@
 
 struct iEventOutlet;
 
-class CS_CSUTIL_EXPORT csWin32KeyComposer : public iKeyComposer
+class CS_CRYSTALSPACE_EXPORT csWin32KeyComposer : public iKeyComposer
 {
 protected:
   utf32_char lastDead;

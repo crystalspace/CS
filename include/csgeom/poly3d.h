@@ -41,7 +41,7 @@ class csPoly2D;
 /**
  * The following class represents a general 3D polygon.
  */
-class CS_CSGEOM_EXPORT csPoly3D
+class CS_CRYSTALSPACE_EXPORT csPoly3D
 {
 protected:
   /// The 3D vertices.
@@ -335,7 +335,7 @@ struct csCompressVertex
  * adds some functionality specific to that use. In particular
  * this class is more used to hold an unordered collection of 3D vectors.
  */
-class CS_CSGEOM_EXPORT csVector3Array : public csPoly3D
+class CS_CRYSTALSPACE_EXPORT csVector3Array : public csPoly3D
 {
 public:
   csVector3Array (size_t start_size = 10) : csPoly3D (start_size) { }

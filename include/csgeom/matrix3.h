@@ -34,7 +34,7 @@ class csQuaternion;
 /**
  * A 3x3 matrix.
  */
-class CS_CSGEOM_EXPORT csMatrix3
+class CS_CRYSTALSPACE_EXPORT csMatrix3
 {
 public:
   float m11, m12, m13;
@@ -164,13 +164,13 @@ public:
   bool IsIdentity () const;
 
   /// Add two matricies.
-  friend CS_CSGEOM_EXPORT csMatrix3 operator+ (const csMatrix3& m1, 
+  friend CS_CRYSTALSPACE_EXPORT csMatrix3 operator+ (const csMatrix3& m1, 
     const csMatrix3& m2);
   /// Subtract two matricies.
-  friend CS_CSGEOM_EXPORT csMatrix3 operator- (const csMatrix3& m1, 
+  friend CS_CRYSTALSPACE_EXPORT csMatrix3 operator- (const csMatrix3& m1, 
     const csMatrix3& m2);
   /// Multiply two matricies.
-  friend CS_CSGEOM_EXPORT csMatrix3 operator* (const csMatrix3& m1, 
+  friend CS_CRYSTALSPACE_EXPORT csMatrix3 operator* (const csMatrix3& m1, 
     const csMatrix3& m2);
 
   /// Multiply a vector by a matrix (transform it).
@@ -182,25 +182,25 @@ public:
   }
 
   /// Multiply a matrix and a scalar.
-  friend CS_CSGEOM_EXPORT csMatrix3 operator* (const csMatrix3& m, float f);
+  friend CS_CRYSTALSPACE_EXPORT csMatrix3 operator* (const csMatrix3& m, float f);
   /// Multiply a matrix and a scalar.
-  friend CS_CSGEOM_EXPORT csMatrix3 operator* (float f, const csMatrix3& m);
+  friend CS_CRYSTALSPACE_EXPORT csMatrix3 operator* (float f, const csMatrix3& m);
   /// Divide a matrix by a scalar.
-  friend CS_CSGEOM_EXPORT csMatrix3 operator/ (const csMatrix3& m, float f);
+  friend CS_CRYSTALSPACE_EXPORT csMatrix3 operator/ (const csMatrix3& m, float f);
   /// Check if two matricies are equal.
-  friend CS_CSGEOM_EXPORT bool operator== (const csMatrix3& m1, 
+  friend CS_CRYSTALSPACE_EXPORT bool operator== (const csMatrix3& m1, 
     const csMatrix3& m2);
   /// Check if two matricies are not equal.
-  friend CS_CSGEOM_EXPORT bool operator!= (const csMatrix3& m1, 
+  friend CS_CRYSTALSPACE_EXPORT bool operator!= (const csMatrix3& m1, 
     const csMatrix3& m2);
   /// Test if each component of a matrix is less than a small epsilon value.
-  friend CS_CSGEOM_EXPORT bool operator< (const csMatrix3& m, float f);
+  friend CS_CRYSTALSPACE_EXPORT bool operator< (const csMatrix3& m, float f);
   /// Test if each component of a matrix is greater than a small epsilon value.
-  friend CS_CSGEOM_EXPORT bool operator> (float f, const csMatrix3& m);
+  friend CS_CRYSTALSPACE_EXPORT bool operator> (float f, const csMatrix3& m);
 };
 
 /// An instance of csMatrix3 that is initialized as a rotation about X
-class CS_CSGEOM_EXPORT csXRotMatrix3 : public csMatrix3
+class CS_CRYSTALSPACE_EXPORT csXRotMatrix3 : public csMatrix3
 {
 public:
   /**
@@ -213,7 +213,7 @@ public:
 };
 
 /// An instance of csMatrix3 that is initialized as a rotation about Y.
-class CS_CSGEOM_EXPORT csYRotMatrix3 : public csMatrix3
+class CS_CRYSTALSPACE_EXPORT csYRotMatrix3 : public csMatrix3
 {
 public:
   /**
@@ -226,7 +226,7 @@ public:
 };
 
 /// An instance of csMatrix3 that is initialized as a rotation about Z.
-class CS_CSGEOM_EXPORT csZRotMatrix3 : public csMatrix3
+class CS_CRYSTALSPACE_EXPORT csZRotMatrix3 : public csMatrix3
 {
 public:
   /**
@@ -239,7 +239,7 @@ public:
 };
 
 /// An instance of csMatrix3 that is initialized to scale the X dimension.
-class CS_CSGEOM_EXPORT csXScaleMatrix3 : public csMatrix3
+class CS_CRYSTALSPACE_EXPORT csXScaleMatrix3 : public csMatrix3
 {
 public:
   /**
@@ -249,7 +249,7 @@ public:
 };
 
 /// An instance of csMatrix3 that is initialized to scale the Y dimension.
-class CS_CSGEOM_EXPORT csYScaleMatrix3 : public csMatrix3
+class CS_CRYSTALSPACE_EXPORT csYScaleMatrix3 : public csMatrix3
 {
 public:
   /**
@@ -259,7 +259,7 @@ public:
 };
 
 /// An instance of csMatrix3 that is initialized to scale the Z dimension.
-class CS_CSGEOM_EXPORT csZScaleMatrix3 : public csMatrix3
+class CS_CRYSTALSPACE_EXPORT csZScaleMatrix3 : public csMatrix3
 {
 public:
   /**

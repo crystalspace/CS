@@ -39,9 +39,9 @@ struct csRenderMesh;
  * \remark Uses csFrameDataHolder internally. See it's documentation for some
  *  additional information.
  */
-class CS_CSTOOL_EXPORT csRenderMeshHolderSingle
+class CS_CRYSTALSPACE_EXPORT csRenderMeshHolderSingle
 {
-  struct CS_CSTOOL_EXPORT csRenderMeshPtr
+  struct CS_CRYSTALSPACE_EXPORT csRenderMeshPtr
   {
     csRenderMesh* ptr;
 
@@ -68,7 +68,7 @@ public:
  * csRenderMesh has it's \a inUse member set to false (the assumption is that 
  * when one mesh is unused, all are).
  */
-class CS_CSTOOL_EXPORT csRenderMeshHolderMultiple
+class CS_CRYSTALSPACE_EXPORT csRenderMeshHolderMultiple
 {
   csArray<csDirtyAccessArray<csRenderMesh*>*> rmHolderList;
   csArray<csDirtyAccessArray<csRenderMesh*>*> clearQueue;

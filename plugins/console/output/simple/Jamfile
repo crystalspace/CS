@@ -5,5 +5,5 @@ Description simpcon : "simple output console" ;
 Plugin simpcon
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith simpcon : csgeom csutil ;
+LinkWith simpcon : crystalspace ;
 

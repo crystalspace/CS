@@ -61,7 +61,7 @@
  * <li> Default implementation of most methods
  * </ul>
  */
-class CS_CSTOOL_EXPORT csMeshObject : public iMeshObject
+class CS_CRYSTALSPACE_EXPORT csMeshObject : public iMeshObject
 {
 protected:
   /// the drawing callback
@@ -238,7 +238,7 @@ public:
   virtual void GetRadius (csVector3& radius, csVector3& center);
 
   // implementation of iObjectModel
-  struct CS_CSTOOL_EXPORT eiObjectModel : public csObjectModel
+  struct CS_CRYSTALSPACE_EXPORT eiObjectModel : public csObjectModel
   {
     SCF_DECLARE_EMBEDDED_IBASE (csMeshObject);
     virtual void GetObjectBoundingBox (csBox3& bbox)
@@ -261,7 +261,7 @@ public:
  * This is the abstract implementation of iMeshObjectFactory. Like
  * csMeshObject, it stores a pointer to the "logical parent".
  */
-class CS_CSTOOL_EXPORT csMeshFactory : public iMeshObjectFactory
+class CS_CRYSTALSPACE_EXPORT csMeshFactory : public iMeshObjectFactory
 {
 protected:
   /// Logical parent (usually the wrapper object from the engine)
@@ -342,7 +342,7 @@ public:
 /**
  * This is the abstract implementation of iMeshObjectType.
  */
-class CS_CSTOOL_EXPORT csMeshType : public iMeshObjectType
+class CS_CRYSTALSPACE_EXPORT csMeshType : public iMeshObjectType
 {
 protected:
   /// pointer to the engine if available (@@@ temporary)
@@ -374,7 +374,7 @@ public:
   /**
    * iComponent implementation.
    */
-  struct CS_CSTOOL_EXPORT eiComponent : public iComponent
+  struct CS_CRYSTALSPACE_EXPORT eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE (csMeshType);
     virtual bool Initialize (iObjectRegistry* p)

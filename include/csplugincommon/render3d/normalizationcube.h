@@ -25,7 +25,7 @@
 #include "csgfx/shadervar.h"
 #include "ivideo/txtmgr.h"
 
-class CS_CSPLUGINCOMMON_EXPORT csNormalizationCubeAccessor : public iShaderVariableAccessor
+class CS_CRYSTALSPACE_EXPORT csNormalizationCubeAccessor : public iShaderVariableAccessor
 {
   void FillNormalizationMapSide (unsigned char *normdata, int size,
     int xx, int xy, int xo,

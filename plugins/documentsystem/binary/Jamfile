@@ -5,4 +5,4 @@ Description bindoc : "binary document system" ;
 Plugin bindoc
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith bindoc : cstool csutil ;
+LinkWith bindoc : crystalspace ;

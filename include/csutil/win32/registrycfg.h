@@ -43,7 +43,7 @@ class csWin32RegistryIterator;
  *  header file should be surrounded by appropriate `#if defined(CS_PLATFORM_WIN32) ... 
  *  #endif' statements.
  */
-class CS_CSUTIL_EXPORT csWin32RegistryConfig : public iConfigFile
+class CS_CRYSTALSPACE_EXPORT csWin32RegistryConfig : public iConfigFile
 {
 private:
   friend class csWin32RegistryIterator;
@@ -157,7 +157,7 @@ public:
  *  header file should be surrounded by appropriate `#if defined(CS_PLATFORM_WIN32) ... 
  *  #endif' statements.
  */
-class CS_CSUTIL_EXPORT csWin32RegistryIterator : public iConfigIterator
+class CS_CRYSTALSPACE_EXPORT csWin32RegistryIterator : public iConfigIterator
 {
   csRef<csWin32RegistryConfig> owner;
 

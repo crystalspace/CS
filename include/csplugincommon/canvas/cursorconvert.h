@@ -38,7 +38,7 @@ class csImageMemory;
  * Helper class to convert images into data formats suitable for
  * mouse cursor creation on various platforms and toolkits.
  */
-class CS_CSPLUGINCOMMON_EXPORT csCursorConverter
+class CS_CRYSTALSPACE_EXPORT csCursorConverter
 {
   static bool InternalConvertTo1bpp (iImage* image, 
     csColorQuantizer& quantizer, uint8*& bitmap, uint8*& mask,

@@ -5,6 +5,6 @@ Description exploldr : "Explosion mesh object loader" ;
 Plugin exploldr
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith exploldr : csgeom csutil ;
+LinkWith exploldr : crystalspace ;
 
 CompileGroups exploldr :  meshes ;

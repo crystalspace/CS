@@ -34,7 +34,7 @@ class csGenerateImageTexture;
  * A base class which represents a value that can be computed
  * for blending purposes for each pixel.
  */
-class CS_CSTOOL_EXPORT csGenerateImageValue
+class CS_CRYSTALSPACE_EXPORT csGenerateImageValue
 {
 public:
   /// delete it
@@ -47,7 +47,7 @@ public:
  * A base class which represents a texture that can be displayed
  * on the terrain. It has a colour for each pixel
  */
-class CS_CSTOOL_EXPORT csGenerateImageTexture
+class CS_CRYSTALSPACE_EXPORT csGenerateImageTexture
 {
 public:
   /// delete it
@@ -67,7 +67,7 @@ public:
  * pixel the base textures are blended together, based on the
  * height.
 */
-class CS_CSTOOL_EXPORT csGenerateImage
+class CS_CRYSTALSPACE_EXPORT csGenerateImage
 {
 private:
   /// the texture to show
@@ -100,7 +100,7 @@ public:
  * This class is used to store the layers of textures per value. Used in the
  * Blend class.
  */
-class CS_CSTOOL_EXPORT csGenerateImageLayer
+class CS_CRYSTALSPACE_EXPORT csGenerateImageLayer
 {
 public:
   /// the value where this texture should show
@@ -114,7 +114,7 @@ public:
 /**
  * A class for a solid coloured texture.
  */
-class CS_CSTOOL_EXPORT csGenerateImageTextureSolid : 
+class CS_CRYSTALSPACE_EXPORT csGenerateImageTextureSolid : 
   public csGenerateImageTexture
 {
 public:
@@ -129,7 +129,7 @@ public:
 /**
  * A class for a single texture.
  */
-class CS_CSTOOL_EXPORT csGenerateImageTextureSingle : 
+class CS_CRYSTALSPACE_EXPORT csGenerateImageTextureSingle : 
   public csGenerateImageTexture
 {
 public:
@@ -156,7 +156,7 @@ public:
  * a class for a texture that is made by blending together other textures
  * based on a value. It has a set of layers to blend between.
  */
-class CS_CSTOOL_EXPORT csGenerateImageTextureBlend : 
+class CS_CRYSTALSPACE_EXPORT csGenerateImageTextureBlend : 
   public csGenerateImageTexture
 {
 public:
@@ -191,7 +191,7 @@ struct iGenerateImageFunction : public iBase
  * This class will generate a value using a given function. For heights
  * or slopes.
  */
-class CS_CSTOOL_EXPORT csGenerateImageValueFunc : public csGenerateImageValue
+class CS_CRYSTALSPACE_EXPORT csGenerateImageValueFunc : public csGenerateImageValue
 {
 private:
   /// Height or slope function.
@@ -218,7 +218,7 @@ public:
 /**
  * This class will generate a constant value.
  */
-class CS_CSTOOL_EXPORT csGenerateImageValueFuncConst : 
+class CS_CRYSTALSPACE_EXPORT csGenerateImageValueFuncConst : 
   public csGenerateImageValue
 {
 public:
@@ -232,7 +232,7 @@ public:
  * This class will generate a value using a texture. The average of the
  * rgb values will be returned.
  */
-class CS_CSTOOL_EXPORT csGenerateImageValueFuncTex : 
+class CS_CRYSTALSPACE_EXPORT csGenerateImageValueFuncTex : 
   public csGenerateImageValue
 {
 public:

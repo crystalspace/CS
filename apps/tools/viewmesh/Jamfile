@@ -2,7 +2,7 @@ SubDir TOP apps tools viewmesh ;
 
 Description viewmesh : "mesh viewing utility" ;
 Application viewmesh : [ Wildcard *.cpp *.h ] ;
-LinkWith viewmesh : csgeom csgfx cstool csutil ;
+LinkWith viewmesh : crystalspace ;
 MsvcCFlags viewmesh : "/D CS_HAVE_CAL3D" ;
 if $(CAL3D.AVAILABLE) = yes
 {

@@ -69,7 +69,7 @@ class csBackground;
  * If you need to query some data from the application (e.g. some textures
  * and so on) you will have to overload the Initialize() virtual method.
  */
-class CS_CSWS_EXPORT csSkinSlice
+class CS_CRYSTALSPACE_EXPORT csSkinSlice
 {
 public:
   /// Destroy this skin slice
@@ -120,13 +120,13 @@ public:
 
 /*
   @@@ Hack:
-  When CS_CSWS_EXPORT is configured for exporting from a shared library,
+  When CS_CRYSTALSPACE_EXPORT is configured for exporting from a shared library,
   VC refuses to compile csSkin if it inherits from 
   csPDelArray<csSkinSlice>, as csSkinSlice contains abstract methods.
   Work around this by inheriting from csSkinSliceNonAbstr instead which
   has no abstract methods.
  */
-class CS_CSWS_EXPORT csSkinSliceNonAbstr : public csSkinSlice
+class CS_CRYSTALSPACE_EXPORT csSkinSliceNonAbstr : public csSkinSlice
 {
 public:
   virtual const char *GetName () const { return 0; };
@@ -159,7 +159,7 @@ public:
  * component (note that this does NOT have to do anything with class
  * hierarchy!) will receive the cscmdSkinChanged broadcast.
  */
-class CS_CSWS_EXPORT csSkin : public csPDelArray<csSkinSliceNonAbstr>
+class CS_CRYSTALSPACE_EXPORT csSkin : public csPDelArray<csSkinSliceNonAbstr>
 {
   /// The application
   csApp *app;
@@ -210,7 +210,7 @@ private:
  * Every skin slice that is meant for buttons should inherit
  * from this interface.
  */
-class CS_CSWS_EXPORT csButtonSkin : public csSkinSlice
+class CS_CRYSTALSPACE_EXPORT csButtonSkin : public csSkinSlice
 {
 public:
   /// Get the identifier of the component this skin slice is for
@@ -226,7 +226,7 @@ public:
  * Every skin slice that is meant for windows should inherit
  * from this interface.
  */
-class CS_CSWS_EXPORT csWindowSkin : public csSkinSlice
+class CS_CRYSTALSPACE_EXPORT csWindowSkin : public csSkinSlice
 {
 public:
   /// Get the identifier of the component this skin slice is for
@@ -251,7 +251,7 @@ public:
  * Every skin slice that is meant for dialogs should inherit
  * from this interface.
  */
-class CS_CSWS_EXPORT csDialogSkin : public csSkinSlice
+class CS_CRYSTALSPACE_EXPORT csDialogSkin : public csSkinSlice
 {
 public:
   /// Get the identifier of the component this skin slice is for
@@ -267,7 +267,7 @@ public:
  * Every skin slice that is meant for title bars should inherit
  * from this interface.
  */
-class CS_CSWS_EXPORT csTitlebarSkin : public csSkinSlice
+class CS_CRYSTALSPACE_EXPORT csTitlebarSkin : public csSkinSlice
 {
 public:
   /// Get the identifier of the component this skin slice is for
@@ -280,7 +280,7 @@ public:
  * Every skin slice that is meant for listboxes should inherit
  * from this interface.
  */
-class CS_CSWS_EXPORT csListBoxSkin : public csSkinSlice
+class CS_CRYSTALSPACE_EXPORT csListBoxSkin : public csSkinSlice
 {
 public:
   /// Get the identifier of the component this skin slice is for
@@ -296,7 +296,7 @@ public:
  * Every skin slice that is meant for listboxe items should inherit
  * from this interface.
  */
-class CS_CSWS_EXPORT csListBoxItemSkin : public csSkinSlice
+class CS_CRYSTALSPACE_EXPORT csListBoxItemSkin : public csSkinSlice
 {
 public:
   /// Get the identifier of the component this skin slice is for
@@ -310,7 +310,7 @@ public:
  * Every skin slice that is meant for scrollbars should inherit
  * from this interface.
  */
-class CS_CSWS_EXPORT csScrollBarSkin : public csSkinSlice
+class CS_CRYSTALSPACE_EXPORT csScrollBarSkin : public csSkinSlice
 {
 public:
   /// Get the identifier of the component this skin slice is for

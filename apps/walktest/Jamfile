@@ -2,7 +2,7 @@ SubDir TOP apps walktest ;
 
 Description walktest : "WalkTest demo" ;
 Application walktest : [ Wildcard *.cpp *.h ] ;
-LinkWith walktest : csgeom csgfx cstool csutil ;
+LinkWith walktest : crystalspace ;
 
 # Some external projects use gcc's -ansi and -pedantic options. We need to
 # ensure that CS's public headers are usable when these options are enabled,
@@ -65,6 +65,6 @@ Application walktest_static : [ Wildcard *.cpp *.h ] :
   independent noinstall nohelp ;
 CFlags walktest_static : [ FDefines CS_STATIC_LINKED ] : nostatic ;
 MsvcDefine walktest_static : CS_STATIC_LINKED ;
-LinkWith walktest_static : csgeom csgfx cstool csutil ;
+LinkWith walktest_static : crystalspace ;
 LinkStaticPlugins walktest_static : $(STATIC.PLUGINLIST) ;
 SubVariant ;

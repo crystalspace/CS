@@ -53,7 +53,7 @@ struct csFileTime;
  * <li>Doesn't like files >4GB.
  * </ul>
  */
-class CS_CSUTIL_EXPORT csArchive
+class CS_CRYSTALSPACE_EXPORT csArchive
 {
 public:
   static char hdr_central[4];
@@ -87,7 +87,7 @@ private:
   friend class ArchiveEntry;
 
   /// A vector of ArchiveEntries
-  class CS_CSUTIL_EXPORT ArchiveEntryVector : public csPDelArray<ArchiveEntry>
+  class CS_CRYSTALSPACE_EXPORT ArchiveEntryVector : public csPDelArray<ArchiveEntry>
   {
   public:
     ArchiveEntryVector () : csPDelArray<ArchiveEntry> (256, 256) {}

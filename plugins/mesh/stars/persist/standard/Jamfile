@@ -5,7 +5,7 @@ Description starldr : "Star mesh object loader" ;
 Plugin starldr
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith starldr : csgeom csutil ;
+LinkWith starldr : crystalspace ;
 
 CompileGroups starldr :  meshes ;
 

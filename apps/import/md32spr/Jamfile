@@ -6,4 +6,4 @@ Application md32spr
 	: [ Wildcard *.cpp *.h ]
 	: console
 ;
-LinkWith md32spr : csgeom csgfx cstool csutil ;
+LinkWith md32spr : crystalspace ;

@@ -1,4 +1,4 @@
-@node SCF, csGeom, csUtil, Libraries
+@node SCF, csGeom, csUtil, Facilities
 @section Shared Class Facility (@sc{scf})
 @cindex @sc{scf}, Shared Class Facility
 @cindex Shared Class Facility (@sc{scf})
@@ -34,7 +34,7 @@ interested in exposing @sc{scf} in gory detail.  There is also a @sc{howto}
 which explains how to make using @sc{scf} interfaces easier by using smart
 pointers (@pxref{HOWTO Smart Pointers}).
 
-The @sc{scf} implementation is resides within the @file{csutil} library.
+The @sc{scf} implementation is resides within the @file{CS/libs/csutil} module.
 
 @menu
 * SCF Explained:: How it Works
@@ -186,12 +186,7 @@ functions which hide these ugly implementation details from end-user.
 
 The only include header file you need to include to utilize @sc{scf}
 functionality is @file{scf.h}.  It contains a number of macros and functions
-that you will need for easier use of @sc{scf}.  If you plan to use @sc{scf} in
-your own project without utilizing Crystal Space, you will also need to include
-@file{scf.cpp} in your main application, and @file{scfimp.cpp} in both your
-main application and each plugin module.  However, projects based upon Crystal
-Space can simply link with the @file{csutil} library which contains the
-@sc{scf} implementation.
+that you will need for easier use of @sc{scf}.
 
 Much basic functionality of @sc{scf} is provided by a central object.  It can
 be accessed as @samp{iSCF::SCF} and is of type @samp{iSCF*} (which is also a

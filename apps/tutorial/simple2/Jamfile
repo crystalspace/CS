@@ -2,4 +2,4 @@ SubDir TOP apps tutorial simple2 ;
 
 Description simple2 : "tutorial part two, sprite" ;
 Application simple2 : [ Wildcard *.cpp *.h ] : noinstall ;
-LinkWith simple2 : csgeom csgfx cstool csutil ;
+LinkWith simple2 : crystalspace ;

@@ -71,7 +71,7 @@ CFLAGS.I = -I
 #------
 CFLAGS := $(shell cs-config --cflags)
 CXXFLAGS := $(shell cs-config --cxxflags)
-LINKFLAGS := $(shell cs-config --libs cstool csgfx csgeom csutil)
+LINKFLAGS := $(shell cs-config --libs)
 
 DO.SHARED.PLUGIN.CORE=$(LINK) $(LFLAGS.DLL) -o $@ $^ $(PLUGIN.POSTFLAGS)
 DO.PLUGIN = \

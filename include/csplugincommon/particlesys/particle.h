@@ -62,7 +62,7 @@ const int CS_PARTICLE_ALIGN_Y           = 512;
  * be disabled, enabled with global values and enabled with per-particle
  * values.
  */
-class CS_CSPLUGINCOMMON_EXPORT csNewParticleSystem : public csMeshObject
+class CS_CRYSTALSPACE_EXPORT csNewParticleSystem : public csMeshObject
 {
 protected:
   /// the mesh factory (should be an empty frame)

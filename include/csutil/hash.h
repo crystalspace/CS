@@ -32,7 +32,7 @@
  * Note that these keys are non-unique; some dissimilar strings may generate
  * the same key. For unique keys, see csStringSet.
  */
-CS_CSUTIL_EXPORT unsigned int csHashCompute (char const*);
+CS_CRYSTALSPACE_EXPORT unsigned int csHashCompute (char const*);
 
 /**
  * Compute a hash key for a string of a given length.
@@ -40,7 +40,7 @@ CS_CSUTIL_EXPORT unsigned int csHashCompute (char const*);
  * Note that these keys are non-unique; some dissimilar strings may generate
  * the same key. For unique keys, see csStringSet.
  */
-CS_CSUTIL_EXPORT unsigned int csHashCompute (char const*, size_t length);
+CS_CRYSTALSPACE_EXPORT unsigned int csHashCompute (char const*, size_t length);
 
 /**
  * A hash key handler for integral types and types that can be casted to such.
