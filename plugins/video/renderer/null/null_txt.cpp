@@ -24,7 +24,7 @@
 #include "csgfxldr/inv_cmap.h"
 #include "csgfxldr/quantize.h"
 #include "csutil/scanstr.h"
-#include "csutil/inifile.h"
+#include "icfgnew.h"
 #include "ievent.h"
 #include "isystem.h"
 #include "iimage.h"
@@ -262,7 +262,7 @@ void csTextureHandleNull::Prepare ()
 //----------------------------------------------- csTextureManagerNull ---//
 
 csTextureManagerNull::csTextureManagerNull (iSystem *iSys,
-  iGraphics2D *iG2D, iConfigFile *config) : csTextureManager (iSys, iG2D)
+  iGraphics2D *iG2D, iConfigFileNew *config) : csTextureManager (iSys, iG2D)
 {
   ResetPalette ();
   read_config (config);
@@ -287,11 +287,11 @@ void csTextureManagerNull::SetPixelFormat (csPixelFormat &PixelFormat)
     GlobalCMap = new uint16 [256];
 }
 
-void csTextureManagerNull::read_config (iConfigFile *config)
+void csTextureManagerNull::read_config (iConfigFileNew *config)
 {
   csTextureManager::read_config (config);
-  prefered_dist = config->GetInt ("TextureManager", "RGB_DIST", PREFERED_DIST);
-  uniform_bias = config->GetInt ("TextureManager", "UNIFORM_BIAS", 75);
+  prefered_dist = config->GetInt ("Video.Null.TextureManager.RGBDist", PREFERED_DIST);
+  uniform_bias = config->GetInt ("Video.Null.TextureManager.UniformBias", 75);
   if (uniform_bias > 100) uniform_bias = 100;
 }
 

@@ -24,7 +24,7 @@
 #include "protex3d.h"
 #include "isystem.h"
 #include "igraph2d.h"
-#include "icfgfile.h"
+#include "icfgnew.h"
 
 IMPLEMENT_FACTORY (csGraphics3DSoftware)
 IMPLEMENT_FACTORY (csSoftProcTexture3D)
@@ -66,7 +66,7 @@ bool csGraphics3DSoftware::Initialize (iSystem *iSys)
 
   const char *driver = iSys->GetOptionCL ("canvas");
   if (!driver)
-    driver = config->GetStr ("Hardware", "Canvas", SOFTWARE_2D_DRIVER);
+    driver = config->GetStr ("Video.Software.Canvas", SOFTWARE_2D_DRIVER);
 
   G2D = LOAD_PLUGIN (System, driver, NULL, iGraphics2D);
 

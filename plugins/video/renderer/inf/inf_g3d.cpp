@@ -25,7 +25,7 @@
 #include "csgeom/polyclip.h"
 #include "video/renderer/inf/inf_g3d.h"
 #include "video/renderer/inf/inf_txt.h"
-#include "csutil/inifile.h"
+#include "icfgnew.h"
 #include "ipolygon.h"
 #include "isystem.h"
 #include "igraph2d.h"
@@ -100,7 +100,7 @@ bool csGraphics3DInfinite::Initialize (iSystem *iSys)
 {
   System = iSys;
 
-  config = System->CreateConfig ("/config/inf3d.cfg");
+  config = System->CreateConfigNew ("/config/inf3d.cfg");
   if (!config)
     return false;
 

@@ -24,7 +24,7 @@
 #include "csgfxldr/inv_cmap.h"
 #include "csgfxldr/quantize.h"
 #include "csutil/scanstr.h"
-#include "csutil/inifile.h"
+#include "icfgnew.h"
 #include "ievent.h"
 #include "isystem.h"
 #include "iimage.h"
@@ -248,7 +248,7 @@ static UByte *GenLightmapTable (int bits)
 }
 
 csTextureManagerLine::csTextureManagerLine (iSystem *iSys,
-  iGraphics2D *iG2D, iConfigFile *config) : csTextureManager (iSys, iG2D)
+  iGraphics2D *iG2D, iConfigFileNew *config) : csTextureManager (iSys, iG2D)
 {
   alpha_tables = NULL;
   ResetPalette ();
@@ -279,11 +279,11 @@ void csTextureManagerLine::SetPixelFormat (csPixelFormat &PixelFormat)
     lightmap_tables [2] = GenLightmapTable (pfmt.BlueBits);
 }
 
-void csTextureManagerLine::read_config (iConfigFile *config)
+void csTextureManagerLine::read_config (iConfigFileNew *config)
 {
   csTextureManager::read_config (config);
-  prefered_dist = config->GetInt ("TextureManager", "RGB_DIST", PREFERED_DIST);
-  uniform_bias = config->GetInt ("TextureManager", "UNIFORM_BIAS", 75);
+  prefered_dist = config->GetInt ("Video.Line.TextureManager.RGBDist", PREFERED_DIST);
+  uniform_bias = config->GetInt ("Video.Line.TextureManager.UniformBias", 75);
   if (uniform_bias > 100) uniform_bias = 100;
 }
 

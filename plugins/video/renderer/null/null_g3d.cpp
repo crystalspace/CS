@@ -23,7 +23,7 @@
 #include "qint.h"
 #include "null_g3d.h"
 #include "null_txt.h"
-#include "csutil/inifile.h"
+#include "icfgnew.h"
 #include "ipolygon.h"
 #include "isystem.h"
 #include "igraph2d.h"
@@ -75,14 +75,14 @@ bool csGraphics3DNull::Initialize (iSystem *iSys)
 {
   System = iSys;
 
-  config = System->CreateConfig ("/config/null3d.cfg");
+  config = System->CreateConfigNew ("/config/null3d.cfg");
   if (!config) return false;
 
   width = height = -1;
 
   const char *driver = iSys->GetOptionCL ("canvas");
   if (!driver)
-    driver = config->GetStr ("Hardware", "Canvas", SOFTWARE_2D_DRIVER);
+    driver = config->GetStr ("Video.Null.Canvas", SOFTWARE_2D_DRIVER);
 
   G2D = LOAD_PLUGIN (System, driver, NULL, iGraphics2D);
   if (!G2D)

@@ -27,7 +27,7 @@
 #include "ievent.h"
 #include "isystem.h"
 #include "iimage.h"
-#include "icfgfile.h"
+#include "icfgnew.h"
 #include "qint.h"
 #include "protex3d.h"
 
@@ -434,7 +434,7 @@ static UByte *GenLightmapTable (int bits)
 }
 
 csTextureManagerSoftware::csTextureManagerSoftware (iSystem *iSys,
-  csGraphics3DSoftwareCommon *iG3D, iConfigFile *config) 
+  csGraphics3DSoftwareCommon *iG3D, iConfigFileNew *config) 
   : csTextureManager (iSys, iG3D->GetDriver2D())
 {
   alpha_tables = NULL;
@@ -492,13 +492,16 @@ void csTextureManagerSoftware::SetPixelFormat (csPixelFormat &PixelFormat)
     Scan.GlobalCMap = new uint16 [256];
 }
 
-void csTextureManagerSoftware::read_config (iConfigFile *config)
+void csTextureManagerSoftware::read_config (iConfigFileNew *config)
 {
   csTextureManager::read_config (config);
-  prefered_dist = config->GetInt ("TextureManager", "RGB_DIST", PREFERED_DIST);
-  uniform_bias = config->GetInt ("TextureManager", "UNIFORM_BIAS", 75);
+  prefered_dist = config->GetInt
+        ("Video.Software.TextureManager.RGBDist", PREFERED_DIST);
+  uniform_bias = config->GetInt
+        ("Video.Software.TextureManager.UniformBias", 75);
   if (uniform_bias > 100) uniform_bias = 100;
-  dither_textures = config->GetYesNo ("TextureManager", "DITHER_TEXTURES", true);
+  dither_textures = config->GetBool
+        ("Video.Software.TextureManager.DitherTextures", true);
 }
 
 csTextureManagerSoftware::~csTextureManagerSoftware ()

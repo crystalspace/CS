@@ -33,7 +33,7 @@
 #include "d3d_txtcache.h"
 #include "video/canvas/ddraw61/IG2D.h"
 #include "cssys/win32/iDDetect.h"
-#include "csutil/inifile.h"
+#include "icfgnew.h"
 #include "csgeom/polyclip.h"
 #include "qint.h"
 #include "isystem.h"
@@ -275,7 +275,7 @@ bool csGraphics3DDirect3DDx6::Initialize (iSystem *iSys)
   m_piSystem = iSys;
   m_piSystem->IncRef ();
 
-  config = m_piSystem->CreateConfig ("/config/direct3ddx6.cfg");
+  config = m_piSystem->CreateConfigNew ("/config/direct3ddx6.cfg");
   if (!config)
     return false;
 
@@ -285,11 +285,11 @@ bool csGraphics3DDirect3DDx6::Initialize (iSystem *iSys)
 
   txtmgr = new csTextureManagerDirect3D (m_piSystem, m_piG2D, config, this);
 
-  m_bVerbose = config->GetYesNo("Direct3DDX6", "VERBOSE", false);
+  m_bVerbose = config->GetBool("Video.Direct3D61.Verbose", false);
 
-  use16BitTexture = config->GetYesNo("Direct3DDX6","USE_16BIT_TEXTURE", false);
+  use16BitTexture = config->GetBool("Video.Direct3D61.Use16BitTexture", false);
   if (use16BitTexture)
-    use32BitTexture = config->GetYesNo("Direct3DDX6","EXTEND_32BIT_TEXTURE", false);  
+    use32BitTexture = config->GetBool("Video.Direct3D61.Extend32BitTexture", false);  
 
   return true;
 }
@@ -573,7 +573,8 @@ bool csGraphics3DDirect3DDx6::Open (const char* Title)
   }
 
   // select type of lightmapping
-  if (m_pDirectDevice->GetAlphaBlend () && !config->GetYesNo ("Direct3DDX6","DISABLE_LIGHTMAP", false))
+  if (m_pDirectDevice->GetAlphaBlend () && !config->GetBool
+        ("Video.Direct3D61.DisableLightmap", false))
   {
     if (m_pDirectDevice->GetAlphaBlendType () == 1)
       m_iTypeLightmap = 1;
@@ -595,7 +596,7 @@ bool csGraphics3DDirect3DDx6::Open (const char* Title)
   }
   else
   {
-    if (config->GetYesNo ("Direct3DDX6", "DISABLE_LIGHTMAP", false))
+    if (config->GetBool ("Video.Direct3D61.DisableLightmap", false))
       m_piSystem->Printf (MSG_INITIALIZATION, "  WARNING : Lightmapping disabled by user.\n");
     else
       m_piSystem->Printf (MSG_INITIALIZATION, "  WARNING : Lightmapping not supported by hardware.\n");
@@ -603,7 +604,7 @@ bool csGraphics3DDirect3DDx6::Open (const char* Title)
   }
 
   // set Halo effect configuration
-  bool bHaloDisabled = config->GetYesNo ("Direct3DDX6","DISABLE_HALO", false);
+  bool bHaloDisabled = config->GetBool ("Video.Direct3D61.DisableHalo", false);
   m_bHaloEffect = m_pDirectDevice->GetAlphaBlendHalo () && !bHaloDisabled;
 
   if (m_bHaloEffect)
@@ -627,7 +628,7 @@ bool csGraphics3DDirect3DDx6::Open (const char* Title)
   }
 
   // set mipmapping configuration
-  bool bDisableMipmap = config->GetYesNo("Direct3DDX6","DISABLE_MIPMAP", false);
+  bool bDisableMipmap = config->GetBool("Video.Direct3D61.DisableMipmap", false);
   m_bMipmapping = m_pDirectDevice->GetMipmap () && bDisableMipmap;
   if (m_bMipmapping)
   {
@@ -708,7 +709,7 @@ bool csGraphics3DDirect3DDx6::Open (const char* Title)
       m_lpd3dDevice2->SetRenderState (D3DRENDERSTATE_TEXTUREMIN, D3DFILTER_LINEAR);
   }
   
-  if (config->GetYesNo ("Direct3DDX6","ENABLE_DITHER", true))
+  if (config->GetBool ("Video.Direct3D61.EnableDither", true))
     m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_DITHERENABLE, TRUE);
   else
     m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_DITHERENABLE, FALSE);

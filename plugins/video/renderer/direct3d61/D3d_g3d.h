@@ -171,7 +171,7 @@ class csGraphics3DDirect3DDx6 : public iGraphics3D
   bool m_bMipmapping;
 
   /// The private config file
-  iConfigFile *config;
+  iConfigFileNew *config;
 
   csStateCacheDirect3DDx6 m_States;
   csVertexCacheDirect3D m_VertexCache;

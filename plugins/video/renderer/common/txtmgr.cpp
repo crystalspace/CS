@@ -252,7 +252,7 @@ csTextureManager::~csTextureManager()
   Clear ();
 }
 
-void csTextureManager::read_config (iConfigFile* /*config*/)
+void csTextureManager::read_config (iConfigFileNew* /*config*/)
 {
 }
 

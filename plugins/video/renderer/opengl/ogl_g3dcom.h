@@ -214,7 +214,7 @@ public:
   iGraphics2D* G2D;
 
   /// The configuration file
-  iConfigFile* config;
+  iConfigFileNew* config;
 
   /// The System interface. 
   iSystem* System;

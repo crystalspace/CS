@@ -105,7 +105,7 @@ private:
 
 public:
   ///
-  csTextureManagerInfinite (iSystem *iSys, iGraphics2D *iG2D, iConfigFile *config);
+  csTextureManagerInfinite (iSystem *iSys, iGraphics2D *iG2D, iConfigFileNew *config);
   ///
   virtual ~csTextureManagerInfinite () { Clear (); }
 

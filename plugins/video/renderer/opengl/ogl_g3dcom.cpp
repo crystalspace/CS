@@ -31,7 +31,7 @@
 #include "ogl_g3dcom.h"
 #include "ogl_txtcache.h"
 #include "ogl_txtmgr.h"
-#include "csutil/inifile.h"
+#include "icfgnew.h"
 #include "isystem.h"
 #include "igraph3d.h"
 #include "itxtmgr.h"
@@ -215,13 +215,13 @@ bool csGraphics3DOGLCommon::NewInitialize (iSystem * iSys)
 {
   (System = iSys)->IncRef ();
 
-  config = System->CreateConfig ("/config/opengl.cfg");
+  config = System->CreateConfigNew ("/config/opengl.cfg");
   if (!config)
     return false;
 
   const char *driver = iSys->GetOptionCL ("canvas");
   if (!driver)
-    driver = config->GetStr ("Display", "Canvas", OPENGL_2D_DRIVER);
+    driver = config->GetStr ("Video.OpenGL.Canvas", OPENGL_2D_DRIVER);
 
   G2D = LOAD_PLUGIN (System, driver, NULL, iGraphics2D);
   if (!G2D)
@@ -229,7 +229,7 @@ bool csGraphics3DOGLCommon::NewInitialize (iSystem * iSys)
 
   txtmgr = new csTextureManagerOpenGL (System, G2D, config, this);
 
-  m_renderstate.dither = config->GetYesNo ("OpenGL", "ENABLE_DITHER", false);
+  m_renderstate.dither = config->GetBool ("Video.OpenGL.EnableDither", false);
   z_buf_mode = CS_ZBUF_NONE;
   width = height = -1;
 
@@ -286,12 +286,13 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
   else
     glDisable (GL_DITHER);
 
-  if (config->GetYesNo ("OpenGL", "HINT_PERSPECTIVE_FAST", false))
+  if (config->GetBool ("Video.OpenGL.HintPerspectiveFast", false))
     glHint (GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
   else
     glHint (GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
-  m_config_options.do_extra_bright = config->GetYesNo ("OpenGL", "EXTRA_BRIGHT", false);
+  m_config_options.do_extra_bright = config->GetBool
+        ("Video.OpenGL.ExtraBright", false);
   // determine what blend mode to use when combining lightmaps with
   // their  underlying textures.  This mode is set in the Opengl
   // configuration  file
@@ -310,7 +311,8 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
   };
 
   // try to match user's blend name with a name in the blendstyles table
-  const char *lightmapstyle = config->GetStr("OpenGL", "LIGHTMAP_MODE","multiplydouble");
+  const char *lightmapstyle = config->GetStr
+        ("Video.OpenGL.LightmapMode","multiplydouble");
   int blendstyleindex = 0;
   while (blendstyles[blendstyleindex].blendstylename != NULL)
   {
@@ -387,7 +389,8 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
   int max_cache_size = 1024*1024*16; // 32mb combined cache
   texture_cache = new OpenGLTextureCache (max_cache_size, 24);
   lightmap_cache = new OpenGLLightmapCache (max_cache_size, 24);
-  texture_cache->SetBilinearMapping (config->GetYesNo ("OpenGL", "ENABLE_BILINEARMAP", true));
+  texture_cache->SetBilinearMapping (config->GetBool
+        ("Video.OpenGL.EnableBilinearMap", true));
 
   GLenum errtest;
   errtest = glGetError ();

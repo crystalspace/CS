@@ -34,7 +34,7 @@
 #include "igraph2d.h"
 #include "ilghtmap.h"
 #include "sft3dcom.h"
-#include "icfgfile.h"
+#include "icfgnew.h"
 
 #if defined (DO_MMX)
 #  include "video/renderer/software/i386/cpuid.h"
@@ -201,19 +201,19 @@ csGraphics3DSoftwareCommon::~csGraphics3DSoftwareCommon ()
 
 void csGraphics3DSoftwareCommon::NewInitialize ()
 {
-  config = System->CreateConfig ("/config/soft3d.cfg");
-  do_smaller_rendering = config->GetYesNo ("Hardware", "SMALLER", false);
-  mipmap_coef = config->GetFloat ("TextureManager", "MIPMAP_COEF", 1.3);
-  do_interlaced = config->GetYesNo ("Hardware", "INTERLACING", false) ? 0 : -1;
+  config = System->CreateConfigNew ("/config/soft3d.cfg");
+  do_smaller_rendering = config->GetBool ("Video.Software.Smaller", false);
+  mipmap_coef = config->GetFloat ("Video.Software.TextureManager.MipmapCoef", 1.3);
+  do_interlaced = config->GetBool ("Video.Software.Interlacing", false) ? 0 : -1;
 
   const char *gamma = System->GetOptionCL ("gamma");
-  if (!gamma) gamma = config->GetStr ("Hardware", "GAMMA", "1");
+  if (!gamma) gamma = config->GetStr ("Video.Software.Gamma", "1");
   float fGamma;
   sscanf (gamma, "%f", &fGamma);
   Gamma = QInt16 (fGamma);
 
 #ifdef DO_MMX
-  do_mmx = config->GetYesNo ("Hardware", "MMX", true);
+  do_mmx = config->GetBool ("Video.Software.MMX", true);
 #endif
 }
 
@@ -303,7 +303,8 @@ bool csGraphics3DSoftwareCommon::NewOpen ()
   texman->SetPixelFormat (pfmt);
 
   tcache = new csTextureCacheSoftware (texman);
-  const char *cache_size = config->GetStr ("TextureManager", "CACHE", NULL);
+  const char *cache_size = config->GetStr
+        ("Video.Software.TextureManager.Cache", NULL);
   int csize = DEFAULT_CACHE_SIZE;
   if (cache_size)
   {

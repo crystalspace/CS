@@ -26,7 +26,7 @@
 #include "csgeom/polyclip.h"
 #include "video/renderer/line/line_g3d.h"
 #include "video/renderer/line/line_txt.h"
-#include "csutil/inifile.h"
+#include "icfgnew.h"
 #include "ipolygon.h"
 #include "isystem.h"
 #include "igraph2d.h"
@@ -96,13 +96,13 @@ bool csGraphics3DLine::Initialize (iSystem *iSys)
 {
   System = iSys;
 
-  config = System->CreateConfig ("/config/line3d.cfg");
+  config = System->CreateConfigNew ("/config/line3d.cfg");
 
   width = height = -1;
 
   const char *driver = iSys->GetOptionCL ("canvas");
   if (!driver)
-    driver = config->GetStr ("Hardware", "Canvas", LINE_SOFTWARE_2D_DRIVER);
+    driver = config->GetStr ("Video.Line.Canvas", LINE_SOFTWARE_2D_DRIVER);
 
   G2D = LOAD_PLUGIN (System, driver, NULL, iGraphics2D);
   if (!G2D)

@@ -32,7 +32,7 @@
 
 class csClipper;
 class csTextureCacheSoftware;
-struct iConfigFile;
+struct iConfigFileNew;
 
 // Maximum number of fog tables in indexed (8-bit) modes.  This is maximum
 // number of instantly visible fogs without noticeable slowdowns.
@@ -191,7 +191,7 @@ public:
   iGraphics2D* G2D;
 
   /// The configuration file
-  iConfigFile* config;
+  iConfigFileNew* config;
 
   /// The texture manager.
   csTextureManagerSoftware* texman;

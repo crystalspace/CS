@@ -30,7 +30,7 @@
 class csTexture;
 class csTextureManager;
 struct iImage;
-struct iConfigFile;
+struct iConfigFileNew;
 
 /**
  * This class is the top-level representation of a texture.
@@ -313,7 +313,7 @@ protected:
   bool verbose;
 
   /// Read configuration values from config file.
-  virtual void read_config (iConfigFile *config);
+  virtual void read_config (iConfigFileNew *config);
 
 public:
   /// Pixel format.
