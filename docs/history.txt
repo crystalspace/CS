@@ -11,8 +11,13 @@ chronological order.
 	  jamcompatibility.jam since it is missing in Jam 2.4 but is needed by
 	  the overridden SubDir rule in jamcompatibility.jam and by other
 	  custom rules we define.
-        - Philip Wyett elimenated gcc compiler warnings in brute.cpp inorder
-          to have a look at the state of play within this plugin.
+        - Philip Wyett eliminated gcc compiler warnings in brute.cpp.
+	- Eric Sunshine made the following changes to 'jamtemplate':
+	    - Added 'msvcgen' support.
+	    - Added --without-cs option to synthesized configure.ac so that
+	      routine maintenance tasks (such as MSVC project generation) can
+	      be accomplished without having CS installed.
+	    - Upgraded build instructions in generated README.
 14-May-2004
 	- Eric Sunshine worked around VS.NET warning C4345 in blockallocator.h.
 	- Eric Sunshine augmented the Jam check in configure.ac so that it now

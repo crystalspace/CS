@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding = "Windows-1252"?>
+<VisualStudioProject
+	ProjectType="Visual C++"
+	Version="7.00"
+	Name="%project%"
+	SccProjectName=""
+	SccLocalPath="">
+	<Platforms>
+		<Platform
+			Name="Win32"/>
+	</Platforms>
+	<Configurations>
+		<Configuration
+			Name="Debug|Win32"
+			OutputDirectory=".\debug\temp\%project%"
+			IntermediateDirectory=".\debug\temp\%project%"
+			ConfigurationType="1"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				OptimizeForProcessor="1"
+				AdditionalOptions="%debugcflags%"
+				AdditionalIncludeDirectories="."
+				PreprocessorDefinitions="_DEBUG,WIN32,_CONSOLE,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_DEBUG,CS_STRICT_SMART_POINTERS;CS_USE_NEW_RENDERER"
+				MinimalRebuild="TRUE"
+				RuntimeLibrary="3"
+				RuntimeTypeInfo="TRUE"
+				PrecompiledHeaderFile=".\debug\temp\%project%/%project%.pch"
+				AssemblerListingLocation=".\debug\temp\%project%/"
+				ObjectFile=".\debug\temp\%project%/"
+				ProgramDataBaseFileName=".\debug\temp\%project%/%project%.pdb"
+				BrowseInformation="1"
+				WarningLevel="3"
+				SuppressStartupBanner="TRUE"
+				DebugInformationFormat="4"
+				CompileAs="0"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				IgnoreImportLibrary="TRUE"
+				AdditionalOptions="%debuglflags%"
+				AdditionalDependencies="%debuglibs%"
+				OutputFile="debug\temp\%project%\%target%"
+				LinkIncremental="2"
+				SuppressStartupBanner="TRUE"
+				AdditionalLibraryDirectories=""
+				IgnoreDefaultLibraryNames="LIBC"
+				GenerateDebugInformation="TRUE"
+				ProgramDatabaseFile=".\debug\temp\%project%/%project%.pdb"
+				SubSystem="1"
+				TargetMachine="1"/>
+			<Tool
+				Name="VCMIDLTool"
+				TypeLibraryName=".\debug\temp\%project%/%project%.tlb"/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="echo Moving output to CS root.
+copy &quot;$(TargetPath)&quot;  ..\..
+echo Moving output to MSVC Debug Bin.
+copy &quot;$(TargetPath)&quot;  debug\bin
+"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG,CS_DEBUG"
+				Culture="1033"
+				AdditionalIncludeDirectories=""/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
+		</Configuration>
+		<Configuration
+			Name="Release|Win32"
+			OutputDirectory=".\release\temp\%project%"
+			IntermediateDirectory=".\release\temp\%project%"
+			ConfigurationType="1"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="4"
+				GlobalOptimizations="TRUE"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="TRUE"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="TRUE"
+				OptimizeForProcessor="1"
+				AdditionalOptions="%cflags%"
+				AdditionalIncludeDirectories="."
+				PreprocessorDefinitions="NDEBUG,_WINDOWS,WIN32,_WINDOWS,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_STRICT_SMART_POINTERS;CS_USE_NEW_RENDERER"
+				RuntimeLibrary="2"
+				PrecompiledHeaderFile=".\release\temp\%project%/%project%.pch"
+				AssemblerListingLocation=".\release\temp\%project%/"
+				ObjectFile=".\release\temp\%project%/"
+				ProgramDataBaseFileName=".\release\temp\%project%/%project%.pdb"
+				WarningLevel="3"
+				SuppressStartupBanner="TRUE"
+				CompileAs="0"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="%lflags%"
+				AdditionalDependencies="%libs%"
+				OutputFile="release\temp\%project%\%target%"
+				LinkIncremental="1"
+				SuppressStartupBanner="TRUE"
+				AdditionalLibraryDirectories=""
+				IgnoreDefaultLibraryNames="LIBC"
+				ProgramDatabaseFile=".\release\temp\%project%/%project%.pdb"
+				SubSystem="2"
+				OptimizeReferences="1"
+				TargetMachine="1"/>
+			<Tool
+				Name="VCMIDLTool"
+				TypeLibraryName=".\release\temp\%project%/%project%.tlb"/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="echo Moving output to CS root.
+copy &quot;$(TargetPath)&quot;  ..\..
+echo Moving output to MSVC Release Bin.
+copy &quot;$(TargetPath)&quot;  release\bin
+"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="1033"
+				AdditionalIncludeDirectories=""/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
+		</Configuration>
+	</Configurations>
+	<Files>
+%groups%
+	</Files>
+	<Globals>
+	</Globals>
+</VisualStudioProject>

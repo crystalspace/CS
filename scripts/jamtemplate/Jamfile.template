@@ -22,4 +22,19 @@ Help distclean : "Remove built targets and configuration" ;
 Help maintainerclean :
     "Remove built targets, configuration, and generated files." ;
 
+MsvcGenSubDir TOP msvc : 6 ;
+MsvcGenSubDir TOP msvc : 7 ;
+MsvcGenTemplateDir TOP mk msvcgen template ;
+MsvcGenWorkspace #PROJECTNAME# ;
+
+MsvcGenConfig CRYSTAL.AVAILABLE : yes ;
+MsvcGenConfig CRYSTAL.CFLAGS ;
+MsvcGenConfig CRYSTAL.LFLAGS ;
+MsvcGenConfig CRYSTAL.LIBS : 
+  "libcstool.lib libcsgfx.lib libcsgeom.lib libcsutil.lib" ;
+MsvcGenConfig CRYSTAL.CFLAGS.DEBUG ;
+MsvcGenConfig CRYSTAL.LFLAGS.DEBUG ;
+MsvcGenConfig CRYSTAL.LIBS.DEBUG : 
+  "libcstool_d.lib libcsgfx_d.lib libcsgeom_d.lib libcsutil_d.lib" ;
+
 SubInclude TOP src ;

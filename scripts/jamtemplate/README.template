@@ -25,6 +25,10 @@ XXX Fill in some text
 
 2. Building and installing
 
+You can build the project on Unix, Msys/Mingw, and Cygwin using the Jam build
+tool. Microsoft Visual-C++ users can build the project using the project files
+in the #PROJECTNAME#/msvc directory.
+
 2.1 Jam
 
  The build system is based upon Jam rather than 'make'.  If you do not yet have
@@ -35,19 +39,26 @@ XXX Fill in some text
 
  You will need at least version 2.4.
 
-2.2 Building
+2.1.1 Building
 
  1. Go to the top-level directory in the project tree.
  2.  Run "./configure", possibly with some options, if you wish.  You can see a
     list of possible options by invoking configure with the "--help".
  3. Run "jam".
 
-2.3 Installing
+2.1.2 Installing
 
  1. Build the project.
  2. Ensure that you have write permissions to the install directories. On
     Unix/Linux this usually means that you need to be the 'root' user.
  3. Run "jam install".
+
+2.2 Microsoft Visual-C++
+
+ 1. Open the workspace file #PROJECTNAME#/msvc/wks#PROJECTNAME#.
+ 2. Set "grpall_#PROJECTNAME#" as the active project.
+ 3. Choose "Release" or "Debug" build mode.
+ 4. Build the project.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

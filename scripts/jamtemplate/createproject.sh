@@ -125,24 +125,38 @@ Instantiate()
 
 # create directories
 mkdir "$PROJECTNAME" || exit 2
-mkdir "$PROJECTNAME/mk" || exit 3
-mkdir "$PROJECTNAME/src" || exit 4
+mkdir "$PROJECTNAME/mk" || exit 2
+mkdir "$PROJECTNAME/mk/msvcgen" || exit 2
+mkdir "$PROJECTNAME/mk/msvcgen/template6" || exit 2
+mkdir "$PROJECTNAME/mk/msvcgen/template7" || exit 2
+mkdir "$PROJECTNAME/msvc" || exit 2
+mkdir "$PROJECTNAME/src" || exit 2
 
-# copy autoconf macros and jamrules
-cp -pr "$CSDIR/mk/autoconf" "$CSDIR/mk/jam" "$PROJECTNAME/mk"
-rm -rf "$PROJECTNAME/mk/autoconf/CVS" "$PROJECTNAME/mk/jam/CVS"
+# copy Autoconf, Jam, and msvcgen support files.
+cp -pr "$CSDIR/mk/autoconf" "$PROJECTNAME/mk"
+cp -pr "$CSDIR/mk/jam" "$PROJECTNAME/mk"
+cp -pr "$CSDIR/mk/msvcgen/msvcgen.pl" "$PROJECTNAME/mk/msvcgen"
+cp -pr "$TEMPLATEDIR/template6" "$PROJECTNAME/mk/msvcgen"
+cp -pr "$TEMPLATEDIR/template7" "$PROJECTNAME/mk/msvcgen"
 
-# copy templatefiles
-cp -p "$TEMPLATEDIR/autogen.template" "$PROJECTNAME/autogen.sh"
-chmod +x "$PROJECTNAME/autogen.sh"
+# instantiate template files
+Instantiate "$TEMPLATEDIR/autogen.template" "$PROJECTNAME/autogen.sh"
 Instantiate "$TEMPLATEDIR/configure.template" "$PROJECTNAME/configure.ac"
-Instantiate "$TEMPLATEDIR/README.template" "$PROJECTNAME/README"
+Instantiate "$TEMPLATEDIR/Jamfile.template" "$PROJECTNAME/Jamfile"
 Instantiate "$TEMPLATEDIR/Jamfile-src.template" "$PROJECTNAME/src/Jamfile"
+Instantiate "$TEMPLATEDIR/Jamrules.template" "$PROJECTNAME/Jamrules"
 Instantiate "$TEMPLATEDIR/main.template" "$PROJECTNAME/src/main.cpp"
-cp -p "$TEMPLATEDIR/Jamfile.template" "$PROJECTNAME/Jamfile"
-cp -p "$TEMPLATEDIR/Jamrules.template" "$PROJECTNAME/Jamrules"
+Instantiate "$TEMPLATEDIR/README.template" "$PROJECTNAME/README"
+Instantiate "$TEMPLATEDIR/README-msvc.template" "$PROJECTNAME/msvc/README"
+
 cp -p "$TEMPLATEDIR/initjamfile.m4" "$PROJECTNAME/mk/autoconf"
 cp -p "$TEMPLATEDIR/cs_check_host.m4" "$PROJECTNAME/mk/autoconf"
+
+chmod +x "$PROJECTNAME/autogen.sh"
+chmod +x "$PROJECTNAME/mk/msvcgen/msvcgen.pl"
+
+# remove CVS directories which may have been copied from the source location
+find "$PROJECTNAME" -type d -name CVS -exec rm -rf {} \; -prune
 
 echo "*Running: autoheader autoconf"
 cd "$PROJECTNAME"
