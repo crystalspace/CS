@@ -18,6 +18,14 @@ The history order is reversed so that new features are at the top.
 	- res enhanced bugplug with a command to send debug commands to
 	  arbitrary plugins. Syntax is: debugcmd <classID> <command>
 	- res fixed a spelling error in bugplug.
+	- duhprey did the following:
+	    - Softness generalization patch (soft_cfm contact is now handled 
+	      the same was as friction and elasticity)
+	    - Plane direction patches (invert A and C, as well as B)
+	      planes are not consistent and still need some work.
+	    - Revert the MeshSphere collider, those optimizations aren't 
+	      general.
+	    - Fix the collision callback to work when 1 body is static.
 2-Jul-2003
 	- Eric Sunshine fixed some spelling errors in the user manual pointed
 	  out by Vincent Knecht <vince@iefr.ath.cx>: existance -> existence
