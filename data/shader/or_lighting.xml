@@ -96,8 +96,7 @@
 			    <colorsource num="1" source="previous layer" modifier="color"/>
           <colorsource num="2" source="texture" modifier="alpha"/>
 			    <coloroperation operation="interpolate" />
-			    <alphasource num="0" source="texture" modifier="alpha"/>
-			    <alphasource num="1" source="previous layer" modifier="alpha"/>
+			    <alphasource num="0" source="previous layer" modifier="alpha"/>
 			    <alphaoperation operation="replace"/>
 			</layer>
           <?endif?>
@@ -117,7 +116,7 @@
 	<fp plugin="software" />
       </pass>
     </technique>
-    <technique priority="50">
+    <technique priority="500">
 	<pass>
 	  <buffer name="vertices" destination="position" />
 	  <buffer name="colors" destination="primary color" />
@@ -136,6 +135,30 @@
 	      <buffer name="vertices" destination="position" />
 	      <buffer name="lightmap coordinates" destination="texture coordinate 0" />
 	      <texture name="tex lightmap" destination="unit 0" />
+	  </pass>
+	<?endif?>
+	<?if vars."fog density".float &gt; 0 ?>
+	  <pass>
+	      <mixmode><alpha /></mixmode><!-- @@@ probably not always desired -->
+	      <zmode><zmesh2 /></zmode>
+	      <buffer name="vertices" destination="position" />
+		<texture name="standardtex fog" destination="unit 0" />
+	      <vp plugin="glfixed">
+		<fixedvp>
+      <texgen type="fog" layer="0"/>
+		  <constantcolor layer="0" type="shadervar">fog color</constantcolor>
+		</fixedvp>
+	      </vp>
+	      <fp plugin="glfixed">
+  	  <fixedfp>
+		      <layer>
+			  <colorsource num="0" source="constant color" modifier="color"/>
+			  <coloroperation operation="replace" />
+			  <alphasource num="0" source="texture" modifier="alpha"/>
+			  <alphaoperation operation="replace" />
+		      </layer>
+  	  </fixedfp>
+        </fp>
 	  </pass>
 	<?endif?>
     </technique>
