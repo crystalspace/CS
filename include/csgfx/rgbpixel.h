@@ -88,12 +88,6 @@ struct csRGBcolor
     (unsigned char)c.blue + blue); }
 } CS_STRUCT_ALIGN_4BYTE_END;
 
-// As an optimization, we sometimes handle R/G/B values simultaneously.
-#ifdef CS_BIG_ENDIAN
-#  define RGB_MASK 0xffffff00
-#else
-#  define RGB_MASK 0x00ffffff
-#endif
 
 /**
  * An RGB pixel. In addition to R,G,B color components this structure also
@@ -199,8 +193,6 @@ struct csRGBpixel
   }
 } CS_STRUCT_ALIGN_4BYTE_END;
 
-// We don't need RGB_MASK anymore
-#undef RGB_MASK
 
 /** \name Eye sensivity to different color components
  * Eye sensivity to different color components, from NTSC grayscale equation.
