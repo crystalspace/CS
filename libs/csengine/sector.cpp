@@ -761,7 +761,7 @@ void csSector::Draw (iRenderView *rview)
       r3d->SetShadowState (CS_SHADOW_VOLUME_FINISH);
     }
     
-
+    delete[] objects;
 #endif
   }
 
