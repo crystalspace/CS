@@ -57,8 +57,10 @@ else
   endif
   SRC.CSSYS += $(SRC.SYS_CSSYS_EXE)
 endif
+ifeq (,$(strip $(OBJ.CSSYS)))
 OBJ.CSSYS = $(addprefix $(OUT),$(notdir \
   $(subst .s,$O,$(subst .c,$O,$(SRC.CSSYS:.cpp=$O)))))
+endif
 
 TO_INSTALL.STATIC_LIBS += $(CSSYS.LIB)
 
