@@ -44,7 +44,6 @@ class InfiniteMaze;
 class HugeRoom;
 class csPolygonSet;
 struct iCollideSystem;
-
 struct iPerfStats;
 
 // Several map modes.
@@ -136,25 +135,24 @@ public:
   csCollider *body;
   csVector3 body_radius, legs_radius;
 
-  /// Vector with recorded camera transformations.
-  csRecordVector recording;
-
   /// A list with all busy entities.
   csEntityList busy_entities;
   /// A vector that is used to temporarily store references to busy entities.
   csVector busy_vector;
-
+  /// Plugin which calculates fps and records statistics
   iPerfStats *perf_stats;
+  /// Vector with recorded camera transformations and commands.
+  csRecordVector recording;
+  /// While playing/recording demos a secondary perfstats instance is used to
+  /// accumulate statistics.
+  char *recorded_perf_stats_name;
+  iPerfStats *recorded_perf_stats;
+  /// This frames current recorded cmd and arg
+  char *recorded_cmd;
+  char *recorded_arg;
   // Various configuration values for collision detection.
   /// If >= 0 then we're recording. The value is the current frame entry.
   int cfg_recording;
-  /// While recording, commands and arguments associated with current camera 
-  /// position are temporarily stored here.
-  char *recorded_cmd;
-  char *recorded_arg;
-  char *recorded_perf_stats_name;
-  iPerfStats *recorded_perf_stats;
-
   /// If >= 0 then we're playing a recording.
   int cfg_playrecording;
   /// If true the demo recording loops.

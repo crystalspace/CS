@@ -53,6 +53,7 @@ csPerfStats::csPerfStats (iBase *iParent)
   statlog_section = NULL;
   statvec = NULL;
   framevec = NULL;
+  margin = NULL;
   indent = 0;
   frame = new FrameEntry ();
   frame_by_frame = false;
