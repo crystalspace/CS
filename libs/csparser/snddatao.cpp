@@ -20,7 +20,7 @@
 
 #include <string.h>
 #include "cssysdef.h"
-#include "cssfxldr/common/snddata.h"
+#include "isnddata.h"
 #include "csparser/snddatao.h"
 
 IMPLEMENT_CSOBJTYPE (csSoundDataObject,csObject);
@@ -30,7 +30,7 @@ csSoundDataObject::~csSoundDataObject ()
   if (sndbuf) delete sndbuf;
 }
 
-csSoundData* csSoundDataObject::GetSound (csObject& csobj, const char* name)
+iSoundData* csSoundDataObject::GetSound (csObject& csobj, const char* name)
 {
   csObjIterator i = csobj.GetIterator (csSoundDataObject::Type);
   while (!i.IsNull ())

@@ -21,6 +21,7 @@
 #include "qint.h"
 #include "csparser/csloader.h"
 #include "csparser/crossbld.h"
+#include "csparser/snddatao.h"
 #include "csengine/cscoll.h"
 #include "csengine/campos.h"
 #include "csengine/triangle.h"
@@ -49,8 +50,9 @@
 #include "csutil/inifile.h"
 #include "csutil/util.h"
 #include "cssys/system.h"
-#include "cssfxldr/sndload.h"
-#include "csparser/snddatao.h"
+#include "isndldr.h"
+#include "isnddata.h"
+#include "isndrdr.h"
 #include "csgfxldr/csimage.h"
 #include "itxtmgr.h"
 
@@ -4413,28 +4415,57 @@ void csLoader::terrain_process (csSector& sector, char* name, char* buf)
 
 csSoundDataObject* csLoader::load_sound(char* name, const char* filename)
 {
-  csSoundDataObject* sndobj = NULL;
-  csSoundData* snd = NULL;
+  /* get the needed plugin interfaces
+   * @@@ when moving the loader to a plug-in, this should be done
+   * at initialization, and pointers shouldn't be DecRef'ed here.
+   */
+  iSoundLoader *SoundLoader = QUERY_PLUGIN(System, iSoundLoader);
+  if (!SoundLoader) {
+    CsPrintf (MSG_FATAL_ERROR, "Cannot load sound \"%s\" "
+      "without sound loader plug-in", filename);
+  }
+  iSoundRender *SoundRender = QUERY_PLUGIN(System, iSoundRender);
+  if (!SoundRender) {
+    /*@@@*/SoundLoader->DecRef();
+    CsPrintf (MSG_FATAL_ERROR, "Cannot load sound \"%s\" "
+      "without sound renderer plug-in", filename);
+  }
 
+  /* read the file data */
   size_t size;
   char* buf = System->VFS->ReadFile (filename, size);
-
-  if (!buf || !size)
-  {
+  if (!buf || !size) {
+    /*@@@*/SoundLoader->DecRef();
+    /*@@@*/SoundRender->DecRef();
     CsPrintf (MSG_FATAL_ERROR,
       "Cannot read sound file \"%s\" from VFS\n", filename);
     return NULL;
   }
 
-  snd = csSoundLoader::load ((UByte*)buf, size);
+  /* get format descriptor */
+  const csSoundFormat *Format = SoundRender->GetLoadFormat();
+
+  /* load the sound */
+  iSoundData *Sound = SoundLoader->LoadSound((UByte*)buf, size, Format);
   delete [] buf;
-  if (!snd)
-  {
+
+  /* dereference interface pointers */
+  /*@@@*/SoundRender->DecRef();
+  /*@@@*/SoundLoader->DecRef();
+
+  /* check for valid sound data */
+  if (!Sound) {
     CsPrintf (MSG_FATAL_ERROR, "The sound file \"%s\" is corrupt!\n", filename);
     return NULL;
   }
 
-  sndobj = new csSoundDataObject (snd);
+  /* decode sound data */
+  iSoundData *Old=Sound;
+  Sound=Old->Decode();
+  Old->DecRef();
+
+  /* build wrapper object */
+  csSoundDataObject* sndobj = new csSoundDataObject (Sound);
   sndobj->SetName (name);
 
   return sndobj;
@@ -4871,29 +4902,29 @@ bool csLoader::LoadSounds (char* buf)
     switch (cmd)
     {
       case TOKEN_SOUND:
+      {
+        const char* filename = name;
+        char* maybename;
+        cmd = csGetCommand (&params, options, &maybename);
+        if (cmd == TOKEN_FILE)
+          filename = maybename;
+        else if (cmd == PARSERR_TOKENNOTFOUND)
         {
-          const char* filename = name;
-	  char* maybename;
-          cmd = csGetCommand (&params, options, &maybename);
-	  if (cmd == TOKEN_FILE)
-            filename = maybename;
-          else if (cmd == PARSERR_TOKENNOTFOUND)
-	  {
-            CsPrintf (MSG_FATAL_ERROR, "Unknown token '%s' found while parsing SOUND directive.\n", csGetLastOffender());
-            fatal_exit (0, false);
-	  }
-          csSoundData *snd = csSoundDataObject::GetSound (*World, name);
-          if (!snd)
+          CsPrintf (MSG_FATAL_ERROR, "Unknown token '%s' found while parsing SOUND directive.\n", csGetLastOffender());
+          fatal_exit (0, false);
+        }
+        iSoundData *snd = csSoundDataObject::GetSound (*World, name);
+        if (!snd)
+        {
+          csSoundDataObject *s = load_sound (name, filename);
+          if (s)
           {
-            csSoundDataObject *s = load_sound (name, filename);
-            if (s)
-	    {
-	      World->ObjAdd(s);
-	      csLoaderStat::sounds_loaded++;
-	    }
+            World->ObjAdd(s);
+            csLoaderStat::sounds_loaded++;
           }
         }
-        break;
+      }
+      break;
     }
   }
   if (cmd == PARSERR_TOKENNOTFOUND)

@@ -21,8 +21,6 @@
 #if !defined(__CSSOUNDLISTENERSOFTWARE_H__)
 #define __CSSOUNDLISTENERSOFTWARE_H__
 
-#include "cssfxldr/common/snddata.h"
-#include "isndrdr.h"
 #include "isndlstn.h"
 
 class csSoundListenerSoftware : public iSoundListener
@@ -32,18 +30,18 @@ public:
 	csSoundListenerSoftware(iBase *piBase);
 	virtual ~csSoundListenerSoftware();
 	
-	void SetDirection(float fx, float fy, float fz, float tx, float ty, float tz);
-	void SetPosition(float x, float y, float z);
-	void SetVelocity(float x, float y, float z);
+	void SetDirection(csVector3 Front, csVector3 Top);
+	void SetPosition(csVector3 pos);
+	void SetVelocity(csVector3 v);
 	void SetDistanceFactor(float factor);
 	void SetRollOffFactor(float factor);
-	void SetDopplerFactor(float factor);
+	void SetDopplerFactor(float ws);
 	void SetHeadSize(float size);
 	void SetEnvironment(SoundEnvironment env);
 	
-	void GetDirection(float &fx, float &fy, float &fz, float &tx, float &ty, float &tz);
-	void GetPosition(float &x, float &y, float &z);
-	void GetVelocity(float &x, float &y, float &z);
+	void GetDirection(csVector3 &Front, csVector3 &Top);
+	csVector3 GetPosition();
+	csVector3 GetVelocity();
 	float GetDistanceFactor();
 	float GetRollOffFactor();
 	float GetDopplerFactor();
@@ -52,11 +50,11 @@ public:
 	
 public:
 	// Position
-	float fPosX, fPosY, fPosZ;
+	csVector3 Position;
 	// Velocity
-	float fVelX, fVelY, fVelZ;
+	csVector3 Velocity;
 	// Direction
-	float fDirTopX, fDirTopY, fDirTopZ, fDirFrontX, fDirFrontY, fDirFrontZ;
+	csVector3 Front, Top;
 	// Doppler
 	float fDoppler;
 	// Distance

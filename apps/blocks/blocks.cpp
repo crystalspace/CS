@@ -52,7 +52,7 @@
 #include "itxtmgr.h"
 #include "isndrdr.h"
 #include "csparser/snddatao.h"
-#include "cssfxldr/common/snddata.h"
+#include "isnddata.h"
 #include "inetdrv.h"
 
 // ----------------------------------------------------
@@ -2102,7 +2102,7 @@ void Blocks::InitWorld ()
 #ifdef DO_SOUND
   // Load the blocks.zip library where sound refs are stored
   csLoader::LoadLibraryFile (world, "/data/blocks/Library");
-  csSoundData* w = csSoundDataObject::GetSound(*world, "background.wav");
+  iSoundData* w = csSoundDataObject::GetSound(*world, "background.wav");
   if (w && Sound) Sound->PlayEphemeral (w, true);
 #endif
 }

@@ -36,7 +36,6 @@
 class Polygon3D;
 class WalkTest;
 class csView;
-class csSoundData;
 class csWorld;
 class csPixmap;
 class csWireFrameCam;
@@ -44,6 +43,7 @@ class PhysicsLibrary;
 class InfiniteMaze;
 class HugeRoom;
 class csPolygonSet;
+struct iSoundData;
 struct iCollideSystem;
 struct iPerfStats;
 
@@ -240,8 +240,8 @@ public:
   HugeRoom* huge_room;
 
   /// Some sounds.
-  csSoundData* wMissile_boom;
-  csSoundData* wMissile_whoosh;
+  iSoundData* wMissile_boom;
+  iSoundData* wMissile_whoosh;
 
   PhysicsLibrary *pl;
 

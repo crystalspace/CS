@@ -59,14 +59,14 @@
 #include "csobject/dataobj.h"
 #include "csobject/csobject.h"
 #include "csobject/objiter.h"
-#include "cssfxldr/common/snddata.h"
+#include "isnddata.h"
 #include "csgfxldr/pngsave.h"
 #include "csparser/snddatao.h"
 #include "igraph3d.h"
 #include "itxtmgr.h"
 #include "isndsrc.h"
 #include "isndlstn.h"
-#include "isndbuf.h"
+#include "isndsrc.h"
 #include "isndrdr.h"
 #include "iimage.h"
 #include "icollide.h"
@@ -414,8 +414,8 @@ void WalkTest::MoveSystems (cs_time elapsed_time, cs_time current_time)
         csMatrix3 m = view->GetCamera ()->GetC2W();
         csVector3 f = m.Col3();
         csVector3 t = m.Col2();
-        sndListener->SetPosition(v.x, v.y, v.z);
-        sndListener->SetDirection(f.x,f.y,f.z,t.x,t.y,t.z);
+        sndListener->SetPosition(v);
+        sndListener->SetDirection(f,t);
         //sndListener->SetDirection(...);
       }
     }
@@ -1377,7 +1377,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   {
     //sounds (other than standard) are from a zip specified in world file
     //SOUNDS section and specified in vfs.cfg in lib/sounds
-    csSoundData* wSoundData = ((csSoundDataObject&)(*sobj)).GetSound();
+    iSoundData* wSoundData = ((csSoundDataObject&)(*sobj)).GetSound();
     if (wSoundData && Sound)
     {
       //don't play now if loaded for missile

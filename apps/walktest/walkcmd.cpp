@@ -48,14 +48,14 @@
 #include "csutil/util.h"
 #include "csparser/impexp.h"
 #include "csobject/dataobj.h"
-#include "cssfxldr/common/snddata.h"
+#include "isnddata.h"
 #include "csparser/snddatao.h"
 #include "csparser/csloader.h"
 #include "csparser/crossbld.h"
 #include "csgeom/math3d.h"
 #include "isndsrc.h"
 #include "isndlstn.h"
-#include "isndbuf.h"
+#include "isndsrc.h"
 #include "isndrdr.h"
 #include "igraph3d.h"
 #include "igraph2d.h"
@@ -1477,7 +1477,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     if (Sys->Sound)
     {
-      csSoundData *sb =
+      iSoundData *sb =
         csSoundDataObject::GetSound(*(Sys->view->GetWorld()), arg);
       if (sb)
         Sys->Sound->PlayEphemeral(sb);

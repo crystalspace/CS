@@ -43,14 +43,14 @@
 #include "csutil/scanstr.h"
 #include "csparser/impexp.h"
 #include "csobject/dataobj.h"
-#include "cssfxldr/common/snddata.h"
+#include "isnddata.h"
 #include "csparser/snddatao.h"
 #include "csparser/csloader.h"
 #include "csparser/crossbld.h"
 #include "csgeom/math3d.h"
 #include "isndsrc.h"
 #include "isndlstn.h"
-#include "isndbuf.h"
+#include "isndsrc.h"
 #include "isndrdr.h"
 #include "igraph3d.h"
 #include "icollide.h"
@@ -907,11 +907,10 @@ void HandleDynLight (csDynLight* dyn)
         delete ms;
         ExplosionStruct* es = new ExplosionStruct;
         if (Sys->Sound)
-          if ((es->snd = Sys->Sound->CreateSource (Sys->wMissile_boom)))
+          if ((es->snd = Sys->Sound->CreateSource (Sys->wMissile_boom, true)))
           {
-            es->snd->SetPosition (v.x, v.y, v.z);
-            iSoundBuffer *sb = es->snd->GetSoundBuffer();
-            sb->Play ();
+            es->snd->SetPosition (v);
+            es->snd->Play();
           }
         es->type = DYN_TYPE_EXPLOSION;
         es->radius = 2;
@@ -925,7 +924,7 @@ void HandleDynLight (csDynLight* dyn)
       dyn->Move (s, v.x, v.y, v.z);
       dyn->Setup ();
       if (ms->sprite) move_sprite (ms->sprite, s, v);
-      if (Sys->Sound && ms->snd) ms->snd->SetPosition (v.x, v.y, v.z);
+      if (Sys->Sound && ms->snd) ms->snd->SetPosition (v);
       break;
     }
     case DYN_TYPE_EXPLOSION:
@@ -943,8 +942,7 @@ void HandleDynLight (csDynLight* dyn)
 	{
           if (Sys->Sound && es->snd)
 	  {
-            iSoundBuffer *sb = es->snd->GetSoundBuffer();
-            sb->Stop ();
+            es->snd->Stop ();
             es->snd->DecRef ();
 	  }
 	  delete es;
@@ -991,11 +989,10 @@ void fire_missile ()
   dyn->Setup ();
   MissileStruct* ms = new MissileStruct;
   if (Sys->Sound)
-    if ((ms->snd = Sys->Sound->CreateSource (Sys->wMissile_whoosh)))
+    if ((ms->snd = Sys->Sound->CreateSource (Sys->wMissile_whoosh, true)))
     {
-      ms->snd->SetPosition (pos.x, pos.y, pos.z);
-      iSoundBuffer *sb = ms->snd->GetSoundBuffer();
-      sb->Play ();
+      ms->snd->SetPosition (pos);
+      ms->snd->Play();
     }
   ms->type = DYN_TYPE_MISSILE;
   ms->dir = (csOrthoTransform)*(Sys->view->GetCamera ());

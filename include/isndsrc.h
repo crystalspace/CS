@@ -21,26 +21,44 @@
 #if !defined(__ISOUNDSOURCE_H__)
 #define __ISOUNDSOURCE_H__
 
-struct iSoundBuffer;
+#include "csutil/scf.h"
+#include "csgeom/vector3.h"
+
+// these are flags and can be or'd
+#define SOUND_RESTART   1
+#define SOUND_LOOP      2
 
 SCF_VERSION (iSoundSource, 0, 0, 1);
 
 /**
  * @@@ Please document me using Doc++!
+ * Note: Merged sound buffers and sources into this class.
  */
 struct iSoundSource : public iBase
 {
-  /// Set position of sound object
-  virtual void SetPosition (float x, float y, float z) = 0;
-  /// Set velocity of sound object
-  virtual void SetVelocity (float x, float y, float z) = 0;
-  /// Get position of sound object
-  virtual void GetPosition (float &x, float &y, float &z) = 0;
-  /// Get velocity of sound object
-  virtual void GetVelocity (float &x, float &y, float &z) = 0;
+  /// Play the sound
+  virtual void Play (unsigned long playMethod = 0) = 0;
+  /// Stop the sound
+  virtual void Stop () = 0;
+  /// Set volume
+  virtual void SetVolume (float volume) = 0;
+  /// Get volume
+  virtual float GetVolume () = 0;
+  /// Set frequency factor : 1 = normal, >1 more speed, <1 more slow
+  virtual void SetFrequencyFactor (float factor) = 0;
+  /// Get frequency factor
+  virtual float GetFrequencyFactor () = 0;
 
-  /// Get sound buffer
-  virtual iSoundBuffer *GetSoundBuffer () = 0;
+  /// is this a 3d source?
+  virtual bool Is3d() = 0;
+  /// set position of this source. Only used in 3d sources
+  virtual void SetPosition(csVector3 pos) = 0;
+  /// get position of this source. Only used in 3d sources
+  virtual csVector3 GetPosition() = 0;
+  /// set velocity of this source. Only used in 3d sources
+  virtual void SetVelocity(csVector3 spd) = 0;
+  /// get velocity of this source. Only used in 3d sources
+  virtual csVector3 GetVelocity() = 0;
 };
 
-#endif // __ISOUNDSOURCE_H__
+#endif // __ISOUNDBUFFER_H__

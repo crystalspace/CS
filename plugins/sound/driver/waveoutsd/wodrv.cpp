@@ -23,13 +23,10 @@
 #include <mmsystem.h>
 
 #include "csutil/scf.h"
-#include "wodrv.h"
-#include "isystem.h"
 #include "csutil/inifile.h"
-#include "isndlstn.h"
-#include "isndsrc.h"
-
-csIniFile* configwodrv;
+#include "isystem.h"
+#include "isndrdr.h"
+#include "wodrv.h"
 
 #define MYMMSYSERR_NOCREATETHREAD 12
 
@@ -91,15 +88,17 @@ bool csSoundDriverWaveOut::Initialize (iSystem *iSys)
 
 bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16, bool stereo)
 {
-  m_piSystem->Printf (MSG_INITIALIZATION, "\nSoundDriver waveOut selected\n");
+  m_piSystem->Printf (MSG_INITIALIZATION, "SoundDriver waveOut selected\n");
 
+  m_piSystem->Printf (MSG_INITIALIZATION,
+    "trying to init sound driver to freq=%d, bit16=%d, stereo=%d\n",frequency,bit16,stereo);
+
+  if (!render) return false;
   m_piSoundRender = render;
   m_piSoundRender->IncRef();
 
-  m_piSystem->Printf (MSG_INITIALIZATION, "\nRender = %d\n",m_piSoundRender);
-
-  iVFS* v = QUERY_PLUGIN_ID (m_piSystem, CS_FUNCID_VFS, iVFS);
-  configwodrv = new csIniFile (v, "/config/wodrv.cfg");
+  iVFS* v = QUERY_PLUGIN(m_piSystem, iVFS);
+  Config = new csIniFile (v, "/config/sound.cfg");
   v->DecRef(); v = NULL;
 
   MMRESULT res;
@@ -123,14 +122,16 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16,
   m_b16Bits = bit16;
   m_bStereo = stereo;
 
-  const char *callback_func=configwodrv->GetStr("SoundDriver.waveOut", "CALLBACK", "function");
-  const char *thread_func=configwodrv->GetStr("SoundDriver.waveOut", "THREAD_PRIORITY", "normal");
+  const char *callback_func=Config->GetStr
+    ("SoundDriver.WaveOut", "CALLBACK", "function");
+  const char *thread_func=Config->GetStr
+    ("SoundDriver.WaveOut", "THREAD_PRIORITY", "normal");
   bool threading = false;
 
   if(stricmp(callback_func, "thread")==0)
     threading = true;
 
-  unsigned int refresh=configwodrv->GetInt("SoundDriver.waveOut", "REFRESH", 5);
+  unsigned int refresh=Config->GetInt("SoundDriver.WaveOut", "REFRESH", 5);
 
 //  if(refresh>format.nAvgBytesPerSec) refresh=format.nAvgBytesPerSec;
 

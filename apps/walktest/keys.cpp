@@ -42,7 +42,7 @@
 #include "csutil/scanstr.h"
 #include "csparser/impexp.h"
 #include "csobject/dataobj.h"
-#include "cssfxldr/common/snddata.h"
+#include "isnddata.h"
 #include "csparser/snddatao.h"
 #include "csparser/csloader.h"
 #include "csparser/crossbld.h"

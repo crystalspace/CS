@@ -20,51 +20,236 @@
 
 #include "cssysdef.h"
 #include "csutil/scf.h"
-#include "srdrbuf.h"
 #include "srdrsrc.h"
+#include "srdrcom.h"
 #include "isystem.h"
-
-IMPLEMENT_FACTORY (csSoundSourceSoftware)
+#include "isndlstn.h"
+#include "isnddata.h"
 
 IMPLEMENT_IBASE(csSoundSourceSoftware)
   IMPLEMENTS_INTERFACE(iSoundSource)
 IMPLEMENT_IBASE_END;
 
-csSoundSourceSoftware::csSoundSourceSoftware(iBase *piBase)
+csSoundSourceSoftware::csSoundSourceSoftware(iBase *piBase, bool snd3d,
+    csSoundRenderSoftware *srdr, iSoundData *sndData)
 {
-	CONSTRUCT_IBASE(piBase);
-  fPosX = fPosY = fPosZ = 0.0;
-  fVelX = fVelY = fVelZ = 0.0;
-  pSoundBuffer = NULL;
+  CONSTRUCT_IBASE(piBase);
+
+  SoundRender=srdr;
+  UserFrequencyFactor=1;
+  InternalFrequencyFactor=sndData->GetFormat()->Freq/srdr->getFrequency();
+  Volume=1.0;
+  Sound3d=snd3d;
+  Position=csVector3(0,0,0);
+  Velocity=csVector3(0,0,0);
+  Active=false;
+  SoundStream=sndData->CreateStream();
 }
 
 csSoundSourceSoftware::~csSoundSourceSoftware()
 {
+  Stop();
+  SoundStream->DecRef();
 }
 
-iSoundBuffer *csSoundSourceSoftware::GetSoundBuffer()
+void csSoundSourceSoftware::Play(unsigned long pMethod)
 {
-  if(!pSoundBuffer) return NULL;
-  return QUERY_INTERFACE(pSoundBuffer, iSoundBuffer);
+  PlayMethod=pMethod;
+  if (!Active) SoundRender->AddSource(this);
+  Active=true;
+  if (PlayMethod & SOUND_RESTART) SoundStream->Reset();
 }
 
-void csSoundSourceSoftware::SetPosition(float x, float y, float z)
-{
-  fPosX = x; fPosY = y; fPosZ = z;
+void csSoundSourceSoftware::Stop() {
+  if (Active) {
+    Active=false;
+    SoundRender->RemoveSource(this);
+  }
 }
 
-void csSoundSourceSoftware::SetVelocity(float x, float y, float z)
-{
-  fVelX = x; fVelY = y; fVelZ = z;
+bool csSoundSourceSoftware::IsActive() {
+  return Active;
 }
 
-void csSoundSourceSoftware::GetPosition(float &x, float &y, float &z)
-{
-  x = fPosX; y = fPosY; z = fPosZ;
+void csSoundSourceSoftware::SetVolume(float vol) {
+  Volume = vol;
 }
 
-void csSoundSourceSoftware::GetVelocity(float &x, float &y, float &z)
-{
-  x = fVelX; y = fVelY; z = fVelZ;
+float csSoundSourceSoftware::GetVolume() {
+  return Volume;
 }
 
+void csSoundSourceSoftware::SetFrequencyFactor(float factor) {
+  UserFrequencyFactor = factor;
+}
+
+float csSoundSourceSoftware::GetFrequencyFactor() {
+  return UserFrequencyFactor;
+}
+
+bool csSoundSourceSoftware::Is3d() {
+  return Sound3d;
+}
+
+void csSoundSourceSoftware::SetPosition(csVector3 pos) {
+  Position=pos;
+}
+
+csVector3 csSoundSourceSoftware::GetPosition() {
+  return Position;
+}
+
+void csSoundSourceSoftware::SetVelocity(csVector3 v) {
+  Velocity=v;
+}
+
+csVector3 csSoundSourceSoftware::GetVelocity() {
+  return Velocity;
+}
+
+void csSoundSourceSoftware::Prepare(unsigned long VolDiv) {
+  // frequency
+  CalcFreqFactor=UserFrequencyFactor*InternalFrequencyFactor;
+
+  // volume
+  CalcVolL=CalcVolR=Volume/VolDiv;
+
+  // for non-3d sources we don't calculate anything else
+  if (!Is3d()) return;
+
+  // get the global listener object
+  iSoundListener *Listener=SoundRender->GetListener();
+  float DistFactor=Listener->GetDistanceFactor();
+    
+  // calculate the 'left' vector
+  csVector3 Front,Top,Left;
+  Listener->GetDirection(Front,Top);
+  Left=Top%Front;
+
+  // calculate ear position
+  csVector3 EarL,EarR;
+  EarL=Listener->GetPosition()+Left*Listener->GetHeadSize()/2;
+  EarR=Listener->GetPosition()-Left*Listener->GetHeadSize()/2;
+
+  // calculate ear distance
+  float DistL,DistR;
+  DistL=(EarL-Position).Norm();
+  DistR=(EarR-Position).Norm();
+
+  // the following tests should not be deleted until we see (or hear)
+  // what gives the best results. Just try it!
+/*
+  // @@@ test: amplify difference between ears.
+  float d=DistL-DistR;
+  DistL+=d;
+  DistR-=d;
+*/
+  // @@@ test: take square root of distance. Otherwise the missile sound
+  // in walktest seems to become distant too fast.
+  DistL=sqrt(DistL);
+  DistR=sqrt(DistR);
+
+  // prevent too near sounds
+  if (DistL<1) DistL=1;
+  if (DistR<1) DistR=1;
+
+  // calculate ear volume
+  CalcVolL/=DistL*DistFactor;
+  CalcVolR/=DistR*DistFactor;
+}
+
+/* helper macros */
+#define MONOSAMP        ((int)(Data[i]))
+#define LEFTSAMP        ((int)(Data[2*i]))
+#define RIGHTSAMP       ((int)(Data[2*i+1]))
+#define READMONO3D      int samp=MONOSAMP;
+#define READSTEREO3D    int samp=(LEFTSAMP+RIGHTSAMP)/2;
+#define WRITEMONO3D     Buffer[i]+=(samp AddModify)*(CalcVolL+CalcVolR)/2;
+#define WRITESTEREO3D   {                   \
+  Buffer[2*i]+=(samp AddModify)*CalcVolL;   \
+  Buffer[2*i+1]=(samp AddModify)*CalcVolR;  \
+}
+
+#define LOOP        for (unsigned long i=0;i<NumSamples;i++)
+
+#define ADDTOBUFFER_BITS {                                                  \
+  stype *Buffer=(stype*)Memory;                                             \
+  unsigned long RemainingSamples=MemSize/(sizeof(stype));                   \
+  if (SoundRender->isStereo()) RemainingSamples/=2;                         \
+                                                                            \
+  while (1) {                                                               \
+    unsigned long NumSamples=RemainingSamples;                              \
+    stype *Data=(stype*)(SoundStream->Read(NumSamples));                    \
+    if (Is3d()) {                                                           \
+      /* handle 3d sound using the above macros */                          \
+      if (Format->Channels==2) {                                            \
+        if (SoundRender->isStereo()) {                                      \
+          LOOP {READSTEREO3D; WRITESTEREO3D;}                               \
+        } else {                                                            \
+          LOOP {READSTEREO3D; WRITEMONO3D;}                                 \
+        }                                                                   \
+      } else {                                                              \
+        if (SoundRender->isStereo()) {                                      \
+          LOOP {READMONO3D; WRITESTEREO3D;}                                 \
+        } else {                                                            \
+          LOOP {READMONO3D; WRITEMONO3D;}                                   \
+        }                                                                   \
+      }                                                                     \
+    } else {                                                                \
+      /* handle non-3d sound (use CalcVolL for volume, NOT 'Volume', */     \
+      /* to use any precalculation done in Prepare()                 */     \
+      if (Format->Channels==2) {                                            \
+        if (SoundRender->isStereo()) {                                      \
+          /* stereo -> stereo */                                            \
+          LOOP {                                                            \
+            Buffer[2*i]+=CalcVolL*(LEFTSAMP AddModify);                     \
+            Buffer[2*i+1]+=CalcVolL*(RIGHTSAMP AddModify);                  \
+          }                                                                 \
+        } else {                                                            \
+          /* stereo -> mono */                                              \
+          LOOP {                                                            \
+            Buffer[i]+=CalcVolL*((LEFTSAMP + RIGHTSAMP)/2 AddModify);       \
+          }                                                                 \
+        }                                                                   \
+      } else {                                                              \
+        if (SoundRender->isStereo()) {                                      \
+          /* mono -> stereo */                                              \
+          LOOP {                                                            \
+            Buffer[2*i]+=CalcVolL*(MONOSAMP AddModify);                     \
+            Buffer[2*i+1]+=CalcVolL*(MONOSAMP AddModify);                   \
+          }                                                                 \
+        } else {                                                            \
+          /* mono -> mono */                                                \
+          LOOP {Buffer[i]+=CalcVolL*(MONOSAMP AddModify);}                  \
+        }                                                                   \
+      }                                                                     \
+    }                                                                       \
+    SoundStream->DiscardBuffer(Data);                                       \
+    RemainingSamples-=NumSamples;                                           \
+    if (RemainingSamples==0) break;                                         \
+    else {                                                                  \
+      if (PlayMethod & SOUND_LOOP) SoundStream->Reset();                    \
+      else {Active=false;return;}                                           \
+    }                                                                       \
+  }                                                                         \
+}
+
+void csSoundSourceSoftware::AddToBuffer(void *Memory, unsigned long MemSize) {
+  if (!Active) return;
+
+  const csSoundFormat *Format=SoundStream->GetSoundData()->GetFormat();
+
+  if (SoundRender->is16Bits()) {
+    #define stype short
+    #define AddModify
+    ADDTOBUFFER_BITS
+    #undef stype
+    #undef AddModify
+  } else {
+    #define stype unsigned char
+    #define AddModify -128
+    ADDTOBUFFER_BITS
+    #undef stype
+    #undef AddModify
+  }
+}

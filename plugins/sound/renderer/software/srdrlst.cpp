@@ -31,98 +31,100 @@ IMPLEMENT_IBASE_END
 
 csSoundListenerSoftware::csSoundListenerSoftware(iBase *piBase)
 {
-	CONSTRUCT_IBASE(piBase);
-	fPosX = fPosY = fPosZ = 0.0;
-	fDirTopX = fDirTopY = fDirTopZ = 0.0;
-	fDirFrontX = fDirFrontY = fDirFrontZ = 0.0;
-	fDoppler = 1.0;
-	fDistance = 1.0;
-	fRollOff = 1.0;
+  CONSTRUCT_IBASE(piBase);
+  Position = csVector3(0,0,0);
+  Velocity = csVector3(0,0,0);
+  Front = csVector3(0,0,1);
+  Top = csVector3(0,1,0);
+  fDoppler = 1.0;
+  fDistance = 1.0;
+  fRollOff = 1.0;
+  fHeadSize = 1.0;
+  Environment = ENVIRONMENT_GENERIC;
 }
 
 csSoundListenerSoftware::~csSoundListenerSoftware()
 {
-	
 }
 
-void csSoundListenerSoftware::SetPosition(float x, float y, float z)
+void csSoundListenerSoftware::SetPosition(csVector3 pos)
 {
-	fPosX = x; fPosY = y; fPosZ = z;
+  Position = pos;
 }
 
-void csSoundListenerSoftware::SetDirection(float fx, float fy, float fz, float tx, float ty, float tz)
+void csSoundListenerSoftware::SetDirection(csVector3 f, csVector3 t)
 {
-	fDirFrontX = fx; fDirFrontY = fy; fDirFrontZ = fz;
-	fDirTopX = tx; fDirTopY = ty; fDirTopZ = tz;
+  Front=f;
+  Top=t;
 }
 
 void csSoundListenerSoftware::SetHeadSize(float size)
 {
-	fHeadSize = size;
+  fHeadSize = size;
 }
 
-void csSoundListenerSoftware::SetVelocity(float x, float y, float z)
+void csSoundListenerSoftware::SetVelocity(csVector3 v)
 {
-	fVelX = x; fVelY = y; fVelZ = z;
+  Velocity=v;
 }
 
 void csSoundListenerSoftware::SetDopplerFactor(float factor)
 {
-	fDoppler = factor;
+  fDoppler = factor;
 }
 
 void csSoundListenerSoftware::SetDistanceFactor(float factor)
 {
-	fDistance = factor;
+  fDistance = factor;
 }
 
 void csSoundListenerSoftware::SetRollOffFactor(float factor)
 {
-	fRollOff = factor;
+  fRollOff = factor;
 }
 
 void csSoundListenerSoftware::SetEnvironment(SoundEnvironment env)
 {
-	Environment = env;
+  Environment = env;
 }
 
-void csSoundListenerSoftware::GetPosition(float &x, float &y, float &z)
+csVector3 csSoundListenerSoftware::GetPosition()
 {
-	x = fPosX; y = fPosY; z = fPosZ;
+  return Position;
 }
 
-void csSoundListenerSoftware::GetDirection(float &fx, float &fy, float &fz, float &tx, float &ty, float &tz)
+void csSoundListenerSoftware::GetDirection(csVector3 &f, csVector3 &t)
 {
-	fx = fDirFrontX; fy = fDirFrontY; fz = fDirFrontZ;
-	tx = fDirTopX; ty = fDirTopY; tz = fDirTopZ;
+  f = Front;
+  t = Top;
 }
 
 float csSoundListenerSoftware::GetHeadSize()
 {
-	return fHeadSize;
+  return fHeadSize;
 }
 
-void csSoundListenerSoftware::GetVelocity(float &x, float &y, float &z)
+csVector3 csSoundListenerSoftware::GetVelocity()
 {
-	x = fVelX; y = fVelY; z = fVelZ;
+  return Velocity;
 }
 
 float csSoundListenerSoftware::GetDopplerFactor()
 {
-	return fDoppler;
+  return fDoppler;
 }
 
 float csSoundListenerSoftware::GetDistanceFactor()
 {
-	return fDistance;
+  return fDistance;
 }
 
 float csSoundListenerSoftware::GetRollOffFactor()
 {
-	return fRollOff;
+  return fRollOff;
 }
 
 SoundEnvironment csSoundListenerSoftware::GetEnvironment()
 {
-	return Environment;
+  return Environment;
 }

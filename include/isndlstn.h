@@ -21,7 +21,7 @@
 #if !defined(__ISOUNDLISTENER_H__)
 #define __ISOUNDLISTENER_H__
 
-#include "isndrdr.h"
+#include "csgeom/vector3.h"
 
 /// taken from eax preset environment
 enum SoundEnvironment
@@ -61,11 +61,11 @@ SCF_VERSION (iSoundListener, 0, 0, 1);
 struct iSoundListener : public iBase
 {
   /// Set direction of listener (front and top 3d vectors)
-  virtual void SetDirection (float fx, float fy, float fz, float tx, float ty, float tz) = 0;
+  virtual void SetDirection (csVector3 Front, csVector3 Top) = 0;
   /// Set position of listener
-  virtual void SetPosition (float x, float y, float z) = 0;
+  virtual void SetPosition (csVector3 pos) = 0;
   /// Set velocity of listener
-  virtual void SetVelocity (float x, float y, float z) = 0;
+  virtual void SetVelocity (csVector3 v) = 0;
   /// Set a distance attenuator
   virtual void SetDistanceFactor (float factor) = 0;
   /// Set a RollOff factor
@@ -78,11 +78,11 @@ struct iSoundListener : public iBase
   virtual void SetEnvironment (SoundEnvironment env) = 0;
 
   /// Get direction of listener (front and top 3d vectors)
-  virtual void GetDirection (float &fx, float &fy, float &fz, float &tx, float &ty, float &tz) = 0;
+  virtual void GetDirection (csVector3 &Front, csVector3 &Top) = 0;
   /// Get position of listener
-  virtual void GetPosition (float &x, float &y, float &z) = 0;
+  virtual csVector3 GetPosition () = 0;
   /// Get velocity of listener
-  virtual void GetVelocity (float &x, float &y, float &z) = 0;
+  virtual csVector3 GetVelocity () = 0;
   /// Get a distance attenuator
   virtual float GetDistanceFactor () = 0;
   /// Get a RollOff factor

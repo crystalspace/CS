@@ -32,13 +32,16 @@
 struct iSoundListener;
 struct iSoundSource;
 struct iSoundBuffer;
-class csSoundData;
+struct iSoundData;
+struct csSoundFormat;
 #include "iplugin.h"
 
 SCF_VERSION (iSoundRender, 0, 0, 1);
 
 /**
  * @@@ Please document me using Doc++!
+ * Note: Merged CreateSoundBuffer() and CreateSource(). You can switch between
+ * them with the Is3d parameter.
  */
 struct iSoundRender : public iPlugIn
 {
@@ -47,20 +50,20 @@ public:
   virtual bool Open () = 0;
   /// Close the sound render
   virtual void Close () = 0;
-  /// Update Sound Render
-  virtual void Update () = 0;
   /// Set Volume [0, 1]
   virtual void SetVolume (float vol) = 0;
   /// Get Volume [0, 1]
   virtual float GetVolume () = 0;
-  /// Play a sound buffer without control (it's play until its end), second arg is for looping
-  virtual void PlayEphemeral (csSoundData *snd, bool loop = false) = 0;
-  /// Create a Listener object
+  /// Play a sound buffer without control (play until its end)
+  virtual void PlayEphemeral (iSoundData *snd, bool Loop=false) = 0;
+  /// create a sound source
+  virtual iSoundSource *CreateSource (iSoundData *snd, bool Is3d) = 0;
+  /// Get the global Listener object
   virtual iSoundListener *GetListener () = 0;
-  /// Create a Source object
-  virtual iSoundSource *CreateSource (csSoundData *snd) = 0;
-  /// Create a controled SoundBuffer object
-  virtual iSoundBuffer *CreateSoundBuffer (csSoundData *snd) = 0;
+  /// get format for sound loader
+  virtual const csSoundFormat *GetLoadFormat() = 0;
+  /// update the renderer
+  virtual void Update() = 0;
   /// Internal use : mixing function (need if your render use a driver)
   virtual void MixingFunction () = 0;
 };

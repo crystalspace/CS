@@ -22,12 +22,11 @@
 #define __ISOUNDDRIVER_H__
 
 #include "csutil/scf.h"
+#include "iplugin.h"
 
 struct iSoundRender;
 
 SCF_VERSION (iSoundDriver, 0, 0, 1);
-
-#include "iplugin.h"
 
 /**
  * This is the sound render interface for CS.

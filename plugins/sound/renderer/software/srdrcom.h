@@ -25,13 +25,17 @@
 // csSoundRenderSoftware class.
 
 #include "csutil/scf.h"
-#include "cssfxldr/common/snddata.h"
-#include "srdrchan.h"
+#include "csutil/csvector.h"
 #include "isndrdr.h"
-#include "isnddrv.h"
 #include "iplugin.h"
+#include "isnddata.h"
+#include "ivfs.h"
 
+struct iSoundDriver;
+struct iSoundData;
+struct iSoundLoader;
 class csSoundListenerSoftware;
+class csSoundSourceSoftware;
 
 class csSoundRenderSoftware : public iSoundRender
 {
@@ -40,65 +44,57 @@ public:
 	csSoundRenderSoftware(iBase *piBase);
 	virtual ~csSoundRenderSoftware();
 	
-	//implementation of iPlugin
+	// implementation of iPlugin
 	virtual bool Initialize (iSystem *iSys);
 	
-	//implementation of iSoundRender
+	// implementation of iSoundRender
 	virtual bool Open ();
 	virtual void Close ();
-	virtual void Update ();
 	virtual void SetVolume (float vol);
 	virtual float GetVolume ();
-	virtual void PlayEphemeral (csSoundData *snd, bool loop = false);
+        virtual void PlayEphemeral (iSoundData *snd, bool Loop);
 	virtual iSoundListener *GetListener ();
-	virtual iSoundSource *CreateSource (csSoundData *snd);
-	virtual iSoundBuffer *CreateSoundBuffer (csSoundData *snd);
+	virtual iSoundSource *CreateSource (iSoundData *snd, bool Is3d);
 	virtual void MixingFunction ();
-	
-public:
-	void CalculEars3D();
-	void CalculSound3D(Channel *c);
-	iSystem* m_piSystem;
-	iSoundDriver *m_piSoundDriver;
-	
-private:
-	/// list of all stored channels
-	Channel *AllChannels;
-	
-	/// delete a channel of the list and destroy it
-	bool delChannel (Channel_ID id);
-	/// add a channel
-	void addChannel(Channel *c);
-	/// this function choice in the 'list' of channels which are the 'n' channels will be mixed 
-	int setChannels();
-	/// update the channels in the 'list' whose aren't be choiced by setChannels()
-	void updateChannels();
-	/// kill the channels in 'list' which are finish to be played
-	void killChannels();
-	
-	/// the channels
-	Channel ** Channels;
-	int numberChannels;
-	
-	/// current priority function choice
-	int PriorityFunc;
-	
-	/// is 16 bit mode device
+    virtual void Update();
+    virtual const csSoundFormat *GetLoadFormat();
+
+    // add a sound source
+    void AddSource(csSoundSourceSoftware *src);
+    void RemoveSource(csSoundSourceSoftware *src);
+
+	// is 16 bit mode device
 	bool is16Bits();
-	/// is a stereo device
+	// is a stereo device
 	bool isStereo();
-	/// return frequency
+	// return frequency
 	int getFrequency();
 	
+private:
+    // the config file
+    csIniFile *Config;
+
+    // all active sound sources
+    csVector *Sources;
+
+    // the system driver
+	iSystem *System;
+
+    // the low-level sound driver
+	iSoundDriver *SoundDriver;
+
+    // memory of the sound driver
 	void *memory;
 	int memorysize;
 	
-	float earL_x, earL_y, earL_z;
-	float earR_x, earR_y, earR_z;
-	float earL_DistanceFactor;
-	float earR_DistanceFactor;
-	
-	csSoundListenerSoftware * m_pListener;
+    // the global listener object
+	csSoundListenerSoftware *Listener;
+
+    // the vfs
+    iVFS *VFS;
+
+    // format for loading sounds
+    csSoundFormat LoadFormat;
 };
 
 #endif	//__NETWORK_DRIVER_SOFTWARE_H__

@@ -23,9 +23,7 @@
 
 #include "cssysdef.h"
 #include "csutil/csvector.h"
-#include "cssfxldr/common/snddata.h"
-#include "cssfxldr/funcs.h"
-#include "cssfxldr/aufile.h"
+#include "sndload.h"
 
 // Sun AU file loader
 //  support 8 and 16 bits PCM
@@ -40,16 +38,14 @@
 #define addStream(x) {if((index+x)>size) {goto exit_read;} else {index+=x;}}
 #define Stream buf[index]
 
-bool RegisterAU ()
-{
-  static AULoader loader;
-  return csSoundLoader::Register (&loader);
+const char *csSoundLoader_AU::GetDesc() const {
+  return "Sun sound format";
 }
 
-csSoundData* AULoader::loadsound(UByte* buf, ULong size)
-{
+iSoundData* csSoundLoader_AU::Load(UByte* buf, ULong size,
+        const csSoundFormat *fmt) const {
   unsigned long index=0;
-  csSoundData *sb= NULL;
+  csSoundDataWave *sb= NULL;
   char *data=NULL;
   unsigned char dummy0, dummy1, dummy2, dummy3;
 
@@ -144,14 +140,13 @@ csSoundData* AULoader::loadsound(UByte* buf, ULong size)
     }
   }
 
-  sb = new csSoundData(freq,
-    (flag==BIT16 || flag==BIT8ULAW)?true:false,
-    (nchannels==2)?true:false,
-    (flag==BIT16)?true:false,
+  sb=new csSoundDataWave(NULL);
+  sb->Initialize(freq,
+    (flag==BIT16 || flag==BIT8ULAW)?16:8,
+    nchannels,
     (flag==BIT16)?(nbytes/2)-1:nbytes-1,
     data);
-  
-  if(sb==NULL) goto exit_read;
+  sb->Prepare(fmt);
 
   goto exit_ok;
 exit_read:
