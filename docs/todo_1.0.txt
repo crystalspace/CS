@@ -14,6 +14,9 @@ have on CS.  The following modifiers can be given:
 	- **: bug or feature has been fixed or implemented.
 
 Bugs to fix:
+	[S]  Restoration of dllwrap uses $* which gets eaten by cs-config.
+	     Need to figure out some way to prevent $* from being eaten.  The
+	     technique for protecting $@ does not seem to work for $*.
 	[S]  Very poor OpenGL/performance on MacOS/X and possibly other
 	     platforms.  dfryer@uvic.ca reports that his OpenGL profiler says
 	     that 95% of the time is spent in DrawArrays().  He further reports
