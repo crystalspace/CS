@@ -24,8 +24,11 @@
 #define _CSVOSOBJECT3D_H_
 
 #include <vos/metaobjects/a3dl/object3d.hh>
+#include <vos/metaobjects/property/propertylistener.hh>
+
 #include "inetwork/vosa3dl.h"
 #include "iengine/mesh.h"
+
 #include "csvosa3dl.h"
 #include "vossector.h"
 
@@ -45,18 +48,31 @@ public:
   void SetMeshWrapper(iMeshWrapper* mw);
 };
 
-class csMetaObject3D : public virtual A3DL::Object3D
+class csMetaObject3D : public virtual A3DL::Object3D,
+                       public VOS::PropertyListener
 {
 protected:
-  csVosObject3D* csvobj3d;
+  csRef<csVosObject3D> csvobj3d;
+  csVosA3DL *vosa3dl;
+
 public:
   csMetaObject3D(VOS::VobjectBase* superobject);
   virtual ~csMetaObject3D();
 
-  static VOS::MetaObject* new_csMetaObject3D(VOS::VobjectBase* superobject, const std::string& type);
+  static VOS::MetaObject* new_csMetaObject3D(VOS::VobjectBase* superobject, 
+                                             const std::string& type);
 
+  // Set up the object
   virtual void Setup(csVosA3DL* vosa3dl, csVosSector* sect);
   csRef<csVosObject3D> GetCSinterface();
+
+  // Property listener and callbacks for object property events
+  virtual void notifyPropertyChange(const VOS::PropertyEvent &event);
+
+  // Call these from CS run loop.  Derived objects can override if they
+  // do not correctly observe movable interface
+  virtual void changePosition(const csVector3 &pos);
+  virtual void changeTransform(const csMatrix3 &trans);
 };
 
 #endif

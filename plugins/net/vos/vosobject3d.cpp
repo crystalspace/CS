@@ -59,6 +59,7 @@ void csVosObject3D::SetMeshWrapper(iMeshWrapper* mw)
   meshwrapper = mw;
 }
 
+/// Construct an object3d
 
 class ConstructObject3DTask : public Task
 {
@@ -109,10 +110,41 @@ void ConstructObject3DTask::doTask()
   }
 }
 
+// Set position task
+
+class PositionTask : public Task
+{
+  vRef<csMetaObject3D> obj;
+  csVector3 pos;
+
+public:
+  PositionTask (csMetaObject3D *o, const csVector3 &p) : obj(o, true), pos(p) {}
+  ~PositionTask () {}
+
+  void doTask() { obj->changePosition(pos); }
+};
+
+// Set orientation task
+        
+class OrientateTask : public Task
+{
+  vRef<csMetaObject3D> obj;
+  csMatrix3 ori;
+
+public:
+  OrientateTask (csMetaObject3D *o, const csMatrix3 &m) 
+    : obj(o, true), ori(m) {}
+  ~OrientateTask () {}
+
+  void doTask() { obj->changeTransform (ori); }
+};
+        
+
 
 /// csMetaObject3D ///
 
-csMetaObject3D::csMetaObject3D(VobjectBase* superobject) : A3DL::Object3D(superobject)
+csMetaObject3D::csMetaObject3D(VobjectBase* superobject) 
+    : A3DL::Object3D(superobject)
 {
   csvobj3d = new csVosObject3D();
   csvobj3d->IncRef();
@@ -123,7 +155,8 @@ csMetaObject3D::~csMetaObject3D()
   delete csvobj3d;
 }
 
-MetaObject* csMetaObject3D::new_csMetaObject3D(VobjectBase* superobject, const std::string& type)
+MetaObject* csMetaObject3D::new_csMetaObject3D(VobjectBase* superobject, 
+                                               const std::string& type)
 {
   return new csMetaObject3D(superobject);
 }
@@ -131,6 +164,8 @@ MetaObject* csMetaObject3D::new_csMetaObject3D(VobjectBase* superobject, const s
 void csMetaObject3D::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
 {
   LOG("csMetaObject3D", 3, "now in csMetaObject3D::setup");
+
+  this->vosa3dl = vosa3dl;
 
   double x, y, z;
   try
@@ -155,10 +190,13 @@ void csMetaObject3D::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
     c = 1;
   }
 
+  LOG("csMetaObject3D", 3, "got orientation ");
+
   double xht, yht, zht;
   try
   {
     getPositionHT(xht, yht, zht);
+    LOG("csMetaObject3D", 3, "got hard position");
   }
   catch(...)
   {
@@ -169,6 +207,7 @@ void csMetaObject3D::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
   try
   {
     getOrientationHT(aht, bht, cht, dht);
+    LOG("csMetaObject3D", 3, "got hard orientation ");
   }
   catch(...)
   {
@@ -180,29 +219,88 @@ void csMetaObject3D::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
   try
   {
     getScalingHT(sxht, syht, szht);
+    LOG("csMetaObject3D", 3, "got hard scaling");
   }
   catch(...)
   {
     sxht = syht = szht = 1.0;
   }
 
-
-  LOG("csMetaObject3D", 3, "got orientation ");
-
   csQuaternion q;
-  q.SetWithAxisAngle(csVector3(a, b, c), d);
+  q.SetWithAxisAngle(csVector3(a, b, c), d * M_PI / 180.0);
 
   csQuaternion qht;
-  qht.SetWithAxisAngle(csVector3(aht, bht, cht), dht);
+  qht.SetWithAxisAngle(csVector3(aht, bht, cht), dht * M_PI/180.0);
 
   LOG("vosobject3d", 3, "setting position " << x << " " << y << " " << z);
 
-  vosa3dl->mainThreadTasks.push(new ConstructObject3DTask(vosa3dl->GetObjectRegistry(), this,
-                                                          csVector3(x, y, z), csMatrix3(q),
-                                                          csVector3(xht, yht, zht),
-                                                          csMatrix3(qht) * csMatrix3(sxht, 0, 0,
-                                                                                    0, syht, 0,
-                                                                                    0, 0, szht)));
+  vosa3dl->mainThreadTasks.push (new ConstructObject3DTask(
+                            vosa3dl->GetObjectRegistry(), this, 
+                            csVector3(x, y, z),                    // pos
+                            csMatrix3(q),                          // ori
+                            csVector3(xht, yht, zht),              // hardpos
+                            csMatrix3(qht) * csMatrix3(sxht, 0, 0, // hardtrans
+                                                       0, syht, 0, 
+                                                       0, 0, szht)));
+//if(vosa3dl->listenUpdates()) {  // should possibly be optional
+  LOG("vosobject3d", 3, "listening to movement changes");
+  try
+  {
+    getPositionObj()->addPropertyListener(this);
+	getOrientationObj()->addPropertyListener(this);
+  }
+  catch (...)
+  {
+  }
+}
+
+void csMetaObject3D::notifyPropertyChange(const PropertyEvent &event)
+{
+  try
+  {
+    if (event.getEvent() != PropertyEvent::PropertyRead)
+    {
+      vRef<ParentChildRelation> pcr = event.getProperty()->findParent (*this);
+      if (pcr->getContextualName() == "a3dl:position")
+      {
+        double x, y, z;
+        getPosition (x,y,z);
+        vosa3dl->mainThreadTasks.push (new PositionTask(this,csVector3(x,y,z)));
+      }
+      else if (pcr->getContextualName() == "a3dl:orientation")
+      {
+        double x, y, z, angle;
+        getOrientation (x,y,z,angle);
+        csQuaternion q;
+        q.SetWithAxisAngle (csVector3(x,y,z), angle * M_PI/180.0);
+        vosa3dl->mainThreadTasks.push (new OrientateTask(this,csMatrix3(q)));
+      }
+    }
+  }
+  catch (...)
+  {}
+}
+
+void csMetaObject3D::changePosition (const csVector3 &pos)
+{
+  csRef<iMeshWrapper> mw = GetCSinterface()->GetMeshWrapper();
+  LOG("vosobject3d", 2, "setting position of " << getURLstr() << 
+      " to " << pos.x << " " << pos.y << " " << pos.z);
+  if(mw.IsValid())
+  {
+    mw->GetMovable()->SetPosition(pos);
+    mw->GetMovable()->UpdateMove();
+  }
+}
+
+void csMetaObject3D::changeTransform (const csMatrix3 &trans)
+{
+  csRef<iMeshWrapper> mw = GetCSinterface()->GetMeshWrapper();
+  if(mw.IsValid())
+  {
+    mw->GetMovable()->SetTransform(trans);
+    mw->GetMovable()->UpdateMove();
+  }
 }
 
 csRef<csVosObject3D> csMetaObject3D::GetCSinterface()
