@@ -33,6 +33,9 @@ The history order is reversed so that new features are at the top.
 	  required, but some file somewhere in the engine is probably
 	  unnecessarily including csimage.h.  The real solution is to find this
 	  unnecessarily inclusion and eliminate it.
+	- Eric Sunshine changed the `sequence' plugin so that it implements
+	  iPlugIn via embedding rather than inheritance in order to work around
+	  NextStep compiler bugs.
 24-May-2001
 	- Eric Sunshine fixed several problems in lexan.mak.
 	- Eric Sunshine eliminated compilation warning from csobject.cpp about
