@@ -716,6 +716,7 @@ WalkTest::~WalkTest ()
   CHK (delete view);
   CHK (delete infinite_maze);
   CHK (delete cslogo);
+  CHK (delete world);
 }
 
 bool WalkTest::ParseArg (int argc, char* argv[], int& i)
