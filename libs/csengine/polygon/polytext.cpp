@@ -1232,12 +1232,12 @@ bool csPolyTexture::CleanIfDirty (csBitSet *bs)
 
   int dc = dirty_cnt;
   unsigned sz = MIN (bs->GetByteCount (), dirty_matrix->GetByteCount ());
-  ULong *src = (ULong *)bs->GetBits ();
-  ULong *dst = (ULong *)dirty_matrix->GetBits ();
+  ULong *lsrc = (ULong *)bs->GetBits ();
+  ULong *ldst = (ULong *)dirty_matrix->GetBits ();
   while (sz >= sizeof (ULong))
   {
-    ULong s = *src;
-    ULong d = *dst;
+    ULong s = *lsrc;
+    ULong d = *ldst;
     s &= d; // leave in bs only the bits that are marked dirty in dirty_matrix
     d ^= s; // drop the bits in dirty_matrix that are going to be refreshed
     if (s)
@@ -1245,20 +1245,22 @@ bool csPolyTexture::CleanIfDirty (csBitSet *bs)
                    COUNT_BITS (s >> 8 ) - COUNT_BITS (s >> 12) -
                    COUNT_BITS (s >> 16) - COUNT_BITS (s >> 20) -
                    COUNT_BITS (s >> 24) - COUNT_BITS (s >> 28);
-    *src++ = s;
-    *dst++ = d;
+    *lsrc++ = s;
+    *ldst++ = d;
     sz -= sizeof (ULong);
   }
+  UByte *bsrc = (UByte *)lsrc;
+  UByte *bdst = (UByte *)ldst;
   while (sz--)
   {
-    UByte s = *(UByte *)src;
-    UByte d = *(UByte *)dst;
+    UByte s = *bsrc;
+    UByte d = *bdst;
     if (s)
       dirty_cnt -= COUNT_BITS (s) - COUNT_BITS (s >> 4);
     s &= d; // leave in bs only the bits that are marked dirty in dirty_matrix
     d ^= s; // drop the bits in dirty_matrix that are going to be refreshed
-    *((UByte *)src++) = s;
-    *((UByte *)dst++) = d;
+    *bsrc++ = s;
+    *bdst++ = d;
   }
 
   return (dc != dirty_cnt);
