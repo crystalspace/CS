@@ -1,0 +1,95 @@
+@c -*-texinfo-*-
+@node RPM, , Unix, Unix
+@subsubsection Unix using RPM packages
+@cindex Rpm
+@cindex package
+@cindex @file{cs.spec}
+
+@subheading Getting @sc{rpm}s packages
+
+There is no official release of @sc{rpm}s packages at the moment.
+Building your own @sc{rpm}s is probably the best option. This way you won't
+have to find distribution specific package, and you'll be able to set building
+options. For this purpose, @file{CS/scripts/rpm/cs.spec} file is provided with
+Crystal Space.
+
+@subheading Configure your system to build @sc{rpm}s packages
+
+Building @sc{rpm}s packages involves a few settings, which are covered in
+the following page:
+@ifnottex
+@uref{http://qa.mandrakesoft.com/twiki/bin/view/Main/RpmHowTo#Preliminary_tasks}
+@end ifnottex
+@iftex
+@code{http://qa.mandrakesoft.com/twiki/bin/view/Main/RpmHowTo#Preliminary_tasks}
+@end iftex
+
+@subheading Building your own @sc{rpm}s packages from Crystal Space source archive 
+
+Once you've set your system to build @sc{rpm} packages as a regular user:
+
+@enumerate
+@item
+Get Crystal Space sources archive (@pxref{Where to Get}) and put it in your
+@file{rpm/SOURCES/} directory.
+
+@item
+Go into your @file{rpm/SPECS} directory.
+
+@item
+Extract the @file{CS/scripts/rpm/cs.spec} file, and put it in your
+@file{rpm/SPECS/} directory.
+
+@example
+cd /home/user/rpm/SPECS
+tar xvjf /home/user/rpm/SOURCES/cs-current-snapshot.tar.bz2 \
+     CS/scripts/rpm/cs.spec
+mv CS/scripts/rpm/cs.spec /home/user/rpm/SPECS
+rm -rf CS/
+@end example
+
+@item
+Verify the source archive filename you downloaded is set in accordance with the
+filename part of the @sc{url} in @samp{Source:} line of @file{cs.spec},
+otherwise @command{rpm} won't be able to do his job.
+@end enumerate
+
+@itemize @bullet
+@item To build binary @sc{rpm}s only, use @command{rpm -bb cs.spec}
+@item To build source @sc{rpm}s as well, use @command{rpm -ba cs.spec}
+@end itemize
+
+Build options are specified by using @command{--with} switch. Actually, the
+following values are supported:
+
+@itemize @bullet
+@item
+@command{--with newrenderer} to build with New Renderer support.
+@item
+@command{--with perl} to build with Perl support.
+@item
+@command{--with debug}. This option may be useless since @command{rpm}
+strips files before packaging.
+@end itemize
+
+So, to build all packages, with New Renderer and Perl support, use:
+
+@command{rpm -ba cs.spec --with newrenderer --with perl}
+
+The binary @sc{rpm}s should be under @file{rpm/RPMS/}, and the source @sc{rpm}
+in @file{rpm/SRPMS/}.
+
+The process builds three Crystal Space binary @sc{rpm}s packages :
+
+@enumerate
+@item
+@samp{crystalspace} base package. It provides executables, plugins, data and
+configuration files.
+@item
+@samp{crystalspace-devel} development package. It provides headers and static
+libraries needed for development.
+@item
+@samp{crystalspace-doc} documentation package. It provides api and user manual
+documentation in @sc{html} format.
+@end enumerate
+
