@@ -1,6 +1,6 @@
 /*
-*      
-*
+    Copyright (C) 2000 by Jorrit Tyberghein
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
@@ -14,12 +14,15 @@
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+/*
 -------------------------------------------------------------------------
-*           OPCODE collision detection plugin for CrystalSpace
-* 
-*           OPCODE library was written by Pierre Terdiman 
-*                  ported to CS by Charles Quarra
 *
+*           OPCODE collision detection plugin for CrystalSpace
+*
+*           OPCODE library was written by Pierre Terdiman
+*                  ported to CS by Charles Quarra
 *
 -------------------------------------------------------------------------
 */
@@ -39,12 +42,10 @@ struct iObjectRegistry;
 
 class csOPCODECollideSystem : public iCollideSystem
 {
-
 public:
-   
 	Opcode::AABBTreeCollider TreeCollider;
-//  CollisionFaces CollideFaces;
-//  csDLinkList CacheList;
+  //  CollisionFaces CollideFaces;
+  //  csDLinkList CacheList;
 	Opcode::BVTCache ColCache;
 	csOPCODECollider* col1;
 	csReversibleTransform T1;
@@ -54,17 +55,15 @@ public:
   int N_pairs;
   iObjectRegistry *object_reg;
  
- SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
   csOPCODECollideSystem (iBase* parent);
   virtual ~csOPCODECollideSystem ();
   bool Initialize (iObjectRegistry* iobject_reg);
 
-
-        virtual csPtr<iCollider> CreateCollider (iPolygonMesh* mesh);
+  virtual csPtr<iCollider> CreateCollider (iPolygonMesh* mesh);
   virtual csPtr<iCollider> CreateSphereCollider (iMeshObject* sphere);
-     virtual csPtr<iCollider> CreateBoxCollider (iMeshObject* box);
-
+  virtual csPtr<iCollider> CreateBoxCollider (iMeshObject* box);
 
   /**
    * Test collision between two colliders.
@@ -132,11 +131,9 @@ public:
    * test against.
    */
   virtual int CollidePath (
-  	iCollider* collider, const csReversibleTransform* trans,
-	csVector3& newpos,
-	int num_colliders,
-	iCollider** colliders,
-	csReversibleTransform** transforms);
+    iCollider* collider, const csReversibleTransform* trans,
+    csVector3& newpos, int num_colliders, iCollider** colliders,
+    csReversibleTransform** transforms);
 
   struct Component : public iComponent
   {
