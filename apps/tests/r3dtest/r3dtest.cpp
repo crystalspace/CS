@@ -288,7 +288,13 @@ bool R3DTest::Initialize ()
   // Change this path to something /Anders Stenberg
   vfs->Mount ("/lev/testrender", "faerie.zip");
   vfs->ChDir ("/lev/testrender");
-  loader->LoadMapFile ("world", false);
+  if (!loader->LoadMapFile ("world", false))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.r3dtest",
+    	"Couldn't load the test level!\nNote that this application is experimental.\nIf you don't have a test level for this app then you probably don't want to run it.");
+    return false;
+  }
 
   csRef<iSector> room = engine->FindSector ("room");
 

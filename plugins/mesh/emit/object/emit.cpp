@@ -557,7 +557,7 @@ void csEmitMeshObject::SetupObject ()
     bbox.StartBoundingBox();
 
     /// create new particles and add to particle system
-	int i;
+    int i;
     for (i=0 ; i < number ; i++)
     {
       if(using_rect_sprites)

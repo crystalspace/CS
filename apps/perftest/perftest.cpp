@@ -137,7 +137,7 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
 
   if (!csInitializer::RequestPlugins (object_reg,
   	CS_REQUEST_VFS,
-	CS_REQUEST_SOFTWARE3D,
+	CS_REQUEST_OPENGL3D,
 	CS_REQUEST_FONTSERVER,
 	CS_REQUEST_IMAGELOADER,
 	CS_REQUEST_CONSOLEOUT,

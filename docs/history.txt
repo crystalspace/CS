@@ -6,6 +6,10 @@ The history order is reversed so that new features are at the top.
 	  in any of its methods. This means that the functions of
 	  csGLStateCache don't have to be virtual anymore. This gives another
 	  small speed increase with the OpenGL renderer.
+	- Made r3dtest spit out a useful error message if it cannot find
+	  a test level.
+	- Most CS applications will now use OpenGL by default instead of the
+	  software renderer.
 27-Jan-2003
 	- Restored number of super lightmaps in OpenGL to 10 again. Apparently
 	  16 was too much for cards with less texture memory. We have to find
