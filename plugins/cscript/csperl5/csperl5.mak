@@ -1,5 +1,5 @@
 DESCRIPTION.csperl5 = Crystal Space Perl5 scripting plugin
-DESCRIPTION.csperl5dist = $(DESCRIPTION.csperl5) interim files
+DESCRIPTION.csperl5maintainer = $(DESCRIPTION.csperl5) interim files
 DESCRIPTION.swigperl5gen = $(DESCRIPTION.csperl5) (forcibly)
 
 #------------------------------------------------------------- rootdefines ---#
@@ -13,7 +13,7 @@ endif
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION), roottargets)
 
-.PHONY: csperl5 swigperl5gen csperl5clean csperl5distclean
+.PHONY: csperl5 swigperl5gen csperl5clean csperl5maintainerclean
 
 all plugins: csperl5
 
@@ -21,9 +21,11 @@ csperl5:
 	$(MAKE_TARGET) MAKE_DLL=yes
 swigperl5gen:
 	$(MAKE_TARGET)
+#swigperl5inst:
+#	$(MAKE_TARGET)
 csperl5clean:
 	$(MAKE_CLEAN)
-csperl5distclean:
+csperl5maintainerclean:
 	$(MAKE_CLEAN)
 
 endif
@@ -93,7 +95,7 @@ endif
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION), targets)
 
-.PHONY: csperl5 swigperl5gen csperl5clean csperl5distclean
+.PHONY: csperl5 swigperl5gen csperl5clean csperl5maintainerclean
 
 csperl5: $(OUTDIRS) $(CSPERL5) $(CSPERL5.PM) $(CEX.CSPERL5)
 
@@ -152,16 +154,14 @@ $(CEX.CSPERL5): $(CIN.CSPERL5)
 swigperl5gen: swigperl5clean $(SWIG.PERL5.C) $(SWIG.PERL5.PM)
 
 clean: csperl5clean
-distclean: csperl5distclean
+maintainerclean: csperl5maintainerclean
 
 csperl5clean:
 	-$(RMDIR) $(CSPERL5) $(OBJ.CSPERL5) $(OUTDLL)/$(notdir $(SCF.CSPERL5)) \
 $(PERLXSI.O) $(PERLXSI.C) $(CSPERL5.PM) $(SWIG.PERL5.O) $(SWIG.PERL5.DLL)
 
-swigperl5clean:
+csperl5maintainerclean: csperl5clean
 	$(RM) $(SWIG.PERL5.DOC) $(SWIG.PERL5.C) $(SWIG.PERL5.PM)
-
-csperl5distclean: csperl5clean swigperl5clean
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/csperl5.dep
