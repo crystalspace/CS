@@ -1,5 +1,15 @@
 The history order is reversed so that new features are at the top.
 
+27-Apr-2002
+	- Worked around a bug in the mipmapping code in csImage. When
+	  mipmapping is called for one dimension equal to 1 the routine
+	  reads to unallocated memory. I don't really understand
+	  mipmap.inc very well so I currently just worked around this
+	  bug. This needs more investigation. Thanks to Matze's valgrind
+	  debugging for discovering this bug.
+	- Fixed a few bugs in the OpenGL renderer where some queue variables
+	  were not initialized. Thanks to Matze's valgrind debugging
+	  for discovering this bug.
 26-Apr-2002
 	- Fixed a bad bug in the XOR buffer which could cause memory
 	  overwrites. A nice side effect of fixing this bug is that it is

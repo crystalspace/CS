@@ -295,6 +295,52 @@ iImage *csImageFile::MipMap (int steps, csRGBpixel *transp)
   if (Alpha)
     nimg->Alpha = new uint8 [nimg->Width * nimg->Height];
 
+  if (Width == 1 || Height == 1)
+  {
+    // @@@@@
+    // This is a work around for a bug in mipmap code defined in mipmap.inc.
+    // It seems that if one of the dimensions is 1 the code in mipmap.inc
+    // will read past image boundaries. I don't understand the code of
+    // mipmap.inc at the moment so I will try to work around the bug for
+    // now. This needs further investigation later. Note that this bug triggers
+    // when non-square textures are mipmapped.
+    int longdim;
+    if (Width == 1) longdim = Height;
+    else longdim = Width;
+    switch (Format & CS_IMGFMT_MASK)
+    {
+      case CS_IMGFMT_NONE:
+      case CS_IMGFMT_PALETTED8:
+	// @@@ Currently not supported!
+	break;
+      case CS_IMGFMT_TRUECOLOR:
+	if (Image)
+	{
+	  csRGBpixel* dest = mipmap;
+	  csRGBpixel* src = (csRGBpixel*)Image;
+	  for (int i = 0 ; i < (longdim >> steps) ; i++)
+	  {
+	    *dest++ = *src;
+	    src += 1<<steps;
+	  }
+	}
+ 	if (Alpha)
+	{
+	  uint8* dest = nimg->Alpha;
+	  uint8* src = (uint8*)Alpha;
+	  for (int i = 0 ; i < (longdim >> steps) ; i++)
+	  {
+	    *dest++ = *src;
+	    src += 1<<steps;
+	  }
+	}
+	break;
+    }
+
+    nimg->convert_rgba (mipmap);
+    return nimg;
+  }
+  
   int transpidx = -1;
   if (transp && Palette)
     transpidx = closest_index (transp);

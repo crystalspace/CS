@@ -110,6 +110,9 @@ public:
   GLfloat* GetLayerGLTxt (int idx) { return &layer_gltxt[idx<<1]; }
 
   csPolyQueue () :
+	mat_handle (NULL), mixmode (~0), z_buf_mode (CS_ZBUF_NONE),
+  	flat_color_r (0), flat_color_g (0), flat_color_b (0),
+
 	num_vertices (0), max_vertices (0),
 	glverts (NULL), gltxt (NULL), glcol (NULL), layer_gltxt (NULL),
 	num_triangles (0), max_triangles (0),

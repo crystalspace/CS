@@ -539,6 +539,7 @@ OpenGLLightmapCache::OpenGLLightmapCache (csGraphics3DOGLCommon* g3d)
   num_lm_processed = 0;
   initialized = false;
   OpenGLLightmapCache::g3d = g3d;
+  queue_zbuf_mode = CS_ZBUF_NONE;
 }
 
 OpenGLLightmapCache::~OpenGLLightmapCache ()
