@@ -171,6 +171,32 @@ csTerrFuncObject::~csTerrFuncObject ()
   delete[] blocks;
 }
 
+void csTerrFuncObject::CorrectSeams (int tw, int th)
+{
+  correct_tw = tw;
+  correct_th = th;
+  if (tw)
+  {
+    correct_du = 1. - 2. / float (tw);
+    correct_su = 1. / float (tw);
+  }
+  else
+  {
+    correct_du = 1;
+    correct_su = 0;
+  }
+  if (th)
+  {
+    correct_dv = 1. - 2. / float (th);
+    correct_sv = 1. / float (th);
+  }
+  else
+  {
+    correct_dv = 1;
+    correct_sv = 0;
+  }
+}
+
 void csTerrFuncObject::LoadMaterialGroup (iEngine* engine, const char *pName,
 	int iStart, int iEnd)
 {
