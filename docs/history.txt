@@ -13,9 +13,9 @@ chronological order.
 	  the templates to build correctly with modern compilers, such as gcc
 	  3.4.x.  For details of "dependent" template contexts, see:
 	  http://gcc.gnu.org/onlinedocs/gcc/Name-lookup.html
-	- Eric Sunshine fixed bug in csModelConverterSPR where it reported that
-	  it could neither load nor save sprites, thus rendering itself quite
-	  useless as a sprite importer/exporter.
+	- Eric Sunshine fixed bug in csModelConverterSPR where it informed
+	  clients that it could neither load nor save sprites, thus rendering
+	  itself quite useless as a sprite importer/exporter.
 	- Eric Sunshine fixed a bug in install.mak where the sub-install rules,
 	  such as install_config, install_doc, etc., would uselessly create an
 	  empty subdirectory within the build directory with the same name as
@@ -23,7 +23,7 @@ chronological order.
 	- Eric Sunshine fixed bugs in several rules in docs.jam where NotFile
 	  was being invoked for actual files.
 	- Eric Sunshine fixed bug in group.jam where it failed to invoke
-	  NotFile for each group name.
+	  NotFile for the registered group names.
 	- Eric Sunshine fixed bug in cs-config/Jamfile (and install.jam) where
 	  the install target did not know how to build cs-config if it did not
 	  already exist at installation time.
