@@ -93,7 +93,7 @@
 				Name="VCWebServiceProxyGeneratorTool"/>
 		</Configuration>
 		<Configuration
-			Name="ExtensiveDebug|Win32"
+			Name="ExtensiveMemDebug|Win32"
 			OutputDirectory=".\csmemdbg\temp\%project%"
 			IntermediateDirectory=".\csmemdbg\temp\%project%"
 			ConfigurationType="4"
