@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-Aug-2004
+	- Peter Amstutz fixed window resizing in the Wx GL canvas.  It works
+	  now.  Also fixed input handling in the canvas (2nd and 3rd mouse
+	  buttons were swapped by accident).
+	- Peter Amstutz also improved sector support in the csvosa3dl plugin,
+	  so it won't try and load a sector that has already been loaded
+	  a second time.
 3-Aug-2004
 	- Eric Sunshine changed the install location of Crystal Space headers
 	  from ${includedir} to ${includedir}/crystalspace in order to avoid
@@ -169,6 +176,8 @@ chronological order.
 	- Eric Sunshine fixed bug in csArray::DeleteRange() where it failed to
 	  destroy (invoke the destructor of) the last object in the range.
 	  Reported by Bedrich Zaba <frogbride@seznam.cz>.
+	- Peter Amstutz fixed the wxgl canvas to work on Microsoft windows
+	  and added the missing wxwin.h header.
 27-Jul-2004
 	- Peter Amstutz added the wxgl canvas (initially developed by
 	  Daniel Fryer) which makes it fairly easy to embed Crystal Space
