@@ -248,14 +248,16 @@ bool awsCheckBox::OnMouseDown (int, int, int)
 
 bool awsCheckBox::OnMouseUp (int, int, int)
 {
-  if (is_down) Broadcast (signalClicked);
+  if (is_down)
+  {
+    if (!is_on)
+      is_on = true;
+    else
+      is_on = false;
 
-  if (!is_on)
-    is_on = true;
-  else
-    is_on = false;
-
-  is_down = false;
+    Broadcast (signalClicked);
+    is_down = false;
+  }
 
   Invalidate ();
   return true;

@@ -153,19 +153,17 @@ bool awsRadButton::HandleEvent (iEvent &Event)
 
   switch (Event.Type)
   {
-    case csevGroupOff:
-      if (is_on)
-      {
+  case csevGroupOff:
+    if (is_on)
+    {
+      is_on = false;
+      Broadcast (signalTurnedOff);
+      Broadcast (signalClicked);
+      Invalidate ();
+    }
 
-		Broadcast (signalTurnedOff);
-
-		Broadcast (signalClicked);
-        is_on = false;
-        Invalidate ();
-      }
-
-      return true;
-      break;
+    return true;
+    break;
   }
 
   return false;
@@ -299,15 +297,17 @@ bool awsRadButton::OnMouseDown (int, int, int)
 
 bool awsRadButton::OnMouseUp (int, int, int)
 {
-  if (is_down) Broadcast (signalClicked);
-
-  if (!is_on)
+  if (is_down) 
   {
-    is_on = true;
-    ClearGroup ();
-  }
+    if (!is_on)
+    {
+      is_on = true;
+      ClearGroup ();
+    }
 
-  is_down = false;
+    is_down = false;
+    Broadcast (signalClicked);
+  }
 
   Invalidate ();
   return true;
