@@ -340,7 +340,7 @@ void csVARRenderBufferManager::TouchBlockInLRU(csVARRenderBuffer* buf)
 bool csVARRenderBufferManager::ReclaimMemory()
 {
   csList<csVARRenderBuffer*>::Iterator dynamicIt(dynamicList, true);
-  while(dynamicIt.HasPrevious())
+  while(dynamicIt.HasCurrent())
   {
     if((*dynamicIt)->Discard())
       return true;
@@ -348,7 +348,7 @@ bool csVARRenderBufferManager::ReclaimMemory()
   }
 
   csList<csVARRenderBuffer*>::Iterator staticIt(staticList, true);
-  while(staticIt.HasPrevious())
+  while(staticIt.HasCurrent())
   {
     if((*staticIt)->Discard())
       return true;
