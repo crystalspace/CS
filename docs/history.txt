@@ -17,6 +17,10 @@ The history order has been reversed so that new features are at the top.
 	  #ifdef OS_UNIX. This isn't pretty but it is debugging stuff
 	  anyway and at least it doesn't contaminate other apps that
 	  don't need this.
+	- Wouter Wijngaards added new csRainParticleSystem to simulate
+	  rain.
+	- Added 'rain' console command to create a new rain particle
+	  system. Experimental right now. Doesn't work perfectly yet.
 14-Jun-2000
 	- Added new command 'db_frustum' to debug the CheckFrustum routine.
 	  This function expects an integer parameter and will draw an outline

@@ -225,7 +225,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("Statistics:\n");
     CONPRI("  stats fps perftest coordshow\n");
     CONPRI("Special effects:\n");
-    CONPRI("  addbot delbot addskel addghost fire explosion spiral\n");
+    CONPRI("  addbot delbot addskel addghost fire explosion spiral rain\n");
     CONPRI("Debugging:\n");
     CONPRI("  fclear hi frustum zbuf debug0 debug1 debug2 edges palette\n");
     CONPRI("Various:\n");
@@ -586,6 +586,21 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     extern void fire_missile ();
     fire_missile ();
+  }
+  else if (!strcasecmp (cmd, "rain"))
+  {
+    char txtname[100];
+    int cnt = 0;
+    if (arg) cnt = ScanStr (arg, "%s", txtname);
+    extern void add_particles_rain (csSector* sector, const csVector3& center,
+    	char* txtname);
+    if (cnt != 1)
+    {
+      Sys->Printf (MSG_CONSOLE, "Expected parameter 'texture'!\n");
+    }
+    else
+      add_particles_rain (Sys->view->GetCamera ()->GetSector (),
+    	Sys->view->GetCamera ()->GetOrigin (), txtname);
   }
   else if (!strcasecmp (cmd, "explosion"))
   {
