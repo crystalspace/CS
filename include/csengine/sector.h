@@ -176,12 +176,6 @@ public:
   uint32 current_visnr;
 
   /**
-   * Option variable: render portals?
-   * If this variable is false portals are rendered as a solid polygon.
-   */
-  static bool do_portals;
-
-  /**
    * Configuration variable: number of allowed reflections for static lighting.
    * This option controls how many time a given sector may be visited by the
    * same beam of light. When this value is 1 it means that light is not

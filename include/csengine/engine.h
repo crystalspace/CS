@@ -383,10 +383,6 @@ private:
   csPDelArray<csLightHalo> halos;
   /// Thing mesh object type for convenience.
   csRef<iMeshObjectType> thing_type;
-  /// Debugging: maximum number of polygons to process in one frame.
-  static int max_process_polygons;
-  /// Current number of processed polygons.
-  static int cur_process_polygons;
 
   /// Current render context (proc texture) or 0 if global.
   iTextureHandle* render_context;
@@ -611,36 +607,6 @@ public:
    * lightmaps will be cached or not.
    */
   virtual void RemoveLight (iLight* light);
-
-  /**
-   * Set the maximum number of polygons to process in
-   * one frame. This is mainly useful for debugging.
-   */
-  static void SetMaxProcessPolygons (int m) { max_process_polygons = m; }
-
-  /**
-   * Get the maximum number of polygons to process in one frame.
-   */
-  static int GetMaxProcessPolygons () { return max_process_polygons; }
-
-  /**
-   * Indicate that we will process another polygon. Returns false
-   * if we need to stop.
-   */
-  static bool ProcessPolygon ()
-  {
-    if (cur_process_polygons > max_process_polygons) return false;
-    cur_process_polygons++;
-    return true;
-  }
-
-  /**
-   * Return true if we are processing the last polygon.
-   */
-  static bool ProcessLastPolygon ()
-  {
-    return cur_process_polygons >= max_process_polygons;
-  }
 
   /**
    * Get the pointer to the radiosity object (used with step-by-step

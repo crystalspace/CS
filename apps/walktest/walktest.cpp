@@ -94,18 +94,7 @@ WalkTest *Sys;
 #define Gfx3D Sys->myG3D
 #define Gfx2D Sys->myG2D
 
-//------------------------------------------------- We need the 3D engine -----
-
 CS_IMPLEMENT_APPLICATION
-
-// Need to register the engine explicit here when not building static.
-#if !defined(CS_STATIC_LINKED)
-SCF_REGISTER_STATIC_CLASS(csEngine,
-"crystalspace.engine.3d", "Crystal Space 3D Engine",
-"crystalspace.kernel.:crystalspace.graphics3d.:crystalspace.graphic.image.io.")
-#endif
-
-//-----------------------------------------------------------------------------
 
 bool WalkTest::move_3d = false;
 
@@ -123,7 +112,6 @@ WalkTest::WalkTest () :
   anim_sky = 0;
   anim_dirlight = 0;
 
-  do_stats = false;
   do_edges = false;
   do_show_coord = false;
   busy_perf_test = false;
@@ -219,7 +207,6 @@ void WalkTest::Report (int severity, const char* msg, ...)
 void WalkTest::SetDefaults ()
 {
   csRef<iConfigManager> Config (CS_QUERY_REGISTRY (object_reg, iConfigManager));
-  do_stats = Config->GetBool ("Walktest.Settings.Stats", false);
   do_cd = Config->GetBool ("Walktest.Settings.Colldet", true);
   do_logo = Config->GetBool ("Walktest.Settings.DrawLogo", true);
 
@@ -265,17 +252,6 @@ void WalkTest::SetDefaults ()
     val = cmdline->GetName (idx);
   }
 
-  if (cmdline->GetOption ("stats"))
-  {
-    do_stats = true;
-    Report (CS_REPORTER_SEVERITY_NOTIFY, "Statistics enabled.");
-  }
-  else if (cmdline->GetOption ("nostats"))
-  {
-    do_stats = false;
-    Report (CS_REPORTER_SEVERITY_NOTIFY, "Statistics disabled.");
-  }
-
   if (cmdline->GetOption ("infinite"))
     do_infinite = true;
 
@@ -317,7 +293,6 @@ void WalkTest::Help ()
   csRef<iConfigManager> cfg (CS_QUERY_REGISTRY (object_reg, iConfigManager));
   printf ("Options for WalkTest:\n");
   printf ("  -exec=<script>     execute given script at startup\n");
-  printf ("  -[no]stats         statistics (default '%sstats')\n", do_stats ? "" : "no");
   printf ("  -[no]colldet       collision detection system (default '%scolldet')\n", do_cd ? "" : "no");
   printf ("  -[no]logo          draw logo (default '%slogo')\n", do_logo ? "" : "no");
   printf ("  -regions           load every map in a separate region (default off)\n");
@@ -463,8 +438,6 @@ void WalkTest::MoveSystems (csTicks elapsed_time, csTicks current_time)
     }
     if (current_time > next_bot_at)
     {
-      extern void add_bot (float size, iSector* where, csVector3 const& pos,
-	                        float dyn_radius);
       add_bot (2, view->GetCamera ()->GetSector (),
                view->GetCamera ()->GetTransform ().GetOrigin (), 0);
       next_bot_at = current_time+1000*10;
@@ -506,7 +479,6 @@ void WalkTest::MoveSystems (csTicks elapsed_time, csTicks current_time)
     }
   }
 
-  extern void move_bots (csTicks);
   move_bots (elapsed_time);
 
   if (move_forward)
@@ -581,18 +553,7 @@ void WalkTest::DrawFrameConsole ()
     int fw, fh;
     Font->GetMaxSize (fw, fh);
 
-    if (do_stats)
-    {
-      char buffer[50];
-      sprintf (buffer, "pc=%d pd=%d po=%d pa=%d pr=%d",
-      	Stats::polygons_considered, Stats::polygons_drawn,
-	Stats::portals_drawn, Stats::polygons_accepted,
-	Stats::polygons_rejected);
-      GfxWrite(FRAME_WIDTH - 30 * 8 - 1, FRAME_HEIGHT - fh - 3, 0, -1, "%s", buffer);
-      GfxWrite(FRAME_WIDTH - 30 * 8, FRAME_HEIGHT - fh - 2, fgcolor_stats, -1,
-      	"%s", buffer);
-    }
-    else if (do_show_coord)
+    if (do_show_coord)
     {
       char buffer[100];
       sprintf (buffer, "%2.2f,%2.2f,%2.2f: %s",

@@ -347,12 +347,6 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
     g3d->SetRenderState (G3DRENDERSTATE_MAXPOLYGONSTODRAW, (long)ival);
 #endif
   }
-  else if (!strcasecmp (cmd, "db_procpol"))
-  {
-    int val = csEngine::GetMaxProcessPolygons ();
-    change_int (arg, &val, "maximum process polygons", 0, 2000000000);
-    csEngine::SetMaxProcessPolygons (val);
-  }
   else if (!strcasecmp (cmd, "cmessage"))
   {
     if (arg) Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "%s", arg);
@@ -401,8 +395,6 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
     else Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
     	"Please specify the name of the script!");
   }
-  else if (!strcasecmp (cmd, "portals"))
-    change_boolean (arg, &csSector::do_portals, "portals");
   else if (!strcasecmp (cmd, "cls"))
   {
     if (console)

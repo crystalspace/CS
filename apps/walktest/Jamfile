@@ -5,7 +5,7 @@ Help walktest : "Crystal Space WalkTest demo" ;
 Application walktest
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith walktest : csengine csgeom csgfx cstool csutil ;
+LinkWith walktest : csgeom csgfx cstool csutil ;
 
 CompileGroups walktest : walkall ;
 CompileGroups vfs : walkall ;
@@ -51,16 +51,16 @@ CompileGroups walktest : nrall ;
 
 if $(MSVCGEN_CONFIG) != "yes"
 {
+Help walktest_static : "Crystal Space WalkTest demo (static build)" ;
+
 SubVariant static ;
 Application walktest_static
 	: [ Wildcard *.cpp *.h ]
 	: independent noinstall
 ;
-LinkWith walktest_static : csengine csgeom csgfx cstool csutil ;
+LinkWith walktest_static : csgeom csgfx cstool csutil ;
 LinkStaticPlugins walktest_static : $(STATIC.PLUGINLIST) ;
-# this is needed because walktest links and registers libcsengine by itself if
-# this flag isn't defined
-CFlags walktest_static : -DCS_STATIC_LINKED ;
+Win32Resource walktest_static : $(TOP)/libs/cssys/win32/rsrc/cs1.rc ;
 SubVariant ;
 }
 

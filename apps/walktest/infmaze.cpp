@@ -238,7 +238,7 @@ bool InfPortalCS::Traverse (iPortal* portal, iBase* context)
     InfRoomData* ird = infinite_maze->create_six_room (Sys->Engine,
     	x2, y2, z2);
     iSector* is = ird->sector;
-    csSector* s = is->GetPrivateObject (); //@@@
+    //csSector* s = is->GetPrivateObject (); //@@@
     infinite_maze->connect_infinite (x1, y1, z1,
     	x2, y2, z2, false);
     portal->SetSector (is);
@@ -254,7 +254,7 @@ bool InfPortalCS::Traverse (iPortal* portal, iBase* context)
       if (linfo)
         linfo->InitializeDefault (true);
     }
-    s->ShineLights ();
+    is->ShineLights ();
     for (i = 0 ; i < ml->GetCount () ; i++)
     {
       iMeshWrapper* mesh = ml->Get (i);
@@ -266,14 +266,14 @@ bool InfPortalCS::Traverse (iPortal* portal, iBase* context)
 
     while (lviews)
     {
-      int old_draw_busy = s->draw_busy;
-      s->draw_busy = 0;
+      //int old_draw_busy = s->draw_busy;
+      //s->draw_busy = 0;
       iFrustumView* fv = lviews->lv;
       csFrustumContext* orig_ctxt = fv->GetFrustumContext ();
       fv->SetFrustumContext (lviews->ctxt);
       portal->CheckFrustum (fv, ird->walls->GetMovable ()->GetTransform (), 0);
       fv->RestoreFrustumContext (orig_ctxt);
-      s->draw_busy = old_draw_busy;
+      //s->draw_busy = old_draw_busy;
 
       LV* n = lviews->next;
       delete lviews;

@@ -27,6 +27,11 @@ chronological order.
 	      warnings, for real now.
 	    - Fixed "..\..\out\mk\fragment7\..\..\..\mk\visualc7\foobar.rc"
 	      style paths VC projects.
+	- res made the following changes:
+	    - Changed walktest so it doesn't link in csengine statically any
+	      more.
+	    - Removed some unused stuff from csengine.
+	    - Cosmetic change in msvcgen.jam.
 20-Jan-2004
 	- Jorrit added a new MemoryAllocator template parameter to csArray.
 	  With this parameter it is possible to use another memory allocator

@@ -22,10 +22,10 @@
 #include "iengine/light.h"
 #include "iengine/sector.h"
 
-Bot::Bot (iEngine* Engine, iMeshObject* botmesh) :
-  csMeshWrapper (0, botmesh)
+Bot::Bot (iEngine *Engine, iMeshWrapper* botmesh)
 {
   engine = Engine;
+  mesh = botmesh;
   do
   {
     d.x = 6*(((float)rand ()) / (float)RAND_MAX)-3;
@@ -42,14 +42,14 @@ Bot::~Bot ()
 
 void Bot::set_bot_move (const csVector3& v)
 {
-  GetCsMovable ().SetPosition (v);
+  mesh->GetMovable()->SetPosition (v);
   follow = v;
-  GetCsMovable ().UpdateMove ();
+  mesh->GetMovable()->UpdateMove ();
 }
 
 void Bot::move (csTicks elapsed_time)
 {
-  csOrthoTransform old_pos (GetCsMovable ().GetTransform ().GetO2T (), follow);
+  csOrthoTransform old_pos (mesh->GetMovable()->GetTransform ().GetO2T (), follow);
   csVector3 rd = (8.*(float)elapsed_time)/1000. * d;
   follow += rd;
   csVector3 new_pos = follow;
@@ -77,24 +77,24 @@ void Bot::move (csTicks elapsed_time)
     d = d.Unit ();
   }
 
-  csVector3 old_p = GetCsMovable ().GetPosition ();
+  csVector3 old_p = mesh->GetMovable()->GetPosition ();
   csVector3 dir = follow-old_p;
   dir.Normalize ();
   csVector3 new_p = old_p + ((3.*(float)elapsed_time)/1000.)*dir;
-  GetCsMovable ().SetPosition (new_p);
+  mesh->GetMovable()->SetPosition (new_p);
 
   //@@@
-  s = GetCsMovable ().GetSectors ()->Get (0);
+  s = mesh->GetMovable()->GetSectors ()->Get (0);
   mirror = false;
-  csOrthoTransform old_pos2 (GetCsMovable ().GetTransform ().GetO2T (), old_p);
+  csOrthoTransform old_pos2 (mesh->GetMovable()->GetTransform ().GetO2T (), old_p);
   s = s->FollowSegment (old_pos2, new_p, mirror);
   if (s)
   {
-    GetCsMovable ().SetSector (s);
+    mesh->GetMovable()->SetSector (s);
     iLight* lights[2];
     int num_lights = engine->GetNearbyLights (s, new_p,
         CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
-    UpdateLighting (lights, num_lights);
+    mesh->UpdateLighting (lights, num_lights);
     if (light)
     {
       if (s != light->GetSector ())
@@ -108,5 +108,5 @@ void Bot::move (csTicks elapsed_time)
       light->Setup ();
     }
   }
-  GetCsMovable ().UpdateMove ();
+  mesh->GetMovable()->UpdateMove ();
 }

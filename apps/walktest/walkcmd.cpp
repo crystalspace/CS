@@ -1578,15 +1578,10 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->myG2D->SetMousePosition (FRAME_WIDTH / 2, FRAME_HEIGHT / 2);
     Sys->myG2D->SetMouseCursor (Sys->do_freelook?csmcNone:csmcArrow);
   }
-  else if (!strcasecmp (cmd, "stats"))
-  {
-    csCommandProcessor::change_boolean (arg, &Sys->do_stats, "stats");
-    if (Sys->do_stats) Sys->do_show_coord = false;
-  }
   else if (!strcasecmp (cmd, "coordshow"))
   {
     csCommandProcessor::change_boolean (arg, &Sys->do_show_coord, "coordshow");
-    if (Sys->do_show_coord) Sys->do_stats = false;
+    if (Sys->do_show_coord) Sys->do_show_coord = false;
   }
   else if (!strcasecmp (cmd, "hi"))
   {
@@ -2242,15 +2237,12 @@ bool CommandHandler (const char *cmd, const char *arg)
     RECORD_ARGS (cmd, arg);
     float radius = 0;
     if (arg) csScanStr (arg, "%f", &radius);
-    extern void add_bot (float size, iSector* where, csVector3 const& pos,
-	float dyn_radius);
-    add_bot (2, Sys->view->GetCamera ()->GetSector (),
+    Sys->add_bot (2, Sys->view->GetCamera ()->GetSector (),
     	Sys->view->GetCamera ()->GetTransform ().GetOrigin (), radius);
   }
   else if (!strcasecmp (cmd, "delbot"))
   {
-    extern void del_bot ();
-    del_bot ();
+    Sys->del_bot ();
   }
   else if (!strcasecmp (cmd, "clrlights"))
   {

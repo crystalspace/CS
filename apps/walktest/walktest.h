@@ -34,6 +34,7 @@
 #include "iutil/vfs.h"
 #include "iutil/plugin.h"
 #include "ivideo/fontserv.h"
+#include "bot.h"
 
 #include "csengine/engine.h"
 
@@ -309,7 +310,6 @@ public:
   iSoundHandle* wMissile_whoosh;
 
   /// Some flags.
-  bool do_stats;
   bool do_show_coord;
   bool busy_perf_test;
   bool do_show_z;
@@ -511,6 +511,13 @@ public:
   virtual void MouseClick3Handler(iEvent &Event);
 
   void GfxWrite (int x, int y, int fg, int bg, char *str, ...);
+
+  // Bot stuff
+  csArray<Bot> bots;
+  void add_bot (float size, iSector* where, csVector3 const& pos,
+    float dyn_radius);
+  void del_bot ();
+  void move_bots (csTicks);
 };
 
 extern csVector2 coord_check_vector;

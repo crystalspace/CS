@@ -50,9 +50,6 @@
 
 #include "cstool/rendermeshlist.h"
 
-// Option variable: render portals?
-bool csSector:: do_portals = true;
-
 // Configuration variable: number of allowed reflections for static lighting.
 int csSector:: cfg_reflections = 1;
 

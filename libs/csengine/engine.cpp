@@ -716,8 +716,6 @@ iObjectRegistry *csEngine:: object_reg = 0;
 csEngine *csEngine:: current_engine = 0;
 iEngine *csEngine:: current_iengine = 0;
 bool csEngine:: use_new_radiosity = false;
-int csEngine:: max_process_polygons = 2000000000;
-int csEngine:: cur_process_polygons = 0;
 int csEngine:: lightcache_mode = CS_ENGINE_CACHE_READ | CS_ENGINE_CACHE_NOUPDATE;
 int csEngine:: lightmap_quality = 3;
 bool csEngine:: do_force_revis = false;
@@ -1744,8 +1742,6 @@ void csEngine::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)
   float topy = -c->GetShiftY () * c->GetInvFOV ();
   float boty = (frame_height - c->GetShiftY ()) * c->GetInvFOV ();
   rview.SetFrustum (leftx, rightx, topy, boty);
-
-  cur_process_polygons = 0;
 }
 
 void csEngine::Draw (iCamera *c, iClipper2D *view)

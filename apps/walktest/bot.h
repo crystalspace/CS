@@ -31,7 +31,7 @@ class csEngine;
 /**
  * A bot which moves randomly through the dungeon.
  */
-class Bot : public csMeshWrapper
+class Bot 
 {
 private:
   /// Engine handle.
@@ -42,16 +42,15 @@ private:
   csVector3 follow;
   /// Corresponding sector.
   iSector* f_sector;
+  csRef<iMeshWrapper> mesh;
 
 public:
-  /// Next bot.
-  Bot* next;
   /// Optional dynamic light.
   csRef<iLight> light;
 
 public:
   /// Constructor.
-  Bot (iEngine *Engine, iMeshObject* botmesh);
+  Bot (iEngine *Engine, iMeshWrapper* botmesh);
   /// Destructor.
   virtual ~Bot ();
 

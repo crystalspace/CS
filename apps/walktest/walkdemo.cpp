@@ -923,11 +923,10 @@ void move_ghost (iMeshWrapper* spr)
 // Everything for bots.
 //===========================================================================
 
-Bot* first_bot = 0;
 bool do_bots = false;
 
 // Add a bot with some size at the specified positin.
-void add_bot (float size, iSector* where, csVector3 const& pos,
+void WalkTest::add_bot (float size, iSector* where, csVector3 const& pos,
 	float dyn_radius)
 {
   csRef<iLight> dyn;
@@ -947,44 +946,34 @@ void add_bot (float size, iSector* where, csVector3 const& pos,
   	->FindByName ("bot");
   if (!tmpl) return;
   csRef<iMeshObject> botmesh (tmpl->GetMeshObjectFactory ()->NewInstance ());
-  Bot* bot;
-  bot = new Bot (Sys->view->GetEngine(), botmesh);
-  bot->SetName ("bot");
-  Sys->view->GetEngine ()->GetMeshes ()->Add (&(bot->scfiMeshWrapper));
-  bot->GetCsMovable ().SetSector (where);
+  csRef<iMeshWrapper> botWrapper = Engine->CreateMeshWrapper (botmesh, "bot",
+    where);
+  
   csMatrix3 m; m.Identity (); m = m * size;
-  bot->GetCsMovable ().SetTransform (m);
-  bot->set_bot_move (pos);
-  bot->set_bot_sector (where);
-  bot->GetCsMovable ().UpdateMove ();
+  botWrapper->GetMovable ()->SetTransform (m);
+  
+  botWrapper->GetMovable ()->UpdateMove ();
   csRef<iSprite3DState> state (SCF_QUERY_INTERFACE (botmesh, iSprite3DState));
   state->SetAction ("default");
-  bot->next = first_bot;
-  bot->light = dyn;
-  first_bot = bot;
-  bot->DecRef ();
+  
+  Bot bot (Sys->view->GetEngine(), botWrapper);
+  bot.set_bot_move (pos);
+  bot.set_bot_sector (where);
+  bots.Push (bot);
 }
 
-void del_bot ()
+void WalkTest::del_bot ()
 {
-  if (first_bot)
-  {
-    Bot* bot = first_bot;
-    first_bot = bot->next;
-    Sys->view->GetEngine ()->GetMeshes ()->Remove (&(bot->scfiMeshWrapper));
-  }
+  if (bots.Length () > 0)
+    bots.DeleteIndex (0);
 }
 
-void move_bots (csTicks elapsed_time)
+void WalkTest::move_bots (csTicks elapsed_time)
 {
-  if (first_bot)
+  int i;
+  for (i = 0; i < bots.Length(); i++)
   {
-    Bot* bot = first_bot;
-    while (bot)
-    {
-      bot->move (elapsed_time);
-      bot = bot->next;
-    }
+    bots[i].move (elapsed_time);
   }
 }
 
@@ -1052,7 +1041,7 @@ bool HandleDynLight (iLight* dyn)
 	    int i;
 	    if (do_bots)
 	      for (i = 0 ; i < 40 ; i++)
-            add_bot (1, dyn->GetSector (), dyn->GetCenter (), 0);
+            Sys->add_bot (1, dyn->GetSector (), dyn->GetCenter (), 0);
 	  }
 	  ms->sprite->GetMovable ()->ClearSectors ();
 	  Sys->view->GetEngine ()->GetMeshes ()->Remove (ms->sprite);

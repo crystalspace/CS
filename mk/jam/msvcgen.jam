@@ -93,7 +93,7 @@ rule MsvcProject
       msvcname = plg$(<) ;
     case library :
       msvcname = lib$(<) ;
-      case group :
+    case group :
       msvcname = grp$(<) ;
     case * :
       exit "Unknown msvc projecttype: $(3) specified!" ;
