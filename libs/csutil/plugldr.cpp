@@ -274,7 +274,7 @@ bool csPluginLoader::LoadPlugins ()
   {
     // Alternate videodriver
     char temp [100];
-    cs_snprintf (temp, sizeof(temp), "crystalspace.graphics3d.%s", val);
+    sprintf (temp, "crystalspace.graphics3d.%s", val);
     csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
     	"crystalspace.pluginloader.loadplugins",
     	"Using alternative 3D driver: %s", temp);
@@ -286,7 +286,7 @@ bool csPluginLoader::LoadPlugins ()
     if (!strchr (val, '.'))
     {
       char temp [100];
-      cs_snprintf (temp, sizeof(temp), "crystalspace.graphics2d.%s", val);
+      sprintf (temp, "crystalspace.graphics2d.%s", val);
       CommandLine->ReplaceOption ("canvas", temp);
     }
   }
