@@ -67,9 +67,13 @@ static inline float qisqrt (float x);
  * cheap on P5+ processors (3 clocks). On a Celeron CPU it takes
  * approximatively 50 clocks, while a division is 42 clocks.
  */
+ 
 static inline float qsqrt (float x)
 {
   float ret;
+  static float c1=0.5f;
+  static float c2=1.5f;
+
 
 // Original C++ formulae:
 // float tmp = x;
@@ -105,7 +109,7 @@ static inline float qsqrt (float x)
 		"fsubp  %%st,%%st(2)\n"		// x 1.5-a*a*h a
 		"fmulp	%%st(1)\n"		// x a
 		"fmulp	%%st(1)\n"		// a
-	: "=&t" (ret), "+m" (x) : "m" (0.5F), "m" (1.5F)
+	: "=&t" (ret), "+m" (x) : "m" (c1), "m" (c2)
 	: "eax", "st(1)", "st(2)", "st(3)", "st(4)", "st(5)", "st(6)", "st(7)"
   );
   return ret;
@@ -121,6 +125,8 @@ static inline float qsqrt (float x)
 static inline float qisqrt (float x)
 {
   float ret;
+  static float c1=0.5f;
+  static float c2=1.5f;
   // Use __volatile__ so that the compiler will not mess with this
   // code. Under some versions of gcc in combination with -O2 optimize
   // mode not using __volatile__ can cause errors.
@@ -145,7 +151,7 @@ static inline float qisqrt (float x)
 		"fxch\n"			// a*a*h a 1.5
 		"fsubp  %%st,%%st(2)\n"		// 1.5-a*a*h a
 		"fmulp	%%st(1)\n"		// a
-	: "=t" (ret), "+m" (x) : "m" (0.5F), "m" (1.5F)
+	: "=t" (ret), "+m" (x) : "m" (c1), "m" (c2)
 	: "eax", "st(1)", "st(2)", "st(3)", "st(4)", "st(5)", "st(6)", "st(7)"
   );
   return ret;
