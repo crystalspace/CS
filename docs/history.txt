@@ -43,6 +43,8 @@ The history order is reversed so that new features are at the top.
 	      iInputBinderBoolean (and vice versa) to ensure that it does not
 	      call methods of the one interface when actually dealing with a
 	      reference to the other.  (Beware of `union'.)
+	- Eric Sunshine applied a couple corrections to aws/quick.txi reported
+	  by <shri@vitalstate.co.uk>.
 12-Mar-2003
 	- Added csArray::ShrinkBestFit() routine. This routine will set
 	  the capacity of the array exactly to the current length. This
