@@ -39,7 +39,6 @@ csGraphics2DGLBe::csGraphics2DGLBe(iBase* p) :
 
 csGraphics2DGLBe::~csGraphics2DGLBe ()
 {
-  Close();
   if (be_system != 0)
     be_system->DecRef();
 }

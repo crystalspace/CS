@@ -47,7 +47,6 @@ csGraphics2DBeLib::csGraphics2DBeLib (iBase* p) :
 
 csGraphics2DBeLib::~csGraphics2DBeLib()
 {
-  Close();
   if (be_system != 0)
     be_system->DecRef();
   delete bitmap;
