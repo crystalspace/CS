@@ -1,7 +1,7 @@
 @c -*-texinfo-*-
-@node API Modifications 92, API Modifications 90, API Modifications 94, API Modifications
-@appendixsec @sc{api} Changes from 0.90 to 0.92
-@cindex @sc{api} Changes
+@node Release Notes 92, Release Notes 90, Release Notes 94, Release Notes
+@appendixsec Release Notes from 0.90 to 0.92
+@cindex Release Notes
 
 This section documents the major changes between versions 0.90 and 0.92 of of
 Crystal Space.
@@ -161,4 +161,3 @@ issue if you made your own mesh object implementation. Also beware
 that there have been some changes in the way the parser interact
 with the plugin loaders. The plugin loaders are no longer responsible
 for setting the factory pointer. The parser will now do that.
-

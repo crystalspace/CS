@@ -107,7 +107,7 @@ version @value{VERSION}, last updated @value{UPDATED}.
 * Contributing:: Contributing to Crystal Space
 * Glossary::
 * FAQ:: Frequently Asked Questions (@sc{faq})
-* API Modifications:: Significant @sc{api} Changes
+* Release Notes::
 * Index::
 @end menu
 @end ifinfo
@@ -133,7 +133,7 @@ For a list of available topics, see the
 @imports{contrib,chapter.txi}
 @imports{appendix,appendix.txi}
 
-@node Index, , API Modifications, Top
+@node Index, , Release Notes, Top
 @unnumbered Index
 
 @printindex cp

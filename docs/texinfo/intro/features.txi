@@ -120,8 +120,10 @@ Various image loaders (@sc{bmp}, @sc{gif}, @sc{jpg}, @sc{png}, @sc{sgi},
 Portals and sectors. @xref{Portal Engine}.
 
 @item
-Lighting (static, pseudo-dynamic, dynamic, halos, shadows, radiosity).
-@xref{Lighting}, @xref{HOWTO Pseudo DynLight}.
+Lighting: static, pseudo-dynamic, dynamic, halos, shadows, radiosity.@*
+
+@noindent
+@xref{Lighting}. @xref{HOWTO Pseudo DynLight}.
 
 @item
 Bezier curves.

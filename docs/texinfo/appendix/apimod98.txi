@@ -1,7 +1,7 @@
 @c -*-texinfo-*-
-@node API Modifications 98, API Modifications 96, API Modifications, API Modifications
-@appendixsec @sc{api} Changes from 0.96 to 0.98
-@cindex @sc{api} Changes
+@node Release Notes 98, Release Notes 96, Release Notes, Release Notes
+@appendixsec Release Notes from 0.96 to 0.98
+@cindex Release Notes
 
 This section documents the major changes between versions 0.96 and 0.98 of of
 Crystal Space.
@@ -14,28 +14,28 @@ Crystal Space.
 @cindex @code{iPolyTexLightMap}
 @cindex shading
 
-The following interfaces have been removed: @code{iPolyTexNone},
-@code{iPolyTexGouraud}, @code{iPolyTexFlat}, and  @code{iPolyTexLightMap}.
-The combined @sc{api} from @code{iPolyTexNone} and the @code{iPolyTexLightMap}
-have moved to @code{iPolygon3D} itself.
+The following interfaces have been removed: @samp{iPolyTexNone},
+@samp{iPolyTexGouraud}, @samp{iPolyTexFlat}, and  @samp{iPolyTexLightMap}.
+The combined @sc{api} from @samp{iPolyTexNone} and the @samp{iPolyTexLightMap}
+have moved to @samp{iPolygon3D} itself.
 
-@code{iPolygon3D->SetTextureType()} and @code{GetTextureType()} have been
+@code{iPolygon3D::SetTextureType()} and @code{GetTextureType()} have been
 removed.  Instead use:
 
 @itemize @bullet
 @item
-@code{iPolygon3D->EnableTextureMapping()}
+@code{iPolygon3D::EnableTextureMapping()}
 @item
-@code{iPolygon3D->IsTextureMappingEnabled()}
+@code{iPolygon3D::IsTextureMappingEnabled()}
 @end itemize
 
-@code{iPolygon3D->GetPolyTexType()} has been removed.
+@code{iPolygon3D::GetPolyTexType()} has been removed.
 
-The @samp{shading} keyword in polygons now accepts a boolean value
-instead of @samp{NONE}, @samp{FLAT}, @samp{GOURAUD}, or @samp{LIGHTMAP}.
+The @samp{<shading>} keyword in polygons in map files now accepts a boolean
+value instead of @samp{NONE}, @samp{FLAT}, @samp{GOURAUD}, or @samp{LIGHTMAP}.
 With this you can enable/disable lightmapping.
 
-If you want gouraud shaded polygons you should use the @samp{genmesh}
+If you want gouraud shaded polygons you should use the @file{genmesh}
 mesh object plugin instead.
 
 @subheading Bezier Curve Changes
@@ -45,11 +45,11 @@ mesh object plugin instead.
 @cindex @code{iBezierState}
 @cindex @code{iBezierFactoryState}
 
-The notion of curve templates has been reworked. @code{iCurveTemplate} has
-been removed and it's functionality has moved to @code{iCurve} itself.
+The notion of curve templates has been reworked. @samp{iCurveTemplate} has
+been removed and it's functionality has moved to @samp{iCurve} itself.
 As a consequence of this change the bezier addon loader has been removed.
 Also curves have been seperated from the thing plugin and now live in the
-'bezier' plugin. So a curve like this in the past:
+@file{bezier} plugin. So, a curve like this in the past:
 
 @example
 <addon>
@@ -75,7 +75,7 @@ Also curves have been seperated from the thing plugin and now live in the
 @end example
 
 @noindent
-should now become (mark the new plugin line):
+should now become (note the new plugin line):
 
 @example
 <meshfact name="tunnel">
@@ -96,10 +96,10 @@ should now become (mark the new plugin line):
 @end example
 
 On the @sc{api} side nothing much changes except that when you use
-the bezier mesh plugin you need to use @code{iBezierState} and
-@code{iBezierFactoryState}.
+the bezier mesh plugin you need to use @samp{iBezierState} and
+@samp{iBezierFactoryState}.
 
-The @code{iThingEnvironment} no longer has code to maintain bezier curve
+The @samp{iThingEnvironment} no longer has code to maintain bezier curve
 templates.
 
 @subheading iThingState and iPolygon3D Changes
@@ -110,28 +110,29 @@ templates.
 @cindex @code{iMeshObject}
 @cindex @code{iMeshObjectFactory}
 
-@code{iPolygon3D} and @code{iThingState} no longer implement @code{iObject}.
-So the @code{QueryObject()} function has been removed. Polygons can still
-have names though. Added @code{SetName()} and @code{GetName()} for that.
+The interfaces @samp{iPolygon3D} and @samp{iThingState} no longer inherit from
+@samp{iObject}, thus the @code{QueryObject()} function has been removed.
+Polygons can still have names though.  Added @code{SetName()} and
+@code{GetName()} for that.
 
-@code{iPolygon3D} has been split in @code{iPolygon3D} and
-@code{iPolygon3DStatic}. The static version contains all static data that
+@samp{iPolygon3D} has been split into @samp{iPolygon3D} and
+@samp{iPolygon3DStatic}. The static version contains all static data that
 can be put in a factory. Several functions like
-@code{iThingState->CreatePolygon()} will now return @code{iPolygon3DStatic}.
+@code{iThingState::CreatePolygon()} will now return @samp{iPolygon3DStatic}.
 
-@code{iThingState} has been split in @code{iThingState} and
-@code{iThingFactoryState}. A thing mesh no longer implements both a mesh
+@samp{iThingState} has been split into @samp{iThingState} and
+@samp{iThingFactoryState}. A thing mesh no longer implements both a mesh
 object and a mesh object factory. Instead things now work like usual
-mesh objects where @code{iMeshObjectType->NewFactory()} creates a
-factory that implements @code{iThingFactoryState} and
-@code{iMeshObjectFactory->NewInstance()} creates an instance that implements
-@code{iThingState}. The engine convenience functions to create a thing
+mesh objects where @code{iMeshObjectType::NewFactory()} creates a
+factory that implements @samp{iThingFactoryState} and
+@code{iMeshObjectFactory::NewInstance()} creates an instance that implements
+@samp{iThingState}. The engine convenience functions to create a thing
 mesh will automatically create both the factory and mesh so you don't
-have to worry about that. You can use @code{iThingState->GetFactory()}
-from a thing mesh object to get the @code{iThingFactoryState} so you can
-build the polygons. Note that @code{SCF_QUERY_INTERFACE} of
-@code{iThingFactoryState} no longer works on a thing mesh object. You must
-use @code{GetFactory}.
+have to worry about that. You can use @code{iThingState::GetFactory()}
+from a thing mesh object to get the @samp{iThingFactoryState} so you can
+build the polygons. Note that @code{SCF_QUERY_INTERFACE()} of
+@samp{iThingFactoryState} no longer works on a thing mesh object. You must
+use @code{GetFactory()}.
 
 @subheading Polygon Planes
 @cindex @code{iPolyTxtPlane}
@@ -140,52 +141,52 @@ use @code{GetFactory}.
 Polygon planes are removed. So it is no longer possible to use
 the plane addon loader to define texture mapping for a polygon outside
 of the polygon itself. To fix this you must specify all texture mapping
-information in the @code{texmap} statement of the polygon. @file{map2cs}
+information in the @samp{texmap} statement of the polygon. @file{map2cs}
 now correctly outputs polygons like this (no longer outputs planes) and
 @file{levtool} can convert old style maps to new format like this:
-
-@code{iThingEnvironment} no longer has code to maintain polygon texture
-mapping planes.
-
-The plane loader and saver addons have been removed from the thing
-loader plugin.
-
-Removed @code{iPolyTxtPlane} interface. Added
-@code{iPolygon3DStatic->GetTextureSpace()} function to get texture space
-definition for polygon.
 
 @example
 levtool -planes yourmap.zip
 @end example
 
-@subheading Portal changes
+@samp{iThingEnvironment} no longer has code to maintain polygon texture
+mapping planes.
+
+The plane loader and saver addons have been removed from the thing
+loader plugin.
+
+Removed @samp{iPolyTxtPlane} interface. Added
+@code{iPolygon3DStatic::GetTextureSpace()} function to get texture space
+definition for polygon.
+
+@subheading Portal Changes
 @cindex @code{iPortal}
 
-Several methods in @code{iPortal} have changed slightly. For example
-@code{SetMirror} now expects a plane instead of a polygon.
+Several methods in @samp{iPortal} have changed slightly. For example,
+@code{SetMirror()} now expects a plane instead of a polygon.
 
-@subheading Datatype changes
+@subheading Datatype Changes
 
-The @code{csSome}, @code{csConstSome} and @code{uint} types have been removed.
-Use @code{void*}, @code{const void*} and @code{unsigned int} instead.
+The @samp{csSome}, @samp{csConstSome} and @samp{uint} types have been removed.
+Use @samp{void*}, @samp{const void*} and @samp{unsigned int} instead.
 
-@subheading csHashMap changes
+@subheading csHashMap Changes
 @cindex @code{csHashMap}
 @cindex @code{csHashIterator}
 @cindex @code{csGlobalHashIterator}
 
-@code{csHashIterator} can no longer iterate over all objects. To do that
-you need to use @code{csGlobalHashIterator}.
+@samp{csHashIterator} can no longer iterate over all objects. To do that
+you need to use @samp{csGlobalHashIterator}.
 
-@subheading Procedural textures
+@subheading Procedural Textures
 
 Instead of only built-in types, procedural textures have been moved into 
-plugins. That means that the @code{<type>} token now works the same way
-as the @code{<plugin>} token for meshes. That is, either specify a full
-class ID (e.g. @code{crystalspace.proctex.loader.fire}), or a shortcut
-specified in the @code{<plugins>} token of the world. To simulate the
-old @code{<type>} behaviour, paste the following lines into a map's 
-@code{<plugin>} section:
+plugins. That means that the @samp{<type>} token now works the same way
+as the @samp{<plugin>} token for meshes. That is, either specify a full
+class ID (e.g. @samp{crystalspace.proctex.loader.fire}), or a shortcut
+specified in the @samp{<plugins>} token of the world. To simulate the
+old @samp{<type>} behaviour, paste the following lines into a map's 
+@samp{<plugin>} section:
 
 @example
 <plugin name="dots">crystalspace.texture.loader.dots</plugin>
@@ -194,18 +195,18 @@ old @code{<type>} behaviour, paste the following lines into a map's
 <plugin name="plasma">crystalspace.texture.loader.plasma</plugin>
 @end example
 
-This requires that you move the @code{<plugin>} block in front of the 
-@code{<textures>} block, as otherwise the shortcuts won't be recognised.
+This requires that you move the @samp{<plugin>} block in front of the 
+@samp{<textures>} block, as otherwise the shortcuts won't be recognised.
 
 The behaviour of procedural textures also differs as a material of the same
 name was created along with the texture; this isn't the case any more, you
 have to create a material which uses the procedural texture manually.
 
 In addition, the loader now doesn't distinguish between normal and procedural
-textures any more, both are loaded with the same @code{<texture>} block. The 
-syntax recognized is a combination of both old @code{<texture>} and 
-@code{<proctex>} tokens - so renaming all @code{<proctex>} to @code{<texture>}
-tags is sufficient to convert a level (apart from fixing the @code{<type>}
+textures any more, both are loaded with the same @samp{<texture>} block. The 
+syntax recognized is a combination of both old @samp{<texture>} and 
+@samp{<proctex>} tokens---so renaming all @samp{<proctex>} to @samp{<texture>}
+tags is sufficient to convert a level (apart from fixing the @samp{<type>}
 tokens.)
 
 @subheading Regions
@@ -219,7 +220,7 @@ Objects also no longer register themselves to the current region. It is
 the responsability of the object creator to do that. The standard loader
 has support for adding objects to a region now.
 
-The following functions have been removed from @code{iEngine}:
+The following functions have been removed from @samp{iEngine}:
 
 @itemize
 @item
@@ -230,44 +231,44 @@ The following functions have been removed from @code{iEngine}:
 @code{AddToCurrentRegion()}
 @end itemize
 
-There is one new function @code{iEngine->CreateRegion()} which will create
+There is one new function @code{iEngine::CreateRegion()} which will create
 a new region.
 
-In @code{iLoader} the functions @code{LoadMapFile()} and
+In @samp{iLoader} the functions @code{LoadMapFile()} and
 @code{ThreadedLoadMapFile()} now expect an optional pointer to a region
 in addition with a boolean to restrict searching to that region.
 
-In addition to all these changes the @samp{region} keyword in XML is no
+In addition to all these changes the @samp{<region>} keyword in map files is no
 longer supported.
 
-@subheading Mesh objects/factories and iPolygonMesh
+@subheading Mesh Objects/Factories and iPolygonMesh
 
-Some mesh factories used to support the querying of the @code{iPolygonMesh}
+Some mesh factories used to support the querying of the @samp{iPolygonMesh}
 interface (e.g. Thing, Sprite3D, Genmesh). Due to the way this was 
-implemented internally this caused leaks. So, querying @code{iPolygonMesh} 
+implemented internally this caused leaks. So, querying @samp{iPolygonMesh} 
 directly from the object is now discouraged. Although it may still work in 
 some cases, this feature may be dropped without further notice and may not 
 work in all cases. 
 
-Similar for mesh objects. Querying @code{iPolygonMesh} is discouranged here
+Similar for mesh objects. Querying @samp{iPolygonMesh} is discouraged here,
 as well.
 
-Instead, if you want the polygon mesh from an object, use the 
-@code{GetObjectModel()} method from the @code{iMeshObject} interface, resp.
-query for the @code{iObjectModel} interface in case of a factory, and utilize 
-one of the @code{GetPolygonMeshXXX()} methods, depending on what you need 
-(the old interface query returned the collision detection mesh.) This has also 
-the advantages that you can get different meshes for different purposes 
-(currently, visibility culling and collision detection in addition the the 
-base mesh), and that those meshes can be overridden by user-defined meshes 
-(e.g. if the collision detection mesh needs to have a shape different from 
-the visible mesh.) 
+Instead, if you want the polygon mesh from an object, use the
+@code{GetObjectModel()} method from the @samp{iMeshObject} interface;
+respectively query for the @samp{iObjectModel} interface in case of a factory,
+and utilize one of the @code{GetPolygonMeshXXX()} methods, depending on what
+you need (the old interface query returned the collision detection mesh.) This
+has also the advantages that you can get different meshes for different
+purposes (currently, visibility culling and collision detection in addition the
+the base mesh), and that those meshes can be overridden by user-defined meshes
+(e.g. if the collision detection mesh needs to have a shape different from the
+visible mesh.)
 
-In @code{iPolygonMesh} the @code{IsDeformable()} method has been replaced
+In @samp{iPolygonMesh} the @code{IsDeformable()} method has been replaced
 with the more general @code{GetFlags()}. In addition to that @code{Cleanup()}
 is removed and instead @code{Lock()} and @code{Unlock()} are added.
 
-@code{iPolygonMesh} now has @code{GetTriangles()} and @code{GetTriangleCount()}.
+@samp{iPolygonMesh} now has @code{GetTriangles()} and @code{GetTriangleCount()}.
 Check out the @sc{api} docs for implementation details.
 
 @subheading Iterator Changes
@@ -286,10 +287,11 @@ Check out the @sc{api} docs for implementation details.
 @cindex @code{csNodeIterator}
 
 Changed the following iterators to conform to the following iterator standard:
+
 @example
-  bool iterator->HasNext() returns true if there are more items.
-  T* iterator->Next() returns next element or 0.
-  void Reset() optionally resets the iterator (not all implement this).
+bool iterator->HasNext() // returns true if there are more items.
+T* iterator->Next()      // returns next element or 0.
+void Reset()             // resets iterator (not all implement this).
 @end example
 
 @itemize
@@ -321,20 +323,19 @@ Changed the following iterators to conform to the following iterator standard:
 @code{csNodeIterator}
 @end itemize
 
+@subheading @sc{aws} Changes
 
-@subheading Changes to AWS
+@code{iAWS::CreateCustomCanvas()} was removed.  To set up the @sc{aws} with a
+cavas, use @code{iAWS::SetupCanvas()} instead. 
 
-@code{iAWS::CreateCustomCanvas} was removed.  To set up the AWS with a cavas,
-use @code{iAWS::SetupCanvas} instead. 
-
-@subheading csPArray removed
+@subheading csPArray Removed
 @cindex @code{csPArray}
 @cindex @code{csArray}
 
-@code{csPArray} has been removed in favor of @code{csArray}. So use
-@code{csArray<T*>} instead of @code{csPArray<T>}.
+@samp{csPArray} has been removed in favor of the @code{csArray<>} template.
+So, use @code{csArray<T*>} instead of @code{csPArray<T>}.
 
-@subheading csStrVector and iStrVector removed
+@subheading csStrVector and iStrVector Removed
 @cindex @code{csStrVector}
 @cindex @code{iStrVector}
 @cindex @code{csStringArray}
@@ -342,37 +343,38 @@ use @code{iAWS::SetupCanvas} instead.
 @cindex @code{FindFiles}
 @cindex @code{MountRoot}
 
-@code{csStrVector} has been removed in favor of @code{csStringArray}.
+@samp{csStrVector} has been removed in favor of @samp{csStringArray}.
 This means that functions like @code{iVFS::MountRoot()} and
-@code{iVFS::FindFiles()} now return an @code{iStringArray}.
+@code{iVFS::FindFiles()} now return an @samp{iStringArray}.
 
-@subheading csVector and csBasicVector removed
+@subheading csVector and csBasicVector Removed
 @cindex @code{csVector}
 @cindex @code{csBasicVector}
 @cindex @code{csArray}
 @cindex @code{csRefArray}
 @cindex @code{csPDelArray}
 
-@code{csVector} and @code{csBasicVector} have been removed. Instead you
-should use one of the templated arrays: @code{csArray}, @code{csPDelArray},
-or @code{csRefArray}.
+@samp{csVector} and @samp{csBasicVector} have been removed. Instead you
+should use one of the templated arrays: @code{csArray<>}, @code{csPDelArray<>},
+or @code{csRefArray<>}.
 
-If you were using a regular @code{csVector} then this can usually be
+If you were using a regular @samp{csVector} then this can usually be
 replaced directly by @code{csArray<type*>} with @samp{type} the type you
 were storing in the vector.
 
-If you subclassed from @code{csVector} in order to override @code{FreeItem()}
+If you subclassed from @samp{csVector} in order to override @code{FreeItem()}
 then you have to decide what to do depending on the code in @code{FreeItem()}.
-If that code performed a @code{delete} then you can use @code{csPDelArray}.
-If that code performed a @code{DecRef()} then you can use @code{csRefArray}
-but you still have to be careful because @code{csRefArray} will automatically
+If that code performed a @samp{delete} then you can use @code{csPDelArray<>}.
+If that code performed a @code{DecRef()} then you can use @code{csRefArray<>}
+but you still have to be careful because @code{csRefArray<>} will automatically
 incref objects that are pushed on the array. In other cases you probably
 need to handle deletion manually.
 
-@code{csVector} also allowed to override @code{Compare()} and
-@code{CompareKey} in order to drive @code{QuickSort}, @code{FindSortedKey},
-@code{InsertSorted}, and @code{FindKey}. This is no longer possible. Instead
-you can do the following transformation. First the old code:
+@samp{csVector} also allowed to override @code{Compare()} and
+@code{CompareKey()} in order to drive @code{QuickSort()},
+@code{FindSortedKey()}, @code{InsertSorted()}, and @code{FindKey()}.  This is
+no longer possible.  Instead you can do the following transformation.  First
+the old code:
 
 @example
 class MyVector : public csVector
@@ -414,10 +416,10 @@ public:
 @};
 @end example
 
-In the calls to @code{InsertSorted}, @code{FindKey}, @dots{} you would then
+In the calls to @code{InsertSorted()}, @code{FindKey()}, etc., you would then
 pass in one of the static functions to use.
 
-@subheading Array changes
+@subheading Array Changes
 @cindex @code{csArray}
 @cindex @code{csPDelArray}
 @cindex @code{csRefArray}
@@ -425,13 +427,29 @@ pass in one of the static functions to use.
 @cindex @code{csGrowingArray}
 @cindex @code{csDirtyAccessArray}
 
-All arrays have been modified to inherit from @code{csArray}. This means
-that there are some slight @sc{api} changes because many functions were
-not consistent with @code{csArray}.
+All arrays have been modified to inherit from @samp{csArray}. This means
+that there are some slight @sc{api} changes because some methods were
+not consistent with @samp{csArray}.
 
-Also @code{csGrowingArray} has been renamed to @code{csDirtyAccessArray}.
+@samp{csGrowingArray} has been renamed to @samp{csDirtyAccessArray} in order to
+better reflect its intention, which is that it publishes a method allowing the
+client to obtain access to the raw memory block containing the items in
+contiguous memory.  This potentially unsafe operation is not available in the
+other array templates.  Use this class only in very special-purpose cases where
+you need to construct a list of objects dynamically and then pass the address
+of the raw memory containing those objects to some foreign function which does
+not understand @code{csArray<>}.
 
-@subheading iEventQueue clients now responsible for their own references
+@subheading Hash and Set Templates
+@cindex @code{csHash}
+@cindex @code{csSet}
+
+The new template classes @code{csHash<>} and @code{csSet<>} are available for
+use by new code; and older code will be upgraded over time to use these
+template classes.  The older @samp{csHashMap} and @samp{csHashSet} classes are
+now deprecated.
+
+@subheading iEventQueue Client References
 @cindex @code{csEventQueue}
 @cindex @code{iEventQueue}
 @cindex @code{csEvent}
@@ -442,37 +460,57 @@ Also @code{csGrowingArray} has been renamed to @code{csDirtyAccessArray}.
 @cindex @code{csEventCord}
 @cindex @code{iEventCord}
 
-Clients passing a @code{csEvent} instance @code{iEventQueue::Post()} or
-@code{iEventOutlet::Post()} must now @code{DecRef()} the @code{csEvent} after
-the call, since the @code{iEventQueue} will @code{IncRef()} it during the call
-and then @code{DecRef()} it when it's been handled.
+Posting an @samp{iEvent} via @code{iEventQueue::Post()} or
+@code{iEventOutlet::Post()} must now @code{DecRef()} the @samp{iEvent} after
+the posting the event, since @code{iEventQueue} will @code{IncRef()} the event
+for itself (that is, it will claim its own reference, rather than inheriting
+the reference from the caller as it did in the past).  As with all reference
+counting, rather than manually invoking @code{DecRef()}, the client is
+encouraged to utilize @code{csRef<>} to automate reference count management, as
+illustrated below.  This means that if you are calling @code{Post()} like this:
 
-This means that if you are calling @code{Post()} like this:
 @example
-  iEvent *e = new csEvent (foo, bar);
-  eventq->Post(e);
+iEvent* e = new csEvent (foo, bar);
+eventq->Post(e);
 @end example
-You must now call it like this:
+
+You should now call it like this:
+
 @example
-  csRef<iEvent> *e = csPtr<iEvent> (new csEvent (foo, bar));
-  eventq->Post(e);
+csRef<iEvent> e = csPtr<iEvent>(new csEvent (foo, bar));
+eventq->Post(e);
 @end example
 
 Events created with @code{iEventQueue::CreateEvent()} or
-@code{iEventOutlet::CreateEvent()} are unaffected by this change.
+@code{iEventOutlet::CreateEvent()} are unaffected by this change since the
+client was already responsible for managing the event's reference count in
+these cases.
 
-@subheading New Renderer Related Changes
+@subheading New Renderer-Related Changes
 
-The mesh object @sc{api} has changed considerably so we recommend looking at the
-documentation on that to see how to modify your own mesh object for the new
-@sc{api}. In this section we describe @sc{api} modifications that are relevant
-for user applications:
+The mesh object @sc{api} has changed considerably, thus we recommend looking
+at the documentation on that to see how to modify your own mesh object for
+the new @sc{api}.  In this section we describe @sc{api} modifications that
+are relevant for user applications.
 
-For @code{iLight}: @code{SetRadius}, @code{GetRadius}, and @code{GetSquaredRadius} have been replaced with @code{SetInfluenceRadius}, @code{GetInfluenceRadius}, and @code{GetInfluenceRadiusSq}.
+For @samp{iLight}: @code{SetRadius()}, @code{GetRadius()}, and
+@code{GetSquaredRadius()} have been replaced with @code{SetInfluenceRadius()},
+@code{GetInfluenceRadius()}, and @code{GetInfluenceRadiusSq()}.
 
-For @code{iMaterialEngine} and related: @code{GetTextureWrapper} for
-layers now expects a @code{csStringID} instead of an integer.
+For @samp{iMaterialEngine} and related: @code{GetTextureWrapper()} for
+layers now expects a @samp{csStringID} instead of an integer.
 
-@subheading SCF Changes
+@subheading @sc{scf} Changes
 
-The SCF_CREATE_INSTANCE macro returns csPtr<>, to be consistent with the rest of the SCF instantiation and query macros.
+The @code{SCF_CREATE_INSTANCE()} macro returns @code{csPtr<>}, in order to be
+consistent with the rest of the @sc{scf} instantiation and query macros.
+
+@subheading csSys Library Removed
+
+The @file{cssys} library has been merged into the @file{csutil} library.  This
+eliminates many problems which resulted from the large number of circular
+dependencies which existed between these two libraries.  From the client
+viewpoint, this manifests merely as the removal of the link library
+@file{libcssys.a} (Unix) or @file{cssys.lib} (Windows).  To account for this
+change, simply eliminate the reference to this library from your build scripts,
+makefiles, or project files.

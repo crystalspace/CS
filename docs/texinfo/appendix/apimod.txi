@@ -1,27 +1,27 @@
 @c -*-texinfo-*-
-@node API Modifications, Index, FAQ, Top
-@appendix Significant @sc{api} Changes
-@cindex @sc{api} Changes
+@node Release Notes, Index, FAQ, Top
+@appendix Release Notes
+@cindex Release Notes
 
 This document provides information to aid developers during the transition
 between versions of Crystal Space.  At this moment Crystal Space is still beta
-so we do not yet have a frozen @sc{api} (@dfn{Application Programmer's
-Interface}).  Even after version 1.0 is released, @sc{api} changes will still
-sometimes be unavoidable (but we will try to minimize them).  The following
-sections should give you a head start at trying to convert your application
-from one version of Crystal Space to the next.  Only the major changes are
-covered here.  If you have trouble with something that is not discussed here
-you should send mail to the Crystal Space mailing list and ask for help.
+so changes are sometimes made to procedures and facilities, and the @sc{api}
+(@dfn{Application Programmer's Interface}) is not completely frozen.  Even
+after version 1.0 is released, changes will still sometimes be unavoidable (but
+we will try to minimize them).  The following sections should give you a head
+start at trying to convert your application from one release of Crystal Space
+to the next.  If you have trouble with something that is not discussed here you
+should send mail to the Crystal Space mailing list and ask for help.
 @xref{Mailing Lists}.
 
 @menu
-* API Modifications 98:: @sc{api} Changes from 0.96 to 0.98
-* API Modifications 96:: @sc{api} Changes from 0.94 to 0.96
-* API Modifications 94:: @sc{api} Changes from 0.92 to 0.94
-* API Modifications 92:: @sc{api} Changes from 0.90 to 0.92
-* API Modifications 90:: @sc{api} Changes from 0.18 to 0.90
-* API Modifications 18:: @sc{api} Changes from 0.17 to 0.18
-* API Modifications 17:: @sc{api} Changes from 0.16 to 0.17
+* Release Notes 98:: Release Notes from 0.96 to 0.98
+* Release Notes 96:: Release Notes from 0.94 to 0.96
+* Release Notes 94:: Release Notes from 0.92 to 0.94
+* Release Notes 92:: Release Notes from 0.90 to 0.92
+* Release Notes 90:: Release Notes from 0.18 to 0.90
+* Release Notes 18:: Release Notes from 0.17 to 0.18
+* Release Notes 17:: Release Notes from 0.16 to 0.17
 @end menu
 
 @imports{appendix,apimod98.txi}
@@ -31,4 +31,3 @@ you should send mail to the Crystal Space mailing list and ask for help.
 @imports{appendix,apimod90.txi}
 @imports{appendix,apimod18.txi}
 @imports{appendix,apimod17.txi}
-

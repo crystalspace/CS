@@ -1,7 +1,7 @@
 @c -*-texinfo-*-
-@node API Modifications 94, API Modifications 92, API Modifications 96, API Modifications
-@appendixsec @sc{api} Changes from 0.92 to 0.94
-@cindex @sc{api} Changes
+@node Release Notes 94, Release Notes 92, Release Notes 96, Release Notes
+@appendixsec Release Notes from 0.92 to 0.94
+@cindex Release Notes
 
 This section documents the major changes between versions 0.92 and 0.94 of of
 Crystal Space.
@@ -202,4 +202,3 @@ The following defines have been changed:
 @item
 @code{DECLARE_TYPED_QUEUE_BASE} @result{} @code{CS_DECLARE_TYPED_QUEUE_BASE}
 @end itemize
-

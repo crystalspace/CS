@@ -106,8 +106,10 @@ color. It has a @samp{duration} parameter. But this duration does NOT influence
 the relative timing in the sequence itself. So for example if you have this:
 
 @example
-  <fadelight light="somelight" red="0" green="0" blue="0" duration="1000" />
-  <fadelight light="somelight" red="1" green="1" blue="1" duration="1000" />
+<fadelight light="somelight" red="0" green="0" blue="0"
+    duration="1000" />
+<fadelight light="somelight" red="1" green="1" blue="1"
+    duration="1000" />
 @end example
 
 Then this will execute two fade operations on the same light at exactly
@@ -115,9 +117,11 @@ the same time which is probably not what you want. This example is probably
 better written as:
 
 @example
-  <fadelight light="somelight" red="0" green="0" blue="0" duration="1000" />
-  <delay time="1000" />
-  <fadelight light="somelight" red="1" green="1" blue="1" duration="1000" />
+<fadelight light="somelight" red="0" green="0" blue="0"
+    duration="1000" />
+<delay time="1000" />
+<fadelight light="somelight" red="1" green="1" blue="1"
+    duration="1000" />
 @end example
 
 This will place the two operations at a time distance of 1000 milliseconds.
@@ -437,4 +441,3 @@ you can disable the trigger initially and let some other sequence (or the
 application) enable the trigger.
 
 @end table
-

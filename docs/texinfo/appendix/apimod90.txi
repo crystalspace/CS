@@ -1,7 +1,7 @@
 @c -*-texinfo-*-
-@node API Modifications 90, API Modifications 18, API Modifications 92, API Modifications
-@appendixsec @sc{api} Changes from 0.18 to 0.90
-@cindex @sc{api} Changes
+@node Release Notes 90, Release Notes 18, Release Notes 92, Release Notes
+@appendixsec Release Notes from 0.18 to 0.90
+@cindex Release Notes
 
 This section documents the major changes between versions 0.18 and 0.90 of of
 Crystal Space.
@@ -332,7 +332,7 @@ iEngine* engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 You then use the engine through @sc{scf} interfaces.  Therefore, your programs
 should include header files from @file{CS/include/iengine} rather than
 @file{CS/include/csengine}.  Importing files from @file{CS/include/csengine}
-is discourages.
+is discouraged.
 
 @subheading Sectors Have No Polygons
 @cindex @code{csSector}

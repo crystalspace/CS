@@ -1,7 +1,7 @@
 @c -*-texinfo-*-
-@node API Modifications 18, API Modifications 17, API Modifications 90, API Modifications
-@appendixsec @sc{api} Changes from 0.17 to 0.18
-@cindex @sc{api} Changes
+@node Release Notes 18, Release Notes 17, Release Notes 90, Release Notes
+@appendixsec Release Notes from 0.17 to 0.18
+@cindex Release Notes
 @cindex @code{AdvanceSpriteFrames()}
 @cindex @code{UpdateParticleSystems()}
 @cindex @code{PrepareParticleSystems()}

@@ -6,6 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-Sep-2003
+	- Eric Sunshine documented cssys+csutil merge in apimod98.txi.
+	- Eric Sunshine documented csHash<> and csSet<> in apimod98.txi.
+	- Eric Sunshine repaired a lot of Texinfo mark-up errors in
+	  apimod98.txi.
+	- Eric Sunshine renamed Appendix C and all of its subsections from "API
+	  Changes" to "Release Notes" since these sections cover more than just
+	  API changes.
+	- Eric Sunshine eliminated numerous `hbox' warnings reported by TeX.
 16-Sep-2003
 	- Jorrit fixed the thing plugin so that it now actually registers
 	  leaving portals to the sector.
