@@ -9,6 +9,7 @@ chronological order.
 1-Jun-2004
 	- Jorrit fixed a bug in the particles loader. The test to see if a
 	  factory is ok was wrong.
+	- Jorrit removed unneeded copy of transformation from OPCODE plugin.
 31-May-2004
 	- Jorrit added "IncludeDir plugins" back to Jamfile.in (it was removed
 	  yesterday).  Otherwise, many video plugins failed to compile.

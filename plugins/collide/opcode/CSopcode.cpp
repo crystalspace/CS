@@ -130,7 +130,7 @@ bool csOPCODECollideSystem::Collide (
   }
   else if (trans2)
   {
-    NetTransform = trans2->GetInverse ();;
+    NetTransform = trans2->GetInverse ();
   }
   
   csMatrix3 m1 = NetTransform.GetO2T ();
@@ -175,22 +175,7 @@ bool csOPCODECollideSystem::Collide (
   bool isOk = TreeCollider.Collide (ColCache ,&col1->transform , 0);
   if (isOk)
   {
-    bool Status = TreeCollider.GetContactStatus ();
-    if (Status) 
-    {
-      // UGLY: I know, it sucks to have to copy them by value, but then how can i be
-      // sure that it would not be modified by the app until the GetCollisionPairs
-      // calls use them?!
-      if (trans1) this->T1 = *trans1;
-      if (trans2) this->T2 = *trans2;
-      //	int size = (int)(udword(TreeCollider.GetNbPairs()));
-      //	N_pairs = size;
-      return true;
-    }
-    else
-    {
-      return false;
-    } 
+    return  TreeCollider.GetContactStatus ();
   }
   else
   {

@@ -48,10 +48,7 @@ public:
   Opcode::AABBTreeCollider TreeCollider;
   Opcode::BVTCache ColCache;
   csOPCODECollider* col1;
-  csReversibleTransform T1;
   csOPCODECollider* col2;
-  csReversibleTransform T2;
-
 
   csCollisionPair *pairs;
   int N_pairs;
