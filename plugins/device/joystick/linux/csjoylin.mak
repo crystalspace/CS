@@ -4,7 +4,7 @@ DESCRIPTION.joylin = Crystal Space Joystick plugin for Linux
 ifeq ($(MAKESECTION),rootdefines)
 
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make joylin     Make the $(DESCRIPTION.joylin)$"
+  $(NEWLINE)echo $"  make joylin       Make the $(DESCRIPTION.joylin)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
