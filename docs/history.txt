@@ -23,6 +23,10 @@ chronological order.
 	- Jorrit fixed a bug in thing and allocation of three-vertex
 	  polygons. This bug would cause too many memory allocations and
 	  memory leaks at exit.
+	- Jorrit reverted the helper.jam fix from Eric by putting an invalid
+	  character back instead of $(i). This will break static linking but
+	  at least normal linking works. With $(i) many modules wont link
+	  correctly.
 14-Oct-2003
 	- Eric Sunshine fixed typographical error in constant expression in
 	  cssys/general/platformconfig.cpp: S_IWGRPS_IXGRP --> S_IWGRP|S_IXGRP.
