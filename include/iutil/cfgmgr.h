@@ -38,12 +38,10 @@ SCF_VERSION(iConfigManager, 0, 0, 3);
  * objects use the same priority value, it is not defined which of them takes
  * precedence. <p>
  *
- * One config object is the so-called 'dynamic' object. When you change
+ * One config object is the so-called 'dynamic' object.  When you change
  * something in the global configuration, these changes are applied to the
- * dynamic config object. The changed key is removed from all objects with
- * higher priority. The dynamic object is given to the config manager at
- * construction and cannot be changed later. It has always priority 0
- * (medium). <p>
+ * dynamic config object.  The changed key is removed from all objects with
+ * higher priority.  The dynamic object has always priority 0 (medium).  <p>
  *
  * Differences in behaviour compared to a normal confguration object are:
  * <ul>
