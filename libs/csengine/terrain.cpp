@@ -28,6 +28,7 @@
 #include "csterr/struct/ddgbtree.h"
 #include "csterr/struct/ddgvarr.h"
 #include "igraph3d.h"
+#include "itxtmgr.h"
 
 IMPLEMENT_CSOBJTYPE (csTerrain,csObject);
 
@@ -239,15 +240,49 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
     fbl.Set(fc[6].v[0],fc[6].v[1],fc[6].v[2]);
     fbr.Set(fc[7].v[0],fc[7].v[1],fc[7].v[2]);
   }
+
   // NOW RENDER THIS USING WHITE LINES and look around to see where it is.
   // @@@ ALEX: to render a line in CAMERA space use:
   //csVector3 camv1, camv2;
   //rview.g3d->DrawLine (camv1, camv2, rview.GetFOV (), rview.g3d->GetTextureManager ()->FindRGB (255, 255, 255));
   // @@@ ALEX: to render a line in WORLD space (between worv1 and worv2) use:
   //csVector3 worv1, worv2;
-  //csVector3 camv1 = rview.World2Camera (worv1);
-  //csVector3 camv2 = rview.World2Camera (worv2);
-  //rview.g3d->DrawLine (camv1, camv2, rview.GetFOV (), rview.g3d->GetTextureManager ()->FindRGB (255, 255, 255));
+  csVector3 camv1 = rview.World2Camera (ftl);
+  csVector3 camv2 = rview.World2Camera (ftr);
+  rview.g3d->DrawLine (camv1, camv2, rview.GetFOV (), rview.g3d->GetTextureManager ()->FindRGB (255, 255, 255));
+  camv1 = rview.World2Camera (fbl);
+  camv2 = rview.World2Camera (fbr);
+  rview.g3d->DrawLine (camv1, camv2, rview.GetFOV (), rview.g3d->GetTextureManager ()->FindRGB (255, 255, 255));
+  camv1 = rview.World2Camera (ftl);
+  camv2 = rview.World2Camera (fbl);
+  rview.g3d->DrawLine (camv1, camv2, rview.GetFOV (), rview.g3d->GetTextureManager ()->FindRGB (255, 255, 255));
+  camv1 = rview.World2Camera (ftr);
+  camv2 = rview.World2Camera (fbr);
+  rview.g3d->DrawLine (camv1, camv2, rview.GetFOV (), rview.g3d->GetTextureManager ()->FindRGB (255, 255, 255));
+  camv1 = rview.World2Camera (ntl);
+  camv2 = rview.World2Camera (ntr);
+  rview.g3d->DrawLine (camv1, camv2, rview.GetFOV (), rview.g3d->GetTextureManager ()->FindRGB (255, 255, 255));
+  camv1 = rview.World2Camera (nbl);
+  camv2 = rview.World2Camera (nbr);
+  rview.g3d->DrawLine (camv1, camv2, rview.GetFOV (), rview.g3d->GetTextureManager ()->FindRGB (255, 255, 255));
+  camv1 = rview.World2Camera (ntl);
+  camv2 = rview.World2Camera (nbl);
+  rview.g3d->DrawLine (camv1, camv2, rview.GetFOV (), rview.g3d->GetTextureManager ()->FindRGB (255, 255, 255));
+  camv1 = rview.World2Camera (ntr);
+  camv2 = rview.World2Camera (nbr);
+  rview.g3d->DrawLine (camv1, camv2, rview.GetFOV (), rview.g3d->GetTextureManager ()->FindRGB (255, 255, 255));
+  camv1 = rview.World2Camera (ntl);
+  camv2 = rview.World2Camera (ftl);
+  rview.g3d->DrawLine (camv1, camv2, rview.GetFOV (), rview.g3d->GetTextureManager ()->FindRGB (255, 255, 255));
+  camv1 = rview.World2Camera (ntr);
+  camv2 = rview.World2Camera (ftr);
+  rview.g3d->DrawLine (camv1, camv2, rview.GetFOV (), rview.g3d->GetTextureManager ()->FindRGB (255, 255, 255));
+  camv1 = rview.World2Camera (nbl);
+  camv2 = rview.World2Camera (fbl);
+  rview.g3d->DrawLine (camv1, camv2, rview.GetFOV (), rview.g3d->GetTextureManager ()->FindRGB (255, 255, 255));
+  camv1 = rview.World2Camera (nbr);
+  camv2 = rview.World2Camera (fbr);
+  rview.g3d->DrawLine (camv1, camv2, rview.GetFOV (), rview.g3d->GetTextureManager ()->FindRGB (255, 255, 255));
 
   // Optimize the mesh w.r.t. the current viewing location.
   modified = mesh->calculate(context);
