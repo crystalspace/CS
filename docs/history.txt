@@ -52,6 +52,10 @@ The history order is reversed so that new features are at the top.
 	- Thing now implements GetObjectModel() in the factory.
 	- Added note about the new InitializeCollisionWrapper() function
 	  in the collision detection howto.
+	- res changed mk/jam/win32.jam to manually create a .def file
+	  for plugins to get rid of that "dllwrap.exe: no export definition 
+	  file provided" message. Also fixed missing deletion of some
+	  tempoary files.
 13-Apr-2003
 	- Wouter fixed mikmod sound loader, delete[]/realloc mismatch.
 	- Matze cleaned some jamrules.
