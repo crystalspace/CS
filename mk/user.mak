@@ -114,6 +114,8 @@ endif
 
 # Should we build libraries as shared/dynamic libraries?
 # Currently only supported on Unix
+# NOTE! Be careful enabling this option. It hasn't been tested well
+# and it will not work in some situations (like with 'make install').
 ifndef USE_SHARED_LIBS
   USE_SHARED_LIBS=no
 endif
