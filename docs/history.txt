@@ -1,5 +1,7 @@
 The history order has been reversed so that new features are at the top.
 
+24-Jan-2001
+	- Small update to Python scripting system.
 23-Jan-2001
 	- Martin Geisse moved the following to the new config system:
 	    - SCF.
