@@ -29,6 +29,7 @@ chronological order.
 	  VERY bad (especially with MSVC) for performance. Now it only
 	  does 'new' if needed.
 	- Neil Mosafi added support for a3dl:sphere to the csvosa3dl plugin.
+	  Neil Mosafi added support for a3dl:cylinder to the csvosa3dl plugin.
 	  It will now automatically load these objects into the engine
 3-Jun-2004
 	- Eric Sunshine added MsvcGenVariable rule to msvcgen.jam, which allows
