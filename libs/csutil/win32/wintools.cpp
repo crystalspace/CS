@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 #include "csutil/csunicode.h"
+#include "csutil/csstring.h"
 #include "csutil/util.h"
 
 #include <windows.h>
@@ -104,9 +105,8 @@ wchar_t* cswinGetErrorMessageW (HRESULT code)
   if (dwResult == 0)
   {
     HRESULT fmError = GetLastError ();
-    const wchar_t fmErrMsg[] = L"{FormatMessage() error %.8x}";
-    wchar_t msg [(sizeof (fmErrMsg) / sizeof (wchar_t)) - 4 + 8];
-    wscsPrintfW (msg, fmErrMsg, (uint)fmError);
+    csString msg;
+    msg.Format ("{FormatMessage() error %.8x}", (uint)fmError);
     ret = csStrNewW (msg);
   }
 

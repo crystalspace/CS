@@ -243,9 +243,9 @@ bool cswinCallStack::GetFunctionName (size_t num, csString& str)
 
   if (symbolInfo->Name[0] != 0)
   {
-    str.Format ("[%p] (%s)%s+0x%" PRIx64, (void*)entries[num].instrPtr,
+    str.Format ("[%p] (%s)%s+0x%llx", (void*)entries[num].instrPtr,
       (module.ImageName[0] != 0) ? module.ImageName : "<unknown>",
-      symbolInfo->Name, displace);
+      symbolInfo->Name, (longlong)displace);
   }
   else
   {
@@ -267,7 +267,7 @@ bool cswinCallStack::GetLineNumber (size_t num, csString& str)
   if (DbgHelp::SymGetLineFromAddr64 (symInit.GetSymProcessHandle (), 
     entries[num].instrPtr, &displacement, &line))
   {
-    str.Format ("%s:%" PRIu32, line.FileName, line.LineNumber);
+    str.Format ("%s:%u", line.FileName, line.LineNumber);
     return true;
   }
   return false;
@@ -285,9 +285,9 @@ bool cswinCallStack::GetParameters (size_t num, csString& str)
     if (!first) { str << ", "; } else { first = false; }
     str << strings.Request (param->name);
     str << " = ";
-    char tmp[23];
+    csString tmp;
     longlong data = param->value;
-    scsPrintf (tmp, "%lld(0x%llx)", data, data);
+    tmp.Format ("%lld(0x%llx)", data, data);
     str << tmp;
     param++;
   }

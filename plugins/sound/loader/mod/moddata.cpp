@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/sysfunc.h"
 #include "moddata.h"
 #include "isound/loader.h"
 #include "iutil/comp.h"

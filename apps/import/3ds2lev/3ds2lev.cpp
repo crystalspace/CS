@@ -33,7 +33,8 @@
 #include <lib3ds/node.h>
 #include <lib3ds/vector.h>
 
-#include <csutil/scfstr.h>
+#include "csutil/scfstr.h"
+#include "csutil/sysfunc.h"
 
 #include "levelwriter.h"
 

@@ -19,6 +19,7 @@
 
 #include "cssysdef.h"
 #include "csutil/util.h"
+#include "csutil/sysfunc.h"
 #include "csutil/win32/registrycfg.h"
 
 SCF_IMPLEMENT_IBASE (csWin32RegistryConfig)
@@ -69,8 +70,8 @@ bool csWin32RegistryConfig::TryOpen (HKEY parent, HKEY& regKey, DWORD access,
     Key = csStrNew (keyName);
   }
 
-/*  CS_ALLOC_STACK_ARRAY (char, key, 9 + strlen (Key) + 1); // 9 = Length "Software\"
-  scsPrintf (key, "Software\\%s", Key);
+/*  csString key;
+  key.Format ("Software\\%s", Key);
   ReplaceSeparators (key);*/
 
   hKeyParent = parent;
@@ -275,18 +276,18 @@ float csWin32RegistryConfig::RegToFloat (DWORD type, Block_O_Mem& data, float De
 const char* csWin32RegistryConfig::RegToStr (DWORD type, Block_O_Mem& data,
 					const char* Def) const
 {
-  char buf[64];
+  csString buf;
   switch (type)
   {
   case REG_SZ:
     return status->strings.Register ((char*)data.data, 0);
     break;
   case REG_DWORD:
-    scsPrintf (buf, "%d", *((int*)data.data));
+    buf.Format ("%d", *((int*)data.data));
     return status->strings.Register (buf, 0);
     break;
   case REG_BINARY:
-    scsPrintf (buf, "%g", *((float*)data.data));
+    buf.Format ("%g", *((float*)data.data));
     return status->strings.Register (buf, 0);
     break;
   default:
@@ -435,8 +436,8 @@ void csWin32RegistryConfig::SetFloat (const char *Key, float Value)
 {
   //InternalSetValue (Key, REG_BINARY, &Value, sizeof (Value));
   // for better readability:
-  char buf[128];
-  scsPrintf (buf, "%g", Value);
+  csString buf;
+  buf.Format ("%g", Value);
   InternalSetValue (Key, REG_SZ, buf, strlen (buf) + 1);
 }
 

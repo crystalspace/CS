@@ -834,14 +834,14 @@ const char* csWin32KeyboardDriver::GetVKName (LONG vKey)
   const char* vkName = Win32VKeyNames.StringForIdent (vKey);
   if (vkName != 0) return vkName;
 
-  static char genName[13];
+  static csString genName;
   if (((vKey >= 'A') && (vKey <= 'Z')) || ((vKey >= '0') && (vKey <= '9')))
   {
-    genName[0] = vKey; genName[1] = 0;
+    genName = (char)vKey;
   }
   else
   {
-    scsPrintf (genName, "[%ld]", vKey);
+    genName.Format ("[%ld]", vKey);
   }
   return genName;
 #endif

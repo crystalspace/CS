@@ -10,10 +10,11 @@
 #include <stdarg.h>
 #include <ctype.h>
 
-#include <csgeom/vector3.h>
-#include <csgeom/plane3.h>
-#include <csgeom/math3d.h>
-#include <csutil/xmltiny.h>
+#include "csgeom/vector3.h"
+#include "csgeom/plane3.h"
+#include "csgeom/math3d.h"
+#include "csutil/xmltiny.h"
+#include "csutil/sysfunc.h"
 
 // includes for lib3ds
 #include <lib3ds/camera.h>

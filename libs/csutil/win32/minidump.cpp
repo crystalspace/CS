@@ -480,8 +480,8 @@ LONG WINAPI cswinMinidumpWriter::ExceptionFilter (
     }
     else
     {
-      char buf[512];
-      scsPrintf (buf, "The application crashed. Dump has been written to %s", 
+      csString buf;
+      buf.Format ("The application crashed. Dump has been written to %s", 
 	dumpFileName);
       MessageBoxA (0, buf, 0, MB_OK | MB_ICONERROR);
     }

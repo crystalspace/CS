@@ -62,7 +62,7 @@ private:
    * of visible pixels (z-buf) in vispix.
    * M, N, and O are used for getting the Z value at every pixel.
    */
-  void InsertPolygon (csVector2* tr_verts, int num_verts,
+  void InsertPolygon (csVector2* tr_verts, size_t num_verts,
   	float M, float N, float O, uint32 obj_number, int& totpix);
 
 public:

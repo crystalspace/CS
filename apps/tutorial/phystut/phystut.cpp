@@ -97,12 +97,12 @@ void Simple::SetupFrame ()
 
   // Write FPS and other info..
   if(!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return;
-  if( speed != 0.0f) WriteShadow( 0,10, 400, g2d->FindRGB (255, 150, 100),"FPS: %.2f",1.0f/speed);
-  WriteShadow( 0,10, 410, g2d->FindRGB (255, 150, 100),"%d Objects",objcnt);
-  if(solver==0) WriteShadow( 0,10, 420, g2d->FindRGB (255, 150, 100),"Solver: WorldStep");
-  else if(solver==1) WriteShadow( 0,10, 420, g2d->FindRGB (255, 150, 100),"Solver: StepFast");
-  else if(solver==2) WriteShadow( 0,10, 420, g2d->FindRGB (255, 150, 100),"Solver: QuickStep");
-  if(disable) WriteShadow( 0,10, 430, g2d->FindRGB (255, 150, 100),"AutoDisable ON");
+  if( speed != 0.0f) WriteShadow( 10, 400, g2d->FindRGB (255, 150, 100),"FPS: %.2f",1.0f/speed);
+  WriteShadow( 10, 410, g2d->FindRGB (255, 150, 100),"%d Objects",objcnt);
+  if(solver==0) WriteShadow( 10, 420, g2d->FindRGB (255, 150, 100),"Solver: WorldStep");
+  else if(solver==1) WriteShadow( 10, 420, g2d->FindRGB (255, 150, 100),"Solver: StepFast");
+  else if(solver==2) WriteShadow( 10, 420, g2d->FindRGB (255, 150, 100),"Solver: QuickStep");
+  if(disable) WriteShadow( 10, 430, g2d->FindRGB (255, 150, 100),"AutoDisable ON");
 }
 
 void Simple::FinishFrame ()
@@ -653,45 +653,27 @@ void Simple::Start ()
   csDefaultRunLoop (object_reg);
 }
 
-void Simple::WriteShadow (int align,int x,int y,int fg,char *str,...) {
-  char buf[256];
+void Simple::WriteShadow (int x,int y,int fg,const char *str,...) 
+{
+  csString buf;
 
   va_list arg;
   va_start (arg, str);
-  vscsPrintf (buf, str, arg);
+  buf.FormatV (str, arg);
   va_end (arg);
 
-  Write (align, x+1, y-1, 0, -1, buf);
-  Write (align, x, y, fg, -1, buf);
+  Write (x+1, y-1, 0, -1, "%s", buf.GetData());
+  Write (x, y, fg, -1, "%s", buf.GetData());
 }
 
-void Simple::Write(int align,int x,int y,int fg,int bg,char *str,...) {
+void Simple::Write(int x,int y,int fg,int bg,const char *str,...) 
+{
   va_list arg;
-  char b[256], *buf = b;
+  csString buf;
 
   va_start (arg,str);
-  int l = vscsPrintf (buf, str, arg);
+  buf.Format (str, arg);
   va_end (arg);
-
-  if (align != 0)
-  {
-    int rb = 0;
-    if (align == 1)
-    {
-      int where;
-      sscanf (buf, "%d%n", &rb,&where);
-      buf += where + 1;
-      l -= where + 1;
-    }
-
-    int w, h;
-    courierFont->GetDimensions (buf, w, h);
-
-    switch(align) {
-      case 2:  x -= w; break;
-      case 1: x = (x + rb - w) / 2; break;
-    }
-  }
 
   g2d->Write (courierFont, x, y, fg, bg, buf);
 }

@@ -168,6 +168,10 @@ static op_args_info optimize_arg_table[] =
   { 0, 0, false }, //  OP_LIMIT
 };
 
+/* Note on vector default values:
+ * - Constant vectors should default to x=0,y=0,z=0,w=1 for unspecified fields.
+ * - Variable vectors default to all 0. */
+
 CS_LEAKGUARD_IMPLEMENT (csShaderExpression);
 
 bool csShaderExpression::loaded = false;
@@ -696,13 +700,13 @@ bool csShaderExpression::eval_variable(csShaderVariable * var, oper_arg & out)
       out.type = TYPE_VECTOR2;
       var->GetValue(out.vec4); // @@@ relies on the fact that csShaderVariables don't check type.
       out.vec4.z = 0;
-      out.vec4.w = 1.0f; // standard value for w
+      out.vec4.w = 0.0f; // standard value for w
       break;
 
     case csShaderVariable::VECTOR3:
       out.type = TYPE_VECTOR3;
       var->GetValue(out.vec4);
-      out.vec4.w = 1.0f; // standard value for w
+      out.vec4.w = 0.0f; // standard value for w
       break;
       
     case csShaderVariable::VECTOR4:
@@ -1279,7 +1283,7 @@ bool csShaderExpression::eval_selt12(const oper_arg & arg1, const oper_arg & arg
     return false;
   }
 
-  output.type = TYPE_VECTOR4;
+  output.type = TYPE_VECTOR2;
   output.vec4.x = arg1.num;
   output.vec4.y = arg2.num;
 
@@ -1295,7 +1299,7 @@ bool csShaderExpression::eval_selt34(const oper_arg & arg1, const oper_arg & arg
     return false;
   }
 
-  output.type = TYPE_VECTOR4;
+  output.type = TYPE_VECTOR3;
   output.vec4.z = arg1.num;
 
   if (arg2.type == TYPE_INVALID) 
@@ -1308,6 +1312,7 @@ bool csShaderExpression::eval_selt34(const oper_arg & arg1, const oper_arg & arg
     return false;
   }
 
+  output.type = TYPE_VECTOR4;
   output.vec4.w = arg2.num;
 
   return true;
@@ -1776,15 +1781,7 @@ bool csShaderExpression::compile_make_vector(const cons * cptr, int & acc_top, i
   cptr = cptr->cdr;
   if (!cptr)
   {
-    tmp.opcode = OP_INT_SELT34;
-    tmp.acc = this_acc;
-    tmp.arg1.type = TYPE_NUMBER;
-    tmp.arg1.num = 0.0f;
-    tmp.arg2.type = TYPE_NUMBER;
-    tmp.arg2.num = 1.0f;
-
     acc_top++;
-    opcodes.Push(tmp);
     return true;
   }
   

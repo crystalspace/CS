@@ -51,8 +51,8 @@ private:
   bool HandleEvent (iEvent& ev);
   void SetupFrame ();
   void FinishFrame ();
-  void WriteShadow (int align,int x,int y,int fg,char *str,...);
-  void Write(int align,int x,int y,int fg,int bg,char *str,...);
+  void WriteShadow (int x,int y,int fg,const char *str,...);
+  void Write(int x,int y,int fg,int bg,const char *str,...);
   
   iRigidBody* CreateBox (void);
   iRigidBody* CreateSphere (void);

@@ -155,7 +155,7 @@ public:
    *
    * For a bigger list go to http://www.utm.edu/research/primes/
    */
-  csHash (int size = 23, int grow_rate = 5, int max_size = 20000)
+  csHash (size_t size = 23, size_t grow_rate = 5, size_t max_size = 20000)
     : Elements (size), Modulo (size), InitModulo (size),
       GrowRate (MIN (grow_rate, size)), MaxSize (max_size), Size (0)
   {

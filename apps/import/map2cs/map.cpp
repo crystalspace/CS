@@ -359,14 +359,14 @@ bool CMapFile::FindTextureFile(const char* name, char* fullname)
 {
   for (int pathnr = 1; true; pathnr++)
   {
-    char keyname[50];
+    csString keyname;
     char Path[256];
-    scsPrintf(keyname, "path%d", pathnr);
+    keyname.Format ("path%d", pathnr);
     strcpy(Path, GetIniStr("texturesettings", keyname, ""));
     if (Path[0])
     {
-      char Buffer[300];
-      scsPrintf(Buffer, "%s/%s", Path, name);
+      csString Buffer;
+      Buffer.Format ("%s/%s", Path, name);
       FILE* fd = fopen(Buffer, "r");
       if (fd)
       {
@@ -407,9 +407,9 @@ void CMapFile::LoadWadFiles()
   int wadnr = 1;
   do
   {
-    char keyname[200];
+    csString keyname;
     char wadname[300];
-    scsPrintf(keyname, "wad%d", wadnr);
+    keyname.Format ("wad%d", wadnr);
     strcpy(wadname, GetIniStr("texturesettings", keyname, ""));
     if (wadname[0])
     {

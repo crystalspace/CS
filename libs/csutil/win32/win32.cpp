@@ -59,8 +59,7 @@ extern char** CS_WIN32_ARGV;
 void SystemFatalError (const char *s)
 {
   ChangeDisplaySettings (0, 0);  // doesn't hurt
-  csFPutErr ("FATAL: ");
-  csFPutErr (s);
+  csPrintfErr ("FATAL: %s\n", s);
   MessageBoxW (0, csCtoW (s), L"Fatal Error", MB_OK | MB_ICONSTOP);
 }
 
@@ -993,8 +992,8 @@ void Win32Assistant::AlertV (HWND window, int type, const char* title,
       (HOOKPROC)&CBTProc, ModuleHandle, GetCurrentThreadId());
   }
 
-  char buf[4096];
-  vscsPrintf(buf, msg, args);
+  csString buf;
+  buf.FormatV (msg, args);
 
   // No need to juggle with string conversions here, 
   // MessageBoxW() also exists on Win9x

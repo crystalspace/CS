@@ -60,13 +60,13 @@ csExactCuller::~csExactCuller ()
   delete[] objects;
 }
 
-void csExactCuller::InsertPolygon (csVector2* tr_verts, int num_verts,
+void csExactCuller::InsertPolygon (csVector2* tr_verts, size_t num_verts,
 	float M, float N, float O, uint32 obj_number, int& totpix)
 {
   totpix = 0;
 
-  int i;
-  int min_i, max_i;
+  size_t i;
+  size_t min_i, max_i;
   min_i = max_i = 0;
   float min_y, max_y;
   min_y = max_y = tr_verts[0].y;
@@ -94,7 +94,7 @@ void csExactCuller::InsertPolygon (csVector2* tr_verts, int num_verts,
   if (real_num_verts < 3)
     return;
 
-  int scanL1, scanL2, scanR1, scanR2;   // scan vertex left/right start/final
+  size_t scanL1, scanL2, scanR1, scanR2;   // scan vertex left/right start/final
   float sxL, sxR, dxL, dxR;             // scanline X left/right and deltas
   int sy, fyL, fyR;                     // scanline Y, final Y l, final Y r
   int xL, xR;

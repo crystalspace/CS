@@ -56,28 +56,17 @@
 
 void DirectDetection::ReportResult (int severity, char *str, HRESULT hRes)
 {
-  char *szMsg = 0;
+  csString szMsg;
   //if (FAILED (hRes))
   {
     char* errmsg = cswinGetErrorMessage (hRes);
-    const char* szStdMessage = "%s\nLast Error: %s [0x%.8x]";
-    szMsg = new char [strlen (szStdMessage) + strlen (errmsg) - 2 + strlen (str) - 2 + 8 - 4 + 1];
       // in the length formula above the format specifier lengths were subtracted.
-    scsPrintf (szMsg, szStdMessage, str, errmsg, (int)hRes);
+    szMsg.Format ("%s\nLast Error: %s [0x%.8x]", str, errmsg, (int)hRes);
     delete[] errmsg;
   }
 
-  csRef<iReporter> rep = CS_QUERY_REGISTRY (object_reg, iReporter);
-  if (rep)
-    rep->Report (severity, "crystalspace.canvas.ddraw.directdetection", "%s", 
-      szMsg ? szMsg : str);
-  else
-  {
-    csPrintf ("%s", szMsg ? szMsg : str);
-    csPrintf ("\n");
-  }
-
-  delete[] szMsg;
+  csReport (object_reg, severity, "crystalspace.canvas.ddraw.directdetection", 
+    "%s", !szMsg.IsEmpty() ? szMsg.GetData() : str);
 }
 
 void DirectDetection::SystemFatalError (char *str, HRESULT hRes)

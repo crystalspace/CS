@@ -212,7 +212,7 @@ int csPrintf (char const* str, ...)
 {
   va_list args;
   va_start(args, str);
-  int const rc = _cs_fprintf (stdout, str, args);
+  int const rc = _cs_vfprintf (stdout, str, args);
   va_end(args);
   fflush (stdout);
   return rc;

@@ -1141,27 +1141,27 @@ csRadElement *csRadiosity::FetchNext ()
 
   // stop varibles
   bool stop_now = false;
-  char reason[80];
-
+  csString reason;
+  
   if (element == 0)
   {
     stop_now = true;
-    scsPrintf (reason, "no polygons to light");
+    reason.Format ("no polygons to light");
   }
   else if (element->GetPriority () < stop_value)
   {
     stop_now = true;
-    scsPrintf (reason, "priority down to %g", element->GetPriority ());
+    reason.Format ("priority down to %g", element->GetPriority ());
   }
   else if (iterations > stop_iterations)
   {
     stop_now = true;
-    scsPrintf (reason, "%d iterations reached", iterations);
+    reason.Format ("%d iterations reached", iterations);
   }
   else if (element->GetRepeatCount () > max_repeats)
   {
     stop_now = true;
-    scsPrintf (reason, "loop detected");
+    reason.Format ("loop detected");
   }
 
   /// more stop conditions can be put here.
@@ -1173,7 +1173,8 @@ csRadElement *csRadiosity::FetchNext ()
         meter->Step ();
       }
 
-    csEngine::current_engine->Report ("Finished radiosity (%s).", reason);
+    csEngine::current_engine->Report ("Finished radiosity (%s).", 
+      reason.GetData());
 
     if (element) list->InsertElement (element); // to prevent memory leak.
     return 0;

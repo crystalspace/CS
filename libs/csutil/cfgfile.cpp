@@ -131,9 +131,8 @@ void csConfigNode::SetStr(const char *s)
 
 void csConfigNode::SetInt(int n)
 {
-  char output [32];
-  cs_snprintf (output, sizeof(output), "%d", n);
-  //scsPrintf (output, "%d", n);
+  csString output;
+  output.Format ("%d", n);
   SetStr (output);
 }
 
