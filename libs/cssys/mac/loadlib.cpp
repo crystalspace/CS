@@ -22,31 +22,30 @@
 #include "cssysdef.h"
 #include "cssys/csshlib.h"
 
-
-csLibraryHandle csLoadLibrary( const char* iName )
+csLibraryHandle csFindLoadLibrary (const char *iName)
 {
-//@@TODO: use csFindLibrary
-	CFragConnectionID libID;
-	OSErr	theError;
-	Str63	theLibName;
-	Str255	errorString;
+  return csFindLoadLibrary (NULL, iName, ".shlb");
+}
+
+csLibraryHandle csLoadLibrary (const char *iName)
+{
+  CFragConnectionID libID;
+  OSErr theError;
+  Str63 theLibName;
+  Str255 errorString;
   void (*pfnDllInitialize)(void) = NULL;
 
-	strcpy( (char *)&theLibName[1], iName );
-	strcat( (char *)&theLibName[1], ".shlb" );
-	theLibName[0] = strlen( (char *)&theLibName[1] );
+  strcpy ((char *)&theLibName [1], iName);
+  theLibName[0] = strlen ((char *)&theLibName [1]);
 
-    theError = GetSharedLibrary( theLibName, kPowerPCCFragArch, kReferenceCFrag, &libID, (Ptr*)&pfnDllInitialize, errorString );
+  theError = GetSharedLibrary (theLibName, kPowerPCCFragArch, kReferenceCFrag,
+    &libID, (Ptr*)&pfnDllInitialize, errorString);
 
-    if ( theError == noErr )
-    {
-		if (pfnDllInitialize) {
-			(*pfnDllInitialize)();
-		}
+  if (theError == noErr)
+    if (pfnDllInitialize)
+      (*pfnDllInitialize) ();
 
-	}
-
-	return (csLibraryHandle)libID;
+  return (csLibraryHandle)libID;
 }
 
 void *csGetLibrarySymbol( csLibraryHandle Handle, const char* iName )

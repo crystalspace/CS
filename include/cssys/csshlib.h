@@ -25,6 +25,7 @@ typedef void *csLibraryHandle;
 /**
  * Load a shared library and return a library handle,
  * which is used later to query and unload the library.
+ * iName is the FULL path to the library.
  */
 extern csLibraryHandle csLoadLibrary (const char* iName);
 
@@ -51,15 +52,24 @@ extern bool csUnloadLibrary (csLibraryHandle Handle);
 extern void csAddLibraryPath (const char *iPath);
 
 /**
- * Find a shared library in library search path.
- * This function returns NULL which says that the library cannot
- * be found, or the full pathname of the library (which you should
- * delete[] after you're done with it). iPrefix can be either NULL
- * or something like "lib"; the routine tries both with (if it is not NULL)
- * and without prefix. Same about iSuffix - it can be something like ".dll"
- * or ".so", but not NULL (because all OSes use some suffix for shared libs).
+ * Find a shared library in library search path and load it.
+ * Same as csLoadLibrary except that you give just the name of the
+ * module, without any prefix/suffix. You give the *possible* prefix
+ * and suffix and it tries with and without them along every library
+ * path entry. The first one that is found gets loaded and a handle
+ * is returned.
  */
-extern char *csFindLibrary (const char *iPrefix, const char *iName,
+extern csLibraryHandle csFindLoadLibrary (const char *iModule);
+
+/**
+ * Same but you give the possible suffix and prefix. This is usually called
+ * by the system-dependent implementation of csFindLoadLibrary, and not
+ * by the user. iPrefix can be either NULL or something like "lib";
+ * the routine tries both with (if it is not NULL) and without prefix.
+ * Same about iSuffix - it can be something like ".dll" or ".so", but
+ * not NULL (because all OSes use some suffix for shared libs).
+ */
+extern csLibraryHandle csFindLoadLibrary (const char *iPrefix, const char *iName,
   const char *iSuffix);
 
 #endif // __CSSHLIB_H__

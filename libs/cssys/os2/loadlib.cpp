@@ -28,16 +28,16 @@ extern "C" int DosFreeModule (csLibraryHandle ModuleHandle);
 extern "C" int DosQueryProcAddr (csLibraryHandle ModuleHandle,
   unsigned long Ordinal, const char *FunctionName, void *FunctionAddress);
 
+csLibraryHandle csFindLoadLibrary (const char *iName)
+{
+  return csFindLoadLibrary (NULL, iName, ".dll");
+}
+
 csLibraryHandle csLoadLibrary (const char* iName)
 {
-  char *name = csFindLibrary (NULL, iName, ".dll");
-  if (!name) return (csLibraryHandle)0;
-
   csLibraryHandle Handle;
-  if (DosLoadModule ((const char *)0, 0, name, &Handle))
+  if (DosLoadModule ((const char *)0, 0, iName, &Handle))
     Handle = (csLibraryHandle)0;
-
-  delete [] name;
   return Handle;
 }
 

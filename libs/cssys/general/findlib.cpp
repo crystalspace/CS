@@ -18,23 +18,23 @@
 */
 
 #define SYSDEF_PATH
-#define SYSDEF_ACCESS
 #include "cssysdef.h"
 #include "cssys/csshlib.h"
 #include "csutil/csstrvec.h"
 #include "csutil/util.h"
 
 static csStrVector LibPath (4, 4);
+bool findlib_search_nodir = true;
 
 void csAddLibraryPath (const char *iPath)
 {
   LibPath.Push (strnew (iPath));
 }
 
-char *csFindLibrary (const char *iPrefix, const char *iName,
+csLibraryHandle csFindLoadLibrary (const char *iPrefix, const char *iName,
   const char *iSuffix)
 {
-  for (int i = -1; i < LibPath.Length (); i++)
+  for (int i = findlib_search_nodir ? -1 : 0; i < LibPath.Length (); i++)
   {
     char lib [MAXPATHLEN + 1];
 
@@ -52,11 +52,12 @@ char *csFindLibrary (const char *iPrefix, const char *iName,
       else
         lib [sl] = 0;
       strcat (strcat (lib + sl, iName), iSuffix);
-      if (!access (lib, F_OK))
-        return strnew (lib);
+      csLibraryHandle lh = csLoadLibrary (lib);
+      if (lh)
+        return lh;
       if (!iPrefix)
         break;
     }
   }
-  return NULL;
+  return (csLibraryHandle)0;
 }

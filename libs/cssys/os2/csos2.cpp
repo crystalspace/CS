@@ -20,7 +20,7 @@
 #include <limits.h>
 #include <stdarg.h>
 #include "cssysdef.h"
-#include "csos2.h"
+#include "cssys/os2/csos2.h"
 #include "csutil/inifile.h"
 #include "isystem.h"
 

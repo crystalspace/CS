@@ -24,20 +24,20 @@ extern "C" {
 #include <streams/streams.h>
 }
 
+//@@TODO: upon startup call csAddLibraryPath (OS_NEXT_PLUGIN_DIR)
+
+csLibraryHandle csFindLoadLibrary (const char *iName)
+{
+  return csFindLoadLibrary (NULL, iName, OS_NEXT_PLUGIN_EXT);
+}
+
 //-----------------------------------------------------------------------------
 // csLoadLibrary
 //-----------------------------------------------------------------------------
 csLibraryHandle csLoadLibrary( char const* lib )
     {
-//@@TODO: use csFindLibrary
-    char* file = new char[strlen(lib) + sizeof(OS_NEXT_PLUGIN_DIR) +
-	sizeof(OS_NEXT_PLUGIN_EXT)]; // Includes '\0'.
-    strcpy( file, OS_NEXT_PLUGIN_DIR );
-    strcat( file, lib );
-    strcat( file, OS_NEXT_PLUGIN_EXT );
-
     csLibraryHandle handle = 0;
-    char const* const files[2] = { file, 0 };
+    char const* const files[2] = { lib, 0 };
     struct mach_header* header = 0;
     NXStream* stream = NXOpenFile( 1, NX_WRITEONLY );
     if (objc_loadModules( (char**)files, stream, 0, &header, 0 ) == 0)
@@ -46,7 +46,6 @@ csLibraryHandle csLoadLibrary( char const* lib )
 	NXPrintf( stream, "Unable to load library '%s'.\n", file );
     NXClose( stream );
 
-    delete[] file;
     return handle;
     }
 

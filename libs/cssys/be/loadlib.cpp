@@ -23,15 +23,14 @@
 #include "cssys/csshlib.h"
 #include "csutil/csstring.h"
 
+csLibraryHandle csFindLoadLibrary (const char *iName)
+{
+  return csFindLoadLibrary (NULL, iName, ".plugin");
+}
+
 csLibraryHandle csLoadLibrary (const char* iName)
 {
-  char *name = csFindLibrary (NULL, iName, ".plugin");
-  if (!name) return (csLibraryHandle)0;
-
-  csLibraryHandle Handle = load_add_on (name);
-
-  delete [] name;
-  return Handle;
+  return load_add_on (iName);
 }
 
 void *csGetLibrarySymbol (csLibraryHandle h, const char* name)

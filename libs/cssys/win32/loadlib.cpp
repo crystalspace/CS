@@ -19,15 +19,14 @@
 #include "cssysdef.h"
 #include "cssys/csshlib.h"
 
-csLibraryHandle csLoadLibrary (const char* szLibName)
+csLibraryHandle csFindLoadLibrary (const char *iName)
 {
-  char *name = csFindLibrary (NULL, iName, ".dll");
-  if (!name) return (csLibraryHandle)0;
+  return csFindLoadLibrary (NULL, iName, ".dll");
+}
 
-  csLibraryHandle Handle = LoadLibrary (name);
-
-  delete [] name;
-  return Handle;
+csLibraryHandle csLoadLibrary (const char* iName)
+{
+  return LoadLibrary (iName);
 }
 
 void* csGetLibrarySymbol(csLibraryHandle Handle, const char* Name)

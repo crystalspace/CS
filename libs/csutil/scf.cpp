@@ -92,7 +92,7 @@ scfSharedLibrary::scfSharedLibrary (const char *iLibraryName)
 
   RefCount = 0;
   ClassTable = NULL;
-  LibraryHandle = csLoadLibrary (LibraryName = iLibraryName);
+  LibraryHandle = csFindLoadLibrary (LibraryName = iLibraryName);
   if (!LibraryHandle)
     return;
 

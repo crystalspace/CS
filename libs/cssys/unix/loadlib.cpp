@@ -37,6 +37,8 @@ class __loadlib_init
 public:
   __loadlib_init ()
   {
+    extern bool findlib_search_nodir;
+    findlib_search_nodir = false;
     char path [1255];
     getcwd (path, sizeof (path));
     strcat (path, "/");
@@ -44,16 +46,16 @@ public:
   }
 } __loadlib_init_dummy;
 
+csLibraryHandle csFindLoadLibrary (const char *iName)
+{
+  return csFindLoadLibrary ("lib", iName, ".so");
+}
+
 csLibraryHandle csLoadLibrary (const char* iName)
 {
-  char *name = csFindLibrary ("lib", iName, ".so");
-  if (!name) return (csLibraryHandle)0;
-
-  csLibraryHandle Handle = dlopen (name, DLOPEN_MODE);
+  csLibraryHandle Handle = dlopen (iName, DLOPEN_MODE);
   if (!Handle)
     fprintf (stderr, "DLERROR: %s\n", dlerror ());
-
-  delete [] name;
   return Handle;
 }
 
