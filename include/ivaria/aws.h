@@ -51,10 +51,10 @@ public:
   virtual void RegisterComponentFactory(awsComponentFactory *factory, char *name)=0;
 
   /// Get the top window
-  virtual awsWindow *GetTopWindow()=0;
+  virtual iAwsWindow *GetTopWindow()=0;
 
   /// Set the top window
-  virtual void       SetTopWindow(awsWindow *win)=0;
+  virtual void       SetTopWindow(iAwsWindow *win)=0;
   
   /// Causes the current view of the window system to be drawn to the given graphics device.
   virtual void       Print(iGraphics3D *g3d)=0;
@@ -93,7 +93,7 @@ public:
   virtual iGraphics3D *G3D()=0; 
   
   /// Instantiates a window based on a window definition.
-  virtual awsWindow *CreateWindowFrom(char *defname)=0;
+  virtual iAwsWindow *CreateWindowFrom(char *defname)=0;
   
 };
 
@@ -268,6 +268,7 @@ struct iAwsSlot : public iBase
 
 
 SCF_VERSION (iAwsComponent, 0, 0, 1);
+
 struct iAwsComponent : public iAwsSource
 {
     /// Sets up a component.
@@ -358,6 +359,43 @@ struct iAwsComponent : public iAwsSource
     virtual bool OnGainFocus()=0;
 };
 
+SCF_VERSION (iAwsWindow, 0, 0, 1);
+
+struct iAwsWindow : public iAwsComponent
+{
+    /// Sets the value of the redraw tag
+    virtual void SetRedrawTag(unsigned int tag)=0;
+
+    /// Gets the value of the redraw tag
+    virtual unsigned int RedrawTag()=0;
+  
+    /// Raises a window to the top.
+    virtual void Raise()=0;
+
+    /// Lowers a window to the bottom.
+    virtual void Lower()=0;
+
+    /// Get's the window above this one, NULL if there is none.
+    virtual iAwsWindow *WindowAbove()=0;
+
+    /// Get's the window below this one, NULL if there is none.
+    virtual iAwsWindow *WindowBelow()=0;
+
+    /// Set's the window above this one
+    virtual void SetWindowAbove(iAwsWindow *win)=0;
+    
+    /// Set's the window below this one
+    virtual void SetWindowBelow(iAwsWindow *win)=0;
+
+    /// Does some additional setup for windows, including linking into the window hierarchy.
+    virtual bool Setup(iAws *_wmgr, awsComponentNode *settings)=0;
+
+    /// Event triggered when a window is about to be raised
+    virtual void OnRaise()=0;
+
+    /// Event triggered when a window is about to be lowered
+    virtual void OnLower()=0;
+};
 
 SCF_VERSION (iAwsComponentFactory, 0, 0, 1);
 
