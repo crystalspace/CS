@@ -78,7 +78,7 @@ public:
   virtual void FinishDraw();
   virtual HRESULT SetColorPalette();
   
-  virtual bool SetMouseCursor (int iShape, csTextureHandle* iBitmap);
+  virtual bool SetMouseCursor (int iShape, ITextureHandle *hBitmap);
 
   /// Set mouse cursor position; return success status
   virtual bool SetMousePosition (int x, int y);
