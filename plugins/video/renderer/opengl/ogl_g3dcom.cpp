@@ -3658,7 +3658,7 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
   // for the clipper on the current type of hardware (the clip_... arrays).
   //===========
   char how_clip = OPENGL_CLIP_NONE;
-  bool use_lazy_clipping = false;
+  bool use_lazy_clipping = true;
   bool do_plane_clipping = false;
   bool do_z_plane_clipping = false;
 
@@ -4229,7 +4229,7 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh)
   // for the clipper on the current type of hardware (the clip_... arrays).
   //===========
   char how_clip = OPENGL_CLIP_NONE;
-  bool use_lazy_clipping = false;
+  bool use_lazy_clipping = true;
   bool do_plane_clipping = false;
   bool do_z_plane_clipping = false;
 

@@ -17,6 +17,12 @@ The history order is reversed so that new features are at the top.
 	  OpenGL renderer). The bug was that GL_RGBA8 was used in case
 	  the super lightmap was not in the cache and GL_RGBA was used
 	  otherwise. Now GL_RGBA is used in all cases.
+	- DrawTriangleMesh() and EffectDrawTriangleMesh() initialized
+	  use_lazy_clipping to false. It was never set to true. However
+	  lazy clipping is very good for performance so it is best to set
+	  that to true initially and only set it to false when it is
+	  required (OpenGL renderer).
+	- Increased the number of super lightmaps from 10 to 16 for OpenGL.
 22-Jan-2003
 	- Made iEngine->CreateDynLight() a bit more efficient by avoiding
 	  the SCF_QUERY_INTERFACE.

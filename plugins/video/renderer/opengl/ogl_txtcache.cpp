@@ -379,7 +379,7 @@ void OpenGLLightmapCache::Cache (csTrianglesPerSuperLightmap* s, bool dirty,
   int numLightmaps = s->lightmaps.Length ();
   if (s->cacheData)
   {
-//printf ("in cache!\n"); fflush (stdout);
+//printf ("s=%p in cache dirty=%d initialized=%d!\n", s, dirty, s->initialized); fflush (stdout);
     //The data is already in cache, let's see
     // if we need to recalculate the lightmaps
     // due the effect of dynamic lights
@@ -407,10 +407,10 @@ void OpenGLLightmapCache::Cache (csTrianglesPerSuperLightmap* s, bool dirty,
 
     return;
   }
-//printf ("NOT in cache!\n"); fflush (stdout);
 
   // The superlightmap isn't in the cache, so we have to cache it.
   int index = FindFreeSuperLightmap ();
+//printf ("s=%p NOT in cache! index=%d\n", s, index); fflush (stdout);
   if (index < 0)
   {
     // Clear one lightmap
