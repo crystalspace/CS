@@ -35,6 +35,9 @@
 #include "OSXLoadLibrary.h"
 #include <sys/param.h>
 
+#define CSPLUGIN_EXT ".csplugin"
+#define CSBUNDLE_EXT ".csbundle"
+
 class OSXPluginEntry
 {
 public:
@@ -68,38 +71,40 @@ static OSXPluginArray& get_loaded_plugins()
 
 //-----------------------------------------------------------------------------
 // csLoadLibrary
-//	*NOTE* Both successful and unsuccessful load requests are cached in the
-//	loaded-plugins list so that we can quickly give the correct response if
-//	we already know the answer from a previous attempt.
+// *1* The incoming path will probably have a .csplugin extension, but we need
+//     to load the associated .csbundle.
+// *2* Both successful and unsuccessful load requests are cached in the
+//     loaded-plugins list so that we can quickly give the correct response if
+//     we already know the answer from a previous attempt.
 //-----------------------------------------------------------------------------
 csLibraryHandle csLoadLibrary(char const* path)
 {
-  // iName will have an ".csplugin" suffix
-  int nameLen = strlen (iName);
-  char* binName = new char[nameLen + 7];
-  strcpy (binName, iName);
+  int const plugin_len = sizeof(CSPLUGIN_EXT) - 1;
+  int const bundle_len = sizeof(CSBUNDLE_EXT) - 1;
+  int const path_len = strlen(path);
+
+  char* bin_name = new char[path_len + bundle_len + 1];
+  strcpy(bin_name, path);
   
-  if ((nameLen >= 7) && 
-    (strcasecmp (binName + nameLen - 7, ".csplugin") == 0))
-  {
-    strcpy (binName + nameLen - 7, ".csbundle");
-  }
-  else if ((nameLen >= 3) && 
-    (strcasecmp (binName + nameLen - 7, ".csbundle") != 0))
-  {
-    strcat (binName, ".csbundle");
-  }
+  if (path_len >= plugin_len && 					// *1*
+    strcasecmp(bin_name + path_len - plugin_len, CSPLUGIN_EXT) == 0)
+    strcpy(bin_name + path_len - plugin_len, CSPLUGIN_EXT);
+  else if (path_len >= bundle_len && 
+    strcasecmp(bin_name + path_len - bundle_len, CSBUNDLE_EXT) != 0)
+    strcat(bin_name, CSBUNDLE_EXT);
 
   csLibraryHandle handle = 0;
   OSXPluginArray& loaded_plugins = get_loaded_plugins();
-  int const n = loaded_plugins.FindSortedKey(binName);
+  int const n = loaded_plugins.FindSortedKey(bin_name);
   if (n >= 0)
     handle = ((OSXPluginEntry*)loaded_plugins[n])->handle;
   else
   {
-    handle = (csLibraryHandle)OSXLoadLibrary(binName);
-    loaded_plugins.InsertSorted(new OSXPluginEntry(handle, binName)); // *NOTE*
+    handle = (csLibraryHandle)OSXLoadLibrary(bin_name);
+    loaded_plugins.InsertSorted(new OSXPluginEntry(handle, bin_name));	// *2*
   }
+
+  delete[] bin_name;
   return handle;
 }
 

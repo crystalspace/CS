@@ -10,6 +10,15 @@ The history order is reversed so that new features are at the top.
           fixed a typo in a csvector.h comment.
 	- Eric Sunshine fixed a lot of const versus non-const char* problems in
 	  csStringArray.  (Bug #755721)
+	- Eric Sunshine fixed several problems recently introduced into
+	  csLoadLibrary() in OSXDynamicLibrary.cpp:
+	    - Compilation error: Incoming argument did not match variable name
+	      used in code.
+	    - Run-time failure: Was using a lot of hard-coded constants for
+	      path dissection, but the constants were incorrect.
+	    - Memory trashing: Was not allocating sufficient memory for the
+	      working path buffer, thus corrupting memory beyond end of buffer.
+	    - Memory leak: Was leaking the working buffer.
 16-Jun-2003
 	- Oktal separated a multiple-argument %ignore directive into several
 	  single-argument ones, in perlpre.i, in order to support older
