@@ -19,40 +19,6 @@
 #include "cssysdef.h"
 #include "csutil/cmdline.h"
 
-struct csCommandLineOption
-{
-  /// Option name
-  char *Name;
-  /// Option value
-  char *Value;
-  /// Name and Value should be already allocated
-  csCommandLineOption (char *iName, char *iValue)
-  {
-    Name = iName;
-    Value = iValue;
-  }
-  /// Destructor
-  ~csCommandLineOption ()
-  { delete [] Name; delete [] Value; }
-};
-
-csCommandLineParser::csCommandLineOptionVector::~csCommandLineOptionVector ()
-{
-  DeleteAll ();
-}
-
-bool csCommandLineParser::csCommandLineOptionVector::FreeItem (csSome item)
-{
-  delete ((csCommandLineOption*)item);
-  return true;
-}
-
-int csCommandLineParser::csCommandLineOptionVector::CompareKey
-  (csSome Item, csConstSome Key, int /*Mode*/) const
-{
-  return strcmp (((csCommandLineOption *)Item)->Name, (const char*)Key);
-}
-
 SCF_IMPLEMENT_IBASE (csCommandLineParser)
   SCF_IMPLEMENTS_INTERFACE (iCommandLineParser)
 SCF_IMPLEMENT_IBASE_END
@@ -103,17 +69,24 @@ void csCommandLineParser::Reset()
 }
 
 csCommandLineOption*
-csCommandLineParser::FindOption (const char *iName, int iIndex) const
+csCommandLineParser::FindOption (const char *name, int iIndex) const
 {
-  int idx = Options.FindKey (iName);
-  if (idx >= 0)
+  int idx;
+  for (idx = 0 ; idx < Options.Length () ; idx++)
+  {
+    csCommandLineOption* cl = Options[idx];
+    if (!strcmp (cl->Name, name))
+      break;
+  }
+
+  if (idx < Options.Length ())
   {
     while (iIndex)
     {
       idx++;
       if (idx >= Options.Length ())
         return NULL;
-      if (Options.CompareKey (Options.Get (idx), iName, 0) == 0)
+      if (!strcmp (Options.Get (idx)->Name,  name))
         iIndex--;
     }
     return Options.Get (idx);

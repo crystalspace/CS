@@ -21,7 +21,7 @@
 
 #include "csutil/scf.h"
 #include "csutil/csvector.h"
-#include "csutil/typedvec.h"
+#include "csutil/ptrarr.h"
 #include "iutil/config.h"
 #include "iutil/plugin.h"
 
@@ -112,7 +112,7 @@ private:
   csPluginsVector Plugins;
 
   // List of all options for all plug-in modules.
-  CS_DECLARE_TYPED_VECTOR (csOptionVector, csPluginOption) OptionList;
+  csPDelArray<csPluginOption> OptionList;
 
 public:
   /// Initialize plugin manager.

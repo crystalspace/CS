@@ -29,7 +29,8 @@
  * @{ */
 
 #include "csgeom/csrect.h"
-#include "csutil/typedvec.h"
+#include "csutil/csvector.h"
+#include "csutil/ptrarr.h"
 #include "cstool/cspixmap.h"
 #include "cswspal.h"
 #include "ivideo/graph2d.h"
@@ -41,7 +42,7 @@ class csSkinSlice;
 struct iEvent;
 
 // this is where we store all the csRect for calculating visible areas and clipping in
-CS_DECLARE_TYPED_VECTOR (cswsRectVector, csRect);
+typedef csPDelArray<csRect> cswsRectVector;
 
 /**
  * \name Component state flags

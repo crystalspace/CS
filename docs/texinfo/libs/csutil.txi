@@ -8,22 +8,14 @@ The utility library consists of many smaller modules that are too small to
 live as a separate library. The biggest part of it is the @sc{scf} library.
 @xref{SCF}.
 
-@emph{WARNING:} This section needs updating after we fixed all code
-to use @code{csPArray} and @code{csRefArray}.
+Then there are a series of classes implementing arrays of some sort.
+There are currently five types of arrays in CS. All are templated and
+type-safe: @code{csRefArray<T>}, @code{csRefArrayObject<T>},
+@code{csPArray<T>}, @code{csPDelArray<T>},
+and @code{csGrowingArray<T>}. See later sections for more information.
 
-The second most important class is probably the @code{csVector}. This class
-is a generic resizable array. It is generic because its elements are
-@code{(void*)} pointers. You can also use handy macros to create type-safe
-subclasses of this class. Also, the @file{.cfg} file reader and the random
-number generator will probably help you.
-
-Two newer alternatives to @code{csVector} are @code{csPArray} and
-@code{csRefArray}. The first one is very similar to @code{csVector} but it
-is automatically type-safe because it uses templates. It is recommended
-to use that one instead of @code{csVector} in new code. @code{csRefArray}
-is like @code{csPArray} but it also keeps references on the objects in the
-array (i.e. the reference count of an object will be increased when it is
-added to the array and decreased when it is removed again).
+Also in csutil are the @file{.cfg} file reader and the random
+number generator.
 
 The other classes might or might not be useful, so if you need some very
 common functionality in your application, you should look in the @sc{api}
@@ -81,51 +73,44 @@ object by 1.
 @subsection @code{Typed Vectors}
 @cindex @code{Typed Vectors}
 
-Typed vectors are the type-safe equivalent to the @code{csVector} class. They
-work similar to templates, but use @code{#define}'s instead. Using one of
-these macros, you can create a vector class for a specific type of objects.
-There are several different macros which produce slightly different
-behavior:
+Crystal Space currently has five types of typed vectors. These four types
+all provide automatical growing when the array size is too small.
 
-@table @code
-@item CS_DECLARE_TYPED_VECTOR
-The standard macro. The elements of the vector are accessible like those of
-@code{csVector}. Objects which are removed with the @code{DeleteIt} parameter
-set to @code{true}, or objects left in the vector at destruction are deleted
-with the @code{delete} operator.
-
-@item CS_DECLARE_TYPED_VECTOR_NODELETE
-Like the above, but removed objects are never deleted. Instead, the pointer
-is just thrown away.
-
-@item CS_DECLARE_TYPED_VECTOR_DECREF
-Like the above, but removed objects are cast to @code{iBase} and
-@code{DecRef()} is called.
-
-@item CS_DECLARE_TYPED_RESTRICTED_ACCESS_VECTOR
-This vector is completely different from the above. Its elements cannot be
-accessed directly (i.e. with @code{operator[]}), but only by real methods.
-For every added object, @code{PrepareItem()} is called; for every removed
-object, @code{FreeItem()} is called. This time it really applies to
-@emph{every} object, since there is no @code{DeleteIt} parameter for methods
-that can remove elements.
-
-@item CS_DECLARE_TYPED_IBASE_VECTOR
-An example where restricted access vectors are useful. This vector holds a
-counted reference to all contained objects.
-@end table
-
-In addition, so-called @dfn{object vectors} are provided. They are specially
-suited to contain objects of type @code{csObject} and add special methods,
-for example to find an object by name. These macros are:
-@table @code
-@item CS_DECLARE_OBJECT_VECTOR_NOREF(NAME,TYPE)
-Object vector equivalent to @code{CS_DECLARE_TYPED_VECTOR_NODELETE}.
-
-@item CS_DECLARE_RESTRICTED_ACCESS_OBJECT_VECTOR(NAME,TYPE)
-Object vector equivalent to @code{CS_DECLARE_TYPED_RESTRICTED_ACCESS_VECTOR}.
-
-@item CS_DECLARE_OBJECT_VECTOR(NAME,TYPE)
-Object vector equivalent to @code{CS_DECLARE_TYPED_IBASE_VECTOR}.
-@end table
+@itemize
+@item
+@code{csRefArray<T>}: this is the prefered way to store references if you want
+to keep a reference to the objects in the array. i.e. when you add elements
+to this array it will increase the reference count and it will also decrease
+the reference count when the element is deleted again. This class can contain
+objects that implement the @code{IncRef()} and @code{DecRef()} functions
+(both @code{iBase} and @code{csRefCount} do that).
+Include file is @file{include/csutil/refarr.h}.
+@item
+@code{csRefArrayObject<T>}: this is a variant of @code{csRefArray<T>} that
+can hold objects that have a method @code{QueryObject()} which returns
+something from which you can call @code{GetName()}. In practice it means
+this is useful for all Crystal Space objects that implement @code{iObject}.
+In addition to the features of @code{csRefArray<T>} this class adds the
+ability to find elements by name.
+Include file is @file{include/csutil/nobjvec.h}.
+@item
+@code{csPArray<T>}: this is similar to @code{csRefArray<T>} but no reference
+counts are maintained. This class also doesn't initialize new items (when you
+do @code{SetLength()} for example) and you are fully responsible for cleaning
+up the items in this array.
+Include file is @file{include/csutil/ptrarr.h}.
+@item
+@code{csPDelArray<T>}: this is similar to @code{csPArray<T>} but the elements
+are deleted (using @code{delete}) when removed from the array. This array
+takes care of initializating everything correctly (so that no double deletes
+can occur).
+Include file is @file{include/csutil/ptrarr.h}.
+@item
+@code{csGrowingArray<T>}: this is the only array class that can handle
+objects that are not pointers. It is best to avoid using this class for pointers
+as the three other array types above already provide support for that.
+Also note that you should not use this class for objects that require a
+constructor as this class doesn't do any initialization at all.
+Include file is @file{include/csutil/garray.h}.
+@end itemize
 

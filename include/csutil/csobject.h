@@ -23,6 +23,9 @@
 #include "cstypes.h"
 #include "csutil/util.h"
 #include "iutil/object.h"
+#include "csutil/refarr.h"
+
+typedef csRefArray<iObject> csObjectContainer;
 
 /**
  * A generic csObject class. Any csObject can have any number of iObject
@@ -37,7 +40,7 @@ protected:
   CS_ID csid;
 
   /// The array of child nodes
-  class csObjectContainer *Children;
+  csObjectContainer *Children;
 
   /// Object's name or NULL if unnamed.
   char *Name;

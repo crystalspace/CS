@@ -163,7 +163,7 @@ public:
   }
 
   /// Pop an element from vector 'top'.
-  csRef<T> Pop ()
+  csPtr<T> Pop ()
   {
     csRef<T> ret = root [count - 1];
     SetLength (count - 1);

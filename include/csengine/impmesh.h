@@ -18,7 +18,7 @@
 #ifndef __CS_IMPMESH_H__
 #define __CS_IMPMESH_H__
 
-#include "csutil/typedvec.h"
+#include "csutil/csvector.h"
 #include "csutil/nobjvec.h"
 #include "iengine/movable.h"
 #include "iengine/sector.h"

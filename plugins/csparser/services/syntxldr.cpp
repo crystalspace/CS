@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 #include "syntxldr.h"
 #include "csutil/ref.h"
+#include "csutil/csvector.h"
 #include "csutil/cscolor.h"
 #include "csutil/scanstr.h"
 #include "csutil/util.h"

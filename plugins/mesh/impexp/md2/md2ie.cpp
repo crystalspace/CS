@@ -25,6 +25,7 @@
 #include "csutil/datastrm.h"
 #include "csutil/csstring.h"
 #include "csutil/nobjvec.h"
+#include "csutil/ptrarr.h"
 #include "csutil/util.h"
 
 // all int's in an MD2 file are little endian
@@ -44,7 +45,7 @@ static int const SIZEOF_MD2HEADER = 15*SIZEOF_MD2LONG;
 static const float SCALE_FACTOR = 0.025;
 static const float FRAME_DELAY = 0.1;
 
-CS_DECLARE_TYPED_VECTOR (csStringVector, csString);
+typedef csPDelArray<csString> csStringVector;
 
 struct csMD2Header
 {

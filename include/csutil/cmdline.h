@@ -20,26 +20,35 @@
 #define __CS_CMDLINE_H__
 
 #include "iutil/cmdline.h"
-#include "csutil/typedvec.h"
+#include "csutil/csvector.h"
+#include "csutil/ptrarr.h"
 #include "csutil/csstrvec.h"
 #include "csutil/util.h"
 
-struct csCommandLineOption;
+struct csCommandLineOption
+{
+  /// Option name
+  char *Name;
+  /// Option value
+  char *Value;
+  /// Name and Value should be already allocated
+  csCommandLineOption (char *iName, char *iValue)
+  {
+    Name = iName;
+    Value = iValue;
+  }
+  /// Destructor
+  ~csCommandLineOption ()
+  { delete [] Name; delete [] Value; }
+};
+
 
 /// Utility class that makes it easier to parse the command line.
 class csCommandLineParser : public iCommandLineParser
 {
 private:
   /// A vector of command line options
-  CS_DECLARE_TYPED_VECTOR_NODELETE (csCommandLineOptionVectorHelper, csCommandLineOption);
-
-  class csCommandLineOptionVector : public csCommandLineOptionVectorHelper
-  {
-  public:
-    virtual ~csCommandLineOptionVector ();
-    virtual bool FreeItem (csSome item);
-    virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
-  };
+  typedef csPDelArray<csCommandLineOption> csCommandLineOptionVector;
 
   /// The array of all command-line options.
   csCommandLineOptionVector Options;

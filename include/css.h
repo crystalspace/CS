@@ -316,7 +316,8 @@
 #include "csutil/sparse3d.h"
 #include "csutil/strset.h"
 #include "csutil/token.h"
-#include "csutil/typedvec.h"
+#include "csutil/ptrarr.h"
+#include "csutil/refarr.h"
 #include "csutil/util.h"
 #include "csutil/virtclk.h"
 #endif

@@ -17,6 +17,7 @@
 */
 #include "cssysdef.h"
 #include "csutil/csvector.h"
+#include "csutil/ptrarr.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
 #include "ivideo/material.h"
@@ -33,8 +34,6 @@
 #include "imesh/thing/curve.h"
 #include "imesh/thing/ptextype.h"
 #include "imesh/thing/polytmap.h"
-
-CS_DECLARE_TYPED_VECTOR_NODELETE (csObjectVectorNodelete, iObject);
 
 //---------------------------------------------------------------------------
 SCF_IMPLEMENT_IBASE_EXT(csRegion)
@@ -63,7 +62,7 @@ void csRegion::DeleteAll ()
 
   // First we need to copy the objects to a csVector to avoid
   // messing up the iterator while we are deleting them.
-  csObjectVectorNodelete copy;
+  csPArray<iObject> copy;
   iter = GetIterator ();
   for ( ; !iter->IsFinished (); iter->Next ())
   {

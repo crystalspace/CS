@@ -21,6 +21,7 @@
 #include "csutil/nobjvec.h"
 #include "csutil/objiter.h"
 #include "csutil/garray.h"
+#include "csutil/ptrarr.h"
 #include "csutil/intarray.h"
 #include "csutil/csstring.h"
 #include "iutil/object.h"
@@ -144,7 +145,7 @@ CS_DECLARE_OBJECT_ITERATOR (csModelDataMaterialIterator, iModelDataMaterial);
 typedef csGrowingArray<csVector3> csVector3ArrayType;
 typedef csGrowingArray<csVector2> csVector2Array;
 typedef csGrowingArray<csColor> csColorArray;
-CS_DECLARE_TYPED_VECTOR (csIntArrayVector, csIntArray);
+typedef csPDelArray<csIntArray> csIntArrayVector;
 
 typedef csRefArrayObject<iModelDataAction> csModelDataActionVector;
 typedef csRefArrayObject<iModelDataMaterial> csModelDataMaterialVector;
@@ -690,7 +691,7 @@ void csModelDataTools::MergeObjects (iModelData *Scene, bool MultiTexture)
 
   while (OldObjects.Length () > 0)
   {
-    iModelDataObject *obj = OldObjects.Pop ();
+    csRef<iModelDataObject> obj = OldObjects.Pop ();
 
     // look if we can merge this object with an existing one
     int i;
@@ -709,7 +710,6 @@ void csModelDataTools::MergeObjects (iModelData *Scene, bool MultiTexture)
       Scene->QueryObject ()->ObjAdd (obj->QueryObject ());
       NewObjects.Push (obj);
     }
-    obj->DecRef ();
   }
 }
 
@@ -721,7 +721,7 @@ void csModelDataTools::SplitObjectsByMaterial (iModelData *Scene)
 
   while (OldObjects.Length () > 0)
   {
-    iModelDataObject *obj = OldObjects.Pop ();
+    csRef<iModelDataObject> obj = OldObjects.Pop ();
 
     if (!CheckMaterialConflict (obj)) {
       Scene->QueryObject ()->ObjAdd (obj->QueryObject ());
@@ -818,7 +818,6 @@ void csModelDataTools::SplitObjectsByMaterial (iModelData *Scene)
       delete [] ColorMap;
       delete [] TexelMap;
     }
-    obj->DecRef ();
   }
 }
 
@@ -971,7 +970,7 @@ void csModelDataTools::CompressVertices (iModelDataObject *Object)
   csColorArray ColorList;
   csVector2Array TexelList;
 
-  iModelDataVertices *ver = VertexFrames[0];
+  csRef<iModelDataVertices> ver = VertexFrames[0];
   DumpVertices (ver, &VertexList, &NormalList, &ColorList, &TexelList);
 
   // build the initial 'potential mergeable vertices' list
@@ -1111,7 +1110,6 @@ void csModelDataTools::CompressVertices (iModelDataObject *Object)
     CS_MDLTOOL_HELPER (Normal);
     CS_MDLTOOL_HELPER (Color);
     CS_MDLTOOL_HELPER (Texel);
-    ver->DecRef ();
   }
 #undef CS_MDLTOOL_HELPER
 
@@ -1124,13 +1122,12 @@ void csModelDataTools::CompressVertices (iModelDataObject *Object)
 
   while (Polygons.Length () > 0)
   {
-    iModelDataPolygon *poly = Polygons.Pop ();
+    csRef<iModelDataPolygon> poly = Polygons.Pop ();
     int *Orig = new int [poly->GetVertexCount ()];
     CS_MDLTOOL_HELPER (Vertex);
     CS_MDLTOOL_HELPER (Normal);
     CS_MDLTOOL_HELPER (Color);
     CS_MDLTOOL_HELPER (Texel);
-    poly->DecRef ();
     delete[] Orig;
   }
 }

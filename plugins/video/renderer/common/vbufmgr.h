@@ -20,7 +20,7 @@
 #define __CS_VBUFMGR_H__
 
 #include "csutil/csvector.h"
-#include "csutil/typedvec.h"
+#include "csutil/ptrarr.h"
 #include "ivideo/vbufmgr.h"
 
 struct iObjectRegistry;
@@ -133,7 +133,7 @@ public:
 class csVertexBufferManager : public iVertexBufferManager
 {
 protected:
-  CS_DECLARE_TYPED_VECTOR_NODELETE (csVBufVector, csVertexBuffer);
+  typedef csPArray<csVertexBuffer> csVBufVector;
 
   /// List of vertex buffers.
   csVBufVector buffers;

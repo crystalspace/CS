@@ -147,5 +147,16 @@ is only a temporary measure. It is a lot better to design the level with
 Note that the statements @samp{culler} and @samp{vistree} are no longer
 supported in world files. The loader will give an error if it finds them.
 
+@subheading Typed Vectors
+@cindex @code{CS_DECLARE_TYPED_VECTOR}
+@cindex @code{CS_DECLARE_OBJECT_VECTOR}
+@cindex @code{CS_DECLARE_GROWING_ARRAY}
+@cindex @code{csRefArray<T>}
+@cindex @code{csRefArrayObject<T>}
+@cindex @code{csPArray<T>}
+@cindex @code{csPDelArray<T>}
+@cindex @code{csGrowingArray<T>}
 
+All the macro versions of the growing arrays and vectors have been removed
+and replaced with corresponding templated arrays (@pxref{csUtil}). 
 

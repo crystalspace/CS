@@ -23,11 +23,11 @@
 #include "csutil/nobjvec.h"
 #include "csutil/csobject.h"
 #include "csutil/garray.h"
+#include "csutil/ptrarr.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/config.h"
 #include "csgeom/math3d.h"
-#include "csengine/arrays.h"
 #include "csengine/rview.h"
 #include "csengine/meshobj.h"
 #include "csengine/region.h"
@@ -350,7 +350,7 @@ private:
   /// The list of all shared variables in the engine.
   csSharedVariableList* shared_variables;
   /// List of halos (csHaloInformation).
-  csHaloArray halos;
+  csPDelArray<csLightHalo> halos;
   /// Debugging: maximum number of polygons to process in one frame.
   static int max_process_polygons;
   /// Current number of processed polygons.

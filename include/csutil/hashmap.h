@@ -19,7 +19,7 @@
 #ifndef __CS_HASHMAP_H__
 #define __CS_HASHMAP_H__
 
-#include "csutil/typedvec.h"
+#include "csutil/ptrarr.h"
 
 class csHashMapReversible;
 class csHashIteratorReversible;
@@ -46,9 +46,9 @@ struct csHashElement
 };
 
 /// a vector of csHashElements
-CS_DECLARE_TYPED_VECTOR (csHashBucket, csHashElement);
+typedef csPDelArray<csHashElement> csHashBucket;
 /// a vector of csHashBuckets
-CS_DECLARE_TYPED_VECTOR (csHashBucketVector, csHashBucket);
+typedef csPDelArray<csHashBucket> csHashBucketVector;
 
 /**
  * An iterator to iterate over elements in the hashmap.

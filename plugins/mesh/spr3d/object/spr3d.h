@@ -21,7 +21,8 @@
 
 #include "cssys/sysfunc.h"
 #include "csutil/cscolor.h"
-#include "csutil/typedvec.h"
+#include "csutil/csvector.h"
+#include "csutil/ptrarr.h"
 #include "csutil/rng.h"
 #include "csutil/refarr.h"
 #include "csgeom/math3d.h"
@@ -329,11 +330,11 @@ private:
   /// The base mesh is also the texture alignment mesh.
   csTriangleMesh2* texel_mesh;
   /// The array of texels
-  CS_DECLARE_TYPED_VECTOR (csTexelsVector,csPoly2D) texels;
+  csPDelArray<csPoly2D> texels;
   /// The vertices
-  CS_DECLARE_TYPED_VECTOR (csVerticesVector,csPoly3D) vertices;
+  csPDelArray<csPoly3D> vertices;
   /// The normals
-  CS_DECLARE_TYPED_VECTOR (csNormalsVector,csPoly3D) normals;
+  csPDelArray<csPoly3D> normals;
 
   /**
    * Connectivity information for this sprite template.

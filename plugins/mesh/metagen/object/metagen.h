@@ -33,7 +33,8 @@
 #include "imesh/metagen.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "csutil/typedvec.h"
+#include "csutil/csvector.h"
+#include "csutil/ptrarr.h"
 #include "csutil/cscolor.h"
 
 #define I_PI_4 (1 / (M_PI * 4.0))
@@ -120,8 +121,8 @@ class csMetaGen : public iMeshObjectFactory
   TexelArray *tex;
   int current_texels;
 
-  CS_DECLARE_TYPED_VECTOR(MetaBoneVector,MetaBone) bones;
-  CS_DECLARE_TYPED_VECTOR(MetaFieldVector, MetaField) fields;
+  csPDelArray<MetaBone> bones;
+  csPDelArray<MetaField> fields;
 
   bool cache_ready;
   bool asin_table_ready;

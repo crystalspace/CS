@@ -21,7 +21,8 @@
 #include "iutil/objreg.h"
 #include "iutil/strvec.h"
 #include "csutil/csstring.h"
-#include "csutil/typedvec.h"
+#include "csutil/csvector.h"
+#include "csutil/ptrarr.h"
 #include "iutil/plugin.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -30,8 +31,8 @@
 
 #define MY_CLASSNAME	"crystalspace.modelconverter.multiplexer"
 
-CS_DECLARE_TYPED_VECTOR_NODELETE (csModelConverterVector, iModelConverter);
-CS_DECLARE_TYPED_VECTOR_NODELETE (csModelConverterFormatVector, const csModelConverterFormat);
+typedef csPArray<iModelConverter> csModelConverterVector;
+typedef csPArray<const csModelConverterFormat> csModelConverterFormatVector;
 
 class csModelConverterMultiplexer : iModelConverter
 {

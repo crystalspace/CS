@@ -30,6 +30,7 @@
  
 #include "cscomp.h"
 #include "csbutton.h"
+#include "csutil/ptrarr.h"
 
 /**
  * \name Notebook styles
@@ -172,7 +173,7 @@ class csNotebook : public csComponent
   /// The first visible tab and the active tab
   int firsttab, activetab;
   /// This array contains the per-page information
-  CS_DECLARE_TYPED_VECTOR (cspPageDataVector, cspPageData) pages;
+  csPDelArray<cspPageData> pages;
 
 public:
   /// Create a notebook component with given parent and style

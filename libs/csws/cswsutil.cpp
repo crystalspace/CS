@@ -230,10 +230,11 @@ void RectUnion (cswsRectVector &rect, csRect &result)
     for (j = rect.Length () - 1; j > i; j--)
       if (((csRect *)rect [i])->Area () < ((csRect *)rect [j])->Area ())
       {
-        csRect *tmp = (csRect *)rect [i];
-        rect [i] = rect [j];
-        rect [j] = tmp;
-      } /* endif */
+        csRect *tmpi = (csRect *)rect.GetAndClear (i);
+        csRect *tmpj = (csRect *)rect.GetAndClear (j);
+        rect.Put (i, tmpj);
+        rect.Put (j, tmpi);
+      }
 
   RectUnionRec ru;
   ru.rect = &rect;

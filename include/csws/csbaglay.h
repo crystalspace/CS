@@ -28,6 +28,7 @@
  * @{ */
  
 #include "cslayout.h"
+#include "csutil/ptrarr.h"
 
 /**
  * Subclass of csLayoutConstraint for use with csGridBagLayout.
@@ -317,7 +318,7 @@ class csGridBagLayout : public csLayout2
     int x, y;
   };
 
-  CS_DECLARE_TYPED_VECTOR(CellHolderArrayT, CellHolder);
+  typedef csPDelArray<CellHolder> CellHolderArrayT;
 
  public:
   csGridBagLayout (csComponent *pParent);

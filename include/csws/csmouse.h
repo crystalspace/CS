@@ -30,7 +30,7 @@
  
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
-#include "csutil/typedvec.h"
+#include "csutil/ptrarr.h"
 #include "csws/csgfxppl.h"
 
 class csMouse;
@@ -86,7 +86,7 @@ private:
   /// The application object
   csApp *app;
   /// The array of pointers
-  CS_DECLARE_TYPED_VECTOR (csPointerArray, csMousePointer) Pointers;
+  csPDelArray<csMousePointer> Pointers;
   /// Current active mouse cursor (system cursor if NULL)
   csMousePointer *ActiveCursor;
   /// Cursor texture

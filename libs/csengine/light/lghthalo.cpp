@@ -164,10 +164,10 @@ uint8 *csFlareHalo::Generate (int
 }
 
 //---------------------------------------------------------+ csLightHalo +---//
-csLightHalo::csLightHalo (csLight *iLight, iHalo *iHandle)
+csLightHalo::csLightHalo (csLight *ilight, iHalo *ihandle)
 {
-  Handle = iHandle;
-  (Light = iLight)->flags.SetBool (CS_LIGHT_ACTIVEHALO, true);
+  Handle = ihandle;
+  (Light = ilight)->flags.SetBool (CS_LIGHT_ACTIVEHALO, true);
   LastTime = 0;
 }
 

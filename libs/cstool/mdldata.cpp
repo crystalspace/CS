@@ -316,7 +316,7 @@ void csModelDataAction::SetTime (int Frame, float NewTime)
 
 void csModelDataAction::SetState (int Frame, iObject *State)
 {
-  States.Replace (Frame, State);
+  States[Frame] = State;
 }
 
 void csModelDataAction::AddFrame (float Time, iObject *State)

@@ -20,20 +20,14 @@
 #ifndef __CS_PARRAYS_H__
 #define __CS_PARRAYS_H__
 
-#include "csutil/typedvec.h"
+#include "csutil/csvector.h"
+#include "csutil/ptrarr.h"
+#include "curve.h"
 
-class csCurve;
 class csPolygon3D;
 
-CS_DECLARE_TYPED_VECTOR_NODELETE (csCurvesArrayHelper, csCurve);
-
 /// A dynamic array of csCurve objects
-class csCurvesArray : public csCurvesArrayHelper {
-public:
-  virtual bool FreeItem (csSome item);
-  virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
-  csCurvesArray (int l=8, int t=8) : csCurvesArrayHelper (l, t) {}
-};
+typedef csPDelArray<csCurve> csCurvesArray;
 
 /**
  * An dynamic array of csPolygon3D objects.

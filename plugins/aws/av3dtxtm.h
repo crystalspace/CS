@@ -19,7 +19,7 @@
 #define __CS_TXTMGR_H__
 
 # include "csutil/csvector.h"
-# include "csutil/typedvec.h"
+# include "csutil/ptrarr.h"
 # include "ivideo/txtmgr.h"
 # include "ivideo/material.h"
 # include "iengine/material.h"
@@ -334,13 +334,13 @@ class csTextureManager :
   public iTextureManager
 {
 protected:
-  CS_DECLARE_TYPED_VECTOR_NODELETE (csTexVector, csTextureHandle);
+  typedef csPArray<csTextureHandle> csTexVector;
 
   /// List of textures.
   csTexVector textures;
 
   // Private class used to keep a list of objects derived from csMaterialHandle
-  CS_DECLARE_TYPED_VECTOR_NODELETE (csMatVector, csMaterialHandle);
+  typedef csPArray<csMaterialHandle> csMatVector;
 
   /// List of materials.
   csMatVector materials;

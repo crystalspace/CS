@@ -32,6 +32,7 @@
 #include "iutil/comp.h"
 #include "iutil/databuff.h"
 #include "csutil/garray.h"
+#include "csutil/ptrarr.h"
 
 #include "ie3ds.h"
 #include <lib3ds/camera.h>
@@ -234,8 +235,8 @@ typedef struct {
 } AdjacentFace;
 
 typedef csGrowingArray<AdjacentFace> Faces;
-CS_DECLARE_TYPED_VECTOR (FacesVector, Faces);
-CS_DECLARE_TYPED_VECTOR (csVector3Vector, csVector3);
+typedef csPDelArray<Faces> FacesVector;
+typedef csPDelArray<csVector3> csVector3Vector;
 
 static void LoadTriangles (iModelDataObject *pDataObject,
 	iModelDataVertices* Vertices, Lib3dsFace * pCurFace,

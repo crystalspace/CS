@@ -18,6 +18,7 @@
 
 #include <ctype.h>
 #include "cssysdef.h"
+#include "csutil/ptrarr.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/objreg.h"
@@ -569,8 +570,8 @@ struct csExtTriangle
   }
 };
 
-CS_DECLARE_TYPED_VECTOR (csTriangleVector, csTriangle);
-CS_DECLARE_TYPED_VECTOR (csExtTriangleVector, csExtTriangle);
+typedef csPDelArray<csTriangle> csTriangleVector;
+typedef csPDelArray<csExtTriangle> csExtTriangleVector;
 CS_DECLARE_OBJECT_ITERATOR (csModelDataPolygonIterator, iModelDataPolygon);
 
 csPtr<iDataBuffer> csModelConverterASE::Save (iModelData *Data, const char *Format)

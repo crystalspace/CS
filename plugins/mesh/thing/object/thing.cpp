@@ -1049,8 +1049,14 @@ void csThing::AddPolygon (csPolygon3D *poly)
 
 csCurve *csThing::GetCurve (char *name) const
 {
-  int idx = curves.FindKey (name);
-  return idx >= 0 ? curves.Get (idx) : NULL;
+  int i;
+  for (i = 0 ; i < curves.Length () ; i++)
+  {
+    const char* n = curves[i]->GetName ();
+    if (n && !strcmp (n, name))
+      return curves[i];
+  }
+  return NULL;
 }
 
 void csThing::AddCurve (csCurve *curve)
@@ -2790,11 +2796,10 @@ void csThing::Merge (csThing *other)
   for (i = 0; i < other->GetCurveVertexCount (); i++)
     AddCurveVertex (other->GetCurveVertex (i), other->GetCurveTexel (i));
 
-  for (i = 0; i < other->curves.Length (); i++)
+  while (other->curves.Length () > 0)
   {
-    csCurve *c = other->GetCurve (i);
+    csCurve *c = other->curves.Extract (0);
     AddCurve (c);
-    other->curves[i] = NULL;
   }
 
   delete[] merge_vertices;
@@ -3088,8 +3093,8 @@ csPtr<iCurveTemplate> csThingObjectType::CreateBezierTemplate (const char *name)
   if (name) ptemplate->SetName (name);
   csRef<iCurveTemplate> tmp = SCF_QUERY_INTERFACE (ptemplate, iCurveTemplate);
   curve_templates.Push (tmp);
-  //tmp->DecRef ();
-  return tmp;
+  tmp->DecRef ();
+  return csPtr<iCurveTemplate> (tmp);
 }
 
 iCurveTemplate *csThingObjectType::FindCurveTemplate (const char *name)

@@ -22,7 +22,8 @@
 #include "iengine/motion.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "csutil/typedvec.h"
+#include "csutil/csvector.h"
+#include "csutil/ptrarr.h"
 #include "csgeom/quaterni.h"
 
 struct csMotionFrame
@@ -50,7 +51,7 @@ public:
   void Animate(float time,float duration, csVector3 &v, csQuaternion &q, bool interpolate);
 };
 
-CS_DECLARE_TYPED_VECTOR( csMotionBoneVectorBase, csMotionBone );
+typedef csPDelArray<csMotionBone> csMotionBoneVectorBase;
 class csMotionBoneVector : public csMotionBoneVectorBase
 {
 public:
@@ -102,7 +103,7 @@ public:
   virtual void AddFrameBone (int boneid, float frametime, const csVector3 &v, const csQuaternion &q);
 };
 
-CS_DECLARE_TYPED_VECTOR( csMotionTemplateVectorBase, csMotionTemplate );
+typedef csPDelArray<csMotionTemplate> csMotionTemplateVectorBase;
 class csMotionTemplateVector : public csMotionTemplateVectorBase
 {
 public:
@@ -137,7 +138,7 @@ public:
   bool Update(float timedelta);
 };
 
-CS_DECLARE_TYPED_VECTOR( csMotionStackVectorBase, csMotionStackItem );
+typedef csPDelArray<csMotionStackItem> csMotionStackVectorBase;
 class csMotionStackVector : public csMotionStackVectorBase
 {
 public:
@@ -185,7 +186,7 @@ public:
   virtual void Pause(bool enable);
 };
 
-CS_DECLARE_TYPED_VECTOR( csMotionControllerVectorBase, csMotionController );
+typedef csPDelArray<csMotionController> csMotionControllerVectorBase;
 class csMotionControllerVector : public csMotionControllerVectorBase
 {
 public:

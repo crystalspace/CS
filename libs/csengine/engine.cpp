@@ -1514,7 +1514,6 @@ void csEngine::AddHalo (csLight *Light)
   if (Light->GetHalo ()->Type == cshtFlare)
   {
     // put a new light flare into the queue
-
     // the cast is safe because of the type check above
     halos.Push (
         new csLightFlareHalo (Light, (csFlareHalo *)Light->GetHalo (), hs));
@@ -1545,8 +1544,16 @@ void csEngine::AddHalo (csLight *Light)
 
 void csEngine::RemoveHalo (csLight *Light)
 {
-  int idx = halos.FindKey (Light);
-  if (idx != -1) halos.Delete (idx);
+  int i;
+  for (i = 0 ; i < halos.Length () ; i++)
+  {
+    csLightHalo* lh = halos[i];
+    if (lh->Light == Light)
+    {
+      halos.Delete (i);
+      return;
+    }
+  }
 }
 
 iStatLight *csEngine::FindLight (unsigned long light_id) const

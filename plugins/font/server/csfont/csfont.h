@@ -24,7 +24,8 @@
 #include "ivideo/fontserv.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "csutil/typedvec.h"
+#include "csutil/csvector.h"
+#include "csutil/ptrarr.h"
 #include "iutil/plugin.h"
 
 struct iObjectRegistry;
@@ -146,7 +147,7 @@ private:
   iObjectRegistry* object_reg;
 
   // A list of csDefaultFont pointers.
-  CS_DECLARE_TYPED_VECTOR (csFontList, csDefaultFont) fonts;
+  csPDelArray<csDefaultFont> fonts;
 
   /// read a font file from vfs
   csDefaultFont *ReadFontFile(const char *file);

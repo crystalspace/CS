@@ -142,12 +142,12 @@ void csDefaultFontServer::NotifyCreate (csDefaultFont *font)
 
 void csDefaultFontServer::NotifyDelete (csDefaultFont *font)
 {
-  int iIndex = fonts.Find (font);
-  if (iIndex >= 0)
+  int index = fonts.Find (font);
+  if (index >= 0)
   {
-    // Set the cell to 0 to avoid the font being freed twice
-    fonts.Get (iIndex) = NULL;
-    fonts.Delete (iIndex);
+    // Extract the element from the array instead of Delete to avoid
+    // the array from deleting it again.
+    fonts.Extract (index);
   }
 }
 

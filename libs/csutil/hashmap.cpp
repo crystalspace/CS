@@ -129,9 +129,6 @@ csHashMap::csHashMap (uint32 size)
 {
   NumBuckets = size;
   Buckets.SetLength (size);
-  uint32 i;
-  for (i = 0 ; i < size ; i++)
-    Buckets[i] = NULL;
 }
 
 csHashMap::~csHashMap ()
@@ -142,7 +139,7 @@ csHashMap::~csHashMap ()
 void csHashMap::Put (csHashKey key, csHashObject object)
 {
   uint32 idx = key % NumBuckets;
-  if (!Buckets[idx]) Buckets[idx] = new csHashBucket ();
+  if (!Buckets[idx]) Buckets.Put (idx, new csHashBucket ());
   csHashBucket* bucket = Buckets[idx];
   csHashElement* element = new csHashElement ();
   element->key = key;
@@ -200,8 +197,7 @@ void csHashMap::DeleteAll ()
   uint32 b;
   for (b = Buckets.Length () ; b-- > 0 ; )
   {
-    delete Buckets[b];
-    Buckets[b] = NULL;
+    Buckets.Put (b, NULL);
   }
 }
 

@@ -25,7 +25,6 @@
 #include "csutil/util.h"
 #include "csutil/csstrvec.h"
 #include "csutil/csobjvec.h"
-#include "csutil/typedvec.h"
 #include "iutil/vfs.h"
 #include "iutil/plugin.h"
 #include "iutil/eventh.h"

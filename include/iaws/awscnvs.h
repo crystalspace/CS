@@ -20,7 +20,7 @@
 
 #include "cstool/proctex.h"
 #include "ivideo/graph2d.h"
-#include "csutil/typedvec.h"
+#include "csutil/csvector.h"
 #include "ivideo/graph3d.h"
 
 /**

@@ -21,7 +21,6 @@
 #define __CS_NOBJVEC_H__
 
 #include "csutil/csobjvec.h"
-#include "csutil/typedvec.h"
 #include "csutil/refarr.h"
 #include "iutil/object.h"
 

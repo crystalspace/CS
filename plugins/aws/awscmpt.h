@@ -22,7 +22,7 @@
 # include "cstool/proctex.h"
 # include "ivideo/graph2d.h"
 # include "ivideo/graph3d.h"
-# include "csutil/typedvec.h"
+# include "csutil/csvector.h"
 # include "csgeom/transfrm.h"
 # include "av3dtxtm.h"
 # include "awscspt.h"
@@ -359,16 +359,6 @@ public:
 
   awsSimpleCanvas *canvas_list;
   csRect *rect_list;
-
-  //CS_DECLARE_TYPED_VECTOR (awsSimpleCanvasVector, awsSimpleCanvas);
-
-  //CS_DECLARE_TYPED_VECTOR (awsSimpleCanvasVectorVector, awsSimpleCanvasVector);
-
-  //  awsSimpleCanvasVectorVector canvases;
-
-  //CS_DECLARE_TYPED_VECTOR (csRectVector, csRect);
-
-  //CS_DECLARE_TYPED_VECTOR (csRectVectorVector, csRectVector);
 
   //  csRectVectorVector rects;
   awsMultiProctexCanvas (

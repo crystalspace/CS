@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "csutil/objiter.h"
 #include "csutil/csstring.h"
-#include "csutil/typedvec.h"
+#include "csutil/ptrarr.h"
 #include "csutil/intarray.h"
 #include "csutil/databuf.h"
 #include "cstool/sprbuild.h"
@@ -27,13 +27,14 @@
 #include "imesh/mdldata.h"
 #include "imesh/sprite3d.h"
 
-CS_DECLARE_TYPED_VECTOR_NODELETE (csModelFrameVector, iModelDataVertices);
+typedef csPArray<iModelDataVertices> csModelFrameVector;
 
-typedef struct {
+struct UsedVertexInfo
+{
   int normal;
   int texel;
   int vidx;
-} UsedVertexInfo;
+};
 
 typedef csGrowingArray<UsedVertexInfo> UsedVerticesInfo;
 

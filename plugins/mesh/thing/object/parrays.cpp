@@ -21,21 +21,6 @@
 #include "curve.h"
 #include "polygon.h"
 
-//-------------------------------------------------------+ csCurvesArray +----//
-bool csCurvesArray::FreeItem (csSome Item)
-{
-  delete((csCurve *)Item);
-  return true;
-}
-
-int csCurvesArray::CompareKey (csSome Item, csConstSome Key, int Mode) const
-{
-  (void)Mode;
-
-  const char *name = ((csCurve *)Item)->GetName ();
-  return name ? strcmp (name, (char *)Key) : -1;
-}
-
 //------------------------------------------------------+ csPolygonArray +----//
 csPolygonArray::~csPolygonArray ()
 {

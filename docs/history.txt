@@ -7,6 +7,25 @@ The history order is reversed so that new features are at the top.
 	  csRefArrayObject when the name of the object was NULL.
 	- Fixed a bug in csGrowingArray where DeleteAll() would not set
 	  the limit to 0.
+	- Added csPDelArray. This is similar to csPArray but it will
+	  delete elements that are removed from the array.
+	- Replaced all occurances of CS_DECLARE_TYPED_VECTOR with
+	  csPDelArray.
+	- Removed the CS_DECLARE_TYPED_VECTOR defines.
+	- Removed the CS_DECLARE_TYPED_IBASE_VECTOR defines.
+	- Changed the return of csRefArray<T>::Pop() from csRef<T> to
+	  csPtr<T>. This is a lot safer since you can assign a csRef<T>
+	  to a normal pointer and that error isn't detected by a compiler.
+	  But you cannot assign a csPtr<T> to a normal pointer. You are
+	  forced to use a csRef<T> then.
+	- Fixed mdltool to use a csRef<T> to catch the Pop().
+	- Fixed compile error in thing plugin (curve templates). Put the
+	  DecRef() back in since it is needed. It will now work correctly.
+	- csMovable now uses a csRefArray for the listeners. Previously
+	  it wouldn't do that with potentially bad results (i.e. it would
+	  keep no refs to the listeners).
+	- Fixed the documentation on typed vectors and added documentation
+	  for all new templated arrays.
 13-Jan-2002
 	- Further work on XML doc.
 	- Added support for <key> in mesh factories and collections.

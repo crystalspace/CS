@@ -16,7 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "csutil/typedvec.h"
+#include "csutil/csvector.h"
 #include "csutil/garray.h"
 #include "csengine/engine.h"
 #include "csengine/rdrprior.h"
@@ -39,10 +39,15 @@ void csRenderQueueSet::Add (iMeshWrapper *mesh)
 
   // look if the desired priority queue exists, and possibly
   // extend the list of queues
-  for (int i = Queues.Length (); i <= pri; i++) Queues[i] = NULL;
+  if (pri >= Queues.Length ())
+    Queues.SetLength (pri+1);
 
   // look if the desired queue exists, and create it if not
-  if (!Queues[pri]) Queues[pri] = new csMeshVectorNodelete ();
+  if (!Queues[pri])
+  {
+    csMeshVectorNodelete* mvnd = new csMeshVectorNodelete ();
+    Queues.Put (pri, mvnd);
+  }
 
   // add the mesh wrapper
   Queues[pri]->Push (mesh);

@@ -22,7 +22,7 @@
 #include "imesh/mdldata.h"
 #include "csutil/garray.h"
 #include "csutil/csobject.h"
-#include "csutil/typedvec.h"
+#include "csutil/refarr.h"
 
 #define CS_DECLARE_ACCESSOR_METHODS(type,name)				\
   type Get##name () const;						\
@@ -65,7 +65,7 @@
     if (o) return o;							\
   SCF_IMPLEMENT_EMBEDDED_IBASE_QUERY_END;
 
-CS_DECLARE_TYPED_IBASE_VECTOR (csObjectVector, iObject);
+typedef csRefArray<iObject> csObjectVector;
 
 class csIntArray;
 

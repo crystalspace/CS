@@ -19,11 +19,13 @@
 #ifndef __CS_ENGINE_RDRPRIOR_H__
 #define __CS_ENGINE_RDRPRIOR_H__
 
+#include "csutil/ptrarr.h"
+
 struct iMeshWrapper;
 struct iRenderView;
 
-CS_DECLARE_TYPED_VECTOR_NODELETE (csMeshVectorNodelete, iMeshWrapper);
-CS_DECLARE_TYPED_VECTOR (csMeshVectorNodeleteVector, csMeshVectorNodelete);
+typedef csPArray<iMeshWrapper> csMeshVectorNodelete;
+typedef csPDelArray<csMeshVectorNodelete> csMeshVectorNodeleteVector;
 
 /**
  * This class contains a list of rendering queues, each of which is a list
