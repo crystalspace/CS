@@ -2132,7 +2132,6 @@ void csEngine::ReadConfig (iConfigFile *Config)
       "Engine.Lighting.Reflections",
       csSector::cfg_reflections);
 
-  //@@@ NOT THE RIGHT PLACE! csSprite3D::global_lighting_quality = Config->GetInt ("Engine.Lighting.SpriteQuality", csSprite3D::global_lighting_quality);
   csSector::do_radiosity = Config->GetBool (
       "Engine.Lighting.Radiosity",
       csSector::do_radiosity);
