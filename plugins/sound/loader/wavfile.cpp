@@ -147,9 +147,6 @@ struct _WAVchk
 iSoundData* csSoundLoader_WAV::LoadSound (void* databuf, ULong size) const
 {
   UByte* buf = (UByte*) databuf;
-  UByte* ptr = NULL;
-  UByte* ptr_end = NULL;
-  csSoundDataRaw* sb = NULL;
   csSoundFormat format;
   char* data = NULL;
 
@@ -203,12 +200,12 @@ iSoundData* csSoundLoader_WAV::LoadSound (void* databuf, ULong size) const
 
   // correct the chunk, if under big-endian system
   #ifdef CS_BIG_ENDIAN // @@@ is this correct?
-    fmtchk.fmt_tag = ByteSwap16 (fmtchk.fmt_tag);
-    fmtchk.channel = ByteSwap16 (fmtchk.channel);
-    fmtchk.samples_per_sec = ByteSwap32 (fmtchk.samples_per_sec);
-    fmtchk.avg_bytes_per_sec = ByteSwap32 (fmtchk.avg_bytes_per_sec);
-    fmtchk.blk_align = ByteSwap16 (fmtchk.blk_align);
-    fmtchk.bits_per_sample = ByteSwap16 (fmtchk.bits_per_sample);
+    fmtchk.fmt_tag = ByteSwap16bit (fmtchk.fmt_tag);
+    fmtchk.channel = ByteSwap16bit (fmtchk.channel);
+    fmtchk.samples_per_sec = ByteSwap32bit (fmtchk.samples_per_sec);
+    fmtchk.avg_bytes_per_sec = ByteSwap32bit (fmtchk.avg_bytes_per_sec);
+    fmtchk.blk_align = ByteSwap16bit (fmtchk.blk_align);
+    fmtchk.bits_per_sample = ByteSwap16bit (fmtchk.bits_per_sample);
   #endif // CS_BIG_ENDIAN
 
   // check format of file

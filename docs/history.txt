@@ -6,6 +6,10 @@ The history order is reversed so that new features are at the top.
 	  csObjectIterator having virtual functions but non-virtual destructor.
 	- Eric Sunshine eliminated compilation warning about implicit
 	  declaration of strncmp() in NeXTMenu.m on MacOS/X.
+	- Eric Sunshine fixed several compilation errors on big-endian
+	  platforms in wavefile.cpp.
+	- Eric Sunshine eliminated several compilation warnings about unused
+	  variables in wavefile.cpp.
 23-May-2001
 	- Added 'virtual' before the csView destructor and also fixed a
 	  warning in the csView constructor.
