@@ -1,6 +1,11 @@
 The history order is reversed so that new features are at the top.
 
 15-Oct-2002
+	- Keith Fulton added definitions and initial implementations for
+	  iSharedVariable, iSharedVariableList and iImposter.  iEngine now
+	  keeps an iSharedVariableList, and csMeshWrapper implements iImposter,
+ 	  which uses iSharedVariable.  See new flarge for examples of definitions
+	  of both.
 	- Started work on the OpenGL implementation of SetRenderTarget().
 	  Added code in BeginDraw() to copy the texture to the display.  Added
 	  code in FinishDraw() to copy the display back to the texture.  This
