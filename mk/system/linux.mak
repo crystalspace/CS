@@ -5,8 +5,8 @@
 DESCRIPTION.linux = Linux
 
 # Choose which drivers you want to build/use
-DRIVERS+=cs2d/softx cs3d/software csnetdrv/sockets \
-  csnetman/simple
+DRIVERS+=cs2d/softx cs3d/software
+DRIVERS+=csnetdrv/sockets csnetman/simple
 
 # uncomment the following to build sound drivers
 DRIVERS+=cssnddrv/oss cssndrdr/software
@@ -23,12 +23,12 @@ DRIVERS+=cs3d/opengl cs2d/openglx
 # uncomment some of the following if you have a special MESA version that uses some 
 # of the following hardware/software renderers
 # Also set the entry Driver in section Display of opengl.cfg
-DRIVERS+=cs2d/openglx/glide
+#DRIVERS+=cs2d/openglx/glide
 DRIVERS+=cs2d/openglx/svga
 DRIVERS+=cs2d/openglx/empty
 
 # uncomment the following to build Glide stuff
-DRIVERS+=cs3d/glide2 cs2d/unxglide2
+#DRIVERS+=cs3d/glide2 cs2d/unxglide2
 
 #---------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
