@@ -143,7 +143,9 @@ ifeq ($(ODE.AVAILABLE),yes)
 PLUGINS.DYNAMIC += physics/odedynam
 PLUGINS.DYNAMIC += physics/loader
 endif
-#PLUGINS.DYNAMIC += device/joystick/linux
+ifeq ($(LINUXJOYSTICK.AVAILABLE),yes)
+PLUGINS.DYNAMIC += device/joystick/linux
+endif
 #PLUGINS.DYNAMIC += video/render3d/opengl
 #PLUGINS.DYNAMIC += video/render3d/shadermgr
 #PLUGINS.DYNAMIC += video/render3d/shaderplugins/glshader_arb

@@ -1289,11 +1289,22 @@ CS_CHECK_LIB_WITH([openal],
 
 #-----------------------------------------------------------------------------
 # Check for freetype2.
-#------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 AC_CHECK_FT2([2.0],
     [CS_MAKEFILE_PROPERTY([FT2.AVAILABLE], [yes])
      CS_MAKEFILE_PROPERTY([FT2.LFLAGS], [$FT2_LIBS])
      CS_MAKEFILE_PROPERTY([FT2.CFLAGS], [$FT2_CFLAGS])])
+
+#----------------------------------------------------------------------------
+# Check if we should build linux joystick drivers
+#----------------------------------------------------------------------------
+AC_ARG_ENABLE([linux-joystick-support],
+    [AC_HELP_STRING([--enable-linux-joystick-support],
+	[enable joystick support on linux platform (default NO); This builds
+	plugins for the linux joystick which tries to use the linux kernel
+	joystick drivers.])], [], [enable_linux_joystick_support=yes])
+AS_IF([test $enable_linux_joystick_support = yes],
+    [CS_MAKEFILE_PROPERTY([LINUXJOYSTICK.AVAILABLE], [yes])], [])
 
 #------------------------------------------------------------------------------
 # For Mingw, test if we need to link explicitly with libmingwex.a.  Older
