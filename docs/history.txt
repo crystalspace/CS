@@ -24,6 +24,22 @@ Short-term cleanups that need to be done:
 	  actually works in accordance with requirements of the system-driver.
 	- Eric Sunshine fixed the csClear plug-in so that it compiles with
 	  compilers which use the old-style casting syntax.
+	- Jorrit updated a lot of makefiles so that most apps at least
+	  compile on Unix (some do not run though).
+14-Nov-1999
+	- Updates to CrystalClear from Michael Dale Long and
+	  fixes for SCF to cctest.
+	- Denis Dmitriev fixed a bug in OpenGL texture manager.
+	- Update to Map2CS from Thomas Hieber. He added further
+	  extensions for manual sectoring.
+13-Nov-1999
+	- Andrew Zabolotny did the following changes:
+	    - Improved memory debugger (nested CHK's supported).
+	    - Added CHK to many places.
+	    - Fixed some CHKs that should be CHKB's.
+	    - Fixed some minor memory leaks.
+	- Fixes to SCF for Windows/VC from Thomas Hieber.
+	- Updates to CrystalClear from Michael Dale Long.
 12-Nov-1999
 	- Brandon Ehle fixes cspython so that it works with SCF.
 	- Michael Dale Long did a major update of Crystal Clear to SCF.
@@ -53,6 +69,9 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine worked around an OpenStep compiler bug which was
 	  triggered by csstring.h & csspr2d.h, and which generates unlinkable
 	  object files.
+	- Large optimization from Andrew Zabolotny to VFS. It should be
+	  about 50 times faster on large levels.
+	- Brandon Ehle updates new LaTeX documentation again.
 11-Nov-1999
 	- Eric Sunshine fixed a "pure virtual method called" crasher at
 	  application termination time.  This bug appeared with the
