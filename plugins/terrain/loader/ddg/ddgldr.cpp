@@ -19,7 +19,6 @@
 
 #include "cssysdef.h"
 #include "ddgldr.h"
-#include "csengine/terrobj.h"
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "iengine/engine.h"
@@ -113,7 +112,7 @@ iBase* csDDGLoader::Parse( const char* pString, iEngine *iEngine, iBase* /* cont
   char *pName;
   long cmd;
   char *pParams;
-  char *pStr = new char[255];
+  char pStr[255];
 
   iTerrainObject* iTerrObj = NULL;
   iDDGState* iTerrainState = NULL;

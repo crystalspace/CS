@@ -55,6 +55,8 @@ The history order has been reversed so that new features are at the top.
 	- Extended RENDERPRIORITIES system with a sorting parameter. This
 	  sorting parameter is not yet used but the parser already parses
 	  it. Possible values are BACK2FRONT, FRONT2BACK, or NONE.
+	- Fixed a few small problems in the DDG landscape plugin (mostly
+	  source code cosmetic ones).
 10-Apr-2001
 	- Implemented render priority queues in sectors. All meshes added to
 	  a sector will automatically be placed in the right queue. At render

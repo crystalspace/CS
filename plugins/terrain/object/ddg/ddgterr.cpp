@@ -19,7 +19,6 @@
 
 #include "cssysdef.h"
 #include "ddgterr.h"
-#include "csengine/pol2d.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/polyclip.h"
@@ -431,13 +430,13 @@ void csDDGTerrainObject::Draw (iRenderView* rview, bool use_z_buf)
     g3dmesh.num_vertices_pool = 1;
     g3dmesh.num_materials = 1;
     g3dmesh.use_vertex_color = false;
-    g3dmesh.do_mirror = pCamera->IsMirrored ();
     g3dmesh.do_morph_texels = false;
     g3dmesh.do_morph_colors = false;
     g3dmesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
     g3dmesh.fxmode = 0;//CS_FX_GOURAUD;
     init = true;
   }
+  g3dmesh.do_mirror = pCamera->IsMirrored ();
 
   // Render the vertex buffer piece by piece (per texture).
   i = 0;
@@ -548,7 +547,7 @@ iTerrainObject* csDDGTerrainObjectFactory::NewInstance ()
 {
   // RDS NOTE:  should the system go in here????
   csDDGTerrainObject* pTerrObj = new csDDGTerrainObject( pSystem, this );
-  return QUERY_INTERFACE( pTerrObj, iTerrainObject );
+  return (iTerrainObject*)pTerrObj;
 }
 
 //----------------------------------------------------------------------
@@ -583,5 +582,5 @@ bool csDDGTerrainObjectType::Initialize (iSystem *pSys)
 iTerrainObjectFactory* csDDGTerrainObjectType::NewFactory()
 {
   csDDGTerrainObjectFactory *pFactory = new csDDGTerrainObjectFactory( pSystem );
-  return QUERY_INTERFACE( pFactory, iTerrainObjectFactory );
+  return (iTerrainObjectFactory*)pFactory;
 }
