@@ -34,6 +34,12 @@ The history order has been reversed so that new features are at the top.
 	  plasma, (an exact value of 256 could be generated) was correct,
 	  I moved the fix to another, precalculated phase. This moves the
 	  bounds test from the inner loop to the table precalculation.
+	- Wouter Wijngaards added the distinction between static and
+	  dynamic lighting to isometric engine. Lights are by default
+	  static. Static lights are only recalculated when a static light
+	  is changed in a grid. Dynamic lighting is calculated per frame.
+	  The isotest now uses a dynamic light for the player, the
+	  blue light is a static light.
 18-Apr-2001
 	- Removed the test for stencil buffer since it seems that just doing
 	  that test is enough to break significant parts of OpenGL on some
