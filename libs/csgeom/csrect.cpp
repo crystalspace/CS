@@ -286,6 +286,11 @@ bool csRect::ClipLine (int& x1, int& y1, int& x2, int& y2)
     return false;
   }
 
+  // If the line is fully in the rectangle then we can also return true.
+  if (x1>=xmin && x1<=xmax && x2>=xmin && x2<=xmax &&
+      y1>=ymin && y1<=ymax && y2>=ymin && y2<=ymax)
+    return true;
+
   return ClipLineGeneral (x1, y1, x2, y2);
 }
 
@@ -326,6 +331,11 @@ bool csRect::ClipLineSafe (int& x1, int& y1, int& x2, int& y2)
     }
     return false;
   }
+
+  // If the line is fully in the rectangle then we can also return true.
+  if (x1>=xmin && x1<=xmax && x2>=xmin && x2<=xmax &&
+      y1>=ymin && y1<=ymax && y2>=ymin && y2<=ymax)
+    return true;
 
   if (!((x1 >> 15) || (y1 >> 15) || (x2 >> 15) || (y2 >> 15)))
   {

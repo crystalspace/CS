@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+13-Feb-2003
+	- Added another trivial case to csRect::ClipLine() making it a little
+	  bit safer again.
+	- Dynavis tiled coverage buffer now uses ClipLine(). This greatly
+	  cleans up the code and makes it a lot more robust.
 12-Feb-2003
 	- Performed several optimizations on the tinyxml parser. Hopefully
 	  it is now a little faster.
@@ -14,6 +19,7 @@ The history order is reversed so that new features are at the top.
 	    3. ClipLineSafe: Checks for trivial cases and is safe for very
 	       large coordinates. This function will automatically switch
 	       to ClipLine() if the given coordinates are small enough.
+	  Thanks to Steven Geens for making the base algorithm.
 11-Feb-2003
 	- Fixed lightning command in walktest to also work if there is no light
 	  called 'l1'.
