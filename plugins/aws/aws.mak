@@ -46,8 +46,6 @@ DEP.AWS = CSUTIL CSSYS CSUTIL CSGEOM CSTOOL CSGFX
 MSVC.DSP += AWS
 DSP.AWS.NAME = aws
 DSP.AWS.TYPE = plugin
-# The following is additional info need by BisonFlex for VC
-DSP.AWS.RESOURCES = $(wildcard plugins/aws/*.bsn) $(wildcard plugins/aws/*.flx)
 DSP.AWS.CFLAGS = /D "YY_NEVER_INTERACTIVE"
 DSP.AWS.LIBS = libflex
 

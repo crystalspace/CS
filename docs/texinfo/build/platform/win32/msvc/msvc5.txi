@@ -154,11 +154,11 @@ following.
 
 @subsubheading BisonFlex
 
-To successfully build the Crystal Space Alternate Windowing System (AWS) plugin
-with Visual C++ requires you have @emph{BisonFlex} by
-@uref{http://www.fg-soup.com} installed on your system.  To download the
-version of @emph{BisonFlex} for your @emph{Visual C++} version, use the
-corresponding link below.
+The Alternate Window System (AWS) plugin will build correctly under MSVC.
+However, if you wish to make modifications to it's structure and/or lexer, it will
+require you re-generate @emph{sllex.cpp, slparse.cpp, slparse.cpp.h and slparse.h}.
+If you need todo this will require you have Bison and Flex on your system. The
+suggested and supported version can be obtained via the link below.
 
 For Visual C++ 5:
 
@@ -170,47 +170,34 @@ For Visual C++ 5:
 @code{bfwizard-1.5.zip}
 @end iftex
 
+Install this package to a location of your choice on your system. During the install
+process, it will detect MSVC and install itself in the appropraiate directories and
+the executables in the system path. We suggest you agree to it's automatic detections. 
+
 @subsubheading Setting up and building the AWS plugin
 
-Open @file{CS\mk\visualc\csall.dsw}.
+To re-generate the files mentioned above. Open a @emph{MS-DOS Prompt/Command Prompt} and
+navigate to the @emph{CS\} root directory. Next, just enter the command lines listed
+below.
 
-In the left hand @emph{Workspace} window click on the @emph{FileView} tab
-at the bottom, then in the window look for and find the project @emph{plgaws}.
-
-Now expand the aws project in the tree and then the @emph{Resource Files}
-directory.
-
-Right click on @file{skinlang.flx} and click on @emph{Settings}.
-
-You will now be presented with the @emph{Project Settings} dialog for that
-file.
-
-Click on the @emph{Custom Build} tab.  In the text box @emph{Commands} enter
-the following:
-
-@noindent
 @ifnottex
-@code{flex.exe -Plex_cpp -L -t ..\..\plugins\aws\skinlang.flx > ..\..\plugins\aws\sllex.cpp}
+@code{flex -L -Splugins/aws/flex.skl -t plugins/aws/skinlang.flx > plugins/aws/sllex.cpp}
 @end ifnottex
 @iftex
-@code{flex.exe -Plex_cpp -L -t ..\..\plugins\aws\skinlang.flx >}@*
-@code{..\..\plugins\aws\sllex.cpp}
+@code{flex -L -Splugins/aws/flex.skl -t plugins/aws/skinlang.flx >}@*
+@code{plugins/aws/sllex.cpp}
 @end iftex
 
-Now in the @emph{Outputs} text box enter the following:
+@ifnottex
+@code{bison --no-lines -d -p aws -o plugins/aws/slparse.cpp plugins/aws/skinlang.bsn}
+@end ifnottex
+@iftex
+@code{bison --no-lines -d -p aws -o plugins/aws/slparse.cpp}@*
+@code{ plugins/aws/skinlang.bsn}
+@end iftex
 
-@code{..\..\plugins\aws\sllex.cpp}
-
-Next click on the @emph{General} tab and check the box
-@emph{Always use the custom build step}
-
-Now just @emph{Ok} out of that dialog box and do a @emph{Save all} and re-build
-Crystal Space.
-
-You need not compile all parts of Crystal Space.  For example, if you don't
-want to use DirectX (DDRAW/D3D) for graphics or have Python scripting support,
-then you don't have to compile it.  See the compilation instructions on how to
-remove the projects.
+Now just follow the @emph{Compiling Crystal Space} instructions to again re-build AWS
+with your modifications included.
 
 @subsubheading Compiling Crystal Space
 
