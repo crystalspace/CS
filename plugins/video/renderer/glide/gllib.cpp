@@ -21,7 +21,7 @@
 // Written by xtrochu and Nathaniel
 
 #include "sysdef.h"
-#include "gllib3.h"
+#include "gllib.h"
 #include "cssys/system.h"
 #include "csutil/inifile.h"
 

@@ -179,7 +179,6 @@ extern GlideLib * glLib;
 #define GlideLib_grSstWinOpen grSstWinOpen
 #define GlideLib_grSstSelect grSstSelect
 #define GlideLib_grDrawPlanarPolygon grDrawPlanarPolygon
-#define GlideLib_grDrawPlanarPolygonVertexList grDrawPlanarPolygonVertexList
 #define GlideLib_grDrawPolygon grDrawPolygon
 #define GlideLib_grDrawPolygonVertexList grDrawPolygonVertexList
 #define GlideLib_grDrawPoint grDrawPoint
@@ -190,7 +189,6 @@ extern GlideLib * glLib;
 #define GlideLib_grBufferSwap grBufferSwap
 #define GlideLib_grRenderBuffer grRenderBuffer
 #define GlideLib_grErrorSetCallback grErrorSetCallback
-#define GlideLib_grSstWinClose grSstWinClose
 #define GlideLib_grSstControl grSstControl
 #define GlideLib_grSstOrigin grSstOrigin
 #define GlideLib_grLfbWriteRegion grLfbWriteRegion
@@ -230,15 +228,56 @@ extern GlideLib * glLib;
 #define GlideLib_grGlideGetState grGlideGetState
 #define GlideLib_grGlideSetState grGlideSetState
 #define GlideLib_grDisableAllEffects grDisableAllEffects
+
+#ifdef GLIDE3
 #define GlideLib_grGet grGet
 #define GlideLib_grGetString grGetString
 #define GlideLib_grVertexLayout grVertexLayout
-#define GlideLib_grDrawVertexArrayLinear grDrawVertexArrayContiguous
+#define GlideLib_grSstWinClose grSstWinClose
+#define GlideLib_grDrawPlanarPolygonVertexList( nCount, vList )  \
+        grDrawVertexArrayContiguous( GR_POLYGON, (nCount), (vList), G3D->m_vertstrulen )
+#else
+#define GlideLib_grGlideGetVersion grGlideGetVersion
+#define GlideLib_grSstQueryHardware grSstQueryHardware
+#define GlideLib_grSstQueryBoards grSstQueryBoards
+#define GlideLib_grSstScreenHeight grSstScreenHeight
+#define GlideLib_grSstScreenWidth grSstScreenWidth
+#define GlideLib_grSstStatus grSstStatus
+#define GlideLib_grDrawPlanarPolygonVertexList( nCount, vList )  \
+        grDrawPlanarPolygonVertexList( (nCount), (vList) )
+#define GlideLib_grSstWinClose( x ) grSstWinClose()
+
+#endif // GLIDE3
 
 #endif // OS_WIN32
 
 #define GLIDELIB_H_INCLUDED
-#endif
 
 // To be correct with the doc
 #define GlideLib_grSstControlMode GlideLib_grSstControl
+
+#ifndef GLIDE3
+#define GR_LOD_LOG2_256 GR_LOD_256
+#define GR_LOD_LOG2_128 GR_LOD_128
+#define GR_LOD_LOG2_64  GR_LOD_64
+#define GR_LOD_LOG2_32  GR_LOD_32
+#define GR_LOD_LOG2_16  GR_LOD_16
+#define GR_LOD_LOG2_8   GR_LOD_8
+#define GR_LOD_LOG2_4   GR_LOD_4
+#define GR_LOD_LOG2_2   GR_LOD_2
+#define GR_LOD_LOG2_1   GR_LOD_1
+
+#define GR_ASPECT_LOG2_1x1 GR_ASPECT_1x1
+#define GR_ASPECT_LOG2_1x2 GR_ASPECT_1x2
+#define GR_ASPECT_LOG2_1x4 GR_ASPECT_1x4
+#define GR_ASPECT_LOG2_1x8 GR_ASPECT_1x8
+#define GR_ASPECT_LOG2_2x1 GR_ASPECT_2x1
+#define GR_ASPECT_LOG2_4x1 GR_ASPECT_4x1
+#define GR_ASPECT_LOG2_8x1 GR_ASPECT_8x1
+
+#define aspectRatioLog2 aspectRatio
+#define largeLodLog2 largeLod
+#define smallLodLog2 smallLod
+#endif
+
+#endif

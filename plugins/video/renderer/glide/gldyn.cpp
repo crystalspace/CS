@@ -17,10 +17,10 @@
 */
 
 #include "sysdef.h"
-#include "gllib3.h"
-#include "gldyntex.h"
-#include "gltex3.h"
-#include "g3dgl3.h"
+#include "gllib.h"
+#include "gldyn.h"
+#include "gltex.h"
+#include "g3dgl.h"
 
 IMPLEMENT_IBASE (csGlideDynamic)
   IMPLEMENTS_INTERFACE (iGraphics3D)
@@ -34,7 +34,7 @@ csGlideDynamic::csGlideDynamic (iBase * pParent)
   g3d=NULL; 
 }
 
-void csGlideDynamic::SetTarget (csGraphics3DGlide3x *g3d, csTextureMMGlide *tex)
+void csGlideDynamic::SetTarget (csGraphics3DGlide *g3d, csTextureMMGlide *tex)
 { 
   this->g3d = g3d;
   this->tex = tex;

@@ -31,21 +31,21 @@
 #include "iplugin.h"
 #include "ipolygon.h"
 #include "icamera.h"
-#include "glcache3.h"
-#include "gltex3.h"
+#include "glcache.h"
+#include "gltex.h"
 #include "video/renderer/common/dtmesh.h"
 #include "video/renderer/common/dpmesh.h"
-#include "glhalo3.h"
+#include "glhalo.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/polyclip.h"
 #include "video/canvas/glide2common/iglide2d.h"
 
-class csGraphics3DGlide3x;
+class csGraphics3DGlide;
 class csGlideTextureCache;
 class csTextureManagerGlide; 
 
 /// the Glide implementation of the Graphics3D class.
-class csGraphics3DGlide3x  : public iGraphics3D
+class csGraphics3DGlide  : public iGraphics3D
 {
 friend class csGlideHalo;
 friend class csGlideDynamic;
@@ -54,9 +54,17 @@ private:
   csGlideTextureCache *m_pTextureCache, *m_pLightmapCache, *m_pAlphamapCache;
   /// texturehandler for FX polygon drawing
   TextureHandler *m_thTex;
+
+#ifdef GLIDE3
   /// graphics context
   GrContext_t context;
-  
+  /// State of GlideEngine
+  UByte *state;
+#else
+  int context;
+  GrState *state;
+#endif
+
   /// vertex array for FX polygon drawing
   MyGrVertex *m_verts, *m_dpverts;
   static long m_vertstrulen; // length of our VertexArray structur
@@ -98,6 +106,8 @@ private:
   /// The system driver
   iSystem* m_piSystem;
 
+  static csGraphics3DGlide *G3D;
+  
   /// The world driver
   //IWorld* m_piWorld;
 
@@ -149,9 +159,6 @@ private:
   /// fogtable
   GrFog_t *fogtable;
 
-  /// State of GlideEngine
-  UByte *state;
-    
   /// aspect
   float aspect, inv_aspect;
   /// object -> camera transformation
@@ -164,9 +171,9 @@ public:
   DECLARE_IBASE;
 
   /// The constructor. Pass all arguments to this.
-  csGraphics3DGlide3x (iBase* iParent);
+  csGraphics3DGlide (iBase* iParent);
   /// the destructor.
-  virtual ~csGraphics3DGlide3x ();
+  virtual ~csGraphics3DGlide ();
   
   virtual bool Initialize (iSystem *iSys);
 

@@ -24,6 +24,8 @@
 #include "itexture.h"
 #include "iimage.h"
 
+class csGraphics3DGlide;
+class csGlideDynamic;
 /**
  * csTextureMMGlide represents a texture and all its mipmapped
  * variants.
@@ -31,17 +33,20 @@
 class csTextureMMGlide : public csTextureMM
 {
 private:
-  
+  csGraphics3DGlide *g3d;
+  csGlideDynamic *dyn;
+
 public:
   /// Create a mipmapped texture object
-  csTextureMMGlide (iImage* image, int flags);
+  csTextureMMGlide (csGraphics3DGlide *g3d, iImage* image, int flags);
+  virtual ~csTextureMMGlide ();
   /// Create a new csTextureGlide object
   virtual csTexture *NewTexture (iImage *Image);
   /// Compute the mean color
   virtual void ComputeMeanColor ();
   /// Encode 24 bit data into 16 bit ( 565 RGB scheme )
   virtual void remap_mm ();
-  
+  virtual iGraphics3D *GetDynamicTextureInterface();
 };
 
 /**
@@ -75,9 +80,12 @@ public:
 class csTextureManagerGlide : public csTextureManager
 {
 
+ protected:
+  csGraphics3DGlide *g3d;
+
 public:
   ///
-  csTextureManagerGlide (iSystem* iSys, iGraphics2D* iG2D, csIniFile *config);
+  csTextureManagerGlide (iSystem* iSys, iGraphics2D* iG2D, csGraphics3DGlide* iG3D, csIniFile *config);
   ///
   virtual ~csTextureManagerGlide ();
 

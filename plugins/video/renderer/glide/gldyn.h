@@ -32,7 +32,7 @@
 
 #include "igraph3d.h"
 
-class csGraphics3DGlide3x;
+class csGraphics3DGlide;
 class csTextureMMGlide;
 class csTextureGlide;
 
@@ -41,7 +41,7 @@ class csGlideDynamic : public iGraphics3D
  protected:
   csTextureMMGlide *tex;
   csTextureGlide *tex_0;
-  csGraphics3DGlide3x *g3d;
+  csGraphics3DGlide *g3d;
   int Width, Height, nPixelBytes;
   csPixelFormat *pfmt;
   
@@ -51,7 +51,7 @@ class csGlideDynamic : public iGraphics3D
   csGlideDynamic (iBase * pParent);
   virtual ~csGlideDynamic (){}
 
-  void SetTarget (csGraphics3DGlide3x *g3d, csTextureMMGlide *tex);
+  void SetTarget (csGraphics3DGlide *g3d, csTextureMMGlide *tex);
 
   virtual bool Initialize (iSystem */*pSystem*/){ return true; }
   virtual bool Open (const char */*Title*/){ return true; }

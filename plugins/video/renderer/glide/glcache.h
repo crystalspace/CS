@@ -28,7 +28,7 @@
 #include "ipolygon.h"
 #include "itexture.h"
 #include "ilghtmap.h"
-#include "glalpha2.h"
+#include "glalpha.h"
 #include "video/renderer/common/texmem.h"
 #include <glide.h>
 
@@ -106,8 +106,7 @@ public:
   /// Clear cache
   void Clear ();
 
-  void Remove (iTextureHandle *texture)
-  { if ( texture->GetCacheData() ) Unload ( (csGlideCacheData*)texture->GetCacheData() ); }
+  void Remove (iTextureHandle *texture);
 
   ///
   virtual void Dump ();

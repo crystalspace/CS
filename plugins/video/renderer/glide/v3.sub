@@ -1,0 +1,84 @@
+# This is a subinclude file used to define the rules needed
+# to build the Glide2 3D driver -- glide3d Version 3
+
+# Driver description
+DESCRIPTION.glide3d3 = Crystal Space Glide V3 3D driver
+
+#-------------------------------------------------------------- rootdefines ---#
+ifeq ($(MAKESECTION),rootdefines)
+
+# Driver-specific help commands
+DRIVERHELP += $(NEWLINE)echo $"  make glide3d3      Make the $(DESCRIPTION.glide3d3)$"
+
+endif # ifeq ($(MAKESECTION),rootdefines)
+
+#-------------------------------------------------------------- roottargets ---#
+ifeq ($(MAKESECTION),roottargets)
+
+.PHONY: glide3d3
+
+all plugins drivers drivers3d: glide3d3
+
+glide3d3:
+	$(MAKE_TARGET) MAKE_DLL=yes
+glide3d3clean:
+	$(MAKE_CLEAN)
+
+endif # ifeq ($(MAKESECTION),roottargets)
+
+#-------------------------------------------------------------- postdefines ---#
+ifeq ($(MAKESECTION),postdefines)
+
+CFLAGS.GLIDE3D3+= $(GLIDE3_PATH) -DGLIDE3 
+LIBS._GLIDE3D3+=-lglide3x
+
+# The Glide driver
+ifeq ($(USE_SHARED_PLUGINS),yes)
+  GLIDE3D3=glide3d3$(DLL)
+  LIBS.GLIDE3D3=$(LIBS._GLIDE3D3)
+  DEP.GLIDE3D3=$(CSGEOM.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+else
+  GLIDE3D3=$(OUT)$(LIB_PREFIX)glide3d3$(LIB)
+  DEP.EXE+=$(GLIDE3D3)
+  LIBS.EXE+=$(LIBS._GLIDE3D3)
+  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_GLIDE3D3
+endif
+DESCRIPTION.$(GLIDE3D3) = $(DESCRIPTION.glide3d3)
+SRC0.GLIDE3D3 = $(wildcard plugins/video/renderer/glide/*.cpp )
+SRC1.GLIDE3D3 = $(wildcard plugins/video/renderer/common/*.cpp)
+SRC.GLIDE3D3 = $(SRC0.GLIDE3D3) $(SRC1.GLIDE3D3)
+OBJ.GLIDE3D3 = $(addprefix $(OUT),$(notdir $(SRC1.GLIDE3D3:.cpp=$O) $(SRC0.GLIDE3D3:.cpp=3$O)))
+
+endif # ifeq ($(MAKESECTION),postdefines)
+
+#------------------------------------------------------------------ targets ---#
+ifeq ($(MAKESECTION),targets)
+
+.PHONY: glide3d3 glide3d3clean
+
+# Chain rules
+clean: glide3d3clean
+
+glide3d3: $(OUTDIRS) $(GLIDE3D3)
+
+$(OUT)%3$O: plugins/video/renderer/glide/%.cpp
+	$(DO.COMPILE.CPP) $(CFLAGS.GLIDE3D3)
+
+$(OUT)%$O: plugins/video/renderer/common/%.cpp 
+	$(DO.COMPILE.CPP) $(CFLAGS.GLIDE3D3)
+
+$(GLIDE3D3): $(OBJ.GLIDE3D3) $(DEP.GLIDE3D3)
+	$(DO.PLUGIN) $(LIBS.GLIDE3D3)
+
+glide3d3clean:
+	$(RM) $(GLIDE3D3) $(OBJ.GLIDE3D3)
+
+ifdef DO_DEPEND
+dep: $(OUTOS)glide3d3.dep
+$(OUTOS)glide3d3.dep: $(SRC.GLIDE3D3)
+	$(DO.DEP1) $(CFLAGS.GLIDE3D3) $(DO.DEP2)
+else
+-include $(OUTOS)glide3d3.dep
+endif
+
+endif # ifeq ($(MAKESECTION),targets)

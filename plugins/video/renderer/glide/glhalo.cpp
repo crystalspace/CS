@@ -18,8 +18,8 @@
 */
 
 #include "sysdef.h"
-#include "glhalo2.h"
-#include "gllib2.h"
+#include "glhalo.h"
+#include "gllib.h"
 #include <glide.h>
 #include <unistd.h>
 
@@ -28,7 +28,7 @@ IMPLEMENT_IBASE (csGlideHalo)
   IMPLEMENTS_INTERFACE(iHalo)
 IMPLEMENT_IBASE_END
 
-csGlideHalo::csGlideHalo (float iR, float iG, float iB, int iWidth, int iHeight, csGraphics3DGlide2x *iG3D, csGlideAlphaMap *am){
+csGlideHalo::csGlideHalo (float iR, float iG, float iB, int iWidth, int iHeight, csGraphics3DGlide *iG3D, csGlideAlphaMap *am){
 
   CONSTRUCT_IBASE(NULL);
 
@@ -128,7 +128,7 @@ void csGlideHalo::Draw (float x, float y, float w, float h, float iIntensity,
 
     GlideLib_grDepthMask (FXFALSE);
     
-    GlideLib_grDrawPlanarPolygonVertexList ( iVertCount, vx);
+    GlideLib_grDrawPlanarPolygonVertexList (iVertCount, vx);
     GlideLib_grDepthMask (FXTRUE);
 
     if ( G3D->m_pAlphamapCache == G3D->m_pTextureCache )

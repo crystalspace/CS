@@ -22,11 +22,12 @@
 #include "qint.h"
 #include "csgeom/math2d.h"
 #include "csutil/util.h"
-#include "g3dgl2.h"
-#include "glcache2.h"
-#include "glalpha2.h"
+#include "g3dgl.h"
+#include "glcache.h"
+#include "glalpha.h"
+#include "video/canvas/glide2common/iglide2d.h"
 
-class csGraphics3DGlide2x;
+class csGraphics3DGlide;
 
 // The structure that stays behind csHaloHandle
 class csGlideHalo : public iHalo
@@ -37,18 +38,18 @@ class csGlideHalo : public iHalo
   int Width, Height;
 
   // Software 3D rasterizer
-  csGraphics3DGlide2x *G3D;
+  csGraphics3DGlide *G3D;
 
   csGlideAlphaMap *am;
   csVector2 *vert;
-  GrVertex *vx;
+  MyGrVertex *vx;
   int oldVerts;
 public:
 
   DECLARE_IBASE;
 
   // Create the halo object
-  csGlideHalo (float iR, float iG, float iB, int iWidth, int iHeight, csGraphics3DGlide2x *iG3D, csGlideAlphaMap *am );
+  csGlideHalo (float iR, float iG, float iB, int iWidth, int iHeight, csGraphics3DGlide *iG3D, csGlideAlphaMap *am );
 
   // Destroy the halo object
   virtual ~csGlideHalo ();
