@@ -15,6 +15,9 @@ The history order has been reversed so that new features are at the top.
 	  implementation and removed it.  (It was specifically engineered to
 	  gracefully handle the case for which he thought it failed.)  The new
 	  implementation is even simpler and more flexible.
+	- Eric Sunshine fixed a problem in dtsimple.cpp.  It was passing NULL
+	  to csThing::MergeTemplate where it should have been passing 'false'.
+	- Eric Sunshine eliminated a compilation warning in levtool.cpp.
 29-Sep-2000
 	- Eric Sunshine made the following changes to install.mak and the
 	  installation-related makefile targets:
