@@ -26,7 +26,7 @@
 #include "lightdef.h"
 
 class csSector;
-class csSprite3D;
+class csSprite;
 class csPolygon3D;
 class csDynLight;
 class Dumper;
@@ -377,7 +377,7 @@ public:
  */
 class csLightHitsSprite
 {
-  friend class csSprite3D;
+  friend class csSprite;
   friend class csDynLight;
   friend class Dumper;
 
@@ -388,7 +388,7 @@ private:
   csLightHitsSprite* prev_light;
 
   /// Sprite that this is for.
-  csSprite3D* sprite;
+  csSprite* sprite;
   /// Light that this originates from.
   csDynLight* light;
 
@@ -407,7 +407,7 @@ public:
   /**
    * Get the sprite that this belongs too.
    */
-  csSprite3D* GetSprite () { return sprite; }
+  csSprite* GetSprite () { return sprite; }
 
   /**
    * Get the light that this belongs too.

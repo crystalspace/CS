@@ -643,7 +643,81 @@ int csSpriteTemplate::MergeTexels ()
 
 //=============================================================================
 
-IMPLEMENT_CSOBJTYPE (csSprite3D, csObject)
+IMPLEMENT_CSOBJTYPE (csSprite, csObject)
+
+csSprite::csSprite () : csObject (), bbox (NULL)
+{
+  bbox.SetOwner (this);
+  dynamiclights = NULL;
+  MixMode = CS_FX_COPY;
+  defered_num_lights = 0;
+  defered_lighting_flags = 0;
+  draw_callback = NULL;
+  draw_callback2 = NULL;
+  is_visible = false;
+  camera_cookie = 0;
+}
+
+csSprite::~csSprite ()
+{
+  while (dynamiclights) CHKB (delete dynamiclights);
+  RemoveFromSectors ();
+}
+
+void csSprite::MoveToSector (csSector* s)
+{
+  RemoveFromSectors ();
+  sectors.Push (s);
+  s->sprites.Push (this);
+  UpdatePolyTreeBBox ();
+}
+
+void csSprite::RemoveFromSectors ()
+{
+  bbox.RemoveFromTree ();
+  while (sectors.Length () > 0)
+  {
+    csSector* ss = (csSector*)sectors.Pop ();
+    if (ss)
+    {
+      int idx = ss->sprites.Find (this);
+      if (idx >= 0)
+      {
+        ss->sprites[idx] = NULL;
+        ss->sprites.Delete (idx);
+      }
+    }
+  }
+}
+
+void csSprite::DeferUpdateLighting (int flags, int num_lights)
+{
+  defered_num_lights = num_lights;
+  defered_lighting_flags = flags;
+}
+
+void csSprite::UnlinkDynamicLight (csLightHitsSprite* lp)
+{
+  if (lp->next_sprite) lp->next_sprite->prev_sprite = lp->prev_sprite;
+  if (lp->prev_sprite) lp->prev_sprite->next_sprite = lp->next_sprite;
+  else dynamiclights = lp->next_sprite;
+  lp->prev_sprite = lp->next_sprite = NULL;
+  lp->sprite = NULL;
+}
+
+void csSprite::AddDynamicLight (csLightHitsSprite* lp)
+{
+  lp->next_sprite = dynamiclights;
+  lp->prev_sprite = NULL;
+  if (dynamiclights) dynamiclights->prev_sprite = lp;
+  dynamiclights = lp;
+  lp->sprite = this;
+}
+
+
+//=============================================================================
+
+IMPLEMENT_CSOBJTYPE (csSprite3D, csSprite)
 
 /// Static vertex array.
 static DECLARE_GROWING_ARRAY (tr_verts, csVector3);
@@ -658,9 +732,8 @@ static DECLARE_GROWING_ARRAY (tween_verts, csVector3);
 /// The list of lights that hit the sprite
 static DECLARE_GROWING_ARRAY (light_worktable, csLight*);
 
-csSprite3D::csSprite3D () : csObject (), bbox (NULL)
+csSprite3D::csSprite3D () : csSprite ()
 {
-  bbox.SetOwner (this);
   v_obj2world.x = 0;
   v_obj2world.y = 0;
   v_obj2world.z = 0;
@@ -669,15 +742,7 @@ csSprite3D::csSprite3D () : csObject (), bbox (NULL)
   force_otherskin = false;
   cur_action = NULL;
   vertex_colors = NULL;
-  dynamiclights = NULL;
   skeleton_state = NULL;
-  MixMode = CS_FX_COPY;
-  defered_num_lights = 0;
-  defered_lighting_flags = 0;
-  draw_callback = NULL;
-  draw_callback2 = NULL;
-  is_visible = false;
-  camera_cookie = 0;
   tween_ratio = 0;
 
   tr_verts.IncRef ();
@@ -697,10 +762,8 @@ csSprite3D::~csSprite3D ()
   obj_verts.DecRef ();
   tween_verts.DecRef ();
 
-  while (dynamiclights) CHKB (delete dynamiclights);
   CHK (delete [] vertex_colors);
   CHK (delete skeleton_state);
-  RemoveFromSectors ();
 }
 
 void csSprite3D::SetMove (float x, float y, float z)
@@ -1374,32 +1437,6 @@ bool csSprite3D::NextFrame (time_t current_time, bool onestep, bool stoptoend)
   return ret;
 }
 
-void csSprite3D::MoveToSector (csSector* s)
-{
-  RemoveFromSectors ();
-  sectors.Push (s);
-  s->sprites.Push (this);
-  UpdatePolyTreeBBox ();
-}
-
-void csSprite3D::RemoveFromSectors ()
-{
-  bbox.RemoveFromTree ();
-  while (sectors.Length () > 0)
-  {
-    csSector* ss = (csSector*)sectors.Pop ();
-    if (ss)
-    {
-      int idx = ss->sprites.Find (this);
-      if (idx >= 0)
-      {
-        ss->sprites[idx] = NULL;
-        ss->sprites.Delete (idx);
-      }
-    }
-  }
-}
-
 csVector3* csSprite3D::GetObjectVerts (csFrame* fr)
 {
   UpdateWorkTables (tpl->GetNumTexels ());
@@ -1415,12 +1452,6 @@ csVector3* csSprite3D::GetObjectVerts (csFrame* fr)
   }
   else
     return obj_verts.GetArray ();
-}
-
-void csSprite3D::DeferUpdateLighting (int flags, int num_lights)
-{
-  defered_num_lights = num_lights;
-  defered_lighting_flags = flags;
 }
 
 void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
@@ -1579,24 +1610,5 @@ void csSprite3D::UpdateLightingHQ (csLight** lights, int num_lights, csVector3* 
 
   // Clamp all vertice colors to 2.0
   FixVertexColors ();
-}
-
-
-void csSprite3D::UnlinkDynamicLight (csLightHitsSprite* lp)
-{
-  if (lp->next_sprite) lp->next_sprite->prev_sprite = lp->prev_sprite;
-  if (lp->prev_sprite) lp->prev_sprite->next_sprite = lp->next_sprite;
-  else dynamiclights = lp->next_sprite;
-  lp->prev_sprite = lp->next_sprite = NULL;
-  lp->sprite = NULL;
-}
-
-void csSprite3D::AddDynamicLight (csLightHitsSprite* lp)
-{
-  lp->next_sprite = dynamiclights;
-  lp->prev_sprite = NULL;
-  if (dynamiclights) dynamiclights->prev_sprite = lp;
-  dynamiclights = lp;
-  lp->sprite = this;
 }
 

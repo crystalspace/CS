@@ -33,6 +33,7 @@ class Polygon2D;
 class csCamera;
 class csDynLight;
 class csSprite3D;
+class csSprite;
 class Dumper;
 class csPolygonTree;
 class csPolygon2DQueue;
@@ -51,16 +52,9 @@ public:
   /**
    * List of sprites in this sector. Note that sprites also
    * need to be in the world list. This vector contains objects
-   * of type csSprite3D*.
+   * of type csSprite*.
    */
   csNamedObjVector sprites;
-
-  /**
-   * List of 2D sprites in this sector. Note that sprites also
-   * need to be in the world list. This vector contains objects
-   * of type csSprite2D*.
-   */
-  csNamedObjVector sprites2d;
 
   /**
    * All static and pseudo-dynamic lights in this sector.

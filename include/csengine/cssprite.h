@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -322,27 +322,18 @@ typedef void (csSpriteCallback) (csSprite3D* spr, csRenderView* rview);
 typedef void (csSpriteCallback2) (csSprite3D* spr, csRenderView* rview, csObject *callbackData);
 
 /**
- * A 3D sprite based on a triangle mesh with a single texture.
- * Animation is done with frames (a frame may be controlled by
- * a skeleton).
+ * The base class for all types of sprites.
  */
-class csSprite3D : public csObject
+class csSprite : public csObject
 {
   friend class Dumper;
-  friend class csCollider;
 
-private:
+protected:
   /// Points to Actor class which "owns" this sprite.
   csObject* myOwner;
 
   /// Bounding box for polygon trees.
   csPolyTreeBBox bbox;
-
-  /// Set the size of internally used tables
-  static void UpdateWorkTables (int max_size);
-
-  /// Update defered lighting.
-  void UpdateDeferedLighting ();
 
   /**
    * Camera space bounding box is cached here.
@@ -354,15 +345,164 @@ private:
   /// Current cookie for camera_bbox.
   csTranCookie camera_cookie;
 
+  /// Mixmode for the triangles/polygons of the sprite.
+  UInt MixMode;
+
+  /**
+   * List of light-hits-sprites for this sprite.
+   */
+  csLightHitsSprite* dynamiclights;
+
+  /// Defered lighting. If > 0 then we have defered lighting.
+  int defered_num_lights;
+
+  /// Flags to use for defered lighting.
+  int defered_lighting_flags;
+
+  /// The callback which is called just before drawing.
+  csSpriteCallback* draw_callback;
+
+  /// This callback is only called if the sprite is actually drawn.
+  csSpriteCallback2* draw_callback2;
+
+  /**
+   * Flag which is set to true when the sprite is visible.
+   * This is used by the c-buffer/bsp routines. The sprite itself
+   * will not use this flag in any way at all. It is simply intended
+   * for external visibility culling routines.
+   */
+  bool is_visible;
+
+  /**
+   * Update the bounding box for the polygon tree
+   * algorithm.
+   */
+  virtual void UpdatePolyTreeBBox () = 0;
+
 public:
+  /// List of sectors where this sprite is.
+  csNamedObjVector sectors;
+
+public:
+  /// Constructor.
+  csSprite ();
+  /// Destructor.
+  virtual ~csSprite ();
+
   /// Set owner (actor) for this sprite.
   void SetMyOwner (csObject *newOwner) { myOwner = newOwner; }
   /// Get owner (actor) for this sprite.
   csObject* GetMyOwner () { return myOwner; }
 
-  /// List of sectors where this sprite is.
-  csNamedObjVector sectors;
+  /// Get the bounding box object for the polygon tree.
+  csPolyTreeBBox& GetBBoxObject () { return bbox; }
 
+  /// Mark this sprite as visible.
+  void MarkVisible () { is_visible = true; }
+
+  /// Mark this sprite as invisible.
+  void MarkInvisible () { is_visible = false; }
+
+  /// Return if this sprite is visible.
+  bool IsVisible () { return is_visible; }
+
+  /**
+   * Update lighting as soon as the sprite becomes visible.
+   * This will call world->GetNearestLights with the supplied
+   * parameters.
+   */
+  void DeferUpdateLighting (int flags, int num_lights);
+
+  /// Sets the mode that is used, when drawing that sprite.
+  void SetMixmode (UInt m) { MixMode = m; }
+
+  /**
+   * Set a callback which is called just before the sprite is drawn.
+   * This is useful to do some expensive computations which only need
+   * to be done on a visible sprite.
+   */
+  void SetDrawCallback (csSpriteCallback* callback) { draw_callback = callback; }
+
+  /**
+   * Set a callback which is called only if the sprite is actually drawn.
+   */
+  void SetDrawCallback2 (csSpriteCallback2* callback) { draw_callback2 = callback; }
+
+  /**
+   * Get the draw callback. If there are multiple draw callbacks you can
+   * use this function to chain.
+   */
+  csSpriteCallback* GetDrawCallback () { return draw_callback; }
+
+  /**
+   * Get the draw callback. If there are multiple draw callbacks you can
+   * use this function to chain.
+   */
+  csSpriteCallback2* GetDrawCallback2 () { return draw_callback2; }
+
+  /// Move this sprite to one sector (conveniance function).
+  void MoveToSector (csSector* s);
+
+  /// Remove this sprite from all sectors it is in (but not from the world).
+  void RemoveFromSectors ();
+
+  /**
+   * Unlink a light-hits-sprite from the list.
+   * Warning! This function does not test if it
+   * is really on the list!
+   */
+  void UnlinkDynamicLight (csLightHitsSprite* lp);
+
+  /**
+   * Add a light-hits-sprite to the list.
+   */
+  void AddDynamicLight (csLightHitsSprite *lp);
+
+  /**
+   * Get the list of dynamic lights that hit this sprite.
+   */
+  csLightHitsSprite* GetDynamicLights () { return dynamiclights; }
+
+  /**
+   * Light sprite according to the given array of lights (i.e.
+   * fill the vertex color array).
+   * No shadow calculation will be done. This is assumed to have
+   * been done earlier. This is a primitive lighting process
+   * based on the lights which hit one point of the sprite (usually
+   * the center). More elaborate lighting systems are possible
+   * but this will do for now.
+   */
+  virtual void UpdateLighting (csLight** lights, int num_lights) = 0;
+
+  /**
+   * Draw this sprite given a camera transformation.
+   * If needed the skeleton state will first be updated.
+   * Optionally update lighting if needed (DeferUpdateLighting()).
+   */
+  virtual void Draw (csRenderView& rview) = 0;
+
+  CSOBJTYPE;
+};
+
+
+/**
+ * A 3D sprite based on a triangle mesh with a single texture.
+ * Animation is done with frames (a frame may be controlled by
+ * a skeleton).
+ */
+class csSprite3D : public csSprite
+{
+  friend class Dumper;
+  friend class csCollider;
+
+private:
+  /// Set the size of internally used tables
+  static void UpdateWorkTables (int max_size);
+
+  /// Update defered lighting.
+  void UpdateDeferedLighting ();
+
+public:
   /**
    * Configuration value for global LOD. 0 is lowest detail, 1 is maximum.
    * If negative then the base mesh is used and no LOD reduction/computation
@@ -376,9 +516,6 @@ public:
    * Otherwise an approximation is used. This is a lot faster though.
    */
   static bool do_quality_lighting;
-
-protected:
-  UInt MixMode;
 
 private:
   /// Object to world transformation.
@@ -422,33 +559,8 @@ private:
   ///
   bool force_otherskin;
 
-  /**
-   * List of light-hits-sprites for this sprite.
-   */
-  csLightHitsSprite* dynamiclights;
-
   /// Skeleton state (optional).
   csSkeletonState* skeleton_state;
-
-  /// Defered lighting. If > 0 then we have defered lighting.
-  int defered_num_lights;
-
-  /// Flags to use for defered lighting.
-  int defered_lighting_flags;
-
-  /// The callback which is called just before drawing.
-  csSpriteCallback* draw_callback;
-
-  /// This callback is only called if the sprite is actually drawn.
-  csSpriteCallback2* draw_callback2;
-
-  /**
-   * Flag which is set to true when the sprite is visible.
-   * This is used by the c-buffer/bsp routines. The sprite itself
-   * will not use this flag in any way at all. It is simply intended
-   * for external visibility culling routines.
-   */
-  bool is_visible;
 
   /**
    * High quality version of UpdateLighting() which recalculates
@@ -466,7 +578,7 @@ private:
    * Update the bounding box for the polygon tree
    * algorithm.
    */
-  void UpdatePolyTreeBBox ();
+  virtual void UpdatePolyTreeBBox ();
 
 public:
   ///
@@ -483,20 +595,8 @@ public:
   /// Get the skeleton state for this sprite.
   csSkeletonState* GetSkeletonState () { return skeleton_state; }
 
-  /// Get the bounding box object for the polygon tree.
-  csPolyTreeBBox& GetBBoxObject () { return bbox; }
-
   /// force a new texture skin other than default
   void SetTexture (const char* name, csTextureList* textures);
-
-  /// Mark this sprite as visible.
-  void MarkVisible () { is_visible = true; }
-
-  /// Mark this sprite as invisible.
-  void MarkInvisible () { is_visible = false; }
-
-  /// Return if this sprite is visible.
-  bool IsVisible () { return is_visible; }
 
   /**
    * Set a color for a vertex.
@@ -530,27 +630,12 @@ public:
   /**
    * Light sprite according to the given array of lights (i.e.
    * fill the vertex color array).
-   * No shadow calculation will be done. This is assumed to have
-   * been done earlier. This is a primitive lighting process
-   * based on the lights which hit one point of the sprite (usually
-   * the center). More elaborate lighting systems are possible
-   * but this will do for now.
    */
-  void UpdateLighting (csLight** lights, int num_lights);
-
-  /**
-   * Update lighting as soon as the sprite becomes visible.
-   * This will call world->GetNearestLights with the supplied
-   * parameters.
-   */
-  void DeferUpdateLighting (int flags, int num_lights);
+  virtual void UpdateLighting (csLight** lights, int num_lights);
 
   ///
   void UnsetTexture ()
   { force_otherskin = false; }
-
-  /// Sets the mode that is used, when drawing that sprite.
-  void SetMixmode (UInt m) { MixMode = m; }
 
   /**
    * Set the transformation vector to move sprite to some position.
@@ -627,31 +712,7 @@ public:
    * If needed the skeleton state will first be updated.
    * Optionally update lighting if needed (DeferUpdateLighting()).
    */
-  void Draw (csRenderView& rview);
-
-  /**
-   * Set a callback which is called just before the sprite is drawn.
-   * This is useful to do some expensive computations which only need
-   * to be done on a visible sprite.
-   */
-  void SetDrawCallback (csSpriteCallback* callback) { draw_callback = callback; }
-
-  /**
-   * Set a callback which is called only if the sprite is actually drawn.
-   */
-  void SetDrawCallback2 (csSpriteCallback2* callback) { draw_callback2 = callback; }
-
-  /**
-   * Get the draw callback. If there are multiple draw callbacks you can
-   * use this function to chain.
-   */
-  csSpriteCallback* GetDrawCallback () { return draw_callback; }
-
-  /**
-   * Get the draw callback. If there are multiple draw callbacks you can
-   * use this function to chain.
-   */
-  csSpriteCallback2* GetDrawCallback2 () { return draw_callback2; }
+  virtual void Draw (csRenderView& rview);
 
   /**
    * Go to the next frame depending on the current time in milliseconds.
@@ -712,12 +773,6 @@ public:
   /// Get sprite transform
   inline const csMatrix3 &GetT2W () const { return m_obj2world; }
 
-  /// Move this sprite to one sector (conveniance function).
-  void MoveToSector (csSector* s);
-
-  /// Remove this sprite from all sectors it is in (but not from the world).
-  void RemoveFromSectors ();
-
   /**
    * Get an array of object vertices which is valid for the given frame.
    * This function correcty acounts for sprites which use skeletons. In
@@ -728,23 +783,6 @@ public:
    * if other calls to the sprite happen.
    */
   csVector3* GetObjectVerts (csFrame* fr);
-
-  /**
-   * Unlink a light-hits-sprite from the list.
-   * Warning! This function does not test if it
-   * is really on the list!
-   */
-  void UnlinkDynamicLight (csLightHitsSprite* lp);
-
-  /**
-   * Add a light-hits-sprite to the list.
-   */
-  void AddDynamicLight (csLightHitsSprite *lp);
-
-  /**
-   * Get the list of dynamic lights that hit this sprite.
-   */
-  csLightHitsSprite* GetDynamicLights () { return dynamiclights; }
 
   CSOBJTYPE;
 };

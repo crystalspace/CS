@@ -51,7 +51,7 @@ void csSprite2D::MoveToSector (csSector* s)
 {
   RemoveFromSectors ();
   sectors.Push (s);
-  s->sprites2d.Push (this);
+  s->sprites.Push (this);
 }
 
 void csSprite2D::RemoveFromSectors ()
@@ -61,11 +61,11 @@ void csSprite2D::RemoveFromSectors ()
     csSector* ss = (csSector*)sectors.Pop ();
     if (ss)
     {
-      int idx = ss->sprites2d.Find (this);
+      int idx = ss->sprites.Find (this);
       if (idx >= 0)
       {
-        ss->sprites2d[idx] = NULL;
-        ss->sprites2d.Delete (idx);
+        ss->sprites[idx] = NULL;
+        ss->sprites.Delete (idx);
       }
     }
   }

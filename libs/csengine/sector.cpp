@@ -84,9 +84,6 @@ csSector::~csSector ()
   for (i = 0 ; i < sprites.Length (); i++) sprites[i] = NULL;
   sprites.DeleteAll ();
 
-  for (i = 0 ; i < sprites2d.Length (); i++) sprites2d[i] = NULL;
-  sprites2d.DeleteAll ();
-
   lights.DeleteAll ();
 
   terrains.DeleteAll ();
@@ -680,7 +677,7 @@ void csSector::Draw (csRenderView& rview)
 
   // In some cases this queue will be filled with all visible
   // sprites.
-  csSprite3D** sprite_queue = NULL;
+  csSprite** sprite_queue = NULL;
   int num_sprite_queue = 0;
 
   csCBuffer* c_buffer = csWorld::current_world->GetCBuffer ();
@@ -699,9 +696,9 @@ void csSector::Draw (csRenderView& rview)
       {
         for (i = 0 ; i < sprites.Length () ; i++)
         {
-          csSprite3D* sp3d = (csSprite3D*)sprites[i];
-	  sp3d->MarkInvisible ();
-	  sp3d->GetBBoxObject ().ClearTransform ();
+          csSprite* sp = (csSprite*)sprites[i];
+	  sp->MarkInvisible ();
+	  sp->GetBBoxObject ().ClearTransform ();
         }
       }
 
@@ -721,12 +718,12 @@ void csSector::Draw (csRenderView& rview)
       {
 	// Push all visible sprites in a queue.
 	// @@@ Avoid memory allocation?
-	CHK (sprite_queue = new csSprite3D* [sprites.Length ()]);
+	CHK (sprite_queue = new csSprite* [sprites.Length ()]);
 	num_sprite_queue = 0;
         for (i = 0 ; i < sprites.Length () ; i++)
         {
-          csSprite3D* sp3d = (csSprite3D*)sprites[i];
-	  if (sp3d->IsVisible ()) sprite_queue[num_sprite_queue++] = sp3d;
+          csSprite* sp = (csSprite*)sprites[i];
+	  if (sp->IsVisible ()) sprite_queue[num_sprite_queue++] = sp;
 	}
       }
     }
@@ -855,14 +852,14 @@ void csSector::Draw (csRenderView& rview)
 
     for (i = 0 ; i < spr_num ; i++)
     {
-      csSprite3D* sp3d;
-      if (sprite_queue) sp3d = sprite_queue[i];
-      else sp3d = (csSprite3D*)sprites[i];
+      csSprite* sp;
+      if (sprite_queue) sp = sprite_queue[i];
+      else sp = (csSprite*)sprites[i];
 
-      if (!previous_sector || sp3d->sectors.Find (previous_sector) == -1)
+      if (!previous_sector || sp->sectors.Find (previous_sector) == -1)
       {
         // Sprite is not in the previous sector or there is no previous sector.
-        sp3d->Draw (rview);
+        sp->Draw (rview);
       }
       else
       {
@@ -875,7 +872,7 @@ void csSector::Draw (csRenderView& rview)
 	  )
 	{
 	  // @@@ Here we should draw clipped to the portal.
-          sp3d->Draw (rview);
+          sp->Draw (rview);
 	}
       }
     }
