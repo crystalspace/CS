@@ -91,13 +91,15 @@ void csIsoCell::RemoveSprite(iIsoSprite *sprite, const csVector3& pos)
   if(p==0) return; /// not found, nothing to do.
   if(p->left==NULL)
   {
-    if(removey < parent->drawpart->GetPosition().y)
+    if(!parent) root = p->right;
+    else if(removey < parent->drawpart->GetPosition().y)
       parent->left = p->right;
     else parent->right = p->right;
   }
   else if(p->right == NULL)
   {
-    if(removey < parent->drawpart->GetPosition().y)
+    if(!parent) root = p->left;
+    else if(removey < parent->drawpart->GetPosition().y)
       parent->left = p->left;
     else parent->right = p->left;
   }
