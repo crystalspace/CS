@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+5-Feb-2004
+	- res added a small convenience wrapper arounf LoadLibrary() and 
+	  FreeLibrary() for Win32.
 4-Feb-2004
 	- Jorrit started the removal of the old effect system (used in OR).
 	  This is unused and doesn't work properly as well.  Removed support

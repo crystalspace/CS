@@ -34,6 +34,7 @@
 
 #include "csutil/win32/wintools.h"
 #include "win32kbd.h"
+#include "cachedll.h"
 
 #include <stdio.h>
 #include <time.h>
@@ -231,7 +232,7 @@ bool csPlatformStartup(iObjectRegistry* r)
     so we have to check if it's available, and if not, patch the PATH
     env var.
    */
-  HMODULE hKernel32 = LoadLibrary ("kernel32.dll");
+  cswinCacheDLL hKernel32 ("kernel32.dll");
   if (hKernel32 != 0)
   {
     LPFNSETDLLDIRECTORYA SetDllDirectoryA =
@@ -253,7 +254,6 @@ bool csPlatformStartup(iObjectRegistry* r)
       if (path.Length () > 0) SetDllDirectoryA (path.GetData ());
       needPATHpatch = false;
     }
-    FreeLibrary (hKernel32);
   }
 #endif
 

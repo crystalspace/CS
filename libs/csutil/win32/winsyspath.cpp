@@ -22,6 +22,7 @@
 #include "csutil/syspath.h"
 
 #include <windows.h>
+#include "cachedll.h"
 
 typedef DWORD (STDAPICALLTYPE* PFNGETLONGPATHNAMEA) (LPCSTR lpszShortPath, 
 						     LPSTR lpszLongPath,
@@ -109,7 +110,7 @@ char* csExpandPath (const char* path)
   DWORD result = 0;
   PFNGETLONGPATHNAMEA GetLongPathName = 0;
   // unfortunately, GetLongPathName() is only supported on Win98+/W2k+
-  HMODULE hKernel32 = LoadLibrary ("kernel32.dll");
+  static cswinCacheDLL hKernel32 ("kernel32.dll");
   if (hKernel32 != 0)
   {
     GetLongPathName = 
@@ -119,7 +120,6 @@ char* csExpandPath (const char* path)
       GetLongPathName = MyGetLPN;
     }
     result = GetLongPathName (fullName, fullName, sizeof (fullName));
-    FreeLibrary (hKernel32);
   }
   if (result == 0) 
   {

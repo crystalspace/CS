@@ -20,6 +20,7 @@
 #define __CS_SYS_WIN32_SHELLSTUFF_H__
 
 #include <shlobj.h>
+#include "cachedll.h"
 
 // This file contains some newer SHELL32 stuff, for example not found
 // in MinGW Win32 headers.
@@ -43,26 +44,23 @@ typedef HRESULT (STDAPICALLTYPE* SHGETFOLDERPATHAPROC)(HWND hwndOwner,
 static inline bool
 GetShellFolderPath (int CSIDL, char* path)
 {
-  HINSTANCE hinstDll;
   bool result = false;
 
   // ShFolder.dll can 'emulate' special folders on older Windowses.
-  hinstDll = LoadLibrary ("shfolder.dll");
+  static cswinCacheDLL shFolder ("shfolder.dll");
 	
-  if(hinstDll)
+  if (shFolder)
   {
     SHGETFOLDERPATHAPROC SHGetFolderPathA;
 
     SHGetFolderPathA = 
-      (SHGETFOLDERPATHAPROC) GetProcAddress (hinstDll, "SHGetFolderPathA");
+      (SHGETFOLDERPATHAPROC) GetProcAddress (shFolder, "SHGetFolderPathA");
 
     if (SHGetFolderPathA)
     {
       result = (SHGetFolderPathA (0, CSIDL, 0, 
 	SHGFP_TYPE_CURRENT, path) == S_OK);
     }
-
-    FreeLibrary(hinstDll);
   }
   else
   {
