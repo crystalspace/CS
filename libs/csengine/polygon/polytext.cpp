@@ -1036,6 +1036,12 @@ b:      if (scanL2 == MinIndex) goto finish;
 
     while (sy >= fin_y)
     {
+      // @@@ This should not be needed. But if this line isn't here
+      // then I can get crashes with dynamic lights. This happens
+      // easily if I use room.zip. We need to investigate exactly
+      // why this can occur. In principle it shouldn't.
+      if (sy < 0) goto finish;
+    
       // Compute the rounded screen coordinates of horizontal strip
       float _l = sxL, _r = sxR;
 
