@@ -102,3 +102,5 @@ endif
 # this flag if your EGCS compiler crashes with an "internal compiler error"
 # while compiling Crystal Space.
 BUGGY_EGCS_COMPILER=yes
+
+PYTHON_PATH=/usr/include/python1.5
