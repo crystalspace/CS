@@ -192,10 +192,6 @@ fType  csGraphics3DOGLCommon::fName = (fType) NULL;
 # include "csglext.h"
 # undef CSGL_FUNCTION
 
-#ifdef CSGL_EXT_STATIC_ASSERTION
-#include "extstat.h"
-#endif
-
 float sAc, sBc, sCc, sDc;
 //csMatrix3 sM;
 //csVector3 sV;

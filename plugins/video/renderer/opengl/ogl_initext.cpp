@@ -37,6 +37,7 @@ allFound = allFound && fName != NULL;
 # define CSGL_FUNCTION(fType,fName) \
 csGraphics3DOGLCommon::fName = (fType) ::fName; \
 allFound = allFound && fName != NULL;
+#include "extstat.h"
 #endif
 
 // -----------------------
