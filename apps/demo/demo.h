@@ -22,6 +22,7 @@
 #include <stdarg.h>
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
+#include "csutil/csstrvec.h"
 
 struct iEngine;
 struct iSector;
@@ -65,7 +66,11 @@ public:
   char message[255];
   csTicks message_timer;
   bool message_error;
-  bool do_demo;
+
+  int do_demo;
+  int selected_demo;
+  csStrVector demos;
+  int first_y;	// First y location where list of demo files start.
 
 private:
   iMeshWrapper* LoadObject (const char* objname, const char* filename,
@@ -75,6 +80,8 @@ private:
   void FileWrite (iFile* file, char *str, ...);
 
   void DrawEditInfo ();
+
+  bool LoadDemoFile (const char* demofile);
 
 public:
   Demo ();

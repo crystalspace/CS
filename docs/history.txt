@@ -3,6 +3,10 @@ The history order is reversed so that new features are at the top.
 13-Mar-2002
 	- Fixed mdl2spr so that it now correctly generates a MESHFACT
 	  keyword instead of MESHOBJ.
+	- csdemo will now show a list of all demo data files that it can
+	  find in the current directory and the data dir if you start it
+	  without commandline. In that case you can click and select the
+	  data file that you want to run.
 12-Mar-2002
 	- Made the lightmap cache for pseudo-dynamic lightmaps (shadow
 	  maps) a bit more robust. Previously changing pseudo-dynamic

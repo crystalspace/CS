@@ -52,6 +52,7 @@
 #include "imesh/object.h"
 #include "imap/reader.h"
 #include "imap/parser.h"
+#include "iutil/strvec.h"
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
 #include "iutil/event.h"
@@ -60,11 +61,12 @@
 #include "iutil/virtclk.h"
 #include "iutil/csinput.h"
 #include "iutil/cmdline.h"
+#include "iutil/plugin.h"
+#include "iutil/vfs.h"
+#include "csutil/csstrvec.h"
 #include "igraphic/imageio.h"
 #include "ivaria/reporter.h"
 #include "qsqrt.h"
-#include "iutil/plugin.h"
-#include "iutil/vfs.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -169,6 +171,71 @@ static bool DemoEventHandler (iEvent& ev)
   {
     return System ? System->DemoHandleEvent (ev) : false;
   }
+}
+
+static void TestDemoFile (const char* zip, iVFS* myVFS, csStrVector& demos)
+{
+  iDataBuffer* realpath_db = myVFS->GetRealPath (zip);
+  char* realpath = (char*)(realpath_db->GetData ());
+  char* testpath = new char [strlen (realpath)+3];
+  strcpy (testpath, realpath);
+  realpath_db->DecRef ();
+  if (testpath[strlen (testpath)-1] == '/')
+  {
+    // We have a directory.
+    int l = strlen (testpath);
+    testpath[l-1] = '$';
+    testpath[l] = '/';
+    testpath[l+1] = 0;
+  }
+  else if (strstr (testpath, ".zip") == NULL)
+  {
+    delete[] testpath;
+    return;
+  }
+
+  myVFS->Mount ("/tmp/csdemo_temp", testpath);
+  if (myVFS->Exists ("/tmp/csdemo_temp/sequences"))
+    demos.Push (csStrNew (testpath));
+  myVFS->Unmount ("/tmp/csdemo_temp", NULL);
+  delete[] testpath;
+}
+
+bool Demo::LoadDemoFile (const char* demofile)
+{
+  do_demo = 3;
+  myVFS->Mount ("/data/demo", demofile);
+
+  if (!myVFS->ChDir ("/data/demo"))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR,
+	  "The directory on VFS for demo file does not exist!");
+   return false;
+  }
+
+  // This can fail, but we don't care :-)
+  loader->LoadLibraryFile ("library");
+
+  if (!loader->LoadMapFile ("world", false, true))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "There was an error loading world!");
+    exit (0);
+  }
+
+  room = engine->GetSectors ()->FindByName ("room");
+  seqmgr = new DemoSequenceManager (this);
+  seqmgr->Setup ("sequences");
+
+  engine->Prepare ();
+
+  view = new csView (engine, myG3D);
+  view->GetCamera ()->SetSector (room);
+  view->GetCamera ()->GetTransform ().SetOrigin (
+  	  csVector3 (0.0f, 0.0f, -900.0f));
+  view->GetCamera ()->GetTransform ().RotateThis (
+  	  csVector3 (0.0f, 1.0f, 0.0f), 0.8f);
+  view->SetRectangle (0, 0, myG2D->GetWidth (), myG2D->GetHeight ());
+  return true;
 }
 
 bool Demo::Initialize (int argc, const char* const argv[],
@@ -280,42 +347,33 @@ bool Demo::Initialize (int argc, const char* const argv[],
   const char *val;
   if ((val = cmdline->GetName ()) != NULL)
   {
-    do_demo = true;
-    myVFS->Mount ("/data/demo", val);
-
-    if (!myVFS->ChDir ("/data/demo"))
-    {
-      Report (CS_REPORTER_SEVERITY_ERROR,
-	  "The directory on VFS for demo file does not exist!");
-     return false;
-    }
-
-    // This can fail, but we don't care :-)
-    loader->LoadLibraryFile ("library");
-
-    if (!loader->LoadMapFile ("world", false, true))
-    {
-      Report (CS_REPORTER_SEVERITY_ERROR, "There was an error loading world!");
-      exit (0);
-    }
-
-    room = engine->GetSectors ()->FindByName ("room");
-    seqmgr = new DemoSequenceManager (this);
-    seqmgr->Setup ("sequences");
-
-    engine->Prepare ();
-
-    view = new csView (engine, myG3D);
-    view->GetCamera ()->SetSector (room);
-    view->GetCamera ()->GetTransform ().SetOrigin (
-  	  csVector3 (0.0f, 0.0f, -900.0f));
-    view->GetCamera ()->GetTransform ().RotateThis (
-  	  csVector3 (0.0f, 1.0f, 0.0f), 0.8f);
-    view->SetRectangle (0, 0, myG2D->GetWidth (), myG2D->GetHeight ());
+    if (!LoadDemoFile (val))
+      return false;
   }
   else
   {
-    do_demo = false;
+    do_demo = 0;
+    selected_demo = -1;
+    // Here we can't do the demo because no data file was given.
+    // However we scan for possible data files and present them to the
+    // user.
+    iStrVector* zips = myVFS->FindFiles ("/this/*");
+    int i;
+    for (i = 0 ; i < zips->Length () ; i++)
+    {
+      char* zip = zips->Get (i);
+      TestDemoFile (zip, myVFS, demos);
+    }
+    zips->DecRef ();
+    myVFS->Mount ("/tmp/csdemo_datadir", "$@data$/");
+    zips = myVFS->FindFiles ("/tmp/csdemo_datadir/*");
+    for (i = 0 ; i < zips->Length () ; i++)
+    {
+      char* zip = zips->Get (i);
+      TestDemoFile (zip, myVFS, demos);
+    }
+    zips->DecRef ();
+    myVFS->Unmount ("/tmp/csdemo_datadir", NULL);
   }
 
   cmdline->DecRef ();
@@ -389,13 +447,16 @@ void Demo::ShowError (const char* msg, ...)
 
 void Demo::SetupFrame ()
 {
-  if (!do_demo)
+  if (do_demo == 0)
   {
     // Don't do the demo but print out information about
     // where to get all stuff.
     if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
     iTextureManager* txtmgr = myG3D->GetTextureManager ();
     int col_bg = txtmgr->FindRGB (200, 180, 180);
+    int col_fgdata = txtmgr->FindRGB (20, 70, 20);
+    int col_bgsel = txtmgr->FindRGB (255, 255, 255);
+    int col_fgsel = txtmgr->FindRGB (0, 0, 0);
     myG2D->Clear (col_bg);
     int tx = 10;
     int ty = 10;
@@ -405,27 +466,71 @@ void Demo::SetupFrame ()
     	"To use this demo you need to give a data file."); ty += 10;
     GfxWrite (tx, ty, col_black, col_bg,
     	"Download 'demodata.zip' from"); ty += 10;
-    GfxWrite (tx, ty, col_red, col_bg,
+    GfxWrite (tx, ty, col_fgdata, col_bg,
     	"    ftp://sunsite.dk/projects/crystal/cs094/levels/demodata.zip"); ty += 10;
 
-    ty += 10;
     ty += 10;
 
     GfxWrite (tx, ty, col_black, col_bg,
     	"After you downloaded demodata you can rerun this demo as follows:"); ty += 10;
-    GfxWrite (tx, ty, col_red, col_bg,
+    GfxWrite (tx, ty, col_fgdata, col_bg,
     	"    csdemo demodata.zip"); ty += 10;
     ty += 10;
     GfxWrite (tx, ty, col_black, col_bg,
     	"or you can run it with OpenGL and a higher resolution:"); ty += 10;
-    GfxWrite (tx, ty, col_red, col_bg,
+    GfxWrite (tx, ty, col_fgdata, col_bg,
     	"    csdemo demodata.zip -video=opengl -mode=800x600"); ty += 10;
 
     ty += 10;
-    ty += 10;
 
-    GfxWrite (tx, ty, col_black, col_bg,
-    	"Good luck!      (exit this program by pressing ESC)"); ty += 10;
+    if (demos.Length () == 0)
+    {
+      GfxWrite (tx, ty, col_black, col_bg,
+    	"I could not find any data files in this and the data directory!");
+      ty += 10;
+      GfxWrite (tx, ty, col_black, col_bg,
+    	"Press ESC to exit this program.");
+      ty += 10;
+    }
+    else
+    {
+      GfxWrite (tx, ty, col_black, col_bg,
+    	"Here are all the demo data files that I could find in this and the data dir:"); ty += 10;
+      GfxWrite (tx, ty, col_black, col_bg,
+    	"You can select one to run that demo or press ESC to exit this program."); ty += 10;
+      ty += 10;
+      first_y = ty;
+      int i;
+      for (i = 0 ; i < demos.Length () ; i++)
+      {
+	int bg = col_bg;
+	int fg = col_fgdata;
+        if (selected_demo == i)
+	{
+	  bg = col_bgsel;
+	  fg = col_fgsel;
+	  myG2D->DrawBox (tx, ty, myG2D->GetWidth ()-2*tx, 10, bg);
+	}
+        GfxWrite (tx+30, ty, fg, bg, demos.Get (i)); ty += 10;
+      }
+    }
+
+    return;
+  }
+  else if (do_demo == 1)
+  {
+    if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
+    myG2D->Clear (0);
+    do_demo++;
+    return;
+  }
+  else if (do_demo == 2)
+  {
+    if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
+    myG2D->Clear (0);
+    if (!LoadDemoFile (demos.Get (selected_demo)))
+      return;
+    do_demo++;
     return;
   }
 
@@ -632,7 +737,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
     bool alt = (Event.Key.Modifiers & CSMASK_ALT) != 0;
     bool ctrl = (Event.Key.Modifiers & CSMASK_CTRL) != 0;
 
-    if (!do_demo)
+    if (do_demo != 3)
     {
       if (Event.Key.Code == CSKEY_ESC)
       {
@@ -1219,9 +1324,18 @@ bool Demo::DemoHandleEvent (iEvent &Event)
       }
     }
   }
-  else if (do_demo && Event.Type == csevMouseDown)
+  else if (Event.Type == csevMouseDown)
   {
-    if (Event.Mouse.Button == 1)
+    if (do_demo == 0)
+    {
+      selected_demo = (Event.Mouse.y - first_y) / 10;
+      if (selected_demo >= 0 && selected_demo < demos.Length ())
+        do_demo = 1;
+    }
+    else if (do_demo < 3)
+    {
+    }
+    else if (Event.Mouse.Button == 1)
     {
       csVector2 p (Event.Mouse.x, myG2D->GetHeight ()-Event.Mouse.y);
       csVector3 v;
@@ -1254,6 +1368,15 @@ bool Demo::DemoHandleEvent (iEvent &Event)
 	map_br.x = cx+dx*.9;
 	map_br.y = cy+dy*.9;
       }
+    }
+  }
+  else if (Event.Type == csevMouseMove)
+  {
+    if (do_demo == 0)
+    {
+      selected_demo = (Event.Mouse.y - first_y) / 10;
+      if (!(selected_demo >= 0 && selected_demo < demos.Length ()))
+        selected_demo = -1;
     }
   }
 
