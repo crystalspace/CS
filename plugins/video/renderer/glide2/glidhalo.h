@@ -28,7 +28,7 @@
 class csGraphics3DGlide2x;
 
 struct csG3DHardwareHaloInfo{
-  HighColorCacheAndManage_Data *halo;
+  csGlideCacheData *halo;
 };
 
 // The structure that stays behind csHaloHandle

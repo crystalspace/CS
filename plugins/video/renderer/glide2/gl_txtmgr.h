@@ -22,56 +22,7 @@
 #include "csutil/scf.h"
 #include "cs3d/common/txtmgr.h"
 #include "itexture.h"
-
-class csTextureMMGlide;
-class csTextureManagerGlide;
-struct iImage;
-
-// Colors are encoded in a 16-bit short using the following
-// distribution (only for 8-bit mode):
-#define BITS_RED 6
-#define BITS_GREEN 6
-#define BITS_BLUE 4
-#define MASK_RED ((1<<BITS_RED)-1)
-#define MASK_GREEN ((1<<BITS_GREEN)-1)
-#define MASK_BLUE ((1<<BITS_BLUE)-1)
-#define NUM_RED (1<<BITS_RED)
-#define NUM_GREEN (1<<BITS_GREEN)
-#define NUM_BLUE (1<<BITS_BLUE)
-
-#define TABLE_RED	0
-#define TABLE_GREEN	1
-#define TABLE_BLUE	2
-#define TABLE_RED_HI	3
-#define TABLE_GREEN_HI	4
-#define TABLE_BLUE_HI	5
-
-typedef UShort RGB16map[256];
-typedef unsigned char RGB8map[256];
-
-/// The prefered distances to use for the color matching.
-#define PREFERED_DIST 16333
-#define PREFERED_COL_DIST 133333
-
-#define R24(rgb) (((rgb)>>16)&0xff)
-#define G24(rgb) (((rgb)>>8)&0xff)
-#define B24(rgb) ((rgb)&0xff)
-
-/**
- * Lookup table entry corresponding to one palette entry.
- * 'red', 'green', and 'blue' are tables giving the red, green,
- * and blue components for all light levels of that palette index.
- */
-struct PalIdxLookup
-{
-  RGB16map red;
-  RGB16map green;
-  RGB16map blue;
-};
-
-#define R24(rgb) (((rgb)>>16)&0xff)
-#define G24(rgb) (((rgb)>>8)&0xff)
-#define B24(rgb) ((rgb)&0xff)
+#include "iimage.h"
 
 /**
  * csTextureMMGlide represents a texture and all its mipmapped
@@ -80,21 +31,42 @@ struct PalIdxLookup
 class csTextureMMGlide : public csTextureMM
 {
 private:
-  /// Convert ImageFile to internal format.
-  virtual void convert_to_internal (csTextureManager* texman, iImage* imfile, unsigned char* bm);
-
+  
 public:
-  ///
+  /// Create a mipmapped texture object
   csTextureMMGlide (iImage* image, int flags);
-  ///
-  virtual ~csTextureMMGlide ();
+  /// Create a new csTextureGlide object
+  virtual csTexture *new_texture (iImage *Image);
+  /// Compute the mean color
+  virtual void compute_mean_color ();
+  /// Encode 24 bit data into 16 bit ( 565 RGB scheme )
+  virtual void remap_mm ();
+  
+};
 
-  /**
-   * This function does not really remap but it converts
-   * the format to an ULong format suitable for 24-bit
-   * internal texture format.
-   */
-  virtual void remap_palette_24bit (csTextureManager* texman);
+/**
+* The Glide version of csTexture
+*/
+class csTextureGlide : public csTexture
+{
+  friend class csTextureMMGlide;
+  /// the original image
+  iImage *image;
+  /// 16 bit encoded raw image data
+  UShort *raw;
+public:
+  /// Create a new texture object
+  csTextureGlide (csTextureMM *Parent, iImage *Image);
+  /// Destroy the texture object
+  virtual ~csTextureGlide ();
+  /// Get the raw bitmap data
+  virtual void *get_bitmap () 
+  { return (void *) raw; }
+  /// 
+  RGBPixel *get_image_data ()
+  { return (RGBPixel*)image->GetImageData (); }
+  iImage *get_image ()
+  { return image; }
 };
 
 /**
@@ -102,11 +74,6 @@ public:
  */
 class csTextureManagerGlide : public csTextureManager
 {
-private:
-  /**
-   * Encode RGB values to a 16-bit word (for 16-bit mode).
-   */
-  ULong encode_rgb (int r, int g, int b);
 
 public:
   ///
@@ -123,12 +90,8 @@ public:
   ///
   virtual void UnregisterTexture (iTextureHandle* handle);
 
-  /**
-   * Remap all textures.
-   */
-  void remap_textures ();
 };
 
 
-#endif // TXTMGR_OPENGL_H
+#endif 
 

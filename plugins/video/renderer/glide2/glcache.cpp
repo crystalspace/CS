@@ -30,7 +30,7 @@
 #include "glide.h"
 
 GlideTextureCache::GlideTextureCache(TMUInfo *t, int bpp, TextureMemoryManager *man)
-: HighColorCacheAndManage(t->memory_size, HIGHCOLOR_TEXCACHE, bpp,man)
+: HighColorCache(t->memory_size, HIGHCOLOR_TEXCACHE, bpp,man)
 {
   m_tmu = t;
 //  m_tmu->currentAddress = m_tmu->minAddress;
@@ -47,7 +47,7 @@ void GlideTextureCache::Dump()
   //CsPrintf (MSG_CONSOLE, "Fragmentation of Memory: %d\n",manager->getFragmentationState());
 }
 
-void GlideTextureCache::Load(HighColorCacheAndManage_Data *d)
+void GlideTextureCache::Load(csGlideCacheData *d)
 {
 
   iTextureHandle* txt_handle = (iTextureHandle*)d->pSource;
@@ -217,8 +217,7 @@ void GlideTextureCache::Load(HighColorCacheAndManage_Data *d)
 
     //piTM->GetBitmap(&lpSrc);
     //ASSERT( lpSrc != NULL );
-    lpSrc = txt_unl->get_bitmap();
-
+    lpSrc = (unsigned char *) txt_unl->get_bitmap();
     //if(bpp==16)
     {
       texhnd->info.format=GR_TEXFMT_RGB_565;
@@ -300,7 +299,7 @@ void GlideTextureCache::Load(HighColorCacheAndManage_Data *d)
         height = piTM->GetHeight();
         lpSrc = piTM->GetBitmap();*/
         csTexture* txt_mip = txt_mm->get_texture (i);
-        src = txt_mip->get_bitmap();
+        src = (unsigned char*)txt_mip->get_bitmap();
 //        ASSERT( src != NULL );
 
         GlideLib_grTexDownloadMipMapLevel(texhnd->tmu->tmu_id,
@@ -325,17 +324,18 @@ void GlideTextureCache::Load(HighColorCacheAndManage_Data *d)
   d->pData = texhnd;
 }
 
-void GlideTextureCache::Unload(HighColorCacheAndManage_Data *d)
+void GlideTextureCache::Unload(csGlideCacheData *d)
 {
-//  TextureHandler * th = (TextureHandler *)d->data;
   manager->freeSpaceMem(d->mempos);
-
+  delete d->mempos;
+  if ( d->pData ) delete (TextureHandler*)d->pData;
+  delete d;
 }
 
-HighColorCacheAndManage_Data * GlideTextureCache::LoadHalo(char *data)
+csGlideCacheData * GlideTextureCache::LoadHalo(char *data)
 {
   CHK (TextureHandler *texhnd = new TextureHandler);
-  CHK (HighColorCacheAndManage_Data *d = new HighColorCacheAndManage_Data);
+  CHK (csGlideCacheData *d = new csGlideCacheData);
 
   int height = 128; 
   int width = 128;
@@ -363,13 +363,16 @@ HighColorCacheAndManage_Data * GlideTextureCache::LoadHalo(char *data)
   return d;
 }
 
-void GlideTextureCache::UnloadHalo(HighColorCacheAndManage_Data *d)
+void GlideTextureCache::UnloadHalo(csGlideCacheData *d)
 {
       manager->freeSpaceMem(d->mempos);
+      delete d->mempos;
+      if ( d->pData ) delete (TextureHandler*)d->pData;
+      delete d;
 }
 
 GlideLightmapCache::GlideLightmapCache(TMUInfo *t,TextureMemoryManager*man)
-: HighColorCacheAndManage(t->memory_size, HIGHCOLOR_LITCACHE, 16,man)
+: HighColorCache(t->memory_size, HIGHCOLOR_LITCACHE, 16,man)
 {
   m_tmu = t;
   
@@ -387,7 +390,7 @@ void GlideLightmapCache::Dump()
   //CsPrintf (MSG_CONSOLE, "Fragmentation of Memory: %d\n",manager->getFragmentationState());
 }
 
-void GlideLightmapCache::Load(HighColorCacheAndManage_Data *d)
+void GlideLightmapCache::Load(csGlideCacheData *d)
 {
   CHK (TextureHandler *texhnd = new TextureHandler);
   iLightMap *piLM = QUERY_INTERFACE (d->pSource, iLightMap);
@@ -584,7 +587,10 @@ void GlideLightmapCache::Load(HighColorCacheAndManage_Data *d)
   piLM->DecRef ();
 }
 
-void GlideLightmapCache::Unload(HighColorCacheAndManage_Data *d)
+void GlideLightmapCache::Unload(csGlideCacheData *d)
 {
   manager->freeSpaceMem(d->mempos);
+  delete d->mempos;
+  if ( d->pData ) delete (TextureHandler*)d->pData;
+  delete d;
 }

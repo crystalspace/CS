@@ -23,7 +23,7 @@
 #if !defined(GLIDECACHE_H_INCLUDED)
 
 #include <glide.h>
-#include "cs3d/glide2/hicache2.h"
+#include "cs3d/glide2/hicache.h"
 #include "itexture.h"
 
 class csGraphics3DGlide;
@@ -48,7 +48,7 @@ typedef struct
 }  TextureHandler;
 
 ///
-class GlideTextureCache: public HighColorCacheAndManage
+class GlideTextureCache: public HighColorCache
 {
 private:
   TMUInfo *m_tmu;
@@ -60,19 +60,19 @@ public:
   virtual void Dump();
   
   /// Load a halo texture data
-  HighColorCacheAndManage_Data * LoadHalo(char *data);
+  csGlideCacheData * LoadHalo(char *data);
   /// Unload halo texture
-  void UnloadHalo(HighColorCacheAndManage_Data *d);
+  void UnloadHalo(csGlideCacheData *d);
 
 protected:
   ///
-  virtual void Load(HighColorCacheAndManage_Data *d);
+  virtual void Load(csGlideCacheData *d);
   ///
-  virtual void Unload(HighColorCacheAndManage_Data *d);
+  virtual void Unload(csGlideCacheData *d);
 };
 
 ///
-class GlideLightmapCache: public HighColorCacheAndManage
+class GlideLightmapCache: public HighColorCache
 {
 private:
   TMUInfo *m_tmu;
@@ -84,9 +84,9 @@ public:
   
 protected:
   ///
-  virtual void Load(HighColorCacheAndManage_Data *d);
+  virtual void Load(csGlideCacheData *d);
   ///
-  virtual void Unload(HighColorCacheAndManage_Data *d);
+  virtual void Unload(csGlideCacheData *d);
 };
 
 #define GLIDECACHE_H_INCLUDED

@@ -64,13 +64,11 @@
 #include "cs3d/glide2/glidelib.h"
 #include "cs3d/glide2/g3dglide.h"
 
-#include "scrnshot.h"
-
 //
 // Interface table definition
 //
 
-#define SysPrintf System->Printf
+#define SysPrintf m_piSystem->Printf
 
 IMPLEMENT_FACTORY (csGraphics3DGlide2x)
 
@@ -662,7 +660,7 @@ bool csGraphics3DGlide2x::Open(const char* Title)
                           GR_COMBINE_OTHER_TEXTURE,FXFALSE);
 
   m_nDrawMode = 0;
-
+ 
   return true;
 }
 
@@ -716,13 +714,47 @@ bool csGraphics3DGlide2x::BeginDraw (int DrawFlags)
       
       // if 3D mode is not enabled, turn it on
       if (!(m_nDrawMode & CSDRAW_3DGRAPHICS))
-        {      
+        {
+//	  ClearBufferUnderTop();
           GlideLib_grBufferClear(0,0,GR_WDEPTHVALUE_FARTHEST);
           
         } /* endif */
     } /* endif */
   m_nDrawMode = DrawFlags;
   return true;
+}
+
+void csGraphics3DGlide2x::ClearBufferUnderTop()
+{
+    /// clear the screen by rendering a black polygon without disturbing overlays
+   GrVertex v[4];
+   v[0].x = 0; v[0].y = 0; 
+   v[1].x = 0; v[1].y = m_nHeight; 
+   v[2].x = m_nWidth; v[2].y = m_nHeight; 
+   v[3].x = m_nWidth; v[3].y = 0;
+   
+   for(int i=0; i < 4; i++ ){
+     v[i].oow = 1./GR_WDEPTHVALUE_FARTHEST;
+//     v[i].r = v[i].g = v[i].b = 0.0; v[i].a = 0;
+   }
+   
+   GrState state;
+  grGlideGetState( &state );
+  GlideLib_grColorCombine(GR_COMBINE_FUNCTION_LOCAL,                    // COLOR COMBINE
+                          GR_COMBINE_FACTOR_NONE,GR_COMBINE_LOCAL_CONSTANT,
+                          GR_COMBINE_OTHER_NONE,FXFALSE);
+   
+   grConstantColorValue( 0xffff0000 ); 
+   G3DZBufMode mode=m_ZBufMode;
+
+   m_ZBufMode=0;
+   grDepthMask( FXTRUE );
+   grDepthBufferFunction( GR_CMP_NOTEQUAL );
+   grDepthBufferMode( GR_DEPTHBUFFER_WBUFFER_COMPARE_TO_BIAS );
+   grDepthBiasLevel( 0 );
+   GlideLib_grDrawPlanarPolygonVertexList(4,v);
+   SetZBufMode (mode);
+  grGlideSetState( &state );
 }
 
 /// End the frame
@@ -918,7 +950,7 @@ void csGraphics3DGlide2x::SetupPolygon( G3DPolygonDP& poly, float& J1, float& J2
 void csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
 {
   if (poly.num < 3) return;
-
+//printf("1\n");
   bool lm_exists=true;
   bool is_transparent = false;
   bool is_colorkeyed = false;
@@ -958,7 +990,9 @@ void csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
 
   if (!pTex) return;
 
+//printf("2\n");
   CacheTexture (pTex);
+//printf("3\n");
 
   if ( poly_alpha != poly.alpha ){
 
@@ -982,11 +1016,20 @@ void csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
   
   // retrieve the cached texture handle.
   tcache = (csGlideCacheData *)txt_mm->GetCacheData ();
-//  ASSERT( tcache );
-        
+/*
+  printf( "pointer %p\n", tcache );
+  printf( "size %ld\n", tcache->lSize );
+  printf( "tex-pointer %p\n", tcache->pSource );
+  printf( "tex-handlerpointer %p\n", tcache->pData );
+  printf( "mempos-pointer %p\n", tcache->mempos );
+  TextureHandler *th = (TextureHandler*)tcache->pData;
+  printf( "loadAddress %ld\n", th->loadAddress );
+  printf( "size %ld\n", th->size );
+  printf( "width, height:  %g %g\n", th->width, th->height );
+*/        
   // retrieve the lightmap from the cache.
   iLightMap* piLM = ( rstate_lighting ? pTex->GetLightMap () : NULL );
-  
+
   if ( piLM )
   {
     lcache = (csGlideCacheData *)piLM->GetCacheData ();
@@ -1095,8 +1138,10 @@ void csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
     }else
       GlideLib_grFogMode( GR_FOG_DISABLE );
   }
+//printf("4\n");
       
   RenderPolygon(m_dpverts,poly.num,lm_exists,thTex,thLm,is_transparent);
+//printf("5\n");
 
   if(is_colorkeyed)
     GlideLib_grChromakeyMode(GR_CHROMAKEY_DISABLE);
@@ -1105,6 +1150,7 @@ void csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
 
 void csGraphics3DGlide2x::StartPolygonFX(iTextureHandle *handle,  UInt mode)
 {
+
   csGlideCacheData* tcache = NULL;
   csTextureMMGlide* txt_mm = (csTextureMMGlide*)handle->GetPrivateObject ();
 
@@ -1131,6 +1177,7 @@ void csGraphics3DGlide2x::StartPolygonFX(iTextureHandle *handle,  UInt mode)
   m_mixmode = mode;
   m_alpha   = float (mode & CS_FX_MASK_ALPHA) / 255.;
   m_gouraud = rstate_gouraud && ((mode & CS_FX_GOURAUD) != 0);
+
 }
 
 void csGraphics3DGlide2x::FinishPolygonFX()
@@ -1735,19 +1782,4 @@ void csGraphics3DGlide2x::csHaloDrawer::drawline_innerrim(int x1, int x2, int y)
 
     r -= rdelta; g -= gdelta; b -= bdelta; a -= adelta;
   }
-}
-
-iImage* csGraphics3DGlide2x::ScreenShot(){
-  int height = m_piG2D->GetHeight();
-  int width = m_piG2D->GetWidth();
-  UShort *data = new UShort[ width * height ];
-  bool succ;
-  succ = GlideLib_grLfbReadRegion( GR_BUFFER_FRONTBUFFER, 0, 0, width, height, width*2, data );
-  if ( succ ){
-    csScreenShot *ss = new csScreenShot ( m_piG2D, data );
-    delete [] data;
-    return ss;
-  }
-  delete [] data;
-  return NULL;
 }

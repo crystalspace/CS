@@ -28,6 +28,7 @@
 #include "ipolygon.h"
 #include "itexture.h"
 #include "ilghtmap.h"
+#include "cs3d/common/texmem.h"
 
 ///
 struct csGlideCacheData
@@ -40,6 +41,8 @@ struct csGlideCacheData
   void *pData;
   /// linked list
   csGlideCacheData *next, *prev;
+  /// tracks the position in texture memory of the board
+  textMemSpace mempos;
 };
 
 ///
@@ -67,7 +70,7 @@ protected:
 
 public:
   /// takes the maximum size of the cache
-  HighColorCache (int max_size, HIGHCOLOR_TYPE type, int bpp);
+  HighColorCache (int max_size, HIGHCOLOR_TYPE type, int bpp, TextureMemoryManager * tm);
   ///
   virtual ~HighColorCache();
 
@@ -84,6 +87,8 @@ public:
 protected:
   ///
   int bpp;
+  /// Manages the boards texture memory
+  TextureMemoryManager * manager;
 
   ///
   virtual void Load (csGlideCacheData *d) = 0;

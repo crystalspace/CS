@@ -116,7 +116,7 @@ void csGlideHalo::Draw (float x, float y, float w, float h, float iIntensity, cs
     GlideLib_grDepthBufferFunction(GR_CMP_ALWAYS);
     GlideLib_grDepthMask(FXFALSE);
 
-    HighColorCacheAndManage_Data *halo=((csG3DHardwareHaloInfo*)haloinfo)->halo;
+    csGlideCacheData *halo=((csG3DHardwareHaloInfo*)haloinfo)->halo;
     TextureHandler *thTex = (TextureHandler *)halo->pData;
     GlideLib_grTexSource(thTex->tmu->tmu_id, thTex->loadAddress,
                          GR_MIPMAPLEVELMASK_BOTH,

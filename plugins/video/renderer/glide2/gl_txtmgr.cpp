@@ -31,70 +31,108 @@
 
 #define RESERVED_COLOR(c) ((c == 0) || (c == 255))
 
+csTextureGlide::csTextureGlide (csTextureMM *Parent, iImage *Image)
+  : csTexture (Parent)
+{
+  image = Image;
+  w = image->GetWidth ();
+  h = image->GetHeight ();
+  raw = NULL;
+  compute_masks ();
+}
+
+csTextureGlide::~csTextureGlide ()
+{
+  if (image) image->DecRef ();
+  if ( raw ) delete [] raw;
+}
+
 csTextureMMGlide::csTextureMMGlide (iImage* image, int flags) : 
   csTextureMM (image, flags)
 {
+  if ( flags & CS_TEXTURE_3D ) adjust_size_po2 ();
+  else printf( "no 3d tex: dim %d, %d\n", image->GetWidth(), image->GetHeight() );
 }
 
-csTextureMMGlide::~csTextureMMGlide ()
+csTexture *csTextureMMGlide::new_texture (iImage *Image)
 {
+  return new csTextureGlide (this, Image);
 }
 
-void csTextureMMGlide::convert_to_internal (csTextureManager* /*texman*/,
-                                            iImage* imfile, unsigned char* bm)
+void csTextureMMGlide::compute_mean_color ()
 {
-  int x,y;
-
-  int w = imfile->GetWidth ();
-  int h = imfile->GetHeight ();
-
-  RGBPixel* bmsrc = (RGBPixel *)imfile->GetImageData ();
-  int r, g, b;
+  csTextureGlide *tex;
+  int i, pixels;
+  RGBPixel *src;
+  unsigned r = 0, g = 0, b = 0;
   
-  UShort* bml = (UShort*)bm;
-  for (y = 0 ; y < h ; y++)
+  // find smallest mipmap around
+  for (i=3; i >= 0; i--)
   {
-    for (x = 0 ; x < w ; x++)
+    tex = (csTextureGlide*)get_texture (i);
+    if (tex) break;
+  }
+  if (!tex) return;
+  
+  i = pixels = tex->get_width () * tex->get_height ();
+  src = tex->get_image_data ();
+  
+  while (i--)
+  {
+    RGBPixel pix = *src++;
+    r += pix.red;
+    g += pix.green;
+    b += pix.blue;
+  }
+  mean_color.red   = r / pixels;
+  mean_color.green = g / pixels;
+  mean_color.blue  = b / pixels;
+}
+
+void csTextureMMGlide::remap_mm ()
+{
+
+  csTextureGlide *tex;
+  int w, h, i;
+  RGBPixel* src;
+  UShort *dest;
+  int x, y;
+
+  for (i=0; i < 4; i++)
+  {
+    tex = (csTextureGlide*)get_texture (i);
+    if (tex)
     {
-      r = bmsrc->red;
-      g = bmsrc->green;
-      b = bmsrc->blue;
-      //*bml++ = (r<<16)|(g<<8)|b;
-      *bml++ = ((r >> 3) << 11) |
-               ((g >> 2) << 5) |
-               ((b >> 3));
-      bmsrc++;
+      w = tex->get_width ();
+      h = tex->get_height ();
+      src = tex->get_image_data ();
+      dest = (UShort *)tex->get_bitmap ();
+      if ( !dest )
+      {
+        CHK ( dest = new UShort[ w*h ] );
+	tex->raw = dest;
+      }
+      
+      for (y = 0 ; y < h ; y++)
+        for (x = 0 ; x < w ; x++)
+        {
+          *dest++ = ((src->red >> 3 ) << 11) |
+                    ((src->green >> 2 ) << 5) |
+                    ((src->blue >> 3));
+          src++;
+        }
     }
   }
 }
 
-void csTextureMMGlide::remap_palette_24bit (csTextureManager*)
-{
-  int w = ifile->GetWidth ();
-  int h = ifile->GetHeight ();
-  RGBPixel* src = (RGBPixel *)ifile->GetImageData ();
-  UShort* dest = (UShort *)t1->get_bitmap ();
-
-  // Map the texture to the RGB palette.
-  int x, y;
-  for (y = 0 ; y < h ; y++)
-    for (x = 0 ; x < w ; x++)
-    {
-      //*dest++ = (src->red<<16) | (src->green<<8) | src->blue;
-      *dest++ = ((src->red >> 3 ) << 11) |
-                ((src->green >> 2 ) << 5) |
-                ((src->blue >> 3));
-      src++;
-    }
-}
-
 //---------------------------------------------------------------------------
 
-csTextureManagerGlide::csTextureManagerGlide (iSystem* iSys, iGraphics2D* iG2D) :
+csTextureManagerGlide::csTextureManagerGlide (iSystem* iSys, iGraphics2D* iG2D,
+  csIniFile *config) :
   csTextureManager (iSys, iG2D)
 {
+  read_config (config);
   Clear ();
-  read_config ();
 }
 
 csTextureManagerGlide::~csTextureManagerGlide ()
@@ -102,57 +140,37 @@ csTextureManagerGlide::~csTextureManagerGlide ()
   Clear ();
 }
 
-ULong csTextureManagerGlide::encode_rgb (int r, int g, int b)
-{
-  return
-    ((r >> (8-pfmt.RedBits))   << pfmt.RedShift) |
-    ((g >> (8-pfmt.GreenBits)) << pfmt.GreenShift) |
-    ((b >> (8-pfmt.BlueBits))  << pfmt.BlueShift);
-}
-
-void csTextureManagerGlide::remap_textures ()
-{
-  int i;
-
-  // Remap all textures according to the new colormap.
-  for (i = 0 ; i < textures.Length () ; i++)
-    ((csTextureMMGlide*)textures[i])->remap_texture (this);
-}
-
 void csTextureManagerGlide::PrepareTextures ()
 {
   int i;
-
-  CHK (delete factory_3d); factory_3d = NULL;
-  CHK (delete factory_2d); factory_2d = NULL;
-  CHK (factory_3d = new csTextureFactory32 ());
-  if (pfmt.PixelBytes == 1)
-    { CHK (factory_2d = new csTextureFactory8 ()); }
-  else if (pfmt.PixelBytes == 2)
-    { CHK (factory_2d = new csTextureFactory16 ()); }
-  else
-    { CHK (factory_2d = new csTextureFactory32 ()); }
-
-  remap_textures ();
+  if (verbose) SysPrintf (MSG_INITIALIZATION, "Preparing textures...\n");
+  if (verbose) SysPrintf (MSG_INITIALIZATION, "  Creating texture mipmaps...\n");
+  for (i = 0 ; i < textures.Length () ; i++)
+  {
+    csTextureMM* txt = textures.Get (i);
+    txt->apply_gamma ();
+    txt->create_mipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
+    ((csTextureMMGlide *)txt)->remap_mm();
+  }
 }
 
 iTextureHandle *csTextureManagerGlide::RegisterTexture (iImage* image,
   int flags)
 {
-  if (!image) return NULL;
+  if (!image) { printf( "NULL image\n"); return NULL; }
 
   csTextureMMGlide *txt = new csTextureMMGlide (image, flags);
   textures.Push (txt);
   return txt;
 }
 
-void csTextureManagerOpenGL::PrepareTexture (iTextureHandle *handle)
+void csTextureManagerGlide::PrepareTexture (iTextureHandle *handle)
 {
-  if (!handle) return;
+  if (!handle) { printf( "NULL image\n"); return; }
 
   csTextureMMGlide *txt = (csTextureMMGlide *)handle->GetPrivateObject ();
   txt->create_mipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
-  txt->remap_texture (this);
+  txt->remap_mm ();
 }
 
 void csTextureManagerGlide::UnregisterTexture (iTextureHandle* handle)
@@ -161,8 +179,3 @@ void csTextureManagerGlide::UnregisterTexture (iTextureHandle* handle)
   //@@@ Not implemented yet.
 }
 
-void csTextureManagerGlide::PrepareTexture (iTextureHandle* handle)
-{
-  (void)handle;
-  //@@@ Not implemented yet.
-}
