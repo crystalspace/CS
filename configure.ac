@@ -86,19 +86,6 @@ m4_define([AS_MKDIR_P],
 
 
 #------------------------------------------------------------------------------
-# CS_ESCAPE(STRING)
-#	Protect special shell characters from shell interpretation.  This is
-#	similar to AS_ESCAPE(), except that it double-protects strings which
-#	will be written first to config.status, and then secondly to an output
-#	file by config.status.  Use this macro to preserve special shell
-#	characters ($"'\) so that they are emitted verbatim to the final target
-#	file by config.status.
-#------------------------------------------------------------------------------
-AC_DEFUN([CS_ESCAPE], [AS_ESCAPE([AS_ESCAPE([$1])])])
-
-
-
-#------------------------------------------------------------------------------
 # CS_TRIM(STRING)
 #	Strip leading and trailing spaces from STRING and collapse internal
 #	runs of multiple spaces to a single space.
@@ -115,13 +102,13 @@ AC_DEFUN([CS_TRIM], [`echo x$1 | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`])
 #	Append text to the contents of the named shell variable.  If the text
 #	contains references to shell variables (such as $foo), then those
 #	references will be expanded.  If expansion is not desired, then protect
-#	the text with CS_ESCAPE().
+#	the text with AS_ESCAPE().
 #
 # CS_TEXT_CACHE_PREPEND(VARIABLE, TEXT)
 #	Prepend text verbatim to the contents of the named shell variable.  If
 #	the text contains references to shell variables (such as $foo), then
 #	those references will be expanded.  If expansion is not desired, then
-#	protect the text with CS_ESCAPE().
+#	protect the text with AS_ESCAPE().
 #
 # CS_TEXT_CACHE_OUTPUT(VARIABLE, FILENAME)
 #	Instruct config.status to write the contents of the named shell
@@ -143,7 +130,7 @@ AC_DEFUN([CS_TEXT_CACHE_OUTPUT],
 		rm -f $2
 		mv $tmp/tcache $2
 	    fi],
-	[$1="$$1" cs_dir=`AS_DIRNAME([$2])`
+	[$1='$$1' cs_dir=`AS_DIRNAME([$2])`
 	    AS_MKDIR_P([AS_ESCAPE([$cs_dir])])])])
 
 
@@ -165,8 +152,8 @@ AC_DEFUN([CS_TEXT_CACHE_OUTPUT],
 #	the APPEND argument is not the empty string, then VALUE is appended to
 #	the existing value of KEY using the form "KEY += VALUE".  Note that if
 #	VALUE references other makefile variables, for example $(OBJS), then be
-#	sure to protect the value with CS_ESCAPE().  For example:
-#	CS_MAKEFILE_PROPERTY([ALLOBJS], [CS_ESCAPE([$(OBJS) $(LIBOBJS)])])
+#	sure to protect the value with AS_ESCAPE().  For example:
+#	CS_MAKEFILE_PROPERTY([ALLOBJS], [AS_ESCAPE([$(OBJS) $(LIBOBJS)])])
 #
 # CS_MAKEFILE_OUTPUT(FILENAME)
 #	Instruct config.status to write the makefile text cache to the given
@@ -224,7 +211,7 @@ AC_DEFUN([CS_HEADER_OUTPUT], [CS_TEXT_CACHE_OUTPUT([cs_header_text], [$1])])
 #	ignored.  If OUTPUT-VARIABLES is omitted, then the split tokens will be
 #	assigned to the shell meta-variables $1, $2, $3, etc.  When
 #	OUTPUT-VARIABLES is omitted, FILLER is assigned to meta-variables in
-#	cases where DELIMITER delimits an zero-length token.  FILLER defaults
+#	cases where DELIMITER delimits a zero-length token.  FILLER defaults
 #	to "filler".  For example, if DELIMITER is "+" and OUTPUT-VARIABLES is
 #	omitted, given the line "one++three", $1 will be "one", $2 will be
 #	"filler", and $3 will be "three".
@@ -583,7 +570,7 @@ AS_IF([test $ac_compiler_gnu = yes],
     [cs_compiler_name="AS_TR_CPP([$CXX])"])
 CS_MAKEFILE_PROPERTY([COMP], [$cs_compiler_name])
 CS_HEADER_PROPERTY([CS_COMPILER_NAME],
-    [CS_ESCAPE(["])$cs_compiler_name[]CS_ESCAPE(["])])
+    [AS_ESCAPE(["])$cs_compiler_name[]AS_ESCAPE(["])])
 
 AC_CHECK_PROGS([FLEXBIN], [flex])
 AS_IF([test -n "$FLEXBIN"], [CS_MAKEFILE_PROPERTY([FLEXBIN], [$FLEXBIN])])
@@ -1404,9 +1391,9 @@ AC_DEFUN([_CS_CHECK_HOST_DARWIN],
 	cs_host_family=unix
 	cs_host_os_normalized='MacOS/X'
 	CS_HEADER_PROPERTY([OS_MACOSX])
-	CS_HEADER_PROPERTY([OS_MACOSX_PLUGIN_DIR],[CS_ESCAPE(["components/"])])
+	CS_HEADER_PROPERTY([OS_MACOSX_PLUGIN_DIR],[AS_ESCAPE(["components/"])])
 	CS_MAKEFILE_PROPERTY([MACOSX.PLUGIN_DIR], [components])
-	CS_HEADER_PROPERTY([OS_MACOSX_PLUGIN_EXT],[CS_ESCAPE([".csplugin"])])
+	CS_HEADER_PROPERTY([OS_MACOSX_PLUGIN_EXT],[AS_ESCAPE([".csplugin"])])
 	CS_MAKEFILE_PROPERTY([MACOSX.PLUGIN_EXT], [.csplugin])
 	AC_CACHE_CHECK([for Objective-C compiler], [cs_cv_prog_objc],
 	    [cs_cv_prog_objc="$CC -c"])
@@ -1436,7 +1423,7 @@ CS_MAKEFILE_PROPERTY([TARGET], [$cs_host_target])
 CS_MAKEFILE_PROPERTY([TARGET_MAKEFILE], [$cs_host_makefile])
 CS_MAKEFILE_PROPERTY([OS], [$cs_host_os_normalized_uc])
 CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
-    [CS_ESCAPE(["])$cs_host_os_normalized[]CS_ESCAPE(["])])
+    [AS_ESCAPE(["])$cs_host_os_normalized[]AS_ESCAPE(["])])
 
 
 
@@ -1464,7 +1451,7 @@ CS_CHECK_HOST_CPU
 CS_MAKEFILE_PROPERTY([PROC], [$cs_host_cpu_normalized])
 CS_HEADER_PROPERTY([PROC_$cs_host_cpu_normalized])
 CS_HEADER_PROPERTY([CS_PROCESSOR_NAME],
-    [CS_ESCAPE(["])$cs_host_cpu[]CS_ESCAPE(["])])
+    [AS_ESCAPE(["])$cs_host_cpu[]AS_ESCAPE(["])])
 
 AS_IF([test $cs_host_cpu = x86], [CS_HEADER_PROPERTY([DO_MMX])])
 

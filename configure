@@ -2640,7 +2640,7 @@ fi
 
 cs_makefile_text="${cs_makefile_text}COMP = $cs_compiler_name
 "
-cs_header_text="${cs_header_text}#define CS_COMPILER_NAME \\\"$cs_compiler_name\\\"
+cs_header_text="${cs_header_text}#define CS_COMPILER_NAME \"$cs_compiler_name\"
 "
 
 for ac_prog in flex
@@ -13969,11 +13969,11 @@ echo "${ECHO_T}no (assume MacOS/X)" >&6
 	cs_host_os_normalized='MacOS/X'
 	cs_header_text="${cs_header_text}#define OS_MACOSX
 "
-	cs_header_text="${cs_header_text}#define OS_MACOSX_PLUGIN_DIR \\\"components/\\\"
+	cs_header_text="${cs_header_text}#define OS_MACOSX_PLUGIN_DIR \"components/\"
 "
 	cs_makefile_text="${cs_makefile_text}MACOSX.PLUGIN_DIR = components
 "
-	cs_header_text="${cs_header_text}#define OS_MACOSX_PLUGIN_EXT \\\".csplugin\\\"
+	cs_header_text="${cs_header_text}#define OS_MACOSX_PLUGIN_EXT \".csplugin\"
 "
 	cs_makefile_text="${cs_makefile_text}MACOSX.PLUGIN_EXT = .csplugin
 "
@@ -14035,7 +14035,7 @@ cs_makefile_text="${cs_makefile_text}TARGET_MAKEFILE = $cs_host_makefile
 "
 cs_makefile_text="${cs_makefile_text}OS = $cs_host_os_normalized_uc
 "
-cs_header_text="${cs_header_text}#define CS_PLATFORM_NAME \\\"$cs_host_os_normalized\\\"
+cs_header_text="${cs_header_text}#define CS_PLATFORM_NAME \"$cs_host_os_normalized\"
 "
 
 
@@ -14064,7 +14064,7 @@ cs_makefile_text="${cs_makefile_text}PROC = $cs_host_cpu_normalized
 "
 cs_header_text="${cs_header_text}#define PROC_$cs_host_cpu_normalized
 "
-cs_header_text="${cs_header_text}#define CS_PROCESSOR_NAME \\\"$cs_host_cpu\\\"
+cs_header_text="${cs_header_text}#define CS_PROCESSOR_NAME \"$cs_host_cpu\"
 "
 
 if test $cs_host_cpu = x86; then
@@ -16641,7 +16641,7 @@ cat >>$CONFIG_STATUS <<_ACEOF
 # INIT-COMMANDS section.
 #
 
-cs_header_text="$cs_header_text" cs_dir=`(dirname include/volatile.h) 2>/dev/null ||
+cs_header_text='$cs_header_text' cs_dir=`(dirname include/volatile.h) 2>/dev/null ||
 $as_expr Xinclude/volatile.h : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
          Xinclude/volatile.h : 'X\(//\)[^/]' \| \
          Xinclude/volatile.h : 'X\(//\)$' \| \
@@ -16678,7 +16678,7 @@ echo X"$as_dir" |
 echo "$as_me: error: cannot create directory \$cs_dir" >&2;}
    { (exit 1); exit 1; }; }; }
 
-cs_makefile_text="$cs_makefile_text" cs_dir=`(dirname config.mak) 2>/dev/null ||
+cs_makefile_text='$cs_makefile_text' cs_dir=`(dirname config.mak) 2>/dev/null ||
 $as_expr Xconfig.mak : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
          Xconfig.mak : 'X\(//\)[^/]' \| \
          Xconfig.mak : 'X\(//\)$' \| \

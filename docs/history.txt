@@ -13,6 +13,9 @@ The history order is reversed so that new features are at the top.
 	  makefile system where no two source files in the entire project can
 	  have the same name even if they reside in different module
 	  directories.
+	- Eric Sunshine made a small change to CS_TEXT_CACHE_OUTPUT() in
+	  configure.ac, as suggested by Matze, which obviates the need for
+	  CS_ESCAPE().  Also removed CS_ESCAPE().
 18-Jan-2003
 	- Fixed the engine so it no longer tries to load the thing_type
 	  immediatelly in initialization. Instead it tries to load it
