@@ -38,6 +38,7 @@
 
 //#include "render/glide3/driver2d/g2d.h" @@@
 #include "cs3d/glide3/g3dglide.h"
+#include "cs2d/glide2common/iglide2d.h"
 
 void sys_fatalerror(char *str, HRESULT hRes = S_OK)
 {
@@ -91,6 +92,7 @@ EXPORT_CLASS_TABLE_END
 IMPLEMENT_IBASE (csGraphics3DGlide3x)
   IMPLEMENTS_INTERFACE (iPlugIn)
   IMPLEMENTS_INTERFACE (iGraphics3D)
+  IMPLEMENTS_INTERFACE (iHaloRasterizer)
 IMPLEMENT_IBASE_END
 
 /**
@@ -339,7 +341,15 @@ bool csGraphics3DGlide3x::Initialize (iSystem *iSys)
     return false;
 
   m_bVRetrace = config->GetYesNo("Glide3x","VRETRACE",FALSE);
-
+  iGraphics2DGlide *piGlide = QUERY_INTERFACE( m_piG2D, iGraphics2DGlide );
+  if (!piGlide){
+      SysPrintf( MSG_INITIALIZATION, "Could not set VRETRACE\n" );
+  }else{
+      SysPrintf( MSG_INITIALIZATION, "VRETRACE is %s\n", m_bVRetrace ? "on" : "off" );
+      piGlide->SetVRetrace( m_bVRetrace );
+      piGlide->DecRef();
+  }
+  
   FxI32 grncard=0;
 
   grGet(GR_NUM_BOARDS, sizeof(FxI32), &grncard);
@@ -612,10 +622,7 @@ void csGraphics3DGlide3x::FinishDraw ()
 /// do the page swap.
 void csGraphics3DGlide3x::Print(csRect* rect)
 {
-  if(m_bVRetrace)
-    grBufferSwap(1);
-  else
-    grBufferSwap(0);
+  m_piG2D->Print( rect );
 }
 
 /// Set the mode for the Z buffer (functionality also exists in SetRenderState).
