@@ -232,8 +232,8 @@ void csMeshWrapper::DrawInt (iRenderView *rview)
 {
   if (imposter_active && CheckImposterRelevant(rview) )
     if (DrawImposter (rview))
-	return;
-  
+    return;
+
   DrawIntFull (rview);
 }
 
@@ -315,7 +315,7 @@ bool csMeshWrapper::DrawImposter (iRenderView *rview)
 
   // Check for too much camera movement since last imposter render
   if (!imposter_mesh->CheckIncidenceAngle (rview,
-  	imposter_rotation_tolerance->Get () ))
+    imposter_rotation_tolerance->Get () ))
       return false;
 
   // Else draw imposter as-is.
@@ -324,7 +324,7 @@ bool csMeshWrapper::DrawImposter (iRenderView *rview)
 }
 
 void csMeshWrapper::SetImposterActive(bool flag,iObjectRegistry *objreg)
-{ 
+{
   imposter_active = flag;
   if (flag)
   {
@@ -761,8 +761,14 @@ bool csMeshMeshList::PrepareItem (csSome item)
   iMeshWrapper *oldParent = child->GetParentContainer ();
   if (oldParent)
     oldParent->GetChildren ()->Remove (child);
-  else
-    csEngine::current_engine->GetMeshes ()->Remove (child);
+  else {
+      csEngine::current_engine->GetMeshes ()->Remove (child);
+      /* csSector->PrepareMesh tells the culler about the mesh
+         (since removing the mesh above also removes it from the culler...) */
+      for(int i = 0; i < mesh->GetMovable().GetSectors()->GetCount(); i++) {
+          mesh->GetMovable().GetSectors()->Get(i)->GetPrivateObject()->PrepareMesh(child);
+      }
+  }
 
   child->SetParentContainer (&mesh->scfiMeshWrapper);
   child->GetMovable ()->SetParent (&mesh->GetMovable ().scfiMovable);
