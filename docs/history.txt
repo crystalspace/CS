@@ -11,6 +11,8 @@ The history order is reversed so that new features are at the top.
 	- Fixed pysimp.py for latest API changes with things and also fixed
 	  python plugin in general for this.
 	- Started working on OpenGL version of OpenPortal() (unfinished).
+	- Eric Sunshine added French translation for texi2html titles and
+	  month names contributed by Vincent K <vince@iefr.ath.cx>.
 23-Mar-2003
 	- Jonathan Tarbox Added initial Flatten/Unflatten code, don't
 	  expect it to work just yet.

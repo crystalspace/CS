@@ -532,6 +532,32 @@ $T2H_WORDS_EN =
 #  'About_Button' => 'About'
 };
 
+$T2H_WORDS_FR =
+{
+'ToC_Title' => 'Table des mati&egrave;res',
+'Overview_Title' => 'Table des mati&egrave;res abr&eacute;g&eacute;e',
+'Index_Title' => 'Index',
+'About_Title' => 'A propos de ce document',
+'Footnotes_Title' => 'Notes',
+'See' => 'Voyez',
+'see' => 'voyez',
+'section' => 'section',
+'Top_Button' => 'Top',
+'ToC_Button' => 'TdM',
+'Overview_Button' => 'Survol',
+'Index_button' => 'Index',
+'Back_Button' => 'Retour',
+'FastBack_Button' => 'RetourRapide',
+'Prev_Button' => 'Pr&eacute;c&eacute;dent',
+'Up_Button' => 'Haut',
+'Next_Button' => 'Suivant',
+'Forward_Button' =>'Avancer',
+'FastWorward_Button' => 'AvanceRapide',
+'First_Button' => 'Premier',
+'Last_Button' => 'Dernier',
+'About_Button' => 'A propos',
+};
+
 $T2H_WORDS_DE =
 {
  'ToC_Title' => 'Inhaltsverzeichniss',
@@ -595,6 +621,7 @@ $T2H_WORDS_PT =
 $T2H_WORDS =
 {
  'en' => $T2H_WORDS_EN,
+ 'fr' => $T2H_WORDS_FR,
  'de' => $T2H_WORDS_DE,
  'nl' => $T2H_WORDS_NL,
  'es' => $T2H_WORDS_ES,
@@ -607,6 +634,13 @@ $T2H_WORDS =
  'January', 'February', 'March', 'April', 'May',
  'June', 'July', 'August', 'September', 'October',
  'November', 'December'
+);
+
+@MONTH_NAMES_FR =
+(
+ 'Janvier', 'F&eacute;vrier', 'Mars', 'Avril', 'Mai',
+ 'Juin', 'Juillet', 'Aout', 'Septembre', 'Octobre',
+ 'Novembre', 'D&eacute;cembre'
 );
 
 @MONTH_NAMES_DE =
@@ -649,6 +683,7 @@ $T2H_WORDS =
 $MONTH_NAMES =
 {
     'en' => \@MONTH_NAMES_EN,
+    'fr' => \@MONTH_NAMES_FR,
     'de' => \@MONTH_NAMES_DE,
     'es' => \@MONTH_NAMES_ES,
     'nl' => \@MONTH_NAMES_NL,
