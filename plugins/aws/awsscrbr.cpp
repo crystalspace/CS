@@ -269,8 +269,7 @@ awsScrollBar::KnobTick(void *sk, iAwsSource *)
   // adjust position of knob and scrollbar value
   awsScrollBar *sb = (awsScrollBar *)sk;
 
-  if (sb->frame_style==fsVertical && sb->knob->last_y > sb->decVal->Frame().ymax 
-      && sb->knob->last_y < sb->incVal->Frame().ymin)
+  if (sb->frame_style==fsVertical)
   {
     int height=10;
     csRect f(sb->Frame());
@@ -291,8 +290,7 @@ awsScrollBar::KnobTick(void *sk, iAwsSource *)
 
     sb->value = (sb->knob->last_y - sb->decVal->Frame().ymax) * sb->max / bh;
   }
-  else if (sb->frame_style==fsHorizontal && sb->knob->last_x > sb->decVal->Frame().xmax 
-      && sb->knob->last_x < sb->incVal->Frame().xmin)
+  else if (sb->frame_style==fsHorizontal)
   {
     int width=10;
     csRect f(sb->Frame());
