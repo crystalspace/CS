@@ -41,6 +41,7 @@
 #include "imap/ldrctxt.h"
 #include "csgeom/vector2.h"
 #include "csgeom/vector4.h"
+#include "csutil/dirtyaccessarray.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -65,7 +66,8 @@ enum
   XMLTOKEN_NOSHADOWS,
   XMLTOKEN_LOCALSHADOWS,
   XMLTOKEN_BACK2FRONT,
-  XMLTOKEN_ANIMCONTROL
+  XMLTOKEN_ANIMCONTROL,
+  XMLTOKEN_SUBMESH
 };
 
 SCF_IMPLEMENT_IBASE (csGeneralFactoryLoader)
@@ -662,6 +664,8 @@ bool csGeneralMeshLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("noshadows", XMLTOKEN_NOSHADOWS);
   xmltokens.Register ("localshadows", XMLTOKEN_LOCALSHADOWS);
   xmltokens.Register ("renderbuffer", XMLTOKEN_RENDERBUFFER);
+  xmltokens.Register ("submesh", XMLTOKEN_SUBMESH);
+  xmltokens.Register ("t", XMLTOKEN_T);
   return true;
 }
 
@@ -697,6 +701,75 @@ bool csGeneralMeshLoader::ParseRenderBuffer(iDocumentNode *node,
       name);
     return false;
   }
+  return true;
+}
+
+bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
+                                       iGeneralMeshState* state, 
+                                       iGeneralFactoryState* factstate,
+                                       iLoaderContext* ldr_context)
+{
+  if(!node) return false;
+  if (!state)
+  {
+    synldr->ReportError ("crystalspace.genmeshloader.parse",
+      node, "Submesh must be specified _after_ factory tag.");
+    return false;
+  }
+
+  csDirtyAccessArray<unsigned int> triangles;
+  csRef<iMaterialWrapper> material;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+    case XMLTOKEN_T:
+      {
+        unsigned int tri = child->GetContentsValueAsInt ();
+        if (tri>factstate->GetTriangleCount ())
+        {
+          synldr->ReportError (
+            "crystalspace.genmeshloader.parse.invalidindex",
+            child, "Invalid triangle index in genmesh submesh!");
+          return false;
+        }
+        triangles.Push (tri);
+        break;
+      }
+    case XMLTOKEN_MATERIAL:
+      {
+        const char* matname = child->GetContentsValue ();
+        material = ldr_context->FindMaterial (matname);
+        if (!material.IsValid ())
+        {
+          synldr->ReportError (
+            "crystalspace.genmeshloader.parse.unknownmaterial",
+            node, "Couldn't find material '%s'!", matname);
+          return false;
+        }
+        break;
+      }
+    default:
+      synldr->ReportBadToken (child);
+    }
+  }
+
+  if (!material.IsValid ())
+  {
+    synldr->ReportError (
+      "crystalspace.genmeshloader.parse.unknownmaterial",
+      node, "No material specified in genmesh submesh!");
+    return false;
+  }
+
+  state->AddSubMesh (triangles.GetArray (), triangles.Length (), material);
+
   return true;
 }
 
@@ -808,6 +881,9 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
 	break;
       case XMLTOKEN_RENDERBUFFER:
         ParseRenderBuffer (child, meshstate, factstate);
+        break;
+      case XMLTOKEN_SUBMESH:
+        ParseSubMesh (child, meshstate, factstate, ldr_context);
         break;
       default:
         synldr->ReportBadToken (child);

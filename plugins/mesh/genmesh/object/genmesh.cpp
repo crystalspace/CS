@@ -199,6 +199,7 @@ void csGenmeshMeshObject::AddSubMesh (unsigned int *triangles,
                                       int tricount,
                                       iMaterialWrapper *material)
 {
+  SetupShaderVariableContext ();
   csGenmeshSubMesh *subMesh = new csGenmeshSubMesh();
   subMesh->material = material;
   subMesh->index_buffer = csRenderBuffer::CreateIndexRenderBuffer (
@@ -206,14 +207,13 @@ void csGenmeshMeshObject::AddSubMesh (unsigned int *triangles,
     CS_BUF_DYNAMIC, CS_BUFCOMP_UNSIGNED_INT, 0, factory->GetVertexCount() - 1);
   csTriangle *triangleData =
     (csTriangle*)subMesh->index_buffer->Lock(CS_BUF_LOCK_NORMAL);
-  //subMesh->index_buffer->CopyToBuffer (triangles,
-    tricount*sizeof (unsigned int)*3);
 
   for (int i=0; i<tricount; ++i)
   {
     triangleData[i] = factory->GetTriangles ()[triangles[i]];
   }
   subMesh->tricount = tricount;
+  subMesh->index_buffer->Release ();
 
   subMesh->bufferHolder.AttachNew (new csRenderBufferHolder);
   subMesh->bufferHolder->SetRenderBuffer(CS_BUFFER_INDEX,

@@ -129,8 +129,12 @@ public:
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iLoaderContext* ldr_context, iBase* context);
+  /// Parse a render buffer node
   bool ParseRenderBuffer(iDocumentNode *node, iGeneralMeshState* state, 
     iGeneralFactoryState* factstate);
+  /// Parse a submesh node
+  bool ParseSubMesh(iDocumentNode *node, iGeneralMeshState* state, 
+    iGeneralFactoryState* factstate, iLoaderContext* ldr_context);
 
   struct eiComponent : public iComponent
   {

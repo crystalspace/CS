@@ -6800,6 +6800,7 @@
             <radius>7</radius>
             <color red="0.4" green="0.4" blue="0.4" />
         </light>
+
         <meshobj name="transpBall">
             <plugin>crystalspace.mesh.loader.ball</plugin>
             <params>
@@ -6818,6 +6819,7 @@
                 <v x="15" y="4" z="14" />
             </move>
         </meshobj>
+      
         <meshobj name="s_large1">
             <plugin>thing</plugin>
             <params>
@@ -7693,6 +7695,24 @@
             <params>
                 <factory>genMeshFact</factory>
                 <material>green_color</material>
+                <submesh>
+                <t>0</t>
+                <t>1</t>
+                <t>2</t>
+                <t>3</t>
+                <t>4</t>
+                <t>5</t>
+                <t>6</t>
+                <t>7</t>
+                <material>green_color</material>
+                </submesh>
+                <submesh>
+                <t>8</t>
+                <t>9</t>
+                <t>10</t>
+                <t>11</t>
+                <material>red</material>
+                </submesh>
                 <!-- <localshadows /> -->
             </params>
             <move>

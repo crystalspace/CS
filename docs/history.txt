@@ -16,6 +16,8 @@ chronological order.
 	  in the source attribute of a buffer mapping.
 	- res made some doc changes to the headers in csplugincommon/canvas.
 	- res fixed genmesh user render buffers to actually work.
+  - Anders Stenberg made genmesh submeshes work with user render buffers,
+    and added loader code for submeshes. No saver code yet.
 26-Feb-2005
 	- res renamed "anonymous render buffers" to user render buffers,
 	  simplified csUserRenderBufferManager, added a render buffer parser
