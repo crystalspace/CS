@@ -4860,6 +4860,11 @@
                 <v x="-2.5" y="-1" z="20" />
             </move>
         </meshobj>
+        <light>
+            <center x="-1.5" y="3" z="17" />
+            <radius>7</radius>
+            <color red="0.4" green="0.4" blue="0.4" />
+        </light>
         <meshobj name="transpBall">
             <plugin>crystalspace.mesh.loader.ball</plugin>
             <params>
@@ -23056,6 +23061,9 @@
 	</sequence>
 
 	<sequence name="opendoor">
+	    <!-- Disable both triggers because the door is now open -->
+	    <disabletrigger>opendoor1</disabletrigger>
+	    <disabletrigger>opendoor2</disabletrigger>
 	    <rotate mesh="rot_door1" duration="2000">
 	        <roty>-1.5707963</roty>
                 <v x="-2.5" y="-1" z="20" />
@@ -23096,9 +23104,25 @@
 	    <fire delay=1000>dobox</fire>
 	</trigger>
 
-	<trigger name="opendoor">
+	<!--
+	 *** opendoor1 and opendoor2 are both responsible for opening
+	 *** the same door. opendoor1 detects coming near the door
+	 *** from within sector 'large' while opendoor2 does the same
+	 *** from within sector 'room3'. Both triggers are disabled
+	 *** from within the opendoor sequence so that the door cannot
+	 *** accidently turn 180 degrees by activating both triggers.
+	 -->
+	<trigger name="opendoor1">
 	    <sectorvis>
 	        <sector>large</sector>
+		<sphere x="-3.75" y="0.5" z="20" radius="5" />
+	    </sectorvis>
+	    <fire delay=0>opendoor</fire>
+	</trigger>
+
+	<trigger name="opendoor2">
+	    <sectorvis>
+	        <sector>room3</sector>
 		<sphere x="-3.75" y="0.5" z="20" radius="5" />
 	    </sectorvis>
 	    <fire delay=0>opendoor</fire>
