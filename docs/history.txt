@@ -66,6 +66,7 @@ The history order is reversed so that new features are at the top.
 	    meshes in this sector. Currently, the loop isn't doing much more 
 	    than the old stuff, and has to be activated by uncommenting a line
 	    in renderloop.h.
+	- res fixed a compile he introduced in ogl_txtmgr.cpp earlier.
 18-May-2003
 	- res made the following changes in and around render3d:
 	    - ATI/NV only exts can be disabled all at once via cfg.
