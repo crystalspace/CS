@@ -1,6 +1,6 @@
 /*
-    Copyright (C) 2002 by Mårten Svanfeldt
-    Written by Mårten Svanfeldt
+    Copyright (C) 2002 by MÃ¥rten Svanfeldt
+    Written by MÃ¥rten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -147,7 +147,7 @@ public:
     vertex_program = 0;
   }
 
-  ~csOpenGlEffectPassData()
+  virtual ~csOpenGlEffectPassData()
   {
     csOpenGlVPConstant* v;
     while( (v = (csOpenGlVPConstant* )vertex_constants.Pop()) != NULL)
