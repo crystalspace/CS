@@ -204,12 +204,6 @@ void csTriangleVerticesSorted::ChangeCostVertex (int vtidx)
   // Cost of this vertex.
   float cost = verts[vtidx].cost;
 
-  // @@@ FIXME
-  // This code seems to be buggy. It is attempting to run through the itherator
-  // backward despite the fact that the iterator was not created as a reverse
-  // iterator, thus HasPrevious() will _always_ fail. Therefore, this block of
-  // code is never entered.
-
   // Check if we still have a higher cost then the vertex left of us.
   if (it.HasPrevious () && cost < verts[it.FetchPrevious ()].cost)
   {
