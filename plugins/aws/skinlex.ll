@@ -32,7 +32,6 @@
 %option noyywrap
 %option yylineno
 %option never-interactive
-%option outfile="sllex.cpp"
 %option prefix="aws"
 
 
