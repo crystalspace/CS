@@ -40,6 +40,7 @@ The history order is reversed so that new features are at the top.
 	  reference to the reporter.
 	- fixed bugs with cs-config - The script now also works when CS is
        	  not installed.
+	- another cygwin fix
 17-Oct-2001
 	- M Voase did the following
 	  - Small typo fix to data/walktest.cfg. This just fixes up

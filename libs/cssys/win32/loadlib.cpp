@@ -18,6 +18,9 @@
 
 #include "cssysdef.h"
 #include "cssys/csshlib.h"
+#ifdef __CYGWIN__
+#include <sys/cygwin.h>
+#endif
 
 csLibraryHandle csFindLoadLibrary (const char *iName)
 {
@@ -26,7 +29,17 @@ csLibraryHandle csFindLoadLibrary (const char *iName)
 
 csLibraryHandle csLoadLibrary (const char* iName)
 {
+#ifdef __CYGWIN__
+  // cygwin wants to have win32 paths not unix paths
+  char *tmp=new char[160];
+  if (cygwin_conv_to_win32_path (iName,tmp))
+      return 0;
+  csLibraryHandle handle = LoadLibrary(tmp);
+  delete[] tmp;
+  return handle;
+#else
   return LoadLibrary (iName);
+#endif
 }
 
 void* csGetLibrarySymbol(csLibraryHandle Handle, const char* Name)
