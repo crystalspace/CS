@@ -566,6 +566,17 @@ void csTriangleArrayPolygonBuffer::AddPolygon (int* verts, int num_verts,
     AddTriangles (polygons.last->info, triSuperLM, verts, num_verts, m_obj2tex,
       v_obj2tex, poly_texture, mat_index, poly_normal);
   }
+
+  csTriangle triangle;
+  triangle.a = verts[0];
+  int i;
+  for (i = 1 ; i < num_verts-1 ; i++)
+  {
+    triangle.b = verts[i];
+    triangle.c = verts[i+1];
+    orig_triangles.Push (triangle);
+  }
+
 }
 
 void csTriangleArrayPolygonBuffer::SetVertexArray (csVector3* verts,

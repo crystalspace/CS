@@ -15,6 +15,8 @@ The history order is reversed so that new features are at the top.
 	  always go through the cache instead. This fixes a bug where
 	  enabling DrawPolygonMesh for the car in the street of flarge would cause
 	  the snow to become too bright.
+	- The OpenGL polygon buffer now stores an array of triangles for fog.
+	  Not operational yet.
 26-Jan-2003
 	- Added a missing call to SetMirrored() in the old OpenGL renderer
 	  in EffectDrawTriangleMesh(). This fixes a few problems with

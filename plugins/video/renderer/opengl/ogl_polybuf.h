@@ -252,6 +252,7 @@ protected:
   csVector3 * vertices;
   int matCount;
   int verticesCount;
+  csGrowingArray<csTriangle> orig_triangles;
 
   csTrianglesPerSuperLightmap* SearchFittingSuperLightmap (
     iPolygonTexture* poly_texture, csRect& rect, int num_vertices);
@@ -318,7 +319,9 @@ public:
   virtual void Clear ();
 
   /// Gets the mesh vertices
-  virtual csVector3* GetVertices() const {return vertices;}
+  virtual csVector3* GetVertices () const { return vertices; }
+  /// Gets the original triangles.
+  csTriangle* GetTriangles () { return orig_triangles.GetArray (); }
 
   /// Gets the original vertices count
   virtual int GetVertexCount() const {return verticesCount;}

@@ -3216,7 +3216,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
     trimesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
 
   SetupDTMTransforms (trimesh.vertex_mode);
-  
+ 
   // Loop over all sub-meshes. Every sub-mesh represents a different material.
   TrianglesNode *t = polbuf->GetFirst ();
   while (t != NULL)
