@@ -55,6 +55,25 @@ chronological order.
 	  the orig size fields are set correctly already. Also the routine
 	  was returning without touching the w and h, causing unpredictable
 	  results. This fixes an Image View component in AWS.
+	- Eric Sunshine augmented the Swig rule (swig.jam) so that it creates a
+	  dependency between the "additional files" (typically generated
+	  scripting files) the main target (typically a generated C or C++
+	  files). This makes it possible for the other generated files to be
+	  created automatically when needed, such as when some other target (an
+	  "install" target, for instance, depends upon them.
+	- Eric Sunshine augmented the various Install rules (install.jam) so
+	  that they grist the incoming files only if they have not already been
+	  gristed. This allows those files to be properly created if missing
+	  (assuming that Jam knows how to create them), whereas the old scheme
+	  of unconditionally gristing the incoming names made it impossible for
+	  Jam to create those files at install time.
+	- Eric Sunshine fixed problems where the Jam "install" targets where
+	  incorrectly installing cspace.py and cspace.pm from the
+	  CS/scripts/python and CS/scripts/perl5 directories, respectively,
+	  rather than installing the most recent Swig-generated versions from
+	  the build directory (if Swig was available).
+	- Eric Sunshine fixed bug in csPerl5::Init() (csperl5.cpp) where it was
+	  passing corrupt argc/argv to perl_parse().
 24-Apr-2004
 	- Jorrit fixed a compile bug in glshader_fixed. 'friend' needs
 	  'struct'.

@@ -90,7 +90,13 @@ if $(CMD.SWIG)
 
     Depends $(target) : $(swigfile) ;
     MakeLocate $(target) : $(LOCATE_TARGET) ;
-    if $(othertargets) { MakeLocate $(othertargets) : $(LOCATE_TARGET) ; }
+    if $(othertargets)
+    {
+      MakeLocate $(othertargets) : $(LOCATE_TARGET) ;
+      # If any target, such as an install target, depends upon the other files,
+      # we force them to be built with a dependency upon the target.
+      Depends $(othertargets) : $(target) ;
+    }
 
     SWIG.FLAGS on $(target) += -$(language) $(swigflags) -I$(swigincdirs) ;
 

@@ -42,11 +42,12 @@ if $(PERL5.AVAILABLE) = "yes" && ! [ Property build : projgen ]
 
   local targetdir ;
   local target = [ FGristFiles cswigpl5.inc ] ;
+  local pmfile = [ FGristFiles cspace.pm ] ;
 
   if $(CMD.SWIG)
   {
     targetdir = $(LOCATE_TARGET) ;
-    Swig $(target) [ FGristFiles cspace.pm ] :
+    Swig $(target) $(pmfile) :
       [ FGristFiles cspace.i ] :
       perl5 :
       -c++ -shadow -const -module cspace :
@@ -72,6 +73,14 @@ if $(PERL5.AVAILABLE) = "yes" && ! [ Property build : projgen ]
     [ FIncludes $(targetdir) ]
     $(COMPILER.C++FLAGS.WARNING.NO_UNUSED)
     $(COMPILER.C++FLAGS.WARNING.NO_UNINITIALIZED) ;
+
+  rule InstallCSPerl5PM
+  {
+    local SUBDIR = $(2) ; # Temporary override for InstallData.
+    InstallData $(1) : $(3) ;
+  }
+  InstallCSPerl5PM $(pmfile) : $(targetdir) : perl5 ;
+
 
   # Note that '__EOF__' is purposely quoted to prevent shell from intrepreting
   # dollar signs in quoted block.

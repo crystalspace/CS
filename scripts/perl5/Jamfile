@@ -1,3 +1,11 @@
 SubDir TOP scripts perl5 ;
 
-InstallData [ Wildcard *.pm ] : perl5 ;
+PERL5_DATAFILES = [ Wildcard *.pm ] ;
+
+# cspace.pm is the responsibility of csperl5/Jamfile.
+PERL5_DATAFILES = [ Filter $(PERL5_DATAFILES) : cspace.pm ] ;
+
+if $(PERL5_DATAFILES)
+{
+  InstallData $(PERL5_DATAFILES) : perl5 ;
+}

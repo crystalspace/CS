@@ -85,7 +85,7 @@ bool csPerl5::Init (iObjectRegistry *objreg)
 
   char *realinc = (char *) incbuff->GetData ();
   char *argv [] = { "perl5", "-T", "-I", realinc, "-e", "0" };
-  int argc = 5;
+  int const argc = sizeof(argv) / sizeof(argv[0]);
   perl_parse (my_perl, xs_init, argc, argv, 0);
   perl_run (my_perl);
   return true;
