@@ -40,6 +40,9 @@ chronological order.
 	- Eric Sunshine fixed msvcgen/workspaces.jam so that librenderercommon
 	  appears only in wkstypical, and librender3dcommon appears only in
 	  wksnewrenderer.
+        - Andrew Craig uncommented out the lock variable for sprcal3d 
+          animations. It was preventing animations from "locking" on the 
+          last frame. 
 2-Jun-2004
 	- Jorrit reverted the change from Andres Freund that checks on the
 	  presence of <params> in a mesh object. There are cases where
