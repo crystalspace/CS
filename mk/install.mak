@@ -144,7 +144,7 @@ define INSTALL.DO_PLUGIN
   @echo $(addprefix $(INSTALL_DLL.DIR)/,$(notdir $(F))) >> $(INSTALL_LOG)
   if test -f $(patsubst %$(DLL),%.csplugin,$(F)); then \
   $(CP) $(patsubst %$(DLL),%.csplugin,$(F)) $(INSTALL_DLL.DIR); \
-  @echo $(addprefix $(INSTALL_DLL.DIR)/, \
+  echo $(addprefix $(INSTALL_DLL.DIR)/, \
     $(notdir $(patsubst %$(DLL),%.csplugin,$(F)))) >> $(INSTALL_LOG); \
   fi
 
