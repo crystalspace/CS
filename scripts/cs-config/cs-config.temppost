@@ -26,8 +26,10 @@ if test -r "$prefix/Makefile"; then
   fi
 fi
 if test -z "$libdir"; then
-  echo "Couldn't detect dir with lib files, aborting!"
-  echo "  Did you already compile CS?"
+  cat 1>&2 <<EOF
+Couldn't detect dir with lib files, aborting!
+Did you already compile CS?
+EOF
   exit 1
 fi
 
