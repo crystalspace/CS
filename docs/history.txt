@@ -93,6 +93,8 @@ chronological order.
 	  void csSequenceManager::Clear ().
         - John Harger fixed the Cg plugin so it works with the newer
           iShaderProgram interface
+	- Chris Matuszewski documented recent changes made to iAWS interface
+	  concerning the new way to create window transitions in apimod98.txi.
 6-Nov-2003
 	- res bumped the version of the iGraphics2D interface and updated some
 	  Doxygen comments in include/graph2d.h (basically, the differences
