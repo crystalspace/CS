@@ -142,6 +142,16 @@ bool awsWindow::Setup (iAws *_wmgr, awsComponentNode *settings)
     pm->GetInt(settings, "BackgroundAlpha", bkg_alpha);
     pm->GetInt(settings, "OverlayAlpha", ovl_alpha);
 
+    bm_bkgsub.Set (0, 0, 0, 0);
+    if (!pm->GetRect (settings, "BackgroundSubrect", bm_bkgsub))
+      if (btxt)
+        btxt->GetOriginalDimensions (bm_bkgsub.xmax, bm_bkgsub.ymax);
+
+    bm_ovlsub.Set (0, 0, 0, 0);
+    if (!pm->GetRect (settings, "OverlaySubrect", bm_ovlsub))
+      if (otxt)
+        otxt->GetOriginalDimensions (bm_ovlsub.xmax, bm_ovlsub.ymax);
+
   }
 
   // Arrange control rects
@@ -1237,21 +1247,19 @@ void awsWindow::OnDraw (csRect clip)
 
     case fsBitmap:
       if (btxt != NULL)
-	  {
-		int bth, btw;
-	    btxt->GetOriginalDimensions (btw, bth);
+      {
         clipper.DrawPixmap (
-            btxt,
-            Frame ().xmin,
-            Frame ().ymin,
-            btw,
-            bth,
-            0,
-            0,
-            btw,
-            bth,
-            bkg_alpha);
-	  }
+                            btxt,
+                            Frame ().xmin,
+                            Frame ().ymin,
+                            Frame ().Width (),
+                            Frame ().Height (),
+                            bm_bkgsub.xmin,
+                            bm_bkgsub.ymin,
+                            bm_bkgsub.Width (),
+                            bm_bkgsub.Height (),
+                            bkg_alpha);
+      }
       if (view)
       {
         g3d->BeginDraw (
@@ -1260,19 +1268,17 @@ void awsWindow::OnDraw (csRect clip)
         g3d->BeginDraw (CSDRAW_2DGRAPHICS);
       }     //  end if view
       if (otxt != NULL)
-	  {
-		int otw, oth;
-		otxt->GetOriginalDimensions (otw, oth);
+      {
         clipper.DrawPixmap (
             otxt,
             Frame ().xmin,
             Frame ().ymin,
-            otw,
-            oth,
-            0,
-            0,
-            otw,
-            oth,
+            Frame ().Width (),
+            Frame ().Height (),
+            bm_ovlsub.xmin,
+            bm_ovlsub.ymin,
+            bm_ovlsub.Width (),
+            bm_ovlsub.Height (),
             ovl_alpha);
 	  }
 

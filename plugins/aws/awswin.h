@@ -104,6 +104,9 @@ private:
   /// The frame cache for storing frame state while the window is zoomed.
   csRect unzoomed_frame;
 
+  /// The frame cache for storing frame state while the window is zoomed.
+  csRect bm_bkgsub, bm_ovlsub;
+
   /// Embedded component
   awsComponent comp;
 
