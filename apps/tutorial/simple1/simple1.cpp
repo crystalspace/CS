@@ -99,7 +99,7 @@ bool SimpleEventHandler (iEvent& ev)
 bool Simple::Initialize (int argc, const char* const argv[],
   const char *iConfigName)
 {
-  object_reg = csInitializer::CreateObjectRegistry ();
+  object_reg = csInitializer::CreateEnvironment ();
   if (!object_reg) return false;
 
   if (!csInitializer::RequestPlugins (object_reg, iConfigName, argc, argv))

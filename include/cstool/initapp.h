@@ -24,6 +24,11 @@
 struct iObjectRegistry;
 struct iEvent;
 struct iEventHandler;
+struct iEventQueue;
+struct iPluginManager;
+struct iVirtualClock;
+struct iCommandLineParser;
+struct iConfigManager;
 
 /**
  * Function to handle events for apps.
@@ -49,13 +54,74 @@ extern bool csInitializeApplication (iObjectRegistry* object_reg,
 class csInitializer
 {
 public:
+  /**
+   * Create everything needed to get a CS application operational.
+   * This function is completely equivalent to calling:
+   * <ul>
+   * <li>InitializeSCF()
+   * <li>CreateObjectRegistry()
+   * <li>CreatePluginManager()
+   * <li>CreateEventQueue()
+   * <li>CreateVirtualClock()
+   * <li>CreateCommandLineParser()
+   * <li>CreateConfigManager()
+   * </ul>
+   * This function will return the pointer to the object registry where
+   * all the created objects will be registered.
+   */
+  static iObjectRegistry* CreateEnvironment ();
 
   /**
-   * This function should be called first. It will create the object
+   * This very important function initializes the SCF sub-system.
+   * Without this you can do almost nothing in CS.
+   */
+  static bool InitializeSCF ();
+
+  /**
+   * This function should be called second. It will create the object
    * registry and return a pointer to it. If there is a problem it will
    * return NULL.
    */
   static iObjectRegistry* CreateObjectRegistry ();
+
+  /**
+   * You will almost certainly want to call this function. It will
+   * create the plugin manager which is essential for nearly everything.
+   * The created plugin manager will be registered with the object registry
+   * as the default plugin manager (using NULL tag).
+   */
+  static iPluginManager* CreatePluginManager (iObjectRegistry* object_reg);
+
+  /**
+   * This essential function creates the event queue which is the main
+   * driving force between the event-driven CS model. In addition this function
+   * will register the created event queue with the object registry as
+   * the default event queue (using NULL tag).
+   */
+  static iEventQueue* CreateEventQueue (iObjectRegistry* object_reg);
+
+  /**
+   * Create the virtual clock. This clock is responsible for keeping
+   * track of virtual time in the game system. This function will
+   * register the created virtual clock with the object registry as the
+   * default virtual clock (using NULL tag).
+   */
+  static iVirtualClock* CreateVirtualClock (iObjectRegistry* object_reg);
+
+  /**
+   * Create the commandline parser. This function will register the created
+   * commandline parser with the object registry as the default
+   * parser (using NULL tag).
+   */
+  static iCommandLineParser* CreateCommandLineParser (
+  	iObjectRegistry* object_reg);
+
+  /**
+   * Create the config manager. This function will register the created
+   * config manager with the object registry as the default config manager
+   * (using NULL tag).
+   */
+  static iConfigManager* CreateConfigManager (iObjectRegistry* object_reg);
 
   /**
    * Request a few widely used standard plugins and also read

@@ -1,5 +1,20 @@
 The history order is reversed so that new features are at the top.
 
+3-Oct-2001
+	- Added the following functions to csInitializer:
+	    - InitializeSCF()
+	    - CreatePluginManager()
+	    - CreateEventQueue()
+	    - CreateVirtualClock()
+	    - CreateCommandLineParser()
+	    - CreateConfigManager()
+	  These functions are responsible for splitting up the initialization
+	  process even more. The functions above are practically essential
+	  for any CS application.
+	- Added new csInitializer::CreateEnvironment() which calls all
+	  of the above new functions and also calls CreateObjectRegistry()
+	  (and returns it). Since most apps will want to call those functions
+	  anyway it makes sense to have one call to do all that.
 2-Oct-2001
 	- Changed the csInitialize... functions in cstool to static member
 	  functions of the class csInitializer. There are now the following

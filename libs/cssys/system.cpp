@@ -360,6 +360,12 @@ csSystemDriver::csSystemDriver () :
   strcat (scfconfigpath, "scf.cfg");
   csConfigFile scfconfig (scfconfigpath);
   scfInitialize (&scfconfig);
+
+  iConfigFile *cfg = new csConfigFile();
+  iConfigManager* Config = new csConfigManager(cfg, true);
+  object_reg.Register (Config, NULL);
+  Config->DecRef ();
+  cfg->DecRef ();
 }
 
 csSystemDriver::~csSystemDriver ()
@@ -420,11 +426,16 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
 
   ReportSys (CS_REPORTER_SEVERITY_DEBUG, "*** Initializing system driver!\n");
 
+#if 0
   iConfigFile *cfg = new csConfigFile();
   iConfigManager* Config = new csConfigManager(cfg, true);
   object_reg.Register (Config, NULL);
   Config->DecRef ();
   cfg->DecRef ();
+#endif
+
+  iConfigManager* Config = CS_QUERY_REGISTRY (&object_reg, iConfigManager);
+  iConfigFile* cfg = Config->GetDynamicDomain ();
   Config->SetDomainPriority(cfg, iConfigManager::ConfigPriorityApplication);
   VFS = CS_LOAD_PLUGIN (this, "crystalspace.kernel.vfs", CS_FUNCID_VFS, iVFS);
 

@@ -36,15 +36,65 @@
 #include "isys/plugin.h"
 #include "iutil/eventq.h"
 #include "iutil/evdefs.h"
+#include "iutil/virtclk.h"
+#include "iutil/eventq.h"
+#include "iutil/cmdline.h"
+#include "iutil/cfgmgr.h"
 
 static SysSystemDriver* global_sys = NULL;
 static char* global_config_name = NULL;
 static int global_argc = 0;
 static const char* const * global_argv = 0;
 
-iObjectRegistry* csInitializer::CreateObjectRegistry ()
+iObjectRegistry* csInitializer::CreateEnvironment ()
+{
+  if (!InitializeSCF ()) return NULL;
+  iObjectRegistry* object_reg = CreateObjectRegistry ();
+  if (!object_reg) return NULL;
+  if (!CreatePluginManager (object_reg)) return NULL;
+  if (!CreateEventQueue (object_reg)) return NULL;
+  if (!CreateVirtualClock (object_reg)) return NULL;
+  if (!CreateCommandLineParser (object_reg)) return NULL;
+  if (!CreateConfigManager (object_reg)) return NULL;
+  return object_reg;
+}
+
+bool csInitializer::InitializeSCF ()
 {
   global_sys = new SysSystemDriver ();
+  return true;
+}
+
+iPluginManager* csInitializer::CreatePluginManager (
+	iObjectRegistry* object_reg)
+{
+  return CS_QUERY_REGISTRY (object_reg, iPluginManager);
+}
+
+iEventQueue* csInitializer::CreateEventQueue (iObjectRegistry* object_reg)
+{
+  return CS_QUERY_REGISTRY (object_reg, iEventQueue);
+}
+
+iVirtualClock* csInitializer::CreateVirtualClock (iObjectRegistry* object_reg)
+{
+  return CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+}
+
+iCommandLineParser* csInitializer::CreateCommandLineParser (
+  	iObjectRegistry* object_reg)
+{
+  return CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
+}
+
+iConfigManager* csInitializer::CreateConfigManager (
+	iObjectRegistry* object_reg)
+{
+  return CS_QUERY_REGISTRY (object_reg, iConfigManager);
+}
+
+iObjectRegistry* csInitializer::CreateObjectRegistry ()
+{
   return global_sys->GetObjectRegistry ();
 }
 
