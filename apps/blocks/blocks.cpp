@@ -38,6 +38,7 @@
 #include "isys/vfs.h"
 #include "iutil/cfgmgr.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/graph2d.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/fontserv.h"
 #include "isound/renderer.h"

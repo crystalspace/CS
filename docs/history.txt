@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+17-May-2001
+	- Fixed Blocks so it compiles again.
 16-May-2001
 	- Philip Wyett did a quick update to eliminate 3000 compiler warnings.
 	  Pragma'ed C4291 out, for time being, will come back to this.
