@@ -21,6 +21,21 @@ The history order has been reversed so that new features are at the top.
 	- Fixed ddraw61.mak so that the description is a little shorter.
 	- Fixed Makefile so that it correctly displays help for the install
 	  target with win32gcc.mak.
+	- Added the first (VERY primitive) version of the new 'levtool'
+	  application. This will be a CSWS based application (and also
+	  commandline based) with which you will be able to do various things
+	  on levels. Here are a few uses that I see:
+	  	- Recalculating lighting with graphical dialog for
+		  controlling the lighting optionsl (radiosity, ambient, ...)
+		- Recalculating PVS.
+		- Portalizing a level.
+		- Deportalizing a level.
+		- Extracting entities and objects.
+		- Adding entities and objects.
+		- ...
+	  It will have a 3D preview of the level too.
+	  Current version is just a version of csws3d that is modified
+	  a little.
 23-Aug-2000
 	- Martin Geisse fixed a bug in the console plugin.
 	- Gary Haussmann enabled GL-level backface culling. This makes
