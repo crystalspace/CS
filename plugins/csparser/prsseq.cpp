@@ -411,7 +411,7 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
 	    return NULL;
 	  }
 	  if (polygon)
-	    sequence->AddOperationSetMaterial (cur_time, polygon, mat);
+	    sequence->AddOperationSetPolygonMaterial (cur_time, polygon, mat);
 	  else
 	    sequence->AddOperationSetMaterial (cur_time, mesh, mat);
 	}

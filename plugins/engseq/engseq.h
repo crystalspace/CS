@@ -47,7 +47,7 @@ public:
   iSequence* GetSequence () { return sequence; }
   void AddOperationSetMaterial (csTicks time, iMeshWrapper* mesh,
 		  iMaterialWrapper* mat);
-  void AddOperationSetMaterial (csTicks time, iPolygon3D* polygon,
+  void AddOperationSetPolygonMaterial (csTicks time, iPolygon3D* polygon,
 		  iMaterialWrapper* mat);
   void AddOperationSetLight (csTicks time, iLight* light,
 		  const csColor& color);
@@ -87,6 +87,49 @@ public:
 		  iSequence* trueSequence,
 		  iSequence* falseSequence);
 
+  // Indexed versions.
+  void AddOperationSetMaterial (csTicks time, int meshidx,
+		  int matidx);
+  void AddOperationSetPolygonMaterial (csTicks time, int polygonidx,
+		  int matidx);
+  void AddOperationSetLight (csTicks time, int lightidx,
+		  const csColor& color);
+  void AddOperationFadeLight (csTicks time, int lightidx,
+		  const csColor& color, csTicks duration);
+  void AddOperationSetMeshColor (csTicks time, int meshidx,
+		  const csColor& color);
+  void AddOperationFadeMeshColor (csTicks time, int meshidx,
+		  const csColor& color, csTicks duration);
+  void AddOperationSetFog (csTicks time, int sectoridx,
+		  const csColor& color, float density);
+  void AddOperationFadeFog (csTicks time, int sectoridx,
+		  const csColor& color, float density, csTicks duration);
+  void AddOperationAbsoluteMove (csTicks time, int meshidx,
+		  int sectoridx, const csReversibleTransform& trans);
+  void AddOperationAbsoluteMove (csTicks time, int meshidx,
+		  int sectoridx, const csVector3& pos);
+  void AddOperationRelativeMove (csTicks time, int meshidx,
+		  const csReversibleTransform& trans);
+  void AddOperationRelativeMove (csTicks time, int meshidx,
+		  const csVector3& pos);
+  void AddOperationRotateDuration (csTicks time, int meshidx,
+  		int axis1, float tot_angle1,
+		int axis2, float tot_angle2,
+		int axis3, float tot_angle3,
+		const csVector3& offset,
+		csTicks duration);
+  void AddOperationMoveDuration (csTicks time, int meshidx,
+		const csVector3& offset,
+		csTicks duration);
+  void AddOperationTriggerState (csTicks time, int triggeridx,
+		  bool en);
+  void AddOperationCheckTrigger (csTicks time,
+  		  int triggeridx, csTicks delay);
+  void AddOperationTestTrigger (csTicks time,
+  		  int triggeridx,
+		  int trueSequenceidx,
+		  int falseSequenceidx);
+
   SCF_DECLARE_IBASE_EXT (csObject);
 
   //------------------- iSequenceWrapper implementation ------------------//
@@ -101,10 +144,10 @@ public:
     {
       return scfParent->GetSequence ();
     }
-    virtual void AddOperationSetMaterial (csTicks time, iPolygon3D* polygon,
-		  iMaterialWrapper* mat)
+    virtual void AddOperationSetPolygonMaterial (csTicks time,
+    		  iPolygon3D* polygon, iMaterialWrapper* mat)
     {
-      scfParent->AddOperationSetMaterial (time, polygon, mat);
+      scfParent->AddOperationSetPolygonMaterial (time, polygon, mat);
     }
     virtual void AddOperationSetMaterial (csTicks time, iMeshWrapper* mesh,
 		  iMaterialWrapper* mat)
@@ -177,6 +220,85 @@ public:
       scfParent->AddOperationTestTrigger (time, trigger,
 		      trueSequence, falseSequence);
     }
+
+    // Indexed versions.
+
+    virtual void AddOperationSetPolygonMaterial (csTicks time,
+    		  int polygonidx, int matidx)
+    {
+      scfParent->AddOperationSetPolygonMaterial (time, polygonidx, matidx);
+    }
+    virtual void AddOperationSetMaterial (csTicks time, int meshidx,
+		  int matidx)
+    {
+      scfParent->AddOperationSetMaterial (time, meshidx, matidx);
+    }
+    virtual void AddOperationSetLight (csTicks time, int lightidx,
+		  const csColor& color)
+    {
+      scfParent->AddOperationSetLight (time, lightidx, color);
+    }
+    virtual void AddOperationFadeLight (csTicks time, int lightidx,
+		  const csColor& color, csTicks duration)
+    {
+      scfParent->AddOperationFadeLight (time, lightidx, color, duration);
+    }
+    virtual void AddOperationSetMeshColor (csTicks time, int meshidx,
+		  const csColor& color)
+    {
+      scfParent->AddOperationSetMeshColor (time, meshidx, color);
+    }
+    virtual void AddOperationFadeMeshColor (csTicks time, int meshidx,
+		  const csColor& color, csTicks duration)
+    {
+      scfParent->AddOperationFadeMeshColor (time, meshidx, color, duration);
+    }
+    virtual void AddOperationSetFog (csTicks time, int sectoridx,
+		  const csColor& color, float density)
+    {
+      scfParent->AddOperationSetFog (time, sectoridx, color, density);
+    }
+    virtual void AddOperationFadeFog (csTicks time, int sectoridx,
+		  const csColor& color, float density, csTicks duration)
+    {
+      scfParent->AddOperationFadeFog (time, sectoridx, color, density,
+      	duration);
+    }
+    virtual void AddOperationRotateDuration (csTicks time, int meshidx,
+  		int axis1, float tot_angle1,
+		int axis2, float tot_angle2,
+		int axis3, float tot_angle3,
+		const csVector3& offset,
+		csTicks duration)
+    {
+      scfParent->AddOperationRotateDuration (time, meshidx,
+      	axis1, tot_angle1, axis2, tot_angle2, axis3, tot_angle3,
+	offset, duration);
+    }
+    virtual void AddOperationMoveDuration (csTicks time, int meshidx,
+		const csVector3& offset,
+		csTicks duration)
+    {
+      scfParent->AddOperationMoveDuration (time, meshidx, offset, duration);
+    }
+    virtual void AddOperationTriggerState (csTicks time,
+    		  int triggeridx, bool en)
+    {
+      scfParent->AddOperationTriggerState (time, triggeridx, en);
+    }
+    virtual void AddOperationCheckTrigger (csTicks time,
+  		  int triggeridx, csTicks delay)
+    {
+      scfParent->AddOperationCheckTrigger (time, triggeridx, delay);
+    }
+    virtual void AddOperationTestTrigger (csTicks time,
+  		  int triggeridx,
+		  int trueSequenceidx,
+		  int falseSequenceidx)
+    {
+      scfParent->AddOperationTestTrigger (time, triggeridx,
+		      trueSequenceidx, falseSequenceidx);
+    }
   } scfiSequenceWrapper;
   friend struct SequenceWrapper;
 };
@@ -216,6 +338,7 @@ private:
   bool enable_onetest;
   uint32 onetest_framenr;	// We test for this frame.
   csRef<iSequenceWrapper> fire_sequence;
+  csRef<iEngineSequenceParameters> params;
   csEngineSequenceManager* eseqmgr;
   csTicks fire_delay;
   uint32 framenr;
@@ -244,6 +367,16 @@ public:
   bool IsEnabled () const { return enabled; }
   void ClearConditions ();
   void Trigger ();
+
+  void SetParameters (iEngineSequenceParameters* params)
+  {
+    csSequenceTrigger::params = params;
+  }
+  iEngineSequenceParameters* GetParameters () const
+  {
+    return params;
+  }
+
   void FireSequence (csTicks delay, iSequenceWrapper* seq);
   iSequenceWrapper* GetFiredSequence () { return fire_sequence; }
 
@@ -312,6 +445,14 @@ public:
     virtual void Trigger ()
     {
       scfParent->Trigger ();
+    }
+    virtual void SetParameters (iEngineSequenceParameters* params)
+    {
+      scfParent->SetParameters (params);
+    }
+    virtual iEngineSequenceParameters* GetParameters () const
+    {
+      return scfParent->GetParameters ();
     }
     virtual void FireSequence (csTicks delay, iSequenceWrapper* seq)
     {

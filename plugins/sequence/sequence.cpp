@@ -298,7 +298,7 @@ void csSequenceManager::RunSequence (csTicks time, iSequence* sequence,
   while (op)
   {
     main_sequence->AddOperation (main_time + time + op->time, op->operation,
-    	params);
+    	params ? params : (iBase*)op->params);
     op = op->next;
   }
 }

@@ -788,7 +788,7 @@ csSequenceWrapper::~csSequenceWrapper ()
 {
 }
 
-void csSequenceWrapper::AddOperationSetMaterial (csTicks time,
+void csSequenceWrapper::AddOperationSetPolygonMaterial (csTicks time,
 	iPolygon3D* polygon, iMaterialWrapper* material)
 {
   OpSetMaterial* op = new OpSetMaterial (polygon, material);
@@ -901,6 +901,123 @@ void csSequenceWrapper::AddOperationTestTrigger (csTicks time,
   CondTestTrigger* cond = new CondTestTrigger (trigger);
   sequence->AddCondition (time, cond, trueSequence, falseSequence);
   cond->DecRef ();
+}
+
+// Indexed versions.
+
+void csSequenceWrapper::AddOperationSetPolygonMaterial (csTicks time,
+	int polygonidx, int materialidx)
+{
+  //OpSetMaterial* op = new OpSetMaterial (polygon, material);
+  //sequence->AddOperation (time, op);
+  //op->DecRef ();
+}
+
+void csSequenceWrapper::AddOperationSetMaterial (csTicks time,
+	int meshidx, int materialidx)
+{
+  //OpSetMaterial* op = new OpSetMaterial (mesh, material);
+  //sequence->AddOperation (time, op);
+  //op->DecRef ();
+}
+
+void csSequenceWrapper::AddOperationSetLight (csTicks time,
+	int lightidx, const csColor& color)
+{
+  //OpSetLight* op = new OpSetLight (light, color);
+  //sequence->AddOperation (time, op);
+  //op->DecRef ();
+}
+
+void csSequenceWrapper::AddOperationFadeLight (csTicks time,
+	int lightidx, const csColor& color, csTicks duration)
+{
+  //OpFadeLight* op = new OpFadeLight (light, color, duration, eseqmgr);
+  //sequence->AddOperation (time, op);
+  //op->DecRef ();
+}
+
+void csSequenceWrapper::AddOperationSetMeshColor (csTicks time,
+	int meshidx, const csColor& color)
+{
+  //OpSetMeshColor* op = new OpSetMeshColor (mesh, color);
+  //sequence->AddOperation (time, op);
+  //op->DecRef ();
+}
+
+void csSequenceWrapper::AddOperationFadeMeshColor (csTicks time,
+	int meshidx, const csColor& color, csTicks duration)
+{
+  //OpFadeMeshColor* op = new OpFadeMeshColor (mesh, color, duration, eseqmgr);
+  //sequence->AddOperation (time, op);
+  //op->DecRef ();
+}
+
+void csSequenceWrapper::AddOperationSetFog (csTicks time,
+	int sectoridx, const csColor& color, float density)
+{
+  //OpSetFog* op = new OpSetFog (sector, color, density);
+  //sequence->AddOperation (time, op);
+  //op->DecRef ();
+}
+
+void csSequenceWrapper::AddOperationFadeFog (csTicks time,
+	int sectoridx, const csColor& color, float density,
+	csTicks duration)
+{
+  //OpFadeFog* op = new OpFadeFog (sector, color, density, duration, eseqmgr);
+  //sequence->AddOperation (time, op);
+  //op->DecRef ();
+}
+
+void csSequenceWrapper::AddOperationRotateDuration (csTicks time,
+	int meshidx,
+	int axis1, float tot_angle1,
+	int axis2, float tot_angle2,
+	int axis3, float tot_angle3,
+	const csVector3& offset, csTicks duration)
+{
+  //OpRotate* op = new OpRotate (mesh,
+  	//axis1, tot_angle1, axis2, tot_angle2, axis3, tot_angle3,
+	//offset, duration, eseqmgr);
+  //sequence->AddOperation (time, op);
+  //op->DecRef ();
+}
+
+void csSequenceWrapper::AddOperationMoveDuration (csTicks time,
+	int meshidx, const csVector3& offset,
+	csTicks duration)
+{
+  //OpMove* op = new OpMove (mesh, offset,
+	//duration, eseqmgr);
+  //sequence->AddOperation (time, op);
+  //op->DecRef ();
+}
+
+void csSequenceWrapper::AddOperationTriggerState (csTicks time,
+	int triggeridx, bool en)
+{
+  //OpTriggerState* op = new OpTriggerState (trigger, en);
+  //sequence->AddOperation (time, op);
+  //op->DecRef ();
+}
+
+void csSequenceWrapper::AddOperationCheckTrigger (csTicks time,
+  		  int triggeridx, csTicks delay)
+{
+  //OpCheckTrigger* op = new OpCheckTrigger (trigger, delay);
+  //sequence->AddOperation (time, op);
+  //op->DecRef ();
+}
+
+void csSequenceWrapper::AddOperationTestTrigger (csTicks time,
+  		  int triggeridx,
+		  int trueSequenceidx,
+		  int falseSequenceidx)
+{
+  //CondTestTrigger* cond = new CondTestTrigger (trigger);
+  //sequence->AddCondition (time, cond, trueSequence, falseSequence);
+  //cond->DecRef ();
 }
 
 //---------------------------------------------------------------------------
@@ -1131,7 +1248,7 @@ void csSequenceTrigger::Fire ()
       // Only fire if trigger is enabled. Otherwise we are only
       // doing the test.
       eseqmgr->GetSequenceManager ()->RunSequence (fire_delay,
-    	  fire_sequence->GetSequence ());
+    	  fire_sequence->GetSequence (), params);
       enabled = false;
       fired_conditions = 0;
     }
@@ -1210,7 +1327,7 @@ void csSequenceTrigger::TestConditions (csTicks delay)
     CondTestConditions* cond = new CondTestConditions (this, delay);
     seq->AddCondition (delay, cond, seq, NULL);
     cond->DecRef ();
-    eseqmgr->GetSequenceManager ()->RunSequence (0, seq);
+    eseqmgr->GetSequenceManager ()->RunSequence (0, seq, params);
   }
 }
 

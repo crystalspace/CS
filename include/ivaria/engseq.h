@@ -24,6 +24,7 @@
 struct iSequence;
 struct iSequenceManager;
 struct iSequenceTrigger;
+struct iSequenceWrapper;
 struct iMaterialWrapper;
 struct iSector;
 struct iMeshWrapper;
@@ -37,7 +38,31 @@ class csVector3;
 class csBox3;
 class csSphere;
 
-SCF_VERSION (iSequenceWrapper, 0, 0, 1);
+SCF_VERSION (iEngineSequenceParameters, 0, 0, 1);
+
+/**
+ * An interface for passing on parameters to the engine sequence
+ * manager. Some of the operations expect this.
+ */
+struct iEngineSequenceParameters : public iBase
+{
+  /**
+   * Get the number of parameters supported.
+   */
+  virtual int GetParameterCount () const = 0;
+
+  /**
+   * Get a parameter.
+   */
+  virtual iBase* GetParameter (int idx) const = 0;
+
+  /**
+   * Get a parameter by name.
+   */
+  virtual iBase* GetParameter (const char* name) const = 0;
+};
+
+SCF_VERSION (iSequenceWrapper, 0, 1, 0);
 
 /**
  * A sequence wrapper. This objects holds the reference
@@ -66,15 +91,39 @@ struct iSequenceWrapper : public iBase
 		  iMaterialWrapper* mat) = 0;
 
   /**
+   * Operation: set a material on a mesh.
+   * This version works on the supplied iEngineSequenceParameters instance.
+   * So the given indices are parameter indices.
+   */
+  virtual void AddOperationSetMaterial (csTicks time, int meshidx,
+		  int matidx) = 0;
+
+  /**
    * Operation: set a material on a polygon.
    */
-  virtual void AddOperationSetMaterial (csTicks time, iPolygon3D* mesh,
+  virtual void AddOperationSetPolygonMaterial (csTicks time, iPolygon3D* mesh,
 		  iMaterialWrapper* mat) = 0;
+
+  /**
+   * Operation: set a material on a polygon.
+   * This version works on the supplied iEngineSequenceParameters instance.
+   * So the given indices are parameter indices.
+   */
+  virtual void AddOperationSetPolygonMaterial (csTicks time, int meshidx,
+		  int matidx) = 0;
 
   /**
    * Operation: set a light color.
    */
   virtual void AddOperationSetLight (csTicks time, iLight* light,
+		  const csColor& color) = 0;
+
+  /**
+   * Operation: set a light color.
+   * This version works on the supplied iEngineSequenceParameters instance.
+   * So the given indices are parameter indices.
+   */
+  virtual void AddOperationSetLight (csTicks time, int lightidx,
 		  const csColor& color) = 0;
 
   /**
@@ -84,9 +133,25 @@ struct iSequenceWrapper : public iBase
 		  const csColor& color, csTicks duration) = 0;
 
   /**
+   * Operation: fade a light to some color during some time.
+   * This version works on the supplied iEngineSequenceParameters instance.
+   * So the given indices are parameter indices.
+   */
+  virtual void AddOperationFadeLight (csTicks time, int lightidx,
+		  const csColor& color, csTicks duration) = 0;
+
+  /**
    * Operation: set a mesh color.
    */
   virtual void AddOperationSetMeshColor (csTicks time, iMeshWrapper* mesh,
+		  const csColor& color) = 0;
+
+  /**
+   * Operation: set a mesh color.
+   * This version works on the supplied iEngineSequenceParameters instance.
+   * So the given indices are parameter indices.
+   */
+  virtual void AddOperationSetMeshColor (csTicks time, int meshidx,
 		  const csColor& color) = 0;
 
   /**
@@ -96,15 +161,39 @@ struct iSequenceWrapper : public iBase
 		  const csColor& color, csTicks duration) = 0;
 
   /**
+   * Operation: fade a mesh to some color during some time.
+   * This version works on the supplied iEngineSequenceParameters instance.
+   * So the given indices are parameter indices.
+   */
+  virtual void AddOperationFadeMeshColor (csTicks time, int meshidx,
+		  const csColor& color, csTicks duration) = 0;
+
+  /**
    * Operation: set a fog color and density.
    */
   virtual void AddOperationSetFog (csTicks time, iSector* sector,
 		  const csColor& color, float density) = 0;
 
   /**
+   * Operation: set a fog color and density.
+   * This version works on the supplied iEngineSequenceParameters instance.
+   * So the given indices are parameter indices.
+   */
+  virtual void AddOperationSetFog (csTicks time, int sectoridx,
+		  const csColor& color, float density) = 0;
+
+  /**
    * Operation: fade fog to some color/density during some time.
    */
   virtual void AddOperationFadeFog (csTicks time, iSector* sector,
+		  const csColor& color, float density, csTicks duration) = 0;
+
+  /**
+   * Operation: fade fog to some color/density during some time.
+   * This version works on the supplied iEngineSequenceParameters instance.
+   * So the given indices are parameter indices.
+   */
+  virtual void AddOperationFadeFog (csTicks time, int sectoridx,
 		  const csColor& color, float density, csTicks duration) = 0;
 
   /**
@@ -120,12 +209,34 @@ struct iSequenceWrapper : public iBase
 		csTicks duration) = 0;
 
   /**
+   * Operation: rotate object during some time. After the time has elapsed
+   * the rotation will be equal to the given angle here.
+   * Axis is 0, 1, or 2 for x, y, or z. If axis is -1 it is not used.
+   * This version works on the supplied iEngineSequenceParameters instance.
+   * So the given indices are parameter indices.
+   */
+  virtual void AddOperationRotateDuration (csTicks time, int meshidx,
+  		int axis1, float tot_angle1,
+		int axis2, float tot_angle2,
+		int axis3, float tot_angle3,
+		const csVector3& offset,
+		csTicks duration) = 0;
+
+  /**
    * Operation: move object during some time. After the time has elapsed
    * the total relative move will be equal to the 'offset'.
    */
   virtual void AddOperationMoveDuration (csTicks time, iMeshWrapper* mesh,
-		const csVector3& offset,
-		csTicks duration) = 0;
+		const csVector3& offset, csTicks duration) = 0;
+
+  /**
+   * Operation: move object during some time. After the time has elapsed
+   * the total relative move will be equal to the 'offset'.
+   * This version works on the supplied iEngineSequenceParameters instance.
+   * So the given indices are parameter indices.
+   */
+  virtual void AddOperationMoveDuration (csTicks time, int meshidx,
+		const csVector3& offset, csTicks duration) = 0;
 
   /**
    * Operation: enable/disable a given trigger.
@@ -134,12 +245,31 @@ struct iSequenceWrapper : public iBase
   		  iSequenceTrigger* trigger, bool en) = 0;
 
   /**
+   * Operation: enable/disable a given trigger.
+   * This version works on the supplied iEngineSequenceParameters instance.
+   * So the given indices are parameter indices.
+   */
+  virtual void AddOperationTriggerState (csTicks time,
+  		  int triggeridx, bool en) = 0;
+
+  /**
    * Operation: enable checking of trigger state every 'delay'
    * milliseconds (or disable with delay == 0). Use this in
    * combination with AddOperationTestTrigger().
    */
   virtual void AddOperationCheckTrigger (csTicks time,
   		  iSequenceTrigger* trigger, csTicks delay) = 0;
+
+  /**
+   * Operation: enable checking of trigger state every 'delay'
+   * milliseconds (or disable with delay == 0). Use this in
+   * combination with AddOperationTestTrigger().
+   * This version works on the supplied iEngineSequenceParameters instance.
+   * So the given indices are parameter indices.
+   */
+  virtual void AddOperationCheckTrigger (csTicks time,
+  		  int triggeridx, csTicks delay) = 0;
+
   /**
    * Operation: test trigger state and run a sequence if trigger
    * is still valid or another sequence if not (both sequences
@@ -150,9 +280,22 @@ struct iSequenceWrapper : public iBase
   		  iSequenceTrigger* trigger,
 		  iSequence* trueSequence,
 		  iSequence* falseSequence) = 0;
+
+  /**
+   * Operation: test trigger state and run a sequence if trigger
+   * is still valid or another sequence if not (both sequences
+   * can be NULL in which case nothing is run).
+   * Use in combination with AddOperationCheckTrigger().
+   * This version works on the supplied iEngineSequenceParameters instance.
+   * So the given indices are parameter indices.
+   */
+  virtual void AddOperationTestTrigger (csTicks time,
+  		  int triggeridx,
+		  int trueSequenceidx,
+		  int falseSequenceidx) = 0;
 };
 
-SCF_VERSION (iSequenceTrigger, 0, 0, 1);
+SCF_VERSION (iSequenceTrigger, 0, 0, 2);
 
 /**
  * A sequence trigger. When all conditions in a trigger are
@@ -220,6 +363,16 @@ struct iSequenceTrigger : public iBase
    * Trigger the manual condition.
    */
   virtual void Trigger () = 0;
+
+  /**
+   * Set the parameter block to use for the sequence when it is fired.
+   */
+  virtual void SetParameters (iEngineSequenceParameters* params) = 0;
+
+  /**
+   * Get the parameter block.
+   */
+  virtual iEngineSequenceParameters* GetParameters () const = 0;
 
   /**
    * Attach the sequence that will be fired when all trigger
