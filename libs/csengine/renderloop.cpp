@@ -151,54 +151,82 @@ void csLightingRenderStep::Perform (csRenderView* rview, iSector* sector)
     rview->GetCamera()->GetTransform();
   r3d->SetObjectToCamera (&camTransR);
 
-  r3d->SetLightParameter (0, CS_LIGHTPARAM_POSITION,
-  	csVector3 (0, 0, 0));
-  r3d->SetLightParameter (0, CS_LIGHTPARAM_ATTENUATION,
-  	csVector3 (1, 0, 0));
+//  r3d->SetLightParameter (0, CS_LIGHTPARAM_POSITION,
+//  	csVector3 (0, 0, 0));
+//  r3d->SetLightParameter (0, CS_LIGHTPARAM_ATTENUATION,
+//  	csVector3 (1, 0, 0));
   r3d->SetLightParameter (0, CS_LIGHTPARAM_SPECULAR, 
     csVector3 (0, 0, 0));
 
   iSectorRenderMeshList* meshes = sector->GetRenderMeshes ();
-  int i = 0/*, meshnum = meshes->GetCount()*/;
   CS_ALLOC_STACK_ARRAY (csRenderMesh*, sameShaderMeshes, meshes->GetCount());
   int numSSM = 0;
   iShader* shader = NULL;
-  while (true)
+  iLightList* lights = sector->GetLights();
+
+  int nlights = lights->GetCount();
+
+  while (nlights-- > 0)
   {
-    iMeshWrapper* mw;
-    iVisibilityObject* visobj;
-    csRenderMesh* mesh;
-    if (!meshes->GetVisible (i, mw, visobj, mesh)) break;
-    /*
-     @@@!!! That should of course NOT be necessary,
-      but otherwise there's some corruption (at least w/ genmesh).
-     Seems that it has some side effect we have to find out.
+    iLight* light = lights->Get (nlights);
+    const csVector3 lightPos = light->GetCenter ();
+
+    /* 
+      @@@ material specific diffuse/specular/ambient.
+      Realized as shader variables maybe?
      */
-    int n;
-    mw->GetRenderMeshes(n);
-
+    const csColor& color = light->GetColor ();
     r3d->SetLightParameter (0, CS_LIGHTPARAM_DIFFUSE, 
-      csVector3 ((i & 1), (i & 2) >> 1, (i & 4) >> 2));
+      csVector3 (color.red, color.green, color.blue));
+    
+    r3d->SetLightParameter (0, CS_LIGHTPARAM_ATTENUATION,
+      light->GetAttenuationVector ());
+    r3d->SetLightParameter (0, CS_LIGHTPARAM_POSITION,
+      lightPos);
 
-    if (!mesh) continue;
-
-    mesh->material->Visit(); // @@@ here?
-    iShader* meshShader = mesh->material->GetMaterialHandle()->GetShader();
-/*    if (meshShader != shader)
+    csSphere lightSphere (lightPos, light->GetInfluenceRadius ());
+    if (rview->TestBSphere (camTransR, lightSphere))
     {
-      RenderMeshes (r3d, shader, sameShaderMeshes, numSSM);
+      int i = 0/*, meshnum = meshes->GetCount()*/;
 
-      shader = meshShader;
-      numSSM = 0;
+      while (true)
+      {
+	iMeshWrapper* mw;
+	iVisibilityObject* visobj;
+	csRenderMesh* mesh;
+	// @@@Objects outside the light's influence radius are 'lit' as well!
+	if (!meshes->GetVisible (i, mw, visobj, mesh)) break;
+	/*
+	@@@!!! That should of course NOT be necessary,
+	  but otherwise there's some corruption (at least w/ genmesh).
+	Seems that it has some side effect we have to find out.
+	*/
+	int n;
+	mw->GetRenderMeshes(n);
+
+//	r3d->SetLightParameter (0, CS_LIGHTPARAM_DIFFUSE, 
+//	  csVector3 ((i & 1), (i & 2) >> 1, (i & 4) >> 2));
+
+	if (!mesh) continue;
+
+	mesh->material->Visit(); // @@@ here?
+	iShader* meshShader = mesh->material->GetMaterialHandle()->GetShader();
+        if (meshShader != shader)
+	{
+	  RenderMeshes (r3d, shader, sameShaderMeshes, numSSM);
+
+	  shader = meshShader;
+	  numSSM = 0;
+	}
+	sameShaderMeshes[numSSM++] = mesh;
+	// for now, so different objects are colored
+	//RenderMeshes (r3d, meshShader, &mesh, 1);
+      }
+      if (numSSM != 0)
+      {
+	RenderMeshes (r3d, shader, sameShaderMeshes, numSSM);
+      }
     }
-    sameShaderMeshes[numSSM++] = mesh;*/
-    // for now, so different objects are colored
-    RenderMeshes (r3d, meshShader, &mesh, 1);
-  }
-
-  if (numSSM != 0)
-  {
-    RenderMeshes (r3d, shader, sameShaderMeshes, numSSM);
   }
 };
 

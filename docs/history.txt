@@ -48,6 +48,8 @@ The history order is reversed so that new features are at the top.
 	  jamcompatibility. (Also for some reason I don't understand yet
 	  jam2.5rc3 is alot faster when scanning header files...)
 	- Matze also reordered and reindented Boyans history entry.
+	- res updated the hard-coded lighting step in the currently developed
+	  new render loop to do some actual lighting again.
 24-May-2003
 	- Jorrit fixed a bug in GetObjectBoundingBox() of 2D sprites. This
 	  could cause culling errors of those sprites.
