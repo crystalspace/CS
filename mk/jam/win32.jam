@@ -152,7 +152,7 @@ rule SystemLinkPlugin
   Depends $(target) : $(>) ;
   EXPORTDEFS on $(target) = $(exportdefs) ;
   LinkPlugin $(target) : $(>) ;
-  PluginMetaData $(<) : $($(<)_METADATA) ;
+  PluginMetaData $(<) : $($(<)_METAFILE) ;
   # setup clean rules
   Clean clean : $(target) ;
   Clean $(<)clean : $(target) ;
