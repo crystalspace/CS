@@ -161,6 +161,9 @@ typedef class MD3Model {
   md3Bone *bones;
   md3Tag *tags;
   md3Mesh *meshes;
+  AnimInfo *animInfo;
+  int numActions;
+  static const int NUM_ACTIONS;
 } md3Model;
 
 
@@ -180,7 +183,6 @@ class MD32spr {
   csRef<iDocumentNode> CreateValueNodeAsFloat (csRef<iDocumentNode>& parent,
         const char* name, float value);
 
-  //bool ReadFile ();
 
   bool ReadVfsDir ();
   bool LoadAnimation(char *md3File);
@@ -208,8 +210,7 @@ class MD32spr {
   md3Model *upperModel;
   md3Model *lowerModel;
   csVector generic;
-  AnimInfo *animInfo;
-  static const char actionNames[25][15];
+
   static const int NUM_ACTIONS;
   int md3Files;
 

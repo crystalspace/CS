@@ -68,7 +68,6 @@ void Usage() {
   printf("by Manjunath Sripadarao\n");
   printf("Usage: md32spr [options] <model-file.zip> [-o=<output-file.zip>]\n");
   printf("Options:\n");
-  printf("-player\t\tIndicates whether the model is a human model\n");
   printf("-wdir=<dir>\tDirectory in which the weapon files are stored.\n");
   printf("\t\texample: -wdir=railgun\n");
   printf("-o=<file.zip>\tOutput zip file name. \n");
@@ -76,17 +75,8 @@ void Usage() {
   printf("\t\texample: -scale=4096. Model will be scaled as 1/4096.\n");
 }
 
-const char MD32spr::actionNames[25][15] = {
-  "BOTH_DEATH1", "BOTH_DEAD1", "BOTH_DEATH2", "BOTH_DEAD2",
-  "BOTH_DEATH3", "BOTH_DEAD3",
-  "TORSO_GESTURE", "TORSO_ATTACK", "TORSO_ATTACK2", "TORSO_DROP",
-  "TORSO_RAISE", "TORSO_STAND", "TORSO_STAND2",
-  "LEGS_WALKCR", "LEGS_WALK", "LEGS_RUN", "LEGS_BACK", "LEGS_SWIM",
-  "LEGS_JUMP", "LEGS_LAND", "LEGS_JUMPB",
-  "LEGS_LANDB", "LEGS_IDLE", "LEGS_IDLECR", "LEGS_TURN"
-};
-
 const int MD32spr::NUM_ACTIONS = 25;
+const int MD3Model::NUM_ACTIONS = 25;
 
 csRef < iDocumentNode > MD32spr::CreateValueNode(csRef < iDocumentNode >
 						 &parent, const char *name,
@@ -134,6 +124,15 @@ csRef < iDocumentNode > MD32spr::CreateValueNodeAsFloat(csRef <
 MD3Model::MD3Model(iObjectRegistry * object_reg)
 {
   MD3Model::object_reg = object_reg;
+  animInfo = (AnimInfo *) malloc(sizeof(AnimInfo) * (int) NUM_ELEMENTS);
+  for (int i = 0; i < NUM_ACTIONS; i++) {
+    animInfo[i].action = (Actions) i;
+    animInfo[i].startFrame = -1;
+    animInfo[i].numFrames = -1;
+    animInfo[i].loopFrames = -1;
+    animInfo[i].fps = -1;
+  }
+
 }
 
 MD3Model::~MD3Model()
@@ -174,17 +173,7 @@ MD32spr::MD32spr(iObjectRegistry * object_reg)
   MD32spr::object_reg = object_reg;
   player = false;
   headModel = upperModel = lowerModel = NULL;
-  animInfo = (AnimInfo *) malloc(sizeof(AnimInfo) * (int) NUM_ELEMENTS);
   scaleFactor = 1;
-
-  for (int i = 0; i < NUM_ACTIONS; i++) {
-    strcpy(animInfo[i].actionName, actionNames[i]);
-    animInfo[i].action = (Actions) i;
-    animInfo[i].startFrame = -1;
-    animInfo[i].numFrames = -1;
-    animInfo[i].loopFrames = -1;
-    animInfo[i].fps = -1;
-  }
 }
 
 MD32spr::~MD32spr()
@@ -232,14 +221,13 @@ void MD32spr::Main()
    */
   weaponDir = cmdline->GetOption("wdir");
 
-  if (cmdline->GetOption("player")) {
-    player = true;
-  } else {
-    player = false;
-  }
   if (cmdline->GetOption("o")) {
     outZipName = cmdline->GetOption("o");
-  };
+  } else {
+    char *outName = new char[strlen(name.GetData()) + 1];
+    outZipName = basename(name.GetData(), outName);
+    outZipName += "_out.zip";
+  }
 
   if (cmdline->GetOption("scale")) {
     scaleFactor = atof(cmdline->GetOption("scale"));
@@ -257,8 +245,6 @@ void MD32spr::Main()
      baseName += (char)*ptr++;
    */
   basename(name.GetData(), fileName);
-
-  //printf("%d %s\n", strlen(fileName), fileName);
 
   /* This doesn't seem to work if you have the name as /tmp/%s_data, but works when
      there is an ending slash, like /tmp/%s_data/. It mounts the zip file but vfs->FindFiles(char *dirname)
@@ -286,6 +272,8 @@ void MD32spr::Main()
     }
     if(head && torso && leg)
       player = true;
+    else
+      player = false;
   }
 
   for (i = 0; i < fileNames->Length(); i++) {
@@ -576,6 +564,7 @@ bool MD3Model::LoadSkin(char *skinFile)
 bool MD32spr::LoadAnimation(char *animFile)
 {
   int lineLen = 0, tmp = -1, i = 0;
+  int headActions = 1, upperActions = 0, lowerActions = 0;
   char *line;
   size_t fileSz;
   vfs->GetFileSize(animFile, fileSz);
@@ -589,31 +578,46 @@ bool MD32spr::LoadAnimation(char *animFile)
     junk[0] = '\0';
     if (sscanf
 	(line, "%d%d%d%d%s%s", &tmp, &tmp, &tmp, &tmp, junk, name) == 6) {
-      for (i = 0; i < NUM_ACTIONS; i++) {
-	if (strcmp(name, animInfo[i].actionName) == 0) {
-	  sscanf(line, "%d%d%d%d", &animInfo[i].startFrame,
-		 &animInfo[i].numFrames, &animInfo[i].loopFrames,
-		 &animInfo[i].fps);
-	}
+      if(stristr(name, "BOTH") || stristr(name, "TORSO")) {
+	sscanf(line, "%d%d%d%d%s%s", &upperModel->animInfo[upperActions].startFrame,
+	       &upperModel->animInfo[upperActions].numFrames, &upperModel->animInfo[upperActions].loopFrames,
+	       &upperModel->animInfo[upperActions].fps, junk, upperModel->animInfo[upperActions].actionName);
+	upperActions++;
+      }
+      if(stristr(name, "BOTH") || stristr(name, "LEGS")) {
+	sscanf(line, "%d%d%d%d%s%s", &lowerModel->animInfo[lowerActions].startFrame,
+	       &lowerModel->animInfo[lowerActions].numFrames, &lowerModel->animInfo[lowerActions].loopFrames,
+	       &lowerModel->animInfo[lowerActions].fps, junk, lowerModel->animInfo[lowerActions].actionName);
+	lowerActions++;
       }
     }
   }
+  headModel->numActions = headActions;
+  upperModel->numActions = upperActions;
+  lowerModel->numActions = lowerActions;
   /*
    * Post Processing:
    * In some of the animation config files, the numbering leg animations of start frames continue 
    * after torso animations. To correct this we sum the number of torso animations and negate them
    * from leg animations thus resetting the start frames of leg animations.
    */
-  if (animInfo[TORSO_GESTURE].startFrame !=
-      animInfo[LEGS_WALKCR].startFrame) {
+  int upperActionStart = 0, lowerActionStart = 0;
+  for(i = 0; i < NUM_ACTIONS; i++)
+    strcmp(upperModel->animInfo[i].actionName, "TORSO_GESTURE");
+  upperActionStart = i;
+  for(i = 0; i < NUM_ACTIONS; i++)
+    strcmp(lowerModel->animInfo[i].actionName, "LEGS_WALKCR");
+  lowerActionStart = i;
+  if (upperModel->animInfo[upperActionStart].startFrame !=
+      lowerModel->animInfo[lowerActionStart].startFrame) {
     int numTorsoFrames = 0;
-    for (i = 0; i < NUM_ACTIONS; i++)
-      if (stristr(animInfo[i].actionName, "TORSO"))
-	numTorsoFrames += animInfo[i].numFrames;
+    for (i = 0; i < upperActions; i++)
+      if (stristr(upperModel->animInfo[i].actionName, "TORSO"))
+	numTorsoFrames += upperModel->animInfo[i].numFrames;
 
-    for (i = 0; i < NUM_ACTIONS; i++)
-      if (stristr(animInfo[i].actionName, "LEGS")) {
-	animInfo[i].startFrame -= numTorsoFrames;
+    for (i = 0; i < lowerActions; i++)
+      if (stristr(lowerModel->animInfo[i].actionName, "LEGS")) {
+	lowerModel->animInfo[i].startFrame -= numTorsoFrames;
       }
   }
   return true;
@@ -624,9 +628,13 @@ void MD32spr::Write()
   int i = 0;
   char *vfspath, *fileName, *mdlName;
 
-  if (outZipName)
+  if (outZipName) {
     if (outZipName.Length() > 0) {
       csArchive *zipFile = new csArchive(outZipName.GetData());
+      if(!zipFile) {
+	ReportError("Error creating output zip file.\n");
+	return;
+      }
       delete zipFile;
       vfspath = new char[outZipName.Length() + 12];
       fileName = new char[outZipName.Length() + 1];
@@ -637,7 +645,8 @@ void MD32spr::Write()
 	return;
       }
     }
-  
+  }
+
   if(!player && !weaponDir) {
     if (generic.Length()) {
       for (i = 0; i < generic.Length(); i++) {
@@ -852,6 +861,7 @@ void MD32spr::WriteXMLMaterials(md3Model * model,
       CreateValueNode(child, "texture", lowercase(tname));
     }
 }
+
 void MD32spr::WriteGeneric(md3Model * model,
 			   csRef < iDocumentNode > &parent)
 {
@@ -876,7 +886,6 @@ void MD32spr::WriteGeneric(md3Model * model,
       localParent->SetAttribute("name", model->meshes[i].meshHeader->name);
       CreateValueNode(localParent, "plugin",
 		      "crystalspace.mesh.loader.factory.sprite.3d");
-      //WriteXMLTags(model, localParent);
       csRef < iDocumentNode > child =
 	localParent->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
       child->SetValue("params");
@@ -916,26 +925,22 @@ void MD32spr::WriteGeneric(md3Model * model,
 	  texel->SetAttributeAsFloat("v", v);
 	}
       }
-      if(stristr(model->fileName.GetData(), "head") || 
+      if((stristr(model->fileName.GetData(), "head") || 
 	 stristr(model->fileName.GetData(), "upper") || 
-	 stristr(model->fileName.GetData(), "lower")) {
-	int numActions = 0;
-	for(j = 0; j < NUM_ACTIONS; j++)
-	  if(!(model->meshes[i].meshHeader->numMeshFrames - (animInfo[j].startFrame + 1)))
-	    break;
-	numActions = j + 1;
-	for(j = 0; j < numActions; j++) {
-	  if(numActions == 1) {
+	 stristr(model->fileName.GetData(), "lower")) && player) {
+	// Write all the actions.
+	for(j = 0; j < model->numActions; j++) {
+	  if(model->numActions == 1) {
 	    csRef < iDocumentNode > action =
 	      child->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
 	    action->SetValue("action");
 	    action->SetAttribute("name", "default");
 
-	    for (j = 0; j < model->meshes[i].meshHeader->numMeshFrames; j++) {
+	    for (k = 0; k < model->meshes[i].meshHeader->numMeshFrames; k++) {
 	      char fNum[10];
 	      csRef < iDocumentNode > f =
 		action->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
-	      sprintf(fNum, "f%d", j);
+	      sprintf(fNum, "f%d", k);
 	      f->SetValue("f");
 	      f->SetAttribute("name", fNum);
 	      f->SetAttribute("delay", "1000");	/// 1000 is the default delay.
@@ -944,19 +949,19 @@ void MD32spr::WriteGeneric(md3Model * model,
 	    csRef < iDocumentNode > action =
 	      child->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
 	    action->SetValue("action");
-	    action->SetAttribute("name", animInfo[j].actionName);
+	    action->SetAttribute("name", model->animInfo[j].actionName);
 	  
-	    for(k = animInfo[j].startFrame; k < animInfo[j].startFrame + animInfo[j].numFrames; k++) {
+	    for(k = model->animInfo[j].startFrame; 
+		k < (model->animInfo[j].startFrame + model->animInfo[j].numFrames); 
+		k++) {
 	      char fNum[10];
 	      csRef < iDocumentNode > f =
 		action->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
 	      sprintf(fNum, "f%d", k);
 	      f->SetValue("f");
 	      f->SetAttribute("name", fNum);
-	      float delay = (1.0f/(float)animInfo[j].fps) * 1000;
-	      char dStr[10];
-	      sprintf(dStr, "%d", (int)delay);
-	      f->SetAttribute("delay", dStr);  
+	      float delay = (1.0f/(float)model->animInfo[j].fps) * 1000;
+	      f->SetAttributeAsFloat("delay", delay);  
 	    }
 	  }
 	}
