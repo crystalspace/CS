@@ -1295,7 +1295,7 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
     // -GL_COLOR_BUFFER_BIT saves blend types among other things,
     // -GL_DEPTH_BUFFER_BIT saves depth test function
     // -GL_TEXTURE_BIT saves current texture handle
-    glPushAttrib (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_TEXTURE_BIT);
+    glPushAttrib ( GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_TEXTURE_BIT );
 
     // we need to texture and blend, without vertex color
     // interpolation
