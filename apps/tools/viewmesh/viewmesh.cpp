@@ -140,7 +140,7 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 	  }
       	  if (dialog)
 	    delete dialog;
-	  dialog= csFileDialog (this, "Select Mesg Object");
+	  dialog= csFileDialog (this, "Select Mesh Object", "/this/", "Open", true);
 	  StartModal (dialog, NULL);
 	  return true;
 	}
@@ -150,6 +150,7 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 	  csQueryFileDialog (dialog, filename, sizeof(filename));
 	  delete dialog;
 	  dialog = NULL;
+
 	  if (!LoadSprite(filename,1))
 	  {
 	    Printf (CS_REPORTER_SEVERITY_ERROR, "couldn't load mesh");
