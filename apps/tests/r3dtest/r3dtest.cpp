@@ -58,107 +58,10 @@
 #  include "ivideo/graph3d.h"
 #endif
 
-#include "imesh/terrfunc.h"
-#include "imesh/genmesh.h"
-
-
-
-/*#include "csengine/material.h"
-#include "csengine/texture.h"*/
-
 #include "r3dtest.h"
 
 CS_IMPLEMENT_APPLICATION
 
-#ifdef CS_USE_NEW_RENDERER
-class csTestMesh : public iStreamSource
-{
-private:
-  csRef<iRender3D> r3d;
-  csRef<iRenderBuffer> vertices;
-  csRef<iRenderBuffer> indices;
-  csRef<iRenderBuffer> texcoords;
-
-  csStringID vertices_name, indices_name, texcoords_name;
-
-public:
-
-  SCF_DECLARE_IBASE;
-
-  csTestMesh (iRender3D* r3d)
-  {
-    SCF_CONSTRUCT_IBASE (NULL)
-
-    csTestMesh::r3d = r3d;
-
-    vertices = r3d->GetBufferManager ()->GetBuffer (
-      sizeof (csVector3)*8, CS_BUF_STATIC);
-    texcoords = r3d->GetBufferManager ()->GetBuffer (
-      sizeof (csVector2)*8, CS_BUF_STATIC);
-    indices = r3d->GetBufferManager ()->GetBuffer (
-      sizeof (unsigned int)*36, CS_BUF_INDEX);
-
-    csVector3* vbuf = (csVector3*)vertices->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
-    vbuf[0] = csVector3 (-1,  1, -1);
-    vbuf[1] = csVector3 ( 1,  1, -1);
-    vbuf[2] = csVector3 (-1,  1,  1);
-    vbuf[3] = csVector3 ( 1,  1,  1);
-    vbuf[4] = csVector3 (-1, -1, -1);
-    vbuf[5] = csVector3 ( 1, -1, -1);
-    vbuf[6] = csVector3 (-1, -1,  1);
-    vbuf[7] = csVector3 ( 1, -1,  1);
-    vertices->Release();
-
-    unsigned int* ibuf = (unsigned int*)indices->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
-    ibuf[ 0] = 0;  ibuf[ 1] = 1;  ibuf[ 2] = 4;
-    ibuf[ 3] = 1;  ibuf[ 4] = 5;  ibuf[ 5] = 4;
-    ibuf[ 6] = 0;  ibuf[ 7] = 3;  ibuf[ 8] = 1;
-    ibuf[ 9] = 0;  ibuf[10] = 2;  ibuf[11] = 3;
-    ibuf[12] = 4;  ibuf[13] = 7;  ibuf[14] = 6;
-    ibuf[15] = 4;  ibuf[16] = 5;  ibuf[17] = 7;
-    ibuf[18] = 1;  ibuf[19] = 3;  ibuf[20] = 5;
-    ibuf[21] = 3;  ibuf[22] = 7;  ibuf[23] = 5;
-    ibuf[24] = 2;  ibuf[25] = 0;  ibuf[26] = 6;
-    ibuf[27] = 0;  ibuf[28] = 4;  ibuf[29] = 6;
-    ibuf[30] = 2;  ibuf[31] = 6;  ibuf[32] = 3;
-    ibuf[33] = 3;  ibuf[34] = 6;  ibuf[35] = 7;
-    indices->Release();
-
-    csVector2* tcbuf = (csVector2*)texcoords->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
-    tcbuf[0] = csVector2 (0, 0);
-    tcbuf[1] = csVector2 (1, 0);
-    tcbuf[2] = csVector2 (0, 1);
-    tcbuf[3] = csVector2 (1, 1);
-    tcbuf[4] = csVector2 (0, 0);
-    tcbuf[5] = csVector2 (1, 0);
-    tcbuf[6] = csVector2 (0, 1);
-    tcbuf[7] = csVector2 (1, 1);
-
-    texcoords->Release();
-
-
-    vertices_name = r3d->GetStringContainer ()->Request ("vertices");
-    indices_name = r3d->GetStringContainer ()->Request ("indices");
-    texcoords_name = r3d->GetStringContainer ()->Request ("texture coordinates");
-  }
-  virtual ~csTestMesh () { }
-
-  iRenderBuffer* GetBuffer(csStringID name)
-  {
-    if (name == vertices_name)
-      return vertices;
-    if (name == indices_name)
-      return indices;
-    if (name == texcoords_name)
-      return texcoords;
-    return NULL;
-  }
-};
-
-SCF_IMPLEMENT_IBASE (csTestMesh)
-  SCF_IMPLEMENTS_INTERFACE (iStreamSource)
-SCF_IMPLEMENT_IBASE_END
-#endif
 
 //-----------------------------------------------------------------------------
 
@@ -182,26 +85,6 @@ void R3DTest::SetupFrame ()
   // Now rotate the camera according to keyboard state
 
   float speed = (elapsed_time / 1000.0) * (0.03 * 20);
-  static float FPS = 0;
-  static int framecount = 0;
-  static int timeaccum = 0;
-  framecount++;
-  timeaccum += elapsed_time;
-
-  if ((framecount % 60) == 0)
-  {
-    FPS = 60000.0/(float)timeaccum;
-    timeaccum = 0;
-  }
-
-  /*if (kbd->GetKeyState (CSKEY_RIGHT))
-    view->GetCamera ()->GetTransform ().RotateOther (CS_VEC_ROT_RIGHT, speed * 5.0);
-  if (kbd->GetKeyState (CSKEY_LEFT))
-    view->GetCamera ()->GetTransform ().RotateOther (CS_VEC_ROT_LEFT, speed * 5.0);
-  if (kbd->GetKeyState (CSKEY_PGUP))
-    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed * 5.0);
-  if (kbd->GetKeyState (CSKEY_PGDN))
-    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed * 5.0);*/
 
   int w = r3d->GetDriver2D ()->GetWidth()/2;
   int h = r3d->GetDriver2D ()->GetHeight()/2;
@@ -239,23 +122,6 @@ void R3DTest::SetupFrame ()
     return;
 
   view->Draw ();
-
-  r3d->FinishDraw ();
-  
-  if (!r3d->BeginDraw (CSDRAW_2DGRAPHICS))
-    return;
-
-  iFontServer* fntsvr = r3d->GetDriver2D ()->GetFontServer ();
-  CS_ASSERT (fntsvr != NULL);
-  csRef<iFont> fnt (fntsvr->GetFont (0));
-  if (fnt == NULL)
-  {
-    fnt = fntsvr->LoadFont (CSFONT_COURIER);
-  }
-  char text[1024];
-  //sprintf (text, "Ah, it iz le test!      Le FPS c'est cyrrentlee %f, frame %d", FPS/*, framecount*/);
-  sprintf (text, "%f", FPS);
-  r3d->GetDriver2D ()->Write (fnt, 10, 50, 0x00FF00FF, -1, text);
 
   r3d->FinishDraw ();
 }
