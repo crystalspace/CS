@@ -45,8 +45,6 @@ struct iObjectRegistry;
 struct iMeshWrapper;
 struct iSkeletonBone;
 
-
-
 ////////////////////////////////////////////
 // NOTE
 // There is lots of unused stuff in here involving iCollideSystem
@@ -154,6 +152,7 @@ private:
   iDynamicsMoveCallback* move_cb;
 
   csObjVector bodies;
+  csObjVector groups;
   csObjVector joints;
 
 public:
@@ -174,10 +173,35 @@ public:
   iRigidBody* CreateBody ();
   void RemoveBody (iRigidBody* body);
 
+  iBodyGroup* CreateGroup ();
+  void RemoveGroup (iBodyGroup *group);
+
   iJoint* CreateJoint ();
   void RemoveJoint (iJoint* joint);
 
   iDynamicsMoveCallback* GetDefaultMoveCallback () { return move_cb; }
+};
+
+/**
+ * odedynam implementation of iBodyGroup.  This will set a 
+ * variable inside the body which will be compared against 
+ * inside NearCallback
+ */
+class csODEBodyGroup : public iBodyGroup
+{
+  csObjVector bodies;
+
+  csODEDynamicSystem *system;
+ 
+public:
+  SCF_DECLARE_IBASE;
+
+  csODEBodyGroup (csODEDynamicSystem *sys); 
+  virtual ~csODEBodyGroup ();
+
+  void AddBody (iRigidBody *body);
+  void RemoveBody (iRigidBody *body);
+  bool BodyInGroup (iRigidBody *body);
 };
 
 /**
@@ -193,6 +217,7 @@ private:
   dGeomID groupID;
   csGeomList ids;
   dJointID statjoint;
+  iBodyGroup *collision_group;
 
   csODEDynamicSystem* dynsys;
 
@@ -212,6 +237,10 @@ public:
   bool MakeStatic (void);
   bool IsStatic (void) { return statjoint != 0; }
   bool MakeDynamic (void);
+
+  void SetGroup (iBodyGroup *group);
+  void UnsetGroup () { collision_group = NULL; }
+  iBodyGroup *GetGroup (void) { return collision_group; }
 
   bool AttachColliderMesh (iMeshWrapper* mesh,
   	const csOrthoTransform& trans, float friction, float density,

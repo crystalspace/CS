@@ -47,6 +47,10 @@ SCF_IMPLEMENT_IBASE (csODEDynamicSystem)
   SCF_IMPLEMENTS_INTERFACE (iDynamicSystem)
 SCF_IMPLEMENT_IBASE_END
 
+SCF_IMPLEMENT_IBASE (csODEBodyGroup)
+  SCF_IMPLEMENTS_INTERFACE (iBodyGroup)
+SCF_IMPLEMENT_IBASE_END
+
 SCF_IMPLEMENT_IBASE (csODERigidBody)
   SCF_IMPLEMENTS_INTERFACE (iRigidBody)
 SCF_IMPLEMENT_IBASE_END
@@ -121,10 +125,11 @@ void csODEDynamics::Step (float stepsize)
 
 void csODEDynamics::NearCallback (void *data, dGeomID o1, dGeomID o2)
 {
-  iRigidBody *b1 = (iRigidBody *)dBodyGetData (dGeomGetBody (o1));
-  iRigidBody *b2 = (iRigidBody *)dBodyGetData (dGeomGetBody (o2));
+  iRigidBody *b1 = (iRigidBody *)dBodyGetData (dGeomGetBody(o1));
+  iRigidBody *b2 = (iRigidBody *)dBodyGetData (dGeomGetBody(o2));
 
   if (b1->IsStatic() && b2->IsStatic()) return;
+  if (b1->GetGroup() != NULL && (b1->GetGroup() == b2->GetGroup())) return;
 
   dContact contact[10];
   int a = dCollide (o1, o2, 10, &(contact[0].geom), sizeof (dContact));
@@ -495,6 +500,18 @@ void csODEDynamicSystem::RemoveBody (iRigidBody* body)
   bodies.Delete (body, true);
 }
 
+iBodyGroup *csODEDynamicSystem::CreateGroup ()
+{
+  csODEBodyGroup* group = new csODEBodyGroup (this);
+  groups.Push (group);
+  return group;
+}
+
+void csODEDynamicSystem::RemoveGroup (iBodyGroup *group)
+{
+  bodies.Delete (group); 
+}
+
 iJoint* csODEDynamicSystem::CreateJoint ()
 {
   csODEJoint* joint = new csODEJoint (this);
@@ -527,6 +544,35 @@ void csODEDynamicSystem::Step (float stepsize)
     ((iRigidBody*)bodies.Get (i))->Update ();
 }
 
+csODEBodyGroup::csODEBodyGroup (csODEDynamicSystem* sys)
+{
+  system = sys;
+}
+
+csODEBodyGroup::~csODEBodyGroup ()
+{
+  for (int i = 0; i < bodies.Length(); i ++) {
+    ((csODERigidBody *)bodies[i])->UnsetGroup ();
+  }
+}
+
+void csODEBodyGroup::AddBody (iRigidBody *body) 
+{
+  bodies.Push (body);
+  ((csODERigidBody *)body)->SetGroup (this);
+}
+
+void csODEBodyGroup::RemoveBody (iRigidBody *body)
+{
+  bodies.Delete (body, false);
+  ((csODERigidBody *)body)->UnsetGroup ();
+}
+
+bool csODEBodyGroup::BodyInGroup (iRigidBody *body)
+{
+  return bodies.Find (body) != -1;
+}
+
 csODERigidBody::csODERigidBody (csODEDynamicSystem* sys)
 {
   SCF_CONSTRUCT_IBASE (NULL);
@@ -539,6 +585,7 @@ csODERigidBody::csODERigidBody (csODEDynamicSystem* sys)
   groupID = dCreateGeomGroup (dynsys->GetSpaceID());
   dGeomSetBody (groupID, bodyID);
   statjoint = 0;
+  collision_group = NULL;
 
   mesh = NULL;
   bone = NULL;
@@ -572,6 +619,14 @@ bool csODERigidBody::MakeDynamic ()
     dBodySetGravityMode (bodyID, 1);
   }
   return true;
+}
+
+void csODERigidBody::SetGroup(iBodyGroup *group)
+{
+  if (collision_group) {
+    collision_group->RemoveBody (this);
+  }
+  collision_group = group;
 }
 
 bool csODERigidBody::AttachColliderMesh (iMeshWrapper *mesh,

@@ -30,7 +30,9 @@ struct iSkeletonBone;
 
 struct iDynamicSystem;
 struct iRigidBody;
+struct iBodyGroup;
 struct iDynamicsMoveCallback;
+struct iDynamicsCollisionCallback;
 struct iJoint;
 struct iPolygonMesh;
 
@@ -76,6 +78,12 @@ struct iDynamicSystem : public iBase
   /// Create a rigid body and add it to the simulation
   virtual void RemoveBody( iRigidBody* body ) = 0;
 
+  /// Create a body group.  Bodies in a group don't collide with each other
+  virtual iBodyGroup* CreateGroup () = 0;
+
+  /// Remove a group from a simulation.  Those bodies now collide
+  virtual void RemoveGroup (iBodyGroup* group) = 0;
+
   /// Create a joint and add it to the simulation
   virtual iJoint* CreateJoint () = 0;
 
@@ -108,6 +116,25 @@ struct iDynamicsCollisionCallback : public iBase
   virtual void Execute (iRigidBody *thisbody, iRigidBody *otherbody) = 0;
 };
 
+SCF_VERSION (iBodyGroup, 0, 0, 1);
+
+/**
+ * Body Group is a collection of bodies which don't collide with
+ * each other.  This can speed up processing by manually avoiding
+ * certain collisions.  For instance if you have a car built of 
+ * many different bodies.  The bodies can be collected into a group
+ * and the car will be treated as a single object.
+ */
+struct iBodyGroup : public iBase
+{
+   /// Adds a body to this group
+   virtual void AddBody (iRigidBody *body) = 0;
+   /// Removes a body from this group
+   virtual void RemoveBody (iRigidBody *body) = 0;
+   /// Tells whether the body is in this group or not
+   virtual bool BodyInGroup (iRigidBody *body) = 0;
+};
+
 SCF_VERSION (iRigidBody, 0, 0, 1);
 
 /**
@@ -128,6 +155,9 @@ struct iRigidBody : public iBase
   virtual bool MakeDynamic (void) = 0;
   /// Tells whether a body has been made static or not
   virtual bool IsStatic (void) = 0;
+
+  /// Returns which group a body belongs to
+  virtual iBodyGroup *GetGroup (void) = 0;
 
   /// Add a collider with a associated friction coefficient
   virtual bool AttachColliderMesh (iMeshWrapper* mesh,
