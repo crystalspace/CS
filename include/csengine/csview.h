@@ -116,7 +116,7 @@ public:
     }
     virtual void Draw ()
     {
-      return scfParent->Draw ();
+      scfParent->Draw ();
     }
   } scfiView;
 };
