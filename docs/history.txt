@@ -52,6 +52,9 @@ chronological order.
 	  flex or yacc, so if something doesn't appear to work, please let me
 	  know (or fix it!).
 	- Rhad fixed a bounds issue in partedit.
+	- Rhad added a minimum scrollbar knob width to aws scrollbars of 5
+	  pixels.  Without this, when the range of the scrollbar was big
+	  enough, the knob would disappear.
 21-Oct-2003
 	- Rhad added UI for Initial Speed and Initial Acceleration to partedit.
 	- Eric Sunshine made the following configuration-related changes:

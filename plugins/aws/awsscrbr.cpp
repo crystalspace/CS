@@ -567,7 +567,12 @@ void awsScrollBar::OnDraw (csRect clip)
           "ScrollBarHeight",
           height);
     else
+	{
       height = (int)((amntvis * f.Height ()) / (max-min));
+	  // Minimum height of the scrollbar is 5 pixels
+	  if (height<5)
+		  height=5;
+	}
 
     // Get the actual height that we can traverse with the knob
     int bh = f.Height () - height;
@@ -594,7 +599,12 @@ void awsScrollBar::OnDraw (csRect clip)
       WindowManager ()->GetPrefMgr ()->LookupIntKey 
         ("ScrollBarWidth", width);
     else
+	{
       width = (int)((amntvis * f.Width ()) / (max-min));
+	  // Minimum width of the scrollbar is 5 pixels
+	  if (width<5)
+		  width=5;
+	}
 
     // Get the actual height that we can traverse with the knob
     int bw = f.Width () - width;
