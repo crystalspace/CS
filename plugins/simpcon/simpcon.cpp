@@ -67,6 +67,7 @@ csSimpleConsole::csSimpleConsole (iBase *iParent)
   ConsoleMode = CONSOLE_MODE;
   CursorState = false;
   InvalidAll = true;
+  console_font = NULL;
 }
 
 csSimpleConsole::~csSimpleConsole ()
@@ -115,7 +116,11 @@ bool csSimpleConsole::Initialize (iSystem *iSys)
   }
   else
     fontname = buf;
-  console_font = G2D->GetFontServer ()->LoadFont (fontname);
+  iFontServer *fs = G2D->GetFontServer ();
+  if (!fs)
+    System->Printf (MSG_FATAL_ERROR, "Console: No font server plug-in loaded!\n");
+  else
+    console_font = fs->LoadFont (fontname);
   if (!console_font)
   {
     System->Printf (MSG_FATAL_ERROR,
