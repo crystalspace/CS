@@ -21,7 +21,7 @@
 #include "csengine/sysitf.h"
 #include "csengine/colldet/being.h"
 #include "csobject/nameobj.h"
-#include "csobject/cdobj.h"
+#include "csengine/colldet/cdobj.h"
 
 ///
 bool csBeing::init = false;
@@ -223,18 +223,18 @@ int csBeing::CollisionDetect( void )
 {
   int hit = 0, cs;
   CollideReset();
-	
+        
   if (_sold == 0)
   {
-	_mold = transform->GetO2T ();
-	_vold = transform->GetO2TTranslation ();
-	_sold = sector;
+        _mold = transform->GetO2T ();
+        _vold = transform->GetO2TTranslation ();
+        _sold = sector;
   }
-	
+        
   // See if we have entered a new sector.
   if (sector!=_sold)
-	_ground = 0;	// If so we do not know the ground object.
-	
+        _ground = 0;    // If so we do not know the ground object.
+        
 
   // Find all sectors which our being occupies.
   csSector*  all[MAXSECTORSOCCUPIED];
@@ -251,48 +251,48 @@ int csBeing::CollisionDetect( void )
   // If there isn't one, test the sector.
   cdtnew.SetOrigin (transform->GetO2TTranslation ()+(0.2*VEC_DOWN));
 
-  hit = _ground&&CollidePair(this,_ground, &cdtnew);	// Test with the known ground object.
+  hit = _ground&&CollidePair(this,_ground, &cdtnew);    // Test with the known ground object.
   cs = 0;
   while (!hit && (cs < scount))    // Test all nearby sectors.
   {
-    hit = _CollisionDetect (all[cs], &cdtnew);		// Test with everything in the sector.
+    hit = _CollisionDetect (all[cs], &cdtnew);          // Test with everything in the sector.
     cs++;
   }
 
   if (hit)
   {
-	falling = false;
-	climbing = false;
-		
-	// We are on something solid, remember what the ground was.
-	CDTriangle *tr1 = 0, *tr2 = 0;
-	_ground = FindCollision(&tr1,&tr2);
-	// TODO: Check tr2 and what its normal is w.r.t. gravity,
-	// If the angle more than 45* we should slip/bounce.
-		
-	// printf("Ground %s\n",ground->get_name());
-	// Perform forward collision of player with this sector.
-	CollideReset();
+        falling = false;
+        climbing = false;
+                
+        // We are on something solid, remember what the ground was.
+        CDTriangle *tr1 = 0, *tr2 = 0;
+        _ground = FindCollision(&tr1,&tr2);
+        // TODO: Check tr2 and what its normal is w.r.t. gravity,
+        // If the angle more than 45* we should slip/bounce.
+                
+        // printf("Ground %s\n",ground->get_name());
+        // Perform forward collision of player with this sector.
+        CollideReset();
 
         cs = 0;
         hit = 0;
         while (!hit && (cs < scount))    // Test all nearby sectors.
         {
-	  hit = _CollisionDetect (all[cs], transform);
+          hit = _CollisionDetect (all[cs], transform);
           cs++;
         }
-	// Hack for now assumes constant frame rate.
-	if (hit) // Return to previous position.
-	{
-		// Get the object we hit.
+        // Hack for now assumes constant frame rate.
+        if (hit) // Return to previous position.
+        {
+                // Get the object we hit.
 
-		csCollider *cdhit = FindCollision();
-			
-		// Try to see if we can climb up.
-		csTransform cdtnew(transform->GetO2T (),transform->GetO2TTranslation ()+(0.2*VEC_UP));
-			
-		// See if we still hit.  If so we are stuck, if not we may try to climb but
-		// we need to retest the sector since we may still hit something else.
+                csCollider *cdhit = FindCollision();
+                        
+                // Try to see if we can climb up.
+                csTransform cdtnew(transform->GetO2T (),transform->GetO2TTranslation ()+(0.2*VEC_UP));
+                        
+                // See if we still hit.  If so we are stuck, if not we may try to climb but
+                // we need to retest the sector since we may still hit something else.
                 cs = 0;
                 hit = 0;
                 while (!hit && (cs < scount))    // Test all nearby sectors.
@@ -300,39 +300,39 @@ int csBeing::CollisionDetect( void )
                     hit = _CollisionDetect(all[cs], &cdtnew);
                     cs++;
                 }
-		if (!CollidePair(this,cdhit, &cdtnew) && !hit)
-		{
-			CollideReset();
-			climbing = true;
-			transform->SetOrigin (cdtnew.GetO2TTranslation ());
-		}
-		else // Stay where we were, we definitly hit something.
-		{
-			climbing = false;
-               		 blocked = true;
-			transform->SetOrigin (_vold);
-			transform->SetO2T (_mold);
-			sector = _sold;
-		}
-	}
+                if (!CollidePair(this,cdhit, &cdtnew) && !hit)
+                {
+                        CollideReset();
+                        climbing = true;
+                        transform->SetOrigin (cdtnew.GetO2TTranslation ());
+                }
+                else // Stay where we were, we definitly hit something.
+                {
+                        climbing = false;
+                         blocked = true;
+                        transform->SetOrigin (_vold);
+                        transform->SetO2T (_mold);
+                        sector = _sold;
+                }
+        }
   }
   else // We did not find ground below us.
   {
-	// Assume constant fall rate.
+        // Assume constant fall rate.
 
-	// Patch from Ivan Avramovic to avoid the bug with falling through
-	// the hole in large.zip.
-	//transform->SetOrigin (transform->GetO2TTranslation () +(0.2*VEC_DOWN));
-	bool mirror = false;
-	csVector3 new_position = transform->GetOrigin () + (0.2*VEC_DOWN);
-	csReversibleTransform t = *transform;
-	sector = sector->FollowSegment (t, new_position, mirror);
-	*transform = t;  transform->SetOrigin (new_position);
+        // Patch from Ivan Avramovic to avoid the bug with falling through
+        // the hole in large.zip.
+        //transform->SetOrigin (transform->GetO2TTranslation () +(0.2*VEC_DOWN));
+        bool mirror = false;
+        csVector3 new_position = transform->GetOrigin () + (0.2*VEC_DOWN);
+        csReversibleTransform t = *transform;
+        sector = sector->FollowSegment (t, new_position, mirror);
+        *transform = t;  transform->SetOrigin (new_position);
 
-	//	transform->SetO2T (_mold);
-	_ground = 0;
-	falling = true;
-	climbing = false;
+        //      transform->SetO2T (_mold);
+        _ground = 0;
+        falling = true;
+        climbing = false;
   }
 
   // Store these locations for next frame.
