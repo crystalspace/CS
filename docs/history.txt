@@ -34,6 +34,9 @@ chronological order.
 	- Jorrit implemented support for hierarchical transforms (both for
 	  vertices and color) in gmeshanim.
 	- Jorrit did several other small fixes and optimizations to gmeshanim.
+	- Jorrit implemented scaling of vertex groups in gmeshanim. Not 100%
+	  ok though. There is a new fancy object in flarge demonstrating
+	  all this.
 14-Sep-2004
 	- Eric Sunshine fixed bug in msvcgen.jam's LinkWith override where it
 	  did not distinguish between release and debug libraries & linker

@@ -149,6 +149,34 @@ bool csAnimControlRunnable::Do (csTicks current, bool& stop)
   }
 
   //-------
+  // Perform all running scales.
+  //-------
+  i = scales.Length ();
+  while (i > 0)
+  {
+    i--;
+    ac_scale_execution& m = scales[i];
+    float scale;
+    if (current < m.final)
+      scale = m.final_scale - (m.final-current) * m.delta_scale_per_tick;
+    else
+      scale = m.final_scale;
+    csMatrix3 sca;
+    switch (m.axis)
+    {
+      case 0: sca = csXScaleMatrix3 (scale); break;
+      case 1: sca = csYScaleMatrix3 (scale); break;
+      case 2: sca = csZScaleMatrix3 (scale); break;
+    }
+    m.group->GetTransform () = m.base_transform *
+	csReversibleTransform (sca, csVector3 (0));
+
+    if (current >= m.final)
+      scales.DeleteIndexFast (i);
+    mod = true;
+  }
+
+  //-------
   // Perform all running rotates.
   //-------
   i = rotates.Length ();
@@ -204,6 +232,37 @@ bool csAnimControlRunnable::Do (csTicks current, bool& stop)
       case AC_REPEAT:
         current_instruction = 0;
         return mod;
+      case AC_SCALEX:
+      case AC_SCALEY:
+      case AC_SCALEZ:
+	{
+	  ac_scale_execution m;
+	  m.final = current + inst.scale.duration;
+	  m.group = groups[inst.scale.group_id];
+	  m.final_scale = inst.scale.scale;
+	  m.axis = inst.opcode - AC_SCALEX;
+	  if (inst.scale.duration == 0)
+	  {
+	    // Scale instantly.
+	    csMatrix3 sca;
+	    switch (m.axis)
+	    {
+	      case 0: sca = csXScaleMatrix3 (m.final_scale); break;
+	      case 1: sca = csYScaleMatrix3 (m.final_scale); break;
+	      case 2: sca = csZScaleMatrix3 (m.final_scale); break;
+	    }
+	    m.group->GetTransform () *= csReversibleTransform (sca,
+	    	csVector3 (0));
+	  }
+	  else
+	  {
+	    m.base_transform = m.group->GetTransform ();
+	    m.delta_scale_per_tick = m.final_scale
+	    	/ float (inst.scale.duration);
+	    scales.Push (m);
+	  }
+	}
+	break;
       case AC_ROTX:
       case AC_ROTY:
       case AC_ROTZ:
@@ -211,7 +270,6 @@ bool csAnimControlRunnable::Do (csTicks current, bool& stop)
 	  ac_rotate_execution m;
 	  m.final = current + inst.rotate.duration;
 	  m.group = groups[inst.rotate.group_id];
-	  m.base_transform = m.group->GetTransform ();
 	  m.final_angle = inst.rotate.angle;
 	  m.axis = inst.opcode - AC_ROTX;
 	  if (inst.rotate.duration == 0)
@@ -229,6 +287,7 @@ bool csAnimControlRunnable::Do (csTicks current, bool& stop)
 	  }
 	  else
 	  {
+	    m.base_transform = m.group->GetTransform ();
 	    m.delta_angle_per_tick = m.final_angle
 	    	/ float (inst.rotate.duration);
 	    rotates.Push (m);
@@ -736,6 +795,45 @@ const char* csGenmeshAnimationControlFactory::ParseScript (iDocumentNode* node)
 	  animates_vertices = true;
 	}
         break;
+      case XMLTOKEN_SCALEX:
+	{
+	  const char* groupname = child->GetAttributeValue ("group");
+	  if (!groupname) return "Missing group name for <scalex>!";
+	  size_t group_id = FindGroupIndex (groupname);
+	  if (group_id == (size_t)~0) return "Can't find group for <scalex>!";
+	  ac_instruction& instr = ad.script->AddInstruction (AC_SCALEX);
+	  instr.scale.group_id = group_id;
+	  instr.scale.duration = child->GetAttributeValueAsInt ("duration");
+	  instr.scale.scale = child->GetAttributeValueAsFloat ("scale");
+	  animates_vertices = true;
+	}
+	break;
+      case XMLTOKEN_SCALEY:
+	{
+	  const char* groupname = child->GetAttributeValue ("group");
+	  if (!groupname) return "Missing group name for <scaley>!";
+	  size_t group_id = FindGroupIndex (groupname);
+	  if (group_id == (size_t)~0) return "Can't find group for <scaley>!";
+	  ac_instruction& instr = ad.script->AddInstruction (AC_SCALEY);
+	  instr.scale.group_id = group_id;
+	  instr.scale.duration = child->GetAttributeValueAsInt ("duration");
+	  instr.scale.scale = child->GetAttributeValueAsFloat ("scale");
+	  animates_vertices = true;
+	}
+	break;
+      case XMLTOKEN_SCALEZ:
+	{
+	  const char* groupname = child->GetAttributeValue ("group");
+	  if (!groupname) return "Missing group name for <scalez>!";
+	  size_t group_id = FindGroupIndex (groupname);
+	  if (group_id == (size_t)~0) return "Can't find group for <scalez>!";
+	  ac_instruction& instr = ad.script->AddInstruction (AC_SCALEZ);
+	  instr.scale.group_id = group_id;
+	  instr.scale.duration = child->GetAttributeValueAsInt ("duration");
+	  instr.scale.scale = child->GetAttributeValueAsFloat ("scale");
+	  animates_vertices = true;
+	}
+	break;
       case XMLTOKEN_ROTX:
 	{
 	  const char* groupname = child->GetAttributeValue ("group");

@@ -106,6 +106,9 @@ enum ac_opcode
   AC_REPEAT,
   AC_COLOR,
   AC_MOVE,
+  AC_SCALEX,
+  AC_SCALEY,
+  AC_SCALEZ,
   AC_ROTX,
   AC_ROTY,
   AC_ROTZ
@@ -142,6 +145,12 @@ struct ac_instruction
       csTicks duration;
       float angle;
     } rotate;
+    struct
+    {
+      size_t group_id;
+      csTicks duration;
+      float scale;
+    } scale;
     struct
     {
       csTicks time;
@@ -188,6 +197,19 @@ struct ac_move_execution
 };
 
 /**
+ * A running scale operation.
+ */
+struct ac_scale_execution
+{
+  csAnimControlGroup* group;
+  csTicks final;
+  int axis;
+  csReversibleTransform base_transform;
+  float delta_scale_per_tick;
+  float final_scale;
+};
+
+/**
  * A running rotate operation.
  */
 struct ac_rotate_execution
@@ -228,6 +250,8 @@ private:
   csArray<ac_move_execution> moves;
   // Current rotate operations.
   csArray<ac_rotate_execution> rotates;
+  // Current scale operations.
+  csArray<ac_scale_execution> scales;
   // Current delay operation.
   struct del
   {
