@@ -95,6 +95,7 @@ chronological order.
 	  principles are now working. Removed the jittering test case.
 	  Currently no animation is occuring but you can see test messages
 	  appear on stdout. Still work in progress.
+	- PK added multi-include protection to DbgHelpAPI.h
 13-Sep-2004
 	- Eric Sunshine renamed the following symbols in order to avoid
 	  global namespace pollution:
