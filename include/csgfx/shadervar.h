@@ -28,7 +28,6 @@
 #include "csgfx/rgbpixel.h"
 
 struct iTextureHandle;
-struct iMaterialHandle;
 
 /**
  * Storage class for inheritable variables in the shader system.
@@ -44,7 +43,6 @@ public:
     STRING,
     COLOR,
     TEXTURE,
-    MATERIAL,
     VECTOR2,
     VECTOR3,
     VECTOR4
@@ -57,9 +55,7 @@ private:
 
   int Int;
   csRef<iString> String;
-  csRGBpixel ColorValue;
   csRef<iTextureHandle> TextureValue;
-  csRef<iMaterialHandle> MaterialValue;
   csVector4 VectorValue;
 
 public:
@@ -84,8 +80,6 @@ public:
   bool GetValue (csRGBpixel& value) const;
   /// Retrieve a texture
   bool GetValue (iTextureHandle*& value) const;
-  /// Retrieve a material
-  bool GetValue (iMaterialHandle*& value) const;
   /// Retireve a csVector2
   bool GetValue (csVector2& value) const;
   /// Retrieve a csVector3
@@ -103,8 +97,6 @@ public:
   bool SetValue (const csRGBpixel &value);
   /// Stoew a texture
   bool SetValue (iTextureHandle* value);
-  /// Store a material
-  bool SetValue (iMaterialHandle* value);
   /// Store a csVector2
   bool SetValue (const csVector2 &value);
   /// Store a csVector3

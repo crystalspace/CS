@@ -70,19 +70,16 @@ bool csShaderVariable::GetValue(iString*& value) const
 
 bool csShaderVariable::GetValue(csRGBpixel& value) const
 {
-  value = ColorValue;
+  value.red = (char) VectorValue.x;
+  value.green = (char) VectorValue.y;
+  value.blue = (char) VectorValue.z;
+  value.alpha = (char) VectorValue.w;
   return true;
 }
 
 bool csShaderVariable::GetValue(iTextureHandle*& value) const
 {
   value = TextureValue;
-  return true;
-}
-
-bool csShaderVariable::GetValue(iMaterialHandle*& value) const
-{
-  value = MaterialValue;
   return true;
 }
 
@@ -138,7 +135,10 @@ bool csShaderVariable::SetValue(iString* value)
 bool csShaderVariable::SetValue(const csRGBpixel &value)
 {
   Type = COLOR;
-  ColorValue = value;
+  VectorValue.x = (float) value.red;
+  VectorValue.y = (float) value.green;
+  VectorValue.z = (float) value.blue;
+  VectorValue.w = (float) value.alpha;
   return true;
 }
 
@@ -146,13 +146,6 @@ bool csShaderVariable::SetValue(iTextureHandle *value)
 {
   Type = TEXTURE;
   TextureValue = value;
-  return true;
-}
-
-bool csShaderVariable::SetValue(iMaterialHandle *value)
-{
-  Type = MATERIAL;
-  MaterialValue = value;
   return true;
 }
 

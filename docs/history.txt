@@ -21,6 +21,9 @@ chronological order.
 	  optimizations on the others.
         - Philip Wyett added test for PGSERVER.AVAILABLE to pgtest application
           Jamfile.
+	- Oktal removed iMaterialHandle from the list of types that can be
+	  stored by csShaderVariable, and changed the way in which it stores
+	  csRGBpixel (the four int members are stored as floats in csVector4.)
 20-Aug-2003
 	- Jorrit moved the engine sequence manager documentation out of
 	  the xml format description. Also extended that documentation with
