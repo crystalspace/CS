@@ -24,25 +24,23 @@
 #include "isndbuf.h"
 #include "isndsrc.h"
 
-class csSoundBufferNull : public ISoundBuffer
+class csSoundBufferNull : public iSoundBuffer
 {
 public:
-	csSoundBufferNull();
-	virtual ~csSoundBufferNull();
+  csSoundBufferNull();
+  virtual ~csSoundBufferNull();
 
-	STDMETHODIMP Stop();
-	STDMETHODIMP Play(SoundBufferPlayMethod playMethod);
+  virtual void Stop();
+  virtual void Play(SoundBufferPlayMethod playMethod);
 
-  STDMETHODIMP SetVolume(float vol);
-  STDMETHODIMP GetVolume(float &vol);
+  virtual void SetVolume(float vol);
+  virtual float GetVolume();
   
-  STDMETHODIMP SetFrequencyFactor(float vol);
-  STDMETHODIMP GetFrequencyFactor(float &vol);
+  virtual void SetFrequencyFactor(float vol);
+  virtual float GetFrequencyFactor();
 
-  STDMETHODIMP CreateSource(ISoundSource **source);
+  virtual iSoundSource* CreateSource();
 
- 	DECLARE_IUNKNOWN()
-	DECLARE_INTERFACE_TABLE(csSoundBufferNull)
 public:
   float fFrequencyFactor;
   float fVolume;

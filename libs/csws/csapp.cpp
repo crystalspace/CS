@@ -395,7 +395,9 @@ bool csApp::ProcessEvents ()
      && !PreHandleEvent (*ev)
      && !HandleEvent (*ev)
      && !PostHandleEvent (*ev))
-      ; // nobody handled the event
+    {
+      // nobody handled the event, do nothing
+    }  
     CHK (delete ev);
   }
 

@@ -212,8 +212,8 @@ bool csGraphics2DDDraw3::Initialize (iSystem *pSystem)
     return false;
 
   // Get the creation parameters //
-  m_piWin32System->GetInstance(&m_hInstance);
-  m_piWin32System->GetCmdShow(&m_nCmdShow);
+  m_hInstance = m_piWin32System->GetInstance();
+  m_nCmdShow  = m_piWin32System->GetCmdShow();
 
   System->GetSettings(Width, Height, Depth, FullScreen);
   

@@ -226,7 +226,7 @@ public:
 
   /// Print the screen.
   virtual void Print (csRect* rect)
-  { return m_piG2D->Print (rect); }
+  { m_piG2D->Print (rect); }
   
   /// Set a render state
   virtual bool SetRenderState(G3D_RENDERSTATEOPTION, long);
@@ -234,7 +234,7 @@ public:
   virtual long GetRenderState(G3D_RENDERSTATEOPTION);
   
   /// Get a z-buffer point
-  virtual long *GetZBufPoint (int, int)
+  virtual unsigned long *GetZBufPoint (int /*x*/, int /*y*/)
   { return NULL; }
   
   /// Get the width
@@ -262,7 +262,7 @@ public:
   { return (fogm == G3DFOGMETHOD_VERTEX); }
 
   /// Get the ITextureManager.
-  virtual ITextureManager *GetTextureManager ()
+  virtual iTextureManager *GetTextureManager ()
   { return txtmgr; }
 
   /// 

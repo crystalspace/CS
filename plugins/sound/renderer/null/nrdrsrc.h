@@ -29,19 +29,18 @@ class csSoundBufferNull;
 class csSoundSourceNull : public iSoundSource
 {
 public:
-	csSoundSourceNull();
-	virtual ~csSoundSourceNull();
+  DECLARE_IBASE;
 
-	STDMETHODIMP SetPosition(float x, float y, float z);
-	STDMETHODIMP SetVelocity(float x, float y, float z);
+  csSoundSourceNull();
+  virtual ~csSoundSourceNull();
 
-	STDMETHODIMP GetPosition(float &x, float &y, float &z);
-	STDMETHODIMP GetVelocity(float &x, float &y, float &z);
+  virtual void SetPosition(float x, float y, float z);
+  virtual void SetVelocity(float x, float y, float z);
 
-  STDMETHODIMP GetSoundBuffer(ISoundBuffer **sound);
+  virtual void GetPosition(float &x, float &y, float &z);
+  virtual void GetVelocity(float &x, float &y, float &z);
 
- 	DECLARE_IUNKNOWN()
-	DECLARE_INTERFACE_TABLE(csSoundSourceNull)
+  virtual iSoundBuffer* GetSoundBuffer();
 
 public:
   /// Position of sound object

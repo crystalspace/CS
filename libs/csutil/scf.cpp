@@ -70,7 +70,7 @@ public:
   scfClassInfo *Find (const char *iClassID);
 
   /// Find a shared library by name
-  virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const
+  virtual int CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
   { return (strcmp (((scfSharedLibrary *)Item)->LibraryName, (char *)Key) == 0); }
 };
 

@@ -84,6 +84,9 @@ IMPLEMENT_IBASE (csGraphics3DDirect3DDx5)
   IMPLEMENTS_INTERFACE (iHaloRasterizer)
 IMPLEMENT_IBASE_END
 
+//COM Helpers. (DirectX is still COM...)
+#define FINAL_RELEASE( d ) if (d!=NULL) { d->Release(); d = NULL; }
+
 //
 // Implementation
 //
@@ -264,18 +267,25 @@ bool csGraphics3DDirect3DDx5::Open(const char* Title)
     return false;
   
   // Get the direct detection device.
-  
+  iGraphics2DDDraw3* pSysGInfo = QUERY_INTERFACE(m_piG2D, iGraphics2DDDraw3);
+  ASSERT(pSysGInfo);
+
   pSysGInfo->GetDirectDetection(&m_pDirectDevice);
   ASSERT( m_pDirectDevice );
   
   pSysGInfo->GetDirectDrawDriver(&m_lpDD);
+  ASSERT(m_lpDD);
+
   pSysGInfo->GetDirectDrawPrimary(&m_lpddPrimary);
+  ASSERT(m_lpddPrimary);
+
   pSysGInfo->GetDirectDrawBackBuffer(&m_lpddDevice);
+  ASSERT(m_lpddDevice);
   
-  m_nWidth = pGraphicsInfo->GetWidth();
+  m_nWidth = m_piG2D->GetWidth();
   m_nHalfWidth = m_nWidth/2;
   
-  m_nHeight = pGraphicsInfo->GetHeight();
+  m_nHeight = m_piG2D->GetHeight();
   m_nHalfHeight = m_nHeight/2;
   
   // get the amount of texture memory on the video card.
@@ -328,7 +338,7 @@ bool csGraphics3DDirect3DDx5::Open(const char* Title)
   // Create Z-buffer
   if (!lpD3dDeviceDesc->dwDeviceZBufferBitDepth && m_bIsHardware)
   {
-    hRes = CSD3DERR_NOZBUFFER;
+    //hRes = CSD3DERR_NOZBUFFER;
     return false;
   }
   
@@ -740,9 +750,9 @@ void csGraphics3DDirect3DDx5::SetZBufMode(G3DZBufMode mode)
     VERIFY_RESULT( m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL), DD_OK );
 }
 
-void csGraphics3DDirect3DDx5::GetColormapFormat( G3D_COLORMAPFORMAT& g3dFormat ) 
+G3D_COLORMAPFORMAT csGraphics3DDirect3DDx5::GetColormapFormat ()
 {
-  g3dFormat = G3DCOLORFORMAT_24BIT;
+  return G3DCOLORFORMAT_24BIT;
 }
 
 void csGraphics3DDirect3DDx5::DumpCache()
@@ -855,7 +865,7 @@ void csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygonDP& poly)
   
   if (poly.num < 3) 
   {
-    return E_INVALIDARG;
+    return;
   }
   
   // set up the geometry.
@@ -869,7 +879,7 @@ void csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygonDP& poly)
   iPolygonTexture *pTex = poly.poly_texture[0];
 
   if (!pTex)
-    return E_INVALIDARG;
+    return;
 
   // cache the texture and initialize rasterization.
   CacheTexture (pTex);
@@ -1296,13 +1306,9 @@ void csGraphics3DDirect3DDx5::GetCaps(G3D_CAPS *caps)
   memcpy(caps, &m_Caps, sizeof(G3D_CAPS));
 }
 
-void csGraphics3DDirect3DDx5::GetStringError( HRESULT /*hRes*/, char* /*szErrorString*/ )
-{
-}
-
 void csGraphics3DDirect3DDx5::DrawLine (csVector3& v1, csVector3& v2, float aspect, int color)
 {
-  if (v1.z < SMALL_Z && v2.z < SMALL_Z) return S_FALSE;
+  if (v1.z < SMALL_Z && v2.z < SMALL_Z) return;
   
   float x1 = v1.x, y1 = v1.y, z1 = v1.z;
   float x2 = v2.x, y2 = v2.y, z2 = v2.z;
@@ -1338,7 +1344,7 @@ void csGraphics3DDirect3DDx5::DrawLine (csVector3& v1, csVector3& v2, float aspe
   m_piG2D->DrawLine (px1, py1, px2, py2, color);
 }
 
-void csGraphics3DDirect3DDx5::SetRenderState(G3D_RENDERSTATEOPTION option, long value)
+bool csGraphics3DDirect3DDx5::SetRenderState(G3D_RENDERSTATEOPTION option, long value)
 {
   switch (option)
   {
@@ -1576,7 +1582,7 @@ void csGraphics3DDirect3DDx5::DrawHalo(csVector3* pCenter, float fIntensity, csH
     int dont_forget_to_return_false=0;
     
     if (haloInfo == NULL)
-      return E_INVALIDARG;
+      return;
     
     if (pCenter->x > m_nWidth || pCenter->x < 0 || pCenter->y > m_nHeight || pCenter->y < 0 ) 
       dont_forget_to_return_false=1;
@@ -1607,7 +1613,7 @@ void csGraphics3DDirect3DDx5::DrawHalo(csVector3* pCenter, float fIntensity, csH
     vx.rhw = pCenter->z;
 
     if(fIntensity<=0.f)
-      return S_FALSE;
+      return;
 
 //    vx.color = D3DRGBA(1, 1, 1, fIntensity);
     vx.color = D3DRGBA(fIntensity, fIntensity, fIntensity, fIntensity);

@@ -24,11 +24,9 @@
 #include "cssndrdr/null/nrdrsrc.h"
 #include "isystem.h"
 
-IMPLEMENT_UNKNOWN_NODELETE (csSoundSourceNull)
-
-BEGIN_INTERFACE_TABLE(csSoundSourceNull)
-  IMPLEMENTS_INTERFACE(ISoundSource)
-END_INTERFACE_TABLE()
+IMPLEMENT_IBASE (csSoundSourceNull)
+  IMPLEMENTS_INTERFACE (iSoundSource)
+IMPLEMENT_IBASE_END
 
 csSoundSourceNull::csSoundSourceNull()
 {
@@ -42,40 +40,32 @@ csSoundSourceNull::~csSoundSourceNull()
 
 }
 
-STDMETHODIMP csSoundSourceNull::GetSoundBuffer(ISoundBuffer **ppv)
+iSoundBuffer* csSoundSourceNull::GetSoundBuffer()
 {
   if(!pSoundBuffer)
   {
-    return E_FAIL;
+    return NULL;
   }
 
-  return pSoundBuffer->QueryInterface (IID_ISoundBuffer, (void**)ppv);
+  return QUERY_INTERFACE(pSoundBuffer, iSoundBuffer);
 }
 
-STDMETHODIMP csSoundSourceNull::SetPosition(float x, float y, float z)
+void csSoundSourceNull::SetPosition(float x, float y, float z)
 {
   fPosX = x; fPosY = y; fPosZ = z;
-
-  return S_OK;
 }
 
-STDMETHODIMP csSoundSourceNull::SetVelocity(float x, float y, float z)
+void csSoundSourceNull::SetVelocity(float x, float y, float z)
 {
   fVelX = x; fVelY = y; fVelZ = z;
-
-  return S_OK;
 }
 
-STDMETHODIMP csSoundSourceNull::GetPosition(float &x, float &y, float &z)
+void csSoundSourceNull::GetPosition(float &x, float &y, float &z)
 {
   x = fPosX; y = fPosY; z = fPosZ;
-
-  return S_OK;
 }
 
-STDMETHODIMP csSoundSourceNull::GetVelocity(float &x, float &y, float &z)
+void csSoundSourceNull::GetVelocity(float &x, float &y, float &z)
 {
   x = fVelX; y = fVelY; z = fVelZ;
-
-  return S_OK;
 }

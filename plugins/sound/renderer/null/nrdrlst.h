@@ -25,36 +25,51 @@
 #include "isndrdr.h"
 #include "isndlstn.h"
 
-class csSoundListenerNull : public ISoundListener
+class csSoundListenerNull : public iSoundListener
 {
 public:
-	csSoundListenerNull();
-	virtual ~csSoundListenerNull();
+  DECLARE_IBASE;
 
-	STDMETHODIMP SetDirection(float fx, float fy, float fz, float tx, float ty, float tz);
-	STDMETHODIMP SetPosition(float x, float y, float z);
-  STDMETHODIMP SetVelocity(float x, float y, float z);
-	STDMETHODIMP SetDistanceFactor(float factor);
-  STDMETHODIMP SetRollOffFactor(float factor);
-  STDMETHODIMP SetDopplerFactor(float factor);
-  STDMETHODIMP SetHeadSize(float size);
-  STDMETHODIMP SetEnvironment(SoundEnvironment env);
-  
-	STDMETHODIMP GetDirection(float &fx, float &fy, float &fz, float &tx, float &ty, float &tz);
-	STDMETHODIMP GetPosition(float &x, float &y, float &z);
-  STDMETHODIMP GetVelocity(float &x, float &y, float &z);
-	STDMETHODIMP GetDistanceFactor(float &factor);
-  STDMETHODIMP GetRollOffFactor(float &factor);
-  STDMETHODIMP GetDopplerFactor(float &factor);
-  STDMETHODIMP GetHeadSize(float &size);
-  STDMETHODIMP GetEnvironment(SoundEnvironment &env);
+  csSoundListenerNull();
+  virtual ~csSoundListenerNull();
 
-  DECLARE_IUNKNOWN()
-	DECLARE_INTERFACE_TABLE(csSoundListenerNull)
+  /// Set direction of listener (front and top 3d vectors)
+  virtual void SetDirection (float fx, float fy, float fz, float tx, float ty, float tz);
+  /// Set position of listener
+  virtual void SetPosition (float x, float y, float z);
+  /// Set velocity of listener
+  virtual void SetVelocity (float x, float y, float z);
+  /// Set a distance attenuator
+  virtual void SetDistanceFactor (float factor);
+  /// Set a RollOff factor
+  virtual void SetRollOffFactor (float factor);
+  /// Set the Doppler attenuator
+  virtual void SetDopplerFactor (float factor);
+  /// Set distance between the 2 'ears' of listener
+  virtual void SetHeadSize (float size);
+  /// set type of environment where 'live' listener
+  virtual void SetEnvironment (SoundEnvironment env);
+
+  /// Get direction of listener (front and top 3d vectors)
+  virtual void GetDirection (float &fx, float &fy, float &fz, float &tx, float &ty, float &tz);
+  /// Get position of listener
+  virtual void GetPosition (float &x, float &y, float &z);
+  /// Get velocity of listener
+  virtual void GetVelocity (float &x, float &y, float &z);
+  /// Get a distance attenuator
+  virtual float GetDistanceFactor ();
+  /// Get a RollOff factor
+  virtual float GetRollOffFactor ();
+  /// Get the Doppler attenuator
+  virtual float GetDopplerFactor ();
+  /// Get distance between the 2 'ears' of listener
+  virtual float GetHeadSize ();
+  /// Get type of environment where 'live' listener
+  virtual SoundEnvironment GetEnvironment ();
 
 public:
   // Position
-	float fPosX, fPosY, fPosZ;
+  float fPosX, fPosY, fPosZ;
   // Velocity
   float fVelX, fVelY, fVelZ;
   // Direction

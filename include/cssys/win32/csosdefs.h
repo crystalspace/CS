@@ -48,6 +48,17 @@
 #define main csMain
 #endif
 
+#ifdef _DEBUG
+#  include <assert.h>
+#  define ASSERT(expression) assert(expression)
+#  define VERIFY_SUCCESS(expression) assert(SUCCEEDED(expression))
+#  define VERIFY_RESULT(expression, result) assert(expression == result)
+#else
+#  define ASSERT(expression)
+#  define VERIFY_SUCCESS(expression) expression
+#  define VERIFY_RESULT(expression, result) expression
+#endif
+
 // The 2D graphics driver used by software renderer on this platform
 #define SOFTWARE_2D_DRIVER "crystalspace.graphics2d.directdraw"
 #define OPENGL_2D_DRIVER "crystalspace.graphics2d.glwin32"

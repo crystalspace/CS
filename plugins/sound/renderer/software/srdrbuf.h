@@ -29,11 +29,11 @@
 class csSoundBufferSoftware : public ISoundBuffer, public Channel
 {
 public:
-	csSoundBufferSoftware();
-	virtual ~csSoundBufferSoftware();
+  csSoundBufferSoftware();
+  virtual ~csSoundBufferSoftware();
 
-	STDMETHODIMP Stop();
-	STDMETHODIMP Play(SoundBufferPlayMethod playMethod);
+  STDMETHODIMP Stop();
+  STDMETHODIMP Play(SoundBufferPlayMethod playMethod);
 
   STDMETHODIMP SetVolume(float vol);
   STDMETHODIMP GetVolume(float &vol);
@@ -43,8 +43,8 @@ public:
 
   STDMETHODIMP CreateSource(ISoundSource **source);
 
- 	DECLARE_IUNKNOWN()
-	DECLARE_INTERFACE_TABLE(csSoundBufferSoftware)
+  DECLARE_IUNKNOWN()
+  DECLARE_INTERFACE_TABLE(csSoundBufferSoftware)
 public:
   float fFrequencyFactor;
   float fVolume;

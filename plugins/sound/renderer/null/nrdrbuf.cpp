@@ -24,11 +24,13 @@
 #include "cssndrdr/null/nrdrbuf.h"
 #include "isystem.h"
 
+/*
 IMPLEMENT_UNKNOWN_NODELETE (csSoundBufferNull)
 
 BEGIN_INTERFACE_TABLE(csSoundBufferNull)
   IMPLEMENTS_INTERFACE(ISoundBuffer)
 END_INTERFACE_TABLE()
+*/
 
 csSoundBufferNull::csSoundBufferNull()
 {
@@ -38,51 +40,44 @@ csSoundBufferNull::~csSoundBufferNull()
 {
 }
 
-STDMETHODIMP csSoundBufferNull::CreateSource(ISoundSource** ppv)
+iSoundSource* csSoundBufferNull::CreateSource()
 {
   csSoundSourceNull* pNew = new csSoundSourceNull ();
   if (!pNew)
   {
-    *ppv = 0;
-    return E_OUTOFMEMORY;
+    return NULL;
   }
 
   pNew->pSoundBuffer = this;
 
-  return pNew->QueryInterface (IID_ISoundSource, (void**)ppv);
+  return QUERY_INTERFACE(pNew, iSoundSource);
 }
 
-STDMETHODIMP csSoundBufferNull::Play(SoundBufferPlayMethod /*playMethod*/)
+void csSoundBufferNull::Play(SoundBufferPlayMethod /*playMethod*/)
 {
-  return S_OK;
 }
 
-STDMETHODIMP csSoundBufferNull::Stop()
+void csSoundBufferNull::Stop()
 {
-  return S_OK;
 }
 
-STDMETHODIMP csSoundBufferNull::SetVolume(float vol)
+void csSoundBufferNull::SetVolume(float vol)
 {
   fVolume = vol;
-  return S_OK;
 }
 
-STDMETHODIMP csSoundBufferNull::GetVolume(float &vol)
+float csSoundBufferNull::GetVolume()
 {
-  vol = fVolume;
-  return S_OK;
+  return fVolume;
 }
 
-STDMETHODIMP csSoundBufferNull::SetFrequencyFactor(float factor)
+void csSoundBufferNull::SetFrequencyFactor(float factor)
 {
   fFrequencyFactor = factor;
-  return S_OK;
 }
 
-STDMETHODIMP csSoundBufferNull::GetFrequencyFactor(float &factor)
+float csSoundBufferNull::GetFrequencyFactor()
 {
-  factor = fFrequencyFactor;
-  return S_OK;
+  return fFrequencyFactor;
 }
 
