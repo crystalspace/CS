@@ -36948,7 +36948,8 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-CalAnimation* a = 0; a->completeCallbacks((CalModel*)0)
+CalAnimation* a = 0; a->completeCallbacks((CalModel*)0);
+	    CalCoreSkeletonPtr s = CalLoader::loadCoreSkeleton((void*)0);
   ;
   return 0;
 }
@@ -37099,7 +37100,8 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-CalAnimation* a = 0; a->completeCallbacks((CalModel*)0)
+CalAnimation* a = 0; a->completeCallbacks((CalModel*)0);
+	    CalCoreSkeletonPtr s = CalLoader::loadCoreSkeleton((void*)0);
   ;
   return 0;
 }

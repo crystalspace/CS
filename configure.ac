@@ -1512,7 +1512,8 @@ AS_IF([test $cs_cv_libcal3d = yes],
     [CS_CHECK_BUILD([if cal3d is sufficiently recent], [cs_cv_cal3d_recent],
 	[AC_LANG_PROGRAM(
 	    [[#include <cal3d/cal3d.h>]],
-	    [CalAnimation* a = 0; a->completeCallbacks((CalModel*)0)])],
+	    [CalAnimation* a = 0; a->completeCallbacks((CalModel*)0);
+	    CalCoreSkeletonPtr s = CalLoader::loadCoreSkeleton((void*)0);])],
 	[], [C++],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libcal3d], [CAL3D])], [], [],
 	[$cs_cv_libcal3d_cflags],

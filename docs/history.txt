@@ -32,6 +32,8 @@ chronological order.
 	    - Changed some iLight-related defines into enums.
 	- Marten made it possible to load lights as a part of a meshobject
 	  hierarchy.
+	- Eric Sunshine updated the cal3d check in configure.ac to demand the
+	  latest CVS version of cal3d.
 15-Feb-2005
 	- Jorrit added csIntersect3::IntersectPolygon() to intersect
 	  a polygon with a segment.
