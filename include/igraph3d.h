@@ -372,7 +372,7 @@ struct csFog
   float blue;
 };
 
-SCF_VERSION (iGraphics3D, 2, 0, 1);
+SCF_VERSION (iGraphics3D, 2, 0, 2);
 
 /**
  * This is the standard 3D graphics interface.
@@ -562,6 +562,10 @@ struct iGraphics3D : public iPlugIn
   /// Create a halo of the specified color and return a handle.
   virtual iHalo *CreateHalo (float iR, float iG, float iB,
     unsigned char *iAlpha, int iWidth, int iHeight) = 0;
+
+  /// Draw a sprite using a rectangle from given texture
+  virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
+    int tx, int ty, int tw, int th) = 0;
 };
 
 #endif // __IGRAPH3D_H__

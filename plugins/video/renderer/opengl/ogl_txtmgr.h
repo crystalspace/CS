@@ -61,8 +61,6 @@ public:
   csTextureOpenGL (csTextureMM *Parent, iImage *Image);
   /// Destroy the texture
   virtual ~csTextureOpenGL ();
-  /// Return a pointer to texture data
-  virtual void *get_bitmap ();
   /// Get image data
   RGBPixel *get_image_data ()
   { return (RGBPixel *)image->GetImageData (); }

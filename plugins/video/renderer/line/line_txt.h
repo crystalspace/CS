@@ -133,9 +133,6 @@ public:
 
   /// Query palette -> native format table
   void *GetPaletteToGlobal () { return pal2glob; }
-
-  /// Override GetMipMapData() to return palette if (mm == -1)
-  virtual void *GetMipMapData (int mm);
 };
 
 /**
@@ -165,9 +162,6 @@ public:
   /// Destroy the texture
   virtual ~csTextureLine ()
   { delete [] bitmap; if (image) image->DecRef (); }
-  /// Return a pointer to texture data
-  virtual void *get_bitmap ()
-  { return bitmap; }
 };
 
 /**

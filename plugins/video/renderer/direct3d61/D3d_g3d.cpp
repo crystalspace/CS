@@ -2205,3 +2205,96 @@ void csGraphics3DDirect3DDx6::DrawFogPolygon (CS_ID /*id*/,
 void csGraphics3DDirect3DDx6::CloseFogObject (CS_ID /*id*/)
 {
 }
+
+void csGraphics3DDirect3DDx6::DrawPixmap (iTextureHandle *hTex,
+  int sx, int sy, int sw, int sh,
+  int tx, int ty, int tw, int th)
+{
+  // not implemented yet :-)
+  // Thomas, I really beg pardon for all this mess with DrawSprite,
+  // but it really really needed a re-thought. The reason is that this
+  // routine was the only routine in iG2D that uses texture handles...
+  // thus the real place for it is in iG3D.
+
+  // Now that it's possible to implement DrawPixmap properly I would
+  // highly recommend doing it using polygon drawing call. This will use
+  // hardware acceleration. In any case it's easy to reanimate the
+  // old routine (you just have to properly retrieve the bitmap data
+  // and dimensions) but I would recommend re-implementing it using
+  // hardware acceleration. -- A.Z.
+  // P.S. It should be possible to implement it in a generic way using
+  // DrawPolygonFX() but I think it will work faster if we'll use
+  // dedicated code...
+
+#if 0
+  /// Clipping code - sprites should be clipped against G2D's clipping rectangle
+
+
+  /// Retrieve clipping rectangle
+  int ClipX1, ClipY1, ClipX2, ClipY2;
+  G2D->GetClipRect (ClipX1, ClipY1, ClipX2, ClipY2);
+
+  // Texture coordinates (floats)
+  float _tx = tx, _ty = ty, _tw = tw, _th = th;
+
+  // Clipping
+  if ((sx >= ClipX2) || (sy >= ClipY2) ||
+      (sx + sw <= ClipX1) || (sy + sh <= ClipY1))
+    return;                             // Sprite is totally invisible
+  if (sx < ClipX1)                      // Left margin crossed?
+  {
+    int nw = sw - (ClipX1 - sx);        // New width
+    _tx += (ClipX1 - sx) * _tw / sw;    // Adjust X coord on texture
+    _tw = (_tw * nw) / sw;              // Adjust width on texture
+    sw = nw; sx = ClipX1;
+  } /* endif */
+  if (sx + sw > ClipX2)                 // Right margin crossed?
+  {
+    int nw = ClipX2 - sx;               // New width
+    _tw = (_tw * nw) / sw;              // Adjust width on texture
+    sw = nw;
+  } /* endif */
+  if (sy < ClipY1)                      // Top margin crossed?
+  {
+    int nh = sh - (ClipY1 - sy);        // New height
+    _ty += (ClipY1 - sy) * _th / sh;    // Adjust Y coord on texture
+    _th = (_th * nh) / sh;              // Adjust height on texture
+    sh = nh; sy = ClipY1;
+  } /* endif */
+  if (sy + sh > ClipY2)                 // Bottom margin crossed?
+  {
+    int nh = ClipY2 - sy;               // New height
+    _th = (_th * nh) / sh;              // Adjust height on texture
+    sh = nh;
+  } /* endif */
+
+  // now use _tx,_ty,_tw and _th instead of tx, ty, tw and th
+  // since they can be fractional values
+
+#endif
+
+}
+
+#if 0
+
+  ///--- these should be put into csGraphics3DDirect3DDx6 interface
+  ///--- if you still decide to use the old software-only routines
+
+  /// Draw a sprite on 16-bit display using a rectangle from given texture
+  static void DrawPixmap16 (csGraphics2D *This, iTextureHandle *hTex, int sx, int sy, int sw, int sh,
+    int tx, int ty, int tw, int th);
+  /// Draw a sprite on 32-bit display using a rectangle from given texture
+  static void DrawPixmap32 (csGraphics2D *This, iTextureHandle *hTex, int sx, int sy, int sw, int sh,
+    int tx, int ty, int tw, int th);
+
+  ///--
+
+#define DRAWSPRITE_NAME DrawPixmap16
+#define DRAWSPRITE_PIXTYPE UShort
+#include "d3ddrawsprt.inc"
+
+#define DRAWSPRITE_NAME DrawPixmap32
+#define DRAWSPRITE_PIXTYPE ULong
+#include "d3ddrawsprt.inc"
+
+#endif

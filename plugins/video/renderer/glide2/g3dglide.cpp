@@ -1501,3 +1501,153 @@ float csGraphics3DGlide2x::GetZBuffValue ( int x, int y )
 //  printf("%g\n", z);
   return z;
 }
+
+void csGraphics3DGlide2x::DrawPixmap ( iTextureHandle *hTex,
+  int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th)
+{
+  // Now that it's possible to implement DrawPixmap properly I would
+  // highly recommend doing it using polygon drawing call. This will use
+  // hardware acceleration. For now the old renderer is commented
+  // out since there is no more GetMipmapData() method in iTextureHandle.
+  // In any case it's easy to reanimate the old routine (you just have to
+  // properly retrieve the bitmap data and dimensions) but I would recommend
+  // re-implementing it using hardware acceleration. -- A.Z.
+
+#if 0
+  /// Clipping code - sprites should be clipped against G2D's clipping rectangle
+
+
+  /// Retrieve clipping rectangle
+  int ClipX1, ClipY1, ClipX2, ClipY2;
+  G2D->GetClipRect (ClipX1, ClipY1, ClipX2, ClipY2);
+
+  // Texture coordinates (floats)
+  float _tx = tx, _ty = ty, _tw = tw, _th = th;
+
+  // Clipping
+  if ((sx >= ClipX2) || (sy >= ClipY2) ||
+      (sx + sw <= ClipX1) || (sy + sh <= ClipY1))
+    return;                             // Sprite is totally invisible
+  if (sx < ClipX1)                      // Left margin crossed?
+  {
+    int nw = sw - (ClipX1 - sx);        // New width
+    _tx += (ClipX1 - sx) * _tw / sw;    // Adjust X coord on texture
+    _tw = (_tw * nw) / sw;              // Adjust width on texture
+    sw = nw; sx = ClipX1;
+  } /* endif */
+  if (sx + sw > ClipX2)                 // Right margin crossed?
+  {
+    int nw = ClipX2 - sx;               // New width
+    _tw = (_tw * nw) / sw;              // Adjust width on texture
+    sw = nw;
+  } /* endif */
+  if (sy < ClipY1)                      // Top margin crossed?
+  {
+    int nh = sh - (ClipY1 - sy);        // New height
+    _ty += (ClipY1 - sy) * _th / sh;    // Adjust Y coord on texture
+    _th = (_th * nh) / sh;              // Adjust height on texture
+    sh = nh; sy = ClipY1;
+  } /* endif */
+  if (sy + sh > ClipY2)                 // Bottom margin crossed?
+  {
+    int nh = ClipY2 - sy;               // New height
+    _th = (_th * nh) / sh;              // Adjust height on texture
+    sh = nh;
+  } /* endif */
+
+  // now use _tx,_ty,_tw and _th instead of tx, ty, tw and th
+  // since they can be fractional values
+
+#endif
+
+#if 0
+  bool transp = hTex->GetTransparent ();
+  int bw, bh;
+  hTex->GetMipMapDimensions (0, bw, bh);
+  UShort *bitmap = (UShort *)hTex->GetMipMapData (0);
+  UShort tp;
+
+  int dx = (tw << 16) / sw;
+  int dy = (th << 16) / sh;
+
+  // Clipping
+  if ((sx >= ClipX2) || (sy >= ClipY2) ||
+      (sx + sw <= ClipX1) || (sy + sh <= ClipY1))
+    return;				// Sprite is totally invisible
+  if (sx < ClipX1)		// Left margin crossed?
+  {
+    int nw = sw - (ClipX1 - sx);	// New width
+    tx += (ClipX1 - sx) * tw / sw;// Adjust X coord on texture
+    tw = (tw * nw) / sw;		// Adjust width on texture
+    sw = nw; sx = ClipX1;
+  } /* endif */
+  if (sx + sw > ClipX2)		// Right margin crossed?
+  {
+    int nw = ClipX2 - sx;		// New width
+    tw = (tw * nw) / sw;		// Adjust width on texture
+    sw = nw;
+  } /* endif */
+  if (sy < ClipY1)		// Top margin crossed?
+  {
+    int nh = sh - (ClipY1 - sy);	// New height
+    ty += (ClipY1 - sy) * th / sh;// Adjust Y coord on texture
+    th = (th * nh) / sh;		// Adjust height on texture
+    sh = nh; sy = ClipY1;
+  } /* endif */
+  if (sy + sh > ClipY2)		// Bottom margin crossed?
+  {
+    int nh = ClipY2 - sy;		// New height
+    th = (th * nh) / sh;		// Adjust height on texture
+    sh = nh;
+  } /* endif */
+
+  if (transp){
+    UByte r,g,b;
+    hTex->GetTransparent (r, g, b);
+    tp = ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3);
+  }
+      
+  bitmap += ty * bw + tx;
+  ty = 0;
+
+  if (sw == tw)
+    for (; sh > 0; sh--, ty += dy, sy++)
+    {
+      UShort *VRAM = (UShort *)GetPixelAt (sx, sy);
+      UShort *data = bitmap + (ty >> 16) * bw;
+      if (transp)
+        for (int w = sw; w; w--)
+        {
+          if (*data != tp )
+            *VRAM = *data;
+          VRAM++;
+          data++;
+        } /* endfor */
+      else
+        for (int w = sw; w; w--)
+          *VRAM++ = *data++;
+    } /* endfor */
+  else
+    for (; sh > 0; sh--, ty += dy, sy++)
+    {
+      UShort *VRAM = (UShort *)GetPixelAt (sx, sy);
+      UShort *data = bitmap + (ty >> 16) * bw;
+      int tx = 0;
+      if (transp)
+        for (int w = sw; w; w--)
+        {
+          UShort pixel = *(data + (tx >> 16));
+          if (pixel != tp)
+            *VRAM = pixel;
+          VRAM++;
+          tx += dx;
+        } /* endfor */
+      else
+        for (int w = sw; w; w--)
+        {
+          *VRAM++ = *(data + (tx >> 16));
+          tx += dx;
+        } /* endfor */
+    } /* endfor */
+#endif
+}

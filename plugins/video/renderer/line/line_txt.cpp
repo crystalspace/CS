@@ -33,8 +33,6 @@
 
 #define RESERVED_COLOR(c) ((c == 0) || (c == 255))
 
-#define GAMMA(c) ((int) (256.0 * pow (float (c) / 256.0, 1.0 / Gamma)))
-
 #define CLIP_RGB \
   if (r < 0) r = 0; else if (r > 255) r = 255; \
   if (g < 0) g = 0; else if (g > 255) g = 255; \
@@ -221,14 +219,6 @@ void csTextureMMLine::remap_texture (csTextureManager *texman)
           palette [i].green, palette [i].blue);
       break;
   }
-}
-
-void *csTextureMMLine::GetMipMapData (int mm)
-{
-  if (mm == -1)
-    return pal2glob;
-  else
-    return csTextureMM::GetMipMapData (mm);
 }
 
 //----------------------------------------------- csTextureManagerLine ---//
@@ -522,11 +512,5 @@ void csTextureManagerLine::SetPalette ()
     compute_palette ();
 
   for (int i = 0; i < 256; i++)
-  {
-    int r = GAMMA (cmap [i].red);
-    int g = GAMMA (cmap [i].green);
-    int b = GAMMA (cmap [i].blue);
-    CLIP_RGB;
-    G2D->SetRGB (i, r, g, b);
-  }
+    G2D->SetRGB (i, cmap [i].red, cmap [i].green, cmap [i].blue);
 }

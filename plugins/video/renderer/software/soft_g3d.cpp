@@ -1338,7 +1338,7 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
   }
 
   // Now get the unlighted texture corresponding to mipmap level we choosen
-  csTexture *txt_unl = tex_mm->get_texture (mipmap);
+  csTextureSoftware *txt_unl = (csTextureSoftware *)tex_mm->get_texture (mipmap);
 
   // Check if polygon has a lightmap (i.e. if it is lighted)
   bool has_lightmap = tex->GetLightMap () && do_lighting;
@@ -1979,8 +1979,8 @@ void csGraphics3DSoftware::StartPolygonFX (iTextureHandle* handle,
   if (handle)
   {
     csTextureMMSoftware *tex_mm = (csTextureMMSoftware*)handle->GetPrivateObject ();
-    csTexture *txt_unl = tex_mm->get_texture (0);
-    pqinfo.bm = (UByte *)txt_unl->get_bitmap ();
+    csTextureSoftware *txt_unl = (csTextureSoftware *)tex_mm->get_texture (0);
+    pqinfo.bm = txt_unl->get_bitmap ();
     pqinfo.tw = txt_unl->get_width ();
     pqinfo.th = txt_unl->get_height ();
     pqinfo.shf_w = txt_unl->get_w_shift ();

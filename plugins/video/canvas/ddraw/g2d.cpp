@@ -318,8 +318,9 @@ void csGraphics2DDDraw3::SecondaryInit()
 
   if (Depth == 16)
   {
-    _DrawPixel = DrawPixel16;   _WriteChar = WriteChar16;
-    _GetPixelAt = GetPixelAt16; _DrawPixmap = DrawPixmap16;
+    _DrawPixel = DrawPixel16;
+    _WriteChar = WriteChar16;
+    _GetPixelAt = GetPixelAt16;
 
     // Set pixel format
     pfmt.PixelBytes = 2;
@@ -332,8 +333,9 @@ void csGraphics2DDDraw3::SecondaryInit()
   }
   else if (Depth == 32)
   {
-    _DrawPixel = DrawPixel32;   _WriteChar = WriteChar32;
-    _GetPixelAt = GetPixelAt32; _DrawPixmap = DrawPixmap32;
+    _DrawPixel = DrawPixel32;
+    _WriteChar = WriteChar32;
+    _GetPixelAt = GetPixelAt32;
     
     // calculate CS's pixel format structure.
     pfmt.PixelBytes = 4;
@@ -777,53 +779,3 @@ void csGraphics2DDDraw3::SetFor3D(bool For3D)
 {
   m_bUses3D = For3D;
 }
-
-/*
-void csGraphics2DDDraw3::DrawPixmap8 (csGraphics2D *This, iTextureHandle *hTex, 
-                                      int sx, int sy, int sw, int sh,
-                                      int tx, int ty, int tw, int th)
-{
-  (void) This;
-  (void) hTex;
-  (void) sx;
-  (void) sy;
-  (void) sw;
-  (void) sh;
-  (void) tx;
-  (void) ty;
-  (void) tw;
-  (void) th;
-}
-
-void csGraphics2DDDraw3::DrawPixmap16 (csGraphics2D *This, iTextureHandle *hTex, 
-                                       int sx, int sy, int sw, int sh,
-                                       int tx, int ty, int tw, int th)
-{
-  (void) This;
-  (void) hTex;
-  (void) sx;
-  (void) sy;
-  (void) sw;
-  (void) sh;
-  (void) tx;
-  (void) ty;
-  (void) tw;
-  (void) th;
-}
-
-void csGraphics2DDDraw3::DrawPixmap32 (csGraphics2D *This, iTextureHandle *hTex, 
-                                       int sx, int sy, int sw, int sh,
-                                       int tx, int ty, int tw, int th)
-{
-  (void) This;
-  (void) hTex;
-  (void) sx;
-  (void) sy;
-  (void) sw;
-  (void) sh;
-  (void) tx;
-  (void) ty;
-  (void) tw;
-  (void) th;
-}
-*/

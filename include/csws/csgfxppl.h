@@ -23,7 +23,7 @@
 #include "csutil/csbase.h"
 #include "csutil/csrect.h"
 #include "csengine/cspixmap.h"
-#include "igraph3d.h"
+#include "igraph2d.h"
 
 struct iGraphics2D;
 struct iSystem;

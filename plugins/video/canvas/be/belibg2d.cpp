@@ -152,7 +152,6 @@ void csGraphics2DBeLib::ApplyDepthInfo(color_space cs)
       _DrawPixel = DrawPixel16;
       _WriteChar = WriteChar16;
       _GetPixelAt= GetPixelAt16;
-      _DrawPixmap= DrawPixmap16;
 
       pfmt.PixelBytes = 2;
       pfmt.PalEntries = 0;
@@ -171,7 +170,6 @@ void csGraphics2DBeLib::ApplyDepthInfo(color_space cs)
       _DrawPixel = DrawPixel16;
       _WriteChar = WriteChar16;
       _GetPixelAt= GetPixelAt16;
-      _DrawPixmap= DrawPixmap16;
 
       pfmt.PixelBytes = 2;
       pfmt.PalEntries = 0;
@@ -191,7 +189,6 @@ void csGraphics2DBeLib::ApplyDepthInfo(color_space cs)
       _DrawPixel = DrawPixel32;
       _WriteChar = WriteChar32;
       _GetPixelAt= GetPixelAt32;
-      _DrawPixmap= DrawPixmap32;
 
       pfmt.PixelBytes = 4;
       pfmt.PalEntries = 0;

@@ -35,6 +35,7 @@ csWSTexture::csWSTexture (const char *iName, iImage *inImage, int iFlags)
   Handle = NULL;
   TexMan = NULL;
   TranspChanged = false;
+  tr = tg = tb = 255;
 }
 
 csWSTexture::~csWSTexture ()
@@ -50,24 +51,24 @@ csWSTexture::~csWSTexture ()
 
 void csWSTexture::SetTransparent (int iR, int iG, int iB)
 {
-  IsTransp = (iR >= 0) && (iG >= 0) && (iB >= 0);
-  if (IsTransp)
-  {
-    tr = iR; tg = iG; tb = iB;
-    TranspChanged = true;
-  }
+  IsTransp = true;
+  TranspChanged = true;
+  tr = iR; tg = iG; tb = iB;
   if (Handle)
-    Handle->SetTransparent (iR, iG, iB);
+  {
+    Handle->SetTransparent (tr, tg, tb);
+    Handle->SetTransparent (IsTransp);
+  }
 }
 
 void csWSTexture::SetTransparent (bool iTransparent)
 {
   IsTransp = iTransparent;
   if (Handle)
-    if (IsTransp)
-      Handle->SetTransparent (tr, tg, tb);
-    else
-      Handle->SetTransparent (255, 255, 255);
+  {
+    Handle->SetTransparent (tr, tg, tb);
+    Handle->SetTransparent (IsTransp);
+  }
 }
 
 void csWSTexture::FixTransparency ()
@@ -114,8 +115,7 @@ void csWSTexture::Register (iTextureManager *iTexMan)
   Unregister ();
   TexMan = iTexMan;
   Handle = iTexMan->RegisterTexture (Image, Flags);
-  if (IsTransp)
-    Handle->SetTransparent (tr, tg, tb);
+  SetTransparent (IsTransp);
 }
 
 void csWSTexture::Unregister ()
@@ -134,10 +134,7 @@ void csWSTexture::Refresh ()
   if (!TexMan || !Handle)
     return;
   FixTransparency ();
-  if (IsTransp)
-    Handle->SetTransparent (tr, tg, tb);
-  else
-    Handle->SetTransparent (255, 255, 255);
+  SetTransparent (IsTransp);
   TexMan->PrepareTexture (Handle);
 }
 

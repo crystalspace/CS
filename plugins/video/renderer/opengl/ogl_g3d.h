@@ -369,6 +369,10 @@ public:
   virtual iHalo *CreateHalo (float iR, float iG, float iB,
     unsigned char* iAlpha, int iWidth, int iHeight);
 
+  /// Draw a 2D sprite
+  virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy,
+    int sw, int sh, int tx, int ty, int tw, int th);
+
   /// If supported, this function will attempt to query the OpenGL driver
   /// to see what extensions it supports so that other parts of the renderer
   /// can use appropriate extensions where possible.

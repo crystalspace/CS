@@ -333,8 +333,15 @@ public:
   virtual void DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, int fogtype);
   virtual void CloseFogObject (CS_ID id);
 
+  /**
+   * Draw a sprite (possibly rescaled to given width (sw) and height (sh))
+   * using given rectangle from given texture clipped with G2D's clipper.
+   */
+  virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
+    int tx, int ty, int tw, int th);
+
 private:
-  
+
   // Z-Buffer enumeration callback  
   static HRESULT CALLBACK EnumZBufferFormatsCallback(LPDDPIXELFORMAT lpddpf, LPVOID lpUserArg);
 

@@ -50,9 +50,6 @@ public:
 
   /// Create all mipmapped bitmaps from the first level.
   virtual void CreateMipmaps ();
-
-  /// Override GetMipMapData() to return 2d texture if (mm == -2)
-  virtual void *GetMipMapData (int mm);
 };
 
 /**
@@ -71,8 +68,6 @@ public:
   csTextureDirect3D (csTextureMM *Parent, iImage *Image, csGraphics3DDirect3DDx6 *iG3D, bool For2d);
   /// Destroy the texture
   virtual ~csTextureDirect3D ();
-  /// Return a pointer to texture data
-  virtual void *get_bitmap ();
   /// Get image data
   UByte *get_image_data ()
   { return image; }

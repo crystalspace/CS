@@ -102,8 +102,6 @@ public:
   virtual void DrawPixel (int x, int y, int color);
   /// Write a single character
   static void WriteCharGlide (csGraphics2D *This, int x, int y, int fg, int bg, char c);
-  /// Draw a 2D sprite
-  virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th);
 
   virtual bool BeginDraw();
   virtual void FinishDraw();

@@ -378,6 +378,13 @@ public:
   virtual iHalo *CreateHalo (float iR, float iG, float iB,
     unsigned char *iAlpha, int iWidth, int iHeight);
 
+  /**
+   * Draw a sprite (possibly rescaled to given width (sw) and height (sh))
+   * using given rectangle from given texture clipped with G2D's clipper.
+   */
+  virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
+    int tx, int ty, int tw, int th);
+
   ///------------------- iConfig interface implementation -------------------
   struct csSoftConfig : public iConfig
   {

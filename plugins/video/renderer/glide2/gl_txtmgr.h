@@ -60,7 +60,7 @@ public:
   /// Destroy the texture object
   virtual ~csTextureGlide ();
   /// Get the raw bitmap data
-  virtual void *get_bitmap () 
+  void *get_bitmap () 
   { return (void *) raw; }
   /// 
   RGBPixel *get_image_data ()
@@ -92,6 +92,4 @@ public:
 
 };
 
-
 #endif 
-

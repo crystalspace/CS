@@ -105,7 +105,6 @@ bool csGraphics2DSVGALib::Initialize (iSystem *pSystem)
       _DrawPixel = DrawPixel16;
       _WriteChar = WriteChar16;
       _GetPixelAt = GetPixelAt16;
-      _DrawPixmap = DrawPixmap16;
       break;
 
     case 16:
@@ -118,7 +117,6 @@ bool csGraphics2DSVGALib::Initialize (iSystem *pSystem)
       _DrawPixel = DrawPixel16;
       _WriteChar = WriteChar16;
       _GetPixelAt = GetPixelAt16;
-      _DrawPixmap = DrawPixmap16;
       break;
 
     case 32:
@@ -131,7 +129,6 @@ bool csGraphics2DSVGALib::Initialize (iSystem *pSystem)
       _DrawPixel = DrawPixel32;
       _WriteChar = WriteChar32;
       _GetPixelAt = GetPixelAt32;
-      _DrawPixmap = DrawPixmap32;
       break;
   }
 

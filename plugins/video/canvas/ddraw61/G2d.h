@@ -69,16 +69,6 @@ public:
   ///
   virtual void SetFor3D(bool For3D);
 
-  /// Draw a sprite on 8-bit display using a rectangle from given texture
-  static void DrawPixmap8 (csGraphics2D *This, iTextureHandle *hTex, int sx, int sy, int sw, int sh,
-    int tx, int ty, int tw, int th);
-  /// Draw a sprite on 16-bit display using a rectangle from given texture
-  static void DrawPixmap16 (csGraphics2D *This, iTextureHandle *hTex, int sx, int sy, int sw, int sh,
-    int tx, int ty, int tw, int th);
-  /// Draw a sprite on 32-bit display using a rectangle from given texture
-  static void DrawPixmap32 (csGraphics2D *This, iTextureHandle *hTex, int sx, int sy, int sw, int sh,
-    int tx, int ty, int tw, int th);
-  
 protected:
   void SecondaryInit();
 

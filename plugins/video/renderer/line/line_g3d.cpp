@@ -291,7 +291,7 @@ bool csGraphics3DLine::SetRenderState (G3D_RENDERSTATEOPTION op,
   switch (op)
   {
     case G3DRENDERSTATE_ZBUFFERMODE:
-      z_buf_mode = value;
+      z_buf_mode = csZBufMode (value);
       break;
     default:
       return false;

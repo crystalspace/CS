@@ -199,9 +199,6 @@ struct iGraphics2D : public iPlugIn
   virtual void DrawPixel (int x, int y, int color) = 0;
   /// Returns the address of the pixel at the specified (x, y) coordinates.
   virtual unsigned char *GetPixelAt (int x, int y) = 0;
-  /// Draw a sprite using a rectangle from given texture
-  virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
-    int tx, int ty, int tw, int th) = 0;
 
  /**
   * Save a subarea of screen and return a handle to saved buffer.

@@ -151,16 +151,6 @@ public:
   virtual int GetTextWidth (int Font, const char *text);
   /// Get the height of given font
   virtual int GetTextHeight (int Font);
-  /**
-   * Draw a sprite (possibly rescaled to given width (sw) and height (sh))
-   * using given rectangle from given texture
-   */
-  void (*_DrawPixmap) (csGraphics2D *This, iTextureHandle *hTex, int sx, int sy,
-    int sw, int sh, int tx, int ty, int tw, int th);
-  /// Same but exposed through iGraphics2D interface
-  virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
-    int tx, int ty, int tw, int th)
-  { _DrawPixmap (this, hTex, sx, sy, sw, sh, tx, ty, tw, th); }
   /// (*) Get address of video RAM at given x,y coordinates
   unsigned char* (*_GetPixelAt) (csGraphics2D *This, int x, int y);
   /// Same but exposed through iGraphics2D interface
@@ -269,9 +259,6 @@ protected:
   static void WriteChar8 (csGraphics2D *This, int x, int y, int fg, int bg, char c);
   /// Return address of a 8-bit pixel
   static unsigned char *GetPixelAt8 (csGraphics2D *This, int x, int y);
-  /// Draw a sprite on 8-bit display using a rectangle from given texture
-  static void DrawPixmap8 (csGraphics2D *This, iTextureHandle *hTex, int sx, int sy, int sw, int sh,
-    int tx, int ty, int tw, int th);
 
   /// Draw a pixel in 16-bit modes
   static void DrawPixel16 (csGraphics2D *This, int x, int y, int color);
@@ -279,9 +266,6 @@ protected:
   static void WriteChar16 (csGraphics2D *This, int x, int y, int fg, int bg, char c);
   /// Return address of a 16-bit pixel
   static unsigned char *GetPixelAt16 (csGraphics2D *This, int x, int y);
-  /// Draw a sprite on 16-bit display using a rectangle from given texture
-  static void DrawPixmap16 (csGraphics2D *This, iTextureHandle *hTex, int sx, int sy, int sw, int sh,
-    int tx, int ty, int tw, int th);
 
   /// Draw a pixel in 32-bit modes
   static void DrawPixel32 (csGraphics2D *This, int x, int y, int color);
@@ -289,9 +273,6 @@ protected:
   static void WriteChar32 (csGraphics2D *This, int x, int y, int fg, int bg, char c);
   /// Return address of a 32-bit pixel
   static unsigned char *GetPixelAt32 (csGraphics2D *This, int x, int y);
-  /// Draw a sprite on 32-bit display using a rectangle from given texture
-  static void DrawPixmap32 (csGraphics2D *This, iTextureHandle *hTex, int sx, int sy, int sw, int sh,
-    int tx, int ty, int tw, int th);
 };
 
 #endif // __GRAPH2D_H__

@@ -171,13 +171,11 @@ bool csGraphics2DDOSRAW::Open (const char* Title)
       _DrawPixel = DrawPixel16;
       _WriteChar = WriteChar16;
       _GetPixelAt = GetPixelAt16;
-      _DrawPixmap = DrawPixmap16;
       break;
     case 4:
       _DrawPixel = DrawPixel32;
       _WriteChar = WriteChar32;
       _GetPixelAt = GetPixelAt32;
-      _DrawPixmap = DrawPixmap32;
       break;
     default:
       CsPrintf (MSG_WARNING, "WARNING: No 2D routines for selected mode!\n");

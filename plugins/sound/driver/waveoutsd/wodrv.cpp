@@ -104,19 +104,19 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16,
   MMRESULT res;
   WAVEFORMATEX format;
   memset(&format, 0, sizeof(PCMWAVEFORMAT));
-	format.wFormatTag = WAVE_FORMAT_PCM;
-	if(stereo)
+  format.wFormatTag = WAVE_FORMAT_PCM;
+  if(stereo)
     format.nChannels = 2;
   else
     format.nChannels = 1;
-	format.nSamplesPerSec = frequency;
+  format.nSamplesPerSec = frequency;
   if(bit16)
-	  format.wBitsPerSample = 16;
+    format.wBitsPerSample = 16;
   else
     format.wBitsPerSample = 8;
-	format.nBlockAlign = format.nChannels * format.wBitsPerSample / 8;
+  format.nBlockAlign = format.nChannels * format.wBitsPerSample / 8;
   format.nAvgBytesPerSec = format.nBlockAlign * format.nSamplesPerSec;
-	format.cbSize = 0;
+  format.cbSize = 0;
 
   m_nFrequency = frequency;
   m_b16Bits = bit16;
@@ -137,8 +137,8 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16,
   MemorySize -=(MemorySize%format.nBlockAlign);
   Memory = NULL;
 
-	// Open the playback device
-	if(threading)
+  // Open the playback device
+  if(threading)
   {
     SysPrintf (MSG_INITIALIZATION, "SoundDriver use thread method\n");
     hThread = CreateThread(NULL, 0, &waveOutThreadProc, this, 0, &dwThread);
@@ -165,33 +165,33 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16,
   {
     switch(res)
     {
-    case MYMMSYSERR_NOCREATETHREAD:
-      SysPrintf (MSG_FATAL_ERROR, "WaveOut error : Cannot create thread !");
-      break;
+      case MYMMSYSERR_NOCREATETHREAD:
+        SysPrintf (MSG_FATAL_ERROR, "WaveOut error : Cannot create thread !");
+        break;
 
-    case MMSYSERR_ALLOCATED:
-      SysPrintf (MSG_FATAL_ERROR, "WaveOut error : Ressource already allocated by an other program !");
-      break;
+      case MMSYSERR_ALLOCATED:
+        SysPrintf (MSG_FATAL_ERROR, "WaveOut error : Ressource already allocated by an other program !");
+        break;
 
-    case MMSYSERR_BADDEVICEID:
-      SysPrintf (MSG_FATAL_ERROR, "WaveOut error : Bad device !");
-      break;
+      case MMSYSERR_BADDEVICEID:
+        SysPrintf (MSG_FATAL_ERROR, "WaveOut error : Bad device !");
+        break;
 
-    case MMSYSERR_NODRIVER:
-      SysPrintf (MSG_FATAL_ERROR, "WaveOut error : there is no device !");
-      break;
+      case MMSYSERR_NODRIVER:
+        SysPrintf (MSG_FATAL_ERROR, "WaveOut error : there is no device !");
+        break;
 
-    case MMSYSERR_NOMEM:
-      SysPrintf (MSG_FATAL_ERROR, "WaveOut error : Unable to allocate memory !");
-      break;
+      case MMSYSERR_NOMEM:
+        SysPrintf (MSG_FATAL_ERROR, "WaveOut error : Unable to allocate memory !");
+        break;
 
-    case WAVERR_BADFORMAT:
-      SysPrintf (MSG_FATAL_ERROR, "WaveOut error : Unsupported audio format !");
-      break;
+      case WAVERR_BADFORMAT:
+        SysPrintf (MSG_FATAL_ERROR, "WaveOut error : Unsupported audio format !");
+        break;
 
-    default:
-      SysPrintf (MSG_FATAL_ERROR, "WaveOut error : Inknown Error !");
-      break;
+      default:
+        SysPrintf (MSG_FATAL_ERROR, "WaveOut error : Inknown Error !");
+        break;
     }
     return E_FAIL;
   }
@@ -201,14 +201,14 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16,
   SetVolume((float)old_v2/(float)65535.0);
 	
   if (MixChunk())
-	{
-		if (MixChunk())
-		{
+  {
+    if (MixChunk())
+    {
       SysPrintf (MSG_INITIALIZATION, "SoundDriver initialized to %d Hz %d bits %s\n",
         m_nFrequency, (m_b16Bits)?16:8, (m_bStereo)?"Stereo":"Mono");
       return S_OK;
-		}
-	}
+    }
+  }
 
   SysPrintf (MSG_FATAL_ERROR, "WaveOut error : Error then prepare chunk");
   return E_FAIL;
@@ -217,17 +217,17 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16,
 void csSoundDriverWaveOut::Close()
 {
   if (hwo)
-	{
+  {
     waveOutSetVolume(hwo, old_Volume);
     waveOutReset(hwo);
-		waveOutClose(hwo);
-		hwo=NULL;
-	}
+    waveOutClose(hwo);
+    hwo=NULL;
+  }
 
   if( m_piSoundRender ) 
   {
-	  m_piSoundRender->DecRef();
-	  m_piSoundRender = NULL;
+    m_piSoundRender->DecRef();
+    m_piSoundRender = NULL;
   }
 
   Memory = NULL;
@@ -272,7 +272,7 @@ bool csSoundDriverWaveOut::IsBackground()
 
 bool csSoundDriverWaveOut::Is16Bits()
 {
-	return m_b16Bits;
+  return m_b16Bits;
 }
 
 bool csSoundDriverWaveOut::IsStereo()

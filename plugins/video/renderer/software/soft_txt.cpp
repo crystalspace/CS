@@ -277,14 +277,6 @@ void csTextureMMSoftware::remap_texture (csTextureManagerSoftware *texman)
   }
 }
 
-void *csTextureMMSoftware::GetMipMapData (int mm)
-{
-  if (mm == -1)
-    return pal2glob;
-  else
-    return csTextureMM::GetMipMapData (mm);
-}
-
 //----------------------------------------------- csTextureManagerSoftware ---//
 
 static UByte *GenLightmapTable (int bits)

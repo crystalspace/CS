@@ -386,10 +386,9 @@ void csGlideTextureCache::Unload ( csGlideCacheData *d )
  
 void csGlideTextureCache::LoadTex(csGlideCacheData *d, int nMM)
 {
-
   iTextureHandle* txt_handle = (iTextureHandle*)d->pSource;
   csTextureMM* txt_mm = (csTextureMM*)txt_handle->GetPrivateObject ();
-  csTexture* txt_unl = txt_mm->get_texture (0);
+  csTextureGlide* txt_unl = (csTextureGlide *)txt_mm->get_texture (0);
   int i;
   int width = txt_unl->get_width ();
   int height = txt_unl->get_height ();
@@ -401,7 +400,7 @@ void csGlideTextureCache::LoadTex(csGlideCacheData *d, int nMM)
   {
     d->texhnd.info.format=GR_TEXFMT_RGB_565;
     d->texhnd.tmu = m_tmu;
-    d->texhnd.info.data=(unsigned char*)txt_mm->get_texture (0)->get_bitmap();
+    d->texhnd.info.data = (unsigned char*)txt_unl->get_bitmap();
     d->texhnd.size = GlideLib_grTexTextureMemRequired(GR_MIPMAPLEVELMASK_BOTH,&d->texhnd.info);
 
     /* if(d->texhnd.size!=d->size)
@@ -419,7 +418,7 @@ void csGlideTextureCache::LoadTex(csGlideCacheData *d, int nMM)
       if (lod[i]!=-1)
       {
       
-        csTexture* txt_mip = txt_mm->get_texture (i);
+        csTextureGlide *txt_mip = (csTextureGlide *)txt_mm->get_texture (i);
         src = (unsigned char*)txt_mip->get_bitmap();
 
         GlideLib_grTexDownloadMipMapLevel(d->texhnd.tmu->tmu_id,
@@ -520,7 +519,7 @@ void csGlideTextureCache::LoadAlpha (csGlideCacheData *d)
   {
     d->texhnd.info.format=GR_TEXFMT_ALPHA_8;
     d->texhnd.tmu = m_tmu;
-    d->texhnd.info.data=(unsigned char*)txt_mm->GetMipMapData( 0 );
+    d->texhnd.info.data=(unsigned char*)txt_mm->GetAlphaMap ();
     d->texhnd.size = GlideLib_grTexTextureMemRequired(GR_MIPMAPLEVELMASK_BOTH,&d->texhnd.info);
 
     d->mempos=manager->allocSpaceMem(d->texhnd.size);

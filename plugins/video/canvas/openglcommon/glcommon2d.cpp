@@ -206,55 +206,6 @@ void csGraphics2DGLCommon::WriteChar (int x, int y, int fg, int /*bg*/, char c)
   glPopMatrix ();
 }
 
-void csGraphics2DGLCommon::DrawPixmap (iTextureHandle *hTex,
-  int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th)
-{
-  // cache the texture if we haven't already.
-  GLuint texturehandle = (GLuint)hTex->GetMipMapData (0);
-
-  // as we are drawing in 2D, we disable some of the commonly used features
-  // for fancy 3D drawing
-  glShadeModel (GL_FLAT);
-  glDisable (GL_DEPTH_TEST);
-  glDepthMask (GL_FALSE);
-
-  // if the texture has transparent bits, we have to tweak the
-  // OpenGL blend mode so that it handles the transparent pixels correctly
-  if (hTex->GetTransparent ())
-  {
-    glEnable (GL_BLEND);
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  }
-  else
-    glDisable (GL_BLEND);
-
-  glEnable (GL_TEXTURE_2D);
-  glColor4f (1.,1.,1.,1.);
-  glBindTexture (GL_TEXTURE_2D, texturehandle);
-  
-  int bitmapwidth = 0, bitmapheight = 0;
-  hTex->GetMipMapDimensions (0, bitmapwidth, bitmapheight);
-
-  // convert texture coords given above to normalized (0-1.0) texture coordinates
-  float ntx1,nty1,ntx2,nty2;
-  ntx1 = float (tx     ) / bitmapwidth;
-  ntx2 = float (tx + tw) / bitmapwidth;
-  nty1 = float (ty     ) / bitmapheight;
-  nty2 = float (ty + th) / bitmapheight;
-
-  // draw the bitmap
-  glBegin (GL_QUADS);
-  glTexCoord2f (ntx1, nty1);
-  glVertex2i (sx, Height - sy - 1);
-  glTexCoord2f (ntx2, nty1);
-  glVertex2i (sx + sw, Height - sy - 1);
-  glTexCoord2f (ntx2, nty2);
-  glVertex2i (sx + sw, Height - sy - sh - 1);
-  glTexCoord2f (ntx1, nty2);
-  glVertex2i (sx, Height - sy - sh - 1);
-  glEnd ();
-}
-
 // This variable is usually NULL except when doing a screen shot:
 // in this case it is a temporarily allocated buffer for glReadPixels ()
 static UByte *screen_shot = NULL;

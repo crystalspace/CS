@@ -125,12 +125,6 @@ public:
    */
   virtual bool GetMipMapDimensions (int mm, int& w, int& h);
 
-  /**
-   * Get the bitmap data for the given mipmap.
-   * This function is not always available: it depends on implementation.
-   */
-  virtual void *GetMipMapData (int mm);
-
   /// Get the mean color.
   virtual void GetMeanColor (UByte &r, UByte &g, UByte &b);
 
@@ -198,9 +192,6 @@ public:
   int get_size () { return w * h; }
   ///
   csTextureMM *get_parent () { return parent; }
-
-  /// This function should be implemented by heirs
-  virtual void *get_bitmap () = 0;
 };
 
 /**

@@ -40,7 +40,7 @@ class csWSTexture
   // Will be this texture used for 3D and/or for 2D operations?
   int Flags;
   // Red,Green and Blue components of transparent color
-  int tr, tg, tb;
+  UByte tr, tg, tb;
   // has texture transparent areas?
   bool IsTransp;
   // Has transparent color changed?

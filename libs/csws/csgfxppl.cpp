@@ -314,7 +314,7 @@ void csGraphicsPipeline::Flush (int iCurPage)
         break;
       }
       case pipeopSPR2D:
-        op->Spr2D.s2d->Draw (G2D, op->Spr2D.x, op->Spr2D.y, op->Spr2D.w, op->Spr2D.h);
+        op->Spr2D.s2d->Draw (G3D, op->Spr2D.x, op->Spr2D.y, op->Spr2D.w, op->Spr2D.h);
         INCLUDE_MIN_POINT (op->Spr2D.x, op->Spr2D.y);
         INCLUDE_MAX_POINT (op->Spr2D.x + op->Spr2D.w, op->Spr2D.y + op->Spr2D.h);
         break;

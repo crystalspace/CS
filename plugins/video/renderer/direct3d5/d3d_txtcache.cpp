@@ -99,7 +99,7 @@ void D3DTextureCache::Load(csD3DCacheData *d)
   DDSURFACEDESC ddsd;
   
   // get the texture map
-  csTexture* txt_unl = txt_mm->get_texture (0);
+  csTextureDirect3D *txt_unl = (csTextureDirect3D *)txt_mm->get_texture (0);
   
   // create a texture surface in system memory and move it there.
   memcpy(&ddsd, &csGraphics3DDirect3DDx5::m_ddsdTextureSurfDesc, sizeof(DDSURFACEDESC));
@@ -176,7 +176,7 @@ void D3DTextureCache::Load(csD3DCacheData *d)
     txt_unl              = txt_mm->get_texture (z);
     int OriginalWidth    = txt_unl->get_width ();
     int OriginalHeight   = txt_unl->get_height ();
-    unsigned long* lpSrc = (ULong *)txt_unl->get_bitmap();
+    unsigned long* lpSrc = (ULong *)txt_unl->get_image_data();
 
     //When using Mipmaps, every Mipmap level has half the size of 
     //the previous level. So we now derive all actual sizes from

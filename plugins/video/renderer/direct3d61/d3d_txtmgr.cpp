@@ -153,11 +153,6 @@ csTextureDirect3D::~csTextureDirect3D ()
   delete [] image;
 }
 
-void *csTextureDirect3D::get_bitmap ()
-{
-  return image;
-}
-
 //---------------------------------------------------------------------------
 
 csTextureMMDirect3D::csTextureMMDirect3D (iImage* image, int flags,
@@ -247,23 +242,6 @@ void csTextureMMDirect3D::CreateMipmaps ()
   }
 
   ComputeMeanColor ();
-}
-
-void* csTextureMMDirect3D::GetMipMapData(int mm)
-{
-  if (mm==-2)
-  {
-    if (m_pTexture2d)
-    {
-      return m_pTexture2d->get_bitmap();
-    }
-    else
-    {
-      return NULL;
-    }
-  }
-
-  return csTextureMM::GetMipMapData(mm);
 }
 
 //---------------------------------------------------------------------------

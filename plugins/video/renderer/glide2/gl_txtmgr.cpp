@@ -91,7 +91,6 @@ void csTextureMMGlide::ComputeMeanColor ()
 
 void csTextureMMGlide::remap_mm ()
 {
-
   csTextureGlide *tex;
   int w, h, i;
   RGBPixel* src;

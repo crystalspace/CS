@@ -48,14 +48,6 @@ csTextureOpenGL::~csTextureOpenGL ()
   if (image) image->DecRef ();
 }
 
-void *csTextureOpenGL::get_bitmap ()
-{
-  csGraphics3DOpenGL *G3D = ((csTextureMMOpenGL *)parent)->G3D;
-  G3D->texture_cache->cache_texture (parent);
-  csGLCacheData *cd = (csGLCacheData *)parent->GetCacheData ();
-  return (void *)cd->Handle;
-}
-
 //---------------------------------------------------------------------------
 
 csTextureMMOpenGL::csTextureMMOpenGL (iImage *image, int flags,

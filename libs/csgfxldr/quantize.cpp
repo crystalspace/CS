@@ -274,6 +274,14 @@ struct csColorBox
             bs += pixc * b;
           } /* endif */
       } /* endfor */
+    // In some extreme cases (textures with zero pixels or
+    // single-color textures with 1 transparent color)
+    // we can end here with count == 0; avoid division by zero
+    if (!count)
+    {
+      color = RGBPixel (0, 0, 0);
+      return;
+    }
     color.red   = ((rs + count / 2) << (8 - HIST_R_BITS)) / count;
     color.green = ((gs + count / 2) << (8 - HIST_G_BITS)) / count;
     color.blue  = ((bs + count / 2) << (8 - HIST_B_BITS)) / count;

@@ -50,9 +50,9 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
 
   csTextureMMSoftware *texmm =
     (csTextureMMSoftware *)pt->GetTextureHandle ()->GetPrivateObject ();
-  csTexture *tx = texmm->get_texture (mipmap);
+  csTextureSoftware *tx = (csTextureSoftware *)texmm->get_texture (mipmap);
   RGBPixel *tx_palette = texmm->GetColorMap ();
-  UByte *tx_bitmap = (UByte *)tx->get_bitmap ();
+  UByte *tx_bitmap = tx->get_bitmap ();
 
   int pt_min_u = pt->GetIMinU () >> mipmap;
   int pt_min_v = pt->GetIMinV () >> mipmap;

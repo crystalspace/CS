@@ -25,7 +25,7 @@
 
 //---//---//---//---//---//---//---//---//---//---/ Forward declarations //---//
 
-class csTexture;
+class csTextureSoftware;
 class csTextureMMSoftware;
 class csGraphics3DSoftware;
 struct iPolygonTexture;
@@ -229,7 +229,7 @@ void csScan_Finalize ();
 void csScan_CalcBlendTables (int rbits, int gbits, int bbits);
 /// Initialize the scanline variables
 void csScan_InitDraw (int MipMap, csGraphics3DSoftware* g3d,
-  iPolygonTexture* tex, csTextureMMSoftware* texture, csTexture* untxt);
+  iPolygonTexture* tex, csTextureMMSoftware* texture, csTextureSoftware *untxt);
 /// Dump debugging information about last polygon
 void csScan_dump (csGraphics3DSoftware* pG3D);
 /// Pixel-depth independent routine

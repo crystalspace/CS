@@ -139,9 +139,6 @@ public:
   /// Query palette -> native format table
   void *GetPaletteToGlobal () { return pal2glob; }
 
-  /// Override GetMipMapData() to return palette if (mm == -1)
-  virtual void *GetMipMapData (int mm);
-
   /// Apply gamma correction to private palette
   void ApplyGamma (UByte *GammaTable);
 };
@@ -174,7 +171,7 @@ public:
   virtual ~csTextureSoftware ()
   { delete [] bitmap; if (image) image->DecRef (); }
   /// Return a pointer to texture data
-  virtual void *get_bitmap ()
+  UByte *get_bitmap ()
   { return bitmap; }
 };
 

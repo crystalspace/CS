@@ -20,7 +20,7 @@
 #ifndef __CSPIXMAP_H__
 #define __CSPIXMAP_H__
 
-#include "igraph2d.h"
+#include "igraph3d.h"
 #include "itexture.h"
 #include "csutil/csbase.h"
 
@@ -57,15 +57,15 @@ public:
   { return hTex != NULL; }
 
   /// Draw the pixmap given the screen position and new size
-  virtual void Draw (iGraphics2D* g2d, int sx, int sy, int sw, int sh)
+  virtual void Draw (iGraphics3D* g3d, int sx, int sy, int sw, int sh)
   {
     if (hTex)
-      g2d->DrawPixmap (hTex, sx, sy, sw, sh, tx, ty, tw, th);
+      g3d->DrawPixmap (hTex, sx, sy, sw, sh, tx, ty, tw, th);
   }
 
   /// Draw the pixmap without rescale
-  void Draw (iGraphics2D* g2d, int sx, int sy)
-  { Draw (g2d, sx, sy, tw, th); }
+  void Draw (iGraphics3D* g3d, int sx, int sy)
+  { Draw (g3d, sx, sy, tw, th); }
 
   /// Return pixmap width
   int Width ()

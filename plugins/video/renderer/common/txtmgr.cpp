@@ -137,12 +137,6 @@ bool csTextureMM::GetMipMapDimensions (int mipmap, int& w, int& h)
   return false;
 }
 
-void *csTextureMM::GetMipMapData (int mipmap)
-{
-  csTexture *txt = get_texture (mipmap);
-  return txt ? txt->get_bitmap () : NULL;
-}
-
 void csTextureMM::AdjustSizePo2 ()
 {
   int newwidth  = image->GetWidth();

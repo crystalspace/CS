@@ -262,6 +262,10 @@ public:
 
   virtual float GetZBuffValue( int x, int y );
 
+  /// Draw a 2D sprite
+  virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
+    int tx, int ty, int tw, int th);
+
 private:
   /// board selected
   int board;

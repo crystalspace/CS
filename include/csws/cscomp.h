@@ -25,6 +25,7 @@
 #include "csutil/csobjvec.h"
 #include "csengine/cspixmap.h"
 #include "cswspal.h"
+#include "igraph2d.h"
 
 class csApp;
 class csEvent;
