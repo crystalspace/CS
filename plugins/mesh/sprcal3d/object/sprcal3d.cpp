@@ -115,12 +115,18 @@ csSpriteCal3DMeshObjectFactory::csSpriteCal3DMeshObjectFactory (iBase *pParent)
   scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMesh);
   scfiObjectModel.SetPolygonMeshViscull (0);
   scfiObjectModel.SetPolygonMeshShadows (0);
-
-
 }
 
 csSpriteCal3DMeshObjectFactory::~csSpriteCal3DMeshObjectFactory ()
 {
+    // Now remove ugly CS material hack from model so cal dtor will work
+//    for (int i=0; i<calCoreModel.getCoreMaterialCount(); i++)
+//    {
+//	CalCoreMaterial *mat = calCoreModel.getCoreMaterial(i);
+//	std::vector< CalCoreMaterial::Map > maps = mat->getVectorMap();
+//	maps.clear();
+//    }
+
     calCoreModel.destroy();
 }
 
@@ -151,13 +157,30 @@ bool csSpriteCal3DMeshObjectFactory::LoadCoreSkeleton(const char *filename)
     return calCoreModel.loadCoreSkeleton((const char *)path);
 }
 
-int csSpriteCal3DMeshObjectFactory::LoadCoreAnimation(const char *filename)
+int  csSpriteCal3DMeshObjectFactory::LoadCoreAnimation(const char *filename,
+						       const char *name,
+						       int type,
+						       float base_vel, 
+						       float min_vel, 
+						       float max_vel)
 {
     csString path(basePath);
     path.Append(filename);
     int id = calCoreModel.loadCoreAnimation((const char *)path);
     if (id != -1)
-	animationIDs.Push(id);
+    {
+	csCal3DAnimation *an = new csCal3DAnimation;
+	an->name          = name;
+	an->type          = type;
+	an->base_velocity = base_vel;
+	an->min_velocity  = min_vel;
+	an->max_velocity  = max_vel;
+
+	an->index = anims.Push(an);
+
+	std::string str(name);
+	calCoreModel.addAnimHelper(str,id);
+    }
     return id;
 }
 
@@ -178,6 +201,7 @@ bool csSpriteCal3DMeshObjectFactory::AddCoreMaterial(iMaterialWrapper *mat)
     newmat->reserve(1);
     newmat->setMap(0,newmap);  // sticking iMaterialWrapper into 2 places
     newmat->setUserData(mat);  // jam CS iMaterialWrapper into cal3d material holder
+   
     calCoreModel.addCoreMaterial(newmat);
     return true;
 }
@@ -612,6 +636,11 @@ bool csSpriteCal3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   if (!movable->IsFullTransformIdentity ())
     tr_o2c /= movable->GetFullTransform ();
 
+//  float scale = factory->GetRenderScale();
+//  csMatrix3 scale_mat(scale,0,0,0,scale,0,0,0,scale);
+
+//  tr_o2c *= scale_mat;
+
   csVector3 radius;
   csSphere sphere;
   GetRadius (radius, sphere.GetCenter ());
@@ -678,9 +707,10 @@ bool csSpriteCal3DMeshObject::DrawSubmesh (iGraphics3D* g3d,iRenderView* rview,C
     faceCount = pCalRenderer->getFaces(&meshFaces[0][0]);
 
     SetupVertexBuffer (mesh, submesh, vertexCount, faceCount, (csTriangle *)meshFaces);
-    material->Visit ();
+    if (material)
+	material->Visit ();
 
-    meshes[mesh][submesh].mat_handle = material->GetMaterialHandle();
+    meshes[mesh][submesh].mat_handle = (material)?material->GetMaterialHandle():0;
     meshes[mesh][submesh].use_vertex_color = true;
     meshes[mesh][submesh].mixmode = /* MixMode  | */ CS_FX_GOURAUD;
     meshes[mesh][submesh].vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
@@ -772,6 +802,129 @@ void csSpriteCal3DMeshObject::eiVertexBufferManagerClient::ManagerClosing ()
     scfParent->vbufmgr = 0;
   }
 }
+
+int csSpriteCal3DMeshObject::GetAnimCount()
+{
+    return calModel.getCoreModel()->getCoreAnimationCount();
+}
+
+const char *csSpriteCal3DMeshObject::GetAnimName(int idx)
+{
+    if (idx >= GetAnimCount())
+	return NULL;
+
+    return factory->anims[idx]->name;
+}
+
+int csSpriteCal3DMeshObject::FindAnim(const char *name)
+{
+    int count = GetAnimCount();
+
+    for (int i=0; i<count; i++)
+    {
+	if (factory->anims[i]->name == name)
+	    return i;
+    }
+    return -1;
+}
+
+void csSpriteCal3DMeshObject::ClearAllAnims()
+{
+    while (active_anims.Length())
+    {
+	csCal3DAnimation *pop = active_anims.Pop();
+	ClearAnimCycle(pop->index,0);  // do not delete pop because ptr is shared with factory
+    }
+}
+
+bool csSpriteCal3DMeshObject::SetAnimCycle(const char *name, float weight)
+{
+    ClearAllAnims();
+    return AddAnimCycle(name, weight, 0);
+}
+
+bool csSpriteCal3DMeshObject::AddAnimCycle(const char *name, float weight, float delay)
+{
+    int idx = FindAnim(name);
+    if (idx == -1)
+	return false;
+
+    calModel.getMixer()->blendCycle(idx,weight,delay);
+    
+    active_anims.Push(factory->anims[idx]);
+
+    return true;
+}
+
+void csSpriteCal3DMeshObject::ClearAnimCycle(int idx, float delay)
+{
+    calModel.getMixer()->clearCycle(idx,delay);
+}
+
+bool csSpriteCal3DMeshObject::ClearAnimCycle(const char *name, float delay)
+{
+    int idx = FindAnim(name);
+    if (idx == -1)
+	return false;
+    
+    ClearAnimCycle(idx,delay);
+
+    return true;
+}
+
+bool csSpriteCal3DMeshObject::SetAnimAction(const char *name, float delayIn, float delayOut)
+{
+    int idx = FindAnim(name);
+    if (idx == -1)
+	return false;
+
+    calModel.getMixer()->executeAction(idx,delayIn,delayOut);
+
+    return true;
+}
+
+bool csSpriteCal3DMeshObject::SetVelocity(float vel)
+{
+    int count = GetAnimCount();
+
+    for (int i=0; i<count; i++)
+    {
+	if (factory->anims[i]->type == C3D_ANIM_TYPE_TRAVEL)
+	{
+	    if (vel < factory->anims[i]->min_velocity ||
+		vel > factory->anims[i]->max_velocity)
+		continue;
+
+	    float pct,vel_diff;
+	    if (vel == factory->anims[i]->base_velocity)
+		pct = 1;
+	    else if (vel < factory->anims[i]->base_velocity)
+	    {
+		vel_diff = factory->anims[i]->base_velocity - factory->anims[i]->min_velocity;
+		pct      = (vel - factory->anims[i]->min_velocity) / vel_diff;
+	    }
+	    else
+	    {
+		vel_diff = factory->anims[i]->max_velocity - factory->anims[i]->base_velocity;
+		pct      = 1 - (factory->anims[i]->min_velocity - vel) / vel_diff;
+	    }
+	    calModel.getMixer()->blendCycle(i,pct,0);
+	    if (pct == 1)
+		break;
+	}
+    }
+
+    return true;    
+}
+
+void csSpriteCal3DMeshObject::SetLOD(float lod)
+{
+    calModel.setLodLevel(lod);
+}
+
+
+
+
 
 
 //----------------------------------------------------------------------

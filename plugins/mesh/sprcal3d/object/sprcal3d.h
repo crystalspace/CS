@@ -60,6 +60,24 @@ struct iEngine;
 
 #define ALL_LOD_FEATURES (CS_LOD_TRIANGLE_REDUCTION|CS_LOD_DISTANCE_REDUCTION)
 
+enum
+{
+    C3D_ANIM_TYPE_NONE,
+    C3D_ANIM_TYPE_TRAVEL,
+    C3D_ANIM_TYPE_CYCLE,
+    C3D_ANIM_TYPE_STYLE_CYCLE,
+    C3D_ANIM_TYPE_ACTION
+};
+
+struct csCal3DAnimation
+{
+    int      index;
+    csString name;
+    int	     type;
+    float    base_velocity;
+    float    min_velocity;
+    float    max_velocity;
+};
 
 class csSpriteCal3DMeshObject;
 
@@ -82,7 +100,7 @@ private:
 
   /// This is the factory equivalent class in cal3d.
   CalCoreModel calCoreModel;
-  csArray<int> animationIDs;
+  csArray<csCal3DAnimation*> anims;
   csString     basePath;
   float	       renderScale;
 
@@ -111,8 +129,9 @@ public:
   void ReportLastError ();
   void SetBasePath(const char *path);
   void SetRenderScale(float scale);
+  float GetRenderScale() { return renderScale; }
   bool LoadCoreSkeleton(const char *filename);
-  int  LoadCoreAnimation(const char *filename);
+  int  LoadCoreAnimation(const char *filename,const char *name,int type,float base_vel,float min_vel,float max_vel);
   bool LoadCoreMesh(const char *filename);
   bool AddCoreMaterial(iMaterialWrapper *mat);
   void BindMaterials();
@@ -225,8 +244,8 @@ public:
     virtual bool LoadCoreSkeleton(const char *filename)
     { return scfParent->LoadCoreSkeleton(filename); }
 
-    virtual int  LoadCoreAnimation(const char *filename)
-    { return scfParent->LoadCoreAnimation(filename); }
+    virtual int LoadCoreAnimation(const char *filename,const char *name,int type,float base_vel,float min_vel,float max_vel)
+    { return scfParent->LoadCoreAnimation(filename,name,type,base_vel,min_vel,max_vel); }
 
     virtual bool LoadCoreMesh(const char *filename)
     { return scfParent->LoadCoreMesh(filename); }
@@ -311,6 +330,8 @@ private:
   iBase* logparent;
   CalModel calModel;
   float last_update_time;
+  csArray<csCal3DAnimation*> active_anims;
+
 #ifndef CS_USE_NEW_RENDERER
   iVertexBufferManager* vbufmgr;
   csRef<iVertexBuffer> vbuf;
@@ -331,6 +352,7 @@ private:
   void UpdateLightingSubmesh (iLight** lights, int num_lights,iMovable* movable,CalRenderer *pCalRenderer,int mesh, int submesh);
 
 public:
+  SCF_DECLARE_IBASE;
 
   /// The parent.
   csSpriteCal3DMeshObjectFactory* factory;
@@ -348,7 +370,6 @@ public:
 
 
   ///------------------------ iMeshObject implementation ----------------------
-  SCF_DECLARE_IBASE;
   virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
       csVector3& intersect, float* pr) { return false; }
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
@@ -454,11 +475,66 @@ public:
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
 
   //--------------------- iSpriteCal3DState implementation -------------//
+  int GetAnimCount();
+  const char *GetAnimName(int idx);
+  int  FindAnim(const char *name);
+  void ClearAllAnims();
+  bool SetAnimCycle(const char *name, float weight);
+  bool AddAnimCycle(const char *name, float weight, float delay);
+  void ClearAnimCycle(int idx, float delay);
+  bool ClearAnimCycle(const char *name, float delay);
+  bool SetAnimAction(const char *name, float delayIn, float delayOut);
+  bool SetVelocity(float vel);
+  void SetLOD(float lod);
+  
   struct SpriteCal3DState : public iSpriteCal3DState
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csSpriteCal3DMeshObject);
+    SCF_DECLARE_EMBEDDED_IBASE(csSpriteCal3DMeshObject);
+
+    virtual int GetAnimCount()
+    {
+	return scfParent->GetAnimCount();
+    }
+    virtual const char *GetAnimName(int idx)
+    {
+	return scfParent->GetAnimName(idx);
+    }
+
+    virtual void ClearAllAnims()
+    {
+	scfParent->ClearAllAnims();
+    }
+
+    virtual bool SetAnimCycle(const char *name, float weight)
+    {
+	return scfParent->SetAnimCycle(name,weight);
+    }
+    virtual bool AddAnimCycle(const char *name, float weight, float delay)
+    {
+	return scfParent->AddAnimCycle(name,weight,delay);
+    }
+    virtual bool ClearAnimCycle(const char *name, float delay)
+    {
+	return scfParent->ClearAnimCycle(name,delay);
+    }
+
+    virtual bool SetAnimAction(const char *name, float delayIn, float delayOut)
+    {
+	return scfParent->SetAnimAction(name,delayIn,delayOut);
+    }
+
+    virtual bool SetVelocity(float vel)
+    {
+	return scfParent->SetVelocity(vel);
+    }
+
+    virtual void SetLOD(float lod)
+    {
+	scfParent->SetLOD(lod);
+    }
 
   } scfiSpriteCal3DState;
+  friend struct SpriteCal3DState;
 
   //--------------------- iLODControl implementation -------------//
   int GetLODPolygonCount (float lod)
