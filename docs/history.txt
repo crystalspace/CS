@@ -15,6 +15,10 @@ The history order is reversed so that new features are at the top.
 	    - Procedural bump texture is now independent of u,v direction
 	      size.
 	    - Bumptest only does engine::Prepare once now.
+	- Wouter also ran into a const problem with a SetTextureSpace method
+	  when trying to fix Tunnel Fighter.
+	- Philip Wyett fixed a few VC compiler warnings in csdemo and
+	  phyztest.
 28-Apr-2001
 	- Removed a type->DecRef() in engine.cpp. The mesh object type
 	  plugins can remain in memory. This DecRef() caused crashes
