@@ -10,6 +10,9 @@ chronological order.
         - Philip Wyett changed #include "GL/glu.h" to <GL/glu.h>, in the new
           GL renderer gl_txtcache.cpp, eliminating the warning messages within
           the make build system.
+	- Jorrit fixed an initialization error of last_visible_vistest_nr
+	  with both dynavis and frustvis. With a bit of bad luck this could
+	  cause culling errors.
 30-Aug-2003
 	- Old_Belge added the morph target support to sprcal3d.
 	- Eric Sunshine augmented configure.ac so that it emits the appropriate

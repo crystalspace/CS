@@ -93,6 +93,7 @@ public:
     SCF_CONSTRUCT_IBASE (0);
     history = new csVisibilityObjectHistory ();
     csVisibilityObjectWrapper::dynavis = dynavis;
+    last_visible_vistestnr = 0;
   }
   virtual ~csVisibilityObjectWrapper ()
   {

@@ -68,6 +68,7 @@ public:
   {
     SCF_CONSTRUCT_IBASE (0);
     csFrustVisObjectWrapper::frustvis = frustvis;
+    last_visible_vistest_nr = 0;
   }
   virtual ~csFrustVisObjectWrapper ()
   {
