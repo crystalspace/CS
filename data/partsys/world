@@ -148,6 +148,7 @@ WORLD (
 	  POLYGON 'left2' (VERTICES (16,17,9,8))
 	  POLYGON 'left3' (VERTICES (17,5,1,9))
 	)
+      LMCACHE (room_walls)
     )
     LIGHT (CENTER (0, 0, 0) RADIUS (40) COLOR (1,1,1))
     MESHOBJ 'flame' (
@@ -266,6 +267,7 @@ WORLD (
 	  POLYGON 'left3' (VERTICES (17,5,1,9))
 	)
       HARDMOVE (V (0,0,40))
+      LMCACHE (room0_1_walls)
     )
     LIGHT (CENTER (0, 0, 40) RADIUS (40) COLOR (0,0,1))
     MESHOBJ 'emit1' (
@@ -413,6 +415,7 @@ WORLD (
 	  POLYGON 'left3' (VERTICES (17,5,1,9))
 	)
       HARDMOVE (V (0,0,80))
+      LMCACHE (room0_2_walls)
     )
     LIGHT (CENTER (0, 0, 80) RADIUS (40) COLOR (1,0,1))
     MESHOBJ 'fire' (
@@ -542,6 +545,7 @@ WORLD (
 	  POLYGON 'left3' (VERTICES (17,5,1,9))
 	)
       HARDMOVE (V (-40,0,80))
+      LMCACHE (room-1_2_walls)
     )
     LIGHT (CENTER (-40, 0, 80) RADIUS (40) COLOR (1,1,0))
     MESHOBJ 'emit7' (
@@ -696,6 +700,7 @@ WORLD (
 	  POLYGON 'left3' (VERTICES (17,5,1,9))
 	)
       HARDMOVE (V (40,0,0))
+      LMCACHE (room1_0_walls)
     )
     LIGHT (CENTER (40, 0, 0) RADIUS (40) COLOR (1,0,0))
     MESHOBJ 'haze1' (
@@ -797,6 +802,7 @@ WORLD (
 	  POLYGON 'left3' (VERTICES (17,5,1,9))
 	)
       HARDMOVE (V (80,0,0))
+      LMCACHE (room2_0_walls)
     )
     MESHOBJ 'haze5' (
       PLUGIN ('haze')

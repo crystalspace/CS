@@ -33,6 +33,7 @@
 
 #include "iutil/databuff.h"
 #include "imap/reader.h"
+#include "imesh/lighting.h"
 #include "imesh/sprite3d.h"
 #include "imesh/skeleton.h"
 #include "imesh/object.h"
@@ -110,6 +111,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (LEVEL)
   CS_TOKEN_DEF (LIBRARY)
   CS_TOKEN_DEF (LIGHT)
+  CS_TOKEN_DEF (LMCACHE)
   CS_TOKEN_DEF (LOD)
   CS_TOKEN_DEF (MATERIAL)
   CS_TOKEN_DEF (MATERIALS)
@@ -1454,6 +1456,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
     CS_TOKEN_TABLE (CONVEX)
     CS_TOKEN_TABLE (PRIORITY)
     CS_TOKEN_TABLE (LOD)
+    CS_TOKEN_TABLE (LMCACHE)
   CS_TOKEN_TABLE_END
 
   CS_TOKEN_TABLE_START (tok_matvec)
@@ -1489,7 +1492,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 	  {
             ReportError (
 	      "crystalspace.maploader.parse.meshobject",
-	      "First use LOD after PARAMS!");
+	      "Only use LOD after PARAMS!");
 	    return false;
 	  }
 	  iLODControl* lodctrl = SCF_QUERY_INTERFACE (
@@ -1703,6 +1706,26 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 	{
 	  csScanStr (params, "%s", str);
 	  plug = loaded_plugins.FindPlugin (str);
+	}
+        break;
+
+      case CS_TOKEN_LMCACHE:
+        {
+	  if (!mesh->GetMeshObject ())
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.meshobject",
+	      "Only use LMCACHE after PARAMS!");
+	    return false;
+	  }
+	  iLightingInfo* li = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+	  	iLightingInfo);
+	  if (li)
+	  {
+	    csScanStr (params, "%s", str);
+	    li->SetCacheName (str);
+	    li->DecRef ();
+	  }
 	}
         break;
     }

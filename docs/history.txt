@@ -3,6 +3,22 @@ The history order is reversed so that new features are at the top.
 20-Nov-2001
 	- Small fix in csObject::SetName() with relation to the debugging
 	  graph.
+	- There is a problem with the lightmap and octree cache in that
+	  it assumes uniqueness of the id for things. Unfortunatelly this
+	  is not true when parts of the world are loaded dynamically and
+	  the order of loading can no longer be guaranteed. To fix this
+	  I added a new keyword to the loader called LMCACHE. With this
+	  keyword you can give every mesh object a cache name. All lightmaps
+	  and octree information will then be saved in a directory with
+	  that name instead of the usual 'lm' dir. If you correctly give
+	  every thing mesh object a unique LMCACHE name then lighting will
+	  be correct even if the thing is loaded at another time later.
+	  If the name is not given then the lightmap will be cached in
+	  the default 'lm' dir. Note that in the future we might try
+	  to use md5 to generate a unique name automatically from the
+	  geometrical data of the mesh object.
+	- partsys level in CVS now uses LMCACHE. This means you'll have to
+	  recalculate lighting for this.
 19-Nov-2001
 	- Added iEngine::RemoveObject() which is a conveniance function to
 	  'remove' a CS object from the engine. This will not clear the

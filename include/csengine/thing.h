@@ -23,6 +23,7 @@
 #include "csutil/csobject.h"
 #include "csutil/nobjvec.h"
 #include "csengine/bsp.h"
+#include "csutil/util.h"
 #include "csutil/flags.h"
 #include "csutil/cscolor.h"
 #include "csutil/csvector.h"
@@ -120,6 +121,8 @@ private:
   static int last_thing_id;
   /// Last used polygon ID.
   unsigned long last_polygon_id;
+  /// Name of the cache to use for lightmapping.
+  char* cachename;
 
   /// Number of vertices
   int num_vertices;
@@ -735,6 +738,15 @@ public:
    */
   void PrepareLighting ();
 
+  /// Set the cache name for this thing.
+  void SetCacheName (const char* cachename)
+  {
+    delete[] csThing::cachename;
+    csThing::cachename = cachename ? csStrNew (cachename) : NULL;
+  }
+  /// Get the cache name.
+  const char* GetCacheName () const { return cachename; }
+
   //----------------------------------------------------------------------
   // Utility functions
   //----------------------------------------------------------------------
@@ -982,6 +994,14 @@ public:
     virtual void PrepareLighting ()
     {
       scfParent->PrepareLighting ();
+    }
+    virtual void SetCacheName (const char* cachename)
+    {
+      scfParent->SetCacheName (cachename);
+    }
+    virtual const char* GetCacheName () const
+    {
+      return scfParent->GetCacheName ();
     }
   } scfiLightingInfo;
   friend struct LightingInfo;

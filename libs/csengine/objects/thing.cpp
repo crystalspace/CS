@@ -143,6 +143,7 @@ csThing::csThing (iBase* parent) : csObject (parent),
 
   polybuf = NULL;
   polybuf_materials = NULL;
+  cachename = NULL;
 }
 
 csThing::~csThing ()
@@ -168,6 +169,7 @@ csThing::~csThing ()
   polygons.DeleteAll (); // delete prior to portal_poly array !
   if (portal_polygons.Length()) portal_polygons.DeleteAll();
   CleanupThingEdgeTable ();
+  delete[] cachename;
 }
 
 void csThing::CleanupThingEdgeTable ()
@@ -612,6 +614,12 @@ void csThing::BuildStaticTree (const char* name, int mode)
   bool recalc_octree = true;
   if (!csEngine::do_force_revis && w->VFS->Exists ((const char*)str))
   {
+    if (cachename)
+    {
+      csEngine* w = csEngine::current_engine;
+      w->VFS->PushDir ();
+      w->VFS->ChDir (cachename);
+    }
     recalc_octree = false;
     csEngine::current_engine->Report ("Loading bsp/octree...");
     recalc_octree = !((csOctree*)static_tree)->ReadFromCache (
@@ -623,13 +631,29 @@ void csThing::BuildStaticTree (const char* name, int mode)
       static_tree = new csOctree (this, bbox.Min (), bbox.Max (),
       	150/*15*/, mode);
     }
+    if (cachename)
+    {
+      csEngine* w = csEngine::current_engine;
+      w->VFS->PopDir ();
+    }
   }
   if (recalc_octree)
   {
     csEngine::current_engine->Report ("Calculate bsp/octree...");
     static_tree->Build (GetPolygonArray ());
+    if (cachename)
+    {
+      csEngine* w = csEngine::current_engine;
+      w->VFS->PushDir ();
+      w->VFS->ChDir (cachename);
+    }
     csEngine::current_engine->Report ("Caching bsp/octree...");
     ((csOctree*)static_tree)->Cache (w->VFS, (const char*)str);
+    if (cachename)
+    {
+      csEngine* w = csEngine::current_engine;
+      w->VFS->PopDir ();
+    }
   }
   csEngine::current_engine->Report ("Compress vertices...");
   CompressVertices ();
@@ -2853,27 +2877,59 @@ bool csThing::ReadFromCache (int id)
 {
   Prepare ();
   if (id == 0) id = thing_id;
+  if (cachename)
+  {
+    id = 0;
+    csEngine* w = csEngine::current_engine;
+    w->VFS->PushDir ();
+    w->VFS->ChDir (cachename);
+  }
   int i;
+  bool rc = false;
   for (i = 0 ; i < polygons.Length () ; i++)
     if (!polygons.Get (i)->ReadFromCache (id))
-      return false;
+      goto stop;
   for (i = 0 ; i < GetCurveCount () ; i++)
     if (!curves.Get (i)->ReadFromCache (id))
-      return false;
-  return true;
+      goto stop;
+  rc = true;
+
+stop:
+  if (cachename)
+  {
+    csEngine* w = csEngine::current_engine;
+    w->VFS->PopDir ();
+  }
+  return rc;
 }
 
 bool csThing::WriteToCache (int id)
 {
   if (id == 0) id = thing_id;
+  if (cachename)
+  {
+    id = 0;
+    csEngine* w = csEngine::current_engine;
+    w->VFS->PushDir ();
+    w->VFS->ChDir (cachename);
+  }
   int i;
+  bool rc = false;
   for (i = 0 ; i < polygons.Length () ; i++)
     if (!polygons.Get (i)->WriteToCache (id))
-      return false;
+      goto stop;
   for (i = 0 ; i < GetCurveCount () ; i++)
     if (!curves.Get (i)->WriteToCache (id))
-      return false;
-  return true;
+      goto stop;
+  rc = true;
+
+stop:
+  if (cachename)
+  {
+    csEngine* w = csEngine::current_engine;
+    w->VFS->PopDir ();
+  }
+  return rc;
 }
 
 void csThing::PrepareLighting ()

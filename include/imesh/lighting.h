@@ -21,7 +21,7 @@
 
 #include "csutil/scf.h"
 
-SCF_VERSION (iLightingInfo, 0, 0, 1);
+SCF_VERSION (iLightingInfo, 0, 0, 2);
 
 /**
  * This interface is implemented by mesh objects that have some kind
@@ -55,6 +55,18 @@ struct iLightingInfo : public iBase
    * last.
    */
   virtual void PrepareLighting () = 0;
+
+  /**
+   * Set the name of the lightmap cache to use for this. If not given
+   * then the 'id' will be used for uniqueness.
+   */
+  virtual void SetCacheName (const char* cachename) = 0;
+
+  /**
+   * Get the name of the lightmap cache used for this.
+   * Returns NULL if none given.
+   */
+  virtual const char* GetCacheName () const = 0;
 };
 
 #endif // __IMESH_LIGHTING_H__

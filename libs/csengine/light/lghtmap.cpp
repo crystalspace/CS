@@ -196,7 +196,10 @@ struct LightHeader
 void CacheName (char *buf, char* prefix, int id,
 	unsigned long ident, char *suffix)
 {
-  sprintf (buf, "lm/%s%d_%lu%s", prefix, id, ident, suffix);
+  if (id == 0)
+    sprintf (buf, "%s%lu%s", prefix, ident, suffix);
+  else
+    sprintf (buf, "lm/%s%d_%lu%s", prefix, id, ident, suffix);
 }
 
 bool csLightMap::ReadFromCache (int id, int w, int h,
