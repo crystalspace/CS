@@ -188,6 +188,13 @@ public:
    */
   bool Contains (const csVector3& point);
 
+  /**
+   * Check if a point is inside the frustrum. The point and
+   * frustrum are relative to (0,0,0).
+   */
+  static bool Contains (csVector3* frustrum, int num_frust,
+  	const csVector3& point);
+
   /// Return true if frustrum is empty.
   bool IsEmpty () const { return !wide && vertices == NULL; }
 

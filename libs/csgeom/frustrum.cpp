@@ -344,3 +344,15 @@ bool csFrustrum::Contains (const csVector3& point)
   return true;
 }
 
+bool csFrustrum::Contains (csVector3* frustrum, int num_frust, const csVector3& point)
+{
+  int i, i1;
+  i1 = num_frust-1;
+  for (i = 0 ; i < num_frust ; i++)
+  {
+    if (csMath3::WhichSide3D (point, frustrum[i], frustrum[i1]) > 0) return false;
+    i1 = i;
+  }
+  return true;
+}
+
