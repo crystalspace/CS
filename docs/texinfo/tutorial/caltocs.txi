@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node caltocs Tutorial, WinCVS Tutorial, map2cs Tutorial, Tutorials
+@node caltocs Tutorial, WinCVS Tutorial, md32spr Tutorial, Tutorials
 @section @code{caltocs} Tutorial
 @cindex @file{caltocs} Tutorial
 @cindex Tutorial, @file{caltocs}

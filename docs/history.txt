@@ -35,6 +35,8 @@ The history order is reversed so that new features are at the top.
 	  frustum.
 	- First attempts at implementing shadow receiving for genmeshes.
 	  Not fully operational yet and also not enabled by default.
+	- Eric Sunshine added to the user manual an `md32spr' tutorial written
+	  by Manjunath Sripadarao <msripada@@evl.uic.edu>.
 16-Dec-2002
 	- Completely removed the old octree culler. This has a great impact
 	  on the internal engine structure. It greatly simplifies both

@@ -190,6 +190,11 @@ Andreas Busch (@email{nobita@@t-online.de})
 Andreas wrote documentation explaining how to build Crystal Space with
 KDevelop.  He also made a very thorough proof-reeading pass through the entire
 user manual and spotted and corrected a large number of typographical problems.
+
+@item
+Manjunath Sripadarao (@email{msripada@@evl.uic.edu})
+
+Manjunath wrote a tutorial for the @code{md32spr} conversion program.
 @end itemize
 
 If we have forgotten anyone or missed a contribution, we sincerely apologize.

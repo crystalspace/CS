@@ -1,4 +1,4 @@
 @c -*-texinfo-*-
-@set UPDATED 4 November 2002
-@set EDITION 95.dev.6
+@set UPDATED 17 December 2002
+@set EDITION 95.dev.7
 @set VERSION 95.dev
