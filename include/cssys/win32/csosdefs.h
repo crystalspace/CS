@@ -36,6 +36,7 @@
   #pragma warning(disable:4201)   // structure/ union without name. (Only relevant on MSVC 5.0)
   #pragma warning(disable:4702)   // Unreachable Code
   #pragma warning(disable:4512)   // Could not generate assignment operator
+  #pragma warning(disable:4100)   // Use of void* as a formal function parameter
 #endif
 
 // So many things require this. IF you have an issue with something defined

@@ -832,7 +832,7 @@ void DrawOctreeBoxes (int draw_level)
 #define PLANE_Y 1
 #define PLANE_Z 2
 
-static csVector3 GetVector3 (int plane_nr, float plane_pos,
+csVector3 GetVector3 (int plane_nr, float plane_pos,
 	const csVector2& p)
 {
   csVector3 v;

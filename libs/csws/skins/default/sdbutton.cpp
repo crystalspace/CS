@@ -25,7 +25,7 @@ void csDefaultButtonSkin::Draw (csComponent &This)
 {
 #define This ((csButton &)This)
   int li, di;                   // light and dark colors
-  int areaw, areah;             // drawing area width and height
+  int areaw = 0, areah = 0;             // drawing area width and height
 
   csPixmap *ImageNormal, *ImagePressed;
   This.GetBitmap (&ImageNormal, &ImagePressed);

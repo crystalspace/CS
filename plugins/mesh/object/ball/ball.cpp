@@ -281,7 +281,7 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
   vertices[num_vertices].Set (0, vert_radius, 0);
   uvverts[num_vertices].Set (.5, .5);
   num_vertices++;
-  int bottom_vertex;
+  int bottom_vertex = 0;
   if (!toponly)
   {
     bottom_vertex = num_vertices;
