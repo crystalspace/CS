@@ -85,6 +85,7 @@ IMPLEMENT_IBASE_END
 
 SysSystemDriver::SysSystemDriver () : csSystemDriver (), Callback (NULL)
 {
+  CONSTRUCT_IBASE (NULL);
   // Initialize signal handler for clean shutdown
   init_sig ();
 }
@@ -146,19 +147,19 @@ void SysSystemDriver::Sleep (int SleepTime)
 
 //------------------------------------------------------ XUnixSystemDriver ---//
 
-void SysSystemDriver::GetExtSettings (int &SimDepth,
-  bool &UseSHM, bool &HardwareCursor)
+void SysSystemDriver::GetExtSettings (int &pSimDepth,
+  bool &pUseSHM, bool &pHardwareCursor)
 {
-  SimDepth = this->SimDepth;
-  UseSHM = this->UseSHM;
-  HardwareCursor = this->HardwareCursor;
+  pSimDepth = SimDepth;
+  pUseSHM = UseSHM;
+  pHardwareCursor = HardwareCursor;
 }
 
 void SysSystemDriver::SetLoopCallback
-  (LoopCallback Callback, void *Param)
+  (LoopCallback pCallback, void *pParam)
 {
-  this->Callback = Callback;
-  this->CallbackParam = Param;
+  Callback = pCallback;
+  CallbackParam = pParam;
 }
 
 //------------------------------------------------------ SysKeyboardDriver ---//
