@@ -83,7 +83,7 @@ bool Mdl::ReadMDLFile(const char* mdlfile)
   if ((f = fopen(mdlfile, "rb")) == NULL)
     return setError("Cannot find MDL file");
 
-  // read mdl header
+  // read mdl magic
   magic_t magic;
   if (fread(&magic, sizeof(magic_t), 1, f) != 1)
     return setError("Cannot read magic header", f);
@@ -101,6 +101,7 @@ bool Mdl::ReadMDLFile(const char* mdlfile)
   mdl_t header;
   if (fread(&header, sizeof(mdl_t), 1, f) != 1)
     return setError("Cannot read mdl header", f);
+
   header.scale.x = convert_endian (header.scale.x);
   header.scale.y = convert_endian (header.scale.y);
   header.scale.z = convert_endian (header.scale.z);
@@ -137,9 +138,9 @@ bool Mdl::ReadMDLFile(const char* mdlfile)
   skins = new skin_t[nbskins];
   for (i = 0; i < nbskins; i++)
   {
-    long group = 0;
-    if (fread(&group, sizeof(long), 1, f) != 1)
-      return setError("Error then reading mdl file", f);
+    int32 group = 0;
+    if (fread(&group, sizeof(group), 1, f) != 1)
+      return setError("Error reading mdl file", f);
     group = convert_endian (group);
 
     if (group != 1 && group != 0)
@@ -152,19 +153,19 @@ bool Mdl::ReadMDLFile(const char* mdlfile)
       skins[i].texs = new unsigned char*[1];
       skins[i].texs[0] = new unsigned char [skinheight * skinwidth];
       if (fread(skins[i].texs[0], skinheight * skinwidth, 1, f) != 1)
-        return setError("Error then reading alone tex skin", f);
+        return setError("Error reading tex skin", f);
     }
     else // multi-tex skin
     {
       skins[i].group = true;
-      if (fread(&skins[i].nbtexs, sizeof(long), 1, f) != 1)
-        return setError("Error then reading mdl file", f);
+      if (fread(&skins[i].nbtexs, sizeof(skins[i].nbtexs), 1, f) != 1)
+        return setError("Error reading mdl file", f);
       skins[i].nbtexs = convert_endian (skins[i].nbtexs);
 
       // read time between frame
       skins[i].timebtwskin = new float [skins[i].nbtexs];
       if (fread(skins[i].timebtwskin, sizeof(float)*skins[i].nbtexs, 1, f)!=1)
-        return setError("Error then reading multi-tex skin", f);
+        return setError("Error reading multi-tex skin", f);
       for (ii = 0 ; ii < skins[i].nbtexs ; ii++)
         skins[i].timebtwskin[ii] = convert_endian (skins[i].timebtwskin[ii]);
 
@@ -174,7 +175,7 @@ bool Mdl::ReadMDLFile(const char* mdlfile)
       {
         skins[i].texs[j] = new unsigned char [skinheight * skinwidth];
         if (fread(skins[i].texs[j], skinheight * skinwidth, 1, f) != 1)
-          return setError("Error then reading multi-tex skin", f);
+          return setError("Error reading multi-tex skin", f);
       }
     }
   }
@@ -186,7 +187,7 @@ bool Mdl::ReadMDLFile(const char* mdlfile)
   for (i = 0; i < nbvertices; i++)
   {
     if (fread(&vertices[i], sizeof(vertice_t), 1, f) != 1)
-      return setError("Error then reading mdl file", f);
+      return setError("Error reading mdl file", f);
     vertices[i].onseam = convert_endian (vertices[i].onseam);
     vertices[i].s = convert_endian (vertices[i].s);
     vertices[i].t = convert_endian (vertices[i].t);
@@ -199,7 +200,7 @@ bool Mdl::ReadMDLFile(const char* mdlfile)
   for (i = 0; i < nbtriangles; i++)
   {
     if (fread(&triangles[i], sizeof(triangle_t), 1, f) != 1)
-      return setError("Error then reading mdl file", f);
+      return setError("Error reading mdl file", f);
     triangles[i].facefront = convert_endian (triangles[i].facefront);
     triangles[i].vertice[0] = convert_endian (triangles[i].vertice[0]);
     triangles[i].vertice[1] = convert_endian (triangles[i].vertice[1]);
@@ -212,9 +213,9 @@ bool Mdl::ReadMDLFile(const char* mdlfile)
   // check all framessets
   for (i = 0; i < nbframesets; i++)
   {
-    long typeframe = 0;
-    if (fread(&typeframe, sizeof(long), 1, f) != 1)
-      return setError("Error then reading mdl file", f);
+    int32 typeframe = 0;
+    if (fread(&typeframe, sizeof(typeframe), 1, f) != 1)
+      return setError("Error reading mdl file", f);
     typeframe = convert_endian (typeframe);
 
     if (typeframe == 0) // one animation frame
@@ -228,30 +229,31 @@ bool Mdl::ReadMDLFile(const char* mdlfile)
 
       // read min bound
       if (fread(&framesets[i].frames[0].min, sizeof(trivertx_t), 1, f) != 1)
-        return setError("Error then reading mdl file", f);
+        return setError("Error reading mdl file", f);
       memcpy(&framesets[i].min,&framesets[i].frames[0].min,sizeof(trivertx_t));
 
       // read max bound
       if (fread(&framesets[i].frames[0].max, sizeof(trivertx_t), 1, f) != 1)
-        return setError("Error then reading mdl file", f);
+        return setError("Error reading mdl file", f);
       memcpy(&framesets[i].max,&framesets[i].frames[0].max,sizeof(trivertx_t));
 
       // name of frame
       memset(framesets[i].frames[0].name, 0, MDL_FRAME_NAME_MAX + 1);
       if (fread(framesets[i].frames[0].name, MDL_FRAME_NAME_MAX, 1, f) != 1)
-        return setError("Error then reading mdl file", f);
+        return setError("Error reading mdl file", f);
 
       // vertices
       if (fread(framesets[i].frames[0].trivert,
         sizeof(trivertx_t) * nbvertices, 1, f) != 1)
-        return setError("Error then reading mdl file", f);
+        return setError("Error reading mdl file", f);
     }
     else  // multi-frame animation
     {
       framesets[i].group = true;
 
-      if (fread(&framesets[i].nbframes, sizeof(long), 1, f) != 1)
-        return setError("Error then reading mdl file", f);
+      if (fread(&framesets[i].nbframes, sizeof(framesets[i].nbframes), 
+                1, f) != 1)
+        return setError("Error reading mdl file", f);
       framesets[i].nbframes = convert_endian (framesets[i].nbframes);
 
       framesets[i].delay = new float[framesets[i].nbframes];
@@ -259,15 +261,15 @@ bool Mdl::ReadMDLFile(const char* mdlfile)
 
       // read general min bound
       if (fread(&framesets[i].min, sizeof(trivertx_t), 1, f) != 1)
-        return setError("Error then reading mdl file", f);
+        return setError("Error reading mdl file", f);
 
       // read general max bound
       if (fread(&framesets[i].max, sizeof(trivertx_t), 1, f) != 1)
-        return setError("Error then reading mdl file", f);
+        return setError("Error reading mdl file", f);
 
       // read time between frame
       if (fread(framesets[i].delay,sizeof(float)*framesets[i].nbframes,1,f)!=1)
-        return setError("Error then reading mdl file", f);
+        return setError("Error reading mdl file", f);
       for (ii = 0 ; ii < framesets[i].nbframes; ii++)
         framesets[i].delay[ii] = convert_endian (framesets[i].delay[ii]);
 
@@ -276,22 +278,22 @@ bool Mdl::ReadMDLFile(const char* mdlfile)
       {
         // read min bound
         if (fread(&framesets[i].frames[j].min, sizeof(trivertx_t), 1, f) != 1)
-          return setError("Error then reading mdl file", f);
+          return setError("Error reading mdl file", f);
 
         // read max bound
         if (fread(&framesets[i].frames[j].max, sizeof(trivertx_t), 1, f) != 1)
-          return setError("Error then reading mdl file", f);
+          return setError("Error reading mdl file", f);
         
         // frame name
         memset(framesets[i].frames[j].name, 0, MDL_FRAME_NAME_MAX + 1);
         if (fread(framesets[i].frames[j].name, MDL_FRAME_NAME_MAX, 1, f) != 1)
-          return setError("Error then reading mdl file", f);
+          return setError("Error reading mdl file", f);
         
         // frame vertices
         framesets[i].frames[j].trivert = new trivertx_t[nbvertices];
         if (fread(framesets[i].frames[j].trivert,
 	  sizeof(trivertx_t) * nbvertices, 1, f) != 1)
-          return setError("Error then reading mdl file", f);
+          return setError("Error reading mdl file", f);
       }
     }
   }

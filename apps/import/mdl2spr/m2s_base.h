@@ -36,7 +36,7 @@ struct vec3_t                 // Vector or Position
 struct magic_t
 {
   char id[4];                 // "IDPO" (MDL) or "IDP2" (MD2)
-  long version;               // MDL=6, MD2=8
+  int32 version;               // MDL=6, MD2=8
 };
 
 struct trivertx_t

@@ -192,10 +192,10 @@ void csLightMap::CopyLightMap (csLightMap* source)
 struct PolySave
 {
   char header[4];
-  short x1, y1, z1;	// Coordinate of vertex 1
-  short x2, y2, z2;	// Coordinate of vertex 2
-  long lm_size;		// Size of lightmap
-  long lm_cnt;		// Number of non-dynamic lightmaps (normally 3)
+  int16 x1, y1, z1;	// Coordinate of vertex 1
+  int16 x2, y2, z2;	// Coordinate of vertex 2
+  int32 lm_size;		// Size of lightmap
+  int32 lm_cnt;		// Number of non-dynamic lightmaps (normally 3)
 };
 
 struct LightSave
@@ -254,7 +254,7 @@ bool csLightMap::ReadFromCache (int id, int w, int h,
     CacheName (buf, "C", id, curve->GetCurveID (), "");
   }
   pswanted.lm_size = convert_endian (lm_size);
-  pswanted.lm_cnt = convert_endian (111);
+  pswanted.lm_cnt = convert_endian ((int32)111);
 
   iDataBuffer* data = engine->VFS->ReadFile (buf);
   if (!data) return false;

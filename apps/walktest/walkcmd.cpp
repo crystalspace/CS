@@ -70,13 +70,13 @@ extern WalkTest* Sys;
 char* LookForKeyValue(iObjectIterator* it,const char* key);
 double ParseScaleFactor(iObjectIterator* it);
 
-
 /// Save recording
 void SaveRecording (iVFS* vfs, const char* fName)
 {
   iFile* cf;
   cf = vfs->Open (fName, VFS_FILE_WRITE);
-  long l = convert_endian (Sys->recording.Length ());
+  int32 l = Sys->recording.Length();
+  l = convert_endian (l);
   cf->Write ((char*)&l, sizeof (l));
   int i;
   csRecordedCameraFile camint;

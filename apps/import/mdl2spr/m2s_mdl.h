@@ -33,36 +33,36 @@ struct mdl_t
   vec3_t origin;              // Model origin.
   scalar_t radius;            // Model bounding radius.
   vec3_t offsets;             // Eye position (useless?)
-  long numskins ;             // the number of skin textures
-  long skinwidth;             // Width of skin texture; must be multiple of 8
-  long skinheight;            // Height of skin texture; must be multiple of 8
-  long numverts;              // Number of vertices
-  long numtris;               // Number of triangles surfaces
-  long numframes;             // Number of frames
-  long synctype;              // 0=synchronized, 1=random
-  long flags;                 // 0 (see Alias models)
+  int32 numskins ;            // the number of skin textures
+  int32 skinwidth;            // Width of skin texture; must be multiple of 8
+  int32 skinheight;           // Height of skin texture; must be multiple of 8
+  int32 numverts;             // Number of vertices
+  int32 numtris;              // Number of triangles surfaces
+  int32 numframes;            // Number of frames
+  int32 synctype;             // 0=synchronized, 1=random
+  int32 flags;                // 0 (see Alias models)
   scalar_t size;              // average size of triangles
 };
 
 struct skin_t
 {
   bool group;
-  long nbtexs;                // number of pictures in group
+  int32 nbtexs;                // number of pictures in group
   unsigned char **texs;       // the textures
   float *timebtwskin;         // time values, for each texture
 };
 
 struct vertice_t
 {
-  long onseam;                // 0 or 0x20
-  long s;                     // position, horizontally in range [0,skinwidth)
-  long t;                     // position, vertically in range [0,skinheight)
+  int32 onseam;                // 0 or 0x20
+  int32 s;                     // position, horizontally in range [0,skinwidth)
+  int32 t;                     // position, vertically in range [0,skinheight)
 };
 
 struct triangle_t
 {
-  long facefront;             // boolean
-  long vertice[3];            // Index of 3 triangle vertices
+  int32 facefront;             // boolean
+  int32 vertice[3];            // Index of 3 triangle vertices
 };                            // in range [0,numverts)
 
 struct frame_t
@@ -78,7 +78,7 @@ struct frameset_t
   bool group;                 // is a mdl group
   trivertx_t min;             // min position in all simple frames
   trivertx_t max;             // max position in all simple frames
-  long nbframes;              // number of frames
+  int32 nbframes;              // number of frames
   float *delay;               // time for each of the single frames
   frame_t *frames;            // a group of simple frames
 };

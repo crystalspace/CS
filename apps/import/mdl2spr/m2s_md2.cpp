@@ -154,22 +154,13 @@ bool Md2::ReadMDLFile(const char* mdlfile)
   md2_t header;
   if (fread(&header, sizeof(md2_t), 1, f) != 1)
     return setError("Cannot read mdl header", f);
-  header.skinwidth = convert_endian ((long)header.skinwidth);
-  header.skinheight = convert_endian ((long)header.skinheight);
-  header.framesize = convert_endian ((long)header.framesize);
-  header.numskins = convert_endian ((long)header.numskins);
-  header.numxyz = convert_endian ((long)header.numxyz);
-  header.numverts = convert_endian ((long)header.numverts);
-  header.numtris = convert_endian ((long)header.numtris);
-  header.numglcmds = convert_endian ((long)header.numglcmds);
-  header.numframes = convert_endian ((long)header.numframes);
-  header.ofsskins = convert_endian ((long)header.ofsskins);
-  header.ofsverts = convert_endian ((long)header.ofsverts);
-  header.ofstris = convert_endian ((long)header.ofstris);
-  header.ofsframes = convert_endian ((long)header.ofsframes);
-  header.ofsglcmds = convert_endian ((long)header.ofsglcmds);
-  header.ofsend = convert_endian ((long)header.ofsend);
-
+ 
+  // byteswap header
+  int32 * ph = (int32*) &header;
+  int32 * phe = ph + sizeof(md2_t) / sizeof(int32);
+  while (ph < phe)
+    *ph++ = convert_endian(*ph);
+    
   // skins ops
   fseek(f, header.ofsskins, SEEK_SET);
   skinheight = header.skinheight;
@@ -194,7 +185,7 @@ bool Md2::ReadMDLFile(const char* mdlfile)
   for (i = 0; i < nbvertices; i++)
   {
     if (fread(&vertices[i], sizeof(vertice2_t), 1, f) != 1)
-      return setError("Error then reading mdl file", f);
+      return setError("Error reading mdl file", f);
     vertices[i].s = convert_endian (vertices[i].s);
     vertices[i].t = convert_endian (vertices[i].t);
   }
@@ -208,7 +199,7 @@ bool Md2::ReadMDLFile(const char* mdlfile)
   for (i = 0; i < nbtriangles; i++)
   {
     if (fread(&qtriangles[i], sizeof(triangle2_t), 1, f) != 1)
-      return setError("Error then reading mdl file", f);
+      return setError("Error reading mdl file", f);
     qtriangles[i].xyz[0] = convert_endian (qtriangles[i].xyz[0]);
     qtriangles[i].xyz[1] = convert_endian (qtriangles[i].xyz[1]);
     qtriangles[i].xyz[2] = convert_endian (qtriangles[i].xyz[2]);
@@ -226,13 +217,13 @@ bool Md2::ReadMDLFile(const char* mdlfile)
   for (i = 0; i < nbframes; i++)
   {
     if (fread(&frames[i].scale, sizeof(vec3_t), 1, f) != 1)
-      return setError("Error then reading mdl file", f);
+      return setError("Error reading mdl file", f);
     frames[i].scale.x = convert_endian (frames[i].scale.x);
     frames[i].scale.y = convert_endian (frames[i].scale.y);
     frames[i].scale.z = convert_endian (frames[i].scale.z);
 
     if (fread(&frames[i].translate, sizeof(vec3_t), 1, f) != 1)
-      return setError("Error then reading mdl file", f);
+      return setError("Error reading mdl file", f);
     frames[i].translate.x = convert_endian (frames[i].translate.x);
     frames[i].translate.y = convert_endian (frames[i].translate.y);
     frames[i].translate.z = convert_endian (frames[i].translate.z);
@@ -240,12 +231,12 @@ bool Md2::ReadMDLFile(const char* mdlfile)
     // name of frame
     memset(frames[i].name, 0, MD2_FRAME_NAME_MAX + 1);
     if (fread(frames[i].name, MD2_FRAME_NAME_MAX, 1, f) != 1)
-      return setError("Error then reading mdl file", f);
+      return setError("Error reading mdl file", f);
 
     // frame vertices
     frames[i].trivert = new trivertx_t[nbxyz];
     if (fread(frames[i].trivert, sizeof(trivertx_t) * nbxyz, 1, f) != 1)
-      return setError("Error then reading mdl file", f);
+      return setError("Error reading mdl file", f);
   }
 
   fclose(f);

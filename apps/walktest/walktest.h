@@ -113,11 +113,11 @@ struct csRecordedCamera
  */
 struct csRecordedCameraFile
 {
-  long m11, m12, m13;
-  long m21, m22, m23;
-  long m31, m32, m33;
-  long x, y, z;
-  long ax, ay, az;
+  int32 m11, m12, m13;
+  int32 m21, m22, m23;
+  int32 m31, m32, m33;
+  int32 x, y, z;
+  int32 ax, ay, az;
   unsigned char mirror;
 };
 

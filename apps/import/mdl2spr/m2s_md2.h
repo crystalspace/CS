@@ -30,23 +30,23 @@
 
 struct md2_t
 {
-  int skinwidth;
-  int skinheight;
-  int framesize;              // byte size of each frame
+  int32 skinwidth;
+  int32 skinheight;
+  int32 framesize;              // byte size of each frame
   
-  int numskins;               // number of skins
-  int numxyz;                 // number of xyz points
-  int numverts;               // number of vertices
-  int numtris;                // number of triangles
-  int numglcmds;              // dwords in strip/fan command list ?
-  int numframes;              // number of frames
+  int32 numskins;               // number of skins
+  int32 numxyz;                 // number of xyz points
+  int32 numverts;               // number of vertices
+  int32 numtris;                // number of triangles
+  int32 numglcmds;              // dwords in strip/fan command list ?
+  int32 numframes;              // number of frames
   
-  int ofsskins;              // each skin is a MD2_SKIN_NAME_MAX string
-  int ofsverts;              // offset from start for stverts
-  int ofstris;               // offset for dtriangles
-  int ofsframes;             // offset for first frame
-  int ofsglcmds; 
-  int ofsend;                // end of file
+  int32 ofsskins;              // each skin is a MD2_SKIN_NAME_MAX string
+  int32 ofsverts;              // offset from start for stverts
+  int32 ofstris;               // offset for dtriangles
+  int32 ofsframes;             // offset for first frame
+  int32 ofsglcmds; 
+  int32 ofsend;                // end of file
 };
 
 struct skin2_t
@@ -56,14 +56,14 @@ struct skin2_t
 
 struct vertice2_t
 {
-  short s;                     // position, horizontally; range [0,skinwidth)
-  short t;                     // position, vertically; range [0,skinheight)
+  int16 s;                     // position, horizontally; range [0,skinwidth)
+  int16 t;                     // position, vertically; range [0,skinheight)
 };
 
 struct triangle2_t
 {
-  short xyz[3];                // Index of 3 triangle xyz; range [0,numxyz)
-  short vertice[3];            // Index of 3 triangle vertices
+  int16 xyz[3];                // Index of 3 triangle xyz; range [0,numxyz)
+  int16 vertice[3];            // Index of 3 triangle vertices
 };                             // in range [0,numverts)
 
 struct frame2_t

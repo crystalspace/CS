@@ -158,15 +158,15 @@ static inline float short2float (short s)
 static inline uint32 convert_endian (uint32 l)
 { return little_endian_long (l); }
 
-/// Swap the bytes in a long value.
+/// Swap the bytes in a int32 value.
 static inline int32 convert_endian (int32 l)
 { return little_endian_long (l); }
 
-/// Swap the bytes in a int value.
-static inline int convert_endian (int i)
-{ return little_endian_long (i); }
+/// Swap the bytes in a int16 value.
+static inline int16 convert_endian (int16 s)
+{ return little_endian_short (s); }
 
-/// Swap the bytes in a short value.
+/// Swap the bytes in a uint16 value.
 static inline uint16 convert_endian (uint16 s)
 { return little_endian_short (s); }
 
