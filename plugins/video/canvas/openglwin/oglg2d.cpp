@@ -27,13 +27,13 @@
 CS_IMPLEMENT_PLUGIN
 
 #ifndef CDS_UPDATEREGISTRY
-#  define CDS_UPDATEREGISTRY  0x00000001
+#define CDS_UPDATEREGISTRY  0x00000001
 #endif
 #ifndef CDS_TEST
 #define CDS_TEST            0x00000002
 #endif
 #ifndef CDS_FULLSCREEN
-#  define CDS_FULLSCREEN      0x00000004
+#define CDS_FULLSCREEN      0x00000004
 #endif
 #ifndef CDS_GLOBAL
 #define CDS_GLOBAL          0x00000008
@@ -81,12 +81,11 @@ static void sys_fatalerror(char *str, HRESULT hRes = S_OK)
   LPVOID lpMsgBuf;
   char* szMsg;
   char szStdMessage[] = "Last Error: ";
+
   if (FAILED(hRes))
   {
-    DWORD dwResult;
-    dwResult = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL,
-                 hRes,  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), 
-                   (LPTSTR) &lpMsgBuf, 0, NULL );
+    DWORD dwResult = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+		NULL, hRes,  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &lpMsgBuf, 0, NULL );
   
     if (dwResult != 0)
     {
@@ -97,14 +96,14 @@ static void sys_fatalerror(char *str, HRESULT hRes = S_OK)
       
       LocalFree( lpMsgBuf );
       
-      MessageBox (NULL, szMsg, "Fatal Error in OpenGL2D.dll", MB_OK);
+      MessageBox (NULL, szMsg, "Fatal Error in glwin32.dll", MB_OK);
       delete szMsg;
 
       exit(1);
     }
   }
 
-  MessageBox(NULL, str, "Fatal Error in OpenGL2D.dll", MB_OK);
+  MessageBox(NULL, str, "Fatal Error in glwin32.dll", MB_OK);
   
   exit(1);
 }
