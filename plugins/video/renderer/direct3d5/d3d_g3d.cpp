@@ -56,7 +56,7 @@ csIniFile *configd3d5;
 
 static bool bGotTexDesc=false, bGotLitDesc=false, bGotHaloDesc=false;
 static bool use32BitTexture=false, use16BitTexture=false;
-static const float SCALE_FACTOR = 1.0f/10100.0f;
+static const float SCALE_FACTOR = 1.0f/2500.0f;
 
 /* ************************************************************** 
 csGraphics3DDirect3DDx5 Class Definition
@@ -1000,7 +1000,12 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygonDP& poly)
     
     vx.sx = poly.vertices[i].sx;
     vx.sy = m_nHeight-poly.vertices[i].sy;
+
     vx.sz = z*(float)SCALE_FACTOR;
+
+    if(vx.sz>0.9999)
+      vx.sz=0.9999;
+
     vx.rhw = 1/z;
 
     vx.color = D3DRGBA(1.0f, 1.0f, 1.0f, (float)poly_alpha/100.0f);
@@ -1072,6 +1077,10 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygonDP& poly)
       vx.sx = poly.vertices[i].sx;
       vx.sy = m_nHeight-poly.vertices[i].sy;
       vx.sz = z*(float)SCALE_FACTOR;
+
+      if(vx.sz>0.9999)
+        vx.sz=0.9999;
+
       vx.rhw = 1/z;
       
       if(!bTransparent)
@@ -1164,6 +1173,10 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygonQuick (G3DPolygonDPQ& poly)
     vx.sx = poly.vertices[i].sx;
     vx.sy = m_nHeight-poly.vertices[i].sy;
     vx.sz = SCALE_FACTOR / poly.vertices[i].z;
+
+    if(vx.sz>0.9999)
+      vx.sz=0.9999;
+
     vx.rhw = poly.vertices[i].z;
     if (m_gouraud)
       vx.color = D3DRGB(poly.vertices[i].r, poly.vertices[i].g, poly.vertices[i].b);
