@@ -6,15 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-Oct-2004
+	- Eric Sunshine eliminated several compilation warnings.
 14-Oct-2004
-	- Jorrit optimized the LOD calculation routines a lot by using
-	  csList linked list to maintain a cost-sorted array of
-	  vertices.
-	- Jorrit added csList<T>::MoveAfter() and MoveBefore() to have
-	  a more efficient way to move items around in a list.
-	- Jorrit added csList<T>::Iterator::FetchNext() and FetchPrev()
-	  to more efficiently get the next and previous item from
-	  a list iterator.
 	- Eric Sunshine added an AAlib (ASCII Art library) check to
 	  configure.ac. If the package is present, then the CS `asciiart'
 	  canvas is built.
@@ -28,6 +22,14 @@ chronological order.
 	- Eric Sunshine upgraded unix.jam so that it respects the result of the
 	  configure.ac `-fPIC' check rather than being hard-coded to assume
 	  that all compilers understand this option.
+	- Jorrit optimized the LOD calculation routines a lot by using
+	  csList linked list to maintain a cost-sorted array of
+	  vertices.
+	- Jorrit added csList<T>::MoveAfter() and MoveBefore() to have
+	  a more efficient way to move items around in a list.
+	- Jorrit added csList<T>::Iterator::FetchNext() and FetchPrev()
+	  to more efficiently get the next and previous item from
+	  a list iterator.
 	- Jorrit added the triangle connectivity information again to
 	  the triangle LOD routines.
 	- Jorrit implemented a LOD algorithm in bruteblock using the new
@@ -213,9 +215,9 @@ chronological order.
 	  renderer.  Resolves bug #981288.  Also minor changes in anticipation
 	  of some future fixes.
 5-Oct-2004
-	- Rhad fixed a long standing bug in the Ogg loader.
-	  - Per specs, SEEK_END must seek 1 byte past the end of data
-	    buffer, not to the last byte.
+	- Rhad fixed a long standing bug in the Ogg loader.  Per specs,
+	  SEEK_END must seek 1 byte past the end of data buffer, not to the
+	  last byte.
 	- Jorrit fixed a bug with hierarchical objects (and static lod
 	  too) that are created using meshref. The children would not get
 	  added to the engine with the result that cached lighting wouldn't
@@ -249,10 +251,10 @@ chronological order.
 	  based filling.
 	- Rhad: Background thread is now set to time critical priority.
 	- Rhad applied more fixes to software sound renderer.
-	  - Fixed crash when source was deleted while background thread was
-	    reading sound data related to the source.
-	  - Fixed sound plays at full volume when beyond maxdistance.
-	  - Added assertion on handle destruction if sources are still
+	    - Fixed crash when source was deleted while background thread was
+	      reading sound data related to the source.
+	    - Fixed sound plays at full volume when beyond maxdistance.
+	    - Added assertion on handle destruction if sources are still
 	    associated with the handle.
 1-Oct-2004
 	- Rhad added Get,set MinimumDistance and MaximumDistance interface

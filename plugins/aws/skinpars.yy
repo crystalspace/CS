@@ -19,9 +19,16 @@
 #include "awsparser.h"
 #include <stdio.h>
 
-// bison 1.875 outputs wrong code (an attribute after a label is not allowed in
-// g++
+// Bison 1.875 outputs bogus code -- an attribute after a label is not
+// allowed in g++, so work around the problem.
 #define __attribute__(x)
+
+// MSVC 7.1 complains about switch statement without any 'case' labels in
+// generated yydestruct(). We have no control over this generated code, so
+// silence the warning.
+#if defined(CS_COMPILER_MSVC)
+#pragma warning(disable:4065)
+#endif
 
 %}
 
