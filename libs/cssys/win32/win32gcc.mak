@@ -168,7 +168,7 @@ DO.SHARED.PLUGIN.POSTAMBLE = -mwindows -lstdc++
 DO.LINK.EXE = \
   $(MAKEVERSIONINFO) $(OUT)/$(@:$(EXE)=-version.rc) \
     "$(DESCRIPTION.$(TARGET.RAW))" $(COMMAND_DELIM) \
-  $(MERGERES) $(OUT)/$(@:$(EXE)=-rsrc.rc) ./ \
+  $(MERGERES) $(OUT)/$(@:$(EXE)=-rsrc.rc) $(SRCDIR) $(SRCDIR) \
     $(OUT)/$(@:$(EXE)=-version.rc) $($@.WINRSRC) $(COMMAND_DELIM) \
   $(COMPILE_RES) -i $(OUT)/$(@:$(EXE)=-rsrc.rc) \
     -o $(OUT)/$(@:$(EXE)=-rsrc.o) $(COMMAND_DELIM) \

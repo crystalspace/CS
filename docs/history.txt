@@ -44,6 +44,11 @@ The history order is reversed so that new features are at the top.
 	  amount, though I doubt that anyone will notice.  (If anyone does
 	  notice, we can attempt to craft a "configure" test for popen()
 	  failure.)
+	- Eric Sunshine fixed win32gcc.mak so that mergeres.sh invocation in
+	  DO.LINK.EXE passes the correct arguments.  This change had already
+	  been made to the DO.SHARED.PLUGIN.PREAMBLE's invocation of
+	  mergeres.sh as part of Eric's changes yesterday, but DO.LINK.EXE
+	  slipped by unaltered.
 11-May-2003
 	- Oktal removed one of two instances of the same phony target,
 	  swigperl5gen, in the csperl5 makefile.
