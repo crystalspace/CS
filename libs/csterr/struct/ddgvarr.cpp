@@ -53,9 +53,9 @@ bool ddgVArray::init(void)
 
     if (_bufsize)
     {
-	    ibuf = new unsigned int[_bufsize*2];
+	    ibuf = new int[_bufsize*2];
 		ddgAsserts(ibuf,"Failed to Allocate memory");
-		ddgMemorySet(unsigned int,_bufsize*2);
+		ddgMemorySet(int,_bufsize*2);
         vbuf = new ddgVector3[_bufsize];
 		ddgAsserts(vbuf,"Failed to Allocate memory");
 		ddgMemorySet(ddgVector3,_bufsize);
@@ -240,5 +240,5 @@ void ddgVArray::sort(void)
 	for (i = 0; i < ZCACHESIZE; i++)
 		ddgZcache[i] = 0;
 	ddgCurrentVBuf = this;
-	qsort((void*)ibuf,_inum/n,n*sizeof(unsigned int),compareObjects);
+	qsort((void*)ibuf,_inum/n,n*sizeof(int),compareObjects);
 }

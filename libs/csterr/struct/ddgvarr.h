@@ -23,7 +23,7 @@
 #include "math/ddgvec.h"
 #include "struct/ddgcolor.h"
 
-typedef unsigned int ddgVBIndex;
+typedef int ddgVBIndex;
 /**
  * A class supporting vertex array buffers.
  * It can allocate memory and supports pushing data into
@@ -74,6 +74,8 @@ public:
     void size(unsigned int s) { _bufsize = s; }
 	/// Return the number of triangles in the buffer.
 	unsigned int size(void) { return _inum/3; }
+	/// Return the number of shared indexes in the buffer.
+	unsigned int num(void) { return _num; }
 	/// Set the rendering mode.
 	void renderMode( bool t = true, bool n = true, bool c = true)
     { _fTexture = t; _fNormal = n; _fColor = c; }

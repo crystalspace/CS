@@ -31,7 +31,7 @@ class ddgVArray;
 class ddgContext;
 class csTextureHandle;
 class csVector3;
-typedef unsigned int ddgVBIndex;
+typedef int ddgVBIndex;
 
 /**
  * This object encapsulates a terrain surface so that it
