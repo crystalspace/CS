@@ -175,13 +175,6 @@ protected:
   void* TestQueuePolygonArray (csPolygonInt** polygon, int num, csRenderView* d,
   	csPolygon2DQueue* poly_queue);
 
-  /**
-   * Test a number of polygons against the quadtree and insert them to the
-   * quadtree if visible and also add them to a queue.
-   */
-  void* TestQueuePolygonArrayQuad (csPolygonInt** polygon, int num, csRenderView* d,
-  	csPolygon2DQueue* poly_queue);
-
 private:
   /**
    * Fog information.

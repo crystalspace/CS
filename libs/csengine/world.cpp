@@ -225,6 +225,7 @@ csWorld::~csWorld ()
   CHK (delete plugins);
   //  plugins->Release();
   CHK (delete camera_hack);
+  camera_hack = NULL;
 }
 
 void csWorld::Clear ()
@@ -283,14 +284,11 @@ void csWorld::EnableQuadtree (bool en)
     c_buffer = NULL;
     if (quadtree) return;
     csVector2 corners[4];
-    float x = (frame_width/2) * csCamera::default_inv_aspect;
-    float y = (frame_height/2) * csCamera::default_inv_aspect;
-    float z = 1;
-    corners[0] = csVector2 (-x,  y);
-    corners[1] = csVector2 ( x,  y);
-    corners[2] = csVector2 ( x, -y);
-    corners[3] = csVector2 (-x, -y);
-    CHK (quadtree = new csQuadtreePersp (corners, 8));
+    corners[0] = csVector2 (0,  frame_height);
+    corners[1] = csVector2 (frame_width, frame_height);
+    corners[2] = csVector2 (frame_height, 0);
+    corners[3] = csVector2 (0, 0);
+    CHK (quadtree = new csQuadtree (corners, 8));
   }
   else
   {

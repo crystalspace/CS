@@ -20,6 +20,7 @@
 #define QUADCUBE_H
 
 class Dumper;
+class csClipper;
 
 #include "csgeom/quadtree.h"
 #include "csengine/pol2d.h"
@@ -41,13 +42,15 @@ public:
 
   /**
    * Insert a polygon/frustrum into the quad-tree.
+   * The optional 'clipper' will be used to clip the resulting polygon.
    */
-  bool InsertPolygon (csVector3* verts, int num_verts);
+  bool InsertPolygon (csVector3* verts, int num_verts, csClipper* clipper = NULL);
 
   /**
    * Test for polygon/frustrum visibility with the quad-tree.
+   * The optional 'clipper' will be used to clip the resulting polygon.
    */
-  bool TestPolygon (csVector3* verts, int num_verts);
+  bool TestPolygon (csVector3* verts, int num_verts, csClipper* clipper = NULL);
 };
 
 /**

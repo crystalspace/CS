@@ -550,6 +550,7 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
   int num_verts;
   int i;
   csCBuffer* c_buffer = csWorld::current_world->GetCBuffer ();
+  csQuadtree* quadtree = csWorld::current_world->GetQuadtree ();
   bool visible;
   csPoly2DPool* render_pool = csWorld::current_world->render_pol2d_pool;
   csPolygon2D* clip;
@@ -575,11 +576,13 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	 	d->IsMirrored ()) &&
              clip->ClipAgainst (d->view) )
         {
-          if (c_buffer->TestPolygon (clip->GetVertices (),
-	  	clip->GetNumVertices ()))
+	  if (quadtree)
 	  {
-            sp3d->MarkVisible ();
+	    if (quadtree->TestPolygon (clip->GetVertices (), clip->GetNumVertices ()))
+              sp3d->MarkVisible ();
 	  }
+	  else if (c_buffer->TestPolygon (clip->GetVertices (), clip->GetNumVertices ()))
+            sp3d->MarkVisible ();
         }
         render_pool->Free (clip);
       }
@@ -600,12 +603,20 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
         po = p->GetPortal ();
         if (csSector::do_portals && po)
         {
-          visible = c_buffer->TestPolygon (clip->GetVertices (),
+	  if (quadtree)
+            visible = quadtree->TestPolygon (clip->GetVertices (),
+		  clip->GetNumVertices ());
+	  else
+            visible = c_buffer->TestPolygon (clip->GetVertices (),
 		  clip->GetNumVertices ());
         }
         else
         {
-          visible = c_buffer->InsertPolygon (clip->GetVertices (),
+	  if (quadtree)
+            visible = quadtree->InsertPolygon (clip->GetVertices (),
+		  clip->GetNumVertices ());
+	  else
+            visible = c_buffer->InsertPolygon (clip->GetVertices (),
 		  clip->GetNumVertices ());
         }
       }
@@ -613,7 +624,7 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
       {
         poly_queue->Push (p, clip);
 	Stats::polygons_accepted++;
-	if (c_buffer->IsFull ()) return (void*)1;	// End BSP processing
+	if (c_buffer && c_buffer->IsFull ()) return (void*)1;	// End BSP processing
       }
       else
       {
@@ -624,85 +635,6 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
   }
   return NULL;
 }
-
-
-void* csPolygonSet::TestQueuePolygonArrayQuad (csPolygonInt** polygon, int num,
-	csRenderView* d, csPolygon2DQueue* poly_queue)
-{
-  csPolygon3D* p;
-  csPortal* po;
-  csVector3* verts;
-  int num_verts;
-  int i, j;
-  csQuadtreePersp* quadtree = csWorld::current_world->GetQuadtree ();
-  bool visible;
-  csPoly2DPool* render_pool = csWorld::current_world->render_pol2d_pool;
-  csPolygon2D* clip;
-  
-  for (i = 0 ; i < num ; i++)
-  {
-    if (polygon[i]->GetType () == 2)
-    {
-      // We're dealing with a csBspPolygon.
-      csBspPolygon* bsppol = (csBspPolygon*)polygon[i];
-      csBspContainer* bspcont = bsppol->GetParent ();
-      csSprite3D* sp3d = (csSprite3D*)(bsppol->GetOriginator ());
-
-      // If the sprite is already marked visible then we don't have
-      // to do any of the other processing for this polygon.
-      if (!sp3d->IsVisible ())
-      {
-	// @@@ IDEA If we transform the quadtree to inverse camera space
-	// we can use world space coordinates here!!!
-        csVector3 cam_verts[20];	// @@@ HARDCODED!
-	for (j = 0 ; j < bsppol->GetNumVertices () ; j++)
-	  cam_verts[j] = bspcont->GetCameraVertices ()[bsppol->GetPolygon ()[j]];
-        // Test against the quadtree first.
-	if (quadtree->TestPolygon (cam_verts, bsppol->GetNumVertices ()))
-	  sp3d->MarkVisible ();
-      }
-    }
-    else
-    {
-      // We're dealing with a csPolygon3D.
-      p = (csPolygon3D*)polygon[i];
-
-      // @@@ IDEA If we transform the quadtree to inverse camera space
-      // we can use world space coordinates here!!!
-      csVector3 cam_verts[20];	// @@@ HARDCODED!
-      for (j = 0 ; j < p->GetNumVertices () ; j++)
-	cam_verts[j] = p->Vcam (j);
-      po = p->GetPortal ();
-      visible = false;
-      if (csSector::do_portals && po)
-        visible = quadtree->TestPolygon (cam_verts, p->GetNumVertices ());
-      else
-        visible = quadtree->InsertPolygon (cam_verts, p->GetNumVertices ());
-
-      if (visible)
-      {
-        clip = (csPolygon2D*)(render_pool->Alloc ());
-        if ( !p->dont_draw &&
-             p->ClipToPlane (d->do_clip_plane ? &d->clip_plane : (csPlane*)NULL,
-	 	    d->GetOrigin (), verts, num_verts) &&
-             p->DoPerspective (*d, verts, num_verts, clip, NULL,
-	 	    d->IsMirrored ())  &&
-             clip->ClipAgainst (d->view) )
-        {
-          poly_queue->Push (p, clip);
-	  Stats::polygons_accepted++;
-        }
-        else
-        {
-          render_pool->Free (clip);
-          Stats::polygons_rejected++;
-        }
-      }
-    }
-  }
-  return NULL;
-}
-
 
 void csPolygonSet::GetCameraMinMaxZ (float& minz, float& maxz)
 {

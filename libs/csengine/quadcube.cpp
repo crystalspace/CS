@@ -17,6 +17,7 @@
 */
 
 #include "sysdef.h"
+#include "csgeom/polyclip.h"
 #include "csengine/quadcube.h"
 #include "csengine/world.h"
 
@@ -86,18 +87,22 @@ bool csQuadtreePersp::DoPerspective (csVector3* verts, int num_verts,
   return true;
 }
 
-bool csQuadtreePersp::InsertPolygon (csVector3* verts, int num_verts)
+bool csQuadtreePersp::InsertPolygon (csVector3* verts, int num_verts,
+	csClipper* clipper)
 {
   static csPolygon2D persp;
   if (!DoPerspective (verts, num_verts, persp)) return false;
+  if (clipper && !persp.ClipAgainst (clipper)) return false;
   return csQuadtree::InsertPolygon (persp.GetVertices (),
   	persp.GetNumVertices ());
 }
 
-bool csQuadtreePersp::TestPolygon (csVector3* verts, int num_verts)
+bool csQuadtreePersp::TestPolygon (csVector3* verts, int num_verts,
+	csClipper* clipper)
 {
   static csPolygon2D persp;
   if (!DoPerspective (verts, num_verts, persp)) return false;
+  if (clipper && !persp.ClipAgainst (clipper)) return false;
   return csQuadtree::TestPolygon (persp.GetVertices (),
   	persp.GetNumVertices ());
 }

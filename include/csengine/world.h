@@ -51,7 +51,7 @@ class csHaloInformation;
 class csIniFile;
 class csEngineConfig;
 class csCBuffer;
-class csQuadtreePersp;
+class csQuadtree;
 class csPoly2DPool;
 class csLightPatchPool;
 class csVFS;
@@ -264,7 +264,7 @@ private:
   csCBuffer* c_buffer;
 
   /// Optional quad-tree used for rendering.
-  csQuadtreePersp* quadtree;
+  csQuadtree* quadtree;
 
   /// Quad-cube used for lighting.
   csQuadcube* quadcube;
@@ -360,7 +360,7 @@ public:
   /**
    * Return quadtree (or NULL if not used).
    */
-  csQuadtreePersp* GetQuadtree () { return quadtree; }
+  csQuadtree* GetQuadtree () { return quadtree; }
 
   /**
    * Return quad-cube.

@@ -354,6 +354,7 @@ void* csSector::TestQueuePolygons (csPolygonParentInt* pi,
 //@@@int max_num_polygons = 1;
 //@@@int polygons_still_left = 1;
 
+#if 0
 void* csSector::TestQueuePolygonsQuad (csPolygonParentInt* pi,
 	csPolygonInt** polygon, int num, void* data)
 {
@@ -363,6 +364,7 @@ void* csSector::TestQueuePolygonsQuad (csPolygonParentInt* pi,
 //@@@if (polygons_still_left <= 0) return NULL;
   return sector->TestQueuePolygonArrayQuad (polygon, num, d, poly_queue);
 }
+#endif
 
 void csSector::DrawPolygonsFromQueue (csPolygon2DQueue* queue,
 	csRenderView* rview)
@@ -407,6 +409,7 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
   csOctree* otree = (csOctree*)tree;
   csOctreeNode* onode = (csOctreeNode*)node;
   csCBuffer* c_buffer = csWorld::current_world->GetCBuffer ();
+  csQuadtree* quadtree = csWorld::current_world->GetQuadtree ();
   csRenderView* rview = (csRenderView*)data;
   csVector3 array[6];
   static csPolygon2D persp;
@@ -474,7 +477,10 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
     if (!persp.ClipAgainst (rview->view)) return false;
 
     // c-buffer test.
-    if (!c_buffer->TestPolygon (persp.GetVertices (), persp.GetNumVertices ()))
+    bool vis;
+    if (quadtree) vis = quadtree->TestPolygon (persp.GetVertices (), persp.GetNumVertices ());
+    else vis = c_buffer->TestPolygon (persp.GetVertices (), persp.GetNumVertices ());
+    if (!vis)
     {
       count_cull_node_notvis_cbuffer++;
       return false;
@@ -499,6 +505,7 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
   return true;
 }
 
+#if 0
 bool CullOctreeNodeQuad (csPolygonTree* tree, csPolygonTreeNode* node,
 	const csVector3& pos, void* data)
 {
@@ -507,7 +514,7 @@ bool CullOctreeNodeQuad (csPolygonTree* tree, csPolygonTreeNode* node,
   int i;
   csOctree* otree = (csOctree*)tree;
   csOctreeNode* onode = (csOctreeNode*)node;
-  csQuadtreePersp* quadtree = csWorld::current_world->GetQuadtree ();
+  csQuadtree* quadtree = csWorld::current_world->GetQuadtree ();
   csRenderView* rview = (csRenderView*)data;
   csVector3 array[6];
   int num_array;
@@ -554,6 +561,7 @@ bool CullOctreeNodeQuad (csPolygonTree* tree, csPolygonTreeNode* node,
   }
   return true;
 }
+#endif
 
 void csSector::Draw (csRenderView& rview)
 {
@@ -628,12 +636,8 @@ void csSector::Draw (csRenderView& rview)
       CHK (poly_queue = new csPolygon2DQueue (GetNumPolygons ()+
       	static_thing->GetNumPolygons ()));
       static_thing->UpdateTransformation ();
-      if (c_buffer)
-        static_tree->Front2Back (rview.GetOrigin (), &TestQueuePolygons,
-      	  (void*)&rview, CullOctreeNode, (void*)&rview);
-      else
-        static_tree->Front2Back (rview.GetOrigin (), &TestQueuePolygonsQuad,
-      	  (void*)&rview, CullOctreeNodeQuad, (void*)&rview);
+      static_tree->Front2Back (rview.GetOrigin (), &TestQueuePolygons,
+      	(void*)&rview, CullOctreeNode, (void*)&rview);
 
       if (sprites.Length () > 0)
       {
@@ -657,11 +661,7 @@ void csSector::Draw (csRenderView& rview)
       CHK (poly_queue = new csPolygon2DQueue (GetNumPolygons ()));
     }
     csPolygon2DQueue* queue = poly_queue;
-    if (c_buffer)
-      TestQueuePolygons ((csPolygonParentInt*)this, polygons, num_polygon,
-    	(void*)&rview);
-    else
-      TestQueuePolygonsQuad ((csPolygonParentInt*)this, polygons, num_polygon,
+    TestQueuePolygons ((csPolygonParentInt*)this, polygons, num_polygon,
     	(void*)&rview);
     DrawPolygonsFromQueue (queue, &rview);
     CHK (delete queue);
