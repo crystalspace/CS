@@ -41,7 +41,7 @@ TiXmlString::TiXmlString (const char* instring)
     {
         allocated = 0;
         cstring = NULL;
-	clength = 0;
+  clength = 0;
         return;
     }
     newlen = strlen (instring) + 1;
@@ -55,62 +55,62 @@ TiXmlString::TiXmlString (const char* instring)
 // TiXmlString copy constructor
 TiXmlString::TiXmlString (const TiXmlString& copy)
 {
-    unsigned newlen;
-    char * newstring;
+  unsigned newlen;
+  char * newstring;
 
-    if (! copy . allocated)
-    {
-        allocated = 0;
-        cstring = NULL;
-	clength = 0;
-        return;
-    }
-    newlen = copy . length() + 1;
-    newstring = (char*)malloc (newlen);
-    strcpy (newstring, copy . cstring);
-    allocated = newlen;
-    cstring = newstring;
-    clength = newlen - 1; // length of string not including null terminator.
+  if (! copy . allocated)
+  {
+    allocated = 0;
+    cstring = NULL;
+    clength = 0;
+    return;
+  }
+  newlen = copy . length() + 1;
+  newstring = (char*)malloc (newlen);
+  strcpy (newstring, copy . cstring);
+  allocated = newlen;
+  cstring = newstring;
+  clength = newlen - 1; // length of string not including null terminator.
 }
 
 // TiXmlString = operator. Safe when assign own content
 void TiXmlString ::operator = (const char * content)
 {
-    unsigned newlen;
-    char * newstring;
+  unsigned newlen;
+  char * newstring;
 
-    if (! content)
-    {
-        empty_it ();
-        return;
-    }
-    newlen = strlen (content) + 1;
-    newstring = (char*)malloc (newlen);
-    strcpy (newstring, content);
+  if (! content)
+  {
     empty_it ();
-    allocated = newlen;
-    cstring = newstring;
-    clength = newlen - 1; // length of string not including null terminator.
+    return;
+  }
+  newlen = strlen (content) + 1;
+  newstring = (char*)malloc (newlen);
+  strcpy (newstring, content);
+  empty_it ();
+  allocated = newlen;
+  cstring = newstring;
+  clength = newlen - 1; // length of string not including null terminator.
 }
 
 // = operator. Safe when assign own content
 void TiXmlString ::operator = (const TiXmlString & copy)
 {
-    unsigned newlen;
-    char * newstring;
+  unsigned newlen;
+  char * newstring;
 
-    if (! copy . length ())
-    {
-        empty_it ();
-        return;
-    }
-    newlen = copy . length () + 1;
-    newstring = (char*)malloc (newlen);
-    strcpy (newstring, copy . c_str ());
+  if (! copy . length ())
+  {
     empty_it ();
-    allocated = newlen;
-    cstring = newstring;
-    clength = newlen - 1; // length of string not including null terminator.
+    return;
+  }
+  newlen = copy . length () + 1;
+  newstring = (char*)malloc (newlen);
+  strcpy (newstring, copy . c_str ());
+  empty_it ();
+  allocated = newlen;
+  cstring = newstring;
+  clength = newlen - 1; // length of string not including null terminator.
 }
 
 
@@ -127,71 +127,71 @@ void TiXmlString ::operator = (const TiXmlString & copy)
 // append a const char * to an existing TiXmlString
 void TiXmlString::append( const char* str, int len )
 {
-    unsigned new_alloc, new_size;
+  unsigned new_alloc, new_size;
 
-    new_size = length () + len + 1;
-    // check if we need to expand
-    if (new_size > allocated)
-    {
-        // compute new size
-        new_alloc = assign_new_size (new_size);
+  new_size = length () + len + 1;
+  // check if we need to expand
+  if (new_size > allocated)
+  {
+    // compute new size
+    new_alloc = assign_new_size (new_size);
 
-        // allocate new buffer
-        if (allocated && cstring)
-	  cstring = (char*)realloc (cstring, new_alloc);
-	else
-	  cstring = (char*)malloc (new_alloc);
-
-        // append the suffix. It does exist, otherwize we wouldn't be expanding 
-	strncpy (cstring + length(), str, len);
-	cstring [new_size - 1] = 0;
-
-        // update member variables
-	clength = new_size - 1;
-        allocated = new_alloc;
-    }
+    // allocate new buffer
+    if (allocated && cstring)
+      cstring = (char*)realloc (cstring, new_alloc);
     else
-    {
-        // we know we can safely append the new string
-	strncpy (cstring + length(), str, len);
-	clength += len;
-	cstring [clength] = 0;
-     }
+      cstring = (char*)malloc (new_alloc);
+
+    // append the suffix. It does exist, otherwize we wouldn't be expanding 
+    strncpy (cstring + length(), str, len);
+    cstring [new_size - 1] = 0;
+
+    // update member variables
+    clength = new_size - 1;
+    allocated = new_alloc;
+  }
+  else
+  {
+    // we know we can safely append the new string
+    strncpy (cstring + length(), str, len);
+    clength += len;
+    cstring [clength] = 0;
+   }
 }
 
 // append a single char
 void TiXmlString::append( char single )
 {
-    unsigned new_alloc, new_size;
+  unsigned new_alloc, new_size;
 
-    new_size = length () + 1 + 1;
-    // check if we need to expand
-    if (new_size > allocated)
-    {
-        // compute new size
-        new_alloc = assign_new_size (new_size);
+  new_size = length () + 1 + 1;
+  // check if we need to expand
+  if (new_size > allocated)
+  {
+    // compute new size
+    new_alloc = assign_new_size (new_size);
 
-        // allocate new buffer
-        if (allocated && cstring)
-	  cstring = (char*)realloc (cstring, new_alloc);
-	else
-	  cstring = (char*)malloc (new_alloc);
-
-        // append the suffix. It does exist, otherwize we wouldn't be expanding 
-	cstring [new_size - 2] = single;
-	cstring [new_size - 1] = 0;
-
-        // update member variables
-	clength = new_size - 1;
-        allocated = new_alloc;
-    }
+    // allocate new buffer
+    if (allocated && cstring)
+      cstring = (char*)realloc (cstring, new_alloc);
     else
-    {
-        // we know we can safely append the new string
-	cstring [clength] = single;
-	clength++;
-	cstring [clength] = 0;
-     }
+      cstring = (char*)malloc (new_alloc);
+
+    // append the suffix. It does exist, otherwize we wouldn't be expanding 
+    cstring [new_size - 2] = single;
+    cstring [new_size - 1] = 0;
+
+    // update member variables
+    clength = new_size - 1;
+    allocated = new_alloc;
+  }
+  else
+  {
+    // we know we can safely append the new string
+    cstring [clength] = single;
+    clength++;
+    cstring [clength] = 0;
+  }
 }
 
 
@@ -203,61 +203,61 @@ void TiXmlString::append( char single )
 
 unsigned TiXmlString::find (char tofind, unsigned offset) const
 {
-    char * lookup;
+  char * lookup;
 
-    if (offset >= length ())
-        return (unsigned) notfound;
-    for (lookup = cstring + offset; * lookup; lookup++)
-        if (* lookup == tofind)
-            return lookup - cstring;
+  if (offset >= length ())
     return (unsigned) notfound;
+  for (lookup = cstring + offset; * lookup; lookup++)
+    if (* lookup == tofind)
+      return lookup - cstring;
+  return (unsigned) notfound;
 }
 
 
 bool TiXmlString::operator == (const TiXmlString & compare) const
 {
-	if ( &compare == this )
-		return true;
-	if ( length() == 0 && compare.length() == 0 )
-		return true;
-	if ( allocated && compare.allocated )
-	{
-		//assert( cstring );
-		//assert( compare.cstring );
-		return ( strcmp( cstring, compare.cstring ) == 0 );
- 	}
-	return false;
+  if ( &compare == this )
+    return true;
+  if ( length() == 0 && compare.length() == 0 )
+    return true;
+  if ( allocated && compare.allocated )
+  {
+    //assert( cstring );
+    //assert( compare.cstring );
+    return ( strcmp( cstring, compare.cstring ) == 0 );
+   }
+  return false;
 }
 
 
 bool TiXmlString::operator < (const TiXmlString & compare) const
 {
-	if ( &compare == this )
-		return false;
-	if ( allocated && compare.allocated )
-	{
-		//assert( cstring );
-		//assert( compare.cstring );
-		return ( strcmp( cstring, compare.cstring ) > 0 );
- 	}
-	if ( length() == 0 && compare.length() != 0 )
-		return true;
-	return false;
+  if ( &compare == this )
+    return false;
+  if ( allocated && compare.allocated )
+  {
+    //assert( cstring );
+    //assert( compare.cstring );
+    return ( strcmp( cstring, compare.cstring ) > 0 );
+  }
+  if ( length() == 0 && compare.length() != 0 )
+    return true;
+  return false;
 }
 
 
 bool TiXmlString::operator > (const TiXmlString & compare) const
 {
-	if ( &compare == this )
-		return false;
-	if ( allocated && compare.allocated )
-	{
-		//assert( cstring );
-		//assert( compare.cstring );
-		return ( strcmp( cstring, compare.cstring ) < 0 );
- 	}
-	if ( length() != 0 )
-		return true;
-	return false;
+  if ( &compare == this )
+    return false;
+  if ( allocated && compare.allocated )
+  {
+    //assert( cstring );
+    //assert( compare.cstring );
+    return ( strcmp( cstring, compare.cstring ) < 0 );
+  }
+  if ( length() != 0 )
+    return true;
+  return false;
 }
 
