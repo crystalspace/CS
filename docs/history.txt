@@ -10,6 +10,8 @@ chronological order.
 	- Peter Amstutz added more comments to the AttachCollider*
 	  methods in varia/dynamics.h and changed the default
 	  softness from .316 to .01
+	- Duhprey fixed the default to stepfast and coding style in
+	  odedynam
 4-Sep-2003
 	- Peter Amstutz fixed the csPolyTexture destructor (part of
 	  the thing plugin) to not try to deallocate the lightmap 
