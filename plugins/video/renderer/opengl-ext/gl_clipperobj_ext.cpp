@@ -72,22 +72,22 @@ iClipper2D * ClipperObjectStencil::GetCurClipper()
   return m_curclip;
 }
 
-G3DPolygonDP  & ClipperObjectStencil::ClipPolygon     ( G3DPolygonDP& poly )
+G3DPolygonDP  & ClipperObjectStencil::ClipPolygon (G3DPolygonDP& poly)
 {
   return poly;
 }
 
-G3DPolygonDPFX& ClipperObjectStencil::ClipPolygonFX   ( G3DPolygonDPFX& poly )
+G3DPolygonDPFX& ClipperObjectStencil::ClipPolygonFX (G3DPolygonDPFX& poly)
 {
   return poly;
 }
 
-G3DTriangleMesh& ClipperObjectStencil::ClipTriangleMesh( G3DTriangleMesh& mesh )
+G3DTriangleMesh& ClipperObjectStencil::ClipTriangleMesh (G3DTriangleMesh& mesh)
 {
   return mesh;
 }
 
-G3DPolygonMesh & ClipperObjectStencil::ClipPolygonMesh ( G3DPolygonMesh&  mesh )
+G3DPolygonMesh & ClipperObjectStencil::ClipPolygonMesh (G3DPolygonMesh&  mesh)
 {
   return mesh;
 }
@@ -134,9 +134,8 @@ void ClipperObjectStencil::SetupClipper()
   glVertexPointer(2,GL_FLOAT, sizeof(csVector2), &poly->x);
   glDrawArrays(GL_LINE_LOOP, 0, m_curclip->GetVertexCount());
 
- 
   glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE); // We want the stencil buffer 
 
-  glEnable(GL_STENCIL_TEST);
+  glEnable(GL_STENCIL_TEST); // Since the clipper is active, we have to test
   m_glstates.glenabled_stencil_test = true;
 }

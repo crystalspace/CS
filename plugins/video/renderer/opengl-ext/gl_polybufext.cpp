@@ -40,3 +40,55 @@
 #include "csutil/util.h"
 #include "imesh/thing/polygon.h"
 #include "qint.h"
+
+csPolygonBufferEXT::csPolygonBufferEXT(iGraphics3D *g3d)
+{
+}
+ 
+csPolygonBufferEXT::~csPolygonBufferEXT()
+{
+}
+
+void csPolygonBufferEXT::AddPolygon (int* verts, int num_verts,
+	const csPlane3& poly_normal,
+	int mat_index,
+	const csMatrix3& m_obj2tex, const csVector3& v_obj2tex,
+	iPolygonTexture* poly_texture)
+{
+}
+
+void csPolygonBufferEXT::SetVertexArray (csVector3* verts, int num_verts)
+{
+}
+
+void csPolygonBufferEXT::AddMaterial (iMaterialHandle* mat_handle)
+{
+}
+
+int csPolygonBufferEXT::GetMaterialCount ()
+{
+}
+
+iMaterialHandle* csPolygonBufferEXT::GetMaterial (int idx)
+{
+}
+
+int csPolygonBufferEXT::GetVertexCount()
+{
+}
+
+csVector3* csPolygonBufferEXT::GetVertices()
+{
+}
+
+void csPolygonBufferEXT::SetMaterial (int idx, iMaterialHandle* mat_handle)
+{
+}
+
+void csPolygonBufferEXT::Clear ()
+{
+}
+
+void csPolygonBufferEXT::MarkLightmapsDirty()
+{
+}
