@@ -30,6 +30,12 @@ class csGLShader_FIXED;
 
 class csGLShaderFVP : public csShaderProgram
 {
+public:
+  enum TEXGENMODE
+  {
+    TEXGEN_NONE = 0,
+    TEXGEN_REFLECT_CUBE
+  };
 private:
   csStringHash tokens;
 #define CS_TOKEN_ITEM_FILE \
@@ -39,12 +45,6 @@ private:
 
   csRef<iGraphics3D> g3d;
   csGLShader_FIXED* shaderPlug;
-
-  enum TEXGENMODE
-  {
-    TEXGEN_NONE = 0,
-    TEXGEN_REFLECT_CUBE
-  };
 
   struct lightingentry
   {

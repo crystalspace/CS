@@ -47,10 +47,12 @@ INF.GLSHADER_PS1 = $(SRCDIR)/plugins/video/render3d/shader/shaderplugins/glshade
 INC.GLSHADER_PS1 = \
   $(wildcard $(addprefix $(SRCDIR)/, \
   plugins/video/render3d/shader/shaderplugins/glshader_ps1/*.h \
+  plugins/video/render3d/shader/shaderplugins/common/*.h \
   plugins/video/render3d/shader/common/*.h))
 SRC.GLSHADER_PS1 = \
   $(wildcard $(addprefix $(SRCDIR)/, \
   plugins/video/render3d/shader/shaderplugins/glshader_ps1/*.cpp \
+  plugins/video/render3d/shader/shaderplugins/common/*.cpp \
   plugins/video/render3d/shader/common/*.cpp))
 OBJ.GLSHADER_PS1 = $(addprefix $(OUT)/,$(notdir $(SRC.GLSHADER_PS1:.cpp=$O)))
 DEP.GLSHADER_PS1 = CSGFX CSGEOM CSUTIL
@@ -78,6 +80,9 @@ glshader_ps1: $(OUTDIRS) $(GLSHADER_PS1)
 
 $(OUT)/%$O: $(SRCDIR)/plugins/video/render3d/shader/shaderplugins/glshader_ps1/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.PIXEL_LAYOUT) $(GL.CFLAGS)
+
+$(OUT)/%$O: $(SRCDIR)/plugins/video/render3d/shader/shaderplugins/common/%.cpp
+	$(DO.COMPILE.CPP) $(CFLAGS.PIXEL_LAYOUT)
 
 $(GLSHADER_PS1): $(OBJ.GLSHADER_PS1) $(LIB.GLSHADER_PS1)
 	$(DO.PLUGIN.PREAMBLE) \

@@ -74,6 +74,11 @@ chronological order.
 	  style portal specification using the <portal> keyword in a
 	  thing mesh. In this particular case it wouldn't actually work
 	  and it would also use an uninitialized variable.
+	- res augmented the swig-generated output for cspython to #undefine
+	  _DEBUG before including Python.h. This way, python23.lib instead of
+	  python23_d.lib is used on MSVC.
+	- res fixed some VC6 compile errors in some shader plugin and updated
+	  some shader plugin makefiles to utilize the common shaderplugin code.
 1-Apr-2004
 	- Eric Sunshine fixed include/Jamfile so that it installs Swig (*.i)
 	  files.  These are needed by CEL, for instance.

@@ -48,10 +48,12 @@ INF.GLSHADER_CG = $(SRCDIR)/plugins/video/render3d/shader/shaderplugins/glshader
 INC.GLSHADER_CG = \
   $(wildcard $(addprefix $(SRCDIR)/,\
   plugins/video/render3d/shader/shaderplugins/glshader_cg/*.h\
+  plugins/video/render3d/shader/shaderplugins/common/*.h \
   plugins/video/render3d/shader/common/*.h))
 SRC.GLSHADER_CG = \
   $(wildcard $(addprefix $(SRCDIR)/,\
   plugins/video/render3d/shader/shaderplugins/glshader_cg/*.cpp\
+  plugins/video/render3d/shader/shaderplugins/common/*.cpp \
   plugins/video/render3d/shader/common/*.cpp))
 OBJ.GLSHADER_CG = $(addprefix $(OUT)/,$(notdir $(SRC.GLSHADER_CG:.cpp=$O)))
 DEP.GLSHADER_CG = CSGEOM CSUTIL CSUTIL CSGFX
@@ -79,6 +81,9 @@ glshader_cg: $(OUTDIRS) $(GLSHADER_CG)
 
 $(OUT)/%$O: $(SRCDIR)/plugins/video/render3d/shader/shaderpluginsglshader_cg/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.PIXEL_LAYOUT) $(CG.CFLAGS)
+
+$(OUT)/%$O: $(SRCDIR)/plugins/video/render3d/shader/shaderplugins/common/%.cpp
+	$(DO.COMPILE.CPP) $(CFLAGS.PIXEL_LAYOUT)
 
 $(GLSHADER_CG): $(OBJ.GLSHADER_CG) $(LIB.GLSHADER_CG)
 	$(DO.PLUGIN.PREAMBLE) \

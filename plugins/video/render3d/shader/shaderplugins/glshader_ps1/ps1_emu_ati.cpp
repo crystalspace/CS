@@ -303,7 +303,7 @@ bool csShaderGLPS1_ATI::LoadProgramStringToGL ()
 
   ext->glBeginFragmentShaderATI ();
 
-  for(int i = 0; i < instrs->Length (); i++)
+  for(i = 0; i < instrs->Length (); i++)
   {
     if(!GetATIShaderCommand (instrs->Get (i)))
     {

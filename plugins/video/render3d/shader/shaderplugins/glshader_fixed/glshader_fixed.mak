@@ -49,10 +49,12 @@ INF.GLSHADER_FIXED = $(SRCDIR)/plugins/video/render3d/shader/shaderplugins/glsha
 INC.GLSHADER_FIXED = \
   $(wildcard $(addprefix $(SRCDIR)/,\
   plugins/video/render3d/shader/shaderplugins/glshader_fixed/*.h\
+  plugins/video/render3d/shader/shaderplugins/common/*.h \
   plugins/video/render3d/shader/common/*.h))
 SRC.GLSHADER_FIXED = \
   $(wildcard $(addprefix $(SRCDIR)/,\
   plugins/video/render3d/shader/shaderplugins/glshader_fixed/*.cpp\
+  plugins/video/render3d/shader/shaderplugins/common/*.cpp \
   plugins/video/render3d/shader/common/*.cpp))
 OBJ.GLSHADER_FIXED = $(addprefix $(OUT)/,$(notdir $(SRC.GLSHADER_FIXED:.cpp=$O)))
 DEP.GLSHADER_FIXED = CSGFX CSGEOM CSUTIL
@@ -80,6 +82,9 @@ glshader_fixed: $(OUTDIRS) $(GLSHADER_FIXED)
 
 $(OUT)/%$O: $(SRCDIR)/plugins/video/render3d/shader/shaderplugins/glshader_fixed/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.PIXEL_LAYOUT) $(GL.CFLAGS)
+
+$(OUT)/%$O: $(SRCDIR)/plugins/video/render3d/shader/shaderplugins/common/%.cpp
+	$(DO.COMPILE.CPP) $(CFLAGS.PIXEL_LAYOUT)
 
 $(GLSHADER_FIXED): $(OBJ.GLSHADER_FIXED) $(LIB.GLSHADER_FIXED)
 	$(DO.PLUGIN.PREAMBLE) \

@@ -14,8 +14,9 @@ if $(CMD.SWIG)
   # Python.h is included, so we post-process the output file.  Also, we delete
   # any lines containing the CVS `Header' keyword to ensure that CVS does not
   # consider the file changed simply because `Header' expansion differs.
-  # (Despite the fact that this customization seems project-specific, it should
-  # be safe for all projects.)
+  # Also #undefine _DEBUG, so python23.lib is used with MSVC instead of 
+  # python23_d.lib. (Despite the fact that this customization seems 
+  # project-specific, it should be safe for all projects.)
   SWIG.SED_SCRIPT =
     "'s/\\([ 	]*#[ 	]*include[ 	][ 	]*[<\"]Python.h[>\"]\\)/\\
     #ifndef __STDC_CONSTANT_MACROS\\
@@ -23,6 +24,9 @@ if $(CMD.SWIG)
     #endif\\
     #ifndef __STDC_LIMIT_MACROS\\
     #define __STDC_LIMIT_MACROS\\
+    #endif\\
+    #ifndef DEBUG_PYTHON\\
+    #undef _DEBUG\\
     #endif\\
     \\1/
     /\$Header:/d'" ;

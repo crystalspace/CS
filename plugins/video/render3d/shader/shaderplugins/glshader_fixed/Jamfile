@@ -7,7 +7,7 @@ Help glshader_fixed : "Crystal Space Render3d Shaderplugin for fixed function pi
 Plugin glshader_fixed
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith glshader_fixed : csgeom csgfx csutil ;
+LinkWith glshader_fixed : shaderplugincommon csgeom csgfx csutil ;
 ExternalLibs glshader_fixed :  GL ;
 
 CompileGroups glshader_fixed : nrall ;

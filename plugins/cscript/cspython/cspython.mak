@@ -182,8 +182,9 @@ else
 # chance to define the __STDC_* macros.  There is no Swig-supported mechanism
 # allowing us to insert these #defines before Python.h is included, so we
 # post-process the output file.  Also, we delete any lines containing the CVS
-# `Header' keyword to ensure that CVS does not consider the file changed simply
-# because `Header' expansion differs.
+# Also #undefine _DEBUG, so python23.lib is used with MSVC instead of 
+# python23_d.lib. (Despite the fact that this customization seems 
+# project-specific, it should be safe for all projects.)
 $(SWIG.CSPYTHON.SED):
 	echo $"s/\([ 	]*#[ 	]*include[ 	][ 	]*[<"]Python.h[>"]\)/\$">$@
 	echo $"#ifndef __STDC_CONSTANT_MACROS\$">>$@
@@ -191,6 +192,9 @@ $(SWIG.CSPYTHON.SED):
 	echo $"#endif\$">>$@
 	echo $"#ifndef __STDC_LIMIT_MACROS\$">>$@
 	echo $"#define __STDC_LIMIT_MACROS\$">>$@
+	echo $"#endif\$">>$@
+	echo $"#ifndef DEBUG_PYTHON\$">>$@
+	echo $"#undef _DEBUG\$">>$@
 	echo $"#endif\$">>$@
 	echo $"\1/$">>$@
 	echo $"/$(BUCK)Header:/d$">>$@
