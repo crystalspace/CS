@@ -40,10 +40,13 @@ public:
 
   void AddBlock (csBCTerrBlock *block);
   void RebuildBoundingBoxes ();
+  // basic
   void HeightTest (csVector3  *point, 
     int &hits);
+  // camera test
   void HeightTestExt (csVector3  *point, 
     int &hits);
+  // Exact point, may clip into polys
   void HeightTestExact (csVector3  *point, 
     int &hits);
 };

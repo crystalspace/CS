@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2002 by Ryan Surkamp
+    Copyright (C) 2002 by Jorrit Tyberghein and Ryan Surkamp
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -78,11 +78,7 @@ void csColQuad::HeightTest (csVector3  *point,
   }	
 }
 
-void csColQuad::HeightTestExt (csVector3  *point, 
-    int &hits)
-{
-  return; // don't use yet
-}
+
 
 void csColQuad::HeightTestExact (csVector3  *point, 
     int &hits)
@@ -117,6 +113,68 @@ void csColQuad::HeightTestExact (csVector3  *point,
           {
             point->y = newpoint.y + 2.0f;
             hits += 1;
+          }
+          //point->y = newpoint.y + 10.0f;
+        }
+      }			
+    }
+    if (children[0])
+    {
+      for (i = 0; i < 4; i++)
+        children[i]->HeightTestExact (point, hits);
+    }
+  }
+}
+
+void csColQuad::HeightTestExt (csVector3  *point, 
+    int &hits)
+{
+  if ( Inside (bbox, point) )
+  {
+    int i;
+    for (i = 0; i < num_blocks; i++)
+    {
+      if ( Inside (blocks[i]->bbox, point) )
+      {
+        if (point->y <= blocks[i]->bbox.MaxY ())
+        {
+          csVector3 newpoint;
+          float u, v;
+          csVector3 temp[4];
+  u = ( point->x - blocks[i]->bbox.MinX () )
+    / (blocks[i]->bbox.MaxX () - blocks[i]->bbox.MinX ());
+  v = (blocks[i]->bbox.MaxZ () - point->z)
+    / (blocks[i]->bbox.MaxZ () - blocks[i]->bbox.MinZ ());
+          if (u < 0.0f) u = -u;
+          if (v < 0.0f) v = -v;
+          if (u > 1.0f) u = 1.0f;
+          if (v > 1.0f) v = 1.0f;
+          temp[0] = BezierControlCompute (v, blocks[i]->verts, 4);
+          temp[1] = BezierControlCompute (v, &blocks[i]->verts[1], 4);
+          temp[2] = BezierControlCompute (v, &blocks[i]->verts[2], 4);
+          temp[3] = BezierControlCompute (v, &blocks[i]->verts[3], 4);
+          newpoint =  BezierCompute (u, temp);
+          newpoint.y += 2.0f;
+          if ( newpoint.y > point->y)
+          {
+            point->y = newpoint.y;
+            hits += 1;
+          }
+          v = u - 0.1f;
+          if ( v >= 0.0)
+          {
+            newpoint = BezierCompute (v, temp);
+            newpoint.y += 2.0f;
+            if (newpoint.y > point->y)
+              point->y = newpoint.y;
+          }
+          v = u + 0.1f;
+          if (v <= 1.0)
+          {
+            newpoint = BezierCompute (v, temp);
+            newpoint.y += 2.0f;
+            if (newpoint.y > point->y)
+              point->y = newpoint.y;
           }
           //point->y = newpoint.y + 10.0f;
         }
