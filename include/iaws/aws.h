@@ -226,7 +226,7 @@ public:
   virtual iAwsSinkManager *GetSinkMgr()=0;
 
   /// Set the preference manager used by the window system
-  virtual void             SetPrefMgr(iAwsPrefManager *pmgr)=0;
+  virtual void SetPrefMgr(iAwsPrefManager *pmgr)=0;
 
   /// Allows a component to register itself for dynamic template instatiation via definition files.
   virtual void RegisterComponentFactory(iAwsComponentFactory *factory, const char* name)=0;
@@ -238,37 +238,37 @@ public:
   virtual iAwsComponent *GetTopComponent()=0;
 
   /// Set the top component
-  virtual void       SetTopComponent(iAwsComponent *win)=0;
+  virtual void SetTopComponent(iAwsComponent *win)=0;
 
   /// Finds the smallest visible component which contains the point (x,y)
   virtual iAwsComponent* ComponentAt(int x, int y)=0;
 
   /// Causes the current view of the window system to be drawn to the given graphics device.
-  virtual void       Print(iGraphics3D *g3d, uint8 Alpha=0)=0;
+  virtual void Print(iGraphics3D *g3d, uint8 Alpha=0)=0;
 
   /// Redraw whatever portions of the screen need it.
-  virtual void       Redraw()=0;
+  virtual void Redraw()=0;
 
   /// Mark a region dirty
-  virtual void       Mark(const csRect &rect)=0;
+  virtual void Mark(const csRect &rect)=0;
 
   /// Mark a section of the screen clean.
-  virtual void       Unmark(const csRect &rect)=0;
+  virtual void Unmark(const csRect &rect)=0;
 
   /// Erase a section of the screen next round (only useful if AlwaysEraseWindows flag is set)
-  virtual void       Erase(const csRect &rect)=0;
+  virtual void Erase(const csRect &rect)=0;
 
   /// Mask off a section that has been marked to erase.  This part won't be erased.
-  virtual void       MaskEraser(const csRect &rect)=0;
+  virtual void MaskEraser(const csRect &rect)=0;
 
   /// Tell the system to rebuild the update store
-  virtual void       InvalidateUpdateStore()=0;
+  virtual void InvalidateUpdateStore()=0;
 
   /// Capture all mouse events until release is called, no matter where the mouse is
-  virtual void       CaptureMouse(iAwsComponent *comp)=0;
+  virtual void CaptureMouse(iAwsComponent *comp)=0;
 
   /// Release the mouse events to go where they normally would.
-  virtual void       ReleaseMouse()=0;
+  virtual void ReleaseMouse()=0;
 
   /// Dispatches events to the proper components
   virtual bool HandleEvent(iEvent&)=0;

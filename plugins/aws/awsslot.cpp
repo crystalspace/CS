@@ -75,7 +75,8 @@ iAwsSink *awsSinkManager::FindSink (const char *_name)
   {
     SinkMap *sm = (SinkMap *)sinks[i];
 
-    if (sm->name == name) return sm->sink;
+    if (sm->name == name)
+      return sm->sink;
   }
 
   return NULL;
@@ -146,14 +147,12 @@ awsSource::awsSource (iAwsComponent *_owner) :
 
 awsSource::~awsSource ()
 {
-  int i;
-  for (i = 0; i < slots.Length (); ++i)
+  for (int i = 0; i < slots.Length (); ++i)
   {
-    void *p = slots[i];
-    delete (SlotSignalMap *)p;
+    SlotSignalMap *p = (SlotSignalMap*) slots[i];
+    p->slot->DecRef ();
+    delete p;
   }
-
-  slots.SetLength (0);
 }
 
 iAwsComponent *awsSource::GetComponent ()
@@ -176,14 +175,9 @@ bool awsSource::RegisterSlot (iAwsSlot *slot, unsigned long signal)
 
 bool awsSource::UnregisterSlot (iAwsSlot *slot, unsigned long signal)
 {
-  void *entry;
-  int i;
-
-  for (i = 0; i < slots.Length (); ++i)
+  for (int i = 0; i < slots.Length (); ++i)
   {
-    entry = slots[i];
-
-    SlotSignalMap *ssm = STATIC_CAST (SlotSignalMap *, entry);
+    SlotSignalMap *ssm = (SlotSignalMap*) slots[i];
 
     if (ssm->signal == signal && ssm->slot == slot)
     {
@@ -204,9 +198,10 @@ void awsSource::Broadcast (unsigned long signal)
 
   for (i = 0; i < slots.Length (); ++i)
   {
-    SlotSignalMap *ssm = STATIC_CAST (SlotSignalMap *, slots[i]);
+    SlotSignalMap *ssm = (SlotSignalMap*) slots[i];
 
-    if (ssm->signal == signal) ssm->slot->Emit (*this, signal);
+    if (ssm->signal == signal)
+	ssm->slot->Emit (*this, signal);
   }
 }
 
@@ -218,6 +213,12 @@ awsSlot::awsSlot ()
 
 awsSlot::~awsSlot ()
 {
+    for (int i = 0; i < stmap.Length(); i++)
+    {
+	SignalTriggerMap* sm = (SignalTriggerMap*) stmap[i];
+	sm->sink->DecRef ();
+	delete sm;
+    }
 }
 
 void awsSlot::Connect (
@@ -237,11 +238,11 @@ void awsSlot::Connect (
     if (stm->signal == signal && stm->trigger == trigger && stm->sink == sink)
     {
       stm->refs++;
-      stm->sink->IncRef ();
       return ;
     }
   }
 
+  sink->IncRef ();
   stmap.Push (new SignalTriggerMap (signal, sink, trigger, 1));
 }
 
@@ -262,9 +263,12 @@ void awsSlot::Disconnect (
     if (stm->signal == signal && stm->trigger == trigger && stm->sink == sink)
     {
       stm->refs--;
-      stm->sink->DecRef ();
 
-      if (stm->refs == 0) stmap.Delete (i);
+      if (stm->refs == 0)
+      {
+	  stm->sink->DecRef ();
+	  stmap.Delete (i);
+      }
 
       return ;
     }
