@@ -14,6 +14,8 @@ The history order is reversed so that new features are at the top.
 	  sort of bug in Swig.
 	  Also added csArray and csRefArray support, and removed the
 	  typemap to convert csHashMapReversible to a native Perl hash type.
+	- Jorrit did a minor change to emit again to properly change the
+	  object model when some of the attributes change.
 24-Jun-2003
 	- Oktal added an iGraphicsMemory interface with which to access
 	  the csGraphicsMemory plugin.
