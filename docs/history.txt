@@ -25,6 +25,45 @@ The history order is reversed so that new features are at the top.
 	  A work in progress...
 	- Fixed SCF_TRACE for embedded SCF interfaces. scfRefCount is
 	  no longer part of the embedded interface.
+	- Martin Geisse added DECLARE_TYPED_SCF_VECTOR again (a version of
+	  typed vectors that controls the reference count of the contained
+	  objects). This time it should work correctly.
+	- Christopher Nelson did more work on the parser, as well as some
+	  additional work on the preferences manager. The parser now adds
+	  window and skin definition trees into the preference manager. (In
+	  other words, the parser is now useful. :-)
+	  There is a difference between skin and window definitions that may
+	  not seem obvious at first.  That is, skin definitions specify
+	  global options for components and window defintions specify local,
+	  unique options.  In other words, the background texture for all
+	  items would be specified in a skin definition.  As would the
+	  texture used for buttons, for checkboxes, scrollbars, etc.  A
+	  window definition is used to specify stuff like the caption, where
+	  the component goes, exactly what type of window it is, etc.
+	  Window definitions currently take a skin definition as a parameter
+	  of their grammatical structure.  I'm not sure this is a good idea,
+	  and I will probably change that.  Multiple skin definitions and
+	  window definitions can exist in a single file.  There is no need to
+	  predeclare anything, since there are no interdependencies.  I may
+	  add an include statement which will allow a single file to include
+	  other files that it may depend upon.
+	  I am thinking through the ramifications of allowing modular code, e.g.
+		component "Sex Frame" is "Frame"
+		{
+		  component "Male" is "Radio Button"
+		  { ... }
+		  component "Female is "Radio Button"
+		  { ... }
+		}
+	  then later:
+		window "new player"
+		{
+		  named component "Sex Frame"
+		}
+	  This may make some things a lot easier, especially when you have
+	  gui constructs that you'd like to use in other places.
+	- Norman Kramer fixed a bug in the texture manager: materials are
+	  freed now. Also fixed this in the software renderer.
 12-Jun-2001
 	- Fixed a compile error and warning in SCF.
 	- Removed dumper.cpp and dumper.h. They are obsolete and BugPlug
