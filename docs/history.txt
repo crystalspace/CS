@@ -31,6 +31,13 @@ chronological order.
 	    - csRegionTree2D::FindRegion() now uses csArray instead of
 	      csVector.
 	- Jorrit added csPDelArray::FindKey().
+	- Jorrit replaced various occurances of csVector:
+	    - Replaced 'csConstraintVector' for csws layouts with a
+	      csPDelArray<csLayoutConstraint>.
+	    - csSkin now inherits from csPDelArray<csSkinSlice> instead of
+	      csVector.
+	    - Replaced 'csWSTexVector' for csws with a
+	      csPDelArray<csWSTexture>.
 31-Jul-2003
 	- Jorrit replaced various occurances of csVector:
 	    - Replaced 'vTex' in OpenGL texture manager with

@@ -63,7 +63,6 @@
 
 // Forward declarations
 class csRect;
-class csVector;
 class csEventQueue;
 class csGraphicsPipeline;
 class csComponent;

@@ -29,23 +29,12 @@
 
 //--//--//--//--//--//--//--//--//--//--//--// The skin repository class -//--//
 
-csSkin::~csSkin ()
-{
-  DeleteAll ();
-}
-
-bool csSkin::FreeItem (void* Item)
-{
-  delete (csSkinSlice *)Item;
-  return true;
-}
-
-int csSkin::CompareKey (void* Item, const void* Key, int) const
+int csSkin::CompareKey (void const* Item, void* Key)
 {
   return strcmp (((csSkinSlice *)Item)->GetName (), (char *)Key);
 }
 
-int csSkin::Compare (void* Item1, void* Item2, int) const
+int csSkin::Compare (void const* Item1, void* Item2)
 {
   return strcmp (((csSkinSlice *)Item1)->GetName (), ((csSkinSlice *)Item2)->GetName ());
 }
@@ -59,14 +48,14 @@ void csSkin::Initialize (csApp *iApp)
 {
   app = iApp;
   int i;
-  for (i = 0; i < count; i++)
+  for (i = 0; i < Length (); i++)
     Get (i)->Initialize (iApp, this);
 }
 
 void csSkin::Deinitialize ()
 {
   int i;
-  for (i = 0; i < count; i++)
+  for (i = 0; i < Length (); i++)
     Get (i)->Deinitialize ();
   app = 0;
 }

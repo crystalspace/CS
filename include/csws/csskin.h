@@ -28,7 +28,7 @@
  * \addtogroup csws_skins
  * @{ */
  
-#include "csutil/csvector.h"
+#include "csutil/parray.h"
 
 class csSkin;
 class csSkinSlice;
@@ -67,7 +67,7 @@ class csBackground;
  * component (note that this does NOT have to do anything with class
  * hierarchy!) will receive the cscmdSkinChanged broadcast.
  */
-class csSkin : public csVector
+class csSkin : public csPDelArray<csSkinSlice>
 {
   /// The application
   csApp *app;
@@ -77,23 +77,15 @@ public:
   const char *Prefix;
 
   /// Create the skin repository object
-  csSkin () : csVector (16, 16), Prefix (0) {}
+  csSkin () : csPDelArray<csSkinSlice> (16, 16), Prefix (0) {}
 
-  /// Destroy all skins in this repository
-  virtual ~csSkin ();
-
-  /// Free a skin from this repository
-  virtual bool FreeItem (void* Item);
+  virtual ~csSkin () { }
 
   /// Compare a item from this array with some key
-  virtual int CompareKey (void* Item, const void* Key, int) const;
+  static int CompareKey (void const* Item, void* Key);
 
   /// Compare two items from this array
-  virtual int Compare (void* Item1, void* Item2, int) const;
-
-  /// Get a skin from this array
-  csSkinSlice *Get (int iIndex)
-  { return (csSkinSlice *)csVector::Get (iIndex); }
+  static int Compare (void const* Item1, void* Item2);
 
   /// Apply this skin to some component and all components inserted into it
   void Apply (csComponent *iComp);
@@ -337,7 +329,7 @@ public:
  * name, e.g. "Button", "Window" and so on.
  */
 #define CSWS_SKIN_SLICE(comp)	\
-      InsertSorted (new cs##comp##Skin);
+      InsertSorted (new cs##comp##Skin, Compare);
 
 /**
  * Finish the definition of a skin.

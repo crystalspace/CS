@@ -26,6 +26,7 @@
  
 #include "csws/csdialog.h"
 #include "csgeom/cspoint.h"
+#include "csutil/parray.h"
 
 /**
  * csLayoutConstraint is a basic constraint used for positioning a control
@@ -54,31 +55,16 @@ public:
  * The constraints (and thus the components to place) are
  * taken into account in the sequence they are added to this vector.
  */
-class csConstraintVector : public csVector
+class csConstraintVector : public csPDelArray<csLayoutConstraint>
 {
 public:
-  /// for looking up an constraint by comparing the attached components
-  virtual int Compare (void* Item1, void* Item2, int Mode = 0) const
-  {
-    (void)Mode;
-    csLayoutConstraint *c1 = (csLayoutConstraint *)Item1;
-    csLayoutConstraint *c2 = (csLayoutConstraint *)Item2;
-    return (c1->comp < c2->comp ? -1 : c1->comp > c2->comp ? 1 : 0);
-  }
   /// look up an constraint given a components
-  virtual int CompareKey (void* Item1, const void* Item2, int Mode = 0) const
+  static int CompareKey (void const* Item1, void* Item2)
   {
-    (void)Mode;
     csLayoutConstraint *c1 = (csLayoutConstraint *)Item1;
     csComponent *c2 = (csComponent *)Item2;
     return (c1->comp < c2 ? -1 : c1->comp > c2 ? 1 : 0);
   }
-  /// for automatic cleanup of the vector elements
-  virtual bool FreeItem (void* Item)
-  { if (Item) delete (csLayoutConstraint *)Item; return true; }
-  /// for convenience
-  csLayoutConstraint *Get (int idx)
-  { return (csLayoutConstraint *)csVector::Get (idx); }
 };
 
 /**

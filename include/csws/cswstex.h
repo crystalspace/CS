@@ -25,7 +25,7 @@
  * @{ */
  
 #include "csgfx/csimage.h"
-#include "csutil/csvector.h"
+#include "csutil/parray.h"
 
 struct iTextureHandle;
 struct iTextureManager;
@@ -111,25 +111,18 @@ public:
 };
 
 /// This class is a vector of csWSTexture's
-class csWSTexVector : public csVector
+class csWSTexVector : public csPDelArray<csWSTexture>
 {
 public:
   /// Initialize the texture vector
   csWSTexVector ();
-  /// Destroy the object
-  virtual ~csWSTexVector ();
-  /// Free a texture element
-  virtual bool FreeItem (void* Item);
   /// Compare texture with name; used in FindKey ()
-  virtual int CompareKey (void* Item, const void* Key, int Mode) const;
-  /// Get texture by index
-  csWSTexture *Get (int idx)
-  { return (csWSTexture *)csVector::Get (idx); }
+  static int CompareKey (void const* Item, void* Key);
   /// Find a texture by name
-  csWSTexture *FindTexture (const char *iName)
+  csWSTexture *FindTexture (const char *name)
   {
-    int idx = FindKey (iName);
-    return idx >= 0 ? (csWSTexture *)Get (idx) : (csWSTexture*)0;
+    int idx = FindKey ((void*)name, CompareKey);
+    return idx >= 0 ? Get (idx) : (csWSTexture*)0;
   }
 };
 

@@ -167,23 +167,11 @@ int csWSTexture::GetHeight ()
   return 0;
 }
 
-csWSTexVector::csWSTexVector () : csVector (16, 16)
+csWSTexVector::csWSTexVector () : csPDelArray<csWSTexture> (16, 16)
 {
 }
 
-csWSTexVector::~csWSTexVector ()
+int csWSTexVector::CompareKey (void const* Item, void* Key)
 {
-  DeleteAll ();
-}
-
-bool csWSTexVector::FreeItem (void* Item)
-{
-  delete (csWSTexture *)Item;
-  return true;
-}
-
-int csWSTexVector::CompareKey (void* Item, const void* Key, int Mode) const
-{
-  (void) Mode;
   return strcmp (((csWSTexture *)Item)->GetName (), (char *)Key);
 }
