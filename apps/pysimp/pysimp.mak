@@ -35,6 +35,7 @@ PYSIMP.EXE=pysimp$(EXE)
 SRC.PYSIMP = $(wildcard apps/pysimp/*.cpp) apps/support/static.cpp
 OBJ.PYSIMP = $(addprefix $(OUT),$(notdir $(SRC.PYSIMP:.cpp=$O)))
 DESCRIPTION.$(PYSIMP.EXE) = $(DESCRIPTION.pysimple)
+TO_INSTALL.EXE+=$(PYSIMP.EXE)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

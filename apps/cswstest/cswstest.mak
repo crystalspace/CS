@@ -31,6 +31,7 @@ CSWSTEST.EXE=cswstest$(EXE)
 SRC.CSWSTEST = $(wildcard apps/cswstest/*.cpp) apps/support/static.cpp
 OBJ.CSWSTEST = $(addprefix $(OUT),$(notdir $(SRC.CSWSTEST:.cpp=$O)))
 DESCRIPTION.$(CSWSTEST.EXE) = $(DESCRIPTION.wstest)
+TO_INSTALL.EXE+=$(CSWSTEST.EXE)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

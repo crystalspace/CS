@@ -12,7 +12,7 @@ include mk/user.mak
 include mk/common.mak
 
 .PHONY: depend clean cleanlib cleandep distclean install install_mkdir \
-  install_config
+  install_config uninstall 
 
 # Remove all standard suffixes to speed up make lookups
 .SUFFIXES:
@@ -175,11 +175,11 @@ all: $(OUTDIRS)
 dep: $(OUTBASE) $(OUTOS)
 
 -include mk/install.mak
-install: $(INSTALL_DIR) install_config install_data install_dynamiclibs \
-  install_staticlibs install_exe install_include
-#	@echo Files: $(TO_INSTALL.CONFIG) $(TO_INSTALL.DATA) \
-#	  $(TO_INSTALL.DYNAMIC_LIBS) $(TO_INSTALL.STATIC_LIBS) \
-#	  $(TO_INSTALL.EXE)
+install: $(INSTALL_DIR) install_data install_config install_dynamiclibs \
+  install_staticlibs install_exe install_include install_root install_logfile
+
+uninstall: uninstexe
+	uninst $(INSTALL_DIR)/install.log
 
 distclean: clean
 	-$(RM) config.mak include/volatile.h

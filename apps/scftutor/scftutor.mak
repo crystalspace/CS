@@ -42,10 +42,12 @@ OBJ.WORM = $(addprefix $(OUT),$(notdir $(SRC.WORM:.cpp=$O)))
 DESCRIPTION.$(ZOO.EXE) = $(DESCRIPTION.scftut)
 DESCRIPTION.$(DOG.DLL) = Sample Shared Dog class
 DESCRIPTION.$(WORM.DLL) = Sample Shared Worm class
+#TO_INSTALL.EXE+=$(ZOO.EXE)
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
   DOG.DLL = $(OUTDLL)Dog$(DLL)
   WORM.DLL = $(OUTDLL)Worm$(DLL)
+  #TO_INSTALL.DYNAMIC_LIBS+=$(DOG.DLL) $(WORM.DLL)
 else
   SRC.ZOO += $(SRC.DOG) $(SRC.WORM)
 endif

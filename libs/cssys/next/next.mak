@@ -72,6 +72,9 @@ NEXT.SHARED=shared
 NEXT.SEARCH_PATH=$(NEXT.SOURCE_DIRS) $(NEXT.SHARED)
 NEXT.SOURCE_PATHS=$(addprefix libs/cssys/next/,$(NEXT.SEARCH_PATH))
 
+# select next config file for inclusion with install
+TO_INSTALL.CONFIG+=data/config/next.cfg
+
 # Typical extension for dynamic libraries on this system.
 DLL=.dylib
 

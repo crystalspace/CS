@@ -33,6 +33,7 @@ GFXTEST.EXE = gfxtest$(EXE)
 SRC.GFXTEST += apps/tests/gfxtst/gfxtest.cpp
 OBJ.GFXTEST = $(addprefix $(OUT),$(notdir $(SRC.GFXTEST:.cpp=$O)))
 DESCRIPTION.$(GFXTEST.EXE) = $(DESCRIPTION.gfxtst)
+TO_INSTALL.EXE+=$(GFXTEST.EXE)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
