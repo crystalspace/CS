@@ -79,6 +79,7 @@ csReporterListener::csReporterListener (iBase *iParent)
   object_reg = 0;
   reporter = 0;
   scfiEventHandler = 0;
+  silent = false;
 
   debug_filename = DefaultDebugFilename ();
 #ifdef CS_DEBUG
@@ -178,6 +179,7 @@ bool csReporterListener::Initialize (iObjectRegistry* r)
       dest_stdout[CS_REPORTER_SEVERITY_DEBUG] = true;
       dest_stderr[CS_REPORTER_SEVERITY_DEBUG] = false;
     }
+    silent = cmdline->GetOption ("silent") != 0;
   }
 
   return true;
@@ -194,9 +196,8 @@ bool csReporterListener::Report (iReporter*, int severity,
 
   csString msg;
   if (show_msgid[severity])
-  {
     msg.Format("%s:  %s\n", msgID, description);
-  } else
+  else
     msg.Format("%s\n", description);
 
   if (dest_stdout[severity])
@@ -249,19 +250,22 @@ bool csReporterListener::Report (iReporter*, int severity,
   }
   if (dest_popup[severity])
   {
-    csScopedMutexLock lock (mutex);
-    csString popmsg;
-    if (!repeatedID)
+    if (!silent)
     {
-      popmsg.Format ("%s:", msgID);
+      csScopedMutexLock lock (mutex);
+      csString popmsg;
+      if (!repeatedID)
+      {
+        popmsg.Format ("%s:", msgID);
+        csRef<csTimedMessage> tm = csPtr<csTimedMessage> (
+          new csTimedMessage (popmsg.GetData ()));
+        messages.Push (tm);
+      }
+      popmsg.Format (" %s", description);
       csRef<csTimedMessage> tm = csPtr<csTimedMessage> (
-        new csTimedMessage (popmsg.GetData ()));
+    	  new csTimedMessage (popmsg.GetData ()));
       messages.Push (tm);
     }
-    popmsg.Format (" %s", description);
-    csRef<csTimedMessage> tm = csPtr<csTimedMessage> (
-    	new csTimedMessage (popmsg.GetData ()));
-    messages.Push (tm);
   }
   return msg_remove[severity];
 }

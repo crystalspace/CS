@@ -63,6 +63,9 @@ chronological order.
 	  meshes is handled. A child mesh is no longer considered to be
 	  automatically invisible when the parent is invisible. You have to
 	  set the invisible flag individually on every child if you want that.
+	- Jorrit added a -silent commandline option for the standard reporter
+	  listener plugin. If you give that option then it will no longer
+	  pop up the yellow messages for warnings at startup.
 17-Mar-2004
 	- Duhprey added a simple terraformer loader plugin
 	- Eric Sunshine fixed copy/paste error in terraformer loader makefile

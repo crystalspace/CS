@@ -84,6 +84,7 @@ private:
   csRefArray<csTimedMessage> messages;
   csString lastID;
   csRef<iFont> fnt;
+  bool silent;	// Don't show the yellow warnings if true.
 
   static csString DefaultDebugFilename();
 
