@@ -55,7 +55,7 @@ The history order is reversed so that new features are at the top.
 	      - Some of the operations will not work properly with parameters.
 	        More importantly the fade, move, and rotate type of operations
 	        (the ones that cause a timed operation will not work properly).
-	- Eric Sunshine eliminated comilation warnings.
+	- Eric Sunshine eliminated compilation warnings.
 	- Changed the way that timed operations are created in the
 	  engine sequence manager. They are now much more optimal (only
 	  query for the object on which they operate once instead of
@@ -171,7 +171,7 @@ The history order is reversed so that new features are at the top.
 		- checktool()
 		    Same as checkprog(), but also reports its results to the
 		    user.
-	    - The precondition() and postcondition() scripts are now employed
+	    - The precondition() and postcondition() functions are now employed
 	      by many of the configuration scripts to ensure that the scripts
 	      are run in the correct order.  For example, chkheadr.sh relies
 	      upon CXX being properly defined, so it specifies that requirement
