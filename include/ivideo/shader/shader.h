@@ -72,8 +72,10 @@ struct iShaderVariableContext : public iBase
     sv = GetVariable (name);
     if (sv == 0)
     {
-      sv = new csShaderVariable (name);
-      AddVariable (sv);
+      csRef<csShaderVariable> nsv (
+	csPtr<csShaderVariable> (new csShaderVariable (name)));
+      AddVariable (nsv);
+      sv = nsv; // OK, sv won't be destructed, SV context takes ownership
     }
     return sv;
   }

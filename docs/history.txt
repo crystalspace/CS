@@ -24,9 +24,15 @@ chronological order.
 	- Neil Mosafi changed csvosa3dl plugin to listen to children as well
 	  as properties and use child changes to initiate property listening.
 	  This is a more correct way of doing things
+	- res removed a char too much.
 	- Neil Mosafi changed vospolygonmesh to use iMeshObjectFactory to set
 	  the CS_THING_NOCOMPRESS flag which was previously a flag of
 	  iThingFactoryState
+	- res removed SCF_CONSTRUCT_IBASE/SCF_DESTRUCT_IBASE from the 
+	  csImageMemory ctor/dtor. csImageMemory inherits from csImageFile
+	  which already invoked those macros.
+	- res fixed a leak where shadervars were created with new, but not
+	  properly DecRef()ed.
 18-Feb-2004
 	- Jorrit added the ability to specify defaults for mesh object types
 	  in the map loader. Here is an example to demonstrate how this works:

@@ -24,7 +24,6 @@
 csImageMemory::csImageMemory (int width, int height, int format)
   : csImageFile (format)
 {
-  SCF_CONSTRUCT_IBASE (0);
   DG_TYPE (this, "csImageMemory");
   Width = width;
   Height = height;
@@ -50,7 +49,6 @@ csImageMemory::csImageMemory (int width, int height, void *buffer, bool destroy,
 			      int format, csRGBpixel *palette)
   : csImageFile (format)
 {
-  SCF_CONSTRUCT_IBASE (0);
   DG_TYPE (this, "csImageMemory");
   Width = width;
   Height = height;
@@ -62,7 +60,6 @@ csImageMemory::csImageMemory (int width, int height, void *buffer, bool destroy,
 
 csImageMemory::~csImageMemory ()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csImageMemory::Clear (const csRGBpixel &colour)
