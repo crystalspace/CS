@@ -16,6 +16,12 @@ chronological order.
 	  impacted other clients of Replace(), such as operator=(). For
 	  instance, `csString s("foo"); s = s;' resulted incorrectly in 'foo'
 	  being cleared.
+	- Eric Sunshine added more sanity checks to csString to detect and
+	  properly handle near-pathalogical cases such as `s = s.GetData()' and
+	  `s = s.GetData() + n'.
+	- Eric Sunshine fixed bug in csString::Replace(char const*,count) where
+	  it was documented as accepting -1 for `count', but did not correctly
+	  handle the case.
 19-Aug-2004
 	- Jorrit added support for key/value pairs to materials and textures
 	  in the loader.

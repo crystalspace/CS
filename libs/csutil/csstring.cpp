@@ -176,24 +176,33 @@ csString &csString::Overwrite (size_t iPos, const csString &iStr)
 
 csString& csString::Replace (const csString& Str, size_t Count)
 {
-  if (this == &Str)
-  {
-    if (Count < Length())
-      Truncate(Count);
-    return *this;
-  }
-  return Replace(Str.GetData(), Count);
+  if (this != &Str)
+    Replace(Str.GetData(), Count);
+  else if (Count != (size_t)-1 && Count < Length())
+    Truncate(Count);
+  return *this;
 }
 
 csString& csString::Replace (const char* Str, size_t Count)
 {
-  if (Str == 0)
+  if (Str == 0 || Count == 0)
     Free();
+  else if (Data != 0 && Str >= Data && Str < Data + Size) // Pathalogical cases
+  {
+    if (Count == (size_t)-1) Count = Size - (Str - Data);
+    if (Str == Data && Count < Size)	// i.e. `s.Replace(s.GetData(), n)'
+      Truncate(Count);
+    else if (Str > Data)		// i.e. `s.Replace(s.GetData() + n)'
+    {
+      memmove(Data, Str, Count);
+      Data[Count] = '\0';
+      Size = Count;
+    }
+  }
   else
   {
     Truncate(0);
-    if (Count > 0)
-      Append (Str, Count);
+    Append (Str, Count);
   }
   return *this;
 }
