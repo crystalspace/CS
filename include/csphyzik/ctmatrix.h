@@ -271,7 +271,7 @@ protected:
     c2 = (j == 2) ? 1 : 2;
 
     real C = rows[r1][c1] * rows[r2][c2] - rows[r2][c1] * rows[r1][c2];
-    return rows[i][j] * sign * C;
+    return sign * C;
   }
 
   real determinant() {
