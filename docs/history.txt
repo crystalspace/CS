@@ -246,7 +246,7 @@ chronological order.
 	      argument specifying the script to load (ex. "./pysimp pysimp2").
 	      This makes it easy to load the pysimp2.py script in place of
 	      pysimp.py. Previously, one either had to edit pysimp.cpp to
-	      achive this, or copy pysimp2.py over top of pysimp.py.
+	      achieve this, or copy pysimp2.py over top of pysimp.py.
 	    - pysimp now links explicitly against the Python library. This
 	      allows the cspython --python-enable-debugger option to work.
 	      (Other than that, there is no reason for pysimp to link against
