@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+22-Oct-2001
+	- Fixed a bug in the 'addghost' console command. It would fail
+	  if you used it more than once.
+	- Fixed a bug in Blocks with the menu entries having a weird
+	  color when fog was enabled (used for fading in/out). Fixed this
+	  by not using fog but csfxFadeOut() instead.
 20-Oct-2001
 	- Removed several warnings throughout the project.
 	- Fixed a bug in GetLODPolygonCount() in spr3d.

@@ -547,11 +547,13 @@ void add_skeleton_tree (iSector* where, csVector3 const& pos, int depth,
     	"crystalspace.mesh.object.sprite.3d", skelname);
     if (tmpl == NULL)
     {
-      Sys->Report (CS_REPORTER_SEVERITY_WARNING, "Could not load the sprite 3d plugin!");
+      Sys->Report (CS_REPORTER_SEVERITY_WARNING,
+      	"Could not load the sprite 3d plugin!");
       return;
     }
     iMeshObjectFactory* fact = tmpl->GetMeshObjectFactory ();
-    iSprite3DFactoryState* state = SCF_QUERY_INTERFACE (fact, iSprite3DFactoryState);
+    iSprite3DFactoryState* state = SCF_QUERY_INTERFACE (fact,
+    	iSprite3DFactoryState);
     state->SetMaterialWrapper (Sys->Engine->GetMaterialList ()->
 			       FindByName ("white"));
     int vertex_idx = 0;
@@ -564,7 +566,8 @@ void add_skeleton_tree (iSector* where, csVector3 const& pos, int depth,
     state->DecRef ();
 
     iMeshWrapper* spr = add_meshobj (skelname, "__skeltree__",
-				     where, pos-csVector3 (0, Sys->cfg_body_height, 0), 1);
+	     where,
+	     pos-csVector3 (0, Sys->cfg_body_height, 0), 1);
     AnimSkelTree* cb = new AnimSkelTree ();
     spr->SetDrawCallback (cb);
     cb->DecRef ();
@@ -764,7 +767,8 @@ bool AnimSkelGhost::BeforeDrawing (iMeshWrapper* spr, iRenderView* /*rview*/)
   iMeshObject* obj = spr->GetMeshObject ();
   iSprite3DState* state = SCF_QUERY_INTERFACE (obj, iSprite3DState);
   iSkeletonState* sk_state = state->GetSkeletonState ();
-  iSkeletonLimbState* isk_limb = SCF_QUERY_INTERFACE (sk_state, iSkeletonLimbState);
+  iSkeletonLimbState* isk_limb = SCF_QUERY_INTERFACE (sk_state,
+  	iSkeletonLimbState);
   animate_skeleton_ghost (isk_limb);
   isk_limb->DecRef ();
   state->DecRef ();
@@ -777,12 +781,21 @@ void add_skeleton_ghost (iSector* where, csVector3 const& pos, int maxdepth,
 	int width)
 {
   const char *skelname = "__skelghost__\n";
-  iMeshFactoryWrapper* tmpl = Sys->Engine->CreateMeshFactory ("crystalspace.mesh.object.sprite.3d", 
-							      skelname);
-  if (tmpl)
+  iMeshFactoryWrapper* tmpl;
+  tmpl = Sys->Engine->GetMeshFactories ()->FindByName (skelname);
+  if (!tmpl)
   {
+    tmpl = Sys->Engine->CreateMeshFactory (
+    	"crystalspace.mesh.object.sprite.3d", skelname);
+    if (!tmpl)
+    {
+      Sys->Report (CS_REPORTER_SEVERITY_WARNING,
+      	"Could not load the sprite 3d plugin!");
+      return;
+    }
     iMeshObjectFactory* fact = tmpl->GetMeshObjectFactory ();
-    iSprite3DFactoryState* fstate = SCF_QUERY_INTERFACE (fact, iSprite3DFactoryState);
+    iSprite3DFactoryState* fstate = SCF_QUERY_INTERFACE (fact,
+    	iSprite3DFactoryState);
     fstate->SetMaterialWrapper (Sys->Engine->GetMaterialList ()->
 			       FindByName ("green"));
     int vertex_idx = 0;
@@ -793,32 +806,27 @@ void add_skeleton_ghost (iSector* where, csVector3 const& pos, int maxdepth,
     act->AddFrame (fr, 100);
     create_skelghost (fstate, fr, vertex_idx, maxdepth, width);
     fstate->DecRef ();
-
-    iMeshWrapper* spr = add_meshobj (skelname, "__skelghost__", where, pos, 1);
-    iMeshObject* obj = spr->GetMeshObject ();
-    iSprite3DState* state = SCF_QUERY_INTERFACE (obj, iSprite3DState);
-    state->SetMixMode (CS_FX_SETALPHA (0.75));
-    iPolygonMesh* mesh = SCF_QUERY_INTERFACE (obj, iPolygonMesh);
-    iObject* sprobj = SCF_QUERY_INTERFACE (spr, iObject);
-    (new csColliderWrapper (sprobj, Sys->collide_system, mesh))->DecRef ();
-    GhostSpriteInfo* gh_info = new GhostSpriteInfo ();
-    iObject* iobj = SCF_QUERY_INTERFACE (gh_info, iObject);
-    sprobj->ObjAdd (iobj);
-    gh_info->dir = 1;
-    AnimSkelGhost* cb = new AnimSkelGhost ();
-    spr->SetDrawCallback (cb);
-    cb->DecRef ();
-    iobj->DecRef ();
-    sprobj->DecRef ();
-    mesh->DecRef ();
-    state->DecRef ();
     tmpl->DecRef ();
   }
-  else
-  {
-    Sys->Report (CS_REPORTER_SEVERITY_WARNING, "Could not load the sprite 3d plugin!");
-    return;
-  }
+
+  iMeshWrapper* spr = add_meshobj (skelname, "__skelghost__", where, pos, 1);
+  iMeshObject* obj = spr->GetMeshObject ();
+  iSprite3DState* state = SCF_QUERY_INTERFACE (obj, iSprite3DState);
+  state->SetMixMode (CS_FX_SETALPHA (0.75));
+  iPolygonMesh* mesh = SCF_QUERY_INTERFACE (obj, iPolygonMesh);
+  iObject* sprobj = SCF_QUERY_INTERFACE (spr, iObject);
+  (new csColliderWrapper (sprobj, Sys->collide_system, mesh))->DecRef ();
+  GhostSpriteInfo* gh_info = new GhostSpriteInfo ();
+  iObject* iobj = SCF_QUERY_INTERFACE (gh_info, iObject);
+  sprobj->ObjAdd (iobj);
+  gh_info->dir = 1;
+  AnimSkelGhost* cb = new AnimSkelGhost ();
+  spr->SetDrawCallback (cb);
+  cb->DecRef ();
+  iobj->DecRef ();
+  sprobj->DecRef ();
+  mesh->DecRef ();
+  state->DecRef ();
 }
 
 #define MAXSECTORSOCCUPIED  20

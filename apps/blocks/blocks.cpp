@@ -36,6 +36,7 @@
 #include "csgeom/textrans.h"
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
+#include "cstool/csfxscr.h"
 #include "csutil/cmdhelp.h"
 
 #include "iutil/vfs.h"
@@ -1847,14 +1848,6 @@ void Blocks::HandleMovement (csTicks elapsed_time)
     float elapsed_fog = elapsed*.8;
     if (elapsed_fog > player1->fog_density) elapsed_fog = player1->fog_density;
     player1->fog_density -= elapsed_fog;
-    iSector* s;
-    if (screen == SCREEN_STARTUP) s = demo_room;
-    else s = room;
-    if (player1->fog_density)
-      s->SetFog (player1->fog_density, csColor (0, 0, 0));
-    else
-      s->DisableFog ();
-    return;
   }
 
   if (screen == SCREEN_STARTUP)
@@ -2378,7 +2371,6 @@ void Blocks::StartDemo ()
   view->SetRectangle (0, 0, Sys->FrameWidth, Sys->FrameHeight);
 
   player1->fog_density = 1;
-  demo_room->SetFog (player1->fog_density, csColor (0, 0, 0));
 
   InitMainMenu ();
   menu_hor_old_menu = NULL;
@@ -2430,7 +2422,6 @@ void Blocks::StartNewGame ()
   view->SetRectangle (0, 0, Sys->FrameWidth, Sys->FrameHeight);
 
   player1->fog_density = 1;
-  room->SetFog (player1->fog_density, csColor (0, 0, 0));
 }
 
 void Blocks::removePlanesVisual (States* player)
@@ -2655,8 +2646,8 @@ void Blocks::SetupFrame ()
     if (!Gfx3D->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
       return;
     view->Draw ();
-    Gfx3D->FinishDraw ();
-    Gfx3D->Print (NULL);
+    if (player1->fog_density > 0)
+      csfxFadeOut (Gfx3D, player1->fog_density);
     return;
   }
 
@@ -2665,8 +2656,6 @@ void Blocks::SetupFrame ()
     if (initscreen) StartKeyConfig ();
     if (!Gfx3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
     keyconf_menu->Draw (elapsed_time);
-    Gfx3D->FinishDraw ();
-    Gfx3D->Print (NULL);
     return;
   }
 
@@ -2700,8 +2689,6 @@ void Blocks::SetupFrame ()
     if (!scores)
       Gfx2D->Write (font, 10, Sys->FrameHeight/2, white, black,
       	"This screen intentionally left blank");
-    Gfx3D->FinishDraw ();
-    Gfx3D->Print (NULL);
     return;
   }
 
@@ -2757,6 +2744,8 @@ void Blocks::SetupFrame ()
       Gfx2D->Write (font, x+10, y+24+2, white, black, name);
     }
   }
+  if (player1->fog_density > 0)
+    csfxFadeOut (Gfx3D, player1->fog_density);
 }
 
 void Blocks::FinishFrame ()
