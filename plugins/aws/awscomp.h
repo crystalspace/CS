@@ -132,6 +132,9 @@ public:
 
     /// Mirrors the GetNextItem from the DLinkList class
     virtual awsComponent *GetNextChild();
+
+    /// Checks to see if we're done iterating through children - you must ALWAYS check this at the bottom of a loop!
+    virtual bool          FinishedChildren();
     
     /// Returns true if this component has children
     virtual bool HasChildren()

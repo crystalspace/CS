@@ -6,7 +6,7 @@
 
 #include <stdio.h>
 
-const bool AWS_COMP_DEBUG=false;
+const bool AWS_COMP_DEBUG=true;
 
 
 awsComponent::awsComponent():wmgr(NULL),children(NULL)
@@ -53,7 +53,7 @@ awsComponent::Setup(iAws *_wmgr, awsComponentNode *settings)
   wmgr = _wmgr;
   
   if (AWS_COMP_DEBUG)
-    printf("aws-debug: setting up awsComponent.\n");
+    printf("aws-debug: setting up awsComponent (%s).\n", Type());
   
   if (settings) 
   {
@@ -171,6 +171,16 @@ awsComponent::GetNextChild()
     return (awsComponent *)children->GetNextItem();
 
   return NULL;
+}
+
+bool
+awsComponent::FinishedChildren()
+{
+  if (children->GetCurrentItem() == children->PeekFirstItem())
+    return true;
+
+  else
+    return false;
 }
 
 

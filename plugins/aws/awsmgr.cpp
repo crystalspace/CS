@@ -9,10 +9,15 @@
 #include "iutil/objreg.h"
 #include "iutil/event.h"
 #include "ivaria/reporter.h"
+
+#include "awscmdbt.h"
+
+
 #include <stdio.h>
 
 const int proctex_width=512;
 const int proctex_height=512; 
+const int DEBUG_MANAGER = false;
 
 awsManager::awsComponentFactoryMap::~awsComponentFactoryMap ()
 {
@@ -49,9 +54,8 @@ bool
 awsManager::Initialize(iObjectRegistry *object_reg)
 {   
   awsManager::object_reg = object_reg;
-//   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
     
-  printf("aws-debug: getting preference manager.\n");  
+  if (DEBUG_MANAGER) printf("aws-debug: getting preference manager.\n");  
   iAwsPrefs *prefs =  SCF_CREATE_INSTANCE ("crystalspace.window.preferencemanager", iAwsPrefs);
   
   if (!prefs)
@@ -62,19 +66,25 @@ awsManager::Initialize(iObjectRegistry *object_reg)
   }
   else
   {
-    printf("aws-debug: initing and setting the internal preference manager.\n");
+    if (DEBUG_MANAGER) printf("aws-debug: initing and setting the internal preference manager.\n");
     
     prefs->Setup(object_reg);
 
-    printf("aws-debug: inited pref manager, now setting.\n");
+    if (DEBUG_MANAGER) printf("aws-debug: inited pref manager, now setting.\n");
 
     SetPrefMgr(prefs);
 
-    printf("aws-debug: decRefing the prefs manager.\n");
+    if (DEBUG_MANAGER) printf("aws-debug: decRefing the prefs manager.\n");
     prefs->DecRef();
   }
-      
-  printf("aws-debug: left aws initialize.\n");
+
+  if (DEBUG_MANAGER) printf("aws-debug: registering common components.\n");
+
+  RegisterCommonComponents();
+  
+  if (DEBUG_MANAGER) printf("aws-debug: left aws initialize.\n");
+ 
+
   return true;
 }
 
@@ -91,6 +101,7 @@ awsManager::SetPrefMgr(iAwsPrefs *pmgr)
    {
       prefmgr->DecRef();
       pmgr->IncRef();
+
       prefmgr=pmgr;
    }
    else if (pmgr)
@@ -251,7 +262,9 @@ awsManager::UpdateStore()
    // Get all frames into the store.
    while(curwin)
    {
-      updatestore.Include(curwin->Frame());
+      csRect r(curwin->Frame());
+      printf("\t%d,%d,%d,%d\n", r.xmin, r.ymin, r.xmax, r.ymax);
+      updatestore.Include(r);
       curwin = curwin->WindowBelow();
    }
 
@@ -296,9 +309,11 @@ awsManager::Print(iGraphics3D *g3d)
 void       
 awsManager::Redraw()
 {
-   static unsigned redraw_tag = 0;
+   static unsigned redraw_tag = 1;
    static csRect bounds(0,0,proctex_width,proctex_height);
    int    erasefill = GetPrefMgr()->GetColor(AC_TRANSPARENT);
+   int    i;
+        
 
    redraw_tag++;
    
@@ -340,12 +355,16 @@ awsManager::Redraw()
    curwin=oldwin;
    while(curwin)
    {
-      if (curwin->RedrawTag() == redraw_tag) 
-      {
-        int i;
-          
+      printf("aws-debug: consider window: %p\n", curwin); 
+      printf("aws-debug: redraw tag: %d/%d\n", curwin->RedrawTag(), redraw_tag);
+
+      if (redraw_tag == curwin->RedrawTag()) 
+      {          
+        printf("aws-debug: window is dirty, redraw.\n");
         for(i=0; i<dirty.Count(); ++i)
         {
+          printf("aws-debug: consider rect:%d of %d\n", i, dirty.Count()); 
+
           csRect dr(dirty.RectAt(i));
 
           // Find out if we need to erase.
@@ -358,9 +377,11 @@ awsManager::Redraw()
               ptG2D->DrawBox(dr.xmin-1, dr.ymin-1, dr.xmax+1, dr.ymax+1, erasefill);
           }*/
           
+          
           RedrawWindow(curwin, dr);
         }
       }
+
       curwin=curwin->WindowAbove();
    }
   
@@ -378,9 +399,7 @@ awsManager::Redraw()
    
    // This only needs to happen when drawing to the default context.
    if (UsingDefaultContext)
-   {
-     int i;
-
+   {     
      ptG3D->FinishDraw ();
      ptG3D->Print(&bounds);
 
@@ -399,6 +418,8 @@ awsManager::Redraw()
 void
 awsManager::RedrawWindow(awsWindow *win, csRect &dirtyarea)
 {
+     printf("aws-debug: start drawing window.\n");
+
      /// See if this window intersects with this dirty area
      if (!dirtyarea.Intersects(win->Frame()))
        return;
@@ -415,6 +436,8 @@ awsManager::RedrawWindow(awsWindow *win, csRect &dirtyarea)
 
      /// Now draw all of it's children
      RecursiveDrawChildren(win, dirtyarea);
+
+     printf("aws-debug: finished drawing window.\n");
 }
 
 void
@@ -422,8 +445,14 @@ awsManager::RecursiveDrawChildren(awsComponent *cmp, csRect &dirtyarea)
 {
    awsComponent *child = cmp->GetFirstChild();
 
-   while (child) 
+   if (!child) return;
+
+   printf("aws-debug: start drawing children.\n");
+
+   do 
    {
+     printf("aws-debug: entered draw children loop for %p.\n", child);
+
      // Check to see if this component even needs redrawing.
      if (!dirtyarea.Intersects(child->Frame()))
        continue;                                            
@@ -439,8 +468,10 @@ awsManager::RecursiveDrawChildren(awsComponent *cmp, csRect &dirtyarea)
      if (child->HasChildren())
        RecursiveDrawChildren(child, dirtyarea);
 
-    child = cmp->GetNextChild();
-   }
+     child = cmp->GetNextChild();
+   } while (!cmp->FinishedChildren()); 
+
+   printf("aws-debug: finished drawing children.\n");
 
 }
 
@@ -483,7 +514,7 @@ awsManager::CreateChildrenFromDef(iAws *wmgr, awsComponent *parent, awsComponent
   {
     awsKey *key = settings->GetItemAt(i); 
     
-    if (key->Type() == KEY_COMPONENT)
+    if (key != NULL && key->Type() == KEY_COMPONENT)
     {
       awsComponentNode *comp_node = (awsComponentNode *)key;
       awsComponentFactory *factory = FindComponentFactory(comp_node->ComponentTypeName()->GetData());
@@ -656,6 +687,16 @@ awsManager::RecursiveBroadcastToChildren(awsComponent *cmp, iEvent &Event)
     } // End while
 
   return false;
+
+}
+
+void 
+awsManager::RegisterCommonComponents()
+{
+  // Components register themselves into the window manager.  Just creating a factory
+  //  takes care of all the implementation details.  There's nothing else you need to do.
+
+  new awsCmdButtonFactory(this);
 
 }
     

@@ -35,6 +35,9 @@ class awsCmdButton : public awsComponent
 
    /// Flags for frame style.
    int frame_style;
+
+   /// Alpha level for this component
+   int alpha_level;
    
 public:
     awsCmdButton();

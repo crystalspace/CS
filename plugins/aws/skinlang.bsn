@@ -37,8 +37,14 @@ extern int awslex(YYSTYPE *awslval);
 extern int awserror(char *s);
 extern int awslineno;
 
-/// This is locally global variable that holds  
-static awsKeyContainer kcont;
+/// This is locally global variable that holds keys for a little while 
+static awsKeyContainer kcont[32];
+/// This is the locally global variable that holds window keys.
+static awsKeyContainer wkcont;
+/// This is the locally global variable that holds skin keys.
+static awsKeyContainer skcont;
+/// This is the level we're on.
+static int			   klevel=0;
 
 /// This is the parser parameter
 #define YYPARSE_PARAM prefcont
@@ -56,7 +62,7 @@ static awsKeyContainer kcont;
 %token        TOKEN_IS
 
 %type  <val>  exp constant_item
-%type  <key>  skin_item window_item component_item
+%type  <key>  skin_item window_item 
  
 
 %right '='
@@ -75,35 +81,48 @@ input:          /* empty */
 line:            '\n'
                | skin                   { }
                | window                 { }
-               | error '}'             { yyerrok;      }
+               | error '}'              { yyerrok;      }
 ;
 
 /*************************************
   Definitions for parsing a window def
  *************************************/
- 
-component_item: TOKEN_ATTR ':' TOKEN_STR                                        { $$ = new awsStringKey(new scfString($1), new scfString($3));          }
-			  | TOKEN_ATTR ':' exp                                              { $$ = new awsIntKey(new scfString($1), $3);                            }
-              | TOKEN_ATTR ':' '(' exp ',' exp ')' '-' '(' exp ',' exp ')'      { $$ = new awsRectKey(new scfString($1), csRect($4, $6, $10, $12));     }            
-			  | TOKEN_COMPONENT TOKEN_STR TOKEN_IS TOKEN_STR '{' component_item_list '}' { awsComponentNode *cn = new awsComponentNode(new scfString($2), new scfString($4)); ((awsKeyContainer*)cn)->Consume(&kcont); $$=cn; }
+
+component_item: TOKEN_ATTR ':' TOKEN_STR                                        { kcont[klevel].Add(new awsStringKey(new scfString($1), new scfString($3)));         }
+			  | TOKEN_ATTR ':' exp                                              { kcont[klevel].Add(new awsIntKey(new scfString($1), $3));                           }
+              | TOKEN_ATTR ':' '(' exp ',' exp ')' '-' '(' exp ',' exp ')'      { kcont[klevel].Add(new awsRectKey(new scfString($1), csRect($4, $6, $10, $12)));    }            
+			  | TOKEN_COMPONENT TOKEN_STR TOKEN_IS TOKEN_STR 
+					 '{'														{ ++klevel; /* go down a level (mid-action rule) */ }
+					  component_item_list '}'									{ awsComponentNode *cn = new awsComponentNode(new scfString($2), new scfString($4));
+																				  ((awsKeyContainer*)cn)->Consume(&(kcont[klevel])); 
+																				  --klevel;  /* go up a level in recursion */
+																				  kcont[klevel].Add(cn); 
+																				}
 ;
 
-component_item_list:  component_item                                            { kcont.Add($1); }
-              | component_item_list component_item                              { kcont.Add($2); }
+component_item_list:  component_item                                            { /*empty*/ }
+              | component_item_list component_item                              { /*empty*/ }
 ;
 
  
 window_item:    TOKEN_ATTR ':' TOKEN_STR                                        { $$ = new awsStringKey(new scfString($1), new scfString($3));          }  
 			  | TOKEN_ATTR ':' exp                                              { $$ = new awsIntKey(new scfString($1), $3);                            }
               | TOKEN_ATTR ':' '(' exp ',' exp ')' '-' '(' exp ',' exp ')'      { $$ = new awsRectKey(new scfString($1), csRect($4, $6, $10, $12));     }
-              | TOKEN_COMPONENT TOKEN_STR TOKEN_IS TOKEN_STR '{' component_item_list '}' { awsComponentNode *cn = new awsComponentNode(new scfString($2), new scfString($4)); ((awsKeyContainer*)cn)->Consume(&kcont); $$=cn; }
+              | TOKEN_COMPONENT TOKEN_STR TOKEN_IS TOKEN_STR '{' component_item_list '}' { awsComponentNode *cn = new awsComponentNode(new scfString($2), new scfString($4)); 
+																						   ((awsKeyContainer*)cn)->Consume(&(kcont[klevel])); 
+																						   $$=cn; 
+																						 }
 ;
               
-window_item_list:  window_item                                                  { kcont.Add($1); }
-              | window_item_list window_item                                    { kcont.Add($2); }
+window_item_list:  window_item                                                  { wkcont.Add($1); }
+              | window_item_list window_item                                    { wkcont.Add($2); }
 ;
 
-window:        TOKEN_WINDOW TOKEN_STR  '{' window_item_list '}' { awsComponentNode *win = new awsComponentNode(new scfString($2), new scfString("Default")); ((awsKeyContainer*)win)->Consume(&kcont); ((awsPrefManager *)prefcont)->AddWindowDef(win); }
+window:        TOKEN_WINDOW TOKEN_STR  '{' window_item_list '}'					{ 
+																				  awsComponentNode *win = new awsComponentNode(new scfString($2), new scfString("Default"));
+																				  ((awsKeyContainer*)win)->Consume(&wkcont); 
+																				  ((awsPrefManager *)prefcont)->AddWindowDef(win); 
+																				}
 ;                                     
 
 
@@ -115,11 +134,11 @@ skin_item:       TOKEN_ATTR ':' TOKEN_STR             { $$ = new awsStringKey(ne
 	       | TOKEN_ATTR ':' exp ',' exp ',' exp       { $$ = new awsRGBKey(new scfString($1), $3, $5, $7);           }
 ;
 
-skin_item_list:  skin_item                            { kcont.Add($1); }
-               | skin_item_list skin_item             { kcont.Add($2); }
+skin_item_list:  skin_item                            { skcont.Add($1); }
+               | skin_item_list skin_item             { skcont.Add($2); }
 ; 
 
-skin:            TOKEN_SKIN TOKEN_STR '{' skin_item_list '}'    { awsSkinNode *skin = new awsSkinNode(new scfString($2)); ((awsKeyContainer*)skin)->Consume(&kcont); ((awsPrefManager *)prefcont)->AddSkinDef(skin); }
+skin:            TOKEN_SKIN TOKEN_STR '{' skin_item_list '}'    { awsSkinNode *skin = new awsSkinNode(new scfString($2)); ((awsKeyContainer*)skin)->Consume(&skcont); ((awsPrefManager *)prefcont)->AddSkinDef(skin); }
 ;
 
 /*************************************
@@ -158,3 +177,4 @@ awserror(char *s)
  printf("  aws skin definition parse error(%i): %s\n", awslineno, s);
  return 0;
 }
+

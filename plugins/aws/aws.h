@@ -201,6 +201,9 @@ protected:
 
     /// Checks the updatestore_dirty flag and refreshes the store accordingly.
     void UpdateStore();
+
+    /// Registers all the "known" components.
+    void RegisterCommonComponents();
     
 public:
     /// Instantiates a window based on a window definition.

@@ -46,7 +46,7 @@ awsKeyContainer::Consume(awsKeyContainer *c)
      if (aws_debug)
        printf("aws-debug: Consuming %d items (%d items currently).\n", c->children.Length(), children.Length());
      
-	 int i;
+     int i;
      for(i=0; i<c->children.Length(); ++i) 
      {
         void *p = c->children[i];
