@@ -18,7 +18,7 @@
 */
 // For timing info.
 #include "sysdef.h"
-#ifdef WIN32
+#ifdef OS_WIN32
 #include <time.h>
 #elif OS_MACOS
 #include <time.h>
