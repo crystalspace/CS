@@ -18,9 +18,10 @@
 
 #include "cssysdef.h"
 #include "csgeom/frustum.h"
-#include "csengine/lppool.h"
-#include "csengine/polygon.h"
-#include "csengine/curve.h"
+#include "lppool.h"
+#include "polygon.h"
+#include "curve.h"
+#include "iengine/shadows.h"
 
 csLightPatch::csLightPatch ()
 {
@@ -44,7 +45,7 @@ void csLightPatch::RemovePatch ()
 {
   if (polygon) polygon->UnlinkLightpatch (this);
   if (curve) curve->UnlinkLightPatch (this);
-  shadows.DeleteShadows ();
+  shadows->DeleteShadows ();
   if (light_frustum)
   {
     light_frustum->DecRef ();
@@ -62,5 +63,10 @@ void csLightPatch::Initialize (int n)
   }
 
   num_vertices = n;
+}
+
+void csLightPatch::SetShadowBlock (iShadowBlock* bl)
+{
+  shadows = bl;
 }
 

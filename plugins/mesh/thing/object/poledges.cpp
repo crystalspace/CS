@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "csengine/poledges.h"
-#include "csengine/polygon.h"
+#include "poledges.h"
+#include "polygon.h"
 
 //---------------------------------------------------------------------------
 csPolEdgeIterator::csPolEdgeIterator (csHashMap &edges, int i1, int i2)

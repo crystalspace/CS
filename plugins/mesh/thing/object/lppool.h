@@ -20,9 +20,12 @@
 #define __CS_LPPOOL_H__
 
 #include "csutil/objpool.h"
-#include "csengine/light.h"
 
 class csLightPatchPool;
+class csPolygon3D;
+class csCurve;
+struct iDynLight;
+struct iShadowBlock;
 
 /**
  * A light patch. This is a 3D polygon which fits on a world level 3D
@@ -53,10 +56,10 @@ private:
   csCurve* curve;
 
   /// Light that this light patch originates from.
-  csDynLight* light;
+  iDynLight* light;
 
   /// List of shadow frustums.
-  csShadowBlock shadows;
+  csRef<iShadowBlock> shadows;
 
   /// frustum of where the visible light hits (for use with curves)
   csFrustum *light_frustum;
@@ -97,10 +100,12 @@ public:
   /**
    * Get the light that this light patch belongs too.
    */
-  csDynLight* GetLight () { return light; }
+  iDynLight* GetLight () { return light; }
 
+  /// Set the shadow block.
+  void SetShadowBlock (iShadowBlock* bl);
   /// Get a reference to the shadow list.
-  csShadowBlock& GetShadowBlock () { return shadows; }
+  iShadowBlock* GetShadowBlock () { return shadows; }
 
   /// Get the number of vertices in this light patch.
   int GetVertexCount () { return num_vertices; }
@@ -125,7 +130,7 @@ public:
   /// Set curve.
   void SetPolyCurve (csCurve* c) { curve = c; polygon = NULL; }
   /// Set light.
-  void SetLight (csDynLight* l) { light = l; }
+  void SetLight (iDynLight* l) { light = l; }
   /// Add to list.
   void AddList (csLightPatch*& first)
   {
@@ -162,7 +167,8 @@ CS_DECLARE_OBJECT_POOL (csLightPatchPoolHelper, csLightPatch);
  * If needed it will allocate one for you but ideally it can
  * give you one which was allocated earlier.
  */
-class csLightPatchPool : public csLightPatchPoolHelper {
+class csLightPatchPool : public csLightPatchPoolHelper
+{
 public:
   void Free (void* o)
   {
@@ -173,3 +179,4 @@ public:
 };
 
 #endif // __CS_LPPOOL_H__
+

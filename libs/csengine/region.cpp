@@ -29,6 +29,7 @@
 #include "iengine/material.h"
 #include "iengine/engine.h"
 #include "iengine/mesh.h"
+#include "imesh/thing/thing.h"
 #include "imesh/thing/curve.h"
 #include "imesh/thing/ptextype.h"
 #include "imesh/thing/polytmap.h"
@@ -44,7 +45,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csRegion::Region)
   SCF_IMPLEMENTS_INTERFACE(iRegion)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csRegion::csRegion (iEngine *e) :
+csRegion::csRegion (csEngine *e) :
   csObject()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiRegion);

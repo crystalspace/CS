@@ -502,9 +502,9 @@ public:
     sq_radius = rad*rad;
   }
   /// Get the radius.
-  virtual float GetRadius () { return radius; }
+  virtual float GetRadius () const { return radius; }
   /// Get the squared radius.
-  float GetSquaredRadius () { return sq_radius; }
+  virtual float GetSquaredRadius () const { return sq_radius; }
   /// Enable shadowing for things (off by default). @@@SUSPECT!!!
   void EnableThingShadows (bool e) { things_shadow = e; }
   /// Return true if shadowing for things is enabled.
@@ -541,6 +541,10 @@ public:
   virtual iFrustumViewUserdata* GetUserdata ()
   {
     return userdata;
+  }
+  virtual csPtr<iShadowBlock> CreateShadowBlock ()
+  {
+    return csPtr<iShadowBlock> (new csShadowBlock ());
   }
   SCF_DECLARE_IBASE;
 };

@@ -28,7 +28,6 @@ class csPolyTexture;
 class csThing;
 class csPolygon3D;
 class csCurve;
-class csLight;
 class csDelayedLightingInfo;
 class csObject;
 struct iLight;
@@ -144,6 +143,8 @@ public:
   static int lightcell_size;
   /// Log base 2 of lightcell_size
   static int lightcell_shift;
+  /// Default.
+  static int default_lightmap_cell_size;
 
   /// Return the width of a lightmap given a texture size.
   static int CalcLightMapWidth (int w)
@@ -190,7 +191,7 @@ public:
   /**
    * Create a ShadowMap for this LightMap.
    */
-  csShadowMap* NewShadowMap (csLight* light, int w, int h);
+  csShadowMap* NewShadowMap (iLight* light, int w, int h);
 
   /**
    * Allocate the static csRGBMap.
@@ -200,7 +201,7 @@ public:
   /**
    * Find a ShadowMap for a specific pseudo-dynamic light.
    */
-  csShadowMap* FindShadowMap (csLight* light);
+  csShadowMap* FindShadowMap (iLight* light);
 
   /**
    * Delete a ShadowMap. NOTE!!! This function only works

@@ -30,13 +30,13 @@ struct iMaterialHandle;
 struct iPolygon3D;
 struct iLight;
 struct csRGBpixel;
-struct csLightingPolyTexQueue;
+struct iFrustumView;
+class csLightingPolyTexQueue;
 class csPolygon3D;
 class csPolyTexture;
 class csLightMap;
 class csLightPatch;
 class csFrustumContext;
-class csFrustumView;
 class csLight;
 class csMatrix3;
 class csVector3;
@@ -175,7 +175,7 @@ public:
 	float shf_u, float shf_v,
 	float mul_u, float mul_v,
 	const csMatrix3& m_t2w, const csVector3& v_t2w,
-	csLight* light, const csVector3& lightpos,
+	iLight* light, const csVector3& lightpos,
 	const csColor& lightcolor,
 	csPolygon3D* poly,
 	float cosfact);
@@ -199,7 +199,7 @@ public:
 	float shf_u, float shf_v,
 	float mul_u, float mul_v,
 	const csMatrix3& m_t2w, const csVector3& v_t2w,
-	csLight* light, const csVector3& lightpos,
+	iLight* light, const csVector3& lightpos,
 	csPolygon3D* poly,
 	float cosfact);
   /**
@@ -351,7 +351,7 @@ public:
    * case we should use 'subpoly' to see where the shadow must go and
    * not the base polygon which this csPolyTexture points too.
    */
-  void FillLightMap (csFrustumView* lview, csLightingPolyTexQueue* lptq,
+  void FillLightMap (iFrustumView* lview, csLightingPolyTexQueue* lptq,
   	bool vis, csPolygon3D* subpoly);
 
   /**

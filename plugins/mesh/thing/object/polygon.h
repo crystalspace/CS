@@ -25,13 +25,13 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/polyidx.h"
-#include "csengine/polyplan.h"
-#include "csengine/portal.h"
+#include "polyplan.h"
+#include "portal.h"
+#include "thing.h"
+#include "polytext.h"
 #include "iengine/sector.h"
 #include "imesh/thing/ptextype.h"
-#include "csengine/thing.h"
 #include "imesh/thing/polygon.h"
-#include "csengine/polytext.h"
 
 class csFrustumView;
 class csFrustumContext;
@@ -536,7 +536,7 @@ private:
    * through callbacks and csPolyTexture::ProcessDelayedLightmaps ().
    * Called only for lightmapped polygons with shared lightmap.
    */
-  void CalculateDelayedLighting (csFrustumView *lview, csFrustumContext* ctxt);
+  void CalculateDelayedLighting (iFrustumView *lview, csFrustumContext* ctxt);
 
 public:
   /// Set of flags
@@ -1019,7 +1019,7 @@ public:
    * The "frustum" parameter defines the original light frustum (not the
    * one bounded by this polygon as given by "lview").
    */
-  void FillLightMapDynamic (csFrustumView& lview);
+  void FillLightMapDynamic (iFrustumView* lview);
 
   /**
    * Fill the lightmap of this polygon according to the given light and
@@ -1036,7 +1036,7 @@ public:
    * If 'vis' == false this means that the lighting system already discovered
    * that the polygon is totally shadowed.
    */
-  void FillLightMapStatic (csFrustumView* lview, csLightingPolyTexQueue* lptq,
+  void FillLightMapStatic (iFrustumView* lview, csLightingPolyTexQueue* lptq,
   	bool vis);
 
   /**
@@ -1064,12 +1064,12 @@ public:
    * This function will also discard all shadow frustums which start at
    * the same plane as the given plane.
    */
-  bool MarkRelevantShadowFrustums (csFrustumView& lview, csPlane3& plane);
+  bool MarkRelevantShadowFrustums (iFrustumView* lview, csPlane3& plane);
 
   /**
    * Same as above but takes polygon plane as 'plane' argument.
    */
-  bool MarkRelevantShadowFrustums (csFrustumView& lview);
+  bool MarkRelevantShadowFrustums (iFrustumView* lview);
 
   /**
    * Check visibility of this polygon with the given csFrustumView
@@ -1077,7 +1077,7 @@ public:
    * This function will also traverse through a portal if so needed.
    * This version is for dynamic lighting.
    */
-  void CalculateLightingDynamic (csFrustumView* lview);
+  void CalculateLightingDynamic (iFrustumView* lview);
 
   /**
    * Check visibility of this polygon with the given csFrustumView
@@ -1087,7 +1087,7 @@ public:
    * that the polygon is totally shadowed.
    * This version is for static lighting.
    */
-  void CalculateLightingStatic (csFrustumView* lview,
+  void CalculateLightingStatic (iFrustumView* lview,
   	csLightingPolyTexQueue* lptq, bool vis);
 
   /**

@@ -19,13 +19,12 @@
 #ifndef __CS_RADIOSTY_H__
 #define __CS_RADIOSTY_H__
 
+#if 0
+// TOTALLY DISABLED FOR NOW!
+
 #include "csutil/csobject.h"
 #include "csgeom/vector3.h"
 #include "csutil/cscolor.h"
-#include "csengine/polygon.h"
-#include "csengine/curve.h"
-#include "csengine/polytext.h"
-#include "csengine/lghtmap.h"
 #include "csengine/lview.h"
 
 class csEngine;
@@ -652,5 +651,7 @@ public:
   void RemoveAmbient();
 
 };
+
+#endif
 
 #endif // __CS_RADIOSTY_H__

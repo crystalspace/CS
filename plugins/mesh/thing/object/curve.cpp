@@ -19,16 +19,21 @@
 #include "cssysdef.h"
 #include "qint.h"
 #include "qsqrt.h"
-#include "csengine/bezier.h"
-#include "csengine/curve.h"
-#include "csengine/polytext.h"
-#include "csengine/polygon.h"
-#include "csengine/thing.h"
-#include "csengine/lppool.h"
+#include "bezier.h"
+#include "curve.h"
+#include "polytext.h"
+#include "polygon.h"
+#include "thing.h"
+#include "lppool.h"
+#include "csgeom/frustum.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/vbufmgr.h"
 #include "iengine/light.h"
 #include "iengine/engine.h"
+#include "iengine/dynlight.h"
+#include "iengine/statlght.h"
+#include "iengine/shadows.h"
+#include "iengine/camera.h"
 
 
 struct csCoverageMatrix
@@ -232,7 +237,7 @@ void csCurve::DynamicLightDisconnect (iDynLight* dynlight)
   while (lp)
   {
     csLightPatch* lpnext = lp->GetNext ();
-    if (&(lp->GetLight ()->scfiDynLight) == dynlight)
+    if (lp->GetLight () == dynlight)
       thing_type->lightpatch_pool->Free (lp);
     lp = lpnext;
   }
@@ -281,12 +286,12 @@ void csCurve::ShineDynLight (csLightPatch *lp)
   int lm_width = LightMap->GetWidth ();
   int lm_height = LightMap->GetHeight ();
 
-  csDynLight *light = lp->GetLight ();
+  iDynLight *light = lp->GetLight ();
 
-  iShadowIterator *shadow_it = lp->GetShadowBlock ().GetShadowIterator ();
+  iShadowIterator *shadow_it = lp->GetShadowBlock ()->GetShadowIterator ();
   bool has_shadows = shadow_it->HasNext ();
 
-  csColor color = light->GetColor () * CS_NORMAL_LIGHT_LEVEL;
+  csColor color = light->QueryLight ()->GetColor () * CS_NORMAL_LIGHT_LEVEL;
 
   csRGBpixel *map = LightMap->GetRealMap ().GetArray ();
   csVector3 &center = lp->GetLightFrustum ()->GetOrigin ();
@@ -336,7 +341,7 @@ void csCurve::ShineDynLight (csLightPatch *lp)
       }
 
       d = csSquaredDist::PointPoint (center, pos);
-      if (d >= light->GetSquaredRadius ()) continue;
+      if (d >= light->QueryLight ()->GetSquaredRadius ()) continue;
       d = qsqrt (d);
       normal = uv2Normal[uv];
 
@@ -348,7 +353,8 @@ void csCurve::ShineDynLight (csLightPatch *lp)
       else if (cosinus > 1)
         cosinus = 1;
 
-      float brightness = cosinus * light->GetBrightnessAtDistance (d);
+      float brightness = cosinus * light->QueryLight ()->
+      	GetBrightnessAtDistance (d);
 
       if (color.red > 0)
       {
@@ -418,7 +424,7 @@ void csCurve::SetObject2World (const csReversibleTransform *o2w)
   }
 }
 
-void csCurve::CalculateLightingStatic (csFrustumView *lview, bool vis)
+void csCurve::CalculateLightingStatic (iFrustumView *lview, bool vis)
 {
   if (!vis) return ;
 
@@ -437,10 +443,8 @@ void csCurve::CalculateLightingStatic (csFrustumView *lview, bool vis)
   int lm_width = LightMap->GetWidth ();
   int lm_height = LightMap->GetHeight ();
 
-  csLight* l = lpi->GetLight ()->GetPrivateObject ();
-  csStatLight *light = (csStatLight *)l;
-
-  bool dyn = light->IsDynamic ();
+  iLight* l = lpi->GetLight ();
+  bool dyn = l->IsDynamic ();
 
   csShadowMap *smap;
   uint8 *ShadowMap = 0;
@@ -451,10 +455,10 @@ void csCurve::CalculateLightingStatic (csFrustumView *lview, bool vis)
 
   if (dyn)
   {
-    smap = LightMap->FindShadowMap (light);
+    smap = LightMap->FindShadowMap (l);
     if (!smap)
     {
-      smap = LightMap->NewShadowMap (light, CURVE_LM_SIZE, CURVE_LM_SIZE);
+      smap = LightMap->NewShadowMap (l, CURVE_LM_SIZE, CURVE_LM_SIZE);
     }
 
     ShadowMap = smap->GetArray ();
@@ -473,7 +477,7 @@ void csCurve::CalculateLightingStatic (csFrustumView *lview, bool vis)
   csCoverageMatrix *shadow_matrix = new csCoverageMatrix (
       lm_width,
       lm_height);
-  GetCoverageMatrix (*lview, *shadow_matrix);
+  GetCoverageMatrix (lview, *shadow_matrix);
 
   csFrustumContext *ctxt = lview->GetFrustumContext ();
   csVector3 &center = ctxt->GetLightFrustum ()->GetOrigin ();
@@ -499,7 +503,7 @@ void csCurve::CalculateLightingStatic (csFrustumView *lview, bool vis)
       pos = uv2World[uv];
 
       d = csSquaredDist::PointPoint (center, pos);
-      if (d >= light->GetSquaredRadius ()) continue;
+      if (d >= l->GetSquaredRadius ()) continue;
       d = qsqrt (d);
 
       normal = uv2Normal[uv];
@@ -513,7 +517,7 @@ void csCurve::CalculateLightingStatic (csFrustumView *lview, bool vis)
       else if (cosinus > 1)
         cosinus = 1;
 
-      float brightness = cosinus * light->GetBrightnessAtDistance (d);
+      float brightness = cosinus * l->GetBrightnessAtDistance (d);
 
       if (dyn)
       {
@@ -550,7 +554,7 @@ void csCurve::CalculateLightingStatic (csFrustumView *lview, bool vis)
   delete shadow_matrix;
 }
 
-void csCurve::CalculateLightingDynamic (csFrustumView *lview)
+void csCurve::CalculateLightingDynamic (iFrustumView *lview)
 {
   iFrustumViewUserdata* fvud = lview->GetUserdata (); 
   iLightingProcessInfo* lpi = (iLightingProcessInfo*)fvud;
@@ -561,8 +565,8 @@ void csCurve::CalculateLightingDynamic (csFrustumView *lview)
 
   AddLightPatch (lp);
 
-  csLight* l = lpi->GetLight ()->GetPrivateObject ();
-  csDynLight *dl = (csDynLight *)l;
+  iLight* l = lpi->GetLight ();
+  csRef<iDynLight> dl = SCF_QUERY_INTERFACE (l, iDynLight);
   lp->SetLight (dl);
 
   // This light patch has exactly 4 vertices because it fits around our
@@ -570,12 +574,12 @@ void csCurve::CalculateLightingDynamic (csFrustumView *lview)
   lp->Initialize (4);
 
   // Copy shadow frustums.
-  lp->GetShadowBlock ().DeleteShadows ();
+  lp->GetShadowBlock ()->DeleteShadows ();
 
   // @@@: It would be nice if we could optimize earlier
   // to determine relevant shadow frustums in curves and use
   // AddRelevantShadows instead.
-  lp->GetShadowBlock ().AddAllShadows (
+  lp->GetShadowBlock ()->AddAllShadows (
       lview->GetFrustumContext ()->GetShadows ());
 
   lp->SetLightFrustum (
@@ -590,16 +594,14 @@ void csCurve::InitializeDefaultLighting ()
   LightMap = new csLightMap ();
 
   // Allocate space for the LightMap and initialize it to ambient color.
-  int r, g, b;
-  r = csLight::ambient_red;
-  g = csLight::ambient_green;
-  b = csLight::ambient_blue;
+  csColor ambient;
+  ParentThing->thing_type->engine->GetAmbientLight (ambient);
   LightMap->Alloc (
       CURVE_LM_SIZE * csLightMap::lightcell_size,
       CURVE_LM_SIZE * csLightMap::lightcell_size,
-      r,
-      g,
-      b);
+      	ambient.red * 255.0f,
+      	ambient.green * 255.0f,
+      	ambient.blue * 255.0f);
   LightmapUpToDate = false;
 }
 
@@ -609,16 +611,14 @@ bool csCurve::ReadFromCache (iFile* file)
   LightMap = new csLightMap ();
 
   // Allocate space for the LightMap and initialize it to ambient color.
-  int r, g, b;
-  r = csLight::ambient_red;
-  g = csLight::ambient_green;
-  b = csLight::ambient_blue;
+  csColor ambient;
+  ParentThing->thing_type->engine->GetAmbientLight (ambient);
   LightMap->Alloc (
       CURVE_LM_SIZE * csLightMap::lightcell_size,
       CURVE_LM_SIZE * csLightMap::lightcell_size,
-      r,
-      g,
-      b);
+      	ambient.red * 255.0f,
+      	ambient.green * 255.0f,
+      	ambient.blue * 255.0f);
 
   LightMap->ReadFromCache (
       file,
@@ -652,13 +652,13 @@ void csCurve::PrepareLighting ()
 }
 
 void csCurve::GetCoverageMatrix (
-  csFrustumView &lview,
+  iFrustumView* lview,
   csCoverageMatrix &cm) const
 {
   csVector3 pos;
   int uv, ui, vi;
 
-  csFrustumContext *ctxt = lview.GetFrustumContext ();
+  csFrustumContext *ctxt = lview->GetFrustumContext ();
   iShadowIterator *shadow_it = ctxt->GetShadows ()->GetShadowIterator ();
   bool has_shadows = shadow_it->HasNext ();
   csVector3 &center = ctxt->GetLightFrustum ()->GetOrigin ();

@@ -16,7 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "csengine/polyplan.h"
+#include "polyplan.h"
 #include "csgeom/textrans.h"
 #include "csgeom/transfrm.h"
 

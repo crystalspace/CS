@@ -25,6 +25,8 @@
 #include "imesh/object.h"
 #include "imesh/lighting.h"
 #include "imesh/thing/polygon.h"
+#include "imesh/thing/thing.h"
+#include "igeom/polymesh.h"
 #include "iengine/light.h"
 #include "iengine/statlght.h"
 #include "iengine/material.h"

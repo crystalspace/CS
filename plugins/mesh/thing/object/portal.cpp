@@ -16,16 +16,17 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "csengine/portal.h"
-#include "csengine/polygon.h"
-#include "csengine/pol2d.h"
-#include "csengine/sector.h"
+#include "portal.h"
+#include "polygon.h"
+#include "pol2d.h"
 #include "csutil/debug.h"
+#include "csgeom/frustum.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 #include "iengine/rview.h"
 #include "iengine/fview.h"
 #include "iengine/camera.h"
+#include "iengine/shadows.h"
 
 SCF_IMPLEMENT_IBASE_EXT(csPortal)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPortal)
@@ -70,7 +71,9 @@ csPortal::~csPortal ()
 iReferencedObject *csPortal::GetReferencedObject () const
 {
   if (!sector) return NULL;
-  return &(sector->GetPrivateObject ()->scfiReferencedObject);
+  csRef<iReferencedObject> ref = SCF_QUERY_INTERFACE (sector,
+  	iReferencedObject);
+  return ref;	// DecRef is ok.
 }
 
 void csPortal::SetReferencedObject (iReferencedObject *b)
@@ -268,7 +271,7 @@ bool csPortal::Draw (
   iRenderView *rview)
 {
   if (!CompleteSector (rview)) return false;
-  if (sector->GetPrivateObject ()->draw_busy >= max_sector_visit)
+  if (sector->GetRecLevel () >= max_sector_visit)
     return false;
 
   if (!new_clipper->GetVertexCount ()) return false;
@@ -321,10 +324,10 @@ bool csPortal::Draw (
     WarpSpace (inewcam->GetTransform (), mirror);
     inewcam->SetMirrored (mirror);
 
-    sector->GetPrivateObject ()->Draw (rview);
+    sector->Draw (rview);
   }
   else
-    sector->GetPrivateObject ()->Draw (rview);
+    sector->Draw (rview);
 
   rview->RestoreRenderContext (old_ctxt);
 
@@ -347,7 +350,7 @@ iPolygon3D *csPortal::HitBeam (
   csVector3 &isect)
 {
   if (!CompleteSector (NULL)) return NULL;
-  if (sector->GetPrivateObject ()->draw_busy >= max_sector_visit)
+  if (sector->GetRecLevel () >= max_sector_visit)
     return NULL;
   if (flags.Check (CS_PORTAL_WARP))
   {
@@ -365,38 +368,37 @@ iPolygon3D *csPortal::HitBeam (
   }
 }
 
-csMeshWrapper *csPortal::HitBeam (
+iMeshWrapper *csPortal::HitBeam (
   const csVector3 &start,
   const csVector3 &end,
   csVector3 &isect,
   iPolygon3D **polygonPtr)
 {
   if (!CompleteSector (NULL)) return NULL;
-  if (sector->GetPrivateObject ()->draw_busy >= max_sector_visit)
+  if (sector->GetRecLevel () >= max_sector_visit)
     return NULL;
   if (flags.Check (CS_PORTAL_WARP))
   {
     csVector3 new_start = warp_wor.Other2This (start);
     csVector3 new_end = warp_wor.Other2This (end);
-    csMeshWrapper *o = sector->GetPrivateObject ()->HitBeam (
-        new_start,
-        new_end,
-        isect,
+    iMeshWrapper *o = sector->HitBeam (
+        new_start, new_end, isect,
         polygonPtr);
     return o;
   }
   else
-    return sector->GetPrivateObject ()->HitBeam (
-        start,
-        end,
-        isect,
+  {
+    return sector->HitBeam (
+        start, end, isect,
         polygonPtr);
+  }
 }
 
 void csPortal::CheckFrustum (iFrustumView *lview, int alpha)
 {
   if (!CompleteSector (lview)) return ;
-  if (sector->GetPrivateObject ()->draw_busy > csSector::cfg_reflections)
+  if (sector->GetRecLevel () > 1)
+  //@@@@@ if (sector->GetRecLevel () > csSector::cfg_reflections)
     return ;
 
   csFrustumContext *old_ctxt = lview->GetFrustumContext ();
@@ -500,7 +502,7 @@ void csPortal::CheckFrustum (iFrustumView *lview, int alpha)
     }
   }
 
-  sector->GetPrivateObject ()->RealCheckFrustum (lview);
+  sector->CheckFrustum (lview);
 
   if (copied_frustums)
   {

@@ -23,7 +23,6 @@
 #include "csgeom/transfrm.h"
 #include "iengine/camera.h"
 #include "csengine/sector.h"
-#include "csengine/polygon.h"
 
 class csSector;
 class Vertex;

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "csengine/polytmap.h"
-#include "csengine/thing.h"
+#include "polytmap.h"
+#include "thing.h"
 #include "iengine/engine.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/textrans.h"

@@ -45,6 +45,7 @@
 #include "imesh/mdldata.h"
 #include "imesh/crossbld.h"
 #include "iengine/skelbone.h"
+#include "iengine/material.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "iutil/vfs.h"
@@ -52,12 +53,13 @@
 #include "iengine/light.h"
 #include "ivaria/perfstat.h"
 #include "imesh/sprite3d.h"
+#include "imesh/thing/thing.h"
+#include "imesh/thing/polygon.h"
 #include "iengine/statlght.h"
 #include "ivaria/reporter.h"
-//#include "csengine/meshobj.h"
+#include "igeom/clip2d.h"
 
 
-#include "csengine/polygon.h"
 #include "csengine/radiosty.h"
 #include "csengine/light.h"
 #include "imap/parser.h"
@@ -335,9 +337,16 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
 }
 
 
-void GenerateThing (iObjectIterator * it, iMaterialWrapper* mat,
+void GenerateThing (iObjectRegistry* object_reg,
+	iObjectIterator * it, iMaterialWrapper* mat,
 	char* spriteName, iSector* sector, csVector3 position, float size)
 {
+  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager);
+  csRef<iMeshObjectType> thingType = CS_QUERY_PLUGIN_CLASS (
+      plugin_mgr, "crystalspace.mesh.object.thing",
+      iMeshObjectType);
+
   it->Reset();
   while(!it->IsFinished())
   {
@@ -348,7 +357,6 @@ void GenerateThing (iObjectIterator * it, iMaterialWrapper* mat,
       it->Next();
       continue;
     }
-    iMeshObjectType* thingType = Sys->Engine->GetThingType();
     csRef<iMeshObjectFactory> thingFactory (thingType->NewFactory());
     csRef<iThingState> thingState (
     	SCF_QUERY_INTERFACE(thingFactory, iThingState));
@@ -393,7 +401,8 @@ void GenerateThing (iObjectIterator * it, iMaterialWrapper* mat,
   }
 }
 
-void load_thing (iSector* sector, csVector3 position,
+void load_thing (iObjectRegistry* object_reg,
+	iSector* sector, csVector3 position,
 	iObjectIterator* it, iEngine* Engine)
 {
   /*
@@ -433,7 +442,8 @@ void load_thing (iSector* sector, csVector3 position,
   }
 
   csRef<iObjectIterator> it2 (Model->QueryObject()->GetIterator());
-  GenerateThing(it2,mat,spriteName,sector,position, ParseScaleFactor(it));
+  GenerateThing(object_reg, it2,mat,spriteName,sector,
+  	position, ParseScaleFactor(it));
 }
 
 
@@ -805,13 +815,14 @@ void BuildSprite(iSector * sector, iObjectIterator* it, csVector3 position)
 
 
 
-void BuildThing(iSector* sector, csVector3 position,iObjectIterator* it,
-				iEngine* Engine)
+void BuildThing(iObjectRegistry* object_reg,
+	iSector* sector, csVector3 position,iObjectIterator* it,
+	iEngine* Engine)
 {
-  load_thing(sector,position,it,Engine);
+  load_thing(object_reg, sector,position,it,Engine);
 }
 
-void BuildObject(iSector * sector,
+void BuildObject(iObjectRegistry* object_reg, iSector * sector,
 	iObjectIterator* it, iEngine* Engine,
 	csVector3 position, iGraphics3D* MyG3D, iLoader* loader,
 	iObjectRegistry* objReg)
@@ -824,7 +835,7 @@ void BuildObject(iSector * sector,
   RegisterMaterials(it,Engine,MyG3D,loader,objReg);
   if (!strcmp(LookForKeyValue(it,"staticflag"),"static"))
   {
-    BuildThing(sector,position,it,Engine);
+    BuildThing(object_reg, sector,position,it,Engine);
   }
   else
   {
@@ -853,7 +864,7 @@ void WalkTest::ParseKeyNodes(iObject* src)
     }
     csRef<iObjectIterator> it2 (it->GetObject()->GetIterator());
 
-    BuildObject(sector,it2, Engine, node->GetPosition(), myG3D,
+    BuildObject(object_reg, sector,it2, Engine, node->GetPosition(), myG3D,
 		LevelLoader, object_reg);
     it->Next();
   }
@@ -1355,6 +1366,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     csCommandProcessor::change_int (arg, &Sys->cfg_debug_check_frustum, "debug check frustum", 0, 2000000000);
   else if (!strcasecmp (cmd, "db_radstep"))
   {
+#if 0
     csRadiosity* rad;
     csEngine* engine = (csEngine*)(iEngine*)(Sys->Engine);
     if ((rad = engine->GetRadiosity ()) != NULL)
@@ -1368,9 +1380,11 @@ bool CommandHandler (const char *cmd, const char *arg)
       rad->DoRadiosityStep (steps);
       engine->InvalidateLightmaps ();
     }
+#endif
   }
   else if (!strcasecmp (cmd, "db_radtodo"))
   {
+#if 0
     csRadiosity* rad;
     csEngine* engine = (csEngine*)(iEngine*)(Sys->Engine);
     if ((rad = engine->GetRadiosity ()) != NULL)
@@ -1378,9 +1392,11 @@ bool CommandHandler (const char *cmd, const char *arg)
       rad->ToggleShowDeltaMaps ();
       engine->InvalidateLightmaps ();
     }
+#endif
   }
   else if (!strcasecmp (cmd, "db_radhi"))
   {
+#if 0
     csRadiosity* rad;
     csEngine* engine = (csEngine*)(iEngine*)(Sys->Engine);
     if ((rad = engine->GetRadiosity ()) != NULL)
@@ -1389,6 +1405,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       	iPolygon3D));
       Sys->selected_polygon = p;
     }
+#endif
   }
   else if (!strcasecmp (cmd, "palette"))
     csCommandProcessor::change_boolean (arg, &Sys->do_show_palette, "palette");

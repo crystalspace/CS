@@ -27,7 +27,6 @@
 #include <string.h>
 #include "cssysdef.h"
 #include "csver.h"
-#include "csengine/polytext.h"
 #include "command.h"
 #include "csutil/scanstr.h"
 #include "walktest.h"
@@ -324,7 +323,7 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, " console, facenorth, facesouth, faceeast");
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, " facewest, faceup, facedown, turn, activate");
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, " cls, exec, dnl, cmessage, dmessage");
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, " portals, cosfact");
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, " portals");
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, " extension, lod, sprlight, coordset");
   }
   else if (!strcasecmp (cmd, "about"))
@@ -362,8 +361,6 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
     if (arg) Sys->Report (CS_REPORTER_SEVERITY_DEBUG, "%s", arg);
     else Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Argument expected!");
   }
-  else if (!strcasecmp (cmd, "cosfact"))
-    change_float (arg, &csPolyTexture::cfg_cosinus_factor, "cosinus factor", -1, 1);
   else if (!strcasecmp (cmd, "lod"))
   {
     csRef<iPluginManager> plugin_mgr (

@@ -24,6 +24,7 @@
 #include "iutil/vfs.h"
 #include "iutil/plugin.h"
 #include "iutil/objreg.h"
+#include "igeom/clip2d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
@@ -33,8 +34,9 @@
 #include "csengine/light.h"
 #include "iengine/rview.h"
 #include "imesh/lighting.h"
-
-
+#include "imesh/thing/thing.h"
+#include "imesh/thing/polygon.h"
+#include "imesh/thing/portal.h"
 
 // Option variable: render portals?
 bool csSector:: do_portals = true;
@@ -589,17 +591,6 @@ iPolygon3D *csSector::IntersectSphere (
  */
 void csSector::Draw (iRenderView *rview)
 {
-# ifdef CS_DEBUG
-  extern int viscnt_vis_poly; viscnt_vis_poly = 0;
-  extern int viscnt_invis_poly; viscnt_invis_poly = 0;
-  extern int viscnt_vis_node; viscnt_vis_node = 0;
-  extern int viscnt_invis_node; viscnt_invis_node = 0;
-  extern int viscnt_vis_obj; viscnt_vis_obj = 0;
-  extern int viscnt_invis_obj; viscnt_invis_obj = 0;
-  extern float viscnt_invis_node_vol; viscnt_invis_node_vol = 0;
-  extern float viscnt_vis_node_vol; viscnt_vis_node_vol = 0;
-# endif
-
   draw_busy++;
 
   // Make sure the visibility culler is loaded.
@@ -785,20 +776,6 @@ void csSector::Draw (iRenderView *rview)
 #endif // CS_USE_NEW_RENDERER
 
   draw_busy--;
-
-# ifdef CS_DEBUG
-  extern bool viscnt_enabled;
-  if (viscnt_enabled)
-  {
-    float percentage =
-      100.0f - 100.0f * viscnt_invis_node_vol / viscnt_vis_node_vol;
-    printf ("p+%d-%d   o+%d-%d   n+%d-%d(%g%%)\n",
-	viscnt_vis_poly, viscnt_invis_poly,
-	viscnt_vis_obj, viscnt_invis_obj,
-	viscnt_vis_node, viscnt_invis_node, percentage);
-    fflush (stdout);
-  }
-# endif
 }
 
 void csSector::CheckFrustum (iFrustumView *lview)

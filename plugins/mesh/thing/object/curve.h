@@ -24,13 +24,11 @@
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"
 #include "csgeom/box.h"
-#include "csengine/bezier.h"
-#include "csengine/texture.h"
-#include "csengine/material.h"
-#include "csengine/lghtmap.h"
-#include "csengine/rview.h"
+#include "bezier.h"
+#include "lghtmap.h"
 #include "csutil/csobject.h"
 #include "imesh/thing/curve.h"
+#include "iengine/material.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/vbufmgr.h"
 
@@ -39,13 +37,14 @@ class csThing;
 class csThingObjectType;
 class csCurveTemplate;
 class csLightPatch;
-class csSector;
 class csRadCurve;
-class csBspContainer;
-class csFrustumView;
+struct iFrustumView;
 struct csCoverageMatrix;
 struct iMaterialHandle;
+struct iMaterialWrapper;
 struct iCacheManager;
+struct iDynLight;
+struct iCamera;
 
 /**
  * Tesselated curve. This is basicly a list of triangles.
@@ -238,9 +237,9 @@ public:
   /// Get the lightmap.
   inline csLightMap* GetLightMap () const;
   /// Calculate the lighting for this curve (static).
-  void CalculateLightingStatic (csFrustumView* lview, bool vis);
+  void CalculateLightingStatic (iFrustumView* lview, bool vis);
   /// Calculate the lighting for this curve (dynamic).
-  void CalculateLightingDynamic (csFrustumView* lview);
+  void CalculateLightingDynamic (iFrustumView* lview);
   /// Initialize default lighting.
   void InitializeDefaultLighting ();
   /// Read lighting from file.
@@ -254,7 +253,7 @@ public:
    * Populate a coverage matrix which relates shadow information for this
    * curve's lightmap
    */
-  void GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &cm) const;
+  void GetCoverageMatrix (iFrustumView* lview, csCoverageMatrix &cm) const;
 
   /// return an approximation of the area of this curve
   float GetArea();

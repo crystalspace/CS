@@ -66,7 +66,8 @@ private:
   csRef<iReporter> reporter;
   csStringHash xmltokens;
 
-  bool LoadThingPart (iDocumentNode* node, iLoaderContext* ldr_context,
+  bool LoadThingPart (iThingEnvironment* te,
+  	iDocumentNode* node, iLoaderContext* ldr_context,
 	iObjectRegistry* object_reg, iReporter* reporter,
 	iSyntaxService *synldr, ThingLoadInfo& info,
 	iEngine* engine, iThingState* thing_state,

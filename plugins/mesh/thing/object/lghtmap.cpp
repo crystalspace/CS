@@ -17,15 +17,16 @@
 */
 #include "cssysdef.h"
 #include "cssys/csendian.h"
-#include "csengine/lghtmap.h"
-#include "csengine/polygon.h"
-#include "csengine/thing.h"
-#include "csengine/curve.h"
+#include "lghtmap.h"
+#include "polygon.h"
+#include "thing.h"
+#include "curve.h"
 #include "csutil/util.h"
 #include "csutil/debug.h"
 #include "csutil/memfile.h"
 #include "iutil/vfs.h"
 #include "iutil/cache.h"
+#include "iengine/statlght.h"
 
 #define LMMAGIC	    "LM03" // must be 4 chars!
 
@@ -75,8 +76,9 @@ void csShadowMap::CalcMaxShadow()
 }
 
 //---------------------------------------------------------------------------
-int csLightMap:: lightcell_size = 16;
-int csLightMap:: lightcell_shift = 4;
+int csLightMap::lightcell_size = 16;
+int csLightMap::lightcell_shift = 4;
+int csLightMap::default_lightmap_cell_size = 16;
 
 SCF_IMPLEMENT_IBASE(csLightMap)
   SCF_IMPLEMENTS_INTERFACE(iLightMap)
@@ -124,25 +126,25 @@ void csLightMap::DelShadowMap (csShadowMap *smap)
   delete smap;
 }
 
-csShadowMap *csLightMap::NewShadowMap (csLight *light, int w, int h)
+csShadowMap *csLightMap::NewShadowMap (iLight *light, int w, int h)
 {
   csShadowMap *smap = new csShadowMap ();
-  smap->Light = &light->scfiLight;
+  smap->Light = light;
   smap->next = first_smap;
   first_smap = smap;
   DG_LINK (this, smap);
 
-  smap->Alloc (&light->scfiLight, w, h);
+  smap->Alloc (light, w, h);
 
   return smap;
 }
 
-csShadowMap *csLightMap::FindShadowMap (csLight *light)
+csShadowMap *csLightMap::FindShadowMap (iLight *light)
 {
   csShadowMap *smap = first_smap;
   while (smap)
   {
-    if (smap->Light == &light->scfiLight) return smap;
+    if (smap->Light == light) return smap;
     smap = smap->next;
   }
 
@@ -238,7 +240,7 @@ bool csLightMap::ReadFromCache (
   PolySave ps, pswanted;
   LightHeader lh;
   LightSave ls;
-  csLight *light;
+  iLight *light;
   int i;
 
   csPolygon3D *poly = NULL;
@@ -374,7 +376,7 @@ bool csLightMap::ReadFromCache (
     iStatLight *il = engine->FindLight (ls.light_id);
     if (il)
     {
-      light = il->GetPrivateObject ();
+      light = il->QueryLight ();
       csShadowMap *smap = NewShadowMap (light, w, h);
 
       csRef<iStatLight> slight (SCF_QUERY_INTERFACE (il, iStatLight));
@@ -477,7 +479,7 @@ void csLightMap::Cache (
 
     while (smap)
     {
-      csLight *light = smap->Light->GetPrivateObject ();
+      iLight *light = smap->Light;
       if (smap->GetArray ())
       {
         LightSave ls;
@@ -564,7 +566,7 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
   //---
   // Then add all pseudo-dynamic lights.
   //---
-  csLight *light;
+  iLight *light;
   csRGBpixel *map;
   float red, green, blue;
   unsigned char *p, *last_p;
@@ -578,7 +580,7 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
     do
     {
       map = real_lm.GetArray ();
-      light = smap->Light->GetPrivateObject ();
+      light = smap->Light;
       red = light->GetColor ().red;
       green = light->GetColor ().green;
       blue = light->GetColor ().blue;

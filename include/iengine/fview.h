@@ -31,6 +31,7 @@
 #include "csgeom/box.h"
 
 struct iFrustumView;
+struct iShadowBlock;
 struct iShadowBlockList;
 struct iMeshWrapper;
 class csFrustum;
@@ -127,7 +128,7 @@ public:
   bool IsMirrored () { return mirror; }
 };
 
-SCF_VERSION (iFrustumView, 0, 3, 0);
+SCF_VERSION (iFrustumView, 0, 4, 1);
 
 /**
  * This structure represents all information needed for the frustum
@@ -168,7 +169,9 @@ struct iFrustumView : public iBase
   virtual void CallObjectFunction (iMeshWrapper* mesh, bool vis) = 0;
 
   /// Get the radius.
-  virtual float GetRadius () = 0;
+  virtual float GetRadius () const = 0;
+  /// Get the squared radius.
+  virtual float GetSquaredRadius () const = 0;
   /// Return true if shadowing for things is enabled.
   virtual bool ThingShadowsEnabled () = 0;
   /// Check if a mask corresponds with the shadow mask.
@@ -183,6 +186,9 @@ struct iFrustumView : public iBase
   virtual void SetUserdata (iFrustumViewUserdata* data) = 0;
   /// Get userdata.
   virtual iFrustumViewUserdata* GetUserdata () = 0;
+
+  /// Create a new empty shadow block.
+  virtual csPtr<iShadowBlock> CreateShadowBlock () = 0;
 };
 
 /** @} */

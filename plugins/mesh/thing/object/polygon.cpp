@@ -17,15 +17,16 @@
 */
 #include "cssysdef.h"
 #include "cssys/csendian.h"
-#include "csengine/polygon.h"
-#include "csengine/pol2d.h"
-#include "csengine/polytext.h"
-#include "csengine/polyplan.h"
-#include "csengine/polytmap.h"
-#include "csengine/lghtmap.h"
-#include "csengine/portal.h"
-#include "csengine/lppool.h"
-#include "csengine/thing.h"
+#include "polygon.h"
+#include "pol2d.h"
+#include "polytext.h"
+#include "polyplan.h"
+#include "polytmap.h"
+#include "lghtmap.h"
+#include "portal.h"
+#include "lppool.h"
+#include "thing.h"
+#include "csgeom/frustum.h"
 #include "csutil/garray.h"
 #include "csutil/debug.h"
 #include "csutil/memfile.h"
@@ -37,6 +38,8 @@
 #include "qsqrt.h"
 #include "iengine/texture.h"
 #include "iengine/material.h"
+#include "iengine/dynlight.h"
+#include "iengine/shadows.h"
 #include "ivideo/texture.h"
 #include "ivideo/material.h"
 #include "ivideo/txtmgr.h"
@@ -397,7 +400,7 @@ csPolygon3D::~csPolygon3D ()
   {
     while (light_info.lightpatches)
     {
-      csDynLight* dl = light_info.lightpatches->GetLight ();
+      iDynLight* dl = light_info.lightpatches->GetLight ();
       if (dl)
         dl->RemoveAffectedLightingInfo (&(thing->scfiLightingInfo));
       thing->thing_type->lightpatch_pool->Free (light_info.lightpatches);
@@ -1139,7 +1142,7 @@ void csPolygon3D::DynamicLightDisconnect (iDynLight* dynlight)
   while (lp)
   {
     csLightPatch* lpnext = lp->GetNext ();
-    if (&(lp->GetLight ()->scfiDynLight) == dynlight)
+    if (lp->GetLight () == dynlight)
       thing->thing_type->lightpatch_pool->Free (lp);
     lp = lpnext;
   }
@@ -1481,7 +1484,7 @@ bool csPolygon3D::DoPerspective (
   while (ind < end)
   {
     if (ind->z >= SMALL_Z)
-      dest->AddPerspective (*ind);
+      dest->AddPerspective (*ind, fov, shift_x, shift_y);
     else
       break;
     ind++;
@@ -1557,12 +1560,11 @@ bool csPolygon3D::DoPerspective (
     else
     {
       // we know where the polygon becomes NORMAL, now we need to
-
       // to find out on which edge it ceases to be NORMAL.
       while (ind < end)
       {
         if (ind->z >= SMALL_Z)
-          dest->AddPerspective (*ind);
+          dest->AddPerspective (*ind, fov, shift_x, shift_y);
         else
         {
           exit = ind;
@@ -1719,7 +1721,8 @@ bool csPolygon3D::DoPerspective (
 
     // Add the rest of the vertices, which are all NORMAL points.
     if (needfinish)
-      while (ind < end) dest->AddPerspective (*ind++);
+      while (ind < end) dest->AddPerspective (*ind++,
+      	fov, shift_x, shift_y);
   } /* if (exit || reenter) */
 
   // Do special processing (all points are NEAR or BEHIND)
@@ -2083,26 +2086,28 @@ void csPolygon3D::UpdateVertexLighting (
   }
 }
 
-void csPolygon3D::FillLightMapDynamic (csFrustumView &lview)
+void csPolygon3D::FillLightMapDynamic (iFrustumView* lview)
 {
-  csFrustumContext *ctxt = lview.GetFrustumContext ();
+  csFrustumContext *ctxt = lview->GetFrustumContext ();
 
   // We are working for a dynamic light. In this case we create
   // a light patch for this polygon.
   csLightPatch *lp = thing->thing_type->lightpatch_pool->Alloc ();
+  csRef<iShadowBlock> sb = lview->CreateShadowBlock ();
+  lp->SetShadowBlock (sb);
   AddLightpatch (lp);
 
-  iFrustumViewUserdata* fvud = lview.GetUserdata ();
+  iFrustumViewUserdata* fvud = lview->GetUserdata ();
   iLightingProcessInfo* lpi = (iLightingProcessInfo*)fvud;
-  csLight* l = lpi->GetLight ()->GetPrivateObject ();
-  csDynLight *dl = (csDynLight *)l;
+  iLight* l = lpi->GetLight ();
+  csRef<iDynLight> dl = SCF_QUERY_INTERFACE (l, iDynLight);
   lp->SetLight (dl);
 
   csFrustum *light_frustum = ctxt->GetLightFrustum ();
   lp->Initialize (light_frustum->GetVertexCount ());
 
   // Copy shadow frustums.
-  lp->GetShadowBlock ().AddRelevantShadows (ctxt->GetShadows ());
+  lp->GetShadowBlock ()->AddRelevantShadows (ctxt->GetShadows ());
 
   int i, mi;
   for (i = 0; i < lp->GetVertexCount (); i++)
@@ -2113,7 +2118,7 @@ void csPolygon3D::FillLightMapDynamic (csFrustumView &lview)
 }
 
 bool csPolygon3D::MarkRelevantShadowFrustums (
-  csFrustumView &lview,
+  iFrustumView* lview,
   csPlane3 &plane)
 {
   // @@@ Currently this function only checks if a shadow frustum is inside
@@ -2121,7 +2126,7 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
   // each other.
   int i, i1, j, j1;
 
-  csFrustumContext *ctxt = lview.GetFrustumContext ();
+  csFrustumContext *ctxt = lview->GetFrustumContext ();
   iShadowIterator *shadow_it = ctxt->GetShadows ()->GetShadowIterator ();
   csFrustum *lf = ctxt->GetLightFrustum ();
   const csVector3 &center = ctxt->GetLightFrustum ()->GetOrigin ();
@@ -2238,18 +2243,18 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
   return true;
 }
 
-bool csPolygon3D::MarkRelevantShadowFrustums (csFrustumView &lview)
+bool csPolygon3D::MarkRelevantShadowFrustums (iFrustumView* lview)
 {
   csPlane3 poly_plane = *GetPolyPlane ();
 
   // First translate plane to center of frustum.
-  poly_plane.DD += poly_plane.norm * lview.GetFrustumContext ()
+  poly_plane.DD += poly_plane.norm * lview->GetFrustumContext ()
   	->GetLightFrustum ()->GetOrigin ();
   poly_plane.Invert ();
   return MarkRelevantShadowFrustums (lview, poly_plane);
 }
 
-void csPolygon3D::CalculateLightingDynamic (csFrustumView *lview)
+void csPolygon3D::CalculateLightingDynamic (iFrustumView *lview)
 {
   csFrustum *light_frustum = lview->GetFrustumContext ()->GetLightFrustum ();
   const csVector3 &center = light_frustum->GetOrigin ();
@@ -2331,22 +2336,22 @@ void csPolygon3D::CalculateLightingDynamic (csFrustumView *lview)
   // FillLightMap() will use this information and
   // csPortal::CalculateLighting() will also use it!!
   po = GetPortal ();
-  if (!MarkRelevantShadowFrustums (*lview)) goto stop;
+  if (!MarkRelevantShadowFrustums (lview)) goto stop;
 
   // Update the lightmap given light and shadow frustums in new_lview.
-  if (fill_lightmap) FillLightMapDynamic (*lview);
+  if (fill_lightmap) FillLightMapDynamic (lview);
 
   if (po)
   {
     if (!po->flags.Check (CS_PORTAL_MIRROR))
-      po->CheckFrustum ((iFrustumView *)lview, GetAlpha ());
+      po->CheckFrustum (lview, GetAlpha ());
   }
 
 stop:
   lview->RestoreFrustumContext (old_ctxt);
 }
 
-void csPolygon3D::CalculateLightingStatic (csFrustumView *lview,
+void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
 	csLightingPolyTexQueue* lptq, bool vis)
 {
   bool do_smooth = GetParent ()->GetSmoothingFlag ();
@@ -2447,7 +2452,7 @@ void csPolygon3D::CalculateLightingStatic (csFrustumView *lview,
   }
 }
 
-void csPolygon3D::FillLightMapStatic (csFrustumView *lview,
+void csPolygon3D::FillLightMapStatic (iFrustumView *lview,
 	csLightingPolyTexQueue* lptq, bool vis)
 {
   csPolyTexGouraud *goi = GetGouraudInfo ();

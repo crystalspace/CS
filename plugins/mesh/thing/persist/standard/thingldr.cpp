@@ -208,7 +208,7 @@ bool csThingLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-bool csThingLoader::LoadThingPart (iDocumentNode* node,
+bool csThingLoader::LoadThingPart (iThingEnvironment* te, iDocumentNode* node,
 	iLoaderContext* ldr_context,
 	iObjectRegistry* object_reg, iReporter* reporter,
 	iSyntaxService *synldr, ThingLoadInfo& info,
@@ -337,7 +337,7 @@ bool csThingLoader::LoadThingPart (iDocumentNode* node,
         }
         break;
       case XMLTOKEN_PART:
-	if (!LoadThingPart (child, ldr_context, object_reg, reporter,
+	if (!LoadThingPart (te, child, ldr_context, object_reg, reporter,
 		synldr, info, engine, thing_state,
 		thing_state->GetVertexCount (), false))
 	  return false;
@@ -377,9 +377,6 @@ Nag to Jorrit about this feature if you want it.");
       case XMLTOKEN_CURVE:
         {
 	  const char* cname = child->GetContentsValue ();
-	  csRef<iThingEnvironment> te (
-	  	SCF_QUERY_INTERFACE (engine->GetThingType (),
-		iThingEnvironment));
 	  iCurveTemplate* ct = te->FindCurveTemplate (cname);
 	  iCurve* p = thing_state->CreateCurve (ct);
 	  p->QueryObject()->SetName (cname);
@@ -450,20 +447,36 @@ Nag to Jorrit about this feature if you want it.");
 csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
 			     iLoaderContext* ldr_context, iBase*)
 {
-  // Things only work with the real 3D engine and not with the iso engine.
-  csRef<iEngine> engine (CS_QUERY_REGISTRY (object_reg, iEngine));
-  CS_ASSERT (engine != NULL);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.thing", iMeshObjectType));
+  if (!type)
+  {
+    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.thing",
+    	iMeshObjectType);
+  }
+  if (!type)
+  {
+    synldr->ReportError (
+		"crystalspace.thingloader.setup.objecttype",
+		node, "Could not load the thing mesh object plugin!");
+    return NULL;
+  }
+  csRef<iThingEnvironment> te = SCF_QUERY_INTERFACE (type,
+  	iThingEnvironment);
+  csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+
   csRef<iMeshObjectFactory> fact;
   csRef<iThingState> thing_state;
 
-  iMeshObjectType* type = engine->GetThingType (); // @@@ CS_LOAD_PLUGIN LATER!
   // We always do NewFactory() even for mesh objects.
   // That's because csThing implements both so a factory is a mesh object.
   fact = type->NewFactory ();
   thing_state = SCF_QUERY_INTERFACE (fact, iThingState);
 
   ThingLoadInfo info;
-  if (!LoadThingPart (node, ldr_context, object_reg, reporter, synldr, info,
+  if (!LoadThingPart (te, node, ldr_context, object_reg, reporter, synldr, info,
   	engine, thing_state, 0, true))
   {
     fact = NULL;
@@ -538,12 +551,25 @@ csPtr<iBase> csPlaneLoader::Parse (iDocumentNode* node,
 			     iLoaderContext* /*ldr_context*/,
 			     iBase* /*context*/)
 {
-  // Things only work with the real 3D engine and not with the iso engine.
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.thing", iMeshObjectType));
+  if (!type)
+  {
+    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.thing",
+    	iMeshObjectType);
+  }
+  if (!type)
+  {
+    synldr->ReportError (
+		"crystalspace.thingloader.setup.objecttype",
+		node, "Could not load the thing mesh object plugin!");
+    return NULL;
+  }
+  csRef<iThingEnvironment> te = SCF_QUERY_INTERFACE (type,
+  	iThingEnvironment);
   csRef<iEngine> engine (CS_QUERY_REGISTRY (object_reg, iEngine));
-  CS_ASSERT (engine != NULL);
-
-  csRef<iThingEnvironment> te (SCF_QUERY_INTERFACE (engine->GetThingType (),
-  	iThingEnvironment));
   csRef<iPolyTxtPlane> ppl (te->CreatePolyTxtPlane ());
 
   bool tx1_given = false, tx2_given = false;
@@ -695,15 +721,29 @@ bool csBezierLoader::Initialize (iObjectRegistry* object_reg)
 csPtr<iBase> csBezierLoader::Parse (iDocumentNode* node,
 			      iLoaderContext* ldr_context, iBase* /*context*/)
 {
-  // Things only work with the real 3D engine and not with the iso engine.
-  csRef<iEngine> engine (CS_QUERY_REGISTRY (object_reg, iEngine));
-  CS_ASSERT (engine != NULL);
   csRef<iSyntaxService> synldr (CS_QUERY_REGISTRY (object_reg, iSyntaxService));
 
-  csRef<iThingEnvironment> te (SCF_QUERY_INTERFACE (engine->GetThingType (),
-	    iThingEnvironment));
-  csRef<iCurveTemplate> tmpl (te->CreateBezierTemplate ());
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.thing", iMeshObjectType));
+  if (!type)
+  {
+    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.thing",
+    	iMeshObjectType);
+  }
+  if (!type)
+  {
+    synldr->ReportError (
+		"crystalspace.thingloader.setup.objecttype",
+		node, "Could not load the thing mesh object plugin!");
+    return NULL;
+  }
+  csRef<iThingEnvironment> te = SCF_QUERY_INTERFACE (type,
+  	iThingEnvironment);
+  csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
+  csRef<iCurveTemplate> tmpl (te->CreateBezierTemplate ());
   iMaterialWrapper* mat = NULL;
 
   int num_v = 0;

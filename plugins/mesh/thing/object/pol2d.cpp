@@ -17,17 +17,18 @@
 */
 #include "cssysdef.h"
 #include "qint.h"
-#include "csengine/polygon.h"
-#include "csengine/pol2d.h"
-#include "csengine/polytext.h"
-#include "csengine/polytmap.h"
-#include "csengine/polyplan.h"
-#include "csengine/engine.h"
-#include "csengine/lppool.h"
-#include "csengine/lghtmap.h"
-#include "csengine/portal.h"
+#include "polygon.h"
+#include "pol2d.h"
+#include "polytext.h"
+#include "polytmap.h"
+#include "polyplan.h"
+#include "lppool.h"
+#include "lghtmap.h"
+#include "portal.h"
+#include "iengine/camera.h"
 #include "iengine/texture.h"
 #include "iengine/material.h"
+#include "iengine/dynlight.h"
 #include "ivideo/texture.h"
 #include "ivideo/material.h"
 #include "ivideo/txtmgr.h"
@@ -49,11 +50,19 @@
 
 CS_IMPLEMENT_STATIC_CLASSVAR(csPolygon2DFactory,sharedFactory,SharedFactory,csPolygon2DFactory,())
 
-void csPolygon2D::AddPerspective (const csVector3 &v)
+static void Perspective (const csVector3& v, csVector2& p, int
+	aspect, float shift_x, float shift_y)
+{
+  float iz = aspect / v.z;
+  p.x = v.x * iz + shift_x;
+  p.y = v.y * iz + shift_y;
+}
+
+void csPolygon2D::AddPerspective (const csVector3 &v, int aspect,
+	float shift_x, float shift_y)
 {
   if (num_vertices >= max_vertices) MakeRoom (max_vertices + 5);
-  csEngine::current_engine->current_camera->Perspective (v,
-  	vertices[num_vertices]);
+  Perspective (v, vertices[num_vertices], aspect, shift_x, shift_y);
   bbox.AddBoundingVertex (vertices[num_vertices]);
   num_vertices++;
 }
@@ -93,8 +102,8 @@ void csPolygon2D::Draw (iGraphics2D * g2d, int col)
   {
     x2 = QRound(vertices[i].x);
     y2 = QRound (vertices[i].y);
-    g2d->DrawLine (x1, csEngine::frame_height - 1 - y1, x2,
-    	csEngine::frame_height - 1 - y2, col);
+    g2d->DrawLine (x1, g2d->GetHeight () - 1 - y1, x2,
+    	g2d->GetHeight () - 1 - y2, col);
     x1 = x2;
     y1 = y2;
   }
@@ -448,11 +457,11 @@ void csPolygon2D::DrawFilled (
           bool reset = true;
           while (lp)
           {
-	    csDynLight* dl = lp->GetLight ();
-	    iLight* il = &(dl->scfiLight);
+	    iDynLight* dl = lp->GetLight ();
+	    iLight* il = dl->QueryLight ();
             unsplit->UpdateVertexLighting (
                 il,
-                lp->GetLight ()->GetColor (),
+                il->GetColor (),
                 true,
                 reset);
             reset = false;

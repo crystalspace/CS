@@ -23,6 +23,7 @@
 #include "iengine/light.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
+#include "imesh/thing/portal.h"
 
 extern WalkTest* Sys;
 

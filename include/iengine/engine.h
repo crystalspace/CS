@@ -173,7 +173,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 12, 0);
+SCF_VERSION (iEngine, 0, 13, 0);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -450,13 +450,6 @@ struct iEngine : public iBase
   /// Get the mode for the lighting cache.
   virtual int GetLightingCacheMode () = 0;
 
-  /// Return the current lightmap cell size
-  virtual int GetLightmapCellSize () const = 0;
-  /// Set lightmap cell size
-  virtual void SetLightmapCellSize (int Size) = 0;
-  /// Return default lightmap cell size
-  virtual int GetDefaultLightmapCellSize () const = 0;
-
   /**
    * Require that the Z-buffer is cleared every frame. The engine
    * itself will not use this setting but will only return the
@@ -658,12 +651,6 @@ struct iEngine : public iBase
   virtual csPtr<iMeshWrapper> LoadMeshWrapper (
   	const char* name, const char* loaderClassId,
 	iDataBuffer* input, iSector* sector, const csVector3& pos) = 0;
-
-  /**
-   * @@@ This function is deprecated! Please don't use it!
-   * Only the engine and thing mesh objects should use this now.
-   */
-  virtual iMeshObjectType* GetThingType () const = 0;
 
   /**
    * Draw the 3D world given a camera and a clipper. Note that

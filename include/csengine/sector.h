@@ -518,6 +518,10 @@ public:
     {
       return scfParent->GetSectorCallback (idx);
     }
+    virtual void CheckFrustum (iFrustumView* lview)
+    {
+      return scfParent->CheckFrustum (lview);
+    }
   } scfiSector;
   friend struct eiSector;
 };

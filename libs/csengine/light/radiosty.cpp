@@ -21,7 +21,6 @@
 #include "csengine/engine.h"
 #include "csengine/sector.h"
 #include "csengine/light.h"
-#include "csengine/polytmap.h"
 #include "csengine/texture.h"
 #include "csengine/material.h"
 #include "csengine/rview.h"
@@ -38,6 +37,9 @@
 #include "ivaria/pmeter.h"
 #include <math.h>
 #include "qint.h"
+
+#if 0
+// TOTALLY DISABLED FOR NOW
 
 //------------ Utility ------------------------------------
 float FastPow2 (float x, const int y)
@@ -1847,3 +1849,6 @@ void csRadiosity::ApplyDeltaAndAmbient ()
   /// add deltamaps
   list->Traverse (add_delta_func);
 }
+
+#endif
+

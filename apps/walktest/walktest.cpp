@@ -28,6 +28,7 @@
 #include "walktest.h"
 #include "infmaze.h"
 #include "command.h"
+#include "igeom/polymesh.h"
 #include "csgeom/frustum.h"
 #include "iengine/region.h"
 #include "iengine/light.h"

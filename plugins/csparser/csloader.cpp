@@ -2224,7 +2224,18 @@ bool csLoader::LoadSettings (iDocumentNode* node)
 	        cellsize, newcellsize);
 	      cellsize = newcellsize;
 	    }
-	    Engine->SetLightmapCellSize (cellsize);
+	    csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+		iPluginManager));
+	    csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+		"crystalspace.mesh.object.thing", iMeshObjectType));
+	    if (!type)
+	    {
+	      type = CS_LOAD_PLUGIN (plugin_mgr,
+	      	"crystalspace.mesh.object.thing", iMeshObjectType);
+	    }
+	    csRef<iThingEnvironment> te = SCF_QUERY_INTERFACE (type,
+		iThingEnvironment);
+	    te->SetLightmapCellSize (cellsize);
 	  }
 	  else
 	  {

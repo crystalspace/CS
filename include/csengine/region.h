@@ -23,7 +23,7 @@
 #include "csutil/nobjvec.h"
 #include "iengine/region.h"
 
-struct iEngine;
+class csEngine;
 
 /**
  * A region. A region is basically a collection of objects in the
@@ -32,13 +32,13 @@ struct iEngine;
 class csRegion : public csObject
 {
 private:
-  iEngine* engine;
+  csEngine* engine;
 
 public:
   /**
    * Initialize an empty region.
    */
-  csRegion (iEngine*);
+  csRegion (csEngine*);
 
   /**
    * Delete the region without deleting the entities in it. The entities

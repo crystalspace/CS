@@ -18,19 +18,26 @@
 #include "cssysdef.h"
 #include "cssys/csendian.h"
 #include "qint.h"
-#include "csengine/thing.h"
-#include "csengine/polygon.h"
-#include "csengine/polytmap.h"
-#include "csengine/pol2d.h"
-#include "csengine/polytext.h"
-#include "csengine/lppool.h"
+#include "thing.h"
+#include "polygon.h"
+#include "polytmap.h"
+#include "pol2d.h"
+#include "polytext.h"
+#include "lppool.h"
+#include "curve.h"
 #include "csgeom/polypool.h"
+#include "csgeom/poly3d.h"
+#include "csgeom/frustum.h"
 #include "iengine/light.h"
 #include "iengine/engine.h"
 #include "iengine/sector.h"
-#include "csengine/curve.h"
+#include "iengine/movable.h"
 #include "iengine/material.h"
 #include "iengine/mesh.h"
+#include "iengine/camera.h"
+#include "iengine/statlght.h"
+#include "iengine/dynlight.h"
+#include "iengine/shadows.h"
 #include "csgeom/sphere.h"
 #include "csgeom/math3d.h"
 #include "csutil/csstring.h"
@@ -55,6 +62,7 @@
 #include "ivideo/graph3d.h"
 #include "ivaria/reporter.h"
 
+CS_IMPLEMENT_PLUGIN
 
 //---------------------------------------------------------------------------
 
@@ -1337,7 +1345,8 @@ void csThing::DrawOnePolygon (
   }
 
   csPortal *po = p->GetPortal ();
-  if (csSector::do_portals && po)
+  //@@@if (csSector::do_portals && po)
+  if (po)
   {
     bool filtered = false;
 
@@ -2677,18 +2686,18 @@ void csThing::CastShadows (iFrustumView *lview, iMovable *movable)
   {
     csPolygon3D* poly = GetPolygon3D (i);
     if (dyn)
-      poly->CalculateLightingDynamic ((csFrustumView*)lview);
+      poly->CalculateLightingDynamic (lview);
     else
-      poly->CalculateLightingStatic ((csFrustumView*)lview, lptq, true);
+      poly->CalculateLightingStatic (lview, lptq, true);
   }
 
   for (i = 0; i < GetCurveCount (); i++)
   {
     csCurve* curve = curves.Get (i);
     if (dyn)
-      curve->CalculateLightingDynamic ((csFrustumView*)lview);
+      curve->CalculateLightingDynamic (lview);
     else
-      curve->CalculateLightingStatic ((csFrustumView*)lview, true);
+      curve->CalculateLightingStatic (lview, true);
   }
 
   draw_busy--;
@@ -2978,6 +2987,7 @@ csPtr<iMeshObject> csThing::MeshObjectFactory::NewInstance ()
 }
 
 //---------------------------------------------------------------------------
+
 SCF_IMPLEMENT_IBASE(csThingObjectType)
   SCF_IMPLEMENTS_INTERFACE(iMeshObjectType)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
@@ -2998,6 +3008,12 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csThingObjectType::eiConfig)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csThingObjectType)
+
+SCF_EXPORT_CLASS_TABLE (thing)
+  SCF_EXPORT_CLASS (csThingObjectType,
+  	"crystalspace.mesh.object.thing",
+	"Crystal Space Thing Mesh Type")
+SCF_EXPORT_CLASS_TABLE_END
 
 csThingObjectType::csThingObjectType (
   iBase *pParent)

@@ -20,7 +20,7 @@
 #define __CS_THING_H__
 
 #include "csgeom/transfrm.h"
-#include "csengine/parrays.h"
+#include "parrays.h"
 #include "csutil/csobject.h"
 #include "csutil/nobjvec.h"
 #include "csutil/util.h"
@@ -41,6 +41,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/config.h"
+#include "lghtmap.h"
 
 class csThing;
 class csThingObjectType;
@@ -1366,6 +1367,18 @@ public:
     virtual void ClearCurveTemplates ()
     {
       scfParent->ClearCurveTemplates ();
+    }
+    virtual int GetLightmapCellSize () const
+    {
+      return csLightMap::lightcell_size;
+    }
+    virtual void SetLightmapCellSize (int size)
+    {
+      csLightMap::lightcell_size = size;
+    }
+    virtual int GetDefaultLightmapCellSize () const
+    {
+      return csLightMap::default_lightmap_cell_size;
     }
   } scfiThingEnvironment;
 

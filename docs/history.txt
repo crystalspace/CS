@@ -22,6 +22,24 @@ The history order is reversed so that new features are at the top.
 	- csPolygon3D class no longer requires access to csEngine and csLight
 	  classes.
 	- csPolygon3D now uses iMaterialWrapper instead of csMaterialWrapper.
+	- Lightmap cell size can no longer be set from within config.
+	  Use the <settings> block in the map file instead.
+	- Temporarily removed the ability of setting cosinus factor from
+	  within config.
+	- Added iFrustumView->CreateShadowBlock().
+	- Added accessor functions for lightmap cell size in iThingEnvironment.
+	  And removed the SetLightmapCellSize/GetLightmapCellSize() functions
+	  from iEngine.
+	- Added iFrustumView->GetSquaredRadius().
+	- Temporarily removed the ability to set lightmap calculation quality.
+	  It will now always be 3.
+	- Temporarily removed the ability to control the number of reflections
+	  in lighting calculations. Now hardcoded at the default 1 value.
+	- Temporarily removed the ability to disable portal traversal for
+	  debugging purposes.
+	- Added iSector->CheckFrustum() for portal traversal.
+	- Removed the 'cosfact' console command in walktest.
+	- The big step! csThing is now a seperate plugin!
 	- Removed all includes from from the include/csengine dir from css.h.
 	  Nothing (except for the engine) is supposed to include from
 	  include/csengine.

@@ -33,7 +33,7 @@ struct iObject;
 struct iLight;
 struct iLightingInfo;
 
-SCF_VERSION (iDynLight, 0, 1, 0);
+SCF_VERSION (iDynLight, 0, 2, 0);
 
 /**
  * The iDynLight interface represents a dynamic light.
@@ -54,6 +54,11 @@ struct iDynLight : public iBase
    * dynamic light.
    */
   virtual void AddAffectedLightingInfo (iLightingInfo* li) = 0; 
+
+  /**
+   * Remove a mesh from this dynamic light.
+   */
+  virtual void RemoveAffectedLightingInfo (iLightingInfo* li) = 0; 
 
   /// Setup the light (i.e. do the lighting calculations).
   virtual void Setup () = 0;

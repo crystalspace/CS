@@ -57,6 +57,7 @@
 #include "imap/reader.h"
 #include "imap/ldrctxt.h"
 #include "imesh/lighting.h"
+#include "imesh/thing/thing.h"
 #include "ivaria/reporter.h"
 #include "ivaria/engseq.h"
 #include "iutil/plugin.h"
@@ -64,7 +65,10 @@
 #include "csengine/radiosty.h"
 #include "imesh/thing/curve.h"
 #include "imesh/thing/polytmap.h"
+#include "imesh/thing/polygon.h"
+#include "imesh/thing/portal.h"
 #include "ivideo/graph3d.h"
+#include "igeom/clip2d.h"
 
 
 
@@ -616,8 +620,7 @@ csEngine::csEngine (iBase *iParent) :
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
   DG_TYPE (&scfiObject, "csEngine");
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
-  thing_type = new csThingObjectType (NULL);
-  rad_debug = NULL;
+  //rad_debug = NULL;
   first_dyn_lights = NULL;
   object_reg = NULL;
   textures = NULL;
@@ -634,7 +637,6 @@ csEngine::csEngine (iBase *iParent) :
   nextframe_pending = 0;
   default_max_lightmap_w = 256;
   default_max_lightmap_h = 256;
-  default_lightmap_cell_size = 16;
   default_clear_zbuf = false;
   default_clear_screen = false;
 
@@ -646,11 +648,6 @@ csEngine::csEngine (iBase *iParent) :
   resize = false;
 
   ClearRenderPriorities ();
-
-# ifdef CS_DEBUG
-  extern bool viscnt_enabled;
-  viscnt_enabled = false;
-# endif
 }
 
 csEngine::~csEngine ()
@@ -675,7 +672,7 @@ csEngine::~csEngine ()
 
   render_priorities.DeleteAll ();
 
-  delete rad_debug;
+  // @@@TOTALLY DISABLED FOR NOW delete rad_debug;
   delete materials;
   delete textures;
   delete shared_variables;
@@ -687,6 +684,17 @@ bool csEngine::Initialize (iObjectRegistry *object_reg)
 
   virtual_clock = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   if (!virtual_clock) return false;
+
+  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager);
+  thing_type = CS_QUERY_PLUGIN_CLASS (
+      plugin_mgr, "crystalspace.mesh.object.thing",
+      iMeshObjectType);
+  if (!thing_type)
+  {
+    thing_type = CS_LOAD_PLUGIN (plugin_mgr,
+    	"crystalspace.mesh.object.thing", iMeshObjectType);
+  }
 
 #ifndef CS_USE_NEW_RENDERER
   G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
@@ -725,8 +733,6 @@ bool csEngine::Initialize (iObjectRegistry *object_reg)
 
   csConfigAccess cfg (object_reg, "/config/engine.cfg");
   ReadConfig (cfg);
-
-  thing_type->Initialize (object_reg);
 
   return true;
 }
@@ -842,9 +848,10 @@ void csEngine::DeleteAll ()
   delete shared_variables;
   shared_variables = new csSharedVariableList();
 
+  CS_ASSERT (((iMeshObjectType*)thing_type) != NULL);
   csRef<iThingEnvironment> te (
   	SCF_QUERY_INTERFACE (thing_type, iThingEnvironment));
-  CS_ASSERT (te != NULL);
+  CS_ASSERT (((iThingEnvironment*)te) != NULL);
   te->Clear ();
 
   render_context = NULL;
@@ -943,21 +950,14 @@ void csEngine::ClearRenderPriorities ()
   RegisterRenderPriority ("alpha", 8, CS_RENDPRI_BACK2FRONT);
 }
 
-int csEngine::GetLightmapCellSize () const
-{
-  return csLightMap::lightcell_size;
-}
-
-void csEngine::SetLightmapCellSize (int Size)
-{
-  csLightMap::SetLightCellSize (Size);
-}
-
 void csEngine::ResetWorldSpecificSettings()
 {
   SetClearZBuf (default_clear_zbuf);
   SetClearScreen (default_clear_screen);
-  SetLightmapCellSize (default_lightmap_cell_size);
+  csRef<iThingEnvironment> te (SCF_QUERY_INTERFACE (
+          GetThingType (),
+          iThingEnvironment));
+  te->SetLightmapCellSize (16);
   SetMaxLightmapSize (default_max_lightmap_w, default_max_lightmap_h);
   SetAmbientLight (csColor (
   	default_ambient_red / 255.0f,
@@ -1080,8 +1080,8 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
   current.ambient_blue = csLight::ambient_blue;
   current.reflect = csSector::cfg_reflections;
   current.radiosity = (int)csSector::do_radiosity;
-  current.cosinus_factor = csPolyTexture::cfg_cosinus_factor;
-  current.lightmap_size = csLightMap::lightcell_size;
+  current.cosinus_factor = 0;	//@@@
+  current.lightmap_size = 0;	//@@@
 
   char *reason = NULL;
 
@@ -1129,10 +1129,7 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
       {
       }
 
-      CHECK ("LMVERSION", xi != current.lm_version, "lightmap format") CHECK (
-        "LIGHTMAP_SIZE",
-        xi != current.lightmap_size,
-        "lightmap size")
+      CHECK ("LMVERSION", xi != current.lm_version, "lightmap format")
 #undef CHECK
     }
   }
@@ -1266,6 +1263,8 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
     Report ("Time taken: %.4f seconds.", (float)(stop - start) / 1000.);
   }
 
+#if 0
+  // TOTALLY DISABLED FOR NOW
   // Render radiosity
   if (use_new_radiosity && do_relight)
   {
@@ -1286,6 +1285,7 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
     if (do_relight)
       Report ("Time taken: %.4f seconds.", (float)(stop - start) / 1000.);
   }
+#endif
 
   if (do_relight && (lightcache_mode & CS_ENGINE_CACHE_WRITE))
   {
@@ -1773,9 +1773,6 @@ iCollection* csEngine::FindCollection (const char* name,
 
 void csEngine::ReadConfig (iConfigFile *Config)
 {
-  default_lightmap_cell_size = 
-    Config->GetInt ("Engine.Lighting.LightmapSize", default_lightmap_cell_size);
-  csLightMap::SetLightCellSize (default_lightmap_cell_size);
   csEngine::lightmap_quality = Config->GetInt (
       "Engine.Lighting.LightmapQuality",
       3);
@@ -1803,9 +1800,6 @@ void csEngine::ReadConfig (iConfigFile *Config)
   csSector::cfg_reflections = Config->GetInt (
       "Engine.Lighting.Reflections",
       csSector::cfg_reflections);
-  csPolyTexture::cfg_cosinus_factor = Config->GetFloat (
-      "Engine.Lighting.CosinusFactor",
-      csPolyTexture::cfg_cosinus_factor);
 
   //@@@ NOT THE RIGHT PLACE! csSprite3D::global_lighting_quality = Config->GetInt ("Engine.Lighting.SpriteQuality", csSprite3D::global_lighting_quality);
   csSector::do_radiosity = Config->GetBool (
@@ -1816,6 +1810,8 @@ void csEngine::ReadConfig (iConfigFile *Config)
   csEngine::use_new_radiosity = Config->GetBool (
       "Engine.Lighting.Radiosity.Enable",
       csEngine::use_new_radiosity);
+#if 0
+  // @@@ TOTALLY DISABLED FOR NOW
   csRadiosity::do_static_specular = Config->GetBool (
       "Engine.Lighting.Radiosity.DoStaticSpecular",
       csRadiosity::do_static_specular);
@@ -1840,6 +1836,7 @@ void csEngine::ReadConfig (iConfigFile *Config)
   csRadiosity::source_patch_size = Config->GetInt (
       "Engine.Lighting.Radiosity.SourcePatchSize",
       csRadiosity::source_patch_size);
+#endif
 
   default_clear_zbuf = 
     Config->GetBool ("Engine.ClearZBuffer", default_clear_zbuf);
@@ -2928,16 +2925,6 @@ bool csEngine::DebugCommand (const char* cmd)
 {
   if (!strcasecmp (cmd, "toggle_cullstat"))
   {
-#   ifdef CS_DEBUG
-    extern bool viscnt_enabled;
-    viscnt_enabled = !viscnt_enabled;
-    if (viscnt_enabled)
-      Report ("Visibility culling statistics.");
-    else
-      Report ("Visibility culling statistics.");
-#   else
-    Report ("toggle_cullstat is only available in debug mode!");
-#   endif
     return true;
   }
   return false;

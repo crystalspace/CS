@@ -36,12 +36,11 @@
 #include "iengine/collectn.h"
 #include "iengine/campos.h"
 #include "iutil/dbghelp.h"
-#include "csengine/thing.h"
 #include "ivideo/graph3d.h"
 
 
 class csPoly2DPool;
-class csRadiosity;
+//class csRadiosity;
 class csRegion;
 class csSector;
 class csMeshWrapper;
@@ -363,7 +362,7 @@ private:
   iTextureHandle* render_context;
 
   /// Pointer to radiosity system if we are in step-by-step radiosity mode.
-  csRadiosity* rad_debug;
+  //csRadiosity* rad_debug;
 
   /// Clear the Z-buffer every frame.
   bool clear_zbuf;
@@ -376,9 +375,6 @@ private:
 
   /// default buffer clear flag.
   bool default_clear_screen;
-
-  /// default lightmap cell size
-  int default_lightmap_cell_size;
 
   /// default maximum lightmap width/height
   int default_max_lightmap_w, default_max_lightmap_h;
@@ -566,7 +562,7 @@ public:
    * Get the pointer to the radiosity object (used with step-by-step
    * debugging).
    */
-  csRadiosity* GetRadiosity () const { return rad_debug; }
+  //csRadiosity* GetRadiosity () const { return rad_debug; }
 
   /**
    * Invalidate all lightmaps. This can be called after doing
@@ -602,14 +598,6 @@ public:
   virtual void SetLightingCacheMode (int mode) { lightcache_mode = mode; }
   /// Get the mode for the lighting cache.
   virtual int GetLightingCacheMode () { return lightcache_mode; }
-
-  /// Return current lightmap cell size
-  virtual int GetLightmapCellSize () const;
-  /// Set lightmap cell size
-  virtual void SetLightmapCellSize (int Size);
-  /// Return default lightmap cell size
-  virtual int GetDefaultLightmapCellSize () const
-  { return default_lightmap_cell_size; }
 
   /// Set clear z buffer flag
   virtual void SetClearZBuf (bool yesno)
@@ -825,9 +813,8 @@ public:
   /// Clear all render priorities.
   virtual void ClearRenderPriorities ();
 
-  /// @@@ Temporary until things move to their own mesh plugin system.
-  csRef<csThingObjectType> thing_type;
-  virtual iMeshObjectType* GetThingType () const
+  csRef<iMeshObjectType> thing_type;
+  iMeshObjectType* GetThingType () const
   {
     return (iMeshObjectType*)thing_type;
   }

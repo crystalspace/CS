@@ -23,6 +23,7 @@
 #include "bot.h"
 #include "infmaze.h"
 #include "command.h"
+#include "imesh/thing/thing.h"
 #include "imesh/thing/polygon.h"
 #include "csutil/scanstr.h"
 #include "csutil/dataobj.h"

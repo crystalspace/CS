@@ -284,7 +284,7 @@ struct iThingState : public iBase
   virtual csVector3* GetNormals () = 0;
 };
 
-SCF_VERSION (iThingEnvironment, 0, 1, 0);
+SCF_VERSION (iThingEnvironment, 0, 1, 1);
 
 /**
  * This interface is implemented by the iObjectType for things.
@@ -320,6 +320,13 @@ struct iThingEnvironment : public iBase
   virtual void ClearPolyTxtPlanes () = 0;
   /// Remove all curve templates.
   virtual void ClearCurveTemplates () = 0;
+
+  /// Return the current lightmap cell size
+  virtual int GetLightmapCellSize () const = 0;
+  /// Set lightmap cell size
+  virtual void SetLightmapCellSize (int Size) = 0;
+  /// Return default lightmap cell size
+  virtual int GetDefaultLightmapCellSize () const = 0;
 };
 
 #endif

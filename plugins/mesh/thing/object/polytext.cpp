@@ -21,14 +21,17 @@
 #include "qsqrt.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/polyaa.h"
-#include "csengine/polytext.h"
-#include "csengine/polyplan.h"
-#include "csengine/polytmap.h"
-#include "csengine/polygon.h"
-#include "csengine/lppool.h"
-#include "csengine/engine.h"
-#include "csengine/lghtmap.h"
+#include "csgeom/poly3d.h"
+#include "csgeom/frustum.h"
+#include "polytext.h"
+#include "polyplan.h"
+#include "polytmap.h"
+#include "polygon.h"
+#include "lppool.h"
+#include "lghtmap.h"
 #include "iengine/texture.h"
+#include "iengine/shadows.h"
+#include "iengine/dynlight.h"
 #include "csutil/bitset.h"
 #include "csutil/debug.h"
 #include "ivideo/texture.h"
@@ -61,8 +64,11 @@ csPolyTexture::csPolyTexture ()
 csPolyTexture::~csPolyTexture ()
 {
 #ifndef CS_USE_NEW_RENDERER
-  if (csEngine::current_engine->G3D)
-    csEngine::current_engine->G3D->RemoveFromCache (this);
+  if (polygon && polygon->GetParent ())
+  {
+    iGraphics3D* G3D = polygon->GetParent ()->thing_type->G3D;
+    if (G3D) G3D->RemoveFromCache (this);
+  }
 #endif // CS_USE_NEW_RENDERER
   CS_ASSERT (cache_data[0] == NULL);
   CS_ASSERT (cache_data[1] == NULL);
@@ -288,7 +294,7 @@ static bool CanCastShadow (
 
 
 void csPolyTexture::FillLightMap (
-  csFrustumView *lview,
+  iFrustumView *lview,
   csLightingPolyTexQueue* lptq,
   bool vis,
   csPolygon3D *subpoly)
@@ -315,7 +321,7 @@ void csPolyTexture::FillLightMap (
     shadow_bitmap = new csShadowBitmap (
         lm_w,
         lm_h,
-        csEngine::lightmap_quality,
+        3, //@@@@@@@csEngine::lightmap_quality,
         light_frustum->IsInfinite () ? 1 : 0);
 
     lptq->AddPolyTexture (this);
@@ -538,7 +544,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp)
   invhh = 1.0f / (float)hh;
 
   csRGBMap &remap = lm->GetRealMap ();
-  csDynLight *light = (csDynLight *) (lp->GetLight ());
+  iDynLight *light = lp->GetLight ();
   csRGBpixel *map = remap.GetArray ();
 
   int i;
@@ -550,7 +556,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp)
   if (lp->GetLightFrustum ())
     lightpos = lp->GetLightFrustum ()->GetOrigin ();
   else
-    lightpos = light->GetCenter ();
+    lightpos = light->QueryLight ()->GetCenter ();
 
   // Calculate the uv's for all points of the frustum (the
   // frustum is actually a clipped version of the polygon).
@@ -575,7 +581,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp)
     }
   }
 
-  csColor color = light->GetColor () * CS_NORMAL_LIGHT_LEVEL;
+  csColor color = light->QueryLight ()->GetColor () * CS_NORMAL_LIGHT_LEVEL;
 
   int new_lw = lm->GetWidth ();
 
@@ -715,7 +721,8 @@ b:
         // Check if the point on the polygon is shadowed. To do this
         // we traverse all shadow frustums and see if it is contained in
 	// any of them.
-        iShadowIterator *shadow_it = lp->GetShadowBlock ().GetShadowIterator ();
+        iShadowIterator *shadow_it = lp->GetShadowBlock ()
+		->GetShadowIterator ();
         bool shadow = false;
         while (shadow_it->HasNext ())
         {
@@ -736,7 +743,7 @@ b:
         {
           d = csSquaredDist::PointPoint (lightpos, v2);
 
-          if (d >= light->GetSquaredRadius ()) continue;
+          if (d >= light->QueryLight ()->GetSquaredRadius ()) continue;
           d = qsqrt (d);
 
           float cosinus = (v2 - lightpos) *
@@ -748,7 +755,8 @@ b:
           else if (cosinus > 1)
             cosinus = 1;
 
-          float brightness = cosinus * light->GetBrightnessAtDistance (d);
+          float brightness = cosinus * light->QueryLight ()
+	  	->GetBrightnessAtDistance (d);
 
           if (color.red > 0)
           {
@@ -816,9 +824,7 @@ void csPolyTexture::UpdateFromShadowBitmap (
   float mul_u = 1.0f / ww;
   float mul_v = 1.0f / hh;
 
-  csLight* l = light->GetPrivateObject ();
-  csStatLight *slight = (csStatLight *)l;
-  bool dyn = slight->IsDynamic ();
+  bool dyn = light->IsDynamic ();
 
   // From: T = Mwt * (W - Vwt)
   // ===>
@@ -834,8 +840,8 @@ void csPolyTexture::UpdateFromShadowBitmap (
 
   if (dyn)
   {
-    csShadowMap *smap = lm->FindShadowMap (l);
-    if (!smap) smap = lm->NewShadowMap (l, w, h);
+    csShadowMap *smap = lm->FindShadowMap (light);
+    if (!smap) smap = lm->NewShadowMap (light, w, h);
 
     unsigned char *shadowmap = smap->GetArray ();
     shadow_bitmap->UpdateShadowMap (
@@ -847,7 +853,7 @@ void csPolyTexture::UpdateFromShadowBitmap (
         mul_v,
         m_t2w,
         v_t2w,
-        l,
+        light,
         lightpos,
         polygon,
         cosfact);
@@ -866,7 +872,7 @@ void csPolyTexture::UpdateFromShadowBitmap (
         mul_v,
         m_t2w,
         v_t2w,
-        l,
+        light,
         lightpos,
         lightcolor,
         polygon,
@@ -1239,7 +1245,7 @@ void csShadowBitmap::UpdateLightMap (
   float mul_v,
   const csMatrix3 &m_t2w,
   const csVector3 &v_t2w,
-  csLight *light,
+  iLight *light,
   const csVector3 &lightpos,
   const csColor &lightcolor,
   csPolygon3D* poly,
@@ -1434,7 +1440,7 @@ void csShadowBitmap::UpdateShadowMap (
   float mul_v,
   const csMatrix3 &m_t2w,
   const csVector3 &v_t2w,
-  csLight *light,
+  iLight *light,
   const csVector3 &lightpos,
   csPolygon3D* poly,
   float cosfact)

@@ -46,6 +46,7 @@ struct csFog;
 struct iGraphics3D;
 struct iPolygon3D;
 struct iRenderView;
+struct iFrustumView;
 struct iSector;
 
 SCF_VERSION (iSectorCallback, 0, 0, 1);
@@ -65,7 +66,7 @@ struct iSectorCallback : public iBase
 };
 
 
-SCF_VERSION (iSector, 0, 5, 0);
+SCF_VERSION (iSector, 0, 5, 1);
 
 /**
  * The iSector interface is used to work with "sectors". A "sector"
@@ -199,6 +200,9 @@ struct iSector : public iBase
 
   /// Get the specified sector callback.
   virtual iSectorCallback* GetSectorCallback (int idx) const = 0;
+
+  /// Used for portal traversal.
+  virtual void CheckFrustum (iFrustumView* lview) = 0;
 };
 
 
