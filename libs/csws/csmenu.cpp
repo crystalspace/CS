@@ -39,8 +39,8 @@ csPixmap *csMenuItem::sprchecked = NULL;
 csPixmap *csMenuItem::sprsubmenu = NULL;
 static int menuitemref = 0;
 
-csMenuItem::csMenuItem (csComponent *iParent, char *iText, int iCommandCode,
-  int iStyle) : csComponent (iParent)
+csMenuItem::csMenuItem (csComponent *iParent, const char *iText,
+  int iCommandCode, int iStyle) : csComponent (iParent)
 {
   Init ();
   SetText (iText);
@@ -58,8 +58,8 @@ csMenuItem::csMenuItem (csComponent *iParent, int iStyle)
   CommandCode = cscmdNothing;
 }
 
-csMenuItem::csMenuItem (csComponent *iParent, char *iText, csMenu *iSubMenu,
-  int iStyle) : csComponent (iParent)
+csMenuItem::csMenuItem (csComponent *iParent, const char *iText,
+  csMenu *iSubMenu, int iStyle) : csComponent (iParent)
 {
   Init ();
   SetText (iText);

@@ -29,7 +29,9 @@
  * Methods:
  * <ul>
  * <li>void SetLimit (int) - set max number of values the array can hold
- * <li>int GetLimit () - query max number of values the array can hold
+ * <li>int Limit () - query max number of values the array can hold
+ * <li>void SetLength (int) - set the amount of elements that are actually used
+ * <li>int Length () - query the amount of elements that are actually used
  * <li>void IncRef ()/void DecRef () - Reference counter management
  * <li>operator [] (int) - return a reference to Nth element of the array
  * </ul>
@@ -45,17 +47,31 @@
   class Name								\
   {									\
     Type *root;								\
-    int Limit;								\
+    int limit;								\
     int RefCount;							\
+    int length;								\
   public:								\
-    int GetLimit ()							\
-    { return Limit; }							\
+    Name ()								\
+    { limit = length = RefCount = 0; root = NULL; }			\
+    ~Name ()								\
+    { SetLimit (0); }							\
+    int Limit ()							\
+    { return limit; }							\
     void SetLimit (int iLimit)						\
     {									\
-      if (!(Limit = iLimit))						\
-      { if (root) { free (root); root = NULL; } }			\
+      if (limit == iLimit) return;					\
+      if ((limit = iLimit))						\
+        root = (Type *)realloc (root, limit * sizeof (Type));		\
       else								\
-        root = (Type *)realloc (root, Limit * sizeof (Type));		\
+      { if (root) { free (root); root = NULL; } }			\
+    }									\
+    int Length ()							\
+    { return length; }							\
+    void SetLength (int iLength, int iGrowStep = 8)			\
+    {									\
+      length = iLength;							\
+      int newlimit = ((length + (iGrowStep - 1)) / iGrowStep) * iGrowStep;\
+      if (newlimit != limit) SetLimit (newlimit);			\
     }									\
     void IncRef ()							\
     { RefCount++; }							\
@@ -66,14 +82,14 @@
     }									\
     Type &operator [] (int n)						\
     { return root [n]; }						\
+    Type &Get (int n)							\
+    { return root [n]; }						\
     void Delete (int n)							\
-    { memmove (&root [n], &root [n + 1], (Limit - n - 1) * sizeof (Type)); }\
+    { memmove (&root [n], &root [n + 1], (limit - n - 1) * sizeof (Type)); }\
     Type *GetArray ()							\
     { return root; }							\
-    Name ()								\
-    { Limit = 0; RefCount = 0; root = NULL; }				\
-    ~Name ()								\
-    { SetLimit (0); }							\
+    void Push (Type &val, int iGrowStep = 8)				\
+    { SetLength (length + 1, iGrowStep); root [length - 1] = val; }	\
   }
 
 /**

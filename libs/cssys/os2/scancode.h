@@ -124,6 +124,7 @@
 #define SCANCODE_GRAYPGDN   0x67
 #define SCANCODE_GRAYINS    0x68
 #define SCANCODE_GRAYDEL    0x69
+#define SCANCODE_GRAYSLASH  0x6f
 
 extern int ScancodeToChar[128];
 

@@ -699,7 +699,7 @@ bool tri_contact (csVector3 P1, csVector3 P2, csVector3 P3,
 
 int add_collision (csCdTriangle *tr1, csCdTriangle *tr2)
 {
-  int limit = CD_contact.GetLimit ();
+  int limit = CD_contact.Limit ();
   if (csRAPIDCollider::numHits >= limit)
   {
 //  is this really needed? - A.Z.

@@ -65,14 +65,14 @@ class csMenuItem : public csComponent
 
 public:
   /// Menu item constructor: text item with optional style
-  csMenuItem (csComponent *iParent, char *iText, int iCommandCode = cscmdNothing,
-    int iStyle = CSMIS_DEFAULTVALUE);
+  csMenuItem (csComponent *iParent, const char *iText,
+    int iCommandCode = cscmdNothing, int iStyle = CSMIS_DEFAULTVALUE);
 
   /// Menu item constructor: construct a separator item
   csMenuItem (csComponent *iParent, int iStyle = CSMIS_DEFAULTVALUE);
 
   /// Menu item constructor: construct a submenu
-  csMenuItem (csComponent *iParent, char *iText, csMenu *iSubMenu,
+  csMenuItem (csComponent *iParent, const char *iText, csMenu *iSubMenu,
     int iStyle = CSMIS_DEFAULTVALUE);
 
   /// Destroy menu item object

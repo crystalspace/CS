@@ -58,14 +58,14 @@ static unsigned short ScanCodeToChar[128] =
   'o',      'p',      '[',      ']',      '\n',     CSKEY_CTRL,'a',     's',    // 18..1F
   'd',      'f',      'g',      'h',      'j',      'k',      'l',      ';',    // 20..27
   39,       '`',      CSKEY_SHIFT,'\\',   'z',      'x',      'c',      'v',    // 28..2F
-  'b',      'n',      'm',      ',',      '.',      '/',      CSKEY_SHIFT,'*',  // 30..37
+  'b',      'n',      'm',      ',',      '.',      '/',CSKEY_SHIFT,CSKEY_PADMULT,// 30..37
   CSKEY_ALT,' ',      0,        CSKEY_F1, CSKEY_F2, CSKEY_F3, CSKEY_F4, CSKEY_F5,// 38..3F
   CSKEY_F6,  CSKEY_F7, CSKEY_F8, CSKEY_F9, CSKEY_F10,0,       0,        CSKEY_HOME,// 40..47
-  CSKEY_UP,  CSKEY_PGUP,'-',    CSKEY_LEFT,CSKEY_CENTER,CSKEY_RIGHT,'+',CSKEY_END,// 48..4F
+  CSKEY_UP,  CSKEY_PGUP,CSKEY_PADMINUS,CSKEY_LEFT,CSKEY_CENTER,CSKEY_RIGHT,CSKEY_PADPLUS,CSKEY_END,// 48..4F
   CSKEY_DOWN,CSKEY_PGDN,CSKEY_INS,CSKEY_DEL,0,      0,        0,        CSKEY_F11,// 50..57
   CSKEY_F12,0,        0,        0,        0,        0,        0,        0,      // 58..5F
   0,        0,        0,        0,        0,        0,        0,        0,      // 60..67
-  0,        0,        0,        0,        0,        0,        0,        0,      // 68..6F
+  0,        0,        0,        0,        0,        0,        0,        CSKEY_PADDIV,// 68..6F
   0,        0,        0,        0,        0,        0,        0,        0,      // 70..77
   0,        0,        0,        0,        0,        0,        0,        0       // 78..7F
 };
@@ -91,6 +91,7 @@ void *SysSystemDriver::QueryInterface (const char *iInterfaceID, int iVersion)
 
 void SysSystemDriver::Loop ()
 {
+  bool ExtKey = false;
   while (!Shutdown && !ExitLoop)
   {
     static long prev_time = -1;
@@ -108,6 +109,12 @@ void SysSystemDriver::Loop ()
         {
           int ScanCode = event_queue [event_queue_tail].Keyboard.ScanCode;
           bool Down = (ScanCode < 0x80);
+          if ((ScanCode == 0xe0) || (ScanCode == 0xe1))
+          { ExtKey = true; continue; }
+
+          // handle keypad '/'
+          if (ExtKey && (ScanCode == 0x35))
+            ScanCode = 0x6f;
 
           ScanCode = ScanCodeToChar [ScanCode & 0x7F];
           if (ScanCode)

@@ -53,7 +53,7 @@ void csSprite2D::Draw (csRenderView& rview)
   rview.g3d->SetZBufMode (CS_ZBUF_USE);
 
   static G3DPolygonDPFX g3dpolyfx;
-  g3dpolyfx.num = vertices.GetLimit ();
+  g3dpolyfx.num = vertices.Limit ();
   g3dpolyfx.txt_handle = cstxt->GetTextureHandle ();
   g3dpolyfx.inv_aspect = rview.inv_aspect;
 }

@@ -173,7 +173,7 @@ public:
   DataIterator EnumData (const char* SectionPath, bool& Found) const;
   /// Returns a data iterator
   DataIterator EnumData (const char* SectionPath) const
-    { bool b; return EnumData(SectionPath, b); }
+    { bool b; return EnumData (SectionPath, b); }
   /// Enumerate data entries and put their names into a string vector
   bool EnumData (const char *SectionPath, csStrVector *oList) const;
 
@@ -198,20 +198,20 @@ public:
     /// Destructor
     ~CommentIterator();
     /// Returns section name over which this object iterates comments
-    const char* GetSection() const { return Section; }
+    const char* GetSection () const { return Section; }
     /// Returns key name (if specified) over which this object iterates
-    const char* GetKey() const { return Key; }
+    const char* GetKey () const { return Key; }
     /// Returns text of comment
-    const char* GetText() const { return Node->Comment.Text; }
+    const char* GetText () const { return Node->Comment.Text; }
   };
   friend class csIniFile::CommentIterator;
 
   /// Returns a comment iterator; sets Found to true if comments are found
-  CommentIterator EnumComments(const char* SectionPath, const char* KeyName,
+  CommentIterator EnumComments (const char* SectionPath, const char* KeyName,
     bool& Found) const;
   /// Returns a comment iterator; KeyName may be NULL
   CommentIterator EnumComments (const char* SectionPath, const char* KeyName)
-    const { bool b; return EnumComments(SectionPath, KeyName, b); }
+    const { bool b; return EnumComments (SectionPath, KeyName, b); }
   /// Enumerate comments bound to a entry; KeyName may be NULL
   bool EnumComments (const char* SectionPath, const char* KeyName,
     csStrVector *oList) const;

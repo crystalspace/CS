@@ -243,7 +243,7 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d, csTransfo
   // in the generic implementation. This is a todo...
 
   // Update work tables.
-  if (mesh.num_vertices > tr_verts.GetLimit ())
+  if (mesh.num_vertices > tr_verts.Limit ())
   {
     tr_verts.SetLimit (mesh.num_vertices);
     z_verts.SetLimit (mesh.num_vertices);

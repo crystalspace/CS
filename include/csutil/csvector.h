@@ -150,59 +150,53 @@ inline void csVector::QuickSort (int Mode)
     QuickSort (0, count - 1, Mode);
 }
 
-
-/* These macros will create a type-safe wrapper for csVector which manages
- * pointers to some type.
- *
- * Usage: DECLARE_TYPED_VECTOR(NAME,TYPE)
- *   NAME - Name of the new vector class.
- *   TYPE - Data type to which this vector of pointers refer.
- *
- *   Declares a new vector type NAME as a subclass of csVector.  Elements of
- *   this vector are pointer to TYPE.
+/**
+ * Declares a new vector type NAME as a subclass of BASE.  Elements of
+ * this vector are of type TYPE. The elements are automatically delete'd
+ * on either Delete() or DeleteAll() or upon vector destruction.
  *
  * Usage: DECLARE_TYPED_VECTOR_WITH_BASE(NAME,TYPE,BASE)
  *   NAME - Name of the new vector class.
- *   TYPE - Data type to which this vector of pointers refer.
+ *   TYPE - Data type to which this vector refer.
+ *          The TYPE should be possible to cast to (void *) and back.
  *   BASE - Base class of this new class (typically csVector).
- *
- *   Declares a new vector type NAME as a subclass of BASE.  Elements of
- *   this vector are pointer to TYPE.
  */
 #define DECLARE_TYPED_VECTOR_WITH_BASE(NAME,TYPE,BASE)		\
-  class NAME : protected BASE					\
+  class NAME : public BASE					\
   {								\
   public:							\
-    NAME (int ilimit = 8, int ithreshold = 16) :		\
+    NAME (int ilimit = 16, int ithreshold = 16) :		\
       BASE (ilimit, ithreshold) {}				\
+    virtual ~NAME ()						\
+    { DeleteAll (); }						\
     inline TYPE*& operator [] (int n)				\
     { return (TYPE*&)BASE::operator [] (n); }			\
     inline TYPE*& Get (int n) const				\
     { return (TYPE*&)BASE::Get (n); }				\
-    inline TYPE*& operator [] (int n) const			\
-    { return Get (n); }						\
-    void SetLength (int n)					\
-    { BASE::SetLength (n); }					\
-    inline int Length () const					\
-    { return BASE::Length (); }					\
     int Find (TYPE* which) const				\
-    { return BASE::Find (which); }				\
+    { return BASE::Find ((csSome)which); }			\
     int FindKey (const TYPE* value) const			\
-    { return BASE::FindKey (value); }				\
-    inline void Push (TYPE* what)				\
-    { BASE::Push (what); }					\
+    { return BASE::FindKey ((csSome)value); }			\
+    inline void Push (const TYPE* what)				\
+    { BASE::Push ((csSome)what); }				\
     inline TYPE* Pop ()						\
     { return (TYPE*)BASE::Pop (); }				\
-    bool Delete (int n)						\
-    { return BASE::Delete (n); }				\
-    void DeleteAll ()						\
-    { BASE::DeleteAll (); }					\
     bool Insert (int n, TYPE* Item)				\
-    { return BASE::Insert (n, Item); }				\
+    { return BASE::Insert (n, (csSome)Item); }			\
     virtual bool FreeItem (TYPE* Item)				\
-    { return BASE::FreeItem (Item); }				\
+    { delete (TYPE*)Item; return true; }			\
   };
 
+/**
+ * Declares a new vector type NAME as a subclass of csVector.  Elements of
+ * this vector are of type TYPE. The elements are automatically delete'd
+ * on either Delete() or DeleteAll() or upon vector destruction.
+ *
+ * Usage: DECLARE_TYPED_VECTOR(NAME,TYPE).
+ *   NAME - Name of the new vector class.
+ *   TYPE - Data type to which this vector of pointers refer.
+ *          The TYPE should be possible to cast to (void *) and back.
+ */
 #define DECLARE_TYPED_VECTOR(NAME,TYPE)				\
   DECLARE_TYPED_VECTOR_WITH_BASE (NAME,TYPE,csVector)
 

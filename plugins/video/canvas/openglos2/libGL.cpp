@@ -435,6 +435,11 @@ MRESULT glWindow::ClientMessage (ULONG Message, MPARAM MsgParm1, MPARAM MsgParm2
           return OldClientWindowProc (hwndCL, Message, MsgParm1, MsgParm2);
       }
     case WM_CHAR:
+      // err.... for some strange reasons '/' on numeric keypad
+      // emits very strange codes for me ...
+      if (SHORT1FROMMP (MsgParm1) == KC_CHAR
+       && SHORT1FROMMP (MsgParm2) == 0x7f)
+        MsgParm1 = MPARAM (int (MsgParm1) | 0x6f000000 | KC_SCANCODE);
       if (hKeyboard && (SHORT1FROMMP (MsgParm1) & KC_SCANCODE))
       {
         unsigned int ScanCode = SHORT2FROMMP (MsgParm1);

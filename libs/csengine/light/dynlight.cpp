@@ -64,7 +64,7 @@ static inline unsigned long CLOCK ()
 
 void CLights::AddLight (CLights *newLight)
 {
-  if (numLights >= theLights.GetLimit ())
+  if (numLights >= theLights.Limit ())
     theLights.SetLimit (numLights + 8);
 
   theLights [numLights++] = newLight;

@@ -455,6 +455,10 @@ public:
   inline void Set (float a, float b, float c, float d)
   { norm.x = a; norm.y = b; norm.z = c; DD = d; }
 
+  /// Same but takes directly a vector
+  inline void Set (csVector3 normal, float d)
+  { norm = normal; DD = d; }
+
   /// Classify the given vector with regards to this plane.
   inline float Classify (const csVector3& pt) const { return norm*pt+DD; }
 

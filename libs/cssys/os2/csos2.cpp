@@ -148,6 +148,11 @@ SysKeyboardDriver::SysKeyboardDriver () : csKeyboardDriver ()
   ScancodeToChar [SCANCODE_END]         = CSKEY_END;
   ScancodeToChar [SCANCODE_GRAYENTER]   = CSKEY_ENTER;
 
+  ScancodeToChar [SCANCODE_GRAYPLUS]    = CSKEY_PADPLUS;
+  ScancodeToChar [SCANCODE_GRAYMINUS]   = CSKEY_PADMINUS;
+  ScancodeToChar [SCANCODE_GRAYAST]     = CSKEY_PADMULT;
+  ScancodeToChar [SCANCODE_GRAYSLASH]   = CSKEY_PADDIV;
+
   ScancodeToChar [SCANCODE_F1]          = CSKEY_F1;
   ScancodeToChar [SCANCODE_F2]          = CSKEY_F2;
   ScancodeToChar [SCANCODE_F3]          = CSKEY_F3;

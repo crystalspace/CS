@@ -106,25 +106,44 @@ enum
 #define CSKEY_ALT		1011
 /// Shift key
 #define CSKEY_SHIFT		1012
-/// Function keys
+/// Function key F1
 #define CSKEY_F1		1013
+/// Function key F2
 #define CSKEY_F2		1014
+/// Function key F3
 #define CSKEY_F3		1015
+/// Function key F4
 #define CSKEY_F4		1016
+/// Function key F5
 #define CSKEY_F5		1017
+/// Function key F6
 #define CSKEY_F6		1018
+/// Function key F7
 #define CSKEY_F7		1019
+/// Function key F8
 #define CSKEY_F8		1020
+/// Function key F9
 #define CSKEY_F9		1021
+/// Function key F10
 #define CSKEY_F10		1022
+/// Function key F11
 #define CSKEY_F11		1023
+/// Function key F12
 #define CSKEY_F12		1024
 /// The "center" key ("5" on numeric keypad)
 #define CSKEY_CENTER		1025
+/// Numeric keypad '+'
+#define CSKEY_PADPLUS		1026
+/// Numeric keypad '-'
+#define CSKEY_PADMINUS		1027
+/// Numeric keypad '*'
+#define CSKEY_PADMULT		1028
+/// Numeric keypad '/'
+#define CSKEY_PADDIV		1029
 
 /// First and last control key code
 #define CSKEY_FIRST		1000
-#define CSKEY_LAST		1025
+#define CSKEY_LAST		1029
 
 /**
  * Predefined Command Codes<p>

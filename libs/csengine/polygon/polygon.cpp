@@ -1529,7 +1529,7 @@ void csPolygon3D::CalculateLighting (csLightView* lview)
   csVector3& center = light_frustrum->GetOrigin ();
 
   int num_vertices = GetVertices ().GetNumVertices ();
-  if (num_vertices > VectorArray.GetLimit ())
+  if (num_vertices > VectorArray.Limit ())
     VectorArray.SetLimit (num_vertices);
   csVector3 *poly = VectorArray.GetArray ();
 

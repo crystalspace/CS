@@ -56,7 +56,7 @@ public:
     bool zs, z1s;
     float r;
 
-    if (num_verts > verts.GetLimit())
+    if (num_verts > verts.Limit())
       init(num_verts);
 
     for (i = 0 ; i < num_vertices ; i++)

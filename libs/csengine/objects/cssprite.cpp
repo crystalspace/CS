@@ -928,7 +928,7 @@ void csSprite3D::GenerateSpriteLOD (int num_vts)
 
 void csSprite3D::UpdateWorkTables (int max_size)
 {
-  if (max_size > tr_verts.GetLimit ())
+  if (max_size > tr_verts.Limit ())
   {
     tr_verts.SetLimit (max_size);
     uv_verts.SetLimit (max_size);
@@ -942,7 +942,7 @@ void csSprite3D::UpdateDeferedLighting ()
 {
   if (defered_num_lights)
   {
-    if (defered_num_lights > light_worktable.GetLimit ())
+    if (defered_num_lights > light_worktable.Limit ())
       light_worktable.SetLimit (defered_num_lights);
 
     csSector* sect = (csSector*)sectors[0];
