@@ -24,19 +24,12 @@
 	#endif
  
 	#if defined( _WIN32 ) || defined( WIN32 )
-		#pragma message("Compiling on Windows...")
 		#define PLATFORM_WINDOWS
-	#else
-		#pragma message("Compiling on unknown platform...")
 	#endif
 
 	// Check compiler
 	#if defined(_MSC_VER)
-		#pragma message("Compiling with VC++...")
 		#define COMPILER_VISUAL_CPP
-	#else
-		#pragma message("Compiling with unknown compiler...")
-       
 	#endif
 
 	// Check compiler options
@@ -88,6 +81,8 @@
 	#define inline_				inline
       	
    // Down the hatch
+#if defined(COMPILER_VISUAL_CPP)
 	#pragma inline_depth( 255 )
+#endif
 
 #endif // __ICEPREPROCESSOR_H__
