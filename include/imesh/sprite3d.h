@@ -375,6 +375,16 @@ struct iSprite3DState : public iBase
   /// Set whether action should run in reverse or not.
   virtual void SetReverseAction(bool reverse) = 0;
 
+  /// Set single-step frame advance flag on actions
+  virtual void SetSingleStepAction(bool singlestep) = 0;
+
+  /**
+   * This sets an action to run one time, then the
+   * sprite reverts to the prior action.
+   */
+  virtual bool SetOverrideAction(const char *name,
+        float speed = 1) = 0;
+
   /// Propogate set action to all children
   virtual bool PropagateAction (const char *name) = 0;
 
