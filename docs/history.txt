@@ -72,6 +72,10 @@ chronological order.
 	- Eric Sunshine fixed bugs in cgdriver2d.mak and glosx2d.mak where they
 	  were prefixing one extra $(SRCDIR)/ to several of the computed path
 	  containers.
+	- Eric Sunshine worked around compilation error on MacOS/X 10.1 in
+	  ogl_polybuf.cpp where it failed to resolve ?: conditional operator
+	  when given a csRef and a zero.  Changed it to instead use a simple
+	  `if' expression.
 20-Oct-2003
         - Philip Wyett added 'joytest' to CS/ root .cvsignore file.
 	- Jorrit added thing.cfg.

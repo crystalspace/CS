@@ -151,7 +151,8 @@ void csTriangleArrayPolygonBuffer::MarkLightmapsDirty()
 //  superLM.MarkLightmapsDirty();
 }
 
-void csTriangleArrayPolygonBuffer::SetVertexArray (csVector3* verts, int num_verts)
+void csTriangleArrayPolygonBuffer::SetVertexArray (
+  csVector3* verts, int num_verts)
 {
   delete[] vertices;
   num_vertices = num_verts;
@@ -217,7 +218,9 @@ void csTriangleArrayPolygonBuffer::AddPolygon (int num_verts,
    * the face normal, just add it to the vertex normal and normalize
    */
 
-  iSuperLightmap* slm = lm ? ((csGLRendererLightmap*)lm)->slm : 0;
+  iSuperLightmap* slm = 0;
+  if (lm)
+    slm = ((csGLRendererLightmap*)lm)->slm;
 
   csTrianglesPerMaterial* pol;
   int last_mat_index = polygons.GetLastMaterial ();
@@ -236,9 +239,9 @@ void csTriangleArrayPolygonBuffer::AddPolygon (int num_verts,
     pol = polygons.last;
   }
 
-  const csMatrix3& m_obj2tex = 
+  const csMatrix3& m_obj2tex =
     tmapping ? tmapping->m_obj2tex : csMatrix3 (); // @@@
-  const csVector3& v_obj2tex = 
+  const csVector3& v_obj2tex =
     tmapping ? tmapping->v_obj2tex : csVector3 (); // @@@
   csTransform obj2tex (m_obj2tex, v_obj2tex);
 
@@ -259,7 +262,7 @@ void csTriangleArrayPolygonBuffer::AddPolygon (int num_verts,
     float lm_high_u = 1.0f, lm_high_v = 1.0f;
     if (tmapping)
       tmapping->GetTextureBox (lm_low_u, lm_low_v, lm_high_u, lm_high_v);
-    
+
     float lm_scale_u = ((lmc.u2 - lmc.u1) / (lm_high_u - lm_low_u));
     float lm_scale_v = ((lmc.v2 - lmc.v1) / (lm_high_v - lm_low_v));
 
@@ -269,8 +272,8 @@ void csTriangleArrayPolygonBuffer::AddPolygon (int num_verts,
 		  0, 0, 1));
     tex2lm.SetO2TTranslation (
       csVector3 (
-      (lm_scale_u != 0.0f) ? (lm_low_u - lmc.u1 / lm_scale_u) : 0, 
-      (lm_scale_v != 0.0f) ? (lm_low_v - lmc.v1 / lm_scale_v) : 0, 
+      (lm_scale_u != 0.0f) ? (lm_low_u - lmc.u1 / lm_scale_u) : 0,
+      (lm_scale_v != 0.0f) ? (lm_low_v - lmc.v1 / lm_scale_v) : 0,
       0));
   }
 
@@ -322,7 +325,7 @@ void csTriangleArrayPolygonBuffer::AddPolygon (int num_verts,
 }
 
 csTriangleArrayVertexBufferManager::csTriangleArrayVertexBufferManager
-  (iObjectRegistry* object_reg, csGraphics3DOGLCommon* g3d) : 
+  (iObjectRegistry* object_reg, csGraphics3DOGLCommon* g3d) :
    csVertexBufferManager (object_reg)
 {
   csTriangleArrayVertexBufferManager::g3d = g3d;
