@@ -29,12 +29,10 @@ CrystGLView::CrystGLView(BRect frame, iSystem* isys) :
   BGLView(frame, "", B_FOLLOW_NONE, 0, BGL_RGB | BGL_DEPTH | BGL_DOUBLE),
   system(isys)
 {
-  system->IncRef();
 }
 
 CrystGLView::~CrystGLView()
 {
-  system->DecRef();
 }
 
 void CrystGLView::UserAction() const

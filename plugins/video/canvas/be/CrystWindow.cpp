@@ -28,12 +28,10 @@
 CrystView::CrystView(BRect frame, iSystem* isys, BBitmap* ibmap) :
   BView(frame, "", B_FOLLOW_ALL, B_WILL_DRAW), system(isys), bitmap(ibmap)
 {
-  system->IncRef();
 }
 
 CrystView::~CrystView()
 {
-  system->DecRef();
 }
 
 void CrystView::UserAction() const

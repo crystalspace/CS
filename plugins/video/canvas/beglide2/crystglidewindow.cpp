@@ -28,12 +28,10 @@
 CrystGlideView::CrystGlideView(BRect frame, iSystem* isys, BBitmap* ibmap) :
   BView(frame, "", B_FOLLOW_NONE, B_WILL_DRAW), system(isys), bitmap(ibmap)
 {
-  system->IncRef();
 }
 
 CrystGlideView::~CrystGlideView()
 {
-  system->DecRef();
 }
 
 void CrystGlideView::UserAction() const
