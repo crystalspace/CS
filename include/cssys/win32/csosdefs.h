@@ -20,22 +20,6 @@
 #ifndef __CSOSDEFS_H__
 #define __CSOSDEFS_H__
 
-// So many things require this. IF you have an issue with something defined
-// in it then undef that def here.
-#include <windows.h>
-#undef min
-#undef max
-#undef GetCurrentTime
-#undef DeleteFile
-
-
-
-// For GUI applications, use "csMain" instead of "main".
-// For console applications, use regular "main".
-#ifndef CONSOLE
-  #define main csMain
-#endif
-
 #if defined(COMP_VC)
   #pragma warning(disable:4244)   // conversion from 'double' to 'float'
   #pragma warning(disable:4305)   // conversion from 'const double' to 'float'
@@ -52,6 +36,20 @@
   #pragma warning(disable:4201)   // structure/ union without name. (Only relevant on MSVC 5.0)
   #pragma warning(disable:4702)   // Unreachable Code
   #pragma warning(disable:4512)   // Could not generate assignment operator
+#endif
+
+// So many things require this. IF you have an issue with something defined
+// in it then undef that def here.
+#include <windows.h>
+#undef min
+#undef max
+#undef GetCurrentTime
+#undef DeleteFile
+
+// For GUI applications, use "csMain" instead of "main".
+// For console applications, use regular "main".
+#ifndef CONSOLE
+  #define main csMain
 #endif
 
 #if defined(COMP_WCC) || defined(COMP_BC)
