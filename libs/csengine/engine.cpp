@@ -227,6 +227,13 @@ bool csEngineMeshList::FreeItem (csSome Item)
   return true;
 }
 
+void csEngineMeshList::RemoveMesh (iMeshWrapper* mesh)
+{
+  mesh->IncRef ();
+  csMeshList::RemoveMesh (mesh);
+  mesh->DecRef ();
+}
+
 //---------------------------------------------------------------------------
 
 csLightIt::csLightIt (csEngine* e, csRegion* r) : engine (e), region (r)
@@ -769,11 +776,8 @@ void csEngine::DeleteAll ()
   for (i=GetMeshes ()->GetMeshCount ()-1; i >= 0; i--)
   {
     iMeshWrapper *imw = GetMeshes ()->GetMesh (i);
-    imw->IncRef ();
-    GetMeshes ()->RemoveMesh (imw);
-    imw->DecRef ();
+    GetMeshes ()->RemoveMesh (imw); // this will IncRef before removal and DecRef afterward
   }
-  meshes.DeleteAll ();
   mesh_factories.DeleteAll ();
 
 // @@@ I suppose the loop below is no longer needed?
@@ -1493,11 +1497,7 @@ void csEngine::ControlMeshes ()
   {
     iMeshWrapper* sp = (iMeshWrapper*)meshes[i];
     if (sp->WantToDie ())
-    {
-      sp->IncRef (); // mesh checks while destructed not being in a sector -- see DeleteAll ()
       GetMeshes ()->RemoveMesh (sp);
-      sp->DecRef ();
-    }
     i--;
   }
 }

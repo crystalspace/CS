@@ -316,6 +316,7 @@ class csEngineMeshList : public csMeshList
 {
 public:
   virtual bool FreeItem (csSome Item);
+  virtual void RemoveMesh (iMeshWrapper* mesh);
 };
 
 /**
