@@ -38,7 +38,7 @@ void OutpHeadCS (FILE *o, Lib3dsFile *p3dsFile)
   {
 
     // extracts all unique textures
-    char *textures[100];
+    char *textures[10000];
     int numTextures = 0;
     int j;
 
