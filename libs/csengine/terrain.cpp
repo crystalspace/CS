@@ -160,6 +160,11 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
   JORRIT:
      this code is copied from the ogl_g3d renderer.
   csMatrix3 orientation = o2c.GetO2T();
+  */
+  // Alex: here it is I think:
+  const csMatrix3& orientation = rview.GetO2T ();
+
+  /*
     
   // set up coordinate transform
   GLfloat matrixholder[16];
@@ -280,7 +285,7 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
 	while (i < mesh->getBinTreeNo())
 	{
 //	  if (_textureMap && (i%2 == 0) && _textureMap[i/2])
-// JORRIT:       g3dmesh.txt_handle[0] = _textureMap[i/2];
+		g3dmesh.txt_handle[0] = _textureMap[i/2]->GetTextureHandle ();
 
 		if ((bt = mesh->getBinTree(i)) && (bt->visTriangle() > 0))
 		{
