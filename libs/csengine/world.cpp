@@ -541,7 +541,7 @@ void csWorld::ShineLights ()
   int sn = 0;
   int num_sectors = sectors.Length ();
   csProgressMeter meter;
-  CsPrintf (MSG_INITIALIZATION, "Initializing lightmaps (%d sectors total):\n  ", num_sectors);
+  CsPrintf (MSG_INITIALIZATION, "Initializing lightmaps (%d sectors):\n  ", num_sectors);
 
   meter.SetTotal (num_sectors);
   for (sn = 0; sn < num_sectors ; sn++)
@@ -552,7 +552,7 @@ void csWorld::ShineLights ()
   }
 
   meter.SetTotal (light_count);
-  CsPrintf(MSG_INITIALIZATION, "\nShining lights (%d lights total):\n  ", light_count);
+  CsPrintf(MSG_INITIALIZATION, "\nShining lights (%d lights):\n  ", light_count);
   lit->Restart ();
   while ((l = lit->Fetch ()) != NULL)
   {
@@ -564,7 +564,7 @@ void csWorld::ShineLights ()
   // and remap all lightmaps.
   if (csPolygon3D::do_lightmap_highqual && csPolygon3D::do_force_recalc)
   {
-    CsPrintf(MSG_INITIALIZATION, "\nScaling lightmaps:\n  ");
+    CsPrintf(MSG_INITIALIZATION, "\nScaling lightmaps (%d maps):\n  ", polygon_count);
     csPolygon3D::def_mipmap_size *= 2;
     meter.SetTotal (polygon_count);
     pit->Restart ();
@@ -576,7 +576,7 @@ void csWorld::ShineLights ()
   }
 
   meter.SetTotal (num_sectors);
-  CsPrintf(MSG_INITIALIZATION, "\nCaching lightmaps (%d sectors total):\n  ", num_sectors);
+  CsPrintf(MSG_INITIALIZATION, "\nCaching lightmaps (%d sectors):\n  ", num_sectors);
   for (sn = 0; sn < num_sectors ; sn++)
   {
     csSector* s = (csSector*)sectors[sn];
