@@ -264,7 +264,7 @@ csPolygon3D::csPolygon3D (csMaterialWrapper* material) : csPolygonInt (),
   csObject (), vertices (4)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
-  DG_DESCRIBE0 ((csObject*)this, "csPolygon3D()");
+  DG_TYPE ((csObject*)this, "csPolygon3D");
   polygon_id = 0;
 
   if (material) SetMaterial (material);
@@ -299,7 +299,7 @@ csPolygon3D::csPolygon3D (csPolygon3D& poly) : csPolygonInt (),
   csObject (), vertices (4)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
-  DG_DESCRIBE0 ((csObject*)this, "csPolygon3D()");
+  DG_TYPE ((csObject*)this, "csPolygon3D");
 
   const char* tname = poly.GetName ();
   if (tname) SetName (tname);

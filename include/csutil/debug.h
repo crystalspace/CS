@@ -33,6 +33,8 @@ struct iObjectRegistry;
   csDebuggingGraph::AddObject(NULL,(void*)(obj),false,__FILE__,__LINE__,desc)
 #define DG_ADDI(obj,desc) \
   csDebuggingGraph::AddObject(NULL,(void*)(obj),true,__FILE__,__LINE__,desc)
+#define DG_TYPE(obj,type) \
+  csDebuggingGraph::AttachType(NULL,(void*)(obj),type)
 #define DG_DESCRIBE0(obj,desc) \
   csDebuggingGraph::AttachDescription(NULL,(void*)(obj),desc)
 #define DG_DESCRIBE1(obj,desc,a) \
@@ -58,6 +60,7 @@ struct iObjectRegistry;
 #else
 #define DG_ADD(obj,desc)
 #define DG_ADDI(obj,desc)
+#define DG_TYPE(obj,type)
 #define DG_DESCRIBE0(obj,desc)
 #define DG_DESCRIBE1(obj,desc,a)
 #define DG_DESCRIBE2(obj,desc,a,b)
@@ -101,6 +104,12 @@ public:
    */
   static void AttachDescription (iObjectRegistry* object_reg,
   	void* object, char* description, ...);
+
+  /**
+   * Attach a type to an object in the graph.
+   */
+  static void AttachType (iObjectRegistry* object_reg,
+  	void* object, char* type);
 
   /**
    * Remove an object from the debug tree.

@@ -23,6 +23,7 @@
 #include "csengine/light.h"
 #include "csengine/engine.h"
 #include "csengine/thing.h"
+#include "csutil/debug.h"
 #include "ivideo/graph3d.h"
 #include "iengine/rview.h"
 #include "imesh/thing/polygon.h"
@@ -51,6 +52,7 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent, iMeshObject* mesh)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshWrapper);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVisibilityObject);
+  DG_TYPE (this, "csMeshWrapper");
 
   movable.scfParent = this;
   defered_num_lights = 0;
@@ -77,6 +79,7 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshWrapper);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVisibilityObject);
+  DG_TYPE (this, "csMeshWrapper");
 
   movable.scfParent = this;
   defered_num_lights = 0;

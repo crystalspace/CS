@@ -21,6 +21,7 @@
 #include "csutil/csstring.h"
 #include "csutil/hashmap.h"
 #include "csutil/csppulse.h"
+#include "csutil/debug.h"
 #include "iutil/vfs.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
@@ -118,6 +119,7 @@ csSector::csSector (csEngine* engine) : csObject ()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSector);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiReferencedObject);
+  DG_TYPE (this, "csSector");
   csSector::engine = engine;
   culler_mesh = NULL;
   culler = NULL;

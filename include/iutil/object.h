@@ -131,6 +131,9 @@ struct iObject : public iBase
    * remove child objects while iterating.
    */
   virtual iObjectIterator *GetIterator () = 0;
+
+  // @@@ temporary fix
+  virtual void ObjReleaseOld (iObject *obj) = 0;
 };
 
 

@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 #include "csengine/material.h"
 #include "csengine/engine.h"
+#include "csutil/debug.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
@@ -141,6 +142,7 @@ csMaterialWrapper::csMaterialWrapper (iMaterial* m) :
   csObject (), handle (NULL)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
+  DG_TYPE (this, "csMaterialWrapper");
   material = m;
   material->IncRef ();
 
@@ -152,6 +154,7 @@ csMaterialWrapper::csMaterialWrapper (iMaterialHandle *ith) :
   csObject (), material (NULL)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
+  DG_TYPE (this, "csMaterialWrapper");
 
   handle = ith;
   handle->IncRef ();
@@ -163,6 +166,7 @@ csMaterialWrapper::csMaterialWrapper (iMaterialHandle *ith) :
 csMaterialWrapper::csMaterialWrapper (csMaterialWrapper &w) : csObject (w)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
+  DG_TYPE (this, "csMaterialWrapper");
 
   material = w.material;
   material->IncRef ();

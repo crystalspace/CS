@@ -17,6 +17,13 @@ The history order is reversed so that new features are at the top.
 	  clean up curve templates and polytxt planes from the thing
 	  environment using these functions. Another memory leak
 	  fixed :-)
+	- Added the notion of types to the csDebuggingGraph tool.
+	  This means that you can now also indicate the type of the
+	  object in the graph. This is purely to make the dump
+	  easier to read. Use DG_TYPE to set the type.
+	- Added DG_TYPE to lots of common csObject's in the engine.
+	- Reverted part of Martin's changes to csObject because
+	  this causes problems in some cases. i.e. re-added ObjReleaseOld().
 16-Nov-2001
 	- Removed csDebuggingGraph::AddInterface() and instead added
 	  a 'bool scf' parameter to AddObject().

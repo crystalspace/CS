@@ -98,7 +98,7 @@ csThing::csThing (iBase* parent) : csObject (parent),
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVisibilityCuller);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshObject);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshObjectFactory);
-  DG_DESCRIBE0 (this, "csThing()");
+  DG_TYPE (this, "csThing");
 
   last_thing_id++;
   thing_id = last_thing_id;

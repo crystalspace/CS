@@ -48,7 +48,7 @@ csLight::csLight (float x, float y, float z, float d,
   float red, float green, float blue) : csObject()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLight);
-  DG_DESCRIBE0 (this, "csLight()");
+  DG_TYPE (this, "csLight");
   light_id = last_light_id++;
   center.x = x;
   center.y = y;
@@ -170,7 +170,7 @@ csStatLight::csStatLight (float x, float y, float z, float dist,
   : csLight (x, y, z, dist, red, green, blue)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiStatLight);
-  DG_DESCRIBE0 (this, "csStatLight()");
+  DG_TYPE (this, "csStatLight");
   csStatLight::dynamic = dynamic;
   flags.SetAll (CS_LIGHT_THINGSHADOWS);
 }
@@ -376,7 +376,7 @@ csDynLight::csDynLight (float x, float y, float z, float dist,
   : csLight (x, y, z, dist, red, green, blue)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDynLight);
-  DG_DESCRIBE0 (this, "csDynLight()");
+  DG_TYPE (this, "csDynLight");
   lightpatches = NULL;
 }
 

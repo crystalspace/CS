@@ -45,6 +45,7 @@
 #include "csgfx/csimage.h"
 #include "csutil/util.h"
 #include "csutil/cfgacc.h"
+#include "csutil/debug.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
 #include "iutil/vfs.h"
@@ -700,6 +701,7 @@ csEngine::csEngine (iBase *iParent) : sectors (true)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
+  DG_TYPE (&scfiObject, "csEngine");
   engine_mode = CS_ENGINE_AUTODETECT;
   first_dyn_lights = NULL;
   object_reg = NULL;

@@ -21,6 +21,7 @@
 #include "cssysdef.h"
 #include "csengine/texture.h"
 #include "csengine/engine.h"
+#include "csutil/debug.h"
 #include "igraphic/image.h"
 #include "ivideo/txtmgr.h"
 
@@ -39,6 +40,7 @@ csTextureWrapper::csTextureWrapper (iImage* Image) :
   csObject (), handle (NULL), flags (CS_TEXTURE_3D), use_callback (NULL)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
+  DG_TYPE (this, "csTextureWrapper");
 
   (image = Image)->IncRef ();
   UpdateKeyColorFromImage ();
@@ -51,6 +53,7 @@ csTextureWrapper::csTextureWrapper (iTextureHandle *ith) :
   csObject (), image (NULL), use_callback (NULL)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
+  DG_TYPE (this, "csTextureWrapper");
 
   handle = ith;
   if (handle)
@@ -73,6 +76,7 @@ csTextureWrapper::csTextureWrapper (csTextureWrapper &t) :
   csObject (t), flags (CS_TEXTURE_3D), use_callback (NULL)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
+  DG_TYPE (this, "csTextureWrapper");
 
   (handle = t.handle)->IncRef ();
   (image = t.image)->IncRef ();

@@ -44,7 +44,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 csPortal::csPortal ()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPortal);
-  DG_DESCRIBE0 (this, "csPortal()");
+  DG_TYPE (this, "csPortal");
   filter_texture = NULL;
   filter_r = 1;
   filter_g = 1;

@@ -112,6 +112,9 @@ public:
   virtual iObjectIterator *GetIterator ();
 
   SCF_DECLARE_IBASE;
+
+  // @@@ temporary fix
+  virtual void ObjReleaseOld (iObject *obj);
 };
 
 #endif // __CSOBJ_H__

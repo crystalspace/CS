@@ -36,6 +36,7 @@ struct csDGEL
   bool used;		// If true the object is currently allocated.
   uint32 timestamp;	// Timestamp of last allocation.
   char* description;
+  char* type;
   char* file;
   int linenr;
   int num_parents;
@@ -54,6 +55,7 @@ struct csDGEL
     used = false;
     timestamp = 0;
     description = NULL;
+    type = NULL;
     file = NULL;
     num_parents = 0;
     parents = NULL;
@@ -65,6 +67,7 @@ struct csDGEL
   void Clear ()
   {
     delete[] description; description = NULL;
+    delete[] type; type = NULL;
     delete[] file; file = NULL;
     delete[] parents; parents = NULL; num_parents = 0;
     delete[] p_stamps; p_stamps = NULL;
@@ -367,6 +370,30 @@ void csDebuggingGraph::AttachDescription (iObjectRegistry* object_reg,
   else el->description = NULL;
 }
 
+void csDebuggingGraph::AttachType (iObjectRegistry* object_reg,
+  	void* object, char* type)
+{
+#ifdef CS_DEBUG
+  if (!object_reg) object_reg = iSCF::SCF->object_reg;
+#endif
+  if (!object_reg) return;
+  csDebugGraph* dg = SetupDebugGraph (object_reg);
+
+  csDGEL* el = dg->FindEl (object);
+  if (el == NULL)
+  {
+    printf ("ERROR! Cannot find object %p to add type '%s'\n", object, type);
+    fflush (stdout);
+    CS_ASSERT (false);
+    return;
+  }
+
+  delete[] el->type;
+  if (type)
+    el->type = csStrNew (type);
+  else el->type = NULL;
+}
+
 void csDebuggingGraph::RemoveObject (iObjectRegistry* object_reg,
 	void* object, char* file, int linenr)
 {
@@ -560,7 +587,10 @@ static void DumpSubTree (int indent, const char* type, uint32 link_timestamp,
   }
   else if (!el->used)
     printf ("-");
-  printf ("t%d) %s", el->timestamp, el->description);
+  if (el->type)
+    printf ("t%d) %s(%s)", el->timestamp, el->type, el->description);
+  else
+    printf ("t%d) %s", el->timestamp, el->description);
 
   // If the object is used but the link to this object was created
   // BEFORE the object (i.e. timestamps) then this is at least very
