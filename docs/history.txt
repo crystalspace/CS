@@ -7,17 +7,21 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 3-Nov-2003
-  - Chris Matuszewski added some explicit type casts to stop msvc6 from
-    emitting warning messages in csgfx/rgbpixel.h and shadervar.h.
-  - Chris Matuszewski added ComponentIsInTransition() to iAws interface.
-    Cleaned up the implementation of ComponentIsInTransition
-    within awsmgr.cpp to do only what its name implies.
-    Removed spurious error message that would display after a
-    transition completed.
-  - Chris Matuszewski fixed a bug in csObject::GetChild(const char* Name)
-    where it would crash when an object didn't have a name.
-  - Chris Matuszewski brought cspace.i and swig generated python wrappers
-    up to date.
+	- Chris Matuszewski added some explicit type casts to stop msvc6 from
+	  emitting warning messages in csgfx/rgbpixel.h and shadervar.h.
+	- Chris Matuszewski added ComponentIsInTransition() to iAws interface.
+	  Cleaned up the implementation of ComponentIsInTransition within
+	  awsmgr.cpp to do only what its name implies.  Removed spurious error
+	  message that would display after a transition completed.
+	- Chris Matuszewski fixed a bug in csObject::GetChild(const char* Name)
+	  where it would crash when an object didn't have a name.
+	- Chris Matuszewski brought cspace.i and swig generated python wrappers
+	  up to date.
+	- Eric Sunshine fixed bug which was recently introduced into
+	  csObject::GetChild(char const*).  It was incorrectly aborting the
+	  search when it found an unnamed child.  Instead, it should simply
+	  ignore that child and continue examining the others.  Problem noted
+	  by Frank Richter.
 2-Nov-2003
 	- Eric Sunshine performed project-wide spelling corrections:
 	    seperate    --> separate

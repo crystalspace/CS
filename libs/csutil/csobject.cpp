@@ -283,13 +283,10 @@ iObject* csObject::GetChild (const char *Name) const
   if (!Children || !Name)
     return 0;
 
-  int i;
-  for (i = 0; i < Children->Length (); i++)
+  for (int i = 0; i < Children->Length (); i++)
   {
     const char *ThisName = Children->Get (i)->GetName ();
-    if (!ThisName)
-      return 0;
-    if (!strcmp (ThisName, Name))
+    if (ThisName != 0 && !strcmp (ThisName, Name))
       return Children->Get (i);
   }
   return 0;
