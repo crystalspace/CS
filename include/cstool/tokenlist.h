@@ -90,7 +90,7 @@ enum {
 };
 
 #undef CS_TOKEN_LIST_TOKEN
-#define CS_TOKEN_LIST_TOKEN(X) s = #X; s.strlwr(); \
+#define CS_TOKEN_LIST_TOKEN(X) s = #X; s.Downcase(); \
   t.Register(s, XMLTOKEN_ ## X);
 
 static void init_token_table(csStringHash& t)
