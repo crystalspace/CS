@@ -396,7 +396,13 @@ void csMovieRecorder::Start(void)
   minFrameEncodeTime = minFrameTime = minWriteToDiskTime = (csTicks)-1;
   maxFrameEncodeTime = maxFrameTime = maxWriteToDiskTime = 0;
 
-  movieFile = VFS->Open(movieFileName, VFS_FILE_WRITE | VFS_FILE_UNCOMPRESSED);
+  movieFile = VFS->Open (movieFileName, VFS_FILE_WRITE | VFS_FILE_UNCOMPRESSED);
+  if (!movieFile)
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING,
+    	"Couldn't open file '%s' for recording", movieFileName);
+    return;
+  }
   fakeTicksPerFrame = (1000 / frameRate);
   ffakeClockTicks = fakeClockTicks;
 
