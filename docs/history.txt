@@ -22,6 +22,10 @@ chronological order.
 	- Eric Sunshine augmented crystal.m4 so that it also exports
 	  CRYSTAL_INCLUDE_DIR (make) and CRYSTAL.INCLUDE_DIR (jam).  This is
 	  the value returned by cs-config's --includedir option.
+	- Eric Sunshine disabled warning C4248 for MSVC6 in win32/csosdefs.h
+	  since MSVC6 emits bogus warning about "protected constructor" when
+	  csHash instantiates Iterator and GlobalIterator even though csHash is
+	  a friend of Iterator and GlobalIterator.
 4-Dec-2003
         - Steven Geens added a odedynam function for mesh<->plane collisions.
 3-Dec-2003

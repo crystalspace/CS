@@ -41,7 +41,13 @@
   #pragma warning(disable:4786)   // identifier was truncated to '255' characters in the browser information (VC6)
   #pragma warning(disable:4800)   // Forcing value to bool
   #pragma warning(disable:4805)   // unsafe mix of bool and int.
-  
+
+#if (_MSC_VER < 1300)
+  #pragma warning(disable:4248)   // MSVC6 gives bogus "protected constructor"
+				  // for csHash::*Iterator, even though csHash
+				  // is friend.
+#endif
+
   #pragma warning(default:4265)   // class has virtual functions, but destructor is not virtual
 
   #pragma inline_depth (255)
