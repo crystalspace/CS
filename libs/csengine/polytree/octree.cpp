@@ -172,7 +172,7 @@ int csOctreeNode::CountPolygons ()
 static csVector3 GetVector3 (int plane_nr, float plane_pos,
 	const csVector2& p)
 {
-  csVector3 v;
+  csVector3 v(0);
   switch (plane_nr)
   {
     case PLANE_X: v.Set (plane_pos, p.x, p.y); break;
