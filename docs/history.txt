@@ -5,11 +5,18 @@ The history order has been reversed so that new features are at the top.
 	  This caused a bug because the dynamic lighting routine can't handle
 	  this correctly. Rather than fixing this routine (which would make
 	  it slower) I choose to just disable this feature.
-	- The dynamic lighting routine also accounts for space warping
-	  portals now.
+	- The dynamic lighting routine also accounts for space warping portals
+	  now.
 	- Removed a lot of the obsolete tokens in csparser.
 	- Fixed a bug in csThing::MergeTemplate(). The function did not
 	  correctly copy the flags from the template to the thing.
+	- Eric Sunshine fixed a couple of problems in
+	  ddgTriangle3::intersectPointTriangle() which were reported by
+	  Jonathon Doran <jon.doran@nsc.com>:
+	    - The `d23' vector was being incorrectly computed.
+	    - The Borland compiler was not able to grok computation of the
+	      `d1', `d2', and `d3' vectors on account of very questionable
+	      mixing of references and pointers.
 15-Feb-2001
 	- Updated various parts of the documentation. The most important
 	  change is that the simple tutorial has been updated to the mesh

@@ -111,12 +111,12 @@ bool ddgTriangle3::intersectTriangleWithLine( const ddgVector3* l1, const ddgVec
 bool ddgTriangle3::intersectPointTriangle( const ddgVector3* pt)
 {
     // Must be able to optimize this...
-    ddgVector3 d1(v[0]-pt);
-    ddgVector3 d2(v[1]-pt);
-    ddgVector3 d3(v[2]-pt);
+    ddgVector3 d1(v[0]-*pt);
+    ddgVector3 d2(v[1]-*pt);
+    ddgVector3 d3(v[2]-*pt);
     ddgVector3 d12(v[0]-v[1]);
     ddgVector3 d13(v[0]-v[2]);
-    ddgVector3 d23(v[1]-v[1]);
+    ddgVector3 d23(v[1]-v[2]);
 
     float sd1 = d1.sizesq();
     float sd2 = d2.sizesq();
