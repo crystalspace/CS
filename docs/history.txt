@@ -45,6 +45,14 @@ chronological order.
 	  build to fail.
 	- Eric Sunshine augmented the Java SDK usability test in configure.ac
 	  so that it succeeds on MacOS/X.
+	- Eric Sunshine changed cspace.i so that it %ignores almost all
+	  functionality of iString.  All higher-level languages for which CS
+	  bindings exist already have powerful string classes, so we can safely
+	  export a bare-bones iString interface.  As a happy side-effect, this
+	  change also eliminates the compilation error "cs_pyth.cpp: error: ISO
+	  C++ forbids assignment of arrays" which occurs on 64-bit x86_64
+	  systems when SWIG tries assigning a va_list to a va_list in the
+	  iString::FormatV() wrapper.
 21-Mar-2004
 	- Luca Cappa committed the res fix to the problem regarding the lack
 	  of the regex.c file in the CSUtil library. The problem was 

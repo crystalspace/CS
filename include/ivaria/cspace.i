@@ -539,7 +539,42 @@ TYPEMAP_OUT_csWrapPtr
 %include "csutil/cmdhelp.h"
 %include "csutil/strset.h"
 
-%ignore iString::operator char const*() const;
+%ignore iString::SetCapacity;
+%ignore iString::GetCapacity;
+%ignore iString::SetGrowsBy;
+%ignore iString::GetGrowsBy;
+%ignore iString::SetGrowsExponentially;
+%ignore iString::GetGrowsExponentially;
+%ignore iString::Truncate;
+%ignore iString::Reclaim;
+%ignore iString::Clear;
+%ignore iString::Clone;
+%ignore iString::GetData (); // Non-const.
+%ignore iString::Length;
+%ignore iString::IsEmpty;
+%ignore iString::SetAt;
+%ignore iString::GetAt;
+%ignore iString::Insert;
+%ignore iString::Overwrite;
+%ignore iString::Append;
+%ignore iString::Append;
+%ignore iString::Slice;
+%ignore iString::SubString;
+%ignore iString::FindFirst;
+%ignore iString::FindLast;
+%ignore iString::Format;
+%ignore iString::FormatV;
+%ignore iString::Replace;
+%ignore iString::Compare;
+%ignore iString::CompareNoCase;
+%ignore iString::Downcase;
+%ignore iString::Upcase;
+%ignore iString::operator+=;
+%ignore iString::operator+;
+%ignore iString::operator==;
+%ignore iString::operator [] (size_t);
+%ignore iString::operator [] (size_t) const;
+%ignore iString::operator char const*;
 %include "iutil/string.h"
 #endif // CS_MINI_SWIG
 
@@ -588,10 +623,12 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csString::Downcase;
 %ignore csString::operator=;
 %ignore csString::operator+=;
-%ignore csString::operator const char*;
 %ignore csString::operator+;
 %ignore csString::operator==;
 %ignore csString::operator!=;
+%ignore csString::operator [] (size_t);
+%ignore csString::operator [] (size_t) const;
+%ignore csString::operator const char*;
 %ignore operator+ (const char*, const csString&);
 %ignore operator+ (const csString&, const char*);
 %ignore operator<<;
