@@ -21,7 +21,8 @@
 #import <Foundation/NSString.h>
 #import <Foundation/NSPathUtilities.h>
 
-#include <csutil/csstring.h>
+#include "cssysdef.h"
+#include "csutil/csstring.h"
 
 csString csGetPlatformConfigPath (const char* key)
 {
