@@ -1,6 +1,3 @@
-# Application target only valid if module is listed in PLUGINS.
-ifneq (,$(findstring glrender3d,$(PLUGINS) $(PLUGINS.DYNAMIC)))
-
 # Application description
 DESCRIPTION.r3dtest = Test of new renderer
 
@@ -79,5 +76,3 @@ else
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
-
-endif # ifneq (,$(findstring glrender3d,$(PLUGINS) $(PLUGINS.DYNAMIC)))

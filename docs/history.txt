@@ -34,9 +34,6 @@ chronological order.
 	  if this is not needed.
 	- Jorrit performed some further optimizations on
 	  csShaderManager::SetupState().
-        - Philip Wyett added test for glrender3d plugin to r3dtest app.
-          This will stop the application being built unless you are building
-          with --enable-new-renderer.
 1-Sep-2003
 	- Jorrit unreverted the changes from Old_Belge on the sprcal3d
 	  mesh object. Unfortunatelly this means that this plugin now
