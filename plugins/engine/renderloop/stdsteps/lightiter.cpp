@@ -148,7 +148,7 @@ void csLightIterRenderStep::InitVariables ()
     initialized = true;
 
     csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-      object_reg, "crystalspace.renderer.stringset", iStringSet);
+      object_reg, "crystalspace.shared.stringset", iStringSet);
 
     csStringID posname = strings->Request ("STANDARD_LIGHT_0_POSITION");
     csStringID difname = strings->Request ("STANDARD_LIGHT_0_DIFFUSE");

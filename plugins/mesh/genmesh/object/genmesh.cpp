@@ -1278,7 +1278,7 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
   {
     csRef<iStringSet> strings = 
       CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-      "crystalspace.renderer.stringset", iStringSet);
+      "crystalspace.shared.stringset", iStringSet);
     vertex_name = strings->Request ("vertices");
     texel_name = strings->Request ("texture coordinates");
     normal_name = strings->Request ("normals");

@@ -149,6 +149,7 @@ public:
    * <li>CreateCommandLineParser()</li>
    * <li>CreateConfigManager()</li>
    * <li>CreateInputDrivers()</li>
+   * <li>CreateStringSet()</li>
    * <li>csPlatformStartup()</li>
    * </ul>
    * You may want to call all or some of those manually if you don't wish
@@ -223,6 +224,17 @@ public:
    * called after creating the config manager (CreateConfigManager()).
    */
   static bool CreateInputDrivers (iObjectRegistry*);
+
+  /**
+   * Create the global shared string set and register it with the registry.
+   * This can be used if multiple, distinct modules want to share string IDs.
+   * The set can be requested with:
+   * \code
+   * csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+       object_reg, "crystalspace.shared.stringset", iStringSet);
+   * \endcode
+   */
+  static bool CreateStringSet (iObjectRegistry*);
 
   /**
    * Setup the config manager. If you have no config file then you can still

@@ -32,6 +32,7 @@
 #include "csutil/plugldr.h"
 #include "csutil/plugmgr.h"
 #include "csutil/prfxcfg.h"
+#include "csutil/scfstrset.h"
 #include "csutil/virtclk.h"
 #include "csutil/xmltiny.h"
 #include "iengine/engine.h"
@@ -51,6 +52,7 @@
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
+#include "iutil/strset.h"
 #include "iutil/vfs.h"
 #include "iutil/virtclk.h"
 #include "ivaria/conin.h"
@@ -118,6 +120,7 @@ iObjectRegistry* csInitializer::CreateEnvironment (
           CreateCommandLineParser(r, argc, argv) &&
           CreateConfigManager(r) &&
           CreateInputDrivers(r) &&
+	  CreateStringSet (r) &&
           csPlatformStartup(r))
         reg = r;
       else
@@ -168,6 +171,14 @@ bool csInitializer::CreateInputDrivers (iObjectRegistry* r)
   j->DecRef();
   m->DecRef();
   k->DecRef();
+  return true;
+}
+
+bool csInitializer::CreateStringSet (iObjectRegistry* r)
+{
+  csRef<iStringSet> strings;
+  strings.AttachNew (new csScfStringSet ());
+  r->Register (strings, "crystalspace.shared.stringset");
   return true;
 }
 

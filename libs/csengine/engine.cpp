@@ -899,14 +899,7 @@ bool csEngine::HandleEvent (iEvent &Event)
           if (G3D)
           {
 	    Strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-	      object_reg, "crystalspace.renderer.stringset", iStringSet);
-	    if (!Strings)
-	    {
-	      // We are using the old renderer or for some other reason
-	      // the string set isn't created yet. So we create it here.
-	      Strings = csPtr<iStringSet> (new csScfStringSet ());
-	      object_reg->Register (Strings, "crystalspace.renderer.stringset");
-	    }
+	      object_reg, "crystalspace.shared.stringset", iStringSet);
 
 #ifndef CS_USE_NEW_RENDERER
             const csGraphics3DCaps *caps = G3D->GetCaps ();

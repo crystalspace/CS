@@ -330,7 +330,7 @@ csTextureManager::csTextureManager (iObjectRegistry* object_reg,
   pfmt = *iG2D->GetPixelFormat ();
 
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.renderer.stringset", iStringSet);
+    object_reg, "crystalspace.shared.stringset", iStringSet);
   CS_ASSERT(strings != 0);
   nameDiffuseTexture = strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
 }

@@ -71,12 +71,7 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
   objectreg = object_reg;
 
   strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.renderer.stringset", iStringSet);
-  if (!strings)
-  {
-    strings = csPtr<iStringSet> (new csScfStringSet ());
-    object_reg->Register (strings, "crystalspace.renderer.stringset");
-  }
+    object_reg, "crystalspace.shared.stringset", iStringSet);
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   synldr = CS_QUERY_REGISTRY (objectreg, iSyntaxService);

@@ -323,12 +323,7 @@ bool csSoftwareGraphics3DCommon::Initialize (iObjectRegistry* p)
     q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
 
   strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.renderer.stringset", iStringSet);
-  if (!strings)
-  {
-    strings = csPtr<iStringSet> (new csScfStringSet ());
-    object_reg->Register (strings, "crystalspace.renderer.stringset");
-  }
+    object_reg, "crystalspace.shared.stringset", iStringSet);
 
   return true;
 }

@@ -267,7 +267,7 @@ bool csShaderGLCGFP::Load(iDocumentNode* program)
   csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY(
   	object_reg, iShaderManager);
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-	object_reg, "crystalspace.renderer.stringset", iStringSet);
+	object_reg, "crystalspace.shared.stringset", iStringSet);
 
   csRef<iDocumentNode> variablesnode = program->GetNode("cgfp");
   if(variablesnode)

@@ -216,7 +216,7 @@ bool csShaderGLAVP::Load (iDocumentNode* program)
   BuildTokenHash();
 
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    shaderPlug->object_reg, "crystalspace.renderer.stringset", iStringSet);
+    shaderPlug->object_reg, "crystalspace.shared.stringset", iStringSet);
 
   csRef<iDocumentNode> variablesnode = program->GetNode("arbvp");
   if (variablesnode)

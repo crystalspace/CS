@@ -1859,12 +1859,7 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
   bugplug = CS_QUERY_REGISTRY (object_reg, iBugPlug);
 
   strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.renderer.stringset", iStringSet);
-  if (!strings)
-  {
-    strings = csPtr<iStringSet> (new csScfStringSet ());
-    object_reg->Register (strings, "crystalspace.renderer.stringset");
-  }
+    object_reg, "crystalspace.shared.stringset", iStringSet);
 
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
   	object_reg, iPluginManager);

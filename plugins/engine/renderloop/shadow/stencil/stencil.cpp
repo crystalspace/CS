@@ -441,7 +441,7 @@ bool csStencilShadowStep::Initialize (iObjectRegistry* objreg)
   shmgr = CS_QUERY_REGISTRY (object_reg, iShaderManager);
 
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (objreg,
-	"crystalspace.renderer.stringset", iStringSet);
+	"crystalspace.shared.stringset", iStringSet);
   if (!strings)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Unable to retrieve string set");

@@ -149,7 +149,7 @@ csGenericRenderStep::csGenericRenderStep (
   objreg = object_reg;
 
   strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-    "crystalspace.renderer.stringset", iStringSet);
+    "crystalspace.shared.stringset", iStringSet);
   shaderManager = CS_QUERY_REGISTRY (object_reg, iShaderManager);
 
   shadertype = 0;

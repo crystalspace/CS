@@ -463,7 +463,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
   csRefArray<csShaderVariable> shadervars;
 
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.renderer.stringset", iStringSet);
+    object_reg, "crystalspace.shared.stringset", iStringSet);
 #endif // CS_USE_NEW_RENDERER
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();

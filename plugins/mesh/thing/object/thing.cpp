@@ -225,7 +225,7 @@ csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type) :
   {
     csRef<iStringSet> strings = 
       CS_QUERY_REGISTRY_TAG_INTERFACE (thing_type->object_reg,
-        "crystalspace.renderer.stringset", iStringSet);
+        "crystalspace.shared.stringset", iStringSet);
 
     texLightmapName = strings->Request ("tex lightmap");
   }

@@ -52,7 +52,7 @@ void csShaderGLCGVP::Activate(csRenderMesh* mesh)
 
 
   /*csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.renderer.stringset", iStringSet);
+    object_reg, "crystalspace.shared.stringset", iStringSet);
   csShaderVariable* var = GetVariable (strings->Request ("STANDARD_LIGHT_0_POSITION"));
   if (var)
   {
@@ -242,7 +242,7 @@ bool csShaderGLCGVP::Load(iDocumentNode* program)
   csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY(
   	object_reg, iShaderManager);
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-	object_reg, "crystalspace.renderer.stringset", iStringSet);
+	object_reg, "crystalspace.shared.stringset", iStringSet);
 
 
   csRef<iDocumentNode> variablesnode = program->GetNode("cgvp");

@@ -1386,7 +1386,7 @@ void csSprite3DMeshObject::SetupObject ()
 #ifdef CS_USE_NEW_RENDERER
     csRef<iStringSet> strings = 
       CS_QUERY_REGISTRY_TAG_INTERFACE (factory->object_reg,
-      "crystalspace.renderer.stringset", iStringSet);
+      "crystalspace.shared.stringset", iStringSet);
     vertices_name = strings->Request ("vertices");
     normals_name = strings->Request ("normals");
     texcoords_name = strings->Request ("texture coordinates");

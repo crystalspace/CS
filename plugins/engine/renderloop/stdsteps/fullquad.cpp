@@ -158,7 +158,7 @@ csPtr<iBase> csFullScreenQuadRSLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_SHADERTYPE:
         {
           csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-            object_reg, "crystalspace.renderer.stringset", iStringSet);
+            object_reg, "crystalspace.shared.stringset", iStringSet);
           ((csFullScreenQuadRenderStep*)(void*)step)->
             SetShaderType (strings->Request (child->GetContentsValue ()));
         }
@@ -208,7 +208,7 @@ csFullScreenQuadRenderStep::csFullScreenQuadRenderStep (
   SCF_CONSTRUCT_IBASE(0);
 
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-    "crystalspace.renderer.stringset", iStringSet);
+    "crystalspace.shared.stringset", iStringSet);
 
   csRef<iGraphics3D> g3d = 
     CS_QUERY_REGISTRY (object_reg, iGraphics3D);
