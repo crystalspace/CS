@@ -13,7 +13,7 @@ def CreateRoom(matname):
 	room = engine.GetSectors().FindByName("room")
 	walls = engine.CreateSectorWallsMesh(room,"walls")
 	thingstate = walls.GetMeshObject().Query_iThingState()
-	material=engine.FindMaterial(matname)
+	material=engine.GetMaterialList().FindByName(matname)
 
 	poly=thingstate.CreatePolygon('floor')
 	poly.CreateVertex(csVector3(-5,0,5))
