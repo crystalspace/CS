@@ -1,5 +1,9 @@
 <lighter>
 
+  <select_portals>
+    <all />
+  </select_portals>
+
   <select_sectors>
     <all />
   </select_sectors>
@@ -20,7 +24,10 @@
         <name>xxx</name>
 	<regexp>.*a.*</regexp>
       </or>
-        <type>thing</type>
+      <type>thing</type>
+      <not>
+	<key name="entity" attr="type" value="monster" />
+      </not>
     </and>
   </select_receivers>
 
