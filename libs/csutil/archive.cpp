@@ -1,6 +1,6 @@
 /*
     ZIP archive support for Crystal Space 3D library
-    Copyright (C) 1998 FRIENDS software
+    Copyright (C) 1998 by Jorrit Tyberghein
     Written by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
@@ -24,18 +24,12 @@
 
 #define SYSDEF_PATH
 #define SYSDEF_TEMP
-#define SYSDEF_MKDIR
-#define SYSDEF_DIR
 #define SYSDEF_UNLINK
 #define SYSDEF_ACCESS
 #include "sysdef.h"
 #include "cssys/common/csendian.h"
+#include "csutil/util.h"
 #include "csutil/archive.h"
-
-// Name for ZIP central directory header file (for readonly archives)
-#ifndef ZIP_HEADER_FILENAME
-#  define ZIP_HEADER_FILENAME "-dir-.zip"
-#endif
 
 // Default compression method to use when adding entries (there is no choice for now)
 #ifndef DEFAULT_COMPRESSION_METHOD
@@ -49,14 +43,13 @@
 
 // This value is used as compression_method to indicate deleted file
 #define FILE_DELETED 0xffff
-#define FILE_ONDISK  0xfffe
 
 //---------------------------------------------------------------------------
 
-char Archive::hdr_central[4] = {'P', 'K', CENTRAL_HDR_SIG};
-char Archive::hdr_local[4] = {'P', 'K', LOCAL_HDR_SIG};
-char Archive::hdr_endcentral[4] = {'P', 'K', END_CENTRAL_SIG};
-char Archive::hdr_extlocal[4] = {'P', 'K', EXTD_LOCAL_SIG};
+char csArchive::hdr_central[4] = {'P', 'K', CENTRAL_HDR_SIG};
+char csArchive::hdr_local[4] = {'P', 'K', LOCAL_HDR_SIG};
+char csArchive::hdr_endcentral[4] = {'P', 'K', END_CENTRAL_SIG};
+char csArchive::hdr_extlocal[4] = {'P', 'K', EXTD_LOCAL_SIG};
 
 //-- Endianess handling -----------------------------------------------------
 
@@ -67,55 +60,22 @@ char Archive::hdr_extlocal[4] = {'P', 'K', EXTD_LOCAL_SIG};
 
 //-- Archive class implementation -------------------------------------------
 
-Archive::Archive (const char *filename, bool read_only, const char *base_path)
+csArchive::csArchive (const char *filename)
 {
   first = NULL;
   lazyops = NULL;
   comment = NULL;
   comment_length = 0;
-  readonly = read_only;
-  CHK (Archive::filename = new char[strlen (filename) + 1]);
-  strcpy (Archive::filename, filename);
-
-  if (readonly)
-  {
-    // Transform basepath into workdir
-    char wd[MAXPATHLEN];
-    int wd_len = strlen (base_path);
-    int tmp;
-
-    strcpy (wd, base_path);
-    APPEND_SLASH (wd, wd_len);
-
-    // Append archive name to workdir and remove extension, if any
-    strcat (wd, filename);
-    tmp = strlen (wd);
-    while (--tmp > wd_len)
-    {
-      if (wd[tmp] == '.')
-      {
-        wd[tmp] = 0;
-        break;
-      }
-    } /* endwhile */
-
-    wd_len = strlen (wd);
-    APPEND_SLASH (wd, wd_len);
-
-    // And finally, copy this into workdir variable
-    CHK (workdir = new char[wd_len + 1]);
-    strcpy (workdir, wd);
-  } else
-    workdir = NULL;
+  csArchive::filename = strnew (filename);
 
   file = fopen (filename, "rb");
-  if (!file && !readonly)       /* Create new archive file */
+  if (!file)       			/* Create new archive file */
     file = fopen (filename, "wb");
   else
-    read_directory ();
+    ReadDirectory ();
 }
 
-Archive::~Archive ()
+csArchive::~csArchive ()
 {
   ArchiveEntry *cur = first;
 
@@ -132,37 +92,17 @@ Archive::~Archive ()
     CHKB (delete [] comment);
   if (file)
     fclose (file);
-  if (workdir)
-    CHKB (delete [] workdir);
 }
 
-void Archive::read_directory ()
+void csArchive::ReadDirectory ()
 {
   if (first)
     return;                     /* Directory already read */
 
-  if (workdir)
-  {
-    FILE *temp;
-    char fname[MAXPATHLEN];
-
-    strcpy (fname, workdir);
-    strcat (fname, ZIP_HEADER_FILENAME);
-    temp = fopen (fname, "rb");
-    if (temp)
-    {
-      read_zip_directory (temp);
-      fclose (temp);
-    } else
-    {
-      read_zip_directory (file);
-      read_disk_directory (workdir);
-    }
-  } else
-    read_zip_directory (file);
+  ReadZipDirectory (file);
 }
 
-void Archive::read_zip_directory (FILE *infile)
+void csArchive::ReadZipDirectory (FILE *infile)
 {
   ZIP_end_central_dir_record ecdr;
   ZIP_central_directory_file_header cdfh;
@@ -206,10 +146,10 @@ void Archive::read_zip_directory (FILE *infile)
         {
           /* Central directory structure found */
           central_directory_offset = cur_offs + (ULong) search_ptr - (ULong)buff;
-          load_ecdr (ecdr, &search_ptr[sizeof (hdr_endcentral)]);
+          LoadECDR (ecdr, &search_ptr[sizeof (hdr_endcentral)]);
           if (fseek (infile, central_directory_offset + sizeof (hdr_endcentral) + ZIP_END_CENTRAL_DIR_RECORD_SIZE, SEEK_SET)
-              || !read_archive_comment (infile, ecdr.zipfile_comment_length)
-              || fseek (infile, ecdr.offset_start_central_directory, SEEK_SET))
+           || !ReadArchiveComment (infile, ecdr.zipfile_comment_length)
+           || fseek (infile, ecdr.offset_start_central_directory, SEEK_SET))
             goto rebuild_cdr;   /* Broken central directory */
 
           /* Now read central directory structure */
@@ -223,7 +163,7 @@ void Archive::read_zip_directory (FILE *infile)
               else
                 goto rebuild_cdr;       /* Broken central directory */
             }
-            if ((!read_cdfh (cdfh, infile))
+            if ((!ReadCDFH (cdfh, infile))
                 || (cdfh.filename_length > sizeof (buff))
                 || (fread (buff, 1, cdfh.filename_length, infile) < cdfh.filename_length))
               return;           /* Broken zipfile? */
@@ -232,33 +172,9 @@ void Archive::read_zip_directory (FILE *infile)
             if ((buff[cdfh.filename_length - 1] != '/')
                 && (buff[cdfh.filename_length - 1] != PATH_SEPARATOR))
             {
-              ArchiveEntry *curentry;
-
-              if (infile == file)
-                curentry = insert_entry (buff, cdfh, NULL);
-              else
-              {
-                char fname[MAXPATHLEN];
-
-                strcpy (fname, workdir);
-                strcat (fname, buff);
-                FILE *temp = fopen (fname, "rb");
-
-                if (temp)
-                {
-                  read_zip_entries (temp, fname);
-                  fclose (temp);
-              skipfile:
-                  if (fseek (infile, cdfh.extra_field_length + cdfh.file_comment_length, SEEK_CUR))
-                    return;     /* Broken zipfile? */
-                  continue;
-                } else if (cdfh.compression_method != FILE_ONDISK)
-                  curentry = insert_entry (buff, cdfh, NULL);
-                else
-                  goto skipfile;
-              } /* endif */
-              if (!curentry->read_extra_field (infile, cdfh.extra_field_length)
-                  || !curentry->read_file_comment (infile, cdfh.file_comment_length))
+              ArchiveEntry *curentry = InsertEntry (buff, cdfh);
+              if (!curentry->ReadExtraField (infile, cdfh.extra_field_length)
+                  || !curentry->ReadFileComment (infile, cdfh.file_comment_length))
                 return;         /* Broken zipfile? */
             } else
             {
@@ -275,56 +191,10 @@ rebuild_cdr:
   /* If so, we have to rebuild it by reading each ZIPfile member separately */
   if (fseek (infile, 0, SEEK_SET))
     return;
-  read_zip_entries (infile, NULL);
+  ReadZipEntries (infile);
 }
 
-void Archive::read_disk_directory (const char *path)
-{
-  char dirname[MAXPATHLEN];
-  size_t pathlen = strlen (path);
-  size_t basepathlen = strlen (workdir);
-
-  if ((workdir[basepathlen - 1] != '/')
-      && (workdir[basepathlen - 1] != PATH_SEPARATOR))
-    basepathlen++;
-  strcpy (dirname, path);
-  if ((dirname[pathlen - 1] == '/')
-      || (dirname[pathlen - 1] == PATH_SEPARATOR))
-    dirname[--pathlen] = 0;
-
-  DIR *dh;
-  struct dirent *de;
-
-  if ((dh = opendir (dirname)) == NULL)
-    return;
-  while ((de = readdir (dh)) != NULL)
-  {
-    if ((strcmp (de->d_name, ".") == 0)
-     || (strcmp (de->d_name, "..") == 0))
-      continue;
-    size_t tmplen = pathlen;
-
-    APPEND_SLASH (dirname, tmplen);
-    strcat (dirname, de->d_name);
-
-    if (isdir (path, de))
-      read_disk_directory (dirname);
-    else
-    {
-      FILE *temp = fopen (dirname, "rb");
-
-      if (temp)
-      {
-        read_zip_entries (temp, dirname);
-        fclose (temp);
-      } /* endif */
-    } /* endif */
-    dirname[pathlen] = 0;
-  } /* endwhile */
-  closedir (dh);
-}
-
-void Archive::read_zip_entries (FILE *infile, const char *source)
+void csArchive::ReadZipEntries (FILE *infile)
 {
   size_t cur_offs, new_offs;
   char buff[1024];
@@ -334,7 +204,7 @@ void Archive::read_zip_entries (FILE *infile, const char *source)
   cur_offs = 0;
   while ((fread (buff, 1, sizeof (hdr_local), infile) >= sizeof (hdr_local))
          && (memcmp (buff, hdr_local, sizeof (hdr_local)) == 0)
-         && (read_lfh (lfh, infile)))
+         && (ReadLFH (lfh, infile)))
   {
     new_offs = cur_offs + sizeof (hdr_local) + ZIP_LOCAL_FILE_HEADER_SIZE +
       lfh.filename_length + lfh.extra_field_length + lfh.csize;
@@ -359,43 +229,18 @@ void Archive::read_zip_entries (FILE *infile, const char *source)
       cdfh.ucsize = lfh.ucsize;
       cdfh.relative_offset_local_header = cur_offs;
 
-      ArchiveEntry *curentry = insert_entry (buff, cdfh, source);
+      ArchiveEntry *curentry = InsertEntry (buff, cdfh);
 
-      if (!curentry->read_extra_field (infile, lfh.extra_field_length))
+      if (!curentry->ReadExtraField (infile, lfh.extra_field_length))
         return;                 /* Broken zipfile */
     } /* endif */
     if (fseek (infile, cur_offs = new_offs, SEEK_SET))
       return;                   /* Broken zipfile */
   } /* endwhile */
-
-  if ((infile != file) && (cur_offs == 0))      /* No headers found */
-  {
-    /* Treat this file as a plain uncompressed file */
-    struct stat st;
-
-    memset (&cdfh, 0, sizeof (cdfh));
-    cdfh.version_made_by[0] = 0x16;     /* Zip version 2.2 rev 6 ??? */
-    cdfh.version_made_by[1] = 0x06;
-    cdfh.version_needed_to_extract[0] = 20;     /* Unzip version 2.0 rev 0 */
-    cdfh.version_needed_to_extract[1] = 00;
-    cdfh.compression_method = FILE_ONDISK;
-
-    if (fstat (fileno (infile), &st) == 0)
-    {
-      time_t const mtime = st.st_mtime;
-      struct tm *curtm = localtime (&mtime);
-
-      cdfh.csize = st.st_size;
-      cdfh.ucsize = st.st_size;
-      cdfh.relative_offset_local_header = 0;
-      strcpy (buff, (char *) &source[strlen (workdir)]);
-      set_file_time (insert_entry (buff, cdfh, source), *curtm);
-    }
-  } /* endif */
 }
 
-Archive::ArchiveEntry *Archive::insert_entry (const char *name,
-  ZIP_central_directory_file_header &cdfh, const char *source)
+csArchive::ArchiveEntry *csArchive::InsertEntry (const char *name,
+  ZIP_central_directory_file_header &cdfh)
 {
   ArchiveEntry *cur, *prev;
 
@@ -407,12 +252,12 @@ Archive::ArchiveEntry *Archive::insert_entry (const char *name,
     {
       if (prev)
       {
-        CHK (prev->next = new ArchiveEntry (name, cdfh, source));
+        CHK (prev->next = new ArchiveEntry (name, cdfh));
         prev->next->next = cur->next;
         prev = prev->next;
       } else
       {
-        CHK (first = new ArchiveEntry (name, cdfh, source));
+        CHK (first = new ArchiveEntry (name, cdfh));
         first->next = cur->next;
         prev = first;
       }
@@ -428,33 +273,31 @@ Archive::ArchiveEntry *Archive::insert_entry (const char *name,
     cur = first;
     while (cur->next)
       cur = cur->next;
-    CHK (cur->next = new ArchiveEntry (name, cdfh, source));
+    CHK (cur->next = new ArchiveEntry (name, cdfh));
     return (cur->next);
   } else
   {
-    CHK (first = new ArchiveEntry (name, cdfh, source));
+    CHK (first = new ArchiveEntry (name, cdfh));
     return first;
   } /* endif */
 }
 
-bool Archive::read_archive_comment (FILE *infile, size_t zipfile_comment_length)
+bool csArchive::ReadArchiveComment (FILE *infile, size_t zipfile_comment_length)
 {
   if (comment && (comment_length != zipfile_comment_length))
   {
     CHK (delete [] comment);
     comment = NULL;
   }
-  comment_length = zipfile_comment_length;
-  if (zipfile_comment_length)
-  {
-    if (!comment)
-      CHKB (comment = new char [zipfile_comment_length]);
-    return (fread (comment, 1, zipfile_comment_length, infile) == zipfile_comment_length);
-  }
-  else return true;
+  if (!(comment_length = zipfile_comment_length))
+    return true;
+
+  if (!comment)
+    CHKB (comment = new char [zipfile_comment_length]);
+  return (fread (comment, 1, zipfile_comment_length, infile) == zipfile_comment_length);
 }
 
-void Archive::dir () const
+void csArchive::Dir () const
 {
   ArchiveEntry *f = first;
 
@@ -469,7 +312,7 @@ void Archive::dir () const
   }
 }
 
-void *Archive::find_name (const char *name) const
+void *csArchive::FindName (const char *name) const
 {
   ArchiveEntry *f = first;
 
@@ -482,33 +325,19 @@ void *Archive::find_name (const char *name) const
   return NULL;
 }
 
-char *Archive::read (const char *name, size_t * size)
+char *csArchive::Read (const char *name, size_t * size)
 {
-  ArchiveEntry *f = (ArchiveEntry *) find_name (name);
+  ArchiveEntry *f = (ArchiveEntry *) FindName (name);
 
   if (!f)
     return NULL;
   if (size)
     *size = f->info.ucsize;
 
-  if (f->archive)
-  {
-    FILE *temp = fopen (f->archive, "rb");
-
-    if (temp)
-    {
-      char *data = read_entry (temp, f);
-
-      fclose (temp);
-      return data;
-    } else
-      return NULL;
-  }
-  else
-    return read_entry (file, f);
+  return ReadEntry (file, f);
 }
 
-char *Archive::read_entry (FILE *infile, ArchiveEntry * f)
+char *csArchive::ReadEntry (FILE *infile, ArchiveEntry * f)
 {
   // This routine allocates one byte more than is actually needed
   // and fills it with zero. This can be used when reading text files
@@ -524,19 +353,10 @@ char *Archive::read_entry (FILE *infile, ArchiveEntry * f)
     return NULL;
   out_buff [f->info.ucsize] = 0;
 
-  if (f->info.compression_method == FILE_ONDISK)
-  {
-    if (fread (out_buff, 1, f->info.ucsize, infile) < f->info.ucsize)
-    {
-      CHK (delete[] out_buff);
-      return NULL;
-    } /* endif */
-    return out_buff;
-  }
   if ((fseek (infile, f->info.relative_offset_local_header, SEEK_SET))
       || (fread (buff, 1, sizeof (hdr_local), infile) < sizeof (hdr_local))
       || (memcmp (buff, hdr_local, sizeof (hdr_local)) != 0)
-      || (!read_lfh (lfh, infile))
+      || (!ReadLFH (lfh, infile))
       || (fseek (infile, lfh.filename_length + lfh.extra_field_length, SEEK_CUR)))
   {
     CHK (delete[] out_buff);
@@ -607,14 +427,14 @@ char *Archive::read_entry (FILE *infile, ArchiveEntry * f)
   return out_buff;
 }
 
-void *Archive::new_file (const char *name, size_t size, bool pack)
+void *csArchive::NewFile (const char *name, size_t size, bool pack)
 {
-  delete_file (name);
+  DeleteFile (name);
 
   ZIP_central_directory_file_header cdfh;
 
   memset (&cdfh, 0, sizeof (cdfh));
-  cdfh.version_made_by[0] = 0x16;       /* Zip version 2.2 rev 6 ??? */
+  cdfh.version_made_by[0] = 0x16;		/* Zip version 2.2 rev 6 ??? */
   cdfh.version_made_by[1] = 0x06;
   cdfh.version_needed_to_extract[0] = 20;       /* Unzip version 2.0 rev 0 */
   cdfh.version_needed_to_extract[1] = 00;
@@ -626,20 +446,12 @@ void *Archive::new_file (const char *name, size_t size, bool pack)
 
   ArchiveEntry *f;
 
-  if (readonly)
-  {
-    char source[MAXPATHLEN];
-
-    strcpy (source, workdir);
-    strcat (source, name);
-    CHK (f = new ArchiveEntry (name, cdfh, source));
-  } else
-    CHKB (f = new ArchiveEntry (name, cdfh, NULL));
+  CHKB (f = new ArchiveEntry (name, cdfh));
 
   time_t curtime = time (NULL);
   struct tm *curtm = localtime (&curtime);
 
-  set_file_time ((void *) f, *curtm);
+  SetFileTime ((void *) f, *curtm);
 
   if (lazyops)
   {
@@ -654,16 +466,16 @@ void *Archive::new_file (const char *name, size_t size, bool pack)
   return (void *) f;
 }
 
-void Archive::delete_file (const char *name)
+bool csArchive::DeleteFile (const char *name)
 {
-  if (!file_exists (name))
-    return;
+  if (!FileExists (name))
+    return false;
 
   ZIP_central_directory_file_header cdfh;
 
   memset (&cdfh, 0, sizeof (cdfh));
   cdfh.compression_method = FILE_DELETED;
-  CHK (ArchiveEntry * f = new ArchiveEntry (name, cdfh, NULL));
+  CHK (ArchiveEntry * f = new ArchiveEntry (name, cdfh));
 
   if (lazyops)
   {
@@ -674,11 +486,13 @@ void Archive::delete_file (const char *name)
     last->next = f;
   } else
     lazyops = f;
+
+  return true;
 }
 
-bool Archive::file_exists (const char *name, size_t * size) const
+bool csArchive::FileExists (const char *name, size_t * size) const
 {
-  ArchiveEntry *f = (ArchiveEntry *) find_name (name);
+  ArchiveEntry *f = (ArchiveEntry *) FindName (name);
 
   if (!f)
     return false;
@@ -687,37 +501,24 @@ bool Archive::file_exists (const char *name, size_t * size) const
   return true;
 }
 
-bool Archive::write (void *entry, const char *data, size_t len)
+bool csArchive::Write (void *entry, const char *data, size_t len)
 {
   if (entry)
-  {
-    ((ArchiveEntry *) entry)->buffer_pos = 0;
-    return (((ArchiveEntry *) entry)->append (data, len));
-  } else
-    return false;
-}
-
-bool Archive::append (void *entry, const char *data, size_t len)
-{
-  if (entry)
-    return (((ArchiveEntry *) entry)->append (data, len));
+    return (((ArchiveEntry *) entry)->Append (data, len));
   else
     return false;
 }
 
 // Flush all pending operations (if any)
-bool Archive::write_archive ()
+bool csArchive::Flush ()
 {
   if (!lazyops)
     return true;                /* Nothing to do */
-  if (readonly)
-    return write_workdir_archive ();
-  else
-    return write_zip_archive ();
+  return WriteZipArchive ();
 }
 
 // Write pending operations into ZIP archive
-bool Archive::write_zip_archive ()
+bool csArchive::WriteZipArchive ()
 {
   char temp_file[MAXPATHLEN];
   FILE *temp;
@@ -744,7 +545,7 @@ bool Archive::write_zip_archive ()
     {                           //----------------------------------local header
       ZIP_local_file_header lfh;
 
-      if (!read_lfh (lfh, file))
+      if (!ReadLFH (lfh, file))
         goto temp_failed;
 
       CHK (char *this_name = new char[lfh.filename_length + 1]);
@@ -755,7 +556,7 @@ bool Archive::write_zip_archive ()
       }
       this_name[lfh.filename_length] = 0;
 
-      if (is_deleted (this_name))
+      if (IsDeleted (this_name))
       {
     skip_file:
         bytes_to_skip = lfh.extra_field_length + lfh.csize;
@@ -763,16 +564,16 @@ bool Archive::write_zip_archive ()
         CHK (delete[] this_name);
       } else
       {
-        this_file = (ArchiveEntry *) find_name (this_name);
+        this_file = (ArchiveEntry *) FindName (this_name);
         if (this_file)
         {
           CHK (delete[] this_name);
           if (this_file->info.csize != lfh.csize)
             goto temp_failed;   /* Broken archive */
-          this_file->read_extra_field (file, lfh.extra_field_length);
+          this_file->ReadExtraField (file, lfh.extra_field_length);
           bytes_to_skip = 0;
           bytes_to_copy = lfh.csize;
-          if (!this_file->write_lfh (temp))
+          if (!this_file->WriteLFH (temp))
             goto temp_failed;   /* Write error */
         } else
           goto skip_file;       /* hmm... strange. */
@@ -781,7 +582,7 @@ bool Archive::write_zip_archive ()
     {                           //----------------------------------central directory header
       ZIP_central_directory_file_header cdfh;
 
-      if (!read_cdfh (cdfh, file))
+      if (!ReadCDFH (cdfh, file))
         goto temp_failed;
 
       bytes_to_copy = 0;
@@ -793,7 +594,7 @@ bool Archive::write_zip_archive ()
 
       if (fread (buff, 1, ZIP_END_CENTRAL_DIR_RECORD_SIZE, file) < ZIP_END_CENTRAL_DIR_RECORD_SIZE)
         goto temp_failed;
-      load_ecdr (ecdr, buff);
+      LoadECDR (ecdr, buff);
 
       bytes_to_copy = 0;
       bytes_to_skip = ecdr.zipfile_comment_length;
@@ -828,14 +629,14 @@ bool Archive::write_zip_archive ()
     while (cur)
     {
       if ((cur->info.compression_method != FILE_DELETED)
-          && !cur->write_file (temp))
+          && !cur->WriteFile (temp))
         goto temp_failed;       /* Write error */
       cur = cur->next;
     } /* endwhile */
   }
 
   /* And finaly write central directory structure */
-  if (!write_central_directory (temp))
+  if (!WriteCentralDirectory (temp))
     goto temp_failed;
 
   /* Now copy temporary file into archive. If we'll get a error in process, */
@@ -873,7 +674,7 @@ bool Archive::write_zip_archive ()
   }
 
   /* Now if we are here, all operations have been successful */
-  update_directory ();
+  UpdateDirectory ();
 
   success = true;
 
@@ -883,89 +684,7 @@ temp_failed:
   return success;
 }
 
-// Write pending operations to disk into workdir
-bool Archive::write_workdir_archive ()
-{
-  // Create the work directory if it doesn't exist
-  {
-    char fname[MAXPATHLEN];
-    size_t wd_len = strlen (workdir);
-
-    strcpy (fname, workdir);
-    if ((fname[wd_len - 1] == '/') || (fname[wd_len - 1] == PATH_SEPARATOR))
-      fname[wd_len - 1] = 0;
-    MKDIR (fname);
-  }
-
-  /* Write all files that were added to archive */
-  {
-    ArchiveEntry *cur = lazyops;
-
-    while (cur)
-    {
-      size_t i = 0, wd_len = strlen (workdir), fnlen = strlen (cur->filename);
-      char fname[MAXPATHLEN];
-
-      strcpy (fname, workdir);
-      while (i < fnlen)
-      {
-        fname[wd_len++] = cur->filename[i++];
-
-        // If this is a subdirectory in archive, try to reproduce
-        // same directory on disk
-        if ((cur->filename[i] == '/') || (cur->filename[i] == PATH_SEPARATOR))
-        {
-          fname[wd_len] = 0;
-          MKDIR (fname);
-        } /* endif */
-      } /* endwhile */
-      fname[wd_len] = 0;
-
-      if (cur->info.compression_method != FILE_DELETED)
-      {
-        FILE *temp = fopen (fname, "wb");
-
-        if (!temp)
-          return false;         /* File creation error */
-        if (!cur->write_file (temp))
-        {
-          fclose (temp);
-          unlink (fname);
-          return false;         /* Write error */
-        }
-        fclose (temp);
-      } else
-        unlink (fname);
-
-      cur = cur->next;
-    } /* endwhile */
-  }
-
-  {
-    char fname[MAXPATHLEN];
-
-    strcpy (fname, workdir);
-    strcat (fname, ZIP_HEADER_FILENAME);
-
-    FILE *temp = fopen (fname, "wb");
-
-    if (!temp)
-      return false;             /* ZIPfile directory creation error */
-
-    if (!write_central_directory (temp))
-    {
-      fclose (temp);
-      unlink (fname);
-      return false;
-    }
-    fclose (temp);
-  }
-
-  update_directory ();
-  return true;
-}
-
-bool Archive::write_central_directory (FILE *temp)
+bool csArchive::WriteCentralDirectory (FILE *temp)
 {
   ArchiveEntry *cur = first;
   int count = 0;
@@ -973,9 +692,9 @@ bool Archive::write_central_directory (FILE *temp)
 
   while (cur)
   {
-    if (!is_deleted (cur->filename))
+    if (!IsDeleted (cur->filename))
     {
-      if (!cur->write_cdfh (temp))
+      if (!cur->WriteCDFH (temp))
         return false;
       count++;
     } /* endif */
@@ -986,7 +705,7 @@ bool Archive::write_central_directory (FILE *temp)
   while (cur)
   {
     if (cur->info.compression_method != FILE_DELETED)
-      if (cur->write_cdfh (temp))
+      if (cur->WriteCDFH (temp))
         count++;
       else
         return false;
@@ -1002,12 +721,12 @@ bool Archive::write_central_directory (FILE *temp)
   ecdr.size_central_directory = ftell (temp) - cdroffs;
   ecdr.offset_start_central_directory = cdroffs;
   ecdr.zipfile_comment_length = comment_length;
-  if (!write_ecdr (ecdr, temp))
+  if (!WriteECDR (ecdr, temp))
     return false;
   return true;
 }
 
-void Archive::update_directory ()
+void csArchive::UpdateDirectory ()
 {
   /* Update archive directory: remove deleted entries first */
   {
@@ -1016,11 +735,9 @@ void Archive::update_directory ()
 
     while (cur)
     {
-      if (is_deleted (cur->filename))
+      if (IsDeleted (cur->filename))
       {
         *prev = cur->next;
-	if (cur == last)
-	  last = cur->next;
         CHK (delete cur);
         cur = *prev;
       } else
@@ -1039,24 +756,9 @@ void Archive::update_directory ()
       cur = lazyops->next;
       if (lazyops->info.compression_method != FILE_DELETED)
       {
-        lazyops->free_buffer ();
+        lazyops->FreeBuffer ();
         lazyops->next = NULL;
 
-        if (lazyops->archive)
-          CHKB (delete[] lazyops->archive);
-        lazyops->archive = NULL;
-        if (readonly)
-        {
-          char fname[MAXPATHLEN];
-
-          strcpy (fname, workdir);
-          strcat (fname, lazyops->filename);
-          if (access (fname, F_OK) == 0)
-          {
-            CHK (lazyops->archive = new char[strlen (fname) + 1]);
-            strcpy (lazyops->archive, fname);
-          } /* endif */
-        } /* endif */
         if (last)
           last->next = lazyops;
         last = lazyops;
@@ -1069,7 +771,7 @@ void Archive::update_directory ()
   }
 }
 
-bool Archive::is_deleted (const char *name) const
+bool csArchive::IsDeleted (const char *name) const
 {
   ArchiveEntry *current = lazyops;
 
@@ -1083,7 +785,7 @@ bool Archive::is_deleted (const char *name) const
   return false;
 }
 
-void Archive::unpack_time (ush zdate, ush ztime, tm & rtime) const
+void csArchive::UnpackTime (ush zdate, ush ztime, tm & rtime) const
 {
   rtime.tm_year = (((zdate >> 9) & 0x7f) + 80);
   rtime.tm_mon = ((zdate >> 5) & 0x0f);
@@ -1094,7 +796,7 @@ void Archive::unpack_time (ush zdate, ush ztime, tm & rtime) const
   rtime.tm_sec = ((ztime & 0x1f) * 2);
 }
 
-void Archive::pack_time (tm & ztime, ush & rdate, ush & rtime) const
+void csArchive::PackTime (tm & ztime, ush & rdate, ush & rtime) const
 {
   rdate = (((ztime.tm_year - 80) & 0x7f) << 9)
         | ((ztime.tm_mon & 0x0f) << 5)
@@ -1104,7 +806,7 @@ void Archive::pack_time (tm & ztime, ush & rdate, ush & rtime) const
         | ((ztime.tm_sec / 2) & 0x1f);
 }
 
-void Archive::load_ecdr (ZIP_end_central_dir_record & ecdr, char *buff)
+void csArchive::LoadECDR (ZIP_end_central_dir_record & ecdr, char *buff)
 {
   ecdr.number_this_disk = BUFF_GET_SHORT (E_NUMBER_THIS_DISK);
   ecdr.num_disk_start_cdir = BUFF_GET_SHORT (E_NUM_DISK_WITH_START_CENTRAL_DIR);
@@ -1115,7 +817,7 @@ void Archive::load_ecdr (ZIP_end_central_dir_record & ecdr, char *buff)
   ecdr.zipfile_comment_length = BUFF_GET_SHORT (E_ZIPFILE_COMMENT_LENGTH);
 }
 
-bool Archive::read_cdfh (ZIP_central_directory_file_header & cdfh, FILE *infile)
+bool csArchive::ReadCDFH (ZIP_central_directory_file_header & cdfh, FILE *infile)
 {
   char buff[ZIP_CENTRAL_DIRECTORY_FILE_HEADER_SIZE];
 
@@ -1144,7 +846,7 @@ bool Archive::read_cdfh (ZIP_central_directory_file_header & cdfh, FILE *infile)
   return true;
 }
 
-bool Archive::read_lfh (ZIP_local_file_header & lfh, FILE *infile)
+bool csArchive::ReadLFH (ZIP_local_file_header & lfh, FILE *infile)
 {
   char buff[ZIP_LOCAL_FILE_HEADER_SIZE];
 
@@ -1166,7 +868,7 @@ bool Archive::read_lfh (ZIP_local_file_header & lfh, FILE *infile)
   return true;
 }
 
-bool Archive::write_ecdr (ZIP_end_central_dir_record & ecdr, FILE *outfile)
+bool csArchive::WriteECDR (ZIP_end_central_dir_record & ecdr, FILE *outfile)
 {
   char buff[ZIP_END_CENTRAL_DIR_RECORD_SIZE];
 
@@ -1187,8 +889,8 @@ bool Archive::write_ecdr (ZIP_end_central_dir_record & ecdr, FILE *outfile)
   return true;
 }
 
-Archive::ArchiveEntry::ArchiveEntry (const char *name,
-  ZIP_central_directory_file_header &cdfh, const char *source)
+csArchive::ArchiveEntry::ArchiveEntry (const char *name,
+  ZIP_central_directory_file_header &cdfh)
 {
   CHK (filename = new char[strlen (name) + 1]);
   strcpy (filename, name);
@@ -1198,19 +900,11 @@ Archive::ArchiveEntry::ArchiveEntry (const char *name,
   extrafield = NULL;
   comment = NULL;
   buffer_pos = 0;
-  if (source)
-  {
-    CHK (archive = new char[strlen (source) + 1]);
-    strcpy (archive, source);
-  } else
-    archive = NULL;
 }
 
-Archive::ArchiveEntry::~ArchiveEntry ()
+csArchive::ArchiveEntry::~ArchiveEntry ()
 {
-  free_buffer ();
-  if (archive)
-    CHKB (delete [] archive);
+  FreeBuffer ();
   if (comment)
     CHKB (delete [] comment);
   if (extrafield)
@@ -1219,7 +913,7 @@ Archive::ArchiveEntry::~ArchiveEntry ()
     CHKB (delete [] filename);
 }
 
-void Archive::ArchiveEntry::free_buffer ()
+void csArchive::ArchiveEntry::FreeBuffer ()
 {
   if (buffer)
     CHKB (delete[] buffer);
@@ -1227,24 +921,35 @@ void Archive::ArchiveEntry::free_buffer ()
   buffer_pos = 0;
 }
 
-bool Archive::ArchiveEntry::append (const void *data, size_t size)
+bool csArchive::ArchiveEntry::Append (const void *data, size_t size)
 {
-  if ((info.compression_method == FILE_DELETED) /* Non-writeable file */
-      || (buffer_pos + size > info.ucsize))     /* Data exceeds buffer */
+  if (info.compression_method == FILE_DELETED)	/* Non-writeable file */
     return false;
-  if (!buffer)
+
+  if (!buffer || (buffer_pos + size > info.ucsize))
   {
-    CHK (buffer = new char[info.ucsize]);
-    if (!buffer)
-      return false;             /* Not enough memory */
-    memset (buffer, 0, info.ucsize);
+    size_t new_size = buffer_pos + size;
+    if (new_size < info.ucsize)
+      new_size = info.ucsize;
+    CHK (char *new_buffer = new char [new_size]);
+    if (!new_buffer)
+      return false;				/* Not enough memory */
+    if (buffer)
+    {
+      memcpy (new_buffer, buffer, info.ucsize);
+      delete [] buffer;
+    }
+    if (buffer_pos + size < new_size)
+      memset (new_buffer + buffer_pos + size, 0, new_size - (buffer_pos + size));
+    buffer = new_buffer;
+    info.ucsize = new_size;
   } /* endif */
   memcpy (&buffer[buffer_pos], data, size);
   buffer_pos += size;
   return true;
 }
 
-bool Archive::ArchiveEntry::write_lfh (FILE *outfile)
+bool csArchive::ArchiveEntry::WriteLFH (FILE *outfile)
 {
   char buff[ZIP_LOCAL_FILE_HEADER_SIZE];
   size_t lfhpos = ftell (outfile);
@@ -1272,7 +977,7 @@ bool Archive::ArchiveEntry::write_lfh (FILE *outfile)
   return true;
 }
 
-bool Archive::ArchiveEntry::write_cdfh (FILE *outfile)
+bool csArchive::ArchiveEntry::WriteCDFH (FILE *outfile)
 {
   char buff[ZIP_CENTRAL_DIRECTORY_FILE_HEADER_SIZE];
 
@@ -1310,7 +1015,7 @@ bool Archive::ArchiveEntry::write_cdfh (FILE *outfile)
   return true;
 }
 
-bool Archive::ArchiveEntry::read_extra_field (FILE *infile, size_t extra_field_length)
+bool csArchive::ArchiveEntry::ReadExtraField (FILE *infile, size_t extra_field_length)
 {
   if (extrafield && (info.extra_field_length != extra_field_length))
   {
@@ -1318,16 +1023,12 @@ bool Archive::ArchiveEntry::read_extra_field (FILE *infile, size_t extra_field_l
     extrafield = NULL;
   }
   info.extra_field_length = extra_field_length;
-  if (extra_field_length)
-  {
-    if (!extrafield)
-      CHKB (extrafield = new char[extra_field_length]);
-    return (fread (extrafield, 1, extra_field_length, infile) == extra_field_length);
-  }
-  else return true;
+  if (!extrafield)
+    CHKB (extrafield = new char[extra_field_length]);
+  return (fread (extrafield, 1, extra_field_length, infile) == extra_field_length);
 }
 
-bool Archive::ArchiveEntry::read_file_comment (FILE *infile, size_t file_comment_length)
+bool csArchive::ArchiveEntry::ReadFileComment (FILE *infile, size_t file_comment_length)
 {
   if (comment && (info.file_comment_length != file_comment_length))
   {
@@ -1335,16 +1036,12 @@ bool Archive::ArchiveEntry::read_file_comment (FILE *infile, size_t file_comment
     comment = NULL;
   }
   info.file_comment_length = file_comment_length;
-  if (file_comment_length)
-  {
-    if (!comment)
-      CHKB (comment = new char[file_comment_length]);
-    return (fread (comment, 1, file_comment_length, infile) == file_comment_length);
-  }
-  else return true;
+  if (!comment)
+    CHKB (comment = new char[file_comment_length]);
+  return (fread (comment, 1, file_comment_length, infile) == file_comment_length);
 }
 
-bool Archive::ArchiveEntry::write_file (FILE *outfile)
+bool csArchive::ArchiveEntry::WriteFile (FILE *outfile)
 {
   size_t lfhoffs = ftell (outfile);
 
@@ -1415,7 +1112,7 @@ bool Archive::ArchiveEntry::write_file (FILE *outfile)
   } /* endwhile */
 
   fseek (outfile, lfhoffs, SEEK_SET);
-  if (!write_lfh (outfile))
+  if (!WriteLFH (outfile))
     return false;
   fseek (outfile, info.csize, SEEK_CUR);
   return true;
