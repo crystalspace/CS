@@ -49,7 +49,9 @@ public:
   static void* GetData (iObject* obj)
   {
     iDataObject *d = CS_GET_CHILD_OBJECT (obj, iDataObject);
-    return d ? d->GetData () : NULL;
+    void *res = (d ? d->GetData () : NULL);
+    if (d) d->DecRef ();
+    return res;
   }
   
   SCF_DECLARE_IBASE_EXT (csObject);
