@@ -84,7 +84,7 @@ Cloth::Cloth(iClothFactoryState * mesh,
   shift = &Sh;
   object_bbox = &box;
   gravity = grav;
-  printf(" CREATING the cloth  %u... \n",sizeof(float));
+  // printf(" CREATING the cloth  %u... \n",sizeof(float));
   int            i;
   vertices = NULL;
   triangles = NULL;
