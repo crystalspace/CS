@@ -5,12 +5,12 @@
 Group: Applications/Development
 Source: cs-current-snapshot.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
-URL: http://crystal.sourceforge.net
+URL: http://crystal.sourceforge.net/
 #Requires: 
 #Obsoletes:
 
 # Main rpm and .src.rpm packages
-Summary: Crystal Space free 3d engine
+Summary: Crystal Space free 3D SDK
 Name: %{name}
 Release: %{release}
 Version: %{version}
@@ -29,7 +29,7 @@ Headers and files needed for building a Crystal Space apps
 
 # Docs package
 %package -n %{name}-doc
-Summary: Docs for Crystal Space free 3d engine
+Summary: Documentation for Crystal Space free 3D SDK
 Group: Application/Development
 Provides:       %{name}-doc = %{version}-%{release}
 %description -n %{name}-doc
@@ -109,6 +109,9 @@ rm -rf "$RPM_BUILD_ROOT"
 %{prefix}/include/igraphic/*.h
 
 %changelog
+* Tue Feb 10 2004 Eric Sunshine <sunshine@users.sourceforge.net>
+- Unification and clean up of package descriptions.
+
 * Mon Feb 9 2004 Vincent Knecht <vknecht@users.sourceforge.net> 20040209-3
 - Using /usr for %{prefix}
 - Fixed bogus doc package by using %docdir instead of %doc
