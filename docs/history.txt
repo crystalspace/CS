@@ -1,6 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
 18-Jul-2000
+	- Did an optimization in csFrustum::Classify() as suggested
+	  by Norman Kramer.
 	- Fixed another bug in csFrustum::Classify() where it would
 	  misclassify adjacent frustum/polygon as covered instead of
 	  outside.
