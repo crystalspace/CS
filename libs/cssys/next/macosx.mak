@@ -40,6 +40,7 @@ NEXT.PLUGINS+=video/canvas/macosx/opengl
 NEXT.PLUGINS+=sound/driver/coreaudio
 NEXT.PLUGINS+=sound/renderer/software
 
+# Unfortunately, makefile variable CC is not yet defined, so we hardcode "cc".
 NEXT.SYSCONFIG=$(NEWLINE)sh libs/cssys/next/macosx.sh cc>>config.tmp
 
 NEXT.FRIEND=yes

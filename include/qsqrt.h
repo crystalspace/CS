@@ -196,15 +196,14 @@ static inline float qisqrt(float x)
 #elif (!defined (CS_NO_QSQRT)) && defined (PROC_X86) && defined (COMP_VC)
 
 #include <math.h>
-
-#define qsqrt(x) sqrtf(x)
-#define qisqrt(x) (1.0f / sqrtf(x))
+static inline float qsqrt (float x) { return sqrtf(x); }
+static inline float qisqrt(float x) { return 1.0f / sqrtf(x); }
 
 #else
 
 #include <math.h>
-#define qsqrt(x)  sqrt(x)
-#define qisqrt(x) (1.0/sqrt(x))
+static inline float qsqrt (float x) { return (float)sqrt(x); }
+static inline float qisqrt(float x) { return (float)(1.0 / sqrt(x)); }
 
 #endif
 

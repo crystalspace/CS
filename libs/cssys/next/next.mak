@@ -1,6 +1,6 @@
 #==============================================================================
 # This is the system makefile for MacOS/X Server, OpenStep, and NextStep.
-# Copyright (C)1998-2001 by Eric Sunshine <sunshine@sunshineco.com>
+# Copyright (C)1998-2002 by Eric Sunshine <sunshine@sunshineco.com>
 #==============================================================================
 
 # Only one of the cover makefiles should be including this file. Ignore others.
@@ -103,25 +103,27 @@ LIBS.EXE.PLATFORM = $(NEXT.LIBS)
 # Socket library
 LIBS.SOCKET.SYSTEM =
 
-# Where can the Zlib library be found on this system?
+# The name of the zlib library.
 Z_LIBS = $(LFLAGS.l)z
 
-# Where can the PNG library be found on this system?
+# The name of the PNG library.
 PNG_LIBS = $(LFLAGS.l)png
 
-# Where can the JPG library be found on this system?
+# The name of the JPEG library.
 JPG_LIBS = $(LFLAGS.l)jpeg
 
-# Where can the optional sound libraries be found on this system?
+# Additional audio libraries.
 SOUND_LIBS =
 
 # Indicate where special include files can be found.
 CFLAGS.INCLUDE = $(NEXT.INCLUDE_DIRS) \
-  $(addprefix $(CFLAGS.I),$(NEXT.SOURCE_PATHS)) \
-  $(CFLAGS.I)libs/zlib $(CFLAGS.I)libs/libpng $(CFLAGS.I)libs/libjpeg
+  $(addprefix $(CFLAGS.I),$(NEXT.SOURCE_PATHS))
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL = $(NEXT.CFLAGS.GENERAL) $(NEXT.ARCH_FLAGS) \
+CFLAGS.GENERAL = \
+  $(NEXT.CFLAGS.GENERAL) \
+  $(NEXT.CFLAGS.CONFIG) \
+  $(NEXT.ARCH_FLAGS) \
   -Wno-precomp -fno-common -pipe
 
 # Special option for the software 3D renderer to force it to ARGB mode
@@ -146,8 +148,7 @@ CFLAGS.DLL = $(NEXT.CFLAGS.DLL)
 LFLAGS.GENERAL = \
   $(NEXT.ARCH_FLAGS) \
   $(NEXT.LFLAGS.GENERAL) \
-  $(NEXT.LFLAGS.CONFIG) \
-  $(LFLAGS.L)libs/zlib $(LFLAGS.L)libs/libpng $(LFLAGS.L)libs/libjpeg
+  $(NEXT.LFLAGS.CONFIG)
 
 # Flags for the linker which are used when debugging.
 LFLAGS.debug = -g
@@ -273,10 +274,41 @@ ifeq ($(ROOTCONFIG),config)	  # ROOTCONFIG, but we only need to run once.
 ifneq ($(strip $(TARGET_ARCHS)),)
   SYSCONFIG += $(NEWLINE)echo TARGET_ARCHS = $(NEXT.TARGET_ARCHS)>>config.tmp
 endif
+
+# Unfortunately, makefile variables CC and CXX are not yet defined, so we use
+# hardcoded compiler name "cc".
 SYSCONFIG += $(NEXT.SYSCONFIG) \
   $(NEWLINE)CC=cc CXX=cc sh bin/comptest.sh>>config.tmp \
   $(NEWLINE)CC=cc CXX=cc sh bin/haspythn.sh>> config.tmp \
   $(NEWLINE)echo override DO_ASM = $(DO_ASM)>>config.tmp
+
+NEXT.DIR.ZLIB    = $(wildcard libs/zlib)
+NEXT.DIR.LIBPNG  = $(wildcard libs/libpng)
+NEXT.DIR.LIBJPEG = $(wildcard libs/libjpeg)
+
+# Unfortunately, these are not yet defined, so we do so manually.
+ifeq (,$(CFLAGS.I))
+  CFLAGS.I = -I
+endif
+ifeq (,$(LFLAGS.L))
+  LFLAGS.L = -L
+endif
+
+ifneq (,$(NEXT.DIR.ZLIB))
+  SYSCONFIG += \
+    $(NEWLINE)echo NEXT.CFLAGS.CONFIG += $(CFLAGS.I)$(NEXT.DIR.ZLIB)>>config.tmp \
+    $(NEWLINE)echo NEXT.LFLAGS.CONFIG += $(LFLAGS.L)$(NEXT.DIR.ZLIB)>>config.tmp
+endif
+ifneq (,$(NEXT.DIR.LIBPNG))
+  SYSCONFIG += \
+    $(NEWLINE)echo NEXT.CFLAGS.CONFIG += $(CFLAGS.I)$(NEXT.DIR.LIBPNG)>>config.tmp \
+    $(NEWLINE)echo NEXT.LFLAGS.CONFIG += $(LFLAGS.L)$(NEXT.DIR.LIBPNG)>>config.tmp
+endif
+ifneq (,$(NEXT.DIR.LIBJPEG))
+  SYSCONFIG += \
+    $(NEWLINE)echo NEXT.CFLAGS.CONFIG += $(CFLAGS.I)$(NEXT.DIR.LIBJPEG)>>config.tmp \
+    $(NEWLINE)echo NEXT.LFLAGS.CONFIG += $(LFLAGS.L)$(NEXT.DIR.LIBJPEG)>>config.tmp
+endif
 
 endif # ifeq ($(ROOTCONFIG),config)
 

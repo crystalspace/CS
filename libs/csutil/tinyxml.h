@@ -45,6 +45,7 @@ distribution.
 // all FILE related routines (fprintf) to work on iString instead.
 #include "iutil/string.h"
 #include "csutil/scfstr.h"
+#undef FILE
 #define FILE iString
 #define fprintf new_fprintf
 #define fputs new_fputs

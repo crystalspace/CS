@@ -1,5 +1,13 @@
 The history order is reversed so that new features are at the top.
 
+15-Aug-2002
+	- Eric Sunshine changed next.mak so that it only uses the CFLAGS
+	  -Ilibs/zlib, -Ilibs/libpng, -Ilibs/libjpeg and the LFLAGS
+	  -Llibs/zlib, -Llibs/libpng, -Llibs/libjpeg if those directories
+	  actually exist, rather than using the flags unconditionally.  This
+	  change will eliminate the annoying MacOS/X (Apple/NeXT) linker
+	  warnings about non-existent directories.
+	- Eric Sunshine eliminated a number of compilation warnings in csutil.
 14-Aug-2002
 	- Removed CreateElement(), CreateText(), and CreateComment() again.
 	  Will do this differently.
