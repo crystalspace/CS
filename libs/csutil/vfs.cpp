@@ -323,7 +323,7 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, int RIndex,
     if (fseek (file, 0, SEEK_END))
       CheckError ();
     Size = ftell (file);
-    if (Size == -1)
+    if (Size == (size_t)-1)
     {
       Size = 0;
       CheckError ();
