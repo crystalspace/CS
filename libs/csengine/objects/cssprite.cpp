@@ -203,7 +203,7 @@ void csSpriteTemplate::SetTexture (csTextureList* textures, char *texname)
   cstxt = texture;
 }
 
-csSpriteAction* csSpriteTemplate::FindAction (char *n)
+csSpriteAction* csSpriteTemplate::FindAction (const char *n)
 {
   for (int i = GetNumActions () - 1; i >= 0; i--)
     if (strcmp (GetAction (i)->GetName (), n) == 0)

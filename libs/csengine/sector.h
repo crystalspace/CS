@@ -184,7 +184,7 @@ public:
   /**
    * Find a thing with the given name.
    */
-  csThing* GetThing (char* name);
+  csThing* GetThing (const char* name);
 
   /**
    * Get the first thing in this sector.

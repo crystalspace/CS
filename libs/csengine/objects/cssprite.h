@@ -200,7 +200,7 @@ public:
   /// Create and add a new action frameset to the sprite.
   csSpriteAction* AddAction ();
   /// find a named action into the sprite.
-  csSpriteAction* FindAction (char * name);
+  csSpriteAction* FindAction (const char * name);
   /// Get the first action.
   csSpriteAction* GetFirstAction ()
   { return (csSpriteAction *)actions [0]; }
@@ -394,7 +394,7 @@ public:
   /**
    * Select an action.
    */
-  void SetAction (char * name)
+  void SetAction (const char * name)
   {
     csSpriteAction *act;
     if ((act = tpl->FindAction (name)) != NULL)

@@ -983,7 +983,7 @@ void csSector::CacheLightmaps ()
   }
 }
 
-csThing* csSector::GetThing (char* name)
+csThing* csSector::GetThing (const char* name)
 {
   csThing* s = first_thing;
   while (s)

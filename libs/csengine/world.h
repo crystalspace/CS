@@ -250,7 +250,7 @@ public:
   /**
    * Open a file as the world file.
    */
-  Archive* OpenWorldFile (char* filename);
+  Archive* OpenWorldFile (const char* filename);
 
   /**
    * Close the world file.
@@ -272,21 +272,21 @@ public:
    * optionally in all loaded libraries. This template can then
    * be used to create sprites.
    */
-  csSpriteTemplate* GetSpriteTemplate (char* name, bool use_libs = false);
+  csSpriteTemplate* GetSpriteTemplate (const char* name, bool use_libs = false);
 
   /**
    * Find a named thing template in the loaded world and
    * optionally in all loaded libraries. This template can then
    * be used to create things.
    */
-  csThingTemplate* GetThingTemplate (char* name, bool use_libs = false);
+  csThingTemplate* GetThingTemplate (const char* name, bool use_libs = false);
 
   /**
    * Find a thing with a given name. This function will scan all sectors
    * of the current world and return the first thing that it can find with
    * the given name.
    */
-  csThing* GetThing (char* name);
+  csThing* GetThing (const char* name);
 
   /**
    * Return the object managing all loaded textures.

@@ -112,7 +112,7 @@ IConfig* csWorld::GetEngineConfigCOM ()
   return GetIConfigFromcsEngineConfig (cfg_engine);
 }
 
-csSpriteTemplate* csWorld::GetSpriteTemplate (char* name, bool use_libs)
+csSpriteTemplate* csWorld::GetSpriteTemplate (const char* name, bool use_libs)
 {
   // if use_libs == true we should support qualified names (like standard.bullet).
   // with the library first and then the name of the object.
@@ -139,7 +139,7 @@ csSpriteTemplate* csWorld::GetSpriteTemplate (char* name, bool use_libs)
   return NULL;
 }
 
-csThingTemplate* csWorld::GetThingTemplate (char* name, bool use_libs)
+csThingTemplate* csWorld::GetThingTemplate (const char* name, bool use_libs)
 {
   int tn = thing_templates.Length ();
   while (tn > 0)
@@ -220,7 +220,7 @@ csScript* csWorld::NewScript (LanguageLayer* layer, char* name, char* params)
   return s;
 }
 
-csThing* csWorld::GetThing (char* name)
+csThing* csWorld::GetThing (const char* name)
 {
   int i = sectors.Length ();
   while (i > 0)
@@ -318,7 +318,7 @@ Archive* csWorld::GetWorldFile ()
   return world_file;
 }
 
-Archive* csWorld::OpenWorldFile (char* filename)
+Archive* csWorld::OpenWorldFile (const char* filename)
 {
   CloseWorldFile ();
   CHK (world_file = new Archive (filename));
