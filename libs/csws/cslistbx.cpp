@@ -36,16 +36,13 @@
 #define LISTBOX_HORIZONTAL_PAGESTEP     8
 
 csListBoxItem::csListBoxItem (csComponent *iParent, const char *iText, int iID,
-  csListBoxItemStyle iStyle) : csComponent (iParent)
+  csListBoxItemStyle iStyle) : csComponent (iParent), 
+    ItemStyle(iStyle), deltax(0),  ItemBitmap(NULL),  DeleteBitmap(false),
+    hOffset(0)
 {
   state |= CSS_SELECTABLE | CSS_TRANSPARENT;
+  id = iID; 
   SetText (iText);
-  id = iID;
-  ItemStyle = iStyle;
-  ItemBitmap = NULL;
-  DeleteBitmap = false;
-  hOffset = 0;
-  deltax = 0;
   SetPalette (CSPAL_LISTBOXITEM);
 }
 
@@ -164,63 +161,18 @@ void csListBoxItem::SetBitmap (csPixmap *iBitmap, bool iDelete)
   Invalidate ();
 }
 
-void csListBoxItem::Draw ()
-{
-  bool enabled = !parent->GetState (CSS_DISABLED);
-  bool selected = enabled && GetState (CSS_LISTBOXITEM_SELECTED);
-  if (selected)
-  {
-    if (parent->GetState (CSS_FOCUSED) && enabled)
-      Clear (CSPAL_LISTBOXITEM_SELECTION);
-    else
-      Rect3D (0, 0, bound.Width (), bound.Height (),
-        CSPAL_LISTBOXITEM_SELECTION, CSPAL_LISTBOXITEM_SELECTION);
-  }
-
-  int color;
-  if (GetState (CSS_SELECTABLE) && enabled)
-  {
-    if (ItemStyle == cslisNormal)
-      if (selected && parent->GetState (CSS_FOCUSED))
-        color = CSPAL_LISTBOXITEM_SNTEXT;
-      else
-        color = CSPAL_LISTBOXITEM_UNTEXT;
-    else
-      if (selected && parent->GetState (CSS_FOCUSED))
-        color = CSPAL_LISTBOXITEM_SETEXT;
-      else
-        color = CSPAL_LISTBOXITEM_UETEXT;
-  }
-  else
-    color = CSPAL_LISTBOXITEM_DTEXT;
-
-  int x = LISTBOXITEM_XSPACE - deltax + hOffset;
-  if (ItemBitmap)
-  {
-    Pixmap (ItemBitmap, x, (bound.Height () - ItemBitmap->Height ()) / 2);
-    x += ItemBitmap->Width () + LISTBOXITEM_XSPACE;
-  } /* endif */
-  if (text)
-  {
-    int fh;
-    GetTextSize (text, &fh);
-    Text (x, (bound.Height () - fh + 1) / 2, color, -1, text);
-  } /* endif */
-  csComponent::Draw ();
-}
-
 //---------------------------------------------------// csListBox //----------//
 
 csListBox::csListBox (csComponent *iParent, int iStyle,
-  csListBoxFrameStyle iFrameStyle) : csComponent (iParent)
+  csListBoxFrameStyle iFrameStyle) : csComponent (iParent),
+    ListBoxStyle(iStyle),  FrameStyle(iFrameStyle),
+    deltax(0), fPlaceItems(false),
+    FrameBitmap(NULL), fDelFrameBitmap(false)
 {
   state |= CSS_SELECTABLE;
-  ListBoxStyle = iStyle;
-  FrameStyle = iFrameStyle;
   SetPalette (CSPAL_LISTBOX);
-  deltax = 0;
-  fPlaceItems = false;
   csScrollBarFrameStyle sbsty;
+  
   switch (FrameStyle)
   {
     case cslfsNone:
@@ -235,6 +187,16 @@ csListBox::csListBox (csComponent *iParent, int iStyle,
       BorderWidth = BorderHeight = 2;
       sbsty = cssfsThickRect;
       break;
+     case cslfsTextured:
+       BorderWidth=BorderHeight=2;
+       sbsty=cssfsThinRect;
+       state|=CSS_TRANSPARENT;
+       break;
+     case cslfsBitmap:
+       BorderWidth=BorderHeight=0;
+       sbsty=cssfsThinRect;
+       state|=CSS_TRANSPARENT;
+       break;
     default:
       return;
   } /* endswitch */
@@ -249,33 +211,10 @@ csListBox::csListBox (csComponent *iParent, int iStyle,
     vscroll = NULL;
 }
 
-void csListBox::Draw ()
+csListBox::~csListBox() 
 {
-  if (fPlaceItems)
-    PlaceItems ();
-
-  switch (FrameStyle)
-  {
-    case cslfsNone:
-      break;
-    case cslfsThinRect:
-      Rect3D (0, 0, bound.Width (), bound.Height (),
-          CSPAL_LISTBOX_LIGHT3D, CSPAL_LISTBOX_DARK3D);
-      Rect3D (1, 1, bound.Width () - 1, bound.Height () - 1,
-          CSPAL_LISTBOX_DARK3D, CSPAL_LISTBOX_LIGHT3D);
-      break;
-    case cslfsThickRect:
-      Rect3D (0, 0, bound.Width (), bound.Height (),
-          CSPAL_LISTBOX_LIGHT3D, CSPAL_LISTBOX_DARK3D);
-      Rect3D (1, 1, bound.Width () - 1, bound.Height () - 1,
-          CSPAL_LISTBOX_2LIGHT3D, CSPAL_LISTBOX_2DARK3D);
-      break;
-  } /* endswitch */
-  Box (BorderWidth, BorderHeight, bound.Width () - BorderWidth,
-    bound.Height () - BorderHeight, FrameStyle == cslfsThickRect ?
-    CSPAL_LISTBOX_BACKGROUND2 : CSPAL_LISTBOX_BACKGROUND);
-
-  csComponent::Draw ();
+   if (fDelFrameBitmap && FrameBitmap)
+     delete FrameBitmap;
 }
 
 void csListBox::PlaceItems (bool setscrollbars)
@@ -817,3 +756,28 @@ void csListBox::Delete (csComponent *comp)
   Invalidate ();
   csComponent::Delete (comp);
 }
+
+void csListBox::GetBorderSize(int *iBorderWidth,  int *iBorderHeight) 
+{
+   if (iBorderWidth)  *iBorderWidth =BorderWidth;
+   if (iBorderHeight) *iBorderHeight=BorderHeight;
+}
+
+void csListBox::SetFrameBitmap(csPixmap *iFrameBitmap, bool iDelFrameBitmap)
+{
+  if (iFrameBitmap)
+  {
+    FrameBitmap=iFrameBitmap;
+    fDelFrameBitmap=iDelFrameBitmap;
+  } 
+}
+
+void csListBox::SetTexture(csPixmap *iTexture, bool iDelFrameBitmap)
+{
+  if (iTexture)
+  {
+    FrameBitmap=iTexture;
+    fDelFrameBitmap=iDelFrameBitmap;
+  }
+}
+

@@ -88,26 +88,27 @@ void csDefaultDialogSkin::Draw (csComponent &This)
   }
 
 
-	// Draw the background only if this is NOT a Bitmap-style frame
-	if (This.GetFrameStyle() != csdfsBitmap)
-	{
+// Draw the background only if this is NOT a Bitmap-style frame
+if (This.GetFrameStyle() != csdfsBitmap)
+{
 
-  	int orgx = 0, orgy = 0;
-  	// If dialog has title, suppose it is the top-level window
-  	// thus we'll align the texture with the dialog; otherwise
-  	// we'll align the texture to parent's top-left corner.
-  	if (!This.GetText ())
-  	{
-  	  orgx = -This.bound.xmin;
-  	  orgy = -This.bound.ymin;
-  	}
-  	Back.Draw (This, bw, bh, This.bound.Width () - 2 * bw,
-  	  This.bound.Height () - 2 * bh, orgx, orgy, This.GetAlpha ());
+   int orgx = 0, orgy = 0;
+   // If dialog has title, suppose it is the top-level window
+   // thus we'll align the texture with the dialog; otherwise
+   // we'll align the texture to parent's top-left corner.
+   if (!This.GetText ())
+   {
+     orgx = -This.bound.xmin;
+     orgy = -This.bound.ymin;
+  }
+   Back.Draw (This, bw, bh, This.bound.Width () - 2 * bw,
+     This.bound.Height () - 2 * bh, orgx, orgy, This.GetAlpha ());
   }
   // Draw the bitmap-style frame
   else
   {
   	This.Pixmap(This.GetFrameBitmap(), 0,0, This.GetAlpha());
+  	This.Pixmap(This.GetOverlayBitmap(), 0,0, This.GetOverlayAlpha());
   }
 #undef This
 }

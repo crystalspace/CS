@@ -26,11 +26,13 @@
 #define SKIN ((csDialogSkin *)skinslice)
 
 csDialog::csDialog (csComponent *iParent, csDialogFrameStyle iFrameStyle)
-  : csComponent (iParent), FrameBitmap(NULL), delFrameBitmap(false)
+  : csComponent (iParent), FrameBitmap(NULL),  OverlayBitmap(NULL),
+    delFrameBitmap(false), delOverlayBitmap(false)
 {
   SetPalette (CSPAL_DIALOG);
   state |= CSS_SELECTABLE;
   DragStyle = 0;
+  OverlayAlpha=0;
   first = NULL;
   GridX = GridY = -1;
   SnapSizeToGrid = false;
@@ -53,13 +55,11 @@ csDialog::csDialog (csComponent *iParent, csDialogFrameStyle iFrameStyle)
   SetFrameStyle (iFrameStyle);
 }
 
-
 csDialog::~csDialog()
 {
  if (delFrameBitmap && FrameBitmap) delete FrameBitmap;
+ if (delOverlayBitmap && OverlayBitmap) delete OverlayBitmap;
 }
-
-
 
 bool csDialog::HandleEvent (iEvent &Event)
 {
@@ -273,7 +273,17 @@ void csDialog::SetFrameStyle (csDialogFrameStyle iFrameStyle)
 
 void csDialog::SetAlpha (uint8 iAlpha)
 {
-	Alpha = iAlpha;
+  Alpha = iAlpha;
+	
+  if (Alpha || FrameStyle == csdfsBitmap)
+    SetState (CSS_TRANSPARENT, true);
+  else
+    SetState (CSS_TRANSPARENT, false);
+}
+
+void csDialog::SetOverlayAlpha (uint8 iAlpha)
+{
+  OverlayAlpha = iAlpha;
 	
   if (Alpha || FrameStyle == csdfsBitmap)
     SetState (CSS_TRANSPARENT, true);
@@ -296,6 +306,24 @@ csDialog::SetFrameBitmap(csPixmap *iFrameBitmap, bool iDelFrameBitmap)
 	if (iFrameBitmap) {
 	  FrameBitmap = iFrameBitmap;
 	  delFrameBitmap = iDelFrameBitmap;
+	}
+}
+
+void 
+csDialog::SetOverlayBitmap(csPixmap *iOverlayBitmap, bool iDelOverlayBitmap)
+{
+	// Delete the previous bitmap, if it needs to be
+	if (delOverlayBitmap && OverlayBitmap)
+	{
+  	  delete OverlayBitmap;
+	  delOverlayBitmap=false;
+	  OverlayBitmap=NULL;
+	}
+	
+	// Set the new one only if there's something to set
+	if (iOverlayBitmap) {
+	  OverlayBitmap = iOverlayBitmap;
+	  delOverlayBitmap = iDelOverlayBitmap;
 	}
 }
 
