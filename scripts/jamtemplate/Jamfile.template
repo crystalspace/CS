@@ -1,5 +1,7 @@
 SubDir TOP ;
 
+CleanDir clean :
+    out ;
 Clean distclean :
     aclocal.m4
     config.h
@@ -9,18 +11,15 @@ Clean distclean :
     Jamconfig ;
 CleanDir distclean :
     autom4te.cache
-    out ;
 Depends distclean : clean ;
 
 Clean maintainerclean :
-  aclocal.m4
   configure
   config.h.in ;
 Depends maintainerclean : distclean ;
 
-Description clean : "Remove all built targets" ;
-Description distclean : "Remove built targets and configuration" ;
-Description maintainerclean :
+Help distclean : "Remove built targets and configuration" ;
+Help maintainerclean :
     "Remove built targets, configuration, and generated files." ;
 
 SubInclude TOP src ;
