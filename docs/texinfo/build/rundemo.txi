@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Quick Start, Memory Debugger, Problems, Building
+@node Quick Start, , Problems, Building
 @section Quick Start
 @cindex Walktest
 @cindex Quick Start

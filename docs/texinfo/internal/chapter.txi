@@ -7,11 +7,13 @@ should not be nessecary to use CS in your project. It is intended for
 developers.
 
 @menu
-* Dependencies::
-* Makefile How-To:: Makefile How-To
 * Platform Details:: Platform-Specific Details
+* Dependencies::
+* Makefile How-To::
+* Memory Debugger:: Crystal Space Memory Debugger
 @end menu
 
+@importss{internal,platform,details.txi}
 @imports{internal,depend.txi}
 @imports{internal,makefile.txi}
-@importss{internal,platform,details.txi}
+@imports{internal,memdebug.txi}

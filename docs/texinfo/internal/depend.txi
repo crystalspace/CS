@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Dependencies, Makefile How-To, Internals, Internals
+@node Dependencies, Makefile How-To, Platform Details, Internals
 @section Dependencies
 @cindex Dependencies
 @cindex Dependency Graph

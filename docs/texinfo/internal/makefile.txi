@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Makefile How-To, Platform Details, Dependencies, Internals
+@node Makefile How-To, Memory Debugger, Dependencies, Internals
 @section Makefile How-To
 @cindex Makefile How-To
 

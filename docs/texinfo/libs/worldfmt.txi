@@ -1,0 +1,1122 @@
+@c -*-texinfo-*-
+@c ----------------------------------------------------------------------------
+@c Define typesetting macros for syntax production.
+@c
+@c    token{} represents a terminal symbol.
+@c    nonterm{} represents a non-terminal symbol.
+@c    production{} represents a syntactical production.  The first argument is
+@c        the non-terminal symbol represented by this production, and the
+@c        second argument is its expansion.
+@c    prodwrap{} is used for continuation lines when a production does not fit
+@c        entirely on a single line of printed output.
+@c    prodnext{} is used for alternative expansions of a production which
+@c        should appear on a line following the production itself.  The '|' is
+@c        automatically inserted.
+@c    simpleprod{} represents a production for which no expansion is given.
+@c    comma{} represent the punctuation symbol 'comma'.  It is used when a
+@c        comma must appear within the expansion of a production, since one
+@c        can not use an actual comma, as it would be interpreted as a macro
+@c        delimeter, instead.
+@c    COMMA{} represents a comma wrapped as a @token{}.
+@c    LP{} represents a left parenthesis '(' wrapped as a @token{}.
+@c    RP{} represents a right parenthesis ')' wrapped as a @token{}.
+@c
+@c Eric Sunshine <sunshine@sunshineco.com>                     8 September 2000
+@c ----------------------------------------------------------------------------
+@ifnotinfo
+@macro token{a}
+`@code{\a\}'
+@end macro
+
+@macro nonterm{a}
+@emph{\a\}
+@end macro
+@end ifnotinfo
+
+@ifinfo
+@macro token{a}
+`\a\'
+@end macro
+
+@macro nonterm{a}
+<\a\>
+@end macro
+@end ifinfo
+
+@macro production{a,b}
+@noindent
+@nonterm{\a\} @result{} \b\
+@end macro
+
+@macro prodwrap{b}
+@noindent
+@ @ @ @ @ @ @ @ \b\
+@end macro
+
+@macro prodnext{b}
+@noindent
+@prodwrap{| \b\}
+@end macro
+
+@macro simpleprod{a}
+@noindent
+@nonterm{\a\}
+@end macro
+
+@macro comma
+,
+@end macro
+
+@macro COMMA
+@token{@comma{}}
+@end macro
+
+@macro LP
+@token{(}
+@end macro
+
+@macro RP
+@token{)}
+@end macro
+
+@node World File Format, , csParser, csParser
+@subsection Format of World File
+@cindex Format of World File
+@cindex World File Format
+
+@noindent
+@emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.}
+
+The next couple sections of this document describe the format of the standard
+Crystal Space world file.  The first section describes the syntax of the file.
+The second section contains extra discussions and hints regarding the world
+file and the objects contained within it.
+
+The Crystal Space engine, itself, does not care about the external format of
+world data, nor does it care about how that information was obtained.  It is
+possible to create additional world loaders as plug-in modules which
+understand world data stored in other formats, such as binary.  A world
+loading plug-in module could even load worlds over the network from a world
+file server, or generate worlds randomly based upon some set of input
+properties.  There are many possiblities.
+
+The world file syntax described in this section, however, is that which is
+understood by the standard world file loader which accompanies Crystal Space.
+It deals strictly with plain-text files.
+
+@menu
+* World File Grammar:: Grammar
+* World File Syntax:: Syntax
+* World File Hints:: Hints
+@end menu
+
+@node World File Grammar, World File Syntax, World File Format, World File Format
+@subsubsection Grammar
+
+@noindent
+@emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.}
+
+The syntax for the standard Crystal Space world file is specified as a
+context-free grammar using a modified @sc{bnf} (@emph{Backus-Naur Form})
+notation.
+
+@dfn{Terminal} symbols (also known as @dfn{tokens}) are denoted like this,
+@token{VERTEX}.  @dfn{Non-terminal} symbols are denoted in this fashion,
+@nonterm{vector}.  Expressions enclosed within `[' and `]' are optional.  When
+an expression is followed by the notation `@dots{}', then the expression may
+appear zero or more times.  Finally, the symbol '|' appearing between
+expressions indicates selection.  Either the expression to the left may be
+utilized, or the one to the right, but not both.  An example follows.
+
+@production{flip, @token{HEAD} | @token{TAIL}}@*
+@production{wager, @token{WAGER} @nonterm{flip}
+    @LP{} @nonterm{money} [ @COMMA{} @nonterm{money} @dots{} ] @RP{}}
+
+In this example, a @samp{WAGER} may be followed by either @samp{HEAD} or
+@samp{TAIL}, and then by a parenthesized list of monetary values separated by
+commas.  At least one monetary value must be specified.  All subsequent values
+(including the comma) are optional, as denoted by `[' and `]'.  Here are a
+couple of valid expressions which satisfy the @nonterm{wager} production:
+
+@example
+WAGER HEAD (44)
+WAGER TAIL (5, 39, 2)
+@end example
+
+@noindent
+And here are a few invalid expressions which do not:
+
+@example
+WAGER HEAD (44,)
+WAGER TAIL (,23)
+WAGER TAIL ()
+WAGER EITHER (81, 15)
+WAGER (72, 91)
+@end example
+
+@node World File Syntax, World File Hints, World File Grammar, World File Format
+@subsubsection Syntax
+
+@noindent
+@emph{Written by numerous Crystal Space developers.  Extensive Texinfo
+typesetting performed by Eric Sunshine, @email{sunshine@@sunshineco.com}.}
+
+@subsubheading Basic Syntax Elements
+
+@simpleprod{number}
+
+A general number.
+
+@simpleprod{pos-number}
+
+A general positive number.
+
+@simpleprod{integer}
+
+A general integer.
+
+@simpleprod{pos-integer}
+
+A positive integer (> 0).
+
+@simpleprod{number..number}
+
+A numeric range. For example, `0..1' represents a number between 0 and 1.
+
+@simpleprod{name}
+
+A name identifier.  An unquoted string provided that it contains no
+punctuation or whitespace; otherwise delimited by double quotes.
+
+@simpleprod{string}
+
+A string delimited by double quotes. Special characters are escaped with a
+backslash.
+
+@subsubheading Number List
+@production{number-list,
+    @nonterm{number} [ @COMMA{} @nonterm{number} ] @dots{}}
+
+@subsubheading Boolean Value
+@production{yes, @token{yes} | @token{true} | @token{on} | @token{1}}@*
+@production{no, @token{no} | @token{false} | @token{off} | @token{0}}@*
+@production{yes-no, @nonterm{yes} | @nonterm{no}}
+
+@subsubheading Color Description
+@production{red, 0..1}@*
+@production{green, 0..1}@*
+@production{blue, 0..1}@*
+@production{color,
+    @nonterm{red} @COMMA{} @nonterm{green} @COMMA{} @nonterm{blue}}
+
+@subsubheading Vectors and Coordinates
+@noindent
+Note that the x-axis points to the right, the y-axis points up, and the z-axis
+points forward.
+
+@production{x, @nonterm{number}}@*
+@production{y, @nonterm{number}}@*
+@production{z, @nonterm{number}}@*
+@production{u, @nonterm{number}}@*
+@production{v, @nonterm{number}}@*
+@production{vector-2d, @nonterm{x} @COMMA{} @nonterm{z}}@*
+@production{vector-3d, @nonterm{x} @COMMA{} @nonterm{y} @COMMA{} @nonterm{z}}@*
+@production{vertex-idx, @nonterm{integer}}@*
+@production{coordinate, @nonterm{vector-3d}}@*
+@production{coordinate-2d, @nonterm{vector-2d}}@*
+@production{texture-coordinate, @nonterm{u} @COMMA{} @nonterm{v}}
+
+@subsubheading Object Names
+
+@production{sector-name, @nonterm{name}}@*
+@production{light-name, @nonterm{name}}@*
+@production{thing-name, @nonterm{name}}@*
+@production{thingtpl-name, @nonterm{name}}@*
+@production{plane-name, @nonterm{name}}@*
+@production{col-name, @nonterm{name}}@*
+@production{script-name, @nonterm{name}}@*
+@production{texture-name, @nonterm{name}}@*
+@production{material-name, @nonterm{name}}@*
+@production{polygon-name, @nonterm{name}}@*
+@production{sprite-name, @nonterm{name}}@*
+@production{spritetpl-name, @nonterm{name}}@*
+@production{library-name, @nonterm{name}}@*
+@production{file-name, @nonterm{name}}
+
+@subsubheading Attributes and Numbers
+@production{max-textures-nr, @nonterm{pos-integer}}@*
+@production{radius, @nonterm{pos-number}}@*
+@production{texture-length, @nonterm{pos-number}}@*
+@production{height-nr, @nonterm{number}}@*
+@production{angle, @nonterm{number}}@*
+@production{light-index, @token{0} | @nonterm{pos-integer}}@*
+@production{vertex-index, @token{0} | @nonterm{pos-integer}}@*
+@production{keyname, @nonterm{string}}@*
+@production{keyvalue, @nonterm{string}}
+
+@subsubheading @sc{bsp} Tree
+@production{bsp, @token{BSP} @LP{} @RP{}}@*
+@production{statbsp, @token{STATBSP} @LP{} @RP{}}
+
+@subsubheading Key
+@production{key,
+    @token{KEY} @LP{} @nonterm{keyname} @COMMA{} @nonterm{keyvalue} @RP{}}
+
+@subsubheading WorldFMT Lighting
+@production{tex-lighting,
+    @token{TEXTURE_LIGHTING} @LP{} @nonterm{yes-no} @RP{}}@*
+@production{lighting, @token{LIGHTING} @LP{} @nonterm{yes-no} @RP{}}
+
+@subsubheading Rooms
+@production{dim, @token{DIM}
+    @LP{} @nonterm{x} @COMMA{} @nonterm{y} @COMMA{} @nonterm{z} @RP{}}@*
+@production{height, @token{HEIGHT} @LP{} @nonterm{height-nr} @RP{}}@*
+@production{floor-height, @token{FLOOR_HEIGHT} @LP{} @nonterm{height-nr} @RP{}}
+
+@subsubheading Fog
+@production{density, @nonterm{number}}@*
+@production{fog-desc,
+    @token{FOG} @LP{} @nonterm{color} @COMMA{} @nonterm{density} @RP{}}@*
+@production{alpha-nr, @token{0} | @token{25} | @token{50} | @token{75}}@*
+@production{alpha, @token{ALPHA} @LP{} @nonterm{alpha-nr} @RP{}}
+
+@subsubheading Vertex and Vector
+@production{vertex, @token{VERTEX} @LP{} @nonterm{coordinate} @RP{}}@*
+@production{vector, @token{V} @LP{} @nonterm{vector-3d} @RP{}}
+
+@subsubheading Matrices, Vectors, Scalers, and Angles
+@production{matrix-scaler, @nonterm{number}}@*
+@production{matrix-x-scaler, @nonterm{matrix-scaler}}@*
+@production{matrix-y-scaler, @nonterm{matrix-scaler}}@*
+@production{matrix-z-scaler, @nonterm{matrix-scaler}}@*
+@production{stated-matrix-x-scaler,
+    @token{SCALE_X} @LP{} @nonterm{matrix-x-scaler} @RP{}}@*
+@production{stated-matrix-y-scaler,
+    @token{SCALE_Y} @LP{} @nonterm{matrix-y-scaler} @RP{}}@*
+@production{stated-matrix-z-scaler,
+    @token{SCALE_Z} @LP{} @nonterm{matrix-z-scaler} @RP{}}@*
+@production{complex-matrix-scaler, @nonterm{stated-matrix-x-scaler}}@*
+    @prodnext{@nonterm{stated-matrix-y-scaler}}@*
+    @prodnext{@nonterm{stated-matrix-z-scaler}}@*
+@production{full-matrix-scaler, @nonterm{matrix-x-scaler} @COMMA{}
+    @nonterm{matrix-y-scaler} @COMMA{} @nonterm{matrix-z-scaler}}@*
+@production{uniform-matrix-scaler, @nonterm{matrix-scaler}}@*
+@production{simple-matrix-scaler, @token{SCALE} @LP{}
+    @nonterm{uniform-matrix-scaler} | @nonterm{full-matrix-scaler} @RP{}}@*
+@production{compound-matrix-scaler,
+    @nonterm{simple-matrix-scaler} | @nonterm{complex-matrix-scaler}}
+
+@production{rotation-x-angle, @nonterm{angle}}@*
+@production{rotation-y-angle, @nonterm{angle}}@*
+@production{rotation-z-angle, @nonterm{angle}}@*
+@production{rotation-x-matrix,
+    @token{ROT_X} @LP{} @nonterm{rotation-x-angle} @RP{}}@*
+@production{rotation-y-matrix,
+    @token{ROT_Y} @LP{} @nonterm{rotation-y-angle} @RP{}}@*
+@production{rotation-z-matrix,
+    @token{ROT_Z} @LP{} @nonterm{rotation-z-angle} @RP{}}@*
+@production{complex-rotation-matrix, @nonterm{rotation-x-matrix} |
+    @nonterm{rotation-y-matrix} | @nonterm{rotation-z-matrix}}@*
+@production{rotation-angles, @nonterm{rotation-x-angle} @COMMA{}
+    @nonterm{rotation-y-angle} @COMMA{} @nonterm{rotation-z-angle}}@*
+@production{simple-rotation-matrix,
+    @token{ROT} @LP{} @nonterm{rotation-angles} @RP{}}
+
+@production{rotation-matrix,
+    @nonterm{simple-rotation-matrix} | @nonterm{complex-rotation-matrix}}@*
+@production{complex-matrix,
+    @nonterm{rotation-matrix} | @nonterm{compound-matrix-scaler}}@*
+@production{simple-scaled-matrix, @nonterm{uniform-matrix-scaler}}@*
+@production{normal-matrix, @nonterm{vector-3d} @COMMA{} @nonterm{vector-3d}
+    @COMMA{} @nonterm{vector-3d}}@*
+@production{identity-matrix, @token{IDENTITY}}@*
+@production{matrix-type, @nonterm{identity-matrix}}@*
+    @prodnext{@nonterm{normal-matrix}}@*
+    @prodnext{@nonterm{simple-scaled-matrix}}@*
+    @prodnext{@nonterm{complex-matrix}}@*
+@production{matrix,
+    @token{MATRIX} @LP{} [ @nonterm{matrix-type} @dots{} ] @RP{}}
+
+@subsubheading Planes
+@production{plane-desc-comp, @nonterm{plane-orig}}@*
+    @prodnext{@nonterm{plane-first-len}}@*
+    @prodnext{@nonterm{plane-first}}@*
+    @prodnext{@nonterm{plane-second-len}}@*
+    @prodnext{@nonterm{plane-second}}@*
+    @prodnext{@nonterm{matrix}}@*
+    @prodnext{@nonterm{vector}}@*
+    @prodnext{@nonterm{plane-uvec}}@*
+    @prodnext{@nonterm{plane-vvec}}@*
+@production{plane-desc, @token{PLANE} @nonterm{plane-name}
+    @LP{} [ @nonterm{plane-desc-comp} @dots{} ] @RP{}}
+
+@subsubheading Texturing: Planes and Polygons
+@production{plane-orig,
+    @token{ORIG} @LP{} @nonterm{vector-3d} | @nonterm{vertex-idx} @RP{}}@*
+@production{plane-first,
+    @token{FIRST} @LP{} @nonterm{vector-3d} | @nonterm{vertex-idx} @RP{}}@*
+@production{plane-second,
+    @token{SECOND} @LP{} @nonterm{vector-3d} | @nonterm{vertex-idx} @RP{}}@*
+@production{plane-first-len,
+    @token{FIRST_LEN} @LP{} @nonterm{texture-length} @RP{}}@*
+@production{plane-second-len,
+    @token{SECOND_LEN} @LP{} @nonterm{texture-length} @RP{}}@*
+@production{plane-uvec, @token{UVEC} @LP{} @nonterm{vector-3d} @RP{}}@*
+@production{plane-vvec, @token{VVEC} @LP{} @nonterm{vector-3d} @RP{}}@*
+@production{uv-shift,
+    @token{UV_SHIFT} @LP{} @nonterm{texture-coordinate} @RP{}}@*
+@production{txt-uv,
+    @token{UV} @LP{}
+    	@nonterm{vertex-idx} @nonterm{texture-coordinate}
+    	@nonterm{vertex-idx} @nonterm{texture-coordinate}
+    	@nonterm{vertex-idx} @nonterm{texture-coordinate}
+    @RP{}}@*
+@production{polytext-comp, @nonterm{plane-orig}}@*
+    @prodnext{@nonterm{plane-first-len}}@*
+    @prodnext{@nonterm{plane-first}}@*
+    @prodnext{@nonterm{plane-second-len}}@*
+    @prodnext{@nonterm{plane-second}}@*
+    @prodnext{@nonterm{matrix}}@*
+    @prodnext{@nonterm{vector}}@*
+    @prodnext{@nonterm{texlen}}@*
+    @prodnext{@nonterm{plane}}@*
+    @prodnext{@nonterm{plane-uvec}}@*
+    @prodnext{@nonterm{plane-vvec}}@*
+    @prodnext{@nonterm{uv-shift}}@*
+    @prodnext{@nonterm{txt-uv}}@*
+@production{polygon-texture,
+    @token{TEXTURE} @LP{} [ @nonterm{polytext-comp} @dots{} ] @RP{}}
+
+@subsubheading Texturing: Bezier Patches
+@production{beziertext-comp, @nonterm{plane-orig}}@*
+    @prodnext{@nonterm{plane-first-len}}@*
+    @prodnext{@nonterm{plane-first}}@*
+    @prodnext{@nonterm{plane-second-len}}@*
+    @prodnext{@nonterm{plane-second}}@*
+    @prodnext{@nonterm{matrix}}@*
+    @prodnext{@nonterm{vector}}@*
+    @prodnext{@nonterm{texlen}}@*
+    @prodnext{@nonterm{uv-shift}}@*
+    @prodnext{@nonterm{plane-uvec}}@*
+    @prodnext{@nonterm{plane-vvec}}@*
+@production{bezier-texture,
+    @token{TEXTURE} @LP{} [ @nonterm{beziertext-comp} @dots{} ] @RP{}}
+
+@subsubheading Portals
+@production{portal, @token{PORTAL} @LP{} @nonterm{sector-name} @RP{}}
+
+@production{after-vector, @token{W} @LP{} @nonterm{vector-3d} @RP{}}@*
+@production{warp-mirror, @token{MIRROR} @LP{} @RP{}}@*
+@production{warp-static, @token{STATIC} @LP{} @RP{}}@*
+@production{portal-clip, @token{CLIP} @LP{} @RP{}}@*
+@production{portal-zfill, @token{ZFILL} @LP{} @RP{}}@*
+@production{warp-comp, @nonterm{matrix}}@*
+    @prodnext{@nonterm{vector}}@*
+    @prodnext{@nonterm{after-vector}}@*
+    @prodnext{@nonterm{warp-mirror}}@*
+    @prodnext{@nonterm{warp-static}}@*
+    @prodnext{@nonterm{portal-clip}}@*
+    @prodnext{@nonterm{portal-zfill}}@*
+@production{warp, @token{WARP} @LP{} [ @nonterm{warp-comp} @dots{} ] @RP{}}
+
+@production{move-comp, @nonterm{matrix} | @nonterm{vector}}@*
+@production{move2, @token{MOVE} @LP{} [ @nonterm{move-comp} @dots{} ] @RP{}}@*
+@production{move, @token{MOVE} @LP{} @nonterm{matrix} @nonterm{vector} @RP{}}@*
+@production{hardmove,
+    @token{HARDMOVE} @LP{} [ @nonterm{move-comp} @dots{} ] @RP{}}
+
+@subsubheading Rooms
+@production{floor, @token{FLOOR} @LP{}}@*
+    @prodwrap{@LP{} @nonterm{coordinate} @RP{}}@*
+    @prodwrap{@LP{} @nonterm{coordinate} @RP{}}@*
+    @prodwrap{@LP{} @nonterm{coordinate} @RP{}}@*
+    @prodwrap{@LP{} @nonterm{coordinate} @RP{} @RP{}}@*
+@production{ceiling, @token{CEILING} @LP{}}@*
+    @prodwrap{@LP{} @nonterm{coordinate} @RP{}}@*
+    @prodwrap{@LP{} @nonterm{coordinate} @RP{}}@*
+    @prodwrap{@LP{} @nonterm{coordinate} @RP{}}@*
+    @prodwrap{@LP{} @nonterm{coordinate} @RP{} @RP{}}@*
+@production{floor-ceil, @token{FLOOR_CEILING} @LP{}}@*
+    @prodwrap{@LP{} @nonterm{coordinate} @RP{}}@*
+    @prodwrap{@LP{} @nonterm{coordinate} @RP{}}@*
+    @prodwrap{@LP{} @nonterm{coordinate} @RP{}}@*
+    @prodwrap{@LP{} @nonterm{coordinate} @RP{} @RP{}}
+
+@subsubheading Circle of Vertices
+@noindent
+This command is a short-cut for specifying some vertices in a circular
+pattern.  Internally it is exactly the same as using the @samp{VERTEX
+(@dots{})} expression multiple times for the points around a circle.
+
+@production{radiusx, @nonterm{number}}@*
+@production{radiusy, @nonterm{number}}@*
+@production{radiusz, @nonterm{number}}@*
+@production{num-verts, @nonterm{integer}}@*
+@production{circle, @token{CIRCLE} @LP{} @nonterm{coordinate} @token{:}
+    @nonterm{radiusx} @COMMA{} @nonterm{radiusy} @COMMA{} @nonterm{radiusz}
+    @COMMA{} @nonterm{num-verts} @RP{}}
+
+@subsubheading Sky Dome (Half Sphere)
+@noindent
+A skydome is a short-cut for creating a complex half-sphere with gouraud
+shaded triangles.  Note that you need to generate the first circle of vertices
+using the @samp{CIRCLE} macro.
+
+@production{skydome-radius, @token{RADIUS} @LP{} @nonterm{radius} @RP{}}@*
+@production{skydome-vertices,
+    @token{VERTICES} @LP{} @nonterm{vertex-index} @dots{} @RP{}}@*
+@production{skydome-comp, @nonterm{skydome-radius} | @nonterm{skydome-vertices}
+    | @nonterm{lighting}}@*
+@production{skydome,
+    @token{SKYDOME} @LP{} [ @nonterm{skydome-comp} @dots{} ] @RP{}}
+
+@subsubheading Lights
+@production{dynamic-flag, @token{0} | @token{1}}@*
+@production{light-oldsyntax, @nonterm{coordinate} @token{:} @nonterm{radius}
+    @COMMA{} @nonterm{color} @COMMA{} @nonterm{dynamic-flag}}
+
+@production{light-center, @token{CENTER} @LP{} @nonterm{coordinate} @RP{}}@*
+@production{light-radius, @token{RADIUS} @LP{} @nonterm{radius} @RP{}}@*
+@production{light-color, @token{COLOR} @LP{} @nonterm{color} @RP{}}@*
+@production{light-dynamic, @token{DYNAMIC} @LP{} @RP{}}@*
+@production{light-halo, @token{HALO} @LP{} @RP{}}@*
+@production{light-comp, @nonterm{light-center}}@*
+    @prodnext{@nonterm{light-radius}}@*
+    @prodnext{@nonterm{light-dynamic}}@*
+    @prodnext{@nonterm{light-color}}@*
+    @prodnext{@nonterm{light-halo}}@*
+@production{light-newsyntax, [ @nonterm{light-comp} @dots{} ]}
+
+@production{light, @token{LIGHT} @nonterm{light-name}
+    @LP{} @nonterm{light-oldsyntax} | @nonterm{light-newsyntax} @RP{}}
+
+@subsubheading Bezier Curve
+@production{bezier-comp, @nonterm{texnr} | @nonterm{material} |
+    @nonterm{bezier-texture} | @nonterm{vertices}}@*
+@production{bezier,
+    @token{BEZIER} @LP{} [ @nonterm{bezier-comp} @dots{} ] @RP{}}
+
+@subsubheading Polygons
+@noindent
+The list of vertices is a list of vertex indices.  These indices are relative
+to the list of vertices of the parent object (a Sector, Thing, or Thing
+Template).  The first vertex in the parent object has index 0.  The vertices
+of a polygon must be defined in clock-wise ordering as seen from a position
+from where you want the polygon to be visible.
+
+@production{vertices,
+    @token{VERTICES} @LP{} @nonterm{vertex-index} @dots{} @RP{}}
+
+@production{uva-scale, @nonterm{number}}@*
+@production{uva-offset, @nonterm{number}}@*
+@production{uva-spec, @nonterm{angle} @COMMA{} @nonterm{uva-scale} @COMMA{}
+    @nonterm{uva-offset}}@*
+@production{uva, @token{UVA} @LP{} @nonterm{uva-spec} @dots{} @RP{}}@*
+@production{uv, @token{UV} @LP{} @nonterm{texture-coordinate} @dots{} @RP{}}
+
+@production{colors, @token{COLORS} @LP{} @nonterm{color} @dots{} @RP{}}@*
+@production{gouraud, @token{GOURAUD} @LP{} @RP{}}@*
+@production{flatcol, @token{FLATCOL} @LP{} @nonterm{color} @RP{}}
+
+@production{cosfact, @token{COSFACT} @LP{} @nonterm{number} @RP{}}@*
+@production{colldet, @token{COLLDET} @LP{} @nonterm{yes-no} @RP{}}
+
+@production{shading-comp,
+    @token{NONE} | @token{FLAT} | @token{GOURAUD} | @token{LIGHTMAP}}@*
+@production{shading, @token{SHADING} @LP{} @nonterm{shading-comp} @RP{}}
+
+@production{polygon-comp, @nonterm{texnr}}@*
+    @prodnext{@nonterm{material}}@*
+    @prodnext{@nonterm{lighting}}@*
+    @prodnext{@nonterm{portal}}@*
+    @prodnext{@nonterm{warp}}@*
+    @prodnext{@nonterm{polygon-texture}}@*
+    @prodnext{@nonterm{vertices}}@*
+    @prodnext{@nonterm{alpha}}@*
+    @prodnext{@nonterm{fog}}@*
+    @prodnext{@nonterm{uv}}@*
+    @prodnext{@nonterm{uva}}@*
+    @prodnext{@nonterm{colors}}@*
+    @prodnext{@nonterm{cosfact}}@*
+    @prodnext{@nonterm{gouraud}}@*
+    @prodnext{@nonterm{flatcol}}@*
+    @prodnext{@nonterm{mixmode}}@*
+    @prodnext{@nonterm{colldet}}@*
+    @prodnext{@nonterm{shading}}@*
+@production{polygon, @token{POLYGON} @nonterm{polygon-name}
+    @LP{} [ @nonterm{polygon-comp} @dots{} ] @RP{}}
+
+@subsubheading Polygon Templates
+@production{polygon-tpl-comp, @nonterm{texnr}}@*
+    @prodnext{@nonterm{material}}@*
+    @prodnext{@nonterm{lighting}}@*
+    @prodnext{@nonterm{polygon-texture}}@*
+    @prodnext{@nonterm{vertices}}@*
+    @prodnext{@nonterm{gouraud}}@*
+    @prodnext{@nonterm{flatcol}}@*
+    @prodnext{@nonterm{colldet}}@*
+    @prodnext{@nonterm{shading}}@*
+    @prodnext{@nonterm{colors}}@*
+@production{polygon-template, @token{POLYGON} @nonterm{polygon-name}
+    @LP{} [ @nonterm{polygon-tpl-comp} @dots{} ] @RP{}}
+
+@subsubheading Collection Objects
+@production{col-thing, @token{THING} @LP{} @nonterm{thing-name} @RP{}}@*
+@production{col-sprite, @token{SPRITE} @LP{} @nonterm{sprite-name} @RP{}}@*
+@production{col-collection,
+    @token{COLLECTION} @LP{} @nonterm{col-name} @RP{}}@*
+@production{col-light, @token{LIGHT} @LP{} @nonterm{light-name} @RP{}}@*
+@production{col-sector, @token{SECTOR} @LP{} @nonterm{sector-name} @RP{}}@*
+@production{collection-comp, @nonterm{col-thing}}@*
+    @prodnext{@nonterm{col-collection}}@*
+    @prodnext{@nonterm{col-light}}@*
+    @prodnext{@nonterm{col-sector}}@*
+    @prodnext{@nonterm{col-sprite}}@*
+@production{collection, @token{COLLECTION} @nonterm{col-name}
+    @LP{} [ @nonterm{collection-comp} @dots{} ] @RP{}}
+
+@subsubheading Materials and Textures
+@production{material, @token{MATERIAL} @LP{} @nonterm{material-name} @RP{}}@*
+@production{texture, @token{TEXTURE} @LP{} @nonterm{texture-name} @RP{}}@*
+@production{ceil-texture,
+    @token{CEIL_TEXTURE} @LP{} @nonterm{texture-name} @RP{}}@*
+@production{floor-texture,
+    @token{FLOOR_TEXTURE} @LP{} @nonterm{texture-name} @RP{}}@*
+@production{texnr,
+    @token{TEXNR} @LP{} @nonterm{texture-name} @RP{}} (Obsolete)@*
+@production{texlen, @token{LEN} @LP{} @nonterm{texture-length} @RP{}}@*
+@production{texture-scale,
+    @token{TEXTURE_SCALE} @LP{} @nonterm{texture-length} @RP{}}
+
+@subsubheading Material and Texture Description
+@production{transparent, @token{TRANSPARENT} @LP{} @nonterm{color} @RP{}}@*
+@production{procedural, @token{PROCEDURAL} @LP{} @RP{}}@*
+@production{tex2d, @token{FOR_2D} @LP{} @nonterm{yes-no} @RP{}}@*
+@production{tex3d, @token{FOR_3D} @LP{} @nonterm{yes-no} @RP{}}@*
+@production{persistent, @token{PERSISTENT} @LP{} @RP{}}@*
+@production{filter, @token{FILTER} @LP{} @dots{} @RP{}}@*
+@production{mipmap, @token{MIPMAP} @LP{} @nonterm{yes-no} @RP{}}@*
+@production{dither, @token{DITHER} @LP{} @nonterm{yes-no} @RP{}}@*
+@production{texture-file, @token{FILE} @LP{} @nonterm{file-name} @RP{}}
+
+@production{texture-desc-comp, @nonterm{transparent}}@*
+    @prodnext{@nonterm{filter}}@*
+    @prodnext{@nonterm{mipmap}}@*
+    @prodnext{@nonterm{dither}}@*
+    @prodnext{@nonterm{file}}@*
+    @prodnext{@nonterm{procedural}}@*
+    @prodnext{@nonterm{tex2d}}@*
+    @prodnext{@nonterm{tex3d}}@*
+    @prodnext{@nonterm{persistent}}@*
+@production{texture-desc, @token{TEXTURE} @nonterm{texture-name}
+    @LP{} [ @nonterm{texture-desc-comp} @dots{} ] @RP{}}
+
+@production{material-desc-comp, @nonterm{texture}}@*
+    @prodnext{@token{COLOR} @LP{} @nonterm{color} @RP{}}@*
+    @prodnext{@token{DIFFUSE} @LP{} @nonterm{number} @RP{}}@*
+    @prodnext{@token{AMBIENT} @LP{} @nonterm{number} @RP{}}@*
+    @prodnext{@token{REFLECTION} @LP{} @nonterm{number} @RP{}}@*
+@production{material-desc, @token{MATERIAL} @nonterm{material-name}
+    @LP{} [ @nonterm{material-desc-comp} @dots{} ] @RP{}}
+
+@subsubheading Things and Objects
+@production{moveable, @token{MOVEABLE} @LP{} @RP{}}@*
+@production{detail, @token{DETAIL} @LP{} @RP{}}@*
+@production{convex, @token{CONVEX} @LP{} @RP{}}@*
+@production{template, @token{TEMPLATE} @LP{} @nonterm{thingtpl-name} @RP{}}@*
+@production{tex-select,
+    @token{MAT_SET_SELECT} @LP{} @nonterm{mat-set-name} @RP{}}@*
+@production{thing-camera, @token{CAMERA} @LP{} @RP{}}
+
+@production{thing-comp, @nonterm{vertex}}@*
+    @prodnext{@nonterm{polygon}}@*
+    @prodnext{@nonterm{texnr}}@*
+    @prodnext{@nonterm{material}}@*
+    @prodnext{@nonterm{texlen}}@*
+    @prodnext{@nonterm{key}}@*
+    @prodnext{@nonterm{bsp}}@*
+    @prodnext{@nonterm{move2}}@*
+    @prodnext{@nonterm{hardmove}}@*
+    @prodnext{@nonterm{template}}@*
+    @prodnext{@nonterm{fog-desc}}@*
+    @prodnext{@nonterm{moveable}}@*
+    @prodnext{@nonterm{detail}}@*
+    @prodnext{@nonterm{convex}}@*
+    @prodnext{@nonterm{circle}}@*
+    @prodnext{@nonterm{bezier}}@*
+    @prodnext{@nonterm{tex-select}}@*
+    @prodnext{@nonterm{thing-camera}}@*
+@production{thing, @token{THING} @nonterm{thing-name}
+    @LP{} [ @nonterm{thing-comp} @dots{} ] @RP{}}@*
+@production{sky, @token{SKY} @nonterm{thing-name}
+    @LP{} [ @nonterm{thing-comp} @dots{} ] @RP{}}
+
+@production{sixface-comp, @nonterm{move2}}@*
+    @prodnext{@nonterm{texture-scale}}@*
+    @prodnext{@nonterm{texture}}@*
+    @prodnext{@nonterm{ceil-texture}}@*
+    @prodnext{@nonterm{dim}}@*
+    @prodnext{@nonterm{height}}@*
+    @prodnext{@nonterm{floor-height}}@*
+    @prodnext{@nonterm{floor-ceil}}@*
+    @prodnext{@nonterm{floor-texture}}@*
+    @prodnext{@nonterm{floor}}@*
+    @prodnext{@nonterm{ceiling}}@*
+    @prodnext{@nonterm{moveable}}@*
+    @prodnext{@nonterm{detail}}@*
+    @prodnext{@nonterm{fog-desc}}@*
+    @prodnext{@nonterm{convex}}@*
+@production{sixface, @token{SIXFACE} @nonterm{thing-name}
+    @LP{} [ @nonterm{sixface-comp} @dots{} ] @RP{}}
+
+@subsubheading Thing and Object Templates
+@production{curve-center,
+    @token{CURVECENTER} @LP{} @nonterm{coordinate} @RP{}}@*
+@production{curve-scale, @token{CURVESCALE} @LP{} @nonterm{number} @RP{}}@*
+@production{curve-control, @token{CURVECONTROL}
+    @LP{} @nonterm{coordinate} @token{:} @nonterm{texture-coordinate} @RP{}}@*
+@production{template-file, @token{FILE} @LP{} @nonterm{file-name} @RP{}}@*
+@production{thing-tpl-comp, @nonterm{vertex}}@*
+    @prodnext{@nonterm{polygon-template}}@*
+    @prodnext{@nonterm{texnr}}@*
+    @prodnext{@nonterm{material}}@*
+    @prodnext{@nonterm{texlen}}@*
+    @prodnext{@nonterm{move}}@*
+    @prodnext{@nonterm{fog-desc}}@*
+    @prodnext{@nonterm{circle}}@*
+    @prodnext{@nonterm{bezier}}@*
+    @prodnext{@nonterm{curve-center}}@*
+    @prodnext{@nonterm{curve-scale}}@*
+    @prodnext{@nonterm{curve-control}}@*
+    @prodnext{@nonterm{template-file}}@*
+@production{thing-template, @token{THING} @nonterm{thingtpl-name}
+    @LP{} [ @nonterm{thing-tpl-comp} @dots{} ] @RP{}}
+
+@production{sixface-tpl-comp, @nonterm{move}}@*
+    @prodnext{@nonterm{texture-scale}}@*
+    @prodnext{@nonterm{texture}}@*
+    @prodnext{@nonterm{ceil-texture}}@*
+    @prodnext{@nonterm{dim}}@*
+    @prodnext{@nonterm{height}}@*
+    @prodnext{@nonterm{floor-height}}@*
+    @prodnext{@nonterm{floor-ceil}}@*
+    @prodnext{@nonterm{floor-texture}}@*
+    @prodnext{@nonterm{floor}}@*
+    @prodnext{@nonterm{ceiling}}@*
+    @prodnext{@nonterm{fog-desc}}@*
+@production{sixface-template, @token{SIXFACE} @nonterm{thingtpl-name}
+    @LP{} [ @nonterm{sixface-tpl-comp} @dots{} ] @RP{}}
+
+@subsubheading Sprites
+@production{v1, @nonterm{pos-number}}@*
+@production{v2, @nonterm{pos-number}}@*
+@production{v3, @nonterm{pos-number}}@*
+@production{frame-vector, @token{V} @LP{} @nonterm{x} @COMMA{} @nonterm{y}
+    @COMMA{} @nonterm{z} @token{:} @nonterm{u} @COMMA{} @nonterm{v} @RP{}}@*
+@production{frame-name, @nonterm{name}}@*
+@production{sprite-frame, @token{FRAME} @nonterm{frame-name}
+    @LP{} [ @nonterm{frame-vector} ] @RP{}}@*
+@production{action-name, @nonterm{name}}@*
+@production{action-delay, @nonterm{pos-number}}@*
+@production{action-frame, @token{F}
+    @LP{} @nonterm{frame-name} @COMMA{} @nonterm{action-delay} @RP{}}@*
+@production{sprite-action, @token{ACTION} @nonterm{action-name}
+    @LP{} [ @nonterm{action-frame} ] @RP{}}@*
+@production{sprite-triangle, @token{TRIANGLE}
+    @LP{} @nonterm{v1} @COMMA{} @nonterm{v2} @COMMA{} @nonterm{v3} @RP{}}@*
+@production{sprite-skeleton, @@@@@@@@@emph{Define this.}}@*
+@production{sprite-tween, @token{TWEEN} @LP{} @nonterm{yes-no} @RP{}}
+
+@production{sprite-tpl-comp, @nonterm{texnr}}@*
+    @prodnext{@nonterm{material}}@*
+    @prodnext{@nonterm{sprite-frame}}@*
+    @prodnext{@nonterm{sprite-action}}@*
+    @prodnext{@nonterm{sprite-triangle}}@*
+    @prodnext{@nonterm{template-file}}@*
+    @prodnext{@nonterm{sprite-skeleton}}@*
+    @prodnext{@nonterm{sprite-tween}}@*
+@production{sprite-template, @token{SPRITE} @nonterm{spritetpl-name}
+    @LP{} [ @nonterm{sprite-tpl-comp} @dots{} ] @RP{}}
+
+@production{mixmode1, @token{COPY} @LP{} @RP{}}@*
+    @prodnext{@token{MULTIPLY} @LP{} @RP{}}@*
+    @prodnext{@token{MULTIPLY2} @LP{} @RP{}}@*
+    @prodnext{@token{ADD} @LP{} @RP{}}@*
+    @prodnext{@token{ALPHA} @LP{} @nonterm{number} @RP{}}@*
+    @prodnext{@token{TRANSPARENT} @LP{} @RP{}}@*
+    @prodnext{@token{KEYCOLOR} @LP{} @RP{}}@*
+@production{mixmode, @token{MIXMODE} @LP{} @nonterm{mixmode1} @dots{} @RP{}}
+
+@production{sp-template, @token{TEMPLATE}
+    @LP{} @nonterm{spritetpl-name} @COMMA{} @nonterm{action-name} @RP{}}@*
+@production{sprite-comp, @nonterm{move2}}@*
+    @prodnext{@nonterm{sp-template}}@*
+    @prodnext{@nonterm{texnr}}@*
+    @prodnext{@nonterm{material}}@*
+    @prodnext{@nonterm{mixmode}}@*
+    @prodnext{@nonterm{sprite-tween}}@*
+@production{sprite, @token{SPRITE} @nonterm{sprite-name}
+    @LP{} [ @nonterm{sprite-comp} @dots{} ] @RP{}}
+
+@production{move2d, @token{MOVE} @LP{} @nonterm{vector-3d} @RP{}}@*
+@production{spr2d-vertices,
+    @token{VERTICES} @LP{} @nonterm{vector-2d} @dots{} @RP{}}@*
+@production{sprite2d-comp, @nonterm{move2d}}@*
+    @prodnext{@nonterm{texnr}}@*
+    @prodnext{@nonterm{material}}@*
+    @prodnext{@nonterm{spr2d-vertices}}@*
+    @prodnext{@nonterm{uv}}@*
+    @prodnext{@nonterm{mixmode}}@*
+    @prodnext{@nonterm{colors}}@*
+    @prodnext{@nonterm{lighting}}@*
+@production{sprite2d, @token{SPRITE2D} @nonterm{sprite-name}
+    @LP{} [ @nonterm{sprite2d-comp} @dots{} ] @RP{}}
+
+@subsubheading Nodes
+@production{position, @token{POSITION} @LP{} @nonterm{coordinate} @RP{}}@*
+@production{node-comp, @nonterm{position} | @nonterm{key}}@*
+@production{node, @token{NODE} @LP{} [ @nonterm{node-comp} @dots{} ] @RP{}}
+
+@subsubheading Particle Systems
+@production{partsys-color, @token{COLOR} @LP{} @nonterm{color} @RP{}}@*
+@production{partsys-number, @token{NUMBER} @LP{} @nonterm{number} @RP{}}@*
+@production{partsys-dropsize,
+    @token{DROPSIZE} @LP{} @nonterm{number} @COMMA{} @nonterm{number} @RP{}}@*
+@production{partsys-box,
+    @token{BOX} @LP{} @nonterm{vector-3d} @COMMA{} @nonterm{vector-3d} @RP{}}
+
+@production{fountain-origin, @token{ORIGIN} @LP{} @nonterm{vector-3d} @RP{}}@*
+@production{fountain-accel, @token{ACCEL} @LP{} @nonterm{vector-3d} @RP{}}@*
+@production{fountain-speed, @token{SPEED} @LP{} @nonterm{number} @RP{}}@*
+@production{fountain-falltime, @token{FALLTIME} @LP{} @nonterm{number} @RP{}}@*
+@production{fountain-opening, @token{OPENING} @LP{} @nonterm{number} @RP{}}@*
+@production{fountain-azimuth, @token{AZIMUTH} @LP{} @nonterm{number} @RP{}}@*
+@production{fountain-elevation,
+    @token{ELEVATION} @LP{} @nonterm{number} @RP{}}@*
+@production{fountain-comp, @nonterm{texture}}@*
+    @prodnext{@nonterm{mixmode}}@*
+    @prodnext{@nonterm{lighting}}@*
+    @prodnext{@nonterm{partsys-dropsize}}@*
+    @prodnext{@nonterm{partsys-color}}@*
+    @prodnext{@nonterm{partsys-number}}@*
+    @prodnext{@nonterm{fountain-origin}}@*
+    @prodnext{@nonterm{fountain-accel}}@*
+    @prodnext{@nonterm{fountain-speed}}@*
+    @prodnext{@nonterm{fountain-falltime}}@*
+    @prodnext{@nonterm{fountain-opening}}@*
+    @prodnext{@nonterm{fountain-azimuth}}@*
+    @prodnext{@nonterm{fountain-elevation}}@*
+@production{fountain, @token{FOUNTAIN} @nonterm{name}
+    @LP{} [ @nonterm{fountain-comp} @dots{} ] @RP{}}
+
+@production{fire-origin, @token{ORIGIN} @LP{} @nonterm{vector-3d} @RP{}}@*
+@production{fire-speed, @token{SPEED} @LP{} @nonterm{vector-3d} @RP{}}@*
+@production{fire-swirl, @token{SWIRL} @LP{} @nonterm{number} @RP{}}@*
+@production{fire-totaltime, @token{TOTALTIME} @LP{} @nonterm{number} @RP{}}@*
+@production{fire-colorscale, @token{COLORSCALE} @LP{} @nonterm{number} @RP{}}@*
+@production{fire-comp, @nonterm{texture}}@*
+    @prodnext{@nonterm{mixmode}}@*
+    @prodnext{@nonterm{lighting}}@*
+    @prodnext{@nonterm{partsys-dropsize}}@*
+    @prodnext{@nonterm{partsys-number}}@*
+    @prodnext{@nonterm{fire-origin}}@*
+    @prodnext{@nonterm{fire-speed}}@*
+    @prodnext{@nonterm{fire-swirl}}@*
+    @prodnext{@nonterm{fire-totaltime}}@*
+    @prodnext{@nonterm{fire-colorscale}}@*
+@production{fire,
+    @token{FIRE} @nonterm{name} @LP{} [ @nonterm{fire-comp} @dots{} ] @RP{}}
+
+@production{snow-swirl, @token{SWIRL} @LP{} @nonterm{number} @RP{}}@*
+@production{snow-speed, @token{SPEED} @LP{} @nonterm{vector-3d} @RP{}}@*
+@production{snow-comp, @nonterm{texture}}@*
+    @prodnext{@nonterm{mixmode}}@*
+    @prodnext{@nonterm{lighting}}@*
+    @prodnext{@nonterm{partsys-dropsize}}@*
+    @prodnext{@nonterm{partsys-color}}@*
+    @prodnext{@nonterm{partsys-number}}@*
+    @prodnext{@nonterm{partsys-box}}@*
+    @prodnext{@nonterm{snow-speed}}@*
+    @prodnext{@nonterm{snow-swirl}}@*
+@production{snow,
+    @token{SNOW} @nonterm{name} @LP{} [ @nonterm{snow-comp} @dots{} ] @RP{}}
+
+@production{rain-speed, @token{SPEED} @LP{} @nonterm{vector-3d} @RP{}}@*
+@production{rain-comp, @nonterm{texture}}@*
+    @prodnext{@nonterm{mixmode}}@*
+    @prodnext{@nonterm{lighting}}@*
+    @prodnext{@nonterm{partsys-dropsize}}@*
+    @prodnext{@nonterm{partsys-color}}@*
+    @prodnext{@nonterm{partsys-number}}@*
+    @prodnext{@nonterm{partsys-box}}@*
+    @prodnext{@nonterm{rain-speed}}@*
+@production{rain,
+    @token{RAIN} @nonterm{name} @LP{} [ @nonterm{rain-comp} @dots{} ] @RP{}}
+
+@production{partsys, @nonterm{fountain} | @nonterm{snow} | @nonterm{rain} |
+    @nonterm{fire}}
+
+@subsubheading Sectors and Rooms
+@production{tex-comp, @nonterm{texture} | @nonterm{plane} | @nonterm{texlen}}@*
+@production{tex, @token{TEX} @LP{} [ @nonterm{tex-comp} @dots{} ] @RP{}}
+
+@production{portal-poly, @token{POLYGON} @LP{} @nonterm{polygon-name} @RP{}}@*
+@production{portal-sector, @token{SECTOR} @LP{} @nonterm{sector-name} @RP{}}@*
+@production{room-portal-comp, @nonterm{portal-poly} | @nonterm{portal-sector} |
+    @nonterm{alpha} | @nonterm{warp}}@*
+@production{room-portal,
+    @token{PORTAL} @LP{} [ @nonterm{room-portal-comp} @dots{} ] @RP{}}
+
+@production{split-direction, @token{VER} | @token{HOR}}@*
+@production{split-list, @nonterm{number-list}}@*
+@production{split, @token{SPLIT} @LP{} @nonterm{polygon-name} @COMMA{}
+    @nonterm{split-direction} @LP{} @nonterm{split-list} @RP{} @RP{}}
+
+@production{sector-comp, @nonterm{vertex}}@*
+    @prodnext{@nonterm{polygon}}@*
+    @prodnext{@nonterm{texnr}}@*
+    @prodnext{@nonterm{material}}@*
+    @prodnext{@nonterm{texlen}}@*
+    @prodnext{@nonterm{bsp}}@*
+    @prodnext{@nonterm{statbsp}}@*
+    @prodnext{@nonterm{thing}}@*
+    @prodnext{@nonterm{hardmove}}@*
+    @prodnext{@nonterm{sixface}}@*
+    @prodnext{@nonterm{light}}@*
+    @prodnext{@nonterm{sprite}}@*
+    @prodnext{@nonterm{fog-desc}}@*
+    @prodnext{@nonterm{circle}}@*
+    @prodnext{@nonterm{skydome}}@*
+    @prodnext{@nonterm{key}}@*
+    @prodnext{@nonterm{node}}@*
+    @prodnext{@nonterm{partsys}}@*
+    @prodnext{@nonterm{sky}}@*
+@production{sector, @token{SECTOR} @nonterm{sector-name}
+    @LP{} [ @nonterm{sector-comp} @dots{} ] @RP{}}
+
+@production{room-comp, @nonterm{tex-lighting}}@*
+    @prodnext{@nonterm{texture-scale}}@*
+    @prodnext{@nonterm{texture}}@*
+    @prodnext{@nonterm{tex}}@*
+    @prodnext{@nonterm{ceil-texture}}@*
+    @prodnext{@nonterm{floor-texture}}@*
+    @prodnext{@nonterm{light}}@*
+    @prodnext{@nonterm{dim}}@*
+    @prodnext{@nonterm{height}}@*
+    @prodnext{@nonterm{floor-height}}@*
+    @prodnext{@nonterm{floor-ceil}}@*
+    @prodnext{@nonterm{floor}}@*
+    @prodnext{@nonterm{ceiling}}@*
+    @prodnext{@nonterm{sixface}}@*
+    @prodnext{@nonterm{thing}}@*
+    @prodnext{@nonterm{room-portal}}@*
+    @prodnext{@nonterm{split}}@*
+    @prodnext{@nonterm{partsys}}@*
+    @prodnext{@nonterm{sky}}@*
+    @prodnext{@nonterm{bsp}}@*
+    @prodnext{@nonterm{statbsp}}@*
+    @prodnext{@nonterm{move}}@*
+    @prodnext{@nonterm{sprite}}@*
+    @prodnext{@nonterm{fog-desc}}@*
+@production{room, @token{ROOM} @nonterm{sector-name}
+    @LP{} [ @nonterm{room-comp} @dots{} ] @RP{}}
+
+@subsubheading Texture List
+@production{textures-comp, @nonterm{texture-desc}}@*
+@production{textures,
+    @token{TEXTURES} @LP{} [ @nonterm{textures-comp} @dots{} ] @RP{}}
+
+@subsubheading Material List
+@production{materials-comp, @nonterm{material-desc}}@*
+@production{materials,
+    @token{MATERIALS} @LP{} [ @nonterm{materials-comp} @dots{} ] @RP{}}
+
+@subsubheading Material Groupings
+@noindent
+Sometimes you want things of the same type but with different materials on it.
+This is where material groupings come in handy.  The final name of a texture
+in a @samp{MAT_SET} expression will be `@var{mat-set-name_texture-name}'.  The
+materials will be merged into the global texture list.  You should define a
+@samp{MAT_SET} after @samp{TEXTURES} since the latter command clears the
+internal list first.  For usage of @samp{MAT_SET} see the description of
+@samp{THING}.
+
+@production{tex-set-name, @nonterm{name}}@*
+@production{texture-set,
+    @token{MAT_SET} @nonterm{mat-set-name} @LP{} @nonterm{materials} @RP{}}
+
+@subsubheading Library
+@production{library,
+    @token{LIBRARY} @nonterm{library-name} @LP{} @nonterm{file-name} @RP{}}
+
+@subsubheading Starting Position
+@production{start, @token{START}
+    @LP{} @nonterm{sector-name} @COMMA{} @nonterm{coordinate} @RP{}}
+
+@subsubheading World
+@production{world-comp, @nonterm{textures}}@*
+    @prodnext{@nonterm{materials}}@*
+    @prodnext{@nonterm{library}}@*
+    @prodnext{@nonterm{sector}}@*
+    @prodnext{@nonterm{room}}@*
+    @prodnext{@nonterm{thing-template}}@*
+    @prodnext{@nonterm{sixface-template}}@*
+    @prodnext{@nonterm{sprite-template}}@*
+    @prodnext{@nonterm{plane-desc}}@*
+    @prodnext{@nonterm{collection}}@*
+    @prodnext{@nonterm{start}}@*
+    @prodnext{@nonterm{key}}@*
+@production{world, @token{WORLD} @LP{} [ @nonterm{world-comp} @dots{} ] @RP{}}
+
+@subsubheading Library File
+@production{library-comp, @nonterm{textures} | @nonterm{materials} |
+    @nonterm{thing-template} | @nonterm{sprite-template}}@*
+@production{library,
+    @token{LIBRARY} @LP{} [ @nonterm{library-comp} @dots{} ] @RP{}}
+
+@node World File Hints, , World File Syntax, World File Format
+@subsubsection Hints
+
+@noindent
+@emph{Written by Jorrit Tyberghein,
+@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.  Mathematical typesetting for
+@TeX{} performed by Eric Sunshine, @email{sunshine@@sunshineco.com}.}
+
+This section contains extra discussions and hints regarding the world file and
+the objects contained within it.
+
+First, a little explanation about @samp{LEN} and @samp{TEXLEN}.  With these
+you can specify the size of the texture on the polygon.  For example, let's
+say that you have a rectangular polygon which is 4 units wide and 6 units
+tall.  A texture with @samp{LEN} set to 2 will be tiled 2 times horizontally
+and 3 times vertically.  If this texture is 128x128 (for example) then the
+final texture on the polygon will be 256x384.
+
+Using a @samp{TEXTURE} statement inside a @samp{POLYGON} or with a
+@samp{PLANE} statement you can obtain even more control over how the texture
+should be scaled accross the polygon.  This is most easily explained with an
+example.  Say that you have a polygon like this:
+
+@example
+VERTEX (0,2,3) VERTEX (2,2,3) VERTEX (2,0,3) VERTEX (0,0,3)
+POLYGON 'poly' (VERTICES (0,1,2,3))
+@end example
+
+Let's say that you want to align the texture so that its origin is at (2,2,3).
+You can do this as follows:
+
+@example
+POLYGON 'poly' (
+  VERTICES (0,1,2,3)
+  TEXTURE (
+    ORIG (2,2,3)
+    FIRST (0,2,3)
+    SECOND (2,0,3)
+    FIRST_LEN (1)
+    SECOND_LEN (1)))
+@end example
+
+With @samp{ORIG}, @samp{FIRST}, and @samp{SECOND} you specify how the u/v
+coordinate system is located.  The origin of u/v is at @samp{ORIG}; the u-axis
+is at @samp{FIRST-ORIG}; and the v-axis is at @samp{SECOND-ORIG}.
+@samp{FIRST_LEN} and @samp{SECOND_LEN} are simlar to @samp{LEN} and
+@samp{TEXLEN} except that you can control the u and v scaling seperately here.
+Note that @samp{ORIG}, @samp{FIRST}, and @samp{SECOND} need not coincide with
+vertices of the polygon.  They should just be on the same plane as the
+polygon.  That way you can also create slanted textures.
+
+@samp{TEXLEN} in a @samp{THING} or @samp{SECTOR} is the default @samp{LEN} for
+all polygons following the @samp{TEXLEN} declaration.  @samp{TEXNR} in a
+@samp{THING} or @samp{SECTOR} is the default @samp{TEXNR} for all following
+polygons.  @emph{Note, however, that @samp{TEXNR} is considered obsolete and
+its use is deprecated.}
+
+Use of planes is recommended.  A @samp{PLANE} provides a way to assign a name
+to a texture orientation.  All polygons sharing the same @samp{PLANE} will
+have textures that fit perfectly at the borders.  Crystal Space will also be
+able to do some optimizations on polygons that share the same plane (like
+backface culling an entire set of polygons in one operation).  Note that even
+if a @samp{PLANE} is only used by one polygon it does not hurt.  If you do not
+specify the @samp{PLANE}, Crystal Space will creat one anyway.
+
+Currently Crystal Space assumes that there is a sector called @samp{room}.  It
+will use that as a starting place, and will always start at location (0,0,0)
+unless you use an @samp{ORIGIN} directive to instruct it otherwise.
+
+Note that Sectors must be convex (unless you add a @sc{bsp} tree).  Things
+need not be convex.
+
+Vertices in a @samp{THING} are specified in local object space.  You can
+translate this object space to world space with the @samp{MOVE} directive.
+
+When a @samp{THING} or @samp{SPRITE} is defined in the @samp{WORLD} statement
+and not in a @samp{SECTOR} or @samp{ROOM} then it defines a template.  This
+template can then be used inside a @samp{SECTOR} or @samp{ROOM} by providing
+another @samp{THING} or @samp{SPRITE} statement and using the @samp{TEMPLATE}
+statement there.  It is also possible to define the @samp{THING} or
+@samp{SPRITE} inside a @samp{SECTOR} or @samp{ROOM} directly, but using
+templates is preferable.
+
+With @samp{WARP} you provide a matrix which will mirror or warp space.  For
+example, when you want to make a mirroring floor the warping matrix should
+invert the Y-axis and leave the others intact.  So the @samp{WARP} matrix
+would be:
+
+@ifnottex
+@example
+/ 1  0 0 \
+| 0 -1 0 |
+\ 0  0 1 /
+@end example
+@end ifnottex
+@tex
+$$\pmatrix{
+1 &  0 & 0 \cr
+0 & -1 & 0 \cr
+0 &  0 & 1 \cr
+}$$
+@end tex
+
+The vector should be a vector on the plane of the mirror.  It is used to
+determine exactly where mirroring should start.  For example, if the floor is
+at height -1, then (0,-1,0) is a good spot.
+
+@samp{MATRIX (.5)} is a shorthand for:
+
+@ifnottex
+@example
+/ .5  0  0 \
+|  0 .5  0 |
+\  0  0 .5 /
+@end example
+@end ifnottex
+@tex
+$$\pmatrix{
+.5 &  0 &  0 \cr
+ 0 & .5 &  0 \cr
+ 0 &  0 & .5 \cr
+}$$
+@end tex
+
+Portals are unidirectional.  If you need a @samp{PORTAL} that works in two
+directions (so that you can go back) then you'll also have to specify a
+@samp{PORTAL} in the other sector pointing back.
+
+Note that even though a @samp{PORTAL} does not require a texture (unless it
+has alpha transparency) you still need to specify one, since Crystal Space
+currently assumes that every polygon has a texture.
+
+The @samp{ROOM} and @samp{SIXFACE} interfaces are good for human editors but
+it not suited for computer generated output.  Ignore @samp{ROOM} and
+@samp{SIXFACE} if you want to write an editor or convertor and concentrate on
+@samp{SECTOR} and @samp{THING} instead.
+
+@unmacro nonterm
+@unmacro token
+@unmacro production
+@unmacro simpleprod
+@unmacro prodnext
+@unmacro comma
+@unmacro COMMA
+@unmacro LP
+@unmacro RP

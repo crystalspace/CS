@@ -32,7 +32,7 @@ all parts of Crystal Space, so it is very important. @xref{VFS}.
 
 @item csGeom
 A library for 3d geometry operations. It provides 2d and 3d vectors, polygons
-and bounding boxes, 3d matrices and some other useful things. @xref{csGeom}.
+and bounding boxes, 3d matrices and some other useful things.
 
 @item csGfxldr
 Routines to support loading various graphic file formats and put them
@@ -57,4 +57,4 @@ Engine. @xref{csParser}.
 @item csPhyzik
 This module supports calculation of various physical properties.
 @xref{csPhyziks}.
-@end itemize
+@end table

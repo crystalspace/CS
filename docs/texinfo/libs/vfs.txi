@@ -25,7 +25,13 @@ media) and so on.
 The Virtual File System is driven by a configuration file.
 @xref{VFS Configuration File}.
 
-@subheading Details
+@menu
+* VFS Details:: Details
+* VFS Configuration File:: Configuration File (@file{vfs.cfg})
+@end menu
+
+@node VFS Details, VFS Configuration File, VFS, VFS
+@subsection Details
 @cindex @sc{vfs} Details
 @cindex Details, @sc{vfs}
 
@@ -76,7 +82,7 @@ files which are located in archives but is not advisable to do so---and has
 not been tested.)
 @end itemize
 
-@node VFS Configuration File, , VFS, VFS
+@node VFS Configuration File, , VFS Details, VFS
 @subsection Configuration File (@file{vfs.cfg})
 @cindex @sc{vfs} Configuration File
 @cindex @file{vfs.cfg}, @sc{vfs} Configuration File

@@ -1,9 +1,8 @@
 @c -*-texinfo-*-
 @node Building, Options, CS Introduction, Top
-@chapter Configure, Build, and Install
-@cindex Configuration
+@chapter Building and Installing
 @cindex Building
-@cindex Installtion
+@cindex Installation
 
 This chapter describes how to configure, build, and install Crystal Space.
 It begins by describing the resources you need to utilize Crystal Space
@@ -19,7 +18,6 @@ read the Quick Start section.  @xref{Quick Start}.
 * Platform Instructions:: Platform Specific Instructions
 * Problems:: Platform Specific Problems
 * Quick Start::
-* Memory Debugger:: Crystal Space Memory Debugger
 @end menu
 
 @imports{build,dirhier.txi}
@@ -28,4 +26,3 @@ read the Quick Start section.  @xref{Quick Start}.
 @imports{build,platform.txi}
 @imports{build,problems.txi}
 @imports{build,rundemo.txi}
-@imports{build,memdebug.txi}

@@ -9,21 +9,6 @@ sort of hierarchy.  If you are developer actually working on Crystal Space,
 you should be careful not to introduce circular dependencies into the library
 graph.  @xref{Dependencies}.
 
-@emph{FIXME}: Fill in these sections.  Some of this information currently
-resides in LaTeX format.
-
-@itemize @bullet
-@item
-@anchor{csGame}
-Game Library (@code{csgame})
-@item
-@anchor{csGeom}
-Geometry Library (@code{csgeom})
-@item
-@anchor{csUtil}
-Utility Library (@code{csutil})
-@end itemize
-
 @menu
 * Lib Overview:: Quick Overview
 * SCF:: Shared Class Facility (@sc{scf})

@@ -1,5 +1,18 @@
 The history order has been reversed so that new features are at the top.
 
+21-Nov-2000
+	- Eric Sunshine made the following changes to the Texinfo
+	  documentation:
+	    - Added several missing @menu blocks following Martin's most recent
+	      reorganization.  The absence of these menus made navigation
+	      rather difficult and non-obvious in the HTML output.
+	    - Moved memdebug.txi from the "Building and Installing" chapter
+	      to the "Internals" chapter.  (Sorry, Martin.  The dicussion of
+	      a low-level diagnostic tool just did not seem appropriate for
+	      a chapter about compilation and installation.)
+	    - Repaired several Texinfo mark-up errors in libs/overview.txi,
+	      contrib/porting.txi, and apps/overview.txi.
+	    - Cleaned up a few other minor issues.
 20-Nov-2000
 	- Eric Sunshine removed a bunch of files left over in the 'concepts'
 	  directory after Martin moved them to 'plugins/engine'.

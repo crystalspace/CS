@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Memory Debugger, , Quick Start, Building
+@node Memory Debugger, , Makefile How-To, Internals
 @section Crystal Space Memory Debugger
 @cindex Memory Debugger
 

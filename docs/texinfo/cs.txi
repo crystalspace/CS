@@ -98,7 +98,7 @@ version @value{VERSION}, last updated @value{UPDATED}.
 @ifinfo
 @menu
 * CS Introduction:: Introduction
-* Building:: Configure, Build, and Install
+* Building:: Building and Installing
 * Options:: Configuring Crystal Space
 * Applications::
 * Tutorials::

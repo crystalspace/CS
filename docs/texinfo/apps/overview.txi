@@ -104,7 +104,6 @@ application is the subject of a Crystal Space programming tutorial,
 Crystal Shooter.  An application that is intended to grow into a classic
 @dfn{First Person Shooter}.  Right now it is more some sort of feasability
 study.  It is also a demo application of the @file{csgame} gaming library.
-@xref{csGame}.
 
 @cindex @file{squawk}
 @cindex Applications, @file{squawk}
