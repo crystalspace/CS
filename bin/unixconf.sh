@@ -52,9 +52,9 @@ case $MACHINE in
 esac
 
 # Find the C++ compiler
-CXX=`which g++ | grep -v "[Nn]o"`
+CXX=`which gcc | grep -v "[Nn]o"`
 [ -z "${CXX}" ] && CXX=`which egcs | grep -v "[Nn]o"`
-[ -z "${CXX}" ] && CXX=`which gcc | grep -v "[Nn]o"`
+[ -z "${CXX}" ] && CXX=`which g++ | grep -v "[Nn]o"`
 [ -z "${CXX}" ] && CXX=`which c++ | grep -v "[Nn]o"`
 
 if [ -z "${CXX}" ]; then
