@@ -21,7 +21,6 @@
 #ifndef __CSEVENTQ_H__
 #define __CSEVENTQ_H__
 
-#include "csutil/csbase.h"
 #include "cssys/csevent.h"
 
 // Default event queue size: the queue will automatically grow
@@ -35,7 +34,7 @@
  * The implemented event queue is limited thread-safe. There are some
  * primitive spinlocks acquired/released in critical sections.
  */
-class csEventQueue : public csBase
+class csEventQueue
 {
   /// The queue itself
   volatile iEvent **EventQueue;

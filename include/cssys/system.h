@@ -63,7 +63,7 @@ class csSystemDriver : public iSystem
   /*
    * This is a private structure used to keep the list of plugins.
    */
-  class csPlugIn : public csBase
+  class csPlugIn
   {
   public:
     // The plugin itself
@@ -82,11 +82,11 @@ class csSystemDriver : public iSystem
   /*
    * This is a superset of csObjVector that can find by pointer a plugin.
    */
-  class csPlugInsVector : public csObjVector
+  class csPlugInsVector : public csVector
   {
   public:
     // Create the vector
-    csPlugInsVector (int iLimit, int iDelta) : csObjVector (iLimit, iDelta) {}
+    csPlugInsVector (int iLimit, int iDelta) : csVector (iLimit, iDelta) {}
     // Find a plugin either by its address or by his function ID
     virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const
     {
@@ -98,13 +98,16 @@ class csSystemDriver : public iSystem
     }
     // Overrided Get() to avoid typecasts
     csPlugIn *Get (int idx)
-    { return (csPlugIn *)csObjVector::Get (idx); }
+    { return (csPlugIn *)csVector::Get (idx); }
+    
+    virtual bool FreeItem (csSome *Item)
+    { delete (csPlugIn*)Item; return true; }
   };
 
   /*
    * Class to collect all options for all plug-in modules in the system.
    */
-  class csPluginOption : public csBase
+  class csPluginOption
   {
   public:
     char *Name;
@@ -288,7 +291,7 @@ public:
   /// Debugging level (0 = no debug, 1 = normal debug, 2 = verbose debug)
   int debug_level;
   /// List of all options for all plug-in modules.
-  csObjVector OptionList;
+  DECLARE_TYPED_VECTOR (csOptionVector, csPluginOption) OptionList;
   /// The collection of all options specified on command line
   csCommandLineOptions CommandLine;
   /// The list of raw filenames on the command line (i.e. without any switches)

@@ -63,8 +63,6 @@
 #ifndef __CS_MD5_H__
 #define __CS_MD5_H__
 
-#include "csutil/csbase.h"
-
 /**
  * This is am encapsulation of a C-implementation of MD5 digest algorithm by 
  * Peter Deutsch <ghost@aladdin.com>.  It provides the exact raw interface as 

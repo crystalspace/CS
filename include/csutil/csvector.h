@@ -20,15 +20,13 @@
 #ifndef __CSVECTOR_H__
 #define __CSVECTOR_H__
 
-#include "csbase.h"
 #include "cstypes.h"
 
 /**
  * This is a lightweight base class for containers.  It contains no virtual
  * functions and, by default, does not preallocate any memory.  It contains all
  * the basic functionality of the derived csVector class, but none of the
- * gimmicks.  This class intentionally does not derived from csBase in order to
- * avoid getting a virtual destructor.
+ * gimmicks.
  */
 class csBasicVector
 {

@@ -23,7 +23,6 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
-#include "csutil/csbase.h"
 
 /// alignment settings for drawing pixmaps
 #define PIXMAP_TOP      0
@@ -39,7 +38,7 @@
  * Note that this class is only used as the interface to several
  * implementations of pixmaps, for example csSimplePixmap.
  */
-class csPixmap : public csBase
+class csPixmap
 {
 public:
   /// return current width of this pixmap

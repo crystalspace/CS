@@ -212,7 +212,7 @@ public:
 // nodes - both "directory" and "archive" types) but since we have to
 // balance between pretty understandable code and effective code, this
 // time we choose effectivity - the cost can become very big in this case.
-class VfsNode : public csBase
+class VfsNode
 {
 public:
   // The virtual path

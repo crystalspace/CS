@@ -21,7 +21,6 @@
 #define __CSOBJ_H__
 
 #include "cstypes.h"
-#include "csutil/csbase.h"
 #include "csutil/util.h"
 #include "iutil/object.h"
 

@@ -98,6 +98,7 @@ struct iBase
     if (ibase == NULL) return NULL;
     else return ibase->QueryInterface (iInterfaceID, iVersion);
   }
+  virtual ~iBase () {}
 };
 
 /// This macro should make use of IncRef() safer.
