@@ -28,6 +28,7 @@
 #include "csutil/scf.h"
 #include "csutil/weakref.h"
 #include "iutil/document.h"
+#include "iutil/objreg.h"
 
 class csWrappedDocumentNodeIterator;
 
