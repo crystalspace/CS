@@ -146,7 +146,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csMeshFactory::csMeshFactory (
 	iEngine *eng, iObjectRegistry* reg, iMeshObjectType* parent)
-	: Engine (eng), object_reg (reg), mesh_type(parent)
+	: LogParent(0), mesh_type(parent), Engine (eng), object_reg (reg)
 {
   SCF_CONSTRUCT_IBASE (0);
 }
