@@ -7880,7 +7880,9 @@ WORLD (
       MATERIAL ('plasma')
       MIXMODE (ADD ())
       PORTAL ('corridor')
-      WARP (V(-25.6, 22.0, 12.6))
+      ; matrix y rotation a is (cos(a),0,-sin(a),0,1,0,sin(a),0,cos(a))
+      WARP (W(+25.6, -22.0, -12.6) MATRIX(1,0,0, 0,1,0, 0,0,1))
+      ;WARP (W(+25.6, -22.0, -12.6) MATRIX(0,0,-1, 0,1,0, 1,0,0))
       TEXTURE (
         MATRIX (0,0,-0.2,0,-0.2,0,0.2,0,0)
         V (34,-14,16)
