@@ -402,11 +402,17 @@ INTERFACE_ID_VAR (csRadCurve);
 
 IMPLEMENT_CSOBJTYPE (csEngine,csObject);
 
-IMPLEMENT_IBASE_EXT (csEngine)
+IMPLEMENT_IBASE (csEngine)
   IMPLEMENTS_INTERFACE (iPlugIn)
   IMPLEMENTS_INTERFACE (iEngine)
   IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
-IMPLEMENT_IBASE_EXT_END
+  IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
+IMPLEMENT_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE (csEngine::iObjectInterface)
+  void *itf = csObject::QueryInterface (iInterfaceID, iVersion);
+  if (itf) return itf;
+IMPLEMENT_EMBEDDED_IBASE_END
 
 IMPLEMENT_FACTORY (csEngine)
 
@@ -418,10 +424,11 @@ EXPORT_CLASS_TABLE (engine)
       "crystalspace.graphic.image.io.")
 EXPORT_CLASS_TABLE_END
 
-csEngine::csEngine (iBase *iParent) : csObject (), camera_positions (16, 16)
+csEngine::csEngine (iBase *iParent) : camera_positions (16, 16)
 {
   CONSTRUCT_IBASE (iParent);
   CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
+  CONSTRUCT_EMBEDDED_IBASE (scfiObject);
   engine_mode = CS_ENGINE_AUTODETECT;
   first_dyn_lights = NULL;
   System = NULL;
@@ -699,7 +706,7 @@ void csEngine::Clear ()
 
 iObject *csEngine::QueryObject ()
 {
-  return this;
+  return &scfiObject;
 }
 
 void csEngine::RegisterRenderPriority (const char* name, long priority)
@@ -1858,7 +1865,7 @@ iCameraPosition *csEngine::CreateCameraPosition (const char *iName, const char *
 
 bool csEngine::CreateKey (const char *iName, const char *iValue)
 {
-  ObjAdd (new csKeyValuePair (iName, iValue));
+  scfiObject.ObjAdd (new csKeyValuePair (iName, iValue));
   return true;
 }
 
@@ -1888,7 +1895,7 @@ iMeshWrapper* csEngine::CreateSectorWallsMesh (csSector* sector,
   iMeshObject* thing_obj = QUERY_INTERFACE (thing_fact, iMeshObject);
   thing_fact->DecRef ();
 
-  csMeshWrapper* thing_wrap = new csMeshWrapper (this, thing_obj);
+  csMeshWrapper* thing_wrap = new csMeshWrapper (&scfiObject, thing_obj);
 
   thing_obj->DecRef ();
   thing_wrap->SetName (iName);
@@ -2266,7 +2273,7 @@ iMeshWrapper* csEngine::LoadMeshObject (
   if (!plug)
     return NULL;
 
-  csMeshWrapper* meshwrap = new csMeshWrapper (this);
+  csMeshWrapper* meshwrap = new csMeshWrapper (&scfiObject);
   if (name) meshwrap->SetName (name);
   meshwrap->IncRef ();
   meshes.Push (meshwrap);
@@ -2301,7 +2308,7 @@ iMeshWrapper* csEngine::CreateMeshObject (iMeshFactoryWrapper* factory,
 iMeshWrapper* csEngine::CreateMeshObject (iMeshObject* mesh,
   	const char* name, iSector* sector, const csVector3& pos)
 {
-  csMeshWrapper* meshwrap = new csMeshWrapper (this, mesh);
+  csMeshWrapper* meshwrap = new csMeshWrapper (&scfiObject, mesh);
   if (name) meshwrap->SetName (name);
   meshwrap->IncRef ();
   meshes.Push (meshwrap);
@@ -2316,7 +2323,7 @@ iMeshWrapper* csEngine::CreateMeshObject (iMeshObject* mesh,
 
 iMeshWrapper* csEngine::CreateMeshObject (const char* name)
 {
-  csMeshWrapper* meshwrap = new csMeshWrapper (this);
+  csMeshWrapper* meshwrap = new csMeshWrapper (&scfiObject);
   if (name) meshwrap->SetName (name);
   meshwrap->IncRef ();
   meshes.Push (meshwrap);

@@ -256,7 +256,7 @@ struct csEngineConfig : public iConfig
  * This class manages all components which comprise a 3D world including
  * sectors, polygons, curves, mesh objects, etc.
  */
-class csEngine : public iEngine, public csObject
+class csEngine : public iEngine
 {
   friend class Dumper;
 
@@ -567,6 +567,8 @@ public:
 
   /// Query the iObject for the engine.
   virtual iObject *QueryObject();
+  /// Query the csObject for the engine.
+  inline csObject *QueryCsObject () {return &scfiObject;}
 
   /**
    * Prepare the engine. This function must be called after
@@ -1027,7 +1029,7 @@ public:
   }
 
   CSOBJTYPE;
-  DECLARE_IBASE_EXT(csObject);
+  DECLARE_IBASE;
 
   //--------------------- iPlugIn interface implementation --------------------
 
@@ -1291,6 +1293,14 @@ private:
   csEngineStateVector *engine_states;
 
   //------------End-Multi-Context-Support-------------------------------------
+
+  /**
+   * This object is used in the engine as an embedded iObject interface.
+   */
+  class iObjectInterface : public csObject
+  {
+    DECLARE_EMBEDDED_IBASE (csEngine);
+  } scfiObject;
 };
 
 // This is a global replacement for printf ()

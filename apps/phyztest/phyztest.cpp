@@ -99,7 +99,7 @@ csMeshWrapper *add_test_mesh( csMeshFactoryWrapper *tmpl, csSector *aroom, csVie
 {
   csMeshWrapper *tsprt;
   
-  tsprt = tmpl->NewMeshObject (view->GetEngine ()->GetCsEngine ());
+  tsprt = tmpl->NewMeshObject (view->GetEngine ()->GetCsEngine ()->QueryCsObject ());
   view->GetEngine ()->GetCsEngine ()->meshes.Push (tsprt);
   tsprt->GetMovable ().SetSector (aroom);
   csXScaleMatrix3 m (2);
@@ -411,7 +411,7 @@ void Phyztest::NextFrame ()
 	return;
       }
 
-      bot = tmpl->NewMeshObject (view->GetEngine ()->GetCsEngine ());
+      bot = tmpl->NewMeshObject (view->GetEngine ()->GetCsEngine ()->QueryCsObject ());
       view->GetEngine ()->GetCsEngine ()->meshes.Push (bot);
       bot->GetMovable ().SetSector (room);
       iSprite3DState* state = QUERY_INTERFACE (bot->GetMeshObject (), iSprite3DState);

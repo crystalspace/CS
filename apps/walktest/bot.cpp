@@ -24,7 +24,8 @@
 
 IMPLEMENT_CSOBJTYPE (Bot,csMeshWrapper);
 
-Bot::Bot (csEngine* Engine, iMeshObject* botmesh) : csMeshWrapper (Engine, botmesh)
+Bot::Bot (csEngine* Engine, iMeshObject* botmesh) :
+  csMeshWrapper (Engine->QueryCsObject (), botmesh)
 {
   engine = Engine;
   do
