@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<mtex>
+	<layer>
+		<texturesource number="0"/>
+		<texturecoordinate source="mesh"/>
+		<environment>
+			<colorsource num="0" source="texture" modifier="color"/>
+			<coloroperation operation="replace"/>
+		</environment>
+	</layer>
+	<layer>
+		<texturesource number="1"/>
+		<texturecoordinate source="mesh"/>
+		<environment>
+			<colorsource num="0" source="previous layer" modifier="color"/>
+			<colorsource num="1" source="texture" modifier="color"/>
+			<coloroperation operation="dot3"/>
+		</environment>
+	</layer>
+</mtex>
