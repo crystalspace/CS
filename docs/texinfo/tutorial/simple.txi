@@ -43,7 +43,7 @@ viewed online.  @xref{Where to Get}.
 @cindex Minimum Application Requirements, Tutorial
 
 For an application to be considered a proper ``Crystal Space application'',
-there are a frew requirements.  These are:
+there are a few requirements.  These are:
 
 @itemize @bullet
 @item

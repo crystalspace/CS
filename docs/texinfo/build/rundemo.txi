@@ -11,10 +11,10 @@ Later sections will describe options and applications in more detail, but
 for now, sit back and have some fun.
 
 The executable for each application and all of its support files must be
-located in the same directory.  The map files are generally be placed in the
+located in the same directory.  The map files are generally placed in the
 @file{CS/data} directory, but this not a strict requirement.  Please note that
 the map @sc{zip} files should @emph{not} be unpacked.  Crystal Space can read
-files directly.
+zip files directly.
 
 In this example, we will run @samp{walktest}, the quintessential Crystal Space
 demonstration program.  To run @samp{walktest} with a specific map you have
@@ -46,7 +46,7 @@ this.
 
 Note that on most platforms Crystal Space currently only supports 256-color
 displays (with a colormap) or 15/16/32-bit truecolor displays, though some
-platforms may be more tolerant and implement provide support for additional
+platforms may be more tolerant and provide support for additional
 display depths.
 
 You can also use other command line parameters when running Crystal Space

@@ -8,7 +8,7 @@
 @emph{Written by Thomas Hieber, @email{thieber@@gmx.net}.}
 
 This section is intended to explain the general CS directory structure. It
-contains all directories, so maybe some will be missing, if you just
+contains all directories so maybe some will be missing if you just
 downloaded the files for a specific port like Linux or Win32.
 
 Crystal Space consists of the following directories:
@@ -63,7 +63,7 @@ directory.
 @item CS/docs/html
 This directory contains the @sc{html} conversion of the Texinfo Crystal Space
 documentation.  Most users will want to look at @file{CS/docs/html/index.htm}
-which resides here.
+that resides here.
 
 @item CS/docs/incoming
 This is a temporary staging area for documentation which has not yet been
@@ -72,7 +72,7 @@ perusing.
 
 @item CS/docs/pubapi
 This directory contains the Crystal Space SDK's public API reference manual
-rendered into @sc{html} format.
+rendered in @sc{html} format.
 @end table
 
 @item CS/include
@@ -84,13 +84,13 @@ hierarchy) contain definitions for @sc{scf} interfaces.
 @xref{SCF}.
 
 @item CS/libs
-Here are all Modules provided be Crystal Space. Some modules will consist of
+Here is all the Modules provided by Crystal Space. Some modules will consist of
 only one subdirectory in libs, some will be a combination of several
 subdirectories.
 
 @table @code
 @item CS/libs/csengine
-The 3D engine is one of the corner stones of Crystal Space and also what
+The 3D engine is one of the cornerstones of Crystal Space and also what
 originally sparked the birth of the Crystal Space project.  It needs the 3D
 rasterizer component to display output and also requires a number of other
 libraries (csutil, csgeom, csgfxldr).  The 3D engine exports a number of
@@ -116,7 +116,7 @@ formats and put them internally in the same format.  This library supports
 library will be removed in favor of a set of plugins.
 
 @item CS/libs/csobject
-Hierarchy of Crystal Space independant classes, that are used as base for most
+Hierarchy of Crystal Space independant classes which are used as the base for most
 Crystal Space classes.  The main use for these classes is a system for
 run-time type information and for management of attributes like names that can
 dynamically be attached to objects at run-time.
@@ -131,7 +131,7 @@ library.
 
 @table @code
 @item CS/libs/cssys/general
-Code which may be shared between system drivers which can make use of it.
+Code which may be shared between system drivers that can make use of it.
 @item CS/libs/cssys/be
 BeOS
 @item CS/libs/cssys/djgpp
@@ -180,7 +180,7 @@ performed strictly via @sc{scf} interfaces.  @xref{SCF}.
 The 2D driver component which manages creation of the Crystal Space window
 used for rendering and also supports limited 2D drawing capabilities
 (including 2D pixmaps).  It can be used standalone but it is currently very
-limited and not very useful (may change in the future).  There are several
+limited and not very useful (this may change in the future).  There are several
 implementations of this component.  All are specific to some 3D Rasterizer
 (for example, the OpenGL 3D Rasterizer on Unix requires the OpenGL 2D XLib
 Driver).
@@ -198,7 +198,7 @@ Win32 using Direct Draw
 Win32 using Direct Draw (DirectX 6.1)
 @item CS/plugins/video/canvas/dosraw
 @sc{dos}
-@item CS/plugins/video/canvas/ggi
+@item C~S/plugins/video/canvas/ggi
 Unix, using @sc{ggi}
 @item CS/plugins/video/canvas/softx
 Unix, using X
@@ -273,7 +273,7 @@ will be the prefered way.
 @table @code
 @item CS/plugins/sound/driver
 System dependent sound drivers.  There are currently drivers for MacOS/9,
-@sc{oss} (Linux), and Windows.
+@sc{oss} (Unix), and Windows.
 
 @table @code
 @item CS/plugins/sound/driver/macsnd

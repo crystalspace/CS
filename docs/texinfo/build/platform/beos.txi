@@ -135,7 +135,7 @@ Glide2 support package has been installed on your system.
 
 The standard library archive, @file{standard.zip}, is included with
 the Crystal Space package within the @file{CS/data} directory.  If it is
-missing, however, you may downloaded it from the Crystal Space site
+missing, however, you may download it from the Crystal Space site
 (@pxref{Where to Get}) and place it in @file{CS/data} manually.  This file
 contains resources which are used by several Crystal Space demonstration
 programs.  Do not unpack this file; Crystal Space uses it as is.
@@ -227,7 +227,7 @@ Now that the engine supports window resizing, the @BeOS{} 2D drivers should
 also support this feature.  Also enable the ``zoom'' button on the window.
 
 @item
-Pause when not foreground application.  Make sure that screen redraws
+Pause when not the foreground application.  Make sure that screen redraws
 correctly even when paused.
 
 @item
@@ -259,8 +259,8 @@ in the 2D driver and respond directly to the @samp{B_UNMAPPED_KEY_DOWN} and
 @samp{B_UNMAPPED_KEY_UP} messages.
 
 @item
-Consider using @samp{DirectWindow} rather than @samp{DirectBitmap} where
-supported since @samp{DirectWindow} puts much less load on the @sc{cpu}.
+Consider using @samp{DirectWindow} rather than @samp{DirectBitmap}, where
+supported, since @samp{DirectWindow} puts much less load on the @sc{cpu}.
 Auto-detect if @samp{DirectWindow} is available and use it if so.  Note,
 though, that David Huen says this might not be worthwhile on account of the
 fact that the software renderer reads from the frame buffer, and this can be a

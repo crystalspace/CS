@@ -76,6 +76,19 @@ The history order has been reversed so that new features are at the top.
 	  that I committed). The problem is that there is still a movable
 	  instance in csThing itself which is used instead of the correct
 	  movable in csMeshWrapper.
+	- Michael Voase did the following:
+	    - Document discovered bug in csloader.cpp / crossbuild.
+	    - Fixed documentation bug in phyztest. Now displays
+  	      instructions on the tab, del and enter keys.
+	    - Fixed bug where QUERY_INTERFACE was being called
+  	      on a mesh wrapper.
+	    - Fixed bug where incorrect object was being used in
+  	      collision detection. Now extracts the csThing from
+  	      the sector where the walls are stored.
+	- Bob Ham fixed several errors in the documentation.
+	- Martin Geisse fixed another compiler error in ptlab.
+	- Christopher Nelson fixed source code formatting errors in his CSWS
+	  patches.
 4-Apr-2001
 	- Started work on thing loader and saver. Although things haven't
 	  moved to a plugin yet it is already possible to make real

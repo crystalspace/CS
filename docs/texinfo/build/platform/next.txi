@@ -57,19 +57,14 @@ current Unix installations, but are absent from MacOS/X, MacOS/X Server 1.0
 
 @anchor{NeXT Resources}
 The most convenient site from which to download these library packages is the
-LinuxGames @sc{ftp} site, which can be accessed through 3D Downloads.  These
-packages are known to work with MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep,
-and NextStep and have already been organized to fit correctly into the Crystal
-Space project hierarchy.
-
-zlib_1.1.1.tgz@*
-libjpeg-6a.tgz@*
-libpng_1.0.tgz
-
-The above files can be obtained through the link below.
+LinuxGames @sc{ftp} site.  These packages are known to work with MacOS/X,
+MacOS/X Server 1.0 (Rhapsody), OpenStep, and NextStep and have already been
+organized to fit correctly into the Crystal Space project hierarchy.
 
 @noindent
-@uref{http://www.3ddownloads.com/?directory=/linuxgames/crystal/support/general/}
+@uref{ftp://ftp.linuxgames.com/crystal/support/general/zlib_1.1.1.tgz}@*
+@uref{ftp://ftp.linuxgames.com/crystal/support/general/libjpeg-6a.tgz}@*
+@uref{ftp://ftp.linuxgames.com/crystal/support/general/libpng_1.0.tgz}
 
 Finally, if you are building Crystal Space on NextStep, you will need to
 download and install the @sc{gnu} @samp{make} program since Crystal Space
@@ -188,7 +183,7 @@ gnutar xfz zlib*.tgz
 
 The standard library archive, @file{standard.zip}, is included with
 the Crystal Space package within the @file{CS/data} directory.  If it is
-missing, however, you may downloaded it from the Crystal Space site
+missing, however, you may download it from the Crystal Space site
 (@pxref{Where to Get}) and place it in @file{CS/data} manually.  This file
 contains resources which are used by several Crystal Space demonstration
 programs.  Do not unpack this file; Crystal Space uses it as is.
@@ -394,7 +389,7 @@ illustrated above if you have not already invoked the @samp{all} target.
 
 Before attempting to run any of the Crystal Space sample applications, ensure
 that the files @file{standard.zip} and @file{stdtex.zip} reside in
-@file{CS/data}.  These file contain resources and textures which are used by
+@file{CS/data}.  These files contain resources and textures which are used by
 several of the example programs and map files.
 
 You need to have one or more @dfn{map} files in order to run WalkTest.  These

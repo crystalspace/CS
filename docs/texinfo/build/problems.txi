@@ -2,7 +2,7 @@
 @node Problems, Quick Start, Platform Instructions, Building
 @section Platform Specific Problems
 
-These problems are both relevant for compiling and running.  Crystal Space is
+These problems are relevant for both compiling and running.  Crystal Space is
 work in progress.  Expect these problems to go away in the future.
 
 @itemize @bullet
