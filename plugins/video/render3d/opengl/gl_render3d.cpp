@@ -969,10 +969,10 @@ bool csGLGraphics3D::Open ()
   {
     for (unsigned int fogindex2 = 0; fogindex2 < CS_FOGTABLE_SIZE; fogindex2++)
     {
-      unsigned char fogalpha1 = (255 * csFogRamp((float)fogindex1 / CS_FOGTABLE_SIZE));
+      unsigned char fogalpha1 = (unsigned char)(255 * csFogRamp((float)fogindex1 / CS_FOGTABLE_SIZE));
       if (fogindex1 == (CS_FOGTABLE_SIZE - 1))
         fogalpha1 = 255;
-      unsigned char fogalpha2 = (255 * csFogRamp((float)fogindex2 / CS_FOGTABLE_SIZE));
+      unsigned char fogalpha2 = (unsigned char)(255 * csFogRamp((float)fogindex2 / CS_FOGTABLE_SIZE));
       if (fogindex2 == (CS_FOGTABLE_SIZE - 1))
         fogalpha2 = 255;
       transientfogdata[(fogindex1+fogindex2*CS_FOGTABLE_SIZE) * 4 + 3] = MIN(fogalpha1, fogalpha2);
