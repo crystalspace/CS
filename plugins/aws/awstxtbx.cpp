@@ -341,7 +341,9 @@ void awsTextBox::OnDraw (csRect /*clip*/)
     {
 
       // Check to see if we're getting wierd.
-      start = cursor - mcc;
+      // this was changed to avoid 
+      // jittering in the start value
+      if (cursor > start + mcc) start = cursor - mcc;
       if (start < 0) start = 0;
 
       // Make the text the right length
@@ -375,10 +377,16 @@ void awsTextBox::OnDraw (csRect /*clip*/)
 
     if (has_focus && blink)
     {
+      int co, cx, tty;
+      co = cursor - start;
+      tmp.Truncate (co);
+      // figure out where to put the cursor
+      WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->
+         GetDimensions (tmp, cx, tty);
       g2d->DrawLine (
-          Frame ().xmin + tx + tw + 1,
+          Frame ().xmin + tx + cx + 1,
           Frame ().ymin + ty,
-          Frame ().xmin + tx + tw + 1,
+          Frame ().xmin + tx + cx + 1,
           Frame ().ymin + ty + th,
           WindowManager ()->GetPrefMgr ()->GetColor (AC_TEXTFORE));
     }
@@ -395,9 +403,20 @@ void awsTextBox::OnDraw (csRect /*clip*/)
   }
 }
 
-bool awsTextBox::OnMouseDown (int, int, int)
+bool awsTextBox::OnMouseDown (int, int x, int y)
 {
-  /// This is needed to get keyboard focus for the mouse!
+  // make sure text is valid
+  if (text && text->Length() > 0)
+  {
+    // determine how many chars in the mouse was clicked
+    int tp,cp;
+    scfString tmp(text->GetData () + start);
+    tp = x - 4 - Frame ().xmin;
+    cp = WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->
+      GetLength(tmp,tp);
+    cursor = cp + start;
+  }
+  // This is needed to get keyboard focus for the mouse!
   return true;
 }
 
@@ -428,13 +447,68 @@ bool awsTextBox::OnKeypress (int key, int Char, int)
       break;
 
     case CSKEY_BACKSPACE:
-      if (cursor > 0) cursor--;
+      if (cursor > 0) 
+      {
+        cursor--;
+        if (cursor - start < 5) start = cursor - 5;
+        if (start < 0) start = 0;
+        if (text && (text->Length () > 1))
+          if (cursor == text->Length ())
+            text->Truncate (text->Length () - 1);
+          else
+          {
+            scfString tmp(text->GetData());
+            tmp.Truncate (cursor);
+            tmp.Append (text->GetData()+cursor+1);
+            text->Replace(&tmp);
+          }
+        else
+          text->Clear ();
+      }
+
+      break;
+
+    case CSKEY_DEL:
+      if (cursor == text->Length ()) cursor--;
       if (cursor - start < 5) start = cursor - 5;
       if (start < 0) start = 0;
       if (text && (text->Length () > 1))
-        text->Truncate (text->Length () - 1);
+        if (cursor == text->Length ())
+          text->Truncate (text->Length () - 1);
+        else
+        {
+          scfString tmp(text->GetData());
+          tmp.Truncate (cursor);
+          tmp.Append (text->GetData()+cursor+1);
+          text->Replace(&tmp);
+        }
       else
         text->Clear ();
+
+      break;
+
+    case CSKEY_LEFT:
+      if (cursor > 0) cursor--;
+      if (cursor - start < 5) start = cursor - 5;
+      if (start < 0) start = 0;
+
+      break;
+
+    case CSKEY_RIGHT:
+      if (cursor < text->Length ()) {
+        cursor++;
+      }
+
+      break;
+
+    case CSKEY_HOME:
+      cursor=0;
+      start=0;
+
+      break;
+
+    case CSKEY_END:
+      cursor=text->Length();
 
       break;
 
@@ -449,8 +523,16 @@ bool awsTextBox::OnKeypress (int key, int Char, int)
 	char str[2];
 	str[0] = (char)Char;
 	str[1] = 0;
+        scfString tmp(str);
 
-	text->Append (str);
+        if (cursor == text->Length ()) 
+        {
+	  text->Append (str);
+        }
+        else
+        {
+          text->Insert (cursor, &tmp);
+        }
 	cursor++;
 	Broadcast (signalChanged);
       }
