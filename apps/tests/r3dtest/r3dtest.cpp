@@ -23,6 +23,9 @@
 #include "csutil/cscolor.h"
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
+#include "iengine/camera.h"
+#include "iengine/engine.h"
+#include "iengine/sector.h"
 #include "iutil/eventq.h"
 #include "iutil/event.h"
 #include "iutil/objreg.h"
@@ -43,7 +46,7 @@
 #include "csutil/cmdhelp.h"
 #include "ivideo/render3d.h"
 #include "ivideo/rndbuf.h"
-#include "iengine/engine.h"
+#include "imesh/terrfunc.h"
 
 /*#include "csengine/material.h"
 #include "csengine/texture.h"*/
@@ -91,18 +94,18 @@ public:
     vertices->Release();
 
     unsigned int* ibuf = (unsigned int*)indices->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
-    ibuf[ 0] = 0;  ibuf[ 1] = 4;  ibuf[ 2] = 1;
-    ibuf[ 3] = 1;  ibuf[ 4] = 4;  ibuf[ 5] = 5;
-    ibuf[ 6] = 0;  ibuf[ 7] = 1;  ibuf[ 8] = 3;
-    ibuf[ 9] = 0;  ibuf[10] = 3;  ibuf[11] = 2;
-    ibuf[12] = 4;  ibuf[13] = 6;  ibuf[14] = 7;
-    ibuf[15] = 4;  ibuf[16] = 7;  ibuf[17] = 5;
-    ibuf[18] = 1;  ibuf[19] = 5;  ibuf[20] = 3;
-    ibuf[21] = 3;  ibuf[22] = 5;  ibuf[23] = 7;
-    ibuf[24] = 2;  ibuf[25] = 6;  ibuf[26] = 0;
-    ibuf[27] = 0;  ibuf[28] = 6;  ibuf[29] = 4;
-    ibuf[30] = 2;  ibuf[31] = 3;  ibuf[32] = 6;
-    ibuf[33] = 3;  ibuf[34] = 7;  ibuf[35] = 6;
+    ibuf[ 0] = 0;  ibuf[ 1] = 1;  ibuf[ 2] = 4;
+    ibuf[ 3] = 1;  ibuf[ 4] = 5;  ibuf[ 5] = 4;
+    ibuf[ 6] = 0;  ibuf[ 7] = 3;  ibuf[ 8] = 1;
+    ibuf[ 9] = 0;  ibuf[10] = 2;  ibuf[11] = 3;
+    ibuf[12] = 4;  ibuf[13] = 7;  ibuf[14] = 6;
+    ibuf[15] = 4;  ibuf[16] = 5;  ibuf[17] = 7;
+    ibuf[18] = 1;  ibuf[19] = 3;  ibuf[20] = 5;
+    ibuf[21] = 3;  ibuf[22] = 7;  ibuf[23] = 5;
+    ibuf[24] = 2;  ibuf[25] = 0;  ibuf[26] = 6;
+    ibuf[27] = 0;  ibuf[28] = 4;  ibuf[29] = 6;
+    ibuf[30] = 2;  ibuf[31] = 6;  ibuf[32] = 3;
+    ibuf[33] = 3;  ibuf[34] = 6;  ibuf[35] = 7;
     indices->Release();
 
     csVector2* tcbuf = (csVector2*)texcoords->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
@@ -166,10 +169,9 @@ void R3DTest::SetupFrame ()
   static int timeaccum = 0;
   framecount++;
   timeaccum += elapsed_time;
-  if (framecount == 100)
+  if ((framecount % 10) == 0)
   {
-    FPS = 100000.0/(float)timeaccum;
-    framecount = 0;
+    FPS = 10000.0/(float)timeaccum;
     timeaccum = 0;
   }
 
@@ -182,25 +184,22 @@ void R3DTest::SetupFrame ()
     fnt = fntsvr->LoadFont (CSFONT_COURIER);
   }
 
-  if (!r3d->BeginDraw (CSDRAW_2DGRAPHICS | CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER))
-    return;
-
-  char asdf[1024];
-
-  sprintf (asdf, "Ah, it iz le test!      Le FPS c'est cyrrentlee %d", FPS);
-  r3d->GetDriver2D ()->Write (fnt, 10, 50, 0x00FF0000, -1, asdf);
-
-  r3d->FinishDraw ();
+  if (kbd->GetKeyState (CSKEY_RIGHT))
+    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed);
+  if (kbd->GetKeyState (CSKEY_LEFT))
+    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_ROT_LEFT, speed);
+  if (kbd->GetKeyState (CSKEY_UP))
+    view->GetCamera ()->Move (CS_VEC_FORWARD);
+  if (kbd->GetKeyState (CSKEY_DOWN))
+    view->GetCamera ()->Move (CS_VEC_BACKWARD);
 
   // Tell 3D driver we're going to display 3D things.
-  if (!r3d->BeginDraw (CSDRAW_3DGRAPHICS))
+  if (!r3d->BeginDraw (CSDRAW_3DGRAPHICS | CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER))
     return;
-
-  // Tell the camera to render into the frame buffer.
-  //view->Draw ();
 
   csRenderMesh mesh;
 
+  mesh.SetIndexRange (0, 36);
   mesh.SetMaterialWrapper (matwrap);
   mesh.SetStreamSource (testmesh);
   mesh.SetType (csRenderMesh::MESHTYPE_TRIANGLES);
@@ -209,18 +208,32 @@ void R3DTest::SetupFrame ()
   static float a = 0;
 
   a += speed;
-  trans.RotateThis (csVector3 (1,0,0), a*2.0);
-  trans.RotateThis (csVector3 (0,1,0), a*1.5);
-  trans.RotateThis (csVector3 (0,0,1), a*1.0);
+  trans.RotateOther (csVector3 (1,0,0), a*2.0);
+  trans.RotateOther (csVector3 (0,1,0), a*1.5);
+  trans.RotateOther (csVector3 (0,0,1), a*1.0);
   trans.SetOrigin (csVector3 (0,0,5));
-  r3d->SetWVMatrix (&trans);
+  trans = trans.GetInverse ();
+  r3d->SetObjectToCamera (&trans);
   r3d->DrawMesh (&mesh);
+
+  // Tell the camera to render into the frame buffer.
+  //view->Draw ();
+
+  r3d->FinishDraw ();
+
+  if (!r3d->BeginDraw (CSDRAW_2DGRAPHICS))
+    return;
+
+  char asdf[1024];
+
+  sprintf (asdf, "Ah, it iz le test!      Le FPS c'est cyrrentlee %d, frame %d", FPS, framecount);
+  r3d->GetDriver2D ()->Write (fnt, 10, 50, 0x00FF00FF, -1, asdf);
+  r3d->FinishDraw ();
 
 }
 
 void R3DTest::FinishFrame ()
 {
-  r3d->FinishDraw ();
   r3d->Print (NULL);
 }
 
@@ -258,6 +271,7 @@ bool R3DTest::Initialize ()
         CS_REQUEST_PLUGIN ("crystalspace.render3d.opengl", iRender3D),
         CS_REQUEST_ENGINE,
 	CS_REQUEST_IMAGELOADER,
+	CS_REQUEST_LEVELLOADER,
 	CS_REQUEST_FONTSERVER,
 	CS_REQUEST_REPORTER,
 	CS_REQUEST_REPORTERLISTENER,
@@ -321,6 +335,24 @@ bool R3DTest::Initialize ()
     return false;
   }
 
+  kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
+  if (kbd == NULL)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.r3dtest",
+    	"No iKeyboardDriver plugin!");
+    return false;
+  }
+
+  csRef<iLoader> loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  if (loader == NULL)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.r3dtest",
+    	"No iLoader plugin!");
+    return false;
+  }
+
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!csInitializer::OpenApplication (object_reg))
@@ -333,41 +365,28 @@ bool R3DTest::Initialize ()
 
   testmesh = new csTestMesh (r3d);
 
-  csRef<iDataBuffer> buf (vfs->ReadFile ("/lib/std/portal.jpg"));
-  if (!buf || !buf->GetSize ())
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-	"crystalspace.application.r3dtes",
-    	"Could not open image file 'portal.jpg' on VFS!");
-    return NULL;
-  }
-
-
-  csRef<iImageIO> imldr = CS_QUERY_REGISTRY (object_reg, iImageIO);
-  if (imldr == NULL)
+  if (!loader->LoadTexture ("portal", "/lib/std/portal.jpg"))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.r3dtest",
-    	"No iImageIO plugin!");
+    	"Error loading 'portal' texture!");
     return false;
   }
+  matwrap = engine->GetMaterialList ()->FindByName ("portal");
 
-  int format = r3d->GetTextureManager ()->GetTextureFormat ();
-  csRef<iImage> im = imldr->Load (buf->GetUint8 (), buf->GetSize (), format);
-  csRef<iTextureHandle> txthandle = 
-    r3d->GetTextureManager ()->RegisterTexture (im, 0);
+  // Just disregard this. It's for testing. /Anders Stenberg
+  /*vfs->Mount ("/level", "./data/newersky.zip");
+  vfs->ChDir ("/level");
+  loader->LoadMapFile ("world", false);
 
-  iTextureWrapper *txtwrap =
-	engine->GetTextureList ()->NewTexture(txthandle);
-  txtwrap->SetImageFile(im);
+  //csRef<iSector> room = engine->CreateSector ("room");
+  csRef<iSector> room = engine->FindSector ("room");
 
-  csRef<iMaterial> mat (engine->CreateBaseMaterial (txtwrap, 0, NULL, NULL));
-  matwrap = engine->GetMaterialList ()->NewMaterial (mat);
-
-  txtwrap->Register (r3d->GetTextureManager ());
-  txtwrap->GetTextureHandle()->Prepare ();
-  matwrap->Register (r3d->GetTextureManager ());
-  matwrap->GetMaterialHandle ()->Prepare ();
+  view = csPtr<iView> (new csView (engine, r3d));
+  view->GetCamera ()->SetSector (room);
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
+  csRef<iGraphics2D> g2d = r3d->GetDriver2D ();
+  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());*/
 
   engine->Prepare ();
 

@@ -27,6 +27,7 @@ struct iObjectRegistry;
 struct iEvent;
 struct iVirtualClock;
 struct iMaterialWrapper;
+struct iKeyboardDriver;
 struct iVFS;
 
 
@@ -38,6 +39,8 @@ private:
   iObjectRegistry* object_reg;
   csRef<iEngine> engine;
   csRef<iRender3D> r3d;
+  csRef<iView> view;
+  csRef<iKeyboardDriver> kbd;
 
   csRef<iVFS> vfs;
   csRef<iVirtualClock> vc;

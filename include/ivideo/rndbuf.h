@@ -120,6 +120,7 @@ public:
 
 private: 
   meshtype type;
+  unsigned int indexstart, indexend;
   csRef<iStreamSource> streamsource;
   csRef<iMaterialWrapper> matwrap;
 
@@ -139,6 +140,16 @@ public:
   /// Get buffer source
   virtual iStreamSource* GetStreamSource ()
     { return streamsource; }
+
+  /// Set range of indices to use
+  virtual void SetIndexRange (unsigned int start, unsigned int end)
+    { indexstart = start; indexend = end; }
+  /// Get start of index range
+  virtual unsigned int GetIndexStart ()
+    { return indexstart; }
+  /// Get end of index range
+  virtual unsigned int GetIndexEnd ()
+    { return indexend; }
 
   /// Set mesh type
   virtual void SetType (meshtype type) 

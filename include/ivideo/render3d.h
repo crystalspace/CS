@@ -142,7 +142,7 @@ struct iRender3D : public iBase
   virtual float GetFOV () = 0;
 
   /// Set world to view transform
-  virtual void SetWVMatrix (csReversibleTransform* wvmatrix) = 0;
+  virtual void SetObjectToCamera (csReversibleTransform* wvmatrix) = 0;
   virtual csReversibleTransform* GetWVMatrix () = 0;
 
   /// Begin drawing in the renderer

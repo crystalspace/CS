@@ -300,6 +300,12 @@ void* csVARRenderBuffer::Lock(CS_BUFFER_LOCK_TYPE lockType)
 
   if(memblock->buffer)
   {
+    if(lockType != CS_BUF_LOCK_RENDER)
+    {
+      lastlock = lockType;
+      locked = true;
+      return memblock->buffer;
+    }
     if(type == CS_BUF_STATIC)
     {
       bm->render3d->ext.glFinishFenceNV(memblock->fence_id); //for now.. lockup until finnished

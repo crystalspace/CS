@@ -37,6 +37,7 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/render3d.h"
 #include "ivideo/effects/efclient.h"
+#include "video/canvas/openglcommon/iglstates.h"
 
 #include "glextmanager.h"
 #include "gl_sysbufmgr.h"
@@ -63,16 +64,18 @@ class csGLRender3D : public iRender3D
   friend class csVARRenderBufferManager;
   friend class csSysRenderBufferManager;
   friend class csVARRenderBuffer;
-private:
-friend class csGLTextureHandle;
-friend class csGLTextureCache;
-friend class csGLTextureManager;
+ private:
+  friend csGLTextureHandle;
+  friend csGLTextureCache;
+  friend csGLTextureManager;
 
   csRef<iObjectRegistry> object_reg;
   csRef<iGraphics2D> G2D;
   csRef<iRenderBufferManager> buffermgr;
   csRef<iLightingManager> lightmgr;
   csRef<iEffectServer> effectserver;
+
+  static csRef<iGLStateCache> statecache;
 
   csGLExtensionManager ext;
   csGLTextureCache *txtcache;
@@ -108,29 +111,29 @@ public:
   ////////////////////////////////////////////////////////////////////
 
   /// Open 3d renderer.
-  bool Open();
+  bool Open ();
 
   /// Close renderer and release all resources used
-  void Close();
+  void Close ();
 
   /// Get a pointer to our 2d canvas driver. NOTE: It's not increfed,
   /// and therefore it shouldn't be decref-ed by caller.
-  iGraphics2D* GetDriver2D() 
+  iGraphics2D* GetDriver2D () 
     { return G2D; }
 
   /// Get a pointer to our texture manager
-  iTextureManager* GetTextureManager() 
+  iTextureManager* GetTextureManager () 
     { return (iTextureManager*)txtmgr; }
 
   /**
    * Get a pointer to the VB-manager
    * Always use the manager referenced here to get VBs
    */
-  iRenderBufferManager* GetBufferManager() 
+  iRenderBufferManager* GetBufferManager () 
     { return buffermgr; }
 
   /// Get a pointer to lighting manager
-  iLightingManager* GetLightingManager() 
+  iLightingManager* GetLightingManager () 
     { return lightmgr; }
 
   /// Set dimensions of window
@@ -153,23 +156,23 @@ public:
     { return fov; }
 
   /// Set world to view transform
-  void SetWVMatrix(csReversibleTransform* wvmatrix);
-  csReversibleTransform* GetWVMatrix();
+  void SetObjectToCamera (csReversibleTransform* wvmatrix);
+  csReversibleTransform* GetWVMatrix ();
 
   /// Begin drawing in the renderer
-  bool BeginDraw(int drawflags);
+  bool BeginDraw (int drawflags);
 
   /// Indicate that drawing is finished
-  void FinishDraw();
+  void FinishDraw( );
 
   /// Do backbuffer printing
-  void Print(csRect* area);
+  void Print (csRect* area);
 
   /// Drawroutine. Only way to draw stuff
-  void DrawMesh(csRenderMesh* mymesh);
+  void DrawMesh (csRenderMesh* mymesh);
 
   /// Get a stringhash to be used by our streamsources etc.
-  csStringSet *GetStringContainer() 
+  csStringSet *GetStringContainer () 
     { return strings; }
 
   ////////////////////////////////////////////////////////////////////

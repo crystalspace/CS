@@ -52,7 +52,8 @@ public:
     csSysRenderBuffer::type = type;
     locked = false;
   }
-  virtual ~csSysRenderBuffer ()
+
+  ~csSysRenderBuffer ()
   {
     if (buffer != NULL)
     {

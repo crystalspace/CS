@@ -50,6 +50,10 @@
 #include "ivideo/effects/efpass.h"
 #include "ivideo/effects/eflayer.h"
 
+
+csRef<iGLStateCache> csGLRender3D::statecache;
+
+
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGLRender3D)
@@ -152,6 +156,8 @@ bool csGLRender3D::Open ()
     Report (CS_REPORTER_SEVERITY_ERROR, "Error opening Graphics2D context.");
     return false;
   }
+
+  G2D->PerformExtension("getstatecache", &statecache);
   
   int w = G2D->GetWidth ();
   int h = G2D->GetHeight ();
@@ -168,7 +174,7 @@ bool csGLRender3D::Open ()
   csRef<iOpenGLInterface> gl = SCF_QUERY_INTERFACE (G2D, iOpenGLInterface);
   ext.InitExtensions (gl);
 
-  if( ext.CS_GL_NV_vertex_array_range && ext.CS_GL_NV_fence)
+  if( false && ext.CS_GL_NV_vertex_array_range && ext.CS_GL_NV_fence)
   {
     csVARRenderBufferManager * bm = new csVARRenderBufferManager();
     bm->Initialize(this);
@@ -194,11 +200,14 @@ bool csGLRender3D::BeginDraw (int drawflags)
 {
   current_drawflags = drawflags;
 
-  glEnable (GL_CULL_FACE);
-  glCullFace (GL_BACK);
+  glClearDepth (0.0);
+  statecache->EnableState (GL_CULL_FACE);
+  statecache->SetCullFace (GL_FRONT);
+  statecache->EnableState (GL_DEPTH_TEST);
+  statecache->SetDepthFunc (GL_GREATER);
   if (drawflags & CSDRAW_CLEARZBUFFER)
   {
-    glDepthMask (GL_TRUE);
+    statecache->SetDepthMask (GL_TRUE);
     if (drawflags & CSDRAW_CLEARSCREEN)
       glClear (GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     else
@@ -206,7 +215,6 @@ bool csGLRender3D::BeginDraw (int drawflags)
   }
   else if (drawflags & CSDRAW_CLEARSCREEN)
     G2D->Clear (0);
-
   if (drawflags & CSDRAW_3DGRAPHICS)
   {
     glMatrixMode (GL_PROJECTION);
@@ -246,21 +254,33 @@ csReversibleTransform* csGLRender3D::GetWVMatrix()
   return NULL;
 }
 
-void csGLRender3D::SetWVMatrix(csReversibleTransform* wvmatrix)
+void csGLRender3D::SetObjectToCamera(csReversibleTransform* wvmatrix)
 {
-  glMatrixMode (GL_MODELVIEW);
+  GLfloat matrixholder[16];
+  const csMatrix3 &orientation = wvmatrix->GetO2T();
 
-  GLfloat m[16];
-  csVector3 c1 = wvmatrix->GetT2O ().Col1 ();
-  csVector3 c2 = wvmatrix->GetT2O ().Col2 ();
-  csVector3 c3 = wvmatrix->GetT2O ().Col3 ();
-  csVector3 o = wvmatrix->GetOrigin ();
-  m[ 0] = c1.x; m[ 1] = c2.x; m[ 2] = c3.x; m[3] = 0.0;
-  m[ 4] = c1.y; m[ 5] = c2.y; m[ 6] = c3.y; m[7] = 0.0;
-  m[ 8] = c1.z; m[ 9] = c2.z; m[10] = c3.z; m[11] = 0.0;
-  m[12] = o.x;  m[13] = o.y;  m[14] = o.z;  m[15] = 1.0;
-  
-  glLoadMatrixf (m);
+  matrixholder[0] = orientation.m11;
+  matrixholder[1] = orientation.m21;
+  matrixholder[2] = orientation.m31;
+
+  matrixholder[4] = orientation.m12;
+  matrixholder[5] = orientation.m22;
+  matrixholder[6] = orientation.m32;
+
+  matrixholder[8] = orientation.m13;
+  matrixholder[9] = orientation.m23;
+  matrixholder[10] = orientation.m33;
+
+  matrixholder[3] = matrixholder[7] = matrixholder[11] =
+  matrixholder[12] = matrixholder[13] = matrixholder[14] = 0.0;
+  matrixholder[15] = 1.0;
+
+  const csVector3 &translation = wvmatrix->GetO2TTranslation();
+
+  glMatrixMode (GL_MODELVIEW);
+  glLoadIdentity ();
+  glMultMatrixf (matrixholder);
+  glTranslatef (-translation.x, -translation.y, -translation.z);
 }
 
 void csGLRender3D::SetFOV(float fov)
@@ -269,11 +289,13 @@ void csGLRender3D::SetFOV(float fov)
 
 void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
 {
-
   csRef<iStreamSource> source = mymesh->GetStreamSource ();
-  csRef<iRenderBuffer> vertexbuf = source->GetBuffer (strings->Request ("vertices"));
-  csRef<iRenderBuffer> texcoordbuf = source->GetBuffer (strings->Request ("texture coordinates"));
-  csRef<iRenderBuffer> indexbuf = source->GetBuffer (strings->Request ("indices"));
+  csRef<iRenderBuffer> vertexbuf = 
+    source->GetBuffer (strings->Request ("vertices"));
+  csRef<iRenderBuffer> texcoordbuf = 
+    source->GetBuffer (strings->Request ("texture coordinates"));
+  csRef<iRenderBuffer> indexbuf = 
+    source->GetBuffer (strings->Request ("indices"));
 
   if (!vertexbuf)
     return;
@@ -291,26 +313,34 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
     txtcache->Cache (txthandle);
     csGLTextureHandle *gltxthandle = (csGLTextureHandle *)
 	    txthandle->GetPrivateObject ();
-    csTxtCacheData *cachedata = (csTxtCacheData *)gltxthandle->GetCacheData ();
+    csTxtCacheData *cachedata = 
+      (csTxtCacheData *)gltxthandle->GetCacheData ();
 
-    glBindTexture (GL_TEXTURE_2D, cachedata->Handle);
-    glEnable (GL_TEXTURE_2D);
-  } else glDisable (GL_TEXTURE_2D);
+    statecache->SetTexture (GL_TEXTURE_2D, cachedata->Handle);
+    statecache->EnableState (GL_TEXTURE_2D);
+  } else statecache->DisableState (GL_TEXTURE_2D);
 
 
   glColor3f (1,1,1);
-  glVertexPointer (3, GL_FLOAT, 0, (float*)vertexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER));
+  glVertexPointer (3, GL_FLOAT, 0, 
+    (float*)vertexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER));
   glEnableClientState (GL_VERTEX_ARRAY);
 
   if (texcoordbuf)
   {
-    glTexCoordPointer (2, GL_FLOAT, 0, (float*) texcoordbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER));
+    glTexCoordPointer (2, GL_FLOAT, 0, (float*) 
+      texcoordbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER));
     glEnableClientState (GL_TEXTURE_COORD_ARRAY);
   }
   /*glIndexPointer (GL_INT, 0, vertexbuf->GetUIntBuffer ());
   glEnableClientState (GL_INDEX_ARRAY);
   glDrawArrays (GL_TRIANGLES, 0, indexbuf->GetUIntLength ());*/
-  glDrawElements (GL_TRIANGLES, indexbuf->GetSize() / sizeof(unsigned int) , GL_UNSIGNED_INT, (unsigned int*)indexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER) );
+  glDrawElements (
+    GL_TRIANGLES,
+    mymesh->GetIndexEnd ()-mymesh->GetIndexStart (),
+    GL_UNSIGNED_INT,
+    ((unsigned int*)indexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER))
+    +mymesh->GetIndexStart ());
 
   vertexbuf->Release();
   indexbuf->Release();
