@@ -541,14 +541,19 @@ void Win32Assistant::Shutdown()
   {
     printf ("\nPress a key to close this window...");
     fflush (stdout);
-    HANDLE hConsole = GetStdHandle (STD_INPUT_HANDLE);
-    INPUT_RECORD ir;
-    DWORD events_read;
-    do 
+    HANDLE hConsole;
+    hConsole = CreateFile ("CONIN$", GENERIC_READ, FILE_SHARE_READ, 0, 
+      OPEN_EXISTING, 0, 0);
+    if (hConsole != 0)
     {
-      ReadConsoleInput (hConsole, &ir, 1, &events_read);
-    } while ((events_read == 0) || (ir.EventType != KEY_EVENT));
-    CloseHandle (hConsole);
+      INPUT_RECORD ir;
+      DWORD events_read;
+      do 
+      {
+	ReadConsoleInput (hConsole, &ir, 1, &events_read);
+      } while ((events_read == 0) || (ir.EventType != KEY_EVENT));
+      CloseHandle (hConsole);
+    }
   }
 }
 
