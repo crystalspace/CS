@@ -1,6 +1,7 @@
 .cvsignore
 *.dll
 *.exe
+*.log
 *.zip
 *.txt
 config.mak*
