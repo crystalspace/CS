@@ -38,7 +38,7 @@ endif
 INC.EXPLO = $(wildcard plugins/mesh/explo/object/*.h plugins/mesh/partgen/*.h)
 SRC.EXPLO = $(wildcard plugins/mesh/explo/object/*.cpp plugins/mesh/partgen/*.cpp)
 OBJ.EXPLO = $(addprefix $(OUT)/,$(notdir $(SRC.EXPLO:.cpp=$O)))
-DEP.EXPLO = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.EXPLO = CSTOOL CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += EXPLO
 DSP.EXPLO.NAME = explo

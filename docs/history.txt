@@ -26,12 +26,14 @@ The history order is reversed so that new features are at the top.
 	      Iterator::HasCurrent() instead of Iterator::HasNext()
 	      or Iterator::HasPrevious().  This is the only place where
 	      csList is used within the Crystal Space CVS code.
-	- Micah fixed some typos in the movie recorder HOWTO
+	- Micah fixed some typos in the movie recorder HOWTO.
 	- Matze did the following changes to the jambuild:
 	    - Added workarounds to make the system working with boostjam.
 	    - Completely reworked the documentation rules.
 	    - Fixed configure to only output Makefiles when run from top
 	      source directory.
+	- Fixed the makefiles of all particle systems. They need to link
+	  with cstool now. Also fixed the Jamfiles.
 15-Apr-2003
 	- Fixed a bug in the thing plugin.  If the dynavis culler was already
 	  mentioned before all other objects in the sector then this could

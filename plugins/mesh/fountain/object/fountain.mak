@@ -38,7 +38,7 @@ endif
 INC.FOUNTAIN = $(wildcard plugins/mesh/fountain/object/*.h plugins/mesh/partgen/*.h)
 SRC.FOUNTAIN = $(wildcard plugins/mesh/fountain/object/*.cpp plugins/mesh/partgen/*.cpp)
 OBJ.FOUNTAIN = $(addprefix $(OUT)/,$(notdir $(SRC.FOUNTAIN:.cpp=$O)))
-DEP.FOUNTAIN = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.FOUNTAIN = CSTOOL CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += FOUNTAIN
 DSP.FOUNTAIN.NAME = fountain
