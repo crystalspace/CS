@@ -42,8 +42,11 @@
 MSVC.PLUGINS.REQUIRED =         \
   apps/import/caltocs		\
   cscript/cspython              \
+  filesys/vfs			\
   font/server/freefnt2          \
   mesh/impexp/3ds               \
+  net/driver/socket		\
+  net/driver/ensocket		\
   physics/odedynam              \
   sound/driver/waveoutsd        \
   sound/loader/mod              \
@@ -55,5 +58,7 @@ MSVC.PLUGINS.REQUIRED =         \
   video/canvas/openglwin        \
   video/format/avi              \
   video/format/codecs/rle       \
+  video/loader/png		\
+  video/loader/jpg		\
   video/loader/jng              \
   video/renderer/opengl
