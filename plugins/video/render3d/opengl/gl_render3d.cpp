@@ -946,7 +946,8 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
   glTranslatef (viewwidth/2, viewheight/2, 0);
 
   GLfloat matrixholder[16];
-  for (int i = 0 ; i < 16 ; i++) matrixholder[i] = 0.0;
+  int i;
+  for (i = 0 ; i < 16 ; i++) matrixholder[i] = 0.0;
   matrixholder[0] = matrixholder[5] = 1.0;
   matrixholder[11] = 1.0/aspect;
   matrixholder[14] = -matrixholder[11];

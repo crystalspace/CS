@@ -22,6 +22,7 @@
 #define __CS_IVIDEO_SHADERVAR_H__
 
 #include "csutil/csstring.h"
+#include "iutil/string.h"
 
 struct iShaderVariable;
 

@@ -372,6 +372,7 @@ public:
 
     virtual csSome GetObject(const char* name);
   } scfiShaderRenderInterface;
+  friend class eiShaderRenderInterface;
 
   ////////////////////////////////////////////////////////////////////
   //                          iComponent
