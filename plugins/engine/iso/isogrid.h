@@ -68,6 +68,10 @@ public:
   /// get a cell from the grid
   iIsoCell *GetCell(int x, int y) const
   {
+    if(x<0) x=0;
+    else if(x >= width) x=width;
+    if(y<0) y=0;
+    else if(y >= height) y=height;
     CS_ASSERT (x >= 0 && x < width);
     CS_ASSERT (y >= 0 && y < height);
     return grid[y*width+x];
@@ -75,6 +79,10 @@ public:
   /// set a cell in the grid
   void SetCell(int x, int y, iIsoCell *val)
   {
+    if(x<0) x=0;
+    else if(x >= width) x=width;
+    if(y<0) y=0;
+    else if(y >= height) y=height;
     CS_ASSERT (x >= 0 && x < width);
     CS_ASSERT (y >= 0 && y < height);
     grid[y*width+x] = val;
