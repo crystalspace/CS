@@ -1444,7 +1444,7 @@ void csPolygon3D::InitLightMaps (csPolygonSet* owner, bool do_cache, int index)
     lmi->lightmap_up_to_date = false;
   }
   else if (!lmi->tex->lm->ReadFromCache (lmi->tex->w_orig, lmi->tex->h,
-    owner, this, index, csWorld::current_world))
+    owner, this, true, index, csWorld::current_world))
   {
     lmi->tex->InitLightMaps ();
     lmi->lightmap_up_to_date = true;

@@ -16,6 +16,33 @@ The history order has been reversed so that new features are at the top.
 	  the results in a few arrays.
 	- Fixed a bug in csString as reported by George Yohng
 	  <yohng@drivex.dosware.8m.com>.
+	- Got a new patch from Travis McIntosh. This patch finished
+	  pseudo-dynamic lighting for curved surfaces. Works nicely now.
+	- Update from Andrew Zabolotny:
+	    - Fixed the titlebar title that someone had broken for software
+	      renderer (the window heading used to be empty last week).
+	    - (Finally! :-) fixed the polygon clipper routines so that 2D
+	      sprites (and 3D sprites as well) are clipped in 2D correctly.
+	      The problem was not with the CS_VERTEX_INSIDE case, but with
+	      the fact that sometimes for some CS_VERTEX_ONEDGE vertices
+	      it used to generate incorrectly the 't' parametric value.
+	      More specifically, it happened when an edge was clipped more
+	      than once (against several clipper edges).
+	    - Fixed a bug in software renderer - all polygons were drawn
+	      one pixel up. E.g. with the default renderer view with a 2
+	      pixel border on each side it worked like 3 pixels border at
+	      bottom and 1 pixel border at top.
+	    - Implemented polygon drawing (clipped against other windows!)
+	      in CSWS. This is the first step towards implementing the
+	      solid view window.
+	    - Implemented a little bit of solid view window in MazeD. It
+	      is very limited and buggy for now, but thats a start. Texture
+	      mapping doesn't work (all vertices get u/v == 0) thus you
+	      will see strange colors for textured polygons. Flat-shaded
+	      polygons work.
+	    - Added a new random number generator class to csutil library.
+	      Currently it is unused but I'm going to use it in future,
+	      besides we can switch existing code from rand() to it.
 18-Jun-2000
 	- Norman Kramer fixed Squawk and csgame following the recent modifications
 	  in sprite creation.

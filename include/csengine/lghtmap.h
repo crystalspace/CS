@@ -30,6 +30,7 @@ class csLight;
 class csWorld;
 class Dumper;
 class csDelayedLightingInfo;
+class csObject;
 
 /**
  * This is a shadow-map for a pseudo-dynamic light.
@@ -254,7 +255,7 @@ public:
    * for identifying the lightmap on disk.
    */
   bool ReadFromCache (int w, int h, csPolygonSet* owner,
-    csPolygon3D* poly, int index, csWorld* world);
+    csObject* obj, bool isPolygon, int index, csWorld* world);
 
   /**
    * Cache the lightmaps in the precalculation area.

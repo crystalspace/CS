@@ -122,6 +122,9 @@ public:
   /// Get the parent template used for this curve.
   csCurveTemplate* GetParentTemplate () { return parent_template; }
 
+  /// Get the lightmap.
+  csLightMap* GetLightMap () { return lightmap; }
+
   /**
    * Tesselate this curve with the given resolution.
    * This function will allocated and return a csCurveTesselated object.

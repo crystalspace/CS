@@ -24,6 +24,7 @@
 #include "csengine/thing.h"
 #include "csengine/light.h"
 #include "csengine/world.h"
+#include "csengine/curve.h"
 #include "csutil/util.h"
 #include "ivfs.h"
 
@@ -219,7 +220,7 @@ void CacheName (char *buf, csPolygonSet *owner, int index, char *suffix)
 }
 
 bool csLightMap::ReadFromCache (int w, int h, csPolygonSet* owner,
-  csPolygon3D* poly, int index, csWorld* world)
+  csObject* obj, bool isPolygon, int index, csWorld* world)
 {
   char buf[200];
   PolySave ps;
@@ -227,6 +228,12 @@ bool csLightMap::ReadFromCache (int w, int h, csPolygonSet* owner,
   LightSave ls;
   csLight* light;
   int i;
+
+  csPolygon3D* poly = NULL;
+  
+  if (isPolygon)
+    poly = (csPolygon3D*)obj;
+
 
   SetSize (w, h);
 
@@ -309,12 +316,21 @@ bool csLightMap::ReadFromCache (int w, int h, csPolygonSet* owner,
     light = world->FindLight (ls.x, ls.y, ls.z, ls.dist);
     if (light)
     {
-      if (light->GetType () == csStatLight::Type && poly)
+      if (light->GetType () == csStatLight::Type && obj)
       {
         csStatLight* slight = (csStatLight*)light;
-        //@@@: is this cast neccessary or should I
-        //     put MakeDynamicDirty() in iLightMap
-        slight->RegisterLightMap ( (csLightMap *)( poly->GetLightMapInfo()->GetLightMap() ) ); 
+        // @@@: HACK!!! Curves and Polygon3Ds need a common base class which would
+        //      help this temporary hack out a lot
+        if (isPolygon)
+        {
+          //@@@: is this cast neccessary or should I
+          //     put MakeDynamicDirty() in iLightMap
+          slight->RegisterLightMap ( (csLightMap *)( ((csPolygon3D*)obj )->GetLightMapInfo()->GetLightMap() ) ); 
+        }
+        else
+        {
+          slight->RegisterLightMap ( ((csCurve*)obj )->GetLightMap() );
+        }
       }
       csShadowMap* smap = NewShadowMap (light, w, h);
       memcpy (smap->map, d, lm_size);
