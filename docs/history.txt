@@ -1,5 +1,9 @@
 he history order is reversed so that new features are at the top.
 
+18-Jan-2002
+	- Greatly enhanced and clarified the comments for the
+	  csTransform, csReversibleTransform, and csOrthoTransform classes
+	  in the reference manual.
 17-Jan-2002
 	- Jorge Acereda made the following changes:
 	    - Added a comment to iGraphics2D::Write() to document the

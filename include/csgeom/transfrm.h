@@ -64,40 +64,47 @@ public:
 
   /**
    * Get 'world' to 'this' translation. This is the vector V
-   * from the transform equation T=M*(O-V).
+   * from the transform equation T=M*(O-V). This is equivalent
+   * to calling GetOrigin().
    */
   inline const csVector3& GetO2TTranslation () const { return v_o2t; }
 
   /**
-   * Get origin of transformed coordinate system.
+   * Get origin of transformed coordinate system. This is equivalent
+   * to calling GetO2TTranslation().
    */
   inline const csVector3& GetOrigin () const { return v_o2t; }
 
   /**
    * Set 'other' to 'this' transformation matrix.
-   * this is the 3x3 matrix M from the transform equation T=M*(O-V).
+   * This is the 3x3 matrix M from the transform equation T=M*(O-V).
    */
   virtual void SetO2T (const csMatrix3& m) { m_o2t = m; }
 
   /**
    * Set 'world' to 'this' translation. This is the vector V
-   * from the transform equation T=M*(O-V).
+   * from the transform equation T=M*(O-V). This is equivalent to
+   * calling SetOrigin().
    */
   virtual void SetO2TTranslation (const csVector3& v) { v_o2t = v; }
 
   /**
-   * Set origin of transformed coordinate system.
+   * Set origin of transformed coordinate system. This is equivalent
+   * to calling SetO2TTranslation().
    */
   inline void SetOrigin (const csVector3& v) { SetO2TTranslation (v); }
 
   /**
    * Move the 'other' to 'this' translation by a specified amount.
+   * Basically this will add 'v' to the origin or translation of this
+   * transform so that the new transform looks like T=M*(O-(V+v)).
    */
   inline void Translate (const csVector3& v) { SetO2TTranslation (v_o2t + v); }
 
   /**
    * Transform vector in 'other' space v to a vector in 'this' space.
-   * This is the basic transform function.
+   * This is the basic transform function. This will calculate and return
+   * M*(v-V).
    */
   inline csVector3 Other2This (const csVector3& v) const
   {
@@ -106,26 +113,33 @@ public:
 
   /**
    * Convert vector v in 'other' space to a vector in 'this' space.
-   * Use the origin of 'other' space.
+   * Use the origin of 'other' space. This will calculate and return
+   * M*v (so the translation or V of this transform is ignored).
    */
   csVector3 Other2ThisRelative (const csVector3& v) const
   { return m_o2t * v; }
 
   /**
-   * Convert a plane in 'other' space to 'this' space.
+   * Convert a plane in 'other' space to 'this' space. If 'p' is expressed
+   * as (N,D) (with N a vector for the A,B,C components of 'p') then this will
+   * return a new plane which looks like (M*N,D+(M*N)*(M*V)).
    */
   csPlane3 Other2This (const csPlane3& p) const;
 
   /**
    * Convert a plane in 'other' space to 'this' space.
-   * This version ignores translation.
+   * This version ignores translation. If 'p' is expressed as (N,D) (with
+   * N a vector for the A,B,C components of 'p') then this will return a new
+   * plane which looks like (M*N,D).
    */
   csPlane3 Other2ThisRelative (const csPlane3& p) const;
 
   /**
    * Convert a plane in 'other' space to 'this' space. This is an optimized
    * version for which a point on the new plane is known (point). The result
-   * is stored in 'result'.
+   * is stored in 'result'. If 'p' is expressed as (N,D) (with N a vector
+   * for the A,B,C components of 'p') then this will return a new plane
+   * in 'result' which looks like (M*N,-(M*N)*point).
    */
   void Other2This (const csPlane3& p, const csVector3& point,
   	csPlane3& result) const;
@@ -136,33 +150,88 @@ public:
   csSphere Other2This (const csSphere& s) const;
 
   /**
-   * Apply a transformation to a 3D vector.
+   * Apply a transformation to a 3D vector. This corresponds exactly
+   * to calling t.Other2This (v).
    */
   friend csVector3 operator* (const csVector3& v, const csTransform& t);
 
-  /// Apply a transformation to a 3D vector.
+  /**
+   * Apply a transformation to a 3D vector. This corresponds exactly
+   * to calling t.Other2This (v).
+   */
   friend csVector3 operator* (const csTransform& t, const csVector3& v);
-  /// Apply a transformation to a 3D vector.
+
+  /**
+   * Apply a transformation to a 3D vector. This corresponds exactly
+   * to calling v = t.Other2This(v).
+   */
   friend csVector3& operator*= (csVector3& v, const csTransform& t);
-  /// Apply a transformation to a Plane.
+
+  /**
+   * Apply a transformation to a Plane. This corresponds exactly
+   * to calling t.Other2This(p).
+   */
   friend csPlane3 operator* (const csPlane3& p, const csTransform& t);
-  /// Apply a transformation to a Plane.
+
+  /**
+   * Apply a transformation to a Plane. This corresponds exactly
+   * to calling t.Other2This(p).
+   */
   friend csPlane3 operator* (const csTransform& t, const csPlane3& p);
-  /// Apply a transformation to a Plane.
+
+  /**
+   * Apply a transformation to a Plane. This corresponds exactly
+   * to calling p = t.Other2This(p).
+   */
   friend csPlane3& operator*= (csPlane3& p, const csTransform& t);
-  /// Apply a transformation to a sphere.
+
+  /**
+   * Apply a transformation to a sphere. This corresponds exactly
+   * to calling t.Other2This(p).
+   */
   friend csSphere operator* (const csSphere& p, const csTransform& t);
-  /// Apply a transformation to a sphere.
+
+  /**
+   * Apply a transformation to a sphere. This corresponds exactly
+   * to calling t.Other2This(p).
+   */
   friend csSphere operator* (const csTransform& t, const csSphere& p);
-  /// Apply a transformation to a sphere.
+
+  /**
+   * Apply a transformation to a sphere. This corresponds exactly
+   * to calling p = t.Other2This(p).
+   */
   friend csSphere& operator*= (csSphere& p, const csTransform& t);
-  /// Multiply a matrix with the transformation matrix.
+
+  /**
+   * Multiply a matrix with the transformation matrix. This will calculate
+   * and return m*M.
+   */
   friend csMatrix3 operator* (const csMatrix3& m, const csTransform& t);
-  /// Multiply a matrix with the transformation matrix.
+
+  /**
+   * Multiply a matrix with the transformation matrix. This will calculate
+   * and return M*m.
+   */
   friend csMatrix3 operator* (const csTransform& t, const csMatrix3& m);
-  /// Multiply a matrix with the transformation matrix.
+
+  /**
+   * Multiply a matrix with the transformation matrix.
+   * This corresponds exactly to m*=M.
+   */
   friend csMatrix3& operator*= (csMatrix3& m, const csTransform& t);
-  /// Combine two transforms, rightmost first.
+
+  /**
+   * Combine two transforms, rightmost first. Given the following
+   * definitions:
+   * <ul>
+   * <li>'t1' expressed as T=t1.M*(O-t1.V)
+   * <li>'t2' expressed as T=t2.M*(O-t2.V)
+   * <li>t2.Minv is the inverse of t2.M
+   * </ul>
+   * Then this will return a new transform
+   * T=(t1.M*t2.M)*(O-(t2.V+t2.Minv*t1.V)).
+   */
   friend csTransform operator* (const csTransform& t1,
                               const csReversibleTransform& t2);
 
@@ -215,16 +284,21 @@ public:
   csReversibleTransform (const csTransform& t) :
     csTransform (t) { m_t2o = m_o2t.GetInverse (); }
 
+  /**
+   * Initialize with the given transformation.
+   */
   csReversibleTransform (const csReversibleTransform& t) :
     csTransform (t) { m_t2o = t.m_t2o; }
 
-   /**
-   * Get 'this' to 'other' transformation matrix.
+  /**
+   * Get 'this' to 'other' transformation matrix. This corresponds
+   * to the inverse of M.
    */
   inline const csMatrix3& GetT2O () const { return m_t2o; }
 
   /**
-   * Get 'this' to 'other' translation.
+   * Get 'this' to 'other' translation. This will calculate
+   * and return -(M*V).
    */
   inline csVector3 GetT2OTranslation () const { return -m_o2t*v_o2t; }
 
@@ -236,45 +310,58 @@ public:
 
   /**
    * Set 'other' to 'this' transformation matrix.
+   * This is the 3x3 matrix M from the transform equation T=M*(O-V).
    */
   virtual void SetO2T (const csMatrix3& m) 
   { m_o2t = m;  m_t2o = m_o2t.GetInverse (); }
 
   /**
    * Set 'this' to 'other' transformation matrix.
+   * This is equivalent to SetO2T() except that you can now give the
+   * inverse matrix.
    */
   virtual void SetT2O (const csMatrix3& m) 
   { m_t2o = m;  m_o2t = m_t2o.GetInverse (); }
 
   /**
    * Convert vector v in 'this' space to 'other' space.
-   * This is the basic inverse transform operation.
+   * This is the basic inverse transform operation and it corresponds
+   * with the calculation of V+Minv*v (with Minv the inverse of M).
    */
   csVector3 This2Other (const csVector3& v) const
   { return v_o2t + m_t2o * v; }
 
   /**
    * Convert vector v in 'this' space to a vector in 'other' space,
-   * relative to local origin.
+   * relative to local origin. This calculates and returns
+   * Minv*v (with Minv the inverse of M).
    */
   inline csVector3 This2OtherRelative (const csVector3& v) const
   { return m_t2o * v; }
 
   /**
-   * Convert a plane in 'this' space to 'other' space.
+   * Convert a plane in 'this' space to 'other' space. If 'p' is expressed
+   * as (N,D) (with N a vector for the A,B,C components of 'p') then this will
+   * return a new plane which looks like (Minv*N,D-N*(M*V)) (with Minv
+   * the inverse of M).
    */
   csPlane3 This2Other (const csPlane3& p) const;
 
   /**
    * Convert a plane in 'this' space to 'other' space.
-   * This version ignores translation.
+   * This version ignores translation. If 'p' is expressed as (N,D) (with
+   * N a vector for the A,B,C components of 'p') then this will return a new
+   * plane which looks like (Minv*N,D) (with Minv the inverse of M).
    */
   csPlane3 This2OtherRelative (const csPlane3& p) const;
 
   /**
    * Convert a plane in 'this' space to 'other' space. This is an optimized
    * version for which a point on the new plane is known (point). The result
-   * is stored in 'result'.
+   * is stored in 'result'. If 'p' is expressed as (N,D) (with N a vector
+   * for the A,B,C components of 'p') then this will return a new
+   * plane which looks like (Minv*N,-(Minv*N)*point) (with Minv the inverse
+   * of M).
    */
   void This2Other (const csPlane3& p, const csVector3& point,
   	csPlane3& result) const;
@@ -286,50 +373,89 @@ public:
 
   /**
    * Rotate the transform by the angle (radians) around the given vector,
-   * in other coordinates.
-   * Note: this function rotates the transform, not the coordinate system.
+   * in other coordinates. Note: this function rotates the transform, not
+   * the coordinate system.
    */
   void RotateOther (const csVector3& v, float angle);
 
   /**
    * Rotate the transform by the angle (radians) around the given vector,
-   * in these coordinates.
-   * Note: this function rotates the tranform, not the coordinate system.
+   * in these coordinates. Note: this function rotates the tranform,
+   * not the coordinate system.
    */
   void RotateThis (const csVector3& v, float angle);
 
   /**
    * Use the given transformation matrix, in other space,
-   * to reorient the transformation.
-   * Note: this function rotates the transformation, not the coordinate system.
+   * to reorient the transformation. Note: this function rotates the
+   * transformation, not the coordinate system. This basically
+   * calculates Minv=m*Minv (with Minv the inverse of M). M will be
+   * calculated accordingly.
    */
   void RotateOther (const csMatrix3& m) { SetT2O (m * m_t2o); }
 
   /**
    * Use the given transformation matrix, in this space,
-   * to reorient the transformation.
-   * Note: this function rotates the transformation, not the coordinate system.
+   * to reorient the transformation. Note: this function rotates the
+   * transformation, not the coordinate system. This basically
+   * calculates Minv=Minv*m (with Minv the inverse of M). M will be
+   * calculated accordingly.
    */
   void RotateThis (const csMatrix3& m) { SetT2O (m_t2o * m); }
 
   /**
    * Let this transform look at the given (x,y,z) point, using up as
    * the up-vector. 'v' should be given relative to the position
-   * of the origin of this transform.
+   * of the origin of this transform. For example, if the transform is
+   * located at pos=(3,1,9) and you want it to look at location
+   * loc=(10,2,8) while keeping the orientation so that the up-vector is
+   * upwards then you can use: LookAt (loc-pos, csVector3 (0, 1, 0)).
    */
   void LookAt (const csVector3& v, const csVector3& up);
 
-  /// Reverse a transformation on a 3D vector.
-  friend csVector3 operator/ (const csVector3& v, const csReversibleTransform& t); 
-  /// Reverse a transformation on a 3D vector.
+  /**
+   * Reverse a transformation on a 3D vector. This corresponds exactly
+   * to calling t.This2Other(v).
+   */
+  friend csVector3 operator/ (const csVector3& v,
+  	const csReversibleTransform& t); 
+
+  /**
+   * Reverse a transformation on a 3D vector. This corresponds exactly
+   * to calling v=t.This2Other(v).
+   */
   friend csVector3& operator/= (csVector3& v, const csReversibleTransform& t); 
-  /// Reverse a transformation on a Plane.
+
+  /**
+   * Reverse a transformation on a Plane. This corresponds exactly
+   * to calling t.This2Other(p).
+   */
   friend csPlane3 operator/ (const csPlane3& p, const csReversibleTransform& t);
-  /// Reverse a transformation on a Plane.
+
+  /**
+   * Reverse a transformation on a Plane. This corresponds exactly to
+   * calling p = t.This2Other(p).
+   */
   friend csPlane3& operator/= (csPlane3& p, const csReversibleTransform& t);
-  /// Reverse a transformation on a sphere.
+
+  /**
+   * Reverse a transformation on a sphere. This corresponds exactly to
+   * calling t.This2Other(p).
+   */
   friend csSphere operator/ (const csSphere& p, const csReversibleTransform& t);
-  /// Combine two transforms, with the rightmost being applied first.
+
+  /**
+   * Combine two transforms, rightmost first. Given the following
+   * definitions:
+   * <ul>
+   * <li>'t1' expressed as T=t1.M*(O-t1.V)
+   * <li>'t2' expressed as T=t2.M*(O-t2.V)
+   * <li>t1.Minv is the inverse of t1.M
+   * <li>t2.Minv is the inverse of t2.M
+   * </ul>
+   * Then this will calculate a new transformation in 't1' as follows:
+   * T=(t1.M*t2.M)*(O-(t2.Minv*t1.V+t2.V)).
+   */
   friend csReversibleTransform& operator*= (csReversibleTransform& t1,
                                           const csReversibleTransform& t2)
   {
@@ -339,20 +465,68 @@ public:
     t1.m_t2o *= t1.m_t2o;
     return t1;
   }
-  /// Combine two transforms, with the rightmost being applied first.
+
+  /**
+   * Combine two transforms, rightmost first. Given the following
+   * definitions:
+   * <ul>
+   * <li>'t1' expressed as T=t1.M*(O-t1.V)
+   * <li>'t2' expressed as T=t2.M*(O-t2.V)
+   * <li>t1.Minv is the inverse of t1.M
+   * <li>t2.Minv is the inverse of t2.M
+   * </ul>
+   * Then this will calculate a new transformation in 't1' as follows:
+   * T=(t1.M*t2.M)*(O-(t2.Minv*t1.V+t2.V)).
+   */
   friend csReversibleTransform operator* (const csReversibleTransform& t1,
                                         const csReversibleTransform& t2)
   {
     return csReversibleTransform (t1.m_o2t*t2.m_o2t, t2.m_t2o*t1.m_t2o, 
                              t2.v_o2t + t2.m_t2o*t1.v_o2t); 
   }
-  /// Combine two transforms, with the rightmost being applied first.
+
+  /**
+   * Combine two transforms, rightmost first. Given the following
+   * definitions:
+   * <ul>
+   * <li>'t1' expressed as T=t1.M*(O-t1.V)
+   * <li>'t2' expressed as T=t2.M*(O-t2.V)
+   * <li>t1.Minv is the inverse of t1.M
+   * <li>t2.Minv is the inverse of t2.M
+   * </ul>
+   * Then this will calculate a new transformation in 't1' as follows:
+   * T=(t1.M*t2.M)*(O-(t2.Minv*t1.V+t2.V)).
+   */
   friend csTransform operator* (const csTransform& t1, 
                               const csReversibleTransform& t2);
-  /// Combine two transforms, reversing t2 then applying t1.
+
+  /**
+   * Combine two transforms, reversing t2 then applying t1.
+   * Given the following definitions:
+   * <ul>
+   * <li>'t1' expressed as T=t1.M*(O-t1.V)
+   * <li>'t2' expressed as T=t2.M*(O-t2.V)
+   * <li>t1.Minv is the inverse of t1.M
+   * <li>t2.Minv is the inverse of t2.M
+   * </ul>
+   * Then this will calculate a new transformation in 't1' as follows:
+   * T=(t1.M*t2.Minv)*(O-(t2.M*(t1.V-t2.V))).
+   */
   friend csReversibleTransform& operator/= (csReversibleTransform& t1,
                                           const csReversibleTransform& t2);
-  /// Combine two transforms, reversing t2 then applying t1.
+
+  /**
+   * Combine two transforms, reversing t2 then applying t1.
+   * Given the following definitions:
+   * <ul>
+   * <li>'t1' expressed as T=t1.M*(O-t1.V)
+   * <li>'t2' expressed as T=t2.M*(O-t2.V)
+   * <li>t1.Minv is the inverse of t1.M
+   * <li>t2.Minv is the inverse of t2.M
+   * </ul>
+   * Then this will calculate a new transformation in 't1' as follows:
+   * T=(t1.M*t2.Minv)*(O-(t2.M*(t1.V-t2.V))).
+   */
   friend csReversibleTransform operator/ (const csReversibleTransform& t1,
                                         const csReversibleTransform& t2);
 };
@@ -381,19 +555,25 @@ public:
    * Initialize with the given transformation.
    */
   csOrthoTransform (const csTransform& t) :
-    csReversibleTransform (t.GetO2T (), t.GetO2T ().GetTranspose (), t.GetO2TTranslation ()) { }
+    csReversibleTransform (t.GetO2T (), t.GetO2T ().GetTranspose (),
+    	t.GetO2TTranslation ())
+  { }
 
   /**
    * Set 'other' to 'this' transformation matrix.
+   * This is the 3x3 matrix M from the transform equation T=M*(O-V).
    */
   virtual void SetO2T (const csMatrix3& m) 
   { m_o2t = m;  m_t2o = m_o2t.GetTranspose (); }
 
   /**
    * Set 'this' to 'other' transformation matrix.
+   * This is equivalent to SetO2T() except that you can now give the
+   * inverse matrix.
    */
   virtual void SetT2O (const csMatrix3& m) 
   { m_t2o = m;  m_o2t = m_t2o.GetTranspose (); }
 };
 
 #endif // __CS_TRANSFORM_H__
+
