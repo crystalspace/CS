@@ -80,6 +80,13 @@ void csPolyTexture::SetMipmapSize (int mm)
   }
 }
 
+void csPolyTexture::SetLightMap (csLightMap* lightmap)
+{
+  if (lm) lm->DecRef ();
+  lm = lightmap;
+  if (lm) lm->IncRef ();
+}
+
 void csPolyTexture::CreateBoundingTextureBox ()
 {
   // First we compute the bounding box in 2D texture space (uv-space).

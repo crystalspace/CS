@@ -12,6 +12,11 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+7-Jan-2000
+	- Fixed colored static lighting for OpenGL and Direct3D.
+	- Some fixes on lightmap deallocation. Now use DecRef()
+	  consistently. Unfortunatelly this still doesn't seem to fix
+	  the 'pure virtual method call' at exit.
 6-Jan-2000
 	- Thomas Hieber added iterators for nodes and keys.
 	  Added simplified access to keys and node by name and classname.

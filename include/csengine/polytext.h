@@ -190,6 +190,13 @@ public:
    */
   void SetPolygon (csPolygon3D* p) { polygon = p; }
 
+  /**
+   * Set the lightmap for this polytexture (and call IncRef()
+   * on the lightmap). Can also be used to clear the reference
+   * to the lightmap if 'lightmap' is NULL.
+   */
+  void SetLightMap (csLightMap* lightmap);
+
   ///
   void SetMipmapLevel (int mm) { mipmap_level = mm; }
 

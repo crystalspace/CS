@@ -72,10 +72,10 @@ csLightMapped::csLightMapped () : csPolygonTextureType ()
 
 csLightMapped::~csLightMapped ()
 {
-  CHK (delete tex);
-  CHK (delete tex1);
-  CHK (delete tex2);
-  CHK (delete tex3);
+  if (tex) tex->DecRef ();
+  if (tex1) tex1->DecRef ();
+  if (tex2) tex2->DecRef ();
+  if (tex3) tex3->DecRef ();
   if (txt_plane) txt_plane->DecRef ();
 }
 
@@ -553,24 +553,26 @@ void csPolygon3D::Finish ()
     fatal_exit (0, false);
   }
   lmi->Setup (this, txtMM);
-  lmi->tex->lm = NULL;
-  lmi->tex1->lm = NULL;
-  lmi->tex2->lm = NULL;
-  lmi->tex3->lm = NULL;
+  lmi->tex->SetLightMap (NULL);
+  lmi->tex1->SetLightMap (NULL);
+  lmi->tex2->SetLightMap (NULL);
+  lmi->tex3->SetLightMap (NULL);
   if (portal)
     portal->SetTexture (txtMM->GetTextureHandle ());
 
   if (CheckFlags (CS_POLY_LIGHTING) && TEXW(lmi->tex)*TEXH(lmi->tex) < 1000000)
   {
-    CHK (lmi->tex->lm = new csLightMap ());
+    CHK (csLightMap* lm = new csLightMap ());
+    lmi->tex->SetLightMap (lm);
     int r, g, b;
     GetSector ()->GetAmbientColor (r, g, b);
     lmi->tex->lm->Alloc (TEXW(lmi->tex), TEXH(lmi->tex),
       def_mipmap_size, r, g, b);
     lmi->tex->SetMipmapSize (def_mipmap_size);
-    lmi->tex1->lm = lmi->tex->lm; lmi->tex->lm->IncRef ();
-    lmi->tex2->lm = lmi->tex->lm; lmi->tex->lm->IncRef ();
-    lmi->tex3->lm = lmi->tex->lm; lmi->tex->lm->IncRef ();
+    lmi->tex1->SetLightMap (lm);
+    lmi->tex2->SetLightMap (lm);
+    lmi->tex3->SetLightMap (lm);
+    lm->DecRef ();
   }
 }
 
@@ -607,9 +609,9 @@ void csPolygon3D::CreateLightMaps (iGraphics3D* g3d)
   int aspect = g3d->GetMaximumAspectRatio ();
 
   if (lmi->tex->lm) lmi->tex->lm->ConvertFor3dDriver (po2, aspect);
-  lmi->tex1->lm = lmi->tex->lm;
-  lmi->tex2->lm = lmi->tex->lm;
-  lmi->tex3->lm = lmi->tex->lm;
+  lmi->tex1->SetLightMap (lmi->tex->lm);
+  lmi->tex2->SetLightMap (lmi->tex->lm);
+  lmi->tex3->SetLightMap (lmi->tex->lm);
 }
 
 void csPolygon3D::SetTextureSpace (csPolyTxtPlane* txt_pl)
@@ -1596,8 +1598,9 @@ void csPolygon3D::UpdateLightMapSize ()
 
   if (CheckFlags (CS_POLY_LIGHTING) && TEXW(lmi->tex)*TEXH(lmi->tex) < 1000000)
   {
-    CHK (delete lmi->tex->lm);
-    CHK (lmi->tex->lm = new csLightMap ());
+    CHK (csLightMap* lm = new csLightMap ());
+    lmi->tex->SetLightMap (lm);
+    lm->DecRef ();
     int r, g, b;
     GetSector ()->GetAmbientColor (r, g, b);
     lmi->tex->lm->Alloc (TEXW(lmi->tex), TEXH(lmi->tex), def_mipmap_size,
