@@ -66,8 +66,12 @@ void SCANFUNC (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
   unsigned long shifter_h = Scan.shf_h;
   unsigned long ander_w = Scan.and_w;
   unsigned long ander_h = Scan.and_h;
+  #ifdef SCAN16
+  unsigned char *srcTex = (unsigned char *)Scan.tmap;
+  #else
   PIXTYPE *srcTex = (PIXTYPE *)Scan.tmap;
-# endif /*SCANMAP*/
+  #endif // SCAN16
+# endif // SCANMAP
   unsigned long *z_buffer = z_buf; (void)z_buffer;
   unsigned long *lastZbuf = z_buffer + xx-1; (void)lastZbuf;
   PIXTYPE *_destend;

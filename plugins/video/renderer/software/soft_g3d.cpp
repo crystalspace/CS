@@ -1286,7 +1286,6 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
     K3 = Q3              + Q4 * O;
   }
 
-
   // Select the right interpolation factor based on the z-slope of our
   // polygon. This will greatly increase the speed of polygons which are
   // horizontally constant in z.
