@@ -18,6 +18,10 @@ chronological order.
 	- Matt Reda changed the MacOS X OpenGL canvas to use a 32 bit depth 
 	  buffer (it was 16) and added 8 bit stencil and alpha buffers when 
 	  compiling for the new renderer
+	- Jorrit added a new csStringReader class to csutil. This class takes
+	  a const char* input buffer as input and will split that buffer
+	  in lines. You can then read the lines one by one. It will correctly
+	  read lines for both CR and CR/LF format.
 24-Mar-2004
 	- Jorrit extended the standard output console so that it now also
 	  supports setting of the font through the config file. Added
