@@ -1058,7 +1058,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("Various:");
     CONPRI("  coordsave coordload bind p_alpha s_fog");
     CONPRI("  snd_play snd_volume record play clrrec saverec");
-    CONPRI("  loadrec action plugins conflist confset");
+    CONPRI("  loadrec action plugins conflist confset do_logo");
 
 #   undef CONPRI
   }
@@ -1343,6 +1343,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     	"crystalspace.utilities.bugplug");
     plug->IncRef ();	// Avoid smart pointer release (@@@)
   }
+  else if (!strcasecmp (cmd, "do_logo"))
+    csCommandProcessor::change_boolean (arg, &Sys->do_logo, "do_logo");
   else if (!strcasecmp (cmd, "do_gravity"))
     csCommandProcessor::change_boolean (arg, &Sys->do_gravity, "do_gravity");
   else if (!strcasecmp (cmd, "inverse_mouse"))
