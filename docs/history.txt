@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+13-Sep-2003
+	- Jorrit cleaned up the shadermanager. Also fixed a small bug in the
+	  registration of the event handler where it would use || to combine
+	  two masks instead of |. Additionally removed some warnings.
 12-Sep-2003
 	- Jorrit moved the progressive LOD calculation classes from sprite3d
 	  to csgeom.

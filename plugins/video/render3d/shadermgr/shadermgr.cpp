@@ -53,31 +53,31 @@
 // Pluginstuff
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE( csShaderManager )
-  SCF_IMPLEMENTS_INTERFACE( iShaderManager )
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE( iComponent )
+SCF_IMPLEMENT_IBASE (csShaderManager)
+  SCF_IMPLEMENTS_INTERFACE (iShaderManager)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE( csShaderManager::Component )
-  SCF_IMPLEMENTS_INTERFACE( iComponent )
+SCF_IMPLEMENT_EMBEDDED_IBASE (csShaderManager::Component)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csShaderManager::EventHandler)
-SCF_IMPLEMENTS_INTERFACE (iEventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csShaderManager)
 
-SCF_IMPLEMENT_IBASE( csShader )
-  SCF_IMPLEMENTS_INTERFACE( iShader )
+SCF_IMPLEMENT_IBASE (csShader)
+  SCF_IMPLEMENTS_INTERFACE (iShader)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_IBASE( csShaderTechnique )
-  SCF_IMPLEMENTS_INTERFACE( iShaderTechnique )
+SCF_IMPLEMENT_IBASE (csShaderTechnique)
+  SCF_IMPLEMENTS_INTERFACE (iShaderTechnique)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_IBASE( csShaderPass )
-  SCF_IMPLEMENTS_INTERFACE( iShaderPass )
+SCF_IMPLEMENT_IBASE (csShaderPass)
+  SCF_IMPLEMENTS_INTERFACE (iShaderPass)
 SCF_IMPLEMENT_IBASE_END
 
 //=================== csShaderWrapper ================//
@@ -91,8 +91,8 @@ SCF_IMPLEMENT_IBASE_END
 // General stuff
 csShaderManager::csShaderManager(iBase* parent)
 {
-  SCF_CONSTRUCT_IBASE( parent );
-  SCF_CONSTRUCT_EMBEDDED_IBASE( scfiComponent );
+  SCF_CONSTRUCT_IBASE(parent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   scfiEventHandler = 0;
 
   seqnumber = 0;
@@ -122,34 +122,36 @@ void csShaderManager::Report (int severity, const char* msg, ...)
 bool csShaderManager::Initialize(iObjectRegistry *objreg)
 {
   objectreg = objreg;
-  vc = CS_QUERY_REGISTRY(objectreg, iVirtualClock);
-  txtmgr = CS_QUERY_REGISTRY(objectreg, iTextureManager);
+  vc = CS_QUERY_REGISTRY (objectreg, iVirtualClock);
+  txtmgr = CS_QUERY_REGISTRY (objectreg, iTextureManager);
 
   if (!scfiEventHandler)
     scfiEventHandler = new EventHandler (this);
 
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY(objectreg, iEventQueue));
+  csRef<iEventQueue> q = CS_QUERY_REGISTRY (objectreg, iEventQueue);
   if (q)
-    q->RegisterListener (scfiEventHandler, CSMASK_Broadcast || CSMASK_FrameProcess  );
+    q->RegisterListener (scfiEventHandler,
+	CSMASK_Broadcast | CSMASK_FrameProcess);
 
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY(objectreg, iPluginManager);
+  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY  (objectreg,
+	iPluginManager);
 
-  csRef<iStringArray> classlist (csPtr<iStringArray> 
-    (iSCF::SCF->QueryClassList("crystalspace.graphics3d.shader.")));
+  csRef<iStringArray> classlist = csPtr<iStringArray> 
+    (iSCF::SCF->QueryClassList("crystalspace.graphics3d.shader."));
   int const nmatches = classlist->Length();
-  if(nmatches != 0)
+  if (nmatches != 0)
   {
     int i;
-    for(i = 0; i < nmatches; ++i)
+    for (i = 0; i < nmatches; ++i)
     {
       const char* classname = classlist->Get(i);
       csRef<iShaderProgramPlugin> plugin = 
 	CS_LOAD_PLUGIN (plugin_mgr, classname, iShaderProgramPlugin);
-      if(plugin)
+      if (plugin)
       {
         Report (CS_REPORTER_SEVERITY_NOTIFY, "Loaded plugin %s", classname);
-        pluginlist.Push(plugin);
-        plugin->Open();
+        pluginlist.Push (plugin);
+        plugin->Open ();
       }
     }
   }
@@ -167,7 +169,7 @@ bool csShaderManager::HandleEvent(iEvent& event)
   {
     switch(event.Command.Code)
     {
-    case cscmdPreProcess:
+      case cscmdPreProcess:
 //      UpdateStandardVariables();
       return false;
     }
@@ -209,10 +211,10 @@ csPtr<iShaderProgram> csShaderManager::CreateShaderProgram(const char* type)
 
   if(!type) return 0;
 
-  for(i = 0; i < pluginlist.Length(); ++i)
+  for (i = 0; i < pluginlist.Length(); ++i)
   {
-    if( ((iShaderProgramPlugin*)pluginlist.Get(i))->SupportType(type))
-      return ((iShaderProgramPlugin*)pluginlist.Get(i))->CreateProgram(type);
+    if (pluginlist.Get(i)->SupportType(type))
+      return pluginlist.Get(i)->CreateProgram(type);
   }
   return 0;
 }
@@ -227,7 +229,7 @@ void csShaderManager::PrepareShaders ()
 
 
 //===================== csShader ====================//
-csShader::csShader(csShaderManager* owner, iObjectRegistry* reg)
+csShader::csShader (csShaderManager* owner, iObjectRegistry* reg)
 {
   SCF_CONSTRUCT_IBASE( 0 );
   this->name = 0;
@@ -239,7 +241,8 @@ csShader::csShader(csShaderManager* owner, iObjectRegistry* reg)
   symtabs.SetLength (1, csSymbolTable());
 }
 
-csShader::csShader(const char* name, csShaderManager* owner, iObjectRegistry* reg)
+csShader::csShader (const char* name, csShaderManager* owner,
+	iObjectRegistry* reg)
 {
   SCF_CONSTRUCT_IBASE( 0 );
   csShader::name = 0;
@@ -258,9 +261,9 @@ csShader::~csShader()
   delete name;
 
   //Clear variables
-  csGlobalHashIterator cIter( variables);
+  csGlobalHashIterator cIter (variables);
 
-  while(cIter.HasNext() )
+  while (cIter.HasNext())
   {
     csShaderVariable* i = (csShaderVariable*)cIter.Next();
     i->DecRef();
@@ -269,7 +272,7 @@ csShader::~csShader()
   variables->DeleteAll();
   delete variables;
 
-  while(techniques->Length() > 0)
+  while (techniques->Length() > 0)
   {
     delete (csShaderTechnique*)techniques->Pop();
   }
@@ -288,19 +291,18 @@ bool csShader::IsValid() const
   return false;
 }
 
-csShaderVariable* csShader::privateGetVariable(int namehash)
+csShaderVariable* csShader::privateGetVariable (int namehash)
 {
   csShaderVariable* var;
   csHashIterator cIter(variables, namehash);
 
-  if( cIter.HasNext() )
+  if (cIter.HasNext())
   {
     var = (csShaderVariable*)cIter.Next();
-
     return var;
   }
 
-  if(parent)
+  if (parent)
   {
     return parent->privateGetVariable (namehash);
   }
@@ -311,7 +313,7 @@ csShaderVariable* csShader::privateGetVariable(int namehash)
 //technique-related
 csPtr<iShaderTechnique> csShader::CreateTechnique()
 {
-  iShaderTechnique* mytech = new csShaderTechnique(this, objectreg);
+  iShaderTechnique* mytech = new csShaderTechnique (this, objectreg);
   mytech->IncRef();
 
   techniques->Push(mytech);
@@ -546,8 +548,8 @@ void csShaderPass::SetupState (csRenderMesh *mesh)
   }
   g3d->SetBufferState (attribs, buffers, STREAMMAX*2);
 
-  iMaterialHandle* mathandle =
-    (mesh->material) ? (mesh->material->GetMaterialHandle()) : 0;
+  //iMaterialHandle* mathandle =
+    //(mesh->material) ? (mesh->material->GetMaterialHandle()) : 0;
 
   memset (textures, 0, sizeof (iTextureHandle*)*TEXMAX);
   for (i=0; i<TEXMAX; i++)
@@ -602,7 +604,7 @@ void csShaderPass::AddStreamMapping (csStringID name, csVertexAttrib attribute)
 csStringID csShaderPass::GetStreamMapping (csVertexAttrib attribute) const
 {
   int a = attribute<100?attribute:attribute-100;
-  csStringID s = streammapping[a];
+  //csStringID s = streammapping[a];
   if ((attribute<100 && streammappinggeneric[a]) ||
       (attribute>=100 && !streammappinggeneric[a]))
     return streammapping[a];
@@ -942,7 +944,8 @@ bool csShaderTechnique::Load (iDocumentNode* node)
 
   BuildTokenHash();
 
-  csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY(objectreg, iShaderManager);
+  csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY (objectreg,
+	iShaderManager);
   csRef<iStringSet> strings = 
     CS_QUERY_REGISTRY_TAG_INTERFACE (objectreg, 
     "crystalspace.renderer.stringset", iStringSet);
@@ -952,7 +955,7 @@ bool csShaderTechnique::Load (iDocumentNode* node)
     priority = node->GetAttributeValueAsInt("priority");
     SetPriority(priority);
     csRef<iDocumentNodeIterator> it = node->GetNodes ();
-    while(it->HasNext())
+    while (it->HasNext())
     {
       csRef<iDocumentNode> child = it->Next();
       if(child->GetType() != CS_NODE_ELEMENT) continue;
@@ -960,49 +963,50 @@ bool csShaderTechnique::Load (iDocumentNode* node)
       csStringID id = xmltokens.Request (value);
       switch(id)
       {
-      case XMLTOKEN_PASS:
-        {
-          csRef<iShaderPass> pass = CreatePass();
-          pass->Load(child);
-		  // CreatePass already pushes this
-          // passes->Push(pass);
-        }
-        break;
-      case XMLTOKEN_DECLARE:
-        {
-          //create a new variable
-          csRef<csShaderVariable> var = 
-            shadermgr->CreateVariable (
-            strings->Request(child->GetAttributeValue ("name")));
-
-          // @@@ Will leak! Should do proper refcounting.
-          var->IncRef ();
-
-          csStringID idtype = xmltokens.Request( child->GetAttributeValue("type") );
-          idtype -= 100;
-          var->SetType( (csShaderVariable::VariableType) idtype);
-          switch(idtype)
+        case XMLTOKEN_PASS:
           {
-          case csShaderVariable::INT:
-            var->SetValue( child->GetAttributeValueAsInt("default") );
-            break;
-          case csShaderVariable::FLOAT:
-            var->SetValue( child->GetAttributeValueAsFloat("default") );
-            break;
-          case csShaderVariable::STRING:
-            var->SetValue(new scfString( child->GetAttributeValue("default")) );
-            break;
-          case csShaderVariable::VECTOR3:
-            const char* def = child->GetAttributeValue("default");
-            csVector3 v;
-            sscanf(def, "%f,%f,%f", &v.x, &v.y, &v.z);
-            var->SetValue( v );
-            break;
+            csRef<iShaderPass> pass = CreatePass();
+            pass->Load(child);
+		    // CreatePass already pushes this
+            // passes->Push(pass);
           }
-          AddVariable (var);
-        }
-        break;
-    }
+          break;
+        case XMLTOKEN_DECLARE:
+          {
+            //create a new variable
+            csRef<csShaderVariable> var = shadermgr->CreateVariable (
+              strings->Request(child->GetAttributeValue ("name")));
+
+            // @@@ Will leak! Should do proper refcounting.
+            var->IncRef ();
+
+            csStringID idtype = xmltokens.Request (
+			child->GetAttributeValue("type") );
+            idtype -= 100;
+            var->SetType ((csShaderVariable::VariableType) idtype);
+            switch(idtype)
+            {
+              case csShaderVariable::INT:
+                var->SetValue (child->GetAttributeValueAsInt("default"));
+                break;
+              case csShaderVariable::FLOAT:
+                var->SetValue (child->GetAttributeValueAsFloat("default"));
+                break;
+              case csShaderVariable::STRING:
+                var->SetValue (new scfString (
+			child->GetAttributeValue("default")));
+                break;
+              case csShaderVariable::VECTOR3:
+                const char* def = child->GetAttributeValue("default");
+                csVector3 v;
+                sscanf(def, "%f,%f,%f", &v.x, &v.y, &v.z);
+                var->SetValue( v );
+                break;
+            }
+            AddVariable (var);
+          }
+          break;
+      }
     }
   }
   return true;
@@ -1015,10 +1019,10 @@ bool csShaderTechnique::Load(iDataBuffer* program)
 
 bool csShaderTechnique::Prepare()
 {
-  for(int i = 0; i < passes->Length(); ++i)
+  for (int i = 0; i < passes->Length(); ++i)
   {
     iShaderPass* p = passes->Get(i);
-    if(!p->Prepare())
+    if (!p->Prepare())
       return false;
   }
   return true;
@@ -1027,3 +1031,4 @@ bool csShaderTechnique::Prepare()
 //@@@: What's the point of #undef'ing these? It's the end of the file!
 #undef STREAMMAX
 #undef TEXTUREMAX
+
