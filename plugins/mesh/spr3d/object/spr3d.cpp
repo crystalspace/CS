@@ -1282,21 +1282,9 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
             if (socket)
             {
               // Get the index of the triange at that spot
-              //static int c = 0;
-              //static int delay = 0;
               int tri_index = socket->GetTriangleIndex();
-              //int tri_index = c;
               csTriangle& tri = sof->GetTriangles()[tri_index];
-              //delay++;
-              //if (delay == 25)
-              //{
-              //  c++;
-              //  if (c == 1000) c = 0;
-              //  delay = 0;
-              //}
-              //printf("%d\n", c);
-
-              // Get the verts for the current frame
+              
               // This cast is crummy, but the only way to get at it.
               csSprite3DMeshObject *cs = 
                 (csSprite3DMeshObject *)parent->GetMeshObject();
@@ -1335,8 +1323,6 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
                 float parent_tween_ratio = cs->GetTweenRatio();
                 float remainder = 1 - parent_tween_ratio;
     
-                //printf("tween: %f %f", parent_tween_ratio, remainder);
-
                 // Lets look at the tween ratio also... Maybe this is the glitch
                 spot_verts[0] = 
                   parent_tween_ratio * next_verts[tri.a] + 
@@ -1351,8 +1337,6 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
                   remainder * current_verts[tri.c];
   
               
-                //printf(" s: %f %f %f", spot_verts[0], spot_verts[1], spot_verts[2]);
-              
                 // Create the center of the triangle for translation
                 center = 
                   (spot_verts[0] + spot_verts[1] + spot_verts[2]) / 3;
@@ -1361,21 +1345,11 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
               // Get the normal to this triangle based on the verts
               csVector3 ab = spot_verts[1] - spot_verts[0];
               csVector3 bc = spot_verts[2] - spot_verts[1];
-
               csVector3 normal = ab % bc;
-              //normal.Normalize();
               
-              // This is a transform that should be done 
-              // in the object itself
-              csMatrix3 m; m.Identity();
-              m *= csXRotMatrix3(-PI/2);
-              
-              
-              // Get any transforms built into the object
               csReversibleTransform trans = movable->GetFullTransform();
               trans.SetOrigin(center);
               trans.LookAt(normal, csVector3(0,1,0));
-              trans.RotateThis(m);
               movable->SetTransform(trans);
               movable->UpdateMove();
               
