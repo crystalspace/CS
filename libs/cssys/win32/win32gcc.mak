@@ -69,9 +69,6 @@ LIBS.SOCKET.SYSTEM=$(LFLAGS.l)wsock32
 # Sound library
 LIBS.SOUND.SYSTEM=$(LFLAGS.l)dsound $(LFLAGS.l)winmm
 
-# Python library
-LIBS.CSPYTHON.SYSTEM=$(LFLAGS.l)python15
-
 # Lua library
 LIBS.CSLUA.SYSTEM=$(LFLAGS.l)lua $(LFLAGS.l)lualib
 
@@ -83,8 +80,8 @@ SOUND_LIBS=
 
 # Indicate where special include files can be found.
 # for instance where your dx includes are
-CFLAGS.INCLUDE=$(CFLAGS.I)/usr/include/directx
-# $(CFLAGS.I)/dx7asdk/dxf/include
+CFLAGS.INCLUDE=$(CFLAGS.I)/usr/include/directx 
+#	$(CFLAGS.I)/dx7asdk/dxf/include
 
 # General flags for the compiler which are used in any case.
 CFLAGS.GENERAL=-Wall -Wno-unknown-pragmas $(CFLAGS.SYSTEM) $(CSTHREAD.CFLAGS) -pipe
@@ -130,7 +127,9 @@ DFLAGS.optimize = -s
 DFLAGS.debug = -g3
 
 # Flags for the linker which are used when building a shared library.
-LFLAGS.DLL=$(DFLAGS.$(MODE)) -q --no-export-all-symbols --dllname $*
+#was
+#LFLAGS.DLL=$(DFLAGS.$(MODE)) -q --no-export-all-symbols --dllname $*
+LFLAGS.DLL=$(DFLAGS.$(MODE)) -shared
 
 # Typical extension for objects and static libraries
 LIB=.a
@@ -192,12 +191,10 @@ else
 endif
 
 # How to make shared libs for cs-config
-LINK.PLUGIN=dllwrap
+LINK.PLUGIN=$(LINK)
 PLUGIN.POSTFLAGS=-mwindows -mconsole
 
 # How to make a shared AKA dynamic library
-
-DLLWRAPWRAP = $(RUN_SCRIPT) libs/cssys/win32/dllwrapwrap.sh
 
 ifeq ($(MODE),debug)
 	RCFLAGS=-DCS_DEBUG
@@ -216,12 +213,9 @@ DO.SHARED.PLUGIN.CORE = \
     $(OUT)/$(@:$(DLL)=-version.rc) $($@.WINRSRC) $(COMMAND_DELIM) \
   $(COMPILE_RES) -i $(OUT)/$(@:$(DLL)=-rsrc.rc) \
     -o $(OUT)/$(@:$(DLL)=-rsrc.o) $(COMMAND_DELIM) \
-  $(DLLWRAPWRAP) $* $(LFLAGS.DLL) $(LFLAGS.@) $(^^) \
-    $(OUT)/$(@:$(DLL)=-rsrc.o) $(L^) $(LIBS) $(LFLAGS) --driver-name=$(LINK) \
+  $(LINK.PLUGIN) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) \
+    $(OUT)/$(@:$(DLL)=-rsrc.o) $(L^) $(LIBS) $(LFLAGS) \
     -mwindows
-#DO.SHARED.PLUGIN.CORE = \
-#  $(DLLWRAPWRAP) $* $(LFLAGS.DLL) $(LFLAGS.@) $(^^) \
-#    $(L^) $(LIBS) $(LFLAGS) -mwindows
 
 # Commenting out the following line will make the -noconsole option work
 # but the only way to redirect output will be WITH -noconsole (wacky :-)
@@ -237,6 +231,7 @@ DO.LINK.EXE = \
 	  -o $(OUT)/$(@:$(EXE)=-rsrc.o) $(COMMAND_DELIM) \
 	$(LINK) $(LFLAGS) $(LFLAGS.EXE) $(LFLAGS.@) $(^^) \
 	  $(OUT)/$(@:$(EXE)=-rsrc.o) $(L^) $(LIBS) $(LIBS.EXE.PLATFORM)
+
 DO.LINK.CONSOLE.EXE = $(DO.LINK.EXE)
 
 endif # ifeq ($(MAKESECTION),postdefines)
