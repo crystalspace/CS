@@ -179,7 +179,7 @@ awsTextBox::OnDraw(csRect clip)
   if (text && text->Length())
   {     
     int tw, th, tx, ty, mcc;
-    iString *saved;
+    iString *saved=NULL;
 
     if (should_mask && maskchar)
     {

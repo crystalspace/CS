@@ -5,6 +5,7 @@
 #include "awsfparm.h"
 #include "iutil/event.h"
 #include "csutil/scfstr.h"
+#include "aws/iawsdefs.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -12,9 +13,8 @@
 const bool AWS_COMP_DEBUG=false;
 
 
-awsComponent::awsComponent():wmgr(NULL), win(NULL), parent(NULL), children(NULL), signalsrc(this)
-{
-  hidden = true; // initially set it hidden to cause the marking of a dirty rectangle upon first Show ()
+awsComponent::awsComponent():wmgr(NULL), win(NULL), parent(NULL), children(NULL), flags(0), signalsrc(this)
+{  
 }
 
 awsComponent::~awsComponent()
@@ -48,7 +48,23 @@ awsComponent::Type()
 
 bool 
 awsComponent::isHidden()
-{ return hidden; }
+{ return Flags() & AWSF_CMP_HIDDEN; }
+
+void 
+awsComponent::SetFlag(unsigned int flag)
+{
+ flags |= flag;
+}
+
+void 
+awsComponent::ClearFlag(unsigned int flag)
+{
+ flags &= (~flag);
+}
+
+unsigned int
+awsComponent::Flags()
+{ return flags; }
 
 unsigned long 
 awsComponent::GetID()
@@ -307,10 +323,10 @@ awsComponent::GetChildAt(int i)
 void 
 awsComponent::Hide()
 {
-  if (hidden) return;
+  if (Flags()&AWSF_CMP_HIDDEN) return;
   else 
   {
-    hidden=true;
+    SetFlag(AWSF_CMP_HIDDEN);
     WindowManager()->Mark(Frame());
   }
 }
@@ -318,10 +334,10 @@ awsComponent::Hide()
 void 
 awsComponent::Show()
 {
-  if (!hidden) return;
+  if (!(Flags()&AWSF_CMP_HIDDEN)) return;
   else 
   {
-    hidden=false;
+    ClearFlag(AWSF_CMP_HIDDEN);
     WindowManager()->Mark(Frame());
   }
 }

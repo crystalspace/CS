@@ -19,7 +19,9 @@ const int awsLabel::alignCenter=0x2;
 
 awsLabel::awsLabel():is_down(false), mouse_is_over(false), alignment(0), 
                      caption(NULL)
-{ }
+{
+  SetFlag(AWSF_CMP_ALWAYSERASE);
+}
 
 awsLabel::~awsLabel()
 { }

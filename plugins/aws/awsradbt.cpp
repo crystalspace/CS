@@ -26,6 +26,7 @@ awsRadButton::awsRadButton():is_down(false), mouse_is_over(false),
                              caption(NULL)
 {
   tex[0]=tex[1]=tex[2]=tex[3]=NULL;
+  SetFlag(AWSF_CMP_ALWAYSERASE);
 }
 
 awsRadButton::~awsRadButton()

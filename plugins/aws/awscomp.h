@@ -18,6 +18,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
 #include "aws/iaws.h"
+#include "aws/iawsdefs.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csgeom/csrect.h"
@@ -67,8 +68,8 @@ class awsComponent : public iAwsComponent
    /// Every component will have a name, which is translated to an id
    unsigned long id;
 
-   /// True if the component is hidden, else false.
-   bool hidden;
+   /// 32 bits worth of flags, like hidden, transparent, etc.
+   unsigned int flags;
 
    /// Embedded awsSource
    awsSource signalsrc;
@@ -122,6 +123,15 @@ public:
 
     /// Returns the named TYPE of the component, like "Radio Button", etc.
     virtual char *Type();
+
+    /// Sets the flag (can handle multiple simultaneous sets)
+    virtual void SetFlag(unsigned int flag);
+
+    /// Clears the flag (can handle multiple simultaneous clears)
+    virtual void ClearFlag(unsigned int flag);
+
+    /// Returns the current state of the flags
+    virtual unsigned int Flags();
 
     /// Returns true if this window overlaps the given rect.
     virtual bool Overlaps(csRect &r);

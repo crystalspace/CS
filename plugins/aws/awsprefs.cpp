@@ -15,7 +15,7 @@ extern int awsparse(void *prefscont);
 extern FILE *awsin;
 
 const bool DEBUG_KEYS = false;
-const bool DEBUG_INIT = true;
+const bool DEBUG_INIT = false;
 
 /// The gradient step for the slightly darker and lighter versions of the highlight and shadow.
 const unsigned char GRADIENT_STEP=25;
@@ -442,11 +442,11 @@ awsPrefManager::GetRect(awsComponentNode *node, char *name, csRect &val)
 {
    if (!node) return false;
    
-   printf("aws-debug: Getting \"%s\" from %p\n", name, node);
+   if (DEBUG_KEYS) printf("aws-debug: Getting \"%s\" from %p\n", name, node);
    
    awsKey *k = ((awsKeyContainer *)node)->Find(NameToId(name));
 
-   printf("aws-debug: Node retrieved: %p [%s]\n", node, name);
+   if (DEBUG_KEYS) printf("aws-debug: Node retrieved: %p [%s]\n", node, name);
    
     if (k)
     {

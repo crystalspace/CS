@@ -5,6 +5,8 @@
 #include "ivideo/fontserv.h"
 #include "iutil/event.h"
 #include "csutil/scfstr.h"
+#include "csutil/snprintf.h"
+#include "aws/iawsdefs.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -41,9 +43,10 @@ awsWindow::awsWindow():above(NULL), below(NULL),
   resizing_mode(false), moving_mode(false), 
   minp(50,5, 50+13, 5+11), maxp(34,5, 34+13, 5+11), closep(18,5, 18+13,5+11),
   min_down(false), max_down(false), close_down(false),
-  is_zoomed(false), is_minimized(false)
+  is_zoomed(false), is_minimized(false), todraw_dirty(true)
 {
-
+  // Window start off hidden.
+  SetFlag(AWSF_CMP_HIDDEN);
 }
 
 awsWindow::~awsWindow()
@@ -115,7 +118,7 @@ awsWindow::Setup(iAws *_wmgr, awsComponentNode *settings)
   closep.xmax=Frame().xmax-closep.xmax;
   closep.ymin=Frame().ymin+closep.ymin;
   closep.ymax=Frame().ymin+closep.ymax;
-   
+
   return true;
 }
 
@@ -519,6 +522,7 @@ awsWindow::OnMouseMove(int button, int x, int y)
     WindowManager()->Mark(dirty2);
 
     WindowManager()->InvalidateUpdateStore();
+    todraw_dirty=true;
   }
   return false;
 }
@@ -623,6 +627,21 @@ awsWindow::OnDraw(csRect clip)
 //int white = WindowManager()->GetPrefMgr()->GetColor(AC_WHITE);
 
   int tw, th, toff, btw, bth;
+  int i;
+
+  if (todraw_dirty)
+  {
+    todraw_dirty=false;
+
+    todraw.makeEmpty();
+    todraw.Include(Frame());
+    
+    for(i=0; i<GetChildCount(); ++i)
+    {
+      if (!(GetChildAt(i)->Flags() & AWSF_CMP_ALWAYSERASE))
+      todraw.Exclude(GetChildAt(i)->Frame());
+    }
+  }
 
   // Get the size of the text
   WindowManager()->GetPrefMgr()->GetDefaultFont()->GetMaxSize(tw, th);
@@ -644,11 +663,16 @@ awsWindow::OnDraw(csRect clip)
   case fsNormal:
     // Draw the solid fill (or texture)
     if (frame_options & foBeveledBorder)
-    {
-      if (btxt==NULL)
-        g2d->DrawBox(Frame().xmin+2, Frame().ymin+2, Frame().xmax-Frame().xmin-2, Frame().ymax-Frame().ymin-2, fill);
-      else
-        g3d->DrawPixmap(btxt, Frame().xmin+2, Frame().ymin+2, Frame().xmax-Frame().xmin-2, Frame().ymax-Frame().ymin-2, 0,0, Frame().Width(), Frame().Height(), 0);
+    {      
+      for (i=0; i<todraw.Count(); ++i)
+      {
+        csRect r(todraw.RectAt(i));
+               
+        if (btxt==NULL) 
+          g2d->DrawBox(r.xmin, r.ymin, r.Width(), r.Height(), fill);
+        else
+          g3d->DrawPixmap(btxt, r.xmin, r.ymin, r.Width(), r.Height(), 0,0, r.Width(), r.Height(), 0);
+      }
 
       // Draw a beveled border, fill-hi on top and left, black-shadow on bot and right
       g2d->DrawLine(Frame().xmin, Frame().ymin, Frame().xmax, Frame().ymin, fill);
@@ -666,18 +690,21 @@ awsWindow::OnDraw(csRect clip)
     }
     else
     {
-      
-      if (btxt==NULL) 
-        g2d->DrawBox(Frame().xmin+9, Frame().ymin+9, Frame().xmax-Frame().xmin-9, Frame().ymax-Frame().ymin-9, fill);
-      else
-        g3d->DrawPixmap(btxt, Frame().xmin+9, Frame().ymin+9, Frame().xmax-Frame().xmin-9, Frame().ymax-Frame().ymin-9, 0,0, Frame().Width(), Frame().Height(), 0);
-      
-
       int topleft[10] =  { fill, hi, hi2, fill, fill, fill, lo2, lo, black };
       int botright[10] = { black, lo, lo2, fill, fill, fill, hi2, hi, fill };
-      int i, titleback;
+      int titleback;
       const int step=6;
-
+     
+      for (i=0; i<todraw.Count(); ++i)
+      {
+        csRect r(todraw.RectAt(i));
+               
+        if (btxt==NULL) 
+          g2d->DrawBox(r.xmin, r.ymin, r.Width(), r.Height(), fill);
+        else
+          g3d->DrawPixmap(btxt, r.xmin, r.ymin, r.Width(), r.Height(), 0,0, r.Width(), r.Height(), 0);
+      }
+      
       if (frame_options & foTitle)
       {
         // start with even border
@@ -809,8 +836,6 @@ awsWindow::Draw3DRect(iGraphics2D *g2d, csRect &f, int hi, int lo)
   g2d->DrawLine(f.xmin, f.ymax, f.xmax, f.ymax, lo);
   g2d->DrawLine(f.xmax, f.ymin, f.xmax, f.ymax, lo);
 }
-
-
     
 void 
 awsWindow::Invalidate() 
@@ -856,16 +881,34 @@ awsWindow::SetID(unsigned long _id)
 { comp.SetID(_id); }
 
 void 
+awsWindow::SetFlag(unsigned int flag)
+{ comp.SetFlag(flag); }
+
+void 
+awsWindow::ClearFlag(unsigned int flag)
+{ comp.ClearFlag(flag); }
+
+unsigned int 
+awsWindow::Flags()
+{ return comp.Flags(); }
+
+void 
 awsWindow::MoveChildren(int delta_x, int delta_y)
 { comp.MoveChildren(delta_x, delta_y); }
 
 void 
 awsWindow::AddChild(iAwsComponent* child, bool owner=true)
-{ comp.AddChild(child, owner); }
+{ 
+  todraw_dirty=true;
+  comp.AddChild(child, owner); 
+}
 
 void 
 awsWindow::RemoveChild(iAwsComponent *child)
-{ comp.RemoveChild(child); }
+{ 
+  todraw_dirty=true;
+  comp.RemoveChild(child); 
+}
 
 int 
 awsWindow::GetChildCount()

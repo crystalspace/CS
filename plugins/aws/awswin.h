@@ -21,6 +21,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csgeom/csrect.h"
+#include "csgeom/csrectrg.h"
 #include "awscomp.h"
 
 /***************************************************************************************************************************
@@ -88,11 +89,17 @@ private:
     /// True if the window is in one of these various states
     bool is_zoomed, is_minimized;
 
+    /// True if the child exclusion region needs to be updated
+    bool todraw_dirty;
+
     /// The frame cache for storing frame state while the window is zoomed.
     csRect unzoomed_frame;
 
     /// Embedded component
     awsComponent comp;
+
+    /// Child region excluder, optimizes drawing of windows.
+    csRectRegion todraw;
 
 private:
     void Draw3DRect(iGraphics2D *g2d, csRect &f, int hi, int lo);
@@ -135,6 +142,15 @@ private:
 
     /// Shows a component
     virtual void Show();
+
+    /// Sets the flag (can handle multiple simultaneous sets)
+    virtual void SetFlag(unsigned int flag);
+
+    /// Clears the flag (can handle multiple simultaneous clears)
+    virtual void ClearFlag(unsigned int flag);
+
+    /// Returns the current state of the flags
+    virtual unsigned int Flags();
 
     /// Get's the unique id of this component.
     virtual unsigned long GetID();
