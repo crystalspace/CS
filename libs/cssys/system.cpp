@@ -359,7 +359,10 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[], const char 
   // Add both installpath and installpath/lib dirs to search for plugins
   GetInstallPath (scfconfigpath, sizeof (scfconfigpath));
   csAddLibraryPath (scfconfigpath);
-  strcat (scfconfigpath, "lib/");   
+  strcat (scfconfigpath, "lib");   
+  int scfconfiglen = strlen(scfconfigpath);
+  scfconfigpath[scfconfiglen] = PATH_SEPARATOR;
+  scfconfigpath[scfconfiglen+1] = 0;
   csAddLibraryPath (scfconfigpath);
 
   // Find scf.cfg and initialize SCF
