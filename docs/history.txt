@@ -13,6 +13,15 @@ The history order is reversed so that new features are at the top.
 	  would leak a reference.
 	- Fixed a missing DecRef() in the thing loader when loading polygons.
 	- Removed csPolygonArrayNoFree. It is not used.
+	- Fixed a bug in csSector::FollowSegment(). It would not
+	  work correctly for null portals. Now it correctly detects
+	  that case.
+	- Removed the ref from csPolyTexture to csPolygon3D. It is a
+	  circular reference.
+	- Worked on a very old bug in the software renderer texture cache.
+	  Actually I tried to worked around the bug. I don't understand the
+	  real nature of the bug though. The code is commented because
+	  it doesn't work correctly yet. There are also underflows it seems!
 21-Jun-2001
 	- Fixed a bug in the cleanup of sectors in the engine.  The portal
 	  references were not cleaned up.

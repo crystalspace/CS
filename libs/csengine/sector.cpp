@@ -110,7 +110,6 @@ csSector::~csSector ()
 
 void csSector::CleanupReferences ()
 {
-  int i = 0;
   while (references.Length () > 0)
   {
     iReference* ref = (iReference*)references[references.Length ()-1];
@@ -559,13 +558,18 @@ csSector* csSector::FollowSegment (csReversibleTransform& t,
     if (po)
     {
       po->CompleteSector (NULL);
+      if (!po->GetSector ())
+      {
+        new_position = isect;
+	return this;
+      }
       if (po->flags.Check (CS_PORTAL_WARP))
       {
         po->WarpSpace (t, mirror);
 	new_position = po->Warp (new_position);
       }
       csSector* dest_sect = po->GetSector ()->GetPrivateObject ();
-      return dest_sect ? dest_sect->FollowSegment (t, new_position, mirror) : (csSector*)NULL;
+      return dest_sect->FollowSegment (t, new_position, mirror);
     }
     else
       new_position = isect;

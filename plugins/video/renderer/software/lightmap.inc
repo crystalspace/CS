@@ -83,6 +83,7 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
   iLightMap *lm = pt->GetLightMap ();
   int lm_w = lm->GetWidth ();
   UByte *lm_data = lm->GetMapData ();
+  int lm_size = lm->GetSize ();
 
   void *dst = ct->get_bitmap ();
   ULong *old_lm = (ULong *)ct->get_lightmap ();
@@ -132,12 +133,40 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
 
   int src = min_lu + min_lv * lm_w;
   int src_dlu = lm_w - (max_lu - min_lu);
+
+  // @@@ Jorrit: the code below is a bit clumsy. When an overflow
+  // is detected we calculate the number of lightmap lines that
+  // cannot be calculated due to overflowing the lightmap bounds (why
+  // this can happen in the first place is a mistery).
+  // For those lines we will reuse the last line of the lightmap
+  // that we can safely use.
+  int src_end = src + (src_dlu + max_lu-min_lu) * (max_lv-min_lv)
+  	- src_dlu + lm_w + 1;
+  int overflow_lv;
+  if (src_end > lm_size)
+    overflow_lv = max_lv - ((src_end-lm_size+lm_w-1) / lm_w);
+  else
+    overflow_lv = max_lv;
+
   int lmlm_w = lm_w << 2;
+  int src_old = src;
   for (int lv = min_lv; lv < max_lv; lv++)
   {
+#if 0
+    if (lv >= overflow_lv)
+    {
+      // Go back one line in the lightmap data.
+      src_old = src_old - lm_w;
+    }
+#endif
+
     for (int lu = min_lu; lu < max_lu; lu++)
     {
-      int lmsrc = src << 2;
+      int lmsrc = src_old << 2;
+#if 0
+      CS_ASSERT (src_old >= 0);
+      CS_ASSERT ((src_old + lm_w + 1) < lm_size);
+#endif
 #define GET(map, col)				\
       UByte col##00, col##10, col##01, col##11;	\
       col##00 = map [lmsrc];			\
@@ -147,10 +176,6 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
 
       GET (lm_data, r);
       GET ((lm_data+1), g);
-      // @@@ The following statement causes an access slightly
-      // beyond the bounds of the lm_B array in some cases.
-      // I discovered this with a memory debugger. However I
-      // have not yet found out why and how to fix it.
       GET ((lm_data+2), b);
 #undef GET
 
@@ -167,12 +192,12 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
         ((b00 + hash_table [b01] + hash_table [b10 + 64] + hash_table [b11 + 128]) << 22);
 #endif
 
-      // If this lightmap cell did not changed, do not recalculate
+      // If this lightmap cell did not change, do not recalculate
       if (old_lm [src] == cellid)
-      { src++; continue; }
+      { src_old++; src++; continue; }
 
       old_lm [src] = cellid;
-      src++;
+      src_old++; src++;
 
       int u = lu << pt_cell_shift;
       int v = lv << pt_cell_shift;
@@ -230,6 +255,7 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
       }
     }
     src += src_dlu;
+    src_old += src_dlu;
   }
 }
 

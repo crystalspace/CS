@@ -261,6 +261,7 @@ csPolyTexture::csPolyTexture ()
   CONSTRUCT_IBASE (NULL);
   lm = NULL;
   cache_data [0] = cache_data [1] = cache_data [2] = cache_data [3] = NULL;
+  polygon = NULL;
   ipolygon = NULL;
 }
 
@@ -272,7 +273,6 @@ csPolyTexture::~csPolyTexture ()
   CS_ASSERT (cache_data[2] == NULL);
   CS_ASSERT (cache_data[3] == NULL);
   if (lm) lm->DecRef ();
-  if (ipolygon) ipolygon->DecRef ();
 }
 
 void csPolyTexture::SetLightMap (csLightMap* lightmap)
@@ -1117,9 +1117,8 @@ void csPolyTexture::GetTextureBox (float& fMinU, float& fMinV, float& fMaxU, flo
 
 void csPolyTexture::SetPolygon (csPolygon3D* p)
 {
-  iPolygon3D* ipol = QUERY_INTERFACE (p, iPolygon3D);
-  if (ipolygon) ipolygon->DecRef ();
-  ipolygon = ipol;
+  ipolygon = QUERY_INTERFACE (p, iPolygon3D);
+  ipolygon->DecRef ();
   polygon = p;
 }
 
