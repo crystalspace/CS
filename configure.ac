@@ -1312,8 +1312,6 @@ AC_DEFUN([_CS_CHECK_HOST_DARWIN],
 	cs_host_family=unix
 	cs_host_os_normalized='MacOS/X'
 	CS_HEADER_PROPERTY([OS_MACOSX])
-	CS_HEADER_PROPERTY([OS_MACOSX_PLUGIN_DIR],[AS_ESCAPE(["components/"])])
-	CS_BUILD_PROPERTY([MACOSX.PLUGIN_DIR], [components])
 	CS_HEADER_PROPERTY([OS_MACOSX_PLUGIN_EXT],[AS_ESCAPE([".csplugin"])])
 	CS_BUILD_PROPERTY([MACOSX.PLUGIN_EXT], [.csplugin])
 	# We assume that we always have CoreAudio available on macosx

@@ -132,7 +132,7 @@ INC.SYS_CSSYS = \
   $(CSTHREAD.INC)
 
 # Where to put dynamic libraries on this system?
-OUTDLL = $(MACOSX.PLUGIN_DIR)
+OUTDLL =
 
 # The library (archive) manager
 # <cs-config>

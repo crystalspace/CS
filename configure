@@ -19828,12 +19828,6 @@ echo "${ECHO_T}no (assume MacOS/X)" >&6
 	cs_host_os_normalized='MacOS/X'
 	cs_header_text="${cs_header_text}#define OS_MACOSX
 "
-	cs_header_text="${cs_header_text}#define OS_MACOSX_PLUGIN_DIR \"components/\"
-"
-	cs_makefile_text="${cs_makefile_text}MACOSX.PLUGIN_DIR = components
-"
-    cs_jamconfig_text="${cs_jamconfig_text}MACOSX.PLUGIN_DIR ?= \"components\" ;
-"
 	cs_header_text="${cs_header_text}#define OS_MACOSX_PLUGIN_EXT \".csplugin\"
 "
 	cs_makefile_text="${cs_makefile_text}MACOSX.PLUGIN_EXT = .csplugin

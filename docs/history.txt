@@ -34,6 +34,13 @@ The history order is reversed so that new features are at the top.
 	  change the original dimensions of a texture in case the texture
 	  was resized to PO2 dimensions. This affected GetOriginalDimensions().
 	  Also applied the fix to the new OpenGL renderer.
+	- Eric Sunshine changed the makefile-based build on MacOS/X so that
+	  plugins are no longer placed in a "components" subdirectory.
+	  Although this was an organizational convenience, it was not
+	  necessary, and it did not fit in well with the LFS organization for
+	  installed resources toward which CS is moving.  This change should
+	  allow the plugins to be located when built and installed via the Jam
+	  build facility, which uses an LFS organization.
 18-May-2003
 	- res made the following changes in and around render3d:
 	    - ATI/NV only exts can be disabled all at once via cfg.

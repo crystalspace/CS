@@ -26,6 +26,7 @@
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
 #include "OSXInstallPath.h"
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "csutil/util.h"
@@ -35,21 +36,22 @@
 //-----------------------------------------------------------------------------
 char* csGetConfigPath()
 {
-  char* buff = new char[1024];
-  if (!OSXGetInstallPath(buff, 1024, PATH_SEPARATOR))
+  char* buff = new char[FILENAME_MAX];
+  if (OSXGetInstallPath(buff, FILENAME_MAX, PATH_SEPARATOR) == 0)
   {
     char const* path = getenv("CRYSTAL");
-    if (!path || *path == 0)
-      strncpy (buff, ".", 1024);
+    if (path == 0 || *path == 0)
+      strncpy(buff, ".", FILENAME_MAX);
     else
-      strncpy (buff, path, 1024);
+      strncpy(buff, path, FILENAME_MAX);
   }
 
-  // Add our path separator if not present.
-  int length = strlen(buff);
-  if (buff[length-1]!=PATH_SEPARATOR && length <=1022) {
-      buff[length]=PATH_SEPARATOR;
-      buff[length+1]='\0';
+  // Add path separator if not present.
+  int const length = strlen(buff);
+  if (buff[length - 1] != PATH_SEPARATOR && length <= FILENAME_MAX - 2)
+  {
+    buff[length] = PATH_SEPARATOR;
+    buff[length + 1] = '\0';
   }
   
   return buff;
@@ -61,18 +63,24 @@ char* csGetConfigPath()
 //-----------------------------------------------------------------------------
 char** csGetPluginPaths()
 {
-  char** paths = new char* [4];     // Caller frees.
-  char*  buff  = new char[1024];    // Caller frees.
-  char*  cpath = csGetConfigPath(); // Caller frees.
+  char** paths = new char*[5];			// Caller frees.
+  char*  buff1 = new char[FILENAME_MAX];	// Caller frees.
+  char*  buff2 = new char[FILENAME_MAX];	// Caller frees.
+  char*  cpath = csGetConfigPath();		// Caller frees.
 
-  strncpy(buff, cpath, 1024);
-  strncat(buff, OS_MACOSX_PLUGIN_DIR, 1024);
-  buff[1023] = '\0';
+  strncpy(buff1, cpath, FILENAME_MAX);
+  strncat(buff1, "/lib", FILENAME_MAX);
+  buff1[FILENAME_MAX - 1] = '\0';
   
-  paths[0] = buff;
-  paths[1] = cpath;
-  paths[2] = csStrNew(".");
-  paths[3] = 0;
+  strncpy(buff2, buff1, FILENAME_MAX);
+  strncat(buff2, "/crystal", FILENAME_MAX);
+  buff2[FILENAME_MAX - 1] = '\0';
+  
+  paths[0] = buff1;
+  paths[1] = buff2;
+  paths[2] = cpath;
+  paths[3] = csStrNew(".");
+  paths[4] = 0;
 
   return paths;
 }
