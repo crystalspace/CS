@@ -66,6 +66,9 @@ class awsManager : public iAws
    /// The current top window
    awsWindow   *top;
 
+   /// The current component that the mouse was in.
+   awsComponent *mouse_in;
+
    /// True if mouse events are locked into the top window
    bool         mouse_captured;
 

@@ -21,7 +21,8 @@ awsManager::awsComponentFactoryMap::~awsComponentFactoryMap ()
 
 awsManager::awsManager(iBase *p):prefmgr(NULL),
                updatestore_dirty(true), 
-               top(NULL), ptG2D(NULL), ptG3D(NULL), object_reg(NULL), 
+               top(NULL), mouse_in(NULL), mouse_captured(false),
+               ptG2D(NULL), ptG3D(NULL), object_reg(NULL), 
                UsingDefaultContext(false), DefaultContextInitialized(false)
 {
   SCF_CONSTRUCT_IBASE (p);
@@ -612,7 +613,27 @@ awsManager::RecursiveBroadcastToChildren(awsComponent *cmp, iEvent &Event)
 
         // Only give to child if it contains the mouse.
         if (child->Frame().Contains(Event.Mouse.x, Event.Mouse.y))
-          if (child->HandleEvent(Event)) return true;
+          if (child->HandleEvent(Event)) 
+          {
+            if (mouse_in != child)
+            {
+              // Create a new event for MouseExit and MouseEnter
+              uchar et = Event.Type;
+
+              if (mouse_in)
+              {
+                Event.Type = csevMouseExit;
+                mouse_in->HandleEvent(Event);
+              }
+
+              mouse_in=child;
+              Event.Type = csevMouseEnter;
+              mouse_in->HandleEvent(Event);
+
+              Event.Type = et;
+            }
+            return true;
+          }
         
       break;
 
