@@ -9,6 +9,8 @@ The history order has been reversed so that new features are at the top.
 	  fix by Martin to Eric's fix to Martin's fix. :-)  Martin's most
 	  recent change triggered an internal NextStep compiler error again.
 	  *Hopefully* this fix will be acceptable to all compilers.
+	- Wouter Wijngaards added the start for a bounding box implementation
+	  for particle systems that will help for visibility culling of them.
 22-Jun-2000
 	- Got a new patch from Travis McIntosh.  This patch finished
 	  dynamic lighting for curved surfaces. Still a bit slow but it
