@@ -312,7 +312,7 @@ void csAVIStreamVideo::yuv_channel_2_rgba_interleave (char *data[3])
     {
       if (uvidx != (sc>>1)) // this YUV is a 1:4:4 scheme
       {
-	uvidx = (sr>>1) * sw + sc>>1;
+	uvidx = (sr>>1) * sw + (sc>>1);
 	u=((float)(unsigned char)udata[uvidx]) - 128.f;
 	v=((float)(unsigned char)vdata[uvidx]) - 128.f;
 	uf1 = 2.018f * u;
