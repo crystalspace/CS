@@ -181,6 +181,23 @@ int csFoliageObject::GetLODPolygonCount (float lod) const
 
 //----------------------------------------------------------------------
 
+csFoliageMeshBlock::csFoliageMeshBlock (const csBox2& box,
+    iTerraFormer* terraformer, int res)
+{
+  csFoliageMeshBlock::box = box;
+  terrasampler = terraformer->GetSampler (box, res);
+
+  bbox.Empty ();
+}
+
+void csFoliageMeshBlock::Draw (iGraphics3D* g3d, iRenderView* rview,
+      uint32 frustum_mask, const csReversibleTransform& transform,
+      csRenderMeshHolderSingle& rmHolder)
+{
+}
+
+//----------------------------------------------------------------------
+
 SCF_IMPLEMENT_IBASE (csFoliageMeshObject)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iFoliageMeshState)

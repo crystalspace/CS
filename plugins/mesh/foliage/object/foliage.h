@@ -142,6 +142,48 @@ public:
 
 
 /**
+ * Foliage mesh block. This represents a subset of the foliage
+ * geometry depending on where the camera is.
+ */
+class csFoliageMeshBlock
+{
+private:
+  // Bounding box for this block (in 2D).
+  csBox2 box;
+
+  // 3D bounding box for all geometry in this block.
+  csBox3 bbox;
+
+  // Interleaved render buffer for all foliage geometry in this
+  // block.
+  csRef<iRenderBuffer> interleaved_buffer;
+
+  // Render buffer for the triangle data.
+  csRef<iRenderBuffer> index_buffer;
+
+  // Sampler for getting the data for this block.
+  csRef<iTerraSampler> terrasampler;
+
+  // Resolution at which we sample this block.
+  int res;
+
+public:
+  /**
+   * Construct a new mesh block for the given area
+   * and with the supplied terraformer.
+   */
+  csFoliageMeshBlock (const csBox2& box, iTerraFormer* terraformer,
+      int res);
+
+  /**
+   * Draw this block (add to the render mesh holder).
+   */
+  void Draw (iGraphics3D* g3d, iRenderView* rview,
+      uint32 frustum_mask, const csReversibleTransform& transform,
+      csRenderMeshHolderSingle& rmHolder);
+};
+
+/**
  * Foliage version of mesh object.
  */
 class csFoliageMeshObject : public iMeshObject
