@@ -404,9 +404,11 @@ void csGLFontCache::FlushArrays ()
 {
   if (jobCount == 0) return;
 
+  bool texEnabled = statecache->enabled_GL_TEXTURE_2D;
+  statecache->Enable_GL_TEXTURE_2D ();
+
   if (needStates)
   {
-    statecache->Enable_GL_TEXTURE_2D ();
     if (multiTexText)
     {
       glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_PRIMARY_COLOR);
@@ -436,6 +438,7 @@ void csGLFontCache::FlushArrays ()
       glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     }
     statecache->SetBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    statecache->Enable_GL_BLEND ();
 
     static float envTransparent[4] = {1.0f, 1.0f, 1.0f, 0.0f};
     glTexEnvfv (GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, envTransparent);
@@ -497,6 +500,9 @@ void csGLFontCache::FlushArrays ()
   }
   jobCount = 0;
   numFloats = 0;
+
+  if (!texEnabled)
+    statecache->Disable_GL_TEXTURE_2D;
 }
 
 csGLFontCache::TextJob& csGLFontCache::GetJob (int fg, int bg, 
@@ -781,6 +787,7 @@ void csGLFontCache::BeginText ()
   tcaEnabled = statecache->enabled_GL_TEXTURE_COORD_ARRAY;
   caEnabled = statecache->enabled_GL_COLOR_ARRAY;
 
+  statecache->SetActiveTU (0);
   statecache->Enable_GL_VERTEX_ARRAY();
   statecache->Enable_GL_TEXTURE_COORD_ARRAY();
   statecache->Disable_GL_COLOR_ARRAY();

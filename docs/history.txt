@@ -12,6 +12,8 @@ chronological order.
 	  manipulation functions into helper classes.
 	- res fixed a bug where a csImageMemory with Image == 0 would exit
 	  from the ConvertXXX() methods.
+	- Anders made DrawSimpleMesh & text drawing get along with eachother
+	  a bit better.
 15-Jan-2004
 	- Jorrit fixed a bug in engine->GetNearbyObjects() and
 	  GetNearbyMeshes(). These functions could get confused in situations

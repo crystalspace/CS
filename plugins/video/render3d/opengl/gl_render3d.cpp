@@ -131,7 +131,6 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent)
     texunittarget[i] = 0;
     texunitenabled[i] = false;
   }
-
   for (i = 0; i < CS_VATTRIB_SPECIFIC_LAST+1; i++)
   {
     scrapMapping[i] = CS_BUFFER_NONE;
@@ -139,8 +138,6 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent)
   scrapMapping[CS_VATTRIB_POSITION] = CS_BUFFER_POSITION;
   scrapMapping[CS_VATTRIB_TEXCOORD0] = CS_BUFFER_TEXCOORD0;
   scrapMapping[CS_VATTRIB_COLOR] = CS_BUFFER_COLOR;
-
-
 //  lastUsedShaderpass = 0;
 
   scrapIndicesSize = 0;
@@ -1645,15 +1642,15 @@ bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
       DeactivateTexture (unit);
       return false;
   }
-  texunitenabled[unit] = true;
-  texunittarget[unit] = gltxthandle->target;
+  /*texunitenabled[unit] = true;
+  texunittarget[unit] = gltxthandle->target;*/
   return true;
 }
 
 void csGLGraphics3D::DeactivateTexture (int unit)
 {
-  if (!texunitenabled[unit])
-    return;
+  /*if (!texunitenabled[unit])
+    return;*/
 
   if (ext->CS_GL_ARB_multitexture)
   {
@@ -1661,7 +1658,7 @@ void csGLGraphics3D::DeactivateTexture (int unit)
   }
   else if (unit != 0) return;
 
-  switch (texunittarget[unit])
+  /*switch (texunittarget[unit])
   {
     case iTextureHandle::CS_TEX_IMG_1D:
       statecache->Disable_GL_TEXTURE_1D ();
@@ -1675,7 +1672,13 @@ void csGLGraphics3D::DeactivateTexture (int unit)
     case iTextureHandle::CS_TEX_IMG_CUBEMAP:
       statecache->Disable_GL_TEXTURE_CUBE_MAP ();
       break;
-  }
+  }*/
+
+  statecache->Disable_GL_TEXTURE_1D ();
+  statecache->Disable_GL_TEXTURE_2D ();
+  statecache->Disable_GL_TEXTURE_3D ();
+  statecache->Disable_GL_TEXTURE_CUBE_MAP ();
+
   texunitenabled[unit] = false;
 }
 
@@ -1907,7 +1910,6 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       indexbuf->rangeEnd, mymesh->indexend - mymesh->indexstart,
       indexbuf->compGLType, 
       ((uint8*)bufData) + (indexCompsBytes * mymesh->indexstart));
-
     indexbuf->Release();
   }
 
@@ -2336,6 +2338,12 @@ csPtr<iPolygonRenderer> csGLGraphics3D::CreatePolygonRenderer ()
 void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh, 
 				     uint flags)
 {  
+  if (current_drawflags & CSDRAW_2DGRAPHICS)
+  {
+    // Try to be compatible with 2D drawing mode
+    G2D->PerformExtension ("glflushtext");
+  }
+
   if (scrapIndicesSize < mesh.indexCount)
   {
     scrapIndices = CreateIndexRenderBuffer (mesh.indexCount * sizeof (uint),
@@ -2459,8 +2467,6 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
                    0.0f, -1.0f, 0.0f,
                    0.0f, 0.0f, 1.0f));
       rmesh.object2camera.SetO2TTranslation (csVector3 (0, viewheight, 0));
-      // Try to be compatible with 2D drawing mode
-      G2D->PerformExtension ("glflushtext");
     } 
     else 
       {
