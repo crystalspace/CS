@@ -100,7 +100,7 @@ csPtr<iString> csGLShader_ARB::GetProgramID(const char* programstring)
 {
   csMD5::Digest d = csMD5::Encode(programstring);
   scfString* str = new scfString();
-  str->Append((const char*)d.data[0], 16);
+  str->Append((const char*)d.data, 16);
   return csPtr<iString>(str);
 }
 

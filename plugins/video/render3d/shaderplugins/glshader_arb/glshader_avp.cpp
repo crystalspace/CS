@@ -105,6 +105,9 @@ void csShaderGLAVP::SetupState (iShaderPass *current, csRenderMesh *mesh)
                                               v4.x ,v4.y,v4.z,v4.w);
         }
         break;
+      // iShaderVariable::STRING missing...
+      default:
+	break;
       }
     }
   }
@@ -154,12 +157,9 @@ bool csShaderGLAVP::LoadProgramStringToGL(const char* programstring)
     else
       start++;
 
-    csReport ( object_reg, CS_REPORTER_SEVERITY_WARNING,"crystalspace.render3d.shader.glarb",
-      "Couldn't load vertexprogram", 0);
-    csReport ( object_reg, CS_REPORTER_SEVERITY_WARNING,"crystalspace.render3d.shader.glarb",
-      "Programerror at: \"%s\"", start);
-    csReport ( object_reg, CS_REPORTER_SEVERITY_WARNING,"crystalspace.render3d.shader.glarb",
-      "Errorstring %s", programErrorString);
+    csReport ( object_reg, CS_REPORTER_SEVERITY_WARNING,"crystalspace.render3d.shader.glarb", "Couldn't load vertexprogram");
+    csReport ( object_reg, CS_REPORTER_SEVERITY_WARNING,"crystalspace.render3d.shader.glarb", "Programerror at: \"%s\"", start);
+    csReport ( object_reg, CS_REPORTER_SEVERITY_WARNING,"crystalspace.render3d.shader.glarb", "Errorstring %s", programErrorString);
     return false;
   }
 
@@ -320,6 +320,6 @@ csPtr<iString> csShaderGLAVP::GetProgramID()
 {
   csMD5::Digest d = csMD5::Encode(programstring);
   scfString* str = new scfString();
-  str->Append((const char*)d.data[0], 16);
+  str->Append((const char*)d.data, 16);
   return csPtr<iString>(str);
 }
