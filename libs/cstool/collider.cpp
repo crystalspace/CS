@@ -88,11 +88,17 @@ bool csColliderWrapper::Collide (csColliderWrapper& otherCollider,
 
 csColliderWrapper* csColliderWrapper::GetColliderWrapper (csObject &object) 
 {
-  return CS_GET_CHILD_OBJECT (&object, csColliderWrapper);
+  csColliderWrapper* w = CS_GET_CHILD_OBJECT (&object, csColliderWrapper);
+  if (w)
+    w->DecRef ();
+  return w;
 }
 
 csColliderWrapper* csColliderWrapper::GetColliderWrapper (iObject* object) 
 {
-  return CS_GET_CHILD_OBJECT (object, csColliderWrapper);
+  csColliderWrapper* w = CS_GET_CHILD_OBJECT (object, csColliderWrapper);
+  if (w)
+    w->DecRef ();
+  return w;
 }
 
