@@ -796,13 +796,13 @@ void awsComponent::OnDraw (csRect)
 
 bool awsComponent::OnMouseDown (int, int, int)
 {
-  printf("mouse down  : %s\n", Type());
+  if (AWS_COMP_DEBUG) printf("aws-debug: mouse down  : %s\n", Type());
   return false;
 }
 
 bool awsComponent::OnMouseUp (int, int, int)
 {
-  printf("mouse up    : %s\n", Type());
+  if (AWS_COMP_DEBUG) printf("aws-debug: mouse up    : %s\n", Type());
   return false;
 }
 
@@ -813,7 +813,7 @@ bool awsComponent::OnMouseMove (int, int, int)
 
 bool awsComponent::OnMouseClick (int, int, int)
 {
-  printf("mouse click : %s\n", Type());
+  if (AWS_COMP_DEBUG) printf("aws-debug: mouse click : %s\n", Type());
   return false;
 }
 
@@ -824,13 +824,13 @@ bool awsComponent::OnMouseDoubleClick (int, int, int)
 
 bool awsComponent::OnMouseExit ()
 {
-  printf("mouse exit  : %s\n", Type());
+  if (AWS_COMP_DEBUG) printf("aws-debug: mouse exit  : %s\n", Type());
   return false;
 }
 
 bool awsComponent::OnMouseEnter ()
 {
-  printf("mouse enter : %s\n", Type());
+  if (AWS_COMP_DEBUG) printf("aws-debug: mouse enter : %s\n", Type());
   return false;
 }
 

@@ -976,7 +976,8 @@ void awsManager::CreateChildrenFromDef (
 
 void awsManager::CaptureMouse (iAwsComponent *comp)
 {
-  printf("Mouse captured\n");
+  if (DEBUG_MANAGER) printf("aws-debug: Mouse captured\n");
+
   mouse_captured = true;
   if (comp == NULL) comp = GetTopComponent ();
 
@@ -985,7 +986,7 @@ void awsManager::CaptureMouse (iAwsComponent *comp)
 
 void awsManager::ReleaseMouse ()
 {
-  printf("Mouse released\n");
+  if (DEBUG_MANAGER) printf("aws-debug: Mouse released\n");
   mouse_captured = false;
   mouse_focus = NULL;
 }
