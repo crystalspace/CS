@@ -41,6 +41,7 @@ chronological order.
 	    - Fixed corruption of AA'ed glyphs with OpenGL canvases.
 	- res replaced in wintools.cpp the usage of 'swprintf()', which
 	  cygwin doesn't have, with 'wsprintfW()' from the Win32 API.
+	- res fixed wintools.cpp so it compiles on VC again.
 13-Aug-2003
 	- res renamed the rlloader, rlsstd and rlsstencil plugins to less
 	  cryptic rendloop_loader, rendstep_std and rendstep_stencil.
