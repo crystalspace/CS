@@ -163,6 +163,7 @@ csThing::~csThing ()
     vinf->visobj->DecRef ();
     delete vinf;
   }
+  polygons.DeleteAll (); // delete prior to portal_poly array !
   if (portal_polygons.Length()) portal_polygons.DeleteAll();
   CleanupThingEdgeTable ();
 }
@@ -2996,6 +2997,7 @@ csThingObjectType::csThingObjectType (iBase* pParent)
 
 csThingObjectType::~csThingObjectType ()
 {
+  printf ("*** thingobjecttype dtor\n");
   int i;
   for (i = 0 ; i < planes.Length () ; i++)
   {
