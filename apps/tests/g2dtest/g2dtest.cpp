@@ -1476,13 +1476,6 @@ int main (int argc, char *argv[])
   Sys = &System;
   iObjectRegistry* object_reg = System.object_reg;
 
-  int i = 0;
-  while (quickBrownFox[i] != 0)
-  {
-    csPrintf ("%s\n", quickBrownFox[i]);
-    i += 2;
-  }
-
   if (!csInitializer::SetupEventHandler (object_reg, G2DEventHandler))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
