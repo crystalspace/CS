@@ -83,7 +83,7 @@ class scfSharedLibrary
 {
   friend class scfLibraryVector;
   // Shared library name
-  const char *LibraryName;
+  char *LibraryName;
   // Handle of shared module (if RefCount > 0)
   csLibraryHandle LibraryHandle;
   // Number of references to this shared library
@@ -110,7 +110,6 @@ public:
   void DecRef ()
   { 
     RefCount--;
-    TryUnload ();
   }
 
   /// Get the reference count.
@@ -136,9 +135,10 @@ scfSharedLibrary::scfSharedLibrary (const char *iLibraryName)
 {
   LibraryRegistry->Push (this);
 
-  RefCount = 1;
+  RefCount = 0;
   ClassTable = NULL;
-  LibraryHandle = csFindLoadLibrary (LibraryName = iLibraryName);
+  LibraryName = csStrNew (iLibraryName);
+  LibraryHandle = csFindLoadLibrary (LibraryName);
   if (!LibraryHandle)
     return;
 
@@ -176,6 +176,7 @@ scfSharedLibrary::~scfSharedLibrary ()
       func ();
     csUnloadLibrary (LibraryHandle);
   }
+  delete [] LibraryName;
 }
 
 scfClassInfo *scfSharedLibrary::Find (const char *iClassID)
@@ -310,10 +311,7 @@ void scfFactory::IncRef ()
   {
     int libidx = LibraryRegistry->FindKey (LibraryName);
     if (libidx >= 0)
-    {
       Library = (scfSharedLibrary *)LibraryRegistry->Get (libidx);
-      Library->IncRef ();
-    }
     else
       Library = new scfSharedLibrary (LibraryName);
     if (Library->ok ())
@@ -321,10 +319,11 @@ void scfFactory::IncRef ()
 
     if (!Library->ok () || !ClassInfo)
     {
-      Library->DecRef();
       Library = NULL;
       return; // Signify that IncRef() failed by _not_ incrementing count.
     }
+    
+    Library->IncRef ();
   }
 #endif
   scfRefCount++;
@@ -341,6 +340,17 @@ void scfFactory::DecRef ()
   }
 #endif
   scfRefCount--;
+#ifndef CS_STATIC_LINKED
+  if (scfRefCount == 0)
+  {
+    // now we no longer need the library either
+    if (Library)
+    {
+      Library->DecRef ();
+      Library = NULL;
+    }
+  }
+#endif
 }
 
 int scfFactory::GetRefCount ()
@@ -371,10 +381,6 @@ void *scfFactory::CreateInstance ()
 
 void scfFactory::TryUnload ()
 {
-#ifndef CS_STATIC_LINKED
- if (Library &&  Library->TryUnload ())
-    Library = NULL;
-#endif
 }
 
 const char *scfFactory::QueryDescription ()
@@ -430,6 +436,7 @@ csSCF::~csSCF ()
   delete ClassRegistry;
   ClassRegistry = NULL;
 #ifndef CS_STATIC_LINKED
+  UnloadUnusedModules ();
   delete LibraryRegistry;
   LibraryRegistry = NULL;
 #endif
@@ -498,10 +505,10 @@ void *csSCF::CreateInstance (const char *iClassID, const char *iInterface,
 
 void csSCF::UnloadUnusedModules ()
 {
-  for (int i = ClassRegistry->Length () - 1; i >= 0; i--)
+  for (int i = LibraryRegistry->Length () - 1; i >= 0; i--)
   {
-    iFactory *cf = (iFactory *)ClassRegistry->Get (i);
-    cf->TryUnload ();
+    scfSharedLibrary *sl = (scfSharedLibrary *)LibraryRegistry->Get (i);
+    sl->TryUnload ();
   }
 }
 
