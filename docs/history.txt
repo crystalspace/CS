@@ -45,6 +45,9 @@ chronological order.
 	  several locations; replaced with CS_VERSION.
 	- Eric Sunshine fixed a lot of Texinfo errors and warnings in material
 	  recently added to the CS manual.
+	- Neil Mosafi added GetObject3Ds() function to iVosSector.  This returns
+	  all the loaded objects in the sector
+	
 6-Jun-2004
 	- Jorrit modified the Jamfile so that the isotest application
 	  is only build with new renderer.
