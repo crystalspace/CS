@@ -435,7 +435,7 @@ static Bool CheckKeyPress (Display *dpy, XEvent *event, XPointer arg)
 //    are needed in order to catch "WM_DELETE_WINDOW")
 static Bool AlwaysTruePredicate (Display*, XEvent*, char*) { return True; }
 
-bool csGraphics2DLineXLib::HandleEvent (csEvent &Event)
+bool csGraphics2DLineXLib::HandleEvent (csEvent &/*Event*/)
 {
   static int button_mapping[6] = {0, 1, 3, 2, 4, 5};
   XEvent event;

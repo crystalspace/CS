@@ -330,7 +330,7 @@ static Bool CheckKeyPress (Display *dpy, XEvent *event, XPointer arg)
   return false;
 }
 
-bool csGraphics2DGlideX::HandleEvent (csEvent &Event)
+bool csGraphics2DGlideX::HandleEvent (csEvent &/*Event*/)
 {
   static int button_mapping[6] = {0, 1, 3, 2, 4, 5};
   XEvent event;

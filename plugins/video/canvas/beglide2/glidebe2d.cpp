@@ -155,7 +155,7 @@ void csGraphics2DBeGlide::FXgetImage()
 
 }
 
-bool csGraphics2DBeGlide::HandleEvent (csEvent &Event)
+bool csGraphics2DBeGlide::HandleEvent (csEvent &/*Event*/)
 {
 //  static int button_mapping[6] = {0, 1, 3, 2, 4, 5};
 #if 0

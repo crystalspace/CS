@@ -367,7 +367,7 @@ int csGraphics2DMGL::TranslateKey (int mglKey)
   }
 }
 
-bool csGraphics2DMGL::HandleEvent (csEvent &Event)
+bool csGraphics2DMGL::HandleEvent (csEvent &/*Event*/)
 {
   event_t evt;
 
