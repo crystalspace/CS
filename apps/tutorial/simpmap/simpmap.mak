@@ -12,12 +12,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: simpmap tutmapclean
+.PHONY: simpmap simpmapclean
 
 all apps: simpmap
 simpmap:
 	$(MAKE_APP)
-tutmapclean:
+simpmapclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -45,16 +45,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.simpmap tutmapclean
+.PHONY: build.simpmap simpmapclean
 
 all: $(SIMPMAP.EXE)
 build.simpmap: $(OUTDIRS) $(SIMPMAP.EXE)
-clean: tutmapclean
+clean: simpmapclean
 
 $(SIMPMAP.EXE): $(DEP.EXE) $(OBJ.SIMPMAP) $(LIB.SIMPMAP)
 	$(DO.LINK.EXE)
 
-tutmapclean:
+simpmapclean:
 	-$(RM) $(SIMPMAP.EXE) $(OBJ.SIMPMAP)
 
 ifdef DO_DEPEND

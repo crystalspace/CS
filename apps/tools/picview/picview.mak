@@ -12,12 +12,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: picview pviewclean
+.PHONY: picview picviewclean
 
 all apps: picview
 picview:
 	$(MAKE_APP)
-pviewclean:
+picviewclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -47,16 +47,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.picview pviewclean
+.PHONY: build.picview picviewclean
 
 all: $(PICVIEW.EXE)
 build.picview: $(OUTDIRS) $(PICVIEW.EXE)
-clean: pviewclean
+clean: picviewclean
 
 $(PICVIEW.EXE): $(DEP.EXE) $(OBJ.PICVIEW) $(LIB.PICVIEW)
 	$(DO.LINK.EXE)
 
-pviewclean:
+picviewclean:
 	-$(RM) $(PICVIEW.EXE) $(OBJ.PICVIEW)
 
 ifdef DO_DEPEND

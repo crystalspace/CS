@@ -13,12 +13,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: simpvs tutsimpvsclean
+.PHONY: simpvs simpvsclean
 
 all apps: simpvs
 simpvs:
 	$(MAKE_APP)
-tutsimpvsclean:
+simpvsclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -46,16 +46,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.simpvs tutsimpvsclean
+.PHONY: build.simpvs simpvsclean
 
 all: $(SIMPVS.EXE)
 build.simpvs: $(OUTDIRS) $(SIMPVS.EXE)
-clean: tutsimpvsclean
+clean: simpvsclean
 
 $(SIMPVS.EXE): $(DEP.EXE) $(OBJ.SIMPVS) $(LIB.SIMPVS)
 	$(DO.LINK.EXE)
 
-tutsimpvsclean:
+simpvsclean:
 	-$(RM) $(SIMPVS.EXE) $(OBJ.SIMPVS)
 
 ifdef DO_DEPEND

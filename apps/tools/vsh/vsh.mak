@@ -13,12 +13,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: vsh vshellclean
+.PHONY: vsh vshclean
 
 all apps: vsh
 vsh:
 	$(MAKE_APP)
-vshellclean:
+vshclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -46,16 +46,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.vsh vshellclean
+.PHONY: build.vsh vshclean
 
 all: $(VSH.EXE)
 build.vsh: $(OUTDIRS) $(VSH.EXE)
-clean: vshellclean
+clean: vshclean
 
 $(VSH.EXE): $(DEP.EXE) $(OBJ.VSH) $(LIB.VSH)
 	$(DO.LINK.CONSOLE.EXE)
 
-vshellclean:
+vshclean:
 	-$(RM) $(VSH.EXE) $(OBJ.VSH)
 
 ifdef DO_DEPEND

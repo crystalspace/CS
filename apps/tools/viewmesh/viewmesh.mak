@@ -13,12 +13,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: viewmesh vmeshclean
+.PHONY: viewmesh viewmeshclean
 
 all apps: viewmesh
 viewmesh:
 	$(MAKE_APP)
-vmeshclean:
+viewmeshclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -46,16 +46,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.viewmesh vmeshclean
+.PHONY: build.viewmesh viewmeshclean
 
 all: $(VIEWMESH.EXE)
 build.viewmesh: $(OUTDIRS) $(VIEWMESH.EXE)
-clean: vmeshclean
+clean: viewmeshclean
 
 $(VIEWMESH.EXE): $(DEP.EXE) $(OBJ.VIEWMESH) $(LIB.VIEWMESH)
 	$(DO.LINK.EXE)
 
-vmeshclean:
+viewmeshclean:
 	-$(RM) $(VIEWMESH.EXE) $(OBJ.VIEWMESH)
 
 ifdef DO_DEPEND

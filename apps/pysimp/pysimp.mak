@@ -16,12 +16,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: pysimp pysimpleclean
+.PHONY: pysimp pysimpclean
 
 all apps: pysimp
 pysimp:
 	$(MAKE_APP)
-pysimpleclean:
+pysimpclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -49,16 +49,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.pysimp pysimpleclean
+.PHONY: build.pysimp pysimpclean
 
 all: $(PYSIMP.EXE)
 build.pysimp: $(OUTDIRS) $(PYSIMP.EXE)
-clean: pysimpleclean
+clean: pysimpclean
 
 $(PYSIMP.EXE): $(DEP.EXE) $(OBJ.PYSIMP) $(LIB.PYSIMP)
 	$(DO.LINK.EXE)
 
-pysimpleclean:
+pysimpclean:
 	-$(RM) $(PYSIMP.EXE) $(OBJ.PYSIMP)
 
 ifdef DO_DEPEND

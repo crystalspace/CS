@@ -15,12 +15,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: csfgen csfgclean
+.PHONY: csfgen csfgenclean
 
 all apps: csfgen
 csfgen:
 	$(MAKE_APP)
-csfgclean:
+csfgenclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -48,16 +48,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.csfgen csfgclean
+.PHONY: build.csfgen csfgenclean
 
 all: $(CSFGEN.EXE)
 build.csfgen: $(OUTDIRS) $(CSFGEN.EXE)
-clean: csfgclean
+clean: csfgenclean
 
 $(CSFGEN.EXE): $(OBJ.CSFGEN) $(LIB.CSFGEN)
 	$(DO.LINK.CONSOLE.EXE)
 
-csfgclean:
+csfgenclean:
 	-$(RM) $(CSFGEN.EXE) $(OBJ.CSFGEN)
 
 ifdef DO_DEPEND

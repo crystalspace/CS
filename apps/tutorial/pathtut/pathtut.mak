@@ -13,12 +13,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: pathtut tutpathclean
+.PHONY: pathtut pathtutclean
 
 all apps: pathtut
 pathtut:
 	$(MAKE_APP)
-tutpathclean:
+pathtutclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -46,16 +46,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.pathtut tutpathclean
+.PHONY: build.pathtut pathtutclean
 
 all: $(PATHTUT.EXE)
 build.pathtut: $(OUTDIRS) $(PATHTUT.EXE)
-clean: tutpathclean
+clean: pathtutclean
 
 $(PATHTUT.EXE): $(DEP.EXE) $(OBJ.PATHTUT) $(LIB.PATHTUT)
 	$(DO.LINK.EXE)
 
-tutpathclean:
+pathtutclean:
 	-$(RM) $(PATHTUT.EXE) $(OBJ.PATHTUT)
 
 ifdef DO_DEPEND

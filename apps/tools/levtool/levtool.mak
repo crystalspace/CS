@@ -12,12 +12,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: levtool ltoolclean
+.PHONY: levtool levtoolclean
 
 all apps: levtool
 levtool:
 	$(MAKE_APP)
-ltoolclean:
+levtoolclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -47,16 +47,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.levtool ltoolclean
+.PHONY: build.levtool levtoolclean
 
 all: $(LEVTOOL.EXE)
 build.levtool: $(OUTDIRS) $(LEVTOOL.EXE)
-clean: ltoolclean
+clean: levtoolclean
 
 $(LEVTOOL.EXE): $(DEP.EXE) $(OBJ.LEVTOOL) $(LIB.LEVTOOL)
 	$(DO.LINK.EXE)
 
-ltoolclean:
+levtoolclean:
 	-$(RM) $(LEVTOOL.EXE) $(OBJ.LEVTOOL)
 
 ifdef DO_DEPEND

@@ -12,12 +12,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: makedep mkdepclean
+.PHONY: makedep makedepclean
 
 #all apps: makedep
 makedep:
 	$(MAKE_APP)
-mkdepclean:
+makedepclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -45,11 +45,11 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.makedep mkdepclean
+.PHONY: build.makedep makedepclean
 
 all: $(MAKEDEP.EXE)
 build.makedep: $(OUTDIRS) $(MAKEDEP.EXE)
-clean: mkdepclean
+clean: makedepclean
 
 $(OUT)/main$O: apps/tools/makedep/main.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.MAKEDEP)
@@ -57,7 +57,7 @@ $(OUT)/main$O: apps/tools/makedep/main.cpp
 $(MAKEDEP.EXE): $(OBJ.MAKEDEP) $(LIB.MAKEDEP)
 	$(DO.LINK.CONSOLE.EXE)
 
-mkdepclean:
+makedepclean:
 	-$(RM) $(MAKEDEP.EXE) $(OBJ.MAKEDEP)
 
 ifdef DO_DEPEND

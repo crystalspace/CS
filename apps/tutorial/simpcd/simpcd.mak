@@ -13,12 +13,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: simpcd tutsimpcdclean
+.PHONY: simpcd simpcdclean
 
 all apps: simpcd
 simpcd:
 	$(MAKE_APP)
-tutsimpcdclean:
+simpcdclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -46,16 +46,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.simpcd tutsimpcdclean
+.PHONY: build.simpcd simpcdclean
 
 all: $(SIMPCD.EXE)
 build.simpcd: $(OUTDIRS) $(SIMPCD.EXE)
-clean: tutsimpcdclean
+clean: simpcdclean
 
 $(SIMPCD.EXE): $(DEP.EXE) $(OBJ.SIMPCD) $(LIB.SIMPCD)
 	$(DO.LINK.EXE)
 
-tutsimpcdclean:
+simpcdclean:
 	-$(RM) $(SIMPCD.EXE) $(OBJ.SIMPCD)
 
 ifdef DO_DEPEND

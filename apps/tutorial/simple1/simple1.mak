@@ -13,12 +13,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: simple1 tutsimp1clean
+.PHONY: simple1 simple1clean
 
 all apps: simple1
 simple1:
 	$(MAKE_APP)
-tutsimp1clean:
+simple1clean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -46,16 +46,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.simple1 tutsimp1clean
+.PHONY: build.simple1 simple1clean
 
 all: $(SIMPLE1.EXE)
 build.simple1: $(OUTDIRS) $(SIMPLE1.EXE)
-clean: tutsimp1clean
+clean: simple1clean
 
 $(SIMPLE1.EXE): $(DEP.EXE) $(OBJ.SIMPLE1) $(LIB.SIMPLE1)
 	$(DO.LINK.EXE)
 
-tutsimp1clean:
+simple1clean:
 	-$(RM) $(SIMPLE1.EXE) $(OBJ.SIMPLE1)
 
 ifdef DO_DEPEND

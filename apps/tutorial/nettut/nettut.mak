@@ -13,12 +13,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: nettut netutclean
+.PHONY: nettut nettutclean
 
 all apps: nettut
 nettut:
 	$(MAKE_APP)
-netutclean:
+nettutclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -46,16 +46,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.nettut netutclean
+.PHONY: build.nettut nettutclean
 
 all: $(NETTUT.EXE)
 build.nettut: $(OUTDIRS) $(NETTUT.EXE)
-clean: netutclean
+clean: nettutclean
 
 $(NETTUT.EXE): $(DEP.EXE) $(OBJ.NETTUT) $(LIB.NETTUT)
 	$(DO.LINK.EXE)
 
-netutclean:
+nettutclean:
 	-$(RM) $(NETTUT.EXE) $(OBJ.NETTUT)
 
 ifdef DO_DEPEND

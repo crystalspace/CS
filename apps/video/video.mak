@@ -15,12 +15,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: csvid vidclean
+.PHONY: csvid csvidclean
 
 all apps: csvid
 csvid:
 	$(MAKE_APP)
-vidclean:
+csvidclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -48,16 +48,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.csvid vidclean
+.PHONY: build.csvid csvidclean
 
 all: $(CSVID.EXE)
 build.csvid: $(OUTDIRS) $(CSVID.EXE)
-clean: vidclean
+clean: csvidclean
 
 $(CSVID.EXE): $(DEP.EXE) $(OBJ.CSVID) $(LIB.CSVID)
 	$(DO.LINK.EXE)
 
-vidclean:
+csvidclean:
 	-$(RM) $(CSVID.EXE) $(OBJ.CSVID)
 
 ifdef DO_DEPEND

@@ -13,12 +13,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: phystut tutphysclean
+.PHONY: phystut phystutclean
 
 all apps: phystut
 phystut:
 	$(MAKE_APP)
-tutphysclean:
+phystutclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -46,16 +46,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.phystut tutphysclean
+.PHONY: build.phystut phystutclean
 
 all: $(PHYSTUT.EXE)
 build.phystut: $(OUTDIRS) $(PHYSTUT.EXE)
-clean: tutphysclean
+clean: phystutclean
 
 $(PHYSTUT.EXE): $(DEP.EXE) $(OBJ.PHYSTUT) $(LIB.PHYSTUT)
 	$(DO.LINK.EXE)
 
-tutphysclean:
+phystutclean:
 	-$(RM) $(PHYSTUT.EXE) $(OBJ.PHYSTUT)
 
 ifdef DO_DEPEND

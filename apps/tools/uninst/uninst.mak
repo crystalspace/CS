@@ -13,11 +13,11 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: uninst uninstexeclean
+.PHONY: uninst uninstclean
 
 uninst:
 	$(MAKE_APP)
-uninstexeclean:
+uninstclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -46,16 +46,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.uninst uninstexeclean
+.PHONY: build.uninst uninstclean
 
 all apps: uninst
 build.uninst: $(OUTDIRS) $(UNINST.EXE)
-clean: uninstexeclean
+clean: uninstclean
 
 $(UNINST.EXE): $(OBJ.UNINST) $(LIB.UNINST)
 	$(DO.LINK.CONSOLE.EXE)
 
-uninstexeclean:
+uninstclean:
 	-$(RM) $(UNINST.EXE) $(OBJ.UNINST)
 
 ifdef DO_DEPEND

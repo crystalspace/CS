@@ -12,12 +12,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: csfedit csfedtclean
+.PHONY: csfedit csfeditclean
 
 all apps: csfedit
 csfedit:
 	$(MAKE_APP)
-csfedtclean:
+csfeditclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -45,16 +45,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.csfedit csfedtclean
+.PHONY: build.csfedit csfeditclean
 
 all: $(CSFEDIT.EXE)
 build.csfedit: $(OUTDIRS) $(CSFEDIT.EXE)
-clean: csfedtclean
+clean: csfeditclean
 
 $(CSFEDIT.EXE): $(DEP.EXE) $(OBJ.CSFEDIT) $(LIB.CSFEDIT)
 	$(DO.LINK.EXE)
 
-csfedtclean:
+csfeditclean:
 	-$(RM) $(CSFEDIT.EXE) $(OBJ.CSFEDIT)
 
 ifdef DO_DEPEND

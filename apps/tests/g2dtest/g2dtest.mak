@@ -12,12 +12,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: g2dtest g2dtstclean
+.PHONY: g2dtest g2dtestclean
 
 all apps: g2dtest
 g2dtest:
 	$(MAKE_APP)
-g2dtstclean:
+g2dtestclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -45,15 +45,15 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.g2dtest g2dtstclean
+.PHONY: build.g2dtest g2dtestclean
 
 build.g2dtest: $(OUTDIRS) $(G2DTEST.EXE)
-clean: g2dtstclean
+clean: g2dtestclean
 
 $(G2DTEST.EXE): $(DEP.EXE) $(OBJ.G2DTEST) $(LIB.G2DTEST)
 	$(DO.LINK.EXE)
 
-g2dtstclean:
+g2dtestclean:
 	-$(RM) $(G2DTEST.EXE) $(OBJ.G2DTEST)
 
 ifdef DO_DEPEND

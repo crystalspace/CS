@@ -15,12 +15,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: awstest awststclean
+.PHONY: awstest awstestclean
 
 all apps: awstest
 awstest:
 	$(MAKE_APP)
-awststclean:
+awstestclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -50,16 +50,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.awstest awststclean
+.PHONY: build.awstest awstestclean
 
 all: $(AWSTEST.EXE)
 build.awstest: $(OUTDIRS) $(AWSTEST.EXE)
-clean: awststclean
+clean: awstestclean
 
 $(AWSTEST.EXE): $(DEP.EXE) $(OBJ.AWSTEST) $(LIB.AWSTEST)
 	$(DO.LINK.EXE)
 
-awststclean:
+awstestclean:
 	-$(RM) $(AWSTEST.EXE) $(OBJ.AWSTEST)
 
 ifdef DO_DEPEND

@@ -15,7 +15,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: walktest walkclean
+.PHONY: walktest walktestclean
 
 walkall: walktest vfs soft3d softcanvas csfont csconin simpcon perfstat \
   rapid meshes cssynldr imgplex csgifimg csjpgimg cspngimg csbmpimg reporter \
@@ -23,7 +23,7 @@ walkall: walktest vfs soft3d softcanvas csfont csconin simpcon perfstat \
 all apps: walktest
 walktest:
 	$(MAKE_APP)
-walkclean:
+walktestclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -56,16 +56,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.walktest walkclean
+.PHONY: build.walktest walktestclean
 
 all: $(WALKTEST.EXE)
 build.walktest: $(OUTDIRS) $(WALKTEST.EXE)
-clean: walkclean
+clean: walktestclean
 
 $(WALKTEST.EXE): $(DEP.EXE) $(OBJ.WALKTEST) $(LIB.WALKTEST)
 	$(DO.LINK.EXE)
 
-walkclean:
+walktestclean:
 	-$(RM) $(WALKTEST.EXE) $(OBJ.WALKTEST)
 
 ifdef DO_DEPEND

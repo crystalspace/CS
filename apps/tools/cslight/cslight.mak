@@ -13,12 +13,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: cslight cslghtclean
+.PHONY: cslight cslightclean
 
 all apps: cslight
 cslight:
 	$(MAKE_APP)
-cslghtclean:
+cslightclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -48,16 +48,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.cslight cslghtclean
+.PHONY: build.cslight cslightclean
 
 all: $(CSLIGHT.EXE)
 build.cslight: $(OUTDIRS) $(CSLIGHT.EXE)
-clean: cslghtclean
+clean: cslightclean
 
 $(CSLIGHT.EXE): $(DEP.EXE) $(OBJ.CSLIGHT) $(LIB.CSLIGHT)
 	$(DO.LINK.EXE)
 
-cslghtclean:
+cslightclean:
 	-$(RM) $(CSLIGHT.EXE) $(OBJ.CSLIGHT)
 
 ifdef DO_DEPEND

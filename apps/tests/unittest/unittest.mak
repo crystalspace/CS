@@ -12,12 +12,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: unittest unitclean
+.PHONY: unittest unittestclean
 
 all apps: unittest
 unittest:
 	$(MAKE_APP)
-unitclean:
+unittestclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -48,16 +48,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.unittest unitclean
+.PHONY: build.unittest unittestclean
 
 all: $(UNITTEST.EXE)
 build.unittest: $(OUTDIRS) $(UNITTEST.EXE)
-clean: unitclean
+clean: unittestclean
 
 $(UNITTEST.EXE): $(DEP.EXE) $(OBJ.UNITTEST) $(LIB.UNITTEST)
 	$(DO.LINK.EXE)
 
-unitclean:
+unittestclean:
 	-$(RM) $(UNITTEST.EXE) $(OBJ.UNITTEST)
 
 ifdef DO_DEPEND

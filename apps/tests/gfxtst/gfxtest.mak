@@ -13,12 +13,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: gfxtest gfxtstclean
+.PHONY: gfxtest gfxtestclean
 
 all apps: gfxtest
 gfxtest:
 	$(MAKE_APP)
-gfxtstclean:
+gfxtestclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -46,11 +46,11 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.gfxtest gfxtstclean
+.PHONY: build.gfxtest gfxtestclean
 
 all: $(GFXTEST.EXE)
 build.gfxtest: $(OUTDIRS) $(GFXTEST.EXE)
-clean: gfxtstclean
+clean: gfxtestclean
 
 # Unfortunately, this command-line utility uses the plugin loading facilities
 # of the system driver, and on some platforms, that requires linking via
@@ -59,7 +59,7 @@ clean: gfxtstclean
 $(GFXTEST.EXE): $(DEP.EXE) $(OBJ.GFXTEST) $(LIB.GFXTEST)
 	$(DO.LINK.EXE)
 
-gfxtstclean:
+gfxtestclean:
 	-$(RM) $(GFXTEST.EXE) $(OBJ.GFXTEST)
 
 ifdef DO_DEPEND

@@ -15,12 +15,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: scfreg scfrclean
+.PHONY: scfreg scfregclean
 
 all apps: scfreg
 scfreg:
 	$(MAKE_APP)
-scfrclean:
+scfregclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -48,16 +48,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.scfreg scfrclean
+.PHONY: build.scfreg scfregclean
 
 all: $(SCFREG.EXE)
 build.scfreg: $(OUTDIRS) $(SCFREG.EXE)
-clean: scfrclean
+clean: scfregclean
 
 $(SCFREG.EXE): $(OBJ.SCFREG) $(LIB.SCFREG)
 	$(DO.LINK.CONSOLE.EXE)
 
-scfrclean:
+scfregclean:
 	-$(RM) $(SCFREG.EXE) $(OBJ.SCFREG)
 
 ifdef DO_DEPEND
