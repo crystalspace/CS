@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+24-Jan-2002
+	- Jorge Acereda relaxed a limit in 3ds2lev that made it crash
+	  with scenes with more than 100 textures.
 23-Jan-2002 
         - Jorge Acereda fixed LoadCamera() (crashed if the sector
 	  wasn't found). Rewrote it to be more robust and coherent
