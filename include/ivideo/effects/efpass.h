@@ -20,6 +20,8 @@
 #ifndef __IEFFECTPASS_H__
 #define __IEFFECTPASS_H__
 
+/**\file
+ */
 #include "csutil/scf.h"
 #include "cstypes.h"
 
