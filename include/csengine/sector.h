@@ -520,7 +520,7 @@ public:
     }
     virtual void CheckFrustum (iFrustumView* lview)
     {
-      return scfParent->CheckFrustum (lview);
+      scfParent->CheckFrustum (lview);
     }
   } scfiSector;
   friend struct eiSector;
