@@ -118,6 +118,8 @@ class csMPGFrame
 
   csBitstreamInfo bsi;
   al_table *alloc;
+  int junk;
+
   int stereo;
   int jsbound;
   int single;

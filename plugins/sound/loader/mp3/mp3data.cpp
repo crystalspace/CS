@@ -116,6 +116,8 @@ bool csMp3SoundData::IsMp3 (void *Buffer, size_t len)
   datastore ds ((uint8*)Buffer, len, false);
   csMPGFrame *mpframe = new csMPGFrame (&ds, (ioCallback*)&cb, AUDIO_FORMAT_SIGNED_8, 16, 0);
   bool ok = mpframe->Read ();
+  //  ok = ok && mpframe->junk < 20; // this doesnt really work :(
+  //  printf("ok = %d, junk %d len = %d\n", ok, mpframe->junk, len);
   delete mpframe;
   return ok;
 }
@@ -221,7 +223,9 @@ public:
   {
     csMp3SoundData *sd=NULL;
     if (csMp3SoundData::IsMp3 (Buffer, Size))
+    {
       sd = new csMp3SoundData ((iBase*)this, (uint8*)Buffer, Size);
+    }
     return sd;
   }
 };

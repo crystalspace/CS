@@ -85,7 +85,7 @@ csMPGFrame::csMPGFrame (void *datasource, ioCallback *io, int outformat, int fla
   channels = -1;
   down_sample = 0;
   bits = 16;
-
+  framesize = 0;
   if (!layer_n_table_done)
   {
     make_decode_tables(CSMPEG_OUTSCALE);
@@ -105,6 +105,7 @@ void csMPGFrame::Init ()
 {
   oldhead = firsthead = 0;
   bsi.Init ();
+  junk = 0;
 }
 
 void csMPGFrame::Rewind ()
@@ -178,6 +179,7 @@ bool csMPGFrame::ReadFrameBody ()
   {
     if (l <= 0)
       return false;
+    printf ("%d of %d read\n", l, framesize);
     memset (bsi.bsbuf+l, 0, framesize-l);
   }
   return true;
@@ -239,6 +241,7 @@ init_resync:
 	  if (HeadValid(newhead))
 	    break;
 	}
+	junk += i;
 	if (i == 65536) 
 	{
 	  fprintf(stderr,"Giving up searching valid MPEG header\n");
@@ -468,7 +471,7 @@ bool csMPGFrame::DecodeHeader (uint32 newhead)
     return false;
   }
 
-  return true;
+  return framesize < MAXFRAMESIZE && framesize >0 ; // sanitycheck
 }
 
 void csMPGFrame::Resync ()
