@@ -299,9 +299,9 @@ much as possible.
 
 The above comment is why it is important to have a good world design.
 World geometry (which is at the basis of visibility culling) should
-contain as little polygons as possible but they should be as big as
-possible and also potentially cull lots of geometry. Culling objects
-should be found for all large detail objects which can potentially
+contain as few polygons (quantity) as possible but they should be as big
+(in size) as possible and also potentially cull lots of geometry. Culling
+objects should be found for all large detail objects which can potentially
 cull large numbers of other objects or portals.
 
 The current culler works with the c-buffer.  For every scanline we have a list

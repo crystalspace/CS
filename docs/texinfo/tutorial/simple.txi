@@ -27,6 +27,10 @@ The manual is included in @sc{html} form Crystal Space itself and is also
 available online.  The @sc{api} documentation can be generated locally or
 viewed online.  @xref{Where to Get}.
 
+Additionally note that the source for some of these tutorials can be
+found in the @file{CS/apps/tutorials} directory. There are also a few
+additional tutorials there that are not (yet) covered in the documentation.
+
 Before reading this tutorial you should read the Tutorial Introduction first
 (@pxref{Tutorial Introduction}).
 

@@ -173,13 +173,13 @@ public:
   static bool RequestPlugins (iObjectRegistry*, ...);
 
   /**
-   * Send the cscmdOpen command to all loaded plugins.
+   * Send the cscmdSystemOpen command to all loaded plugins.
    * This should be done after initializing them (Initialize()).
    */
   static bool OpenApplication (iObjectRegistry*);
 
   /**
-   * Send the cscmdClose command to all loaded plugins.
+   * Send the cscmdSystemClose command to all loaded plugins.
    */
   static void CloseApplication (iObjectRegistry*);
 

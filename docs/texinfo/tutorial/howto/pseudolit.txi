@@ -10,7 +10,7 @@
 One little known feature in CS is the ability to have pseudo-dynamic
 lights. Pseudo-dynamic lights are somewhere between static lights and
 dynamic lights. Static lights cannot move but they generate high quality
-lightmaps. Static lights can move but the quality of lighting is much
+lightmaps. Dynamic lights can move but the quality of lighting is much
 less. Pseudo-dynamic lights are a variant of static lights. They cannot
 move either but they can change intensity and color dynamically. Since
 they also use lightmaps the quality is very good and they have correct

@@ -27,6 +27,11 @@
  * functions and, by default, does not preallocate any memory.  It contains all
  * the basic functionality of the derived csVector class, but none of the
  * gimmicks.
+ * <p>
+ * Side note: the reason CS doesn't use templates for these classes is
+ * for portability. CS runs on platforms and compilers on which templates
+ * are not always working nicely and even on modern compilers there can
+ * be subtle but annoying differences. So we avoid them.
  */
 class csBasicVector
 {

@@ -37,7 +37,7 @@ struct csDLListItem
  * This class implements a doubly-linked list. Note that this implementation
  * builds a circular list, that means to next pointer of the last element
  * points to the first element.
- *
+ * <p>
  * Nothing in this code affects the objects in the list.
  * They do not get deleted by any of these function calls.
  */
@@ -52,7 +52,7 @@ private:
   csDLListItem* FindListItem (void *anObj);
 
 public:
-  /// Constructor
+  /// Constructor.
   csDLinkList ();
 
   /**
@@ -100,6 +100,19 @@ public:
   /**
    * Return the next item in the list, and set the currentItem
    * to that item.
+   * <p>
+   * Note that the last list element doesn't point to NULL but to the
+   * first item again. So to traverse a list do something like the following:
+   * <code>
+   * csDLinkList list;
+   * type* first = (type*)list.GetFirstItem ();
+   * type* p = first;
+   * do
+   * {
+   *   ...
+   *   p = (type*) list.GetNextItem ();
+   * } while (p != first);
+   * </code>
    */
   void* GetNextItem ();
 
@@ -110,3 +123,4 @@ public:
 };
 
 #endif // __CS_CSDLLIST_H__
+

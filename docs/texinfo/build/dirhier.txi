@@ -25,6 +25,11 @@ as it is supported by your operating system.  This is the path that all
 compiled programs end up in.  This should be your working directory for these
 executables. The two files @file{vfs.cfg} and @file{scf.cfg} also reside in this directory.
 
+@item CS/out
+This directory is used by the build process. It will contain all object,
+dependency files and other files needed for building the Crystal Space
+applications, libraries, and plugins.
+
 @item CS/apps
 This is where all applications which ship with Crystal Space reside.
 @xref{Applications}.

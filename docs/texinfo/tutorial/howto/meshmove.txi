@@ -56,7 +56,7 @@ arrive at some point in the near future.
 is an example of some code that places an object in some sector and position:
 
 @example
-  iMeshWrapper* mesh;
+  iMeshWrapper* mesh = @dots{};
   iMovable* movable = mesh->GetMovable ();
   movable->SetSector (room);
   movable->SetPosition (csVector3 (2, 3, 1));
@@ -118,6 +118,45 @@ want to move them so that the origin is ok. That can make later transformations
 from object to world space easier. @code{HardTransform()} is not a function
 of @samp{iMovable} but of @samp{iMeshWrapper} (which will in turn delegate
 this to the mesh object itself).
+
+@subsubheading Moving Things
+@cindex Moving Things
+@cindex @samp{MOVEABLE}
+
+Things are one implementation of mesh objects for which movement is a
+bit special. By default things cannot move at all. The engine assumes
+they are static and is able to optimize on that. In order to make a thing
+movable you need to do the following in code:
+
+@example
+  iMeshWrapper* mesh = @dots{};
+  iThingState* state = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+  	iThingState);
+  if (state)
+  @{
+    state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
+    state->DecRef ();
+  @}
+@end example
+
+Warning: do NOT use the @code{CS_THING_MOVE_OFTEN} flag yet as that
+is not implemented at this moment.
+
+To do this from within a map file you can do the following:
+
+@example
+  MESHOBJ 'myObject' (
+    PLUGIN ('thing')
+    PARAMS (
+      MOVEABLE ()
+      @dots{}
+    )
+    MOVE (@dots{})
+  )
+@end example
+
+If you don't make a thing movable you can only move it with
+@code{HardTransform()} or @samp{HARDMOVE}.
 
 @subsubheading Include Files
 

@@ -128,13 +128,8 @@ contains resources which are used by several Crystal Space demonstration
 programs.  Do not unpack this file; Crystal Space uses it as is.
 
 The standard texture archive, @file{stdtex.zip}, contains textures which are
-required by many of the example Crystal Space map files.  You should download
-this file and place it in the @file{CS/data} directory.  As with
-@file{standard.zip}, do not unpack this file.  @file{stdtex.zip} can be
-downloaded from the following location:
-
-@noindent
-@uref{ftp://ftp.linuxgames.com/crystal/levels/stdtex.zip}
+required by many of the example Crystal Space map files. It is also included
+with CS.
 
 You will also need to have at least one @dfn{map} file in order to use the
 Crystal Space demonstration program, WalkTest.  Typically map files should be
@@ -142,13 +137,13 @@ placed within the @file{CS/data} directory.  As with other Crystal Space
 resources, map files are actually compressed archives which are used directly
 by the engine, thus you should not unpack these archives.
 
-The most commonly used map file is @file{flarge.zip} since it demonstrates many
+The most commonly used map file is @file{flarge} since it demonstrates many
 of the special features of the engine rather than focusing on merely one or two
-areas.  You can download @file{flarge.zip}, as well as several other example
-map files from the following location:
+areas. Both @file{flarge} and @file{partsys} are included with CS.
+You can download several other example map files from the following location:
 
 @noindent
-@uref{ftp://ftp.linuxgames.com/crystal/levels/}
+@uref{ftp://sunsite.dk/projects/crystal/cs094/levels/}
 
 To launch WalkTest you can either double-click on its icon or, from the command
 line, you can type:

@@ -147,6 +147,8 @@ public:
 
   /**
    * Put an object in this map.
+   * Use the csHashCompute() function to get a pseudo-unique numeric
+   * key from a string.
    */
   void Put (csHashKey key, csHashObject object);
 

@@ -30,7 +30,8 @@ struct iEventHandler;
 SCF_VERSION(iEventQueue, 0, 0, 1);
 
 /**
- * This interface represents a general event queue.<p>
+ * This interface represents a general event queue.
+ * <p>
  * Events may be posted to the queue by various sources.  Listeners
  * (implementing iEventHandler) can register to receive notification when
  * various events are processed.  Typically, one instance of this object is
@@ -46,7 +47,7 @@ struct iEventQueue : public iBase
    * own event loop) in order to give Crystal Space modules a chance to run and
    * respond to events.
    */
-  virtual void Process() = 0;
+  virtual void Process () = 0;
 
   /**
    * Dispatch a single event from the queue.  This is normally called by
@@ -54,7 +55,7 @@ struct iEventQueue : public iBase
    * appropriate listeners (implementors of iEventHandler) which have been
    * registered via RegisterListener().
    */
-  virtual void Dispatch(iEvent&) = 0;
+  virtual void Dispatch (iEvent&) = 0;
 
   /**
    * Register a listener for specific events.  If the listener is already
@@ -69,18 +70,19 @@ struct iEventQueue : public iBase
    * cscmdPreProcess before event dispatching, and cscmdPostProcess after event
    * dispatching.
    */
-  virtual void RegisterListener(iEventHandler*, unsigned int trigger) = 0;
+  virtual void RegisterListener (iEventHandler*, unsigned int trigger) = 0;
 
   /**
-   * Unregister a listener.
+   * Unregister a listener. It is important to call RemoveListener() before
+   * deleting your event handler!
    */
-  virtual void RemoveListener(iEventHandler*) = 0;
+  virtual void RemoveListener (iEventHandler*) = 0;
 
   /**
    * Change a listener's trigger.  See RegisterListener() for a discussion of
    * the trigger.
    */
-  virtual void ChangeListenerTrigger(iEventHandler*, unsigned int trigger) = 0;
+  virtual void ChangeListenerTrigger (iEventHandler*, unsigned int trigger) = 0;
 
   /**
    * Register an event plug and return a new outlet.  Any module which
@@ -91,7 +93,7 @@ struct iEventQueue : public iBase
    * queue.  It is the caller's responsibility to send a DecRef() message to
    * the returned event outlet when it is no longer needed.
    */
-  virtual iEventOutlet* CreateEventOutlet(iEventPlug*) = 0;
+  virtual iEventOutlet* CreateEventOutlet (iEventPlug*) = 0;
 
   /**
    * Get a public event outlet for posting just an event.
@@ -107,16 +109,17 @@ struct iEventQueue : public iBase
    * Note that the returned object is NOT IncRef'd, thus you should NOT
    * DecRef it after usage.
    */
-  virtual iEventOutlet* GetEventOutlet() = 0;
+  virtual iEventOutlet* GetEventOutlet () = 0;
 
   /**
-   * Get the event cord for a given category and subcategory.<p>
+   * Get the event cord for a given category and subcategory.
+   * <p>
    * This allows events to be delivered immediately, bypassing the normal event
    * queue, to a chain of plugins that register with the implementation of
    * iEventCord returned by this function.  The category and subcategory are
    * matched against the category and subcategory of each actual iEvent.
    */
-  virtual iEventCord* GetEventCord(int Category, int Subcategory) = 0;
+  virtual iEventCord* GetEventCord (int Category, int Subcategory) = 0;
 
   /**
    * Place an event into queue.  In general, clients should post events to the
@@ -124,7 +127,7 @@ struct iEventQueue : public iBase
    * may be certain circumanstances where posting directly to the queue is
    * preferred.
    */
-  virtual void Post(iEvent*) = 0;
+  virtual void Post (iEvent*) = 0;
 
   /**
    * Get next event from queue; returns NULL if no events are present.  There
@@ -134,13 +137,13 @@ struct iEventQueue : public iBase
    * caller's responsibility to invoke iEvent::DecRef() when the event is no
    * longer needed.
    */
-  virtual iEvent* Get() = 0;
+  virtual iEvent* Get () = 0;
 
   /// Clear event queue.
-  virtual void Clear() = 0;
+  virtual void Clear () = 0;
 
   /// Query if queue is empty.
-  virtual bool IsEmpty() = 0;
+  virtual bool IsEmpty () = 0;
 };
 
 #endif // __IUTIL_EVENTQ_H__

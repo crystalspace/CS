@@ -19,7 +19,9 @@ NextStep, OS/2, BeOS, and MS-DOS.
 @item
 C++ Development Environment: Crystal Space must be built with a C++
 compiler such as the GNU C++, Microsoft Visual C/++, and Metrowerks 
-CodeWarrior compilers and other standard development tools.
+CodeWarrior compilers and other standard development tools. If someone
+makes a nice framework for you based on CS and Python you can get away
+without C++ compiler by developing in Python.
 
 @item
 The main Crystal Space package.  In fact you need the compiled library, an

@@ -265,7 +265,8 @@ You also should call @code{SCF_CONSTRUCT_IBASE(@var{parent})} inside your class
 constructor, this macro will initialize @samp{scfRefCount} to zero and
 @samp{scfParent} to @var{parent}. In fact, the constructor of any class
 should receive at least one argument of type @samp{iBase*} which should then
-be passed along to the @code{SCF_CONSTRUCT_IBASE()} macro.
+be passed along to the @code{SCF_CONSTRUCT_IBASE()} macro. Note that the
+parent can also be NULL if you want.
 
 @node SCF Multiple Interfaces, SCF Versions, SCF Using, SCF
 @subsection Classes Implementing Multiple Interfaces

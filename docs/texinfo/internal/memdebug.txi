@@ -6,6 +6,8 @@
 @noindent
 @emph{Written by Andrew Zabolotny, @email{bit@@eltech.ru}.}
 
+@emph{This section is most likely totally outdated!}
+
 The goals of the Crystal Space memory debugger are listed below:
 
 @itemize @bullet

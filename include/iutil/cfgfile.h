@@ -82,7 +82,7 @@ struct iConfigFile : public iBase
   virtual bool Save (const char *iFileName, iVFS* = NULL) = 0;
 
   /// Delete all options and rewind all iterators.
-  virtual void Clear() = 0;
+  virtual void Clear () = 0;
 
   /**
    * Enumerate selected keys.  If a subsection is given, only those keys which
@@ -90,23 +90,35 @@ struct iConfigFile : public iBase
    * iterator does not yet point to a valid key.  You must call Next() to set
    * it to the first key.
    */
-  virtual iConfigIterator *Enumerate(const char *Subsection = NULL) = 0;
+  virtual iConfigIterator *Enumerate (const char *Subsection = NULL) = 0;
 
   /// Test if a key exists.
-  virtual bool KeyExists(const char *Key) const = 0;
+  virtual bool KeyExists (const char *Key) const = 0;
   /// Test if at least one key exists with the given Subsection prefix.
-  virtual bool SubsectionExists(const char *Subsection) const = 0;
+  virtual bool SubsectionExists (const char *Subsection) const = 0;
 
-  /// Get an integer value from the configuration.
-  virtual int GetInt(const char *Key, int Def = 0) const = 0;
-  /// Get a float value from the configuration.
-  virtual float GetFloat(const char *Key, float Def = 0.0) const = 0;
-  /// Get a string value from the configuration.
-  virtual const char *GetStr(const char *Key, const char *Def = "") const = 0;
-  /// Get a boolean value from the configuration.
-  virtual bool GetBool(const char *Key, bool Def = false) const = 0;
+  /**
+   * Get an integer value from the configuration. The optional default
+   * value (Def parameter) will be used if the key was not found.
+   */
+  virtual int GetInt (const char *Key, int Def = 0) const = 0;
+  /**
+   * Get a float value from the configuration. The optional default
+   * value (Def parameter) will be used if the key was not found.
+   */
+  virtual float GetFloat (const char *Key, float Def = 0.0) const = 0;
+  /**
+   * Get a string value from the configuration. The optional default
+   * value (Def parameter) will be used if the key was not found.
+   */
+  virtual const char *GetStr (const char *Key, const char *Def = "") const = 0;
+  /**
+   * Get a boolean value from the configuration. The optional default
+   * value (Def parameter) will be used if the key was not found.
+   */
+  virtual bool GetBool (const char *Key, bool Def = false) const = 0;
   /// Get the comment of the given key, or NULL if no comment exists.
-  virtual const char *GetComment(const char *Key) const = 0;
+  virtual const char *GetComment (const char *Key) const = 0;
 
   /// Set an null-terminated string value.
   virtual void SetStr (const char *Key, const char *Val) = 0;
@@ -124,11 +136,11 @@ struct iConfigFile : public iBase
    */
   virtual bool SetComment (const char *Key, const char *Text) = 0;
   /// Delete a key and its value and comment.
-  virtual void DeleteKey(const char *Key) = 0;
+  virtual void DeleteKey (const char *Key) = 0;
   /// return the final comment at the end of the configuration file
-  virtual const char *GetEOFComment() const = 0;
+  virtual const char *GetEOFComment () const = 0;
   /// set the final comment at the end of the configuration file
-  virtual void SetEOFComment(const char *Text) = 0;
+  virtual void SetEOFComment (const char *Text) = 0;
 };
 
 
@@ -141,9 +153,9 @@ SCF_VERSION(iConfigIterator, 0, 0, 1);
 struct iConfigIterator : public iBase
 {
   /// Returns the configuration object for this iterator.
-  virtual iConfigFile *GetConfigFile() const = 0;
+  virtual iConfigFile *GetConfigFile () const = 0;
   /// Returns the subsection in the configuruation.
-  virtual const char *GetSubsection() const = 0;
+  virtual const char *GetSubsection () const = 0;
 
   /// Rewind the iterator (points to nowhere after this)
   virtual void Rewind () = 0;
@@ -156,17 +168,17 @@ struct iConfigIterator : public iBase
    * which follows the subsection prefix which was used to create this
    * iterator.
    */
-  virtual const char *GetKey(bool Local = false) const = 0;
+  virtual const char *GetKey (bool Local = false) const = 0;
   /// Get an integer value from the configuration.
-  virtual int GetInt() const = 0;
+  virtual int GetInt () const = 0;
   /// Get a float value from the configuration.
-  virtual float GetFloat() const = 0;
+  virtual float GetFloat () const = 0;
   /// Get a string value from the configuration.
-  virtual const char *GetStr() const = 0;
+  virtual const char *GetStr () const = 0;
   /// Get a boolean value from the configuration.
-  virtual bool GetBool() const = 0;
+  virtual bool GetBool () const = 0;
   /// Get the comment of the given key, or NULL if no comment exists.
-  virtual const char *GetComment() const = 0;
+  virtual const char *GetComment () const = 0;
 };
 
 #endif // __IUTIL_CFGFILE_H__

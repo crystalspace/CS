@@ -22,10 +22,10 @@ what's new.
 @node Current Status, UsingForProject, HowToRead, CS Introduction
 @section Current Status
 
-@emph{Note}: Crystal Space is still in beta.  This means that there are known
-and unknown bugs and that things in general may not work as expected (or may
-not work at all).  For information about known bugs and unfinished items,
-refer to the Developer's Project page at SourceForge:
+@emph{Note}: Crystal Space (@sc{CS}) is still in beta. This means that there
+are known and unknown bugs and that things in general may not work as
+expected (or may not work at all).  For information about known bugs and
+unfinished items, refer to the Developer's Project page at SourceForge:
 
 @noindent
 @uref{http://sourceforge.net/projects/crystal/}

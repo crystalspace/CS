@@ -388,7 +388,7 @@ get the application running. In the tutorial below we will use several of the
 functions from @code{csInitializer}. This class contains only static member
 functions.
 
-@node TutIntro Minimum Requirements, , TutIntro Basic Concepts, Tutorial Introduction
+@node TutIntro Minimum Requirements, , TutIntro Basic Concepts, Tutorial Compilation
 @subsection Minimum Application Requirements
 @cindex Tutorial Minimum Application Requirements
 @cindex Minimum Application Requirements, Tutorial
@@ -400,7 +400,11 @@ there are a few requirements.  These are:
 @item
 Each and every source file (@file{.cpp}) must import @file{cssysdef.h} as the
 very first included Crystal Space header files.  @file{cssysdef.h} should never
-be included by a header file.
+be included by a header file. The reason for this is that @file{cssysdef.h}
+has modifiers which control what should be defined and what not. If a header
+file would include @file{cssysdef.h} on its own the cpp file would not be
+able to include it again (due to header protection) and would then not be
+able to add the additional stuff that it may need.
 
 @item
 @code{CS_IMPLEMENT_APPLICATION} needs to be put in the beginning of
@@ -415,4 +419,18 @@ int main(int argc, char *argv[]);
 
 Following these guidelines will help to ensure that your application builds
 and runs on all platforms supported by Crystal Space.
+
+@node TutIntro Compilation, , TutIntro Minimum Requirements, Tutorial Introduction
+@subsection Compiling the Application
+@cindex Compiling an Application, Tutorial
+
+In order to compile a Crystal Space application I recommend you look at the
+howto on compiling an external application. For @sc{MSVC} this tutorial
+can be found at @xref{HOWTO Creating External MSVC Application}, for
+other environments based on GNU make you can look at
+@xref{HOWTO CS Project}.
+
+Additionally note that the source for some of these tutorials can be
+found in the @file{CS/apps/tutorials} directory. There are also a few
+additional tutorials there that are not (yet) covered in the documentation.
 

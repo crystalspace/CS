@@ -42,38 +42,48 @@ SCF_VERSION (iConsoleInput, 1, 0, 1);
 /**
  * This is a plugin that can handle keyboard input and display
  * it on an associated console. The plugin has a command history
- * and when user presses <Enter> can call some callback function
+ * and when user presses 'Enter' can call some callback function
  * to execute the entered command.
+ * <p>
+ * <b>WARNING</b> Do NOT use the event handler
+ * that may (or may not) be implemented by the console and register
+ * that to the event queue. This doesn't work properly. Instead register
+ * your own event handler and call HandleEvent() from that.
  */
 struct iConsoleInput : public iBase
 {
-  /// Bind to a console
+  /// Bind to a console.
   virtual void Bind (iConsoleOutput*) = 0;
 
-  /// Set the command execution callback
+  /// Set the command execution callback.
   virtual void SetExecuteCallback (iConsoleExecCallback* iCallback) = 0;
   /// Get the command execution callback.
   virtual iConsoleExecCallback* GetExecuteCallback () = 0;
 
-  /// Return a line from the input buffer (-1 = current line)
+  /// Return a line from the input buffer (-1 = current line).
   virtual const char *GetText (int iLine = -1) const = 0;
 
-  /// Return the current input line number
+  /// Return the current input line number.
   virtual int GetCurLine () const = 0;
 
-  /// Retrieve the size of the history buffer
+  /// Retrieve the size of the history buffer.
   virtual int GetBufferSize () const = 0;
 
-  /// Set the size of the history buffer;
+  /// Set the size of the history buffer.
   virtual void SetBufferSize (int iSize) = 0;
 
-  /// Clear the history buffer
+  /// Clear the history buffer.
   virtual void Clear () = 0;
 
-  /// Set the prompt string
+  /// Set the prompt string.
   virtual void SetPrompt (const char *iPrompt) = 0;
 
-  /// Handle a console-related event
+  /**
+   * Handle a console-related event. Do NOT use the event handler
+   * that may (or may not) be implemented by the console and register
+   * that to the event queue. This doesn't work properly. Instead register
+   * your own event handler and call HandleEvent() from that.
+   */
   virtual bool HandleEvent (iEvent&) = 0;
 };
 

@@ -409,7 +409,7 @@ this problem, edit @file{user.cfg} and add a line to it similar to the
 following:
 
 @example
-Glboal.Engine.Lighting.Ambient.White = 70
+Global.Engine.Lighting.Ambient.White = 70
 @end example
 
 Some potentially good choices for this setting are summarized below.  If these
@@ -419,10 +419,10 @@ which is suitable.
 @quotation
 @multitable @columnfractions .25 .80
 @item @emph{Platform} @tab @emph{Setting}
-@item MacOS/X @tab @code{Glboal.Engine.Lighting.Ambient.White=70}
-@item MacOS/X Server 1.0 @tab @code{Glboal.Engine.Lighting.Ambient.White=70}
-@item OpenStep @tab @code{Glboal.Engine.Lighting.Ambient.White=50}
-@item NextStep @tab @code{Glboal.Engine.Lighting.Ambient.White=50}
+@item MacOS/X @tab @code{Global.Engine.Lighting.Ambient.White=70}
+@item MacOS/X Server 1.0 @tab @code{Global.Engine.Lighting.Ambient.White=70}
+@item OpenStep @tab @code{Global.Engine.Lighting.Ambient.White=50}
+@item NextStep @tab @code{Global.Engine.Lighting.Ambient.White=50}
 @end multitable
 @end quotation
 

@@ -52,6 +52,19 @@ This will move the camera in the world so that it goes one unit in
 the positive Z direction. This will happen independently of the orientation
 of the camera.
 
+Here is another example which demonstrates how to use the @code{LookAt()}
+function. The following example will set a camera at location @samp{3,5,1}
+and let it look at @samp{3,5,10}. The up vector of the camera will be
+@samp{0,1,0} (which is default):
+
+@example
+  csVector3 camera_pos (3, 5, 1);
+  csVector3 look_at_pos (3, 5, 10);
+  csVector3 up (0, 1, 0);
+  camera->GetTransform ().Move (camera_pos);
+  camera->GetTransform ().LookAt (camera_pos - look_at_pos, up);
+@end example
+
 @subsubheading Include Files
 
 The include files useful for this section are:
