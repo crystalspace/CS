@@ -111,6 +111,8 @@ bool csModelConverterMultiplexer::Initialize (iObjectRegistry *object_reg)
 
 bool csModelConverterMultiplexer::LoadNextPlugin ()
 {
+  if (!classlist) return false;
+  
   csRef<iModelConverter> plugin;
   if (classlist && !plugin)
   {

@@ -129,14 +129,22 @@ bool CCSSector::Write(csRef<iDocumentNode> node, CIWorld* pIWorld)
 
   DocNode sector = CreateNode (node, "sector");
   sector->SetAttribute ("name", GetName());
+  CMapEntity* worldspawn = pWorld->GetWorldspawn ();
+  if (worldspawn->GetBoolValueOfKey ("dynavis"))
+  {
+    CreateNode (sector, "cullerp", "crystalspace.culling.dynavis");
+  }
+
+  CMapEntity* pEntity = m_pOriginalBrush->GetEntity();
 
   DocNode meshobj = CreateNode (sector, "meshobj");
-  meshobj->SetAttribute ("name", "static");
+  meshobj->SetAttribute ("name", 
+    pEntity->GetValueOfKey ("cs_name",
+    csString().Format ("%s_portals", GetName())));
   CreateNode (meshobj, "plugin", "thing");
   CreateNode (meshobj, "zuse");
   CreateNode (meshobj, "priority", "wall");
 
-  CMapEntity* pEntity = m_pOriginalBrush->GetEntity();
   CCSWorld::WriteKeys(meshobj, pWorld, pEntity);
 
   DocNode params = CreateNode (meshobj, "params");
@@ -156,8 +164,9 @@ bool CCSSector::Write(csRef<iDocumentNode> node, CIWorld* pIWorld)
     if (m_Walls.Length() > 0 ||
         m_Portals.Length() > 0)
     {
-      DocNode part = CreateNode (params, "part");
-      part->SetAttribute ("name", "p1");
+      //DocNode part = CreateNode (params, "part");
+      //part->SetAttribute ("name", "p1");
+      DocNode part = params;
 
       int i, j, l;
 
@@ -204,7 +213,8 @@ bool CCSSector::Write(csRef<iDocumentNode> node, CIWorld* pIWorld)
     } //if contains any polygons
   }
 
-  WriteWorldspawn(params, pWorld);
+  //WriteWorldspawn(params, pWorld);
+  WriteWorldspawn(sector, pWorld);
 
   WriteFog(sector, pWorld);
   WriteLights(sector, pWorld);
@@ -230,10 +240,30 @@ bool CCSSector::WriteWorldspawn(csRef<iDocumentNode> node, CIWorld* pWorld)
   {
     if (strcasecmp(m_Things[i]->GetClassname(), "worldspawn")==0)
     {
-      if (!((CCSThing*)m_Things[i])->WriteAsPart(node, pWorld, this))
+      CMapEntity* pEntity = m_pOriginalBrush->GetEntity();
+
+      DocNode meshobj = CreateNode (node, "meshobj");
+      meshobj->SetAttribute ("name", 
+	pEntity->GetValueOfKey ("cs_name",
+	csString().Format ("%s_walls", GetName())));
+      CreateNode (meshobj, "plugin", "thing");
+      CreateNode (meshobj, "zuse");
+
+      CCSWorld::WriteKeys(meshobj, pWorld, pEntity);
+
+      DocNode params = CreateNode (meshobj, "params");
+
+      bool Sky;
+      if (!((CCSThing*)m_Things[i])->WriteAsPart(params, pWorld, this, Sky))
       {
         return false;
       }
+
+      DocNode priority = meshobj->CreateNodeBefore (CS_NODE_ELEMENT,
+	params);
+      priority->SetValue ("priority");
+      priority = priority->CreateNodeBefore (CS_NODE_TEXT);
+      priority->SetValue ("wall");
     }
   }
   return true;

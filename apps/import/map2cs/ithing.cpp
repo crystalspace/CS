@@ -60,10 +60,11 @@ bool CIThing::IsMoveable()
 
 bool CIThing::IsSky()
 {
+  bool Sky = false;
   if (m_pOriginalEntity)
-    return m_pOriginalEntity->GetBoolValueOfKey("sky", false);
-  
-  return false;
+    Sky = m_pOriginalEntity->GetBoolValueOfKey("sky", false);
+
+  return Sky;
 }
 
 const char* CIThing::GetClassname()

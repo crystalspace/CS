@@ -113,8 +113,7 @@ CTextureFile* CTextureManager::GetTexture(const char* TextureName)
   int i=0;
   for (i=0; i<strlen(InternalName); i++)
   {
-    if ((!isalnum(InternalName[i])) && (InternalName[i] != '_') && 
-      (InternalName[i] != '{') && (InternalName[i] != '~'))
+    if (strchr ("/\\", InternalName[i]))
     {
       InternalName[i] = '_';
     }

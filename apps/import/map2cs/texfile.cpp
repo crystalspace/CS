@@ -52,7 +52,15 @@ static const char* InvisibleTextures[] =
  "common/slick",
  //"common/teleporter",
  "common/trigger",
- "common/weapclip"
+ "common/weapclip",
+ "clip",
+ "aaatrigger",
+ "origin"
+};
+
+static const char* UnstoredTextures[] =
+{
+  "sky"
 };
 
 CTextureFile::CTextureFile()
@@ -95,8 +103,28 @@ bool CTextureFile::AddToVFS(csRef<iVFS> VFS, const char* path)
   if (m_OriginalData.GetSize() == 0) return true;
   VFS->PushDir();
   VFS->ChDir (path);
-  bool res = VFS->WriteFile (m_Filename, (char*)m_OriginalData.GetData(),
-    m_OriginalData.GetSize());
+  bool res = false;
+  if (VFS->Exists (m_Filename))
+  {
+    size_t vfssize;
+    VFS->GetFileSize (m_Filename, vfssize);
+    if (vfssize == m_OriginalData.GetSize())
+    {
+      res = true;
+    }
+    else
+    {
+      printf ("Texture %s: file %s already exists, but has different size (%d != %d).\n"
+	"Maybe a texture with this name exists in multiple archives?\n",
+	m_Texturename, vfssize, m_OriginalData.GetSize());
+    }
+  }
+  else
+  {
+    VFS->WriteFile (m_Filename, (char*)m_OriginalData.GetData(),
+      m_OriginalData.GetSize());
+    res = true;
+  }
   VFS->PopDir ();
   return res;
 //  return pZipfile->AddData(&m_OriginalData, m_Filename);
@@ -113,6 +141,19 @@ void CTextureFile::SetTexturename(const char* name)
     if (strcmp(m_Texturename, InvisibleTextures[i])==0)
     {
       m_Visible = false;
+    }
+  }
+
+  if (m_Visible)
+  {
+    m_Stored = true;
+    int i;
+    for (i=0; i<int(sizeof(UnstoredTextures)/sizeof(UnstoredTextures[0])); i++)
+    {
+      if (stricmp(m_Texturename, UnstoredTextures[i])==0)
+      {
+	m_Stored = false;
+      }
     }
   }
 }

@@ -89,6 +89,9 @@ protected:
   FILE*       m_Filehandle;
   S_Lumpinfo* m_Lumpinfo;
   int         m_Numlumps;
+
+  bool has_keycolor;
+  int keycolor_r, keycolor_g, keycolor_b;
 };
 
 #endif // __WAD3FILE_H__

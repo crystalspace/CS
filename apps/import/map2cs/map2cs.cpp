@@ -116,11 +116,11 @@ int appMain (iObjectRegistry* object_reg, int argc, char *argv[])
   const char* worldfile = argv[2];
 
   CMapFile Map;
-  printf("Reading map '%s'\n", mapfile);
+  printf("Reading map '%s'...\n", mapfile);
   Map.Read(mapfile, configfile);
 
   Map.CreatePolygons();
-  printf("Writing world '%s'\n", worldfile);
+  printf("Generating data for world '%s'...\n", worldfile);
 
   csRef<iDocumentSystem> xml(csPtr <iDocumentSystem>
     (new csTinyDocumentSystem()));
@@ -132,10 +132,15 @@ int appMain (iObjectRegistry* object_reg, int argc, char *argv[])
 
   remove (worldfile);
   VFS->Mount ("/map2cs_temp", worldfile);
+  printf ("Writing world...\n");
   doc->Write(VFS, "/map2cs_temp/world");
 
-  Map.GetTextureManager()->AddAllTexturesToVFS (VFS,
-    "/map2cs_temp/");
+  printf ("Writing textures...\n");
+  if (!Map.GetTextureManager()->AddAllTexturesToVFS (VFS,
+    "/map2cs_temp/"))
+  {
+    printf ("Not all textures where written correctly.\n");
+  }
 
   VFS->Unmount ("/map2cs_temp", worldfile);
 

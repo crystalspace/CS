@@ -190,6 +190,42 @@ bool CWad3File::Extract(const char* Texture, char*& Data, int& Size, csString& f
     csImageMemory mi (TexInfo.width, TexInfo.height, 
       (void*)((uint8*)Buffer + TexInfo.offsets[0]),
       false, CS_IMGFMT_PALETTED8, pal);
+    // set the keycolor
+    if (*Texture == '{')
+    {
+      // arg. some textures around specify their transparency color
+      // in pal index 255, some others uses blue, but it isn't on
+      // index 255. IIRC HL wants blue AND index 255.
+      // Anyway, we seek the pal for bright blue. If found: our 
+      // transparency color. If not: take index 255.
+      has_keycolor = true;
+
+      bool found_blue = false;
+      for (i = 0; !found_blue && (i < 256); i++)
+      {
+	if ((pal[i].red == 0) && (pal[i].green == 0) && 
+	  (pal[i].blue == 255))
+	{
+	  found_blue = true;
+	}
+      }
+
+      if (found_blue)
+      {
+	keycolor_r = 0;
+	keycolor_g = 0;
+	keycolor_b = 255;
+      }
+      else
+      {
+        keycolor_r = pal[255].red;
+        keycolor_g = pal[255].green;
+        keycolor_b = pal[255].blue;
+      }
+      mi.SetKeycolor (keycolor_r, keycolor_g, keycolor_b);
+    }
+    else
+      has_keycolor = false;
     csRef<iDataBuffer> db = ImageLoader->Save (&mi, "image/png", "compress=100");
     if (db)
     {
@@ -256,9 +292,10 @@ CTextureFile* CWad3File::CreateTexture(const char* texturename)
     pTexture->SetTexturename (texturename);
     pTexture->SetFilename    (fn);
     pTexture->SetOriginalData(pData, Size);
-    if (*texturename == '{')
+    if (has_keycolor)
     {
-      pTexture->SetKeyColor (0, 0, 1);
+      pTexture->SetKeyColor (keycolor_r / 255.0f, keycolor_g / 255.0f, 
+	keycolor_b / 255.0f);
     }
 
     miptex_t Info;

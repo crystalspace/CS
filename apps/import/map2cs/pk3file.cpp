@@ -39,6 +39,10 @@ CTextureFile* CPk3File::CreateTexture(const char* texturename)
   pTexture = ExtractTexture(texturename, texfilename);
   if (pTexture) return pTexture;
 
+  sprintf (texfilename, "textures/%s.png", texturename);
+  pTexture = ExtractTexture(texturename, texfilename);
+  if (pTexture) return pTexture;
+
   return NULL;
 }
 

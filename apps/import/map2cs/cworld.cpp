@@ -152,8 +152,8 @@ bool CCSWorld::Write(csRef<iDocumentNode> root, CMapFile* pMap, const char * /*s
   struct tm *now = localtime (&Time);
   char buf[128];
 
-  sprintf (buf, "Created by map2cs " CS_VERSION " on "
-    "%04d-%02d-%02d %02d:%02d:%02d", now->tm_year+1900, 
+  sprintf (buf, " Created by map2cs 0.97 on "
+    "%04d-%02d-%02d %02d:%02d:%02d ", now->tm_year+1900, 
     now->tm_mon, now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
 
   DocNode temp = root->CreateNodeBefore (CS_NODE_COMMENT);
@@ -161,8 +161,16 @@ bool CCSWorld::Write(csRef<iDocumentNode> root, CMapFile* pMap, const char * /*s
   DocNode world = CreateNode(root, "world");
 
   CMapEntity* pEntity = GetWorldspawn();
+  
+  {
+    DocNode settings = CreateNode (world, "settings");
+    CreateNode(settings, "clearzbuf", "yes");
 
-  CreateNode(CreateNode (world, "settings"), "clearzbuf", "yes");
+    if (const char *lmcs = pEntity->GetValueOfKey ("lightmapcellsize"))
+    {
+      CreateNode(settings, "lightmapcellsize", lmcs);
+    }
+  }
   
   {
     DocNode scaling = CreateNode (world, "key");
@@ -198,7 +206,7 @@ bool CCSWorld::Write(csRef<iDocumentNode> root, CMapFile* pMap, const char * /*s
     CreateNode (object, "sort", "NONE");
 
     DocNode alpha = CreateNode (renderpriorities, "priority");
-    alpha->SetAttribute ("name", "object");
+    alpha->SetAttribute ("name", "alpha");
     CreateNode (alpha, "level", "5");
     CreateNode (alpha, "sort", "BACK2FRONT");
   }
@@ -284,11 +292,11 @@ void CCSWorld::WriteSkysector(csRef<iDocumentNode> node)
     DocNode sector = CreateNode (node, "sector");
     sector->SetAttribute ("name", "cs_skysector");
 
-    DocNode meshobj = CreateNode (sector, "meshobJ");
+    DocNode meshobj = CreateNode (sector, "meshobj");
     meshobj->SetAttribute ("name", "sky");
 
     CreateNode (meshobj, "plugin", "thing");
-    CreateNode (meshobj, "znone");
+    CreateNode (meshobj, "zfill");
     CreateNode (meshobj, "priority", "sky");
     CreateNode (meshobj, "camera");
 
@@ -514,30 +522,33 @@ bool CCSWorld::WriteTextures(csRef<iDocumentNode> node)
     CTextureFile* pTexture = m_pMap->GetTextureManager()->GetTexture(i);
     assert(pTexture);
 
-    char replacename[255];
-    const char *newtexfile;
-    sprintf(replacename, "filename_%s", pTexture->GetTexturename());
-    if ((newtexfile = pEntity->GetValueOfKey(replacename)))
-      pTexture->SetStored (false);
+    if (pTexture->IsStored())
+    {
+      char replacename[255];
+      const char *newtexfile;
+      sprintf(replacename, "filename_%s", pTexture->GetTexturename());
+      if ((newtexfile = pEntity->GetValueOfKey(replacename)))
+	pTexture->SetStored (false);
       
-    DocNode texture = CreateNode (textures, "texture");
-    texture->SetAttribute ("name", pTexture->GetTexturename());
-    CreateNode (texture, "file", newtexfile?newtexfile:pTexture->GetFilename());
+      DocNode texture = CreateNode (textures, "texture");
+      texture->SetAttribute ("name", pTexture->GetTexturename());
+      CreateNode (texture, "file", newtexfile?newtexfile:pTexture->GetFilename());
 
-    if (pTexture->IsColorKeyed())
-    {
-      float r, g, b;
-      pTexture->GetKeyColor(r, g, b);
+      if (pTexture->IsColorKeyed())
+      {
+	float r, g, b;
+	pTexture->GetKeyColor(r, g, b);
 
-      DocNode transparent = CreateNode (texture, "transparent");
-      transparent->SetAttributeAsFloat ("red", r);
-      transparent->SetAttributeAsFloat ("green", g);
-      transparent->SetAttributeAsFloat ("blue", b);
-    }
+	DocNode transparent = CreateNode (texture, "transparent");
+	transparent->SetAttributeAsFloat ("red", r);
+	transparent->SetAttributeAsFloat ("green", g);
+	transparent->SetAttributeAsFloat ("blue", b);
+      }
 
-    if (!pTexture->IsMipmapped())
-    {
-      CreateNode (texture, "mipmapped", "no");
+      if (!pTexture->IsMipmapped())
+      {
+	CreateNode (texture, "mipmap", "no");
+      }
     }
   }
 
@@ -552,7 +563,17 @@ bool CCSWorld::WriteTextures(csRef<iDocumentNode> node)
 
     DocNode material = CreateNode (materials, "material");
     material->SetAttribute ("name", pTexture->GetTexturename());
-    CreateNode (material, "texture", pTexture->GetTexturename());
+    if (pTexture->IsStored())
+    {
+      CreateNode (material, "texture", pTexture->GetTexturename());
+    }
+    else
+    {
+      DocNode color = CreateNode (material, "color");
+      color->SetAttributeAsFloat ("red", 0.5f);
+      color->SetAttributeAsFloat ("green", 0.5f);
+      color->SetAttributeAsFloat ("blue", 0.5f);
+    }
   }
 
   return true;
@@ -753,7 +774,8 @@ bool CCSWorld::WriteKeys(csRef<iDocumentNode> node, CIWorld* pWorld,
 
 bool CCSWorld::WritePolygon(csRef<iDocumentNode> node, CMapPolygon* pPolygon, 
 			    CCSSector* pSector, bool SectorPolygon, 
-			    const CVertexBuffer& Vb)
+			    const CVertexBuffer& Vb,
+			    bool &Sky)
 {
   const CMapTexturedPlane* pPlane   = pPolygon->GetBaseplane();
   CMapEntity*              pEntity  = pPolygon->GetEntity();
@@ -780,7 +802,7 @@ bool CCSWorld::WritePolygon(csRef<iDocumentNode> node, CMapPolygon* pPolygon,
   }
 
   CTextureFile* pTexture = pPlane->GetTexture();
-  bool Sky = false;
+  Sky = false;
   if (!pTexture)
   {
     //@@@ doesn't seem to be supported any more
@@ -795,7 +817,7 @@ bool CCSWorld::WritePolygon(csRef<iDocumentNode> node, CMapPolygon* pPolygon,
     CreateNode (poly, "material", pTexture->GetTexturename());
     CreateNode (CreateNode (poly, "texmap"), "plane", 
       pPolygon->GetBaseplane()->GetName());
-    Sky = (strcmp (pTexture->GetTexturename(), "sky") == 0);
+    Sky = (stricmp (pTexture->GetTexturename(), "sky") == 0);
   }
 
   
@@ -805,6 +827,7 @@ bool CCSWorld::WritePolygon(csRef<iDocumentNode> node, CMapPolygon* pPolygon,
     DocNode portal = CreateNode (poly, "portal");
     CreateNode (portal, "sector", "cs_skysector");
     CreateNode (portal, "clip");
+    CreateNode (poly, "lighting", "no");
   } else if (pEntity)
   {
     //support for special rendering flags. Ideally, these properties would be
@@ -821,7 +844,7 @@ bool CCSWorld::WritePolygon(csRef<iDocumentNode> node, CMapPolygon* pPolygon,
 
     if (Alpha < 100)
     {
-      CreateNode (poly, "lighting", (float)Alpha);
+      CreateNode (poly, "alpha", (float)Alpha);
     }
 
     if (Mirror || Alpha<100 || !Solid)

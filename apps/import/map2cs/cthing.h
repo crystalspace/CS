@@ -46,7 +46,8 @@ public:
   virtual bool Write(csRef<iDocumentNode> node, CIWorld* pIWorld, CISector* pISector);
 
   /// Write only polygons without headings
-  virtual bool WriteAsPart(csRef<iDocumentNode> node, CIWorld* pIWorld, CISector* pISector);
+  virtual bool WriteAsPart(csRef<iDocumentNode> node, CIWorld* pIWorld, CISector* pISector,
+			   bool &Sky);
 };
 
 #endif // __CTHING_H__

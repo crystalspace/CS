@@ -106,11 +106,11 @@ CMapTexturedPlane::CMapTexturedPlane(CMapFile*,
     double angle = rot_angle*0.017453293;
 
     //The Origin of the texture is rotated around (0,0) and scaled.
-    double xo=-( cos(angle)*x_off*x_scale +
+    double xo=( cos(angle)*x_off*x_scale +
                 sin(angle)*y_off*y_scale );
-    double yo=-(-sin(angle)*x_off*x_scale +
+    double yo=(-sin(angle)*x_off*x_scale +
                 cos(angle)*y_off*y_scale );
-
+    
     //The first and second point are relative to the origin and of course
     //rotated too.
     double x1=xo+sx*cos(angle);

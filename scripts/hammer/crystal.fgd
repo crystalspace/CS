@@ -27,6 +27,19 @@
 //	skydomeradius(integer) : "Skydome radius (default 800)" : 800
 	skybox(string) : "Skybox texture"
 	skyboxsize(integer) : "Skybox size (the lenght of a side, default 1600)" : 1600
+	dynavis(choices) : "Activate Dynavis" : 0 =
+	[
+		1 : "Yes"
+		0 : "No"
+	]
+	lightmapcellsize(choices) : "Lightmap cell size" : "16" =
+	[
+		 4 :  "4"
+		 8 :  "8"
+		16 : "16" 
+		32 : "32"
+		64 : "64"
+	]
 ]
 
 
@@ -66,19 +79,22 @@
 		1 : "Yes"
 		0 : "No"
 	]
-	solid(integer) : "if set to ´No, a portal is created for every side of the entity to the given targetsector" : 1 =
+	// if set to ´No, a portal is created for every side of the entity to the given targetsector
+	solid(choices) : "Portal" : 1 =
 	[
-		1 : "Yes"
-		0 : "No"
+		1 : "No"
+		0 : "Yes"
 	]
-	targetsector(string) : "Combine it with solid key"
+	// Combine it with solid key
+	targetsector(string) : "Target sector"
 	trigger(string) : "Trigger a script event"
-	moveable(choices) : "If thing is to be activated by a script, it must be moveable" : 0 =
+	moveable(choices) : "Moveable" : 0 =
 	[
 		1 : "Yes"
 		0 : "No"
 	]
-	activate(string) : "`cs_name´ of script specified in Classname cs_script that must be used to animate the thing"
+	// `cs_name´ of script specified in Classname cs_script that must be used to animate the thing
+	activate(string) : "Activated by"
 	lighting(choices) : "Lighting" : 1 =
 	[
 		1 : "Yes"
@@ -96,6 +112,14 @@
 		0 : "No"
 	]
 //	cs_collection(string) : "Under development"
+	priority(choices) : "Render priority" : "object" =
+	[
+		"sky" : "Sky"
+		"mirror" : "Mirror"
+		"wall" : "Wall"
+		"object" : "Object"
+		"alpha" : "Alpha"
+	]
 ]
 
 

@@ -66,7 +66,8 @@ public:
     * index numbers to use.
     */
   bool WritePolygon(csRef<iDocumentNode> node, CMapPolygon* pPolygon, 
-    CCSSector* pSector, bool SectorPolygon, const CVertexBuffer& Vb);
+    CCSSector* pSector, bool SectorPolygon, const CVertexBuffer& V,
+    bool &Sky);
 
   /// return a new CCSThing
   virtual CIThing* CreateNewThing(CMapEntity* pEntity);
@@ -82,6 +83,13 @@ public:
    * heading
    */
   void WriteSky(csRef<iDocumentNode> node);
+
+  /**
+   * Return the worldspawn entity. (All general map settings are stored there)
+   * returns NULL if there is no such entity. (I would consider this to be
+   * a map bug...)
+   */
+  CMapEntity* GetWorldspawn();
 
 protected:
   /**
@@ -111,13 +119,6 @@ protected:
    * resulting map
    */
   void FindAdditionalTextures();
-
-  /**
-   * Return the worldspawn entity. (All general map settings are stored there)
-   * returns NULL if there is no such entity. (I would consider this to be
-   * a map bug...)
-   */
-  CMapEntity* GetWorldspawn();
 
   /// Request all needed textures for display of sky from the texture manager
   void AllocateSkytextures();

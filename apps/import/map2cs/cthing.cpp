@@ -57,23 +57,29 @@ bool CCSThing::Write(csRef<iDocumentNode> node, CIWorld* pIWorld, CISector* pISe
   CreateNode (meshobj, "plugin", "thing");
   CreateNode (meshobj, "zuse");
 
-  if (IsSky())
-    CreateNode (meshobj, "priority", "sky");
-  else
-    CreateNode (meshobj, "priority",  
-      m_pOriginalEntity->GetValueOfKey("priority", 
-      m_pOriginalEntity->GetValueOfKey("mirror")?"mirror":"object"));
-
-  CCSWorld::WriteKeys(node, pWorld, m_pOriginalEntity);
+  CCSWorld::WriteKeys(meshobj, pWorld, m_pOriginalEntity);
 
   DocNode params = CreateNode (meshobj, "params");
 
-  WriteAsPart(params, pWorld, pSector);
+  bool Sky;
+  WriteAsPart(params, pWorld, pSector, Sky);
+
+  DocNode priority = meshobj->CreateNodeBefore (CS_NODE_ELEMENT,
+    params);
+  priority->SetValue ("priority");
+  priority = priority->CreateNodeBefore (CS_NODE_TEXT);
+  
+  if (IsSky())
+    priority->SetValue ("sky");
+  else
+    priority->SetValue (m_pOriginalEntity->GetValueOfKey("priority", 
+      m_pOriginalEntity->GetValueOfKey("mirror")?"mirror":"object"));
 
   return true;
 }
 
-bool CCSThing::WriteAsPart(csRef<iDocumentNode> node, CIWorld* pIWorld, CISector* pISector)
+bool CCSThing::WriteAsPart(csRef<iDocumentNode> node, CIWorld* pIWorld, CISector* pISector,
+			   bool &Sky)
 {
   if (!ContainsVisiblePolygons()) return true;
 
@@ -97,9 +103,10 @@ bool CCSThing::WriteAsPart(csRef<iDocumentNode> node, CIWorld* pIWorld, CISector
   //  fprintf(fd, "MOVEABLE ()\n");
   //}
 
-  DocNode part = CreateNode (node, "part");
-  part->SetAttribute ("name", 
-    csString().Format ("part_%s", GetName()));
+  //DocNode part = CreateNode (node, "part");
+  //part->SetAttribute ("name", 
+  //  csString().Format ("part_%s", GetName()));
+  DocNode part = node;
 
   CVertexBuffer Vb;
   Vb.AddVertices(&m_Polygon);
@@ -117,7 +124,9 @@ bool CCSThing::WriteAsPart(csRef<iDocumentNode> node, CIWorld* pIWorld, CISector
 
       if (pTexture->IsVisible())
       {
-        pWorld->WritePolygon(part, pPolygon, pSector, false, Vb);
+	bool poly_sky;
+        pWorld->WritePolygon(part, pPolygon, pSector, false, Vb, poly_sky);
+	Sky = Sky | poly_sky;
       } //if texture is visible
     }
   }
