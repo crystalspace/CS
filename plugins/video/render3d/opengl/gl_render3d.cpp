@@ -1762,7 +1762,6 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
 
   const uint mixmode = modes.mixmode;
   statecache->SetShadeModel ((mixmode & CS_FX_FLAT) ? GL_FLAT : GL_SMOOTH);
-  statecache->SetShadeModel (GL_SMOOTH);
 
   void* bufData = indexbuf->RenderLock (CS_GLBUF_RENDERLOCK_ELEMENTS);
   if (bufData != (void*)-1)
@@ -2392,19 +2391,25 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
   float aspect = (float)G3D->GetWidth() / G3D->GetAspect();
   float hw = (float)G3D->GetWidth() * 0.5f;
 
-  //???@@@glMatrixMode (GL_MODELVIEW);
-  glPushMatrix ();
-  glLoadIdentity();
-  G3D->SetGlOrtho (false);
-  //glTranslatef (0, 0, 0);
+  int oldTU = G3D->statecache->GetActiveTU ();
+  if (G3D->ext->CS_GL_ARB_multitexture)
+    G3D->statecache->SetActiveTU (0);
 
   //csGLGraphics3D::SetGLZBufferFlags (CS_ZBUF_NONE);
   G3D->SetZMode (CS_ZBUF_NONE);
+  bool texEnabled = 
+    csGLGraphics3D::statecache->enabled_GL_TEXTURE_2D[0];
   csGLGraphics3D::statecache->Enable_GL_TEXTURE_2D ();
 
   csGLGraphics3D::statecache->SetShadeModel (GL_FLAT);
   csGLGraphics3D::statecache->SetTexture (GL_TEXTURE_2D, halohandle);
   G3D->SetAlphaType (csAlphaMode::alphaSmooth);
+
+  //???@@@glMatrixMode (GL_MODELVIEW);
+  glPushMatrix ();
+  glLoadIdentity();
+  G3D->SetGlOrtho (false);
+  //glTranslatef (0, 0, 0);
 
   G3D->SetMixMode (dstblend);
   glColor4f (R, G, B, iIntensity);
@@ -2419,6 +2424,17 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
   glEnd ();
 
   glPopMatrix ();
+
+  /*
+    @@@ Urgh. B/C halos are drawn outside the normal 
+    shader/texture/buffer activation/mesh drawing realms, the states
+    changed have to be backed up and restored when done.
+   */
+  csGLGraphics3D::statecache->SetTexture (GL_TEXTURE_2D, 0);
+  if (!texEnabled)
+    csGLGraphics3D::statecache->Disable_GL_TEXTURE_2D ();
+  if (G3D->ext->CS_GL_ARB_multitexture)
+    G3D->statecache->SetActiveTU (oldTU);
 }
 
 iHalo *csGLGraphics3D::CreateHalo (float iR, float iG, float iB,
