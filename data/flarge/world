@@ -587,6 +587,7 @@
 		    <delay time="1000" />
 		    <repeat />
 		</script>
+		<run script="main" />
 	    </animcontrol>
         </params>
         <meshfact name="child1">
