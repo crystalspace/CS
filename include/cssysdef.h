@@ -40,16 +40,16 @@
 
 // Defaults for platforms that do not define their own.
 #ifndef CS_EXPORT_SYM_DLL
-  #define CS_EXPORT_SYM_DLL
+#  define CS_EXPORT_SYM_DLL
 #endif
 #ifndef CS_IMPORT_SYM_DLL
-  #define CS_IMPORT_SYM_DLL     extern
+#  define CS_IMPORT_SYM_DLL extern
 #endif
 #ifndef CS_EXPORT_SYM
-  #define CS_EXPORT_SYM
+#  define CS_EXPORT_SYM
 #endif
 #ifndef CS_IMPORT_SYM
-  #define CS_IMPORT_SYM
+#  define CS_IMPORT_SYM
 #endif
 
 #include "csextern.h"
@@ -80,11 +80,11 @@
 #ifdef CS_COMPILER_GCC
 // In GCC we are able to declare stack vars of dynamic size directly
 #  define CS_ALLOC_STACK_ARRAY(type, var, size) \
-      type var [size]
+     type var [size]
 #else
 #  include <malloc.h>
 #  define CS_ALLOC_STACK_ARRAY(type, var, size) \
-      type *var = (type *)alloca ((size) * sizeof (type))
+     type *var = (type *)alloca ((size) * sizeof (type))
 #endif
 
 /**\def CS_TEMP_DIR
@@ -230,7 +230,7 @@ struct csMemMapInfo
  * \remark NB: It is invoked in csInitializer::CreateEnvironment().
  */
 #ifndef CS_INITIALIZE_PLATFORM_APPLICATION
-#  define CS_INITIALIZE_PLATFORM_APPLICATION	/* */
+#  define CS_INITIALIZE_PLATFORM_APPLICATION /* */
 /*
   This definition may seem odd, but it's here for doxygen's sake, which
   apparently fails to document empty macro definitions.
@@ -242,7 +242,7 @@ extern csStaticVarCleanupFN csStaticVarCleanup;
 
 #ifndef CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION
 #  define CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION(Name)              \
-void Name (void (*p)())             			       \
+void Name (void (*p)())                                                \
 {                                                                      \
   static void (**a)() = 0;                                             \
   static int lastEntry = 0;                                            \
@@ -273,12 +273,12 @@ void Name (void (*p)())             			       \
 #endif
 
 #ifndef CS_DEFINE_STATIC_VARIABLE_REGISTRATION
-#  define CS_DEFINE_STATIC_VARIABLE_REGISTRATION(func)			\
+#  define CS_DEFINE_STATIC_VARIABLE_REGISTRATION(func) \
     csStaticVarCleanupFN csStaticVarCleanup = &func
 #endif
 
 #ifndef CS_DECLARE_STATIC_VARIABLE_REGISTRATION
-#  define CS_DECLARE_STATIC_VARIABLE_REGISTRATION(func)			\
+#  define CS_DECLARE_STATIC_VARIABLE_REGISTRATION(func) \
     void func (void (*p)())
 #endif
 
@@ -348,13 +348,14 @@ void Name (void (*p)())             			       \
 #endif
 
 /**\def CS_IMPLEMENT_STATIC_VAR(getterFunc,Type,initParam,kill_how)
- * Create a global variable thats created on demand. Create a Getter function to access 
- * the variable and a destruction function. The Getter function will register
- * the destruction function on first invocation.
- * Example:
+ * Create a global variable thats created on demand. Create a Getter function
+ * to access the variable and a destruction function. The Getter function will
+ * register the destruction function on first invocation. Example:
+ * <pre>
  * CS_IMPLEMENT_STATIC_VAR (GetVertexPool, csVertexPool,)
- * This will give you a global function GetVertexPool that returns a pointer to a 
- * static variable.
+ * </pre>
+ * This will give you a global function GetVertexPool that returns a pointer to
+ * a static variable.
  */
 
 #ifndef CS_IMPLEMENT_STATIC_VAR_EXT
@@ -387,19 +388,21 @@ Type* getterFunc ()                                                     \
 #endif
 
 #ifndef CS_IMPLEMENT_STATIC_VAR
-#define CS_IMPLEMENT_STATIC_VAR(getterFunc,Type,initParam)    \
+#define CS_IMPLEMENT_STATIC_VAR(getterFunc,Type,initParam) \
  CS_IMPLEMENT_STATIC_VAR_EXT(getterFunc,Type,initParam,_kill)    
 #endif
 
 #ifndef CS_IMPLEMENT_STATIC_VAR_ARRAY
-#define CS_IMPLEMENT_STATIC_VAR_ARRAY(getterFunc,Type,initParam)    \
+#define CS_IMPLEMENT_STATIC_VAR_ARRAY(getterFunc,Type,initParam) \
  CS_IMPLEMENT_STATIC_VAR_EXT(getterFunc,Type,initParam,_kill_array)    
 #endif
 
 /**\def CS_DECLARE_STATIC_CLASSVAR(var,getterFunc,Type)
- * Declare a static variable inside a class. This will also declare a Getter function.
- * Example:
+ * Declare a static variable inside a class. This will also declare a Getter
+ * function.  Example:
+ * <pre>
  * CS_DECLARE_STATIC_CLASSVAR (pool, GetVertexPool, csVertexPool)
+ * </pre>
  */
 #ifndef CS_DECLARE_STATIC_CLASSVAR
 #define CS_DECLARE_STATIC_CLASSVAR(var,getterFunc,Type)       \
@@ -414,88 +417,96 @@ static Type &getterFunc ();
 #endif
 
 /**\def CS_IMPLEMENT_STATIC_CLASSVAR(Class,var,getterFunc,Type,initParam)
- * Create the static class variable that has been declared with 
- * CS_DECLARE_STATIC_CLASSVAR.
- * This will also create the Getter function and the destruction function. 
- * The destruction function will be registered upon the first invocation
- * of the Getter function.
- * Example:
- * CS_IMPLEMENT_STATIC_CLASSVAR (csPolygon2D, pool, GetVertexPool, csVertexPool,)
+ * Create the static class variable that has been declared with
+ * CS_DECLARE_STATIC_CLASSVAR.  This will also create the Getter function and
+ * the destruction function.  The destruction function will be registered upon
+ * the first invocation of the Getter function.  Example:
+ * <pre>
+ * CS_IMPLEMENT_STATIC_CLASSVAR (csPolygon2D, pool, GetVertexPool,
+ *                               csVertexPool,)
+ * </pre>
  */
 #ifndef CS_IMPLEMENT_STATIC_CLASSVAR_EXT
-#define CS_IMPLEMENT_STATIC_CLASSVAR_EXT(Class,var,getterFunc,Type,initParam,kill_how)   \
-Type *Class::var = 0;                                                                    \
-extern "C" {                                                                             \
-static void Class ## _ ## getterFunc ## _kill ();                                        \
-static void Class ## _ ## getterFunc ## _kill_array ();                                  \
-void Class ## _ ## getterFunc ## _kill ()                                                \
-{                                                                                        \
-  (void) Class ## _ ## getterFunc ## _kill_array;                                        \
-  delete Class::getterFunc ();                                                           \
-}                                                                                        \
-void Class ## _ ## getterFunc ## _kill_array ()                                          \
-{                                                                                        \
-  (void) Class ## _ ## getterFunc ## _kill;                                              \
-  delete [] Class::getterFunc ();                                                        \
-}                                                                                        \
-}                                                                                        \
-Type* Class::getterFunc ()                                                               \
-{                                                                                        \
-  if (!var)                                                                              \
-  {                                                                                      \
-    var = new Type initParam;                                                            \
-    csStaticVarCleanup (Class ## _ ## getterFunc ## kill_how);           		 \
-  }                                                                                      \
-  return var;                                                                            \
+#define CS_IMPLEMENT_STATIC_CLASSVAR_EXT(Class,var,getterFunc,Type,initParam,\
+  kill_how)                                                    \
+Type *Class::var = 0;                                          \
+extern "C" {                                                   \
+static void Class ## _ ## getterFunc ## _kill ();              \
+static void Class ## _ ## getterFunc ## _kill_array ();        \
+void Class ## _ ## getterFunc ## _kill ()                      \
+{                                                              \
+  (void) Class ## _ ## getterFunc ## _kill_array;              \
+  delete Class::getterFunc ();                                 \
+}                                                              \
+void Class ## _ ## getterFunc ## _kill_array ()                \
+{                                                              \
+  (void) Class ## _ ## getterFunc ## _kill;                    \
+  delete [] Class::getterFunc ();                              \
+}                                                              \
+}                                                              \
+Type* Class::getterFunc ()                                     \
+{                                                              \
+  if (!var)                                                    \
+  {                                                            \
+    var = new Type initParam;                                  \
+    csStaticVarCleanup (Class ## _ ## getterFunc ## kill_how); \
+  }                                                            \
+  return var;                                                  \
 }
 #endif
 
 #ifndef CS_IMPLEMENT_STATIC_CLASSVAR
 #define CS_IMPLEMENT_STATIC_CLASSVAR(Class,var,getterFunc,Type,initParam) \
-        CS_IMPLEMENT_STATIC_CLASSVAR_EXT(Class,var,getterFunc,Type,initParam,_kill)
+  CS_IMPLEMENT_STATIC_CLASSVAR_EXT(Class,var,getterFunc,Type,initParam,_kill)
 #endif
 
 #ifndef CS_IMPLEMENT_STATIC_CLASSVAR_ARRAY
-#define CS_IMPLEMENT_STATIC_CLASSVAR_ARRAY(Class,var,getterFunc,Type,initParam) \
-        CS_IMPLEMENT_STATIC_CLASSVAR_EXT(Class,var,getterFunc,Type,initParam,_kill_array)
+#define CS_IMPLEMENT_STATIC_CLASSVAR_ARRAY(Class,var,getterFunc,Type,\
+  initParam) \
+  CS_IMPLEMENT_STATIC_CLASSVAR_EXT(Class,var,getterFunc,Type,initParam,\
+    _kill_array)
 #endif
 
 #ifndef CS_IMPLEMENT_STATIC_CLASSVAR_REF_EXT
-#define CS_IMPLEMENT_STATIC_CLASSVAR_REF_EXT(Class,var,getterFunc,Type,initParam,kill_how)   \
-Type *Class::var = 0;                                                                        \
-extern "C" {                                                                                 \
-static void Class ## _ ## getterFunc ## _kill ();                                            \
-static void Class ## _ ## getterFunc ## _kill_array ();                                      \
-void Class ## _ ## getterFunc ## _kill ()                                                    \
-{                                                                                            \
-  (void) Class ## _ ## getterFunc ## _kill_array;                                            \
-  delete &Class::getterFunc ();                                                              \
-}                                                                                            \
-void Class ## _ ## getterFunc ## _kill_array ()                                              \
-{                                                                                            \
-  (void) Class ## _ ## getterFunc ## _kill;                                                  \
-  delete [] &Class::getterFunc ();                                                           \
-}                                                                                            \
-}                                                                                            \
-Type &Class::getterFunc ()                                                                   \
-{                                                                                            \
-  if (!var)                                                                                  \
-  {                                                                                          \
-    var = new Type initParam;                                                                \
-    csStaticVarCleanup (Class ## _ ## getterFunc ## kill_how);               		     \
-  }                                                                                          \
-  return *var;                                                                               \
+#define CS_IMPLEMENT_STATIC_CLASSVAR_REF_EXT(Class,var,getterFunc,Type,\
+  initParam,kill_how) \
+Type *Class::var = 0;                                          \
+extern "C" {                                                   \
+static void Class ## _ ## getterFunc ## _kill ();              \
+static void Class ## _ ## getterFunc ## _kill_array ();        \
+void Class ## _ ## getterFunc ## _kill ()                      \
+{                                                              \
+  (void) Class ## _ ## getterFunc ## _kill_array;              \
+  delete &Class::getterFunc ();                                \
+}                                                              \
+void Class ## _ ## getterFunc ## _kill_array ()                \
+{                                                              \
+  (void) Class ## _ ## getterFunc ## _kill;                    \
+  delete [] &Class::getterFunc ();                             \
+}                                                              \
+}                                                              \
+Type &Class::getterFunc ()                                     \
+{                                                              \
+  if (!var)                                                    \
+  {                                                            \
+    var = new Type initParam;                                  \
+    csStaticVarCleanup (Class ## _ ## getterFunc ## kill_how); \
+  }                                                            \
+  return *var;                                                 \
 }
 #endif
 
 #ifndef CS_IMPLEMENT_STATIC_CLASSVAR_REF
-#define CS_IMPLEMENT_STATIC_CLASSVAR_REF(Class,var,getterFunc,Type,initParam)   \
-        CS_IMPLEMENT_STATIC_CLASSVAR_REF_EXT(Class,var,getterFunc,Type,initParam,_kill)
+#define CS_IMPLEMENT_STATIC_CLASSVAR_REF(Class,var,getterFunc,Type,initParam)\
+  CS_IMPLEMENT_STATIC_CLASSVAR_REF_EXT(Class,var,getterFunc,Type,\
+    initParam,_kill)
 #endif
 
 #ifndef CS_IMPLEMENT_STATIC_CLASSVAR_REF_ARRAY
-#define CS_IMPLEMENT_STATIC_CLASSVAR_REF_ARRAY(Class,var,getterFunc,Type,initParam)   \
-        CS_IMPLEMENT_STATIC_CLASSVAR_REF_EXT(Class,var,getterFunc,Type,initParam,_kill_array)
+#define CS_IMPLEMENT_STATIC_CLASSVAR_REF_ARRAY(Class,var,getterFunc,Type,\
+  initParam) \
+  CS_IMPLEMENT_STATIC_CLASSVAR_REF_EXT(Class,var,getterFunc,Type,initParam,\
+    _kill_array)
 #endif
 
 // The following define should only be enabled if you have defined
@@ -517,7 +528,7 @@ Type &Class::getterFunc ()                                                      
 #  undef CS_REF_TRACKER
 #else
 #  if defined(CS_EXTENSIVE_MEMDEBUG) && defined(CS_MEMORY_TRACKER)
-#    error Do not use CS_EXTENSIVE_MEMDEBUG and CS_MEMORY_TRACKER at the same time!
+#    error Do not use CS_EXTENSIVE_MEMDEBUG and CS_MEMORY_TRACKER together!
 #  endif
 #endif
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
@@ -541,28 +552,43 @@ extern void* operator new[] (size_t s, void* filename, int line);
 #  endif
 #  if !defined (CS_ASSERT)
 #    if defined (CS_COMPILER_MSVC)
-#      define  CS_ASSERT(x) assert(x)
+#      define CS_ASSERT(x) assert(x)
 #    else
 #      include <stdio.h>
-#      define CS_ASSERT(x)            \
-         if (!(x))              \
-         {                \
-           fprintf (stderr, __FILE__ ":%d: failed assertion '%s'\n",\
-             int(__LINE__), #x );         \
-           DEBUG_BREAK;             \
+#      define CS_ASSERT(x) \
+         if (!(x)) \
+         { \
+           fprintf (stderr, __FILE__ ":%d: failed assertion '%s'\n", \
+             int(__LINE__), #x); \
+           DEBUG_BREAK; \
          }
 #    endif
 #  endif
 #  if !defined (CS_ASSERT_MSG)
-#      define  CS_ASSERT_MSG(msg, x) CS_ASSERT(((msg) && (x)))
+#      define CS_ASSERT_MSG(msg,x) CS_ASSERT(((msg) && (x)))
 #  endif
 #else
-#  undef DEBUG_BREAK
+#  undef  DEBUG_BREAK
 #  define DEBUG_BREAK
-#  undef CS_ASSERT
+#  undef  CS_ASSERT
 #  define CS_ASSERT(x)
-#  undef CS_ASSERT_MSG
-#  define CS_ASSERT_MSG(m, x)
+#  undef  CS_ASSERT_MSG
+#  define CS_ASSERT_MSG(m,x)
+#endif
+
+/**
+ * Use the CS_DEPRECATED_METHOD macro in front of method declarations to
+ * indicate that they are deprecated. Example:
+ * \code
+ * struct iFoo : iBase {
+ *   CS_DEPRECATED_METHOD virtual void Plankton() const = 0;
+ * }
+ * \endcode
+ * Compilers which are capable of flagging deprecation will exhibit a warning
+ * when it encounters client code invoking methods so tagged.
+ */
+#ifndef CS_DEPRECATED_METHOD
+#  define CS_DEPRECATED_METHOD
 #endif
 
 // Check if the csosdefs.h defined either CS_LITTLE_ENDIAN or CS_BIG_ENDIAN
@@ -605,16 +631,16 @@ extern void* operator new[] (size_t s, void* filename, int line);
 // gcc can perform usefull checking for printf/scanf format strings, just add
 // this define at the end of the function declaration
 #if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ > 4)
-#  define CS_GNUC_PRINTF( format_idx, arg_idx)    \
+#  define CS_GNUC_PRINTF(format_idx, arg_idx) \
      __attribute__((format (__printf__, format_idx, arg_idx)))
-#  define CS_GNUC_SCANF( format_idx, arg_idx )        \
+#  define CS_GNUC_SCANF(format_idx, arg_idx) \
      __attribute__((format (__scanf__, format_idx, arg_idx)))
 #else
-#  define CS_GNUC_PRINTF( format_idx, arg_idx )
-#  define CS_GNUC_SCANF( format_idx, arg_idx )
+#  define CS_GNUC_PRINTF(format_idx, arg_idx)
+#  define CS_GNUC_SCANF(format_idx, arg_idx)
 #endif
 
-// remove __attribute__ on non GNUC compilers
+// Remove __attribute__ on non GNUC compilers.
 #ifndef __GNUC__
 #define __attribute__(x)
 #endif
@@ -642,8 +668,8 @@ extern void* operator new[] (size_t s, void* filename, int line);
  * \remarks
  * This macro is intended to support typecasting within macros, allowing the
  * compiler to provide a more descriptive error message. Use
- * CS_IMPLEMENT_IMPLICIT_PTR_CAST in the declaration of the class and
- * CS_IMPLICIT_PTR_CAST in the macro declaration.
+ * CS_IMPLEMENT_IMPLICIT_PTR_CAST() in the declaration of the class and
+ * CS_IMPLICIT_PTR_CAST() in the macro declaration.
  * \par Example:
  * \code
  * struct iObjectRegistry : public iBase
