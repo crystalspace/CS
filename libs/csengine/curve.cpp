@@ -30,6 +30,7 @@
 #include "csengine/world.h"
 #include "csengine/lppool.h"
 
+// Initialize the cache for Bezier curves
 static csBezier2 bezierCache;
 
 IMPLEMENT_CSOBJTYPE (csCurve,csObject);
@@ -125,15 +126,16 @@ csCurveTesselated* csBezierCurve::Tesselate (int res)
   for (j=0;j<=res;j++)
   {
     int idx = i+(res+1)*j;
+
     csVector3* vtx_coord = previous_tesselation->GetVertices ()+idx;
     csVector2* vtx_txtcoord = previous_tesselation->GetTxtCoords ()+idx;
     csVector2* vtx_control = previous_tesselation->GetControlPoints ()+idx;
-    *vtx_coord = csBezier2::GetPoint (controls, i, j,res);
+    *vtx_coord = csBezier2::GetPoint (controls, i, j, res);
     //
     *vtx_txtcoord = csBezier2::GetTextureCoord (controls, i, j, res);
     //
-    vtx_control->x      = ((float)i)/(float)res;
-    vtx_control->y      = ((float)j)/(float)res;
+    vtx_control->x = ((float)i)/(float)res;
+    vtx_control->y = ((float)j)/(float)res;
   }
 
   for (i=0;i<res;i++)
@@ -800,6 +802,7 @@ void csBezierCurve::PosInSpace (csVector3& vec, double u, double v)
     cpt[0], cpt[1], cpt[2], cpt[3], cpt[4],
     cpt[5], cpt[6], cpt[7], cpt[8],
   };
+
   vec = csBezier2::GetPoint (controls,  u, v);
 }
 

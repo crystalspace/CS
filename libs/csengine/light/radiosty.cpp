@@ -243,7 +243,7 @@ csRGBLightMap * csRadElement::ComputeTextureLumelSized()
   if(txthandle == NULL) // no texture: flatcol is enough.
     return map;
   
-  int transr, transg, transb; // transparent color
+  int transr=0, transg=0, transb=0; // transparent color
   
   txthandle->SetKeyColor(transr, transg, transb);
   
@@ -998,8 +998,8 @@ void csRadiosity :: StartFrustum()
   csVector3 center; 
 
   // And this leads to sharper shadows as well.
-  shoot_src->Lumel2World(center, shoot_src->GetWidth()/2.0, 
-                         shoot_src->GetHeight()/2.0);
+  shoot_src->Lumel2World(center, QInt (shoot_src->GetWidth()/2.0),
+                         QInt (shoot_src->GetHeight()/2.0));
 
   center -= shoot_src->GetAvgNormal() * 0.1f;
 
@@ -1226,8 +1226,8 @@ void csRadiosity :: ShootRadiosityToElement(csRadElement* dest)
 void csRadiosity :: PrepareShootSourceLumel(int sx, int sy, int suv)
 {
   src_uv = suv;
-  shoot_src->Lumel2World(src_lumel, sx + srcp_width / 2.0,
-    sy + srcp_height / 2.0);
+  shoot_src->Lumel2World(src_lumel, QInt (sx + srcp_width / 2.0),
+    QInt (sy + srcp_height / 2.0));
   /// use the size of a lumel in the source poly *
   /// the amount of the lumel visible to compute area of sender.
   /// factor is included, which saves a lot of multiplications.

@@ -1,5 +1,18 @@
 The history order has been reversed so that new features are at the top.
 
+5-Jul-2000
+	- Samuel Humphreys did the following changes:
+	    - Rearranged iGraphics2D/3D so that related functions are
+	      grouped... ;)
+	    - Fixed transparent images in dtsimple which showed up with
+	      the opengl backbuffer proc texture.
+	    - Fixed text rendering on the backbuffer proc textures.
+	    - Fixed an omission from my last commit.
+	    - Simple optimization in the gl font server gives a 12.5x
+	      speed up for font rasterization :)
+	    - Also skips rasterizing spaces.
+	- Travis McIntosh added curve radiosity support as well as an
+	  updated interface into the Bezier math.
 4-Jul-2000
 	- Samuel Humphreys did the following changes:
 	    - Backbuffer now works without being inverted. Re-reversed the
@@ -14,6 +27,8 @@ The history order has been reversed so that new features are at the top.
 	  cleaned up the files.
 	- Eric Sunshine hacked Squawk to keep it from depositing precalc_info
 	  files where they are not wanted.
+	- Norman Kramer removed const qualifier from GetCorner, now
+	  compiles again (csQuadTree3D).
 3-Jul-2000
 	- Seth Galbraith cut skybox in half to save 200 KB for Squawk.
 	- Andrew Zabolotny did the following changes:
