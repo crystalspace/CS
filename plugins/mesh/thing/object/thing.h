@@ -646,9 +646,13 @@ private:
   bool lightmapsPrepared;
   bool lightmapsDirty;
 
+  void RegisterPortalMeshes ();
+  void UnregisterPortalMeshes ();
+  void PreparePolygons ();
   void PrepareLMs ();
   void ClearLMs ();
   void UpdateDirtyLMs ();
+
 public:
   /**
    * How many times are we busy drawing this thing (recursive).

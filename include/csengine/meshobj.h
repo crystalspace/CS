@@ -215,6 +215,9 @@ protected:
   /// Update defered lighting.
   void UpdateDeferedLighting (const csBox3& box);
 
+  /// Clear this object from all sector portal lists.
+  void ClearFromSectorPortalLists ();
+
 private:
   /// Mesh object corresponding with this csMeshWrapper.
   csRef<iMeshObject> meshobj;

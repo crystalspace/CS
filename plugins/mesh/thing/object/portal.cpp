@@ -51,9 +51,6 @@ csPortal::csPortal (csPolygon3DStatic* parent)
 
 csPortal::~csPortal ()
 {
-  // Before destruction the destination of the portal needs to be
-  // set to 0.
-  CS_ASSERT (sector == 0);
   if (filter_texture) filter_texture->DecRef ();
 }
 

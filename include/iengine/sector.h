@@ -212,36 +212,20 @@ struct iSector : public iBase
   virtual void CheckFrustum (iFrustumView* lview) = 0;
 
   /**
-   * Get the set of portals that arrive in this sector.
-   * Note that portals are uni-directional. The portals represented
-   * by this list are portals that arrive in this sector but these are
-   * not always portals that also start in this sector.
-   */
-  virtual const csSet<iPortal*>& GetArrivingPortals () const = 0;
-  /**
-   * Register an arriving portal.
-   */
-  virtual void RegisterArrivingPortal (iPortal* portal) = 0;
-  /**
-   * Unregister an arriving portal.
-   */
-  virtual void UnregisterArrivingPortal (iPortal* portal) = 0;
-
-  /**
-   * Get the set of portals that leave from this sector.
+   * Get the set of meshes containing portals that leave from this sector.
    * Note that portals are uni-directional. The portals represented
    * by this list are portals that are on some mesh object that is
    * actually located in this sector.
    */
-  virtual const csSet<iPortal*>& GetLeavingPortals () const = 0;
+  virtual const csSet<iMeshWrapper*>& GetPortalMeshes () const = 0;
   /**
-   * Register a leaving portal.
+   * Register a mesh with a portal.
    */
-  virtual void RegisterLeavingPortal (iPortal* portal) = 0;
+  virtual void RegisterPortalMesh (iMeshWrapper* mesh) = 0;
   /**
-   * Unregister a leaving portal.
+   * Unregister a mesh with a portal.
    */
-  virtual void UnregisterLeavingPortal (iPortal* portal) = 0;
+  virtual void UnregisterPortalMesh (iMeshWrapper* mesh) = 0;
 };
 
 

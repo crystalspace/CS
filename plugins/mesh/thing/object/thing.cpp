@@ -1647,7 +1647,66 @@ void csThing::HardTransform (const csReversibleTransform& t)
 
 void csThing::Unprepare ()
 {
-    prepared = false;
+  prepared = false;
+}
+
+void csThing::RegisterPortalMeshes ()
+{
+  csRef<iMeshWrapper> mw = SCF_QUERY_INTERFACE (logparent, iMeshWrapper);
+  if (mw)
+  {
+    iMovable* mov = mw->GetMovable ();
+    iSectorList* sl = mov->GetSectors ();
+    int j;
+    for (j = 0 ; j < sl->GetCount () ; j++)
+    {
+      iSector* s = sl->Get (j);
+      s->RegisterPortalMesh (mw);
+    }
+  }
+}
+
+void csThing::UnregisterPortalMeshes ()
+{
+  csRef<iMeshWrapper> mw = SCF_QUERY_INTERFACE (logparent, iMeshWrapper);
+  if (mw)
+  {
+    iMovable* mov = mw->GetMovable ();
+    iSectorList* sl = mov->GetSectors ();
+    int j;
+    for (j = 0 ; j < sl->GetCount () ; j++)
+    {
+      iSector* s = sl->Get (j);
+      s->UnregisterPortalMesh (mw);
+    }
+  }
+}
+
+void csThing::PreparePolygons ()
+{
+  csPolygon3DStatic *ps;
+  csPolygon3D *p;
+  polygons.FreeAll ();
+
+  UnregisterPortalMeshes ();
+
+  bool has_portals = false;
+  int i;
+  for (i = 0; i < static_data->static_polygons.Length (); i++)
+  {
+    p = static_data->thing_type->blk_polygon3d.Alloc ();
+    ps = static_data->static_polygons.Get (i);
+    p->SetStaticData (ps);
+    p->SetParent (this);
+    polygons.Push (p);
+    p->SetMaterial (FindRealMaterial (ps->GetMaterialWrapper ()));
+    p->Finish ();
+    csPortal* portal = ps->GetPortal ();
+    if (portal) has_portals = true;
+  }
+
+  if (has_portals)
+    RegisterPortalMeshes ();
 }
 
 void csThing::Prepare ()
@@ -1681,77 +1740,11 @@ void csThing::Prepare ()
       }
 #endif // CS_USE_NEW_RENDERER
 
-#if 1
       polybuf_materials.DeleteAll ();
       materials_to_visit.DeleteAll ();
 
-      int i;
-      csPolygon3D *p;
-      csPolygon3DStatic *ps;
       ClearLMs ();
-      polygons.FreeAll ();
-      for (i = 0 ; i < static_data->static_polygons.Length () ; i++)
-      {
-	p = static_data->thing_type->blk_polygon3d.Alloc ();
-	ps = static_data->static_polygons.Get (i);
-	p->SetStaticData (ps);
-	p->SetParent (this);
-	polygons.Push (p);
-	p->SetMaterial (FindRealMaterial (ps->GetMaterialWrapper ()));
-	p->Finish ();
-      }
-
-#else
-      /*
-        Here, only 'changes' in the static data are duplicated (i.e. adding
-	and removal of polys.) However, the algo below has the problem that if
-	a poly is removed and immediately afterward a new poly is created, the 
-	address of the new poly may be the same the old poly had - thus, it's not
-	recognized that it was removed and re-added.
-       */
-      int i;
-      csHash<csPolygon3DStatic*, csPolygon3DStatic*> staticPolys;
-      csPolygon3DStatic* ps;
-
-      for (i = 0 ; i < static_data->static_polygons.Length () ; i++)
-      {
-	ps = static_data->static_polygons.Get (i);
-	if (staticPolys.Get (ps) == 0)
-	  staticPolys.Add (ps);
-      }
-
-      i = 0;
-      csPolygon3D *p;
-      while (i < polygons.Length ())
-      {
-	p = polygons.Get (i);
-	ps = p->GetStaticData ();
-	if (staticPolys.Get (ps) != 0)
-	{
-	  staticPolys.Delete (ps);
-	  i++;
-	}
-	else
-	{
-	  polygons.FreeItem (Get (i));
-	  polygons.DeleteIndex (i);
-	}
-      }
-      
-      csHash<csPolygon3DStatic*, csPolygon3DStatic*>::GlobalIterator spIt =
-        staticPolys.GetIterator ();
-
-      while (spIt.HasNext ())
-      {
-	p = static_data->thing_type->blk_polygon3d.Alloc ();
-	ps = spIt.Next ();
-	p->SetStaticData (ps);
-	p->SetParent (this);
-	polygons.Push (p);
-	p->SetMaterial (FindRealMaterial (ps->GetMaterialWrapper ()));
-	p->Finish ();
-      }
-#endif
+      PreparePolygons ();
 
       MarkLightmapsDirty ();
       ClearLMs ();
@@ -1788,20 +1781,7 @@ void csThing::Prepare ()
   polybuf_materials.DeleteAll ();
   materials_to_visit.DeleteAll ();
 
-  int i;
-  csPolygon3DStatic *ps;
-  csPolygon3D *p;
-  polygons.FreeAll ();
-  for (i = 0; i < static_data->static_polygons.Length (); i++)
-  {
-    p = static_data->thing_type->blk_polygon3d.Alloc ();
-    ps = static_data->static_polygons.Get (i);
-    p->SetStaticData (ps);
-    p->SetParent (this);
-    polygons.Push (p);
-    p->SetMaterial (FindRealMaterial (ps->GetMaterialWrapper ()));
-    p->Finish ();
-  }
+  PreparePolygons ();
 
   // don't prepare lightmaps yet - the LMs may still be unlit,
   // as this function is called from within 'ReadFromCache()'.

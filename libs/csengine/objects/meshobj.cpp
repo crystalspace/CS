@@ -118,13 +118,39 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent) :
   draw_after_fancy_stuff = false;
 }
 
+void csMeshWrapper::ClearFromSectorPortalLists ()
+{
+  if (meshobj && meshobj->GetPortalCount () > 0)
+  {
+    int i;
+    const iSectorList *sectors = movable.GetSectors ();
+    for (i = 0; i < sectors->GetCount (); i++)
+    {
+      iSector *ss = sectors->Get (i);
+      if (ss) ss->UnregisterPortalMesh (&scfiMeshWrapper);
+    }
+  }
+}
+
 void csMeshWrapper::SetMeshObject (iMeshObject *meshobj)
 {
+  ClearFromSectorPortalLists ();
+
   csMeshWrapper::meshobj = meshobj;
   if (meshobj)
   {
     light_info = SCF_QUERY_INTERFACE (meshobj, iLightingInfo);
     shadow_receiver = SCF_QUERY_INTERFACE (meshobj, iShadowReceiver);
+    if (meshobj->GetPortalCount () > 0)
+    {
+      int i;
+      const iSectorList *sectors = movable.GetSectors ();
+      for (i = 0; i < sectors->GetCount (); i++)
+      {
+        iSector *ss = sectors->Get (i);
+        if (ss) ss->UnregisterPortalMesh (&scfiMeshWrapper);
+      }
+    }
   }
   else
   {
@@ -136,6 +162,7 @@ void csMeshWrapper::SetMeshObject (iMeshObject *meshobj)
 csMeshWrapper::~csMeshWrapper ()
 {
   delete imposter_mesh;
+  ClearFromSectorPortalLists ();
 }
 
 void csMeshWrapper::UpdateMove ()
@@ -154,6 +181,8 @@ void csMeshWrapper::MoveToSector (iSector *s)
   // Otherwise we have a hierarchical object and in that case
   // the parent object controls this.
   if (!Parent) s->GetMeshes ()->Add (&scfiMeshWrapper);
+  if (meshobj && meshobj->GetPortalCount () > 0)
+    s->RegisterPortalMesh (&scfiMeshWrapper);
 }
 
 void csMeshWrapper::RemoveFromSectors ()
@@ -165,7 +194,11 @@ void csMeshWrapper::RemoveFromSectors ()
   for (i = 0; i < sectors->GetCount (); i++)
   {
     iSector *ss = sectors->Get (i);
-    if (ss) ss->GetMeshes ()->Remove (&scfiMeshWrapper);
+    if (ss)
+    {
+      ss->GetMeshes ()->Remove (&scfiMeshWrapper);
+      ss->UnregisterPortalMesh (&scfiMeshWrapper);
+    }
   }
 }
 

@@ -110,14 +110,9 @@ private:
   csSectorMeshList meshes;
 
   /**
-   * List of portals that arrive in this sector.
+   * List of meshes that have portals that leave from this sector.
    */
-  csSet<iPortal*> arriving_portals;
-
-  /**
-   * List of portals that leave from this sector.
-   */
-  csSet<iPortal*> leaving_portals;
+  csSet<iMeshWrapper*> portal_meshes;
 
   /**
    * Visibilty number for last VisTest call
@@ -459,14 +454,10 @@ public:
   //----------------------------------------------------------------------
   // Portal stuff.
   //----------------------------------------------------------------------
-  const csSet<iPortal*>& GetArrivingPortals () const
-  { return arriving_portals; }
-  void RegisterArrivingPortal (iPortal* portal);
-  void UnregisterArrivingPortal (iPortal* portal);
-  const csSet<iPortal*>& GetLeavingPortals () const
-  { return leaving_portals; }
-  void RegisterLeavingPortal (iPortal* portal);
-  void UnregisterLeavingPortal (iPortal* portal);
+  const csSet<iMeshWrapper*>& GetPortalMeshes () const
+  { return portal_meshes; }
+  void RegisterPortalMesh (iMeshWrapper* mesh);
+  void UnregisterPortalMesh (iMeshWrapper* mesh);
 
   //--------------------- iVisibilityCullerListner interface ------------------
   struct eiVisibilityCullerListener : public iVisibilityCullerListener
@@ -549,29 +540,17 @@ public:
       scfParent->CheckFrustum (lview);
     }
 
-    virtual const csSet<iPortal*>& GetArrivingPortals () const
+    virtual const csSet<iMeshWrapper*>& GetPortalMeshes () const
     {
-      return scfParent->GetArrivingPortals ();
+      return scfParent->GetPortalMeshes ();
     }
-    virtual void RegisterArrivingPortal (iPortal* portal)
+    virtual void RegisterPortalMesh (iMeshWrapper* mesh)
     {
-      scfParent->RegisterArrivingPortal (portal);
+      scfParent->RegisterPortalMesh (mesh);
     }
-    virtual void UnregisterArrivingPortal (iPortal* portal)
+    virtual void UnregisterPortalMesh (iMeshWrapper* mesh)
     {
-      scfParent->UnregisterArrivingPortal (portal);
-    }
-    virtual const csSet<iPortal*>& GetLeavingPortals () const
-    {
-      return scfParent->GetLeavingPortals ();
-    }
-    virtual void RegisterLeavingPortal (iPortal* portal)
-    {
-      scfParent->RegisterLeavingPortal (portal);
-    }
-    virtual void UnregisterLeavingPortal (iPortal* portal)
-    {
-      scfParent->UnregisterLeavingPortal (portal);
+      scfParent->UnregisterPortalMesh (mesh);
     }
   } scfiSector;
   friend struct eiSector;

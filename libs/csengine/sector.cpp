@@ -937,24 +937,14 @@ iSector *csSector::eiSector::FollowSegment (
 
 //---------------------------------------------------------------------------
 
-void csSector::RegisterArrivingPortal (iPortal* portal)
+void csSector::RegisterPortalMesh (iMeshWrapper* mesh)
 {
-  arriving_portals.Add (portal);
+  portal_meshes.Add (mesh);
 }
 
-void csSector::UnregisterArrivingPortal (iPortal* portal)
+void csSector::UnregisterPortalMesh (iMeshWrapper* mesh)
 {
-  arriving_portals.Delete (portal);
-}
-
-void csSector::RegisterLeavingPortal (iPortal* portal)
-{
-  leaving_portals.Add (portal);
-}
-
-void csSector::UnregisterLeavingPortal (iPortal* portal)
-{
-  leaving_portals.Delete (portal);
+  portal_meshes.Delete (mesh);
 }
 
 //---------------------------------------------------------------------------

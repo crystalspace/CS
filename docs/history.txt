@@ -6,6 +6,17 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+16-Sep-2003
+	- Jorrit fixed the thing plugin so that it now actually registers
+	  leaving portals to the sector.
+	- Jorrit cleaned up a few portal things in thing mesh.
+	- Jorrit changed the leaving portals in iSector so that
+	  it is now a set of meshes that have portals instead of just portals.
+	- Jorrit removed the arriving portal stuff. It is currently not
+	  possible to correctly maintain this list and it is probably also
+	  not needed.
+	- Jorrit changed the movable code so that it now correctly updates
+	  the list of leaving portal meshes when an object changes sector.
 15-Sep-2003
 	- Eric Sunshine added a check for the C++ `typename' keyword to
 	  configure.ac.  If not recognized by the compiler, the

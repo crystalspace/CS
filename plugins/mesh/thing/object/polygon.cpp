@@ -103,7 +103,7 @@ csPolygon3DStatic::~csPolygon3DStatic ()
   thing_static->thing_type->blk_lightmapmapping.Free (mapping);
   thing_static->thing_type->blk_texturemapping.Free (tmapping);
 
-  if (portal && flags.Check (CS_POLY_DELETE_PORTAL))
+  if (portal)
   {
     portal->SetSector (0);
     delete portal;
@@ -319,11 +319,11 @@ void csPolygon3DStatic::Reset ()
   vertices.MakeEmpty ();
 }
 
-void csPolygon3DStatic::SetCSPortal (iSector *sector, bool null)
+void csPolygon3DStatic::SetPortal (iSector *sector, bool null)
 {
   if (portal && portal->GetSector () == sector)
     return ;
-  if (portal && flags.Check (CS_POLY_DELETE_PORTAL))
+  if (portal)
   {
     delete portal;
     portal = 0;
@@ -332,28 +332,8 @@ void csPolygon3DStatic::SetCSPortal (iSector *sector, bool null)
 
   if (!null && !sector) return ;
   portal = new csPortal (this);
-  flags.Set (CS_POLY_DELETE_PORTAL);
   portal->flags.Reset (CS_PORTAL_WARP);
-  if (sector)
-    portal->SetSector (sector);
-  else
-    portal->SetSector (0);
-  flags.Reset (CS_POLY_COLLDET);         // Disable CD by default for portals.
-  if (thing_static) thing_static->UpdatePortalList ();
-}
-
-void csPolygon3DStatic::SetPortal (csPortal *prt)
-{
-  if (portal && flags.Check (CS_POLY_DELETE_PORTAL))
-  {
-    portal->SetSector (0);
-    delete portal;
-    portal = 0;
-    if (thing_static) thing_static->UpdatePortalList ();
-  }
-
-  portal = prt;
-  flags.Set (CS_POLY_DELETE_PORTAL);
+  portal->SetSector (sector);
   flags.Reset (CS_POLY_COLLDET);         // Disable CD by default for portals.
   if (thing_static) thing_static->UpdatePortalList ();
 }

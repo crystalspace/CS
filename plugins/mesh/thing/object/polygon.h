@@ -57,12 +57,6 @@ struct iMaterialWrapper;
  */
 
 /**
- * If this flag is set this portal was allocated by this polygon
- * and it should also be deleted by it.
- */
-#define CS_POLY_DELETE_PORTAL	0x80000000
-
-/**
  * This flag is set if the renderer can't handle the lightmap.
  * Lighting is still calculated, but the lightmap isn't passed to the
  * renderer.
@@ -293,12 +287,7 @@ public:
    * If 'null' is true and sector == '0' then a 0 portal
    * is created.
    */
-  void SetCSPortal (iSector* sector, bool null = false);
-
-  /**
-   * Set a pre-created portal on this polygon.
-   */
-  void SetPortal (csPortal* prt);
+  void SetPortal (iSector* sector, bool null = false);
 
   /**
    * Get the portal structure (if there is one).
@@ -645,12 +634,12 @@ public:
 
     virtual iPortal* CreateNullPortal ()
     {
-      scfParent->SetCSPortal (0, true);
+      scfParent->SetPortal (0, true);
       return &(scfParent->GetPortal ()->scfiPortal);
     }
     virtual iPortal* CreatePortal (iSector *target)
     {
-      scfParent->SetCSPortal (target);
+      scfParent->SetPortal (target);
       return &(scfParent->GetPortal ()->scfiPortal);
     }
     virtual iPortal* GetPortal ()
