@@ -17,7 +17,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: metaball metaballclean
-all plugins: metaball
+meshes all plugins: metaball
 
 metaball:
 	$(MAKE_TARGET) MAKE_DLL=yes
