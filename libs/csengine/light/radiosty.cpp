@@ -1457,7 +1457,7 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
   // This function calculates radiosity with linear light attenuation
   // because that is what CS uses internally as well.
   float totalfactor = cossrcangle * cosdestangle * 
-    source_patch_area * visibility / (distance * sqdistance);
+    source_patch_area * visibility / (sqdistance*sqdistance);
 
   //if(totalfactor > 10.0f) totalfactor = 10.0f;
 
