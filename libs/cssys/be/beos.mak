@@ -12,6 +12,11 @@ PLUGINS += video/canvas/be video/canvas/openglbe video/renderer/opengl
 override DO_ASM=no
 override CS_NO_QSQRT=yes
 
+# As there are now binaries of the custom version of NASM for BeOS, you
+# can enable the use of nasm by uncommenting the following line and changing
+# the above DO_ASM to yes.
+#NASM.INSTALLED=yes
+
 # The extensive memory debugger facility in cssysdef.h interferes with the
 # 'operator new' overloads in the Be system headers.
 override EXTENSIVE_MEMDEBUG=no
