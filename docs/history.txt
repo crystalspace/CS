@@ -85,6 +85,8 @@ The history order is reversed so that new features are at the top.
 	    - All QUERY_PLUGIN macros are now prefixed by "CS_".
 	    - All LOAD_PLUGIN macros are now prefixed by "CS_".
 	    - All IS_BLAH_EVENT macros are now prefixed by "CS_".
+	- Eric Sunshine eliminated compilation warnings about unused variables
+	  in metasys.cpp.
 24-Jun-2001
 	- 'Fixed' the lightmap overflow bug in software renderer. It is
 	  not really an elegant bug fix as I simply test for overflow
