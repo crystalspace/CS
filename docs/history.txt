@@ -20,6 +20,9 @@ chronological order.
 	  not correctly restoring the z-buffer mode after drawing lightmaps.
 	  In some cases this could cause objects to use the wrong z-buf
 	  mode later.
+	- res fixed some compile errors on gcc3.3.
+	- res disabled the use of SetDllDirectory() in Win32. Doesn't seem
+	  to do what it was intended for.
 23-Nov-2003
         - Matze fixed jam clean target for libraries.
         - Matze fixed a bug when SubInclude rule was placed in the middle of a

@@ -215,9 +215,9 @@ char* csGenmeshMeshObject::GenerateCacheName ()
   csMemFile mf;
   mf.Write ("genmesh", 7);
   uint32 l;
-  l = convert_endian (factory->GetVertexCount ());
+  l = convert_endian ((uint32)factory->GetVertexCount ());
   mf.Write ((char*)&l, 4);
-  l = convert_endian (factory->GetTriangleCount ());
+  l = convert_endian ((uint32)factory->GetTriangleCount ());
   mf.Write ((char*)&l, 4);
 
   if (logparent)
@@ -234,46 +234,46 @@ char* csGenmeshMeshObject::GenerateCacheName ()
         mf.Write (sect->QueryObject ()->GetName (),
 		strlen (sect->QueryObject ()->GetName ()));
       csVector3 pos = movable->GetFullPosition ();
-      l = convert_endian ((int)QInt ((pos.x * 1000)+.5));
+      l = convert_endian ((int32)QInt ((pos.x * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int)QInt ((pos.y * 1000)+.5));
+      l = convert_endian ((int32)QInt ((pos.y * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int)QInt ((pos.z * 1000)+.5));
+      l = convert_endian ((int32)QInt ((pos.z * 1000)+.5));
       mf.Write ((char*)&l, 4);
       csReversibleTransform tr = movable->GetFullTransform ();
       const csMatrix3& o2t = tr.GetO2T ();
-      l = convert_endian ((int)QInt ((o2t.m11 * 1000)+.5));
+      l = convert_endian ((int32)QInt ((o2t.m11 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int)QInt ((o2t.m12 * 1000)+.5));
+      l = convert_endian ((int32)QInt ((o2t.m12 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int)QInt ((o2t.m13 * 1000)+.5));
+      l = convert_endian ((int32)QInt ((o2t.m13 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int)QInt ((o2t.m21 * 1000)+.5));
+      l = convert_endian ((int32)QInt ((o2t.m21 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int)QInt ((o2t.m22 * 1000)+.5));
+      l = convert_endian ((int32)QInt ((o2t.m22 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int)QInt ((o2t.m23 * 1000)+.5));
+      l = convert_endian ((int32)QInt ((o2t.m23 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int)QInt ((o2t.m31 * 1000)+.5));
+      l = convert_endian ((int32)QInt ((o2t.m31 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int)QInt ((o2t.m32 * 1000)+.5));
+      l = convert_endian ((int32)QInt ((o2t.m32 * 1000)+.5));
       mf.Write ((char*)&l, 4);
-      l = convert_endian ((int)QInt ((o2t.m33 * 1000)+.5));
+      l = convert_endian ((int32)QInt ((o2t.m33 * 1000)+.5));
       mf.Write ((char*)&l, 4);
     }
   }
 
-  l = convert_endian ((int)QInt ((b.MinX () * 1000)+.5));
+  l = convert_endian ((int32)QInt ((b.MinX () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int)QInt ((b.MinY () * 1000)+.5));
+  l = convert_endian ((int32)QInt ((b.MinY () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int)QInt ((b.MinZ () * 1000)+.5));
+  l = convert_endian ((int32)QInt ((b.MinZ () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int)QInt ((b.MaxX () * 1000)+.5));
+  l = convert_endian ((int32)QInt ((b.MaxX () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int)QInt ((b.MaxY () * 1000)+.5));
+  l = convert_endian ((int32)QInt ((b.MaxY () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((int)QInt ((b.MaxZ () * 1000)+.5));
+  l = convert_endian ((int32)QInt ((b.MaxZ () * 1000)+.5));
   mf.Write ((char*)&l, 4);
 
   csMD5::Digest digest = csMD5::Encode (mf.GetData (), mf.GetSize ());

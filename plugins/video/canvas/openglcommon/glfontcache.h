@@ -93,7 +93,7 @@ class csGLFontCache : public csFontCache
     int& numBgVerts, const int fg, const int bg);
 protected:
   virtual GlyphCacheData* InternalCacheGlyph (KnownFont* font,
-    utf32_char glyph, uint32 flags);
+    utf32_char glyph, uint flags);
   virtual void InternalUncacheGlyph (GlyphCacheData* cacheData);
 
   void CopyGlyphData (iFont* font, utf32_char glyph, int tex,

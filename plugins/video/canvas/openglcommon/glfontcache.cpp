@@ -60,7 +60,7 @@ csGLFontCache::~csGLFontCache ()
 }
 
 csGLFontCache::GlyphCacheData* csGLFontCache::InternalCacheGlyph (
-  KnownFont* font, utf32_char glyph, uint32 flags)
+  KnownFont* font, utf32_char glyph, uint flags)
 {
   bool hasGlyph = font->font->HasGlyph (glyph);
   if (!hasGlyph)

@@ -741,7 +741,7 @@ void IndentLevel(int level)
     
 }
 
-bool csEvent::Print(int32 level)
+bool csEvent::Print(int level)
 {
   csGlobalHashIteratorReversible iter(&attributes);
   while (iter.HasNext())
@@ -1004,19 +1004,19 @@ bool csEvent::FlattenCrystal(char * buffer)
   b.Write((char *)&Category, sizeof(uint8));      // iEvent.Category
   b.Write((char *)&SubCategory, sizeof(uint8));   // iEvent.SubCategory
   b.Write((char *)&Flags, sizeof(uint8));         // iEvent.Flags
-  ui32 = convert_endian(Time);
+  ui32 = convert_endian((uint32)Time);
   b.Write((char *)&ui32, sizeof(uint32));       // iEvent.Time
 
   // The largest struct in the union is Joystick, so we take that..
-  i32 = convert_endian(Joystick.number);
+  i32 = convert_endian((int32)Joystick.number);
   b.Write((char *)&i32, sizeof(int32));
-  i32 = convert_endian(Joystick.x);
+  i32 = convert_endian((int32)Joystick.x);
   b.Write((char *)&i32, sizeof(int32));
-  i32 = convert_endian(Joystick.y);
+  i32 = convert_endian((int32)Joystick.y);
   b.Write((char *)&i32, sizeof(int32));
-  i32 = convert_endian(Joystick.Button);
+  i32 = convert_endian((int32)Joystick.Button);
   b.Write((char *)&i32, sizeof(int32));
-  i32 = convert_endian(Joystick.Modifiers);
+  i32 = convert_endian((int32)Joystick.Modifiers);
   b.Write((char *)&i32, sizeof(int32));
    
   while (iter.HasNext())

@@ -216,6 +216,8 @@ bool csPlatformStartup(iObjectRegistry* r)
    */
   bool needPATHpatch = true;
 
+#if 0
+  // @@@ doesn't seem to work in some cases?
   /*
     WinXP SP 1 has a nice function that does exactly that: setting
     a number of search paths for DLLs. However, it's WinXP SP 1+,
@@ -246,6 +248,7 @@ bool csPlatformStartup(iObjectRegistry* r)
     }
     FreeLibrary (hKernel32);
   }
+#endif
 
   if (needPATHpatch)
   {
