@@ -6,7 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-11-Sep-2003
+10-Sep-2003
+	- Philip Wyett made struct ShadowDrawVisCallback a friend to
+	  class csStencilShadowStep. This works round C2248 MSVC 6
+	  compiler error and known compiler bug Q243351.
+	- res fixed the totally bogus OR csLight::GetDistanceForBrightness ().
+	- Philip Wyett added CSTOOL dependency to rlsstd.mak (rendstep_std). 
+	- Anders Stenberg fixed some drawing problems in pgserver.
 	- Jorrit copied data/shader/light.xml to data/shader/light_bumpmap.xml.
 	  Then he created a new data/shader/light.xml which doesn't do the
 	  bumpmapping techniques. r3dtest now uses light_bumpmap.xml while
@@ -25,13 +31,8 @@ chronological order.
 	  portals.
 	- Eric Sunshine removed 8-bit characters from rendermeshlist.h and
 	  rendermeshlist.cpp.
-10-Sep-2003
-	- Philip Wyett made struct ShadowDrawVisCallback a friend to
-	  class csStencilShadowStep. This works round C2248 MSVC 6
-	  compiler error and known compiler bug Q243351.
-	- res fixed the totally bogus OR csLight::GetDistanceForBrightness ().
-	- Philip Wyett added CSTOOL dependency to rlsstd.mak (rendstep_std). 
-	- Anders Stenberg fixed some drawing problems in pgserver.
+	- Eric Sunshine bug in bfdplugins.cpp where it assumed the `errmsg'
+	  variable would be null but was in fact unassigned.
 9-Sep-2003
 	- res added a simple calculation of binormals and tangents to thing.
 	- res reformatted light.xml a bit.

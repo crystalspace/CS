@@ -63,7 +63,7 @@ csRef<iString> csGetPluginMetadata (const char* fullPath,
       (new csTinyDocumentSystem ());
     metadata = docsys->CreateDocument ();
   }
-  char const* errmsg;
+  char const* errmsg = 0;
   bool usebfd = false;
   bfd *abfd = bfd_openr (fullPath, 0);
   if (abfd)
