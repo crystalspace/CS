@@ -90,10 +90,16 @@ bool csConsole::IsActive() const
   return true;
 }
 
-void csConsole::Clear()
+void csConsole::Clear(bool wipe)
 {
-  // Clear the buffer and redraw the (now blank) console
-  buffer->Clear();
+  if(wipe)
+    // Clear the buffer 
+    buffer->Clear();
+  else
+    // Put the top of the buffer on the current line
+    buffer->SetTopLine(buffer->GetCurLine());
+
+  // Redraw the (now blank) console
   invalid.Set(size);
   // Reset the cursor position
   cx = cy = 0;
@@ -116,21 +122,29 @@ void csConsole::PutText(const char *text)
       buffer->NewLine(do_snap);
       // Update the cursor Y position
       cx = 0;
-      ++cy < buffer->GetPageSize() ? cy : cy--;
+      if(do_snap)
+	cy = buffer->GetCurLine() - buffer->GetTopLine();
+      else
+	++cy < buffer->GetPageSize() ? cy : cy--;
       // Make sure we don't change the X position below
       curline = NULL;
       break;
     case '\b':
-      // @@@ Should we handle backspaces to previous lines?  Probably...
       if(cx>0) {
 	if(cx==1) {
 	  cx = 0;
 	  buffer->DeleteLine(cy);
+	  curline = NULL;
 	} else {
 	  // Delete the character before the cursor, and move the cursor back
 	  curline = buffer->WriteLine();
 	  curline->DeleteAt(--cx);
 	}
+      } else if(cy>0) {
+	// Backup a line
+	cy--;
+	buffer->SetCurLine(cy);
+	curline = buffer->WriteLine();
       }
       break;
     case '\t':
@@ -164,6 +178,7 @@ void csConsole::Draw(csRect *area)
 
   // Save old clipping region
   piG2D->GetClipRect(oldrgn.xmin, oldrgn.ymin, oldrgn.xmax, oldrgn.ymax);
+  piG2D->SetClipRect(size.xmin, size.ymin, size.xmax, size.ymax);
 
   // Save the old font and set it to the requested font
   oldfont = piG2D->GetFontID();
@@ -172,13 +187,13 @@ void csConsole::Draw(csRect *area)
   // Calculate the height of the text
   height = (piG2D->GetTextHeight(font) + 2);
 
-  // Make sure we erase everything we need to erase
-  if(!(invalid.IsEmpty()||transparent)) {
-    piG2D->SetClipRect(invalid.xmin, invalid.ymin, invalid.xmax, invalid.ymax);
-    piG2D->DrawBox(invalid.xmin, invalid.ymin, invalid.xmax, invalid.ymax, bg);
-    if(area)
-      area->Union(invalid);
-  }
+  // Draw the background
+  if(!transparent)
+    piG2D->DrawBox(size.xmin, size.ymin, size.xmax, size.ymax, bg);
+
+  // Make sure we redraw everything we need to
+  if(area)
+    area->Union(invalid);
 
   // Print all lines on the current page
   for (i=0; i<buffer->GetPageSize(); i++) {
@@ -194,18 +209,11 @@ void csConsole::Draw(csRect *area)
     line.Set(size.xmin, (i * height) + size.ymin, size.xmax, (i * height) + size.ymin + height);
 
     // See if the line changed or if the line intersects with the invalid area
-    if(dirty||line.Intersects(invalid)) {
-      // If area is a valid pointer, add this line's rectangle to it
-      if(area)
-	area->Union(line);
-      // Clip the the current line
-      piG2D->SetClipRect(line.xmin, line.ymin, line.xmax, line.ymax);
-      // Clear the bg if necessary
-      if(!transparent)
-	piG2D->DrawBox(line.xmin, line.ymin, line.xmax, line.ymax, bg);
-      // Write the line
-      piG2D->Write(1 + size.xmin, (i * height) + size.ymin, fg, -1, text->GetData());
-    }
+    if(area&&(dirty||line.Intersects(invalid)))
+      area->Union(line);
+
+    // Write the line
+    piG2D->Write(1 + size.xmin, (i * height) + size.ymin, fg, -1, text->GetData());
 
   }
 
@@ -220,7 +228,7 @@ void csConsole::Draw(csRect *area)
     do_flash = true;
 
   // See if we draw a cursor
-  if((cursor!=csConNoCursor)&&do_flash) {
+  if((cursor!=csConNoCursor)&&do_flash&&(cy!=-1)) {
 
     int cx_pix, cy_pix;
 
@@ -404,6 +412,11 @@ void csConsole::ScrollTo(int top, bool snap)
     buffer->SetTopLine(top);
     break;
   }
+  if( (buffer->GetCurLine() >= buffer->GetTopLine())
+      && (buffer->GetCurLine() <= buffer->GetTopLine() + buffer->GetPageSize())) {
+    cy = buffer->GetCurLine() - buffer->GetTopLine();
+  } else
+    cy = -1;
   do_snap = snap;
 }
 

@@ -173,12 +173,21 @@ void csConsoleBuffer::SetPageSize(int size)
 
 void csConsoleBuffer::SetTopLine(int line)
 {
+  // Make sure we don't go "above" the top of the buffer
+  if(line<0) {
+    display_top = 0;
+    display_bottom = page_size;
   // Make sure we don't go past the end of the buffer
-  if(line + page_size > len) {
+  } else if(line + page_size > len) {
     display_top = len - page_size;
     display_bottom = len;
-  } else
+  } else if(line > current_line) {
+    display_top = current_line;
+    display_bottom = current_line + page_size;
+  } else {
     display_top = line;
+    display_bottom = line + page_size;
+  }
 }
 
 void csConsoleBuffer::SetCurLine(int line)

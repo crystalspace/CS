@@ -746,8 +746,8 @@ void csSystemDriver::DemoWrite (const char* buf)
   if (Console)
   {
     bool const ok2d = ((G2D!=NULL) && G2D->BeginDraw());
-    if (ok2d)
-      G2D->Clear (0);
+    if(ok2d)
+      G2D->Clear(0);
 
     Console->PutText (buf);
     csRect area;

@@ -303,7 +303,7 @@ void csSimpleConsole::ExecuteCommand (char *command)
   }
 }
 
-void csSimpleConsole::Clear ()
+void csSimpleConsole::Clear (bool)
 {
   LineCommandCount = 0;
   LineMessageNumber = 0;

@@ -68,7 +68,7 @@ bool csConsoleInput::HandleEvent(csEvent &event)
 	break;
       case CSKEY_BACKSPACE:
 	{
-	  int cx, cy;
+	  int cx, cy, diff;
 	  line = buffer->WriteLine();
 	  /* Backspace will only handle deleting last character if it can't
 	   * retrieve the cursor position from the console!!! */
@@ -77,17 +77,18 @@ bool csConsoleInput::HandleEvent(csEvent &event)
 	    const csString *otherline = piConsole->GetText(cy);
 	    // Account for prompts, etc.
 	    if(otherline!=NULL)
-	      cx -= otherline->Length() - line->Length();
+	      cx -= (diff = otherline->Length() - line->Length());
 	  } else {
 	    cx = line->Length();
 	    cy = buffer->GetCurLine();
+	    diff = 0;
 	  }
 	  // Delete the last character in the current line
 	  if(cx>1)
 	    line->DeleteAt(cx-1);
 	  else if (cx==1)
-	    buffer->DeleteLine(cy);
-	  else
+	    buffer->DeleteLine(buffer->GetCurLine());
+	  else if (diff>0) // Don't backspace over prompts
 	    echo = false;
 	  break;
 	}

@@ -112,7 +112,7 @@ public:
   /// Print (if console is active) and execute a command
   virtual void ExecuteCommand (char *command);
   /// Clear console
-  virtual void Clear ();
+  virtual void Clear (bool wipe = false);
   /// Refresh console image
   virtual void Print (csRect* area);
 

@@ -41,7 +41,7 @@ public:
   virtual void Hide();
   /***DEPRECATED***/
   virtual bool IsActive() const;
-  virtual void Clear();
+  virtual void Clear(bool wipe = false);
   virtual void PutText(const char *text);
   virtual const csString *GetText(int line = -1) const;
   virtual void Draw(csRect *rect);

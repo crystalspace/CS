@@ -76,8 +76,10 @@ struct iConsole : public iPlugIn
   /// Return true if console is active  !DEPRECATED!
   virtual bool IsActive() const = 0;
 
-  /// Clear console
-  virtual void Clear() = 0;
+  /** Clear console.  If wipe = false, it just moves the top line to the current line
+   * If wipe is true, it clears the buffer completely
+   */
+  virtual void Clear(bool wipe = false) = 0;
 
   /// Set the buffer size in lines
   virtual void SetBufferSize(int maxlines) = 0;
