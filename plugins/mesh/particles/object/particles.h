@@ -570,7 +570,7 @@ public:
   { return (iMeshObjectFactory*)pFactory; }
 
   virtual csFlags& GetFlags () { return flags; }
-  virtual csPtr<iMeshObject> Clone () { return 0; }
+  virtual csPtr<iMeshObject> Clone ();
 
   /**
    * Does all pre-render calculation.  Determines which LOD children in the

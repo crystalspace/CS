@@ -276,6 +276,91 @@ csParticlesObject::~csParticlesObject ()
     delete mesh;
 }
 
+csPtr<iMeshObject> csParticlesObject::Clone ()
+{
+  csParticlesObject* new_obj = new csParticlesObject(pFactory);
+
+  new_obj->vis_cb = vis_cb;
+  
+  new_obj->matwrap = matwrap;
+  new_obj->meshppsize = meshppsize;
+  
+  new_obj->vis_cb = vis_cb;
+
+  new_obj->tr_o2c = tr_o2c;
+  new_obj->rotation_matrix = rotation_matrix;
+  new_obj->tricount = tricount;
+
+  new_obj->vertex_name = vertex_name;
+  new_obj->color_name = color_name;
+  new_obj->texcoord_name = texcoord_name;
+  new_obj->index_name = index_name;
+  new_obj->radius_name = radius_name;
+  new_obj->scale_name = scale_name;
+
+  new_obj->camera_fov = camera_fov;
+  new_obj->camera_pixels = camera_pixels;
+
+  new_obj->basecolor = basecolor;
+
+  new_obj->emit_type = emit_type;
+  new_obj->emit_size_1 = emit_size_1;
+  new_obj->emit_size_2 = emit_size_2;
+  new_obj->emit_size_3 = emit_size_3;
+
+  new_obj->force_type = force_type;
+
+  new_obj->force_direction = force_direction;
+  new_obj->force_range = force_range;
+  new_obj->force_falloff = force_falloff;
+  new_obj->force_cone_radius = force_cone_radius;
+  new_obj->force_cone_radius_falloff = force_cone_radius_falloff;
+
+  new_obj->force_amount = force_amount;
+
+  new_obj->particles_per_second = particles_per_second;
+  new_obj->initial_particles = initial_particles;
+
+  new_obj->gravity = gravity;
+
+  new_obj->emit_time = emit_time;
+  new_obj->time_to_live = time_to_live;
+  new_obj->time_variation = time_variation;
+  
+  new_obj->particle_mass = particle_mass;
+  new_obj->mass_variation = mass_variation;
+  new_obj->dampener = dampener;
+
+  new_obj->autostart = autostart;
+  new_obj->running = running;
+  new_obj->transform_mode = transform_mode;
+
+  new_obj->diffusion = diffusion;
+
+  new_obj->particle_radius = particle_radius;
+
+  new_obj->gradient_colors = gradient_colors;
+  new_obj->loop_time = loop_time;
+  new_obj->base_heat = base_heat;
+  new_obj->constant_color = constant_color;
+  new_obj->color_method = color_method;
+
+  new_obj->buffer_length = buffer_length;
+
+  new_obj->point_sprites = point_sprites;
+  new_obj->corners[0] = corners[0];
+  new_obj->corners[1] = corners[1];
+  new_obj->corners[2] = corners[2];
+  new_obj->corners[3] = corners[3];
+
+  new_obj->emitter = emitter;
+  new_obj->radius = radius;
+
+  new_obj->flags = flags;
+  
+  return csPtr<iMeshObject> (new_obj);
+}
+
 bool csParticlesObject::LoadPhysicsPlugin (const char *plugin_id)
 {
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
