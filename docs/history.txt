@@ -1,18 +1,23 @@
 The history order is reversed so that new features are at the top.
 
+11-Feb-2003
+	- Eric Sunshine fixed documentation booboo (<texture> was used instead
+	  of <texmap>) in thing.txi which was reported by Oroszi Balazs
+	  <oroszib@vpg.sulinet.hu>.
 10-Feb-2003
-  - Philip Wyett removed duplicate CS_REPORTER_SEVERITY_DEBUG, which caused
-    perftest to output results twice.
-  - Philip Wyett also moved changes by jorrit which remove misleading
-    texture not found messages and res's change to add texture which lets
-    people know that the outdoor flickering is intentional.
-  - Philip Wyett moved the flicker-note texture into 'stdtex.zip', updated the
-    world accordingly and removed the texture from the 'data/flarge' directory.
-  - Fixed a 'cs-config' typo in creating external app docs, reported by
-    David Calkins.
+	- Philip Wyett removed duplicate CS_REPORTER_SEVERITY_DEBUG, which
+	  caused perftest to output results twice.
+	- Philip Wyett also moved changes by jorrit which remove misleading
+	  texture not found messages and res's change to add texture which lets
+	  people know that the outdoor flickering is intentional.
+	- Philip Wyett moved the flicker-note texture into 'stdtex.zip',
+	  updated the world accordingly and removed the texture from the
+	  'data/flarge' directory.
+	- Fixed a 'cs-config' typo in creating external app docs, reported by
+	  David Calkins.
 9-Feb-2003
-  - Philip Wyett extended Cygwin docs to cover installation of MNG
-    and the Open Dynamics Engine (ODE) libraries.
+	- Philip Wyett extended Cygwin docs to cover installation of MNG and
+	  the Open Dynamics Engine (ODE) libraries.
 7-Feb-2002
 	- Philip Wyett fixed -fs switch under Windows GL and poor fps in
 	  fullscreen mode.
