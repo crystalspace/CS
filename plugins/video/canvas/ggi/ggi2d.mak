@@ -35,6 +35,7 @@ LIBS._GGI2D = -lggi
 ifeq ($(USE_DLL),yes)
   GGI2D=$(OUTDLL)ggi2d$(DLL)
   LIBS.GGI2D+=$(LIBS._GGI2D)
+  DEP.GGI2D=$(CSCOM.LIB) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
 else
   GGI2D=$(OUT)$(LIB_PREFIX)ggi2d$(LIB)
   DEP.EXE+=$(GGI2D)
@@ -61,6 +62,12 @@ cleanlib: ggicleanlib
 ggi2d: $(OUTDIRS) $(GGI2D)
 
 $(GGI2D): $(OBJ.GGI2D)
+#	$(DO.LIBRARY) $(LIBS.GGI2D)
+
+$(OUT)%$O: libs/cs2d/ggi/%.cpp
+	$(DO.COMPILE.CPP) $(CFLAGS.GGI2D)
+
+$(GGI2D): $(OBJ.GGILIB2D) $(DEP.GGI2D)
 	$(DO.LIBRARY) $(LIBS.GGI2D)
 
 ggiclean:
