@@ -305,7 +305,7 @@ public:
             
       csVector2 *Texels = GenFactState->GetTexels();
       csColor   *Colors = GenFactState->GetColors();
-      csVector3 *Vertices = GenFactState->GetVertices();
+      //csVector3 *Vertices = GenFactState->GetVertices(); //@@@ Unused
 
       int i;
           

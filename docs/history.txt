@@ -14,7 +14,8 @@ The history order is reversed so that new features are at the top.
 	  "make iso" was invoked.  New solution augments $(OUTDIRS) to achieve
 	  proper behavior.
 	- Philip Wyett eliminated the makefile systems warnings introduced in
-	  changes earlier today.
+	  changes earlier today. Also commented out and marked some unused
+	  variables.
 26-Mar-2003
 	- Fixed a bug with the new OpenPortal() implementation in OpenGL
 	  renderer.  It was not setting/restoring the stencil in all cases.

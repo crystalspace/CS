@@ -100,8 +100,8 @@ void csLightningMeshObject::SetupObject ()
 {
   if (!initialized)
   {    
-    csVector3 pos;
-	int l, i;
+    //csVector3 pos; //@@@ Unused
+    //int l, i; //@@@ Unused
     initialized = true;
   }
 }
