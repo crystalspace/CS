@@ -452,9 +452,9 @@ int csSector::IntersectSegment (
     iMeshWrapper *mesh;
     int poly;
     bool rc = culler->IntersectSegment (start, end, isect, &r, &mesh, &poly);
-    if (rc && poly != -1)
+    if (rc)
     {
-      best_p = poly;
+      if (poly != -1) best_p = poly;
       best_r = r;
       if (p_mesh) *p_mesh = mesh;
     }

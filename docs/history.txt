@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+31-Mar-2004
+	- Jorrit fixed a bug with iSector->HitBeamPortals(). It would not
+	  be able to register hits on meshes that don't return a polygon
+	  index.
 30-Mar-2004
 	- Eric Sunshine added missing "#define CS_SYSDEF_PROVIDE_SOFTWARE2D"
 	  to null_render3d.cpp.  Reported by Steven Geens.
