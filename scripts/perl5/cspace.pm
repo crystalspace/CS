@@ -2113,6 +2113,8 @@ sub DESTROY {
 *SetDimensionValue = *cspacec::csSpline_SetDimensionValue;
 *GetDimensionValues = *cspacec::csSpline_GetDimensionValues;
 *GetDimensionValue = *cspacec::csSpline_GetDimensionValue;
+*SetIndexValues = *cspacec::csSpline_SetIndexValues;
+*GetIndexValues = *cspacec::csSpline_GetIndexValues;
 *Calculate = *cspacec::csSpline_Calculate;
 *GetCurrentIndex = *cspacec::csSpline_GetCurrentIndex;
 *GetInterpolatedDimension = *cspacec::csSpline_GetInterpolatedDimension;
