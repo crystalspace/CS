@@ -36,10 +36,6 @@ define SYSMODIFIERSHELP
   echo $"  MODE=optimize$|debug$|profile$"
   echo $"      Select one of three available compilation modes$"
 endef
-define SYSCONFIG
-  echo MODE = $(MODE)>>config.tmp
-  echo USE_DLL = $(USE_DLL)>>config.tmp
-endef
 
 # If there is no target defined (makefile system were not configured),
 # look which targets are available in mk/system directory.
@@ -141,6 +137,8 @@ configure: config.tmp
 	@echo $(SEPARATOR)
 
 config.tmp:
+	@echo MODE = $(MODE)>>config.tmp
+	@echo USE_DLL = $(USE_DLL)>>config.tmp
 	@$(SYSCONFIG)
 	$(subst DEST,config.mak,$(UPD))
 
