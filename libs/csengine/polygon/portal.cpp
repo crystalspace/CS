@@ -112,24 +112,10 @@ void csPortal::WarpSpace (csReversibleTransform& t, bool& mirror)
   if (flags.Check (CS_PORTAL_MIRROR)) mirror = !mirror;
 }
 
-/// Calculate inverse perspective corrected point for this camera.
-static void InvPerspective (const csVector2& p, float z, csVector3& v,
-	float inv_aspect, float shift_x, float shift_y)
-{
-  v.z = z;
-  v.x = (p.x - shift_x) * z * inv_aspect;
-  v.y = (p.y - shift_y) * z * inv_aspect;
-}
-
 bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
     	iRenderView* rview)
 {
   if (!CompleteSector (rview)) return false;
-  iCamera* icam = rview->GetCamera ();
-  const csReversibleTransform& camtrans = icam->GetTransform ();
-  float inv_aspect = icam->GetInvFOV ();
-  float shift_x = icam->GetShiftX ();
-  float shift_y = icam->GetShiftY ();
 
   // Initialize the 2D/3D culler. We only traverse through portals
   // after the culler has been used in the previous sector so this is
@@ -152,6 +138,7 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
   if (!new_clipper->GetNumVertices ())
     return false;
 
+  iCamera* icam = rview->GetCamera ();
   csPolygonClipper new_view (new_clipper, icam->IsMirrored (), true);
 
   csRenderContext* old_ctxt = rview->GetRenderContext ();

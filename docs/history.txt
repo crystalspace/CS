@@ -102,6 +102,8 @@ The history order is reversed so that new features are at the top.
 	  method perform the removal.  Since these objects must now be detroyed
 	  via DecRef() rather than via `delete', their destructors were also
 	  made private.
+	- Eric Sunshine eliminated several compilation warnings from
+	  portal.cpp.
 4-Jun-2001
 	- Added csTransform This2OtherRelative() and Other2ThisRelative()
 	  which operate on csPlane3.
