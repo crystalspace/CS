@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+27-Jan-2004
+	- Dentoid added a missing CS_IMPLEMENT_PLUGIN to the engine plugin.
+	- John Harger moved everything from iParticlesObjectState::Update into
+	  the physics plugin. This will allow better control over the particles
+	  and especially make the ODE particle physics plugin a lot easier and
+	  cleaner.
 26-Jan-2004
 	- Eric Sunshine updated CS/scripts/jamtemplate/cs_check_host.m4 to
 	  reflect all the MacOS/X-specific fixes Eric applied to
@@ -22,7 +28,7 @@ chronological order.
 	  from include/csengine.
 	- Luca added a very informative message in the bottom of the screen
 	  for the waterdemo application.
-    - Matze removed csengine from cs-config.
+	- Matze removed csengine from cs-config.
 	- res made the following changes to data/config/opengl.cfg:
 	    - Improved comment for Video.OpenGL.TextureDownsample.
 	    - Added GL font cache settings.
@@ -38,11 +44,6 @@ chronological order.
 	  which does not pollute the $(OUT) directory.
 	- Eric Sunshine fixed bug in bugplug.mak where it failed to install
 	  bugplug.key.
-	- Added a missing CS_IMPLEMENT_PLUGIN to the new engine plugin
-	- John Harger moved everything from iParticlesObjectState::Update into
-	  the physics plugin. This will allow better control over the particles
-	  and especially make the ODE particle physics plugin a lot easier and
-	  cleaner.
 25-Jan-2004
         - Matze did some updates to the jam rules:
             - I decided not to fight autoconf while using custom variable
