@@ -93,6 +93,12 @@ The history order is reversed so that new features are at the top.
 	    - Eliminated a number of compilation warnings from snprintf.c which
 	      were reported by MSVC.Unfortunately, a couple additional warnings
 	      are still present.
+	- Eric Sunshine fixed a potential bug in
+	  csObjectRegistry::Get(scfInterfaceID,int) where it was accessing
+	  an interface pointer after it had invoked DecRef() on that interface.
+	  It was making the potentially invalid assumption that the interface
+	  was pointing at the same object from which it was queried (which may
+	  not always be true).
 15-Oct-2001
 	- All func-id's are now changed so that they are equal to their
 	  interface name. Basically this means:

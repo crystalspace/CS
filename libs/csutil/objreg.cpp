@@ -220,7 +220,7 @@ iObjectRegistryIterator* csObjectRegistry::Get (scfInterfaceID id, int version)
     {
       interf->DecRef ();
       char* t = (char*)tags[i];
-      iterator->Add (interf, t);
+      iterator->Add (b, t);
     }
   }
   return iterator;
