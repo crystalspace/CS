@@ -1,5 +1,0 @@
-DllUnregisterServer
-DllRegisterServer
-DllGetClassObject
-DllCanUnloadNow
-DllInitialize
