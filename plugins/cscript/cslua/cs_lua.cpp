@@ -4271,7 +4271,7 @@ wrap_iEngine_CreateTexture(lua_State *L)
 	return 1;
 }
 
-#define iEngine_CreateSector(_swigobj,_swigarg0,_swigarg1)  (_swigobj->CreateSector(_swigarg0,_swigarg1))
+#define iEngine_CreateSector(_swigobj,_swigarg0,_swigarg1)  (_swigobj->CreateSector(_swigarg0))
 static int
 wrap_iEngine_CreateSector(lua_State *L)
 {
