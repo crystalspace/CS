@@ -41,6 +41,7 @@
   #pragma warning(disable:4710)   // function not inlined
   #pragma warning(disable:4201)   // structure/ union without name. (Only relevant on MSVC 5.0)
   #pragma warning(disable:4702)   // Unreachable Code
+  #pragma warning(disable:4512)   // Could not generate assignment operator
 #endif
 
 #if defined(COMP_WCC) || defined(COMP_BC)
