@@ -218,7 +218,7 @@ STDMETHODIMP csNetworkDriverSockets::Receive(DWORD dwID, DWORD *lpdwBytesToRecei
 	}
 
 #if !defined(NO_SOCKETS_SUPPORT)
-	if((*lpdwBytesToReceive = recv(Socket[dwID], lpDataBuffer, sizeof(lpDataBuffer), 0)) != -1) return S_OK;
+	if((*lpdwBytesToReceive = recv(Socket[dwID], lpDataBuffer, sizeof(lpDataBuffer), 0)) != (DWORD)-1) return S_OK;
 #else
 	return S_OK;
 #endif
