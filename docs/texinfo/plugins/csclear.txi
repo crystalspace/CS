@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node CrystalClear, csPython, PlugIns, PlugIns
+@node CrystalClear, Dungeon, PlugIns, PlugIns
 @subsection CrystalClear
 @cindex CrystalClear Plug-In
 @cindex Plug-In, CrystalClear

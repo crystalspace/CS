@@ -20,7 +20,7 @@ Space.
 @imports{plugins,csclear.txi}
 @imports{plugins,dungeon.txi}
 
-@node csPython, , CrystalClear, PlugIns
+@node csPython, , Dungeon, PlugIns
 @subsection csPython
 @cindex csPython Plug-In
 @cindex Python Plug-In

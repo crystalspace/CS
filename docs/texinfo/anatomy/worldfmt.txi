@@ -1,4 +1,4 @@
-@node World File Format
+@node World File Format, Memory Debugger, VFS, Anatomy
 @section Format of the World File
 @cindex World File Format
 
@@ -6,7 +6,7 @@ The first section of this document is a syntax description of the
 Crystal Space world file format. The second section gives a few hints
 about what everything means.
 
-@node WorldFmt Syntax
+@node WorldFmt Syntax, WorldFmt Hints, World File Format, World File Format
 @subsection Syntax
 
 @itemize @bullet
@@ -586,7 +586,7 @@ Description of a Library file (@file{library}):
 <library> ::= 'LIBRARY' '(' [ <library-comp> ] ')'
 @end itemize
 
-@node WorldFmt Hints
+@node WorldFmt Hints, , WorldFmt Syntax, World File Format
 @subsection Hints
 
 A little explanation about @code{LEN} and @code{TEXLEN}. With those you can
