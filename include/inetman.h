@@ -23,6 +23,7 @@
 
 #include "csutil/scf.h"
 #include "iplugin.h"
+#include "iproto.h"
 
 #define NETPORT_PROTO_UNKNOWN (-1)
 #define NETPORT_PROTO_TCP     (1)
@@ -85,10 +86,6 @@ SCF_VERSION (iNetworkManager, 0, 0, 1);
   virtual int AssignServer(int ipPortNumber,  
 			   int ipProtocol,  int maxConnects) =0;
 
-  virtual int AssociateAcceptHandler(int csNetPort, 
-				     int (*msghandler)(int,char *)) =0;
-  virtual int AssociateMsgHandler(int csNetPort, int (*accepthandler)(int)) =0;
-
   virtual void SetPollCounter(int counter) = 0;
 
   virtual int StartServer(int csNetPort) =0;
@@ -118,7 +115,7 @@ SCF_VERSION (iNetworkManager, 0, 0, 1);
   virtual void Broadcast(int csNetPort, int len, char *msg) =0;
 
   // Glue to NSTP
-  virtual void AssignProtocol(iSystem *iSys) =0;
+  virtual void AssignProtocol(iPROTO *AssignedProtocol) =0;
     
   /// Utility stuff
   virtual int GetLastError () = 0;

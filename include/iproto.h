@@ -59,7 +59,7 @@ struct iPROTO: public iPlugIn
 
   /// Setup Network Command Manager. - this wires the protocol upwards
   /// For any call backs required.
-  virtual bool AddCmdManager(iSystem *iSys) = 0;
+  virtual bool AddCmdManager(iCMDMGR *NewCmdManager) = 0;
 
 };
 
