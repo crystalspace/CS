@@ -27,8 +27,7 @@
 #include "iimage.h"
 #include "csgfxldr/boxfilt.h"
 #include "csutil/scanstr.h"
-
-#include "csengine/light/light.h"	//@@@FOR NORMAL_LIGHT_LEVEL
+#include "lightdef.h"
 
 #if defined(COMP_MWERKS) && defined(PROC_POWERPC)
 #if ! __option( global_optimizer )
