@@ -55,7 +55,7 @@ NEED_SOCKET_LIB=
 CFLAGS.INCLUDE=
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM)
+CFLAGS.GENERAL= -fvtable-thunks -Wall $(CFLAGS.SYSTEM)
 
 # Flags for the compiler which are used when optimizing.
 CFLAGS.optimize=-s -O3 -fomit-frame-pointer -ffast-math
