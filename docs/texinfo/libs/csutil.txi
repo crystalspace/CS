@@ -59,7 +59,7 @@ removed. An object also stores a pointer to its parent (which is not
 reference-counted to avoid circular references). Note that this pointer will
 always point to the last parent if the object is added to more than one
 parent. When the object is removed from a parent, the pointer is set to
-@code{NULL}, even if the object is still a child of another parent!
+@code{0}, even if the object is still a child of another parent!
 
 Although the children of an object are only available as @code{iObject}'s,
 you can use @code{SCF_QUERY_INTERFACE} to query other interfaces from them.
@@ -76,7 +76,7 @@ multiple objects with the same name correctly.
 
 @item CS_GET_FIRST_NAMED_CHILD_OBJECT(object,Interface,name)
 Same as the above but stops at the first object with the given name, even if
-it does not implement the requested interface (in that case, @code{NULL} is
+it does not implement the requested interface (in that case, @code{0} is
 returned). This is slightly faster.
 @end table
 Note that all these macros increase the reference count of the returned

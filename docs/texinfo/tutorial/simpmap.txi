@@ -154,7 +154,7 @@ void Simple::SetupFrame ()
 void Simple::FinishFrame ()
 @{
   g3d->FinishDraw ();
-  g3d->Print (NULL);
+  g3d->Print (0);
 @}
 
 bool Simple::HandleEvent (iEvent& ev)

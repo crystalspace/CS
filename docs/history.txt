@@ -14,6 +14,10 @@ The history order is reversed so that new features are at the top.
 	  with the proper usage of GetObjectModel().
 	- Jorrit added a few references towards individual HOWTO's from the
 	  rest of the documentation.
+	- Jorrit replaced all occurances of NULL in the documentation with 0.
+	  This same replacement has been done on the source code some time
+	  ago.
+	- Jorrit fixed the ensocket documentation to use csRef.
 20-Jul-2003
 	- Jorrit forgot to link the new howto into the howto chapter.
 	- Jorrit fixed a small note about curves in the thing mesh object

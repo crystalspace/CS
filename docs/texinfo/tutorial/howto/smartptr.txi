@@ -28,7 +28,7 @@ class MyClass
 @end example
 
 Smart pointers don't need to be initialized. So there is no need
-to do @samp{engine = NULL} in the constructor of your class.
+to do @samp{engine = 0} in the constructor of your class.
 There is also no need to clean them up. The reference to the engine
 will be cleaned up automatically when the instance of @code{MyClass}
 is deleted.
@@ -53,7 +53,7 @@ class MyClass
 
 MyClass::MyClass ()
 @{
-  engine = NULL;
+  engine = 0;
 @}
 
 MyClass::~MyClass ()
@@ -242,7 +242,7 @@ Avoid constructs like this:
 csRef<iMeshWrapper> mesh = @dots{};
 @dots{}
 mesh->DecRef ();
-mesh = NULL;
+mesh = 0;
 @end example
 
 As this will cause @emph{two} references to be decremented! And that is
@@ -270,7 +270,7 @@ int main (int argc, char* argv[])
 The reason this doesn't work is that the @samp{plugin_mgr} reference
 will only be cleaned up after @code{DestroyApplication} is called.
 To fix this you can use several techniques. Manually setting
-@samp{plugin_mgr} to NULL right before calling @code{DestroyApplication}
+@samp{plugin_mgr} to 0 right before calling @code{DestroyApplication}
 is one way. Another way is to put the initialization into another
 routine so that @samp{plugin_mgr} is created in another scope.
 

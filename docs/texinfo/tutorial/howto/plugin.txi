@@ -394,7 +394,7 @@ plugins.
 
 Then it will use the plugin manager to load your plugin. Note that
 this can fail. You should always check the returned value to see if
-it is different from @samp{NULL}.
+it is different from @samp{0}.
 
 Another way to load the plugin is through @code{RequestPlugins()} which
 is called at initialization time:

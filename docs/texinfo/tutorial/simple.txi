@@ -534,15 +534,15 @@ bool Simple::Initialize ()
   csRef<iStatLight> light;
   iLightList* ll = room->GetLights ();
 
-  light = engine->CreateLight (NULL, csVector3 (-3, 5, 0), 10,
+  light = engine->CreateLight (0, csVector3 (-3, 5, 0), 10,
   	csColor (1, 0, 0), false);
   ll->Add (light->QueryLight ());
 
-  light = engine->CreateLight (NULL, csVector3 (3, 5,  0), 10,
+  light = engine->CreateLight (0, csVector3 (3, 5,  0), 10,
   	csColor (0, 0, 1), false);
   ll->Add (light->QueryLight ());
 
-  light = engine->CreateLight (NULL, csVector3 (0, 5, -3), 10,
+  light = engine->CreateLight (0, csVector3 (0, 5, -3), 10,
   	csColor (0, 1, 0), false);
   ll->Add (light->QueryLight ());
 
@@ -617,7 +617,7 @@ instance of @code{iStatLight} you can do @code{iStatLight::QueryLight()}.
 
 When creating a light we use several parameters.
 First we have the name of the light. This is not used
-often and mostly you can set this to @code{NULL}. The second parameter is
+often and mostly you can set this to @code{0}. The second parameter is
 the location of the light in the world. Then follows a radius. The light will
 not affect polygons which are outside the sphere described by the center of
 the light and the radius.  The next parameter is the color of the light in
@@ -721,7 +721,7 @@ void Simple::SetupFrame ()
 void Simple::FinishFrame ()
 @{
   g3d->FinishDraw ();
-  g3d->Print (NULL);
+  g3d->Print (0);
 @}
 @end example
 

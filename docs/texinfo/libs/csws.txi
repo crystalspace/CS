@@ -378,14 +378,14 @@ and its parents.  If other behavior is desired, a component should capture
 the mouse by calling @code{app->CaptureMouse(this)}---in this case mouse
 events are sent by application object directly to the object that captured the
 mouse, bypassing normal event flow.  To revert to normal mode of operation
-component should call @code{app->CaptureMouse(NULL)}.
+component should call @code{app->CaptureMouse(0)}.
 
 @item
 Keyboard events are sent only to components from @dfn{focus chain}
 (@pxref{CSWS Focus Chain}).  If a different behavior is desired, component
 should capture keyboard events by calling @code{app->CaptureKeyboard(this)}.
 To disable capturing keyboard events component should call
-@code{app->CaptureKeyboard(NULL)}.
+@code{app->CaptureKeyboard(0)}.
 
 @item
 Command events are not sent to child windows.  A reply to command event is
@@ -508,7 +508,7 @@ starting from focused, then going to @emph{focused-to-next} and so on.
 @item csComponent *prev
 @itemx csComponent *next
 Contains the next and previous neighbors in parent's child list.  They are
-never @code{NULL}, chains are always closed.  If a component is the only child
+never @code{0}, chains are always closed.  If a component is the only child
 of another, its next and prev fields points to himself.
 
 @anchor{CSWS Focus Chain}
@@ -516,8 +516,8 @@ of another, its next and prev fields points to himself.
 This is the focused child component.  For example, keyboard events are sent
 only to components in @dfn{focused} chain, i.e. to @samp{app},
 @samp{app->focused}, @samp{app->focused->focused} and so on.  If component
-does not have any child components, focused is @code{NULL}.  This is the only
-possible case when ``focused'' can be @code{NULL}.
+does not have any child components, focused is @code{0}.  This is the only
+possible case when ``focused'' can be @code{0}.
 
 @item csComponent *top
 This is the top component in Z-order.  Mouse events are processed in Z-order
@@ -745,7 +745,7 @@ a mouse and nothing more.  What the program does is:
 First of all, it creates the system driver object.  You can provide a
 configuration file which contains the list of all plugins to be loaded, in
 addition to other things.  You can use the @file{cswstest.cfg} file as a
-template.  You can also pass @samp{NULL} as the file name, in which case you
+template.  You can also pass @samp{0} as the file name, in which case you
 will have to manually tell to the system driver which plug-ins to load (via the
 @code{iSystem::RequestPlugin()} method).
 

@@ -85,7 +85,7 @@ To get a specific node you can call:
 
 @example
 csMapNode::GetNode(csSector* pSector, char const* name,
-    char const* classname=NULL);
+    char const* classname=0);
 @end example
 
 For example:

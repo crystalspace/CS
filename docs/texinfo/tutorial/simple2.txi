@@ -64,7 +64,7 @@ bool Simple::Initialize()
   // Load a texture for our sprite.
   iTextureWrapper* txt = loader->LoadTexture ("spark",
   	"/lib/std/spark.png", CS_TEXTURE_3D, txtmgr, true);
-  if (txt == NULL)
+  if (txt == 0)
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.simple",
@@ -125,7 +125,7 @@ bool Simple::Initialize ()
   // Load a sprite template from disk.
   csRef<iMeshFactoryWrapper> imeshfact (loader->LoadMeshObjectFactory (
   	"/lib/std/sprite1"));
-  if (imeshfact == NULL)
+  if (imeshfact == 0)
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.simple1",

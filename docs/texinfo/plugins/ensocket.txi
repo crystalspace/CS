@@ -100,9 +100,9 @@ Here is a simple example showing the module in use.
 #include "inetwork/socket2.h"
 #include "inetwork/sockerr.h"
 
-iNetworkDriver2* netdriver = NULL;
-iSocketDriver2*  client = NULL;
-iSocketDriver2*  server = NULL;
+csRef<iNetworkDriver2> netdriver;
+csRef<iSocketDriver2> client;
+csRef<iSocketDriver2> server;
 
 @dots{}
 
@@ -135,14 +135,12 @@ if (server)
 if (server)
 @{
   client = server->Accept();
-  if (client != NULL)
+  if (client != 0)
   @{
     // We have a connection.
     client->Send("hello\r\n",7);
     client->Disconnect();
   @}
-server->Close();
-client->DecRef();
-server->DecRef();
+  server->Close();
 @}
 @end example

@@ -270,7 +270,7 @@ constructor, this macro will initialize @samp{scfRefCount} to zero and
 @samp{scfParent} to @var{parent}. In fact, the constructor of any class
 should receive at least one argument of type @samp{iBase*} which should then
 be passed along to the @code{SCF_CONSTRUCT_IBASE()} macro. Note that the
-parent can also be NULL if you want.
+parent can also be 0 if you want.
 
 @node SCF Multiple Interfaces, SCF Versions, SCF Using, SCF
 @subsection Classes Implementing Multiple Interfaces
@@ -443,7 +443,7 @@ range for micro version number is 0..65535.
 
 When you query an interface, you should always tell it what interface version
 are you looking for.  If a module cannot provide an interface compatible with
-the requested version, then @code{QueryInterface()} will return @samp{NULL}
+the requested version, then @code{QueryInterface()} will return @samp{0}
 (same as if interface wasn't available at all).  You can use
 @code{scfCompatibleVersion()} to check whether the requested version is
 compatible with interface version. In fact, the @code{SCF_IMPLEMENTS_INTERFACE()}
@@ -600,7 +600,7 @@ csDog::csDog(iBase* iParent)
 @{
   SCF_CONSTRUCT_IBASE(iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiName);
-  Name = NULL;
+  Name = 0;
 @}
 
 void csDog::Walk()
@@ -746,13 +746,13 @@ bool iSCF::UnregisterClass(char const* iClassID);
 Sometimes you don't want to register your classes with the @sc{scf} kernel.
 That is, you create your objects manually, using @samp{new} or some other
 method.  In this case your object is not a part of the class tree (see above)
-and thus doesn't have a parent.  In this case you have to pass @samp{NULL} to
+and thus doesn't have a parent.  In this case you have to pass @samp{0} to
 the @code{SCF_CONSTRUCT_IBASE()} macro in constructor.
 
 @example
 MyClass::MyClass()
 @{
-  SCF_CONSTRUCT_IBASE(NULL)
+  SCF_CONSTRUCT_IBASE(0)
 @}
 @end example
 
