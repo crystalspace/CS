@@ -216,9 +216,12 @@ void csIsoSprite::Draw(iIsoRenderView *rview)
   iIsoView* view = rview->GetView ();
 
   // Prepare for rendering.
+  csZBufMode zbufmode;
   if((g3dpolyfx.mixmode & CS_FX_MASK_MIXMODE) == CS_FX_COPY)
-    g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_USE);
-  else g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_TEST);
+    zbufmode = CS_ZBUF_USE;
+  else
+    zbufmode = CS_ZBUF_TEST;
+  g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, zbufmode);
   //g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_NONE);
 
   //material->Visit ();
@@ -285,7 +288,9 @@ void csIsoSprite::Draw(iIsoRenderView *rview)
   // for non-iso-engine created materials, we have to draw them now.
   //rview->CalculateFogPolygon (g3dpolyfx);
   g3dpolyfx.mixmode = g3dpolyfx.mixmode;
-  g3d->DrawPolygonFX (g3dpolyfx);
+  extern void IsoDrawPolygonFX (iGraphics3D* g3d, G3DPolygonDPFX& poly,
+  	csZBufMode zbufmode);
+  IsoDrawPolygonFX (g3d, g3dpolyfx, zbufmode);
 
   return;// true;
 }

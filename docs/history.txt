@@ -24,6 +24,9 @@ chronological order.
 	- Jorrit changed the order of the include directories in Jamfile.in
 	  so that $(BUILDTOP) include is used before the global include
 	  in CS. That fixes compilation of CS in another build dir.
+	- Jorrit started work on updating the isometric engine to NR. The
+	  tiles display but there is a problem with scrolling. Also mesh
+	  objects don't display yet.
 2-Jun-2004
 	- Jorrit reverted the change from Andres Freund that checks on the
 	  presence of <params> in a mesh object. There are cases where

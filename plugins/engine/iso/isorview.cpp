@@ -52,6 +52,8 @@ void csIsoRenderView::CreateBuckets(int num)
 
 void csIsoRenderView::DrawBuckets()
 {
+  extern void IsoDrawPolygonFX (iGraphics3D* g3d, G3DPolygonDPFX& poly,
+  	csZBufMode zbufmode);
   csIsoRenderBucket *p, *np;
   int i;
   for(i=0; i<maxbuckets; i++)
@@ -61,7 +63,7 @@ void csIsoRenderView::DrawBuckets()
     //int num = 0;
     while(p)
     {
-      g3d->DrawPolygonFX (*p->g3dpolyfx);
+      IsoDrawPolygonFX (g3d, *p->g3dpolyfx, CS_ZBUF_FILL);
       /// move to prealloc list
       np = p->next;
       p->next = prebuck;
@@ -84,7 +86,9 @@ void csIsoRenderView::AddPolyFX(int materialindex, G3DPolygonDPFX *g3dpolyfx,
   if(materialindex>=maxbuckets)
   {
     g3dpolyfx->mixmode = mixmode;
-    g3d->DrawPolygonFX (*g3dpolyfx);
+    extern void IsoDrawPolygonFX (iGraphics3D* g3d, G3DPolygonDPFX& poly,
+    	csZBufMode zbufmode);
+    IsoDrawPolygonFX (g3d, *g3dpolyfx, CS_ZBUF_FILL);
     return;
   }
   csIsoRenderBucket *bucket = 0;

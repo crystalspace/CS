@@ -61,6 +61,62 @@ SCF_IMPLEMENT_IBASE (csIsoEngine::EventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
+#ifdef CS_USE_NEW_RENDERER
+static csSimpleRenderMesh rmesh;
+static bool rmesh_init = false;
+static uint rmesh_indices[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
+static csVector3 rmesh_vertices[14];
+static csVector4 rmesh_colors[14];
+static csVector2 rmesh_texels[14];
+static int rmesh_fw;
+static int rmesh_fh;
+static float rmesh_inv_aspect;
+#endif
+
+// Function to implement DrawPolygonFX temporarily for the iso engine
+// in NR.
+void IsoDrawPolygonFX (iGraphics3D* g3d, G3DPolygonDPFX& poly,
+	csZBufMode zbufmode)
+{
+#ifdef CS_USE_NEW_RENDERER
+  if (!rmesh_init)
+  {
+    rmesh_init = true;
+    rmesh.meshtype = CS_MESHTYPE_TRIANGLEFAN;
+    rmesh.indices = rmesh_indices;
+    rmesh.vertices = rmesh_vertices;
+    rmesh.colors = rmesh_colors;
+    rmesh_fw = g3d->GetWidth ();
+    rmesh_fh = g3d->GetHeight ();
+    rmesh_inv_aspect = 1.0f / g3d->GetPerspectiveAspect ();
+  }
+  rmesh.z_buf_mode = zbufmode;
+  rmesh.mixmode = poly.mixmode;
+  rmesh.indexCount = poly.num;
+  rmesh.vertexCount = poly.num;
+  rmesh.texcoords = poly.texels;
+  int i;
+  for (i = 0 ; i < poly.num ; i++)
+  {
+    float z = 1.0f / poly.z[i];
+    rmesh_vertices[i].Set (
+    	(poly.vertices[i].x - rmesh_fw/2) * rmesh_inv_aspect * z,
+    	(poly.vertices[i].y - rmesh_fh/2) * rmesh_inv_aspect * z,
+	z
+	);
+    rmesh_colors[i].Set (
+    	poly.colors[i].red,
+    	poly.colors[i].green,
+    	poly.colors[i].blue,
+	1.0);
+  }
+  rmesh.texture = poly.mat_handle->GetTexture ();
+  g3d->DrawSimpleMesh (rmesh);
+#else
+  g3d->DrawPolygonFX (poly);
+#endif
+}
+
 
 void csIsoEngine::Report (int severity, const char* msg, ...)
 {
