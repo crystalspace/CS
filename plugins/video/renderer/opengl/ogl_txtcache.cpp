@@ -38,6 +38,8 @@
 #define NORMAL_LIGHT_LEVEL 128
 #endif
 
+static int const MAX_MIPMAP_LEVELS = 4;
+
 OpenGLTextureCache::OpenGLTextureCache(int size, int bitdepth)
   : HighColorCache(size,HIGHCOLOR_TEXCACHE,bitdepth)
 {
@@ -55,52 +57,59 @@ void OpenGLTextureCache::Dump()
 
 void OpenGLTextureCache::Load (HighColorCache_Data *d)
 {
-    ITextureHandle* txt_handle = (ITextureHandle*)d->pSource;
+    ITextureHandle* const txt_handle = (ITextureHandle*)d->pSource;
     csTextureMM* const txt_mm = GetcsTextureMMFromITextureHandle (txt_handle);
-    csTexture* const txt_unl = txt_mm->get_texture (0);
-    int const texture_width = txt_unl->get_width ();
-    int const texture_height = txt_unl->get_height ();
     bool const transparent = txt_mm->get_transparent ();
 
     CHK (GLuint *texturehandle = new GLuint);
-    glGenTextures (1,texturehandle);
 
-/*    CsPrintf(MSG_DEBUG_0,"caching texture in handle %d\n",*texturehandle);
-    CsPrintf(MSG_DEBUG_0,"size (%d,%d)\n",texture_width,texture_height);
-    CsPrintf(MSG_DEBUG_0,"texture data location %x\n",texture->get_bitmap32());*/
+    // bind all 4 mipmap levels if possible
+    glGenTextures (1,texturehandle);
 
     glBindTexture (GL_TEXTURE_2D, *texturehandle);
 
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, rstate_bilinearmap ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_NEAREST);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, rstate_bilinearmap ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_NEAREST);
 
-    CHK (unsigned char *tempdata = new unsigned char[texture_width*texture_height*4]);
-    ULong const *source = txt_unl->get_bitmap32 ();
-    unsigned char *dest = tempdata;
-    for (int count = texture_width * texture_height;
-          count > 0; count--)
+    csTexture* txt_unl = txt_mm->get_texture (0);
+    int texture_width = txt_unl->get_width ();
+    int texture_height = txt_unl->get_height ();
+
+    CHK (unsigned char * const tempdata = new unsigned char[texture_width*texture_height*4]);
+
+    for (int mipmaplevel=0; mipmaplevel < MAX_MIPMAP_LEVELS; mipmaplevel++)
     {
-      dest[0] = R24(*source);
-      dest[1] = G24(*source);
-      dest[2] = B24(*source);
+      txt_unl = txt_mm->get_texture (mipmaplevel);
+      texture_width = txt_unl->get_width ();
+      texture_height = txt_unl->get_height ();
+      ULong const *source = txt_unl->get_bitmap32 ();
 
-      if (transparent && (*source == 0))
-        dest[3] = 0;
+      unsigned char * dest = tempdata;
+      for (int count = texture_width * texture_height;
+      count > 0; count--)
+      {
+	dest[0] = R24(*source);
+	dest[1] = G24(*source);
+	dest[2] = B24(*source);
+	
+	if (transparent && (*source == 0))
+	dest[3] = 0;
+	else
+	dest[3] = 255;
+	
+	dest+=4; source++;
+      }
+      if (transparent)
+        glTexImage2D(GL_TEXTURE_2D,mipmaplevel,GL_RGBA,texture_width,
+			texture_height,0,GL_RGBA,GL_UNSIGNED_BYTE,
+			tempdata);
       else
-        dest[3] = 255;
-
-      dest+=4; source++;
+        glTexImage2D(GL_TEXTURE_2D,mipmaplevel,GL_RGB,texture_width,
+			texture_height,0,GL_RGBA,GL_UNSIGNED_BYTE,
+			tempdata);
     }
-    if (transparent)
-      glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,texture_width,
-                   texture_height,0,GL_RGBA,GL_UNSIGNED_BYTE,
-                   tempdata);
-    else
-      glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,texture_width,
-                   texture_height,0,GL_RGBA,GL_UNSIGNED_BYTE,
-                   tempdata);
 
     delete []tempdata;
 

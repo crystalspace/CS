@@ -42,24 +42,8 @@
 // multitexture support
 #define USE_MULTITEXTURE 0
 #ifdef GL_ARB_multitexture
-//#define USE_MULTITEXTURE 1
+#define USE_MULTITEXTURE 1
 #endif
-
-// Option variable: do texture lighting?
-bool csGraphics3DOpenGL::do_lighting = true;
-// Option variable: render transparent textures?
-bool csGraphics3DOpenGL::do_transp = true;
-// Option variable: render textures?
-bool csGraphics3DOpenGL::do_textured = true;
-// Option variable: do perfect texture mapping?
-bool csGraphics3DOpenGL::do_perfect = false;
-// Option variable: do multitexturing?  How many textures can we do at once?
-int csGraphics3DOpenGL::do_multitexture_level = 0;
-// Interlacing.
-int csGraphics3DOpenGL::do_interlaced = -1;
-bool csGraphics3DOpenGL::ilace_fastmove = false;
-// Texel filtering.
-bool csGraphics3DOpenGL::do_texel_filt = false;
 
 #if USE_MULTITEXTURE
 // function to check for a certain extension - stolen from 
@@ -139,15 +123,24 @@ STDMETHODIMP csGraphics3DOpenGL::Initialize ()
   m_piG2D->Initialize ();
   txtmgr->InitSystem ();
 
-  rstate_dither = config->GetYesNo ("OpenGL", "ENABLE_DITHER", false);
+  m_renderstate.dither = config->GetYesNo ("OpenGL", "ENABLE_DITHER", false);
 
   z_buf_mode = CS_ZBUF_NONE;
 
   width = height = -1;
 
-  rstate_alphablend = true;
-  rstate_mipmap = 0;
-  rstate_gouraud = true;
+  m_renderstate.alphablend = true;
+  m_renderstate.mipmap = 0;
+  m_renderstate.gouraud = true;
+  m_renderstate.lighting = true;
+  m_renderstate.textured = true;
+  m_renderstate.texel_filt = false;
+  m_renderstate.perfect = false;
+  m_renderstate.interlaced = -1;
+  m_renderstate.ilace_fastmove = false;
+
+  m_config_options.do_multitexture_level = 0;
+  m_config_options.do_extra_bright = false;
   return S_OK;
 }
 
@@ -188,7 +181,7 @@ STDMETHODIMP csGraphics3DOpenGL::Open (const char *Title)
   csPixelFormat pfmt;
   piGI->GetPixelFormat (&pfmt);
 
-  if (rstate_dither)
+  if (m_renderstate.dither)
     glEnable (GL_DITHER);
   else
     glDisable (GL_DITHER);
@@ -198,7 +191,7 @@ STDMETHODIMP csGraphics3DOpenGL::Open (const char *Title)
   else
     glHint (GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
-  do_extra_bright = config->GetYesNo ("OpenGL", "EXTRA_BRIGHT", false);
+  m_config_options.do_extra_bright = config->GetYesNo ("OpenGL", "EXTRA_BRIGHT", false);
 
   // determine what blend mode to use when combining lightmaps with their
   // underlying textures.  This mode is set in the Opengl configuration file
@@ -212,8 +205,8 @@ STDMETHODIMP csGraphics3DOpenGL::Open (const char *Title)
                      { NULL            , GL_DST_COLOR, GL_ZERO     }
 		    };
   // default lightmap blend style
-  m_lightmap_src_blend = GL_DST_COLOR;
-  m_lightmap_dst_blend = GL_ZERO;
+  m_config_options.m_lightmap_src_blend = GL_DST_COLOR;
+  m_config_options.m_lightmap_dst_blend = GL_ZERO;
 
   // try to match user's blend name with a name in the blendstyles table
   char *lightmapstyle = config->GetStr("OpenGL", "LIGHTMAP_MODE","multiplydouble");
@@ -222,8 +215,8 @@ STDMETHODIMP csGraphics3DOpenGL::Open (const char *Title)
   {
     if (strcmp(lightmapstyle, blendstyles[blendstyleindex].blendstylename) == 0)
     {
-      m_lightmap_src_blend = blendstyles[blendstyleindex].srcblend;
-      m_lightmap_dst_blend = blendstyles[blendstyleindex].dstblend;
+      m_config_options.m_lightmap_src_blend = blendstyles[blendstyleindex].srcblend;
+      m_config_options.m_lightmap_dst_blend = blendstyles[blendstyleindex].dstblend;
       break;
     }
     blendstyleindex++;
@@ -241,8 +234,9 @@ STDMETHODIMP csGraphics3DOpenGL::Open (const char *Title)
     
     if (maxtextures > 1)
     {
-      do_multitexture_level = maxtextures;
-      SysPrintf (MSG_INITIALIZATION, "Using multitexture extension; up to %d textures allowed.",maxtextures);
+      m_config_options.do_multitexture_level = maxtextures;
+      ShortcutDrawPolygon = &MultitextureDrawPolygon;
+      SysPrintf (MSG_INITIALIZATION, "Using multitexture extension; using %d texture units",maxtextures);
     }
     else
     {
@@ -393,7 +387,6 @@ STDMETHODIMP csGraphics3DOpenGL::BeginDraw (int DrawFlags)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glColor3f(1.,0.,0.);
-//  glClearColor(0.,1.,0.,0.);
     glClearColor(0.,0.,0.,0.);
     dbg_current_polygon = 0;
   }
@@ -456,13 +449,7 @@ STDMETHODIMP csGraphics3DOpenGL::DrawPolygon (G3DPolygonDP& poly)
   int i;
   float P1, P2, P3, P4;
   float Q1, Q2, Q3, Q4;
-  int max_i, min_i;
-  float max_y, min_y;
   float min_z, max_z;
-
-  IGraphicsInfo* piGI = NULL;
-  int gi_pixelbytes;
-  float inv_aspect = poly.inv_aspect;
 
   if (poly.num < 3) return S_FALSE;
 
@@ -475,10 +462,6 @@ STDMETHODIMP csGraphics3DOpenGL::DrawPolygon (G3DPolygonDP& poly)
   if (dbg_current_polygon == dbg_max_polygons_to_draw-1) return E_FAIL;
   if (dbg_current_polygon >= dbg_max_polygons_to_draw-1) return S_OK;
 
-  VERIFY_SUCCESS (m_piG2D->QueryInterface( (REFIID)IID_IGraphicsInfo, (void**)&piGI));
-  piGI->GetPixelBytes( gi_pixelbytes);
-  FINAL_RELEASE (piGI);
-
   // Get the plane normal of the polygon. Using this we can calculate
   // '1/z' at every screen space point.
   float Ac, Bc, Cc, Dc, inv_Dc;
@@ -488,6 +471,7 @@ STDMETHODIMP csGraphics3DOpenGL::DrawPolygon (G3DPolygonDP& poly)
   Dc = poly.normal.D;
 
   float M, N, O;
+  float inv_aspect = poly.inv_aspect;
   if (ABS (Dc) < SMALL_D)
   {
     // The Dc component of the plane normal is too small. This means that
@@ -511,24 +495,12 @@ STDMETHODIMP csGraphics3DOpenGL::DrawPolygon (G3DPolygonDP& poly)
   // We are going to use these to scan the polygon from top to bottom.
   // Also compute the min_z/max_z in camera space coordinates. This is going to be
   // used for mipmapping.
-  min_i = max_i = 0;
-  min_y = max_y = poly.vertices[0].sy;
   max_z = min_z = M * (poly.vertices[0].sx - width2)
                 + N * (poly.vertices[0].sy - height2) + O;
   // count 'real' number of vertices
   int num_vertices = 1;
   for (i = 1 ; i < poly.num ; i++)
   {
-    if (poly.vertices[i].sy > max_y)
-    {
-      max_y = poly.vertices[i].sy;
-      max_i = i;
-    }
-    else if (poly.vertices[i].sy < min_y)
-    {
-      min_y = poly.vertices[i].sy;
-      min_i = i;
-    }
     float inv_z = M * (poly.vertices[i].sx - width2)
                 + N * (poly.vertices[i].sy - height2) + O;
     if (inv_z > min_z) min_z = inv_z;
@@ -542,12 +514,12 @@ STDMETHODIMP csGraphics3DOpenGL::DrawPolygon (G3DPolygonDP& poly)
 
   // if this is a 'degenerate' polygon, skip it
   if (num_vertices < 3) return S_FALSE;
-
+/*
   // Mipmapping.
   int mipmap;
-  if (!poly.uses_mipmaps ||  rstate_mipmap == 1)
+  if (!poly.uses_mipmaps ||  m_renderstate.mipmap == 1)
     mipmap = 0;
-  else if (rstate_mipmap == 0)
+  else if (m_renderstate.mipmap == 0)
   {
     //@@@ The ZDIST_... config values should move to the 3D rasterizer
     if (min_z < 8) mipmap =  0;
@@ -556,10 +528,15 @@ STDMETHODIMP csGraphics3DOpenGL::DrawPolygon (G3DPolygonDP& poly)
     else mipmap = 3;
   }
   else
-    mipmap = rstate_mipmap - 1;
+    mipmap = m_renderstate.mipmap - 1;
+*/
 
-  IPolygonTexture*   tex     = poly.poly_texture[mipmap];
+  IPolygonTexture*   tex     = poly.poly_texture[0];
   csTextureMMOpenGL* txt_mm  = (csTextureMMOpenGL*)GetcsTextureMMFromITextureHandle (poly.txt_handle);
+
+  // find lightmap information, if any
+  ILightMap *thelightmap = NULL;
+  tex->GetLightMap(&thelightmap);
 
   // Initialize our static drawing information and cache
   // the texture in the texture cache (if this is not already the case).
@@ -613,7 +590,7 @@ STDMETHODIMP csGraphics3DOpenGL::DrawPolygon (G3DPolygonDP& poly)
   float flat_r = 1., flat_g = 1., flat_b = 1.;
 
   glShadeModel (GL_FLAT);
-  if (do_textured)
+  if (m_renderstate.textured)
     glEnable (GL_TEXTURE_2D);
   else
   {
@@ -639,10 +616,6 @@ STDMETHODIMP csGraphics3DOpenGL::DrawPolygon (G3DPolygonDP& poly)
     glDisable (GL_BLEND);
     glColor4f (flat_r, flat_g, flat_b, 0.);
   }
-
-  // find lightmap information, if any
-  ILightMap *thelightmap = NULL;
-  tex->GetLightMap(&thelightmap);
 
   float sx,sy,sz, one_over_sz, u_over_sz, v_over_sz;
 
@@ -673,7 +646,7 @@ STDMETHODIMP csGraphics3DOpenGL::DrawPolygon (G3DPolygonDP& poly)
   // together.
   // if a lightmap exists, extract the proper data (GL handle, plus
   // texture coordinate bounds)
-  if (thelightmap && do_lighting)
+  if (thelightmap && m_renderstate.lighting)
   {
     HighColorCache_Data *lightmapcache_data;
     thelightmap->GetHighColorCache(&lightmapcache_data);
@@ -695,11 +668,11 @@ STDMETHODIMP csGraphics3DOpenGL::DrawPolygon (G3DPolygonDP& poly)
     float lightmap_low_u, lightmap_low_v, lightmap_high_u, lightmap_high_v;
     tex->GetTextureBox(lightmap_low_u,lightmap_low_v,
                        lightmap_high_u,lightmap_high_v);
+
     lightmap_low_u-=0.125;
     lightmap_low_v-=0.125;
     lightmap_high_u+=0.125;
     lightmap_high_v+=0.125;
-
     float lightmap_scale_u, lightmap_scale_v;
 
     if (lightmap_high_u <= lightmap_low_u)
@@ -734,7 +707,8 @@ STDMETHODIMP csGraphics3DOpenGL::DrawPolygon (G3DPolygonDP& poly)
 
     glEnable(GL_BLEND);
     // The following blend function is configurable.
-    glBlendFunc (m_lightmap_src_blend, m_lightmap_dst_blend);
+    glBlendFunc (m_config_options.m_lightmap_src_blend, 
+    		 m_config_options.m_lightmap_dst_blend);
 
     glBegin(GL_TRIANGLE_FAN);
     for (i=0; i<poly.num; i++)
@@ -765,7 +739,7 @@ STDMETHODIMP csGraphics3DOpenGL::DrawPolygon (G3DPolygonDP& poly)
 
   // An extra pass which improves the lighting on SRC*DST so that
   // it looks more like 2*SRC*DST.
-  if (do_extra_bright)
+  if (m_config_options.do_extra_bright)
   {
     glDisable (GL_TEXTURE_2D);
     if (z_buf_mode == CS_ZBUF_FILL)
@@ -789,7 +763,6 @@ STDMETHODIMP csGraphics3DOpenGL::DrawPolygon (G3DPolygonDP& poly)
     }
     glEnd ();
   }
-
 
   // If there is vertex fog then we apply that last.
   if (poly.use_fog)
@@ -859,12 +832,12 @@ STDMETHODIMP csGraphics3DOpenGL::StartPolygonFX (ITextureHandle* handle, UInt mo
   if (ShortcutStartPolygonFX && (this->*ShortcutStartPolygonFX)(handle, mode) ) 
   { return S_OK; }
 
-  m_gouraud = do_lighting && rstate_gouraud && ((mode & CS_FX_GOURAUD) != 0);
+  m_gouraud = m_renderstate.lighting && m_renderstate.gouraud && ((mode & CS_FX_GOURAUD) != 0);
   m_mixmode = mode;
   m_alpha = 1.0f - float (mode & CS_FX_MASK_ALPHA) / 255.;
 
   GLuint texturehandle = 0;
-  if (handle && do_textured)
+  if (handle && m_renderstate.textured)
   {
     csTextureMMOpenGL* txt_mm = (csTextureMMOpenGL*)GetcsTextureMMFromITextureHandle (handle);
     texture_cache->Add (handle);
@@ -1202,25 +1175,25 @@ STDMETHODIMP csGraphics3DOpenGL::SetRenderState(G3D_RENDERSTATEOPTION op, long v
       }
       break;
     case G3DRENDERSTATE_DITHERENABLE:
-      rstate_dither = value;
+      m_renderstate.dither = value;
       break;
     case G3DRENDERSTATE_SPECULARENABLE:
-      rstate_specular = value;
+      m_renderstate.specular = value;
       break;
     case G3DRENDERSTATE_BILINEARMAPPINGENABLE:
       texture_cache->SetBilinearMapping (value);
       break;
     case G3DRENDERSTATE_TRILINEARMAPPINGENABLE:
-      rstate_trilinearmap = value;
+      m_renderstate.trilinearmap = value;
       break;
     case G3DRENDERSTATE_TRANSPARENCYENABLE:
-      rstate_alphablend = value;
+      m_renderstate.alphablend = value;
       break;
     case G3DRENDERSTATE_MIPMAPENABLE:
-      rstate_mipmap = value;
+      m_renderstate.mipmap = value;
       break;
     case G3DRENDERSTATE_TEXTUREMAPPINGENABLE:
-      do_textured = value;
+      m_renderstate.textured = value;
       break;
 	// XAVIER: unhandled cases in enumerated switch (just to keep gcc happy)
     case G3DRENDERSTATE_MMXENABLE:
@@ -1228,19 +1201,19 @@ STDMETHODIMP csGraphics3DOpenGL::SetRenderState(G3D_RENDERSTATEOPTION op, long v
     case G3DRENDERSTATE_INTERLACINGENABLE:
       if (m_piG2D->DoubleBuffer (!value) != S_OK)
         return E_FAIL;
-      do_interlaced = value ? 0 : -1;
+      m_renderstate.interlaced = value ? 0 : -1;
       break;
     case G3DRENDERSTATE_FILTERINGENABLE:
-      do_texel_filt = value;
+      m_renderstate.texel_filt = value;
       break;
     case G3DRENDERSTATE_PERFECTMAPPINGENABLE:
-      do_perfect = value;
+      m_renderstate.perfect = value;
       break;
     case G3DRENDERSTATE_LIGHTINGENABLE:
-      do_lighting = value;
+      m_renderstate.lighting = value;
       break;
     case G3DRENDERSTATE_GOURAUDENABLE:
-      rstate_gouraud = value;
+      m_renderstate.gouraud = value;
       break;
     case G3DRENDERSTATE_MAXPOLYGONSTODRAW:
       dbg_max_polygons_to_draw = value;
@@ -1267,42 +1240,42 @@ STDMETHODIMP csGraphics3DOpenGL::GetRenderState(G3D_RENDERSTATEOPTION op, long& 
       retval = (bool)(z_buf_mode & CS_ZBUF_FILL);
       break;
     case G3DRENDERSTATE_DITHERENABLE:
-      retval = rstate_dither;
+      retval = m_renderstate.dither;
       break;
     case G3DRENDERSTATE_SPECULARENABLE:
-      retval = rstate_specular;
+      retval = m_renderstate.specular;
       break;
     case G3DRENDERSTATE_BILINEARMAPPINGENABLE:
       retval = texture_cache->GetBilinearMapping ();
       break;
     case G3DRENDERSTATE_TRILINEARMAPPINGENABLE:
-      retval = rstate_trilinearmap;
+      retval = m_renderstate.trilinearmap;
       break;
     case G3DRENDERSTATE_TRANSPARENCYENABLE:
-      retval = rstate_alphablend;
+      retval = m_renderstate.alphablend;
       break;
     case G3DRENDERSTATE_MIPMAPENABLE:
-      retval = rstate_mipmap;
+      retval = m_renderstate.mipmap;
       break;
     case G3DRENDERSTATE_TEXTUREMAPPINGENABLE:
-      retval = do_textured;
+      retval = m_renderstate.textured;
       break;
     case G3DRENDERSTATE_MMXENABLE:
       break;
     case G3DRENDERSTATE_INTERLACINGENABLE:
-      retval = do_interlaced == -1 ? false : true;
+      retval = m_renderstate.interlaced == -1 ? false : true;
       break;
     case G3DRENDERSTATE_FILTERINGENABLE:
-      retval = do_texel_filt;
+      retval = m_renderstate.texel_filt;
       break;
     case G3DRENDERSTATE_PERFECTMAPPINGENABLE:
-      retval = do_perfect;
+      retval = m_renderstate.perfect;
       break;
     case G3DRENDERSTATE_LIGHTINGENABLE:
-      retval = do_lighting;
+      retval = m_renderstate.lighting;
       break;
     case G3DRENDERSTATE_GOURAUDENABLE:
-      retval = rstate_gouraud;
+      retval = m_renderstate.gouraud;
       break;
     case G3DRENDERSTATE_MAXPOLYGONSTODRAW:
       retval = dbg_max_polygons_to_draw;
@@ -1428,7 +1401,7 @@ void csGraphics3DOpenGL::SysPrintf (int mode, char* szMsg, ...)
 
 // extension detection code blatantly lifted from Mark J. Kilgard's
 // "All about OpenGL extensions" paper.
-int isExtensionSupported(const char *extension)
+static int isExtensionSupported(const char *extension)
 {
   const GLubyte *extensions = NULL;
   const GLubyte *start;
@@ -1459,6 +1432,7 @@ int isExtensionSupported(const char *extension)
 /// Shortcut to override standard polygon drawing when we have multitexture
 bool csGraphics3DOpenGL::MultitextureDrawPolygon(G3DPolygonDP &poly)
 {
+// work in progress - GJH
 #if USE_MULTITEXTURE
   IPolygonTexture*   tex     = poly.poly_texture[0];
 
@@ -1466,88 +1440,243 @@ bool csGraphics3DOpenGL::MultitextureDrawPolygon(G3DPolygonDP &poly)
   ILightMap *thelightmap = NULL;
   tex->GetLightMap(&thelightmap);
 
-  // if we support multiple textures, then it may be possible to combine
-  // the following two passes into a single pass with multitexuring.
-  if (thelightmap && (do_multitexture_level > 1) )
+  // the shortcut works only if there is a lightmap and no fog
+  if (!thelightmap || poly.use_fog) return false;
+
+  // OK, we're gonna draw a polygon with a dual texture
+  // Get the plane normal of the polygon. Using this we can calculate
+  // '1/z' at every screen space point.
+  float Ac, Bc, Cc, Dc, inv_Dc;
+  Ac = poly.normal.A;
+  Bc = poly.normal.B;
+  Cc = poly.normal.C;
+  Dc = poly.normal.D;
+
+  float inv_aspect = poly.inv_aspect;
+  float M, N, O;
+  if (ABS (Dc) < SMALL_D)
   {
-    HighColorCache_Data *lightmapcache_data;
-    thelightmap->GetHighColorCache(&lightmapcache_data);
-    GLuint lightmaphandle = *( (GLuint *)(lightmapcache_data->pData) );
-
-    // Jorrit: this code was added to scale the lightmap.
-    // @@@ Note that many calculations in this routine are not very optimal
-    // to do here and should in fact be precalculated.
-    int lmwidth, lmrealwidth, lmheight, lmrealheight;
-    thelightmap->GetWidth (lmwidth);
-    thelightmap->GetRealWidth (lmrealwidth);
-    thelightmap->GetHeight (lmheight);
-    thelightmap->GetRealHeight (lmrealheight);
-    //float scale_u = (float)(lmrealwidth-1) / (float)lmwidth;
-    //float scale_v = (float)(lmrealheight-1) / (float)lmheight;
-    float scale_u = (float)(lmrealwidth) / (float)lmwidth;
-    float scale_v = (float)(lmrealheight) / (float)lmheight;
-
-    float lightmap_low_u, lightmap_low_v, lightmap_high_u, lightmap_high_v;
-    tex->GetTextureBox(lightmap_low_u,lightmap_low_v,
-                       lightmap_high_u,lightmap_high_v);
-
-    float lightmap_scale_u, lightmap_scale_v;
-
-    if (lightmap_high_u == lightmap_low_u)
-      lightmap_scale_u = scale_u;	// @@@ Is this right?
-    else
-      lightmap_scale_u = scale_u / (lightmap_high_u - lightmap_low_u);
-
-    if (lightmap_high_v == lightmap_low_v)
-      lightmap_scale_v = scale_v;	// @@@ Is this right?
-    else
-      lightmap_scale_v = scale_v / (lightmap_high_v - lightmap_low_v);
-
-    float light_u, light_v;
-
-    glActiveTextureARB(GL_TEXTURE0_ARB);
-    glBindTexture (GL_TEXTURE_2D, texturehandle);
-    glActiveTextureARB(GL_TEXTURE1_ARB);
-    glEnable (GL_TEXTURE_2D);
-    glBindTexture (GL_TEXTURE_2D, lightmaphandle);
-    glTexEnvf  (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    
-    glBegin(GL_TRIANGLE_FAN);
-    for (i=0; i<poly.num; i++)
-    {
-      sx = poly.vertices[i].sx - width2;
-      sy = poly.vertices[i].sy - height2;
-      one_over_sz = M*sx + N*sy + O;
-      sz = 1.0/one_over_sz;
-      u_over_sz = (J1 * sx + J2 * sy + J3);
-      v_over_sz = (K1 * sx + K2 * sy + K3);
-      light_u = (u_over_sz*sz - lightmap_low_u) * lightmap_scale_u;
-      light_v = (v_over_sz*sz - lightmap_low_v) * lightmap_scale_v;
-      // we must communicate the perspective correction (1/z) for textures
-      // by using homogenous coordinates in either texture space
-      // or in object (vertex) space.  We do it in texture space.
-
-      // modified to use homogenous object space coordinates instead
-      // of homogenous texture space coordinates
-      glMultiTexCoord2fARB (GL_TEXTURE0_ARB,u_over_sz*sz, v_over_sz*sz);
-      glMultiTexCoord2fARB (GL_TEXTURE1_ARB,light_u, light_v);
-      glVertex4f (poly.vertices[i].sx*sz, poly.vertices[i].sy*sz, -1.0, sz);
-    }
-    glEnd();
-
-    // we must disable the 2nd texture unit, so that other parts of the
-    // code won't accidently have a second texture applied if they
-    // don't want it.
-    // at this point our active texture is still TEXTURE1_ARB
-    glActiveTextureARB(GL_TEXTURE1_ARB);
-    glDisable (GL_TEXTURE_2D);
-    glActiveTextureARB(GL_TEXTURE0_ARB);
-
-    FINAL_RELEASE (thelightmap);
+    // The Dc component of the plane normal is too small. This means that
+    // the plane of the polygon is almost perpendicular to the eye of the
+    // viewer. In this case, nothing much can be seen of the plane anyway
+    // so we just take one value for the entire polygon.
+    M = 0;
+    N = 0;
+    // For O choose the transformed z value of one vertex.
+    // That way Z buffering should at least work.
+    O = 1/poly.z_value;
   }
-#endif
-  // not done yet
+  else
+  {
+    inv_Dc = 1/Dc;
+    M = -Ac*inv_Dc*inv_aspect;
+    N = -Bc*inv_Dc*inv_aspect;
+    O = -Cc*inv_Dc;
+  }
+  // Compute the min_y and max_y for this polygon in screen space coordinates.
+  // We are going to use these to scan the polygon from top to bottom.
+  // Also compute the min_z/max_z in camera space coordinates. This is going to be
+  // used for mipmapping.
+  float max_z, min_z;
+  max_z = min_z = M * (poly.vertices[0].sx - width2)
+                + N * (poly.vertices[0].sy - height2) + O;
+  // count 'real' number of vertices
+  int num_vertices = 1;
+  int i;
+  for (i = 1 ; i < poly.num ; i++)
+  {
+    float inv_z = M * (poly.vertices[i].sx - width2)
+                + N * (poly.vertices[i].sy - height2) + O;
+    if (inv_z > min_z) min_z = inv_z;
+    if (inv_z < max_z) max_z = inv_z;
+    // theoretically we should do here sqrt(dx^2+dy^2), but
+    // we can approximate it just by abs(dx)+abs(dy)
+    if ((fabs (poly.vertices [i].sx - poly.vertices [i - 1].sx)
+       + fabs (poly.vertices [i].sy - poly.vertices [i - 1].sy)) > VERTEX_NEAR_THRESHOLD)
+      num_vertices++;
+  }
+
+  // if this is a 'degenerate' polygon, skip it
+  if (num_vertices < 3) return false;
+
+  // Mipmapping.
+  int mipmap;
+  if (!poly.uses_mipmaps ||  m_renderstate.mipmap == 1)
+    mipmap = 0;
+  else if (m_renderstate.mipmap == 0)
+  {
+    //@@@ The ZDIST_... config values should move to the 3D rasterizer
+    if (min_z < 8) mipmap =  0;
+    else if (min_z < 16) mipmap = 1;
+    else if (min_z < 28) mipmap = 2;
+    else mipmap = 3;
+  }
+  else
+    mipmap = m_renderstate.mipmap - 1;
+
+  tex     = poly.poly_texture[mipmap];
+  csTextureMMOpenGL* txt_mm  = (csTextureMMOpenGL*)GetcsTextureMMFromITextureHandle (poly.txt_handle);
+
+  // find lightmap information, if any
+  thelightmap = NULL;
+  tex->GetLightMap(&thelightmap);
+
+  // Initialize our static drawing information and cache
+  // the texture in the texture cache (if this is not already the case).
+  CacheTexture (tex);
+
+  // @@@ The texture transform matrix is currently written as T = M*(C-V)
+  // (with V being the transform vector, M the transform matrix, and C
+  // the position in camera space coordinates. It would be better (more
+  // suitable for the following calculations) if it would be written
+  // as T = M*C - V.
+  float P1, P2, P3, P4, Q1, Q2, Q3, Q4;
+  P1 = poly.plane.m_cam2tex->m11;
+  P2 = poly.plane.m_cam2tex->m12;
+  P3 = poly.plane.m_cam2tex->m13;
+  P4 = - (P1 * poly.plane.v_cam2tex->x
+        + P2 * poly.plane.v_cam2tex->y
+        + P3 * poly.plane.v_cam2tex->z);
+  Q1 = poly.plane.m_cam2tex->m21;
+  Q2 = poly.plane.m_cam2tex->m22;
+  Q3 = poly.plane.m_cam2tex->m23;
+  Q4 = - (Q1 * poly.plane.v_cam2tex->x
+        + Q2 * poly.plane.v_cam2tex->y
+        + Q3 * poly.plane.v_cam2tex->z);
+
+  // Precompute everything so that we can calculate (u,v) (texture space
+  // coordinates) for every (sx,sy) (screen space coordinates). We make
+  // use of the fact that 1/z, u/z and v/z are linear in screen space.
+  float J1, J2, J3, K1, K2, K3;
+  if (ABS (Dc) < SMALL_D)
+  {
+    // The Dc component of the plane of the polygon is too small.
+    J1 = J2 = J3 = 0;
+    K1 = K2 = K3 = 0;
+  } else
+  {
+    J1 = P1 * inv_aspect + P4 * M;
+    J2 = P2 * inv_aspect + P4 * N;
+    J3 = P3              + P4 * O;
+    K1 = Q1 * inv_aspect + Q4 * M;
+    K2 = Q2 * inv_aspect + Q4 * N;
+    K3 = Q3              + Q4 * O;
+  }
+
+  bool tex_transp;
+  int poly_alpha = poly.alpha;
+
+  HighColorCache_Data *texturecache_data;
+  texturecache_data = txt_mm->get_hicolorcache ();
+  tex_transp = txt_mm->get_transparent ();
+  GLuint texturehandle = *( (GLuint *) (texturecache_data->pData) );
+
+  HighColorCache_Data *lightmapcache_data;
+  thelightmap->GetHighColorCache(&lightmapcache_data);
+  GLuint lightmaphandle = *( (GLuint *)(lightmapcache_data->pData) );
+
+  // configure base texture for texure unit 0
+  float flat_r = 1.0, flat_g = 1.0, flat_b = 1.0;
+  glActiveTextureARB(GL_TEXTURE0_ARB);
+  glBindTexture (GL_TEXTURE_2D, texturehandle);
+  if ((poly_alpha > 0) || tex_transp)
+  {
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glTexEnvf  (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    glEnable (GL_BLEND);
+    if (poly_alpha > 0)
+      glColor4f (flat_r, flat_g, flat_b, 1.0 - (float)poly_alpha / 100.0);
+    else
+      glColor4f (flat_r, flat_g, flat_b, 1.0);
+  }
+  else
+  {
+    glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    glDisable (GL_BLEND);
+    glColor4f (flat_r, flat_g, flat_b, 0.);
+  }
+
+  // configure lightmap for texture unit 1
+  glActiveTextureARB(GL_TEXTURE1_ARB);
+  glEnable (GL_TEXTURE_2D);
+  glBindTexture (GL_TEXTURE_2D, lightmaphandle);
+  glTexEnvf  (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+  SetGLZBufferFlags();
+  
+  // Jorrit: this code was added to scale the lightmap.
+  // @@@ Note that many calculations in this routine are not very optimal
+  // to do here and should in fact be precalculated.
+  int lmwidth, lmrealwidth, lmheight, lmrealheight;
+  thelightmap->GetWidth (lmwidth);
+  thelightmap->GetRealWidth (lmrealwidth);
+  thelightmap->GetHeight (lmheight);
+  thelightmap->GetRealHeight (lmrealheight);
+  //float scale_u = (float)(lmrealwidth-1) / (float)lmwidth;
+  //float scale_v = (float)(lmrealheight-1) / (float)lmheight;
+  float scale_u = (float)(lmrealwidth) / (float)lmwidth;
+  float scale_v = (float)(lmrealheight) / (float)lmheight;
+  
+  float lightmap_low_u, lightmap_low_v, lightmap_high_u, lightmap_high_v;
+  tex->GetTextureBox(lightmap_low_u,lightmap_low_v, lightmap_high_u,lightmap_high_v);
+  lightmap_low_u-=0.125;
+  lightmap_low_v-=0.125;
+  lightmap_high_u+=0.125;
+  lightmap_high_v+=0.125;
+
+  float lightmap_scale_u, lightmap_scale_v;
+  
+  if (lightmap_high_u == lightmap_low_u)
+    lightmap_scale_u = scale_u;	// @@@ Is this right?
+  else
+    lightmap_scale_u = scale_u / (lightmap_high_u - lightmap_low_u);
+  
+  if (lightmap_high_v == lightmap_low_v)
+    lightmap_scale_v = scale_v;	// @@@ Is this right?
+  else
+    lightmap_scale_v = scale_v / (lightmap_high_v - lightmap_low_v);
+  
+  float light_u, light_v;
+  float sx, sy, sz, one_over_sz;
+  float u_over_sz, v_over_sz;
+  
+  glBegin(GL_TRIANGLE_FAN);
+  for (i=0; i<poly.num; i++)
+  {
+    sx = poly.vertices[i].sx - width2;
+    sy = poly.vertices[i].sy - height2;
+    one_over_sz = M*sx + N*sy + O;
+    sz = 1.0/one_over_sz;
+    u_over_sz = (J1 * sx + J2 * sy + J3);
+    v_over_sz = (K1 * sx + K2 * sy + K3);
+    light_u = (u_over_sz*sz - lightmap_low_u) * lightmap_scale_u;
+    light_v = (v_over_sz*sz - lightmap_low_v) * lightmap_scale_v;
+
+    // modified to use homogenous object space coordinates instead
+    // of homogenous texture space coordinates
+    glMultiTexCoord2fARB (GL_TEXTURE0_ARB,u_over_sz*sz, v_over_sz*sz);
+    glMultiTexCoord2fARB (GL_TEXTURE1_ARB,light_u, light_v);
+    glVertex4f (poly.vertices[i].sx*sz, poly.vertices[i].sy*sz, -1.0, sz);
+  }
+  glEnd();
+  
+  // we must disable the 2nd texture unit, so that other parts of the
+  // code won't accidently have a second texture applied if they
+  // don't want it.
+  // at this point our active texture is still TEXTURE1_ARB
+  glActiveTextureARB(GL_TEXTURE1_ARB);
+  glDisable (GL_TEXTURE_2D);
+  glActiveTextureARB(GL_TEXTURE0_ARB);
+  
+  FINAL_RELEASE (thelightmap);
+  FINAL_RELEASE (tex);
+
+  return true;
+#else
+  (void)poly;
+  // multitexture not enabled -- how did we get into this shortcut?
   return false;
+#endif
 }
 
 /// Shortcuts to replace the standard Start/Draw/Finish set of Draw...FX functions;

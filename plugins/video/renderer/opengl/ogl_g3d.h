@@ -121,12 +121,25 @@ protected:
    * DAN: render-states
    * these override any other variable settings.
    */
-  bool rstate_dither;
-  bool rstate_specular;
-  bool rstate_trilinearmap;
-  bool rstate_gouraud;
-  bool rstate_alphablend;
-  int rstate_mipmap;
+  struct {
+    bool dither; // dither colors?
+    bool specular; // draw specular highlights?
+    bool trilinearmap; // texel/mipmap interpolate?
+    bool gouraud; // gouraud shading on polygons?
+    bool alphablend; // enable transparency?
+    int  mipmap;    // enable mipmapping?
+    bool lighting; // Option variable: do texture lighting? (lightmaps)
+    bool textured; // Option variable: render textures?
+    bool texel_filt; // Option variable: do expensive texel filtering?
+    bool perfect; // Option variable: do perfect texture mapping?
+    int interlaced; // For interlacing. 0 = draw odd lines, 1 = draw even lines, -1 = draw all lines.
+    /**
+    * For interlacing. Temporary set to true if we moved quickly. This will decrease
+    * the bluriness a little.
+    */
+    bool ilace_fastmove;
+    
+  } m_renderstate;
 
   /// Should DrawPolygonFX use Gouraud shading?
   bool  m_gouraud;
@@ -137,20 +150,27 @@ protected:
   /// Should DrawPolygonFX use texture?
   bool  m_textured;
 
-  /**
-   * Current settings of the user configurable blend parameters for
-   * lightmaps.  Certain settings work better on certain cards
-   */
-  GLenum m_lightmap_src_blend;
-  GLenum m_lightmap_dst_blend;
-
-  /**
-   * Brighten rendered textures in an extra pass.
-   * This slows down rendering (we should use multi-texturing)
-   * but is simulates 2*SRC*DST on cards that only support SRC*DST.
-   * At least it seems to do this on a RIVA 128.
-   */
-  bool do_extra_bright;
+  struct { // load-time configuration options
+    /**
+    * Current settings of the user configurable blend parameters for
+    * lightmaps.  Certain settings work better on certain cards
+    */
+    GLenum m_lightmap_src_blend;
+    GLenum m_lightmap_dst_blend;
+    
+    /// Option variable: do multitexturing?  This value is zero if multitexturing
+    /// is not available.  If multitexturing is available, this value holds
+    /// the number of textures that can be mixed together in one pass.
+    int do_multitexture_level;
+    
+    /**
+    * Brighten rendered textures in an extra pass.
+    * This slows down rendering (we should use multi-texturing)
+    * but is simulates 2*SRC*DST on cards that only support SRC*DST.
+    * At least it seems to do this on a RIVA 128.
+    */
+    bool do_extra_bright;
+  } m_config_options;
 
   /// For debugging: the maximum number of polygons to draw in a frame.
   long dbg_max_polygons_to_draw;
@@ -181,30 +201,6 @@ public:
 
   /// The System interface. 
   ISystem* m_piSystem;
-
-  /// Option variable: do texture lighting?
-  static bool do_lighting;
-  /// Option variable: render transparent textures?
-  static bool do_transp;
-  /// Option variable: render textures?
-  static bool do_textured;
-  /// Option variable: do expensive texel filtering?
-  static bool do_texel_filt;
-  /// Option variable: do perfect texture mapping?
-  static bool do_perfect;
-
-  /// Option variable: do multitexturing?  This value is zero if multitexturing
-  /// is not available.  If multitexturing is available, this value holds
-  /// the number of textures that can be mixed together in one pass.
-  static int do_multitexture_level;
-
-  /// For interlacing. 0 = draw odd lines, 1 = draw even lines, -1 = draw all lines.
-  static int do_interlaced;
-  /**
-   * For interlacing. Temporary set to true if we moved quickly. This will decrease
-   * the bluriness a little.
-   */
-  static bool ilace_fastmove;
 
   ///
   csGraphics3DOpenGL (ISystem* piSystem);
