@@ -149,9 +149,9 @@ want to know how to write a plug-in yourself, you should read the @sc{scf}
 documentation.  @xref{SCF}.
 @end itemize
 
-For further information about modules and plug-in drivers, see the sections on
-project anatomy (@pxref{Anatomy}) and plug-in modules (@pxref{Plug-In
-Drivers}).
+For further information about modules and plug-in drivers, see the sections
+on Libraries (@pxref{Libraries}) and plug-in modules
+(@pxref{Plug-In Drivers}).
 
-Now that you have learned some basics about the Crystal Space environment, you
-can try writing your first program.
+Now that you have learned some basics about the Crystal Space environment,
+you can try writing your first program.

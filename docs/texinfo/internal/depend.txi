@@ -1,0 +1,97 @@
+@c -*-texinfo-*-
+@node Dependencies, Directory Hierarchy, Library List, Anatomy
+@section Dependencies
+@cindex Dependencies
+@cindex Dependency Graph
+
+To make sure some parts of Crystal Space can be used by themselves, there is
+a philosophy, about which parts of Crystal Space are allowed to use other
+parts. You can think of the various modules as sitting on a specific level:
+
+@emph{Note}: This information may not be fully accurate at the time you read
+this.  Crystal Space is moving toward a system of plug-in modules which
+advertise pure, abstract interfaces which often imply much less dependency
+than actually linking with a library.
+
+@itemize @bullet
+@item Level 1: @emph{Utility---Independant of CS}
+
+@itemize @minus
+@item
+@code{libjpeg}
+@item
+@code{libpng}
+@item
+@code{zlib}
+@item
+@code{csgeom}
+@item
+@code{csobject}
+@item
+@code{csutil}
+@end itemize
+
+@item Level 2: @emph{Basics---Common Base of Various CS Parts}
+
+@itemize @minus
+@item
+@code{csgfxldr}
+@item
+@code{cssfxldr}
+@item
+@code{cssys}
+@end itemize
+
+@item Level 3: @emph{SCF---Various Interchangeable Plug-In Modules of CS}
+
+@itemize @minus
+@item
+@code{video/canvas}
+@item
+@code{video/renerer}
+@item
+@code{network/driver}
+@item
+@code{sound/driver}
+@item
+@code{sound/renderer}
+@end itemize
+
+@item Level 4: @emph{Engine---Binds Togehter Engines Components}
+
+@itemize @minus
+@item
+@code{csengine}
+@item
+@code{csparser}
+@end itemize
+
+@item Level 5: @emph{Support---Adds a Common Layer of Engine Abstraction}
+
+@itemize @minus
+@item
+@code{csws}
+@item
+@code{csgame}
+@end itemize
+
+@item Level 6: @emph{Application}
+
+@itemize @minus
+@item
+@code{walktest}
+@item
+@code{metademo}
+@item
+@code{MazeD}
+@end itemize
+@end itemize
+
+Every modules is only allowed to include headers from the same modules or from
+lower levels.  So for example, @file{csengine} may include headers from
+@file{csutil} but not from @file{csws} or @file{csparser}.
+
+All communication between level 3 libraries happens through @sc{scf}
+interfaces.  Those are defined in the @file{CS/include} directory.  That is
+the @emph{only} way to communicate on level 3.  @file{csengine} can use level
+3 libraries only through @sc{scf}.

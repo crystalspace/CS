@@ -91,7 +91,7 @@ Follow these installation instructions:
 @itemize @bullet
 @item
 Unzip the compiled libraries into the same folder where you unzipped Crystal
-Space.  (@xref{MSDOS Bugs}.)
+Space (@pxref{MSDOS Bugs}).
 
 @item
 Unzip @sc{nasm} somewhere.

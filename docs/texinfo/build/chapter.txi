@@ -13,15 +13,19 @@ If you are eager to try out the package after building it successfully, then
 read the Quick Start section.  @xref{Quick Start}.
 
 @menu
+* Directory Hierarchy::
 * Requirements::
 * External Libraries::
 * Platform Instructions:: Platform Specific Instructions
 * Problems:: Platform Specific Problems
 * Quick Start::
+* Memory Debugger:: Crystal Space Memory Debugger
 @end menu
 
+@imports{build,dirhier.txi}
 @imports{build,sysreq.txi}
 @imports{build,extlibs.txi}
 @imports{build,platform.txi}
 @imports{build,problems.txi}
 @imports{build,rundemo.txi}
+@imports{build,memdebug.txi}

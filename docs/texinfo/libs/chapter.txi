@@ -25,6 +25,7 @@ Utility Library (@code{csutil})
 @end itemize
 
 @menu
+* Lib Overview:: Quick Overview
 * SCF:: Shared Class Facility (@sc{scf})
 * VFS:: Virtual File System (@sc{vfs})
 * csParser:: World File Parser (@code{csParser})
@@ -32,6 +33,7 @@ Utility Library (@code{csutil})
 * csPhyziks:: csPhyziks Library (@code{csphyzik})
 @end menu
 
+@imports{libs,overview.txi}
 @imports{libs,scf.txi}
 @imports{libs,vfs.txi}
 @imports{libs,csparser.txi}

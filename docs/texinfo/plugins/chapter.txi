@@ -23,6 +23,7 @@ and drivers is known as @sc{scf}.  @xref{SCF}.
 
 The following plug-ins are available:
 @menu
+* Plug-In Overview:: Quick Overview
 * Graphics Drivers::
 * Sound Drivers::
 * Network Drivers::
@@ -32,6 +33,7 @@ The following plug-ins are available:
 * csPython::
 @end menu
 
+@imports{plugins,overview.txi}
 @importss{plugins,graphics,graphics.txi}
 @imports{plugins,sound.txi}
 @imports{plugins,network.txi}

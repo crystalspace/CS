@@ -1,0 +1,36 @@
+@node Plug-In Overview
+@section Quick Overview
+@cindex Plugin List
+@cindex Plugin Overview
+
+This section presents a quick overview of the plug-ins provided by Crystal
+Space. More detailed descriptions of these facilities may be found in later
+sections.
+
+@table @code
+@item Graphics Drivers
+The graphics modules provide ``low-level'' graphics output. This includes
+drawing pixels, lines and text, but also drawing polygons and polygon meshes
+to support hardware acceleration. @xref{Graphics Drivers}.
+
+@item Sound Drivers
+The sound modules allow you to load and play sound effects and music. 3d
+effects are supported, as well as different ways to the same sound file.
+@xref{Sound Drivers}.
+
+@item Network Drivers
+The networking modules allow CS programs to communicate between a network,
+internet or similar connection. @xref{Network Drivers}.
+
+@item Crystal Clear
+The Crystal Clear Plug-In provides high-level functions to make it easier to
+write games. @xref{CrystalClear}.
+
+@item Dungeon
+The Dungeon Plug-In can be used to create random levels based on simple
+parts created by a level editor. @xref{Dungeon}.
+
+@item Python
+The Python Plug-In allows support for Python scripts. @xref{csPython}.
+@end table
+
