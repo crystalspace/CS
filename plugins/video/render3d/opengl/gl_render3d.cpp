@@ -100,7 +100,6 @@ csGLRender3D::csGLRender3D (iBase *parent)
 
   scfiEventHandler = NULL;
 
-  strings = new csStringSet ();
 
   frustum_valid = false;
 
@@ -130,12 +129,6 @@ csGLRender3D::csGLRender3D (iBase *parent)
   clip_outer[0] = CS_GL_CLIP_PLANES;
   clip_outer[1] = CS_GL_CLIP_STENCIL;
   clip_outer[2] = CS_GL_CLIP_NONE;
-
-  string_vertices = strings->Request ("vertices");
-  string_texture_coordinates = strings->Request ("texture coordinates");
-  string_normals = strings->Request ("normals");
-  string_colors = strings->Request ("colors");
-  string_indices = strings->Request ("indices");
 
   int i;
   for (i=0; i<16; i++)
@@ -779,12 +772,19 @@ bool csGLRender3D::Open ()
     buffermgr = new csSysRenderBufferManager();
   }
 
-  txtcache = new csGLTextureCache (1024*1024*64, this);
+  txtcache = new csGLTextureCache (1024*1024*32, this);
   txtmgr = new csGLTextureManager (object_reg, GetDriver2D (), config, this);
 
   glClearDepth (0.0);
   statecache->Enable_GL_CULL_FACE ();
   statecache->SetCullFace (GL_FRONT);
+
+
+  string_vertices = strings->Request ("vertices");
+  string_texture_coordinates = strings->Request ("texture coordinates");
+  string_normals = strings->Request ("normals");
+  string_colors = strings->Request ("colors");
+  string_indices = strings->Request ("indices");
 
   return true;
 }
@@ -1502,6 +1502,7 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
     if (bugplug)
         bugplug->AddCounter ("Triangle Count", (mymesh->indexend-mymesh->indexstart)/3);
 
+    glColor4f (0, 0, 0, 0);
     glDrawElements (
       primitivetype,
       mymesh->indexend-mymesh->indexstart,
@@ -1702,6 +1703,14 @@ bool csGLRender3D::Initialize (iObjectRegistry* p)
   scfiShaderRenderInterface.Initialize(p);
 
   bugplug = CS_QUERY_REGISTRY (object_reg, iBugPlug);
+
+  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, "crystalspace.renderer.stringset", iStringSet);
+  if (!strings)
+  {
+    strings = csPtr<iStringSet> (new csScfStringSet ());
+    object_reg->Register (strings, "crystalspace.renderer.stringset");
+  }
+
   return true;
 }
 

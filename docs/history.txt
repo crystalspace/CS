@@ -160,6 +160,8 @@ The history order is reversed so that new features are at the top.
 	  uses csHashMap::AddNoTest() instead of csHashMap::Add() now
 	  (the latter one tests whether a hash object already exists in the
 	  hash, which is never the case here)
+	- Anders Stenberg added SCF wrapper for stringset, and made the new 
+	  renderer use it.
 10-May-2003
 	- Philip Wyett eliminated the 88 double to float conversion compiler
           warnings in gtreeldr.cpp under MSVC 6.

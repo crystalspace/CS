@@ -455,9 +455,6 @@ struct iRender3D : public iBase
   /// Disable vertex lighting
   virtual void DisablePVL () = 0;
 
-  /// Get a stringhash to be used by our streamsources etc.
-  virtual csStringSet* GetStringContainer () = 0;
-
   /// Set a renderstate value.
   virtual bool SetRenderState (R3D_RENDERSTATEOPTION op, long val) = 0;
 

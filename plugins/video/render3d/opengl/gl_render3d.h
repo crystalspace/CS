@@ -31,7 +31,8 @@
 #include "csutil/cscolor.h"
 #include "csutil/csstring.h"
 #include "csutil/scf.h"
-#include "csutil/strset.h"
+#include "csutil/scfstrset.h"
+#include "iutil/strset.h"
 
 #include "iutil/comp.h"
 #include "iutil/event.h"
@@ -120,7 +121,7 @@ private:
 
   csRender3dCaps rendercaps;
 
-  csStringSet* strings;
+  csRef<iStringSet> strings;
 
   csStringID string_vertices;
   csStringID string_texture_coordinates;
@@ -423,10 +424,6 @@ public:
   /// Disable vertex lighting
   virtual void DisablePVL ()
     { statecache->Disable_GL_LIGHTING (); }
-
-  /// Get a stringhash to be used by our streamsources etc.
-  csStringSet *GetStringContainer () 
-    { return strings; }
 
   virtual bool SetRenderState (R3D_RENDERSTATEOPTION op, long val);
   virtual long GetRenderState (R3D_RENDERSTATEOPTION op);

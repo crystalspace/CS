@@ -22,7 +22,7 @@
 #include "cstypes.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
-#include "csutil/strset.h"
+#include "csutil/scfstrset.h"
 #include "csgeom/vector3.h"
 #include "csutil/objreg.h"
 #include "csutil/scfstr.h"
@@ -581,6 +581,14 @@ void csShaderPass::Deactivate()
       r3d->DeactivateTexture (i);
     }
   }
+
+  for (i=0; i<STREAMMAX; i++)
+  {
+    if (streammapping[i] != csInvalidStringID)
+    {
+      r3d->DeactivateBuffer ((csVertexAttrib)i);
+    }
+  }
 }
 
 void csShaderPass::SetupState (csRenderMesh *mesh)
@@ -593,8 +601,10 @@ void csShaderPass::SetupState (csRenderMesh *mesh)
     {
       iRenderBuffer* buf  = mesh->streamsource->GetBuffer (streammapping[i]);
       if (buf)
-        r3d->ActivateBuffer ((csVertexAttrib)i, buf);
+        if (r3d->ActivateBuffer ((csVertexAttrib)i, buf))
+          continue;
     }
+    r3d->DeactivateBuffer ((csVertexAttrib)i);
   }
 
   for (i=0; i<TEXMAX; i++)
@@ -623,13 +633,13 @@ void csShaderPass::SetupState (csRenderMesh *mesh)
 void csShaderPass::ResetState ()
 {
   int i;
-  for (i=0; i<STREAMMAX; i++)
+  /*for (i=0; i<STREAMMAX; i++)
   {
     if (streammapping[i] != csInvalidStringID)
     {
       r3d->DeactivateBuffer ((csVertexAttrib)i);
     }
-  }
+  }*/
   /*
   for (i=TEXMAX-1; i>=0; i--)
   {
@@ -708,6 +718,7 @@ void csShaderPass::BuildTokenHash()
 
 bool csShaderPass::Load(iDocumentNode* node)
 {
+
   if (!node) 
     return false;
 
@@ -716,6 +727,10 @@ bool csShaderPass::Load(iDocumentNode* node)
   csRef<iRender3D> r3d = CS_QUERY_REGISTRY(objectreg, iRender3D);
   csRef<iSyntaxService> synserv = 
     CS_QUERY_REGISTRY (objectreg, iSyntaxService);
+
+  csRef<iStringSet> strings = 
+    CS_QUERY_REGISTRY_TAG_INTERFACE (objectreg, 
+    "crystalspace.renderer.stringset", iStringSet);
 
   if(node)
   {
@@ -806,7 +821,7 @@ bool csShaderPass::Load(iDocumentNode* node)
           if (found)
           {
             AddStreamMapping (
-              r3d->GetStringContainer ()->Request (child->GetAttributeValue ("stream")),
+              strings->Request (child->GetAttributeValue ("stream")),
               attribute);
           }
         }
