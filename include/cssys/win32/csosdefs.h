@@ -29,6 +29,7 @@
   #pragma warning(disable:4146)   // unary minus operator applied to unsigned type, result still unsigned
   #pragma warning(disable:4201)   // structure/ union without name. (Only relevant on MSVC 5.0)
   #pragma warning(disable:4244)   // conversion from 'double' to 'float'
+  #pragma warning(disable:4291)   // no matching operator delete found
   #pragma warning(disable:4312)	  // 'variable' : conversion from 'type' to 'type' of greater size
   #pragma warning(disable:4390)   // Empty control statement
   #pragma warning(disable:4505)   // 'function' : unreferenced local function has been removed
