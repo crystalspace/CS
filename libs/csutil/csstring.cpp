@@ -17,9 +17,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "sysdef.h"
+#define CS_DISABLE_MODULE_LOCKING
+#include "cscom/com.h"
+#undef  CS_DISABLE_MODULE_LOCKING
 #include "csutil/csstring.h"
 
-NO_MODULE_LOCK(a)
 IMPLEMENT_UNKNOWN(csString)
 
 BEGIN_INTERFACE_TABLE(csString)
@@ -35,4 +38,3 @@ STDMETHODIMP csString::xLength(unsigned long int *size) {
 	*size=Size;
 	return S_OK;
 }
-

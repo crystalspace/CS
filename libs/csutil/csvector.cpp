@@ -21,9 +21,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include "sysdef.h"
+#define CS_DISABLE_MODULE_LOCKING
+#include "cscom/com.h"
+#undef  CS_DISABLE_MODULE_LOCKING
 #include "csutil/csvector.h"
 
-NO_MODULE_LOCK(a)
 IMPLEMENT_DEFAULT_COM(Base)
 
 csVector::csVector (int ilimit, int ithreshold)
