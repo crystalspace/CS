@@ -41,7 +41,8 @@ BOOL cswinCallStack::EnumSymCallback (SYMBOL_INFO* pSymInfo, ULONG SymbolSize,
     SymCallbackInfo* info = (SymCallbackInfo*)UserContext;
 
     uint32 data = *((uint32*)(info->paramOffset + pSymInfo->Address));
-    StackEntry::Param& param = info->params->GetExtend (info->params->Length ());
+    StackEntry::Param& param =
+      info->params->GetExtend(info->params->Length ());
     param.name = strings.Request (pSymInfo->Name);//csStrNew (pSymInfo->Name);
     param.value = data;
   }
@@ -78,7 +79,8 @@ void cswinCallStack::AddFrame (const STACKFRAME64& frame)
     callbackInfo.params = &entry.params;
     callbackInfo.paramOffset = (uint8*)(LONG_PTR)(frame.AddrStack.Offset - 8);
     if (DbgHelp::SymEnumSymbols (GetCurrentProcess (), 
-      0/*DbgHelp::SymGetModuleBase64 (GetCurrentProcess (), frame.AddrPC.Offset)*/,
+      0
+      /*DbgHelp::SymGetModuleBase64(GetCurrentProcess(),frame.AddrPC.Offset)*/,
       "*", &EnumSymCallback, &callbackInfo))
     {
       entry.hasParams = true;
@@ -146,9 +148,9 @@ bool cswinCallStack::GetFunctionName (int num, csString& str)
 
   if (symbolInfo->Name[0] != 0)
   {
-    str.Format ("[%.8x] (%s)%s+0x%x", (uint32)entries[num].instrPtr,
+    str.Format ("[%.8x] (%s)%s+0x%x", (unsigned int)entries[num].instrPtr,
       (module.ImageName[0] != 0) ? module.ImageName : "<unknown>",
-      symbolInfo->Name, (uint32)displace);
+      symbolInfo->Name, (unsigned int)displace);
   }
   else
   {
@@ -217,8 +219,8 @@ public:
 
     DbgHelp::IncRef();
     DbgHelp::SymInitialize (GetCurrentProcess (), 0, true);
-    DbgHelp::SymSetOptions (SYMOPT_DEFERRED_LOADS | SYMOPT_FAIL_CRITICAL_ERRORS |
-      SYMOPT_LOAD_LINES | SYMOPT_UNDNAME);
+    DbgHelp::SymSetOptions (SYMOPT_DEFERRED_LOADS |
+      SYMOPT_FAIL_CRITICAL_ERRORS | SYMOPT_LOAD_LINES | SYMOPT_UNDNAME);
   }
 };
 
