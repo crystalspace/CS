@@ -87,12 +87,14 @@ bool csPosixMutex::LockWait()
 
 bool csPosixMutex::LockTry ()
 {
-  uint32 ret = 0;
   int rc = pthread_mutex_trylock (&mutex);
   switch (rc)
   {
   case EINVAL:
     lasterr = "Mutex not initialized";
+    break;
+  case EBUSY:
+    lasterr = "Mutex locked";
     break;
   case EDEADLK:
     lasterr = "Deadlock";
@@ -102,10 +104,11 @@ bool csPosixMutex::LockTry ()
     break;
   default:
     lasterr = "Unknown error while trying to lock mutex";
+    //    printf ("rc = %d\n", rc);
     break;
   }
   CS_SHOW_ERROR;
-  return ret;
+  return rc == 0;
 }
 
 bool csPosixMutex::Release ()
