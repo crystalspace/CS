@@ -54,7 +54,7 @@ Bugs to fix:
 	     This is not hard. Harder will be the fact that the lighting
 	     system has changed. It now works with the shadow bitmaps.
 	     [Bug 429283]
-	[V]  In isometric engine (isotest) + OpenGL some of the mesh
+	[**] In isometric engine (isotest) + OpenGL some of the mesh
 	     objects (like the particle systems) are clipped wrong to the
 	     floor.
 	     This is a very hard bug. We have been hunting this bug for

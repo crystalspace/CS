@@ -651,7 +651,8 @@ void csGraphics3DOGLCommon::PerfTest ()
       cnt++;
     }
     test_modes[i].cnt = cnt;
-    Report (CS_REPORTER_SEVERITY_NOTIFY, "    %d FPS for %c (small clipper)", cnt,
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"    %d FPS for %c (small clipper)", cnt,
     	test_modes[i].mode); fflush (stdout);
   }
   GetVertexBufferManager ()->UnlockBuffer (vbuf);
@@ -1719,22 +1720,16 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
   else
   {
     glDisable (GL_TEXTURE_2D);
+    csRGBpixel color;
     if (txt_handle)
-    {
-      uint8 r, g, b;
-      txt_handle->GetMeanColor (r, g, b);
-      flat_r = BYTE_TO_FLOAT (r);
-      flat_g = BYTE_TO_FLOAT (g);
-      flat_b = BYTE_TO_FLOAT (b);
-    }
+      txt_handle->GetMeanColor (color.red, color.green, color.blue);
     else if (mat_handle)
-    {
-      csRGBpixel color;
       mat_handle->GetFlatColor (color);
-      flat_r = BYTE_TO_FLOAT (color.red);
-      flat_g = BYTE_TO_FLOAT (color.green);
-      flat_b = BYTE_TO_FLOAT (color.blue);
-    }
+    else
+      color.red = color.green = color.blue = 255;
+    flat_r = BYTE_TO_FLOAT (color.red);
+    flat_g = BYTE_TO_FLOAT (color.green);
+    flat_b = BYTE_TO_FLOAT (color.blue);
   }
 
   SetGLZBufferFlags (queue.z_buf_mode);
@@ -2035,8 +2030,9 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
     queue.flat_color_b = flat_b;
   }
 
-  // the following attempt to speed up only hits for about 10% in flarge, so maybe its prolly not woth it
-  // however, for highly triangulized cases it may be worth to rethink. - norman
+  // The following attempt to speed up only hits for about 10% in flarge,
+  // so maybe its prolly not woth it. However, for highly triangulized cases
+  // it may be worth to rethink. - norman
   //  if (prevPolyPlane.norm != poly.normal.norm || prevPolyPlane.DD != poly.normal.DD
   //      || prevTexMatrix != *poly.plane.m_cam2tex || prevTexVector != *poly.plane.v_cam2tex)
   {
@@ -2566,7 +2562,6 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
   // num_planes is the number of planes to test with. If there is no
   // near clipping plane then this will be equal to num_frust.
   int num_planes = num_frust;
-//printf ("transform=%d plane_clipping=%d z_plane_clipping=%d mirror=%d\n", transform, plane_clipping, z_plane_clipping, mirror); fflush (stdout);
   if (plane_clipping)
   {
   //@@@ If mirror???
@@ -3009,13 +3004,12 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     work_uv_verts = uv1;
     work_colors = col1;
   }
-  csTriangle *triangles = mesh.triangles;
+  csTriangle* triangles = mesh.triangles;
   G3DFogInfo* work_fog = mesh.vertex_fog;
 
   //===========
   // Here we perform lazy or software clipping if needed.
   //===========
-//printf ("how_clip=%c use_lazy_clipping=%d do_plane_clipping=%d do_z_plane_clipping=%d\n", how_clip, use_lazy_clipping, do_plane_clipping, do_z_plane_clipping); fflush (stdout);
   if (how_clip == '0' || use_lazy_clipping
   	|| do_plane_clipping || do_z_plane_clipping)
   {
@@ -3190,13 +3184,43 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   SetGLZBufferFlags (z_buf_mode);
 
   csMaterialHandle* mat = NULL;
+  iTextureHandle* txt_handle = NULL;
   if (mesh.mat_handle)
   {
+    txt_handle = mesh.mat_handle->GetTexture ();
     mat = (csMaterialHandle*)mesh.mat_handle;
   }
   bool do_gouraud = m_gouraud && work_colors;
 
+  //--------
+  // First see if the material specified a flat color.
+  // If so we need to modify the color array with this
+  // flat color.
+  //--------
   float flat_r = 1., flat_g = 1., flat_b = 1.;
+  // If do_multiply_color == true this means that we will multiply
+  // the base color (color array in mesh) with the flat color from
+  // the material.
+  bool do_multiply_color = false;
+  if (mesh.mat_handle)
+  {
+    csRGBpixel color;
+    if (txt_handle)
+      txt_handle->GetMeanColor (color.red, color.green, color.blue);
+    else
+    {
+      // We have a material without texture. In this case the flat
+      // color will be used in all cases. We only do this if the
+      // flat color from the material is different from white though.
+      mesh.mat_handle->GetFlatColor (color);
+      if (color.red < 255 || color.green < 255 | color.blue < 255)
+        do_multiply_color = true;
+    }
+    flat_r = BYTE_TO_FLOAT (color.red);
+    flat_g = BYTE_TO_FLOAT (color.green);
+    flat_b = BYTE_TO_FLOAT (color.blue);
+  }
+
   if (do_gouraud)
   {
     // special hack for transparent meshes
@@ -3204,38 +3228,52 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     {
       if ((num_vertices*4) > rgba_verts.Limit ())
         rgba_verts.SetLimit (num_vertices*4);
-      for (k=0, i=0; i<num_vertices; i++)
+      if (do_multiply_color)
       {
-        rgba_verts[k++] = work_colors[i].red;
-        rgba_verts[k++] = work_colors[i].green;
-        rgba_verts[k++] = work_colors[i].blue;
-	rgba_verts[k++] = m_alpha;
+        for (k=0, i=0; i<num_vertices; i++)
+        {
+          rgba_verts[k++] = work_colors[i].red * flat_r;
+          rgba_verts[k++] = work_colors[i].green * flat_g;
+          rgba_verts[k++] = work_colors[i].blue * flat_b;
+	  rgba_verts[k++] = m_alpha;
+        }
       }
-    }
-  }
-  else
-  {
-    // Fill flat color if renderer decide to paint it flat-shaded
-    uint8 r,g,b;
-    if (mesh.mat_handle)
-    {
-      iTextureHandle* txt_handle = mesh.mat_handle->GetTexture ();
-      if (txt_handle)
-        txt_handle->GetMeanColor (r, g, b);
       else
       {
-        csRGBpixel color;
-        mesh.mat_handle->GetFlatColor (color);
-	r = color.red;
-	g = color.green;
-	b = color.blue;
+        for (k=0, i=0; i<num_vertices; i++)
+        {
+          rgba_verts[k++] = work_colors[i].red;
+          rgba_verts[k++] = work_colors[i].green;
+          rgba_verts[k++] = work_colors[i].blue;
+	  rgba_verts[k++] = m_alpha;
+        }
       }
     }
-    else
-      r = g = b = 1;
-    flat_r = BYTE_TO_FLOAT (r);
-    flat_g = BYTE_TO_FLOAT (g);
-    flat_b = BYTE_TO_FLOAT (b);
+    else if (do_multiply_color)
+    {
+      // If we are already using the array in color_verts then
+      // we do not have to copy.
+      if (work_colors == color_verts.GetArray ())
+      {
+        for (i = 0 ; i < num_vertices ; i++)
+	{
+	  work_colors[i].red *= flat_r;
+	  work_colors[i].green *= flat_g;
+	  work_colors[i].blue *= flat_b;
+	}
+      }
+      else
+      {
+        csColor* old = work_colors;
+	work_colors = color_verts.GetArray ();
+	for (i = 0 ; i < num_vertices ; i++)
+	{
+	  work_colors[i].red = old[i].red * flat_r;
+	  work_colors[i].green = old[i].green * flat_g;
+	  work_colors[i].blue = old[i].blue * flat_b;
+	}
+      }
+    }
   }
 
   //===========

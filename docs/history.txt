@@ -8,6 +8,14 @@ he history order is reversed so that new features are at the top.
 	  to investigate further.
 	- Fixed a bug in the engine which caused crashes if a material
 	  was defined without a texture.
+	- Fixed the OpenGL renderer so that it now properly combines
+	  the color defined in the mesh with the color specified in the
+	  material (for materials which have no texture). This way it
+	  behaves like the software renderer. Note that this is only
+	  for DrawTriangleMesh for now.
+	- Reformatted some new code in genmaze a little bit.
+	- Fixed a bug in the engine in relation with materials without texture
+	  in combination with mixmode settings different from CS_FX_COPY.
 20-Jan-2002
 	- Tobias Brueckner did the following:
 	    - Fixed a potential initialization bug in the GLX OpenGL

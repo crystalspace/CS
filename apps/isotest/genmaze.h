@@ -72,7 +72,7 @@ public:
   /// generate the maze from a given starting point
   void GenerateMaze(int x, int y);
 
-  /// Prints ascii Maze - amazing :-) 
+  /// Prints ascii Maze - amazing :-)
   void PrintMaze();
 
   /// Return actual height - allows for thickness of walls
@@ -81,7 +81,7 @@ public:
   /// Return actual width - allows for thickness of walls
   int ActualWidth();
 
-  /// Returns true if x,y is solid - note this function adjusts 
+  /// Returns true if x,y is solid - note this function adjusts
   /// for tickness of walls
   bool ActualSolid(int x,int y);
 

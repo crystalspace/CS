@@ -638,7 +638,8 @@ iThingState* csPolygon3D::eiPolygon3D::GetParent ()
   return it;
 }
 
-void csPolygon3D::eiPolygon3D::CreatePlane (const csVector3 &iOrigin, const csMatrix3 &iMatrix)
+void csPolygon3D::eiPolygon3D::CreatePlane (const csVector3 &iOrigin,
+	const csMatrix3 &iMatrix)
 {
   scfParent->SetTextureSpace (iMatrix, iOrigin);
 }
@@ -790,12 +791,13 @@ void csPolygon3D::Finish ()
     case POLYTXT_GOURAUD:
       // Ensure the respective arrays are allocated
       GetGouraudInfo ()->Setup (this);
-      return;
     case POLYTXT_LIGHTMAP:
       // If material has no texture, switch our type to POLYTXT_NONE
       if (!material->GetMaterialHandle ()->GetTexture ())
       {
+	uint mixmode = scfiPolygon3D.GetPolyTexType ()->GetMixMode ();
         SetTextureType (POLYTXT_NONE);
+	scfiPolygon3D.GetPolyTexType ()->SetMixMode (mixmode);
         return;
       }
       break;

@@ -2769,7 +2769,8 @@ void csGraphics3DSoftwareCommon::RealStartPolygonFX (iMaterialHandle* handle,
   iTextureHandle *txt_handle = handle ? handle->GetTexture () : NULL;
   if (txt_handle)
   {
-    csTextureHandleSoftware *tex_mm = (csTextureHandleSoftware*)txt_handle->GetPrivateObject ();
+    csTextureHandleSoftware *tex_mm = (csTextureHandleSoftware*)
+    	txt_handle->GetPrivateObject ();
     csTextureSoftware *txt_unl = (csTextureSoftware *)tex_mm->get_texture (0);
     csScan_InitDrawFX (tex_mm, txt_unl);
     pqinfo.bm = txt_unl->get_bitmap ();
@@ -2833,14 +2834,18 @@ void csGraphics3DSoftwareCommon::RealStartPolygonFX (iMaterialHandle* handle,
     case CS_FX_TRANSPARENT:
 zfill_only:
       mode &= ~CS_FX_GOURAUD;
-      pqinfo.drawline = (z_buf_mode == CS_ZBUF_USE) ? NULL : csScan_scan_pi_zfil;
+      pqinfo.drawline = (z_buf_mode == CS_ZBUF_USE)
+      	? NULL
+	: csScan_scan_pi_zfil;
       break;
     default:
       break;
   }
 
   // Select draw scanline routines
-  int scan_index = pqinfo.textured ? SCANPROC_PI_TEX_ZNONE : SCANPROC_PI_FLAT_ZNONE;
+  int scan_index = pqinfo.textured
+  	? SCANPROC_PI_TEX_ZNONE
+	: SCANPROC_PI_FLAT_ZNONE;
   if (z_buf_mode == CS_ZBUF_FILL) scan_index++;
   else if (z_buf_mode == CS_ZBUF_USE) scan_index += 2;
   else if (z_buf_mode == CS_ZBUF_TEST) scan_index += 3;
@@ -2861,9 +2866,9 @@ zfill_only:
   // 32bpp modes/textured where we use (#-2).16 format).
   int shift_amount =
     ((pfmt.PixelBytes == 4) && (Scan.BlendTable || pqinfo.textured)) ? 6 : 8;
-  pqinfo.redFact   = (((pfmt.RedMask >> pfmt.RedShift) + 1)     << shift_amount) - 1;
-  pqinfo.greenFact = (((pfmt.GreenMask >> pfmt.GreenShift) + 1) << shift_amount) - 1;
-  pqinfo.blueFact  = (((pfmt.BlueMask >> pfmt.BlueShift) + 1)   << shift_amount) - 1;
+  pqinfo.redFact = (((pfmt.RedMask>>pfmt.RedShift)+1) << shift_amount)-1;
+  pqinfo.greenFact = (((pfmt.GreenMask>>pfmt.GreenShift)+1) << shift_amount)-1;
+  pqinfo.blueFact  = (((pfmt.BlueMask>>pfmt.BlueShift)+1)   << shift_amount)-1;
 
   pqinfo.max_r = (1 << (pfmt.RedBits   + shift_amount + 8)) - 1;
   pqinfo.max_g = (1 << (pfmt.GreenBits + shift_amount + 8)) - 1;
@@ -2885,7 +2890,8 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
     if (pqinfo.mat_handle)
       pqinfo.mat_handle->GetFlatColor (Scan.FlatRGB);
     else
-      Scan.FlatRGB.Set (poly.flat_color_r, poly.flat_color_g, poly.flat_color_b);
+      Scan.FlatRGB.Set (
+      	poly.flat_color_r, poly.flat_color_g, poly.flat_color_b);
   }
 
   // Get the same value as a pixel-format-encoded value
@@ -3151,13 +3157,15 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
               int tmpu = uu + span_u;
               if (tmpu < 0 || tmpu > pqinfo.twfp)
               {
-                if (tmpu < 0) tmpu = 0; if (tmpu > pqinfo.twfp) tmpu = pqinfo.twfp;
+                if (tmpu < 0) tmpu = 0; if (tmpu > pqinfo.twfp)
+		  tmpu = pqinfo.twfp;
                 duu = QInt ((tmpu - uu) * inv_l);
               }
               int tmpv = vv + span_v;
               if (tmpv < 0 || tmpv > pqinfo.thfp)
               {
-                if (tmpv < 0) tmpv = 0; if (tmpv > pqinfo.thfp) tmpv = pqinfo.thfp;
+                if (tmpv < 0) tmpv = 0; if (tmpv > pqinfo.thfp)
+		  tmpv = pqinfo.thfp;
                 dvv = QInt ((tmpv - vv) * inv_l);
               }
 	    }
@@ -3197,7 +3205,8 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
 
           if (do_gouraud)
             pqinfo.drawline_gouraud (dest, l, zbuff, uu, duu, vv, dvv,
-              L.z, dzz, pqinfo.bm, pqinfo.shf_w, rr, gg, bb, drr, dgg, dbb, clamp);
+              L.z, dzz, pqinfo.bm, pqinfo.shf_w, rr, gg, bb, drr, dgg,
+	      dbb, clamp);
           else
             pqinfo.drawline (dest, l, zbuff, uu, duu, vv, dvv,
               L.z, dzz, pqinfo.bm, pqinfo.shf_w);
@@ -3435,8 +3444,8 @@ void csGraphics3DSoftwareCommon::DumpCache()
   if (tcache) tcache->dump (this);
 }
 
-void csGraphics3DSoftwareCommon::DrawLine (const csVector3& v1, const csVector3& v2,
-	float fov, int color)
+void csGraphics3DSoftwareCommon::DrawLine (const csVector3& v1,
+	const csVector3& v2, float fov, int color)
 {
   if (v1.z < SMALL_Z && v2.z < SMALL_Z)
     return;
@@ -3481,3 +3490,4 @@ float csGraphics3DSoftwareCommon::GetZBuffValue (int x, int y)
   if (!zbf) return 1000000000.;
   return 16777216.0 / float (zbf);
 }
+
