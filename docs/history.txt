@@ -35,6 +35,11 @@ Short-term cleanups that need to be done:
 	  generating two key-down events with distinct key codes.
 	- Blocks uses correct FindRGB to look for colors.
 	- Fixed bug in Blocks so that shapes cannot be stranded partially.
+	- Michael Dale Long added MSVC project files for cscon, csclear,
+	  and cctest. Fixed some various problems with the previous three
+	  for compiling under MSVC. Important fixes for Simple and
+	  csConsole for running on some platforms. Added a new csutil
+	  file to cspace so PhyzTest will compile under MSVC.
 31-Jan-2000
 	- Eric Sunshine fixed unixconf.sh so that it correctly captures
 	  and interprets output of 'which' command.
