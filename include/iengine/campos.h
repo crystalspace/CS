@@ -32,6 +32,15 @@ struct iCameraPosition : public iBase
 {
   /// Get the iObject for this camera position.
   virtual iObject *QueryObject() = 0;
+  
+  virtual const char *GetSector() = 0;
+  
+  virtual csVector3 GetPosition() = 0;
+  
+  virtual csVector3 GetUpwardVector() = 0;
+  
+  virtual csVector3 GetForwardVector() = 0;
+  
 };
 
 #endif
