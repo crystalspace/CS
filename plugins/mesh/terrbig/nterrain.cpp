@@ -1,3 +1,5 @@
+#define CS_SYSDEF_PROVIDE_HARDWARE_MMIO 1
+
 #include "cssysdef.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
@@ -17,7 +19,18 @@
 #include "iutil/objreg.h"
 #include "csgfx/rgbpixel.h"
 #include "imesh/object.h"
+#include "csutil/mmapio.h"
 #include "nterrain.h"
+
+///////////////////////////// SCF stuff ///////////////////////////////////////////////////////////////////////
+
+CS_IMPLEMENT_PLUGIN
+
+SCF_IMPLEMENT_IBASE (csBigTerrainObject)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObject)
+SCF_IMPLEMENT_IBASE_END
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 csBigTerrainObject::csBigTerrainObject():pFactory(NULL), terrain(NULL)
 {
@@ -90,7 +103,7 @@ csBigTerrainObject::Draw (iRenderView* rview, iMovable* movable, csZBufMode zbuf
 }
 
 void 
-csBigTerrainObject::GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
+csBigTerrainObject::GetObjectBoundingBox (csBox3& bbox, int type)
 {
 	
 }
@@ -104,12 +117,13 @@ csBigTerrainObject::GetRadius (csVector3& rad, csVector3& cent)
 bool 
 csBigTerrainObject::HitBeamOutline (const csVector3& start, const csVector3& end, csVector3& isect, float* pr)
 {
-
+	return false;
 }
 
 bool 
 csBigTerrainObject::HitBeamObject (const csVector3& start, const csVector3& end, csVector3& isect, float* pr)
 {
+	return false;
 
 }
 

@@ -1,11 +1,12 @@
 #ifndef __N_TERRAIN_RENDERER__
 #define __N_TERRAIN_RENDERER__
 
-#include "csgeom/poly3d.h"
+#include "csutil/scf.h"
 #include "csgeom/sphere.h"
 #include "csgeom/transfrm.h"
 #include "csutil/mmapio.h"
-#include "csutil/bitarray.h"
+#include "csutil/garray.h"
+#include "csutil/cscolor.h"
 #include "ivideo/graph3d.h"
 #include "iengine/rview.h"
 #include <string.h>
@@ -16,24 +17,27 @@ struct iVertexBufferManager;
 
 const int NTERRAIN_QUADTREE_ROOT=1;
 
-/*******************************************************************************************************************
+/******************************************************************************************
  
    Some design notes and rationalizations.
 
- 1. I realize that there is a large redundancy of information in the disk-structure.  Part of the reason behind that
- is that I either have to perform a lookup into the heightmap using generated offsets, or store indexes into it.
- Since the heightmap needs to be stored at all points anyhow, you could store a height and the variance together,
- and then just look it up at runtime.  This bothers me, since the variance is different depending on the resolution
- of the block, and I can't see an easy way of resolving coarse-resolution variances.  I've decided to trade size
- for speed, thus the heightmap file is about 33% larger than it absolutely needs to be.  However, nothing that can
- be stored needs to be computed or looked up, so this should massively increase cache coherency.
+ 1. I realize that there is a large redundancy of information in the disk-structure.  Part 
+ of the reason behind that is that I either have to perform a lookup into the heightmap 
+ using generated offsets, or store indexes into it. Since the heightmap needs to be stored 
+ at all points anyhow, you could store a height and the variance together, and then just 
+ look it up at runtime.  This bothers me, since the variance is different depending on the
+ resolution of the block, and I can't see an easy way of resolving coarse-resolution 
+ variances.  I've decided to trade size for speed, thus the heightmap file is about 33% 
+ larger than it absolutely needs to be.  However, nothing that can be stored needs to be 
+ computed or looked up, so this should massively increase cache coherency.
 
- 2. The algorithm basically follows "Visualization of Large Terrains Made Easy," except that there are not two trees,
- but one, and they are not interleaved.  Also, I don't use his error metric.  Also, instead of generating parity lists,
- and triangle strips, I generate one large mesh.  The detail levels may not be quite as fine-tuned, but they are 
+ 2. The algorithm basically follows "Visualization of Large Terrains Made Easy," except 
+ that there are not two trees, but one, and they are not interleaved.  Also, I don't use
+ his error metric.  Also, instead of generating parity lists, and triangle strips, I 
+ generate one large mesh.  The detail levels may not be quite as fine-tuned, but they are 
  simple and fast.  
 
- *******************************************************************************************************************/
+ ******************************************************************************************/
 
 
 /// Simple rect structure for bounds.
@@ -51,7 +55,9 @@ struct nRect
 
 
 /// The length of the nBlock structure
-unsigned const nBlockLen=16;
+unsigned const nBlockLen=20;
+
+typedef unsigned short ti_type;
 
 /** This is a terrain block.  X and Y elements are generated dynamically 
  * each run, so they don't need storage. The constant nBlockLen should always be used, 
@@ -69,6 +75,12 @@ struct nBlock
 
   /// Middle height of the block
   unsigned short midh;
+
+  /// Texture coordinates of ne vertice, spread down to sw.
+  unsigned char u, v;
+
+  /// Texture index
+  ti_type ti;
 };
 
 
@@ -138,6 +150,21 @@ public:
 };
 
 
+struct nTerrainInfo
+{
+    /// Triangle mesh to draw for block
+    G3DTriangleMesh mesh;
+
+    /// Keep track of tris, verts, tex, indexes, and color
+    CS_DECLARE_GROWING_ARRAY (triangles, csTriangle);
+    CS_DECLARE_GROWING_ARRAY (vertices, csVector3);
+    CS_DECLARE_GROWING_ARRAY (texels, csVector2);
+    CS_DECLARE_GROWING_ARRAY (tindexes, ti_type);
+    CS_DECLARE_GROWING_ARRAY (colors, csColor);
+};
+
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -149,11 +176,8 @@ class nTerrain
   /// Error metric tolerance (that is, below this level, the error metric does not fail)
   float error_metric_tolerance;
 
-  /// Array of vertices to render this frame.
-  csVector3Array verts;
-
-  /// Stack of triangles to render this frame.
-  nTriangleStack tris;
+  /// The info structure for the viewable terrain.
+  nTerrainInfo *info;
 
   /// The source for the heightfield data, must have been created with BuildTree first.
   csMemoryMappedIO *hm;
@@ -251,16 +275,30 @@ private:
   void BufferTreeNode(nBlock *b, nRect bounds)
   {
         
-    int ne = verts.AddVertexSmart(bounds.x, b->ne, bounds.y),
-        nw = verts.AddVertexSmart(bounds.x, b->ne, bounds.y),
-        se = verts.AddVertexSmart(bounds.x, b->ne, bounds.y),
-        sw = verts.AddVertexSmart(bounds.x, b->ne, bounds.y),
-        center = verts.AddVertexSmart(bounds.x, b->ne, bounds.y);
+    int ne = info->vertices.Push(csVector3(bounds.x, b->ne, bounds.y)),
+        nw = info->vertices.Push(csVector3(bounds.x, b->ne, bounds.y)),
+        se = info->vertices.Push(csVector3(bounds.x, b->ne, bounds.y)),
+        sw = info->vertices.Push(csVector3(bounds.x, b->ne, bounds.y)),
+        center = info->vertices.Push(csVector3(bounds.x, b->ne, bounds.y));
 
-    tris.Push(se, center, sw);
-    tris.Push(sw, center, nw);
-    tris.Push(nw, center, ne);
-    tris.Push(ne, center, se);
+    /**  This seems like a lot of duplication, but I don't know how to do it right
+     otherwise. We push one texture index for each vert... even though they're
+     the same inside a block. 
+     */
+    info->tindexes.Push(b->ti);
+    info->tindexes.Push(b->ti);
+    info->tindexes.Push(b->ti);
+    info->tindexes.Push(b->ti);
+    info->tindexes.Push(b->ti);
+    
+    /** Build triangle stacks, for each block output four triangles.
+     No need to merge and split because each block is at full resolution,
+     we have no partial resolution blocks.
+     */
+    info->triangles.Push(csTriangle(se, center, sw));
+    info->triangles.Push(csTriangle(sw, center, nw));
+    info->triangles.Push(csTriangle(ne, center, nw));
+    info->triangles.Push(csTriangle(ne, center, se));
   }
 
   /// Processes a node for buffering, checks for visibility and detail levels.
@@ -333,8 +371,8 @@ public:
   void AssembleTerrain(iRenderView *rv)
   {
     // Clear mesh lists
-    verts.MakeEmpty();
-    tris.MakeEmpty();
+    //verts.MakeEmpty();
+    //tris.MakeEmpty();
 
     unsigned int mid = (terrain_w>>1)+1;
     unsigned int x=0, y=0;
