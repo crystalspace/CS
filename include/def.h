@@ -122,7 +122,7 @@
 #endif
 
 #if !defined(SIGN) && !defined(OS_AMIGAOS)
-#define SIGN(x) ((x)<0?-1:((x)>0?1:0))
+#define SIGN(x) ((x) < 0 ? -1 : ((x) > 0 ? 1 : 0))
 #endif
 
 #undef EPSILON
