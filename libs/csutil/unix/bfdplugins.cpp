@@ -155,7 +155,7 @@ void InternalScanPluginDir (iStringArray*& messages,
   
 	  if (subdirMessages != 0)
 	  {
-	    for (int i = 0; i < subdirMessages->Length(); i++)
+	    for (size_t i = 0; i < subdirMessages->Length(); i++)
 	    {
 	      AppendStrVecString (messages, subdirMessages->Get (i));
 	    }
@@ -190,7 +190,7 @@ csRef<iStringArray> csScanPluginDirs (csPluginPaths* dirs,
   if (!plugins)
     plugins.AttachNew (new scfStringArray ());
 
-  for (int i = 0; i < dirs->GetCount (); i++)
+  for (size_t i = 0; i < dirs->GetCount (); i++)
   {
     iStringArray* dirMessages = 0;
     InternalScanPluginDir (dirMessages, (*dirs)[i].path, plugins, 
@@ -204,7 +204,7 @@ csRef<iStringArray> csScanPluginDirs (csPluginPaths* dirs,
 
       AppendStrVecString (messages, tmp);
 
-      for (int i = 0; i < dirMessages->Length(); i++)
+      for (size_t i = 0; i < dirMessages->Length(); i++)
       {
 	tmp.Format (" %s", dirMessages->Get (i));
 	AppendStrVecString (messages, tmp);
