@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Mar-2005
+	- Jorrit fixed isotest so that the actor displays again. For some
+	  reason someone (res2k?) put a NetMaterial() line in comments.
+	  But that line is obviously needed. Thanks to Ross for finding
+	  this.
 17-Mar-2005
 	- Mike Handverger applied a patch #1158485 from Piotr Obrzut to 
           odedynamics with the following features:
