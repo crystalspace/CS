@@ -1,40 +1,31 @@
 The history order is reversed so that new features are at the top.
 
 6-Aug-2001
-        - Michael Voase added the following,
+	- Michael Voase added the following,
           Feature update:
-          - CS/include/csutil/typedvec.h: Added CS_DECLARE_TYPED_VECTOR_DECREF
-            convenience macro.
-
+	    - CS/include/csutil/typedvec.h: Added
+	      CS_DECLARE_TYPED_VECTOR_DECREF convenience macro.
           Texture manager cleanup: common
-          - CS/include/ivideo/texture.h: Added UnregisterTexture() and
-            UnregisterMaterial() to the scf interface.
-
-          - CS/libs/csengine/texture.cpp: Texture wrapper now keeps a
-            reference to the texture handle when registered with a texture
-            wrapper.
-  
-          - CS/libs/objects/meshobj.cpp: FreeItem(): Added NULL assignment
-            to object being free'd to prevent dangling pointers.
-
-          - CS/libs/objects/thing.cpp: Added portal polygon delete routine
-            to thing destructor, in preparation for an audit.
- 
-          - CS/libs/csws/cswstex.cpp: Changed how csws textures are treated.
-            The csws textures now use the freshly added UnregisterTexture()
-            scf interface to unregister textures. Note: Texture Manager now
-            destructs correctly in csfedit and a couple of other csws apps
-            (finally ;).
-  
-          - Texure Manager Common: 
+	    - CS/include/ivideo/texture.h: Added UnregisterTexture() and
+	      UnregisterMaterial() to the scf interface.
+	    - CS/libs/csengine/texture.cpp: Texture wrapper now keeps a
+	      reference to the texture handle when registered with a texture
+	      wrapper.
+	    - CS/libs/objects/meshobj.cpp: FreeItem(): Added NULL assignment
+	      to object being free'd to prevent dangling pointers.
+	    - CS/libs/objects/thing.cpp: Added portal polygon delete routine
+	      to thing destructor, in preparation for an audit.
+	    - CS/libs/csws/cswstex.cpp: Changed how csws textures are treated.
+	      The csws textures now use the freshly added UnregisterTexture()
+	      scf interface to unregister textures. Note: Texture Manager now
+	      destructs correctly in csfedit and a couple of other csws apps
+	      (finally ;).
             - Changed csMatVector and csTexVector to use 
               CS_DECLARE_TYPED_VECTOR_DECREF.
-  
             - Added UnregisterTexture() and UnregisterMaterial() to
               iTextureManager interface. You should now be able to
               Register/Unregister textures and materials with impunity.
-    
-          - Texture Manager All drivers:
+          Texture Manager All drivers:
             - Changed procedural texture Prepare() methods to adhere to the
               scf contract. This includes the opengl software
               procedural textures, which seemed to have a blatant habit of
@@ -46,16 +37,77 @@ The history order is reversed so that new features are at the top.
               sft3dcom.cpp, Clear(), the engine does exit cleanly. I have
               not traced this back as yet as the texture cache is another
               animal altogether.
-
             - Modified Unregister[Material|Texture] to check for a
               zero reference count on incoming handles. This breaks
               an endless loop issue between csMat/TexVector,
               the destructor and unregister (it is a circular reference).
-	
-
 5-Aug-2001
 	- Fixed a small bug in haze. Now it shows in OpenGL but not
 	  correctly right yet.
+	- Wouter Wijngaards writes: the haze now adaptively draws polygons to
+	  a certain quality setting. This makes hazes get fuzzy borders and
+	  retain shape.  Also added two new haze meshes, to a total of four in
+	  the red room of the partsys level. Work in opengl and software.
+	- Wouter also fixed the problem where weird glitches would occur for
+	  hazes when they tried to draw when not onscreen.
+	- Martin Geisse made the following changes:
+	    - Added csIntArray, a growing array of integers (using
+	      CS_TYPEDEF_GROWING_ARRAY), which adds some convenience
+	      functions
+	    - Added PushSmart() to csVector which uses Find() to detect if the
+	      object is already in the vector.
+	    - Fixed a bug in growing arrays.
+	    - Added iModelDataVertices::CopyFrom() to copy all data from
+	      another vertex frame. Also added copy and concat constructors to
+	      csModelDataVertices.
+	    - Added csModelDataTools::CompressVertices(). This looks for
+	      duplicate vertices in either one or all objects and removes them.
+	    - Added a function to the crossbuilder plugin to build a
+	      hierarchical sprite factory from all objects of an imported
+	      scene. In combination with SplitObjectsByMaterial() this can
+	      also be used to import sprites with multiple materials. mdltest
+	      uses this feature: It now merges all imported objects, builds a
+	      thing from them, then splits by material and builds a sprite
+	      hierarchy.
+	- Philip Wyett changed
+		class csHazeHull : iHazeHull
+	  to
+		class csHazeHull : public iHazeHull
+	  This fixes C2243 compile error under MSVC. Problem was all a matter
+	  of VC inheriting a private not public. :-/
+	- Philip renamed class Bot ptLabBot.
+	  This fixes class name conflict warning in devapi docs generation
+	  process.
+	- Philip did a clean-up and some minor code optimization in memimage.h
+	  and bumpmap.h.
+4-Aug-2001
+	- Wouter Wijngaards did the following:
+	    - Added a loader for the haze mesh object. hazeldr. The loader
+	      compiles and works. The haze itself seems to compute all right.
+	      The outline looks peachy keen, but nothing gets drawn...
+	    - Later fixed a bug where the triangles would be drawn
+	      backfaced. Still does not show up in OpenGL though.
+	    - Added proper bounding box drawtest visibility testing.
+	      Drawing at an almost 90' angle (with bad vis testing) would give
+	      visual anomalies.
+	    - Added a hazy circular texture to stdtex.zip.
+	      This texture is called hazecirc.zip looks slightly yellow and
+	      has motes of dust in it.
+	    - Added another texture for hazes, this one is a very basic
+	      whitish glow. in stdtex.zip, hazebasic.png
+	    - Added a new Hull prefab to the haze: The Cone - it is really
+	      two y-axis facing circles connected.
+	    - Making things neat. Also added two haze meshes to the partsys
+	      level. A 'cubic haze' which looks plainly weird :) and a cone
+	      haze - which looks like a search light of some kind. The
+	      occasional glitches when turning around are due to DrawTest
+	      sometimes saying the bounding box is visible when it isn't.
+	- Dan Bogdanov did the following:
+	    - Almost fixed DOS configuration batch to output a proper
+	      config.mak file.
+	    - Fixed DJGPP compile.
+	    - Fixed perftest.mak so it will not fail a static build.
+	    - Fixed vsh.mak so it will not fail a static build.
 3-Aug-2001
 	- Removed iSystem::AddConfig(). Use iConfigManager::AddDomain()
 	  instead.
@@ -80,10 +132,112 @@ The history order is reversed so that new features are at the top.
 	    - Fixed (a typo) and updated djgpp.mak
 	    - Fixed dosconf.bat to output a more useful config.mak
 	    - Changed perftest and vsh so that they can be linked statically
+	- Wouter Wijngaards added a patch by E.Allen Soard (esp@espsw.net),
+	  that will enable a build on linux for the ipaq. It modifies
+	  unixconf.sh to detect the strongarm processor.
+	- Martin Geisse made the following changes:
+	    - Added iModelDataAction::GetTotalTime() which returns the length
+	      in time of a complete animation cycle.
+	    - Added merging of different actions. As the resulting action may
+	      be longer than the input actions if they have different length
+	      in time, merging is only done if no input action has to be
+	      repeated more than three times. However, this test is
+	      independent from the merging algorithm itself, so it can easily
+	      be changed to allow higher repetition counts.
+	    - Fixed a bug in the sprite factory crossbuilder.
 2-Aug-2001
 	- Eric Sunshine eliminated a compilation warning about unused variable
 	  in mdltool.cpp.  (In fact, this particular variable was being
 	  shadowed by another variable in another scope.)
+	- Michael Voasse did the following:
+	    - Texture manager: Implement DecRef() FreeTypedItem() in
+	      csMatVector, this corrects a memory leak in csMatVector and
+	      with some minor corrections to all video driver, permits the
+	      material handles to cleanup correctly. *NOTE* I havent tested
+	      the opengl driver. If the opengl driver does not cleanup
+	      correctly on exit please let me know.
+	    - Added a debug message to the destructor of csTextureManager.
+	      When the texture manager is closing down correctly, this
+	      message will go away...
+	- Philip Wyett reports:
+	  This adds VC project file specific extras which with the aid of
+	  GPL "BisonFlex" for MSVC aids my fixing of AWS plugin
+	  compilation errors under MSVC and allows VC users to take
+	  advantage of "Flex" and "Bison" in there own projects.
+	  Note: Not fully implemented yet, due to an MSVCGEN issue.
+	- Philip also writes:
+	  As of tomorrows CRON run the AWS plugin will be added to the MSVC
+	  global build. Thus as of then bleeding edge cvs users/developers
+	  using MSVC will need to unload the aws plugin or work through the
+	  following instructions in-order to compile.
+	    - Downloading "BisonFlex"
+	      Firstly you need "BisonFlex Wizard" developed and released by
+	      "FG Soup Sofware" http://www.fg-soup.com under General Public
+	      License (GPL). BisonFlex will not only allow you to build the
+	      AWS plugin, but will also allow you to use the included
+	      appwizard and associated features to make use of lexers etc. in
+	      your own software. :-)
+	      For MSVC 5: http://www.philipwyett.dsl.pipex.com/crystal_space/
+	      msvc/downloads/bfwizard-1.5.zip
+	      For MSVC 6: http://www.philipwyett.dsl.pipex.com/crystal_space/
+	      msvc/downloads/bfwizard-1.6.zip
+	    - Installing "BisonFlex"
+	      Next you need to unpack the ".zip" you downloaded and then
+	      run the "setup.exe" and follow the instructions. Please take
+	      your time with the install process! :-)
+	    - Setting Up Custom Build
+	      Open "CS\mk\visualc\csall.dsw". In the left hand "Workspace"
+	      window click on the "FileView" tab at the bottom, then in the
+	      window look for and find the project "plgaws". Now expand the
+	      aws project in the tree and then the "Resource Files" directory.
+	      Right click on "skinlang.flx" and click on "Settings".  You will
+	      now be presented with the "Project Settings" dialog for that
+	      file. Click on the "Custom Build" tab. In the text box "Commands"
+	      enter the following: 
+		    flex.exe -Plex_cpp -L -t ..\..\plugins\aws\skinlang.flx
+		    	> ..\..\plugins\aws\sllex.cpp
+	      Now in the "Outputs" text box enter the following:
+			..\..\plugins\aws\sllex.cpp
+	      Next click on the "General" tab and check the box "Always use
+	      the custom build step". Now just "Ok" out of that dialog box and
+	      do a "Save all" and re-build CS.
+	    - Notes for CS Developers
+	      This custom build step re-generates "sllex.cpp" with a VC
+	      friendly version and is slightly different from the one
+	      currently in cvs. However, the file generated by MSVC/BisonFlex
+	      is CS Mingw compatible. :-) Please remember not to commit the
+	      locally modified "sllex.cpp" to cvs. :-)
+	    - TODOS
+	      Try get rid of this setup and integrate into MSVCGEN.
+	- Philip also started a massive restructuring and rewrite of the
+	  windows 32 docs. Changed titles for Windows menu.
+	  The new internal per compiler menu under a Window (Win32) subsection
+	  will allow future addition of docs for other Windows ports i.e.
+	  Borland or OpenWatcom easier.  I hope! :-)
+	  Completed new Windows menu page which options/leads to Compiler
+	  specific sections.
+	- Martin Geisse made the following changes:
+	    - Added a debug dump feature to csModelDataTools (which outputs
+	      into a csString).
+	    - Enabled csModelDataTools::SplitByMaterial() and usage of action
+	      conflict detection (objects with unmergeable actions are not
+	      merged) and material conflict detection (objects with different
+	      materials are not merged if the user doesn't want that to
+	      happen) in ::MergeObjects(). 
+	    - Fixed a bug in csObject.
+	- Justin Miller started reimplementing csString::Format().
+1-Aug-2001
+	- Martin Geisse added some missing 'inline' keywords to objiter.h.
+	- Christopher Nelson did the following:
+	    - The awsTextureManager is now completely functional, if untested,
+	      other than the register/unregister functionality.  Once I
+	      figure out how to unregister a texture from the texture manager,
+	      that will work as well.  
+	    - I still need to make some updates to the AwsPrefs class so that
+	      it will expose the functionality of the texture manager.
+	      With this update I can now begin to actually test drawing code,
+	      since nearly all of the AWS enhancements require access to
+	      bitmaps for background textures and for bitmapable buttons/etc.
 31-Jul-2001
 	- Martin Geisse moved high-level model data manipulation functions
 	  out of the model data classes themselves and into their own
