@@ -183,9 +183,9 @@ private:
   /// root has children in byte 0.
   /// nodes in byte 0 have children in byte 0+node_nr(1,2,3,4).
   /// nodes in byte 1 have children in byte 4+node_nr.
-  /// nodes in byte n have children in byte 4**n+node_nr
-  /// So for byte 0, take 0+node_nr,
-  /// for byte n, take Pow2(2*n) + node_nr
+  /// nodes in byte n have children in byte 4*n+node_nr
+  /// So for byte 0, take 0+node_nr as the new byte
+  /// for byte n, take 4*n + node_nr as the new byte
   unsigned char* states;
   /// convenience variable: how many bytes alloced in states
   int state_size;
