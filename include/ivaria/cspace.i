@@ -743,6 +743,8 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csBox3::operator< (const csVector3& point, const csBox3& box);
 %include "csgeom/box.h"
 
+%include "csgeom/segment.h"
+
 %rename(asRGBcolor) csRGBpixel::operator csRGBcolor;
 %include "csgfx/rgbpixel.h"
 #endif // CS_MINI_SWIG
@@ -767,9 +769,11 @@ TYPEMAP_OUT_csWrapPtr
 #ifndef CS_MINI_SWIG
 %include "iaws/aws.h"
 
-%include "igeom/polymesh.h"
 %include "igeom/clip2d.h"
 %include "igeom/objmodel.h"
+
+%include "igeom/polymesh.h"
+%include "csgeom/polymesh.h"
 
 %include "iengine/fview.h"
 %include "iengine/light.h"
