@@ -43,6 +43,10 @@ The history order has been reversed so that new features are at the top.
 	  compiler which could not grok the 64,000 byte "Data" buffer built
 	  into dnFileBuffer.  Therefore, the Data buffer is now allocated from
 	  heap.
+	- Thomas Riemer added auth interface/plugin and NetCmd interface.
+	  Change icmdmgr.h and iproto.h to use NetCmd interface.
+	  Added first nstp implementation documentation.
+	  Upgrade nstp client demo - now it allows login to server.
 7-May-2000
 	- More work on PVS. Still not working properly though.
 	- Started working on saving and loading of octree and PVS.
