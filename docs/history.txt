@@ -13,6 +13,8 @@ The history order has been reversed so that new features are at the top.
 	  CSKEY_PADMULT, and CSKEY_PADDIV in the NextStep port.  Andrew
 	  recently added these constants to csevent.h.
 	- Eric Sunshine brought simple.txi (the Simple tutorial) up to date.
+	- Eric Sunshine fixed several problems in the CrystalClear tutorial
+	  document.
 25-Jun-2000
 	- New tree control in CSWS from Norman Kramer.
 	- Did an experiment for speeding up OpenGL by putting the setup
