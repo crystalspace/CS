@@ -23,20 +23,20 @@
 #include "cscom/com.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
-#include "soft_g3d.h"
-#include "scan.h"
-#include "tcache.h"
-#include "tcache16.h"
-#include "tcache32.h"
-#include "soft_txt.h"
-#include "tables.h"
+#include "cs3d/software/soft_g3d.h"
+#include "cs3d/software/scan.h"
+#include "cs3d/software/tcache.h"
+#include "cs3d/software/tcache16.h"
+#include "cs3d/software/tcache32.h"
+#include "cs3d/software/soft_txt.h"
+#include "cs3d/software/tables.h"
 #include "ipolygon.h"
 #include "isystem.h"
 #include "igraph2d.h"
 #include "ilghtmap.h"
 
 #if defined (DO_MMX)
-#  include "i386/cpuid.h"
+#  include "cs3d/software/i386/cpuid.h"
 #endif
 
 //-------------------------- The indices into arrays of scanline routines ------
@@ -308,8 +308,8 @@ void csGraphics3DSoftware::ScanSetup ()
       ScanProc [SCANPROC_MAP_KEY_ZFIL] = csScan_8_draw_scanline_map_key_zfil;
 //    ScanProc [SCANPROC_MAP_KEY_ZUSE] = csScan_8_draw_scanline_map_key_zuse;
 
-//    ScanProc [SCANPROC_FOG] = csScan_8_draw_scanline_fog;
-//    ScanProc [SCANPROC_FOG_VIEW] = csScan_8_draw_scanline_fog_view;
+      ScanProc [SCANPROC_FOG] = csScan_8_draw_scanline_fog;
+      ScanProc [SCANPROC_FOG_VIEW] = csScan_8_draw_scanline_fog_view;
 //    ScanProc [SCANPROC_FOG_PLANE] = csScan_8_draw_scanline_fog_plane;
 
 //    ScanProcPI [SCANPROCPI_FLAT_ZFIL] = csScan_8_draw_pi_scanline_flat_zfil;
@@ -329,10 +329,10 @@ void csGraphics3DSoftware::ScanSetup ()
       if (do_transp)
         ScanProc_Alpha = ScanProc_8_Alpha;
 
-      ScanProcPIFX[SCANPROCPIFX_ZUSE]        = csScan_8_draw_pifx_scanline_dummy;
-      ScanProcPIFX[SCANPROCPIFX_ZFIL]        = csScan_8_draw_pifx_scanline_dummy;
-      ScanProcPIFX[SCANPROCPIFX_TRANSP_ZUSE] = csScan_8_draw_pifx_scanline_dummy;
-      ScanProcPIFX[SCANPROCPIFX_TRANSP_ZFIL] = csScan_8_draw_pifx_scanline_dummy;
+      ScanProcPIFX [SCANPROCPIFX_ZUSE] = csScan_8_draw_pifx_scanline_dummy;
+      ScanProcPIFX [SCANPROCPIFX_ZFIL] = csScan_8_draw_pifx_scanline_dummy;
+      ScanProcPIFX [SCANPROCPIFX_TRANSP_ZUSE] = csScan_8_draw_pifx_scanline_dummy;
+      ScanProcPIFX [SCANPROCPIFX_TRANSP_ZFIL] = csScan_8_draw_pifx_scanline_dummy;
       break;
 
     case 2:
@@ -404,16 +404,16 @@ void csGraphics3DSoftware::ScanSetup ()
         csScan_16_draw_pi_scanline_tex_gouraud_zuse_555 :
         csScan_16_draw_pi_scanline_tex_gouraud_zuse_565;
 
-      ScanProcPIFX[SCANPROCPIFX_ZUSE] = (pfmt.GreenBits == 5) ?
+      ScanProcPIFX [SCANPROCPIFX_ZUSE] = (pfmt.GreenBits == 5) ?
           csScan_16_draw_pifx_scanline_zuse_555 :
           csScan_16_draw_pifx_scanline_zuse_565;
-      ScanProcPIFX[SCANPROCPIFX_ZFIL] = (pfmt.GreenBits == 5) ?
+      ScanProcPIFX [SCANPROCPIFX_ZFIL] = (pfmt.GreenBits == 5) ?
           csScan_16_draw_pifx_scanline_zfil_555 :
           csScan_16_draw_pifx_scanline_zfil_565;
-      ScanProcPIFX[SCANPROCPIFX_TRANSP_ZUSE] = (pfmt.GreenBits == 5) ?
+      ScanProcPIFX [SCANPROCPIFX_TRANSP_ZUSE] = (pfmt.GreenBits == 5) ?
           csScan_16_draw_pifx_scanline_transp_zuse_555 :
           csScan_16_draw_pifx_scanline_transp_zuse_565;
-      ScanProcPIFX[SCANPROCPIFX_TRANSP_ZFIL] = (pfmt.GreenBits == 5) ?
+      ScanProcPIFX [SCANPROCPIFX_TRANSP_ZFIL] = (pfmt.GreenBits == 5) ?
           csScan_16_draw_pifx_scanline_transp_zfil_555 :
           csScan_16_draw_pifx_scanline_transp_zfil_565;
 
@@ -467,10 +467,10 @@ void csGraphics3DSoftware::ScanSetup ()
       ScanProcPIG [SCANPROCPI_TEX_GOURAUD_ZFIL] = csScan_32_draw_pi_scanline_tex_gouraud_zfil;
       ScanProcPIG [SCANPROCPI_TEX_GOURAUD_ZUSE] = csScan_32_draw_pi_scanline_tex_gouraud_zuse;
 
-      ScanProcPIFX[SCANPROCPIFX_ZUSE]        = csScan_32_draw_pifx_scanline_zuse;
-      ScanProcPIFX[SCANPROCPIFX_ZFIL]        = csScan_32_draw_pifx_scanline_zfil;
-      ScanProcPIFX[SCANPROCPIFX_TRANSP_ZUSE] = csScan_32_draw_pifx_scanline_transp_zuse;
-      ScanProcPIFX[SCANPROCPIFX_TRANSP_ZFIL] = csScan_32_draw_pifx_scanline_transp_zfil;
+      ScanProcPIFX [SCANPROCPIFX_ZUSE] = csScan_32_draw_pifx_scanline_zuse;
+      ScanProcPIFX [SCANPROCPIFX_ZFIL] = csScan_32_draw_pifx_scanline_zfil;
+      ScanProcPIFX [SCANPROCPIFX_TRANSP_ZUSE] = csScan_32_draw_pifx_scanline_transp_zuse;
+      ScanProcPIFX [SCANPROCPIFX_TRANSP_ZFIL] = csScan_32_draw_pifx_scanline_transp_zfil;
 
       if (do_transp)
         ScanProc_Alpha = ScanProc_32_Alpha;
@@ -519,7 +519,7 @@ csDrawScanline* csGraphics3DSoftware::ScanProc_8_Alpha
   if (alpha < 37)
   {
     Scan.AlphaMap = lt_alpha->alpha_map25;
-    return csScan_8_draw_scanline_map_alpha1;
+    return csScan_8_draw_scanline_map_alpha2;
   }
   if (alpha >= 37 && alpha < 63)
   {
@@ -529,7 +529,7 @@ csDrawScanline* csGraphics3DSoftware::ScanProc_8_Alpha
   if (alpha >= 63 && alpha < 87)
   {
     Scan.AlphaMap = lt_alpha->alpha_map25;
-    return csScan_8_draw_scanline_map_alpha2;
+    return csScan_8_draw_scanline_map_alpha1;
   }
   // completely opaque
   return csScan_8_draw_scanline_map_zfil;
@@ -665,12 +665,19 @@ STDMETHODIMP csGraphics3DSoftware::Open (char *Title)
 
   FINAL_RELEASE (piGI);
 
+  for (int i = 0; i < MAX_INDEXED_FOG_TABLES; i++)
+    fog_tables [i].table = NULL;
+
   ScanSetup ();
   return S_OK;
 }
 
 STDMETHODIMP csGraphics3DSoftware::Close()
 {
+  for (int i = 0; i < MAX_INDEXED_FOG_TABLES; i++)
+    if (fog_tables [i].table)
+      delete [] fog_tables [i].table;
+
   CHK (delete tcache); tcache = NULL;
 
   if ((width == height) && (width == -1))
@@ -1655,18 +1662,20 @@ STDMETHODIMP csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly,
     exit (0);
   }
 
-  Scan.FogDensity = QInt (fb->density * 100);
+  Scan.FogDensity = QRound (fb->density * 100);
   if (pfmt.PalEntries == 0)
   {
-    Scan.FogR = QInt (fb->red * ((1 << pfmt.RedBits) - 1)) << pfmt.RedShift;
-    Scan.FogG = QInt (fb->green * ((1 << pfmt.GreenBits) - 1)) << pfmt.GreenShift;
-    Scan.FogB = QInt (fb->blue * ((1 << pfmt.BlueBits) - 1)) << pfmt.BlueShift;
+    Scan.FogR = QRound (fb->red * ((1 << pfmt.RedBits) - 1)) << pfmt.RedShift;
+    Scan.FogG = QRound (fb->green * ((1 << pfmt.GreenBits) - 1)) << pfmt.GreenShift;
+    Scan.FogB = QRound (fb->blue * ((1 << pfmt.BlueBits) - 1)) << pfmt.BlueShift;
   }
   else
   {
-    Scan.FogR = QInt (fb->red * 255);
-    Scan.FogG = QInt (fb->green * 255);
-    Scan.FogB = QInt (fb->blue * 255);
+    Scan.FogR = QRound (fb->red * 255);
+    Scan.FogG = QRound (fb->green * 255);
+    Scan.FogB = QRound (fb->blue * 255);
+    Scan.Fog8 = BuildIndexedFogTable ();
+    Scan.FogIndex = txtmgr->find_rgb (Scan.FogR, Scan.FogG, Scan.FogB);
   }
 
   // Steps for interpolating horizontally accross a scanline.
@@ -2747,6 +2756,61 @@ void csGraphics3DSoftware::CacheRectTexture (IPolygonTexture* tex,
   for (iv = minv ; iv < maxv ; iv += subtex_size)
       tcache->use_sub_texture (tex, txtmgr, maxu, iv);
   tcache->use_sub_texture (tex, txtmgr, maxu, maxv);
+}
+
+unsigned char *csGraphics3DSoftware::BuildIndexedFogTable ()
+{
+  static int usage = 0;
+  usage++;
+
+  // first look if a fog table with given R,G,B has already been built
+  int i;
+  for (i = 0; i < MAX_INDEXED_FOG_TABLES; i++)
+    if (fog_tables [i].table
+     && (fog_tables [i].r == Scan.FogR)
+     && (fog_tables [i].g == Scan.FogG)
+     && (fog_tables [i].b == Scan.FogB))
+    {
+      fog_tables [i].lastuse = usage;
+      return fog_tables [i].table;
+    }
+
+  // We have to build this table: find a free slot
+  // in fog tables or free the least recently used one
+  int fi = -1, lr = -1;
+  for (i = 0; i < MAX_INDEXED_FOG_TABLES; i++)
+    if (!fog_tables [i].table)
+    {
+      fi = i;
+      break;
+    }
+    else if (usage - fog_tables [i].lastuse > lr)
+    {
+      fi = i;
+      lr = usage - fog_tables [i].lastuse;
+    }
+
+  if (fog_tables [fi].table)
+    delete [] fog_tables [fi].table;
+  fog_tables [fi].table = new unsigned char [32 * 4096];
+  if (!fog_tables [fi].table)
+    return NULL;
+
+  unsigned char *dest = fog_tables [fi].table;
+  for (i = 0; i < 256; i++)
+  {
+    int r = txtmgr->get_palette () [i].red;
+    int g = txtmgr->get_palette () [i].green;
+    int b = txtmgr->get_palette () [i].blue;
+    for (int j = 1; j <= 32; j++)
+      dest [(j - 1) * 256 + i] = txtmgr->find_rgb (
+        Scan.FogR + ((j * (r - Scan.FogR)) >> 5),
+        Scan.FogG + ((j * (g - Scan.FogG)) >> 5),
+        Scan.FogB + ((j * (b - Scan.FogB)) >> 5));
+  }
+
+  fog_tables [fi].lastuse = usage;
+  return fog_tables [fi].table;
 }
 
 STDMETHODIMP csGraphics3DSoftware::UncacheTexture (IPolygonTexture* texture)

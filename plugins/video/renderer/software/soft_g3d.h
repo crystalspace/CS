@@ -36,6 +36,10 @@
 #  undef DO_MMX
 #endif
 
+// Max number of fog tables in indexed (8-bit) modes
+// This is maximal number of instantly visible fogs without noticeable slowdowns
+#define MAX_INDEXED_FOG_TABLES	8
+
 class TextureCache;
 
 interface IPolygon3D;
@@ -161,6 +165,17 @@ private:
    * (Flat drawing).
    */
   HRESULT DrawPolygonFlat (G3DPolygonDPF& poly);
+
+  /// The dynamically built fog tables
+  struct
+  {
+    unsigned char *table;
+    int r, g, b;
+    int lastuse;
+  } fog_tables [MAX_INDEXED_FOG_TABLES];
+
+  /// Build the table used for fog in paletted modes
+  unsigned char *BuildIndexedFogTable ();
 
 public:
   /**

@@ -123,8 +123,12 @@ struc csScanSetup
   int FogR;
   int FogG;
   int FogB;
+  ; The fog table for paletted (currently only 8-bit) modes
+  unsigned_char_P Fog8;
   ; Fog density
   unsigned_long FogDensity;
+  ; The index into palette of fog color
+  int FogIndex;
 
   ; A pointer to the texture.
   csTextureMMSoftware_P Texture;

@@ -188,7 +188,7 @@ private:
    * An RGB value has four bytes: R, G, B, unused.
    * So there are 256*4 bytes in this array.
    */
-  unsigned char rgb_values[256*4];
+  unsigned char rgb_values [256*4];
 
   /**
    * Array which maps the private palette index to the global
@@ -463,7 +463,7 @@ public:
   /**
    * Get the palette.
    */
-  RGBcolor* get_palette () { return pal; }
+  const RGBcolor *get_palette () const { return pal; }
 
   /**
    * GAC: Use a slower method of mixing lights that produces a better result

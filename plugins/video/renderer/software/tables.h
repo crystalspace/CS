@@ -35,10 +35,10 @@
 #define X_AND_FILTER			(0xffff-(1<<(17-LOG2_STEPS_X))+1)
 #define Y_AND_FILTER			(0xffff-(1<<(17-LOG2_STEPS_Y))+1)
 
-/**
- * At this point QInt (255.9999 * exp (zero
- */
+/// At this point QRound (255 * exp (-float (i) / 256.)) reaches zero
 #define EXP_256_SIZE			1420
+/// Same for QRound (32 * exp (-float (i) / 256.))
+#define EXP_16_SIZE			1065
 
 /**
  * This class represents all precalculated tables that are needed.
@@ -77,6 +77,10 @@ public:
    * A table of exp(x) in the range 0..255; x == 0..EXP_256_SIZE
    */
   unsigned char *exp_256;
+  /**
+   * Same in the range 0..31 for 8-bit fog
+   */
+  unsigned char *exp_16;
 
   /**
    * Compute all of the values of the tables.

@@ -25,6 +25,7 @@ csTables tables;
 
 csTables::~csTables ()
 {
+  CHK (delete [] exp_16);
   CHK (delete [] exp_256);
   CHK (delete [] one_div_z);
   CHK (delete [] color_565_table);
@@ -41,6 +42,8 @@ void csTables::Initialize ()
   CHK (one_div_z = new unsigned int [1 << 12]);
   // ~1.5K
   CHK (exp_256 = new unsigned char [EXP_256_SIZE]);
+  // ~1K
+  CHK (exp_16 = new unsigned char [EXP_16_SIZE]);
 
   int i, j;
   int mx = 1 << LOG2_STEPS_X, my = 1 << LOG2_STEPS_Y;
@@ -88,4 +91,6 @@ void csTables::Initialize ()
 
   for (i = 0; i < EXP_256_SIZE; i++)
     exp_256 [i] = QRound (255 * exp (-float (i) / 256.));
+  for (i = 0; i < EXP_16_SIZE; i++)
+    exp_16 [i] = QRound (32 * exp (-float (i) / 256.)) - 1;
 }

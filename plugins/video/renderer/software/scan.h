@@ -70,6 +70,10 @@ struct csScanSetup
   int FogB;
   /// Fog density
   unsigned long FogDensity;
+  /// The fog table for paletted (currently only 8-bit) modes
+  unsigned char *Fog8;
+  /// The index into palette of fog color
+  int FogIndex;
 
   /// A pointer to the texture.
   csTextureMMSoftware *Texture;
@@ -214,6 +218,8 @@ extern "C" csDrawScanline csScan_8_draw_scanline_map_key_zfil;
 
 /// Draw one horizontal scanline for fog.
 extern "C" csDrawScanline csScan_8_draw_scanline_fog;
+/// Draw one horizontal scanline for fog when camera is inside fog
+extern "C" csDrawScanline csScan_8_draw_scanline_fog_view;
 
 /// Draw one horizontal scanline (lighting and alpha transparency).
 extern "C" csDrawScanline csScan_8_draw_scanline_map_alpha1;

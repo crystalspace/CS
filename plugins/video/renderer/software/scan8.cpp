@@ -19,6 +19,7 @@
 #include "sysdef.h"
 #include "qint.h"
 #include "scan.h"
+#include "tables.h"
 #include "tcache.h"
 #include "isystem.h"
 #include "ipolygon.h"
@@ -557,11 +558,80 @@ void csScan_8_draw_scanline_flat_zuse (int xx, unsigned char* d,
 void csScan_8_draw_scanline_fog (int xx, unsigned char* d,
   unsigned long *z_buf, float inv_z, float u_div_z, float v_div_z)
 {
-  //@@@ Not implemented yet!
-  (void)xx; (void)d; (void)z_buf; (void)inv_z; (void)u_div_z; (void)v_div_z;
+  if (xx <= 0) return;
+  (void)u_div_z; (void)v_div_z;
+  unsigned char *_dest = (unsigned char *)d;
+  unsigned char *_destend = _dest + xx;
+  unsigned long izz = QInt24 (inv_z);
+  int dzz = QInt24 (Scan.M);
+  ULong fog_dens = Scan.FogDensity;
+  unsigned char fog_pix = Scan.FogIndex;
+
+  do
+  {
+    int fd;
+    unsigned long izb = *z_buf;
+    if (izz >= 0x1000000)
+    {
+      // izz exceeds our 1/x table, so compute fd aproximatively and go on.
+      // This happens seldom, only when we're very close to fog, but not
+      // inside it; however we should handle this case as well.
+      if ((izb < 0x1000000) && (izz > izb))
+      {
+        fd = fog_dens * (tables.one_div_z [izb >> 12] - (tables.one_div_z [izz >> 20] >> 8)) >> 12;
+        goto fd_done;
+      }
+    }
+    else if (izz > izb)
+    {
+      fd = fog_dens * (tables.one_div_z [izb >> 12] - tables.one_div_z [izz >> 12]) >> 12;
+fd_done:
+      if (fd < EXP_16_SIZE)
+        *_dest = Scan.Fog8 [(tables.exp_16 [fd] << 8) | *_dest];
+      else
+        *_dest = fog_pix;
+    }
+    _dest++;
+    z_buf++;
+    izz += dzz;
+  }
+  while (_dest < _destend);
 }
 
 #endif // NO_draw_scanline_fog
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_scanline_fog_view
+
+void csScan_8_draw_scanline_fog_view (int xx, unsigned char* d,
+  unsigned long *z_buf, float inv_z, float u_div_z, float v_div_z)
+{
+  if (xx <= 0) return;
+  (void)u_div_z; (void)v_div_z; (void)inv_z;
+  unsigned char *_dest = (unsigned char *)d;
+  unsigned char *_destend = _dest + xx;
+  ULong fog_dens = Scan.FogDensity;
+  unsigned char fog_pix = Scan.FogIndex;
+
+  do
+  {
+    unsigned long izb = *z_buf;
+    if (izb < 0x1000000)
+    {
+      int fd = fog_dens * tables.one_div_z [izb >> 12] >> 12;
+      if (fd < EXP_16_SIZE)
+        *_dest = Scan.Fog8 [(tables.exp_16 [fd] << 8) | *_dest];
+      else
+        *_dest = fog_pix;
+    }
+    _dest++;
+    z_buf++;
+  }
+  while (_dest < _destend);
+}
+
+#endif // NO_draw_scanline_fog_view
 
 //------------------------------------------------------------------
 
