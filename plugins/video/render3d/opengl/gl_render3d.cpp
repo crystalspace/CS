@@ -2004,7 +2004,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh)
   {
     csAlphaMode::AlphaType autoMode = csAlphaMode::alphaNone;
 
-    iTextureHandle* tex;
+    iTextureHandle* tex = 0;
     if ((mesh.alphaType.autoModeTexture != csInvalidStringID) &&
       (mesh.dynDomain != 0))
     {
