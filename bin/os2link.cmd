@@ -53,11 +53,11 @@
         dir_out = substr(a, 5);
       when left(a, 7) = "CONSOLE" then
         do_console = 1;
-      when left(a, 13) = "DESCRIPTION=[" then
+      when ((left(a, 13) = 'DESCRIPTION="') | (left(a, 13) = '"DESCRIPTION=')) then
       do
         mod_desc = substr(a, 14);
         do forever
-          if (right(a,1) = ']') then
+          if (right(a,1) = '"') then
             leave;
           i = i + 1;
           if (i > max_i) then
