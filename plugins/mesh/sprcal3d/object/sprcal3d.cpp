@@ -335,8 +335,6 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreMesh (
 
       submeshes.Push(mesh);
 
-      calCoreModel.getCoreSkeleton()->calculateBoundingBoxes(&calCoreModel);
-
       return mesh->index;
     }
     else
@@ -375,6 +373,12 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreMorphTarget (
     return morph_index;
   }
   return -1;
+}
+
+void csSpriteCal3DMeshObjectFactory::CalculateAllBoneBoundingBoxes()
+{
+  // This function is SLOOOW.  Should only be called once after model is fully loaded.
+  calCoreModel.getCoreSkeleton()->calculateBoundingBoxes(&calCoreModel);
 }
 
 int csSpriteCal3DMeshObjectFactory::AddMorphAnimation(const char *name)
@@ -613,7 +617,7 @@ void csSpriteCal3DMeshObjectFactory::HardTransform (
       }
     }
   }
-  calCoreModel.getCoreSkeleton()->calculateBoundingBoxes(&calCoreModel);
+//  calCoreModel.getCoreSkeleton()->calculateBoundingBoxes(&calCoreModel);
 }
 
 //=============================================================================

@@ -193,6 +193,8 @@ public:
   void SetLoadFlags(int flags);
   void SetBasePath(const char *path);
   void RescaleFactory(float factor);
+  void CalculateAllBoneBoundingBoxes();
+
   bool LoadCoreSkeleton(iVFS *vfs,const char *filename);
   int  LoadCoreAnimation(iVFS *vfs,const char *filename,const char *name,
   	int type,float base_vel, float min_vel,float max_vel,int min_interval,
@@ -377,6 +379,9 @@ public:
 	    
     virtual bool AddCoreMaterial(iMaterialWrapper *mat)
     { return scfParent->AddCoreMaterial(mat); }
+
+    virtual void CalculateAllBoneBoundingBoxes()
+    { scfParent->CalculateAllBoneBoundingBoxes(); }
 
     virtual void BindMaterials()
     { scfParent->BindMaterials(); }

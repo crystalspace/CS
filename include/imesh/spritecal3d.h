@@ -209,6 +209,9 @@ struct iSpriteCal3DFactoryState : public iBase
    */
   virtual bool AddCoreMaterial(iMaterialWrapper *mat) = 0;
 
+  /// Does internal cal3d prep work for doing fast bbox calcs later.
+  virtual void CalculateAllBoneBoundingBoxes() = 0;
+
   /**
    * Cal3d requires extra initialization once all materials are loaded.
    * The loader calls this at the appropriate time automatically.
@@ -279,6 +282,7 @@ struct iSpriteCal3DFactoryState : public iBase
   virtual int GetSocketCount () const = 0;
   /// Query the socket number f.
   virtual iSpriteCal3DSocket* GetSocket (int f) const = 0;
+
   /** This gives you access to the internal Cal3d Core Model class
    *  which sprcal3dfact wraps.  If you use it directly, you run
    *  the risk of making sprcal3dfact and CalCoreModel get out of sync.
