@@ -1,5 +1,5 @@
 %define name    crystalspace
-%define version 20040628
+%define version 0.98
 %define release 1
 %define prefix	/usr
 
@@ -15,8 +15,8 @@
 %{?_without_perl: %{expand: %%global with_PERL 0}}
 %{?_with_perl: %{expand: %%global with_PERL 1}}
 
-Group: Applications/Development
-Source: http://crystal.sourceforge.net/cvs-snapshots/bzip2/cs-current-snapshot.tar.bz2
+Group: Development/C++
+Source: ftp://ftp.sunsite.dk/projects/crystal/cs098/source/cs98_003.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 URL: http://crystal.sourceforge.net/
 #Requires: 
@@ -35,7 +35,7 @@ Crystal Space is a free (LGPL) and portable 3D SDK written in C++.
 # Dev package
 %package -n %{name}-devel
 Summary: C++ headers for Crystal Space free 3D SDK.
-Group: Application/Development
+Group: Development/C++
 Provides:       %{name}-devel = %{version}-%{release}
 %description -n %{name}-devel
 Headers and files needed for building a Crystal Space apps
@@ -43,7 +43,7 @@ Headers and files needed for building a Crystal Space apps
 # Docs package
 %package -n %{name}-doc
 Summary: Documentation for Crystal Space free 3D SDK
-Group: Application/Development
+Group: Development/C++
 Provides:       %{name}-doc = %{version}-%{release}
 %description -n %{name}-doc
 Documentation (manual and public API reference) for CrystalSpace free 3D SDK.
@@ -52,7 +52,7 @@ Documentation (manual and public API reference) for CrystalSpace free 3D SDK.
 %setup -n CS
 
 %build
-sh configure \
+sh  configure \
 %if %{with_DEBUG}
  --enable-debug \
 %endif
@@ -62,24 +62,21 @@ sh configure \
 %if %{with_PERL}
  --with-perl \
 %endif
---prefix=%{prefix}
+ --prefix=%{prefix} \
+ --libdir=%{prefix}/lib \
+ --datadir=%{prefix}/share \
+ --sysconfdir=/etc
 
 make all
 
 %install
 DESTDIR=%{buildroot} make install
 
-%if ! %{with_NR}
- CRYSTAL=%{buildroot}%{prefix} \
- CS_DATADIR=%{buildroot}%{prefix}/share/crystal \
- CS_MAPDIR=%{buildroot}%{prefix}/share/crystal/maps \
- %{buildroot}%{prefix}/bin/cslight -canvas=null2d -video=null flarge
+./cslight -canvas=null2d -video=null flarge
+cp -R data/flarge/cache %{buildroot}%{_datadir}/%{name}/maps/flarge
 
- CRYSTAL=%{buildroot}%{prefix} \
- CS_DATADIR=%{buildroot}%{prefix}/share/crystal \
- CS_MAPDIR=%{buildroot}%{prefix}/share/crystal/maps \
- %{buildroot}%{prefix}/bin/cslight -canvas=null2d -video=null partsys
-%endif
+./cslight -canvas=null2d -video=null partsys
+cp -R data/partsys/cache %{buildroot}%{_datadir}/%{name}/maps/partsys
 
 %clean
 rm -rf "$RPM_BUILD_ROOT"
@@ -87,31 +84,32 @@ rm -rf "$RPM_BUILD_ROOT"
 #---------------------MAIN-------------------------
 %files -n %{name}
 %defattr(-,root,root)
+
 %{prefix}/bin/*
-%{prefix}/etc/crystal/*
-%{prefix}/lib/crystal/*
-%{prefix}/share/crystal/*
+%{_sysconfdir}/%{name}/*
+%{_libdir}/%{name}/*
+%{_datadir}/%{name}/*
 
 #---------------------DOC-------------------------
 %files -n %{name}-doc
 %defattr(-,root,root)
 %docdir docs
-%{prefix}/share/doc/crystal/README.html
-%{prefix}/share/doc/crystal/html/manual/*.html
-%{prefix}/share/doc/crystal/html/manual/build/platform/win32/cygwin/*.jpg
-%{prefix}/share/doc/crystal/html/manual/tutorial/howto/msvc6proj/*.jpg
-%{prefix}/share/doc/crystal/html/manual/tutorial/howto/msvc7proj/*.jpg
-%{prefix}/share/doc/crystal/html/manual/tutorial/howto/kdevproj/*.jpg
-%{prefix}/share/doc/crystal/html/manual/tutorial/map2cs/*.png
-%{prefix}/share/doc/crystal/html/manual/tutorial/map2cs/*.jpg
-%{prefix}/share/doc/crystal/html/manual/tutorial/wincvs/*.jpg
-%{prefix}/share/doc/crystal/html/manual/plugins/engine/*.jpg
-%{prefix}/share/doc/crystal/html/manual/plugins/engine/*.png
+%{_datadir}/doc/%{name}-%{version}/README.html
+%{_datadir}/doc/%{name}-%{version}/html/manual/*.html
+%{_datadir}/doc/%{name}-%{version}/html/manual/build/platform/win32/cygwin/*.jpg
+%{_datadir}/doc/%{name}-%{version}/html/manual/tutorial/howto/msvc6proj/*.jpg
+%{_datadir}/doc/%{name}-%{version}/html/manual/tutorial/howto/msvc7proj/*.jpg
+%{_datadir}/doc/%{name}-%{version}/html/manual/tutorial/howto/kdevproj/*.jpg
+%{_datadir}/doc/%{name}-%{version}/html/manual/tutorial/map2cs/*.png
+%{_datadir}/doc/%{name}-%{version}/html/manual/tutorial/map2cs/*.jpg
+%{_datadir}/doc/%{name}-%{version}/html/manual/tutorial/wincvs/*.jpg
+%{_datadir}/doc/%{name}-%{version}/html/manual/plugins/engine/*.jpg
+%{_datadir}/doc/%{name}-%{version}/html/manual/plugins/engine/*.png
 
-%{prefix}/share/doc/crystal/history.txt
-%{prefix}/share/doc/crystal/history.old
+%{_datadir}/doc/%{name}-%{version}/history.txt
+%{_datadir}/doc/%{name}-%{version}/history.old
 
-%{prefix}/share/doc/crystal/html/api/*
+%{_datadir}/doc/%{name}-%{version}/html/api/*
 
 #---------------------DEV-------------------------
 %files -n %{name}-devel
@@ -147,6 +145,20 @@ rm -rf "$RPM_BUILD_ROOT"
 %{prefix}/include/igraphic/*.h
 
 %changelog
+* Fri Jul 09 2004 Vincent Knecht <vknecht@users.sourceforge.net> 0.98-1
+- Preparation for 0.98r003 release.
+- Simplified and re-enabled levels relighting.
+
+* Thu Jul 08 2004 Vincent Knecht <vknecht@users.sourceforge.net> 0.99-1
+- Adaptation for CS PACKAGE_NAME change.
+- Changed Group: to Development/C++
+- Disabled levels relighting since lightmaps aren't written where expected.
+
+* Sun Jul 04 2004 Vincent Knecht <vknecht@users.sourceforge.net> 20040704-1
+- Specified datadir, libdir and sysconfig switches at configure step.
+- Specified CS_CONFIGDIR in cslight commands.
+- Re-enabled levels relighting when building NR.
+
 * Mon Jun 28 2004 Vincent Knecht <vknecht@users.sourceforge.net> 20040628-1
 - Added conditional build flags to enable debug, NR and perl plugin.
 - Disabled relighting of levels when building NR. Crashes for me.
