@@ -55,6 +55,7 @@
   #pragma warning(disable:4248)   // MSVC6 gives bogus "protected constructor"
 				  // for csHash::*Iterator, even though csHash
 				  // is friend.
+  #pragma warning(disable:4503)   // 'identifier' : decorated name length exceeded, name was truncated
 #endif
 
   #pragma warning(default:4265)   // class has virtual functions, but destructor is not virtual
