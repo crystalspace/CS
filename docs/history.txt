@@ -63,6 +63,12 @@ chronological order.
 	      now allow the elements to be modified by the client. This widens
 	      the scope of permissible operations on elements, thus making the
 	      class more useful.
+	- Luca reverted the revert about the memory leak in the DDS loader, 
+	  fixing the memory leak and correcting the csDDSImageFile::MipMap 
+	  method: in the last 'return' of the method it was not returning a
+	  new image, but it was returning the orignal image: in this way,
+	  assigning the return value to a csRef, the original image would have
+	  been destroyed when that csRef was destroyed.
 21-Oct-2004
 	- Eric Sunshine made the following changes to the DDS image loader:
 	    - Fixed bug in dds::Loader::ReadHeader() where it could/would
