@@ -120,11 +120,17 @@ const char* csLight::GenerateUniqueID ()
 
   mf.Write ("light", 5);
 
-  l = csConvertEndian ((int32)type);
-  mf.Write ((char*)&l, 4);
-  l = csConvertEndian ((int32)dynamicType);
-  mf.Write ((char*)&l, 4);
-  
+  if (type != CS_LIGHT_POINTLIGHT)
+  {
+    l = csConvertEndian ((int32)type);
+    mf.Write ((char*)&l, 4);
+  }
+  if (dynamicType != CS_LIGHT_DYNAMICTYPE_PSEUDO)
+  {
+    l = csConvertEndian ((int32)dynamicType);
+    mf.Write ((char*)&l, 4);
+  }
+
   iSector* sector = GetSector ();
   if (sector)
   {
@@ -144,11 +150,14 @@ const char* csLight::GenerateUniqueID ()
   l = csConvertEndian ((int32)csQint ((cutoffDistance * 1000)+.5));
   mf.Write ((char*)&l, 4);
 
-  l = csConvertEndian ((int32)attenuation);
-  mf.Write ((char*)&l, 4);
-  l = csConvertEndian ((int32)csQint ((attenuationConstants.x * 1000)+.5));
-  mf.Write ((char*)&l, 4);
+  if (attenuation != CS_ATTN_LINEAR)
+  {
+    l = csConvertEndian ((int32)attenuation);
+    mf.Write ((char*)&l, 4);
+  }
   l = csConvertEndian ((int32)csQint ((attenuationConstants.y * 1000)+.5));
+  mf.Write ((char*)&l, 4);
+  l = csConvertEndian ((int32)csQint (((1.0/attenuationConstants.x) * 1000)+.5));
   mf.Write ((char*)&l, 4);
   l = csConvertEndian ((int32)csQint ((attenuationConstants.z * 1000)+.5));
   mf.Write ((char*)&l, 4);
