@@ -660,7 +660,7 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
     { "multiply", GL_DST_COLOR, GL_ZERO } ,
     { "add", GL_ONE, GL_ONE } ,
     { "coloradd", GL_ONE, GL_SRC_COLOR } ,
-    { "ps2tristage", 696969, 696969 } ,
+    { "ps2tristage", (GLenum)696969, (GLenum)696969 } ,
     { NULL, GL_DST_COLOR, GL_ZERO }
   };
 
