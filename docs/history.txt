@@ -21,8 +21,16 @@ The history order is reversed so that new features are at the top.
 	  to include/ivaria. The reason is that this is also a public include
 	  file. If you want to make a python plugin in your own project you
 	  will need to include this file.
+	- Added error checking to the lightmap writer so that it will now
+	  show a warning if it couldn't open a lightmap cache file for
+	  writing and it will also return without causing crashes.
+	- Gouraud lighting is now also saved in the lightmap cache.
+	  This also means that startup will now be a little faster EVEN
+	  if the level is not using gouraud shading because it will not have
+	  to calculate lighting anymore for (potentially non-existant)
+	  gouraud shaded polygons.
 	- Matze inlined constructor of csMatrix3 in the hope to speed it up a
-	  bit (no tests made)
+	  bit (no tests made).
 14-Dec-2001
 	- Reverted a patch from 'res' on the OpenGL windows canvas
 	  related to the calculation of 'wwidth' and 'wheight'. This

@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "cssys/csendian.h"
 #include "csengine/polygon.h"
 #include "csengine/pol2d.h"
 #include "csengine/polytext.h"
@@ -34,6 +35,7 @@
 #include "csengine/thing.h"
 #include "csutil/garray.h"
 #include "csutil/debug.h"
+#include "iutil/vfs.h"
 #include "csgeom/matrix2.h"
 #include "qint.h"
 #include "qsqrt.h"
@@ -1659,20 +1661,69 @@ void csPolygon3D::InitializeDefault ()
 {
   if (orig_poly) return;
   csPolyTexLightMap* lmi = GetLightMapInfo ();
-  if (!lmi || lmi->tex->lm == NULL) return;
-  lmi->tex->InitLightMaps ();
-  lmi->lightmap_up_to_date = false;
+  if (lmi)
+  {
+    if (lmi->tex->lm == NULL) return;
+    lmi->tex->InitLightMaps ();
+    lmi->lightmap_up_to_date = false;
+    return;
+  }
+  csPolyTexGouraud* goi = GetGouraudInfo ();
+  if (goi)
+  {
+    goi->gouraud_up_to_date = false;
+    return;
+  }
 }
 
 bool csPolygon3D::ReadFromCache (int id)
 {
   if (orig_poly) return true;
   csPolyTexLightMap* lmi = GetLightMapInfo ();
-  if (!lmi || lmi->tex->lm == NULL) return true;
-  if (!lmi->tex->lm->ReadFromCache (id, lmi->tex->w_orig, lmi->tex->h,
-      this, true, csEngine::current_engine))
-    lmi->tex->InitLightMaps ();
-  lmi->lightmap_up_to_date = true;
+  if (lmi)
+  {
+    if (lmi->tex->lm == NULL) return true;
+    if (!lmi->tex->lm->ReadFromCache (id, lmi->tex->w_orig, lmi->tex->h,
+        this, true, csEngine::current_engine))
+      lmi->tex->InitLightMaps ();
+    lmi->lightmap_up_to_date = true;
+    return true;
+  }
+  csPolyTexGouraud* goi = GetGouraudInfo ();
+  if (goi)
+  {
+    extern void CacheName (char *buf, char* prefix, int id,
+	unsigned long ident, char *suffix);
+    char buf[200];
+    CacheName (buf, "G", id, GetPolygonID (), "");
+    iDataBuffer* data = csEngine::current_engine->VFS->ReadFile (buf);
+
+    char *d = **data;
+    uint16 num_vts;
+    memcpy (&num_vts, d, sizeof (num_vts)); d += sizeof (num_vts);
+    num_vts = convert_endian (num_vts);
+    if (num_vts != GetVertexCount ())
+    {
+      data->DecRef ();
+      return false;
+    }
+    float r, g, b;
+    int i;
+    for (i = 0 ; i < num_vts ; i++)
+    {
+      memcpy (&r, d, sizeof (r)); d += sizeof (r);
+      memcpy (&g, d, sizeof (g)); d += sizeof (g);
+      memcpy (&b, d, sizeof (b)); d += sizeof (b);
+      r = convert_endian (r);
+      g = convert_endian (g);
+      b = convert_endian (b);
+      goi->SetColor (i, r, g, b);
+    }
+
+    data->DecRef ();
+    goi->gouraud_up_to_date = true;
+    return true;
+  }
   return true;
 }
 
@@ -1680,14 +1731,56 @@ bool csPolygon3D::WriteToCache (int id)
 {
   if (orig_poly) return true;
   csPolyTexLightMap* lmi = GetLightMapInfo ();
-  if (!lmi || lmi->tex->lm == NULL)
-    return true;
-  if (!lmi->lightmap_up_to_date)
+  if (lmi)
   {
-    lmi->lightmap_up_to_date = true;
-    if (csEngine::current_engine->GetLightingCacheMode ()
-    	& CS_ENGINE_CACHE_WRITE)
-      lmi->tex->lm->Cache (id, this, NULL, csEngine::current_engine);
+    if (lmi->tex->lm == NULL)
+      return true;
+    if (!lmi->lightmap_up_to_date)
+    {
+      lmi->lightmap_up_to_date = true;
+      if (csEngine::current_engine->GetLightingCacheMode ()
+    	  & CS_ENGINE_CACHE_WRITE)
+        lmi->tex->lm->Cache (id, this, NULL, csEngine::current_engine);
+    }
+    return true;
+  }
+  csPolyTexGouraud* goi = GetGouraudInfo ();
+  if (goi)
+  {
+    if (!goi->gouraud_up_to_date)
+    {
+      goi->gouraud_up_to_date = true;
+      extern void CacheName (char *buf, char* prefix, int id,
+	  unsigned long ident, char *suffix);
+      if (csEngine::current_engine->GetLightingCacheMode ()
+    	  & CS_ENGINE_CACHE_WRITE)
+      {
+        csColor* sc = goi->GetStaticColors ();
+        char buf[200];
+        CacheName (buf, "G", id, GetPolygonID (), "");
+        iFile* cf = csEngine::current_engine->VFS->Open (buf, VFS_FILE_WRITE);
+        if (!cf)
+        {
+          csEngine::current_engine->Warn ("Could not open '%s' for writing!\n",
+		  buf);
+          return false;
+        }
+        uint16 num_verts = convert_endian ((uint16)GetVertexCount ());
+        cf->Write ((char*)&num_verts, sizeof (num_verts));
+        int i;
+        float r, g, b;
+        for (i = 0 ; i < num_verts ; i++)
+        {
+          r = convert_endian (sc[i].red);
+          g = convert_endian (sc[i].green);
+          b = convert_endian (sc[i].blue);
+          cf->Write ((char*)&r, sizeof (r));
+          cf->Write ((char*)&g, sizeof (g));
+          cf->Write ((char*)&b, sizeof (b));
+        }
+        cf->DecRef ();
+      }
+    }
   }
   return true;
 }
@@ -2010,12 +2103,18 @@ void csPolygon3D::CalculateLightingStatic (csFrustumView* lview, bool vis)
   // @@@ TODO: Optimization. Precalculated edge-table to detect polygons
   // that are adjacent.
 
-  csPolyTexLightMap *lmi = GetLightMapInfo ();
+  csPolyTexLightMap* lmi = GetLightMapInfo ();
   bool calc_lmap;
   if (lmi)
     calc_lmap = lmi->tex && lmi->tex->lm && !lmi->lightmap_up_to_date;
   else
-    calc_lmap = true;
+  {
+    csPolyTexGouraud* goi = GetGouraudInfo ();
+    if (goi)
+      calc_lmap = !goi->gouraud_up_to_date;
+    else
+      calc_lmap = true;
+  }
 
   // Update the lightmap given light and shadow frustums in lview.
   if (calc_lmap) FillLightMapStatic (lview, vis);
@@ -2060,9 +2159,11 @@ void csPolygon3D::FillLightMapStatic (csFrustumView* lview, bool vis)
   csFrustumContext* ctxt = lview->GetFrustumContext ();
   csLightingPolyTexQueue* lptq = (csLightingPolyTexQueue*)lview->GetUserdata ();
 
-  if (GetTextureType () != POLYTXT_LIGHTMAP)
+  csPolyTexGouraud* goi = GetGouraudInfo ();
+  if (goi)
   {
     // We are working for a vertex lighted polygon.
+    if (goi->gouraud_up_to_date) return;
     const csColor& col = lptq->GetColor ();
     iLight* il = lptq->GetLight ();
     UpdateVertexLighting (il, col, false, ctxt->IsFirstTime ());
@@ -2072,7 +2173,10 @@ void csPolygon3D::FillLightMapStatic (csFrustumView* lview, bool vis)
   if (lptq->GetGouraudOnly ()) return;
 
   csPolyTexLightMap* lmi = GetLightMapInfo ();
-  if (lmi->lightmap_up_to_date) return;
-  lmi->tex->FillLightMap (lview, vis, this);
+  if (lmi)
+  {
+    if (lmi->lightmap_up_to_date) return;
+    lmi->tex->FillLightMap (lview, vis, this);
+  }
 }
 

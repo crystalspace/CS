@@ -1337,16 +1337,15 @@ void csEngine::ShineLights (iRegion* iregion, iProgressMeter* meter)
       meter->SetTotal (light_count);
       meter->Restart ();
     }
-  }
-  lit->Restart ();
-  while ((l = lit->Fetch ()) != NULL)
-  {
-    ((csStatLight*)l)->CalculateLighting ();
-    if (do_relight && meter) meter->Step();
-  }
-  stop = csGetTicks ();
-  if (do_relight)
+    lit->Restart ();
+    while ((l = lit->Fetch ()) != NULL)
+    {
+      ((csStatLight*)l)->CalculateLighting ();
+      if (meter) meter->Step();
+    }
+    stop = csGetTicks ();
     Report ("Time taken: %.4f seconds.", (float)(stop-start)/1000.);
+  }
 
   // Render radiosity
   if (use_new_radiosity && do_relight)

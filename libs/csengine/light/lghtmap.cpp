@@ -372,7 +372,12 @@ void csLightMap::Cache (int id, csPolygon3D* poly,
   //-------------------------------
   // Write the normal lightmap data.
   //-------------------------------
-  iFile *cf = engine->VFS->Open (buf, VFS_FILE_WRITE);
+  iFile* cf = engine->VFS->Open (buf, VFS_FILE_WRITE);
+  if (!cf)
+  {
+    engine->Warn ("Could not open '%s' for writing!\n", buf);
+    return;
+  }
   cf->Write (ps.header, 4);
   s = ps.x1;      cf->Write ((char*)&s, sizeof (s));
   s = ps.y1;      cf->Write ((char*)&s, sizeof (s));
@@ -406,6 +411,11 @@ void csLightMap::Cache (int id, csPolygon3D* poly,
     else
       CacheName (buf, "C", id, curve->GetCurveID (), "_d");
     cf = engine->VFS->Open (buf, VFS_FILE_WRITE);
+    if (!cf)
+    {
+      engine->Warn ("Could not open '%s' for writing!\n", buf);
+      return;
+    }
     cf->Write (lh.header, 4);
     l = convert_endian (lh.dyn_cnt);
     cf->Write ((char*)&l, 4);

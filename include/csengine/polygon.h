@@ -225,10 +225,21 @@ private:
    */
   csColor *static_colors;
 
+  /**
+   * This bool indicates if the gouraud shading (static colors)
+   * is up-to-date (read from the cache). If set to false the polygon
+   * still needs to be lit.
+   */
+  bool gouraud_up_to_date;
+
 protected:
   /// Constructor.
   csPolyTexGouraud () : csPolyTexFlat ()
-  { SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPolyTexGouraud); colors = static_colors = 0; }
+  {
+    SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPolyTexGouraud);
+    colors = static_colors = 0;
+    gouraud_up_to_date = false;
+  }
 
   /// Destructor.
   virtual ~csPolyTexGouraud ();
@@ -334,7 +345,7 @@ private:
 
   /**
    * This bool indicates if the lightmap is up-to-date (read from the
-   * cache). If set to false the polygon still needs to be recalculated.
+   * cache). If set to false the polygon still needs to be lit.
    */
   bool lightmap_up_to_date;
 
