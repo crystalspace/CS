@@ -12,6 +12,8 @@ chronological order.
 	  doesn't like non-numerical characters. Note: Not needed for CS
 	  itself, but external projects may have versions with alphabetical
 	  characters.
+	- Keith completed commit of perf optimizations to sprcal3d loading.
+	  This is mostly through avoidance of redundant calls to slow functions.
 9-Jul-2004
 	- Jorrit fixed the engine so that before removing a sector, all
 	  objects in that sector are unlinked from it. Added an
