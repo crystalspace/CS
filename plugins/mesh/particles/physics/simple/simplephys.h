@@ -48,6 +48,7 @@ class csParticlesPhysicsSimple : public iParticlesPhysics
 
   void StepPhysics (float elapsed_time, iParticlesObjectState *particles,
     csArray<csParticlesData> *data);
+
 public:
   SCF_DECLARE_IBASE;
 

@@ -25,6 +25,14 @@ chronological order.
 	  csutil/randomgen.h rather than the deprecated csutil/rng.h.
 	- Eric Sunshine added particles, particlesldr, and partphys_simple
 	  plugins to user.mak.
+	- Eric Sunshine changed the particles, particlesldr, and
+	  partphys_simple plugins to #include appropriate header files rather
+	  than using forward declarations for a number of interfaces which were
+	  used as template arguments.  This will allow the code to build
+	  correctly with older compilers, such as Borland C++Builder.
+	- Eric Sunshine removed a good number of unnecessary #includes and
+	  forward delcarations from the particle-related plugins and fixed
+	  numerous formatting goofs.
 10-Jan-2004
 	- res added a facility to draw meshes with less render buffer juggling
 	  etc. required from the client.

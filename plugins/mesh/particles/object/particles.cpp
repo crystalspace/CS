@@ -19,33 +19,20 @@
 #include "cssysdef.h"
 
 #include "iutil/objreg.h"
-#include "iutil/vfs.h"
-#include "iutil/plugin.h"
 
-#include "imesh/terrain.h"
-
-#include "iengine/rview.h"
 #include "iengine/camera.h"
 #include "iengine/movable.h"
+#include "iengine/rview.h"
 
-#include "ivideo/graph3d.h"
-#include "ivideo/rndbuf.h"
-#include "ivideo/txtmgr.h"
 #include "ivideo/material.h"
+#include "ivideo/rndbuf.h"
 #include "ivideo/texture.h"
-
-#include "csutil/randomgen.h"
-
-#include "iutil/virtclk.h"
-
-#include "igraphic/image.h"
-
-#include "csgfx/rgbpixel.h"
-#include "csgfx/memimage.h"
-
-#include "csutil/util.h"
+#include "ivideo/txtmgr.h"
 
 #include "ivaria/reporter.h"
+
+#include "csutil/randomgen.h"
+#include "csutil/util.h"
 
 #include "qsqrt.h"
 #include "qint.h"
@@ -80,7 +67,7 @@ csParticlesType::~csParticlesType ()
 
 csPtr<iMeshObjectFactory> csParticlesType::NewFactory ()
 {
-  return csPtr<iMeshObjectFactory> 
+  return csPtr<iMeshObjectFactory>
 	(new csParticlesFactory (this, object_reg));
 }
 
@@ -93,7 +80,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csParticlesFactory::eiParticlesFactoryState)
   SCF_IMPLEMENTS_INTERFACE (iParticlesFactoryState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csParticlesFactory::csParticlesFactory (csParticlesType* p, 
+csParticlesFactory::csParticlesFactory (csParticlesType* p,
 	iObjectRegistry* objreg) : parent (p), object_reg (objreg)
 {
   SCF_CONSTRUCT_IBASE (p)
@@ -116,12 +103,12 @@ csParticlesFactory::csParticlesFactory (csParticlesType* p,
   force_cone_radius_falloff = CS_PART_FALLOFF_CONSTANT;
 
   force_amount = 1.0f;
-  
+
   particles_per_second = 100;
   initial_particles = 100;
 
   gravity = csVector3(0.0f, 0.0f, 0.0f);
-  
+
   emit_time = 1.0f;
   time_to_live = 1.0f;
   time_variation = 0.0f;
@@ -175,7 +162,7 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
   meshpp = 0;
   meshppsize = 0;
 
-  csRef<iStringSet> strings = 
+  csRef<iStringSet> strings =
     CS_QUERY_REGISTRY_TAG_INTERFACE (p->object_reg,
 	  "crystalspace.shared.stringset", iStringSet);
 
@@ -204,12 +191,12 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
   force_amount = p->force_amount;
   particle_mass = p->particle_mass;
   dampener = p->dampener;
-  
+
   particles_per_second = p->particles_per_second;
   initial_particles = p->initial_particles;
 
   gravity = p->gravity;
-  
+
   emit_time = p->emit_time;
   total_elapsed_time = 0.0f;
   time_to_live = p->time_to_live;
@@ -274,7 +261,7 @@ bool csParticlesObject::LoadPhysicsPlugin (const char *plugin_id)
   {
     csReport (pFactory->object_reg, CS_REPORTER_SEVERITY_ERROR,
       "crystalspace.mesh.object.particles",
-		  "Could not load the particles physics plugin '%s'!", plugin_id);
+      "Could not load the particles physics plugin '%s'!", plugin_id);
     return false;
   }
   physics->RegisterParticles (&scfiParticlesObjectState, &point_data);
@@ -284,9 +271,9 @@ bool csParticlesObject::LoadPhysicsPlugin (const char *plugin_id)
 void csParticlesObject::SetParticleRadius (float rad)
 {
   particle_radius = rad;
-  if(dynDomain) {
+  if (dynDomain) {
     csShaderVariable* sv = dynDomain->GetVariableAdd (radius_name);
-    if(sv) sv->SetValue (particle_radius);
+    if (sv) sv->SetValue (particle_radius);
   }
 }
 
@@ -298,9 +285,9 @@ bool csParticlesObject::DrawTest (iRenderView* rview, iMovable* movable)
   emitter = movable->GetFullPosition();
 
   int vertnum = 0;
-  if((vertnum = point_data.Length () - dead_particles) < 1) return false;
+  if ((vertnum = point_data.Length () - dead_particles) < 1) return false;
 
-  if(!point_sprites) 
+  if (!point_sprites)
   {
     vertnum *= 6;
     csMatrix3 m = tr_o2c.GetT2O();
@@ -313,7 +300,7 @@ bool csParticlesObject::DrawTest (iRenderView* rview, iMovable* movable)
   {
     int fov = QInt (cam->GetFOVAngle ());
     int fov_pixels = cam->GetFOV ();
-    if(camera_fov != fov || camera_pixels != fov_pixels)
+    if (camera_fov != fov || camera_pixels != fov_pixels)
     {
       camera_fov = fov;
       camera_pixels = fov_pixels;
@@ -331,7 +318,7 @@ bool csParticlesObject::DrawTest (iRenderView* rview, iMovable* movable)
   if (!rview->ClipBSphere (tr_o2c, s, clip_portal, clip_plane, clip_z_plane))
     return false;
 
-  if(!mesh) {
+  if (!mesh) {
     mesh = new csRenderMesh;
   }
 
@@ -347,17 +334,18 @@ bool csParticlesObject::DrawTest (iRenderView* rview, iMovable* movable)
   mesh->indexstart = 0;
   mesh->indexend = vertnum;
   mesh->dynDomain = dynDomain;
-  if(point_sprites)
+  if (point_sprites)
     mesh->meshtype = CS_MESHTYPE_POINT_SPRITES;
-  else  
+  else
     mesh->meshtype = CS_MESHTYPE_TRIANGLES;
 
   return true;
 }
 
-int csParticlesObject::ZSort (csParticlesData const &item1, csParticlesData const &item2)
+int csParticlesObject::ZSort (csParticlesData const &item1,
+  csParticlesData const &item2)
 {
-  if(item1.position.z > item2.position.z) return 1;
+  if (item1.position.z > item2.position.z) return 1;
   return -1;
 }
 
@@ -365,7 +353,7 @@ int csParticlesObject::ZSort (void const *item1, void const *item2)
 {
   csParticlesData* i1 = (csParticlesData*)item1;
   csParticlesData* i2 = (csParticlesData*)item2;
-  if(i1->position.z > i2->position.z) return 1;
+  if (i1->position.z > i2->position.z) return 1;
   return -1;
 }
 
@@ -385,7 +373,7 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
     buffer_length = point_data.Length ();
     csArray<iRenderBuffer*> buffers;
     int bufsize = (point_sprites ? buffer_length : buffer_length * 4);
-    pFactory->g3d->CreateInterleavedRenderBuffers (bufsize      
+    pFactory->g3d->CreateInterleavedRenderBuffers (bufsize
       * sizeof(csParticlesData), CS_BUF_DYNAMIC, 2, buffers);
     vertex_buffer = buffers.Get(0);
     vertex_buffer->SetOffset (0);
@@ -397,31 +385,31 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
     color_buffer->SetComponentCount (4);
     color_buffer->SetStride (sizeof(csParticlesData));
     texcoord_buffer = pFactory->g3d->CreateRenderBuffer (
-      sizeof (csVector2) * bufsize, CS_BUF_DYNAMIC, 
+      sizeof (csVector2) * bufsize, CS_BUF_DYNAMIC,
       CS_BUFCOMP_FLOAT, 2, false);
     csVector2 *texcoords = new csVector2 [bufsize];
-    if(point_sprites)
+    if (point_sprites)
     {
       vertex_buffer->SetStride (sizeof(csParticlesData));
       color_buffer->SetStride (sizeof(csParticlesData));
 
       unsigned int *indices = new unsigned int[buffer_length];
-      for(int i=0;i<buffer_length;i++)
+      for (int i=0;i<buffer_length;i++)
       {
         indices[i] = i;
       }
       index_buffer = pFactory->g3d->CreateRenderBuffer (
-        sizeof (unsigned int) * buffer_length, CS_BUF_STATIC, 
+        sizeof (unsigned int) * buffer_length, CS_BUF_STATIC,
         CS_BUFCOMP_UNSIGNED_INT, 1, true);
-      index_buffer->CopyToBuffer (indices, sizeof(unsigned int) * buffer_length);
+      index_buffer->CopyToBuffer(indices, sizeof(unsigned int)*buffer_length);
       delete [] indices;
     }
-    else 
+    else
     {
       vertex_buffer->SetStride (sizeof(i_vertex));
       color_buffer->SetStride (sizeof(i_vertex));
       int i;
-      for(i=0;i<bufsize-4;i+=4)
+      for (i=0;i<bufsize-4;i+=4)
       {
         texcoords[i].x = 0;
         texcoords[i].y = 0;
@@ -434,7 +422,7 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
       }
       unsigned int *indices = new unsigned int[buffer_length * 6];
       int j;
-      for(i=0,j=0;i<bufsize-1;i+=4,j+=6)
+      for (i=0,j=0;i<bufsize-1;i+=4,j+=6)
       {
         // First triangle
         indices[j] = i;
@@ -446,9 +434,10 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
         indices[j+5] = i + 3;
       }
       index_buffer = pFactory->g3d->CreateRenderBuffer (
-        sizeof (unsigned int) * buffer_length * 6, CS_BUF_STATIC, 
+        sizeof (unsigned int) * buffer_length * 6, CS_BUF_STATIC,
         CS_BUFCOMP_UNSIGNED_INT, 1, true);
-      index_buffer->CopyToBuffer (indices, sizeof(unsigned int) * buffer_length * 6);
+      index_buffer->CopyToBuffer(
+        indices, sizeof(unsigned int) * buffer_length * 6);
       delete [] indices;
     }
     texcoord_buffer->CopyToBuffer (texcoords, sizeof(csVector2) * bufsize);
@@ -458,7 +447,7 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
   {
     void *data;
     int size;
-    if(point_sprites)
+    if (point_sprites)
     {
       data = point_data.GetArray ();
       size = point_data.Length () * (sizeof(csParticlesData));
@@ -468,7 +457,7 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
       int len = point_data.Length ();
       vertex_data.SetLength (len * 4);
       int i,j;
-      for(i=0, j=0;i<len-1;i++,j+=4)
+      for (i=0, j=0;i<len-1;i++,j+=4)
       {
         csParticlesData &point = point_data[i];
         i_vertex &vertex = vertex_data[j];
@@ -520,7 +509,7 @@ csRenderMesh** csParticlesObject::GetRenderMeshes (int &n)
   return meshpp;
 }
 
-bool csParticlesObject::HitBeamOutline (const csVector3& start, 
+bool csParticlesObject::HitBeamOutline (const csVector3& start,
 	const csVector3& end, csVector3& isect, float* pr)
 {
   return false;
@@ -544,7 +533,7 @@ void csParticlesObject::GetObjectBoundingBox (csBox3& bbox, int type)
     break;
   case CS_BBOX_ACCURATE:
     // TODO: Vertices, not just points (and radius)
-    /*for(int i=0;i<max_particles;i++) {
+    /*for (int i=0;i<max_particles;i++) {
       bbox.AddBoundingVertex (positions[i]);
     }*/
     bbox.AddBoundingVertex (-radius, -radius, -radius);
@@ -567,12 +556,12 @@ void csParticlesObject::GetRadius(csVector3 &rad, csVector3 &c)
 void csParticlesObject::Start ()
 {
   int start_size = 1000;
-  if(initial_particles > start_size) start_size = initial_particles;
+  if (initial_particles > start_size) start_size = initial_particles;
 
   buffer_length = 0;
 
   point_data.SetLength (start_size);
-  for(int i=0;i<start_size;i++) {
+  for (int i=0;i<start_size;i++) {
     csParticlesData &p = point_data.Get (i);
     p.position.z = FLT_MAX;
     p.color.w = 0.0f;
@@ -587,30 +576,32 @@ bool csParticlesObject::Update (float elapsed_time)
 {
   float new_radius = 0.0f;
 
-  if(total_elapsed_time < emit_time) {
+  if (total_elapsed_time < emit_time) {
     total_elapsed_time += elapsed_time;
     new_particles += elapsed_time * (float)particles_per_second;
   }
 
   dead_particles = 0;
 
-  for(int i=0;i<point_data.Length ();i++)
+  for (int i=0;i<point_data.Length ();i++)
   {
     csParticlesData &point = point_data[i];
-    
-    if(point.time_to_live < 0.0f)
+
+    if (point.time_to_live < 0.0f)
     {
-      if(new_particles >= 1.0f)
+      if (new_particles >= 1.0f)
       {
         // Emission
         csVector3 start;
 
-        switch(emit_type)
+        switch (emit_type)
         {
         case CS_PART_EMIT_SPHERE:
-          start = csVector3((rng.Get() - 0.5) * 2,(rng.Get() - 0.5) * 2,(rng.Get() - 0.5) * 2);
+          start = csVector3((rng.Get() - 0.5) * 2,(rng.Get() - 0.5) * 2,
+	    (rng.Get() - 0.5) * 2);
           start.Normalize ();
-          start = emitter + (start * ((rng.Get() * (emit_size_1 - emit_size_2)) + emit_size_2));
+          start = emitter + (start * ((rng.Get() *
+	    (emit_size_1 - emit_size_2)) + emit_size_2));
           break;
         case CS_PART_EMIT_PLANE:
           break;
@@ -625,7 +616,7 @@ bool csParticlesObject::Update (float elapsed_time)
 
         new_particles -= 1.0f;
       }
-      else 
+      else
       {
         // Deletion :(
         point.color.x = 0.0f;
@@ -642,12 +633,12 @@ bool csParticlesObject::Update (float elapsed_time)
     point.time_to_live -= elapsed_time;
 
     float heat = 1.0f;
-    switch(heat_function)
+    switch (heat_function)
     {
     case CS_PART_HEAT_CONSTANT:
       break;
     case CS_PART_HEAT_TIME_LINEAR:
-      if(point.time_to_live < 0.0f) heat = 0.0f;
+      if (point.time_to_live < 0.0f) heat = 0.0f;
       else heat = point.time_to_live / (time_to_live + time_variation);
       break;
     case CS_PART_HEAT_SPEED:
@@ -664,14 +655,14 @@ bool csParticlesObject::Update (float elapsed_time)
 
     // The color functions
     int color_len;
-    if((color_len=gradient_colors.Length()))
+    if ((color_len=gradient_colors.Length()))
     {
       // With a gradient
       float cref = (1.0f - heat) * (float)(color_len-1);
       int index = (int)floor(cref);
       csColor color1 = gradient_colors.Get(index);
       csColor color2 = color1;
-      if(index != color_len - 1)
+      if (index != color_len - 1)
       {
         color2 = gradient_colors.Get(index + 1);
       }
@@ -684,7 +675,7 @@ bool csParticlesObject::Update (float elapsed_time)
     }
     else
     {
-      // With no gradient set, use the mesh's base color instead (fade to black)
+      // With no gradient set, use mesh's base color instead (fade to black)
       point.color.x = basecolor.red * heat;
       point.color.y = basecolor.green * heat;
       point.color.z = basecolor.blue * heat;
@@ -692,20 +683,21 @@ bool csParticlesObject::Update (float elapsed_time)
     point.color.w = point.time_to_live / (time_to_live + time_variation);
 
     // For calculating radius
-    csVector3 dist_vect = point.position - emitter; 
-    if(dist_vect.SquaredNorm() > new_radius) new_radius = dist_vect.SquaredNorm();
+    csVector3 dist_vect = point.position - emitter;
+    if (dist_vect.SquaredNorm() > new_radius)
+      new_radius = dist_vect.SquaredNorm();
   }
   point_data.Sort (ZSort);
 
-  if(dead_particles > (int)((float)point_data.Length () * 0.70f))
+  if (dead_particles > (int)((float)point_data.Length () * 0.70f))
   {
     point_data.Truncate ((point_data.Length () >> 1));
   }
-  else if(dead_particles < (int)((float)point_data.Length () * 0.30f))
+  else if (dead_particles < (int)((float)point_data.Length () * 0.30f))
   {
     int oldlen = point_data.Length ();
     point_data.SetLength ((oldlen << 1));
-    for(int i=oldlen;i<point_data.Length ();i++) {
+    for (int i=oldlen;i<point_data.Length ();i++) {
       csParticlesData &p = point_data.Get (i);
       p.position.z = FLT_MAX;
       p.color.w = 0.0f;
@@ -721,4 +713,3 @@ bool csParticlesObject::Update (float elapsed_time)
 void csParticlesObject::NextFrame (csTicks, const csVector3 &)
 {
 }
-

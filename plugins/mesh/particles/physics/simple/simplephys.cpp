@@ -71,8 +71,8 @@ bool csParticlesPhysicsSimple::Initialize (iObjectRegistry* reg)
   return true;
 }
 
-void csParticlesPhysicsSimple::RegisterParticles (iParticlesObjectState *particles,
-  csArray<csParticlesData> *data)
+void csParticlesPhysicsSimple::RegisterParticles (
+  iParticlesObjectState *particles, csArray<csParticlesData> *data)
 {
   particles_object *part = new particles_object;
   part->particles = particles;
@@ -80,13 +80,14 @@ void csParticlesPhysicsSimple::RegisterParticles (iParticlesObjectState *particl
   partobjects.Push (part);
 }
 
-void csParticlesPhysicsSimple::RemoveParticles (iParticlesObjectState *particles)
+void csParticlesPhysicsSimple::RemoveParticles (
+  iParticlesObjectState *particles)
 {
   particles_object *temp;
   int end = partobjects.Length () - 1;
-  for(int i=end;i>=0;i++) {
+  for (int i=end;i>=0;i++) {
     temp = partobjects[i];
-    if(temp->particles == particles) {
+    if (temp->particles == particles) {
       partobjects[i] = partobjects[end];
       partobjects[end] = temp;
       temp = partobjects.Pop ();
@@ -98,14 +99,14 @@ void csParticlesPhysicsSimple::RemoveParticles (iParticlesObjectState *particles
 
 bool csParticlesPhysicsSimple::HandleEvent (iEvent &event)
 {
-  if(event.Type == csevBroadcast && event.Command.Code == cscmdPreProcess) 
+  if (event.Type == csevBroadcast && event.Command.Code == cscmdPreProcess)
   {
     csTicks elapsed = vclock->GetElapsedTicks ();
     int updates = (elapsed + leftover_time) / 20;
     leftover_time = (elapsed + leftover_time) - (updates * 20);
-    
+
     float elapsedSecs = (float)elapsed * 0.001f;
-    for(int i=0; i < partobjects.Length (); i++) 
+    for (int i=0; i < partobjects.Length (); i++)
     {
       StepPhysics (elapsedSecs, partobjects[i]->particles,
         partobjects[i]->data);
@@ -119,15 +120,16 @@ void csParticlesPhysicsSimple::StepPhysics (float elapsed_time,
   iParticlesObjectState *particles, csArray<csParticlesData> *data)
 {
   float force_range = particles->GetForceRange ();
-  for(int i=0;i<data->Length ();i++) 
+  for (int i=0;i<data->Length ();i++)
   {
     // Setup for this particle
     csParticlesData &part = data->Get (i);
 
-    if(part.time_to_live < 0.0f) break;
+    if (part.time_to_live < 0.0f) break;
 
     // Diffusion
-    csVector3 diff((rng.Get() * 2.0f) - 1.0f, (rng.Get() * 2.0f) - 1.0f, (rng.Get() * 2.0f) - 1.0f);
+    csVector3 diff((rng.Get() * 2.0f) - 1.0f, (rng.Get() * 2.0f) - 1.0f,
+      (rng.Get() * 2.0f) - 1.0f);
     diff *= particles->GetDiffusion ();
     part.position += (diff * elapsed_time);
 
@@ -135,14 +137,14 @@ void csParticlesPhysicsSimple::StepPhysics (float elapsed_time,
     csVector3 emitter;
     particles->GetEmitPosition (emitter);
     float force_range_squared = (force_range * force_range);
-    csVector3 dir = part.position - emitter; 
+    csVector3 dir = part.position - emitter;
     float dist_squared = dir.SquaredNorm();
     float falloff = 1.0f;
 
     csParticleForceType force_type;
     force_type = particles->GetForceType ();
 
-    switch(force_type)
+    switch (force_type)
     {
     case CS_PART_FORCE_RADIAL:
       dir.Normalize ();
@@ -159,16 +161,16 @@ void csParticlesPhysicsSimple::StepPhysics (float elapsed_time,
 
     particles->GetFalloffType (force_falloff, cone_falloff);
 
-    switch(force_falloff) {
+    switch (force_falloff) {
     case CS_PART_FALLOFF_CONSTANT:
-      if(dist_squared > force_range_squared) falloff = 0.0f;
+      if (dist_squared > force_range_squared) falloff = 0.0f;
       break;
     case CS_PART_FALLOFF_LINEAR:
-      if(dist_squared > force_range_squared) falloff = 0.0f;
+      if (dist_squared > force_range_squared) falloff = 0.0f;
       else falloff = 1.0f - (dist_squared / force_range_squared);
       break;
     case CS_PART_FALLOFF_PARABOLIC:
-      if(dist_squared < force_range_squared)
+      if (dist_squared < force_range_squared)
         falloff = (1.0f / (force_range_squared - dist_squared));
       break;
     }
@@ -177,8 +179,8 @@ void csParticlesPhysicsSimple::StepPhysics (float elapsed_time,
     particles->GetGravity (gravity);
 
     part.velocity += dir * (((particles->GetForce() * falloff -
-      fabs(part.velocity.Norm()) * particles->GetDampener ())
-      / particles->GetMass ()) * elapsed_time) + gravity * elapsed_time;
+      fabs(part.velocity.Norm()) * particles->GetDampener ()) /
+      particles->GetMass ()) * elapsed_time) + gravity * elapsed_time;
     part.position += part.velocity * elapsed_time;
   }
 }

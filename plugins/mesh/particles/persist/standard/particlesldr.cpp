@@ -19,18 +19,15 @@
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
 
-#include "imap/services.h"
 #include "imap/ldrctxt.h"
-#include "imap/loader.h"
 
-#include "iutil/plugin.h"
+#include "iutil/comp.h"
 #include "iutil/document.h"
 #include "iutil/objreg.h"
-#include "iutil/comp.h"
-#include "iutil/vfs.h"
+#include "iutil/plugin.h"
 
-#include "iengine/mesh.h"
 #include "iengine/material.h"
+#include "iengine/mesh.h"
 
 #include "imesh/object.h"
 #include "imesh/particles.h"
@@ -161,7 +158,7 @@ csPtr<iBase> csParticlesFactoryLoader::Parse (iDocumentNode* node,
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
       "crystalspace.particles.loader.factory",
-		  "Could not query iParticlesFactoryState from factory object!");
+      "Could not query iParticlesFactoryState from factory object!");
     return 0;
   }
 
@@ -224,9 +221,12 @@ csPtr<iBase> csParticlesFactoryLoader::Parse (iDocumentNode* node,
             child, "No falloff type specified!");
           return false;
         }
-        if (!strcmp (str, "constant")) heat = CS_PART_HEAT_CONSTANT;
-        else if (!strcmp (str, "time_linear")) heat = CS_PART_HEAT_TIME_LINEAR;
-        else if (!strcmp (str, "speed")) heat = CS_PART_HEAT_SPEED;
+        if (!strcmp (str, "constant"))
+	  heat = CS_PART_HEAT_CONSTANT;
+        else if (!strcmp (str, "time_linear"))
+	  heat = CS_PART_HEAT_TIME_LINEAR;
+        else if (!strcmp (str, "speed"))
+	  heat = CS_PART_HEAT_SPEED;
         else
         {
           synldr->ReportError ("crystalspace.particles.factory.loader",
@@ -240,7 +240,7 @@ csPtr<iBase> csParticlesFactoryLoader::Parse (iDocumentNode* node,
           child, "Unknown token '%s'!", value);
     }
   }
-  
+
   return csPtr<iBase> (fact);
 }
 
@@ -346,9 +346,12 @@ bool csParticlesFactoryLoader::ParseForce (iDocumentNode *node,
             child, "No falloff type specified!");
           return false;
         }
-        if (!strcmp (str, "constant")) falloff = CS_PART_FALLOFF_CONSTANT;
-        else if (!strcmp (str, "linear")) falloff = CS_PART_FALLOFF_LINEAR;
-        else if (!strcmp (str, "parabolic")) falloff = CS_PART_FALLOFF_PARABOLIC;
+        if (!strcmp (str, "constant"))
+	  falloff = CS_PART_FALLOFF_CONSTANT;
+        else if (!strcmp (str, "linear"))
+	  falloff = CS_PART_FALLOFF_LINEAR;
+        else if (!strcmp (str, "parabolic"))
+	  falloff = CS_PART_FALLOFF_PARABOLIC;
         else
         {
           synldr->ReportError ("crystalspace.particles.factory.loader",
@@ -372,9 +375,12 @@ bool csParticlesFactoryLoader::ParseForce (iDocumentNode *node,
             child, "No cone falloff type specified!");
           return false;
         }
-        if (!strcmp (str, "constant")) radius_falloff = CS_PART_FALLOFF_CONSTANT;
-        else if (!strcmp (str, "linear")) radius_falloff = CS_PART_FALLOFF_LINEAR;
-        else if (!strcmp (str, "parabolic")) radius_falloff = CS_PART_FALLOFF_PARABOLIC;
+        if (!strcmp (str, "constant"))
+	  radius_falloff = CS_PART_FALLOFF_CONSTANT;
+        else if (!strcmp (str, "linear"))
+	  radius_falloff = CS_PART_FALLOFF_LINEAR;
+        else if (!strcmp (str, "parabolic"))
+	  radius_falloff = CS_PART_FALLOFF_PARABOLIC;
         else
         {
           synldr->ReportError ("crystalspace.particles.factory.loader",
@@ -401,7 +407,7 @@ bool csParticlesFactoryLoader::ParseForce (iDocumentNode *node,
   }
   else if (!strcmp(type, "cone"))
   {
-    state->SetConeForceType (direction, range, falloff, radius, radius_falloff);
+    state->SetConeForceType(direction, range, falloff, radius, radius_falloff);
   }
   else
   {
@@ -453,7 +459,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 SCF_IMPLEMENT_FACTORY (csParticlesFactorySaver)
 
 csParticlesFactorySaver::csParticlesFactorySaver (iBase* parent)
-{ 
+{
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
 }
@@ -527,7 +533,7 @@ bool csParticlesObjectLoader::Initialize (iObjectRegistry* objreg)
   return true;
 }
 
-csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node, 
+csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
   iLoaderContext* ldr_context, iBase* context)
 {
   csRef<iMeshObject> mesh;
@@ -545,14 +551,14 @@ csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_FACTORY:
       {
         const char* factname = child->GetContentsValue ();
-	      iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
-	      if (!fact)
-	      {
+        iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
+        if (!fact)
+        {
       	  synldr->ReportError ("crystalspace.particles.object.loader",
-		        child, "Couldn't find factory '%s'!", factname);
-	        return 0;
-	      }
-	      mesh = fact->GetMeshObjectFactory ()->NewInstance ();
+            child, "Couldn't find factory '%s'!", factname);
+          return 0;
+        }
+        mesh = fact->GetMeshObjectFactory ()->NewInstance ();
         state = SCF_QUERY_INTERFACE(fact, iParticlesObjectState);
         break;
       }
@@ -564,19 +570,18 @@ csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
         break;
       }
       case XMLTOKEN_MATERIAL:
-    	{
-	      const char* matname = child->GetContentsValue ();
+      {
+        const char* matname = child->GetContentsValue ();
         iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
-	      if (!mat)
-	      {
-      	  synldr->ReportError (
-		        "crystalspace.ballloader.parse.unknownmaterial",
-		        child, "Couldn't find material '%s'!", matname);
+        if (!mat)
+        {
+          synldr->ReportError ("crystalspace.ballloader.parse.unknownmaterial",
+	    child, "Couldn't find material '%s'!", matname);
           return 0;
-	      }
-	      mesh->SetMaterialWrapper (mat);
-  	    break;
-	    }
+        }
+        mesh->SetMaterialWrapper (mat);
+        break;
+      }
       case XMLTOKEN_EMITTER:
         ParseEmitter (child, state);
         break;
@@ -627,9 +632,12 @@ csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
             child, "No falloff type specified!");
           return false;
         }
-        if (!strcmp (str, "constant")) heat = CS_PART_HEAT_CONSTANT;
-        else if (!strcmp (str, "time_linear")) heat = CS_PART_HEAT_TIME_LINEAR;
-        else if (!strcmp (str, "speed")) heat = CS_PART_HEAT_SPEED;
+        if (!strcmp (str, "constant"))
+	  heat = CS_PART_HEAT_CONSTANT;
+        else if (!strcmp (str, "time_linear"))
+	  heat = CS_PART_HEAT_TIME_LINEAR;
+        else if (!strcmp (str, "speed"))
+	  heat = CS_PART_HEAT_SPEED;
         else
         {
           synldr->ReportError ("crystalspace.particles.object.loader",
@@ -749,9 +757,12 @@ bool csParticlesObjectLoader::ParseForce (iDocumentNode *node,
             child, "No falloff type specified!");
           return false;
         }
-        if (!strcmp (str, "constant")) falloff = CS_PART_FALLOFF_CONSTANT;
-        else if (!strcmp (str, "linear")) falloff = CS_PART_FALLOFF_LINEAR;
-        else if (!strcmp (str, "parabolic")) falloff = CS_PART_FALLOFF_PARABOLIC;
+        if (!strcmp (str, "constant"))
+	  falloff = CS_PART_FALLOFF_CONSTANT;
+        else if (!strcmp (str, "linear"))
+	  falloff = CS_PART_FALLOFF_LINEAR;
+        else if (!strcmp (str, "parabolic"))
+	  falloff = CS_PART_FALLOFF_PARABOLIC;
         else
         {
           synldr->ReportError ("crystalspace.particles.object.loader",
@@ -775,9 +786,12 @@ bool csParticlesObjectLoader::ParseForce (iDocumentNode *node,
             child, "No cone falloff type specified!");
           return false;
         }
-        if (!strcmp (str, "constant")) radius_falloff = CS_PART_FALLOFF_CONSTANT;
-        else if (!strcmp (str, "linear")) radius_falloff = CS_PART_FALLOFF_LINEAR;
-        else if (!strcmp (str, "parabolic")) radius_falloff = CS_PART_FALLOFF_PARABOLIC;
+        if (!strcmp (str, "constant"))
+	  radius_falloff = CS_PART_FALLOFF_CONSTANT;
+        else if (!strcmp (str, "linear"))
+	  radius_falloff = CS_PART_FALLOFF_LINEAR;
+        else if (!strcmp (str, "parabolic"))
+	  radius_falloff = CS_PART_FALLOFF_PARABOLIC;
         else
         {
           synldr->ReportError ("crystalspace.particles.object.loader",
@@ -804,7 +818,7 @@ bool csParticlesObjectLoader::ParseForce (iDocumentNode *node,
   }
   else if (!strcmp(type, "cone"))
   {
-    state->SetConeForceType (direction, range, falloff, radius, radius_falloff);
+    state->SetConeForceType(direction, range, falloff, radius, radius_falloff);
   }
   else
   {

@@ -16,21 +16,21 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_PARTICLESLDR_H
-#define __CS_PARTICLESLDR_H
+#ifndef __CS_PARTICLESLDR_H__
+#define __CS_PARTICLESLDR_H__
 
+#include "imap/loader.h"
 #include "imap/reader.h"
+#include "imap/services.h"
 #include "imap/writer.h"
 #include "iutil/comp.h"
+#include "iutil/vfs.h"
 #include "csutil/strhash.h"
 
 struct iObjectRegistry;
-struct iSyntaxService;
-struct iLoader;
-struct iVFS;
 
 /**
- *
+ * Particle factory loader.
  */
 class csParticlesFactoryLoader : public iLoaderPlugin
 {
@@ -54,7 +54,7 @@ public:
 
   /// Parse the given node block and build the particles factory
   csPtr<iBase> Parse (iDocumentNode *node, iLoaderContext *ldr_context,
-    iBase* context);	
+    iBase* context);
 
   /// Parse the emitter block
   bool ParseEmitter (iDocumentNode *node, iParticlesFactoryState *state);
@@ -66,7 +66,7 @@ public:
   bool ParseGradient (iDocumentNode *node, iParticlesFactoryState *state);
 
   struct eiComponent : public iComponent
-  { 
+  {
     SCF_DECLARE_EMBEDDED_IBASE (csParticlesFactoryLoader);
     virtual bool Initialize (iObjectRegistry *p)
     { return scfParent->Initialize (p); }
@@ -74,7 +74,7 @@ public:
 };
 
 /**
- *
+ * Particle factory saver.
  */
 class csParticlesFactorySaver : public iSaverPlugin
 {
@@ -102,11 +102,10 @@ public:
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize (p); }
   } scfiComponent;
-
 };
 
 /**
- *
+ * Particles loader.
  */
 class csParticlesObjectLoader : public iLoaderPlugin
 {
@@ -151,7 +150,7 @@ public:
 };
 
 /**
- *
+ * Particles saver.
  */
 class csParticlesObjectSaver : public iSaverPlugin
 {
@@ -181,4 +180,4 @@ public:
   } scfiComponent;
 };
 
-#endif // __CS_CHUNKLDR_H
+#endif // __CS_PARTICLESLDR_H__

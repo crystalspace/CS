@@ -19,31 +19,25 @@
 #ifndef __CS_PARTICLES_H__
 #define __CS_PARTICLES_H__
 
-#include "csutil/cscolor.h"
 #include "csutil/array.h"
+#include "csutil/cscolor.h"
 #include "csutil/garray.h"
 
-#include "csgeom/transfrm.h"
 #include "csgeom/objmodel.h"
+#include "csgeom/transfrm.h"
+
+#include "iengine/material.h"
 
 #include "imesh/object.h"
 #include "imesh/particles.h"
 
 #include "iutil/comp.h"
 
+#include "ivideo/graph3d.h"
 #include "ivideo/rendermesh.h"
 
 #include "csgfx/shadervar.h"
 #include "csgfx/shadervarcontext.h"
-
-struct iMaterialWrapper;
-struct iImage;
-struct iGraphics3D;
-struct iVirtualClock;
-
-class csParticlesType;
-class csParticlesFactory;
-class csParticlesObject;
 
 /**
  * Particles type, instantiates factories which create meshes
@@ -55,7 +49,7 @@ private:
   iBase* parent;
 
 public:
-  SCF_DECLARE_IBASE;	
+  SCF_DECLARE_IBASE;
 
   csParticlesType (iBase* p);
   virtual ~csParticlesType ();
@@ -102,12 +96,12 @@ private:
   float force_amount;
   float particle_mass;
   float dampener;
-  
+
   int particles_per_second;
   int initial_particles;
 
   csVector3 gravity;
-  
+
   float emit_time;
   float time_to_live;
   float time_variation;
@@ -117,7 +111,7 @@ private:
   float particle_radius;
 
   csArray<csColor> gradient_colors;
-  
+
   csParticleHeatFunction heat_function;
 
   float (*heat_callback)(float time, float speed, float dist);
@@ -129,7 +123,7 @@ public:
   virtual ~csParticlesFactory ();
 
   csPtr<iMeshObject> NewInstance ();
-  void HardTransform (const csReversibleTransform&) { }
+  void HardTransform (const csReversibleTransform&) {}
   bool SupportsHardTransform () const { return false; }
   void SetLogicalParent (iBase* lp) { parent = lp; }
   iBase* GetLogicalParent () const { return parent; }
@@ -157,14 +151,17 @@ public:
     force_range = range;
     force_falloff = falloff;
   }
-  void SetLinearForceType (csVector3 &direction, float range, csParticleFalloffType falloff)
+  void SetLinearForceType (csVector3 &direction, float range,
+    csParticleFalloffType falloff)
   {
     force_type = CS_PART_FORCE_LINEAR;
     force_direction = direction;
     force_range = range;
     force_falloff = falloff;
   }
-  void SetConeForceType (csVector3 &direction, float range, csParticleFalloffType falloff, float radius, csParticleFalloffType radius_falloff)
+  void SetConeForceType (csVector3 &direction, float range,
+    csParticleFalloffType falloff, float radius,
+    csParticleFalloffType radius_falloff)
   {
     force_type = CS_PART_FORCE_CONE;
     force_direction = direction;
@@ -186,7 +183,8 @@ public:
   void SetTimeVariation (float variation)
   { time_variation = variation; }
 
-  void SetParticleHeatFunction(csParticleHeatFunction type, float (*callback)(float time, float speed, float dist))
+  void SetParticleHeatFunction(csParticleHeatFunction type,
+    float (*callback)(float time, float speed, float dist))
   {
     heat_function = type;
     heat_callback = callback;
@@ -228,15 +226,19 @@ public:
     virtual void SetSphereEmitType (float outer_radius, float inner_radius)
     { scfParent->SetSphereEmitType(outer_radius, inner_radius); }
     virtual void SetPlaneEmitType (float x_size, float y_size)
-    { }
+    {}
     virtual void SetBoxEmitType (float x_size, float y_size, float z_size)
-    { }
-    virtual void SetRadialForceType (float range, csParticleFalloffType falloff)
-    { scfParent->SetRadialForceType (range, falloff); }
-    virtual void SetLinearForceType (csVector3 &direction, float range, csParticleFalloffType falloff)
-    { scfParent->SetLinearForceType (direction, range, falloff); }
-    virtual void SetConeForceType (csVector3 &direction, float range, csParticleFalloffType falloff, float radius, csParticleFalloffType radius_falloff)
-    { scfParent->SetConeForceType (direction, range, falloff, radius, radius_falloff); }
+    {}
+    virtual void SetRadialForceType(float range, csParticleFalloffType falloff)
+    { scfParent->SetRadialForceType(range, falloff); }
+    virtual void SetLinearForceType(csVector3 &direction, float range,
+      csParticleFalloffType falloff)
+    { scfParent->SetLinearForceType(direction, range, falloff); }
+    virtual void SetConeForceType (csVector3 &direction, float range,
+      csParticleFalloffType falloff, float radius,
+      csParticleFalloffType radius_falloff)
+    { scfParent->SetConeForceType (direction, range, falloff, radius,
+        radius_falloff); }
     virtual void SetForce (float force)
     { scfParent->SetForce (force); }
     virtual void SetDiffusion (float size)
@@ -249,7 +251,8 @@ public:
     { scfParent->SetTimeToLive (time); }
     virtual void SetTimeVariation (float variation)
     { scfParent->SetTimeVariation (variation); }
-    virtual void SetParticleHeatFunction(csParticleHeatFunction type, float (*callback)(float time, float speed, float dist) = NULL)
+    virtual void SetParticleHeatFunction(csParticleHeatFunction type,
+      float (*callback)(float time, float speed, float dist) = NULL)
     { scfParent->SetParticleHeatFunction (type, callback); }
     virtual void AddColor (csColor color)
     { scfParent->AddColor (color); }
@@ -318,12 +321,12 @@ private:
   csParticleFalloffType force_cone_radius_falloff;
 
   float force_amount;
-  
+
   int particles_per_second;
   int initial_particles;
 
   csVector3 gravity;
-  
+
   float emit_time;
   float total_elapsed_time;
   float time_to_live;
@@ -367,27 +370,29 @@ private:
   csRandomGen rng;
   csVector3 emitter;
   float radius;
-  static int ZSort (csParticlesData const &item1, csParticlesData const &item2);
-  static int ZSort (void const *item1, void const *item2);
-public: 
+  static int ZSort(csParticlesData const &item1, csParticlesData const &item2);
+  static int ZSort(void const *item1, void const *item2);
+
+public:
   SCF_DECLARE_IBASE;
 
   csParticlesObject (csParticlesFactory* f);
   virtual ~csParticlesObject ();
 
   /// Returns a point to the factory that made this
-  iMeshObjectFactory* GetFactory () const { return (iMeshObjectFactory*)pFactory; }
+  iMeshObjectFactory* GetFactory () const
+  { return (iMeshObjectFactory*)pFactory; }
 
   /**
-   * Does all pre-render calculation.  Determines which LOD children in the 
+   * Does all pre-render calculation.  Determines which LOD children in the
    * tree should be drawn
    */
   bool DrawTest (iRenderView* rview, iMovable* movable);
 
   /// Updates the lighting
   void UpdateLighting (iLight** lights, int num_lights, iMovable* movable);
-  
-  bool Draw (iRenderView*, iMovable*, csZBufMode) 
+
+  bool Draw (iRenderView*, iMovable*, csZBufMode)
   { /* deprecated */ return false; }
 
   /// Returns the mesh, ready for rendering
@@ -400,16 +405,16 @@ public:
   void NextFrame (csTicks ticks, const csVector3&);
 
   /// Unsupported
-  void HardTransform (const csReversibleTransform&) { }
+  void HardTransform (const csReversibleTransform&) {}
 
   /// Shows that HardTransform is not supported by this mesh
   bool SupportsHardTransform () const { return false; }
 
   /// Check if hit by the beam
-  bool HitBeamOutline (const csVector3& start, const csVector3& end, 
+  bool HitBeamOutline (const csVector3& start, const csVector3& end,
 	csVector3& isect, float* pr);
   /// Find exact position of a beam hit
-  bool HitBeamObject (const csVector3& start, const csVector3& end, 
+  bool HitBeamObject (const csVector3& start, const csVector3& end,
 	csVector3& isect, float* pr, int* polygon_idx = 0);
 
   /// Set/Get logical parent
@@ -419,19 +424,19 @@ public:
   /// Gets the object model
   iObjectModel *GetObjectModel () { return &scfiObjectModel; }
 
-  /// Set (Get) the constant base color 
+  /// Set the constant base color
   bool SetColor (const csColor& c) { basecolor = c; return true; }
+  /// Get the constant base color
   bool GetColor (csColor &c) const { c = basecolor; return true; }
 
   iRenderBuffer *GetRenderBuffer (csStringID name);
 
-  /** 
-   * Set (Get) the material wrapper
-   */
+  /// Set the material wrapper
   bool SetMaterialWrapper (iMaterialWrapper* m)
   { matwrap = m; return true; }
+  /// Get the material wrapper
   iMaterialWrapper* GetMaterialWrapper () const { return matwrap; }
-  void InvalidateMaterialHandles () { }
+  void InvalidateMaterialHandles () {}
 
   void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
   void GetRadius (csVector3& rad, csVector3& c);
@@ -460,14 +465,17 @@ public:
     force_range = range;
     force_falloff = falloff;
   }
-  void SetLinearForceType (csVector3 &direction, float range, csParticleFalloffType falloff)
+  void SetLinearForceType (csVector3 &direction, float range,
+    csParticleFalloffType falloff)
   {
     force_type = CS_PART_FORCE_LINEAR;
     force_direction = direction;
     force_range = range;
     force_falloff = falloff;
   }
-  void SetConeForceType (csVector3 &direction, float range, csParticleFalloffType falloff, float radius, csParticleFalloffType radius_falloff)
+  void SetConeForceType (csVector3 &direction, float range,
+    csParticleFalloffType falloff, float radius,
+    csParticleFalloffType radius_falloff)
   {
     force_type = CS_PART_FORCE_CONE;
     force_direction = direction;
@@ -488,7 +496,8 @@ public:
   { time_to_live = time; }
   void SetTimeVariation (float variation)
   { time_variation = variation; }
-  void SetParticleHeatFunction(csParticleHeatFunction type, float (*callback)(float time, float speed, float dist))
+  void SetParticleHeatFunction(csParticleHeatFunction type,
+    float (*callback)(float time, float speed, float dist))
   {
     heat_function = type;
     heat_callback = callback;
@@ -554,11 +563,11 @@ public:
 
   void Start ();
   void Stop ()
-  { }
+  {}
 
   bool Update (float elapsed_time);
 
-  virtual void PositionChild (iMeshObject* child,csTicks current_time) { }
+  virtual void PositionChild (iMeshObject* child,csTicks current_time) {}
 
   struct eiParticlesObjectState : public iParticlesObjectState
   {
@@ -572,15 +581,19 @@ public:
     virtual void SetSphereEmitType (float outer_radius, float inner_radius)
     { scfParent->SetSphereEmitType (outer_radius, inner_radius); }
     virtual void SetPlaneEmitType (float x_size, float y_size)
-    { }
+    {}
     virtual void SetBoxEmitType (float x_size, float y_size, float z_size)
-    { }
-    virtual void SetRadialForceType (float range, csParticleFalloffType falloff)
-    { scfParent->SetRadialForceType (range, falloff); }
-    virtual void SetLinearForceType (csVector3 &direction, float range, csParticleFalloffType falloff)
-    { scfParent->SetLinearForceType (direction, range, falloff); }
-    virtual void SetConeForceType (csVector3 &direction, float range, csParticleFalloffType falloff, float radius, csParticleFalloffType radius_falloff)
-    { scfParent->SetConeForceType (direction, range, falloff, radius, radius_falloff); }
+    {}
+    virtual void SetRadialForceType(float range, csParticleFalloffType falloff)
+    { scfParent->SetRadialForceType(range, falloff); }
+    virtual void SetLinearForceType(csVector3 &direction, float range,
+      csParticleFalloffType falloff)
+    { scfParent->SetLinearForceType(direction, range, falloff); }
+    virtual void SetConeForceType (csVector3 &direction, float range,
+      csParticleFalloffType falloff, float radius,
+      csParticleFalloffType radius_falloff)
+    { scfParent->SetConeForceType (direction, range, falloff, radius,
+        radius_falloff); }
     virtual void SetForce (float force)
     { scfParent->SetForce (force); }
     virtual void SetDiffusion (float size)
@@ -593,7 +606,8 @@ public:
     { scfParent->SetTimeToLive (time); }
     virtual void SetTimeVariation (float variation)
     { scfParent->SetTimeVariation (variation); }
-    virtual void SetParticleHeatFunction(csParticleHeatFunction type, float (*callback)(float time, float speed, float dist) = NULL)
+    virtual void SetParticleHeatFunction(csParticleHeatFunction type,
+      float (*callback)(float time, float speed, float dist) = NULL)
     { scfParent->SetParticleHeatFunction (type, callback); }
     virtual void AddColor (csColor color)
     { scfParent->AddColor (color); }
