@@ -60,7 +60,7 @@ csCommandLineParser::csCommandLineParser (iBase *Parent) :
 }
 
 csCommandLineParser::csCommandLineParser (int argc, const char* const argv[]) :
-  Names (16, 16), Options (16, 16)
+  Options (16, 16), Names (16, 16)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   Initialize (argc, argv);
