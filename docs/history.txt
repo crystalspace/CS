@@ -49,6 +49,11 @@ The history order is reversed so that new features are at the top.
 	  wrapping macros for their internal Perl variable, and added a
 	  paragraph to the documentation about same.
 	- res fixed double compilation of cssys/win32/syspath.cpp with jam.
+	- duhprey did the following:
+	    - Quick fix to return current working directory instead of App's 
+	      full path
+	    - Added #include "cssys/syspath.h" so vfs could find 
+	      csGetConfigPath
 16-Jun-2003
 	- Oktal separated a multiple-argument %ignore directive into several
 	  single-argument ones, in perlpre.i, in order to support older
