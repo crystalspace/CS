@@ -185,6 +185,11 @@ public:
   virtual void UpdateLighting (iLight** lights, int num_lights,
       	iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
+#ifdef CS_USE_NEW_RENDERER
+  virtual bool DrawZ (iRenderView* rview, iMovable* movable, csZBufMode zbufMode);
+  virtual bool DrawShadow (iRenderView* rview, iMovable* movable, csZBufMode zbufMode);
+  virtual bool DrawLight (iRenderView* rview, iMovable* movable, csZBufMode zbufMode);
+#endif // CS_USE_NEW_RENDERER
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
     if (cb) cb->IncRef ();
@@ -408,6 +413,8 @@ private:
   bool mesh_colors_dirty_flag;
   bool mesh_triangle_dirty_flag;
 
+  csRef<iRender3D> r3d;
+
   csRef<iRenderBuffer> vertex_buffer;
   csRef<iRenderBuffer> texel_buffer;
   csRef<iRenderBuffer> normal_buffer;
@@ -523,12 +530,15 @@ public:
   }
 #else
   iRenderBuffer *GetBuffer (csStringID name);
+  int GetComponentCount (csStringID name);
   //------------------------- iStreamSource implementation ----------------
   class StreamSource : public iStreamSource 
   {
-	SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObjectFactory);
+    SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObjectFactory);
     iRenderBuffer *GetBuffer (csStringID name)
 	{ return scfParent->GetBuffer (name); }
+    int GetComponentCount (csStringID name)
+	{ return scfParent->GetComponentCount (name); }
   } scfiStreamSource;
   friend class StreamSource;
 #endif

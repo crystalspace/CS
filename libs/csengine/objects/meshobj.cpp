@@ -232,6 +232,69 @@ void csMeshWrapper::Draw (iRenderView *rview)
     DrawInt (rview);
 }
 
+#ifdef CS_USE_NEW_RENDERER
+void csMeshWrapper::DrawZ (iRenderView* rview)
+{
+  iMeshWrapper *meshwrap = &scfiMeshWrapper;
+  if (rview->GetCallback ())
+  {
+    rview->CallCallback (CS_CALLBACK_MESH, (void *) &scfiMeshWrapper);
+  }
+
+  int i;
+  // Callback are traversed in reverse order so that they can safely
+  // delete themselves.
+  i = draw_cb_vector.Length ()-1;
+  while (i >= 0)
+  {
+    iMeshDrawCallback* cb = draw_cb_vector.Get (i);
+    if (!cb->BeforeDrawing (meshwrap, rview)) return ;
+    i--;
+  }
+
+  if (meshobj->DrawTest (rview, &movable.scfiMovable))
+  {
+    if (rview->GetCallback ())
+    {
+      rview->CallCallback (CS_CALLBACK_VISMESH, (void *) &scfiMeshWrapper);
+    }
+    else
+    {
+      csTicks lt = csEngine::current_engine->GetLastAnimationTime ();
+      if (lt != 0)
+      {
+        if (lt != last_anim_time)
+        {
+          meshobj->NextFrame (lt,movable.GetPosition ());
+          last_anim_time = lt;
+        }
+      }
+
+      UpdateDeferedLighting (movable.GetFullPosition ());
+      meshobj->DrawZ (rview, &movable.scfiMovable, zbufMode);
+    }
+  }
+
+  for (i = 0; i < children.GetCount (); i++)
+  {
+    iMeshWrapper *spr = children.Get (i);
+    spr->DrawZ (rview);
+  }
+}
+
+void csMeshWrapper::DrawShadow (iRenderView* rview, iLight* light)
+{
+  if (meshobj->DrawTest (rview, &movable.scfiMovable))
+    meshobj->DrawShadow (rview, &movable.scfiMovable, zbufMode);
+}
+
+void csMeshWrapper::DrawLight (iRenderView* rview, iLight* light)
+{
+  if (meshobj->DrawTest (rview, &movable.scfiMovable))
+    meshobj->DrawLight (rview, &movable.scfiMovable, zbufMode);
+}
+#endif // CS_USE_NEW_RENDERER
+
 void csMeshWrapper::DrawInt (iRenderView *rview)
 {
   if (imposter_active && CheckImposterRelevant(rview) )

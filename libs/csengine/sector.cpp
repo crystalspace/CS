@@ -115,6 +115,10 @@ csSector::csSector (csEngine *engine) :
   dynamic_ambient_color.Set(0,0,0);
   meshes.SetSector (this);
   lights.SetSector (this);
+
+#ifdef CS_USE_NEW_RENDERER
+  r3d = CS_QUERY_REGISTRY (csEngine::object_reg, iRender3D);
+#endif // CS_USE_NEW_RENDERER
 }
 
 csSector::~csSector ()
@@ -565,6 +569,7 @@ iPolygon3D *csSector::IntersectSphere (
  */
 void csSector::Draw (iRenderView *rview)
 {
+#ifndef CS_USE_NEW_RENDERER
   draw_busy++;
 
   // Make sure the visibility culler is loaded.
@@ -582,15 +587,12 @@ void csSector::Draw (iRenderView *rview)
     i--;
   }
 
-#ifndef CS_USE_NEW_RENDERER
   G3D_FOGMETHOD fogmethod = G3DFOGMETHOD_NONE;
-#endif // CS_USE_NEW_RENDERER
 
   if (rview->GetCallback ())
   {
     rview->CallCallback (CS_CALLBACK_SECTOR, (void *) &scfiSector);
   }
-#ifndef CS_USE_NEW_RENDERER
   else
   {
     if (HasFog ())
@@ -642,6 +644,7 @@ void csSector::Draw (iRenderView *rview)
    */
   if (meshes.GetCount () > 0)
   {
+#ifndef CS_USE_NEW_RENDERER
     // Mark visible objects.
     culler->VisTest (rview);
     uint32 current_visnr = culler->GetCurrentVisibilityNumber ();
@@ -654,17 +657,10 @@ void csSector::Draw (iRenderView *rview)
 
     if (prev_sector)
     {
-#ifndef CS_USE_NEW_RENDERER
       draw_prev_sector = prev_sector->HasFog () ||
         rview->GetPortalPolygon ()->IsTransparent () ||
         rview->GetPortalPolygon ()->GetPortal ()->GetFlags ().Check (
             CS_PORTAL_WARP);
-#else
-      draw_prev_sector = 
-        rview->GetPortalPolygon ()->IsTransparent () ||
-        rview->GetPortalPolygon ()->GetPortal ()->GetFlags ().Check (
-            CS_PORTAL_WARP);
-#endif // CS_USE_NEW_RENDERER
     }
 
     // First sort everything based on render priority and return
@@ -694,8 +690,40 @@ void csSector::Draw (iRenderView *rview)
     }
 
     delete[] objects;
+#else
+
+	csLightList alllights;
+    csRef<iSectorList> secs = csEngine::current_engine->GetSectors ();
+	int i;
+    for (i = secs->GetCount () - 1; i >= 0; i --)
+	{
+	  csRef<iLightList> seclights = secs->Get(i)->GetLights ();
+      for (int j = seclights->GetCount() - 1; j >= 0; j --)
+	  {
+		// Sphere check against rview before adding it.
+		csSphere s = csSphere (seclights->Get(j)->GetCenter (), 
+		  seclights->Get(j)->GetRadius());
+        if (rview->TestBSphere (rview->GetCamera()->GetTransform(), s))
+	      alllights.Add (seclights->Get(j));
+        // else { light isn't visible anyway }
+	  }
+	}
+
+    r3d->EnableZOffset ();
+    DrawZ (rview);
+    r3d->DisableZOffset ();
+    for (i = alllights.GetCount () - 1; i >= 0; i--) 
+    {
+      r3d->SetObjectToCamera (&rview->GetCamera ()->GetTransform ());
+      r3d->SetLightParameter (0, CS_LIGHTPARAM_POSITION, alllights.Get (i)->GetCenter ());
+      DrawShadow (rview, alllights.Get (i));
+      DrawLight (rview, alllights.Get(i));
+    }
+
+#endif
   }
 
+#ifndef CS_USE_NEW_RENDERER
   // queue all halos in this sector to be drawn.
   for (i = lights.GetCount () - 1; i >= 0; i--)
     // Tell the engine to try to add this light into the halo queue
@@ -705,7 +733,6 @@ void csSector::Draw (iRenderView *rview)
   {
     rview->CallCallback (CS_CALLBACK_SECTOREXIT, (void *) &scfiSector);
   }
-#ifndef CS_USE_NEW_RENDERER
   else
   {
     // Handle the fog, if any
@@ -747,10 +774,107 @@ void csSector::Draw (iRenderView *rview)
       }
     }
   }
-#endif // CS_USE_NEW_RENDERER
 
   draw_busy--;
+#endif // CS_USE_NEW_RENDERER
 }
+
+#ifdef CS_USE_NEW_RENDERER
+void csSector::DrawZ (iRenderView* rview)
+{
+  draw_busy++;
+
+  // Make sure the visibility culler is loaded.
+  GetVisibilityCuller ();
+
+  int i;
+  rview->SetThisSector (&scfiSector);
+
+  i = sector_cb_vector.Length ()-1;
+  while (i >= 0)
+  {
+    iSectorCallback* cb = sector_cb_vector.Get (i);
+    cb->Traverse (&scfiSector, rview);
+    i--;
+  }
+
+  if (rview->GetCallback ())
+  {
+    rview->CallCallback (CS_CALLBACK_SECTOR, (void *) &scfiSector);
+  }
+
+  // Mark visible objects.
+  culler->VisTest (rview);
+  uint32 current_visnr = culler->GetCurrentVisibilityNumber ();
+
+  // get a pointer to the previous sector
+  iSector *prev_sector = rview->GetPreviousSector ();
+
+  // look if meshes from the previous sector should be drawn
+  bool draw_prev_sector = false;
+
+  if (prev_sector) {
+    draw_prev_sector = 
+      rview->GetPortalPolygon ()->IsTransparent () ||
+      rview->GetPortalPolygon ()->GetPortal ()->GetFlags ().Check (
+          CS_PORTAL_WARP);
+  }
+
+  objects = RenderQueues.SortAll (rview, num_objects, current_visnr);
+  for (i = 0; i < num_objects; i ++) {
+    iMeshWrapper *sp = objects[i];
+    if (
+          !prev_sector ||
+          sp->GetMovable ()->GetSectors ()->Find (prev_sector) == -1 ||
+          draw_prev_sector)
+    {
+      // Mesh is not in the previous sector or there is no previous
+      // sector.
+      sp->DrawZ (rview);
+    }
+    else
+    {
+      objects[i] = NULL;
+    }
+  }
+}
+
+void csSector::DrawShadow (iRenderView* rview, iLight* light)
+{
+  for (int i = 0; i < num_objects; i ++) {
+    iMeshWrapper *sp = objects[i];
+    if (sp) 
+    {
+      sp->DrawShadow (rview, light);
+    }
+  }
+}
+
+void csSector::DrawLight (iRenderView* rview, iLight* light)
+{
+  int i;
+  for (i = 0; i < num_objects; i ++) {
+    iMeshWrapper *sp = objects[i];
+    if (sp)
+    {
+      sp->DrawLight (rview, light);
+    }
+  }
+  //delete [] objects;
+   
+  // queue all halos in this sector to be drawn.
+  for (i = lights.GetCount () - 1; i >= 0; i--)
+    // Tell the engine to try to add this light into the halo queue
+    csEngine::current_engine->AddHalo (lights.Get (i)->GetPrivateObject ());
+
+  if (rview->GetCallback ())
+  {
+    rview->CallCallback (CS_CALLBACK_SECTOREXIT, (void *) &scfiSector);
+  }
+
+  draw_busy --;
+}
+#endif // CS_USE_NEW_RENDERER
 
 void csSector::CheckFrustum (iFrustumView *lview)
 {

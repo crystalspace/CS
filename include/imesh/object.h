@@ -87,6 +87,17 @@ struct iMeshObject : public iBase
   virtual bool Draw (iRenderView* rview, iMovable* movable,
   	csZBufMode zbufMode) = 0;
 
+#ifdef CS_USE_NEW_RENDERER
+  virtual bool DrawZ (iRenderView* rview, iMovable* movable,
+  	csZBufMode zbufMode) = 0;
+
+  virtual bool DrawShadow (iRenderView* rview, iMovable* movable,
+  	csZBufMode zbufMode) = 0;
+
+  virtual bool DrawLight (iRenderView* rview, iMovable* movable,
+  	csZBufMode zbufMode) = 0;
+#endif // CS_USE_NEW_RENDERER
+
   /**
    * Register a callback to the mesh object which will be called
    * from within Draw() if the mesh object thinks that the object is

@@ -660,6 +660,70 @@ bool csGenmeshMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   return true;
 }
 
+#ifdef CS_USE_NEW_RENDERER
+bool csGenmeshMeshObject::DrawZ (iRenderView* rview, iMovable* /*movable*/,
+	csZBufMode mode)
+{
+  if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
+
+  iRender3D* r3d = rview->GetGraphics3D ();
+
+  // Prepare for rendering.
+  mesh.z_buf_mode = mode;
+
+  mesh.SetIndexRange (0, factory->GetTriangleCount () * 3);
+  mesh.SetMaterialHandle (NULL);
+  csRef<iStreamSource> stream = SCF_QUERY_INTERFACE (factory, iStreamSource);
+  mesh.SetStreamSource (stream);
+  mesh.SetType (csRenderMesh::MESHTYPE_TRIANGLES);
+  r3d->DrawMesh (&mesh);
+
+  return true;
+}
+
+bool csGenmeshMeshObject::DrawShadow (iRenderView* rview, iMovable* /*movable*/,
+	csZBufMode mode)
+{
+  return true;
+}
+
+bool csGenmeshMeshObject::DrawLight (iRenderView* rview, iMovable* /*movable*/,
+	csZBufMode mode)
+{
+  iMaterialWrapper* mater = material;
+  if (!mater) mater = factory->GetMaterialWrapper ();
+  if (!mater)
+  {
+    printf ("INTERNAL ERROR: mesh used without material!\n");
+    return false;
+  }
+  iMaterialHandle* mat = mater->GetMaterialHandle ();
+  if (!mat)
+  {
+    printf ("INTERNAL ERROR: mesh used without valid material handle!\n");
+    return false;
+  }
+
+  iRender3D* r3d = rview->GetGraphics3D ();
+
+  mater->Visit ();
+
+  // Prepare for rendering.
+  mesh.z_buf_mode = CS_ZBUF_TEST;
+  mesh.mixmode = CS_FX_ADD;
+
+  mesh.SetIndexRange (0, factory->GetTriangleCount () * 3);
+  mesh.SetMaterialHandle (mater->GetMaterialHandle ());
+  csRef<iStreamSource> stream = SCF_QUERY_INTERFACE (factory, iStreamSource);
+  mesh.SetStreamSource (stream);
+  mesh.SetType (csRenderMesh::MESHTYPE_TRIANGLES);
+  r3d->DrawMesh (&mesh);
+
+  return true;
+}
+#endif // CS_USE_NEW_RENDERER
+
+
 void csGenmeshMeshObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
 {
   bbox = factory->GetObjectBoundingBox ();
@@ -820,7 +884,7 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
   color_buffer = NULL;
   index_buffer = NULL;
 
-  csRef<iRender3D> r3d (CS_QUERY_REGISTRY (object_reg, iRender3D));
+  r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
   vertex_name = r3d->GetStringContainer ()->Request ("vertices");
   texel_name = r3d->GetStringContainer ()->Request ("texture coordinates");
   normal_name = r3d->GetStringContainer ()->Request ("normals");
@@ -932,7 +996,6 @@ void csGenmeshMeshObjectFactory::SetupFactory ()
 #ifdef CS_USE_NEW_RENDERER
 iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
 {
-  csRef<iRender3D> r3d (CS_QUERY_REGISTRY (object_reg, iRender3D));
   if (name == vertex_name) {
     if (mesh_vertices_dirty_flag) {
       vertex_buffer = r3d->GetBufferManager ()->GetBuffer (
@@ -991,6 +1054,26 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
       mesh_triangle_dirty_flag = false;
     }
     return index_buffer;
+  }
+  return NULL;
+}
+
+int csGenmeshMeshObjectFactory::GetComponentCount (csStringID name)
+{
+  if (name == vertex_name) {
+    return 3;
+  }
+  if (name == texel_name) {
+    return 2;
+  }
+  if (name == normal_name) {
+    return 3;
+  }
+  if (name == color_name) {
+    return 4;
+  }
+  if (name == index_name) {
+    return 1;
   }
   return NULL;
 }

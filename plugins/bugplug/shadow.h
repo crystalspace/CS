@@ -118,6 +118,11 @@ public:
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual void UpdateLighting (iLight**, int, iMovable*) { }
   virtual bool Draw (iRenderView*, iMovable*, csZBufMode);
+#ifdef CS_USE_NEW_RENDERER
+  virtual bool DrawZ (iRenderView*, iMovable*, csZBufMode) { return false; }
+  virtual bool DrawShadow (iRenderView*, iMovable*, csZBufMode) { return false; }
+  virtual bool DrawLight (iRenderView*, iMovable*, csZBufMode) { return false; }
+#endif // CS_USE_NEW_RENDERER
   virtual void SetVisibleCallback (iMeshObjectDrawCallback*) { }
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const { return NULL; }
   virtual void NextFrame (csTicks, const csVector3& /*pos*/) { }

@@ -353,6 +353,17 @@ public:
    */
   void Draw (iRenderView* rview);
 
+#ifdef CS_USE_NEW_RENDERER
+  /**
+   * Draw the zpass for the object.  If this object doesn't use lighting
+   * then it can be drawn fully here.
+   */
+  void DrawZ (iRenderView* rview);
+  /// This pass sets up the shadow stencil buffer
+  void DrawShadow (iRenderView* rview, iLight* light);
+  /// This pass draws the diffuse lit mesh
+  void DrawLight (iRenderView* rview, iLight* light);
+#endif
   /// Returns true if this object wants to die.
   bool WantToDie () { return meshobj->WantToDie (); }
 
@@ -656,6 +667,20 @@ public:
     {
       scfParent->Draw (rview);
     }
+#ifdef CS_USE_NEW_RENDERER
+    virtual void DrawZ (iRenderView* rview) 
+	{
+	  scfParent->DrawZ (rview);
+	}
+	virtual void DrawShadow (iRenderView* rview, iLight* light)
+	{
+	  scfParent->DrawShadow (rview, light);
+	}
+	virtual void DrawLight (iRenderView* rview, iLight* light)
+	{
+	  scfParent->DrawLight (rview, light);
+	}
+#endif
     virtual bool WantToDie ()
     {
       return scfParent->WantToDie ();

@@ -102,6 +102,16 @@ private:
    */
   csSectorMeshList meshes;
 
+#ifdef CS_USE_NEW_RENDERER  
+  /// num_objects in this sector
+  int num_objects;
+
+  /// sorted list of MeshObjects, saved for future render passes
+  iMeshWrapper **objects;
+
+  csRef<iRender3D> r3d;
+#endif
+
   /**
    * The same meshes above but each mesh in their own render priority
    * queue. This is a vector of vectors.
@@ -292,6 +302,14 @@ public:
    * Draw the sector in the given view and with the given transformation.
    */
   void Draw (iRenderView* rview);
+#ifdef CS_USE_NEW_RENDERER
+  /// First pass of the Draw
+  void DrawZ (iRenderView* rview);
+  /// Second pass
+  void DrawShadow (iRenderView* rview, iLight *light);
+  /// Third pass
+  void DrawLight (iRenderView* rview, iLight *light);
+#endif
 
   //----------------------------------------------------------------------
   // Utility Functions
@@ -499,6 +517,14 @@ public:
   	csVector3& new_position, bool& mirror, bool only_portals = false);
     virtual void Draw (iRenderView* rview)
       { scfParent->Draw (rview); }
+#ifdef CS_USE_NEW_RENDERER
+    virtual void DrawZ (iRenderView* rview)
+      { scfParent->DrawZ (rview); }
+    virtual void DrawShadow (iRenderView* rview, iLight* light)
+      { scfParent->DrawShadow (rview, light); }
+    virtual void DrawLight (iRenderView* rview, iLight* light)
+      { scfParent->DrawLight (rview, light); }
+#endif // CS_USE_NEW_RENDERER
     virtual void SetSectorCallback (iSectorCallback* cb)
     {
       scfParent->SetSectorCallback (cb);

@@ -1222,6 +1222,23 @@ public:
     {
       return scfParent->Draw (rview, movable, zMode);
     }
+#ifdef CS_USE_NEW_RENDERER
+    virtual bool DrawZ (iRenderView* rview, iMovable* movable,
+    	csZBufMode zMode)
+    {
+      return false;
+    }
+    virtual bool DrawShadow (iRenderView* rview, iMovable* movable,
+    	csZBufMode zMode)
+    {
+      return false;
+    }
+    virtual bool DrawLight (iRenderView* rview, iMovable* movable,
+    	csZBufMode zMode)
+    {
+      return false;
+    }
+#endif // CS_USE_NEW_RENDERER
     virtual void SetVisibleCallback (iMeshObjectDrawCallback* /*cb*/) { }
     virtual iMeshObjectDrawCallback* GetVisibleCallback () const
     { return NULL; }
