@@ -24,6 +24,8 @@
 
  
 %%
+component                                        return TOKEN_COMPONENT;
+is                                               return TOKEN_IS;
 skin                    /* printf("skin-");   */ return TOKEN_SKIN;
 window                  /* printf("window-"); */ return TOKEN_WINDOW;
 for                     /* printf("for-");    */ return TOKEN_FOR;

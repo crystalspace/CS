@@ -11,5 +11,7 @@ typedef union {
 #define	TOKEN_FOR	261
 #define	TOKEN_WINDOW	262
 #define	TOKEN_FROM	263
-#define	NEG	264
+#define	TOKEN_COMPONENT	264
+#define	TOKEN_IS	265
+#define	NEG	266
 

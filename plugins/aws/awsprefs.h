@@ -40,6 +40,7 @@ const unsigned char KEY_STR  = 1;
 const unsigned char KEY_RECT = 2;
 const unsigned char KEY_WIN  = 3;
 const unsigned char KEY_SKIN = 4;
+const unsigned char KEY_COMPONENT = 5;
  
 /// Abstract key interface
 class awsKey
@@ -149,6 +150,20 @@ public:
   /// Removes a specific item from the container
   void Remove(awsKey *key)
   { children.RemoveItem(key); }
+
+  /// Consumes an entire list by moving all of it's member's to this one, and removing them from it.
+  void Consume(awsKeyContainer *c)
+  {
+     void *p = c->children.GetFirstItem();
+
+     while(p)
+     {
+        children.AddItem(p);
+        c->children.RemoveItem();
+
+        p=c->children.GetNextItem();
+     }
+  }
 };
 
 class awsSkinNode : public awsKey, awsKeyContainer
@@ -160,7 +175,22 @@ public:
     /// So that we know this is a skin node
     virtual unsigned char Type() 
     { return KEY_SKIN; }
+};
+
+class awsComponentNode : public awsKey, awsKeyContainer
+{
+  /// The type of component, like "Radio Button", "Check Box", etc.
+  iString *comp_type;
+
+public:  
+    awsComponentNode(iString *name, iString *component_type):awsKey(name), comp_type(component_type) {};
+    virtual ~awsComponentNode() {};
+    
+    /// So that we know this is a skin node
+    virtual unsigned char Type() 
+    { return KEY_COMPONENT; }
 }; 
+
 
 //////////////////////////////////  Preference Manager ////////////////////////////////////////////////////////////////
 

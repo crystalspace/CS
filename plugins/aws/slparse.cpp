@@ -18,7 +18,9 @@
 #define	TOKEN_FOR	261
 #define	TOKEN_WINDOW	262
 #define	TOKEN_FROM	263
-#define	NEG	264
+#define	TOKEN_COMPONENT	264
+#define	TOKEN_IS	265
+#define	NEG	266
 
 
 
@@ -55,26 +57,26 @@ static awsKeyContainer kcont;
 
 
 
-#define	YYFINAL		57
+#define	YYFINAL		88
 #define	YYFLAG		-32768
-#define	YYNTBASE	24
+#define	YYNTBASE	26
 
-#define YYTRANSLATE(x) ((unsigned)(x) <= 264 ? yytranslate[x] : 33)
+#define YYTRANSLATE(x) ((unsigned)(x) <= 266 ? yytranslate[x] : 37)
 
 static const char yytranslate[] = {     0,
-     2,     2,     2,     2,     2,     2,     2,     2,     2,    17,
+     2,     2,     2,     2,     2,     2,     2,     2,     2,    19,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-     2,     2,     2,     2,     2,     2,     2,     2,     2,    20,
-    22,    13,    12,    21,    11,     2,    14,     2,     2,     2,
-     2,     2,     2,     2,     2,     2,     2,    19,     2,     2,
-    10,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+     2,     2,     2,     2,     2,     2,     2,     2,     2,    22,
+    24,    15,    14,    23,    13,     2,    16,     2,     2,     2,
+     2,     2,     2,     2,     2,     2,     2,    21,     2,     2,
+    12,     2,     2,     2,     2,     2,     2,     2,     2,     2,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-     2,     2,     2,    16,     2,     2,     2,     2,     2,     2,
+     2,     2,     2,    18,     2,     2,     2,     2,     2,     2,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-     2,     2,    23,     2,    18,     2,     2,     2,     2,     2,
+     2,     2,    25,     2,    20,     2,     2,     2,     2,     2,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -88,35 +90,39 @@ static const char yytranslate[] = {     0,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
      2,     2,     2,     2,     2,     1,     3,     4,     5,     6,
-     7,     8,     9,    15
+     7,     8,     9,    10,    11,    17
 };
 
 #if YYDEBUG != 0
 static const short yyprhs[] = {     0,
      0,     1,     4,     6,     8,    10,    13,    17,    31,    35,
-    37,    40,    48,    52,    54,    57,    63,    65,    69,    73,
-    77,    81,    84
+    43,    45,    48,    52,    66,    70,    78,    80,    83,    91,
+    95,    97,   100,   106,   108,   112,   116,   120,   124,   127
 };
 
 static const short yyrhs[] = {    -1,
-    24,    25,     0,    17,     0,    31,     0,    28,     0,     1,
-    18,     0,     5,    19,     4,     0,     5,    19,    20,    32,
-    21,    32,    22,    11,    20,    32,    21,    32,    22,     0,
-     5,    19,     5,     0,    26,     0,    27,    26,     0,     8,
-     4,     9,     4,    23,    27,    18,     0,     5,    19,     4,
-     0,    29,     0,    30,    29,     0,     6,     4,    23,    30,
-    18,     0,     3,     0,    32,    12,    32,     0,    32,    11,
-    32,     0,    32,    13,    32,     0,    32,    14,    32,     0,
-    11,    32,     0,    20,    32,    22,     0
+    26,    27,     0,    19,     0,    35,     0,    32,     0,     1,
+    20,     0,     5,    21,     4,     0,     5,    21,    22,    36,
+    23,    36,    24,    13,    22,    36,    23,    36,    24,     0,
+     5,    21,     5,     0,    10,     4,    11,     4,    25,    29,
+    20,     0,    28,     0,    29,    28,     0,     5,    21,     4,
+     0,     5,    21,    22,    36,    23,    36,    24,    13,    22,
+    36,    23,    36,    24,     0,     5,    21,     5,     0,    10,
+     4,    11,     4,    25,    29,    20,     0,    30,     0,    31,
+    30,     0,     8,     4,     9,     4,    25,    31,    20,     0,
+     5,    21,     4,     0,    33,     0,    34,    33,     0,     6,
+     4,    25,    34,    20,     0,     3,     0,    36,    14,    36,
+     0,    36,    13,    36,     0,    36,    15,    36,     0,    36,
+    16,    36,     0,    13,    36,     0,    22,    36,    24,     0
 };
 
 #endif
 
 #if YYDEBUG != 0
 static const short yyrline[] = { 0,
-    56,    57,    60,    61,    62,    63,    70,    71,    72,    76,
-    77,    80,    89,    92,    93,    96,   103,   104,   105,   106,
-   107,   108,   109
+    58,    59,    62,    63,    64,    65,    72,    73,    74,    75,
+    78,    79,    83,    84,    85,    86,    89,    90,    93,   102,
+   105,   106,   109,   116,   117,   118,   119,   120,   121,   122
 };
 #endif
 
@@ -125,72 +131,91 @@ static const short yyrline[] = { 0,
 
 static const char * const yytname[] = {   "$","error","$undefined.","TOKEN_NUM",
 "TOKEN_STR","TOKEN_ATTR","TOKEN_SKIN","TOKEN_FOR","TOKEN_WINDOW","TOKEN_FROM",
-"'='","'-'","'+'","'*'","'/'","NEG","'^'","'\\n'","'}'","':'","'('","','","')'",
-"'{'","input","line","window_item","window_item_list","window","skin_item","skin_item_list",
-"skin","exp", NULL
+"TOKEN_COMPONENT","TOKEN_IS","'='","'-'","'+'","'*'","'/'","NEG","'^'","'\\n'",
+"'}'","':'","'('","','","')'","'{'","input","line","component_item","component_item_list",
+"window_item","window_item_list","window","skin_item","skin_item_list","skin",
+"exp", NULL
 };
 #endif
 
 static const short yyr1[] = {     0,
-    24,    24,    25,    25,    25,    25,    26,    26,    26,    27,
-    27,    28,    29,    30,    30,    31,    32,    32,    32,    32,
-    32,    32,    32
+    26,    26,    27,    27,    27,    27,    28,    28,    28,    28,
+    29,    29,    30,    30,    30,    30,    31,    31,    32,    33,
+    34,    34,    35,    36,    36,    36,    36,    36,    36,    36
 };
 
 static const short yyr2[] = {     0,
-     0,     2,     1,     1,     1,     2,     3,    13,     3,     1,
-     2,     7,     3,     1,     2,     5,     1,     3,     3,     3,
-     3,     2,     3
+     0,     2,     1,     1,     1,     2,     3,    13,     3,     7,
+     1,     2,     3,    13,     3,     7,     1,     2,     7,     3,
+     1,     2,     5,     1,     3,     3,     3,     3,     2,     3
 };
 
 static const short yydefact[] = {     1,
      0,     0,     0,     0,     3,     2,     5,     4,     6,     0,
-     0,     0,     0,     0,    14,     0,     0,     0,    16,    15,
-     0,    13,     0,    10,     0,     0,    12,    11,     7,     9,
-     0,    17,     0,     0,     0,    22,     0,     0,     0,     0,
-     0,     0,    23,    19,    18,    20,    21,     0,     0,     0,
-     0,     0,     0,     0,     8,     0,     0
+     0,     0,     0,     0,    21,     0,     0,     0,    23,    22,
+     0,    20,     0,     0,    17,     0,     0,     0,    19,    18,
+    13,    15,     0,     0,    24,     0,     0,     0,     0,    29,
+     0,     0,     0,     0,     0,     0,     0,    30,    26,    25,
+    27,    28,     0,     0,     0,    11,     0,     0,     0,     0,
+    16,    12,     0,     7,     9,     0,     0,     0,     0,     0,
+     0,     0,     0,     0,     0,     0,     0,     0,    10,    14,
+     0,     0,     0,     0,     0,     8,     0,     0
 };
 
 static const short yydefgoto[] = {     1,
-     6,    24,    25,     7,    15,    16,     8,    35
+     6,    56,    57,    25,    26,     7,    15,    16,     8,    38
 };
 
 static const short yypact[] = {-32768,
-    11,   -14,     6,    25,-32768,-32768,-32768,-32768,-32768,    -9,
-    30,    35,    37,    33,-32768,    -3,    28,    49,-32768,-32768,
-    50,-32768,    43,-32768,    -2,    18,-32768,-32768,-32768,-32768,
-    10,-32768,    10,    10,    36,-32768,    13,    10,    10,    10,
-    10,    10,-32768,    23,    23,-32768,-32768,    20,    45,    44,
-    10,    47,    10,    32,-32768,    63,-32768
+    12,   -17,    13,    15,-32768,-32768,-32768,-32768,-32768,   -20,
+    19,    34,    37,    22,-32768,     6,    36,    41,-32768,-32768,
+    55,-32768,    26,    45,-32768,    17,    11,    64,-32768,-32768,
+-32768,-32768,     1,    73,-32768,     1,     1,    74,    66,-32768,
+    38,     1,     1,     1,     1,     1,    71,-32768,    48,    48,
+-32768,-32768,    42,    59,    75,-32768,    24,    46,    20,    81,
+-32768,-32768,    84,-32768,-32768,     1,    91,     1,    85,    68,
+    89,     1,    71,     1,    54,    30,    58,    83,-32768,-32768,
+    87,     1,   100,     1,    70,-32768,   107,-32768
 };
 
 static const short yypgoto[] = {-32768,
--32768,    40,-32768,-32768,    51,-32768,-32768,   -33
+-32768,   -55,    44,    92,-32768,-32768,    94,-32768,-32768,   -36
 };
 
 
-#define	YYLAST		68
+#define	YYLAST		123
 
 
-static const short yytable[] = {    36,
-    37,    14,    23,     9,    44,    45,    46,    47,    48,    10,
-    56,     2,    32,    12,    19,    27,     3,    52,     4,    54,
-    33,    29,    30,    38,    39,    40,    41,     5,    11,    34,
-    38,    39,    40,    41,    43,    40,    41,    31,    13,    14,
-    17,    49,    38,    39,    40,    41,    38,    39,    40,    41,
-    21,    18,    22,    55,    23,    50,    42,    38,    39,    40,
-    41,    26,    57,    51,    28,     0,    20,    53
+static const short yytable[] = {    40,
+    41,    62,     9,    35,    12,    49,    50,    51,    52,    53,
+    14,    87,     2,    36,    31,    32,    10,     3,    11,     4,
+    62,    23,    37,    64,    65,    19,    24,    13,    54,    69,
+     5,    71,    33,    55,    54,    75,    29,    77,    14,    55,
+    17,    66,    18,    61,    22,    83,    27,    85,    28,    79,
+    42,    43,    44,    45,    42,    43,    44,    45,    63,    23,
+    21,    48,    44,    45,    24,    58,    42,    43,    44,    45,
+    42,    43,    44,    45,    34,    54,    39,    78,    60,    59,
+    55,    80,    42,    43,    44,    45,    42,    43,    44,    45,
+    47,    67,    73,    86,    70,    81,    46,    42,    43,    44,
+    45,    42,    43,    44,    45,    68,    88,    72,    82,    20,
+     0,    74,    42,    43,    44,    45,    76,    30,     0,     0,
+     0,     0,    84
 };
 
-static const short yycheck[] = {    33,
-    34,     5,     5,    18,    38,    39,    40,    41,    42,     4,
-     0,     1,     3,    23,    18,    18,     6,    51,     8,    53,
-    11,     4,     5,    11,    12,    13,    14,    17,     4,    20,
-    11,    12,    13,    14,    22,    13,    14,    20,     9,     5,
-     4,    22,    11,    12,    13,    14,    11,    12,    13,    14,
-    23,    19,     4,    22,     5,    11,    21,    11,    12,    13,
-    14,    19,     0,    20,    25,    -1,    16,    21
+static const short yycheck[] = {    36,
+    37,    57,    20,     3,    25,    42,    43,    44,    45,    46,
+     5,     0,     1,    13,     4,     5,     4,     6,     4,     8,
+    76,     5,    22,     4,     5,    20,    10,     9,     5,    66,
+    19,    68,    22,    10,     5,    72,    20,    74,     5,    10,
+     4,    22,    21,    20,     4,    82,    21,    84,     4,    20,
+    13,    14,    15,    16,    13,    14,    15,    16,    13,     5,
+    25,    24,    15,    16,    10,    24,    13,    14,    15,    16,
+    13,    14,    15,    16,    11,     5,     4,    24,     4,    21,
+    10,    24,    13,    14,    15,    16,    13,    14,    15,    16,
+    25,    11,    25,    24,     4,    13,    23,    13,    14,    15,
+    16,    13,    14,    15,    16,    22,     0,    23,    22,    16,
+    -1,    23,    13,    14,    15,    16,    73,    26,    -1,    -1,
+    -1,    -1,    23
 };
 #define YYPURE 1
 
@@ -747,48 +772,69 @@ case 6:
 { yyerrok;      ;
     break;}
 case 7:
-{               ;
+{ yyval.key = new awsStringKey(new scfString(yyvsp[-2].str), new scfString(yyvsp[0].str)); ;
     break;}
 case 8:
-{               ;
+{ yyval.key = new awsRectKey(new scfString(yyvsp[-12].str), csRect(yyvsp[-9].val, yyvsp[-7].val, yyvsp[-3].val, yyvsp[-1].val)); ;
     break;}
 case 9:
-{               ;
+{ yyval.key = new awsStringKey(new scfString(yyvsp[-2].str), new scfString(yyvsp[0].str)); ;
     break;}
 case 10:
-{ kcont.Add(yyvsp[0].key); ;
+{ awsComponentNode *cn = new awsComponentNode(new scfString(yyvsp[-5].str), new scfString(yyvsp[-3].str)); ((awsKeyContainer*)cn)->Consume(&kcont); yyval.key=cn; ;
     break;}
 case 11:
 { kcont.Add(yyvsp[0].key); ;
     break;}
+case 12:
+{ kcont.Add(yyvsp[0].key); ;
+    break;}
 case 13:
-{ yyval.key = new awsStringKey(new scfString(yyvsp[-2].str), new scfString(yyvsp[0].str));  printf("  item: %s: %s\n", yyvsp[-2].str, yyvsp[0].str);  ;
+{ yyval.key = new awsStringKey(new scfString(yyvsp[-2].str), new scfString(yyvsp[0].str));          ;
     break;}
 case 14:
-{ kcont.Add(yyvsp[0].key); ;
+{ yyval.key = new awsRectKey(new scfString(yyvsp[-12].str), csRect(yyvsp[-9].val, yyvsp[-7].val, yyvsp[-3].val, yyvsp[-1].val));     ;
     break;}
 case 15:
-{ kcont.Add(yyvsp[0].key); ;
+{ yyval.key = new awsStringKey(new scfString(yyvsp[-2].str), new scfString(yyvsp[0].str));          ;
+    break;}
+case 16:
+{ awsComponentNode *cn = new awsComponentNode(new scfString(yyvsp[-5].str), new scfString(yyvsp[-3].str)); ((awsKeyContainer*)cn)->Consume(&kcont); yyval.key=cn; ;
     break;}
 case 17:
-{ yyval.val = yyvsp[0].val;      ;
+{ kcont.Add(yyvsp[0].key); ;
     break;}
 case 18:
-{ yyval.val = yyvsp[-2].val + yyvsp[0].val; ;
-    break;}
-case 19:
-{ yyval.val = yyvsp[-2].val - yyvsp[0].val; ;
+{ kcont.Add(yyvsp[0].key); ;
     break;}
 case 20:
-{ yyval.val = yyvsp[-2].val * yyvsp[0].val; ;
+{ yyval.key = new awsStringKey(new scfString(yyvsp[-2].str), new scfString(yyvsp[0].str)); ;
     break;}
 case 21:
-{ yyval.val = yyvsp[-2].val / yyvsp[0].val; ;
+{ kcont.Add(yyvsp[0].key); ;
     break;}
 case 22:
+{ kcont.Add(yyvsp[0].key); ;
+    break;}
+case 24:
+{ yyval.val = yyvsp[0].val;      ;
+    break;}
+case 25:
+{ yyval.val = yyvsp[-2].val + yyvsp[0].val; ;
+    break;}
+case 26:
+{ yyval.val = yyvsp[-2].val - yyvsp[0].val; ;
+    break;}
+case 27:
+{ yyval.val = yyvsp[-2].val * yyvsp[0].val; ;
+    break;}
+case 28:
+{ yyval.val = yyvsp[-2].val / yyvsp[0].val; ;
+    break;}
+case 29:
 { yyval.val = -yyvsp[0].val;     ;
     break;}
-case 23:
+case 30:
 { yyval.val = yyvsp[-1].val;      ;
     break;}
 }
