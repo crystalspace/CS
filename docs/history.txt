@@ -18,6 +18,10 @@ chronological order.
 	- res fixed OpenGL 2D Blit() to work when no render target is set.
 	- res added a Blit() test to g2dtest.
 	- res added a custom cursor test to g2dtest.
+	- res changed the custom cursor plugin so a keycolor isn't mandatory
+	  any more for a cursor.
+	- res changed iCursor->ParseConfigFile () to accept an iConfigFile*
+	  instead of a VFS file name.
 4-Oct-2004
 	- res fixed xmlshader to correctly deal with shader conditionals 
 	  in text.

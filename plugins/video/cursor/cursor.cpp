@@ -124,16 +124,7 @@ bool csCursor::ParseConfigFile (iConfigFile* ini)
       ignorelist.Push (name);
       continue;
     }
-    else /*if (!ini->KeyExists(csString(prefix).Append(name).Append(".keycolor")))
-    {
-      csReport (reg, CS_REPORTER_SEVERITY_WARNING, CURSOR_SCF_NAME,
-            "No keycolor defined for cursor %s, ignoring", 
-            name.GetData());
-
-      ignorelist.Push (name);
-      continue;
-    }
-    else*/
+    else 
     {
       // Temporary number storage
       int x, y, z;
