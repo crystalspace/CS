@@ -123,6 +123,9 @@ and @emph{lib} directories to the global MSVC options, so MSVC can see them.
 
 @uref{http://www.libsdl.org}
 
+Also remember to copy the @emph{SDL.dll} into the @emph{CS\} root directory
+or at it to your systems path before using the SDL2D canvas.
+
 For instructon on using a specific canvas including
 the @emph{sdl2d} canvas @ref{Common Command Line Options}
 
