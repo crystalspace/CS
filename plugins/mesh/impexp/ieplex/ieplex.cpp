@@ -100,7 +100,6 @@ csModelConverterMultiplexer::~csModelConverterMultiplexer ()
 
 bool csModelConverterMultiplexer::Initialize (iObjectRegistry *object_reg)
 {
-  int i, j;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   // collect converter plugins
