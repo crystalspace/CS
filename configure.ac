@@ -598,11 +598,19 @@ CS_EMIT_BUILD_FLAGS([how to disable C++ exceptions],
 # Check if the linker recognizes "-multiply_defined suppress".  This is
 # required for MacOS/X 10.1 to avoid warning messages when linking a program
 # with "-framework Foundation" if that program does not actually employ any
-# Objective-C.
+# Objective-C. Note that we first attempt the uglier equivalent
+# "-Wl,-multiply_defined,suppress" in order to make life simpler for external
+# projects using cs-config (which reports this linker option in response to
+# --libs) in conjunction with GNU libtool. The problem with "-multiply_defined
+# suppress" for GNU libtool users is that libtool re-orders linker arguments,
+# not realizing that "suppress" must follow immediately after
+# "-multiply_defined". The uglier equivalent does not suffer from this problem
+# in the hands of libtool since it contains no whitespace.
 #------------------------------------------------------------------------------
 CS_EMIT_BUILD_FLAGS([if -multiply_defined suppress is needed],
     [cs_cv_prog_link_suppress_multiple],
-    [CS_CREATE_TUPLE([], [-multiply_defined suppress])],
+    [CS_CREATE_TUPLE([], [-Wl,-multiply_defined,suppress]) \
+    CS_CREATE_TUPLE([], [-multiply_defined suppress])],
     [], [COMPILER.LFLAGS], [+])
 
 

@@ -10219,7 +10219,14 @@ fi
 # Check if the linker recognizes "-multiply_defined suppress".  This is
 # required for MacOS/X 10.1 to avoid warning messages when linking a program
 # with "-framework Foundation" if that program does not actually employ any
-# Objective-C.
+# Objective-C. Note that we first attempt the uglier equivalent
+# "-Wl,-multiply_defined,suppress" in order to make life simpler for external
+# projects using cs-config (which reports this linker option in response to
+# --libs) in conjunction with GNU libtool. The problem with "-multiply_defined
+# suppress" for GNU libtool users is that libtool re-orders linker arguments,
+# not realizing that "suppress" must follow immediately after
+# "-multiply_defined". The uglier equivalent does not suffer from this problem
+# in the hands of libtool since it contains no whitespace.
 #------------------------------------------------------------------------------
 echo "$as_me:$LINENO: checking if -multiply_defined suppress is needed" >&5
 echo $ECHO_N "checking if -multiply_defined suppress is needed... $ECHO_C" >&6
@@ -10238,7 +10245,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_build_ok=no
 
 
-    for cs_build_item in `echo @@-multiply_defined suppress@ | sed 'y% %#%'`
+    for cs_build_item in `echo @@-Wl,-multiply_defined,suppress@ | sed 'y% %#%'` \
+    `echo @@-multiply_defined suppress@ | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
