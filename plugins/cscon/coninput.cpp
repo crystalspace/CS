@@ -173,7 +173,7 @@ bool csConsoleInput::HandleEvent(csEvent &event)
 	    line->Append((char) event.Key.Code);
 #ifdef CS_DEBUG
 	  else if(cursor>line->Length())
-	    piSystem->Printf(MSG_FATAL_ERROR, "csConsoleInput:  Cursor past end of line!\n");
+	    piSystem->Printf(MSG_FATAL_ERROR, "csConsoleInput:  Cursor past end of line! cursor at %d, line len = %d\n", cursor,line->Length());
 #endif
 	  else
 	    line->Insert(cursor, (char) event.Key.Code);
@@ -183,7 +183,9 @@ bool csConsoleInput::HandleEvent(csEvent &event)
 	}
 	if(piConsole&&echo) {
 	  csString put((char) event.Key.Code);
+//	  char p[5]; sprintf(p, "%d", event.Key.Code );
 	  piConsole->PutText(put.GetData());
+//	  piConsole->PutText(p);
 	}
       }
     }

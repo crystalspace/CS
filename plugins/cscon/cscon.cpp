@@ -279,6 +279,7 @@ void csConsole::Draw(csRect *area)
     }
 
     cy_pix = (cy * height) + size.ymin;
+    cx_pix += size.xmin;
 
     line.Set(cx_pix, cy_pix, cx_pix + piG2D->GetTextWidth(font, "_"), cy_pix + height);
     piG2D->SetClipRect(line.xmin, line.ymin, line.xmax, line.ymax);
@@ -286,10 +287,10 @@ void csConsole::Draw(csRect *area)
     // Draw the appropriate cursor
     switch(cursor) {
     case csConLineCursor:
-      piG2D->DrawLine(cx_pix + 1, (cy * height) + (height-3), line.xmax, (cy * height) + (height-3), fg);
+      piG2D->DrawLine(cx_pix + 1, cy_pix + (height-3), line.xmax, cy_pix + (height-3), fg);
       break;
     case csConBlockCursor:
-      piG2D->DrawBox(cx_pix + 1, (cy * height) + 1, line.xmax - 1, (cy * height) + (height-1), fg);
+      piG2D->DrawBox(cx_pix + 1, cy_pix + 1, line.xmax - 1, cy_pix + (height-1), fg);
       break;
     case csConCustomCursor:
 #ifdef CS_DEBUG
