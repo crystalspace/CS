@@ -29,12 +29,12 @@
 #include "csengine/cscolor.h"
 #include "csengine/texture.h"
 #include "csengine/tranman.h"
+#include "csengine/triangle.h"
 #include "igraph3d.h"
 
 class Dumper;
 class csTextureList;
 class csTextureHandle;
-class csTriangleMesh;
 class csLightHitsSprite;
 class csSkeleton;
 class csSkeletonState;
@@ -52,18 +52,22 @@ private:
   csVector2* texels;
   csVector3* normals;
   char* name;
-  int max_vertex;
-  int max_texel;
-  int max_normal;
+
   /// Bounding box in object space for this frame.
   csBox3 box;
 
 public:
   ///
-  csFrame (int max_vertices);
+  csFrame ();
   ///
   virtual ~csFrame ();
 
+  ///
+  csVector3* GetVertices () { return vertices; }
+  ///
+  csVector3& GetVertex (int i) { return vertices[i]; }
+  ///
+  void SetVertices (csVector3 * v) { vertices = v;}
   ///
   void SetVertex (int i, float x, float y, float z)
   {
@@ -71,7 +75,6 @@ public:
     vertices[i].y = y;
     vertices[i].z = z;
   }
-
   ///
   void SetVertex (int i, const csVector3& v)
   {
@@ -81,55 +84,29 @@ public:
   }
 
   ///
+  csVector2* GetTexels () { return texels; }
+  ///
+  csVector2& GetTexel (int i) { return texels[i]; }
+  ///
+  void SetTexels (csVector2 * t) { texels = t;}
+  ///
   void SetTexel (int i, float u, float v)
   {
     texels[i].x = u;
     texels[i].y = v;
   }
 
+  /// Return true if this frame has calculated normals.
+  bool HasNormals () { return normals != NULL; }
+  ///
+  csVector3& GetNormal (int i) { return normals[i]; }
+  ///
+  void SetNormals (csVector3 * n) { normals = n;}
+
   ///
   void SetName (char * n);
   ///
   char* GetName () { return name; }
-
-  ///
-  csVector3& GetVertex (int i) { return vertices[i]; }
-  ///
-  csVector3* GetVertices () { return vertices; }
-  ///
-  csVector2& GetTexel (int i) { return texels[i]; }
-  ///
-  csVector2* GetTexels () { return texels; }
-  ///
-  void SetTexels (csVector2 * t) { texels = t;}
-
-  ///
-  csVector3& GetNormal (int i) { return normals[i]; }
-  /// Return true if this frame has calculated normals.
-  bool HasNormals () { return normals != NULL; }
-
-  ///
-  void AddVertex (int num_vertices);
-  ///
-  int GetMaxVertices () { return max_vertex; }
-
-  /**
-   * Reorder vertices in this frame according to a mapping.
-   * This is used after LOD precalculation to remap the vertices
-   * in a more efficient ordering.
-   * The index to 'mapping' is the old vertex number. The
-   * result is the new number.
-   */
-  void RemapVertices (int* mapping, int num_vertices);
-
-  /**
-   * Compute all normals in this frame given the
-   * mesh which connects the vertices in the frame.
-   * The vertex array is also given. Note that the vertex
-   * array from the frame is not used because it is possible
-   * that the vertices are computed using a skeleton.
-   */
-  void ComputeNormals (csTriangleMesh* mesh, csVector3* object_verts, int num_vertices);
 
   /**
    * Compute the object space bounding box for this frame.
@@ -195,18 +172,6 @@ private:
   /// Texture handle as returned by iTextureManager.
   csTextureHandle* cstxt;
 
-  /// The vertices.
-  int num_vertices;
-  int num_texels;
-  int num_normals;
-
-  /// The triangles.
-  csTriangleMesh* base_mesh;
-  /// Optimized animation mesh
-  csTriangleMesh* anim_mesh;
-  /// alternate vertex smoothing scheme mesh
-  csTriangleMesh* norm_mesh;
-
   /// An optional skeleton.
   csSkeleton* skeleton;
 
@@ -224,7 +189,28 @@ private:
   /// The actions (a vector of csSpriteAction objects)
   csNamedObjVector actions;
 
+  /// The base mesh is also the texture alignment mesh.
+  csTriangleMesh* texel_mesh;
+  csVector texels;
+  int num_texels;
+
+  /// This mesh is optimized for skeletal and vertex animation.
+  csTriangleMesh* vertex_mesh;
+  csVector vertices;
+  int num_vertices;
+
+  /// The normal mesh is used for smooth shading control.
+  csTriangleMesh* normal_mesh;
+  csVector normals;
+  int num_normals;
+
+  /// Array that maps Texels to Normals
+  int* texel_to_normal;
+  /// Array that maps Texels to Vertices
+  int* texel_to_vertex;
+
 public:
+
   /// Create the sprite template
   csSpriteTemplate ();
   /// Destroy the template
@@ -237,11 +223,6 @@ public:
    * The sprite will also be initialized (csSprite3D::InitSprite()).
    */
   csSprite3D* NewSprite ();
-
-  /**
-   * Get the base triangle mesh of this sprite.
-   */
-  csTriangleMesh* GetBaseMesh () { return base_mesh; }
 
   /// Set the skeleton for this sprite template.
   void SetSkeleton (csSkeleton* sk);
@@ -266,11 +247,33 @@ public:
    */
   void ComputeBoundingBox ();
 
-  /// Set the number of vertices.
-  void SetNumVertices (int v) { num_vertices = v; }
+  ///
+  csTriangleMesh* GetTexelMesh () {return texel_mesh;}
 
+  /// Add some vertices
+  void AddVertices (int num);
+  /// Add a vertex
+  void AddVertex () { AddVertices (1); }
+  ///
+  csVector3 GetVertex (csFrame* frame, int vertex)
+    { return frame->GetVertices()[texel_to_vertex[vertex]]; }
   /// Query the number of vertices.
-  int GetNumVertices () { return num_vertices; }
+  int GetNumTexels () { return num_texels; }
+
+  /**
+   * Add a triangle to the normal, texel, and vertex meshes
+   * a, b and c are indices to texel vertices
+   */
+  void AddTriangle (int a, int b, int c);
+  /// returns the texel indices for triangle 'x'  
+  csTriangle GetTriangle (int x)
+    { return texel_mesh->GetTriangles()[x]; }
+  /// returns the triangles of the texel_mesh
+  csTriangle* GetTriangles ()
+    { return texel_mesh->GetTriangles(); }
+  /// returns the number of triangles in the sprite
+  int GetNumTriangles ()
+    { return texel_mesh->GetNumTriangles(); }
 
   /// Create and add a new frame to the sprite.
   csFrame* AddFrame ();
@@ -302,6 +305,11 @@ public:
   iTextureHandle* GetTextureHandle () const { return cstxt->GetTextureHandle (); }
   /// Set the texture used for this sprite
   void SetTexture (csTextureList* textures, const char *texname);
+
+  /**
+   * Compute all normals in a frame.
+   */
+  void ComputeNormals (csFrame* frame, csVector3* object_verts);
 
   /**
    * Minimize the number of 3D coordinates.
@@ -370,6 +378,9 @@ private:
 
   /// Current cookie for camera_bbox.
   csTranCookie camera_cookie;
+
+  /// one frame of 3d coordinates
+  csVector3* object_vertices;
 
 public:
   /// Set owner (actor) for this sprite.

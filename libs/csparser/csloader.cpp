@@ -4415,18 +4415,12 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
                 // check if it's the first frame
                 if (stemp->GetNumFrames () == 1)
                 {
-                  // add vertice/texel in current frame
-                  if (stemp->GetNumVertices () >= fr->GetMaxVertices ())
-                  {
-                    int more = 1;
-                    stemp->SetNumVertices (stemp->GetNumVertices ()+more);
-                    fr->AddVertex (more);
-                  }
+                  stemp->AddVertex();
                 }
-                else if (i >= stemp->GetNumVertices ())
+                else if (i >= stemp->GetNumTexels ())
                 {
                   CsPrintf (MSG_FATAL_ERROR, "Error! Trying to add too many vertices in frame '%s'!\n",
-                          fr->GetName ());
+                    fr->GetName ());
                   fatal_exit (0, false);
                 }
                 fr->SetVertex (i, x, y, z);
@@ -4441,10 +4435,10 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
                 fr->GetName (), csGetLastOffender ());
             fatal_exit (0, false);
           }
-          if (i < stemp->GetNumVertices ())
+          if (i < stemp->GetNumTexels ())
           {
             CsPrintf (MSG_FATAL_ERROR, "Error! Too few vertices in frame '%s'! (%d %d)\n",
-                fr->GetName (), i, stemp->GetNumVertices ());
+                fr->GetName (), i, stemp->GetNumTexels ());
             fatal_exit (0, false);
           }
         }
@@ -4454,7 +4448,7 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
         {
           int a, b, c;
           ScanStr (params, "%d,%d,%d", &a, &b, &c);
-          stemp->GetBaseMesh ()->AddTriangle (a, b, c);
+          stemp->AddTriangle (a, b, c);
         }
         break;
 

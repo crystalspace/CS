@@ -210,12 +210,9 @@ void add_tree_limbs (csSpriteTemplate* tmpl, csFrame* frame, csSkeletonLimb* par
   parent->AddVertex (vertex_idx++);
   parent->AddVertex (vertex_idx++);
   parent->AddVertex (vertex_idx++);
-  if (tmpl->GetNumVertices ()+6 >= frame->GetMaxVertices ())
-  {
-    int more = 6;
-    tmpl->SetNumVertices (tmpl->GetNumVertices ()+more);
-    frame->AddVertex (more);
-  }
+
+  tmpl->AddVertices(6);
+
   frame->SetVertex (par_vertex_idx+0, -.05, 0, -.05); frame->SetTexel (par_vertex_idx+0, 0, 0);
   frame->SetVertex (par_vertex_idx+1, .05, 0, -.05); frame->SetTexel (par_vertex_idx+1, .99, 0);
   frame->SetVertex (par_vertex_idx+2, 0, 0, .05); frame->SetTexel (par_vertex_idx+2, 0, .99);
@@ -225,20 +222,20 @@ void add_tree_limbs (csSpriteTemplate* tmpl, csFrame* frame, csSkeletonLimb* par
   if (recursion > 0)
   {
     // Create connection triangles with previous set
-    tmpl->GetBaseMesh ()->AddTriangle (prev_par_idx+3, prev_par_idx+5, par_vertex_idx+0);
-    tmpl->GetBaseMesh ()->AddTriangle (prev_par_idx+5, par_vertex_idx+2, par_vertex_idx+0);
-    tmpl->GetBaseMesh ()->AddTriangle (prev_par_idx+4, par_vertex_idx+1, par_vertex_idx+2);
-    tmpl->GetBaseMesh ()->AddTriangle (prev_par_idx+5, prev_par_idx+4, par_vertex_idx+2);
-    tmpl->GetBaseMesh ()->AddTriangle (prev_par_idx+4, par_vertex_idx+0, par_vertex_idx+1);
-    tmpl->GetBaseMesh ()->AddTriangle (prev_par_idx+4, prev_par_idx+3, par_vertex_idx+0);
+    tmpl->AddTriangle (prev_par_idx+3, prev_par_idx+5, par_vertex_idx+0);
+    tmpl->AddTriangle (prev_par_idx+5, par_vertex_idx+2, par_vertex_idx+0);
+    tmpl->AddTriangle (prev_par_idx+4, par_vertex_idx+1, par_vertex_idx+2);
+    tmpl->AddTriangle (prev_par_idx+5, prev_par_idx+4, par_vertex_idx+2);
+    tmpl->AddTriangle (prev_par_idx+4, par_vertex_idx+0, par_vertex_idx+1);
+    tmpl->AddTriangle (prev_par_idx+4, prev_par_idx+3, par_vertex_idx+0);
   }
   // Create base triangles
-  tmpl->GetBaseMesh ()->AddTriangle (par_vertex_idx+0, par_vertex_idx+5, par_vertex_idx+3);
-  tmpl->GetBaseMesh ()->AddTriangle (par_vertex_idx+0, par_vertex_idx+2, par_vertex_idx+5);
-  tmpl->GetBaseMesh ()->AddTriangle (par_vertex_idx+2, par_vertex_idx+4, par_vertex_idx+5);
-  tmpl->GetBaseMesh ()->AddTriangle (par_vertex_idx+2, par_vertex_idx+1, par_vertex_idx+4);
-  tmpl->GetBaseMesh ()->AddTriangle (par_vertex_idx+1, par_vertex_idx+3, par_vertex_idx+4);
-  tmpl->GetBaseMesh ()->AddTriangle (par_vertex_idx+1, par_vertex_idx+0, par_vertex_idx+3);
+  tmpl->AddTriangle (par_vertex_idx+0, par_vertex_idx+5, par_vertex_idx+3);
+  tmpl->AddTriangle (par_vertex_idx+0, par_vertex_idx+2, par_vertex_idx+5);
+  tmpl->AddTriangle (par_vertex_idx+2, par_vertex_idx+4, par_vertex_idx+5);
+  tmpl->AddTriangle (par_vertex_idx+2, par_vertex_idx+1, par_vertex_idx+4);
+  tmpl->AddTriangle (par_vertex_idx+1, par_vertex_idx+3, par_vertex_idx+4);
+  tmpl->AddTriangle (par_vertex_idx+1, par_vertex_idx+0, par_vertex_idx+3);
 
   if (recursion >= maxdepth) return;
   csSkeletonConnection* con;
@@ -416,12 +413,9 @@ void add_ghost_limbs (csSpriteTemplate* tmpl, csFrame* frame, csSkeletonLimb* pa
   parent->AddVertex (vertex_idx++);
   parent->AddVertex (vertex_idx++);
   parent->AddVertex (vertex_idx++);
-  if (tmpl->GetNumVertices ()+6 >= frame->GetMaxVertices ())
-  {
-    int more = 6;
-    tmpl->SetNumVertices (tmpl->GetNumVertices ()+more);
-    frame->AddVertex (more);
-  }
+
+  tmpl->AddVertices (6);
+
   frame->SetVertex (par_vertex_idx+0, -dim, 0, -dim); frame->SetTexel (par_vertex_idx+0, 0, 0);
   frame->SetVertex (par_vertex_idx+1, dim, 0, -dim); frame->SetTexel (par_vertex_idx+1, .99, 0);
   frame->SetVertex (par_vertex_idx+2, 0, 0, dim); frame->SetTexel (par_vertex_idx+2, 0, .99);
@@ -431,20 +425,20 @@ void add_ghost_limbs (csSpriteTemplate* tmpl, csFrame* frame, csSkeletonLimb* pa
   if (recursion > 0)
   {
     // Create connection triangles with previous set
-    tmpl->GetBaseMesh ()->AddTriangle (prev_par_idx+3, prev_par_idx+5, par_vertex_idx+0);
-    tmpl->GetBaseMesh ()->AddTriangle (prev_par_idx+5, par_vertex_idx+2, par_vertex_idx+0);
-    tmpl->GetBaseMesh ()->AddTriangle (prev_par_idx+4, par_vertex_idx+1, par_vertex_idx+2);
-    tmpl->GetBaseMesh ()->AddTriangle (prev_par_idx+5, prev_par_idx+4, par_vertex_idx+2);
-    tmpl->GetBaseMesh ()->AddTriangle (prev_par_idx+4, par_vertex_idx+0, par_vertex_idx+1);
-    tmpl->GetBaseMesh ()->AddTriangle (prev_par_idx+4, prev_par_idx+3, par_vertex_idx+0);
+    tmpl->AddTriangle (prev_par_idx+3, prev_par_idx+5, par_vertex_idx+0);
+    tmpl->AddTriangle (prev_par_idx+5, par_vertex_idx+2, par_vertex_idx+0);
+    tmpl->AddTriangle (prev_par_idx+4, par_vertex_idx+1, par_vertex_idx+2);
+    tmpl->AddTriangle (prev_par_idx+5, prev_par_idx+4, par_vertex_idx+2);
+    tmpl->AddTriangle (prev_par_idx+4, par_vertex_idx+0, par_vertex_idx+1);
+    tmpl->AddTriangle (prev_par_idx+4, prev_par_idx+3, par_vertex_idx+0);
   }
   // Create base triangles
-  tmpl->GetBaseMesh ()->AddTriangle (par_vertex_idx+0, par_vertex_idx+5, par_vertex_idx+3);
-  tmpl->GetBaseMesh ()->AddTriangle (par_vertex_idx+0, par_vertex_idx+2, par_vertex_idx+5);
-  tmpl->GetBaseMesh ()->AddTriangle (par_vertex_idx+2, par_vertex_idx+4, par_vertex_idx+5);
-  tmpl->GetBaseMesh ()->AddTriangle (par_vertex_idx+2, par_vertex_idx+1, par_vertex_idx+4);
-  tmpl->GetBaseMesh ()->AddTriangle (par_vertex_idx+1, par_vertex_idx+3, par_vertex_idx+4);
-  tmpl->GetBaseMesh ()->AddTriangle (par_vertex_idx+1, par_vertex_idx+0, par_vertex_idx+3);
+  tmpl->AddTriangle (par_vertex_idx+0, par_vertex_idx+5, par_vertex_idx+3);
+  tmpl->AddTriangle (par_vertex_idx+0, par_vertex_idx+2, par_vertex_idx+5);
+  tmpl->AddTriangle (par_vertex_idx+2, par_vertex_idx+4, par_vertex_idx+5);
+  tmpl->AddTriangle (par_vertex_idx+2, par_vertex_idx+1, par_vertex_idx+4);
+  tmpl->AddTriangle (par_vertex_idx+1, par_vertex_idx+3, par_vertex_idx+4);
+  tmpl->AddTriangle (par_vertex_idx+1, par_vertex_idx+0, par_vertex_idx+3);
 
   if (recursion >= maxdepth) return;
   csSkeletonConnection* con;

@@ -77,15 +77,15 @@ void csCrossBuild_SpriteTemplateFactory::CrossBuild (csBase* object,
   csSpriteTemplate *newtemplate = (csSpriteTemplate*)object;
   buildsource.set_animation_frame(0);
 
-  newtemplate->SetNumVertices(buildsource.num_cor3);
+  newtemplate->AddVertices(buildsource.num_cor3);
 
   // build the triangle mesh
   Build_TriangleMesh(*newtemplate, buildsource);
 
   // build all the frames
   for (int frameindex=0; 
-           frameindex<=buildsource.set_animation_frame(frameindex); 
-	   frameindex++)
+    frameindex<=buildsource.set_animation_frame(frameindex); 
+    frameindex++)
   {
     Build_Frame(*newtemplate, buildsource);
   }
@@ -121,19 +121,15 @@ void csCrossBuild_SpriteTemplateFactory::Build_Frame
   }
 }
 
-
 /// triangle mesh builder
 void csCrossBuild_SpriteTemplateFactory::Build_TriangleMesh(csSpriteTemplate& meshsource,converter& buildsource)
 {
-  // get the mesh from the sprite template
-  csTriangleMesh *targetmesh = meshsource.GetBaseMesh();
-
   for (int triangleindex=0; triangleindex<buildsource.num_face; triangleindex++)
   {
     int a = buildsource.face[0][triangleindex];
     int b = buildsource.face[1][triangleindex];
     int c = buildsource.face[2][triangleindex];
-    targetmesh->AddTriangle(a,b,c);
+    meshsource.AddTriangle(a,b,c);
   }
 }
 

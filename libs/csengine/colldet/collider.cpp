@@ -97,7 +97,7 @@ csCollider::csCollider (csSprite3D *sp)
 
   CD_contact.IncRef ();
 
-  csTriangleMesh *mesh = _sp->tpl->GetBaseMesh ();
+  csTriangleMesh *mesh = _sp->tpl->GetTexelMesh ();
 
   // Pick a frame for now.  This should of course be done for the
   // correct frame (some global CD outline or else we need to do it
