@@ -56,7 +56,7 @@ $(EXPLO): $(OBJ.EXPLO) $(LIB.EXPLO)
 
 clean: exploclean
 exploclean:
-	-$(RM) $(EXPLO) $(OBJ.EXPLO) $(OUTOS)explo.dep
+	-$(RM) $(EXPLO) $(OBJ.EXPLO)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)explo.dep

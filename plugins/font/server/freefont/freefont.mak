@@ -63,7 +63,7 @@ $(FREEFONT): $(OBJ.FREEFONT) $(LIB.FREEFONT)
 
 clean: freefontclean
 freefontclean:
-	-$(RM) $(FREEFONT) $(OBJ.FREEFONT) $(OUTOS)freefont.dep
+	-$(RM) $(FREEFONT) $(OBJ.FREEFONT)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)freefont.dep

@@ -61,7 +61,7 @@ $(SNDOSS): $(OBJ.SNDOSS) $(LIB.SNDOSS)
 
 clean: ossclean
 ossclean:
-	$(RM) $(SNDOSS) $(OBJ.SNDOSS) $(OUTOS)oss.dep
+	$(RM) $(SNDOSS) $(OBJ.SNDOSS)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)oss.dep

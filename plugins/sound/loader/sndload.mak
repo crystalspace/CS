@@ -65,7 +65,7 @@ $(SNDLOAD): $(OBJ.SNDLOAD) $(LIB.SNDLOAD)
 
 clean: sndloadclean
 sndloadclean:
-	$(RM) $(SNDLOAD) $(OBJ.SNDLOAD) $(OUTOS)sndload.dep
+	$(RM) $(SNDLOAD) $(OBJ.SNDLOAD)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)sndload.dep

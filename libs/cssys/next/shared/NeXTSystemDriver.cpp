@@ -76,7 +76,8 @@ bool NeXTSystemDriver::Initialize( int argc, char const* const argv[],
     event_outlet = CreateEventOutlet( &scfiEventPlug );
     if (superclass::Initialize( argc, argv, cfgfile ))
 	{
-	iConfigFileNew* next_config = CreateConfigNew( "/config/next.cfg" );
+	iConfigFileNew* next_config =
+	    CreateSeparateConfig( "/config/next.cfg", false );
 	init_menu( next_config );
 	next_config->DecRef();
 	ok = true;

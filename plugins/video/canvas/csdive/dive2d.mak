@@ -75,7 +75,7 @@ $(DIVE2D.RES): plugins/video/canvas/csdive/libDIVE.rc
 
 clean: csdiveclean
 csdiveclean:
-	$(RM) $(CSDIVE) $(OBJ.CSDIVE) $(OUTOS)csdive.dep
+	$(RM) $(CSDIVE) $(OBJ.CSDIVE)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)csdive.dep

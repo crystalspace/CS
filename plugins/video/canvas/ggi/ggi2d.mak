@@ -66,7 +66,7 @@ $(GGI2D): $(OBJ.GGI2D) $(LIB.GGI2D)
 
 clean: ggi2dclean
 ggi2dclean:
-	$(RM) $(GGI2D) $(OBJ.GGI2D) $(OUTOS)ggi2d.dep
+	$(RM) $(GGI2D) $(OBJ.GGI2D)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)ggi2d.dep

@@ -78,7 +78,7 @@ $(D3DDX6): $(OBJ.D3DDX6) $(LIB.D3DDX6)
 	$(DO.PLUGIN) $(LIB.D3DDX6.SPECIAL)
 
 d3ddx6clean:
-	$(RM) $(D3DDX6) $(OBJ.D3DDX6) $(OUTOS)d3ddx6.dep
+	$(RM) $(D3DDX6) $(OBJ.D3DDX6)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)d3ddx6.dep

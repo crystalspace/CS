@@ -60,7 +60,7 @@ $(CSAVI): $(OBJ.CSAVI) $(LIB.CSAVI)
 
 clean: csaviclean
 csaviclean:
-	-$(RM) $(CSAVI) $(OBJ.CSAVI) $(OUTOS)csavi.dep
+	-$(RM) $(CSAVI) $(OBJ.CSAVI)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)csavi.dep

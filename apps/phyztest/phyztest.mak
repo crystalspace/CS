@@ -56,7 +56,7 @@ $(PHYZTEST.EXE): $(DEP.EXE) $(OBJ.PHYZTEST) $(LIB.PHYZTEST)
 	$(DO.LINK.EXE)
 
 phyzclean:
-	-$(RM) $(PHYZTEST.EXE) $(OBJ.PHYZTEST) $(OUTOS)phyztest.dep
+	-$(RM) $(PHYZTEST.EXE) $(OBJ.PHYZTEST)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)phyztest.dep

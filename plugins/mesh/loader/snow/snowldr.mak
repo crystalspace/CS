@@ -56,7 +56,7 @@ $(SNOWLDR): $(OBJ.SNOWLDR) $(LIB.SNOWLDR)
 
 clean: snowldrclean
 snowldrclean:
-	-$(RM) $(SNOWLDR) $(OBJ.SNOWLDR) $(OUTOS)snowldr.dep
+	-$(RM) $(SNOWLDR) $(OBJ.SNOWLDR)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)snowldr.dep

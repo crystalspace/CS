@@ -101,7 +101,7 @@ $(CSGFXLDR.LIB): $(OBJ.CSGFXLDR)
 	$(DO.LIBRARY)
 
 csgfxldrclean:
-	-$(RM) $(CSGFXLDR.LIB) $(OBJ.CSGFXLDR) $(OUTOS)csgfxldr.dep
+	-$(RM) $(CSGFXLDR.LIB) $(OBJ.CSGFXLDR)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)csgfxldr.dep

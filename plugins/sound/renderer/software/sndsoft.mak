@@ -79,7 +79,7 @@ $(SNDSOFT): $(OBJ.SNDSOFT) $(LIB.SNDSOFT)
 
 clean: sndsoftclean
 sndsoftclean:
-	$(RM) $(SNDSOFT) $(OBJ.SNDSOFT) $(OUTOS)sndsoft.dep
+	$(RM) $(SNDSOFT) $(OBJ.SNDSOFT)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)sndsoft.dep

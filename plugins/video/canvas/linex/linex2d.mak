@@ -75,7 +75,7 @@ $(LINEX2D): $(OBJ.LINEX2D) $(LIB.LINEX2D)
 
 clean: linex2dclean
 linex2dclean:
-	$(RM) $(LINEX2D) $(OBJ.LINEX2D) $(OUTOS)linex2d.dep
+	$(RM) $(LINEX2D) $(OBJ.LINEX2D)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)linex2d.dep

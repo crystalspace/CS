@@ -82,7 +82,7 @@ $(GLWIN32): $(OBJ.GLWIN32) $(LIB.GLWIN32)
 
 clean: glwin32clean
 glwin32clean:
-	$(RM) $(GLWIN32) $(OBJ.GLWIN32) $(OUTOS)glwin32.dep
+	$(RM) $(GLWIN32) $(OBJ.GLWIN32)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)glwin32.dep

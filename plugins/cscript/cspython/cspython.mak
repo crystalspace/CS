@@ -103,14 +103,12 @@ $(CSPYTHON): $(OBJ.CSPYTHON) $(LIB.CSPYTHON)
 	$(DO.PLUGIN) $(LIB.CSPYTHON.LOCAL)
 
 cspythonclean:
-	-$(RM) $(CSPYTHON) $(OBJ.CSPYTHON) $(TRASH.CSPYTHON) \
-	$(OUTOS)cspython.dep
+	-$(RM) $(CSPYTHON) $(OBJ.CSPYTHON) $(TRASH.CSPYTHON)
 
 cspythonswig: cspythonswigclean cspython
 
 cspythonswigclean:
-	-$(RM) $(CSPYTHON) $(SWIG.CSPYTHON) $(OUT)cs_pyth.cpp \
-	$(OUTOS)cspython.dep
+	-$(RM) $(CSPYTHON) $(SWIG.CSPYTHON) $(OUT)cs_pyth.cpp
 
 ifdef DO_DEPEND
 dep: $(OUTOS)cspython.dep

@@ -55,7 +55,7 @@ $(PERF.EXE): $(DEP.EXE) $(OBJ.PERF) $(LIB.PERF)
 	$(DO.LINK.EXE)
 
 perfclean:
-	-$(RM) $(PERF.EXE) $(OBJ.PERF) $(OUTOS)perf.dep
+	-$(RM) $(PERF.EXE) $(OBJ.PERF)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)perf.dep

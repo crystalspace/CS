@@ -82,7 +82,7 @@ $(NEXT2D): $(OBJ.NEXT2D) $(LIB.NEXT2D)
 
 clean: next2dclean
 next2dclean:
-	$(RM) $(NEXT2D) $(OBJ.NEXT2D) $(OUTOS)next2d.dep
+	$(RM) $(NEXT2D) $(OBJ.NEXT2D)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)next2d.dep

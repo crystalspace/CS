@@ -96,7 +96,7 @@ $(SOFT3D): $(OBJ.SOFT3D) $(LIB.SOFT3D)
 	$(DO.PLUGIN)
 
 softclean:
-	$(RM) $(SOFT3D) $(OBJ.SOFT3D) $(OUTOS)soft3d.dep
+	$(RM) $(SOFT3D) $(OBJ.SOFT3D)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)soft3d.dep

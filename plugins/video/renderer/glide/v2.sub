@@ -88,7 +88,7 @@ $(GLIDE3D2): $(OBJ.GLIDE3D2) $(LIB.GLIDE3D2)
 	$(DO.PLUGIN) $(LIB.GLIDE3D2.SPECIAL)
 
 glide3d2clean:
-	$(RM) $(GLIDE3D2) $(OBJ.GLIDE3D2) $(OUTOS)glide3d2.dep
+	$(RM) $(GLIDE3D2) $(OBJ.GLIDE3D2)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)glide3d2.dep

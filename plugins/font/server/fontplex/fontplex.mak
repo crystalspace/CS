@@ -55,7 +55,7 @@ $(FONTPLEX): $(OBJ.FONTPLEX) $(LIB.FONTPLEX)
 
 clean: fontplexclean
 fontplexclean:
-	-$(RM) $(FONTPLEX) $(OBJ.FONTPLEX) $(OUTOS)fontplex.dep
+	-$(RM) $(FONTPLEX) $(OBJ.FONTPLEX)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)fontplex.dep

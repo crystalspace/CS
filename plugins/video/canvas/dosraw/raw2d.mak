@@ -61,7 +61,7 @@ $(RAW2D): $(OBJ.RAW2D) $(LIB.RAW2D)
 
 clean: dosrawclean
 dosrawclean:
-	$(RM) $(RAW2D) $(OBJ.RAW2D) $(OUTOS)raw2d.dep
+	$(RM) $(RAW2D) $(OBJ.RAW2D)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)raw2d.dep

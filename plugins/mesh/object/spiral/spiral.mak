@@ -56,7 +56,7 @@ $(SPIRAL): $(OBJ.SPIRAL) $(LIB.SPIRAL)
 
 clean: spiralclean
 spiralclean:
-	-$(RM) $(SPIRAL) $(OBJ.SPIRAL) $(OUTOS)spiral.dep
+	-$(RM) $(SPIRAL) $(OBJ.SPIRAL)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)spiral.dep

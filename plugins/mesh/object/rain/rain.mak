@@ -56,7 +56,7 @@ $(RAIN): $(OBJ.RAIN) $(LIB.RAIN)
 
 clean: rainclean
 rainclean:
-	-$(RM) $(RAIN) $(OBJ.RAIN) $(OUTOS)rain.dep
+	-$(RM) $(RAIN) $(OBJ.RAIN)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)rain.dep

@@ -58,7 +58,7 @@ $(ENGINE): $(OBJ.ENGINE) $(LIB.ENGINE)
 
 clean: engineclean
 engineclean:
-	-$(RM) $(ENGINE) $(OBJ.ENGINE) $(OUTOS)engine.dep
+	-$(RM) $(ENGINE) $(OBJ.ENGINE)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)engine.dep

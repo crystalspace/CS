@@ -56,7 +56,7 @@ $(SPR3DLDR): $(OBJ.SPR3DLDR) $(LIB.SPR3DLDR)
 
 clean: spr3dldrclean
 spr3dldrclean:
-	-$(RM) $(SPR3DLDR) $(OBJ.SPR3DLDR) $(OUTOS)spr3dldr.dep
+	-$(RM) $(SPR3DLDR) $(OBJ.SPR3DLDR)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)spr3dldr.dep

@@ -56,7 +56,7 @@ $(FOUNTLDR): $(OBJ.FOUNTLDR) $(LIB.FOUNTLDR)
 
 clean: fountldrclean
 fountldrclean:
-	-$(RM) $(FOUNTLDR) $(OBJ.FOUNTLDR) $(OUTOS)fountldr.dep
+	-$(RM) $(FOUNTLDR) $(OBJ.FOUNTLDR)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)fountldr.dep

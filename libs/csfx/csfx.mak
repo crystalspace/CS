@@ -53,7 +53,7 @@ $(CSFX.LIB): $(OBJ.CSFX)
 	$(DO.LIBRARY)
 
 csfxclean:
-	-$(RM) $(CSFX.LIB) $(OBJ.CSFX) $(OUTOS)csfx.dep
+	-$(RM) $(CSFX.LIB) $(OBJ.CSFX)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)csfx.dep

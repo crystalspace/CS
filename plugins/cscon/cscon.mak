@@ -60,7 +60,7 @@ $(CSCON): $(OBJ.CSCON) $(LIB.CSCON)
 
 clean: csconclean
 csconclean:
-	-$(RM) $(CSCON) $(OBJ.CSCON) $(OUTOS)cscon.dep
+	-$(RM) $(CSCON) $(OBJ.CSCON)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)cscon.dep

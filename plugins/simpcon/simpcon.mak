@@ -65,7 +65,7 @@ $(SIMPCON): $(OBJ.SIMPCON) $(LIB.SIMPCON)
 
 clean: simpconclean
 simpconclean:
-	$(RM) $(SIMPCON) $(OBJ.SIMPCON) $(OUTOS)simpcon.dep
+	$(RM) $(SIMPCON) $(OBJ.SIMPCON)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)simpcon.dep

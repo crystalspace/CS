@@ -56,7 +56,7 @@ $(FIRELDR): $(OBJ.FIRELDR) $(LIB.FIRELDR)
 
 clean: fireldrclean
 fireldrclean:
-	-$(RM) $(FIRELDR) $(OBJ.FIRELDR) $(OUTOS)fireldr.dep
+	-$(RM) $(FIRELDR) $(OBJ.FIRELDR)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)fireldr.dep

@@ -56,7 +56,7 @@ $(SPR3D): $(OBJ.SPR3D) $(LIB.SPR3D)
 
 clean: spr3dclean
 spr3dclean:
-	-$(RM) $(SPR3D) $(OBJ.SPR3D) $(OUTOS)spr3d.dep
+	-$(RM) $(SPR3D) $(OBJ.SPR3D)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)spr3d.dep

@@ -20,6 +20,7 @@
 #ifndef __CS_VFS_H__
 #define __CS_VFS_H__
 
+#include "csutil/cfgfile.h"
 #include "csutil/csstrvec.h"
 #include "ivfs.h"
 #include "iplugin.h"
@@ -120,7 +121,7 @@ class csVFS : public iVFS
   // The current directory minus current node (cnode suffix)
   char cnsufx [VFS_MAX_PATH_LEN + 1];
   // The initialization file
-  iConfigFileNew *config;
+  csConfigFile config;
   // Directory stack (used in PushDir () and PopDir ())
   csStrVector dirstack;
   // The pointer to system driver interface

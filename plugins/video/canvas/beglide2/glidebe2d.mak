@@ -73,7 +73,7 @@ $(GLIDEBE2D): $(OBJ.GLIDEBE2D) $(LIB.GLIDEBE2D)
 	$(DO.PLUGIN) $(LIB.GLIDEBE2D.SPECIAL)
 
 glidebe2dclean:
-	$(RM) $(GLIDEBE2D) $(OBJ.GLIDEBE2D) $(OUTOS)glidebe2d.dep
+	$(RM) $(GLIDEBE2D) $(OBJ.GLIDEBE2D)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)glidebe2d.dep

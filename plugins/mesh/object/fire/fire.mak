@@ -56,7 +56,7 @@ $(FIRE): $(OBJ.FIRE) $(LIB.FIRE)
 
 clean: fireclean
 fireclean:
-	-$(RM) $(FIRE) $(OBJ.FIRE) $(OUTOS)fire.dep
+	-$(RM) $(FIRE) $(OBJ.FIRE)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)fire.dep

@@ -34,8 +34,6 @@
 #include "csutil/databuf.h"
 #include "csutil/csstring.h"
 #include "isystem.h"
-#include "icfgmgr.h"
-#include "icfgfile.h"
 
 // Characters ignored in VFS paths (except in middle)
 #define CS_VFSSPACE		" \t"
@@ -232,7 +230,7 @@ public:
   virtual ~VfsNode ();
 
   // Parse a directory link directive and fill RPathV
-  bool AddRPath (const char *RealPath, const csVFS *Parent);
+  bool AddRPath (const char *RealPath, csVFS *Parent);
   // Remove a real-world path
   bool RemoveRPath (const char *RealPath);
   // Find all files in a subpath
@@ -251,9 +249,9 @@ public:
   bool GetFileSize (const char *Suffix, size_t &oSize);
 private:
   // Get value of a variable
-  const char *GetValue (const csVFS *Parent, const char *VarName);
+  const char *GetValue (csVFS *Parent, const char *VarName);
   // Copy a string from src to dst and expand all variables
-  int Expand (const csVFS *Parent, char *dst, char *src, int size);
+  int Expand (csVFS *Parent, char *dst, char *src, int size);
   // Find a file either on disk or in archive - in this node only
   bool FindFile (const char *Suffix, char *RealPath, csArchive *&) const;
 };
@@ -634,7 +632,7 @@ VfsNode::~VfsNode ()
   delete [] VPath;
 }
 
-bool VfsNode::AddRPath (const char *RealPath, const csVFS *Parent)
+bool VfsNode::AddRPath (const char *RealPath, csVFS *Parent)
 {
   bool rc = false;
   // Split rpath into several, separated by commas
@@ -691,7 +689,7 @@ bool VfsNode::RemoveRPath (const char *RealPath)
   return false;
 }
 
-int VfsNode::Expand (const csVFS *Parent, char *dst, char *src, int size)
+int VfsNode::Expand (csVFS *Parent, char *dst, char *src, int size)
 {
   char *org = dst;
   while (*src && ((dst - org) < size))
@@ -752,14 +750,14 @@ int VfsNode::Expand (const csVFS *Parent, char *dst, char *src, int size)
   return dst - org;
 }
 
-const char *VfsNode::GetValue (const csVFS *Parent, const char *VarName)
+const char *VfsNode::GetValue (csVFS *Parent, const char *VarName)
 {
   // Look in environment first
   const char *value = getenv (VarName);
   if (value)
     return value;
 
-  iConfigFileNew *Config = Parent->config;
+  iConfigFileNew *Config = &(Parent->config);
 
   // Now look in "VFS.Solaris" section, for example
   csString Keyname;
@@ -1140,7 +1138,6 @@ csVFS::csVFS (iBase *iParent) : dirstack (8, 8)
   cwd [1] = 0;
   cnode = NULL;
   cnsufx [0] = 0;
-  config = NULL;
   basedir = NULL;
   CS_ASSERT (!ArchiveCache);
   ArchiveCache = new VfsArchiveCache ();
@@ -1148,7 +1145,6 @@ csVFS::csVFS (iBase *iParent) : dirstack (8, 8)
 
 csVFS::~csVFS ()
 {
-  if (config) config->DecRef ();
   delete [] cwd;
   delete [] basedir;
   CS_ASSERT (ArchiveCache);
@@ -1164,17 +1160,13 @@ bool csVFS::Initialize (iSystem *iSys)
   iSys->GetInstallPath (vfsconfigpath, sizeof (vfsconfigpath));
   basedir = strnew (vfsconfigpath);
   strcat (vfsconfigpath, "vfs.cfg");
-  const char *path = System->GetConfig ()->GetStr ("VFS.Config", vfsconfigpath);
-  System->AddConfig(iSystem::ConfigPriorityPlugIn, path, false);
-  config = System->GetConfig();
-  config->IncRef();
-  bool retval = ReadConfig ();
-  return retval;
+  config.Load (vfsconfigpath);
+  return ReadConfig ();
 }
 
 bool csVFS::ReadConfig ()
 {
-  iConfigIterator *iterator = config->Enumerate ("VFS.Mount.");
+  iConfigIterator *iterator = config.Enumerate ("VFS.Mount.");
   while (iterator->Next ())
     AddLink (iterator->GetKey (true), iterator->GetStr ());
   iterator->DecRef ();
@@ -1565,7 +1557,7 @@ bool csVFS::Unmount (const char *VirtualPath, const char *RealPath)
   {
     csString s("VFS.Mount.");
     s+=node->ConfigKey;
-    config->DeleteKey (s);
+    config.DeleteKey (s);
     int idx = NodeList.Find (node);
     if (idx >= 0)
       NodeList.Delete (idx);
@@ -1603,10 +1595,10 @@ bool csVFS::SaveMounts (const char *FileName)
     }
     csString s("VFS.Mount.");
     s+=node->ConfigKey;
-    config->SetStr (s, tmp);
+    config.SetStr (s, tmp);
     delete [] tmp;
   }
-  return config->Save (FileName);
+  return config.Save (FileName);
 }
 
 bool csVFS::GetFileTime (const char *FileName, csFileTime &oTime) const

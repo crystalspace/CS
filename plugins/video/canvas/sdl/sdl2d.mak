@@ -72,7 +72,7 @@ $(SDL2D): $(OBJ.SDL2D) $(LIB.SDL2D)
 
 clean: sdl2dclean
 sdl2dclean:
-	$(RM) $(SDL2D) $(OBJ.SDL2D) $(OUTOS)sdl2d.dep
+	$(RM) $(SDL2D) $(OBJ.SDL2D)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)sdl2d.dep

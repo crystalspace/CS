@@ -56,7 +56,7 @@ $(CUBE): $(OBJ.CUBE) $(LIB.CUBE)
 
 clean: cubeclean
 cubeclean:
-	-$(RM) $(CUBE) $(OBJ.CUBE) $(OUTOS)cube.dep
+	-$(RM) $(CUBE) $(OBJ.CUBE)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)cube.dep

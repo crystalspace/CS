@@ -56,7 +56,7 @@ $(RAPID): $(OBJ.RAPID) $(LIB.RAPID)
 
 clean: rapidclean
 rapidclean:
-	-$(RM) $(RAPID) $(OBJ.RAPID) $(OUTOS)rapid.dep
+	-$(RM) $(RAPID) $(OBJ.RAPID)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)rapid.dep

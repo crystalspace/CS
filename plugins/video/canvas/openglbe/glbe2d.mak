@@ -71,7 +71,7 @@ $(GLBE2D): $(OBJ.GLBE2D) $(LIB.BE2D)
 
 clean: glbeclean
 glbeclean:
-	$(RM) $(GLBE2D) $(OBJ.GLBE2D) $(OUTOS)glbe2d.dep
+	$(RM) $(GLBE2D) $(OBJ.GLBE2D)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)glbe2d.dep

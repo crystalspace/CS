@@ -63,7 +63,7 @@ $(SNDDS3D): $(OBJ.SNDDS3D) $(LIB.SNDDS3D)
 
 clean: sndds3dclean
 sndds3dclean:
-	$(RM) $(SNDDS3D) $(OBJ.SNDDS3D) $(OUTOS)sndds3d.dep
+	$(RM) $(SNDDS3D) $(OBJ.SNDDS3D)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)sndds3d.dep

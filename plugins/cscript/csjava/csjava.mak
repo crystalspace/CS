@@ -93,7 +93,7 @@ $(CSJAVA): $(OBJ.CSJAVA) $(LIB.CSJAVA)
 	$(DO.PLUGIN) $(LIB.CSJAVA.LOCAL)
 
 csjavaclean:
-	-$(RM) $(CSJAVA) $(OBJ.CSJAVA) $(OUTOS)csjava.dep
+	-$(RM) $(CSJAVA) $(OBJ.CSJAVA)
 
 csjavaswig: csjavaswigclean csjava
 

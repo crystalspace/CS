@@ -54,7 +54,7 @@ $(CSGEOM.LIB): $(OBJ.CSGEOM)
 	$(DO.LIBRARY)
 
 csgeomclean:
-	-$(RM) $(CSGEOM.LIB) $(OBJ.CSGEOM) $(OUTOS)csgeom.dep
+	-$(RM) $(CSGEOM.LIB) $(OBJ.CSGEOM)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)csgeom.dep

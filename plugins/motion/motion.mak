@@ -62,7 +62,7 @@ $(MOTION): $(OBJ.MOTION) $(LIB.MOTION)
 
 clean: motionclean
 motionclean:
-	$(RM) $(MOTION) $(OBJ.MOTION) $(OUTOS)motion.dep
+	$(RM) $(MOTION) $(OBJ.MOTION)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)motion.dep

@@ -56,7 +56,7 @@ $(CSFONT): $(OBJ.CSFONT) $(LIB.CSFONT)
 
 clean: csfontclean
 csfontclean:
-	-$(RM) $(CSFONT) $(OBJ.CSFONT) $(OUTOS)csfont.dep
+	-$(RM) $(CSFONT) $(OBJ.CSFONT)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)csfont.dep

@@ -70,7 +70,7 @@ $(BE2D): $(OBJ.BE2D) $(LIB.BE2D)
 	$(DO.PLUGIN)
 
 be2dclean:
-	$(RM) $(BE2D) $(OBJ.BE2D) $(OUTOS)be2d.dep
+	$(RM) $(BE2D) $(OBJ.BE2D)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)be2d.dep

@@ -104,7 +104,7 @@ $(GL3D): $(OBJ.GL3D) $(LIB.GL3D)
 	$(DO.PLUGIN) $(LIB.GL3D.SPECIAL)
 
 gl3dclean:
-	$(RM) $(GL3D) $(OBJ.GL3D) $(OUTOS)gl3d.dep
+	$(RM) $(GL3D) $(OBJ.GL3D)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)gl3d.dep

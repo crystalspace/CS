@@ -67,7 +67,7 @@ $(SNDWOS): $(OBJ.SNDWOS) $(LIB.SNDWOS)
 
 clean: wosclean
 wosclean:
-	$(RM) $(SNDWOS) $(OBJ.SNDWOS) $(OUTOS)wos.dep
+	$(RM) $(SNDWOS) $(OBJ.SNDWOS)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)wos.dep

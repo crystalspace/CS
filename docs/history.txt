@@ -1,5 +1,43 @@
 The history order has been reversed so that new features are at the top.
 
+21-Fev-2001
+	- Eric Sunshine resolved a circular reference problem between the
+	  system driver and the VFS plugin.  The actual problem was that the
+	  VFS plugin was utilizing the new configuration manager module even
+	  though it should not have been doing so.  There are a couple of
+	  reasons why utilization of the configuration manager by VFS was
+	  problematic.  First, this introduced an unwanted circularity since
+	  the configuration manager and the VFS plugin each relied upon the
+	  services of the other.  Second, it does not make sense for the VFS
+	  plugin to utilize the configuration manager at initialization time
+	  since the VFS plugin is loaded very early in the application start-up
+	  sequence.  In fact, it is loaded before any other configuration files
+	  have been loaded (indeed, all other configuration files are typically
+	  loaded from a VFS volume; thus this was a chicken-and-egg issue).
+	  Now the VFS plugin manually loads its own configuration file
+	  (vfs.cfg) rather than relying on the configuration manager mechanism.
+	  In the future, we should introduce some new API into the VFS plugin
+	  which allows an application to override or augment the initial
+	  configuration from vfs.cfg.  This will allow a client application to
+	  provide its own VFS.Mount settings if desired.  Also note that when
+	  this API is finally added it should be in the form of a method in the
+	  VFS plugin which is invoked by the client application (or system
+	  driver) and that method should accept an iConfigFile* as its
+	  argument.  The VFS plugin can then query this configuration object
+	  for the desired information.  There is no need to re-introduce any
+	  circularity with iConfigManager.
+	- Eric Sunshine converted several modules to use the new configuration
+	  manager which were missed by Martin when he made his conversion sweep
+	  through the project.
+	- Eric Sunshine modified all makefiles project-wide so that the
+	  individual `clean' targets (such as `softclean', `x2dclean', etc.) no
+	  longer remove the dependency information (.dep files).  In theory,
+	  having a module's `clean' target remove the .dep file was a sensible
+	  idea, however in actual practice, it turned out to be quite obnoxious
+	  to lose dependency information each time an individual module's
+	  `clean' target was invoked.  You can still remove dependency files by
+	  invoking one of the standard and existing targets `cleandep' or
+	  `distclean'.
 20-Feb-2001
 	- Wouter Wijngaards applied fix to demosky as suggested by Seth
 	  Galbraith. This fixed the crackes in the skydome. It aligns

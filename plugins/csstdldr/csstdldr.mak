@@ -77,7 +77,7 @@ $(STDLDR): $(OBJ.STDLDR) $(LIB.STDLDR)
 #	$(DO.PLUGIN)
 
 stdldrclean:
-	-$(RM) $(STDLDR) $(OBJ.STDLDR) $(OUTOS)stdldr.dep
+	-$(RM) $(STDLDR) $(OBJ.STDLDR)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)stdldr.dep

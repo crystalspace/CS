@@ -68,7 +68,7 @@ $(METABALL): $(OBJ.METABALL) $(LIB.METABALL)
 	$(DO.PLUGIN)
 
 metaballclean:
-	$(RM) $(METABALL) $(OBJ.METABALL) $(OUTOS)metaball.dep
+	$(RM) $(METABALL) $(OBJ.METABALL)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)metaball.dep

@@ -56,7 +56,7 @@ $(SPIRLDR): $(OBJ.SPIRLDR) $(LIB.SPIRLDR)
 
 clean: spirldrclean
 spirldrclean:
-	-$(RM) $(SPIRLDR) $(OBJ.SPIRLDR) $(OUTOS)spirldr.dep
+	-$(RM) $(SPIRLDR) $(OBJ.SPIRLDR)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)spirldr.dep

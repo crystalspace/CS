@@ -66,7 +66,7 @@ $(OGLGLIDE): $(OBJ.OGLGLIDE) $(LIB.OGLGLIDE)
 
 clean: oglglideclean
 oglglideclean:
-	$(RM) $(OGLGLIDE) $(OBJ.OGLGLIDE) $(OUTOS)oglglide.dep
+	$(RM) $(OGLGLIDE) $(OBJ.OGLGLIDE)
  
 ifdef DO_DEPEND
 dep: $(OUTOS)oglglide.dep

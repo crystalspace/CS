@@ -74,7 +74,7 @@ $(NULL3D): $(OBJ.NULL3D) $(LIB.NULL3D)
 	$(DO.PLUGIN)
 
 null3dclean:
-	$(RM) $(NULL3D) $(OBJ.NULL3D) $(OUTOS)null3d.dep
+	$(RM) $(NULL3D) $(OBJ.NULL3D)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)null3d.dep

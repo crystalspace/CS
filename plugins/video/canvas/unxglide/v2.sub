@@ -82,7 +82,7 @@ $(GLIDX2D2): $(OBJ.GLIDX2D2) $(LIB.GLIDX2D2)
 
 clean: glidx2d2clean
 glidx2d2clean:
-	$(RM) $(GLIDX2D2) $(OBJ.GLIDX2D2) $(OUTOS)glidx2d2.dep
+	$(RM) $(GLIDX2D2) $(OBJ.GLIDX2D2)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)glidx2d2.dep

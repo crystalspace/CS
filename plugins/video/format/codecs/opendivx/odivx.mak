@@ -62,7 +62,7 @@ $(ODIVX): $(OBJ.ODIVX) $(LIB.ODIVX)
 
 clean: odivxclean
 odivxclean:
-	-$(RM) $(ODIVX) $(OBJ.ODIVX) $(OUTOS)odivx.dep
+	-$(RM) $(ODIVX) $(OBJ.ODIVX)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)odivx.dep

@@ -56,7 +56,7 @@ $(EXPLOLDR): $(OBJ.EXPLOLDR) $(LIB.EXPLOLDR)
 
 clean: exploldrclean
 exploldrclean:
-	-$(RM) $(EXPLOLDR) $(OBJ.EXPLOLDR) $(OUTOS)exploldr.dep
+	-$(RM) $(EXPLOLDR) $(OBJ.EXPLOLDR)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)exploldr.dep

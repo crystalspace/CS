@@ -55,7 +55,7 @@ $(GFXTEST.EXE): $(OBJ.GFXTEST) $(LIB.GFXTEST)
 	$(DO.LINK.CONSOLE.EXE)
 
 gfxtstclean:
-	-$(RM) $(GFXTEST.EXE) $(OBJ.GFXTEST) $(OUTOS)gfxtst.dep
+	-$(RM) $(GFXTEST.EXE) $(OBJ.GFXTEST)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)gfxtst.dep

@@ -96,7 +96,7 @@ $(GLX2D): $(OBJ.GLX2D) $(LIB.GLX2D)
 
 clean: glx2dclean
 glx2dclean:
-	$(RM) $(GLX2D) $(OBJ.GLX2D) $(OUTOS)glx2d.dep
+	$(RM) $(GLX2D) $(OBJ.GLX2D)
  
 ifdef DO_DEPEND
 dep: $(OUTOS)glx2d.dep

@@ -74,7 +74,7 @@ $(LINE3D): $(OBJ.LINE3D) $(LIB.LINE3D)
 	$(DO.PLUGIN)
 
 line3dclean:
-	$(RM) $(LINE3D) $(OBJ.LINE3D) $(OUTOS)line3d.dep
+	$(RM) $(LINE3D) $(OBJ.LINE3D)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)line3d.dep

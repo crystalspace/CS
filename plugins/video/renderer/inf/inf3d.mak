@@ -76,7 +76,7 @@ $(INF3D): $(OBJ.INF3D) $(LIB.INF3D)
 	$(DO.PLUGIN)
 
 infiniteclean:
-	$(RM) $(INF3D) $(OBJ.INF3D) $(OUTOS)inf3d.dep
+	$(RM) $(INF3D) $(OBJ.INF3D)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)inf3d.dep

@@ -54,7 +54,7 @@ $(G2DTEST.EXE): $(DEP.EXE) $(OBJ.G2DTEST) $(LIB.G2DTEST)
 	$(DO.LINK.EXE)
 
 g2dtstclean:
-	-$(RM) $(G2DTEST.EXE) $(OBJ.G2DTEST) $(OUTOS)g2dtest.dep
+	-$(RM) $(G2DTEST.EXE) $(OBJ.G2DTEST)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)g2dtest.dep

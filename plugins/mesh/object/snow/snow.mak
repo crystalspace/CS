@@ -56,7 +56,7 @@ $(SNOW): $(OBJ.SNOW) $(LIB.SNOW)
 
 clean: snowclean
 snowclean:
-	-$(RM) $(SNOW) $(OBJ.SNOW) $(OUTOS)snow.dep
+	-$(RM) $(SNOW) $(OBJ.SNOW)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)snow.dep

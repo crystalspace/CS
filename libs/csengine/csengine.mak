@@ -61,7 +61,7 @@ $(CSENGINE.LIB): $(OBJ.CSENGINE)
 	$(DO.LIBRARY)
 
 csengineclean:
-	-$(RM) $(CSENGINE.LIB) $(OBJ.CSENGINE) $(OUTOS)csengine.dep
+	-$(RM) $(CSENGINE.LIB) $(OBJ.CSENGINE)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)csengine.dep

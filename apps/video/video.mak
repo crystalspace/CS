@@ -59,7 +59,7 @@ $(CSVID.EXE): $(DEP.EXE) $(OBJ.CSVID) $(LIB.CSVID)
 	$(DO.LINK.EXE)
 
 vidclean:
-	-$(RM) $(CSVID.EXE) $(OBJ.CSVID) $(OUTOS)csvid.dep
+	-$(RM) $(CSVID.EXE) $(OBJ.CSVID)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)csvid.dep

@@ -59,7 +59,7 @@ $(BLOCKS.EXE): $(DEP.EXE) $(OBJ.BLOCKS) $(LIB.BLOCKS)
 	$(DO.LINK.EXE)
 
 blksclean:
-	-$(RM) $(BLOCKS.EXE) $(OBJ.BLOCKS) $(OUTOS)blocks.dep
+	-$(RM) $(BLOCKS.EXE) $(OBJ.BLOCKS)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)blocks.dep

@@ -76,7 +76,7 @@ $(X2D): $(OBJ.X2D) $(LIB.X2D)
 
 clean: x2dclean
 x2dclean:
-	$(RM) $(X2D) $(OBJ.X2D) $(OUTOS)x2d.dep
+	$(RM) $(X2D) $(OBJ.X2D)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)x2d.dep

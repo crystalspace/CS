@@ -56,7 +56,7 @@ $(FOUNT): $(OBJ.FOUNT) $(LIB.FOUNT)
 
 clean: fountclean
 fountclean:
-	-$(RM) $(FOUNT) $(OBJ.FOUNT) $(OUTOS)fount.dep
+	-$(RM) $(FOUNT) $(OBJ.FOUNT)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)fount.dep

@@ -65,7 +65,8 @@ bool csGraphics2DAA::Initialize (iSystem *pSystem)
   if (!csGraphics2D::Initialize (pSystem))
     return false;
 
-  iConfigFileNew *config = pSystem->CreateConfigNew ("/config/asciiart.cfg");
+  System->AddConfig(iSystem::ConfigPriorityPlugIn, "/config/asciiart.cfg");
+  iConfigFileNew *config = System->GetConfig ();
   if (!config)
     return false;
 
@@ -126,10 +127,7 @@ bool csGraphics2DAA::Initialize (iSystem *pSystem)
   pfmt.BlueMask   = 0xff;
   pfmt.complete ();
 
-  config->DecRef ();
-
   EventOutlet = System->CreateEventOutlet (this);
-
   return true;
 }
 

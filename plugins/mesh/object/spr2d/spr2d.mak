@@ -56,7 +56,7 @@ $(SPR2D): $(OBJ.SPR2D) $(LIB.SPR2D)
 
 clean: spr2dclean
 spr2dclean:
-	-$(RM) $(SPR2D) $(OBJ.SPR2D) $(OUTOS)spr2d.dep
+	-$(RM) $(SPR2D) $(OBJ.SPR2D)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)spr2d.dep

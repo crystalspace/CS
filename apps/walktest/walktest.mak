@@ -63,7 +63,7 @@ $(WALKTEST.EXE): $(DEP.EXE) $(OBJ.WALKTEST) $(LIB.WALKTEST)
 	$(DO.LINK.EXE)
 
 walkclean:
-	-$(RM) $(WALKTEST.EXE) $(OBJ.WALKTEST) $(OUTOS)walktest.dep
+	-$(RM) $(WALKTEST.EXE) $(OBJ.WALKTEST)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)walktest.dep

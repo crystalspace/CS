@@ -77,7 +77,7 @@ $(MGL2D): $(OBJ.MGL2D) $(LIB.MGL2D)
 
 clean: mgl2dclean
 mgl2dclean:
-	$(RM) $(MGL2D) $(OBJ.MGL2D) $(OUTOS)mgl2d.dep
+	$(RM) $(MGL2D) $(OBJ.MGL2D)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)mgl2d.dep

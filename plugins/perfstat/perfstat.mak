@@ -65,7 +65,7 @@ $(PERFSTAT): $(OBJ.PERFSTAT) $(LIB.PERFSTAT)
 
 clean: perfstatclean
 perfstatclean:
-	$(RM) $(PERFSTAT) $(OBJ.PERFSTAT) $(OUTOS)perfstat.dep
+	$(RM) $(PERFSTAT) $(OBJ.PERFSTAT)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)perfstat.dep

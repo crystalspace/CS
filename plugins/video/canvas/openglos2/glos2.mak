@@ -79,7 +79,7 @@ $(RES.GLOS2): plugins/video/canvas/openglos2/libGL.rc
 
 clean: glos2clean
 glos2clean:
-	$(RM) $(GLOS2) $(OBJ.GLOS2) $(OUTOS)glos2.dep
+	$(RM) $(GLOS2) $(OBJ.GLOS2)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)glos2.dep

@@ -56,7 +56,7 @@ $(CUBELDR): $(OBJ.CUBELDR) $(LIB.CUBELDR)
 
 clean: cubeldrclean
 cubeldrclean:
-	-$(RM) $(CUBELDR) $(OBJ.CUBELDR) $(OUTOS)cubeldr.dep
+	-$(RM) $(CUBELDR) $(OBJ.CUBELDR)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)cubeldr.dep

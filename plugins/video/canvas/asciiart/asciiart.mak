@@ -81,7 +81,7 @@ $(ASCIIART): $(OBJ.ASCIIART) $(LIB.ASCIIART)
 	$(DO.PLUGIN) $(LIB.ASCIIART.SPECIAL)
 
 asciiartclean:
-	$(RM) $(ASCIIART) $(OBJ.ASCIIART) $(OUTOS)asciiart.dep
+	$(RM) $(ASCIIART) $(OBJ.ASCIIART)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)asciiart.dep

@@ -54,7 +54,7 @@ $(CSPHYZIK.LIB): $(OBJ.CSPHYZIK)
 	$(DO.STATIC.LIBRARY)
 
 csphyzikclean:
-	-$(RM) $(CSPHYZIK.LIB) $(OBJ.CSPHYZIK) $(OUTOS)csphyzik.dep
+	-$(RM) $(CSPHYZIK.LIB) $(OBJ.CSPHYZIK)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)csphyzik.dep

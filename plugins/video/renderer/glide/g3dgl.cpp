@@ -220,8 +220,10 @@ bool csGraphics3DGlide::Initialize (iSystem *iSys)
 
   SysPrintf (MSG_INITIALIZATION, "\nGlideRender Glide selected\n");
 
-  config = m_piSystem->CreateConfigNew ("/config/glide.cfg");
+  System->AddConfig(iSystem::ConfigPriorityPlugIn, "/config/glide.cfg");
+  config = m_piSystem->GetConfig ();
   if (!config) return false;
+  config->IncRef();
 
   m_piG2D = LOAD_PLUGIN (m_piSystem, GLIDE_2D, NULL, iGraphics2D);
   if (!m_piG2D) return false;

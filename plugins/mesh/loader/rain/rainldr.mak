@@ -56,7 +56,7 @@ $(RAINLDR): $(OBJ.RAINLDR) $(LIB.RAINLDR)
 
 clean: rainldrclean
 rainldrclean:
-	-$(RM) $(RAINLDR) $(OBJ.RAINLDR) $(OUTOS)rainldr.dep
+	-$(RM) $(RAINLDR) $(OBJ.RAINLDR)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)rainldr.dep

@@ -65,7 +65,7 @@ $(SOCKET): $(OBJ.SOCKET) $(LIB.SOCKET)
 
 clean: socketclean
 socketclean:
-	$(RM) $(SOCKET) $(OBJ.SOCKET) $(OUTOS)socket.dep
+	$(RM) $(SOCKET) $(OBJ.SOCKET)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)socket.dep

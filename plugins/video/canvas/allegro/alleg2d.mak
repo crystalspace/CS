@@ -77,7 +77,7 @@ $(ALLEG2D): $(OBJ.ALLEG2D) $(LIB.ALLEG2D)
 	$(DO.PLUGIN) $(LIB.ALLEG2D.SPECIAL)
 
 alleg2dclean:
-	$(RM) $(ALLEG2D) $(OBJ.ALLEG2D) $(OUTOS)alleg2d.dep
+	$(RM) $(ALLEG2D) $(OBJ.ALLEG2D)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)alleg2d.dep

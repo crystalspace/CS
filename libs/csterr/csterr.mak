@@ -71,7 +71,7 @@ $(CSTERR.LIB): $(OBJ.CSTERR)
 	$(DO.LIBRARY)
 
 csterrclean:
-	-$(RM) $(CSTERR.LIB) $(OBJ.CSTERR) $(OUTOS)csterr.dep
+	-$(RM) $(CSTERR.LIB) $(OBJ.CSTERR)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)csterr.dep

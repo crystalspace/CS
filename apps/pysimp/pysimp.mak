@@ -60,7 +60,7 @@ $(PYSIMP.EXE): $(DEP.EXE) $(OBJ.PYSIMP) $(LIB.PYSIMP)
 	$(DO.LINK.EXE)
 
 pysimpleclean:
-	-$(RM) $(PYSIMP.EXE) $(OBJ.PYSIMP) $(OUTOS)pysimp.dep
+	-$(RM) $(PYSIMP.EXE) $(OBJ.PYSIMP)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)pysimp.dep

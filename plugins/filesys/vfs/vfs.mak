@@ -67,7 +67,7 @@ $(VFS): $(OBJ.VFS) $(LIB.VFS)
 	$(DO.PLUGIN)
 
 vfsclean:
-	$(RM) $(VFS) $(OBJ.VFS) $(OUTOS)vfs.dep
+	$(RM) $(VFS) $(OBJ.VFS)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)vfs.dep

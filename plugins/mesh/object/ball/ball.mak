@@ -56,7 +56,7 @@ $(BALL): $(OBJ.BALL) $(LIB.BALL)
 
 clean: ballclean
 ballclean:
-	-$(RM) $(BALL) $(OBJ.BALL) $(OUTOS)ball.dep
+	-$(RM) $(BALL) $(OBJ.BALL)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)ball.dep
