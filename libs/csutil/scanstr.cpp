@@ -138,6 +138,55 @@ int ScanStr (const char* in, const char* format, ...)
 	  num++;
 	  break;
 	}
+	case 'S':
+	{
+	  char* a = va_arg (arg, char*);
+	  in += strspn (in, " \t\n\f");
+	  if (*in == '\"')
+	  {
+	    in++;
+	    while (*in!= '\"')
+	    {
+	      if (*in == '\\')
+	      {
+		in++;
+		switch (*in)
+		{
+		  case '\\':
+		    *a++ = '\\';
+		    break;
+		  case 'n':
+		    *a++ = '\n';
+		    break;
+		  case 'r':
+		    *a++ = '\r';
+		    break;
+		  case 't':
+		    *a++ = '\t';
+		    break;
+		  case '"':
+		    *a++ = '"';
+		    break;
+		  default:
+		    *a++ = '\\';
+		    *a++ = *in;
+		    break;
+		} //switch
+		in++;
+	      }
+	      else
+	      {
+		*a++ = *in++;
+	      }
+	    } //while in string
+	    in++;
+	    num++;
+	  } //if string started
+
+	  //terminate string
+	  *a = '\0';
+	  break;
+	}
       }
       if (*format) format++;
     }

@@ -28,6 +28,12 @@
  * <dt>%f<dd>	floating point
  * <dt>%b<dd>	boolean (0, 1, true, false, yes, no, on, off)
  * <dt>%s<dd>	string (with or without single quotes)
+ * <dt>%S<dd>   string (delimited with double quotes) 
+ *              \n will be converted to a newline
+ *              \t will be converted to a tab
+ *              \\ produces a \
+ *              \" produces a "
+ *              all other conbinations of \ are copied. 
  * <dt>%D<dd>	list of integers, first argument should be a
  *		pointer to an array of integers, second argument
  *		a pointer to an integer which will contain the
