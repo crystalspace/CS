@@ -236,6 +236,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
     int anm_idx = fr->GetAnmIndex ();
     int tex_idx = fr->GetTexIndex ();
     float x, y, z, u, v, nx, ny, nz;
+    x = y = z = u = v = nx = ny = nz = 0.0f;
 
     if (!has_normals)
     {

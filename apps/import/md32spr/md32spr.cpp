@@ -630,45 +630,57 @@ bool MD32spr::LoadAnimation(char *animFile)
 void MD32spr::Write()
 {
   int i = 0;
-  char *vfspath, *fileName, *mdlName;
+  char* vfspath = NULL;
+  char* fileName = NULL;
+  char* mdlName = NULL;
 
-  if (outZipName) {
-    if (outZipName.Length() > 0) {
-      csArchive *zipFile = new csArchive(outZipName.GetData());
-      if(!zipFile) {
-	ReportError("Error creating output zip file.\n");
-	return;
+  if (outZipName)
+  {
+    if (outZipName.Length() > 0)
+    {
+      csArchive* zipFile = new csArchive (outZipName.GetData());
+
+      if(!zipFile)
+      {
+        ReportError("Error creating output zip file.\n");
+        return;
       }
+
       delete zipFile;
       vfspath = new char[outZipName.Length() + 12];
       fileName = new char[outZipName.Length() + 1];
       basename(outZipName.GetData(), fileName);
       sprintf(vfspath, "/tmp/%s_out/", fileName);
-      if (!out->Mount(vfspath, outZipName.GetData())) {
-	ReportError("Error mounting output zip file.\n");
-	return;
+
+      if (!out->Mount(vfspath, outZipName.GetData()))
+      {
+        ReportError("Error mounting output zip file.\n");
+        return;
       }
     }
   }
 
-  if(!player && !weaponDir) {
-    if (generic.Length()) {
-      for (i = 0; i < generic.Length(); i++) {
-	md3Model *mdl = (md3Model *) generic.Get(i);
-	mdlName = new char[strlen(mdl->GetFileName()) + 1];
-	basename(mdl->GetFileName(), mdlName);
-	csRef < iDocumentSystem > xml(csPtr < iDocumentSystem >
-				      (new csTinyDocumentSystem()));
-	csRef < iDocument > doc = xml->CreateDocument();
-	csRef < iDocumentNode > root = doc->CreateRoot();
-	csRef < iDocumentNode > parent =
-	  root->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
-	parent->SetValue("library");
+  if (!player && !weaponDir)
+  {
+    if (generic.Length())
+    {
+      for (i = 0; i < generic.Length(); i++)
+      {
+        md3Model *mdl = (md3Model *) generic.Get(i);
+        mdlName = new char[strlen(mdl->GetFileName()) + 1];
+        basename(mdl->GetFileName(), mdlName);
+        csRef<iDocumentSystem> xml(csPtr <iDocumentSystem>
+          (new csTinyDocumentSystem()));
+        csRef <iDocument> doc = xml->CreateDocument();
+        csRef <iDocumentNode> root = doc->CreateRoot();
+        csRef <iDocumentNode> parent =
+          root->CreateNodeBefore(CS_NODE_ELEMENT, NULL);
+        parent->SetValue("library");
 	
-	WriteGeneric(mdl, parent);
-	csString outFile(vfspath);
-	outFile += mdlName;
-	doc->Write(out, outFile.GetData());
+        WriteGeneric(mdl, parent);
+        csString outFile(vfspath);
+        outFile += mdlName;
+        doc->Write(out, outFile.GetData());
       }
     }
   }

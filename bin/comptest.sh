@@ -111,6 +111,7 @@ if test -n "$ARCH"; then
 fi
 
 # Check for machine-specific C compiler flags (these are mutually exclusive).
+(echo "$CPU" | grep -s [aA]thlon >/dev/null && ${CXX} -c -mcpu=athlon ${ARCH-"-march=athlon"} comptest.cpp >/dev/null 2>&1 && echo "-mcpu=athlon ${ARCH-"-march=athlon"}") >comptest.log || \
 (echo "$CPU" | grep -s 686 >/dev/null && ${CXX} -c -mcpu=pentiumpro ${ARCH-"-march=i686"} comptest.cpp >/dev/null 2>&1 && echo "-mcpu=pentiumpro ${ARCH-"-march=i686"}") >comptest.log || \
 (echo "$CPU" | grep -s 686 >/dev/null && ${CXX} -c -mpentiumpro ${ARCH-"-march=i686"} comptest.cpp >/dev/null 2>&1 && echo "-mpentiumpro ${ARCH-"-march=i686"}") >comptest.log || \
 (echo "$CPU" | grep -s [5-6]86 >/dev/null && ${CXX} -c -mcpu=pentium ${ARCH-"-march=i586"} comptest.cpp >/dev/null 2>&1 && echo "-mcpu=pentium ${ARCH-"-march=i586"}") >comptest.log || \

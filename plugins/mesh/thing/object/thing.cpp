@@ -1785,6 +1785,7 @@ void csThing::AppendShadows (
 void csThing::CreateBoundingBox ()
 {
   float minx, miny, minz, maxx, maxy, maxz;
+  minx = miny = minz = maxx = maxy = maxz = 0.0f;
   delete bbox;
   bbox = NULL;
   if (num_vertices <= 0 && num_curve_vertices <= 0) return ;
