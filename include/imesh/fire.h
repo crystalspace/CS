@@ -40,9 +40,9 @@ struct iFireState : public iBase
   /// Get the size of the fire drops.
   virtual void GetDropSize (float& dropwidth, float& dropheight) const = 0;
   /// Set origin of the fire.
-  virtual void SetOrigin (const csVector3& origin) = 0;
+  virtual void SetOrigin (const csBox3& origin) = 0;
   /// Get origin of the fire.
-  virtual const csVector3& GetOrigin () const = 0;
+  virtual const csBox3& GetOrigin () const = 0;
   /// Set direction of the fire.
   virtual void SetDirection (const csVector3& dir) = 0;
   /// Get direction of the fire.

@@ -39,7 +39,7 @@ class csFireMeshObject : public csParticleSystem
 protected:
   int amt;
   csVector3 direction;
-  csVector3 origin;
+  csBox3 origin;
   float swirl;
   float color_scale;
   csVector3* part_pos;
@@ -104,13 +104,13 @@ public:
   void GetDropSize (float& dropwidth, float& dropheight) const
   { dropwidth = drop_width; dropheight = drop_height; }
   /// Set origin of the fire.
-  void SetOrigin (const csVector3& origin)
+  void SetOrigin (const csBox3& origin)
   {
     initialized = false;
     csFireMeshObject::origin = origin;
   }
   /// Get origin of the fire.
-  const csVector3& GetOrigin () const 
+  const csBox3& GetOrigin () const 
   { return origin; }
   /// Set direction of the fire.
   void SetDirection (const csVector3& direction)
@@ -187,11 +187,11 @@ public:
     {
       scfParent->GetDropSize (dropwidth, dropheight);
     }
-    virtual void SetOrigin (const csVector3& origin)
+    virtual void SetOrigin (const csBox3& origin)
     {
       scfParent->SetOrigin (origin);
     }
-    virtual const csVector3& GetOrigin () const
+    virtual const csBox3& GetOrigin () const
     {
       return scfParent->GetOrigin ();
     }

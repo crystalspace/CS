@@ -213,9 +213,11 @@ void add_particles_fire (csSector* sector, char* matname, int num,
 
   iFireState* firestate = QUERY_INTERFACE (mesh, iFireState);
   firestate->SetNumberParticles (num);
-  firestate->SetDropSize (.02, .04);
+  //firestate->SetDropSize (.02, .04);
+  firestate->SetDropSize (.04, .08);
   firestate->SetLighting (false);
-  firestate->SetOrigin (origin);
+  firestate->SetOrigin (csBox3(origin-csVector3(.2,0,.2), 
+    origin+csVector3(.2,0.2)));
   firestate->SetDirection (csVector3 (0, 1., 0));
   firestate->SetSwirl (1.6);
   firestate->SetColorScale (0.2);

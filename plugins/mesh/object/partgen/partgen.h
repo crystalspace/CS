@@ -91,6 +91,7 @@ protected:
   /// Helping func. Returns vector of with -1..+1 members. Varying length!
   static csVector3& GetRandomDirection (const csVector3& magnitude,
 	const csVector3& offset);
+  static csVector3& GetRandomPosition (const csBox3& box);
 
 public:
   /**

@@ -56,8 +56,8 @@ void csFireMeshObject::SetupObject ()
 
     float fradius = drop_width * swirl; // guessed radius of the fire
     csVector3 height = total_time * direction; // guessed height
-    bbox.Set (origin - csVector3 (-fradius,0,-fradius), 
-      origin + csVector3 (+fradius, 0, +fradius) + height );
+    bbox.Set (origin.Min() - csVector3 (-fradius,0,-fradius), 
+      origin.Max() + csVector3 (+fradius, 0, +fradius) + height );
 
     // Calculate the maximum radius.
     csVector3 size = bbox.Max () - bbox.Min ();
@@ -91,7 +91,7 @@ csFireMeshObject::csFireMeshObject (iSystem* system, iMeshObjectFactory* factory
   part_speed = NULL;
   part_age = NULL;
   direction.Set (0, 1, 0);
-  origin.Set (0, 0, 0);
+  origin.Set (0,0,0, 0,0,0);
   total_time = 1;
   swirl = 1;
   color_scale = 1;
@@ -124,7 +124,7 @@ void csFireMeshObject::SetControlledLight (iLight *l)
 
 void csFireMeshObject::RestartParticle (int index, float pre_move)
 {
-  part_pos[index] = origin;
+  part_pos[index] = GetRandomPosition(origin);
   part_speed[index] = direction;
   part_age[index] = 0.0;
   GetParticle (index)->SetPosition (part_pos[index]);
@@ -183,9 +183,9 @@ void csFireMeshObject::Update (cs_time elapsed_time)
   {
     light_time += elapsed_time;
     csColor newcol;
-    newcol.red =   1.0 - 0.3*sin(light_time/10. + origin.x);
-    newcol.green = 0.7 - 0.3*sin(light_time/15. + origin.y);
-    newcol.blue =  0.3 + 0.3*sin(light_time/10. + origin.z);
+    newcol.red =   1.0 - 0.3*sin(light_time/10. + origin.Min().x);
+    newcol.green = 0.7 - 0.3*sin(light_time/15. + origin.Min().y);
+    newcol.blue =  0.3 + 0.3*sin(light_time/10. + origin.Min().z);
     light->SetColor (newcol);
   }
 
@@ -212,7 +212,7 @@ void csFireMeshObject::Update (cs_time elapsed_time)
 void csFireMeshObject::AddLight (iEngine *engine, iSector *sec)
 {
   if (light) return;
-  dynlight = engine->CreateDynLight (origin, 5, csColor (1, 1, 0));
+  dynlight = engine->CreateDynLight (origin.GetCenter(), 5, csColor (1, 1, 0));
   light = QUERY_INTERFACE (dynlight, iLight);
   light->SetSector (sec);
   dynlight->Setup ();
@@ -222,7 +222,7 @@ void csFireMeshObject::AddLight (iEngine *engine, iSector *sec)
 
 void csFireMeshObject::HardTransform (const csReversibleTransform& t)
 {
-  origin = t.This2Other (origin);
+  origin.Set( t.This2Other (origin.Min()),  t.This2Other (origin.Max()));
   initialized = false;
   shapenr++;
 }

@@ -21,6 +21,7 @@
 #include "cssysdef.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/transfrm.h"
+#include "csgeom/box.h"
 #include "partgen.h"
 #include "imesh/object.h"
 #include "iengine/mesh.h"
@@ -261,6 +262,16 @@ csVector3& csParticleSystem::GetRandomDirection (const csVector3& magnitude,
   return dir;
 }
 
+csVector3& csParticleSystem::GetRandomPosition (const csBox3& box)
+{
+  static csVector3 dir;
+  dir = box.Max() - box.Min();
+  dir.x *= rand() / (1.0+RAND_MAX);
+  dir.y *= rand() / (1.0+RAND_MAX);
+  dir.z *= rand() / (1.0+RAND_MAX);
+  dir += box.Min();
+  return dir;
+}
 //-- csNewtonianParticleSystem ------------------------------------------
 
 csNewtonianParticleSystem::csNewtonianParticleSystem (iSystem* system,
