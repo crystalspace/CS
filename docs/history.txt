@@ -3,6 +3,7 @@ The history order is reversed so that new features are at the top.
 3-Jun-2001
 	- Eric Sunshine eliminated a couple compilation warnings in isoview.cpp
 	  regarding assignment of float to integer.
+	- Eric Sunshine eliminated several compilation errors from metasys.cpp.
 1-Jun-2001
 	- Michael Voasse fixed a couple of additional bugs in motion
 	  manager. Changed csAppliedFrameVector from TYPED_VECTOR to
