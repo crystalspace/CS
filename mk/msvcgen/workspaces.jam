@@ -33,6 +33,7 @@ MsvcGenWorkspace typical : :
   grpnrall
   "grp.+_(?!typical\.)"
   nullrender3d
+  render3dcommon
   shadermgr
   softrender3d
   softshader
@@ -49,5 +50,6 @@ MsvcGenWorkspace newrenderer : :
   gl3d
   "grp.+_(?!newrenderer\.)"
   null3d
+  renderercommon
   soft3d
   ;
