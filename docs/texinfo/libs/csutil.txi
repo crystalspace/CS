@@ -8,3 +8,14 @@ The utility library consists of many smaller modules that are too small to
 live as a separate library. The biggest part of it is the @sc{scf} library.
 @xref{SCF}.
 
+The second most important class is probably the @code{csVector}. This class
+is a generic resizable array. It is generic because its elements are
+@code{(void*)} pointers. You can also use handy macros to create type-safe
+subclasses of this class. Also, the @file{.ini} file reader and the random
+number generator will probably help you.
+
+The other classes might or might not be useful, so if you need some very
+common functionality in your application, you should look in the @sc{api}
+reference to see if it is already implemented. The usage of these classes
+will not be explained further, as most functions are self-explanatory. The
+comments in the @sc{api} reference and the header files should also help.

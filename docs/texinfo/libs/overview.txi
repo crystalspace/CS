@@ -13,6 +13,12 @@ sections.
 The 3d engine is currently moved to a separate plug-in. For documentation on
 the engine, have a look at @ref{csEngine}.
 
+@item csSys
+All system dependent stuff (non-graphics and non-sound related) is in this
+library, for example keyboard, joystick and mouse driver, system-dependent
+file handling, loading dynamic libraries etc. This library the main module to
+make CS apps system-independent.
+
 @item csUtil
 This library contains various utilities. There is an Archive class which can
 read/write @sc{zip} archives. There is a vector class, a sparse matrix class
@@ -29,25 +35,36 @@ in a separate section as it is both complex (compared to the rest of
 A library for 3d geometry operations. It provides 2d and 3d vectors, polygons
 and bounding boxes, 3d matrices and some other useful things. @xref{csGeom}.
 
+@item csObject
+This library provides classes that can be used to build a hierarchy for your
+objects, including a name for every object, faked run-time type information
+(pseudo-@sc{rtti}), tree-like object structures and resizable arrays
+(@code{csVector}) of these objects.
+
 @item csGfxldr
 Routines to support loading various graphic file formats and put them
 internally in the same format. This library supports @sc{jpg}, @sc{gif},
 @sc{tga}, @sc{png}, and @sc{bmp}. Note that in the future this library will
 be converted to a plug-in.
 
+@item csParser
+A library which parses @sc{ascii} world files and creates a world in the 3D
+Engine. @xref{csParser}.
+
 @item csWS
 A window system nicely integrated with Crystal Space. It is also platform
 independent, as it is based on the CS graphics drivers. @xref{CSWS}.
 
-@item csSys
-All system dependent stuff (non-graphics and non-sound related) is in this
-library, for example keyboard, joystick and mouse driver, system-dependent
-file handling, loading dynamic libraries etc. This library the main module to
-make CS apps system-independent.
+@item csClear
+This is the statically-linked part of the Crystal Clear plug-in module.
+@xref{CrystalClear}.
 
-@item csParser
-A library which parses @sc{ascii} world files and creates a world in the 3D
-Engine. @xref{csParser}.
+@item csGame
+This libary is an attempt to build a gaming system that is specialized on
+3d shooters.
+
+@item csS
+@@@@@@FIXME: What is this?
 
 @item csPhyzik
 This module supports calculation of various physical properties.

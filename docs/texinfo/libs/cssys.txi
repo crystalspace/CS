@@ -36,6 +36,13 @@ all options required by the system or any plug-in.
 @item
 It processes the command-line parameters and also allows plug-in modules to
 react to the parameters.
+
+@item
+It calls additional startup and shutdown functions of some basic plug-in
+modules, called the @dfn{drivers}.
+
+@item
+All these methods are @code{virtual} methods, so you can override them.
 @end itemize
 
 @subheading How to Use the System Driver
