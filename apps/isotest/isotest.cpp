@@ -252,38 +252,38 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
 
 
   /// create a mesh object
-  //const char* classId = "crystalspace.mesh.object.cube";
-  const char* classId = "crystalspace.mesh.object.sprite.2d";
+  const char* classId = "crystalspace.mesh.object.cube";
+  //const char* classId = "crystalspace.mesh.object.sprite.2d";
   iMeshObjectType *mesh_type = LOAD_PLUGIN( System, classId, 
     "MeshObj", iMeshObjectType);
   iMeshObjectFactory *mesh_fact = mesh_type->NewFactory();
 
-  /*
+  ///*
   iCubeFactoryState* cubelook = QUERY_INTERFACE(mesh_fact, iCubeFactoryState);
   cubelook->SetMaterialWrapper(math2);
   cubelook->SetSize(.5, .5, .5);
   cubelook->SetMixMode (CS_FX_COPY);
   cubelook->DecRef();
-  */
-  ///*
+  //*/
+  /*
   iSprite2DFactoryState *fstate = QUERY_INTERFACE(mesh_fact, 
     iSprite2DFactoryState);
   fstate->SetMaterialWrapper(math2);
   fstate->SetMixMode(CS_FX_ADD);
   fstate->SetLighting(false);
   fstate->DecRef();
-  //*/
+  */
 
   iMeshObject *mesh_obj = mesh_fact->NewInstance();
 
-  ///*
+  /*
   iSprite2DState *ostate = QUERY_INTERFACE(mesh_obj, iSprite2DState);
   ostate->CreateRegularVertices(6, true);
   ostate->DecRef();
   //iParticle *pstate = QUERY_INTERFACE(mesh_obj, iParticle);
   //pstate->ScaleBy(10.0);
   //pstate->DecRef();
-  //*/
+  */
 
   /// add a mesh object sprite
   iIsoMeshSprite *meshspr = engine->CreateMeshSprite();
@@ -302,16 +302,16 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   pastate->SetMaterialWrapper(halo);
   pastate->SetMixMode(CS_FX_ADD);
   pastate->SetColor( csColor(0.125, 0.5, 1.0) );
-  fostate->SetNumberParticles(200);
+  fostate->SetNumberParticles(100);
   fostate->SetDropSize(0.1, 0.1);
   fostate->SetOrigin( csVector3(0,0,0) );
   fostate->SetLighting(false);
-  fostate->SetAcceleration( csVector3(0, -.4, 0) );
+  fostate->SetAcceleration( csVector3(0, -.3, 0) );
   fostate->SetElevation(PI/2.0);
   fostate->SetAzimuth(1.0);
   fostate->SetOpening(0.04);
-  fostate->SetSpeed(2.0);
-  fostate->SetFallTime(8.0);
+  fostate->SetSpeed(1.0);
+  fostate->SetFallTime(6.0);
   pastate->DecRef();
   fostate->DecRef();
 
