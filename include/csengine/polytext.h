@@ -30,7 +30,7 @@ struct iMaterialHandle;
 struct iPolygon3D;
 struct iLight;
 struct csRGBpixel;
-class csLightingPolyTexQueue;
+struct csLightingPolyTexQueue;
 class csPolygon3D;
 class csPolyTexture;
 class csLightMap;
