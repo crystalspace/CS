@@ -42,6 +42,7 @@
 #include "iutil/stringarray.h"
 #include "iutil/strset.h"
 #include "iutil/timer.h"
+#include "iutil/verbositymanager.h"
 #include "iutil/vfs.h"
 #include "iutil/virtclk.h"
 #endif /* __IUTIL_H__ */
