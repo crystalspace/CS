@@ -26,6 +26,9 @@
 #define CS_QUERY_REGISTRY(Reg,Interface)		\
   (Interface*)((Reg)->Get (#Interface, iSCF::SCF->GetInterfaceID (#Interface), \
   	VERSION_##Interface))
+#define CS_QUERY_REGISTRY_TAG_INTERFACE(Reg,Tag,Interface)		\
+  (Interface*)((Reg)->Get (Tag, iSCF::SCF->GetInterfaceID (#Interface), \
+  	VERSION_##Interface))
 
 struct iObjectRegistryIterator;
 
