@@ -5258,6 +5258,7 @@ sub DESTROY {
     }
 }
 
+*scfGetVersion = *cspacec::iMeshWrapperIterator_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -5562,6 +5563,141 @@ sub DESTROY {
     }
 }
 
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iPortalCallback ##############
+
+package cspace::iPortalCallback;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*Traverse = *cspacec::iPortalCallback_Traverse;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iPortalCallback($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iPortal ##############
+
+package cspace::iPortal;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*QueryObject = *cspacec::iPortal_QueryObject;
+*SetName = *cspacec::iPortal_SetName;
+*GetName = *cspacec::iPortal_GetName;
+*GetSector = *cspacec::iPortal_GetSector;
+*GetVertices = *cspacec::iPortal_GetVertices;
+*GetWorldVertices = *cspacec::iPortal_GetWorldVertices;
+*GetVertexIndices = *cspacec::iPortal_GetVertexIndices;
+*GetVertexIndicesCount = *cspacec::iPortal_GetVertexIndicesCount;
+*GetObjectPlane = *cspacec::iPortal_GetObjectPlane;
+*GetWorldPlane = *cspacec::iPortal_GetWorldPlane;
+*ComputeCameraPlane = *cspacec::iPortal_ComputeCameraPlane;
+*PointOnPolygon = *cspacec::iPortal_PointOnPolygon;
+*SetSector = *cspacec::iPortal_SetSector;
+*GetFlags = *cspacec::iPortal_GetFlags;
+*SetMaximumSectorVisit = *cspacec::iPortal_SetMaximumSectorVisit;
+*GetMaximumSectorVisit = *cspacec::iPortal_GetMaximumSectorVisit;
+*SetPortalCallback = *cspacec::iPortal_SetPortalCallback;
+*RemovePortalCallback = *cspacec::iPortal_RemovePortalCallback;
+*GetPortalCallbackCount = *cspacec::iPortal_GetPortalCallbackCount;
+*GetPortalCallback = *cspacec::iPortal_GetPortalCallback;
+*SetMissingSectorCallback = *cspacec::iPortal_SetMissingSectorCallback;
+*RemoveMissingSectorCallback = *cspacec::iPortal_RemoveMissingSectorCallback;
+*GetMissingSectorCallbackCount = *cspacec::iPortal_GetMissingSectorCallbackCount;
+*GetMissingSectorCallback = *cspacec::iPortal_GetMissingSectorCallback;
+*GetTextureFilter = *cspacec::iPortal_GetTextureFilter;
+*SetFilter = *cspacec::iPortal_SetFilter;
+*GetColorFilter = *cspacec::iPortal_GetColorFilter;
+*SetWarp = *cspacec::iPortal_SetWarp;
+*SetMirror = *cspacec::iPortal_SetMirror;
+*GetWarp = *cspacec::iPortal_GetWarp;
+*HardTransform = *cspacec::iPortal_HardTransform;
+*ObjectToWorld = *cspacec::iPortal_ObjectToWorld;
+*Warp = *cspacec::iPortal_Warp;
+*WarpSpace = *cspacec::iPortal_WarpSpace;
+*CompleteSector = *cspacec::iPortal_CompleteSector;
+*CheckFrustum = *cspacec::iPortal_CheckFrustum;
+*HitBeamPortals = *cspacec::iPortal_HitBeamPortals;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iPortal($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iPortal_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iPortalContainer ##############
+
+package cspace::iPortalContainer;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*GetPortalCount = *cspacec::iPortalContainer_GetPortalCount;
+*GetPortal = *cspacec::iPortalContainer_GetPortal;
+*CreatePortal = *cspacec::iPortalContainer_CreatePortal;
+*RemovePortal = *cspacec::iPortalContainer_RemovePortal;
+*Draw = *cspacec::iPortalContainer_Draw;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iPortalContainer($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iPortalContainer_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -11311,6 +11447,7 @@ sub DESTROY {
     }
 }
 
+*scfGetVersion = *cspacec::iStandardReporterListener_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -12933,6 +13070,15 @@ sub CS_LIGHTINGUPDATE_SORTRELEVANCE () { $cspacec::CS_LIGHTINGUPDATE_SORTRELEVAN
 sub CS_LIGHTINGUPDATE_ALWAYSUPDATE () { $cspacec::CS_LIGHTINGUPDATE_ALWAYSUPDATE }
 sub CS_CULLER_HINT_GOODOCCLUDER () { $cspacec::CS_CULLER_HINT_GOODOCCLUDER }
 sub CS_CULLER_HINT_BADOCCLUDER () { $cspacec::CS_CULLER_HINT_BADOCCLUDER }
+sub CS_PORTAL_CLIPDEST () { $cspacec::CS_PORTAL_CLIPDEST }
+sub CS_PORTAL_CLIPSTRADDLING () { $cspacec::CS_PORTAL_CLIPSTRADDLING }
+sub CS_PORTAL_ZFILL () { $cspacec::CS_PORTAL_ZFILL }
+sub CS_PORTAL_WARP () { $cspacec::CS_PORTAL_WARP }
+sub CS_PORTAL_MIRROR () { $cspacec::CS_PORTAL_MIRROR }
+sub CS_PORTAL_STATICDEST () { $cspacec::CS_PORTAL_STATICDEST }
+sub CS_PORTAL_FLOAT () { $cspacec::CS_PORTAL_FLOAT }
+sub CS_PORTAL_COLLDET () { $cspacec::CS_PORTAL_COLLDET }
+sub CS_PORTAL_VISCULL () { $cspacec::CS_PORTAL_VISCULL }
 sub CS_SPR_LIGHTING_HQ () { $cspacec::CS_SPR_LIGHTING_HQ }
 sub CS_SPR_LIGHTING_LQ () { $cspacec::CS_SPR_LIGHTING_LQ }
 sub CS_SPR_LIGHTING_FAST () { $cspacec::CS_SPR_LIGHTING_FAST }
