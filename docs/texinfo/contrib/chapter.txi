@@ -7,7 +7,7 @@
 @menu
 * Writing Documentation::
 * Coding Style::
-* CVS Guide:: CVS Etiquette Guidelines
+* CVS Guide:: @sc{cvs} Etiquette Guidelines
 * Porting:: Porting to a New Platorm
 @end menu
 

@@ -10,7 +10,7 @@ This section provides a quick overview of the various applications which are
 bundled with Crystal Space.  In some cases, more detailed information for a
 particular application may be found in subsequent sections.
 
-@table @file
+@table @code
 @cindex @file{blocks}
 @cindex Applications, @file{blocks}
 @item blocks
@@ -39,7 +39,7 @@ lacking such a tool.
 @cindex @file{map2cs}
 @cindex Applications, @file{map2cs}
 @item map2cs
-A map convertors which converts between Quake style @file{*.map} format to the
+A map convertors which converts between Quake style @file{.map} format to the
 native Crystal Space @samp{world} format.  It is known to work with WorldCraft
 2.1 Beta and QuArK (Quake Army Knife).
 
@@ -70,7 +70,7 @@ An example demonstrating use of the Crystal Space network driver.
 @cindex Applications, @file{phyztest}
 @item phyztest
 This application tests the physics library for proper operation.
-@xref{csPhyzik}.
+@xref{csPhyziks}.
 
 @cindex @file{pysimp}
 @cindex Applications, @file{pysimp}

@@ -60,7 +60,7 @@ keyboard, joystick, etc.).
 
 @item
 @emph{Physics} (library: csphyzik) This module supports calculation of
-various physical properties.  @xref{csPhyzik}.
+various physical properties.  @xref{csPhyziks}.
 
 @item
 @emph{Scripting} A non-existant module.

@@ -35,6 +35,7 @@ DESCRIPTION.apidoc = public API reference via Doc++
 DESCRIPTION.htmldoc = documentation as HTML
 DESCRIPTION.dvidoc = documentation as DVI
 DESCRIPTION.psdoc = documentation as PostScript
+DESCRIPTION.pdfdoc = documentation as PDF
 DESCRIPTION.infodoc = documentation as Info
 DESCRIPTION.repairdoc = Texinfo @node and @menu directives
 # For 'cleandoc' target
@@ -50,6 +51,7 @@ DOCHELP += \
   $(NEWLINE)echo $"  make htmldoc      Make the $(DESCRIPTION.htmldoc)$" \
   $(NEWLINE)echo $"  make dvidoc       Make the $(DESCRIPTION.dvidoc)$" \
   $(NEWLINE)echo $"  make psdoc        Make the $(DESCRIPTION.psdoc)$" \
+  $(NEWLINE)echo $"  make pdfdoc       Make the $(DESCRIPTION.pdfdoc)$" \
   $(NEWLINE)echo $"  make infodoc      Make the $(DESCRIPTION.infodoc)$" \
   $(NEWLINE)echo $"  make repairdoc    Repair $(DESCRIPTION.repairdoc)$" \
   $(NEWLINE)echo $"  make cleandoc     Clean all $(DESCRIPTION.doc)$"
@@ -59,9 +61,9 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: devdoc apidoc htmldoc dvidoc psdoc infodoc repairdoc cleandoc
+.PHONY: devdoc apidoc htmldoc dvidoc psdoc pdfdoc infodoc repairdoc cleandoc
 
-devdoc apidoc htmldoc dvidoc psdoc infodoc:
+devdoc apidoc htmldoc dvidoc psdoc pdfdoc infodoc:
 	$(MAKE_TARGET)
 
 repairdoc:
@@ -84,6 +86,7 @@ TEXI2HTML = bin/texi2html
 TEXI2HTMLINIT = bin/texi2html.init
 TEXI2DVI = texi2dvi
 DVIPS = dvips
+PS2PDF = ps2pdf
 MAKEINFO = makeinfo
 PWD = pwd
 DOCXX = doc++
@@ -106,6 +109,7 @@ OUT.DOC.API  = $(OUT.DOC)/api
 OUT.DOC.HTML = $(OUT.DOC)/html
 OUT.DOC.DVI  = $(OUT.DOC)/dvi
 OUT.DOC.PS   = $(OUT.DOC)/ps
+OUT.DOC.PDF  = $(OUT.DOC)/pdf
 OUT.DOC.INFO = $(OUT.DOC)/info
 
 # Header files used to generate public API and developer documentation.
@@ -157,6 +161,8 @@ OUT.DOC.IMAGE.DIRS.DVI  = \
   $(addprefix $(OUT.DOC.DVI)/,$(OUT.DOC.IMAGE.DIRS.ALL))
 OUT.DOC.IMAGE.DIRS.PS   = \
   $(addprefix $(OUT.DOC.PS)/,$(OUT.DOC.IMAGE.DIRS.ALL))
+OUT.DOC.IMAGE.DIRS.PDF  = \
+  $(addprefix $(OUT.DOC.PDF)/,$(OUT.DOC.IMAGE.DIRS.ALL))
 OUT.DOC.IMAGE.DIRS.INFO = \
   $(addprefix $(OUT.DOC.INFO)/,$(OUT.DOC.IMAGE.DIRS.ALL))
 
@@ -172,7 +178,7 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: devdoc apidoc htmldoc dvidoc psdoc infodoc repairdoc cleandoc
+.PHONY: devdoc apidoc htmldoc dvidoc psdoc pdfdoc infodoc repairdoc cleandoc
 .PHONY: do-htmldoc do-dvidoc do-infodoc
 
 clean: cleandoc
@@ -182,11 +188,11 @@ $(OUT.DOC): $(OUTBASE)
 	-$(MKDIR)
 
 $(OUT.DOC.DEV) $(OUT.DOC.API) $(OUT.DOC.HTML) $(OUT.DOC.DVI) $(OUT.DOC.PS) \
-$(OUT.DOC.INFO): $(OUT.DOC)
+$(OUT.DOC.PDF) $(OUT.DOC.INFO): $(OUT.DOC)
 	-$(MKDIR)
 
 $(OUT.DOC.IMAGE.DIRS.HTML) $(OUT.DOC.IMAGE.DIRS.DVI) $(OUT.DOC.IMAGE.DIRS.PS) \
-$(OUT.DOC.IMAGE.DIRS.INFO):
+$(OUT.DOC.IMAGE.DIRS.PDF)  $(OUT.DOC.IMAGE.DIRS.INFO):
 	$(MKDIR)
 
 # Rule for removing a particular directory.  To remove directory "foo",
@@ -293,6 +299,17 @@ psdoc: \
   $(OUT.DOC.PS) \
   dvidoc \
   do-psdoc
+
+# Rule to perform actual PDF conversion from PS file.
+do-pdfdoc:
+	$(PS2PDF) $(OUT.DOC.PS)/cs.ps $(OUT.DOC.PDF)/cs.pdf
+
+# Rule to generate PDF format output.
+pdfdoc: \
+  $(OUT.DOC.PDF).CLEAN \
+  $(OUT.DOC.PDF) \
+  psdoc \
+  do-pdfdoc
 
 # Rule to perform actual Info conversion of $(CSMANUAL_FILE).
 do-infodoc:

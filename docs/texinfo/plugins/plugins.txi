@@ -2,6 +2,7 @@
 @node PlugIns, Drivers, Plug-In Drivers, Plug-In Drivers
 @section Plug-In Modules
 @cindex Plug-In Modules
+@cindex Modules, Plug-In
 
 Plug-in modules provide a means of extending the functionality of Crystal
 Space or an application based upon Crystal Space without having to actually

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Config_Soft3D_TextureManager, Config_SoundDriver, Config_Common, Configuration File
+@node Config Soft3D TextureManager, Config SoundDriver, Config Common, Configuration File
 @subsection @code{[TextureManager]} section
 
 This section describes configuration options specific to the 3D software

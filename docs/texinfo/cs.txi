@@ -106,7 +106,7 @@ version @value{VERSION}, last updated @value{UPDATED}.
 * Anatomy:: Project Anatomy
 * Plug-In Drivers:: Plug-In Modules and Drivers
 * Contributing:: Contributing to Crystal Space
-* FAQ:: Frequently Asked Questions (FAQ)
+* FAQ:: Frequently Asked Questions (@sc{faq})
 * Todo:: To-Do List
 * History::
 * Index::

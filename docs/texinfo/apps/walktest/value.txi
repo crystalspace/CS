@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
-@node Console_Value, Console_MultiChoice, Console_Boolean, Console
-@subsubsection Value commands
+@node Console Value, Console Multi-Choice, Console Boolean, Console
+@subsubsection Value Commands
 
 A value command has some value associated with it. Typing the command without
 arguments will show the current value. Just type the value after the command
@@ -60,7 +60,7 @@ configuration option.
 
 @item cosfact
 Control the cosinus factor (default 0) used for lighting. For details,
-@xref{Config_Lighting}.
+@xref{Config Lighting}.
 
 @item p_alpha
 Change the alpha transparency for a selected portal. You can select a

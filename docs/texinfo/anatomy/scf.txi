@@ -1,7 +1,13 @@
-@node SCF, Platform_Details, csPhyzik, Anatomy
-@section Crystal Space Shared Class Facility (@sc{scf})
+@node SCF, Platform Details, csPhyziks, Anatomy
+@section Shared Class Facility (@sc{scf})
 @cindex @sc{scf}, Shared Class Facility
 @cindex Shared Class Facility (@sc{scf})
+
+@emph{Original @sc{scf} design and concept by Andrew Zabolotny, 1999.  This
+document and Crystal Space's particular @sc{scf} implementation were written,
+and are copyright @copyright{} 1999 by Andrew Zabolotny,
+@email{bit@@eltech.ru}.  @sc{scf} is distributed under the @sc{gnu} Library
+General Public License (@sc{lgpl}).  @xref{License}.}
 
 This library is intended for separating C++ class implementations from
 programs that use them; this is achieved by separating class implementations
@@ -16,18 +22,17 @@ only two minimal configurations supported: using shared libraries and using
 static linkage (for platforms that don't have shared library support).
 
 @menu
-* SCF how it works:: How it works
-* SCF usage:: @sc{scf} library usage
-* SCF classes implementing multiple interfaces:: Classes implementing multiple interfaces
-* SCF Interface versions:: @sc{scf} Interface versions
-* SCF Client side:: Client side
+* SCF Explained:: How it Works
+* SCF Using:: Using @sc{scf}
+* SCF Multiple Interfaces:: Classes Implementing Multiple Interfaces
+* SCF Versions:: Interface Versions
+* SCF Client:: Client Side
 * SCF Example:: Example
-* SCF Advanced techniques:: Advanced techniques
-* SCF author:: The author
+* SCF Advanced:: Advanced Techniques
 @end menu
 
-@node SCF how it works, SCF usage, SCF, SCF
-@subsection How it works
+@node SCF Explained, SCF Using, SCF, SCF
+@subsection How it Works
 
 This paragraph contains technical details about @sc{scf}.  If you're not
 interested in details, you can skip directly to next chapter which explains
@@ -41,9 +46,9 @@ implementation was a good testbed for this @sc{scf} implementation.
 The differences between @sc{com} and @sc{scf} are due to increased need in a
 easier-to-use and maybe a more lightweighted interface than @sc{com}.  The
 @sc{com} implementation caused some problems (because of bugs in @sc{egcs}
-1.1.X and in the NeXT C++ compiler).  Also it has some problems due to native
-Windows types used in @sc{com}; this experience has been taken into account
-while developing @sc{scf}.
+1.1.x and incompatibilities with the Objective-C language used by NeXT).  Also
+it has some problems due to native Windows types used in @sc{com}; this
+experience has been taken into account while developing @sc{scf}.
 
 The main paradigm of @sc{scf}, as in @sc{com}/@sc{corba}/Java/etc is
 interface.  You define an @emph{interface}, that is, a set of abstract methods
@@ -52,339 +57,346 @@ structs (or classes, it doesn't matter much except that if you're using
 classes you will have to add the @samp{public:} keyword).  Theoretically
 interface can contain even member variables and inline methods (but no
 non-virtual methods and constructors), @emph{but} this practice is not
-encouraged because later someone can want to add an
-@sc{com}/@sc{corba}/whatever layer between client and the actual object, and
-this will not be possible if interface would contain variables or inline
-methods.  If you don't plan to use @sc{com}/@sc{corba} later, you can use
-variables and inline functions as much as you want.
+encouraged because later someone can want to add an @sc{com}, @sc{corba}, etc.
+layer between client and the actual object, and this will not be possible if
+interface would contain variables or inline methods.  If you don't plan to use
+@sc{com} or @sc{corba} later, you can use variables and inline functions as
+much as you want.
 
 Here is an example of an interface:
 
 @example
 struct iDog
 @{
-  virtual bool IsAlive () = 0;
-  virtual const char *GetName () = 0;
-  virtual void SetName (const char *iName) = 0;
-  virtual void Barf (int iHowLoud) = 0;
-  virtual void Run (int iSpeed, float iDirection) = 0;
-  virtual bool GetChildren (IObjVector *oBrood) = 0;
+  virtual bool IsAlive() = 0;
+  virtual char const* GetName() = 0;
+  virtual void SetName (char const* iName) = 0;
+  virtual void Shout(int iHowLoud) = 0;
+  virtual void Run(int iSpeed, float iDirection) = 0;
+  virtual bool GetChildren(iObjVector* oBrood) = 0;
 @};
 @end example
 
-Note the last method that gets a pointer of @code{IObjVector} type.
-@code{IObjVector} is yet another interface.  We could pass a pointer to an
+Note the last method that gets a pointer of @code{iObjVector} type.
+@code{iObjVector} is yet another interface.  We could pass a pointer to an
 @code{csObjVector} (the implementation of that interface) as well, but this
 will mean both modules (caller and callee) should have same idea about what a
-@code{csObjVector} is@dots{} and if it happened you compiled the shared
-library with a slightly different version of @code{csObjVector} (that, say,
-had one member variable less) you will end up with an @sc{sigsegv}.
+@code{csObjVector} is and if it happened that you compiled the shared library
+with a slightly different version of @code{csObjVector} (that, say, had one
+member variable fewer) you will end up with a @sc{sigsegv} crash.
 
-Now let's write @emph{a particular implementation} of the above interface.
+Now let's write a particular @dfn{implementation} of the above interface.
 
 @example
 #include "idog.h"
 
 class MyDog : public iDog
 @{
-  @dots{} member functions/variables go here @dots{}
-
-  char *Name;
+private:
+  @r{@dots{} private member functions & variables @dots{}}
+  char* Name;
 public:
-  virtual bool IsAlive ();
-  virtual const char *GetName ();
-  virtual void SetName (const char *iName);
-  virtual void Barf (int iHowLoud);
-  virtual void Run (int iSpeed, float iDirection);
-  virtual bool GetChildren (IObjVector *oBrood);
-
-  @dots{} some additional member functions/variables go here @dots{}
+  virtual bool IsAlive();
+  virtual char const* GetName();
+  virtual void SetName(char const* iName);
+  virtual void Shout(int iHowLoud);
+  virtual void Run(int iSpeed, float iDirection);
+  virtual bool GetChildren(iObjVector* oBrood);
+  @r{@dots{} public member functions & variables @dots{}}
 @};
 
-bool MyDog::IsAlive ()
+bool MyDog::IsAlive()
 @{
   return true;
 @};
 
-const char *MyDog::GetName ()
+char const* MyDog::GetName()
 @{
   return Name;
 @}
 
-void MyDog::SetName (const char *iName)
+void MyDog::SetName(char const* iName)
 @{
   if (Name)
     free (Name);
   Name = strcpy (iName);
 @}
 
-@dots{} and so on @dots{}
-
+@r{@dots{} and so on @dots{}}
 @end example
 
-Now we put the actual implementation into a separate module (i.e.  into a
+Now we put the actual implementation into a separate module (i.e. into a
 shared library), and include into client just the interface file
 @file{idog.h}.  Now, since the client don't have an idea how we should build a
-object of the @code{MyDog} class, we also should provide a function that will
+object of the @samp{MyDog} class, we also should provide a function that will
 return a newly-allocated object of that class.  This is further called a
-@samp{class factory} (in fact, a class factory is a bit more than just this,
-but about this later).  Here is how we do it:
+@dfn{class factory} (in fact, a class factory is a bit more than just this,
+but more about this later).  Here is how to do it:
 
 @example
-static iDog *Create_iDog ()
+static iDog* Create_iDog()
 @{
-  return new MyDog ();
+  return new MyDog();
 @}
 @end example
 
-Okay, we did it.  Now back to the client: to work with a object that
-implements the @code{iDog} interface we need to load the shared library, get a
-pointer to @code{Create_MyDog} function, call it and get a new @code{MyDog}
+Okay, we did it.  Now back to the client.  To work with an object that
+implements the @samp{iDog} interface we need to load the shared library, get a
+pointer to @code{Create_MyDog()} function, call it and get a new @samp{MyDog}
 object.  Further we work with this pointer as if it were pointing an
-@code{iDog} object:
+@samp{iDog} object:
 
 @example
-handle = LoadLibrary ("libdog.so");
-iDog (*Create_iDog) () = GetLibrarySymbol ("Create_IDog");
-iDog *dog = Create_iDog ();
-printf ("Doggy's name is %s\n", dog->GetName ());
-dog->Barf (100);
+handle = LoadLibrary("libdog.so");
+iDog (*Create_iDog)() = GetLibrarySymbol("Create_IDog");
+iDog* dog = Create_iDog();
+printf("Doggy's name is %s\n", dog->GetName());
+dog->Shout(100);
 @dots{}
-
 @end example
 
 Of course, you don't have to do all this stuff manually with current @sc{scf}
 implementation.  The @sc{scf} library provides a number of macros and
 functions that almost hides the implementation details from end-user.
 
-@node SCF usage, SCF classes implementing multiple interfaces, SCF how it works, SCF
-@subsection @sc{scf} library usage
+@node SCF Using, SCF Multiple Interfaces, SCF Explained, SCF
+@subsection Using @sc{scf}
 
 The only include file you need in both your client and server modules is
-@file{csscf.h}.  It contain a number of macros and functions that you will
-need for easier use of @sc{scf}.  For the client, you will also have to add
-the @file{csscf.cpp} source code file to your project, on the server-side you
-don't need it (inline macros defined in @file{csscf.h} are enough).
+@file{scf.h}.  It contain a number of macros and functions that you will need
+for easier use of @sc{scf}.  For the client, you will also have to add the
+@file{scf.cpp} source code file to your project, on the server-side you don't
+need it (inline macros defined in @file{scf.h} are enough).
 
 To simplify things, all exported classes are supposed to be derived from some
-basical interface called iBase.  Thus, any interface is supposed to implement
-some basical functionality.  Currently @code{iBase} defines three interface
-functions:
+basical interface called @samp{iBase}.  Thus, any interface is supposed to
+implement some basical functionality.  Currently @samp{iBase} defines three
+interface functions:
 
 @table @code
-@item void IncRef ();
+@item void IncRef();
 This function should be called each time you get a new reference to a object
 and store it for a long-time usage.
 
-@item void DecRef ();
+@item void DecRef();
 Call this function to decrement the object's reference count.  When reference
-count reaches zero, the object is automatically deleted (if it is not an
-interface embedded within another object, see below).
+count reaches zero, the object is automatically deleted, provided that it is
+not an interface embedded within another object,
+@ref{SCF Embedded Interfaces}.
 
-@item iBase *QueryInterface (const char *iItfName, int iVersion);
-This method will return a pointer to an interface or to an embedded interface
-(see the description of embedded interfaces below).
+@item iBase* QueryInterface(char const* iInterfaceName, int iVersion);
+This method will return a pointer to an interface or to an embedded interface,
+@ref{SCF Embedded Interfaces}.
 @end table
 
-To simplify things even more, @file{csscf.h} file provides several macros that
-provide default declaration and default implementation of these three methods.
-@code{DECLARE_IBASE} macro will declare above three methods within any class
-definition that is derived from @code{iBase}.  The @code{IMPLEMENT_IBASE} will
-add the default implementation of these function to your module.  Example:
+To simplify things even more, @file{scf.h} provides several macros that
+provide default declarations and default implementations of these three
+methods.  The @samp{DECLARE_IBASE} macro will declare these three methods
+within any class definition that is derived from @samp{iBase}.  The
+@samp{IMPLEMENT_IBASE} will add the default implementation of these function
+to your module.  Example:
 
 @example
 struct iTest : public iBase
 @{
-  ...
+  @dots{}
 @};
 
-class Test : public ITest
+class Test : public iTest
 @{
   DECLARE_IBASE;
 @};
 
-IMPLEMENT_IBASE (Test)
+IMPLEMENT_IBASE(Test)
 @end example
 
-In reality, we need a bit more macros because the @code{QueryInterface()}
-function is not static - it depends on the interfaces implemented by given
-object.  In fact, @code{IMPLEMENT_IBASE} defines the @code{IncRef},
-@code{DecRef()} and the beginning of the @code{QueryInterface} function, but
-not the end of that function (i.e.  the closing brace).  That's because you
-have to use an additional macro called @code{IMPLEMENTS_INTERFACE} that will
+In reality, we need a few more macros because the @code{QueryInterface()}
+function is not static---it depends on the interfaces implemented by given
+object.  In fact, @code{IMPLEMENT_IBASE()} defines @code{IncRef()} and
+@code{DecRef()} and the beginning of the @code{QueryInterface()} function, but
+not the end of that function (i.e. the closing brace).  That's because you
+have to use an additional macro called @code{IMPLEMENTS_INTERFACE()} that will
 add the code required to support all implemented interface inside the
 @code{QueryInterface()}:
 
 @example
-IMPLEMENT_IBASE (Test)
-  IMPLEMENTS_INTERFACE (ITest)
+IMPLEMENT_IBASE(Test)
+  IMPLEMENTS_INTERFACE(iTest)
 IMPLEMENT_IBASE_END
 @end example
 
-The @code{DECLARE_IBASE} macro also defines two member variables:
-@code{csfRefCount} and @code{csfParent}.  @code{csfRefCount} is the counter
+The @samp{DECLARE_IBASE} macro also defines two member variables:
+@samp{scfRefCount} and @samp{scfParent}.  @samp{scfRefCount} is the counter
 for external references to this object and is used by @code{IncRef()} and
-@code{DecRef()} methods.  The @code{csfParent} method points to parent object
-and is also used by @code{IncRef()} and @code{DecRef()}.  Objects are chained
-in a tree-like fashion, and an call to @code{IncRef} will also call
-@code{csfParent->IncRef()}; same about @code{DecRef()}.  The root of the chain
-is the class factory, that is, a object that is used to create objects of a
-specific class.  The object tree looks like this:
+@code{DecRef()} methods.  The @samp{scfParent} variable points to the parent
+object and is also used by @code{IncRef()} and @code{DecRef()}.  Objects are
+chained together in a tree-like fashion, and an call to @code{IncRef()} will
+also call @code{scfParent->IncRef()}; same with @code{DecRef()}.  The root of
+the chain is the class factory, that is, an object that is used to create
+objects of a specific class.  The object tree looks like this:
 
 @example
-[ClassFactory]
-  +--[Object]
-       +--[Embedded interface]
-       +--[Embedded interface]
-            +--[Sub-embedded interface]
+@r{ClassFactory}
+    @r{@result{} Object}
+        @r{@result{} Embedded interface}
+        @r{@result{} Embedded interface}
+            @r{@result{} Sub-embedded interface}
 @end example
 
-Thus, if we call the @code{IncRef} method for @samp{Sub-embedded interface},
-we also will increment reference count for Object and ClassFactory.
+Thus, if we call the @code{IncRef()} method for @emph{Sub-embedded interface},
+we also will increment reference count for @emph{Object} and
+@emph{ClassFactory}.
 
-You also should call the @code{CONSTRUCT_IBASE(Parent)} inside your class
-constructor, this macro will initialize @code{scfRefCount} to zero and
-@code{scfParent} to the value you pass to this macro.  In fact, constructor of
-any class should receive at least one argument (@code{iBase *}) which should
-then be passed to @code{CONSTRUCT_IBASE} macro.
+You also should call @code{CONSTRUCT_IBASE(@var{parent})} inside your class
+constructor, this macro will initialize @samp{scfRefCount} to zero and
+@samp{scfParent} to @var{parent}.  In fact, the constructor of any class
+should receive at least one argument of type @samp{iBase*} which should then
+be passed along to the @code{CONSTRUCT_IBASE()} macro.
 
-@node SCF classes implementing multiple interfaces, SCF Interface versions, SCF usage, SCF
-@subsection Classes implementing multiple interfaces
+@node SCF Multiple Interfaces, SCF Versions, SCF Using, SCF
+@subsection Classes Implementing Multiple Interfaces
 
 Sometimes we will want one object to implement several interfaces.  For
-example, the 3D graphics driver could provide a basic @code{IGraphics3D}
-interface and several additional optional interfaces such as @code{IHalo},
-@code{IBumpMap} and so on.  There are two ways to do that: through multiple
-inheritance and through embedding a object that implements another interface
-within the @samp{carrier} object.  To simplify the following text we'll refer
-them as @samp{multiple interface} and @samp{embedded interface} methods.
+example, the 3D graphics driver could provide a basic @samp{iGraphics3D}
+interface and several additional optional interfaces such as @samp{iHalo},
+@samp{iBumpMap}, and so on.  There are two ways to do this:
 
-@menu
-* SCF multiple interfacing:: Multiple interfacing
-* SCF Embedded interfaces:: Embedded interfaces
-@end menu
+@itemize @bullet
+@item
+Via C++ multiple inheritance.
+@item
+Via object embedding, in which an object that implements another interface is
+embedded within the ``carrier'' object.
+@end itemize
 
-@node SCF multiple interfacing, SCF Embedded interfaces, SCF classes implementing multiple interfaces, SCF classes implementing multiple interfaces
-@subsubsection Multiple interfacing
+To simplify the following discussion we'll refer them as @dfn{multiple
+interface} and @dfn{embedded interface} methods.
+
+@subsubheading Multiple Interfacing
 
 You can declare a class to inherit from several interfaces at once.  This is
 useful if all implemented interfaces will need to access often same member
-variables.  For example, both the @code{IHalo} and @code{IBumpMap}
+variables.  For example, both the @samp{iHalo} and @samp{iBumpMap}
 implementations will need to access many member variables from
-@code{IGraphics3D} such as pixel format, screen dimensions and so on.  You
+@samp{iGraphics3D} such as pixel format, screen dimensions and so on.  You
 declare such classes this way:
 
 @example
-class MyGraphics3D : public IGraphics3D, public IHalo, public IBumpMap
+class MyGraphics3D :
+    public iGraphics3D, public iHalo, public iBumpMap
 @{
 public:
-  ...
+  @dots{}
 @};
 @end example
 
-When implementing the methods imposed by @code{iBase} interface you should use
-@code{IMPLEMENT_INTERFACE()} macro once for each implemented interface:
+When implementing the methods imposed by the @samp{iBase} interface you should
+use the @code{IMPLEMENT_INTERFACE()} macro once for each implemented
+interface:
 
 @example
-IMPLEMENT_IBASE (MyGraphics3D)
-  IMPLEMENTS_INTERFACE (IGraphics3D)
-  IMPLEMENTS_INTERFACE (IHalo)
-  IMPLEMENTS_INTERFACE (IBumpMap)
+IMPLEMENT_IBASE(MyGraphics3D)
+  IMPLEMENTS_INTERFACE(iGraphics3D)
+  IMPLEMENTS_INTERFACE(iHalo)
+  IMPLEMENTS_INTERFACE(iBumpMap)
 IMPLEMENT_IBASE_END
 @end example
 
-@node SCF Embedded interfaces, , SCF multiple interfacing, SCF classes implementing multiple interfaces
-@subsubsection Embedded interfaces
+@anchor{SCF Embedded Interfaces}
+@subsubheading Embedded Interfaces
 
-Other way to implement several interfaces in one object is to embed another
-object that implements another interface into the main, @samp{carrier} object.
-This method is preferable when a secondary interfaces seldom needs access to
-@samp{carrier} object's members, because you will need to access them through
-@code{scfParent} pointer.  Here is an example:
+Another way to implement several interfaces in one object is to embed an
+object that implements some interface into the another object, known as the
+``carrier'' object.  This method is preferable when a secondary interfaces
+seldom needs access to the carrier object's members, since you will need to
+access them through @code{scfParent} pointer.  Here is an example:
 
 @example
-class MyGraphics3D : public IGraphics3D
+class MyGraphics3D : public iGraphics3D
 @{
-  // declare the IHalo embedded interface
-  class MyHalo : public IHalo
+  // Declare the iHalo embedded interface.
+  class MyHalo : public iHalo
   @{
-    DECLARE_EMBEDDED_IBASE (MyGraphics3D);
-    ...
-  @} scfIHalo;
-  // declare the IBumpMap embedded interface
-  class MyBumpMap : public IBumpMap
+    DECLARE_EMBEDDED_IBASE(MyGraphics3D);
+    @dots{}
+  @} scfiHalo;
+  // Declare the iBumpMap embedded interface.
+  class MyBumpMap : public iBumpMap
   @{
-    DECLARE_EMBEDDED_IBASE (MyGraphics3D);
-    ...
-  @} scfIBumpMap;
+    DECLARE_EMBEDDED_IBASE(MyGraphics3D);
+    @dots{}
+  @} scfiBumpMap;
 
 public:
   DECLARE_IBASE;
-  ...
+  @dots{}
 @};
 @end example
 
-Note that you don't need to use some @samp{special} names for classes; use
-anything you want (i.e.  the @samp{My} prefix is not required; you could name
-above class @samp{GraphixThreeDeeImplementation}, this is true for embedded
-classes as well).  But most macros that have the word @samp{EMBEDDED} within
-their names (see below) relies on embedded object names to be
-@code{scf##InterfaceName}, that is, @code{scfiBase}, @code{scfiTest},
-@code{scfiGraphics3D} and so on.
+Note that you don't need to use special names for classes; use anything you
+want (that is, the @samp{My} prefix is not required; you could name the above
+class @samp{GraphixThreeDeeImplementation} if you like; this is true for
+embedded classes as well).  But most @sc{scf} macros that have the word
+@samp{EMBEDDED} within their names expect embedded object names to follow the
+form @samp{scf@var{InterfaceName}}.  For instance, @samp{scfiBase},
+@samp{scfiTest}, @samp{scfiGraphics3D}, and so on.
 
-When you declare the @code{iBase} methods within an embedded class, you can
-use the @code{DECLARE_EMBEDDED_IBASE(OuterClass)} macro instead of
-@code{DECLARE_IBASE}.  In this case the @code{scfParent} member will be of
-@code{OuterClass*} type rather than @code{iBase*}; this will allow member
-class to talk with his parent directly, thus allowing for direct member
-variables/functions access.  In fact, @code{DECLARE_IBASE} macro expands to
-@code{DECLARE_EMBEDDED_IBASE(iBase)}.
+When you declare the @samp{iBase} methods within an embedded class, you can
+use the @code{DECLARE_EMBEDDED_IBASE(@var{OuterClass})} macro instead of
+@samp{DECLARE_IBASE}.  In this case the @samp{scfParent} member will be of
+type @code{@var{OuterClass}*} rather than of type @code{iBase*}; this will
+allow the member class to talk with its parent directly, thus allowing for
+direct member variables and functions access.  In fact, the
+@samp{DECLARE_IBASE} macro expands to @code{DECLARE_EMBEDDED_IBASE(iBase)}.
 
-You also should use @code{IMPLEMENT_EMBEDDED_IBASE} macro instead of
-@code{IMPLEMENT_IBASE} because @code{IMPLEMENT_IBASE} will destroy the object
-when its reference count will reach zero; if you will do the same for an
-embedded interface you will fail because the object is allocated/freed at the
-same time when parent object is.  This way:
+You also should use the @code{IMPLEMENT_EMBEDDED_IBASE()} macro instead of
+@code{IMPLEMENT_IBASE()} because @code{IMPLEMENT_IBASE()} will destroy the
+object when its reference count will reach zero; if you do the same for an
+embedded interface it will fail because the object is allocated and freed at
+the same time when parent object is (since it is directly embedded within the
+parent.
 
 @example
-IMPLEMENT_IBASE (MyGraphics3D)
-  IMPLEMENTS_INTERFACE (IGraphics3D)
-  IMPLEMENTS_EMBEDDED_INTERFACE (IHalo)
-  IMPLEMENTS_EMBEDDED_INTERFACE (IBumpMap)
+IMPLEMENT_IBASE(MyGraphics3D)
+  IMPLEMENTS_INTERFACE (iGraphics3D)
+  IMPLEMENTS_EMBEDDED_INTERFACE(iHalo)
+  IMPLEMENTS_EMBEDDED_INTERFACE(iBumpMap)
 IMPLEMENT_IBASE_END
 @end example
 
-And finally, in parent object's constructor you should initialize all embedded
-interface objects with the @code{CONSTRUCT_EMBEDDED_IBASE(InterfaceName)}
-macro.  This will initialize @code{scfRefCount} and @code{scfParent} fields
-within @code{scf##InterfaceName} member variables to appropiate values (zero
-and @samp{this}).  Here is how we do it:
+And finally, in the parent object's constructor you should initialize all
+embedded interface objects with the
+@code{CONSTRUCT_EMBEDDED_IBASE(@var{InterfaceName})} macro.  This will
+initialize @samp{scfRefCount} and @samp{scfParent} fields within
+@samp{scf@var{InterfaceName}} member variables to appropiate values (zero and
+@samp{this}).  Here is how to do it:
 
 @example
-MyGraphics3D::MyGraphics3D (iBase *iParent)
+MyGraphics3D::MyGraphics3D(iBase* iParent)
 @{
-  CONSTRUCT_IBASE (iParent);
-  CONSTRUCT_EMBEDDED_IBASE (IHalo);
-  CONSTRUCT_EMBEDDED_IBASE (IBumpMap);
-  ...
+  CONSTRUCT_IBASE(iParent);
+  CONSTRUCT_EMBEDDED_IBASE(iHalo);
+  CONSTRUCT_EMBEDDED_IBASE(iBumpMap);
+  @dots{}
 @}
 @end example
 
-You should not call @code{CONSTRUCT_IBASE} within embedded object's
+You should not call @code{CONSTRUCT_IBASE()} within embedded object's
 constructor (in fact, it can not have a constructor at all) since all work
-needed to initialize @code{iBase} fields is done in carrier object's
+needed to initialize @code{iBase} fields is done in the carrier object's
 constructor.
 
-@node SCF Interface versions, SCF Client side, SCF classes implementing multiple interfaces, SCF
-@subsection @sc{scf} Interface versions
+@node SCF Versions, SCF Client, SCF Multiple Interfaces, SCF
+@subsection Interface Versions
 
 Unlike @sc{com}, @sc{scf} supports interface versions.  That is, a shared
 class could implement verion 0.3.6 of given interface, and if client requests
 that interface of a version lower or equal than 0.3.6, a correct interface
 pointer is returned.  For this to work you need to define inside each
-@file{i###.h} file a constant called @code{VERSION_i###} that defines the
-current version of given interface.  To correctly support different versions
-of interfaces you should follow the following guidelines:
+interface header file (typically named @file{i@var{InterfaceName}}) a constant
+called @samp{VERSION_i@var{InterfaceName}} that defines the current version of
+given interface.  To correctly support different versions of interfaces you
+should follow these guidelines:
 
 @itemize @bullet
 @item
@@ -401,120 +413,130 @@ If your changes are relatively minor, but you do a major release, increase the
 minor version number and drop the micro version to zero.
 
 @item
-If you're in developement process, and did a minor change to the interface,
-increase the micro version.
+If you're in the developement process, and did a minor change to the
+interface, increase the micro version.
 @end itemize
 
 The possible range for major and minor version numbers is 0..255, and the
 range for micro version number is 0..65535.
 
-When you query an interface, you always should tell what interface version are
-you looking for.  If module cannot provide an interface compatible with the
-requested version, the @code{QueryInterface()} will return @code{NULL} (same
-as if interface wouldn't be available at all).  You can use
-@code{scfCompatibleVersion()} to check whenever requested version is
-compatible with interface version.  In fact, the @code{IMPLEMENTS_INTERFACE}
-and @code{IMPLEMENTS_EMBEDDED_INTERFACE} macros use this function.
+When you query an interface, you should always tell it what interface version
+are you looking for.  If a module cannot provide an interface compatible with
+the requested version, then @code{QueryInterface()} will return @samp{NULL}
+(same as if interface wasn't available at all).  You can use
+@code{scfCompatibleVersion()} to check whether the requested version is
+compatible with interface version.  In fact, the @code{IMPLEMENTS_INTERFACE()}
+and @code{IMPLEMENTS_EMBEDDED_INTERFACE()} macros employ this function.
 
 For easier definition of versioned interfaces you can use the
-@code{SCF_VERSION} macro.  This way:
+@code{SCF_VERSION()} macro.
 
 @example
-SCF_VERSION (MyGraphics3D, 0, 0, 1);
+SCF_VERSION(MyGraphics3D, 0, 0, 1);
 
 struct MyGraphics3D : public iBase
 @{
-  ...
+  @dots{}
 @}
 @end example
 
-@node SCF Client side, SCF Example, SCF Interface versions, SCF
-@subsection Client side
+@node SCF Client, SCF Example, SCF Versions, SCF
+@subsection Client Side
 
 Now let's explain how to use all this mess from client side.  First, we should
 be able to create objects that implements the interfaces we want.  For this,
-you should use the @code{CREATE_INSTANCE} macro.  It receives two arguments:
+you should use the @code{CREATE_INSTANCE()} macro.  It receives two arguments:
 the name of external class, and the name of the interface it implements.  So,
-if we know class @code{MyGraphics3D} implements the @code{IGraphics3D}
+if we know class @samp{MyGraphics3D} implements the @samp{iGraphics3D}
 interface, you should write:
 
 @example
-IGraphics3D *G3D = CREATE_INSTANCE (MyGraphics3D, IGraphics3D);
+iGraphics3D* G3D = CREATE_INSTANCE(MyGraphics3D, iGraphics3D);
 if (!G3D)
 @{
-  fprintf (stderr, "Cannot create an object of the MyGraphics3D class!\n");
-  abort ();
+  fprintf(stderr,
+    "Failed to create an instance of MyGraphics3D!\n");
+  abort();
 @}
 @end example
 
 Now you can use the object any way you like, just like standard C++:
 
 @example
-G3D->BeginDraw ();
-G3D->DrawLine (...);
-G3D->DrawPolygon (...);
-G3D->EndDraw ();
+G3D->BeginDraw();
+G3D->DrawLine(@dots{});
+G3D->DrawPolygon(@dots{});
+G3D->EndDraw();
 @end example
 
-When you are done using the @code{G3D} pointer (say, when program exits), you
-should free that object by calling @code{G3D->DecRef()}.  After this you
-cannot use @code{G3D} anymore; you should create another instance of
-@code{IGraphics3D} for this.
+When you are done using the @samp{G3D} pointer (say, when program exits), you
+should free that object by calling @code{G3D->DecRef()}.  After this you can
+not use @samp{G3D} anymore; you should create another instance of
+@samp{iGraphics3D} for this.
 
 To query an embedded interface, you will want to use the
-@code{QUERY_INTERFACE} macro; it also receives two arguments, first being the
-object you are querying for the embedded interface and second being the name
-of the interface you want.  Example:
+@code{QUERY_INTERFACE()} macro.  It also receives two arguments, first being
+the object you are querying for the embedded interface and second being the
+name of the interface you want.  Example:
 
 @example
-IHalo *halo = QUERY_INTERFACE (G3D, IHalo);
+iHalo* halo = QUERY_INTERFACE(G3D, iHalo);
 if (!halo)
 @{
-  fprintf (stderr, "The 3D graphics driver doesn't support halo drawing!\n");
+  fprintf(stderr,
+    "3D graphic driver doesn't support halos!\n");
   return;
 @}
 @end example
 
-@node SCF Example, SCF Advanced techniques, SCF Client side, SCF
+@node SCF Example, SCF Advanced, SCF Client, SCF
 @subsection Example
 
-Here is a completely working example.  It implements an shared class that has
-a base and an embedded interface.  Here are the interface files for the
-@code{iDog} interface (the base interface of our class) and the @code{iName}
-interface (the interface embedded into our class):
+Here is a completely working example.  It implements a shared class that has
+a base and an embedded interface.
 
-File @file{idog.h}:
+Here are the interface files for the @samp{iDog} interface (the base interface
+of our class) and the @samp{iName} interface (the interface embedded into our
+class).
+
+@noindent
+@emph{File}: @file{idog.h}
+
 @example
-#include "csscf.h"
+#include "scf.h"
 
-// the version number of our interface
-SCF_VERSION (iDog, 0, 0, 1)
+// Version number of our interface.
+SCF_VERSION(iDog, 0, 0, 1)
 
 struct iDog : public iBase
 @{
-  virtual void Walk () = 0;
-  virtual void Barf (char *iWhat) = 0;
+  virtual void Walk() = 0;
+  virtual void Shout(char const* iWhat) = 0;
 @};
 @end example
 
-File @file{iname.h}:
-@example
-#include "csscf.h"
+@noindent
+@emph{File}: @file{iname.h}
 
-// the version number of our interface
-SCF_VERSION (iName, 0, 0, 1);
+@example
+#include "scf.h"
+
+// Version number of our interface.
+SCF_VERSION(iName, 0, 0, 1);
 
 struct iName : public iBase
 @{
-  virtual char *GetName () = 0;
-  virtual void SetName (char *iName) = 0;
+  virtual char const* GetName() = 0;
+  virtual void SetName(char const* iName) = 0;
 @};
 @end example
 
-Now here is the implementation of a class that provides both above
+Now here is the implementation of a class for both of the mentioned
 interfaces:
 
-File @file{dog.cpp}:
+@noindent
+@emph{File}: @file{dog.cpp}
+
 @example
 #include "idog.h"
 #include "iname.h"
@@ -524,209 +546,190 @@ File @file{dog.cpp}:
 
 class csDog : public iDog
 @{
-  char *Name;
+  char* Name;
 
-  // Embedded interface
+  // Embedded interface.
   class csName : public iName
   @{
   public:
-    DECLARE_EMBEDDED_IBASE (csDog);
-
-    virtual char *GetName ();
-    virtual void SetName (char *iName);
+    DECLARE_EMBEDDED_IBASE(csDog);
+    virtual char const* GetName();
+    virtual void SetName(char const* iName);
   @} scfiName;
   friend class csName;
 
 public:
   DECLARE_IBASE;
-
-  csDog (iBase *iParent);
-  virtual void Walk ();
-  virtual void Barf (char *iWhat);
+  csDog(iBase* iParent);
+  virtual void Walk();
+  virtual void Shout(char const* iWhat);
 @};
 
-//--------------- implementation ----------------
+//---------- Implementation ---------
 
-IMPLEMENT_IBASE (csDog)
-  IMPLEMENTS_INTERFACE (iDog)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iName)
+IMPLEMENT_IBASE(csDog)
+  IMPLEMENTS_INTERFACE(iDog)
+  IMPLEMENTS_EMBEDDED_INTERFACE(iName)
 IMPLEMENT_IBASE_END
 
-csDog::csDog (iBase *iParent)
+csDog::csDog(iBase* iParent)
 @{
-  CONSTRUCT_IBASE (iParent);
-  CONSTRUCT_EMBEDDED_IBASE (scfiName);
+  CONSTRUCT_IBASE(iParent);
+  CONSTRUCT_EMBEDDED_IBASE(scfiName);
   Name = NULL;
 @}
 
-void csDog::Walk ()
+void csDog::Walk()
 @{
-  printf ("%s: I'm walking\n", Name);
+  printf("%s: I'm walking\n", Name);
 @}
 
-void csDog::Barf (char *iWhat)
+void csDog::Shout(char const* iWhat)
 @{
-  printf ("I'm %s: barf, barf, %s\n", Name, iWhat);
+  printf("I'm %s: shout, shout, %s\n", Name, iWhat);
 @}
 
-// iName interface for dog
+// iName interface for dog.
 
-IMPLEMENT_EMBEDDED_IBASE (csDog::csName)
-  IMPLEMENTS_INTERFACE (iName)
+IMPLEMENT_EMBEDDED_IBASE(csDog::csName)
+  IMPLEMENTS_INTERFACE(iName)
 IMPLEMENT_IBASE_END
 
-char *csDog::csName::GetName ()
+char const* csDog::csName::GetName()
 @{
   return scfParent->Name;
 @}
 
-void csDog::csName::SetName (char *iName)
+void csDog::csName::SetName(char const* iName)
 @{
   if (scfParent->Name)
-    free (scfParent->Name);
-  scfParent->Name = strdup (iName);
+    free(scfParent->Name);
+  scfParent->Name = strdup(iName);
 @}
 
-// ... and now export all classes
+// Now export all classes.
 
-IMPLEMENT_FACTORY (csDog)
+IMPLEMENT_FACTORY(csDog)
 
-EXPORT_CLASS_TABLE (Dog)
-  EXPORT_CLASS (csDog, "A Dog that barfs")
+EXPORT_CLASS_TABLE(Dog)
+  EXPORT_CLASS(csDog, "A Dog that shouts")
 EXPORT_CLASS_TABLE_END
 @end example
 
 The above three files should be compiled together to get a shared library.
-The shared library should export the @code{Create_csDog} function (implemented
-with the @code{IMPLEMENT_FACTORY} macro).  On most platforms this is achieved
-automatically, on OS/2 you will need to write an @file{.def} file for this
-(you need it anyway).  And finally, here is the source code for a client
-application that uses the @code{csDog} class:
+The shared library should export the @code{Create_csDog()} function
+(implemented with the @code{IMPLEMENT_FACTORY()} macro).  On most platforms
+this is achieved automatically, however on @sc{os}/2 you will need to write a
+@file{.def} file for this.  Finally, here is the source code for a client
+application that uses the @samp{csDog} class:
 
-File @file{doggy.cpp}:
+@noindent
+@emph{File}: @file{doggy.cpp}
+
 @example
 #include <stdio.h>
-#include "csscf.h"
-#include "inifile.h"
-
+#include "scf.h"
 #include "idog.h"
 #include "iname.h"
+#include "inifile.h"
 
 int main ()
 @{
-  csIniFile config ("scf.cfg");
-  scfInitialize (&config);
+  csIniFile config("scf.cfg");
+  scfInitialize(&config);
 
-  iDog *dog = CREATE_INSTANCE (csDog, iDog);
+  iDog *dog = CREATE_INSTANCE(csDog, iDog);
   if (!dog)
-    fprintf (stderr, "No csDog shared class!\n");
+    fprintf(stderr, "No csDog shared class!\n");
   else
   @{
-    iName *name = QUERY_INTERFACE (dog, iName);
+    iName* name = QUERY_INTERFACE(dog, iName);
     if (!name)
-      fprintf (stderr, "dog does not support iName interface!\n");
+      fprintf(stderr,
+        "Dog does not support iName interface!\n");
     else
     @{
-      name->SetName ("Droopy");
-      dog->Walk ();
-      dog->Barf ("hello!");
-      printf ("Dog's name is %s\n", name->GetName ());
-      name->DecRef ();
+      name->SetName("Droopy");
+      dog->Walk();
+      dog->Shout("hello!");
+      printf("Dog's name is %s\n", name->GetName());
+      name->DecRef();
     @}
-    dog->DecRef ();
+    dog->DecRef();
   @}
 
-  scfFinish ();
+  scfFinish();
 @}
 @end example
 
-Easy, eh? Now the last thing: @sc{scf} uses a file called @file{scf.cfg} for
-storing class name <-> shared library name mapping.  File format is easy:
-@code{ClassName = SharedLibraryName}.  So, for the above example to work you
-have to add a line that reads @samp{csDog = libdog.so} (or @file{.dll}) to the
-respective system-dependent section of @file{scf.cfg}.
+Now the last thing: @sc{scf} uses a file called @file{scf.cfg} for storing the
+@var{class name} to @var{shared library name} mapping.  The file's format is
+simple: @samp{@var{ClassName} = @var{SharedLibraryName}}.  So, for the above
+example to work you have to add a line that reads @samp{csDog = dog} to the
+@code{[SCF.Registry]} section of the configuration file @file{scf.cfg}.
 
-Alternatively, you can register classes at run time. This way:
+Alternatively, you can register classes at run time:
 
 @example
-scfRegisterClass ("csDog", "libDog.dll");
+scfRegisterClass("csDog", "dog");
 @end example
 
-@node SCF Advanced techniques, SCF author, SCF Example, SCF
-@subsection Advanced techniques
+@node SCF Advanced, , SCF Example, SCF
+@subsection Advanced Techniques
 
-@sc{scf} library implements some things that you will need if you're an
-@emph{advanced guy} type man (I'm personally not one :-).  Here I will
-describe them in details.
+The @sc{scf} library implements some things that you will need to know about
+to use some advanced techniques.  They are described in detail, below.
 
-@menu
-* SCF dynamic class registration:: Dynamic class registration
-* SCF Non-registered classes:: Non-registered classes
-@end menu
-
-@node SCF dynamic class registration, SCF Non-registered classes, SCF Advanced techniques, SCF Advanced techniques
-@subsubsection Dynamic class registration
+@subsubheading Dynamic Class Registration
 
 You can register and deregister @sc{scf} classes at run time.  You can even
-dynamically replace one class with another if you will use same ID during
+dynamically replace one class with another if you use same @sc{id} during
 registration.  There are two functions that can be used to dynamically
-register classes, one for registering classes in shared libraries and one for
+register classes; one for registering classes in shared libraries and one for
 registering classes within client module.  To register a class that is located
 inside a shared library, use this function:
 
 @example
-extern bool scfRegisterClass (const char *iClassID, const char *iLibraryName);
+extern bool scfRegisterClass(
+    char const* iClassID,
+    char const* iLibraryName);
 @end example
 
 The prototype should be self-describing.  If you have a class that is linked
-into the executable, you should prepare a structure of the @code{scfClassInfo}
+into the executable, you should prepare a structure of the @samp{scfClassInfo}
 type and pass it to the following function:
 
 @example
-extern bool scfRegisterClass (scfClassInfo *iClassInfo);
+extern bool scfRegisterClass(scfClassInfo*);
 @end example
 
-You should fill the ClassID and Factory fields (the @code{Description} field
-is not used except in scfreg).
+You should fill the @samp{ClassID} and @samp{Factory} fields.  The
+@samp{Description} field is not used except by the @file{scfreg} utility.
 
-You can unregister an class that is already registered with the following
-function:
+You can deregister an already registered class with the following function:
 
 @example
-extern bool scfUnregisterClass (char *iClassID);
+extern bool scfUnregisterClass(char const* iClassID);
 @end example
 
-@node SCF Non-registered classes, , SCF dynamic class registration, SCF Advanced techniques
-@subsubsection Non-registered classes
+@subsubheading Non-Registered Classes
 
 Sometimes you don't want to register your classes with the @sc{scf} kernel.
-That is, you create your objects manually, using @samp{new} or whatever.  In
-this case your object is not a part of the class tree (see above) and thus
-don't have a parent.  In this case you have to pass @code{NULL} to the
-@code{CONSTRUCT_IBASE} macro in constructor.  This way:
+That is, you create your objects manually, using @samp{new} or some other
+method.  In this case your object is not a part of the class tree (see above)
+and thus doesn't have a parent.  In this case you have to pass @samp{NULL} to
+the @code{CONSTRUCT_IBASE()} macro in constructor.
 
 @example
-MyClass::MyClass ()
+MyClass::MyClass()
 @{
-  CONSTRUCT_IBASE (NULL)
+  CONSTRUCT_IBASE(NULL)
 @}
 @end example
 
-If you also want your object to not be automatically deleted when reference
-count reaches zero, you can use the @code{IMPLEMENT_EMBEDDED_IBASE} instead of
-@code{IMPLEMENT_IBASE}, as if your object would be an embedded interface.
-Embedded interfaces don't have the habbit of deleting themselves when their
-reference count reaches zero.  In this case you should take care and delete
-your object manually.
-
-@node SCF author, , SCF Advanced techniques, SCF
-@subsection The author
-
-Original @sc{scf} design & concept by Andrew Zabolotny, 1999
-
-This particular @sc{scf} implementation is Copyright @copyright{} 1999 by
-Andrew Zabolotny, @email{bit@@eltech.ru}
-
-Written for the Crystal Space project,
-distributed under GNU Library General Public License (LGPL).
-@xref{License}.
+If you also want your object to not be automatically deleted when the
+reference count reaches zero, you can use @code{IMPLEMENT_EMBEDDED_IBASE()}
+instead of @code{IMPLEMENT_IBASE()}, as if your object was an embedded
+interface.  Embedded interfaces don't have the habit of deleting themselves
+when their reference count reaches zero.  In this case you should take care
+and delete your object manually.

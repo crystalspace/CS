@@ -1,100 +1,108 @@
 @c -*-texinfo-*-
-@node MS-DOS, GCC Windows, BeOS, OSSpecific
-@subsection MS-DOS
-@cindex MS-DOS
+@node MS-DOS, GCC Windows, BeOS, Platform Instructions
+@subsection @sc{ms-dos}
+@cindex @sc{ms-dos}
 
-The DJGPP port of Crystal Space for MS-DOS is maintained by
-@email{sgalbrai@@krl.org, Seth Galbraith}.
+The @sc{djgpp} port of Crystal Space for @sc{ms-dos} is maintained by Seth
+Galbraith, @email{sgalbrai@@krl.org}.
 
-If you want to compile and use Crystal Space for DOS using the DJGPP compiler
-(@uref{http://www.delorie.com/djgpp}), you're reading the right document.
+If you want to compile and use Crystal Space for @sc{dos} using the @sc{djgpp}
+compiler (@uref{http://www.delorie.com/djgpp}), you're reading the right
+document.
 
-@menu
-* MSDOS files:: Files you will need
-* MSDOS Install:: Installation
-* MSDOS Allegro:: Allegro
-* MSDOS Bugs:: Bugs
-@end menu
-
-@node MSDOS files, MSDOS Install, MS-DOS, MS-DOS
-@subsubsection Files you will need
+@subsubheading Necessary Files
 
 You should use the Crystal Space makefile system to compile Crystal Space.
 This will require some utilities and libraries which are common in Unix-like
-environments but not in DOS.  Here is a list of all of the files you should
-need to compile Crystal Space with DJGPP:
+environments but not in @sc{dos}.  Here is a list of all of the files you
+should need to compile Crystal Space with @sc{djgpp}:
 
-@table @emph
-@item DJGPP development kit
+@noindent
+@sc{djgpp} development kit@*
 @uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2/djdev201.zip}
 
-@item DJGPP frequently asked questions
+@noindent
+@sc{djgpp} frequently asked questions@*
 @uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2/faq210b.zip}
 
-@item DJGPP DPMI provider
+@noindent
+@sc{djgpp} DPMI provider@*
 @uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2misc/csdpmi3b.zip}
 
-@item DJGPP GNU C++ libraries
+@noindent
+@sc{djgpp} GNU C++ libraries@*
 @uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/lgp271b.zip}
 
-@item DJGPP GNU help system
+@noindent
+@sc{djgpp} GNU help system@*
 @uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/txi390b.zip}
 
-@item DJGPP GNU linker and assembler
+@noindent
+@sc{djgpp} GNU linker and assembler@*
 @uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/bnu281b.zip}
 
-@item DJGPP GNU C compiler
+@noindent
+@sc{djgpp} GNU C compiler@*
 @uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/gcc281b.zip}
 
-@item DJGPP GNU C++ compiler
+@noindent
+@sc{djgpp} GNU C++ compiler@*
 @uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/gpp281b.zip}
 
-@item DJGPP GNU make utility
+@noindent
+@sc{djgpp} GNU make utility@*
 @uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/mak375b.zip}
 
-@item DJGPP GNU sed utility
+@noindent
+@sc{djgpp} GNU sed utility@*
 @uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/sed302b.zip}
 
-@item DJGPP GNU file utilities
+@noindent
+@sc{djgpp} GNU file utilities@*
 @uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/fil316b.zip}
 
-@item DJGPP GNU text utilities
+@noindent
+@sc{djgpp} GNU text utilities@*
 @uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/txt122b.zip}
 
-@item DJGPP GNU shell utilities
+@noindent
+@sc{djgpp} GNU shell utilities@*
 @uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/shl112b.zip}
 
-@item DJGPP GNU diff utilities
+@noindent
+@sc{djgpp} GNU diff utilities@*
 @uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/dif271b.zip}
 
-@item Compiled zip, jpeg and png libraries
-@uref{ftp://ftp.linuxgames.com/crystal/support/doslibs.zip} @*
-These are needed if the @samp{original} libraries don't work.
-@xref{MSDOS Bugs}.
+@noindent
+Compiled zip, jpeg and png libraries@*
+@uref{ftp://ftp.linuxgames.com/crystal/support/doslibs.zip}@*
+@emph{These are needed if the ``original'' libraries don't work.
+@xref{MSDOS Bugs}.}
 
-@item NASM (Netwide Assembler) for DOS
+@noindent
+@sc{nasm} (Netwide Assembler) for @sc{dos}@*
 @uref{ftp://ftp.linuxgames.com/crystal/nasm/nasm-0.98e-bin-dos.zip}
-@end table
 
-@node MSDOS Install, MSDOS Allegro, MSDOS files, MS-DOS
-@subsubsection Installation
+@subsubheading Installation
+
+Follow these installation instructions:
 
 @itemize @bullet
 @item
 Unzip the compiled libraries into the same folder where you unzipped Crystal
-Space. (@xref{MSDOS Bugs}.)
+Space.  (@xref{MSDOS Bugs}.)
 
 @item
-Unzip NASM somewhere.
+Unzip @sc{nasm} somewhere.
 
 @item
-If you don't already have a directory for DJGPP, create one.  Unzip all of
-the DJGPP stuff into that directory.
+If you don't already have a directory for @sc{djgpp}, create one.  Unzip all
+of the @sc{djgpp} stuff into that directory.
 
 @item
-To use DJGPP you need to set two environment variables. Use this example but
-change the directories to match the directories where you have DJGPP and NASM
-installed:
+To use @sc{djgpp} you need to set two environment variables.  Use this example
+but change the directories to match the directories where you have @sc{djgpp}
+and @sc{nasm} installed:
 
 @example
 SET PATH=c:\djgpp\bin;c:\nasm\bin;%PATH%
@@ -102,30 +110,28 @@ SET DJGPP=c:\djgpp\djgpp.env
 @end example
 
 @item
-Now just CD to your Crystal Space directory, run make and follow the
-instructions.
+Now just go to the Crystal Space directory (@file{CS/}), run @samp{make} and
+follow the instructions.
 @end itemize
 
-@node MSDOS Allegro, MSDOS Bugs, MSDOS Install, MS-DOS
-@subsubsection Allegro
+@subsubheading Allegro
 
-If you use Allegro graphics library (and want to use it in Crystal Space),
-you can use an alternative video driver. For this, you will have to add a
-line
+If you use Allegro graphics library (and want to use it in Crystal Space), you
+can use an alternative video driver.  For this, you will have to add the
+following line to @file{CS/config.mak} after the configuration step.
 
 @example
 USE_ALLEGRO = yes
 @end example
 
-to config.mak (after configuring as usual).
+@anchor{MSDOS Bugs}
+@subsubheading Bugs
 
-@node MSDOS Bugs, , MSDOS Allegro, MS-DOS
-@subsubsection Bugs
+The pre-compiled libraries on the Crystal Space site didn't work for me, so I
+made my own.  You can download them from here:
 
-The compiled libraries didn't work for me, so I made my own. You can download
-them from here:
 @uref{http://asp.planetquake.com/dl/dl.asp?simitar/doslibsb.zip}
 
 Do not unzip the other compiled libraries into your Crystal Space directory.
 (Delete them if you already unzipped them.)  Unzip my version of the compiled
-libraries into your DJGPP directory.
+libraries into your @sc{djgpp} directory.

@@ -42,10 +42,10 @@ Utility Library (@code{csutil})
 * Library List:: Quick Overview of Modules and Libraries
 * Dependencies::
 * Directory Hierarchy::
-* Makefile Structure:: Structure of the Makefile
-* csPhyzik:: csPhyziks Library @code{csphyzik}
-* SCF:: Crystal Space Shared Class Facility (@sc{scf})
-* Platform_Details:: Platform-Specific Details
+* Makefile How-To::
+* csPhyziks:: csPhyziks Library (@code{csphyzik})
+* SCF:: Shared Class Facility (@sc{scf})
+* Platform Details:: Platform-Specific Details
 @end menu
 
 @imports{anatomy,liblist.txi}

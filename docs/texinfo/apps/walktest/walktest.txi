@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Walktest, Blocks, Applications Overview, Applications
+@node Walktest, CCtest, Applications Overview, Applications
 @section Walktest
 @cindex @file{walktest}
 @cindex Applications, @file{walktest}
@@ -11,9 +11,9 @@ this application as a guide for developing their own programs, as
 it is not the best example in clean coding.
 
 @menu
-* Walktest_Keyboard:: Keyboard Interface
+* Walktest Keyboard:: Keyboard Interface
 * Console:: The Console
-* Walktest_Config:: Keyboard Configuration
+* Walktest Configuration:: Keyboard Configuration
 @end menu
 
 @importss{apps,walktest,keys.txi}

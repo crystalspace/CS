@@ -1,188 +1,184 @@
 @c -*-texinfo-*-
-@node Macintosh, BeOS, OS/2, OSSpecific
+@node Macintosh, BeOS, OS2, Platform Instructions
 @subsection Macintosh
 @cindex Macintosh
 
-The Macintosh port of Crystal Space is maintained by
-@email{rbate@@ma.ultranet.com, K. Robert Bate}.
+@noindent
+@emph{Written by K.  Robert Bate, @email{rbate@@ma.ultranet.com}.  Last
+updated 8 December 1999.}
 
-You will need the following to compile Crystal Space :
+The Macintosh port of Crystal Space is maintained by K.  Robert Bate.  If you
+have any questions or problems, contact him at @email{rbate@@ma.ultranet.com}.
 
-@itemize @bullet
+You will need the following to compile Crystal Space:
+
+@enumerate
 @item
 Compiler: Metrowerks CodeWarrior Pro 4 or later.
 @item
 Include Files: Universal Includes 3.2 from Apple
-@end itemize
+@end enumerate
 
-@menu
-* MAC getting ready:: Getting ready to develop
-* MAC projects:: Working with the Crystal Space projects
-* MAC FAQ:: Frequently Asked Questions
-@end menu
+@subsubheading Getting Ready To Develop
 
-@node MAC getting ready, MAC projects, Macintosh, Macintosh
-@subsubsection Getting ready to develop
+If you are going to build the Open GL Renderer you need to download the OpenGL
+@sc{sdk} from Apple:
 
-If you are going to build the Open GL Renderer you need to download the
-OpenGL SDK from Apple :
 @uref{ftp://ftp.apple.com/developer/opengl/opengl_sdk.hqx}
-This will download a self mounting disk image. Double click on it. Create a
+
+This will download a self mounting disk image.  Double click on it.  Create a
 folder in the @file{Metrowerks CodeWarrior:MacOS Support} folder called
-@file{OpenGL SDK}. Copy the folders @file{Headers}, @file{Libraries} and
+@file{OpenGL SDK}.  Copy the folders @file{Headers}, @file{Libraries} and
 @file{Resources} from the @file{OpenGL SDK} disk and place them into the
 @file{OpenGL SDK} folder you just created.
 
 If you are going to build the Glide Renderer you need to download the Glide
-SDK from 3dfx :
+@sc{sdk} from 3dfx:
+
 @uref{http://www.3dfx.com/downloads/SDK/sdk_glidemacppc/glide2xsdk_sea.hqx}
-This will download a self extracting archive. Double click on
-@file{Glide2x SDK.sea}. No drivers are included. The SDK depends upon the
-operating system, not the cards. The Glide 2x drivers are available from the
-manufacturer of your Voodoo-based Macintosh accelerator card. You will need
-to place a copy of your driver (library) into the LIB folder in order to
+
+This will download a self extracting archive.  Double click on @file{Glide2x
+SDK.sea}.  No drivers are included.  The @sc{sdk} depends upon the operating
+system, not the cards.  The Glide 2x drivers are available from the
+manufacturer of your Voodoo-based Macintosh accelerator card.  You will need
+to place a copy of your driver (library) into the @sc{lib} folder in order to
 build your projects.
 
-@node MAC projects, MAC FAQ, MAC getting ready, Macintosh
-@subsubsection Working with the Crystal Space projects
+@subsubheading Working with the Crystal Space Projects
 
-There are 22 Crystal Space projects in the mwcw folder:
+There are 22 Crystal Space projects in the @file{mwcw} folder:
 
-3 projects that build static libraries:
-@table @samp
+@noindent
+Three projects that build static libraries:
+
+@table @code
 @item CSpace.mcp
-Generates the static linked library, which includes the majority of the
-code for Crystal Space.
-
+Generates the static linked library, which includes the majority of the code
+for Crystal Space.
 @item CSWS.mcp
-Generates the static linked library, which includes the code for the
-Crystal Space Windowing System.
-
+Generates the static linked library, which includes the code for the Crystal
+Space Windowing System.
 @item impexp.mcp
-Generates the static linked library, which includes the code for the
-import and export code.
+Generates the static linked library, which includes the code for the import
+and export code.
 @end table
 
-7 projects that build shared libraries:
-@table @samp
+@noindent
+Seven projects that build shared libraries:
+
+@table @code
 @item Driver2D.mcp
 Generates the 2D Graphics shared library.
-
 @item SftRndr.mcp
-Generates the SoftwareRender shared library, which includes the 3D
-graphics driver for software rasterization.
-
+Generates the SoftwareRender shared library, which includes the 3D graphics
+driver for software rasterization.
 @item OpenGLRndr.mcp
 Generates the OpenGL Render shared library.
-
 @item Sound.mcp
-Generates the mac sound driver shared library and software sound render
-shared library.
+Generates the mac sound driver shared library and software sound render shared
+library.
 @end table
 
-These next 3 projects are not up to date:
-@table @samp
+@noindent
+These next three projects are not up to date:
+
+@table @code
 @item GlideRender.mcp
 Generates the Glide Render shared library.
-
 @item NetworkDriverNull.mcp
 Generates the null network driver shared library.
-
 @item NetworkMgrNull.mcp
 Generates the null network manager shared library.
 @end table
 
-10 projects that generate applications
-@table @samp
-@item Blocks.mcp
-A Tetris type game
+@noindent
+Ten projects that generate applications
 
+@table @code
+@item Blocks.mcp
+A Tetris type game.
 @item scfreg.mcp
 The application which registers the shared libraries.
-
 @item CSWSTest.mcp
 The application which tests the Crystal Space Windowing System.
-
 @item MazeD.mcp
 The Crystal Space Editor.
-
 @item MetaDemo.mcp
-A demo application
-
-@item Primedit.mcp
-Another Crystal Space Editor. (Not up to date)
-
+A meta-balls demo application.
 @item Simple.mcp
 Simple Crystal Space application.
-
 @item Shooter.mcp
 A Crystal Space application.
-
 @item Squawk.mcp
 A Crystal Space application.
-
 @item Walktest.mcp
 Another Simple Crystal Space application.
 @end table
 
-and 2 project that builds other projects
-@table @samp
+@noindent
+Two project that builds other projects
+
+@table @code
 @item MakeShared.mcp
 Makes sure all of the shared libraries and scfreg are up to date.
-
 @item MakeApps.mcp
 Makes sure all of the applications are up to date.
 @end table
 
 Generally you will just build an application and all of the other pieces will
-be built for you. All of the resulting libraries and applications will be
+be built for you.  All of the resulting libraries and applications will be
 placed in the src directory.
+
+@enumerate
+@item
+Open MakeShared.mcp in CodeWarrior and make it.
+@item
+Switch back to the finder, select all of the files that end in @file{.shlb} in
+the src folder and drop them on the scfreg application.
+@item
+Choose an application to build.  I generally start with walktest.  Make it.
+@item
+Make sure the world file @file{flarge.zip} is in the data folder.
+@end enumerate
+
+@noindent
+You're all set to run the application.
+
+@subsubheading Frequently Asked Questions (@sc{faq})
 
 @itemize @bullet
 @item
-Open MakeShared.mcp in CodeWarrior and make it.
+Q. @emph{There are a lot of warnings during compile.}
+
+A. Well, that's normal as long as there are no errors.
 
 @item
-Switch back to the finder, select all of the files that end in
-@file{.shlb} in the src folder and drop them on the scfreg application.
+Q. @emph{What is this ``ignored `fopen' (code) in @code{MSL.C.PPC.Lib}'' link
+warning?}
+
+A. In order to keep from changing a lot of Crystal Space to fix the differences
+in path separators, I wrote a new version of @code{fopen()} which handles the
+path separators then calls the same routines that the @sc{msl} library version
+of @code{fopen()} does.  The warning is harmless and you should only worry if
+you don't get the warning message.
 
 @item
-Choose an application to build.  I generally start with walktest.
-Make it.
+Q. @emph{What is this ``ignored `fgets' (code) in @code{MSL.C.PPC.Lib}" link
+warning?}
+
+A. In order to keep from changing a lot of Crystal Space to fix the
+differences in line endings, I wrote a new version of @code{fgets()} which
+handles the line endings then calls the same routines that the @sc{msl}
+library version of @code{fgets()} does.  The warning is harmless and you
+should only worry if you don't get the warning message.
 
 @item
-Make sure the world file @file{flarge.zip} is in the data folder.
+Q. @emph{I need to get to the command line, where is it?}
 
-@item
-You're all set to run the application.
-@end itemize
-
-@node MAC FAQ, , MAC projects, Macintosh
-@subsubsection Frequently Asked Questions
-
-@table @samp
-@item There are a lot of warnings during compile.
-Well, that's normal as long as there are no errors.
-
-@item What is this "ignored 'fopen' (code) in MSL.C.PPC.Lib" link warning?
-In order to keep from changing a lot of crystal space to fix the differences
-in path separators, I wrote a new version of fopen which handles the path
-separators then calls the same routines that the MSL library version of
-fopen does. The warning is harmless and you should only worry if you don't
-get the warning message.
-
-@item What is this "ignored 'fgets' (code) in MSL.C.PPC.Lib" link warning?
-In order to keep from changing a lot of crystal space to fix the differences
-in line endings, I wrote a new version of fgets which handles the line
-endings then calls the same routines that the MSL library version of fgets
-does. The warning is harmless and you should only worry if you don't get the
-warning message.
-
-@item I need to get to the command line, where is it?
-When you launch the application, if you hold down the option key a command
+A. When you launch the application, if you hold down the option key a command
 line dialog will pop up.  If the command line that you are typing needs to be
-the same all the time, create a 'str#' resource with an id of 1024 and make
-the first string in it the command line you want and it will be automaticly
-used. Also, if you drop a text file on the application, the first 255
-characters of the file are read and used as the command line.
-@end table
+the same all the time, create a @samp{str#} resource with an @emph{id} of 1024
+and make the first string in it the command line you want and it will be
+automaticly used.  Also, if you drop a text file on the application, the first
+255 characters of the file are read and used as the command line.
+@end itemize

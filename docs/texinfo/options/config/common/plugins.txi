@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Config_Plugins, Config_World, Config_Common, Config_Common
+@node Config Plugins, Config World, Config Common, Config Common
 @subsubsection @code{[PlugIns]} section
 
 This section tells the program which plug-in modules to load.  These lines 
@@ -9,35 +9,10 @@ Do not specify the same @var{PluginType} more than once.  @var{PluginName}
 must be a known plug-in module or driver which is registered for use by 
 Crystal Space in the @file{scf.cfg} configuration file.  
 
-@quotation
-@emph{This section is confusing and probably does not belong here}.
-
-All included plug-ins are registered with all included programs that need
-them. So this only applies if you have a new plug-in or a new program :
-If this is a statically linked plug-in, you must tell your program to link
-to it in the program code with @code{REGISTER_STATIC_LIBRARY}.
-If this is a dynamically linked plug-in, you must register @var{PluginName}
-in the @file{scf.cfg} file with the line
-@samp{@var{PluginName} = @var{SharedLibName}}.
-SharedLibName should not end in @file{.so} or @file{.dll} as this is
-appended by CS automatically.
-
-The clue with @var{PluginTypes} is that all plug-ins of that same type share
-a common interface.  No matter which 3D rasterizer you load, the methods
-you have to call are the same.
-
-If a plug-in, for example a 3D driver, needs a run-time library to be
-selected (e.g. the DirectX run-time installation), this is normally not
-enough. Yes, the plug-in only requires the run-time libs, but to compile
-the plug-in you normally need the SDK as well. It means that if you finally
-distribute your program, you have to include the run-time libs, but not the
-@sc{sdk}.
-@end quotation
-
 You need not load a plug-in for every type. For example you may ommit the
 sound renderer if sound is not required.
 
-Options in the @samp{[PlugIns]} section follow these guidelines:
+Options in the @code{[PlugIns]} section follow these guidelines:
 
 @itemize @bullet
 @item
@@ -129,22 +104,22 @@ Crystal Space for 3D output, sound, etc@enddots{}  This is because the other
 engine will have a totally different interface.  The engine plug-in is called 
 @samp{crystalspace.engine.core}.
 
-@item other plug-ins
+@item Other Plug-Ins
 You may also load any additional desired plug-in modules or modules which are 
 specific to a particular application.  This is useful if you write your own 
 application with Crystal Space.  Loading a plug-in does nothing else than 
 really loading the shared library (if it is a shared libraries) and creating 
 an entry in the plug-in table.  You have to query the interface from within 
-your program (by giving the system driver the PluginType), and then use the 
-plug-in for something.  
+your program (by giving the system driver the @var{PluginType}), and then use
+the plug-in for something.  
 
 Additionally available plug-in modules are:
 
 @itemize @bullet
 @item
-Python = crystalspace.script.python
+@code{Python = crystalspace.script.python}
 
 @item
-CrystalClear = crystalclear.kernel
+@code{CrystalClear = crystalclear.kernel}
 @end itemize
 @end table

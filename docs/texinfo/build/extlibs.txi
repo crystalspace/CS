@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node External Libraries, OSSpecific, Requirements, Building
+@node External Libraries, Platform Instructions, Requirements, Building
 @section External Libraries
 
 Crystal Space relies upon several external, and publically available
@@ -17,6 +17,12 @@ development libraries.  These libraries are:
 Many computer systems come with these libraries pre-installed.
 If the libraries are not already available on your system, then see the
 following sections for information about how to obtain them.
+
+Windows and @sc{dos} users can download a single package containing all three
+libraries in precompiled form from the following location at the Crystal Space
+site:
+
+@uref{ftp://ftp.linuxgames.com/crystal/support/winlibs14.zip}
 
 @subheading zlib
 @cindex zlib

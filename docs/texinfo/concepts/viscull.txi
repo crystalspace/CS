@@ -17,8 +17,8 @@ system are implemented though.
 * VIS sector structure:: Sector Structure
 * VIS visibility culling:: Visibility Culling
 * VIS view frustrum culling:: View Frustrum Culling
-* VIS portal/sector visibility:: Portal/sector Visibility
-* VIS in sector visibility:: In-sector Visibility
+* VIS portal/Sector visibility:: Portal/Sector Visibility
+* VIS in Sector Visibility:: In-Sector Visibility
 * VIS PVS:: Potentially Visible Set (PVS)
 @end menu
 
@@ -200,17 +200,17 @@ added to the octree if there is one.
 
 @end table
 
-@node VIS view frustrum culling, VIS portal/sector visibility, VIS visibility culling, Visibility Culling
+@node VIS view frustrum culling, VIS portal/Sector visibility, VIS visibility culling, Visibility Culling
 @subsection View Frustrum Culling
-@cindex view frustrum
+@cindex View frustrum
 
 View frustrum culling is the most obvious type of culling. CS does not
 do it right now (see the following section about portal/sector visibility
 for the reason) but there are some areas where we should certainly do
 this. Detail objects are one example.
 
-@node VIS portal/sector visibility, VIS in sector visibility, VIS view frustrum culling, Visibility Culling
-@subsection Portal/sector Visibility
+@node VIS portal/Sector visibility, VIS in Sector Visibility, VIS view frustrum culling, Visibility Culling
+@subsection Portal/Sector Visibility
 
 Portal/sector visibility is based on 2D clipping. The 2D projected
 outline (in screen coordinates) of the last portal is used as a clipper
@@ -262,8 +262,8 @@ because that enables good culling of other portals. Culling portals
 is valuable because culling a portal means that the entire sector behind
 that portal is also culled.
 
-@node VIS in sector visibility, VIS PVS, VIS portal/sector visibility, Visibility Culling
-@subsection In-sector Visibility
+@node VIS in Sector Visibility, VIS PVS, VIS portal/Sector visibility, Visibility Culling
+@subsection In-Sector Visibility
 @cindex c-buffer
 
 For a normal sector which has no octree in-sector visibility is really
@@ -361,7 +361,7 @@ So again, there is much room for experimentation to see what approach
 works best. It may be that we will have to make things configurable
 depending on the selected hardware.
 
-@node VIS PVS, , VIS in sector visibility, Visibility Culling
+@node VIS PVS, , VIS in Sector Visibility, Visibility Culling
 @subsection Potentially Visible Set (PVS)
 @cindex PVS
 @cindex Potentially Visible Set

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node CCtest, Squawk, Blocks, Applications
+@node CCtest, Squawk, Walktest, Applications
 @section CCtest
 @cindex @file{cctest}
 @cindex Applications, @file{cctest}
@@ -13,31 +13,22 @@ Here is a table of the control keys.
 @table @kbd
 @item @key{UP}, @key{DOWN}, @key{LEFT}, @key{RIGHT}
 Up/Down move forward and backwards, left/right turn in those directions.
-
 @item @key{PAGE-UP}, @key{PAGE-DOWN}
 Look up/down.
-
 @item s
 Move forward.
-
 @item x
 Move backward.
-
 @item a
 Strafe left.
-
 @item d
 Strafe right.
-
 @item @key{ESC}
 Release mouse capture.
-
 @item @key{SPACE}
 Fire a rocket.
-
 @item @key{ENTER}
 Jump.  Press multiple times to @dfn{space jump}.
-
 @end table
 
 The mouse can also be used for input as summarized below.
@@ -45,13 +36,10 @@ The mouse can also be used for input as summarized below.
 @table @asis
 @item Mouse
 Moves viewpoint according to mouse motions (freelook).
-
 @item Mouse look
 The mouse is captured when you click on the window with any mouse button.
-
 @item Left button
 Move forward.
-
 @item Right button
 Move backward.
 @end table

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Config_Common, Config_Soft3D_TextureManager, Configuration File, Configuration File
+@node Config Common, Config Soft3D TextureManager, Configuration File, Configuration File
 @subsection Common Configuration Options
 @cindex Common Configuration Options
 
@@ -22,11 +22,11 @@ The following sections detail options which apply to all Crystal Space
 applications.
 
 @menu
-* Config_Plugins:: @code{[PlugIns]} section
-* Config_World:: @code{[World]} section
-* Config_VideoDriver:: @code{[VideoDriver]} section
-* Config_Lighting:: @code{[Lighting]} section
-* Config_Console:: @code{[SimpleConsole]} section
+* Config Plugins:: @code{[PlugIns]} section
+* Config World:: @code{[World]} section
+* Config VideoDriver:: @code{[VideoDriver]} section
+* Config Lighting:: @code{[Lighting]} section
+* Config Console:: @code{[SimpleConsole]} section
 @end menu
 
 @importsss{options,config,common,plugins.txi}

@@ -21,10 +21,10 @@ demonstration program.  To run @samp{walktest} with a specific map you have
 two options.  First, you can specify the map name on the command line:
 
 @example
-walktest map
+walktest @var{map}
 @end example
 
-Replace @samp{map} with any map file name which you have downloaded and
+Replace @var{map} with any map file name which you have downloaded and
 placed in your @file{CS/data} directory.  For instance:
 
 @example

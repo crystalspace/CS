@@ -15,8 +15,8 @@ read the Quick Start section.  @xref{Quick Start}.
 @menu
 * Requirements::
 * External Libraries::
-* OSSpecific:: Platform Specific Instructions
-* Problems:: Known platform specific bugs and problems
+* Platform Instructions:: Platform Specific Instructions
+* Problems:: Platform Specific Problems
 * Quick Start::
 @end menu
 

@@ -11,13 +11,11 @@ examples of how to actually program with Crystal Space.
 @menu
 * Applications Overview:: Quick Overview
 * Walktest::
-* Blocks::
 * CCtest::
 * Squawk::
 @end menu
 
 @imports{apps,overview.txi}
 @importss{apps,walktest,walktest.txi}
-@imports{apps,blocks.txi}
 @imports{apps,cctest.txi}
 @imports{apps,squawk.txi}

@@ -1,52 +1,57 @@
 @c -*-texinfo-*-
-@node Makefile Structure, csPhyzik, Directory Hierarchy, Anatomy
-@section Structure of the Makefile
-@cindex Makefile
+@node Makefile How-To, csPhyziks, Directory Hierarchy, Anatomy
+@section Makefile How-To
+@cindex Makefile How-To
 
-@emph{NOTE:} This section describes the interior of the makefile for GNU
-make. It will only help you if you use GNU make, and if you intend to change
-the GNU makefiles. If you want to change any makefiles or project files,
-you should contact the mailing list so that someone changes the other
-makefiles as well. @xref{Mailing Lists}.
+@noindent
+@emph{Written by Andrew Zabolotny, @email{bit@@eltech.ru}.}
+
+This section describes the interior of the makefile for @sc{gnu} @samp{make}.
+It will only help you if you use @sc{gnu} @samp{make}, and if you intend to
+change the @sc{gnu} makefiles.  If you want to change any makefiles or project
+files, you should contact the mailing list so that other people can change
+other resources as well, if needed.  @xref{Mailing Lists}.
 
 Crystal Space has a complex and kinda sophisticated makefile system, this
 document describes how it works and defines a set of rules that should be
 followed, if possible, to keep makefiles clean and understandable.
 
-The makefile system heavily relies on many features of GNU Make. This renders
-them very simple, but at the same time makes it heavily depend on this tool;
-however as of today GNU Make is available for almost every platform, so this
-is not a so big price for the goods it brings.
+The makefile system heavily relies on many features of @sc{gnu} @samp{make}.
+This renders them very simple, but at the same time makes it heavily depend on
+this tool; however as of today @sc{gnu} @samp{make} is available for almost
+every platform, so this is not a too big of a price for the goods it brings.
 
-This document is not intended as a GNU Make manual; refer to appropiate
-documents if you do not understand something. The following text supposes you
-are familiar with GNU Make extensions; with at least basic features if not with
-all.
+This document is not intended as a @sc{gnu} @samp{make} manual; refer to
+appropiate documents if you do not understand something.  The following text
+supposes you are familiar with @sc{gnu} @samp{make} extensions; with at least
+basic features if not with all.
 
 @menu
-* overall makefile structure:: The overall structure
-* Makefile nariable names:: Variable naming conventions
-* makefile output directory:: The output directory
+* Makefile Structure:: Overall Structure
+* Makefile Variables:: Variable Naming Conventions
+* Makefile Output Directory:: Output Directory
 @end menu
 
-@node overall makefile structure, Makefile nariable names, Makefile Structure, Makefile Structure
-@subsection The overall structure
+@node Makefile Structure, Makefile Variables, Makefile How-To, Makefile How-To
+@subsection Overall Structure
+@cindex Makefile Structure
+@cindex Structure of Makefiles
 
-The makefile system was designed to be very modular. This means that there
-are separate submakefiles for each unit that have to be built. Besides, there
+The makefile system was designed to be very modular.  This means that there
+are separate submakefiles for each unit that have to be built.  Besides, there
 is a system-dependent submakefile (referenced through the variable
-@samp{$(TARGET_MAKEFILE)}), user settings submakefile (@file{mk/user.mak}),
+@code{$(TARGET_MAKEFILE)}), user settings submakefile (@file{mk/user.mak}),
 common definitions submakefile (@file{mk/common.mak}) and several other minor
-submakefiles. The @samp{root} Makefile (which is located in the root of
-Crystal Space source tree) cares about including all other submakefiles as
-required.
+submakefiles.  The root @file{Makefile} (which is located in the root
+directory of Crystal Space source tree, @file{CS}) takes care of including all
+other submakefiles as required.
 
-Initially the makefile system is supposed to be unconfigured. The
-@samp{configuration} process is supposed to define the system-dependent
-submakefile and several other definitions required for building Crystal Space
-on host platform. During configuration phase a submakefile called
-@file{config.mak} is created (in the same directory where root makefile is
-located). Here is a sample of configuration submakefile for Linux:
+Initially the makefile system is unconfigured.  The @dfn{configuration}
+process is supposed to define the system-dependent submakefile and several
+other definitions required for building Crystal Space on host platform.
+During configuration phase a submakefile called @file{config.mak} is created
+(in the same directory where root makefile is located, @file{CS}).  Here is a
+sample of @file{config.mak} for Linux:
 
 @example
 # Automatically generated file, do not edit!
@@ -55,41 +60,41 @@ TARGET_MAKEFILE = libs/cssys/unix/linux.mak
 MODE = debug
 USE_SHARED_PLUGINS = yes
 PROC = INTEL
-CXX = g++
+CXX = gcc
 CFLAGS.CONFIG += -mpentium -march=i586
 CFLAGS.CONFIG += -fno-exceptions
 CFLAGS.CONFIG += -fno-rtti
 X11_PATH = /usr/X11R6
 @end example
 
-As you can see, the first statement defines the @code{TARGET} platform and
-the second defines the system-dependend submakefile. The @code{MODE} variable
+As you can see, the first statement defines the @samp{TARGET} platform and the
+second defines the system-dependend submakefile.  The @samp{MODE} variable
 defines the default build mode (debug, profile or optimize).
-@code{USE_SHARED_PLUGINS} tells whenever we will or won't use dynamic-linked
+@samp{USE_SHARED_PLUGINS} tells whenever we will or won't use dynamic-linked
 libraries (on platforms that do not support dynamic linking system-dependent
-submakefile usually do @samp{override USE_SHARED_PLUGINS=no}). The following
-statements defines several minor host platform/OS characteristics such as
-processor type, C++ compiler, X Windows include path and several optimization
-switches that are supported by compiler.
+submakefile usually do @samp{override USE_SHARED_PLUGINS=no}).  The following
+statements defines several minor host platform and operating system
+characteristics such as processor type, C++ compiler, X-windows include path,
+and several optimization switches that are supported by compiler.
 
 The system submakefile defines everything that is host platform/compiler
-dependent - the system-dependent libraries (for example, some Unices require
-the math library @code{-lm} in order to use several math functions required
-by CS), the C/C++ compiler flags (separate for optimize, debug and profile
-modes) and so on. The system submakefile is included several times; the
-reason is that there are (system/compiler dependent) definitions that should
-be defined at the top of makefile, in the middle and so on. To differentiate
-between them a variable called @code{MAKESECTION} is used. For example, at
-the top of root makefile it is already needed to know which
-OS/compiler/processor we are running on. For this root makefile does the
-following:
+dependent---the system-dependent libraries (for example, some Unix platforms
+require the math library @samp{-lm} in order to use several math functions
+required by Crystal Space), the C/C++ compiler flags (separate for optimize,
+debug and profile modes) and so on.  The system submakefile is included
+several times; the reason is that there are (system/compiler dependent)
+definitions that should be defined at the top of makefile, in the middle and
+so on.  To differentiate between them a variable called @samp{MAKESECTION} is
+used.  For example, at the top of root makefile it is already needed to know
+which operating system, compiler, and processor we are running on.  For this,
+the root makefile does the following:
 
 @example
 MAKESECTION=rootdefines
 include mk/subs.mak
 @end example
 
-The @file{mk/subs.mak} makefile is a special makefile that cares about
+The @file{mk/subs.mak} makefile is a special makefile that takes care of
 including all submakefiles: system-dependent and submakefiles for all drivers
 and applications; in our case we care only about system submakefile;
 effectively @samp{include mk/subs.mak} turns into:
@@ -98,8 +103,8 @@ effectively @samp{include mk/subs.mak} turns into:
 -include $(TARGET_MAKEFILE)
 @end example
 
-In @code{$(TARGET_MAKEFILE)} we check the @code{MAKESECTION} variable, and
-execute appropiate makefile statements. In our case:
+In @code{$(TARGET_MAKEFILE)} we check the @samp{MAKESECTION} variable, and
+execute appropiate makefile statements.  In our case:
 
 @example
 ifeq ($(MAKESECTION),rootdefines)
@@ -111,226 +116,208 @@ endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 
 Note that for some operating systems processor is defined directly in
 @file{config.mak} (it is detected in configure phase), so for such systems
-@code{PROC=} is not defined in rootdefines section.
+@samp{PROC=} is not defined in rootdefines section.
 
-For building something root Makefile runs a submakefile called
-@file{mk/cs.mak}. Note that @file{cs.mak} is not @emph{included} but is run
-as a separate submakefile using @samp{$(MAKE) mk/cs.mak [args...]} command.
+For building something the root makefile runs a submakefile called
+@file{mk/cs.mak}.  Note that @file{cs.mak} is not @emph{included} but is run
+as a separate make process using @samp{$(MAKE) mk/cs.mak @var{args}} command.
 This means that all definitions made for root makefile are ignored in
 @file{cs.mak}, so @file{cs.mak} needs again to include @file{mk/subs.mak} in
-appropiate places with appropiate values for @code{MAKESECTION}. For example,
+appropiate places with appropiate values for @samp{MAKESECTION}.  For example,
 to build csutil library, root makefile executes the following command:
 
 @example
 $(MAKE) -f mk/cs.mak csutil
 @end example
 
-Currently the following values of @code{MAKESECTION} are used:
+Currently the following values of @samp{MAKESECTION} are used:
 
 @table @emph
-@item used in root makefile
+@item Used in root @file{Makefile}.
 @table @code
-@item configure
-The system submakefile is included from root makefile to define the
-@samp{configure:} target.
-
+@item confighelp
+The system submakefile is included from root makefile to define the various
+``help'' messages which the makefile can display.
 @item rootdefines
 Define all the variables required by the root makefile
-
 @item roottargets
 Define all additional targets required by the root makefile
 @end table
 
-@item used in cs.mak
+@item Used in @file{cs.mak}.
 @table @code
 @item defines
-Define all variables that are required for building any targets - the C/C++
+Define all variables that are required for building any targets---the C/C++
 compilers, flags and so on.
-
 @item postdefines
 Define any variables that depend on other variables.
-
 @item targets
-Define any additional targets to @file{cs.mak}: a library, a driver, an
-executable and so on.
+Define targets in addition to those in @file{cs.mak}; for instance, a library,
+a driver, an executable and so on.
 @end table
 @end table
 
-Note that @code{MAKESECTION} variable is used not only in system-dependent
-submakefile. All submakefiles uses it: for libraries, for drivers and so on.
+Note that @samp{MAKESECTION} variable is used not only in system-dependent
+submakefile.  All submakefiles uses it; for libraries, for drivers and so on.
 
-Each system-dependent submakefile defines a variable called @code{DRIVERS}
+Each system-dependent submakefile defines a variable called @samp{DRIVERS}
 which contain references to all drivers that are supported by this platform.
 The drivers are referenced by their directory name inside @file{libs/}
-subdirectory. For example, a @code{DRIVERS} variable that refers to the
-software X Windows 2D driver and to the software 3D renderer would look this
-way:
+subdirectory.  For example, a @samp{DRIVERS} variable that refers to the
+software X-windows 2D driver and to the software 3D renderer would look like
+this:
 
 @example
-DRIVERS = cs2d/softx cs3d/soft
+DRIVERS += cs2d/softx cs3d/soft
 @end example
 
 To find the submakefiles for drivers, @file{libs/} is prepended to all
-components of @code{DRIVERS}, @file{/*.mak} is appended and a wildcard search
-is performed. A possible result of above expansion would be:
+components of @samp{DRIVERS}; @file{/*.mak} is appended; and a wildcard search
+is performed.  A possible result of above expansion might be:
 
 @example
 DRIVER_SUBMAKEFILES=libs/cs2d/softx/x2d.mak libs/cs3d/soft/soft3d.mak
 @end example
 
 These submakefiles are included each time when @file{subs.mak} is included
-either into root makefile or into submakefile.
+either into root makefile or into a submakefile.
 
 To find the submakefiles for libraries, @file{subs.mak} looks for all
-submakefiles contained one level deep into @file{libs/} directory (i.e.
-@file{libs/*/*.mak}). For example, it could look like this:
+submakefiles contained one level deep in the @file{libs/} directory (i.e.
+@file{libs/*/*.mak}).  For example, it might look like this:
 
 @example
-[1|home|~/CS]ls libs/*/*.mak
-
-libs/cs2d/cs2d.mak          libs/csinput/csinput.mak
-libs/cs3d/cs3d.mak          libs/csparser/csparser.mak
-libs/cscom/cscom.mak        libs/cssndldr/cssndldr.mak
-libs/csengine/csengine.mak  libs/cssys/cssys.mak
-libs/csgeom/csgeom.mak      libs/csutil/csutil.mak
-libs/csgfxldr/csgfxldr.mak  libs/csws/csws.mak
+(~/CS)% ls libs/*/*.mak
+libs/cs2d/cs2d.mak              libs/csparser/csparser.mak
+libs/cs3d/cs3d.mak              libs/csphyzik/csphyzik.mak
+libs/csengine/csengine.mak      libs/cssfxldr/cssfxldr.mak
+libs/csgame/csgame.mak          libs/cssys/cssys.mak
+libs/csgeom/csgeom.mak          libs/csterr/csterr.mak
+libs/csgfxldr/csgfxldr.mak      libs/cstools/cstools.mak
+libs/csinput/csinput.mak        libs/csutil/csutil.mak
 @end example
 
-The submakefiles for applications are searched latest, using the search mask
-@file{apps/*/*.mak}, this way:
+Submakefiles for applications located last, using the search mask
+@file{apps/*/*.mak}, in this fashion:
 
 @example
-[1|home|~/CS]ls apps/*/*.mak
-
-apps/blocks/blocks.mak      apps/primedit/primedit.mak
-apps/scfreg/scfreg.mak      apps/simple/simple.mak
-apps/cswstest/cswstest.mak  apps/walktest/walktest.mak
-apps/mazed/mazed.mak
+(~/CS)% ls apps/*/*.mak
+apps/blocks/blocks.mak          apps/shooter/shooter.mak
+apps/map2cs/map2cs.mak          apps/simple/simple.mak
+apps/mazed/mazed.mak            apps/walktest/walktest.mak
 @end example
 
-The library and application submakefiles also uses the @code{MAKESECTION}
-variable to insert statements into different places of the makefile. If you
-do not understand something, feel free to look through submakefiles that can
-be found in any major directory of Crystal Space source tree.
+The library and application submakefiles also uses the @samp{MAKESECTION}
+variable to insert statements into different places of the makefile.  If you
+do not understand something, feel free to look through submakefiles that
+reside in all major directories of the Crystal Space source tree.
 
+@node Makefile Variables, Makefile Output Directory, Makefile Structure, Makefile How-To
+@subsection Variable Naming Conventions
+@cindex Makefile Variable Naming Conventions
+@cindex Variable Naming Conventions, Makefile
+@cindex Naming Conventions, Makefile Variables
 
-@node Makefile nariable names, makefile output directory, overall makefile structure, Makefile Structure
-@subsection Variable naming conventions
+For maximum flexibility (the makefile system should be usable by any compiler
+on any platform).  @file{cs.mak} avoids any direct references to compiler
+switches, tool names and so on.  Instead there are a number of variables (some
+of which have default values, but can be changed by submakefiles) which should
+be used by @file{cs.mak} as well as by submakefiles, if possible.
 
-For maximal flexibility (the makefile system should be usable by any compiler
-on any platform) @file{cs.mak} avoids any direct references to compiler
-switches, tool names and so on; instead there are a number of variables (some
-of which have default values, but can be changed by submakefiles) which
-should be used by @file{cs.mak} as well as by submakefiles, if possible.
-
-The main @samp{tool} used to build Crystal Space is, naturally, the C++
-compiler. The variable name for C++ compiler is CXX. There are also places
-where The plain C compiler is required; it is referenced by CC variable. The
-flags for C/C++ compilers (it is supposed they both understand same
-command-line flags) are collected from a number of variables:
+The main ``tool'' used to build Crystal Space is, naturally, the C++ compiler.
+The variable name for C++ compiler is @samp{CXX}.  There are also places where
+the plain C compiler is required; it is referenced by @samp{CC} variable.  The
+flags for the C/C++ compilers (it is assumed they both understand same
+command-line flags) are collected from a number of additional variables, as
+summarized below.
 
 @table @code
 @item CFLAGS.GENERAL
-The general C/C++ compiler flags used in all compilation modes.
-
+General flags used in all compilation modes.
 @item CFLAGS.optimize
-The C/C++ flags used in optimize mode.
-
+Flags used in optimize mode.
 @item CFLAGS.debug
-The C/C++ flags used in debug mode.
-
+Flags used in debug mode.
 @item CFLAGS.profile
-The C/C++ flags used in profile mode.
-
+Flags used in profile mode.
 @item CFLAGS.DLL
-The C/C++ flags used when compiling object files for dynamicaly-linked
-libraries (i.e. @code{-fpic}).
+Flags used when compiling object files for dynamicaly-linked libraries (i.e.
+@code{-fpic}).
 @end table
 
-The submakefiles also often needs to know how to tell something to C/C++
-compiler; for example the path to some system-dependent include files,
-libraries, how to define a macro and so on. The GNU C++ compiler, for
-example, uses the @code{-I[path]} form to define a include path; the Watcom C
-compiler, on other hand, uses the @code{-i=[path]} form. To accomodate with
-this, there are a number of variables that contain the equivalent of required
-switches for currently selected compiler:
+The submakefiles also often need to know how to tell something to C/C++
+compiler.  For example the path to some system-dependent include files or
+libraries, or how to define a macro, and so on.  The @sc{gnu} C++ compiler,
+for example, uses the @code{-I@var{path}} form to define a include path; the
+Watcom-C compiler, on other hand, uses the @code{-i=@var{path}} form.  To
+accomodate this, there are a number of variables that contain the equivalent
+of required switches for currently selected compiler.  They are summarized
+below.
 
 @table @code
 @item CFLAGS.@@
-The flags to define the output file name. The default (for Unix-like C
-compilers) equivalent is @samp{-o $@@}
-
+Flag to define the output file name.  The default (for Unix-like C compilers)
+is @samp{-o $@@}.
 @item CFLAGS.D
-How to define a macro. The default equivalent is @samp{-D}
-
+Flag to define a C-preprocessor macro. The default is @samp{-D}.
 @item CFLAGS.I
-How to define a macro. The default equivalent is @samp{-I}
+Flag to specify an additional search path for @code{#include} directives.  The
+default equivalent is @samp{-I}.
 @end table
 
-The linker is referenced through the variable @code{$(LINK)}; there are also
-a number of variables that defines linker flags:
+The linker is referenced through the variable @code{$(LINK)}.  There are also
+a number of variables that defines linker flags.  They are summarized below.
 
 @table @code
 @item LFLAGS.GENERAL
-The general linker flags
-
+General linker flags.
 @item LFLAGS.optimize
-The linker flags used in optimize mode
-
+Flags used in optimize mode.
 @item LFLAGS.debug
-The linker flags used in debug mode
-
+Flags used in debug mode.
 @item LFLAGS.profile
-The linker flags used for profiling
-
+Flags used in profile mode.
 @item LFLAGS.DLL
-The linker flags used when building a dynamic library
-
+Flags used when building a dynamically loaded plug-in module.
 @item LFLAGS.EXE
-The linker flags used when building a executable
-
+Flags used when building a executable.
 @item LFLAGS.CONSOLE.EXE
-These flags are used when building a console executable (for example,
-@emph{SCFREG}). Some systems makes difference between a @emph{graphics}
-executable and a @emph{console} executable.
+Flags used when building a console executable (for example, @file{scfreg}).
+Some systems differentiate between a ``graphics'' executable and a ``console''
+executable.
 @end table
 
-Also there are variables similar to @code{CFLAGS.*} which tells linker how to
-link with an additional library and so on:
+Also there are variables similar to @samp{CFLAGS.*} which tell the linker how
+to link with an additional library and so on.
 
 @table @code
 @item LFLAGS.@@
-Define the output file name to @code{$@@}. The default equivalent is
-@samp{-o $@@}.
-
+Define output file name to @samp{$@@}.  The default is @samp{-o $@@}.
 @item LFLAGS.L
-Define an non-standard library path. The default equivalent is @samp{-L}
-
+Define an additional library search path.  The default is @samp{-L}.
 @item LFLAGS.l
-Add a library for linking. The default equivalent is @samp{-l}.
+Add a library for linking. The default is @samp{-l}.
 @end table
 
-If your driver/application/library requires specific C/C++ compiler flags,
-linking flags, libraries, the usual naming convention is the following:
+If your driver, application, or library requires specific C/C++ compiler
+flags, linking flags, libraries, the usual naming convention is the following:
 
 @table @code
-@item CFLAGS.[name]
-Additional C/C++ flags
-
-@item LFLAGS.[name]
-Additional linking flags
-
-@item LIBS.[name]
-Additional libraries
-
-@item DEP.[name]
-Additional dependencies
+@item CFLAGS.@var{name}
+Additional C/C++ flags.
+@item LFLAGS.@var{name}
+Additional linking flags.
+@item LIBS.@var{name}
+Additional libraries.
+@item DEP.@var{name}
+Additional dependencies.
 @end table
 
-For example, suppose your application which is called Ping-Pong requires
+For example, suppose your application, which is called Ping-Pong, requires
 specific compilation flags, as well as dependencies (it depends on several
-Crystal Space libraries) and libraries (suppose you link with an additional
-@file{libpingpong.a}). In this case the variables would be called this way:
+Crystal Space libraries) and extra libraries (suppose you link with an
+additional @file{libpingpong.a}).  In this case the variables would be named
+like this:
 
 @example
 CFLAGS.PINGPONG = $(CFLAGS.I)~/include
@@ -339,92 +326,105 @@ DEP.PINGPONG = $(CSSYS.LIB) $(CSUTIL.LIB)
 @end example
 
 Another issue is that several types of files use different extensions on
-different systems; for example, executable files on Unix typically have no
-extension; on DOS, OS/2 and Windows they typically have the @file{.exe}
-extension; other example could be object files that have @file{.o} extension
-on Unix and  @file{.obj} extension on Windows. To accomodate this several
-variables are used where appropiate:
+different platforms.  For example, executable files on Unix typically have no
+extension, whereas on @sc{dos}, @sc{os}/2 and Windows they typically have an
+@file{.exe} extension.  As another example, object files have an @file{.o}
+extension on Unix and an @file{.obj} extension on Windows.  To accomodate
+these differences, several variables are used where appropiate, as summarized
+below.
 
 @table @code
 @item EXE
-Typical extension for executables (ex: @samp{.exe})
-
+Typical extension for executables (ex: @samp{.exe}).
 @item O
-Typical extension for object files (ex: @file{.o}; usage: @samp{pingpong$O})
-
+Typical extension for object files (ex: @file{.o}; usage: @samp{pingpong$O}).
 @item LIB
-Typical extension for libraries (ex: @samp{.a} or @samp{.lib})
-
+Typical extension for libraries (ex: @samp{.a} or @samp{.lib}).
 @item DLL
-Typical extension for dynamic libraries (@samp{.so} or @samp{.dll})
+Typical extension for dynamically loaded libraries (@samp{.so} or @samp{.dll}).
 @end table
 
-Also on Unix systems libraries usually have the @samp{lib} prefix, i.e. the
-@samp{util} library would typically be called @samp{libutil.a}. On other
+Also on Unix systems libraries usually have the @samp{lib} prefix, i.e.  the
+@samp{csutil} library would typically be named @file{libcsutil.a}.  On other
 systems this is not the case; to resolve this problem a variable called
-@code{LIB_PREFIX} is used; it is equal to @samp{lib} or it is empty depending
-on environment. So, for example, if our submakefile would define the rules to
-build @file{libpingpong.a}, the name of target library could be:
+@samp{LIB_PREFIX} is used.  It is either set to @samp{lib} or it is empty
+depending upon the environment.  Back to the example, if the submakefile
+needed to define the rule to build @file{libpingpong.a}, it could be done in
+this fashion:
 
 @example
 PINGPONG.LIB = $(LIB_PREFIX)pingpong$(LIB)
 @end example
 
-If we would like to build a dynamic library, the name of target would be:
+If we would wanted to build a dynamic library, the name of target would be:
 
 @example
 PINGPONG.DLL = pingpong$(DLL)
 @end example
 
-As you observe, the name of target variables also has a kind of naming
-convention. If the target is a static library, it is typically named
-@samp{NAME.LIB}; if it is a dynamic library, it is called @samp{NAME.DLL}; if
-it is an executable, the variable is typically named @samp{NAME.EXE}.
+As you can observe, the name of target variables also has a naming convention
+of its own.  If the target is a static library, it is typically named
+@samp{@var{NAME}.LIB}; if it is a dynamic library, it is called
+@samp{@var{NAME}.DLL}; if it is an executable, it is typically named
+@samp{@var{NAME}.EXE}.
 
-@node makefile output directory, , Makefile nariable names, Makefile Structure
-@subsection The output directory
+@node Makefile Output Directory, , Makefile Variables, Makefile How-To
+@subsection Output Directory
+@cindex Output Directory, Makefile
+@cindex Makefile Output Directory
 
-To avoid filling directory structure with temporary and intermediate files,
-all such output should be put into a separate directory. By default this
-directory is named @samp{out/$(OS)/$(PROC)/$(MODE)$(MAKE_DLL)}. So, if you're
-building a dynamic library for Linux on a x86, the output directory would be
-called @file{out/Linux/INTEL/optimize.so/}. To reference to the output
-directory you should use the variable @code{$(OUT)}. For example, the default
-rule that tells make how to compile @file{.cpp} files looks like this:
+To avoid polluting the entire directory hierarchy with temporary and
+intermediate files, all output from the build process should be placed into a
+separate directory intended specifically for such transient files.  By default
+this directory is named as follows, and assigned to the makefile variable
+@samp{OUT}.
+
+@example
+OUT = out/$(OS)/$(PROC)/$(MODE)$(MAKE_DLL)
+@end example
+
+So, if you're building a dynamic library for Linux on an x86 machine, the
+output directory would be named @file{out/LINUX/INTEL/optimize.so/}.  To
+reference to the output directory you should use the variable @code{$(OUT)} in
+your submakefiles.  For example, the following rule tells @samp{make} how to
+compile @file{.cpp} files:
 
 @example
 $(OUT)%$O: %.cpp
         $(DO.COMPILE.CPP)
 @end example
 
-This rule supposes that the @file{.cpp} file is located in current directory;
-this is wrong of course. We can avoid this problem in several ways; the major
-solution is to define a @code{vpath} for @file{.cpp} files, this way:
+This rule assumes that the @file{.cpp} file is located in the current
+directory; this is wrong of course.  We can avoid this problem in several
+ways.  The typical solution is to define a @code{vpath} for @file{.cpp} files,
+this way:
 
 @example
 vpath %.cpp libs/csutil libs/cssys libs/csgfxldr
 @end example
 
-This forces MAKE to look for @file{.cpp} files in all mentioned directory.
-The overall rule is that each submakefile defines an additional vpath for his
-directory or directories. For example, the submakefile that defines the rules
-for building @code{$(CSSYS.LIB)} defines the following vpath:
+This forces @samp{make} to look for @file{.cpp} files in all mentioned
+directories.  The overall rule is that each submakefile defines an additional
+@samp{vpath} for its own directory or directories.  For example, the
+submakefile that defines the rules for building @code{$(CSSYS.LIB)}, the
+Crystal Space system library, defines the following @samp{vpath}:
 
 @example
 vpath %.cpp libs/cssys
 @end example
 
-However, sometimes you want a separate rule for one or several files. In this
-case you can define a rule for building a object file in @code{$(OUT)}
-directory from a source file in given directory; if we take the above
-example, we could write instead of that vpath directive the following:
+However, sometimes you want a separate rule for one or several files.  In this
+case you can define a rule for building an object file in the @code{$(OUT)}
+directory from a source file in given directory.  If we take the above
+example, we could write, instead of that @samp{vpath} directive, the
+following:
 
 @example
 $(OUT)%$O: libs/cssys/%.cpp
         $(DO.COMPILE.CPP) $(CFLAGS.CSSYS)
 @end example
 
-If you will want a separate rule for just one or several specific files, you
+If you would like a separate rule for just one or several specific files, you
 could do it this way:
 
 @example

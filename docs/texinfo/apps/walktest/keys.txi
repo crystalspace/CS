@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Walktest_Keyboard, Console, Walktest, Walktest
+@node Walktest Keyboard, Console, Walktest, Walktest
 @subsection Keyboard Interface
 @cindex Walktest Keys
 @cindex Keyboard Control, Walktest
@@ -8,7 +8,7 @@ To navigate through a map in the Watlktest application, use these keys:
 
 @table @kbd
 @item b
-Turn camera the other way arround.
+Turn camera the other way around (by 180 degrees).
 
 @item @key{SHIFT}
 Makes the following movement commands faster.
@@ -181,5 +181,4 @@ Assigned to @samp{debug1}.
 
 @item *
 Enable/disable collision detection.
-
 @end table

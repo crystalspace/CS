@@ -3,7 +3,7 @@
 @chapter Introduction
 @cindex Introduction
 
-CrystalSpace is a 6DOF 3D engine, it is not in itself a game and is still
+CrystalSpace is a 6@sc{dof} 3D engine, it is not in itself a game and is still
 very much in development.  Everyone who feels inclined can contribute to the
 source. There are several things that still need to be done. For more
 information about what is missing and a list of current known bugs,
@@ -16,8 +16,8 @@ that you are allowed to use Crystal Space in your products.  You are even
 allowed to sell your product using Crystal Space provided Crystal Space
 itself remains free.
 
-Please read the FAQ if you have a question.  If you don't find the answer
-there you can always E-Mail the mailing lists. @xref{FAQ}, or
+Please read the @sc{faq} if you have a question.  If you don't find the answer
+there you can always email the mailing lists. @xref{FAQ}, or
 @ref{Mailing Lists}.
 
 @menu
@@ -25,9 +25,8 @@ there you can always E-Mail the mailing lists. @xref{FAQ}, or
 * Current Status::
 * UsingForProject:: Using Crystal Space For Your Project
 * Feature List::
-* WhereToGet:: Where To Get Crystal Space
+* Where to Get:: Where to Get Crystal Space
 * Mailing Lists::
-* Texture Archive::
 * Feedback:: Feedback and Bug Reporting
 * Genesis:: Genesis of Crystal Space
 * Authors:: Documentation Authors & Contributors

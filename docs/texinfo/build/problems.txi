@@ -1,41 +1,40 @@
 @c -*-texinfo-*-
-@node Problems, Quick Start, OSSpecific, Building
-@section Known platform specific bugs and problems
+@node Problems, Quick Start, Platform Instructions, Building
+@section Platform Specific Problems
 
-These problems are both relevant for compiling and running.
-Crystal Space is work in progress. Expect these problems to go away
-in the future.
+These problems are both relevant for compiling and running.  Crystal Space is
+work in progress.  Expect these problems to go away in the future.
 
 @itemize @bullet
 @item
 With the exception of MacOS/X Server, OpenStep, and NextStep, all ports of
-Crystal Space require an 8-bit, 15-bit, 16-bit, or 32-bit display to run.
-It will NOT work on 24-bit displays.
+Crystal Space require an 8-bit, 15-bit, 16-bit, or 32-bit display to run.  It
+will @emph{not} work on 24-bit displays.
 
 @item
-DJGPP: If you have gcc 2.8.1 then you must disable optimization (set
-@code{OPT=debug} in @file{mk/user.mak}) before compilation because there
-seems to be a bug in the optimizer. You can also download EGCS from
-@uref{http://goof.com/pcg} which fixes this problem and also generates a
-more efficient executable.
+@sc{djgpp}: If you have @sc{gcc} 2.8.1 then you must disable optimization (set
+@code{OPT=debug} in @file{mk/user.mak}) before compilation because there seems
+to be a bug in the optimizer.  You can also download @sc{egcs} from
+@uref{http://goof.com/pcg} which fixes this problem and also generates a more
+efficient executable.
 
 @item
-DJGPP: With very old versions of gcc you need to disable the assembler
+@sc{djgpp}: With very old versions of gcc you need to disable the assembler
 routines (set @code{DO_ASM=no} in @file{mk/user.mak}) because the assembler
-doesn't understand some of the MMX routines. You should upgrade to a more
-recent version of DJGPP if possible.
+doesn't understand some of the @sc{mmx} routines.  You should upgrade to a
+more recent version of @sc{djgpp} if possible.
 
 @item
 OpenGL: If your OpenGL display looks really bad (bad quality of lighting
-compared to the software renderer) then you have a card which doesn't
-support the desired blending mode @code{2*SRC*DST} that CS uses. You can
-edit @file{opengl.cfg} and change the @code{LIGHTMAP_MODE} option to
-@file{multiply} (which all cards should understand) or any of the other
-values. @file{multiply} will make everything dark but at least it will look
-right. The RIVA 128ZX is an example of a card which doesn't support
+compared to the software renderer) then you have a card which doesn't support
+the desired blending mode @code{2*SRC*DST} that Crystal Space uses.  You can
+edit @file{opengl.cfg} and change the @samp{LIGHTMAP_MODE} option to
+@samp{multiply} (which all cards should understand) or any of the other
+values.  @samp{multiply} will make everything dark but at least it will look
+right.  The @sc{riva} 128@sc{zx} is an example of a card which doesn't support
 @code{2*SRC*DST}.
 
 @item
-Direct3D: The Direct3D port suffers from the same bug as the OpenGL port
-with the lightmaps not correctly applied on some 3D cards.
+Direct3D: The Direct3D port suffers from the same bug as the OpenGL port with
+the lightmaps not correctly applied on some 3D cards.
 @end itemize

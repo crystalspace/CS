@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
-@node Console_Boolean, Console_Value, Console_General, Console
-@subsubsection Boolean commands
+@node Console Boolean, Console Value, Console General, Console
+@subsubsection Boolean Commands
 
 Boolean commands have either an @code{on} or @code{off} state. When you just
 type the command without arguments it will show you the current state of the
@@ -12,13 +12,10 @@ a state use @code{toggle}. Example:
 @itemize @bullet
 @item
 @samp{fps}: show current setting for FPS display
-
 @item
 @samp{fps on}: enable FPS display
-
 @item
 @samp{fps 0}: disable FPS display
-
 @item
 @samp{fps toggle}: toggle FPS display
 @end itemize
@@ -27,9 +24,8 @@ The following boolean commands are available :
 
 @table @code
 @item colldet
-Enable/disable new collision detection (using RAPID library). Corresponds
-to @code{-colldet}/@code{-nocolldet} commandline options.
-COMMAND NOT USEFUL CURRENTLY.
+Enable/disable collision detection.  Corresponds to @code{-colldet} and
+@code{-nocolldet} commandline options.
 
 @item fclear
 Enable/disable the clearing of the display every frame (this is useful for
@@ -41,13 +37,14 @@ if the program crashes provided your system can catch crashes).
 
 @item stats
 Enable/disable statistics display. Corresponds to
-@code{-stats}/@code{-nostats} commandline options and STATS configuration
-option. Note that enabling the statistics counter automatically disables
-the display of the coordinates.
+@code{-stats}/@code{-nostats} commandline options and @samp{STATS}
+configuration option.  Note that enabling the statistics counter automatically
+disables the display of the coordinates.
 
 @item fps
-Enable/disable FPS display (frames per second). Corresponds to
-@code{-fps}/@code{-nofps} commandline options and FPS configuration option.
+Enable/disable @sc{fps} display (frames per second).  Corresponds to
+@code{-fps}/@code{-nofps} commandline options and @sc{fps} configuration
+option.
 
 @item transp
 Enable/disable transparent/filtered/alpha drawing.
@@ -72,7 +69,7 @@ Enable/disable texture mapping.
 Enable/disable lighting.
 
 @item console
-Open/close console (is done automatically by @key{tab} key).
+Open/close console (is done automatically by @key{TAB} key).
 
 @item coordshow
 Enable/disable display of coordinate at runtime. Note that enabling the
@@ -82,13 +79,13 @@ coordinates display automatically disables the statistics display.
 Toggle the display of things on/off (default on).
 
 @item ilace
-Toggle interlace on/off. For information about the INTERLACING option
-@xref{Config_VideoDriver}.
+Toggle interlace on/off.  See the video driver configuration section for
+information about the @samp{INTERLACING} option.  @xref{Config VideoDriver}.
 
 @item mmx
-Toggle MMX support on/off. This command corresponds with the MMX
-configuration file option. @xref{Config_VideoDriver}. Note that this
-command is only useful if you have a MMX capable processor.
+Toggle @sc{mmx} support on/off.  This command corresponds with the @sc{mmx}
+configuration file option.  @xref{Config VideoDriver}.  Note that this command
+is only useful if you have a @sc{mmx} capable processor.
 
 @item zbuf
 For debugging. When enabled this will show an alternate view where far away
@@ -149,22 +146,22 @@ command). Enabling the c-buffer disables the coverage mask
 tree automatically.
 
 @item covtree
-Toggle coverage mask tree rendering on/off. In some levels (especially
-levels with many non-moving things) enabling the coverage mask tree for the
-engine can improve performance considerably. By default it is off
-(currently). Note that the level needs to be prepared for this (octree
-needs to be added using STATBSP command). Enabling the coverage mask tree
-disables the c-buffer automatically.
+Toggle coverage mask tree rendering on/off.  In some levels (especially levels
+with many non-moving things) enabling the coverage mask tree for the engine
+can improve performance considerably.  By default it is off (currently).  Note
+that the level needs to be prepared for this (octree needs to be added using
+@samp{STATBSP} command).  Enabling the coverage mask tree disables the
+c-buffer automatically.
 
 @item solidbsp
 Toggle solidbsp rendering on/off. This is experimental for now.
 
 @item sprlight
-Change quality setting of sprite lighting. If yes every vertex will be lit
-according to the correct distance with the light. If no then the distances
-for all vertices are calculated to the center of the sprite. Default is
-@samp{no}. This option can also be set with the SPRITE_HIGHQUAL option in
-the config file.
+Change quality setting of sprite lighting.  If yes every vertex will be lit
+according to the correct distance with the light.  If no then the distances
+for all vertices are calculated to the center of the sprite.  Default is
+@samp{no}.  This option can also be set with the @samp{SPRITE_HIGHQUAL} option
+in the configuration file.
 
 @item palette
 Toggle on/off displaying the palette on top of everything (just below the

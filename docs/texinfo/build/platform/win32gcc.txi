@@ -1,38 +1,42 @@
 @c -*-texinfo-*-
-@node GCC Windows, Amiga, MS-DOS, OSSpecific
-@subsection GCC for Windows
+@node GCC Windows, Amiga, MS-DOS, Platform Instructions
+@subsection @sc{gcc} and Mingw for Windows
 
-Written and maintained by Seth Galbraith (@email{sgalbrai@@krl.org}).
+@strong{Warning}: @emph{These instructions are extremely incomplete.  You
+should not rely upon them at this time.  Andrew Zabolotny
+(@email{bit@@eltech.ru}) intends to update them as time permits.}
 
-Andrew Zabolotny, myself and others are working on instructions for using
-Crystal Space with a GNU compiler for windows, but it isn't easy because of
-the many different versions of the GNU Windows compiler and problems with
-some Windows header files containing non-standard code used by Microsoft.
-If you're interested in helping out with this project, contact me or one of
-the other Crystal Space developers.
+These instructions are for building Crystal Space with a @sc{gnu} compiler for
+Windows.  Unfortunately, there are many different versions of the @sc{gnu}
+Windows compiler and problems arise with some Windows header files containing
+non-standard code used by Microsoft.
 
-@menu
-* Win GCC Files:: Files you will need
-* Win GCC Installation:: Installation
-@end menu
+Here is a link to Mingw, the most recently updated and well supported @sc{gcc}
+Windows compiler:
 
-@node Win GCC Files, Win GCC Installation, GCC Windows, GCC Windows
-@subsubsection Files you will need
+@url{http://www.nanotech.wisc.edu/~khan/software/gnu-win32/}
 
-@table @emph
-@item Cygwin GNU Windows compiler
-@uref{ftp://go.cygnus.com/pub/sourceware.cygnus.com/
-pub/cygwin/latest/full.exe}
+@subsubheading Necessary Resources
 
-@item compiled zip, jpeg, and png libraries for Windows
+This is a listof resources which you will need in order to build Crystal
+Space for Windows using the @sc{gcc} compiler.
+
+@noindent
+Cygwin @sc{gnu} Windows compiler@*
+@uref{ftp://go.cygnus.com/pub/sourceware.cygnus.com/pub/cygwin/latest/full.exe}
+
+@noindent
+Compiled @sc{zip}, @sc{jpeg}, and @sc{png} libraries for Windows@*
 @uref{ftp://ftp.linuxgames.com/crystal/support/winlibs14.zip}
 
-@item NASM (Netwide Assembler) for Windows
+@noindent
+@sc{nasm} (Netwide Assembler) for Windows@*
 @uref{ftp://ftp.linuxgames.com/crystal/nasm/nasm-0.98e-bin-w32.zip}
-@end table
 
-@node Win GCC Installation, , Win GCC Files, GCC Windows
-@subsubsection Installation
+@subsubheading Building
+
+Here are the instructions for building Crystal Space with the @sc{gcc}
+compiler for Windows.
 
 @itemize @bullet
 @item
@@ -40,19 +44,22 @@ Unzip the compiled libraries into the same folder where you unzipped
 Crystal Space.
 
 @item
-Unzip NASM somwhere.
+Unzip @sc{nasm} somwhere.
 
 @item
-Run the Cygwin full.exe installer.
+Run the Cygwin @file{full.exe} installer.
 
 @item
-To use GCC and NASM you need to make sure you have the appropriate bin
-directories in your PATH. Here's my own PATH as an example:
+To use @sc{gcc} and @sc{nasm} you need to make sure you have the appropriate
+@file{bin} directories in your @samp{PATH}.  Here's my own @samp{PATH} as an
+example:
+
 @example
-SET PATH=C:\Cygnus\cygwin-b20\H-i586-cygwin32\bin;C:\nasm\bin\win32;%PATH%
+SET PATH=C:\Cygnus\cygwin-b20\H-i586-cygwin32\bin;
+  C:\nasm\bin\win32;%PATH%
 @end example
 
 @item
-Now just CD to your Crystal Space directory, run make and follow the
-instructions.
+From within the Crystal Space directory (@file{CS}), run the @samp{make}
+command and follow the instructions.
 @end itemize

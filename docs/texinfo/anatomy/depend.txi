@@ -14,86 +14,80 @@ advertise pure, abstract interfaces which often imply much less dependency
 than actually linking with a library.
 
 @itemize @bullet
-@item Level 1@*
-Utility---independant of CS.
+@item Level 1: @emph{Utility---Independant of CS}
 
 @itemize @minus
 @item
-@file{libjpeg}
+@code{libjpeg}
 @item
-@file{libpng}
+@code{libpng}
 @item
-@file{zlib}
+@code{zlib}
 @item
-@file{csgeom}
+@code{csgeom}
 @item
-@file{csobject}
+@code{csobject}
 @item
-@file{csutil}
+@code{csutil}
 @end itemize
 
-@item Level 2@*
-Basics---common base of various CS parts.
+@item Level 2: @emph{Basics---Common Base of Various CS Parts}
 
 @itemize @minus
 @item
-@file{csgfxldr}
+@code{csgfxldr}
 @item
-@file{cssfxldr}
+@code{cssfxldr}
 @item
-@file{cssys}
+@code{cssys}
 @end itemize
 
-@item Level 3@*
-SCF---various interchangeable plug-in modules of CS.
+@item Level 3: @emph{SCF---Various Interchangeable Plug-In Modules of CS}
 
 @itemize @minus
 @item
-@file{cs2d}
+@code{cs2d}
 @item
-@file{cs3d}
+@code{cs3d}
 @item
-@file{csnetdrv}
+@code{csnetdrv}
 @item
-@file{cssnddrv}
+@code{cssnddrv}
 @item
-@file{cssndrdr}
+@code{cssndrdr}
 @end itemize
 
-@item Level 4@*
-Engine---binds togehter all the engines components.
+@item Level 4: @emph{Engine---Binds Togehter Engines Components}
 
 @itemize @minus
 @item
-@file{csengine}
+@code{csengine}
 @item
-@file{csinput}
+@code{csinput}
 @item
-@file{csparser}
+@code{csparser}
 @item
-@file{csscript}
+@code{csscript}
 @end itemize
 
-@item Level 5@*
-Support---adds a common layer of engine abstraction.
+@item Level 5: @emph{Support---Adds a Common Layer of Engine Abstraction}
 
 @itemize @minus
 @item
-@file{csws}
+@code{csws}
 @item
-@file{csgame}
+@code{csgame}
 @end itemize
 
-@item Level 6@*
-Application.
+@item Level 6: @emph{Application}
 
 @itemize @minus
 @item
-@file{walktest}
+@code{walktest}
 @item
-@file{metademo}
+@code{metademo}
 @item
-@file{MazeD}
+@code{MazeD}
 @end itemize
 @end itemize
 

@@ -1,8 +1,10 @@
 @c -*-texinfo-*-
-@node WhereToGet, Mailing Lists, Feature List, CS Introduction
-@section Where To Get Crystal Space
+@node Where to Get, Mailing Lists, Feature List, CS Introduction
+@section Where to Get Crystal Space
+@cindex Resources, Where to Get
+@cindex Where to Get, Resources
 
-The Crystal Space home page.  This page contains the latest development and
+The Crystal Space home page contains the latest development and
 official releases of Crystal Space.  Here is a small note about the
 difference between the official and the development (beta) releases: both
 the official and development versions are actually beta.  The difference is
@@ -13,11 +15,94 @@ your particular system, it may not work at all, or you might not be able to
 compile it.  But the development release may also work very well.  You never
 know.
 
-Crystal Space Homepage: @uref{http://crystal.linuxgames.com}
-If you want to keep in touch with the latest development of CS you can try to
-access the CVS server.  Have a look at the above page to see how this works.
+@noindent
+The Crystal Space home page is located at:
 
-@node Mailing Lists, Texture Archive, WhereToGet, CS Introduction
+@uref{http://crystal.linuxgames.com}
+
+@noindent
+The released Crystal Space packages can also be downloaded directly via
+@sc{ftp} from the following location:
+
+@uref{ftp://ftp.linuxgames.com/crystal}
+
+@subheading Bleeding-Edge Developmental Releases (@sc{cvs})
+@cindex CVS
+@cindex Bleeding-Edge Developmental Releases
+@cindex Developmental Releases, Bleeding-Edge
+
+@anchor{CVS}
+Crystal Space is being actively developed.  You can download
+@emph{bleeding-edge} versions of the project from the @sc{cvs} repository
+where the absolute latest copy is stored.  There are two ways to access the
+developmental version of the project.
+
+First, you can access the @sc{cvs} repository directly via a @sc{cvs} tool.
+Instructions for doing so may be found here:
+
+@uref{http://sourceforge.net/cvs/?group_id=649}
+
+Second, you can download a snapshot of the @sc{cvs} repository using @sc{http}
+or @sc{ftp}.  Snapshots are generated daily and are accompanied by standard
+@samp{diff}-style @dfn{patch} files.
+
+@uref{http://crystal.sourceforge.net/cvs-snapshots/}
+
+@uref{ftp://crystal.sourceforge.net/pub/crystal/cvs-snapshots/}
+
+@subheading Documentation
+@cindex Documentation, Obtaining
+@cindex Documentation, Online
+@cindex Obtaining Documentation
+@cindex Online Documentation
+@cindex Developer Documentation and @sc{api}
+@cindex Public @sc{api}
+@cindex @sc{api}, Public
+
+@anchor{Documentation Resources}
+Documentation is included with the Crystal Space distribution.  A gateway to
+all documentation can be found in the file @file{CS/docs/README.htm}.  You can
+also read the Crystal Space manual with your web browser by loading the file
+@file{CS/docs/html/index.htm}.
+
+Documentation is also available online.  A version of this manual is available
+online at this location:
+
+@url{http://crystal.sourceforge.net/docs/online/manual/}
+
+The @cite{Public @sc{api}} reference for programmers utilizing Crystal Space
+is available online here:
+
+@url{http://crystal.sourceforge.net/docs/online/api/}
+
+The @cite{Developer's Documentation and @sc{api}} for programmers actually
+working on Crystal Space itself is available here:
+
+@url{http://crystal.sourceforge.net/docs/online/dev/}
+
+Additionally, @sc{html}, @sc{pdf}, and PostScript conversions of this manual
+can be downloaded as a single archive for offline perusal or printing.  The
+@cite{Public @sc{api}} and @cite{Developer's Documentation and @sc{api}} can
+each be downloaded as a single archive as well.  These archives may be found
+here:
+
+@url{http://crystal.sourceforge.net/docs/download/}
+
+Developers can generate the @cite{Public @sc{api}} and @cite{Developer's
+Documentation and @sc{api}} documents themselves by invoking the makefile
+targets @samp{apidoc} and @samp{devdoc}.  Output from these targets is placed
+in the @file{CS/out/docs/api} and @file{CS/out/docs/dev} directories,
+respectively.
+
+@subheading Texture Archive
+@cindex Texture Archive
+@cindex Archives, Texture
+
+A Crystal Space texture archive is maintained at:
+
+@uref{http://server.empathy.com/crystal}.
+
+@node Mailing Lists, Feedback, Where to Get, CS Introduction
 @section Mailing Lists
 @cindex Mailing Lists
 
@@ -27,28 +112,25 @@ interest to users and developers.
 The first list is the discussion list used for general and in-depth
 discussion of Crystal Space and related projects.
 
+@noindent
 Mailing List: @email{crystal-main@@lists.sourceforge.net}.
 
-To subscribe to this list goto
-@uref{http://lists.sourceforge.net/mailman/listinfo/crystal-main} and follow
-the instructions there. To unsubscribe goto the same page and follow the
-instructions for unsubscribing.
+To subscribe to this list visit the mailing list administration page and
+follow the instructions there.  This page also contains instructions for
+unsubscribing.
+
+@uref{http://lists.sourceforge.net/mailman/listinfo/crystal-main}
 
 The second list is for people who are interested in being notified of
 changes which are made to Crystal Space's CVS repository.  A notification
 message is sent to members of this list each time a change is made to some
 resource in the CVS repository.
 
+@noindent
 Mailing List: @email{crystal-cvs@@lists.sourceforge.net}.
 
-To subscribe to this list goto
-@uref{http://lists.sourceforge.net/mailman/listinfo/crystal-cvs} and follow
-the instructions there. To unsubscribe goto the same page and follow the
-instructions for unsubscribing.
+To subscribe to this list visit the mailing list administration page and
+follow the instructions there.  This page also contains instructions for
+unsubscribing.
 
-
-@node Texture Archive, Feedback, Mailing Lists, CS Introduction
-@section Texture Archive
-
-A Crystal Space texture archive is maintained at
-@uref{http://server.empathy.com/crystal}.
+@uref{http://lists.sourceforge.net/mailman/listinfo/crystal-cvs}

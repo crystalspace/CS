@@ -1,15 +1,15 @@
 @c -*-texinfo-*-
-@node Console, Walktest_Config, Walktest_Keyboard, Walktest
+@node Console, Walktest Configuration, Walktest Keyboard, Walktest
 @subsection The Console
 @cindex Console
 
-Walktest provides a console to control the system. Only the Walktest console
-works like described here. Other CS apps can have their own console commands.
-The CS console is, in fact, only a class that provides text input and output
-on top of the 2d rasterizer. The main part in this file describes the command
-handler, which you have to provide in addition to the console. It reacts to
-console commands. Without a command handler, the console will be quiet and
-ignore any input.
+Walktest provides a console to control the system.  Only the Walktest console
+works like described here.  Other Crystal Space apps can have their own
+console commands.  The Crystal Space console is, in fact, only a class that
+provides text input and output on top of the 2d rasterizer.  The main part in
+this file describes the command handler, which you have to provide in addition
+to the console.  It reacts to console commands.  Without a command handler,
+the console will be quiet and ignore any input.
 
 Pressing @key{TAB} activates the console. On the console there are several
 commands that you can use to control how Crystal Space works. Several of
@@ -27,10 +27,10 @@ overview of argument treatment prior to listing commands.
 @end quotation
 
 @menu
-* Console_General:: General commands
-* Console_Boolean:: Boolean commands
-* Console_Value:: Value commands
-* Console_MultiChoice:: Multi-choice commands
+* Console General:: General commands
+* Console Boolean:: Boolean Commands
+* Console Value:: Value Commands
+* Console Multi-Choice:: Multi-Choice Commands
 @end menu
 
 @importss{apps,walktest,general.txi}

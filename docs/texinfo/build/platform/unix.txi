@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Unix, Win32, OSSpecific, OSSpecific
+@node Unix, Win32, Platform Instructions, Platform Instructions
 @subsection Unix
 @cindex Unix
 
@@ -22,7 +22,7 @@ safely leave it enabled.
 @menu
 * Unix Editing the Makefile:: Editing the Makefile
 * Unix Compiling:: Compiling on Unix
-* Unix Other2d3d:: Compiling with other 3D and 2D drivers
+* Unix Other2d3d:: Compiling with other 3D and 2D Drivers
 * Unix WhereOBJ:: Where are the Object Files?
 @end menu
 
@@ -130,7 +130,7 @@ This step is not needed when @code{USE_SHARED_PLUGINS=no} is specified.
 Now you can run the executable @file{walktest}.
 
 @node Unix Other2d3d, Unix WhereOBJ, Unix Compiling, Unix
-@subsubsection Compiling with other 3D and 2D drivers
+@subsubsection Compiling with other 3D and 2D Drivers
 
 The makefiles are normally configured only for the software renderer
 and some default 2D driver. Here are some other options:
@@ -138,13 +138,10 @@ and some default 2D driver. Here are some other options:
 @itemize @bullet
 @item
 OpenGL with X11
-
 @item
 Glide with X11
-
 @item
 Software with SVGALIB
-
 @item
 Software with GGI
 @end itemize

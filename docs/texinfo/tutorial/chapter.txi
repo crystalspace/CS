@@ -8,9 +8,9 @@ yourself with the various aspects of the Crystal Space development
 environment.
 
 @menu
-* Tutorial_Introduction:: Developing a Crystal Space Application
-* Tutorial_Simple:: A @code{Simple} Tutorial
-* Tutorial_CrystalClear:: A @code{CrystalClear} Tutorial
+* Tutorial Introduction:: Developing a Crystal Space Application
+* Tutorial Simple:: Simple Tutorial
+* Tutorial CrystalClear:: A CrystalClear Tutorial
 @end menu
 
 @imports{tutorial,intro.txi}

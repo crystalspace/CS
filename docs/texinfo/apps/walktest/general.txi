@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Console_General, Console_Boolean, Console, Console
+@node Console General, Console Boolean, Console, Console
 @subsubsection General commands
 
 General commands, in contrast to other commands, DO something instead of
@@ -182,21 +182,21 @@ Rotate player left. Uses gravity system if @samp{move3d} is disabled.
 Rotate player right. Uses gravity system if @samp{move3d} is disabled.
 
 @item i_forward, i_backward, i_left, i_right, i_up, i_down
-Move. The first argument is 0 or 1. If 1 we will move VERY VERY slowly (for
+Move. The first argument is 0 or 1. If 1 we will move @emph{very} slowly (for
 debugging). The second argument is 0 or 1. If 1 we will move very fast.
 This command only works if @samp{move3d} is enabled.
 
 @item i_rotleftc, i_rotleftw, i_rotrightc, i_rotrightw
 Rotate left or right. The @samp{c} versions rotate along the camera axis.
 The @samp{w} version along the world axis. The first argument is 0 or 1.
-If 1 we will move VERY VERY slowly (for debugging). The second argument is
+If 1 we will move @emph{very} slowly (for debugging). The second argument is
 0 or 1. If 1 we will move very fast. This command only works if
 @samp{move3d} is enabled.
 
 @item i_rotleftx, i_rotleftz, i_rotrightx, i_rotrightz
-Rotate the camera. The first argument is 0 or 1. If 1 we will move VERY
-VERY slowly (for debugging). The second argument is 0 or 1. If 1 we will
-move very fast. This command only works if @samp{move3d} is enabled.
+Rotate the camera. The first argument is 0 or 1. If 1 we will move @emph{very}
+slowly (for debugging). The second argument is 0 or 1. If 1 we will move very
+fast. This command only works if @samp{move3d} is enabled.
 
 @item addbot
 Add a sprite that moves randomly through the dungeon.
@@ -228,7 +228,7 @@ Add a skeletal tree (demonstration). The first argument is the depth. A
 depth of 1 will create a root and one layer above. The second argument is
 the width. This is the number of branches created at every depth. A good
 tree is @samp{addskel 3,3}. Be careful with large numbers here. The number
-of triangles grows VERY fast! If the width parameter is negative the
+of triangles grows @emph{very} fast! If the width parameter is negative the
 choosen width will be random between 1 and @code{-width} (inclusive).
 
 @item addghost

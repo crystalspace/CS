@@ -1,32 +1,37 @@
 @c -*-texinfo-*-
-@node csPhyzik, SCF, Makefile Structure, Anatomy
-@section csPhyziks Library @code{csphyzik}
+@node csPhyziks, SCF, Makefile How-To, Anatomy
+@section csPhyziks Library (@code{csphyzik})
 @cindex Phyziks
 @cindex csphyzik
 @cindex Libraries, csphyzik
 
-The csPhyziks library is a dynamics modeling and simulation engine.  The
-core of the engine is a numerical integrator that solves the equations of
-motion for given bodies.  Different types of bodies will have different
-equations of motion.  A simple example would be the equations of motion for
-the center of mass of a rigid body.
+@noindent
+@emph{Written by Michael Alexander Ewert.  Last updated 6 December 1999.}
 
-These two equations together have a fancy name:  coupled Ordinary
-Differential Equations.
+This library is a work in progress so many things will change (and probably
+already have by the time you read this).
+
+The Phyziks (@file{csphyzik}) library is a dynamics modeling and simulation
+engine.  The core of the engine is a numerical integrator that solves the
+equations of motion for given bodies.  Different types of bodies will have
+different equations of motion.  A simple example would be the equations of
+motion for the center of mass of a rigid body.
+
+These two equations together have a fancy name: @dfn{Coupled Ordinary
+Differential Equations}.
 
 @table @code
 @item dx/dt = v
-Change of the bodies position over time = the velocity of the body.
-
+Change of the bodies position over time @equiv{} the velocity of the body.
 @item dv/dt = a
-Change in velocity = acceleration.
+Change in velocity @equiv{} acceleration.
 @end table
 
-This equation is used to bootstrap the solving of the above ODE's
+This equation is used to bootstrap the solving of the above @sc{ode}s:
 
 @table @code
 @item F = ma
-Force = mass * acceleration. So @code{a = F/m}. Plug into second ODE.
+Force = mass * acceleration. So @code{a = F/m}. Plug into second @sc{ode}.
 @end table
 
 You would add the body to the engine and any forces that act on it.  When
@@ -36,269 +41,315 @@ the engine via a pointer to your body.  That value would be used that to
 update the position of the object that represents your body in the renderer.
 
 @menu
-* csPhyzik World:: The World
-* csPhyzik Bodies:: Bodies
-* csPhyzik Forces:: Forces
-* csPhyzik Articulated Bodies:: Articulated Bodies
-* csPhyzik Impulses:: Impulses
-* csPhyzik Solvers:: Solvers
-* csPhyzik Evolve-Collide-Update Loop:: Evolve-Collide-Update Loop
-* csPhyzik ODE Solvers:: ODE Solvers
+* csPhyziks World:: The World
+* csPhyziks Bodies:: Bodies
+* csPhyziks Forces:: Forces
+* csPhyziks Articulated Bodies:: Articulated Bodies
+* csPhyziks Impulses:: Impulses
+* csPhyziks Solvers:: Solvers
+* csPhyziks Evolve-Collide-Update Loop:: Evolve-Collide-Update Loop
+* csPhyziks ODE Solvers:: @sc{ode} Solvers
 @end menu
 
-@node csPhyzik World, csPhyzik Bodies, csPhyzik, csPhyzik
+@node csPhyziks World, csPhyziks Bodies, csPhyziks, csPhyziks
 @subsection The World
 
 There is a convenient header file that includes all the other headers you
 will probably need.
+
 @example
 #include "csphyzik/phyziks.h"
 @end example
 
-The main object used to represent the physics engine is ctWorld.
+The main object used to represent the physics engine is @samp{ctWorld}.
+
 @example
 ctWorld phyz_world;
 @end example
 
 Any bodies you want to be dynamically simulated need to be added to a
-ctWorld.
+@samp{ctWorld}.
+
 @example
-phyz_world.add_rigidbody( a_rigid_body_pointer );
+phyz_world.add_rigidbody(a_rigid_body_pointerd);
 @end example
 
 You can add forces that will affect all bodies the system by adding an
 environmental force:
+
 @example
-phyz_world.add_enviro_force( gravity_force_pointer );
+phyz_world.add_enviro_force(gravity_force_pointer);
 @end example
 
 When you want to evolve the system simply do this:
+
 @example
-phyz_world.evolve( time_start, time_end );
+phyz_world.evolve(time_start, time_end);
 @end example
 
 Now the rigid body we added should have been moved by the gravity force.
 
-@node csPhyzik Bodies, csPhyzik Forces, csPhyzik World, csPhyzik
+@node csPhyziks Bodies, csPhyziks Forces, csPhyziks World, csPhyziks
 @subsection Bodies
 
 The inheritance heirarchy for bodies looks something like this:
 
 @example
-ctPhysicalEntity        a body with position and velocity. any body 
-|                       inheriting from this can be added to a world.
-|
-+-- ctWorld
-|
-+-- ctArticulatedBody   a body that in composed of a number of rigidbodies
-|                       connected via joints
-|
-+-- ctDynamicEntity     a body that has mass 
-    |
-    +-- ctSoftBody      (not implemented) 
-    |
-    +-- ctRigidBody     a rigid body with rotational state and an inertia
-                        tensor
+ctPhysicalEntity
+    @result{} ctWorld
+    @result{} ctArticulatedBody
+    @result{} ctDynamicEntity
+        @result{} ctSoftBody
+        @result{} ctRigidBody
 @end example
 
-Lets look at @code{ctRigidBody}. Probably the most common type of body. Any
-solid object without moving parts is most likely a rigid body. The best way
+Here is a brief summary of the various bodies:
+
+@table @code
+@item ctPhysicalEntity
+A body with position and velocity.  Any body inheriting from this can be added
+to a world.
+@item ctArticulatedBody
+A body that in composed of a number of rigid bodies connected via joints.
+@item ctDynamicEntity
+A body that has mass.
+@item ctSoftBody
+@emph{Not implemented}.
+@item ctRigidBody
+A rigid body with rotational state and an inertia tensor.
+@end table
+
+Let's look at @samp{ctRigidBody}.  Probably the most common type of body.  Any
+solid object without moving parts is most likely a rigid body.  The best way
 to create one and add it to a world is like so:
-@example
-// this will set up reference frame correctly.
-// Creating a RB with "new" will not.
 
-ctRigidBody *rb = ctRigidBody::new_ctRigidBody();
-phyz_world.add_rigidbody( rb ); 
+@example
+ctRigidBody* rb = ctRigidBody::new_ctRigidBody();
+phyz_world.add_rigidbody(rb);
 @end example
 
-Now you need to specify some properties.  Position, mass and an Inertia
-tensor. NOTE: Be sure you set the mass before calculating the I_tensor!
-I_tensor is dependent on mass.
+@noindent
+This will set up reference frame correctly.  Creating a rigid-body with the
+C++ @samp{new} operator will not do so.
+
+Now you need to specify some properties: position, mass, and an inertia
+tensor.  @emph{Note}: Be sure you set the mass before calculating the
+@samp{I_tensor}, since @samp{I_tensor} is dependent upon mass.
+
 @example
-rb->set_m( 15.0 );      // set the mass 
-rb->set_pos( 0.0, 10.0, 0.0 );   // set the position 
-rb->set_v( ctVector3( 1.0, 0.0, 0.0) );    // defaults to zero if you omit this step 
-rb->calc_simple_I_tensor( 0.2,0.4, 0.2 );  // calc inertia tensor of a rectangle block 
+rb->set_m(15.0);       // Set mass.
+rb->set_pos(0, 10, 0); // Set position.
+// Defaults to zero if you omit following step.
+rb->set_v(ctVector3(1, 0, 0));
+// Calculate inertia tensor of a rectangular block.
+rb->calc_simple_I_tensor(0.2, 0.4, 0.2);
 @end example
 
-That last step will calculate an Inertia tensor for a solid rectangular block
+That last step will calculate an inertia tensor for a solid rectangular block
 with dimensions of width 0.2, height 0.4 and depth 0.2 (x,y,z). An inertia
 tensor is used to calculate the response to angular forces and impulses.
 Every shape of object has a different type of inertia tensor.
 
 You can set the orientation of the body directly (by setting the
 transformation matrix), or like so:
+
 @example
-ctVector3 rotaxisxy( 1,1,0 );   // axis around which to rotate body 
-rb->rotate_around_line( rotaxisy, degree_to_rad(45) ); 
+// Axis around which to rotate body.
+ctVector3 rotaxisxy(1, 1, 0);
+rb->rotate_around_line(rotaxisy, degree_to_rad(45));
 @end example
 
 Angular velocity is specified by a vector that points in the direction of the
-axis of rotation. The magnitude of that vector determines how fast it
+axis of rotation.  The magnitude of that vector determines how fast it
 rotates.
 
-@node csPhyzik Forces, csPhyzik Articulated Bodies, csPhyzik Bodies, csPhyzik
+@node csPhyziks Forces, csPhyziks Articulated Bodies, csPhyziks Bodies, csPhyziks
 @subsection Forces
 
-There are many types of forces that can be used. More are easy to add as
-well. The three main types are environmental forces, N-body forces, and
+There are many types of forces that can be used.  More are easy to add as
+well.  The three main types are environmental forces, N-body forces, and
 simple forces.
 
-Environmental forces are added to a ctWorld and act on all bodies in that
-world. e.g. gravity, air resistance.
+Environmental forces are added to a @samp{ctWorld} and act on all bodies in
+that world, for example gravity, air resistance, etc.
+
 @example
-ctGravityF *gf = new ctGravityF( 9.81 / M_PER_WORLDUNIT );
-phyz_world.add_enviro_force( gf );
+ctGravityF* gf = new ctGravityF(9.81 / M_PER_WORLDUNIT);
+phyz_world.add_enviro_force(gf);
 @end example
 
-N-body forces are forces that act between multiple bodies. e.g. springs,
-planetary gravity.
+N-body forces are forces that act between multiple bodies, for example springs
+and planetary gravity.
+
 @example
-ctVector3 spring_attachment_point1( 0, 1, 0 ); 
-ctSpringF *sf = new ctSpringF( rb1, spring_attachment_point1, rb2, spring_attachment_point2 ); 
-sf->set_magnitude( 200.0 / M_PER_WORLDUNIT ); 
-rb1->add_force( sf );    // need to add force to each body it affects 
-rb2->add_force( sf ); 
+ctVector3 spring_attachment_point1(0, 1, 0);
+ctSpringF* sf = new ctSpringF(
+    rb1, spring_attachment_point1,
+    rb2, spring_attachment_point2);
+sf->set_magnitude(200.0 / M_PER_WORLDUNIT);
+// Need to add force to each body it affects.
+rb1->add_force(sf);
+rb2->add_force(sf);
 @end example
 
 Simple forces would be something like a rocket engine or other kind of force
 that only acts on one body.
 
-@node csPhyzik Articulated Bodies, csPhyzik Impulses, csPhyzik Forces, csPhyzik
+@node csPhyziks Articulated Bodies, csPhyziks Impulses, csPhyziks Forces, csPhyziks
 @subsection Articulated Bodies
 
 An articulated body is a rigid body that can have one or more other rigid
-bodies connected to it by joints. Such as a chain or a human figure.
+bodies connected to it by joints.  Such as a chain or a human figure.
 Currently revolute (like a hinge) joints and prismatic (like an air pump)
-joints are implemented. Also the articulated body can not at present have any
-closed loops in it. Articulated bodies can have one end fixed immovably to
+joints are implemented.  Also the articulated body can not at present have any
+closed loops in it.  Articulated bodies can have one end fixed immovably to
 the world reference frame or be free floating.
+
 @example
-rb = ctRigidBody::new_ctRigidBody(); 
-ab_parent = new ctArticulatedBody( rb );  // create an articulated body with a rigid body 
-phyz_world.add_add_articulatedbodybase( ab_parent );   // only have to add the root, 
-                                                       // no child need to be added to world 
-  
-ab_child = new ctArticulatedBody( rb2 ); 
-ctVector3 joint_offset_parent_to_child( 0, -0.1, 0 ); 
-ctVector3 joint_action( 0,0,1 );    // line of action for this joint 
-// link the child to the parent with a revolute joint. 
-ab_parent->link_revolute( ab_child, joint_offset_parent_to_child, joint_offset_ctop, joint_action ); 
+rb = ctRigidBody::new_ctRigidBody();
+// Create an articulated body with a rigid body.
+ab_parent = new ctArticulatedBody(rb);
+// Only have to add the root; no need to add
+// children to world.
+phyz_world.add_add_articulatedbodybase(ab_parent);
+
+ab_child = new ctArticulatedBody(rb2);
+ctVector3 joint_offset_parent_to_child(0, -0.1, 0);
+// Line of action for this joint.
+ctVector3 joint_action(0, 0, 1);
+// Link the child to the parent with a revolute joint.
+ab_parent->link_revolute(
+    ab_child,
+    joint_offset_parent_to_child,
+    joint_offset_ctop,
+    joint_action);
 @end example
 
 Now when evolved the articulated body will move in a dynamically correct
 manner in response to any external and internal forces (if the featherstone
 solver is used).
 
-It is possible to define your own joints from @code{ctJoint}. You can then
+It is possible to define your own joints from @samp{ctJoint}.  You can then
 overload the @code{get_actuator_magnitude()} method to implement a joint with
 a motor that will exert whatever force you like at that joint.
 
-@node csPhyzik Impulses, csPhyzik Solvers, csPhyzik Articulated Bodies, csPhyzik
+@node csPhyziks Impulses, csPhyziks Solvers, csPhyziks Articulated Bodies, csPhyziks
 @subsection Impulses
 
-An impulse is a large force applied over a very short time
-interval.  Such as in a collision or an explosion.  Impulses
-should be applied to a body any time before or after, but not
-during an evolve process.
+An impulse is a large force applied over a very short time interval.  Such as
+in a collision or an explosion.  Impulses should be applied to a body any time
+before or after, but not during an evolve process.
+
 @example
-rb->apply_impulse( vector_direction_of_impulse_with_magnitude, 
-                   vector_location_of_impulse_in_world_coords );
+rb->apply_impulse(
+    vector_direction_of_impulse_with_magnitude,
+    vector_location_of_impulse_in_world_coords);
 @end example
 
-@node csPhyzik Solvers, csPhyzik Evolve-Collide-Update Loop, csPhyzik Impulses, csPhyzik
+@node csPhyziks Solvers, csPhyziks Evolve-Collide-Update Loop, csPhyziks Impulses, csPhyziks
 @subsection Solvers
 
-Every object has a solver that represents the algorithm used
-to help calulate it's change in state each time-step.  A
-ctPhysicalEntity or any of it's sub-classes can change what
-solver it uses at any time.
+Every object has a solver that represents the algorithm used to help calulate
+its change in state each time step.  A @samp{ctPhysicalEntity} or any of it's
+subclasses can change what solver it uses at any time.
 
-@node csPhyzik Evolve-Collide-Update Loop, csPhyzik ODE Solvers, csPhyzik Solvers, csPhyzik
+@node csPhyziks Evolve-Collide-Update Loop, csPhyziks ODE Solvers, csPhyziks Solvers, csPhyziks
 @subsection Evolve-Collide-Update Loop
 
-This section will outline a good strategy for your main loop using the
-csphyziks library. The simplest way to evolve you system from time t_start to
-t_end is like so:
+This section will outline a good strategy for your main loop using the Phyziks
+library.  The simplest way to evolve you system from time @samp{t_start} to
+@samp{t_end} is as follows.
 
-The goal is to evolve the phyziks engine, then figure out if any thing
-crashed into anything else, deal with those collisions and finally update the
-data structures representing your objects for the renderer. Minimum csphyzik
-data you need to keep around on your end of things are 1) a ctWorld object
-and 2) a pointer to each ctPhysicalEntity class ( or a more useful sub-class
-like ctRigidBody ) that you have instansiated and has some meaning to the
-rest of your program. Here is a simple evolve-collide-upate cycle.
+The goal is to evolve the @samp{csphyziks} engine, then figure out if any
+thing crashed into anything else; deal with those collisions and finally
+update the data structures representing your objects for the renderer.  The
+minimum @samp{csphyzik} data you need to keep around on your end of things
+are:
+
+@enumerate
+@item
+A @samp{ctWorld} object.
+@item
+A pointer to each @samp{ctPhysicalEntity} class (or a more useful subclass
+like @samp{ctRigidBody}) that you have instantiated and has some meaning to
+the rest of your program.
+@end enumerate
+
+Here is a simple evolve-collide-upate cycle, using pseudo-code:
+
 @example
-phyz_world.evolve( t_start, t_end ); 
-loop through all your game entities 
-    Update your collider object from the rigidbody 
-    detect any collisions ( you are responsible for supplying this code ) 
-    if there is a collision respond as follows: 
-        fill out the fields of a ctContact object: 
-            contact.body_a = a ctPhysicalEntity * the first body involved in the collision 
-            contact.body_b = a ctPhysicalEntity * the second body involved in the collision 
-                if you hit an immovable object ( i.e. wall, floor ) set body_b to NULL 
-            contact.contact_p = the exact point of contact between the two bodies 
-            contact.n = the collision normal. 
-            contact.resitution = value from 0.0 to 1.0 that determines the "bounce" factor 
-                of the collision.  0 = no bounce, 1.0 = no energy lost in collision. 
-        rb_a->resolve_collision( the_contact );  // hand control over to phyziks engine 
-    end if 
-end loop 
+phyz_world.evolve(t_start, t_end);
+loop @r{through all game entities}:
+    @r{update your collider object from the rigidbody}
+    @r{detect any collisions (you are responsible for supplying this code)}
+    if @r{there is a collision respond as follows}:
+        @r{fill in the fields of a @code{ctContact} object}:
+            contact.body_a = @r{a} ctPhysicalEntity *
+                @r{the first body involved in the collision}
+            contact.body_b = @r{a} ctPhysicalEntity *
+                @r{the second body involved in the collision}
+                if @r{you hit an immovable object (i.e. wall, floor)}:
+                    set body_b to NULL
+                end if
+            contact.contact_p =
+                @r{the exact point of contact between the two bodies}
+            contact.n = @r{the collision normal}
+            contact.resitution =
+                @r{value from 0.0 to 1.0 that determines the ``bounce'' factor}
+                @r{of the collision; 0 = no bounce, 1.0 = no energy lost in}
+                @r{collision}
+        // hand control over to phyziks engine
+        rb_a->resolve_collision(the_contact);
+    end if
+end loop
 
-loop through all game entities
-    get position/orientation from rigidbody for this entity 
-    update position/orientation of the object to be rendered for this entity 
-end loop 
+loop @r{through all game entities}
+    @r{get position/orientation from rigidbody for this entity}
+    @r{update position/orientation of object to be rendered for this entity}
+end loop
 @end example
 
 The above code is quite simplistic, it doesn't find the exact time of
-collision. Couple of things that need to be explained. The collision normal
-and contact point must be figured out by the collision detection routines,
-which are not part of the csphyziks library. The collision normal is the
+collision.  A couple of things need to be explained.  The collision normal and
+contact point must be figured out by the collision detection routines, which
+are not part of the @samp{csphyziks} library.  The collision normal is the
 vector that specifies what component of the objects momentum to bounce back.
 
 The collision normal is calculated once you know what features of each object
-collided. If it was a vertex or edge of one object hitting a face of another
-object, the collision normal is just the normal of that face. If it is an
-edge-edge collision the normal is the cross-product ( normalized ) of those
-two edges. Or you can just take a best guess if you don't have a very
-accurate collision detection system.
+collided.  If it was a vertex or edge of one object hitting a face of another
+object, the collision normal is just the normal of that face.  If it is an
+edge-edge collision the normal is the cross-product (normalized) of those two
+edges.  Or you can just take a best guess if you don't have a very accurate
+collision detection system.
 
-To find the exact time of collision involves rewinding the csphyziks
-simulation and trying with smaller time steps until you have reached a
-minimum collision distance. This can be quite a time-consuming process.
+To find the exact time of collision involves rewinding the @samp{csphyziks}
+simulation and trying with smaller time steps until you have reached a minimum
+collision distance.  This can be quite a time-consuming process.
 
 The collision response code does not currently support multiple points of
 simultaneous collision on one object.
 
-@node csPhyzik ODE Solvers, , csPhyzik Evolve-Collide-Update Loop, csPhyzik
-@subsection ODE Solvers
+@node csPhyziks ODE Solvers, , csPhyziks Evolve-Collide-Update Loop, csPhyziks
+@subsection @sc{ode} Solvers
 
-The Ordinary Differential Equation solver. @code{ctWorld} starts out with a
-default ODE solver of Runga-Kutta order 4. This is a fairly good one for
-stability and has only a moderate performance hit.
+An @sc{ode} is an @dfn{Ordinary Differential Equation} solver.  @code{ctWorld}
+starts out with a default @sc{ode} solver of Runga-Kutta order 4.  This is a
+fairly good one for stability and has only a moderate performance hit.
 
 If you notice your objects freaking out and disappearing (usually by flying
-off into space), you probably have a stability problem. Springs with high
+off into space), you probably have a stability problem.  Springs with high
 magnitudes (stiff) are a classic for stability problems.
 
 If you need either more speed or more stability, you may want to use a
-different one. Improved stability means decreased performance and vice versa.
+different one.  Improved stability means decreased performance and vice versa.
 Basically improved stability is gained by more complete evaluations of the
-whole system per time-step (call to evolve).
+whole system per time step (call to evolve).
 
-Problem is that the slower your frame-rate is, the bigger time-steps the
-dynamics solver will be solving for. Big time-steps contribute to instability
-as well. So you can try to fix instability by using a more sophisticated ODE
-solver like Runga-Kutta with adaptive step sizing (not implemented yet), but
-the resulting performance hit could cause more instability. So it can be a
-no-win situation when choosing and ODE solver if you have a very low
-frame-rate. Then it's time to up the system requirements on the box :)
-
-This library is a work in progress so many things will
-change... and probably already have by the time you read this :)
-
-Michael Alexander Ewert
-Last update: Dec 6, 1999
+The problem is that the slower your frame-rate is, the bigger time steps the
+dynamics solver will be solving for.  Big time steps contribute to instability
+as well.  So you can try to fix instability by using a more sophisticated
+@sc{ode} solver like Runga-Kutta with adaptive step sizing (not yet
+implemented), but the resulting performance hit could cause more instability.
+So it can be a no-win situation when choosing and @sc{ode} solver if you have
+a very low frame-rate.  Then it's time to up the system requirements of the
+computer.

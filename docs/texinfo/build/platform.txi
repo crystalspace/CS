@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node OSSpecific, Problems, External Libraries, Building
+@node Platform Instructions, Problems, External Libraries, Building
 @section Platform Specific Instructions
 
 When working with Crystal Space, always keep in mind, that this is a
@@ -12,19 +12,19 @@ Space Mailing List describing you problem and include the exact error
 messages. If you wait a while, this will probably be fixed, or at least be
 worked around. @xref{Mailing Lists}.
 
-For some ports there is an additional document called
-@samp{Detailed information for @dots{}}. This document explains the inner
-structure of the port to those who want to contribute code for that port.
+For some ports there is additional reference information explaining the
+internal workings of the port.  When such detailed information exists, you
+will find a reference to it from within the instructions in this section.
 
 @menu
 * Unix::
 * Win32:: Windows
-* NeXT::
-* OS/2::
+* NeXT:: MacOS/X Server, OpenStep, NextStep
+* OS2:: @sc{os}/2
 * Macintosh::
-* BeOS::
-* MS-DOS::
-* GCC Windows:: GCC for Windows
+* BeOS:: @sc{b}e@sc{os}
+* MS-DOS:: @sc{ms-dos}
+* GCC Windows:: @sc{gcc} and Mingw for Windows
 * Amiga::
 @end menu
 

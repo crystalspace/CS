@@ -14,6 +14,51 @@ The history order has been reversed so that new features are at the top.
 	  wasted and only slows down.
 	- Eric Sunshine updated the VC project files (received them
 	  from Nicholas Blumire <empathy@empathy.hostingcheck.com>).
+	- Eric Sunshine completed Phase Six of Eric's Big Documentation
+	  Overhaul(tm).
+	    - Completely eliminated all remaining warnings which were reported
+	      by TeX.  Mostly these involved overfull and underfull 'hbox'.
+	      Now all conversions (TeX, HTML, Info) build warning-free.
+	    - Added a 'pdfdoc' target to the makefile which converts the
+	      Crystal Space manual from Texinfo to PDF.  This complements the
+	      other output formats, PS, DVI, HTML, and Info.  (PDF generation
+	      still requires a bit more tweaking.  As it stands, it does not
+	      preserve the print margins, thus the printed material appears
+	      immediately adjacent to the border of the sheet of paper.)
+	    - Overhauled the NeXT compilation and NeXT detailed information
+	      documents so that they make sense in the context of a larger
+	      manual.  Also sensibly merged the old INSTALL.NeXT and
+	      INSTALL.NeXT-Binary documents into a single section within the
+	      manual.
+	    - Performed an overhaul of texinfo/intro/contrib.txi, the Crystal
+	      Space "contributors" document.  Unified its layout with the
+	      layout of authors.txi.  Also subjected it to a much more
+	      thorough Texinfo conversion.
+	    - Overhauled resource.txi.  Provided much more up-to-date
+	      information regarding accessing Crystal Space in its various
+	      forms (such as CVS snapshots, etc.).
+	    - Completely overhauled faq.txi to bring it much more up-to-date.
+	      It was extremely outdated.
+	    - Overhauled coding.txi and cvs.txi within the "Contributing"
+	      chapter.  Some of the information in cvs.txi was also relevant
+	      to coding.txi in one form or another, so I added the information
+	      there as well.
+	    - Major cleanup of a significant number of Texinfo document files.
+	      (I would name them here, but the list would be too long :-).
+	      Also performed a much more thorough Texinfo conversion on many
+	      of the existing documents.
+	    - Finished overhauling the Simple tutorial so that the discussion
+	      now agrees with the sample code; rather than often being
+	      independent of it.
+	    - Upgraded to texi2html version 1.62.  This version fixes six or
+	      seven additional bugs which I reported to the maintainer.
+	      Unfortunately, it also introduces several new bugs (some of
+	      which are severe).  I have sent off appropriate bug reports and
+	      am awaiting response.  In the meantime, I manually patched the
+	      most severe problems myself.
+	    - Way too many additional documentation changes to even begin to
+	      summarize them here.  You'll just have to take my word for it
+	      that a _lot_ has changed. :-)
 13-Apr-2000
 	- Changes from Paul Garceau:
 	  Patch for Mingw to work around unknown escape sequence
@@ -31,20 +76,14 @@ The history order has been reversed so that new features are at the top.
 	  once into the texture cache (e.g. with complex levels, also
 	  those sudden slowdowns that happens sometimes while
 	  you're walking). Some numbers, just to give you the feeling:
-		Entry data:
-		2.2Mb textures visible at once (e.g. flarge.zip,
-		near the staircase).
-
-		First with texture cache of 10Mb (e.g. far enough for
-		current frame): 11.976048 fps in both cases (old and new).
-
-		Now setting texture cache of 2MB:
-		5.025126 fps without improvement and 11.415525 (!!!!)
-		with improvement.
- 
-		Now setting texture cache of 1MB:
-		5.025126 fps without improvement (naturally) and
-		6.752194 fps with it
+	    - Entry data: 2.2Mb textures visible at once (e.g.  flarge.zip,
+	      near the staircase).
+	    - First with texture cache of 10Mb (e.g.  far enough for current
+	      frame): 11.976048 fps in both cases (old and new).
+	    - Now setting texture cache of 2MB: 5.025126 fps without
+	      improvement and 11.415525 (!!!!) with improvement.
+	    - Now setting texture cache of 1MB: 5.025126 fps without
+	      improvement (naturally) and 6.752194 fps with it
 	  For real-world cases it should give even MORE performance:
 	  generally the more the texture set occupies, the bigger is
 	  improvement. For example, with the default cache size of 5MP

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Walktest_Config, , Console, Walktest
+@node Walktest Configuration, , Console, Walktest
 @subsection Keyboard Configuration
 @cindex Walktest Configuration
 @cindex Configuration, Walktest

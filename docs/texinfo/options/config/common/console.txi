@@ -1,11 +1,11 @@
 @c -*-texinfo-*-
-@node Config_Console, , Config_Lighting, Config_Common
+@node Config Console, , Config Lighting, Config Common
 @subsubsection @code{[SimpleConsole]} section
 
 This section defines configuration options for the Simple Console
 implementation.
 
-@emph{Warning}: Simple console will soon become obsolete and is slated for
+@emph{Warning}: Simple Console will soon become obsolete and is slated for
 removal.
 
 @table @code

@@ -1,97 +1,122 @@
 @c -*-texinfo-*-
 @node CVS Guide, Porting, Coding Style, Contributing
-@section CVS Etiquette Guidelines
+@section @sc{cvs} Etiquette Guidelines
+@cindex @sc{cvs} Guide
+@cindex @sc{cvs} Etiquette
+@cindex Etiquette, @sc{cvs}
 
-Since Crystal Space has enough developers to warrant the use of CVS to manage
-it's code base, there are some rules you need to keep in mind if you are
-going to be making changes of any sort to the @sc{cvs} source tree.
+Since Crystal Space has enough developers to warrant the use of @sc{cvs} to
+manage its code base, there are some rules you need to keep in mind if you
+are going to be making changes of any sort to the @sc{cvs} source tree.
 
-First of all, hereis  how to access the repository. The @code{CVSROOT} is:
+First off, to access the @sc{cvs} repository anonymously, use this
+@code{CVSROOT} setting:
 
 @example
 :pserver:anonymous@@cvs.crystal.sourceforge.net:/cvsroot/crystal
 @end example
 
+The password for the @samp{anonymous} account is the empty string---that is,
+just press the @key{RET} key at the @samp{Password:} prompt.
+
+For further instructions, please refer to the following document:
+
+@uref{http://sourceforge.net/cvs/?group_id=649}
+
 Once you've logged in, checkout the module @samp{crystal} to download the
 source code to the @file{CS} directory.  See the documentation for your
 @sc{cvs} client on how to do this.
 
-If you do not have a developer account, just use anonymous for your password.
-You will be able to check out files, but will not be able to commit files,
-that is, make any changes.  So the rest of this document doesn't really apply
-to you.
+If you do not have a developer account, you will be able to check out files,
+but will not be able to commit any changes, so the rest of this document
+doesn't really apply to you.
 
-If you do have an account, replace anonymous in the @code{CVSROOT} with your
-account name, and you will have full access.  That implies you will be able to
-make changes to the code.  You should read the rest of this document before
-you make any changes.
+If you do have developer account, you will have to access the @sc{cvs}
+repository via @sc{ssh}, the secure shell.  Instructions can be found at this
+location:
+
+@uref{http://sourceforge.net/cvs/?group_id=649}
+
+Having a developer account implies you will be able to make changes to the
+code.  You should read the rest of this document before making any changes.
 
 Here are some guidelines you should follow before committing files:
 
 @itemize @bullet
 @item
-Always do an update before committing new or changed files, and then rebuild
-@emph{everything} after updating.  @emph{Do not rely on dependencies!}.
+Always do an @samp{update} before committing new or changed files, and then
+rebuild @emph{everything} from scratch after updating.  @emph{Do not rely on
+dependencies!}
 
 @item
-If everything compiles, run walktest using @file{large.zip} and take a look
-at the donut and the fog corridor, just to ensure you didn't break something
-else.
+If you worked on the engine internals or on the renderers, run @code{walktest}
+using @file{large.zip} and visit various locations which exercise the engine's
+features, such as the donut in the street and the foggy corridor.
 
 @item
 If it works, commit @emph{everything} you have modified, not just parts of
-your modifications.
+your modifications.  If you have created new files, please be certain that you
+have used the @sc{cvs} @samp{add} command before committing in order to ensure
+that the new files actually get added to the repository.
 
 @item
-Do another update after checking in everything. Take a look at the output, to
-see if you really checked in everything.
+Do another @samp{update} after committing everything.  Take a look at the
+output to see if you really committed everything you intended to commit.
 
 @item
-Do another rebuild the ensure your changes didn't collide with somebody
-others recent changes.
+Do another rebuild the ensure your changes didn't collide with somebody else's
+recent changes.
 
 @item
 For large and important modifications, post a description of your changes to
-@email{crystal-main@@lists.sourceforge.net}.  This is especially important if
-your changes may have affected other ports which must be updated by other
-developers as a consequence.
+the main mailing list, @email{crystal-main@@lists.sourceforge.net}.  This is
+especially important if your changes may have affected other ports which must
+be updated by other developers as a consequence.
 @end itemize
 
-This might look overdone to some people, but you will have to remember that
-we are all working together with the same source. A bug in your code can stop
-the whole project!
-
-Another thing to remember is that Crystal Space is a cross platform system.
-As such, there are some considerable subtleties that @emph{will} pop up. Here
-are some snags to keep in mind:
-
-@itemize @bullet
-@item
-Some operating systems have case sensitive filenames, some don't.  Bad things
-happen if you capitalize a file one way in the code and and another way in the
-actual filename.  This may not even show up on your system, if you are using a
-case-insensitive file system such as @sc{dos} or Windows.  @strong{Warning}:
-WinCVS has been reported to botch capitalization of files.  Please be aware of
-this potential problem.
-
-@item
-There are multiple makefile systems for the various compiler systems used.  If
-you change one makefile and change the code so that it depends on this change,
-other systems will probably break.  This may be unavoidable to some extent,
-but try to minimize the breakage.  For example, wrap the dependent code in an
-@code{#ifdef} and check for operating systems that DO support the change.
-This will allow other systems to still work without your change.
-
-@item
-All cross-platform files must be restricted the 8.3 filename convention.
-Files which are not needed by @sc{dos} are not subject to this restriction.
-@end itemize
+This might look overdone to some people, but you shoudl remember that we are
+all working together with the same source.  A bug in your code can cripple the
+entire project.
 
 One final thing to remember is that you should @emph{never} commit files that
 you @emph{know} will stop other developers progress.  The @sc{cvs} respository
 is the place to commit completed code, not code that needs debugging because
 you can't find a certain bug.  Other developers should not have to stop and
-track down your bugs, just so they can proceed with their own coding.  When
+track down your bugs just so they can proceed with their own coding.  When
 you've committed code, please monitor the mailing list regularly for any signs
 that you've caused a problem somewhere.  This is part of the responsibility
 that goes with the ability to commit code.
+
+@subheading Additional Tips
+@cindex Tips, @sc{cvs}
+@cindex @sc{cvs} Tips
+
+When working on Crystal Space, you should keep in mind that it is a
+cross-platform project.  As such, there are certain subtleties that that you
+should be aware of.  Here are some tips to keep in mind:
+
+@itemize @bullet
+@item
+All cross-platform files must be restricted the @sc{dos} 8.3 filename
+convention.  Files which are not needed by @sc{dos} are not subject to this
+restriction.
+
+@item
+Some operating systems have case sensitive filenames, whereas others do not.
+Bad things happen if you capitalize a file one way in @code{#include}
+directive and a different way in the actual filename.  This problem many not
+even be apparent on your platform, if you are using a case-insensitive file
+system such as @sc{dos} or Windows.  In general, it is preferable to use
+entirely lower-case filenames for files which are shared between ports.
+
+@strong{Warning}: @file{WinCVS} has been reported to botch capitalization of
+files.  Please be aware of this potential problem.
+
+@item
+Most platforms have their own makefiles or project files.  If you change one
+makefile and change the code so that it depends on this change, other
+platforms will probably break.  This may be unavoidable to some extent, but
+try to minimize the breakage.  For example, wrap the dependent code in an
+@code{#ifdef} and check for operating systems that @emph{do} support the
+change.  This will allow other systems to still work without your change.
+@end itemize

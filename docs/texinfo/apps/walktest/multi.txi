@@ -1,11 +1,11 @@
 @c -*-texinfo-*-
-@node Console_MultiChoice, , Console_Value, Console
-@subsubsection Multi-choice commands
+@node Console Multi-Choice, , Console Value, Console
+@subsubsection Multi-Choice Commands
 
 A multi-choice command has one or more possible values. Typing the command
 without arguments will show the current value. Just type the new value after
 the command to change it. Use @samp{next} to switch to the next value and
-@samp{prev} to switch to the previous value. Example:
+@samp{prev} to switch to the previous value.  Example:
 
 @itemize @bullet
 @item

@@ -13,8 +13,10 @@ The following people have made significant contributions to the Crystal Space
 documentation by authoring large portions of this manual, often with entire
 chapters or sections to their name.
 
-@table @asis
-@item Jorrit Tyberghein (@email{jorrit.tyberghein@@uz.kuleuven.ac.be})
+@itemize @bullet
+@item
+Jorrit Tyberghein (@email{jorrit.tyberghein@@uz.kuleuven.ac.be})
+
 As the creator of Crystal Space, Jorrit wrote the original documentation
 included with the package.  Although some of that original work has since been
 subsumed by more recent work by himself and others, much of his writing can
@@ -22,13 +24,17 @@ still be found in this document.  In particular, he has authored several
 sections which detail inner workings of the 3D engine as well as sections
 which describe the theory behind the engine.
 
-@item Andrew Zabolotny (@email{bit@@eltech.ru})
+@item
+Andrew Zabolotny (@email{bit@@eltech.ru})
+
 Andrew has contributed several sections to this manual which document the
 various large-scale contributions which he has made to the project.  They
 include the SCF and VFS systems, CSWS, MazeD, memory debugger, makefiles, and
 detailed information pertaining to the OS/2 port.
 
-@item Eric Sunshine (@email{sunshine@@sunshineco.com})
+@item
+Eric Sunshine (@email{sunshine@@sunshineco.com})
+
 In addition to writing several documents describing various ports of Crystal
 Space in detail, Eric took on the task of acting as master editor of this
 manual.  As part of this job, he has written much of the content which ties
@@ -38,7 +44,7 @@ have been very extensive, and he is responsible for the manual's current
 organization, look, and feel.  He also created several utilities and Texinfo
 extension packages which allow the documentation to build cleanly on all
 platforms supported by Crystal Space.
-@end table
+@end itemize
 
 The following list of people have contributed to the Crystal Space
 documentation effort in various ways over time.  In some cases their work has
@@ -46,76 +52,105 @@ become obsolete or has been superceded by more recent work and is, therefore,
 absent from this manual, but we thank them anyhow.  This list is ordered
 alphabetically by surname.
 
-@table @asis
-@item Robert Bate (@email{rbate@@ma.ultranet.com})
+@itemize @bullet
+@item
+Robert Bate (@email{rbate@@ma.ultranet.com})
+
 Robert wrote the documentation detailing the Macintosh port of Crystal Space
 which he also maintains.
 
-@item Brandon Ehle (@email{azverkan@@yahoo.com})
+@item
+Brandon Ehle (@email{azverkan@@yahoo.com})
+
 Brandon initiated the aborted attempt to convert Crystal Space documentation
 to LaTeX.  As part of this task, he made an initial effort to organize the
 diverse and unrelated existing documents which were maintained as plain text
 and HTML.  The attempted LaTeX conversion predates the current manual which is
 maintained in Texinfo format.
 
-@item Michael Ewert (@email{mewert99@@yahoo.com})
+@item
+Michael Ewert (@email{mewert99@@yahoo.com})
+
 Michael wrote the documentation for Crystal Space's Phyziks library, of which
 he is the author and principal maintainer.
 
-@item Seth Galbraith (@email{sgalbrai@@linknet.kitsap.lib.wa.us})
+@item
+Seth Galbraith (@email{sgalbrai@@linknet.kitsap.lib.wa.us})
+
 Seth wrote the documentation for the DJGPP port of Crystal Space.  He also
 provided a more organized entry-point to the old text-based documentation
 by creating an easily navigated HTML cover page.
 
-@item Martin Geisse (@email{Hellwig.Geisse@@mni.fh-giessen.de})
+@item
+Martin Geisse (@email{Hellwig.Geisse@@mni.fh-giessen.de})
+
 As part of the effort to generate a unified Crystal Space manual, Martin
 converted many of the Crystal Space plain text and LaTeX documents to Texinfo
 format.
 
 @item
 Gary Haussmann (@email{g.haussmann@@worldnet.att.net})
+
 Gary wrote documentation explaining how to import foreign model formats into
 Crystal Space.
 
-@item Thomas Hieber (@email{thieber@@gmx.net})
+@item
+Thomas Hieber (@email{thieber@@gmx.net})
+
 Thomas wrote thorough documentation for the very useful map2cs conversion
 tool which he authored.  He also maintains the documentation which details the
 Windows port of Crystal Space.
 
-@item David Huen (@email{smh1008@@cus.cam.ac.uk})
+@item
+David Huen (@email{smh1008@@cus.cam.ac.uk})
+
 David wrote some detailed documentation about the BeOS port of Crystal Space
 while studying the original port.  Since that time, most of David's work on
 this documentation has been superceded by Eric Sunshine following Eric's
 major overhaul of the BeOS port.
 
-@item Michael Dale Long (@email{mlong@@custom.net})
+@item
+Michael Dale Long (@email{mlong@@custom.net})
+
 Michael wrote detailed documentation about the Crystal Clear project, of which
 he is the principal developer, and which is layered atop Crystal Space.
 
-@item Wyatt Miler (@email{wmiler@@milertronics.com}
+@item
+Wyatt Miler (@email{wmiler@@milertronics.com}
+
 Wyatt was involved in improving and correcting mark-up problems in the aborted
 conversion of Crystal Space documentation to LaTex.
 
-@item Jesse McClusky  (@email{Jesse.McClusky@@PSS.Boeing.com})
+@item
+Jesse McClusky  (@email{Jesse.McClusky@@PSS.Boeing.com})
+
 Jesse wrote documentation explaining how to build Crystal Space on the Amiga
 platform.
 
-@item Dan Ogles (@email{dogles@@peachtree.com})
+@item
+Dan Ogles (@email{dogles@@peachtree.com})
+
 Dan wrote the documentation for Crystal Space's now defunct COM implementation
 which he created.
 
-@item Alex Pfaffe (@email{ddg@@oz.net})
+@item
+Alex Pfaffe (@email{ddg@@oz.net})
+
 Alex has written documentation pertaining to Crystal Space's collision
 detection and terrain libraries, both of which he authored.
 
-@item Nathaniel Saint Martin (@email{noote@@bigfoot.com})
+@item
+Nathaniel Saint Martin (@email{noote@@bigfoot.com})
+
 Nathaniel wrote documentation for Crystal Space's sound system, of which he
 is also the author.
 
-@item Siu-Hang (@email{shor@@cse.cuhk.edu.hk})
+@item
+Siu-Hang (@email{shor@@cse.cuhk.edu.hk})
+
 Siu-Hang wrote one of several tutorials for MazeD, the Crystal Space map
 editor.
-@end table
+@end itemize
 
 If we have forgotten anyone or missed a contribution, we sincerely apologize.
 Please feel free to send corrections.

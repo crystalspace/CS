@@ -1,17 +1,15 @@
 @c -*-texinfo-*-
-@node Directory Hierarchy, Makefile Structure, Dependencies, Anatomy
+@node Directory Hierarchy, Makefile How-To, Dependencies, Anatomy
 @section Directory Hierarchy
 @cindex Directory Hierarchy
 @cindex Hierarchy, Directory
 
+@noindent
+@emph{Written by Thomas Hieber, @email{thieber@@gmx.net}.}
+
 This section is intended to explain the general CS directory structure. It
 contains all directories, so maybe some will be missing, if you just
 downloaded the files for a specific port like Linux or Win32.
-
-Documentation written by Thomas Hieber (@email{thieber@@gmx.net}).
-
-@emph{Note}: This section may be slightly outdated and missing a few
-directories which have shown up since this description was written.
 
 Crystal Space consists of the following directories:
 
@@ -19,7 +17,7 @@ Crystal Space consists of the following directories:
 @c Most directories should get a very short note and a link to their real
 @c documentation.
 @c --------------------------------------------------------------------------
-@table @file
+@table @code
 @item CS
 The main directory for Crystal Space.  You can choose any path for it, as long
 as it is supported by your operating system.  This is the path that all
@@ -30,7 +28,7 @@ executables.  Configuration files (@file{.cfg}) also reside here.
 This is where all applications which ship with Crystal Space reside.
 @xref{Applications}.
 
-@table @file
+@table @code
 @item CS/apps/tests
 Applications for testing specific features of the project reside here.
 @end table
@@ -48,7 +46,7 @@ must update the information in the configuration for the Virtual File System,
 The root of the Crystal Space documentation hierarchy.  There are several
 subdirectories.
 
-@table @file
+@table @code
 @item CS/docs/texinfo
 Texinfo is the master format for all Crystal Space documentation.  This
 directory and its subdirectories contain all of the Texinfo source and images
@@ -79,7 +77,7 @@ Here are all Modules provided be Crystal Space. Some modules will consist of
 only one subdirectory in libs, some will be a combination of several
 subdirectories.
 
-@table @file
+@table @code
 @item CS/libs/cs2d
 The 2D driver component which manages creation of the Crystal Space window
 used for rendering and also supports limited 2D drawing capabilities
@@ -89,76 +87,54 @@ implementations of this component.  All are specific to some 3D Rasterizer
 (for example, the OpenGL 3D Rasterizer on Unix requires the OpenGL 2D XLib
 Driver).
 
-@multitable @columnfractions .25 .75
-@item @file{CS/libs/cs2d/common}
-@tab Common code for 2D drivers
-
-@item @file{CS/libs/cs2d/be}
-@tab BeOS version
-
-@item @file{CS/libs/cs2d/csdive}
-@tab @sc{os}/2 version
-
-@item @file{CS/libs/cs2d/ddraw}
-@tab Win32 using Direct Draw
-
-@item @file{CS/libs/cs2d/ddraw6}
-@tab Win32 using Direct Draw (DirectX 6)
-
-@item @file{CS/libs/cs2d/dosraw}
-@tab @sc{dos}
-
-@item @file{CS/libs/cs2d/ggi}
-@tab Unix, using @sc{ggi}
-
-@item @file{CS/libs/cs2d/softx}
-@tab Unix, using X
-
-@item @file{CS/libs/cs2d/svgalib}
-@tab Unix, using @sc{svga}lib
-
-@item @file{CS/libs/cs2d/mac}
-@tab Macintosh
-
-@item @file{CS/libs/cs2d/next}
-@tab MacOS/X Server, OpenStep, NextStep
-
-@item @file{CS/libs/cs2d/glid2dcommon}
-@tab Common code for to Glide2 drivers
-
-@item @file{CS/libs/cs2d/beglide2}
-@tab Glide2X 2D driver for BeOS
-
-@item @file{CS/libs/cs2d/macglide2}
-@tab Glide2x 2D driver for Macintosh
-
-@item @file{CS/libs/cs2d/unxglide2}
-@tab Glide2x 2D driver for Unix
-
-@item @file{CS/libs/cs2d/winglide2}
-@tab Glide2x 2D driver for Win32
-
-@item @file{CS/libs/cs2d/winglide3}
-@tab Glide3x 2D driver for Win32
-
-@item @file{CS/libs/cs2d/openglcommon}
-@tab Common code for all OpenGL 2D drivers
-
-@item @file{CS/libs/cs2d/openglbe}
-@tab OpenGL 2D driver for BeOS
-
-@item @file{CS/libs/cs2d/openglmac}
-@tab OpenGL 2D driver for Macintosh
-
-@item @file{CS/libs/cs2d/openglos2}
-@tab OpenGL 2D driver for @sc{os}/2
-
-@item @file{CS/libs/cs2d/openglwin}
-@tab OpenGL 2D driver for Win32
-
-@item @file{CS/libs/cs2d/openglx}
-@tab OpenGL 2D driver for Unix/X Windows
-@end multitable
+@table @code
+@item CS/libs/cs2d/common
+Common code for 2D drivers
+@item CS/libs/cs2d/be
+BeOS version
+@item CS/libs/cs2d/csdive
+@sc{os}/2 version
+@item CS/libs/cs2d/ddraw
+Win32 using Direct Draw
+@item CS/libs/cs2d/ddraw6
+Win32 using Direct Draw (DirectX 6)
+@item CS/libs/cs2d/dosraw
+@sc{dos}
+@item CS/libs/cs2d/ggi
+Unix, using @sc{ggi}
+@item CS/libs/cs2d/softx
+Unix, using X
+@item CS/libs/cs2d/svgalib
+Unix, using @sc{svga}lib
+@item CS/libs/cs2d/mac
+Macintosh
+@item CS/libs/cs2d/next
+MacOS/X Server, OpenStep, NextStep
+@item CS/libs/cs2d/glid2dcommon
+Common code for to Glide2 drivers
+@item CS/libs/cs2d/beglide2
+Glide2X 2D driver for BeOS
+@item CS/libs/cs2d/macglide2
+Glide2x 2D driver for Macintosh
+@item CS/libs/cs2d/unxglide2
+Glide2x 2D driver for Unix
+@item CS/libs/cs2d/winglide2
+Glide2x 2D driver for Win32
+@item CS/libs/cs2d/winglide3
+Glide3x 2D driver for Win32
+@item CS/libs/cs2d/openglcommon
+Common code for all OpenGL 2D drivers
+@item CS/libs/cs2d/openglbe
+OpenGL 2D driver for BeOS
+@item CS/libs/cs2d/openglmac
+OpenGL 2D driver for Macintosh
+@item CS/libs/cs2d/openglos2
+OpenGL 2D driver for @sc{os}/2
+@item CS/libs/cs2d/openglwin
+OpenGL 2D driver for Win32
+@item CS/libs/cs2d/openglx
+OpenGL 2D driver for Unix/X Windows
+@end table
 
 @item CS/libs/cs3d
 The 3D rasterizer component is required by the 3D engine but may also be
@@ -168,34 +144,26 @@ Glide, and Direct3D.  Some rasterizers are operating system independent, such
 as OpenGL and software.  Some rasterizer techonolgy is only available on
 certain operating systems, such as DirectX.
 
-@multitable @columnfractions .25 .75
-@item @file{CS/libs/cs3d/common}
-@tab Common code for 3D rasterizers
-
-@item @file{CS/libs/cs3d/direct3d5}
-@tab Direct3D rasterizer using DirectX 5
-
-@item @file{CS/libs/cs3d/direct3d6}
-@tab Direct3D rasterizer using DirectX 6
-
-@item @file{CS/libs/cs3d/glide2}
-@tab 3D rasterizer using glide2x
-
-@item @file{CS/libs/cs3d/glide3}
-@tab 3D rasterizer using glide3x
-
-@item @file{CS/libs/cs3d/opengl}
-@tab 3D rasterizer using OpenGL
-
-@item @file{CS/libs/cs3d/software}
-@tab Software based rasterizer
-
-@item @file{CS/libs/cs3d/line}
-@tab A vector based rasterizer (draws only lines)
-
-@item @file{CS/libs/cs3d/inf}
-@tab The @emph{infinite} rasterizer (draws nothing at all)
-@end multitable
+@table @code
+@item CS/libs/cs3d/common
+Common code for 3D rasterizers
+@item CS/libs/cs3d/direct3d5
+Direct3D rasterizer using DirectX 5
+@item CS/libs/cs3d/direct3d6
+Direct3D rasterizer using DirectX 6
+@item CS/libs/cs3d/glide2
+3D rasterizer using glide2x
+@item CS/libs/cs3d/glide3
+3D rasterizer using glide3x
+@item CS/libs/cs3d/opengl
+3D rasterizer using OpenGL
+@item CS/libs/cs3d/software
+Software based rasterizer
+@item CS/libs/cs3d/line
+A vector based rasterizer (draws only lines)
+@item CS/libs/cs3d/inf
+The @emph{infinite} rasterizer (draws nothing at all)
+@end table
 
 @item CS/libs/csengine
 The 3D engine is one of the corner stones of Crystal Space and also what
@@ -204,19 +172,16 @@ rasterizer component to display output and also requires a number of other
 libraries (csutil, csgeom, csgfxldr).  The 3D engine exports a number of
 @sc{scf} interfaces to allow access through the @sc{scf} mechanism.
 
-@multitable @columnfractions .25 .75
-@item @file{CS/libs/csengine/colldet}
-@tab Collision detection system
-
-@item @file{CS/libs/csengine/light}
-@tab Lighting system
-
-@item @file{CS/libs/csengine/objects}
-@tab Sprites and things
-
-@item @file{CS/libs/csengine/polygon}
-@tab Polygon related functionality
-@end multitable
+@table @code
+@item CS/libs/csengine/colldet
+Collision detection system
+@item CS/libs/csengine/light
+Lighting system
+@item CS/libs/csengine/objects
+Sprites and things
+@item CS/libs/csengine/polygon
+Polygon related functionality
+@end table
 
 @item CS/libs/csgame
 The Crystal Space Game library.  This is set of utility classes that focus on
@@ -258,78 +223,64 @@ used by some of the current levels.
 System dependent sound drivers.  There are currently drivers for Macintosh,
 @sc{oss} (Linux), and Windows.
 
-@multitable @columnfractions .25 .75
-@item @file{CS/libs/cssnddrv/macsnd}
-@tab Sounddriver for Macintosh
-
-@item @file{CS/libs/cssnddrv/oss}
-@tab Sounddriver for Unix
-
-@item @file{CS/libs/cssnddrv/waveoutsd}
-@tab Sounddriver for Win32
-@end multitable
+@table @code
+@item CS/libs/cssnddrv/macsnd
+Sounddriver for Macintosh
+@item CS/libs/cssnddrv/oss
+Sounddriver for Unix
+@item CS/libs/cssnddrv/waveoutsd
+Sounddriver for Win32
+@end table
 
 @item CS/libs/cssfxldr
 Routines to support loading various sound file formats and put them internally
 in the same format.  This library supports @sc{wav}, @sc{aiff}, @sc{au}, etc.
 
-@multitable @columnfractions .25 .75
-@item @file{CS/libs/cssfxldr/common}
-@tab Code common to many sound loaders.
-@end multitable
+@table @code
+@item CS/libs/cssfxldr/common
+Code common to many sound loaders.
+@end table
 
 @item CS/libs/cssndrdr
 System dependent sound renderers.
 
-@multitable @columnfractions .25 .75
-@item @file{CS/libs/cssndrdr/software}
-@tab Software based sound renderer
-
-@item @file{CS/libs/cssndrdr/a3d}
-@tab 3D sound renderer for @sc{a3d}
-
-@item @file{CS/libs/cssndrdr/ds3d}
-@tab 3D sound renderer for Direct Sound 3D
-
-@item @file{CS/libs/cssndrdr/eax}
-@tab 3D sound renderer for @sc{eax}
-@end multitable
+@table @code
+@item CS/libs/cssndrdr/software
+Software based sound renderer
+@item CS/libs/cssndrdr/a3d
+3D sound renderer for @sc{a3d}
+@item CS/libs/cssndrdr/ds3d
+3D sound renderer for Direct Sound 3D
+@item CS/libs/cssndrdr/eax
+3D sound renderer for @sc{eax}
+@end table
 
 @item CS/libs/cssys
 All system dependent stuff (non-graphics and non-sound related) is in this
 library.
 
-@multitable @columnfractions .25 .75
-@item @file{CS/libs/cssys/general}
-@tab Code which may be shared between system drivers which can make use of it.
-
-@item @file{CS/libs/cssys/be}
-@tab BeOS
-
-@item @file{CS/libs/cssys/djgpp}
-@tab @sc{dos} using the @sc{djgpp} compiler
-
-@item @file{CS/libs/cssys/wcc}
-@tab @sc{dos} using the Watcom compiler
-
-@item @file{CS/libs/cssys/mac}
-@tab Macintosh
-
-@item @file{CS/libs/cssys/next}
-@tab MacOS/X Server, OpenStep, NextStep
-
-@item @file{CS/libs/cssys/os2}
-@tab @sc{os}/2
-
-@item @file{CS/libs/cssys/unix}
-@tab Unix, including Linux, Solaris, Irix, etc.
-
-@item @file{CS/libs/cssys/win32}
-@tab Win32
-
-@item @file{CS/libs/cssys/amiga}
-@tab Amiga
-@end multitable
+@table @code
+@item CS/libs/cssys/general
+Code which may be shared between system drivers which can make use of it.
+@item CS/libs/cssys/be
+BeOS
+@item CS/libs/cssys/djgpp
+@sc{dos} using the @sc{djgpp} compiler
+@item CS/libs/cssys/wcc
+@sc{dos} using the Watcom compiler
+@item CS/libs/cssys/mac
+Macintosh
+@item CS/libs/cssys/next
+MacOS/X Server, OpenStep, NextStep
+@item CS/libs/cssys/os2
+@sc{os}/2
+@item CS/libs/cssys/unix
+Unix, including Linux, Solaris, Irix, etc.
+@item CS/libs/cssys/win32
+Win32
+@item CS/libs/cssys/amiga
+Amiga
+@end table
 
 @item CS/libs/tools
 High level application tools. This are specialized objects which provide
@@ -364,38 +315,34 @@ Space.
 @item CS/mk
 This directory contains the common parts of the makefiles for many systems
 
-@multitable @columnfractions .25 .75
-@item @file{CS/mk/mwcw}
-@tab Project files for Macintosh CodeWarrior
-
-@item @file{CS/mk/visualc}
-@tab Project files for Win32 using MSVC 5.0/ 6.0
-@end multitable
+@table @code
+@item CS/mk/mwcw
+Project files for Macintosh CodeWarrior
+@item CS/mk/visualc
+Project files for Win32 using MSVC 5.0/ 6.0
+@end table
 
 @item CS/plugins
 Plug-in, dynamically loaded modules.  Communication with these modules is
 performed strictly via @sc{scf} interfaces.  @xref{SCF}.
 
-@multitable @columnfractions .25 .75
-@item @file{CS/plugins/csclear}
-@tab The Crystal Clear plug-in, a game abstraction library.
-
-@item @file{CS/plugins/cscon}
-@tab A console plug-in for displaying a textual console within the graphic
+@table @code
+@item CS/plugins/csclear
+The Crystal Clear plug-in, a game abstraction library.
+@item CS/plugins/cscon
+A console plug-in for displaying a textual console within the graphic
 environment.
-
-@item @file{CS/plugins/cspython}
-@tab A Python interpreter plug-in (unfinished).
-@end multitable
+@item CS/plugins/cspython
+A Python interpreter plug-in (unfinished).
+@end table
 
 @item CS/support
 Support routines.
 
-@multitable @columnfractions .25 .75
-@item @file{CS/support/debug}
-@tab Support routines for extensive memory checking.
-
-@item @file{CS/support/gnu}
-@tab Replacement for getopt (missing on some systems).
-@end multitable
+@table @code
+@item CS/support/debug
+Support routines for extensive memory checking.
+@item CS/support/gnu
+Replacement for getopt (missing on some systems).
+@end table
 @end table
