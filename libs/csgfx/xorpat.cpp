@@ -22,7 +22,7 @@
 #include "csgfx/memimage.h"
 #include "csgfx/rgbpixel.h"
 
-iImage* csCreateXORPatternImage(int width, int height, int recdepth)
+csPtr<iImage> csCreateXORPatternImage(int width, int height, int recdepth)
 {
   int x,y;
   iImage *image = new csImageMemory(width, height);

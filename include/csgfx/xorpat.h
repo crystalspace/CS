@@ -27,7 +27,8 @@
  * Create an iImage with a nice XOR pattern.
  * recdepth - "recursion depth", clamped to range 1-8
  */
-extern iImage* csCreateXORPatternImage(int width, int height, int recdepth);
+extern csPtr<iImage> csCreateXORPatternImage(int width, int height,
+					     int recdepth);
 
 #endif
 
