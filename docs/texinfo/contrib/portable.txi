@@ -82,6 +82,20 @@ long extract_long(unsigned char const* stream)
 @end example
 
 @item
+@emph{Data type sizes}
+
+Don't make any assumptions about the size of @samp{int}, @samp{long}, 
+@samp{size_t}, @samp{void*} etc such as @code{sizeof(int)==4}, 
+@code{sizeof(int)==sizeof(void*)}, @code{sizeof(long)==sizeof(void*)} and so 
+on. If a specifically sized type is needed (for example, when reading a file
+and the format specification dictates a certain word size) use the sized types
+from @file{cstypes.h} (e.g. @samp{int32}, @samp{uint8}). Consequently, also 
+avoid constructs such as casting pointers to @samp{int}s. If there's a rare 
+case that no other way than casting a pointer to/from an integral type, use the 
+value of the @samp{CS_PROCSIZE} macro (usually 32 or 64) to determine an 
+appropriate sized type.
+
+@item
 @emph{Floating Points}
 
 Depending upon the accuracy and representation of floating point values on
@@ -249,7 +263,7 @@ will be rendered.  Microsoft's DirectX renderer is known to have this
 requirement, so be sure to follow this guideline for maximum portability.
 
 @item
-@emph{Avoid Templates}
+@emph{Template precautions}
 
 These days, C++ compilers used with Crystal Space support templates, and the
 project makes use of templates for several utility classes.  For portability
