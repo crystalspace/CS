@@ -37,8 +37,9 @@ else
   TO_INSTALL.STATIC_LIBS += $(ISOLOAD)
 endif
 
-INC.ISOLOAD = $(wildcard plugins/engine/iso/*.h)
-SRC.ISOLOAD = $(wildcard plugins/engine/iso/*.cpp)
+INC.ISOLOAD = plugins/engine/iso/isoload.h
+SRC.ISOLOAD = plugins/engine/iso/isoload.cpp \
+	plugins/engine/iso/plgldr.cpp
 OBJ.ISOLOAD = $(addprefix $(OUT),$(notdir $(SRC.ISOLOAD:.cpp=$O)))
 DEP.ISOLOAD = CSUTIL CSSYS CSGEOM CSGFX CSUTIL CSSYS
 
