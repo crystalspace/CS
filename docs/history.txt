@@ -1,5 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
+9-Mar-2001
+	- Fixed some include files in the Direct3D6.1 plugin which were
+	  not converted to the new structure.
 8-Mar-2001
 	- Eric Sunshine moved all of the pure SCF interface header files (the
 	  filenames beginning with `i') into subdirectories of CS/include.
