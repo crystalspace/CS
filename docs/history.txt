@@ -9,6 +9,7 @@ chronological order.
 16-Dec-2003
 	- Jorrit fixed a warning in shadervar.h with initializers given in
 	  the wrong order.
+	- Jorrit fixed another similar warning in shadervar.cpp.
 15-Dec-2003
 	- Matze reworked some jam rules so that subdirs are more robust now.
 	  This should also fix some msvcgen problems on jam.
