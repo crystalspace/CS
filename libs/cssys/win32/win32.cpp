@@ -32,6 +32,12 @@
 #include <windows.h>
 #include <windowsx.h>
 #include <ddraw.h>
+// Remove this to have a DirectInput Keyboard Support (xtrochu@yahoo.com)
+#define DO_DINPUT_KEYBOARD
+//
+#ifdef DO_DINPUT_KEYBOARD
+#include <dinput.h>
+#endif
 #include <stdio.h>
 #include <time.h>
 
@@ -129,9 +135,115 @@ SysKeyboardDriver::~SysKeyboardDriver(void)
   Close();
 }
 
+#ifdef DO_DINPUT_KEYBOARD
+
+static int s_KeyTable[257]= {
+	0,
+	CSKEY_ESC,'1','2','3','4','5','6','7','8','9','0','-','=',CSKEY_BACKSPACE,CSKEY_TAB,
+	'q','w','e','r','t','y','u','i','o','p','[',']','\n',
+	CSKEY_CTRL,'a','s','d','f','g','h','j','k','l',';','\'','`',CSKEY_SHIFT,'\\',
+	'z','x','c','v','b','n','m',',','.','/',CSKEY_SHIFT,'*',CSKEY_ALT,
+	' ',0/*DIK_CAPITAL*/,
+	CSKEY_F1,CSKEY_F2,CSKEY_F3,CSKEY_F4,CSKEY_F5,CSKEY_F6,CSKEY_F7,CSKEY_F8,CSKEY_F9,CSKEY_F10,
+	0/*DIK_NUMLOCK*/,0/*DIK_SCROLL*/,
+	CSKEY_HOME,CSKEY_UP,CSKEY_PGUP,'-',CSKEY_LEFT,CSKEY_CENTER,CSKEY_RIGHT,'+',CSKEY_END,CSKEY_DOWN,CSKEY_PGDN,CSKEY_INS,'.',
+	0/*DIK_OEM_102*/,CSKEY_F11,CSKEY_F12,0,0,0,0,0,0,0,0,0,0,0,0/*DIK_F13*/,0/*DIK_F14*/,0/*DIK_F15*/,0,0,0,0,0,0,0,0,0,
+	0/*DIK_KANA*/,0,0,0/*DIK_ABNT_C1*/,0,0,0,0,0,0/*DIK_CONVERT*/,0,0/*DIK_NOCONVERT*/,
+	0,0/*DIK_YEN*/,0/*DIK_ABNT_C2*/,0,0,0,0,0,0,0,0,0,0,0,0,0,0,'=',0,0,0/*DIK_CIRCUMFLEX*/,0/*DIK_AT*/,
+	0/*DIK_COLON*/,0/*DIK_UNDERLINE*/,0/*DIK_KANJI*/,0/*DIK_STOP*/,0/*DIK_AX*/,0/*DIK_UNLABELED*/,0,0,0,0,
+	'\n',CSKEY_CTRL,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	'.',0,'/',0,0/*DIK_SYSRQ*/,CSKEY_ALT,0,0,0,0,0,0,0,0,0,0,0,0,0/*DIK_PAUSE*/,0,
+	CSKEY_HOME,CSKEY_UP,CSKEY_PGUP,0,CSKEY_LEFT,0,CSKEY_RIGHT,0,CSKEY_END,CSKEY_DOWN,CSKEY_PGDN,CSKEY_INS,CSKEY_DEL
+};
+
+#define CHK_FAILED(x)  { if(FAILED(x)) { ::MessageBox(::GetFocus(), #x " Failed!", NULL,MB_OK|MB_ICONERROR); ::ExitProcess(1); } }
+#define CHK_RELEASE(x)  { if((x) != NULL) { (x)->Release(); (x)=NULL; } }
+extern "C" DWORD WINAPI s_threadroutine(LPVOID param)
+{
+	SysKeyboardDriver * kbd=(SysKeyboardDriver*)param;
+	HRESULT hr;
+	char * buffer, *oldbuffer=NULL;
+	LPDIRECTINPUT lpdi=NULL;
+	LPDIRECTINPUTDEVICE lpKbd=NULL; 
+	HANDLE hEvent;
+	int i;
+
+	CHK_FAILED(::DirectInputCreate(gb_hInstance, 0X300, &lpdi, NULL));  // 0X300 instead of DIRECTINPUT_VERSION allow the binaries to stay compatible with NT4
+	CHK_FAILED(lpdi->CreateDevice(GUID_SysKeyboard, &lpKbd, NULL));
+	CHK_FAILED(lpKbd->SetDataFormat(&c_dfDIKeyboard)); 
+	CHK_FAILED(lpKbd->SetCooperativeLevel(::FindWindow(NAME,NULL), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE)); 
+	hEvent=::CreateEvent(NULL,FALSE,FALSE,NULL);
+	if(hEvent==NULL)
+	{
+		::MessageBox(::GetFocus(), "CreateEvent() Failed!", NULL,MB_OK|MB_ICONERROR);
+		::ExitProcess(1);
+	}
+	hr=lpKbd->SetEventNotification(hEvent);
+	switch(hr) {
+	case DI_OK:
+		break;
+	default:
+		::MessageBox(::GetFocus(), "lpKbd->SetEventNotification(hEvent) Failed!", NULL,MB_OK|MB_ICONERROR);
+		::ExitProcess(1);
+		break;
+	}
+	CHK_FAILED(lpKbd->Acquire());
+	oldbuffer=new char[256];
+	hr=lpKbd->GetDeviceState(256,oldbuffer);
+	while(1) {
+		switch(::WaitForSingleObject(hEvent,INFINITE))
+		{
+		case WAIT_OBJECT_0:
+			buffer=new char[256];
+			do {
+				hr=lpKbd->GetDeviceState(256,buffer);
+				switch(hr)
+				{
+				case DIERR_NOTACQUIRED:
+				case DIERR_INPUTLOST:
+					lpKbd->Acquire();
+					break;
+				case DI_OK:
+					break;
+				default:
+					::MessageBox(::GetFocus(), "lpKbd->GetDeviceState(hEvent) Failed!", NULL,MB_OK|MB_ICONERROR);
+					::ExitProcess(1);
+					break;
+				}
+			} while(hr!=DI_OK);
+			for(i=0;i<256;i++)
+				if(oldbuffer[i]!=buffer[i])
+				{
+					if(buffer[i]&0X80)
+						kbd->do_keypress(SysGetTime(),s_KeyTable[i]);
+					else
+						kbd->do_keyrelease(SysGetTime(),s_KeyTable[i]);
+					break;
+				}
+			delete[] oldbuffer;
+			oldbuffer=buffer;
+			break;
+		case WAIT_TIMEOUT:
+			lpKbd->Unacquire();
+			CloseHandle(hEvent);
+			CHK_RELEASE(lpKbd);
+			CHK_RELEASE(lpdi);
+			return 0;
+		}
+	}
+}
+
+#undef CHK_RELEASE
+#undef CHK_FAILED
+#endif
+
 bool SysKeyboardDriver::Open(csEventQueue *EvQueue)
 {
   csKeyboardDriver::Open (EvQueue);
+#ifdef DO_DINPUT_KEYBOARD
+  DWORD dwThreadId;
+  ::CloseHandle(::CreateThread(NULL,0,s_threadroutine,this,0,&dwThreadId));
+#endif
   return true;
 }
 
@@ -258,13 +370,14 @@ STDMETHODIMP SysSystemDriver::XWin32SystemDriver::GetCmdShow(int* retval)
 
 // Windows input translator ////////////
 
+#ifndef DO_DINPUT_KEYBOARD
 inline void WinKeyTrans(csSystemDriver* pSystemDriver, WPARAM wParam, 
                         bool /*shift*/, bool /*alt*/, bool /*ctrl*/, bool down)
 {
   if(!pSystemDriver) return;
   
   // handle standard alphabetical.
-/*              if((wParam >= 'A') && (wParam <= 'z'))
+/*    if((wParam >= 'A') && (wParam <= 'z'))
     {
       if(down)
         pSystemDriver->Keyboard->do_keypress (SysGetTime (), wParam + ('a' - 'A')) ;
@@ -360,13 +473,16 @@ inline void WinKeyTrans(csSystemDriver* pSystemDriver, WPARAM wParam,
       }
     }
 }
+#endif
 
 long FAR PASCAL WindowProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
+#ifndef DO_DINPUT_KEYBOARD
   bool shift=false, ctrl=false;
   
   if(GetAsyncKeyState(VK_CONTROL)) ctrl=true;
   if(GetAsyncKeyState(VK_SHIFT)) shift=true;
+#endif
   
   switch( message )
   {
@@ -389,6 +505,7 @@ long FAR PASCAL WindowProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
     PostQuitMessage( 0 );
     break;
 
+#ifndef DO_DINPUT_KEYBOARD
   case WM_CHAR:
     if(System)
     {
@@ -416,6 +533,7 @@ long FAR PASCAL WindowProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
     WinKeyTrans(System, wParam, shift, true, ctrl, false);
     if(wParam==VK_MENU) return 0;
     break;
+#endif
     
   case WM_LBUTTONDOWN:
     if (System)
