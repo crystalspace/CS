@@ -83,23 +83,26 @@ void csTextureMM::create_mipmaps (bool verynice, bool blend_mipmap0)
 
   if (flags & CS_TEXTURE_3D)
   {
+    int n=1;
+    int maxMM = CS_GET_TEXTURE_MMLEVEL(flags);
+    maxMM = maxMM == 0 ? 4 : MIN( maxMM, 4 );
     iImage *i0 = blend_mipmap0 ? image->MipMap (0, tc) : (image->IncRef (), image);
 #if 1
     // Create each new level by creating a level 2 mipmap from previous level
-    iImage *i1 = i0->MipMap (step, tc);
-    iImage *i2 = i1->MipMap (1, tc);
-    iImage *i3 = i2->MipMap (1, tc);
+    iImage *i1 = ++n <= maxMM ? i0->MipMap (step, tc) : NULL;
+    iImage *i2 = ++n <= maxMM ? i1->MipMap (1, tc) : NULL;
+    iImage *i3 = ++n <= maxMM ? i2->MipMap (1, tc) : NULL;
 #else
     // Create each mipmap level from original texture
-    iImage *i1 = image->MipMap (step++, tc);
-    iImage *i2 = image->MipMap (step++, tc);
-    iImage *i3 = image->MipMap (step++, tc);
+    iImage *i1 = ++n <= maxMM ? image->MipMap (step++, tc) : NULL;
+    iImage *i2 = ++n <= maxMM ? image->MipMap (step++, tc) : NULL;
+    iImage *i3 = ++n <= maxMM ? image->MipMap (step++, tc) : NULL;
 #endif
 
     tex [0] = new_texture (i0);
-    tex [1] = new_texture (i1);
-    tex [2] = new_texture (i2);
-    tex [3] = new_texture (i3);
+    tex [1] = i1 ? new_texture (i1) : NULL;
+    tex [2] = i2 ? new_texture (i2) : NULL;
+    tex [3] = i3 ? new_texture (i3) : NULL;
   }
   else
   {
