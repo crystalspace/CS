@@ -238,7 +238,7 @@ void csTriangleArrayPolygonBuffer::AddTriangles (csTrianglesPerMaterial* pol,
     iPolygonTexture* poly_texture, int mat_index, int cur_vt_idx)
 {
   csVector3 aux;
-  csVector2 uv, uv0;
+  csVector2 uv[100];	// @@@ Hardcoded limit
   int i;
   csTriangle triangle;
 
@@ -248,23 +248,18 @@ void csTriangleArrayPolygonBuffer::AddTriangles (csTrianglesPerMaterial* pol,
 
   int old_cur_vt_idx = cur_vt_idx;
 
-  aux = transform.Other2This (vertices[verts[0]]);
-  uv0.x = aux.x;
-  uv0.y = aux.y;
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    aux = transform.Other2This (vertices[verts[i]]);
+    uv[i].x = aux.x;
+    uv[i].y = aux.y;
+  }
+
+  triangle.a = AddSingleVertex (pol, verts, 0, uv[0], cur_vt_idx);
   for (i = 1; i < num_vertices-1; i++)
   {
-    triangle.a = AddSingleVertex (pol, verts, 0, uv0, cur_vt_idx);
-
-    aux = transform.Other2This (vertices[verts[i]]);
-    uv.x = aux.x;
-    uv.y = aux.y;
-    triangle.b = AddSingleVertex (pol, verts, i, uv, cur_vt_idx);
-
-    aux = transform.Other2This (vertices[verts[i+1]]);
-    uv.x = aux.x;
-    uv.y = aux.y;
-    triangle.c = AddSingleVertex (pol, verts, i+1, uv, cur_vt_idx);
-
+    triangle.b = AddSingleVertex (pol, verts, i, uv[i], cur_vt_idx);
+    triangle.c = AddSingleVertex (pol, verts, i+1, uv[i+1], cur_vt_idx);
     pol->triangles.Push (triangle);
 
     pol->numTriangles++;
@@ -343,24 +338,18 @@ void csTriangleArrayPolygonBuffer::AddTriangles (csTrianglesPerMaterial* pol,
    * same coordinates but different uv's a new vertex is
    * created)
    */
-  csVector2 uvLightmap, uvLightmap0;
-  uvLightmap0.x = (uv0.x - lm_offset_u) * lm_scale_u;
-  uvLightmap0.y = (uv0.y - lm_offset_v) * lm_scale_v;
+  csVector2 uvLightmap[100];	// @@@ HARDCODED.
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    uvLightmap[i].x = (uv[i].x - lm_offset_u) * lm_scale_u;
+    uvLightmap[i].y = (uv[i].y - lm_offset_v) * lm_scale_v;
+  }
   cur_vt_idx = old_cur_vt_idx;
+  triangle.a = AddSingleVertexLM (uvLightmap[0], cur_vt_idx);
   for (i = 1; i < num_vertices - 1; i++)
   {
-    triangle.a = AddSingleVertexLM (uvLightmap0, cur_vt_idx);
-
-    aux = transform.Other2This (vertices[verts[i]]);
-    uvLightmap.x = (aux.x - lm_offset_u) * lm_scale_u;
-    uvLightmap.y = (aux.y - lm_offset_v) * lm_scale_v;
-    triangle.b = AddSingleVertexLM (uvLightmap, cur_vt_idx);
-
-    aux = transform.Other2This (vertices[verts[i+1]]);
-    uvLightmap.x = (aux.x - lm_offset_u) * lm_scale_u;
-    uvLightmap.y = (aux.y - lm_offset_v) * lm_scale_v;
-    triangle.c = AddSingleVertexLM (uvLightmap, cur_vt_idx);
-
+    triangle.b = AddSingleVertexLM (uvLightmap[i], cur_vt_idx);
+    triangle.c = AddSingleVertexLM (uvLightmap[i+1], cur_vt_idx);
     triSuperLM->triangles.Push (triangle);
     poly_texture->IncRef ();
     triSuperLM->numTriangles++;
@@ -449,10 +438,13 @@ return;
    * the face normal, just add it to the vertex normal and normalize
    */
 
-  int cur_tri_num = orig_triangles.Length ();
-  vec_vertices.SetLength ((cur_tri_num+num_verts-2) * 3);
-  texels.SetLength ((cur_tri_num+num_verts-2) * 3);
-  lumels.SetLength ((cur_tri_num+num_verts-2) * 3);
+  //int cur_tri_num = orig_triangles.Length ();
+
+  int cur_vt_num = vec_vertices.Length ();
+  int new_vt_num = cur_vt_num + num_verts;
+  vec_vertices.SetLength (new_vt_num);
+  texels.SetLength (new_vt_num);
+  lumels.SetLength (new_vt_num);
 
   int last_mat_index = polygons.GetLastMaterial ();
   if (last_mat_index != mat_index)
@@ -461,7 +453,7 @@ return;
     // last material.
     csTrianglesPerMaterial* pol = new csTrianglesPerMaterial ();
     AddTriangles (pol, verts, num_verts, m_obj2tex, v_obj2tex,
-      poly_texture, mat_index, cur_tri_num * 3);
+      poly_texture, mat_index, cur_vt_num);
     polygons.Add (pol);
 
     matCount ++;
@@ -471,7 +463,7 @@ return;
     // We can add the triangles in the last PolygonPerMaterial
     // as long they share the same material.
     AddTriangles (polygons.last, verts, num_verts, m_obj2tex,
-      v_obj2tex, poly_texture, mat_index, cur_tri_num * 3);
+      v_obj2tex, poly_texture, mat_index, cur_vt_num);
   }
 
   csTriangle triangle;

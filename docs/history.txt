@@ -1,6 +1,14 @@
 The history order is reversed so that new features are at the top.
 
 2-Feb-2003
+	- Optimization with polygon buffers (DrawPolygonMesh) in OpenGL
+	  renderer. They use less memory now and they are also more efficient.
+	- Cleaned up some unused code in ogl_g3dcom.cpp.
+	- Fixed a crash bug with fog when clipping is needed.
+	- With Z-plane clipping (OpenGL) we now only switch to exact clipping
+	  if the NeedScreenClipping flag is set in opengl.cfg.
+	- Fixed bug in OpenGL fog handling. Was broken after a recent
+	  optimization.
 	- Eric Sunshine eliminated unnecessary and fragile "darwin6.3" alias
 	  from vfs.cfg.
 	- Eric Sunshine modified tutorial/intro.txi so that it gives the full

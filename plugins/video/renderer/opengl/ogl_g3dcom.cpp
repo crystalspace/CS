@@ -3191,7 +3191,7 @@ static void ResolveVertex (
   switch (ci->type)
   {
     case CS_CLIPINFO_ORIGINAL:
-      texel[outi] = otexels[ci->original.idx];
+      if (otexels) texel[outi] = otexels[ci->original.idx];
       if (ocolors) color[outi] = ocolors[ci->original.idx];
       if (ofog) fog[outi] = ofog[ci->original.idx];
       if (ouserarrays)
@@ -3214,7 +3214,8 @@ static void ResolveVertex (
       int i1 = ci->onedge.i1;
       int i2 = ci->onedge.i2;
       float r = ci->onedge.r;
-      texel[outi] = otexels[i1] * (1-r) + otexels[i2] * r;
+      if (otexels)
+	texel[outi] = otexels[i1] * (1-r) + otexels[i2] * r;
       if (ocolors)
       {
 	color[outi].red = ocolors[i1].red * (1-r) + ocolors[i2].red * r;
@@ -3513,7 +3514,8 @@ void csGraphics3DOGLCommon::ClipTriangleMeshExact (
       const csVector3& v = vertices[i];
       clip_translate[i] = num_clipped_vertices;
       clip_vertices[num_clipped_vertices] = v;
-      clip_texels[num_clipped_vertices] = texels[i];
+      if (texels)
+        clip_texels[num_clipped_vertices] = texels[i];
       if (vertex_colors)
         clip_colors[num_clipped_vertices] = vertex_colors[i];
       if (vertex_fog)
@@ -3664,163 +3666,6 @@ static dpmesh_persp *dp_persp = NULL;
 static dpmesh_visible *dp_visible = NULL;
 #endif
 
-static void PlaneZ (
-  const csVector3 &u,
-  const csVector3 &v,
-  float z,
-  csVector3 &isect)
-{
-  float denom;
-  csVector3 vu = v - u;
-
-  denom = vu.z;
-  if (denom == 0)
-  {
-    // they are parallel
-    isect = v;
-    return;
-  }
-  float dist = -(u.z + (-z)) / denom;
-  if (dist < -SMALL_EPSILON || dist > 1 + SMALL_EPSILON) return;
-
-  isect = u + dist * vu;
-}
-
-static void PlaneZ (
-  const csVector3 &u,
-  const csVector3 &v,
-  const G3DFogInfo& fu,
-  const G3DFogInfo& fv,
-  float z,
-  csVector3 &isect,
-  G3DFogInfo &fisect)
-{
-  float denom;
-  csVector3 vu = v - u;
-
-  denom = vu.z;
-  if (denom == 0)
-  {
-    // they are parallel
-    isect = v;
-    fisect = fv;
-    return;
-  }
-  float dist = -(u.z + (-z)) / denom;
-  if (dist < -SMALL_EPSILON || dist > 1 + SMALL_EPSILON) return;
-
-  isect = u + dist * vu;
-  fisect.r = fu.r + dist * (fv.r - fu.r);
-  fisect.g = fu.g + dist * (fv.g - fu.g);
-  fisect.b = fu.b + dist * (fv.b - fu.b);
-  fisect.intensity = fu.intensity + dist * (fv.intensity - fu.intensity);
-  fisect.intensity2 = fu.intensity2 + dist * (fv.intensity2 - fu.intensity2);
-}
-
-static bool ClipPolygonZ (
-  csVector3* pverts,
-  csVector3* verts,
-  int &num_verts)
-{
-  int i, i1, num_vertices = num_verts;
-  bool zs, z1s;
-  bool vis[100];
-
-  float z = 0.01;
-
-  for (i = 0; i < num_vertices; i++)
-  {
-    vis[i] = pverts[i].z >= z;
-  }
-
-  // This routine assumes clipping is needed.
-  num_verts = 0;
-
-  i1 = num_vertices - 1;
-
-  for (i = 0; i < num_vertices; i++)
-  {
-    zs = vis[i];
-    z1s = vis[i1];
-
-    if (!z1s && zs)
-    {
-      PlaneZ (pverts[i1], pverts[i], z, verts[num_verts]);
-      num_verts++;
-      verts[num_verts++] = pverts[i];
-    }
-    else if (z1s && !zs)
-    {
-      PlaneZ (pverts[i1], pverts[i], z, verts[num_verts]);
-      num_verts++;
-    }
-    else if (z1s && zs)
-    {
-      verts[num_verts++] = pverts[i];
-    }
-
-    i1 = i;
-  }
-
-  return true;
-}
-
-static bool ClipPolygonZ (
-  csVector3* pverts,
-  csVector3* verts,
-  G3DFogInfo* pfog,
-  G3DFogInfo* fog,
-  int &num_verts)
-{
-  int i, i1, num_vertices = num_verts;
-  bool zs, z1s;
-  bool vis[100];
-
-  float z = 0.01;
-
-  for (i = 0; i < num_vertices; i++)
-  {
-    vis[i] = pverts[i].z >= z;
-  }
-
-  // This routine assumes clipping is needed.
-  num_verts = 0;
-
-  i1 = num_vertices - 1;
-
-  for (i = 0; i < num_vertices; i++)
-  {
-    zs = vis[i];
-    z1s = vis[i1];
-
-    if (!z1s && zs)
-    {
-      PlaneZ (pverts[i1], pverts[i], pfog[i1], pfog[i], z,
-      	verts[num_verts], fog[num_verts]);
-      num_verts++;
-      verts[num_verts] = pverts[i];
-      fog[num_verts] = pfog[i];
-      num_verts++;
-    }
-    else if (z1s && !zs)
-    {
-      PlaneZ (pverts[i1], pverts[i], pfog[i1], pfog[i], z,
-      	verts[num_verts], fog[num_verts]);
-      num_verts++;
-    }
-    else if (z1s && zs)
-    {
-      verts[num_verts] = pverts[i];
-      fog[num_verts] = pfog[i];
-      num_verts++;
-    }
-
-    i1 = i;
-  }
-
-  return true;
-}
-
 struct DTM_Info
 {
   // For clipping:
@@ -3845,341 +3690,6 @@ static DTM_Info ci;
 
 void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
 {
-#if 0
-  FlushDrawPolygon ();
-  csPolArrayPolygonBuffer* polbuf = (csPolArrayPolygonBuffer*)mesh.polybuf;
-
-  if (!dp_tr_verts)
-  {
-    dp_tr_verts = Get_dpmesh_tr_verts ();
-    dp_persp = Get_dpmesh_persp ();
-    dp_visible = Get_dpmesh_visible ();
-  }
-
-  int num_vertices = polbuf->GetVertexCount ();
-  int num_polygons = polbuf->GetPolygonCount ();
-
-  // Update work arrays
-  if (num_vertices > dp_tr_verts->Limit ())
-  {
-    dp_tr_verts->SetLimit (num_vertices);
-    dp_persp->SetLimit (num_vertices);
-    dp_visible->SetLimit (num_vertices);
-  }
-
-  csVector3 *f1 = polbuf->GetVertices ();
-  csVector3 *work_verts;
-  int i;
-
-  // Perform vertex transforms if necessary
-  if (mesh.vertex_mode == G3DPolygonMesh::VM_WORLDSPACE)
-  {
-    for (i = 0 ; i < num_vertices ; i++)
-      (*dp_tr_verts)[i] = o2c * f1[i];
-    work_verts = dp_tr_verts->GetArray();
-  }
-  else
-    work_verts = f1;
-
-  // Perspective project the vertices
-  int width2 = width >> 1;
-  int height2 = height >> 1;
-  for (i = 0 ; i < num_vertices ; i++)
-  {
-    if (work_verts[i].z >= SMALL_Z)
-    {
-      float iz = aspect / work_verts[i].z;
-      (*dp_persp)[i].x = work_verts[i].x * iz + width2;
-      (*dp_persp)[i].y = work_verts[i].y * iz + height2;
-      (*dp_visible)[i] = true;
-    }
-    else
-      (*dp_visible)[i] = false;
-  }
-
-  csMatrix3 m_cam2tex;
-  csVector3 v_cam2tex;
-
-  G3DPolygonDP poly;
-  poly.mixmode = mesh.mixmode;
-  poly.use_fog = mesh.do_fog;
-  poly.do_fullbright = false;
-  poly.plane.m_cam2tex = &m_cam2tex;
-  poly.plane.v_cam2tex = &v_cam2tex;
-
-iMaterialHandle* prev_mh = NULL;
-uint prev_mixmode = ~0;
-
-  // @@@ We need to restructure a bit here to avoid
-  // unneeded copy of data.
-  for (i = 0 ; i < num_polygons ; i++)
-  {
-    const csPolArrayPolygon& pol = polbuf->GetPolygon (i);
-    poly.num = pol.num_vertices;
-    CS_ASSERT (pol.mat_index >= 0 && pol.mat_index
-    	< polbuf->GetMaterialCount ());
-    poly.mat_handle = polbuf->GetMaterial (pol.mat_index);
-
-    // Transform object to texture transform to
-    // camera to texture transformation here.
-    m_cam2tex = pol.m_obj2tex * o2c.GetT2O ();
-    v_cam2tex = o2c.Other2This (pol.v_obj2tex);
-
-    poly.poly_texture = pol.poly_texture;
-    int j;
-    // @@@ Support mirror here.
-    int vis_cnt = 0;
-    for (j = 0 ; j < poly.num ; j++)
-    {
-      int vidx = pol.vertices[j];
-      if ((*dp_visible)[vidx]) vis_cnt++;
-    }
-    if (vis_cnt == 0) continue;
-    if (vis_cnt < poly.num)
-    {
-      csVector3 p[100];
-      G3DFogInfo f[100];
-      csVector3 clip_p[100];
-      G3DFogInfo clip_f[100];
-      // We need some kind of clipping.
-      for (j = 0 ; j < poly.num ; j++)
-      {
-        int vidx = pol.vertices[j];
-        p[j] = work_verts[vidx];
-	if (mesh.vertex_fog)
-	  f[j] = mesh.vertex_fog[vidx];
-      }
-      if (mesh.vertex_fog)
-        ClipPolygonZ (p, clip_p, f, clip_f, poly.num);
-      else
-        ClipPolygonZ (p, clip_p, poly.num);
-      for (j = 0 ; j < poly.num ; j++)
-      {
-        float iz = aspect / clip_p[j].z;
-        poly.vertices[j].x = clip_p[j].x * iz + width2;
-        poly.vertices[j].y = clip_p[j].y * iz + height2;
-        if (mesh.vertex_fog)
-          poly.fog_info[j] = clip_f[j];
-      }
-    }
-    else
-    {
-      for (j = 0 ; j < poly.num ; j++)
-      {
-        int vidx = pol.vertices[j];
-        poly.vertices[j].x = (*dp_persp)[vidx].x;
-        poly.vertices[j].y = (*dp_persp)[vidx].y;
-        if (mesh.vertex_fog)
-          poly.fog_info[j] = mesh.vertex_fog[vidx];
-      }
-    }
-
-    // Clip polygon. Note that the clipper doesn't care about the
-    // orientation of the polygon vertices. It works just as well in
-    // mirrored mode.
-    if (clipper)
-    {
-      csVector2 clipped_poly[100];
-      int clipped_num;
-      uint8 clip_result;
-      if (mesh.vertex_fog)
-      {
-        csVertexStatus clipped_status[100];
-        clip_result = clipper->Clip (poly.vertices, poly.num,
-      	  clipped_poly, clipped_num, clipped_status);
-        if (clip_result == CS_CLIP_OUTSIDE) continue;
-	if (clip_result != CS_CLIP_INSIDE)
-	{
-#undef INTERPOLATE
-#define INTERPOLATE(comp) fi.comp=f1.comp+t*(f2.comp-f1.comp)
-#define INTERPOLATE2(comp) \
-{ \
-  float v1 = f [edge_from [0]].comp + \
-    t1 * (f [edge_to [0]].comp - f [edge_from [0]].comp); \
-  float v2 = f [edge_from [1]].comp + \
-    t2 * (f [edge_to [1]].comp - f [edge_from [1]].comp); \
-  fi.comp = v1 + t * (v2 - v1); \
-}
-	  G3DFogInfo f[100];
-	  memcpy (f, poly.fog_info, poly.num * sizeof (G3DFogInfo));
-	  for (j = 0 ; j < clipped_num ; j++)
-	  {
-	    G3DFogInfo& fi = poly.fog_info[j];
-	    switch (clipped_status[j].Type)
-	    {
-	      case CS_VERTEX_ORIGINAL:
-	        fi = f[clipped_status[j].Vertex];
-	        break;
-	      case CS_VERTEX_ONEDGE:
-	        {
-		  int vt = clipped_status[j].Vertex;
-		  float t = clipped_status[j].Pos;
-		  const G3DFogInfo& f1 = f[vt];
-		  const G3DFogInfo& f2 = f[(vt+1) % poly.num];
-		  INTERPOLATE (r);
-		  INTERPOLATE (g);
-		  INTERPOLATE (b);
-		  INTERPOLATE (intensity);
-		  INTERPOLATE (intensity2);
-		}
-	        break;
-	      case CS_VERTEX_INSIDE:
-	        {
-        	  float x = clipped_poly[j].x;
-        	  float y = clipped_poly[j].y;
-        	  int edge_from[2], edge_to[2];
-		  int edge = 0;
-		  int k, k1;
-		  k1 = poly.num - 1;
-		  for (k = 0 ; k < poly.num ; k++)
-		  {
-		    if ((y >= poly.vertices[k].y && y <= poly.vertices[k1].y) ||
-			(y <= poly.vertices[k].y && y >= poly.vertices[k1].y))
-		    {
-		      edge_from[edge] = k;
-		      edge_to[edge] = k1;
-		      edge++;
-		      if (edge >= 2) break;
-		    }
-		    k1 = k;
-		  }
-		  if (edge == 1)
-		  {
-		    // Safety if we only found one edge.
-		    edge_from[1] = edge_from[0];
-		    edge_to[1] = edge_to[0];
-		  }
-		  csVector2& A = poly.vertices[edge_from [0]];
-		  csVector2& B = poly.vertices[edge_to [0]];
-		  csVector2& C = poly.vertices[edge_from [1]];
-		  csVector2& D = poly.vertices[edge_to [1]];
-		  float t1 = (y - A.y) / (B.y - A.y);
-		  float t2 = (y - C.y) / (D.y - C.y);
-		  float x1 = A.x + t1 * (B.x - A.x);
-		  float x2 = C.x + t2 * (D.x - C.x);
-		  float t = (x - x1) / (x2 - x1);
-		  INTERPOLATE2 (r);
-		  INTERPOLATE2 (g);
-		  INTERPOLATE2 (b);
-		  INTERPOLATE2 (intensity);
-		  INTERPOLATE2 (intensity2);
-		}
-	        break;
-	    }
-	  }
-#undef INTERPOLATE
-#undef INTERPOLATE2
-	}
-      }
-      else
-      {
-        clip_result = clipper->Clip (poly.vertices, poly.num,
-      	  clipped_poly, clipped_num);
-        if (clip_result == CS_CLIP_OUTSIDE) continue;
-      }
-      if (clip_result != CS_CLIP_INSIDE)
-      {
-        // We need to copy the clipped polygon.
-	memcpy (poly.vertices, clipped_poly, sizeof (csVector2)*2*clipped_num);
-        poly.num = clipped_num;
-      }
-    }
-
-    csVector3& vertex0 = work_verts[pol.vertices[0]];
-    poly.z_value = vertex0.z;
-    o2c.Other2This (pol.normal, vertex0, poly.normal);
-
-    // Draw the polygon
-#if 1
-    if (poly.mixmode != prev_mixmode || poly.mat_handle != prev_mh)
-    {
-      prev_mixmode = poly.mixmode;
-      prev_mh = poly.mat_handle;
-      DrawPolygonStartMaterial (prev_mh, prev_mixmode);
-    }
-    DrawPolygonMaterialOnly (poly);
-#else
-    DrawPolygon (poly);
-#endif
-  }
-  // @@@ We need to restructure a bit here to avoid
-  // unneeded copy of data.
-  for (i = 0 ; i < num_polygons ; i++)
-  {
-    const csPolArrayPolygon& pol = polbuf->GetPolygon (i);
-    poly.num = pol.num_vertices;
-    CS_ASSERT (pol.mat_index >= 0 && pol.mat_index
-    	< polbuf->GetMaterialCount ());
-    poly.mat_handle = polbuf->GetMaterial (pol.mat_index);
-
-    // Transform object to texture transform to
-    // camera to texture transformation here.
-    m_cam2tex = pol.m_obj2tex * o2c.GetT2O ();
-    v_cam2tex = o2c.Other2This (pol.v_obj2tex);
-
-    poly.poly_texture = pol.poly_texture;
-    int j;
-    // @@@ Support mirror here.
-    int vis_cnt = 0;
-    for (j = 0 ; j < poly.num ; j++)
-    {
-      int vidx = pol.vertices[j];
-      if ((*dp_visible)[vidx]) vis_cnt++;
-    }
-    if (vis_cnt == 0) continue;
-    if (vis_cnt < poly.num)
-    {
-      csVector3 p[100];
-      csVector3 clip_p[100];
-      // We need some kind of clipping.
-      for (j = 0 ; j < poly.num ; j++)
-      {
-        int vidx = pol.vertices[j];
-        p[j] = work_verts[vidx];
-      }
-      ClipPolygonZ (p, clip_p, poly.num);
-      for (j = 0 ; j < poly.num ; j++)
-      {
-        float iz = aspect / clip_p[j].z;
-        poly.vertices[j].x = clip_p[j].x * iz + width2;
-        poly.vertices[j].y = clip_p[j].y * iz + height2;
-      }
-    }
-    else
-    {
-      for (j = 0 ; j < poly.num ; j++)
-      {
-        int vidx = pol.vertices[j];
-        poly.vertices[j].x = (*dp_persp)[vidx].x;
-        poly.vertices[j].y = (*dp_persp)[vidx].y;
-      }
-    }
-
-    // Clip polygon. Note that the clipper doesn't care about the
-    // orientation of the polygon vertices. It works just as well in
-    // mirrored mode.
-    if (clipper)
-    {
-      csVector2 clipped_poly[100];
-      int clipped_num;
-      uint8 clip_result = clipper->Clip (poly.vertices, poly.num,
-      	  clipped_poly, clipped_num);
-      if (clip_result == CS_CLIP_OUTSIDE) continue;
-      if (clip_result != CS_CLIP_INSIDE)
-      {
-        // We need to copy the clipped polygon.
-	memcpy (poly.vertices, clipped_poly, sizeof (csVector2)*2*clipped_num);
-        poly.num = clipped_num;
-      }
-    }
-
-    csVector3& vertex0 = work_verts[pol.vertices[0]];
-    poly.z_value = vertex0.z;
-    o2c.Other2This (pol.normal, vertex0, poly.normal);
-
-    DrawPolygonLightmapOnly (poly);
-  }
-#else
   csRef<iVertexBufferManager> vbman = GetVertexBufferManager();
   csRef<iVertexBuffer> vb = vbman->CreateBuffer (0);
 
@@ -4311,13 +3821,19 @@ uint prev_mixmode = ~0;
     trimesh.num_triangles = polbuf->GetTriangleCount ();
     trimesh.do_fog = mesh.do_fog;
     trimesh.vertex_fog = mesh.vertex_fog;
+    if (ci.how_clip == '0' || ci.use_lazy_clipping
+        || ci.do_plane_clipping || ci.do_z_plane_clipping)
+    {
+      ClassifyForClipTriangleMesh (
+            polbuf->GetVertexCount (), polbuf->GetVertices (),
+            ci.frust_origin, ci.frustum_planes, ci.num_planes);
+    }
     FogDrawTriangleMesh (trimesh, false);
     vbman->UnlockBuffer (vb);
   }
 
   RestoreDTMTransforms ();
   RestoreDTMClipping ();
-#endif
 }
 
 csStringID csGraphics3DOGLCommon::GLBlendToString (GLenum blend)
@@ -4853,7 +4369,7 @@ void csGraphics3DOGLCommon::SetupDTMClipping (G3DTriangleMesh& mesh)
     // If hardware requires clipping to the z-plane (because it
     // crashes otherwise) we have to disable lazy clipping.
     // @@@
-    if (true)
+    if (GLCaps.need_screen_clipping)
     {
       ci.use_lazy_clipping = false;
     }
