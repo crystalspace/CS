@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SIMPLE1_H__
-#define __SIMPLE1_H__
+#ifndef __PHYSTUT_H__
+#define __PHYSTUT_H__
 
 #include <stdarg.h>
 #include "csutil/ref.h"
@@ -74,5 +74,5 @@ public:
   void Start ();
 };
 
-#endif // __SIMPLE1_H__
+#endif // __PHYSTUT_H__
 

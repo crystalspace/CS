@@ -2,7 +2,7 @@
 @node map2cs Tutorial Skybox, map2cs Tutorial Tips, map2cs Tutorial Step 9, map2cs Tutorial
 @subsection Generating Skybox Textures
 
-If you don't like to idea of keeping the player always inside a building and
+If you don't like the idea of keeping the player always inside a building and
 never allowing him to look outside, then you need a skybox.  A skybox will
 give the player a good illusion that there is an outside to your level.  A
 skybox is a huge box with textures that shows what is outside.  However,

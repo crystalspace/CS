@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef AWSTUT_H
-#define AWSTUT_H
+#ifndef __AWSTUT_H__
+#define __AWSTUT_H__
 
 #include <stdarg.h>
 #include "csgeom/math2d.h"
@@ -61,5 +61,5 @@ public:
   bool HandleEvent (iEvent &Event);
 };
 
-#endif // AWSTUT_H
+#endif // __AWSTUT_H__
 

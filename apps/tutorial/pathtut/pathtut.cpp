@@ -156,7 +156,7 @@ bool PathTut::Initialize (int argc, const char* const argv[])
 	CS_REQUEST_END))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.PathTut2",
+    	"crystalspace.application.PathTut",
 	"Can't initialize plugins!");
     return false;
   }
@@ -164,7 +164,7 @@ bool PathTut::Initialize (int argc, const char* const argv[])
   if (!csInitializer::SetupEventHandler (object_reg, PathTutEventHandler))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.PathTut2",
+    	"crystalspace.application.PathTut",
 	"Can't initialize event handler!");
     return false;
   }
@@ -181,7 +181,7 @@ bool PathTut::Initialize (int argc, const char* const argv[])
   if (!vc)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.PathTut2",
+    	"crystalspace.application.PathTut",
 	"Can't find the virtual clock!");
     return false;
   }
@@ -191,7 +191,7 @@ bool PathTut::Initialize (int argc, const char* const argv[])
   if (!engine)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.PathTut2",
+    	"crystalspace.application.PathTut",
 	"No iEngine plugin!");
     return false;
   }
@@ -200,7 +200,7 @@ bool PathTut::Initialize (int argc, const char* const argv[])
   if (!loader)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.PathTut2",
+    	"crystalspace.application.PathTut",
     	"No iLoader plugin!");
     return false;
   }
@@ -209,7 +209,7 @@ bool PathTut::Initialize (int argc, const char* const argv[])
   if (!g3d)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.PathTut2",
+    	"crystalspace.application.PathTut",
     	"No iGraphics3D plugin!");
     return false;
   }
@@ -218,7 +218,7 @@ bool PathTut::Initialize (int argc, const char* const argv[])
   if (!kbd)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.PathTut2",
+    	"crystalspace.application.PathTut",
     	"No iKeyboardDriver plugin!");
     return false;
   }
@@ -227,7 +227,7 @@ bool PathTut::Initialize (int argc, const char* const argv[])
   if (!csInitializer::OpenApplication (object_reg))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.PathTut2",
+    	"crystalspace.application.PathTut",
     	"Error opening system!");
     return false;
   }
@@ -239,7 +239,7 @@ bool PathTut::Initialize (int argc, const char* const argv[])
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.PathTut2",
+    	"crystalspace.application.PathTut",
     	"Error loading 'stone4' texture!");
     return false;
   }
@@ -329,7 +329,7 @@ bool PathTut::Initialize (int argc, const char* const argv[])
   if (txt == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.PathTut2",
+    	"crystalspace.application.PathTut",
     	"Error loading texture!");
     return false;
   }
@@ -340,7 +340,7 @@ bool PathTut::Initialize (int argc, const char* const argv[])
   if (imeshfact == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.PathTut2",
+    	"crystalspace.application.PathTut",
     	"Error loading mesh object factory!");
     return false;
   }

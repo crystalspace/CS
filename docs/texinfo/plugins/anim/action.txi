@@ -147,7 +147,7 @@ This is due to the tweening flag on the sprite @dfn{instance} being set
 to false. To enable tweening, set the tweening flag to true (it is normally
 enabled). Tweening is a method of producing a smoother animation by
 interpolating the position of the vertices between frame based on a ratio
-of the the time into the frame and the duration of the frame. Enabling
+of the time into the frame and the duration of the frame. Enabling
 tweening in an animation involves an additional overhead in calculating
 the interpolated vertices, however, produces a more satisfactory result.
 This is also the second reason why each frame must have the same number

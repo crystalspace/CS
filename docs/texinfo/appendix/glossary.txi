@@ -107,7 +107,7 @@ is an important object. See also
 A Portal is one of the polygons of a thing mesh object which will not be
 texture mapped (unless it has a semi-transparent texture).  Instead another
 sector (visible through that portal) will be drawn.  A portal may
-even point back into the the sector in which it is contained.  This is
+even point back into the sector in which it is contained.  This is
 useful for portals which act as mirrors. A more general form of a mirror
 is a space warping portal. This way a portal can go to any place in the
 world.

@@ -164,7 +164,7 @@ with the tag name 'iGraphics3D'.
 
 Note that the decision which graphics driver you use (e.g. Software or
 OpenGL) is done at the time you load the plug-in by passing the name of
-that driver. At the time you ask for the plug-in interface and use use it in
+that driver. At the time you ask for the plug-in interface and use it in
 your program, this does not make a difference anymore. This makes it possible
 to exchange the driver simply by loading another driver, but without changing
 your main program.

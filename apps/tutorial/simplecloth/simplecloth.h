@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SIMPLE2_H__
-#define __SIMPLE2_H__
+#ifndef __SIMPLECLOTH_H__
+#define __SIMPLECLOTH_H__
 
 #include <stdarg.h>
 #include "csutil/ref.h"
@@ -57,5 +57,5 @@ public:
   void Start ();
 };
 
-#endif // __SIMPLE2_H__
+#endif // __SIMPLECLOTH_H__
 

@@ -18,7 +18,7 @@ Internally in the engine the @samp{csCamera} class inherits
 directly from @samp{csOrthoTransform} which inherits from
 @samp{csReversibleTransform}. If you work with @samp{iCamera} then you
 can get the reference to this transform with @code{camera->GetTransform()}.
-In addition the transformation a camera also holds a pointer to the
+In addition to the transformation a camera also holds a pointer to the
 current sector.
 
 This means that all operations you have in @samp{csOrthoTransform} can

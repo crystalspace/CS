@@ -69,7 +69,7 @@ The coordinate system is based on most-used (yet undesirable) system where
 top-left corner is (0,0) and bottom-right corner is (@var{width},
 @var{height}).  It would be better to use the more desirable coordinate system
 which is used, for example in @sc{os/2} and OpenGL, but most programmers are
-already familiar with the the less disirable one.
+already familiar with the less disirable one.
 
 Most @sc{csws} functions works with rectangles (@samp{csRect} class).  The
 @samp{csRect} class has four data fields: @samp{xmin}, @samp{xmax},

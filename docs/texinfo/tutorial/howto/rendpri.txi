@@ -120,7 +120,7 @@ By default objects will be put in the @samp{object} render queue.
 @subsubheading Z-Buffer Render Mode
 
 In addition to render priorities you can also choose how the object
-will be renderer with regards to the Z-buffer. There are four possibilities:
+will be rendered with regards to the Z-buffer. There are four possibilities:
 
 @itemize
 @item

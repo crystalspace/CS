@@ -146,7 +146,7 @@ bool Simple::Initialize ()
 	CS_REQUEST_END))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple2",
+    	"crystalspace.application.simplecloth",
 	"Can't initialize plugins!");
     return false;
   }
@@ -154,7 +154,7 @@ bool Simple::Initialize ()
   if (!csInitializer::SetupEventHandler (object_reg, SimpleEventHandler))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple2",
+    	"crystalspace.application.simplecloth",
 	"Can't initialize event handler!");
     return false;
   }
@@ -171,7 +171,7 @@ bool Simple::Initialize ()
   if (vc == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple2",
+    	"crystalspace.application.simplecloth",
 	"Can't find the virtual clock!");
     return false;
   }
@@ -181,7 +181,7 @@ bool Simple::Initialize ()
   if (engine == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple2",
+    	"crystalspace.application.simplecloth",
 	"No iEngine plugin!");
     return false;
   }
@@ -190,7 +190,7 @@ bool Simple::Initialize ()
   if (loader == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple2",
+    	"crystalspace.application.simplecloth",
     	"No iLoader plugin!");
     return false;
   }
@@ -199,7 +199,7 @@ bool Simple::Initialize ()
   if (g3d == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple2",
+    	"crystalspace.application.simplecloth",
     	"No iGraphics3D plugin!");
     return false;
   }
@@ -208,7 +208,7 @@ bool Simple::Initialize ()
   if (kbd == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple2",
+    	"crystalspace.application.simplecloth",
     	"No iKeyboardDriver plugin!");
     return false;
   }
@@ -217,7 +217,7 @@ bool Simple::Initialize ()
   if (!csInitializer::OpenApplication (object_reg))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple2",
+    	"crystalspace.application.simplecloth",
     	"Error opening system!");
     return false;
   }
@@ -229,7 +229,7 @@ bool Simple::Initialize ()
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple2",
+    	"crystalspace.application.simplecloth",
     	"Error loading 'stone4' texture!");
     return false;
   }
@@ -319,7 +319,7 @@ bool Simple::Initialize ()
   if (txt == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple2",
+    	"crystalspace.application.simplecloth",
     	"Error loading texture!");
     return false;
   }
@@ -332,7 +332,7 @@ bool Simple::Initialize ()
   if (imeshfact == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple2",
+    	"crystalspace.application.simplecloth",
     	"Error loading mesh object factory!");
     return false;
   }
@@ -342,7 +342,7 @@ bool Simple::Initialize ()
   if (mat == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple2",
+    	"crystalspace.application.simplecloth",
     	"Error loading material!!!");
     return false;
   }

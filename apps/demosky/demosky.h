@@ -27,7 +27,6 @@ class csProcSky;
 class csProcSkyTexture;
 class Flock;
 struct iSector;
-struct iSector;
 struct iView;
 struct iEngine;
 struct iDynLight;

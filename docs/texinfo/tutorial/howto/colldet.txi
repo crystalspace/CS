@@ -17,7 +17,7 @@ and what you should do to use them.
 @subsubheading Loading the @samp{iCollideSystem}
 
 The basis of the collision detection system is the @samp{iCollideSystem}.
-This is an interface which implemented by some collision detection plugin.
+This is an interface which is implemented by some collision detection plugin.
 At this moment we only have an implementation of the @sc{rapid} collision
 detection system but it would be a simple matter to add a new plugin for
 another system.
@@ -172,7 +172,7 @@ was able to move before it collided with the world. So you should move
 the mesh that far, and subtract the new vector from the original vector,
 to get the distance still to go. We will call this @code{V}.
 
-Use @code{GetCollisionPairs} to get the triange that was collided with.
+Use @code{GetCollisionPairs} to get the triangle that was collided with.
 It is described by the points @code{a2, b2, c2} in the
 @samp{csCollisionPair} structure. Then use those points to create a
 @samp{csPlane3}. We will call this @code{P}.

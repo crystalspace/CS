@@ -6,6 +6,9 @@ The history order is reversed so that new features are at the top.
 	  Crystal Space.
 	- Eric Sunshine eliminated some overfull- and underfull-hbox warnings
 	  in the Texinfo files reported by TeX.
+	- Eric Sunshine applied patches to documentation and tutorial programs
+	  to correct simple typographical errors.  Thanks to Andreas Busch
+	  <nobita@t-online.de> for the patches.
 27-Oct-2002
 	- Fixed a few bugs in iThingState::GetPolygon() as reported by Groton.
 20-Oct-2002

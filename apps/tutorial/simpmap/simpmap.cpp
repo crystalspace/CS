@@ -176,7 +176,7 @@ bool Simple::LoadMap ()
   if (!room)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simpmap",
       	"Can't find a valid starting position!");
     return false;
   }

@@ -39,7 +39,7 @@ distrubtions files in the same location.
 @end ifnotinfo
 
 Click/Double Click on @emph{setup.exe} icon as shown in the screenshot above to begin
-the the installation process.
+the installation process.
 
 You will be first be propmted with a Cygwin welcome dialog, which can be seen in the
 screenshot below. It tells you basic information e.g. what it is and what version of
