@@ -341,6 +341,7 @@ void csGraphics2DLineXLib::Print (csRect *area)
   }
 
   XCopyArea (dpy, back, window, gc, 0, 0, Width, Height, 0, 0);
+  XSync (dpy, false);
 }
 
 void csGraphics2DLineXLib::DrawLine (float x1, float y1, float x2, float y2, int color)

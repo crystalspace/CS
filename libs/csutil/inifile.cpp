@@ -489,7 +489,7 @@ void csIniFile::SaveData (const char* Name, csSome Data, size_t DataSize,
             top = 0;
           }
           acc |= (byte >> (2 + accbits));
-          byte = (byte <<= (6 - accbits)) & 0xff;
+          byte = (byte << (6 - accbits)) & 0xff;
           bits -= (6 - accbits);
           tmp[top++] = INIbase64[acc];
           total++;

@@ -65,23 +65,27 @@
 
 #include "csutil/csbase.h"
 
-/* This is the CS MD5 Hash generator class.  It is based on code
+/**
+ * This is the CS MD5 Hash generator class.  It is based on code
  * C code from sources noted above.
  */
 class csMD5 : public csBase
 {
 public:
-  // Passing in a buffer is the same as calling SetBuffer(buffer) after new
+  /// Passing in a buffer is the same as calling SetBuffer(buffer) after new
   csMD5(char *buffer = NULL);
   //virtual ~csMD5();
 
-  // Give csMD5 the buffer to encode
+  /// Give csMD5 the buffer to encode
   void SetBuffer(char *buffer);
-  // Retrieve the buffer csMD5 is set to encode (or NULL)
+  /// Retrieve the buffer csMD5 is set to encode (or NULL)
   char *GetBuffer();
-  // Return the resulting code
+  /**
+   * Return the resulting code. This string is not NULL ended and
+   * always 16 bytes long.
+   */
   unsigned char *GetHash();
-  // Return the resulting code reduced down to an integer
+  /// Return the resulting code reduced down to an integer
   unsigned int GetReducedHash();
 
 protected:
