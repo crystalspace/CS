@@ -23,8 +23,8 @@
 
 #include <AL/al.h>
 
-#include "sndrdr.h"
-#include "sndlstn.h"
+#include "alsndrdr.h"
+#include "alsndlst.h"
 
 SCF_IMPLEMENT_IBASE(csSoundListenerOpenAL)
 	SCF_IMPLEMENTS_INTERFACE(iSoundListener)

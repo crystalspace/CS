@@ -19,9 +19,9 @@
 #include "cssysdef.h"
 #include "csutil/scf.h"
 
-#include "sndsrc.h"
-#include "sndhdl.h"
-#include "sndrdr.h"
+#include "alsndsrc.h"
+#include "alsndhdl.h"
+#include "alsndrdr.h"
 
 #include <AL/al.h>
 

@@ -27,10 +27,10 @@
 #include "iutil/virtclk.h"
 #include "ivaria/reporter.h"
 
-#include "sndrdr.h"
-#include "sndlstn.h"
-#include "sndsrc.h"
-#include "sndhdl.h"
+#include "alsndrdr.h"
+#include "alsndlst.h"
+#include "alsndsrc.h"
+#include "alsndhdl.h"
 
 #include <AL/al.h>
 #include <AL/alut.h>

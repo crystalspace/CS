@@ -17,9 +17,9 @@
 */
 
 #include "cssysdef.h"
-#include "sndhdl.h"
-#include "sndrdr.h"
-#include "sndsrc.h"
+#include "alsndhdl.h"
+#include "alsndrdr.h"
+#include "alsndsrc.h"
 
 #define REFRESH_RATE    10
 
