@@ -33,13 +33,6 @@ if test -r "$prefix/Makefile"; then
     fi
   fi
 fi
-if test -z "$libdir"; then
-  cat 1>&2 <<EOF
-Couldn't detect dir with lib files, aborting!
-Did you already compile CS?
-EOF
-  exit 1
-fi
 
 usage()
 {
@@ -66,6 +59,9 @@ Libraries:
 	cstool
 	csutil
 	csws
+
+Note that the Crystal Space directory is detect by looking at the CRYSTAL
+environment variable. Make sure this variable is set correctly.
 EOF
 }
 
@@ -264,6 +260,15 @@ while test $# -gt 0; do
   esac
   shift
 done
+
+if test -z "$libdir"; then
+  cat 1>&2 <<EOF
+Couldn't detect dir with lib files, aborting!
+Did you already compile CS? Did you set CRYSTAL environment variable
+correctly?
+EOF
+  exit 1
+fi
 
 if test -n "$show_cflags"; then
 	echo "-I$includedir $common_cflags $add_cflags"
