@@ -170,6 +170,10 @@ rule GenerateExportDefs
   Depends $(<) : $(>) ;
 }
 
+# Implementation note: Do not change the layout/formatting of the sed
+# invocation.  It is purposely split over multiple lines (using backslash +
+# newline) in order to ensure that the entries in the generated .def file are
+# each placed on a separate line.
 actions GenerateExportDefs
 {
   echo "EXPORTS" > $(<)
@@ -183,4 +187,3 @@ actions LinkPlugin bind NEEDLIBS bind EXTRAOBJECTS bind EXPORTDEFS
 {
   dllwrap --driver-name=$(CMD.LINK) --dllname $(<:B) --def=$(EXPORTDEFS) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
 }
-
