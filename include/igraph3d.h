@@ -178,11 +178,11 @@ struct G3DPolygonAFP
 
 typedef enum 
 {
-  Multiply,
-  Multiply2,
-  Add,
-  Copy,
-  Alpha
+  FX_Multiply,
+  FX_Multiply2,
+  FX_Add,
+  FX_Copy,
+  FX_Alpha
 } DPFXMixMode;
 
 ///Structure containing all info needed by DrawPolygonFX (DPFX)
@@ -198,12 +198,6 @@ struct G3DPolygonDPFX
 
   /// The texture handle as returned by ITextureManager.
   ITextureHandle* txt_handle;
-
-  /** 
-    * AlphaValue of the polygon. Ranges from 0.0 to 1.0. 0 means opaque, 1.0 is 
-    * comletely transparent.
-    */
-  float alpha;
 };
 
 
@@ -433,8 +427,11 @@ public:
    *          the colorvalues in vertices[i].r, .b, .g, if you set gouraud 
    *          to true and set all color components to 1.0, you will see no 
    *          gouraud shading.
+   * alpha:   AlphaValue of the polygon. Ranges from 0.0 to 1.0. 0 means 
+   *          opaque, 1.0 is comletely transparent. Will only cause some 
+   *          effect, if mode is FX_Alpha
    */
-  STDMETHOD (StartPolygonFX)  (ITextureHandle* handle, DPFXMixMode mode, bool gouraud) PURE;
+  STDMETHOD (StartPolygonFX)  (ITextureHandle* handle, DPFXMixMode mode, float alpha, bool gouraud) PURE;
 
   /**
    * Finish drawing a series of Polygon FX.
@@ -447,7 +444,7 @@ public:
    * interface for all Polygon drawing. For now, you will have to use 
    * this method, if you need advanced possibilities.
    */
-  STDMETHOD (DrawPolygonFX)    (G3DPolygonDPFX& poly, bool gouraud) PURE;
+  STDMETHOD (DrawPolygonFX)    (G3DPolygonDPFX& poly) PURE;
 
   /// Get the current fog mode (G3D_FOGMETHOD).
   COM_METHOD_DECL GetFogMode (G3D_FOGMETHOD& fogMethod) = 0;

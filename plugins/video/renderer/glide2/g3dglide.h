@@ -102,6 +102,7 @@ private:
 
   bool        m_gouraud;
   DPFXMixMode m_mixmode;
+  float       m_alpha;
 
   /// use 16 bit texture else 8 bit
   bool use16BitTexture;
@@ -151,13 +152,13 @@ public:
   STDMETHODIMP DrawPolygonQuick (G3DPolygonDPQ& poly);
 
   /// Start a series of DrawPolygonFX
-  STDMETHODIMP StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, bool gouraud);
+  STDMETHODIMP StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, float alpha, bool gouraud);
 
   /// Finish a series of DrawPolygonFX
   STDMETHODIMP FinishPolygonFX();
 
   /// Draw a polygon with special effects.
-  STDMETHODIMP DrawPolygonFX    (G3DPolygonDPFX& poly, bool gouraud);
+  STDMETHODIMP DrawPolygonFX    (G3DPolygonDPFX& poly);
 
   /// Draw a projected floating light on the screen.
   STDMETHODIMP DrawFltLight(G3DFltLight& light);

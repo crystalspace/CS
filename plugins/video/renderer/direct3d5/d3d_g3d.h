@@ -136,6 +136,7 @@ class csGraphics3DDirect3DDx5 : public IGraphics3D,
 
   bool        m_gouraud;
   DPFXMixMode m_mixmode;
+  float       m_alpha;
 
   /// Capabilities of the renderer.
   G3D_CAPS m_Caps;
@@ -200,13 +201,13 @@ public:
   STDMETHODIMP DrawPolygonQuick (G3DPolygonDPQ& poly);
   
   /// Start a series of DrawPolygonFX
-  STDMETHODIMP StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, bool gouraud);
+  STDMETHODIMP StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, float alpha, bool gouraud);
 
   /// Finish a series of DrawPolygonFX
   STDMETHODIMP FinishPolygonFX();
 
   /// Draw a polygon wit special effects.
-  STDMETHODIMP DrawPolygonFX    (G3DPolygonDPFX& poly, bool gouraud);
+  STDMETHODIMP DrawPolygonFX    (G3DPolygonDPFX& poly);
 
   /// Draw a projected floating light on the screen.
   STDMETHODIMP DrawFltLight(G3DFltLight& light);

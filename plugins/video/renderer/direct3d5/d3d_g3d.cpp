@@ -1163,10 +1163,11 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygonQuick (G3DPolygonDPQ& poly)
   return S_OK;
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx5::StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, bool gouraud)
+STDMETHODIMP csGraphics3DDirect3DDx5::StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, float alpha, bool gouraud)
 {
   m_gouraud = gouraud;
   m_mixmode = mode;
+  m_alpha   = alpha;
 
   csTextureMMDirect3D* txt_mm = (csTextureMMDirect3D*)GetcsTextureMMFromITextureHandle (handle);
 
@@ -1181,7 +1182,7 @@ STDMETHODIMP csGraphics3DDirect3DDx5::StartPolygonFX(ITextureHandle* handle, DPF
     m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_COLORKEYENABLE, TRUE);
   }
 
-  if (mode!=Copy)
+  if (mode!=FX_Copy)
   {
     m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, TRUE);
   }
@@ -1193,32 +1194,43 @@ STDMETHODIMP csGraphics3DDirect3DDx5::StartPolygonFX(ITextureHandle* handle, DPF
   //Alpha: Alpha value of the polygon
   switch (mode)
   {
-    case Multiply:
+    case FX_Multiply:
       //Color = SRC * DEST +   0 * SRC = DEST * SRC
+      m_alpha = 0.0f;
       m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCCOLOR); 
       m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ZERO);
       break;
-    case Multiply2:
+    case FX_Multiply2:
       //Color = SRC * DEST + DEST * SRC = 2 * DEST * SRC
+      m_alpha = 0.0f;
       m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCCOLOR); 
       m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_DESTCOLOR);
       break;
-    case Add:
+    case FX_Add:
       //Color = 1 * DEST + 1 * SRC = DEST + SRC
+      m_alpha = 0.0f;
       m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE); 
       m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
       break;
-    case Alpha:
+    case FX_Alpha:
       //Color = Alpha * DEST + (1-Alpha) * SRC 
       m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCALPHA); 
       m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_INVSRCALPHA);
       break;
-    case Copy:
+    case FX_Copy:
     default:
       //Color = 0 * DEST + 1 * SRC = SRC
+      m_alpha = 0.0f;
       m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ZERO); 
       m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
       break;
+  }
+
+  if (m_alpha == 0.0f && m_mixmode == FX_Alpha)
+  {
+    //workaround for a bug in alpha transparency. It looks like on some cards you may not select
+    //alpha == 0, (opaque) because that will make the result invisible. :-(
+    m_alpha = 0.01f; 
   }
 
   //m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ANTIALIAS, D3DANTIALIAS_NONE);
@@ -1240,23 +1252,13 @@ STDMETHODIMP csGraphics3DDirect3DDx5::FinishPolygonFX()
   return S_OK;
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygonFX(G3DPolygonDPFX& poly, bool gouraud)
+STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygonFX(G3DPolygonDPFX& poly)
 {
-  m_gouraud = gouraud;
-
   int i;
   D3DTLVERTEX vx;
 
   VERIFY_SUCCESS( m_lpd3dDevice->Begin(D3DPT_TRIANGLEFAN, D3DVT_TLVERTEX, D3DDP_DONOTUPDATEEXTENTS) == DD_OK );
   
-  float alpha = poly.alpha;
-  if (alpha == 0.0f && m_mixmode == Alpha)
-  {
-    //workaround for a bug in alpha transparency. It looks like on some cards you may not select
-    //alpha == 0, (opaque) because that will make the result invisible. :-(
-    alpha = 0.01f; 
-  }
-
   for(i=0; i<poly.num; i++)
   {
     vx.sx = poly.vertices[i].sx;
@@ -1264,9 +1266,9 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygonFX(G3DPolygonDPFX& poly, bool g
     vx.sz = SCALE_FACTOR / poly.vertices[i].z;
     vx.rhw = poly.vertices[i].z;
     if (m_gouraud)
-      vx.color = D3DRGBA(poly.vertices[i].r, poly.vertices[i].g, poly.vertices[i].b, alpha);
+      vx.color = D3DRGBA(poly.vertices[i].r, poly.vertices[i].g, poly.vertices[i].b, m_alpha);
     else
-      vx.color = D3DRGBA(1.0f, 1.0f, 1.0f, alpha);
+      vx.color = D3DRGBA(1.0f, 1.0f, 1.0f, m_alpha);
     vx.specular = D3DRGB(0.0, 0.0, 0.0);
     vx.tu = poly.vertices[i].u;
     vx.tv = poly.vertices[i].v;

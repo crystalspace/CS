@@ -34,7 +34,6 @@
 #include <glide.h>
 
 #include "sysdef.h"
-#include "cs3d/software/scan.h" //@@@WHY?
 #include "isystem.h"
 #include "ipolygon.h"
 #include "icamera.h"
@@ -1216,9 +1215,13 @@ STDMETHODIMP csGraphics3DGlide2x::DrawPolygonQuick (G3DPolygonDPQ& poly)
   return S_OK;
 }
 
-STDMETHODIMP csGraphics3DGlide2x::StartPolygonFX(ITextureHandle* handle, DPFXMixMode /*mode*/, bool gouraud)
+STDMETHODIMP csGraphics3DGlide2x::StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, 
+                                                 float alpha, bool gouraud)
 {
   //This implementation is pretty wrong, but at least, it will show something on the screen
+  m_mixmode = mode;
+  m_alpha   = alpha;
+  m_gouraud = gouraud;
   return StartPolygonQuick(handle, gouraud);
 }
 
@@ -1228,7 +1231,7 @@ STDMETHODIMP csGraphics3DGlide2x::FinishPolygonFX()
   return FinishPolygonQuick();
 }
 
-STDMETHODIMP csGraphics3DGlide2x::DrawPolygonFX(G3DPolygonDPFX& poly, bool /*gouraud*/)
+STDMETHODIMP csGraphics3DGlide2x::DrawPolygonFX(G3DPolygonDPFX& poly)
 {
   //This implementation is pretty wrong, but at least, it will show something on the screen
   G3DPolygonDPQ newpoly;
