@@ -25,6 +25,8 @@ chronological order.
 	  error message on missing name attribute in <animation> tag.
 	- DeSigna changed all instances of type unsigned in the picogui plugin 
 	  to uint32.
+	- DeSigna changed all instances of uint32 in the picogui plugin to
+	  __u32.
 19-Aug-2003
 	- Jorrit fixed a bug in the new optimization in odedynamics where
 	  the transform of the object was ignored.
