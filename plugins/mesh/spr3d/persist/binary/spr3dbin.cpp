@@ -293,7 +293,8 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
   // Read the number of actions
   int action_count = convert_endian(*((int32 *)p)); p += sizeof(int);
 
-  // Write out each action
+
+  // Read each action
   for (i=0; i<action_count; i++)
   {
     iSpriteAction* act = spr3dLook->AddAction ();
@@ -334,7 +335,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
     }
   }
 
-  // Read the number of actions
+  // Read the number of triangles
   int tri_count = convert_endian(*((int32 *)p)); p += sizeof(int);
 
   for(i=0; i<tri_count; i++)
@@ -370,7 +371,6 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
 
   // Read the 1 byte tween value
   spr3dLook->EnableTweening (*p++);
-
   return csPtr<iBase> (fact);
 }
 
@@ -487,7 +487,7 @@ void csSprite3DBinFactorySaver::WriteDown (iBase* obj, iFile * file)
     name = action->GetName();
     file->Write (name, strlen(name) + 1);
 
-    // Write out the number of triangles
+    // Write out the number of frames
     int action_frame_count = action->GetFrameCount();
     int afc = convert_endian((int32)action_frame_count);
     file->Write ((char *)&afc, 4);
@@ -501,9 +501,10 @@ void csSprite3DBinFactorySaver::WriteDown (iBase* obj, iFile * file)
       int frame_delay = action->GetFrameDelay(j);
       int fd = convert_endian((int32)frame_delay);
       file->Write ((char *)&fd, 4);
+      float disp = 0;
       if (!frame_delay)  // write optional displacement if no delay
       {
-        float disp = action->GetFrameDisplacement(j);
+        disp = action->GetFrameDisplacement(j);
 	long ce_disp = convert_endian(float2long(disp));
         file->Write ((char *)&ce_disp, 4);
       }
@@ -548,7 +549,7 @@ void csSprite3DBinFactorySaver::WriteDown (iBase* obj, iFile * file)
 
   // Write out TWEEN state
   char buf[1];
-  buf[0] = state->IsTweeningEnabled() ? 0x00: 0x01;
+  buf[0] = state->IsTweeningEnabled() ? 0x01 : 0x00;
   file->Write(buf, 1);
 }
 

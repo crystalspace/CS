@@ -10,6 +10,8 @@ The history order is reversed so that new features are at the top.
 	  a test level.
 	- Most CS applications will now use OpenGL by default instead of the
 	  software renderer.
+	- Keith Fulton fixed a bug flipping the do_tweening flag on saving
+	  of binary spr3d's.
 27-Jan-2003
 	- Restored number of super lightmaps in OpenGL to 10 again. Apparently
 	  16 was too much for cards with less texture memory. We have to find
