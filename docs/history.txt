@@ -22,6 +22,8 @@ The history order is reversed so that new features are at the top.
 	- Matze removed the really unfinished plugins in 
 	  plugins/mesh/spr3d/persist/impexp and
 	  plugins/mesh/thing/persist/impexp
+	- Matze removed comments about 8.3 filenames from CS docs. Even djgpp
+	  (which isn't supported anymore) was able to use long names in win9x.
 19-Feb-2003
 	- Mårten Svanfeldt fixed a bug introduced when adding the new
 	  light-parameters for the new renderer due to a missing

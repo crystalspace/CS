@@ -155,11 +155,6 @@ Here are some general formatting conventions.
 
 @itemize @bullet
 @item
-Restrict the names of documentation files to eight characters with a
-file extension of no more than three characters.  This allows @sc{dos} users
-to access the documentation by respecting @sc{dos}'s 8.3 limitation.
-
-@item
 When creating @code{@@itemize} lists, one blank line should separate each
 @code{@@item} except for short lists of items with short descriptions.
 

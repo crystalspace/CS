@@ -187,14 +187,6 @@ An even better solution is to utilize the initialization hooks provided by the
 module is loaded.  @xref{SCF}.
 
 @item
-@emph{@sc{dos} Filename Restrictions}
-
-Use @sc{dos}-style 8.3 filenames for files which are shared by all platforms
-which run Crystal Space.  This allows the project to support @sc{dos} in
-addition to platforms with less restrictive filenames.  Platform-specific
-files (not intended for @sc{dos}) need not follow this restriction.
-
-@item
 @emph{Pathname Syntax}
 
 Pathname syntax varies widely from platform to platform.  For instance, a

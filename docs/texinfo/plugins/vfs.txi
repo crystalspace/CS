@@ -54,12 +54,8 @@ should follow this list of guidelines:
 @item
 Choose filenames that are well suited for all operating systems you are
 targeting.  As of today @sc{dos} has the most restricted rules for naming
-files (8.3 file names with only @sc{ascii7} characters except ``?*+'' and
-space, and with only one dot per filename).  @sc{vfs} does not make any
-attempt to mimic long file names on systems that does not support them.
-Although some @sc{c} compiler runtimes (for example, @sc{djgpp}) have limited
-support for working with long filenames, they are automatically truncated to
-8.3 creation and truncated before comparisons, in most cases this is enough.
+files (@sc{ascii7} characters except ``?*+'' and space, and with only one
+dot per filename).
 The part of @sc{vfs} that is located in archives support virtually any
 filenames, so if you're sure that you will never have to place some file on a
 ``real'' filesystem, you can give it any name you desire.
