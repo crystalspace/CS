@@ -295,9 +295,6 @@ bool awsScrollBar::SetProperty (char *name, void *parm)
   {
     min = *(int *)parm;
 
-    // Fix value in case it's out of range
-    value = (value < min ? min : (value > max ? max : value));
-
     Invalidate ();
     return true;
   }
@@ -307,9 +304,10 @@ bool awsScrollBar::SetProperty (char *name, void *parm)
 
     // Fix the page size
     if (amntvis > max) amntvis = max;
+    int maxval = (int)(max-amntvis);
 
     // Fix value in case it's out of range
-    value = (value < min ? min : (value > max ? max : value));
+    value = (value < 0 ? 0 : (value > maxval ? maxval : value));
 
     Invalidate ();
     return true;
@@ -320,6 +318,10 @@ bool awsScrollBar::SetProperty (char *name, void *parm)
 
     // Fix the page size
     if (amntvis > max) amntvis = max;
+    int maxval = (int)(max-amntvis);
+
+    // Fix value in case it's out of range
+    value = (value < 0 ? 0 : (value > maxval ? maxval : value));
 
     Invalidate ();
     return true;
@@ -332,6 +334,7 @@ void awsScrollBar::KnobTick (void *sk, iAwsSource *)
 {
   // adjust position of knob and scrollbar value
   awsScrollBar *sb = (awsScrollBar *)sk;
+  int maxval = (int)(sb->max - sb->amntvis);
 
   if (sb->orientation == sboVertical)
   {
@@ -352,8 +355,11 @@ void awsScrollBar::KnobTick (void *sk, iAwsSource *)
 
     // Get the actual height that we can traverse with the knob
     int bh = f.Height () - height;
-
-    sb->value = (sb->knob->last_y - sb->decVal->Frame ().ymax) * sb->max / bh;
+    
+    if (maxval == 0)
+      sb->value = 0;
+    else
+      sb->value = (sb->knob->last_y - sb->decVal->Frame ().ymax) * maxval / bh;
   }
   else if (sb->orientation == sboHorizontal)
   {
@@ -373,17 +379,19 @@ void awsScrollBar::KnobTick (void *sk, iAwsSource *)
     // Get the actual height that we can traverse with the knob
     int bw = f.Width () - width;
 
-    sb->value = (sb->knob->last_x - sb->decVal->Frame ().xmax) * sb->max / bw;
+    if (maxval == 0)
+      sb->value = 0;
+    else
+      sb->value = (sb->knob->last_x - sb->decVal->Frame ().xmax) * maxval / bw;
   }
   else
     return ;
 
   sb->value =
     (
-      sb->value < sb->min ? sb->min :
-        (sb->value > sb->max ? sb->max : sb->value)
+      sb->value < sb->min ? 0 :
+        (sb->value > maxval ? maxval : sb->value)
     );
-
   sb->Broadcast (signalChanged);
   sb->Invalidate ();
 }
@@ -411,10 +419,11 @@ void awsScrollBar::TickTock (void *sk, iAwsSource *)
       return ;
   }
 
+ int maxval = (int)(sb->max - sb->amntvis);
   sb->value =
     (
-      sb->value < sb->min ? sb->min :
-        (sb->value > sb->max ? sb->max : sb->value)
+      sb->value < sb->min ? 0 :
+        (sb->value > maxval ? maxval : sb->value)
     );
 
   sb->Broadcast (signalChanged);
@@ -428,11 +437,12 @@ void awsScrollBar::IncClicked (void *sk, iAwsSource *)
   sb->value += sb->value_delta;
 
   /// Check floor and ceiling
+ int maxval = (int)(sb->max - sb->amntvis);
   sb->value =
     (
-      sb->value < sb->min ? sb->min :
-        (sb->value > sb->max ? sb->max : sb->value)
-    );
+     sb->value < sb->min ? 0 :
+     (sb->value > maxval ? maxval : sb->value)
+     );
 
   sb->Broadcast (signalChanged);
   sb->Invalidate ();
@@ -445,10 +455,11 @@ void awsScrollBar::DecClicked (void *sk, iAwsSource *)
   sb->value -= sb->value_delta;
 
   /// Check floor and ceiling
+ int maxval = (int)(sb->max - sb->amntvis);
   sb->value =
     (
-      sb->value < sb->min ? sb->min :
-        (sb->value > sb->max ? sb->max : sb->value)
+      sb->value < sb->min ? 0 :
+        (sb->value > maxval ? maxval : sb->value)
     );
 
   sb->Broadcast (signalChanged);
@@ -480,7 +491,11 @@ void awsScrollBar::OnDraw (csRect /*clip*/)
     int bh = f.Height () - height;
 
     // Get the knob's position
-    int ky = (int)((value * bh) / max);
+    int ky;
+    if ((max-amntvis) == 0)
+      ky = 0;
+    else
+      ky = (int)((value * bh) / (max-amntvis));
 
     f.ymin += ky;
     f.ymax = f.ymin + height;
@@ -502,7 +517,11 @@ void awsScrollBar::OnDraw (csRect /*clip*/)
     int bw = f.Width () - width;
 
     // Get the knob's position
-    int kx = (int)((value * bw) / max);
+    int kx;
+    if ((max-amntvis)==0)
+      kx = 0;
+    else
+      kx = (int)((value * bw) / max);
 
     f.xmin += kx;
     f.xmax = f.xmin + width;
