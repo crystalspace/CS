@@ -27,7 +27,7 @@
 
 class ctQuaternion : public csQuaternion {
  public:
-  ctQuaternion (real r, real x, real y, real z)
+  ctQuaternion (float r, float x, float y, float z)
     : csQuaternion ( r, x, y, z ) {}
 
   ctQuaternion (ctVector3 x)

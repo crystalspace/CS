@@ -83,13 +83,13 @@ class ctQuatRigidBody : public ctEntity
   {
     real len = rot.Norm ();
     if (len <= 3*MIN_REAL)
-      set_orientation(ctQuaternion(1.0, 0.0, 0.0, 0.0));
+      set_orientation(ctQuaternion(1.0f, 0.0f, 0.0f, 0.0f));
     else
     {
       rot /= len;
-      real sine = sin(len);
-      set_orientation(ctQuaternion(cos(len / 2), sine*rot[0], sine*rot[1],
-				   sine*rot[2]));
+      float sine = (float) sin(len);
+      set_orientation(ctQuaternion((float) cos(len / 2.0f),
+        sine * rot[0], sine * rot[1], sine * rot[2]));
     }
   }
 
@@ -152,7 +152,7 @@ class ctQuatRigidBody : public ctEntity
   int get_state_size ()
   { return QUATRIGID_STATE_SIZE; }
 
-  int get_state (const real *sa);
+  int get_state (const float *sa);
   int set_state (real *sa);
   int set_delta_state (real *sa);
 

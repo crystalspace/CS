@@ -26,18 +26,18 @@
 void csfxInterference(iGraphics2D *g2d, iTextureManager *txtmgr,
   float amount, float anim, float length)
 {
-#define SEMIRAND anim = (anim+0.137564) - int(anim+0.137564);
-  if(amount==0) amount = 0.000001;
-  float skipwidth = length * (1.0/amount);
-  float xpos = 0;
-  float ypos = 0;
+#define SEMIRAND anim = (anim + 0.137564f) - int(anim + 0.137564f);
+  if (amount == 0) amount = 0.000001f;
+  float skipwidth = length * (1.0f / amount);
+  float xpos = 0.0f;
+  float ypos = 0.0f;
   int width = g2d->GetWidth();
   int height = g2d->GetHeight();
   while(ypos < height)
   {
     float skipnow = skipwidth * anim; SEMIRAND;
     float donow = length * anim; SEMIRAND;
-    int col = 255 - int(255.*anim); SEMIRAND;
+    int col = 255 - int(255.0f * anim); SEMIRAND;
     int colour = txtmgr->FindRGB(col, col, col);
     while(donow+xpos >= width)
     {
@@ -45,7 +45,7 @@ void csfxInterference(iGraphics2D *g2d, iTextureManager *txtmgr,
       ypos++;
       if(ypos >= height) return;
       donow -= width-xpos;
-      xpos = 0.0;
+      xpos = 0.0f;
     }
     g2d->DrawLine(xpos, ypos, xpos+donow, ypos, colour);
     xpos += donow;
@@ -73,7 +73,7 @@ void csfxFadeOut(iGraphics3D *g3d, float fadevalue)
 
 void csfxFadeTo(iGraphics3D *g3d, iMaterialHandle *mat, float fadevalue)
 {
-  float fade = 1.0 - fadevalue;
+  float fade = 1.0f - fadevalue;
   csfxScreenDPFX(g3d, mat, CS_FX_SETALPHA(fade), 0, 0, 0);
 }
 

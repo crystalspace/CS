@@ -41,7 +41,7 @@ ctQuatRigidBody::ctQuatRigidBody(ctVector3 x, real M)
   precalculated = false;
 }
 
-int ctQuatRigidBody::get_state(const real *sa)
+int ctQuatRigidBody::get_state(const float *sa)
 {
   pos[0] = sa[0];
   pos[1] = sa[1];

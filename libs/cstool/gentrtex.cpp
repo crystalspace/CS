@@ -102,33 +102,33 @@ void csGenerateImageTextureBlend::GetColor(csColor &col,
     above = above->next;
   }
   /// compute color
-  float belowfactor = 0.0;
-  float abovefactor = 0.0;
+  float belowfactor = 0.0f;
+  float abovefactor = 0.0f;
   csColor abovecol, belowcol;
   if(!below && !above)
   {
-    col.Set(.5, .5, .5);
+    col.Set(0.5f, 0.5f, 0.5f);
     return;
   }
   if(!below)
   {
-    abovefactor = 1.0;
+    abovefactor = 1.0f;
     above->tex->GetColor(abovecol, x,y);
   }
   else if(!above)
   {
-    belowfactor = 1.0;
+    belowfactor = 1.0f;
     below->tex->GetColor(belowcol, x,y);
   }
   else { // both an above and below - blend
     float dist = above->value - below->value;
     belowfactor = (above->value - value) / dist;
-    abovefactor = 1.0 - belowfactor;
+    abovefactor = 1.0f - belowfactor;
     above->tex->GetColor(abovecol, x,y);
     below->tex->GetColor(belowcol, x,y);
   }
 
-  col.Set(0,0,0);
+  col.Set(0.0f, 0.0f, 0.0f);
   col += abovecol * abovefactor;
   //printf("col = %g %g %g\n", col.red, col.green, col.blue);
   col += belowcol * belowfactor;
@@ -224,7 +224,7 @@ void csGenerateImageTextureSingle::ComputeLayerColor(
 
   // return trilinear interpolated value
   //printf("layercol = %g %g %g\n", col.red, col.green, col.blue);
-  col *= 1./255.;
+  col *= 1.0f / 255.0f;
 }
 
 void csGenerateImageTextureSingle::GetColor(csColor &col,
@@ -257,7 +257,7 @@ iImage *csGenerateImage::Generate(int totalw, int totalh,
   csim->Clear(csRGBpixel (128, 128, 128));
   iImage *result = csim;
 
-  csVector2 pixelsize( 1./float(totalw), 1./float(totalh) );
+  csVector2 pixelsize (1.0f / float(totalw), 1.0f / float(totalh));
   csVector2 startpos(float(startx) * pixelsize.x, float(starty)*pixelsize.y);
   csVector2 pos;
   /// memory image is always truecolor
@@ -297,6 +297,6 @@ float csGenerateImageValueFuncTex::GetValue(float x, float y)
 {
   csColor col;
   tex->GetColor(col, x, y);
-  return (col.red + col.green + col.blue)*(1./3.);
+  return (col.red + col.green + col.blue) * (1.0f / 3.0f);
 }
 

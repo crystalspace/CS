@@ -78,8 +78,8 @@ public:
    */
   void PrepRotation (float angle, csVector3 vec)
   {
-    double theSin = sin (angle / 2);
-    Init ((float) cos (angle / 2), vec.x * theSin, vec.y * theSin, vec.z * theSin);
+    double theSin = sin (angle / 2.0f);
+    Init ((float) cos (angle / 2.0f), vec.x * theSin, vec.y * theSin, vec.z * theSin);
   }
 
   /// rotated = q * vec * qConj.

@@ -73,10 +73,10 @@ void csProcWater::SetHSI (csColor& col, float H, float S, float I)
 {
   /// from Hue Saturation Intensity to Red Green Blue
   float Temp=H;
-  col.red = 1.0 + S * sin(Temp - TWO_PI / 3.0);
-  col.green = 1.0 + S * sin(Temp);
-  col.blue = 1.0 + S * sin(Temp + TWO_PI / 3.0);
-  Temp = 63.999 * I / 512.0;
+  col.red = 1.0f + S * sin(Temp - TWO_PI / 3.0f);
+  col.green = 1.0f + S * sin(Temp);
+  col.blue = 1.0f + S * sin(Temp + TWO_PI / 3.0f);
+  Temp = 63.999f * I / 512.0f;
   col *= Temp;
 }
 
@@ -95,12 +95,12 @@ void csProcWater::MakePalette (int max)
   int r,g,b;
   for (i=0; i<maxcolours; i++)
   {
-    float H = 1.0-1.5*float(i)/float(maxcolours);
-    float S = 1.0-float(i)/float(maxcolours);
+    float H = 1.0f - 1.5f * float(i) / float(maxcolours);
+    float S = 1.0f - float(i) / float(maxcolours);
     float I = float(i)/float(maxcolours);
-    I = 8.0 * I;
+    I = 8.0f * I;
     SetHSI (col, H, S, I);
-    col *= 255.0;
+    col *= 255.0f;
     r = (int) col.red;
     g = (int) col.green;
     b = (int) col.blue;

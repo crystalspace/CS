@@ -79,21 +79,21 @@ csProcSky::csProcSky()
 {
   firstsky = NULL;
   int i;
-  radius = 20000000.; /// 20 000 km
-  center.Set(0., -radius + 100000.0, 0.); // sky is 100 km high
-  cam.Set(0.,0.,0.);
+  radius = 20000000.0f; /// 20 000 km
+  center.Set(0.0f, -radius + 100000.0f, 0.0f); // sky is 100 km high
+  cam.Set(0.0f, 0.0f, 0.0f);
 
-  sunpos.Set(0,0,radius);  // at north  point
+  sunpos.Set(0.0f, 0.0f, radius);  // at north  point
   //// try 0.95(edge of sun) -- 1.0(at top) for elevation.
-  float sunelevation = 0.99 * HALF_PI; // pi/2 is top.
-  float sunazimuth = 0.0; // 0=north,+z
+  float sunelevation = 0.99f * HALF_PI; // pi/2 is top.
+  float sunazimuth = 0.0f; // 0=north,+z
   csXRotMatrix3 elev(-sunelevation);
   sunpos = elev * sunpos;
   csYRotMatrix3 compassdir(sunazimuth);
   sunpos = compassdir * sunpos;
   sunpos += center;
-  suncolor.Set(1.0,1.0,0.6);
-  maxhaze.Set(130,150,255);
+  suncolor.Set(1.0f, 1.0f, 0.6f);
+  maxhaze.Set(130, 150, 255);
 
   nr_octaves = 5;
   octsize = 32; // octave is octsize x octsize
@@ -324,15 +324,15 @@ bool csProcSky::SphereIntersect(const csVector3& point, csVector3& isect)
 
   float a = pd.SquaredNorm();
   float b = 2.0f * pc * pd;
-  float c = center.SquaredNorm() - 2.0*(cam*center) +
+  float c = center.SquaredNorm() - 2.0f * (cam*center) +
     cam.SquaredNorm() - radius*radius;
-  float discrim = b*b - 4.0*a*c;
-  if(discrim < 0.0) return false;
-  float div = 1.0 / (2.0 * a); /// do the div only once
+  float discrim = b * b - 4.0f * a * c;
+  if(discrim < 0.0f) return false;
+  float div = 1.0f / (2.0f * a); /// do the div only once
   float sqdis = qsqrt(discrim); /// and the sqrt only once.
   /// the positive mu solution is in the direction viewed.
   float mu = div * (-b + sqdis);
-  if(mu < 0.0) mu = div * (-b - sqdis);
+  if(mu < 0.0f) mu = div * (-b - sqdis);
 
   isect = cam + mu * pd;
   return true;
@@ -354,64 +354,64 @@ csRGBcolor csProcSky::GetSkyBlue(const csVector3& spot, float& haze,
   csRGBcolor res;
   int r,g,b;
 
-  if(spot.y < cam.y)
+  if (spot.y < cam.y)
   {
-    haze = 1.0;   /// ground
+    haze = 1.0f;   /// ground
     below = true;
-    float d = (cam.y-spot.y)/(radius - (cam.y-center.y));
-    float mirrorplace = 0.0;
-    if(d>mirrorplace){
-      haze = 1.0-(d-mirrorplace)/200. ;
-      if(haze<0.0)haze=0.0;
+    float d = (cam.y-spot.y) / (radius - (cam.y-center.y));
+    float mirrorplace = 0.0f;
+    if(d > mirrorplace){
+      haze = 1.0f - (d-mirrorplace) / 200.0f;
+      if(haze < 0.0f) haze = 0.0f;
       //haze += float(rand()&0xFF)/256./10.;
       //if(haze>1.0)haze=1.0;
     }
-    if(d>1.0)d=1.0;
-    r = int( (maxhaze.red) - d*50.);
-    g = int( (maxhaze.green) - d*40.);
-    b = int( (maxhaze.blue) - d*30.);
-    float sunmirror = 1.0;
-    if(sundist < sunmirror)
+    if (d > 1.0f) d = 1.0f;
+    r = (int) maxhaze.red - d * 50.0f;
+    g = (int) maxhaze.green - d * 40.0f;
+    b = (int) maxhaze.blue - d * 30.0f;
+    float sunmirror = 1.0f;
+    if (sundist < sunmirror)
     {
-      float m = (sunmirror-sundist)/sunmirror;
-      r += int( (suncolor.red)*m*30.);
-      g += int( (suncolor.green)*m*30.);
-      b += int( (suncolor.blue)*m*30.);
+      float m = (sunmirror-sundist) / sunmirror;
+      r += (int) suncolor.red * m * 30.0f;
+      g += (int) suncolor.green * m * 30.0f;
+      b += (int) suncolor.blue * m * 30.0f;
     }
-    if(r>255)r=255;
-    if(g>255)g=255;
-    if(b>255)b=255;
-    res.Set(r,g,b);
+    if (r > 255) r = 255;
+    if (g > 255) g = 255;
+    if (b > 255) b = 255;
+    res.Set(r, g, b);
     return res;
   }
-  haze = (spot.y-cam.y)/(radius - (cam.y-center.y));
-  haze = 1.0 - haze*haze;
+  haze = (spot.y-cam.y) / (radius - (cam.y - center.y));
+  haze = 1.0f - haze*haze;
 
   /// check sun
-  if(sundist> 1.0) sundist = 1.0;
-  sundist = 1.0-sundist;
+  if (sundist > 1.0f) sundist = 1.0f;
+  sundist = 1.0f - sundist;
   //float glaremoment = 0.5;
   //if(sundist > glaremoment) haze = (sundist-glaremoment)/(1.0-glaremoment);
 
   float elev = haze; //- sundist;
   //if(elev<0.0)elev=0.0;
   b = maxhaze.blue;
-  g = (int)( elev*float(maxhaze.green) );
-  r = (int)( elev*float(maxhaze.red) );
-  elev = 1.0 - elev;
-  b -= (int)( elev*70.0 );
+  g = (int)(elev * (float) maxhaze.green);
+  r = (int)(elev * (float) maxhaze.red);
+  elev = 1.0f - elev;
+  b -= (int)elev * 70.0f;
 
-  r += (int)( suncolor.red*sundist*255.);
-  g += (int)( suncolor.green*sundist*255.);
-  b += (int)( suncolor.blue*sundist*255.);
+  r += (int) suncolor.red * sundist * 255.0f;
+  g += (int) suncolor.green * sundist * 255.0f;
+  b += (int) suncolor.blue * sundist * 255.0f;
 
   //printf("color %d %d %d\n", res.red, res.green, res.blue);
-  if(r>255)r=255;
-  if(g>255)g=255;
-  if(b>255)b=255;
+  if (r > 255) r = 255;
+  if (g > 255) g = 255;
+  if (b > 255) b = 255;
   res.red = r;
   res.green = g;
-  res.blue =b;
+  res.blue = b;
   return res;
 }
 

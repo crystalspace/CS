@@ -241,7 +241,9 @@ bool csArchive::ReadArchiveComment (FILE *infile, size_t zipfile_comment_length)
     delete [] comment;
     comment = NULL;
   }
-  if (!(comment_length = zipfile_comment_length))
+
+  comment_length = zipfile_comment_length;
+  if (!comment_length)
     return true;
 
   if (!comment)

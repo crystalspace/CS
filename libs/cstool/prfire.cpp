@@ -87,10 +87,10 @@ void csProcFire::SetHSI(csColor& col, float H, float S, float I)
 {
   /// from Hue Saturation Intensity to Red Green Blue
   float Temp = H;
-  col.red = 1.0 + S * sin(Temp - TWO_PI / 3.0);
-  col.green = 1.0 + S * sin(Temp);
-  col.blue = 1.0 + S * sin(Temp + TWO_PI / 3.0);
-  Temp = 63.999 * I / 512.0;
+  col.red = 1.0f + S * sin(Temp - TWO_PI / 3.0f);
+  col.green = 1.0f + S * sin(Temp);
+  col.blue = 1.0f + S * sin(Temp + TWO_PI / 3.0f);
+  Temp = 63.999f * I / 512.0f;
   col *= Temp;
 }
 
@@ -109,26 +109,26 @@ void csProcFire::MakePalette (int max)
   int r,g,b;
   for (i = 0; i < maxcolours; i++)
   {
-    float H = 4.6 - 1.5 * float(i) / float(maxcolours);
+    float H = 4.6f - 1.5f * float(i) / float(maxcolours);
     float S = float(i) / float(maxcolours);
-    float I = 4.0 * float(i) / float(maxcolours);
-    if (i < palsize/4)
-      S=0.0;
+    float I = 4.0f * float(i) / float(maxcolours);
+    if (i < palsize / 4)
+      S=0.0f;
     SetHSI (col, H, S, I);
-    col *= 255.0;
+    col *= 255.0f;
     r = (int) col.red;
     g = (int) col.green;
     b = (int) col.blue;
     palette[i] = ptTxtMgr->FindRGB (r,g,b);
   }
   //// guess rest of colours
-  float inc = 512.0 / float (palsize - maxcolours);
+  float inc = 512.0f / float (palsize - maxcolours);
   for (i = maxcolours; i < palsize; i++)
   {
-    col.red += 2.0 * inc;
-    col.green += inc * 0.5;
-    col.blue += inc * 0.5;
-    col.Clamp (255.0, 255.0, 255.0);
+    col.red += 2.0f * inc;
+    col.green += inc * 0.5f;
+    col.blue += inc * 0.5f;
+    col.Clamp (255.0f, 255.0f, 255.0f);
     r = (int) col.red;
     g = (int) col.green;
     b = (int) col.blue;

@@ -243,17 +243,17 @@
    {
     switch(char_class)
     {
-  	case MATCH_ALPHA_TABLE: return isalpha(ch);
-  	case MATCH_DIGIT_TABLE: return isdigit(ch);
-  	case MATCH_ALNUM_TABLE: return isalnum(ch);
-  	case MATCH_PUNCT_TABLE: return ispunct(ch);
-  	case MATCH_SPACE_TABLE: return isspace(ch);
-  	case MATCH_CNTRL_TABLE: return iscntrl(ch);
-  	case MATCH_GRAPH_TABLE: return isgraph(ch);
-  	case MATCH_LOWER_TABLE: return islower(ch);
-  	case MATCH_UPPER_TABLE: return isupper(ch);
-  	case MATCH_PRINT_TABLE: return isprint(ch);
-  	case MATCH_XDIGIT_TABLE: return isxdigit(ch);
+    case MATCH_ALPHA_TABLE: return isalpha(ch) ? true : false;
+  	case MATCH_DIGIT_TABLE: return isdigit(ch) ? true : false;
+  	case MATCH_ALNUM_TABLE: return isalnum(ch) ? true : false;
+  	case MATCH_PUNCT_TABLE: return ispunct(ch) ? true : false;
+  	case MATCH_SPACE_TABLE: return isspace(ch) ? true : false;
+  	case MATCH_CNTRL_TABLE: return iscntrl(ch) ? true : false;
+  	case MATCH_GRAPH_TABLE: return isgraph(ch) ? true : false;
+  	case MATCH_LOWER_TABLE: return islower(ch) ? true : false;
+  	case MATCH_UPPER_TABLE: return isupper(ch) ? true : false;
+  	case MATCH_PRINT_TABLE: return isprint(ch) ? true : false;
+  	case MATCH_XDIGIT_TABLE: return isxdigit(ch) ? true : false;
   	default:
   	 return false;
     } // end switch char class

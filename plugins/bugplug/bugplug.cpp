@@ -586,7 +586,7 @@ bool csBugPlug::EatKey (iEvent& event)
         {
 	  if (!G3D) break;
 	  float val = G3D->GetRenderState (G3DRENDERSTATE_GAMMACORRECTION)
-		/ 65536.;
+		/ 65536.0f;
 	  sprintf (buf, "%g", val);
           EnterEditMode (cmd, "Enter new gamma:", buf);
 	}

@@ -63,8 +63,8 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   cur_cameranr = -1;
   cur_movablenr = -1;
   radiusx = radiusy = radiusz = 1;
-  max_radius.Set (1, 1, 1);
-  shift.Set (0, 0, 0);
+  max_radius.Set (0.0f, 0.0f, 0.0f);
+  shift.Set (0.0f, 0.0f, 0.0f);
   verts_circle = 6;
   material = NULL;
   MixMode = 0;
@@ -80,10 +80,10 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   toponly = false;
   cyl_mapping = false;
   do_lighting = true;
-  color.red = 0;
-  color.green = 0;
-  color.blue = 0;
-  current_lod = 1;
+  color.red = 0.0f;
+  color.green = 0.0f;
+  color.blue = 0.0f;
+  current_lod = 1.0f;
   current_features = 0;
   vbuf = NULL;
   vbufmgr = NULL;
@@ -170,7 +170,7 @@ float csBallMeshObject::GetScreenBoundingBox (long cameranr,
   {
     // Sprite is very close to camera.
     // Just return a maximum bounding box.
-    sbox.Set (-10000, -10000, 10000, 10000);
+    sbox.Set (-10000.0f, -10000.0f, 10000.0f, 10000.0f);
   }
   else
   {
@@ -197,7 +197,7 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
   csVector3* vertices = new csVector3[10000];	// Temporary only
   csVector2* uvverts = new csVector2[10000];
   csTriangle* triangles = new csTriangle[10000];
-  float radius = 1;
+  float radius = 1.0f;
 
   int prev_verticesT[60];
   int prev_verticesB[60];
@@ -205,7 +205,7 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
   int i, j;
 
   // Number of degrees between layers.
-  float radius_step = 180. / num;
+  float radius_step = 180.0f / num;
   float vert_radius = radius;
 
   // If cylindrical mapping is used we duplicate the last column of
@@ -216,26 +216,25 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
 
   // Generate the first series of vertices (the outer circle).
   // Calculate u,v for them.
-  for (j = 0 ; j < num2 ; j++)
+  for (j = 0; j < num2; j++)
   {
     float new_radius = radius;
-    float new_height = 0;
-    float angle = j*2.*radius_step * TWO_PI / 360.;
+    float new_height = 0.0f;
+    float angle = j * 2.0f * radius_step * TWO_PI / 360.0f;
     prev_verticesT[j] = num_vertices;
     prev_verticesB[j] = num_vertices;
-    vertices[num_vertices].Set (
-                         new_radius * cos (angle),
-                         new_height,
-                         new_radius * sin (angle));
+    vertices[num_vertices].Set (new_radius * (float) cos (angle),
+      new_height, new_radius * (float) sin (angle));
+
     if (cyl_mapping)
     {
       u = float (j) / float (num);
-      v = .5;
+      v = 0.5f;
     }
     else
     {
-      u = cos (angle) * .5 + .5;
-      v = sin (angle) * .5 + .5;
+      u = (float) cos (angle) * 0.5f + 0.5f;
+      v = (float) sin (angle) * 0.5f + 0.5f;
     }
     uvverts[num_vertices].Set (u, v);
     num_vertices++;
@@ -246,48 +245,45 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
   int new_verticesB[60];
 
   // First create the layered triangle strips.
-  for (i = 1 ; i < num/2 ; i++)
+  for (i = 1; i < (num / 2); i++)
   {
     //-----
     // First create a new series of vertices.
     //-----
     // Angle from the center to the new circle of vertices.
-    float new_angle = i*radius_step * TWO_PI / 360.;
+    float new_angle = i * radius_step * TWO_PI / 360.0f;
     // Radius of the new circle of vertices.
-    float new_radius = radius * cos (new_angle);
+    float new_radius = radius * (float) cos (new_angle);
     // Height of the new circle of vertices.
-    float new_height = vert_radius * sin (new_angle);
+    float new_height = vert_radius * (float) sin (new_angle);
     // UV radius.
-    float uv_radius = (1. - 2.*(float)i/(float)num) * .5;
-    for (j = 0 ; j < num2 ; j++)
+    float uv_radius = (1.0f - 2.0f * (float) i / (float)num) * 0.5f;
+    for (j = 0; j < num2; j++)
     {
-      float angle = j*2.*radius_step * TWO_PI / 360.;
+      float angle = j * 2.0f * radius_step * TWO_PI / 360.0f;
       if (cyl_mapping)
       {
         u = float (j) / float (num);
-        v = 1. - float (i+num/2) / float (num);
+        v = 1.0f - float (i + num / 2) / float (num);
       }
       else
       {
-        u = uv_radius * cos (angle) + .5;
-        v = uv_radius * sin (angle) + .5;
+        u = uv_radius * (float) cos (angle) + 0.5f;
+        v = uv_radius * (float) sin (angle) + 0.5f;
       }
       new_verticesT[j] = num_vertices;
-      vertices[num_vertices].Set (
-                         new_radius * cos (angle),
-                         new_height,
-                         new_radius * sin (angle));
+      vertices[num_vertices].Set (new_radius * (float) cos (angle),
+        new_height, new_radius * (float) sin (angle));
       uvverts[num_vertices].Set (u, v);
       num_vertices++;
 
       if (!toponly)
       {
         new_verticesB[j] = num_vertices;
-        vertices[num_vertices].Set (
-                           new_radius * cos (angle),
-                           -new_height,
-                           new_radius * sin (angle));
-	if (cyl_mapping) v = 1.-v;
+        vertices[num_vertices].Set (new_radius * (float) cos (angle),
+          -new_height, new_radius * (float) sin (angle));
+        
+        if (cyl_mapping) v = 1.0f - v;
         uvverts[num_vertices].Set (u, v);
         num_vertices++;
       }
@@ -296,7 +292,7 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
     //-----
     // Now make the triangle strips.
     //-----
-    for (j = 0 ; j < num ; j++)
+    for (j = 0; j < num; j++)
     {
       int j1num;
       if (cyl_mapping) j1num = j+1;
@@ -334,21 +330,21 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
 
   // Create the top and bottom vertices.
   int top_vertex = num_vertices;
-  vertices[num_vertices].Set (0, vert_radius, 0);
+  vertices[num_vertices].Set (0.0f, vert_radius, 0.0f);
   if (cyl_mapping)
-    uvverts[num_vertices].Set (.5, 0);
+    uvverts[num_vertices].Set (0.5f, 0.0f);
   else
-    uvverts[num_vertices].Set (.5, .5);
+    uvverts[num_vertices].Set (0.5f, 0.5f);
   num_vertices++;
   int bottom_vertex = 0;
   if (!toponly)
   {
     bottom_vertex = num_vertices;
-    vertices[num_vertices].Set (0, -vert_radius, 0);
+    vertices[num_vertices].Set (0.0f, -vert_radius, 0.0f);
     if (cyl_mapping)
-      uvverts[num_vertices].Set (.5, 1);
+      uvverts[num_vertices].Set (0.5f, 1.0f);
     else
-      uvverts[num_vertices].Set (.5, .5);
+      uvverts[num_vertices].Set (0.5f, 0.5f);
     num_vertices++;
   }
 
@@ -411,7 +407,7 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
   memcpy (ball_texels, uvverts, sizeof(csVector2)*num_vertices);
   ball_colors = new csColor[num_vertices];
   for (i = 0 ; i < num_vertices ; i++)
-    ball_colors[i].Set (1, 1, 1);
+    ball_colors[i].Set (1.0f, 1.0f, 1.0f);
   mesh.vertex_fog = new G3DFogInfo[num_vertices];
   mesh.num_triangles = num_triangles;
   mesh.triangles = new csTriangle[num_triangles];
@@ -446,7 +442,7 @@ void csBallMeshObject::SetupObject ()
       csVector3 (-radiusx, -radiusy, -radiusz) + shift);
     object_bbox.AddBoundingVertexSmart (
       csVector3 ( radiusx,  radiusy,  radiusz) + shift);
-    top_mesh.morph_factor = 0;
+    top_mesh.morph_factor = 0.0f;
     top_mesh.num_vertices_pool = 1;
     top_mesh.do_morph_texels = false;
     top_mesh.do_morph_colors = false;
@@ -561,10 +557,10 @@ void csBallMeshObject::UpdateLighting (iLight** lights, int num_lights,
 
     csVector3 obj_light_dir = (obj_light_pos - obj_center);
 
-    csColor light_color = li->GetColor () * (256. / CS_NORMAL_LIGHT_LEVEL)
+    csColor light_color = li->GetColor () * (256.0f / CS_NORMAL_LIGHT_LEVEL)
       * li->GetBrightnessAtDistance (qsqrt (wor_sq_dist));
 
-    for (i = 0 ; i < num_ball_vertices ; i++)
+    for (i = 0; i < num_ball_vertices; i++)
     {
       csVector3 normal = top_normals[i];
       float cosinus;
@@ -575,7 +571,7 @@ void csBallMeshObject::UpdateLighting (iLight** lights, int num_lights,
       {
         color = light_color;
         if (obj_sq_dist >= SMALL_EPSILON) cosinus *= in_obj_dist;
-        if (cosinus < 1) color *= cosinus;
+        if (cosinus < 1.0f) color *= cosinus;
 	colors[i] += color;
       }
     }
@@ -583,7 +579,7 @@ void csBallMeshObject::UpdateLighting (iLight** lights, int num_lights,
 
   // Clamp all vertex colors to 2.
   for (i = 0 ; i < num_ball_vertices ; i++)
-    colors[i].Clamp (2., 2., 2.);
+    colors[i].Clamp (2.0f, 2.0f, 2.0f);
 }
 
 bool csBallMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
@@ -653,7 +649,7 @@ bool csBallMeshObject::HitBeamOutline (const csVector3& start,
     	vrt[tr[i].c], seg, isect))
     {
       if (pr) *pr = qsqrt (csSquaredDist::PointPoint (start, isect) /
-		csSquaredDist::PointPoint (start, end));
+        csSquaredDist::PointPoint (start, end));
 
       return true;
     }
@@ -673,11 +669,11 @@ bool csBallMeshObject::HitBeamObject(const csVector3& start,
   int i, max = top_mesh.num_triangles;
   float tot_dist = csSquaredDist::PointPoint (start, end);
   float dist, temp;
-  float itot_dist = 1 / tot_dist;
+  float itot_dist = 1.0f / tot_dist;
   dist = temp = tot_dist;
   csVector3 *vrt = ball_vertices, tmp;
   csTriangle *tr = top_mesh.triangles;
-  for (i = 0 ; i < max ; i++)
+  for (i = 0; i < max; i++)
   {
     if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],
     	vrt[tr[i].c], seg, tmp))
@@ -686,7 +682,7 @@ bool csBallMeshObject::HitBeamObject(const csVector3& start,
       {
           isect = tmp;
 	  dist = temp;
-          if (pr) *pr = qsqrt( dist * itot_dist);
+          if (pr) *pr = qsqrt(dist * itot_dist);
       }
     }
   }
@@ -711,7 +707,7 @@ static void GetGradientColor(float **gradient, float val, csColor& col)
 {
   if(gradient == NULL || gradient[0] == NULL)
   {
-    col.Set(0,0,0);
+    col.Set(0.0f, 0.0f, 0.0f);
     return;
   }
   int entry = 0;
@@ -720,7 +716,7 @@ static void GetGradientColor(float **gradient, float val, csColor& col)
   {
     if(entry>0) col.Set( gradient[entry-1][1], gradient[entry-1][2],
       gradient[entry-1][3]);
-    else col.Set(0,0,0);
+    else col.Set(0.0f, 0.0f, 0.0f);
     return;
   }
   if(entry <= 0)
@@ -733,7 +729,7 @@ static void GetGradientColor(float **gradient, float val, csColor& col)
   CS_ASSERT( gradient[entry][0] >= gradient[entry-1][0] );
   float sc1 = val - gradient[entry-1][0];
   float sc2 = gradient[entry][0] - val;
-  float invdist = 1.0 / (gradient[entry][0] - gradient[entry-1][0]);
+  float invdist = 1.0f / (gradient[entry][0] - gradient[entry-1][0]);
   sc1 *= invdist;
   sc2 *= invdist;
 
@@ -750,7 +746,7 @@ void csBallMeshObject::ApplyVertGradient(float horizon_height,
   SetupObject();
   CS_ASSERT( zenith_height > horizon_height );
   //printf("ApplyVertGradient\n");
-  float invdist = 1.0 / (zenith_height - horizon_height);
+  float invdist = 1.0f / (zenith_height - horizon_height);
   csColor color(0,0,0);
   for(int i=0; i<num_ball_vertices; i++)
   {
@@ -769,13 +765,13 @@ void csBallMeshObject::ApplyLightSpot(const csVector3& position, float size,
   pos = pos * (radiusy/len);
   pos += shift;
   /// see if gradient is given
-  float sun1[] = {0., 1.,1.,.6};
-  float sun2[] = {1., 1.,0.8,.6};
+  float sun1[] = {0.0f, 1.0f, 1.0f, 0.6f};
+  float sun2[] = {1.0f, 1.0f, 0.8f, 0.6f};
   float *sungrad[] = {sun1, sun2, NULL};
   float **grad = sungrad;
   if(gradient) grad = gradient;
   /// compute the max distance for the lightspot given radius.
-  float maxdist = radiusy * size / 1.4;
+  float maxdist = radiusy * size / 1.4f;
   //float maxdist = radiusy * radiusy * size / 2.4;
   /// apply the spot
   csColor color(0,0,0);
@@ -783,12 +779,12 @@ void csBallMeshObject::ApplyLightSpot(const csVector3& position, float size,
   {
     float val = (ball_vertices[i] - pos).Norm() / maxdist;
     GetGradientColor(grad, val, color);
-    float apply = 1.0-val;
-    if(apply <= 0.0) continue;
+    float apply = 1.0f - val;
+    if(apply <= 0.0f) continue;
     //if(apply >= 1.0) apply = 1.0;
     //ball_colors[i] = ball_colors[i]*(1-apply) + color*apply;
     ball_colors[i] += color*apply;
-    ball_colors[i].Clamp(2,2,2);
+    ball_colors[i].Clamp(2.0f, 2.0f, 2.0f);
     ball_colors[i].ClampDown();
   }
 }
@@ -798,22 +794,22 @@ void csBallMeshObject::PaintSky(float time, float **dayvert, float **nightvert,
   float **topsun, float **sunset)
 {
   // apply defaults if needed
-  float sky1[] = {0.0, .5, .6, 1.};
-  float sky2[] = {1.0, .1, .3, .8};
+  float sky1[] = {0.0f, 0.5f, 0.6f, 1.0f};
+  float sky2[] = {1.0f, 0.1f, 0.3f, 0.8f};
   float* def_dayvert[] = {sky1, sky2, NULL};
 
-  float night1[] = {0.0, 0.1,0.1,0.1};
-  float night2[] = {1.0, 0,0,0};
+  float night1[] = {0.0f, 0.1f, 0.1f, 0.1f};
+  float night2[] = {1.0f, 0.0f, 0.0f, 0.0f};
   float* def_nightvert[] = {night1, night2, NULL};
 
-  float sun0[] = {0., 1.,1., .6};
-  float sun1[] = {0.5,1.,0.9,.6};
-  float sun2[] = {1., 1.,0.8,.6};
+  float sun0[] = {0.0f, 1.0f, 1.0f, 0.6f};
+  float sun1[] = {0.5f, 1.0f, 0.9f, 0.6f};
+  float sun2[] = {1.0f, 1.0f, 0.8f, 0.6f};
   float *def_topsun[] = {sun0, sun1, sun2, NULL};
 
-  float sunset0[] = {0.0, 0.9,0.9,-0.9};
-  float sunset1[] = {0.5, 0.1,-0.8,-0.6};
-  float sunset2[] = {1.0, 1,-0.9,1};
+  float sunset0[] = {0.0f, 0.9f, 0.9f, -0.9f};
+  float sunset1[] = {0.5f, 0.1f, -0.8f, -0.6f};
+  float sunset2[] = {1.0f, 1.0f, -0.9f, 1.0f};
   float* def_sunset[] = {sunset0, sunset1, sunset2, NULL};
 
   if(!dayvert) dayvert = def_dayvert;
@@ -821,8 +817,8 @@ void csBallMeshObject::PaintSky(float time, float **dayvert, float **nightvert,
   if(!topsun) topsun = def_topsun;
   if(!sunset) sunset = def_sunset;
   // scale time to 0-1.
-  while(time < 0.0) time += 1.0;
-  while(time >= 1.0) time -= 1.0;
+  while(time < 0.0f) time += 1.0f;
+  while(time >= 1.0f) time -= 1.0f;
   // allocate application gradients
   int vertlen = 0;
   int sunlen = 0;
@@ -840,19 +836,19 @@ void csBallMeshObject::PaintSky(float time, float **dayvert, float **nightvert,
     applysun[i] = new float [4];
 
   // interpolate the gradients
-  float day_amount = 1.0;
+  float day_amount = 1.0f;
   // 0.9 -- 0.1 is night to day shift
-  if(time <= 0.1) day_amount = (time + 0.1) / 0.2;
-  if(time >= 0.9) day_amount = (time - 0.9) / 0.2;
+  if(time <= 0.1f) day_amount = (time + 0.1f) / 0.2f;
+  if(time >= 0.9f) day_amount = (time - 0.9f) / 0.2f;
   // 0.4 -- 0.6 is day to night shift
-  if( (time >= 0.4) && (time <= 0.6))
-    day_amount = (0.6 - time) / 0.2;
+  if( (time >= 0.4f) && (time <= 0.6f))
+    day_amount = (0.6f - time) / 0.2f;
   // 0.6 -- 0.9 is night
-  if( (time > 0.6) && (time < 0.9))
-    day_amount = 0.0;
+  if( (time > 0.6f) && (time < 0.9f))
+    day_amount = 0.0f;
 
   float sc1 = day_amount;
-  float sc2 = 1.0 - day_amount;
+  float sc2 = 1.0f - day_amount;
   for(i=0; i<vertlen; i++)
   {
     CS_ASSERT( dayvert[i][0] == nightvert[i][0] ) ;
@@ -862,15 +858,15 @@ void csBallMeshObject::PaintSky(float time, float **dayvert, float **nightvert,
     applyvert[i][3] = sc1 * dayvert[i][3] + sc2 * nightvert[i][3];
   }
 
-  float sunset_amount = 0.0;
-  if(time <= 0.1) sunset_amount = (0.1 - time) / 0.2;
-  if(time >= 0.9) sunset_amount = (1.1 - time) / 0.2;
-  if( (time >= 0.4) && (time <= 0.6))
-    sunset_amount = (time - 0.4) / 0.2;
-  if( (time > 0.6) && (time < 0.9))
-    sunset_amount = 1.0;
+  float sunset_amount = 0.0f;
+  if(time <= 0.1f) sunset_amount = (0.1f - time) / 0.2f;
+  if(time >= 0.9f) sunset_amount = (1.1f - time) / 0.2f;
+  if( (time >= 0.4f) && (time <= 0.6f))
+    sunset_amount = (time - 0.4f) / 0.2f;
+  if( (time > 0.6f) && (time < 0.9f))
+    sunset_amount = 1.0f;
 
-  sc1 = 1.0 - sunset_amount;
+  sc1 = 1.0f - sunset_amount;
   sc2 = sunset_amount;
   for(i=0; i<sunlen; i++)
   {
@@ -890,28 +886,28 @@ void csBallMeshObject::PaintSky(float time, float **dayvert, float **nightvert,
   // 0.0 is east, 0.5 is west.
   csVector3 sunpos = shift;
   float scaletime = time * TWO_PI;
-  sunpos.x += cos( scaletime ) * radiusx;
-  sunpos.y += sin( scaletime ) * radiusy;
-  sunpos.z -= sin( scaletime ) * radiusz;
+  sunpos.x += (float) cos(scaletime) * radiusx;
+  sunpos.y += (float) sin(scaletime) * radiusy;
+  sunpos.z -= (float) sin(scaletime) * radiusz;
   ApplyLightSpot(sunpos, apply_size, applysun);
 
   /// compute apparent light
   csColor apparent(1,1,1);
   if(sunpos.y >= shift.y)
-    GetGradientColor(applysun, 0.0, apparent);
+    GetGradientColor(applysun, 0.0f, apparent);
   else
   {
-    float maxdist = radiusy * apply_size / 1.4;
-    if( ((time > 0.6) && (time < 0.9))
+    float maxdist = radiusy * apply_size / 1.4f;
+    if( ((time > 0.6f) && (time < 0.9f))
        || (sunpos.y < shift.y - maxdist))
-      apparent.Set(0,0,0); // deep night
+      apparent.Set(0.0f, 0.0f, 0.0f); // deep night
     else
       GetGradientColor(applysun, (shift.y - sunpos.y)/maxdist, apparent);
   }
   csColor skyatsun;
-  GetGradientColor(applyvert, 0.0, skyatsun);
+  GetGradientColor(applyvert, 0.0f, skyatsun);
   apparent += skyatsun;
-  apparent.Clamp(2.0, 2.0, 2.0);
+  apparent.Clamp(2.0f, 2.0f, 2.0f);
   apparent.ClampDown();
   //printf("Apparent is %g, %g, %g\n", apparent.red, apparent.green,
     //apparent.blue);

@@ -153,7 +153,7 @@ public:
     return (CurrentIterator ? CurrentIterator->GetInt() : 0);
   }
   virtual float GetFloat() const {
-    return (CurrentIterator ? CurrentIterator->GetFloat() : 0.0);
+    return (CurrentIterator ? CurrentIterator->GetFloat() : 0.0f);
   }
   virtual const char *GetStr() const {
     return (CurrentIterator ? CurrentIterator->GetStr() : "");

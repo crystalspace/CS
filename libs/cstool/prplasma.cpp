@@ -103,31 +103,31 @@ void csProcPlasma::MakePalette (int max)
   palsize = max;
   palette = new int[palsize];
   palette[0] = ptTxtMgr->FindRGB (0,0,0);
-  for (i=0; i<palsize; i++)
+  for (i = 0; i < palsize; i++)
     palette[i] = palette[0];
   /// fill the palette
   int maxcolours = palsize;
   csColor col;
   int r,g,b;
-  for (i=0; i<maxcolours; i++)
+  for (i = 0; i < maxcolours; i++)
   {
-    col.Set(0.9,0.9,1.0);
+    col.Set(0.9f, 0.9f, 1.0f);
     float val;// = float(GetCos( (i*4)%256))/float(64);
     val = float(i) / float(maxcolours);
-    float I = val*val;
+    float I = val * val;
     col *= I;
-    col *= 255.0;
+    col *= 255.0f;
     r = (int) col.red;
     g = (int) col.green;
     b = (int) col.blue;
-    palette[i] = ptTxtMgr->FindRGB(r,g,b);
+    palette[i] = ptTxtMgr->FindRGB(r, g, b);
   }
 }
 
 void csProcPlasma::Animate (csTicks current_time)
 {
   (void)current_time;
-  int x,y;
+  int x, y;
   /// draw palette
   //for(int i=0; i<palsize; i++)
   //{
