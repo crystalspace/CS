@@ -46,11 +46,11 @@ enum
 class csTimer : public csComponent
 {
   /// Timer period in milliseconds
-  unsigned long timeout;
+  time_t timeout;
   /// Period start
-  unsigned long start;
+  time_t start;
   /// Pause time before counting begins
-  unsigned long pause;
+  time_t pause;
   /// Timer is stopped?
   bool Stopped;
 
