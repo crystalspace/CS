@@ -29,13 +29,17 @@ struct iGUIConnection : public iBase
   /// The server calls this whenever it wants to send data to a client.
   virtual bool SendDataToClient (csGUIClientHandle, void *buf, size_t len) = 0;
 
-  /// The client helper calls this when it wants to see if the server has
-  /// sent any data. It writes the data to the given buffer and returns the
-  /// number of bytes actually written.
+  /**
+   * The client helper calls this when it wants to see if the server has
+   * sent any data. It writes the data to the given buffer and returns the
+   * number of bytes actually written.
+   */
   virtual size_t GetDataFromServer (void *data, size_t len) = 0;
 
-  /// The client helper calls then when it wants to send data to the server.
-  /// It reads len bytes from the given buffer.
+  /**
+   * The client helper calls then when it wants to send data to the server.
+   * It reads len bytes from the given buffer.
+   */
   virtual bool SendDataToServer (void *buf, size_t len) = 0;
 };
 

@@ -21,7 +21,6 @@ SCF_VERSION (iGUIConnection, 0, 0, 1);
  */
 struct iGUIConnection : public iBase
 {
-
 };
 
 SCF_VERSION (iGUIServer, 0, 0, 1);

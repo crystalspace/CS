@@ -91,52 +91,76 @@ struct iScriptObject : public iBase
   virtual bool Call (const char *name, csRef<iScriptObject> &ret,
     const char *fmt, ...) CS_GNUC_PRINTF(4, 5) = 0;
 
-  /// Set the value of an int variable in the script interpreter.
-  /// Returns false if the named property does not exist.
+  /**
+   * Set the value of an int variable in the script interpreter.
+   * Returns false if the named property does not exist.
+   */
   virtual bool Set (const char *name, int data) = 0;
 
-  /// Set the value of a float variable in the script interpreter.
-  /// Returns false if the named property does not exist.
+  /**
+   * Set the value of a float variable in the script interpreter.
+   * Returns false if the named property does not exist.
+   */
   virtual bool Set (const char *name, float data) = 0;
 
-  /// Set the value of a double variable in the script interpreter.
-  /// Returns false if the named property does not exist.
+  /**
+   * Set the value of a double variable in the script interpreter.
+   * Returns false if the named property does not exist.
+   */
   virtual bool Set (const char *name, double data) = 0;
 
-  /// Set the value of a string variable in the script interpreter.
-  /// Returns false if the named property does not exist.
+  /**
+   * Set the value of a string variable in the script interpreter.
+   * Returns false if the named property does not exist.
+   */
   virtual bool Set (const char *name, char *data) = 0;
 
-  /// Set the value of an object variable in the script interpreter.
-  /// Returns false if the named property does not exist.
+  /**
+   * Set the value of an object variable in the script interpreter.
+   * Returns false if the named property does not exist.
+   */
   virtual bool Set (const char *name, iScriptObject *data) = 0;
 
-  /// Set the value of a bool variable in the script interpreter.
-  /// Returns false if the named property does not exist.
+  /**
+   * Set the value of a bool variable in the script interpreter.
+   * Returns false if the named property does not exist.
+   */
   virtual bool SetTruth (const char *name, bool isTrue) = 0;
 
-  /// Get the value of an int variable in the script interpreter.
-  /// Returns false if the named property does not exist.
+  /**
+   * Get the value of an int variable in the script interpreter.
+   * Returns false if the named property does not exist.
+   */
   virtual bool Get (const char *name, int &data) const = 0;
 
-  /// Get the value of a float variable in the script interpreter.
-  /// Returns false if the named property does not exist.
+  /**
+   * Get the value of a float variable in the script interpreter.
+   * Returns false if the named property does not exist.
+   */
   virtual bool Get (const char *name, float &data) const = 0;
 
-  /// Get the value of a double variable in the script interpreter.
-  /// Returns false if the named property does not exist.
+  /**
+   * Get the value of a double variable in the script interpreter.
+   * Returns false if the named property does not exist.
+   */
   virtual bool Get (const char *name, double &data) const = 0;
 
-  /// Get the value of a string variable in the script interpreter.
-  /// Returns false if the named property does not exist.
+  /**
+   * Get the value of a string variable in the script interpreter.
+   * Returns false if the named property does not exist.
+   */
   virtual bool Get (const char *name, char **data) const = 0;
 
-  /// Get the value of an object variable in the script interpreter.
-  /// Returns false if the named variable does not exist.
+  /**
+   * Get the value of an object variable in the script interpreter.
+   * Returns false if the named variable does not exist.
+   */
   virtual bool Get (const char *name, csRef<iScriptObject> &data) const = 0;
 
-  /// Get the value of a bool variable in the script interpreter.
-  /// Returns false if the named property does not exist.
+  /**
+   * Get the value of a bool variable in the script interpreter.
+   * Returns false if the named property does not exist.
+   */
   virtual bool GetTruth (const char *name, bool &isTrue) const = 0;
 };
 
@@ -146,7 +170,7 @@ SCF_VERSION (iScript, 0, 0, 2);
 
 /**
  * This provides the interface to a scripting language interpreter.
- *
+ * <p>
  * Several functions here take a variable-length argument list with a
  * printf-style format string supporting all the argument types supported by
  * printf, except width and precision specifiers, as they have no meaning here.
@@ -242,32 +266,46 @@ struct iScript : public iBase
   /// Set the value of a bool variable in the script interpreter.
   virtual bool SetTruth (const char *name, bool isTrue) = 0;
 
-  /// Get the value of an int variable in the script interpreter.
-  /// Returns false if the named variable does not exist.
+  /**
+   * Get the value of an int variable in the script interpreter.
+   * Returns false if the named variable does not exist.
+   */
   virtual bool Retrieve (const char *name, int &data) const = 0;
 
-  /// Get the value of a float variable in the script interpreter.
-  /// Returns false if the named variable does not exist.
+  /**
+   * Get the value of a float variable in the script interpreter.
+   * Returns false if the named variable does not exist.
+   */
   virtual bool Retrieve (const char *name, float &data) const = 0;
 
-  /// Get the value of a double variable in the script interpreter.
-  /// Returns false if the named variable does not exist.
+  /**
+   * Get the value of a double variable in the script interpreter.
+   * Returns false if the named variable does not exist.
+   */
   virtual bool Retrieve (const char *name, double &data) const = 0;
 
-  /// Get the value of a string variable in the script interpreter.
-  /// Returns false if the named variable does not exist.
+  /**
+   * Get the value of a string variable in the script interpreter.
+   * Returns false if the named variable does not exist.
+   */
   virtual bool Retrieve (const char *name, char **data) const = 0;
 
-  /// Get the value of an object variable in the script interpreter.
-  /// Returns false if the named variable does not exist.
+  /**
+   * Get the value of an object variable in the script interpreter.
+   * Returns false if the named variable does not exist.
+   */
   virtual bool Retrieve (const char *name, csRef<iScriptObject>&data) const = 0;
 
-  /// Get the value of a bool variable in the script interpreter.
-  /// Returns false if the named variable does not exist.
+  /**
+   * Get the value of a bool variable in the script interpreter.
+   * Returns false if the named variable does not exist.
+   */
   virtual bool GetTruth (const char *name, bool &isTrue) const = 0;
 
-  /// Remove a variable from the script interpreter.
-  /// Returns false if the named variable does not exist.
+  /**
+   * Remove a variable from the script interpreter.
+   * Returns false if the named variable does not exist.
+   */
   virtual bool Remove (const char *name) = 0;
 };
 

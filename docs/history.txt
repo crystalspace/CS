@@ -33,6 +33,8 @@ for each given day, however, are in normal (ascending) chronological order.
 	  with 'uint32' to store the flags.
 	- Jorrit marked csPArray<T> as deprecated.
 	- Jorrit cleaned up several include files in include/imesh.
+	- Jorrit cleaned up several include files and Doxygen commments
+	  in include/ivaria.
 26-Jul-2003
 	- Wouter Wijngaards fixed the partedit awssink.cpp file, removed
 	  'static' from enums and put initializers for a constructor

@@ -56,16 +56,14 @@ SCF_VERSION (iCollideSystem, 0, 0, 3);
  */
 struct iCollideSystem : public iBase
 {
-
-  /// Create an iCollider for the given mesh geometry.
+  /// Create a iCollider for the given mesh geometry.
   virtual csPtr<iCollider> CreateCollider (iPolygonMesh* mesh) = 0;
   
-  /// Create an iPrimSphereCollider for the given sphere geometry
+  /// Create a iCollider for the given sphere geometry.
   virtual csPtr<iCollider> CreateSphereCollider (iMeshObject* sphere) = 0;
 
-  /// Create an iPrimBoxCollider for the given box geometry
+  /// Create a iCollider for the given box geometry.
   virtual csPtr<iCollider> CreateBoxCollider (iMeshObject* box) = 0;
-  
  
   /**
    * Test collision between two colliders.

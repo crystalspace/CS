@@ -114,16 +114,18 @@ struct iDynamicSystem : public iBase
 
   /// The following colliders exist relative only to the space and are static
   virtual bool AttachColliderMesh (iMeshWrapper* mesh,
-  	const csOrthoTransform& trans, float friction, float elasticity, float softness = 0.316f) = 0;
+  	const csOrthoTransform& trans, float friction,
+	float elasticity, float softness = 0.316f) = 0;
   virtual bool AttachColliderCylinder (float length, float radius,
-  	const csOrthoTransform& trans, float friction, float elasticity, float softness = 0.316f) = 0;
+  	const csOrthoTransform& trans, float friction,
+	float elasticity, float softness = 0.316f) = 0;
   virtual bool AttachColliderBox (const csVector3 &size,
-  	const csOrthoTransform& trans, float friction, float elasticity, float softness = 0.316f) = 0;
+  	const csOrthoTransform& trans, float friction,
+	float elasticity, float softness = 0.316f) = 0;
   virtual bool AttachColliderSphere (float radius, const csVector3 &offset,
   	float friction, float elasticity, float softness = 0.316f) = 0;
   virtual bool AttachColliderPlane (const csPlane3 &plane, float friction,
-    float elasticity, float softness = 0.316f) = 0;
-
+	float elasticity, float softness = 0.316f) = 0;
 };
 
 SCF_VERSION (iDynamicsMoveCallback, 0, 0, 1);
@@ -206,7 +208,8 @@ struct iRigidBody : public iBase
   	const csOrthoTransform& trans, float friction, float density,
 	float elasticity, float softness = 0.316f) = 0;
   virtual bool AttachColliderSphere (float radius, const csVector3 &offset,
-  	float friction, float density, float elasticity, float softness = 0.316f) = 0;
+  	float friction, float density, float elasticity,
+	float softness = 0.316f) = 0;
   virtual bool AttachColliderPlane (const csPlane3 &plane, float friction,
     float density, float elasticity, float softness = 0.316f) = 0;
 

@@ -69,7 +69,7 @@ SCF_VERSION (iIsoEngine, 0, 1, 1);
 
 /**
  * SCF Interface to the isometric engine.
-*/
+ */
 struct iIsoEngine : public iBase
 {
   /// Get the system
@@ -130,7 +130,7 @@ SCF_VERSION (iIsoWorld, 0, 0, 1);
 
 /**
  * The isometric world, contains all the sprites to render the world.
-*/
+ */
 struct iIsoWorld : public iBase
 {
   /// Add a sprite to this world
@@ -157,7 +157,7 @@ SCF_VERSION (iIsoGrid, 0, 0, 1);
  * contains sort of a screenfull of world space.
  * it has a width in number of cells - laying in the z direction.
  * and it has a height in number of cells - laying in the x direction.
-*/
+ */
 struct iIsoGrid : public iBase
 {
   /// the the world that this grid is part of.
@@ -184,18 +184,20 @@ struct iIsoGrid : public iBase
   /// get a cell by index
   virtual iIsoCell* GetGridCell(int x, int y) = 0;
 
-  /** Set the ground level precision, default is 1,1
-   *  you give a multiplier, each cell in the grid then has
-   *  multx x multy ground values. This resets the groundmap.
+  /**
+   * Set the ground level precision, default is 1,1
+   * you give a multiplier, each cell in the grid then has
+   * multx x multy ground values. This resets the groundmap.
    */
   virtual void SetGroundMult(int multx, int multy) = 0;
   /// get the x mult
   virtual int GetGroundMultX() const = 0;
   /// get the y mult
   virtual int GetGroundMultY() const = 0;
-  /** Set a ground value for cell, and subground index grx, gry.
-   *  0 < grx < multx, 0 < gry < multy. x,y are cell indices.
-   *  the value is the height of the floor. Walls have a high value.
+  /**
+   * Set a ground value for cell, and subground index grx, gry.
+   * 0 < grx < multx, 0 < gry < multy. x,y are cell indices.
+   * the value is the height of the floor. Walls have a high value.
    */
   virtual void SetGroundValue(int x, int y, int gr_x, int gr_y, float val) = 0;
   /// get a ground value, same syntax as SetGroundValue.
@@ -228,9 +230,9 @@ struct iIsoGrid : public iBase
   /// Remove a sprite from this grid
   virtual void RemoveSprite(iIsoSprite *sprite) = 0;
   /**
-    * Move a sprite already in this grid, give previous and new position
-    * (used internally by IsoSprite).
-    */
+   * Move a sprite already in this grid, give previous and new position
+   * (used internally by IsoSprite).
+   */
   virtual void MoveSprite(iIsoSprite *sprite, const csVector3& oldpos,
     const csVector3& newpos) = 0;
 
@@ -253,7 +255,7 @@ SCF_VERSION (iIsoCell, 0, 0, 2);
 
 /**
  * a grid cell. Size is 1.000 x 1.000 in (x,z) world space.
-*/
+ */
 struct iIsoCell : public iBase
 {
   /// Add a sprite to this cell at pos (used internally)
@@ -282,7 +284,7 @@ SCF_VERSION (iIsoView, 0, 0, 1);
  *     \.
  *       \.
  *         \+x
-*/
+ */
 struct iIsoView : public iBase
 {
   /// Get the iso engine this view belongs to.
@@ -298,15 +300,16 @@ struct iIsoView : public iBase
   /// Get the rectangle on the screen to draw to
   virtual const csRect& GetRect() const = 0;
 
-  /** set the axis of the view on the world.
-   *  The scale is in pixels, and must be > 0. Default is g3d->height/16.
-   *  The skew values determine the angle of the z and x axis.
-   *  it is the amount of vertical change per horizontal change.
-   *  1.0 gives perfect isometrical view, 0.5 flattens the lines.
-   *  skew values must be > 0.
-   *  For a nice y scale, (sqrt(xskew*xskew+1+sqrt(yskew*yskew+1)/2
-   *  can compensate for the lengthening and shortening of the axes due
-   *  to the skewing.
+  /**
+   * Set the axis of the view on the world.
+   * The scale is in pixels, and must be > 0. Default is g3d->height/16.
+   * The skew values determine the angle of the z and x axis.
+   * it is the amount of vertical change per horizontal change.
+   * 1.0 gives perfect isometrical view, 0.5 flattens the lines.
+   * skew values must be > 0.
+   * For a nice y scale, (sqrt(xskew*xskew+1+sqrt(yskew*yskew+1)/2
+   * can compensate for the lengthening and shortening of the axes due
+   * to the skewing.
    */
   virtual void SetAxes(float xscale, float yscale, float zscale,
     float zskew, float xskew) = 0;
@@ -323,19 +326,19 @@ struct iIsoView : public iBase
   /// Transform world space coordinate into a screen coordinate.
   virtual void W2S(const csVector3& world, csVector2& screen) const = 0;
   /**
-   *  Transform world space coordinate into a screen coordinate.
-   *  The returned z value can be used for a zbuffer, is bigger when
-   *  further away.
+   * Transform world space coordinate into a screen coordinate.
+   * The returned z value can be used for a zbuffer, is bigger when
+   * further away.
    */
   virtual void W2S(const csVector3& world, csVector3& screen) const = 0;
   /**
-   *  Transform screen coordinate into a world space coordinate.
-   *  The world space coordinate will have y=0.
+   * Transform screen coordinate into a world space coordinate.
+   * The world space coordinate will have y=0.
    */
   virtual void S2W(const csVector2& screen, csVector3& world) const = 0;
 
   /**
-   * draw the view onto the screen.
+   * Draw the view onto the screen.
    * Call this when in 3d mode (with the engine->getBeginDrawFlags passed)
    */
   virtual void Draw() = 0;
@@ -364,7 +367,7 @@ SCF_VERSION (iIsoRenderView, 0, 0, 1);
 
 /**
  * a view being rendered onto the screen.
-*/
+ */
 struct iIsoRenderView : public iBase
 {
   /// get the view for this rendering
@@ -391,7 +394,7 @@ SCF_VERSION (iIsoSprite, 0, 0, 1);
 
 /**
  * A sprite for the isometric engine.
-*/
+ */
 struct iIsoSprite : public iBase
 {
   /// get the number of vertices
@@ -498,7 +501,7 @@ SCF_VERSION (iIsoLight, 0, 0, 1);
 
 /**
  * A light for the isometric engine.
-*/
+ */
 struct iIsoLight : public iBase
 {
   /// set the grid for this light, first set the light dynamic if you want
@@ -540,7 +543,7 @@ SCF_VERSION (iIsoMaterialWrapperIndex, 0, 0, 1);
  * the materialwrappers, iMaterialWrappers made by the isoengine,
  * also implement this interface, giving an index in the materials list.
  * It is used inside the engine
-*/
+ */
 struct iIsoMaterialWrapperIndex: public iBase
 {
   /// Get the index
