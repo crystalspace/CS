@@ -13,6 +13,26 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+22-Jul-1999
+	- Updated some docs (like the todo and faq).
+	- Added a callback to csSprite3D which is called just before the
+	  sprite is drawn. This allows games to delay expensive sprite
+	  operations until just before the sprite becomes visible.
+	  The ghost and skeletal trees use this feature to stop animating
+	  once they are no longer visible.
+	- Defined COMBOOL as BOOL on Windows (safer).
+	- Andrew Zabolotny added a static OpenGL 2D driver for OS/2.
+	- Andrew also did some small fixes to the OS/2 port.
+	- Significant change to the makefile system from Andrew.
+	  First, there is no more need to add support for specific OS
+	  targets into root Makefile. It will search the mk/system
+	  directory for available targets.
+	  'make depend' works better now.
+	  volatile.h is now generated only during 'make system' run
+	  (along with config.mak). Don't change config.mak manually!
+	  (note from Jorrit: as a result of these makefile changes the
+	  Linux port will now run about 25-50% faster compared to the
+	  previous CVS update. This is no joke! :-)
 21-Jul-1999
 	- Eric Sunshine uploaded new archives of zlib, libpng, and libjpeg
 	  to the Crystal Space ftp site which conform to the new beta 13

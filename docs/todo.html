@@ -10,41 +10,15 @@ Note that some of the wanted features in this list are currently
 being worked on by some people. Always check on the developers mailing
 list first.
 
-<h1>Bugs</h1>
 <ul>
-<li> The u/v overflow tests in the draw_scanline routines should
-     be either removed or minimized.
-<li> Shadows are not always very accurate at the boundaries of
-     different polygons. This is because the lightmap grids
-     of the bordering polygons are not always aligned. I need to
-     force the alignment so that shadows are always nicely shaded.
-<li> Two adjacent polygons may not have correctly connected lightmaps. In
-     other words: there may be a dark border when there should not be any.
-     This probably needs to be solved by a second pass through all the
-     lightmaps.
-<li> Static lighting currently does not work correctly when checking if a beam
-     of light hits a thing in combination with warping portals and radiosity.
-     To implement this we need to remember the inverse transformation so that we
-     can correctly trace the beam of light through the thing and check if it
-     intersects with it.
-<li> Need to do a major cleanup of code (we are constantly busy with this :-)
-<li> Clean up the language, the API, and the interface to create the world.
-</ul>
-
-<h1>Desired New Features and Enhancements</h1>
-<h2>Lighting:</h2>
-<ul>
-<li> Some parts of the view frustrum calculation can also be optimized
-     considerably.
-<li> Maybe we should limit the size of the textures in the texture cache
-     (max 256x256 for example). This would give a better throughput on the
-     texture cache and also enhance the speed of the dynamic lighting system.
-     An automatic polygon splitter would be great for this.
-<li> Dynamic lighting has correct shadows through portals but things do not
-     cast shadows. It is probably too expensive to have the full
-     shadow calculation that is used in the static lighting system but maybe
-     we can have an approximated version of the thing (and also 3D sprite)
-     to have an approximate shadow.
+<li> General todo: fix all bugs in bugs.txt :-)
+<li> Continue with more support for sprite lighting. This is almost
+     finished but there are still a few missing things (like the
+     ability to see which dynamic lights affected a sprite).
+<li> Optimizing lighting. Using the convex outline of objects
+     we can still do some opts.
+<li> Maybe implement shadows for sprites and things using a simpler
+     outline version? (for sprites we can use LOD).
 <li> We also need to update the lighting on the polygons of a thing when
      the thing moves. It is easy to find all dynamic lights that hit a thing
      at the current location but then you also have to find all dynamic lights
@@ -55,57 +29,95 @@ list first.
      static and dynamic lights in every sector. This not only contains all the
      lights of that sector but also lights of nearby sectors which are visible
      from the sector.
-<li> We have no lighting for 3D sprites currently. I suggest lighting every
-     triangle based on the distance from all lights (static and dynamic) that
-     affect the current sector of the triangle (we have this with the list that
-     is maintained above).
-<li> An alternative way to light 3D sprites would be to light the vertices
-     instead of the triangles and do gouraud shading between them. The gouraud
-     shading routines are already in place, we just have to light the vertices.
-<li> Radiosity (as opposed to the pseudo-radiosity which now exists).
-<li> Complete lighting support for curved surfaces.
-<li> Improve the 8-bit palette generator.
-</ul>
-
-<h2>API</h2>
-<ul>
-<li> Define the global structure of Crystal Space (3D engine, system
-     dependent stuff, physics, scripting, sound, ...).
-<li> Make a good definition of the class structure and individual API
-     of every class. This is not specifically intended for the Crystal
-     Space user but for the Crystal Space developer.
-<li> Define which classes should be exported to the outside and how the
-     CS user will see them.
-<li> Create the additional COM API for all those classes.
-</ul>
-
-<h2>Scripting</h2>
-<ul>
-<li> Create a VM which interfaces to the Crystal Space engine through COM.
-<li> Scripting support is closely related to the API work above. We need
-     a good API which is supported by COM for the scripting to work good.
-</ul>
-
-<h2>Engine And Mathematical Features</h2>
-<ul>
-<li> Seperate physics library. This library will be used from within the
-     scripting language. The 3D engine will have support for collision
-     detection only (used by the physics library) and the physics library
-     will provide a PhysicalProperties class which the engine will use
-     for all objects that need it.
-<li> More texture features like bumpmapping, displacement mapping, ...
-     The problem is to do all those things fast enough.
-<li> We have to look into the possibility of using particle systems
-     for smoke, clouds, explosions, ...
-     A possible optimization here would be to use many small 2D
-     animated sprites (possibly with a bit of alpha transparency) and
-     use these as particles. This way one could probably get away with
-     using less particles and reduce the computational overhead a bit.
-<li> Make alpha mapping configurable. We currently have two tables.
-     Instead we could define a fixed number of tables (let's say three)
-     which can be used in a configurable way. For example, table 1 can
-     be used for 25% alpha mapping (and thus also 75% if the table is
-     used in reverse) while table 2 can be used for additive filtering.
+<li> Make MazeD the best Crystal Space editor in the world :-)
+<li> Better LOD function for sprites. The current one doesn't preserve
+     the shape well enough.
+<li> Dynamic curve lighting. This requires some thought because
+     lightmapping a curve is expensive. More precalculation may help
+     here.
+<li> Dynamic gouraud shaded polygons. This is easy to do. We need to do
+     something similar to lightmaps where we store a static lightmap
+     and let the dynamic light patches update it. In this case with
+     vertex color data.
+<li> Generalize the engine so that it can use general gouraud shaded
+     polygons instead of only triangles. The 3D rasterizers can already
+     do this.
+<li> Implement halo visilibity checking in the engine instead of using
+     the Z buffer.
+<li> For correct portal on thing handling we need to Z fill the portal
+     polygon after drawing (and use Z sort or STATBSP for the portals).
+<li> Continue with support for multi-sector sprites. We need a way to
+     quickly update the list of sectors that every sprite is in. Also
+     we need to clip the sprite (rough clip) to the portal.
+<li> Consider support for multi-sector things as well.
+<li> Convert the few remaining classes to csXxxx name convention.
+<li> Create more user documentation. Update FAQ. More tutorials.
+<li> Rewrite bots and missile using the real collision detection system.
+<li> Optimize the collision detection system.
+<li> Optimize WhichSide3D. For lighting this is a very important function.
+     It could at least be made inline.
+<li> Fully implement 2*SRC*DST in software.
+<li> Fully implement or approximate 2*SRC*DST in hardware (with gamma or
+     something else).
+<li> Integrate landscape engine (ROAM) with CS. Also integrate dynamic sky
+     support which is also in the ROAM engine from Alex Pfaffe.
+<li> Physics module? Is this still needed? What do we need here?
+<li> Scripting: Make COM interfaces (IDL) for the engine.
+<li> Scripting: Ad hoc scripting language?
+<li> Scripting: interface with existing language (Python, Scheme, ...)
+<li> Option to make dynamic library (DLL/so) for all CS libraries.
+<li> VFS (virtual file system) to make things easier for the game developer.
+<li> Curved surfaces on sector walls.
+<li> Curved surfaces in sprites. There are two ways: we could merge them
+     statically and just use the curves as a triangle generator or we could
+     have real LOD curves. I think the first approach is best because sprites
+     have LOD on their own.
+<li> REMPES visibility system.
+<li> Implement a 'make install' in the makefile system.
+<li> Try to use the NASM assembler code in the Windows/VC port as well.
+<li> Better world loader with support for plug-ins (to allow apps to insert
+     game specific data in a world file).
+<li> Import entities from MDL, 3DS, ...
+<li> Support for fog in the hardware renderers (Direct3D, OpenGL, and Glide).
+     Maybe with layered fog? Or some other approach?
+<li> Resolve TXTMODE mess (private, global, and 24bit). Some mode/display
+     combinations are obsolete or not well supported.
+<li> Special effects (bumpmapping, explosions, particles, smoke, ...)
+<li> 2D sprites (flat sprites).
+<li> Particle system. Maybe using pixels or 2D sprites.
+<li> Fix BMP loading so that it is endian correct.
+<li> Fix WAV loading so that it is endian correct.
+<li> More configuration parameters for objects (like lightmap size for detail
+     of shadows).
+<li> Allow flags and config values for objects to be set from within the
+     world file.
+<li> Gravity configuration value for WalkTest.
+<li> Do mipmapping based on texel density instead of fixed distances.
+<li> Automatic portal generation (used in MazeD or Crystal Space itself).
+<li> Fix cleanup problems in engine.
+<li> Better error handling and checking for invalid data in the engine.
+     Maybe make a level validator.
+<li> Hierarchical objects.
+<li> LOD on things. Maybe user specified.
+<li> Artificial Intelligence?
+<li> Spotlight support.
+<li> Ability to load dynamic textures later. It's almost there but not yet :-)
+<li> Correct textures for special hardware (like square limitation on RIVA
+     128 and 256x256 limitation on Voodoo).
+<li> Two adjacent polygons may not have correctly connected lightmaps. In
+     other words: there may be a dark border when there should not be any.
+     This probably needs to be solved by a second pass through all the
+     lightmaps.
+<li> Calculate lightmaps in a higher resolution and then down-sample them
+     for better quality.
+<li> Full radiosity on lightmaps.
+<li> Need to continue cleanup of code (we are constantly busy with this :-)
+<li> Continue cleaning up the language, the API, and the interface to create
+     the world.
+<li> We need to improve the quality of the 8-bit palette generator.
+<li> Allow the choice between a fixed palette or a computed
+     palette. Control how the palette should be computed (adherence
+     to the colors in the bitmaps), ...
 <li> We should also implement animated textures. There is a problem
      with lighting though. There are (at least) three options:
      <ul>
@@ -127,32 +139,11 @@ list first.
      </ul>
      All three methods are useful and can be used on other occasions,
      so maybe I should try to implement them all :-)
-<li> Maybe we should select the mipmapping level more dynamically.
-     Currently the next mipmap level is selected based on distance.
-     But this would better be done based on the amount of texel-
-     squishing inside one pixel. For example, if four texels fit in
-     one pixel then one should consider going to the next mipmap
-     level.
-</ul>
-
-<h2>Special Portal Features</h2>
-<ul>
 <li> Portals can now affect the light color that passes through it. it
      would be nice if this could also be done based on individual
      texel values on the portal polygon. That way a light shining
      through an alpha-mapped portal would shine on the wall with
      the colors of the texture on the portal.
-<li> Create a polygonal terrain renderer that can be fully integrated
-     with the portal engine through the portals. Transition from one
-     sub-engine to another will be completely transparent to the
-     player. To make support for things and sprites in the polygonal
-     renderer easy it should also fill the Z buffer like the portal
-     engine does.
-<li> Portals on things work but currently they are limited. A portal
-     on a thing may not overlap or be overlapped by other thing polygons
-     which are in the same sector because this interferes with the
-     Z buffer. One solution could be to sort the Things/Sprites in the
-     current sector from back to front and render them that way.
 <li> Allow 'animated' space-warping portals. Using these one could
      for example create a train where the inside of the train is
      rendered as usual while the windows are portals to a large sector
@@ -160,56 +151,14 @@ list first.
      would have a space warping matrix so that the moving of the train
      (or other vehicule) can be simulated by changing that
      transformation. This would be a really cool effect.
-</ul>
-
-<h2>Renderer</h2>
-<ul>
-<li> Complete support in the texture cache and texture mapper for
-     the various settings of TXTMODE (24bit, global, and private)
-     and the display depth.
 <li> Support for 24-bit display-mode (32-bit is already supported).
-<li> Complete the 16-bit alpha mapper (currently only 50% is supported).
-<li> Complete 32/16-bit support and private colormap support.
-</ul>
-
-<h2>Sprites And 3D Objects</h2>
-<ul>
-<li> Allow transparent textures for Things. We can make use of
-     the transparent polygon queue that we are going to need
-     anyway to implement the previous feature.
-<li> Lighting and shadows for 3D sprites (see the lighting section above).
 <li> Delay real transformation of sprites until they are visible (with a
      dirty bit or something).
-<li> Improve support for large sprites which are in more than one sector
-     at the same time. Also support this for Things.
-</ul>
-
-<h2>World File And Other External Files</h2>
-<ul>
-<li> Config file.
-     Allow the choice between a fixed palette or a computed
-     palette. Control how the palette should be computed (adherence
-     to the colors in the bitmaps), ...
-<li> Continue work on MazeD, the level editor.
-</ul>
-
-<h2>Textures, Games, ...</h2>
-<ul>
-<li> We will need libraries of 3D models that can be used for
-     various things. I'm thinking about torches, candles, space-ship
-     consoles, switches, ... Anything really.
-</ul>
-
-<h2>Optimizations</h2>
-<ul>
+<li> Consider rewriting parts of the texture cache in assembler. They
+     still take a lot of time.
 <li> Transform the planes of polygons only once if they are shared.
-<li> Rewrite texture mapping loops in assembler (partly done).
-<li> Rewrite texture cache filler in assembler.
-<li> Rewrite memset in assembler?
 <li> Make a special optimized algorithm for the texture cache private
      memory pool.
-<li> General optimization: try to get Crystal Space as fast as
-     possible.
 <li> Optimization with cross product as suggested by Segher Boessenkool:
      (a1 b2 - a2 b1) becomes (a1 - b1) (a2 + b2) - (a1 a2) + (b1 b2).
      (a1 a2) and (b1 b2) can be precomputed. This mainly affects
@@ -223,20 +172,6 @@ list first.
      would need to postpone this transformation of vertices and maybe
      use an array to indicate which vertices have already been
      transformed.
-</ul>
-
-<h2>Ports</h2>
-<ul>
-<li> Complete DOS ports to other compilers (Microsoft C++,
-     Borland C++, ...).
-<li> Commodore 64, HP calculators, Eniac :-) ...
-</ul>
-
-<h2>Various Features</h2>
-<ul>
-<li> The hardware accelerated renderers (OpenGL, Glide, Direct3D) need
-     to be improved and also ported to the various systems that CS
-     supports.
 <li> Allow multiple textures on a polygon (overlaying textures) which
      are automatically merged by the Texture Cacher.
 <li> Use a different lightmap size for a polygon. This is useful for
