@@ -32,7 +32,7 @@
 #include "isys/vfs.h"
 #include "iutil/cfgmgr.h"
 #include "csutil/util.h"
-#include "iobject/object.h"
+#include "iutil/object.h"
 #include "igraphic/imageio.h"
 #include "imesh/object.h"
 

@@ -58,7 +58,7 @@
 #include "iengine/thing.h"
 #include "iengine/camera.h"
 #include "imesh/object.h"
-#include "iobject/object.h"
+#include "iutil/object.h"
 #include "imap/parser.h"
 
 #include "csengine/thing.h"

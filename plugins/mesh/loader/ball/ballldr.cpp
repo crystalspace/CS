@@ -32,7 +32,7 @@
 #include "qint.h"
 #include "iutil/strvec.h"
 #include "csutil/util.h"
-#include "iobject/object.h"
+#include "iutil/object.h"
 #include "iengine/material.h"
 
 CS_TOKEN_DEF_START

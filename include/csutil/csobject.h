@@ -23,7 +23,7 @@
 #include "cstypes.h"
 #include "csutil/csbase.h"
 #include "csutil/util.h"
-#include "iobject/object.h"
+#include "iutil/object.h"
 
 /**
  * A generic csObject class. Any csObject can have any number of iObject

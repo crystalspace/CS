@@ -34,7 +34,7 @@
 #include "qint.h"
 #include "iutil/strvec.h"
 #include "csutil/util.h"
-#include "iobject/object.h"
+#include "iutil/object.h"
 #include "iengine/material.h"
 #include "iengine/motion.h"
 

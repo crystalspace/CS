@@ -33,7 +33,7 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/txtmgr.h"
 #include "ivaria/conout.h"
-#include "iobject/object.h"
+#include "iutil/object.h"
 #include "imesh/object.h"
 #include "iengine/engine.h"
 #include "iengine/sector.h"

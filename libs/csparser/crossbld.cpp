@@ -28,7 +28,7 @@
 #include "csutil/scfstrv.h"
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"
-#include "iobject/object.h"
+#include "iutil/object.h"
 #include "imesh/sprite3d.h"
 #include "imesh/object.h"
 #include "iengine/engine.h"

@@ -36,7 +36,7 @@
 #include "qint.h"
 #include "iutil/strvec.h"
 #include "csutil/util.h"
-#include "iobject/object.h"
+#include "iutil/object.h"
 #include "ivideo/material.h"
 #include "iengine/material.h"
 #include "iengine/polytmap.h"
