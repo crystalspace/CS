@@ -197,6 +197,25 @@ awsComponent::Show()
   }
 }
 
+void 
+awsComponent::MoveChildren(int delta_x, int delta_y)
+{
+  // If we have no children, go away.
+  if (!HasChildren()) return;
+
+  int i;
+  for(i=0; i<GetChildCount(); ++i)
+  {
+    awsComponent *child = GetChildAt(i);
+    
+    if (child->HasChildren())
+      child->MoveChildren(delta_x, delta_y);
+
+    child->Frame().Move(delta_x, delta_y);
+  }
+
+}
+
 /////////////////////////////////////  awsComponentFactory ////////////////////////////////////////////////////////
 
 /**

@@ -12,18 +12,18 @@ const unsigned long awsWindow::sWindowShown   = 0x3;
 const unsigned long awsWindow::sWindowHidden  = 0x4;
 const unsigned long awsWindow::sWindowClosed  = 0x5;
 
-const unsigned int awsWindow::fsNormal  = 0x0;
-const unsigned int awsWindow::fsToolbar = 0x1;
-const unsigned int awsWindow::fsBitmap  = 0x2;
+const int awsWindow::fsNormal  = 0x0;
+const int awsWindow::fsToolbar = 0x1;
+const int awsWindow::fsBitmap  = 0x2;
 
-const unsigned int awsWindow::foControl =       0x1;
-const unsigned int awsWindow::foZoom    =       0x2;
-const unsigned int awsWindow::foMin     =       0x4;
-const unsigned int awsWindow::foClose   =       0x8;
-const unsigned int awsWindow::foTitle   =       0x10;
-const unsigned int awsWindow::foGrip    =       0x20;
-const unsigned int awsWindow::foRoundBorder   = 0x0;
-const unsigned int awsWindow::foBeveledBorder = 0x40;
+const int awsWindow::foControl =       0x1;
+const int awsWindow::foZoom    =       0x2;
+const int awsWindow::foMin     =       0x4;
+const int awsWindow::foClose   =       0x8;
+const int awsWindow::foTitle   =       0x10;
+const int awsWindow::foGrip    =       0x20;
+const int awsWindow::foRoundBorder   = 0x0;
+const int awsWindow::foBeveledBorder = 0x40;
 
 const int grip_size=16;
 
@@ -41,7 +41,8 @@ awsWindow::awsWindow():above(NULL), below(NULL),
   frame_options(foControl | foZoom | foMin | foClose | foTitle | foGrip | foRoundBorder),
   resizing_mode(false), moving_mode(false), 
   minp(50,5, 50+13, 5+11), maxp(34,5, 34+13, 5+11), closep(18,5, 18+13,5+11),
-  min_down(false), max_down(false), close_down(false)
+  min_down(false), max_down(false), close_down(false),
+  is_zoomed(false), is_minimized(false)
 {
 
 }
@@ -240,6 +241,10 @@ awsWindow::OnMouseDown(int button, int x, int y)
       return true;
     }
 
+    ////////// NOTE!! Past this point is where all events that are not allowed to happen while zoomed go!!
+    if (is_zoomed) return false;
+
+    ///// Check for resizing
     if ((frame_options & foGrip) &&
         x<Frame().xmax && x>Frame().xmax-grip_size &&
         y<Frame().ymax && y>Frame().ymax-grip_size)
@@ -252,7 +257,9 @@ awsWindow::OnMouseDown(int button, int x, int y)
         printf("aws-debug: Window resize mode=true\n");
 
       return true;
-    } else if (
+    } 
+    ///// Check for moving
+    else if    (
                 // Move using titlebar if it's a normal window
                ((frame_style==fsNormal && !(frame_options & foBeveledBorder)) && 
                (x<Frame().xmax && x>Frame().xmin && 
@@ -283,6 +290,53 @@ awsWindow::OnMouseDown(int button, int x, int y)
 bool 
 awsWindow::OnMouseUp(int button, int x, int y)
 {
+  if (max_down && (frame_options & foZoom) && maxp.Contains(x, y))
+    {
+      max_down=false;
+
+      // Zoom/de-zoom window
+      if (is_zoomed)
+      {
+        int delta_x = unzoomed_frame.xmax - Frame().xmax, delta_y=unzoomed_frame.ymin;
+        is_zoomed=false;
+        
+        // Fix controls
+        minp.Move(delta_x, delta_y);
+        maxp.Move(delta_x, delta_y);
+        closep.Move(delta_x, delta_y);
+
+        // Fix kids
+        MoveChildren(unzoomed_frame.xmin, delta_y);
+
+        // Fix frame
+        Frame().Set(unzoomed_frame);
+      }
+      else
+      {
+        is_zoomed=true;
+        unzoomed_frame.Set(Frame());
+        
+        Frame().xmin=Frame().ymin=0;
+        Frame().xmax=WindowManager()->G2D()->GetWidth();
+        Frame().ymax=WindowManager()->G2D()->GetHeight();
+
+        int delta_x = Frame().xmax - unzoomed_frame.xmax, delta_y=-unzoomed_frame.ymin;
+
+        // Fix controls
+        minp.Move(delta_x, delta_y);
+        maxp.Move(delta_x, delta_y);
+        closep.Move(delta_x, delta_y);
+
+        // Fix kids
+        MoveChildren(-unzoomed_frame.xmin, delta_y);
+
+      }
+
+      Invalidate();
+      WindowManager()->InvalidateUpdateStore();
+      return true;
+    }
+
   if (min_down || max_down || close_down)
   {
     min_down=false;
@@ -387,19 +441,7 @@ awsWindow::OnMouseMove(int button, int x, int y)
     closep.Move(delta_x, delta_y);
 
     // Move children
-    int i;
-    awsComponent *child;
-   
-    for(i=0; i<GetChildCount(); ++i) 
-    {
-        child=GetChildAt(i);
-
-        child->Frame().xmin+=delta_x;
-        child->Frame().ymin+=delta_y;
-        child->Frame().xmax+=delta_x;
-        child->Frame().ymax+=delta_y;                
-    } 
-    
+    MoveChildren(delta_x, delta_y);
 
     //if (DEBUG_WINDOW_EVENTS)
         //printf("aws-debug: deltas for move: %d, %d\n", delta_x, delta_y);
@@ -661,3 +703,4 @@ awsWindow::Draw3DRect(iGraphics2D *g2d, csRect &f, int hi, int lo)
   g2d->DrawLine(f.xmin, f.ymax, f.xmax, f.ymax, lo);
   g2d->DrawLine(f.xmax, f.ymin, f.xmax, f.ymax, lo);
 }
+

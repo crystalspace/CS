@@ -112,6 +112,8 @@ public:
     /// Set's the unique id of this component. Note: only to be used by window manager.
     void SetID(unsigned long _id);
 
+    /// Recursively moves children (and all nested children) by relative amount given.
+    void MoveChildren(int delta_x, int delta_y);
 
 public:
     /** Adds a child into this component.  It's frame should be respective this component, not absolute.

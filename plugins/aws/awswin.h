@@ -82,9 +82,15 @@ private:
     /// These are true if the control buttons that we're using are down, else false
     bool min_down, max_down, close_down;
 
+    /// True if the window is in one of these various states
+    bool is_zoomed, is_minimized;
+
+    /// The frame cache for storing frame state while the window is zoomed.
+    csRect unzoomed_frame;
+
 private:
     void Draw3DRect(iGraphics2D *g2d, csRect &f, int hi, int lo);
-
+    
 public:
    static const unsigned long sWindowRaised;
    static const unsigned long sWindowLowered;
@@ -95,39 +101,39 @@ public:
    /******* Frame Styles **********************/
 
    /// A normal frame that may have a title bar, buttons, 3d border, and a grip.
-   static const unsigned int fsNormal;
+   static const int fsNormal;
 
    /// A frame with only a 3d border.  No controls or decorations allowed.
-   static const unsigned int fsToolbar;
+   static const int fsToolbar;
 
    /// A frame drawn with the background and overlay elements.  Nothing else is drawn.
-   static const unsigned int fsBitmap;
+   static const int fsBitmap;
 
    /******* Frame Options **********************/
 
    /// Should draw control box
-   static const unsigned int foControl;
+   static const int foControl;
 
    /// Should draw zoom (maximize) button
-   static const unsigned int foZoom;
+   static const int foZoom;
 
    /// Should draw minimize button
-   static const unsigned int foMin;
+   static const int foMin;
 
    /// Should draw close button
-   static const unsigned int foClose;
+   static const int foClose;
 
    /// Should draw title
-   static const unsigned int foTitle;
+   static const int foTitle;
 
    /// Should draw grip
-   static const unsigned int foGrip;
+   static const int foGrip;
 
    /// Should draw round border (default)
-   static const unsigned int foRoundBorder;
+   static const int foRoundBorder;
    
    /// Should draw beveled border
-   static const unsigned int foBeveledBorder;
+   static const int foBeveledBorder;
    
    SCF_DECLARE_IBASE;
    

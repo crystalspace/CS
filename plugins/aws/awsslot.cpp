@@ -205,8 +205,7 @@ awsSlot::Emit(iAwsSource &source, unsigned long signal)
         if (stm->signal==signal)
           sink->HandleTrigger(stm->trigger, source);
       }
-
-      //(sink->*Slot)(source, signal);
+      
     }
 }
 

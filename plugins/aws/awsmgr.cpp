@@ -430,14 +430,14 @@ awsManager::RedrawWindow(awsWindow *win, csRect &dirtyarea)
        return;
 
      /// Draw the window first.
-     csRect clip(win->Frame());
+     //csRect clip(win->Frame());
 
      /// Clip the window to it's intersection with the dirty rectangle
-     clip.Intersect(dirtyarea);
+     //clip.Intersect(dirtyarea);
      //ptG2D->SetClipRect(clip.xmin, clip.ymin, clip.xmax, clip.ymax);
 
      /// Tell the window to draw
-     win->OnDraw(clip);
+     win->OnDraw(win->Frame());
 
      /// Now draw all of it's children
      RecursiveDrawChildren(win, dirtyarea);
