@@ -1381,7 +1381,10 @@ CS_CHECK_LIB3DS
 CS_CHECK_LIB_WITH([ode],
     [AC_LANG_PROGRAM(
 	[#include <ode/ode.h>],
-	[dWorldCreate();])],
+	[dWorldCreate();
+	 dBodySetGravityMode (0, 0);
+	 dCloseODE();
+	])],
     [libs/libode*], [C++],
     [CS_MAKEFILE_BUILD_RESULT([cs_cv_libode], [ODE])])
 
