@@ -239,7 +239,7 @@ actions ResponseFile1
 
 actions piecemeal together quietly ResponseFile2
 {
-  echo '$(>)$(DELIM)' | sed 's/$(DELIM) /$(DELIM)/g' | tr '$(DELIM)' '
+  echo '$(>)$(DELIM)' | $(SED) 's/$(DELIM) /$(DELIM)/g' | tr '$(DELIM)' '
 ' >> $(<)
 }
 
