@@ -1,5 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
+3-May-2000
+	- Fixed bug in Blocks which caused the menu not to work
+	  properly (left/right arrows were gone).
 2-May-2000
 	- Added csPoly3D::ProjectAxisPlane() which is similar to
 	  ProjectXPlane() but for a general axis aligned plane.
