@@ -823,12 +823,12 @@ AC_DEFUN([CS_JAVA_HEADER_PATH],
 	    [cs_java_inc="-I$cs_java_dir/include"
 	    case $host_os in
 		mingw*|cygwin*) cs_java_platform=win32 ;;
-		*) cs_java_platform=\
-		    `echo $host_os|sed 's/^\([[^-]]*\).*$/\1/'` ;;
+		*) cs_java_platform=`echo $host_os |
+		    sed 's/^\([[^-]]*\).*$/\1/'` ;;
 	    esac
 	    AS_IF([test -n "$cs_java_platform"],
-		[cs_java_inc=\
-		    "$cs_java_inc $cs_java_inc/$cs_java_platform"])])])])
+		[cs_java_inc="$cs_java_inc
+		    $cs_java_inc/$cs_java_platform"])])])])
 
 AC_PATH_PROGS([JAVA], [java], [],
     [$PATH$PATH_SEPARATOR$JAVA_HOME/bin$PATH_SEPARATOR$JAVA_HOME/jre/bin])

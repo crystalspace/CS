@@ -7568,12 +7568,12 @@ fi
   cs_java_inc="-I$cs_java_dir/include"
 	    case $host_os in
 		mingw*|cygwin*) cs_java_platform=win32 ;;
-		*) cs_java_platform=\
-		    `echo $host_os|sed 's/^\([^-]*\).*$/\1/'` ;;
+		*) cs_java_platform=`echo $host_os |
+		    sed 's/^\([^-]*\).*$/\1/'` ;;
 	    esac
 	    if test -n "$cs_java_platform"; then
-  cs_java_inc=\
-		    "$cs_java_inc $cs_java_inc/$cs_java_platform"
+  cs_java_inc="$cs_java_inc
+		    $cs_java_inc/$cs_java_platform"
 fi
 
 fi

@@ -25,6 +25,9 @@ chronological order.
 	- res fixed a bug in csRenderMeshHolderSingle where it reported the
 	  first returned mesh as 'not created', tho the opposite would've been
 	  correct.
+	- Eric Sunshine fixed run-time syntax error in Java header directory
+	  check in configure.ac.  Problem was introduced on 22-Mar-2004 when
+	  Java check was augmented for MacOS/X.
 23-Mar-2004
 	- Anders Stenberg brought stencil shadows back to life in NR.
 	  They should get along well with stencil clipping.
