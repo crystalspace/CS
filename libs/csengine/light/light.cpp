@@ -33,6 +33,7 @@ int csLight:: ambient_green = CS_DEFAULT_LIGHT_LEVEL;
 int csLight:: ambient_blue = CS_DEFAULT_LIGHT_LEVEL;
 
 float csLight::influenceIntensityFraction = 256;
+#define HUGE_RADIUS 100000000
 
 SCF_IMPLEMENT_IBASE_EXT(csLight)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iLight)
@@ -204,7 +205,8 @@ void csLight::SetColor (const csColor& col)
 void csLight::SetAttenuation (int a)
 {
   float dist;
-  GetDistanceForBrightness (1.0f, dist);
+  if (!GetDistanceForBrightness (1.0f, dist))
+    dist = HUGE_RADIUS; // can't determine distance
   CalculateAttenuationVector (a, dist, 1.0f);
   attenuation = a;
 }
@@ -264,7 +266,7 @@ void csLight::CalculateInfluenceRadius ()
   float radius;
   if (!GetDistanceForBrightness (1 / (y * influenceIntensityFraction), radius))
     // can't determine distance
-    radius = 100000000;
+    radius = HUGE_RADIUS;
   influenceRadius = radius;
   influenceRadiusSq = radius*radius;
   inv_dist = 1.0 / influenceRadius;
@@ -297,55 +299,74 @@ void csLight::CalculateAttenuationVector (int atttype, float radius,
 
 bool csLight::GetDistanceForBrightness (float brightness, float& distance)
 {
-  // simple cases
-  if (attenuationvec.z == 0)
+#ifdef CS_USE_NEW_RENDERER
   {
-    if (attenuationvec.y == 0)
+#else
+  switch (attenuation)
+  {
+  case CS_ATTN_NONE:      
+    return false;
+  case CS_ATTN_LINEAR:    
+    return (1 - brigtness) / inv_dist;
+  case CS_ATTN_INVERSE:   
+    return 1 / brightness;
+  case CS_ATTN_REALISTIC: 
+    return sqrt (1 / brightness);
+  case CS_ATTN_CLQ:
+#endif
     {
-      //no solution
-      return false;
-    }
-    else
-    {
+      // simple cases
+      if (attenuationvec.z == 0)
+      {
+        if (attenuationvec.y == 0)
+        {
+          //no solution
+          return false;
+        }
+        else
+        {
+          float kc = attenuationvec.x;
+          float kl = attenuationvec.y;
+          distance = (1 / brightness - kc) / kl;
+          return true;
+        }
+      }
+
+      /*
+      calculate radius where the light has the intensity of 
+      influenceIntensityFraction using the standard light model:    
+
+        brightness = 1/(kc + kl*d + kq*d^2)
+
+      solving equation:
+              /-kl +- sqrt( kl^2 - 4*kc*kq - 4*kq/brightness)\
+      d = 0.5*|----------------------------------------------|
+              \                       kq                     /
+      */
       float kc = attenuationvec.x;
       float kl = attenuationvec.y;
-      distance = (1 / brightness - kc) / kl;
-      return true;
+      float kq = attenuationvec.z;
+      float discr;
+      
+      discr = kl*kl - 4*kq*(kc - 1/brightness);
+      if (discr < 0)
+      {
+        //no solution
+        return false;
+      }
+      else 
+      {
+        float radius1, radius2, det;
+        det = qsqrt (discr);
+        float denom = 0.5 / kq;
+        radius1 = denom * (-kl + det);
+        radius2 = denom * (-kl - det);
+        distance = MAX (radius1,radius2);
+        return true;
+      }
     }
   }
-
-  /*
-   calculate radius where the light has the intensity of 
-   influenceIntensityFraction using the standard light model:    
-
-     brightness = 1/(kc + kl*d + kq*d^2)
-
-   solving equation:
-           /-kl +- sqrt( kl^2 - 4*kc*kq - 4*kq/brightness)\
-   d = 0.5*|----------------------------------------------|
-           \                       kq                     /
-  */
-  float kc = attenuationvec.x;
-  float kl = attenuationvec.y;
-  float kq = attenuationvec.z;
-  float discr;
-  
-  discr = kl*kl - 4*kq*(kc - 1/brightness);
-  if (discr < 0)
-  {
-    //no solution
-    return false;
-  }
-  else 
-  {
-    float radius1, radius2, det;
-    det = qsqrt (discr);
-    float denom = 0.5 / kq;
-    radius1 = denom * (-kl + det);
-    radius2 = denom * (-kl - det);
-    distance = MAX (radius1,radius2);
-    return true;
-  }
+  return false;
 }
 
 iCrossHalo *csLight::Light::CreateCrossHalo (float intensity, float cross)

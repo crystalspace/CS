@@ -77,6 +77,10 @@ chronological order.
             - Added a technique to do dot3 lighting in a single pass.
             - Added a new 'srcalphaadd' blending mode, needed for single pass
               dot3.
+        - res & groton fixed csLight::GetDistanceForBrightness () to properly 
+          work on non-CLQ attenuations for OR. Apparently, the fact that this 
+          function returned 'false' caused some trouble (e.g. weird floating 
+          point exceptions with VC6.)
 8-Sep-2003
 	- Jorrit added csgfx to the stdsteps renderloop plugin (for Jam).
 	- Jorrit did the following changes to bring new and old renderer
