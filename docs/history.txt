@@ -25,6 +25,7 @@ chronological order.
 	- Eric Sunshine once again disabled warning C4291 (no matching operator
 	  delete found) for MSVC6 builds since MSVC6 emits nearly a thousand
 	  warning messages when this warning is enabled.
+	- Eric Sunshine removed the obsolete CS/include/ivaria/cs.i.
 26-Oct-2003
 	- Eric Sunshine updated `simple1' tutorial in the user manual to
 	  reflect recent changes to keyboard-related event handling.
