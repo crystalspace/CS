@@ -295,6 +295,10 @@ public:
     {
       return 0;
     }
+    virtual void GetLOD(iSharedVariable *& first,iSharedVariable *& second) const
+    {
+      first=0; second=0;
+    }
   } scfiLODControl;
   friend struct LODControl;
 
@@ -561,6 +565,10 @@ public:
     {
       return scfParent->GetLODPolygonCount (lod);
     }
+    virtual void GetLOD(iSharedVariable *& first,iSharedVariable *& second) const
+    {
+      first=0; second=0;
+    }
   } scfiLODControl;
   friend struct LODControl;
 
@@ -659,6 +667,10 @@ public:
     virtual int GetLODPolygonCount (float /*lod*/) const
     {
       return 0;
+    }
+    virtual void GetLOD(iSharedVariable *& first,iSharedVariable *& second) const
+    {
+      first=0; second=0;
     }
   } scfiLODControl;
   friend struct LODControl;
