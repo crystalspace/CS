@@ -15,6 +15,8 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+#ifndef __IVIDEO_EFFECTS_EFFECTSTRINGS_H__
+#define __IVIDEO_EFFECTS_EFFECTSTRINGS_H__
 
 /////////////////////////////////////////
 // General strings
@@ -102,4 +104,6 @@ REGISTER_STRING( scale_alpha, "scale alpha")
 /////////////////////////////////////////
 
 REGISTER_STRING( nvvertex_program_gl, "nvvertex program gl")
+
+#endif
 
