@@ -632,12 +632,12 @@ are slated for removal:
 
 In most cases, applications should now maintain these variables themselves
 rather than relying upon the system driver to do so.  Currently, in the case of
-@samp{VFS}, code can invoke the @code{SCF_QUERY_INTERFACE()} macro to obtain a
+@samp{VFS}, code can invoke the @code{CS_QUERY_PLUGIN()} macro to obtain a
 pointer to the shared @sc{vfs} instance.  For example:
 
 @example
 iSystem* sys = @dots{};
-iVFS* vfs = SCF_QUERY_INTERFACE(sys, iVFS);
+iVFS* vfs = CS_QUERY_PLUGIN (sys, iVFS);
 @end example
 
 @subheading @sc{ddg} Terrain Engine Removed

@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+26-Jun-2001
+	- Fixed a problem in apimod19.txi. The document incorrectly stated
+	  that you had to do SCF_QUERY_INTERFACE() in order to get the
+	  pointer to VFS, G3D, and other plugins from the system driver.
+	  This should be CS_QUERY_PLUGIN().
 25-Jun-2001
 	- Added iBase::GetRefCount(). This way you can now get the reference
 	  counter from any SCF interface. Note that this is ONLY for debugging
