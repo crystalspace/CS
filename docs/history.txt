@@ -17,6 +17,9 @@ The history order is reversed so that new features are at the top.
 	  patch asking for the selection after ClearList() would crash.
 	- Anders also gave a patch to increase the ref count of an image
 	  in the same list box.
+	- Fixed the rapid fix from Rhad so that instead of comparing directly
+	  with 0 (which you should never do with floats!) it now uses an
+	  epsilon test instead.
 16-Apr-2003
 	- Rhad altered the rapid triangle collision test to ignore
 	  degenerate triangles.
