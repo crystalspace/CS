@@ -294,7 +294,7 @@ bool csSolidBsp::TestPolygon (csVector2* verts, int num_verts)
   return rc;
 }
 
-int white, red, blue, green, yellow, black;
+static int white, red, blue, green, yellow, black;
 
 void csSolidBsp::GfxDump (csSolidBspNode* node, iGraphics2D* ig2d, int depth,
 	csPoly2D& poly)
@@ -303,7 +303,7 @@ void csSolidBsp::GfxDump (csSolidBspNode* node, iGraphics2D* ig2d, int depth,
   if (!node->left) return;
   if (depth <= 0) return;
 
-  int width = ig2d->GetWidth ();
+//   int width = ig2d->GetWidth ();
   int height = ig2d->GetHeight ();
 
   csPlane2& sp = node->splitter;
@@ -312,17 +312,18 @@ void csSolidBsp::GfxDump (csSolidBspNode* node, iGraphics2D* ig2d, int depth,
 
   if (sp.IntersectPolygon (&poly, v1, v2))
   {
-    ig2d->DrawLine (v1.x, height-v1.y, v2.x, height-v2.y, depth == 1 ? yellow : white);
+    ig2d->DrawLine (v1.x, height-v1.y, v2.x, height-v2.y,
+      depth == 1 ? yellow : white);
 
-    ig2d->DrawPixel (spc.x, height-spc.y, blue);
-    ig2d->DrawPixel (spc.x-1, height-spc.y-1, blue);
-    ig2d->DrawPixel (spc.x-2, height-spc.y-2, blue);
-    ig2d->DrawPixel (spc.x+1, height-spc.y-1, blue);
-    ig2d->DrawPixel (spc.x+2, height-spc.y-2, blue);
-    ig2d->DrawPixel (spc.x-1, height-spc.y+1, blue);
-    ig2d->DrawPixel (spc.x-2, height-spc.y+2, blue);
-    ig2d->DrawPixel (spc.x+1, height-spc.y+1, blue);
-    ig2d->DrawPixel (spc.x+2, height-spc.y+2, blue);
+    ig2d->DrawPixel (int(spc.x),   int(height-spc.y),   blue);
+    ig2d->DrawPixel (int(spc.x-1), int(height-spc.y-1), blue);
+    ig2d->DrawPixel (int(spc.x-2), int(height-spc.y-2), blue);
+    ig2d->DrawPixel (int(spc.x+1), int(height-spc.y-1), blue);
+    ig2d->DrawPixel (int(spc.x+2), int(height-spc.y-2), blue);
+    ig2d->DrawPixel (int(spc.x-1), int(height-spc.y+1), blue);
+    ig2d->DrawPixel (int(spc.x-2), int(height-spc.y+2), blue);
+    ig2d->DrawPixel (int(spc.x+1), int(height-spc.y+1), blue);
+    ig2d->DrawPixel (int(spc.x+2), int(height-spc.y+2), blue);
 printf ("==============\n");
 printf ("(%f,%f)-(%f,%f) - ", v1.x, v1.y, v2.x, v2.y);
 printf ("(%f,%f,%f)\n", sp.A (), sp.B (), sp.C ());
@@ -342,7 +343,8 @@ printf ("  right%d  (%f,%f)\n", i, poly_right[i].x, poly_right[i].y);
   GfxDump (node->right, ig2d, depth-1, poly_right);
 }
 
-void csSolidBsp::GfxDump (iGraphics2D* ig2d, iTextureManager* itxtmgr, int depth)
+void csSolidBsp::GfxDump (iGraphics2D* ig2d, iTextureManager* itxtmgr,
+  int depth)
 {
   if (root && root->solid) return;
   white = itxtmgr->FindRGB (255, 255, 255);
@@ -362,4 +364,3 @@ void csSolidBsp::GfxDump (iGraphics2D* ig2d, iTextureManager* itxtmgr, int depth
 }
 
 //---------------------------------------------------------------------------
-
