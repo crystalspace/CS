@@ -18,6 +18,7 @@ const int awsListBox:: ctTree = 0x1;
 
 const int awsListBox:: signalSelected = 0x1;
 const int awsListBox:: signalScrolled = 0x2;
+const int awsListBox:: signalFocused  = 0x3;
 
 const int alignLeft = 0;
 const int alignCenter = 1;
@@ -1377,6 +1378,97 @@ bool awsListBox::OnMouseDown (int
   return false;
 }
 
+bool awsListBox::OnKeypress (int key, int cha, int modifiers)
+{
+ ///Changing selected row with arrow keys
+ /// !!! Worked correctly only for awsListHotspot.type == hsRow
+ if( !(WindowManager()->GetFlags() & AWSF_KeyboardControl) )
+	 return false;
+
+ switch (key)
+ {
+	 case CSKEY_DOWN:
+		 {
+			 awsListRow *parent = sel ? sel->parent: NULL;
+
+				if (parent == NULL)
+				{ 
+					int i = rows.Find (sel);
+					
+					if(i < rows.Length() -1 && rows.Length() > 0)
+					{
+					 ++i;
+					 sel = (awsListRow *)rows[i];
+					 Broadcast (awsListBox::signalSelected);
+
+					 /// @@@ HACK ;-]
+
+					 /// Change scroll bar position if selected component 
+					 /// is in the bottom of our list box
+
+					 awsListRow *row;
+					 UpdateMap ();
+					 if (map)
+						 row = map[drawable_count + scroll_start];
+
+					 if (sel == row)
+						 awsScrollBar::IncClicked (scrollbar, NULL);
+
+					 ///@@@ END_HACK
+
+					 return true;
+					}
+				}
+			}
+
+	 return true;
+
+	 case CSKEY_UP:
+		 {
+				awsListRow *parent = sel ? sel->parent: NULL;
+
+				if (parent == NULL)
+				{ 
+					int i = rows.Find (sel);
+
+					if(i > 0 && rows.Length () > 0)
+					{
+					 --i;
+					 sel = (awsListRow *)rows[i];
+					 Broadcast (awsListBox::signalSelected);
+
+					 /// @@@ HACK ;-]
+
+					 /// Change scroll bar position if selected component 
+					 /// is in the top of our list box
+
+					 awsListRow *row;
+					 UpdateMap ();
+					 if (map)
+						 row = map[scroll_start -1];
+
+					 if (sel == row)
+						 awsScrollBar::DecClicked (scrollbar, NULL);
+
+					 ///@@@ END_HACK
+
+					 return true;
+					}
+				}
+			}
+
+	}
+
+	Invalidate ();
+
+	return true;
+}
+
+void awsListBox::OnSetFocus ()
+{
+	Broadcast (signalFocused);
+}
+
 bool awsListBox::OnMouseExit ()
 {
   mouse_is_over = false;
@@ -1434,6 +1526,7 @@ awsListBoxFactory::awsListBoxFactory (iAws *wmgr) :
     "signalListBoxSelectionChanged",
     awsListBox::signalSelected);
   RegisterConstant ("signalListBoxScrolled", awsListBox::signalScrolled);
+  RegisterConstant ("signalListBoxFocused", awsListBox::signalFocused);
 }
 
 awsListBoxFactory::~awsListBoxFactory ()

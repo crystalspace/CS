@@ -87,6 +87,9 @@ public:
   /// Occures when the "tab" key is pressed.
   static const int signalTabPressed;
 
+  /// Occures when component becomes focused
+  static const int signalFocused;
+
 public:
   /// Get's the texture handle and the title, plus style if there is one.
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
@@ -121,6 +124,10 @@ public:
 
   /// Triggered when the keyboard focus is gained
   virtual bool OnGainFocus ();
+
+  /// Triggered when component becomes focused
+  virtual void OnSetFocus ();
+
 };
 
 class awsTextBoxFactory :

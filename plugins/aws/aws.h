@@ -89,6 +89,9 @@ private:
   /// The current component that has mouse focus locked, if there is one, NULL otherwise.
   iAwsComponent *mouse_focus;
 
+  /// The focused component, NULL otherwise.
+  iAwsComponent *focused;
+
   /// True if mouse events are locked into the top window
   bool mouse_captured;
 
@@ -184,6 +187,12 @@ public:
 
   /// Set the top window
   virtual void SetTopComponent (iAwsComponent *_top);
+
+  /// Get the focused component
+  virtual iAwsComponent *GetFocusedComponent ();
+
+  /// Set the focused component
+  virtual void SetFocusedComponent (iAwsComponent *_focused);
 
   /// Returns the lowest-level visible component (if any) at the screen coordinates
   virtual iAwsComponent* ComponentAt(int x, int y);

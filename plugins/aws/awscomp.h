@@ -94,6 +94,12 @@ protected:
      */
   unsigned int redraw_tag;
 
+	/// Tab order
+	csVector TabOrder;
+
+	/// Focusable flag
+	bool focusable;
+
 public:
   SCF_DECLARE_IBASE;
 
@@ -176,6 +182,15 @@ public:
   /// Returns the state of the hidden flag
   virtual bool isHidden ();
 
+  /// Set focusable flag
+  virtual void SetFocusable (bool _focusable);
+
+  /// Returns focusable flag
+  virtual bool Focusable ();
+
+  /// Returns the state of the focus flag
+  virtual bool isFocused ();
+
   /// Returns true if this component is maximized
   virtual bool IsMaximized();
 
@@ -184,6 +199,12 @@ public:
 
   /// Shows a component
   virtual void Show ();
+
+  /// Focus a component
+  virtual void SetFocus ();
+
+  /// Unfocus a component
+  virtual void UnsetFocus ();
 
   /// Returns the state of the DEAF flag
   virtual bool isDeaf ();
@@ -280,6 +301,21 @@ public:
   /// Sets the sibling below this one
   virtual void SetComponentBelow (iAwsComponent* below);
 
+	//Add child to TabOrder
+  virtual bool AddToTabOrder(iAwsComponent *child);
+
+  /// Get's next child component in parent TabOrder
+  virtual iAwsComponent *TabNext (iAwsComponent *child);
+
+  /// Get's previous child component in parent TabOrder
+  virtual iAwsComponent *TabPrev (iAwsComponent *child);
+
+  /// Returns TabOrder length
+  virtual int GetTabLength();
+
+  /// Returns "index" component from TabOrder, NULL if there is none
+  virtual iAwsComponent *GetTabComponent(int index);
+
   /// Returns true if this component has children
   virtual bool HasChildren ();
 
@@ -371,6 +407,12 @@ public:
 
   /// Triggered when a child is hidden
   virtual void OnChildHide();
+
+  /// Triggered when a child becomes focused
+  virtual void OnSetFocus();
+
+  /// Triggered when a child becomes unfocused
+  virtual void OnUnsetFocus();
 
 
 protected:

@@ -106,6 +106,9 @@ public:
   /// The value of the scroll bar changed
   static const int signalChanged;
 
+  /// The component becomes focused
+  static const int signalFocused;
+
   /// Trigger called when inc button is clicked
   static void IncClicked (void *sk, iAwsSource *source);
 
@@ -157,6 +160,12 @@ public:
 
   /// Triggered when this component gains mouse focus
   virtual bool OnMouseEnter ();
+
+  /// Triggered when the user presses a key
+  virtual bool OnKeypress (int key, int cha, int modifiers);
+
+  /// Triggered when component becomes focused
+  virtual void OnSetFocus ();
 
   /// Adds in the inc and dec buttons appropriately
   virtual void OnAdded ();

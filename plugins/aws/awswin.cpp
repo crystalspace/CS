@@ -198,7 +198,6 @@ bool awsWindow::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   mininfo->AddIntKey("IconAlign", awsCmdButton::iconLeft);
   mininfo->AddStringKey("Icon", min_button_txt->GetData());
 
-
   min_button.SetFlag(AWSF_CMP_NON_CLIENT);
   min_button.Create(WindowManager(), this, mininfo->GetThisNode());
   mininfo->DecRef();

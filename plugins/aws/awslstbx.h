@@ -306,6 +306,9 @@ public:
 
   /// The box was scrolled programmatically, or by a keypress.
   static const int signalScrolled;
+
+  /// Component becomes focused
+  static const int signalFocused;
 public:
   /// Get's the texture handle and the title, plus style if there is one.
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
@@ -336,6 +339,12 @@ public:
 
   /// Triggered when this component gains mouse focus
   virtual bool OnMouseEnter ();
+
+  /// Triggered when the user presses a key
+  virtual bool OnKeypress (int key, int cha, int modifiers);
+
+  /// Triggered when the component becomes focused
+  virtual void OnSetFocus ();
 
   /// Updates the scrollbar so that it's in the right place and has the right stuff.
   virtual void OnAdded ();

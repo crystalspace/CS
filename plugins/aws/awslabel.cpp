@@ -3,11 +3,13 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/fontserv.h"
+#include "iutil/evdefs.h"
 #include "csutil/scfstr.h"
 
 #include <stdio.h>
 
 const int awsLabel:: signalClicked = 0x1;
+const int awsLabel:: signalFocused = 0x2;
 const int awsLabel:: alignLeft = 0x0;
 const int awsLabel:: alignRight = 0x1;
 const int awsLabel:: alignCenter = 0x2;
@@ -38,6 +40,10 @@ bool awsLabel::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 
   pm->GetString (settings, "Caption", caption);
   pm->GetInt (settings, "Align", alignment);
+
+  int _focusable = 0;
+  pm->GetInt (settings, "Focusable", _focusable);
+	focusable = _focusable;
 
   return true;
 }
@@ -191,6 +197,26 @@ bool awsLabel::OnMouseEnter ()
   return true;
 }
 
+bool awsLabel::OnKeypress (int key, int cha, int modifiers)
+{
+ char chr = (char)key;
+ switch(chr)
+ {
+  case CSKEY_ENTER:
+		Broadcast (signalClicked);
+		break;
+ }
+
+	Invalidate ();
+
+	return true;
+}
+
+void awsLabel::OnSetFocus()
+{
+	Broadcast (signalFocused);
+}
+
 /************************************* Command Button Factory ****************/
 
 awsLabelFactory::awsLabelFactory (iAws *wmgr) :
@@ -198,6 +224,7 @@ awsLabelFactory::awsLabelFactory (iAws *wmgr) :
 {
   Register ("Label");
   RegisterConstant ("signalLabelClicked", awsLabel::signalClicked);
+  RegisterConstant ("signalLabelFocused", awsLabel::signalFocused);
 
   RegisterConstant ("lblAlignLeft", awsLabel::alignLeft);
   RegisterConstant ("lblAlignRight", awsLabel::alignRight);

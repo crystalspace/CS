@@ -43,6 +43,9 @@ public:
   /// An up and down motion for the button
   static const int signalClicked;
 
+  /// Component becomes focused
+  static const int signalFocused;
+
   /******* Alignment Options ************/
 
   /// Align text to left.
@@ -89,6 +92,12 @@ public:
 
   /// Triggered when this component gains mouse focus
   virtual bool OnMouseEnter ();
+
+  /// Triggered when the user presses a key
+  virtual bool OnKeypress (int key, int cha, int modifiers);
+
+  /// Triggered when this component becomes focused
+  virtual void OnSetFocus ();
 };
 
 class awsLabelFactory :

@@ -13,6 +13,7 @@
 #include <stdio.h>
 
 const int awsScrollBar:: signalChanged = 0x1;
+const int awsScrollBar:: signalFocused = 0x2;
 const int awsScrollBar:: sboVertical = 0x0;
 const int awsScrollBar:: sboHorizontal = 0x1;
 
@@ -608,6 +609,54 @@ bool awsScrollBar::OnMouseEnter ()
   return true;
 }
 
+bool awsScrollBar::OnKeypress (int key, int cha, int modifiers)
+{
+ switch(key)
+ {
+  case CSKEY_UP:
+    if(orientation == sboVertical)
+		{
+		 value -= value_delta;
+		 Broadcast (signalChanged);
+		 value = (value < min ? min : (value > max ? max : value));
+		}
+		break;
+  case CSKEY_DOWN:
+    if(orientation == sboVertical)
+		{
+		 value += value_delta;
+		 Broadcast (signalChanged);
+		 value = (value < min ? min : (value > max ? max : value));
+		}
+		break;
+  case CSKEY_LEFT:
+    if(orientation == sboHorizontal)
+		{
+		 value -= value_delta;
+		 Broadcast (signalChanged);
+		 value = (value < min ? min : (value > max ? max : value));
+		}
+		break;
+  case CSKEY_RIGHT:
+    if(orientation == sboHorizontal)
+		{
+		 value += value_delta;
+		 Broadcast (signalChanged);
+		 value = (value < min ? min : (value > max ? max : value));
+		}
+		break;
+	}
+
+	Invalidate ();
+
+	return true;
+}
+
+void awsScrollBar::OnSetFocus ()
+{
+	Broadcast (signalFocused);
+}
+
 void awsScrollBar::OnAdded ()
 {
   AddChild (incVal);
@@ -636,6 +685,7 @@ awsScrollBarFactory::awsScrollBarFactory (
   RegisterConstant ("sboHorizontal", awsScrollBar::sboHorizontal);
 
   RegisterConstant ("signalScrollBarChanged", awsScrollBar::signalChanged);
+  RegisterConstant ("signalScrollBarFocused", awsScrollBar::signalFocused);
 }
 
 awsScrollBarFactory::~awsScrollBarFactory ()

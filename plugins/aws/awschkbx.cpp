@@ -14,6 +14,7 @@ const int awsCheckBox:: alignRight = 0x1;
 const int awsCheckBox:: alignCenter = 0x2;
 
 const int awsCheckBox:: signalClicked = 0x1;
+const int awsCheckBox:: signalFocused = 0x2;
 
 awsCheckBox::awsCheckBox () :
   is_down(false),
@@ -51,6 +52,11 @@ bool awsCheckBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   tex[1] = pm->GetTexture ("CheckBoxDn");
   tex[2] = pm->GetTexture ("CheckBoxOn");
   tex[3] = pm->GetTexture ("CheckBoxOff");
+
+	int _focusable = 0;
+  pm->GetInt (settings, "Focusable", _focusable);
+	focusable = _focusable;
+
 
   return true;
 }
@@ -121,6 +127,9 @@ void awsCheckBox::OnDraw (csRect /*clip*/)
 
   int txw = 0, txh = 0;
   int txy = 0, txx = 0;
+
+  int hi = WindowManager ()->GetPrefMgr ()->GetColor (AC_HIGHLIGHT);
+  int lo = WindowManager ()->GetPrefMgr ()->GetColor (AC_SHADOW);
 
   /// Get the size of our textures
   if (tex[0]) tex[0]->GetOriginalDimensions (txw, txh);
@@ -269,6 +278,30 @@ bool awsCheckBox::OnMouseEnter ()
   return true;
 }
 
+bool awsCheckBox::OnKeypress (int key, int cha, int modifiers)
+{
+ char chr = (char)key;
+ switch(chr)
+ {
+  case CSKEY_ENTER:
+			if (!is_on)
+				is_on = true;
+			else
+				is_on = false;
+			Broadcast (signalClicked);
+		break;
+	}
+
+	Invalidate ();
+
+	return true;
+}
+
+void awsCheckBox::OnSetFocus ()
+{
+	Broadcast (signalFocused);
+}
+
 /************************************* Command Button Factory ****************/
 awsCheckBoxFactory::awsCheckBoxFactory (iAws *wmgr) :
   awsComponentFactory(wmgr)
@@ -278,6 +311,7 @@ awsCheckBoxFactory::awsCheckBoxFactory (iAws *wmgr) :
   RegisterConstant ("cbAlignLeft", awsCheckBox::alignLeft);
   RegisterConstant ("cbAlignRight", awsCheckBox::alignRight);
   RegisterConstant ("signalCheckBoxClicked", awsCheckBox::signalClicked);
+  RegisterConstant ("signalCheckBoxFocused", awsCheckBox::signalFocused);
 }
 
 awsCheckBoxFactory::~awsCheckBoxFactory ()

@@ -19,6 +19,7 @@ const int awsTextBox::signalChanged = 0x1;
 const int awsTextBox::signalLostFocus = 0x2;
 const int awsTextBox::signalEnterPressed = 0x3;
 const int awsTextBox::signalTabPressed = 0x4;
+const int awsTextBox::signalFocused = 0x5;
 
 static iAwsSink *textbox_sink = 0;
 
@@ -558,6 +559,11 @@ bool awsTextBox::OnGainFocus ()
   return true;
 }
 
+void awsTextBox::OnSetFocus ()
+{
+	Broadcast (signalFocused);
+}
+
 /************************************* Command Button Factory ****************/
 awsTextBoxFactory::awsTextBoxFactory (iAws *wmgr) :
   awsComponentFactory(wmgr)
@@ -570,6 +576,7 @@ awsTextBoxFactory::awsTextBoxFactory (iAws *wmgr) :
   RegisterConstant ("signalTextBoxLostFocus", awsTextBox::signalLostFocus);
   RegisterConstant ("signalEnterKeyPressed", awsTextBox::signalEnterPressed);
   RegisterConstant ("signalTabKeyPressed", awsTextBox::signalTabPressed);
+  RegisterConstant ("signalTextBoxFocused", awsTextBox::signalFocused);
 }
 
 awsTextBoxFactory::~awsTextBoxFactory ()

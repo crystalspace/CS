@@ -15,6 +15,7 @@ const int awsCmdButton:: iconTop = 0x2;
 const int awsCmdButton:: iconBottom = 0x3;
 
 const int awsCmdButton:: signalClicked = 0x1;
+const int awsCmdButton:: signalFocused = 0x2;
 
 awsCmdButton::awsCmdButton () :
   is_down(false),
@@ -214,6 +215,10 @@ void awsCmdButton::OnDraw (csRect /*clip*/)
 {
   int tw=0, th=0, tx, ty, itx=0, ity=0;
 
+	bool can_raise = 
+		(mouse_is_over &&  !(WindowManager ()->GetFlags () & AWSF_KeyboardControl ))
+		||(isFocused () && (WindowManager ()->GetFlags () & AWSF_KeyboardControl ));
+
   iGraphics2D *g2d = WindowManager ()->G2D ();
   iGraphics3D *g3d = WindowManager ()->G3D ();
 
@@ -243,7 +248,7 @@ void awsCmdButton::OnDraw (csRect /*clip*/)
 	  {
 		  if(is_down)
 			  showing_style = fsSunken;
-		  else if(mouse_is_over)
+		  else if (can_raise)
 			  showing_style = fsRaised;
 		  else
 			  showing_style = fsFlat;
@@ -332,7 +337,7 @@ void awsCmdButton::OnDraw (csRect /*clip*/)
 		  -1,
 		  caption->GetData ());
 	  
-	  if (mouse_is_over && style == fsNormal)
+	  if ( can_raise && style == fsNormal)
 	  {
           int x, y, y1 = Frame ().ymin +
 			  ty +
@@ -349,14 +354,14 @@ void awsCmdButton::OnDraw (csRect /*clip*/)
 		  
           for (x = x1; x < x2; ++x)
           {
-			  g2d->DrawPixel (x, y1, (x & 1 ? hi : lo));
-			  g2d->DrawPixel (x, y2, (x & 1 ? hi : lo));
+						g2d->DrawPixel (x, y1, (x & 1 ? hi : lo));
+						g2d->DrawPixel (x, y2, (x & 1 ? hi : lo));
           }
 		  
           for (y = y2; y < y1; ++y)
           {
-			  g2d->DrawPixel (x1, y, (y & 1 ? hi : lo));
-			  g2d->DrawPixel (x2, y, (y & 1 ? hi : lo));
+						g2d->DrawPixel (x1, y, (y & 1 ? hi : lo));
+						g2d->DrawPixel (x2, y, (y & 1 ? hi : lo));
           }
 	  }
   }
@@ -368,7 +373,7 @@ void awsCmdButton::OnDraw (csRect /*clip*/)
 	  
 	  if (is_down)
           texindex = 2;
-	  else if (mouse_is_over)
+	  else if (can_raise)
           texindex = 1;
 	  else
           texindex = 0;
@@ -509,6 +514,44 @@ bool awsCmdButton::OnMouseEnter ()
   return true;
 }
 
+bool awsCmdButton::OnKeypress (int key, int cha, int modifiers)
+{
+ char chr = (char)key;
+ switch(chr)
+ {
+  case CSKEY_ENTER:
+    was_down = is_down;
+
+    if (!is_switch || is_down == false) is_down = true;
+
+		if (!is_switch)
+		{
+			if (is_down) 
+				Broadcast (signalClicked);
+			is_down = false;
+		}
+		else
+		{
+			if (was_down)
+				is_down = false;
+			else
+				ClearGroup ();
+
+			Broadcast (signalClicked);
+		}
+		break;
+	}
+
+	Invalidate ();
+
+	return true;
+}
+
+void awsCmdButton::OnSetFocus ()
+{
+	Broadcast (signalFocused);
+}
+
 /************************************* Command Button Factory ****************/
 awsCmdButtonFactory::awsCmdButtonFactory (
   iAws *wmgr) :
@@ -524,6 +567,7 @@ awsCmdButtonFactory::awsCmdButtonFactory (
   RegisterConstant ("biaBottom", awsCmdButton::iconBottom);
 
   RegisterConstant ("signalCmdButtonClicked", awsCmdButton::signalClicked);
+  RegisterConstant ("signalCmdButtonFocused", awsCmdButton::signalFocused);
 }
 
 awsCmdButtonFactory::~awsCmdButtonFactory ()

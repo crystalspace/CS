@@ -19,6 +19,8 @@ const int awsRadButton:: signalTurnedOff = 0x2;
 
 const int awsRadButton:: signalTurnedOn  = 0x3;
 
+const int awsRadButton:: signalFocused	 = 0x4;
+
 awsRadButton::awsRadButton () :
   is_down(false),
   mouse_is_over(false),
@@ -55,6 +57,11 @@ bool awsRadButton::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   tex[1] = pm->GetTexture ("RadioButtonDn");
   tex[2] = pm->GetTexture ("RadioButtonOn");
   tex[3] = pm->GetTexture ("RadioButtonOff");
+
+  int _focusable = 0;
+  pm->GetInt (settings, "Focusable", _focusable);
+	focusable = _focusable;
+
 
   return true;
 }
@@ -172,6 +179,9 @@ void awsRadButton::OnDraw (csRect /*clip*/)
   int txw = 0, txh = 0;
   int txy = 0, txx = 0;
 
+  int hi = WindowManager ()->GetPrefMgr ()->GetColor (AC_HIGHLIGHT);
+  int lo = WindowManager ()->GetPrefMgr ()->GetColor (AC_SHADOW);
+
   /// Get the size of our textures
   if (tex[0]) tex[0]->GetOriginalDimensions (txw, txh);
 
@@ -277,7 +287,6 @@ void awsRadButton::OnDraw (csRect /*clip*/)
         WindowManager ()->GetPrefMgr ()->GetColor (AC_TEXTFORE),
         -1,
         tmp.GetData ());
-  
 	}
 }
 
@@ -321,6 +330,31 @@ bool awsRadButton::OnMouseEnter ()
   return true;
 }
 
+bool awsRadButton::OnKeypress (int key, int cha, int modifiers)
+{
+ char chr = (char)key;
+ switch(chr)
+ {
+  case CSKEY_ENTER:
+			if (!is_on)
+			{
+				is_on = true;
+				ClearGroup ();
+			}
+			Broadcast (signalClicked);
+		break;
+	}
+
+	Invalidate ();
+
+	return true;
+}
+
+void awsRadButton::OnSetFocus ()
+{
+	Broadcast (signalFocused);
+}
+
 /************************************* Command Button Factory ****************/
 
 awsRadButtonFactory::awsRadButtonFactory (
@@ -336,6 +370,8 @@ awsRadButtonFactory::awsRadButtonFactory (
   RegisterConstant ("signalRadButtonTurnedOff", awsRadButton::signalTurnedOff);
 
   RegisterConstant ("signalRadButtonTurnedOn", awsRadButton::signalTurnedOn);
+
+  RegisterConstant ("signalRadButtonFocused", awsRadButton::signalFocused);
 }
 
 awsRadButtonFactory::~awsRadButtonFactory ()

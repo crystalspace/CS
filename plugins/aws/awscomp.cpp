@@ -24,13 +24,16 @@ awsComponent::awsComponent () :
   above(NULL),
   is_zoomed(false),
   flags(0),
-  signalsrc(this)
+  signalsrc(this),
+	focusable(false)
 {
   SCF_CONSTRUCT_IBASE (NULL);
 }
 
 awsComponent::~awsComponent ()
 {
+  TabOrder.DeleteAll(false); //remove all children from TabOrder, but don't free them
+
   /// Let go our references to any children if we have them.
   iAwsComponent* child = GetTopChild();
   iAwsComponent* next;
@@ -38,7 +41,6 @@ awsComponent::~awsComponent ()
   {
     next = child->ComponentBelow();
     RemoveChild (child);
-
     child = next;
   }
 
@@ -75,6 +77,21 @@ bool awsComponent::IsMaximized()
 bool awsComponent::isHidden ()
 {
   return Flags () & AWSF_CMP_HIDDEN;
+}
+
+void awsComponent::SetFocusable (bool _focusable)
+{
+  focusable = _focusable;
+}
+
+bool awsComponent::Focusable ()
+{
+  return focusable;
+}
+
+bool awsComponent::isFocused ()
+{
+  return Flags () & AWSF_CMP_FOCUSED;
 }
 
 bool awsComponent::isDeaf ()
@@ -169,6 +186,8 @@ bool awsComponent::Create(iAws* wmgr, iAwsComponent* parent,
       Parent()->Layout()->AddComponent(this, settings);
 
     Parent()->AddChild(this);
+		//if(Focusable())
+		 Parent()->AddToTabOrder(this);
   }
 
   return true;
@@ -235,7 +254,8 @@ bool awsComponent::GetProperty (const char *name, void **parm)
 {
   if (strcmp ("Frame", name) == 0)
   {
-    csRect *r = new csRect (Frame ());
+		csRect rect = Frame ();
+    csRect *r = new csRect(rect);
     *parm = (void *)r;
     return true;
   }
@@ -504,6 +524,32 @@ void awsComponent::Show ()
     Parent()->OnChildShow();
 }
 
+void awsComponent::SetFocus ()
+{
+  if (Flags () & AWSF_CMP_FOCUSED)
+    return;
+
+  SetFlag (AWSF_CMP_FOCUSED);
+  Invalidate();
+  if(!Parent())
+    WindowManager()->InvalidateUpdateStore();
+  else
+      OnSetFocus();
+}
+
+void awsComponent::UnsetFocus ()
+{
+  if (!(Flags () & AWSF_CMP_FOCUSED))
+    return;
+  
+  ClearFlag (AWSF_CMP_FOCUSED);
+  Invalidate();
+  if(!Parent())
+    WindowManager()->InvalidateUpdateStore();
+  else
+    OnUnsetFocus();
+}
+
 void awsComponent::SetDeaf (bool bDeaf)
 {
   if (!((Flags () & AWSF_CMP_DEAF) ^ bDeaf))
@@ -675,6 +721,54 @@ void awsComponent::SetComponentBelow(iAwsComponent* comp)
 {
   below = comp;
   CS_ASSERT(LinkedListCheck());
+}
+
+bool awsComponent::AddToTabOrder(iAwsComponent *child)
+{
+	if (child->Parent() != this)
+		return false;
+	
+	TabOrder.PushSmart(child);
+
+	return true;
+}
+
+iAwsComponent *awsComponent::TabNext(iAwsComponent *child)
+{
+	int n = TabOrder.Find(child);
+
+	if(n == -1)
+		return NULL;
+	else 
+	if(n == TabOrder.Length() -1)
+		return ((iAwsComponent *)TabOrder[0]);
+	else 
+		return ((iAwsComponent *)TabOrder[n +1]);
+}
+
+iAwsComponent *awsComponent::TabPrev(iAwsComponent *child)
+{
+	int n = TabOrder.Find(child);
+
+	if(n == -1)
+		return NULL;
+	else 
+	if(n == 0)
+		return ((iAwsComponent *)TabOrder[TabOrder.Length() -1]);
+	else 
+		return ((iAwsComponent *)TabOrder[n -1]);
+}
+
+int awsComponent::GetTabLength()
+{
+	return TabOrder.Length();
+}
+
+iAwsComponent *awsComponent::GetTabComponent(int index)
+{
+	if(index < TabOrder.Length())
+		return ((iAwsComponent *)TabOrder[index]);	
+	else return NULL;
 }
 
 void awsComponent::SetAbove(iAwsComponent* comp)
@@ -926,6 +1020,16 @@ void awsComponent::OnChildHide()
 }
 
 void awsComponent::OnChildShow()
+{
+  return ;
+}
+
+void awsComponent::OnSetFocus()
+{
+  return ;
+}
+
+void awsComponent::OnUnsetFocus()
 {
   return ;
 }
