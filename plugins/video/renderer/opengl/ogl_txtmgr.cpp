@@ -26,7 +26,6 @@
 #include "ogl_proctexsoft.h"
 #include "csutil/scanstr.h"
 #include "csutil/debug.h"
-#include "csutil/util.h"
 #include "iutil/cfgfile.h"
 #include "igraphic/image.h"
 #include "csgfx/memimage.h"
@@ -498,32 +497,20 @@ void csTextureHandleOpenGL::InitTexture (csTextureManagerOpenGL *texman,
   orig_width = image->GetWidth ();
   orig_height = image->GetHeight ();
 
-  // In opengl all textures, even non-mipmapped textures are required
-  // to be powers of 2.
-  if (!csIsPowerOf2(orig_width))
-    orig_width = csFindNearestPowerOf2 (orig_width) / 2;
-
-  if (!csIsPowerOf2 (orig_height))
-    orig_height = csFindNearestPowerOf2 (orig_height) / 2;
-
-  int nwidth = orig_width;
-  int nheight = orig_height;
-
-  // downsample textures, if requested, but not 2D textures
-  if (!(flags & (CS_TEXTURE_2D | CS_TEXTURE_PROC)))
-  {
-    nwidth >>= texman->texture_downsample;
-    nheight >>= texman->texture_downsample;
-  }
-
   // If necessary rescale if bigger than maximum texture size
-  if (nwidth > texman->max_tex_size) nwidth = texman->max_tex_size;
-  if (nheight > texman->max_tex_size) nheight = texman->max_tex_size;
-
-  if ((nwidth != image->GetWidth() ) || (nheight != image->GetHeight() ))
+  if ((orig_width > texman->max_tex_size) ||
+      (orig_height > texman->max_tex_size))
   {
+    int nwidth = orig_width;
+    int nheight = orig_height;
+    if (orig_width > texman->max_tex_size) nwidth = texman->max_tex_size;
+    if (orig_height > texman->max_tex_size) nheight = texman->max_tex_size;
     image->Rescale (nwidth, nheight);
   }
+
+  // In opengl all textures, even non-mipmapped textures are required
+  // to be powers of 2.
+  AdjustSizePo2 ();
 
   // Determine the format and type of the source we gonna tranform the data to
   FindFormatType ();
@@ -666,8 +653,8 @@ bool csTextureHandleOpenGL::GetMipMapDimensions (int mipmap, int &w, int &h)
 {
   if (mipmap < vTex.Length ())
   {
-    w = orig_width >> mipmap;
-    h = orig_height >> mipmap;
+    w = vTex[mipmap]->get_width ();
+    h = vTex[mipmap]->get_height ();
     return true;
   }
   return false;
@@ -719,8 +706,6 @@ void csTextureManagerOpenGL::read_config (iConfigFile *config)
 
   sharpen_mipmaps = config->GetInt
         ("Video.OpenGL.SharpenMipmaps", 0);
-  texture_downsample = config->GetInt
-        ("Video.OpenGL.TextureDownsample", 0);
 
   csRef<iConfigIterator> it (config->Enumerate ("Video.OpenGL.TargetFormat"));
   while (it->Next ())
