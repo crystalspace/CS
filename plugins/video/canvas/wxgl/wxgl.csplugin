@@ -6,7 +6,7 @@
       <class>
         <name>crystalspace.graphics2d.wxgl</name>
         <implementation>csGraphics2DWX</implementation>
-        <description>Crystal Space OpenGL canvas that can be embedded into a WxWidgets application</description>
+        <description>wxWidgets OpenGL canvas</description>
       </class>
     </classes>
   </scf>
