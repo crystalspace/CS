@@ -90,7 +90,7 @@ bool csGraphics3DSoftware::Open (const char *Title)
 }
 
 iGraphics3D *csGraphics3DSoftware::CreateOffScreenRenderer 
-  (iGraphics2D */*parent_g2d*/, int width, int height, csPixelFormat *pfmt, 
+  (iGraphics2D* /*parent_g2d*/, int width, int height, csPixelFormat *pfmt, 
    void *buffer, RGBPixel *palette, int pal_size)
 {
   csDynamicTextureSoft3D *tex3d =  
