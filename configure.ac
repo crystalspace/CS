@@ -1302,8 +1302,9 @@ AC_ARG_ENABLE([linux-joystick-support],
     [AC_HELP_STRING([--enable-linux-joystick-support],
 	[enable joystick support on linux platform (default NO); This builds
 	plugins for the linux joystick which tries to use the linux kernel
-	joystick drivers.])], [], [enable_linux_joystick_support=yes])
-AS_IF([test $enable_linux_joystick_support = yes],
+	joystick drivers.])],
+    [enable_linux_joystick_support=$enableval])
+AS_IF([test "$enable_linux_joystick_support" = yes],
     [CS_MAKEFILE_PROPERTY([LINUXJOYSTICK.AVAILABLE], [yes])], [])
 
 #------------------------------------------------------------------------------
