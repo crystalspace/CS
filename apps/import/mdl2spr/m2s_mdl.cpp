@@ -436,7 +436,7 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
   }
 
   // begin hard work now
-  fprintf(f, "MESHOBJ '%s' (\n", spritename);
+  fprintf(f, "MESHFACT '%s' (\n", spritename);
   fprintf(f, "\tPLUGIN ('crystalspace.mesh.loader.factory.sprite.3d')\n");
   fprintf(f, "\tPARAMS (\n");
   fprintf(f, "\t\tMATERIAL ('%s')\n", spritename);

@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+13-Mar-2002
+	- Fixed mdl2spr so that it now correctly generates a MESHFACT
+	  keyword instead of MESHOBJ.
 12-Mar-2002
 	- Made the lightmap cache for pseudo-dynamic lightmaps (shadow
 	  maps) a bit more robust. Previously changing pseudo-dynamic
