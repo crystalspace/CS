@@ -987,6 +987,7 @@ csVFS::~csVFS ()
 
 bool csVFS::EnumConfig (csSome Parm, char *Name, size_t DataSize, csSome Data)
 {
+  (void) DataSize;
   ((csVFS *)Parm)->AddLink (Name, (char *)Data);
   return false;
 }

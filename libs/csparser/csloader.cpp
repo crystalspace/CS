@@ -1629,6 +1629,7 @@ csCurve* csLoader::load_bezier (char* polyname, csWorld* w, char* buf,
 
 ImageFile* csLoader::load_image (char* name, csWorld* w)
 {
+  (void) w;
   size_t size;
   ImageFile *ifile = NULL;
   char *buf = VFS->ReadFile (name, size);
@@ -3471,6 +3472,8 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
 
 csSoundBufferObject* csLoader::load_sound(char* name, char* filename, csWorld* w)
 {
+  (void) w;
+
   csSoundBufferObject* sndobj = NULL;
   csSoundBuffer* snd = NULL;
 
