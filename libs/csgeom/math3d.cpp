@@ -141,13 +141,10 @@ int csMatrix3::Eigen (csMatrix3* vout, csVector3* dout)
   int nrot;
 
   csMatrix3 v;
-  csVector3 b,d;
   csVector3 z (0, 0, 0);
 
   // Load b and d with the diagonals of a.
-  b.x = d.x = m11;
-  b.y = d.y = m22;
-  b.z = d.z = m33;
+  csVector3 b (m11, m22, m33), d (m11, m22, m33);
 
   nrot = 0;
   
@@ -256,7 +253,7 @@ int csMatrix3::Eigens1 (csMatrix3 *evecs)
 {
 #define swap(a,b) { float t = a; a = b; b = t; }
   int n;
-  csVector3 evals;
+  csVector3 evals (0, 0, 0);
 
   n = Eigen (evecs, &evals);
 
@@ -417,6 +414,14 @@ int csMath3::WhichSide3D (const csVector3& p,
   if (s < 0) return 1;
   else if (s > 0) return -1;
   else return 0;
+}
+
+bool csMath3::PlanesClose (const csPlane& p1, const csPlane& p2)
+{
+  if (PlanesEqual (p1, p2)) return true;
+  csPlane p1n = p1; p1n.Normalize ();
+  csPlane p2n = p2; p2n.Normalize ();
+  return PlanesEqual (p1n, p2n);
 }
 
 //---------------------------------------------------------------------------
