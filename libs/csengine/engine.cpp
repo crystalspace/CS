@@ -1025,7 +1025,6 @@ void csEngine::DeleteAll ()
   delete shared_variables;
   shared_variables = new csSharedVariableList();
 
-  GetThingType ();
   if (thing_type != 0)
   {
     csRef<iThingEnvironment> te (

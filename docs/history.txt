@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+23-Jan-2004
+	- Jorrit fixed a crash bug in the engine. At destruction it was
+	  forcing a get of the thing plugin. However this also happens
+	  at cleanup if nothing else has been initialized yet (i.e. if
+	  there is an error doing application initialization). This
+	  caused crashes because thing plugin was trying to do stuff to
+	  the renderers which were not initialized yet.
 22-Jan-2004
 	- Jorrit added the engine target to both jam and make 'walkall' since
 	  the engine plugin is now required.
