@@ -385,5 +385,27 @@ float csPoly2D::GetSignedArea ()
   return area / 2.0;
 }
 
+static float randflt ()
+{
+  return ((float)rand ()) / RAND_MAX;
+}
+
+void csPoly2D::Random (int num, const csBox2& max_bbox)
+{
+  MakeEmpty ();
+  int i;
+  csVector2 v;
+  float w = max_bbox.MaxX () - max_bbox.MinX ();
+  float h = max_bbox.MaxY () - max_bbox.MinY ();
+  float dx = max_bbox.MinX ();
+  float dy = max_bbox.MinY ();
+  for (i = 0 ; i < 3 ; i++)
+  {
+    v.Set (randflt ()*w+dx, randflt ()*h+dy);
+    AddVertex (v);
+  }
+  // @@@ Only triangles are supported right now.
+  (void)num;
+}
 
 //---------------------------------------------------------------------------

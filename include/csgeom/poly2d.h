@@ -205,6 +205,13 @@ public:
    * Calculate the signed area of this polygon.
    */
   float GetSignedArea();
+
+  /**
+   * Generate a random convex polygon with the specified number
+   * of vertices. The polygon will be inside the given bounding box.
+   * @@@ Currently only triangles are supported.
+   */
+  void Random (int num, const csBox2& max_bbox);
 };
 
 /**

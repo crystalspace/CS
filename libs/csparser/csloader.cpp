@@ -4643,10 +4643,7 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
                     fr->GetName ());
                   fatal_exit (0, false);
                 }
-                if (stemp->VerticesAreCompressed ())
-                  stemp->GetCompressedVertex (anm_idx, i) = csVector3 (x, y, z);
-                else
-                  stemp->GetVertex (anm_idx, i) = csVector3 (x, y, z);
+                stemp->GetVertex (anm_idx, i) = csVector3 (x, y, z);
                 stemp->GetTexel  (tex_idx, i) = csVector2 (u, v);
                 i++;
                 break;
@@ -4693,34 +4690,19 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
 
       case TOKEN_MERGE_NORMALS:
         {
-          csFrame* frame = LoadFrame (stemp, params);
-          CsPrintf (MSG_INITIALIZATION, "MERGE_NORMALS: ");
-          int new_vertex_count = stemp->MergeNormals (frame);
-          CsPrintf (MSG_INITIALIZATION, "%d redundant vertices found.\n",
-            new_vertex_count);
+	  CsPrintf (MSG_WARNING, "MERGE_NORMALS is obsolete.\n");
         }
         break;
 
       case TOKEN_MERGE_TEXELS:
         {
-          int do_merge;
-          ScanStr (params, "%b", &do_merge);
-          if (do_merge)
-          {
-            int same_count = stemp->MergeTexels ();
-            CsPrintf (MSG_INITIALIZATION,
-            "MERGE_TEXELS: Deleted %d redundant texel maps.\n",
-              same_count);
-          }
+	  CsPrintf (MSG_WARNING, "MERGE_TEXELS is obsolete.\n");
         }
         break;
 
       case TOKEN_MERGE_VERTICES:
         {
-          csFrame* frame = LoadFrame (stemp, params);
-          int new_vertex_count = stemp->MergeVertices (frame);
-          CsPrintf (MSG_INITIALIZATION, "MERGE_VERTICES: %d redundant vertices found.\n",
-            new_vertex_count);
+	  CsPrintf (MSG_WARNING, "MERGE_VERTICES is obsolete.\n");
         }
         break;
     }

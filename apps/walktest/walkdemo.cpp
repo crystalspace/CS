@@ -154,24 +154,12 @@ void add_tree_limbs (csSpriteTemplate* tmpl, csFrame* frame,
   int anm_idx = frame->GetAnmIndex ();
   int tex_idx = frame->GetTexIndex ();
 
-  if (tmpl->VerticesAreCompressed ())
-  {
-    tmpl->GetCompressedVertex(anm_idx, par_vertex_idx+0) = csVector3(-.05, 0, -.05);
-    tmpl->GetCompressedVertex(anm_idx, par_vertex_idx+1) = csVector3(.05, 0, -.05);
-    tmpl->GetCompressedVertex(anm_idx, par_vertex_idx+2) = csVector3(0, 0, .05);
-    tmpl->GetCompressedVertex(anm_idx, par_vertex_idx+3) = csVector3(-.05, .45, -.05);
-    tmpl->GetCompressedVertex(anm_idx, par_vertex_idx+4) = csVector3(.05, .45, -.05);
-    tmpl->GetCompressedVertex(anm_idx, par_vertex_idx+5) = csVector3(0, .45, .05);
-  }
-  else
-  {
-    tmpl->GetVertex(anm_idx, par_vertex_idx+0) = csVector3(-.05, 0, -.05);
-    tmpl->GetVertex(anm_idx, par_vertex_idx+1) = csVector3(.05, 0, -.05);
-    tmpl->GetVertex(anm_idx, par_vertex_idx+2) = csVector3(0, 0, .05);
-    tmpl->GetVertex(anm_idx, par_vertex_idx+3) = csVector3(-.05, .45, -.05);
-    tmpl->GetVertex(anm_idx, par_vertex_idx+4) = csVector3(.05, .45, -.05);
-    tmpl->GetVertex(anm_idx, par_vertex_idx+5) = csVector3(0, .45, .05);
-  }
+  tmpl->GetVertex(anm_idx, par_vertex_idx+0) = csVector3(-.05, 0, -.05);
+  tmpl->GetVertex(anm_idx, par_vertex_idx+1) = csVector3(.05, 0, -.05);
+  tmpl->GetVertex(anm_idx, par_vertex_idx+2) = csVector3(0, 0, .05);
+  tmpl->GetVertex(anm_idx, par_vertex_idx+3) = csVector3(-.05, .45, -.05);
+  tmpl->GetVertex(anm_idx, par_vertex_idx+4) = csVector3(.05, .45, -.05);
+  tmpl->GetVertex(anm_idx, par_vertex_idx+5) = csVector3(0, .45, .05);
 
   tmpl->GetTexel(tex_idx, par_vertex_idx+0) = csVector2(0, 0);
   tmpl->GetTexel(tex_idx, par_vertex_idx+1) = csVector2(.99, 0);
@@ -381,24 +369,12 @@ void add_ghost_limbs (csSpriteTemplate* tmpl, csFrame* frame, csSkeletonLimb* pa
   int anm_idx = frame->GetAnmIndex ();
   int tex_idx = frame->GetTexIndex ();
 
-  if (tmpl->VerticesAreCompressed ())
-  {
-    tmpl->GetCompressedVertex(anm_idx, par_vertex_idx+0) = csVector3(-dim, 0, -dim);
-    tmpl->GetCompressedVertex(anm_idx, par_vertex_idx+1) = csVector3(dim, 0, -dim);
-    tmpl->GetCompressedVertex(anm_idx, par_vertex_idx+2) = csVector3(0, 0, dim);
-    tmpl->GetCompressedVertex(anm_idx, par_vertex_idx+3) = csVector3(-dim, .45, -dim);
-    tmpl->GetCompressedVertex(anm_idx, par_vertex_idx+4) = csVector3(dim, .45, -dim);
-    tmpl->GetCompressedVertex(anm_idx, par_vertex_idx+5) = csVector3(0, .45, dim);
-  }
-  else
-  {
-    tmpl->GetVertex(anm_idx, par_vertex_idx+0) = csVector3(-dim, 0, -dim);
-    tmpl->GetVertex(anm_idx, par_vertex_idx+1) = csVector3(dim, 0, -dim);
-    tmpl->GetVertex(anm_idx, par_vertex_idx+2) = csVector3(0, 0, dim);
-    tmpl->GetVertex(anm_idx, par_vertex_idx+3) = csVector3(-dim, .45, -dim);
-    tmpl->GetVertex(anm_idx, par_vertex_idx+4) = csVector3(dim, .45, -dim);
-    tmpl->GetVertex(anm_idx, par_vertex_idx+5) = csVector3(0, .45, dim);
-  }
+  tmpl->GetVertex(anm_idx, par_vertex_idx+0) = csVector3(-dim, 0, -dim);
+  tmpl->GetVertex(anm_idx, par_vertex_idx+1) = csVector3(dim, 0, -dim);
+  tmpl->GetVertex(anm_idx, par_vertex_idx+2) = csVector3(0, 0, dim);
+  tmpl->GetVertex(anm_idx, par_vertex_idx+3) = csVector3(-dim, .45, -dim);
+  tmpl->GetVertex(anm_idx, par_vertex_idx+4) = csVector3(dim, .45, -dim);
+  tmpl->GetVertex(anm_idx, par_vertex_idx+5) = csVector3(0, .45, dim);
 
   tmpl->GetTexel(tex_idx, par_vertex_idx+0) = csVector2(0, 0);
   tmpl->GetTexel(tex_idx, par_vertex_idx+1) = csVector2(.99, 0);

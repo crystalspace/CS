@@ -1222,12 +1222,65 @@ void CreateSystem(void)
 }
 #endif
 
+#include "csengine/quadtree.h"
 
 /*---------------------------------------------------------------------*
  * Main function
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
+#if 0
+{
+srand (12345678);
+csCBuffer* cbuf = new csCBuffer (0, 1023, 1024);
+//csQuadTree* qtree = new csQuadTree (csBox2 (0, 0, 1023, 1023), 11);
+csBox2 bbox (-1, -1, 1024, 1024);
+csPoly2D poly;
+csVector2 v;
+int i;
+float x, y;
+for (; ;)
+{
+printf ("New cbuffer\n");
+  cbuf->Initialize ();
+  while (!cbuf->IsFull ())
+  {
+    poly.Random (3, bbox);
+    if (poly.GetSignedArea () > 0)
+    {
+      for (i = 0 ; i < poly.GetNumVertices ()/2 ; i++)
+      {
+        csVector2 sw = poly[i];
+	poly[i] = poly[poly.GetNumVertices ()-i-1];
+	poly[poly.GetNumVertices ()-i-1] = sw;
+      }
+    }
+    printf ("Insert polygon...\n");
+    cbuf->InsertPolygon (poly.GetVertices (), poly.GetNumVertices ());
+    //qtree->InsertPolygon (poly.GetVertices (), poly.GetNumVertices (),
+    	//poly.GetBoundingBox ());
+    for (x = 1 ; x < 1023 ; x+= 10)
+      for (y = 1 ; y < 1023 ; y+= 10)
+      {
+        v.Set (x, y);
+	bool 
+	//int qvis = qtree->TestPoint (v);
+	//if (qvis != CS_QUAD_PARTIAL)
+	//{
+	  //bool cvis = cbuf->TestPoint (v);
+          //if (cvis != (qvis == CS_QUAD_EMPTY))
+	  //{
+	    //printf ("Mismatch v=(%f,%f) cbuf=%d quad=%d\n", x, y, cvis, qvis);
+	  //}
+	//}
+      }
+  }
+}
+}
+#endif
+
+
+
   // Initialize the random number generator
   srand (time (NULL));
 

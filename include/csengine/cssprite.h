@@ -169,20 +169,10 @@ private:
   csTriangleMesh* texel_mesh;
   /// The array of texels
   DECLARE_TYPED_VECTOR (csTexelsVector,csPoly2D) texels;
-
-  /// This mesh is optimized for skeletal and vertex animation.
-  csTriangleMesh* vertex_mesh;
   /// The vertices
   DECLARE_TYPED_VECTOR (csVerticesVector,csPoly3D) vertices;
-  /// Array that maps Texels to Normals
-  int* texel_to_normal;
-
-  /// The normal mesh is used for smooth shading control.
-  csTriangleMesh* normal_mesh;
   /// The normals
   DECLARE_TYPED_VECTOR (csNormalsVector,csPoly3D) normals;
-  /// Array that maps Texels to Vertices
-  int* texel_to_vertex;
 
   /**
    * Connectivity information for this sprite template.
@@ -248,33 +238,21 @@ public:
 
   /// Query the number of vertices.
   int GetNumVertices () { return vertices.Get (0)->GetNumVertices (); }
-  /// Get a vertex in compressed mode.
-  csVector3& GetCompressedVertex (int frame, int vertex)
-    { return (*vertices.Get(frame)) [texel_to_vertex [vertex]]; }
-  /// Get a vertex in uncompressed mode.
+  /// Get a vertex.
   csVector3& GetVertex (int frame, int vertex)
     { return (*vertices.Get(frame)) [vertex]; }
-  /// Get vertex array (only valid in uncompressed mode).
+  /// Get vertex array.
   csVector3* GetVertices (int frame)
     { return (*vertices.Get(frame)).GetVertices (); }
-  /// Return true if vertices are compressed.
-  bool VerticesAreCompressed ()
-    { return texel_to_vertex ? true : false; }
 
   /// Query the number of normals.
   int GetNumNormals () { return normals.Get (0)->GetNumVertices (); }
-  /// Get a normal in compressed mode.
-  csVector3& GetCompressedNormal (int frame, int vertex)
-    { return (*normals.Get(frame)) [texel_to_normal [vertex]]; }
-  /// Get a normal in uncompressed mode.
+  /// Get a normal.
   csVector3& GetNormal (int frame, int vertex)
     { return (*normals.Get(frame)) [vertex]; }
-  /// Get normal array (only valid in uncompressed mode).
+  /// Get normal array.
   csVector3* GetNormals (int frame)
     { return (*normals.Get(frame)).GetVertices (); }
-  /// Return true if normals are compressed.
-  bool NormalsAreCompressed ()
-    { return texel_to_normal ? true : false; }
 
   /**
    * Add a triangle to the normal, texel, and vertex meshes
@@ -323,33 +301,6 @@ public:
    * Compute all normals in a frame.
    */
   void ComputeNormals (csFrame* frame, csVector3* object_verts);
-
-  /**
-   * Minimize the number of 3D coordinates.
-   * Reduces the size of animation frames.
-   * Speeds up interpolation and skeletal animation.
-   */
-  int MergeVertices (csFrame * frame);
-  int MergeVertices (char * action, int frame)
-    {return MergeVertices (FindAction(action)->GetFrame(frame));}
-  int MergeVertices (int frame)
-    {return MergeVertices (GetFrame(frame));}
-
-  /**
-   * Combine normals of adjacent vertices based on one special frame.
-   * Eliminates unwanted gouraud shading "seams".
-   */
-  int MergeNormals (csFrame * frame);
-  int MergeNormals (char * action, int frame)
-    {return MergeNormals (FindAction(action)->GetFrame(frame));}
-  int MergeNormals (int frame)
-    {return MergeNormals (GetFrame(frame));}
-
-  /**
-   * Merge identical texel frames
-   * Returns number of redundant texel maps deleted
-   */
-  int MergeTexels ();
 
   CSOBJTYPE;
 };

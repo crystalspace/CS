@@ -210,6 +210,14 @@ public:
    */
   bool InsertPolygon (csVector2* verts, int num_verts, bool negative = false);
 
+  /**
+   * Test if a given point is visible in the c-buffer.
+   * Returns true if visible (i.e. c-buffer is empty at
+   * that point).
+   */
+  bool TestPoint (const csVector2& point);
+
+
   /// Dump debug information for a scanline.
   void DumpLine (int y) { lines[y].Dump (); }
 

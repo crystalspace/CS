@@ -1,5 +1,33 @@
 The history order has been reversed so that new features are at the top.
 
+13-Jun-2000
+	- Added csPoly2D::Random() to generate a random convex polygon
+	  (triangles only right now). This is going to be used for
+	  debugging the c-buffer.
+	- Cleaned up all compressed vertex/normal/texel stuff in csSprite3D.
+	  This cleans up sprite code considerably. If this funcationality
+	  needs to go back we'll have to implement it again in a cleaner
+	  way.
+	- Added csCBuffer::TestPoint() to test a single point in the
+	  c-buffer.
+	- Fixed LOD for 3D sprites. Looks as ugly as before but at least
+	  it works again :-)
+	- Wouter Wijngaards did some changes on csQuadTree again.
+	  Now uses a more transparent storage ordering. Untested code,
+	  but functionality for full culling should be present. Print()
+	  method should work now (for debug). Perhaps I have removed
+	  K. Robert Bate's mac port fix. But that fix provably breaks theu
+	  VC port.... Anyway, perhaps I should look up the correct syntax
+	  somewhere?
+12-Jun-2000
+	- Thomas Hieber added basic support for WC3 (WorldCraft) file
+	  format to Map2CS.
+	- Robert Bate made a few fixes to csQuadtree so that it will
+	  compile on Macintosh. Robert also added 'alloca.h' include
+	  to cssys/mac/malloc.h.
+	- Robert updated the Mac project files.
+	- Frank O' Connor updated the VC project files for the dungeon
+	  plugin changes that Martin did.
 10-Jun-2000
 	- Started a reasonably big redesign of the dynamic object system.
 	  csObjectStub and csPolyTreeObject don't care about polygons
@@ -28,6 +56,7 @@ The history order has been reversed so that new features are at the top.
 	  probably also the reason for various lighting errors using
 	  the c-buffer cube (enabled yesterday) and visibility errors with
 	  PVS.
+	- Martin Geisse committed a huge update to the dungeon plugin.
 9-Jun-2000
 	- Moved a lot of PVS algorithm code into csPVSAlgo. That cleans
 	  up csOctree a little.
@@ -42,6 +71,8 @@ The history order has been reversed so that new features are at the top.
 	  seems to work reasonably well. This also improves speed of dynamic
 	  lighting with about the same factor. Radiosity will also improve
 	  by this.
+	- Thomas Hieber fixed some of the VC project files and removed a
+	  warning in the metaballs plugin.
 8-Jun-2000
 	- In an effort to completly fix PVS and make sure that everything is
 	  ok I started adding extensive comments everywhere.

@@ -104,13 +104,7 @@ csSpriteTemplate::csSpriteTemplate ()
   emerge_from = NULL;
   skeleton = NULL;
 
-  texel_to_normal = NULL;
-  normal_mesh = NULL;
-
   texel_mesh = new csTriangleMesh ();
-
-  texel_to_vertex = NULL;
-  vertex_mesh = NULL;
 
   tri_verts = NULL;
 }
@@ -121,17 +115,11 @@ csSpriteTemplate::~csSpriteTemplate ()
   delete [] emerge_from;
   delete skeleton;
   delete tri_verts;
-
-  delete normal_mesh;
-  delete [] texel_to_normal;
-
-  delete vertex_mesh;
-  delete [] texel_to_vertex;
 }
 
 void csSpriteTemplate::AddVertices (int num)
 {
-  int frame, vertex;
+  int frame;
 
   for (frame = 0; frame < frames.Length(); frame++)
   {
@@ -139,47 +127,11 @@ void csSpriteTemplate::AddVertices (int num)
     texels.Get (frame)->SetNumVertices (GetNumTexels () + num);
     vertices.Get (frame)->SetNumVertices (GetNumVertices () + num);
   }
-
-  // if a texel_to_normal array is in use,
-  // add the vertex to that array
-
-  if (NormalsAreCompressed ())
-  {
-    int* ttn = new int [GetNumTexels() + num];
-    for (vertex = 0; vertex < GetNumTexels(); vertex++)
-      ttn [vertex] = texel_to_normal [vertex];
-    delete[] texel_to_normal;
-    texel_to_normal = ttn;
-    for (vertex = 0; vertex < num; vertex++)
-      texel_to_normal [GetNumTexels() + vertex] = GetNumNormals  () + vertex;
-  }
-
-  // if a texel_to_vertex array is in use,
-  // add the vertex to that array
-
-  if (VerticesAreCompressed ())
-  {
-    int* ttv = new int [GetNumTexels() + num];
-    for (vertex = 0; vertex < GetNumTexels(); vertex++)
-      ttv [vertex] = texel_to_vertex [vertex];
-    delete[] texel_to_vertex;
-    texel_to_vertex = ttv;
-    for (vertex = 0; vertex < num; vertex++)
-      texel_to_vertex [GetNumTexels() + vertex] = GetNumVertices () + vertex;
-  }
 }
 
 void csSpriteTemplate::AddTriangle (int a, int b, int c)
 {
   texel_mesh->AddTriangle (a, b, c);
-
-  if (NormalsAreCompressed ())
-    normal_mesh->AddTriangle
-      (texel_to_normal[a], texel_to_normal[b], texel_to_normal[c]);
-
-  if (VerticesAreCompressed ())
-    vertex_mesh->AddTriangle
-      (texel_to_vertex[a], texel_to_vertex[b], texel_to_vertex[c]);
 }
 
 void csSpriteTemplate::SetSkeleton (csSkeleton* sk)
@@ -202,7 +154,7 @@ void csSpriteTemplate::GenerateLOD ()
 {
 // @@@ TEMPORARILY DISABLED LOD BECAUSE IT IS BROKEN RIGHT NOW.
 // WE NEED TO SEE WHAT IS WRONG IN THIS ROUTINE.
-return;
+//return;
   int i;
 
   //@@@ turn this into a parameter or member variable?
@@ -210,16 +162,8 @@ return;
 
   csVector3* v = new csVector3[GetNumTexels()];
 
-  if (VerticesAreCompressed ())
-  {
-    for (i = 0; i < GetNumTexels(); i++)
-      v[i] = GetCompressedVertex (lod_base_frame, i);
-  }
-  else
-  {
-    for (i = 0; i < GetNumTexels(); i++)
-      v[i] = GetVertex (lod_base_frame, i);
-  }
+  for (i = 0; i < GetNumTexels(); i++)
+    v[i] = GetVertex (lod_base_frame, i);
 
   csTriangleVertices* verts = new csTriangleVertices (texel_mesh, v, GetNumTexels());
   delete [] v;
@@ -234,13 +178,27 @@ return;
   for (i = 0 ; i < texels.Length () ; i++)
   {
     int j;
-    csVector2* new_texels = new csVector2 [GetNumTexels()];
-    csPoly2D* tx = texels.Get(i);
-    for (j = 0 ; j < GetNumTexels() ; j++)
+    csVector2* new_texels = new csVector2 [GetNumTexels ()];
+    csVector3* new_vertices = new csVector3 [GetNumTexels ()];
+    csVector3* new_normals = new csVector3 [GetNumTexels ()];
+    csPoly2D* tx = texels.Get (i);
+    csPoly3D* vt = vertices.Get (i);
+    csPoly3D* vn = normals.Get (i);
+    for (j = 0 ; j < GetNumTexels () ; j++)
+    {
       new_texels[translate[j]] = (*tx)[j];
-    for (j = 0 ; j < GetNumTexels() ; j++)
+      new_vertices[translate[j]] = (*vt)[j];
+      new_normals[translate[j]] = (*vn)[j];
+    }
+    for (j = 0 ; j < GetNumTexels () ; j++)
+    {
       (*tx)[j] = new_texels[j];
+      (*vt)[j] = new_vertices[j];
+      (*vn)[j] = new_normals[j];
+    }
     delete [] new_texels;
+    delete [] new_vertices;
+    delete [] new_normals;
   }
 
   if (skeleton) skeleton->RemapVertices (translate);
@@ -251,24 +209,6 @@ return;
     tr.a = translate[tr.a];
     tr.b = translate[tr.b];
     tr.c = translate[tr.c];
-  }
-
-  if (NormalsAreCompressed ())
-  {
-    int* ttn = new int [GetNumTexels()];
-    for (i = 0 ; i < GetNumTexels() ; i++)
-      ttn[translate[i]] = texel_to_normal[i];
-    delete [] texel_to_normal;
-    texel_to_normal = ttn;
-  }
-
-  if (VerticesAreCompressed ())
-  {
-    int* ttv = new int [GetNumTexels()];
-    for (i = 0 ; i < GetNumTexels() ; i++)
-      ttv[translate[i]] = texel_to_vertex[i];
-    delete [] texel_to_vertex;
-    texel_to_vertex = ttv;
   }
 
   delete [] translate;
@@ -285,18 +225,9 @@ void csSpriteTemplate::ComputeBoundingBox ()
     csBox3 box;
     GetFrame(frame)->GetBoundingBox (box);
 
-    if (VerticesAreCompressed ())
-    {
-      box.StartBoundingBox (GetCompressedVertex (frame, 0));
-      for ( vertex = 1 ; vertex < GetNumTexels() ; vertex++ )
-        box.AddBoundingVertexSmart (GetCompressedVertex (frame, vertex));
-    }
-    else
-    {
-      box.StartBoundingBox (GetVertex (frame, 0));
-      for ( vertex = 1 ; vertex < GetNumTexels() ; vertex++ )
-        box.AddBoundingVertexSmart (GetVertex (frame, vertex));
-    }
+    box.StartBoundingBox (GetVertex (frame, 0));
+    for ( vertex = 1 ; vertex < GetNumTexels() ; vertex++ )
+      box.AddBoundingVertexSmart (GetVertex (frame, vertex));
 
     GetFrame(frame)->SetBoundingBox (box);
   }
@@ -395,38 +326,18 @@ void csSpriteTemplate::ComputeNormals (csFrame* frame, csVector3* object_verts)
   // calculate vertex normals, by averaging connected triangle normals
   int frame_number = frame->GetAnmIndex();
 
-  if (NormalsAreCompressed ())
+  for (i = 0; i < GetNumTexels(); i++)
   {
-    for (i = 0; i < GetNumTexels(); i++)
+    csTriangleVertex &vt = tri_verts->GetVertex (i);
+    if (vt.num_con_triangles)
     {
-      csTriangleVertex &vt = tri_verts->GetVertex (i);
-      if (vt.num_con_triangles)
-      {
-        csVector3 &n = GetCompressedNormal (frame_number, i);
-        n = csVector3 (0,0,0);
-        for (j = 0; j < vt.num_con_triangles; j++)
-          n += tri_normals [vt.con_triangles[j]];
-        float norm = n.Norm ();
-        if (norm)
-          n /= norm;
-      }
-    }
-  }
-  else
-  {
-    for (i = 0; i < GetNumTexels(); i++)
-    {
-      csTriangleVertex &vt = tri_verts->GetVertex (i);
-      if (vt.num_con_triangles)
-      {
-        csVector3 &n = GetNormal (frame_number, i);
-        n = csVector3 (0,0,0);
-        for (j = 0; j < vt.num_con_triangles; j++)
-          n += tri_normals [vt.con_triangles[j]];
-        float norm = n.Norm ();
-        if (norm)
-          n /= norm;
-      }
+      csVector3 &n = GetNormal (frame_number, i);
+      n = csVector3 (0,0,0);
+      for (j = 0; j < vt.num_con_triangles; j++)
+        n += tri_normals [vt.con_triangles[j]];
+      float norm = n.Norm ();
+      if (norm)
+        n /= norm;
     }
   }
 
@@ -441,260 +352,6 @@ csSpriteAction* csSpriteTemplate::FindAction (const char *n)
       return GetAction (i);
 
   return NULL;
-}
-
-int csSpriteTemplate::MergeVertices (csFrame * frame)
-{
-  // Minimize the number of 3D coordinates:
-
-  csPoly3D* verts = vertices.Get (frame->GetAnmIndex ());
-
-  // create an array of ints which maps old vertex indices to new ones
-  int* new_vertices = new int [GetNumVertices()];
-  int* old_vertices = new int [GetNumVertices()];
-
-  // map the first new vertex to the first old vertex
-  new_vertices[0] = 0;
-
-  // set the new vertex counter to one
-  int new_vertex_count = 1;
-
-  // FOR each old vertex
-  for (int old_vertex = 1; old_vertex < GetNumVertices(); old_vertex++)
-  {
-    bool unique = true;
-
-    // FOR each new vertex
-    for (int new_vertex = 0; new_vertex < new_vertex_count; new_vertex++)
-    {
-      // IF the vertices have the same coordinates
-      if ((*verts)[old_vertex] == (*verts)[new_vertices[new_vertex]])
-      {
-        //  map this new vertex to this old vertex
-        old_vertices[new_vertex] = new_vertex;
-
-        //  next old vertex
-        unique = false;
-        break;
-      }
-    }
-    if (unique)
-    {
-      // map this old vertex to a new new vertex
-      new_vertices[new_vertex_count] = old_vertex;
-      old_vertices[old_vertex] = new_vertex_count;
-
-      // increment the new vertex counter
-      new_vertex_count++;
-    }
-  }
-  int redundant_vertex_count = GetNumVertices() - new_vertex_count;
-
-#if 0
-
-  // STOP!  The rest of these steps will no doubt break some things:
-
-  // FOR each animation frame
-  for (int frame_number = 0; frame_number < frames.Length(); frame_number++)
-  {
-    // create a new vertex array
-    csPoly3D* newverts = new csPoly3D (new_vertex_count);
-
-    verts = vertices.Get (frame_number);
-    // copy the old vertex positions into the new array
-    for (int v = 0; v < new_vertex_count; v++)
-      (*newverts)[v] = (*verts)[new_vertices[v]];
-
-    // replace the old vertex array with the new one
-    vertices.Replace (frame_number, newverts);
-  }
-
-  // remap texel_to_vertex array
-  int * ttv = new int [GetNumTexels()];
-  for (int i = 0; i < GetNumTexels(); i++)
-    ttv[i] = old_vertices[texel_to_vertex[i]];
-  if (texel_to_vertex)
-    delete [] texel_to_vertex;
-  texel_to_vertex = ttv;
-
-#endif
-
-  delete [] new_vertices;
-  delete [] old_vertices;
-
-  return redundant_vertex_count;
-}
-
-int csSpriteTemplate::MergeNormals (csFrame * frame)
-{
-  // Combine normals of adjacent vertices based on one special frame:
-
-  csPoly3D* verts = vertices.Get (frame->GetAnmIndex ());
-
-  // create an array of ints which maps old vertex indices to new ones
-  int* new_vertices = new int [GetNumNormals()];
-  int* old_vertices = new int [GetNumNormals()];
-
-  // map the first new vertex to the first old vertex
-  new_vertices[0] = 0;
-
-  // set the new vertex counter to one
-  int new_vertex_count = 1;
-
-  // FOR each old vertex
-  for (int old_vertex = 1; old_vertex < GetNumNormals(); old_vertex++)
-  {
-    bool unique = true;
-
-    // FOR each new vertex
-    for (int new_vertex = 0; new_vertex < new_vertex_count; new_vertex++)
-    {
-      // IF the vertices have the same coordinates
-      if ((*verts)[old_vertex] == (*verts)[new_vertices[new_vertex]])
-      {
-        //  map this new vertex to this old vertex
-        old_vertices[new_vertex] = new_vertex;
-
-        //  next old vertex
-        unique = false;
-        break;
-      }
-    }
-    if (unique)
-    {
-      // map this old vertex to a new new vertex
-      new_vertices[new_vertex_count] = old_vertex;
-      old_vertices[old_vertex] = new_vertex_count;
-
-      // increment the new vertex counter
-      new_vertex_count++;
-    }
-  }
-  int redundant_vertex_count = GetNumVertices() - new_vertex_count;
-
-#if 0
-
-  // STOP!  The rest of these steps will no doubt break some things:
-
-  // FOR each animation frame
-  for (int frame_number = 0; frame_number < frames.Length(); frame_number++)
-  {
-    // create a new normals array
-    csPoly3D* newverts = new csPoly3D (new_vertex_count);
-
-    verts = normals.Get (frame_number);
-
-    // copy the old normals into the new array
-    for (int v = 0; v < new_vertex_count; v++)
-      (*newverts)[v] = (*verts)[new_vertices[v]];
-
-    // replace the old normals array with the new one
-    normals.Replace (frame_number, newverts);
-  }
-
-  // remap texel_to_normal array
-  int * ttn = new int [GetNumTexels()];
-  for (int i = 0; i < GetNumTexels(); i++)
-    ttn[i] = old_vertices[texel_to_normal[i]];
-  if (texel_to_normal)
-    delete [] texel_to_normal;
-  texel_to_normal = ttn;
-
-#endif
-
-  delete [] new_vertices;
-  delete [] old_vertices;
-
-  return redundant_vertex_count;
-}
-
-int csSpriteTemplate::MergeTexels ()
-{
-  // Merge identical texel frames:
-
-  int same_count = 0;
-  int frame, map, v;
-  bool same, unique;
-  csPoly2D* tx;
-
-  // start a count and a list of unique texel maps
-  int unique_texel_map_count;
-  csPoly2D** unique_texel_maps = new csPoly2D* [frames.Length()];
-
-  // add the first frame to the unique texel map list
-  unique_texel_maps [0] = texels.Get (GetFrame (0)->GetTexIndex ());
-  unique_texel_map_count = 1;
-
-  // FOR each frame
-  for ( frame = 1;  frame < frames.Length(); frame++ )
-  {
-    tx = texels.Get(GetFrame(frame)->GetTexIndex());
-    unique = true;
-
-    // FOR each unique texel map
-    for ( map = 0; map < unique_texel_map_count; map++ )
-    {
-      // IF this texel map is already in our list
-      if (tx == unique_texel_maps [map])
-      {
-        // next frame
-        unique = false;
-        break;
-      }
-      // IF all texture vertices are are the same in both
-      same = true;
-      for ( v = 0; v < GetNumTexels(); v++ )
-      {
-        if ((*tx)[v] != (*(unique_texel_maps[map]))[v])
-        {
-          same = false;
-          break;
-        }
-      }
-      if (same)
-      {
-        // use the texel map already in our list
-        GetFrame(frame)->SetTexIndex(map);
-
-        // next frame
-        unique = false;
-        break;
-      }
-    }
-    // add this frame to the unique texel map list
-    if (unique)
-    {
-      GetFrame(frame)->SetTexIndex(unique_texel_map_count);
-      unique_texel_maps[unique_texel_map_count] = tx;
-      unique_texel_map_count ++;
-    }
-  }
-
-  // Delete texel frames which are not in our list of unique texel maps
-  for ( frame = 0; frame < texels.Length(); frame++ )
-  {
-    unique = false;
-    tx = texels.Get (GetFrame (frame)->GetTexIndex ());
-
-    for ( map = 0; map < unique_texel_map_count; map++ )
-    {
-      if ( tx == unique_texel_maps[map])
-      {
-        unique = true;
-        break;
-      }
-    }
-    if (!unique)
-    {
-      texels.Delete(frame);
-      same_count++;
-      frame--;
-    }
-  }
-
-  delete[] unique_texel_maps;
-
-  return same_count;
 }
 
 //=============================================================================
@@ -1333,27 +990,11 @@ void csSprite3D::Draw (csRenderView& rview)
   csVector3* real_obj_verts;
   csVector3* real_tween_verts = NULL;
 
-  if (tpl->VerticesAreCompressed ())
+  real_obj_verts = tpl->GetVertices (cf_idx);
+  if (do_tween)
   {
-    for (i = 0 ; i < tpl->GetNumTexels () ; i++)
-      obj_verts[i] = tpl->GetCompressedVertex (cf_idx, i);
-    real_obj_verts = obj_verts.GetArray ();
-    if (do_tween)
-    {
-      int nf_idx = next_frame->GetAnmIndex();
-      for (i = 0 ; i < tpl->GetNumTexels () ; i++)
-        tween_verts[i] = tpl->GetCompressedVertex (nf_idx, i);
-      real_tween_verts = tween_verts.GetArray ();
-    }
-  }
-  else
-  {
-    real_obj_verts = tpl->GetVertices (cf_idx);
-    if (do_tween)
-    {
-      int nf_idx = next_frame->GetAnmIndex();
-      real_tween_verts = tpl->GetVertices (nf_idx);
-    }
+    int nf_idx = next_frame->GetAnmIndex();
+    real_tween_verts = tpl->GetVertices (nf_idx);
   }
 
   // If we have a skeleton then we transform all vertices through
@@ -1545,16 +1186,8 @@ csVector3* csSprite3D::GetObjectVerts (csFrame* fr)
   UpdateWorkTables (tpl->GetNumTexels ());
   int fr_idx = fr->GetAnmIndex();
 
-  if (tpl->VerticesAreCompressed ())
-  {
-    for (int i = 0; i < tpl->GetNumTexels (); i++)
-      obj_verts[i] = tpl->GetCompressedVertex(fr_idx, i);
-  }
-  else
-  {
-    for (int i = 0; i < tpl->GetNumTexels (); i++)
-      obj_verts[i] = tpl->GetVertex(fr_idx, i);
-  }
+  for (int i = 0; i < tpl->GetNumTexels (); i++)
+    obj_verts[i] = tpl->GetVertex(fr_idx, i);
 
   if (skeleton_state)
   {
@@ -1589,18 +1222,9 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
     int nf_idx = next_frame->GetAnmIndex();
     float remainder = 1 - tween_ratio;
 
-    if (tpl->VerticesAreCompressed ())
-    {
-      for (i = 0 ; i < tpl->GetNumTexels() ; i++)
-        obj_verts[i] = tween_ratio * tpl->GetCompressedVertex (tf_idx, i)
-          + remainder * tpl->GetCompressedVertex (nf_idx, i);
-    }
-    else
-    {
-      for (i = 0 ; i < tpl->GetNumTexels() ; i++)
-        obj_verts[i] = tween_ratio * tpl->GetVertex (tf_idx, i)
-          + remainder * tpl->GetVertex (nf_idx, i);
-    }
+    for (i = 0 ; i < tpl->GetNumTexels() ; i++)
+      obj_verts[i] = tween_ratio * tpl->GetVertex (tf_idx, i)
+        + remainder * tpl->GetVertex (nf_idx, i);
 
     work_obj_verts = obj_verts.GetArray ();
   }
@@ -1657,53 +1281,26 @@ void csSprite3D::UpdateLightingLQ (csLight** lights, int num_lights, csVector3* 
     float obj_dist = FastSqrt (obj_sq_dist);
     float wor_dist = FastSqrt (wor_sq_dist);
 
-    if (tpl->NormalsAreCompressed ())
+    for (j = 0 ; j < tpl->GetNumTexels () ; j++)
     {
-      for (j = 0 ; j < tpl->GetNumTexels () ; j++)
+      csVector3& obj_vertex = object_vertices[j];
+
+      float cosinus;
+      if (obj_sq_dist < SMALL_EPSILON)
+        cosinus = 1;
+      else
+        cosinus = (obj_light_pos - obj_vertex) * tpl->GetNormal (tf_idx, j);
+
+      if (cosinus > 0)
       {
-        csVector3& obj_vertex = object_vertices[j];
-
-        float cosinus;
-        if (obj_sq_dist < SMALL_EPSILON)
-          cosinus = 1;
-        else
-          cosinus = (obj_light_pos - obj_vertex) * tpl->GetCompressedNormal (tf_idx, j);
-
-        if (cosinus > 0)
-        {
-          color = light_color;
-          if (obj_sq_dist >= SMALL_EPSILON)
-            cosinus /= obj_dist;
-          if (cosinus < 1)
-            color *= cosinus * lights[i]->GetBrightnessAtDistance (wor_dist);
-          AddVertexColor (j, color);
-        }
+        color = light_color;
+        if (obj_sq_dist >= SMALL_EPSILON)
+          cosinus /= obj_dist;
+        if (cosinus < 1)
+          color *= cosinus * lights[i]->GetBrightnessAtDistance (wor_dist);
+        AddVertexColor (j, color);
       }
     }
-    else
-    {
-      for (j = 0 ; j < tpl->GetNumTexels () ; j++)
-      {
-        csVector3& obj_vertex = object_vertices[j];
-
-        float cosinus;
-        if (obj_sq_dist < SMALL_EPSILON)
-          cosinus = 1;
-        else
-          cosinus = (obj_light_pos - obj_vertex) * tpl->GetNormal (tf_idx, j);
-
-        if (cosinus > 0)
-        {
-          color = light_color;
-          if (obj_sq_dist >= SMALL_EPSILON)
-            cosinus /= obj_dist;
-          if (cosinus < 1)
-            color *= cosinus * lights[i]->GetBrightnessAtDistance (wor_dist);
-          AddVertexColor (j, color);
-        }
-      }
-    }
-
   }
 
   // Clamp all vertice colors to 2.0
@@ -1726,69 +1323,34 @@ void csSprite3D::UpdateLightingHQ (csLight** lights, int num_lights, csVector3* 
     csVector3 wor_light_pos = lights [i]->GetCenter ();
     csVector3 obj_light_pos = m_world2obj * (wor_light_pos - v_obj2world);
 
-    if (tpl->NormalsAreCompressed ())
+    for (j = 0 ; j < tpl->GetNumTexels () ; j++)
     {
-      for (j = 0 ; j < tpl->GetNumTexels () ; j++)
+      csVector3& obj_vertex = object_vertices[j];
+      csVector3 wor_vertex = m_obj2world * obj_vertex + v_obj2world;
+
+      // @@@ We have the distance in object space. Can't we use
+      // that to calculate the distance in world space as well?
+      // These calculations aren't optimal. I have the feeling they
+      // can be optimized somewhat.
+      float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, obj_vertex);
+      float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, wor_vertex);
+
+      float cosinus;
+      if (obj_sq_dist < SMALL_EPSILON)
+        cosinus = 1;
+      else
+        cosinus = (obj_light_pos - obj_vertex) * tpl->GetNormal (tf_idx, j);
+
+      if ((cosinus > 0) && (wor_sq_dist < sq_light_radius))
       {
-        csVector3& obj_vertex = object_vertices[j];
-        csVector3 wor_vertex = m_obj2world * obj_vertex + v_obj2world;
-
-        // @@@ We have the distance in object space. Can't we use
-        // that to calculate the distance in world space as well?
-        // These calculations aren't optimal. I have the feeling they
-        // can be optimized somewhat.
-        float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, obj_vertex);
-        float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, wor_vertex);
-
-        float cosinus;
-        if (obj_sq_dist < SMALL_EPSILON)
-          cosinus = 1;
-        else
-          cosinus = (obj_light_pos - obj_vertex) * tpl->GetCompressedNormal (tf_idx, j);
-
-        if ((cosinus > 0) && (wor_sq_dist < sq_light_radius))
-        {
-          color = light_color;
-          if (obj_sq_dist >= SMALL_EPSILON)
-            cosinus /= FastSqrt (obj_sq_dist);
-          if (cosinus < 1)
-            color *= cosinus * lights[i]->GetBrightnessAtDistance (FastSqrt (wor_sq_dist));
-          AddVertexColor (j, color);
-        }
+        color = light_color;
+        if (obj_sq_dist >= SMALL_EPSILON)
+          cosinus /= FastSqrt (obj_sq_dist);
+        if (cosinus < 1)
+          color *= cosinus * lights[i]->GetBrightnessAtDistance (FastSqrt (wor_sq_dist));
+        AddVertexColor (j, color);
       }
     }
-    else
-    {
-      for (j = 0 ; j < tpl->GetNumTexels () ; j++)
-      {
-        csVector3& obj_vertex = object_vertices[j];
-        csVector3 wor_vertex = m_obj2world * obj_vertex + v_obj2world;
-
-        // @@@ We have the distance in object space. Can't we use
-        // that to calculate the distance in world space as well?
-        // These calculations aren't optimal. I have the feeling they
-        // can be optimized somewhat.
-        float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, obj_vertex);
-        float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, wor_vertex);
-
-        float cosinus;
-        if (obj_sq_dist < SMALL_EPSILON)
-          cosinus = 1;
-        else
-          cosinus = (obj_light_pos - obj_vertex) * tpl->GetNormal (tf_idx, j);
-
-        if ((cosinus > 0) && (wor_sq_dist < sq_light_radius))
-        {
-          color = light_color;
-          if (obj_sq_dist >= SMALL_EPSILON)
-            cosinus /= FastSqrt (obj_sq_dist);
-          if (cosinus < 1)
-            color *= cosinus * lights[i]->GetBrightnessAtDistance (FastSqrt (wor_sq_dist));
-          AddVertexColor (j, color);
-        }
-      }
-    }
-
   }
 
   // Clamp all vertice colors to 2.0

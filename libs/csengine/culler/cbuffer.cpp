@@ -531,6 +531,11 @@ finish:
   return vis;
 }
 
+bool csCBuffer::TestPoint (const csVector2& point)
+{
+  return lines[QRound (point.y)].TestSpan (QRound (point.x), QRound (point.x));
+}
+
 void csCBuffer::GfxDump (iGraphics2D* ig2d, iGraphics3D* ig3d)
 {
   iTextureManager* txtmgr = ig3d->GetTextureManager ();
