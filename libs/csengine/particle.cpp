@@ -42,9 +42,13 @@ csParticleSystem :: csParticleSystem(int max_part)
   // for robustness
   for(int i=0; i<max_particles; i++)
     part_2d[i] = NULL;
-  // put me in list
-  next = first;
-  first = this;
+  // add me to the world
+  csWorld::current_world->particle_systems.Push(this);
+  // defaults
+  change_size = false;
+  change_color = false;
+  change_alpha = false;
+  change_rotation = false;
 }
 
 
@@ -58,15 +62,6 @@ csParticleSystem :: ~csParticleSystem()
       //delete part_2d[i]; done in above call
     }
   delete[] part_2d;
-  // remove from list, find previous system
-  if(first == this)
-    first = next;
-  else {
-    csParticleSystem *prev = first;
-    while(prev->next != this)
-      prev = prev->next;
-    prev->next = next;
-  }
 }
 
 
@@ -136,6 +131,13 @@ void csParticleSystem :: SetLighting(bool b)
 }
 
 
+void csParticleSystem :: SetColors(const csColor& col)
+{
+  for(int i = 0; i<num_particles; i++)
+    part_2d[i]->SetColor(col);
+}
+
+
 void csParticleSystem :: MoveToSector(csSector *sector)
 {
   for(int i = 0; i<num_particles; i++)
@@ -156,36 +158,36 @@ void csParticleSystem :: Update(time_t elapsed_time)
     }
     time_to_live -= elapsed_time;
   }
-}
-
-
-// static members
-csParticleSystem* csParticleSystem::first = 0;
-
-void csParticleSystem :: UpdateAll(time_t elapsed_time)
-{
-    csParticleSystem *p = first, *pnext;
-    while(p)
-    {
-      // remember next ptr as object may get deleted.
-      pnext = p->next;
-      p->Update(elapsed_time);
-      if(p->to_delete)
-        delete p;
-      p = pnext;
-    }
-}
-
-
-void csParticleSystem :: DeleteAll()
-{
-    csParticleSystem *p = first, *pnext;
-    while(p)
-    {
-      pnext = p->next;
-      delete p;
-      p = pnext;
-    }
+  int i;
+  float elapsed_seconds = ((float)elapsed_time) / 1000.0;
+  if(change_color)
+  {
+    csColor change = colorpersecond;
+    change *= elapsed_seconds;
+    for(i=0; i<num_particles; i++)
+      part_2d[i]->AddColor(change);
+  }
+  if(change_size)
+  {
+    float sizefactor = pow(scalepersecond, elapsed_seconds);
+    for(i=0; i<num_particles; i++)
+      part_2d[i]->ScaleBy(sizefactor);
+  }
+  if(change_alpha)
+  {
+    float alpnow = 
+      (part_2d[0]->GetMixmode() & CS_FX_MASK_ALPHA) / (float)CS_FX_MASK_ALPHA + 
+      alphapersecond * elapsed_seconds;
+    if(alpnow < 0.0f) alpnow = 0.0f;
+    else if(alpnow > 1.0f) alpnow = 1.0f;
+    SetMixmodes(CS_FX_SETALPHA(alpnow));
+  }
+  if(change_rotation)
+  {
+    float angle = anglepersecond * elapsed_seconds;
+    for(i=0; i<num_particles; i++)
+      part_2d[i]->Rotate(angle);
+  }
 }
 
 
@@ -239,7 +241,8 @@ static csVector3& GetRandomDirection()
 
 
 csParSysExplosion :: csParSysExplosion(int number_p, 
-    const csVector3& explode_center, const csVector3& push, csTextureHandle *txt,
+    const csVector3& explode_center, const csVector3& push, 
+    csTextureHandle *txt, int nr_sides, float part_radius,
     float spread_pos, float spread_speed, float spread_accel)
     : csNewtonianParticleSystem(number_p)
 {
@@ -250,11 +253,12 @@ csParSysExplosion :: csParSysExplosion(int number_p,
   has_light = false;
   light_sector = NULL;
   explight = NULL;
+  scale_sprites = false;
   /// add particles
   for(i=0; i<number_p; i++)
   {
-    //AppendRectSprite(0.5, 0.5, txt);
-    AppendRegularSprite(16, 0.25, txt);
+    //AppendRectSprite(0.25, 0.25, txt);
+    AppendRegularSprite(nr_sides, part_radius, txt);
     pos = center + GetRandomDirection() * spread_pos;
     part_2d[i]->SetMove( pos );
     part_speed[i] = push + spread_speed * GetRandomDirection();
@@ -272,7 +276,16 @@ csParSysExplosion :: ~csParSysExplosion()
 
 void csParSysExplosion :: Update(time_t elapsed_time)
 {
+  int i;
   csNewtonianParticleSystem::Update(elapsed_time);
+
+  // size of particles is exponentially reduced in fade time.
+  if(scale_sprites && self_destruct && time_to_live < sprites_fade )
+  {
+    float scaleamt = 1.0 - (sprites_fade - time_to_live)/((float)sprites_fade);
+    for(i=0; i<num_particles; i++)
+      part_2d[i]->ScaleBy(scaleamt);
+  }
   if(!has_light) return;
   csColor newcol;
   newcol.red =   1.0 - 0.3*sin(time_to_live/10. + center.x);
@@ -282,9 +295,6 @@ void csParSysExplosion :: Update(time_t elapsed_time)
   {
     float fade_amt = 1.0 - (light_fade - time_to_live)/((float)light_fade);
     newcol *= fade_amt;
-    // size of particles is exponentially reduced in fade time.
-    for(int i=0; i<num_particles; i++)
-      part_2d[i]->ScaleBy(fade_amt);
   }
   explight->SetColor(newcol);
   explight->Setup();
