@@ -23,7 +23,6 @@
 #include "wglext.h"
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
-#include "video/canvas/openglcommon/gl2d_font.h"
 #include "video/canvas/openglcommon/glcommon2d.h"
 #include "video/canvas/openglcommon/iogl.h"
 
