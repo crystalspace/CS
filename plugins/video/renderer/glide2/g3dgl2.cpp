@@ -598,7 +598,7 @@ bool csGraphics3DGlide2x::Open(const char* Title)
     sys_fatalerror ("csGraphics3DGlide2x::Open() : Could not open Window !");
   
 
-  GlideLib_grRenderBuffer (GR_BUFFER_BACKBUFFER);        // RENDER IN BACKBUFFER
+  m_piG2D->DoubleBuffer (true);        // RENDER IN BACKBUFFER
   GlideLib_grColorMask (FXTRUE,FXFALSE);                 // DISABLE ALPHA BUFFER
   GlideLib_grDepthMask (FXTRUE);                                 // ENABLE ZBUFFER
   GlideLib_grDepthBufferMode (GR_DEPTHBUFFER_WBUFFER); // ENABLE WBUFFER

@@ -74,7 +74,7 @@ public:
   
   /// The following doesnt matter since we have an alphamap anyway
   virtual void SetTransparent (bool ){};
-  virtual void SetTransparent (UByte red, UByte green, UByte blue){};
+  virtual void SetTransparent (UByte , UByte , UByte ){};
   virtual bool GetTransparent (){ return true; }
 
   /// Get the transparent color
