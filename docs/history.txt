@@ -12,6 +12,10 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+28-Jun-99:
+	- Removed test on rstate_gouraud in software renderer because it
+	  is plain wrong.
+	- Received and integrated patch from David Huen for the BeOS port.
 25-Jun-99:
 	- New csSprite3D::UpdateLighting() to update the lighting of a
 	  sprite given an array of lights.
@@ -32,11 +36,19 @@ Short-term cleanups that need to be done:
 	- The bounding box creation also works for curves now.
 	- Andrew Zabolotny moved the specific FPU settings which are
 	  (uncommented) in walktest.cpp to support/debug/fpu80x86.h.
+	  FPU exceptions are now enabled by default on debug builds
+	  and disabled on optimized builds.
 	- Andrew added a faster version of QInt() and QInt24() for
 	  x86/GCC platforms (and QInt24() also for M68K).
 	- Andrew also fixed a few bugs in the NASM code.
 	- Andrew changed ALL occurances of 'gouroud' still remaining to
 	  'gouraud' and removed an additional number of warnings.
+	- Andrew fixed OS/2 port by removing an unneeded WaitSwitch().
+	- Andrew avoided an internal compiler error for the sound loader
+	  for GCC 2.8.0 and early EGCS/PGCC's.
+	- Denis Dmitriev added [] operator to csVector3.
+	- Michael Dale Long fixed a small warning in the COM code.
+	- Robert Bate updated Macintosh project files with new files.
 23-Jun-99:
 	- Fixed another serious bug with lighting.
 	- Thomas Hieber changed the interface of DrawPolygonFX().
