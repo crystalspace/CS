@@ -6619,6 +6619,8 @@ package cspace::iSpriteCal3DFactoryState;
 *GetSocketCount = *cspacec::iSpriteCal3DFactoryState_GetSocketCount;
 *GetSocket = *cspacec::iSpriteCal3DFactoryState_GetSocket;
 *GetCal3DCoreModel = *cspacec::iSpriteCal3DFactoryState_GetCal3DCoreModel;
+*RegisterAnimCallback = *cspacec::iSpriteCal3DFactoryState_RegisterAnimCallback;
+*RemoveAnimCallback = *cspacec::iSpriteCal3DFactoryState_RemoveAnimCallback;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -6682,6 +6684,7 @@ package cspace::iSpriteCal3DState;
 *GetAnimationDuration = *cspacec::iSpriteCal3DState_GetAnimationDuration;
 *SetAnimationTime = *cspacec::iSpriteCal3DState_SetAnimationTime;
 *GetCal3DModel = *cspacec::iSpriteCal3DState_GetCal3DModel;
+*SetUserData = *cspacec::iSpriteCal3DState_SetUserData;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
