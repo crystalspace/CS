@@ -43,7 +43,7 @@ static scfLibraryVector *LibraryRegistry = 0;
 /// A object of this class represents a shared library
 class scfSharedLibrary : public csBase
 {
-  friend scfLibraryVector;
+  friend class scfLibraryVector;
   // Shared library name
   const char *LibraryName;
   // Handle of shared module (if RefCount > 0)
