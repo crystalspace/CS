@@ -591,7 +591,6 @@ void csObjectListIt::Reset ()
 
 iObject* csObjectListIt::Next ()
 {
-printf ("csObjectListIt::Next\n"); fflush (stdout);
   if (cur_idx >= num_objects) return 0;
   cur_idx++;
   return (*list)[cur_idx-1];
@@ -599,7 +598,6 @@ printf ("csObjectListIt::Next\n"); fflush (stdout);
 
 bool csObjectListIt::HasNext () const
 {
-printf ("csObjectListIt::HasNext\n"); fflush (stdout);
   return cur_idx < num_objects;
 }
 
