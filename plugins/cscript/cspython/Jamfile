@@ -31,6 +31,3 @@ if $(PYTHON.AVAILABLE) = "yes"
   CFlags cspython : -DSWIG_GLOBAL ;
   Help cspython : "Crystal Script Python plug-in" ;
 }
-
-SubDir TOP plugins cscript cspython ;
-
