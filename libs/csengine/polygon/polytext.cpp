@@ -1483,7 +1483,7 @@ void csShadowBitmap::UpdateShadowMap (
 	csVector3* nearestNormals = new csVector3[vCount];
 	float *distances = new float[vCount];
 	float shortestDistance = 10000000.0f;  // Big enought?
-	int nearestNormal;
+	int nearestNormal = 0;
 
 	for (act = 0; act < vCount ; act++)
 	{
