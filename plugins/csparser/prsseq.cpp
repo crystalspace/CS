@@ -468,6 +468,11 @@ iSequenceTrigger* csLoader::LoadTrigger (iDocumentNode* node)
 	  trigger->AddConditionMeshClick (mesh);
 	}
 	break;
+      case XMLTOKEN_MANUAL:
+	{
+	  trigger->AddConditionManual();
+	}
+	break;
       case XMLTOKEN_SECTORVIS:
 	{
 	  const char* sectname = child->GetAttributeValue ("sector");

@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+10-Dec-2002
+	- Keith Fulton added direct application access to running sequences
+	  and triggering triggers defined in the world file.  Also added
+	  lightning effect to "large" room in flarge, activated with ctrl-L
+	  to demo/test this feature.
 9-Dec-2002
 	- Fixed a bug in Dynavis where it would consider polygons as possible
 	  occluders even if Z very close to 0. This could cause bad overflow.

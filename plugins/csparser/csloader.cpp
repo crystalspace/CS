@@ -801,6 +801,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("delay", XMLTOKEN_DELAY);
   xmltokens.Register ("fire", XMLTOKEN_FIRE);
   xmltokens.Register ("sectorvis", XMLTOKEN_SECTORVIS);
+  xmltokens.Register ("manual", XMLTOKEN_MANUAL);
   xmltokens.Register ("onclick", XMLTOKEN_ONCLICK);
   xmltokens.Register ("polygon", XMLTOKEN_POLYGON);
   xmltokens.Register ("arg", XMLTOKEN_ARG);

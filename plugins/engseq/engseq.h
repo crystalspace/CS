@@ -543,12 +543,14 @@ public:
   virtual int GetTriggerCount () const;
   virtual iSequenceTrigger* GetTrigger (int idx) const;
   virtual iSequenceTrigger* FindTriggerByName (const char* name) const;
+  virtual bool FireTriggerByName (const char *name) const;
   virtual csPtr<iSequenceWrapper> CreateSequence (const char* name);
   virtual void RemoveSequence (iSequenceWrapper* seq);
   virtual void RemoveSequences ();
   virtual int GetSequenceCount () const;
   virtual iSequenceWrapper* GetSequence (int idx) const;
   virtual iSequenceWrapper* FindSequenceByName (const char* name) const;
+  virtual bool RunSequenceByName (const char *name,int delay) const;
   virtual void FireTimedOperation (csTicks delta,
   	csTicks duration, iSequenceTimedOperation* op,
 	iBase* params = NULL);

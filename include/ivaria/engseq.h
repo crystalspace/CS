@@ -493,6 +493,11 @@ struct iEngineSequenceManager : public iBase
    */
   virtual iSequenceTrigger* FindTriggerByName (const char* name) const = 0;
 
+  /**
+   * Fire a trigger manually, specifying the name.
+   */
+  virtual bool FireTriggerByName (const char *name) const = 0;
+
   //-----------------------------------------------------------------------
 
   /**
@@ -524,6 +529,11 @@ struct iEngineSequenceManager : public iBase
    * Get a sequence by name.
    */
   virtual iSequenceWrapper* FindSequenceByName (const char* name) const = 0;
+
+  /**
+   * Run a sequence and don't mess around with triggers.
+   */
+  virtual bool RunSequenceByName (const char *name,int delay) const = 0;
 
   //-----------------------------------------------------------------------
 
