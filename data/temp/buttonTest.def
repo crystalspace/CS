@@ -75,7 +75,7 @@ window "Another"
   {
     Frame: (20, 90) - (90, 110)
     Style: bfsNormal
-    Toggle: No
+    Toggle: Yes
     Caption: "Normal-Toggle"
 
     connect 
@@ -248,15 +248,15 @@ window "Layout Test"
   Title:  "Layout Test Window"
   Layout: "GridBag"
 
-  component "Button1" is "Command Button"
+  component "Button1" is "Window"
   {
-    Caption: "Button 1"
     Anchor: gbcEast
 	Fill:   gbcNone
 	GridHeight: 1
 	GridWidth:  1
 	WeightX: 1
 	WeightY: 0
+    Style: wfsNormal
   }
 
   component "Button2" is "Command Button"
@@ -294,16 +294,19 @@ window "Layout Test"
 	HorizontalGap: 5
 	VerticalGap: 5
 
-	component "North" is "Command Button"
+	component "North" is "Window"
 	{
 		Caption: "Child Window"
 		Anchor:  blNorth
+		Style: wfsNormal
+	
 	}
 	
 	component "South" is "Command Button"
 	{
 		Caption: "South"
 		Anchor:  blSouth
+	
 	}
 
 	component "East" is "Command Button"
@@ -324,6 +327,7 @@ window "Layout Test"
 	{
 		Caption: "Center"
 		Anchor:  blCenter
+	
 	}
   }
  

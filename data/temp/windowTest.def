@@ -1,0 +1,89 @@
+skin "Normal Windows"
+{
+  Texture: 		"/aws/texture.png"
+  HighlightColor: 		230,230,230
+  ShadowColor:    		60,60,60
+  FillColor:      		200,200,200
+  TextDisabledColor:	128,128,0
+  TextForeColor:		0,0,0
+  TextBackColor:        255,255,255
+  ButtonTextColor:		0,0,192
+  ChartBarColor:		255,0,0
+  OverlayTextureAlpha:	128
+  ScrollBarHeight:	16
+  ScrollBarWidth:	16
+  WindowMin:		"/aws/minimize.png"
+  WindowZoom:		"/aws/zoom.png"
+  WindowClose:		"/aws/close.png"
+  WindowMinAt:		(46, 6) - (46-11, 6+10)
+  WindowZoomAt:		(34, 6) - (34-11, 6+10)
+  WindowCloseAt:	(19, 6) - (19-11, 6+10)
+  CheckBoxUp:		"/aws/chkup.png"
+  CheckBoxDn:		"/aws/chkdn.png"
+  CheckBoxOn:		"/aws/chkon.png"
+  CheckBoxOff:		"/aws/chkoff.png"
+  RadioButtonUp:	"/aws/radup.png"
+  RadioButtonDn:	"/aws/raddn.png"
+  RadioButtonOn:	"/aws/radon.png"
+  RadioButtonOff:	"/aws/radoff.png"
+  TreeCollapsed:	"/aws/treecol.png"
+  TreeExpanded:		"/aws/treeexp.png"
+  TreeCollapsed:	"/aws/treecol.png"
+  TreeVertLine:		"/aws/treevl.png"
+  TreeHorzLine:		"/aws/treehl.png"
+  TreeChkUnmarked:	"/aws/treechke.png"
+  TreeChkMarked:	"/aws/treechkf.png"
+  TreeGrpUnmarked:	"/aws/treegrpe.png"
+  TreeGrpMarked:	"/aws/treegrpf.png"
+  ScrollBarUp:		"/aws/sbup.png"
+  ScrollBarDn:		"/aws/sbdn.png"
+  ScrollBarRt:		"/aws/sbrt.png"
+  ScrollBarLt:		"/aws/sblt.png"
+}
+
+
+window "Splash"
+{
+  Frame: (0,0)-(600,400)
+  Style: wfsNormal
+  Options: wfoTitle+wfoGrip
+  Title: "Parent window"
+
+  connect
+  {
+    signalComponentCreated -> awsStandardSink::Show
+  }
+
+  component "Kid" is "Window"
+  {
+     Frame: (0,0)-(500,300)
+     Style: wfsNormal
+     Options: wfoTitle+wfoGrip
+     Title: "Kid Window"
+
+  
+   
+     component "AnotherKid" is "Window"
+     {
+        Frame: (50,50)-(300,500)
+        Style: wfsNormal
+        Options: wfoTitle+wfoGrip
+        Title: "Kid Window 2"
+	connect
+	{
+	  signalComponentCreated -> awsStandardSink::ShowWindow
+	}
+
+     }
+
+  }
+
+  component "Engine View" is "Engine View"
+  {
+     Frame: (50,350)-(400,500)
+  }
+
+  
+}
+
+ 

@@ -1,0 +1,132 @@
+skin "Normal Windows"
+{
+  Texture: 		"/aws/texture.png"
+  HighlightColor: 		230,230,230
+  ShadowColor:    		60,60,60
+  FillColor:      		200,200,200
+  TextDisabledColor:	128,128,0
+  TextForeColor:		0,0,0
+  TextBackColor:        255,255,255
+  ButtonTextColor:		0,0,192
+  ChartBarColor:		255,0,0
+  OverlayTextureAlpha:	128
+  ScrollBarHeight:	16
+  ScrollBarWidth:	16
+  WindowMin:		"/aws/minimize.png"
+  WindowZoom:		"/aws/zoom.png"
+  WindowClose:		"/aws/close.png"
+  WindowMinAt:		(46, 6) - (46-11, 6+10)
+  WindowZoomAt:		(34, 6) - (34-11, 6+10)
+  WindowCloseAt:	(19, 6) - (19-11, 6+10)
+  CheckBoxUp:		"/aws/chkup.png"
+  CheckBoxDn:		"/aws/chkdn.png"
+  CheckBoxOn:		"/aws/chkon.png"
+  CheckBoxOff:		"/aws/chkoff.png"
+  RadioButtonUp:	"/aws/radup.png"
+  RadioButtonDn:	"/aws/raddn.png"
+  RadioButtonOn:	"/aws/radon.png"
+  RadioButtonOff:	"/aws/radoff.png"
+  TreeCollapsed:	"/aws/treecol.png"
+  TreeExpanded:		"/aws/treeexp.png"
+  TreeCollapsed:	"/aws/treecol.png"
+  TreeVertLine:		"/aws/treevl.png"
+  TreeHorzLine:		"/aws/treehl.png"
+  TreeChkUnmarked:	"/aws/treechke.png"
+  TreeChkMarked:	"/aws/treechkf.png"
+  TreeGrpUnmarked:	"/aws/treegrpe.png"
+  TreeGrpMarked:	"/aws/treegrpf.png"
+  ScrollBarUp:		"/aws/sbup.png"
+  ScrollBarDn:		"/aws/sbdn.png"
+  ScrollBarRt:		"/aws/sbrt.png"
+  ScrollBarLt:		"/aws/sblt.png"
+}
+
+window "Layout Test 2"
+{
+  Style: wfsNormal
+  Options: wfoGrip+wfoTitle+wfoClose+wfoMin+wfoZoom+wfoControl
+  Frame: (0,0) - (460,252)
+  Title: "Form1"
+  Layout: "GridBag"
+  component "PushButton3" is "Command Button"
+  {
+    Anchor: gbcCenter
+    Caption: "PushButton3"
+  }
+  component "PushButton4" is "Command Button"
+  {
+    Anchor: gbcCenter
+	GridWidth: 0
+    Fill: gbcHorizontal
+    Caption: "PushButton4"
+  }
+  component "PushButton5" is "Command Button"
+  {
+    Anchor: gbcCenter
+    Fill: gbcNone
+    Caption: "PushButton5"
+  }
+  component "PushButton1" is "Command Button"
+  {
+    Anchor: gbcCenter
+    Fill: gbcHorizontal
+    Caption: "PushButton1"
+  }
+  component "PushButton2" is "Command Button"
+  {
+    Anchor: gbcCenter
+    GridWidth: 0
+    Fill: gbcBoth
+    Caption: "PushButton2"
+  }
+}
+
+
+window "Layout Test"
+{
+  Frame:  (100,10)-(400,320)
+  Style:  wfsNormal
+  Options: wfoGrip+wfoTitle+wfoClose+wfoMin+wfoZoom+wfoControl
+  Title:  "Layout Test Window"
+
+	Layout: "Border"
+	HorizontalGap: 5
+	VerticalGap: 5
+
+	component "North" is "Command Button"
+	{
+		Caption: "Child Window"
+		Anchor:  blNorth
+		Style: wfsNormal
+	
+	}
+	
+	component "South" is "Command Button"
+	{
+		Caption: "South"
+		Anchor:  blSouth
+	
+	}
+
+	component "East" is "Command Button"
+	{
+		Caption: "East"
+		Anchor:  blEast
+	
+	}
+
+	component "West" is "Command Button"
+	{
+		Caption: "West"
+		Anchor:  blWest
+	
+	}
+
+	component "Center" is "Command Button"
+	{
+		Caption: "Center"
+		Anchor:  blCenter
+	
+	}
+}
+
