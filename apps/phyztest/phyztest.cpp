@@ -182,8 +182,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   csLoader::LoadTexture (world, "stone", "/lib/std/stone4.gif");
   csMaterialWrapper* tm = world->GetMaterials ()->FindByName ("stone");
 
-  room = world->NewSector ();
-  room->SetName ("room"); 
+  room = world->CreateCsSector ("room");
   csPolygon3D* p;
   p = room->NewPolygon (tm);
   p->AddVertex (-5, 5, 5);

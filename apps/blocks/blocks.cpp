@@ -1991,8 +1991,7 @@ void Blocks::StartKeyConfig ()
 void Blocks::InitGameRoom ()
 {
   csMaterialWrapper* tm = world->GetMaterials ()->FindByName ("room");
-  room = Sys->world->NewSector ();
-  room->SetName ("room");
+  room = Sys->world->CreateCsSector ("room");
   Sys->set_cube_room (room);
   csPolygon3D* p;
   p = room->NewPolygon (tm);
@@ -2066,8 +2065,7 @@ void Blocks::InitGameRoom ()
 void Blocks::InitDemoRoom ()
 {
   csMaterialWrapper* demo_tm = world->GetMaterials ()->FindByName ("clouds");
-  demo_room = Sys->world->NewSector ();
-  demo_room->SetName ("room");
+  demo_room = Sys->world->CreateCsSector ("room");
 
   csPolygon3D* p;
   p = demo_room->NewPolygon (demo_tm);
