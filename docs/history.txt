@@ -1,6 +1,10 @@
 The history order has been reversed so that new features are at the top.
 
 27-Sep-2000
+	- Fixed bug in csparser which would cause things defined with
+	  the SIXFACE command to be added twice to the sector. This was
+	  apparant in flarge.zip.
+	- Cleaned up some old remnants of csThingTemplate in csparser.
 	- Optimized csPolygon3D::MarkRelevantShadowFrustums by letting
 	  it use csFrustum::BatchClassify instead of csFrustum::Classify.
 	  This should improve the speed of radiosity and lighting somewhat.
@@ -11,8 +15,10 @@ The history order has been reversed so that new features are at the top.
 	- Wouter Wijngaards and Jorrit Tyberghein did a lot of debugging
 	  and improvement of the radiosity code. At this moment it seems
 	  to be working reasonably well now.
+	- Wouter fixed sourcepatchsizes above 1 for radiosity.
 	- Michael Dale Long integrated a patch to input in cctest from
 	  admin@wwwconsulting.com to improve input under Windows.
+	- Michael also added inverted mouse option to cctest.cfg.
 	- Fixes to csphyzik from Michael Ewert.
 	- Thomas Hieber did some cosmetic updates to icsgame.h.
 	- Further cosmetic changes to icsgame.h. I also added Doxygen
