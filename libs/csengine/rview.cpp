@@ -693,7 +693,7 @@ bool csRenderView::ClipBSphere (const csReversibleTransform& o2c,
   {
     bool mirror = GetCamera ()->IsMirrored ();
     float dist = ctxt->clip_plane.Classify (tr_center);
-    if (mirror) dist = -dist;
+    if (!mirror) dist = -dist;
     if ((-dist) > radius) return false;
     else if (dist <= radius) clip_plane = CS_CLIP_NEEDED;
   }
@@ -779,7 +779,7 @@ bool csRenderView::ClipBBox (const csBox2& sbox, const csBox3& cbox,
     for (i = 0 ; i < 8 ; i++)
     {
       csVector3 c = cbox.GetCorner (i);
-      if (mirror)
+      if (!mirror)
       {
         if (ctxt->clip_plane.Classify (c) > 0)
 	  cnt++;

@@ -39,7 +39,7 @@ Bugs to fix:
 	     portals.
 	[**] Investigate if PlaceMesh() works correctly. I suspect it
 	     doesn't. May be related to bug [Bug 471637].
-	[V]  Bug with models seen through portals [Bug 471638].
+	[**] Bug with models seen through portals [Bug 471638].
 	[V]  One of the halos in flarge seems to disappear in some cases
 	     with OpenGL.
 	[V]  Walktest + newsky: it appears that there are some visibility
