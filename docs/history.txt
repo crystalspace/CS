@@ -25,6 +25,7 @@ chronological order.
 	  and doing nothing in that loop.
 	- Jorrit added some debug code to scan for big memory allocations
 	  in memdebug.cpp.
+	- Anders Stenberg fixed procedural textures in NR.
 16-Dec-2003
 	- Jorrit fixed a warning in shadervar.h with initializers given in
 	  the wrong order.

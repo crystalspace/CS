@@ -1042,7 +1042,8 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
     SetGlOrtho (false);
-    glViewport (0, 0, viewwidth, viewheight);
+    //glViewport (0, 0, viewwidth, viewheight);
+    glViewport (1, -1, viewwidth+1, viewheight+1);
 
     glMatrixMode (GL_MODELVIEW);
     glLoadIdentity ();
@@ -1731,6 +1732,7 @@ void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
   int sx, int sy, int sw, int sh, 
   int tx, int ty, int tw, int th, uint8 Alpha)
 {
+  return;
   // If original dimensions are different from current dimensions (because
   // image has been scaled to conform to OpenGL texture size restrictions)
   // we correct the input coordinates here.

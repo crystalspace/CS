@@ -748,8 +748,15 @@ bool csXMLShader::SetupPass (csRenderMesh *mesh,
   for(i = 0; i < thispass->textureCount; i++)
   {
     if (thispass->textureRef[i])
+    {
       thispass->textureRef[i]->GetValue(last_textures[i]);
-    else
+      if (!last_textures[i])
+      {
+        iTextureWrapper* wrap;
+        thispass->textureRef[i]->GetValue(wrap);
+        if (wrap) last_textures[i] = wrap->GetTextureHandle ();
+      }
+    } else
       last_textures[i] = 0;
   }
   g3d->SetTextureState (textureUnits, last_textures, 

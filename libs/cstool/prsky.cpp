@@ -488,10 +488,8 @@ void csProcSky::DrawToTexture (csProcSkyTexture *skytex, csTicks current_time,
   int i;
   csVector3 txtorig, txtu, txtv;
   skytex->GetTextureSpace(txtorig, txtu, txtv);
-#ifndef CS_USE_NEW_RENDERER
   int width = skytex->GetWidth();
   int height = skytex->GetHeight();
-#endif
 
   /// if it already has a texture cache (it has been drawn to in the past)
   /// and we do not animate, and no rerender is forced,
@@ -513,7 +511,6 @@ void csProcSky::DrawToTexture (csProcSkyTexture *skytex, csTicks current_time,
     old_time = current_time;
   }
 
-#ifndef CS_USE_NEW_RENDERER
   iGraphics3D* g3d = skytex->GetG3D ();
   iGraphics2D* g2d = skytex->GetG2D ();
   g3d->SetRenderTarget (skytex->GetTextureWrapper ()->GetTextureHandle (),
@@ -578,7 +575,6 @@ void csProcSky::DrawToTexture (csProcSkyTexture *skytex, csTicks current_time,
     }
 
   g3d->FinishDraw();
-#endif // CS_USE_NEW_RENDERER
 
   /// did a rendering
   skytex->UnsetForceRender();

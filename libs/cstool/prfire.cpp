@@ -318,7 +318,6 @@ void csProcFire::Animate (csTicks /*current_time*/)
     }
   g2d->FinishDraw ();
 #else
-#ifndef CS_USE_NEW_RENDERER
   if (visible)
   {
     g3d->SetRenderTarget (tex->GetTextureHandle ());
@@ -340,7 +339,6 @@ void csProcFire::Animate (csTicks /*current_time*/)
     g3d->FinishDraw ();
   }
   curimg = newimg;
-#endif // CS_USE_NEW_RENDERER
 #endif
 }
 
