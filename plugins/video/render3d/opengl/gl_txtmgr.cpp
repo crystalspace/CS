@@ -567,6 +567,7 @@ void csGLTextureHandle::CreateMipmaps ()
 /*  else
     ComputeMeanColor (vTex[0]->get_width (), vTex[0]->get_height (),
       (csRGBpixel *)image->GetImageData ());*/
+
 }
 
 void csGLTextureHandle::ComputeMeanColor (int w, int h, csRGBpixel *src)

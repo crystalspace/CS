@@ -33,6 +33,10 @@
 #define CS_NORMAL_LIGHT_LEVEL 128
 #endif
 
+SCF_IMPLEMENT_IBASE(csGLTextureCache)
+SCF_IMPLEMENTS_INTERFACE(iGLTextureCache)
+SCF_IMPLEMENT_IBASE_END
+
 //---------------------------------------------------------------------------//
 
 /// Unload a texture cache element (common for both caches)

@@ -81,6 +81,7 @@ private:
   friend class csGLTextureCache;
   friend class csGLTextureManager;
   friend class eiShaderRenderInterface;
+  friend class csShaderGLMTEX;
 
   csRef<iObjectRegistry> object_reg;
   csRef<iGraphics2D> G2D;
@@ -176,6 +177,8 @@ private:
   void SetupClipper (int clip_portal, int clip_plane, int clip_z_plane);
 
   void ApplyObjectToCamera ();
+
+  void CacheTexture(iTextureHandle* itex);
 
 public:
   SCF_DECLARE_IBASE;

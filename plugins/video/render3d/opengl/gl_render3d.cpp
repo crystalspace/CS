@@ -687,7 +687,7 @@ bool csGLRender3D::Open ()
   csRef<iOpenGLInterface> gl = SCF_QUERY_INTERFACE (G2D, iOpenGLInterface);
   ext.InitExtensions (gl);
 
-  if ( /*false &&*/ ext.CS_GL_NV_vertex_array_range && ext.CS_GL_NV_fence)
+  if ( false && ext.CS_GL_NV_vertex_array_range && ext.CS_GL_NV_fence)
   {
     csVARRenderBufferManager * bm = new csVARRenderBufferManager();
     bm->Initialize(this);
@@ -892,7 +892,7 @@ void csGLRender3D::FinishDraw ()
 
 void csGLRender3D::Print (csRect* area)
 {
-  glFinish ();
+  //glFinish ();
   G2D->Print (area);
 }
 
@@ -1275,6 +1275,8 @@ csSome csGLRender3D::eiShaderRenderInterface::GetObject(const char* name)
 {
   if(strcasecmp(name, "ext") == 0)
     return (void*) (&scfParent->ext);
+  if(strcasecmp(name, "txtcache") == 0)
+    return (void*) (scfParent->txtcache);
   return NULL;
 }
 

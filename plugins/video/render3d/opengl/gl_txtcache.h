@@ -45,10 +45,22 @@ struct csTxtCacheData
   csTxtCacheData *next, *prev;
 };
 
+SCF_VERSION ( iGLTextureCache, 0,0,1)
+/**
+ * Simle interface just to be able to marshal across plugin-border
+ */
+struct iGLTextureCache : iBase
+{
+  /// Make sure this texture is active in OpenGL.
+  virtual void Cache (iTextureHandle *texture) = 0;
+  /// Remove an individual texture from cache.
+  virtual void Uncache (iTextureHandle *texh) = 0;
+};
+
 /**
  * This is the OpenGL texture cache.
  */
-class csGLTextureCache
+class csGLTextureCache : iGLTextureCache
 {
 private:
   csGLRender3D* R3D;
@@ -65,15 +77,16 @@ protected:
   /// Total size of all loaded textures
   long total_size;
 public:
+  SCF_DECLARE_IBASE;
   /// Takes the maximum size of the cache.
   csGLTextureCache (int max_size, csGLRender3D* R3D);
   ///
-  ~csGLTextureCache ();
+  virtual ~csGLTextureCache ();
 
   /// Make sure this texture is active in OpenGL.
-  void Cache (iTextureHandle *texture);
+  virtual void Cache (iTextureHandle *texture);
   /// Remove an individual texture from cache.
-  void Uncache (iTextureHandle *texh);
+  virtual void Uncache (iTextureHandle *texh);
 
   /// Clear the cache.
   void Clear ();
