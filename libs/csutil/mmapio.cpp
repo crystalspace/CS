@@ -16,7 +16,7 @@ void *
 csMemoryMappedIO::GetPointer(unsigned int index)
 {
 
-#if defined _HAS_MEMORY_MAPPED_IO_
+#ifdef CS_HAS_MEMORY_MAPPED_IO
 
   return platform.data + (index*block_size);
 
@@ -48,58 +48,6 @@ csMemoryMappedIO::GetPointer(unsigned int index)
   
 #endif
 
-}
-
-void 
-csMemoryMappedIO::CachePage(unsigned int page)
-{
-  unsigned int bucket = page % csmmioDefaultHashSize;
-
-  CacheBlock *cp;
-
-  if (cache_block_count < cache_max_size)
-  {
-    cp = new CacheBlock;
-    ++cache_block_count;
-
-    // Insert it into the bucket.
-    cp->next=cache[bucket];
-    cache[bucket]=cp;
-
-    // Initialize it
-    cp->data = new unsigned char[block_size * cache_block_size];
-  }
-  else
-  {
-    CacheBlock *block;
-   
-    // Find the least used block in this bucket.
-    cp=cache[bucket];
-    block=cp->next;
-
-    while(block)
-    { 
-      if (block->age < cp->age)
-        cp=block;
-
-      block=block->next;
-    }
-
-    // Unmark this page as allocated
-    page_map->ClearBit(cp->page); 
-  }
-    
-  // Get the data for it.
-  cp->offset=page*cache_block_size;
-  cp->page=page;
-  cp->age=0;
-
-  // Mark this page as allocated
-  page_map->SetBit(page);
-    
-  // Read the page from the file
-  fseek(mapped_file, page*cache_block_size*block_size, SEEK_SET);
-  fread(cp->data, block_size, cache_block_size, mapped_file);
 }
 
 
@@ -152,6 +100,58 @@ csMemoryMappedIO::UnMemoryMapFile(mmioInfo *_platform)
      cp=np;
     }
   }
+}
+
+void 
+csMemoryMappedIO::CachePage(unsigned int page)
+{
+  unsigned int bucket = page % csmmioDefaultHashSize;
+
+  CacheBlock *cp;
+
+  if (cache_block_count < cache_max_size)
+  {
+    cp = new CacheBlock;
+    ++cache_block_count;
+
+    // Insert it into the bucket.
+    cp->next=cache[bucket];
+    cache[bucket]=cp;
+
+    // Initialize it
+    cp->data = new unsigned char[block_size * cache_block_size];
+  }
+  else
+  {
+    CacheBlock *block;
+   
+    // Find the least used block in this bucket.
+    cp=cache[bucket];
+    block=cp->next;
+
+    while(block)
+    { 
+      if (block->age < cp->age)
+        cp=block;
+
+      block=block->next;
+    }
+
+    // Unmark this page as allocated
+    page_map->ClearBit(cp->page); 
+  }
+    
+  // Get the data for it.
+  cp->offset=page*cache_block_size;
+  cp->page=page;
+  cp->age=0;
+
+  // Mark this page as allocated
+  page_map->SetBit(page);
+    
+  // Read the page from the file
+  fseek(mapped_file, page*cache_block_size*block_size, SEEK_SET);
+  fread(cp->data, block_size, cache_block_size, mapped_file);
 }
 
 
