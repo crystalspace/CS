@@ -705,9 +705,10 @@ void csPolygon3D::SetTextureSpace (
   delete_plane = true;
 
   ComputeNormal ();
-  plane->SetTextureSpace (csVector3 (xo, yo, zo),
-  	csVector3 (x1, y1, z1), len1,
-	csVector3 (x2, y2, z2), len2);
+
+  csVector3 v1(xo, yo, zo), v2(x1, y1, z1), v3(x2, y2, z2);
+
+  plane->SetTextureSpace (v1, v2, len1, v3, len2);
 }
 
 
