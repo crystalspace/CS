@@ -109,17 +109,11 @@ Polygon related functionality
 The geometry library.  Various geometry related functions and classes can be
 found here: matrices, vectors, transforms, clipper, planes, etc.
 
-@item CS/libs/csgfxldr
-The graphics loader library.  Routines to support loading various graphic file
-formats and put them internally in the same format.  This library supports
-@sc{jpg}, @sc{gif}, @sc{tga}, @sc{png}, and @sc{bmp}. In the future this
-library will be removed in favor of a set of plugins.
-
-@item CS/libs/csobject
-Hierarchy of Crystal Space independant classes which are used as the base for most
-Crystal Space classes.  The main use for these classes is a system for
-run-time type information and for management of attributes like names that can
-dynamically be attached to objects at run-time.
+@item CS/libs/csgfx
+The graphics library.  Routines to support loading various graphic file
+formats (through plugins) and put them internally in the same format.
+Through this library you can get at @sc{jpg}, @sc{gif}, @sc{tga}, @sc{png},
+and @sc{bmp} files.
 
 @item CS/libs/csparser
 A library which parses @sc{ascii} map files and imports the map into the
@@ -265,10 +259,19 @@ Network drivers.  The only existing driver is a @sc{bsd} socket-based
 @item CS/plugins/cscript/cspython
 @sc{Python} scripting module.
 
-@item CS/plugins/engine
+@item CS/plugins/bugplug
+@sc{BugPlug} is a small plugin that gives debugging facilities to any
+Crystal Space application. Just load the plugin and it works.
+
+@item CS/plugins/engine/3d
 If you want to use the engine as a plugin then this directory contains
 the needed support for that. In the future using the engine as a plugin
 will be the prefered way.
+
+@item CS/plugins/engine/iso
+This is an alternative engine used in Crystal Space. It gives an isometric view
+instead of a real 3D view. Mesh objects can also work with this engine
+(with a few limitations, mostly regarding size).
 
 @table @code
 @item CS/plugins/sound/driver
@@ -291,16 +294,17 @@ Support for 3D sound (@sc{ds3d} or @sc{software} only at the moment).
 @end table
 
 @table @code
-@item CS/plugins/cscon
-A console plug-in for displaying a textual console within the graphic
-environment.
+@item CS/plugins/console
+Various console plugins for input/output. A console is typically overlayed
+on top of the 3D display.
 @end table
 
 @table @code
-@item CS/plugins/mesh/object
+@item CS/plugins/mesh
 Various mesh object implementations.  @xref{MeshObject}.
-@item CS/plugins/mesh/loader
-Loaders for the mesh objects.
+For every mesh object there is typically one implementation in @sc{object}
+and one or more loader/saver plugins in @sc{persist}. @sc{persist/classic}
+is the loader in Crystal Space format.
 @end table
 
 @table @code

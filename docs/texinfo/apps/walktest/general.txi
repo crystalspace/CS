@@ -17,12 +17,6 @@ Give a short list of all commands.
 @item capture
 Generate a screenshot in PNG format.
 
-@item cachedump
-Give information about the contents of the texture cache.
-
-@item cacheclr
-Clear the texture cache.
-
 @item activate
 Activate the object that is right in front of you (@emph{obsolete}).
 
@@ -35,9 +29,6 @@ opening doors that use the cmd_Door key.
 Run a performance test on the current position.
 The default number of runs is 100 but you can change it
 with an optional argument.
-
-@item coorddump
-Show where the camera is located (sector and position).
 
 @item coordsave
 Save the current position to the @file{coord} file.

@@ -27,10 +27,6 @@ The following boolean commands are available :
 Enable/disable collision detection.  Corresponds to @code{-colldet} and
 @code{-nocolldet} commandline options.
 
-@item fclear
-Enable/disable the clearing of the display every frame (this is useful for
-debugging). Corresponds to @code{-clear} command line option.
-
 @item debug
 Enable/disable more debug information (which is written in @file{debug.txt}
 if the program crashes provided your system can catch crashes).
@@ -46,27 +42,9 @@ Enable/disable @sc{fps} display (frames per second).  Corresponds to
 @code{-fps}/@code{-nofps} commandline options and @samp{Walktest.Settings.FPS}
 configuration option.
 
-@item transp
-Enable/disable transparent/filtered/alpha drawing.
-
 @item portals
 Enable/disable drawing through portals. If this is off, a portal will just
 draw as the default texture on the polygon.
-
-@item edges
-Enable/disable display of edges around polygons. This is useful for
-debugging.
-
-@item frustum
-Enable/disable the display of the view frustum around the selected light
-(select lights with @samp{edges} enabled and by clicking the left
-mousebutton on the light).
-
-@item texture
-Enable/disable texture mapping.
-
-@item lighting
-Enable/disable lighting.
 
 @item console
 Open/close console (is done automatically by @key{TAB} key).
@@ -78,49 +56,16 @@ coordinates display automatically disables the statistics display.
 @item things
 Toggle the display of things on/off (default on).
 
-@item ilace
-Toggle interlace on/off.  See the video driver configuration section for
-information about the @samp{Video.Software.Interlacing} option in the config
-file for the software renderer, @file{CS/data/config/soft3d.cfg}.
-
-@item mmx
-Toggle @sc{mmx} support on/off.  This command corresponds to the software
-renderer's @samp{Video.Software.MMX} option in
-@file{CS/data/config/soft3d.cfg}.  @xref{Config Graphics}.  Note that this
-command is only useful if you have a @sc{mmx} capable processor.
-
 @item zbuf
 For debugging. When enabled this will show an alternate view where far away
 objects are rendered in another color. In other words: it tests the Z
 buffer. It works best in 16-bit mode.
-
-@item bilinear
-Experimental feature. Disable/enable bilinear filtering (default off). This
-will slow down the engine considerably and the current implementation also
-shows artifacts.
-
-@item trilinear
-Experimental feature. Disable/enable trilinear filtering (default off). This
-will slow down the engine considerably and the current implementation also
-shows artifacts.
-
-@item dblbuff
-Enable double buffering for systems that support this.
 
 @item debug0
 Debug command. The function of this command is undefined but it serves as a
 place-holder for some debugging functionality. A particular version of
 Crystal Space may assign some action to this command but another version
 may remove this action again.
-
-@item lm_grid
-Enable a lightmap grid which is overlayed on all lighted textures. This is
-for debugging and is disabled by default. You need to clear the texture
-cache to see the effects of this command.
-
-@item lm_only
-When enabled texture mapping is disabled and lightmaps are drawn instead.
-You need to clear the texture cache to see the effects of this command.
 
 @item move3d
 Toggle between between pure 3D movement (Descent-like) and
@@ -135,9 +80,6 @@ Enable/disable gravity (enabled by default).
 @item freelook
 If freelook is enabled the mouse moves around like in Quake. By default
 freelook is disabled.
-
-@item gouraud
-Toggle support for gouraud shading. By default this is on.
 
 @item pvs
 Toggle pvs visibility culling on/off. Use this in combination with the
