@@ -29,7 +29,7 @@ SCF_INTERFACE (iScript, 0, 0, 1) : public iBase
 {
   virtual bool Initialize (iSystem *iSys) = 0;
   virtual bool RunText(const char *iStr)=0;
-  virtual bool RunFile(const char *iStr)=0;
+  virtual bool LoadModule(const char *iStr)=0;
 };
 
 #endif // __ISCRIPT_H__
