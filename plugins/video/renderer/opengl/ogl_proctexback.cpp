@@ -38,6 +38,7 @@ csOpenGLProcBackBuffer::csOpenGLProcBackBuffer (iBase *parent) :
   tex_mm = NULL; 
   g3d = NULL;
   rstate_bilinearmap = false;
+  buffer = NULL;
 }
 
 csOpenGLProcBackBuffer::~csOpenGLProcBackBuffer ()
@@ -45,6 +46,7 @@ csOpenGLProcBackBuffer::~csOpenGLProcBackBuffer ()
   // Our dummy 2d driver will get destroyed lower down in the class hierachy
   // NULL out those members which are shared with the frame buffer interfaces
   // so they don't get deleted.
+  vbufmgr = NULL;
   txtmgr = NULL;
   texture_cache = NULL;
   lightmap_cache = NULL;

@@ -268,3 +268,4 @@ void csTextureManagerOpenGL::Clear ()
 
   csTextureManager::Clear ();
 }
+

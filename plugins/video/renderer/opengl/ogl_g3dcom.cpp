@@ -669,6 +669,7 @@ bool csGraphics3DOGLCommon::NewOpen ()
     width = height = -1;
     return false;
   }
+
   // See if we find any OpenGL extensions, and set the corresponding
   // flags. Look at the bottom
   // of ogl_g3d.h for known extensions (currently only multitexture)
@@ -870,9 +871,16 @@ void csGraphics3DOGLCommon::Close ()
     return;
 
   // we should remove all texture handles before we kill the graphics context
-  txtmgr->Clear ();
-  txtmgr->DecRef (); txtmgr = NULL;
-  vbufmgr->DecRef (); vbufmgr = NULL;
+  if (txtmgr)
+  {
+    txtmgr->Clear ();
+    txtmgr->DecRef (); txtmgr = NULL;
+  }
+  if (vbufmgr)
+  {
+    vbufmgr->DecRef (); vbufmgr = NULL;
+  }
+
   delete texture_cache; texture_cache = NULL;
   delete lightmap_cache; lightmap_cache = NULL;
   if (clipper)

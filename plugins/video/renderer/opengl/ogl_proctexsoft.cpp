@@ -184,13 +184,11 @@ csOpenGLProcSoftware::csOpenGLProcSoftware (iBase * pParent)
 
 csOpenGLProcSoftware::~csOpenGLProcSoftware ()
 {
-  printf ("*** csOpenGLProcSoftware dtor\n");
   // remove ourselves from the linked list
   if (!head_soft_tex)
   {
     if (!next_soft_tex)
     {
-      printf ("*** freeing proctexture handles\n");
       delete txts_vector;
     }
     else
