@@ -885,8 +885,9 @@ public:
   void SetTransform (const csReversibleTransform& tr) { transform = tr; }
 
   // Static LOD methods.
-  void CreateStaticLOD ();
+  iLODControl* CreateStaticLOD ();
   void DestroyStaticLOD ();
+  iLODControl* GetStaticLOD ();
   void SetStaticLOD (float m, float a);
   void GetStaticLOD (float& m, float& a) const;
   void RemoveFactoryFromStaticLOD (iMeshFactoryWrapper* mesh);
@@ -918,13 +919,17 @@ public:
       { return scfParent->GetTransform (); }
     virtual void SetTransform (const csReversibleTransform& tr)
       { scfParent->SetTransform (tr); }
-    virtual void CreateStaticLOD ()
+    virtual iLODControl* CreateStaticLOD ()
     {
-      scfParent->CreateStaticLOD ();
+      return scfParent->CreateStaticLOD ();
     }
     virtual void DestroyStaticLOD ()
     {
       scfParent->DestroyStaticLOD ();
+    }
+    virtual iLODControl* GetStaticLOD ()
+    {
+      return scfParent->GetStaticLOD ();
     }
     virtual void SetStaticLOD (float m, float a)
     {

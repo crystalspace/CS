@@ -861,14 +861,20 @@ void csMeshFactoryWrapper::HardTransform (const csReversibleTransform &t)
   meshFact->HardTransform (t);
 }
 
-void csMeshFactoryWrapper::CreateStaticLOD ()
+iLODControl* csMeshFactoryWrapper::CreateStaticLOD ()
 {
   static_lod = csPtr<csStaticLODFactoryMesh> (new csStaticLODFactoryMesh ());
+  return static_lod;
 }
 
 void csMeshFactoryWrapper::DestroyStaticLOD ()
 {
   static_lod = 0;
+}
+
+iLODControl* csMeshFactoryWrapper::GetStaticLOD ()
+{
+  return (iLODControl*)static_lod;
 }
 
 void csMeshFactoryWrapper::SetStaticLOD (float m, float a)

@@ -15,6 +15,8 @@ chronological order.
 	  iMeshFactoryWrapper->CreateMeshWrapper() you can create a
 	  hierarchical mesh object that inherits the lod attributes
 	  from the factory.
+	- Jorrit added the ability to use <lodlevel> and <staticlod> for
+	  factories too. Forgot that in the previous commit.
 12-Aug-2003
 	- Jorrit fixed a compile error in the OpenGL Windows canvas after the
 	  changes from res yesterday.

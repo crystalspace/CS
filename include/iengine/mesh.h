@@ -534,12 +534,19 @@ struct iMeshFactoryWrapper : public iBase
    * used to select which children are visible and which are not.
    * Use this to create static lod.
    */
-  virtual void CreateStaticLOD () = 0;
+  virtual iLODControl* CreateStaticLOD () = 0;
 
   /**
    * Destroy the LOD control for this factory.
    */
   virtual void DestroyStaticLOD () = 0;
+
+  /**
+   * Get the LOD control for this factory. This will return 0 if this is a
+   * normal (hierarchical) factory. Otherwise it will return an object with
+   * which you can control the static LOD of this factory.
+   */
+  virtual iLODControl* GetStaticLOD () = 0;
 
   /**
    * Set the LOD function parameters for this factory. These control the

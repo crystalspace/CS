@@ -611,7 +611,7 @@ csPtr<iMeshFactoryWrapper> csLoader::LoadMeshObjectFactory (const char* fname)
     }
     csRef<iMeshFactoryWrapper> t = Engine->CreateMeshFactory (
       	meshfactnode->GetAttributeValue ("name"));
-    if (LoadMeshObjectFactory (ldr_context, t, meshfactnode))
+    if (LoadMeshObjectFactory (ldr_context, t, 0, meshfactnode))
     {
       AddToRegion (ldr_context, t->QueryObject ());
       return csPtr<iMeshFactoryWrapper> (t);
@@ -1018,7 +1018,7 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* node)
 	      if (t) break;
 	    }
             csRef<iMeshFactoryWrapper> t = Engine->CreateMeshFactory (name);
-	    if (!t || !LoadMeshObjectFactory (ldr_context, t, child))
+	    if (!t || !LoadMeshObjectFactory (ldr_context, t, 0, child))
 	    {
 	      // Error is already reported.
 	      return false;
@@ -1221,7 +1221,7 @@ bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* node)
 			    child->GetAttributeValue ("name"));
 	    if (t)
 	    {
-	      if (!LoadMeshObjectFactory (ldr_context, t, child))
+	      if (!LoadMeshObjectFactory (ldr_context, t, 0, child))
 	      {
 	        // Error is already reported.
 		return false;
@@ -1545,7 +1545,7 @@ bool csLoader::ParsePolyMesh (iDocumentNode* node, iObjectModel* objmodel)
 }
 
 bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
-	iMeshFactoryWrapper* stemp,
+	iMeshFactoryWrapper* stemp, iMeshFactoryWrapper* parent,
 	iDocumentNode* node, csReversibleTransform* transf)
 {
   iLoaderPlugin* plug = 0;
@@ -1597,6 +1597,26 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	if (!LoadAddOn (ldr_context, child, stemp))
 	  return false;
       	break;
+      case XMLTOKEN_LODLEVEL:
+        {
+          if (!parent)
+	  {
+	    SyntaxService->ReportError (
+	  	    "crystalspace.maploader.load.meshfactory", child,
+		    "Factory must be part of a hierarchy for <lodlevel>!");
+	    return false;
+	  }
+	  parent->AddFactoryToStaticLOD (child->GetContentsValueAsInt (),
+	  	stemp);
+        }
+        break;
+      case XMLTOKEN_STATICLOD:
+        {
+	  iLODControl* lodctrl = stemp->CreateStaticLOD ();
+	  if (!LoadLodControl (lodctrl, child))
+	    return false;
+        }
+        break;
       case XMLTOKEN_PARAMS:
 	if (!plug)
 	{
@@ -1809,7 +1829,8 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
           csRef<iMeshFactoryWrapper> t = Engine->CreateMeshFactory (
 	  	child->GetAttributeValue ("name"));
 	  csReversibleTransform child_transf;
-          if (!LoadMeshObjectFactory (ldr_context, t, child, &child_transf))
+          if (!LoadMeshObjectFactory (ldr_context, t, stemp, child,
+	  	&child_transf))
 	  {
 	    // Error is already reported above.
 	    return false;

@@ -89,7 +89,7 @@ public:
  * hierarchical mesh factory. It is used as a template to create
  * a csStaticLODMesh instance.
  */
-class csStaticLODFactoryMesh : public csRefCount
+class csStaticLODFactoryMesh : public iLODControl
 {
 private:
   /// All static lod levels.
@@ -99,12 +99,15 @@ private:
   float lod_m, lod_a;
 
 public:
+  SCF_DECLARE_IBASE;
+
   /// constructor
   csStaticLODFactoryMesh ();
   virtual ~csStaticLODFactoryMesh ();
 
-  void SetLOD (float m, float a);
-  void GetLOD (float& m, float& a) const;
+  virtual void SetLOD (float m, float a);
+  virtual void GetLOD (float& m, float& a) const;
+  virtual int GetLODPolygonCount (float lod) const { return 0; }
 
   /// Get the mesh array for the numerical lod.
   csArray<iMeshFactoryWrapper*>& GetMeshesForLOD (int lod)

@@ -555,9 +555,11 @@ private:
    * If the transformation pointer is given then this is for a hierarchical
    * mesh object factory and the transformation will be filled in with
    * the relative transform (from MOVE keyword).
+   * parent is not 0 if the factory is part of a hierarchical factory.
    */
   bool LoadMeshObjectFactory (
   	iLoaderContext* ldr_context, iMeshFactoryWrapper* meshFact,
+	iMeshFactoryWrapper* parent,
   	iDocumentNode* node, csReversibleTransform* transf = 0);
 
   /**

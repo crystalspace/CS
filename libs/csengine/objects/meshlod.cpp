@@ -55,8 +55,13 @@ int csStaticLODMesh::GetLODPolygonCount (float lod) const
 
 //----------------------------------------------------------------------------
 
+SCF_IMPLEMENT_IBASE(csStaticLODFactoryMesh)
+  SCF_IMPLEMENTS_INTERFACE(iLODControl)
+SCF_IMPLEMENT_IBASE_END
+
 csStaticLODFactoryMesh::csStaticLODFactoryMesh ()
 {
+  SCF_CONSTRUCT_IBASE (0);
   lod_m = 0;
   lod_a = 1;
 }
