@@ -6,7 +6,7 @@ DESCRIPTION.OS.win32gcc = Win32
 
 # Choose which drivers you want to build/use
 PLUGINS+= cscript/cspython
-PLUGINS+= cscript/cslua
+#PLUGINS+= cscript/cslua
 PLUGINS+= sound/renderer/software
 PLUGINS+= video/canvas/ddraw
 #PLUGINS+= video/canvas/ddraw8

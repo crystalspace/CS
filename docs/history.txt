@@ -1,5 +1,14 @@
 The history order is reversed so that new features are at the top.
 
+21-Feb-2002
+	- Peter Amstutz <tetron@student.umass.edu> added a patch to CS
+	  to add two additional broadcast events:
+	    cscmdCanvasExposed
+	    cscmdCanvasHidden
+	  these events are sent when the canvas becomes exposed/hidden
+	  (i.e. iconify for example). Currently only the XWindow canvas
+	  will actually send these!
+	- Disabled default building of LUA for mingw port.
 20-Feb-2002
 	- Added SetMaximumSectorVisit() and GetMaximumSectorVisit() functions
 	  to iPortal. With this you can control how many times the same
