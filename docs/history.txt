@@ -3746,9 +3746,26 @@ Short-term cleanups that need to be done:
 	  has correct lightmaps like the OpenGL port!
 	- *** Release of 0.12_003 ***
 3-Mar-1999
-	- Patch from Eric Sunshine with a fix on the bots. There are cases
-	  where the bots could crash Crystal Space. Also some small changes
-	  to the NeXT ports.
+	- Eric Sunshine made the following changes:
+	    - Fixed a very nasty crasher where Bot::move() was trying to
+	      generate a unit vector from <0,0,0>.  Unfortunately
+	      Vector3::unit() which computes (v / norm) was not checking for
+	      (norm == 0) which is the case for vector <0,0,0>.  This bug
+	      manifested itself in the following manner.  The result of unit()
+	      was NaN, as a consequence of division by zero.  This NaN value
+	      was then used in other computations which resulted in NaN for
+	      those values as well.  Finally, a NaN value was passed to
+	      csSector::follow_segment() which resulted in infinite mutual
+	      recursion with Portal::follow_segment().  Each follow_segment()
+	      function repeatedly called the other until the stack overflowed.
+	      I fixed this problem by making Vector3d::unit() more robust.  It
+	      now checks for the special case where (norm == 0).
+	    - Fixed NeXTSystemProxy and NeXTDelegate so that when application
+	      pauses, the clock also pauses.  This prevents program AI from
+	      experiencing a temporal anomaly when execution is resumed.
+	    - Added a README.Binaries file which will be included in the
+	      binary-only distributions of Crystal Space for MacOS/X Server,
+	      OpenStep, and NextStep.
 	- Update to csall.dsw (VC5 project file) from Jason McKnight. The
 	  correct dependencies for MazeD are added so that MazeD can compile
 	  out of the box.
@@ -3759,11 +3776,42 @@ Short-term cleanups that need to be done:
 	- Removed MSG_WARNING call from general/loader (curved surfaces)
 	  because MSG_WARNING gives problems in fullscreen Windows.
 	- Added two GUIDS from Xavier Pianet for BeOS.
-	- Patch from Eric Sunshine to integrate Blocks with the main code.
-	  Although Blocks was intended as a demonstration for a seperate
-	  program, at this moment it is probably better to include it with
-	  the distribution like this because this makes it more accessible
-	  to others and shows a good example of CS usage.
+	- Eric Sunshine made the following changes:
+	    - Moved the Blocks game into the cryst/src/general directory.  It
+	      used to be stand-alone which was annoying because it required a
+	      special makefile for each platform.
+	    - Added data file for Blocks: cryst/data/blocks.zip.
+	    - Moved blocks.cfg directly into cryst/src directory.
+	    - Fixed some compilation warnings in blocks.cpp.
+	    - Added "quit" feature to Blocks.  Program now terminates when
+	      Escape is pressed.
+	    - Documented the Blocks game in cryst/docs/blocks.txt.
+	    - FILES & docs/whatsnew.txt now mention Blocks.
+	    - Modified Makefile, common.mak, & cs.mak to build Blocks game.
+	    - Changed cs.mak so that it now uses the PROC variable to compose
+	      the "out" object-file directory.  This way one can cross-compile
+	      without having to "make clean" first.
+	    - Fixed next.mak so that it sorts TARGET_ARCHS so that when PROC
+	      is used to compose "out" directory, the same list of
+	      architectures will always result in the same PROC value
+	      regardless of initial order.
+	    - Fixed next2d.mak to refer to NEXT.DESCRIPTION rather than
+	      NEXT.FLAVOR.
+	    - Fixed INSTALL document so that it no longer makes invalid claims
+	      about NeXT ports not working with 24-bit displays.
+	    - Documented new structure of "out" directory in INSTALL.BeOS,
+	      INSTALL.Unix, INSTALL.General.
+	    - Clarified introduction of INSTALL.General.  It is now easier to
+	      understand that it may be useful for Unix-like ports, but that
+	      one should read port-specific documentation as well.  Now
+	      mentions "gnumake" explicitly.
+	    - Updated INSTALL.NeXT to refer to new package naming conventions:
+	      csmain.tgz, csnext.tgz, etc.  NeXT port used to be on other.tgz
+	      package, but now resides in its own package.  Now mentions new
+	      INSTALL.General instead of INSTALL.Unix.  Now mentions new
+	      Blocks (csblocks.tgz) game, as well as docs/blocks.txt.
+	    - Fixed a warning in keys.cpp add_bot() which someone introduced
+	      in this release.
 	- New project files from Vyacheslav Chupyatov for Watcom C++/Windows.
 	- *** Release of 0.12_002 ***
 1-Mar-1999
@@ -3824,8 +3872,98 @@ Short-term cleanups that need to be done:
 	- I added 32-bit support for unlighted triangle drawers. This
 	  was easy to do and allowed correct viewing of unlighted sprites.
 	  Curved surfaces will now also be visible.
-	- Received two new ports from Eric Sunshine: Mac OS/X Server DR2 and
-	  OpenStep 4.2.  He also fixed various problems in parts of the engine.
+	- Received two new ports from Eric Sunshine: Mac OS/X Server and
+	  OpenStep 4.2.  He also fixed various problems in parts of the
+	  engine.  A summary of his changes follows:
+	    - Restructured directory "system/next" to accommodate the new
+	      ports.  Added port-specific subdirectories "nextstep",
+	      "openstep", & "rhapsody", as well as "shared" which contains
+	      resources common to all ports.  The "openstep" directory is used
+	      by both the OpenStep & Rhapsody ports.
+	    - Overhauled NeXTSystemProxy to work with OpenStep and Rhapsody.
+	      Completely dropped the use of a separate thread for AppKit's
+	      run-loop.  Even though NextStep did not mind DPS activity from
+	      either thread (properly synchronized, of course), Rhapsody
+	      disallowed it.  Rather than complicating the code even more by
+	      sending messages between threads, I ditched the idea altogether.
+	      As a replacement, I was able to add a category to NSApplication
+	      defining the method -runRecursively: which works a little magic
+	      and allows the run-loop to be invoked recursively unlike the
+	      normal -run method.  This simplified the implementation of
+	      NeXTSystemProxy considerably.
+	    - Added NeXTMenu module which constructs the application's menu
+	      based on a menu-definition configuration file (NeXTMenu.cfg).
+	      There are two such files.  One defines a NextStep-style menu
+	      which is used for NextStep and OpenStep, and the other defines a
+	      Rhapsody-style menu.  Removed the hard-coded NextStep-style menu
+	      definition from NeXTSystemProxy.
+	    - Worked around Rhapsody compiler bug.  Use of
+	      -fomit-frame-pointer flag was causing the program to crash in
+	      the constructor of global objects.
+	    - Added NeXTfopen.cpp & NeXTprintf.cpp which define
+	      csSystemDriver::fopen() & csSystemDriver::printf() since the
+	      Rhapsody compiler was generating unlinkable object files when
+	      using the versions in system/general which accessed global
+	      ::fopen() && ::printf().  This is a known problem with the
+	      Rhapsody development tools.
+	    - Generalized next.mak for use by all NeXT ports.  Moved
+	      definition of SYSMODIFIERSHELP to next2d.mak where it belongs.
+	    - The NeXT makefiles, next.mak & next2d.mak, now properly restrict
+	      the available architectures for TARGET_ARCHS to those allowed by
+	      each platform: i386, m68k, sparc, hppa for NextStep; i386, m68k,
+	      sparc for OpenStep; and i386, ppc for Rhapsody DR2.
+	    - Renamed libnext2d to next2d.
+	    - Fixed version.h to define OS_VERSION appropriately for each
+	      NeXT-style platform rather than being hard-coded as "NextStep".
+	    - NeXTDelegate no longer eats right-mouse-down when application is
+	      paused, so the right button can be used for the main-menu in
+	      this case.
+	    - NeXTDelegate no longer sends mouse-moved events when the mouse
+	      is outside the view bounds.  Even though the tracking rectangle
+	      is removed when the cursor leaves the view bounds, some
+	      mouse-moved events tend to get sent anyhow.  The code now
+	      ignores these anomalous events.
+	    - NeXTDelegate now reveals the mouse pointer when it exits the
+	      view bounds if it was hidden.
+	    - Fixed three bugs in NeXTProxy2D's handling of 24-bit RGB.
+		(a) Was allocating only half the memory needed for the
+		    palette.
+		(b) set_rgb() was miscomputing the pointer to the palette
+		    entry.
+		(c) flush_24() was only copying 2-bytes from the palette to
+		    the frame buffer, rather than 4-bytes.
+	    - Worked around an OpenStep compiler bug which was triggered by
+	      several classes, where it generates unlinkable object files
+	      if an inline method calls a second inline method before the
+	      second method has been seen by the compiler.
+	    - Centralized discussion of multi-architecture binaries in
+	      INSTALL.NeXT.
+	    - Fixed a compiler warning in drvsdefs.h.  It was defining
+	      CS_NET_SOCKET as (unsigned int), yet CS_NET_INVALID_SOCKET as
+	      (-1).
+	    - Worked around problem caused by radically different (struct
+	      stat) on Rhapsody leading to compilation error in
+	      Archive::read_zip_entries().
+	    - Added 'const' version of operator[] to csVector.
+	    - Added missing 'const' qualifier to many csIniFile methods.
+	    - Fixed a bug in Andrew's implementation of the NeXT_STDAPI_
+	      macro in cscom.cpp.  It was emitting code which tried to return
+	      a value from a (void) function.
+	    - Fixed long-standing bug in cspFileDialog::Reread() where it
+	      botched handling of root "/" directory by interpreting it as "".
+	      This made it impossible to browse the root directory.  This bug
+	      affected all platforms which use "/" as a path separator.
+	    - Added top-level makefile targets for nextstep, openstep, and
+	      rhapsody.
+	    - Overhauled INSTALL.NeXT and README.NeXT to reflect new ports.
+	    - Fixed several documents to mention the new ports.
+	    - Fixed faq.html to mention the new INSTALL.BeOS.
+	    - Fixed the 'net' target since it was incorrect for platforms
+	      which do not use all network related modules.  Now the target
+	      dependencies are added dynamically.
+	    - Fixed more "unused variable" compiler warnings.
+	    - Fixed bug in PolygonSet::intersects_camera_z_plane().  It was
+	      declared as returning a value, but failed to do so.
 	- New project files for VC from Bart van Langen. These should make
 	  things easier for beginning users.
 	- Added Doom to CS map convertor from Wolfgang Lehrach
@@ -4002,12 +4140,11 @@ Short-term cleanups that need to be done:
 	- Update to Macintosh port from Robert Bate. He fixed the DrawSprocket
 	  support.
 	- Update to NextStep port from Eric Sunshine:
-		- Implemented a NeXT specific csGraphics2D::SetMouseCursor()
-		- The cscmdFocusChangedEvent is now sent upon focus state
-		  changes.
-		- Added a Pause item to the NextStep menu.
-		- The application now pauses automatically when hidden and
-		  when in the background.
+	    - Implemented a NeXT specific csGraphics2D::SetMouseCursor()
+	    - Now sends cscmdFocusChanged event when window's focus changes.
+	    - Added a Pause item to the NextStep menu.
+	    - The application now pauses automatically when hidden and when in
+	      the background.
 	- New sound patches from Normal Kramer.
 	- I added a really old fix from Ivan Avramovic to fix a really old
 	  bug. The bug is the problem that when you are too close to a portal
@@ -4070,25 +4207,30 @@ Short-term cleanups that need to be done:
 	  unneeded anyway.
 15-Feb-1999
 	- Andrew Zabolotny send me a patch which the following changes:
-		- Fixed DOS/DJGPP port to improve the changes that I
-		  made.
-		- Added 32-bit mode to OS/2 port. However it is untested
-		  since Andrew doesn't have a functional 32-bit mode
-		  (only 24-bit).
-		- Fixed text color on console in 32-bit mode.
+	    - Fixed DOS/DJGPP port to improve the changes that I made.
+	    - Added 32-bit mode to OS/2 port.  However it is untested since
+	      Andrew doesn't have a functional 32-bit mode (only 24-bit).
+	    - Fixed text color on console in 32-bit mode.
 	- Patch from Nathaniel Saint Martin with the following fixes:
-		- Fix for broken cscom.cpp (NeXT_STDAPI define).
-		- Some fixes to Direct3D and Glide ports.
-		- He reports that there is a bug with sprite code.
+	    - Fix for broken cscom.cpp (NeXT_STDAPI define).
+	    - Some fixes to Direct3D and Glide ports.
+	    - He reports that there is a bug with sprite code.
 	- Fix from Robert Bate to the Macintosh port.
 	- Changes from Eric Sunshine to the NextStep port:
-		- Added NEED_SOCKET_LIB to fix problem with Solaris
-		  requiring -lsocket while this is not needed on Linux.
-		- Fix NextStep port which was a bit broken by Andrew.
-		- The NextStep port also works on m68k hardware now. He
-		  had to change the GIF loader for this and some other
-		  stuff.
-		- The NextStep port also works for sparc and hppa.
+	    - Ported it to m68k, sparc, and hppa hardware.  Previously it ran
+	      only on Intel.
+	    - Fix SysSystemDriver, SysMouseDriver, and SysKeyboardDriver which
+	      broke after Andrew's recent changes.
+	    - Added NEED_SOCKET_LIB to the makefiles to control whether or not
+	      libsocket.a is linked in.  NextStep sets this flag to 'no'.
+	    - Added SYSMODIFIERSHELP to makefiles so that NextStep port can
+	      add a message to the makefile help concerning TARGET_ARCHS.
+	    - Worked around a compiler crasher on HPPA when compiling
+	      TextureCache::create_lighted_texture_true_rgb_private().
+	      Apparently the name is too long for the HPPA compiler.  Fixed
+	      by shortening it.
+	    - Worked around a compiler crasher on SPARC when compiling
+	      calls to QueryInterface() for the IHaloRasterizer interface.
 	- Fix to Linux sound driver from Norman Krämer. Also a fix to
 	  the WAV file loader in general. There should no longer be
 	  an audible crack when playing wav files.
@@ -4111,6 +4253,17 @@ Short-term cleanups that need to be done:
 	  The port appears incomplete: no lightmaps for example but it
 	  seems to run fine otherwise.
 	- Fixed SysTime() so that it uses times() instead of clock().
+	- Eric Sunshine fixed the ImageGifFile so that it works on m68k
+	  hardware.  The problem was that the constructor tried allocating 9KB
+	  on the stack for local variables.  Fixed so that large variables are
+	  now allocated from the heap.  Also cleaned up the class and mad it
+	  more robust for all platforms.
+	- Eric Sunshine added CS_USE_FAST_FLOAT_TO_INT option to defs.h.  This
+	  option is disabled on NextStep since the fast version of QRound()
+	  was crashing Scan::draw_scanline_map().
+	- Eric Sunshine fixed a bugin the csSystemDriver construtor.  It was
+	  not initializing its 'world' pointer to null.  This led to crashes
+	  when other code attempted to use that field.
 11-Feb-1999
 	- Fixed compilation of Linux port. Mainly I had to add a dummy 'main'
 	  function to all dynamic libraries so that I could link them without
@@ -4129,9 +4282,18 @@ Short-term cleanups that need to be done:
 	- Andrew Apted didn't have to do anything. It appears that his GGI
 	  port already correctly supports 32-bit mode :-)
 	- Update to Macintosh port from Robert Bate to support 32-bit mode.
-	- Update to NextStep port from Eric Sunshine. He added support for
-	  building NextStep multi-architecture binaries (MAB). With this
-	  he can build an executable which can run on multiple CPU types.
+	- Eric Sunshine added support for building NextStep multi-architecture
+	  binaries (MAB).  With this feature it is possible to build an
+	  executable which can run on multiple CPU types.  In support, a
+	  TARGET_ARCHS option was added to the makefile.
+	- Eric Sunshine fixed the NextStep port to define
+	  PORT_BYTESEX_BIG_ENDIAN when appropriate.  This fixes a problem
+	  where WAV files failed to load on m68k.
+	- Eric Sunshine fixed a problem which caused loading of PNG images to
+	  fail on m68k.  The problem was that the PNG loader was assuming that
+	  the RGBPixel structure was 4 bytes, however on m68k, the compiler
+	  padded it out to 6 bytes.  To fix this, he rewrote RGBPixel and
+	  RGBPalEntry to be more resilient to padding changes.
 	- I modified the DOS/DJGPP port for 32-bit support. However, this is
 	  untested and I'm not sure that the Vesa detection code in
 	  djvidsys.cpp will correctly open a 32-bit mode (I don't understand
@@ -4161,7 +4323,49 @@ Short-term cleanups that need to be done:
 	  things in the Crystal Space sources to work around some bugs in
 	  the compiler he used. For example, don't use static_cast<> but
 	  use STATIC_CAST() instead (a macro which does something else on
-	  NextStep).
+	  NextStep).  Eric's changes included:
+	    - Added missing '#include "types.h"' to many files in order to
+	      define the fake 'bool' type which NextStep requires.
+	    - Fixed a number of occurances where expressions which work with
+	      the real 'bool' type failed with the fake one.  Expressions of
+	      the sort: bool a = 4; bool b = 1; bool c = (a == b), or
+	      variations of this theme.
+	    - Rewrote physics.cpp and dynlight.cpp to rely upon
+	      csSystemDriver::Time() rather than CLOCKS_PER_SEC and clock()
+	      which are unavailable on NextStep.
+	    - Provided macros for STATIC_CAST, DYNAMIC_CAST, etc. since the
+	      NextStep compiler does not support the new-style cast syntax.
+	    - Updated DLL_NAME macros within various drivers to reflect
+	      NextStep semantics.
+	    - Worked around a problem in cscom.cpp where the compiler
+	      disallows the 'new' keyword in 'extern "C"' functions.
+	    - Provided the CS_STATIC_TABLE macro in defs.h in order to work
+	      around the problem where the compiler crashes when it finds a
+	      'const' table of one or two elements but where the table size
+	      is not stated beforehand.
+	    - Worked around a compiler bug triggered by inttable.h where a
+	      using a cast of a typedef'd type in a complex offsetof()
+	      expression crashed the compiler.
+	    - Fixed warnings about mixing integral versus non-integral types
+	      in csMenuItem::Press().
+	    - Fixed a number of cases where local method arguments were
+	      shadowing instance variables since the NextStep compiler
+	      periodically botches it.
+	    - Fixed the global makefiles to work with the NextStep tools.
+	    - Fixed a bug in PrimEdit where a call to Gfx3D->BeginDraw() was
+	      expecting to return 'true', when in fact it was returning S_OK.
+	      As a consequence, the conditional always failed in cases where
+	      it should have succeeded.
+	    - Fixed a bug in the BeOS port where the #include directive for
+	      driver2d was mis-typed as driver2dx.
+	    - Fixed a problem in the BeOS 2D driver where it was missing an
+	      #endif directive which caused compilation to fail when
+	      CS_STATIC_LINKED was defined.
+	    - Added notion of OS_NEXT, DISP_NEXT, and PROC_HPPA to version.h.
+	    - Fixed compilation warnings about unused variables and variables
+	      used uninitialized.
+	    - Rewrote section one of the INSTALL document.  Updated several
+	      other documents to mention the NextStep port.
 	- *** Release of 0.11_053 ***
 	- Fix to the DJGPP port when clearing the screen.
 	- Patch to Windows port from Nathaniel. He added 32-bits support
