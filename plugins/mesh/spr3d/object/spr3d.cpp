@@ -1539,7 +1539,7 @@ bool csSprite3DMeshObject::HitBeamObject (const csVector3& start,
   csBox3 b;
   GetObjectBoundingBox (b);
   csSegment3 seg (start, end);
-  if (!csIntersect3::BoxSegment (b, seg, isect, pr) < 0)
+  if (!(csIntersect3::BoxSegment (b, seg, isect, pr) < 0))
     return false;
   csSpriteFrame* cframe = cur_action->GetCsFrame (cur_frame);
   csVector3* verts = GetObjectVerts (cframe);
