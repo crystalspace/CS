@@ -56,7 +56,6 @@ csMenuItem::csMenuItem (csComponent *iParent, int iStyle)
   Init ();
   Style = iStyle | CSMIS_SEPARATOR;
   CommandCode = cscmdNothing;
-  iParent->SendCommand (cscmdMenuPlaceItemsDelayed);
 }
 
 csMenuItem::csMenuItem (csComponent *iParent, char *iText, csMenu *iSubMenu,
@@ -741,9 +740,6 @@ bool csMenu::HandleEvent (csEvent &Event)
         case cscmdMenuPlaceItems:
           PlaceItems ();
           return true;
-        case cscmdMenuPlaceItemsDelayed:
-          fPlaceItems = true;
-          return true;
         case cscmdMenuCaptureMouse:
           if (parent->SendCommand (cscmdMenuCaptureMouse, this))
             app->CaptureMouse (this);
@@ -966,10 +962,20 @@ void csMenu::SetState (int mask, bool enable)
 
 bool csMenu::SetRect (int xmin, int ymin, int xmax, int ymax)
 {
-  bool ret = csComponent::SetRect (xmin, ymin, xmax, ymax);
+  // If fPlaceItems is true, adjust our bounds
   if (IsMenuBar ())
+    fPlaceItems = true;
+  else if (fPlaceItems)
+  {
     PlaceItems ();
-  return ret;
+    if (!IsMenuBar ())
+    {
+      xmax = xmin + bound.Width ();
+      ymax = ymin + bound.Height ();
+    }
+  }
+
+  return csComponent::SetRect (xmin, ymin, xmax, ymax);
 }
 
 struct finditem_rec
@@ -1005,4 +1011,16 @@ void csMenu::SetCheck (int iCommandCode, bool iState)
   csComponent *item = GetItem (iCommandCode);
   if (item)
     item->SendCommand (cscmdMenuItemCheck, (void *)iState);
+}
+
+void csMenu::Insert (csComponent *comp)
+{
+  fPlaceItems = true;
+  csComponent::Insert (comp);
+}
+
+void csMenu::Delete (csComponent *comp)
+{
+  fPlaceItems = true;
+  csComponent::Delete (comp);
 }

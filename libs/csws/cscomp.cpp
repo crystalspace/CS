@@ -221,6 +221,14 @@ bool csComponent::SetFocused (csComponent *comp)
     return false;
   if (focused != comp)
   {
+    // Ask parent if it agrees to move focus away from currently focused child
+    if (focused && !SendCommand (cscmdLoseFocus, focused))
+      return false;
+
+    // Now ask parent if it agrees to focus given child component
+    if (comp && !SendCommand (cscmdReceiveFocus, comp))
+      return false;
+
     csComponent *oldfocused;
     csComponent *olddefault = GetDefault ();
     do
@@ -232,6 +240,7 @@ bool csComponent::SetFocused (csComponent *comp)
       if (focused == comp)
         return true;
     } while (focused != oldfocused);
+
     if (!comp->GetState (CSS_VISIBLE))
       comp->SetState (CSS_VISIBLE, true);
     if (GetState (CSS_FOCUSED))

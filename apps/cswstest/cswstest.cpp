@@ -134,8 +134,6 @@ bool csWsTest::InitialSetup (int argc, char *argv[],
       (void)new csMenuItem (submenu);
       (void)new csMenuItem (submenu, "~About", cscmdNothing);
       submenu->GetChild (cscmdNothing)->SendCommand (cscmdDeactivateMenu, (void *)false);
-
-    menu->PlaceItems ();
   }
   csDialog *toolbar = (csDialog *)window->GetChild (CSWID_TOOLBAR);
   if (toolbar)
@@ -170,9 +168,11 @@ bool csWsTest::InitialSetup (int argc, char *argv[],
     but->SetText ("~crash!"); but->SetRect (220, 130, 300, 144);
 
     csInputLine *il = new csInputLine (client, 40, csifsThinRect);
-    il->SetText ("input line test: check it out!"); il->SetRect (100, 200, 300, 216);
+    il->SetRect (100, 200, 300, 216);
+    il->SetText ("input line test: check it out!");
     il = new csInputLine (client, 10, csifsThickRect);
-    il->SetText ("another input line"); il->SetRect (100, 220, 300, 236);
+    il->SetRect (100, 220, 300, 236);
+    il->SetText ("another input line");
     il->SetFont (csFontCourier); il->SetSelection (0, 999);
 
     csListBox *lb = new csListBox (client, CSLBS_HSCROLL | CSLBS_VSCROLL, cslfsThinRect);
@@ -184,7 +184,6 @@ bool csWsTest::InitialSetup (int argc, char *argv[],
       sprintf (tmp, "item %d - dummy", i);
       (void)new csListBoxItem (lb, tmp, i);
     }
-    lb->PlaceItems ();
   }
 
   window = new csWindow (this, "SetState (CSS_TOPSELECT, false)",

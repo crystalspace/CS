@@ -122,6 +122,18 @@ void csWSTexture::Unregister ()
   }
 }
 
+void csWSTexture::Refresh ()
+{
+  if (!TexMan || !Handle)
+    return;
+  FixTransparency ();
+  if (IsTransp)
+    Handle->SetTransparent (tr, tg, tb);
+  else
+    Handle->SetTransparent (-1, -1, -1);
+  TexMan->MergeTexture (Handle);
+}
+
 void csWSTexture::SetName (const char *iName)
 {
   CHK (delete [] Name);
@@ -132,6 +144,32 @@ void csWSTexture::SetFileName (const char *iFileName)
 {
   CHK (delete [] FileName);
   FileName = strnew (iFileName);
+}
+
+int csWSTexture::GetWidth ()
+{
+  if (Image)
+    return Image->GetWidth ();
+  else if (Handle)
+  {
+    int bw, bh;
+    Handle->GetBitmapDimensions (bw, bh);
+    return bw;
+  }
+  return 0;
+}
+
+int csWSTexture::GetHeight ()
+{
+  if (Image)
+    return Image->GetHeight ();
+  else if (Handle)
+  {
+    int bw, bh;
+    Handle->GetBitmapDimensions (bw, bh);
+    return bh;
+  }
+  return 0;
 }
 
 csWSTexVector::csWSTexVector () : csVector (16, 16)

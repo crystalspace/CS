@@ -122,10 +122,6 @@ enum
    */
   cscmdMenuPlaceItems,
   /**
-   * Same, but delayed - until first ::Draw()
-   */
-  cscmdMenuPlaceItemsDelayed,
-  /**
    * Tell menu to capture the mouse, if its parent menu didn't so.
    * <pre>
    * IN: (csComponent *)Source;
@@ -280,6 +276,12 @@ public:
   /// Set/remove a checkmark left to menu item
   void SetCheck (int iCommandCode, bool iState);
 
+  /// Set fPlaceItems since a item has been inserted
+  virtual void Insert (csComponent *comp);
+
+  /// Set fPlaceItems since a item has been removed
+  virtual void Delete (csComponent *comp);
+
 private:
   /// Set 'width' for 'count' items from 'start'
   void SetItemWidth (csComponent *start, int count, int width);
@@ -303,7 +305,6 @@ private:
  *     (void)new csMenuItem (submenu);
  *     (void)new csMenuItem (submenu, "~Quit\tCtrl+Q", cscmdQuit);
  *   [...]
- *   menu->PlaceItems ();
  * }
  * </pre>
  */

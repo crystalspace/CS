@@ -45,6 +45,10 @@ public:
 
   /// Compare two strings for equality (case-sensitive)
   virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
+
+  /// Overrided Get() to avoid type conversions
+  inline char *Get (int n) const
+  { return (char *)csVector::Get (n); }
 };
 
 #endif // __CSSTRVEC_H__

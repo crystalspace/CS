@@ -1047,7 +1047,7 @@ static bool CommandHandler (char *cmd, char *arg)
     Sys->Printf (MSG_CONSOLE, " i_forward, i_backward, i_left, i_right, i_up, i_down\n");
     Sys->Printf (MSG_CONSOLE, " i_rotleftc, i_rotleftw, i_rotrightc, i_rotrightw\n");
     Sys->Printf (MSG_CONSOLE, " i_rotleftx, i_rotleftz, i_rotrightx, i_rotrightz\n");
-    Sys->Printf (MSG_CONSOLE, " clrlights, setlight\n");
+    Sys->Printf (MSG_CONSOLE, " clrlights, setlight, palette\n");
   }
   else if (!strcasecmp (cmd, "coordsave"))
   {
@@ -1086,6 +1086,8 @@ static bool CommandHandler (char *cmd, char *arg)
     Command::change_boolean (arg, &Sys->do_light_frust, "frustrum");
   else if (!strcasecmp (cmd, "zbuf"))
     Command::change_boolean (arg, &Sys->do_show_z, "zbuf");
+  else if (!strcasecmp (cmd, "palette"))
+    Command::change_boolean (arg, &Sys->do_show_palette, "palette");
   else if (!strcasecmp (cmd, "move3d"))
     Command::change_boolean (arg, &Sys->move_3d, "move3d");
   else if (!strcasecmp (cmd, "cbuffer"))
@@ -1557,6 +1559,7 @@ WalkTest::WalkTest () :
   do_show_coord = false;
   busy_perf_test = false;
   do_show_z = false;
+  do_show_palette = false;
   do_infinite = false;
   do_huge = false;
   do_cd = true;

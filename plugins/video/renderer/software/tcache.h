@@ -59,8 +59,8 @@ struct TCacheData
   int shf_w, and_w, and_h;
 
   // Some global settings.
-  int txtmode, mixing;
-  bool lm_only, lm_grid;
+  int txtmode;
+  bool lm_grid;
 };
 
 /**
@@ -149,16 +149,9 @@ private:
    */
   virtual void create_lighted_texture (TCacheData& tcd, TCacheLightedTexture* pt, csTextureManagerSoftware* txtmgr);
 
-  /// Create a texture in the texture cache (nocolor version).
-  void create_lighted_nocolor (TCacheData& tcd, TCacheLightedTexture* pt, csTextureManagerSoftware* txtmgr);
-  /// Create a texture in the texture cache (true_rgb version).
+  /// Create a texture in the texture cache
   void create_lighted_true_rgb (TCacheData& tcd, TCacheLightedTexture* pt, csTextureManagerSoftware* txtmgr);
-  /// Create a texture in the texture cache (fast_wxx version).
-  void create_lighted_fast_wxx (TCacheData& tcd, TCacheLightedTexture* pt, csTextureManagerSoftware* txtmgr);
-  /**
-   * Create a texture in the texture cache (true_rgb version and for 'private'
-   * colormap textures).
-   */
+  /// Create a texture in the texture cache (private colormap textures)
   void create_lighted_true_rgb_priv (TCacheData& tcd, TCacheLightedTexture* pt, csTextureManagerSoftware* txtmgr);
 
   /**
@@ -200,11 +193,6 @@ protected:
    * be called after calling create_lighted_texture ().
    */
   virtual void show_lightmap_grid (TCacheData& tcd, TCacheLightedTexture* tclt, csTextureManagerSoftware* txtmgr);
-
-  /**
-   * For debugging: don't add the texture but only the lightmap data.
-   */
-  virtual void create_lighted_texture_lightmaps (TCacheData& tcd, TCacheLightedTexture* tclt, csTextureManagerSoftware* txtmgr);
 
 public:
   ///

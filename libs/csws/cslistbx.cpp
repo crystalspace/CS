@@ -154,9 +154,9 @@ void csListBoxItem::SetState (int mask, bool enable)
   } /* endif */
   if ((oldstate ^ state) & CSS_FOCUSED)
   {
-   Invalidate ();
-   if (GetState (CSS_FOCUSED))
-     parent->SendCommand (cscmdListBoxMakeVisible, this);
+    Invalidate ();
+    if (GetState (CSS_FOCUSED))
+      parent->SendCommand (cscmdListBoxMakeVisible, this);
   } /* endif */
 }
 
@@ -224,6 +224,7 @@ csListBox::csListBox (csComponent *iParent, int iStyle,
   FrameStyle = iFrameStyle;
   SetPalette (CSPAL_LISTBOX);
   deltax = 0;
+  fPlaceItems = false;
   csScrollBarFrameStyle sbsty;
   switch (FrameStyle)
   {
@@ -255,6 +256,9 @@ csListBox::csListBox (csComponent *iParent, int iStyle,
 
 void csListBox::Draw ()
 {
+  if (fPlaceItems)
+    PlaceItems ();
+
   switch (FrameStyle)
   {
     case cslfsNone:
@@ -283,6 +287,8 @@ void csListBox::PlaceItems (bool setscrollbars)
 {
   int cury = BorderHeight;
   bool vis = false;
+
+  fPlaceItems = false;
 
   // if focused item is not selectable, find next selectable item
   if (focused && !focused->GetState (CSS_SELECTABLE))
@@ -399,7 +405,7 @@ bool csListBox::SetRect (int xmin, int ymin, int xmax, int ymax)
       vscroll->SetRect (bound.Width () - CSSB_DEFAULTSIZE, 0,
         bound.Width (),
         bound.Height () - (hscroll ? CSSB_DEFAULTSIZE - 1 : 0));
-    PlaceItems (true);
+    fPlaceItems = true;
     return true;
   } else
     return false;
@@ -430,6 +436,11 @@ static bool do_true (csComponent *child, void *param)
 {
   (void)child; (void)param;
   return true;
+}
+
+static bool do_findtext (csComponent *child, void *param)
+{
+  return (strcmp (child->GetText (), (char *)param) == 0);
 }
 
 bool csListBox::HandleEvent (csEvent &Event)
@@ -586,7 +597,6 @@ bool csListBox::HandleEvent (csEvent &Event)
             app->CaptureMouse (NULL);
           ForEachItem (do_deleteitem, NULL, false);
           firstvisible = first;
-          PlaceItems ();
           return true;
         case cscmdListBoxItemSelected:
           if ((ListBoxStyle & CSLBS_MULTIPLESEL) == 0)
@@ -701,6 +711,9 @@ bool csListBox::HandleEvent (csEvent &Event)
           } /* endif */
           return true;
         }
+        case cscmdListBoxSelectItem:
+          Event.Command.Info = ForEachItem (do_findtext, (char *)Event.Command.Info);
+          return true;
       } /* endswitch */
       break;
   } /* endswitch */
@@ -740,8 +753,6 @@ void csListBox::MakeItemVisible (csComponent *item)
     } /* endwhile */
   } /* endif */
   PlaceItems ();
-  if (parent)
-    parent->SendCommand (cscmdListBoxItemFocused, (void *)focused->id);
 }
 
 csComponent *csListBox::ForEachItem (bool (*func) (csComponent *child,
@@ -782,4 +793,27 @@ void csListBox::SetState (int mask, bool enable)
     if (vscroll)
       vscroll->SetState (CSS_DISABLED, dis);
   }
+}
+
+bool csListBox::SetFocused (csComponent *comp)
+{
+  if (!csComponent::SetFocused (comp))
+    return false;
+  if (parent)
+    parent->SendCommand (cscmdListBoxItemFocused, comp);
+  return true;
+}
+
+void csListBox::Insert (csComponent *comp)
+{
+  fPlaceItems = true;
+  Invalidate ();
+  csComponent::Insert (comp);
+}
+
+void csListBox::Delete (csComponent *comp)
+{
+  fPlaceItems = true;
+  Invalidate ();
+  csComponent::Delete (comp);
 }

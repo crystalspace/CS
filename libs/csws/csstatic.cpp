@@ -49,8 +49,7 @@ csStatic::csStatic (csComponent *iParent, csSprite2D *iBitmap)
 
 csStatic::~csStatic ()
 {
-  if (Bitmap)
-    CHKB (delete Bitmap);
+  CHKB (delete Bitmap);
 }
 
 void csStatic::Init (csStaticStyle iStyle)
@@ -96,7 +95,7 @@ void csStatic::Draw ()
       break;
     }
     case csscsBitmap:
-      if (Bitmap->GetTextureHandle ())
+      if (Bitmap && Bitmap->GetTextureHandle ())
       {
         Sprite2D (Bitmap, 0, 0, bound.Width (), bound.Height ());
         break;

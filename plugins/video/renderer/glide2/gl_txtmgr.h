@@ -171,14 +171,6 @@ public:
   virtual int find_color (int r, int g, int b);
 
   /**
-   * This version of find_rgb finds some r,g,b value AFTER gamma
-   * correction is applied. This is useful for console messages
-   * that always need the same color regardless of the gamma
-   * correction.
-   */
-  int find_rgb_real (int r, int g, int b);
-
-  /**
    * Remap all textures.
    */
   void remap_textures ();

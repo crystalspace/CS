@@ -38,9 +38,9 @@ private:
   /// Create a texture in the texture cache (24bit version).
   void create_lighted_24bit (TCacheData& tcd, TCacheLightedTexture* tclt, csTextureManagerSoftware* txtmgr);
 #if 0
-  /// Create a texture in the texture cache (true_rgb version).
+  /// Create a texture in the texture cache
   void create_lighted_true_rgb (TCacheData& tcd, TCacheLightedTexture* tclt, csTextureManagerSoftware* txtmgr);
-  /// Create a texture in the texture cache (true_rgb and private colormaps).
+  /// Create a texture in the texture cache (private colormaps).
   void create_lighted_true_rgb_priv (TCacheData& tcd, TCacheLightedTexture* tclt, csTextureManagerSoftware* txtmgr);
 #endif
   /// Byte number in output pixel format of red, green and blue
@@ -54,11 +54,6 @@ protected:
    * be called after calling create_lighted_texture ().
    */
   virtual void show_lightmap_grid (TCacheData& tcd, TCacheLightedTexture* tclt, csTextureManagerSoftware* txtmgr);
-
-  /**
-   * For debugging: don't add the texture but only the lightmap data.
-   */
-  virtual void create_lighted_texture_lightmaps (TCacheData& tcd, TCacheLightedTexture* tclt, csTextureManagerSoftware* txtmgr);
 
 public:
   ///

@@ -18,7 +18,6 @@
 */
 
 #include <limits.h>
-#include <assert.h>
 #include "sysdef.h"
 #include "qint.h"
 #include "csws/csgfxppl.h"
@@ -352,7 +351,8 @@ void csGraphicsPipeline::Flush (int iCurPage)
         break;
       }
       default:
-        assert ("unknown graphics pipeline operation in Pipeline::Flush()");
+        // unknown graphics pipeline operation in Pipeline::Flush()
+        abort ();
     } /* endswitch */
   } /* endfor */
   pipelen = 0;

@@ -750,7 +750,7 @@ csMapNode* csLoader::load_node (char* name, char* buf, csSector* sec)
         ScanStr (params, "%f,%f,%f", &x, &y, &z);
         break;
       default:
-        assert(false);
+        abort ();
         break;
     }
   }
@@ -1890,7 +1890,10 @@ csImageFile* csLoader::load_image (const char* name)
     return NULL;
   }
 
-  ifile->SetName (name);
+  char *xname = System->VFS->ExpandPath (name);
+  ifile->SetName (xname);
+  delete [] xname;
+
   return ifile;
 }
 

@@ -177,6 +177,26 @@ enum
    */
   cscmdLimitMaximize,
   /**
+   * A component loses focus. This message is sent to the component owner
+   * right before component loses focus (i.e. during this message the
+   * component still owns the focus)
+   * <pre>
+   * IN: (csComponent *)Component
+   * OUT: NULL if you prohibit the focus change operation
+   * </pre>
+   */
+  cscmdLoseFocus,
+  /**
+   * A component receives focus. This message is sent to the component owner
+   * right before component receives focus (i.e. during this message the
+   * component still does not own the focus)
+   * <pre>
+   * IN: (csComponent *)Component
+   * OUT: NULL if you prohibit the focus change operation
+   * </pre>
+   */
+  cscmdReceiveFocus,
+  /**
    * These commands are used for message boxes. csMessageBox (...) returns
    * cscmdOK, cscmdCancel and so on depending on which button user presses.
    */
@@ -299,7 +319,7 @@ public:
   { return clipparent; }
 
   /// Focus a child component
-  bool SetFocused (csComponent *comp);
+  virtual bool SetFocused (csComponent *comp);
 
   /// Get the focused child window
   csComponent *GetFocused ()

@@ -351,23 +351,24 @@ bool csButton::PostHandleEvent (csEvent &Event)
 bool csButton::HandleKeyPress (csEvent &Event)
 {
   // Check hot key
-  if (((underline_pos >= 0)
-    && ((Event.Key.ShiftKeys & CSMASK_CTRL) == 0)
-    && (Event.Key.ShiftKeys & CSMASK_FIRST)
-    && (UPPERCASE (Event.Key.Code) == UPPERCASE (text [underline_pos]))
-    && (app->KeyboardOwner == NULL))
-   || ((GetState (CSS_FOCUSED))
-    && (Event.Key.Code == ' ')
-    && (Event.Key.ShiftKeys & CSMASK_FIRST)
-    && (!(Event.Key.ShiftKeys & (CSMASK_ALLSHIFTS - CSMASK_ALT)))))
-  {
-    if (!app->KeyboardOwner)
-      app->CaptureKeyboard (this);
-    SetPressed (true);
-    if ((ButtonStyle & CSBS_NOKEYBOARDFOCUS) == 0)
-      Select ();
-    return true;
-  }
+  if (!GetState (CSS_DISABLED))
+    if (((underline_pos >= 0)
+      && ((Event.Key.ShiftKeys & CSMASK_CTRL) == 0)
+      && (Event.Key.ShiftKeys & CSMASK_FIRST)
+      && (UPPERCASE (Event.Key.Code) == UPPERCASE (text [underline_pos]))
+      && (app->KeyboardOwner == NULL))
+     || ((GetState (CSS_FOCUSED))
+      && (Event.Key.Code == ' ')
+      && (Event.Key.ShiftKeys & CSMASK_FIRST)
+      && (!(Event.Key.ShiftKeys & (CSMASK_ALLSHIFTS - CSMASK_ALT)))))
+    {
+      if (!app->KeyboardOwner)
+        app->CaptureKeyboard (this);
+      SetPressed (true);
+      if ((ButtonStyle & CSBS_NOKEYBOARDFOCUS) == 0)
+        Select ();
+      return true;
+    }
   return false;
 }
 

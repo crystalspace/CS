@@ -40,11 +40,6 @@ static const csOptionDescription config_options [NUM_OPTIONS] =
   { 7, "cache", "Enabling caching of generated lightmaps", CSVAR_BOOL },
 };
 
-int csWorld::csWorldConfig::GetOptionCount ()
-{
-  return NUM_OPTIONS;
-}
-  
 bool csWorld::csWorldConfig::SetOption (int id, csVariant* value)
 {
   switch (id)

@@ -934,7 +934,7 @@ void csGraphics3DSoftware::DrawPolygonFlat (G3DPolygonDPF& poly)
       }
       else
       {
-        unsigned char * rgb, * rgb_values = tex_mm->GetPrivateColorMap ();
+        unsigned char *rgb, *rgb_values = tex_mm->GetPrivateColorMap ();
         rgb = rgb_values + (mean_color_idx << 2);
         mean_color_idx = true_to_pal[lt_light[*rgb].red[lr] |
                    lt_light[*(rgb+1)].green[lg] |
@@ -2647,7 +2647,7 @@ IMPLEMENT_EMBEDDED_IBASE (csGraphics3DSoftware::csSoftConfig)
   IMPLEMENTS_INTERFACE (iConfig)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-#define NUM_OPTIONS 15
+#define NUM_OPTIONS 14
 
 static const csOptionDescription config_options [NUM_OPTIONS] =
 {
@@ -2665,13 +2665,7 @@ static const csOptionDescription config_options [NUM_OPTIONS] =
   { 11, "gouraud", "Gouraud shading", CSVAR_BOOL },
   { 12, "smaller", "Smaller rendering", CSVAR_BOOL },
   { 13, "lmgrid", "Lightmap grid", CSVAR_BOOL },
-  { 14, "lmonly", "Lightmap only", CSVAR_BOOL },
 };
-
-int csGraphics3DSoftware::csSoftConfig::GetOptionCount ()
-{
-  return NUM_OPTIONS;
-}
 
 bool csGraphics3DSoftware::csSoftConfig::SetOption (int id, csVariant* value)
 {
@@ -2695,7 +2689,6 @@ bool csGraphics3DSoftware::csSoftConfig::SetOption (int id, csVariant* value)
     case 11: scfParent->rstate_gouraud = value->v.b; break;
     case 12: scfParent->do_smaller_rendering = value->v.b; break;
     case 13: scfParent->txtmgr->do_lightmapgrid = value->v.b; break;
-    case 14: scfParent->txtmgr->do_lightmaponly = value->v.b; break;
     default: return false;
   }
   scfParent->ScanSetup ();
@@ -2723,7 +2716,6 @@ bool csGraphics3DSoftware::csSoftConfig::GetOption (int id, csVariant* value)
     case 11: value->v.b = scfParent->rstate_gouraud; break;
     case 12: value->v.b = scfParent->do_smaller_rendering; break;
     case 13: value->v.b = scfParent->txtmgr->do_lightmapgrid; break;
-    case 14: value->v.b = scfParent->txtmgr->do_lightmaponly; break;
     default: return false;
   }
   return true;

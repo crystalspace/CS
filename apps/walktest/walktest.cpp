@@ -108,6 +108,17 @@ void DrawZbuffer ()
   }
 }
 
+void DrawPalette ()
+{
+  if (System->G2D->GetPixelBytes () != 1)
+    return;
+  int pw = System->G2D->GetWidth () / 16;
+  int ph = System->G2D->GetHeight () / 16;
+  for (int i = 0; i < 16; i++)
+    for (int j = 0; j < 16; j++)
+      System->G2D->DrawBox (i * pw, j * ph, pw, ph, j * 16 + i);
+}
+
 int collcount = 0;
 
 //------------------------------------------------------------------------
@@ -484,6 +495,7 @@ void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
   else
   {
     if (do_show_z) DrawZbuffer ();
+    if (do_show_palette) DrawPalette ();
     if (do_edges) view->GetWorld ()->DrawFunc (view->GetCamera (), view->GetClipper (), draw_edges);
     if (selected_polygon || selected_light) view->GetWorld ()->DrawFunc (view->GetCamera (), view->GetClipper (), draw_edges, (void*)1);
     if (do_light_frust && selected_light) ((csStatLight*)selected_light)->LightingFunc (show_frustrum);

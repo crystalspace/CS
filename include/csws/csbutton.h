@@ -41,9 +41,9 @@
  * until a group bound is encountered. This is used for panels of buttons of
  * which only one can be selected (and pressed) at one time.
  */
-#define CSBS_MULTICHOOSE	0x00000020
+#define CSBS_MULTICHOOSE	0x00000040
 /// Dismiss parent dialog when this button is pressed
-#define CSBS_DISMISS		0x00000040
+#define CSBS_DISMISS		0x00000080
 /// Text placement relative to bitmap: value mask
 #define CSBS_TEXTPLACEMENT	0x00000300
 /// Draw text above bitmap
@@ -145,7 +145,7 @@ public:
 
   /// Set button text
   virtual void SetText (const char *iText)
-  { PrepareLabel (iText, text, underline_pos); }
+  { PrepareLabel (iText, text, underline_pos); Invalidate (); }
 
   /**
    * Set button bitmaps in normal and pressed states<p>

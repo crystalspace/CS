@@ -347,26 +347,20 @@ void TextureCache::use_texture (iPolygonTexture* pt, csTextureManagerSoftware* t
   }
 }
 
-
 void TextureCache::create_lighted_texture (TCacheData& tcd, TCacheLightedTexture* tclt,
 	csTextureManagerSoftware* txtmgr)
 {
-  if (tcd.lm_only) create_lighted_texture_lightmaps (tcd, tclt, txtmgr);
-  else if (tcd.txtmode == TXT_PRIVATE) create_lighted_true_rgb_priv (tcd, tclt, txtmgr);
+  if (tcd.txtmode == TXT_PRIVATE)
+    create_lighted_true_rgb_priv (tcd, tclt, txtmgr);
   else
-    switch (tcd.mixing)
-    {
-      case MIX_NOCOLOR: create_lighted_nocolor (tcd, tclt, txtmgr); break;
-      case MIX_TRUE_RGB: create_lighted_true_rgb (tcd, tclt, txtmgr); break;
-    }
-  if (tcd.lm_grid) show_lightmap_grid (tcd, tclt, txtmgr);
+    create_lighted_true_rgb (tcd, tclt, txtmgr);
+  if (tcd.lm_grid)
+    show_lightmap_grid (tcd, tclt, txtmgr);
 }
 
 void TextureCache::init_cache_filler (TCacheData& tcd, iPolygonTexture* pt, csTextureManagerSoftware* txtmgr, int stu, int stv)
 {
   tcd.txtmode = txtmgr->txtMode;
-  tcd.mixing = txtmgr->mixing;
-  tcd.lm_only = txtmgr->do_lightmaponly;
   tcd.lm_grid = txtmgr->do_lightmapgrid;
 
   iLightMap* i_lm = pt->GetLightMap ();
@@ -424,117 +418,8 @@ void TextureCache::init_cache_filler (TCacheData& tcd, iPolygonTexture* pt, csTe
   tcd.d_lw = tcd.lw-(tcd.lu2-tcd.lu1);
 }
 
-void TextureCache::create_lighted_nocolor (TCacheData& tcd,
-  TCacheLightedTexture* tclt, csTextureManagerSoftware* txtmgr)
-{
-  int w = tcd.width;
-  int h = tcd.height;
-  int Imin_u = tcd.Imin_u;
-  int Imin_v = tcd.Imin_v;
-
-  unsigned char* map = tcd.mapR;
-  unsigned char* otmap = tcd.tdata;
-  int shf_w = tcd.shf_w;
-  int and_w = tcd.and_w;
-  int and_h = tcd.and_h;
-  and_h <<= shf_w;
-
-  unsigned char* tm, * tm2;
-  int u, v, end_u, uu;
-
-  unsigned char* light;
-
-  int o_idx, ov_idx;
-
-  int whi_00, whi_10, whi_01, whi_11;
-  int whi_0, whi_1, whi_d, whi_0d, whi_1d;
-  int whi;
-
-  TextureTablesWhite8* w8 = txtmgr->lt_white8;
-  RGB8map* wl = w8->white2_light;
-
-  int lu, lv, luv, dv;
-  luv = tcd.lv1 * tcd.lw + tcd.lu1;
-  for (lv = tcd.lv1 ; lv < tcd.lv2 ; lv++)
-  {
-    for (lu = tcd.lu1 ; lu < tcd.lu2 ; lu++)
-    {
-      whi_00 = map[luv];
-      whi_10 = map[luv+1];
-      whi_01 = map[luv+tcd.lw];
-      whi_11 = map[luv+tcd.lw+1];
-
-      u = lu<<tcd.mipmap_shift;
-      v = lv<<tcd.mipmap_shift;
-      tm = &tclt->get_tmap8 ()[w*v+u];	//@@@
-
-      if (whi_00 == whi_10 && whi_00 == whi_01 && whi_00 == whi_11)
-      {
-	//*****
-	// Constant level of white light.
-	//*****
-
-	light = wl[whi_00];
-
-	for (dv = 0 ; dv < tcd.mipmap_size ; dv++, tm += w-tcd.mipmap_size)
-	  if (v+dv < h)
-	  {
-	    ov_idx = ((v+dv+Imin_v)<<shf_w) & and_h;
-
-	    end_u = u+tcd.mipmap_size;
-	    if (end_u > w) end_u = w;
-	    end_u += Imin_u;
-	    tm2 = tm + tcd.mipmap_size;
-	    for (uu = u+Imin_u ; uu < end_u ; uu++)
-	    {
-	      o_idx = ov_idx + (uu & and_w);
-	      *tm++ = light[otmap[o_idx]];
-	    }
-	    tm = tm2;
-	  }
-	  else break;
-      }
-      else
-      {
-	//*****
-	// A varying level of white light.
-	//*****
-
-	whi_0 = whi_00 << 16; whi_0d = ((whi_01-whi_00)<<16) >> tcd.mipmap_shift;
-	whi_1 = whi_10 << 16; whi_1d = ((whi_11-whi_10)<<16) >> tcd.mipmap_shift;
-
-	for (dv = 0 ; dv < tcd.mipmap_size ; dv++, tm += w-tcd.mipmap_size)
-	  if (v+dv < h)
-	  {
-	    ov_idx = ((v+dv+Imin_v)<<shf_w) & and_h;
-	    whi = whi_0; whi_d = (whi_1-whi_0) >> tcd.mipmap_shift;
-
-	    end_u = u+tcd.mipmap_size;
-	    if (end_u > w) end_u = w;
-	    end_u += Imin_u;
-	    tm2 = tm + tcd.mipmap_size;
-	    for (uu = u+Imin_u ; uu < end_u ; uu++)
-	    {
-	      light = wl[whi >> 16];
-	      o_idx = ov_idx + (uu & and_w);
-	      *tm++ = light[otmap[o_idx]];
-	      whi += whi_d;
-	    }
-	    tm = tm2;
-
-	    whi_0 += whi_0d;
-	    whi_1 += whi_1d;
-	  }
-	  else break;
-      }
-      luv++;
-    }
-    luv += tcd.d_lw;
-  }
-}
-
 void TextureCache::create_lighted_true_rgb (TCacheData& tcd, TCacheLightedTexture* tclt,
-	csTextureManagerSoftware* txtmgr)
+  csTextureManagerSoftware* txtmgr)
 {
   //LightMap* lm = tcd.lm;
   int w = tcd.width;
@@ -555,12 +440,8 @@ void TextureCache::create_lighted_true_rgb (TCacheData& tcd, TCacheLightedTextur
   unsigned char* tm, * tm2;
   int u, v, end_u, uu;
 
-  unsigned char* light = NULL;
-
   int ov_idx;
 
-  int whi_0, whi_1, whi_d, whi_0d, whi_1d;
-  int whi;
   int red_00, gre_00, blu_00;
   int red_10, gre_10, blu_10;
   int red_01, gre_01, blu_01;
@@ -570,10 +451,7 @@ void TextureCache::create_lighted_true_rgb (TCacheData& tcd, TCacheLightedTextur
   int blu_0, blu_1, blu_d, blu_0d, blu_1d;
   int red, gre, blu;
 
-  TextureTablesWhite8* w8 = txtmgr->lt_white8;
-  RGB8map* wl = w8->white2_light;
-
-  PalIdxLookup* lt_light, * pil;
+  PalIdxLookup *lt_light, *pil;
   lt_light = txtmgr->lt_light;
 
   TextureTablesPalette* lt_pal = txtmgr->lt_pal;
@@ -601,42 +479,6 @@ void TextureCache::create_lighted_true_rgb (TCacheData& tcd, TCacheLightedTextur
       u = lu << tcd.mipmap_shift;
       v = lv << tcd.mipmap_shift;
       tm = &tclt->get_tmap8 ()[w*v+u];	//@@@
-
-      if (blu_00 == gre_00 && blu_10 == gre_10 && blu_01 == gre_01 && blu_11 == gre_11 &&
-          blu_00 == red_00 && blu_10 == red_10 && blu_01 == red_01 && blu_11 == red_11)
-      {
-        //*****
-	// Pure white light.
-        //*****
-	whi_0 = gre_00 << 16; whi_0d = ((gre_01-gre_00)<<16) >> tcd.mipmap_shift;
-	whi_1 = gre_10 << 16; whi_1d = ((gre_11-gre_10)<<16) >> tcd.mipmap_shift;
-
-	for (dv = 0 ; dv < tcd.mipmap_size ; dv++, tm += w-tcd.mipmap_size)
-	  if (v+dv < h)
-	  {
-	    ov_idx = ((v+dv+Imin_v)<<shf_w) & and_h;
-	    whi = whi_0; whi_d = (whi_1-whi_0) >> tcd.mipmap_shift;
-
-	    end_u = u+tcd.mipmap_size;
-	    if (end_u > w) end_u = w;
-	    end_u += Imin_u;
-	    tm2 = tm + tcd.mipmap_size;
-	    for (uu = u+Imin_u ; uu < end_u ; uu++)
-	    {
-	      light = wl[whi >> 16];
-	      *tm++ = light[otmap[ov_idx + (uu & and_w)]];
-	      whi += whi_d;
-	    }
-	    tm = tm2;
-
-	    whi_0 += whi_0d;
-	    whi_1 += whi_1d;
-	  }
-	  else break;
-
-	luv++;
-	continue;
-      }
 
       //*****
       // Most general case: varying levels of red, green, and blue light.
@@ -834,114 +676,3 @@ void TextureCache::show_lightmap_grid (TCacheData& tcd, TCacheLightedTexture* tc
     luv += tcd.d_lw;
   }
 }
-
-void TextureCache::create_lighted_texture_lightmaps (TCacheData& /*tcd*/, TCacheLightedTexture* /*tclt*/,
-  csTextureManagerSoftware* /*txtmgr*/)
-{
-#if 0
-  int w = tcd.width;
-  int h = tcd.height;
-  int Imin_u = tcd.Imin_u;
-
-  unsigned char* mapR = tcd.mapR;
-  unsigned char* mapG = tcd.mapG;
-  unsigned char* mapB = tcd.mapB;
-
-  unsigned char* light1 = NULL, * light2 = NULL, * light3 = NULL;
-  TextureTablesFastXxx* lt_fastxxx = txtmgr->lt_fastxxx;
-  RGB8map* lt1 = lt_fastxxx->light1;
-  RGB8map* lt2 = lt_fastxxx->light2;
-  RGB8map* lt3 = lt_fastxxx->light3;
-
-  int white_color = txtmgr->find_rgb (255, 255, 255);
-
-  unsigned char* tm, * tm2;
-  int u, v, end_u, uu;
-
-  int red_00, gre_00, blu_00;
-  int red_10, gre_10, blu_10;
-  int red_01, gre_01, blu_01;
-  int red_11, gre_11, blu_11;
-  int red_0, red_1, red_d, red_0d, red_1d;
-  int gre_0, gre_1, gre_d, gre_0d, gre_1d;
-  int blu_0, blu_1, blu_d, blu_0d, blu_1d;
-  int red, gre, blu;
-
-  int lu, lv, luv, dv;
-  luv = tcd.lv1 * tcd.lw + tcd.lu1;
-  for (lv = tcd.lv1 ; lv < tcd.lv2 ; lv++)
-  {
-    for (lu = tcd.lu1 ; lu < tcd.lu2 ; lu++)
-    {
-      red_00 = mapR[luv];
-      red_10 = mapR[luv+1];
-      red_01 = mapR[luv+tcd.lw];
-      red_11 = mapR[luv+tcd.lw+1];
-      gre_00 = mapG[luv];
-      gre_10 = mapG[luv+1];
-      gre_01 = mapG[luv+tcd.lw];
-      gre_11 = mapG[luv+tcd.lw+1];
-      blu_00 = mapB[luv];
-      blu_10 = mapB[luv+1];
-      blu_01 = mapB[luv+tcd.lw];
-      blu_11 = mapB[luv+tcd.lw+1];
-
-      u = lu << tcd.mipmap_shift;
-      v = lv << tcd.mipmap_shift;
-      tm = &tclt->get_tmap8 ()[w*v+u];	//@@@
-
-      red_0 = red_00 << 16; red_0d = ((red_01-red_00)<<16) >> tcd.mipmap_shift;
-      red_1 = red_10 << 16; red_1d = ((red_11-red_10)<<16) >> tcd.mipmap_shift;
-      gre_0 = gre_00 << 16; gre_0d = ((gre_01-gre_00)<<16) >> tcd.mipmap_shift;
-      gre_1 = gre_10 << 16; gre_1d = ((gre_11-gre_10)<<16) >> tcd.mipmap_shift;
-      blu_0 = blu_00 << 16; blu_0d = ((blu_01-blu_00)<<16) >> tcd.mipmap_shift;
-      blu_1 = blu_10 << 16; blu_1d = ((blu_11-blu_10)<<16) >> tcd.mipmap_shift;
-
-      for (dv = 0 ; dv < tcd.mipmap_size ; dv++, tm += w-tcd.mipmap_size)
-	if (v+dv < h)
-        {
-	  red = red_0; red_d = (red_1-red_0) >> tcd.mipmap_shift;
-	  gre = gre_0; gre_d = (gre_1-gre_0) >> tcd.mipmap_shift;
-	  blu = blu_0; blu_d = (blu_1-blu_0) >> tcd.mipmap_shift;
-
-	  end_u = u+tcd.mipmap_size;
-	  if (end_u > w) end_u = w;
-	  end_u += Imin_u;
-	  tm2 = tm + tcd.mipmap_size;
-	  for (uu = u+Imin_u ; uu < end_u ; uu++)
-	  {
-	    if (tcd.mixing == MIX_TRUE_RGB)
-	    {
-	      //@@@Not optimal but this is a debug function only.
-	      *tm++ = txtmgr->mix_lights (red, gre, blu, white_color);
-	    }
-	    else
-	    {
-	      light1 = lt1[red >> 16];
-	      light2 = lt2[gre >> 16];
-	      light3 = lt3[blu >> 16];
-	      *tm++ = light3[light2[light1[white_color]]];
-	    }
-	    red += red_d;
-	    gre += gre_d;
-	    blu += blu_d;
-	  }
-	  tm = tm2;
-
-	  red_0 += red_0d;
-	  red_1 += red_1d;
-	  gre_0 += gre_0d;
-	  gre_1 += gre_1d;
-	  blu_0 += blu_0d;
-	  blu_1 += blu_1d;
-	}
-	else break;
-
-      luv++;
-    }
-    luv += tcd.d_lw;
-  }
-#endif
-}
-
-//---------------------------------------------------------------------------

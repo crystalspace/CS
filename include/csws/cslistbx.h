@@ -195,11 +195,13 @@ enum
    */
   cscmdListBoxItemDoubleClicked,
   /**
-   * This message is sent by a listbox to notify its owner that a item
+   * This message is sent by a listbox to notify its parent that a item
    * has been focused.
    * <pre>
-   * IN: (int)ItemID;
+   * IN: (csListBoxItem *)Item;
    * </pre>
+   * To find the parent listbox of the item, use Item->parent;
+   * Item->parent->parent is the listbox parent.
    */
   cscmdListBoxItemFocused,
   /**
@@ -225,7 +227,15 @@ enum
    * OUT: (csListBoxItem *)item
    * </pre>
    */
-  cscmdListBoxQueryFirstSelected
+  cscmdListBoxQueryFirstSelected,
+  /**
+   * Select first item that exactly matches the text.
+   * <pre>
+   * IN: (char *)text
+   * OUT: (csListBoxItem *)item (or NULL if not found)
+   * </pre>
+   */
+  cscmdListBoxSelectItem
 };
 
 #define CS_LISTBOXITEMCHECK_SELECTED	0xdeadface
@@ -259,6 +269,8 @@ class csListBox : public csComponent
   csScrollBarStatus hsbstatus, vsbstatus;
   /// Horizontal scrolling position & maximum
   int deltax, maxdeltax;
+  /// Flag: place items before redraw?
+  bool fPlaceItems;
 
 public:
   /// Create input line object
@@ -286,6 +298,15 @@ public:
 
   /// Override SetState method to disable scroll bars as well
   virtual void SetState (int mask, bool enable);
+
+  /// Tell parent that a new item has been selected
+  virtual bool SetFocused (csComponent *comp);
+
+  /// Set fPlaceItems since a item has been inserted
+  virtual void Insert (csComponent *comp);
+
+  /// Set fPlaceItems since a item has been removed
+  virtual void Delete (csComponent *comp);
 
 protected:
   /// Make a listbox item visible (same as cscmdListBoxMakeVisible)

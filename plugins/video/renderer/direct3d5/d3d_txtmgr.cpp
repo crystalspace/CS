@@ -212,13 +212,6 @@ csTexture* csTextureManagerDirect3D::get_texture (int idx, int lev)
   return ((csTextureMMDirect3D*)textures[idx])->get_texture (lev);
 }
 
-#define GAMMA(c) ((int)(256.*pow (((float)(c))/256., 1./Gamma)))
-
-int csTextureManagerDirect3D::find_rgb_real (int r, int g, int b)
-{
-  return encode_rgb (r, g, b);
-}
-
 ULong csTextureManagerDirect3D::encode_rgb (int r, int g, int b)
 {
   return

@@ -48,7 +48,7 @@ struct csOptionDescription
   csVariantType type;	// Type to use for this option.
 };
 
-SCF_VERSION (iConfig, 0, 0, 1);
+SCF_VERSION (iConfig, 1, 0, 0);
 
 /**
  * Interface to a configurator object. If a SCF module
@@ -57,13 +57,11 @@ SCF_VERSION (iConfig, 0, 0, 1);
  */
 struct iConfig : public iBase
 {
-  ///
-  virtual int GetOptionCount () = 0;
-  ///
+  /// Get option description; return FALSE if there is no such option
   virtual bool GetOptionDescription (int idx, csOptionDescription *option) = 0;
-  ///
+  /// Set option
   virtual bool SetOption (int id, csVariant* value) = 0;
-  ///
+  /// Get option
   virtual bool GetOption (int id, csVariant* value) = 0;
 };
 

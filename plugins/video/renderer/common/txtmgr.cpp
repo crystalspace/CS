@@ -21,7 +21,6 @@
 
 #include "sysdef.h"
 #include "cs3d/common/txtmgr.h"
-#include "cs3d/common/inv_cmap.h"
 #include "csgfxldr/boxfilt.h"
 #include "csutil/util.h"
 #include "iimage.h"

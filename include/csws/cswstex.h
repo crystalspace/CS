@@ -73,6 +73,8 @@ public:
   void Register (iTextureManager *iTexMan);
   /// Unregister the texture
   void Unregister ();
+  /// Refresh the texture in video memory (do iTexMan->MergeTexture ())
+  void Refresh ();
   /// Define texture name
   void SetName (const char *iName);
   /// Get texture name
@@ -99,6 +101,10 @@ public:
   /// Tell texture that transparent color has already been fixed
   void DontFixTransparency ()
   { TranspChanged = false; }
+  /// Query texture width
+  int GetWidth ();
+  /// Query texture height
+  int GetHeight ();
 };
 
 /// This class is a vector of csWSTexture's

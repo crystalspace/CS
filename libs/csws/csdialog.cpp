@@ -105,11 +105,13 @@ bool csDialog::HandleEvent (csEvent &Event)
           if ((Event.Key.ShiftKeys & CSMASK_ALLSHIFTS) == CSMASK_SHIFT)
           {
             SetFocused (PrevGroup ());
+            AdjustFocused (false);
             return true;
           }
           else if ((Event.Key.ShiftKeys & CSMASK_ALLSHIFTS) == 0)
           {
             SetFocused (NextGroup ());
+            AdjustFocused (true);
             return true;
           } /* endif */
           break;
@@ -118,6 +120,7 @@ bool csDialog::HandleEvent (csEvent &Event)
           if ((Event.Key.ShiftKeys & CSMASK_ALLSHIFTS) == 0)
           {
             SetFocused (PrevControl ());
+            AdjustFocused (false);
             return true;
           }
           break;
@@ -126,6 +129,7 @@ bool csDialog::HandleEvent (csEvent &Event)
           if ((Event.Key.ShiftKeys & CSMASK_ALLSHIFTS) == 0)
           {
             SetFocused (NextControl ());
+            AdjustFocused (true);
             return true;
           }
           break;
@@ -147,6 +151,17 @@ bool csDialog::HandleEvent (csEvent &Event)
       break;
   } /* endswitch */
   return false;
+}
+
+void csDialog::AdjustFocused (bool forward)
+{
+  int i = 10;
+  while (i--)
+  {
+    if (!focused->GetState (CSS_DISABLED))
+      break;
+    SetFocused (forward ? NextControl () : PrevControl ());
+  }
 }
 
 bool csDialog::PlaceItems ()

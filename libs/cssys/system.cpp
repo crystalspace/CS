@@ -581,13 +581,13 @@ void csSystemDriver::SetSystemDefaults (csIniFile *Config)
 
 void csSystemDriver::Help (iConfig* Config)
 {
-  csOptionDescription option;
-  int num = Config->GetOptionCount ();
-  for (int i = 0 ; i < num ; i++)
+  for (int i = 0; ; i++)
   {
-    csVariant def;
-    Config->GetOptionDescription (i, &option);
+    csOptionDescription option;
+    if (!Config->GetOptionDescription (i, &option))
+      break;
     char opt [30], desc [80];
+    csVariant def;
     Config->GetOption (i, &def);
     switch (option.type)
     {
@@ -784,11 +784,12 @@ void csSystemDriver::QueryOptions (iPlugIn *iObject)
   iConfig *Config = QUERY_INTERFACE (iObject, iConfig);
   if (Config)
   {
-    int on = OptionList.Length (), num = Config->GetOptionCount ();
-    for (int i = 0 ; i < num ; i++)
+    int on = OptionList.Length ();
+    for (int i = 0 ; ; i++)
     {
       csOptionDescription option;
-      Config->GetOptionDescription (i, &option);
+      if (!Config->GetOptionDescription (i, &option))
+        break;
       CHK (OptionList.Push (new csPluginOption (option.name, option.type, option.id,
         (option.type == CSVAR_BOOL) || (option.type == CSVAR_CMD), Config)));
       if (option.type == CSVAR_BOOL)

@@ -170,7 +170,6 @@ void csWindowList::RebuildList ()
 {
   list->SendCommand (cscmdListBoxClear, NULL);
   app->ForEach (do_addtowindowlist, (void *)this, true);
-  list->PlaceItems ();
 }
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//- Utility functions --//--
@@ -781,8 +780,6 @@ void cspFileDialog::Reread ()
 done:
   busy = false;
   // Place listbox items
-  dp->PlaceItems ();
-  fp->PlaceItems ();
   // Activate current directory item
   if (activate)
     activate->SendCommand (cscmdListBoxItemSet, (void *)true);

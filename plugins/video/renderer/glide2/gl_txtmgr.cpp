@@ -275,13 +275,6 @@ csTexture* csTextureManagerGlide::get_texture (int idx, int lev)
   return ((csTextureMMGlide*)textures[idx])->get_texture (lev);
 }
 
-#define GAMMA(c) ((int)(256.*pow (((float)(c))/256., 1./Gamma)))
-
-int csTextureManagerGlide::find_rgb_real (int r, int g, int b)
-{
-  return encode_rgb (r, g, b);
-}
-
 ULong csTextureManagerGlide::encode_rgb (int r, int g, int b)
 {
   return

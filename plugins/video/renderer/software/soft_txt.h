@@ -43,14 +43,12 @@ struct iImageFile;
 #define NUM_GREEN	(1 << BITS_GREEN)
 #define NUM_BLUE	(1 << BITS_BLUE)
 
-#define TABLE_WHITE	0
-#define TABLE_RED	1
-#define TABLE_GREEN	2
-#define TABLE_BLUE	3
-#define TABLE_WHITE_HI	4
-#define TABLE_RED_HI	5
-#define TABLE_GREEN_HI	6
-#define TABLE_BLUE_HI	7
+#define TABLE_RED	0
+#define TABLE_GREEN	1
+#define TABLE_BLUE	2
+#define TABLE_RED_HI	3
+#define TABLE_GREEN_HI	4
+#define TABLE_BLUE_HI	5
 
 /**
  * Define a small (3 pixels) margin at the bottom and top of
@@ -106,32 +104,6 @@ struct TextureTablesTrueRgbPriv
 {
   /// Lookup table.
   PalIdxLookup lut[256];
-};
-
-/**
- * Two tables with white light. They add white light to a palette
- * index and return a 16-bit truecolor value.
- * (used for display output of 16-bit and texture width of 8-bit).
- */
-struct TextureTablesWhite16
-{
-  /// White light table with index 0 as default (no light added).
-  RGB16map white1_light[256];
-  /// White light table with index NORMAL_LIGHT_LEVEL as default (no light added).
-  RGB16map white2_light[256];
-};
-
-/**
- * Two tables with white light. They add white light to a palette
- * index and return a new 8-bit palette index.
- * (used for display output of 8-bit and texture width of 8-bit).
- */
-struct TextureTablesWhite8
-{
-  /// White light table with index 0 as default (no light added).
-  RGB8map white1_light[256];
-  /// White light table with index NORMAL_LIGHT_LEVEL as default (no light added).
-  RGB8map white2_light[256];
 };
 
 /**
@@ -193,7 +165,7 @@ private:
   unsigned char priv_to_global[256];
 
   /// Colors which are allocated.
-  unsigned char alloc[256];
+  bool alloc[256];
 
 private:
   /// Constructor
@@ -203,7 +175,7 @@ private:
    * Find an RGB value from the private map and return the
    * index in the private colormap.
    */
-  int find_rgb (int r, int g, int b);
+  int find_rgb (int r, int g, int b, int *d = NULL);
 
   /**
    * Allocate a new RGB color in the private colormap.
@@ -287,12 +259,10 @@ private:
    */
   RGBcolor pal[256];
   /// Which colors are allocated and which are not?
-  int alloc[256];
+  bool alloc[256];
 
   /// Configuration values for color matching.
   int prefered_dist;
-  /// Configuration values for color matching.
-  int prefered_col_dist;
 
   /// Read configuration values from config file.
   void read_config ();
@@ -312,18 +282,6 @@ private:
    * be created before this can be used.
    */
   void create_lt_palette ();
-
-  /**
-   * Create the lookup tables for the white tables in 16-bit display
-   * mode.
-   */
-  void create_lt_white16 ();
-
-  /**
-   * Create the lookup tables for the white tables in 8-bit display mode.
-   * The tables are cached if needed (with the name 'table_white8').
-   */
-  void create_lt_white8 ();
 
   /**
    * Create the truergb 16-bit tables.
@@ -360,10 +318,6 @@ public:
   TextureTablesTrueRgb* lt_truergb;
   /// Lookup table.
   TextureTablesTrueRgbPriv* lt_truergb_private;
-  /// Lookup table.
-  TextureTablesWhite16* lt_white16;
-  /// Lookup table.
-  TextureTablesWhite8* lt_white8;
   /// Lookup table.
   TextureTablesPalette* lt_pal;
   /// Lookup table.
@@ -409,15 +363,12 @@ public:
    * Find an rgb value using the palette directly (not use
    * the faster lookup tables).
    */
-  int find_rgb_slow (int r, int g, int b);
+  int find_rgb_slow (int r, int g, int b, int *d = NULL);
 
   /**
    * Allocate a new RGB color.
    */
   int alloc_rgb (int r, int g, int b, int dist);
-
-  ///
-  bool force_mixing (char* mix);
 
   ///
   bool force_txtmode (char* txtmode);
@@ -433,14 +384,6 @@ public:
    * (returns a 15/16-bit encoded RGB value).
    */
   virtual int find_color (int r, int g, int b);
-
-  /**
-   * This version of find_rgb finds some r,g,b value AFTER gamma
-   * correction is applied. This is useful for console messages
-   * that always need the same color regardless of the gamma
-   * correction.
-   */
-  int find_rgb_real (int r, int g, int b);
 
   /**
    * Compute the 'best' palette for all loaded textures.

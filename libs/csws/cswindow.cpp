@@ -80,7 +80,7 @@ csWindow::csWindow (csComponent *iParent, char *iTitle, int iWindowStyle,
 
     CHK (csMenu *mn = new csSysMenu (this, csmfs3D, CSMS_DEFAULTVALUE, bt));
     ADD_SYSMENU_ENTRIES (mn);
-    mn->PlaceItems ();
+//    mn->PlaceItems ();
     mn->Hide ();
     mn->id = CSWID_SYSMENU;
   } /* endif */

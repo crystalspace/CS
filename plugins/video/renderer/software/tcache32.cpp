@@ -45,9 +45,9 @@ TextureCache32::~TextureCache32 ()
 void TextureCache32::create_lighted_texture (TCacheData& tcd, TCacheLightedTexture* tclt,
 	csTextureManagerSoftware* txtmgr)
 {
-  if (tcd.lm_only) create_lighted_texture_lightmaps (tcd, tclt, txtmgr);
-  else create_lighted_24bit (tcd, tclt, txtmgr);
-  if (tcd.lm_grid) show_lightmap_grid (tcd, tclt, txtmgr);
+  create_lighted_24bit (tcd, tclt, txtmgr);
+  if (tcd.lm_grid)
+    show_lightmap_grid (tcd, tclt, txtmgr);
 }
 
 /*
@@ -196,105 +196,3 @@ void TextureCache32::show_lightmap_grid (TCacheData& /*tcd*/,
   }
 #endif
 }
-
-void TextureCache32::create_lighted_texture_lightmaps (TCacheData& /*tcd*/, TCacheLightedTexture* /*tclt*/,
-  csTextureManagerSoftware* /*txtmgr*/)
-{
-#if 0
-  int w = tcd.width;
-  int h = tcd.height;
-  int Imin_u = tcd.Imin_u;
-
-  unsigned char* mapR = tcd.mapR;
-  unsigned char* mapG = tcd.mapG;
-  unsigned char* mapB = tcd.mapB;
-
-  UShort* tm, * tm2;
-  int u, v, end_u, uu;
-
-  int red_00, gre_00, blu_00;
-  int red_10, gre_10, blu_10;
-  int red_01, gre_01, blu_01;
-  int red_11, gre_11, blu_11;
-  int red_0, red_1, red_d, red_0d, red_1d;
-  int gre_0, gre_1, gre_d, gre_0d, gre_1d;
-  int blu_0, blu_1, blu_d, blu_0d, blu_1d;
-  int red, gre, blu;
-
-  TextureTablesTrueRgb* lt_truergb = txtmgr->lt_truergb;
-  PalIdxLookup* lut = lt_truergb->lut;
-  PalIdxLookup* pil;
-
-  int white_color = txtmgr->find_rgb (255, 255, 255);
-
-  int lu, lv, luv, dv;
-  luv = tcd.lv1 * tcd.lw + tcd.lu1;
-  for (lv = tcd.lv1 ; lv < tcd.lv2 ; lv++)
-  {
-    for (lu = tcd.lu1 ; lu < tcd.lu2 ; lu++)
-    {
-      red_00 = mapR[luv];
-      red_10 = mapR[luv+1];
-      red_01 = mapR[luv+tcd.lw];
-      red_11 = mapR[luv+tcd.lw+1];
-      gre_00 = mapG[luv];
-      gre_10 = mapG[luv+1];
-      gre_01 = mapG[luv+tcd.lw];
-      gre_11 = mapG[luv+tcd.lw+1];
-      blu_00 = mapB[luv];
-      blu_10 = mapB[luv+1];
-      blu_01 = mapB[luv+tcd.lw];
-      blu_11 = mapB[luv+tcd.lw+1];
-
-      u = lu << tcd.mipmap_shift;
-      v = lv << tcd.mipmap_shift;
-      tm = &tclt->get_tmap16 ()[w*v+u];
-
-      red_0 = red_00 << 16; red_0d = ((red_01-red_00)<<16) >> tcd.mipmap_shift;
-      red_1 = red_10 << 16; red_1d = ((red_11-red_10)<<16) >> tcd.mipmap_shift;
-      gre_0 = gre_00 << 16; gre_0d = ((gre_01-gre_00)<<16) >> tcd.mipmap_shift;
-      gre_1 = gre_10 << 16; gre_1d = ((gre_11-gre_10)<<16) >> tcd.mipmap_shift;
-      blu_0 = blu_00 << 16; blu_0d = ((blu_01-blu_00)<<16) >> tcd.mipmap_shift;
-      blu_1 = blu_10 << 16; blu_1d = ((blu_11-blu_10)<<16) >> tcd.mipmap_shift;
-
-      for (dv = 0 ; dv < tcd.mipmap_size ; dv++, tm += w-tcd.mipmap_size)
-	if (v+dv < h)
-        {
-	  red = red_0; red_d = (red_1-red_0) >> tcd.mipmap_shift;
-	  gre = gre_0; gre_d = (gre_1-gre_0) >> tcd.mipmap_shift;
-	  blu = blu_0; blu_d = (blu_1-blu_0) >> tcd.mipmap_shift;
-
-	  end_u = u+tcd.mipmap_size;
-	  if (end_u > w) end_u = w;
-	  end_u += Imin_u;
-	  tm2 = tm + tcd.mipmap_size;
-	  for (uu = u+Imin_u ; uu < end_u ; uu++)
-	  {
-	    //*tm++ = i_tc->mix_lights_16 (red, gre, blu, ot[uu & and_w]);
-	    pil = lut+white_color;
-	    *tm++ = pil->red[red>>16] | pil->green[gre>>16] | pil->blue[blu>>16];
-
-	    red += red_d;
-	    gre += gre_d;
-	    blu += blu_d;
-	  }
-	  tm = tm2;
-
-	  red_0 += red_0d;
-	  red_1 += red_1d;
-	  gre_0 += gre_0d;
-	  gre_1 += gre_1d;
-	  blu_0 += blu_0d;
-	  blu_1 += blu_1d;
-	}
-	else break;
-
-      luv++;
-    }
-    luv += tcd.d_lw;
-  }
-#endif
-}
-
-
-//---------------------------------------------------------------------------

@@ -392,7 +392,6 @@ public:
   struct csSoftConfig : public iConfig
   {
     DECLARE_EMBEDDED_IBASE (csGraphics3DSoftware);
-    virtual int GetOptionCount ();
     virtual bool GetOptionDescription (int idx, csOptionDescription *option);
     virtual bool SetOption (int id, csVariant* value);
     virtual bool GetOption (int id, csVariant* value);

@@ -157,6 +157,7 @@ public:
   bool do_show_coord;
   bool busy_perf_test;
   bool do_show_z;
+  bool do_show_palette;
   bool do_infinite;
   bool do_huge;
   bool do_cd;
