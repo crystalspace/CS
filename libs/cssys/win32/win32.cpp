@@ -769,7 +769,7 @@ void SysSystemDriver::SetSystemDefaults (iConfigFile *Config)
 void SysSystemDriver::Help ()
 {
   csSystemDriver::Help();
-  Printf (MSG_STDOUT, "  -[np]console       Create a debug console (default = %s)\n",
+  Printf (MSG_STDOUT, "  -[no]console       Create a debug console (default = %s)\n",
     need_console ? "yes" : "no");
 }
 
@@ -777,36 +777,20 @@ void SysSystemDriver::Help ()
 bool SysSystemDriver::GetInstallPath (char *oInstallPath, size_t iBufferSize)
 {
   // override the default to get install path from
-  // 1. registry
-  // 2. CRYSTAL environment variable
+  // 1. CRYSTAL environment variable
+  // 2. this machine's system registry
   // 3. if current working directory contains 'vfs.cfg' use this dir.
-  // 4. default.
+  // 4. hard-wired default path
 
-  /// Try the registry .. tentative code I cannot compile this...
-  char * pValueName = "installpath";
-  DWORD dwType;
-  DWORD bufSize = iBufferSize;
-  HKEY m_pKey;
-  LONG result;
+  //@@@ this function is called several times; maybe cache the found dir
 
-  result = RegCreateKey(HKEY_LOCAL_MACHINE, "Software\\CrystalSpace", &m_pKey);
-  if (result == ERROR_SUCCESS) {
-
-    result = RegQueryValueEx(
-      m_pKey, 
-      pValueName, 
-      0,
-      &dwType,
-      (unsigned char *)oInstallPath,
-      &bufSize);
- 
-    if (ERROR_SUCCESS == result) {
-      goto got_value;
-    }
-  }
-
-  // registry didn't work.
-  // try env variable.
+  // try env variable first
+  // we check this before we check registry, so that one app can putenv() to
+  // use a special private build of CrystalSpace, while other apps fall back on
+  // the shared systemwide registry strategy; this is the best approach unless
+  // someone implements a SetInstallPath() to override it before Open() is called.
+  //
+  if (1)
   {
     char *path = getenv ("CRYSTAL");
     if (path && *path)
@@ -816,7 +800,37 @@ bool SysSystemDriver::GetInstallPath (char *oInstallPath, size_t iBufferSize)
     }
   }
 
-  // no env. variable. perhaps current dir?
+  // try the registry
+  if (1)
+  {
+    char * pValueName = "installpath";
+    DWORD dwType;
+    DWORD bufSize = iBufferSize;
+    HKEY m_pKey;
+    LONG result;
+
+    result = RegCreateKey(HKEY_LOCAL_MACHINE, "Software\\CrystalSpace", &m_pKey);
+    if (result == ERROR_SUCCESS)
+    {
+      result = RegQueryValueEx(
+	m_pKey, 
+	pValueName, 
+	0,
+	&dwType,
+	(unsigned char *)oInstallPath,
+	&bufSize);
+ 
+      if (ERROR_SUCCESS == result)
+      {
+	goto got_value;
+      }
+    }
+  }
+
+  //@@@ might try GetModuleFilename(NULL,...) here for application's directory
+
+  // perhaps current drive/dir? 
+  if (1)
   {
     FILE *test = fopen("vfs.cfg", "r");
     if(test != NULL)
