@@ -25,23 +25,60 @@
 
     Before including this file you should define the following macros:
 
-    DRAWSPRITE_NAME - The name of routine (DrawPixmap8 etc).
-    DRAWSPRITE_PIXTYPE - The type of a pixel (UByte, UShort, ULong)
+    DP_NAME - The name of routine (DrawPixmap8 etc).
+    DP_PIXTYPE - The type of a pixel (uint8, uint16, uint32)
 */
 
-static void DRAWSPRITE_NAME (iGraphics2D *G2D, iTextureHandle *hTex,
-  int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th)
+#if defined (DP_PIXFORM_INDEX8)
+#  define ALPHA_MIX(dst,src)						     \
+  {									     \
+    uint s = Scan.PrivateCMap [src], d = Scan.GlobalCMap [dst];        	     \
+    dst = Scan.inv_cmap [                                                    \
+          (((((s & 0x7c1f) * srcf) + ((d & 0x7c1f) * dstf)) >> 5) & 0x7c1f)  \
+        | (((((s & 0x03e0) * srcf) + ((d & 0x03e0) * dstf)) >> 5) & 0x03e0)];\
+  }
+#elif defined (DP_PIXFORM_R5G5B5)
+#  define ALPHA_MIX(dst,src)						     \
+  {									     \
+    uint s = palette [src], d = dst;					     \
+    dst = (((((s & 0x7c1f) * srcf) + ((d & 0x7c1f) * dstf)) >> 5) & 0x7c1f)  \
+        | (((((s & 0x03e0) * srcf) + ((d & 0x03e0) * dstf)) >> 5) & 0x03e0); \
+  }
+#elif defined (DP_PIXFORM_R5G6B5)
+#  define ALPHA_MIX(dst,src)						     \
+  {									     \
+    uint s = palette [src], d = dst;					     \
+    dst = (((((s & 0xf81f) * srcf) + ((d & 0xf81f) * dstf)) >> 5) & 0xf81f)  \
+        | (((((s & 0x07e0) * srcf) + ((d & 0x07e0) * dstf)) >> 5) & 0x07e0); \
+  }
+#elif defined (DP_PIXFORM_R8G8B8)
+#  define ALPHA_MIX(dst,src)						     \
+  {									     \
+    uint s = palette [src], d = dst;					     \
+    dst = (((((s & 0xff00ff) * srcf) + ((d & 0xff00ff) * dstf)) >> 8) & 0xff00ff)\
+        | (((((s & 0x00ff00) * srcf) + ((d & 0x00ff00) * dstf)) >> 8) & 0x00ff00);\
+  }
+#endif
+
+static void DP_NAME (iGraphics2D *G2D, iTextureHandle *hTex,
+  int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th, uint8 Alpha)
 {
+  if (Alpha == 255)
+    return;
+
   bool transp = hTex->GetKeyColor ();
 
   csTextureMMSoftware *tex_mm = (csTextureMMSoftware *)hTex->GetPrivateObject ();
   csTextureSoftware *txt_unl = (csTextureSoftware *)tex_mm->get_texture (0);
 
   int bw = txt_unl->get_width ();
-  //  int bh = txt_unl->get_height ();
+  int bh = txt_unl->get_height ();
 
   UByte *bitmap = txt_unl->get_bitmap ();
-  DRAWSPRITE_PIXTYPE *palette = (DRAWSPRITE_PIXTYPE *)tex_mm->GetPaletteToGlobal ();
+  DP_PIXTYPE *palette = (DP_PIXTYPE *)tex_mm->GetPaletteToGlobal ();
+#ifdef DP_PIXFORM_INDEX8
+  Scan.PrivateCMap = tex_mm->GetPaletteToGlobal8 ();
+#endif
 
   /// Retrieve clipping rectangle
   int ClipX1, ClipY1, ClipX2, ClipY2;
@@ -51,8 +88,8 @@ static void DRAWSPRITE_NAME (iGraphics2D *G2D, iTextureHandle *hTex,
   int dy = (th << 16) / sh;
 
   // Clipping
-  if ((sx >= ClipX2) || (sy >= ClipY2) ||
-      (sx + sw <= ClipX1) || (sy + sh <= ClipY1))
+  if ((sx >= ClipX2) || (sy >= ClipY2)
+   || (sx + sw <= ClipX1) || (sy + sh <= ClipY1))
     return;                             // Sprite is totally invisible
   if (sx < ClipX1)                      // Left margin crossed?
   {
@@ -81,13 +118,103 @@ static void DRAWSPRITE_NAME (iGraphics2D *G2D, iTextureHandle *hTex,
     sh = nh;
   } /* endif */
 
-  bitmap += ty * bw + tx;
-  ty = 0;
+  bool tile = (tx < 0) || (tx + tw > bw) || (ty < 0) || (ty + th > bh);
+  if (!tile)
+  {
+    bitmap += ty * bw + tx;
+    ty = 0;
+  }
 
-  if (sw == tw)
+  if (Alpha)
+  {
+    register uint8
+#ifdef DP_PIXFORM_R8G8B8
+    dstf = Alpha, srcf = dstf ^ 0xff;
+#else
+    dstf = Alpha >> 3, srcf = dstf ^ 0x1f;
+#endif
+    if (tile)
+    {
+      uint bwm = (bw << 16) - 1, bhm = (bh << 16) - 1;
+      tx <<= 16;
+      for (ty = (ty << 16) & bhm; sh > 0; sh--, ty = (ty + dy) & bhm, sy++)
+      {
+        DP_PIXTYPE *VRAM = (DP_PIXTYPE *)G2D->GetPixelAt (sx, sy);
+        UByte *data = bitmap + (ty >> 16) * bw;
+        int _tx = tx;
+        if (transp)
+          for (int w = sw; w; w--)
+          {
+            UByte pixel = data [(_tx & bwm) >> 16];
+            if (pixel)
+              ALPHA_MIX (*VRAM, pixel);
+            VRAM++;
+            _tx += dx;
+          } /* endfor */
+        else
+          for (int w = sw; w; w--)
+          {
+            ALPHA_MIX (*VRAM, data [(_tx & bwm) >> 16]);
+            VRAM++;
+            _tx += dx;
+          } /* endfor */
+      } /* endfor */
+    }
+    else
+    {
+      for (; sh > 0; sh--, ty += dy, sy++)
+      {
+        DP_PIXTYPE *VRAM = (DP_PIXTYPE *)G2D->GetPixelAt (sx, sy);
+        UByte *data = bitmap + (ty >> 16) * bw;
+        int tx = 0;
+        if (transp)
+          for (int w = sw; w; w--)
+          {
+            UByte pixel = data [tx >> 16];
+            if (pixel)
+              ALPHA_MIX (*VRAM, pixel);
+            VRAM++;
+            tx += dx;
+          } /* endfor */
+        else
+          for (int w = sw; w; w--)
+          {
+            ALPHA_MIX (*VRAM, data [tx >> 16]);
+            tx += dx;
+          } /* endfor */
+      } /* endfor */
+    }
+  }
+  else if (tile)
+  {
+    uint bwm = (bw << 16) - 1, bhm = (bh << 16) - 1;
+    tx <<= 16;
+    for (ty = (ty << 16) & bhm; sh > 0; sh--, ty = (ty + dy) & bhm, sy++)
+    {
+      DP_PIXTYPE *VRAM = (DP_PIXTYPE *)G2D->GetPixelAt (sx, sy);
+      UByte *data = bitmap + (ty >> 16) * bw;
+      int _tx = tx;
+      if (transp)
+        for (int w = sw; w; w--)
+        {
+          UByte pixel = data [(_tx & bwm) >> 16];
+          if (pixel)
+            *VRAM = palette [pixel];
+          VRAM++;
+          _tx += dx;
+        } /* endfor */
+      else
+        for (int w = sw; w; w--)
+        {
+          *VRAM++ = palette [data [(_tx & bwm) >> 16]];
+          _tx += dx;
+        } /* endfor */
+    } /* endfor */
+  }
+  else if (sw == tw)
     for (; sh > 0; sh--, ty += dy, sy++)
     {
-      DRAWSPRITE_PIXTYPE *VRAM = (DRAWSPRITE_PIXTYPE *)G2D->GetPixelAt (sx, sy);
+      DP_PIXTYPE *VRAM = (DP_PIXTYPE *)G2D->GetPixelAt (sx, sy);
       UByte *data = bitmap + (ty >> 16) * bw;
       if (transp)
         for (int w = sw; w; w--)
@@ -105,7 +232,7 @@ static void DRAWSPRITE_NAME (iGraphics2D *G2D, iTextureHandle *hTex,
   else
     for (; sh > 0; sh--, ty += dy, sy++)
     {
-      DRAWSPRITE_PIXTYPE *VRAM = (DRAWSPRITE_PIXTYPE *)G2D->GetPixelAt (sx, sy);
+      DP_PIXTYPE *VRAM = (DP_PIXTYPE *)G2D->GetPixelAt (sx, sy);
       UByte *data = bitmap + (ty >> 16) * bw;
       int tx = 0;
       if (transp)
@@ -126,5 +253,10 @@ static void DRAWSPRITE_NAME (iGraphics2D *G2D, iTextureHandle *hTex,
     } /* endfor */
 }
 
-#undef DRAWSPRITE_NAME
-#undef DRAWSPRITE_PIXTYPE
+#undef ALPHA_MIX
+#undef DP_NAME
+#undef DP_PIXTYPE
+#undef DP_PIXFORM_INDEX8
+#undef DP_PIXFORM_R5G5B5
+#undef DP_PIXFORM_R5G6B5
+#undef DP_PIXFORM_R8G8B8

@@ -534,7 +534,7 @@ void csNotebook::Draw ()
             w -= h * 2 / 3;
 
           if (data->flags & NOTEBOOK_PAGE_PIXMAP)
-            Sprite2D (data->image, rect.xmin + (w - data->image->Width ()) / 2,
+            Pixmap (data->image, rect.xmin + (w - data->image->Width ()) / 2,
               rect.ymin + (h - data->image->Height ()) / 2,
               data->image->Width (), data->image->Height ());
           else

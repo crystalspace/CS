@@ -585,7 +585,7 @@ iHalo *csOpenGLProcSoftware::CreateHalo (float iR, float iG, float iB,
 }
 
 void csOpenGLProcSoftware::DrawPixmap (iTextureHandle *hTex, int sx, 
-  int sy, int sw, int sh,int tx, int ty, int tw, int th)
+  int sy, int sw, int sh,int tx, int ty, int tw, int th, uint8 Alpha)
 { 
   iTextureHandle *soft_txt_handle;
   int idx = txts_vector->FindKey ((void*)hTex);
@@ -593,5 +593,5 @@ void csOpenGLProcSoftware::DrawPixmap (iTextureHandle *hTex, int sx,
     soft_txt_handle = txts_vector->RegisterAndPrepare (hTex);
   else
     soft_txt_handle = (iTextureHandle*)txts_vector->Get (idx)->soft_txt;
-  g3d->DrawPixmap (soft_txt_handle, sx, sy, sw, sh, tx, ty, tw, th); 
+  g3d->DrawPixmap (soft_txt_handle, sx, sy, sw, sh, tx, ty, tw, th, Alpha); 
 }

@@ -98,13 +98,6 @@
 #  error "ERROR: Pixel format not defined before including scanalph.inc!"
 #endif
 
-#ifdef A_MAP
-#  define SCANMAP
-#  define A_SRCADDR	((vv >> 16) << shifter) + (uu >> 16)
-#else
-#  define A_SRCADDR	((uu >> 16) & ander_w) + ((vv >> shifter_h) & ander_h)
-#endif
-
 #ifndef A_PI
 
 #if defined (A_ZUSE)
@@ -113,12 +106,27 @@
 #  define IF_ZBUF_OK
 #endif
 
+#if defined (A_ZNONE)
+#  define Z_FILL
+#  define Z_INC
+#else
+#  define Z_FILL	*z_buf = izz
+#  define Z_INC		izz += dzz; z_buf++
+#endif
+
+#ifdef A_MAP
+#  define SCANMAP
+#  define A_SRCADDR	((vv >> 16) << shifter) + (uu >> 16)
+#else
+#  define A_SRCADDR	((uu >> 16) & ander_w) + ((vv >> shifter_h) & ander_h)
+#endif
+
 #define SCANLOOP \
   do									\
   {									\
     IF_ZBUF_OK								\
     {									\
-      *z_buf = izz;							\
+      Z_FILL;								\
       unsigned srcaddr = A_SRCADDR;					\
       uint8 alpha = Scan.AlphaMap [srcaddr];				\
       A_IPIXTYPE src = A_COLORMAP (srcTex [srcaddr]);			\
@@ -134,10 +142,10 @@
     _dest++;								\
     uu += duu;								\
     vv += dvv;								\
-    izz += dzz;								\
-    z_buf++;								\
+    Z_INC;								\
   }									\
   while (_dest <= _destend)
+
 #define SCANFUNC A_SCANFUNC
 #include "scanln.inc"
 #undef IF_ZBUF_OK
@@ -197,3 +205,6 @@ void A_SCANFUNC (void *dest, int len, unsigned long *zbuff,
 #undef A_DSTTEX
 #undef A_IPIXTYPE
 #undef A_PIXTYPE
+#undef A_ZUSE
+#undef A_ZFILL
+#undef A_ZNONE

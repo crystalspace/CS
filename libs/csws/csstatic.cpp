@@ -60,11 +60,7 @@ void csStatic::Init (csStaticStyle iStyle)
   SetPalette (CSPAL_STATIC);
   style = iStyle;
   if (style != csscsRectangle)
-  {
     state |= CSS_TRANSPARENT;
-    if (parent)
-      SetColor (CSPAL_STATIC_BACKGROUND, parent->GetColor (0));
-  }
   TextAlignment = CSSTA_LEFT | CSSTA_VCENTER;
   linkactive = false;
   linkdisabled = false;
@@ -84,20 +80,31 @@ void csStatic::Draw ()
       break;
     case csscsFrameLabel:
     {
-      int fry = (TextHeight () - 1) / 2;
-      Rect3D (0, fry, bound.Width (), bound.Height () - fry,
-        CSPAL_STATIC_LIGHT3D, CSPAL_STATIC_DARK3D);
-      Rect3D (1, fry + 1, bound.Width () - 1, bound.Height () - fry - 1,
-        CSPAL_STATIC_DARK3D, CSPAL_STATIC_LIGHT3D);
       int txtx = TextWidth ("///");
-      Text (txtx, 0, textcolor, CSPAL_STATIC_BACKGROUND, text);
+      int fryt = (TextHeight () - 1) / 2;
+      int fryb = bound.Height () - fryt;
+      int txtw = TextWidth (text);
+
+      Line (0, fryt, txtx, fryt, CSPAL_STATIC_DARK3D);
+      Line (txtx + txtw, fryt, bound.Width (), fryt, CSPAL_STATIC_DARK3D);
+      Line (bound.Width () - 2, fryt, bound.Width () - 2, fryb, CSPAL_STATIC_DARK3D);
+      Line (bound.Width () - 2, fryb - 1, 1, fryb - 1, CSPAL_STATIC_DARK3D);
+      Line (0, fryb + 1, 0, fryt, CSPAL_STATIC_DARK3D);
+
+      Line (1, fryt + 1, txtx, fryt + 1, CSPAL_STATIC_LIGHT3D);
+      Line (txtx + txtw, fryt + 1, bound.Width () - 1, fryt + 1, CSPAL_STATIC_LIGHT3D);
+      Line (bound.Width () - 1, fryt + 1, bound.Width () - 1, fryb, CSPAL_STATIC_LIGHT3D);
+      Line (bound.Width (), fryb, 1, fryb, CSPAL_STATIC_LIGHT3D);
+      Line (1, fryb, 1, fryt + 1, CSPAL_STATIC_LIGHT3D);
+
+      Text (txtx, 0, textcolor, -1, text);
       DrawUnderline (txtx, 0, text, underline_pos, textcolor);
       break;
     }
     case csscsBitmap:
       if (Bitmap && Bitmap->GetTextureHandle ())
       {
-        Sprite2D (Bitmap, 0, 0, bound.Width (), bound.Height ());
+        Pixmap (Bitmap, 0, 0, bound.Width (), bound.Height ());
         break;
       }
     case csscsRectangle:
@@ -218,14 +225,6 @@ bool csStatic::HandleEvent (iEvent &Event)
 
   switch (Event.Type)
   {
-    case csevBroadcast:
-      if ((Event.Command.Code == cscmdColorSchemeChanged)
-       && GetState (CSS_TRANSPARENT) && parent)
-      {
-        ResetPalette ();
-        SetColor (CSPAL_STATIC_BACKGROUND, parent->GetColor (0));
-      }
-      break;
     case csevCommand:
       switch (Event.Command.Code)
       {

@@ -310,7 +310,7 @@ public:
 
   /// Draw a 2D sprite
   virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
-    int tx, int ty, int tw, int th);
+    int tx, int ty, int tw, int th, uint8 Alpha);
 
 private:
   /// board selected

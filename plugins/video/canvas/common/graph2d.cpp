@@ -51,7 +51,7 @@ bool csGraphics2D::Initialize (iSystem* pSystem)
 
   // Get the font server
   const char *p = pSystem->GetConfig ()->GetStr (
-    "FontServer", CS_FUNCID_FONT, "crystalspace.font.server.csfont");
+    "VideoDriver", CS_FUNCID_FONT, "crystalspace.font.server.csfont");
   FontServer = LOAD_PLUGIN (pSystem, p, CS_FUNCID_FONT, iFontServer);
   Font = 0;
   if (!FontServer)

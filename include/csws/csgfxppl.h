@@ -122,8 +122,15 @@ private:
   /// Draw a text string: if bg < 0 background is not drawn
   void Text (int x, int y, int fg, int bg, int font, int fontsize, const char *s);
 
-  /// Draw a 2D sprite
-  void Sprite2D (csPixmap *s2d, int x, int y, int w, int h);
+  /// Draw a pixmap
+  void Pixmap (csPixmap *s2d, int x, int y, int w, int h);
+
+  /// Draw a tiled pixmap
+  void TiledPixmap (csPixmap *s2d, int x, int y, int w, int h, int orgx, int orgy);
+
+  /// Draw a tiled texture
+  void Texture (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
+    int tx, int ty, int tw, int th, uint8 Alpha);
 
   /// Save a part of screen
   void SaveArea (csImageArea **Area, int x, int y, int w, int h);
@@ -152,10 +159,6 @@ private:
 
   /// Get R,G,B at given screen location
   void GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB);
-
-  /// Draw a (part) of texture (possibly scaled) in given screen rectangle
-  void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
-    int tx, int ty, int tw, int th);
 
   /// Change system mouse cursor and return success status
   bool SwitchMouseCursor (csMouseCursorID Shape);

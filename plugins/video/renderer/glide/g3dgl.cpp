@@ -1321,7 +1321,7 @@ float csGraphics3DGlide::GetZBuffValue ( int x, int y )
 }
 
 void csGraphics3DGlide::DrawPixmap ( iTextureHandle *hTex,
-  int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th)
+  int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th, uint8 Alpha)
 {
   // Now that it's possible to implement DrawPixmap properly I would
   // highly recommend doing it using polygon drawing call. This will use

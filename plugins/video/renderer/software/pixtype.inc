@@ -34,7 +34,7 @@
 #undef PI_BB
 
 #if defined (PI_INDEX8)
-#  define PI_PIXTYPE	UByte
+#  define PI_PIXTYPE	uint8
 #  define PI_RB		RGB2PAL_BITS_R
 #  define PI_GB		RGB2PAL_BITS_G
 #  define PI_BB		RGB2PAL_BITS_B
@@ -42,7 +42,7 @@
 #  define PI_GS		(RGB2PAL_BITS_B)
 #  define PI_BS		(0)
 #elif defined (PI_R5G5B5)
-#  define PI_PIXTYPE	UShort
+#  define PI_PIXTYPE	uint16
 #  define PI_RB		5
 #  define PI_GB		5
 #  define PI_BB		5
@@ -50,7 +50,7 @@
 #  define PI_GS		5
 #  define PI_BS		0
 #elif defined (PI_R5G6B5)
-#  define PI_PIXTYPE	UShort
+#  define PI_PIXTYPE	uint16
 #  define PI_RB		5
 #  define PI_GB		6
 #  define PI_BB		5
@@ -58,7 +58,7 @@
 #  define PI_GS		5
 #  define PI_BS		0
 #elif defined (PI_R8G8B8)
-#  define PI_PIXTYPE	ULong
+#  define PI_PIXTYPE	uint32
 #  define PI_RB	8
 #  define PI_GB	8
 #  define PI_BB	8

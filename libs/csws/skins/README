@@ -18,7 +18,7 @@ the object files will overlap). If the first letter of your skin name
 is already busy, use the second, or use a number and so on. The name
 of the skin file doesn't really matter.
 
-Also note that you can easily derived skins from other skins - that is, some
+Also note that you can easily derive skins from other skins - that is, some
 skin slices may be implemented from scratch, other skins may be derived from
 existing skin slices. For example, you may want a skin that has the same
 look like the default skin, with the exception you want a black pixel in the

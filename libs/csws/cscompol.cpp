@@ -29,7 +29,9 @@
  * separated into this file, to clobber less cscomp.cpp. Polygon clipping
  * is implemented as usual (e.g. for lines, boxes etc) - the only difference
  * is that we should adjust per-vertex data (r/g/b/u/v etc) after each
- * clipping.
+ * clipping. Also since this is the only place in CSWS where we use polygon
+ * clipper from libcsgeom if you don't use this function, you won't get
+ * the clipper linked into your application.
  */
 
 #define INTERPOLATE1(component) \

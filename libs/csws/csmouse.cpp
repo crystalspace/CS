@@ -27,10 +27,9 @@
 #define MOUSE_TEXTURE_NAME	"csws::Mouse"
 #define NO_VIRTUAL_POS		-999999
 
-csMousePointer::csMousePointer (csApp *iApp, csMouse *iParent, int ID,
+csMousePointer::csMousePointer (csMouse *iParent, int ID,
   int x, int y, int w, int h, int hsx, int hsy)
 {
-  app = iApp;
   parent = iParent;
   id = ID;
   tX = x; tY = y; tW = w; tH = h;
@@ -42,8 +41,8 @@ void csMousePointer::Draw (int x, int y, csImageArea *&Under)
   if (parent->Texture)
   {
     x -= hsX; y -= hsY;
-    app->pplSaveArea (Under, x, y, tW, tH);
-    app->pplDrawPixmap (parent->Texture, x, y, tW, tH, tX, tY, tW, tH);
+    parent->app->pplSaveArea (Under, x, y, tW, tH);
+    parent->app->pplTexture (parent->Texture, x, y, tW, tH, tX, tY, tW, tH);
   } /* endif */
 }
 
@@ -122,7 +121,7 @@ void csMouse::NewPointer (const char *id, const char *posdef)
 
   int cX, cY, cW, cH, chX, chY;
   ScanStr (posdef, "%d,%d,%d,%d,%d,%d", &cX, &cY, &cW, &cH, &chX, &chY);
-  Pointers.Push (new csMousePointer (app, this, cID, cX, cY, cW, cH, chX, chY));
+  Pointers.Push (new csMousePointer (this, cID, cX, cY, cW, cH, chX, chY));
 }
 
 void csMouse::Setup ()

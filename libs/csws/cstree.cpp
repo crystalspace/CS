@@ -226,7 +226,7 @@ void csTreeItem::Draw ()
   int x = TREEITEM_XSPACE - deltax + hOffset;
   if (ItemBitmap)
   {
-    Sprite2D (ItemBitmap, x, vOffset + (bound.Height () - ItemBitmap->Height ()) / 2);
+    Pixmap (ItemBitmap, x, vOffset + (bound.Height () - ItemBitmap->Height ()) / 2);
     x += ItemBitmap->Width () + 2;
   } /* endif */
   if (text)

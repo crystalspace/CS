@@ -41,8 +41,6 @@ public:
 
   virtual bool Initialize (const char *iConfigName);
 
-  virtual void StartFrame ();
-
   iFontServer * pFontServer;
   int iLucidiaID;
 };
@@ -164,16 +162,6 @@ csWsTest::~csWsTest ()
   if (pFontServer != NULL)
     pFontServer->DecRef();
 }
-
-void csWsTest::StartFrame ()
-{
-  // JAS:  Transparency is buggy.  This works around the problem for now.
-  // JAS:  Okay, so I was wrong.  I don't know what the problem with trans is.
-//  Invalidate();
-//  pplDontCacheFrame();
-  csApp::StartFrame();
-}
-
 
 bool csWsTest::Initialize (const char *iConfigName)
 {
@@ -480,11 +468,12 @@ void csWsTest::GridDialog ()
 void csWsTest::ThemeDialog ()
 {
   // create a window
-  csComponent *window = new csThemeTestWindow (this, "Theme test",
+  csWindow *window = new csThemeTestWindow (this, "Theme test",
     CSWS_BUTSYSMENU | CSWS_TITLEBAR | CSWS_BUTCLOSE);
   window->SetSize (400, 300);
   window->Center ();
   window->Select ();
+  window->SetAlpha (uint8 (0.2 * 255));
 }
 
 void csWsTest::NotebookDialog ()
@@ -837,7 +826,7 @@ int main (int argc, char* argv[])
 {
   SysSystemDriver System;
 
-  if (!System.Initialize (argc, argv, "/config/wscs3d.cfg"))
+  if (!System.Initialize (argc, argv, "/config/cswstest.cfg"))
     return -1;
 
   if (!System.Open ("Crystal Space Windowing System testbed"))

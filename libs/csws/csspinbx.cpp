@@ -85,7 +85,7 @@ void csSpinBox::Draw ()
   if ((app->MouseOwner == this)
    && !SpinTimer->Running ())
     State = 0;
-  Sprite2D (sprspin [State], bound.Width () - SpinBoxSize, 0,
+  Pixmap (sprspin [State], bound.Width () - SpinBoxSize, 0,
     SpinBoxSize, SpinBoxSize);
 }
 

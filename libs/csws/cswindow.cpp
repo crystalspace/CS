@@ -326,3 +326,8 @@ void csWindow::SetFrameStyle (csWindowFrameStyle iFrameStyle)
   csComponent::SetRect (bound);
   Invalidate ();
 }
+
+void csWindow::SetAlpha (uint8 iAlpha)
+{
+  SetState (CSS_TRANSPARENT, !!(Alpha = iAlpha));
+}

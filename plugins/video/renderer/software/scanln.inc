@@ -51,11 +51,11 @@
 */
 
 #if defined (SCAN8)
-#  define PIXTYPE UByte
+#  define PIXTYPE uint8
 #elif defined (SCAN16)
-#  define PIXTYPE UShort
+#  define PIXTYPE uint16
 #elif defined (SCAN32)
-#  define PIXTYPE ULong
+#  define PIXTYPE uint32
 #else
 #  error "WARNING: no pixel size defined before including scanln.inc!"
 #endif

@@ -134,7 +134,7 @@ void csGraphicsPipeline::Text (int x, int y, int fg, int bg, int font, int fonts
   G2D->Write (x, y, fg, bg, s);
 }
 
-void csGraphicsPipeline::Sprite2D (csPixmap *s2d, int x, int y, int w, int h)
+void csGraphicsPipeline::Pixmap (csPixmap *s2d, int x, int y, int w, int h)
 {
   if (!BeginDraw (CSDRAW_2DGRAPHICS))
     return;
@@ -144,15 +144,26 @@ void csGraphicsPipeline::Sprite2D (csPixmap *s2d, int x, int y, int w, int h)
   s2d->DrawScaled (G3D, x, y, w, h);
 }
 
-void csGraphicsPipeline::DrawPixmap (iTextureHandle *hTex, int sx, int sy,
-  int sw, int sh, int tx, int ty, int tw, int th)
+void csGraphicsPipeline::TiledPixmap (csPixmap *s2d, int x, int y, int w, int h,
+  int orgx, int orgy)
+{
+  if (!BeginDraw (CSDRAW_2DGRAPHICS))
+    return;
+
+  INCLUDE_MIN_POINT (x, y);
+  INCLUDE_MAX_POINT (x + w, y + h);
+  s2d->DrawTiled (G3D, x, y, w, h, orgx, orgy);
+}
+
+void csGraphicsPipeline::Texture (iTextureHandle *hTex, int sx, int sy,
+  int sw, int sh, int tx, int ty, int tw, int th, uint8 Alpha)
 {
   if (!BeginDraw (CSDRAW_2DGRAPHICS))
     return;
 
   INCLUDE_MIN_POINT (sx, sy);
   INCLUDE_MAX_POINT (sx + sw, sy + sh);
-  G3D->DrawPixmap (hTex, sx, sy, sw, sh, tx, ty, tw, th);
+  G3D->DrawPixmap (hTex, sx, sy, sw, sh, tx, ty, tw, th, Alpha);
 }
 
 void csGraphicsPipeline::SaveArea (csImageArea **Area, int x, int y, int w, int h)

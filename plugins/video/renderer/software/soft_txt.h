@@ -293,9 +293,6 @@ public:
   /// The multiplication tables used for lightmapping
   UByte *lightmap_tables [3];
 
-  /// The inverse colormap (for 8-bit modes)
-  UByte *inv_cmap;
-
   /// The translation table for applying gamma
   UByte GammaTable [256];
 

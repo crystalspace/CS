@@ -330,7 +330,7 @@ void csTextureMMSoftware::remap_texture ()
 void csTextureMMSoftware::RemapProcToGlobalPalette (csTextureManagerSoftware *txtmgr)
 {
   csTextureSoftwareProc* t = (csTextureSoftwareProc*)tex[0];
-  if (!txtmgr->inv_cmap || t->proc_ok || !t->texG3D)
+  if (!Scan.inv_cmap || t->proc_ok || !t->texG3D)
     return;
 
   // This texture manager is fully 8bit and is either managing all the textures in
@@ -342,7 +342,7 @@ void csTextureMMSoftware::RemapProcToGlobalPalette (csTextureManagerSoftware *tx
   // Remap image according to new palette if persistent
   if ((flags & CS_TEXTURE_PROC_PERSISTENT) == CS_TEXTURE_PROC_PERSISTENT) 
     for (int i = 0; i < t->get_size (); i++, dst++, src++)
-      *dst = txtmgr->inv_cmap[txtmgr->encode_rgb(src->red, src->green, src->blue)];
+      *dst = Scan.inv_cmap [txtmgr->encode_rgb(src->red, src->green, src->blue)];
   // we have really finished with the image now
   t->image->DecRef ();
   t->image = NULL;
@@ -423,7 +423,7 @@ csTextureManagerSoftware::csTextureManagerSoftware (iSystem *iSys,
   ResetPalette ();
   read_config (config);
   G3D = iG3D;
-  inv_cmap = NULL;
+  Scan.inv_cmap = NULL;
   Scan.GlobalCMap = NULL;
 
   first_8bit_proc_tex = NULL;
@@ -489,7 +489,7 @@ csTextureManagerSoftware::~csTextureManagerSoftware ()
     first_8bit_proc_tex->DecRef ();
   if (!proc_txtmgr)
     delete [] Scan.GlobalCMap;
-  delete [] inv_cmap;
+  delete [] Scan.inv_cmap;
   delete [] lightmap_tables [0];
   if (lightmap_tables [1] != lightmap_tables [0])
     delete [] lightmap_tables [1];
@@ -516,7 +516,7 @@ ULong csTextureManagerSoftware::encode_rgb (int r, int g, int b)
 int csTextureManagerSoftware::find_rgb (int r, int g, int b)
 {
   CLIP_RGB;
-  return inv_cmap [encode_rgb (r, g, b)];
+  return Scan.inv_cmap [encode_rgb (r, g, b)];
 }
 
 int csTextureManagerSoftware::FindRGB (int r, int g, int b)
@@ -525,7 +525,7 @@ int csTextureManagerSoftware::FindRGB (int r, int g, int b)
   if (truecolor)
     return encode_rgb (r, g, b);
   else
-    return inv_cmap ? inv_cmap [encode_rgb (r, g, b)] : 0;
+    return Scan.inv_cmap ? Scan.inv_cmap [encode_rgb (r, g, b)] : 0;
 }
 
 void csTextureManagerSoftware::create_inv_cmap ()
@@ -543,13 +543,13 @@ void csTextureManagerSoftware::create_inv_cmap ()
     SysPrintf (MSG_INITIALIZATION, "  Computing inverse colormap...\n");
 
   // Greg Ewing, 12 Oct 1998
-  delete [] inv_cmap;
-  inv_cmap = NULL; // let the routine allocate the array itself
+  delete [] Scan.inv_cmap;
+  Scan.inv_cmap = NULL; // let the routine allocate the array itself
   csInverseColormap (256, &cmap [0], RGB2PAL_BITS_R, RGB2PAL_BITS_G,
-    RGB2PAL_BITS_B, inv_cmap);
+    RGB2PAL_BITS_B, Scan.inv_cmap);
 
   // Color number 0 is reserved for transparency
-  inv_cmap [encode_rgb (cmap [0].red, cmap [0].green, cmap [0].blue)] =
+  Scan.inv_cmap [encode_rgb (cmap [0].red, cmap [0].green, cmap [0].blue)] =
     cmap.find_rgb (cmap [0].red, cmap [0].green, cmap [0].blue);
 
   // Now we'll encode the palette into 16-bit values

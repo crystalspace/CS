@@ -33,21 +33,6 @@
 
 ///---------------------------------------------------------------------------
 
-#if defined(OS_UNIX)
-static char* get_null_2d_driver ()
-{
-  if (getenv ("DISPLAY"))
-    return "crystalspace.graphics2d.linex2d";
-  else
-    return SOFTWARE_2D_DRIVER;
-}
-#define NULL_SOFTWARE_2D_DRIVER get_null_2d_driver()
-#else
-#define NULL_SOFTWARE_2D_DRIVER SOFTWARE_2D_DRIVER
-#endif
-
-///---------------------------------------------------------------------------
-
 IMPLEMENT_FACTORY (csGraphics3DNull)
 
 EXPORT_CLASS_TABLE (null3d)
@@ -97,13 +82,13 @@ bool csGraphics3DNull::Initialize (iSystem *iSys)
 
   const char *driver = iSys->GetOptionCL ("canvas");
   if (!driver)
-    driver = config->GetStr ("Hardware", "Canvas", NULL_SOFTWARE_2D_DRIVER);
+    driver = config->GetStr ("Hardware", "Canvas", SOFTWARE_2D_DRIVER);
 
   G2D = LOAD_PLUGIN (System, driver, NULL, iGraphics2D);
   if (!G2D)
     return false;
 
-  texman = new csTextureManagerLine (System, G2D, config);
+  texman = new csTextureManagerNull (System, G2D, config);
 
   return true;
 }

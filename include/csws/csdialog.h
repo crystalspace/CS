@@ -68,6 +68,8 @@ protected:
   csComponent *first;
   /// Border width and height
   int BorderWidth, BorderHeight;
+  /// Dialog transparency (if CSS_TRANSPARENT is set)
+  uint8 Alpha;
 
 public:
   /// Create dialog object
@@ -109,6 +111,12 @@ public:
   /// Get the name of the skip slice for this component
   virtual char *GetSkinName ()
   { return "Dialog"; }
+
+  /// Set dialog transparency level (0 - opaque, 255 - fully transparent)
+  void SetAlpha (uint8 iAlpha);
+  /// Query dialog transparency level
+  uint8 GetAlpha ()
+  { return GetState (CSS_TRANSPARENT) ? Alpha : 0; }
 
 protected:
   /// Adjust focused control by switching back or forth if it is disabled

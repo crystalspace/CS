@@ -2220,8 +2220,6 @@ void csGraphics3DSoftwareCommon::StartPolygonFX (iMaterialHandle* handle,
   else
     pqinfo.textured = false;
 
-  Scan.inv_cmap = texman->inv_cmap;
-
   Scan.AlphaMask = alpha_mask;
 
   Scan.BlendTable = NULL;

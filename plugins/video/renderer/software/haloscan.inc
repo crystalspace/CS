@@ -33,9 +33,9 @@
 */
 
 #if (HALO_BPP == 16)
-#  define HALO_PIXTYPE	unsigned short
+#  define HALO_PIXTYPE	uint16
 #else
-#  define HALO_PIXTYPE	unsigned long
+#  define HALO_PIXTYPE	uint32
 #endif
 
 #if (HALO_BPP == 32) && defined (TOP8BITS_R8G8B8_USED)

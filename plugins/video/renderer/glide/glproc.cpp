@@ -46,12 +46,13 @@ void csGlideProcedural::SetTarget (csGraphics3DGlide *g3d, csTextureMMGlide *tex
 bool csGlideProcedural::BeginDraw (int DrawFlags)
 {
   bool succ = g3d->BeginDraw (DrawFlags);
-  if (succ){
-    if (DrawFlags & CSDRAW_CLEARSCREEN){
+  if (succ)
+  {
+    if (DrawFlags & CSDRAW_CLEARSCREEN)
       g3d->ClearBuffer ();
-    }else
-    // copy the tex into upper left corner
-    g3d->DrawPixmap (tex, 0, 0, Width, Height, 0, 0, Width, Height);
+    else
+      // copy the tex into upper left corner
+      g3d->DrawPixmap (tex, 0, 0, Width, Height, 0, 0, Width, Height, 0);
   }
   return succ;
 }
@@ -236,7 +237,7 @@ iHalo *csGlideProcedural::CreateHalo (float iR, float iG, float iB, unsigned cha
 }
 
 void csGlideProcedural::DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
-				 int tx, int ty, int tw, int th)
+				 int tx, int ty, int tw, int th, uint8 Alpha)
 { 
-  g3d->DrawPixmap (hTex, sx, sy, sw, sh, tx, ty, tw, th); 
+  g3d->DrawPixmap (hTex, sx, sy, sw, sh, tx, ty, tw, th, Alpha); 
 }

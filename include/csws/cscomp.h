@@ -651,12 +651,15 @@ public:
   void Text (int x, int y, int fgindx, int bgindx, const char *s);
 
   /// Draw a (scaled) 2D sprite
-  void Sprite2D (csPixmap *s2d, int x, int y, int w, int h);
+  void Pixmap (csPixmap *s2d, int x, int y, int w, int h);
   /// Draw a (non-scaled) 2D sprite
-  void Sprite2D (csPixmap *s2d, int x, int y)
-  { Sprite2D (s2d, x, y, s2d->Width (), s2d->Height ()); }
-  /// Draw a (Tiled) 2D sprite
-  void Sprite2DTiledShifted (csPixmap *s2d, int x, int y, int w, int h, int shiftx, int shifty);
+  void Pixmap (csPixmap *s2d, int x, int y)
+  { Pixmap (s2d, x, y, s2d->Width (), s2d->Height ()); }
+  /// Draw a (tiled) pixmap (orgy stands for "origin y", not what you though of - shame!)
+  void Pixmap (csPixmap *s2d, int x, int y, int w, int h, int orgx, int orgy);
+  /// Draw a (possibly tiled) texture, possibly semi-transparent
+  void Texture (iTextureHandle *tex, int x, int y, int w, int h,
+    int orgx, int orgy, uint8 Alpha = 0);
 
   /// Return the width of given text using currently selected font
   int TextWidth (const char *text);

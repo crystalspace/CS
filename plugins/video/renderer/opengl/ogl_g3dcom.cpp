@@ -2019,7 +2019,7 @@ void csGraphics3DOGLCommon::DrawPolygon (G3DPolygonDP & poly)
 }
 
 void csGraphics3DOGLCommon::DrawPixmap (iTextureHandle *hTex,
-  int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th)
+  int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th, uint8 Alpha)
 {
   end_draw_poly ();
 

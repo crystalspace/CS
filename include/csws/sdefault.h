@@ -50,7 +50,11 @@ public:
  */
 class csDefaultWindowSkin : public csWindowSkin
 {
+  // The material for titlebar buttons
   iTextureHandle *ButtonTex;
+  // The background bitmap
+  iTextureHandle *BackTex;
+  // The parent skin object
   csSkin *Skin;
 
 public:
@@ -87,7 +91,16 @@ protected:
  */
 class csDefaultDialogSkin : public csDialogSkin
 {
+  // The material for background
+  iTextureHandle *BackTex;
+
 public:
+  /// Query the required resources from application
+  void Initialize (csApp *iApp, csSkin *Parent);
+
+  /// Free the resources allocated in Initialize()
+  virtual void Deinitialize ();
+
   /// Draw the component we are responsible for
   virtual void Draw (csComponent &iComp);
 

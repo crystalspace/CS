@@ -127,10 +127,13 @@ csTextureMMNull::csTextureMMNull (iImage *image, int flags) :
   csTextureMM (image, flags)
 {
   pal2glob = NULL;
+  pal2glob8 = NULL;
 }
 
 csTextureMMNull::~csTextureMMNull ()
 {
+  delete [] (UByte *)pal2glob;
+  delete [] pal2glob8;
 }
 
 csTexture *csTextureMMNull::NewTexture (iImage *Image)
@@ -197,15 +200,21 @@ void csTextureMMNull::ComputeMeanColor ()
 void csTextureMMNull::remap_texture (csTextureManager *texman)
 {
   int i;
-  csTextureManagerLine *txm = (csTextureManagerLine *)texman;
+  csTextureManagerNull *txm = (csTextureManagerNull *)texman;
   switch (texman->pfmt.PixelBytes)
   {
     case 1:
       delete [] (UByte *)pal2glob;
       pal2glob = new UByte [palette_size];
+      delete [] pal2glob8;
+      pal2glob8 = new uint16 [palette_size];
       for (i = 0; i < palette_size; i++)
+      {
         ((UByte *)pal2glob) [i] = txm->cmap.find_rgb (palette [i].red,
           palette [i].green, palette [i].blue);
+        pal2glob8 [i] = txm->encode_rgb (palette [i].red,
+          palette [i].green, palette [i].blue);
+      }
       break;
     case 2:
       delete [] (UShort *)pal2glob;
@@ -224,25 +233,29 @@ void csTextureMMNull::remap_texture (csTextureManager *texman)
   }
 }
 
-//----------------------------------------------- csTextureManagerLine ---//
+//----------------------------------------------- csTextureManagerNull ---//
 
-csTextureManagerLine::csTextureManagerLine (iSystem *iSys,
+csTextureManagerNull::csTextureManagerNull (iSystem *iSys,
   iGraphics2D *iG2D, iConfigFile *config) : csTextureManager (iSys, iG2D)
 {
   ResetPalette ();
   read_config (config);
   G2D = iG2D;
   inv_cmap = NULL;
+  GlobalCMap = NULL;
 }
 
-void csTextureManagerLine::SetPixelFormat (csPixelFormat &PixelFormat)
+void csTextureManagerNull::SetPixelFormat (csPixelFormat &PixelFormat)
 {
   pfmt = PixelFormat;
 
   truecolor = (pfmt.PalEntries == 0);
+
+  if ((pfmt.PixelBytes == 1) && !GlobalCMap)
+    GlobalCMap = new uint16 [256];
 }
 
-void csTextureManagerLine::read_config (iConfigFile *config)
+void csTextureManagerNull::read_config (iConfigFile *config)
 {
   csTextureManager::read_config (config);
   prefered_dist = config->GetInt ("TextureManager", "RGB_DIST", PREFERED_DIST);
@@ -250,17 +263,18 @@ void csTextureManagerLine::read_config (iConfigFile *config)
   if (uniform_bias > 100) uniform_bias = 100;
 }
 
-csTextureManagerLine::~csTextureManagerLine ()
+csTextureManagerNull::~csTextureManagerNull ()
 {
   Clear ();
+  delete [] GlobalCMap;
 }
 
-void csTextureManagerLine::Clear ()
+void csTextureManagerNull::Clear ()
 {
   csTextureManager::Clear ();
 }
 
-ULong csTextureManagerLine::encode_rgb (int r, int g, int b)
+ULong csTextureManagerNull::encode_rgb (int r, int g, int b)
 {
   return
     ((r >> (8 - pfmt.RedBits))   << pfmt.RedShift) |
@@ -268,13 +282,13 @@ ULong csTextureManagerLine::encode_rgb (int r, int g, int b)
     ((b >> (8 - pfmt.BlueBits))  << pfmt.BlueShift);
 }
 
-int csTextureManagerLine::find_rgb (int r, int g, int b)
+int csTextureManagerNull::find_rgb (int r, int g, int b)
 {
   CLIP_RGB;
   return inv_cmap [encode_rgb (r, g, b)];
 }
 
-int csTextureManagerLine::FindRGB (int r, int g, int b)
+int csTextureManagerNull::FindRGB (int r, int g, int b)
 {
   CLIP_RGB;
   if (truecolor)
@@ -283,7 +297,7 @@ int csTextureManagerLine::FindRGB (int r, int g, int b)
     return inv_cmap [encode_rgb (r, g, b)];
 }
 
-void csTextureManagerLine::create_inv_cmap ()
+void csTextureManagerNull::create_inv_cmap ()
 {
   // We create a inverse colormap for finding fast the nearest palette index
   // given any R,G,B value. Usually this is done by scanning the entire palette
@@ -306,9 +320,13 @@ void csTextureManagerLine::create_inv_cmap ()
   // Color number 0 is reserved for transparency
   inv_cmap [encode_rgb (cmap [0].red, cmap [0].green, cmap [0].blue)] =
     cmap.find_rgb (cmap [0].red, cmap [0].green, cmap [0].blue);
+
+  // Now we'll encode the palette into 16-bit values
+  for (int i = 0; i < 256; i++)
+    GlobalCMap [i] = encode_rgb (cmap [i].red, cmap [i].green, cmap [i].blue);
 }
 
-void csTextureManagerLine::compute_palette ()
+void csTextureManagerNull::compute_palette ()
 {
   if (truecolor) return;
 
@@ -367,7 +385,7 @@ void csTextureManagerLine::compute_palette ()
   palette_ok = true;
 }
 
-void csTextureManagerLine::PrepareTextures ()
+void csTextureManagerNull::PrepareTextures ()
 {
   if (verbose) SysPrintf (MSG_INITIALIZATION, "Preparing textures...\n");
 
@@ -395,7 +413,7 @@ void csTextureManagerLine::PrepareTextures ()
     ((csTextureMMNull*)textures[i])->remap_texture (this);
 }
 
-iTextureHandle *csTextureManagerLine::RegisterTexture (iImage* image,
+iTextureHandle *csTextureManagerNull::RegisterTexture (iImage* image,
   int flags)
 {
   if (!image) return NULL;
@@ -405,7 +423,7 @@ iTextureHandle *csTextureManagerLine::RegisterTexture (iImage* image,
   return txt;
 }
 
-void csTextureManagerLine::PrepareTexture (iTextureHandle *handle)
+void csTextureManagerNull::PrepareTexture (iTextureHandle *handle)
 {
   if (!handle) return;
 
@@ -414,14 +432,14 @@ void csTextureManagerLine::PrepareTexture (iTextureHandle *handle)
   txt->remap_texture (this);
 }
 
-void csTextureManagerLine::UnregisterTexture (iTextureHandle* handle)
+void csTextureManagerNull::UnregisterTexture (iTextureHandle* handle)
 {
   csTextureMMNull *tex_mm = (csTextureMMNull *)handle->GetPrivateObject ();
   int idx = textures.Find (tex_mm);
   if (idx >= 0) textures.Delete (idx);
 }
 
-void csTextureManagerLine::ResetPalette ()
+void csTextureManagerNull::ResetPalette ()
 {
   memset (&locked, 0, sizeof (locked));
   locked [0] = true;
@@ -432,14 +450,14 @@ void csTextureManagerLine::ResetPalette ()
   palette_ok = false;
 }
 
-void csTextureManagerLine::ReserveColor (int r, int g, int b)
+void csTextureManagerNull::ReserveColor (int r, int g, int b)
 {
   if (!pfmt.PalEntries) return;
   int color = cmap.alloc_rgb (r, g, b, 0);
   locked [color] = true;
 }
 
-void csTextureManagerLine::SetPalette ()
+void csTextureManagerNull::SetPalette ()
 {
   if (!truecolor && !palette_ok)
     compute_palette ();

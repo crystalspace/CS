@@ -190,7 +190,6 @@ void csScan_InitDraw (int MipMap, csGraphics3DSoftwareCommon* g3d,
   UByte r, g, b;
   texture->GetMeanColor (r, g, b);
   Scan.FlatColor = g3d->texman->FindRGB (r, g, b);
-  Scan.inv_cmap = g3d->texman->inv_cmap;
 
   if (g3d->do_lighting)
   {

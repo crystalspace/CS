@@ -114,10 +114,6 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
   UByte *lt_G = texman->lightmap_tables [1];
   UByte *lt_B = texman->lightmap_tables [2];
 
-#if defined (PI_INDEX8)
-  UByte *inv_cmap = texman->inv_cmap;
-#endif
-
   int min_lu = QRound (floor (u_min)) >> pt_cell_shift;
   int max_lu = (QRound (ceil (u_max)) + pt_cell_size - 1) >> pt_cell_shift;
   int min_lv = QRound (floor (v_min)) >> pt_cell_shift;
@@ -211,7 +207,7 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
           csRGBpixel pix = tx_palette [tx_bitmap [tx_idx + (uu & tx_andw)]];
 	  *out++ =
 #if defined (PI_INDEX8)
-            inv_cmap [
+            Scan.inv_cmap [
 #endif
             (lt_R [pix.red   | (r & 0x3f00)] << PI_RS) |
             (lt_G [pix.green | (g & 0x3f00)] << PI_GS) |

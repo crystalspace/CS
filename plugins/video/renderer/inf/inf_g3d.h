@@ -261,7 +261,8 @@ public:
    * Draw a sprite (possibly rescaled to given width (sw) and height (sh))
    * using given rectangle from given texture clipped with G2D's clipper.
    */
-  virtual void DrawPixmap (iTextureHandle*, int, int, int, int, int, int, int, int)
+  virtual void DrawPixmap (iTextureHandle*, int, int, int, int, int, int,
+    int, int, uint8)
   { }
 
   ///------------------- iConfig interface implementation -------------------

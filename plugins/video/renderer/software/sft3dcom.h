@@ -433,7 +433,7 @@ public:
    * using given rectangle from given texture clipped with G2D's clipper.
    */
   virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw,
-    int sh, int tx, int ty, int tw, int th);
+    int sh, int tx, int ty, int tw, int th, uint8 Alpha);
 };
 
 #endif // __CSSFT3DCOM_H__

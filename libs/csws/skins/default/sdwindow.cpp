@@ -24,6 +24,7 @@
 #include "csws/cswsutil.h"
 #include "csws/sdefault.h"
 #include "isystem.h"
+#include "icfgfile.h"
 
 #define TITLEBAR_TEXTURE_NAME	"csws::TitlebarButtons"
 
@@ -41,6 +42,19 @@ void csDefaultWindowSkin::Initialize (csApp *iApp, csSkin *Parent)
       "Cannot find texture %s for default window skin\n", TITLEBAR_TEXTURE_NAME);
     fatal_exit (0, false);
   }
+
+  if (BackTex)
+  {
+    BackTex->DecRef ();
+    BackTex = NULL;
+  }
+  const char *tex = iApp->Config->GetStr ("Dialog", "Background", NULL);
+  if (tex)
+  {
+    BackTex = iApp->GetTexture (tex);
+    if (BackTex)
+      BackTex->IncRef ();
+  }
 }
 
 void csDefaultWindowSkin::Deinitialize ()
@@ -49,6 +63,11 @@ void csDefaultWindowSkin::Deinitialize ()
   {
     ButtonTex->DecRef ();
     ButtonTex = NULL;
+  }
+  if (BackTex)
+  {
+    BackTex->DecRef ();
+    BackTex = NULL;
   }
 }
 
@@ -99,9 +118,9 @@ void csDefaultWindowSkin::SetButtBitmap (csButton *button, const char *id)
   strcat (strcpy (id_p, id), ".P");
 
   int tx,ty,tw,th;
-  ParseConfigBitmap (button->app, Skin->Prefix, "Titlebar", id_n, tx, ty, tw, th);
+  ParseConfigBitmap (button->app, Skin->Prefix, "Window", id_n, tx, ty, tw, th);
   csPixmap *bmpn = new csPixmap (ButtonTex, tx, ty, tw, th);
-  ParseConfigBitmap (button->app, Skin->Prefix, "Titlebar", id_p, tx, ty, tw, th);
+  ParseConfigBitmap (button->app, Skin->Prefix, "Window", id_p, tx, ty, tw, th);
   csPixmap *bmpp = new csPixmap (ButtonTex, tx, ty, tw, th);
   button->SetBitmap (bmpn, bmpp);
 }
@@ -268,14 +287,14 @@ void csDefaultWindowSkin::Draw (csComponent &This)
 
   if (This.GetState (CSS_TRANSPARENT))
   {
-    int xmax = This.bound.Width () - wbw;
-    int ymax = This.bound.Height () - bh;
-    This.Box (bw, bh, wbw, ymax, CSPAL_WINDOW_BORDER);
-    This.Box (This.bound.Width () - wbw, bh,
-      This.bound.Width () - bw, ymax, CSPAL_WINDOW_BORDER);
-    This.Box (wbw, bh, xmax, wbh, CSPAL_WINDOW_BORDER);
-    This.Box (wbw, This.bound.Height () - wbh,
-      xmax, This.bound.Height () - bh, CSPAL_WINDOW_BORDER);
+    int x1 = This.bound.Width ()  - wbw, x2 = This.bound.Width ()  - bw;
+    int y1 = This.bound.Height () - wbh, y2 = This.bound.Height () - bh;
+    This.Box (bw, bh, wbw, y2, CSPAL_WINDOW_BORDER);
+    This.Box (x1, bh, x2, y2, CSPAL_WINDOW_BORDER);
+    This.Box (wbw, bh, x1, wbh, CSPAL_WINDOW_BORDER);
+    This.Box (wbw, y1, x1, y2, CSPAL_WINDOW_BORDER);
+    This.Texture (BackTex, wbw, wbh, This.bound.Width () - 2 * wbw,
+      This.bound.Height () - 2 * wbh, 0, 0, This.GetAlpha ());
   }
   else
     This.Box (bw, bh, This.bound.Width () - bw, This.bound.Height () - bh,

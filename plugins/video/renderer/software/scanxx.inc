@@ -27,13 +27,13 @@
 */
 
 #if defined (SCAN8)
-#  define PIXTYPE UByte
+#  define PIXTYPE uint8
 #  define SCAN_BPP 8
 #elif defined (SCAN16)
-#  define PIXTYPE UShort
+#  define PIXTYPE uint16
 #  define SCAN_BPP 16
 #elif defined (SCAN32)
-#  define PIXTYPE ULong
+#  define PIXTYPE uint32
 #  define SCAN_BPP 32
 #else
 #  error "No valid SCANXX macro defined!"

@@ -123,7 +123,7 @@ struct G3DPolygonDPFX
   float inv_aspect;
 
   /// The material handle as returned by iTextureManager.
-  iMaterialHandle* mat_handle;
+  iMaterialHandle *mat_handle;
 
   /// Use this color for drawing (if txt_handle == NULL) instead of a material.
   UByte flat_color_r;
@@ -435,7 +435,7 @@ struct csFog
   float blue;
 };
 
-SCF_VERSION (iGraphics3D, 4, 0, 0);
+SCF_VERSION (iGraphics3D, 4, 0, 1);
 
 /**
  * This is the standard 3D graphics interface.
@@ -633,9 +633,22 @@ struct iGraphics3D : public iPlugIn
   virtual iHalo *CreateHalo (float iR, float iG, float iB,
     unsigned char *iAlpha, int iWidth, int iHeight) = 0;
 
-  /// Draw a sprite using a rectangle from given texture
+  /**
+   * Draw a pixmap using a rectangle from given texture.
+   * The sx,sy(sw,sh) rectangle defines the screen rectangle within
+   * which the drawing is performed (clipping rectangle is also taken
+   * into account). The tx,ty(tw,th) rectangle defines a subrectangle
+   * from texture which should be painted. If the subrectangle exceeds
+   * the actual texture size, texture coordinates are wrapped around
+   * (e.g. the texture is tiled). The Alpha parameter defines the
+   * transparency of the drawing operation, 0 means opaque, 255 means
+   * fully transparent.<p>
+   * <b>WARNING: TILING WORKS ONLY WITH TEXTURES THAT HAVE POWER-OF-TWO SIZES!</b>
+   * That is, both width and height should be a power of two, although not
+   * neccessarily equal.
+   */
   virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
-    int tx, int ty, int tw, int th) = 0;
+    int tx, int ty, int tw, int th, uint8 Alpha = 0) = 0;
 
   /// Get the texture manager: do NOT increment the refcount of texture manager
   virtual iTextureManager *GetTextureManager () = 0;

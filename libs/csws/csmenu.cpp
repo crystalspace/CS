@@ -366,9 +366,9 @@ void csMenuItem::Draw ()
   } /* endif */
 
   if (Style & CSMIS_CHECKED)
-    Sprite2D (sprchecked, 1, (bound.Height () - 8) / 2);
+    Pixmap (sprchecked, 1, (bound.Height () - 8) / 2);
   if (focused && !((csMenu *)parent)->IsMenuBar ())
-    Sprite2D (sprsubmenu, bound.Width () - 9, (bound.Height () - 8) / 2);
+    Pixmap (sprsubmenu, bound.Width () - 9, (bound.Height () - 8) / 2);
 }
 
 void csMenuItem::Press ()

@@ -38,14 +38,12 @@ private:
   int id;
   /// Texture X, Y, width, height, hotspot X and Y
   int tX, tY, tW, tH, hsX, hsY;
-  /// The application object
-  csApp *app;
   /// The parent mouse object
   csMouse *parent;
 
 public:
   /// Initializes mouse cursor
-  csMousePointer (csApp *iApp, csMouse *iParent, int ID,
+  csMousePointer (csMouse *iParent, int ID,
     int x, int y, int w, int h, int hsx, int hsy);
 
   /// Draw mouse cursor, keeping first the background

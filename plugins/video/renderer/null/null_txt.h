@@ -23,7 +23,7 @@
 #include "video/renderer/common/txtmgr.h"
 #include "iimage.h"
 
-class csTextureManagerLine;
+class csTextureManagerNull;
 
 /**
  * In 8-bit modes we build a 32K inverse colormap for converting
@@ -87,6 +87,9 @@ protected:
    */
   void *pal2glob;
 
+  /// Same but for 8-bit modes (8bit to 16bit values)
+  uint16 *pal2glob8;
+
   /// The private palette
   csRGBpixel palette [256];
 
@@ -120,6 +123,8 @@ public:
 
   /// Query palette -> native format table
   void *GetPaletteToGlobal () { return pal2glob; }
+  /// Query palette -> 16-bit values table for 8-bit modes
+  uint16 *GetPaletteToGlobal8 () { return pal2glob8; }
 };
 
 /**
@@ -161,7 +166,7 @@ public:
  * a lot of work regarding palette management and the creation
  * of lots of lookup tables.
  */
-class csTextureManagerLine : public csTextureManager
+class csTextureManagerNull : public csTextureManager
 {
 private:
   /// How strong texture manager should push 128 colors towards a uniform palette
@@ -187,12 +192,15 @@ public:
   csColorMapLine cmap;
 
   /// The inverse colormap (for 8-bit modes)
-  UByte *inv_cmap;
+  uint8 *inv_cmap;
+
+  /// The global colormap (for 8-bit modes)
+  uint16 *GlobalCMap;
 
   ///
-  csTextureManagerLine (iSystem *iSys, iGraphics2D *iG2D, iConfigFile *config);
+  csTextureManagerNull (iSystem *iSys, iGraphics2D *iG2D, iConfigFile *config);
   ///
-  virtual ~csTextureManagerLine ();
+  virtual ~csTextureManagerNull ();
 
   /// Called from G3D::Open ()
   void SetPixelFormat (csPixelFormat &PixelFormat);

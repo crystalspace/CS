@@ -19,7 +19,36 @@
 
 #include "cssysdef.h"
 #include "csws/csdialog.h"
+#include "csws/csapp.h"
 #include "csws/sdefault.h"
+#include "icfgfile.h"
+
+void csDefaultDialogSkin::Initialize (csApp *iApp, csSkin *Parent)
+{
+  (void)Parent;
+  if (BackTex)
+  {
+    BackTex->DecRef ();
+    BackTex = NULL;
+  }
+
+  const char *tex = iApp->Config->GetStr ("Dialog", "Background", NULL);
+  if (tex)
+  {
+    BackTex = iApp->GetTexture (tex);
+    if (BackTex)
+      BackTex->IncRef ();
+  }
+}
+
+void csDefaultDialogSkin::Deinitialize ()
+{
+  if (BackTex)
+  {
+    BackTex->DecRef ();
+    BackTex = NULL;
+  }
+}
 
 void csDefaultDialogSkin::Draw (csComponent &This)
 {
@@ -53,8 +82,23 @@ void csDefaultDialogSkin::Draw (csComponent &This)
   } /* endswitch */
   int bw, bh;
   This.GetBorderSize (bw, bh);
-  This.Box (bw, bh, This.bound.Width () - bw, This.bound.Height () - bh,
-    CSPAL_DIALOG_BACKGROUND);
+  if (This.GetState (CSS_TRANSPARENT) || BackTex)
+  {
+    int orgx = 0, orgy = 0;
+    // If dialog has title, suppose it is the top-level window
+    // thus we'll align the texture with the dialog; otherwise
+    // we'll align the texture to parent's top-left corner.
+    if (!This.GetText ())
+    {
+      orgx = -This.bound.xmin;
+      orgy = -This.bound.ymin;
+    }
+    This.Texture (BackTex, bw, bh, This.bound.Width () - 2 * bw,
+      This.bound.Height () - 2 * bh, orgx, orgy, This.GetAlpha ());
+  }
+  else
+    This.Box (bw, bh, This.bound.Width () - bw, This.bound.Height () - bh,
+      CSPAL_DIALOG_BACKGROUND);
 #undef This
 }
 
@@ -75,6 +119,8 @@ void csDefaultDialogSkin::SetBorderSize (csDialog &This)
     case csdfsAround:
       bw = 2; bh = 2;
       break;
+    default:
+      return;
   } /* endswitch */
   This.SetBorderSize (bw, bh);
 }

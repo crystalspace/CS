@@ -157,7 +157,7 @@ void csDefaultButtonSkin::Draw (csComponent &This)
 
   // Draw image
   if (img)
-    This.Sprite2D (img, imgx, imgy, imgw, imgh);
+    This.Pixmap (img, imgx, imgy, imgw, imgh);
   // Draw text
   if (text)
   {

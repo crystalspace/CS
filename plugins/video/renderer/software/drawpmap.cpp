@@ -20,26 +20,33 @@
 #include "sft3dcom.h"
 #include "soft_txt.h"
 
-#define DRAWSPRITE_NAME DrawPixmap8
-#define DRAWSPRITE_PIXTYPE UByte
+#define DP_NAME DrawPixmap8
+#define DP_PIXTYPE uint8
+#define DP_PIXFORM_INDEX8
 #include "drawsprt.inc"
 
-#define DRAWSPRITE_NAME DrawPixmap16
-#define DRAWSPRITE_PIXTYPE UShort
+#define DP_NAME DrawPixmap16_555
+#define DP_PIXTYPE uint16
+#define DP_PIXFORM_R5G5B5
 #include "drawsprt.inc"
 
-#define DRAWSPRITE_NAME DrawPixmap32
-#define DRAWSPRITE_PIXTYPE ULong
+#define DP_NAME DrawPixmap16_565
+#define DP_PIXTYPE uint16
+#define DP_PIXFORM_R5G6B5
+#include "drawsprt.inc"
+
+#define DP_NAME DrawPixmap32
+#define DP_PIXTYPE uint32
+#define DP_PIXFORM_R8G8B8
 #include "drawsprt.inc"
 
 void csGraphics3DSoftwareCommon::DrawPixmap (iTextureHandle *hTex,
   int sx, int sy, int sw, int sh,
-  int tx, int ty, int tw, int th)
+  int tx, int ty, int tw, int th, uint8 Alpha)
 {
-  switch (pfmt.PixelBytes)
-  {
-    case 1:  DrawPixmap8 (G2D, hTex, sx, sy, sw, sh, tx, ty, tw, th); break;
-    case 2:  DrawPixmap16(G2D, hTex, sx, sy, sw, sh, tx, ty, tw, th); break;
-    default: DrawPixmap32(G2D, hTex, sx, sy, sw, sh, tx, ty, tw, th); break;
-  }
+  void (*drawpixfunc) (iGraphics2D *, iTextureHandle *, int, int, int, int,
+    int, int, int, int, uint8) = (pfmt.PixelBytes == 1) ? DrawPixmap8 :
+    (pfmt.PixelBytes == 2) ? ((pfmt.GreenBits == 5) ? DrawPixmap16_555 : DrawPixmap16_565) :
+    DrawPixmap32;
+  drawpixfunc (G2D, hTex, sx, sy, sw, sh, tx, ty, tw, th, Alpha);
 }

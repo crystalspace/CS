@@ -245,3 +245,8 @@ void csDialog::SetFrameStyle (csDialogFrameStyle iFrameStyle)
   csComponent::SetRect (bound);
   Invalidate ();
 }
+
+void csDialog::SetAlpha (uint8 iAlpha)
+{
+  SetState (CSS_TRANSPARENT, !!(Alpha = iAlpha));
+}

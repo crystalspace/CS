@@ -182,7 +182,7 @@ public:
   { return &Textures; }
 
   /// Find a texture by name
-  iTextureHandle *GetTexture (char *Name)
+  iTextureHandle *GetTexture (const char *Name)
   {
     csWSTexture *tex = GetTextures ()->FindTexture (Name);
     return tex ? tex->GetHandle () : NULL;
@@ -275,9 +275,17 @@ public:
   void pplText (int x, int y, int fg, int bg, int Font, int FontSize, const char *s)
   { GfxPpl->Text (x, y, pplColor (fg), bg != -1 ? pplColor (bg) : bg, Font, FontSize, s); }
 
-  /// Draw a (scaled) 2D sprite
-  void pplSprite2D (csPixmap *s2d, int x, int y, int w, int h)
-  { GfxPpl->Sprite2D (s2d, x, y, w, h); }
+  /// Draw a (scaled) pixmap
+  void pplPixmap (csPixmap *s2d, int x, int y, int w, int h)
+  { GfxPpl->Pixmap (s2d, x, y, w, h); }
+  /// Draw a (unscaled but tiled) pixmap
+  void pplTiledPixmap (csPixmap *s2d, int x, int y, int w, int h, int orgx, int orgy)
+  { GfxPpl->TiledPixmap (s2d, x, y, w, h, orgx, orgy); }
+
+  /// Draw a (part) of texture (possibly scaled) in given screen rectangle
+  void pplTexture (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
+    int tx, int ty, int tw, int th, uint8 Alpha = 0)
+  { GfxPpl->Texture (hTex, sx, sy, sw, sh, tx, ty, tw, th, Alpha); }
 
   /// Save a part of screen
   void pplSaveArea (csImageArea *&Area, int x, int y, int w, int h)
@@ -324,11 +332,6 @@ public:
   /// Get R,G,B at given screen location
   void GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB)
   { GfxPpl->GetPixel (x, y, oR, oG, oB); }
-
-  /// Draw a (part) of texture (possibly scaled) in given screen rectangle
-  void pplDrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
-    int tx, int ty, int tw, int th)
-  { GfxPpl->DrawPixmap (hTex, sx, sy, sw, sh, tx, ty, tw, th); }
 
   //--- 3D drawing ---//
 

@@ -123,6 +123,8 @@ protected:
   int TitlebarHeight;
   /// Menu height
   int MenuHeight;
+  /// Window transparency (if CSS_TRANSPARENT is set)
+  uint8 Alpha;
 
 public:
   /// Create a window object
@@ -190,6 +192,12 @@ public:
   /// Get the name of the skip slice for this component
   virtual char *GetSkinName ()
   { return "Window"; }
+
+  /// Set window transparency level (0 - opaque, 255 - fully transparent)
+  void SetAlpha (uint8 iAlpha);
+  /// Query window transparency level
+  uint8 GetAlpha ()
+  { return GetState (CSS_TRANSPARENT) ? Alpha : 0; }
 };
 
 #endif // __CSWINDOW_H__

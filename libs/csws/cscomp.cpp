@@ -32,6 +32,7 @@
 #include "csws/cswsutil.h"
 #include "csws/csskin.h"
 #include "isystem.h"
+#include "imater.h"
 
 //--//--//--//--//--//--//--//--//--//--//--//--/ The csComponent class --//--//
 
@@ -1346,13 +1347,13 @@ void csComponent::Text (int x, int y, int fgindx, int bgindx, const char *s)
     app->pplRestoreClipRect ();
 }
 
-void csComponent::Sprite2D (csPixmap *s2d, int x, int y, int w, int h)
+void csComponent::Pixmap (csPixmap *s2d, int x, int y, int w, int h)
 {
   if (!s2d)
     return;
 
- /* Do clipping as follows: create a minimal rectangle which fits the sprite,
-  * clip the rectangle against children & parents, then clip the sprite against
+ /* Do clipping as follows: create a minimal rectangle which fits the pixmap,
+  * clip the rectangle against children & parents, then clip the pixmap against
   * all resulting rectangles.
   */
   csObjVector rect (8, 4);
@@ -1369,19 +1370,19 @@ void csComponent::Sprite2D (csPixmap *s2d, int x, int y, int w, int h)
   {
     csRect *cur = (csRect *)rect[i];
     app->pplSetClipRect (*cur); restoreclip = true;
-    app->pplSprite2D (s2d, x, y, w, h);
+    app->pplPixmap (s2d, x, y, w, h);
   } /* endfor */
   if (restoreclip)
     app->pplRestoreClipRect ();
 }
 
-void csComponent::Sprite2DTiledShifted (csPixmap *s2d, int x, int y, int w, int h, int shiftx, int shifty)
+void csComponent::Pixmap (csPixmap *s2d, int x, int y, int w, int h, int orgx, int orgy)
 {
   if (!s2d)
     return;
 
- /* Do clipping as follows: create a minimal rectangle which fits the sprite,
-  * clip the rectangle against children & parents, then clip the sprite against
+ /* Do clipping as follows: create a minimal rectangle which fits the pixmap,
+  * clip the rectangle against children & parents, then clip the pixmap against
   * all resulting rectangles.
   */
   csObjVector rect (8, 4);
@@ -1392,16 +1393,35 @@ void csComponent::Sprite2DTiledShifted (csPixmap *s2d, int x, int y, int w, int 
   rect.Push (sb);
   Clip (rect, this);
 
-  LocalToGlobal (x, y);
-  bool restoreclip = false;
   for (int i = rect.Length () - 1; i >= 0; i--)
   {
     csRect *cur = (csRect *)rect [i];
-    app->pplSetClipRect (*cur); restoreclip = true;
-    s2d->DrawTiledShifted (app->GetG3D (), x, y, w, h, shiftx, shifty);
+    app->pplTiledPixmap (s2d, cur->xmin, cur->ymin, cur->Width (), cur->Height (),
+      orgx, orgy);
   } /* endfor */
-  if (restoreclip)
-    app->pplRestoreClipRect ();
+}
+
+void csComponent::Texture (iTextureHandle *tex, int x, int y, int w, int h,
+  int orgx, int orgy, uint8 Alpha)
+{
+  if (!tex)
+    return;
+
+  csObjVector rect (8, 4);
+  csRect *sb = new csRect (x, y, x + w, y + h);
+  sb->Intersect (dirty);
+  if (!clip.IsEmpty ())
+    sb->Intersect (clip);
+  rect.Push (sb);
+  Clip (rect, this);
+
+  LocalToGlobal (orgx, orgy);
+  for (int i = rect.Length () - 1; i >= 0; i--)
+  {
+    csRect *cur = (csRect *)rect [i];
+    app->pplTexture (tex, cur->xmin, cur->ymin, cur->Width (), cur->Height (),
+      cur->xmin - orgx, cur->ymin - orgy, cur->Width (), cur->Height (), Alpha);
+  } /* endfor */
 }
 
 void csComponent::Rect3D (int xmin, int ymin, int xmax, int ymax, int darkindx,
