@@ -166,6 +166,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (HEIGHT)
   CS_TOKEN_DEF (HEIGHTMAP)
   CS_TOKEN_DEF (IDENTITY)
+  CS_TOKEN_DEF (INCLUDESPRITE)
   CS_TOKEN_DEF (KEY)
   CS_TOKEN_DEF (KEYCOLOR)
   CS_TOKEN_DEF (LEN)
@@ -4011,6 +4012,7 @@ bool csLoader::LoadWorld (char* buf)
     CS_TOKEN_TABLE (SOUNDS)
     CS_TOKEN_TABLE (KEY)
     CS_TOKEN_TABLE (MOTION)
+    CS_TOKEN_TABLE (INCLUDESPRITE)
   CS_TOKEN_TABLE_END
 
   csResetParserLine();
@@ -4038,20 +4040,28 @@ bool csLoader::LoadWorld (char* buf)
       switch (cmd)
       {
         case CS_TOKEN_MOTION:
-					{
-						iMotionManager* motionmanager=System->MotionMan;
-						if (!motionmanager) {
-							CsPrintf(MSG_FATAL_ERROR, "No motion manager loaded!\n");
-							fatal_exit(0, false);
-						} else {
-							iMotion* m=motionmanager->FindByName(name);
-							if(!m) {
-								m=motionmanager->AddMotion(name);
-								LoadMotion(m, params);
-							}
-						}
-					}
-					break;
+	  {
+	    iMotionManager* motionmanager=System->MotionMan;
+	    if (!motionmanager) {
+	      CsPrintf(MSG_FATAL_ERROR, "No motion manager loaded!\n");
+	      fatal_exit(0, false);
+	    } else {
+	      iMotion* m=motionmanager->FindByName(name);
+	      if(!m) {
+		m=motionmanager->AddMotion(name);
+		LoadMotion(m, params);
+	      }
+	    }
+	  }
+	  break;
+        case CS_TOKEN_INCLUDESPRITE:
+	  {
+	    char str[255];
+	    ScanStr (params, "%s", str);
+	    CsPrintf (MSG_WARNING, "Loading sprite '%s'\n", str);
+	    LoadSpriteTemplate(World, str);
+	  }
+	  break;
         case CS_TOKEN_SPRITE:
           {
             csSpriteTemplate* t = (csSpriteTemplate*)World->sprite_templates.FindByName (name);
