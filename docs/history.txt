@@ -17,8 +17,8 @@ Short-term cleanups that need to be done:
 	- Andrew made changes to DrawPolygonFX().  He fixed a number of small
 	  bugs and adjusted the prototype.  It also now safely supports 2*SRC
 	  mode.
-	- Andrew removed scanln8, scanln16, a& scanln32 and replaced them
-	  with scanln.inc.
+	- Andrew removed scanln8.inc, scanln16.inc, & scanln32.inc and
+	  replaced them with scanln.inc.
 	- Unfortunately Andrew forgot to check in the new scanln.inc file,
 	  which prevents the software renderer from compiling.  Therefore,
 	  Eric Sunshine created a replacement scanln.inc file, as a stop-gap
