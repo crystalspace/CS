@@ -13,6 +13,25 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+19-Aug-1999
+	- Added 'statistics' to engine for c-buffer rejection/acception.
+	  WalkTest also shows this with the 'stats' command.
+	- Added new criteria to BSP tree building to concentrate on more
+	  balanced trees (while still keeping splitting in mind).
+18-Aug-1999
+	- Fixed bug in BSP tree building. If a split happened on the very
+	  first level then it is possible that a crash would happen because
+	  the first array of polygons would be reallocated. This is fixed
+	  by doing a copy first. It is less efficient but at least it
+	  doesn't crash.
+	- Fixed bug in SplitWithPlane() which is used by BSP splitting
+	  code.
+	- Two bugfixes to flat shaded texture mapping in DrawPolygonFX
+	  from Andrew Zabolotny.
+	- Fixed flat color selection in DrawFilled(). If the texture
+	  is texture mapped it will take the flat color from the
+	  texture instead of the polygon.
+	- Fixed init of flat color in csPolygon3D.
 17-Aug-1999
 	- Small optimization. If a sprite is already marked visible we will
 	  not do further processing on the bounding box polygons in the BSP
@@ -22,6 +41,20 @@ Short-term cleanups that need to be done:
 	- There is still one problem with the visibility testing for sprites
 	  using the c-buffer. If the sprite is too close it may disappear
 	  (the c-buffer thinks it is not visible). I will fix that soon.
+	- Added '-huge' commandline option to WalkTest. This will create
+	  a really huge room full of random polygons. It is used to test
+	  the c-buffer system.
+	- Added new mode to BSP tree building which is a lot faster. It just
+	  takes a maximum of 20 polygons to test for splitting.
+	- Some small changes from Andrew Zabolotny. Also added autodetection
+	  of installed OpenGL libraries for OS/2.
+	- Andrew also fixed a bug in QInt() (for Intel processors only)
+	  which caused QInt (1.0) to return 0. This bug could cause the
+	  precalculated lighting stuff to fail completely (infinite
+	  recursion).
+	- Robert Bate updated Macintosh project files.
+	- Michael Dale Long updated Windows/VC project files.
+	- Thomas Hieber fixed the project file modified by Michael Dale Long.
 16-Aug-1999
 	- Added csSprite3D::AddBoundingBox().
 	- Added a csPoly3D class to csgeom similar to csPoly2D.
@@ -42,7 +75,7 @@ Short-term cleanups that need to be done:
 	      values of the vertices but instead holds indices into
 	      some array (which isn't maintained by this class).
 	      csPolygon3D and csBspPolygon now use this class.
-	- csengine knows about the following engine classes:
+	- csengine knows about the following three polygon classes:
 	    - csPolygon3D: the main polygon class. It uses csPolyIndexed
 	      (but not subclassed). It subclasses csPolygonInt so that it
 	      can be put in a BSP tree.
@@ -57,6 +90,9 @@ Short-term cleanups that need to be done:
 	- Basic c-buffer testing on sprites seems to work now. I
 	  need to test it further though. I also need to test the
 	  performance of this new system. What gain do we really get.
+	- Andrew Zabolotny added 32bpp mode support for OS/2. He also
+	  fixed RGB lighting in 32bpp modes. Blue and red channels were
+	  swapped both for low-endian and big-endian machines.
 15-Aug-1999
 	- Started work on new bounding box object. This object is
 	  specifically designed to be inserted in a BSP tree dynamically.
@@ -67,6 +103,10 @@ Short-term cleanups that need to be done:
 	- Added the calculation of bounding boxes for sprites. Every
 	  frame has its own bounding box in object space. For a skeleton
 	  sprite, every limb has its bounding box in object space.
+	- Thomas Hieber did some cleanup in the API for csWorld and
+	  csTexture.
+	- Thomas also fixed a workaround for a bug in the Jpeg loader
+	  which caused memory to be overwritten.
 13-Aug-1999
 	- Added an extra parameter to the BSP tree builder so that you
 	  can select a criteria on which to choose the BSP splitter.
@@ -74,6 +114,15 @@ Short-term cleanups that need to be done:
 	- Provided the ability to add dynamic polygons to a BSP tree.
 	  This is untested currently but the plan is to use this ability
 	  to add dynamic (i.e. moving) things and sprites to the BSP tree.
+	- Andrew Zabolotny fixed several DJGPP related issues with regards
+	  to the dependency generator that he wrote. He also fixed and
+	  improved the AA driver (ascii art). It now works on DOS but
+	  requires a version of AA lib that only Andrew has (we will soon
+	  add that to the CS site).
+	- Some other small changes from Andrew.
+	- Thomas Hieber added the ability to embed the CS output window
+	  into another application.
+	- Thomas fixed windows port to have a more consistant timer.
 12-Aug-1999
 	- Implemented an object pool for csLightPatch. This improves speed
 	  of dynamic lighting noticably.
