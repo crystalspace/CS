@@ -83,6 +83,11 @@ void csSymbolTable::AddChildren (csArray<csSymbolTable*> &children)
     AddChild (children[i]);
 }
 
+csArray<csSymbolTable *> csSymbolTable::GetChildren ()
+{
+  return Children;
+}
+
 void csSymbolTable::Propagate (const Stack *stack)
 {
   for (int i = 0; i < Children.Length (); i++)
@@ -177,7 +182,8 @@ csArray<csShaderVariable *> csSymbolTable::GetSymbols ()
 {
   csArray<csShaderVariable *> values;
   csGlobalHashIterator iter (& Hash);
-  while (iter.HasNext ()) values.Push ((csShaderVariable *) iter.Next ());
+  while (iter.HasNext ())
+    values.Push (((Stack *) iter.Next ())->Vals.Top ().Val);
   return values;
 }
 

@@ -32,6 +32,8 @@ chronological order.
 	- Oktal added a GetSymbols() method with no parameters to csSymbolTable
 	  which returns an array containing all the symbols in the table, and
 	  fixed const correctness in the class.
+	- Oktal added a GetChildren() method to csSymbolTable which returns
+	  a copy of the array of child tables.
 20-Aug-2003
 	- Jorrit moved the engine sequence manager documentation out of
 	  the xml format description. Also extended that documentation with

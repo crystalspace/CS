@@ -90,6 +90,9 @@ public:
   /// Add child tables which will inherit the symbols of this one.
   void AddChildren (csArray<csSymbolTable*> &);
 
+  /// Get the whole array of chlidren.
+  csArray<csSymbolTable *> GetChildren ();
+
   /// Set the value of a symbol, or create a new one if it doesn't exist.
   void SetSymbol (csStringID name, csShaderVariable *value);
 
