@@ -69,6 +69,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (STARTPOS)
   CS_TOKEN_DEF (STARTSPEED)
   CS_TOKEN_DEF (TOTALTIME)
+  CS_TOKEN_DEF (WEIGHT)
 CS_TOKEN_DEF_END
 
 IMPLEMENT_IBASE (csEmitFactoryLoader)
@@ -251,9 +252,11 @@ static UInt ParseMixmode (char* buf)
 }
 
 
-static iEmitGen3D* ParseEmit (char* buf, iEmitFactoryState *fstate)
+static iEmitGen3D* ParseEmit (char* buf, iEmitFactoryState *fstate,
+	float* weight)
 {
   CS_TOKEN_TABLE_START (emits)
+    CS_TOKEN_TABLE (WEIGHT)
     CS_TOKEN_TABLE (EMITBOX)
     CS_TOKEN_TABLE (EMITCONE)
     CS_TOKEN_TABLE (EMITCYLINDERTANGENT)
@@ -273,6 +276,7 @@ static iEmitGen3D* ParseEmit (char* buf, iEmitFactoryState *fstate)
   iEmitGen3D* result = 0;
   csVector3 a,b;
   float p,q,r,s,t;
+  if (weight) *weight = 1.;
 
   while ((cmd = csGetObject (&buf, emits, &name, &params)) > 0)
   {
@@ -283,6 +287,14 @@ static iEmitGen3D* ParseEmit (char* buf, iEmitFactoryState *fstate)
     }
     switch (cmd)
     {
+      case CS_TOKEN_WEIGHT:
+	if (weight == NULL)
+	{
+	  printf ("WEIGHT cannot be given in this context!\n");
+	  return 0;
+	}
+        ScanStr (params, "%f", weight);
+	break;
       case CS_TOKEN_EMITFIXED:
         {
           ScanStr (params, "%f,%f,%f", &a.x, &a.y, &a.z);
@@ -322,9 +334,7 @@ static iEmitGen3D* ParseEmit (char* buf, iEmitFactoryState *fstate)
 	  iEmitMix *emix = fstate->CreateMix();
 	  float amt;
 	  iEmitGen3D *gen;
-	  
-	  // ScanStr amt
-	  //gen = ParseEmit(bla, fstate);
+	  gen = ParseEmit(params, fstate, &amt);
 	  emix->AddEmitter(amt, gen);
           
 	  result = emix;
@@ -500,22 +510,26 @@ iBase* csEmitLoader::Parse (const char* string, iEngine* engine,
 	break;
       case CS_TOKEN_STARTPOS:
 	{
-	  emitstate->SetStartPosEmit (ParseEmit(params, emitfactorystate));
+	  emitstate->SetStartPosEmit (ParseEmit(params, emitfactorystate,
+	  	NULL));
 	}
 	break;
       case CS_TOKEN_STARTSPEED:
 	{
-	  emitstate->SetStartSpeedEmit (ParseEmit(params, emitfactorystate));
+	  emitstate->SetStartSpeedEmit (ParseEmit(params, emitfactorystate,
+	  	NULL));
 	}
 	break;
       case CS_TOKEN_STARTACCEL:
 	{
-	  emitstate->SetStartAccelEmit (ParseEmit(params, emitfactorystate));
+	  emitstate->SetStartAccelEmit (ParseEmit(params, emitfactorystate,
+	  	NULL));
 	}
 	break;
       case CS_TOKEN_ATTRACTOR:
 	{
-	  emitstate->SetAttractorEmit (ParseEmit(params, emitfactorystate));
+	  emitstate->SetAttractorEmit (ParseEmit(params, emitfactorystate,
+	  	NULL));
 	}
 	break;
     }

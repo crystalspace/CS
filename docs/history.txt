@@ -1,11 +1,8 @@
 The history order is reversed so that new features are at the top.
 
-@@@ ADD: libs/csgeom/subrec.cpp libs/csgeom/csrect.cpp
-@@@ ADD: include/csgeom/subrec.h include/csgeom/csrect.h
-@@@ REM: libs/csutil/csrect.cpp include/csutil/csrect.h
-
 21-May-2001
 	- Added non-functional emit loader/saver which Wouter can complete.
+	- Wouter worked on emit loader. I did a small enhancement too.
 20-May-2001
 	- Philip Wyett started a big overhaul of CS/Visual C++ docs.
 	- Wouter Wijngaards added an emittor particle system. This is a very
