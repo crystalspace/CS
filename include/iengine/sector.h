@@ -45,6 +45,7 @@ struct csFog;
 struct iGraphics3D;
 struct iPolygon3D;
 struct iRenderView;
+struct iSector;
 
 SCF_VERSION (iSectorCallback, 0, 0, 1);
 
