@@ -163,7 +163,7 @@ class Integrator
 		shear_rigidity      = 0.8;
 		dt           = 0.05;
 		time         = 0.0;
-		int  i;
+		uint  i;
 		velocities   = new csVector3 [ nverts ];
 		forces       = new csVector3 [ nverts ];
 #if defined(AMPC_PROVOT)
@@ -229,7 +229,7 @@ class Integrator
 #if defined(AMPC_PROVOT)
 	ComputeFields();
 	ComputeShearFields();	  
-        int i;     
+        uint i;     
 		  cloth_object->object_bbox->StartBoundingBox ( *(cloth_object->shift) +vertices[0] );
    for (i=0;i<nverts;i++)
    {
@@ -247,7 +247,6 @@ class Integrator
 	  
 	inline void ComputeFields()
 	{
-		Constraint* first;		
 		Constraint* p;
 		csVector3   temp;
 		float       N;
@@ -281,7 +280,6 @@ class Integrator
 	
 	inline void ComputeShearFields()
 	{
-		Constraint* first;		
 		Constraint* p;
 		csVector3   temp;
 		float       N;
@@ -315,7 +313,6 @@ class Integrator
 	
 	inline void ApplyProvotConstraint()
 	{
-	Constraint* first;
 	Constraint* p;
 	csVector3   temp;
 	float       N;
@@ -369,7 +366,6 @@ class Integrator
 	
 		inline void ApplyShearProvotConstraint()
 	{
-	Constraint* first;
 	Constraint* p;
 	csVector3   temp;
 	float       N;
@@ -426,7 +422,7 @@ class Integrator
 	
 	inline void Compute()
 	{
-		int i;
+		uint i;
 #if defined(EULER_PROVOT)		
 		time += dt;
 		ComputeFields();

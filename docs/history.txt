@@ -65,6 +65,8 @@ The history order is reversed so that new features are at the top.
 	  "undefined reference to `atexit'" error on some platforms.
 	- Eric Sunshine eliminated compilation warnings in prsseq.cpp.
 	- Eric Sunshine eliminated unused function from syntxldr.cpp.
+	- Eric Sunshine eliminated an enormous number of compilation warnings
+	  from the cloth plugin.
 23-Sep-2002
 	- Added new iEngineSequenceManager API. This is going to be used
 	  for an engine sequence manager. More info on this new feature

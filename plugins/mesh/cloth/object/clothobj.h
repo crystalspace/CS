@@ -369,14 +369,12 @@ class StuffFactory : public iMeshObjectFactory
 	SetVertexCount  ( ( Xsize + 1 )*( Ysize + 1 ) );
 	SetTriangleCount( 4 * Xsize * Ysize ); 
 	uint nverts = scfParent->num_vertices;
-	uint ntris  = scfParent->num_triangles;
-	int count;
 			
 	float xindex=0.0;
 	float yindex=0.0;
-	int i;
-	int j;
-	int k;
+	uint i;
+	uint j;
+	uint k;
     
      for (i=0;i<nverts;i++) {
 		 scfParent->factory_vertices[i].z=0.0;  //(xindex-3)*(yindex-3);

@@ -49,13 +49,13 @@ bool Cloth::AddConstraint ( int v0 , int v1 , Constraint** edge , int* pos)
 		return false;
 	};
 	Constraint* p;
-	int size    = Edges->Length();  
+	uint size    = Edges->Length();  
 	for (uint i=0; i < size ; i++ )
 	{
 		p = (Constraint*) Edges -> Get( i ); 
-		if ((p->v0==v0) || (p->v0==v1)) 
+		if ((p->v0==(uint)v0) || (p->v0==(uint)v1)) 
 		{
-			if ((p->v1==v0) || (p->v1==v1))
+			if ((p->v1==(uint)v0) || (p->v1==(uint)v1))
 			{ 
 				*edge = p;	
 				*pos  = i;
@@ -77,13 +77,13 @@ bool Cloth::AddShearConstraint ( int v0 , int v1 , Constraint** edge , int* pos)
 		return false;
 	};
 	Constraint* p;
-	int size    = Shear_Neighbours->Length();  
+	uint size    = Shear_Neighbours->Length();  
 	for (uint i=0; i < size ; i++ )
 	{
 		p = (Constraint*) Shear_Neighbours -> Get( i ); 
-		if ((p->v0==v0) || (p->v0==v1)) 
+		if ((p->v0==(uint)v0) || (p->v0==(uint)v1)) 
 		{
-			if ((p->v1==v0) || (p->v1==v1))
+			if ((p->v1==(uint)v0) || (p->v1==(uint)v1))
 			{ 
 				*edge = p;	
 				*pos  = i;
@@ -123,7 +123,7 @@ Cloth::Cloth( iClothFactoryState* mesh,
 	nedges              = 0;
 	vertices            = new csVector3[ nverts ];  
 	
-	for (i = 0; i < nverts ; i++)
+	for (i = 0; i < (uint)nverts ; i++)
 	{
 		vertices[i].Set( verts[i].x , verts[i].y , verts[i].z );
 	};
@@ -140,9 +140,7 @@ Cloth::Cloth( iClothFactoryState* mesh,
 	                                         
 	//int* vidx;
 	//printf( " CREATING the cloth3... \n");
-	int index=0;
 	//int tri;
-	int v;
 	Constraint* current;
 	//Constraint* b;
 	//Constraint* c;
