@@ -68,6 +68,18 @@
   #pragma warning(disable:4248)   /* MSVC6 gives bogus "protected constructor"
 				   * for csHash::*Iterator, even though csHash
 				   * is friend. */
+  #pragma warning(disable:4284)   /* At least some versions of MSVC6 (though
+				   * not all) complain about
+				   * csList<int>::operator->() returning a
+				   * pointer to a base type.  In general, this
+				   * is a valid complaint because you can not
+				   * legally apply -> to a pointer to a base
+				   * type, however, in the context of a
+				   * template, such as csList<>, the complaint
+				   * is useless if it occurs at declaration
+				   * time.  It would be meaningful if it
+				   * complained at invocation time, though.
+				   */
   #pragma warning(disable:4503)   /* 'identifier' : decorated name length 
 				   * exceeded, name was truncated */
 #endif
