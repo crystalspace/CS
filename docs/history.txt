@@ -23,6 +23,7 @@ chronological order.
 	- res fixed a recent leak fix in csImage to not subsequently crash
 	  when a paletted image is converted to another paletted format
 	  (notably, stripping or adding alpha).
+	- res fixed some weird line breaks in wxgl.csplugin.
 	- Luca fixed a little compilation error (in xmlshader) that was 
 	  happening on the VisualC++ 6.0 "compiler".
 	- Squee fixed a problem in OpenGL canvases where alpha colors didn't
