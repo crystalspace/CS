@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,7 +20,6 @@
 #define __CS_POLYTEXT_H__
 
 #include "csgeom/math3d.h"
-#include "csengine/lview.h"
 #include "iengine/polygon.h"
 
 class csPolygon3D;
@@ -28,6 +27,8 @@ class Textures;
 class csPolyPlane;
 class csLightMap;
 class csLightPatch;
+class csFrustumView;
+class csFrustumViewCleanup;
 class csBitSet;
 class Dumper;
 struct iMaterialHandle;

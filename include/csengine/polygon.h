@@ -42,6 +42,7 @@ class csPolyPlane;
 class csPolyTxtPlane;
 class csPolygon2D;
 class csPolygon3D;
+class csLight;
 class csLightMap;
 class csLightPatch;
 class Dumper;

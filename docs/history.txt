@@ -1,6 +1,9 @@
 The history order has been reversed so that new features are at the top.
 
 21-Mar-2001:
+	- Removed a few unneeded includes to lview.h. As few things as
+	  possible should include that file since we're going to do
+	  that through SCF soon.
 	- Reverted the fix from Philip to python plugin and did the fix the
 	  'right' way.  Please don't modify cs_pyth.cpp directly.  It is an
 	  automatically generated file and it makes no sense to modify it.  You

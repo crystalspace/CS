@@ -26,6 +26,7 @@
 #include "csengine/cbuffer.h"
 #include "csengine/quadtr3d.h"
 #include "csengine/covtree.h"
+#include "csengine/lview.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 #include "iengine/rview.h"
