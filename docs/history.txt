@@ -13,6 +13,20 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+30-Sep-1999
+	- Eric Sunshine ported map2cs to Unix.  He created map2cs.mak which
+	  conforms to the CS makefile system.  He was also forced to renamed
+	  parser.{h|cpp} and main.cpp to mparser.{h|cpp} and map2cs.cpp,
+	  respectively.  Unfortunately, the original file names conflicted
+	  with other file names used elsewhere in CS, and the flat structure
+	  of the 'out' object-file directory prevents use of files with the
+	  same name even in different subprojects.  (We really need to do
+	  something to resolve this less than ideal situation.)  He also
+	  replaced a Windows-specific calls with more portable code.
+	- Eric Sunshine fixed a bug in map2cs where some variables were
+	  shadowing others with the same name.  The code incorrectly assumed
+	  that it was setting the values of the original variables, when in
+	  fact it was not.
 29-Sep-1999
 	- Added initial code base from Brandon Ehle for the CS scripting
 	  layer.
@@ -50,6 +64,7 @@ Short-term cleanups that need to be done:
 	  boundary condition.
 	- Eric Sunshine fixed the new command-line -cfg option in Squawk 17
 	  so that it actually works.
+	- Thomas Hieber imported his map2cs utility into the CVS repository.
 28-Sep-1999
 	- Csparser detects duplicate vertex indices in polygons and ignores
 	  them (while given a warning at the same time).
