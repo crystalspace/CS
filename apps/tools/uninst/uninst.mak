@@ -25,7 +25,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-
 UNINST.EXE = uninst$(EXE.CONSOLE)
 DIR.UNINST = apps/tools/uninst
 OUT.UNINST = $(OUT)/$(DIR.UNINST)
@@ -34,6 +33,8 @@ SRC.UNINST = apps/tools/uninst/uninst.cpp
 OBJ.UNINST = $(addprefix $(OUT.UNINST)/,$(notdir $(SRC.UNINST:.cpp=$O)))
 DEP.UNINST =
 LIB.UNINST =
+
+OUTDIRS += $(OUT.UNINST)
 
 # Uninstall program is installed in the CS root rather than CS/bin.
 TO_INSTALL.ROOT += $(UNINST.EXE)
@@ -50,7 +51,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: build.uninst uninstclean uninstcleandep
 
 all apps: uninst
-build.uninst: $(OUT.UNINST) $(UNINST.EXE)
+build.uninst: $(OUTDIRS) $(UNINST.EXE)
 clean: uninstclean
 
 $(OUT.UNINST)/%$O: $(DIR.UNINST)/%.cpp
@@ -58,9 +59,6 @@ $(OUT.UNINST)/%$O: $(DIR.UNINST)/%.cpp
 
 $(UNINST.EXE): $(OBJ.UNINST) $(LIB.UNINST)
 	$(DO.LINK.CONSOLE.EXE)
-
-$(OUT.UNINST):
-	$(MKDIRS)
 
 uninstclean:
 	-$(RM) uninst.txt

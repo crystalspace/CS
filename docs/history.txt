@@ -35,6 +35,11 @@ The history order is reversed so that new features are at the top.
 	  duplicate directory-creation rules from these two makefiles, and by
 	  upgrading the OUTDIRS creation rule in cs.mak to use MKDIRS rather
 	  than MKDIR.
+	- Eric Sunshine fixed uninst.mak so that it creates its output
+	  directory even when invoked implicitly via the "install" target.
+	  Fixed using same technique as used for bugplug.mak and iso.mak.  We
+	  need to apply this fix to all such makefiles (presently, all
+	  application makefiles).
 26-Mar-2003
 	- Fixed a bug with the new OpenPortal() implementation in OpenGL
 	  renderer.  It was not setting/restoring the stencil in all cases.
