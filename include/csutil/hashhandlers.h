@@ -89,4 +89,22 @@ public:
   }
 };
 
+/**
+ * A hash key handler for struct type keys.
+ */
+template <class T>
+class csStructKeyHandler
+{
+public:
+  static uint32 ComputeHash (const csRef<T>& key)
+  {
+    return csHashCompute ((char*)&key, sizeof (T));
+  }
+
+  static bool CompareKeys (const csRef<T>& key1, const csRef<T>& key2)
+  {
+    return (memcmp (&key1, &key2, sizeof (T)) == 0);
+  }
+};
+
 #endif // __CS_UTIL_HASHHANDLERS_H__

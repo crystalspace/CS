@@ -4,7 +4,7 @@ JAMCONFIG ?= $(BUILDTOP)/Jamconfig ;
 include $(JAMCONFIG) ;
 if ! $(JAMCONFIG_READ)
 {
-    EXIT "Could not locat configuration. Please run 'configure' first." ;
+    EXIT "Could not locate configuration. Please run 'configure' first." ;
 }
 
 # Set up compiler flags

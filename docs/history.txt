@@ -41,6 +41,9 @@ chronological order.
 	- res added a declaration of iBase to weakref.h.
 	- res added a sanity check for the sector in the NR part in 
 	  csEngine::Draw().
+	- res changed a few header files that incorrectly had a GPL boilerplate.
+	- res added a "struct" hash element handler.
+	- res fixed a typo in Jamrules.template.
 14-May-2004
 	- Eric Sunshine worked around VS.NET warning C4345 in blockallocator.h.
 	- Eric Sunshine augmented the Jam check in configure.ac so that it now
