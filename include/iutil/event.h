@@ -199,7 +199,7 @@ struct iEvent : public iBase
 {
   /// Event type (one of #csevKeyDown etc.)
   uint8 Type;			
-  /// Event cathegory (unused by CSWS)
+  /// Event category (unused by CSWS)
   uint8 Category;		
   /// Even finer granularity
   uint8 SubCategory;		
@@ -247,7 +247,7 @@ struct iEvent : public iBase
   virtual bool Find(const char *name, float &v, int index = 0) = 0;
   virtual bool Find(const char *name, double &v, int index = 0) = 0;
   virtual bool Find(const char *name, char **v, int index = 0) = 0;
-  virtual bool Find(const char *name, void **v, uint32 &size, int index = 0) = 0;
+  virtual bool Find(const char *name, void **v, uint32 &size, int index = 0)=0;
 #ifndef CS_USE_FAKE_BOOL_TYPE
   virtual bool Find(const char *name, bool &v, int index = 0) = 0;
 #endif
@@ -489,6 +489,5 @@ struct iEventCord : public iBase
 };
 
 /** @} */
-
 
 #endif // __CS_IUTIL_EVENT_H__
