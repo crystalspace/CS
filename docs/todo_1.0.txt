@@ -14,7 +14,7 @@ can be given:
 	- **: bug or feature has been fixed or implemented.
 
 Bugs to fix:
-	[O]  Fix the problem with adding -lutil for more recent
+	[**] Fix the problem with adding -lutil for more recent
 	     versions of python. This should be automatic and not manual.
 	[V]  Investigate if LOD for sprites is still working.
 	[S]  Investigate if there are any more memory leaks after
@@ -23,7 +23,7 @@ Bugs to fix:
 	     CS. To enable this just edit include/csutil/debug.h and
 	     remove the comment ('//') right before the define of
 	     CS_USE_GRAPHDEBUG. Then recompile.
-	[V]  Shoot a missile in hole in flarge. The walls of the hole
+	[**] Shoot a missile in hole in flarge. The walls of the hole
 	     become lit ok then but revert to full bright after missile
 	     particles have disappeared. Only with OpenGL.
 	[V]  It seems that pseudo-dynamic lighting is not working
@@ -145,7 +145,7 @@ Bugs to fix:
 	     the movable is changed.
 	     [Bug 478072]
 	[S]  Using software renderer proctexes with OpenGL causes a crash
-	     (At some place the OpenGL texture's images get NULL)
+	     (At some place the OpenGL texture's images get NULL).
 	
 API and Small Feature Additions:
 	[F]  Translate point on polygon to texture space/object space
