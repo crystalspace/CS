@@ -5,7 +5,8 @@ The history order has been reversed so that new features are at the top.
 	  the new indices defined in GetEdgeInfo().  Added a second variant of
 	  GetEdge which fills in a given csSegment3 structure.
 	- Also did similar things to csBox2 (i.e. add GetEdgeInfo(), GetEdge(),
-	  etc.).
+	  ...).
+	- Fixed 3ds2lev texture mapping. I think it now works correctly.
 	- Eric Sunshine fixed a Texinfo error in beos.txi which was reported
 	  by 'makeinfo'.
 	- Eric Sunshine fixed some out-of-date information and discussion in
