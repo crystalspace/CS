@@ -480,4 +480,12 @@ Command: delbot
 Type:    general command
 Action:  Remove the last added bot.
 
+Command: addsprite
+Type:    general command
+Action:  Add a sprite from a template already in memory.
+	 'addsprite <name>,<size>'. <name> is the name of
+	  a sprite template which needs to be loaded in memory (either
+	  from standard.zip or from the level). The <size> is a scale
+	  factor for the sprite. The sprite is put at the current
+	  location.
 
