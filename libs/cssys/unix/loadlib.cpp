@@ -34,6 +34,7 @@
 // list of paths searched for plugins
 class __loadlib_init
 {
+public:
   __loadlib_init ()
   {
     char path [1255];
