@@ -132,7 +132,8 @@ struct csThingBBox
 
 /**
  * If CS_ENTITY_VISTREE is set then an octree will be calculated for the
- * polygons in this thing.
+ * polygons in this thing. In this case the thing will implement a
+ * fully working iVisibilityCuller which the sector can use.
  */
 #define CS_ENTITY_VISTREE 256
 
@@ -159,10 +160,13 @@ struct csThingBBox
  * the polygons form a sort of container or room where the camera
  * can be located. This kind of thing can be used for the outside
  * walls of a sector. In another kind the polygons are
- * oriented such that they are visible from the outside.
+ * oriented such that they are visible from the outside.<p>
  *
  * Things can also be used for volumetric fog. In that case
  * the Thing must be convex.
+ *
+ * If you add a static tree (octree/BSP trees) to a thing it can
+ * be used as a visibility culler (i.e. it implements iVisibilityCuller).
  */
 class csThing : public csPObject
 {
@@ -208,25 +212,20 @@ private:
    */
   long light_frame_number;
 
-  /**
-   * Draw the given array of polygons in the current csPolygonSet. This
-   * function is called by subclasses of csPolygonSet (csSector and
-   * csThing currently). This version uses iGraphics3D->DrawPolygonMesh()
-   * for more efficient rendering. WARNING! This version only works for
-   * lightmapped polygons right now.
-   */
-  void DrawPolygonArrayDPM (csPolygonInt** polygon, int num, csRenderView* rview,
-  	bool use_z_buf);
-
   /// Fog information.
   csFog fog;
 
-private:
   /**
    * Vector with visibility objects. Only useful if this thing has a
    * static tree and thus can do visibility testing.
    */
   csVector visobjects;
+
+  /**
+   * If this variable is not NULL then it is a BSP or octree for this
+   * thing.
+   */
+  csPolygonTree* static_tree;
 
   /// Engine handle.
   csEngine* engine;
@@ -237,105 +236,42 @@ private:
   /// Pointer to the Thing Template which it derived from.
   csThing* ParentTemplate;
 
-  /**
-   * If this variable is not NULL then it is a BSP or octree for this
-   * thing.
-   */
-  csPolygonTree* static_tree;
-
-  /**
-   * Utility function to be called whenever obj changes which updates
-   * object to world transform in all of the curves
-   */
-  void UpdateCurveTransform ();
-
-  /// Internal draw function.
-  void DrawInt (csRenderView& rview);
-
   /// If true this thing is visible.
   bool is_visible;
 
-  /// If true this thing is a 'sky' object.
+  /// If true this thing is a 'sky' object. @@@ Obsolete when 'render order' is implemented
   bool is_sky;
 
   /// If true this thing is a 'template' object.
   bool is_template;
 
-  /**
-   * Update this thing in the polygon trees.
-   */
-  void UpdateInPolygonTrees ();
-
   /// Position in the world.
   csMovable movable;
 
-protected:
-  /// Move this thing to the specified sector. Can be called multiple times.
-  virtual void MoveToSector (csSector* s);
-
-  /// Remove this thing from all sectors it is in (but not from the engine).
-  virtual void RemoveFromSectors ();
-
   /**
-   * Update transformations after the thing has moved
-   * (through updating the movable instance).
-   * This MUST be done after you change the movable otherwise
-   * some of the internal data structures will not be updated
-   * correctly. This function is called by movable.UpdateMove().
+   * Tesselation parameter:
+   * Center of thing to determine distance from
    */
-  virtual void UpdateMove ();
+  csVector3 curves_center;
+  /**
+   * Scale param (the larger this param it, the more the curves are
+   * tesselated).
+   */
+  float curves_scale;  
+
+  /// Curve vertices. 
+  csVector3* curve_vertices;
+  /// Texture coords of curve vertices
+  csVector2* curve_texels;
+
+  /// Number of vertices.
+  int num_curve_vertices;
+  /// Maximum number of vertices.
+  int max_curve_vertices;
 
 public:
   /// Set of flags
   csFlags flags;
-
-public:
-
-//@@@@@@@@@@@@@@@@ CHECK OUT PRIVATE/PUBLIC/PROTECTED OF THIS CLASS
-//@@@@@@@@@@@@@@@@ ORDER FUNCTIONS IN THIS CLASS ON FUNCTIONALITY
-
-//@@@@@@@@@@@@@@@@@@
-  /**
-   * Draw the given array of polygons in the current csPolygonSet. This
-   * function is called by subclasses of csPolygonSet (csSector and
-   * csThing currently).
-   */
-  static void DrawPolygonArray (csPolygonInt** polygon, int num, csRenderView* rview,
-  	bool use_z_buf);
-//@@@@@@@@@@@@@@@@@@
-  /**
-   * Test a number of polygons against the c-buffer and insert them to the
-   * c-buffer if visible and also add them to a queue.
-   * If 'pvs' is true then the PVS is used (polygon->IsVisible()).
-   */
-  static void* TestQueuePolygonArray (csPolygonInt** polygon, int num, csRenderView* d,
-  	csPolygon2DQueue* poly_queue, bool pvs);
-//@@@@@@@@@@@@@@@@@@@
-  /**
-   * Draw one 3D/2D polygon combination. The 2D polygon is the transformed
-   * and clipped version of the 3D polygon.
-   */
-  static void DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly, csRenderView* d,
-	bool use_z_buf);
-//@@@@@@@@@@@@
-  /**
-   * This function is called by the BSP tree traversal routine
-   * to test polygons against the C buffer and add them to a queue if needed.
-   */
-  static void* TestQueuePolygons (csThing*, csPolygonInt** polygon,
-  	int num, bool same_plane, void* data);
-//@@@@@@@@@@@
-  /**
-   * Draw a number of polygons from a queue (used with C buffer processing).
-   */
-  void DrawPolygonsFromQueue (csPolygon2DQueue* queue, csRenderView* rview);
-//@@@@@@@@@@@@
-  /**
-   * This function is called by the BSP tree traversal routine
-   * to draw a number of polygons.
-   */
-  static void* DrawPolygons (csThing*, csPolygonInt** polygon,
-  	int num, bool same_plane, void* data);
 
   /**
    * Current light frame number. This is used for seeing
@@ -353,24 +289,79 @@ public:
    */
   int draw_busy;
 
+private:
   /**
-   * Tesselation parameter:
-   * Center of thing to determine distance from
+   * Draw the given array of polygons in the current thing.
+   * This version uses iGraphics3D->DrawPolygonMesh()
+   * for more efficient rendering. WARNING! This version only works for
+   * lightmapped polygons right now and is far from complete.
    */
-  csVector3 curves_center;
-  /// scale param (the larger this param it, the more the curves are tesselated).
-  float curves_scale;  
+  void DrawPolygonArrayDPM (csPolygonInt** polygon, int num,
+	csRenderView* rview, bool use_z_buf);
 
-  /// Curve vertices. 
-  csVector3* curve_vertices;
-  /// Texture coords of curve vertices
-  csVector2* curve_texels;
+  /**
+   * Draw the given array of polygons in the current csPolygonSet.
+   */
+  static void DrawPolygonArray (csPolygonInt** polygon, int num,
+	csRenderView* rview, bool use_z_buf);
 
-  /// Number of vertices.
-  int num_curve_vertices;
-  /// Maximum number of vertices.
-  int max_curve_vertices;
+  /**
+   * Test a number of polygons against the c-buffer and insert them to the
+   * c-buffer if visible and also add them to a queue.
+   * If 'pvs' is true then the PVS is used (polygon->IsVisible()).
+   */
+  static void* TestQueuePolygonArray (csPolygonInt** polygon, int num,
+	csRenderView* d, csPolygon2DQueue* poly_queue, bool pvs);
 
+  /**
+   * Draw one 3D/2D polygon combination. The 2D polygon is the transformed
+   * and clipped version of the 3D polygon.
+   */
+  static void DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
+	csRenderView* d, bool use_z_buf);
+
+  /**
+   * This function is called by the BSP tree traversal routine
+   * to test polygons against the C buffer and add them to a queue if needed.
+   */
+  static void* TestQueuePolygons (csThing*, csPolygonInt** polygon,
+  	int num, bool same_plane, void* data);
+
+  /**
+   * Draw a number of polygons from a queue (used with C buffer processing).
+   */
+  void DrawPolygonsFromQueue (csPolygon2DQueue* queue, csRenderView* rview);
+
+  /**
+   * This function is called by the BSP tree traversal routine
+   * to draw a number of polygons.
+   */
+  static void* DrawPolygons (csThing*, csPolygonInt** polygon,
+  	int num, bool same_plane, void* data);
+
+  /**
+   * Utility function to be called whenever movable changes so the
+   * object to world transforms in all the curves have to be updated.
+   */
+  void UpdateCurveTransform ();
+
+  /// Internal draw function.
+  void DrawInt (csRenderView& rview);
+
+  /// Move this thing to the specified sector. Can be called multiple times.
+  void MoveToSector (csSector* s);
+
+  /// Remove this thing from all sectors it is in (but not from the engine).
+  void RemoveFromSectors ();
+
+  /**
+   * Update transformations after the thing has moved
+   * (through updating the movable instance).
+   * This MUST be done after you change the movable otherwise
+   * some of the internal data structures will not be updated
+   * correctly. This function is called by movable.UpdateMove().
+   */
+  void UpdateMove ();
 
 public:
   /**
@@ -381,14 +372,9 @@ public:
   /// Destructor.
   virtual ~csThing ();
 
-  /**
-   * Prepare all polygons for use. This function MUST be called
-   * AFTER the texture manager has been prepared. This function
-   * is normally called by csEngine::Prepare() so you only need
-   * to worry about this function when you add sectors or things
-   * later.
-   */
-  void Prepare (csSector* sector);
+  //----------------------------------------------------------------------
+  // Vertex handling functions
+  //----------------------------------------------------------------------
 
   /// Just add a new vertex to the thing.
   int AddVertex (const csVector3& v) { return AddVertex (v.x, v.y, v.z); }
@@ -404,7 +390,10 @@ public:
    * to add a lot of vertices you should just use AddVertex()
    * and call CompressVertices() later.
    */
-  int AddVertexSmart (const csVector3& v) { return AddVertexSmart (v.x, v.y, v.z); }
+  int AddVertexSmart (const csVector3& v)
+  {
+    return AddVertexSmart (v.x, v.y, v.z);
+  }
 
   /**
    * Add a vertex but first check if there is already
@@ -444,6 +433,10 @@ public:
   /// Return the number of vertices.
   int GetNumVertices () { return num_vertices; }
 
+  //----------------------------------------------------------------------
+  // Polygon handling functions
+  //----------------------------------------------------------------------
+
   /// Add a polygon to this thing.
   void AddPolygon (csPolygonInt* spoly);
 
@@ -466,6 +459,10 @@ public:
 
   /// Get the entire array of polygons.
   csPolygonArray& GetPolygonArray () { return polygons; }
+
+  //----------------------------------------------------------------------
+  // Curve handling functions
+  //----------------------------------------------------------------------
 
   /// Add a curve to this thing.
   void AddCurve (csCurve* curve);
@@ -496,47 +493,107 @@ public:
   /// Add a curve vertex and return the index of the vertex.
   int AddCurveVertex (csVector3& v, csVector2& t);
 
-  /**
-   * Get the movable instance for this thing.
-   * It is very important to call GetMovable().UpdateMove()
-   * after doing any kind of modification to this movable
-   * to make sure that internal data structures are
-   * correctly updated.
-   */
-  csMovable& GetMovable () { return movable; }
+  /// Get the curve scale.
+  float GetCurvesScale () { return curves_scale; }
+
+  /// Set the curve scale.
+  void SetCurvesScale (float f) { curves_scale = f; }
+
+  /// Get the curves center.
+  const csVector3& GetCurvesCenter () { return curves_center; }
+
+  /// Set the curves center.
+  void SetCurvesCenter (csVector3& v) { curves_center = v; }
+
+  //----------------------------------------------------------------------
+  // Setup
+  //----------------------------------------------------------------------
 
   /**
-   * Return true if this thing is a sky object.
+   * Prepare all polygons for use. This function MUST be called
+   * AFTER the texture manager has been prepared. This function
+   * is normally called by csEngine::Prepare() so you only need
+   * to worry about this function when you add sectors or things
+   * later.
    */
-  bool IsSky () { return is_sky; }
+  void Prepare (csSector* sector);
 
   /**
-   * Return true if this thing is a template.
+   * Merge the given Thing into this one. The other polygons and
+   * curves are removed from the other thing so that it is ready to
+   * be removed. Warning! All Things are merged in world space
+   * coordinates and not in object space as one could expect!
    */
-  bool IsTemplate () { return is_template; }
+  void Merge (csThing* other);
 
   /**
-   * Set convexity flag of this thing. You should call this instead
-   * of SetFlags (CS_ENTITY_CONVEX, CS_ENTITY_CONVEX) because this function
-   * does some extra calculations.
+   * Add polygons and vertices from the specified template. Replace the
+   * materials if they match one in the matList.
    */
-  void SetConvex (bool c);
+  void MergeTemplate (csThing* tpl, csSector* sector, csMaterialList* matList,
+  	const char* prefix, 
+	csMaterialWrapper* default_material = NULL,
+  	float default_texlen = 1, bool objspace = false,
+	csVector3* shift = NULL, csMatrix3* transform = NULL);
 
   /**
-   * If this thing is convex you can use getCenter to get the index
-   * of the vertex holding the center of this thing. This center is
-   * calculated by 'setConvex(true)'.
+   * Add polygons and vertices from the specified thing (seen as template).
    */
-  int GetCenter () { return center_idx; }
+  void MergeTemplate (csThing* tpl, csSector* sector,
+  	csMaterialWrapper* default_material = NULL,
+  	float default_texlen = 1, bool objspace = false,
+	csVector3* shift = NULL, csMatrix3* transform = NULL);
 
-  /// Mark this thing as visible.
-  void MarkVisible () { is_visible = true; }
+  /// Set parent template.
+  void SetTemplate (csThing *t)
+  { ParentTemplate = t; }
 
-  /// Mark this thing as invisible.
-  void MarkInvisible () { is_visible = false; }
+  /// Query parent template.
+  csThing *GetTemplate () const
+  { return ParentTemplate; }
 
-  /// Return if this thing is visible.
-  bool IsVisible () { return is_visible; }
+  //----------------------------------------------------------------------
+  // Bounding information
+  //----------------------------------------------------------------------
+
+  /**
+   * Create an oriented bounding box (currently not oriented yet@@@)
+   * for this polygon set. This function will add the vertices for the
+   * bounding box to the set itself so that they will get translated
+   * together with the other vertices. The indices of the vertices
+   * are added to the csThingBBox structure which is returned here.
+   * Note that this creation is done in object space. The newly added
+   * vertices will not have been translated to world/camera space yet.<p>
+   */
+  void CreateBoundingBox ();
+
+  /// Get the oriented bounding box created by CreateBoundingBox().
+  csThingBBox* GetBoundingBox ()
+  {
+    if (!bbox) CreateBoundingBox ();
+    return bbox;
+  }
+
+  /**
+   * Get the bounding box in object space for this polygon set.
+   * This is calculated based on the oriented bounding box.
+   */
+  void GetBoundingBox (csBox3& box);
+
+  /**
+   * Get the radius in object space for this polygon set.
+   */
+  const csVector3& GetRadius ();
+
+  /**
+   * Find the minimum and maximum Z values of all vertices in
+   * this polygon set (in camera space). This is used for planed fog.
+   */
+  void GetCameraMinMaxZ (float& minz, float& mazx);
+
+  //----------------------------------------------------------------------
+  // Visibility culler
+  //----------------------------------------------------------------------
 
   /**
    * Get the static polygon tree.
@@ -553,20 +610,27 @@ public:
    */
   void BuildStaticTree (int mode = BSP_MINIMIZE_SPLITS, bool octree = false);
 
-  /**
-   * Merge the given Thing into this one. The other polygons and
-   * curves are removed from the other thing so that it is ready to
-   * be removed. Warning! All Things are merged in world space
-   * coordinates and not in object space as one could expect!
-   */
-  void Merge (csThing* other);
+  /// Register a visibility object with this culler.
+  void RegisterVisObject (iVisibilityObject* visobj);
+  /// Unregister a visibility object with this culler.
+  void UnregisterVisObject (iVisibilityObject* visobj);
 
   /**
-   * Prepare the lightmaps for all polys so that they are suitable
-   * for the 3D rasterizer.
+   * Do the visibility test from a given viewpoint. This will first
+   * clear the visible flag on all registered objects and then it will
+   * mark all visible objects.
    */
-  void CreateLightMaps (iGraphics3D* g3d);
+  bool VisTest (iRenderView* irview);
 
+  /// The movable has changed.
+  void MovableChanged (iMovable* movable, void* userdata);
+  /// The movable is about to be destroyed.
+  void MovableDestroyed (iMovable* movable, void* userdata);
+
+  //----------------------------------------------------------------------
+  // Drawing
+  //----------------------------------------------------------------------
+  
   /**
    * Draw this thing given a view and transformation.
    */
@@ -583,26 +647,38 @@ public:
    */
   void DrawFoggy (csRenderView& rview);
 
+  //----------------------------------------------------------------------
+  // Lighting
+  //----------------------------------------------------------------------
+  
+  /**
+   * Prepare the lightmaps for all polys so that they are suitable
+   * for the 3D rasterizer.
+   */
+  void CreateLightMaps (iGraphics3D* g3d);
+
   /**
    * Init the lightmaps for all polygons in this thing.
    */
   void InitLightMaps (bool do_cache = true);
 
   /**
-   * Check frustum visibility on this thing.
-   */
-  void RealCheckFrustum (csFrustumView& lview);
-
-  /**
-   * Check frustum visibility on this thing.
-   * First initialize the 2D culler cube.
-   */
-  void CheckFrustum (csFrustumView& lview);
-
-  /**
    * Cache the lightmaps for all polygons in this thing.
    */
   void CacheLightMaps ();
+
+  /// Mark this thing as visible.
+  void MarkVisible () { is_visible = true; }
+
+  /// Mark this thing as invisible.
+  void MarkInvisible () { is_visible = false; }
+
+  /// Return if this thing is visible.
+  bool IsVisible () { return is_visible; }
+
+  //----------------------------------------------------------------------
+  // Utility functions
+  //----------------------------------------------------------------------
 
   /**
    * Intersects world-space sphere with polygons of this set. Return
@@ -612,31 +688,8 @@ public:
    * If 'pr' != NULL it will also return the distance where the
    * intersection happened.
    */
-  csPolygon3D* IntersectSphere (csVector3& center, float radius, float* pr = NULL);
-
-  /**
-   * Add polygons and vertices from the specified template. Replace the materials if they 
-   * match one in the matList.
-   */
-  void MergeTemplate (csThing* tpl, csSector* sector, csMaterialList* matList, const char* prefix, 
-	csMaterialWrapper* default_material = NULL,
-  	float default_texlen = 1, bool objspace = false,
-	csVector3* shift = NULL, csMatrix3* transform = NULL);
-
-  /**
-   * Add polygons and vertices from the specified thing (seen as template).
-   */
-  void MergeTemplate (csThing* tpl, csSector* sector, csMaterialWrapper* default_material = NULL,
-  	float default_texlen = 1, bool objspace = false,
-	csVector3* shift = NULL, csMatrix3* transform = NULL);
-
-  /// Set parent template
-  void SetTemplate (csThing *t)
-  { ParentTemplate = t; }
-
-  /// Query parent template
-  csThing *GetTemplate () const
-  { return ParentTemplate; }
+  csPolygon3D* IntersectSphere (csVector3& center, float radius,
+  	float* pr = NULL);
 
   /**
    * Intersect world-space segment with polygons of this set. Return
@@ -650,6 +703,42 @@ public:
   csPolygon3D* IntersectSegment (const csVector3& start, 
                                        const csVector3& end, csVector3& isect,
 				       float* pr = NULL);
+
+  /**
+   * Intersect this polygon set in camera space with a polygon which
+   * coincides with plane Zc = <value> (a plane parallel to the view
+   * plane) and return a new polygon which is the intersection (as a 2D
+   * polygon with z not given). This function assumes that the
+   * polygon set is convex (so it can in general not be used for polygon
+   * sets which use a BSP tree) and gives unexpected results otherwise.
+   * Delete the returned polygon with 'delete []' when ready.
+   */
+  csVector2* IntersectCameraZPlane (float z, csVector2* clipper,
+  	int num_clip, int& num_pts);
+
+  /**
+   * Check frustum visibility on this thing.
+   */
+  void RealCheckFrustum (csFrustumView& lview);
+
+  /**
+   * Check frustum visibility on this thing.
+   * First initialize the 2D culler cube.
+   */
+  void CheckFrustum (csFrustumView& lview);
+
+  /**
+   * Return a list of shadow frustums which extend from
+   * this polygon set. The origin is the position of the light.
+   * Note that this function uses camera space coordinates and
+   * thus assumes that this polygon set is transformed to the
+   * origin of the light.
+   */
+  csFrustumList* GetShadows (csSector* sector, csVector3& origin);
+
+  //----------------------------------------------------------------------
+  // Transformation
+  //----------------------------------------------------------------------
 
   /**
    * Transform to the given camera if needed. This function works
@@ -702,46 +791,45 @@ public:
     return cam_verts;
   }
 
+  //----------------------------------------------------------------------
+  // Various
+  //----------------------------------------------------------------------
+
+  /**
+   * Get the movable instance for this thing.
+   * It is very important to call GetMovable().UpdateMove()
+   * after doing any kind of modification to this movable
+   * to make sure that internal data structures are
+   * correctly updated.
+   */
+  csMovable& GetMovable () { return movable; }
+
+  /**
+   * Return true if this thing is a sky object.
+   */
+  bool IsSky () { return is_sky; }
+
+  /**
+   * Return true if this thing is a template.
+   */
+  bool IsTemplate () { return is_template; }
+
+  /**
+   * Set convexity flag of this thing. You should call this instead
+   * of SetFlags (CS_ENTITY_CONVEX, CS_ENTITY_CONVEX) because this function
+   * does some extra calculations.
+   */
+  void SetConvex (bool c);
+
+  /**
+   * If this thing is convex you can use getCenter to get the index
+   * of the vertex holding the center of this thing. This center is
+   * calculated by 'setConvex(true)'.
+   */
+  int GetCenter () { return center_idx; }
+
   /// Get the engine for this thing.
   csEngine* GetEngine () { return engine; }
-
-  /**
-   * Return a list of shadow frustums which extend from
-   * this polygon set. The origin is the position of the light.
-   * Note that this function uses camera space coordinates and
-   * thus assumes that this polygon set is transformed to the
-   * origin of the light.
-   */
-  csFrustumList* GetShadows (csSector* sector, csVector3& origin);
-
-  /**
-   * Create an oriented bounding box (currently not oriented yet@@@)
-   * for this polygon set. This function will add the vertices for the
-   * bounding box to the set itself so that they will get translated
-   * together with the other vertices. The indices of the vertices
-   * are added to the csThingBBox structure which is returned here.
-   * Note that this creation is done in object space. The newly added
-   * vertices will not have been translated to world/camera space yet.<p>
-   */
-  void CreateBoundingBox ();
-
-  /// Get the oriented bounding box created by CreateBoundingBox().
-  csThingBBox* GetBoundingBox ()
-  {
-    if (!bbox) CreateBoundingBox ();
-    return bbox;
-  }
-
-  /**
-   * Get the bounding box in object space for this polygon set.
-   * This is calculated based on the oriented bounding box.
-   */
-  void GetBoundingBox (csBox3& box);
-
-  /**
-   * Get the radius in object space for this polygon set.
-   */
-  const csVector3& GetRadius ();
 
   /// Return true if this has fog.
   bool HasFog () { return fog.enabled; }
@@ -762,43 +850,10 @@ public:
   /// Disable fog.
   void DisableFog () { fog.enabled = false; }
 
-  /**
-   * Find the minimum and maximum Z values of all vertices in
-   * this polygon set (in camera space). This is used for planed fog.
-   */
-  void GetCameraMinMaxZ (float& minz, float& mazx);
-
-  /**
-   * Intersect this polygon set in camera space with a polygon which
-   * coincides with plane Zc = <value> (a plane parallel to the view
-   * plane) and return a new polygon which is the intersection (as a 2D
-   * polygon with z not given). This function assumes that the
-   * polygon set is convex (so it can in general not be used for polygon
-   * sets which use a BSP tree) and gives unexpected results otherwise.
-   * Delete the returned polygon with 'delete []' when ready.
-   */
-  csVector2* IntersectCameraZPlane (float z, csVector2* clipper, int num_clip, int& num_pts);
-
-  /// Register a visibility object with this culler.
-  void RegisterVisObject (iVisibilityObject* visobj);
-  /// Unregister a visibility object with this culler.
-  void UnregisterVisObject (iVisibilityObject* visobj);
-  /**
-   * Do the visibility test from a given viewpoint. This will first
-   * clear the visible flag on all registered objects and then it will
-   * mark all visible objects.
-   */
-  bool VisTest (iRenderView* irview);
-
-  /// The movable has changed.
-  void MovableChanged (iMovable* movable, void* userdata);
-  /// The movable is about to be destroyed.
-  void MovableDestroyed (iMovable* movable, void* userdata);
-
   CSOBJTYPE;
   DECLARE_IBASE_EXT (csPObject);
 
-  //------------------------- iThing interface --------------------------------
+  //------------------------- iThing interface -------------------------------
   struct eiThing : public iThing
   {
     DECLARE_EMBEDDED_IBASE (csThing);
@@ -821,7 +876,7 @@ public:
   } scfiThing;
   friend struct eiThing;
  
-  //-------------------- iPolygonMesh interface implementation ------------------
+  //-------------------- iPolygonMesh interface implementation ---------------
   struct PolyMesh : public iPolygonMesh
   {
     DECLARE_EMBEDDED_IBASE (csThing);
@@ -843,7 +898,7 @@ public:
   } scfiPolygonMesh;
   friend struct PolyMesh;
  
-  //-------------------- iVisibilityCuller interface implementation ------------------
+  //-------------------- iVisibilityCuller interface implementation ----------
   struct VisCull : public iVisibilityCuller
   {
     DECLARE_EMBEDDED_IBASE (csThing);
@@ -862,7 +917,7 @@ public:
   } scfiVisibilityCuller;
   friend struct VisCull;
 
-  //-------------------- iVisibilityObject interface implementation ------------------
+  //-------------------- iVisibilityObject interface implementation ----------
   struct VisObject : public iVisibilityObject
   {
     DECLARE_EMBEDDED_IBASE (csThing);
@@ -877,7 +932,7 @@ public:
   } scfiVisibilityObject;
   friend struct VisObject;
 
-  //-------------------- iMovableListener interface implementation ------------------
+  //-------------------- iMovableListener interface implementation -----------
   struct MovListener : public iMovableListener
   {
     DECLARE_EMBEDDED_IBASE (csThing);

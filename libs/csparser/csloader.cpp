@@ -1233,12 +1233,16 @@ void csLoader::load_thing_part (csThing* thing, csSector* sec, PSLoadInfo& info,
         {
           csVector3 c;
           ScanStr (params, "%f,%f,%f", &c.x, &c.y, &c.z);
-          thing->curves_center = c;
+          thing->SetCurvesCenter (c);
         }
         break;
       case CS_TOKEN_CURVESCALE:
-        ScanStr (params, "%f", &thing->curves_scale);
-        break;
+        {
+	  float f;
+          ScanStr (params, "%f", &f);
+	  thing->SetCurvesScale (f);
+          break;
+	}
 
       case CS_TOKEN_CURVECONTROL:
         {

@@ -1278,7 +1278,6 @@ void csThing::UpdateMove ()
     p->ObjectToWorld (movable.GetTransform ());
   }
   UpdateCurveTransform ();
-  UpdateInPolygonTrees ();
 }
 
 void csThing::MoveToSector (csSector* s)
@@ -2215,44 +2214,6 @@ void csThing::MergeTemplate (csThing* tpl, csSector* sector, csMaterialList* mat
       p->SetMaterial (th);
     delete [] newname;
   }
-}
-
-void csThing::UpdateInPolygonTrees ()
-{
-return;//@@@@@@@@@@@@@@@@@@@@@
-#if 0
-  // If thing has not been placed in a sector we do nothing here.
-  if (!movable.InSector ()) return;
-
-  // If we are not in a sector which has a polygon tree
-  // then we don't really update. We should consider if this is
-  // a good idea. Do we only want this object updated when we
-  // want to use it in a polygon tree? It is certainly more
-  // efficient to do it this way when the thing is currently
-  // moving in normal convex sectors.
-  csPolygonTree* tree = NULL;
-  csThing* stat = NULL;
-  // @@@ What if we are in more than one sector? To be done later
-  // when this becomes possible.
-  stat = movable.GetSector (0)->GetStaticThing ();
-  if (!stat) return;
-
-  csBox3 b;
-  GetBoundingBox (b);
-
-  csReversibleTransform trans = movable.GetTransform ().GetInverse ();
-  tree_bbox.Update (b, trans, this);
-
-  // Here we need to insert in trees where this thing lives.
-  tree = stat->GetStaticTree ();
-  if (tree)
-  {
-    // Temporarily increase reference to prevent free.
-    tree_bbox.GetBaseStub ()->IncRef ();
-    tree->AddObject (&tree_bbox);
-    tree_bbox.GetBaseStub ()->DecRef ();
-  }
-#endif
 }
 
 iPolygon3D *csThing::eiThing::GetPolygon (int idx)

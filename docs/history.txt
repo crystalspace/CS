@@ -54,6 +54,9 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine eliminated several compilation warnings from MSVC
 	  (reported by Martin Geisse) in sft3dcom.cpp and avistrv.cpp about
 	  variables possibly used uninitialized.
+	- Cleaned up the csThing.h header a lot. Made a lot private
+	  and added GetCurvesScale/SetCurvesScale and GetCurvesCenter/
+	  SetCurvesCenter.
 18-Feb-2001
 	- Martin Geisse added some missing 'volatile' keywords to the
 	  waveout driver.
