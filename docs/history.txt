@@ -29,6 +29,10 @@ The history order is reversed so that new features are at the top.
 	      - shift-p: counterfreeze
 	      - ctrl-p: counterreset
 	      - alt-p: counterremove
+	- A few minor optimizations to Dynavis in the tiled coverage line
+	  drawer.
+	- Converted tinyxml string class (TiXmlString) to use malloc/realloc.
+	  This should speed up things a tiny bit.
 12-Feb-2003
 	- Performed several optimizations on the tinyxml parser. Hopefully
 	  it is now a little faster.

@@ -48,7 +48,7 @@ TiXmlString::TiXmlString (const char* instring)
         return;
     }
     newlen = strlen (instring) + 1;
-    newstring = new char [newlen];
+    newstring = (char*)malloc (newlen);
     strcpy (newstring, instring);
     allocated = newlen;
     cstring = newstring;
@@ -69,7 +69,7 @@ TiXmlString::TiXmlString (const TiXmlString& copy)
         return;
     }
     newlen = copy . length() + 1;
-    newstring = new char [newlen];
+    newstring = (char*)malloc (newlen);
     strcpy (newstring, copy . cstring);
     allocated = newlen;
     cstring = newstring;
@@ -88,7 +88,7 @@ void TiXmlString ::operator = (const char * content)
         return;
     }
     newlen = strlen (content) + 1;
-    newstring = new char [newlen];
+    newstring = (char*)malloc (newlen);
     strcpy (newstring, content);
     empty_it ();
     allocated = newlen;
@@ -108,7 +108,7 @@ void TiXmlString ::operator = (const TiXmlString & copy)
         return;
     }
     newlen = copy . length () + 1;
-    newstring = new char [newlen];
+    newstring = (char*)malloc (newlen);
     strcpy (newstring, copy . c_str ());
     empty_it ();
     allocated = newlen;
@@ -141,22 +141,16 @@ void TiXmlString::append( const char* str, int len )
         new_alloc = assign_new_size (new_size);
 
         // allocate new buffer
-        new_string = new char [new_alloc];        
-
-        // copy the previous allocated buffer into this one
         if (allocated && cstring)
-            strcpy (new_string, cstring);
+	  cstring = (char*)realloc (cstring, new_alloc);
+	else
+	  cstring = (char*)malloc (new_alloc);
 
         // append the suffix. It does exist, otherwize we wouldn't be expanding 
-	strncpy (new_string + length(), str, len);
-	new_string [new_size - 1] = 0;
-
-        // return previsously allocated buffer if any
-        if (allocated && cstring)
-            delete [] cstring;
+	strncpy (cstring + length(), str, len);
+	cstring [new_size - 1] = 0;
 
         // update member variables
-        cstring = new_string;
 	clength = new_size - 1;
         allocated = new_alloc;
     }
@@ -183,22 +177,16 @@ void TiXmlString::append( char single )
         new_alloc = assign_new_size (new_size);
 
         // allocate new buffer
-        new_string = new char [new_alloc];        
-
-        // copy the previous allocated buffer into this one
         if (allocated && cstring)
-            strcpy (new_string, cstring);
+	  cstring = (char*)realloc (cstring, new_alloc);
+	else
+	  cstring = (char*)malloc (new_alloc);
 
         // append the suffix. It does exist, otherwize we wouldn't be expanding 
-	new_string [new_size - 2] = single;
-	new_string [new_size - 1] = 0;
-
-        // return previsously allocated buffer if any
-        if (allocated && cstring)
-            delete [] cstring;
+	cstring [new_size - 2] = single;
+	cstring [new_size - 1] = 0;
 
         // update member variables
-        cstring = new_string;
 	clength = new_size - 1;
         allocated = new_alloc;
     }

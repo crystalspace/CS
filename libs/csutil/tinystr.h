@@ -143,7 +143,7 @@ class TiXmlString
         if (size)
         {
             allocated = size;
-            cstring = new char [size];
+            cstring = (char*)malloc (size);
             cstring [0] = 0;
         }
     }
@@ -181,7 +181,7 @@ class TiXmlString
     void empty_it ()
     {
         if (cstring)
-            delete [] cstring;
+	    free (cstring);
         cstring = NULL;
 	clength = 0;
         allocated = 0;

@@ -876,7 +876,7 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
   bool outside = !r.ClipLineSafe (x1, y1, x2, y2);
 
   // @@@ Is the below good?
-  if (y1 == y2) return;	// Return if clipping results in one pixel.
+  if (!outside && y1 == y2) return;  // Return if clipping results in one pixel.
   y2 += yfurther;
 
   if (outside)
@@ -1071,6 +1071,7 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
   int tile_y2 = (y2-1) >> 6;
 
 # define xmask ((32<<16)-1)
+# define ymask ((64<<16)-1)
 
   if (tile_x1 == tile_x2 && tile_y1 == tile_y2)
   {
@@ -1119,37 +1120,72 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
 
   //------
   // This is the most general case.
+  // @@@ The loops below can be done more efficiently.
   //------
   int dy = y2-y1;
-
-  int x = x1<<16;
-  int y = y1;
   int dx = ((x2-x1)<<16) / (dy-yfurther);
 
+  if (tile_y1 == tile_y2)
+  {
+    //------
+    // Line is nearly horizontal. This means we will stay in the same
+    // row of tiles.
+    //------
+    MarkTileDirty (tile_x1, tile_y1);
+    MarkTileDirty (tile_x2, tile_y1);
+    // Calculate the slope of the line.
+    int x = x1<<16;
+    int y = y1;
 
-  int last_x = x;
-  int last_y = y;
-  int cur_tile_x = x >> (16+5);
-  int cur_tile_y = y >> 6;
-  bool need_to_finish;
+    //------
+    // Here is the remainder of the line until we go out screen again.
+    //------
+    bool need_to_finish = dy > 0;
+    int last_x = x;
+    int last_y = y;
+    int cur_tile_x = tile_x1;
+    csCoverageTile* stile = GetTile (tile_x1, tile_y1);
+    while (dy > 0)
+    {
+      int tile_x = x >> (16+5);
+      if (cur_tile_x != tile_x)
+      {
+        csCoverageTile* tile = stile + (cur_tile_x-tile_x1);
+        tile->PushLine (last_x & xmask, last_y & 63, (x-dx) & xmask,
+      	  (y-1) & 63, dx);
+        cur_tile_x = tile_x;
+        last_x = x;
+        last_y = y;
+      }
 
-  //------
-  // At this point we know that:
-  //    x,y is the first point of the line that actually is on screen.
-  //    x is shifted 16 pixels to the left.
-  //    dy contains the number of lines left to process.
-  //    dx is the slope of the line.
-  //------
-  last_x = x;
-  last_y = y;
+      x += dx;
+      y++;
+      dy--;
+    }
+
+    if (need_to_finish)
+    {
+      csCoverageTile* tile = stile + (cur_tile_x-tile_x1);
+      tile->PushLine (last_x & xmask, last_y & 63, (x-dx) & xmask,
+    	  (y-1) & 63, dx);
+    }
+    return;
+  }
+
+  // Calculate the slope of the line.
+  int x = x1<<16;
+  int y = y1;
 
   //------
   // Here is the remainder of the line until we go out screen again.
   //------
-  need_to_finish = false;
+  bool need_to_finish = dy > 0;
+  int last_x = x;
+  int last_y = y;
+  int cur_tile_x = tile_x1;
+  int cur_tile_y = tile_y1;
   while (dy > 0)
   {
-    need_to_finish = true;
     int tile_x = x >> (16+5);
     int tile_y = y >> 6;
     if (cur_tile_x != tile_x || cur_tile_y != tile_y)
