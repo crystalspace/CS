@@ -33,6 +33,20 @@ chronological order.
 	  target.
         - Philip Wyett changed the order of variable initialisation culling a
           compiler warning in particles.cpp.
+	- Eric Sunshine added an 'outdir' argument to the Swig rule (swig.jam)
+	  which controls placement of the generated language-specific support
+	  files.
+	- Eric Sunshine added (the presently incomplete) cscript/csjava/Jamfile
+	  for creation of the csjava module. Completed tasks are:
+	    - Creates Swig-generated files.
+	    - Builds csjava shared library.
+	    - Invokes 'ant' to create the crystalspace.jar file.
+	  Still to do:
+	    - Implement install targets.
+	    - Figure out how to determine correct shared library suffix on
+	      MacOS/X, and utilize that suffix.
+	    - Ensure that 'clean' targets are accurate.
+	    - Remove legacy Makefile.
 22-Jul-2004
 	- Jorrit started work on adding a new test to csbench to test lots
 	  of smaller objects.
