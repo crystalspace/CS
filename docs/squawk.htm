@@ -1,15 +1,24 @@
 <html>
 
 <head>
-<title>Squawk game</title>
+<title>Squawk 3D Game</title>
 </head>
 
 <body>
 
-<h1>Squawk game</h1>
+<h1>Squawk 3D Game</h1>
 
 Created by <a href="mailto:sgalbrai@krl.org">Seth Galbraith</a>, also known as
 <a href="http://www.planetquake.com/simitar/">&quot;The Serpent Lord&quot;</a>
+
+<br>
+
+Some programming by Jorrit Tyberghein and Eric Sunshine
+
+<br>
+
+MDL models and PNG textures Copyright 1999 by
+<a href="mailto:ugalbrai@krl.org">Ulrich Galbraith</a>
 
 <ul>
 <li><a href="#about"  >What it's about</a>
@@ -27,8 +36,8 @@ I'm making a multiplayer action role-playing game.
 Currently this application just tests a few ideas:
 <ul>
 <li>multiple views for split-screen play
-<li>sky box environment map
-<li>animated 3d sprite character
+<li>sky box / environment map / background
+<li>animated 3d characters
 </ul>
 
 <hr>
@@ -53,32 +62,42 @@ up arrow     look up
 down arrow   look down
 left arrow   look left
 right arrow  look right
-
+insert       roll left
+delete       roll right
 home         look up and left
 end          look down and left
 page up      look up and right
 page down    look down and right
-
-insert       roll left
-delete       roll right
 </pre>
 
 <h3>Lower left view</h3>
 
 <pre>
-w  tilt camera up
-s  tilt camera down
-a  turn camera left
-d  turn camera right
+w  look up
+s  look down (also 'x')
+a  look left
+d  look right
+r  roll left
+f  roll right
+q  look up and left
+z  look down and left
+e  look up and right
+c  look down and right
 </pre>
 
 <h3>Lower right view</h3>
 
 <pre>
-i  tilt camera up
-k  tilt camera down
-j  turn camera left
-l  turn camera right
+i  look up
+k  look down (also ',')
+j  look left
+l  look right
+y  roll left
+h  roll right
+u  look up and left
+m  look down and left
+o  look up and right
+.  look down and right
 </pre>
 
 <hr>
@@ -86,25 +105,43 @@ l  turn camera right
 <h2><a name="#bugs"></a>Known Bugs</h2>
 
 <ul>
-
 <li>Converting 24 bit images to 8 bit palettes is <em>very</em>
 slow and TXTMODE=24bit doesn't work for non-lightmapped polygons.
 The skybox uses 24 bit JPEG images again so it takes a <em>long</em>
 time to start in 16 or 8 bit.
-
-<li>The feild-of-view should be FrameHeight / 2 for the lower views,
-but this causes a Floating Point Exception when I try to look at the sprite.
-
-<li>The sprite is not centered correctly.  This looks
-like it's a bug in the convertor I used.
-
-<li>Floating point exceptions in DrawPolygonFX
-
+<li>Floating point exceptions in PreparePolygonFX, pol2d.cpp,
+lines 169 and 173.
+<li>Edges of sky box polygons visible because of sloppy texture
+alignment code that allows some wrapping of the non-tiling textures.
+<li>Some sprite polygons vanish when they cross the view plane.
 </ul>
 
 <hr>
 
 <h2><a name="#history"></a>History</h2>
+
+<h3>September 29, 1999 Seth Galbraith and Eric Sunshine</h3>
+<ul>
+<li>Alternate configuration using the -cfg option
+<li>Sprites can now be loaded from the data/squawk folder
+</ul>
+
+<h3>September 28, 1999 Seth Galbraith</h3>
+<ul>
+<li>Environment models in .mdl format by Ulrich Galbraith
+<li>New skybox textures (ugly, meant to be temporary)
+<li>configurable view layout (see squawk.cfg)
+<li>configurable sky textures (see squawk.cfg)
+</ul>
+
+<h3>September 27, 1999 Seth Galbraith</h3>
+<ul>
+<li>gravity flag controls whether a view rotates around the world's Y axis
+<li>enabled lighting for some sprites
+<li>changed the FOV of each view
+<li>added _control87 commands to disable some FPU exceptions
+<li>version 17
+</ul>
 
 <h3>September 26, 1999 Seth Galbraith</h3>
 <ul>
@@ -213,36 +250,21 @@ centered around the middle of the screen
 <h3>Controls</h3>
 
 <ul>
+<li>Add view controls to config
 <li>Better keyboard and mouse handling
 <li>Multiple controls that can be used simultaneously
 <li>Control character rather than camera
 <li>Gamepad and Joystick support
-</ul>
-
-<h3>Cameras</h3>
-
-<ul>
 <li>Chase cameras that follow characters
-<li>Adjust FOV in split views
-<li>Use a plain text file with information for configuring views.
-(Probably described as a list of sqkViews which are described as
-a list of csViews which are described as a list of 2d coordinates.
-with an arbitrary number of each type of object allowed.)
 </ul>
 
 <h3>Content</h3>
 
 <ul>
-<li>A local environment to move around in
 <li>Create a Squawk or general Crystal Space skybox class
-<li>Make sky textures a command line and config option.
-The base name, the extension for each direction, and the
-file type extension could all be options.  For example:
-<pre>
-SKYNAME=snowy
-SKYEXT1=_up _dn _lt _rt _fr _bk
-SKYEXT2=.tga
-</pre>
+<li>Transparent color on the treez.mdl
+<li>Configure actions for sprites
+<li>Load .mdl files through VFS
 </ul>
 
 <hr>
