@@ -17,6 +17,15 @@ The history order is reversed so that new features are at the top.
 	      reported that RedHat 8.x requires this library.
 	- Eric Sunshine committed an update to the map2cs tutorial from
 	  Leandro Ezequiel Lovisolo <lovisolo@datafull.com>.
+	- Eric Sunshine made the following changes to csConsoleBuffer:
+	    - Fixed bug: SetLength() was accessing uninitialized memory.
+	    - Fixed bugs: Several methods potentially were deleting the
+	      csString referenced by the `empty' member and other "empty"
+	      lines, thus allowing those other references to access a deleted
+	      object.
+	    - Fixed bug: SetCurLine() had bogus logic.
+	    - Fixed bugs: A significant number of boundary (one-off) errors
+	      were present.
 25-Feb-2003
 	- Marten Svanfeldt made these changes:
 	    - Fixed a bug in the light/shadow culling.
