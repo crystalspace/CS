@@ -74,7 +74,7 @@ CS_IMPLEMENT_APPLICATION
 //-----------------------------------------------------------------------------
 
 // the global system driver variable
-BumpTest *System;
+BumpTest *bumptest;
 
 BumpTest::BumpTest ()
 {
@@ -102,6 +102,7 @@ BumpTest::~BumpTest ()
   if (LevelLoader) LevelLoader->DecRef();
   if (myG3D) myG3D->DecRef ();
   if (kbd) kbd->DecRef ();
+  csInitializer::DestroyApplication (object_reg);
 }
 
 void BumpTest::Report (int severity, const char* msg, ...)
@@ -120,14 +121,6 @@ void BumpTest::Report (int severity, const char* msg, ...)
     csPrintf ("\n");
   }
   va_end (arg);
-}
-
-void Cleanup ()
-{
-  csPrintf ("Cleaning up...\n");
-  iObjectRegistry* object_reg = System->object_reg;
-  delete System; System = NULL;
-  csInitializer::DestroyApplication (object_reg);
 }
 
 bool BumpTest::InitProcDemo ()
@@ -273,17 +266,17 @@ static bool BumpEventHandler (iEvent& ev)
 {
   if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
   {
-    System->SetupFrame ();
+    bumptest->SetupFrame ();
     return true;
   }
   else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
   {
-    System->FinishFrame ();
+    bumptest->FinishFrame ();
     return true;
   }
   else
   {
-    return System->BumpHandleEvent (ev);
+    return bumptest->BumpHandleEvent (ev);
   }
 }
 
@@ -359,8 +352,7 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   if (!csInitializer::OpenApplication (object_reg))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Error opening system!");
-    Cleanup ();
-    exit (1);
+    return false;
   }
 
   // Setup the texture manager
@@ -564,6 +556,11 @@ bool BumpTest::BumpHandleEvent (iEvent &Event)
   return false;
 }
 
+void BumpTest::Start ()
+{
+  csDefaultRunLoop (object_reg);
+}
+
 /*---------------------------------------------------------------------*
  * Main function
  *---------------------------------------------------------------------*/
@@ -572,22 +569,12 @@ int main (int argc, char* argv[])
   srand (time (NULL));
 
   // Create our main class.
-  System = new BumpTest ();
+  bumptest = new BumpTest ();
 
-  // Initialize the main system. This will load all needed plug-ins
-  // (3D, 2D, network, sound, ...) and initialize them.
-  if (!System->Initialize (argc, argv, "/config/csbumptest.cfg"))
-  {
-    System->Report (CS_REPORTER_SEVERITY_NOTIFY, "Error initializing system!");
-    Cleanup ();
-    exit (1);
-  }
+  if (bumptest->Initialize (argc, argv, "/config/csbumptest.cfg"))
+	bumptest->Start ();
 
-  // Main loop.
-  csDefaultRunLoop(System->object_reg);
-
-  // Cleanup.
-  Cleanup ();
+  delete bumptest;
 
   return 0;
 }

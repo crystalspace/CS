@@ -68,6 +68,7 @@ public:
 
   bool Initialize (int argc, const char* const argv[],
     const char *iConfigName);
+  void Start ();
   void SetupFrame ();
   void FinishFrame ();
   bool BumpHandleEvent (iEvent &Event);

@@ -73,7 +73,7 @@ void CreatePolygon (iThingState *th, int v1, int v2, int v3, int v4,
 //-----------------------------------------------------------------------------
 
 // The global system driver
-Simple *System;
+Simple *simple;
 
 Simple::Simple ()
 {
@@ -114,13 +114,6 @@ Simple::~Simple ()
   if (g3d) g3d->DecRef ();
   if (kbd) kbd->DecRef ();
   if (vc) vc->DecRef ();
-}
-
-void Cleanup ()
-{
-  csPrintf ("Cleaning up...\n");
-  iObjectRegistry* object_reg = System->object_reg;
-  delete System; System = NULL;
   csInitializer::DestroyApplication (object_reg);
 }
 
@@ -128,17 +121,17 @@ static bool SimpleEventHandler (iEvent& ev)
 {
   if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
   {
-    System->SetupFrame ();
+    simple->SetupFrame ();
     return true;
   }
   else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
   {
-    System->FinishFrame ();
+    simple->FinishFrame ();
     return true;
   }
   else
   {
-    return System ? System->HandleEvent (ev) : false;
+    return simple ? simple->HandleEvent (ev) : false;
   }
 }
 
@@ -159,7 +152,7 @@ bool Simple::Initialize (int argc, const char* const argv[])
 	CS_REQUEST_END))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simplept",
 	"Can't initialize plugins!");
     return false;
   }
@@ -167,7 +160,7 @@ bool Simple::Initialize (int argc, const char* const argv[])
   if (!csInitializer::SetupEventHandler (object_reg, SimpleEventHandler))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simplept",
 	"Can't initialize event handler!");
     return false;
   }
@@ -176,7 +169,7 @@ bool Simple::Initialize (int argc, const char* const argv[])
   if (csCommandLineHelper::CheckHelp (object_reg))
   {
     csCommandLineHelper::Help (object_reg);
-    exit (0);
+    return false;
   }
 
   // The virtual clock.
@@ -187,46 +180,45 @@ bool Simple::Initialize (int argc, const char* const argv[])
   if (!engine)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simplept",
     	"No iEngine plugin!");
-    exit (1);
+    return false;
   }
 
   loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!loader)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simplept",
     	"No iLoader plugin!");
-    exit (1);
+    return false;
   }
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!g3d)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simplept",
     	"No iGraphics3D pluginn");
-    exit (1);
+    return false;
   }
 
   kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
   if (!kbd)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simplept",
     	"No iKeyboardDriver pluginn");
-    exit (1);
+    return false;
   }
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!csInitializer::OpenApplication (object_reg))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simplept",
     	"Error opening system!");
-    Cleanup ();
-    exit (1);
+    return false;
   }
 
   // Setup the texture manager
@@ -237,8 +229,8 @@ bool Simple::Initialize (int argc, const char* const argv[])
   txtmgr->ResetPalette ();
 
   csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-    	"crystalspace.application.simple1",
-  	"Simple Crystal Space Application version 0.1.");
+    	"crystalspace.application.simplept",
+  	"Simple Procedural Texture Crystal Space Application version 0.1.");
 
   // First disable the lighting cache. Our app is simple enough
   // not to need this.
@@ -246,16 +238,15 @@ bool Simple::Initialize (int argc, const char* const argv[])
 
   // Create our world.
   csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simplept",
   	"Creating world!...");
 
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simplept",
     	"Error loading 'stone4' texture!");
-    Cleanup ();
-    exit (1);
+    return false;
   }
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
   // Create the procedural texture and a material for it
@@ -265,19 +256,18 @@ bool Simple::Initialize (int argc, const char* const argv[])
   if (!VFS)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simplept",
     	"No iVFS plugin!");
-    exit (1);
+    return false;
   }
 
   if (!ProcTexture->Initialize (g3d, engine, VFS, loader))
   {
     VFS->DecRef ();
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simplept",
     	"Could not initialize procedural texture!");
-    Cleanup ();
-    exit (1);
+    return false;
   }
   VFS->DecRef ();
   iTextureWrapper *tw = engine->GetTextureList ()->NewTexture
@@ -386,6 +376,11 @@ void Simple::FinishFrame ()
   g3d->Print (NULL);
 }
 
+void Simple::Start ()
+{
+  csDefaultRunLoop(object_reg);
+}
+
 /*---------------------------------------------------------------------*
  * Main function
  *---------------------------------------------------------------------*/
@@ -394,24 +389,14 @@ int main (int argc, char* argv[])
   srand (time (NULL));
 
   // Create our main class.
-  System = new Simple ();
+  simple = new Simple ();
 
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.
-  if (!System->Initialize (argc, argv))
-  {
-    csReport (System->object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
-    	"Error initializing system!");
-    Cleanup ();
-    exit (1);
-  }
+  if (simple->Initialize (argc, argv))
+	  simple->Start ();
 
-  // Main loop.
-  csDefaultRunLoop(System->object_reg);
-
-  // Cleanup.
-  Cleanup ();
+  delete simple;
 
   return 0;
 }
