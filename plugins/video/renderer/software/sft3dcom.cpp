@@ -1929,7 +1929,8 @@ texr_done:
   // Select the right scanline drawing function.
   bool tex_keycolor = tex_mm->GetKeyColor ();
   csDrawScanline* dscan;
-  if (poly.mixmode != CS_FX_COPY)
+  // poly.alpha old way or with mixmode!!!???
+  if (!poly.alpha && poly.mixmode != CS_FX_COPY)
   {
     int scan_index = Scan.bitmap2 ?
     	SCANPROC_MAP_FX_ZNONE :
