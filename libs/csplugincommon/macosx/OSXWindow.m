@@ -6,7 +6,7 @@
 //  Copyright (c) 2001 Matt Reda. All rights reserved.
 //
 
-#import "OSXWindow.h"
+#import "csplugincommon/macosx/OSXWindow.h"
 
 
 @implementation OSXWindow

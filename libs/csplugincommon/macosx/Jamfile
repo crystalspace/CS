@@ -4,7 +4,7 @@ if $(TARGET.OS) = MACOS_X
 {
 Description csplugincommon_osx : "MacOS/X-specific common plugin classes" ;
 Library csplugincommon_osx : 
-  [ Wildcard *.cpp *.h ] 
+  [ Wildcard *.cpp *.cxx *.cc *.m *.mm *.M *.h ] 
   [ Wildcard
     [ ConcatDirs $(DOTDOT) $(DOTDOT) include csplugincommon macosx ] : *.h ]
   : shared ;

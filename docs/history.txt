@@ -73,6 +73,8 @@ chronological order.
 	  when `csplugincommon' was introduced, and which prevented the MacOS/X
 	  canvases from ever being built. (It was broken for a month, but
 	  nobody complained.)
+	- Eric Sunshine fixed problems which prevented csplugincommon_osx from
+	  building.
 21-Mar-2005
 	- Eric Sunshine re-wrote crystal.m4 essentially from scratch since it
 	  was fragile, obfuscated, and unnecessarily complex.
