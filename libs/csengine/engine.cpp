@@ -1113,7 +1113,7 @@ bool csEngine::Prepare (iProgressMeter *meter)
   return true;
 }
 
-void csEngine::ForceRelight (iProgressMeter *meter)
+void csEngine::ForceRelight (iRegion* region, iProgressMeter *meter)
 {
 #ifndef CS_USE_NEW_RENDERER
   G3D->ClearCache ();
@@ -1121,11 +1121,11 @@ void csEngine::ForceRelight (iProgressMeter *meter)
   int old_lightcache_mode = lightcache_mode;
   lightcache_mode &= ~CS_ENGINE_CACHE_READ;
   lightcache_mode &= ~CS_ENGINE_CACHE_NOUPDATE;
-  ShineLights (0, meter);
+  ShineLights (region, meter);
   lightcache_mode = old_lightcache_mode;
 }
 
-void csEngine::ForceRelight (iStatLight* light)
+void csEngine::ForceRelight (iStatLight* light, iRegion* region)
 {
 #ifndef CS_USE_NEW_RENDERER
   G3D->ClearCache ();
@@ -1137,14 +1137,15 @@ void csEngine::ForceRelight (iStatLight* light)
   for (sn = 0; sn < num_meshes; sn++)
   {
     iMeshWrapper *s = meshes.Get (sn);
-    //if (!region || region->IsInRegion (s->QueryObject ()))
-    //{
+    if (!region || region->IsInRegion (s->QueryObject ()))
+    {
       iLightingInfo* linfo = s->GetLightingInfo ();
       if (linfo)
       {
-        linfo->InitializeDefault ();
+	// Do not clear!
+        linfo->InitializeDefault (false);
       }
-    //}
+    }
   }
 
   ((csStatLight *)(light->GetPrivateObject ()))->CalculateLighting ();
@@ -1153,8 +1154,8 @@ void csEngine::ForceRelight (iStatLight* light)
   for (sn = 0 ; sn < num_meshes ; sn++)
   {
     iMeshWrapper *s = meshes.Get (sn);
-    //if (!region || region->IsInRegion (s->QueryObject ()))
-    //{
+    if (!region || region->IsInRegion (s->QueryObject ()))
+    {
       iLightingInfo* linfo = s->GetLightingInfo ();
       if (linfo)
       {
@@ -1162,7 +1163,7 @@ void csEngine::ForceRelight (iStatLight* light)
           linfo->WriteToCache (cm);
         linfo->PrepareLighting ();
       }
-    //}
+    }
   }
 
   if (!VFS->Sync())
@@ -1170,6 +1171,10 @@ void csEngine::ForceRelight (iStatLight* light)
     Warn ("Error updating lighttable cache!");
     Warn ("Perhaps disk full or no write permission?");
   }
+}
+
+void csEngine::RemoveLight (iStatLight* light)
+{
 }
 
 void csEngine::SetCacheManager (iCacheManager* cache_mgr)
@@ -1371,7 +1376,7 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
       if (linfo)
       {
         if (do_relight)
-          linfo->InitializeDefault ();
+          linfo->InitializeDefault (true);
         else
           if (!linfo->ReadFromCache (cm))
 	  {

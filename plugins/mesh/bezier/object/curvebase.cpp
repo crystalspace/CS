@@ -580,20 +580,23 @@ void csCurve::CalculateLightingDynamic (iFrustumView *lview)
       new csFrustum (*lview->GetFrustumContext ()->GetLightFrustum ()));
 }
 
-void csCurve::InitializeDefaultLighting ()
+void csCurve::InitializeDefaultLighting (bool clear)
 {
   if (!IsLightable ()) return ;
-  LightMap = new csCurveLightMap ();
+  if (clear || !LightMap)
+  {
+    LightMap = new csCurveLightMap ();
 
-  // Allocate space for the LightMap and initialize it to ambient color.
-  csColor ambient;
-  ParentThing->GetStaticData ()->thing_type->engine->GetAmbientLight (ambient);
-  LightMap->Alloc (
-      CURVE_LM_SIZE * csCurveLightMap::lightcell_size,
-      CURVE_LM_SIZE * csCurveLightMap::lightcell_size,
-        int(ambient.red * 255.0f),
-        int(ambient.green * 255.0f),
-        int(ambient.blue * 255.0f));
+    // Allocate space for the LightMap and initialize it to ambient color.
+    csColor ambient;
+    ParentThing->GetStaticData ()->thing_type->engine->GetAmbientLight (ambient);
+    LightMap->Alloc (
+        CURVE_LM_SIZE * csCurveLightMap::lightcell_size,
+        CURVE_LM_SIZE * csCurveLightMap::lightcell_size,
+          int(ambient.red * 255.0f),
+          int(ambient.green * 255.0f),
+          int(ambient.blue * 255.0f));
+  }
   LightmapUpToDate = false;
 }
 

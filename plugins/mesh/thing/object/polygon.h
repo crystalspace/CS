@@ -938,7 +938,7 @@ public:
    * Should be called before calling CalculateLighting() and before
    * calling WriteToCache().
    */
-  void InitializeDefault ();
+  void InitializeDefault (bool clear);
 
   /**
    * This function will try to read the lightmap from the given file.

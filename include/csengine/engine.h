@@ -564,23 +564,36 @@ public:
    * of calling engine->Prepare() again as engine->Prepare() will also do
    * other stuff (like registering textures). Warning! This function can
    * be very slow (depending on the number of lights and objects in the
-   * world).
+   * world). The optional region can be given to limit calculation to
+   * objects in the region.
    * <p>
-   * The current flags set with SetLightingCacheMode() control if the
+   * The current flags set with SetLightingCacheMode() controls if the
    * lightmaps will be cached or not.
    */
-  virtual void ForceRelight (iProgressMeter* meter);
+  virtual void ForceRelight (iRegion* region, iProgressMeter* meter);
 
   /**
    * Force a relight for the given light. This is useful to update the
    * lightmaps after a static or pseudo-dynamic light has been added (don't
    * use this for dynamic lights). If there are a lot of objects this function
-   * can be slow.
+   * can be slow. The optional region can be given to limit calculation to
+   * objects in the region.
    * <p>
-   * The current flags set with SetLightingCacheMode() control if the
+   * The current flags set with SetLightingCacheMode() controls if the
    * lightmaps will be cached or not.
    */
-  virtual void ForceRelight (iStatLight* light);
+  virtual void ForceRelight (iStatLight* light, iRegion* region);
+
+  /**
+   * Remove a light and update all lightmaps. This function only works
+   * correctly for pseudo-dynamic static lights. If you give a normal
+   * static light then the light will be removed but lightmaps will not
+   * be affected. You can call ForceRelight() to force relighting then.
+   * <p>
+   * The current flags set with SetLightingCacheMode() controls if the
+   * lightmaps will be cached or not.
+   */
+  virtual void RemoveLight (iStatLight* light);
 
   /**
    * Set the maximum number of polygons to process in

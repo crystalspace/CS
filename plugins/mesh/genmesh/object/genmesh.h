@@ -189,7 +189,7 @@ public:
 
   //----------------------- Shadow and lighting system ----------------------
   char* GenerateCacheName ();
-  void InitializeDefault ();
+  void InitializeDefault (bool clear);
   bool ReadFromCache (iCacheManager* cache_mgr);
   bool WriteToCache (iCacheManager* cache_mgr);
   void PrepareLighting ();
@@ -278,9 +278,9 @@ public:
   struct LightingInfo : public iLightingInfo
   {
     SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObject);
-    virtual void InitializeDefault ()
+    virtual void InitializeDefault (bool clear)
     {
-      scfParent->InitializeDefault ();
+      scfParent->InitializeDefault (clear);
     }
     virtual bool ReadFromCache (iCacheManager* cache_mgr)
     {

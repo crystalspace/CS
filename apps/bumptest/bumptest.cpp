@@ -208,7 +208,7 @@ bool BumpTest::InitProcDemo ()
   thing_wrap->GetMovable ()->UpdateMove ();
 
   csRef<iLightingInfo> linfo (SCF_QUERY_INTERFACE (thing_obj, iLightingInfo));
-  linfo->InitializeDefault ();
+  linfo->InitializeDefault (true);
   room->ShineLights (thing_wrap);
   linfo->PrepareLighting ();
 

@@ -1867,13 +1867,13 @@ void csThing::CastShadows (iFrustumView *lview, iMovable *movable)
   draw_busy--;
 }
 
-void csThing::InitializeDefault ()
+void csThing::InitializeDefault (bool clear)
 {
   Prepare ();
 
   int i;
   for (i = 0; i < polygons.Length (); i++)
-    polygons.Get (i)->InitializeDefault ();
+    polygons.Get (i)->InitializeDefault (clear);
 }
 
 bool csThing::ReadFromCache (iCacheManager* cache_mgr)

@@ -142,7 +142,7 @@ struct iRenderLoop;
 #define CS_RENDPRI_FRONT2BACK 2
 /** @} */
 
-SCF_VERSION (iEngine, 0, 18, 0);
+SCF_VERSION (iEngine, 0, 19, 0);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -172,22 +172,39 @@ struct iEngine : public iBase
   /**
    * Force a relight of all lighting. It is better to call this instead
    * of calling engine->Prepare() again as engine->Prepare() will also do
-   * other stuff (like registering textures).
+   * other stuff (like registering textures). Warning! This function can
+   * be very slow (depending on the number of lights and objects in the
+   * world). The optional region can be given to limit calculation to
+   * objects in the region.
    * <p>
-   * The current flags set with SetLightingCacheMode() control if the
+   * The current flags set with SetLightingCacheMode() controls if the
    * lightmaps will be cached or not.
    */
-  virtual void ForceRelight (iProgressMeter* meter = 0) = 0;
+  virtual void ForceRelight (iRegion* region = 0,
+  	iProgressMeter* meter = 0) = 0;
 
   /**
    * Force a relight for the given light. This is useful to update the
    * lightmaps after a static or pseudo-dynamic light has been added (don't
-   * use this for dynamic lights).
+   * use this for dynamic lights). If there are a lot of objects this function
+   * can be slow. The optional region can be given to limit calculation to
+   * objects in the region.
    * <p>
-   * The current flags set with SetLightingCacheMode() control if the
+   * The current flags set with SetLightingCacheMode() controls if the
    * lightmaps will be cached or not.
    */
-  virtual void ForceRelight (iStatLight* light) = 0;
+  virtual void ForceRelight (iStatLight* light, iRegion* region = 0) = 0;
+
+  /**
+   * Remove a light and update all lightmaps. This function only works
+   * correctly for pseudo-dynamic static lights. If you give a normal
+   * static light then the light will be removed but lightmaps will not
+   * be affected. You can call ForceRelight() to force relighting then.
+   * <p>
+   * The current flags set with SetLightingCacheMode() controls if the
+   * lightmaps will be cached or not.
+   */
+  virtual void RemoveLight (iStatLight* light) = 0;
 
   /**
    * Prepare the textures. It will initialise all loaded textures

@@ -25,7 +25,7 @@ struct iCacheManager;
 struct iDynLight;
 struct iStatLight;
 
-SCF_VERSION (iLightingInfo, 0, 1, 4);
+SCF_VERSION (iLightingInfo, 0, 1, 5);
 
 /**
  * This interface is implemented by mesh objects that have some kind
@@ -36,8 +36,11 @@ struct iLightingInfo : public iBase
 {
   /**
    * Initialize the lighting information to some default (mostly black).
+   * If clear is true then the lighting is really cleared to black. Otherwise
+   * the lighting system is just warned that lighting information is
+   * going to be added. This is useful in case a single light is added.
    */
-  virtual void InitializeDefault () = 0;
+  virtual void InitializeDefault (bool clear) = 0;
 
   /**
    * Read the lighting information from the cache. Call this instead

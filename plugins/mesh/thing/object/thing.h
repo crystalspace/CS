@@ -681,7 +681,7 @@ public:
   /**
    * Init the lightmaps for all polygons in this thing.
    */
-  void InitializeDefault ();
+  void InitializeDefault (bool clear);
 
   /**
    * Read the lightmaps from the cache.
@@ -860,9 +860,9 @@ public:
   struct LightingInfo : public iLightingInfo
   {
     SCF_DECLARE_EMBEDDED_IBASE (csThing);
-    virtual void InitializeDefault ()
+    virtual void InitializeDefault (bool clear)
     {
-      scfParent->InitializeDefault ();
+      scfParent->InitializeDefault (clear);
     }
     virtual bool ReadFromCache (iCacheManager* cache_mgr)
     {

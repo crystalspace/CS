@@ -224,7 +224,7 @@ public:
   /// Calculate the lighting for this curve (dynamic).
   void CalculateLightingDynamic (iFrustumView* lview);
   /// Initialize default lighting.
-  void InitializeDefaultLighting ();
+  void InitializeDefaultLighting (bool clear);
   /// Read lighting from file.
   const char* ReadFromCache (iFile* file);
   /// Cache the curve lightmaps to file.

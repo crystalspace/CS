@@ -254,7 +254,7 @@ bool InfPortalCS::Traverse (iPortal* portal, iBase* context)
       csRef<iLightingInfo> linfo (SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
       	iLightingInfo));
       if (linfo)
-        linfo->InitializeDefault ();
+        linfo->InitializeDefault (true);
     }
     s->ShineLights ();
     for (i = 0 ; i < ml->GetCount () ; i++)

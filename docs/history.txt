@@ -26,6 +26,16 @@ The history order is reversed so that new features are at the top.
 	  cause the lightmaps to be updated correctly.
 	- Jorrit forgot to remove a parameter to the second version of
 	  ForceRelight().
+	- Jorrit added region parameter to ForceRelight().
+	- Jorrit added iEngine->RemoveLight() to remove a pseudo-dynamic
+	  static lights and also automatically update all lightmaps. In case
+	  of a static light this will not update the lightmaps unless
+	  ForceRelight() is called later.
+	  NOTE! Currently not implemented yet!
+	- Jorrit Extended iLightingInfo->InitializeDefault() with a new flag
+	  telling the lighting sub-system if the lighting information should
+	  be cleared or not. This allows correct handling when a single light
+	  is added in case of genmesh and bezier curves.
 	- Eric Sunshine augmented the Jam system so that it now builds the
 	  new renderer if --enable-new-renderer was specified with configure.
 12-Jun-2003

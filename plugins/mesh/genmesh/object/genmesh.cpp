@@ -182,7 +182,7 @@ void csGenmeshMeshObject::CheckLitColors ()
   }
 }
 
-void csGenmeshMeshObject::InitializeDefault ()
+void csGenmeshMeshObject::InitializeDefault (bool clear)
 {
   SetupObject ();
 
@@ -192,8 +192,10 @@ void csGenmeshMeshObject::InitializeDefault ()
   // Set all colors to ambient light (@@@ NEED TO GET AMBIENT!)
   int i;
   CheckLitColors ();
-  for (i = 0 ; i < num_lit_mesh_colors ; i++)
-    lit_mesh_colors[i].Set (0, 0, 0);
+  if (clear)
+    for (i = 0 ; i < num_lit_mesh_colors ; i++)
+      lit_mesh_colors[i].Set (0, 0, 0);
+  lighting_dirty = true;
 }
 
 char* csGenmeshMeshObject::GenerateCacheName ()

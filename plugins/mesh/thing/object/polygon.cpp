@@ -1743,7 +1743,7 @@ bool csPolygon3D::DoPerspective (
   return true;
 }
 
-void csPolygon3D::InitializeDefault ()
+void csPolygon3D::InitializeDefault (bool /*clear*/)
 {
   if (txt_info)
   {

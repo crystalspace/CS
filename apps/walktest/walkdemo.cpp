@@ -1457,7 +1457,7 @@ static csPtr<iMeshWrapper> CreatePortalThing (const char* name, iSector* room,
 
   csRef<iLightingInfo> linfo (SCF_QUERY_INTERFACE (thing->GetMeshObject (),
     iLightingInfo));
-  linfo->InitializeDefault ();
+  linfo->InitializeDefault (true);
   room->ShineLights (thing);
   linfo->PrepareLighting ();
 

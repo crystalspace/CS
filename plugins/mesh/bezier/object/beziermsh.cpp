@@ -988,13 +988,13 @@ void csBezierMesh::CastShadows (iFrustumView *lview, iMovable *movable)
   }
 }
 
-void csBezierMesh::InitializeDefault ()
+void csBezierMesh::InitializeDefault (bool clear)
 {
   Prepare ();
 
   int i;
   for (i = 0; i < GetCurveCount (); i++)
-    curves.Get (i)->InitializeDefaultLighting ();
+    curves.Get (i)->InitializeDefaultLighting (clear);
 }
 
 bool csBezierMesh::ReadFromCache (iCacheManager* cache_mgr)
