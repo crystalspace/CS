@@ -2,7 +2,7 @@
 # to build the Glide2 3D driver -- glide3d Version 3
 
 # Driver description
-DESCRIPTION.glide33 = Crystal Space Glide 3D driver
+DESCRIPTION.glide33 = Crystal Space Glide V3 3D driver
 
 #-------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #-------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-CFLAGS.GLIDE33+=-I/usr/include/glide3 -I/usr/local/include/glide -DGLIDE3 
+CFLAGS.GLIDE33+= $(GLIDE3_PATH) -DGLIDE3 
 LIBS._GLIDE33+=-lglide3x
 
 # The Glide driver
