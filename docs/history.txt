@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+12-Oct-2002
+    - Some MSVC warnings cleanup to the opcode plugin (jtarbox)
 11-Oct-2002
 	- Some more cleanups in the OpenGL renderer.
 10-Oct-2002
