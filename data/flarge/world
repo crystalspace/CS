@@ -3895,6 +3895,24 @@
                 <v x="-19.9" y="1" z="9" />
             </hardmove>
         </meshobj>
+	<!--
+	<portals name="wavyPortal">
+	    <portal>
+                <v x="0.2" y="2.8" z="-0.8" />
+                <v x="0.2" y="2.8" z="0.8" />
+                <v x="0.2" y="-1" z="0.8" />
+                <v x="0.2" y="-1" z="-0.8" />
+                <sector>wavySector</sector>
+		<zfill />
+		<float />
+		<clip />
+	    </portal>
+            <hardmove>
+                <v x="13" y="0" z="12" />
+            </hardmove>
+	    <priority>alpha</priority>
+	</portals>
+	-->
         <meshobj name="wavyPortal">
             <plugin>thing</plugin>
             <params>
@@ -3952,17 +3970,6 @@
                     <v>4</v>
                     <v>5</v>
                     <v>7</v>
-                </p>
-                <material>misty</material>
-                <p name="front">
-                    <v>10</v>
-                    <v>11</v>
-                    <v>9</v>
-                    <v>8</v>
-                    <portal>
-                        <sector>wavySector</sector>
-                        <zfill />
-                    </portal>
                 </p>
             </params>
             <hardmove>
