@@ -824,7 +824,6 @@ void csSector::Draw (iRenderView *rview)
 
 void csSector::CheckFrustum (iFrustumView *lview)
 {
-// @@@ REMOVE ME!
   int i = sector_cb_vector.Length ()-1;
   while (i >= 0)
   {

@@ -31,6 +31,7 @@
 #include "iengine/mesh.h"
 #include "iengine/viscull.h"
 #include "iengine/imposter.h"
+#include "iengine/shadcast.h"
 #include "ivideo/graph3d.h"
 #include "csengine/impmesh.h"
 
@@ -197,6 +198,8 @@ private:
   csRef<iMeshObject> meshobj;
   /// For optimization purposes we keep the iLightingInfo interface here.
   csRef<iLightingInfo> light_info;
+  /// For optimization purposes we keep the iShadowReceiver interface here.
+  csRef<iShadowReceiver> shadow_receiver;
 
   /// Children of this object (other instances of iMeshWrapper).
   csMeshMeshList children;
@@ -533,6 +536,10 @@ public:
     virtual iLightingInfo* GetLightingInfo () const
     {
       return scfParent->light_info;
+    }
+    virtual iShadowReceiver* GetShadowReceiver () const
+    {
+      return scfParent->shadow_receiver;
     }
     virtual iMeshFactoryWrapper* GetFactory () const
     {

@@ -854,7 +854,7 @@ public:
    * Check frustum visibility on this thing.
    * First initialize the 2D culler cube.
    */
-  void CheckFrustum (iFrustumView* lview, iMovable* movable);
+  void CastShadows (iFrustumView* lview, iMovable* movable);
 
   /**
    * Append a list of shadow frustums which extend from
@@ -1017,8 +1017,6 @@ public:
     virtual void DeleteVertices (int from, int to)
     { scfParent->DeleteVertices (from, to); }
 
-    virtual void CheckFrustum (iFrustumView* fview, iMovable* movable)
-    { scfParent->CheckFrustum (fview, movable); }
     virtual csFlags& GetFlags () { return scfParent->flags; }
     virtual int GetMovingOption () const
     { return scfParent->GetMovingOption (); }
@@ -1170,7 +1168,7 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE (csThing);
     virtual void CastShadows (iMovable* movable, iFrustumView* fview)
     {
-      scfParent->CheckFrustum (fview, movable);
+      scfParent->CastShadows (fview, movable);
     }
   } scfiShadowReceiver;
   friend struct ShadowReceiver;

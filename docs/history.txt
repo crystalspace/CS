@@ -15,6 +15,16 @@ The history order is reversed so that new features are at the top.
 	  indicates that -relight is needed to fix that.
 	- Made engine reporting a little less verbose to avoid confusing
 	  people.
+	- Removed SetNodeFunction, SetPolygonFunction, and SetCurveFunction
+	  from iFrustumView. Instead there is now the more general
+	  SetObjectFunction. That way the engine is more removed from using
+	  polygons and thing specific stuff.
+	- Added iMeshWrapper->GetShadowReceiver() as an optimization.
+	- Removed iThingState::CheckFrustum(). It is obsolete.
+	- Fixed the cullers to call the object function from the frustum
+	  view instead of calling shadow receiver directly. The shadow
+	  receiver will now be called from within the object function
+	  that is supplied by the lighting routines.
 16-Dec-2002
 	- Completely removed the old octree culler. This has a great impact
 	  on the internal engine structure. It greatly simplifies both

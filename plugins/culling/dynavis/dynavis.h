@@ -83,7 +83,6 @@ public:
   // Optional data for shadows. Both fields can be NULL.
   csRef<iMeshWrapper> mesh;
   csRef<iShadowCaster> caster;
-  csRef<iShadowReceiver> receiver;
   csRef<iThingState> thing_state;	// Optional.
 
   csVisibilityObjectWrapper (csDynaVis* dynavis)

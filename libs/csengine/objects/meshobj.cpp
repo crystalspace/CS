@@ -75,7 +75,10 @@ csMeshWrapper::csMeshWrapper (
   csEngine::current_engine->AddToCurrentRegion (this);
   csMeshWrapper::meshobj = meshobj;
   if (meshobj)
+  {
     light_info = SCF_QUERY_INTERFACE (meshobj, iLightingInfo);
+    shadow_receiver = SCF_QUERY_INTERFACE (meshobj, iShadowReceiver);
+  }
   factory = NULL;
   zbufMode = CS_ZBUF_USE;
   render_priority = csEngine::current_engine->GetObjectRenderPriority ();
@@ -115,9 +118,15 @@ void csMeshWrapper::SetMeshObject (iMeshObject *meshobj)
 {
   csMeshWrapper::meshobj = meshobj;
   if (meshobj)
+  {
     light_info = SCF_QUERY_INTERFACE (meshobj, iLightingInfo);
+    shadow_receiver = SCF_QUERY_INTERFACE (meshobj, iShadowReceiver);
+  }
   else
+  {
     light_info = NULL;
+    shadow_receiver = NULL;
+  }
 }
 
 csMeshWrapper::~csMeshWrapper ()

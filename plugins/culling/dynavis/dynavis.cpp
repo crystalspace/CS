@@ -297,8 +297,6 @@ void csDynaVis::RegisterVisObject (iVisibilityObject* visobj)
   {
     visobj_wrap->caster = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
     	iShadowCaster);
-    visobj_wrap->receiver = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-    	iShadowReceiver);
     visobj_wrap->thing_state = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
 	iThingState);
   }
@@ -1532,7 +1530,7 @@ struct ShadObj
 {
   float sqdist;
   iShadowCaster* caster;
-  iShadowReceiver* receiver;
+  iMeshWrapper* mesh;
   iMovable* movable;
 };
 
@@ -1598,16 +1596,15 @@ static bool CastShadows_Front2Back (csKDTree* treenode, void* userdata,
       {
         data->shadobjs[data->num_shadobjs].sqdist = b.SquaredOriginDist ();
 	data->shadobjs[data->num_shadobjs].caster = visobj_wrap->caster;
-	data->shadobjs[data->num_shadobjs].receiver = NULL;
+	data->shadobjs[data->num_shadobjs].mesh = NULL;
 	data->shadobjs[data->num_shadobjs].movable =
 		visobj_wrap->visobj->GetMovable ();
 	data->num_shadobjs++;
       }
-      if (visobj_wrap->receiver
-	&& fview->CheckProcessMask (visobj_wrap->mesh->GetFlags ().Get ()))
+      if (fview->CheckProcessMask (visobj_wrap->mesh->GetFlags ().Get ()))
       {
         data->shadobjs[data->num_shadobjs].sqdist = b.SquaredOriginMaxDist ();
-	data->shadobjs[data->num_shadobjs].receiver = visobj_wrap->receiver;
+	data->shadobjs[data->num_shadobjs].mesh = visobj_wrap->mesh;
 	data->shadobjs[data->num_shadobjs].caster = NULL;
 	data->shadobjs[data->num_shadobjs].movable =
 		visobj_wrap->visobj->GetMovable ();
@@ -1633,13 +1630,13 @@ void csDynaVis::CastShadows (iFrustumView* fview)
 
   //======================================
   // First we find all relevant objects. For all these objects we add
-  // both the shadow-caster as the receiver to the array (as two different
-  // entries). The caster is added with the distance from the light position
-  // to the nearest point on the bounding box while the receiver is added
-  // with the distance from the light position to the farthest point on
-  // the bounding box. Later on we can then traverse the resulting list
-  // so that all relevant shadow casters are added before the receivers
-  // are processed.
+  // both the shadow-caster as the receiver (as mesh) to the array (as
+  // two different entries). The caster is added with the distance from
+  // the light position to the nearest point on the bounding box while
+  // the receiver is added with the distance from the light position to
+  // the farthest point on the bounding box. Later on we can then traverse
+  // the resulting list so that all relevant shadow casters are added before
+  // the receivers are processed.
   //======================================
 
   data.shadobjs = new ShadObj [visobj_vector.Length () * 2];
@@ -1696,16 +1693,15 @@ void csDynaVis::CastShadows (iFrustumView* fview)
       {
         data.shadobjs[data.num_shadobjs].sqdist = b.SquaredOriginDist ();
 	data.shadobjs[data.num_shadobjs].caster = visobj_wrap->caster;
-	data.shadobjs[data.num_shadobjs].receiver = NULL;
+	data.shadobjs[data.num_shadobjs].mesh = NULL;
 	data.shadobjs[data.num_shadobjs].movable =
 		visobj_wrap->visobj->GetMovable ();
 	data.num_shadobjs++;
       }
-      if (visobj_wrap->receiver
-	&& fview->CheckProcessMask (visobj_wrap->mesh->GetFlags ().Get ()))
+      if (fview->CheckProcessMask (visobj_wrap->mesh->GetFlags ().Get ()))
       {
         data.shadobjs[data.num_shadobjs].sqdist = b.SquaredOriginMaxDist ();
-	data.shadobjs[data.num_shadobjs].receiver = visobj_wrap->receiver;
+	data.shadobjs[data.num_shadobjs].mesh = visobj_wrap->mesh;
 	data.shadobjs[data.num_shadobjs].caster = NULL;
 	data.shadobjs[data.num_shadobjs].movable =
 		visobj_wrap->visobj->GetMovable ();
@@ -1726,7 +1722,7 @@ void csDynaVis::CastShadows (iFrustumView* fview)
   for (i = 0 ; i < data.num_shadobjs ; i++)
   {
     if (so->caster) so->caster->AppendShadows (so->movable, shadows, center);
-    if (so->receiver) so->receiver->CastShadows (so->movable, fview);
+    if (so->mesh) fview->CallObjectFunction (so->mesh, true);
     so++;
   }
   delete[] data.shadobjs;

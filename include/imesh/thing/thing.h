@@ -62,7 +62,7 @@ struct csFog;
 #define CS_THING_MOVE_OFTEN 1
 #define CS_THING_MOVE_OCCASIONAL 2
 
-SCF_VERSION (iThingState, 0, 2, 0);
+SCF_VERSION (iThingState, 0, 3, 0);
 
 /**
  * This is the state interface to access the internals of a thing
@@ -142,13 +142,6 @@ struct iThingState : public iBase
    * DeleteVertices(0,1000000000).
    */
   virtual void DeleteVertices (int from, int to) = 0;
-
-  /**
-   * Check frustum visibility on this thing.
-   * First initialize the 2D culler cube.
-   * @@@ Does this belong here?
-   */
-  virtual void CheckFrustum (iFrustumView* fview, iMovable* movable) = 0;
 
   /// Set thing flags (see CS_THING_... values above)
   virtual csFlags& GetFlags () = 0;

@@ -430,9 +430,8 @@ public:
 class csFrustumView;
 class csObject;
 class csOctreeNode;
-typedef void (csFrustumViewFunc)(csObject* obj, csFrustumView* lview, bool vis);
-typedef void (csFrustumViewNodeFunc)(csOctreeNode* node, csFrustumView* lview,
-	bool vis);
+typedef void (csFrustumViewObjectFunc)(iMeshWrapper* mesh,
+	iFrustumView* lview, bool vis);
 
 /**
  * This structure represents all information needed for the frustum
@@ -442,11 +441,7 @@ class csFrustumView : public iFrustumView
 {
 private:
   /// A function that is called for every node that is visited.
-  csFrustumViewNodeFunc* node_func;
-  /// A function that is called for every polygon that is hit.
-  csFrustumViewFunc* poly_func;
-  /// A function that is called for every curve that is hit.
-  csFrustumViewFunc* curve_func;
+  csFrustumViewObjectFunc* object_func;
   /// User data for the entire process.
   iFrustumViewUserdata* userdata;
 
@@ -496,26 +491,12 @@ public:
   /// Start new shadow list for this frustum.
   virtual void StartNewShadowBlock ();
 
-  /// Set the function that is called for every node.
-  void SetNodeFunction (csFrustumViewNodeFunc* func) { node_func = func; }
-  /// Set the function that is called for every polygon to visit.
-  void SetPolygonFunction (csFrustumViewFunc* func) { poly_func = func; }
-  /// Set the function that is called for every curve to visit.
-  void SetCurveFunction (csFrustumViewFunc* func) { curve_func = func; }
-  /// Call the node function.
-  virtual void CallNodeFunction (csOctreeNode* onode, bool vis)
+  /// Set the function that is called for every object.
+  void SetObjectFunction (csFrustumViewObjectFunc* func) { object_func = func; }
+  /// Call the object function.
+  virtual void CallObjectFunction (iMeshWrapper* mesh, bool vis)
   {
-    if (node_func) node_func (onode, this, vis);
-  }
-  /// Call the polygon function.
-  virtual void CallPolygonFunction (csObject* poly, bool vis)
-  {
-    poly_func (poly, this, vis);
-  }
-  /// Call the curve function.
-  virtual void CallCurveFunction (csObject* curve, bool vis)
-  {
-    curve_func (curve, this, vis);
+    if (object_func) object_func (mesh, this, vis);
   }
   /// Set the maximum radius to use for visiting objects.
   void SetRadius (float rad)

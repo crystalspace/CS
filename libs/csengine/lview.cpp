@@ -31,12 +31,10 @@ SCF_IMPLEMENT_IBASE(csFrustumView)
 SCF_IMPLEMENT_IBASE_END
 
 csFrustumView::csFrustumView () :
-  node_func(NULL),
-  poly_func(NULL),
-  curve_func(NULL),
-  userdata(NULL),
-  things_shadow(false),
-  ctxt(NULL)
+  object_func (NULL),
+  userdata (NULL),
+  things_shadow (false),
+  ctxt (NULL)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   ctxt = new csFrustumContext ();

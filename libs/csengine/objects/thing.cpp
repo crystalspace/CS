@@ -2614,13 +2614,12 @@ bool csThing::DrawFoggy (iRenderView *d, iMovable *)
 
 //----------------------------------------------------------------------
 
-void csThing::CheckFrustum (iFrustumView *lview, iMovable *movable)
+void csThing::CastShadows (iFrustumView *lview, iMovable *movable)
 {
   //@@@ Ok?
   cached_movable = movable;
   WorUpdate ();
 
-  csPolygon3D *p;
   int i;
 
   draw_busy++;
@@ -2635,14 +2634,24 @@ void csThing::CheckFrustum (iFrustumView *lview, iMovable *movable)
 
   for (i = 0; i < polygons.Length (); i++)
   {
-    p = GetPolygon3D (i);
-    lview->CallPolygonFunction ((csObject *)p, true);
+    csPolygon3D* poly = GetPolygon3D (i);
+    csLightingPolyTexQueue *lptq = (csLightingPolyTexQueue *)
+      (lview->GetUserdata ());
+    if (lptq->IsDynamic ())
+      poly->CalculateLightingDynamic ((csFrustumView*)lview);
+    else
+      poly->CalculateLightingStatic ((csFrustumView*)lview, true);
   }
 
   for (i = 0; i < GetCurveCount (); i++)
   {
-    csCurve *c = curves.Get (i);
-    lview->CallCurveFunction ((csObject *)c, true);
+    csCurve* curve = curves.Get (i);
+    csLightingPolyTexQueue *lptq = (csLightingPolyTexQueue *)
+      (lview->GetUserdata ());
+    if (lptq->IsDynamic ())
+      curve->CalculateLightingDynamic ((csFrustumView*)lview);
+    else
+      curve->CalculateLightingStatic ((csFrustumView*)lview, true);
   }
 
   draw_busy--;

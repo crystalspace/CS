@@ -32,6 +32,7 @@
 
 struct iFrustumView;
 struct iShadowBlockList;
+struct iMeshWrapper;
 class csFrustum;
 class csFrustumContext;
 class csObject;
@@ -130,7 +131,7 @@ public:
   bool IsFirstTime () { return first_time; }
 };
 
-SCF_VERSION (iFrustumView, 0, 1, 6);
+SCF_VERSION (iFrustumView, 0, 2, 0);
 
 /**
  * This structure represents all information needed for the frustum
@@ -165,12 +166,8 @@ struct iFrustumView : public iBase
    */
   virtual void RestoreFrustumContext (csFrustumContext* original) = 0;
 
-  /// Call the node function.
-  virtual void CallNodeFunction (csOctreeNode* onode, bool vis) = 0;
-  /// Call the polygon function.
-  virtual void CallPolygonFunction (csObject* poly, bool vis) = 0;
-  /// Call the curve function.
-  virtual void CallCurveFunction (csObject* curve, bool vis) = 0;
+  /// Call the object function.
+  virtual void CallObjectFunction (iMeshWrapper* mesh, bool vis) = 0;
 
   /// Get the radius.
   virtual float GetRadius () = 0;

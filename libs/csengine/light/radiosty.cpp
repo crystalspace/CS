@@ -1204,13 +1204,9 @@ void csRadiosity::PrepareShootSource (csRadElement *src)
   texturemap = shoot_src->ComputeTextureLumelSized ();
 }
 
-static void frustum_polygon_report_func (
-              csObject *obj,
-              csFrustumView *lview,
-              bool vis);
-static void frustum_curve_report_func (
-              csObject *obj,
-              csFrustumView *lview,
+static void frustum_object_report_func (
+              iMeshWrapper *mesh,
+              iFrustumView *lview,
               bool vis);
 
 void csRadiosity::StartFrustum ()
@@ -1221,8 +1217,10 @@ void csRadiosity::StartFrustum ()
   // the resulting color can be used as a filter
   //linfo.SetColor (csColor (1, 1, 1));
   //@@@lview->SetUserData ((void*) this);
-  lview->SetCurveFunction (frustum_curve_report_func);
-  lview->SetPolygonFunction (frustum_polygon_report_func);
+  // @@@ USE SetObjectFunction!!!
+  lview->SetObjectFunction (frustum_object_report_func);
+  //lview->SetCurveFunction (frustum_curve_report_func);
+  //lview->SetPolygonFunction (frustum_polygon_report_func);
   lview->SetRadius (10000000.0);                // should be enough
   lview->EnableThingShadows (true);
   lview->SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
@@ -1257,6 +1255,18 @@ void csRadiosity::StartFrustum ()
   delete lview;
 }
 
+#if 1
+static void frustum_object_report_func (
+  iMeshWrapper *mesh,
+  iFrustumView *lview,
+  bool vis)
+{
+  (void)mesh;
+  (void)lview;
+  (void)vis;
+  // @@@ TODO TO FIX RADIOSITY
+}
+#else
 static void frustum_curve_report_func (
   csObject *obj,
   csFrustumView *lview,
@@ -1380,6 +1390,7 @@ static void frustum_polygon_report_func (
 stop:
   lview->RestoreFrustumContext (old_ctxt);
 }
+#endif
 
 void csRadiosity::ProcessDest (csRadElement *dest, csFrustumView *lview)
 {

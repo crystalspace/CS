@@ -255,76 +255,20 @@ csStatLight::~csStatLight ()
 {
 }
 
-#if 0
-// @@@ REMOVE ME
-static void node_light_func (
-  csOctreeNode *node,
-  csFrustumView *lview,
-  bool vis)
+static void object_light_func (iMeshWrapper *mesh, iFrustumView *lview,
+	bool vis)
 {
-  if (vis) return ;
-  if (!vis)
-  {
-    // If this node is not visible we still have to mark all polygons
-    // in this node as having no light.
-    csPolygonIntArray &pols = node->GetUnsplitPolygons ();
-    int i;
-    for (i = 0; i < pols.GetPolygonCount (); i++)
-    {
-      csPolygonInt *pi = pols.GetPolygon (i);
-      if (pi->GetType () == 1)
-      {
-        csPolygon3D *p = (csPolygon3D *)pi;
-
-        // If this polygon is the top-level polygon (i.e. base or original
-        // polygon) then we know the entire polygon is shadowed. In that
-        // case we have to do nothing.
-        if (p->GetBasePolygon () != p)
-        {
-          // Otherwise we have to calculate lighting (but with vis set
-          // to false).
-          p->CalculateLightingStatic (lview, false);
-        }
-      }
-    }
-  }
-}
-#endif
-
-static void poly_light_func (csObject *obj, csFrustumView *lview, bool vis)
-{
-  csPolygon3D *poly = (csPolygon3D *)obj;
-  csLightingPolyTexQueue *lptq = (csLightingPolyTexQueue *)
-    (lview->GetUserdata ());
-  if (lptq->IsDynamic ())
-  {
-    if (!vis) return ;
-    poly->CalculateLightingDynamic (lview);
-  }
-  else
-    poly->CalculateLightingStatic (lview, vis);
-}
-
-static void curve_light_func (csObject *obj, csFrustumView *lview, bool vis)
-{
-  csCurve *curve = (csCurve *)obj;
-  csLightingPolyTexQueue *lptq = (csLightingPolyTexQueue *)
-    (lview->GetUserdata ());
-  if (lptq->IsDynamic ())
-  {
-    if (!vis) return ;
-    curve->CalculateLightingDynamic (lview);
-  }
-  else
-    curve->CalculateLightingStatic (lview, vis);
+  if (!vis) return;
+  iShadowReceiver* receiver = mesh->GetShadowReceiver ();
+  if (receiver)
+    receiver->CastShadows (mesh->GetMovable (), lview);
 }
 
 void csStatLight::CalculateLighting ()
 {
   csFrustumView lview;
   csFrustumContext *ctxt = lview.GetFrustumContext ();
-  lview.SetPolygonFunction (poly_light_func);
-  lview.SetCurveFunction (curve_light_func);
+  lview.SetObjectFunction (object_light_func);
   lview.SetRadius (GetRadius ());
   lview.EnableThingShadows (flags.Get () & CS_LIGHT_THINGSHADOWS);
   lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
@@ -349,8 +293,7 @@ void csStatLight::CalculateLighting (iMeshWrapper *th)
 {
   csFrustumView lview;
   csFrustumContext *ctxt = lview.GetFrustumContext ();
-  lview.SetPolygonFunction (poly_light_func);
-  lview.SetCurveFunction (curve_light_func);
+  lview.SetObjectFunction (object_light_func);
   lview.SetRadius (GetRadius ());
   lview.EnableThingShadows (flags.Get () & CS_LIGHT_THINGSHADOWS);
   lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
@@ -366,15 +309,7 @@ void csStatLight::CalculateLighting (iMeshWrapper *th)
   ctxt->SetLightFrustum (new csFrustum (center));
   ctxt->GetLightFrustum ()->MakeInfinite ();
 
-  // @@@ Engine should not know about iThingState!!!
-  if (th)
-  {
-    csRef<iThingState> thing_state (SCF_QUERY_INTERFACE (
-        th->GetMeshObject (),
-        iThingState));
-    if (thing_state)
-      thing_state->CheckFrustum ((iFrustumView *) &lview, th->GetMovable ());
-  }
+  lview.CallObjectFunction (th, true);
 
   lptq->UpdateMaps (this, GetCenter (), GetColor ());
   lptq->DecRef ();
@@ -485,8 +420,7 @@ void csDynLight::Setup ()
 
   csFrustumView lview;
   csFrustumContext *ctxt = lview.GetFrustumContext ();
-  lview.SetPolygonFunction (poly_light_func);
-  lview.SetCurveFunction (curve_light_func);
+  lview.SetObjectFunction (object_light_func);
   lview.SetRadius (GetRadius ());
   lview.EnableThingShadows (flags.Get () & CS_LIGHT_THINGSHADOWS);
   lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
