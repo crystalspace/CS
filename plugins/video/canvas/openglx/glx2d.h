@@ -95,4 +95,4 @@ public:
   bool CreateContext (int *desired_attributes);
 };
 
-#endif // __XLIB2D_H__
+#endif // __GLX2D_H__

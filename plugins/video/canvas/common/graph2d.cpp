@@ -46,8 +46,6 @@ bool csGraphics2D::Initialize (iSystem* pSystem)
   // Get the system parameters
   System->GetSettings (Width, Height, Depth, FullScreen);
 
-  Palette = new RGBPixel[256];
-
   // Get the font server
   const char *p = pSystem->ConfigGetStr (
     "FontServer", CS_FUNCID_FONT, "crystalspace.font.server.csfont");

@@ -199,11 +199,33 @@ bool csGraphics2DGLX::CreateContext (int *desired_attributes)
   return true;
 }
 
+const char *visual_class_name (int cls)
+{
+   switch (cls) {
+      case StaticColor:
+         return "StaticColor";
+      case PseudoColor:
+         return "PseudoColor";
+      case StaticGray:
+         return "StaticGray";
+      case GrayScale:
+         return "GrayScale";
+      case TrueColor:
+         return "TrueColor";
+      case DirectColor:
+         return "DirectColor";
+      default:
+         return "";
+   }
+}
+
 bool csGraphics2DGLX::Open(const char *Title)
 {
+  // We now select the visual here as with a mesa bug it is not possible
+  // to destroy double buffered contexts and then create a single buffered
+  // one.
   if (!is_double_buffered)
   {
-    CsPrintf (MSG_INITIALIZATION, "Single Buffered Mode\n");
     int desired_attributes[] =
     {
       GLX_RGBA, 
@@ -211,6 +233,7 @@ bool csGraphics2DGLX::Open(const char *Title)
       GLX_RED_SIZE, 4,
       GLX_BLUE_SIZE, 4,
       GLX_GREEN_SIZE, 4,
+      GLX_AUX_BUFFERS, 1,
       None
     };
 
@@ -219,7 +242,6 @@ bool csGraphics2DGLX::Open(const char *Title)
   }
   else
   {
-    CsPrintf (MSG_INITIALIZATION, "Double Buffered Mode\n");
     int desired_attributes[] =
     {
       GLX_RGBA, 
@@ -228,6 +250,7 @@ bool csGraphics2DGLX::Open(const char *Title)
       GLX_RED_SIZE, 4,
       GLX_BLUE_SIZE, 4,
       GLX_GREEN_SIZE, 4,
+      GLX_AUX_BUFFERS, 1,
       None
     };
 
@@ -235,9 +258,79 @@ bool csGraphics2DGLX::Open(const char *Title)
       return false;
   }
 
-  CsPrintf (MSG_INITIALIZATION, "Video driver GL/X version ");
+  CsPrintf (MSG_INITIALIZATION, "\nVideo driver GL/X version ");
   if (glXIsDirect (dpy, active_GLContext))
-    CsPrintf (MSG_INITIALIZATION, "(direct renderer) ");
+    CsPrintf (MSG_INITIALIZATION, "(direct renderer)\n");
+
+  Depth = active_GLVisual->depth;
+
+  if (Depth == 24 || Depth = 32)
+    pfmt.PixelBytes = 4;
+  else pfmt.PixelBytes = 2;
+
+  CsPrintf (MSG_INITIALIZATION, "Visual ID: %x,  depth %dbit,  %s\n",
+	    active_GLVisual->visualid, Depth, 
+	    visual_class_name (active_GLVisual->c_class));
+
+  int ctype, frame_buffer_depth, double_buffer, size_depth_buffer, level;
+  glXGetConfig(dpy, active_GLVisual, GLX_RGBA, &ctype);
+  glXGetConfig(dpy, active_GLVisual, GLX_DOUBLEBUFFER, &double_buffer);
+  glXGetConfig(dpy, active_GLVisual, GLX_BUFFER_SIZE, &frame_buffer_depth);
+  glXGetConfig(dpy, active_GLVisual, GLX_DEPTH_SIZE, &size_depth_buffer);
+  glXGetConfig(dpy, active_GLVisual, GLX_LEVEL, &level);
+
+  int alpha_bits = 0;
+  char *colour_type;
+  if (ctype)
+  {
+    pfmt.RedMask = active_GLVisual->red_mask;
+    pfmt.GreenMask = active_GLVisual->green_mask;
+    pfmt.BlueMask = active_GLVisual->blue_mask;
+    glXGetConfig(dpy, active_GLVisual, GLX_RED_SIZE, &pfmt.RedBits);
+    glXGetConfig(dpy, active_GLVisual, GLX_GREEN_SIZE, &pfmt.GreenBits);
+    glXGetConfig(dpy, active_GLVisual, GLX_BLUE_SIZE, &pfmt.BlueBits);
+    glXGetConfig(dpy, active_GLVisual, GLX_ALPHA_SIZE, &alpha_bits);
+
+    if (pfmt.RedMask > pfmt.BlueMask)
+    {
+      if (alpha_bits)
+	colour_type = "RGBA";
+      else 
+	colour_type = "RGB";
+    }
+    else
+    {
+      if (alpha_bits)
+	colour_type = "BGRA";
+      else
+	colour_type = "BGR";
+    }
+  }
+
+  CsPrintf (MSG_INITIALIZATION, 
+	    "Frame buffer: Type %s,  depth %dbit, level %d, %s\n",
+	    ctype ? colour_type : "ci", frame_buffer_depth, level,
+	    double_buffer ? "double buffered" : "single buffered");
+  CsPrintf (MSG_INITIALIZATION, "Depth buffer: %dbit\n", size_depth_buffer);
+
+  if (ctype)
+  {
+    CsPrintf (MSG_INITIALIZATION, 
+	      "Red  : bits %d, mask %d\n", pfmt.RedBits, pfmt.RedMask);
+    CsPrintf (MSG_INITIALIZATION, 
+	      "Green: bits %d, mask %d\n", pfmt.GreenBits, pfmt.GreenMask);
+    CsPrintf (MSG_INITIALIZATION, 
+	      "Blue : bits %d, mask %d\n", pfmt.BlueBits, pfmt.BlueMask);
+    CsPrintf (MSG_INITIALIZATION, 
+	      "Alpha: bits %d\n", alpha_bits);
+  } 
+ 
+  int aux_buffers;
+  glXGetConfig(dpy, active_GLVisual, GLX_AUX_BUFFERS, &aux_buffers);
+
+  CsPrintf (MSG_INITIALIZATION, 
+	    "Auxiliary buffers %d,  depth %dbit\n\n",
+	    aux_buffers, aux_buffers ? frame_buffer_depth : 0);
 
   // Create window
   XSetWindowAttributes winattr;

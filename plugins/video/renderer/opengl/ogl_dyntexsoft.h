@@ -20,7 +20,7 @@
 #define _OGL_DYNTEXSOFT_H_
 
 #include "igraph3d.h"
-class csGraphics3DOpenGL;
+class csGraphics3DOGLCommon;
 class csTextureMMOpenGL;
 class csTextureOpenGLDynamic;
 struct iGraphics2D;
@@ -34,7 +34,7 @@ class csOpenGLDynamicSoftware : public iGraphics3D
 
   csTextureMMOpenGL *tex;
   csTextureOpenGLDynamic *tex_0;
-  csGraphics3DOpenGL *parent_g3d;
+  csGraphics3DOGLCommon *parent_g3d;
   iGraphics2D *g2d;
   int Width, Height, frame_height, nPixelBytes;
   csPixelFormat *pfmt;
@@ -46,7 +46,7 @@ class csOpenGLDynamicSoftware : public iGraphics3D
   csOpenGLDynamicSoftware (iBase * pParent);
   virtual ~csOpenGLDynamicSoftware ();
 
-  void SetTarget (csGraphics3DOpenGL *g3d, csTextureMMOpenGL *tex);
+  void SetTarget (csGraphics3DOGLCommon *g3d, csTextureMMOpenGL *tex);
 
   virtual bool Initialize (iSystem * /*pSystem*/){ return true; }
   virtual bool Open (const char * /*Title*/){ return true; }

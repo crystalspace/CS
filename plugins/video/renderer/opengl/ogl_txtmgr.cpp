@@ -21,7 +21,7 @@
 
 #include "cssysdef.h"
 #include "cssys/sysdriv.h"
-#include "ogl_g3d.h"
+#include "ogl_g3dcom.h"
 #include "ogl_txtmgr.h"
 #include "ogl_txtcache.h"
 #include "ogl_dyntexback.h"
@@ -53,7 +53,7 @@ csTextureOpenGL::~csTextureOpenGL ()
 //---------------------------------------------------------------------------
 
 void csTextureOpenGLDynamic::CreateInterfaces (csTextureMMOpenGL *mm_tex, 
-   csGLDynTexType type, csGraphics3DOpenGL *parentG3D, csPixelFormat *pfmt)
+   csGLDynTexType type, csGraphics3DOGLCommon *parentG3D, csPixelFormat *pfmt)
 {
   switch (type)
   {
@@ -74,12 +74,6 @@ void csTextureOpenGLDynamic::CreateInterfaces (csTextureMMOpenGL *mm_tex,
 	texG3D = (iGraphics3D*) stexG3D;
       break;
     }
-    case SOFTWARE_TEXTURE_OLD:
-    {
-      texG3D = parentG3D->CreateOffScreenRenderer (NULL, w, h, pfmt,
-                                        image->GetImageData (), NULL, 0);
-      break;
-    }
     case AUXILIARY_BUFFER_TEXTURE:
     default:
     break;
@@ -95,17 +89,9 @@ csTextureOpenGLDynamic::~csTextureOpenGLDynamic ()
 //---------------------------------------------------------------------------
 
 csTextureMMOpenGL::csTextureMMOpenGL (iImage *image, int flags,
-  csGraphics3DOpenGL *iG3D) : csTextureMM (image, flags)
+  csGraphics3DOGLCommon *iG3D) : csTextureMM (image, flags)
 {
   G3D = iG3D;
-  // Preserve original width/height so that in DrawPixmap subregions of
-  // textures are calculated correctly. In other words, the app writer need
-  // not know about opengl texture size adjustments. smgh
-  orig_width = image->GetWidth ();
-  orig_height = image->GetHeight ();
-  // In opengl all textures, even non-mipmapped textures are required 
-  // to be powers of 2.
-  AdjustSizePo2 ();
 }
 
 csTextureMMOpenGL::~csTextureMMOpenGL ()
@@ -121,6 +107,36 @@ csTexture *csTextureMMOpenGL::NewTexture (iImage *Image)
   else
     return new csTextureOpenGL (this, Image);
 }
+
+void csTextureMMOpenGL::InitTexture (int max_tex_size, csPixelFormat *pfmt,
+				     csGLDynTexType dyn_tex_type)
+{
+  // Preserve original width/height so that in DrawPixmap subregions of
+  // textures are calculated correctly. In other words, the app writer need
+  // not know about opengl texture size adjustments. smgh
+  if (!image) return;
+  orig_width = image->GetWidth ();
+  orig_height = image->GetHeight ();
+
+  if ((orig_width > max_tex_size) ||
+      (orig_height > max_tex_size))
+  {
+    int nwidth = orig_width;
+    int nheight = orig_height; 
+    if (orig_width > max_tex_size) nwidth = max_tex_size;
+    if (orig_height > max_tex_size) nheight = max_tex_size;
+    image->Rescale (nwidth, nheight);
+  }
+
+  // In opengl all textures, even non-mipmapped textures are required 
+    // to be powers of 2.
+  AdjustSizePo2 ();
+
+  CreateMipmaps ();
+  if ((GetFlags() & CS_TEXTURE_DYNAMIC) == CS_TEXTURE_DYNAMIC)
+    CreateDynamicTexture (G3D, dyn_tex_type, pfmt);
+}
+
 
 void csTextureMMOpenGL::ComputeMeanColor ()
 {
@@ -157,7 +173,7 @@ iGraphics3D *csTextureMMOpenGL::GetDynamicTextureInterface ()
   return ((csTextureOpenGLDynamic*)tex[0])->texG3D;
 }
 
-void csTextureMMOpenGL::CreateDynamicTexture (csGraphics3DOpenGL *parentG3D, 
+void csTextureMMOpenGL::CreateDynamicTexture (csGraphics3DOGLCommon *parentG3D, 
    csGLDynTexType type, csPixelFormat *pfmt)
 {
   ((csTextureOpenGLDynamic*)tex[0])->CreateInterfaces (this, type,
@@ -167,7 +183,7 @@ void csTextureMMOpenGL::CreateDynamicTexture (csGraphics3DOpenGL *parentG3D,
 //---------------------------------------------------------------------------
 
 csTextureManagerOpenGL::csTextureManagerOpenGL (iSystem* iSys,
-  iGraphics2D* iG2D, csIniFile *config, csGraphics3DOpenGL *iG3D)
+  iGraphics2D* iG2D, csIniFile *config, csGraphics3DOGLCommon *iG3D)
   : csTextureManager (iSys, iG2D)
 {
   G3D = iG3D;
@@ -191,26 +207,26 @@ void csTextureManagerOpenGL::read_config (csIniFile *config)
     dyn_tex_type = BACK_BUFFER_TEXTURE;
   else if (!strcmp (dynamic_texture_type, "auxiliary_buffer"))
     dyn_tex_type = AUXILIARY_BUFFER_TEXTURE;
-  else if (!strcmp (dynamic_texture_type, "oldsoftware"))
-    dyn_tex_type = SOFTWARE_TEXTURE_OLD;
   else // default
-    dyn_tex_type = SOFTWARE_TEXTURE;
+    dyn_tex_type = BACK_BUFFER_TEXTURE;
 }
 
 void csTextureManagerOpenGL::PrepareTextures ()
 {
-  if (verbose) SysPrintf(MSG_INITIALIZATION, "Preparing textures...\n");
+  // hack, pixel format is now not yet determined until G2D is opened
+  pfmt = *G3D->GetDriver2D()->GetPixelFormat ();
+  max_tex_size = G3D->max_texture_size;
 
+  if (verbose) SysPrintf(MSG_INITIALIZATION, "Preparing textures...\n");
+  if (verbose) SysPrintf(MSG_INITIALIZATION, 
+			 "Maximum texture size: %dx%d\n", 
+			 max_tex_size, max_tex_size);
   if (verbose) SysPrintf(MSG_INITIALIZATION, "  Creating texture mipmaps...\n");
 
   // Create mipmaps for all textures
   for (int i = 0; i < textures.Length (); i++)
-  {
-    csTextureMM *txt = textures.Get (i);
-    txt->CreateMipmaps ();
-    if ((txt->GetFlags() & CS_TEXTURE_DYNAMIC) == CS_TEXTURE_DYNAMIC)
-      ((csTextureMMOpenGL*)txt)->CreateDynamicTexture(G3D, dyn_tex_type, &pfmt);
-  }
+    ((csTextureMMOpenGL *)textures.Get (i))->InitTexture
+                                         (max_tex_size, &pfmt, dyn_tex_type);
 }
 
 iTextureHandle *csTextureManagerOpenGL::RegisterTexture (iImage* image,
@@ -225,12 +241,14 @@ iTextureHandle *csTextureManagerOpenGL::RegisterTexture (iImage* image,
 
 void csTextureManagerOpenGL::PrepareTexture (iTextureHandle *handle)
 {
+  // hack, pixel format is now not yet determined until G2D is opened
+  pfmt = *G3D->GetDriver2D()->GetPixelFormat ();
+  max_tex_size = G3D->max_texture_size;
+
   if (!handle) return;
 
-  csTextureMMOpenGL *txt = (csTextureMMOpenGL *)handle->GetPrivateObject ();
-  txt->CreateMipmaps ();
-  if ((txt->GetFlags() & CS_TEXTURE_DYNAMIC) == CS_TEXTURE_DYNAMIC)
-    ((csTextureMMOpenGL*)txt)->CreateDynamicTexture (G3D, dyn_tex_type, &pfmt);
+  ((csTextureMMOpenGL*)handle->GetPrivateObject ())->InitTexture
+                                            (max_tex_size, &pfmt, dyn_tex_type);
 }
 
 void csTextureManagerOpenGL::UnregisterTexture (iTextureHandle* handle)

@@ -24,7 +24,7 @@
 #include "itexture.h"
 #include "iimage.h"
 
-class csGraphics3DOpenGL;
+class csGraphics3DOGLCommon;
 class csOpenGLDynamic;
 
 enum csGLDynTexType
@@ -32,7 +32,6 @@ enum csGLDynTexType
   SOFTWARE_TEXTURE = 1,
   BACK_BUFFER_TEXTURE = 2,
   AUXILIARY_BUFFER_TEXTURE = 3,
-  SOFTWARE_TEXTURE_OLD = 4 
 };
 
 /**
@@ -45,20 +44,23 @@ public:
   /// Retains original size of image before any readjustment
   int orig_width, orig_height;
   /// A pointer to the 3D driver object
-  csGraphics3DOpenGL *G3D;
+  csGraphics3DOGLCommon *G3D;
 
   /// Initialize the object
-  csTextureMMOpenGL (iImage *image, int flags, csGraphics3DOpenGL *iG3D);
+  csTextureMMOpenGL (iImage *image, int flags, csGraphics3DOGLCommon *iG3D);
   /// Delete the texture object
   virtual ~csTextureMMOpenGL ();
   /// Create a new texture object
   virtual csTexture *NewTexture (iImage *Image);
+  /// Adjust size, mipmap etc
+  void InitTexture (int max_tex_size, csPixelFormat *pfmt, 
+		    csGLDynTexType dyn_tex_type);
   /// Compute the mean color for the just-created texture
   virtual void ComputeMeanColor ();
 
 
-  void CreateDynamicTexture(csGraphics3DOpenGL *parentG3D, csGLDynTexType type,
-			    csPixelFormat *PixelFormat);
+  void CreateDynamicTexture(csGraphics3DOGLCommon *parentG3D, 
+			    csGLDynTexType type, csPixelFormat *PixelFormat);
 
   virtual iGraphics3D *GetDynamicTextureInterface ();
 };
@@ -104,7 +106,7 @@ public:
   virtual ~csTextureOpenGLDynamic ();
 
   void CreateInterfaces (csTextureMMOpenGL *mm_tex, csGLDynTexType type,
-			 csGraphics3DOpenGL *parentG3D, csPixelFormat *pfmt);
+			 csGraphics3DOGLCommon *parentG3D, csPixelFormat *pfmt);
 };
 
 /**
@@ -114,12 +116,13 @@ class csTextureManagerOpenGL : public csTextureManager
 {
 public:
   /// A pointer to the 3D driver object
-  csGraphics3DOpenGL *G3D;
+  csGraphics3DOGLCommon *G3D;
   csGLDynTexType dyn_tex_type;
+  int max_tex_size;
 
   ///
   csTextureManagerOpenGL (iSystem* iSys, iGraphics2D* iG2D, csIniFile *config,
-    csGraphics3DOpenGL *iG3D);
+    csGraphics3DOGLCommon *iG3D);
   ///
   virtual ~csTextureManagerOpenGL ();
   /// Read configuration values from config file.

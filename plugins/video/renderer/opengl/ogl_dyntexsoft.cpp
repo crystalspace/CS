@@ -20,7 +20,7 @@
 #include "ogl_txtcache.h"
 #include "ogl_txtmgr.h"
 #include "ogl_dyntexsoft.h"
-#include "ogl_g3d.h"
+#include "ogl_g3dcom.h"
 #include "isystem.h"
 
 IMPLEMENT_IBASE (csOpenGLDynamicSoftware)
@@ -33,8 +33,8 @@ IMPLEMENT_IBASE_END;
 csOpenGLDynamicSoftware::csOpenGLDynamicSoftware (iBase * pParent)
 { 
   CONSTRUCT_IBASE (pParent);
-  tex=NULL; 
-  g3d=NULL; 
+  tex = NULL; 
+  g3d = NULL; 
   rstate_bilinearmap = false;
 }
 
@@ -43,7 +43,7 @@ csOpenGLDynamicSoftware::~csOpenGLDynamicSoftware ()
   if (g3d) g3d->DecRef ();
 }
 
-void csOpenGLDynamicSoftware::SetTarget (csGraphics3DOpenGL *parent_g3d, 
+void csOpenGLDynamicSoftware::SetTarget (csGraphics3DOGLCommon *parent_g3d, 
   csTextureMMOpenGL *tex)
 { 
   system = parent_g3d->System;

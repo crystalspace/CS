@@ -49,7 +49,6 @@ iGraphics2D *csDynamicTextureSoft2D::CreateOffScreenCanvas
 {
   Width = width;
   Height = height;
-  Font = 0;
   FullScreen = false;
   Memory = (unsigned char*) buffer;
   // If flags is set then we are sharing the texture manager and so we can't 
@@ -118,9 +117,7 @@ iGraphics2D *csDynamicTextureSoft2D::CreateOffScreenCanvas
   pfmt.complete ();
 
   // Get the font server, as we've bypassed csGraphics2D::Initialize
-  const char *p = System->ConfigGetStr ("FontServer", CS_FUNCID_FONT, 
-					"crystalspace.font.server.csfont");
-  FontServer = LOAD_PLUGIN (System, p, CS_FUNCID_FONT, iFontServer);
+  FontServer = QUERY_PLUGIN_ID (System, CS_FUNCID_FONT, iFontServer);
   Font = 0;
 
   return (iGraphics2D*)this;

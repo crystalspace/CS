@@ -43,6 +43,10 @@ bool csGraphics2DGLCommon::Initialize (iSystem *pSystem)
     return false;
 
   // We don't really care about pixel format, except for ScreenShot ()
+
+  // We do now with copying frame data about with the dynamic textures.
+  // Besides, screenshot doesn't work properly in 16bit modes.
+  // This is now over-ridden in the glX drivers
 #if defined (CS_BIG_ENDIAN)
   pfmt.RedMask   = 0xff000000;
   pfmt.GreenMask = 0x00ff0000;
@@ -67,10 +71,13 @@ csGraphics2DGLCommon::~csGraphics2DGLCommon ()
 bool csGraphics2DGLCommon::Open (const char *Title)
 {
   if (glGetString (GL_RENDERER))
-    CsPrintf (MSG_INITIALIZATION, "OpenGL renderer %s ", glGetString (GL_RENDERER));
+    CsPrintf (MSG_INITIALIZATION, "OpenGL renderer:\n%s\n", glGetString (GL_RENDERER));
   if (glGetString (GL_VERSION))
     CsPrintf (MSG_INITIALIZATION, "Version %s", glGetString(GL_VERSION));
   CsPrintf (MSG_INITIALIZATION, "\n");
+
+  CsPrintf (MSG_INITIALIZATION, "Using %s mode at resolution %dx%d.\n",
+	     FullScreen ? "full screen" : "windowed", Width, Height);
 
   if (!csGraphics2D::Open (Title))
     return false;

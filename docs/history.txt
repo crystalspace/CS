@@ -1,5 +1,23 @@
 The history order has been reversed so that new features are at the top.
-
+4-Jun-2000
+	- Samuel Humphreys has been busy with the opengl drivers:
+            - rewrote the ogl backbuffer dynamic texture implementation, it now
+              inherits from csGraphics3DOGLCommon and implements a dummy 
+              iGraphics2D which transforms vertex info to lower bottom left 
+              subregion of back buffer, and reports correctly width and height
+              information. This has required splitting the old ogl_g3d.* into 
+              ogl_g3dcom.* and ogl_g3d.* Also two new private functions are
+              added SharedInitialize and SharedOpen which have the same 
+              functionality as those in the software drivers.
+              The engine now renders to backbuffer 
+              textures, but they are still inverted and have corrupt colour 
+              information.
+            - Added verbose visual information reporting to glx. Now reports 
+              about auxiliary buffers and properly fills in pfmt.
+            - The ogl texture manager now detects and deals with maximum texture
+              constraints i.e. my voodoo2's 256x256 :)
+            - Removed old software dynamic texture implementation.
+            - Small fixes for canvas/common & dtsimple
 2-Jun-2000
 	- Samuel Humphreys added some further options to dtsimple and fixed
 	  cleaning up. Dynamic textures clean up after themselves properly now.
@@ -9,8 +27,8 @@ The history order has been reversed so that new features are at the top.
 	      to determine whether it needs to swap states.
 	    - Metaball plugin now queries iGraphics3D for width and height of
 	      context.
-	    - Opengl: need to convert vertices co-ordinates to the upper left
-	      subregion of the backbuffer.
+	    - Opengl: Converted back buffer dynamic texture vertex co-ordinates
+              to render to the upper left subregion of the backbuffer.
 	- Gary Haussmann added a workaround to allow Mac users to see text;
 	  apparently the current Mac drivers do not support a pure GL_ALPHA
 	  texture, so for the OS_MACOS platform we use GL_LUMENENCE textures
@@ -61,7 +79,7 @@ The history order has been reversed so that new features are at the top.
 	  worked out the warp transform yet so the animation is disabled.
 	- Samuel also did various fixes to some of the X 2D canvas drivers:
 	  migrated the 'behave well under cantankerous window managers code'
-	  into glx and linex.
+	  into glx and linex. Also fixed a bug he introduced into metademo.
 	- Alex Pfaffe added new terrain.zip for the new terrain engine
 	  (with low-res textures).
 	- Alex also fixed the terrain engine for software rendering and

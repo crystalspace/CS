@@ -26,7 +26,7 @@
 #include "qint.h"
 #include "csgeom/math2d.h"
 #include "csutil/util.h"
-#include "ogl_g3d.h"
+#include "ogl_g3dcom.h"
 #include "ihalo.h"
 
 class csOpenGLHalo:public iHalo
@@ -40,12 +40,12 @@ class csOpenGLHalo:public iHalo
                 //alphamap size is arbitrary.
   float prev_intensity;   //Checkup so that we can skip one step occasionally
   GLuint halohandle;      //Our OpenGL texture handle
-  csGraphics3DOpenGL *G3D;  //
+  csGraphics3DOGLCommon *G3D;  //
 public:
   DECLARE_IBASE;
 
-  csOpenGLHalo (float iR,float iG,float iB, unsigned char *iAlpha, int iWidth,int iHeight,
-    csGraphics3DOpenGL *iG3D);
+  csOpenGLHalo (float iR,float iG,float iB, unsigned char *iAlpha, 
+		int iWidth,int iHeight, csGraphics3DOGLCommon *iG3D);
 
   virtual ~csOpenGLHalo();
 
@@ -66,7 +66,7 @@ IMPLEMENT_IBASE(csOpenGLHalo)
 IMPLEMENT_IBASE_END
 
 csOpenGLHalo::csOpenGLHalo(float iR,float iG,float iB,unsigned char *iAlpha,
-               int iWidth,int iHeight,csGraphics3DOpenGL *iG3D)
+               int iWidth,int iHeight,csGraphics3DOGLCommon *iG3D)
 {
   CONSTRUCT_IBASE(NULL);
 
@@ -186,7 +186,8 @@ void csOpenGLHalo::Draw(float x,float y,float w,float h,float iIntensity,csVecto
   delete []texcoords; //Ooops. Almost forgot.
 }
 
-iHalo *csGraphics3DOpenGL::CreateHalo(float iR,float iG,float iB,unsigned char *iAlpha,int iWidth,int iHeight)
+iHalo *csGraphics3DOGLCommon::CreateHalo (float iR, float iG, float iB,
+			      unsigned char *iAlpha,int iWidth,int iHeight)
 {
   csOpenGLHalo *h=new csOpenGLHalo(iR,iG,iB,iAlpha,iWidth,iHeight,this);
   return h;

@@ -1,6 +1,6 @@
 /*
-    Copyright (C) 2000 by Norman Krämer
-    Adapted for opengl by Samuel Humphreys
+    Copyright (C) 2000  by Samuel Humphreys 
+    Based on the glide implementation by Norman Krämer
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -24,7 +24,7 @@
  * And here is the basic idea:
  * On call of a BeginDraw we copy the texture in question into the backbuffer.
  * Then normal rendering occurs.
- * On FinishDraw we copy it back into the csTextureOpenGLDynamic.
+ * On Print we copy the area rendered to back to the texture. TODO..
  * To keep the backbuffer intact we save and restore the area. TODO..
  */
 
@@ -32,75 +32,211 @@
 #define _OGL_DYNTEXBACK_H_
 
 #include "igraph3d.h"
+#include "igraph2d.h"
+#include "isystem.h"
+#include "video/renderer/common/dtmesh.h"
+#include "video/renderer/common/dpmesh.h"
+#include "ogl_g3dcom.h"
+#include "csgeom/transfrm.h"
 
-class csGraphics3DOpenGL;
 class csTextureMMOpenGL;
 class csTextureOpenGLDynamic;
-struct iGraphics2D;
+class csClipper;
 
-class csOpenGLDynamicBackBuffer : public iGraphics3D
+
+
+class csOpenGLDynamicBackBuffer : public csGraphics3DOGLCommon
 {
  protected:
   csTextureMMOpenGL *tex;
   csTextureOpenGLDynamic *tex_0;
-  csGraphics3DOpenGL *g3d;
-  iGraphics2D *g2d;
-  int width, height, frame_height, nPixelBytes;
+
+  int frame_height, pixel_bytes;
   csPixelFormat *pfmt;
   bool rstate_bilinearmap;
-  
+
+  // The pair of intefaces to the frame buffer
+  csGraphics3DOGLCommon *g3d;
+  iGraphics2D *g2d;
  public:
   DECLARE_IBASE;
 
-  csOpenGLDynamicBackBuffer (iBase * pParent);
-  virtual ~csOpenGLDynamicBackBuffer (){}
+  csOpenGLDynamicBackBuffer (iBase *parent);
 
-  void SetTarget (csGraphics3DOpenGL *g3d, csTextureMMOpenGL *tex);
+  virtual ~csOpenGLDynamicBackBuffer ();
 
-  virtual bool Initialize (iSystem * /*pSystem*/){ return true; }
-  virtual bool Open (const char * /*Title*/){ return true; }
+  void SetTarget (csGraphics3DOGLCommon *g3d, csTextureMMOpenGL *tex);
+
+  virtual bool Initialize (iSystem* /*System*/)
+  { return false; }
+
+  virtual bool Open (const char * /*Title*/)
+  { return false; }
+
   virtual void Close () {}
-  virtual void SetDimensions (int /*width*/, int /*height*/){}
 
   virtual bool BeginDraw (int DrawFlags);
-  virtual void FinishDraw ();
+
   virtual void Print (csRect *area);
 
-  virtual int GetWidth (){ return width; }
-  virtual int GetHeight (){ return height; }
-
-  virtual void DrawPolygon (G3DPolygonDP& poly);
-  virtual void DrawPolygonDebug (G3DPolygonDP& poly);
-  virtual void DrawLine (const csVector3& v1, const csVector3& v2, float fov, int color);
-  virtual void StartPolygonFX (iTextureHandle* handle, UInt mode);
-  virtual void FinishPolygonFX ();
-  virtual void DrawPolygonFX (G3DPolygonDPFX& poly);
-  virtual void DrawTriangleMesh (G3DTriangleMesh& mesh);
-  virtual void DrawPolygonMesh (G3DPolygonMesh& mesh);
-  virtual void OpenFogObject (CS_ID id, csFog* fog);
-  virtual void DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, int fogtype);
-  virtual void CloseFogObject (CS_ID id);
-  virtual bool SetRenderState (G3D_RENDERSTATEOPTION op, long val);
-  virtual long GetRenderState (G3D_RENDERSTATEOPTION op);
-  virtual csGraphics3DCaps *GetCaps ();
-  virtual unsigned long *GetZBuffAt (int x, int y);
-  virtual float GetZBuffValue (int x, int y);
-  virtual void DumpCache ();
-  virtual void ClearCache ();
-  virtual void RemoveFromCache (iPolygonTexture* poly_texture);
-  virtual void SetPerspectiveCenter (int x, int y);
-  virtual void SetPerspectiveAspect (float aspect);
-  virtual void SetObjectToCamera (csReversibleTransform* o2c);
-  virtual void SetClipper (csVector2* vertices, int num_vertices);
-  virtual iGraphics2D *GetDriver2D ();
-  virtual iTextureManager *GetTextureManager ();
-  virtual iHalo *CreateHalo (float iR, float iG, float iB, unsigned char *iAlpha, int iWidth, int iHeight);
   virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
 			     int tx, int ty, int tw, int th);
+
   virtual iGraphics3D *CreateOffScreenRenderer (iGraphics3D *parent_g3d, 
     int width, int height, csPixelFormat *pfmt, void *buffer, 
     RGBPixel *palette, int pal_size);
 
 };
+
+
+// We do all this just to intercept a few calls. Mostly to transform 
+// y co-ordinates to a native opengl screen co-ordinate system, but also
+// to be able to report the correct texture width and height of this context, 
+// even though in reality the underlying buffer is the backbuffer.
+
+
+class csOpenGLDynamicBackBuffer2D : public iGraphics2D
+{
+  iGraphics2D *g2d;
+  int frame_height, width, height;
+  int font;
+
+ public:
+  DECLARE_IBASE;
+
+  csOpenGLDynamicBackBuffer2D (iGraphics2D *ig2d, int iwidth, int iheight);  
+
+  virtual ~csOpenGLDynamicBackBuffer2D ();
+
+  virtual bool Initialize (iSystem* /*System*/)
+  { return false; }
+
+  virtual bool Open (const char* /*Title*/)
+  { return false; }
+
+  virtual void Close () {}
+
+  ///?
+  virtual void SetClipRect (int nMinX, int nMinY, int nMaxX, int nMaxY)
+  { g2d->SetClipRect (nMinX, nMinY, nMaxX, nMaxY); }
+  ///?
+  virtual void GetClipRect (int& nMinX, int& nMinY, int& nMaxX, int& nMaxY)
+  { g2d->GetClipRect (nMinX, nMinY, nMaxX, nMaxY); }
+
+  virtual bool BeginDraw ()
+  { return g2d->BeginDraw (); }
+
+  virtual void FinishDraw ()
+  { g2d->FinishDraw (); }
+
+  virtual void Print (csRect* /*pArea*/) {};
+  ///?
+  virtual int GetPage ()
+  { return g2d->GetPage (); }
+
+  virtual bool DoubleBuffer (bool /*Enable*/)
+  { return false; }
+
+  virtual bool GetDoubleBufferState ()
+  { return false; }
+
+  // Use DrawBox?
+  virtual void Clear (int color)
+  { g2d->Clear (color); }
+
+  // UseDrawBox?
+  virtual void ClearAll (int color)
+  { g2d->ClearAll (color); }
+
+  virtual void DrawLine (float x1, float y1, float x2, float y2, int color);
+
+
+  virtual void DrawBox (int x, int y, int w, int h, int color);
+
+  ///?
+  virtual bool ClipLine (float& x1, float& y1, float& x2, float& y2,
+    int xmin, int ymin, int xmax, int ymax)
+  { return g2d->ClipLine (x1, y1, x2, y2, xmin, ymin, xmax, ymax); }
+  ///
+  virtual void DrawPixel (int x, int y, int color);
+
+  ///
+  virtual unsigned char *GetPixelAt (int x, int y);
+
+  ///
+  virtual csImageArea *SaveArea (int x, int y, int w, int h);
+
+  virtual void RestoreArea (csImageArea *Area, bool Free)
+  { g2d->RestoreArea (Area, Free); }
+
+  virtual void FreeArea (csImageArea *Area)
+  { g2d->FreeArea (Area); }
+
+  virtual bool SetMousePosition (int /*x*/, int /*y*/)
+  { return false; }
+
+  virtual bool SetMouseCursor (csMouseCursorID /*iShape*/)
+  { return false; }
+
+  virtual void SetRGB (int i, int r, int g, int b)
+  { g2d->SetRGB (i, r, g, b); }
+  ///
+  virtual void Write (int x, int y, int fg, int bg, const char *str);
+
+  ///
+  virtual void WriteChar (int x, int y, int fg, int bg, char c);
+
+  virtual int GetFontID ()
+  { return g2d->GetFontID (); }
+
+  virtual void SetFontID (int FontID);
+
+  virtual bool SetFontSize (int FontSize)
+  { return g2d->SetFontSize (FontSize); }
+
+  virtual int GetFontSize ()
+  { return g2d->GetFontSize (); }
+
+  virtual bool PerformExtension (const char *args)
+  { return g2d->PerformExtension (args); }
+
+  virtual int GetPixelBytes ()
+  { return g2d->GetPixelBytes (); }
+
+  virtual csPixelFormat *GetPixelFormat ()
+  { return g2d->GetPixelFormat (); }
+  ///
+  virtual int GetWidth ();
+
+  ///
+  virtual int GetHeight ();
+
+  virtual bool GetFullScreen ()
+  { return false; }
+
+  virtual int GetNumPalEntries ()
+  { return g2d->GetNumPalEntries (); }
+
+  virtual RGBPixel *GetPalette ()
+  { return g2d->GetPalette (); }
+
+  virtual int GetTextWidth (int FontID, const char *text)
+  { return g2d->GetTextWidth (FontID, text); }
+
+  virtual int GetTextHeight (int FontID)
+  { return g2d->GetTextHeight (FontID); }
+  ///
+  virtual void GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB);
+
+
+  virtual iImage *ScreenShot () 
+  { return g2d->ScreenShot(); }
+
+  virtual iGraphics2D *CreateOffScreenCanvas (int /*width*/, int /*height*/, 
+    csPixelFormat* /*pfmt*/, void* /*buffer*/, RGBPixel* /*palette*/, 
+    int /*pal_size*/, int /*flags*/) 
+  { return NULL; }
+};
+
 
 #endif // _OGL_DYNTEXBACK_H_
