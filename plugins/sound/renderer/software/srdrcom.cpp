@@ -52,7 +52,7 @@ csSoundRenderSoftware::csSoundRenderSoftware(iBase* piBase) : Listener(NULL)
   Listener = NULL;
   memory = NULL;
   memorysize = 0;
-  Sources = NULL;
+//  Sources = NULL;
   VFS = NULL;
 }
 
