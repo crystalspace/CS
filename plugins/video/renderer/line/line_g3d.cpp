@@ -109,9 +109,14 @@ csGraphics3DLine::csGraphics3DLine (iBase *iParent) : G2D (NULL)
 csGraphics3DLine::~csGraphics3DLine ()
 {
   Close ();
-  texman->Clear();
-  texman->DecRef(); texman = NULL;
-  vbufmgr->DecRef (); vbufmgr = NULL;
+  if (texman)
+    texman->Clear();
+  if (texman)
+    texman->DecRef(); 
+  texman = NULL;
+  if (vbufmgr)
+    vbufmgr->DecRef (); 
+  vbufmgr = NULL;
   if (G2D)
     G2D->DecRef ();
 }
