@@ -91,6 +91,14 @@ private:
   UByte** line_table;
 
   /**
+   * If true the we are really rendering with a smaller size inside a larger window.
+   */
+  bool do_smaller_rendering;
+
+  /// Buffer for smaller rendering.
+  unsigned char* smaller_buffer;
+
+  /**
    * Number of bytes for every pixel (expressed in shifts). Also used in
    * combination with line_table to calculate the in-screen offset.
    */
@@ -403,7 +411,7 @@ public:
   {
   public:
     ///
-    csHaloDrawer(IGraphics2D* piG2D, float r, float g, float b);
+    csHaloDrawer (IGraphics3D* piG3D, IGraphics2D* piG2D, float r, float g, float b);
     ///
     ~csHaloDrawer();
 

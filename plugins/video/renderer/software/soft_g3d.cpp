@@ -227,6 +227,8 @@ csGraphics3DSoftware::csGraphics3DSoftware (ISystem* piSystem) : m_piG2D(NULL)
   do_bilin_filt = false;
   do_transp = true;
   do_textured = true;
+  do_smaller_rendering = false;
+  smaller_buffer = NULL;
   rstate_mipmap = 0;
   rstate_gouraud = true;
   rstate_specular = true;
@@ -247,6 +249,7 @@ csGraphics3DSoftware::~csGraphics3DSoftware ()
 {
   Close ();
   CHK (delete [] z_buffer);
+  CHK (delete [] smaller_buffer);
   FINAL_RELEASE (m_piG2D);
 
   csScan_Finalize ();
@@ -610,14 +613,10 @@ STDMETHODIMP csGraphics3DSoftware::Open (char *Title)
   piGI->GetIsFullScreen (bFullScreen);
   piGI->GetPixelFormat (&pfmt);
 
-  width = nWidth;
-  height = nHeight;
-  width2 = nWidth/2;
-  height2 = nHeight/2;
-  SetDimensions (width, height);
+  SetDimensions (nWidth, nHeight);
 
-  SysPrintf(MSG_INITIALIZATION, "Using %s mode at resolution %dx%d.\n",
-            bFullScreen ? "full screen" : "windowed", nWidth, nHeight);
+  SysPrintf(MSG_INITIALIZATION, "Using %s mode %dx%d (internal rendering at %dx%d).\n",
+            bFullScreen ? "full screen" : "windowed", nWidth, nHeight, width, height);
 
   if (pfmt.PixelBytes == 4)
   {
@@ -688,12 +687,27 @@ STDMETHODIMP csGraphics3DSoftware::Close()
   return rc;
 }
 
-STDMETHODIMP csGraphics3DSoftware::SetDimensions (int width, int height)
+STDMETHODIMP csGraphics3DSoftware::SetDimensions (int nwidth, int nheight)
 {
-  csGraphics3DSoftware::width = width;
-  csGraphics3DSoftware::height = height;
-  csGraphics3DSoftware::width2 = width/2;
-  csGraphics3DSoftware::height2 = height/2;
+  if (do_smaller_rendering)
+  {
+    width = nwidth/2;
+    height = nheight/2;
+  }
+  else
+  {
+    width = nwidth;
+    height = nheight;
+  }
+  width2 = width/2;
+  height2 = height/2;
+
+  CHK (delete [] smaller_buffer);
+  smaller_buffer = NULL;
+  if (do_smaller_rendering)
+  {
+    CHK (smaller_buffer = new UByte [(width*height) * pfmt.PixelBytes]);
+  }
 
   CHK (delete [] z_buffer);
   CHK (z_buffer = new unsigned long [width*height]);
@@ -728,8 +742,73 @@ STDMETHODIMP csGraphics3DSoftware::BeginDraw (int DrawFlags)
     // Initialize the line table.
     int i;
     for (i = 0 ; i < height ; i++)
-      m_piG2D->GetPixelAt (0, i, &line_table[i]);
+      if (do_smaller_rendering)
+        line_table[i] = smaller_buffer + ((i*width)*pfmt.PixelBytes);
+      else
+        m_piG2D->GetPixelAt (0, i, &line_table[i]);
     dbg_current_polygon = 0;
+  }
+  else if (DrawMode & CSDRAW_3DGRAPHICS)
+  {
+    // Finished 3D drawing. If we are simulating the flush output to real frame buffer.
+    if (do_smaller_rendering)
+    {
+      int x, y;
+      switch (pfmt.PixelBytes)
+      {
+        case 2:
+	  if (pfmt.GreenBits == 5)
+            for (y = 0 ; y < height ; y++)
+            {
+              UShort* src = (UShort*)line_table[y];
+	      UByte* dst_b;
+	      UShort* dst1, * dst2;
+	      m_piG2D->GetPixelAt (0, y+y, &dst_b); dst1 = (UShort*)dst_b;
+	      m_piG2D->GetPixelAt (0, y+y+1, &dst_b); dst2 = (UShort*)dst_b;
+              for (x = 0 ; x < width ; x++)
+	      {
+	        dst1[x+x] = src[x];
+	        dst1[x+x+1] = ((src[x]&0x7bde)>>1) + ((src[x+1]&0x7bde)>>1);
+	        dst2[x+x] = ((src[x]&0x7bde)>>1) + ((src[x+width]&0x7bde)>>1);
+	        dst2[x+x+1] = ((dst1[x+x+1]&0x7bde)>>1) + ((dst2[x+x]&0x7bde)>>1);
+	      }
+            }
+	  else
+            for (y = 0 ; y < height ; y++)
+            {
+              UShort* src = (UShort*)line_table[y];
+	      UByte* dst_b;
+	      UShort* dst1, * dst2;
+	      m_piG2D->GetPixelAt (0, y+y, &dst_b); dst1 = (UShort*)dst_b;
+	      m_piG2D->GetPixelAt (0, y+y+1, &dst_b); dst2 = (UShort*)dst_b;
+              for (x = 0 ; x < width ; x++)
+	      {
+	        dst1[x+x] = src[x];
+	        dst1[x+x+1] = ((src[x]&0xf7de)>>1) + ((src[x+1]&0xf7de)>>1);
+	        dst2[x+x] = ((src[x]&0xf7de)>>1) + ((src[x+width]&0xf7de)>>1);
+	        dst2[x+x+1] = ((dst1[x+x+1]&0xf7de)>>1) + ((dst2[x+x]&0xf7de)>>1);
+	      }
+            }
+	  break;
+        case 4:
+          for (y = 0 ; y < height ; y++)
+          {
+            ULong* src = (ULong*)line_table[y];
+	    UByte* dst_b;
+	    ULong* dst1, * dst2;
+	    m_piG2D->GetPixelAt (0, y+y, &dst_b); dst1 = (ULong*)dst_b;
+	    m_piG2D->GetPixelAt (0, y+y+1, &dst_b); dst2 = (ULong*)dst_b;
+            for (x = 0 ; x < width ; x++)
+	    {
+	      dst1[x+x] = src[x];
+	      dst1[x+x+1] = ((src[x]&0xfefefe)>>1) + ((src[x+1]&0xfefefe)>>1);
+	      dst2[x+x] = ((src[x]&0xfefefe)>>1) + ((src[x+width]&0xfefefe)>>1);
+	      dst2[x+x+1] = ((dst1[x+x+1]&0xfefefe)>>1) + ((dst2[x+x]&0xfefefe)>>1);
+	    }
+          }
+	  break;
+      }
+    }
   }
 
   DrawMode = DrawFlags;
@@ -2859,7 +2938,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawHalo(csVector3* pCenter, float fIntensity
 STDMETHODIMP csGraphics3DSoftware::CreateHalo(float r, float g, float b, HALOINFO* pRetVal)
 {
   m_piG2D->AddRef();
-  csHaloDrawer halo(m_piG2D, r, g, b);
+  csHaloDrawer halo (this, m_piG2D, r, g, b);
 
   CHK (csG3DSoftwareHaloInfo* retval = new csG3DSoftwareHaloInfo());
 
@@ -2899,7 +2978,8 @@ STDMETHODIMP csGraphics3DSoftware::TestHalo (csVector3* pCenter)
 
 // csHaloDrawer implementation //
 
-csGraphics3DSoftware::csHaloDrawer::csHaloDrawer(IGraphics2D* piG2D, float r, float g, float b)
+csGraphics3DSoftware::csHaloDrawer::csHaloDrawer (IGraphics3D* piG3D, IGraphics2D* piG2D,
+	float r, float g, float b)
 {
   mpBuffer = NULL;
   mpAlphaBuffer = NULL;
@@ -2909,8 +2989,8 @@ csGraphics3DSoftware::csHaloDrawer::csHaloDrawer(IGraphics2D* piG2D, float r, fl
   piG2D->QueryInterface(IID_IGraphicsInfo, (void**)&piGI);
   mpiG2D = piG2D;
 
-  piGI->GetWidth(mWidth);
-  piGI->GetHeight(mHeight);
+  piG3D->GetWidth (mWidth);
+  piG3D->GetHeight (mHeight);
 
   csPixelFormat pfmt;
   piGI->GetPixelFormat (&pfmt);
@@ -3280,9 +3360,10 @@ csOptionDescription IXConfig3DSoft::config_options[] =
   { 9, "dmipmap2", "Mipmap distance 2", CSVAR_FLOAT },
   { 10, "dmipmap3", "Mipmap distance 3", CSVAR_FLOAT },
   { 11, "gouraud", "Gouraud shading", CSVAR_BOOL },
+  { 12, "smaller", "Smaller rendering", CSVAR_BOOL },
 };
 
-#define NUM_OPTIONS 12
+#define NUM_OPTIONS 13
 
 STDMETHODIMP IXConfig3DSoft::SetOption (int id, csVariant* value)
 {
@@ -3304,6 +3385,7 @@ STDMETHODIMP IXConfig3DSoft::SetOption (int id, csVariant* value)
     case 9: pThis->zdist_mipmap2 = value->v.fVal; break;
     case 10: pThis->zdist_mipmap3 = value->v.fVal; break;
     case 11: pThis->rstate_gouraud = value->v.bVal; break;
+    case 12: pThis->do_smaller_rendering = value->v.bVal; break;
     default: return E_FAIL;
   }
   pThis->ScanSetup ();
@@ -3330,6 +3412,7 @@ STDMETHODIMP IXConfig3DSoft::GetOption (int id, csVariant* value)
     case 9: value->v.fVal = pThis->zdist_mipmap2; break;
     case 10: value->v.fVal = pThis->zdist_mipmap3; break;
     case 11: value->v.bVal = pThis->rstate_gouraud; break;
+    case 12: value->v.bVal = pThis->do_smaller_rendering; break;
     default: return E_FAIL;
   }
   return S_OK;
