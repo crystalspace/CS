@@ -299,7 +299,7 @@ public:
 
   /// Set world to view transform
   void SetObjectToCamera (csReversibleTransform* wvmatrix);
-  csReversibleTransform* GetWVMatrix ();
+  const csReversibleTransform& GetObjectToCamera ();
 
   /// Set the current render target (0 for screen).
   virtual void SetRenderTarget (iTextureHandle* handle,
@@ -311,7 +311,7 @@ public:
   }
 
   /// Get the current render target (0 for screen).
-  virtual iTextureHandle* GetRenderTarget ()
+  virtual iTextureHandle* GetRenderTarget () const
   {
     return render_target;
   }
@@ -414,8 +414,8 @@ public:
   virtual void DisablePVL ()
     { statecache->Disable_GL_LIGHTING (); }
 
-  virtual bool SetRenderState (R3D_RENDERSTATEOPTION op, long val);
-  virtual long GetRenderState (R3D_RENDERSTATEOPTION op) const;
+  virtual bool SetRenderState (G3D_RENDERSTATEOPTION op, long val);
+  virtual long GetRenderState (G3D_RENDERSTATEOPTION op) const;
 
   ////////////////////////////////////////////////////////////////////
   //                         iShaderRenderInterface

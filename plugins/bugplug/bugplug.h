@@ -218,14 +218,11 @@ private:
 
   // Toggle a G3D boolean option.
   bool do_shadow_debug;
-#ifndef CS_USE_NEW_RENDERER
-  void ToggleG3DState (G3D_RENDERSTATEOPTION op, const char* name);
-#else
+#ifdef CS_USE_NEW_RENDERER
   csRef<iShader> standardShadowShader;
   csRef<iShader> debugShadowShader;
-
-  void ToggleR3DState (R3D_RENDERSTATEOPTION op, const char* name);
 #endif
+  void ToggleR3DState (G3D_RENDERSTATEOPTION op, const char* name);
 
   // The selected mesh.
   iMeshWrapper* selected_mesh;

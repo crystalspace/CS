@@ -643,7 +643,7 @@ public:
   //virtual bool IsLightmapOK (iPolygonTexture* poly_texture);
 
   virtual void SetRenderTarget (iTextureHandle* handle, bool persistent);
-  virtual iTextureHandle* GetRenderTarget () { return render_target; }
+  virtual iTextureHandle* GetRenderTarget () const { return render_target; }
 
   /// Get Z-buffer value at given X,Y position
   virtual float GetZBuffValue (int x, int y);
@@ -759,9 +759,9 @@ public:
   {
   }
 
-  csReversibleTransform* GetWVMatrix ()
+  csReversibleTransform& GetObjectToCamera ()
   {
-    return &o2c;
+    return o2c;
   }
 
   /// Set the masking of color and/or alpha values to framebuffer
@@ -812,12 +812,12 @@ public:
   {
   }
 
-  virtual bool SetRenderState (R3D_RENDERSTATEOPTION op, long val)
+  virtual bool SetRenderState (G3D_RENDERSTATEOPTION op, long val)
   {
     return 0;
   }
 
-  virtual long GetRenderState (R3D_RENDERSTATEOPTION op) const
+  virtual long GetRenderState (G3D_RENDERSTATEOPTION op) const
   {
     return 0;
   }

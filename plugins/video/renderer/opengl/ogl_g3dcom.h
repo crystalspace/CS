@@ -638,13 +638,13 @@ public:
   virtual bool SetRenderState (G3D_RENDERSTATEOPTION op, long val);
 
   /// Get a renderstate value.
-  virtual long GetRenderState (G3D_RENDERSTATEOPTION op);
+  virtual long GetRenderState (G3D_RENDERSTATEOPTION op) const;
 
   /**
    * Get the current driver's capabilities. Each driver implements their
    * own function.
    */
-  virtual csGraphics3DCaps *GetCaps ()
+  virtual const csGraphics3DCaps *GetCaps () const
   { return &Caps; }
 
   /// Get address of Z-buffer at specific point
@@ -661,11 +661,9 @@ public:
   virtual void RemoveFromCache (iRendererLightmap* rlm);
 
   /// Get drawing buffer width
-  virtual int GetWidth ()
-  { return width; }
+  virtual int GetWidth () const { return width; }
   /// Get drawing buffer height
-  virtual int GetHeight ()
-  { return height; }
+  virtual int GetHeight () const { return height; }
   /// Set center of projection.
   virtual void SetPerspectiveCenter (int x, int y)
   {
@@ -674,7 +672,7 @@ public:
     frustum_valid = false;
   }
   /// Get center of projection.
-  virtual void GetPerspectiveCenter (int& x, int& y)
+  virtual void GetPerspectiveCenter (int& x, int& y) const
   {
     x = asp_center_x;
     y = asp_center_y;
@@ -687,7 +685,7 @@ public:
     frustum_valid = false;
   }
   /// Get perspective aspect.
-  virtual float GetPerspectiveAspect ()
+  virtual float GetPerspectiveAspect () const
   {
     return aspect;
   }
@@ -706,7 +704,7 @@ public:
   /// Get clipper.
   virtual iClipper2D* GetClipper () { return clipper; }
   /// Get clipper type.
-  virtual int GetClipType () { return cliptype; }
+  virtual int GetClipType () const { return cliptype; }
 
   /// Set near clip plane.
   virtual void SetNearPlane (const csPlane3& pl)
@@ -719,10 +717,10 @@ public:
   virtual void ResetNearPlane () { do_near_plane = false; }
 
   /// Get near clip plane.
-  virtual const csPlane3& GetNearPlane () { return near_plane; }
+  virtual const csPlane3& GetNearPlane () const { return near_plane; }
 
   /// Return true if we have near plane.
-  virtual bool HasNearPlane () { return do_near_plane; }
+  virtual bool HasNearPlane () const { return do_near_plane; }
 
   /// Setup OpenGL transforms for DrawTriangleMesh().
   void SetupDTMTransforms (int vertex_mode);

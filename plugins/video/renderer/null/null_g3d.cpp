@@ -262,7 +262,7 @@ bool csGraphics3DNull::SetRenderState (G3D_RENDERSTATEOPTION op,
   return true;
 }
 
-long csGraphics3DNull::GetRenderState (G3D_RENDERSTATEOPTION op)
+long csGraphics3DNull::GetRenderState (G3D_RENDERSTATEOPTION op) const
 {
   switch (op)
   {

@@ -3249,7 +3249,7 @@ bool csGraphics3DSoftwareCommon::SetRenderState (G3D_RENDERSTATEOPTION op,
   return true;
 }
 
-long csGraphics3DSoftwareCommon::GetRenderState(G3D_RENDERSTATEOPTION op)
+long csGraphics3DSoftwareCommon::GetRenderState(G3D_RENDERSTATEOPTION op) const
 {
   switch (op)
   {

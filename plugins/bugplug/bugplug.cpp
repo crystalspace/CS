@@ -467,7 +467,7 @@ void csBugPlug::ToggleG3DState (G3D_RENDERSTATEOPTION op, const char* name)
   }
 }
 #else
-void csBugPlug::ToggleR3DState (R3D_RENDERSTATEOPTION op, const char* name)
+void csBugPlug::ToggleR3DState (G3D_RENDERSTATEOPTION op, const char* name)
 {
   if (!G3D) return;
   bool v;

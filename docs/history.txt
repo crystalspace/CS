@@ -7,11 +7,18 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 5-Sep-2003
+	- Jorrit changed R3D_RENDERSTATEOPTION to G3D_RENDERSTATEOPTION
+	  for the new renderer.
+	- Jorrit renamed GetWVMatrix() to GetObjectToCamera(). This is
+	  more logical (symetrical with SetObjectToCamera()) and also
+	  more compatible with old renderer.
+	- Jorrit completely merged render3d.h with graph3d.h so that only
+	  graph3d.h remains.
 	- Peter Amstutz added more comments to the AttachCollider*
 	  methods in varia/dynamics.h and changed the default
 	  softness from .316 to .01
 	- Duhprey fixed the default to stepfast and coding style in
-	  odedynam
+	  odedynam.
 4-Sep-2003
 	- Peter Amstutz fixed the csPolyTexture destructor (part of
 	  the thing plugin) to not try to deallocate the lightmap 

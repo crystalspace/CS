@@ -1012,9 +1012,9 @@ void csGLGraphics3D::Print (csRect* area)
   G2D->Print (area);
 }
 
-csReversibleTransform* csGLGraphics3D::GetWVMatrix()
+const csReversibleTransform& csGLGraphics3D::GetObjectToCamera()
 {
-  return &object2camera;
+  return object2camera;
 }
 
 void csGLGraphics3D::SetObjectToCamera(csReversibleTransform* wvmatrix)
@@ -1730,12 +1730,12 @@ void csGLGraphics3D::SetLightParameter (int i, int param, csVector3 value)
 
 // @@@ doesn't serve any purpose for now, but might in the future.
 // left in for now.
-bool csGLGraphics3D::SetRenderState (R3D_RENDERSTATEOPTION op, long val)
+bool csGLGraphics3D::SetRenderState (G3D_RENDERSTATEOPTION op, long val)
 {
   return false;
 }
 
-long csGLGraphics3D::GetRenderState (R3D_RENDERSTATEOPTION op) const
+long csGLGraphics3D::GetRenderState (G3D_RENDERSTATEOPTION op) const
 {
   return 0;
 }

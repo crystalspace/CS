@@ -33,6 +33,7 @@
 #include "csgeom/vector2.h"
 #include "csgeom/tri.h"
 #include "csutil/cscolor.h"
+#include "ivideo/rndbuf.h"
 
 class csMatrix3;
 class csVector3;
@@ -40,6 +41,7 @@ class csVector2;
 class csPlane3;
 class csRect;
 class csReversibleTransform;
+class csRenderMesh;
 
 struct iGraphics2D;
 struct iPolygonTexture;
@@ -57,6 +59,10 @@ struct csRGBpixel;
 struct csPixelFormat;
 struct csPolyTextureMapping;
 struct csPolyLightMapMapping;
+struct iRenderBuffer;
+struct iRenderBufferManager;
+struct iLightingManager;
+
 
 /**\name iGraphics3D::BeginDraw() flags
  * @{ */
@@ -229,12 +235,86 @@ enum G3D_FOGMETHOD
   (CS_FX_ALPHA | uint (alpha & CS_FX_MASK_ALPHA))
 /** @} */
 
-//===========================================================================
-// Below this point follows everything that is NOT relevant for the
-// new renderer!
-//===========================================================================
+/**\name Light parameters
+ * @{ */
+/// Position of the light.
+#define CS_LIGHTPARAM_POSITION 0
+/// Diffuse color of the light.
+#define CS_LIGHTPARAM_DIFFUSE 1
+/// Specular color of the light.
+#define CS_LIGHTPARAM_SPECULAR 2
+/// Attenuation of the light.
+#define CS_LIGHTPARAM_ATTENUATION 3
+/** @} */
+
+/**\name Shadow states
+ * @{ */
+/// Clear stencil.
+#define CS_SHADOW_VOLUME_BEGIN 1
+/// Setup for pass 1.
+#define CS_SHADOW_VOLUME_PASS1 2
+/// Setup for pass 2.
+#define CS_SHADOW_VOLUME_PASS2 3
+/// Setup for carmack's reverse pass 1.
+#define CS_SHADOW_VOLUME_FAIL1 4
+/// Setup for carmack's reverse pass 2.
+#define CS_SHADOW_VOLUME_FAIL2 5
+/// Setup for shadow masking.
+#define CS_SHADOW_VOLUME_USE 6
+/// Restore states.
+#define CS_SHADOW_VOLUME_FINISH 7
+/** @} */
+
+/// Graphics3D render state options
+enum G3D_RENDERSTATEOPTION
+{
+  /// Set Z-buffer fill/test/use mode (parameter is a csZBufMode)
+  G3DRENDERSTATE_ZBUFFERMODE,
+  /// Enable/disable dithering (parameter is a bool)
+  G3DRENDERSTATE_DITHERENABLE,
+  /// Enable/disable bi-linear mapping (parameter is a bool)
+  G3DRENDERSTATE_BILINEARMAPPINGENABLE,
+  /// Enable/disable tri-linear mapping (parameter is a bool)
+  G3DRENDERSTATE_TRILINEARMAPPINGENABLE,
+  /// Enable/disable transparent textures (parameter is a bool)
+  G3DRENDERSTATE_TRANSPARENCYENABLE,
+  /// Enable/disable mip-mapping (parameter is a bool)
+  G3DRENDERSTATE_MIPMAPENABLE,
+  /// Enable/disable textures (parameter is a bool)
+  G3DRENDERSTATE_TEXTUREMAPPINGENABLE,
+  /// Enable/disable lighting (parameter is a bool)
+  G3DRENDERSTATE_LIGHTINGENABLE,
+  /// Enable/disable interlacing (parameter is a bool)
+  G3DRENDERSTATE_INTERLACINGENABLE,
+  /// Enable/disable MMX instructions usage (parameter is a bool)
+  G3DRENDERSTATE_MMXENABLE,
+  /// Set perspective-correction interpolation step (parameter is a int)
+  G3DRENDERSTATE_INTERPOLATIONSTEP,
+  /// Set maximal number of polygons per frame to draw (parameter is a int)
+  G3DRENDERSTATE_MAXPOLYGONSTODRAW,
+  /// Enable/disable Gouraud shading (parameter is a bool)
+  G3DRENDERSTATE_GOURAUDENABLE,
+  /// Enable/disable edge drawing (debugging) (parameter is a bool)
+  G3DRENDERSTATE_EDGES
+};
+
+/// Information about 3d renderer capabilities.
+struct csGraphics3DCaps
+{
+  bool CanClip;
+  int minTexHeight, minTexWidth;
+  int maxTexHeight, maxTexWidth;
+  G3D_FOGMETHOD fog;
+  bool NeedsPO2Maps;
+  int MaxAspectRatio;
+};
+
 
 #ifndef CS_USE_NEW_RENDERER
+
+//===========================================================================
+// Not for new renderer!
+//===========================================================================
 
 #define CS_FOG_FRONT  0
 #define CS_FOG_BACK   1
@@ -366,50 +446,6 @@ struct G3DPolygonDP : public G3DPolygonDFP
 /// Structure containing all info needed by DrawPolygonFlat (DPF)
 typedef G3DPolygonDP G3DPolygonDPF;
 
-/// Graphics3D render state options
-enum G3D_RENDERSTATEOPTION
-{
-  /// Set Z-buffer fill/test/use mode (parameter is a csZBufMode)
-  G3DRENDERSTATE_ZBUFFERMODE,
-  /// Enable/disable dithering (parameter is a bool)
-  G3DRENDERSTATE_DITHERENABLE,
-  /// Enable/disable bi-linear mapping (parameter is a bool)
-  G3DRENDERSTATE_BILINEARMAPPINGENABLE,
-  /// Enable/disable tri-linear mapping (parameter is a bool)
-  G3DRENDERSTATE_TRILINEARMAPPINGENABLE,
-  /// Enable/disable transparent textures (parameter is a bool)
-  G3DRENDERSTATE_TRANSPARENCYENABLE,
-  /// Enable/disable mip-mapping (parameter is a bool)
-  G3DRENDERSTATE_MIPMAPENABLE,
-  /// Enable/disable textures (parameter is a bool)
-  G3DRENDERSTATE_TEXTUREMAPPINGENABLE,
-  /// Enable/disable lighting (parameter is a bool)
-  G3DRENDERSTATE_LIGHTINGENABLE,
-  /// Enable/disable interlacing (parameter is a bool)
-  G3DRENDERSTATE_INTERLACINGENABLE,
-  /// Enable/disable MMX instructions usage (parameter is a bool)
-  G3DRENDERSTATE_MMXENABLE,
-  /// Set perspective-correction interpolation step (parameter is a int)
-  G3DRENDERSTATE_INTERPOLATIONSTEP,
-  /// Set maximal number of polygons per frame to draw (parameter is a int)
-  G3DRENDERSTATE_MAXPOLYGONSTODRAW,
-  /// Enable/disable Gouraud shading (parameter is a bool)
-  G3DRENDERSTATE_GOURAUDENABLE,
-  /// Enable/disable edge drawing (debugging) (parameter is a bool)
-  G3DRENDERSTATE_EDGES
-};
-
-/// Information about 3d renderer capabilities.
-struct csGraphics3DCaps
-{
-  bool CanClip;
-  int minTexHeight, minTexWidth;
-  int maxTexHeight, maxTexWidth;
-  G3D_FOGMETHOD fog;
-  bool NeedsPO2Maps;
-  int MaxAspectRatio;
-};
-
 /**
  * Structure containing all info needed by DrawTriangeMesh.
  * This function is capable of:<br>
@@ -530,6 +566,8 @@ struct G3DPolygonMesh
   G3DFogInfo* vertex_fog;
 };
 
+#endif
+
 SCF_VERSION (iGraphics3D, 5, 2, 0);
 
 /**
@@ -545,22 +583,27 @@ struct iGraphics3D : public iBase
   /// Close the 3D graphics display.
   virtual void Close () = 0;
 
-  /// Get the 2D driver: This does NOT increment the refcount of 2D driver!
+  /**
+   * Get a pointer to our 2d canvas driver. NOTE: It's not increfed,
+   * and therefore it shouldn't be decref-ed by caller.
+   */
   virtual iGraphics2D *GetDriver2D () = 0;
+
+  /// Get the texture manager: do NOT increment the refcount of texture manager
+  virtual iTextureManager *GetTextureManager () = 0;
 
   /// Change the dimensions of the display.
   virtual void SetDimensions (int width, int height) = 0;
-
-  /// Get drawing buffer width
-  virtual int GetWidth () = 0;
-  /// Get drawing buffer height
-  virtual int GetHeight () = 0;
+  /// Get drawing buffer width.
+  virtual int GetWidth () const = 0;
+  /// Get drawing buffer height.
+  virtual int GetHeight () const = 0;
 
   /**
    * Get the current driver's capabilities. Each driver implements their
    * own function.
    */
-  virtual csGraphics3DCaps *GetCaps () = 0;
+  virtual const csGraphics3DCaps *GetCaps () const = 0;
 
   /**
    * Set center of projection for perspective projection.
@@ -569,7 +612,7 @@ struct iGraphics3D : public iBase
   virtual void SetPerspectiveCenter (int x, int y) = 0;
 
   /// Get perspective center.
-  virtual void GetPerspectiveCenter (int& x, int& y) = 0;
+  virtual void GetPerspectiveCenter (int& x, int& y) const = 0;
 
   /**
    * Set aspect ratio for perspective projection.
@@ -577,7 +620,7 @@ struct iGraphics3D : public iBase
   virtual void SetPerspectiveAspect (float aspect) = 0;
 
   /// Get aspect ratio.
-  virtual float GetPerspectiveAspect () = 0;
+  virtual float GetPerspectiveAspect () const = 0;
 
   /**
    * Set world to camera transformation (currently only used by
@@ -589,6 +632,64 @@ struct iGraphics3D : public iBase
    * Get world to camera transformation.
    */
   virtual const csReversibleTransform& GetObjectToCamera () = 0;
+
+  /**
+   * Set the target of rendering. If this is 0 then the target will
+   * be the main screen. Otherwise it is a texture. After calling
+   * g3d->FinishDraw() the target will automatically be reset to 0 (main
+   * screen). Note that on some implementions rendering on a texture
+   * will overwrite the screen. So you should only do this BEFORE you
+   * start rendering your frame.
+   * <p>
+   * If 'persistent' is true then the current contents of the texture
+   * will be copied on screen before drawing occurs (in the first
+   * call to BeginDraw). Otherwise it is assumed that you fully render
+   * the texture.
+   */
+  virtual void SetRenderTarget (iTextureHandle* handle,
+  	bool persistent = false) = 0;
+
+  /**
+   * Get the current render target (0 for screen).
+   */
+  virtual iTextureHandle* GetRenderTarget () const = 0;
+
+  /// Start a new frame (see CSDRAW_XXX bit flags)
+  virtual bool BeginDraw (int DrawFlags) = 0;
+
+  /// End the frame and do a page swap.
+  virtual void FinishDraw () = 0;
+
+  /**
+   * Print the image in backbuffer. The area parameter is only a hint to the
+   * renderer. Changes outside the rectangle may or may not be printed as
+   * well.
+   */
+  virtual void Print (csRect *area) = 0;
+
+  /**
+   * Draw a pixmap using a rectangle from given texture.
+   * The sx,sy(sw,sh) rectangle defines the screen rectangle within
+   * which the drawing is performed (clipping rectangle is also taken
+   * into account). The tx,ty(tw,th) rectangle defines a subrectangle
+   * from texture which should be painted. If the subrectangle exceeds
+   * the actual texture size, texture coordinates are wrapped around
+   * (e.g. the texture is tiled). The Alpha parameter defines the
+   * transparency of the drawing operation, 0 means opaque, 255 means
+   * fully transparent.<p>
+   * <b>WARNING: Tiling works only with textures that have power-of-two
+   * sizes!</b> That is, both width and height should be a power-of-two,
+   * although not neccessarily equal.
+   */
+  virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy,
+    int sw, int sh, int tx, int ty, int tw, int th, uint8 Alpha = 0) = 0;
+
+  /**
+   * Draw a line in camera space. Warning! This is a 2D operation
+   * and must be called while in BeginDraw(CSDRAW_2DGRAPHICS)!
+   */
+  virtual void DrawLine (const csVector3& v1, const csVector3& v2,
+    float fov, int color) = 0;
 
   /**
    * Set optional clipper to use. If clipper == null
@@ -605,7 +706,7 @@ struct iGraphics3D : public iBase
   /**
    * Return type of clipper.
    */
-  virtual int GetClipType () = 0;
+  virtual int GetClipType () const = 0;
 
   /**
    * Set near clip plane.
@@ -621,37 +722,91 @@ struct iGraphics3D : public iBase
   /**
    * Get near clip plane.
    */
-  virtual const csPlane3& GetNearPlane () = 0;
+  virtual const csPlane3& GetNearPlane () const = 0;
 
   /**
    * Return true if we have a near plane.
    */
-  virtual bool HasNearPlane () = 0;
-
-  /// Debugging only: get a pointer to Z-buffer at some location
-  virtual uint32 *GetZBuffAt (int x, int y) = 0;
-
-  /// Get Z-buffer value at given X,Y position
-  virtual float GetZBuffValue (int x, int y) = 0;
-
-  /// Start a new frame (see CSDRAW_XXX bit flags)
-  virtual bool BeginDraw (int DrawFlags) = 0;
-
-  /// End the frame and do a page swap.
-  virtual void FinishDraw () = 0;
-
-  /**
-   * Print the image in backbuffer. The area parameter is only a hint to the
-   * renderer. Changes outside the rectangle may or may not be printed as
-   * well.
-   */
-  virtual void Print (csRect *area) = 0;
+  virtual bool HasNearPlane () const = 0;
 
   /// Set a renderstate value.
   virtual bool SetRenderState (G3D_RENDERSTATEOPTION op, long val) = 0;
 
   /// Get a renderstate value.
-  virtual long GetRenderState (G3D_RENDERSTATEOPTION op) = 0;
+  virtual long GetRenderState (G3D_RENDERSTATEOPTION op) const = 0;
+
+#ifdef CS_USE_NEW_RENDERER
+  /**
+   * Create a renderbuffer.
+   * \param size Size of the buffer in bytes.
+   * \param type Type of buffer; CS_BUF_DYNAMIC or CS_BUF_STATIC
+   * \param componentType Components Types; CS_BUFCOMP_BYTE, CS_BUFCOMP_INT, etc
+   * \param componentCount Number of components per element (e.g. 4 for RGBA)
+   * \param index True if this buffer will contain indices. (Triangle buffer)
+   */
+  virtual csPtr<iRenderBuffer> CreateRenderBuffer (int size, 
+    csRenderBufferType type, csRenderBufferComponentType componentType, 
+    int componentCount, bool index) = 0;
+
+  /**
+   * Activate or deactivate all given buffers depending on the value of
+   * 'buffers' for that index.
+   */
+  virtual void SetBufferState (csVertexAttrib* attribs,
+  	iRenderBuffer** buffers, int count) = 0;
+
+  /**
+   * Activate or deactivate all given textures depending on the value
+   * of 'textures' for that unit (i.e. deactivate if 0).
+   */
+  virtual void SetTextureState (int* units, iTextureHandle** textures,
+  	int count) = 0;
+
+  /// Drawroutine. Only way to draw stuff
+  virtual void DrawMesh (csRenderMesh* mymesh) = 0;
+
+  /// Set the masking of color and/or alpha values to framebuffer
+  virtual void SetWriteMask (bool red, bool green, bool blue, bool alpha) = 0;
+
+  /// Get the masking of color and/or alpha values to framebuffer
+  virtual void GetWriteMask (bool &red, bool &green, bool &blue,
+	bool &alpha) const = 0;
+
+  /// Set the z buffer write/test mode
+  virtual void SetZMode (csZBufMode mode) = 0;
+
+  /// Enables offsetting of Z values
+  virtual void EnableZOffset () = 0;
+
+  /// Disables offsetting of Z values
+  virtual void DisableZOffset () = 0;
+
+  /// Controls shadow drawing
+  virtual void SetShadowState (int state) = 0;
+
+  /// Get maximum number of simultaneous HW lights supported.
+  virtual int GetMaxLights () const = 0;
+
+  /// Sets a parameter for light i.
+  virtual void SetLightParameter (int i, int param, csVector3 value) = 0;
+
+  /// Enables light i.
+  virtual void EnableLight (int i) = 0;
+
+  /// Disables light i.
+  virtual void DisableLight (int i) = 0;
+
+  /// Enable vertex lighting.
+  virtual void EnablePVL () = 0;
+
+  /// Disable vertex lighting.
+  virtual void DisablePVL () = 0;
+#else
+  /// Debugging only: get a pointer to Z-buffer at some location
+  virtual uint32 *GetZBuffAt (int x, int y) = 0;
+
+  /// Get Z-buffer value at given X,Y position
+  virtual float GetZBuffValue (int x, int y) = 0;
 
   /// Draw the projected polygon with light and texture.
   virtual void DrawPolygon (G3DPolygonDP& poly) = 0;
@@ -739,36 +894,9 @@ struct iGraphics3D : public iBase
    */
   virtual void ClosePortal () = 0;
 
-  /**
-   *  Draw a line in camera space. Warning! This is a 2D operation
-   *  and must be called while in BeginDraw(CSDRAW_2DGRAPHICS)!
-   */
-  virtual void DrawLine (const csVector3& v1, const csVector3& v2,
-    float fov, int color) = 0;
-
   /// Create a halo of the specified color and return a handle.
   virtual iHalo *CreateHalo (float iR, float iG, float iB,
     unsigned char *iAlpha, int iWidth, int iHeight) = 0;
-
-  /**
-   * Draw a pixmap using a rectangle from given texture.
-   * The sx,sy(sw,sh) rectangle defines the screen rectangle within
-   * which the drawing is performed (clipping rectangle is also taken
-   * into account). The tx,ty(tw,th) rectangle defines a subrectangle
-   * from texture which should be painted. If the subrectangle exceeds
-   * the actual texture size, texture coordinates are wrapped around
-   * (e.g. the texture is tiled). The Alpha parameter defines the
-   * transparency of the drawing operation, 0 means opaque, 255 means
-   * fully transparent.<p>
-   * <b>WARNING: Tiling works only with textures that have power-of-two
-   * sizes!</b> That is, both width and height should be a power-of-two,
-   * although not neccessarily equal.
-   */
-  virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy,
-    int sw, int sh, int tx, int ty, int tw, int th, uint8 Alpha = 0) = 0;
-
-  /// Get the texture manager: do NOT increment the refcount of texture manager
-  virtual iTextureManager *GetTextureManager () = 0;
 
   /// Dump the texture cache.
   virtual void DumpCache () = 0;
@@ -795,31 +923,8 @@ struct iGraphics3D : public iBase
    */
   virtual bool IsLightmapOK (int lmw, int lmh, 
     int lightCellSize) = 0;
-
-  /**
-   * Set the target of rendering. If this is 0 then the target will
-   * be the main screen. Otherwise it is a texture. After calling
-   * g3d->FinishDraw() the target will automatically be reset to 0 (main
-   * screen). Note that on some implementions rendering on a texture
-   * will overwrite the screen. So you should only do this BEFORE you
-   * start rendering your frame.
-   * <p>
-   * If 'persistent' is true then the current contents of the texture
-   * will be copied on screen before drawing occurs (in the first
-   * call to BeginDraw). Otherwise it is assumed that you fully render
-   * the texture.
-   */
-  virtual void SetRenderTarget (iTextureHandle* handle,
-  	bool persistent = false) = 0;
-
-  /**
-   * Get the current render target (0 for screen).
-   */
-  virtual iTextureHandle* GetRenderTarget () const = 0;
-};
-#else
-#include "ivideo/render3d.h"
 #endif // CS_USE_NEW_RENDERER
+};
 
 /** @} */
 
