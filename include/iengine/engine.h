@@ -45,7 +45,6 @@ struct iTextureWrapper;
 struct iTextureList;
 struct iCameraPosition;
 struct iRegion;
-struct iView;
 struct iGraphics3D;
 struct iClipper2D;
 struct iPolyTxtPlane;
@@ -55,8 +54,6 @@ struct iCollection;
 struct iDataBuffer;
 struct iCamera;
 struct iRenderView;
-struct iMapNode;
-struct iKeyValuePair;
 
 /**
  * Flag for GetNearbyLights().
