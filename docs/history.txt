@@ -79,6 +79,13 @@ The history order is reversed so that new features are at the top.
 	      `main' and global renaming is unnecessary.
 	    - Augmented all applications and plugin modules with the new
 	      CS_IMPLEMENT_APPLICATION and CS_IMPLEMENT_PLUGIN macros.
+	- Martin Geisse fixed a missing bracket in DECLARE_TYPED_SCF_VECTOR.
+	- Philip Wyett fixed some includes in aws plugin:
+	  Fixed #includes so only GCC compilers use
+	  "unistd.h" and MSVC 5/6 use "io.h"
+	- Philip removed zlib png and jpeg libs from MSVC projects files and
+	  placed in the makefiles for apps or plugins in which they are
+	  required.
 13-Jun-2001
 	- Increased robustness of the Spider in BugPlug a little. If there
 	  are no sectors it will not start hunting. There is also a timeout
@@ -143,6 +150,9 @@ The history order is reversed so that new features are at the top.
 	  gui constructs that you'd like to use in other places.
 	- Norman Kramer fixed a bug in the texture manager: materials are
 	  freed now. Also fixed this in the software renderer.
+	- Norman also added Clear to OpenGL similar to softrenderer, now
+	  bumptest wont crash at exit but still leaves unreleased instances
+	  when using opengl renderer.
 12-Jun-2001
 	- Fixed a compile error and warning in SCF.
 	- Removed dumper.cpp and dumper.h. They are obsolete and BugPlug
