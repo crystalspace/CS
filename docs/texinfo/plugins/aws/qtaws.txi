@@ -22,7 +22,9 @@ For development i used the Xalan Java 2 version at: @uref{http://xml.apache.org/
 Design your dialog or widget in Designer and save it somewhere.
 To process the stylesheet with the java version of Xalan you call:
 @example
-java org.apache.xalan.xslt.Process -IN path/to/the/saved/designer/file.ui -XSL path/to/CS/scripts/aws/qt2aws.xsl
+java org.apache.xalan.xslt.Process \
+    -IN path/to/the/saved/designer/file.ui \
+    -XSL path/to/CS/scripts/aws/qt2aws.xsl
 @end example
 
 Append the output to a file containing skin definitions.
@@ -92,7 +94,10 @@ LeftEye: "Blue"
 @end itemize
 @end itemize
 
-Both examples from above would be concatenated and placed in the @strong{whatsThis} property and would look like this:
+Both examples from above would be concatenated and placed in the
+@strong{whatsThis} property and would look like this:
+
 @example
-c:signalClicked,mySink::OnClick,signalBreak,mySink::ByeBye|l:LeftEye: "Blue"
+c:signalClicked,mySink::OnClick,signalBreak,
+    mySink::ByeBye|l:LeftEye: "Blue"
 @end example

@@ -59,13 +59,13 @@ a @file{libs} directory in @file{CS\libs\cssys\djgpp}.
 
 @noindent
 @sc{nasm} (Netwide Assembler) for @sc{dos}@*
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/nasm/nasm-0.98e-bin-dos.zip}
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/nasm/nasm-0.98e-bin-dos.zip}@*
 Install this and add an entry to your PATH environment variable, so it can be
 found.
 
 @noindent
 @sc{libdxe} (Dynamic Library Loader) for @sc{djgpp}@*
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/dos/dxe2_094.zip}
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/dos/dxe2_094.zip}@*
 Extract this into your @sc{djgpp} install directory and compile it
 @file{djgpp\contrib\dxe2} by invoking
 
