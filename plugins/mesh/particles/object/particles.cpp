@@ -19,10 +19,13 @@
 #include "cssysdef.h"
 
 #include "iutil/objreg.h"
+#include "iutil/plugin.h"
 
 #include "iengine/camera.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
+
+#include "imesh/particles.h"
 
 #include "ivideo/material.h"
 #include "ivideo/rndbuf.h"
