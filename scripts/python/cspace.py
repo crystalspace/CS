@@ -5478,6 +5478,7 @@ class iSpriteCal3DFactoryState(iBase):
     def FindSocket(*args): return _cspace.iSpriteCal3DFactoryState_FindSocket(*args)
     def GetSocketCount(*args): return _cspace.iSpriteCal3DFactoryState_GetSocketCount(*args)
     def GetSocket(*args): return _cspace.iSpriteCal3DFactoryState_GetSocket(*args)
+    def GetCal3DCoreModel(*args): return _cspace.iSpriteCal3DFactoryState_GetCal3DCoreModel(*args)
     def __del__(self, destroy=_cspace.delete_iSpriteCal3DFactoryState):
         try:
             if self.thisown: destroy(self)
