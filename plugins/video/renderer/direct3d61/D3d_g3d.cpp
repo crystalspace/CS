@@ -57,6 +57,28 @@ static bool bGotTexDesc=false, bGotLitDesc=false, bGotHaloDesc=false;
 static bool use32BitTexture=false, use16BitTexture=false;
 static const float SCALE_FACTOR = 1.0f/2500.0f;
 
+static const DWORD D3DFVF_TLVERTEX2 = (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX2);
+
+struct D3DTLVERTEX2
+{
+	float sx, sy, sz;
+	float rhw;
+	D3DCOLOR color;
+	D3DCOLOR specular;
+	union
+	{
+		float tu;
+		float tu1;
+	};
+	union
+	{
+		float tv;
+		float tv1;
+	};
+	float tu2;
+	float tv2;
+};
+
 /* ************************************************************** 
 csGraphics3DDirect3DDx61 Class Definition
 ************************************************************** */
@@ -69,6 +91,8 @@ DDSURFACEDESC2 csGraphics3DDirect3DDx6::m_ddsdTextureSurfDesc = { 0 };
 DDSURFACEDESC2 csGraphics3DDirect3DDx6::m_ddsdLightmapSurfDesc = { 0 };
 // have to work on the HALO-support ... will not be easy ... shit MS
 DDSURFACEDESC2 csGraphics3DDirect3DDx6::m_ddsdHaloSurfDesc = { 0 };
+
+int csStateCacheDirect3DDx6::s_Count = 0;
 
 //
 // Interface table definition
@@ -704,6 +728,10 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
   hRes = m_lpd3dViewport->Clear(1, &rect, D3DCLEAR_ZBUFFER);
   if (FAILED(hRes))
     return false;
+
+  // init render state cache
+  m_States.Initialize(m_lpd3dDevice2, m_piSystem);
+  
   return true;
 }
 
@@ -939,10 +967,12 @@ void csGraphics3DDirect3DDx6::SetupPolygon( G3DPolygonDP& poly, float& J1, float
   }
 }
 
+#define MULTITEXTURE
+
 void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
 {
   ASSERT( m_lpd3dDevice2 );
-  
+
   bool bLightmapExists = true,
   bColorKeyed = false,
   bTransparent;
@@ -955,7 +985,7 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
   
   csHighColorCacheData* pTexCache   = NULL;
   csHighColorCacheData* pLightCache = NULL;
-  D3DTLVERTEX vx;
+  D3DTLVERTEX2 vx;
   
   float z;
   
@@ -1008,64 +1038,50 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
     switch( m_iTypeLightmap )
     {
     case 1:    
-      VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_DESTCOLOR), DD_OK );
-      VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCCOLOR), DD_OK );
+//      VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_DESTCOLOR), DD_OK );
+//		m_States.SetSrcBlend(D3DBLEND_DESTCOLOR);
+//      VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCCOLOR), DD_OK );
+//		m_States.SetDstBlend(D3DBLEND_SRCCOLOR);
       break;
       
     case 2:
-      VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_SRCALPHA), DD_OK );
-      VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCCOLOR), DD_OK );
+//      VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_SRCALPHA), DD_OK );
+//        m_States.SetSrcBlend(D3DBLEND_SRCALPHA);
+//      VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCCOLOR), DD_OK );
+//        m_States.SetDstBlend(D3DBLEND_SRCCOLOR);
       break;
     }
   }
-  
+
   if ( bTransparent )
   {
-    VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, TRUE), DD_OK );
-    VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCALPHA), DD_OK );
-    VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_INVSRCALPHA), DD_OK );
+    m_States.SetAlphaBlendEnable(true);
+    m_States.SetDstBlend(D3DBLEND_SRCALPHA);
+    m_States.SetSrcBlend(D3DBLEND_INVSRCALPHA);
+  }
+  else
+  {
+    m_States.SetAlphaBlendEnable(false);
   }
 
   if ( bColorKeyed )
   {
-    VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_COLORKEYENABLE, TRUE), DD_OK );
+    m_States.SetColorKeyEnable(true);
+  }
+  else
+  {
+    m_States.SetColorKeyEnable(false);
   }
 
   D3DTextureCache_Data *pD3D_texcache = (D3DTextureCache_Data *)pTexCache->pData;
 
-  VERIFY_RESULT(m_lpd3dDevice2->SetTexture(0, pD3D_texcache->lptex), DD_OK);
+  m_States.SetTexture(0, pD3D_texcache->lptex);
 
-  VERIFY_RESULT(m_lpd3dDevice2->Begin(D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX, D3DDP_DONOTUPDATEEXTENTS), DD_OK);
-
-  // render texture-mapped poly
-  
-  for (i=0; i < poly.num; i++)
+  float lightmap_scale_u, lightmap_scale_v;
+  float lightmap_low_u, lightmap_low_v;
+  if (bLightmapExists )
   {
-    z = 1.0f  / (M*(poly.vertices[i].sx-m_nHalfWidth) + N*(poly.vertices[i].sy-m_nHalfHeight) + O);
-    
-    vx.sx = poly.vertices[i].sx;
-    vx.sy = m_nHeight-poly.vertices[i].sy;
-
-    vx.sz = z*(float)SCALE_FACTOR;
-
-    if(vx.sz>0.9999)
-      vx.sz=0.9999;
-
-    vx.rhw = 1/z;
-
-    vx.color = D3DRGBA(1.0f, 1.0f, 1.0f, (float)poly_alpha/100.0f);
-        
-    vx.specular = 0;
-    vx.tu =  (J1 * (poly.vertices[i].sx-m_nHalfWidth) + J2 * (poly.vertices[i].sy-m_nHalfHeight) + J3) * z;
-    vx.tv =  (K1 * (poly.vertices[i].sx-m_nHalfWidth) + K2 * (poly.vertices[i].sy-m_nHalfHeight) + K3) * z;
-    
-    m_lpd3dDevice2->Vertex( &vx );  
-  }
-  
-  m_lpd3dDevice2->End(0);
-  
-  if ( bLightmapExists )
-  {
+    // set lightmap stuff
     iLightMap *thelightmap = pTex->GetLightMap ();
 
     int lmwidth = thelightmap->GetWidth ();
@@ -1075,97 +1091,91 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
     float scale_u = (float)(lmrealwidth-1) / (float)lmwidth;
     float scale_v = (float)(lmrealheight-1) / (float)lmheight;
 
-    float lightmap_low_u, lightmap_low_v, lightmap_high_u, lightmap_high_v;
+    float lightmap_high_u, lightmap_high_v;
     pTex->GetTextureBox(lightmap_low_u,lightmap_low_v,
                        lightmap_high_u,lightmap_high_v);
 
-    float lightmap_scale_u = scale_u / (lightmap_high_u - lightmap_low_u), 
-          lightmap_scale_v = scale_v / (lightmap_high_v - lightmap_low_v);
+    lightmap_scale_u = scale_u / (lightmap_high_u - lightmap_low_u), 
+    lightmap_scale_v = scale_v / (lightmap_high_v - lightmap_low_v);
 
-    if(!bTransparent)
-    {
-      VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, TRUE), DD_OK);
-    }
-    else
-    {
-      VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCALPHA), DD_OK);     
-      VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_DESTCOLOR), DD_OK);
-    }
-
-    //Attention: Now we need to be in a D3DRENDERSTATE_ZFUNC that allows the same z-value to be
-    //written once again. We are operating at D3DCMP_LESSEQUAL so we are safe here.
-    //setting to D3DCMP_EQUAL should theoretically work too, but will result in some
-    //visual problems in 32Bit color. (driver problems I guess)
-    VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_TEXTUREADDRESS, D3DTADDRESS_CLAMP), DD_OK);
-    VERIFY_RESULT(m_lpd3dDevice2->SetTexture(0, ((D3DLightCache_Data *)pLightCache->pData)->lptex), DD_OK);
-    
-    // render light-mapped poly
-    VERIFY_RESULT(m_lpd3dDevice2->Begin(D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX, D3DDP_DONOTUPDATEEXTENTS), DD_OK);
-    for (i=0; i<poly.num; i++)
-    {
-      float sx = poly.vertices[i].sx - m_nHalfWidth;
-      float sy = poly.vertices[i].sy - m_nHalfHeight;
-
-      float u_over_sz = (J1 * sx + J2 * sy + J3);
-      float v_over_sz = (K1 * sx + K2 * sy + K3);
-
-      z = 1.0f  / (M*sx + N*sy + O);
-      
-      float light_u = (u_over_sz*z - lightmap_low_u) * lightmap_scale_u;
-      float light_v = (v_over_sz*z - lightmap_low_v) * lightmap_scale_v;
-
-      vx.sx = poly.vertices[i].sx;
-      vx.sy = m_nHeight-poly.vertices[i].sy;
-      vx.sz = z*(float)SCALE_FACTOR;
-
-      if(vx.sz>0.9999)
-        vx.sz=0.9999;
-
-      vx.rhw = 1/z;
-      
-      if(!bTransparent)
-      {
-        if(m_iTypeLightmap == 2)
-          vx.color = (D3DCOLOR) D3DRGBA(1.0f, 1.0f, 1.0f, 1.0f);
-        else
-          vx.color = D3DRGB(1.0f, 1.0f, 1.0f);
-      }
-      else 
-      {
-        vx.color = D3DRGBA(1.0f, 1.0f, 1.0f, (float)poly_alpha/100.0f);
-      }
-      
-      vx.specular = 0;
-
-      vx.tu = light_u;
-      vx.tv = light_v;
-
-      VERIFY_RESULT(m_lpd3dDevice2->Vertex( &vx ), DD_OK);
-    }
-    VERIFY_RESULT(m_lpd3dDevice2->End(0), DD_OK);
-    
-    // reset render states.
-    
-    VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_TEXTUREADDRESS, D3DTADDRESS_WRAP), DD_OK);
-    if(!bTransparent)
-      VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, FALSE), DD_OK);
-    VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL), DD_OK);
+    m_States.SetTexture(1, ((D3DLightCache_Data *)pLightCache->pData)->lptex);
+	m_States.SetStageState(1, D3DTSS_COLOROP, D3DTOP_MODULATE2X);
   }
-  
+  else
+  {
+    m_States.SetStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
+  }
+
+  D3DCOLOR vertex_color;
+
+  if (bTransparent && bLightmapExists)
+  {
+    vertex_color = D3DRGBA(1.0f, 1.0f, 1.0f, (float)poly_alpha * (1.0f / 100.0f));
+  }
+  else
+  {
+    if(m_iTypeLightmap == 2)
+      vertex_color = (D3DCOLOR) D3DRGBA(1.0f, 1.0f, 1.0f, 1.0f);
+    else
+      vertex_color = D3DRGB(1.0f, 1.0f, 1.0f);
+  }
+
+  VERIFY_RESULT(m_lpd3dDevice2->Begin(D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX2,
+				D3DDP_DONOTUPDATEEXTENTS), DD_OK);  
+
+  // render texture-mapped poly
+  for (i=0; i < poly.num; i++)
+  {
+    float sx = poly.vertices[i].sx - m_nHalfWidth;
+    float sy = poly.vertices[i].sy - m_nHalfHeight;
+    float u_over_sz = (J1 * sx + J2 * sy + J3);
+    float v_over_sz = (K1 * sx + K2 * sy + K3);
+    float one_over_sz = (M * sx + N * sy + O);
+
+    z = 1.0f  / one_over_sz;
+
+    vx.sx = poly.vertices[i].sx;
+    vx.sy = m_nHeight-poly.vertices[i].sy;
+
+    vx.sz = z*(float)SCALE_FACTOR;
+
+    if(vx.sz>0.9999)
+      vx.sz=0.9999;
+
+	vx.color = vertex_color;
+    vx.rhw = one_over_sz;
+
+    vx.specular = 0;
+    vx.tu = u_over_sz * z;
+    vx.tv = v_over_sz * z;
+
+    if (bLightmapExists)
+    {
+      vx.tu2 = (vx.tu - lightmap_low_u) * lightmap_scale_u;
+      vx.tv2 = (vx.tv - lightmap_low_v) * lightmap_scale_v;
+    }
+
+    VERIFY_RESULT(m_lpd3dDevice2->Vertex( &vx ), DD_OK);
+  }
+
+  m_lpd3dDevice2->End(0);
+
   // reset render states.
   // If there is vertex fog then we apply that last.
   if (poly.use_fog)
   {
-    VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, TRUE),  DD_OK);
+    m_States.SetAlphaBlendEnable(true);
     VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL), DD_OK);
-    VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCALPHA), DD_OK); 
-    VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_INVSRCALPHA), DD_OK);
-    VERIFY_RESULT(m_lpd3dDevice2->SetTexture(0, NULL), DD_OK);
+	m_States.SetDstBlend(D3DBLEND_SRCALPHA);
+	m_States.SetSrcBlend(D3DBLEND_INVSRCALPHA);
+	m_States.SetTexture(0, NULL);
+    m_States.SetStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
 
     VERIFY_RESULT(m_lpd3dDevice2->Begin(D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX, D3DDP_DONOTUPDATEEXTENTS), DD_OK);
 
     for (i=0; i<poly.num; i++)
     {
+	  D3DTLVERTEX vx;
       float sx = poly.vertices[i].sx - m_nHalfWidth;
       float sy = poly.vertices[i].sy - m_nHalfHeight;
 
@@ -1179,7 +1189,6 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
         vx.sz=0.9999;
 
       vx.rhw = 1/z;
-      
       
       float I = 1.0f-poly.fog_info[i].intensity;
 
@@ -1195,26 +1204,9 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
       VERIFY_RESULT(m_lpd3dDevice2->Vertex( &vx ), DD_OK);
     }
     VERIFY_RESULT(m_lpd3dDevice2->End(0), DD_OK);
-    VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, FALSE),  DD_OK);
-  }
- 
-  if (bColorKeyed)
-  {
-    VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_COLORKEYENABLE, FALSE), DD_OK);
-  }
-  
-  if (bTransparent )
-  {
-    VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, FALSE), DD_OK);
-    VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE), DD_OK);
   }
 
-  if (bLightmapExists)
-  {
-    VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ZERO), DD_OK);
-    VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE), DD_OK);
-  }
-} 
+}  // end of DrawPolygon()
 
 void csGraphics3DDirect3DDx6::StartPolygonFX (iTextureHandle* handle, UInt mode)
 {
@@ -1230,10 +1222,14 @@ void csGraphics3DDirect3DDx6::StartPolygonFX (iTextureHandle* handle, UInt mode)
   csHighColorCacheData* pTexData = txt_mm->GetHighColorCacheData ();
 
   if (txt_mm->GetTransparent ())
-    VERIFY_RESULT (m_lpd3dDevice2->SetRenderState (D3DRENDERSTATE_COLORKEYENABLE, TRUE), DD_OK);
+    m_States.SetColorKeyEnable(true);
+  else
+    m_States.SetColorKeyEnable(false);
 
   if ((mode & CS_FX_MASK_MIXMODE) != CS_FX_COPY)
-    VERIFY_RESULT (m_lpd3dDevice2->SetRenderState (D3DRENDERSTATE_ALPHABLENDENABLE, TRUE), DD_OK);
+    m_States.SetAlphaBlendEnable(true);
+  else
+    m_States.SetAlphaBlendEnable(false);
 
   //Note: In all explanations of Mixing:
   //Color: resulting color
@@ -1245,37 +1241,38 @@ void csGraphics3DDirect3DDx6::StartPolygonFX (iTextureHandle* handle, UInt mode)
     case CS_FX_MULTIPLY:
       //Color = SRC * DEST +   0 * SRC = DEST * SRC
       m_alpha = 0.0f;
-      VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCCOLOR), DD_OK);
-      VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ZERO), DD_OK);
+      m_States.SetDstBlend(D3DBLEND_SRCCOLOR);
+      m_States.SetSrcBlend(D3DBLEND_ZERO);
       break;
     case CS_FX_MULTIPLY2:
       //Color = SRC * DEST + DEST * SRC = 2 * DEST * SRC
       m_alpha = 0.0f;
-      VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCCOLOR), DD_OK); 
-      VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_DESTCOLOR), DD_OK);
+	  m_States.SetDstBlend(D3DBLEND_SRCCOLOR);
+	  m_States.SetSrcBlend(D3DBLEND_DESTCOLOR);
       break;
     case CS_FX_ADD:
       //Color = 1 * DEST + 1 * SRC = DEST + SRC
       m_alpha = 0.0f;
-      VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE), DD_OK); 
-      VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE), DD_OK);
+	  m_States.SetDstBlend(D3DBLEND_ONE);
+	  m_States.SetSrcBlend(D3DBLEND_ONE);
       break;
     case CS_FX_ALPHA:
       //Color = Alpha * DEST + (1-Alpha) * SRC 
-      VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCALPHA), DD_OK); 
-      VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_INVSRCALPHA), DD_OK);
+	  m_States.SetDstBlend(D3DBLEND_SRCALPHA);
+      m_States.SetSrcBlend(D3DBLEND_INVSRCALPHA);
       break;
     case CS_FX_TRANSPARENT:
       //Color = 1 * DEST + 0 * SRC = DEST
-      VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE), DD_OK); 
-      VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ZERO), DD_OK);
+      m_States.SetDstBlend(D3DBLEND_ONE);
+      m_States.SetSrcBlend(D3DBLEND_ZERO);
       break;
     case CS_FX_COPY:
     default:
       //Color = 0 * DEST + 1 * SRC = SRC
       m_alpha = 0.0f;
-      VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ZERO), DD_OK); 
-      VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE), DD_OK);
+	  m_States.SetDstBlend(D3DBLEND_ZERO);
+	  m_States.SetSrcBlend(D3DBLEND_ONE);
+	  m_States.SetStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
       break;
   }
 
@@ -1287,17 +1284,18 @@ void csGraphics3DDirect3DDx6::StartPolygonFX (iTextureHandle* handle, UInt mode)
     m_alpha = 0.01f; 
   }
 
-  VERIFY_RESULT(m_lpd3dDevice2->SetTexture(0, ((D3DTextureCache_Data *)pTexData->pData)->lptex), DD_OK);
+  m_States.SetTexture(0, ((D3DTextureCache_Data *)pTexData->pData)->lptex);
 }
 
 void csGraphics3DDirect3DDx6::FinishPolygonFX()
 {
-  VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, FALSE), DD_OK);
+  m_States.SetAlphaBlendEnable(false);
 
-  VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_COLORKEYENABLE, FALSE), DD_OK);
+  m_States.SetColorKeyEnable(false);
 
-  VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ZERO), DD_OK); 
-  VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE), DD_OK);
+  m_States.SetDstBlend(D3DBLEND_ZERO);
+
+  m_States.SetSrcBlend(D3DBLEND_ONE);
 }
 
 void csGraphics3DDirect3DDx6::DrawPolygonFX(G3DPolygonDPFX& poly)
@@ -1346,11 +1344,11 @@ void csGraphics3DDirect3DDx6::DrawPolygonFX(G3DPolygonDPFX& poly)
     VERIFY_RESULT(m_lpd3dDevice2->GetRenderState(D3DRENDERSTATE_SRCBLEND,         &OldSrcBlend),  DD_OK);
     VERIFY_RESULT(m_lpd3dDevice2->GetTexture(0, &p_oldTexture), DD_OK);
    
-    VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, TRUE),  DD_OK);
+	m_States.SetAlphaBlendEnable(true);
     VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_ZFUNC,            D3DCMP_LESSEQUAL), DD_OK);
-    VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_DESTBLEND,        D3DBLEND_SRCALPHA), DD_OK); 
-    VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_SRCBLEND,         D3DBLEND_INVSRCALPHA), DD_OK);
-    VERIFY_RESULT(m_lpd3dDevice2->SetTexture(0, NULL), DD_OK);
+	m_States.SetDstBlend(D3DBLEND_SRCALPHA);
+	m_States.SetSrcBlend(D3DBLEND_INVSRCALPHA);
+	m_States.SetTexture(0, NULL);
 
     VERIFY_RESULT( m_lpd3dDevice2->Begin(D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX, D3DDP_DONOTUPDATEEXTENTS), DD_OK );
   
@@ -1380,11 +1378,11 @@ void csGraphics3DDirect3DDx6::DrawPolygonFX(G3DPolygonDPFX& poly)
 
     VERIFY_RESULT( m_lpd3dDevice2->End(0), DD_OK );
 
-    VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, OldAlpha),     DD_OK);
+	m_States.SetAlphaBlendEnable(OldAlpha);
     VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_ZFUNC,            OldZFunc),     DD_OK);
-    VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_DESTBLEND,        OldDestBlend), DD_OK); 
-    VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_SRCBLEND,         OldSrcBlend),  DD_OK);
-    VERIFY_RESULT(m_lpd3dDevice2->SetTexture(0, p_oldTexture), DD_OK);
+	m_States.SetDstBlend((enum _D3DBLEND) OldDestBlend);
+    m_States.SetSrcBlend((enum _D3DBLEND) OldSrcBlend);
+	m_States.SetTexture(0, p_oldTexture);
     if (p_oldTexture != NULL) p_oldTexture->Release();
   }
 }
