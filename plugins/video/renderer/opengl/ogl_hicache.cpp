@@ -135,10 +135,6 @@ void HighColorCache::Add(IPolygonTexture *polytex)
     ILightMap *piLM; 
     HighColorCache_Data* l;
 
-    // first recalculation of lightmap
-    bool dl;
-    polytex->RecalculateDynamicLights(dl);
-
     polytex->GetLightMap (&piLM);
     
     if (type != HIGHCOLOR_LITCACHE || piLM == NULL) return;
@@ -152,7 +148,13 @@ void HighColorCache::Add(IPolygonTexture *polytex)
     bool bInVideoMemory;
     piLM->GetInVideoMemory( bInVideoMemory );
     
-    if (bInVideoMemory)
+    // first recalculation of lightmap
+    bool lightmapchanged;
+    polytex->RecalculateDynamicLights(lightmapchanged);
+
+    // if lightmap has changed, uncache it if it was cached so we
+    // can reload it
+    if (lightmapchanged && bInVideoMemory)
     {
         piLM->GetHighColorCache(&l);
         
