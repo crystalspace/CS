@@ -83,8 +83,8 @@ bool csTerrain::Initialize (const void* heightMapFile, unsigned long size)
 
   mesh->init (context);
 
-  vbuf->size ((mesh->absMaxDetail()*3*11)/10);
-  vbuf->renderMode (true, false, false);
+  vbuf->size((mesh->absMaxDetail()*4*12)/10);
+  vbuf->renderMode(true,false,false);
   vbuf->init ();
   vbuf->reset ();
 
