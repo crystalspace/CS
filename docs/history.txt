@@ -26,6 +26,9 @@ The history order is reversed so that new features are at the top.
 	  values for alpha for the same polygon (i.e. changing alpha
 	  dynamically) will not work correctly as the new alpha value is
 	  simply or-ed on top of the previous one.
+	- Matze added a -L/usr/lib/w32api to fix some issues on cygwin (the
+	  compiler is looking there by default but some external tools like
+	  libtool didn't)
 4-Dec-2001
 	- Enabled aws in user.mak.
 	- Created a dummy thing object plugin. This plugin allows applications
