@@ -9,7 +9,7 @@ const int awsGridBagLayout::MAXGRIDSIZE = 512;
 const int awsGridBagLayout::MINSIZE = 1;
 const int awsGridBagLayout::PREFERREDSIZE = 2;
 
-const int awsGridBagConstraints::RELATIVE_ = -1;
+const int awsGridBagConstraints::RELATIVE = -1;
 const int awsGridBagConstraints::REMAINDER = 0;
 const int awsGridBagConstraints::NONE = 0;
 const int awsGridBagConstraints::BOTH = 1;

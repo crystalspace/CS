@@ -3,7 +3,7 @@
 
 struct awsGridBagConstraints
 {
-  static const int RELATIVE_;
+  static const int RELATIVE;
   
    /**
      * Specify that this component is the 
