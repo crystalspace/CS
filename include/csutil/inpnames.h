@@ -21,6 +21,10 @@
 #ifndef __CSUTIL_CSINPUTS_H__
 #define __CSUTIL_CSINPUTS_H__
 
+/**
+ * Use in `int button' for csevXXXMove events
+ * with the backward compatible funcs.
+ */
 #define CSAXIS_X -1
 #define CSAXIS_Y -2
 

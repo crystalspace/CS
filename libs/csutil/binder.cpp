@@ -29,7 +29,8 @@ csHashKey csHashComputeEvent (iEvent *ev)
     case csevKeyDown:
     case csevKeyUp:
       return (csHashKey)
-        (CSMASK_Keyboard + ev->Key.Char + ev->Key.Code);
+        (CSMASK_Keyboard +
+          (ev->Key.Code >= CSKEY_FIRST ? ev->Key.Code : ev->Key.Char));
 
     case csevMouseMove:
       return (csHashKey) CSMASK_MouseMove;
@@ -138,6 +139,7 @@ bool csInputBinder::Unbind (iEvent *ev)
     csEvBind *pair = (csEvBind *)iter.Next ();
     delete pair;
   }
+  Hash->DeleteAll (csHashComputeEvent (ev));
   return true;
 }
 
@@ -155,6 +157,7 @@ bool csInputBinder::UnbindAll ()
     csEvBind *pair = (csEvBind *)iter.Next ();
     delete pair;
   }
+  Hash->DeleteAll ();
   return true;
 }
 

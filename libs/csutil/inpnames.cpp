@@ -130,11 +130,11 @@ bool csParseInputDef (const char *name, iEvent* ev, bool use_shift)
       if (! strcasecmp (c->key, name)) code = c->code;
     
     if	(code)
-    	*ev = csEvent (0, csevKeyDown, code, 0, mod);
+      *ev = csEvent (0, csevKeyDown, code, 0, mod);
     else if (strlen (name) != 1)
-    	return false;
+      return false;
     else
-	*ev = csEvent (0, csevKeyDown, 0, (int)*name, mod);
+      *ev = csEvent (0, csevKeyDown, 0, (int)*name, mod);
   }
   return true;
 }
@@ -150,7 +150,11 @@ bool csParseKeyDef (const char *name, int &key, int &shift, bool use_shift)
   bool ret = csParseInputDef (name, ev, use_shift);
   if (ret)
   {
-    key = ev.Key.Code >= CSKEY_FIRST ? ev.Key.Code : ev.Key.Char;
+    if (ev.Key.Code >= CSKEY_FIRST && ev.Key.Code <= CSKEY_LAST)
+      key = ev.Key.Char;
+    else if (ev.Key.Char < 256 && ev.Key.Char > 0)
+      key = ev.Key.Char;
+    else return false;
     shift = ev.Key.Modifiers;
   }
   return ret;
@@ -219,22 +223,19 @@ bool csGetInputDesc (iEvent *ev, char *buf, bool use_shift)
     }
   }
 
+  const char *key = NULL;
   switch (ev->Type)
   {
     case csevKeyUp:
     case csevKeyDown:
-      if (ev->Key.Code >= CSKEY_FIRST)
+      for (csKeyCodeDef *k = KeyDefs; k->key; k++)
+        if (k->code == ev->Key.Code) key = k->key;
+      if (key)
       {
-        const char *key = NULL;
-        for (csKeyCodeDef *k = KeyDefs; k->key; k++)
-          if (k->code == ev->Key.Code) key = k->key;
-        if (key)
-        {
-          strcpy (buf, key);
-          return true;
-        }
+        strcpy (buf, key);
+        return true;
       }
-      else if (ev->Key.Char < 255)
+      else if (ev->Key.Char < 256 && ev->Key.Char > 0)
       {
         *buf = (char)ev->Key.Char;
         *++buf = 0;
@@ -284,8 +285,8 @@ bool csGetInputDesc (csEvent &ev, char *buf, bool use_shift)
 bool csGetKeyDesc (int key, int shift, char *buf, bool use_shift)
 {
   csEvent ev (0, csevKeyDown,
-    key >= CSKEY_FIRST ? key : 0,
-    key >= CSKEY_FIRST ? 0 : key,
+    key >= CSKEY_FIRST && key <= CSKEY_LAST ? key : 0,
+    key < 256 && key > 0 ? 0 : key,
     shift);
   return csGetInputDesc (ev, buf, use_shift);
 }
