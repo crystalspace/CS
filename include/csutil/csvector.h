@@ -75,6 +75,8 @@ public:
   inline int PushSmart (csSome what);
   /// Pop a element from vector 'top'
   inline csSome Pop ();
+  /// Return the top element but don't remove it.
+  inline csSome Top () const;
 
   /// Insert element 'Item' before element 'n'
   bool Insert (int n, csSome Item);
@@ -191,6 +193,11 @@ inline csSome csBasicVector::Pop ()
   csSome ret = root [count - 1];
   SetLength (count - 1);
   return (ret);
+}
+
+inline csSome csBasicVector::Top () const
+{
+  return root [count - 1];
 }
 
 inline void csBasicVector::Exchange (int n1, int n2)

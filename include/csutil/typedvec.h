@@ -112,9 +112,8 @@
 /**
  * Construct a restricted-access vector class. Elements may not be assigned
  * directly (use Replace() instead). The class contains functions called
- * PrepareItem(), FreeItem() and PopItem(), each of which takes a void*
- * as its parameter. These functions are called when items are added, removed
- * or removed with Pop().
+ * PrepareItem() and FreeItem(), each of which takes a void* as its parameter.
+ * These functions are called when items are added or removed.
  */
 #define CS_DECLARE_TYPED_RESTRICTED_ACCESS_VECTOR(NAME,TYPE)		\
   CS_PRIVATE_DECLARE_TYPED_RESTRICTED_ACCESS_VECTOR (NAME, TYPE)
@@ -166,8 +165,7 @@
  * Subclass of csVector that restricts access to the contained objects. The
  * contents of the vector may not be assigned directly anymore. For every
  * added element, the PrepareItem() function is called. For every
- * removed element, the FreeItem() function is called. The Pop() function
- * is handled specially, and PopItem() it called. <p>
+ * removed element, the FreeItem() function is called. <p>
  *
  * All three functions may return false to abort the push/pop/remove operation.
  */
@@ -177,8 +175,6 @@ public:
   virtual bool PrepareItem (csSome )
   { return true; }
   virtual bool FreeItem (csSome )
-  { return true; }
-  virtual bool PopItem (csSome )
   { return true; }
 
   inline csRestrictedAccessVector (int lim, int thr) : csVector (lim, thr) {}
@@ -224,11 +220,10 @@ public:
   }
   inline csSome Pop ()
   {
-    void *item = csVector::Pop ();
-    if (PopItem (item))
-      return item;
-    Push (item);
-    return NULL;
+    if (FreeItem (Top ()))
+      return csVector::Pop ();
+    else
+      return NULL;
   }
 };
 
@@ -245,6 +240,9 @@ public:
  * iBase. However, at the time CS_DECLARE_IBASE_VECTOR is used, this
  * inheritance may be unknown to the compiler because the class definition of
  * the contained class did not yet appear. <p>
+ *
+ * iBase vectors handle the Pop() method specially in the way that they do not
+ * DecRef items removed with Pop().
  */
 class csIBaseVector : public csRestrictedAccessVector
 {
@@ -261,9 +259,21 @@ public:
     ((iBase*)Item)->DecRef ();
     return true;
   }
-  virtual bool PopItem (csSome /*item*/)
+  inline csSome Pop ()
   {
-    return true;
+    // Items that are removed with Pop() should not be DecRef'ed. To keep
+    // the code simple, we just IncRef them before.
+    csSome item = Top ();
+    ((iBase*)item)->IncRef ();
+
+    if (FreeItem (item)) {
+      // We also have to bypass csRestrictedAccessVector::Pop ().
+      return csVector::Pop ();
+    } else {
+      // Removal failed, so we have to release our reference again.
+      ((iBase*)item)->DecRef ();
+      return NULL;
+    }
   }
 };
 
@@ -305,6 +315,8 @@ public:
     { return superclass::PushSmart ((csSome)obj); }			\
     inline TYPE *Pop ()							\
     { return (TYPE *)superclass::Pop(); }				\
+    inline TYPE *Top ()	const						\
+    { return (TYPE *)superclass::Top(); }				\
     inline bool Insert (int n, TYPE *Item)				\
     { return superclass::Insert (n, (csSome)Item); }			\
     inline int InsertSorted (TYPE *Item, int *oEqual = NULL, int Mode = 0) \
@@ -418,8 +430,6 @@ public:
     typedef sclass superclass;						\
     virtual bool PrepareItem (csSome item)				\
     { return superclass::PrepareItem (item); }				\
-    virtual bool PopItem (csSome item)					\
-    { return superclass::PopItem (item); }				\
     virtual bool FreeItem (csSome item)					\
     { return superclass::FreeItem (item); }				\
   public:								\

@@ -121,6 +121,8 @@ public:
   inline int FindSortedKey (csConstSome Key, int Mode = 0) const;
   /// Pop an element from the vector.
   inline iObject *Pop ();
+  /// Return the topmost element
+  inline iObject *Top () const;
   /// Delete an element from the vector
   inline bool Delete (int n);
   /// Delete an element from the vector
@@ -148,8 +150,8 @@ public:
   CS_PRIVATE_DECLARE_OBJECT_VECTOR_NOREF (NAME, TYPE)
 
 /**
- * Declare an object vector class which contains overridable PrepareItem(),
- * FreeItem() and PopItem() functions. The vector still leaves the RefCount
+ * Declare an object vector class which contains overridable PrepareItem()
+ * and FreeItem() functions. The vector still leaves the RefCount
  * of the contained objects untouched.
  */
 #define CS_DECLARE_RESTRICTED_ACCESS_OBJECT_VECTOR(NAME,TYPE)		\
@@ -157,8 +159,8 @@ public:
 
 /**
  * Declare an object vector class which handles the reference count of the
- * contained object correctly and also contains overridable PrepareItem(),
- * FreeItem() and PopItem() functions.
+ * contained object correctly and also contains overridable PrepareItem()
+ * and FreeItem() functions.
  */
 #define CS_DECLARE_OBJECT_VECTOR(NAME,TYPE)				\
   CS_PRIVATE_DECLARE_OBJECT_VECTOR (NAME, TYPE)
@@ -230,6 +232,15 @@ inline int csNamedObjectVector::FindSortedKey (csConstSome Key, int Mode) const
 inline iObject *csNamedObjectVector::Pop ()
   {
     iBase *objbase = (iBase*)Vector->Pop ();
+    if (!objbase) return 0;
+    iObject *obj = SCF_QUERY_INTERFACE_FAST (objbase, iObject);
+    CS_ASSERT (obj);
+    obj->DecRef ();
+    return obj;
+  }
+inline iObject *csNamedObjectVector::Top () const
+  {
+    iBase *objbase = (iBase*)Vector->Top ();
     if (!objbase) return 0;
     iObject *obj = SCF_QUERY_INTERFACE_FAST (objbase, iObject);
     CS_ASSERT (obj);
