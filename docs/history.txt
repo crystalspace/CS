@@ -18,6 +18,8 @@ The history order is reversed so that new features are at the top.
 	  look of the system.
 	  Anders was also so nice to update the documentation for his changes.
 	  If only everyone would do that!
+        - Philip Wyett fixed rlsstencil makefile and rlsstencil.csplugin is
+          now cleaned correctly.        
 16-Jul-2003
 	- Anders Stenberg made the following new renderer additions and fixes:
 	  - Made AWS work. (Added some stub functions to comply with interface 

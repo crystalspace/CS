@@ -77,7 +77,8 @@ $(OUT)/%$O: $(SRCDIR)/$(DIR.RLSSTENCIL)/common/%.cpp
 
 clean: rlsstencilclean
 rlsstencilclean:
-	$(RM) $(RLSSTENCIL) $(OBJ.RLSSTENCIL)
+	$(RM) $(RLSSTENCIL) $(OBJ.RLSSTENCIL) \
+        $(OUTDLL)/$(notdir $(INF.RLSSTENCIL))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/rlsstencil.dep
