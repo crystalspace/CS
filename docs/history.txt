@@ -1,6 +1,26 @@
 The history order has been reversed so that new features are at the top.
 
+2-Feb-2001
+	- Fixed a compile error in csfedit (only in debug mode) and
+	  fixed the makefile so that the description of the make target
+	  aligns correctly with the other descriptions.
 1-Feb-2001
+	- Martin Geisse changed the sockets driver to use system events
+	  instead of Open() and Close() methods.
+	- Martin also fixed a bug which caused the sound drivers to stop
+	  'open', 'close' and 'pre-process' system events from further
+	  processing.
+	- Norman Kramer set ApplicationShow to SW_SHOWNORMAL in main().
+	  For some reason the mingw links main and not WinMain for guio
+	  apps. In that case ApplicationShow was initialized to 0 which
+	  means HIDE which in turn was the reason the window was invisible
+	  when running with opengl/mingw. I remember that it worked before,
+	  so probably some linker options slightly changed when linking
+	  with mingw - I dont know.
+	- Wouter Wijngaards added the csf edit application (font editor).
+	  Now it can read files. Note that the csws querydialog for
+	  filedialog now only returns full system paths. Not VFS paths.
+	  I worked around (prob. unix specific) using stat() and fread().
 	- Philip Wyett updated levtool to take account of Andrew's changes
 	  yesterday. Move to csTreeBox and changed to new mouse handler
 	  csevMouseClick. App now compiles and runs OK again under Windows.
