@@ -234,8 +234,8 @@ bool csCBuffer::TestPolygon (csVector2* verts, int num_verts)
     }
     // theoretically we should do sqrt(dx^2+dy^2) here, but
     // we can approximate it by just abs(dx)+abs(dy)
-    if ((fabs (verts [i].x - verts [i - 1].x)
-       + fabs (verts [i].y - verts [i - 1].y)) > VERTEX_NEAR_THRESHOLD)
+    if ((ABS (verts [i].x - verts [i - 1].x)
+       + ABS (verts [i].y - verts [i - 1].y)) > VERTEX_NEAR_THRESHOLD)
       num_vertices++;
   }
 
@@ -376,8 +376,8 @@ bool csCBuffer::InsertPolygon (csVector2* verts, int num_verts, bool negative)
     }
     // theoretically we should do sqrt(dx^2+dy^2) here, but
     // we can approximate it by just abs(dx)+abs(dy)
-    if ((fabs (verts [i].x - verts [i - 1].x)
-       + fabs (verts [i].y - verts [i - 1].y)) > VERTEX_NEAR_THRESHOLD)
+    if ((ABS (verts [i].x - verts [i - 1].x)
+       + ABS (verts [i].y - verts [i - 1].y)) > VERTEX_NEAR_THRESHOLD)
       num_vertices++;
   }
 

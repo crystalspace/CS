@@ -901,8 +901,8 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
     }
     // theoretically we should do sqrt(dx^2+dy^2) here, but
     // we can approximate it by just abs(dx)+abs(dy)
-    if ((fabs (poly.vertices [i].sx - poly.vertices [i - 1].sx)
-       + fabs (poly.vertices [i].sy - poly.vertices [i - 1].sy)) > VERTEX_NEAR_THRESHOLD)
+    if ((ABS (poly.vertices [i].sx - poly.vertices [i - 1].sx)
+       + ABS (poly.vertices [i].sy - poly.vertices [i - 1].sy)) > VERTEX_NEAR_THRESHOLD)
       num_vertices++;
 
     if (poly.vertices[i].sx < 0 || poly.vertices[i].sx > width)
@@ -1184,8 +1184,8 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
     }
     // theoretically we should do sqrt(dx^2+dy^2) here, but
     // we can approximate it by just abs(dx)+abs(dy)
-    if ((fabs (poly.vertices [i].sx - poly.vertices [i - 1].sx)
-       + fabs (poly.vertices [i].sy - poly.vertices [i - 1].sy)) > VERTEX_NEAR_THRESHOLD)
+    if ((ABS (poly.vertices [i].sx - poly.vertices [i - 1].sx)
+       + ABS (poly.vertices [i].sy - poly.vertices [i - 1].sy)) > VERTEX_NEAR_THRESHOLD)
       num_vertices++;
 
     if (poly.vertices[i].sx < 0 || poly.vertices[i].sx > width)
@@ -1776,8 +1776,8 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, 
     }
     // theoretically we should do here sqrt(dx^2+dy^2), but
     // we can approximate it just by abs(dx)+abs(dy)
-    if ((fabs (poly.vertices [i].sx - poly.vertices [i - 1].sx)
-       + fabs (poly.vertices [i].sy - poly.vertices [i - 1].sy)) > VERTEX_NEAR_THRESHOLD)
+    if ((ABS (poly.vertices [i].sx - poly.vertices [i - 1].sx)
+       + ABS (poly.vertices [i].sy - poly.vertices [i - 1].sy)) > VERTEX_NEAR_THRESHOLD)
       num_vertices++;
   }
 

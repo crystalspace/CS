@@ -608,8 +608,8 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
       max_z = inv_z;
     // theoretically we should do here sqrt(dx^2+dy^2), but
     // we can approximate it just by abs(dx)+abs(dy)
-    if ((fabs (poly.vertices[i].sx - poly.vertices[i - 1].sx)
-	 + fabs (poly.vertices[i].sy - poly.vertices[i - 1].sy)) > VERTEX_NEAR_THRESHOLD)
+    if ((ABS (poly.vertices[i].sx - poly.vertices[i - 1].sx)
+	 + ABS (poly.vertices[i].sy - poly.vertices[i - 1].sy)) > VERTEX_NEAR_THRESHOLD)
       num_vertices++;
   }
 
@@ -1725,8 +1725,8 @@ bool csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
       max_z = inv_z;
     // theoretically we should do here sqrt(dx^2+dy^2), but
     // we can approximate it just by abs(dx)+abs(dy)
-    if ((fabs (poly.vertices[i].sx - poly.vertices[i - 1].sx)
-	 + fabs (poly.vertices[i].sy - poly.vertices[i - 1].sy)) > VERTEX_NEAR_THRESHOLD)
+    if ((ABS (poly.vertices[i].sx - poly.vertices[i - 1].sx)
+	 + ABS (poly.vertices[i].sy - poly.vertices[i - 1].sy)) > VERTEX_NEAR_THRESHOLD)
       num_vertices++;
   }
 

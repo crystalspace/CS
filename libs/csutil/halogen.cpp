@@ -49,7 +49,7 @@ unsigned char *GenerateHalo (int iSize, float iFactor, float iCross)
                       pow (float (dy) / float (s2), iCross)), iFactor);
 
 #ifdef HALO_HAS_OUTER_RIM
-      float rim = fabs (s3 - (dx * dx + dy * dy)) / 64.0;
+      float rim = ABS (s3 - (dx * dx + dy * dy)) / 64.0;
       if (rim < 1)
         a = a * 0.7 + rim * 0.3;
 #endif

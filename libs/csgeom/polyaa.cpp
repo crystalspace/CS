@@ -35,7 +35,7 @@ static float __calc_area (int n, csVector2 *p)
     area += (p [i].y + p [j].y) * (p [i].x - p [j].x);
   }
 
-  return fabs (area / 2.0);
+  return ABS (area / 2.0);
 }
 
 // No doubt static vars are !!!EVIL!!! :-) but for
@@ -72,7 +72,7 @@ void __poly_fill (csVector2 *iVertices, int iVertexCount)
   }
 
   // Check if polygon surface equals the visible rectangle surface
-  if (fabs (a - visarea) < EPSILON)
+  if (ABS (a - visarea) < EPSILON)
   {
     // this area is completely covered
     if (DrawBox)

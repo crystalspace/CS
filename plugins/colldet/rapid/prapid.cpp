@@ -395,9 +395,9 @@ int coplanar_tri_tri (float N[3],
   short i0,i1;
   /* first project onto an axis-aligned plane, that maximizes the area */
   /* of the triangles, compute indices: i0,i1. */
-  A [0] = fabs (N [0]);
-  A [1] = fabs (N [1]);
-  A [2] = fabs (N [2]);
+  A [0] = ABS  (N [0]);
+  A [1] = ABS  (N [1]);
+  A [2] = ABS  (N [2]);
   if (A [0] > A [1])
   {
     if (A [0] > A [2])
@@ -465,9 +465,9 @@ int tri_contact (const csVector3 &V0, const csVector3 &V1, const csVector3 &V2,
 
   /* coplanarity robustness check */
 #if USE_EPSILON_TEST
-  if (fabs (du0) < EPSILON) du0 = 0.0;
-  if (fabs (du1) < EPSILON) du1 = 0.0;
-  if (fabs (du2) < EPSILON) du2 = 0.0;
+  if (ABS  (du0) < EPSILON) du0 = 0.0;
+  if (ABS  (du1) < EPSILON) du1 = 0.0;
+  if (ABS  (du2) < EPSILON) du2 = 0.0;
 #endif
   du0du1 = du0 * du1;
   du0du2 = du0 * du2;
@@ -489,9 +489,9 @@ int tri_contact (const csVector3 &V0, const csVector3 &V1, const csVector3 &V2,
   dv2 = DOT (N2, V2) + d2;
 
 #if USE_EPSILON_TEST
-  if (fabs (dv0) < EPSILON) dv0 = 0.0;
-  if (fabs (dv1) < EPSILON) dv1 = 0.0;
-  if (fabs (dv2) < EPSILON) dv2 = 0.0;
+  if (ABS  (dv0) < EPSILON) dv0 = 0.0;
+  if (ABS  (dv1) < EPSILON) dv1 = 0.0;
+  if (ABS  (dv2) < EPSILON) dv2 = 0.0;
 #endif
 
   dv0dv1 = dv0 * dv1;
@@ -505,10 +505,10 @@ int tri_contact (const csVector3 &V0, const csVector3 &V1, const csVector3 &V2,
   CROSS (D, N2, N1);
 
   /* compute and index to the largest component of D */
-  max = fabs (D [0]);
+  max = ABS  (D [0]);
   index = 0;
-  b = fabs (D [1]);
-  c = fabs (D [2]);
+  b = ABS  (D [1]);
+  c = ABS  (D [2]);
   if (b > max) max = b, index = 1;
   if (c > max) max = c, index = 2;
 
@@ -644,7 +644,7 @@ int obb_disjoint (const csMatrix3& B, const csVector3& T,
   csMatrix3 Bf;
   const float reps = 1e-6;
 
-  // Bf = fabs(B)
+  // Bf = ABS (B)
   Bf.m11 = ABS (B.m11);  Bf.m11 += reps;
   Bf.m12 = ABS (B.m12);  Bf.m12 += reps;
   Bf.m13 = ABS (B.m13);  Bf.m13 += reps;

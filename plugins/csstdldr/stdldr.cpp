@@ -389,7 +389,7 @@ csTokenList csStandardLoader::Tokenize (char *iData, size_t &ioSize)
           tmp = float2short (f);
           float f1 = f;
           float f2 = short2float (tmp);
-          while (fabs (f1) <= FLOAT_PRECISION)
+          while (ABS (f1) <= FLOAT_PRECISION)
           { f1 *= 10; f2 *= 10; }
           if (QRound (f1) == QRound (f2))
             tmp = little_endian_short (tmp), outtoken = tokNUMBER16F;

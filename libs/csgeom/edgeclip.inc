@@ -29,11 +29,11 @@
     // If starting vertex is visible, put it into output array
     if (prevVertexInside)
       if ((!OutV
-        || fabs (px - OutP [OutV - 1].x) > EPSILON
-        || fabs (py - OutP [OutV - 1].y) > EPSILON)
+        || ABS (px - OutP [OutV - 1].x) > EPSILON
+        || ABS (py - OutP [OutV - 1].y) > EPSILON)
        && (!LastVertex
-        || fabs (px - OutP [0].x) > EPSILON
-        || fabs (py - OutP [0].y) > EPSILON))
+        || ABS (px - OutP [0].x) > EPSILON
+        || ABS (py - OutP [0].y) > EPSILON))
     {
       OutP [OutV].x = px;
       OutP [OutV].y = py;
@@ -61,11 +61,11 @@
       CLIP_INTERSECT
 
       if ((!OutV
-        || fabs (tx - OutP [OutV - 1].x) > EPSILON
-        || fabs (ty - OutP [OutV - 1].y) > EPSILON)
+        || ABS (tx - OutP [OutV - 1].x) > EPSILON
+        || ABS (ty - OutP [OutV - 1].y) > EPSILON)
        && (!LastVertex
-        || fabs (tx - OutP [0].x) > EPSILON
-        || fabs (ty - OutP [0].y) > EPSILON))
+        || ABS (tx - OutP [0].x) > EPSILON
+        || ABS (ty - OutP [0].y) > EPSILON))
       {
         OutP [OutV].x = tx;
         OutP [OutV].y = ty;
@@ -128,8 +128,8 @@
         // Drop out, after adding all vertices left in input polygon
         if (curVertexInside && !LastVertex)
         {
-          if (fabs (InP [vert].x - OutP [OutV - 1].x) < EPSILON
-           && fabs (InP [vert].y - OutP [OutV - 1].y) < EPSILON)
+          if (ABS (InP [vert].x - OutP [OutV - 1].x) < EPSILON
+           && ABS (InP [vert].y - OutP [OutV - 1].y) < EPSILON)
             vert++;
           int count = InV - vert;
           if (OutV + count > MAX_OUTPUT_VERTICES)

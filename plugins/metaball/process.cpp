@@ -72,11 +72,11 @@ csVector3 VertexInterp(const csVector3 &p1,const csVector3 &p2,float valp1,float
   float mu;
   csVector3 p;
 
-  if(fabs(valp1)<EPS)
+  if(ABS (valp1)<EPS)
     return(p1);
-  if(fabs(valp2)<EPS)
+  if(ABS (valp2)<EPS)
     return(p2);
-  if(fabs(valp1-valp2)<EPS)
+  if(ABS (valp1-valp2)<EPS)
     return(p1);
 
   mu=valp1/(valp2-valp1);

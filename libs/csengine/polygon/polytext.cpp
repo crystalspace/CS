@@ -979,7 +979,7 @@ a:      if (scanR2 == MinIndex) goto finish;
         scanR1 = scanR2;
         scanR2 = (scanR2 + 1) % lp->num_vertices;
 
-        if (fabs (f_uv [scanR2].y - f_uv [MaxIndex].y) < EPSILON)
+        if (ABS (f_uv [scanR2].y - f_uv [MaxIndex].y) < EPSILON)
         {
           // oops! we have a flat bottom!
           goto a;
@@ -1006,7 +1006,7 @@ b:      if (scanL2 == MinIndex) goto finish;
         scanL1 = scanL2;
         scanL2 = (scanL2 - 1 + lp->num_vertices) % lp->num_vertices;
 
-        if (fabs (f_uv [scanL2].y - f_uv [MaxIndex].y) < EPSILON)
+        if (ABS (f_uv [scanL2].y - f_uv [MaxIndex].y) < EPSILON)
         {
           // oops! we have a flat bottom!
           goto b;

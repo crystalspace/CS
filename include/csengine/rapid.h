@@ -230,7 +230,7 @@ public:
     v = r - p;
     w = u % v; 
 
-    if (fabs(w.x)+fabs(w.y)+fabs(w.z) > SMALL_EPSILON)
+    if (ABS (w.x)+ABS (w.y)+ABS (w.z) > SMALL_EPSILON)
         A = 0.5 * w.Norm();
     else
         A = 0.0;

@@ -24,7 +24,6 @@
 //---------------------------------------------------------------------------
 
 #define rotate(a1,a2) g=a1; h=a2; a1=g-s*(h+g*tau); a2=h+s*(g-h*tau);
-#define rfabs(x)      ((x < 0) ? -x : x)
 #define swap(a,b)     { float t = a; a = b; b = t; }
 
 // M is the matrix for which we seek to find the eigen values.
@@ -50,7 +49,7 @@ int Eigen (csMatrix3& M, csMatrix3& vout, csVector3& dout)
   for(i=0; i<50; i++)
     {
       // See if bottom half of matrix a is non zero.
-      sm=0.0; sm+=fabs(M.m12); sm+=fabs(M.m13); sm+=fabs(M.m23);
+      sm=0.0; sm+=ABS (M.m12); sm+=ABS (M.m13); sm+=ABS (M.m23);
       // If it is 0 we are done.  Return the current vector v and d.
       if (sm == 0.0)
 	{
@@ -63,19 +62,19 @@ int Eigen (csMatrix3& M, csMatrix3& vout, csVector3& dout)
       
       // Try rotations in 1st dimension
       {
-	g = 100.0*rfabs(M.m12);  
+	g = 100.0*ABS (M.m12);  
 	// Does this make sense??
 	// equiv to   if (i>3 && g == 0) 
-	if (i>3 && rfabs(d.x)+g==rfabs(d.x) && rfabs(d.y)+g==rfabs(d.y))
+	if (i>3 && ABS (d.x)+g==ABS (d.x) && ABS (d.y)+g==ABS (d.y))
 	  M.m12 =0.0;
-	else if (rfabs(M.m12)>tresh)
+	else if (ABS (M.m12)>tresh)
 	  {
 	    h = d.y-d.x;
-	    if (rfabs(h)+g == rfabs(h)) t=(M.m12)/h;
+	    if (ABS (h)+g == ABS (h)) t=(M.m12)/h;
 	    else
 	      {
 		theta=0.5*h/(M.m12);
-		t=1.0/(rfabs(theta)+sqrt(1.0+theta*theta));
+		t=1.0/(ABS (theta)+sqrt(1.0+theta*theta));
 		if (theta < 0.0) t = -t;
 	      }
 	    c=1.0/sqrt(1+t*t); s=t*c; tau=s/(1.0+c); h=t*M.m12;
@@ -89,18 +88,18 @@ int Eigen (csMatrix3& M, csMatrix3& vout, csVector3& dout)
 
       // Try rotations in the 2nd dimension.
       {
-	g = 100.0*rfabs(M.m13);
+	g = 100.0*ABS (M.m13);
 	// See above, can be simplified.
-	if (i>3 && rfabs(d.x)+g==rfabs(d.x) && rfabs(d.z)+g==rfabs(d.z))
+	if (i>3 && ABS (d.x)+g==ABS (d.x) && ABS (d.z)+g==ABS (d.z))
 	  M.m13=0.0;
-	else if (rfabs(M.m13)>tresh)
+	else if (ABS (M.m13)>tresh)
 	  {
 	    h = d.z-d.x;
-	    if (rfabs(h)+g == rfabs(h)) t=(M.m13)/h;
+	    if (ABS (h)+g == ABS (h)) t=(M.m13)/h;
 	    else
 	      {
 		theta=0.5*h/(M.m13);
-		t=1.0/(rfabs(theta)+sqrt(1.0+theta*theta));
+		t=1.0/(ABS (theta)+sqrt(1.0+theta*theta));
 		if (theta < 0.0) t = -t;
 	      }
 	    c=1.0/sqrt(1+t*t); s=t*c; tau=s/(1.0+c); h=t*M.m13;
@@ -115,17 +114,17 @@ int Eigen (csMatrix3& M, csMatrix3& vout, csVector3& dout)
 
       // Try rotations in 3rd dimension.
       {
-	g = 100.0*rfabs(M.m23);
-	if (i>3 && rfabs(d.y)+g==rfabs(d.y) && rfabs(d.z)+g==rfabs(d.z))
+	g = 100.0*ABS (M.m23);
+	if (i>3 && ABS (d.y)+g==ABS (d.y) && ABS (d.z)+g==ABS (d.z))
 	  M.m23=0.0;
-	else if (rfabs(M.m23)>tresh)
+	else if (ABS (M.m23)>tresh)
 	  {
 	    h = d.z-d.y;
-	    if (rfabs(h)+g == rfabs(h)) t=(M.m23)/h;
+	    if (ABS (h)+g == ABS (h)) t=(M.m23)/h;
 	    else
 	      {
 		theta=0.5*h/(M.m23);
-		t=1.0/(rfabs(theta)+sqrt(1.0+theta*theta));
+		t=1.0/(ABS (theta)+sqrt(1.0+theta*theta));
 		if (theta < 0.0) t = -t;
 	      }
 	    c=1.0/sqrt(1+t*t); s=t*c; tau=s/(1.0+c); h=t*M.m23;

@@ -173,7 +173,7 @@ void Normalize(TDtDouble* aVertex)
 {
   TDtDouble len;
   len = sqrt(InProduct(aVertex,aVertex));
-  if (fabs(len)<0.00001)
+  if (ABS (len) < 0.00001)
     return;
   aVertex[0] /= len;
   aVertex[1] /= len;

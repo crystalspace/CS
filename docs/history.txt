@@ -14,6 +14,11 @@ The history order has been reversed so that new features are at the top.
 	  both sprites and templates.
 	- csPolygonSet::GetBoundingBox() will now try to create the bounding
 	  box if it doesn't exist.
+	- Rene Dudfield experienced a strange crash in WalkTest which seemed
+	  to have been caused by using 'fabs'. I replaced most occurances
+	  of 'fabs' with the 'ABS' macro throughout the source to avoid this
+	  problem. Maybe this problem is cyrix related? (Rene has a cyrix
+	  processor).
 	- Eric Sunshine made the definition of the explicitly sized types
 	  int8, uint8, int16, uint16, int32, and uint32 optional in
 	  cstypes.h.  Definition of these types is now controlled by makefile

@@ -52,11 +52,11 @@ bool csMath3::FindIntersection(const csVector3  tri1[3],
   csVector3 d=n1%n2;
 
   int index=0;
-  float max=fabs(d.x);
-  if(fabs(d.y)>max)
-    max=fabs(d.y), index=1;
-  if(fabs(d.z)>max)
-    max=fabs(d.z), index=2;
+  float max=ABS (d.x);
+  if(ABS (d.y)>max)
+    max=ABS (d.y), index=1;
+  if(ABS (d.z)>max)
+    max=ABS (d.z), index=2;
 
   int m1=0,m2=0,n=0;
   float t1[3],t2[3];
@@ -73,9 +73,9 @@ bool csMath3::FindIntersection(const csVector3  tri1[3],
     float div1=n2*v1[i],div2=n1*v2[i];
     float pr1=-(n2*tri1[i]+d2),pr2=-(n1*tri2[i]+d1);
 
-    if(fabs(div1) < SMALL_EPSILON)
+    if(ABS (div1) < SMALL_EPSILON)
     {
-      if(fabs(pr1) < SMALL_EPSILON)
+      if(ABS (pr1) < SMALL_EPSILON)
       {
 	// line is in the plane of intersection
 	t1[i]=0;
@@ -90,9 +90,9 @@ bool csMath3::FindIntersection(const csVector3  tri1[3],
     else
       t1[i]=pr1/div1;
 
-    if(fabs(div2) < SMALL_EPSILON)
+    if(ABS (div2) < SMALL_EPSILON)
     {
-      if(fabs(pr2) < SMALL_EPSILON)
+      if(ABS (pr2) < SMALL_EPSILON)
       {
 	// line is in the plane of intersection
 	t2[i]=0;
