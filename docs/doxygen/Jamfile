@@ -5,6 +5,8 @@ if $(DOXYGEN)
   
 DoxyGen pubapi : pubapi.dox : pubapi : b2w.jpg smalllogo.jpg ;
 DoxyGen devapi : devapi.dox : devapi ;
+Help pubapi : "public API reference manual" ;
+Help devapi : "developer API reference manual" ;
 
 InstallDocDir pubapi ;
 }
