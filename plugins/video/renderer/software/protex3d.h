@@ -28,45 +28,44 @@ class csTextureCacheSoftware;
 class csSoftProcTexture3D : public csGraphics3DSoftwareCommon, 
 			    public iSoftProcTexture
 {
-private:
+  /// Whether sharing resources
+  bool sharing;
   /// True when it is necessary to reprepare a texture each update.
   bool reprepare;
-
-  /**
-   * The first instance of a procedural texture utilising a dedicated 
-   * 8bit texture manager.
-   */
-  static csSoftProcTexture3D *head_texG3D;
-
-  csGraphics3DSoftwareCommon* partner;
-
-public:
+  /// If reprepare is true soft_tex_mm is reprepared
   csTextureMMSoftware *soft_tex_mm;
+  /// Registered with dedicated 8bit texture manager when in true colour mode 
+  csTextureMMSoftware *dummy_soft_tex_mm;
+  /// The parent procedural texture as registered with the main texture manager
   csTextureMMSoftware *parent_tex_mm;
+  /// The main gfx contexts texture cache
   csTextureCacheSoftware *parent_tcache;
 
+public:
   DECLARE_IBASE;
 
   csSoftProcTexture3D (iBase *iParent);
   virtual ~csSoftProcTexture3D ();
 
-  bool Prepare (csTextureMMSoftware *tex_mm,
-		csGraphics3DSoftwareCommon *parent_g3d,
-		csSoftProcTexture3D *partner_g3d,
-		void *buffer, uint8 *bitmap,
-		csPixelFormat *pfmt, RGBPixel *palette, bool alone_hint);
+  bool Prepare (csTextureManagerSoftware *parent_texman, 
+		csTextureMMSoftware *tex_mm, 
+		void *buffer, uint8 *bitmap);
 
   virtual bool Initialize (iSystem *iSys);
 
   virtual void Print (csRect *area);
 
-  // The entry interface for other than software drivers..
-  // implementation of iSoftProcTexture
+  //----------------------------------------------------------------------------
+  /// The entry interface for other than software drivers..
+  /// implementation of iSoftProcTexture
   virtual iTextureHandle *CreateOffScreenRenderer 
     (iGraphics3D *parent_g3d, iGraphics3D *partner_g3d, int width, int height, 
-     void *buffer, csOffScreenBuffer hint, csPixelFormat *ipfmt);
-
+     void *buffer, csPixelFormat *ipfmt, int flags);
+  /// Converts mode
   virtual void ConvertMode ();
+
+private:
+  csGraphics3DSoftwareCommon* partner;
 };
 
 #endif // __CS_PROTEX3D_H__

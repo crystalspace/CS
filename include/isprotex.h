@@ -20,11 +20,10 @@
 #define __ISPROTEX_H__
 
 #include "csutil/scf.h"
-#include "igraph2d.h" // for csOffScreenBuffer
 
 /**
  * This interface is for internal use.
- * This interface currently is implemented in the software dynamic texture
+ * This interface currently is implemented in the software procedural texture
  * driver as part of renderer/software. Opengl currently supports a software
  * renderer option which utilises this. See ogl_proctexsoft.* for usage.
  */
@@ -35,7 +34,7 @@ struct iSoftProcTexture : public iBase
   /// Prepare a software procedural texture for use by a hardware renderer
   virtual iTextureHandle *CreateOffScreenRenderer 
     (iGraphics3D *parent_g3d, iGraphics3D *partner_g3d, int width, int height, 
-     void *buffer, csOffScreenBuffer hint, csPixelFormat *ipfmt) = 0;
+     void *buffer, csPixelFormat *ipfmt, int flags) = 0;
 
   /// This converts mode once and for all to a less efficient one.
   virtual void ConvertMode () = 0;

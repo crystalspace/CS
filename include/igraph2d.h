@@ -74,19 +74,6 @@ enum csMouseCursorID
 };
 
 /**
- * Internal use mostly.
- * Provides hints to the driver which kind of off screen buffer is preferred.
- */
-enum csOffScreenBuffer
-{
-  csosbSoftware,
-  csosbSoftwareAlone,
-  csosbHardware,
-  csosbHardwareAlone
-};
-
-
-/**
  * Structure describing the pixel format.
  */
 struct csPixelFormat
@@ -319,7 +306,7 @@ struct iGraphics2D : public iPlugIn
 
   /// Create an Off Screen Canvas
   virtual iGraphics2D *CreateOffScreenCanvas 
-  (int width, int height, void *buffer, csOffScreenBuffer hint, 
+  (int width, int height, void *buffer, bool alone_hint, 
    csPixelFormat *ipfmt, RGBPixel *palette = NULL, int pal_size = 0) = 0;
 };
 

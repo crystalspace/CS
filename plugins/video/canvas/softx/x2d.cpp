@@ -998,7 +998,7 @@ void csGraphics2DXLib::Print (csRect *area)
         }
       }
     }
-  }
+  } // end  if (sim_depth)
 
 #ifdef DO_SHM
   if (do_shm)

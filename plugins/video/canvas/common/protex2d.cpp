@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 #include "protex2d.h"
 #include "csutil/scf.h"
+#include "csutil/csrect.h"
 #include "isystem.h"
 
 DECLARE_FACTORY (csProcTextureSoft2D)
@@ -45,7 +46,7 @@ csProcTextureSoft2D::~csProcTextureSoft2D ()
 }
 
 iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas 
-  (int width, int height, void *buffer, csOffScreenBuffer hint, 
+  (int width, int height, void *buffer, bool use8bit, 
    csPixelFormat *ipfmt, RGBPixel *palette, int pal_size)
 {
   Width = width;
@@ -53,23 +54,18 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
   FullScreen = false;
   Memory = (unsigned char*) buffer;
 
-  // Four ways into this routine:
-  // 1. via Opengl as a software renderer. Here we do not share resources
-  // and the renderer renders at Opengl preferred format.
-  //
-  // 2. via Opengl as a software renderer, but sharing texture handles..it has
+  // Three ways into this routine:
+  // 1. via Opengl as a software renderer, but sharing texture handles..it has
   // its own texture manager but retains a csVector relating the opengl 
   // texture handles to its own.
   //
-  // 3. via Software drivers as a stand alone. Here we can render in (internal
+  // 2. via Software drivers as a stand alone. Here we can render in (internal
   // format of the texture manager) 8bit.
   //
-  // 4. via Software drivers sharing the texture manager and resources
+  // 3. via Software drivers sharing the texture manager and resources
   // with its parent driver, here we render at screen pfmt.
 
-
-  if ((hint == csosbSoftwareAlone) || 
-      ((hint == csosbSoftware) && (ipfmt->PixelBytes == 1)))
+  if (use8bit || (ipfmt->PixelBytes == 1))
   {
     // We are software stand alone implementation, or software shared
     // implementation at 8bit.
@@ -105,27 +101,23 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
       _WriteChar = WriteChar16;
       _GetPixelAt = GetPixelAt16;
 
-      if (hint == csosbSoftware)
-      {
-	// Here we are in a software context while sharing the texture manager
-	// We therefor render to a 16bit frame buffer and then unpack into an 
-	// RGBPixel format from which the texture manager recalculates the 
-	// texture
-	destroy_memory = true;
-	Memory = new unsigned char[width*height*2];
+      // Here we are in a software context while sharing the texture manager
+      // We therefor render to a 16bit frame buffer and then unpack into an 
+      // RGBPixel format from which the texture manager recalculates the 
+      // texture
+      destroy_memory = true;
+      Memory = new unsigned char[width*height*2];
 
-	image_buffer = (RGBPixel*) buffer;
+      image_buffer = (RGBPixel*) buffer;
 
-	UShort *dst = (UShort*)Memory;
-	UShort bb = 8 - pfmt.BlueBits;
-	UShort gb = 8 - pfmt.GreenBits;
-	UShort rb = 8 - pfmt.RedBits;
-	for (int i = 0; i < width*height; i++, dst++)
-	  *dst = ((((UShort)image_buffer[i].blue >> bb) << pfmt.BlueShift) +
-		  (((UShort)image_buffer[i].green >> gb) << pfmt.GreenShift) +
-		  (((UShort)image_buffer[i].red >> rb) << pfmt.RedShift));
-      
-      }
+      UShort *dst = (UShort*)Memory;
+      UShort bb = 8 - pfmt.BlueBits;
+      UShort gb = 8 - pfmt.GreenBits;
+      UShort rb = 8 - pfmt.RedBits;
+      for (int i = 0; i < width*height; i++, dst++)
+	*dst = ((((UShort)image_buffer[i].blue >> bb) << pfmt.BlueShift) +
+		(((UShort)image_buffer[i].green >> gb) << pfmt.GreenShift) +
+		(((UShort)image_buffer[i].red >> rb) << pfmt.RedShift));
     } 
     else
     {
@@ -153,22 +145,16 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
   return (iGraphics2D*)this;
 }
 
-bool csProcTextureSoft2D::Open(const char *Title)
-{
-  // Open the graphic interface
-  return csGraphics2D::Open (Title);
-}
-
 void csProcTextureSoft2D::Close ()
 {
+  // The font server is DecRefed in csGraphics2D
   // These arrays are shared with the texture, the texture will destroy them.
   Palette = NULL;
-  // the font server is DecRefed in csGraphics2D
   csGraphics2D::Close ();
   System->QueueContextCloseEvent ((void*)this);
 }
 
-void csProcTextureSoft2D::Print (csRect*)
+void csProcTextureSoft2D::Print (csRect *area)
 {
   if (image_buffer)
   {
@@ -179,28 +165,70 @@ void csProcTextureSoft2D::Print (csRect*)
       // the 32 bit image_buffer as this is the format required by the 
       // quantization routines in the texture manager.
       UShort *src = (UShort*) Memory;
-      UShort bb = 8 - pfmt.BlueBits;
-      UShort gb = 8 - pfmt.GreenBits;
-      UShort rb = 8 - pfmt.RedBits;
-      for (int i = 0; i < Width*Height; i++, src++, dst++)
+
+      int rb = 8 - pfmt.RedBits;
+      int gb = 8 - pfmt.GreenBits;
+      int bb = 8 - pfmt.BlueBits;
+
+      if (area)
       {
-	dst->red = ((*src & pfmt.RedMask) >> pfmt.RedShift) << rb;
-	dst->green = ((*src & pfmt.GreenMask) >> pfmt.GreenShift) << gb;
-	dst->blue = ((*src & pfmt.BlueMask) >> pfmt.BlueShift) << bb; 
+	int stride = area->xmin + Width - area->xmax;
+	int offset = area->ymin*Width + area->xmin;
+	src += offset;
+	dst += offset;
+	for (int i = area->ymin; i < (area->ymax+1); i++)
+	{
+	  for (int j = area->xmin; j < area->xmax; j++, src++, dst++)
+	  {
+	    dst->red = ((*src & pfmt.RedMask) >> pfmt.RedShift) << rb;
+	    dst->green = ((*src & pfmt.GreenMask) >> pfmt.GreenShift) << gb;
+	    dst->blue = ((*src & pfmt.BlueMask) >> pfmt.BlueShift) << bb; 
+	  }
+	  src += stride;
+	  dst += stride;
+	}
+      }
+      else
+      {
+	for (int i = 0; i < Width*Height; i++, src++, dst++)
+	{
+	  dst->red = ((*src & pfmt.RedMask) >> pfmt.RedShift) << rb;
+	  dst->green = ((*src & pfmt.GreenMask) >> pfmt.GreenShift) << gb;
+	  dst->blue = ((*src & pfmt.BlueMask) >> pfmt.BlueShift) << bb; 
+	}
       }
     }
-    // 32bit byte shuffle hmmm...if only RGBPixel ordered its red,green,blue,alpha
-    // members differently....
-    else
+    else  // 32bit: byte shuffle 
     {
       ULong *src = (ULong *)Memory;
-      for (int i = 0; i < Width*Height; i++, src++, dst++)
+      if (area)
       {
-	dst->red = ((*src & pfmt.RedMask) >> pfmt.RedShift);
-	dst->green = ((*src & pfmt.GreenMask) >> pfmt.GreenShift);
-	dst->blue = ((*src & pfmt.BlueMask) >> pfmt.BlueShift);
+	int stride = area->xmin + Width - area->xmax;
+	int offset = area->ymin*Width + area->xmin;
+	src += offset;
+	dst += offset;
+	for (int i = area->ymin; i < (area->ymax+1); i++)
+	{
+	  for (int j = area->xmin; j < area->xmax; j++, src++, dst++)
+	  {
+	    dst->red = ((*src & pfmt.RedMask) >> pfmt.RedShift);
+	    dst->green = ((*src & pfmt.GreenMask) >> pfmt.GreenShift);
+	    dst->blue = ((*src & pfmt.BlueMask) >> pfmt.BlueShift);
+	  }
+	  src += stride;
+	  dst += stride;
+	}
+      }
+      else
+      {
+	for (int i = 0; i < Width*Height; i++, src++, dst++)
+	{
+	  dst->red = ((*src & pfmt.RedMask) >> pfmt.RedShift);
+	  dst->green = ((*src & pfmt.GreenMask) >> pfmt.GreenShift);
+	  dst->blue = ((*src & pfmt.BlueMask) >> pfmt.BlueShift);
+	}
       }
     }
-  }
+  } // end if (image_buffer)
 }
 

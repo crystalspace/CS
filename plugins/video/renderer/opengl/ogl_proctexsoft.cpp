@@ -171,7 +171,40 @@ bool csOpenGLProcSoftware::Prepare
  (csGraphics3DOGLCommon *parent_g3d, csOpenGLProcSoftware *head_soft_tex,
   csTextureMMOpenGL *tex, csPixelFormat *ipfmt, void *buffer, bool alone_hint)
 { 
-  memcpy (&pfmt, ipfmt, sizeof(csPixelFormat));
+  // We generate a 32 bit pfmt taking into account endianness and whether
+  // frame buffer is RGB or BGR...there must be a better way...
+
+#if defined (CS_BIG_ENDIAN)
+  if (ipfmt->RedMask > ipfmt->BlueMask)
+  {
+    pfmt.RedMask   = 0xff000000;
+    pfmt.GreenMask = 0x00ff0000;
+    pfmt.BlueMask  = 0x0000ff00;
+  }
+  else
+  {
+    pfmt.RedMask   = 0x0000ff00;
+    pfmt.GreenMask = 0x00ff0000;
+    pfmt.BlueMask  = 0xff000000;
+  }
+#else
+  if (ipfmt->RedMask > ipfmt->BlueMask)
+  {
+    pfmt.RedMask   = 0x00ff0000;
+    pfmt.GreenMask = 0x0000ff00;
+    pfmt.BlueMask  = 0x000000ff;
+  }
+  else
+  {
+    pfmt.RedMask   = 0x000000ff;
+    pfmt.GreenMask = 0x0000ff00;
+    pfmt.BlueMask  = 0x00ff0000;
+  }
+#endif
+  pfmt.PixelBytes = 4;
+  pfmt.PalEntries = 0;
+  pfmt.complete ();
+
   system = parent_g3d->System;
   this->buffer = (char*) buffer;
   this->tex = tex;
@@ -217,10 +250,8 @@ bool csOpenGLProcSoftware::Prepare
 //    g3d = parent_g3d;
 
   iTextureHandle *soft_proc_tex = isoft_proc->CreateOffScreenRenderer 
-    ((iGraphics3D*) parent_g3d, 
-     head_soft_tex ? head_soft_tex->g3d : NULL, 
-     width, height, buffer, 
-     alone_mode ? csosbHardwareAlone : csosbHardware, ipfmt);
+    ((iGraphics3D*) parent_g3d, head_soft_tex ? head_soft_tex->g3d : NULL, 
+     width, height, buffer, &pfmt, tex->GetFlags());
 
   if (!soft_proc_tex)
   {
@@ -251,8 +282,7 @@ bool csOpenGLProcSoftware::Prepare
     last->next_soft_tex = this;
   }
 
-  SysPrintf (MSG_STDOUT, 
-	     "Successfully initialised GL software procedural texture\n");
+  SysPrintf (MSG_STDOUT, "GL software procedural texture\n");
   return true;
 }
 

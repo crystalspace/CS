@@ -1,3 +1,4 @@
+/*  -*- Mode: C++; -*- */
 /*
     Crystal Space 3D engine
     Copyright (C) 2000 by Jorrit Tyberghein

@@ -312,7 +312,7 @@ class csOpenGLProcSoftware2D : public iGraphics2D
   { return g2d->ScreenShot(); }
 
   virtual iGraphics2D *CreateOffScreenCanvas 
-  (int /*width*/, int /*height*/, void* /*buffer*/, csOffScreenBuffer /*hint*/, 
+  (int /*width*/, int /*height*/, void* /*buffer*/, bool /*hint*/, 
    csPixelFormat* /*ipfmt = NULL*/, RGBPixel* /*palette = NULL*/, 
    int /*pal_size = 0*/)
   { return NULL; }

@@ -39,7 +39,6 @@ public:
   csProcTextureSoft2D (iSystem *isys);
   virtual ~csProcTextureSoft2D ();
 
-  virtual bool Open (const char *Title);
   virtual void Close ();
 
   virtual bool BeginDraw () { return (Memory != NULL); }
@@ -47,7 +46,7 @@ public:
   virtual void Print (csRect *area = NULL);
 
   virtual iGraphics2D *CreateOffScreenCanvas 
-  (int width, int height, void *buffer, csOffScreenBuffer hint, 
+  (int width, int height, void *buffer, bool use8bit, 
    csPixelFormat *ipfmt, RGBPixel *palette = NULL, int pal_size = 0);
 };
 

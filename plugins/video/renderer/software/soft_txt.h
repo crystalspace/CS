@@ -156,7 +156,6 @@ public:
  */
 class csTextureMMSoftware : public csTextureMM
 {
-  friend class csSoftProcTexture3D;
 protected:
   /**
    * Private colormap -> global colormap table
@@ -229,6 +228,7 @@ public:
   virtual bool GetAlphaMap ()
   { return !!((csTextureSoftware *)get_texture (0))->get_alphamap (); }
 
+  //-------------------------------Procedural Texture support--------------------
   /// Return the interfaces to the procedural texture buffer
   virtual iGraphics3D *GetProcTextureInterface ();
 
@@ -366,30 +366,38 @@ public:
   /// Really allocate the palette on the system.
   virtual void SetPalette ();
 
-  ///The dedicated procedural texture manager (if there is one)
-  csTextureManagerSoftware *proc_txtmgr;
-
-  /// The main texture manager (if this is a dedicated procedural texture manager)
-  csTextureManagerSoftware *main_txtmgr;
-
+  //-----------------------Procedural Texture Support--------------------------
   /**
    * If this instance is not a proc_only_txtmgr but there are 8bit procedural 
    * textures in the system, remember the first one.
    */
-  csSoftProcTexture3D *first_8bit_proc_tex;
+  csGraphics3DSoftwareCommon *first_8bit_proc_tex;
 
+  /// Retrieve first 8bit Procedural texture registered while in true colour mode
+  csGraphics3DSoftwareCommon *GetFirst8bitProcTexture ()
+  { return (csGraphics3DSoftwareCommon *)first_8bit_proc_tex; }
+
+  ///
   void SetMainTextureManager (csTextureManagerSoftware *main_txt_mgr) 
   { main_txtmgr = main_txt_mgr; }
-
+  ///
   void SetProcTextureManager (csTextureManagerSoftware *proc_txt_mgr) 
   { proc_txtmgr =  proc_txt_mgr; }
 
+private:
   /**
    * When in 16/32bit mode and the proc textures are in 8bit the palettes are
    * managed by the 8bit texture manager. This function is called to remap the 
    * textures according to the new palette etc.
    */
   void ReprepareAloneProcs ();
+
+  ///The dedicated procedural texture manager (if there is one)
+  csTextureManagerSoftware *proc_txtmgr;
+
+  /// The main texture manager (if this is a dedicated procedural texture manager)
+  csTextureManagerSoftware *main_txtmgr;
+
 };
 
 #endif // __SOFT_TXT_H__

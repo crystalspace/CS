@@ -99,9 +99,9 @@ void csOpenGLProcBackBuffer::Prepare (csGraphics3DOGLCommon *g3d,
     buffer = new char[width*height*4];
     memset (buffer, 0, sizeof(char)*width*height*3);
   }
-
-  SysPrintf (MSG_STDOUT, 
-	     "Successfully initialised GL backbuffer procedural texture\n");
+#ifdef CS_DEBUG
+  SysPrintf (MSG_STDOUT, "GL backbuffer procedural texture\n");
+#endif
 }
 
 bool csOpenGLProcBackBuffer::BeginDraw (int DrawFlags)
