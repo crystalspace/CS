@@ -59,8 +59,6 @@ SWIG.INTERFACE = plugins/cscript/common/cs.i
 SWIG.CSLUA = plugins/cscript/cslua/cs_lua.cpp
 SWIG.CSLUA.OBJ = $(addprefix $(OUT),$(notdir $(SWIG.CSLUA:.cpp=$O)))
 
-TRASH.CSLUA = $(wildcard $(addprefix scripts/lua/,*.pyc *.pyo))
-
 INC.CSLUA = $(wildcard plugins/cscript/cslua/*.h)
 SRC.CSLUA = \
   $(sort $(wildcard plugins/cscript/cslua/*.cpp) $(SWIG.CSLUA))
@@ -101,7 +99,7 @@ $(CSLUA): $(OBJ.CSLUA) $(LIB.CSLUA)
 	$(DO.PLUGIN.POSTAMBLE)
 
 csluaclean:
-	-$(RM) $(CSLUA) $(OBJ.CSLUA) $(TRASH.CSLUA)
+	-$(RM) $(CSLUA) $(OBJ.CSLUA)
 
 csluaswig: csluaswigclean cslua
 
