@@ -36,6 +36,8 @@
 #include "null_renderbuffer.h"
 #include "null_render3d.h"
 
+#include "../common/normalizationcube.h"
+
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csNullGraphics3D)
@@ -168,31 +170,6 @@ csPtr<iPolygonRenderer> csNullGraphics3D::CreatePolygonRenderer ()
   return csPtr<iPolygonRenderer> (new csNullPolygonRenderer ());
 }
 
-static void FillNormalizationMapSide (unsigned char *normdata, int size, 
-                          int xx, int xy, int xo,
-                          int yx, int yy, int yo,
-                          int zx, int zy, int zo)
-{
-  const float halfSize = size / 2;
-  for (int y=0; y < size; y++)
-  {
-    float yv = (y + 0.5) / halfSize - 1.0f;
-    for (int x=0; x < size; x++)
-    {
-      float xv = (x + 0.5) / halfSize - 1.0f;
-      csVector3 norm = csVector3 (
-        xo + xv*xx + yv*xy, 
-        yo + xv*yx + yv*yy, 
-        zo + xv*zx + yv*zy);
-      norm.Normalize ();
-      *normdata++ = (unsigned char)(127.5f + norm.x*127.5f);
-      *normdata++ = (unsigned char)(127.5f + norm.y*127.5f);
-      *normdata++ = (unsigned char)(127.5f + norm.z*127.5f);
-      *normdata++ = 0;
-    }
-  }
-}
-
 bool csNullGraphics3D::Open ()
 {
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
@@ -255,11 +232,8 @@ bool csNullGraphics3D::Open ()
   csRef<iImage> img = csPtr<iImage> (new csImageMemory (
     CS_FOGTABLE_SIZE, 1, transientfogdata, true, 
     CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
-  csRef<iImageVector> imgvec = csPtr<iImageVector> (new csImageVector ());
-  imgvec->AddImage (img);
   csRef<iTextureHandle> fogtex = txtmgr->RegisterTexture (
-    imgvec, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS, 
-    iTextureHandle::CS_TEX_IMG_2D);
+    img, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS);
 
   csRef<csShaderVariable> fogvar = csPtr<csShaderVariable>( new csShaderVariable(
     strings->Request ("standardtex fog")));
@@ -267,80 +241,19 @@ bool csNullGraphics3D::Open ()
   if (shadermgr)
     shadermgr->AddVariable(fogvar);
 
-  #define CS_NORMTABLE_SIZE 128
+  {
+    const int normalizeCubeSize = config->GetInt (
+      "Video.Null3d.NormalizeCubeSize", 128);
 
-  imgvec = csPtr<iImageVector> (new csImageVector ());
-
-  // Positive X
-  unsigned char *normdata = 
-    new unsigned char[CS_NORMTABLE_SIZE*CS_NORMTABLE_SIZE*4];
-  FillNormalizationMapSide (normdata, CS_NORMTABLE_SIZE,  0,  0,  1,
-                                                          0, -1,  0,
-                                                         -1,  0,  0);
-  img = csPtr<iImage> (new csImageMemory (
-    CS_NORMTABLE_SIZE, CS_NORMTABLE_SIZE, normdata, true,
-    CS_IMGFMT_TRUECOLOR));
-  imgvec->AddImage (img);
-
-  // Negative X
-  normdata = new unsigned char[CS_NORMTABLE_SIZE*CS_NORMTABLE_SIZE*4];
-  FillNormalizationMapSide (normdata, CS_NORMTABLE_SIZE,  0,  0, -1,
-                                                          0, -1,  0,
-                                                          1,  0,  0);
-  img = csPtr<iImage> (new csImageMemory (
-    CS_NORMTABLE_SIZE, CS_NORMTABLE_SIZE, normdata, true, 
-    CS_IMGFMT_TRUECOLOR));
-  imgvec->AddImage (img);
-
-  // Positive Y
-  normdata = new unsigned char[CS_NORMTABLE_SIZE*CS_NORMTABLE_SIZE*4];
-  FillNormalizationMapSide (normdata, CS_NORMTABLE_SIZE,  1,  0,  0,
-                                                          0,  0,  1,
-                                                          0,  1,  0);
-  img = csPtr<iImage> (new csImageMemory (
-    CS_NORMTABLE_SIZE, CS_NORMTABLE_SIZE, normdata, true, 
-    CS_IMGFMT_TRUECOLOR));
-  imgvec->AddImage (img);
-
-  // Negative Y
-  normdata = new unsigned char[CS_NORMTABLE_SIZE*CS_NORMTABLE_SIZE*4];
-  FillNormalizationMapSide (normdata, CS_NORMTABLE_SIZE,  1,  0,  0,
-                                                          0,  0, -1,
-                                                          0, -1,  0);
-  img = csPtr<iImage> (new csImageMemory (
-    CS_NORMTABLE_SIZE, CS_NORMTABLE_SIZE, normdata, true, 
-    CS_IMGFMT_TRUECOLOR));
-  imgvec->AddImage (img);
-
-  // Positive Z
-  normdata = new unsigned char[CS_NORMTABLE_SIZE*CS_NORMTABLE_SIZE*4];
-  FillNormalizationMapSide (normdata, CS_NORMTABLE_SIZE,  1,  0,  0,
-                                                          0, -1,  0,
-                                                          0,  0,  1);
-  img = csPtr<iImage> (new csImageMemory (
-    CS_NORMTABLE_SIZE, CS_NORMTABLE_SIZE, normdata, true, 
-    CS_IMGFMT_TRUECOLOR));
-  imgvec->AddImage (img);
-
-  // Negative Z
-  normdata = new unsigned char[CS_NORMTABLE_SIZE*CS_NORMTABLE_SIZE*4];
-  FillNormalizationMapSide (normdata, CS_NORMTABLE_SIZE, -1,  0,  0,
-                                                          0, -1,  0,
-                                                          0,  0, -1);
-  img = csPtr<iImage> (new csImageMemory (
-    CS_NORMTABLE_SIZE, CS_NORMTABLE_SIZE, normdata, true, 
-    CS_IMGFMT_TRUECOLOR));
-  imgvec->AddImage (img);
-
-  csRef<iTextureHandle> normtex = txtmgr->RegisterTexture (
-    imgvec, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS, 
-    iTextureHandle::CS_TEX_IMG_CUBEMAP);
-
-  csRef<csShaderVariable> normvar = csPtr<csShaderVariable>( new csShaderVariable(
-    strings->Request ("standardtex normalization map")));
-  normvar->SetValue (normtex);
-  if (shadermgr)
+    csRef<csShaderVariable> normvar = 
+      csPtr<csShaderVariable> (new csShaderVariable (
+      strings->Request ("standardtex normalization map")));
+    csRef<iShaderVariableAccessor> normCube;
+    normCube.AttachNew (new csNormalizationCubeAccessor (txtmgr, 
+      normalizeCubeSize));
+    normvar->SetAccessor (normCube);
     shadermgr->AddVariable(normvar);
+  }
 
 
   #define CS_ATTTABLE_SIZE	  128
@@ -364,11 +277,8 @@ bool csNullGraphics3D::Open ()
   img  = csPtr<iImage> (new csImageMemory (
     CS_ATTTABLE_SIZE, CS_ATTTABLE_SIZE, attenuationdata, true, 
     CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
-  imgvec = csPtr<iImageVector> (new csImageVector ());
-  imgvec->AddImage (img);
   csRef<iTextureHandle> atttex = txtmgr->RegisterTexture (
-    imgvec, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS, 
-    iTextureHandle::CS_TEX_IMG_2D);
+    img, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS);
 
   csRef<csShaderVariable> attvar = csPtr<csShaderVariable>( new csShaderVariable(
     strings->Request ("standardtex attenuation")));

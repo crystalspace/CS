@@ -38,6 +38,7 @@
 #include "ivideo/material.h"
 #include "ivideo/texture.h"
 #include "imap/reader.h"
+#include "csgfx/imagecubemapmaker.h"
 #include "csgfx/xorpat.h"
 
 #include "loadtex.h"
@@ -278,6 +279,8 @@ bool csBaseTextureLoader::Initialize(iObjectRegistry *object_reg)
 
 //----------------------------------------------------------------------------
 
+SCF_IMPLEMENT_FACTORY(csImageTextureLoader);
+
 csImageTextureLoader::csImageTextureLoader (iBase *p) : 
   csBaseTextureLoader(p)
 {
@@ -313,6 +316,8 @@ csPtr<iBase> csImageTextureLoader::Parse (iDocumentNode* node,
 }
 
 //----------------------------------------------------------------------------
+
+SCF_IMPLEMENT_FACTORY(csCheckerTextureLoader);
 
 csCheckerTextureLoader::csCheckerTextureLoader (iBase *p) : 
   csBaseTextureLoader(p)
@@ -378,6 +383,139 @@ csPtr<iBase> csCheckerTextureLoader::Parse (iDocumentNode* node,
   csRef<iTextureWrapper> TexWrapper =
 	Engine->GetTextureList ()->NewTexture(TexHandle);
   TexWrapper->SetImageFile (Image);
+
+  return csPtr<iBase> (TexWrapper);
+}
+
+//----------------------------------------------------------------------------
+
+SCF_IMPLEMENT_FACTORY(csCubemapTextureLoader);
+
+csCubemapTextureLoader::csCubemapTextureLoader (iBase *p) : 
+  csBaseTextureLoader(p)
+{
+  init_token_table (xmltokens);
+}
+
+csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node, 
+					    iLoaderContext* ldr_context,
+					    iBase* context)
+{
+  if (!context) return 0;
+  csRef<iTextureLoaderContext> ctx = csPtr<iTextureLoaderContext>
+    (SCF_QUERY_INTERFACE (context, iTextureLoaderContext));
+  if (!ctx) return 0;
+  
+  csRef<iEngine> Engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  csRef<iGraphics3D> G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iTextureManager> tm = G3D->GetTextureManager();
+  csRef<iLoader> loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  csRef<iSyntaxService> SyntaxService = 
+    CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+
+  csRef<csImageCubeMapMaker> cube;
+  cube.AttachNew (new csImageCubeMapMaker (ctx->GetImage()));
+  if (!Engine->GetSaveableFlag()) cube->SetName (0);
+
+  int Format = tm->GetTextureFormat ();
+  const char* fname;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_NORTH:
+        fname = child->GetContentsValue ();
+	if (!fname)
+	{
+	  SyntaxService->ReportError (
+	       PLUGIN_TEXTURELOADER_CUBEMAP,
+	       child, "Expected VFS filename for 'file'!");
+	  return 0;
+	}
+      
+	cube->SetSubImage (4, csRef<iImage>(loader->LoadImage (fname, Format)));
+        break;
+    
+      case XMLTOKEN_SOUTH:
+        fname = child->GetContentsValue ();
+	if (!fname)
+	{
+	  SyntaxService->ReportError (
+	       PLUGIN_TEXTURELOADER_CUBEMAP,
+	       child, "Expected VFS filename for 'file'!");
+	  return 0;
+	}
+      
+	cube->SetSubImage (5, csRef<iImage>(loader->LoadImage (fname, Format)));
+        break;
+    
+      case XMLTOKEN_EAST:
+        fname = child->GetContentsValue ();
+	if (!fname)
+	{
+	  SyntaxService->ReportError (
+	       PLUGIN_TEXTURELOADER_CUBEMAP,
+	       child, "Expected VFS filename for 'file'!");
+	  return 0;
+	}
+      
+	cube->SetSubImage (0, csRef<iImage>(loader->LoadImage (fname, Format)));
+        break;
+    
+      case XMLTOKEN_WEST:
+        fname = child->GetContentsValue ();
+	if (!fname)
+	{
+	  SyntaxService->ReportError (
+	       PLUGIN_TEXTURELOADER_CUBEMAP,
+	       child, "Expected VFS filename for 'file'!");
+	  return 0;
+	}
+      
+	cube->SetSubImage (1, csRef<iImage>(loader->LoadImage (fname, Format)));
+        break;
+    
+      case XMLTOKEN_TOP:
+        fname = child->GetContentsValue ();
+	if (!fname)
+	{
+	  SyntaxService->ReportError (
+	       PLUGIN_TEXTURELOADER_CUBEMAP,
+	       child, "Expected VFS filename for 'file'!");
+	  return 0;
+	}
+      
+	cube->SetSubImage (2, csRef<iImage>(loader->LoadImage (fname, Format)));
+        break;
+    
+      case XMLTOKEN_BOTTOM:
+        fname = child->GetContentsValue ();
+	if (!fname)
+	{
+	  SyntaxService->ReportError (
+	       PLUGIN_TEXTURELOADER_CUBEMAP,
+	       child, "Expected VFS filename for 'file'!");
+	  return 0;
+	}
+      
+	cube->SetSubImage (3, csRef<iImage>(loader->LoadImage (fname, Format)));
+        break;
+    }
+  }
+
+
+  csRef<iTextureHandle> TexHandle (tm->RegisterTexture (cube, 
+    ctx->HasFlags() ? ctx->GetFlags() : CS_TEXTURE_3D));
+
+  csRef<iTextureWrapper> TexWrapper =
+	Engine->GetTextureList ()->NewTexture(TexHandle);
+  TexWrapper->SetImageFile (cube);
 
   return csPtr<iBase> (TexWrapper);
 }

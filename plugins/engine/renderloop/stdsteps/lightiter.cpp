@@ -329,11 +329,8 @@ csPtr<iTextureHandle> csLightIterRenderStep::GetAttenuationTexture (
     csRef<iImage> img = csPtr<iImage> (new csImageMemory (
       CS_ATTTABLE_SIZE, CS_ATTTABLE_SIZE, attenuationdata, true, 
       CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
-    csRef<iImageVector> imgvec = csPtr<iImageVector> (new csImageVector ());
-    imgvec->AddImage (img);
     attTex = g3d->GetTextureManager()->RegisterTexture (
-	imgvec, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS, 
-	iTextureHandle::CS_TEX_IMG_2D);
+	img, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS);
     attTex->SetTextureClass ("lookup");
   }
   return csPtr<iTextureHandle> (attTex);

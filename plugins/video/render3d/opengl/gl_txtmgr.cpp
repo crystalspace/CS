@@ -25,6 +25,7 @@
 #include "csutil/debug.h"
 #include "csutil/util.h"
 #include "csgfx/csimgvec.h"
+#include "csgfx/imagecubemapmaker.h"
 #include "csgfx/imagemanipulate.h"
 #include "csgfx/memimage.h"
 #include "csgfx/xorpat.h"
@@ -60,19 +61,29 @@ SCF_IMPLEMENT_IBASE(csGLTextureHandle)
   SCF_IMPLEMENTS_INTERFACE(iTextureHandle)
 SCF_IMPLEMENT_IBASE_END
 
-csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, int target,
-				      csGLGraphics3D *iG3D) : uploadData(0)
+csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, 
+				      csGLGraphics3D *iG3D) 
+  : origName(0), uploadData(0)
 {
   SCF_CONSTRUCT_IBASE(0);
-  this->target = target;
+  this->image = image;
+  switch (image->GetImageType())
+  {
+    case csimgCube:
+      target = CS_TEX_IMG_CUBEMAP;
+      break;
+    case csimg3D:
+      target = CS_TEX_IMG_3D;
+      break;
+    default:
+      target = CS_TEX_IMG_2D;
+      break;
+  }
   G3D = iG3D;
   txtmgr = G3D->txtmgr;
   //has_alpha = false;
   Handle = 0;
   textureClass = txtmgr->GetTextureClassID ("default");
-
-  images = csPtr<iImageVector> (new csImageVector());
-  images->AddImage(image);
 
   texFlags.Set (flagsPublicMask, flags);
   transp_color.red = transp_color.green = transp_color.blue = 0;
@@ -93,40 +104,9 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, int target,
   cachedata = 0;
 }
 
-csGLTextureHandle::csGLTextureHandle (iImageVector* image,
-				      int flags, int target,
-				      csGLGraphics3D *iG3D) : uploadData(0)
-{
-  SCF_CONSTRUCT_IBASE(0);
-  this->target = target;
-  G3D = iG3D;
-  txtmgr = G3D->txtmgr;
-  //has_alpha = false;
-  Handle = 0;
-  textureClass = txtmgr->GetTextureClassID ("default");
-
-  images = image;
-
-  texFlags.Set (flagsPublicMask, flags);
-  transp_color.red = transp_color.green = transp_color.blue = 0;
-  if (images->GetImage (0)->GetFormat () & CS_IMGFMT_ALPHA)
-    alphaType = csAlphaMode::alphaSmooth;
-  else if (images->GetImage (0)->HasKeyColor ())
-    alphaType = csAlphaMode::alphaBinary;
-  else
-    alphaType = csAlphaMode::alphaNone;
-
-  if (images->GetImage (0)->HasKeyColor ())
-  {
-    int r,g,b;
-    images->GetImage (0)->GetKeyColor (r,g,b);
-    SetKeyColor (r, g, b);
-  }
-  cachedata = 0;
-}
-
 csGLTextureHandle::csGLTextureHandle (int target, GLuint Handle, 
-				      csGLGraphics3D *iG3D) : uploadData(0)
+				      csGLGraphics3D *iG3D)
+  : origName(0), uploadData(0)
 {
   SCF_CONSTRUCT_IBASE(0);
   G3D = iG3D;
@@ -141,6 +121,7 @@ csGLTextureHandle::~csGLTextureHandle()
 {
   Clear ();
   txtmgr->UnregisterTexture (this);
+  delete[] origName;
   SCF_DESTRUCT_IBASE()
 }
 
@@ -156,12 +137,8 @@ void csGLTextureHandle::Clear()
 
 void csGLTextureHandle::FreeImage ()
 {
-  origNames.SetLength (images->Length ());
-  for (size_t i=0; i<images->Length (); i++)
-  {
-    origNames.Put (i, images->GetImage (i)->GetName ());
-  }
-  images = 0;
+  if (image.IsValid()) origName = csStrNew (image->GetName());
+  image = 0;
 }
 
 int csGLTextureHandle::GetFlags () const
@@ -234,22 +211,9 @@ void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh, int &md)
   md = orig_d;
 }
 
-void csGLTextureHandle::SetTextureTarget (int target)
+const char* csGLTextureHandle::GetImageName () const
 {
-  this->target = target;
-}
-
-const char* csGLTextureHandle::GetImageName (int depth) const
-{
-  if (images.IsValid () && images->GetImage (depth).IsValid ())
-  {
-    return images->GetImage (depth)->GetName ();
-  }
-  else if (origNames.Length () > (size_t)depth)
-  {
-    return origNames.Get (depth);
-  }
-  return 0;
+  return origName;
 }
 
 void csGLTextureHandle::GetMeanColor (uint8 &red, uint8 &green, uint8 &blue)
@@ -278,10 +242,26 @@ bool csGLTextureHandle::GetAlphaMap ()
   return (alphaType != csAlphaMode::alphaNone);
 }
 
+static void ComputeNewPo2ImageSize (int orig_width, int orig_height,
+				    int& newwidth, int& newheight, 
+				    int max_tex_size)
+{
+  csTextureHandle::CalculateNextBestPo2Size (
+    orig_width, orig_height, newwidth, newheight);
+
+  // If necessary rescale if bigger than maximum texture size,
+  // but only if a dimension has changed. For textures that are
+  // already PO2, a lower mipmap will be selected in CreateMipMaps()
+  if ((newwidth != orig_width) && (newwidth > max_tex_size)) 
+    newwidth = max_tex_size;
+  if ((newheight != orig_width) && (newheight > max_tex_size)) 
+    newheight = max_tex_size;
+}
+
 void csGLTextureHandle::PrepareInt ()
 {
   //@@@ Images may be lost if preparing twice. Some better way of solving it?
-  if (!images) return;
+  if (!image.IsValid()) return;
   if (IsPrepared ()) return;
   SetPrepared (true);
 
@@ -289,34 +269,88 @@ void csGLTextureHandle::PrepareInt ()
   // to be powers of 2.
   AdjustSizePo2 ();
 
-  // Set the alpha of keycolored images to 0.
-  size_t i;
-  for(i = 0; i < images->Length(); i++)
+  csAlphaMode::AlphaType newAlphaType = csAlphaMode::alphaNone;
+
+  // Do any resizing, if needed
+  if (image->GetImageType() == csimgCube)
   {
-    // Do any resizing, if needed
+    // Handle cube map faces
+    csRef<csImageCubeMapMaker> newCube;
+    int faceCount = MIN (image->HasSubImages() + 1, 6);
+    for (int i = 0; i < faceCount; i++)
+    {
+      int newFaceW, newFaceH;
+      csRef<iImage> imgFace = image->GetSubImage (i);
+      ComputeNewPo2ImageSize (imgFace->GetWidth(), imgFace->GetHeight(),
+	newFaceW, newFaceH, txtmgr->max_tex_size);
+      csRef<iImage> newFace;
+      if (newFaceW != newFaceH) newFaceH = newFaceW;
+      if ((newFaceW != imgFace->GetWidth()) 
+	|| (newFaceH != imgFace->GetHeight()))
+      {
+	newFace = csImageManipulate::Rescale (imgFace, 
+	  newFaceW, newFaceH);
+      }
+      if (IsTransp())
+      {
+	if (!newFace.IsValid()) 
+	  newFace.AttachNew (new csImageMemory (image));
+	// Set the alpha of keycolored images to 0.
+	PrepareKeycolor (newFace, transp_color, newAlphaType);
+      }
+      if (newFace.IsValid())
+      {
+	// Create a new cube if we needed to resize one face.
+	if (!newCube.IsValid()) 
+	{
+	  newCube.AttachNew (new csImageCubeMapMaker ());
+	  newCube->SetName (image->GetName());
+	}
+	newCube->SetSubImage (i, newFace);
+      }
+    }
+    if (faceCount < 6) // Ensure at least the 6 faces.
+    {
+      newCube.AttachNew (new csImageCubeMapMaker ());
+      newCube->SetName (image->GetName());
+    }
+    if (newCube.IsValid())
+    {
+      for (int i = 0; i < faceCount; i++)
+      {
+	if (!newCube->SubImageSet (i))
+	  newCube->SetSubImage (i, image->GetSubImage (i));
+      }
+      image = newCube;
+    }
+  }
+  else
+  {
+    csRef<iImage> newImage;
     if (actual_width != orig_width || actual_height != orig_height)
     {
-      images->SetImage (i, csImageManipulate::Rescale (
-	images->GetImage (i), actual_width, actual_height));
+      newImage = csImageManipulate::Rescale (image, actual_width, actual_height);
     }
-
-    csAlphaMode::AlphaType newAlphaType = csAlphaMode::alphaNone;
     if (IsTransp())
-      PrepareKeycolor (images->GetImage (i), transp_color, newAlphaType);
-#if 0
+    {
+      if (!newImage.IsValid()) 
+	newImage.AttachNew (new csImageMemory (image));
+      // Set the alpha of keycolored images to 0.
+      PrepareKeycolor (newImage, transp_color, newAlphaType);
+    }
+  #if 0
     // Avoid accessing the image data until really needed
     else
       /*
-        Check all alpha values for the actual alpha type.
-       */
-      CheckAlpha  (images->GetImage (i)->GetWidth(), 
-	images->GetImage (i)->GetHeight(), 
-	(csRGBpixel*)images->GetImage (i)->GetImageData (),
-	0, newAlphaType);
-#endif
-
-    if (newAlphaType > alphaType) alphaType = newAlphaType;
+	Check all alpha values for the actual alpha type.
+	*/
+      CheckAlpha  (image->GetWidth(), image->GetHeight(), 
+	(csRGBpixel*)image->GetImageData (), 0, newAlphaType);
+  #endif
+    if (newImage.IsValid()) image = newImage;
   }
+  if (newAlphaType > alphaType) alphaType = newAlphaType;
+
   CreateMipMaps ();
   FreeImage ();
 }
@@ -326,29 +360,17 @@ void csGLTextureHandle::AdjustSizePo2 ()
   if (IsSizeAdjusted ()) return;
   SetSizeAdjusted (true);
 
-  size_t i;
-  actual_d = orig_d = images->Length();
-  for(i = 0; i < images->Length(); i++)
-  {
-    orig_width  = images->GetImage (i)->GetWidth();
-    orig_height = images->GetImage (i)->GetHeight();
+  //actual_d = orig_d = images->Length();
+  orig_width  = image->GetWidth();
+  orig_height = image->GetHeight();
 
-    int newwidth, newheight;
+  int newwidth, newheight;
 
-    csTextureHandle::CalculateNextBestPo2Size (
-      orig_width, orig_height, newwidth, newheight);
+  ComputeNewPo2ImageSize (orig_width, orig_height, newwidth, newheight,
+    txtmgr->max_tex_size);
 
-    // If necessary rescale if bigger than maximum texture size,
-    // but only if a dimension has changed. For textures that are
-    // already PO2, a lower mipmap will be selected in CreateMipMaps()
-    if ((newwidth != orig_width) && (newwidth > txtmgr->max_tex_size)) 
-      newwidth = txtmgr->max_tex_size;
-    if ((newheight != orig_width) && (newheight > txtmgr->max_tex_size)) 
-      newheight = txtmgr->max_tex_size;
-
-    actual_width = newwidth;
-    actual_height = newheight;
-  }
+  actual_width = newwidth;
+  actual_height = newheight;
 }
 
 //#define MIPMAP_DEBUG
@@ -368,7 +390,7 @@ void csGLTextureHandle::CreateMipMaps()
   GLenum targetFormat = (alphaType != csAlphaMode::alphaNone) ? 
     textureSettings->formatRGBA : textureSettings->formatRGB;
   targetFormat = DetermineTargetFormat (targetFormat, 
-    !textureSettings->forceDecompress, images->GetImage (0)->GetRawFormat(), 
+    !textureSettings->forceDecompress, image->GetRawFormat(), 
     compressedTarget);
 
   // Determine if and how many mipmaps we skip.
@@ -386,61 +408,65 @@ void csGLTextureHandle::CreateMipMaps()
   else
     uploadData = new csArray<csGLUploadData>;
 
-  csRef<iImageVector> thisImages =
-      csPtr<iImageVector> (new csImageVector()); 
-  for (i=0; i < images->Length(); i++)
-  {
-    thisImages->AddImage (images->GetImage (i));
+  size_t subImageCount = image->HasSubImages() + 1;
 #ifdef MIPMAP_DEBUG
-    csDebugImageWriter::DebugImageWrite (images->GetImage (i),
+  for (i=0; i < subImageCount; i++)
+  {
+    csDebugImageWriter::DebugImageWrite (images->GetSubImage (i),
       "/tmp/mipdebug/%.8x_%d_0.png", this, i);
-#endif
   }
+#endif
   if (texFlags.Check (CS_TEXTURE_NOMIPMAPS))
   {
-    transform (!textureSettings->forceDecompress, targetFormat, 
-      thisImages, 0);
+    for (i=0; i < subImageCount; i++)
+    {
+      transform (!textureSettings->forceDecompress, targetFormat, 
+	image->GetSubImage (i), 0, i);
+    }
   }
   else
   {
     // Create each new level by creating a level 2 mipmap from previous level
     // we do this down to 1x1 as opengl defines it
-    csArray<int> nMipmaps;
+    //csArray<int> nMipmaps;
 
     int w, h;
-    int nTex = 0;
-    int nMip = 0;
 
-    for (i=0; i < images->Length(); i++)
+    for (i=0; i < subImageCount; i++)
     {
-      nMipmaps.Push (images->GetImage (i)->HasMipmaps());
+      //nMipmaps.Push (image->GetSubImage (i)->HasMipmaps());
     }
     
-    do
+    for (i=0; i < subImageCount; i++)
     {
-      w = thisImages->GetImage (0)->GetWidth ();
-      h = thisImages->GetImage (0)->GetHeight ();
+      int nTex = 0;
+      int nMip = 0;
+      csRef<iImage> thisImage = image->GetSubImage (i); 
+      int nMipmaps = image->GetSubImage (i)->HasMipmaps();
 
-      if ((mipskip == 0) || ((w == 1) && (h == 1)))
-	transform (!textureSettings->forceDecompress, targetFormat, 
-	thisImages, nTex++);
-
-      if ((w == 1) && (h == 1)) break;
-
-      nMip++;
-      for (i=0; i<thisImages->Length();i++)
+      do
       {
+	w = thisImage->GetWidth ();
+	h = thisImage->GetHeight ();
+
+	if ((mipskip == 0) || ((w == 1) && (h == 1)))
+	  transform (!textureSettings->forceDecompress, targetFormat, 
+	  thisImage, nTex++, i);
+
+	if ((w == 1) && (h == 1)) break;
+
+	nMip++;
 	csRef<iImage> cimg;
 	bool precompMip = false;
-	if (nMipmaps[i] != 0)
+	if (nMipmaps != 0)
 	{
-	  cimg = images->GetImage (i)->GetMipmap (nMip);
-	  nMipmaps[i]--;
+	  cimg = image->GetSubImage (i)->GetMipmap (nMip);
+	  nMipmaps--;
 	  precompMip = true;
 	}
 	else
 	{
-	  cimg = csImageManipulate::Mipmap (thisImages->GetImage (i), 1, tc);
+	  cimg = csImageManipulate::Mipmap (thisImage, 1, tc);
 	}
 	if (txtmgr->sharpen_mipmaps 
 	  && (mipskip == 0) // don't sharpen when doing skip...
@@ -454,11 +480,11 @@ void csGLTextureHandle::CreateMipMaps()
 	csDebugImageWriter::DebugImageWrite (cimg,
 	  "/tmp/mipdebug/%.8x_%d_%d.png", this, i, nMip);
   #endif
-	thisImages->SetImage (i, cimg);
+	thisImage = cimg;
+	if (mipskip != 0) mipskip--;
       }
-      if (mipskip != 0) mipskip--;
+      while (true);
     }
-    while (true);
   }
 }
 
@@ -497,131 +523,63 @@ GLenum csGLTextureHandle::DetermineTargetFormat (GLenum defFormat,
 }
 
 bool csGLTextureHandle::transform (bool allowCompressed, GLenum targetFormat, 
-				   iImageVector *ImageVector, int mipNum)
+				   iImage* Image, int mipNum, int imageNum)
 {
-  uint8 *h;
-
-  csRef<iImage> Image = ImageVector->GetImage (0);
-  int n = Image->GetWidth ()*Image->GetHeight ();
-  int d = ImageVector->Length();
-  if (d > 1)
+  csGLUploadData& uploadData = this->uploadData->GetExtend (
+    this->uploadData->Length());
+  const char* rawFormat = Image->GetRawFormat();
+  if (rawFormat)
   {
-    if (target == CS_TEX_IMG_CUBEMAP)
+    csRef<iDataBuffer> imageRaw = Image->GetRawData();
+    uploadData.dataRef = imageRaw;
+    if (strcmp (rawFormat, "r8g8b8") == 0)
     {
-      for (int j=0; j<d; j++)
-      {
-	csGLUploadData& uploadData = this->uploadData->GetExtend (
-	  this->uploadData->Length());
-
-	csRef<iImage> Image = ImageVector->GetImage (j);
-	uploadData.dataRef = Image;
-	uploadData.image_data = (uint8*)Image->GetImageData (); // @@@ use pixel packing!
-	uploadData.imageNum = j;
-	uploadData.w = Image->GetWidth();
-	uploadData.h = Image->GetHeight();
-	uploadData.d = 1;
-	uploadData.targetFormat = targetFormat;
-	uploadData.sourceFormat = GL_RGBA;
-	uploadData.sourceType = GL_UNSIGNED_BYTE;
-	uploadData.mip = mipNum;
-      }
-    }
-    else
-    {
-      csGLUploadData& uploadData = this->uploadData->GetExtend (
-	this->uploadData->Length());
-      uploadData.w = Image->GetWidth();
-      uploadData.h = Image->GetHeight();
-      uploadData.d = d;
-      uploadData.targetFormat = targetFormat;
-      uploadData.sourceFormat = GL_RGBA;
+      uploadData.image_data = imageRaw->GetUint8();
+      uploadData.sourceFormat = GL_RGB;
       uploadData.sourceType = GL_UNSIGNED_BYTE;
-      uploadData.mip = mipNum;
-
-      const void* data = 0;
-      int j;
-
-      csRef<csDataBuffer> volumeData;
-      volumeData.AttachNew (new csDataBuffer (n * d * 4));
-      uploadData.dataRef = volumeData;
-      uploadData.image_data = h = volumeData->GetUint8();
-      for (j=0; j<d; j++)
+    }
+    else if (strcmp (rawFormat, "r5g6b5") == 0)
+    {
+      uploadData.image_data = imageRaw->GetUint8();
+      uploadData.sourceFormat = GL_RGB;
+      uploadData.sourceType = GL_UNSIGNED_SHORT_5_6_5;
+    }
+    else if (strcmp (rawFormat, "a8r8g8b8") == 0)
+    {
+      uploadData.image_data = imageRaw->GetUint8();
+      uploadData.sourceFormat = GL_BGRA;
+      uploadData.sourceType = GL_UNSIGNED_INT_8_8_8_8_REV;
+    }
+    else 
+    {
+      bool isCompressedTarget;
+      /* Only use glCompressedTexImage if the target format matches
+	* exactly the one of mip 0. */
+      if ((DetermineTargetFormat (targetFormat, allowCompressed,
+	rawFormat, isCompressedTarget) == targetFormat) 
+	&& isCompressedTarget)
       {
-	Image = ImageVector->GetImage (j);
-	if (n == (Image->GetWidth() * Image->GetHeight()))
-	{
-	  data = Image->GetImageData();
-	  memcpy (h, data, n * 4);
-	}
-	else
-	{
-	  memset (h, 0, n * 4);
-	  /* or well, something else? */
-	}
-	h += (n * 4);
+	uploadData.image_data = imageRaw->GetUint8();
+	uploadData.compressed = true;
+	uploadData.compressedSize = imageRaw->GetSize();
       }
     }
+  }
+
+  if (!uploadData.image_data)
+  {
+    uploadData.image_data = (uint8*)Image->GetImageData (); // @@@ use pixel packing!
+    uploadData.dataRef = Image;
     //uploadData->size = n * 4;
+    uploadData.sourceFormat = GL_RGBA;
+    uploadData.sourceType = GL_UNSIGNED_BYTE;
   }
-  else
-  {
-    csGLUploadData& uploadData = this->uploadData->GetExtend (
-      this->uploadData->Length());
-
-    csRef<iImage> Image = ImageVector->GetImage (0);
-    const char* rawFormat = Image->GetRawFormat();
-    if (rawFormat)
-    {
-      csRef<iDataBuffer> imageRaw = Image->GetRawData();
-      uploadData.dataRef = imageRaw;
-      if (strcmp (rawFormat, "r8g8b8") == 0)
-      {
-	uploadData.image_data = imageRaw->GetUint8();
-	uploadData.sourceFormat = GL_RGB;
-	uploadData.sourceType = GL_UNSIGNED_BYTE;
-      }
-      else if (strcmp (rawFormat, "r5g6b5") == 0)
-      {
-	uploadData.image_data = imageRaw->GetUint8();
-	uploadData.sourceFormat = GL_RGB;
-	uploadData.sourceType = GL_UNSIGNED_SHORT_5_6_5;
-      }
-      else if (strcmp (rawFormat, "a8r8g8b8") == 0)
-      {
-	uploadData.image_data = imageRaw->GetUint8();
-	uploadData.sourceFormat = GL_BGRA;
-	uploadData.sourceType = GL_UNSIGNED_INT_8_8_8_8_REV;
-      }
-      else 
-      {
-	bool isCompressedTarget;
-	/* Only use glCompressedTexImage if the target format matches
-	 * exactly the one of mip 0. */
-	if ((DetermineTargetFormat (targetFormat, allowCompressed,
-	  rawFormat, isCompressedTarget) == targetFormat) 
-	  && isCompressedTarget)
-	{
-	  uploadData.image_data = imageRaw->GetUint8();
-	  uploadData.compressed = true;
-	  uploadData.compressedSize = imageRaw->GetSize();
-	}
-      }
-    }
-
-    if (!uploadData.image_data)
-    {
-      uploadData.image_data = (uint8*)Image->GetImageData (); // @@@ use pixel packing!
-      uploadData.dataRef = Image;
-      //uploadData->size = n * 4;
-      uploadData.sourceFormat = GL_RGBA;
-      uploadData.sourceType = GL_UNSIGNED_BYTE;
-    }
-    uploadData.targetFormat = targetFormat;
-    uploadData.w = Image->GetWidth();
-    uploadData.h = Image->GetHeight();
-    uploadData.d = 1;
-    uploadData.mip = mipNum;
-  }
+  uploadData.targetFormat = targetFormat;
+  uploadData.w = Image->GetWidth();
+  uploadData.h = Image->GetHeight();
+  uploadData.d = Image->GetDepth();
+  uploadData.mip = mipNum;
+  uploadData.imageNum = imageNum;
   
   //size += uploadData->size * d;
   return true;
@@ -768,11 +726,22 @@ void csGLTextureHandle::Load ()
     {
       const csGLUploadData& uploadData = this->uploadData->Get (i);
 
-      glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X + uploadData.imageNum, 
-	uploadData.mip, uploadData.targetFormat, 
-	uploadData.w, uploadData.h,
-        0, uploadData.sourceFormat, uploadData.sourceType,	
-	uploadData.image_data);
+      if (uploadData.compressed)
+      {
+	G3D->ext->glCompressedTexImage2DARB (
+	  GL_TEXTURE_CUBE_MAP_POSITIVE_X + uploadData.imageNum, 
+	  uploadData.mip, 
+	  uploadData.targetFormat, uploadData.w, uploadData.h, 
+	  0, uploadData.compressedSize, uploadData.image_data);
+      }
+      else
+      {
+	glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X + uploadData.imageNum, 
+	  uploadData.mip, uploadData.targetFormat, 
+	  uploadData.w, uploadData.h,
+	  0, uploadData.sourceFormat, uploadData.sourceType,	
+	  uploadData.image_data);
+      }
     }
   }
   delete uploadData; uploadData = 0;
@@ -1340,24 +1309,7 @@ csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImage *image,
     return 0;
   }
 
-  csGLTextureHandle *txt = new csGLTextureHandle (image, flags,
-    iTextureHandle::CS_TEX_IMG_2D, G3D);
-  textures.Push(txt);
-  return csPtr<iTextureHandle> (txt);
-}
-
-csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImageVector *image,
-	int flags, int target)
-{
-  if (!image)
-  {
-    G3D->Report(CS_REPORTER_SEVERITY_BUG,
-      "BAAAAAAAD!!! csGLTextureManager::RegisterTexture with 0 image array!");
-    return 0;
-  }
-
-  csGLTextureHandle *txt = new csGLTextureHandle (image, flags,
-    target, G3D);
+  csGLTextureHandle *txt = new csGLTextureHandle (image, flags, G3D);
   textures.Push(txt);
   return csPtr<iTextureHandle> (txt);
 }

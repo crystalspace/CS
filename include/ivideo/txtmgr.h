@@ -41,7 +41,6 @@ struct iImage;
 struct iTextureHandle;
 struct iMaterial;
 struct iMaterialHandle;
-struct iImageVector;
 
 /**\name Texture registration flags.
  * During texture registration you should tell
@@ -120,7 +119,7 @@ struct iSuperLightmap : public iBase
   virtual iTextureHandle* GetTexture () = 0;
 };
 
-SCF_VERSION (iTextureManager, 2, 4, 0);
+SCF_VERSION (iTextureManager, 2, 5, 0);
 
 /**
  * This is the standard texture manager interface.
@@ -164,40 +163,13 @@ struct iTextureManager : public iBase
    * The texture is unregistered at destruction, i.e. as soon as the last
    * reference to the texture handle is released.
    *<p>
-   * Note! This function will NOT scale the texture to fit hardware
-   * restrictions. This is done later before texture is first used.
-   */
-  virtual csPtr<iTextureHandle> RegisterTexture (iImage *image, int flags) = 0;
-
-  /**
-   * Register a texture. The given input image is IncRef'd and DecRef'ed
-   * later when no longer needed. If you want to keep the input image
-   * make sure you have called IncRef yourselves.
-   *<p>
-   * The texture is not converted immediately. Instead, you can make
-   * intermediate calls to iTextureHandle::SetKeyColor ().
-   *<p>
-   * This function returns a handle which should be given
-   * to the 3D rasterizer or 2D driver when drawing or otherwise using
-   * the texture.
-   *<p>
-   * The `flags' contains one or several of CS_TEXTURE_XXX flags OR'ed
-   * together. They define the mode texture is going to be used in.
-   *<p>
-   * The texture manager will reject the texture if it is an inappropiate
-   * format (see GetTextureFormat () method).
-   *<p>
-   * The texture is unregistered at destruction, i.e. as soon as the last
-   * reference to the texture handle is released.
-   *<p>
    * Param target specifies the texture target. Defines for that can be
    * found in ivideo/texture.h
    *<p>
    * Note! This function will NOT scale the texture to fit hardware
    * restrictions. This is done later before texture is first used.
    */
-  virtual csPtr<iTextureHandle> RegisterTexture (iImageVector *image,
-  	int flags, int target) = 0;
+  virtual csPtr<iTextureHandle> RegisterTexture (iImage *image, int flags) = 0;
 
   /**
    * Register a material. The input material is IncRef'd and DecRef'ed

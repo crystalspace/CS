@@ -28,6 +28,7 @@
 #include "iengine/mesh.h"
 #include "iengine/sector.h"
 #include "imesh/object.h"
+#include "csutil/csuctransform.h"
 #include "csutil/scanstr.h"
 #include "csgeom/math3d.h"
 #include "cstool/collider.h"
@@ -104,15 +105,27 @@ void map_key (const char* _keyname, csKeyMap* map)
   else if (!strcmp (keyname, "f10")) map->key = CSKEY_F10;
   else if (!strcmp (keyname, "f11")) map->key = CSKEY_F11;
   else if (!strcmp (keyname, "f12")) map->key = CSKEY_F12;
-  else if (*(keyname+1) != 0) Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+  /*else if (*(keyname+1) != 0) Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
   	"Bad key '%s'!", keyname);
   else if ((*keyname >= 'A' && *keyname <= 'Z') || strchr ("!@#$%^&*()_+", *keyname))
   {
     map->shift = 1;
     map->key = *keyname;
-  }
+  }*/
   else
-    map->key = *keyname;
+  {
+    utf32_char key;
+    size_t nameLen = strlen (keyname);
+    bool charValid;
+    int encLen = csUnicodeTransform::UTF8Decode ((utf8_char*)keyname, 
+      nameLen, key, &charValid);
+    if (!charValid || ((size_t)encLen < nameLen))
+    {
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Bad key '%s'!", keyname);
+    }
+    else
+      map->key = key;
+  }
 }
 
 char* keyname (csKeyMap* map)

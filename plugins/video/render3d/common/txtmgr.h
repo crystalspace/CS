@@ -57,6 +57,8 @@ class csTextureHandle : public iTextureHandle
 protected:
   /// The original image object.
   csRef<iImage> image;
+  /// Parent texture manager
+  csRef<csTextureManager> texman;
 
   /// Texture usage flags: 2d/3d/etc
   int flags;
@@ -73,9 +75,11 @@ protected:
   csRGBpixel transp_color;
   /// Mean color used when texture mapping is disabled.
   csRGBpixel mean_color;
+
+  csStringID texClass;
 public:
   ///
-  csTextureHandle (iImage *Image, int Flags);
+  csTextureHandle (csTextureManager* texman, iImage *Image, int Flags);
   ///
   virtual ~csTextureHandle ();
 
@@ -186,8 +190,8 @@ public:
 
   virtual void Precache () {}
 
-  virtual void SetTextureClass (const char* className) {}
-  virtual const char* GetTextureClass () { return "default"; }
+  virtual void SetTextureClass (const char* className);
+  virtual const char* GetTextureClass ();
 };
 
 /**
@@ -335,6 +339,7 @@ public:
 
   csStringID nameDiffuseTexture;
 
+  csStringSet texClassIDs;
 
   SCF_DECLARE_IBASE;
 

@@ -27,10 +27,12 @@
 #include "csutil/csstring.h"
 #include "csutil/util.h"
 #include "csgeom/math3d.h"
+#include "csgfx/imagemanipulate.h"
 #include "csutil/csendian.h"
 #include "cstool/keyval.h"
 #include "cstool/collider.h"
 #include "cstool/cspixmap.h"
+#include "cstool/csview.h"
 #include "cstool/mdltool.h"
 #include "csqint.h"
 #include "isound/handle.h"
@@ -54,6 +56,7 @@
 #include "ivaria/pmeter.h" 
 #include "csutil/cspmeter.h" 
 #include "igeom/clip2d.h"
+#include "igraphic/imageio.h"
 
 
 #include "iengine/light.h"
@@ -2411,6 +2414,63 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "saveworld: Saved world to `%s'", arg);
     else
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "saveworld: Error saving map file!");
+  }
+  else if (!strcasecmp (cmd, "cubemapshots"))
+  {
+    csRef<iImageIO> iio = CS_QUERY_REGISTRY (Sys->object_reg, iImageIO);
+    int dim = MIN (Sys->myG3D->GetWidth (), Sys->myG3D->GetHeight ());
+    dim = csFindNearestPowerOf2 (dim + 1) >> 1;
+    int g2dh = Sys->myG3D->GetHeight ();
+
+    csRef<iView> sideView;
+    sideView.AttachNew (new csView (Sys->Engine, Sys->myG3D));
+    sideView->GetCamera()->SetSector (Sys->view->GetCamera()->GetSector());
+    sideView->GetCamera()->SetTransform (Sys->view->GetCamera()->GetTransform());
+    sideView->GetCamera()->SetFOVAngle (90, dim);
+    sideView->GetCamera()->SetPerspectiveCenter (dim / 2, dim / 2);
+    
+    sideView->SetRectangle (0, 0, dim, dim);
+    int cMinX, cMinY, cMaxX, xMaxY;
+    Sys->myG2D->GetClipRect (cMinX, cMinY, cMaxX, xMaxY);
+    Sys->myG2D->SetClipRect (0, 0, dim, dim);
+    
+    static const csVector3 lookAtVecs[12] = {
+      csVector3 ( 0.0f,  0.0f,  1.0f), csVector3 (0.0f, 1.0f,  0.0f), 
+      csVector3 ( 0.0f,  0.0f, -1.0f), csVector3 (0.0f, 1.0f,  0.0f), 
+      csVector3 ( 1.0f,  0.0f,  0.0f), csVector3 (0.0f, 1.0f,  0.0f), 
+      csVector3 (-1.0f,  0.0f,  0.0f), csVector3 (0.0f, 1.0f,  0.0f), 
+      csVector3 ( 0.0f,  1.0f,  0.0f), csVector3 (0.0f, 0.0f, -1.0f), 
+      csVector3 ( 0.0f, -1.0f,  0.0f), csVector3 (0.0f, 0.0f, -1.0f)  
+    };
+    static const char* fnSuffix[] = {"pz", "nz", "px", "nx", "py", "ny"};
+
+    for (int i = 0; i < 6; i++)
+    {
+      if (!Sys->myG3D->BeginDraw (Sys->Engine->GetBeginDrawFlags () 
+	| CSDRAW_3DGRAPHICS))
+      {
+	Sys->myG2D->SetClipRect (cMinX, cMinY, cMaxX, xMaxY);
+	return true;
+      }
+
+      csOrthoTransform& camTF = sideView->GetCamera()->GetTransform();
+      camTF.LookAt (lookAtVecs[i*2], lookAtVecs[i*2 + 1]);
+      sideView->Draw ();
+
+      Sys->myG3D->FinishDraw ();
+      Sys->myG3D->Print (0);
+
+      csString fn;
+      fn.Format ("/tmp/cube_%s.png", fnSuffix[i]);
+      csRef<iImage> shot = Sys->myG2D->ScreenShot();
+      shot = csImageManipulate::Crop (shot, 0, g2dh - dim, dim, dim);
+      csRef<iDataBuffer> data = iio->Save (shot, "image/png");
+      if (Sys->myVFS->WriteFile (fn, data->GetData(), data->GetSize()))
+	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Written '%s'...",
+	  fn.GetData());
+    }
+    
+    Sys->myG2D->SetClipRect (cMinX, cMinY, cMaxX, xMaxY);
   }
   else
     return false;

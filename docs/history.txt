@@ -6,6 +6,30 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-Feb-2005
+	- res made the following changes:
+	    - Fixed a problem in the GL extension manager where WGL exts were
+	      never initialized.
+	    - Augmented the "reflect" shader to interpolate between the 
+	      reflected and base texture (based on a fixed ratio).
+	    - Gave the "car" in the flarge street a reflection map based on
+	      the actual surroundings.
+	    - Added a function to walktest to create a cubemap from the current
+	      location (press Alt+C).
+	    - Made walktest also support UTF-8 encoded keys.
+	    - Made the DDS loader support cube maps.
+	    - Changed registering of textures; removed use of image vectors.
+	      Complex images are now packaged into an iImage, too.
+	    - Added a helper class to construct a cubemap image from separate
+	      images.
+	    - Fixed cube map loader so <north> etc now actually map to the
+	      correct direction.
+	    - Changed cube map loader to go through the texture <type> system
+	      and not use a separate <cubemap> statement.
+	    - Fixed a bug in the PNG loader where the alpha flag wasn't cleared
+	      on images without alpha.
+	    - Added a flag to the engine to control whether data needed only
+	      for saving back the world should be kept.
 5-Feb-2005
 	- Mike Handverger fixed a bug in iDynamicSystem::AttachColliderMesh
           ODE needs number of tris * 3 to build the mesh data.

@@ -22,6 +22,7 @@
 #include "iutil/vfs.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/transfrm.h"
+#include "csgfx/imagecubemapmaker.h"
 #include "csutil/cscolor.h"
 #include "cstool/initapp.h"
 #include "iengine/camera.h"
@@ -509,33 +510,28 @@ bool csWaterDemo::Initialize ()
   csRef<iMaterialWrapper> matW = engine->GetMaterialList ()->NewMaterial (mat,
   	"waterMaterial");
 
-  csRef<iImageVector> imgvec = csPtr<iImageVector> (new csImageVector ());
-  csRef<iImage> img;
 
+  csRef<csImageCubeMapMaker> cubeMaker;
+  cubeMaker.AttachNew (new csImageCubeMapMaker ());
 
-  img = loader->LoadImage ("/lib/cubemap/cubemap_rt.jpg");
-  imgvec->AddImage (img);
+  csRef<iImage> img = loader->LoadImage ("/lib/cubemap/cubemap_rt.jpg");
+  cubeMaker->SetSubImage (0, img);
   img = loader->LoadImage ("/lib/cubemap/cubemap_lf.jpg");
-  imgvec->AddImage (img);
-
- 
+  cubeMaker->SetSubImage (1, img);
 
   img = loader->LoadImage ("/lib/cubemap/cubemap_up.jpg");
-  imgvec->AddImage (img);
+  cubeMaker->SetSubImage (2, img);
   img = loader->LoadImage ("/lib/cubemap/cubemap_dn.jpg");
-  imgvec->AddImage (img);
+  cubeMaker->SetSubImage (3, img);
 
   img = loader->LoadImage ("/lib/cubemap/cubemap_fr.jpg");
-  imgvec->AddImage (img);
+  cubeMaker->SetSubImage (4, img);
   img = loader->LoadImage ("/lib/cubemap/cubemap_bk.jpg");
-  imgvec->AddImage (img);
-
-
+  cubeMaker->SetSubImage (5, img);
 
 
   csRef<iTextureHandle> tex = r3d->GetTextureManager ()->RegisterTexture (
-    imgvec, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS, 
-    iTextureHandle::CS_TEX_IMG_CUBEMAP);
+    cubeMaker, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS);
 
   csRef<csShaderVariable> attvar (csPtr<csShaderVariable> (
     new csShaderVariable (strings->Request ("tex diffuse"))));

@@ -49,7 +49,7 @@
 	  <program><![CDATA[
 	  !!ARBvp1.0
 	  OPTION ARB_position_invariant;
-	  
+
 	  PARAM mvp[4]		= { state.matrix.mvp };
 	  PARAM mv[4]	     	= { state.matrix.modelview };
 	  PARAM mvi[4]		= { state.matrix.modelview.inverse };

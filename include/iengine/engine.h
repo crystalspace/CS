@@ -141,7 +141,7 @@ struct iEngineSectorCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 23, 0);
+SCF_VERSION (iEngine, 0, 23, 1);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -1156,6 +1156,21 @@ struct iEngine : public iBase
    * Get the current framenumber. This should be incremented once every Draw
    */
   virtual uint GetCurrentFrameNumber () const = 0;
+
+  /**
+   * Set whether saving should be possible (default OFF).
+   * To allow saving of a world after it has been loaded, some objects may 
+   * need to keep track of extra data that would otherwise not be needed if 
+   * the world will never be written out again. The 'saveable' flag informs
+   * those objects about whether to keep that information or not. Saving
+   * a world with this flag disables is still possible, but the result might
+   * incomplete.
+   */
+  virtual void SetSaveableFlag (bool enable) = 0;
+  /**
+   * Get whether saving should be possible (default OFF).
+   */
+  virtual bool GetSaveableFlag () = 0;
 };
 
 /** @} */

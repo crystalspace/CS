@@ -200,7 +200,7 @@ public:
   
   virtual int GetTextureTarget () const { return iTextureHandle::CS_TEX_IMG_2D; }
 
-  virtual const char* GetImageName (int depth = 0) const { return image->GetName (); }
+  virtual const char* GetImageName () const { return image->GetName (); }
 
   virtual void Blit (int x, int y, int width, int height,
     unsigned char const* data);
@@ -331,12 +331,6 @@ public:
 
   ///
   virtual csPtr<iTextureHandle> RegisterTexture (iImage* image, int flags);
-
-  virtual csPtr<iTextureHandle> RegisterTexture (iImageVector *image,
-  	int flags, int target)
-  {
-    return 0;
-  }
 
   virtual csPtr<iSuperLightmap> CreateSuperLightmap (int width, 
     int height);

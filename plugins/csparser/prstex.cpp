@@ -40,6 +40,7 @@
 #include "ivaria/keyval.h"
 #include "igraphic/animimg.h"
 #include "csgfx/csimgvec.h"
+#include "csgfx/imagecubemapmaker.h"
 #include "loadtex.h"
 #include "ivideo/shader/shader.h"
 
@@ -671,151 +672,44 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
 iTextureWrapper* csLoader::ParseCubemap (iLoaderContext* ldr_context,
     iDocumentNode* node)
 {
-  csRef<iImageVector> cubetextures = csPtr<iImageVector>(new csImageVector());
-
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  iTextureManager* tm = G3D ? G3D->GetTextureManager() : 0;
-  int Format = tm ? tm->GetTextureFormat () : CS_IMGFMT_TRUECOLOR;
- 
-  csRef<iTextureHandle> itex;
-  csRef<iTextureWrapper> itexwrap;
-
-  csRef<iImage> north, south, east, west, top, bottom;
-  const char* texname = node->GetAttributeValue ("name");
-  const char *fname;
-  csString className;
-
-  csRefArray<iDocumentNode> key_nodes;
-
-  while (it->HasNext ())
+  static bool cubemapDeprecationWarning = false;
+  if (!cubemapDeprecationWarning)
   {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    switch (id)
-    {
-      case XMLTOKEN_KEY:
-        key_nodes.Push (child);
-        break;
-      case XMLTOKEN_NORTH:
-        fname = child->GetContentsValue ();
-	if (!fname)
-	{
-	  SyntaxService->ReportError (
-	       "crystalspace.maploader.parse.texture",
-	       child, "Expected VFS filename for 'file'!");
-	  return 0;
-	}
-      
-        north = LoadImage (fname, Format);
-        break;
-    
-      case XMLTOKEN_SOUTH:
-        fname = child->GetContentsValue ();
-	if (!fname)
-	{
-	  SyntaxService->ReportError (
-	       "crystalspace.maploader.parse.texture",
-	       child, "Expected VFS filename for 'file'!");
-	  return 0;
-	}
-      
-        south = LoadImage (fname, Format);
-        break;
-    
-      case XMLTOKEN_EAST:
-        fname = child->GetContentsValue ();
-	if (!fname)
-	{
-	  SyntaxService->ReportError (
-	       "crystalspace.maploader.parse.texture",
-	       child, "Expected VFS filename for 'file'!");
-	  return 0;
-	}
-      
-        east = LoadImage (fname, Format);
-        break;
-    
-      case XMLTOKEN_WEST:
-        fname = child->GetContentsValue ();
-	if (!fname)
-	{
-	  SyntaxService->ReportError (
-	       "crystalspace.maploader.parse.texture",
-	       child, "Expected VFS filename for 'file'!");
-	  return 0;
-	}
-      
-        west = LoadImage (fname, Format);
-        break;
-    
-      case XMLTOKEN_TOP:
-        fname = child->GetContentsValue ();
-	if (!fname)
-	{
-	  SyntaxService->ReportError (
-	       "crystalspace.maploader.parse.texture",
-	       child, "Expected VFS filename for 'file'!");
-	  return 0;
-	}
-      
-        top = LoadImage (fname, Format);
-        break;
-    
-      case XMLTOKEN_BOTTOM:
-        fname = child->GetContentsValue ();
-	if (!fname)
-	{
-	  SyntaxService->ReportError (
-	       "crystalspace.maploader.parse.texture",
-	       child, "Expected VFS filename for 'file'!");
-	  return 0;
-	}
-      
-        bottom = LoadImage (fname, Format);
-        break;
-      case XMLTOKEN_CLASS:
-	{
-	  className.Replace (child->GetContentsValue ());
-	}
-	break;
-    }
+    cubemapDeprecationWarning = true;
+    SyntaxService->Report ("crystalspace.maploader.parse.texture",
+      CS_REPORTER_SEVERITY_WARNING, node,
+      "'<cubemap>...' is deprecated, use '<texture><type>"
+      PLUGIN_TEXTURELOADER_CUBEMAP "</type><params>...' instead");
   }
 
-  cubetextures->AddImage (north);
-  cubetextures->AddImage (south);
-  cubetextures->AddImage (east);
-  cubetextures->AddImage (west);
-  cubetextures->AddImage (top);
-  cubetextures->AddImage (bottom);
+  csRef<csCubemapTextureLoader> plugin;
+  plugin.AttachNew (new csCubemapTextureLoader (0));
+  plugin->Initialize (object_reg);
 
-  itex = tm->RegisterTexture(cubetextures,0,
-  	iTextureHandle::CS_TEX_IMG_CUBEMAP);
+  csRef<TextureLoaderContext> context;
+  const char* txtname = node->GetAttributeValue ("name");
+  context.AttachNew (new TextureLoaderContext (txtname));
 
-  itexwrap = Engine->GetTextureList()->NewTexture(itex);
-  itexwrap->QueryObject()->SetName(texname);
-  if (!className.IsEmpty())
-    itexwrap->SetTextureClass (className);
+  csRef<iBase> b = plugin->Parse (node, ldr_context, context);
+  csRef<iTextureWrapper> tex;
+  if (b) tex = SCF_QUERY_INTERFACE (b, iTextureWrapper);
 
-  // Set keys
-  for (size_t i=0; i<key_nodes.Length (); i++)
+  if (tex)
   {
-    iKeyValuePair* kvp = 0;
-    SyntaxService->ParseKey (key_nodes[i], kvp);
-    if (kvp)
-    {
-      itexwrap->QueryObject()->ObjAdd (kvp->QueryObject ());
-      kvp->DecRef ();
-    }
+    tex->QueryObject ()->SetName (txtname);
+    AddToRegion (ldr_context, tex->QueryObject ());
+    iTextureManager* tm = G3D ? G3D->GetTextureManager() : 0;
+    if (tm) tex->Register (tm);
   }
 
-  return itexwrap;
+  return tex;
 }
 
 iTextureWrapper* csLoader::ParseTexture3D (iLoaderContext* ldr_context,
     iDocumentNode* node)
 {
+  return 0;
+  /*
    csRef<iImageVector> cubetextures = csPtr<iImageVector>(new csImageVector());
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -886,4 +780,5 @@ iTextureWrapper* csLoader::ParseTexture3D (iLoaderContext* ldr_context,
   }
 
   return itexwrap;
+  */
 }

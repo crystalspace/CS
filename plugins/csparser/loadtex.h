@@ -27,6 +27,7 @@
 #define PLUGIN_TEXTURELOADER_IMAGE    "crystalspace.texture.loader.image"
 #define PLUGIN_TEXTURELOADER_ANIMIMG  "crystalspace.texture.loader.animimg"
 #define PLUGIN_TEXTURELOADER_CHECKERS "crystalspace.texture.loader.checkerboard"
+#define PLUGIN_TEXTURELOADER_CUBEMAP  "crystalspace.texture.loader.cubemap"
 
 /// Default texture loader context
 class TextureLoaderContext : public iTextureLoaderContext
@@ -98,6 +99,19 @@ public:
 
   virtual csPtr<iBase> Parse (iDocumentNode* node, iLoaderContext* ldr_context,
   	iBase* context);
+};
+
+/// Cubemap texture loader pseudo-plugin
+class csCubemapTextureLoader : public csBaseTextureLoader
+{
+  csStringHash xmltokens;
+#define CS_TOKEN_ITEM_FILE "plugins/csparser/cubemaploader.tok"
+#include "cstool/tokenlist.h"
+public:
+  csCubemapTextureLoader (iBase *p);
+
+  virtual csPtr<iBase> Parse (iDocumentNode* node, iLoaderContext* ldr_context,
+    iBase* context);
 };
 
 #endif

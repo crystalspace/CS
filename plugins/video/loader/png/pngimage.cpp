@@ -539,6 +539,9 @@ nomem2:
 
   if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_ANY)
     Format = NewFormat;
+  else
+    // Copy alpha flag
+    Format = (Format & CS_IMGFMT_MASK) | (NewFormat & ~CS_IMGFMT_MASK);
 
   return true;
 }

@@ -174,18 +174,29 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
       if ((texClass != 0) && (strcmp (texClass, "default") != 0))
 	CreateValueNode (child, "class", texClass);
 
-      CreateValueNode (child, "north",
-        texHand->GetImageName (iTextureHandle::CS_TEXTURE_CUBE_POS_X));
-      CreateValueNode (child, "south",
-        texHand->GetImageName (iTextureHandle::CS_TEXTURE_CUBE_NEG_X));
-      CreateValueNode (child, "east",
-        texHand->GetImageName (iTextureHandle::CS_TEXTURE_CUBE_POS_Y));
-      CreateValueNode (child, "west",
-        texHand->GetImageName (iTextureHandle::CS_TEXTURE_CUBE_NEG_Y));
-      CreateValueNode (child, "top",
-        texHand->GetImageName (iTextureHandle::CS_TEXTURE_CUBE_POS_Z));
-      CreateValueNode (child, "bottom",
-        texHand->GetImageName (iTextureHandle::CS_TEXTURE_CUBE_NEG_Z));
+      static const char* faceNames[] = {"east", "west", "top", "bottom", 
+	"north", "south"};
+      csString imgName (texHand->GetImageName());
+      if (!imgName.IsEmpty())
+      {
+	uint face = 0;
+	size_t pos = 0;
+
+	while ((pos < imgName.Length()) && (face < 6))
+	{
+	  size_t colon = imgName.FindFirst (':', pos);
+	  size_t subStrLen;
+	  if (colon == 0)
+	    subStrLen = imgName.Length() - pos;
+	  else
+	    subStrLen = colon - pos;
+	  if (subStrLen > 0)
+	    CreateValueNode (child, faceNames[face], 
+	      imgName.Slice (pos, subStrLen));
+	  face++;
+	  pos = colon + 1;
+	}
+      }
     }
     else if (texTarget == iTextureHandle::CS_TEX_IMG_3D)
     {
@@ -197,8 +208,8 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
       int w,h,d;
       if (texHand->GetRendererDimensions (w, h, d) && (d != 0))
       {
-        for (int i=0; i<d; i++)
-          CreateValueNode (child, "layer", texHand->GetImageName (i));
+        /*for (int i=0; i<d; i++)
+          CreateValueNode (child, "layer", texHand->GetImageName (i));*/
       }
     }
     else

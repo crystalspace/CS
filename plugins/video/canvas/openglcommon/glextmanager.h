@@ -13217,7 +13217,6 @@ public:
   void InitWGL_ARB_extensions_string (HDC hDC)
   {
     if (tested_CS_WGL_ARB_extensions_string) return;
-    if (!extstrWGL) return;
     tested_CS_WGL_ARB_extensions_string = true;
     const char* ext = "WGL_ARB_extensions_string";
     char cfgkey[26 + 25 + 1];
@@ -13247,13 +13246,13 @@ public:
   void InitWGL_ARB_buffer_region (HDC hDC)
   {
     if (tested_CS_WGL_ARB_buffer_region) return;
-    if (!extstrWGL) return;
     tested_CS_WGL_ARB_buffer_region = true;
     const char* ext = "WGL_ARB_buffer_region";
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
     SetupWGLextStr (hDC);
+    if (!extstrWGL) return;
     CS_WGL_ARB_buffer_region = (strstr (extstrWGL, ext) != 0);
 
     bool allclear, funcTest;
@@ -15990,13 +15989,13 @@ public:
   void InitWGL_I3D_image_buffer (HDC hDC)
   {
     if (tested_CS_WGL_I3D_image_buffer) return;
-    if (!extstrWGL) return;
     tested_CS_WGL_I3D_image_buffer = true;
     const char* ext = "WGL_I3D_image_buffer";
     char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
     SetupWGLextStr (hDC);
+    if (!extstrWGL) return;
     CS_WGL_I3D_image_buffer = (strstr (extstrWGL, ext) != 0);
 
     bool allclear, funcTest;
@@ -16024,13 +16023,13 @@ public:
   void InitWGL_I3D_swap_frame_lock (HDC hDC)
   {
     if (tested_CS_WGL_I3D_swap_frame_lock) return;
-    if (!extstrWGL) return;
     tested_CS_WGL_I3D_swap_frame_lock = true;
     const char* ext = "WGL_I3D_swap_frame_lock";
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
     SetupWGLextStr (hDC);
+    if (!extstrWGL) return;
     CS_WGL_I3D_swap_frame_lock = (strstr (extstrWGL, ext) != 0);
 
     bool allclear, funcTest;
@@ -16058,13 +16057,13 @@ public:
   void InitWGL_I3D_swap_frame_usage (HDC hDC)
   {
     if (tested_CS_WGL_I3D_swap_frame_usage) return;
-    if (!extstrWGL) return;
     tested_CS_WGL_I3D_swap_frame_usage = true;
     const char* ext = "WGL_I3D_swap_frame_usage";
     char cfgkey[26 + 24 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
     SetupWGLextStr (hDC);
+    if (!extstrWGL) return;
     CS_WGL_I3D_swap_frame_usage = (strstr (extstrWGL, ext) != 0);
 
     bool allclear, funcTest;
@@ -17110,13 +17109,13 @@ public:
   void InitWGL_ARB_pixel_format (HDC hDC)
   {
     if (tested_CS_WGL_ARB_pixel_format) return;
-    if (!extstrWGL) return;
     tested_CS_WGL_ARB_pixel_format = true;
     const char* ext = "WGL_ARB_pixel_format";
     char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
     SetupWGLextStr (hDC);
+    if (!extstrWGL) return;
     CS_WGL_ARB_pixel_format = (strstr (extstrWGL, ext) != 0);
 
     bool allclear, funcTest;
@@ -17143,13 +17142,13 @@ public:
   void InitWGL_ARB_make_current_read (HDC hDC)
   {
     if (tested_CS_WGL_ARB_make_current_read) return;
-    if (!extstrWGL) return;
     tested_CS_WGL_ARB_make_current_read = true;
     const char* ext = "WGL_ARB_make_current_read";
     char cfgkey[26 + 25 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
     SetupWGLextStr (hDC);
+    if (!extstrWGL) return;
     CS_WGL_ARB_make_current_read = (strstr (extstrWGL, ext) != 0);
 
     bool allclear, funcTest;
@@ -17175,13 +17174,13 @@ public:
   void InitWGL_ARB_pbuffer (HDC hDC)
   {
     if (tested_CS_WGL_ARB_pbuffer) return;
-    if (!extstrWGL) return;
     tested_CS_WGL_ARB_pbuffer = true;
     const char* ext = "WGL_ARB_pbuffer";
     char cfgkey[26 + 15 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
     SetupWGLextStr (hDC);
+    if (!extstrWGL) return;
     CS_WGL_ARB_pbuffer = (strstr (extstrWGL, ext) != 0);
 
     bool allclear, funcTest;
@@ -17210,13 +17209,13 @@ public:
   void InitWGL_EXT_swap_control (HDC hDC)
   {
     if (tested_CS_WGL_EXT_swap_control) return;
-    if (!extstrWGL) return;
     tested_CS_WGL_EXT_swap_control = true;
     const char* ext = "WGL_EXT_swap_control";
     char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
     SetupWGLextStr (hDC);
+    if (!extstrWGL) return;
     CS_WGL_EXT_swap_control = (strstr (extstrWGL, ext) != 0);
 
     bool allclear, funcTest;
@@ -17242,13 +17241,13 @@ public:
   void InitWGL_ARB_render_texture (HDC hDC)
   {
     if (tested_CS_WGL_ARB_render_texture) return;
-    if (!extstrWGL) return;
     tested_CS_WGL_ARB_render_texture = true;
     const char* ext = "WGL_ARB_render_texture";
     char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
     SetupWGLextStr (hDC);
+    if (!extstrWGL) return;
     CS_WGL_ARB_render_texture = (strstr (extstrWGL, ext) != 0);
 
     bool allclear, funcTest;
@@ -17275,13 +17274,13 @@ public:
   void InitWGL_EXT_extensions_string (HDC hDC)
   {
     if (tested_CS_WGL_EXT_extensions_string) return;
-    if (!extstrWGL) return;
     tested_CS_WGL_EXT_extensions_string = true;
     const char* ext = "WGL_EXT_extensions_string";
     char cfgkey[26 + 25 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
     SetupWGLextStr (hDC);
+    if (!extstrWGL) return;
     CS_WGL_EXT_extensions_string = (strstr (extstrWGL, ext) != 0);
 
     bool allclear, funcTest;
@@ -17306,13 +17305,13 @@ public:
   void InitWGL_EXT_make_current_read (HDC hDC)
   {
     if (tested_CS_WGL_EXT_make_current_read) return;
-    if (!extstrWGL) return;
     tested_CS_WGL_EXT_make_current_read = true;
     const char* ext = "WGL_EXT_make_current_read";
     char cfgkey[26 + 25 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
     SetupWGLextStr (hDC);
+    if (!extstrWGL) return;
     CS_WGL_EXT_make_current_read = (strstr (extstrWGL, ext) != 0);
 
     bool allclear, funcTest;
@@ -17338,13 +17337,13 @@ public:
   void InitWGL_EXT_pbuffer (HDC hDC)
   {
     if (tested_CS_WGL_EXT_pbuffer) return;
-    if (!extstrWGL) return;
     tested_CS_WGL_EXT_pbuffer = true;
     const char* ext = "WGL_EXT_pbuffer";
     char cfgkey[26 + 15 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
     SetupWGLextStr (hDC);
+    if (!extstrWGL) return;
     CS_WGL_EXT_pbuffer = (strstr (extstrWGL, ext) != 0);
 
     bool allclear, funcTest;
@@ -17373,13 +17372,13 @@ public:
   void InitWGL_EXT_pixel_format (HDC hDC)
   {
     if (tested_CS_WGL_EXT_pixel_format) return;
-    if (!extstrWGL) return;
     tested_CS_WGL_EXT_pixel_format = true;
     const char* ext = "WGL_EXT_pixel_format";
     char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
     SetupWGLextStr (hDC);
+    if (!extstrWGL) return;
     CS_WGL_EXT_pixel_format = (strstr (extstrWGL, ext) != 0);
 
     bool allclear, funcTest;
@@ -17406,13 +17405,13 @@ public:
   void InitWGL_I3D_digital_video_control (HDC hDC)
   {
     if (tested_CS_WGL_I3D_digital_video_control) return;
-    if (!extstrWGL) return;
     tested_CS_WGL_I3D_digital_video_control = true;
     const char* ext = "WGL_I3D_digital_video_control";
     char cfgkey[26 + 29 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
     SetupWGLextStr (hDC);
+    if (!extstrWGL) return;
     CS_WGL_I3D_digital_video_control = (strstr (extstrWGL, ext) != 0);
 
     bool allclear, funcTest;
@@ -17438,13 +17437,13 @@ public:
   void InitWGL_I3D_gamma (HDC hDC)
   {
     if (tested_CS_WGL_I3D_gamma) return;
-    if (!extstrWGL) return;
     tested_CS_WGL_I3D_gamma = true;
     const char* ext = "WGL_I3D_gamma";
     char cfgkey[26 + 13 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
     SetupWGLextStr (hDC);
+    if (!extstrWGL) return;
     CS_WGL_I3D_gamma = (strstr (extstrWGL, ext) != 0);
 
     bool allclear, funcTest;
@@ -17472,13 +17471,13 @@ public:
   void InitWGL_I3D_genlock (HDC hDC)
   {
     if (tested_CS_WGL_I3D_genlock) return;
-    if (!extstrWGL) return;
     tested_CS_WGL_I3D_genlock = true;
     const char* ext = "WGL_I3D_genlock";
     char cfgkey[26 + 15 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
     SetupWGLextStr (hDC);
+    if (!extstrWGL) return;
     CS_WGL_I3D_genlock = (strstr (extstrWGL, ext) != 0);
 
     bool allclear, funcTest;

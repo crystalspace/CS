@@ -70,7 +70,7 @@ static inline int rgb_dist (int tR, int tG, int tB, int sR, int sG, int sB)
 //--------------------------------------------------- csTextureHandleNull ---//
 
 csTextureHandleNull::csTextureHandleNull (csTextureManagerNull *txtmgr,
-  iImage *image, int flags) : csTextureHandle (image, flags)
+  iImage *image, int flags) : csTextureHandle (txtmgr, image, flags)
 {
   pal2glob = 0;
   (texman = txtmgr)->IncRef ();
@@ -240,16 +240,6 @@ csPtr<iTextureHandle> csTextureManagerNull::RegisterTexture (iImage* image,
   if (!image) return 0;
 
   csTextureHandleNull *txt = new csTextureHandleNull (this, image, flags);
-  textures.Push (txt);
-  return csPtr<iTextureHandle> (txt);
-}
-
-csPtr<iTextureHandle> csTextureManagerNull::RegisterTexture (iImageVector *image,
-  int flags, int target)
-{
-  if (!image) return 0;
-
-  csTextureHandleNull *txt = new csTextureHandleNull (this, image->GetImage (0), flags);
   textures.Push (txt);
   return csPtr<iTextureHandle> (txt);
 }

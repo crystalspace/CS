@@ -257,7 +257,7 @@ csRef<iImage> csImageManipulate::Crop (iImage* source, int x, int y,
 
   if (x+width > Width || y+height > Height) return 0;
   csRef<csImageMemory> nimg;
-  nimg.AttachNew (new csImageMemory (Width, Height, source->GetFormat()));
+  nimg.AttachNew (new csImageMemory (width, height, source->GetFormat()));
 
   int i;
   if (source->GetAlpha())

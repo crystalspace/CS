@@ -443,6 +443,9 @@ private:
   /// Default shader to attach to all materials
   csRef<iShader> default_shader;
 
+  /// 'Saveable' flag
+  bool worldSaveable;
+
 public:
   /// Default shadertype to attach to all materials
   csStringID default_shadertype;
@@ -1082,6 +1085,10 @@ public:
   virtual uint GetCurrentFrameNumber () const
   { return current_framenumber; };
 
+  virtual void SetSaveableFlag (bool enable)
+  { worldSaveable = enable; }
+  virtual bool GetSaveableFlag ()
+  { return worldSaveable; }
 private:
   /// Resizes frame width and height dependent data members
   void Resize ();

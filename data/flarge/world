@@ -136,14 +136,21 @@
         <texture name="topping">
             <file>/lib/stdtex/topping.png</file>
         </texture>
-	<cubemap name="reflection">
-	  <north>/lib/cubemap/cubemap_rt.jpg</north>
-	  <south>/lib/cubemap/cubemap_lf.jpg</south>
-	  <east>/lib/cubemap/cubemap_up.jpg</east>
-	  <west>/lib/cubemap/cubemap_dn.jpg</west>
-	  <top>/lib/cubemap/cubemap_fr.jpg</top>
-	  <bottom>/lib/cubemap/cubemap_bk.jpg</bottom>
-	</cubemap>
+	<!-- Cube map specification with separate images: -->
+	<!--texture name="reflection">
+	  <type>crystalspace.texture.loader.cubemap</type>
+	  <params>
+	    <north>/lib/cubemap/cubemap_fr.jpg</north>
+	    <south>/lib/cubemap/cubemap_bk.jpg</south>
+	    <east>/lib/cubemap/cubemap_rt.jpg</east>
+	    <west>/lib/cubemap/cubemap_lf.jpg</west>
+	    <top>/lib/cubemap/cubemap_up.jpg</top>
+	    <bottom>/lib/cubemap/cubemap_dn.jpg</bottom>
+	  </params>
+	</texture-->
+        <texture name="reflection">
+	  <file>cube_street.dds</file>
+        </texture>
         <texture name="mosaic-detail">
 	  <file>mosaic-detail.dds</file>
         </texture>
@@ -295,7 +302,8 @@
 	<material name="carReflect">
 	    <texture>window.gif</texture>
 	    <shader type="standard">reflect</shader>
-	    <shadervar name="cubemap" type="texture">reflection</shadervar>
+	    <shadervar name="tex reflection" type="texture">reflection</shadervar>
+	    <shadervar name="reflection opacity" type="float">0.9</shadervar>
 	</material>
     </materials>
     <renderpriorities>
@@ -8042,7 +8050,7 @@
         </meshobj>
         <meshobj name="seagull">
             <plugin>spr2d</plugin>
-            <priority>alpha</priority>
+            <!--priority>alpha</priority-->
             <params>
                 <factory>billboard</factory>
                 <v x="-1" y="0.5" />

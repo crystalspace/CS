@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 
 #include "csgfx/csimgvec.h"
+#include "csgfx/imagecubemapmaker.h"
 #include "csgfx/memimage.h"
 
 #include "normalizationcube.h"
@@ -74,7 +75,9 @@ void csNormalizationCubeAccessor::PreGetValue (csShaderVariable *variable)
   {
     if (txtmgr.IsValid ())
     {
-      csRef<iImageVector> imgvec = csPtr<iImageVector> (new csImageVector ());
+      csRef<csImageCubeMapMaker> cubeMaker;
+      cubeMaker.AttachNew (new csImageCubeMapMaker ());
+      cubeMaker->SetName (0);
 
       // Positive X
       unsigned char *normdata = 
@@ -85,7 +88,7 @@ void csNormalizationCubeAccessor::PreGetValue (csShaderVariable *variable)
       csRef<iImage> img = csPtr<iImage> (new csImageMemory (
 	normalizeCubeSize, normalizeCubeSize, normdata, true,
 	CS_IMGFMT_TRUECOLOR));
-      imgvec->AddImage (img);
+      cubeMaker->SetSubImage (0, img);
 
       // Negative X
       normdata = new unsigned char[normalizeCubeSize*normalizeCubeSize*4];
@@ -95,7 +98,7 @@ void csNormalizationCubeAccessor::PreGetValue (csShaderVariable *variable)
       img = csPtr<iImage> (new csImageMemory (
 	normalizeCubeSize, normalizeCubeSize, normdata, true, 
 	CS_IMGFMT_TRUECOLOR));
-      imgvec->AddImage (img);
+      cubeMaker->SetSubImage (1, img);
 
       // Positive Y
       normdata = new unsigned char[normalizeCubeSize*normalizeCubeSize*4];
@@ -105,7 +108,7 @@ void csNormalizationCubeAccessor::PreGetValue (csShaderVariable *variable)
       img = csPtr<iImage> (new csImageMemory (
 	normalizeCubeSize, normalizeCubeSize, normdata, true, 
 	CS_IMGFMT_TRUECOLOR));
-      imgvec->AddImage (img);
+      cubeMaker->SetSubImage (2, img);
 
       // Negative Y
       normdata = new unsigned char[normalizeCubeSize*normalizeCubeSize*4];
@@ -115,7 +118,7 @@ void csNormalizationCubeAccessor::PreGetValue (csShaderVariable *variable)
       img = csPtr<iImage> (new csImageMemory (
 	normalizeCubeSize, normalizeCubeSize, normdata, true, 
 	CS_IMGFMT_TRUECOLOR));
-      imgvec->AddImage (img);
+      cubeMaker->SetSubImage (3, img);
 
       // Positive Z
       normdata = new unsigned char[normalizeCubeSize*normalizeCubeSize*4];
@@ -125,7 +128,7 @@ void csNormalizationCubeAccessor::PreGetValue (csShaderVariable *variable)
       img = csPtr<iImage> (new csImageMemory (
 	normalizeCubeSize, normalizeCubeSize, normdata, true, 
 	CS_IMGFMT_TRUECOLOR));
-      imgvec->AddImage (img);
+      cubeMaker->SetSubImage (4, img);
 
       // Negative Z
       normdata = new unsigned char[normalizeCubeSize*normalizeCubeSize*4];
@@ -135,11 +138,10 @@ void csNormalizationCubeAccessor::PreGetValue (csShaderVariable *variable)
       img = csPtr<iImage> (new csImageMemory (
 	normalizeCubeSize, normalizeCubeSize, normdata, true, 
 	CS_IMGFMT_TRUECOLOR));
-      imgvec->AddImage (img);
+      cubeMaker->SetSubImage (5, img);
 
       texture = txtmgr->RegisterTexture (
-	imgvec, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS, 
-	iTextureHandle::CS_TEX_IMG_CUBEMAP);
+	cubeMaker, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS);
       texture->SetTextureClass ("lookup");
       texture->Precache ();
     }

@@ -28,11 +28,9 @@
   
   <technique priority="50">
     <pass>
-      <mixmode>
-        <copy />
-      </mixmode>
+      <mixmode><copy /></mixmode>
       <vp plugin="glarb" file="/shader/scattering.avp" />
-      <texture destination="unit 0" name="tex diffuse" />
+      <texture destination="unit 0" name="standardtex white" />
       <fp plugin="glfixed">
         <fixedfp>
           <layer>

@@ -48,7 +48,8 @@ SCF_IMPLEMENT_IBASE (csTextureHandle)
   SCF_IMPLEMENTS_INTERFACE (iTextureHandle)
 SCF_IMPLEMENT_IBASE_END
 
-csTextureHandle::csTextureHandle (iImage* Image, int Flags)
+csTextureHandle::csTextureHandle (csTextureManager* texman, iImage* Image, 
+				  int Flags)
 {
   SCF_CONSTRUCT_IBASE (0);
   DG_ADDI (this, 0);
@@ -70,6 +71,9 @@ csTextureHandle::csTextureHandle (iImage* Image, int Flags)
     SetKeyColor (r, g, b);
   }
   cachedata = 0;
+
+  this->texman = texman;
+  texClass = texman->texClassIDs.Request ("default");
 }
 
 csTextureHandle::~csTextureHandle ()
@@ -217,6 +221,16 @@ void csTextureHandle::CalculateNextBestPo2Size (const int width,
     if (dD < dU)
       newHeigth >>= 1;
   }
+}
+
+void csTextureHandle::SetTextureClass (const char* className)
+{
+  texClass = texman->texClassIDs.Request (className);
+}
+
+const char* csTextureHandle::GetTextureClass ()
+{
+  return texman->texClassIDs.Request (texClass);
 }
 
 //----------------------------------------------------- csMaterialHandle -----//

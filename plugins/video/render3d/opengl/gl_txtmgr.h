@@ -92,10 +92,10 @@ private:
   csRGBpixel transp_color;
   
   /// Used until Prepare() is called
-  csRef<iImageVector> images;
+  csRef<iImage> image;
 
   /// Stores the names of the images
-  csStringArray origNames;
+  char* origName;
 
   /// Texture flags (combined public and private)
   csFlags texFlags;
@@ -133,7 +133,7 @@ private:
   GLenum DetermineTargetFormat (GLenum defFormat, bool allowCompress,
     const char* rawFormat, bool& compressedTarget);
   bool transform (bool allowCompressed, 
-    GLenum targetFormat, iImageVector *ImageVec, int mipNum);
+    GLenum targetFormat, iImage* Image, int mipNum, int imageNum);
 
   GLuint Handle;
   /// Upload the texture to GL.
@@ -150,11 +150,7 @@ public:
   bool IsWasRenderTarget() const { return texFlags.Check (flagWasRenderTarget); }
   void SetWasRenderTarget (bool b) { texFlags.SetBool (flagWasRenderTarget, b); }
 
-  csGLTextureHandle (iImage* image, int flags, int target, 
-    csGLGraphics3D *iG3D);
-
-  csGLTextureHandle (iImageVector* image, int flags, int target, 
-    csGLGraphics3D *iG3D);
+  csGLTextureHandle (iImage* image, int flags, csGLGraphics3D *iG3D);
 
   csGLTextureHandle (int target, GLuint Handle, csGLGraphics3D *iG3D);
 
@@ -171,7 +167,7 @@ public:
     const csRGBpixel* transp_color, csRGBpixel& mean_color);
   void CheckAlpha (int w, int h, csRGBpixel *src, 
     const csRGBpixel* transp_color, csAlphaMode::AlphaType& alphaType);
-  csRef<iImageVector>& GetImages () { return images; }
+  csRef<iImage>& GetImage () { return image; }
   void Unprepare () { SetPrepared (false); }
   /// Merge this texture into current palette, compute mipmaps and so on.
   void PrepareInt ();
@@ -249,21 +245,11 @@ public:
   virtual void Blit (int x, int y, int width, int height,
     unsigned char const* data);
 
-  /**
-   * Sets Texture Target. 
-   * This can either be CS_TEX_IMG_1D, CS_TEX_IMG_2D, CS_TEX_IMG_3D, 
-   * CS_TEX_IMG_CUBEMAP etc.
-   * With CS_TEX_IMG_CUBEMAP, the depth index specifies the side 
-   * of the cubemap (CS_TEXTURE_CUBE_POS_X, CS_TEXTURE_CUBE_NEG_X,
-   * CS_TEXTURE_CUBE_POS_Y, etc.
-   */
-  virtual void SetTextureTarget(int target);
-
   /// Get the texture target
   virtual int GetTextureTarget () const { return target; }
 
-  /// Get the original image name at the given depth
-  virtual const char* GetImageName (int depth = 0) const;
+  /// Get the original image name
+  virtual const char* GetImageName () const;
 
   /// Get the mean color.
   virtual void GetMeanColor (uint8 &red, uint8 &green, uint8 &blue) const;
@@ -545,14 +531,6 @@ public:
    * make sure you have called IncRef yourselves.
    */
   virtual csPtr<iTextureHandle> RegisterTexture (iImage *image, int flags);
-
-  /**
-   * Register a texture. The given input image is IncRef'd and DecRef'ed
-   * later when not needed any more. If you want to keep the input image
-   * make sure you have called IncRef yourselves.
-   */
-  virtual csPtr<iTextureHandle> RegisterTexture (iImageVector *image,
-  	int flags, int target);
 
   /**
    * Called from csGLTextureHandle destructor to notify parent texture

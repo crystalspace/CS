@@ -62,12 +62,12 @@ bool Loader::ProbeDXT1Alpha (const uint8* source, int w, int h, int depth,
 
 	if (color_0 <= color_1) 
 	{
-	  return true;
+	  return false;
 	}
       }
     }
   }
-  return false;
+  return true;
 }
 
 void Loader::DecompressDXT1 (csRGBpixel* buffer, const uint8* source, 

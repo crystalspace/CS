@@ -88,12 +88,15 @@ public:
   virtual const csRGBpixel* GetPalette ();
   virtual const uint8* GetAlpha ();
 
-  virtual csRef<iImage> GetMipmap (uint num);
-  
   virtual uint HasMipmaps () const;  
+  virtual csRef<iImage> GetMipmap (uint num);
+
+  virtual uint HasSubImages() const;
+  virtual csRef<iImage> GetSubImage (uint num);
 
   virtual const char* GetRawFormat() const;
   virtual csRef<iDataBuffer> GetRawData() const;
+  virtual csImageType GetImageType() const { return imageType; }
 private:
   csDDSImageFile (iObjectRegistry* object_reg, 
     int format, iDataBuffer* sourceData, csDDSRawDataType rawType, 
@@ -109,8 +112,10 @@ private:
   void MakeImageData ();
 
   csRefArray<iImage> mipmaps;
+  csRefArray<iImage> subImages;
   iObjectRegistry* object_reg;
   csDDSImageIO* iio;
+  csImageType imageType;
 
   void Report (int severity, const char* msg, ...);
 };

@@ -37,7 +37,7 @@
 
 csSoftwareTextureHandle::csSoftwareTextureHandle (
 	csSoftwareTextureManager *texman, iImage *image, int flags)
-	: csTextureHandle (image, flags)
+	: csTextureHandle (texman, image, flags)
 {
   pal2glob = 0;
   if (flags & CS_TEXTURE_3D)

@@ -57,11 +57,11 @@
 #include "gl_renderbuffer.h"
 #include "gl_txtmgr.h"
 #include "gl_polyrender.h"
-#include "normalizationcube.h"
 
 #include "plugins/video/canvas/openglcommon/glextmanager.h"
 
 #include "../common/txtmgr.h"
+#include "../common/normalizationcube.h"
 
 #define BYTE_TO_FLOAT(x) ((x) * (1.0 / 255.0))
 
@@ -993,11 +993,8 @@ bool csGLGraphics3D::Open ()
   csRef<iImage> img = csPtr<iImage> (new csImageMemory (
     CS_FOGTABLE_SIZE, CS_FOGTABLE_SIZE, transientfogdata, true, 
     CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
-  csRef<iImageVector> imgvec = csPtr<iImageVector> (new csImageVector ());
-  imgvec->AddImage (img);
   csRef<iTextureHandle> fogtex = txtmgr->RegisterTexture (
-    imgvec, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS, 
-    iTextureHandle::CS_TEX_IMG_2D);
+    img, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS);
 
   csRef<csShaderVariable> fogvar = csPtr<csShaderVariable> (
   	new csShaderVariable (strings->Request ("standardtex fog")));
@@ -1280,18 +1277,11 @@ void csGLGraphics3D::FinishDraw ()
       if (tex_mm->GetKeyColor ())
       {
 	tex_mm->SetWasRenderTarget (true);
-	csRef<iImageVector>& images = tex_mm->GetImages();
-	if (!images.IsValid()) images.AttachNew (new csImageVector ());
-	csRef<iImage> image;
-	if (images->Length() > 0)
-	  image = images->GetImage (0);
-	else
-	  images->AddImage (image = 0);
+	csRef<iImage>& image = tex_mm->GetImage();
 	if (image == 0) // @@@ How to deal with cubemaps?
 	{
 	  image.AttachNew (new csImageMemory (
 	    txt_w, txt_h, CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
-	  images->SetImage (0, image);
 	}
 
 	// @@@ BAD BAD BAD BAD CAST
