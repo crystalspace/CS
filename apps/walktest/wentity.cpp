@@ -178,6 +178,7 @@ AnimPortalCallback::AnimPortalCallback ()
 bool AnimPortalCallback::Traverse (iPortal* portal, iBase* context)
 {
   animportal->visible = true;
+  return true;
 }
 
 csAnimatedPortal::csAnimatedPortal (iPortal* p,
