@@ -6,7 +6,7 @@ ifeq ($(MAKESECTION),rootdefines)
 
 # Plug-in-specific help commands
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make csmod         Make the $(DESCRIPTION.csmod)$"
+  $(NEWLINE)echo $"  make csmod        Make the $(DESCRIPTION.csmod)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 

@@ -6,7 +6,7 @@ ifeq ($(MAKESECTION),rootdefines)
 
 # Plug-in-specific help commands
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make csogg         Make the $(DESCRIPTION.csogg)$"
+  $(NEWLINE)echo $"  make csogg        Make the $(DESCRIPTION.csogg)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
