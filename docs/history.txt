@@ -8,13 +8,13 @@ chronological order.
 
 13-Dec-2004
 	- Marten removed the old renderer and methods/classes/plugins
-	  deprecated togheter with it, for closer info about which see the
+	  deprecated together with it, for closer info about which see the
 	  apimod100 in doc appendix. CVS has been tagged with PRE_OR_REMOVAL
 	  before the change.  One method in CSWS, and a few other places are
 	  yet to be fixed (or removed). Together with this a few fixes have
 	  been made too:
 	    - or_lighting* shaders have been renamed std-lighting*
-	    - the "OR compatibility" shadertype in the default renderloop is
+	    - The "OR compatibility" shader type in the default renderloop is
 	      now "standard"
         - Philip Wyett fixed a compile error with software renderer.
 	- Philip Wyett removed 'vbufmgr.h' refererence from cspace.i.
