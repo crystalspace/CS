@@ -4,18 +4,19 @@
 # Driver description
 DESCRIPTION.glbe2d = Crystal Space GL/Be 2D driver
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRIVERHELP += $(NEWLINE)echo $"  make glbe2d       Make the $(DESCRIPTION.glbe2d)$"
+DRIVERHELP += \
+  $(NEWLINE)echo $"  make glbe2d       Make the $(DESCRIPTION.glbe2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: glbe2d
+.PHONY: glbe2d glbe2dclean
 
 all plugins drivers drivers2d: glbe2d
 
@@ -26,7 +27,7 @@ glbe2dclean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 # We need also the GL libs
@@ -50,7 +51,7 @@ OBJ.GLBE2D = $(addprefix $(OUT),$(notdir $(SRC.GLBE2D:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: glbe2d glbeclean
@@ -69,7 +70,7 @@ $(GLBE2D): $(OBJ.GLBE2D) $(DEP.BE2D)
 	$(DO.PLUGIN) $(LIBS.GLBE2D)
 
 glbeclean:
-	$(RM) $(GLBE2D) $(OBJ.GLBE2D)
+	$(RM) $(GLBE2D) $(OBJ.GLBE2D) $(OUTOS)glbe2d.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)glbe2d.dep

@@ -4,18 +4,19 @@
 # Driver description
 DESCRIPTION.mgl2d = Crystal Space MGL 2D driver
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRIVERHELP += $(NEWLINE)echo $"  make mgl2d        Make the $(DESCRIPTION.mgl2d)$"
+DRIVERHELP += \
+  $(NEWLINE)echo $"  make mgl2d        Make the $(DESCRIPTION.mgl2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: mgl2d
+.PHONY: mgl2d mgl2dclean
 
 all plugins drivers drivers2d: mgl2d
 
@@ -26,7 +27,7 @@ mgl2dclean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 # We need also the MGL libs
@@ -55,7 +56,7 @@ OBJ.MGL2D = $(addprefix $(OUT),$(notdir $(SRC.MGL2D:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: mgl2d mgl2dclean
@@ -72,7 +73,7 @@ $(MGL2D): $(OBJ.MGL2D) $(DEP.MGL2D)
 	$(DO.PLUGIN) $(LIBS.LOCAL.MGL2D)
 
 mgl2dclean:
-	$(RM) $(MGL2D) $(OBJ.MGL2D)
+	$(RM) $(MGL2D) $(OBJ.MGL2D) $(OUTOS)mgl2d.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)mgl2d.dep

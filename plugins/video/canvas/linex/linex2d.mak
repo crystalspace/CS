@@ -4,18 +4,19 @@
 # Driver description
 DESCRIPTION.linex2d = Crystal Space XLib 2D driver for Line3D
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRIVERHELP += $(NEWLINE)echo $"  make linex2d      Make the $(DESCRIPTION.linex2d)$"
+DRIVERHELP += \
+  $(NEWLINE)echo $"  make linex2d      Make the $(DESCRIPTION.linex2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: linex2d
+.PHONY: linex2d linex2dclean
 
 all plugins drivers drivers2d: linex2d
 
@@ -26,7 +27,7 @@ linex2dclean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 # We need also the X libs
@@ -45,12 +46,13 @@ else
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_LINEX2D
 endif
 DESCRIPTION.$(LINEXLIB2D) = $(DESCRIPTION.linex2d)
-SRC.LINEXLIB2D = $(wildcard plugins/video/canvas/linex/*.cpp $(SRC.COMMON.DRV2D))
+SRC.LINEXLIB2D = \
+  $(wildcard plugins/video/canvas/linex/*.cpp $(SRC.COMMON.DRV2D))
 OBJ.LINEXLIB2D = $(addprefix $(OUT),$(notdir $(SRC.LINEXLIB2D:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: linex2d linelibxclean
@@ -67,7 +69,7 @@ $(LINEXLIB2D): $(OBJ.LINEXLIB2D) $(DEP.LINEX2D)
 	$(DO.PLUGIN) $(LIBS.LOCAL.LINEX2D)
 
 linelibxclean:
-	$(RM) $(LINEXLIB2D) $(OBJ.LINEXLIB2D)
+	$(RM) $(LINEXLIB2D) $(OBJ.LINEXLIB2D) $(OUTOS)linex2d.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)linex2d.dep
@@ -79,7 +81,7 @@ endif
 
 endif # ifeq ($(MAKESECTION),targets)
 
-#------------------------------------------------------------------- config ---#
+#------------------------------------------------------------------ config ---#
 ifeq ($(ROOTCONFIG)/$(MAKESECTION),volatile/rootdefines)
 
 # Default value for DO_SHM

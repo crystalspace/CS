@@ -4,18 +4,19 @@
 # Driver description
 DESCRIPTION.raw2d = Crystal Space raw DOS SVGA driver
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRIVERHELP += $(NEWLINE)echo $"  make raw2d        Make the $(DESCRIPTION.raw2d)$"
+DRIVERHELP += \
+  $(NEWLINE)echo $"  make raw2d        Make the $(DESCRIPTION.raw2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: raw2d
+.PHONY: raw2d raw2dclean
 
 all plugins drivers drivers2d: raw2d
 
@@ -26,7 +27,7 @@ raw2dclean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 # The raw 2D DOS SVGA driver
@@ -39,7 +40,7 @@ CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_RAW2D
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 vpath %.cpp plugins/video/canvas/dosraw
@@ -54,7 +55,7 @@ $(RAW2D): $(OBJ.RAW2D)
 	$(DO.LIBRARY)
 
 raw2dclean:
-	$(RM) $(RAW2D) $(OBJ.RAW2D)
+	$(RM) $(RAW2D) $(OBJ.RAW2D) $(OUTOS)raw2d.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)raw2d.dep

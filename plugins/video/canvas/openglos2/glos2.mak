@@ -4,18 +4,19 @@
 # Driver description
 DESCRIPTION.glos2 = Crystal Space OS/2 OpenGL 2D driver
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRIVERHELP += $(NEWLINE)echo $"  make glos2        Make the $(DESCRIPTION.glos2)$"
+DRIVERHELP += \
+  $(NEWLINE)echo $"  make glos2        Make the $(DESCRIPTION.glos2)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: glos2
+.PHONY: glos2 glos2clean
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
 all plugins drivers drivers2d: glos2
@@ -28,7 +29,7 @@ glos2clean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 # The OpenGL library
@@ -39,7 +40,7 @@ GLOS2.RES=$(OUTOS)libGL.res
 
 # The 2D OS/2 OpenGL driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  GLOS2=glos2$(DLL)
+  GLOS2=$(OUTDLL)glos2$(DLL)
   LIBS.LOCAL.GLOS2=$(LIBS.GLOS2)
   DEP.GLOS2=$(GLOS2.RES) $(CSUTIL.LIB) $(CSSYS.LIB)
 else
@@ -55,7 +56,7 @@ OBJ.GLOS2 = $(addprefix $(OUT),$(notdir $(SRC.GLOS2:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 vpath %.cpp plugins/video/canvas/openglos2 plugins/video/canvas/openglcommon
@@ -74,7 +75,7 @@ $(GLOS2.RES): plugins/video/canvas/openglos2/libGL.rc
 	$(RC) $(RCFLAGS) $< $@
 
 glos2clean:
-	$(RM) $(GLOS2) $(OBJ.GLOS2)
+	$(RM) $(GLOS2) $(OBJ.GLOS2) $(OUTOS)glos2.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)glos2.dep
