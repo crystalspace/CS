@@ -39,19 +39,21 @@ chronological order.
 	- Jorrit added csIntersect3::FrustumFrustum() for which the
 	  implementation is actually in csFrustum.
 	- Jorrit added 'const' several times to code in csFrustum.
-	- Erotoman made several big changes in genmesh skeletal animation plugin:
-		- Rotations are claculated by quaternion.
-		- The code for animation blending is completly rewrote.
-		- Changed animation script syntax.
-		- Added functions: 
-		  	iGenMeshSkeletonControlState::SetAlwaysUpdated(bool)
-		  	bool iGenMeshSkeletonControlState::GetAlwaysUpdate()
-		  If flag is false then animation is updated 
-		  only if mesh is visible (default is true)
+	- Erotoman made several big changes in genmesh skeletal animation
+	  plugin:
+	    - Rotations are now calculated by quaternion.
+	    - The code for animation blending was completly rewritten.
+	    - Changed animation script syntax.
+	    - Added functions: 
+	        iGenMeshSkeletonControlState::SetAlwaysUpdated(bool)
+	        bool iGenMeshSkeletonControlState::GetAlwaysUpdate()
+	      If the boolean flag is false then animation is updated only if
+	      mesh is visible (default is true)
 	- Erotoman replaced skeletal animation model with new one.
-	- Erotoman added maxscript for exporting genmesh skeletal animation
+	- Erotoman added MAX script for exporting genmesh skeletal animation
 	  from Character Studio.
-		  
+	- Eric Sunshine fixed Texinfo mark-up problems and rewrote and
+	  clarified discussion recently added to apimod100.txi.
 3-Mar-2005
 	- Jorrit fixed a compile error in spr2d. ||= is not a valid
 	  C++ operator. So put the original |= back.

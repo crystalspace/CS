@@ -728,6 +728,60 @@ For clarification, the following @code{csHash<>} methods have been renamed:
 @code{PutFirst()} @result{} @code{PutUnique()}
 @end itemize
 
+Various methods in @samp{csIntersect3} have been renamed in order to improve
+consistency and clarity.  In addition, some arguments have been reversed order
+so that, for example, a method named @code{SegmentTriangle()} will receive
+first the segment argument followed by the triangle argument.
+
+@itemize @bullet
+@item
+@code{AxisPlane()} @result{} @code{SegmentAxisPlane()}
+@item
+@code{IntersectPolygon()} @result{} @code{PlanePolygon()} (plane version)
+@item
+@code{IntersectPolygon()} @result{} @code{SegmentPolygon()} (segment version)
+@item
+@code{IntersectSegment()} @result{} @code{SegmentFrustum()}
+@item
+@code{IntersectTriangle()} @result{} @code{SegmentTriangle()}
+@item
+@code{Plane()} @result{} @code{SegmentPlane()}
+@item
+@code{Planes()} @result{} @code{SegmentPlanes()} (segment version)
+@item
+@code{Planes()} @result{} @code{ThreePlanes()} (three planes version)
+@item
+@code{XFrustum()} @result{} @code{SegmentXFrustum()}
+@item
+@code{XPlane()} @result{} @code{SegmentXPlane()}
+@item
+@code{YFrustum()} @result{} @code{SegmentYFrustum()}
+@item
+@code{YPlane()} @result{} @code{SegmentYPlane()}
+@item
+@code{Z0Plane()} @result{} @code{SegmentZ0Plane()}
+@item
+@code{ZPlane()} @result{} @code{SegmentZPlane()}
+@end itemize
+
+@noindent
+The same improvements have been made to @code{csIntersect2}:
+
+@itemize @bullet
+@item
+@code{IntersectPolygon()} @result{} @code{PlanePolygon()} (plane version)
+@item
+@code{Lines()} @result{} @code{LineLine()} (plane version)
+@item
+@code{Plane()} @result{} @code{SegmentPlane()}
+@item
+@code{PlaneNoTest()} @result{} @code{SegmentPlaneNoTest()}
+@item
+@code{Planes()} @result{} @code{PlanePlane()}
+@item
+@code{Segments()} @result{} @code{SegmentSegment()} (plane version)
+@end itemize
+
 @subheading Default @code{csHash<>} (and @code{csHashReversible<>}) Table Size
 
 The default hash table size and grow rate has been reduced from 257 and 64 to
@@ -1025,60 +1079,3 @@ goes out is same as the cut-off distance, but this can be changed by altering
 the first attenuation constant. See comments in
 @file{CS/include/iengine/light.h} for exact details of the different
 attenuation modes.
-
-@subheading @samp{csgeom} Routine Changes
-
-Various routines in @code{csIntersect3} have been renamed to have
-a more consistent naming. In addition some parameters have been reversed
-order so that (for example) a routine called @code{SegmentTriangle()} will
-first get the segment parameter and then the triangle parameter.
-
-@itemize bullet
-@item
-@code{IntersectPolygon()} to @code{PlanePolygon()} (plane version)
-@item
-@code{IntersectPolygon()} to @code{SegmentPolygon()} (segment version)
-@item
-@code{IntersectSegment()} to @code{SegmentFrustum()}
-@item
-@code{IntersectTriangle()} to @code{SegmentTriangle()}
-@item
-@code{Planes()} to @code{SegmentPlanes()} (segment version)
-@item
-@code{Planes()} to @code{ThreePlanes()} (three planes version)
-@item
-@code{Plane()} to @code{SegmentPlane()}
-@item
-@code{Z0Plane()} to @code{SegmentZ0Plane()}
-@item
-@code{XPlane()} to @code{SegmentXPlane()}
-@item
-@code{YPlane()} to @code{SegmentYPlane()}
-@item
-@code{ZPlane()} to @code{SegmentZPlane()}
-@item
-@code{AxisPlane()} to @code{SegmentAxisPlane()}
-@item
-@code{XFrustum()} to @code{SegmentXFrustum()}
-@item
-@code{YFrustum()} to @code{SegmentYFrustum()}
-@end itemize
-
-Same for @code{csIntersect2}:
-
-
-@itemize bullet
-@item
-@code{IntersectPolygon()} to @code{PlanePolygon()} (plane version)
-@item
-@code{Segments()} to @code{SegmentSegment()} (plane version)
-@item
-@code{Lines()} to @code{LineLine()} (plane version)
-@item
-@code{Plane()} to @code{SegmentPlane()}
-@item
-@code{Planes()} to @code{PlanePlane()}
-@item
-@code{PlaneNoTest()} to @code{SegmentPlaneNoTest()}
-@end itemize
-
