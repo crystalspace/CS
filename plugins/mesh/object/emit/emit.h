@@ -202,6 +202,8 @@ protected:
   iEmitGen3D *startaccel;
   /// attractor position generator (can be NULL)
   iEmitGen3D *attractor;
+  /// attractor force
+  float attractor_force;
   /// the time to live for particles in msec
   int timetolive;
   /// the aging table
@@ -278,6 +280,10 @@ public:
   {attractor = emit; if(attractor) attractor->IncRef();}
   /// get startemit
   iEmitGen3D* GetAttractorEmit() const {return attractor;}
+  /// Set attractor force
+  void SetAttractorForce(float f) {attractor_force = f;}
+  /// Get attractor force
+  float GetAttractorForce() const {return attractor_force;}
 
   /// get the number of ageing moments
   int GetNumberAging() const {return nr_aging_els;}
@@ -344,6 +350,9 @@ public:
     { scfParent->SetAttractorEmit(emit); }
     virtual iEmitGen3D* GetAttractorEmit() const
     { return scfParent->GetAttractorEmit(); }
+    virtual void SetAttractorForce(float f) {scfParent->SetAttractorForce(f);}
+    virtual float GetAttractorForce() const 
+    {return scfParent->GetAttractorForce();}
     virtual int GetNumberAging() const { return scfParent->GetNumberAging();}
     virtual void AddAge(int time, const csColor& color, float alpha,
         float swirl, float rotspeed, float scale)

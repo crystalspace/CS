@@ -47,6 +47,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (TRANSPARENT)
 
   CS_TOKEN_DEF (AGING)
+  CS_TOKEN_DEF (ATTRACTORFORCE)
   CS_TOKEN_DEF (ATTRACTOR)
   CS_TOKEN_DEF (EMITBOX)
   CS_TOKEN_DEF (EMITCONE)
@@ -383,6 +384,7 @@ iBase* csEmitLoader::Parse (const char* string, iEngine* engine,
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (AGING)
+    CS_TOKEN_TABLE (ATTRACTORFORCE)
     CS_TOKEN_TABLE (ATTRACTOR)
     CS_TOKEN_TABLE (FACTORY)
     CS_TOKEN_TABLE (LIGHTING)
@@ -522,6 +524,13 @@ iBase* csEmitLoader::Parse (const char* string, iEngine* engine,
 	{
 	  emitstate->SetStartAccelEmit (ParseEmit(params, emitfactorystate,
 	  	NULL));
+	}
+	break;
+      case CS_TOKEN_ATTRACTORFORCE:
+	{
+	  float force;
+          ScanStr (params, "%f", &force);
+	  emitstate->SetAttractorForce (force);
 	}
 	break;
       case CS_TOKEN_ATTRACTOR:
@@ -714,6 +723,8 @@ void csEmitSaver::WriteDown (iBase* obj, iStrVector *str,
     str->Push(strnew("ATTRACTOR(\n"));
     WriteEmit(str, state->GetAttractorEmit());
     str->Push(strnew(")\n"));
+    sprintf(buf, "ATTRACTORFORCE (%g)\n", state->GetAttractorForce());
+    str->Push(strnew(buf));
   }
 
   for(int i=0; i<state->GetNumberAging(); i++)

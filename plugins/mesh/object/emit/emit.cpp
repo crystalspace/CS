@@ -559,6 +559,7 @@ csEmitMeshObject::csEmitMeshObject (iSystem* system,
   part_speed = NULL;
   part_accel = NULL;
   part_attract = NULL;
+  attractor_force = 1.0;
   attractor = NULL;
   startpos = NULL;
   startspeed = NULL;
@@ -706,7 +707,7 @@ void csEmitMeshObject::MoveAgeParticle (int i, int elapsed, float delta_t)
   {
     // do attractor influence
     csVector3 d = part_attract[i] - part_pos[i];
-    part_accel[i] += d * delta_t;
+    part_accel[i] += d * (attractor_force * delta_t);
   }
   csVector3 swirl = GetRandomDirection() * swirlamount;
   part_speed[i] += swirl * delta_t;

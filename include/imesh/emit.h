@@ -202,6 +202,11 @@ struct iEmitState : public iBase
   /// get the particle attrator emitter. Null means no attractor.
   virtual iEmitGen3D* GetAttractorEmit() const = 0;
 
+  /// Set the force of the attractor (negative gives repulsion)
+  virtual void SetAttractorForce(float f) = 0;
+  /// Get the force of the attractor
+  virtual float GetAttractorForce() const = 0;
+
   /** Add an aging moment, they are interpolated.
    * time is the time since creation of the particle in msec.
    * color is a gouraud color to set the particle to. (0..1)
