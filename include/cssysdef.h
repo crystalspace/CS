@@ -576,7 +576,7 @@ extern void* operator new[] (size_t s, void* filename, int line);
 #  define CS_ASSERT_MSG(m,x)
 #endif
 
-/**
+/**\def CS_DEPRECATED_METHOD
  * Use the CS_DEPRECATED_METHOD macro in front of method declarations to
  * indicate that they are deprecated. Example:
  * \code
@@ -588,7 +588,35 @@ extern void* operator new[] (size_t s, void* filename, int line);
  * when it encounters client code invoking methods so tagged.
  */
 #ifndef CS_DEPRECATED_METHOD
-#  define CS_DEPRECATED_METHOD
+#  if defined(CS_COMPILER_GCC)
+#    define CS_DEPRECATED_METHOD		__attribute__ ((deprecated))
+#  elif defined(CS_COMPILER_MSVC)
+#    define CS_DEPRECATED_METHOD		/*__declspec(deprecated)*/
+      /* Disabled: Unfortunately, VC is to overzealous with warnings; 
+	 it even emits one when a deprecated method is overridden, e.g. when 
+	 implementing an interface method. */
+#  else
+#    define CS_DEPRECATED_METHOD
+#  endif
+#endif
+
+/**\def CS_DEPRECATED_TYPE
+ * Use the CS_DEPRECATED_TYPE macro after type declarations to
+ * indicate that they are deprecated. Example:
+ * \code
+ * typedef csFoo csBar CS_DEPRECATED_TYPE;
+ * \endcode
+ * Compilers which are capable of flagging deprecation will exhibit a warning
+ * when it encounters client code using types so tagged.
+ */
+#ifndef CS_DEPRECATED_TYPE
+#  if defined(CS_COMPILER_GCC)
+#    define CS_DEPRECATED_TYPE		__attribute__ ((deprecated))
+#  elif defined(CS_COMPILER_MSVC)
+#    define CS_DEPRECATED_TYPE
+#  else
+#    define CS_DEPRECATED_TYPE
+#  endif
 #endif
 
 // Check if the csosdefs.h defined either CS_LITTLE_ENDIAN or CS_BIG_ENDIAN
