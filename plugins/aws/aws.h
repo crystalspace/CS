@@ -21,6 +21,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csgeom/csrect.h"
+#include "csgeom/csrectrg.h"
 #include "cstool/proctex.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
@@ -41,28 +42,11 @@ class awsManager : public iAws
    /// Handle to the preference manager.
    iAwsPrefs *prefmgr;
 
-   /** The group of rects which maintain what needs to be invalidated, and
-    * thus redrawn.  Rectangles which overlap or contain each other will be merged
-    * too keep overdraw to a minimum.  Having multiple dirty zones allows us to
-    * perform a scatter/gather sort of update.  This is especially useful when
-    * updating several small areas.
-    */
-   csRect     dirty[awsNumRectBuckets];
-
-
-
-   /// This contains the index of the highest dirty rect containing valid info.
-   int dirty_lid;
-
-   /** This is true if all the rect buckets got full.  It would be nice to
-    *  have an algorithm that checks to see if the rect is close enough to
-    *  another dirty zone so that including them wouldn't cause too much
-    *  hassle, but I have a feeling that that's overkill.  Currently, if we
-    *  overrun the rect buckets, all buckets are merged and this flag becomes
-    *  set, so that future invalidations are automatically merged into
-    *  bucket 0.
-    */
-   bool all_buckets_full;
+  /** This is the dirty region.  All clean/dirty code now utilizes the update 
+   *  region facility for non-contiguous rectangular spaces.  This buffer
+   *  holds an infinite amount of optimal rectangular regions.
+   */
+   csRectRegion dirty;
    
   /** This is the maximum frame for any window, because it's the size of our
    * canvas, be it the virtual one or otherwise. 
@@ -173,6 +157,9 @@ public:
 
     /// Mark a section of the screen dirty
     virtual void       Mark(csRect &rect);
+
+    /// Mark a section of the screen clean.
+    virtual void       Unmark(csRect &rect);
 
 protected:
     /// Redraws a window only if it has areas in the dirtyarea

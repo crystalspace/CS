@@ -16,7 +16,6 @@ awsManager::awsComponentFactoryMap::~awsComponentFactoryMap ()
 }
 
 awsManager::awsManager(iBase *p):prefmgr(NULL), 
-               dirty_lid(0), all_buckets_full(false),
                top(NULL), ptG2D(NULL), ptG3D(NULL), object_reg(NULL), 
                UsingDefaultContext(false), DefaultContextInitialized(false)
 {
@@ -145,6 +144,8 @@ awsManager::SetContext(iGraphics2D *g2d, iGraphics3D *g3d)
        frame.Set(0,0,ptG2D->GetWidth(), ptG2D->GetHeight());
        
        UsingDefaultContext=false;
+
+       Mark(frame);
    }
 }
 
@@ -193,6 +194,9 @@ awsManager::SetDefaultContext(iEngine* engine, iTextureManager* txtmgr)
     ptG3D->FinishDraw();
     ptG3D->Print(NULL);
     
+    frame.Set(0,0,ptG2D->GetWidth(), ptG2D->GetHeight());
+    
+    Mark(frame);
     UsingDefaultContext=true;
   }
 }
@@ -200,61 +204,23 @@ awsManager::SetDefaultContext(iEngine* engine, iTextureManager* txtmgr)
 void
 awsManager::Mark(csRect &rect)
 {
-   int i;
+  dirty.Include(rect);
+}
 
-   //  If we have too many rects, we simply assume that a large portion of the
-   // screen will be filled, so we agglomerate them all in buffer 0.
-   if (all_buckets_full)
-   {
-     dirty[0].AddAdjanced(rect);
-     return;
-   }
-
-   for(i=0; i<dirty_lid; ++i)
-   {
-       if (dirty[i].Intersects(rect))
-       {
-         printf("aws-debug: combined dirty rects at (%d).\n", dirty_lid);
-	 dirty[i].AddAdjanced(rect);
-       }
-   }
-
-   //  If we get here it's because the rectangle didn't fit anywhere. So,
-   // add in a new one, unless we're full, in which case we merge all and
-   // set the dirty flag.
-   if (dirty_lid>awsNumRectBuckets)
-   {
-     printf("aws-debug: filled up all available dirty rect buckets.\n");
-     for(i=1; i<awsNumRectBuckets; ++i)
-     {
-       dirty[0].AddAdjanced(dirty[i]);
-       all_buckets_full=true;
-     }
-     dirty[0].AddAdjanced(rect);
-   }
-   else
-   {
-     printf("aws-debug: added new dirty rect at (%d).\n", dirty_lid);
-     dirty[dirty_lid++].Set(rect);
-   }
+void
+awsManager::Unmark(csRect &rect)
+{
+  dirty.Exclude(rect);  
 }
 
 bool
 awsManager::WindowIsDirty(awsWindow *win)
 {
-  if (all_buckets_full) 
-  {
-    // return the result the overlap test with the dirty rect
-    return win->Overlaps(dirty[0]);
-  }
-  else
-  {
-    int i;
-    
-    for(i=0; i<dirty_lid; ++i)
-      if (win->Overlaps(dirty[i])) return true;
-  }
-
+  int i;
+   
+  for(i=0; i<dirty.Count(); ++i)
+    if (win->Overlaps(dirty.RectAt(i))) return true;
+  
   return false;
 }
 
@@ -284,7 +250,7 @@ awsManager::Redraw()
    else              ptG2D->DrawBox( 0,  0,25, 25, GetPrefMgr()->GetColor(AC_HIGHLIGHT));
        
    // check to see if there is anything to redraw.
-   if (dirty[0].IsEmpty()) 
+   if (dirty.Count() == 0) 
       return;
    
    /******* The following code is only executed if there is something to redraw *************/
@@ -306,41 +272,32 @@ awsManager::Redraw()
     * equal to oldwin, and then follow the chain up to the top, redrawing on the way.  This makes sure that we 
     * only redraw each window once.
     */
-
-   if (all_buckets_full)
-     ptG2D->DrawBox(dirty[0].xmin, dirty[0].ymin, dirty[0].xmax, dirty[0].ymax, erasefill);
-
+   
    curwin=oldwin;
    while(curwin)
    {
       if (curwin->RedrawTag() == redraw_tag) 
       {
-         if (all_buckets_full) 
-           RedrawWindow(curwin, dirty[0]);
-         else
-         {
-	    int i;
-            
-            for(i=0; i<dirty_lid; ++i)
-            {
-              // Find out if we need to erase.
-              csRect lo(dirty[i]);
-              lo.Subtract(curwin->Frame());
+        int i;
+          
+        for(i=0; i<dirty.Count(); ++i)
+        {
+          // Find out if we need to erase.
+          csRect lo(dirty.RectAt(i));
+          csRect dr(dirty.RectAt(i));
+          lo.Subtract(curwin->Frame());
 
-              if (!lo.IsEmpty())
-                ptG2D->DrawBox(dirty[i].xmin, dirty[i].ymin, dirty[i].xmax, dirty[i].ymax, erasefill);
-
-              RedrawWindow(curwin, dirty[i]);
-            }
-         }
+          if (!lo.IsEmpty())            
+            ptG2D->DrawBox(dr.xmin, dr.ymin, dr.xmax, dr.ymax, erasefill);
+          
+          RedrawWindow(curwin, dr);
+        }
       }
       curwin=curwin->WindowAbove();
    }
 
-   // Reset the dirty buckets
-   dirty_lid=0;
-   all_buckets_full=false;
-   dirty[0].MakeEmpty();
+   // Reset the dirty region
+   dirty.makeEmpty();
 
    // This only needs to happen when drawing to the default context.
    if (UsingDefaultContext)

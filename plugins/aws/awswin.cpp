@@ -4,6 +4,8 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/fontserv.h"
 
+#include <stdio.h>
+
 const unsigned long awsWindow::sWindowRaised  = 0x1;
 const unsigned long awsWindow::sWindowLowered = 0x2;
 const unsigned long awsWindow::sWindowShown   = 0x3;
@@ -24,6 +26,9 @@ const unsigned int awsWindow::foRoundBorder   = 0x0;
 const unsigned int awsWindow::foBeveledBorder = 0x40;
 
 const int grip_size=16;
+
+// Set to true to get printf info about events, false to disable them.
+const bool DEBUG_WINDOW_EVENTS = true;
 
 
 SCF_IMPLEMENT_IBASE(awsWindow)
@@ -163,6 +168,10 @@ awsWindow::OnMouseDown(int button, int x, int y)
     {
       resizing_mode=true;
       WindowManager()->Mark(Frame());
+
+      if (DEBUG_WINDOW_EVENTS)
+        printf("aws-debug: Window resize mode=true\n");
+
       return true;
     } else if (x<Frame().xmax && x>Frame().xmin &&
                y<Frame().ymin + title_bar_height  && y>Frame().ymin)
@@ -170,6 +179,10 @@ awsWindow::OnMouseDown(int button, int x, int y)
       moving_mode=true;
       last_x=x;
       last_y=y;
+
+      if (DEBUG_WINDOW_EVENTS)
+        printf("aws-debug: Window move mode=true\n");
+
       return true;
     }
   } 
@@ -184,12 +197,18 @@ awsWindow::OnMouseUp(int button, int x, int y)
   {
     resizing_mode=false;
     WindowManager()->Mark(Frame());
+
+    if (DEBUG_WINDOW_EVENTS)
+        printf("aws-debug: Window resize mode=false\n");
+
     return true;
   } else if (moving_mode)
   {
     moving_mode=false;
-  }
 
+    if (DEBUG_WINDOW_EVENTS)
+        printf("aws-debug: Window move mode=false\n");
+  }
 
   return false;
 }
@@ -224,25 +243,31 @@ awsWindow::OnMouseMove(int button, int x, int y)
     int delta_x = x-last_x;
     int delta_y = y-last_y;
 
-    if (delta_x+Frame().xmin >=0 && 
-        delta_y+Frame().ymin >=0 &&
-        delta_x+Frame().xmax < WindowManager()->G2D()->GetWidth() &&
-        delta_y+Frame().ymax < WindowManager()->G2D()->GetHeight())
-    {
-      last_x=x;
-      last_y=y;
+    last_x=x;
+    last_y=y;
+
+    if (delta_x+Frame().xmin <0)
+      delta_x=-Frame().xmin;
+    else if (delta_x+Frame().xmax < WindowManager()->G2D()->GetWidth())
+      delta_x=WindowManager()->G2D()->GetWidth() - Frame().xmax;
+
+    if (delta_y+Frame().ymin <0)
+      delta_y=-Frame().ymin;
+    else if (delta_y+Frame().ymax < WindowManager()->G2D()->GetHeight())
+       delta_y=WindowManager()->G2D()->GetHeight() - Frame().ymax;
       
-      // Mark old pos
-      WindowManager()->Mark(Frame());
+      
+    // Mark old pos
+    WindowManager()->Mark(Frame());
 
-      // Move frame
-      Frame().Move(delta_x, delta_y);
+    // Move frame
+    Frame().Move(delta_x, delta_y);
 
-      // Mark new pos
-      WindowManager()->Mark(Frame());
+    // Mark new pos
+    WindowManager()->Mark(Frame());
 
-    }
-
+    if (DEBUG_WINDOW_EVENTS)
+        printf("aws-debug: Finished marking for window move.\n");
   }
   return false;
 }
