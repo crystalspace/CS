@@ -62,7 +62,7 @@ bool awsCmdButton::Setup (iAws *_wmgr, awsComponentNode *settings)
 
   is_switch = switch_style;
 
-  if(style == fsNormal || fsToolbar)
+  if(style == fsNormal || style == fsNormalfsToolbar)
   {
     iString *in = NULL;
     pm->GetString (settings, "Icon", in);
