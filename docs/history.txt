@@ -34,6 +34,13 @@ chronological order.
 	- res applied a patch from Michael D. Adams 
 	  <mdmkolbe@users.sourceforge.net> to fix a crash on exit in Cygwin
 	  (patch #1154478).
+	- Eric Sunshine re-engineered the debug emitting code in pvscalc to
+	  make it more robust. Unfortunately, the changes to the same code
+	  earlier today were unportable and unsafe. Specifically, in an
+	  expression such as `printf("%s\n",box.Description().GetData())', some
+	  older compilers will destroy the temporary csString returned by
+	  Description() before the result of GetData() is used by
+	  printf(). This will typically result in a crash.
 1-Mar-2005
 	- res fixed the use of 'return' in a void method in glrender3d.cpp.
 	- Marten fixed a bug related to attenuation of lights in r3dtest. 

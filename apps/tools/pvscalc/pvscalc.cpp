@@ -36,6 +36,34 @@ CS_IMPLEMENT_APPLICATION
 #define DBA(x)
 #endif
 
+#if (PVSCALC_DEBUG_LEVEL > 1)
+// Utility function for safely converting a temporary csString into a (char
+// const*) without worrying about whether the csString will be destroyed before
+// the (char const*) is used. For instance, if Foo() returns a csString, given
+// the expression `printf("%s\n",Foo().GetData())', some older compilers will
+// destroy the temporary csString before printf() has a chance to utilize the
+// result of GetData(). By interning the string temporarily, this problem can
+// be avoided. New usage: printf("%s\n",intern_str(Foo()))
+#undef STR_QUEUE_SIZE
+#define STR_QUEUE_SIZE 10
+static char const* intern_str(csString const& s)
+{
+  static char* queue[STR_QUEUE_SIZE];
+  static int n = -1;
+
+  if (n < 0)
+    for (int i = STR_QUEUE_SIZE - 1; i >= 0; i--)
+      queue[i] = 0;
+
+  if (++n >= STR_QUEUE_SIZE)
+    n = 0;
+  delete[] queue[n];
+  queue[n] = csStrNew(s);
+
+  return queue[n];
+}
+#endif
+
 //-----------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE (PVSMetaLoader)
@@ -400,7 +428,8 @@ float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
   // because GetSide() expects a side and not an axix.
   csBox2 box_slice = node_bbox.GetSide (axis * 2);
   csPoly2D slice;
-  //DBA(("======================\nbox_slice=%s\n", box_slice.Description().GetData()));
+  //DBA(("======================\nbox_slice=%s\n",
+  //  intern_str(box_slice.Description())));
 
   mina = node_bbox.Min (axis);
   maxa = node_bbox.Max (axis);
@@ -1034,8 +1063,8 @@ bool PVSCalcSector::SetupProjectionPlaneAdjacent (const csBox3& source,
   plane.scale.x = float (DIM_COVBUFFER) / (bbox.MaxX ()-bbox.MinX ());
   plane.scale.y = float (DIM_COVBUFFER) / (bbox.MaxY ()-bbox.MinY ());
   DB(("  Hull_ADJ box: %s scale=%s offset=%s\n",
-    bbox.Description().GetData(), plane.scale.Description().GetData(),
-    plane.offset.Description().GetData()));
+    intern_str(bbox.Description()), intern_str(plane.scale.Description()),
+    intern_str(plane.offset.Description())));
 
   // Clear the coverage buffer.
   plane.covbuf->Initialize ();
@@ -1101,8 +1130,8 @@ bool PVSCalcSector::SetupProjectionPlane (const csBox3& source,
   plane.scale.x = float (DIM_COVBUFFER) / (bbox.MaxX ()-bbox.MinX ());
   plane.scale.y = float (DIM_COVBUFFER) / (bbox.MaxY ()-bbox.MinY ());
   DB(("  Hull box: %s scale=%s offset=%s\n",
-    bbox.Description().GetData(), plane.scale.Description().GetData(),
-    plane.offset.Description().GetData()));
+    intern_str(bbox.Description()), intern_str(plane.scale.Description()),
+    intern_str(plane.offset.Description())));
 
   // Clear the coverage buffer.
   plane.covbuf->Initialize ();
@@ -1114,10 +1143,10 @@ bool PVSCalcSector::SetupProjectionPlane (const csBox3& source,
   DB(("  Hull:\n"));
   for (i = 0 ; i < (size_t)hull_points ; i++)
   {
-    DB(("    N:%d (%s)\n", i, hull[i].Description().GetData()));
+    DB(("    N:%d (%s)\n", i, intern_str(hull[i].Description())));
     hull[i].x = (hull[i].x-plane.offset.x) * plane.scale.x;
     hull[i].y = (hull[i].y-plane.offset.y) * plane.scale.y;
-    DB(("    C:%d (%s)\n", i, hull[i].Description().GetData()));
+    DB(("    C:%d (%s)\n", i, intern_str(hull[i].Description())));
   }
   plane.covbuf->InsertPolygonInvertedNoDepth (hull, hull_points);
 
@@ -1141,7 +1170,7 @@ bool PVSCalcSector::CastShadow (const csPoly3D& polygon)
   size_t j;
   for (j = 0 ; j < polygon.GetVertexCount () ; j++)
   {
-    DB((" (%s)", polygon[j].Description().GetData()));
+    DB((" (%s)", intern_str(polygon[j].Description())));
   }
   DB(("\n"));
 
@@ -1158,7 +1187,7 @@ bool PVSCalcSector::CastShadow (const csPoly3D& polygon)
   {
     pi_verts[i].x = (pi_verts[i].x-plane.offset.x) * plane.scale.x;
     pi_verts[i].y = (pi_verts[i].y-plane.offset.y) * plane.scale.y;
-    DB((" (%s)", pi_verts[i].Description().GetData()));
+    DB((" (%s)", intern_str(pi_verts[i].Description())));
   }
   DB(("\n"));
   int nummod = plane.covbuf->InsertPolygonNoDepth (
@@ -1177,7 +1206,7 @@ bool PVSCalcSector::CastAreaShadow (const csBox3& source,
   size_t j;
   for (j = 0 ; j < polygon.GetVertexCount () ; j++)
   {
-    DB((" (%s)", polygon[j].Description().GetData()));
+    DB((" (%s)", intern_str(polygon[j].Description())));
   }
   DB(("\n"));
 
@@ -1225,7 +1254,7 @@ bool PVSCalcSector::CastAreaShadow (const csBox3& source,
   {
     pi_verts[i].x = (pi_verts[i].x-plane.offset.x) * plane.scale.x;
     pi_verts[i].y = (pi_verts[i].y-plane.offset.y) * plane.scale.y;
-    DB((" (%s)", pi_verts[i].Description().GetData()));
+    DB((" (%s)", intern_str(pi_verts[i].Description())));
   }
   DB(("\n"));
   int nummod = plane.covbuf->InsertPolygonNoDepth (
@@ -1350,8 +1379,8 @@ void PVSCalcSector::MarkInvisible (PVSCalcNode* sourcenode,
   total_invisnodes += destrep;
   DBA(("%d ", destrep));
   DB(("Marked invisible %s to %s\n",
-	    sourcenode->node_bbox.Description().GetData(),
-	    destnode->node_bbox.Description().GetData()));
+    intern_str(sourcenode->node_bbox.Description()),
+    intern_str(destnode->node_bbox.Description())));
 
   // If visibility for the destination node was already calculated and
   // we are here then that means that this node was considered visible
@@ -1429,7 +1458,7 @@ bool PVSCalcSector::RecurseDestNodes (PVSCalcNode* sourcenode,
     // buffer we will project all axis aligned polygons for both nodes.
 
     DB(("\nTEST_ADJ(%d) %s -> %s\n", adjacency,
-    	source.Description().GetData(), dest.Description().GetData()));
+      intern_str(source.Description()), intern_str(dest.Description())));
 
     // First we do a trivial test to see if the nodes can surely see each
     // other.
@@ -1474,8 +1503,8 @@ bool PVSCalcSector::RecurseDestNodes (PVSCalcNode* sourcenode,
     // traversing to the children so we only skip the testing part.
     // Here in this case we know the two nodes don't overlap.
 
-    DB(("\nTEST %s -> %s\n", source.Description().GetData(),
-    	dest.Description().GetData()));
+    DB(("\nTEST %s -> %s\n", intern_str(source.Description()),
+      intern_str(dest.Description())));
 
     // First we do a trivial test to see if the nodes can surely see each
     // other.
