@@ -309,4 +309,4 @@ $(OUT)/%$O: %.asm
 	$(DO.COMPILE.ASM)
 
 $(OUTDIRS):
-	$(MKDIRS)
+	@$(MKDIRS)
