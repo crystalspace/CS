@@ -37,6 +37,7 @@
 #include "csengine/texture.h"
 #include "csengine/curve.h"
 #include "csengine/dumper.h"
+#include "csterr/ddgtmesh.h"
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "csutil/token.h"
@@ -143,6 +144,9 @@ TOKEN_DEF_START
   TOKEN_DEF (STATELESS)
   TOKEN_DEF (STATIC)
   TOKEN_DEF (TEMPLATE)
+  TOKEN_DEF (TERRAIN)
+  TOKEN_DEF (TERRAIN_HEIGHTMAP)
+  TOKEN_DEF (TERRAIN_DETAIL)
   TOKEN_DEF (TEX)
   TOKEN_DEF (TEXLEN)
   TOKEN_DEF (TEXNR)
@@ -1447,10 +1451,10 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
   if (tx1_given)
     if (tx2_given)
          poly3d->SetTextureSpace (tx1_orig.x, tx1_orig.y, tx1_orig.z,
-	 			tx1.x, tx1.y, tx1.z, tx1_len,
+				tx1.x, tx1.y, tx1.z, tx1_len,
 				tx2.x, tx2.y, tx2.z, tx2_len);
     else poly3d->SetTextureSpace (tx1_orig.x, tx1_orig.y, tx1_orig.z,
-                            tx1.x, tx1.y, tx1.z, tx1_len);
+				tx1.x, tx1.y, tx1.z, tx1_len);
   else if (plane_name[0])
            poly3d->SetTextureSpace ((csPolyPlane*)w->planes.FindByName (plane_name));
   else if (tx_len)
@@ -3208,6 +3212,7 @@ csSector* csLoader::load_sector (char* secname, csWorld* w, char* buf,
     TOKEN_TABLE (LIGHT)
     TOKEN_TABLE (SPRITE)
     TOKEN_TABLE (SKYDOME)
+    TOKEN_TABLE (TERRAIN)
   TOKEN_TABLE_END
 
   char* name;
@@ -3234,6 +3239,9 @@ csSector* csLoader::load_sector (char* secname, csWorld* w, char* buf,
     {
       case TOKEN_SKYDOME:
         skydome_process (*sector, name, params, info.default_texture);
+        break;
+      case TOKEN_TERRAIN:
+        terrain_process (*sector, name, params, info.default_texture);
         break;
       case TOKEN_STATBSP:
         do_stat_bsp = true;
@@ -3460,6 +3468,84 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
 
 //---------------------------------------------------------------------------
 
+void csLoader::terrain_process (csSector& sector, char* name, char* buf,
+        csTextureHandle* texture)
+{
+  TOKEN_TABLE_START (commands)
+    TOKEN_TABLE (TERRAIN_HEIGHTMAP)
+    TOKEN_TABLE (TERRAIN_DETAIL)
+  TOKEN_TABLE_END
+
+  long cmd;
+  char* params;
+  char heightmap[256];	// @@@ Hardcoded.
+  int detail;
+
+  while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
+  {
+    switch (cmd)
+    {
+      case TOKEN_TERRAIN_HEIGHTMAP:
+        ScanStr (params, "%s", heightmap);
+        break;
+      case TOKEN_TERRAIN_DETAIL:
+        ScanStr (params, "%D", &detail);
+        break;
+    }
+  }
+  if (cmd == PARSERR_TOKENNOTFOUND)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a terrain!\n", csGetLastOffender ());
+    fatal_exit (0, false);
+  }
+
+  // ---------------------------------------------------------------------
+  //
+  // Global Objects used in this app.
+  //
+  ddgTBinMesh	*mesh = 0;
+  ddgHeightMap	*height = 0;
+  ddgBBox	*clipbox = 0;
+  // ---------------------------------------------------------------------
+  //
+  // Create and Initialize Global Objects.
+  //
+  // Load the data set.
+  height = new ddgHeightMap();
+
+  // Otherwise read file, if that fails generate a random map.
+  if (height->readTGN(heightmap))
+  {
+    CsPrintf (MSG_FATAL_ERROR, "Error creating height field\n");
+    fatal_exit (0, false);
+  }
+  else
+    mesh = new ddgTBinMesh(height);
+
+  // Initialize.
+  double wtoc[16];		// World to camera space transformation matrix.
+  float fov = 90.0;
+  clipbox = new ddgBBox(0,100,0,100,1,15000);
+  mesh->init(wtoc,clipbox,fov);
+
+  // For each frame.
+  // Update the wtoc.
+  mesh->calculate();
+  // Render
+  mesh->qsi()->reset();
+  while (!mesh->qsi()->end() )
+  {
+    ddgTriIndex tvc = mesh->qs()->index(mesh->qsi());
+    ddgTBinTree *bt = mesh->qs()->tree(mesh->qsi());
+
+//  drawTriangle(bt, tvc);
+    mesh->qsi()->next();
+  }
+
+}
+
+//---------------------------------------------------------------------------
+
 csSoundDataObject* csLoader::load_sound(char* name, const char* filename, csWorld* w)
 {
   (void) w;
@@ -3487,6 +3573,7 @@ csSoundDataObject* csLoader::load_sound(char* name, const char* filename, csWorl
 
   CHK (sndobj = new csSoundDataObject (snd));
   csNameObject::AddName (*sndobj, name);
+
   return sndobj;
 }
 

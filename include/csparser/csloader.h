@@ -99,6 +99,9 @@ public:
   ///
   static void skydome_process (csSector& sector, char* name, char* buf,
 			       csTextureHandle* texture);
+  /// Parse the terrain engine's parameters.
+  static void terrain_process (csSector& sector, char* name, char* buf,
+			       csTextureHandle* texture);
   ///
   static csThing* load_sixface (char* name, csWorld* w, char* buf,
                               csTextureList* textures, csSector* sec);
@@ -144,6 +147,7 @@ public:
 
   ///
   static csSoundDataObject* load_sound (char* name, const char* filename, csWorld* w);
+
 
   /// Load data into a world.
   static bool LoadWorld (csWorld* world, LanguageLayer* layer, char* buf);
