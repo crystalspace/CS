@@ -21,6 +21,7 @@
 #include "csutil/util.h"
 #include "cstool/initapp.h"
 #include "iutil/vfs.h"
+#include "iutil/cfgmgr.h"
 #include "iutil/plugin.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -33,11 +34,13 @@
 CS_IMPLEMENT_APPLICATION
 
 static iVFS *VFS;
+static iConfigManager *Cfg;
 static bool ShutDown = false;
 
 // forward declaration for command handlers
 static void cmd_cat (char *args);
 static void cmd_chdir (char *args);
+static void cmd_conf (char *args);
 static void cmd_cp (char *args);
 static void cmd_creat (char *args);
 static void cmd_exists (char *args);
@@ -62,6 +65,7 @@ struct
   { "cat", cmd_cat },
   { "cd", cmd_chdir },
   { "chdir", cmd_chdir },
+  { "conf", cmd_conf },
   { "cp", cmd_cp },
   { "creat", cmd_creat },
   { "dir", cmd_ls },
@@ -160,12 +164,13 @@ static void cmd_help (char *)
        "sync			Synchronize virtual file system\n"
        "mount [vpath] [rpath]	Add a virtual path mapped to given real path\n"
        "unmount [vpath] {rpath}	Remove a virtual path; if no rpath is given, completely\n"
+       "conf {-} [file]         Parse a VFS config file; with '-' file is on real FS\n"
        "save			Save current virtual file system state to " VFS_CONFIG_FILE "\n"
        "time [file]             Display the file's modification time\n"
        "rpath [file]            Convert the virtual path into `real-world' path\n"
        "exit			Exit Virtual Shell\n"
        "------------------------\n"
-       "Wildcards are okay in next commands: ls, cp, rm\n"
+       "Wildcards are okay in these commands: ls, cp, rm\n"
   );
 }
 
@@ -421,6 +426,31 @@ static void cmd_unmount (char *args)
     fprintf (stderr, "unmount: cannot unmount \"%s\" from \"%s\"\n", rpath, vpath);
 }
 
+static void cmd_conf (char *args)
+{
+  bool real_fs;
+  get_option (args, real_fs);
+  iVFS *CfgVFS = real_fs ? NULL : VFS;
+
+  iConfigFile *config = Cfg->AddDomain (args, CfgVFS, iConfigManager::ConfigPriorityCmdLine);
+
+  if (!config)
+  {
+    fprintf (stderr, "conf: cannot load config file \"%s\" in %s\n", args, real_fs ? "real filesystem" : "VFS");
+    return;
+  }
+
+  iConfigIterator *iter = config->Enumerate ("VFS.Mount.");
+  while (iter->Next ())
+  {
+    const char *rpath = iter->GetKey (true);
+    const char *vpath = iter->GetStr ();
+    if (!VFS->Mount (rpath, vpath))
+      fprintf (stderr, "conf: mount: cannot mount \"%s\" to \"%s\"\n", rpath, vpath);
+  }
+  iter->DecRef ();
+}
+
 static void cmd_sync (char *)
 {
   VFS->Sync ();
@@ -535,6 +565,13 @@ int main (int argc, char *argv [])
     return -1;
   }
 
+  Cfg = CS_QUERY_REGISTRY (object_reg, iConfigManager);
+  if (!Cfg)
+  {
+    fprintf (stderr, "Cannot load iConfigManager plugin\n");
+    return -1;
+  }
+
   printf ("Welcome to Virtual Shell\n"
           "Type \"help\" to get a short description of commands\n"
           "\n");
@@ -558,6 +595,7 @@ int main (int argc, char *argv [])
     }
   }
 
+  Cfg->DecRef ();
   VFS->DecRef ();
   return 0;
 }
