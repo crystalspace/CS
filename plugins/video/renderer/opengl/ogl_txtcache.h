@@ -370,6 +370,13 @@ public:
   /// Size of static lightmaps.
   static int super_lm_size;
 
+  // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+  // This OpenGL texture handle is temporary for the version of
+  // DrawPolygon that doesn't use the super lightmap cache.
+  // Should be removed in future.
+  GLuint TempHandle;
+  // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
 private:
   csGraphics3DOGLCommon* g3d;
 
@@ -403,6 +410,10 @@ public:
 
   /// Cache a lightmap.
   void Cache (iPolygonTexture *polytex);
+
+  // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+  GLuint GetTempHandle () { return TempHandle; }
+  // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
   /// Cache a whole precalculated superlightmap
   void Cache(csTrianglesPerSuperLightmap* s, bool dirty,

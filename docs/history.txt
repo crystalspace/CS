@@ -1,6 +1,5 @@
 The history order is reversed so that new features are at the top.
 
-
 20-Sep-2002
 	- Keith Fulton added Dynamic Ambient Lighting capability to all Things.
 	- Keith also added sector convenience function to set Dyn Ambient
@@ -17,6 +16,18 @@ The history order is reversed so that new features are at the top.
 	  Assigned this command to 'p' key.
 	- Removed screenshot capability from walktest.
 	- Removed fps viewer from walktest.
+	- Greatly simplified the OpenGL renderer at the expense of some speed
+	  loss. This is only temporary until DrawPolygonMesh starts
+	  operating at full efficiency. Then we can start using that
+	  function a lot more. Here is what I did:
+	      - DrawPolygon no longer uses any of the polygon, lightmap,
+	        or fog queues and is fully stand alone. This makes
+		it slower but easier to seperate from the rest.
+	      - The fog queue has been removed and merged with the polygon
+	        queue. DrawPolygonFX is now the only function that uses
+		the polygon queue.
+	      - DrawPolygonMesh is the only function using the super lightmap
+	        queues.
 19-Sep-2002
 	- Fixed some memory leaks in csInitializer.
 	- Several enhancements to levtool. By default it now lists the

@@ -84,6 +84,7 @@ public:
   float flat_color_r;
   float flat_color_g;
   float flat_color_b;
+  bool use_fog;
 
   // Vertices.
   int num_vertices;
@@ -92,6 +93,8 @@ public:
   GLfloat* gltxt; // 2*max_vertices
   GLfloat* glcol; // 4*max_vertices
   GLfloat* layer_gltxt; // 2*max_vertices
+  GLfloat* fog_color; // 3*max_vertices
+  GLfloat* fog_txt; // 2*max_vertices
 
   // Triangles.
   int num_triangles;
@@ -113,69 +116,24 @@ public:
   GLfloat* GetGLTxt (int idx) { return &gltxt[idx<<1]; }
   GLfloat* GetGLCol (int idx) { return &glcol[idx<<2]; }
   GLfloat* GetLayerGLTxt (int idx) { return &layer_gltxt[idx<<1]; }
+  GLfloat* GetFogColor (int idx) { return &fog_color[idx*3]; }
+  GLfloat* GetFogTxt (int idx) { return &fog_txt[idx<<1]; }
 
   csPolyQueue () :
-  mat_handle (NULL), mixmode (~0), z_buf_mode (CS_ZBUF_NONE),
+    mat_handle (NULL), mixmode (~0), z_buf_mode (CS_ZBUF_NONE),
     flat_color_r (0), flat_color_g (0), flat_color_b (0),
+    use_fog (false), num_vertices (0), max_vertices (0),
+    glverts (NULL), gltxt (NULL), glcol (NULL), layer_gltxt (NULL),
+    fog_color (NULL), fog_txt (NULL),
+    num_triangles (0), max_triangles (0),
+    tris (NULL) { }
 
-  num_vertices (0), max_vertices (0),
-  glverts (NULL), gltxt (NULL), glcol (NULL), layer_gltxt (NULL),
-  num_triangles (0), max_triangles (0),
-  tris (NULL) { }
   ~csPolyQueue ()
   {
     delete[] glverts;
     delete[] gltxt;
     delete[] glcol;
     delete[] layer_gltxt;
-    delete[] tris;
-  }
-};
-
-/**
- * Queue to optimize fog drawing.
- */
-class csFogQueue
-{
-public:
-  csZBufMode z_buf_mode;
-
-  // Vertices.
-  int num_vertices;
-  int max_vertices;
-  GLfloat* glverts; // 4*max_vertices
-  GLfloat* fog_color; // 3*max_vertices
-  GLfloat* fog_txt; // 2*max_vertices
-
-  // Triangles.
-  int num_triangles;
-  int max_triangles;
-  int* tris;    // 3*max_triangles
-
-  /// Add some vertices. Return index of the added vertices.
-  int AddVertices (int num);
-  /// Add a triangle.
-  void AddTriangle (int i1, int i2, int i3);
-  /// Reset the queue to empty.
-  void Reset ()
-  {
-    num_triangles = 0;
-    num_vertices = 0;
-  }
-
-  GLfloat* GetGLVerts (int idx) { return &glverts[idx<<2]; }
-  GLfloat* GetFogColor (int idx) { return &fog_color[idx*3]; }
-  GLfloat* GetFogTxt (int idx) { return &fog_txt[idx<<1]; }
-
-  csFogQueue () :
-  z_buf_mode (CS_ZBUF_NONE),
-  num_vertices (0), max_vertices (0),
-  glverts (NULL), fog_color (NULL), fog_txt (NULL),
-  num_triangles (0), max_triangles (0),
-  tris (NULL) { }
-  ~csFogQueue ()
-  {
-    delete[] glverts;
     delete[] fog_color;
     delete[] fog_txt;
     delete[] tris;
@@ -553,8 +511,6 @@ protected:
 
   /// Polygon queue.
   csPolyQueue queue;
-  /// Fog queue.
-  csFogQueue fog_queue;
 
   /// Current aspect ratio for perspective correction.
   float aspect;
@@ -897,11 +853,6 @@ public:
    * Flush the DrawPolygon queue if needed.
    */
   void FlushDrawPolygon ();
-
-  /**
-   * Flush the fog queue if needed.
-   */
-  void FlushDrawFog ();
 
   /**
    * Draw a fully-featured polygon assuming one has an OpenGL renderer

@@ -145,7 +145,6 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
 
   G3D->FlushDrawPolygon();
   G3D->lightmap_cache->Flush ();
-  G3D->FlushDrawFog ();
 
   if (w < 0) w = Width;
   if (h < 0) h = Height;

@@ -531,6 +531,11 @@ OpenGLLightmapCache::~OpenGLLightmapCache ()
 {
   Clear ();
   delete[] suplm;
+
+  // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+  // Delete the temporary handle
+  glDeleteTextures (1, &TempHandle);
+  // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 }
 
 void OpenGLLightmapCache::Setup ()
@@ -558,6 +563,25 @@ void OpenGLLightmapCache::Setup ()
         0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
     delete[] buf;
   }
+
+  // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+  // Initialize the temporary handle
+  glGenTextures (1, &TempHandle);
+  csGraphics3DOGLCommon::statecache->SetTexture (
+    	GL_TEXTURE_2D, TempHandle);
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  // Normally OpenGL specs say that the last parameter to glTexImage2D
+  // can be a NULL pointer. Unfortunatelly not all drivers seem to
+  // support that. So I give a dummy texture here.
+  char* buf = new char [256*256*4];
+  memset (buf, 0, 4*256*256);
+  glTexImage2D (GL_TEXTURE_2D, 0, 3, 256, 256,
+      0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
+  delete[] buf;
+  // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 }
 
 void OpenGLLightmapCache::Clear ()
@@ -686,7 +710,6 @@ void OpenGLLightmapCache::Cache(csTrianglesPerSuperLightmap* s, bool dirty,
       lmwidth, lmheigth,GL_RGBA,GL_UNSIGNED_BYTE,lm_data);
   }
 }
-
 
 void OpenGLLightmapCache::Cache (iPolygonTexture *polytex)
 {

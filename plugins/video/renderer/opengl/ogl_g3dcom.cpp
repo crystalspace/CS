@@ -1325,7 +1325,6 @@ bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
   {
     FlushDrawPolygon ();
     lightmap_cache->Flush ();
-    FlushDrawFog ();
   }
 
   // If we go to 2D mode then we do as if several modes are disabled.
@@ -1368,7 +1367,6 @@ void csGraphics3DOGLCommon::FinishDraw ()
   {
     FlushDrawPolygon ();
     lightmap_cache->Flush ();
-    FlushDrawFog ();
   }
 
   if (DrawMode & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
@@ -1725,27 +1723,6 @@ void csGraphics3DOGLCommon::SetupStencil ()
   }
 }
 
-void csGraphics3DOGLCommon::FlushDrawFog ()
-{
-  if (fog_queue.num_triangles <= 0) return;
-
-  SetGLZBufferFlagsPass2 (fog_queue.z_buf_mode, true);
-
-  statecache->EnableState (GL_TEXTURE_2D);
-  statecache->SetTexture (GL_TEXTURE_2D, m_fogtexturehandle);
-  statecache->SetShadeModel (GL_SMOOTH);
-  SetupBlend (CS_FX_ALPHA, 0, false);
-
-  SetClientStates (CS_CLIENTSTATE_ALL);
-  glColorPointer (3, GL_FLOAT, 0, fog_queue.fog_color);
-  glVertexPointer (4, GL_FLOAT, 0, fog_queue.glverts);
-  glTexCoordPointer (2, GL_FLOAT, 0, fog_queue.fog_txt);
-  glDrawElements (GL_TRIANGLES, fog_queue.num_triangles*3, GL_UNSIGNED_INT,
-      fog_queue.tris);
-
-  fog_queue.Reset ();
-}
-
 void csGraphics3DOGLCommon::FlushDrawPolygon ()
 {
   if (queue.num_triangles <= 0) return;
@@ -1855,8 +1832,7 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
   // If we have need other texture passes (for whatever reason)
   // we set the z-buffer to second pass state.
   //=================
-  if (m_config_options.do_extra_bright ||
-      /*@@@queue.use_fog ||*/ multimat)
+  if (m_config_options.do_extra_bright || queue.use_fog || multimat)
   {
     SetGLZBufferFlagsPass2 (queue.z_buf_mode, true);
   }
@@ -1893,8 +1869,8 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
         float vshift = layer->vshift;
         for (i = 0 ; i < queue.num_vertices ; i++)
         {
-    *dst++ = (*src++) * uscale + ushift;
-    *dst++ = (*src++) * vscale + vshift;
+	  *dst++ = (*src++) * uscale + ushift;
+	  *dst++ = (*src++) * vscale + vshift;
         }
 
         p_gltxt = queue.layer_gltxt;
@@ -1925,32 +1901,25 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
     }
   }
 
+  if (queue.use_fog)
+  {
+    statecache->EnableState (GL_TEXTURE_2D);
+    statecache->SetTexture (GL_TEXTURE_2D, m_fogtexturehandle);
+    statecache->SetShadeModel (GL_SMOOTH);
+    SetupBlend (CS_FX_ALPHA, 0, false);
+
+    SetClientStates (CS_CLIENTSTATE_ALL);
+    glColorPointer (3, GL_FLOAT, 0, queue.fog_color);
+    glVertexPointer (4, GL_FLOAT, 0, queue.glverts);
+    glTexCoordPointer (2, GL_FLOAT, 0, queue.fog_txt);
+    glDrawElements (GL_TRIANGLES, queue.num_triangles*3, GL_UNSIGNED_INT,
+        queue.tris);
+  }
+
   if (debug_edges)
     DebugDrawElements (G2D,
-  queue.num_triangles*3, queue.tris, queue.glverts,
+    queue.num_triangles*3, queue.tris, queue.glverts,
     txtmgr->FindRGB (255, 255, 255), false, false);
-
-#if 0
-  //@@@ TEMPORARILY DISABLED
-  //=================
-  // Pass 3: an extra optional pass which improves the lighting on SRC*DST
-  // so that it looks more like 2*SRC*DST.
-  //=================
-  if (m_config_options.do_extra_bright)
-  {
-    statecache->DisableState (GL_TEXTURE_2D);
-    statecache->SetShadeModel (GL_SMOOTH);
-    statecache->EnableState (GL_BLEND);
-    statecache->SetBlendFunc (GL_DST_ALPHA, GL_ONE_MINUS_DST_ALPHA);
-    //@@@ INVALIDATE BLEND MODE!
-    // statecache->SetBlendFunc (GL_ZERO, GL_SRC_COLOR);
-
-    glColor4f (2, 2, 2, 0);
-    glVertexPointer (4, GL_FLOAT, 0, queue.glverts);
-    glDrawElements (GL_TRIANGLES, queue.num_triangles*3, GL_UNSIGNED_INT,
-      queue.tris);
-  }
-#endif
 
   queue.Reset ();
 
@@ -1958,47 +1927,6 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
   {
     statecache->DisableState (GL_ALPHA_TEST);
   }
-}
-
-int csFogQueue::AddVertices (int num)
-{
-  num_vertices += num;
-  if (num_vertices > max_vertices)
-  {
-    GLfloat* new_ar;
-    int old_num = num_vertices-num;
-    max_vertices = num_vertices + 40;
-
-    new_ar = new GLfloat [max_vertices*4];
-    if (glverts) memcpy (new_ar, glverts, sizeof (GLfloat)*4*old_num);
-    delete[] glverts; glverts = new_ar;
-
-    new_ar = new GLfloat [max_vertices*3];
-    if (fog_color) memcpy (new_ar, fog_color, sizeof (GLfloat)*3*old_num);
-    delete[] fog_color; fog_color = new_ar;
-
-    new_ar = new GLfloat [max_vertices*2];
-    if (fog_txt) memcpy (new_ar, fog_txt, sizeof (GLfloat)*2*old_num);
-    delete[] fog_txt; fog_txt = new_ar;
-  }
-  return num_vertices-num;
-}
-
-void csFogQueue::AddTriangle (int i1, int i2, int i3)
-{
-  int old_num = num_triangles;
-  num_triangles++;
-  if (num_triangles > max_triangles)
-  {
-    max_triangles += 20;
-    int* new_ar;
-    new_ar = new int [max_triangles*3];
-    if (tris) memcpy (new_ar, tris, sizeof (int) * 3 * old_num);
-    delete[] tris; tris = new_ar;
-  }
-  tris[old_num*3+0] = i1;
-  tris[old_num*3+1] = i2;
-  tris[old_num*3+2] = i3;
 }
 
 int csPolyQueue::AddVertices (int num)
@@ -2026,6 +1954,14 @@ int csPolyQueue::AddVertices (int num)
     new_ar = new GLfloat [max_vertices*2];
     if (layer_gltxt) memcpy (new_ar, layer_gltxt, sizeof (GLfloat)*2*old_num);
     delete[] layer_gltxt; layer_gltxt = new_ar;
+
+    new_ar = new GLfloat [max_vertices*3];
+    if (fog_color) memcpy (new_ar, fog_color, sizeof (GLfloat)*3*old_num);
+    delete[] fog_color; fog_color = new_ar;
+
+    new_ar = new GLfloat [max_vertices*2];
+    if (fog_txt) memcpy (new_ar, fog_txt, sizeof (GLfloat)*2*old_num);
+    delete[] fog_txt; fog_txt = new_ar;
   }
   return num_vertices-num;
 }
@@ -2094,35 +2030,11 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
     !(txt->GetKeyColor() && (alpha >= OPENGL_KEYCOLOR_MIN_ALPHA) ))
     || (alpha != 1.0f ) );
 
-  //========
-  // First check if this polygon is different from the current polygons
-  // in the queue. If so we need to flush the queue.
-  //========
-  if (poly.mat_handle != queue.mat_handle ||
-      poly.mixmode != queue.mixmode ||
-      z_buf_mode != queue.z_buf_mode ||
-      flat_r != queue.flat_color_r ||
-      flat_g != queue.flat_color_g ||
-      flat_b != queue.flat_color_b)
-  {
-    FlushDrawPolygon ();
-    if (flatlighting || ((poly.mixmode & CS_FX_MASK_MIXMODE) != CS_FX_COPY))
-      lightmap_cache->Flush ();
-    else
-      lightmap_cache->FlushIfNeeded ();
-    if (!CompatibleZBufModes (fog_queue.z_buf_mode, z_buf_mode))
-      FlushDrawFog ();
-
-    //========
-    // Store information in the queue.
-    //========
-    queue.mat_handle = poly.mat_handle;
-    queue.mixmode = poly.mixmode;
-    queue.z_buf_mode = z_buf_mode;
-    queue.flat_color_r = flat_r;
-    queue.flat_color_g = flat_g;
-    queue.flat_color_b = flat_b;
-  }
+  FlushDrawPolygon ();
+  if (flatlighting || ((poly.mixmode & CS_FX_MASK_MIXMODE) != CS_FX_COPY))
+    lightmap_cache->Flush ();
+  else
+    lightmap_cache->FlushIfNeeded ();
 
   // The following attempt to speed up only hits for about 10% in flarge,
   // so maybe its prolly not woth it. However, for highly triangulized cases
@@ -2209,10 +2121,97 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
   iPolygonTexture *tex = poly.poly_texture;
   iLightMap* lm = tex->GetLightMap ();
 
-  int idx = queue.AddVertices (poly.num);
-  GLfloat* glverts = queue.GetGLVerts (idx);
-  GLfloat* gltxt = queue.GetGLTxt (idx);
-  GLfloat* glcol = queue.GetGLCol (idx);
+  bool tex_transp = false;
+  bool multimat = false;
+  csMaterialHandle* mat_handle = (csMaterialHandle*)poly.mat_handle;
+  iTextureHandle* txt_handle = NULL;
+  csTextureHandleOpenGL *txt_mm = NULL;
+  csTxtCacheData *texturecache_data = NULL;
+  GLuint texturehandle = 0;
+
+  if (mat_handle)
+  {
+    multimat = mat_handle->GetTextureLayerCount () > 0;
+    txt_handle = mat_handle->GetTexture ();
+    if (txt_handle)
+    {
+      txt_mm = (csTextureHandleOpenGL *)txt_handle->GetPrivateObject ();
+      tex_transp = txt_mm->GetKeyColor () || txt_mm->GetAlphaMap ();
+      // Initialize our static drawing information and cache
+      // the texture in the texture cache (if this is not already the case).
+      CacheTexture (poly.mat_handle);
+      texturecache_data = (csTxtCacheData *)txt_mm->GetCacheData ();
+      texturehandle = texturecache_data->Handle;
+    }
+  }
+
+  alpha = BYTE_TO_FLOAT (poly.mixmode & CS_FX_MASK_ALPHA);
+  alpha = SetupBlend (poly.mixmode, alpha, tex_transp);
+
+  if (m_renderstate.textured && txt_handle)
+  {
+    statecache->EnableState (GL_TEXTURE_2D);
+    if (txt_mm->GetKeyColor() && !(alpha < OPENGL_KEYCOLOR_MIN_ALPHA))
+    {
+      statecache->EnableState (GL_ALPHA_TEST);
+      statecache->SetAlphaFunc (GL_GEQUAL, OPENGL_KEYCOLOR_MIN_ALPHA);
+      SetupBlend (poly.mixmode, 1.0f, false);
+    }
+    else
+    {
+      statecache->DisableState (GL_ALPHA_TEST);
+    }
+  }
+  else
+  {
+    statecache->DisableState (GL_TEXTURE_2D);
+    csRGBpixel color;
+    if (txt_handle)
+    {
+      txt_handle->GetMeanColor (color.red, color.green, color.blue);
+      flat_r = BYTE_TO_FLOAT (color.red);
+      flat_g = BYTE_TO_FLOAT (color.green);
+      flat_b = BYTE_TO_FLOAT (color.blue);
+    }
+    else if (mat_handle)
+    {
+      mat_handle->GetFlatColor (color);
+      flat_r = BYTE_TO_FLOAT (color.red);
+      flat_g = BYTE_TO_FLOAT (color.green);
+      flat_b = BYTE_TO_FLOAT (color.blue);
+    }
+  }
+
+  SetGLZBufferFlags (z_buf_mode);
+
+  if (txt_handle)
+    statecache->SetTexture (GL_TEXTURE_2D, texturehandle);
+
+  if (flatlighting)
+  {
+    int ir = 255, ig = 255, ib = 255;
+    if (lm)
+    {
+      tex->RecalculateDynamicLights ();
+      lm->GetMeanLighting(ir, ig, ib);
+    }
+    flat_r = ir/128.0f;
+    flat_g = ig/128.0f;
+    flat_b = ib/128.0f;
+  }
+
+  glColor4f (flat_r, flat_g, flat_b, alpha);
+  statecache->SetShadeModel (GL_FLAT);
+
+  //=================
+  // Setup: calculate the polygon and texture information.
+  //=================
+
+  static GLfloat glverts[100*4];
+  static GLfloat gltxt[100*2];
+  static GLfloat gltxttrans[100*2];
+
+  GLfloat* glv = glverts, * glt = gltxt;
   for (i = 0; i < poly.num; i++)
   {
     sx = poly.vertices[i].x - asp_center_x;
@@ -2221,109 +2220,163 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
     sz = 1.0 / one_over_sz;
     u_over_sz = (J1 * sx + J2 * sy + J3);
     v_over_sz = (K1 * sx + K2 * sy + K3);
-
     // Modified to use homogenous object space coordinates instead
     // of homogenous texture space coordinates.
-    *gltxt++ = u_over_sz * sz;
-    *gltxt++ = v_over_sz * sz;
-    *glverts++ = poly.vertices[i].x * sz;
-    *glverts++ = poly.vertices[i].y * sz;
-    *glverts++ = -1.0;
-    *glverts++ = sz;
+    *glt++ = u_over_sz * sz;
+    *glt++ = v_over_sz * sz;
+    *glv++ = poly.vertices[i].x * sz;
+    *glv++ = poly.vertices[i].y * sz;
+    *glv++ = -1.0;
+    *glv++ = sz;
   }
-  if (flatlighting)
+
+  //=================
+  // Pass 1: The unlit texture
+  //=================
+
+  SetClientStates (CS_CLIENTSTATE_VT);
+  glVertexPointer (4, GL_FLOAT, 0, glverts);
+  glTexCoordPointer (2, GL_FLOAT, 0, gltxt);
+  glDrawArrays (GL_TRIANGLE_FAN, 0, poly.num);
+
+  //=================
+  // If we have need other texture passes (for whatever reason)
+  // we set the z-buffer to second pass state.
+  //=================
+  bool do_lm = !flatlighting && !poly.do_fullbright
+  	&& m_renderstate.lighting && lm;
+  if (multimat || do_lm || poly.use_fog)
   {
-    queue.mixmode |= CS_FX_GOURAUD;
+    SetGLZBufferFlagsPass2 (z_buf_mode, true);
+    statecache->EnableState (GL_TEXTURE_2D);
+  }
+  else
+  {
+    // Nothing more to do.
+    return;
+  }
 
-    int ir = 255, ig = 255, ib = 255;
-    if (lm)
+  //=================
+  // Pass 2: Here we add all extra texture layers if there are some.
+  //=================
+  if (multimat)
+  {
+    int j;
+    for (j = 0 ; j < mat_handle->GetTextureLayerCount () ; j++)
     {
-      tex->RecalculateDynamicLights ();
-      lm->GetMeanLighting(ir, ig, ib);
-    }
-    float lgt_r = ir/128.0f, lgt_g = ig/128.0f, lgt_b = ib/128.0f;
+      csTextureLayer* layer = mat_handle->GetTextureLayer (j);
+      iTextureHandle* txt_handle = layer->txt_handle;
+      csTextureHandleOpenGL *txt_mm = (csTextureHandleOpenGL *)
+        txt_handle->GetPrivateObject ();
+      csTxtCacheData *texturecache_data;
+      texturecache_data = (csTxtCacheData *)txt_mm->GetCacheData ();
+      tex_transp = txt_mm->GetKeyColor () || txt_mm->GetAlphaMap ();
+      GLuint texturehandle = texturecache_data->Handle;
+      statecache->SetTexture (GL_TEXTURE_2D, texturehandle);
 
+      float alpha = 1.0f - BYTE_TO_FLOAT (layer->mode & CS_FX_MASK_ALPHA);
+      alpha = SetupBlend (layer->mode, alpha, tex_transp);
+
+      float uscale = layer->uscale;
+      float vscale = layer->vscale;
+      float ushift = layer->ushift;
+      float vshift = layer->vshift;
+      bool trans = mat_handle->TextureLayerTranslated (j);
+
+      glColor4f (1., 1., 1., alpha);
+      if (trans)
+      {
+        glt = gltxt;
+	GLfloat* gltt = gltxttrans;
+        for (i = 0; i < poly.num; i++)
+        {
+	  *gltt++ = (*glt++) * uscale + ushift;
+	  *gltt++ = (*glt++) * vscale + vshift;
+        }
+        glTexCoordPointer (2, GL_FLOAT, 0, gltxttrans);
+      }
+      else
+      {
+        glTexCoordPointer (2, GL_FLOAT, 0, gltxt);
+      }
+      //glVertexPointer (4, GL_FLOAT, 0, glverts);	// No need to set.
+      glDrawArrays (GL_TRIANGLE_FAN, 0, poly.num);
+    }
+  }
+
+  //=================
+  // Pass 3: Lightmaps
+  //=================
+  if (do_lm)
+  {
+    glColor4f (1, 1, 1, 0);
+    SetupBlend (CS_FX_SRCDST, 0, false);
+
+    GLuint TempHandle = lightmap_cache->GetTempHandle ();
+    tex->RecalculateDynamicLights ();
+    statecache->SetTexture (GL_TEXTURE_2D, TempHandle);
+    int lmwidth = lm->GetWidth ();
+    int lmheight = lm->GetHeight ();
+    csRGBpixel* lm_data = lm->GetMapData ();
+    glTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0,
+	lmwidth, lmheight, GL_RGBA, GL_UNSIGNED_BYTE, lm_data);
+
+    float lm_offset_u, lm_offset_v, lm_high_u, lm_high_v;
+    float lm_scale_u, lm_scale_v;
+    tex->GetTextureBox (lm_offset_u, lm_offset_v, lm_high_u, lm_high_v);
+
+    // lightmap fudge factor
+    if (lm_high_u <= lm_offset_u)
+      lm_scale_u = 1.;       // @@@ Is this right?
+    else
+      lm_scale_u = 1. / (lm_high_u - lm_offset_u);
+
+    if (lm_high_v <= lm_offset_v)
+      lm_scale_v = 1.;       // @@@ Is this right?
+    else
+      lm_scale_v = 1. / (lm_high_v - lm_offset_v);
+
+    lm_offset_u -= .75 / (float (lmwidth) * lm_scale_u);
+    lm_high_u += .75 / (float (lmwidth) * lm_scale_u);
+
+    lm_offset_v -= .75 / (float (lmheight) * lm_scale_v);
+    lm_high_v += .75 / (float (lmheight) * lm_scale_v);
+
+    lm_scale_u = float (lmwidth) / (256. * (lm_high_u - lm_offset_u));
+    lm_scale_v = float (lmheight) / (256. * (lm_high_v - lm_offset_v));
+
+    glt = gltxt;
+    GLfloat* gltt = gltxttrans;
     for (i = 0; i < poly.num; i++)
     {
-      *glcol++ = lgt_r;
-      *glcol++ = lgt_g;
-      *glcol++ = lgt_b;
-      *glcol++ = alpha;
+      *gltt++ = (*(glt++) - lm_offset_u) * lm_scale_u;
+      *gltt++ = (*(glt++) - lm_offset_v) * lm_scale_v;
     }
+    //glVertexPointer (4, GL_FLOAT, 0, glverts);	// No need to set.
+    glTexCoordPointer (2, GL_FLOAT, 0, gltxttrans);
+    glDrawArrays (GL_TRIANGLE_FAN, 0, poly.num);
   }
 
-  // Triangulate.
-  for (i = 2 ; i < poly.num ; i++)
-  {
-    queue.AddTriangle (idx+0, idx+i-1, idx+i);
-  }
-
-  if (!flatlighting && !poly.do_fullbright && m_renderstate.lighting && lm)
-  {
-    lightmap_cache->Cache (tex);
-    csLMCacheData* clm = (csLMCacheData *)lm->GetCacheData ();
-    if (clm)
-    {
-      csLightMapQueue* lm_queue = lightmap_cache->GetQueue (clm);
-      if (!lm_queue->ownsData)
-      {
-        lm_queue->LoadArrays ();
-        lm_queue->ownsData = true;
-      }
-      int lm_idx = lm_queue->AddVertices (poly.num);
-
-      // Copy vertex info.
-      GLfloat* glverts = queue.GetGLVerts (idx);
-      GLfloat* lm_glverts = lm_queue->GetGLVerts (lm_idx);
-      memcpy (lm_glverts, glverts, poly.num*sizeof (GLfloat)*4);
-
-      // Copy lightmap texture info.
-      float lm_scale_u = clm->lm_scale_u;
-      float lm_scale_v = clm->lm_scale_v;
-      float lm_offset_u = clm->lm_offset_u;
-      float lm_offset_v = clm->lm_offset_v;
-      GLfloat* gltxt = queue.GetGLTxt (idx);
-      GLfloat* lm_gltxt = lm_queue->GetGLTxt (lm_idx);
-      for (i = 0; i < poly.num; i++)
-      {
-        *lm_gltxt++ = (*gltxt++ - lm_offset_u) * lm_scale_u;
-        *lm_gltxt++ = (*gltxt++ - lm_offset_v) * lm_scale_v;
-      }
-
-      // Triangulate.
-      for (i = 2 ; i < poly.num ; i++)
-      {
-        lm_queue->AddTriangle (lm_idx+0, lm_idx+i-1, lm_idx+i);
-      }
-    }
-  }
-
+  //=================
+  // Pass 3: Fog
+  //=================
   if (poly.use_fog)
   {
-    fog_queue.z_buf_mode = z_buf_mode;
-    int fog_idx = fog_queue.AddVertices (poly.num);
+    statecache->SetTexture (GL_TEXTURE_2D, m_fogtexturehandle);
+    statecache->SetShadeModel (GL_SMOOTH);
+    SetupBlend (CS_FX_ALPHA, 0, false);
 
-    // Copy vertex info.
-    GLfloat* glverts = queue.GetGLVerts (idx);
-    GLfloat* fog_glverts = fog_queue.GetGLVerts (fog_idx);
-    memcpy (fog_glverts, glverts, poly.num*sizeof (GLfloat)*4);
-    GLfloat* fog_color = fog_queue.GetFogColor (fog_idx);
-    GLfloat* fog_txt = fog_queue.GetFogTxt (fog_idx);
-    for (i = 0 ; i < poly.num ; i++)
+    GLfloat* gltt = gltxttrans;
+    for (i = 0; i < poly.num; i++)
     {
-      *fog_color++ = poly.fog_info[i].r;
-      *fog_color++ = poly.fog_info[i].g;
-      *fog_color++ = poly.fog_info[i].b;
-
-      *fog_txt++ = poly.fog_info[i].intensity;
-      *fog_txt++ = 0.0;
+      *gltt++ = poly.fog_info[i].intensity;
+      *gltt++ = 0.0;
     }
-
-    // Triangulate.
-    for (i = 2 ; i < poly.num ; i++)
-    {
-      fog_queue.AddTriangle (fog_idx+0, fog_idx+i-1, fog_idx+i);
-    }
+    SetClientStates (CS_CLIENTSTATE_ALL);
+    glColorPointer (3, GL_FLOAT, sizeof (G3DFogInfo), &poly.fog_info[0].r);
+    //glVertexPointer (4, GL_FLOAT, 0, glverts);	// No need to set.
+    glTexCoordPointer (2, GL_FLOAT, 0, gltxttrans);
+    glDrawArrays (GL_TRIANGLE_FAN, 0, poly.num);
   }
 }
 
@@ -2349,7 +2402,6 @@ void csGraphics3DOGLCommon::DrawPolygonZFill (G3DPolygonDP & poly)
 
   FlushDrawPolygon ();
   lightmap_cache->Flush ();
-  FlushDrawFog ();
 
   // Get the plane normal of the polygon. Using this we can calculate
   // '1/z' at every screen space point.
@@ -2452,12 +2504,11 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
       z_buf_mode != queue.z_buf_mode ||
       flat_r != queue.flat_color_r ||
       flat_g != queue.flat_color_g ||
-      flat_b != queue.flat_color_b)
+      flat_b != queue.flat_color_b ||
+      poly.use_fog != queue.use_fog)
   {
     FlushDrawPolygon ();
     lightmap_cache->Flush ();
-    if (!CompatibleZBufModes (fog_queue.z_buf_mode, z_buf_mode))
-      FlushDrawFog ();
   }
 
   //========
@@ -2469,6 +2520,7 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
   queue.flat_color_r = flat_r;
   queue.flat_color_g = flat_g;
   queue.flat_color_b = flat_b;
+  queue.use_fog = poly.use_fog;
 
   //========
   // Update polygon info in queue.
@@ -2514,15 +2566,9 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
   //========
   if (poly.use_fog)
   {
-    fog_queue.z_buf_mode = z_buf_mode;
-    int fog_idx = fog_queue.AddVertices (poly.num);
-
     // Copy vertex info.
-    GLfloat* glverts = queue.GetGLVerts (idx);
-    GLfloat* fog_glverts = fog_queue.GetGLVerts (fog_idx);
-    memcpy (fog_glverts, glverts, poly.num*sizeof (GLfloat)*4);
-    GLfloat* fog_color = fog_queue.GetFogColor (idx);
-    GLfloat* fog_txt = fog_queue.GetFogTxt (idx);
+    GLfloat* fog_color = queue.GetFogColor (idx);
+    GLfloat* fog_txt = queue.GetFogTxt (idx);
     for (i = 0 ; i < poly.num ; i++)
     {
       *fog_color++ = poly.fog_info[i].r;
@@ -2531,12 +2577,6 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
 
       *fog_txt++ = poly.fog_info[i].intensity;
       *fog_txt++ = 0.0;
-    }
-
-    // Triangulate.
-    for (i = 2 ; i < poly.num ; i++)
-    {
-      fog_queue.AddTriangle (fog_idx+0, fog_idx+i-1, fog_idx+i);
     }
   }
 }
@@ -4274,9 +4314,6 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
   lightmap_cache->Flush ();
 //  lightmap_cache->FlushIfNeeded ();
 
-  if (!CompatibleZBufModes (fog_queue.z_buf_mode, z_buf_mode))
-    FlushDrawFog ();
-
   bool stencil_enabled = false;
   bool clip_planes_enabled = false;
 
@@ -5387,7 +5424,6 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 
   FlushDrawPolygon ();        //@@@ Should do checks here since
   lightmap_cache->Flush ();   //    flushes may be unnecessary
-  FlushDrawFog ();            //    --Anders Stenberg
 
   int num_vertices = mesh.buffers[0]->GetVertexCount ();
   int num_triangles = mesh.num_triangles;
@@ -5938,8 +5974,6 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh)
     lightmap_cache->Flush ();
   else
     lightmap_cache->FlushIfNeeded ();
-  if (!CompatibleZBufModes (fog_queue.z_buf_mode, z_buf_mode))
-    FlushDrawFog ();
 
   bool stencil_enabled = false;
   bool clip_planes_enabled = false;
@@ -6694,7 +6728,6 @@ void csGraphics3DOGLCommon::ClearCache ()
   if (!lightmap_cache) return;  // System is being destructed.
   FlushDrawPolygon ();
   lightmap_cache->Flush ();
-  FlushDrawFog ();
   lightmap_cache->Clear ();
 }
 
@@ -6707,7 +6740,6 @@ void csGraphics3DOGLCommon::DrawLine (const csVector3 & v1,
 {
   FlushDrawPolygon ();
   lightmap_cache->Flush ();
-  FlushDrawFog ();
 
   if (v1.z < SMALL_Z && v2.z < SMALL_Z)
     return;
@@ -6858,8 +6890,6 @@ void csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
     lightmap_cache->Flush ();
   else
     lightmap_cache->FlushIfNeeded ();
-  if (!CompatibleZBufModes (fog_queue.z_buf_mode, z_buf_mode))
-    FlushDrawFog ();
 
   //  printf ("use multi\n");
   // OK, we're gonna draw a polygon with a dual texture
@@ -7073,7 +7103,6 @@ void csGraphics3DOGLCommon::DrawPixmap (iTextureHandle *hTex,
 {
   FlushDrawPolygon ();
   lightmap_cache->Flush ();
-  FlushDrawFog ();
 
   // If original dimensions are different from current dimensions (because
   // image has been scaled to conform to OpenGL texture size restrictions)

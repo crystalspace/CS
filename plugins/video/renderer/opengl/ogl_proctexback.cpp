@@ -123,7 +123,6 @@ bool csOpenGLProcBackBuffer::BeginDraw (int DrawFlags)
 
    g3d->FlushDrawPolygon ();
    g3d->lightmap_cache->Flush ();
-   g3d->FlushDrawFog ();
 
 /*    GLenum format, type;
     switch (pixel_bytes)
