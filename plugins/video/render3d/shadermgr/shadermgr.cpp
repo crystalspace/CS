@@ -633,7 +633,7 @@ bool csShaderPass::Load(iDocumentNode* node)
           csRef<iShaderProgram> fp = shadermgr->CreateShaderProgram(child->GetAttributeValue("type"));
           if(fp)
           {
-            if(node->GetAttribute("file"))
+            if(child->GetAttribute("file"))
             {
               csRef<iVFS> vfs = CS_QUERY_REGISTRY(objectreg, iVFS);
               //load from file

@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+20-Feb-2003
+	- Anders Stenberg fixed a bug in shader loader causing fragment programs not to load
 19-Feb-2003
 	- Mårten Svanfeldt fixed a bug introduced when adding the new light-parameters
 	  for the new renderer due to a missing #ifdef CS_USE_NEW_RENDERER
