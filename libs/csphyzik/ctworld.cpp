@@ -38,7 +38,6 @@ void dydt(real t, const real y[], real dy[] )
 
 ctWorld::ctWorld()
 {
-	ctPhysicalEntity::ctPhysicalEntity(); 
 	ctArticulatedBody::set_joint_friction( DEFAULT_JOINT_FRICTION );
 
 	// default
