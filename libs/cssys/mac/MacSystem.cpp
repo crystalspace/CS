@@ -31,7 +31,7 @@
 #include <TextUtils.h>
 #include <ToolUtils.h>
 #include <Windows.h>
-#include <DrawSprocket.h>
+#include <InputSprocket.h>
 #include "sysdef.h"
 #include "types.h"
 #include "csutil/inifile.h"
@@ -64,6 +64,13 @@ static OSErr AppleEventHandler( AppleEvent *event, AppleEvent *reply, long refCo
 static AEEventHandlerUPP AppleEventHandlerUPP = NULL;
 static SysSystemDriver * gSysSystemDriver = NULL;
 
+#if USE_INPUTSPROCKETS
+extern int gNumInputNeeds;
+extern ISpNeed gInputNeeds[];
+extern bool gInputUseKeyboard;
+extern bool gInputUseMouse;
+extern ISpElementReference gInputElements[];
+#endif
 
 SysSystemDriver::SysSystemDriver()
 				 : csSystemDriver ()
@@ -71,6 +78,8 @@ SysSystemDriver::SysSystemDriver()
 	unsigned int		i;
 	ProcessSerialNumber	theCurrentProcess;
 	ProcessInfoRec		theInfo;
+	OSStatus			theStatus = noErr;
+	char				statusMessage[256];
 
 	gSysSystemDriver = this;
 
@@ -116,6 +125,54 @@ SysSystemDriver::SysSystemDriver()
 	 *	Intialize the command line.
 	 */
 	CommandLine[0] = '\0';
+
+	/*
+	 *	If Input Sprockets is installed then initialize it.
+	 */
+	mInputSprocketsAvailable = false;
+	mInputSprocketsRunning = false;
+#if USE_INPUTSPROCKETS
+	if (( ISpStartup != NULL ) && ( gNumInputNeeds > 0 )) {
+		theStatus = ISpStartup();
+		if ( theStatus != noErr ) {
+			sprintf( statusMessage, "Unable to startup InputSprockets.\nError Number = %d", theStatus );
+			Alert( statusMessage );
+		} else {
+			theStatus = ISpElement_NewVirtualFromNeeds( gNumInputNeeds, gInputNeeds, gInputElements, 0 );
+			if ( theStatus != noErr ) {
+				sprintf( statusMessage, "Unable to create input elements for InputSprockets.\nError Number = %d", theStatus );
+				Alert( statusMessage );
+			} else {
+				theStatus = ISpInit( gNumInputNeeds, gInputNeeds, gInputElements, theInfo.processSignature, '0001', 0, 128, 0);
+				if ( theStatus != noErr ) {
+					sprintf( statusMessage, "Unable to initialize InputSprockts.\nError Number = %d", theStatus );
+					Alert( statusMessage );
+				} else {
+					if ( gInputUseKeyboard ) {
+						theStatus = ISpDevices_ActivateClass( kISpDeviceClass_Keyboard );
+						if ( theStatus != noErr ) {
+							sprintf( statusMessage, "Unable to activate input class \"Keyboard\.\nError Number = %d", theStatus );
+							Alert( statusMessage );
+						}
+					}
+					if ( gInputUseMouse ) {
+						theStatus = ISpDevices_ActivateClass( kISpDeviceClass_Mouse );
+						if ( theStatus != noErr ) {
+							sprintf( statusMessage, "Unable to activate input class \"Mouse\.\nError Number = %d", theStatus );
+							Alert( statusMessage );
+						}
+					}
+					theStatus = ISpSuspend();
+					if ( theStatus != noErr ) {
+						sprintf( statusMessage, "Unable to suspend InputSprockets.\nError Number = %d", theStatus );
+						Alert( statusMessage );
+					}
+					mInputSprocketsAvailable = true;
+				}
+			}
+		}
+	}
+#endif
 }
 
 
@@ -130,6 +187,11 @@ SysSystemDriver::~SysSystemDriver()
 							  (AEEventHandlerUPP)AppleEventHandlerUPP, FALSE );
 		DisposeRoutineDescriptor( AppleEventHandlerUPP );
 		AppleEventHandlerUPP = NULL;
+	}
+
+	if ( mInputSprocketsAvailable ) {
+		ISpStop();
+		ISpShutdown();
 	}
 }
 
@@ -154,24 +216,50 @@ static void NLtoCR( UInt8 *theString )
 void SysSystemDriver::Alert(const char* s)
 {
 	Str255	theMessage;
+	iMacGraphics* piG2D = NULL;
+
+	if ( G2D )
+		piG2D = QUERY_INTERFACE(G2D, iMacGraphics);
+	if ( piG2D ) {
+		piG2D->PauseDisplayContext();
+	}
 
 	strcpy( (char *)&theMessage[1], s );
 	theMessage[0] = strlen( s );
 	NLtoCR( theMessage );
 	ParamText( "\pFatal Error", theMessage, "\p", "\p" );
 	StopAlert( kAlertOrWarningDialog, NULL );
+
+	if ( piG2D ) {
+		piG2D->ActivateDisplayContext();
+		piG2D->DecRef();
+		piG2D = NULL;
+	}
 }
 
 
 void SysSystemDriver::Warn(const char* s)
 {
 	Str255	theMessage;
+	iMacGraphics* piG2D = NULL;
+
+	if ( G2D )
+		piG2D = QUERY_INTERFACE(G2D, iMacGraphics);
+	if ( piG2D ) {
+		piG2D->PauseDisplayContext();
+	}
 
 	strcpy( (char *)&theMessage[1], s );
 	theMessage[0] = strlen( s );
 	NLtoCR( theMessage );
 	ParamText( "\pWarning", theMessage, "\p", "\p" );
 	CautionAlert( kAlertOrWarningDialog, NULL );
+
+	if ( piG2D ) {
+		piG2D->ActivateDisplayContext();
+		piG2D->DecRef();
+		piG2D = NULL;
+	}
 }
 
 
@@ -246,6 +334,11 @@ void SysSystemDriver::Loop(void)
 	SetEventMask( everyEvent );
 #endif
 
+	if ( mInputSprocketsAvailable ) {
+		ISpResume();
+		mInputSprocketsRunning = true;
+	}
+
     prev_time = current_time = Time();
 	while (( ! Shutdown ) && ( ! ExitLoop )) {
     	NextFrame( current_time - prev_time, current_time );
@@ -254,6 +347,10 @@ void SysSystemDriver::Loop(void)
 #if SCAN_KEYBOARD
 		ScanKeyboard( current_time );
 #endif
+
+		if ( mInputSprocketsAvailable && mInputSprocketsRunning ) {
+			ISpTickle();
+		}
 
 		if ( WaitNextEvent( everyEvent, &anEvent, 1, NULL ) ) {
 			eventHandled = false;
@@ -410,10 +507,8 @@ void SysSystemDriver::HandleMouseEvent( time_t current_time, EventRecord *theEve
 			Rect r = (*GetGrayRgn())->rgnBBox;
 			InsetRect( &r, 4, 4 );
 			DragWindow( targetWindow, theEvent->where, &r );
-			{
-				if ( piG2D ) {
-					piG2D->WindowChanged();
-				}
+			if ( piG2D ) {
+				piG2D->WindowChanged();
 			}
 			break;
 		
@@ -457,6 +552,15 @@ void SysSystemDriver::HandleMouseEvent( time_t current_time, EventRecord *theEve
 
 void SysSystemDriver::HandleMenuUpdate( void )
 {
+	MenuHandle	theMenuHandle;
+
+	theMenuHandle = GetMenuHandle(kFileMenuID);
+	if ( theMenuHandle ) {
+		if ( mInputSprocketsAvailable )
+			EnableItem( theMenuHandle, 1 );
+		else
+			DisableItem( theMenuHandle, 1 );
+	}
 }
 
 
@@ -464,6 +568,12 @@ void SysSystemDriver::DoAboutDialog( void )
 {
 	ParamText( mAppName, "\p", "\p", "\p" );
 	::Alert( kAboutDialog, NULL );
+}
+
+
+static Boolean Input_ISpConfigureEventProc( EventRecord * /* inEvent */ )
+{
+	return false;
 }
 
 
@@ -488,10 +598,26 @@ void SysSystemDriver::HandleMenuSelection( const short menuNum, const short item
 	}
 	
 	if (menuNum == kFileMenuID) {
-		// for the file menu, we only handle "quit" here.
-		// We'll assume that's the last item in the File menu.
-		if (itemNum == CountMenuItems( GetMenuHandle(menuNum) )) {
-			// QUIT!
+		if (itemNum == 1) {
+			if ( mInputSprocketsAvailable ) {
+				bool wasRunning = false;
+				OSStatus theStatus;
+				if ( mInputSprocketsRunning ) {
+					wasRunning = true;
+					ISpSuspend();
+				}
+				theStatus = ISpConfigure( Input_ISpConfigureEventProc );
+				if ( theStatus != noErr ) {
+					char statusMessage[256];
+					sprintf( statusMessage, "Unable to display configuration dialog.\nError Number = %d", theStatus );
+					Alert( statusMessage );
+				}
+				if ( wasRunning ) {
+					ISpResume();
+				}
+			}
+		} else if (itemNum == CountMenuItems( GetMenuHandle(menuNum) )) {
+			// We'll assume that the quit is the last item in the File menu.
 			ExitLoop = true;
 		}
 	}
@@ -898,7 +1024,18 @@ void SysSystemDriver::HandleOSEvent( time_t current_time, EventRecord *theEvent,
 		}
 	} else if (osEvtFlag == suspendResumeMessage) {
 		if (theEvent->message & resumeFlag) {
+			if ( mInputSprocketsAvailable ) {
+				ISpResume();
+#if USE_INPUTSPROCKETS
+	 			ISpElement_Flush( gInputElements[0] );
+#endif
+				mInputSprocketsRunning = true;
+			}
 		} else {
+			if ( mInputSprocketsAvailable ) {
+				ISpSuspend();
+				mInputSprocketsRunning = false;
+			}
 			::HiliteMenu(0);				// Unhighlight menu titles
 		}
 	}

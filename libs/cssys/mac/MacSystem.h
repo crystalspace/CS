@@ -65,6 +65,9 @@ private:
 	Str255		mAppName;
 	FSSpec		mAppLocation;
 
+	bool		mInputSprocketsAvailable;
+	bool		mInputSprocketsRunning;
+
 	char		CommandLine[256];
 	char		argStr[256];
 	char 		*argv[MAX_ARGS + 1];
