@@ -1905,9 +1905,9 @@ void converter::print_sizes ( ) {
   fprintf ( logfile,  "  unsigned int        %d       0       %u\n", 
     (int)sizeof ( unsigned int ), UINT_MAX );
   fprintf ( logfile,  "  long int            %d       %ld      %ld\n", 
-    (int)sizeof ( long int ), LONG_MIN, LONG_MAX );
+    (int)sizeof ( long int ), (long int)LONG_MIN, (long int)LONG_MAX );
   fprintf ( logfile,  "  unsigned long int   %d       0       %lu\n", 
-    (int)sizeof ( unsigned long int ), ULONG_MAX );
+    (int)sizeof ( unsigned long int ), (unsigned long int)ULONG_MAX );
 /*
   FLT_MIN, FLT_MAX, DBL_MIN, DBL_MAX not defined on Microsoft C.
 */
