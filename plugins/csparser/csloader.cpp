@@ -782,6 +782,9 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("setlight", XMLTOKEN_SETLIGHT);
   xmltokens.Register ("fadelight", XMLTOKEN_FADELIGHT);
   xmltokens.Register ("rotate", XMLTOKEN_ROTATE);
+  xmltokens.Register ("rotx", XMLTOKEN_ROTX);
+  xmltokens.Register ("roty", XMLTOKEN_ROTY);
+  xmltokens.Register ("rotz", XMLTOKEN_ROTZ);
   xmltokens.Register ("enabletrigger", XMLTOKEN_ENABLETRIGGER);
   xmltokens.Register ("disabletrigger", XMLTOKEN_DISABLETRIGGER);
   xmltokens.Register ("delay", XMLTOKEN_DELAY);

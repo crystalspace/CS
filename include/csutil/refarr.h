@@ -77,6 +77,7 @@ public:
     int i;
     for (i = n ; i < count ; i++) root[i] = NULL;
 
+    int old_count = count;
     count = n;
 
     if (n > limit || (limit > threshold && n < limit - threshold))
@@ -91,7 +92,7 @@ public:
       else
       {
         csRef<T>* newroot = (csRef<T>*)calloc (n, sizeof(csRef<T>));
-	memcpy (newroot, root, count * sizeof (csRef<T>));
+	memcpy (newroot, root, old_count * sizeof (csRef<T>));
 	free (root);
 	root = newroot;
       }

@@ -3,6 +3,14 @@ The history order is reversed so that new features are at the top.
 24-Sep-2002
 	- Relaxed the sequence and trigger loader so that you can now
 	  refer to triggers and sequences that haven't been defined yet.
+	- Added support for rotating along three axii in the 'rotate'
+	  sequence operation. Also added support for an additional
+	  offset to the rotation.
+	- Fixed a bad bug in csRefArray which manifested the first time
+	  the thresshold size was exceeded.
+	- Implemented relative move with duration.
+	- Flarge now has a nice animating model using these new
+	  sequence features.
 23-Sep-2002
 	- Added new iEngineSequenceManager API. This is going to be used
 	  for an engine sequence manager. More info on this new feature

@@ -332,6 +332,19 @@
             <autonormals />
         </params>
     </meshfact>
+    <meshfact name="box_tri">
+        <plugin>meshFact</plugin>
+        <params>
+            <numvt>3</numvt>
+            <numtri>2</numtri>
+            <v x="0" y="0" z="-2" u="0" v="0" />
+            <v x="2" y="0" z="0" u="1" v="0" />
+            <v x="0" y="0" z="2" u="1" v="1" />
+            <t v1="0" v2="1" v3="2" />
+            <t v1="2" v2="1" v3="0" />
+            <autonormals />
+        </params>
+    </meshfact>
     <meshfact name="squareU">
         <plugin>meshFact</plugin>
         <params>
@@ -19256,6 +19269,16 @@
                 <move>
                     <v x="-2" y="0" z="0" />
                 </move>
+                <meshobj name="triL">
+                    <plugin>mesh</plugin>
+                    <params>
+                        <factory>box_tri</factory>
+                        <material>mosaic</material>
+                    </params>
+                    <move>
+                        <v x="0" y="4" z="0" />
+                    </move>
+                </meshobj>
             </meshobj>
             <meshobj name="plateR">
                 <plugin>mesh</plugin>
@@ -19266,6 +19289,19 @@
                 <move>
                     <v x="2" y="0" z="0" />
                 </move>
+                <meshobj name="triR">
+                    <plugin>mesh</plugin>
+                    <params>
+                        <factory>box_tri</factory>
+                        <material>mosaic</material>
+                    </params>
+                    <move>
+                        <v x="0" y="4" z="0" />
+			<matrix>
+			    <rotz>3.1415926535</rotz>
+			</matrix>
+                    </move>
+                </meshobj>
             </meshobj>
             <meshobj name="plateU">
                 <plugin>mesh</plugin>
@@ -19276,6 +19312,20 @@
                 <move>
                     <v x="0" y="0" z="2" />
                 </move>
+                <meshobj name="triU">
+                    <plugin>mesh</plugin>
+                    <params>
+                        <factory>box_tri</factory>
+                        <material>mosaic</material>
+                    </params>
+                    <move>
+                        <v x="0" y="4" z="0" />
+			<matrix>
+			    <roty>1.5707963</roty>
+			    <rotz>3.1415926535</rotz>
+			</matrix>
+                    </move>
+                </meshobj>
             </meshobj>
             <meshobj name="plateD">
                 <plugin>mesh</plugin>
@@ -19286,6 +19336,20 @@
                 <move>
                     <v x="0" y="0" z="-2" />
                 </move>
+                <meshobj name="triD">
+                    <plugin>mesh</plugin>
+                    <params>
+                        <factory>box_tri</factory>
+                        <material>mosaic</material>
+                    </params>
+                    <move>
+                        <v x="0" y="4" z="0" />
+			<matrix>
+			    <roty>-1.5707963</roty>
+			    <rotz>3.1415926535</rotz>
+			</matrix>
+                    </move>
+                </meshobj>
             </meshobj>
         </meshobj>
         <light name="hugeroom_light1">
@@ -22895,21 +22959,98 @@
 	</sequence>
 
 	<sequence name="rotball">
-	    <rotate mesh="transpBall" axis="1" angle="3" duration="1000" />
+	    <rotate mesh="transpBall" duration="1000">
+	        <roty>3</roty>
+	    </rotate>
 	    <delay>1000</delay>
 	    <enabletrigger>rotball</enabletrigger>
 	</sequence>
 
+	<sequence name="dobox">
+	    <runsequence>movebox</runsequence>
+	    <runsequence>openbox</runsequence>
+	</sequence>
+
+	<sequence name="movebox">
+	<!-- Disabled because of problems for now:
+	    <move mesh="floorplate" duration="10000" x="0" y="-10" z="0" />
+	    <delay>10000</delay>
+	    <move mesh="floorplate" duration="10000" x="0" y="10" z="0" />
+	    <delay>10000</delay>
+	    <runsequence>movebox</runsequence>
+	-->
+	</sequence>
+
 	<sequence name="openbox">
-	    <rotate mesh="floorplate:plateL" axis="2" angle="-1.5707963" duration="6000" />
-	    <rotate mesh="floorplate:plateR" axis="2" angle="1.5707963" duration="6000" />
-	    <rotate mesh="floorplate:plateU" axis="0" angle="-1.5707963" duration="6000" />
-	    <rotate mesh="floorplate:plateD" axis="0" angle="1.5707963" duration="6000" />
+	    <rotate mesh="floorplate" duration="12000">
+	        <roty>1.5707963</roty>
+                <v x="-80" y="-16" z="13" />
+	    </rotate>
+	    <rotate mesh="floorplate:plateL" duration="6000">
+	        <rotz>-1.5707963</rotz>
+		<v x="-2" y="0" z="0" />
+	    </rotate>
+	    <rotate mesh="floorplate:plateL:triL" duration="6000">
+	        <rotz>-1.5707963</rotz>
+		<v x="0" y="4" z="0" />
+	    </rotate>
+	    <rotate mesh="floorplate:plateR" duration="6000">
+	        <rotz>1.5707963</rotz>
+		<v x="2" y="0" z="0" />
+	    </rotate>
+	    <rotate mesh="floorplate:plateR:triR" duration="6000">
+	        <rotz>1.5707963</rotz>
+		<v x="0" y="4" z="0" />
+	    </rotate>
+	    <rotate mesh="floorplate:plateU" duration="6000">
+	        <rotx>-1.5707963</rotx>
+		<v x="0" y="0" z="2" />
+	    </rotate>
+	    <rotate mesh="floorplate:plateU:triU" duration="6000">
+	        <rotx>-1.5707963</rotx>
+		<v x="0" y="4" z="0" />
+	    </rotate>
+	    <rotate mesh="floorplate:plateD" duration="6000">
+	        <rotx>1.5707963</rotx>
+		<v x="0" y="0" z="-2" />
+	    </rotate>
+	    <rotate mesh="floorplate:plateD:triD" duration="6000">
+	        <rotx>1.5707963</rotx>
+		<v x="0" y="4" z="0" />
+	    </rotate>
 	    <delay>6000</delay>
-	    <rotate mesh="floorplate:plateL" axis="2" angle="1.5707963" duration="6000" />
-	    <rotate mesh="floorplate:plateR" axis="2" angle="-1.5707963" duration="6000" />
-	    <rotate mesh="floorplate:plateU" axis="0" angle="1.5707963" duration="6000" />
-	    <rotate mesh="floorplate:plateD" axis="0" angle="-1.5707963" duration="6000" />
+	    <rotate mesh="floorplate:plateL" duration="6000">
+	        <rotz>1.5707963</rotz>
+		<v x="-2" y="0" z="0" />
+	    </rotate>
+	    <rotate mesh="floorplate:plateL:triL" duration="6000">
+	        <rotz>1.5707963</rotz>
+		<v x="0" y="4" z="0" />
+	    </rotate>
+	    <rotate mesh="floorplate:plateR" duration="6000">
+	        <rotz>-1.5707963</rotz>
+		<v x="2" y="0" z="0" />
+	    </rotate>
+	    <rotate mesh="floorplate:plateR:triR" duration="6000">
+	        <rotz>-1.5707963</rotz>
+		<v x="0" y="4" z="0" />
+	    </rotate>
+	    <rotate mesh="floorplate:plateU" duration="6000">
+	        <rotx>1.5707963</rotx>
+		<v x="0" y="0" z="2" />
+	    </rotate>
+	    <rotate mesh="floorplate:plateU:triU" duration="6000">
+	        <rotx>1.5707963</rotx>
+		<v x="0" y="4" z="0" />
+	    </rotate>
+	    <rotate mesh="floorplate:plateD" duration="6000">
+	        <rotx>-1.5707963</rotx>
+		<v x="0" y="0" z="-2" />
+	    </rotate>
+	    <rotate mesh="floorplate:plateD:triD" duration="6000">
+	        <rotx>-1.5707963</rotx>
+		<v x="0" y="4" z="0" />
+	    </rotate>
 	    <delay>6000</delay>
 	    <runsequence>openbox</runsequence>
 	</sequence>
@@ -22936,8 +23077,8 @@
 	</trigger>
 
 	<trigger name="openbox">
-	    <sectorvis>kamer2l2</sectorvis>
-	    <fire delay=2000>openbox</fire>
+	    <sectorvis>kamer2lhuge</sectorvis>
+	    <fire delay=1000>dobox</fire>
 	</trigger>
     </triggers>
 

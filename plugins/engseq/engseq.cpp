@@ -268,18 +268,28 @@ class TimedOpRotate : public iSequenceTimedOperation
 {
 private:
   csRef<iMeshWrapper> mesh;
-  int axis;
-  float tot_angle;
+  int axis1, axis2, axis3;
+  float tot_angle1, tot_angle2, tot_angle3;
+  csVector3 offset;
   csReversibleTransform start_transform;
 
 public:
   TimedOpRotate (iMeshWrapper* mesh,
-  	const csReversibleTransform& start_transform, int axis, float tot_angle)
+  	const csReversibleTransform& start_transform,
+	int axis1, float tot_angle1,
+	int axis2, float tot_angle2,
+	int axis3, float tot_angle3,
+	const csVector3& offset)
   {
     SCF_CONSTRUCT_IBASE (NULL);
     TimedOpRotate::mesh = mesh;
-    TimedOpRotate::axis = axis;
-    TimedOpRotate::tot_angle = tot_angle;
+    TimedOpRotate::axis1 = axis1;
+    TimedOpRotate::tot_angle1 = tot_angle1;
+    TimedOpRotate::axis2 = axis2;
+    TimedOpRotate::tot_angle2 = tot_angle2;
+    TimedOpRotate::axis3 = axis3;
+    TimedOpRotate::tot_angle3 = tot_angle3;
+    TimedOpRotate::offset = offset;
     TimedOpRotate::start_transform = start_transform;
   }
   virtual ~TimedOpRotate () { }
@@ -288,23 +298,55 @@ public:
 
   virtual void Do (float time)
   {
-    float angle = tot_angle * time;
-    csReversibleTransform trans;
-    switch (axis)
+    csReversibleTransform trans = start_transform;
+    trans.Translate (-offset);
+    csVector3 o (0);
+    switch (axis1)
     {
-      case 0: trans = start_transform * csTransform (csXRotMatrix3 (angle),
-      	  csVector3 (0));
-      	break;
-      case 1: trans = start_transform * csTransform (csYRotMatrix3 (angle),
-      	  csVector3 (0));
-      	break;
-      case 2: trans = start_transform * csTransform (csZRotMatrix3 (angle),
-      	  csVector3 (0));
-      	break;
+      case -1:
+        break;
+      case 0:
+        trans = trans * csTransform (csXRotMatrix3 (tot_angle1*time), o);
+	break;
+      case 1:
+        trans = trans * csTransform (csYRotMatrix3 (tot_angle1*time), o);
+	break;
+      case 2:
+        trans = trans * csTransform (csZRotMatrix3 (tot_angle1*time), o);
+	break;
     }
+    switch (axis2)
+    {
+      case -1:
+        break;
+      case 0:
+        trans = trans * csTransform (csXRotMatrix3 (tot_angle2*time), o);
+	break;
+      case 1:
+        trans = trans * csTransform (csYRotMatrix3 (tot_angle2*time), o);
+	break;
+      case 2:
+        trans = trans * csTransform (csZRotMatrix3 (tot_angle2*time), o);
+	break;
+    }
+    switch (axis3)
+    {
+      case -1:
+        break;
+      case 0:
+        trans = trans * csTransform (csXRotMatrix3 (tot_angle3*time), o);
+	break;
+      case 1:
+        trans = trans * csTransform (csYRotMatrix3 (tot_angle3*time), o);
+	break;
+      case 2:
+        trans = trans * csTransform (csZRotMatrix3 (tot_angle3*time), o);
+	break;
+    }
+    trans.Translate (offset);
     mesh->GetMovable ()->SetTransform (trans);
     mesh->GetMovable ()->UpdateMove ();
-    // DeferUpdateLighting@@@
+    mesh->DeferUpdateLighting (CS_NLIGHT_STATIC | CS_NLIGHT_DYNAMIC, 10);
   }
 };
 
@@ -319,18 +361,28 @@ class OpRotate : public OpStandard
 {
 private:
   csRef<iMeshWrapper> mesh;
-  int axis;
-  float tot_angle;
+  int axis1, axis2, axis3;
+  float tot_angle1, tot_angle2, tot_angle3;
+  csVector3 offset;
   csTicks duration;
   iEngineSequenceManager* eseqmgr;
 
 public:
-  OpRotate (iMeshWrapper* mesh, int axis, float tot_angle,
+  OpRotate (iMeshWrapper* mesh,
+  	int axis1, float tot_angle1,
+  	int axis2, float tot_angle2,
+  	int axis3, float tot_angle3,
+	const csVector3& offset,
   	csTicks duration, iEngineSequenceManager* eseqmgr)
   {
     OpRotate::mesh = mesh;
-    OpRotate::axis = axis;
-    OpRotate::tot_angle = tot_angle;
+    OpRotate::axis1 = axis1;
+    OpRotate::tot_angle1 = tot_angle1;
+    OpRotate::axis2 = axis2;
+    OpRotate::tot_angle2 = tot_angle2;
+    OpRotate::axis3 = axis3;
+    OpRotate::tot_angle3 = tot_angle3;
+    OpRotate::offset = offset;
     OpRotate::duration = duration;
     OpRotate::eseqmgr = eseqmgr;
   }
@@ -339,7 +391,83 @@ public:
   {
     iMovable* movable = mesh->GetMovable ();
     TimedOpRotate* timedop = new TimedOpRotate (
-    	mesh, movable->GetTransform (), axis, tot_angle);
+    	mesh, movable->GetTransform (),
+	axis1, tot_angle1,
+	axis2, tot_angle2,
+	axis3, tot_angle3,
+	offset);
+    eseqmgr->FireTimedOperation (dt, duration, timedop);
+    timedop->DecRef ();
+  }
+};
+
+//---------------------------------------------------------------------------
+
+/**
+ * Timed move operator.
+ */
+class TimedOpMove : public iSequenceTimedOperation
+{
+private:
+  csRef<iMeshWrapper> mesh;
+  csVector3 offset;
+  csVector3 start_pos;
+
+public:
+  TimedOpMove (iMeshWrapper* mesh,
+  	const csVector3& start_pos,
+	const csVector3& offset)
+  {
+    SCF_CONSTRUCT_IBASE (NULL);
+    TimedOpMove::mesh = mesh;
+    TimedOpMove::offset = offset;
+    TimedOpMove::start_pos = start_pos;
+  }
+  virtual ~TimedOpMove () { }
+
+  SCF_DECLARE_IBASE;
+
+  virtual void Do (float time)
+  {
+    csVector3 new_pos = start_pos + time * offset;
+    mesh->GetMovable ()->GetTransform ().SetOrigin (new_pos);
+    mesh->GetMovable ()->UpdateMove ();
+    mesh->DeferUpdateLighting (CS_NLIGHT_STATIC | CS_NLIGHT_DYNAMIC, 10);
+  }
+};
+
+SCF_IMPLEMENT_IBASE (TimedOpMove)
+  SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
+SCF_IMPLEMENT_IBASE_END
+
+/**
+ * Operate operation.
+ */
+class OpMove : public OpStandard
+{
+private:
+  csRef<iMeshWrapper> mesh;
+  csVector3 offset;
+  csTicks duration;
+  iEngineSequenceManager* eseqmgr;
+
+public:
+  OpMove (iMeshWrapper* mesh,
+	const csVector3& offset,
+  	csTicks duration, iEngineSequenceManager* eseqmgr)
+  {
+    OpMove::mesh = mesh;
+    OpMove::offset = offset;
+    OpMove::duration = duration;
+    OpMove::eseqmgr = eseqmgr;
+  }
+
+  virtual void Do (csTicks dt)
+  {
+    iMovable* movable = mesh->GetMovable ();
+    TimedOpMove* timedop = new TimedOpMove (
+    	mesh, movable->GetTransform ().GetOrigin (),
+	offset);
     eseqmgr->FireTimedOperation (dt, duration, timedop);
     timedop->DecRef ();
   }
@@ -446,9 +574,25 @@ void csSequenceWrapper::AddOperationRelativeMove (csTicks time,
 }
 
 void csSequenceWrapper::AddOperationRotateDuration (csTicks time,
-	iMeshWrapper* mesh, int axis, float tot_angle, csTicks duration)
+	iMeshWrapper* mesh,
+	int axis1, float tot_angle1,
+	int axis2, float tot_angle2,
+	int axis3, float tot_angle3,
+	const csVector3& offset, csTicks duration)
 {
-  OpRotate* op = new OpRotate (mesh, axis, tot_angle, duration, eseqmgr);
+  OpRotate* op = new OpRotate (mesh,
+  	axis1, tot_angle1, axis2, tot_angle2, axis3, tot_angle3,
+	offset, duration, eseqmgr);
+  sequence->AddOperation (time, op);
+  op->DecRef ();
+}
+
+void csSequenceWrapper::AddOperationMoveDuration (csTicks time,
+	iMeshWrapper* mesh, const csVector3& offset,
+	csTicks duration)
+{
+  OpMove* op = new OpMove (mesh, offset,
+	duration, eseqmgr);
   sequence->AddOperation (time, op);
   op->DecRef ();
 }

@@ -62,7 +62,14 @@ public:
   void AddOperationRelativeMove (csTicks time, iMeshWrapper* mesh,
 		  const csVector3& pos);
   void AddOperationRotateDuration (csTicks time, iMeshWrapper* mesh,
-  		  int axis, float tot_angle, csTicks duration);
+  		int axis1, float tot_angle1,
+		int axis2, float tot_angle2,
+		int axis3, float tot_angle3,
+		const csVector3& offset,
+		csTicks duration);
+  void AddOperationMoveDuration (csTicks time, iMeshWrapper* mesh,
+		const csVector3& offset,
+		csTicks duration);
   void AddOperationTriggerState (csTicks time, iSequenceTrigger* trigger,
 		  bool en);
 
@@ -122,10 +129,21 @@ public:
       scfParent->AddOperationRelativeMove (time, mesh, pos);
     }
     virtual void AddOperationRotateDuration (csTicks time, iMeshWrapper* mesh,
-  		int axis, float tot_angle, csTicks duration)
+  		int axis1, float tot_angle1,
+		int axis2, float tot_angle2,
+		int axis3, float tot_angle3,
+		const csVector3& offset,
+		csTicks duration)
     {
-      scfParent->AddOperationRotateDuration (time, mesh, axis, tot_angle,
-      	duration);
+      scfParent->AddOperationRotateDuration (time, mesh,
+      	axis1, tot_angle1, axis2, tot_angle2, axis3, tot_angle3,
+	offset, duration);
+    }
+    virtual void AddOperationMoveDuration (csTicks time, iMeshWrapper* mesh,
+		const csVector3& offset,
+		csTicks duration)
+    {
+      scfParent->AddOperationMoveDuration (time, mesh, offset, duration);
     }
     virtual void AddOperationTriggerState (csTicks time,
     		  iSequenceTrigger* trigger, bool en)

@@ -105,10 +105,22 @@ struct iSequenceWrapper : public iBase
   /**
    * Operation: rotate object during some time. After the time has elapsed
    * the rotation will be equal to the given angle here.
-   * Axis is 0, 1, or 2 for x, y, or z.
+   * Axis is 0, 1, or 2 for x, y, or z. If axis is -1 it is not used.
    */
   virtual void AddOperationRotateDuration (csTicks time, iMeshWrapper* mesh,
-  		int axis, float tot_angle, csTicks duration) = 0;
+  		int axis1, float tot_angle1,
+		int axis2, float tot_angle2,
+		int axis3, float tot_angle3,
+		const csVector3& offset,
+		csTicks duration) = 0;
+
+  /**
+   * Operation: move object during some time. After the time has elapsed
+   * the total relative move will be equal to the 'offset'.
+   */
+  virtual void AddOperationMoveDuration (csTicks time, iMeshWrapper* mesh,
+		const csVector3& offset,
+		csTicks duration) = 0;
 
   /**
    * Operation: enable/disable a given trigger.

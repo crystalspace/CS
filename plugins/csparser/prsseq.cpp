@@ -169,6 +169,27 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
 	  cur_time += delay;
 	}
 	break;
+      case XMLTOKEN_MOVE:
+        {
+	  const char* meshname = child->GetAttributeValue ("mesh");
+	  iMeshWrapper* mesh = Engine->FindMeshObject (meshname);
+	  if (!mesh)
+	  {
+	    SyntaxService->ReportError (
+		"crystalspace.maploader.parse.sequence",
+		child, "Couldn't find mesh '%s' in sequence '%s'!", meshname,
+		seqname);
+	    return NULL;
+	  }
+	  int duration = child->GetAttributeValueAsInt ("duration");
+	  csVector3 offset;
+	  offset.x = child->GetAttributeValueAsFloat ("x");
+	  offset.y = child->GetAttributeValueAsFloat ("y");
+	  offset.z = child->GetAttributeValueAsFloat ("z");
+	  sequence->AddOperationMoveDuration (cur_time, mesh,
+		offset, duration);
+        }
+	break;
       case XMLTOKEN_ROTATE:
         {
 	  const char* meshname = child->GetAttributeValue ("mesh");
@@ -181,11 +202,64 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
 		seqname);
 	    return NULL;
 	  }
-	  int axis = child->GetAttributeValueAsInt ("axis");
-	  float tot_angle = child->GetAttributeValueAsFloat ("angle");
+	  int nr = 0;
+	  int axis1 = -1, axis2 = -1, axis3 = -1;
+	  csVector3 offset (0);
+	  float tot_angle1, tot_angle2, tot_angle3;
 	  int duration = child->GetAttributeValueAsInt ("duration");
+	  csRef<iDocumentNodeIterator> it2 = child->GetNodes ();
+	  while (it2->HasNext ())
+	  {
+	    csRef<iDocumentNode> child2 = it2->Next ();
+	    if (child2->GetType () != CS_NODE_ELEMENT) continue;
+	    const char* value2 = child2->GetValue ();
+	    csStringID id2 = xmltokens.Request (value2);
+	    switch (id2)
+	    {
+	      case XMLTOKEN_ROTX:
+	      case XMLTOKEN_ROTY:
+	      case XMLTOKEN_ROTZ:
+	      {
+	        int axis = id2 == XMLTOKEN_ROTX ? 0 :
+			id2 == XMLTOKEN_ROTY ? 1 : 2;
+	        switch (nr)
+		{
+		  case 0:
+		    axis1 = axis;
+		    tot_angle1 = child2->GetContentsValueAsFloat ();
+		    break;
+		  case 1:
+		    axis2 = axis;
+		    tot_angle2 = child2->GetContentsValueAsFloat ();
+		    break;
+		  case 2:
+		    axis3 = axis;
+		    tot_angle3 = child2->GetContentsValueAsFloat ();
+		    break;
+		  default:
+		    SyntaxService->ReportError (
+			"crystalspace.maploader.parse.sequence",
+			child2, "Maximum 3 rotations in sequence '%s'!",
+			seqname);
+		    return NULL;
+		}
+	        nr++;
+	        break;
+	      }
+	      case XMLTOKEN_V:
+	        if (!SyntaxService->ParseVector (child2, offset))
+		  return NULL;
+		break;
+	      default:
+		SyntaxService->ReportBadToken (child2);
+		return NULL;
+	    }
+	  }
 	  sequence->AddOperationRotateDuration (cur_time, mesh,
-	  	axis, tot_angle, duration);
+	  	axis1, tot_angle1,
+	  	axis2, tot_angle2,
+	  	axis3, tot_angle3,
+		offset, duration);
 	}
 	break;
       case XMLTOKEN_FADELIGHT:
