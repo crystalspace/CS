@@ -38,6 +38,15 @@ struct iSimpleFormerState : public iBase
    * this will return a height of 0
    */
   virtual void SetHeightmap (iImage *heightmap) = 0;
+  
+  /**
+   * Set a heightmap to be used. The heightmap will by default be
+   * covering a region from -1..1 along X and Z, and areas outside
+   * this will return a height of 0
+   * \remarks The plugin will take ownershio of \a data. So, don't delete[]
+   *  it!
+   */
+  virtual void SetHeightmap (float* data, unsigned int width, unsigned int height) = 0;
 
   /**
    * Set a scaling factor to be applied to the heightmap region (X, Z)

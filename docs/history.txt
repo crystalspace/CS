@@ -28,6 +28,8 @@ chronological order.
 	    - Added ptrdiff_t, (u)intmax_t and (u)longlong types to cstypes.h,
 	      used by the new cs_snprintf(). ((u)longlong is intended as a
 	      size-agnostic type for %lld(%llu) formats.)
+	- res added a patch from Seth Yastrov <syastrov@gmail.com> to directly
+	  set the float heightmap data on an iSimpleFormerState.
 4-Mar-2005
 	- Eric Sunshine applied patch from <obi666@users.sourceforge.net>
 	  (patch #1155282), which adds iAnimTimeUpdateHandler for

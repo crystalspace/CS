@@ -321,6 +321,15 @@ bool csSimpleFormer::SetFloatMap (csStringID type, iImage* map,
   return true;
 }
 
+void csSimpleFormer::SetHeightmap (float* data, unsigned int width, unsigned int height)
+{
+  csSimpleFormer::width = width;
+  csSimpleFormer::height = height;
+  
+  delete [] heightData;
+  heightData = data;
+}
+
 void csSimpleFormer::SetHeightmap (iImage *heightmap)
 {
   // Grab dimensions

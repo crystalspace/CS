@@ -107,6 +107,8 @@ public:
 
   /// Set what heightmap to use
   void SetHeightmap (iImage *heightmap);
+  /// Set what heightmap to use directly
+  void SetHeightmap (float* data, unsigned int width, unsigned int height);
 
   /// Set a scaling factor to be used in lookups
   void SetScale (csVector3 scale);
@@ -126,6 +128,10 @@ public:
     virtual void SetHeightmap (iImage *heightmap)
     {
       scfParent->SetHeightmap (heightmap);
+    }
+    virtual void SetHeightmap (float* data, unsigned int width, unsigned int height)
+    {
+      return scfParent->SetHeightmap (data, width, height);
     }
     virtual void SetScale (csVector3 scale)
     {
