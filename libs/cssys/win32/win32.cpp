@@ -48,7 +48,7 @@
 #include <dos.h> // For _argc & _argv
 #endif
 
-extern HINSTANCE ModuleHandle;
+HINSTANCE ModuleHandle;
 bool ApplicationActive = true;
 int ApplicationShow;
 
