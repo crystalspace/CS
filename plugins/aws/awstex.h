@@ -60,7 +60,7 @@ private:
     unsigned long id;
   };
 
-  /// List of textures loaded
+  /// List of textures loaded.
   csPDelArray<awsTexture> textures;
 
   /// Registers all currently loaded textures with the texture manager.

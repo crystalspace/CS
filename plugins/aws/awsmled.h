@@ -39,7 +39,7 @@ protected:
     //csEvent e;
     //csKeyEventData keyData;
     csInputDefinition inputDef;
-    void (awsMultiLineEdit::*ring)();
+    void (awsMultiLineEdit::*ring) ();
   };
 
   class eventVector : public csPDelArray<mlEvent>
@@ -49,6 +49,7 @@ protected:
     {
       return (Item1->inputDef.Compare (Item2->inputDef));
     }
+
     static int CompareEvent (mlEvent* const& Item, void* Key)
     {
       return (Item->inputDef.Compare ((iEvent*)Key));
@@ -79,19 +80,18 @@ protected:
   int style;
   csRect contentRect;
 
-  int nMarkMode; // Currently active mark mode
-  int nClipMarkMode; // Markmode the content of clipboard was created with
-  bool bMarking; // Marking in progress ?
+  int nMarkMode; // Currently active mark mode.
+  int nClipMarkMode; // Markmode the content of clipboard was created with.
+  bool bMarking; // Marking in progress?
   int mark_fromrow, mark_torow;
   int mark_fromcol, mark_tocol;
-  int row, col; // Cursor position
+  int row, col; // Cursor position.
 
-  int toprow; // First visible row
-  int leftcol; // First visible col
+  int toprow; // First visible row.
+  int leftcol; // First visible col.
   int visrow, viscol;
   int ymaxchar, xmaxchar;
-  /// The timer that makes the cursor blink.
-  awsTimer *blink_timer;
+  awsTimer *blink_timer; // The timer that makes the cursor blink.
   bool bBlinkOn;
   int cursorcolor;
 
@@ -125,8 +125,6 @@ protected:
   void PasteClipboard ();
   void CutToClipboard ();
 
-  // Actions
-
   static void actInsertRow (void *owner, iAwsParmList* parmlist);
   static void actDeleteRow (void *owner, iAwsParmList* parmlist);
   static void actReplaceRow (void *owner, iAwsParmList* parmlist);
@@ -153,8 +151,6 @@ public:
   static const int frameMask;
   static const int styleMask;
 
-  // Signals
-
   static const int signalPaste;
   static const int signalCopy;
   static const int signalCut;
@@ -166,10 +162,10 @@ public:
   /// Get's the texture handle and the title, plus style if there is one.
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
-  /// Gets properties.
+  /// Get properties.
   bool GetProperty (const char *name, void **parm);
 
-  /// Sets properties.
+  /// Set properties.
   bool SetProperty (const char *name, void *parm);
 
   /// Returns the named TYPE of the component, like "Radio Button", etc.

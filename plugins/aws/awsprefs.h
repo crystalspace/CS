@@ -49,7 +49,7 @@
  * initialized.  Be very careful in modifying the architecture of keys.
  */
 
-/// Keys 
+/// Keys.
 enum {
   KEY_INT = 0,
   KEY_STR = 1,
@@ -174,7 +174,7 @@ public:
 #endif
   SCF_DECLARE_IBASE_EXT (awsKey);
 
-  /// Constructs a string key with the given name
+  /// Constructs a string key with the given name.
   awsStringKey (const char* name, const char* v) : awsKey (name)
   {
     val = new scfString (v);

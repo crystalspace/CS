@@ -99,7 +99,7 @@ public:
   /// Occures when the "tab" key is pressed.
   static const int signalTabPressed;
 
-  /// Occures when component becomes focused
+  /// Occures when component becomes focused.
   static const int signalFocused;
 
   /// Get's the texture handle and the title, plus style if there is one.

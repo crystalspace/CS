@@ -97,7 +97,7 @@ private:
     void (*trigger) (void *, iAwsSource *);
 
     TriggerMap (unsigned long n, void (*t) (void *, iAwsSource *))
-    	: name(n), trigger(t) { };
+      : name(n), trigger(t) { };
   };
 
   /// List of triggers registered.
@@ -212,7 +212,7 @@ private:
     SignalTriggerMap (
       unsigned long s,
       iAwsSink *sk,
-    	unsigned long t,
+      unsigned long t,
       unsigned long r)
     : signal (s), trigger (t), sink (sk), refs (r)
     { };

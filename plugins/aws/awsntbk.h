@@ -42,7 +42,7 @@ protected:
   /// Does this bottom reside on the top of the notebook or below.
   bool is_top;
 
-  /// Caption
+  /// Caption.
   iString *caption;
 
   /// Is the mouse currently held doen?
@@ -270,7 +270,7 @@ protected:
   /// Holds the texture handle for the background.
   iTextureHandle *tex;
 
-  /// Caption we show in the tab button
+  /// Caption we show in the tab button.
   iString *caption;
   iString *icon;
   int iconalign;
@@ -280,10 +280,10 @@ public:
 
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
-  /// Gets properties.
+  /// Get properties.
   bool GetProperty (const char *name, void **parm);
 
-  /// Sets properties.
+  /// Set properties.
   bool SetProperty (const char *name, void *parm);
 
   /// Returns the named TYPE of the component, like "Notebook Page", etc.
@@ -335,7 +335,7 @@ public:
   static const int nbBreak; // Button are broken onto next line to be visible.
   static const int nbSlide; // Add slider to make outside buttons visible.
 
-  /// Frame styles
+  /// Frame styles.
   static const int fsBump;
   static const int fsSimple;
   static const int fsRaised;
@@ -345,10 +345,10 @@ public:
 
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
-  /// Gets properties.
+  /// Get properties.
   bool GetProperty (const char *name, void **parm);
 
-  /// Sets properties.
+  /// Set properties.
   bool SetProperty (const char *name, void *parm);
 
   /// Returns the named TYPE of the component, like "Notebook Page", etc.

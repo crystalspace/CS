@@ -51,7 +51,7 @@ public:
   awsStatusBar ();
   virtual ~awsStatusBar();
 
-  // Frame Styles.
+  /// Frame Styles.
 
   /// A frame that's a bump.
   static const int fsBump;
@@ -68,7 +68,7 @@ public:
   /// A frame that looks flat.
   static const int fsFlat;
 
-  /// no frame at all.
+  /// No frame at all.
   static const int fsNone;
 
   /// An up and down motion for the button.

@@ -165,7 +165,7 @@ public:
   /// Should draw no border.
   static const int foNoBorder;
 
-  /// window cannot be dragged.
+  /// Window cannot be dragged.
   static const int foNoDrag;
 
   /// Should return false in the OnMouseMove event.
@@ -179,7 +179,7 @@ public:
   /// Constructs window class, clear some variables to defaults.
   awsWindow ();
 
-  /// Destructor
+  /// Destructor.
   virtual ~awsWindow ();
 
   /**
@@ -241,10 +241,10 @@ public:
 class awsWindowFactory : public awsComponentFactory
 {
 public:
-	awsWindowFactory (iAws *wmgr);
-	~awsWindowFactory ();
+  awsWindowFactory (iAws *wmgr);
+  ~awsWindowFactory ();
 
-	iAwsComponent* Create ();
+  iAwsComponent* Create ();
 };
 
 #endif // __CS_AWS_WIN_H__

@@ -52,7 +52,7 @@ private:
   /// Button for down or right.
   awsSliderButton *incVal;
 
-  /// the knob.
+  /// The knob.
   awsSliderButton *knob;
 
   /// timer.
@@ -108,7 +108,7 @@ public:
   /// The value of the scroll bar changed.
   static const int signalChanged;
 
-  /// The component becomes focused
+  /// The component becomes focused.
   static const int signalFocused;
 
   /// Trigger called when inc button is clicked.

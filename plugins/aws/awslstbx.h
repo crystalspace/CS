@@ -92,7 +92,7 @@ struct awsListRow
   int GetHeight (iAwsPrefManager *pm, int colcount);
 
   /// Destroys a list row properly (but not it's children).
-  ~awsListRow();
+  ~awsListRow ();
 };
 
 /**
@@ -203,7 +203,7 @@ private:
   /// Flags for frame style.
   //int frame_style;
 
-  /// Alpha level for this component
+  /// Alpha level for this component.
   //int alpha_level;
 
   /// Alpha level for highlight bitmap.
@@ -275,8 +275,6 @@ private:
   /// Clears the entire list.
   static void ClearList (void *owner, iAwsParmList* parmlist);
 
-  // Static member helper functions
-
   /**
    * Counts the number of visible items recursively, given the starting vector.
    */
@@ -327,15 +325,11 @@ public:
   awsListBox ();
   virtual ~awsListBox ();
 
-  // Control Types
-
   /// A multi-column list.
   static const int ctList;
 
   /// A multi-column tree.
   static const int ctTree;
-
-  // Signals
 
   /// An item was selected.
   static const int signalSelected;
@@ -352,10 +346,10 @@ public:
   /// Get's the texture handle and the title, plus style if there is one.
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
-  /// Gets properties.
+  /// Get properties.
   bool GetProperty (const char *name, void **parm);
 
-  /// Sets properties.
+  /// Set properties.
   bool SetProperty (const char *name, void *parm);
 
   /// Executes some actions.
