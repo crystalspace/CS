@@ -491,5 +491,4 @@ DllMain (HINSTANCE hinstDLL, DWORD fdwReason, LPVOID /*lpvReserved*/) \
 }
 
 #endif // !CS_STATIC_LINKED
-
 #endif // __CSOSDEFS_H__
