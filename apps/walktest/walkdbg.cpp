@@ -832,7 +832,8 @@ void DrawOctreeBoxes (int draw_level)
 #define PLANE_Y 1
 #define PLANE_Z 2
 
-csVector3 GetVector3 (int plane_nr, float plane_pos,
+#if 0
+static csVector3 GetVector3 (int plane_nr, float plane_pos,
 	const csVector2& p)
 {
   csVector3 v;
@@ -845,6 +846,7 @@ csVector3 GetVector3 (int plane_nr, float plane_pos,
   }
   return v;
 }
+#endif
 
 void CreateSolidThings (csEngine* engine, csSector* room,
 	csOctreeNode* node, int depth)

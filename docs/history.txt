@@ -33,6 +33,11 @@ The history order has been reversed so that new features are at the top.
 	      Windows 2000, he simply side-stepped the issue entirely by not
 	      performing any application clean-up.  This is _not_ an acceptable
 	      solution.
+	- Eric Sunshine reverted Philip Wyett's change to walkdbg.cpp.  The
+	  problem with this change was that Philip was addressing the symptom
+	  of the problem rather than the problem itself.  Additionally, his
+	  change added unnecessary pollution to the global name space.
+	  Instead, I (Eric) solved the problem in a more correct fashion.
 16-Apr-2001
 	- Added iEngine::CreateSectorWallsMesh().
 	- Fixed simplep (plugin version of simple) so that it works
