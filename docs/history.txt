@@ -37,6 +37,9 @@ chronological order.
 	- Eric Sunshine fixed render3d/opengl/gl_txtcache.cpp so that, when
 	  including glu.h, it respects the CS_GLU_PATH which is emitted by the
 	  CS configure script.
+	- Eric Sunshine fixed problem on MacOS/X following the cssys+csutil
+	  merge where .m and .mm source files were making their way into the
+	  OBJ.CSUTIL makefile variable, thus causing make-based builds to fail.
 16-Sep-2003
 	- Jorrit fixed the thing plugin so that it now actually registers
 	  leaving portals to the sector.
