@@ -918,7 +918,8 @@ class csPrintfFormatter
     bool sign;
     Tbase exp;
 
-    typename csPrintfFormatter<Twriter,Treader>::IEEEFloatMantissa<T, Tbase> mantissa;
+    typename_qualifier
+    csPrintfFormatter<Twriter,Treader>::IEEEFloatMantissa<T, Tbase> mantissa;
 
     IEEEFloatSplitter (const T& val, const int mantissaBits,
       const int expBits) 
