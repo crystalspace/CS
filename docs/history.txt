@@ -29,6 +29,9 @@ The history order has been reversed so that new features are at the top.
 	  triggered by cfgmgr.cpp.  The problem is that the compiler creates
 	  unlinkable code when an inline method invokes a second inline method
 	  which the compiler has not yet seen.
+	- Eric Sunshine added an ugly (and hopefully temporary) OpenStep/Sparc
+	  hack to pol2d.cpp to work around "local relocation entries in
+	  non-writable section" linkage errors.
 17-Feb-2001
 	- Eric Sunshine defined the missing DESCRIPTION.OS.beos variable in
 	  lib/cssys/beos/beos.mak.

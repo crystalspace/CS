@@ -36,9 +36,21 @@
 #include "itexture.h"
 #include "itxtmgr.h"
 
+// An ugly hack to avoid "local relocation entries in non-writable section"
+// linkage error on OpenStep/HPPA/Sparc when csEngine library is linked into
+// a plug-in.  @@@FIXME: Work around this in a cleaner way in the future.
+#if !defined(OS_NEXT) || (!defined(PROC_SPARC) && !defined(PROC_HPPA))
+#  define CS_LOCAL_STATIC(X,Y) static X Y
+#else
+#  define CS_LOCAL_STATIC(X,Y) \
+     static X* Y##__ = 0; \
+     if (Y##__ == 0) Y##__ = new X; \
+     X& Y = *Y##__
+#endif
+
 csPolygon2DFactory* csPolygon2DFactory::SharedFactory()
 {
-  static csPolygon2DFactory p;
+  CS_LOCAL_STATIC(csPolygon2DFactory,p);
   return &p;
 }
 
@@ -420,7 +432,7 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
       }
     }
 
-    static G3DPolygonDPFX g3dpolyfx;
+    CS_LOCAL_STATIC(G3DPolygonDPFX,g3dpolyfx);
 
     csPolyTexNone *ns = poly->GetNoTexInfo ();
     csPolyTexFlat *fs = poly->GetFlatInfo ();
@@ -487,7 +499,7 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
   }
   else
   {
-    static G3DPolygonDP g3dpoly;
+    CS_LOCAL_STATIC(G3DPolygonDP,g3dpoly);
 
     g3dpoly.num = num_vertices;
     if (poly->GetMaterialWrapper ())
@@ -565,7 +577,7 @@ void csPolygon2D::FillZBuf (csRenderView* rview, csPolygon3D* poly,
 {
   rview->GetG3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_FILLONLY);
 
-  static G3DPolygonDP g3dpoly;
+  CS_LOCAL_STATIC(G3DPolygonDP,g3dpoly);
   g3dpoly.num = num_vertices;
   g3dpoly.inv_aspect = rview->GetInvFOV ();
 
@@ -601,7 +613,7 @@ void csPolygon2D::AddFogPolygon (iGraphics3D* g3d, csPolygon3D* /*poly*/,
 {
   int i;
 
-  static G3DPolygonDFP g3dpoly;
+  CS_LOCAL_STATIC(G3DPolygonDFP,g3dpoly);
   memset(&g3dpoly, 0, sizeof(g3dpoly));
   g3dpoly.num = num_vertices;
   g3dpoly.inv_aspect = csEngine::current_engine->current_camera->GetInvFOV ();
