@@ -1,5 +1,7 @@
 The history order has been reversed so that new features are at the top.
 
+11-Mar-2001
+	- Eric Sunshine fixed some Texinfo mark-up problems in win32.txi.
 10-Mar-2001
 	- Cleaned up layout in DDG loader and also made a small fix
 	  in csTerrainWrapper constructor declaration.

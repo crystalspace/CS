@@ -110,20 +110,21 @@ the compilation instructions on how to remove the projects.
 @subsubsection Special Notes for @sc{msvc} 5
 
 Building Crystal Space with Microsoft Visual C++ Version 5 (@sc{msvc}) is not
-strictly supported or recommended by the Crystal Space team. If you however wish
-to try it anyway, you should read the following carefully:
+strictly supported or recommended by the Crystal Space team.  If you however
+wish to try it anyway, you should read the following carefully:
 
 @itemize @bullet
 @item
-MSVC 5 doesn't include any supported DirectX Software Development
-Kit (@sc{sdk}), so you'll have to download it. We recommend the DirectX 8a SDK for
-release 0.18 or above. It can be downloaded from:
+@sc{msvc} 5 does not include any supported DirectX Software Development Kit
+(@sc{sdk}), so you'll have to download it.  We recommend the DirectX 8a
+@sc{sdk} for release 0.18 or above.  It can be downloaded from:
 
 @uref{http://www.msdn.microsoft.com/}
 
-If you unable to accomplish the 100Mb plus download of the DirectX 8a SDK from
-the link above. You can obtain cut down older versions (6 & 7 with no documents or
-example code) of the DirectX SDK's from the following website:
+If you are unable to accomplish the 100+@sc{mb} download of the DirectX 8a
+@sc{sdk} from the link above.  You can obtain cut down older versions (6 & 7
+with no documents or example code) of the DirectX @sc{sdk}'s from the following
+website:
 
 @uref{http://www.multimania.com/noote/CrystalSpace}
 
