@@ -25,13 +25,9 @@ not too distant future I expect that this situation will change.
 * Sprite Actions::
 * The Sprite Action Interface::
 * Moving On::
-* Canned Sequences::
-* iSkeletonBone::
 @end menu
 
 @importss{plugins,anim,intro.txi}
 @importss{plugins,anim,action.txi}
 @importss{plugins,anim,actionpi.txi}
 @importss{plugins,anim,skeleton.txi}
-@importss{plugins,anim,motion.txi}
-@importss{plugins,anim,skelbone.txi}

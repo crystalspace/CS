@@ -5,6 +5,7 @@ Copyright @copyright{} 1998, 1999, 2000 by Andrew Zabolotny@*
 Copyright @copyright{} 1999, 2000, 2001 by Eric Sunshine@*
 Copyright @copyright{} 1999, 2000 by Thomas Hieber@*
 Copyright @copyright{} 1999, 2000 by Seth Galbraith@*
+Copyright @copyright{} 2001 by Michael Voase@*
 Copyright @copyright{} 2000 by Samuel Humphreys@*
 Copyright @copyright{} 2000 by Martin Geisse@*
 Copyright @copyright{} 1999 by Alex Pfaffe@*
