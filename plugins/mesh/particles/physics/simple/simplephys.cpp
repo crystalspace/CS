@@ -154,6 +154,7 @@ bool csParticlesPhysicsSimple::HandleEvent (iEvent &event)
 void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
   particles_object *part)
 {
+  int i;
   float emit_time = part->particles->GetEmitTime ();
   if (part->total_elapsed_time < emit_time)
   {
@@ -170,7 +171,7 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
       oldlen << 1 : (int)part->new_particles << 1;
     part->data.SetLength (newlen);
     part->dead_particles += part->data.Length() - oldlen;
-    for(int i=oldlen;i<part->data.Length ();i++) {
+    for(i=oldlen;i<part->data.Length ();i++) {
       csParticlesData &p = part->data.Get (i);
       p.sort = -FLT_MAX;
       p.color.w = 0.0f;
@@ -185,7 +186,6 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
     part->dead_particles -= oldlen - part->data.Length();
   }
 
-  int i;
   int dead_offset = part->data.Length() - part->dead_particles;
 
   csVector3 emitter;
@@ -236,7 +236,7 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
   float elapsed_time = 0.0f;
 
   float force_range = part->particles->GetForceRange ();
-  for (int i=0;i<dead_offset;i++)
+  for (i=0;i<dead_offset;i++)
   {
     if(elapsed_time < true_elapsed_time - time_increment)
     {

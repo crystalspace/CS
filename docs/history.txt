@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+1-Feb-2004
+	- Eric Sunshine applied a couple small patches from Randall Foreman
+	  <eidpers@comcast.net> for Borland C++Builder which fix re-declaration
+	  of loop variable in 'for', and which ensures that "Press a key to
+	  close this window" is flushed to console window.
 30-Jan-2004
 	- res augmented csThing::InitializeDefault() to unprepare the thing
 	  when the 'clear' flag is set.

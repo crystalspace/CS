@@ -529,7 +529,8 @@ void Win32Assistant::Shutdown()
     q->RemoveListener(this);
   if (!is_console_app && (cmdline_help_wanted || console_window))
   {
-    fprintf (stdout, "\nPress a key to close this window...");
+    printf ("\nPress a key to close this window...");
+    fflush (stdout);
     HANDLE hConsole = GetStdHandle (STD_INPUT_HANDLE);
     INPUT_RECORD ir;
     DWORD events_read;
