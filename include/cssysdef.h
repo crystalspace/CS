@@ -545,7 +545,6 @@ void Class ## _ ## getterFunc ## _kill ()                                   \
 }                                                                           \
 Type* Class::getterFunc ()                                                  \
 {                                                                           \
-  static Type *var=0;                                                       \
   if (!var)                                                                 \
   {                                                                         \
     var = new Type (initParam);                                             \
@@ -568,7 +567,6 @@ void Class ## _ ## getterFunc ## _kill ()                                   \
 }                                                                           \
 Type &Class::getterFunc ()                                                  \
 {                                                                           \
-  static Type *var=0;                                                       \
   if (!var)                                                                 \
   {                                                                         \
     var = new Type (initParam);                                             \
