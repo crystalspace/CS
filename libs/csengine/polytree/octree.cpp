@@ -1135,6 +1135,7 @@ static int total_total_solid_opt;
 // For statistics, number of times a node is culled.
 static int total_cull_node;
 static int total_total_cull_node;
+static int count_leaves;
 
 void csOctree::InsertShadowIntoCBuffer (csPoly2D& result_poly,
 	csCBuffer* cbuffer, const csVector2& scale, const csVector2& shift)
@@ -1148,7 +1149,9 @@ void csOctree::InsertShadowIntoCBuffer (csPoly2D& result_poly,
     v.x *= scale.x;
     v.y *= scale.y;
   }
+  result_poly.UpdateBoundingBox ();
   // Then clip to cbuffer dimensions.
+  //@@@ SCALE IS MORE EFFICIENT?
   result_poly.MakeRoom (MAX_OUTPUT_VERTICES);
   int num_verts = result_poly.GetNumVertices ();
   if (box_clipper->Clip (result_poly.GetVertices (), num_verts,
@@ -1492,6 +1495,7 @@ void csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
   else if (!leaf->GetPVS ().FindNode (occludee))
   {
     // Node is not in PVS so it isn't visible.
+    return;
   }
   else if (occludee->GetBox ().In (leaf->GetCenter ()))
     visible = true;
@@ -1583,6 +1587,8 @@ void csOctree::BuildPVS (csThing* thing,
     // extra smaller octree leafs so that our granularity
     // for the PVS is better. Those octree leafs are ignored
     // by the normal polygon/node traversal process.
+    printf ("%d:", count_leaves); fflush (stdout);
+    count_leaves++;
     total_cull_node = 0;
     total_solid_opt = 0;
     BuildPVSForLeaf ((csOctreeNode*)root, thing, node);
@@ -1629,6 +1635,7 @@ void csOctree::BuildPVS (csThing* thing)
   CsPrintf (MSG_INITIALIZATION, "  Pass 1...\n");
   total_total_cull_node = 0;
   total_total_solid_opt = 0;
+  count_leaves = 0;
   BuildPVS (thing, (csOctreeNode*)root);
   printf ("\nTotal culled nodes=%d, total opt=%d\n", total_total_cull_node,
   	total_total_solid_opt);
@@ -1642,6 +1649,7 @@ void csOctree::BuildPVS (csThing* thing)
   CsPrintf (MSG_INITIALIZATION, "  Pass 2...\n");
   total_total_cull_node = 0;
   total_total_solid_opt = 0;
+  count_leaves = 0;
   BuildPVS (thing, (csOctreeNode*)root);
   printf ("\nTotal culled nodes=%d, total opt=%d\n", total_total_cull_node,
   	total_total_solid_opt);
