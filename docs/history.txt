@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-Apr-2004
+	- Aren Blondahl updated map2cs to have newly optimized render priority 
+	  on entities ('priority' tag in the .map) and fixed map2cs to support 
+	  new alpha flag under <mixmode> instead of under each polygon. ('alpha'
+	  tag in the .map)
+
 16-Apr-2004
 	- Jorrit fixed a crash at exit for genmesh with NR.
 	- Eric Sunshine fixed bug in Jam build system where msvcgen target

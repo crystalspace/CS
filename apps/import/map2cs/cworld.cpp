@@ -981,13 +981,15 @@ bool CCSWorld::WritePolygon(csRef<iDocumentNode> node, CMapPolygon* pPolygon,
       //if the polygon is not supposed to be lighted...
       CreateNode (poly, "lighting", "no");
     }
-
-    if (Alpha < 100)
+    
+    //Not supported anymore
+    /*if (Alpha < 100)
     {
       CreateNode (poly, "alpha", (float)Alpha);
     }
+    */
 
-    if (Mirror || Alpha<100 || !Solid)
+    if (Mirror || !Solid)
     {
       //We have a special case, where we need to turn this polygon into a portal.
       const char* targetsector =

@@ -63,6 +63,13 @@ bool CCSThing::Write(csRef<iDocumentNode> node, CIWorld* pIWorld, CISector* pISe
 
   bool Sky;
   WriteAsPart(params, pWorld, pSector, Sky);
+  
+  // New Alpha
+  double a = m_pOriginalEntity->GetNumValueOfKey("alpha", -1.00);
+  if (a != -1.00) {
+    DocNode mixmode = CreateNode (params, "mixmode");
+    DocNode alpha = CreateNode (mixmode, "alpha", (float)a);
+  }
 
   DocNode priority = meshobj->CreateNodeBefore (CS_NODE_ELEMENT,
     params);
@@ -72,8 +79,19 @@ bool CCSThing::Write(csRef<iDocumentNode> node, CIWorld* pIWorld, CISector* pISe
   if (IsSky())
     priority->SetValue ("sky");
   else
-    priority->SetValue (m_pOriginalEntity->GetValueOfKey("priority", 
-      m_pOriginalEntity->GetValueOfKey("mirror")?"mirror":"object"));
+  {
+    const char*  prior;
+    prior = m_pOriginalEntity->GetValueOfKey("priority", "");
+    if (strcmp(prior, "alpha")==0)
+      priority->SetValue("alpha");
+    else if (strcmp(prior, "mirror")==0)
+      priority->SetValue("mirror");
+    else
+      priority->SetValue("object");
+
+    //priority->SetValue (m_pOriginalEntity->GetValueOfKey("priority", 
+    //  m_pOriginalEntity->GetValueOfKey("mirror")?"mirror":"object"));
+  }
 
   return true;
 }
