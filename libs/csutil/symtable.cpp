@@ -27,11 +27,10 @@ csSymbolTable::csSymbolTable (const csSymbolTable &other, int size)
   while (iter.HasNext ())
   {
     Stack *s = (Stack *) iter.NextConst ();
-    int i;
     if (s->Vals[0].Owner == & other)
     {
       Hash.Put (s->Name,
-        (csHashObject) new Stack (s->Name, s->Vals[i].Val, this));
+        (csHashObject) new Stack (s->Name, s->Vals[0].Val, this));
       return;
     }
   }
@@ -69,8 +68,12 @@ void csSymbolTable::AddChild (csSymbolTable *child)
   {
     Stack *src = (Stack *) i.Next ();
     Stack *dst = (Stack *) child->Hash.Get (src->Name);
-    if (! dst) child->Hash.Put (src->Name,
-      (csHashObject) new Stack (src->Name, src->Vals));
+    if (dst)
+      for (int i = 0; i < src->Vals.Length (); i++)
+        dst->Vals.Push (Stack::Symbol (src->Vals[i]));
+    else
+      child->Hash.Put (src->Name,
+        (csHashObject) new Stack (src->Name, src->Vals));
   }
 }
 
@@ -85,11 +88,14 @@ void csSymbolTable::Propagate (const Stack *stack)
   for (int i = 0; i < Children.Length (); i++)
   {
     Stack *child = (Stack *) Children[i]->Hash.Get (stack->Name);
+    if (child)
+    {
+      if (child->Vals[0].Owner == Children[i]) child->Vals.Truncate (1);
+      else child->Vals.Empty ();
+    }
+    else Children[i]->Hash.Put (stack->Name, child = new Stack (stack->Name));
 
-    if (child->Vals[0].Owner == Children[i]) child->Vals.Truncate (1);
-    else child->Vals.Empty ();
     child->Vals.SetCapacity (child->Vals.Length () + stack->Vals.Length ());
-
     for (int j = 0; j < stack->Vals.Length (); j++)
       child->Vals.Push (stack->Vals[j]);
 
@@ -106,16 +112,13 @@ void csSymbolTable::SetSymbol (csStringID name, csShaderVariable *value)
       s->Vals[0].Val = value;
     else
       s->Vals.Insert (0, Stack::Symbol (value, this));
-
-    Propagate (s);
   }
   else
   {
     s = new Stack (name, value, this);
     Hash.Put (name, s);
-
-    Propagate (s);
   }
+  Propagate (s);
 }
 
 void csSymbolTable::SetSymbols (const csArray<csStringID> &names,
