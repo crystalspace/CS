@@ -61,6 +61,7 @@ bool csSimpleInput::Initialize (iSystem *iSys)
 {
   // It is not needed to call System->CallOnEvents since application
   // will usually pass events to us directly
+  (void)iSys;
 
   return true;
 }
@@ -177,7 +178,7 @@ void csSimpleInput::Bind (iConsole *iCon)
   Refresh ();
 }
 
-const char *csSimpleInput::GetText (int iLine = -1) const
+const char *csSimpleInput::GetText (int iLine) const
 {
   return ((iLine >= -1) && (iLine < History.Length ())) ?
          History.Get (iLine == -1 ? History.Length () - 1 : iLine) : NULL;
