@@ -694,7 +694,10 @@ int converter::data_read ( void ) {
 /* 
   Open the file. 
 */
-  if ( leqi ( filein_type, "3DS" ) == TRUE ) {
+  if ( (leqi ( filein_type, "3DS" ) == TRUE ) ||
+       (leqi ( filein_type, "MD2" ) == TRUE ) ||
+       (leqi ( filein_type, "MDL" ) == TRUE ) )
+  {
     filein = fopen ( filein_name, "rb" );
   }
   else {
