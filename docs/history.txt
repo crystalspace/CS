@@ -92,6 +92,10 @@ The history order is reversed so that new features are at the top.
 	  renderer. The setting was not correctly processed.
 	- Eric Sunshine eliminated a compilation warning in walkcmd.cpp
 	  regarding "computed value not used."
+	- Eric Sunshine re-introduced some extra searching-logic into
+	  csFindLoadLibrary in NeXTDynamicLibrary.cpp so that scfreg can once
+	  again find plugin modules which are stored in the "components"
+	  subdirectory of the current directory.
 10-Jun-2001
 	- Norman Kramer did the following:
 	    - Blocks now decrefs its queried soundwrapper, releases/stops the

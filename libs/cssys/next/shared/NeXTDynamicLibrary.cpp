@@ -27,6 +27,12 @@
 //-----------------------------------------------------------------------------
 csLibraryHandle csFindLoadLibrary( char const* name )
     {
+    static bool initialized = false;
+    if (!initialized)
+	{
+	initialized = true;
+        csAddLibraryPath( OS_NEXT_PLUGIN_DIR );
+	}
     return csFindLoadLibrary( 0, name, OS_NEXT_PLUGIN_EXT );
     }
 
