@@ -1,6 +1,7 @@
 The history order is reversed so that new features are at the top.
 
 16-Feb-2003
+	- Philipp Aumayr optimized font drawing code to use vertex arrays
 	- Philipp Aumayr extended gmeshldr to support general streams
 	  for new Renderer.
 15-Feb-2003
