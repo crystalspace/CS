@@ -40,6 +40,11 @@ class ctQuatRigidBodyConnector : public ctPointObj {
   ctVector3 vel();
 
   void apply_force(ctVector3 F);
+
+  int num_state_vars();
+  int state_index(int i);
+  ctVector3 dp(int i);
+  ctVector3 dpdot(int i);
 };
 
 #endif // QUATRIGIDBODYCONNECTOR_H
