@@ -47,6 +47,9 @@ The history order is reversed so that new features are at the top.
 	  pseudo-dynamic so that removing it works correctly.
 	- Eric Sunshine augmented the Jam system so that it now builds the
 	  new renderer if --enable-new-renderer was specified with configure.
+	- Matze fixed broken install_maps target in jam. And added a TODO.
+	- Jorrit fixed thing so that removing a pseudo-dynamic light actually
+	  works.
 	- Matze fixed broken install_maps target in jam. And added a TODO
 	- Gregory Block added support for OS X's NSUserDefaults system to
 	  replace user.cfg with the standard user preferences system on OS X.

@@ -107,7 +107,22 @@ void csLightMap::SetLightCellSize (int size)
 
 void csLightMap::DelShadowMap (csShadowMap *smap)
 {
-  first_smap = smap->next;
+  if (smap == first_smap)
+  {
+    first_smap = smap->next;
+  }
+  else
+  {
+    csShadowMap* map = first_smap;
+    while (map && map->next != smap)
+    {
+      map = map->next;
+    }
+    if (map)
+    {
+      map->next = smap->next;
+    }
+  }
   delete smap;
 }
 

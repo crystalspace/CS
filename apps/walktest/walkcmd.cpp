@@ -2200,7 +2200,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     else
     {
       light = Sys->view->GetEngine ()->CreateLight ("deflight",
-        pos, 6, csColor (1, 1, 1), true);
+        pos, 12, csColor (0, 0, 1), true);
     }
     iLightList* ll = Sys->view->GetCamera ()->GetSector ()->GetLights ();
     ll->Add (light->QueryLight ());

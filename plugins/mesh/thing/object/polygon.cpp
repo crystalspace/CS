@@ -38,6 +38,7 @@
 #include "iengine/texture.h"
 #include "iengine/material.h"
 #include "iengine/dynlight.h"
+#include "iengine/statlght.h"
 #include "iengine/shadows.h"
 #include "iengine/movable.h"
 #include "ivideo/texture.h"
@@ -1207,6 +1208,13 @@ void csPolygon3D::DynamicLightDisconnect (iDynLight* dynlight)
 
 void csPolygon3D::StaticLightDisconnect (iStatLight* statlight)
 {
+  if (!txt_info) return;
+  csLightMap* lm = (csLightMap*)(txt_info->GetLightMap ());
+  if (!lm) return;
+  csShadowMap* sm = lm->FindShadowMap (statlight->QueryLight ());
+  if (!sm) return;
+  lm->DelShadowMap (sm);
+  txt_info->light_version--;
 }
 
 void csPolygon3D::UnlinkLightpatch (csLightPatch *lp)

@@ -180,9 +180,8 @@ public:
   csShadowMap* FindShadowMap (iLight* light);
 
   /**
-   * Delete a ShadowMap. NOTE!!! This function only works
-   * if the ShadowMap was the LAST CREATED for this LightMap!!!
-   * It is ment for dynamic lights that do not reach the polygon
+   * Delete a ShadowMap.
+   * It is ment for pseudo-dynamic lights that do not reach the polygon
    * but this can only be seen after trying.
    */
   void DelShadowMap (csShadowMap* plm);
