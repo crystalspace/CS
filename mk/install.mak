@@ -276,9 +276,8 @@ install_all: \
 	@echo $"$"
 	@echo $"Calculating Lightmaps...$"
 	@echo $"------------------------$"
-	CRYSTAL=$"$(INSTALL_DIR)$" && \
-	    $(INSTALL_DIR)/bin/cslight -video=null flarge ; \
-	    $(INSTALL_DIR)/bin/cslight -video=null partsys
+	CRYSTAL=$"$(INSTALL_DIR)$" $(INSTALL_DIR)/bin/cslight -video=null flarge ; \
+	CRASTAL=$"$(INSTALL_DIR)$" $(INSTALL_DIR)/bin/cslight -video=null partsys
 	@echo $"$"
 	@echo $"Installation complete$"
 	@echo $"---------------------$"
