@@ -23,6 +23,10 @@ chronological order.
 	  simpler to perform searches in csArrays in cases when the element and
 	  keys can be compared via standard comparison semantics (such as when
 	  their types are the same, though type equivalence is not required).
+	- Eric Sunshine added an invocation of AC_REQUIRE([CS_CHECK_PTHREAD])
+	  to the Cg check in configure.ac to ensure that the pthread cflags,
+	  lflags, and libs variables are available since the Cg check now
+	  utilizes those variables.
 1-Apr-2004
 	- Eric Sunshine fixed include/Jamfile so that it installs Swig (*.i)
 	  files.  These are needed by CEL, for instance.
