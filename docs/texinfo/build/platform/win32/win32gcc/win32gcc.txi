@@ -19,12 +19,12 @@ Download the following packages:
 
 @itemize @bullet
 @item
-Crystal Space MingW package @file{cs_mingw_0.40.exe} from the Mingw32 support
+Crystal Space MingW package @file{cs_mingw_0.50.exe} from the Mingw32 support
 directory at Linux Games.  This package contains all the recent MingW package
 releases (i.e. all the files necessary to compile Crystal Space successfully).
 
 @noindent
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/mingw32/cs_mingw_0.40.exe}
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/mingw32/cs_mingw_0.50.exe}
 
 @item
 @sc{nasm} (Netwide Assembler) for Windows @samp{nasm-0.98e-bin-w32.zip}
@@ -70,8 +70,8 @@ You must also add the following variables, so that @sc{gcc} can find the Python
 header files.
 
 @example
-SET PYTHON_INC=C:\mingw32\include
-SET PYTHONPATH=C:\mingw32\lib
+SET PYTHON_INC=C:\mingw32\include\python1.5
+SET PYTHONPATH=C:\mingw32\lib\python1.5
 @end example
 
 @noindent
