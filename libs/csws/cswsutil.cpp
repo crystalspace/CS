@@ -1099,7 +1099,7 @@ csWindow *csColorDialog (csComponent *iParent, char *iTitle, int iColor)
 #define ADD_SLIDER(wid,y)						\
   {									\
     int sby = y + 4;							\
-    sb = new csScrollBar (d, cssfsThinRect);			\
+    sb = new csScrollBar (d, cssfsThinRect);				\
     sb->id = wid;							\
     sb->SetRect (sbx + 10, sby,						\
       sbx + 10 + 128 + CSSB_DEFAULTSIZE * 2, sby + CSSB_DEFAULTSIZE);	\
@@ -1113,12 +1113,12 @@ csWindow *csColorDialog (csComponent *iParent, char *iTitle, int iColor)
     sbs.pagestep = 10;							\
     sb->SendCommand (cscmdScrollBarSet, &sbs);				\
 									\
-    st = new csStatic (d, NULL, "@@@");				\
+    st = new csStatic (d, NULL, "@@@");					\
     st->SetPos (sb->bound.xmax + 4,					\
      sby + (sb->bound.Height () - st->bound.Height ()) / 2);		\
     st->id = wid##_NUM;							\
 									\
-    st = new csStatic (d, sb, "@");				\
+    st = new csStatic (d, sb, "@");					\
     st->SetPos (sb->bound.xmin - 10,					\
      sby + (sb->bound.Height () - st->bound.Height ()) / 2);		\
     st->id = wid##_LABEL;						\

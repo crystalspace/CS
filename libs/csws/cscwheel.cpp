@@ -36,7 +36,7 @@ csColorWheel::csColorWheel (csComponent *iParent) : csStatic (iParent, csscsBitm
     // If color wheel image is not loaded, load it
     if (!cwspr)
       cwspr = new csPixmap (app->GetTexture (
-        COLORWHEEL_TEXTURE_NAME), 0, 0, 129, 129);
+        COLORWHEEL_TEXTURE_NAME), 0, 0, 128, 128);
   } /* endif */
   Bitmap = cwspr;
   SetSuggestedSize (0, 0);
@@ -65,8 +65,8 @@ bool csColorWheel::HandleEvent (iEvent &Event)
           app->CaptureMouse (this);
           trackmouse = true;
         }
-        int xc = bound.Width () / 2;
-        int yc = bound.Height () / 2;
+        float xc = bound.Width () / 2.0;
+        float yc = bound.Height () / 2.0;
         float ns = sqrt (fSquare (Event.Mouse.x - xc) + fSquare (Event.Mouse.y - yc)) / xc;
         if (ns > 1) ns = 1;
         float nh = atan2 (yc - Event.Mouse.y, Event.Mouse.x - xc) / (2 * M_PI);
@@ -98,10 +98,12 @@ void csColorWheel::SetHS (float iH, float iS)
 void csColorWheel::Draw ()
 {
   csStatic::Draw ();
-  int xc = bound.Width () / 2;
-  int yc = bound.Height () / 2;
+  float xc = bound.Width () / 2.0;
+  float yc = bound.Height () / 2.0;
   int x = int (xc * (1 + s * cos (h * 2 * M_PI)));
   int y = int (yc * (1 - s * sin (h * 2 * M_PI)));
+  if (x >= bound.Width ()) x = bound.Width () - 1;
+  if (y >= bound.Height ()) y = bound.Height () - 1;
   Line (x, 0, x, bound.Height (), CSPAL_STATIC_LIGHT3D);
   Line (0, y, bound.Width (), y, CSPAL_STATIC_LIGHT3D);
 }

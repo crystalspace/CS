@@ -96,6 +96,14 @@ void cspNotebookButton::Draw ()
 // Texture name with miscelaneous gadgets for notebook
 #define NOTEBOOK_TEXTURE_NAME	"csws::NoteBook"
 
+// Button definition IDs
+static char *NotebookButton [] =
+{
+  "NBARUP", "NBARDN", "NBARUPP", "NBARDNP",
+  "NBARLF", "NBARRT", "NBARLFP", "NBARRTP",
+  "NBNEXT", "NBPREV", "NBNEXTP", "NBPREVP"
+};
+
 // Skip a bit from the left/top margin when painting the firstmost tab
 #define TABPOS_SKIP		4
 
@@ -152,7 +160,12 @@ csNotebook::csNotebook (csComponent *iParent, int iStyle) : csComponent (iParent
     // Load images
     iTextureHandle *tex = app->GetTexture (NOTEBOOK_TEXTURE_NAME);
     for (int i = 0; i < 12; i++)
-      sprites [i] = new csPixmap (tex, i * 9, 0, 9, 9);
+    {
+      int tx,ty,tw,th;
+      FindCFGBitmap (app->System, *(app->dialogdefs), NotebookButton [i],
+        &tx, &ty, &tw, &th);
+      sprites [i] = new csPixmap (tex, tx, ty, tw, th);
+    }
   } /* endif */
 
   // Create the four buttons: two for subpage switching and two for tab scrolling

@@ -244,9 +244,9 @@ bool csComponent::SetFocused (csComponent *comp)
 
     if (!comp->GetState (CSS_VISIBLE))
       comp->SetState (CSS_VISIBLE, true);
+    focused = comp;
     if (GetState (CSS_FOCUSED))
       comp->SetState (CSS_FOCUSED, true);
-    focused = comp;
     csComponent *newdefault = GetDefault ();
     if (newdefault != olddefault)
     {
@@ -1444,7 +1444,10 @@ bool csComponent::HandleDragEvent (iEvent &Event, int BorderW, int BorderH)
 	if ((cursortype == 0) && (DragStyle & CS_DRAG_MOVEABLE))
           cursortype = CS_DRAG_ALL;
         if (cursortype)
+        {
           SetSizingCursor (cursortype);
+          return true;
+        }
       }
       break;
   } /* endswitch */
