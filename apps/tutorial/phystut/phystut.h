@@ -20,6 +20,7 @@
 #define __SIMPLE1_H__
 
 #include <stdarg.h>
+#include "csutil/ref.h"
 #include "csgeom/vector3.h"
 #include "csutil/csvector.h"
 
@@ -47,8 +48,8 @@ private:
   csRef<iGraphics3D> g3d;
   csRef<iKeyboardDriver> kbd;
   csRef<iVirtualClock> vc;
-  iSector* room;
   csRef<iView> view;
+  iSector* room;
 
   csRef<iDynamics> dyn;
   csRef<iDynamicSystem> dynSys;

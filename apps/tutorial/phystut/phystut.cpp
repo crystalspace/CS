@@ -62,14 +62,14 @@ CS_IMPLEMENT_APPLICATION
 // The global pointer to simple
 Simple *simple;
 
-Simple::Simple (iObjectRegistry* obj)
+Simple::Simple (iObjectRegistry* object_reg)
 {
-  object_reg = obj;
+  Simple::object_reg = object_reg;
 }
 
 Simple::~Simple ()
 {
-  dyn->RemoveSystem (dynSys);
+  if (dyn) dyn->RemoveSystem (dynSys);
 }
 
 void Simple::SetupFrame ()
@@ -164,8 +164,7 @@ bool Simple::HandleEvent (iEvent& ev)
   else if (ev.Type == csevKeyDown && ev.Key.Code == CSKEY_ESC)
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
-    if (q)
-      q->GetEventOutlet()->Broadcast (cscmdQuit);
+    if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
     return true;
   }
 
@@ -179,7 +178,6 @@ bool Simple::SimpleEventHandler (iEvent& ev)
 
 bool Simple::Initialize ()
 {
-
   if (!csInitializer::RequestPlugins (object_reg,
   	CS_REQUEST_VFS,
 	CS_REQUEST_SOFTWARE3D,
@@ -215,7 +213,7 @@ bool Simple::Initialize ()
 
   // The virtual clock.
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
-  if (!vc)
+  if (vc == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.phystut",
@@ -225,7 +223,7 @@ bool Simple::Initialize ()
 
   // Find the pointer to engine plugin
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
-  if (!engine)
+  if (engine == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.phystut",
@@ -234,7 +232,7 @@ bool Simple::Initialize ()
   }
 
   loader = CS_QUERY_REGISTRY (object_reg, iLoader);
-  if (!loader)
+  if (loader == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.phystut",
@@ -243,7 +241,7 @@ bool Simple::Initialize ()
   }
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-  if (!g3d)
+  if (g3d == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.phystut",
@@ -252,7 +250,7 @@ bool Simple::Initialize ()
   }
 
   kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
-  if (!kbd)
+  if (kbd == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.phystut",
@@ -292,8 +290,8 @@ bool Simple::Initialize ()
 
   room = engine->CreateSector ("room");
   csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iThingState> walls_state (SCF_QUERY_INTERFACE (walls->GetMeshObject (),
-  	iThingState));
+  csRef<iThingState> walls_state (
+  	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState));
   iPolygon3D* p;
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
@@ -365,9 +363,8 @@ bool Simple::Initialize ()
   engine->Prepare ();
 
   view = csPtr<iView> (new csView (engine, g3d));
-  iCamera *c = view->GetCamera ();
-  c->SetSector (room);
-  c->GetTransform ().SetOrigin (csVector3 (0, 0, -4.5));
+  view->GetCamera ()->SetSector (room);
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, -4.5));
   iGraphics2D* g2d = g3d->GetDriver2D ();
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
@@ -385,7 +382,7 @@ bool Simple::Initialize ()
 
   // Load the box mesh factory.
   boxFact = loader->LoadMeshObjectFactory ("/lib/std/sprite1");
-  if (!boxFact)
+  if (boxFact == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.phystut",
@@ -401,7 +398,7 @@ bool Simple::Initialize ()
   // Create the ball mesh factory.
   ballFact = engine->CreateMeshFactory("crystalspace.mesh.object.ball",
    "ballFact");
-  if (!ballFact)
+  if (ballFact == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.phystut",
@@ -412,7 +409,7 @@ bool Simple::Initialize ()
 
   // Create the dynamic system.
   dynSys = dyn->CreateSystem ();
-  if (!dynSys)
+  if (dynSys == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.phystut",
@@ -578,16 +575,13 @@ void Simple::Start ()
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-  iObjectRegistry *object_reg = csInitializer::CreateEnvironment (argc, argv);
-  if (!object_reg) return 0;
+  iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
 
   simple = new Simple (object_reg);
-
   if (simple->Initialize ())
     simple->Start ();
-
   delete simple;
-  csInitializer::DestroyApplication (object_reg);
 
+  csInitializer::DestroyApplication (object_reg);
   return 0;
 }
