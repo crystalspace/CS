@@ -163,7 +163,7 @@ PLUGINS.DYNAMIC += mesh/impexp/spr
 ifeq ($(3DS.AVAILABLE),yes)
 PLUGINS.DYNAMIC += mesh/impexp/3ds
 endif
-ifeq ($(HAS_CAL3D),yes)
+ifeq ($(CAL3D.AVAILABLE),yes)
 PLUGINS.DYNAMIC += mesh/sprcal3d/object
 PLUGINS.DYNAMIC += mesh/sprcal3d/persist
 endif

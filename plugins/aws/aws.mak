@@ -5,8 +5,8 @@ DESCRIPTION.aws = Alternate Windowing System plug-in
 DESCRIPTION.awsgen = Flex and Bison generated files (forcibly)
 DESCRIPTION.awsinst = Flex and Bison generated files
 
-ifneq (,$(FLEXBIN))
-ifneq (,$(BISONBIN))
+ifneq (,$(CMD.FLEX))
+ifneq (,$(CMD.BISON))
 AWS.CAN_GEN = yes
 endif
 endif
@@ -131,11 +131,11 @@ $(FLEX.SED):
 	echo $"/$(BUCK)Header:/d$">>$@
 
 $(AWS.DERIVED.DIR)/skinlex.cpp: $(SRCDIR)/$(DIR.AWS)/skinlex.ll $(FLEX.SED)
-	$(FLEXBIN) -L -t $(SRCDIR)/$(DIR.AWS)/skinlex.ll | \
+	$(CMD.FLEX) -L -t $(SRCDIR)/$(DIR.AWS)/skinlex.ll | \
 	$(SED) -f $(FLEX.SED) > $@
 
 $(AWS.DERIVED.DIR)/skinpars.cpp: $(SRCDIR)/$(DIR.AWS)/skinpars.yy
-	$(BISONBIN) --no-lines -d -p aws -o $@ $(<)
+	$(CMD.BISON) --no-lines -d -p aws -o $@ $(<)
 
 $(AWS.DERIVED.DIR)/skinpars.hpp: $(AWS.DERIVED.DIR)/skinpars.cpp
 	@if [ -f "$(SRCDIR)/$(DIR.AWS)/skinpars.cpp.hpp" ]; then \

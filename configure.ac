@@ -79,10 +79,6 @@ AC_DEFUN([_CS_BUILD_PROPERTY],
 #------------------------------------------------------------------------------
 AC_DEFUN([_CS_TRANSLATE_MAKE_TO_JAM],
     [m4_case([$1],
-	[FLEXBIN], [CMD.FLEX],
-	[BISONBIN], [CMD.BISON],
-	[SWIGBIN], [CMD.SWIG],
-	[NASM.BIN], [CMD.NASM],
 	[CFLAGS.SYSTEM], [COMPILER.CFLAGS],
 	[CFLAGS.SYSTEM.MANDATORY], [COMPILER.CFLAGS.MANDATORY],
 	[CXXFLAGS.SYSTEM], [COMPILER.C++FLAGS],
@@ -99,7 +95,6 @@ AC_DEFUN([_CS_TRANSLATE_MAKE_TO_JAM],
 	[LFLAGS.DLL.USE_SONAME], [PLUGIN.LFLAGS.USE_SONAME],
 	[LIBS.EXE], [COMPILER.LFLAGS],
 	[LIBS.SYSTEM], [COMPILER.LFLAGS],
-	[USE_XFREE86VM], [XFREE86VM.AVAILABLE],
 	[PROC], [TARGET.PROCESSOR],
 	[$1])])
 
@@ -201,13 +196,13 @@ AS_IF([test -n "$OBJCOPY"],
     [CS_BUILD_PROPERTY([OBJCOPY.AVAILABLE], [yes])
     CS_BUILD_PROPERTY([CMD.OBJCOPY], [$OBJCOPY])])
 
-AC_CHECK_PROGS([FLEXBIN], [flex])
-CS_BUILD_PROPERTY([FLEXBIN], [$FLEXBIN])
+AC_CHECK_PROGS([CMD.FLEX], [flex])
+CS_BUILD_PROPERTY([CMD.FLEX], [$CMD.FLEX])
 
-AC_CHECK_PROGS([BISONBIN], [bison])
-AS_IF([test -n "$BISONBIN"],
-    [CS_CHECK_PROG_VERSION([bison], [$BISONBIN -V], [1.35], [9.9],
-	[CS_BUILD_PROPERTY([BISONBIN], [$BISONBIN])])])
+AC_CHECK_PROGS([CMD.BISON], [bison])
+AS_IF([test -n "$CMD.BISON"],
+    [CS_CHECK_PROG_VERSION([bison], [$CMD.BISON -V], [1.35], [9.9],
+	[CS_BUILD_PROPERTY([CMD.BISON], [$CMD.BISON])])])
 
 AC_CHECK_PROGS([DOXYGEN], [doxygen])
 CS_BUILD_PROPERTY([CMD.DOXYGEN], [$DOXYGEN])
@@ -227,10 +222,10 @@ CS_BUILD_PROPERTY([CMD.MAKEINFO], [$MAKEINFO])
 AC_CHECK_PROGS([INSTALL], [install])
 CS_BUILD_PROPERTY([INSTALL], [$INSTALL])
 
-AC_CHECK_PROGS([SWIGBIN], [swig])
-AS_IF([test -n "$SWIGBIN"],
-    [CS_CHECK_PROG_VERSION([swig], [$SWIGBIN -version 2>&1], [1.3.14],
-	[9.9|.9], [CS_BUILD_PROPERTY([SWIGBIN], [$SWIGBIN])])])
+AC_CHECK_PROGS([CMD.SWIG], [swig])
+AS_IF([test -n "$CMD.SWIG"],
+    [CS_CHECK_PROG_VERSION([swig], [$CMD.SWIG -version 2>&1], [1.3.14],
+	[9.9|.9], [CS_BUILD_PROPERTY([CMD.SWIG], [$CMD.SWIG])])])
 
 AC_CHECK_PROGS([JAM], [jam])
 AC_CHECK_PROGS([MAKE], [gnumake gmake make])
@@ -309,7 +304,7 @@ AS_IF([test -n "$NASM"],
 	rm -f conftest.*])
     AS_IF([test $cs_cv_prog_nasm_ok = yes],
 	[CS_BUILD_PROPERTY([NASM.AVAILABLE], [yes])
-	CS_BUILD_PROPERTY([NASM.BIN], [$NASM])
+	CS_BUILD_PROPERTY([CMD.NASM], [$NASM])
 	CS_HEADER_PROPERTY([DO_NASM])])])
 
 
@@ -1154,7 +1149,7 @@ AS_IF([test "$no_x" != yes],
 	    #include <X11/Xatom.h>
 	    #include <X11/extensions/xf86vmode.h>]],
 	    [XF86VidModeLockModeSwitch(0, 0, 0)])], [], [],
-	[CS_BUILD_PROPERTY([USE_XFREE86VM], [yes])
+	[CS_BUILD_PROPERTY([XFREE86VM.AVAILABLE], [yes])
 	CS_JAMCONFIG_PROPERTY([XFREE86VM.CFLAGS], [AS_ESCAPE([$(X_CFLAGS)])])
 	CS_JAMCONFIG_PROPERTY([XFREE86VM.LFLAGS],
 	    [AS_ESCAPE([$(X_PRE_LIBS) $(X_LIBS) -lXxf86vm -lXext -lX11 dnl
@@ -1652,9 +1647,7 @@ AS_IF([test $cs_cv_libcal3d = yes],
 	    [CalCoreSkeleton* s = (CalCoreSkeleton*)0;
 	    s->calculateBoundingBoxes((CalCoreModel*)0);])],
 	[], [C++],
-	[CS_EMIT_BUILD_RESULT([cs_cv_libcal3d], [CAL3D])
-	    CS_MAKEFILE_PROPERTY([HAS_CAL3D], [yes])],
-	[], [],
+	[CS_EMIT_BUILD_RESULT([cs_cv_libcal3d], [CAL3D])], [], [],
 	[$cs_cv_libcal3d_cflags],
 	[$cs_cv_libcal3d_lflags],
 	[$cs_cv_libcal3d_libs])])

@@ -9,7 +9,7 @@ ifeq ($(MAKESECTION), rootdefines)
 
 PLUGINHELP += \
   $(NEWLINE)echo $"  make csperl5      Make the $(DESCRIPTION.csperl5)$"
-ifneq (,$(SWIGBIN))
+ifneq (,$(CMD.SWIG))
 PSEUDOHELP += \
   $(NEWLINE)echo $"  make swigperl5gen Make the $(DESCRIPTION.swigperl5gen)$" \
   $(NEWLINE)echo $"  make swigperl5inst$" \
@@ -31,7 +31,7 @@ csperl5clean:
 	$(MAKE_CLEAN)
 csperl5maintainerclean:
 	$(MAKE_CLEAN)
-ifneq (,$(SWIGBIN))
+ifneq (,$(CMD.SWIG))
 swigperl5gen:
 	$(MAKE_TARGET)
 swigperl5inst:
@@ -153,7 +153,7 @@ $(PERLXSI.C):
 $(PERLXSI.O): $(PERLXSI.C)
 	$(DO.COMPILE.C) $(PERL5.CFLAGS)
 
-ifeq (,$(SWIGBIN))
+ifeq (,$(CMD.SWIG))
 $(SWIG.PERL5.PM.IN): $(SWIG.PERL5.PM)
 	-$(RM) $(SWIG.PERL5.PM.IN)
 	$(CP) $(SWIG.PERL5.PM) $(SWIG.PERL5.PM.IN)
@@ -162,7 +162,7 @@ $(SWIG.PERL5.C.IN): $(SWIG.PERL5.C)
 	$(CP) $(SWIG.PERL5.C) $(SWIG.PERL5.C.IN)
 else
 $(SWIG.PERL5.PM.IN) $(SWIG.PERL5.C.IN): $(SWIG.I)
-	-$(SWIGBIN) -perl5 -c++ -shadow -const -Iinclude -I$(SRCDIR)/include \
+	-$(CMD.SWIG) -perl5 -c++ -shadow -const -Iinclude -I$(SRCDIR)/include \
 	-module $(SWIG.MOD) -o $(SWIG.PERL5.C.IN) $(SWIG.I)
 	$(SED) '/$(BUCK)Header:/d' < $(SWIG.PERL5.C.IN) > $(SWIG.PERL5.C.IN).sed
 	$(RM) $(SWIG.PERL5.C.IN)

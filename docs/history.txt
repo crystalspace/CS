@@ -39,6 +39,14 @@ chronological order.
 	- Eric Sunshine removed `caltocs' tutorial since the associated program
 	  was removed some time back.  Perhaps, in the future, someone might
 	  want to update this tutorial to explain use of sprcal3d plugin.
+	- Eric Sunshine renamed the following makefile variables to be
+	  consistent with their Jamfile counterparts:
+	    FLEXBIN       --> CMD.FLEX
+	    BISONBIX      --> CMD.BISON
+	    SWIGBIN       --> CMD.SWIG
+	    NASM.BIN      --> CMD.NASM
+	    USE_XFREE86VM --> XFREE86VM.AVAILABLE
+	    HAS_CAL3D     --> CAL3D.AVAILABLE
 3-Feb-2004
 	- Eric Sunshine fixed syntax error in aws.mak introduced yesterday
 	  which manifested when running 'msvcgen' targets.

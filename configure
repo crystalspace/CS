@@ -313,7 +313,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX DLLTOOL ac_ct_DLLTOOL DLLWRAP ac_ct_DLLWRAP WINDRES ac_ct_WINDRES OBJCOPY ac_ct_OBJCOPY FLEXBIN BISONBIN DOXYGEN TEXI2DVI DVIPS DVIPDF MAKEINFO INSTALL SWIGBIN JAM MAKE SET_MAKE RANLIB ac_ct_RANLIB CSLIBS_CONFIG ac_ct_CSLIBS_CONFIG NASM ac_ct_NASM MAKEDEP PERL PYTHON CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS EGREP FT2CONFIG ac_ct_FT2CONFIG SDLCONFIG ac_ct_SDLCONFIG PKGCONFIG ac_ct_PKGCONFIG CGC CXXCPP LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX DLLTOOL ac_ct_DLLTOOL DLLWRAP ac_ct_DLLWRAP WINDRES ac_ct_WINDRES OBJCOPY ac_ct_OBJCOPY CMD.FLEX CMD.BISON DOXYGEN TEXI2DVI DVIPS DVIPDF MAKEINFO INSTALL CMD.SWIG JAM MAKE SET_MAKE RANLIB ac_ct_RANLIB CSLIBS_CONFIG ac_ct_CSLIBS_CONFIG NASM ac_ct_NASM MAKEDEP PERL PYTHON CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS EGREP FT2CONFIG ac_ct_FT2CONFIG SDLCONFIG ac_ct_SDLCONFIG PKGCONFIG ac_ct_PKGCONFIG CGC CXXCPP LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -3232,11 +3232,11 @@ do
 set dummy $ac_prog; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_FLEXBIN+set}" = set; then
+if test "${ac_cv_prog_CMD.FLEX+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$FLEXBIN"; then
-  ac_cv_prog_FLEXBIN="$FLEXBIN" # Let the user override the test.
+  if test -n "$CMD.FLEX"; then
+  ac_cv_prog_CMD.FLEX="$CMD.FLEX" # Let the user override the test.
 else
 as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
 for as_dir in $PATH
@@ -3245,7 +3245,7 @@ do
   test -z "$as_dir" && as_dir=.
   for ac_exec_ext in '' $ac_executable_extensions; do
   if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_FLEXBIN="$ac_prog"
+    ac_cv_prog_CMD.FLEX="$ac_prog"
     echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -3254,21 +3254,21 @@ done
 
 fi
 fi
-FLEXBIN=$ac_cv_prog_FLEXBIN
-if test -n "$FLEXBIN"; then
-  echo "$as_me:$LINENO: result: $FLEXBIN" >&5
-echo "${ECHO_T}$FLEXBIN" >&6
+CMD.FLEX=$ac_cv_prog_CMD.FLEX
+if test -n "$CMD.FLEX"; then
+  echo "$as_me:$LINENO: result: $CMD.FLEX" >&5
+echo "${ECHO_T}$CMD.FLEX" >&6
 else
   echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
 fi
 
-  test -n "$FLEXBIN" && break
+  test -n "$CMD.FLEX" && break
 done
 
-cs_build_prop_val=`echo x$FLEXBIN | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+cs_build_prop_val=`echo x$CMD.FLEX | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
-  cs_makefile_text="${cs_makefile_text}FLEXBIN = $cs_build_prop_val
+  cs_makefile_text="${cs_makefile_text}CMD.FLEX = $cs_build_prop_val
 "
     cs_jamconfig_text="${cs_jamconfig_text}CMD.FLEX ?= \"$cs_build_prop_val\" ;
 "
@@ -3281,11 +3281,11 @@ do
 set dummy $ac_prog; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_BISONBIN+set}" = set; then
+if test "${ac_cv_prog_CMD.BISON+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$BISONBIN"; then
-  ac_cv_prog_BISONBIN="$BISONBIN" # Let the user override the test.
+  if test -n "$CMD.BISON"; then
+  ac_cv_prog_CMD.BISON="$CMD.BISON" # Let the user override the test.
 else
 as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
 for as_dir in $PATH
@@ -3294,7 +3294,7 @@ do
   test -z "$as_dir" && as_dir=.
   for ac_exec_ext in '' $ac_executable_extensions; do
   if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_BISONBIN="$ac_prog"
+    ac_cv_prog_CMD.BISON="$ac_prog"
     echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -3303,19 +3303,19 @@ done
 
 fi
 fi
-BISONBIN=$ac_cv_prog_BISONBIN
-if test -n "$BISONBIN"; then
-  echo "$as_me:$LINENO: result: $BISONBIN" >&5
-echo "${ECHO_T}$BISONBIN" >&6
+CMD.BISON=$ac_cv_prog_CMD.BISON
+if test -n "$CMD.BISON"; then
+  echo "$as_me:$LINENO: result: $CMD.BISON" >&5
+echo "${ECHO_T}$CMD.BISON" >&6
 else
   echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
 fi
 
-  test -n "$BISONBIN" && break
+  test -n "$CMD.BISON" && break
 done
 
-if test -n "$BISONBIN"; then
+if test -n "$CMD.BISON"; then
   echo "$as_me:$LINENO: checking if bison version >= 1.35" >&5
 echo $ECHO_N "checking if bison version >= 1.35... $ECHO_C" >&6
 if test "${cs_cv_prog_bison_version_ok_annotated+set}" = set; then
@@ -3330,7 +3330,7 @@ cs_prog_bison_min_suffix_done=
 
 
 
-test -z $cs_prog_bison_is_version && cs_prog_bison_is_version=`$BISONBIN -V | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
+test -z $cs_prog_bison_is_version && cs_prog_bison_is_version=`$CMD.BISON -V | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
 test -n "$cs_prog_bison_is_version" && test -z $cs_prog_bison_is_suffix_done  && { cs_prog_bison_is_suffix_done=yes ; cs_prog_bison_is_suffix= ; }
 
 
@@ -3367,9 +3367,9 @@ fi
 echo "$as_me:$LINENO: result: $cs_cv_prog_bison_version_ok_annotated" >&5
 echo "${ECHO_T}$cs_cv_prog_bison_version_ok_annotated" >&6
 if test "$cs_cv_prog_bison_version_ok" = yes; then
-  cs_build_prop_val=`echo x$BISONBIN | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  cs_build_prop_val=`echo x$CMD.BISON | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
-  cs_makefile_text="${cs_makefile_text}BISONBIN = $cs_build_prop_val
+  cs_makefile_text="${cs_makefile_text}CMD.BISON = $cs_build_prop_val
 "
     cs_jamconfig_text="${cs_jamconfig_text}CMD.BISON ?= \"$cs_build_prop_val\" ;
 "
@@ -3682,11 +3682,11 @@ do
 set dummy $ac_prog; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_SWIGBIN+set}" = set; then
+if test "${ac_cv_prog_CMD.SWIG+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$SWIGBIN"; then
-  ac_cv_prog_SWIGBIN="$SWIGBIN" # Let the user override the test.
+  if test -n "$CMD.SWIG"; then
+  ac_cv_prog_CMD.SWIG="$CMD.SWIG" # Let the user override the test.
 else
 as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
 for as_dir in $PATH
@@ -3695,7 +3695,7 @@ do
   test -z "$as_dir" && as_dir=.
   for ac_exec_ext in '' $ac_executable_extensions; do
   if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_SWIGBIN="$ac_prog"
+    ac_cv_prog_CMD.SWIG="$ac_prog"
     echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -3704,19 +3704,19 @@ done
 
 fi
 fi
-SWIGBIN=$ac_cv_prog_SWIGBIN
-if test -n "$SWIGBIN"; then
-  echo "$as_me:$LINENO: result: $SWIGBIN" >&5
-echo "${ECHO_T}$SWIGBIN" >&6
+CMD.SWIG=$ac_cv_prog_CMD.SWIG
+if test -n "$CMD.SWIG"; then
+  echo "$as_me:$LINENO: result: $CMD.SWIG" >&5
+echo "${ECHO_T}$CMD.SWIG" >&6
 else
   echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
 fi
 
-  test -n "$SWIGBIN" && break
+  test -n "$CMD.SWIG" && break
 done
 
-if test -n "$SWIGBIN"; then
+if test -n "$CMD.SWIG"; then
   echo "$as_me:$LINENO: checking if swig version >= 1.3.14" >&5
 echo $ECHO_N "checking if swig version >= 1.3.14... $ECHO_C" >&6
 if test "${cs_cv_prog_swig_version_ok_annotated+set}" = set; then
@@ -3732,10 +3732,10 @@ cs_prog_swig_min_suffix_done=
 
 
 
-test -z $cs_prog_swig_is_version && cs_prog_swig_is_version=`$SWIGBIN -version 2>&1 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
+test -z $cs_prog_swig_is_version && cs_prog_swig_is_version=`$CMD.SWIG -version 2>&1 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
 test -n "$cs_prog_swig_is_version" && test -z $cs_prog_swig_is_suffix_done  && { cs_prog_swig_is_suffix_done=yes ; cs_prog_swig_is_suffix= ; }
 
-test -z $cs_prog_swig_is_version && cs_prog_swig_is_version=`$SWIGBIN -version 2>&1 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
+test -z $cs_prog_swig_is_version && cs_prog_swig_is_version=`$CMD.SWIG -version 2>&1 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
 test -n "$cs_prog_swig_is_version" && test -z $cs_prog_swig_is_suffix_done  && { cs_prog_swig_is_suffix_done=yes ; cs_prog_swig_is_suffix=.0 ; }
 
 
@@ -3780,9 +3780,9 @@ fi
 echo "$as_me:$LINENO: result: $cs_cv_prog_swig_version_ok_annotated" >&5
 echo "${ECHO_T}$cs_cv_prog_swig_version_ok_annotated" >&6
 if test "$cs_cv_prog_swig_version_ok" = yes; then
-  cs_build_prop_val=`echo x$SWIGBIN | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  cs_build_prop_val=`echo x$CMD.SWIG | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
-  cs_makefile_text="${cs_makefile_text}SWIGBIN = $cs_build_prop_val
+  cs_makefile_text="${cs_makefile_text}CMD.SWIG = $cs_build_prop_val
 "
     cs_jamconfig_text="${cs_jamconfig_text}CMD.SWIG ?= \"$cs_build_prop_val\" ;
 "
@@ -4365,7 +4365,7 @@ fi
 
 	cs_build_prop_val=`echo x$NASM | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
-  cs_makefile_text="${cs_makefile_text}NASM.BIN = $cs_build_prop_val
+  cs_makefile_text="${cs_makefile_text}CMD.NASM = $cs_build_prop_val
 "
     cs_jamconfig_text="${cs_jamconfig_text}CMD.NASM ?= \"$cs_build_prop_val\" ;
 "
@@ -13834,7 +13834,7 @@ fi
     if test "$cs_cv_libXxf86vm" = yes; then
   cs_build_prop_val=`echo xyes | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
-  cs_makefile_text="${cs_makefile_text}USE_XFREE86VM = $cs_build_prop_val
+  cs_makefile_text="${cs_makefile_text}XFREE86VM.AVAILABLE = $cs_build_prop_val
 "
     cs_jamconfig_text="${cs_jamconfig_text}XFREE86VM.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
@@ -24929,8 +24929,6 @@ fi
 
 fi
 
-	    cs_makefile_text="${cs_makefile_text}HAS_CAL3D = yes
-"
 else
   cs_cv_cal3d_recent_cflags=''
 	cs_cv_cal3d_recent_lflags=''
@@ -33225,15 +33223,15 @@ s,@WINDRES@,$WINDRES,;t t
 s,@ac_ct_WINDRES@,$ac_ct_WINDRES,;t t
 s,@OBJCOPY@,$OBJCOPY,;t t
 s,@ac_ct_OBJCOPY@,$ac_ct_OBJCOPY,;t t
-s,@FLEXBIN@,$FLEXBIN,;t t
-s,@BISONBIN@,$BISONBIN,;t t
+s,@CMD.FLEX@,$CMD.FLEX,;t t
+s,@CMD.BISON@,$CMD.BISON,;t t
 s,@DOXYGEN@,$DOXYGEN,;t t
 s,@TEXI2DVI@,$TEXI2DVI,;t t
 s,@DVIPS@,$DVIPS,;t t
 s,@DVIPDF@,$DVIPDF,;t t
 s,@MAKEINFO@,$MAKEINFO,;t t
 s,@INSTALL@,$INSTALL,;t t
-s,@SWIGBIN@,$SWIGBIN,;t t
+s,@CMD.SWIG@,$CMD.SWIG,;t t
 s,@JAM@,$JAM,;t t
 s,@MAKE@,$MAKE,;t t
 s,@SET_MAKE@,$SET_MAKE,;t t

@@ -15,8 +15,8 @@ endif
 ifeq ($(NASM.AVAILABLE),yes)
 
 # The executable name
-ifeq (,$(NASM.BIN))
-NASM.BIN = nasm
+ifeq (,$(CMD.NASM))
+CMD.NASM = nasm
 endif
 
 # NASM flags (well, PROC= is not quite useful (for now?))

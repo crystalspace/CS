@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-ifeq ($(USE_XFREE86VM),yes)
+ifeq ($(XFREE86VM.AVAILABLE),yes)
   CFLAGS.XWIN += -DXFREE86VM
   # On some platforms -lxf86vm must appear before -lX11.
   LIB.XWIN.SYSTEM += -lXxf86vm

@@ -15,7 +15,7 @@ ifeq ($(MAKESECTION),rootdefines)
 # Plugin-specific help commands
 PLUGINHELP += \
   $(NEWLINE)echo $"  make cspython     Make the $(DESCRIPTION.cspython)$"
-ifneq (,$(SWIGBIN))
+ifneq (,$(CMD.SWIG))
 PSEUDOHELP += \
   $(NEWLINE)echo $"  make swigpythgen  Make the $(DESCRIPTION.swigpythgen)$" \
   $(NEWLINE)echo $"  make swigpythinst Install $(DESCRIPTION.swigpythinst)$"
@@ -49,7 +49,7 @@ pythmod:
 pythmodclean:
 	$(MAKE_CLEAN)
 endif
-ifneq (,$(SWIGBIN))
+ifneq (,$(CMD.SWIG))
 swigpythgen:
 	$(MAKE_TARGET)
 swigpythinst:
@@ -165,7 +165,7 @@ SWIG.CSPYTHON.DEPS=\
 	$(SRCDIR)/include/ivaria/pythpre.i \
 	$(SRCDIR)/include/ivaria/pythpost.i
 
-ifeq (,$(SWIGBIN))
+ifeq (,$(CMD.SWIG))
 $(SWIG.CSPYTHON): $(SWIG.CSPYTHON.CVS)
 	-$(RM) $(SWIG.CSPYTHON)
 	$(CP) $(SWIG.CSPYTHON.CVS) $(SWIG.CSPYTHON)
@@ -175,7 +175,7 @@ $(SWIG.CSPYTHON.PY): $(SWIG.CSPYTHON.PY.CVS)
 else
 $(SWIG.CSPYTHON) $(SWIG.CSPYTHON.PY): \
   $(SWIG.CSPYTHON.INTERFACE) $(SWIG.CSPYTHON.DEPS)
-	$(SWIGBIN) $(SWIGFLAGS) -o $(SWIG.CSPYTHON) $(SWIG.CSPYTHON.INTERFACE)
+	$(CMD.SWIG) $(SWIGFLAGS) -o $(SWIG.CSPYTHON) $(SWIG.CSPYTHON.INTERFACE)
 	$(SED) '/$(BUCK)Header:/d' < $(SWIG.CSPYTHON) > $(SWIG.CSPYTHON).sed
 	$(RM) $(SWIG.CSPYTHON)
 	$(MV) $(SWIG.CSPYTHON).sed $(SWIG.CSPYTHON)
