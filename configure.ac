@@ -409,7 +409,6 @@ AC_DEFUN([CS_CHECK_RTLD],
 CS_CHECK_RTLD
 
 
-
 #------------------------------------------------------------------------------
 # Check if Perl SDK is installed and which compiler and linker flags are
 # required to embed Perl.  Also determine if the glue file can be created with
@@ -1789,6 +1788,17 @@ AS_IF([test $cs_cv_libdivxdecore4 != yes],
 	    [$cs_cv_libdivxdecore_lflags],
 	    [$cs_cv_libdivxdecore_libs])])])
 
+
+
+#------------------------------------------------------------------------------
+# Check if regular expressions are available.
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD([for regexp support], [cs_cv_regexp],
+    [AC_LANG_PROGRAM(
+	[[#include <regex.h>]],
+	[regex_t re; regcomp (&re, 0, 0); regexec (&re, 0, 0, 0, 0);])],
+    [], [],
+    [CS_HEADER_PROPERTY([CS_UNIX_PLUGIN_REQUIRES_MAIN])])
 
 
 #------------------------------------------------------------------------------

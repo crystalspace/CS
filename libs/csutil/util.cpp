@@ -56,6 +56,8 @@ char *csStrNew (const char *s)
 
 char *csStrNew (const wchar_t *s)
 {
+  if (!s) return 0;
+
   utf8_char buf[shortStringChars];
   static const size_t bufChars = sizeof (buf) / sizeof (utf8_char);
   size_t charsNeeded;
@@ -88,6 +90,8 @@ wchar_t* csStrNewW (const wchar_t *s)
 
 wchar_t* csStrNewW (const char *s)
 {
+  if (!s) return 0;
+
   wchar_t buf[shortStringChars];
   static const size_t bufChars = sizeof (buf) / sizeof (wchar_t);
   size_t charsNeeded;

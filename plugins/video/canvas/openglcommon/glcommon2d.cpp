@@ -122,6 +122,7 @@ bool csGraphics2DGLCommon::Open ()
       "Using %s mode at resolution %dx%d.",
       FullScreen ? "full screen" : "windowed", Width, Height);
 
+  driverdb.Open (this);
   ext.Open ();
 
   if (version)
@@ -208,6 +209,7 @@ void csGraphics2DGLCommon::Close ()
   delete fontCache;
   fontCache = 0;
   ext.Close ();
+  driverdb.Close ();
   csGraphics2D::Close ();
 }
 
@@ -302,6 +304,38 @@ void csGraphics2DGLCommon::RecycleScreenShot (csGLScreenShot* shot)
     return;
   }
   scfRefCount--;
+}
+
+const char* csGraphics2DGLCommon::GetRendererString (const char* str)
+{
+  if (strcmp (str, "renderer") == 0)
+  {
+    return (char*)glGetString (GL_RENDERER);
+  }
+  else if (strcmp (str, "vendor") == 0)
+  {
+    return (char*)glGetString (GL_VENDOR);
+  }
+  else if (strcmp (str, "glversion") == 0)
+  {
+    return (char*)glGetString (GL_VERSION);
+  }
+  else if (strcmp (str, "platform") == 0)
+  {
+    return CS_PLATFORM_NAME;
+  }
+  else
+    return 0;
+}
+
+const char* csGraphics2DGLCommon::GetVersionString (const char* ver)
+{
+  if (strcmp (ver, "gl") == 0)
+  {
+    return (char*)glGetString (GL_VERSION);
+  }
+  else
+    return 0;
 }
 
 void csGraphics2DGLCommon::Clear (int color)

@@ -56,6 +56,7 @@ case * :					# Posix, Unix, Linux, etc.
 
 Library csutil
 	: [ Wildcard *.cpp *.h ] $(CSSYS_SRC)
+	  regexp_impl.c
           [ Wildcard ../../include/csutil : *.h ]
           [ Wildcard ../../include/csutil/macosx : *.h ]
           [ Wildcard ../../include/csutil/win32 : *.h ]

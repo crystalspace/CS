@@ -32,6 +32,7 @@
 #include "glstates.h"
 #include "glextmanager.h"
 #include "glss.h"
+#include "driverdb.h"
 
 class OpenGLTextureCache;
 class GLFontCache;
@@ -49,6 +50,7 @@ class GLFontCache;
  */
 class csGraphics2DGLCommon : public csGraphics2D, public iEventPlug
 {
+protected:
   friend class csGLScreenShot;
   friend class csGLFontCache;
 
@@ -69,7 +71,6 @@ class csGraphics2DGLCommon : public csGraphics2D, public iEventPlug
   csGLScreenShot* GetScreenShot ();
   void RecycleScreenShot (csGLScreenShot* shot);
 
-protected:
   /// Extension manager
   csGLExtensionManager ext;
   /// Multisample samples
@@ -78,7 +79,12 @@ protected:
   bool multiFavorQuality;
   /// Depth buffer resolution
   int depthBits;
+  /// Driver database
+  csGLDriverDatabase driverdb;
 public:
+  virtual const char* GetRendererString (const char* str);
+  virtual const char* GetVersionString (const char* ver);
+
   SCF_DECLARE_IBASE_EXT(csGraphics2D);
 
   /// The event plug object

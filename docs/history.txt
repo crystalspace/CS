@@ -50,6 +50,16 @@ chronological order.
 	- Eric Sunshine augmented the OpenDivX check in configure.ac so that it
 	  tests for presence of DEC_PARAM since at least one user's
 	  installation seems to be lacking this necessary typedef.
+	- res made the following changes:
+	    - Added sanity check to some csStrNew() variants.
+	    - Added a iConfigFile implementation for XML format config. Only
+	      reading, though.
+	    - Added support for regular expressions. Uses implementation from
+	      the system's runtime, if available, otherwise uses built-in
+	      implementation borrowed from glibc.
+	    - Added a "GL driver database". The depending on a set of rules 
+	      the GL canvases now load certain config settings. See 
+	      data/config/gldrivers.xml.
 25-Feb-2004
 	- Fritz Elfert fixed the following lighting related crash in sprcal3d:
 	  Previously, csSpriteCal3DMeshObject managed a set of relevant lights
