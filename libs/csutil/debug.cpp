@@ -44,7 +44,8 @@ struct csDGEL
   int num_children;
   csDGEL** children;	// Pointer to children.
   uint32* c_stamps;	// Pointer to array of timestamps for child creation.
-  bool marker;
+  bool marker;		// To see what we already dumped.
+  bool recurse_marker;	// To see what we're dumping in this recursion.
 
   csDGEL ()
   {
@@ -495,6 +496,7 @@ void csDebuggingGraph::Dump (iObjectRegistry* object_reg)
     }
     else
       els[i]->marker = true;
+    els[i]->recurse_marker = false;
   }
 
   printf ("====================================================\n");
@@ -537,6 +539,14 @@ static void DumpSubTree (int indent, const char* type, uint32 link_timestamp,
   }
   *sp = 0;
 
+  if (el->recurse_marker && *type == 'P')
+  {
+    // We already encountered this object in this recursion. So we just
+    // put a short-hand here.
+    printf ("%s%s(%d) %p <-\n", spaces, type, link_timestamp, el->object);
+    return;
+  }
+
   // Show the ref count if it is an scf interface. If the object
   // is no longer used then show '?' instead of ref count to avoid
   // calling an invalid pointer.
@@ -576,6 +586,7 @@ static void DumpSubTree (int indent, const char* type, uint32 link_timestamp,
   }
   else
   {
+    el->recurse_marker = true;
     el->marker = true;
     printf (" (%s,%d) #p=%d #c=%d\n",
     	el->file, el->linenr, el->num_parents, el->num_children);
@@ -588,6 +599,7 @@ static void DumpSubTree (int indent, const char* type, uint32 link_timestamp,
     {
       DumpSubTree (indent+2, "C", el->c_stamps[i], el->children[i]);
     }
+    el->recurse_marker = false;
   }
   fflush (stdout);
 }
@@ -618,6 +630,7 @@ void csDebuggingGraph::Dump (iObjectRegistry* object_reg, void* object,
     {
       if (els[i]->used) els[i]->marker = false;
       else els[i]->marker = true;
+      els[i]->recurse_marker = false;
     }
   }
 

@@ -41,6 +41,11 @@ The history order is reversed so that new features are at the top.
 	      children. The object is then expanded to show all its
 	      parents and children.
 	- Fixed a memory leak in the parsing of KEY statements in the loader.
+	- Made output of csDebuggingGraph::Dump() a little nicer in the
+	  case where you have a pointer back to a parent that is already
+	  mentioned in this recursion level. In this case we simply print
+	  out the pointer and the timestamp of the link and add '<-' to
+	  indicate the information can be found upwards.
 15-Nov-2001
 	- Added DG_ADDI and csDebuggingGraph::AddInterface() with which you
 	  can add an SCF interface (instance of iBase) to the debug graph.
