@@ -21,6 +21,7 @@
 
 #include "csgeom/math3d.h"
 #include "csengine/polytree.h"
+#include "csengine/polyint.h"
 
 class csBspTree;
 class Dumper;
@@ -48,11 +49,7 @@ private:
    * The 'front' and 'back' children in this node are seperated
    * by that plane.
    */
-  csPolygonInt** polygons;
-  ///
-  int num;
-  ///
-  int max;
+  csPolygonIntArray polygons;
   /**
    * If not -1 then this is the index of the first dynamic
    * polygon in the list of polygons.
@@ -105,7 +102,7 @@ public:
   /// Return true if node is empty.
   bool IsEmpty ()
   {
-    return num == 0 &&
+    return polygons.GetNumPolygons () == 0 &&
     	(!front || front->IsEmpty ()) &&
 	(!back || back->IsEmpty ());
   }
@@ -154,6 +151,10 @@ private:
   void Statistics (csBspNode* node, int depth, int* num_nodes,
   	int* num_leaves, int* max_depth,
   	int* tot_polygons, int* max_poly_in_node, int* min_poly_in_node);
+
+  /// Handle all dynamic objects in this tree.
+  void* HandleObjects (csBspNode* node, const csVector3& pos,
+  	csTreeVisitFunc* func, void* data);
 
 public:
   /**

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 2000 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -162,6 +162,52 @@ public:
    * the original unsplit polygon.
    */
   virtual csPolygonInt* GetUnsplitPolygon () = 0;
+};
+
+/**
+ * An array of csPolygonInt pointers.
+ */
+class csPolygonIntArray
+{
+private:
+  /// Array.
+  csPolygonInt** polygons;
+  ///
+  int num;
+  ///
+  int max;
+
+public:
+  /// Constructor. Initialize empty array.
+  csPolygonIntArray ();
+
+  /**
+   * Destructor. The list of polygons is removed
+   * but NOT the polygons themselves.
+   */
+  ~csPolygonIntArray ();
+
+  /// Reset the array to empty.
+  void Reset () { num = 0; }
+
+  /// Add a polygon.
+  void AddPolygon (csPolygonInt* polygon);
+
+  /// Get polygon.
+  csPolygonInt* GetPolygon (int idx) { return polygons[idx]; }
+
+  /// Get polygons.
+  csPolygonInt** GetPolygons () { return polygons; }
+
+  /// Get number of polygons.
+  int GetNumPolygons () { return num; }
+
+  /**
+   * Set number of polygons (i.e. truncate list).
+   * The new number of polygons cannot be greater than the
+   * current number of polygons.
+   */
+  void SetNumPolygons (int n) { num = n; }
 };
 
 #endif /*POLYINT_H*/

@@ -31,32 +31,32 @@ csPolygonTreeNode::~csPolygonTreeNode ()
 
 void csPolygonTreeNode::UnlinkStub (csPolygonStub* ps)
 {
-  if (ps->next_bsp) ps->next_bsp->prev_bsp = ps->prev_bsp;
-  if (ps->prev_bsp) ps->prev_bsp->next_bsp = ps->next_bsp;
+  if (ps->next_tree) ps->next_tree->prev_tree = ps->prev_tree;
+  if (ps->prev_tree) ps->prev_tree->next_tree = ps->next_tree;
   else
   {
-    if (first_stub == ps) first_stub = ps->next_bsp;
-    else if (todo_stubs == ps) todo_stubs = ps->next_bsp;
+    if (first_stub == ps) first_stub = ps->next_tree;
+    else if (todo_stubs == ps) todo_stubs = ps->next_tree;
     else
       printf ("INTERNAL ERROR! Stub not in todo or stub list!\n");
   }
-  ps->prev_bsp = ps->next_bsp = NULL;
+  ps->prev_tree = ps->next_tree = NULL;
   ps->node = NULL;
 }
 
 void csPolygonTreeNode::LinkStubTodo (csPolygonStub* ps)
 {
-  ps->next_bsp = todo_stubs;
-  ps->prev_bsp = NULL;
-  if (todo_stubs) todo_stubs->prev_bsp = ps;
+  ps->next_tree = todo_stubs;
+  ps->prev_tree = NULL;
+  if (todo_stubs) todo_stubs->prev_tree = ps;
   todo_stubs = ps;
 }
 
 void csPolygonTreeNode::LinkStub (csPolygonStub* ps)
 {
-  ps->next_bsp = first_stub;
-  ps->prev_bsp = NULL;
-  if (first_stub) first_stub->prev_bsp = ps;
+  ps->next_tree = first_stub;
+  ps->prev_tree = NULL;
+  if (first_stub) first_stub->prev_tree = ps;
   first_stub = ps;
 }
 

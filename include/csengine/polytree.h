@@ -36,7 +36,7 @@ class csPolyTreeObject;
  */
 class csPolygonTreeNode
 {
-private:
+protected:
   /**
    * A linked list for all polygons stubs that are added
    * to this node. These stubs represents sets of polygons

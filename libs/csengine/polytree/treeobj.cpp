@@ -52,7 +52,6 @@ void csPolyTreeObject::UnlinkStub (csPolygonStub* ps)
 
 csPolygonStub::~csPolygonStub ()
 {
-  CHK (delete [] polygons);
   RemoveStub ();
 }
 

@@ -24,6 +24,7 @@ Short-term cleanups that need to be done:
 	- Samuel also made some changes to the skeleton sprites so that
 	  the skeletal animation system is now completely seperate from
 	  csSprite3D.
+	- Further work on dynamic objects in polygon trees.
 13-Jan-2000
 	- Some further work on dynamic objects in polygon trees.
 	- Eric Sunshine made a fairly major change to the CVS snapshot

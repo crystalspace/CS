@@ -21,6 +21,7 @@
 
 #include "csutil/csvector.h"
 #include "csgeom/math3d.h"
+#include "csengine/polyint.h"
 
 class csObject;
 class csPolygonStub;
@@ -40,7 +41,7 @@ class csPolygonStub
 
 private:
   // Linked list in every tree node.
-  csPolygonStub* next_bsp, * prev_bsp;
+  csPolygonStub* next_tree, * prev_tree;
   // Linked list in every csPolyTreeObject.
   csPolygonStub* next_obj, * prev_obj;
   // Object where this stub lives.
@@ -48,22 +49,29 @@ private:
   // Tree node where this stub lives.
   csPolygonTreeNode* node;
   // List of polygons.
-  csPolygonInt** polygons;
+  csPolygonIntArray polygons;
 
 public:
   ///
-  csPolygonStub () : object (NULL), node (NULL), polygons (NULL) { }
+  csPolygonStub () : object (NULL), node (NULL) { }
   ///
   ~csPolygonStub ();
-  /**
-   * Set list of polygons. This stub will delete this
-   * list (but not the individual polygons) at destruction time.
-   */
-  void SetPolygons (csPolygonInt** pols) { CHK (delete [] polygons); polygons = pols; }
+
+  /// Get access to the list of polygons in this stub.
+  csPolygonIntArray& GetPolygonArray () { return polygons; }
   /// Get list of polygons.
-  csPolygonInt** GetPolygons () { return polygons; }
+  csPolygonInt** GetPolygons () { return polygons.GetPolygons (); }
+  /// Get number of polygons.
+  int GetNumPolygons () { return polygons.GetNumPolygons (); }
   /// Unlink this stub from all lists.
   void RemoveStub ();
+
+  /// Get pointer to next in tree list.
+  csPolygonStub* GetNextTree () { return next_tree; }
+  /// Get parent object for this stub.
+  csPolyTreeObject* GetObject () { return object; }
+  /// Get parent node for this stub.
+  csPolygonTreeNode* GetNode () { return node; }
 };
 
 /**
@@ -214,50 +222,55 @@ public:
 
   /**
    * Split the given stub with a plane and return
-   * two new stubs. This is a pure virtual function that will
+   * three new stubs (all on the plane, in front, or
+   * back of the plane). This is a pure virtual function that will
    * have to be implemented by a subclass.
    */
   virtual void SplitWithPlane (csPolygonStub* stub,
-  	csPolygonStub** stub_front, csPolygonStub** stub_back,
+  	csPolygonStub** stub_on, csPolygonStub** stub_front,
+	csPolygonStub** stub_back,
 	const csPlane& plane) = 0;
 
   /**
-   * Split the given stub with an X plane and return
-   * two new stubs. The default implementation will just call
+   * Split the given stub with an X plane.
+   * The default implementation will just call
    * SplitWithPlane() but it is recommended to implement a more
    * efficient version here.
    */
   virtual void SplitWithPlaneX (csPolygonStub* stub,
-  	csPolygonStub** stub_front, csPolygonStub** stub_back,
+  	csPolygonStub** stub_on, csPolygonStub** stub_front,
+	csPolygonStub** stub_back,
 	float x)
   {
-    SplitWithPlane (stub, stub_front, stub_back, csPlane (1, 0, 0, -x));
+    SplitWithPlane (stub, stub_on, stub_front, stub_back, csPlane (1, 0, 0, -x));
   }
 
   /**
-   * Split the given stub with an Y plane and return
-   * two new stubs. The default implementation will just call
+   * Split the given stub with an Y plane.
+   * The default implementation will just call
    * SplitWithPlane() but it is recommended to implement a more
    * efficient version here.
    */
   virtual void SplitWithPlaneY (csPolygonStub* stub,
-  	csPolygonStub** stub_front, csPolygonStub** stub_back,
+  	csPolygonStub** stub_on, csPolygonStub** stub_front,
+	csPolygonStub** stub_back,
 	float y)
   {
-    SplitWithPlane (stub, stub_front, stub_back, csPlane (0, 1, 0, -y));
+    SplitWithPlane (stub, stub_on, stub_front, stub_back, csPlane (0, 1, 0, -y));
   }
 
   /**
-   * Split the given stub with an Z plane and return
-   * two new stubs. The default implementation will just call
+   * Split the given stub with an Z plane.
+   * The default implementation will just call
    * SplitWithPlane() but it is recommended to implement a more
    * efficient version here.
    */
   virtual void SplitWithPlaneZ (csPolygonStub* stub,
-  	csPolygonStub** stub_front, csPolygonStub** stub_back,
+  	csPolygonStub** stub_on, csPolygonStub** stub_front,
+	csPolygonStub** stub_back,
 	float z)
   {
-    SplitWithPlane (stub, stub_front, stub_back, csPlane (0, 0, 1, -z));
+    SplitWithPlane (stub, stub_on, stub_front, stub_back, csPlane (0, 0, 1, -z));
   }
 
   /**

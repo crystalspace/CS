@@ -283,7 +283,7 @@ void Dumper::dump (csBspTree* tree, csBspNode* node, int indent)
   char spaces[256];
   for (i = 0 ; i < indent ; i++) spaces[i] = ' ';
   spaces[indent] = 0;
-  CsPrintf (MSG_DEBUG_0, "%sThere are %d polygons in this node.\n", spaces, node->num);
+  CsPrintf (MSG_DEBUG_0, "%sThere are %d polygons in this node.\n", spaces, node->polygons.GetNumPolygons ());
   CsPrintf (MSG_DEBUG_0, "%s Front:\n", spaces);
   dump (tree, node->front, indent+2);
   CsPrintf (MSG_DEBUG_0, "%s Back:\n", spaces);

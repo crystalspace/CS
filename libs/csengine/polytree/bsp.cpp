@@ -18,6 +18,7 @@
 
 #include "sysdef.h"
 #include "csengine/polyint.h"
+#include "csengine/treeobj.h"
 #include "csengine/bsp.h"
 
 //---------------------------------------------------------------------------
@@ -25,45 +26,26 @@
 csBspNode::csBspNode ()
 {
   front = back = NULL;
-  polygons = NULL;
-  num = max = 0;
   dynamic_idx = -1;
 }
 
 csBspNode::~csBspNode ()
 {
-  CHK (delete [] polygons);
   CHK (delete front);
   CHK (delete back);
 }
 
 void csBspNode::AddPolygon (csPolygonInt* poly, bool dynamic)
 {
-  if (!polygons)
-  {
-    max = 3;
-    CHK (polygons = new csPolygonInt* [max]);
-  }
-
-  if (num >= max)
-  {
-    CHK (csPolygonInt** pp = new csPolygonInt* [max+2]);
-    memcpy (pp, polygons, sizeof (csPolygonInt*)*max);
-    max += 2;
-    CHK (delete [] polygons);
-    polygons = pp;
-  }
-
-  if (dynamic && dynamic_idx == -1) dynamic_idx = num;
-  polygons[num] = poly;
-  num++;
+  polygons.AddPolygon (poly);
+  if (dynamic && dynamic_idx == -1) dynamic_idx = polygons.GetNumPolygons ()-1;
 }
 
 void csBspNode::RemoveDynamicPolygons ()
 {
   if (dynamic_idx != -1)
   {
-    num = dynamic_idx;
+    polygons.SetNumPolygons (dynamic_idx);
     dynamic_idx = -1;
   }
   if (front)
@@ -92,11 +74,11 @@ int csBspNode::CountVertices ()
   if (front) num_verts += front->CountVertices ();
   if (back) num_verts += back->CountVertices ();
   int i;
-  for (i = 0 ; i < num ; i++)
+  for (i = 0 ; i < polygons.GetNumPolygons () ; i++)
   {
-    num_verts += polygons[i]->GetNumVertices ();
-    if (polygons[i]->GetUnsplitPolygon ())
-      num_verts += polygons[i]->GetUnsplitPolygon ()->GetNumVertices ();
+    num_verts += polygons.GetPolygon (i)->GetNumVertices ();
+    if (polygons.GetPolygon (i)->GetUnsplitPolygon ())
+      num_verts += polygons.GetPolygon (i)->GetUnsplitPolygon ()->GetNumVertices ();
   }
   return num_verts;
 }
@@ -106,16 +88,16 @@ void csBspNode::FetchVertices (int* array, int& cur_idx)
   if (front) front->FetchVertices (array, cur_idx);
   if (back) back->FetchVertices (array, cur_idx);
   int i;
-  for (i = 0 ; i < num ; i++)
+  for (i = 0 ; i < polygons.GetNumPolygons () ; i++)
   {
-    int* idx = polygons[i]->GetVertexIndices ();
-    int n = polygons[i]->GetNumVertices ();
+    int* idx = polygons.GetPolygon (i)->GetVertexIndices ();
+    int n = polygons.GetPolygon (i)->GetNumVertices ();
     memcpy (array+cur_idx, idx, sizeof (int)*n);
     cur_idx += n;
-    if (polygons[i]->GetUnsplitPolygon ())
+    if (polygons.GetPolygon (i)->GetUnsplitPolygon ())
     {
-      int* idx = polygons[i]->GetUnsplitPolygon ()->GetVertexIndices ();
-      int n = polygons[i]->GetUnsplitPolygon ()->GetNumVertices ();
+      int* idx = polygons.GetPolygon (i)->GetUnsplitPolygon ()->GetVertexIndices ();
+      int n = polygons.GetPolygon (i)->GetUnsplitPolygon ()->GetNumVertices ();
       memcpy (array+cur_idx, idx, sizeof (int)*n);
       cur_idx += n;
     }
@@ -354,7 +336,7 @@ void csBspTree::BuildDynamic (csBspNode* node, csPolygonInt** polygons, int num)
 {
   int i;
   csPolygonInt* split_poly;
-  if (node->num) split_poly = node->polygons[0];
+  if (node->polygons.GetNumPolygons ()) split_poly = node->polygons.GetPolygon (0);
   else split_poly = polygons[SelectSplitter (polygons, num)];
   csPlane* split_plane = split_poly->GetPolyPlane ();
 
@@ -401,6 +383,36 @@ void csBspTree::BuildDynamic (csBspNode* node, csPolygonInt** polygons, int num)
   CHK (delete [] back_poly);
 }
 
+void* csBspTree::HandleObjects (csBspNode* node, const csVector3& /*pos*/,
+  	csTreeVisitFunc* func, void* data)
+{
+  csPolygonStub* stub;
+  while (node->todo_stubs)
+  {
+    stub = node->todo_stubs;
+    node->UnlinkStub (stub);	// Unlink from todo list.
+    csPolygonStub* stub_on, * stub_front, * stub_back;
+    stub->GetObject ()->SplitWithPlane (stub, &stub_on, &stub_front, &stub_back,
+    	*(node->polygons.GetPolygon (0)->GetPolyPlane ()));
+    // Link the stub with the polygons on this splitter plane to the current node.
+    if (stub_on) node->LinkStub (stub_on);	// Relink to normal list.
+    // Link the stub with polygons in front to the todo list of the front node.
+    if (stub_front) node->front->LinkStubTodo (stub_front);
+    // Link the stub with back polygons to the todo list of the back node.
+    if (stub_back) node->back->LinkStubTodo (stub_back);
+    // Free the old stub.
+    csPolyTreeObject::stub_pool.Free (stub);
+  }
+  void* rc;
+  stub = node->first_stub;
+  while (stub)
+  {
+    rc = func (pset, stub->GetPolygons (), stub->GetNumPolygons (), data);
+    stub = stub->GetNextTree ();
+  }
+  return NULL;
+}
+
 void* csBspTree::Back2Front (const csVector3& pos, csTreeVisitFunc* func,
 	void* data, csTreeCullFunc* cullfunc, void* culldata)
 {
@@ -422,12 +434,14 @@ void* csBspTree::Back2Front (csBspNode* node, const csVector3& pos,
 
   // Check if some polygon (just take the first) of the polygons array
   // is visible from the given point. If so, we are in front of this node.
-  if (csMath3::Visible (pos, *(node->polygons[0]->GetPolyPlane ())))
+  if (csMath3::Visible (pos, *(node->polygons.GetPolygon (0)->GetPolyPlane ())))
   {
     // Front.
     rc = Back2Front (node->back, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
-    rc = func (pset, node->polygons, node->num, data);
+    rc = func (pset, node->polygons.GetPolygons (), node->polygons.GetNumPolygons (), data);
+    if (rc) return rc;
+    rc = HandleObjects (node, pos, func, data);
     if (rc) return rc;
     rc = Back2Front (node->front, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
@@ -437,7 +451,9 @@ void* csBspTree::Back2Front (csBspNode* node, const csVector3& pos,
     // Back.
     rc = Back2Front (node->front, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
-    rc = func (pset, node->polygons, node->num, data);
+    rc = func (pset, node->polygons.GetPolygons (), node->polygons.GetNumPolygons (), data);
+    if (rc) return rc;
+    rc = HandleObjects (node, pos, func, data);
     if (rc) return rc;
     rc = Back2Front (node->back, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
@@ -454,12 +470,14 @@ void* csBspTree::Front2Back (csBspNode* node, const csVector3& pos,
 
   // Check if some polygon (just take the first) of the polygons array
   // is visible from the given point. If so, we are in front of this node.
-  if (csMath3::Visible (pos, *(node->polygons[0]->GetPolyPlane ())))
+  if (csMath3::Visible (pos, *(node->polygons.GetPolygon (0)->GetPolyPlane ())))
   {
     // Front.
     rc = Front2Back (node->front, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
-    rc = func (pset, node->polygons, node->num, data);
+    rc = func (pset, node->polygons.GetPolygons (), node->polygons.GetNumPolygons (), data);
+    if (rc) return rc;
+    rc = HandleObjects (node, pos, func, data);
     if (rc) return rc;
     rc = Front2Back (node->back, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
@@ -469,7 +487,9 @@ void* csBspTree::Front2Back (csBspNode* node, const csVector3& pos,
     // Back.
     rc = Front2Back (node->back, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
-    rc = func (pset, node->polygons, node->num, data);
+    rc = func (pset, node->polygons.GetPolygons (), node->polygons.GetNumPolygons (), data);
+    if (rc) return rc;
+    rc = HandleObjects (node, pos, func, data);
     if (rc) return rc;
     rc = Front2Back (node->front, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
@@ -484,9 +504,10 @@ void csBspTree::Statistics (csBspNode* node, int depth, int* num_nodes,
   depth++;
   if (depth > *max_depth) *max_depth = depth;
 
-  *tot_polygons += node->num;
-  if (node->num > *max_poly_in_node) *max_poly_in_node = node->num;
-  if (node->num < *min_poly_in_node) *min_poly_in_node = node->num;
+  int num = node->polygons.GetNumPolygons ();
+  *tot_polygons += num;
+  if (num > *max_poly_in_node) *max_poly_in_node = num;
+  if (num < *min_poly_in_node) *min_poly_in_node = num;
   if (node->front || node->back) (*num_nodes)++;
   else (*num_leaves)++;
   if (node->front) Statistics (node->front, depth, num_nodes,
