@@ -88,8 +88,8 @@ MSVC.WORKSPACE.TYPICAL.REJECT = \
 MSVC.WORKSPACES += NEWRENDERER
 MSVC.WORKSPACE.NEWRENDERER.NAME = newrenderer
 MSVC.WORKSPACE.NEWRENDERER.REJECT = \
-  grp.+_(?!newrenderer\.) \
   gl3d \
+  grp.+_(?!newrenderer\.) \
   soft3d
 
 # Walktest plus all plugins commonly required by Walktest.
