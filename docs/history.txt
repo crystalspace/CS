@@ -62,6 +62,9 @@ chronological order.
 	  portal container stuff instead of using portals in the thing plugin.
 	  This seems to work mostly but not completely. That's why this new
 	  code is still disabled for now.
+	- Andrew Mann made a small optimization in csEventTimer::HandleEvent()
+	  This is far from the best way to do things, but it's faster than
+	  the previous method in the apparent current common use.
 28-Sep-2003
 	- Eric Sunshine corrected erroneous comments in
 	  CS/mk/autoconf/compiler.m4.

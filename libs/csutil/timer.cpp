@@ -119,7 +119,7 @@ bool csEventTimer::HandleEvent (iEvent& event)
 
   minimum_time = 2000000000;
   int i;
-  for (i = 0 ; i < timerevents.Length () ; i++)
+  for (i = timerevents.Length() - 1 ; i >= 0 ; i--)
   {
     timerevent& te = timerevents[i];
     te.time_left -= elapsed+accumulate_elapsed;
