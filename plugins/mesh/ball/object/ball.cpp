@@ -855,7 +855,9 @@ void csBallMeshObject::UpdateLighting (const csArray<iLight*>& lights,
 {
   if (generated_colors) return;
 
+#ifdef CS_USE_NEW_RENDERER
   ball_colors_dirty_flag = true;
+#endif
 
   int i, l;
   csColor* colors = ball_colors;

@@ -33,6 +33,8 @@ chronological order.
 	  were introduced yesterday.
 	- John Harger fixed the particles plugin to reflect Marten's recent
 	  change to iMeshObject::GetRenderMeshes
+	- Jorrit fixed the ball plugin so that it compiles again after res2k
+	  'fixed' it.
 20-Mar-2004
 	- Anders Stenberg fixed procedural textures in NR. Visit for
 	  textures wasn't called, and is now called on access in the shader
