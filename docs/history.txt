@@ -65,6 +65,13 @@ chronological order.
 	- res fixed viewmesh to compile with latest Cal3d.
 	- res fixed a crash in csGLVBOBuffer::FindEmptySlot() as per Martens
 	  instructions.
+	- Jorrit fixed a bug in csTiledCoverageBuffer->StatusNoDepth().
+	  Fixing this bug has a negative impact on PVS quality but it makes
+	  PVS more correct.
+	- Jorrit fixed a very bad bug in
+	  csTiledCoverageBuffer->FlushIgnoreDepth(). That bug would make
+	  insertion of polygons in the coverage buffer fail a lot of times.
+	  This bug had a negative impact on PVS quality.
 15-Feb-2005
 	- Jorrit added csIntersect3::IntersectPolygon() to intersect
 	  a polygon with a segment.

@@ -846,10 +846,10 @@ bool csCoverageTile::Flush (csTileCol& fvalue, float maxdepth)
 
 bool csCoverageTile::FlushIgnoreDepth (csTileCol& fvalue)
 {
-  if (tile_full) return false;
-
   if (num_operations == 0)
   {
+    if (tile_full) return false;
+
     // If there are no operations in this tile then there are three
     // special cases we can handle here.
     if (fvalue == TILECOL_FULL)
@@ -2311,6 +2311,11 @@ int csTiledCoverageBuffer::StatusNoDepth ()
 	  return 0;
 	}
         count_empty++;
+      }
+      else
+      {
+        // We have a partially filled tile.
+	return 0;
       }
       tile++;
     }

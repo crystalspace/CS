@@ -657,7 +657,7 @@ void PVSCalcSector::SortPolygonsOnSize ()
   polygons = sorted_polygons;
 
   parent->ReportInfo ("Average polygon area %g, min %g, max %g\n",
-  	float (total_area / polygons.Length ()),
+  	float (total_area / double (polygons_with_area.Length ())),
 	min_area, max_area);
 }
 
@@ -939,6 +939,7 @@ int PVSCalcSector::CastShadowsUntilFull (const csBox3& source)
         if (status == 1)
         {
           // Yes! Coverage buffer is full. We can return early here.
+	  DB(("  Coverage Buffer Full!\n"));
 	  return 1;
         }
       }
@@ -1004,11 +1005,7 @@ void PVSCalcSector::RecurseDestNodes (PVSCalcNode* sourcenode,
       int destrep = destnode->represented_nodes;
       total_invisnodes += destrep;
       DBA(("S%d ", destrep));
-      DB(("S:Marked invisible (%g,%g,%g)-(%g,%g,%g) to (%g,%g,%g)-(%g,%g,%g)\n",
-    	    source.MinX (), source.MinY (), source.MinZ (),
-    	    source.MaxX (), source.MaxY (), source.MaxZ (),
-    	    dest.MinX (), dest.MinY (), dest.MinZ (),
-    	    dest.MaxX (), dest.MaxY (), dest.MaxZ ()));
+      DB(("S:Marked invisible\n"));
 
       // If the destination node is invisible that automatically implies
       // that the children are invisible too. No need to recurse further.
@@ -1026,6 +1023,10 @@ void PVSCalcSector::RecurseDestNodes (PVSCalcNode* sourcenode,
   // traversing to the children so we only skip the testing part.
   if (!dest.Overlap (source))
   {
+    //if ((source.MaxZ()<5 && dest.MinZ()>5) || (source.MinZ()>5 && dest.MaxZ()<5))
+      //printf ("####################################################\n");
+    //else
+      //printf ("----------------------------------------------------\n");
     // First we do a trivial test to see if the nodes can surely see each
     // other.
     if (!NodesSurelyVisible (source, dest))
