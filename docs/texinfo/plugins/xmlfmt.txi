@@ -152,7 +152,7 @@ in the previous section:
       <scale u="10" v="10" />
       <mixmode>
         <add />
-	<tiling />
+        <tiling />
       </mixmode>
     </layer>
   </material>
@@ -237,9 +237,15 @@ spr3d, and spr3dfact plugins:
 
 @example
 <plugins>
-    <plugin name="thing">crystalspace.mesh.loader.thing</plugin>
-    <plugin name="spr3dFact">crystalspace.mesh.loader.factory.sprite.3d</plugin>
-    <plugin name="spr3d">crystalspace.mesh.loader.sprite.3d</plugin>
+    <plugin name="thing">
+        crystalspace.mesh.loader.thing
+    </plugin>
+    <plugin name="spr3dFact">
+        crystalspace.mesh.loader.factory.sprite.3d
+    </plugin>
+    <plugin name="spr3d">
+        crystalspace.mesh.loader.sprite.3d
+    </plugin>
 </plugins>
 @end example
 
@@ -298,9 +304,9 @@ name in your application. Here is an example:
     <start name="alternate">
         <sector>other_room</sector>
         <position x="0" y="0" z="0" />
-	<up x="0" y="-1" z="0" />
-	<forward x="0" y="0" z="-1" />
-	<farplane a="0" b="0" c="1" d="100" />
+        <up x="0" y="-1" z="0" />
+        <forward x="0" y="0" z="-1" />
+        <farplane a="0" b="0" c="1" d="100" />
     </start>
 @end example
 
@@ -509,22 +515,22 @@ Here is an example sector:
       <material>wood</material>
       <texlen>4</texlen>
       <p name="up">
-	<v>6</v> <v>7</v> <v>5</v> <v>4</v>
+        <v>6</v> <v>7</v> <v>5</v> <v>4</v>
       </p>
       <p name="down">
-	<v>3</v> <v>2</v> <v>0</v> <v>1</v>
+        <v>3</v> <v>2</v> <v>0</v> <v>1</v>
       </p>
       <p name="back">
-	<v>7</v> <v>6</v> <v>2</v> <v>3</v>
+        <v>7</v> <v>6</v> <v>2</v> <v>3</v>
       </p>
       <p name="front">
-	<v>4</v> <v>5</v> <v>1</v> <v>0</v>
+        <v>4</v> <v>5</v> <v>1</v> <v>0</v>
       </p>
       <p name="left">
-	<v>6</v> <v>4</v> <v>0</v> <v>2</v>
+        <v>6</v> <v>4</v> <v>0</v> <v>2</v>
       </p>
       <p name="right">
-	<v>5</v> <v>7</v> <v>3</v> <v>1</v>
+        <v>5</v> <v>7</v> <v>3</v> <v>1</v>
       </p>
     </params>
   </meshobj>
@@ -671,23 +677,28 @@ manager is with a few examples:
 @example
 <sequences>
     <sequence name="animlight">
-        <fadelight light="l1" red="0" green="0" blue="0" duration="1000" />
+        <fadelight light="l1" red="0" green="0" blue="0"
+            duration="1000" />
         <delay time="1000" />
-        <fadelight light="l1" red="1" green="1" blue="1" duration="1000" />
+        <fadelight light="l1" red="1" green="1" blue="1"
+            duration="1000" />
         <delay time="1000" />
-        <fadelight light="l1" red="1" green="0" blue="0" duration="1000" />
+        <fadelight light="l1" red="1" green="0" blue="0"
+            duration="1000" />
         <delay time="1000" />
-        <fadelight light="l1" red="0" green="1" blue="0" duration="1000" />
+        <fadelight light="l1" red="0" green="1" blue="0"
+            duration="1000" />
         <delay time="1000" />
-        <fadelight light="l1" red="0" green="0" blue="1" duration="1000" />
+        <fadelight light="l1" red="0" green="0" blue="1"
+            duration="1000" />
         <delay time="1000" />
         <enable trigger="animlight" />
     </sequence>
 </sequences>
 <triggers>
     <trigger name="animlight">
-	<sectorvis sector="large" />
-	<fire sequence="animlight" />
+        <sectorvis sector="large" />
+        <fire sequence="animlight" />
     </trigger>
 </triggers>
 @end example
@@ -735,37 +746,42 @@ use parameters like in the following example:
 @example
 <sequences>
     <sequence name="animlight">
-	<args>
-	    <arg name="l" />
-	    <arg name="trig" />
-	</args>
-        <fadelight light_par="l" red="0" green="0" blue="0" duration="1000" />
+        <args>
+            <arg name="l" />
+            <arg name="trig" />
+        </args>
+        <fadelight light_par="l" red="0" green="0" blue="0"
+	    duration="1000" />
         <delay time="1000" />
-        <fadelight light_par="l" red="1" green="1" blue="1" duration="1000" />
+        <fadelight light_par="l" red="1" green="1" blue="1"
+	    duration="1000" />
         <delay time="1000" />
-        <fadelight light_par="l" red="1" green="0" blue="0" duration="1000" />
+        <fadelight light_par="l" red="1" green="0" blue="0"
+	    duration="1000" />
         <delay time="1000" />
-        <fadelight light_par="l" red="0" green="1" blue="0" duration="1000" />
+        <fadelight light_par="l" red="0" green="1" blue="0"
+	    duration="1000" />
         <delay time="1000" />
-        <fadelight light_par="l" red="0" green="0" blue="1" duration="1000" />
+        <fadelight light_par="l" red="0" green="0" blue="1"
+	    duration="1000" />
         <delay time="1000" />
         <enable trigger_par="trig" />
     </sequence>
 </sequences>
 <triggers>
     <trigger name="animlight_l1">
-	<sectorvis sector="large" />
-	<fire sequence="animlight">
-	    <light name="l" light="l1" />
-	    <light name="trig" light="animlight_l1" />
-	</fire>
+        <sectorvis sector="large" />
+        <fire sequence="animlight">
+            <light name="l" light="l1" />
+            <light name="trig" light="animlight_l1" />
+        </fire>
     </trigger>
     <trigger name="animlight_l2">
-	<sectorvis sector="large" />
-	<fire sequence="animlight">
-	    <light name="l" light="l2" />
-	    <light name="trig" light="animlight_l2" />
-	</fire>
+        <sectorvis sector="large" />
+        <fire sequence="animlight">
+            <light name="l" light="l2" />
+            <light name="trig" light="animlight_l2" />
+        </fire>
     </trigger>
 </triggers>
 @end example
@@ -928,5 +944,3 @@ you can disable the trigger initially and let some other sequence (or the
 application) enable the trigger.
 
 @end itemize
-
-
