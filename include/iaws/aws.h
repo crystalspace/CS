@@ -704,7 +704,7 @@ struct iAwsComponentFactory : public iBase
 };
 
 
-SCF_VERSION (iAwsKeyFactory, 0, 0, 2);
+SCF_VERSION (iAwsKeyFactory, 0, 0, 3);
 
 /// Interface for key factories.
 struct iAwsKeyFactory : public iBase
@@ -727,6 +727,8 @@ struct iAwsKeyFactory : public iBase
    virtual void AddPointKey (const char* name, csPoint v)=0;
    /// Add a connection key
    virtual void AddConnectionKey (const char* name, iAwsSink *s, unsigned long t, unsigned long sig)=0;
+   
+   virtual awsComponentNode* GetThisNode () = 0;
 };
 
 /* @} */
