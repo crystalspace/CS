@@ -66,6 +66,7 @@ struct csRefCounter
 {
   int refcount;
   csRefCounter ():refcount(1) {}
+  virtual ~csRefCounter () {}
   virtual void IncRef (){ refcount++; }
   virtual void DecRef (){ if (--refcount <= 0) delete this; }
   virtual int GetRefCount () {return refcount;}
