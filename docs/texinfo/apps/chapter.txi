@@ -12,13 +12,11 @@ examples of how to actually program with Crystal Space.
 * Applications Overview:: Quick Overview
 * Walktest::
 * map2cs:: Quake Map Converter (@code{map2cs})
-* Squawk::
 * mdl2spr:: Quake Model Converter (@code{mdl2spr})
 @end menu
 
 @imports{apps,overview.txi}
 @importss{apps,walktest,walktest.txi}
 @importss{apps,map2cs,map2cs.txi}
-@imports{apps,squawk.txi}
 @imports{apps,mdl2spr.txi}
 
