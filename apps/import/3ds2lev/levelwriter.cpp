@@ -28,6 +28,8 @@
 
 #include "levelwriter.h"
 
+bool GetObjectNameSetting (const char* name, char setting);
+
 LevelWriter::LevelWriter ()
     : p3dsFile(NULL), newpointmap(NULL), vectors(NULL), planes(NULL)
 {
@@ -98,7 +100,27 @@ csPtr<iDocument> LevelWriter::WriteDocument ()
       cullerpnode->CreateNodeBefore (CS_NODE_TEXT);
     textnode->SetValue ("crystalspace.culling.dynavis");
     
-    WriteObjects (sectornode, flags & FLAG_LIGHTING);
+    WriteObjects (sectornode);
+
+    // create settings section
+    csRef<iDocumentNode> settingsnode =
+	worldnode->CreateNodeBefore(CS_NODE_ELEMENT);
+    settingsnode->SetValue ("settings");
+
+    if (flags & FLAG_CLEARZBUFCLEARSCREEN)
+    {
+      csRef<iDocumentNode> clearzbuf =
+	settingsnode->CreateNodeBefore (CS_NODE_ELEMENT);
+      clearzbuf->SetValue ("clearzbuf");
+      textnode = clearzbuf->CreateNodeBefore (CS_NODE_TEXT);
+      textnode->SetValue ("yes");
+
+      csRef<iDocumentNode> clearscreen =
+	settingsnode->CreateNodeBefore (CS_NODE_ELEMENT);
+      clearscreen->SetValue ("clearscreen");
+      textnode = clearscreen->CreateNodeBefore (CS_NODE_TEXT);
+      textnode->SetValue ("yes");
+    }
   }
   else
   {
@@ -110,43 +132,6 @@ csPtr<iDocument> LevelWriter::WriteDocument ()
 
 void LevelWriter::WriteTexturesMaterials (iDocumentNode* worldnode)
 {
-  // extracts all unique textures
-  char *textures[10000];
-  int numTextures = 0;
-  int j;
-  
-  // set the current mesh to the first in the file
-  Lib3dsMesh *p3dsMesh;
-  // as long as we have a valid mesh...
-  for (p3dsMesh = p3dsFile->meshes; p3dsMesh; p3dsMesh = p3dsMesh->next )
-  {
-    // Null Objekt?
-    if (!p3dsMesh->faces || !p3dsMesh->faceL)
-      continue;
-
-    if (strlen (p3dsMesh->faceL->material) == 0)
-    {
-      fprintf (stderr, "Object '%s' has NO texture specified!\n",
-		p3dsMesh->name);
-      continue;
-    }
-    
-    // search if already present
-    bool found = false;
-    
-    for (j=0; j<numTextures; j++) {
-      if (strcmp(p3dsMesh->faceL->material, textures[j])==0) {
-	found = true;
-	break;
-      }
-    }
-    // if not present add it!
-    if (!found) {
-      textures[numTextures] = p3dsMesh->faceL->material;
-      numTextures++;
-    }
-  }  
-
   // Generate XML tree
   csRef<iDocumentNode> texturesnode = 
     worldnode->CreateNodeBefore (CS_NODE_ELEMENT);
@@ -158,39 +143,59 @@ void LevelWriter::WriteTexturesMaterials (iDocumentNode* worldnode)
     printf ("FATAL: Couldn't create texture nodes!\n");
     return;
   }
+
   texturesnode->SetValue ("textures");
   materialsnode->SetValue ("materials");
 
-  // output textures
-  for (j=0; j<numTextures; j++)
+  Lib3dsMaterial *pMaterial = p3dsFile->materials;
+
+  // iterate through materials
+  for (; pMaterial != NULL; pMaterial = pMaterial->next )
   {
     csRef<iDocumentNode> texturenode =
       texturesnode->CreateNodeBefore (CS_NODE_ELEMENT);
     texturenode->SetValue ("texture");
-    texturenode->SetAttribute ("name", textures[j]);
+    texturenode->SetAttribute ("name", pMaterial->name);
     csRef<iDocumentNode> filenode =
       texturenode->CreateNodeBefore (CS_NODE_ELEMENT);
     filenode->SetValue("file");
     csRef<iDocumentNode> textnode =
       filenode->CreateNodeBefore (CS_NODE_TEXT);
-    textnode->SetValue (textures[j]);
-  }
-  
-  // output materials (here from each texture a material is created)
-  for (j=0; j<numTextures; j++)
-  {
+
+    // set file name to name of texture, whether it's valid or not
+    // (this is only to maintain backward compatibility w/old 3ds2lev)
+    textnode->SetValue (pMaterial->name);
+    int pos = strlen(pMaterial->name);
+
+    // if material name does not end with dot and 3 letters
+    // try to get it from the filename field of the texture1_map
+    if ( ! ( pos > 3 && pMaterial->name[ pos - 3] == '.')  )
+    {
+      if ( pMaterial->texture1_map.name && 
+           strlen(pMaterial->texture1_map.name) > 1 )
+      {
+        // todo: prefix w/texture path if one was given on command line
+        //textnode->SetValue (strlwr (pMaterial->texture1_map.name));
+	textnode->SetValue (pMaterial->texture1_map.name); 
+      }
+    }
+    
+    // Create materials nodes
     csRef<iDocumentNode> materialnode =
       materialsnode->CreateNodeBefore (CS_NODE_ELEMENT);
     materialnode->SetValue ("material");
-    materialnode->SetAttribute ("name", textures[j]);
-    csRef<iDocumentNode> texturenode =
+    materialnode->SetAttribute ("name", pMaterial->name);
+
+    csRef<iDocumentNode> mtexturenode =
       materialnode->CreateNodeBefore (CS_NODE_ELEMENT);
-    texturenode->SetValue("texture");
-    csRef<iDocumentNode> textnode =
-      texturenode->CreateNodeBefore (CS_NODE_TEXT);
-    textnode->SetValue (textures[j]);
+    mtexturenode->SetValue("texture");
+
+    csRef<iDocumentNode> mtextnode =
+      mtexturenode->CreateNodeBefore (CS_NODE_TEXT);
+    mtextnode->SetValue (pMaterial->name);
   }
-}
+  
+} 
 
 void LevelWriter::WritePlugins (iDocumentNode* worldnode)
 {
@@ -244,7 +249,7 @@ void LevelWriter::WriteLights (iDocumentNode* sectornode)
   
   for (pCurLight = p3dsFile->lights; pCurLight; pCurLight = pCurLight->next)
   {
-    // discart spot-lights
+    // discard spot-lights
     if (pCurLight->spot_light) {
       fprintf (stderr, 
 	  "Spotlight are not supported. Light '%s' will not be imported in CS\n",
@@ -314,13 +319,13 @@ void LevelWriter::WriteVertices (iDocumentNode* paramsnode, Lib3dsMesh* mesh)
   }
   else
   {
-    // Create a new set of vertices so that we can eventually remove doubled
-    // verrtices
+    // Create a new set of vertices
+    // so that we can eventually remove doubled verrtices later
     if (newpointmap)
       delete[] newpointmap;
     newpointmap = new int [mesh->points];
     if (vectors)
-	delete[] vectors;
+      delete[] vectors;
     vectors = new csDVector3 [mesh->points];
     
     for (unsigned int i=0;i<mesh->points;i++)
@@ -365,8 +370,8 @@ void LevelWriter::WriteVertices (iDocumentNode* paramsnode, Lib3dsMesh* mesh)
  */
 typedef unsigned short facenum;
 
-bool LevelWriter::CombineTriangle (Lib3dsMesh* mesh, csDPlane*& plane, int* poly,
-	int& plen, int trinum)
+bool LevelWriter::CombineTriangle (Lib3dsMesh* mesh, csDPlane*& plane,
+				   int* poly, int& plen, int trinum)
 {
   facenum* ppoints = mesh->faceL[trinum].points;
   int points[3];
@@ -516,6 +521,7 @@ pointfound:
   return true;
 }
 
+// lighting=flase creates polygon lit with full bright texture colours
 void LevelWriter::WriteFaces(iDocumentNode* paramsnode, 
     Lib3dsMesh* mesh, bool lighting, unsigned int numMesh)
 {
@@ -570,6 +576,20 @@ void LevelWriter::WriteFaces(iDocumentNode* paramsnode,
       }
     }
 
+    // if alpha settings are specified for the first face, apply them
+    // to all faces.(this could be done per face, but it's understood that
+    // each object only has one material anyway )
+    Lib3dsMaterial* mat = p3dsFile->materials;
+    int alpha = 100;
+    if (mesh->faces > 0)
+    {
+      while( mat && strcmp( mat->name, mesh->faceL[0].material) != 0 )
+        mat = mat->next;
+
+      if (mat && mat->transparency > 0 )
+        alpha = 100 - ((int) mat->transparency * 100);
+    }
+
     for (unsigned int f = 0; f < mesh->faces; f++)
     {
       if (used[f])
@@ -619,6 +639,16 @@ void LevelWriter::WriteFaces(iDocumentNode* paramsnode,
 	csRef<iDocumentNode> textnode =
 	  vnode->CreateNodeBefore (CS_NODE_TEXT);
 	textnode->SetValueAsInt (poly[i]);
+      }
+
+      if (alpha < 100)
+      {        
+	csRef<iDocumentNode> alphanode = 
+        pnode->CreateNodeBefore (CS_NODE_ELEMENT);             
+	alphanode->SetValue ("alpha");
+	csRef<iDocumentNode> textnode =
+	    alphanode->CreateNodeBefore (CS_NODE_TEXT);
+	textnode->SetValueAsInt (alpha);
       }
       
       if (!lighting)
@@ -724,75 +754,20 @@ void LevelWriter::WriteSprite (iDocumentNode* rootnode)
  * Based on the object name we create MESHOBJ or PART.
  *
  */
-void LevelWriter::WriteObjects (iDocumentNode* sectornode, bool lighting)
+void LevelWriter::WriteObjects (iDocumentNode* sectornode)
 {
-  Lib3dsMesh *p3dsMesh = p3dsFile->meshes;
-
-  // if a light is present in the 3ds file force LIGHTNING (yes)
-  if (p3dsFile->lights)
-    lighting = true;  
-
-  if (flags & FLAG_SPRITE)
-  {
-    //WriteL ("; Spritename: '%s'", p3dsMesh->name);
-  }
-  else
-  {
-    // count meshes
-    unsigned int numMeshes = 0;
-    unsigned int n;
-    while (p3dsMesh)
-    {
-      // Only count non NULL objects
-      if (p3dsMesh->faces && p3dsMesh->faceL)
-    	numMeshes++;
-      p3dsMesh = p3dsMesh->next;
-    }
-
-    // build an array with all meshes
-    Lib3dsMesh** p3dsMeshArray = new Lib3dsMesh* [numMeshes];
-    p3dsMesh = p3dsFile->meshes;
-    n=0;
-    for ( ; p3dsMesh && n<numMeshes ; p3dsMesh=p3dsMesh->next)
-    {
-      if (p3dsMesh->faces && p3dsMesh->faceL)
-        p3dsMeshArray[n++] = p3dsMesh;
-    }
-
-    // Reorder the objects to have all "_s_" first.
-    // set the current mesh to the first in the file
-    for (n=0; n<numMeshes; n++)
-    {
-        // if not static...
-        if (!strstr( ((Lib3dsMesh *)&p3dsMeshArray[n])->name, "_s_"))
-	{
-          // search a static and swap
-          for (unsigned int j=n+1; j<numMeshes; j++)
-	  {
-             if (strstr( ((Lib3dsMesh *)&p3dsMeshArray[j])->name, "_s_"))
-	     {
-                Lib3dsMesh* tmp = p3dsMeshArray[j];
-                p3dsMeshArray[j] = p3dsMeshArray[n];
-                p3dsMeshArray[n] = tmp;
-             }
-          }
-        }
-    }
-
-    // assign reordered vector to main Lib3ds struct
-    for (n=0; n<numMeshes-1; n++) {
-      p3dsMeshArray[n]->next = p3dsMeshArray[n+1];
-    }
-    p3dsMeshArray[n]->next=0;
-    p3dsFile->meshes = p3dsMeshArray[0];
-  }
+  Lib3dsMesh *p3dsMesh;
 
   // iterate on all meshes
-  p3dsMesh = p3dsFile->meshes;
-
   int numMesh = 0;
-  while (p3dsMesh)
+  bool lighting = true;
+  for (p3dsMesh = p3dsFile->meshes; p3dsMesh; 
+		    p3dsMesh = p3dsMesh->next, numMesh++)
   {
+    // if mesh has no faces, skip it
+    if (!p3dsMesh->faceL)
+      continue;
+      
     csRef<iDocumentNode> meshobjnode = 
       sectornode->CreateNodeBefore (CS_NODE_ELEMENT);
     meshobjnode->SetValue ("meshobj");
@@ -818,26 +793,62 @@ void LevelWriter::WriteObjects (iDocumentNode* sectornode, bool lighting)
       materialnode->CreateNodeBefore (CS_NODE_TEXT);
     textnode->SetValue (p3dsMesh->faceL->material);
 
+    // if 'l' flag specified, set lighting to false
+    lighting = ! GetObjectNameSetting (p3dsMesh->name, 'l');
+    // override object level setting if command-line arg was given
+    if (flags & FLAG_LIGHTING)
+      lighting = false;                                               
+
     WriteFaces(paramsnode, p3dsMesh, lighting, numMesh);
 
     csRef<iDocumentNode> zmodenode =
       meshobjnode->CreateNodeBefore (CS_NODE_ELEMENT);
     zmodenode->SetValue ("zuse");
-    
-    if (strstr(p3dsMesh->name, "_t_"))
-    {
+
+    if (GetObjectNameSetting (p3dsMesh->name, 't') ||
+	    strstr(p3dsMesh->name, "_t_")) /* _t_ is old way */
       zmodenode->SetValue ("ztest");
-      csRef<iDocumentNode> prioritynode =
-	meshobjnode->CreateNodeBefore (CS_NODE_ELEMENT);
-      prioritynode->SetValue ("priority");
-      textnode = 
-	prioritynode->CreateNodeBefore (CS_NODE_TEXT);
-      textnode->SetValue ("alpha");
-    }
-      
-    // increment mesh count
-    numMesh++;
-    p3dsMesh = p3dsMesh->next;
-  } // ~end while (p3dsMesh)
+    if ( GetObjectNameSetting (p3dsMesh->name, 'u'))
+      zmodenode->SetValue ("zuse");
+    if ( GetObjectNameSetting (p3dsMesh->name, 'f'))    
+      zmodenode->SetValue ("zfill");
+    if ( GetObjectNameSetting (p3dsMesh->name, 'n'))
+      zmodenode->SetValue ("znone");
+
+    csRef<iDocumentNode> prioritynode =
+      meshobjnode->CreateNodeBefore (CS_NODE_ELEMENT);
+    prioritynode->SetValue ("priority");
+    csRef<iDocumentNode> prioritytextnode = 
+      prioritynode->CreateNodeBefore (CS_NODE_TEXT);
+    prioritytextnode->SetValue ("object");
+
+    if (GetObjectNameSetting ( p3dsMesh->name, 'a') || 
+         strstr(p3dsMesh->name, "_t_")) // old way
+      prioritytextnode->SetValue ("alpha");
+
+    if (GetObjectNameSetting ( p3dsMesh->name, 'w'))
+      prioritytextnode->SetValue ("wall");
+    if (GetObjectNameSetting ( p3dsMesh->name, 's'))
+      prioritytextnode->SetValue ("sky");
+    if (GetObjectNameSetting ( p3dsMesh->name, 'o'))
+      prioritytextnode->SetValue ("object");                        
+  }
 }
 
+bool GetObjectNameSetting(const char * objectname, char setting)
+{
+  if (objectname && strlen(objectname) > 3)
+  {
+    // if missing either delimiter, return false
+    if (objectname[0] != '|') return false;
+
+    char * fardelim = strchr(&objectname[1], '|');
+    if (fardelim == objectname) return false;
+
+    for (int pos = 1; pos < (fardelim - objectname); pos++)
+      if (objectname[ pos ] == setting) 
+        return true;
+  }
+
+  return false;
+}

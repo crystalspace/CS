@@ -136,12 +136,24 @@ void Lib3dsConvertXYZ (Lib3dsFile* p3dsFile, xyzmode mode)
   }
 
   // swap coords of lights
-  Lib3dsLight *pCurLight = p3dsFile->lights;
+  Lib3dsLight* light;
+  for (light = p3dsFile->lights; light; light = light->next)
+  {
+    ConvertXYZ (mode, light->position[0],
+	              light->position[1],
+		      light->position[2]);
+  }
 
-  while (pCurLight) {
-    ConvertXYZ (mode, pCurLight->position[0], pCurLight->position[1], pCurLight->position[2]);
-
-    pCurLight = pCurLight->next;
+  // swap coords of cameras
+  Lib3dsCamera *camera;
+  for (camera = p3dsFile->cameras; camera; camera = camera->next)
+  {
+    ConvertXYZ (mode, camera->position[0],
+		      camera->position[1],
+		      camera->position[2]);
+    ConvertXYZ (mode, camera->target[0],
+		      camera->target[1],
+		      camera->target[2]);
   }
 }
 
@@ -158,7 +170,9 @@ int main (int argc, char * argv[])
   LevelWriter writer;
 
   flags = 0;
-  writer.SetFlags (LevelWriter::FLAG_SWAP_V); // default to lower left texture origin
+  
+  // default to lower left texture origin
+  writer.SetFlags (LevelWriter::FLAG_SWAP_V);
 
   argc--;
   argv++;
@@ -180,6 +194,7 @@ int main (int argc, char * argv[])
                " -pl       Make polygons lit\n"
                " -3        Output 3D sprite instead of level\n"
 	       " -tl       Make texture origin lower left (default)\n"
+	       " -b	   Use clearzbuf and clearscreen settings\n"
 	       " -xyz      Convert model xyz -> CS xyz\n"
 	       " -xzy      Convert model xyz -> CS xzy (default)\n"
 	       " -yxz      Convert model xyz -> CS yxz\n"
@@ -198,73 +213,89 @@ int main (int argc, char * argv[])
     {
       switch (toupper(argv[n][1]))
       {
-	case 'O': if (n+1<argc) 
-		    outfn=argv[++n];
-		  else
-		  { 
-	      	    fprintf (stderr, "Missing outputfile name!\n");
-      		    return 1;
-		  }
-		  break;
-        case 'R': if (n+3<argc)
-		  {
-                    xrelocate = atof(argv[++n]);
-                    yrelocate = atof(argv[++n]);
-                    zrelocate = atof(argv[++n]);
-		  }
-                  else
-		  {
-		    fprintf(stderr, "Missing relocate value!\n");
-		    return 1;
-		  }
-		  break;
-        case 'S': if (n+3<argc)
-		  {
-                    xscale = atof(argv[++n]);
-                    yscale = atof(argv[++n]);
-                    zscale = atof(argv[++n]);
-		  }
-                  else
-		  {
-		    fprintf(stderr, "Missing scale value!\n");
-		    return 1;
-		  }
-		  break;
+	case 'O':
+	  if (n+1<argc) 
+	    outfn=argv[++n];
+	  else
+	  { 
+	    fprintf (stderr, "Missing outputfile name!\n");
+	    return 1;
+	  }
+	  break;
+        case 'R':
+	  if (n+3<argc)
+	  {
+	    xrelocate = atof(argv[++n]);
+	    yrelocate = atof(argv[++n]);
+	    zrelocate = atof(argv[++n]);
+	  }
+	  else
+	  {
+	    fprintf(stderr, "Missing relocate value!\n");
+	    return 1;
+	  }
+	  break;
+        case 'S':
+	  if (n+3<argc)
+	  {
+	    xscale = atof(argv[++n]);
+	    yscale = atof(argv[++n]);
+	    zscale = atof(argv[++n]);
+	  }
+   	  else
+	  {
+	    fprintf(stderr, "Missing scale value!\n");
+	    return 1;
+	  }
+	  break;
         case 'P':
-	          if (toupper (argv[n][2]) == 'L')
-		  {
-		    writer.SetFlags (LevelWriter::FLAG_LIGHTING);
-		  }
-		  break;
-	case 'V': writer.SetFlags(LevelWriter::FLAG_VERBOSE);
-		  flags |= FLAG_VERBOSE;
-		  break;
-        case 'T': if (toupper (argv[n][2]) == 'L')
-		    writer.SetFlags (LevelWriter::FLAG_SWAP_V);
-		  break;
-	case '3': writer.SetFlags (LevelWriter::FLAG_SPRITE); break;
-	case 'L': flags |= FLAG_LIST; break;
-	case 'X': if (toupper (argv[n][2]) == 'Y')
-		    mode_xyz = MODE_XYZ;
-		  else
-		    mode_xyz = MODE_XZY;
-		  break;
-	case 'Y': if (toupper (argv[n][2]) == 'X')
-		    mode_xyz = MODE_YXZ;
-		  else
-		    mode_xyz = MODE_YZX;
-		  break;
-	case 'Z': if (toupper (argv[n][2]) == 'X')
-		    mode_xyz = MODE_ZXY;
-		  else
-		    mode_xyz = MODE_ZYX;
-		  break;
+	  if (toupper (argv[n][2]) == 'L')
+	  {
+	    writer.SetFlags (LevelWriter::FLAG_LIGHTING);
+	  }
+	  break;
+	case 'V':
+	  writer.SetFlags(LevelWriter::FLAG_VERBOSE);
+	  flags |= FLAG_VERBOSE;
+	  break;
+        case 'T':
+	  if (toupper (argv[n][2]) == 'L')
+	    writer.SetFlags (LevelWriter::FLAG_SWAP_V);
+	  break;
+	case '3':
+	  writer.SetFlags (LevelWriter::FLAG_SPRITE);
+	  break;
+	case 'L':
+	  flags |= FLAG_LIST;
+	  break;
+	case 'B':
+	  writer.SetFlags (LevelWriter::FLAG_CLEARZBUFCLEARSCREEN);
+	  break;
+	case 'X':
+	  if (toupper (argv[n][2]) == 'Y')
+	    mode_xyz = MODE_XYZ;
+	  else
+	    mode_xyz = MODE_XZY;
+	  break;
+	case 'Y':
+	  if (toupper (argv[n][2]) == 'X')
+	    mode_xyz = MODE_YXZ;
+	  else
+	    mode_xyz = MODE_YZX;
+	  break;
+	case 'Z':
+	  if (toupper (argv[n][2]) == 'X')
+	    mode_xyz = MODE_ZXY;
+	  else
+	    mode_xyz = MODE_ZYX;
+	  break;
 	case 'C': 
-		  writer.SetFlags(LevelWriter::FLAG_COMBINEFACES);
-		  writer.SetFlags(LevelWriter::FLAG_REMOVEDOUBLEVERTICES);
-		  break;
-	default:  fprintf (stderr, "Bad param: %s\n",argv[n]);
-		  return 1;
+	  writer.SetFlags(LevelWriter::FLAG_COMBINEFACES);
+	  writer.SetFlags(LevelWriter::FLAG_REMOVEDOUBLEVERTICES);
+	  break;
+	default:
+	  fprintf (stderr, "Bad parameter: %s\n",argv[n]);
+	  return 1;
       }
     }
     else
@@ -307,17 +338,13 @@ int main (int argc, char * argv[])
     fprintf (stderr, "object-name     faces vertices  maps  matrix\n");
 
     // set the current mesh to the first in the file
-    Lib3dsMesh* mesh3ds = file3ds->meshes;
-    // as long as we have a valid mesh...
-    while( mesh3ds )
+    Lib3dsMesh* mesh;
+    for (mesh = file3ds->meshes; mesh; mesh = mesh->next)
     {
         // get the numbers in the current mesh
         fprintf(stderr, "===================================================\n");
         fprintf(stderr, "%-14s  %5ld  %5ld  %5d    %s\n",
-              mesh3ds->name, mesh3ds->faces, mesh3ds->points, -1, " ");
-
-        // go to next mesh
-        mesh3ds = mesh3ds->next;
+              mesh->name, mesh->faces, mesh->points, -1, " ");
     }
   }
 

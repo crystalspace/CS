@@ -49,7 +49,8 @@ public:
     FLAG_SPRITE	  = 0x0008,
     FLAG_SWAP_V	  = 0x0010,
     FLAG_COMBINEFACES = 0x0020,
-    FLAG_REMOVEDOUBLEVERTICES = 0x0040
+    FLAG_REMOVEDOUBLEVERTICES = 0x0040,
+    FLAG_CLEARZBUFCLEARSCREEN = 0x0080
   };
   
   LevelWriter();
@@ -65,12 +66,12 @@ public:
   void WritePlugins (iDocumentNode* worldnode);
   void WriteStartPoints (iDocumentNode* worldnode);
 
-  void WriteObjects (iDocumentNode* sectornore, bool lighting);
+  void WriteObjects (iDocumentNode* sectornore);
   void WriteLights (iDocumentNode* sectornode);
   
   void WriteVertices (iDocumentNode* paramsnode, Lib3dsMesh* mesh);
   void WriteFaces (iDocumentNode* paramsnode, Lib3dsMesh* mesh,
-		    bool lighting, unsigned int numMesh);
+		   bool lighting, unsigned int numMesh);
 
   void SetScale(float x, float y, float z);
   void SetTranslate(float x, float y, float z);
