@@ -233,7 +233,7 @@ void csGraphics2DOpenGLFontServer::BuildFont(FontDef &newfont)
     if (mFont_Information_Array != NULL)
     {
     	GLFontInfo **newhandles;
-	CHK ( newhandles = new (GLFontInfo *)[mFont_Count+1] );
+	CHK ( newhandles = new GLFontInfo*[mFont_Count+1] );
 	for (int index=0; index < mFont_Count; index++)
 		newhandles[index] = mFont_Information_Array[index];
 	
@@ -241,7 +241,7 @@ void csGraphics2DOpenGLFontServer::BuildFont(FontDef &newfont)
 	mFont_Information_Array = newhandles;
     }
     else
-    	CHK ( mFont_Information_Array = new (GLFontInfo *)[1] );
+    	CHK ( mFont_Information_Array = new GLFontInfo*[1] );
 
     mFont_Information_Array[mFont_Count] = new GLFontInfo(newfont);
 
