@@ -68,6 +68,8 @@ REGISTER_STATIC_LIBRARY (engine)
 
 Blocks::Blocks ()
 {
+  world = NULL;
+
   full_rotate_x = create_rotate_x (M_PI/2);
   full_rotate_y = create_rotate_y (M_PI/2);
   full_rotate_z = create_rotate_z (M_PI/2);
@@ -102,7 +104,7 @@ Blocks::Blocks ()
   dest_move_down_dx[2] = 0; dest_move_down_dy[2] = 1;
   dest_move_down_dx[3] = -1; dest_move_down_dy[3] = 0;
   cur_hor_dest = 0;
-  cur_ver_dest = 1;
+  cur_ver_dest = 2;
   move_right_dx = dest_move_right_dx[cur_hor_dest];
   move_right_dy = dest_move_right_dy[cur_hor_dest];
   move_down_dx = dest_move_down_dx[cur_hor_dest];
@@ -113,6 +115,12 @@ Blocks::Blocks ()
   newgame = true;
   startup_screen = true;
   dynlight = NULL;
+}
+
+Blocks::~Blocks ()
+{
+  delete dynlight;
+  if (world) world->Clear ();
 }
 
 void Blocks::init_game ()
@@ -136,6 +144,14 @@ void Blocks::init_game ()
   rot_mz_todo = 0;
   move_hor_todo = 0;
   cam_move_dist = 0;
+
+  cur_hor_dest = 0;
+  cur_ver_dest = 2;
+  move_right_dx = dest_move_right_dx[cur_hor_dest];
+  move_right_dy = dest_move_right_dy[cur_hor_dest];
+  move_down_dx = dest_move_down_dx[cur_hor_dest];
+  move_down_dy = dest_move_down_dy[cur_hor_dest];
+  cam_move_dest = destinations[cur_hor_dest][cur_ver_dest];
 }
 
 
@@ -399,7 +415,7 @@ void set_uv (csPolygon3D* p, float u1, float v1, float u2, float v2,
   gs->SetUV (2, u3, v3);
 }
 
-void Blocks::add_cube (int dx, int dy, int dz, int x, int y, int z)
+csThing* Blocks::create_cube_thing (int dx, int dy, int dz)
 {
   csThing* cube;
   cube = new csThing ();
@@ -423,20 +439,34 @@ void Blocks::add_cube (int dx, int dy, int dz, int x, int y, int z)
   p = cube->GetPolygon3D ("l2"); set_uv (p, 0, 0, 1, 1, 0, 1);
   p = cube->GetPolygon3D ("r1"); set_uv (p, 0, 0, 1, 0, 1, 1);
   p = cube->GetPolygon3D ("r2"); set_uv (p, 0, 0, 1, 1, 0, 1);
+  return cube;
+}
 
-  room->AddThing (cube);
-  csVector3 v ((x-ZONE_DIM/2)*CUBE_DIM, z*CUBE_DIM+CUBE_DIM/2,
+void Blocks::add_cube (int dx, int dy, int dz, int x, int y, int z)
+{
+  csThing* cube = add_cube_thing (room, dx, dy, dz,
+  	(x-ZONE_DIM/2)*CUBE_DIM,
+	z*CUBE_DIM+CUBE_DIM/2,
   	(y-ZONE_DIM/2)*CUBE_DIM);
-  cube->SetMove (room, v);
-  cube->Transform ();
-  cube->InitLightMaps (false);
-  room->ShineLights (cube);
-  cube->CreateLightMaps (Gfx3D);
   cube_info[num_cubes].thing = cube;
   cube_info[num_cubes].dx = dx;
   cube_info[num_cubes].dy = dy;
   cube_info[num_cubes].dz = dz;
   num_cubes++;
+}
+
+csThing* Blocks::add_cube_thing (csSector* sect, int dx, int dy, int dz,
+	float x, float y, float z)
+{
+  csThing* cube = create_cube_thing (dx, dy, dz);
+  sect->AddThing (cube);
+  csVector3 v (x, y, z);
+  cube->SetMove (sect, v);
+  cube->Transform ();
+  cube->InitLightMaps (false);
+  room->ShineLights (cube);
+  cube->CreateLightMaps (Gfx3D);
+  return cube;
 }
 
 void Blocks::start_shape (BlShapeType type, int x, int y, int z)
@@ -545,72 +575,6 @@ void Blocks::start_shape (BlShapeType type, int x, int y, int z)
       add_cube (0, 0, 1, x, y, z);
       add_cube (1, 1, 1, x, y, z);
       break;
-    case SHAPE_DEMO_B:
-      add_cube (-1, 0, -2, x, y, z);
-      add_cube (-1, 0, -1, x, y, z);
-      add_cube (-1, 0,  0, x, y, z);
-      add_cube (-1, 0,  1, x, y, z);
-      add_cube (-1, 0,  2, x, y, z);
-      add_cube ( 0, 0, -2, x, y, z);
-      add_cube ( 0, 0,  0, x, y, z);
-      add_cube ( 0, 0,  2, x, y, z);
-      add_cube ( 1, 0, -1, x, y, z);
-      add_cube ( 1, 0,  1, x, y, z);
-      break;
-    case SHAPE_DEMO_L:
-      add_cube (-1, 0, -2, x, y, z);
-      add_cube (-1, 0, -1, x, y, z);
-      add_cube (-1, 0,  0, x, y, z);
-      add_cube (-1, 0,  1, x, y, z);
-      add_cube (-1, 0,  2, x, y, z);
-      add_cube ( 0, 0,  -2, x, y, z);
-      add_cube ( 1, 0,  -2, x, y, z);
-      break;
-    case SHAPE_DEMO_O:
-      add_cube (-1, 0, -2, x, y, z);
-      add_cube (-1, 0, -1, x, y, z);
-      add_cube (-1, 0,  0, x, y, z);
-      add_cube (-1, 0,  1, x, y, z);
-      add_cube (-1, 0,  2, x, y, z);
-      add_cube ( 0, 0, -2, x, y, z);
-      add_cube ( 0, 0,  2, x, y, z);
-      add_cube ( 1, 0, -2, x, y, z);
-      add_cube ( 1, 0, -1, x, y, z);
-      add_cube ( 1, 0,  0, x, y, z);
-      add_cube ( 1, 0,  1, x, y, z);
-      add_cube ( 1, 0,  2, x, y, z);
-      break;
-    case SHAPE_DEMO_C:
-      add_cube (-1, 0, -1, x, y, z);
-      add_cube (-1, 0,  0, x, y, z);
-      add_cube (-1, 0,  1, x, y, z);
-      add_cube ( 0, 0, -2, x, y, z);
-      add_cube ( 0, 0,  2, x, y, z);
-      add_cube ( 1, 0, -2, x, y, z);
-      add_cube ( 1, 0,  2, x, y, z);
-      break;
-    case SHAPE_DEMO_K:
-      add_cube (-1, 0, -2, x, y, z);
-      add_cube (-1, 0, -1, x, y, z);
-      add_cube (-1, 0,  0, x, y, z);
-      add_cube (-1, 0,  1, x, y, z);
-      add_cube (-1, 0,  2, x, y, z);
-      add_cube ( 0, 0, -1, x, y, z);
-      add_cube ( 0, 0,  1, x, y, z);
-      add_cube ( 1, 0, -2, x, y, z);
-      add_cube ( 1, 0,  2, x, y, z);
-      break;
-    case SHAPE_DEMO_S:
-      add_cube ( 1, 0, -1, x, y, z);
-      add_cube ( 1, 0,  0, x, y, z);
-      add_cube ( 1, 0,  2, x, y, z);
-      add_cube ( 0, 0, -2, x, y, z);
-      add_cube ( 0, 0,  0, x, y, z);
-      add_cube ( 0, 0,  2, x, y, z);
-      add_cube (-1, 0, -2, x, y, z);
-      add_cube (-1, 0,  0, x, y, z);
-      add_cube (-1, 0,  1, x, y, z);
-      break;
     default: break;
   }
   move_down_todo = 0;
@@ -618,6 +582,80 @@ void Blocks::start_shape (BlShapeType type, int x, int y, int z)
   cube_y = y;
   cube_z = z;
   speed = .2;
+}
+
+void Blocks::start_demo_shape (BlShapeType type, float x, float y, float z)
+{
+  switch (type)
+  {
+    case SHAPE_DEMO_B:
+      add_cube_thing (demo_room, -1, 0, -2, x, y, z);
+      add_cube_thing (demo_room, -1, 0, -1, x, y, z);
+      add_cube_thing (demo_room, -1, 0,  0, x, y, z);
+      add_cube_thing (demo_room, -1, 0,  1, x, y, z);
+      add_cube_thing (demo_room, -1, 0,  2, x, y, z);
+      add_cube_thing (demo_room,  0, 0, -2, x, y, z);
+      add_cube_thing (demo_room,  0, 0,  0, x, y, z);
+      add_cube_thing (demo_room,  0, 0,  2, x, y, z);
+      add_cube_thing (demo_room,  1, 0, -1, x, y, z);
+      add_cube_thing (demo_room,  1, 0,  1, x, y, z);
+      break;
+    case SHAPE_DEMO_L:
+      add_cube_thing (demo_room, -1, 0, -2, x, y, z);
+      add_cube_thing (demo_room, -1, 0, -1, x, y, z);
+      add_cube_thing (demo_room, -1, 0,  0, x, y, z);
+      add_cube_thing (demo_room, -1, 0,  1, x, y, z);
+      add_cube_thing (demo_room, -1, 0,  2, x, y, z);
+      add_cube_thing (demo_room,  0, 0,  -2, x, y, z);
+      add_cube_thing (demo_room,  1, 0,  -2, x, y, z);
+      break;
+    case SHAPE_DEMO_O:
+      add_cube_thing (demo_room, -1, 0, -2, x, y, z);
+      add_cube_thing (demo_room, -1, 0, -1, x, y, z);
+      add_cube_thing (demo_room, -1, 0,  0, x, y, z);
+      add_cube_thing (demo_room, -1, 0,  1, x, y, z);
+      add_cube_thing (demo_room, -1, 0,  2, x, y, z);
+      add_cube_thing (demo_room,  0, 0, -2, x, y, z);
+      add_cube_thing (demo_room,  0, 0,  2, x, y, z);
+      add_cube_thing (demo_room,  1, 0, -2, x, y, z);
+      add_cube_thing (demo_room,  1, 0, -1, x, y, z);
+      add_cube_thing (demo_room,  1, 0,  0, x, y, z);
+      add_cube_thing (demo_room,  1, 0,  1, x, y, z);
+      add_cube_thing (demo_room,  1, 0,  2, x, y, z);
+      break;
+    case SHAPE_DEMO_C:
+      add_cube_thing (demo_room, -1, 0, -1, x, y, z);
+      add_cube_thing (demo_room, -1, 0,  0, x, y, z);
+      add_cube_thing (demo_room, -1, 0,  1, x, y, z);
+      add_cube_thing (demo_room,  0, 0, -2, x, y, z);
+      add_cube_thing (demo_room,  0, 0,  2, x, y, z);
+      add_cube_thing (demo_room,  1, 0, -2, x, y, z);
+      add_cube_thing (demo_room,  1, 0,  2, x, y, z);
+      break;
+    case SHAPE_DEMO_K:
+      add_cube_thing (demo_room, -1, 0, -2, x, y, z);
+      add_cube_thing (demo_room, -1, 0, -1, x, y, z);
+      add_cube_thing (demo_room, -1, 0,  0, x, y, z);
+      add_cube_thing (demo_room, -1, 0,  1, x, y, z);
+      add_cube_thing (demo_room, -1, 0,  2, x, y, z);
+      add_cube_thing (demo_room,  0, 0, -1, x, y, z);
+      add_cube_thing (demo_room,  0, 0,  1, x, y, z);
+      add_cube_thing (demo_room,  1, 0, -2, x, y, z);
+      add_cube_thing (demo_room,  1, 0,  2, x, y, z);
+      break;
+    case SHAPE_DEMO_S:
+      add_cube_thing (demo_room,  1, 0, -1, x, y, z);
+      add_cube_thing (demo_room,  1, 0,  0, x, y, z);
+      add_cube_thing (demo_room,  1, 0,  2, x, y, z);
+      add_cube_thing (demo_room,  0, 0, -2, x, y, z);
+      add_cube_thing (demo_room,  0, 0,  0, x, y, z);
+      add_cube_thing (demo_room,  0, 0,  2, x, y, z);
+      add_cube_thing (demo_room, -1, 0, -2, x, y, z);
+      add_cube_thing (demo_room, -1, 0,  0, x, y, z);
+      add_cube_thing (demo_room, -1, 0,  1, x, y, z);
+      break;
+    default: break;
+  }
 }
 
 void Blocks::start_rotation (BlRotType type)
@@ -768,8 +806,7 @@ void Blocks::eatkeypress (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/)
     case ' ': if (speed == 7) speed = 0.2; // Space changes speeds now.
 	      else speed = 7; break;
     case 'p': pause = !pause; break;
-    case 'n': newgame = true; break;
-    case CSKEY_ESC: System->Shutdown = true;
+    case CSKEY_ESC: newgame = true; startup_screen = true; break;
   }
 }
 
@@ -911,6 +948,8 @@ void Blocks::move_cubes (time_t elapsed_time)
   float elapsed_move = elapsed*1.6;
   float elapsed_cam_move = elapsed*1.6;
 
+  csPolygonSet::current_light_frame_number++;
+
   if (startup_screen)
   {
     float old_dyn_x = dynlight_x;
@@ -920,7 +959,7 @@ void Blocks::move_cubes (time_t elapsed_time)
       dynlight_dx = -dynlight_dx;
       dynlight_x = old_dyn_x;
     }
-    dynlight->Move (room, dynlight_x, dynlight_y, dynlight_z);
+    dynlight->Move (demo_room, dynlight_x, dynlight_y, dynlight_z);
     dynlight->Setup ();
     return;
   }
@@ -1024,7 +1063,6 @@ void Blocks::move_cubes (time_t elapsed_time)
     reset_vertex_colors (t);
     room->ShineLights (t);
   }
-  csPolygonSet::current_light_frame_number++;
 }
 
 void Blocks::InitTextures ()
@@ -1042,65 +1080,14 @@ void Blocks::InitTextures ()
   csLoader::LoadTexture (Sys->world, "clouds", "clouds.gif");
 }
 
-
-void Blocks::StartDemo ()
+void Blocks::InitWorld ()
 {
   InitTextures ();
-  csTextureHandle* tm = world->GetTextures ()->GetTextureMM ("clouds");
 
-  room = Sys->world->NewSector ();
-  room->SetName ("room");
-  Sys->set_cube_room (room);
-  csPolygon3D* p;
-
-  p = room->NewPolygon (tm);
-  p->AddVertex (-50, 50, 50);
-  p->AddVertex (50, 50, 50);
-  p->AddVertex (50, -50, 50);
-  p->AddVertex (-50, -50, 50);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 100);
-  p->SetFlags (CS_POLY_MIPMAP, 0);
-
-  Sys->add_cube_template ();
-  Sys->init_game ();
-
-  csStatLight* light;
-  light = new csStatLight (0, 0, -2, 10, .2, .2, .2, false);
-  room->AddLight (light);
-
-  dynlight_x = 0;
-  dynlight_y = 2;
-  dynlight_z = -2;
-  dynlight_dx = 3;
-  delete dynlight;
-  dynlight = new csDynLight (dynlight_x, dynlight_y, dynlight_z, 6, 3, 0, 0);
-  Sys->world->AddDynLight (dynlight);
-  dynlight->SetSector (room);
-  dynlight->Setup ();
-
-  Sys->start_shape (SHAPE_DEMO_B, -7, 10, ZONE_HEIGHT-8);
-  Sys->start_shape (SHAPE_DEMO_L, -3, 10, ZONE_HEIGHT-8);
-  Sys->start_shape (SHAPE_DEMO_O, 1, 10, ZONE_HEIGHT-8);
-  Sys->start_shape (SHAPE_DEMO_C, 5, 10, ZONE_HEIGHT-8);
-  Sys->start_shape (SHAPE_DEMO_K, 9, 10, ZONE_HEIGHT-8);
-  Sys->start_shape (SHAPE_DEMO_S, 13, 10, ZONE_HEIGHT-8);
-  
-  Sys->world->Prepare ();
-
-  Sys->Printf (MSG_INITIALIZATION, "--------------------------------------\n");
-
-  view->SetSector (room);
-  csVector3 pos (0, 3, -5);
-  view->GetCamera ()->SetPosition (pos);
-  view->GetCamera ()->LookAt (view_origin-pos, cam_move_up);
-  view->SetRectangle (0, 0, Sys->FrameWidth, Sys->FrameHeight);
-}
-
-void Blocks::StartNewGame ()
-{
-  InitTextures ();
+  //-----
+  // Prepare the game area.
+  //-----
   csTextureHandle* tm = world->GetTextures ()->GetTextureMM ("txt3");
-
   room = Sys->world->NewSector ();
   room->SetName ("room");
   Sys->set_cube_room (room);
@@ -1142,7 +1129,6 @@ void Blocks::StartNewGame ()
 
   Sys->add_pilar_template ();
   Sys->add_cube_template ();
-  Sys->init_game ();
   Sys->add_pilar (-1, -1);
   Sys->add_pilar (ZONE_DIM, -1);
   Sys->add_pilar (-1, ZONE_DIM);
@@ -1162,16 +1148,78 @@ void Blocks::StartNewGame ()
   	CUBE_DIM*10, .5, .5, .5, false);
   room->AddLight (light);
 
-  Sys->start_shape (SHAPE_T2, 3, 3, ZONE_HEIGHT-3);
-  
+  //-----
+  // Prepare the demo area.
+  //-----
+  csTextureHandle* demo_tm = world->GetTextures ()->GetTextureMM ("clouds");
+  demo_room = Sys->world->NewSector ();
+  demo_room->SetName ("room");
+
+  p = demo_room->NewPolygon (demo_tm);
+  p->AddVertex (-50, 50, 50);
+  p->AddVertex (50, 50, 50);
+  p->AddVertex (50, -50, 50);
+  p->AddVertex (-50, -50, 50);
+  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 100);
+  p->SetFlags (CS_POLY_MIPMAP, 0);
+
+  light = new csStatLight (0, 0, -2, 10, .4, .4, .4, false);
+  demo_room->AddLight (light);
+
+  float char_width = CUBE_DIM*4.;
+  float offset_x = -char_width * (6/2);
+  Sys->start_demo_shape (SHAPE_DEMO_B, offset_x, 3, 4); offset_x += char_width;
+  Sys->start_demo_shape (SHAPE_DEMO_L, offset_x, 3, 4); offset_x += char_width;
+  Sys->start_demo_shape (SHAPE_DEMO_O, offset_x, 3, 4); offset_x += char_width;
+  Sys->start_demo_shape (SHAPE_DEMO_C, offset_x, 3, 4); offset_x += char_width;
+  Sys->start_demo_shape (SHAPE_DEMO_K, offset_x, 3, 4); offset_x += char_width;
+  Sys->start_demo_shape (SHAPE_DEMO_S, offset_x, 3, 4); offset_x += char_width;
+
   Sys->world->Prepare ();
+}
 
-  Sys->Printf (MSG_INITIALIZATION, "--------------------------------------\n");
 
-  view->SetSector (room);
+void Blocks::StartDemo ()
+{
+  newgame = false;
+
+  dynlight_x = 0;
+  dynlight_y = 2;
+  dynlight_z = -2;
+  dynlight_dx = 3;
+  delete dynlight;
+  dynlight = new csDynLight (dynlight_x, dynlight_y, dynlight_z, 6, 3, 0, 0);
+
+  Sys->world->AddDynLight (dynlight);
+  dynlight->SetSector (demo_room);
+  dynlight->Setup ();
+
+  view->SetSector (demo_room);
   csVector3 pos (0, 3, -5);
   view->GetCamera ()->SetPosition (pos);
   view->GetCamera ()->LookAt (view_origin-pos, cam_move_up);
+  view->SetRectangle (0, 0, Sys->FrameWidth, Sys->FrameHeight);
+}
+
+void Blocks::StartNewGame ()
+{
+  delete dynlight; dynlight = NULL;
+
+  // First delete all cubes that may still be in the world.
+  csThing* cube = room->GetFirstThing ();
+  while (cube)
+  {
+    csThing* next_cube = (csThing*)cube->GetNext ();
+    if (!strncmp (cube->GetName (), "cube", 4))
+      room->RemoveThing (cube);
+    cube = next_cube;
+  }
+
+  Sys->init_game ();
+  Sys->start_shape ((BlShapeType)(rand () % difficulty), 3, 3, ZONE_HEIGHT-3);
+
+  view->SetSector (room);
+  Sys->move_camera ();
   view->SetRectangle (0, 0, Sys->FrameWidth, Sys->FrameHeight);
 }
 
@@ -1337,8 +1385,6 @@ void Blocks::NextFrame (time_t elapsed_time, time_t current_time)
   if (startup_screen)
   {
     if (newgame) StartDemo ();
-    //speed = 0;
-    //start_rotation ((enum BlRotType)((rand () % 6) + ROT_PX));
     move_cubes (elapsed_time);
     if (!Gfx3D->BeginDraw (CSDRAW_3DGRAPHICS)) return;
     view->Draw ();
@@ -1477,16 +1523,13 @@ int main (int argc, char* argv[])
   view = new csView (Sys->world, Gfx3D);
 
   // Create our world.
-//. I commented this because it seems to work without it :-)
-  //. csSector* room;
   Sys->Printf (MSG_INITIALIZATION, "Creating world!...\n");
   Sys->world->EnableLightingCache (false);
 
   // Change to virtual directory where Blocks data is stored
   Sys->VFS->ChDir (Sys->Config->GetStr ("Blocks", "DATA", "/data/blocks"));
 
-  Sys->InitTextures ();  
-  Sys->world->Prepare ();
+  Sys->InitWorld ();  
 
   txtmgr->AllocPalette ();
 

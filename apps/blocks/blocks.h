@@ -80,8 +80,8 @@ enum BlShapeType
 // This is a kind of padding around the world(zone).
 #define ZONE_SAFETY 2
 
-// Max cubes in a shape. This is set high for the demo. @@@
-#define MAX_CUBES 300
+// Max cubes in a shape.
+#define MAX_CUBES 30
 
 struct CubeInfo
 {
@@ -98,6 +98,7 @@ private:
   csTextureHandle* cube_txt;
   csTextureHandle* pilar_txt;
   csSector* room;
+  csSector* demo_room;
   csDynLight* dynlight;
   float dynlight_dx;
   float dynlight_x;
@@ -208,115 +209,94 @@ public:
   csWorld* world;
 
 public:
-  ///
   Blocks ();
+  ~Blocks ();
 
-
-  ///
+  // Initialization stuff and starting of game/demo.
   void InitTextures ();
-  ///
+  void InitWorld ();
   void StartNewGame ();
-  ///
   void StartDemo ();
+  void set_cube_room (csSector* s) { room = s; }
+  void init_game ();
 
-  ///
+  // Handling of basic events and frame drawing.
   virtual void NextFrame (time_t elapsed_time, time_t current_time);
-
-  ///
   virtual bool HandleEvent (csEvent &Event);
-
-  ///
   void eatkeypress (int key, bool shift, bool alt, bool ctrl);
 
-  ///
+  // Creating cubes and other geometry.
+  csThing* create_cube_thing (int dx, int dy, int dz);
+  csThing* add_cube_thing (csSector* sect, int dx, int dy, int dz,
+  	float x, float y, float z);
   void add_cube (int dx, int dy, int dz, int x, int y, int z);
-
-  ///
   void add_pilar (int x, int y);
 
-  ///
+  // All the templates for creating geometry.
   void add_cube_template ();
-
-  ///
   void add_pilar_template ();
 
-  ///
+  // Default textures for geometry.
   void set_cube_texture (csTextureHandle* ct) { cube_txt = ct; }
-
-  ///
   void set_pilar_texture (csTextureHandle* ct) { pilar_txt = ct; }
 
-  ///
-  void set_cube_room (csSector* s) { room = s; }
-
-  ///
+  // Handle movement of the game.
   void move_cubes (time_t elapsed_time);
 
-  ///
-  void updateScore();
+  // Update the score.
+  void updateScore ();
 
-  /// Is called when it transition mode instead of move_cubes().
+  // Is called when it transition mode instead of move_cubes().
   void handleTransition (time_t elapsed_time);
 
-  /**
+  /*
    * This is called during a transition, similar to move_cubes(),
    * which is called usually.
    */
   void lower (time_t elapsed_time);
 
-  ///
+  // Handle the movement of the camera.
   void move_camera ();
 
-  ///
+  // Conveniance functions.
   csMatrix3 create_rotate_x (float angle);
-
-  ///
   csMatrix3 create_rotate_y (float angle);
-
-  ///
   csMatrix3 create_rotate_z (float angle);
 
-  ///
+  // Start to rotate the current falling block.
   void start_rotation (BlRotType type);
-
-  ///
+  // Start to move the current falling block horizontally.
   void start_horizontal_move (int dx, int dy);
-
-  ///
+  // If there is nothing falling down this function causes
+  // a new shape to fall down.
   void start_shape (BlShapeType type, int x, int y, int z);
+  // For demo purposes.
+  void start_demo_shape (BlShapeType type, float x, float y, float z);
 
-  ///
   void move_shape_internal (int dx, int dy, int dz);
-
-  ///
   void rotate_shape_internal (const csMatrix3& rot);
 
-  /// Return true if free.
+  // Return true if free.
   bool check_new_shape_location (int dx, int dy, int dz);
-
-  /// Return true if free.
   bool check_new_shape_rotation (const csMatrix3& rot);
 
-  ///
+  // Shape has stopped.
   void freeze_shape ();
 
-  ///
+  // Debugging.
   void dump_shape ();
 
-  ///
-  void init_game ();
-
-  ///
+  // Access the cubes in the playing field.
   bool get_cube (int x, int y, int z)
   { return game_cube[x+ZONE_SAFETY][y+ZONE_SAFETY][z+ZONE_SAFETY]; }
-  ///
   void set_cube (int x, int y, int z, bool v)
   { game_cube[x+ZONE_SAFETY][y+ZONE_SAFETY][z+ZONE_SAFETY] = v; }
 
   // Checks to see if a plane was formed.
-  void checkForPlane();
+  void checkForPlane ();
 
-  void removePlane(int z);
+  // Remove some plane.
+  void removePlane (int z);
 };
 
 #endif // BLOCKS_H

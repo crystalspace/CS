@@ -13,6 +13,13 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 1-Feb-2000
+	- Improved demo screen for Blocks again.
+	- First block in demo is now actually random.
+	- Changed 'ESC' key in Blocks so that it now goes to the
+	  startup screen.
+	- Camera is put at the correct position after starting.
+	- When a dynamic light is deleted (with 'delete') it will now
+	  remove itself from the world.
 	- Eric Sunshine fixed several compilation warnings and errors in
 	  simpcons.h and cssprite.cpp which affliected MSVC++.
 31-Jan-2000
