@@ -403,9 +403,11 @@ const char* TiXmlElement::Parse( TiDocument* document, const char* p )
 
 const char* TiXmlElement::ReadValue( TiDocument* document, const char* p )
 {
+  char const* orig_p;
+
   // Remember original location in stream because text and CDATA nodes decide
   // themselves if leading whitespace should be stripped.
-  char const* orig_p = p;
+  orig_p = p;
 
   // Read in text and elements in any order.
   p = SkipWhiteSpace( p );
@@ -419,7 +421,7 @@ const char* TiXmlElement::ReadValue( TiDocument* document, const char* p )
       if ( !textNode )
       {
         document->SetError( TIXML_ERROR_OUT_OF_MEMORY );
-            return 0;
+        return 0;
       }
 
       p = textNode->Parse( document, orig_p );
@@ -436,7 +438,7 @@ const char* TiXmlElement::ReadValue( TiDocument* document, const char* p )
       if ( !cdataNode )
       {
         document->SetError( TIXML_ERROR_OUT_OF_MEMORY );
-            return 0;
+        return 0;
       }
 
       p = cdataNode->Parse( document, orig_p );
@@ -468,6 +470,11 @@ const char* TiXmlElement::ReadValue( TiDocument* document, const char* p )
         }
       }
     }
+
+    // Remember original location in stream because text and CDATA nodes decide
+    // themselves if leading whitespace should be stripped.
+    orig_p = p;
+
     p = SkipWhiteSpace( p );
   }
 

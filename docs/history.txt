@@ -9,6 +9,9 @@ chronological order.
 31-Mar-2005
 	- Marten fixed a few more places where a temporary return object was 
 	  assigned to a reference.
+        - Anders Reggestad fixed so that TinyXml only save white spaces in
+          the text element it is reading, not including the prev tag if 
+          tags are inserted into a text element.
 30-Mar-2005
 	- Marten fixed a bug in haze-mesh.
 	- Eric Sunshine performed another round of size_t-related cleanups.
