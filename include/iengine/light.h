@@ -183,7 +183,7 @@ struct iLight : public iBase
   virtual void SetColor (const csColor& col) = 0;
   
   /// Return true if this light is pseudo-dynamic.
-  virtual bool IsDynamic () = 0;
+  virtual bool IsDynamic () const = 0;
 
   /// Return current attenuation mode.
   virtual int GetAttenuation () = 0;

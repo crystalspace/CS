@@ -103,26 +103,6 @@ float csLight::GetBrightnessAtDistance (float d)
   return 0;
 }
 
-csLight *csLight::Light::GetPrivateObject ()
-{
-  return scfParent;
-}
-
-unsigned long csLight::Light::GetLightID ()
-{
-  return scfParent->GetLightID ();
-}
-
-iObject *csLight::Light::QueryObject ()
-{
-  return scfParent;
-}
-
-const csVector3 &csLight::Light::GetCenter ()
-{
-  return scfParent->GetCenter ();
-}
-
 void csLight::SetCenter (const csVector3 &pos)
 {
   int i;
@@ -135,11 +115,6 @@ void csLight::SetCenter (const csVector3 &pos)
 
   center = pos;
   lightnr++;
-}
-
-void csLight::Light::SetCenter (const csVector3 &pos)
-{
-  scfParent->SetCenter (pos);
 }
 
 iSector *csLight::Light::GetSector ()
@@ -166,21 +141,6 @@ void csLight::Light::SetSector (iSector *sector)
   scfParent->SetSector (sector ? sector->GetPrivateObject () : NULL);
 }
 
-float csLight::Light::GetRadius ()
-{
-  return scfParent->GetRadius ();
-}
-
-float csLight::Light::GetSquaredRadius ()
-{
-  return scfParent->GetSquaredRadius ();
-}
-
-float csLight::Light::GetInverseRadius ()
-{
-  return scfParent->GetInverseRadius ();
-}
-
 void csLight::SetRadius (float radius)
 {
   int i;
@@ -196,16 +156,6 @@ void csLight::SetRadius (float radius)
   lightnr++;
 }
 
-void csLight::Light::SetRadius (float r)
-{
-  scfParent->SetRadius (r);
-}
-
-const csColor &csLight::Light::GetColor ()
-{
-  return scfParent->GetColor ();
-}
-
 void csLight::SetColor (const csColor& col) 
 {
   int i;
@@ -218,31 +168,6 @@ void csLight::SetColor (const csColor& col)
 
   color = col; 
   lightnr++;
-}
-
-void csLight::Light::SetColor (const csColor &col)
-{
-  scfParent->SetColor (col);
-}
-
-bool csLight::Light::IsDynamic()
-{
-    return false;  // overridden by csStatLight
-}
-
-int csLight::Light::GetAttenuation ()
-{
-  return scfParent->GetAttenuation ();
-}
-
-void csLight::Light::SetAttenuation (int a)
-{
-  scfParent->SetAttenuation (a);
-}
-
-float csLight::Light::GetBrightnessAtDistance (float d)
-{
-  return scfParent->GetBrightnessAtDistance (d);
 }
 
 iCrossHalo *csLight::Light::CreateCrossHalo (float intensity, float cross)

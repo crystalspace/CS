@@ -119,6 +119,9 @@ public:
   /// Get the ID of this light.
   unsigned long GetLightID () { return light_id; }
 
+  /// Return true if the light is pseudo-dynamic.
+  virtual bool IsDynamic () const { return false; }
+
   /**
    * Set the current sector for this light.
    */
@@ -232,23 +235,29 @@ public:
   struct Light : public iLight
   {
     SCF_DECLARE_EMBEDDED_IBASE (csLight);
-    virtual csLight* GetPrivateObject ();
-    virtual unsigned long GetLightID ();
-    virtual iObject *QueryObject();
-    virtual const csVector3& GetCenter ();
-    virtual void SetCenter (const csVector3& pos);
+    virtual csLight* GetPrivateObject () { return scfParent; }
+    virtual unsigned long GetLightID () { return scfParent->GetLightID (); }
+    virtual iObject *QueryObject() { return scfParent; }
+    virtual const csVector3& GetCenter () { return scfParent->GetCenter (); }
+    virtual void SetCenter (const csVector3& pos)
+    {
+      scfParent->SetCenter (pos);
+    }
     virtual iSector *GetSector ();
     virtual void SetSector (iSector* sector);
-    virtual float GetRadius ();
-    virtual float GetSquaredRadius ();
-    virtual float GetInverseRadius ();
-    virtual void SetRadius (float r);
-    virtual const csColor& GetColor ();
-    virtual void SetColor (const csColor& col);
-    virtual bool IsDynamic();
-    virtual int GetAttenuation ();
-    virtual void SetAttenuation (int a);
-    virtual float GetBrightnessAtDistance (float d);
+    virtual float GetRadius () { return scfParent->GetRadius (); }
+    virtual float GetSquaredRadius () { return scfParent->GetSquaredRadius (); }
+    virtual float GetInverseRadius () { return scfParent->GetInverseRadius (); }
+    virtual void SetRadius (float r) { scfParent->SetRadius (r); }
+    virtual const csColor& GetColor () { return scfParent->GetColor (); }
+    virtual void SetColor (const csColor& col) { scfParent->SetColor (col); }
+    virtual bool IsDynamic () const { return scfParent->IsDynamic (); }
+    virtual int GetAttenuation () { return scfParent->GetAttenuation (); }
+    virtual void SetAttenuation (int a) { scfParent->SetAttenuation (a); }
+    virtual float GetBrightnessAtDistance (float d)
+    {
+      return scfParent->GetBrightnessAtDistance (d);
+    }
     virtual iCrossHalo* CreateCrossHalo (float intensity, float cross);
     virtual iNovaHalo* CreateNovaHalo (int seed, int num_spokes,
   	float roundness);
@@ -321,7 +330,7 @@ public:
   /**
    * Return true if this light is pseudo-dynamic.
    */
-  bool IsDynamic () { return dynamic; }
+  virtual bool IsDynamic () const { return dynamic; }
 
   /**
    * Set the light color. Note that setting the color
@@ -370,8 +379,6 @@ public:
     { return scfParent; }
     virtual iLight *QueryLight ()
     { return &scfParent->scfiLight; }
-    virtual bool IsDynamic ()
-    { return scfParent->IsDynamic (); }
     virtual void AddAffectedLightingInfo (iLightingInfo* li)
     { scfParent->AddAffectedLightingInfo (li); }
   } scfiStatLight;

@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+9-Jan-2002
+	- Fixed a bug in the iLight version of IsDynamic(). This caused
+	  pseudo-dynamic lights to be broken since the recent move of thing
+	  outside the engine since that forced the system to use iLight
+	  instead of csLight.
 8-Jan-2002
 	- Committed a 'backwards compatibility' set from Rene Jager for the
 	  Python plugin and SWIG 1.1. The new cspython plugin is built when
