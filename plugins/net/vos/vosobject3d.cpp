@@ -242,15 +242,65 @@ void csMetaObject3D::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
                             csMatrix3(qht) * csMatrix3(sxht, 0, 0, // hardtrans
                                                        0, syht, 0, 
                                                        0, 0, szht)));
-//if(vosa3dl->listenUpdates()) {  // should possibly be optional
-  LOG("vosobject3d", 3, "listening to movement changes");
-  try
+  addChildListener (this);
+}
+
+void csMetaObject3D::notifyChildInserted (VobjectEvent &event)
+
+{
+  LOG ("vosobject3d", 2, "notifyChildInserted " << event.getContextualName());
+  if (event.getContextualName() == "a3dl:position" ||
+      event.getContextualName() == "a3dl:orientation")
   {
-    getPositionObj()->addPropertyListener(this);
-	getOrientationObj()->addPropertyListener(this);
+    try
+    {
+      LOG("vosobject3d", 2, "adding property listener");
+      meta_cast<Property> (event.getChild())->addPropertyListener (this);
+    }
+    catch (...)
+    {
+    }
   }
-  catch (...)
+}
+
+void csMetaObject3D::notifyChildRemoved (VobjectEvent &event)
+{
+  LOG ("vosobject3d", 2, "notifyChildRemoved " << event.getContextualName());
+  if (event.getContextualName() == "a3dl:position" ||
+      event.getContextualName() == "a3dl:orientation")
   {
+    try
+    {
+      meta_cast<Property> (event.getChild())->removePropertyListener (this);
+    }
+    catch (...)
+    {
+    }
+  }
+}
+
+void csMetaObject3D::notifyChildReplaced (VobjectEvent &event)
+{
+  LOG ("vosobject3d", 2, "notifyChildReplaced " << event.getContextualName());
+  if (event.getContextualName() == "a3dl:position" ||
+      event.getContextualName() == "a3dl:orientation")
+  {
+    try
+    {
+      vRef<Property> prop = meta_cast<Property> (event.getOldChild());
+	  if (prop.isValid()) prop->removePropertyListener (this);
+    }
+    catch (...)
+    {
+    }
+
+    try
+    {
+	  meta_cast<Property> (event.getNewChild())->addPropertyListener (this);
+    }
+    catch (...)
+    {
+    }
   }
 }
 

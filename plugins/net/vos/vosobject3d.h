@@ -25,6 +25,7 @@
 
 #include <vos/metaobjects/a3dl/object3d.hh>
 #include <vos/metaobjects/property/propertylistener.hh>
+#include <vos/vos/listener.hh>
 
 #include "inetwork/vosa3dl.h"
 #include "iengine/mesh.h"
@@ -49,7 +50,8 @@ public:
 };
 
 class csMetaObject3D : public virtual A3DL::Object3D,
-                       public VOS::PropertyListener
+                       public VOS::PropertyListener,
+					   public VOS::ChildChangeListener
 {
 protected:
   csRef<csVosObject3D> csvobj3d;
@@ -65,6 +67,11 @@ public:
   // Set up the object
   virtual void Setup(csVosA3DL* vosa3dl, csVosSector* sect);
   csRef<csVosObject3D> GetCSinterface();
+
+  // Child change listener for events
+  virtual void notifyChildInserted (VOS::VobjectEvent &event);
+  virtual void notifyChildRemoved (VOS::VobjectEvent &event);
+  virtual void notifyChildReplaced (VOS::VobjectEvent &event);
 
   // Property listener and callbacks for object property events
   virtual void notifyPropertyChange(const VOS::PropertyEvent &event);
