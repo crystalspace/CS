@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
 @node MINGW, NeXT, Win32, Platform Instructions
-@subsection Windows - Using Mingw Compiler
+@subsection CS MingW Free Compiler Package
 
 @noindent
 @emph{Philip Wyett @email{philipwyett@@dsl.pipex.com}.}

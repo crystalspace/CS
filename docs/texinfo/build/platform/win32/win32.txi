@@ -2,7 +2,13 @@
 @node Windows, Problems, External Libraries, Building
 @section Windows (Win32)
 
-TODO
+Crystal Space can be compiled for Windows (Win32) on both
+commercial and freely available compilers. Follow the available
+links on for info on how to obtain files, compiler specific build
+instructions and troubleshooting FAQ information.
+
+The Windows port of Crystal Space is currently maintained by Philip
+Wyett @email{philipwyett@@dsl.pipex.com}.
 
 @menu
 * MSVC::

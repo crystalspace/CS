@@ -1,15 +1,12 @@
 @c -*-texinfo-*-
 @node MSVC, Mingw, Unix, Platform Instructions
-@subsection Windows - Using @sc{msvc}++ Compiler
+@subsection Microsoft Visual C++ 
 @cindex Windows, Building
 
 @emph{Originally written by Dan Ogles @email{dogles@@peachtree.com}.
 Updated by Nathaniel ``Noote'' Saint Martin, @email{noote@@bigfoot.com}; Thomas
 Hieber, @email{thieber@@gmx.net}; Frank O'Connor, @email{frank@@oconnors.org};
 Last updated 18 July 2001 by Philip Wyett.}
-
-The Windows port of Crystal Space is currently maintained by Philip Wyett
-@email{philipwyett@@dsl.pipex.com}.
 
 @menu
 * Win32 Intro:: Introduction
