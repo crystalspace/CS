@@ -21,6 +21,7 @@
 
 #include <stdarg.h>
 #include <crystalspace.h>
+#include <ivaria/ode.h>
 
 class Simple
 {
