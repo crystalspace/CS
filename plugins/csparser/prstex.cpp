@@ -728,7 +728,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
     //if (shaders[i]->Prepare ())
       material->SetShader (shadertypes[i], shaders[i]);
   for (i=0; i<shadervars.Length (); i++)
-    //material->AddVariable (shadervars[i]);
+    material->AddVariable (shadervars[i]);
 #endif // CS_USE_NEW_RENDERER
   // dereference material since mat already incremented it
 

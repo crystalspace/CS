@@ -45,6 +45,8 @@ chronological order.
 	  of the exact culling result.
 	- Eric Sunshine added SCF_DESTRUCT_IBASE() invocations for each of the
 	  corresponding SCF_CONSTRUCT_IBASE() invocations in CS/apps.
+	- Marten Svanfeldt fixed a bug with shadervars in material which didn't
+	  get loaded as they should.
 2-Nov-2003
 	- Eric Sunshine performed project-wide spelling corrections:
 	    seperate    --> separate
