@@ -1343,13 +1343,12 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
   path *= inv_distance;
   cosdestangle *= inv_distance;
   
-  /// take both angles as positive
+  /// take angle as positive
   if(cosdestangle<0.0)cosdestangle=-cosdestangle;
-  if(cossrcangle<0.0)cossrcangle=-cossrcangle;
 
   csVector3 viewdir = dest_normal;
 
-  csVector3 reflectdir = (2.0f * dest_normal * (cosdestangle) - -path) * 
+  csVector3 reflectdir = (2.0f * dest_normal * (cosdestangle) - path) * 
     dest_normal;
  
   double val = ( reflectdir * viewdir );
@@ -1367,7 +1366,7 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
   float gloss = static_specular_amount * 
     FastPow2(val, static_specular_tightness);
   
-#if 0
+#if 1
     CsPrintf(MSG_STDOUT, "Gloss %g, val=%g, reflect %g,%g,%g\n",
       gloss, val, reflectdir.x, reflectdir.y, reflectdir.z);
 #endif
