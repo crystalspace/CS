@@ -10,26 +10,31 @@ chronological order.
 	- Jorrit cleaned up some sources in the stencil renderloop.
 	- Jorrit did the following optimizations with regards to
 	  iPolygonMesh::CloseMesh() and the stencil renderloop:
-	      - CloseMesh() now returns a table of indices so it doesn't
-	        do an alloc for every single polygon.
-	      - The copy of the polygon mesh maintained by the stencil
-	        renderloop also avoids the per-polygon alloc now.
-	      - CloseMesh() now uses a more optimal way to close the mesh
-	        if it knows the base mesh prefers triangles.
-	- Jorrit fixed a bug in csRenderMeshList with front2back and
-	  back2front sorting. The sorting functions were casting the
-	  pointers wrong.
+	    - CloseMesh() now returns a table of indices so it doesn't do an
+	      alloc for every single polygon.
+	    - The copy of the polygon mesh maintained by the stencil renderloop
+	      also avoids the per-polygon alloc now.
+	    - CloseMesh() now uses a more optimal way to close the mesh if it
+	      knows the base mesh prefers triangles.
+	- Jorrit fixed a bug in csRenderMeshList with front2back and back2front
+	  sorting.  The sorting functions were casting the pointers wrong.
 	- Jorrit did some cleanups to glrender3d.
-	- Jorrit removed the assembly mmx routines for the Dynavis
-	  coverage buffer. They didn't appear to be working correctly
-	  anymore (at least with gcc 3.2) and the gain was minimal while
-	  complexity is a lot more.
+	- Jorrit removed the assembly mmx routines for the Dynavis coverage
+	  buffer.  They didn't appear to be working correctly anymore (at least
+	  with gcc 3.2) and the gain was minimal while complexity is a lot
+	  more.
+	- Eric Sunshine increased the minimum FreeType2 version number checked
+	  by the CS configure script from 2.0 to 2.1.3 since the CS FreeType
+	  plugin is using features introduced in 2.1.3.  (Better yet, in the
+	  future, the configure script should be updated to check for the
+	  actual FeeType features CS requires, rather than checking for
+	  specific version numbers.)
 10-Sep-2003
-	- Philip Wyett made struct ShadowDrawVisCallback a friend to
-	  class csStencilShadowStep. This works round C2248 MSVC 6
-	  compiler error and known compiler bug Q243351.
+	- Philip Wyett made struct ShadowDrawVisCallback a friend to class
+	  csStencilShadowStep.  This works round C2248 MSVC 6 compiler error
+	  and known compiler bug Q243351.
 	- res fixed the totally bogus OR csLight::GetDistanceForBrightness ().
-	- Philip Wyett added CSTOOL dependency to rlsstd.mak (rendstep_std). 
+	- Philip Wyett added CSTOOL dependency to rlsstd.mak (rendstep_std).
 	- Anders Stenberg fixed some drawing problems in pgserver.
 	- Jorrit copied data/shader/light.xml to data/shader/light_bumpmap.xml.
 	  Then he created a new data/shader/light.xml which doesn't do the
@@ -62,17 +67,17 @@ chronological order.
 	  removed a few warnings.
 	- Jorrit performed the following small optimizations in relation
 	  to the renderloop stuff:
-	     - Avoided a memory allocation of a transformation for every
-	       single technique.
-	     - Avoided a memory allocation of the callback structure
-	       every frame.
-	     - Changed csRenderMeshList::GetSortedMeshList() so that it now
-	       updates a csArray<csRenderMesh*> instead of returning a table
-	       that has to be deleted every time. This avoids a lot of
-	       memory allocation overhead. In the generic render step code
-	       we now maintain a permanent array (permanent for that step)
-	       to keep these meshes in. This avoids having to construct/grow
-	       the array all the time.
+	    - Avoided a memory allocation of a transformation for every single
+	      technique.
+	    - Avoided a memory allocation of the callback structure every
+	      frame.
+	    - Changed csRenderMeshList::GetSortedMeshList() so that it now
+	      updates a csArray<csRenderMesh*> instead of returning a table
+	      that has to be deleted every time.  This avoids a lot of memory
+	      allocation overhead.  In the generic render step code we now
+	      maintain a permanent array (permanent for that step) to keep
+	      these meshes in.  This avoids having to construct/grow the array
+	      all the time.
 9-Sep-2003
 	- res added a simple calculation of binormals and tangents to thing.
 	- res reformatted light.xml a bit.
@@ -138,15 +143,15 @@ chronological order.
 	  match the name Marten specified in his CVS log message when he added
 	  the method (also because Reset is a more sensible name than Return).
         - res made the following changes:
-            - glshader_fixed now reports the number of available texture 
+            - glshader_fixed now reports the number of available texture
               units.
             - Added some helper #defines to deal with CS_VATTRIB ids.
             - Added a technique to do dot3 lighting in a single pass.
             - Added a new 'srcalphaadd' blending mode, needed for single pass
               dot3.
-        - res & groton fixed csLight::GetDistanceForBrightness () to properly 
-          work on non-CLQ attenuations for OR. Apparently, the fact that this 
-          function returned 'false' caused some trouble (e.g. weird floating 
+        - res & groton fixed csLight::GetDistanceForBrightness () to properly
+          work on non-CLQ attenuations for OR. Apparently, the fact that this
+          function returned 'false' caused some trouble (e.g. weird floating
           point exceptions with VC6.)
 8-Sep-2003
 	- Jorrit added csgfx to the stdsteps renderloop plugin (for Jam).

@@ -1374,7 +1374,7 @@ CS_CHECK_LIBOPENAL
 #------------------------------------------------------------------------------
 # Check for FreeType2.
 #------------------------------------------------------------------------------
-AC_CHECK_FT2([2.0],
+AC_CHECK_FT2([2.1.3],
     [CS_BUILD_PROPERTY([FT2.AVAILABLE], [yes])
     CS_BUILD_PROPERTY([FT2.LFLAGS], [$FT2_LIBS])
     CS_BUILD_PROPERTY([FT2.CFLAGS], [$FT2_CFLAGS])])
