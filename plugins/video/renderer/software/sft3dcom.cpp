@@ -1779,44 +1779,47 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, 
   if (num_vertices < 3)
     return;
 
-  FogBuffer* fb = find_fog_buffer (id);
-  if (!fb)
+  if (fog_type != CS_FOG_BACK)
   {
-    SysPrintf (MSG_INTERNAL_ERROR, "ENGINE FAILURE! Fog object not open!\n");
-    exit (0);
-  }
-
-  Scan.FogDensity = QRound (fb->density * 100);
-  if (pfmt.PalEntries == 0)
-  {
-    Scan.FogR = QRound (fb->red * ((1 << pfmt.RedBits) - 1)) << pfmt.RedShift;
-    Scan.FogG = QRound (fb->green * ((1 << pfmt.GreenBits) - 1)) << pfmt.GreenShift;
-    Scan.FogB = QRound (fb->blue * ((1 << pfmt.BlueBits) - 1)) << pfmt.BlueShift;
-
-    if (pfmt.PixelBytes == 4)
+    FogBuffer* fb = find_fog_buffer (id);
+    if (!fb)
     {
-      // trick: in 32-bit modes set FogR,G,B so that "R" uses bits 16-23,
-      // "G" uses bits 8-15 and "B" uses bits 0-7. This is to accomodate
-      // different pixel encodings such as RGB, BGR, RBG and so on...
-      unsigned long r = (pfmt.RedShift == 16 + pixel_adjust) ? Scan.FogR :
-        (pfmt.GreenShift == 16 + pixel_adjust) ? Scan.FogG : Scan.FogB;
-      unsigned long g = (pfmt.RedShift == 8 + pixel_adjust) ? Scan.FogR :
-        (pfmt.GreenShift == 8 + pixel_adjust) ? Scan.FogG : Scan.FogB;
-      unsigned long b = (pfmt.RedShift == 0 + pixel_adjust) ? Scan.FogR :
-        (pfmt.GreenShift == 0 + pixel_adjust) ? Scan.FogG : Scan.FogB;
-      Scan.FogR = r >> pixel_adjust;
-      Scan.FogG = g >> pixel_adjust;
-      Scan.FogB = b >> pixel_adjust;
+      SysPrintf (MSG_INTERNAL_ERROR, "ENGINE FAILURE! Fog object not open!\n");
+      exit (0);
     }
-    Scan.FogPix = Scan.FogR | Scan.FogG | Scan.FogB;
-  }
-  else
-  {
-    Scan.FogR = QRound (fb->red * 255);
-    Scan.FogG = QRound (fb->green * 255);
-    Scan.FogB = QRound (fb->blue * 255);
-    Scan.Fog8 = BuildIndexedFogTable ();
-    Scan.FogPix = texman->find_rgb (Scan.FogR, Scan.FogG, Scan.FogB);
+
+    Scan.FogDensity = QRound (fb->density * 100);
+    if (pfmt.PalEntries == 0)
+    {
+      Scan.FogR = QRound (fb->red * ((1 << pfmt.RedBits) - 1)) << pfmt.RedShift;
+      Scan.FogG = QRound (fb->green * ((1 << pfmt.GreenBits) - 1)) << pfmt.GreenShift;
+      Scan.FogB = QRound (fb->blue * ((1 << pfmt.BlueBits) - 1)) << pfmt.BlueShift;
+
+      if (pfmt.PixelBytes == 4)
+      {
+        // trick: in 32-bit modes set FogR,G,B so that "R" uses bits 16-23,
+        // "G" uses bits 8-15 and "B" uses bits 0-7. This is to accomodate
+        // different pixel encodings such as RGB, BGR, RBG and so on...
+        unsigned long r = (pfmt.RedShift == 16 + pixel_adjust) ? Scan.FogR :
+          (pfmt.GreenShift == 16 + pixel_adjust) ? Scan.FogG : Scan.FogB;
+        unsigned long g = (pfmt.RedShift == 8 + pixel_adjust) ? Scan.FogR :
+          (pfmt.GreenShift == 8 + pixel_adjust) ? Scan.FogG : Scan.FogB;
+        unsigned long b = (pfmt.RedShift == 0 + pixel_adjust) ? Scan.FogR :
+          (pfmt.GreenShift == 0 + pixel_adjust) ? Scan.FogG : Scan.FogB;
+        Scan.FogR = r >> pixel_adjust;
+        Scan.FogG = g >> pixel_adjust;
+        Scan.FogB = b >> pixel_adjust;
+      }
+      Scan.FogPix = Scan.FogR | Scan.FogG | Scan.FogB;
+    }
+    else
+    {
+      Scan.FogR = QRound (fb->red * 255);
+      Scan.FogG = QRound (fb->green * 255);
+      Scan.FogB = QRound (fb->blue * 255);
+      Scan.Fog8 = BuildIndexedFogTable ();
+      Scan.FogPix = texman->find_rgb (Scan.FogR, Scan.FogG, Scan.FogB);
+    }
   }
 
   SelectInterpolationStep (M);
