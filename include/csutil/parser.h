@@ -103,7 +103,7 @@ int csGetParserLine ();
  * rewind a file pointer or any other such operation.  It merely resets the
  * internal line number counter which is reported by csGetParserLine().
  */
-int csResetParserLine ();
+void csResetParserLine ();
 
 /**
  * Get pointer to last offending token.

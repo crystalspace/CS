@@ -29,7 +29,7 @@ static int parser_line;
 
 char* csGetLastOffender () { return last_offender; }
 int   csGetParserLine   () { return parser_line;   }
-int   csResetParserLine () { parser_line = 1;      }
+void  csResetParserLine () { parser_line = 1;      }
 
 long csGetObject (char **buf, csTokenDesc * tokens, char **name, char **data)
 {
