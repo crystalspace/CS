@@ -1417,16 +1417,16 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
   //// squared version
   float distance;
 
-  if(source_patch_size == 1)
+  if( 0 && source_patch_size == 1)
   {
+    /// although this is OK code, 
+    /// taking only one normal at short distances is bad.
+    /// an average works much better then.
     cossrcangle = src_normal * pathangle;
     cosdestangle = - (dest_normal * pathangle);
     distance = path.SquaredNorm ();
   } else
   {
-    /// this code is bad!
-    /// need to take .Unit() of paths, not add up distances...
-
     /// average over the source area
     /// take the 4 corners.
     csVector3 pos;
@@ -1435,20 +1435,20 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
     distance = 0.0;
 
     shoot_src->Lumel2World(pos, src_x, src_y);
-    cossrcangle += src_normal * (dest_lumel - pos);
-    cosdestangle += - (dest_normal * (dest_lumel - pos));
+    cossrcangle += src_normal * (dest_lumel - pos).Unit();
+    cosdestangle += - (dest_normal * (dest_lumel - pos).Unit());
     distance += (dest_lumel - pos).SquaredNorm();
     shoot_src->Lumel2World(pos, src_x + srcp_width, src_y);
-    cossrcangle += src_normal * (dest_lumel - pos);
-    cosdestangle += - (dest_normal * (dest_lumel - pos));
+    cossrcangle += src_normal * (dest_lumel - pos).Unit();
+    cosdestangle += - (dest_normal * (dest_lumel - pos).Unit());
     distance += (dest_lumel - pos).SquaredNorm();
     shoot_src->Lumel2World(pos, src_x + srcp_width, src_y + srcp_height);
-    cossrcangle += src_normal * (dest_lumel - pos);
-    cosdestangle += - (dest_normal * (dest_lumel - pos));
+    cossrcangle += src_normal * (dest_lumel - pos).Unit();
+    cosdestangle += - (dest_normal * (dest_lumel - pos).Unit());
     distance += (dest_lumel - pos).SquaredNorm();
     shoot_src->Lumel2World(pos, src_x, src_y + srcp_height);
-    cossrcangle += src_normal * (dest_lumel - pos);
-    cosdestangle += - (dest_normal * (dest_lumel - pos));
+    cossrcangle += src_normal * (dest_lumel - pos).Unit();
+    cosdestangle += - (dest_normal * (dest_lumel - pos).Unit());
     distance += (dest_lumel - pos).SquaredNorm();
 
     cossrcangle /= 4.0; 
@@ -1462,8 +1462,8 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
   //// avoid divide by zero
   if (sqdistance < 0.00001f) totalfactor = source_patch_area * visibility;
   else
-    // This function calculates radiosity with linear light attenuation
-    // because that is what CS uses internally as well.
+    // This function calculates radiosity with squared light attenuation
+    // what CS uses is linear attenuation in lighting.
     totalfactor = cossrcangle * cosdestangle * 
       source_patch_area * visibility / (sqdistance);
   
