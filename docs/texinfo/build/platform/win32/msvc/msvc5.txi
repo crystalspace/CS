@@ -122,11 +122,8 @@ the @sc{sdl2d} canvas @ref{Common Command Line Options}
 
 Crystal Space contains support for Python scripting and thus has projects
 within it requires that Python be installed on your system.  If you wish to
-compile with Python support you must install Python 1.5.2, which can be
+compile with Python support you must install Python 1.5.2 or later, which can be
 obtained from:
-
-Note: Crystal Space currently only supports Python 1.5.2 and not a more recent
-version i.e. 2.0.
 
 @uref{http://www.python.org}
 
