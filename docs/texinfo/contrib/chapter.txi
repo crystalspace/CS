@@ -9,7 +9,7 @@
 * Portability::
 * Coding Style::
 * CVS Guide:: @sc{cvs} Etiquette Guidelines
-* Porting:: Porting to a New Platorm
+* Porting:: Porting to a New Platform
 @end menu
 
 @imports{contrib,document.txi}
