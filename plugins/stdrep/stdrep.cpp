@@ -316,7 +316,7 @@ bool csReporterListener::HandleEvent (iEvent& event)
                 int chars;
                 csString str;
                 str.Format ("  %s", msg.GetData ());
-                while ((chars = fnt->GetLength (str.GetData (), sw-200)) <
+                while ((chars = fnt->GetLength (str.GetData (), sw-20)) <
                   msg.Length ())
                 {
                   str.Truncate (chars);
