@@ -1,5 +1,7 @@
 SubDir TOP plugins mesh sprcal3d object ;
 
+if $(HAS_CAL3D) = "yes"
+{
 Plugin sprcal3d
 	: [ Wildcard *.cpp *.h ]
 ;
@@ -9,3 +11,4 @@ ExternalLibs sprcal3d : CAL3D ;
 Help sprcal3d : "Cal3D Sprite mesh object plug-in" ;
 CompileGroups sprcal3d :  meshes ;
 
+}

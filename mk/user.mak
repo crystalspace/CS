@@ -146,6 +146,10 @@ PLUGINS.DYNAMIC += mesh/impexp/spr
 ifeq ($(3DS.AVAILABLE),yes)
 PLUGINS.DYNAMIC += mesh/impexp/3ds
 endif
+ifeq ($(HAS_CAL3D),yes)
+PLUGINS.DYNAMIC += mesh/sprcal3d/object
+PLUGINS.DYNAMIC += mesh/sprcal3d/persist
+endif
 PLUGINS.DYNAMIC += font/server/fontplex
 ifeq ($(FT2.AVAILABLE),yes)
 PLUGINS.DYNAMIC += font/server/freefnt2

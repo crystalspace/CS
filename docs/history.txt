@@ -11,7 +11,17 @@ chronological order.
 	  framebuffer drawing. Now pico handles all drawing (to a 
 	  memory framebuffer), and CS just relays this to the real 
 	  framebuffer. This means we get perfect(?) output, although no 
-	  acceleration from CS. This could/should be upgraded later. 
+	  acceleration from CS. This could/should be upgraded later.
+        - Philip Wyett added sprcal3d and it's loader to 'user.mak'. Also
+          made both these and the jam builds test for 'HAS_CAL3D' to
+          ensure that they are only compiled on systems where configure
+          has detected libcal3d etc.
+            - Added newline to end of 'plugins/csparser/prstex.cpp'.
+            - Added 'ODE.AVAILABLE' test to physics loader plugin jamfile.
+              This brings it into line with make build. There is no need for
+              it's loader, if the odedyman plugin isn't being built.
+            - Manually updated cs_pyth.cpp and cspace.py after recent
+              changes.
 3-Aug-2003
 	- Paul G. implemented a very nasty (and hopefully very temporary) hack
 	  for csunicode.h to define CS_WCHAR_T_SIZE appropriately for Win32/COMP_GCC
