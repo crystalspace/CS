@@ -25,14 +25,17 @@
 #include "csgfxldr/jpgimage.h"
 
 extern "C" {
-#  define Byte z_Byte     /* Kludge to avoid conflicting typedef in zconf.h */
+#  define Byte z_Byte		// Kludge to avoid conflicting typedef in zconf.h
 #  include "zlib.h"
 #  undef Byte
 #  ifdef FAR
 #  undef FAR
 #  endif
+#  if defined (OS_WIN32)	// Avoid defining "boolean" in libjpeg headers
+#    define HAVE_BOOLEAN
+#  endif
 #  include "jpeglib.h"
-#  include "csgfxldr/jmemsrc.c" // include buffer source input code
+#  include "csgfxldr/jmemsrc.c"	// include buffer source input code
 }
 
 //---------------------------------------------------------------------------
