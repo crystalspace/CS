@@ -35,7 +35,7 @@ main(int argc, char *argv[])
   iObjectRegistry* object_reg = System->object_reg;
   csDefaultRunLoop(System->object_reg);
 
-  delete System;
+  delete System; System = NULL;
   csInitializer::DestroyApplication (object_reg);
 
   return 0;
