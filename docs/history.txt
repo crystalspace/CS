@@ -23,6 +23,13 @@ chronological order.
 	  notion of which animation cycles were active were out-of-sync. (The
 	  only time animation cycles were ever removed from these arrays was
 	  when ClearAllAnims() was invoked.)
+	- Eric Sunshine fixed bugs in the csWrapPtr "out" typemap in javapre.i
+	  where it was incorrectly returning a corrupt Java object when the
+	  wrapped pointer was 0. It should have been returning 'null' in this
+	  case. Subsequent Java operations on the returned bogus object would
+	  then crash within the JNI glue code. This problem manifested, for
+	  instance, when any of the query macros, such as CS_QUERY_REGISTRY(),
+	  failed to find the requested object.
 27-Oct-2004
 	- Eric Sunshine added two mechanisms to msvcgen allowing clients to
 	  have control over the generated project name:

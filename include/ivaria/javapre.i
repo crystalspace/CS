@@ -201,13 +201,18 @@ _csRef_to_Java (const csRef<iBase> & ref, void * ptr, const char * name,
             ptr = iBase__DynamicCast((iBase *)$1.Ref, $1.Type).VoidPtr;
         }
     	//ref->IncRef();
-        jlong cptr = 0;
-        *(void **)&cptr = ptr;
-        char cls_name[1024];
-        strcat(strcpy(cls_name, "com/crystalspace/"), $1.Type);
-        jclass cls = jenv->FindClass(cls_name);
-        jmethodID mid = jenv->GetMethodID(cls, "<init>", "(JZ)V");
-        $result = jenv->NewObject(cls, mid, cptr, false);
+	if (ptr == 0)
+            $result = 0;
+        else
+	{
+            jlong cptr = 0;
+            *(void **)&cptr = ptr;
+            char cls_name[1024];
+            strcat(strcpy(cls_name, "com/crystalspace/"), $1.Type);
+            jclass cls = jenv->FindClass(cls_name);
+            jmethodID mid = jenv->GetMethodID(cls, "<init>", "(JZ)V");
+            $result = jenv->NewObject(cls, mid, cptr, false);
+	}
 	}
 	//%typemap(out) csWrapPtr %{ $result = $1; %}
 	%typemap(jni) csWrapPtr "jobject";
@@ -215,7 +220,7 @@ _csRef_to_Java (const csRef<iBase> & ref, void * ptr, const char * name,
 	%typemap(jstype) csWrapPtr "Object";
 	%typemap(javain) csWrapPtr "$javainput";
 	//%typemap(javaout) csWrapPtr { return $jnicall; }
-	%typemap(javaout) csWrapPtr { Object _obj = $jnicall; iBase ibase = (iBase) _obj; ibase.IncRef(); return _obj; }
+	%typemap(javaout) csWrapPtr { Object _obj = $jnicall; iBase ibase = (iBase) _obj; if (ibase != null) ibase.IncRef(); return _obj; }
 %enddef
 
 #undef INTERFACE_EQUALS
