@@ -26,6 +26,8 @@ The history order is reversed so that new features are at the top.
 	  iFrustumView interface.
 	- Added csLightingPolyTexQueue class which will hold the data for the
 	  lighting process. It implements iFrustumViewUserdata.
+	- Continued work on the new lighter. Almost starts to work now but
+	  it still isn't enabled by default.
 10-Jul-2001
 	- Michael Voasse did the following:
 	    - Next installment on terrfunc, this patch adds some bound

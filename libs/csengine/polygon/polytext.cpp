@@ -867,7 +867,50 @@ void csPolyTexture::FillLightMapNew (csFrustumView* lview)
 {
   if (!lm) return;
 
-  csLightingInfo& linfo = lview->GetFrustumContext ()->GetLightingInfo ();
+  csFrustum* light_frustum = lview->GetFrustumContext ()->GetLightFrustum ();
+  csVector3& lightpos = light_frustum->GetOrigin ();
+  float inv_lightcell_size = 1.0 / csLightMap::lightcell_size;
+  int ww, hh;
+  if (mat_handle && mat_handle->GetTexture ())
+    mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
+  else
+    ww = hh = 64;
+  csPolyTxtPlane* txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
+
+  if (!shadow_bitmap)
+  {
+    int lm_w = lm->rwidth;
+    int lm_h = lm->rheight;
+    shadow_bitmap = new csShadowBitmap (lm_w, lm_h, 0);
+    iFrustumViewUserdata* ud = lview->GetUserdata ();
+    csLightingPolyTexQueue* lptq = (csLightingPolyTexQueue*)ud;
+    lptq->AddPolyTexture (this);
+  }
+
+  // Render all shadow polygons on the shadow-bitmap.
+  csFrustumContext* ctxt = lview->GetFrustumContext ();
+  csVector2 s2d[MAX_OUTPUT_VERTICES];
+  iShadowIterator* shadow_it = ctxt->GetShadows ()->GetShadowIterator ();
+  while (shadow_it->HasNext ())
+  {
+    csFrustum* shadow_frust = shadow_it->Next ();
+    // @@@ Optimization: Check for shadow_it->IsRelevant() here.
+    if (((csPolygon3D*)(shadow_it->GetUserData ())) != polygon)
+    {
+      int nv = shadow_frust->GetVertexCount ();
+      if (nv > MAX_OUTPUT_VERTICES) nv = MAX_OUTPUT_VERTICES;
+      csVector3* s3d = shadow_frust->GetVertices ();
+      for (int j = 0; j < nv; j++)
+      {
+        csVector3 v = txt_pl->m_world2tex *
+          (s3d[j] + lightpos - txt_pl->v_world2tex);
+        s2d[j].x = (v.x * ww - Imin_u) * inv_lightcell_size + 0.5;
+        s2d[j].y = (v.y * hh - Imin_v) * inv_lightcell_size + 0.5;
+      }
+      //@@@ Temporarily disabled: shadow_bitmap->RenderShadow (s2d, nv);
+    }
+  }
+  shadow_it->DecRef ();
 }
 
 /* Modified by me to correct some lightmap's border problems -- D.D. */
@@ -1134,7 +1177,66 @@ finish:
   delete [] f_uv;
 }
 
-void csPolyTexture::GetTextureBox (float& fMinU, float& fMinV, float& fMaxU, float& fMaxV)
+void csPolyTexture::UpdateFromShadowBitmap (csLight* light,
+	const csVector3& lightpos, const csColor& lightcolor)
+{
+  CS_ASSERT (shadow_bitmap != NULL);
+
+  int ww, hh;
+  if (mat_handle && mat_handle->GetTexture ())
+    mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
+  else
+    ww = hh = 64;
+  float mul_u = 1.0 / ww;
+  float mul_v = 1.0 / hh;
+
+  csStatLight* slight = (csStatLight *)light;
+  bool dyn = slight->IsDynamic ();
+
+  // From: T = Mwt * (W - Vwt)
+  // ===>
+  // Mtw * T = W - Vwt
+  // Mtw * T + Vwt = W
+  csPolyTxtPlane* txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
+  csMatrix3 m_t2w = txt_pl->m_world2tex.GetInverse ();
+  csVector3& v_t2w = txt_pl->v_world2tex;
+
+  // Cosinus factor
+  float cosfact = polygon->GetCosinusFactor ();
+  if (cosfact == -1) cosfact = cfg_cosinus_factor;
+
+  if (dyn)
+  {
+    csShadowMap* smap = lm->FindShadowMap (light);
+    if (!smap)
+      smap = lm->NewShadowMap (light, w, h);
+    unsigned char* shadowmap = smap->GetArray ();
+    shadow_bitmap->UpdateShadowMap (shadowmap,
+	csLightMap::lightcell_shift,
+	Imin_u, Imin_v, mul_u, mul_v,
+	m_t2w, v_t2w,
+	light, lightpos,
+	polygon->GetPolyPlane ()->Normal (),
+	cosfact);
+  }
+  else
+  {
+    csRGBpixel* lightmap = lm->GetStaticMap ().GetArray ();
+    shadow_bitmap->UpdateLightMap (lightmap,
+	csLightMap::lightcell_shift,
+	Imin_u, Imin_v, mul_u, mul_v,
+	m_t2w, v_t2w,
+	light, lightpos, lightcolor,
+	polygon->GetPolyPlane ()->Normal (),
+	cosfact);
+  }
+
+  delete shadow_bitmap;
+  shadow_bitmap = NULL;
+}
+
+void csPolyTexture::GetTextureBox (float& fMinU, float& fMinV,
+	float& fMaxU, float& fMaxV)
 {
   fMinU = Fmin_u; fMaxU = Fmax_u;
   fMinV = Fmin_v; fMaxV = Fmax_v;
@@ -1174,6 +1276,7 @@ csShadowBitmap::csShadowBitmap (int lm_w, int lm_h, int quality)
   full_shadow = false;
   csShadowBitmap::lm_w = lm_w;
   csShadowBitmap::lm_h = lm_h;
+  csShadowBitmap::quality = quality;
   if (quality >= 0)
   {
     sb_w = lm_w << quality;
@@ -1213,7 +1316,11 @@ void csShadowBitmap::RenderShadow (csVector2* shadow_poly, int num_vertices)
   // @@@ NOTE: We currently allocate one byte for every shadow-point.
   // That's not optimal. We should use 1/8 byte for every shadow-point.
   //-------------------
-  if (!bitmap) bitmap = new char [sb_w * sb_h];
+  if (!bitmap)
+  {
+    bitmap = new char [sb_w * sb_h];
+    memset (bitmap, 0, sb_w * sb_h);
+  }
 
   //-------------------
   // First calculate the minimum and maximum indices (for 'y').
@@ -1311,18 +1418,18 @@ b:      if (scanL2 == MinIndex) return;
       if (sy < 0) return;
     
       // Compute the rounded screen coordinates of horizontal strip
-      float _l = sxL, _r = sxR;
+      float l = sxL, r = sxR;
 
-      if (_r > _l) { float _=_r; _r=_l; _l=_; }
+      if (r > l) { float s = r; r = l; l = s; }
 
-      xL = 1 + QRound (ceil (_l));
-      xR = QRound (floor (_r));
+      xL = 1 + QRound (ceil (l));
+      xR = QRound (floor (r));
 
       if (xR < 0) xR = 0;
       if (xL > sb_w) xL = sb_w;
 
       char* uv = &bitmap[sy * sb_w + xR];
-      char* uv_end = uv + (xR-xL);
+      char* uv_end = uv + (xL-xR);
       while (uv < uv_end) *uv++ = 1;
 
       if (!sy) return;
@@ -1341,7 +1448,7 @@ float csShadowBitmap::GetLighting (int lm_u, int lm_v)
   if (quality == 0)
   {
     // Shadow-bitmap has equal quality.
-    return float (bitmap[lm_v * sb_w + lm_u]);
+    return float (1-bitmap[lm_v * sb_w + lm_u]);
   }
   else if (quality > 0)
   {
@@ -1365,19 +1472,19 @@ void csShadowBitmap::UpdateLightMap (csRGBpixel* lightmap,
 	float mul_u, float mul_v,
 	const csMatrix3& m_t2w, const csVector3& v_t2w,
 	csLight* light, const csVector3& lightpos,
+	const csColor& lightcolor,
 	const csVector3& poly_normal,
 	float cosfact)
 {
-  const csColor& color = light->GetColor ();
-  float light_r = color.red * NORMAL_LIGHT_LEVEL;
-  float light_g = color.green * NORMAL_LIGHT_LEVEL;
-  float light_b = color.blue * NORMAL_LIGHT_LEVEL;
+  float light_r = lightcolor.red * NORMAL_LIGHT_LEVEL;
+  float light_g = lightcolor.green * NORMAL_LIGHT_LEVEL;
+  float light_b = lightcolor.blue * NORMAL_LIGHT_LEVEL;
   for (int i = 0 ; i < lm_h ; i++)
   {
     int uv = i * lm_w;
     for (int j = 0 ; j < lm_w ; j++, uv++)
     {
-      float lightness = GetLighting (i, j);
+      float lightness = GetLighting (j, i);
       if (lightness < EPSILON)
         continue;
 
@@ -1428,7 +1535,7 @@ void csShadowBitmap::UpdateShadowMap (unsigned char* shadowmap,
     int uv = i * lm_w;
     for (int j = 0 ; j < lm_w ; j++, uv++)
     {
-      float lightness = GetLighting (i, j);
+      float lightness = GetLighting (j, i);
       if (lightness < EPSILON)
         continue;
 
@@ -1476,10 +1583,23 @@ csLightingPolyTexQueue::~csLightingPolyTexQueue ()
 {
 }
 
-void csLightingPolyTexQueue::UpdateMaps (csLight* light,
-	const csVector3& lightpos)
+void csLightingPolyTexQueue::AddPolyTexture (csPolyTexture* pt)
 {
-  (void) light; (void) lightpos;
+  polytxts.Push (pt);
+}
+
+void csLightingPolyTexQueue::UpdateMaps (csLight* light,
+	const csVector3& lightpos, const csColor& lightcolor)
+{
+  int i;
+printf ("UpdateMaps\n"); fflush (stdout);
+  for (i = 0 ; i < polytxts.Length () ; i++)
+  {
+    csPolyTexture* pt = (csPolyTexture*)polytxts[i];
+    pt->UpdateFromShadowBitmap (light, lightpos, lightcolor);
+  }
+printf ("UpdateMaps END\n"); fflush (stdout);
+  polytxts.DeleteAll ();
 }
 
 //------------------------------------------------------------------------------

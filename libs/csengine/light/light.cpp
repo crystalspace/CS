@@ -185,7 +185,7 @@ void csStatLight::CalculateLighting ()
   ctxt->GetLightFrustum ()->MakeInfinite ();
   sector->CheckFrustum ((iFrustumView*)&lview);
 
-  lptq->UpdateMaps (this, GetCenter ());
+  lptq->UpdateMaps (this, GetCenter (), GetColor ());
   lptq->DecRef ();
 }
 
@@ -223,7 +223,7 @@ void csStatLight::CalculateLighting (iMeshWrapper* th)
     }
   }
 
-  lptq->UpdateMaps (this, GetCenter ());
+  lptq->UpdateMaps (this, GetCenter (), GetColor ());
   lptq->DecRef ();
 }
 

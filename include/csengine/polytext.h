@@ -20,6 +20,7 @@
 #define __CS_POLYTEXT_H__
 
 #include "csgeom/math3d.h"
+#include "csutil/csvector.h"
 #include "imesh/thing/polygon.h"
 #include "iengine/fview.h"
 
@@ -27,43 +28,47 @@ struct iFrustumView;
 struct csFrustumViewCleanup;
 struct iMaterialHandle;
 struct iPolygon3D;
-struct LightInfo;
 struct csRGBpixel;
 class csPolygon3D;
-class Textures;
-class csPolyPlane;
+class csPolyTexture;
 class csLightMap;
 class csLightPatch;
 class csFrustumContext;
 class csFrustumView;
-class csBitSet;
 class csLight;
 class csMatrix3;
 class csVector3;
 class csVector2;
-class csHashMap;
+class csColor;
 
 /**
  * This is user-data for iFrustumView for the lighting process.
- * It represents a queue holding references to csPolygonTexture
+ * It represents a queue holding references to csPolyTexture
  * for all polygons that were hit by a light during the lighting
  * process.
  */
 struct csLightingPolyTexQueue : public iFrustumViewUserdata
 {
 private:
-  // Hashmap containing csPolygonTexture pointers.
-  // Key is the pointer itself.
-  csHashMap* map;
+  // Vector containing csPolygonTexture pointers.
+  csVector polytxts;
 
 public:
   csLightingPolyTexQueue ();
   virtual ~csLightingPolyTexQueue ();
 
   /**
+   * Add a csPolyTexture to the queue. Only call this when the
+   * polytexture is not already there! A csPolyTexture should be
+   * added to the queue when it gets a shadow_bitmap.
+   */
+  void AddPolyTexture (csPolyTexture* pt);
+
+  /**
    * Update all lightmaps or shadowmaps mentioned in the queue.
    */
-  void UpdateMaps (csLight* light, const csVector3& lightpos);
+  void UpdateMaps (csLight* light, const csVector3& lightpos,
+  	const csColor& lightcolor);
 
   SCF_DECLARE_IBASE;
 };
@@ -127,6 +132,8 @@ public:
    * <li>light is the light and lightpos is the position of that light (which
    *     can be different from the position of the light given by 'light'
    *     itself because we can have space warping).
+   * <li>lightcolor can also be different from the color of the light because
+   *     it could in principle be modified by portals.
    * </ul>
    */
   void UpdateLightMap (csRGBpixel* lightmap,
@@ -135,6 +142,7 @@ public:
 	float mul_u, float mul_v,
 	const csMatrix3& m_t2w, const csVector3& v_t2w,
 	csLight* light, const csVector3& lightpos,
+	const csColor& lightcolor,
 	const csVector3& poly_normal,
 	float cosfact);
 
@@ -318,6 +326,13 @@ public:
    * Update the lightmap for the given light.
    */
   void FillLightMapNew (csFrustumView* lview);
+
+  /**
+   * Update the lightmap of this polygon using the current shadow-bitmap
+   * and the light information below.
+   */
+  void UpdateFromShadowBitmap (csLight* light, const csVector3& lightpos,
+  	const csColor& lightcolor);
 
   /// set the dirty flag for our lightmap
   void MakeDirtyDynamicLights ();

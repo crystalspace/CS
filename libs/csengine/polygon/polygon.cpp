@@ -2132,8 +2132,10 @@ void csPolygon3D::CalculateLightingNew (csFrustumView* lview)
     	poly, num_vertices);
     // @@@ Check if this isn't a memory leak.
     new_ctxt->SetLightFrustum (new_light_frustum);
-
-    po->CheckFrustum ((iFrustumView*)lview, GetAlpha ());
+    if (new_light_frustum)
+    {
+      po->CheckFrustum ((iFrustumView*)lview, GetAlpha ());
+    }
 
     lview->RestoreFrustumContext (old_ctxt);
   }
