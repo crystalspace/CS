@@ -102,7 +102,7 @@ void csThreadJobQueue::PullAndRun (iJob* job)
       csScopedMutexLock jobLock (jobFinishMutex);
       sharedData.jobFinish->Wait (jobFinishMutex);
       didWait = true;
-      sharedData.jobXS->LockTry();
+      sharedData.jobXS->LockWait();
     }
     if (didWait) jobsWaited++;
   }

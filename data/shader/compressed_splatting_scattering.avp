@@ -65,11 +65,13 @@
 
       MOV norm, iNorm;
       
+      # Compute tangent from normal
       XPD tang, down, norm;
       DP3 tang.w, tang, tang;
       RSQ tang.w, tang.w;
       MUL tang, tang, tang.w;
 
+      # Compute binormal from normal
       XPD binorm, norm, tang;
       DP3 binorm.w, binorm, binorm;
       RSQ binorm.w, binorm.w;

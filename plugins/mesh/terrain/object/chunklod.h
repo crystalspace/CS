@@ -147,10 +147,10 @@ public:
     csDirtyAccessArray<csVector3> normals;
     csRef<iRenderBuffer> normal_buffer;
     csRef<iRenderBuffer> compressed_normal_buffer;
-    csArray<csVector3> tangents;
+    csDirtyAccessArray<csVector3> tangents;
     csRef<iRenderBuffer> tangent_buffer;
     csRef<iRenderBuffer> compressed_tangent_buffer;
-    csArray<csVector3> binormals;
+    csDirtyAccessArray<csVector3> binormals;
     csRef<iRenderBuffer> binormal_buffer;
     csRef<iRenderBuffer> compressed_binormal_buffer;
     csDirtyAccessArray<csVector2> texcors;

@@ -233,6 +233,10 @@ void csChunkLodTerrainFactory::SetSamplerRegion (
 
       datamap[pos].pos = positions[pos];
       datamap[pos].norm = normals[pos];
+      datamap[pos].tan = csVector3 (0,0,1) % datamap[pos].norm;
+      datamap[pos].tan.Normalize ();
+      datamap[pos].bin = datamap[pos].norm % datamap[pos].tan;
+      datamap[pos].bin.Normalize ();
       datamap[pos].tex = texcoords[pos];
       datamap[pos].col = pos;
     }
@@ -537,7 +541,7 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
       vertex_buffer = pFactory->r3d->CreateRenderBuffer (
 	sizeof (csVector3) * len, CS_BUF_STATIC, 
 	CS_BUFCOMP_FLOAT, 3);
-      vertex_buffer->CopyToBuffer (&vertices[0], len * sizeof (csVector3));
+      vertex_buffer->CopyToBuffer (vertices.GetArray(), len * sizeof (csVector3));
     }
     return vertex_buffer;
   }
@@ -550,7 +554,7 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
 	sizeof (csVector3) * len, CS_BUF_STATIC, 
 	CS_BUFCOMP_FLOAT, 3);
    
-      normal_buffer->CopyToBuffer (&normals[0], len * sizeof (csVector3));
+      normal_buffer->CopyToBuffer (normals.GetArray(), len * sizeof (csVector3));
     }
     return normal_buffer;
   }
@@ -563,7 +567,7 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
 	sizeof (csVector3) * len, CS_BUF_STATIC, 
 	CS_BUFCOMP_FLOAT, 3);
    
-      tangent_buffer->CopyToBuffer (&tangents[0], len * sizeof (csVector3));
+      tangent_buffer->CopyToBuffer (tangents.GetArray(), len * sizeof (csVector3));
     }
     return tangent_buffer;
   }
@@ -576,7 +580,7 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
 	sizeof (csVector3) * len, CS_BUF_STATIC, 
 	CS_BUFCOMP_FLOAT, 3);
 
-      binormal_buffer->CopyToBuffer (&binormals[0], len * sizeof (csVector3));
+      binormal_buffer->CopyToBuffer (binormals.GetArray(), len * sizeof (csVector3));
     }
     return binormal_buffer;
   }

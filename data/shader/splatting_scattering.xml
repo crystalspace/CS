@@ -70,9 +70,7 @@
       <mixmode><copy/></mixmode>
       <writemask r="false" g="false" b="false" a="true"/>
       <buffer source="normal" destination="normal" />
-      <buffer source="tangent" destination="texture coordinate 1" />
-      <buffer source="binormal" destination="texture coordinate 2" />
-      <vp plugin="glarb" file="/shader/splatting_scattering_a.avp" />
+      <vp plugin="glarb" file="/shader/compressed_splatting_scattering_a.avp" />
       <texture destination="unit 0" name="standardtex normalization map" />
       <texture destination="unit 1" name="tex normal" />
       <fp plugin="glfixed">

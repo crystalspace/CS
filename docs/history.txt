@@ -11,6 +11,11 @@ chronological order.
 	- Jorrit added a new csChainHull2D class which calculates the convex
 	  hull of a set of points. The main routine is there but the routine
 	  to sort the points is still missing.
+	- res changed a LockTry() in the threaded job queue to LockWait().
+	- res fixed chunklod to provide proper tangents and binormals.
+	- res changed the two-pass technique of the splatting shader used by 
+	  terrainf to use "compressed" tangents and binormals, like the 
+	  one-pass technique does.
 7-Feb-2005
 	- Eric Sunshine fixed some bogus mounts in vfs.cfg.template (the
 	  vfs.cfg which gets installed), which caused several of the maps to
