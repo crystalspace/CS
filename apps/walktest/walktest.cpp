@@ -1194,6 +1194,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   cfg_jumpspeed = cfg->GetFloat ("Walktest.CollDet.JumpSpeed", 0.08f);
   cfg_walk_accelerate = cfg->GetFloat ("Walktest.CollDet.WalkAccelerate", 0.007f);
   cfg_walk_maxspeed = cfg->GetFloat ("Walktest.CollDet.WalkMaxSpeed", 0.1f);
+  cfg_walk_maxspeed_mult = cfg->GetFloat ("Walktest.CollDet.WalkMaxSpeedMult", 10.0f);
+  cfg_walk_maxspeed_multreal = 1.0f;
   cfg_walk_brake = cfg->GetFloat ("Walktest.CollDet.WalkBrake", 0.014f);
   cfg_rotate_accelerate = cfg->GetFloat ("Walktest.CollDet.RotateAccelerate", 0.005f);
   cfg_rotate_maxspeed = cfg->GetFloat ("Walktest.CollDet.RotateMaxSpeed", 0.03f);

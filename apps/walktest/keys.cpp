@@ -260,7 +260,7 @@ void WalkTest::strafe (float speed,int keep_old)
     if (pressed)
     {
       // accelerate
-      if (ABS (velocity.x) < cfg_walk_maxspeed)
+      if (ABS (velocity.x) < cfg_walk_maxspeed * cfg_walk_maxspeed_multreal)
         velocity.x += strafe_speed;
     }
     else
@@ -297,7 +297,8 @@ void WalkTest::step (float speed,int keep_old)
     }
   }
 
-  float max_speed = cfg_walk_maxspeed * (kbd->GetKeyState (CSKEY_SHIFT) ? 2 : 1);
+  float max_speed = cfg_walk_maxspeed * cfg_walk_maxspeed_multreal
+  	* (kbd->GetKeyState (CSKEY_SHIFT) ? 2 : 1);
 
   while ((cur_time - start_time) >= 100)
   {

@@ -1038,7 +1038,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("Views:");
     CONPRI("  split_view unsplit_view toggle_view");
     CONPRI("Movement:");
-    CONPRI("  step_forward step_backward strafe_left strafe_right");
+    CONPRI("  step_forward step_backward strafe_left strafe_right speed");
     CONPRI("  look_up look_down rotate_left rotate_right jump move3d");
     CONPRI("  i_forward i_backward i_left i_right i_up i_down i_rotleftc");
     CONPRI("  i_rotleftw i_rotrightc i_rotrightw i_rotleftx i_rotleftz");
@@ -1517,6 +1517,15 @@ bool CommandHandler (const char *cmd, const char *arg)
     csCommandProcessor::change_boolean (arg, &Sys->do_show_palette, "palette");
   else if (!strcasecmp (cmd, "move3d"))
     csCommandProcessor::change_boolean (arg, &Sys->move_3d, "move3d");
+  else if (!strcasecmp (cmd, "speed"))
+  {
+    bool speed = Sys->cfg_walk_maxspeed_multreal > 1.1f;
+    csCommandProcessor::change_boolean (arg, &speed, "speed");
+    if (speed)
+      Sys->cfg_walk_maxspeed_multreal = Sys->cfg_walk_maxspeed_mult;
+    else
+      Sys->cfg_walk_maxspeed_multreal = 1.0f;
+  }
   else if (!strcasecmp (cmd, "freelook"))
   {
     csCommandProcessor::change_boolean (arg, &Sys->do_freelook, "freelook");

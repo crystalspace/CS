@@ -213,6 +213,10 @@ public:
   float cfg_walk_accelerate;
   /// Walk maximum speed.
   float cfg_walk_maxspeed;
+  /// Multiplier for maximum speed.
+  float cfg_walk_maxspeed_mult;
+  /// Is multiplier used?
+  float cfg_walk_maxspeed_multreal;
   /// Walk brake deceleration.
   float cfg_walk_brake;
   /// Rotate acceleration.

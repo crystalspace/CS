@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+5-Aug-2004
+	- Jorrit added a new 'speed' command to walktest to multiply the
+	  normal maximum movement speed with some factor (default 10). That
+	  way you can move very fast on huge levels. Assigned to the ' key
+	  by default. Also swapped assignment of jump and fire (0 and space).
 4-Aug-2004
 	- Peter Amstutz fixed window resizing in the Wx GL canvas.  It works
 	  now.  Also fixed input handling in the canvas (2nd and 3rd mouse
