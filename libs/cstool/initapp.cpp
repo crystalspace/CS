@@ -86,7 +86,6 @@ bool csInitializeApplication (iObjectRegistry* object_reg, bool use_reporter,
     if (!reporter)
       return false;
     
-    reporter->IncRef ();
   }
   if (reporter)
   {
@@ -103,7 +102,6 @@ bool csInitializeApplication (iObjectRegistry* object_reg, bool use_reporter,
     if (!stdrep)
       return false;
 
-    stdrep->IncRef ();
   }
   if (stdrep)
   {
