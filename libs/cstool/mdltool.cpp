@@ -675,7 +675,9 @@ static bool CheckMaterialConflict (iModelDataObject *obj1,
   {
     for (j=0; j<mat2.Length (); j++)
     {
-      if (mat1.Get (i) != mat2.Get (j))
+      csRef<iModelDataMaterial> mdm1 = mat1.Get (i);
+      csRef<iModelDataMaterial> mdm2 = mat2.Get (j);
+      if (mdm1 != mdm2)
         return true;
     }
   }
