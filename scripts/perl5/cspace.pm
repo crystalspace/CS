@@ -9555,6 +9555,7 @@ package cspace::iGraphics3D;
 *GetRenderState = *cspacec::iGraphics3D_GetRenderState;
 *SetOption = *cspacec::iGraphics3D_SetOption;
 *CreateRenderBuffer = *cspacec::iGraphics3D_CreateRenderBuffer;
+*CreateIndexRenderBuffer = *cspacec::iGraphics3D_CreateIndexRenderBuffer;
 *CreateInterleavedRenderBuffers = *cspacec::iGraphics3D_CreateInterleavedRenderBuffers;
 *SetBufferState = *cspacec::iGraphics3D_SetBufferState;
 *SetTextureState = *cspacec::iGraphics3D_SetTextureState;
