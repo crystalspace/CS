@@ -596,15 +596,13 @@ bool csKDTree::Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
     // There are children.
     if (pos[split_axis] <= split_location)
     {
-      if (!child1->Front2Back (pos, func, userdata, cur_timestamp))
-        return false;
-      return child2->Front2Back (pos, func, userdata, cur_timestamp);
+      child1->Front2Back (pos, func, userdata, cur_timestamp);
+      child2->Front2Back (pos, func, userdata, cur_timestamp);
     }
     else
     {
-      if (!child2->Front2Back (pos, func, userdata, cur_timestamp))
-        return false;
-      return child1->Front2Back (pos, func, userdata, cur_timestamp);
+      child2->Front2Back (pos, func, userdata, cur_timestamp);
+      child1->Front2Back (pos, func, userdata, cur_timestamp);
     }
   }
   return true;

@@ -30,6 +30,7 @@
 #include "iengine/movable.h"
 #include "iengine/rview.h"
 #include "iengine/camera.h"
+#include "iutil/object.h"
 #include "dynavis.h"
 #include "kdtree.h"
 #include "covbuf.h"
@@ -120,14 +121,14 @@ void csDynaVis::CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox)
   csBox3 box;
   visobj->GetBoundingBox (box);
   csReversibleTransform trans = movable->GetFullTransform ();
-  bbox.StartBoundingBox (trans * box.GetCorner (0));
-  bbox.AddBoundingVertexSmart (trans * box.GetCorner (1));
-  bbox.AddBoundingVertexSmart (trans * box.GetCorner (2));
-  bbox.AddBoundingVertexSmart (trans * box.GetCorner (3));
-  bbox.AddBoundingVertexSmart (trans * box.GetCorner (4));
-  bbox.AddBoundingVertexSmart (trans * box.GetCorner (5));
-  bbox.AddBoundingVertexSmart (trans * box.GetCorner (6));
-  bbox.AddBoundingVertexSmart (trans * box.GetCorner (7));
+  bbox.StartBoundingBox (trans.This2Other (box.GetCorner (0)));
+  bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (1)));
+  bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (2)));
+  bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (3)));
+  bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (4)));
+  bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (5)));
+  bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (6)));
+  bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (7)));
 }
 
 void csDynaVis::RegisterVisObject (iVisibilityObject* visobj)
@@ -231,70 +232,53 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode, iRenderView* rview,
   	const csVector3& pos)
 {
   const csBox3& node_bbox = treenode->GetNodeBBox ();
-
-#if 0
   if (node_bbox.Contains (pos)) return true;
 
-  csVector3 center = node_bbox.GetCenter ();
-  float sqrad_box = csSquaredDist::PointPoint (center, node_bbox.Min ());
-  float sqdist_l = planeL.Classify (center); sqdist_l *= sqdist_l;
-#endif
+  if (node_bbox.Contains (pos))
+  {
+    return true;
+  }
 
-#if 0
   // First clip to frustum.
-  bool l = planeL.Classify (node_bbox.GetCorner (0)) < 0 ||
-	   planeL.Classify (node_bbox.GetCorner (1)) < 0 ||
-	   planeL.Classify (node_bbox.GetCorner (2)) < 0 ||
-	   planeL.Classify (node_bbox.GetCorner (3)) < 0 ||
-	   planeL.Classify (node_bbox.GetCorner (4)) < 0 ||
-	   planeL.Classify (node_bbox.GetCorner (5)) < 0 ||
-	   planeL.Classify (node_bbox.GetCorner (6)) < 0 ||
-	   planeL.Classify (node_bbox.GetCorner (7)) < 0;
+  bool l = planeL.Classify (node_bbox.GetCorner (0)) >= 0 ||
+	   planeL.Classify (node_bbox.GetCorner (1)) >= 0 ||
+	   planeL.Classify (node_bbox.GetCorner (2)) >= 0 ||
+	   planeL.Classify (node_bbox.GetCorner (3)) >= 0 ||
+	   planeL.Classify (node_bbox.GetCorner (4)) >= 0 ||
+	   planeL.Classify (node_bbox.GetCorner (5)) >= 0 ||
+	   planeL.Classify (node_bbox.GetCorner (6)) >= 0 ||
+	   planeL.Classify (node_bbox.GetCorner (7)) >= 0;
   if (!l) return false;
 
-  bool r = planeR.Classify (node_bbox.GetCorner (0)) < 0 ||
-	   planeR.Classify (node_bbox.GetCorner (1)) < 0 ||
-	   planeR.Classify (node_bbox.GetCorner (2)) < 0 ||
-	   planeR.Classify (node_bbox.GetCorner (3)) < 0 ||
-	   planeR.Classify (node_bbox.GetCorner (4)) < 0 ||
-	   planeR.Classify (node_bbox.GetCorner (5)) < 0 ||
-	   planeR.Classify (node_bbox.GetCorner (6)) < 0 ||
-	   planeR.Classify (node_bbox.GetCorner (7)) < 0;
+  bool r = planeR.Classify (node_bbox.GetCorner (0)) >= 0 ||
+	   planeR.Classify (node_bbox.GetCorner (1)) >= 0 ||
+	   planeR.Classify (node_bbox.GetCorner (2)) >= 0 ||
+	   planeR.Classify (node_bbox.GetCorner (3)) >= 0 ||
+	   planeR.Classify (node_bbox.GetCorner (4)) >= 0 ||
+	   planeR.Classify (node_bbox.GetCorner (5)) >= 0 ||
+	   planeR.Classify (node_bbox.GetCorner (6)) >= 0 ||
+	   planeR.Classify (node_bbox.GetCorner (7)) >= 0;
   if (!r) return false;
 
-  bool u = planeU.Classify (node_bbox.GetCorner (0)) < 0 ||
-	   planeU.Classify (node_bbox.GetCorner (1)) < 0 ||
-	   planeU.Classify (node_bbox.GetCorner (2)) < 0 ||
-	   planeU.Classify (node_bbox.GetCorner (3)) < 0 ||
-	   planeU.Classify (node_bbox.GetCorner (4)) < 0 ||
-	   planeU.Classify (node_bbox.GetCorner (5)) < 0 ||
-	   planeU.Classify (node_bbox.GetCorner (6)) < 0 ||
-	   planeU.Classify (node_bbox.GetCorner (7)) < 0;
+  bool u = planeU.Classify (node_bbox.GetCorner (0)) >= 0 ||
+	   planeU.Classify (node_bbox.GetCorner (1)) >= 0 ||
+	   planeU.Classify (node_bbox.GetCorner (2)) >= 0 ||
+	   planeU.Classify (node_bbox.GetCorner (3)) >= 0 ||
+	   planeU.Classify (node_bbox.GetCorner (4)) >= 0 ||
+	   planeU.Classify (node_bbox.GetCorner (5)) >= 0 ||
+	   planeU.Classify (node_bbox.GetCorner (6)) >= 0 ||
+	   planeU.Classify (node_bbox.GetCorner (7)) >= 0;
   if (!u) return false;
 
-  bool d = planeU.Classify (node_bbox.GetCorner (0)) < 0 ||
-	   planeU.Classify (node_bbox.GetCorner (1)) < 0 ||
-	   planeU.Classify (node_bbox.GetCorner (2)) < 0 ||
-	   planeU.Classify (node_bbox.GetCorner (3)) < 0 ||
-	   planeU.Classify (node_bbox.GetCorner (4)) < 0 ||
-	   planeU.Classify (node_bbox.GetCorner (5)) < 0 ||
-	   planeU.Classify (node_bbox.GetCorner (6)) < 0 ||
-	   planeU.Classify (node_bbox.GetCorner (7)) < 0;
+  bool d = planeU.Classify (node_bbox.GetCorner (0)) >= 0 ||
+	   planeU.Classify (node_bbox.GetCorner (1)) >= 0 ||
+	   planeU.Classify (node_bbox.GetCorner (2)) >= 0 ||
+	   planeU.Classify (node_bbox.GetCorner (3)) >= 0 ||
+	   planeU.Classify (node_bbox.GetCorner (4)) >= 0 ||
+	   planeU.Classify (node_bbox.GetCorner (5)) >= 0 ||
+	   planeU.Classify (node_bbox.GetCorner (6)) >= 0 ||
+	   planeU.Classify (node_bbox.GetCorner (7)) >= 0;
   if (!d) return false;
-#endif
-
-#if 0
-  // First clip to frustum.
-  // @@@ There should be an iRenderView::TestBBox() that is more efficient
-  // then the iRenderView::ClipBBox().
-  csBox2 sbox;
-  ProjectBBox (rview->GetCamera (), node_bbox, sbox);
-  int clip_portal, clip_plane, clip_z_plane;	// @@@ TEMPORARY
-  if (!rview->ClipBBox (sbox, node_bbox, clip_portal, clip_plane, clip_z_plane))
-  {
-    return false;
-  }
-#endif
 
   return true;
 }
@@ -451,20 +435,25 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
 
     csVector3 view_origin;
     // This is the z at which we want to view the origin.
-    view_origin.z = 20;
+    view_origin.z = 50;
     // The x,y values are then calculated with inverse perspective
     // projection given that we want the view origin to be visualized
     // at view_persp_x and view_persp_y.
-    float view_persp_x = sx/3;
+    float view_persp_x = sx;
     float view_persp_y = sy;
     view_origin.x = (view_persp_x-sx) * view_origin.z / fov;
     view_origin.y = (view_persp_y-sy) * view_origin.z / fov;
     trans.SetOrigin (trans.This2Other (-view_origin));
 
-    g2d->DrawLine (view_persp_x-10, view_persp_y-10,
-    	view_persp_x+10, view_persp_y+10, col_cam);
-    g2d->DrawLine (view_persp_x+10, view_persp_y-10,
-    	view_persp_x-10, view_persp_y+10, col_cam);
+    csVector3 trans_origin = trans.Other2This (
+    	debug_camera->GetTransform ().GetOrigin ());
+    csVector2 to;
+    Perspective (trans_origin, to, fov, sx, sy);
+    g2d->DrawLine (to.x-3,  to.y-3, to.x+3,  to.y+3, col_cam);
+    g2d->DrawLine (to.x+3,  to.y-3, to.x-3,  to.y+3, col_cam);
+    g2d->DrawLine (to.x,    to.y,   to.x+30, to.y,   col_cam);
+    g2d->DrawLine (to.x+30, to.y,   to.x+24, to.y-4, col_cam);
+    g2d->DrawLine (to.x+30, to.y,   to.x+24, to.y+4, col_cam);
 
     for (i = 0 ; i < visobj_vector.Length () ; i++)
     {
@@ -473,41 +462,41 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
       int col = reason_cols[visobj_wrap->reason];
       const csBox3& b = visobj_wrap->child->GetBBox ();
       g3d->DrawLine (
-      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_xyz)),
-      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_Xyz)), fov, col);
+      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_xyz)),
+      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_Xyz)), fov, col);
       g3d->DrawLine (
-      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_xyz)),
-      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_xYz)), fov, col);
+      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_xyz)),
+      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_xYz)), fov, col);
       g3d->DrawLine (
-      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_xyz)),
-      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_xyZ)), fov, col);
+      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_xyz)),
+      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_xyZ)), fov, col);
       g3d->DrawLine (
-      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_XYZ)),
-      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_xYZ)), fov, col);
+      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_XYZ)),
+      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_xYZ)), fov, col);
       g3d->DrawLine (
-      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_XYZ)),
-      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_XyZ)), fov, col);
+      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_XYZ)),
+      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_XyZ)), fov, col);
       g3d->DrawLine (
-      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_XYZ)),
-      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_XYz)), fov, col);
+      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_XYZ)),
+      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_XYz)), fov, col);
       g3d->DrawLine (
-      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_Xyz)),
-      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_XYz)), fov, col);
+      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_Xyz)),
+      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_XYz)), fov, col);
       g3d->DrawLine (
-      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_Xyz)),
-      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_XyZ)), fov, col);
+      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_Xyz)),
+      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_XyZ)), fov, col);
       g3d->DrawLine (
-      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_xYz)),
-      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_xYZ)), fov, col);
+      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_xYz)),
+      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_xYZ)), fov, col);
       g3d->DrawLine (
-      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_xYz)),
-      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_XYz)), fov, col);
+      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_xYz)),
+      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_XYz)), fov, col);
       g3d->DrawLine (
-      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_xyZ)),
-      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_XyZ)), fov, col);
+      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_xyZ)),
+      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_XyZ)), fov, col);
       g3d->DrawLine (
-      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_xyZ)),
-      	trans.Other2This (-b.GetCorner (CS_BOX_CORNER_xYZ)), fov, col);
+      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_xyZ)),
+      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_xYZ)), fov, col);
     }
   }
 }

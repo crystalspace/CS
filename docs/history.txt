@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+15-May-2002
+	- Fixed a bad bug in csKDTree::Front2Back().
+	- Fixed a bug in the bounding box insertion in the KD-tree.
+	  The bounding boxes were not transformed correctly to world space.
+	- This fixes view frustum culling in Dynavis.
+	- Fixed the graphical debug view of Dynavis again.
 14-May-2002
 	- Improved the visual debugger for Dynavis.
 	- Started work on actually implementing frustum culling in Dynavis.
