@@ -39,6 +39,10 @@
   #pragma warning(disable:4702)   // Unreachable Code
   #pragma warning(disable:4512)   // Could not generate assignment operator
   #pragma warning(disable:4100)   // Use of void* as a formal function parameter
+
+  #pragma inline_depth (255)
+  #pragma inline_recursion (on)
+  #pragma auto_inline (on)
 #endif
 
 // So many things require this. IF you have an issue with something defined
