@@ -1106,7 +1106,7 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
             (csTxtCacheData *)gltxthandle->GetCacheData ();
 
           statecache->SetTexture (GL_TEXTURE_2D, cachedata->Handle);
-          statecache->EnableSta_GL_TEXTURE_2D ();
+          statecache->Enable_GL_TEXTURE_2D ();
         } else continue;
 
         alpha = 1.0f - BYTE_TO_FLOAT (layer->mode & CS_FX_MASK_ALPHA);
@@ -1176,6 +1176,7 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
 
 void csGLRender3D::SetShadowState (int state)
 {
+  return;
   switch (state)
   {
   case CS_SHADOW_VOLUME_BEGIN:
