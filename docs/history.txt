@@ -12,6 +12,21 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+7-Feb-2000
+	- Michael Ewert modified phyztest to use new ctVector3 modifications.
+6-Feb-2000
+	- Michael Dale Long stomped some minor bugs in csConsole. Added
+	  support for left/right arrow key movements.
+	- Michael also fixed a bug in csString with the Insert() calls.
+	  Was using memcpy() when the source and destination overlapped.
+	  Now uses memmove().
+	- Seth Galbraith did some modifications to the documentation.
+	- Thomas Hieber fixed csclear by making the typed for ccUID
+	  consistent. (Was a mix of signed and unsigned, which caused
+	  compiler warnings on MSVC).
+	- Norman Kramer made some changes to the Glide drivers so that
+	  the compile and load again.
+	- Norman Kramer added support for defining planes in libraries.
 5-Feb-2000
 	- Fixed bug with clipping portals (i.e. portals that clip geometry
 	  in 3D; only room.zip has such portals on the spinning cube). They
@@ -41,6 +56,15 @@ Short-term cleanups that need to be done:
 	- Thomthee Besset" <Besset@sugar-land.dowell.slb.com> submitted a
 	  patch for several MSVC project files which remove obsolete COM junk
 	  from Release mode.
+	- Andrew Zabolotny added some header files mumbo-jumbo to avoid
+	  repeated #defines of M_PI on OS/2.
+	- Seth Galbraith added MERGE_TEXELS, MERGE_VERTICES and MERGE_NORMALS
+	  world format tokens. Began implementation of vertex and normal
+	  merging (currently only counts unique vertices). Added LoadFrame
+	  method to csLoader (gets csFrame* from a frame number).
+	- Michael Ewert made some code format changes.
+	- Michael also switched csphyzik library to using csVector3 or
+	  csDVector3. It is still aliased as ctVector3.
 3-Feb-2000
 	- Seth Galbraith changed sprite loading in csParser so that
 	  csSpriteTemplate::MergeTexels is now called to eliminate duplicate

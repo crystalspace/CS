@@ -72,11 +72,11 @@ public:
   csDVector3 (double x, double y, double z = 0)
    { csDVector3::x = x; csDVector3::y = y; csDVector3::z = z; }
 
-  // conversion from single precision vector to double
-  csDVector3( const csVector3 &csv );
+  /// conversion from single precision vector to double.
+  csDVector3 (const csVector3 &csv);
 
-  // conversion from single precision vector to double
-  void operator=( const csVector3 &csv );
+  /// Conversion from single precision vector to double.
+  void operator= (const csVector3 &csv);
 
   /// Add two vectors.
   inline friend csDVector3 operator+ (const csDVector3& v1, const csDVector3& v2)
@@ -98,13 +98,13 @@ public:
                     v1.x*v2.y-v1.y*v2.x);
   }
 
-  /// take cross product of two vectors and put result in this vector
-  void Cross(const csDVector3 & px, const csDVector3 & py){
+  /// Take cross product of two vectors and put result in this vector.
+  void Cross (const csDVector3 & px, const csDVector3 & py)
+  {
     x = px.y*py.z - px.z*py.y;
     y = px.z*py.x - px.x*py.z;
     z = px.x*py.y - px.y*py.x;
   }
-
 
   /// Multiply a vector and a scalar.
   inline friend csDVector3 operator* (const csDVector3& v, double f)
@@ -142,10 +142,10 @@ public:
   inline friend bool operator> (double f, const csDVector3& v)
   { return ABS(v.x)<f && ABS(v.y)<f && ABS(v.z)<f; }
 
-	/// Returns n-th component of the vector
+  /// Returns n-th component of the vector.
   inline double operator[](int n) const {return !n?x:n&1?y:z;}
 
-	/// Returns n-th component of the vector.
+  /// Returns n-th component of the vector.
   inline double & operator[](int n){return !n?x:n&1?y:z;}
 
   /// Add another vector to this vector.
@@ -205,11 +205,9 @@ public:
   /// Normalizes a vector to a unit vector.
   inline static csDVector3 Unit (const csDVector3& v) { return v.Unit(); }
 
-  /// scale this vector to length = 1.0;
+  /// Scale this vector to length = 1.0.
   void Normalize();
-
 };
-
 
 
 /**
@@ -416,12 +414,12 @@ public:
   { return ABS (Classify (pt)); }
 
   /// Reverses the direction of the plane while maintianing the plane itself.
-  void Invert() { norm = -norm;  DD = -DD; }
+  void Invert () { norm = -norm;  DD = -DD; }
 
   /// Normalizes the plane equation so that 'norm' is a unit vector.
-  void Normalize()
+  void Normalize ()
   {
-    double f = norm.Norm();
+    double f = norm.Norm ();
     if (f) { norm /= f;  DD /= f; }
   }
 
