@@ -142,11 +142,12 @@ public:									\
 
 /**
  * The SCF_CONSTRUCT_IBASE macro should be invoked inside the constructor
- * of an exported class (not inside an embedded interface). Normally each
+ * of a class (not inside an embedded interface). Normally each
  * constructor should accept an iBase* parameter (that is passed by
  * scfCreateInstance function) which should be passed to this macro.
  * The macro will zero the reference count and initialize the pointer
- * to the parent object.
+ * to the parent object.  If the object is unparented (a common case),
+ * it is okay to use null as the argument to this macro.
  */
 #define SCF_CONSTRUCT_IBASE(Parent)					\
   scfRefCount = 1;							\
@@ -155,24 +156,29 @@ public:									\
 
 /**
  * The SCF_CONSTRUCT_EMBEDDED_IBASE macro should be invoked inside the
- * constructor of an exported class that has exported embedded interfaces
+ * constructor of a class that has an embedded interface
  * (not inside the constructor of the embedded interface).
- * The macro will and initialize the pointer to the parent object
- * (to the object this one is embedded into).
+ * The macro will initialize the pointer to the parent object
+ * (to the object this one is embedded into).  The argument to this macro
+ * is the name of the parent's instance variable by which the embedded
+ * object is known (typically something like `scfiFooBar').
  */
 #define SCF_CONSTRUCT_EMBEDDED_IBASE(Interface)				\
   Interface.scfParent = this;
 
 /**
  * The SCF_DESTRUCT_IBASE macro should be invoked inside the destructor
- * of an exported class (not inside an embedded interface).
+ * of a class (not inside an embedded interface).  It reverses the
+ * initialization performed by the SCF_CONSTRUCT_IBASE() macro.
  */
 #define SCF_DESTRUCT_IBASE()						\
   scfRemoveRefOwners ();
 
 /**
  * The SCF_DESTRUCT_EMBEDDED_IBASE macro should be invoked inside the
- * destructor of an embedded class.
+ * destructor of a class that has an embedded interface (not inside the
+ * destructor of the embedded interface).  It reverses the initialization
+ * performed by the SCF_CONSTRUCT_EMBEDDED_IBASE() macro.
  */
 #define SCF_DESTRUCT_EMBEDDED_IBASE(Interface)				\
   Interface.scfParent = 0;
