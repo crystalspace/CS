@@ -22,6 +22,8 @@
 #if defined (PROC_INTEL)
 
 /**
+    Quick floating point to integer conversions.
+    <p>
     There is a general trick that can be used on all FPUs that uses IEEE
     double-precision floating-point number format (theoretically it should
     cover all CPUs that have a "double" data type of 64 bits; it is applicable
