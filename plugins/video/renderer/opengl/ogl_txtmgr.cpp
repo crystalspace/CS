@@ -24,6 +24,7 @@
 #include "ogl_txtcache.h"
 #include "csutil/scanstr.h"
 #include "csutil/debug.h"
+#include "csutil/util.h"
 #include "iutil/cfgfile.h"
 #include "igraphic/image.h"
 #include "csgfx/memimage.h"
@@ -466,30 +467,37 @@ void csTextureHandleOpenGL::ShowFormat ()
 void csTextureHandleOpenGL::InitTexture (csTextureManagerOpenGL *texman,
            csPixelFormat *pfmt)
 {
-  // Preserve original width/height so that in DrawPixmap subregions of
-  // textures are calculated correctly. In other words, the app writer need
-  // not know about opengl texture size adjustments. smgh
-  if (!image) return;
-
   orig_width = image->GetWidth ();
   orig_height = image->GetHeight ();
 
-  // If necessary rescale if bigger than maximum texture size
-  if ((orig_width > texman->max_tex_size) ||
-      (orig_height > texman->max_tex_size))
+  // In opengl all textures, even non-mipmapped textures are required
+  // to be powers of 2.
+  if (!csIsPowerOf2(orig_width))
+    orig_width = csFindNearestPowerOf2 (orig_width) / 2;
+
+  if (!csIsPowerOf2 (orig_height))
+    orig_height = csFindNearestPowerOf2 (orig_height) / 2;
+
+  int nwidth = orig_width;
+  int nheight = orig_height;
+
+  // downsample textures, if requested, but not 2D textures
+  if (!(flags & (CS_TEXTURE_2D)))
   {
-    int nwidth = orig_width;
-    int nheight = orig_height;
-    if (orig_width > texman->max_tex_size) nwidth = texman->max_tex_size;
-    if (orig_height > texman->max_tex_size) nheight = texman->max_tex_size;
+    nwidth >>= texman->texture_downsample;
+    nheight >>= texman->texture_downsample;
+  }
+
+  // If necessary rescale if bigger than maximum texture size
+  if (nwidth > texman->max_tex_size) nwidth = texman->max_tex_size;
+  if (nheight > texman->max_tex_size) nheight = texman->max_tex_size;
+
+  if ((nwidth != image->GetWidth() ) || (nheight != image->GetHeight() ))
+  {
     image->Rescale (nwidth, nheight);
   }
 
-  // In opengl all textures, even non-mipmapped textures are required
-  // to be powers of 2.
-  AdjustSizePo2 ();
-
-  // Determine the format and type of the source we gonna tranform the data to.
+  // Determine the format and type of the source we gonna transform the data to
   FindFormatType ();
   CreateMipmaps ();
 }
@@ -593,8 +601,10 @@ bool csTextureHandleOpenGL::GetMipMapDimensions (int mipmap, int &w, int &h)
 {
   if (mipmap < vTex.Length ())
   {
-    w = vTex[mipmap]->get_width ();
-    h = vTex[mipmap]->get_height ();
+    w = orig_width >> mipmap;
+    h = orig_height >> mipmap;
+//    w = vTex[mipmap]->get_width ();
+//    h = vTex[mipmap]->get_height ();
     return true;
   }
   return false;
