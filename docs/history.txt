@@ -46,6 +46,8 @@ The history order is reversed so that new features are at the top.
 	  map2cs/texfile.cpp.
 	- Eric Sunshine removed makedep from the Jam build since it is neither
 	  useful nor necessary.
+	- Eric Sunshine fixed bug in options.jam: Failed to declare "option" as
+	  a local variable.
 12-Apr-2003
 	- Rhad fixed a couple potential deadlock and mutex issues in
 	  the ds3d sound renderer plugin. Also fixed similar issues in

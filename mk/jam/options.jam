@@ -25,9 +25,9 @@
 rule _Options
 {
   local target ;
-    
   for target in $(<)
   {
+    local option ;
     for option in $(>)
     {
       switch $(option)
