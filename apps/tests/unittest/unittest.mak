@@ -15,10 +15,13 @@ ifeq ($(MAKESECTION),roottargets)
 .PHONY: unittest unittestclean
 
 all apps: unittest
+check: unittestcheck
 unittest:
 	$(MAKE_APP)
 unittestclean:
 	$(MAKE_CLEAN)
+unittestcheck:
+	$(MAKE_CHECK)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -53,12 +56,16 @@ ifeq ($(MAKESECTION),targets)
 all: $(UNITTEST.EXE)
 build.unittest: $(OUTDIRS) $(UNITTEST.EXE)
 clean: unittestclean
+check: unittestcheck
 
 $(UNITTEST.EXE): $(DEP.EXE) $(OBJ.UNITTEST) $(LIB.UNITTEST)
 	$(DO.LINK.EXE)
 
 unittestclean:
 	-$(RM) $(UNITTEST.EXE) $(OBJ.UNITTEST)
+
+unittestcheck: $(UNITTEST.EXE)
+	$(RUN_TEST)$(UNITTEST.EXE)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/unittest.dep
