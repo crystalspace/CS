@@ -18,6 +18,7 @@
 */
 
 /**\file
+ * Shader variable accessor evaluating a shader expression.
  */
  
 #ifndef __CS_CSGFX_SHADEREXPACCESSOR_H__
@@ -32,7 +33,11 @@
 /**\addtogroup gfx
  * @{ 
  */
- 
+
+/**
+ * Shader variable accessor that evaluates a shader expression when the SV
+ * value is queried.
+ */
 class CS_CRYSTALSPACE_EXPORT csShaderExpressionAccessor : 
   public iShaderVariableAccessor
 {
@@ -41,6 +46,12 @@ private:
 public:
   SCF_DECLARE_IBASE;
 
+  /**
+   * Construct accessor. 
+   * \remarks The accessor object will take ownership of \a expression. You
+   *   should not further use \a expression (especially not delete it) after
+   *   using it to construct an instance of this class.
+   */
   csShaderExpressionAccessor (csShaderExpression* expression);
   virtual ~csShaderExpressionAccessor();
 

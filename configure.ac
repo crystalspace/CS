@@ -801,6 +801,7 @@ AC_ARG_ENABLE([cpu-specific-optimizations],
     [case $enable_cpu_specific_optimizations in
 	yes|min) enable_cpu_specific_optimizations=minimum ;;
 	max) enable_cpu_specific_optimizations=maximum ;;
+	max) enable_cpu_specific_optimizations=maximum ;;
     esac],
     [enable_cpu_specific_optimizations=minimum])
 AC_MSG_RESULT([$enable_cpu_specific_optimizations])
@@ -1605,62 +1606,66 @@ AS_IF([test "$with_vos" != no],
 # try the result of --libs and --gl-libs together; if that fails, then we try
 # only --libs augmented with the results of our own OpenGL checks.
 #------------------------------------------------------------------------------
-CS_CHECK_TOOLS([WXCONFIG], [wx-config])
-
-AC_CACHE_CHECK([for wxWidgets], [cs_cv_wxwidgets],
-    [AS_IF([test -n "$WXCONFIG"],
-    	[cs_cv_wxwidgets=yes
-    	cs_cv_wxwidgets_cflags=CS_RUN_PATH_NORMALIZE([$WXCONFIG --cxxflags])
-    	cs_cv_wxwidgets_lflags=CS_RUN_PATH_NORMALIZE([$WXCONFIG --ldflags])
-    	cs_cv_wxwidgets_libs=CS_RUN_PATH_NORMALIZE([$WXCONFIG --libs])
-    	cs_cv_wxwidgets_gllibs=CS_RUN_PATH_NORMALIZE([$WXCONFIG --gl-libs])],
-        [cs_cv_wxwidgets=no])])
-
-AS_IF([test $cs_cv_wxwidgets = yes],
-    [CS_CHECK_BUILD([if wxWidgets SDK is usable], [cs_cv_wxwidgets_ok],
-	[AC_LANG_PROGRAM(
-	    [[#include "wx/wxprec.h"
-	    #ifdef __BORLANDC__
-	    #pragma hdrstop
-	    #endif
-	    #ifndef WX_PRECOMP
-	    #include "wx/wx.h"
-	    #endif
-	    ]],
-	    [[wxWindow* p = 0; int w,h; p->GetClientSize(&w,&h);]])],
-	[], [C++], [], [], [],
-	[$cs_cv_wxwidgets_cflags],
-	[$cs_cv_wxwidgets_lflags],
-	[$cs_cv_wxwidgets_libs])],
-    [cs_cv_wxwidgets_ok=no])
-
-AS_IF([test $cs_cv_wxwidgets_ok = yes],
-    [CS_CHECK_BUILD([if wxWidgets is built with OpenGL support],
-	[cs_cv_wxwidgets_opengl],
-	[AC_LANG_PROGRAM(
-	    [[#include "wx/wxprec.h"
-	    #ifdef __BORLANDC__
-	    #pragma hdrstop
-	    #endif
-	    #ifndef WX_PRECOMP
-	    #include "wx/wx.h"
-	    #endif
-	    #include "wx/glcanvas.h"
-	    ]],
-	    [wxGLCanvas* f = new wxGLCanvas(0, wxID_ANY)])],
-	[CS_CREATE_TUPLE(
-	    [$cs_cv_wxwidgets_ok_cflags],
-	    [$cs_cv_wxwidgets_ok_lflags],
-	    [$cs_cv_wxwidgets_ok_libs   $cs_cv_wxwidgets_gllibs]) \
-	CS_CREATE_TUPLE(
-	    [$cs_cv_wxwidgets_ok_cflags $cs_cv_libglu_cflags],
-	    [$cs_cv_wxwidgets_ok_lflags $cs_cv_libglu_lflags],
-	    [$cs_cv_wxwidgets_ok_libs   $cs_cv_libglu_libs])],
-	[C++])],
-    [cs_cv_wxwidgets_opengl=no])
-
-AS_IF([test $cs_cv_wxwidgets_opengl = yes],
-    [CS_EMIT_BUILD_RESULT([cs_cv_wxwidgets_opengl], [WX])])
+AC_ARG_WITH([wx],
+    [AC_HELP_STRING([--without-wx], [do not use wxWidgets SDK])])
+    AS_IF([test -z "$with_wx"],	[with_wx=yes])
+	    
+AS_IF([test "$with_wx" != no],
+    [CS_CHECK_TOOLS([WXCONFIG], [wx-config])
+    AC_CACHE_CHECK([for wxWidgets], [cs_cv_wxwidgets],
+	[AS_IF([test -n "$WXCONFIG"],
+	    [cs_cv_wxwidgets=yes
+	    cs_cv_wxwidgets_cflags=CS_RUN_PATH_NORMALIZE([$WXCONFIG --cxxflags])
+	    cs_cv_wxwidgets_lflags=CS_RUN_PATH_NORMALIZE([$WXCONFIG --ldflags])
+	    cs_cv_wxwidgets_libs=CS_RUN_PATH_NORMALIZE([$WXCONFIG --libs])
+	    cs_cv_wxwidgets_gllibs=CS_RUN_PATH_NORMALIZE([$WXCONFIG --gl-libs])],
+	    [cs_cv_wxwidgets=no])])
+    
+    AS_IF([test $cs_cv_wxwidgets = yes],
+	[CS_CHECK_BUILD([if wxWidgets SDK is usable], [cs_cv_wxwidgets_ok],
+	    [AC_LANG_PROGRAM(
+		[[#include "wx/wxprec.h"
+		#ifdef __BORLANDC__
+		#pragma hdrstop
+		#endif
+		#ifndef WX_PRECOMP
+		#include "wx/wx.h"
+		#endif
+		]],
+		[[wxWindow* p = 0; int w,h; p->GetClientSize(&w,&h);]])],
+	    [], [C++], [], [], [],
+	    [$cs_cv_wxwidgets_cflags],
+	    [$cs_cv_wxwidgets_lflags],
+	    [$cs_cv_wxwidgets_libs])],
+	[cs_cv_wxwidgets_ok=no])
+    
+    AS_IF([test $cs_cv_wxwidgets_ok = yes],
+	[CS_CHECK_BUILD([if wxWidgets is built with OpenGL support],
+	    [cs_cv_wxwidgets_opengl],
+	    [AC_LANG_PROGRAM(
+		[[#include "wx/wxprec.h"
+		#ifdef __BORLANDC__
+		#pragma hdrstop
+		#endif
+		#ifndef WX_PRECOMP
+		#include "wx/wx.h"
+		#endif
+		#include "wx/glcanvas.h"
+		]],
+		[wxGLCanvas* f = new wxGLCanvas(0, wxID_ANY)])],
+	    [CS_CREATE_TUPLE(
+		[$cs_cv_wxwidgets_ok_cflags],
+		[$cs_cv_wxwidgets_ok_lflags],
+		[$cs_cv_wxwidgets_ok_libs   $cs_cv_wxwidgets_gllibs]) \
+	    CS_CREATE_TUPLE(
+		[$cs_cv_wxwidgets_ok_cflags $cs_cv_libglu_cflags],
+		[$cs_cv_wxwidgets_ok_lflags $cs_cv_libglu_lflags],
+		[$cs_cv_wxwidgets_ok_libs   $cs_cv_libglu_libs])],
+	    [C++])],
+	[cs_cv_wxwidgets_opengl=no])
+    
+    AS_IF([test $cs_cv_wxwidgets_opengl = yes],
+	[CS_EMIT_BUILD_RESULT([cs_cv_wxwidgets_opengl], [WX])])])
 
 
 

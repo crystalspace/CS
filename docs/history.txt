@@ -32,6 +32,8 @@ chronological order.
 	  driver emulates it or so?
 	- res changed the TGA loader to not convert all images to truecolor, 
 	  paletted images are properly supported.
+	- res augmented configure to support a "--without-wx" option.
+	- res added documentation for csShaderExpressionAccessor.
 5-Apr-2005
 	- res replaced use of printf() and relatives with csPrintf() and 
 	  relatives and use of sprintf() with use of csStrings.

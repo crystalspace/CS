@@ -868,123 +868,166 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-cpu-specific-optimizations=level
                           enable CPU-specific optimizations; recognized levels
-                          are `no', `minimum' or `min', `maximum' or `max'
-                          (default MINIMUM); the `minimum' option selects
+                          are `no',
+ `minimum' or `min', `maximum' or `max'
+                          (default MINIMUM); the `minimum'
+ option selects
                           optimizations which are likely to be supported by
                           reasonably modern hardware, thus making the
-                          resulting executables fairly portable; use the
-                          `maximum' option with caution since code for one
+                          resulting executables
+ fairly portable; use the
+                          `maximum' option with caution since code for
+ one
                           processor will not work with earlier processors (for
-                          example, Intel 686-specific code will not work with
+                          example, Intel
+ 686-specific code will not work with
                           a 586)
   --enable-meta-info-embedding
                           store plugin meta-information directly inside plugin
-                          modules if supported by platform; if disabled,
-                          meta-information is stored in stand-alone .csplugin
-                          files; this is enabled by default for non-Unix
+                          modules if
+ supported by platform; if disabled,
+                          meta-information is stored in
+ stand-alone .csplugin
+                          files; this is enabled by default for
+ non-Unix
                           platforms, and disabled by default for Unix
-                          platforms since the Unix implementation requires the
-                          GPL-licensed libbfd library; enable this option on
-                          Unix only if you are certain you want a GPL-licensed
-                          library infecting your project
-  --enable-optimize       build with optimizations enabled (default YES); same
-                          as --enable-mode=optimize
-  --enable-debug          build with debugging information (default NO); same
+                          platforms
+ since the Unix implementation requires
+                          the GPL-licensed libbfd
+ library; enable this option
+                          on Unix only if you are certain you
+ want a
+                          GPL-licensed library infecting your project
+  --enable-optimize       build with optimizations enabled (default YES);
+                          same as --enable-mode=optimize
+  --enable-debug          build with debugging information (default NO);
+ same
                           as --enable-mode=debug
-  --enable-profile        build with profiling information (default NO); same
+  --enable-profile        build with profiling information (default NO);
+ same
                           as --enable-mode=profile
   --enable-mode=mode      set build mode; recognized modes are `optimize',
-                          `debug', `profile' (default OPTIMIZE)
+                          `debug', `profile'
+ (default OPTIMIZE)
   --enable-extensive-memory-debugger
                           enable the extensive memory debugger which catches
-                          common memory management mistakes (default NO)
+                          common memory
+ management mistakes (default NO)
   --enable-memory-tracker enable the memory tracker which checks memory usage
-                          per source file (default NO)
+                          per
+ source file (default NO)
   --enable-leak-guard     enable the leak guard protection which warns about
-                          objects not freed at program exit (default NO)
+                          objects not freed
+ at program exit (default NO)
   --enable-shared         enable creation of shared libraries
                           (_EXPERIMENTAL_!) (default NO)
   --enable-make-emulation enable emulation layer allowing project to be built
-                          with `make', in addition to `jam' (default YES)
+                          with `make', in
+ addition to `jam' (default YES)
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-perl             use Perl5 scripting interface (default NO)
-  --without-python        do not use Python scripting interface
+  --without-python        do not use
+ Python scripting interface
   --with-java             use Java scripting interface (default YES)
   --with-x                use the X Window System
   --with-libXxf86vm=dir   specify location of libXxf86vm if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libXaw=dir       specify location of libXaw if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-mesa             use Mesa OpenGL library if available (default YES)
   --with-libz=dir         specify location of libz if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libpng=dir       specify location of libpng if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libjpeg=dir      specify location of libjpeg if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-liblcms=dir      specify location of liblcms if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libmng=dir       specify location of libmng if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libmikmod=dir    specify location of libmikmod if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libogg=dir       specify location of libogg if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libvorbis=dir    specify location of libvorbis if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libvorbisfile=dir
                           specify location of libvorbisfile if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-lib3ds=dir       specify location of lib3ds if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libode=dir       specify location of libode if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libfreetype2=dir specify location of libfreetype2 if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libcal3d=dir     specify location of libcal3d if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libsdl=dir       specify location of libsdl if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-vos=dir          specify location of VOS pkg-config files
+  --without-wx            do not use wxWidgets SDK
   --with-libCg=dir        specify location of libCg if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libCgGL=dir      specify location of libCgGL if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libasound=dir    specify location of libasound if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libaa=dir        specify location of libaa if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libcaca=dir      specify location of libcaca if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libcppunit=dir   specify location of libcppunit if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libbfd=dir       specify location of libbfd if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
 
 Some influential environment variables:
@@ -12971,6 +13014,7 @@ if test "${enable_cpu_specific_optimizations+set}" = set; then
   enableval="$enable_cpu_specific_optimizations"
   case $enable_cpu_specific_optimizations in
 	yes|min) enable_cpu_specific_optimizations=minimum ;;
+	max) enable_cpu_specific_optimizations=maximum ;;
 	max) enable_cpu_specific_optimizations=maximum ;;
     esac
 else
@@ -39667,6 +39711,18 @@ fi
 # only --libs augmented with the results of our own OpenGL checks.
 #------------------------------------------------------------------------------
 
+# Check whether --with-wx or --without-wx was given.
+if test "${with_wx+set}" = set; then
+  withval="$with_wx"
+
+fi;
+    if test -z "$with_wx"; then
+  with_wx=yes
+fi
+
+
+if test "$with_wx" != no; then
+
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
 	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
@@ -39759,30 +39815,29 @@ done
   WXCONFIG=$ac_ct_WXCONFIG
 fi
 
-
-echo "$as_me:$LINENO: checking for wxWidgets" >&5
+    echo "$as_me:$LINENO: checking for wxWidgets" >&5
 echo $ECHO_N "checking for wxWidgets... $ECHO_C" >&6
 if test "${cs_cv_wxwidgets+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   if test -n "$WXCONFIG"; then
   cs_cv_wxwidgets=yes
-    	cs_cv_wxwidgets_cflags=`{ (echo "$as_me:$LINENO: \$WXCONFIG --cxxflags") >&5
+	    cs_cv_wxwidgets_cflags=`{ (echo "$as_me:$LINENO: \$WXCONFIG --cxxflags") >&5
   ($WXCONFIG --cxxflags) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    	cs_cv_wxwidgets_lflags=`{ (echo "$as_me:$LINENO: \$WXCONFIG --ldflags") >&5
+	    cs_cv_wxwidgets_lflags=`{ (echo "$as_me:$LINENO: \$WXCONFIG --ldflags") >&5
   ($WXCONFIG --ldflags) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    	cs_cv_wxwidgets_libs=`{ (echo "$as_me:$LINENO: \$WXCONFIG --libs") >&5
+	    cs_cv_wxwidgets_libs=`{ (echo "$as_me:$LINENO: \$WXCONFIG --libs") >&5
   ($WXCONFIG --libs) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    	cs_cv_wxwidgets_gllibs=`{ (echo "$as_me:$LINENO: \$WXCONFIG --gl-libs") >&5
+	    cs_cv_wxwidgets_gllibs=`{ (echo "$as_me:$LINENO: \$WXCONFIG --gl-libs") >&5
   ($WXCONFIG --gl-libs) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
@@ -39795,7 +39850,7 @@ fi
 echo "$as_me:$LINENO: result: $cs_cv_wxwidgets" >&5
 echo "${ECHO_T}$cs_cv_wxwidgets" >&6
 
-if test $cs_cv_wxwidgets = yes; then
+    if test $cs_cv_wxwidgets = yes; then
   if test "" != yes; then
   echo "$as_me:$LINENO: checking if wxWidgets SDK is usable" >&5
 echo $ECHO_N "checking if wxWidgets SDK is usable... $ECHO_C" >&6
@@ -39880,12 +39935,12 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include "wx/wxprec.h"
-	    #ifdef __BORLANDC__
-	    #pragma hdrstop
-	    #endif
-	    #ifndef WX_PRECOMP
-	    #include "wx/wx.h"
-	    #endif
+		#ifdef __BORLANDC__
+		#pragma hdrstop
+		#endif
+		#ifndef WX_PRECOMP
+		#include "wx/wx.h"
+		#endif
 
 int
 main ()
@@ -40038,12 +40093,12 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include "wx/wxprec.h"
-	    #ifdef __BORLANDC__
-	    #pragma hdrstop
-	    #endif
-	    #ifndef WX_PRECOMP
-	    #include "wx/wx.h"
-	    #endif
+		#ifdef __BORLANDC__
+		#pragma hdrstop
+		#endif
+		#ifndef WX_PRECOMP
+		#include "wx/wx.h"
+		#endif
 
 int
 main ()
@@ -40130,7 +40185,7 @@ else
 fi
 
 
-if test $cs_cv_wxwidgets_ok = yes; then
+    if test $cs_cv_wxwidgets_ok = yes; then
   if test "" != yes; then
   echo "$as_me:$LINENO: checking if wxWidgets is built with OpenGL support" >&5
 echo $ECHO_N "checking if wxWidgets is built with OpenGL support... $ECHO_C" >&6
@@ -40150,7 +40205,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
     for cs_build_item in `echo @$cs_cv_wxwidgets_ok_cflags@$cs_cv_wxwidgets_ok_lflags@$cs_cv_wxwidgets_ok_libs   $cs_cv_wxwidgets_gllibs | sed 'y% %#%'` \
-	`echo @$cs_cv_wxwidgets_ok_cflags $cs_cv_libglu_cflags@$cs_cv_wxwidgets_ok_lflags $cs_cv_libglu_lflags@$cs_cv_wxwidgets_ok_libs   $cs_cv_libglu_libs | sed 'y% %#%'`
+	    `echo @$cs_cv_wxwidgets_ok_cflags $cs_cv_libglu_cflags@$cs_cv_wxwidgets_ok_lflags $cs_cv_libglu_lflags@$cs_cv_wxwidgets_ok_libs   $cs_cv_libglu_libs | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -40216,13 +40271,13 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include "wx/wxprec.h"
-	    #ifdef __BORLANDC__
-	    #pragma hdrstop
-	    #endif
-	    #ifndef WX_PRECOMP
-	    #include "wx/wx.h"
-	    #endif
-	    #include "wx/glcanvas.h"
+		#ifdef __BORLANDC__
+		#pragma hdrstop
+		#endif
+		#ifndef WX_PRECOMP
+		#include "wx/wx.h"
+		#endif
+		#include "wx/glcanvas.h"
 
 int
 main ()
@@ -40310,7 +40365,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
     for cs_build_item in `echo @$cs_cv_wxwidgets_ok_cflags@$cs_cv_wxwidgets_ok_lflags@$cs_cv_wxwidgets_ok_libs   $cs_cv_wxwidgets_gllibs | sed 'y% %#%'` \
-	`echo @$cs_cv_wxwidgets_ok_cflags $cs_cv_libglu_cflags@$cs_cv_wxwidgets_ok_lflags $cs_cv_libglu_lflags@$cs_cv_wxwidgets_ok_libs   $cs_cv_libglu_libs | sed 'y% %#%'`
+	    `echo @$cs_cv_wxwidgets_ok_cflags $cs_cv_libglu_cflags@$cs_cv_wxwidgets_ok_lflags $cs_cv_libglu_lflags@$cs_cv_wxwidgets_ok_libs   $cs_cv_libglu_libs | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -40376,13 +40431,13 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include "wx/wxprec.h"
-	    #ifdef __BORLANDC__
-	    #pragma hdrstop
-	    #endif
-	    #ifndef WX_PRECOMP
-	    #include "wx/wx.h"
-	    #endif
-	    #include "wx/glcanvas.h"
+		#ifdef __BORLANDC__
+		#pragma hdrstop
+		#endif
+		#ifndef WX_PRECOMP
+		#include "wx/wx.h"
+		#endif
+		#include "wx/glcanvas.h"
 
 int
 main ()
@@ -40469,7 +40524,7 @@ else
 fi
 
 
-if test $cs_cv_wxwidgets_opengl = yes; then
+    if test $cs_cv_wxwidgets_opengl = yes; then
   if test "$cs_cv_wxwidgets_opengl" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
@@ -40490,6 +40545,8 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}WX.LFLAGS ?= \"$cs_build_prop_val\" ;
 "
+fi
+
 fi
 
 fi
@@ -56083,6 +56140,12 @@ done
 
 
 
+
+
+
+
+
+
 for ac_header in unistd.h \
     sys/types.h \
     sys/socket.h \
@@ -58990,9 +59053,11 @@ if diff $cache_file confcache >/dev/null 2>&1; then :; else
   fi
 fi
 rm -f confcache
-    { { echo "$as_me:$LINENO: error: unrecognized mode --enable-mode=$enableval; use
+    { { echo "$as_me:$LINENO: error: unrecognized mode --enable-mode=$enableval;
+ use
     \`optimize', \`debug', or \`profile'" >&5
-echo "$as_me: error: unrecognized mode --enable-mode=$enableval; use
+echo "$as_me: error: unrecognized mode --enable-mode=$enableval;
+ use
     \`optimize', \`debug', or \`profile'" >&2;}
    { (exit 1); exit 1; }; } ;;
     esac
