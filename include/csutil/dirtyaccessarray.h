@@ -20,8 +20,9 @@
 #ifndef __CS_DIRTYACCESSARRAY_H__
 #define __CS_DIRTYACCESSARRAY_H__
 
-/**\file
- * Array class allowing to directly access the internal array.
+/**\file 
+ * Templated array class, allowing direct access to the internally stored 
+ * array.
  */
 
 //-----------------------------------------------------------------------------
@@ -31,11 +32,6 @@
 //-----------------------------------------------------------------------------
 
 #include "array.h"
-
-/**\file 
- * Templated array class, allowing direct access to the internally stored 
- * array.
- */
 
 /**
  * A templated array class.  The only difference with csArray is that this 

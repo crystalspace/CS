@@ -315,9 +315,9 @@ struct csPackRGBA
   /**
    * Unpack a RGBA byte array into an array of csRGBpixel. 
    * \remarks
-   * Never returns \p pixels.
+   * Never returns \p rgba.
    * Allocate memory. Free it using delete[] when finished.
-   * \param pixels Source array of RGBA data
+   * \param rgba Source array of RGBA data
    * \param numPixels Number of pixels in the array
    * \return An array containing the source data in csRGBpixel structs.
    */

@@ -106,6 +106,15 @@ FULL_PATH_NAMES        = YES
 
 STRIP_FROM_PATH        = $(TOP)/include $(TOP)
 
+# The STRIP_FROM_INC_PATH tag can be used to strip a user-defined part of the 
+# path mentioned in the documentation of a class, which tells the reader which 
+# header file to include in order to use a class. If left blank only the name 
+# of the header file containing the class definition is used. Otherwise one 
+# should specify the include paths that are normally passed to the compiler 
+# using the -I flag. 
+
+STRIP_FROM_INC_PATH    = $(TOP)/include $(TOP)
+
 # The INTERNAL_DOCS tag determines if documentation 
 # that is typed after a \internal command is included. If the tag is set 
 # to NO (the default) then the documentation will be excluded. 

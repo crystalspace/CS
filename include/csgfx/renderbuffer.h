@@ -17,22 +17,31 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-/**\addtogroup gfx
- * @{ 
- */
-
 #ifndef __CS_CSGFX_RENDERBUFFER_H__
 #define __CS_CSGFX_RENDERBUFFER_H__
+
+/**\file
+ */
 
 #include "csextern.h"
 #include "csutil/leakguard.h"
 #include "ivideo/rndbuf.h"
 
+/**\addtogroup gfx
+ * @{ 
+ */
+
 SCF_VERSION (csRenderBuffer, 0, 2, 0);
 
-struct csInterleavedBufferElement
+/**
+ * Structure describing the properties of the individual buffers to be 
+ * interleaved.
+ */
+struct csInterleavedSubBufferOptions
 {
+  /// Components Types; usually CS_BUFCOMP_UNSIGNED_INT
   csRenderBufferComponentType componentType;
+  /// Number of components per element (e.g. 4 for RGBA)
   uint componentCount;
 };
 
@@ -169,12 +178,16 @@ public:
    * Create an interleaved renderbuffer (You would use this then set stride to
    * determine offset and stride of the interleaved buffer
    * \param elementCount Number of elements in the buffer.
+   * \param type Type of buffer; CS_BUF_DYNAMIC, CS_BUF_STATIC or 
+   *  CS_BUF_STREAM.
    * \param count number of render buffers you want
+   * \param elements Array of csInterleavedSubBufferOptions describing the 
+   *  properties of the individual buffers to be interleaved.
    * \param buffers an array of render buffer references that can hold
-   * at least 'count' render buffers.
+   *  at least 'count' render buffers.
    *
    * \code
-   *  static const csInterleavedBufferElement interleavedElements[2] =
+   *  static const csInterleavedSubBufferOptions interleavedElements[2] =
    *    {{CS_BUFCOMP_FLOAT, 3}, {CS_BUFCOMP_FLOAT, 2}};
    *  csRef<iRenderBuffer> buffers[2];
    *  csRenderBuffer::CreateInterleavedRenderBuffers (num_verts, CS_BUF_STATIC,
@@ -184,7 +197,8 @@ public:
    * \endcode
    */
   static csRef<iRenderBuffer> CreateInterleavedRenderBuffers (size_t elementCount, 
-    csRenderBufferType type, uint count, const csInterleavedBufferElement* elements, 
+    csRenderBufferType type, uint count, 
+    const csInterleavedSubBufferOptions* elements, 
     csRef<iRenderBuffer>* buffers);
 protected:
   /// hint about main usage

@@ -51,6 +51,9 @@ chronological order.
 	  also cutomizable). As a convenience, the value of this item is the
 	  number of items in the enumeration (not including the
 	  automatically-added item).
+	- res added STRIP_FROM_INC_PATH to the *.dox files (to get correct
+	  include paths to show up in the docs, at last) and merged some styles
+	  from newer doxygen stylesheets into CS' own API doc stylesheet.
 24-Feb-2005
 	- Jorrit fixed edge drawing by the OpenGL renderer by using
 	  glPolygonMode(GL_BACK,GL_LINE) instead of the way it was currently

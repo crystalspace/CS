@@ -292,10 +292,12 @@ void Name (void (*p)())                                                \
     CS_DECLARE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);
 #endif
 
-/**\var scfStaticallyLinked
- * \internal
- * Flag indicating whether external linkage was used when building the 
- * application. Determines whether SCF scans for plugins at startup.
+/* scfStaticallyLinked - Flag indicating whether external linkage was used when 
+ * building the application. Determines whether SCF scans for plugins at 
+ * startup.
+ */
+/**\def CS_DEFINE_STATICALLY_LINKED_FLAG
+ * Define the scfStaticallyLinked variable.
  */
 #if defined(CS_BUILD_SHARED_LIBS)
 #  define CS_DEFINE_STATICALLY_LINKED_FLAG

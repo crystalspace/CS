@@ -78,14 +78,15 @@ private:
   iObjectRegistry * obj_reg;
   /// Indicates whether the token- and type-tables have been loaded.
   static bool loaded;
+  //@{
   /**
    * Various internal hash tables
-   * @{ */
+   */
   static csStringHash xmltokens;
   static csStringHash sexptokens;
   static csStringHash xmltypes;
   static csStringHash mnemonics;
-  /** @} */
+  //@}
   /// Attached iShaderVariableContext
   iShaderVariableContext * varContext;
   /// String set for producing String IDs
