@@ -718,5 +718,123 @@ void csWorld::RemoveSprite (csSprite3D* sprite)
   sprites.Delete (idx);
 }
 
+struct LightAndDist
+{
+  csLight* light;
+  float sqdist;
+};
+
+// csLightArray is a subclass of csCleanable which is registered
+// to csWorld.cleanup.
+class csLightArray : public csCleanable
+{
+public:
+  LightAndDist* array;
+  // Size is the physical size of the array. num_lights is the number of lights in it.
+  int size, num_lights;
+
+  csLightArray () : array (NULL), size (0), num_lights (0) { }
+  virtual ~csLightArray () { CHK (delete [] array); }
+  void Reset () { num_lights = 0; }
+  void AddLight (csLight* l, float sqdist)
+  {
+    if (num_lights >= size)
+    {
+      LightAndDist* new_array;
+      CHK (new_array = new LightAndDist [size+5]);
+      if (array)
+      {
+        memcpy (new_array, array, sizeof (LightAndDist)*num_lights);
+        CHK (delete [] array);
+      }
+      array = new_array;
+      size += 5;
+    }
+    array[num_lights].light = l;
+    array[num_lights++].sqdist = sqdist;
+  };
+  csLight* GetLight (int i) { return array[i].light; }
+};
+
+int compare_light (const void* p1, const void* p2)
+{
+  LightAndDist* sp1 = (LightAndDist*)p1;
+  LightAndDist* sp2 = (LightAndDist*)p2;
+  float z1 = sp1->sqdist;
+  float z2 = sp2->sqdist;
+  if (z1 < z2) return -1;
+  else if (z1 > z2) return 1;
+  return 0;
+}
+
+int csWorld::GetNearbyLights (csSector* sector, const csVector3& pos, ULong flags,
+  	csLight** lights, int max_num_lights)
+{
+  int i;
+  float sqdist;
+
+  // This is a static light array which is adapted to the
+  // right size everytime it is used. In the beginning it means
+  // that this array will grow a lot but finally it will
+  // stabilize to a maximum size (not big). The advantage of
+  // this approach is that we don't have a static array which can
+  // overflow. And we don't have to do allocation every time we
+  // come here. We register this memory to the 'cleanup' array
+  // in csWorld so that it will be freed later.
+
+  static csLightArray* light_array = NULL;
+  if (!light_array)
+  {
+    CHK (light_array = new csLightArray ());
+    csWorld::current_world->cleanup.Push (light_array);
+  }
+  light_array->Reset ();
+
+  // Add all dynamic lights to the array (if CS_NLIGHT_DYNAMIC is set).
+  if (flags & CS_NLIGHT_DYNAMIC)
+  {
+    csDynLight* dl = first_dyn_lights;
+    while (dl)
+    {
+      if (dl->GetSector () == sector)
+      {
+        sqdist = csSquaredDist::PointPoint (pos, dl->GetCenter ());
+        if (sqdist < dl->GetSquaredRadius ()) light_array->AddLight (dl, sqdist);
+      }
+      dl = dl->GetNext ();
+    }
+  }
+
+  // Add all static lights to the array (if CS_NLIGHT_STATIC is set).
+  if (flags & CS_NLIGHT_STATIC)
+  {
+    for (i = 0 ; i < sector->lights.Length () ; i++)
+    {
+      csStatLight* sl = (csStatLight*)sector->lights[i];
+      sqdist = csSquaredDist::PointPoint (pos, sl->GetCenter ());
+      if (sqdist < sl->GetSquaredRadius ()) light_array->AddLight (sl, sqdist);
+    }
+  }
+
+  if (light_array->num_lights <= max_num_lights)
+  {
+    // The number of lights that we found is smaller than what fits
+    // in the array given us by the user. So we just copy them all
+    // and don't need to sort.
+    for (i = 0 ; i < light_array->num_lights ; i++)
+      lights[i] = light_array->GetLight (i);
+    return light_array->num_lights;
+  }
+  else
+  {
+    // We found more lights than we can put in the given array
+    // so we sort the lights and then return the nearest.
+    qsort (light_array->array, light_array->num_lights, sizeof (LightAndDist), compare_light);
+    for (i = 0 ; i < max_num_lights; i++)
+      lights[i] = light_array->GetLight (i);
+    return max_num_lights;
+  }
+}
+
 //---------------------------------------------------------------------------
 

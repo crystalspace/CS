@@ -60,6 +60,32 @@ interface IConfig;
 #define MAP_ON 2
 
 /**
+ * Flag for GetNearbyLights().
+ * Detect shadows and don't return lights for which the object
+ * is shadowed (not implemented yet).
+ */
+#define CS_NLIGHT_SHADOWS 1
+
+/**
+ * Flag for GetNearbyLights().
+ * Return static lights.
+ */
+#define CS_NLIGHT_STATIC 2
+
+/**
+ * Flag for GetNearbyLights().
+ * Return dynamic lights.
+ */
+#define CS_NLIGHT_DYNAMIC 4
+
+/**
+ * Flag for GetNearbyLights().
+ * Also check lights in nearby sectors (not implemented yet).
+ */
+#define CS_NLIGHT_NEARBYSECTORS 8
+
+
+/**
  * The world! This class basicly represents the 3D engine.
  * It is the main anchor class for working with Crystal Space.
  */
@@ -321,6 +347,25 @@ public:
    * Return the first dynamic light in this world.
    */
   csDynLight* GetFirstDynLight () { return first_dyn_lights; }
+
+  /**
+   * This routine returns all lights which might affect an object
+   * at some position according to the following flags:<br>
+   * <ul>
+   * <li>CS_NLIGHT_SHADOWS: detect shadows and don't return lights for
+   *     which the object is shadowed (not implemented yet).
+   * <li>CS_NLIGHT_STATIC: return static lights.
+   * <li>CS_NLIGHT_DYNAMIC: return dynamic lights.
+   * <li>CS_NLIGHT_NEARBYSECTORS: Also check lights in nearby sectors (not implemented yet).
+   * </ul><br>
+   * It will only return as many lights as the size that you specified
+   * for the light array. The returned lights are not guaranteed to be sorted
+   * but they are guaranteed to be the specified number of lights closest to the
+   * given position.<br>
+   * This function returns the actual number of lights added to the 'lights' array.
+   */
+  int GetNearbyLights (csSector* sector, const csVector3& pos, ULong flags,
+  	csLight** lights, int max_num_lights);
 
   /**
    * Add a halo to the world.
