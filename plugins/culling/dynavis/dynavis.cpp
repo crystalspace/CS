@@ -93,6 +93,7 @@ csDynaVis::csDynaVis (iBase *iParent)
   do_cull_history = true;
   do_cull_writequeue = true;
   do_cull_tiled = false;
+  do_freeze_vis = false;
 
   cfg_view_mode = VIEWMODE_STATS;
   do_state_dump = false;
@@ -839,6 +840,10 @@ bool csDynaVis::VisTest (iRenderView* rview)
   debug_camera = rview->GetOriginalCamera ();
   rview->GetFrustum (debug_lx, debug_rx, debug_ty, debug_by);
 
+  // Just keep vis information from last frame.
+  if (do_freeze_vis)
+    return true;
+
   // Initialize the coverage buffer to all empty.
   if (do_cull_tiled)
     tcovbuf->Initialize ();
@@ -1454,6 +1459,50 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
     do_cull_history = !do_cull_history;
     csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
     	"%s history culling!", do_cull_history ? "Enabled" : "Disabled");
+    return true;
+  }
+  else if (!strcmp (cmd, "toggle_freeze"))
+  {
+    do_freeze_vis = !do_freeze_vis;
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
+    	"%s visibility freezing!", do_freeze_vis ? "Enabled" : "Disabled");
+    return true;
+  }
+  else if (!strcmp (cmd, "exact_freeze"))
+  {
+    do_freeze_vis = true;
+    csExactCuller* excul = new csExactCuller (scr_width, scr_height);
+    int i;
+    for (i = 0 ; i < visobj_vector.Length () ; i++)
+    {
+      csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
+        visobj_vector[i];
+      iVisibilityObject* visobj = visobj_wrap->visobj;
+      iMovable* movable = visobj->GetMovable ();
+      iPolygonMesh* polymesh = visobj->GetObjectModel ()
+      	->GetSmallerPolygonMesh ();
+      if (polymesh)
+        excul->AddObject (visobj_wrap, polymesh, movable, debug_camera,
+  	  visobj_wrap->model->GetPlanes ());
+    }
+    excul->VisTest ();
+    for (i = 0 ; i < visobj_vector.Length () ; i++)
+    {
+      csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
+        visobj_vector[i];
+      visobj_wrap->visobj->MarkInvisible ();
+      iPolygonMesh* polymesh = visobj_wrap->visobj->GetObjectModel ()
+      	->GetSmallerPolygonMesh ();
+      if (polymesh)
+      {
+        int vispix, totpix;
+        excul->GetObjectStatus (visobj_wrap, vispix, totpix);
+	if (vispix)
+	  visobj_wrap->visobj->MarkVisible ();
+      }
+    }
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
+    	"Exact visibility freezing!");
     return true;
   }
   else if (!strcmp (cmd, "toggle_tiled"))

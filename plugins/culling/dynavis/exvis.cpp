@@ -23,6 +23,9 @@
 #include "qsqrt.h"
 #include "csgeom/box.h"
 #include "csgeom/math3d.h"
+#include "csgeom/poly3d.h"
+#include "csgeom/poly2d.h"
+#include "csgeom/polyclip.h"
 #include "igeom/polymesh.h"
 #include "iengine/camera.h"
 #include "iengine/movable.h"
@@ -45,17 +48,20 @@ csExactCuller::csExactCuller (int w, int h)
   num_objects = 0;
   max_objects = 100;
   objects = new csExVisObj [max_objects];
+
+  boxclip = new csBoxClipper (0, 0, float (w), float (h));
 }
 
 csExactCuller::~csExactCuller ()
 {
+  delete boxclip;
   delete[] scr_buffer;
   delete[] z_buffer;
   delete[] objects;
 }
 
-void csExactCuller::InsertPolygon (csVector2* tr_verts, float* tr_invz,
-	int* vi, int num_verts, uint32 obj_number, int& totpix)
+void csExactCuller::InsertPolygon (csVector2* tr_verts, int num_verts,
+	float M, float N, float O, uint32 obj_number, int& totpix)
 {
   totpix = 0;
 
@@ -63,23 +69,23 @@ void csExactCuller::InsertPolygon (csVector2* tr_verts, float* tr_invz,
   int min_i, max_i;
   min_i = max_i = 0;
   float min_y, max_y;
-  min_y = max_y = tr_verts[vi[0]].y;
+  min_y = max_y = tr_verts[0].y;
   // count 'real' number of vertices
   int real_num_verts = 1;
   for (i = 1 ; i < num_verts ; i++)
   {
-    if (tr_verts[vi[i]].y > max_y)
+    if (tr_verts[i].y > max_y)
     {
-      max_y = tr_verts[vi[i]].y;
+      max_y = tr_verts[i].y;
       max_i = i;
     }
-    else if (tr_verts[vi[i]].y < min_y)
+    else if (tr_verts[i].y < min_y)
     {
-      min_y = tr_verts[vi[i]].y;
+      min_y = tr_verts[i].y;
       min_i = i;
     }
-    if ((ABS (tr_verts [vi[i]].x - tr_verts [vi[i - 1]].x)
-       + ABS (tr_verts [vi[i]].y - tr_verts [vi[i - 1]].y))
+    if ((ABS (tr_verts [i].x - tr_verts [i - 1].x)
+       + ABS (tr_verts [i].y - tr_verts [i - 1].y))
        	> 0.001)
       real_num_verts++;
   }
@@ -96,10 +102,7 @@ void csExactCuller::InsertPolygon (csVector2* tr_verts, float* tr_invz,
 
   sxL = sxR = dxL = dxR = 0;            // Avoid warnings about "uninit vars"
   scanL2 = scanR2 = max_i;
-  sy = fyL = fyR = QRound (tr_verts [vi[scanL2]].y);
-  float sinvzL, dinvzL;
-  float sinvzR, dinvzR;
-  float invz;
+  sy = fyL = fyR = QRound (tr_verts [scanL2].y);
 
   for ( ; ; )
   {
@@ -120,19 +123,17 @@ void csExactCuller::InsertPolygon (csVector2* tr_verts, float* tr_invz,
 	  scanR2 = 0;
 
         leave = false;
-        fyR = QRound (tr_verts [vi[scanR2]].y);
+        fyR = QRound (tr_verts [scanR2].y);
         if (sy <= fyR)
           continue;
 
-        float dyR = (tr_verts [vi[scanR1]].y - tr_verts [vi[scanR2]].y);
+        float dyR = (tr_verts [scanR1].y - tr_verts [scanR2].y);
         if (dyR)
         {
-          sxR = tr_verts [vi[scanR1]].x;
-          dxR = (tr_verts [vi[scanR2]].x - sxR) / dyR;
-	  sinvzR = tr_invz [vi[scanR1]];
-          dinvzR = (tr_invz [vi[scanR2]] - sinvzR) / dyR;
+          sxR = tr_verts [scanR1].x;
+          dxR = (tr_verts [scanR2].x - sxR) / dyR;
           // horizontal pixel correction
-          sxR += dxR * (tr_verts [vi[scanR1]].y - (float (sy) - 0.5));
+          sxR += dxR * (tr_verts [scanR1].y - (float (sy) - 0.5));
         }
       }
       if (sy <= fyL)
@@ -142,19 +143,17 @@ void csExactCuller::InsertPolygon (csVector2* tr_verts, float* tr_invz,
 	  scanL2 = num_verts - 1;
 
         leave = false;
-        fyL = QRound (tr_verts [vi[scanL2]].y);
+        fyL = QRound (tr_verts [scanL2].y);
         if (sy <= fyL)
           continue;
 
-        float dyL = (tr_verts [vi[scanL1]].y - tr_verts [vi[scanL2]].y);
+        float dyL = (tr_verts [scanL1].y - tr_verts [scanL2].y);
         if (dyL)
         {
-          sxL = tr_verts [vi[scanL1]].x;
-          dxL = (tr_verts [vi[scanL2]].x - sxL) / dyL;
-	  sinvzL = tr_invz [vi[scanL1]];
-          dinvzL = (tr_invz [vi[scanL2]] - sinvzL) / dyL;
+          sxL = tr_verts [scanL1].x;
+          dxL = (tr_verts [scanL2].x - sxL) / dyL;
           // horizontal pixel correction
-          sxL += dxL * (tr_verts [vi[scanL1]].y - (float (sy) - 0.5));
+          sxL += dxL * (tr_verts [scanL1].y - (float (sy) - 0.5));
         }
       }
     } while (!leave);
@@ -177,12 +176,11 @@ void csExactCuller::InsertPolygon (csVector2* tr_verts, float* tr_invz,
         xR = QRound (sxR);
 	if (xR >= 0 && xL < width && xR != xL)
 	{
-	  invz = sinvzL;
-	  float dinvz = (sinvzR - sinvzL) / (sxR - sxL);
-	  if (xL < 0) { invz += dinvz * (-xL); xL = 0; }
+	  if (xL < 0) xL = 0;
 	  if (xR >= width) xR = width-1;
           uint32* scr_buf = scr_buffer + width * screenY + xL;
           float* z_buf = z_buffer + width * screenY + xL;
+	  float invz = M * (xL-width/2) + N * (sy-height/2) + O;
 
 	  int xx = xR - xL;
 	  if (xx > 0)
@@ -190,7 +188,11 @@ void csExactCuller::InsertPolygon (csVector2* tr_verts, float* tr_invz,
 	    do
   	    {
 	      if (*scr_buf != obj_number) totpix++;
-	      float z = 1.0 / invz;
+	      float z;
+	      if (ABS (invz) > 0.001)
+	        z = 1.0 / invz;
+	      else
+	        z = 9999999999999.0;
 	      if (z < *z_buf)
 	      {
 	        *scr_buf = obj_number;
@@ -198,7 +200,7 @@ void csExactCuller::InsertPolygon (csVector2* tr_verts, float* tr_invz,
 	      }
 	      z_buf++;
 	      scr_buf++;
-	      invz += dinvz;
+	      invz += M;
 	      xx--;
 	    }
 	    while (xx);
@@ -208,8 +210,6 @@ void csExactCuller::InsertPolygon (csVector2* tr_verts, float* tr_invz,
 
       sxL += dxL;
       sxR += dxR;
-      sinvzL += dinvzL;
-      sinvzR += dinvzR;
       sy--;
       screenY++;
     }
@@ -260,21 +260,12 @@ void csExactCuller::AddObject (void* obj,
   csVector3 campos_object = movtrans.Other2This (camtrans.GetOrigin ());
 
   int i;
-  // First transform all vertices.
-  csVector2* tr_verts = new csVector2[vertex_count];
-  float* tr_invz = new float[vertex_count];
+  // First check visibility of all vertices.
   bool* vis = new bool[vertex_count];
   for (i = 0 ; i < vertex_count ; i++)
   {
     csVector3 camv = trans.Other2This (verts[i]);
-    if (camv.z > 0.0001)
-    {
-      Perspective (camv, tr_verts[i], fov, sx, sy);
-      tr_invz[i] = 1.0 / camv.z;
-      vis[i] = true;
-    }
-    else
-      vis[i] = false;
+    vis[i] = (camv.z > 0.1);
   }
 
   // Then insert all polygons.
@@ -287,28 +278,70 @@ void csExactCuller::AddObject (void* obj,
     int num_verts = poly->num_vertices;
     int* vi = poly->vertices;
     int j;
-    bool use = true;
+    int cnt_vis = 0;
     for (j = 0 ; j < num_verts ; j++)
     {
-      if (!vis[vi[j]])
-      {
-        // @@@ Later we should clamp instead of ignoring this polygon.
-	use = false;
-	break;
-      }
+      if (vis[vi[j]]) cnt_vis++;
     }
-    if (use)
+    if (cnt_vis > 0)
     {
-      int totpix;
-      InsertPolygon (tr_verts, tr_invz, vi, num_verts,
-        num_objects-1, totpix);
-      objects[num_objects-1].totpix += totpix;
+      // Here we need to clip the polygon.
+      csPoly3D clippoly;
+      for (j = 0 ; j < num_verts ; j++)
+      {
+        csVector3 camv = trans.Other2This (verts[vi[j]]);
+        clippoly.AddVertex (camv);
+      }
+      csPoly3D front, back;
+      csPoly3D* spoly;
+      if (cnt_vis < num_verts)
+      {
+        clippoly.SplitWithPlaneZ (front, back, 0.1);
+	spoly = &back;
+      }
+      else
+      {
+        spoly = &clippoly;
+      }
+      csVector2 clipped[100];
+      int num_clipped = spoly->GetVertexCount ();
+      csBox2 out_box;
+      out_box.StartBoundingBox ();
+      for (j = 0 ; j < spoly->GetVertexCount () ; j++)
+      {
+        Perspective ((*spoly)[j], clipped[j], fov, sx, sy);
+	out_box.AddBoundingVertex (clipped[j]);
+      }
+      if (boxclip->ClipInPlace (clipped, num_clipped, out_box)
+      	!= CS_CLIP_OUTSIDE)
+      {
+	//csPlane3 camplane = trans.Other2This (planes[i]);
+        csPlane3 camplane;
+	trans.Other2This (planes[i], (*spoly)[0], camplane);
+//printf ("    %g,%g,%g\n", (*spoly)[0].x, (*spoly)[0].y, (*spoly)[0].z);
+//printf ("    planes[i] %g,%g,%g,%g\n",
+//planes[i].A (), planes[i].B (), planes[i].C (), planes[i].D ());
+//printf ("    camplane %g,%g,%g,%g\n",
+//camplane.A (), camplane.B (), camplane.C (), camplane.D ());
+	if (ABS (camplane.D ()) < 0.001)
+	  continue;
+	float M, N, O;
+	float inv_D = 1.0 / camplane.D ();
+	M = -camplane.A () * inv_D / fov;
+	N = -camplane.B () * inv_D / fov;
+	O = -camplane.C () * inv_D;
+//printf ("    MNO %g,%g,%g\n", M, N, O);
+//fflush (stdout);
+
+        int totpix;
+        InsertPolygon (clipped, num_clipped, M, N, O,
+		num_objects-1, totpix);
+        objects[num_objects-1].totpix += totpix;
+      }
     }
   }
 
   delete[] vis;
-  delete[] tr_invz;
-  delete[] tr_verts;
 }
 
 void csExactCuller::VisTest ()

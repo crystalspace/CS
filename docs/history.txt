@@ -1,5 +1,28 @@
 The history order is reversed so that new features are at the top.
 
+19-Jun-2002
+	- Clarified an API comment to indicate that the OFTEN moving
+	  option for things doesn't work yet.
+	- Added 'toggle_freeze' command to Dynavis (assigned to alt-f
+	  in BugPlug). This will freeze the current visibility status
+	  of all objects. No further visibility testing will occur. If
+	  the camera moves the visibility information valid at some
+	  point will be unchanged so you can walk around the level
+	  and see what is visible and not.
+	- Added 'exact_freeze' command to Dynavis (assigned to ctrl-f
+	  in BugPlug). This will first compute exact visibility with
+	  the (slow) exact visibility culler. Then it will freeze
+	  that result. This will give the theoretical maximum performance
+	  that a hypothetical zero-cost visibility culler could give.
+	  This is the upper limit for Dynavis. Dynavis cannot get faster
+	  than that. In order to improve speed further rendering optimizations
+	  have to be done like DrawPolygonMesh and so on.
+	- Fixed the exact visibility culler in Dynavis so that it actually
+	  correctly clips polygons that go out of screen and out of
+	  the Z=0 plane. Without this fix the results of the exact
+	  visibility culler were actually not relevant.
+	- Added an entry to the FAQ about states and mesh wrappers.
+	- Added an entry to the FAQ to clarify reference counting.
 18-Jun-2002
 	- Extended iBugPlug interface with functions to setup a debug
 	  view. This is a 2D view on which you can render one general

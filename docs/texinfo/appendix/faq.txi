@@ -314,5 +314,54 @@ better with the Y axis pointing upwards in 3D coordinates).
 However, when getting mouse events the normal screen
 space coordinate system is used with (0,0) in the top-left corner.
 
+@item
+Why can't I get the @code{iThingState}/@code{iSprite3DState}/@dots{} from
+my mesh wrapper? I do @code{SCF_QUERY_INTERFACE} from the mesh and it
+returns @samp{NULL}.
+
+@strong{A}: A common error is to try to query the state interface for
+a mesh object from the @code{iMeshWrapper} instance. However it is not
+@code{iMeshWrapper} that represents the mesh object. @code{iMeshWrapper} is
+only a stub in the engine to wrap a mesh object so the engine can use
+it. To get the state interface you must query from the @code{iMeshObject}
+instance instead. You can get this instance with @code{mesh->GetMeshObject()}.
+
+@item
+I don't understand when I have to use @code{DecRef()} and when not. Can
+you explain this reference counting to me?
+
+@strong{A}: Basically reference counting keeps track of how many times
+the object is referenced throughout the system. The owner of a reference
+is also responsible for cleaning up that reference later. You are not
+responsible for cleaning up references owned by other modules (like the
+engine). In general you should do @code{DecRef()} in the following
+cases:
+@itemize @bullet
+@item
+On the pointer returned by @code{SCF_QUERY_INTERFACE},
+@code{SCF_QUERY_INTERFACE_FAST}, @code{SCF_QUERY_INTERFACE_SAFE},
+@code{CS_QUERY_REGISTRY}, @code{CS_QUERY_REGISTRY_TAG},
+@code{CS_QUERY_REGISTRY_TAG_INTERFACE}, @code{CS_LOAD_PLUGIN},
+@code{CS_QUERY_PLUGIN_ID}, and @code{CS_QUERY_PLUGIN_CLASS}.
+@item
+On a pointer on which you explicitely did @code{IncRef()}.
+@item
+On an object that you allocated yourselves (and that inherits
+from @code{iBase} or another @sc{scf} interface).
+@end itemize
+You should do @code{DecRef()} when you no longer need the pointer.
+In some cases you can do it immediatelly after using the pointer like
+in this example:
+@example
+iThingState* st = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iThingState);
+if (st)
+@{
+  st->blabla...;
+  st->DecRef ();
+@}
+@end example
+In other cases you can store the pointer in a global class (your application
+class) and call @code{DecRef()} when the application exits.
+
 @end itemize
 

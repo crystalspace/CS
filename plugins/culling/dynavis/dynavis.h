@@ -126,6 +126,7 @@ private:
   bool do_cull_history;
   bool do_cull_writequeue;
   bool do_cull_tiled;
+  bool do_freeze_vis;
 
   // View mode for debugging (one of VIEWMODE_... constants).
   int cfg_view_mode;

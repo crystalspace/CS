@@ -27,6 +27,7 @@ struct iPolygonMesh;
 struct iMovable;
 struct iCamera;
 class csPlane3;
+class csBoxClipper;
 
 struct csExVisObj
 {
@@ -47,6 +48,7 @@ private:
   int width, height;
   uint32* scr_buffer;	// The total screen buffer. Contains object indices.
   float* z_buffer;	// Z buffer.
+  csBoxClipper* boxclip;
 
   int num_objects;
   int max_objects;
@@ -58,9 +60,10 @@ private:
    * perfectly in all orientations. Polygon has to be convex.
    * Returns the total number of pixels in totpix and the number
    * of visible pixels (z-buf) in vispix.
+   * M, N, and O are used for getting the Z value at every pixel.
    */
-  void InsertPolygon (csVector2* tr_verts, float* tr_invz,
-	int* vi, int num_verts, uint32 obj_number, int& totpix);
+  void InsertPolygon (csVector2* tr_verts, int num_verts,
+  	float M, float N, float O, uint32 obj_number, int& totpix);
 
 public:
   /// Create a new exact culler with the given dimensions.
