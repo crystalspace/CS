@@ -1,0 +1,10 @@
+SubDir TOP apps tests vostest ;
+
+if $(VOS.AVAILABLE) = "yes" {
+Help vostest : "Crystal Space VOS support test" ;
+
+Application vostest
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith vostest : csgeom csgfx cstool csutil ;
+}
