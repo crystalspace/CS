@@ -284,8 +284,9 @@ csSoundLoader_WAV::LoadSound (void* databuf, uint32 size) const
   format.Channels = fmtchk.channel;
 
   // set up sound-buffer
+  int n = (fmtchk.bits_per_sample == 16 ? 2 : 1) * fmtchk.channel;
   csSoundDataRaw* rawSound = new csSoundDataRaw(NULL, data,
-    (fmtchk.bits_per_sample == 16) ? (wavchk.len/2)-1 : wavchk.len-1, format);
+						(wavchk.len/n)-1, format);
 
   return rawSound;
 }
