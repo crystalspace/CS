@@ -22,19 +22,7 @@
 
 #include "csutil/typedvec.h"
 
-class csCurve;
 class csLightHalo;
-class csPolygon3D;
-
-CS_DECLARE_TYPED_VECTOR_NODELETE (csCurvesArrayHelper, csCurve);
-
-/// A dynamic array of csCurve objects
-class csCurvesArray : public csCurvesArrayHelper {
-public:
-  virtual bool FreeItem (csSome item);
-  virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
-  csCurvesArray (int l=8, int t=8) : csCurvesArrayHelper (l, t) {}
-};
 
 CS_DECLARE_TYPED_VECTOR_NODELETE (csHaloArrayHelper, csLightHalo);
 
@@ -44,35 +32,6 @@ public:
   virtual bool FreeItem (csSome item);
   virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
   csHaloArray (int l=8, int t=8) : csHaloArrayHelper (l, t) {}
-};
-
-/**
- * An dynamic array of csPolygon3D objects.
- * This class is used in polygon set class and thing template class
- * for storing the polygons that the model consists of.
- */
-class csPolygonArray : public csVector
-{
-public:
-  /// Create the polygon array object
-  csPolygonArray (int iLimit, int iDelta) : csVector (iLimit, iDelta)
-  { }
-
-  /// Destroy the polygon array and all inserted polygons
-  virtual ~csPolygonArray ();
-
-  /// Delete a particular array element
-  virtual bool FreeItem (csSome Item);
-
-  /// Find a polygon by name
-  virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
-
-  /// Get a polygon given its index in the array
-  csPolygon3D *Get (int iIndex) const;
-
-  /// Get the entire array of polygons as an array of pointers
-  csPolygon3D **GetArray ()
-  { return (csPolygon3D **)root; }
 };
 
 #endif // __CS_ARRAYS_H__

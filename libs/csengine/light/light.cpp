@@ -19,12 +19,8 @@
 #include "csgeom/frustum.h"
 #include "csengine/light.h"
 #include "csengine/sector.h"
-#include "csengine/thing.h"
 #include "csengine/lghtmap.h"
 #include "csengine/engine.h"
-#include "csengine/lppool.h"
-#include "csengine/polygon.h"
-#include "csengine/curve.h"
 #include "csengine/halo.h"
 #include "csengine/meshobj.h"
 #include "csutil/debug.h"
@@ -332,49 +328,6 @@ void csStatLight::SetColor (const csColor &col)
 
 //---------------------------------------------------------------------------
 
-csLightPatch::csLightPatch ()
-{
-  next = prev = NULL;
-  num_vertices = 0;
-  max_vertices = 0;
-  vertices = NULL;
-  polygon = NULL;
-  light = NULL;
-  light_frustum = NULL;
-}
-
-csLightPatch::~csLightPatch ()
-{
-  delete[] vertices;
-  if (light_frustum) light_frustum->DecRef ();
-  RemovePatch ();
-}
-
-void csLightPatch::RemovePatch ()
-{
-  if (polygon) polygon->UnlinkLightpatch (this);
-  if (curve) curve->UnlinkLightPatch (this);
-  shadows.DeleteShadows ();
-  if (light_frustum)
-  {
-    light_frustum->DecRef ();
-    light_frustum = NULL;
-  }
-}
-
-void csLightPatch::Initialize (int n)
-{
-  if (n > max_vertices)
-  {
-    delete[] vertices;
-    max_vertices = n;
-    vertices = new csVector3[max_vertices];
-  }
-
-  num_vertices = n;
-}
-
-//---------------------------------------------------------------------------
 SCF_IMPLEMENT_IBASE_EXT(csDynLight)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iDynLight)
 SCF_IMPLEMENT_IBASE_EXT_END

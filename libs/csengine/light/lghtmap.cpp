@@ -19,10 +19,7 @@
 #include "cssys/csendian.h"
 #include "csengine/lghtmap.h"
 #include "csengine/polygon.h"
-#include "csengine/sector.h"
 #include "csengine/thing.h"
-#include "csengine/light.h"
-#include "csengine/engine.h"
 #include "csengine/curve.h"
 #include "csutil/util.h"
 #include "csutil/debug.h"
@@ -378,9 +375,10 @@ bool csLightMap::ReadFromCache (
     }
     else
     {
-      csEngine::current_engine->Warn (
-          "Warning! Light (%ld) not found!\n",
-          ls.light_id);
+      // @@@ TODO: Implement Warn back!!!
+      //Warn (
+          //"Warning! Light (%ld) not found!\n",
+          //ls.light_id);
     }
   }
 

@@ -16,7 +16,6 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "csengine/engine.h"
 #include "csengine/polyplan.h"
 #include "csgeom/textrans.h"
 #include "csgeom/transfrm.h"
@@ -29,8 +28,6 @@ csPolyPlane::csPolyPlane ()
 
 csPolyPlane::~csPolyPlane ()
 {
-  if (ref_count) 
-    csEngine::current_engine->Report ("csPolyPlane: ref_count=%d\n", ref_count);
 }
 
 void csPolyPlane::WorldToCamera (

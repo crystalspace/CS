@@ -19,7 +19,6 @@
 #include "cssysdef.h"
 #include "csengine/lview.h"
 #include "csengine/engine.h"
-#include "csengine/polygon.h"
 #include "csgeom/polyclip.h"
 #include "igeom/clip2d.h"
 #include "iengine/camera.h"

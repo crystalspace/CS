@@ -18,51 +18,8 @@
 */
 #include "cssysdef.h"
 #include "csengine/arrays.h"
-#include "csengine/curve.h"
-#include "csengine/polygon.h"
 #include "csengine/halo.h"
 
-//-------------------------------------------------------+ csCurvesArray +----//
-bool csCurvesArray::FreeItem (csSome Item)
-{
-  delete((csCurve *)Item);
-  return true;
-}
-
-int csCurvesArray::CompareKey (csSome Item, csConstSome Key, int Mode) const
-{
-  (void)Mode;
-
-  const char *name = ((csCurve *)Item)->GetName ();
-  return name ? strcmp (name, (char *)Key) : -1;
-}
-
-//------------------------------------------------------+ csPolygonArray +----//
-csPolygonArray::~csPolygonArray ()
-{
-  DeleteAll ();
-}
-
-bool csPolygonArray::FreeItem (csSome Item)
-{
-  delete (csPolygon3D *)Item;
-  return true;
-}
-
-int csPolygonArray::CompareKey (csSome Item, csConstSome Key, int Mode) const
-{
-  (void)Mode;
-
-  const char *name = ((csPolygon3D *) Item)->GetName ();
-  return name ? strcmp (name, (char *)Key) : -1;
-}
-
-csPolygon3D *csPolygonArray::Get (int iIndex) const
-{
-  return (csPolygon3D *)csVector::Get (iIndex);
-}
-
-//---------------------------------------------------------+ csHaloArray +----//
 bool csHaloArray::FreeItem (csSome Item)
 {
   delete((csLightHalo *)Item);

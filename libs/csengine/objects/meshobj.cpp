@@ -22,7 +22,6 @@
 #include "csengine/meshobj.h"
 #include "csengine/light.h"
 #include "csengine/engine.h"
-#include "csengine/thing.h"
 #include "csutil/debug.h"
 #include "iengine/rview.h"
 #include "imesh/thing/polygon.h"

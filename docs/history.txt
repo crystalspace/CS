@@ -24,6 +24,13 @@ The history order is reversed so that new features are at the top.
 	- Modified csLightingPolyTexQueue to implement iLightingProcessData
 	  so that the lightmap specific lighting stuff is now seperated
 	  from the lighting stuff.
+	- Physically seperated arrays.cpp in the engine to prepare for the
+	  move of thing as a seperate plugin.
+	- Moved csLightPatch to lppool.cpp.
+	- Removed all includes from core engine to thing and vice versa
+	  that are not needed. This only leaves a very few dependencies
+	  before thing can be moved outside. Of course these few
+	  dependencies still require some work.
 18-Dec-2002
 	- Fixed the sprite socket vector. FreeItem() casted the item
 	  to delete to the wrong type (csSpriteSocketVector instead

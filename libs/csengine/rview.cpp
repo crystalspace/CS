@@ -23,7 +23,6 @@
 #include "igeom/clip2d.h"
 #include "iengine/camera.h"
 #include "csengine/sector.h"
-#include "csengine/polygon.h"
 #include "csgeom/polyclip.h"
 #include "iutil/dbghelp.h"
 #include "ivideo/graph3d.h"

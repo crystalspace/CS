@@ -20,15 +20,12 @@
 #include "csengine/polygon.h"
 #include "csengine/pol2d.h"
 #include "csengine/sector.h"
-#include "csengine/engine.h"
-#include "csengine/stats.h"
-#include "csengine/lview.h"
-#include "csengine/light.h"
 #include "csutil/debug.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 #include "iengine/rview.h"
 #include "iengine/fview.h"
+#include "iengine/camera.h"
 
 SCF_IMPLEMENT_IBASE_EXT(csPortal)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPortal)
@@ -274,7 +271,6 @@ bool csPortal::Draw (
   if (sector->GetPrivateObject ()->draw_busy >= max_sector_visit)
     return false;
 
-  Stats::portals_drawn++;
   if (!new_clipper->GetVertexCount ()) return false;
 
   iCamera *icam = rview->GetCamera ();

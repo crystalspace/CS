@@ -17,7 +17,6 @@
 */
 #include "cssysdef.h"
 #include "csengine/cscoll.h"
-#include "csengine/thing.h"
 #include "csengine/engine.h"
 #include "csengine/sector.h"
 

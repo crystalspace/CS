@@ -20,7 +20,7 @@
 #define __CS_THING_H__
 
 #include "csgeom/transfrm.h"
-#include "csengine/arrays.h"
+#include "csengine/parrays.h"
 #include "csutil/csobject.h"
 #include "csutil/nobjvec.h"
 #include "csutil/util.h"

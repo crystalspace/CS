@@ -20,7 +20,6 @@
 #include "csengine/movable.h"
 
 #include "csengine/sector.h"
-#include "csengine/thing.h"
 #include "csengine/meshobj.h"
 #include "csengine/cscoll.h"
 #include "csengine/engine.h"

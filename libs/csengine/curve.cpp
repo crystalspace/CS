@@ -21,14 +21,15 @@
 #include "qsqrt.h"
 #include "csengine/bezier.h"
 #include "csengine/curve.h"
-#include "csengine/light.h"
 #include "csengine/polytext.h"
 #include "csengine/polygon.h"
-#include "csengine/thing.h"
 #include "csengine/engine.h"
+#include "csengine/thing.h"
 #include "csengine/lppool.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/vbufmgr.h"
+#include "iengine/light.h"
+#include "iengine/engine.h"
 
 
 struct csCoverageMatrix
