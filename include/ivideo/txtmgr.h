@@ -145,7 +145,7 @@ struct iTextureManager : public iBase
 {
   /**
    * Register a texture. The given input image is IncRef'd and DecRef'ed
-   * later when FreeImages () is called. If you want to keep the input image
+   * later when no longer needed. If you want to keep the input image
    * make sure you have called IncRef yourselves.
    *<p>
    * The texture is not converted immediately. Instead, you can make
@@ -171,7 +171,7 @@ struct iTextureManager : public iBase
 
   /**
    * Register a texture. The given input image is IncRef'd and DecRef'ed
-   * later when FreeImages () is called. If you want to keep the input image
+   * later when no longer needed. If you want to keep the input image
    * make sure you have called IncRef yourselves.
    *<p>
    * The texture is not converted immediately. Instead, you can make

@@ -1430,13 +1430,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
       Engine->Prepare (meter);
       delete meter;
     }
-    else
-    {
-      // Here we free all loaded images. Normally engine->Prepare()
-      // will do that for us.
-      iTextureManager *txtmgr = Gfx3D->GetTextureManager ();
-      txtmgr->FreeImages ();
-    }
 
     if (cmdline->GetOption ("precache"))
     {

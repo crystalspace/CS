@@ -49,10 +49,8 @@ struct iObjectRegistry;
  * <p>
  * The handle is initialized by giving the 3D driver a iImage object.
  * Later the renderer will create mipmaps and 2D textures are created.
- * You can call TextureManager::FreeImages() which in turn will call
- * csTextureHandle::FreeImage () for each registered texture and the
- * original texture will be released. This means you will free the
- * memory occupied by the original textures.
+ * The texture manager will release its reference to the image when no
+ * longer needed.
  */
 class csTextureHandle : public iTextureHandle
 {
