@@ -16,6 +16,8 @@ chronological order.
 	    - iEmitMix::AdjustEmitterWeight allows for adjusting the weight
 	      of an existing emitter beneath a mix without recreating the 
 	      entire mix, or removing and re-adding the sub emitter.
+	- Wouter added csgfx library to linking of thing.so, now needed
+	  under NR. Both to .mak and Jamfile.
 8-Nov-2003
 	- Andreas Busch added missing awstut.cfg
 	- Wouter fixed a typo in csfxscr fullscreen header file, and 

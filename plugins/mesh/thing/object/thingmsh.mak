@@ -39,7 +39,7 @@ INF.THING = $(SRCDIR)/$(DIR.THING)/thing.csplugin
 INC.THING = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.THING)/*.h))
 SRC.THING = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.THING)/*.cpp))
 OBJ.THING = $(addprefix $(OUT.THING)/,$(notdir $(SRC.THING:.cpp=$O)))
-DEP.THING = CSGEOM CSUTIL CSUTIL
+DEP.THING = CSGFX CSGEOM CSUTIL
 CFG.THING = $(SRCDIR)/data/config/thing.cfg
 
 TO_INSTALL.CONFIG += $(CFG.THING)
