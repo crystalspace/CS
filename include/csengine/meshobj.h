@@ -166,7 +166,12 @@ protected:
   /// Flags to use for defered lighting.
   int defered_lighting_flags;
 
- 
+#ifdef CS_USE_NEW_RENDERER
+  /// Cached value from DrawTest
+  bool draw_test;
+  /// Cached light test
+  bool in_light;
+#endif
 
   /**
    * This value indicates the last time that was used to do animation.

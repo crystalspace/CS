@@ -248,7 +248,8 @@ void csMeshWrapper::DrawZ (iRenderView* rview)
     i--;
   }
 
-  if (meshobj->DrawTest (rview, &movable.scfiMovable))
+  draw_test = meshobj->DrawTest (rview, &movable.scfiMovable);
+  if (draw_test)
   {
     csTicks lt = csEngine::current_engine->GetLastAnimationTime ();
     if (lt != 0)
@@ -273,13 +274,15 @@ void csMeshWrapper::DrawZ (iRenderView* rview)
 
 void csMeshWrapper::DrawShadow (iRenderView* rview, iLight* light)
 {
-  if (meshobj->DrawTest (rview, &movable.scfiMovable))
+  float sqd_dist = (light->GetCenter() - movable.GetPosition()).SquaredNorm();
+  in_light = sqd_dist <= light->GetRadius() * light->GetRadius();
+  if (in_light)
     meshobj->DrawShadow (rview, &movable.scfiMovable, zbufMode);
 }
 
 void csMeshWrapper::DrawLight (iRenderView* rview, iLight* light)
 {
-  if (meshobj->DrawTest (rview, &movable.scfiMovable))
+  if (draw_test && in_light) 
     meshobj->DrawLight (rview, &movable.scfiMovable, zbufMode);
 }
 #endif // CS_USE_NEW_RENDERER
