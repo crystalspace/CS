@@ -23,6 +23,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csutil/hash.h"
+#include "csutil/hashhandlers.h"
 #include "csutil/parray.h"
 #include "csutil/refarr.h"
 #include "csutil/refcount.h"
@@ -185,8 +186,8 @@ public:
   csRef<iVFS> VFS;
   const char *fontset;
   bool freetype_inited;
-  csHash<csFt2FaceWrapper*, const char*> ftfaces;
-  csHash<iFont*, const char*> fonts;
+  csHash<csFt2FaceWrapper*, const char*, csConstCharHashKeyHandler> ftfaces;
+  csHash<iFont*, const char*, csConstCharHashKeyHandler> fonts;
 
   SCF_DECLARE_IBASE;
 

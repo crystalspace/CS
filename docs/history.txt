@@ -16,6 +16,9 @@ chronological order.
 	  the world file. Currently no visibility culler has parameters but
 	  the PVS visibility culler will use a parameter to specify the
 	  filename of the PVS cache.
+	- Anders fixed a bug in FreeFont2 where strings would be hashed on
+	  their pointers, which in effect pretty much disabled the font 
+	  loading cache.
 10-Jan-2005
 	- Jorrit fixed traversal of movable listeners so that it uses a
 	  size_t loop instead of one based on int. This should be the same
