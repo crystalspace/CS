@@ -110,7 +110,7 @@ csSector::~csSector ()
 
 void csSector::CleanupReferences ()
 {
-  int i;
+  int i = 0;
   while (references.Length () > 0)
   {
     iReference* ref = (iReference*)references[references.Length ()-1];
