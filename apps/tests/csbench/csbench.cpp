@@ -379,10 +379,9 @@ void CsBench::PerformTests ()
   csRef<iFile> shaderFile = vfs->Open (shaderPath, VFS_FILE_READ);
   shaderDoc->Parse (shaderFile);
   csRef<iDocumentNode> shadernode = shaderDoc->GetRoot ()->GetNode ("shader");
-  const char* shadertypeName = shadernode->GetAttributeValue ("type");
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
     object_reg, "crystalspace.shared.stringset", iStringSet);
-  csStringID shadertype = strings->Request (shadertypeName);
+  csStringID shadertype = strings->Request ("OR compatibility");
   csRef<iShaderPriorityList> prilist = shcom->GetPriorities (shadernode);
   int i;
   for (i = 0 ; i < prilist->GetCount () ; i++)

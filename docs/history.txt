@@ -10,6 +10,8 @@ chronological order.
 	- Jorrit attempted to add new tests to csbench to try out a shader
 	  with various techniques. Not sure if it works correctly yet though.
 	  Needs more testing.
+	- res fixed the shader technique test in csbench. A wrong "shader type"
+	  parameter was passed to iMaterial->SetShader().
 20-Jun-2004
 	- Christian Bayle adapted debian scripts to the new configuration
 	  options
