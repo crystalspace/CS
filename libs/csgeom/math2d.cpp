@@ -188,8 +188,22 @@ bool csIntersect2::Planes (const csPlane2& p1, const csPlane2& p2,
 {
   // p1: A1x+B1y+C1 = 0
   // p2: A2x+B2y+C2 = 0
-//@@@@@@@@@@@@@@@@@@@@@ TO BE IMPLEMENTED!
-  CRASH;
+//@@@NOT SURE THAT THIS ROUTINE IS RIGHT AND OPTIMAL
+  if (ABS (p1.B ()) < SMALL_EPSILON && ABS (p2.B ()) < SMALL_EPSILON)
+    return false;
+  if (ABS (p1.A ()) > ABS (p2.A ()))
+  {
+    isect.y = (p2.A()*p1.C()/p1.A() - p2.C()) / (p2.B() - p2.A()*p1.B()/p1.A());
+    isect.x = -(p1.B()*isect.y + p1.C()) / p1.A();
+  }
+  else if (ABS (p2.A ()) > SMALL_EPSILON)
+  {
+    isect.y = (p1.A()*p2.C()/p2.A() - p1.C()) / (p1.B() - p1.A()*p2.B()/p2.A());
+    isect.x = -(p2.B()*isect.y + p2.C()) / p2.A();
+  }
+  else
+    return false; // parallel
+
   return false;
 }
 

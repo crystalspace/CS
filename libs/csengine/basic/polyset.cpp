@@ -620,7 +620,7 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
       if (pvs && !p->IsVisible ())
       {
         // Polygon is not visible because of PVS.
-        continue;
+        //@@@ CURRENTLY DISABLED continue;
       }
 
       clip = (csPolygon2D*)(render_pool->Alloc ());

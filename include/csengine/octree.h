@@ -296,12 +296,16 @@ private:
   void BoxOccludeeShadowPolygons (const csBox3& box,
   	const csBox3& occludee,
 	csPolygonInt** polygons, int num_polygons,
-	csCBuffer* cbuffer);
+	csCBuffer* cbuffer,
+  	const csVector2& scale, const csVector2& shift,
+	int plane_nr, float plane_pos);
 
   /**
    * Help function for BoxCanSeeOccludee.
    */
   void BoxOccludeeAddShadows (csOctreeNode* occluder, csCBuffer* cbuffer,
+  	const csVector2& scale, const csVector2& shift,
+	int plane_nr, float plane_pos,
   	const csBox3& box, const csBox3& occludee,
 	csVector3& box_center, csVector3& occludee_center);
 
@@ -321,12 +325,6 @@ private:
    * Build PVS for this node.
    */
   void BuildPVS (csThing* thing, csOctreeNode* node);
-
-  /**
-   * Add all visible nodes and polygons in this tree to
-   * the given pvs.
-   */
-  void AddToPVS (csPVS& pvs, csOctreeNode* node);
 
 public:
   /**

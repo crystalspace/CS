@@ -25,6 +25,7 @@
 #include "csengine/sector.h"
 #include "csengine/world.h"
 #include "csengine/covcube.h"
+#include "csengine/cbuffer.h"
 #include "csengine/polygon.h"
 #include "csengine/thing.h"
 #include "isystem.h"
@@ -806,149 +807,6 @@ void csOctree::MarkVisibleFromPVS (const csVector3& pos)
   }
 }
 
-struct PVSBuildData
-{
-  csCovcube* cube;
-  csVector3 center;
-};
-
-void* MarkPolygonsVisiblePVS (csSector*,
-	csPolygonInt** polygon, int num, void* data)
-{
-  PVSBuildData* pvsdata = (PVSBuildData*)data;
-  csCovcube* cube = pvsdata->cube;
-  const csVector3& center = pvsdata->center;
-  int i, j;
-  for (i = 0 ; i < num ; i++)
-  {
-    if (polygon[i]->GetType () != 1) continue;
-    csPolygon3D* p = (csPolygon3D*)polygon[i];
-
-    csVector3 poly[50];	// @@@ HARDCODED! BAD!
-    for (j = 0 ; j < p->GetNumVertices () ; j++)
-      poly[j] = p->Vwor (j)-center;
-
-    bool vis = cube->InsertPolygon (poly, p->GetNumVertices ());
-    if (vis) p->MarkVisible (); //@@@ Backface culling?
-  }
-  return NULL;
-}
-
-bool CullOctreeNodePVS (csPolygonTree* tree, csPolygonTreeNode* node,
-	const csVector3& /*pos*/, void* data)
-{
-  if (!node) return false;
-  if (node->Type () != NODE_OCTREE) return true;
-
-  csOctree* otree = (csOctree*)tree;
-  csOctreeNode* onode = (csOctreeNode*)node;
-
-  PVSBuildData* pvsdata = (PVSBuildData*)data;
-  csCovcube* cube = pvsdata->cube;
-  const csVector3& center = pvsdata->center;
-
-  // Test node against coverage mask cube.
-  csVector3 outline[6];
-  int num_outline;
-  otree->GetConvexOutline (onode, center, outline, num_outline);
-  if (num_outline > 0)
-  {
-    int i;
-    for (i = 0 ; i < num_outline ; i++)
-      outline[i] -= center;
-    if (!cube->TestPolygon (outline, num_outline)) return false;
-  }
-  onode->MarkVisible ();
-  return true;
-}
-
-struct PVSBuildData2
-{
-  // All collected leafs that can potentially block sight
-  // between the original leaf and the current node.
-  csVector leaf_queue;
-  // The box for the original leaf.
-  csBox3 leaf_box;
-};
-
-bool BuildPVSOctreeNode (csPolygonTree* /*tree*/, csPolygonTreeNode* node,
-	const csVector3& /*pos*/, void* data)
-{
-  if (!node) return false;
-  if (node->Type () != NODE_OCTREE) return true;
-
-//   csOctree* otree = (csOctree*)tree;
-  csOctreeNode* onode = (csOctreeNode*)node;
-
-  PVSBuildData2* pvsdata = (PVSBuildData2*)data;
-  csVector& leaf_queue = pvsdata->leaf_queue;
-
-  // Test this node against all polygons in all leafs in the
-  // queue already. If there is a polygon in there that completely
-  // shadows the original leaf then this node is not visible.
-  int leaf_num, poly_num, cor_num, i = 0, i1;
-//   bool invisible = false;
-  for (leaf_num = 0 ; i < leaf_queue.Length () ; i++)
-  {
-    csOctreeNode* leaf = (csOctreeNode*)leaf_queue[leaf_num];
-    csPolygonIntArray& polygons = leaf->GetUnsplitPolygons ();
-    for (poly_num = 0 ; poly_num < polygons.GetNumPolygons () ; poly_num++)
-    {
-      csPolygonInt* polygon = polygons.GetPolygon (poly_num);
-      if (polygon->GetType () == 1)
-      {
-        // csPolygon3D.
-	csPolygon3D* p = (csPolygon3D*)polygon;
-	csPlane3* plane = p->GetPolyPlane ();
-	for (cor_num = 0 ; cor_num < 8 ; cor_num++)
-	{
-	  csVector3 corner = onode->GetBox ().GetCorner (cor_num);
-	  // Do backface culling first.
-	  if (csMath3::Visible (corner, *plane))
-	  {
-	    i1 = p->GetNumVertices ()-1;
-	    for (i = 0 ; i < p->GetNumVertices () ; i++)
-	    {
-// 	      csVector3& v1 = p->Vwor (i1);
-// 	      csVector3& v2 = p->Vwor (i);
-
-	      i1 = i;
-	    }
-	  }
-	  else
-	  {
-	    // If backface culling fails then we assume
-	    // that this polygon can never cull the node.
-	    break;
-	  }
-	}
-      }
-    }
-  }
-
-  onode->MarkVisible ();
-  return true;
-}
-
-void csOctree::AddToPVS (csPVS& pvs, csOctreeNode* node)
-{
-  if (!node) return;
-  if (!node->IsVisible ()) return;
-
-  csOctreeVisible* ovis = pvs.Add ();
-  ovis->SetOctreeNode (node);
-
-  if (node->GetMiniBsp ())
-  {
-    csBspTree* bsp = node->GetMiniBsp ();
-    bsp->AddToPVS (&ovis->GetPolygons ());
-  }
-
-  int i;
-  for (i = 0 ; i < 8 ; i++)
-    AddToPVS (pvs, (csOctreeNode*)node->children[i]);
-}
-
 #define PLANE_X 0
 #define PLANE_Y 1
 #define PLANE_Z 2
@@ -956,12 +814,15 @@ void csOctree::AddToPVS (csPVS& pvs, csOctreeNode* node)
 void csOctree::BoxOccludeeShadowPolygons (const csBox3& box,
 	const csBox3& occludee,
 	csPolygonInt** polygons, int num_polygons,
-	csCBuffer* cbuffer)
+	csCBuffer* cbuffer, const csVector2& scale, const csVector2& shift,
+	int plane_nr, float plane_pos)
 {
   int i, j;
   csPolygon3D* p;
   csPoly3D cur_poly;
-//  csPoly2D proj_poly;
+  csPoly2D proj_poly;
+  csPoly2D result_poly;
+  bool first_time = true;
   for (i = 0 ; i < num_polygons ; i++)
     if (polygons[i]->GetType () == 1)
     {
@@ -971,17 +832,58 @@ void csOctree::BoxOccludeeShadowPolygons (const csBox3& box,
         cur_poly.AddVertex (p->Vwor (j));
       for (j = 0 ; j < 8 ; j++)
       {
-#if 0
 	const csVector3& corner = box.GetCorner (j);
-	cur_poly.ProjectAxisPlane (corner, plane_nr, box.MinX (), &proj_poly);
-	//@@@@@@@@@@@@@
-#endif
+	cur_poly.ProjectAxisPlane (corner, plane_nr, plane_pos, &proj_poly);
+	if (first_time)
+	{
+	  result_poly = proj_poly;
+	  first_time = false;
+	}
+	else
+	{
+	  CHK (csClipper* clipper = new csPolygonClipper (&proj_poly));
+	  result_poly.MakeRoom (MAX_OUTPUT_VERTICES);
+	  int num_verts = result_poly.GetNumVertices ();
+	  csBox2 bbox;
+	  UByte rc = clipper->Clip (result_poly.GetVertices (), num_verts, bbox);
+	  CHK (delete clipper);
+	  if (rc == CS_CLIP_OUTSIDE) num_verts = 0;
+	  result_poly.SetNumVertices (num_verts);
+	  if (num_verts == 0) break;
+	}
+      }
+      if (result_poly.GetNumVertices () != 0)
+      {
+	// First scale the polygon to cbuffer dimensions.
+	for (j = 0 ; j < result_poly.GetNumVertices () ; j++)
+	{
+	  csVector2& v = result_poly[j];
+	  v = v-shift;
+	  v.x *= scale.x;
+	  v.y *= scale.y;
+	}
+	// Then clip to cbuffer dimensions.
+	// @@@ WE NEED TO MAKE THIS CLIPPER EARLIER AND
+	// GIVE IT TO THIS ROUTINE!
+	csBox2 b (0, 0, 1024, 1024);
+	CHK (csClipper* clipper = new csBoxClipper (b));
+	result_poly.MakeRoom (MAX_OUTPUT_VERTICES);
+	int num_verts = result_poly.GetNumVertices ();
+	csBox2 bbox;
+	if (clipper->Clip (result_poly.GetVertices (), num_verts, bbox))
+	{
+	  result_poly.SetNumVertices (num_verts);
+	  cbuffer->InsertPolygon (result_poly.GetVertices (),
+	  	result_poly.GetNumVertices ());
+	}
+	CHK (delete clipper);
       }
     }
 }
 
 void csOctree::BoxOccludeeAddShadows (csOctreeNode* occluder,
-	csCBuffer* cbuffer,
+	csCBuffer* cbuffer, const csVector2& scale, const csVector2& shift,
+	int plane_nr, float plane_pos,
 	const csBox3& box, const csBox3& occludee,
 	csVector3& box_center, csVector3& occludee_center)
 {
@@ -992,7 +894,8 @@ void csOctree::BoxOccludeeAddShadows (csOctreeNode* occluder,
   {
     for (i = 0 ; i < 8 ; i++)
       BoxOccludeeAddShadows ((csOctreeNode*)occluder->children[i],
-      	cbuffer, box, occludee, box_center, occludee_center);
+      	cbuffer, scale, shift, plane_nr, plane_pos,
+	box, occludee, box_center, occludee_center);
   }
   else if (occluder_box.Between (box, occludee))
   {
@@ -1000,11 +903,12 @@ void csOctree::BoxOccludeeAddShadows (csOctreeNode* occluder,
       BoxOccludeeShadowPolygons (box, occludee,
 	occluder->unsplit_polygons.GetPolygons (),
 	occluder->unsplit_polygons.GetNumPolygons (),
-	cbuffer);
+	cbuffer, scale, shift, plane_nr, plane_pos);
     else
       for (i = 0 ; i < 8 ; i++)
         BoxOccludeeAddShadows ((csOctreeNode*)occluder->children[i],
-      	  cbuffer, box, occludee, box_center, occludee_center);
+      	  cbuffer, scale, shift, plane_nr, plane_pos,
+	  box, occludee, box_center, occludee_center);
   }
 }
 
@@ -1099,30 +1003,23 @@ bool csOctree::BoxCanSeeOccludee (const csBox3& box, const csBox3& occludee)
 
   // From the calculated plane area we can now calculate a scale to get
   // to a c-buffer size of 1024x1024. We also allocate this c-buffer here.
+  CHK (csCBuffer* cbuffer = new csCBuffer (0, 1023, 1024));
+  csVector2 scale = (plane_area.Max () - plane_area.Min ()) / 1024.;
+  scale.x = 1./scale.x;
+  scale.y = 1./scale.y;
+  csVector2 shift = plane_area.Min ();
 
+  cbuffer->Initialize ();
+  BoxOccludeeAddShadows ((csOctreeNode*)root, cbuffer, scale, shift,
+  	plane_nr, plane_pos,
+  	box, occludee, box_center, occludee_center);
 
-#if 0
-  int i;
-  int relevant_sides[6];
-  int num_relevant_sides;
-  num_relevant_sides = csMath3::FindObserverSides (box, occludee,
-  	relevant_sides);
-  for (i = 0 ; i < num_relevant_sides ; i++)
-    cube->GetFace (relevant_sides[i])->MakeEmpty ();
-  csVector3 box_center= box.GetCenter ();
-  csVector3 occludee_center = occludee.GetCenter ();
-  BoxOccludeeAddShadows ((csOctreeNode*)root, cube, box, occludee,
-  	box_center, occludee_center,
-  	relevant_sides, num_relevant_sides, planes, num_planes);
-  for (i = 0 ; i < num_relevant_sides ; i++)
-    if (!cube->GetFace (relevant_sides[i])->IsFull ())
-      return true;
-  return false;
-#endif
-  return true;
+  // If the c-buffer is full then the occludee will not be visible.
+  bool full = cbuffer->IsFull ();
+  CHK (delete cbuffer);
+  return !full;
 }
 
-#if 1
 void csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
 	csOctreeNode* leaf)
 {
@@ -1155,88 +1052,6 @@ void csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
       	thing, leaf);
   }
 }
-#elif 0
-void csOctree::BuildPVSForLeaf (csThing* thing,
-	csOctreeNode* leaf)
-{
-printf ("*"); fflush (stdout);
-  // Here we traverse the octree starting from the leaf node.
-  // Every other leaf we encounter is first checked against
-  // the contents of the queue and if visible marked as visible
-  // and then added to the queue as well.
-
-  // Mark all objects in the world as invisible.
-  csOctreeNode::pvs_cur_vis_nr++;
-
-  // The root is always visible.
-  ((csOctreeNode*)root)->MarkVisible ();
-
-  const csVector3& center = leaf->GetCenter ();
-  thing->UpdateTransformation (center);
-  PVSBuildData2 pvsdata;
-  pvsdata.leaf_box = leaf->bbox;
-  Front2Back (center, NULL, NULL, BuildPVSOctreeNode, (void*)&pvsdata);
-
-  // Now that we have traversed the tree for several positions we have
-  // found a superset of all visible nodes and polygons. Here
-  // we will fetch them all and put them in the PVS for this leaf.
-  csPVS& pvs = leaf->GetPVS ();
-  pvs.Clear ();
-  AddToPVS (pvs, (csOctreeNode*)root);
-}
-#else
-void csOctree::BuildPVSForLeaf (csThing* thing,
-	csOctreeNode* leaf)
-{
-printf ("*"); fflush (stdout);
-  // Here we simulate a limited rendering on a 2D culler
-  // cube. This is used to test for visibility so that we
-  // can mark everything we encounter (nodes and polygons)
-  // as visible.
-
-  // Mark all objects in the world as invisible.
-  csOctreeNode::pvs_cur_vis_nr++;
-
-  // The root is always visible.
-  ((csOctreeNode*)root)->MarkVisible ();
-
-  // @@@ This algorithm is not good. It just samples a few
-  // points in the cube and gathers all visible objects seen
-  // from that point. It has two problems:
-  //    1. Not accurate: it is possible to miss polygons or
-  //       entire nodes that are visible from some point we
-  //       didn't test.
-  //    2. Not fast.
-  // But this is easy to code and a temporary algorithm to
-  // test the PVS in principle.
-  const csVector3& bmin = leaf->GetMinCorner ();
-  const csVector3& bmax = leaf->GetMaxCorner ();
-  csVector3 steps = (bmax-bmin)/2.;
-  //csVector3 steps = (bmax-bmin);//@@@
-  csVector3 pos;
-  PVSBuildData pvsdata;
-  pvsdata.center = pos;
-  pvsdata.cube = cube;
-  for (pos.x = bmin.x+steps.x/2. ; pos.x < bmax.x ; pos.x += steps.x)
-    for (pos.y = bmin.y+steps.y/2. ; pos.y < bmax.y ; pos.y += steps.y)
-      for (pos.z = bmin.z+steps.z/2. ; pos.z < bmax.z ; pos.z += steps.z)
-      {
-        // Traverse the tree as seen from this position and mark every
-	// node and polygon we see as visible.
-        cube->MakeEmpty ();
-        thing->UpdateTransformation (pos);
-	Front2Back (pos, MarkPolygonsVisiblePVS, (void*)&pvsdata,
-		CullOctreeNodePVS, (void*)&pvsdata);
-      }
-
-  // Now that we have traversed the tree for several positions we have
-  // found all (not really, see above) visible nodes and polygons. Here
-  // we will fetch them all and put them in the PVS for this leaf.
-  csPVS& pvs = leaf->GetPVS ();
-  pvs.Clear ();
-  AddToPVS (pvs, (csOctreeNode*)root);
-}
-#endif
 
 void csOctree::BuildPVS (csThing* thing,
 	csOctreeNode* node)
@@ -1256,6 +1071,7 @@ void csOctree::BuildPVS (csThing* thing,
     // by the normal polygon/node traversal process.
     csPVS& pvs = node->GetPVS ();
     pvs.Clear ();
+printf ("*"); fflush (stdout);
     BuildPVSForLeaf ((csOctreeNode*)root, thing, node);
   }
   else

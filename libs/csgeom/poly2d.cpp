@@ -42,6 +42,26 @@ csPoly2D::csPoly2D (csPoly2D& copy)
   bbox = copy.bbox;
 }
 
+csPoly2D& csPoly2D::operator= (const csPoly2D& other)
+{
+  if (other.num_vertices <= max_vertices)
+  {
+    num_vertices = other.num_vertices;
+    if (num_vertices)
+      memcpy (vertices, other.vertices, sizeof (csVector2)*num_vertices);
+  }
+  else
+  {
+    CHK (delete [] vertices);
+    max_vertices = other.max_vertices;
+    CHK (vertices = new csVector2 [max_vertices]);
+    num_vertices = other.num_vertices;
+    if (num_vertices)
+      memcpy (vertices, other.vertices, sizeof (csVector2)*num_vertices);
+  }
+  return *this;
+}
+
 csPoly2D::~csPoly2D ()
 {
   CHK (delete [] vertices);

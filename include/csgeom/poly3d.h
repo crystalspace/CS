@@ -159,6 +159,23 @@ public:
    */
   void ProjectZPlane (const csVector3& point, float plane_z,
   	csPoly2D* poly2d);
+
+  /**
+   * Project this polygon onto an axis-aligned plane as seen from some
+   * point in space. Fills the given 2D polygon with the projection
+   * on the plane. This function assumes that there actually is
+   * a projection. Plane_nr is 0 for the X plane, 1 for Y, and 2 for Z.
+   */
+  void ProjectAxisPlane (const csVector3& point, int plane_nr, float plane_pos,
+  	csPoly2D* poly2d)
+  {
+    switch (plane_nr)
+    {
+      case 0: ProjectXPlane (point, plane_pos, poly2d); break;
+      case 1: ProjectYPlane (point, plane_pos, poly2d); break;
+      case 2: ProjectZPlane (point, plane_pos, poly2d); break;
+    }
+  }
 };
 
 /**

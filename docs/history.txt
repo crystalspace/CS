@@ -1,5 +1,10 @@
 The history order has been reversed so that new features are at the top.
 
+2-May-2000
+	- Added csPoly3D::ProjectAxisPlane() which is similar to
+	  ProjectXPlane() but for a general axis aligned plane.
+	- Added assignment operator for csPoly2D.
+	- Some further work on PVS.
 1-May-2000
 	- Added csBox2 and csBox3 Min() and Max() functions that accept
 	  a component index (x=0, y=1, z=2).
@@ -53,6 +58,9 @@ The history order has been reversed so that new features are at the top.
 	      composite operations of forcing and inhibiting, respectively,
 	      recalculation of all cached information (such as visibility and
 	      lighting data).
+	- Robert Bate added class keyword to a friend declaration so that
+	  CWPro5 is happy.
+	- Norman Kramer did a small fix in pixmap clipcode for glide.
 	- Eric Sunshine made the following changes to csString:
 	    - Added variations of Append() and operator+= for all of the basic
 	      types (including signed and unsigned).
@@ -93,6 +101,12 @@ The history order has been reversed so that new features are at the top.
 	- Martin Geisse added framework for object conditions and cleaned
 	  up thing handling for DUNGEON plugin.
 	- Norman Kramer corrected halo drawing for Glide.
+	- Thomas Riemer moved csnstp/nstp.h to netspace/nstp. Thomas also
+	  added parser functionality to nstp.cpp to echo valid NSTP back.
+	- Gary Haussmann moved the perspective projection in
+	  DrawTriangleMesh. The projection was being placed into the OpenGL
+	  Modelview matrix. Now the code places perspective projection into
+	  the OpenGL projection matrix where it belongs.
 29-Apr-2000
 	- Desmond Fletcher extended Map2CS with the option to add
 	  TRIGGER to activate scripts in a THING.

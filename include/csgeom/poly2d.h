@@ -56,6 +56,9 @@ public:
   /// Destructor.
   virtual ~csPoly2D ();
 
+  /// Assignment operator.
+  csPoly2D& operator= (const csPoly2D& other);
+
   /**
    * Initialize the polygon to empty.
    */
