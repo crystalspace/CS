@@ -185,7 +185,7 @@ chronological order.
 	  value if the target's Jamfile did not invoke the Help rule.
 	- John Harger fixed the particles interface to avoid the dangerous
 	  csArray references.
-	- Norman Kraemer replaced in viewmesh the call to SetRenderScale() with 
+	- Norman Kraemer replaced in viewmesh the call to SetRenderScale() with
 	  RescaleFactory().
 27-Jan-2004
 	- Dentoid added a missing CS_IMPLEMENT_PLUGIN to the engine plugin.
@@ -256,15 +256,14 @@ chronological order.
 	  needs to examine conftest.err, which normally is not created by
 	  AC_LINK_IFELSE() in <= 2.57, so the check had to perform some m4
 	  magic to fool AC_LINK_IFELSE() into creating conftest.err.  As of
-	  Autoconf 2.58, however, AC_LINK_IFELSE() has been changed so that it
-	  always creates conftest.err, but it also deletes conftest.err, with
-	  the result that, by the time the "-shared" check tried to examine
-	  conftest.err, it had already been deleted by AC_LINK_IFELSE().  In
-	  addition to fixing this problem, the functionality of examining
-	  conftest.err has also been generalized and is now available as a
-	  standard option to all callers of CS_BUILD_IFELSE(),
-	  CS_CHECK_BUILD(), and CS_CHECK_BUILD_FLAGS(), rather than being
-	  implemented as a special case for the "-shared" check.
+	  Autoconf 2.58, however, AC_LINK_IFELSE() always creates conftest.err,
+	  but it also deletes conftest.err before the "-shared" check has a
+	  chance to examine the file.  In addition to fixing this problem, the
+	  functionality of examining conftest.err has also been generalized and
+	  is now available as a standard option to all callers of
+	  CS_BUILD_IFELSE(), CS_CHECK_BUILD(), and CS_CHECK_BUILD_FLAGS(),
+	  rather than being implemented as a special case for the "-shared"
+	  check.
 22-Jan-2004
 	- Jorrit added the engine target to both jam and make 'walkall' since
 	  the engine plugin is now required.
@@ -308,7 +307,7 @@ chronological order.
 	- Jorrit added csWeakRefArray<T> which is an array of weak references.
 	  This is needed because csArray<csWeakRef<T> > does not work because
 	  you cannot reallocate an array of weak references.
-	- John Harger cleaned up the particles plugin interface a bit, and 
+	- John Harger cleaned up the particles plugin interface a bit, and
 	  changed the loader syntax a little.
 	- Eric Sunshine added new interface iParticlesColorCallback.  This
 	  replaces the ugly functional-style color callback used by
