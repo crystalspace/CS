@@ -1,5 +1,12 @@
 The history order is reversed so that new features are at the top.
 
+26-Aug-2001
+	- Michael Voase did the following:
+        mesh/surface: Fixed a small bug,
+	vertex buffer was not being assigned to
+	g3dTriangleMesh.buffers[0]. Fixed a couple
+	of error message typos (said ball instead
+	of surface).
 24-Aug-2001
 	- Philip Wyett tried to fix the metaballs plugin from crashing.
 	- Fixed metaballs plugin so that it really works again now.
