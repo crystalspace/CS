@@ -45,6 +45,11 @@ struct PVSCalcProjectionPlane
   // From projected 2D point (p) to coverage buffer (c):
   //     c = (p-offset) * scale;
   csVector2 scale, offset;
+
+  // Here we setup a box clipper that represents the boundaries of the
+  // coverage buffer. This will be used to quickly intersect
+  // polygons that are projected on this plane.
+  csBoxClipper* covbuf_clipper;
 };
 
 /**
@@ -110,9 +115,10 @@ private:
 
   /**
    * Calculate the area shadow on the shadow plane for a given polygon.
-   * Also update this on the coverage buffer.
+   * Also update this on the coverage buffer. This function returns true
+   * if the coverage buffer was actually modified.
    */
-  void CastAreaShadow (const csPoly3D& polygon);
+  bool CastAreaShadow (const csPoly3D& polygon);
 
 public:
   PVSCalcSector (PVSCalc* parent, iSector* sector, iPVSCuller* pvs);

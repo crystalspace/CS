@@ -6,6 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+11-Feb-2005
+	- Jorrit changed csBox3::ProjectOutline() to work with
+	  csPoly2DUnbounded instead of csPoly2D.
+	- Jorrit changed the csPolygonClipper to work with csPoly2DUnbounded
+	  instead of csPoly2D.
+	- Jorrit changed the csPoly2DPool to work with csPoly2DUnbounded
+	  instead of csPoly2D.
+	- Jorrit did some more work on pvscalc. Implemented the basic
+	  shadow area caster. Not working!
 10-Feb-2005
 	- Jorrit added csIntersect3::XPlane() and YPlane() to complement
 	  the already existing ZPlane(). Also added AxisPlane() which will

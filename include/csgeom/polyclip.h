@@ -57,7 +57,8 @@ public:
   virtual ~csClipper ();
 
   /// Wrapper function: clip a polygon in-place.
-  virtual uint8 ClipInPlace (csVector2 *InPolygon, int &InOutCount, csBox2 &BoundingBox);
+  virtual uint8 ClipInPlace (csVector2 *InPolygon, int &InOutCount,
+  	csBox2 &BoundingBox);
 
   /// most recent Clipresult
   uint8 LastClipResult () { return mrClipping; }
@@ -140,7 +141,7 @@ class CS_CSGEOM_EXPORT csPolygonClipper : public csClipper
   /// Clipper polygon itself
   csVector2 *ClipPoly;
   /// A pointer to the pooled polygon (so that we can free it later).
-  csPoly2D *ClipPoly2D;
+  csPoly2DUnbounded *ClipPoly2D;
   /// Number of vertices in clipper polygon
   int ClipPolyVertices;
   /// Clipping polygon bounding box
@@ -151,7 +152,7 @@ class CS_CSGEOM_EXPORT csPolygonClipper : public csClipper
 
 public:
   /// Create a polygon clipper object from a 2D polygon.
-  csPolygonClipper (csPoly2D *Clipper, bool mirror = false,
+  csPolygonClipper (csPoly2DUnbounded *Clipper, bool mirror = false,
     bool copy = false);
   /// Create a polygon clipper object from a set of 2D vectors.
   csPolygonClipper (csVector2 *Clipper, int Count, bool mirror = false,

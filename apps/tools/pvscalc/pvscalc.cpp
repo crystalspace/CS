@@ -402,17 +402,66 @@ bool PVSCalcSector::SetupProjectionPlane (const csBox3& source,
 
   // Now insert our hull outline inverted in the coverage buffer. That
   // will basically mask out all vertices outside the relevant area.
-  plane.covbuf->InsertPolygonInverted (hull, hull_points, 1.0f);
+  plane.covbuf->InsertPolygonInvertedNoDepth (hull, hull_points);
 
   // We no longer need the hull points here.
   delete[] hull;
 
+  // Here we setup the box clipper that represents the boundaries of our
+  // coverage buffer.
+  plane.covbuf_clipper = new csBoxClipper (bbox);
+
   return true;
 }
 
-void PVSCalcSector::CastAreaShadow (const csPoly3D& polygon)
+bool PVSCalcSector::CastAreaShadow (const csPoly3D& polygon)
 {
-  // @@@ TODO
+#if 0
+  // First we calculate the projection of the polygon on the shadow plane
+  // as seen from the first point on the source box. That will be the start
+  // for calculating the intersection of all those projections.
+  csPoly2DUnbounded poly_intersect;
+  if (!dest.ProjectOutline (source.GetCorner (CS_BOX_CORNER_xyz),
+  	plane.axis, plane.where, poly_intersect))
+    return false;
+
+  // First we clip the projected polygon to the bounding box that
+  // represents the coverage buffer. If this intersection is empty already
+  // (returns false) then this is an easy way out.
+  if (!poly_intersect.ClipAgainst (plane.covbuf_clipper))
+    return false;
+
+  // Now we continue calculating projections for the remaining 7 box
+  // corners and we intersect those with poly_intersect.
+  int i;
+  for (i = 1 ; i < 8 ; i++)
+  {
+    csPoly2DUnbounded poly;
+    if (!dest.ProjectOutline (source.GetCorner (i),
+  	plane.axis, plane.where, poly))
+      return false;
+
+    // Now we construct a clipper from this projected polygon.
+    csPolygonClipper clip (&poly);
+
+    // Time to clip our 'poly_intersect'.
+    if (!poly_intersect.ClipAgainst (&clip))
+      return false;
+  }
+
+  // Now 'poly_intersect' contains the intersection of all projected
+  // polygons on the shadow plane. This is the area shadow and we will now
+  // insert that in the coverage buffer.
+  csBox2Int modified_bbox;	//@@@ ???
+  int nummod = plane.covbuf->InsertPolygonNoDepth (
+  	poly_intersect.GetVertices (), poly_intersect.GetVertexCount (),
+	modified_bbox);
+
+  // If nummod > 0 then we modified the coverage buffer and we return
+  // true then.
+  return nummod > 0;
+#endif
+return true;
 }
 
 void PVSCalcSector::Calculate ()

@@ -159,7 +159,10 @@ public:
    * Note! This doesn't update the bounding box!
    */
   void SetVertices (csVector2 const* v, int num)
-  { MakeRoom (num); memcpy (vertices, v, (num_vertices = num) * sizeof (csVector2)); }
+  {
+    MakeRoom (num);
+    memcpy (vertices, v, (num_vertices = num) * sizeof (csVector2));
+  }
 
   /**
    * Clipping routines. They return false if the resulting polygon is not
@@ -179,7 +182,8 @@ public:
    * polygon which already has most edges. i.e. you will not
    * get degenerate polygons.
    */
-  void Intersect (const csPlane2& plane, csPoly2DUnbounded& left, csPoly2DUnbounded& right) const;
+  void Intersect (const csPlane2& plane, csPoly2DUnbounded& left,
+  	csPoly2DUnbounded& right) const;
 
   /**
    * This routine is similar to Intersect but it only returns the

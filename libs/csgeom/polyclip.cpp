@@ -24,7 +24,8 @@
 #include "csgeom/box.h"
 
 //---------------------------------------------------------------------------
-CS_IMPLEMENT_STATIC_VAR (GetPolyPool, csPoly2DPool, (csPoly2DFactory::SharedFactory()))
+CS_IMPLEMENT_STATIC_VAR (GetPolyPool, csPoly2DPool,
+	(csPoly2DFactory::SharedFactory()))
 csPoly2DPool *csClipper::polypool = 0;
 
 SCF_IMPLEMENT_IBASE(csClipper)
@@ -119,7 +120,7 @@ uint8 csBoxClipper::Clip (
 
 //---------------------------------------------------------------------------
 csPolygonClipper::csPolygonClipper (
-  csPoly2D *Clipper,
+  csPoly2DUnbounded *Clipper,
   bool mirror,
   bool copy) :
     csClipper()
