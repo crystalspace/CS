@@ -12,6 +12,15 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+27-Feb-2000
+	- Eric Sunshine fixed several additional compilation and run-time
+	  problems which resulted from Andrew's "Big Change".
+	- Eric Sunshine fixed the LOAD_PLUGIN() macro so that it correctly
+	  handles such cases as: LOAD_PLUGIN(&sys, blah, blah).  Previously,
+	  it barfed on the &.
+	- Eric Sunshine fixed cctest.cpp so that it actually compiles.
+	- Eric Sunshine got the BeOS port up and running again following
+	  Andrew's "Big Change".
 25-Feb-2000
 	- Fixed software texture cache so that it again allocates the
 	  texture cache based on number of pixels instead of bytes.
