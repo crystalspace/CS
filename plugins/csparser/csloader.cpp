@@ -196,11 +196,13 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (LEVEL)
   CS_TOKEN_DEF (LIBRARY)
   CS_TOKEN_DEF (LIGHT)
+  CS_TOKEN_DEF (LIGHTMAPCELLSIZE)
   CS_TOKEN_DEF (LMCACHE)
   CS_TOKEN_DEF (LOD)
   CS_TOKEN_DEF (MATERIAL)
   CS_TOKEN_DEF (MATERIALS)
   CS_TOKEN_DEF (MATRIX)
+  CS_TOKEN_DEF (MAXLIGHTMAPSIZE)
   CS_TOKEN_DEF (MESHFACT)
   CS_TOKEN_DEF (MESHLIB)
   CS_TOKEN_DEF (MESHOBJ)
@@ -448,13 +450,7 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
     return false;
   }
 
-  iConfigFile *cfg = new csConfigFile ("map.cfg", VFS);
-  if (cfg)
-  {
-    Engine->SetLightmapCellSize (cfg->GetInt ("Engine.Lighting.LightmapSize",
-    	Engine->GetLightmapCellSize ()));
-    cfg->DecRef();
-  }
+  Engine->ResetWorldSpecificSettings();
 
   if (!LoadMap (**buf))
   {
@@ -2020,6 +2016,8 @@ bool csLoader::LoadSettings (char* buf)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (CLEARZBUF)
+    CS_TOKEN_TABLE (LIGHTMAPCELLSIZE)
+    CS_TOKEN_TABLE (MAXLIGHTMAPSIZE)
   CS_TOKEN_TABLE_END
 
   char* name;
@@ -2044,6 +2042,40 @@ bool csLoader::LoadSettings (char* buf)
 	csScanStr (params, "%b", &yesno);
 	Engine->SetClearZBuf (yesno);
         break;
+      }
+      case CS_TOKEN_LIGHTMAPCELLSIZE:
+      {
+	int cellsize;
+	csScanStr (params, "%d", &cellsize);
+	if (cellsize >= 0)
+	{
+	  if (!csIsPowerOf2(cellsize) )
+	  {
+	    int newcellsize = csFindNearestPowerOf2(cellsize);
+	    ReportNotify ("lightmap cell size %d (line %d) "
+	      "is not a power of two, using %d", 
+	      cellsize, csGetParserLine(), newcellsize);
+	    cellsize = newcellsize;
+	  }
+	  Engine->SetLightmapCellSize (cellsize);
+	}
+	else
+	{
+	  ReportNotify ("bogus lightmap cell size %d, line %d", 
+	    cellsize, csGetParserLine());
+	}
+	break;
+      }
+      case CS_TOKEN_MAXLIGHTMAPSIZE:
+      {
+	int maxw, maxh;
+	csScanStr (params, "%d,%d", &maxw, &maxh);
+	if ( (maxw >= 0) && (maxh >= 0) )
+	  Engine->SetMaxLightmapSize (maxw, maxh);
+	else
+	  ReportNotify ("bogus maximum lightmap size %dx%d, line %d", 
+	    maxw, maxh, csGetParserLine());
+	break;
       }
     }
   }
