@@ -5,7 +5,7 @@
 @noindent
 @emph{Philip Wyett @email{philipwyett@@dsl.pipex.com}.}
 @noindent
-@emph{Last updated 9 February 2003.}
+@emph{Last updated 20 Janurary 2004.}
 
 These instructions are for building Crystal Space with Cygwin a @sc{gnu}
 compiler for Windows created by Red Hat Inc. and other third party
@@ -23,13 +23,13 @@ Cygwin uses a custom setup application for installation of Cygwin which can be
 obtained from their official website.
 
 @noindent
-@uref{http://sources.redhat.com/cygwin/}
+@uref{http://www.cygin.com/}
 
 The installation program @file{setup.exe} must be downloaded to your system.
 You can download it using the following link:
 
 @noindent
-@uref{http://sources.redhat.com/cygwin/setup.exe}
+@uref{http://www.cygwin.com/setup.exe}
 
 @subsubheading Installing Cygwin
 
@@ -179,20 +179,20 @@ type @samp{make install}.
 
 @subsubheading Open Dynamics Engine (required for physics plugin)
 
-The Open Dynamics Engine library is required for successful compilation of
-the CS @sc{ode} physics plugin. You can obtain the latest source tar ball via
-the web link below.
+The Open Dynamics Engine library is required for successful compilation of the
+Crystal Space @sc{ode} physics plugin.  You can obtain the latest source tar
+ball via the web link below.
 
 @noindent
 @uref{http://opende.sourceforge.net/}
 
-In order to successfully compile, you will need todo a couple of things.  Open
+In order to successfully compile, you will need to do a couple of things.  Open
 a Cygwin Bash prompt and navigate to where you extracted the files (that is,
 the directory which contains the @file{Makefile}).
 
-Sadly... unlike on other platforms, during configurarion the @emph{lib}
-directory would be created for you.  However, under Cygwin it won't, so we
-must.  At the command prompt enter the following command and hit return.
+Sadly, unlike on other platforms, during configurarion the @emph{lib} directory
+would be created for you.  However, under Cygwin it will not be, so you must to
+id yourself.  At the command prompt enter the following command and hit return.
 
 @example
 mkdir lib
@@ -220,24 +220,25 @@ return.
 make configure
 @end example
 
-Once configuration is complete and we have been returned to the Bash Prompt.
-Next, enter the following command and hit return inorder to compile the ode
+Once configuration is complete and you have been returned to the Bash prompt,
+enter the following command and hit return inorder to compile the @sc{ode}
 library.
 
 @example
 make ode-lib
 @end example
 
-After once again being returned to the Bash prompt, we can proceed and install
-@sc{ode} into Cygwin. The easiest way to install @sc{ode} is thus. Copy the
-@emph{lib} and @emph{include} directories and paste them into your Cygwin
-@emph{/usr} directory. You will be prompted about over writing files, which you
-should just answer @file{Yes to All} too.
+After once again being returned to the Bash prompt, you can proceed and install
+@sc{ode} into Cygwin.  The easiest way to install @sc{ode} is as follows.  Copy
+the @file{lib} and @file{include} directories and paste them into your Cygwin
+@emph{/usr} directory.  You will be prompted about overwriting files, and
+you should just answer @file{Yes to All}.
 
 @subsubheading Installing the @sc{mng} Library (optional)
 
-In order to successfully build the @emph{jng} plugin, you must have @emph{mng}
-installed on your system.  You can download it via the following link.
+In order to successfully build the optional @emph{jng} plugin, you must have
+@emph{mng} installed on your system.  You can download it via the following
+link.
 
 @noindent
 @uref{ftp://sunsite.dk/projects/crystal/support/general/libmng-1.0.4.tar.gz}
@@ -256,7 +257,7 @@ commands:
 @example
 ./configure
 make depend
-make all
+make -k all
 @end example
 
 Note that making the @samp{depend} target is optional and can be omitted if you
@@ -267,15 +268,21 @@ project builder to ignore errors and continue compiling regardless.  This can
 be useful in cases when localized errors appear in the project since often they
 affect only a single module.
 
+Finally, you can install the Crystal Space @sc{sdk} as follows:
+
+@example
+make install
+@end example
+
 @subsubheading Additional Command Line Compile Options
 
 You can also insert the @samp{clean} makefile target into the @samp{make}
 command, as follows:
 
 @example
-make clean all
+make -k clean all
 @end example
 
 @noindent
 This will first remove all object files, libraries, etc.  from the
-@file{CS\out\WIN32\X86\debug} directory and then build the entire project.
+@file{out\WIN32\X86\debug} directory and then re-build the entire project.
