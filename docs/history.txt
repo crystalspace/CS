@@ -15,6 +15,9 @@ chronological order.
 	  invoked with linker flags.  Instead, Eric fixed the copy/paste error
 	  which resulted in link failure, which is what Peter was attempting to
 	  address.
+	- Jorrit disabled the 'softgl' rule (Software GL tweaks) in the
+	  gldrivers database. This rule prevents the use of hardware GL
+	  features in some situations so I'm not sure why it even exists.
 4-Apr-2004
 	- res moved the attenuation texture generation to the light iter 
 	  plugin. Still the same texture for all lights, though. Plan is to
