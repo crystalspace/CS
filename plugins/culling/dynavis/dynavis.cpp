@@ -218,7 +218,7 @@ void csDynaVis::UnregisterVisObject (iVisibilityObject* visobj)
   }
 }
 
-void csDynaVis::UpdateObjects ()
+void csDynaVis::UpdateObjects (bool update_prev_visstate)
 {
   int i;
   for (i = 0 ; i < visobj_vector.Length () ; i++)
@@ -237,8 +237,10 @@ void csDynaVis::UpdateObjects ()
       visobj_wrap->shape_number = visobj_wrap->model->GetShapeNumber ();
       visobj_wrap->update_number = movable->GetUpdateNumber ();
     }
-    visobj->MarkInvisible ();
-    visobj_wrap->history->reason = INVISIBLE_PARENT;
+    if (update_prev_visstate)
+      visobj_wrap->MarkInvisible (INVISIBLE_PARENT);
+    else
+      visobj->MarkInvisible ();
   }
 }
 
@@ -896,7 +898,20 @@ bool csDynaVis::VisTest (iRenderView* rview)
 
   // Just keep vis information from last frame.
   if (do_freeze_vis)
+  {
+    int i;
+    for (i = 0 ; i < visobj_vector.Length () ; i++)
+    {
+      csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
+        visobj_vector[i];
+      iVisibilityObject* visobj = visobj_wrap->visobj;
+      if (visobj_wrap->history->prev_visstate)
+        visobj->MarkVisible ();
+      else
+        visobj->MarkInvisible ();
+    }
     return true;
+  }
 
   // Initialize the coverage buffer to all empty.
   if (do_cull_tiled)
@@ -1028,7 +1043,7 @@ static bool VisTestBox_Front2Back (csKDTree* treenode, void* userdata,
 
 bool csDynaVis::VisTest (const csBox3& box)
 {
-  UpdateObjects ();
+  UpdateObjects (false);
   VisTestBox_Front2BackData data;
   data.box = box;
   kdtree->Front2Back (box.GetCenter (), VisTestBox_Front2Back, (void*)&data);
@@ -1087,7 +1102,7 @@ static bool VisTestSphere_Front2Back (csKDTree* treenode, void* userdata,
 
 bool csDynaVis::VisTest (const csSphere& sphere)
 {
-  UpdateObjects ();
+  UpdateObjects (false);
   VisTestSphere_Front2BackData data;
   data.pos = sphere.GetCenter ();
   data.sqradius = sphere.GetRadius () * sphere.GetRadius ();
@@ -1784,12 +1799,16 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
       visobj_wrap->visobj->MarkInvisible ();
       iPolygonMesh* polymesh = visobj_wrap->visobj->GetObjectModel ()
       	->GetSmallerPolygonMesh ();
+      visobj_wrap->history->prev_visstate = false;
       if (polymesh)
       {
         int vispix, totpix;
         excul->GetObjectStatus (visobj_wrap, vispix, totpix);
 	if (vispix)
+	{
 	  visobj_wrap->visobj->MarkVisible ();
+          visobj_wrap->history->prev_visstate = true;
+        }
       }
     }
     csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",

@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+26-Jun-2002
+	- Fixed Dynavis so that the 'freeze' visibility feature works
+	  again.
 25-Jun-2002
 	- Added howto for a very simple map.
 	- Optimized csOBB code a bit and fixed a huge number of rather

@@ -53,12 +53,16 @@ public:
   // automatically. The counter will be decremented then.
   int vis_cnt;
 
+  // Visibility state from previous frame.
+  bool prev_visstate;
+
   SCF_DECLARE_IBASE;
 
   csVisibilityObjectHistory ()
   {
     SCF_CONSTRUCT_IBASE (NULL);
     vis_cnt = 0;
+    prev_visstate = true;
   }
 };
 

@@ -80,6 +80,14 @@ public:
     visobj->MarkVisible ();
     history->reason = reason;
     history->vis_cnt = cnt;
+    history->prev_visstate = true;
+  }
+
+  void MarkInvisible (csVisReason reason)
+  {
+    visobj->MarkInvisible ();
+    history->reason = reason;
+    history->prev_visstate = false;
   }
 };
 
@@ -132,7 +140,10 @@ private:
 
   // Scan all objects, mark them as invisible and check if they
   // have moved since last frame (and update them in the kdtree then).
-  void UpdateObjects ();
+  // If update_prev_visstate == false then prev_visstate in the history
+  // of all objects will not be updated. This is useful for not disturbing
+  // this information.
+  void UpdateObjects (bool update_prev_visstate = true);
 
   // Fill the bounding box with the current object status.
   void CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox);
