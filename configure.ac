@@ -2301,10 +2301,12 @@ RUN_JAM = \
   silent='-d0'; \
   loud='-dx'; \
   $(JAM) -h | grep '(x)commands' $(TO_NULL) || loud='-d+2'; \
+  makeflags=`echo $$MAKEFLAGS | \
+    sed 's/--[[^ ]][[^ ]]*//g;s/[[^ ]][[^ ]]*=.*//g'`; \
   jamflags=''; \
-  echo "x$$MAKEFLAGS" | grep k $(TO_NULL) || jamflags="-q $$jamflags"; \
-  echo "x$$MAKEFLAGS" | grep s $(TO_NULL) || jamflags="$$loud $$jamflags"; \
-  echo "x$$MAKEFLAGS" | grep s $(TO_NULL) && jamflags="$$silent $$jamflags"; \
+  echo "x$$makeflags" | grep k $(TO_NULL) || jamflags="-q $$jamflags"; \
+  echo "x$$makeflags" | grep s $(TO_NULL) || jamflags="$$loud $$jamflags"; \
+  echo "x$$makeflags" | grep s $(TO_NULL) && jamflags="$$silent $$jamflags"; \
   $(JAM) $$jamflags
 EOF
 	echo "JAM = $JAM" >>$1
