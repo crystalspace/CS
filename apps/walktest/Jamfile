@@ -60,7 +60,5 @@ Application walktest_static : [ Wildcard *.cpp *.h ] :
   independent noinstall nohelp ;
 LinkWith walktest_static : csgeom csgfx cstool csutil ;
 LinkStaticPlugins walktest_static : $(STATIC.PLUGINLIST) ;
-Win32Resource walktest_static :
-  [ ConcatDirs $(TOP) libs csutil win32 rsrc cs1.rc ] ;
 SubVariant ;
 }
