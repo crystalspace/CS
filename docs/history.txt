@@ -60,6 +60,7 @@ The history order is reversed so that new features are at the top.
 	  quotes.
 	- Fixed an error in the new XML loading stuff. Thanks to
 	  MatzeB for finding this using valgrind.
+	- Implemented XML version of the rain loader.
 19-Aug-2002
 	- Implemented XML version of the ball mesh object loader.
 	- Fixed a memory leak in SKELETON statement of spr3d loader.
