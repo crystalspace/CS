@@ -332,7 +332,7 @@ EXPORTED_FUNCTION (scfClassInfo *EXPORTED_NAME (LibraryName,_GetClassTable)) ()	
   extern void *Create_##Class (iBase *);				\
   static scfClassInfo Class##_ClassInfo =				\
   { ClassID, Description, Dependency, Create_##Class };			\
-  class __##Class##_Init						\
+  static class __##Class##_Init						\
   {									\
   public:								\
     __##Class##_Init ()							\
