@@ -1425,9 +1425,18 @@ int main (int argc, char* argv[])
     Sys->Printf (MSG_INITIALIZATION, "Creating initial room!...\n");
     world->EnableLightingCache (false);
 
+#if 0
     // Disable collision detection for the infinite maze because
     // it does not work here yet.
     Sys->do_cd = false;
+#else
+    // Unfortunately the current movement system does not allow the user to
+    // move around the maze unless collision detection is enabled, even
+    // though collision detection does not really make sense in this context.
+    // Hopefully the movement system will be fixed some day so that the user
+    // can move around even with collision detection disabled.
+    Sys->do_cd = true;
+#endif
 
     // Load the standard library.
     CSLoader::LoadLibrary (world, "standard", "standard.zip");
@@ -1435,10 +1444,6 @@ int main (int argc, char* argv[])
     // Load two textures that are used in the maze.
     CSLoader::LoadTexture (world, "txt", "stone4.gif");
     CSLoader::LoadTexture (world, "txt2", "mystone2.gif");
-
-    // After loading the textures but BEFORE using them the
-    // texture manager needs to be prepared.
-    txtmgr->Prepare ();
 
     // Create the initial (non-random) part of the maze.
     CHK (Sys->infinite_maze = new InfiniteMaze ());
