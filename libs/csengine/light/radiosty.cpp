@@ -729,7 +729,7 @@ csRadPoly* csRadiosity :: FetchNext()
   char reason[80];
   float stop_value = 0.1000; // the amount of unshot light, where we can stop.
   /// take first stop moment, do the least work expected.
-  if(stop_priority > start_priority < stop_improvement)
+  if(stop_priority > start_priority && start_priority < stop_improvement)
     stop_value = stop_priority;
   else stop_value = start_priority / stop_improvement;
   int max_repeats = 10; // after n loops, stop. Should never be necessary.
