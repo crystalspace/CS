@@ -43,6 +43,7 @@ endif
 # This macro should update target only if it has changed
 define UPD
   cmp -s $@ DEST || (rm -f DEST && cp $@ DEST)
+  rm -f $@
 endef
 
 # Macro used to build a subtarget
