@@ -2,9 +2,67 @@ The history order is reversed so that new features are at the top.
 
 15-Oct-2002
 	- Started work on the OpenGL implementation of SetRenderTarget().
-	  Added code in BeginDraw() to copy the texture to the display.
-	  Added code in FinishDraw() to copy the display back to the
-	  texture. This is all untested for now.
+	  Added code in BeginDraw() to copy the texture to the display.  Added
+	  code in FinishDraw() to copy the display back to the texture.  This
+	  is all untested for now.
+	- Eric Sunshine made the following changes to the project configuration
+	  phase and makefiles.
+	    - Augmented chkpythn.sh so that it now also recognizes python99.lib
+	      and libpython99.a, which are common names on Windows, in addition
+	      to the standard libpython9.9.a Unix-style name.
+	    - Configuration scripts, build scripts, and makefiles now try to be
+	      more robust concerning whitespace in pathnames.  They now do a
+	      better job, for example, of dealing with tools, headers, and
+	      libraries which reside somewhere inside "Program Files" on
+	      Windows.  While this handling still is not perfect, it is
+	      considerably improved.
+	    - Added function shellprotect() to confutil.sh.  This function is
+	      used by client configuration scripts to protect special
+	      characters, such as spaces and backslashes, from the shell.
+	    - chktools.sh now exports the NASM.BIN makefile variable.
+	    - Makefiles for Cygwin and Mingw now use -Wno-unknown-pragmas to
+	      eliminate warnings about unknown pragmas which seem to crop up
+	      often in headers intended primarily for MSVC.
+	- Eric Sunshine created and released a new version of the
+	  csmingwlibs_0.xx.exe archive.  The following changes were made:
+	    - Fixed typographical error in header path ("inlucde" rather than
+	      "include") which prevented headers from being found by the
+	      C-preprocessor.
+	    - Fixed so that only short pathnames are placed in environment
+	      variables.  Previously, was using long names which potentially
+	      contained spaces.  The spaces would wreak havoc with commands
+	      invoked from makefiles rules.
+	    - Restructured and significantly simplified the package hierarchy.
+	      This restructuring also led to simplification of setupenv.sh
+	      script.
+	    - Added multiple-invocation protection to setupenv.sh.  This is
+	      important because the uninstall phase does not "unedit" the Msys
+	      "profile", and it is conceivable that someone could install
+	      csmingwlibs several times.  It would be undesirable for
+	      setupenv.sh to run multiple times since it would result in
+	      unnecessary bloat of environment variables, thus the
+	      multiple-invocation protection.
+	    - Upgraded the tools and resources to the most recent versions
+	      wherever possible.
+	    - Simplified the library resources by providing simple statically
+	      linked library archives, rather than cumbersome lib+dll
+	      combinations.
+	    - Cleaned up csmingwlibs.nsi and fixed some minor problems.  Also
+	      now does a better job of preserving global register state for
+	      function invocations and generally is more robust.
+	    - Improved documentation.  Fixed comments in build script.
+	    - The setupenv.sh script now sets the PYTHON_INC, PYTHON_LIB, and
+	      PYTHONPATH environment variables.  The first two of these
+	      variables are used by the CS/bin/chkpythn.sh script.  The final
+	      variable is used by Python itself.
+	    - Attemped to upgrade to Python 2.2 from Python 1.5 but, even after
+	      several days' of attempts, failed to create a usable static link
+	      library with Mingw.  Consequently, resorted to continued use of
+	      Python 1.5 from deprecated cs_mingw_0.xxx.exe package.
+	    - Converted README to use CRLF terminators rather than LF so that
+	      Notepad.exe users will be able to read the file.
+	    - Moved the generated setupenv.sh script from the root csmingwlibs
+	      directory to csmingwlibs/bin.
 14-Oct-2002
 	- Added SetRenderTarget() and GetRenderTarget() to the
 	  iGraphics3D API. Also added default (empty) implementations

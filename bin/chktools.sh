@@ -8,6 +8,8 @@
 #	argument can be found in the PATH.
 #    msg_*()
 #	Functions for reporting progress to users.
+#    shellprotect()
+#	Shell function which escapes special characters in pathnames.
 #
 # EXPORTS
 #    CMD.MKDIR
@@ -22,6 +24,9 @@
 #    NASM.AVAILABLE
 #	Makefile variable emitted to the standard output stream.  Value is
 #	"yes" if nasm is available, otherwise the variable is not set.
+#    NASM.BIN
+#	Makefile variable emitted to the standard output stream.  Value is
+#	the path of the discovered nasm executable.
 #    DEPEND_TOOL
 #	Makefile varaible emitted to the standard output stream.  Value is
 #	"mkdep" if a special dependency generation tool was located.
@@ -69,7 +74,7 @@ msg_result "${MKDIRS}"
 #------------------------------------------------------------------------------
 RANLIB=`checktool ranlib`
 if [ -n "${RANLIB}" ]; then
-    echo "CMD.RANLIB = ${RANLIB}"
+    echo "CMD.RANLIB = "`shellprotect "${RANLIB}"`
 fi
 
 
@@ -82,9 +87,10 @@ if [ -n "${NASMBIN}" ]; then
   echo "%xdefine TEST" >conftest.asm
   # Well, we really should check here for obj format,
   # but we'll use ELF as it really doesn't matter.
-  ${NASMBIN} -f elf conftest.asm -o conftest.o 2>/dev/null
+  "${NASMBIN}" -f elf conftest.asm -o conftest.o 2>/dev/null
   if [ $? -eq 0 ]; then
     echo "NASM.AVAILABLE = yes"
+    echo "NASM.BIN = "`shellprotect "${NASMBIN}"`
     msg_result "yes"
   else
     msg_result "no"
@@ -115,7 +121,7 @@ fi
 #------------------------------------------------------------------------------
 BISONBIN=`checktool bison`
 if [ -n "${BISONBIN}" ]; then
-    echo "BISONBIN = ${BISONBIN}"
+    echo "BISONBIN = "`shellprotect "${BISONBIN}"`
 fi
 
 
@@ -124,7 +130,7 @@ fi
 #------------------------------------------------------------------------------
 FLEXBIN=`checktool flex`
 if [ -n "${FLEXBIN}" ]; then
-    echo "FLEXBIN = ${FLEXBIN}"
+    echo "FLEXBIN = "`shellprotect "${FLEXBIN}"`
 fi
 
 
@@ -133,7 +139,7 @@ fi
 #------------------------------------------------------------------------------
 SWIGBIN=`checktool swig`
 if [ -n "${SWIGBIN}" ]; then
-    echo "SWIGBIN = ${SWIGBIN}"
+    echo "SWIGBIN = "`shellprotect "${SWIGBIN}"`
 fi
 
 
@@ -142,5 +148,5 @@ fi
 #------------------------------------------------------------------------------
 LUASWIGBIN=`checktool luaswig`
 if [ -n "${SWIGBIN}" ]; then
-    echo "LUASWIGBIN = ${LUASWIGBIN}"
+    echo "LUASWIGBIN = "`shellprotect "${LUASWIGBIN}"`
 fi

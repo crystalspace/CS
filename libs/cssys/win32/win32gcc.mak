@@ -87,7 +87,7 @@ CFLAGS.INCLUDE=$(CFLAGS.I)/usr/include/directx
 # $(CFLAGS.I)/dx7asdk/dxf/include
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM) $(CSTHREAD.CFLAGS) -pipe
+CFLAGS.GENERAL=-Wall -Wno-unknown-pragmas $(CFLAGS.SYSTEM) $(CSTHREAD.CFLAGS) -pipe
 
 # Flags for the compiler which are used when optimizing.
 CFLAGS.optimize=-s -O3 -ffast-math

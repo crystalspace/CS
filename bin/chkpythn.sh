@@ -32,6 +32,8 @@
 #	argument can be found in the PATH.
 #    msg_*()
 #	Functions for reporting progress to users.
+#    shellprotect()
+#	Shell function which escapes special characters in pathnames.
 #
 # EXPORTS
 #    PYTHON_OK
@@ -65,7 +67,8 @@ PYTHON_LFLAGS=''
 
 PYTHON_BIN=`checktool python`
 if [ -n "${PYTHON_BIN}" ]; then
-    PYTHON_DIRS=`echo ${PYTHON_BIN} | sed -e 's:/bin/python::'`
+    PYTHON_BIN=`echo ${PYTHON_BIN} | sed -e 's:/bin/python::'`
+    PYTHON_DIRS=`shellprotect "${PYTHON_BIN}"`
 fi
 
 # A list of common directories in which a Python installation might be found.
@@ -123,9 +126,10 @@ fi
 if [ -n "${PYTHON_INC}" -a -n "${PYTHON_LIB}" ]; then
   msg_checking "if Python SDK is okay"
 
-  PYLIB="-l"`basename ${PYTHON_LIB}`
-  PYCFLAGS="-I${PYTHON_INC} ${PTHREAD_CFLAGS} ${READLINE_CFLAGS}"
-  PYLFLAGS="-L${PYTHON_LIB}/config -L${PYTHON_LIB} ${PYLIB} ${PTHREAD_LFLAGS} ${READLINE_LFLAGS}"
+  PYBASE=`basename "${PYTHON_LIB}"`
+  PYLIBS="${PYBASE} "`echo "${PYBASE}" | sed 's/\.//g'`
+  PYCFLAGS="-I"`shellprotect "${PYTHON_INC}"`" ${PTHREAD_CFLAGS} ${READLINE_CFLAGS}"
+  PYLFLAGS="-L"`shellprotect "${PYTHON_LIB}/config"`" -L"`shellprotect "${PYTHON_LIB}"`" ${PYLIB} ${PTHREAD_LFLAGS} ${READLINE_LFLAGS}"
   PYFLAGS="${PYCFLAGS} ${PYLFLAGS}"
   PYEXTRACFLAGS=''
   PYEXTRALFLAGS=''
@@ -140,34 +144,42 @@ if [ -n "${PYTHON_INC}" -a -n "${PYTHON_LIB}" ]; then
   }
 EOF
 
-  ${LINK} -o testpy testpy.cpp ${PYFLAGS} >/dev/null 2>&1
-  if [ $? -eq 0 ]; then
-    PYTHON_OK=1
-  else
-    ${LINK} -o testpy testpy.cpp ${PYFLAGS} -lutil >/dev/null 2>&1
+  for lib in ${PYLIBS}; do
+    PYLIB="-l${lib}"
+
+    eval "${LINK} -o testpy testpy.cpp ${PYLIB} ${PYFLAGS}" >/dev/null 2>&1
     if [ $? -eq 0 ]; then
       PYTHON_OK=1
-      PYEXTRALFLAGS='-lutil'
     else
-      ${LINK} -o testpy testpy.cpp ${PYFLAGS} -ldl >/dev/null 2>&1
+      eval "${LINK} -o testpy testpy.cpp ${PYLIB} ${PYFLAGS} -lutil" >/dev/null 2>&1
       if [ $? -eq 0 ]; then
         PYTHON_OK=1
-        PYEXTRALFLAGS='-ldl'
+        PYEXTRALFLAGS='-lutil'
       else
-        ${LINK} -o testpy testpy.cpp ${PYFLAGS} -lutil -ldl >/dev/null 2>&1
+        eval "${LINK} -o testpy testpy.cpp ${PYLIB} ${PYFLAGS} -ldl" >/dev/null 2>&1
         if [ $? -eq 0 ]; then
           PYTHON_OK=1
-          PYEXTRALFLAGS='-lutil -ldl'
+          PYEXTRALFLAGS='-ldl'
+        else
+          eval "${LINK} -o testpy testpy.cpp ${PYLIB} ${PYFLAGS} -lutil -ldl" >/dev/null 2>&1
+          if [ $? -eq 0 ]; then
+            PYTHON_OK=1
+            PYEXTRALFLAGS='-lutil -ldl'
+          fi
         fi
       fi
     fi
-  fi
+
+    if [ ${PYTHON_OK} -eq 1 ]; then
+      break
+    fi
+  done
 
   rm -f testpy.cpp testpy.o testpy.obj testpy.exe testpy
 
   if [ ${PYTHON_OK} -eq 1 ] ; then
     PYTHON_CFLAGS="${PYCFLAGS} ${PYEXTRACFLAGS}"
-    PYTHON_LFLAGS="${PYLFLAGS} ${PYEXTRALFLAGS}"
+    PYTHON_LFLAGS="${PYLIB} ${PYLFLAGS} ${PYEXTRALFLAGS}"
     echo "PYTHON.AVAILABLE = yes"
     echo "PYTHON.CFLAGS = ${PYTHON_CFLAGS}"
     echo "PYTHON.LFLAGS = ${PYTHON_LFLAGS}"

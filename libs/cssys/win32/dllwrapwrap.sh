@@ -10,7 +10,7 @@
 
 dllname=$1
 shift
-params=$*
+params="$@"
 
 deffile=out/win32/x86/${dllname}.def
 echo EXPORTS > ${deffile}
@@ -18,4 +18,3 @@ echo  ${dllname}_scfInitialize >> ${deffile}
 echo  ${dllname}_scfFinalize >> ${deffile}
 dllwrap --def ${deffile} ${params}
 rm -f ${deffile}
-

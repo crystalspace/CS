@@ -87,6 +87,18 @@ postcondition()
 
 
 #------------------------------------------------------------------------------
+# shellprotect()
+#    Escape special characters in argument which is assumed to be a pathname
+#    in order to protect them from the shell.
+#------------------------------------------------------------------------------
+
+shellprotect()
+{
+  echo `echo "$1" | sed -e 's/\\\\/\\\\\\\\/g' -e 's/ /\\\\ /g'`
+}
+
+
+#------------------------------------------------------------------------------
 # checkprog()
 #    Determine if program specified as argument to this function is in PATH.
 #    If the program is found, then its full path is printed and true is
@@ -115,8 +127,8 @@ checkprog()
     [ -z "$as_dir" ] && as_dir=.
     for exe in '' $exec_extensions; do
       if [ -f "$as_dir/$app$exe" ]; then
-        echo "$as_dir/$app$exe"
 	IFS="$SAVE_IFS"
+        echo "$as_dir/$app$exe"
 	return 0
       fi
     done
