@@ -111,6 +111,8 @@ The history order is reversed so that new features are at the top.
 	  shutdown-time crashes.
 	- Matze fixed a bug in csObjectIterator pointed out by groton and also
 	  cleaned the code up there.
+	- Jorrit removed Blocks from CS. Blocks is now a seperate project
+	  (http://sf.net/projects/blocks3d).
 	- acraig fixed the csList<T>::Delete() to use pre-increment.
 4-June-2003
 	- Jorrit fixed a bug in the AWS engine view where it would not set the
