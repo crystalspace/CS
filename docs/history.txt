@@ -31,6 +31,9 @@ The history order is reversed so that new features are at the top.
           versions for MSVC/GCC.
         - res changed cstypes.h to properly generate (u)int64 doxygen
           documentation.
+	- Wouter Wijngaards modified csSprite3DMeshObject::DrawTest to test
+	  if logparent is valid, before using it. This solves a crash when
+	  logparent is null.
 5-Apr-2003
         - Rhad improved the Direct Sound 3d sound renderer.
           Design is similar to OpenAL renderer.
