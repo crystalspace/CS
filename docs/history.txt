@@ -40,8 +40,8 @@ chronological order.
 	    - The options were fed through `echo' in such a way that it was
 	      possible for `echo' to mistakenly think that the options were
 	      intended for it (rather than for the compiler), which could
-	      causeresult in `echo' eating some options, and issuing error
-	      messages for others.
+	      result in `echo' eating some options, and issuing error messages
+	      for others.
 	    - The `sed' expression was broken and failed to filter out a
 	      literal "-g" despite the fact that "-g" is one of the problematic
 	      flags.
