@@ -13,6 +13,12 @@ chronological order.
 		// desired capacity.
 	  However, on MSYS neither happens. Instead the size of the input
 	  buffer is returned in case of failure.
+        - John Harger changed iRenderBuffer to use a "CopyToBuffer"
+          method as an alternative (and preferred) method to copy data
+          to a buffer, rather than Locking the buffer. This should be
+          especially beneficial to sprite3d's, where it updates the
+          buffer quite frequently, when VBO is enabled because you
+          cannot render from a locked VBO buffer.
 30-Nov-2003
 	- Eric Sunshine clarified and corrected comments in crystal.m4.  Also
 	  cleaned up m4 mis-quoting issues and generally improved formatting.

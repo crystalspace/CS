@@ -99,6 +99,11 @@ public:
   /// Releases the buffer. After this all writing to the buffer is illegal
   virtual void Release() { locked = false; }
 
+  virtual void CopyToBuffer(void *data, int length)
+  {
+    memcpy(buffer, data, length);
+  }
+
   virtual void* RenderLock (csGLRenderBufferLockType type);
 };
 
@@ -113,6 +118,7 @@ class csVBORenderBuffer : public csGLRenderBuffer
 private:
   char* tempbuf;
   GLuint bufferId;
+  csRenderBufferType buftype;
   bool locked;
   csRenderBufferLockType lastLock;
   csGLRenderBufferLockType lastRLock;
@@ -126,6 +132,7 @@ public:
   {
     csVBORenderBuffer::ext = ext;
     csVBORenderBuffer::index = index;
+    csVBORenderBuffer::buftype = type;
     locked = false;
     ext->glGenBuffersARB (1, &bufferId);
     ext->glBindBufferARB (index?
@@ -175,6 +182,15 @@ public:
     }
     locked = false;
     lastLock = CS_BUF_LOCK_NOLOCK;
+  }
+
+  virtual void CopyToBuffer(void *data, int length)
+  {
+    ext->glBindBufferARB (index?
+      GL_ELEMENT_ARRAY_BUFFER_ARB:GL_ARRAY_BUFFER_ARB, bufferId);
+    ext->glBufferDataARB (index?
+      GL_ELEMENT_ARRAY_BUFFER_ARB:GL_ARRAY_BUFFER_ARB, length, data, 
+      (buftype==CS_BUF_STATIC) ? GL_STATIC_DRAW_ARB : GL_DYNAMIC_DRAW_ARB);
   }
 
   virtual void* RenderLock (csGLRenderBufferLockType type);

@@ -1327,15 +1327,9 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetRenderBuffer (csStringID name)
         sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC, 
         CS_BUFCOMP_FLOAT, 3, false);
       mesh_vertices_dirty_flag = false;
-      csVector3* vbuf = (csVector3*)vertex_buffer->Lock(CS_BUF_LOCK_NORMAL);
-      memcpy (vbuf, mesh_vertices, sizeof(csVector3)*num_mesh_vertices);
-      vertex_buffer->Release ();
+      vertex_buffer->CopyToBuffer (mesh_vertices, sizeof(csVector3)*num_mesh_vertices);
     }
-    if (vertex_buffer)
-    {
-      return vertex_buffer;
-    }
-    return 0;
+    return vertex_buffer;
   }
   if (name == texel_name)
   {
@@ -1349,11 +1343,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetRenderBuffer (csStringID name)
       memcpy (tbuf, mesh_texels, sizeof (csVector2) * num_mesh_vertices);
       texel_buffer->Release ();
     }
-    if (texel_buffer)
-    {
-      return texel_buffer;
-    }
-    return 0;
+    return texel_buffer;
   }
   if (name == normal_name)
   {
@@ -1363,15 +1353,9 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetRenderBuffer (csStringID name)
         sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC,
         CS_BUFCOMP_FLOAT, 3, false);
       mesh_normals_dirty_flag = false;
-      csVector3 *nbuf = (csVector3*)normal_buffer->Lock(CS_BUF_LOCK_NORMAL);
-      memcpy (nbuf, mesh_normals, sizeof (csVector3)*num_mesh_vertices);
-      normal_buffer->Release();
+      normal_buffer->CopyToBuffer (mesh_normals, sizeof (csVector3)*num_mesh_vertices);
     }
-    if(normal_buffer)
-    {
-      return normal_buffer;
-    }
-    return 0;
+    return normal_buffer;
   }
   if (name == color_name)
   {
@@ -1381,15 +1365,9 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetRenderBuffer (csStringID name)
         sizeof (csColor)*num_mesh_vertices, CS_BUF_STATIC,
         CS_BUFCOMP_FLOAT, 3, false);
       mesh_colors_dirty_flag = false;
-      csColor *cbuf = (csColor*)color_buffer->Lock(CS_BUF_LOCK_NORMAL);
-      memcpy (cbuf, mesh_colors, sizeof (csColor) * num_mesh_vertices);
-      color_buffer->Release();
+      color_buffer->CopyToBuffer (mesh_colors, sizeof (csColor) * num_mesh_vertices);
     }
-    if (color_buffer)
-    {
-      return color_buffer;
-    }
-    return 0;
+    return color_buffer;
   }
   if (name == index_name)
   {
@@ -1399,8 +1377,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetRenderBuffer (csStringID name)
         sizeof (unsigned int)*num_mesh_triangles*3, CS_BUF_STATIC,
         CS_BUFCOMP_UNSIGNED_INT, 1, true);
       mesh_triangle_dirty_flag = false;
-      unsigned int *ibuf = (unsigned int *)index_buffer->Lock(
-        CS_BUF_LOCK_NORMAL);
+      unsigned int *ibuf = new unsigned int [num_mesh_triangles * 3];
       int i;
       for (i = 0; i < num_mesh_triangles; i ++) 
       {
@@ -1408,13 +1385,10 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetRenderBuffer (csStringID name)
         ibuf[i * 3 + 1] = mesh_triangles[i].b;
         ibuf[i * 3 + 2] = mesh_triangles[i].c;
       }
-      index_buffer->Release ();
+      index_buffer->CopyToBuffer (ibuf, sizeof (unsigned int)*num_mesh_triangles*3);
+      delete [] ibuf;
     }
-    if (index_buffer)
-    {
-      return index_buffer;
-    }
-    return 0;
+    return index_buffer;
   }
   return anon_buffers.GetRenderBuffer(name);
 }

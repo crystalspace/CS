@@ -2597,12 +2597,7 @@ iRenderBuffer *csSprite3DMeshObject::GetRenderBuffer (csStringID name)
         sizeof (csVector3)*final_num_vertices, CS_BUF_DYNAMIC,
 		CS_BUFCOMP_FLOAT, 3, false);
     }
-    void* vbuf = vertices->Lock (CS_BUF_LOCK_NORMAL);
-    if (vbuf)
-    {
-      memcpy (vbuf, final_verts, sizeof (csVector3)*final_num_vertices);
-      vertices->Release ();
-    }
+    vertices->CopyToBuffer(final_verts, sizeof (csVector3)*final_num_vertices);
     return vertices;
   }
   if (name == normals_name)
@@ -2613,29 +2608,24 @@ iRenderBuffer *csSprite3DMeshObject::GetRenderBuffer (csStringID name)
         sizeof (csVector3)*final_num_vertices, CS_BUF_DYNAMIC,
 		CS_BUFCOMP_FLOAT, 3, false);
     }
-    void* nbuf = normals->Lock (CS_BUF_LOCK_NORMAL);
-    if (nbuf)
+    /*int tf_idx = cur_action->GetCsFrame (cur_frame)->GetAnmIndex ();
+    factory->ComputeNormals (cur_action->GetCsFrame (cur_frame));*/
+    csVector3* norm = new csVector3[final_num_vertices];
+    memset (norm, 0, sizeof(csVector3)*final_num_vertices);
+    int i;
+    for (i=0; i<final_num_triangles; i++)
     {
-      /*int tf_idx = cur_action->GetCsFrame (cur_frame)->GetAnmIndex ();
-      factory->ComputeNormals (cur_action->GetCsFrame (cur_frame));*/
-      csVector3* norm = new csVector3[final_num_vertices];
-      memset (norm, 0, sizeof(csVector3)*final_num_vertices);
-      int i;
-      for (i=0; i<final_num_triangles; i++)
-      {
-        csVector3 ab = final_verts [final_triangles[i].b] 
-          - final_verts [final_triangles[i].a];
-        csVector3 bc = final_verts [final_triangles[i].c] 
-          - final_verts [final_triangles[i].b];
-        csVector3 normal = ab % bc;
-        norm[final_triangles[i].a] += normal;
-        norm[final_triangles[i].b] += normal;
-        norm[final_triangles[i].c] += normal;
-      }
-      memcpy (nbuf, norm, sizeof (csVector3)*final_num_vertices);
-      normals->Release ();
-      delete[] norm;
+      csVector3 ab = final_verts [final_triangles[i].b] 
+        - final_verts [final_triangles[i].a];
+      csVector3 bc = final_verts [final_triangles[i].c] 
+        - final_verts [final_triangles[i].b];
+      csVector3 normal = ab % bc;
+      norm[final_triangles[i].a] += normal;
+      norm[final_triangles[i].b] += normal;
+      norm[final_triangles[i].c] += normal;
     }
+    normals->CopyToBuffer (norm, sizeof (csVector3)*final_num_vertices);
+    delete[] norm;
     return normals;
   }
   if (name == texcoords_name)
@@ -2644,14 +2634,10 @@ iRenderBuffer *csSprite3DMeshObject::GetRenderBuffer (csStringID name)
     {
       texcoords = factory->g3d->CreateRenderBuffer (
         sizeof (csVector2)*final_num_vertices, CS_BUF_DYNAMIC,
-		CS_BUFCOMP_FLOAT, 2, false);
+		    CS_BUFCOMP_FLOAT, 2, false);
     }
-    void* tbuf = texcoords->Lock (CS_BUF_LOCK_NORMAL);
-    if (tbuf)
-    {
-      memcpy (tbuf, final_texcoords, sizeof (csVector2)*final_num_vertices);
-      texcoords->Release ();
-    }
+    texcoords->CopyToBuffer (final_texcoords, sizeof (csVector2)*final_num_vertices);
+    texcoords->Release ();
     return texcoords;
   }
   if (name == colors_name)
@@ -2660,14 +2646,9 @@ iRenderBuffer *csSprite3DMeshObject::GetRenderBuffer (csStringID name)
     {
       colors = factory->g3d->CreateRenderBuffer (
         sizeof (csColor)*final_num_vertices, CS_BUF_DYNAMIC,
-		CS_BUFCOMP_FLOAT, 3, false);
+		    CS_BUFCOMP_FLOAT, 3, false);
     }
-    void* vbuf = colors->Lock (CS_BUF_LOCK_NORMAL);
-    if (vbuf)
-    {
-      memcpy (vbuf, final_colors, sizeof (csColor)*final_num_vertices);
-      colors->Release ();
-    }
+    colors->CopyToBuffer (final_colors, sizeof (csColor)*final_num_vertices);
     return colors;
   }
   if (name == indices_name)
@@ -2676,14 +2657,9 @@ iRenderBuffer *csSprite3DMeshObject::GetRenderBuffer (csStringID name)
     {
       indices = factory->g3d->CreateRenderBuffer (
         sizeof (csTriangle)*final_num_triangles*12, CS_BUF_STATIC,
-		CS_BUFCOMP_UNSIGNED_INT, 1, true);
+		    CS_BUFCOMP_UNSIGNED_INT, 1, true);
     }
-    int* ibuf = (int*)indices->Lock (CS_BUF_LOCK_NORMAL);
-    if (ibuf)
-    {
-      memcpy (ibuf, final_triangles, sizeof (csTriangle)*final_num_triangles);
-      indices->Release ();
-    }
+    indices->CopyToBuffer (final_triangles, sizeof (csTriangle)*final_num_triangles);
     return indices;
   }
   return 0;
