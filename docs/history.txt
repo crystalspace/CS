@@ -23,9 +23,11 @@ chronological order.
 	  hashes more efficiently (they don't need a hash that is preallocated
 	  at 257 items).
 	- Jorrit fixed a weird bug in walktest (introduced by res2k) which
-	  simply disabled coordshow directly after enabling it.
+	  simply disabled `coordshow' directly after enabling it.
 	- Jorrit rewrote the csFrustum code to avoid the old vertex pools.
 	  Instead the code now uses csBlockAllocator.
+	- Eric Sunshine upgraded Jam's msvcgen.sh so that it can be invoked
+	  from a build directory which differs from the source directory.
 19-Feb-2004
 	- res made the following changes:
 	    - A few minor cosmetic changes.

@@ -25,9 +25,16 @@ if test "$DO_MSVC6" = no -a "$DO_MSVC7" = no; then
     DO_MSVC7=yes
 fi
 
+if test -f Jamfile; then
+    top=`cat Jamfile | sed '/^TOP *[?=]/!d;s/..*"\([^"]*\)".*/\1/'`
+    if test -z "$top"; then
+	top='.'
+    fi
+fi
+
 if test $DO_MSVC6 = yes; then
-    jam $@ -sJAMCONFIG=mk/msvcgen/Jamconfig -sMSVC_VERSION=6 msvcgen
+    jam $@ -sJAMCONFIG=$top/mk/msvcgen/Jamconfig -sMSVC_VERSION=6 msvcgen
 fi
 if test $DO_MSVC7 = yes; then
-    jam $@ -sJAMCONFIG=mk/msvcgen/Jamconfig -sMSVC_VERSION=7 msvcgen
+    jam $@ -sJAMCONFIG=$top/mk/msvcgen/Jamconfig -sMSVC_VERSION=7 msvcgen
 fi
