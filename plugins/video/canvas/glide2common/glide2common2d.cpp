@@ -53,8 +53,11 @@ csGraphics2DGlideCommon::csGraphics2DGlideCommon (iBase *iParent) :
   (void)iParent;
   CONSTRUCT_IBASE (NULL);
   SetVRetrace( false );
-  cursorBmp=NULL;
-  nCursor=nCurCursor=0;
+  cursorBmp=mcBack=NULL;
+  nCursor=nCurCursor=mcCols=mcRows=0;
+  mx=my=mxold=myold=-1;
+  writtenArea.MakeEmpty();
+  mouseRect.MakeEmpty();
   PrepareCursors (mouseshapes);
 }
 
@@ -79,6 +82,7 @@ csGraphics2DGlideCommon::~csGraphics2DGlideCommon ()
 {
   Close ();
   if (cursorBmp) delete cursorBmp;
+  if (mcBack) delete mcBack;
   CHKB (delete [] Memory);
 }
 
@@ -243,9 +247,14 @@ unsigned char* csGraphics2DGlideCommon::GetPixelAt ( int x, int y)
 }
 
 void csGraphics2DGlideCommon::Print( csRect* area ){
-  (void)area;
-  // swap the buffers only to show the new frame
-  if (GetDoubleBufferState()) GlideLib_grBufferSwap( m_bVRetrace ? 1 : 0 );
+
+  if (!GetDoubleBufferState())
+    if ( area != NULL ) 
+      writtenArea.Set( *area );
+    else
+      writtenArea.MakeEmpty();
+  else
+    GlideLib_grBufferSwap( m_bVRetrace ? 1 : 0 );
 }
 
 csImageArea *csGraphics2DGlideCommon::SaveArea (int x, int y, int w, int h)
@@ -401,7 +410,9 @@ int csGraphics2DGlideCommon::PrepareCursors (char **shapes)
   off = nCursor + 1 + numcolors;
   // prepare the bitmap we send to the card
   if (cursorBmp) delete cursorBmp;
+  if (mcBack) delete mcBack;
   cursorBmp = new UShort[ w*h + 3*nCursor];
+  mcBack = new UShort[ bw*bh ];
 
 #define HEX2DEC(d) ( (d)>'a' ? (d)-87 : (d)>'A' ? (d)-55 : (d)-30 )
 #define HEXX(a,b) HEX2DEC(a) << 4 | HEX2DEC(b)
@@ -456,6 +467,8 @@ int csGraphics2DGlideCommon::PrepareCursors (char **shapes)
   delete pattern1;
   delete pattern2;
   
+  mcRows = bh;
+  mcCols = bw;
   return nCursor;
 }
 
@@ -464,21 +477,52 @@ void csGraphics2DGlideCommon::DrawCursor ()
   short hx, hy, sx, sy;
   int keycolor, color;
   int row, col;
-
+  csRect r1;
+  
   // read hotspotvalues for curent cursor
   hx = cursorBmp [ nCurCursor*3 +1 ];
   hy = cursorBmp [ nCurCursor*3 +2 ];
   
+  // first restore background where cursor was last
+  r1.Set(mouseRect);
+  r1.Subtract( writtenArea );
+
+  if (!mouseRect.IsEmpty() && (!writtenArea.IsEmpty() || mxold != mx || myold != my ))
+  {
+    for (sy=0,row=mouseRect.ymin; row<mouseRect.ymax; row++, sy++)
+      for (sx=0,col=mouseRect.xmin; col<mouseRect.xmax; col++, sx++ )
+        if ( !writtenArea.Contains (col, row) ) 
+	  DrawPixel (col, row, mcBack[sy*mcCols+sx] );
+  
+  // remember what we are overdrawing
+  mouseRect.Set( MAX(0,mx-hx), MAX(0,my-hy), MIN(Width-1,mx-hx+mcCols), MIN(Height-1,my-hy+mcRows) );
+
+  for (row=mouseRect.ymin; row<mouseRect.ymax; row++){
+    UShort *p = (UShort*)GetPixelAt( mouseRect.xmin, row );
+    memcpy( mcBack + (row-mouseRect.ymin)*mcCols, p, sizeof(UShort)*(mouseRect.Width()) );
+  }
+  }else if (mouseRect.IsEmpty()) 
+  {
+  // remember what we are overdrawing
+  mouseRect.Set( MAX(0,mx-hx), MAX(0,my-hy), MIN(Width-1,mx-hx+mcCols), MIN(Height-1,my-hy+mcRows) );
+
+  for (row=mouseRect.ymin; row<mouseRect.ymax; row++){
+    UShort *p = (UShort*)GetPixelAt( mouseRect.xmin, row );
+    memcpy( mcBack + (row-mouseRect.ymin)*mcCols, p, sizeof(UShort)*(mouseRect.Width()) );
+  }
+  }
+  writtenArea.MakeEmpty();
+  mxold=mx; myold=my;
+  
   // read keycolor
   keycolor = cursorBmp [ nCurCursor*3 ];
-//printf("%d\n",keycolor);
   sy = my - hy;
-  for (row=0; row<32; row++, sy++)
+  for (row=0; row<mcRows && sy<Height; row++, sy++)
   {
     sx = mx - hx;
-    for (col=0; col<32; col++, sx++)
+    for (col=0; col<mcCols && sx<Width; col++, sx++)
     {
-      color = cursorBmp [ nCursor*3 + nCurCursor*32*32 + row*32 + col ];
+      color = cursorBmp [ nCursor*3 + nCurCursor*mcRows*mcCols + row*mcCols + col ];
       if ( sx >= 0 && sy >= 0 && color != keycolor ){
         DrawPixel( sx, sy, color );
       }

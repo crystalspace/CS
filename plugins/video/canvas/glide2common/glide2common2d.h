@@ -27,6 +27,7 @@
 #include "cssys/unix/iunix.h"
 #endif
 #include "csutil/inifile.h"
+#include "csutil/csrect.h"
 #include "iglide2d.h"
 #include <glide.h>
 
@@ -40,16 +41,19 @@ protected:
   bool m_DoGlideInWindow;
   bool m_bVRetrace;
 
-  /// last mouse position
+  /// current and last last mouse position
   int mx, my;
+  int mxold, myold;
   
   /// do we render into backbuffer ?
   FxI32 m_drawbuffer;
     
   /// cursor related data
-  UShort *cursorBmp;
+  UShort *cursorBmp, *mcBack;
   int nCursor; // how many cursors defined
   int nCurCursor; // current cursor
+  int mcCols, mcRows; // pixel rows and cols per cursor
+  csRect mouseRect, writtenArea;
   
   /// palette has been changed
   bool bPaletteChanged;
