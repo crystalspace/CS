@@ -99,6 +99,13 @@ public:
     virtual bool isHidden()
     { return hidden; }
 
+    /// Hides a component
+    virtual void Hide();
+
+    /// Shows a component
+    virtual void Show();
+
+
 public:
     /** Adds a child into this component.  It's frame should be respective this component, not absolute.
      * This component can grab a reference to the child and dispose of it when it destructs, unless you

@@ -54,6 +54,11 @@ private:
      */
     unsigned int redraw_tag;
 
+    /// The frame style of the window
+    unsigned int frame_style;
+
+    /// Individual frame options
+    unsigned int frame_options;
 
 public:
    static const unsigned long sWindowRaised;
@@ -61,6 +66,43 @@ public:
    static const unsigned long sWindowHidden;
    static const unsigned long sWindowShown;
    static const unsigned long sWindowClosed;
+
+   /******* Frame Styles **********************/
+
+   /// A normal frame that may have a title bar, buttons, 3d border, and a grip.
+   static const unsigned int fsNormal;
+
+   /// A frame with only a 3d border.  No controls or decorations allowed.
+   static const unsigned int fsToolbar;
+
+   /// A frame drawn with the background and overlay elements.  Nothing else is drawn.
+   static const unsigned int fsBitmap;
+
+   /******* Frame Options **********************/
+
+   /// Should draw control box
+   static const unsigned int foControl;
+
+   /// Should draw zoom (maximize) button
+   static const unsigned int foZoom;
+
+   /// Should draw minimize button
+   static const unsigned int foMin;
+
+   /// Should draw close button
+   static const unsigned int foClose;
+
+   /// Should draw title
+   static const unsigned int foTitle;
+
+   /// Should draw grip
+   static const unsigned int foGrip;
+
+   /// Should draw round border (default)
+   static const unsigned int foRoundBorder;
+   
+   /// Should draw beveled border
+   static const unsigned int foBeveledBorder;
    
    SCF_DECLARE_IBASE;
    
@@ -76,6 +118,13 @@ public:
    /// Gets the value of the redraw tag
    unsigned int RedrawTag()
    { return redraw_tag; }
+
+public:
+    /// Constructs window class, clear some variables to defaults
+    awsWindow();
+
+    /// empty deconstructor
+    virtual ~awsWindow();
 
 public:
     /// Raises a window to the top.

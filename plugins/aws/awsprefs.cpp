@@ -17,6 +17,9 @@ unsigned long aws_adler32(unsigned long adler,  const unsigned char *buf,  unsig
 const bool DEBUG_KEYS = false;
 const bool DEBUG_INIT = true;
 
+/// The gradient step for the slightly darker and lighter versions of the highlight and shadow.
+const unsigned char GRADIENT_STEP=15;
+
 /***************************************************************************************************************
 *   This constructor converts the text-based name into a fairly unique numeric ID.  The ID's are then used for *
 * comparison.  The method of text-to-id mapping may be somewhat slower than a counter, but it does not have to *
@@ -117,9 +120,19 @@ awsPrefManager::SetupPalette()
 
  LookupRGBKey("HighlightColor", red, green, blue); 
  sys_colors[AC_HIGHLIGHT] = txtmgr->FindRGB(red,green,blue);
- 
+
+ // Create a slightly darker highlight
+ sys_colors[AC_HIGHLIGHT2] = txtmgr->FindRGB((red   > GRADIENT_STEP ? red-GRADIENT_STEP   : 0),
+                                             (green > GRADIENT_STEP ? green-GRADIENT_STEP : 0),
+                                             (blue  > GRADIENT_STEP ? blue-GRADIENT_STEP  : 0));
+                   
  LookupRGBKey("ShadowColor", red, green, blue); 
  sys_colors[AC_SHADOW] = txtmgr->FindRGB(red,green,blue);
+
+ // Create a slightly lighter shadow
+ sys_colors[AC_SHADOW2]    = txtmgr->FindRGB((255-red   > GRADIENT_STEP ? red+GRADIENT_STEP   : 255),
+                                             (255-green > GRADIENT_STEP ? green+GRADIENT_STEP : 255),
+                                             (255-blue  > GRADIENT_STEP ? blue+GRADIENT_STEP  : 255));
  
  LookupRGBKey("FillColor", red, green, blue); 
  sys_colors[AC_FILL] = txtmgr->FindRGB(red,green,blue);
@@ -139,7 +152,13 @@ awsPrefManager::SetupPalette()
  if (LookupRGBKey("TransparentColor", red, green, blue)) 
    sys_colors[AC_TRANSPARENT] = txtmgr->FindRGB(red,green,blue);
  else
-   sys_colors[AC_TRANSPARENT] = txtmgr->FindRGB(255,0,255); 
+   sys_colors[AC_TRANSPARENT] = txtmgr->FindRGB(255,0,255);
+ 
+ sys_colors[AC_BLACK] = txtmgr->FindRGB(0,0,0);
+ sys_colors[AC_WHITE] = txtmgr->FindRGB(255,255,255);
+ sys_colors[AC_RED] = txtmgr->FindRGB(128,0,0);
+ sys_colors[AC_GREEN] = txtmgr->FindRGB(0,128,0);
+ sys_colors[AC_BLUE] = txtmgr->FindRGB(0,0,128);
   
  printf("aws-debug: finished palette setup.\n"); 
 }

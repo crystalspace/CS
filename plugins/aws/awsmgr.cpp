@@ -249,12 +249,16 @@ awsManager::Redraw()
    
    ptG3D->BeginDraw(CSDRAW_2DGRAPHICS);
    
-   ptG2D->SetClipRect(0,0,639,479);
-   ptG2D->DrawBox( 0,  200,512, 20, GetPrefMgr()->GetColor(AC_FILL));
+   ptG2D->SetClipRect(0,0,512,512);
+   ptG2D->DrawBox( 2,  202,510, 18, GetPrefMgr()->GetColor(AC_FILL));
    ptG2D->DrawLine(0,  200,512,200, GetPrefMgr()->GetColor(AC_HIGHLIGHT));
+   ptG2D->DrawLine(1,  201,511,201, GetPrefMgr()->GetColor(AC_HIGHLIGHT2));
    ptG2D->DrawLine(0,  200,0,  220, GetPrefMgr()->GetColor(AC_HIGHLIGHT));
+   ptG2D->DrawLine(1,  201,1,  219, GetPrefMgr()->GetColor(AC_HIGHLIGHT2));
    ptG2D->DrawLine(0,  220,512,220, GetPrefMgr()->GetColor(AC_SHADOW));
-   ptG2D->DrawLine(512,200,512,200, GetPrefMgr()->GetColor(AC_SHADOW));
+   ptG2D->DrawLine(1,  219,511,219, GetPrefMgr()->GetColor(AC_SHADOW2));
+   ptG2D->DrawLine(512,200,512,220, GetPrefMgr()->GetColor(AC_SHADOW));
+   ptG2D->DrawLine(511,201,511,219, GetPrefMgr()->GetColor(AC_SHADOW2));
    
    // This only needs to happen when drawing to the default context.
    if (UsingDefaultContext)

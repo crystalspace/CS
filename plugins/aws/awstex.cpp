@@ -41,8 +41,8 @@ awsTextureManager::Initialize(iObjectRegistry* obj_reg)
 {
   object_reg=obj_reg;
 
-  if (!obj_reg) printf("aws-debug:  bad obj_reg (%s)\n", __PRETTY_FUNCTION__);
-  if (!object_reg) printf("aws-debug:  bad object_reg (%s)\n", __PRETTY_FUNCTION__);
+  if (!obj_reg) printf("aws-debug:  bad obj_reg (%s)\n", __FILE__);
+  if (!object_reg) printf("aws-debug:  bad object_reg (%s)\n", __FILE__);
 
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 

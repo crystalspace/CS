@@ -132,8 +132,29 @@ awsComponent::GetNextChild()
 
   return NULL;
 }
-    
 
+
+void 
+awsComponent::Hide()
+{
+  if (hidden) return;
+  else 
+  {
+    hidden=true;
+    WindowManager()->Mark(Frame());
+  }
+}
+
+void 
+awsComponent::Show()
+{
+  if (!hidden) return;
+  else 
+  {
+    hidden=false;
+    WindowManager()->Mark(Frame());
+  }
+}
 
 /////////////////////////////////////  awsComponentFactory ////////////////////////////////////////////////////////
 
