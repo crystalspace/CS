@@ -487,19 +487,32 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
       }
       else
       {
-        static const char mapName[] = "texture coordinate %d";
-        char buf[sizeof (mapName)];
+	static const char mapName[] = "texture coordinate ";
+	if (strncasecmp (dest, mapName, sizeof (mapName) - 1) == 0)
+	{
+	  const char* target = dest + sizeof (mapName) - 1;
 
-        for (int u = 0; u < 8; u++)
-        {
-          sprintf (buf, mapName, u);
-          if (strcasecmp (dest, buf) == 0)
-          {
-            attrib = (csVertexAttrib)((int)CS_VATTRIB_TEXCOORD0 + u);
-            found = true;
-            break;
-          }
-        }
+	  for (int u = 0; u < 8; u++)
+	  {
+	    char buf[2];
+	    sprintf (buf, "%d", u);
+	    if (strcmp (target, buf) == 0)
+	    {
+	      attrib = (csVertexAttrib)((int)CS_VATTRIB_TEXCOORD0 + u);
+	      found = true;
+	      break;
+	    }
+	  }
+	  if (!found && pass->fp)
+	  {
+	    int texUnit = pass->fp->ResolveTextureBinding (target);
+	    if (texUnit >= 0)
+	    {
+	      attrib = (csVertexAttrib)((int)CS_VATTRIB_TEXCOORD0 + texUnit);
+	      found = true;
+	    }
+	  }
+	}
       }
     }
     if (found)

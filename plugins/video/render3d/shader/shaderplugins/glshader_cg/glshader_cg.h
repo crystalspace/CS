@@ -42,6 +42,8 @@ public:
   csRef<iShaderProgramPlugin> psplg;
   csRef<iShaderProgramPlugin> arbplg;
   csGLExtensionManager* ext;
+  bool debugDump;
+  char* dumpDir;
 
   SCF_DECLARE_IBASE;
   

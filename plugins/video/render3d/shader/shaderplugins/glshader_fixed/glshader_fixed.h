@@ -34,6 +34,7 @@ public:
   bool isOpen;
 
   bool enable;
+  bool enableFP;
   GLint texUnits;
 
   void Report (int severity, const char* msg, ...);

@@ -182,14 +182,15 @@ void csGLGraphics3D::DisableStencilShadow ()
 void csGLGraphics3D::EnableStencilClipping ()
 {
   clipping_stencil_enabled = true;
-  if (needStencil) statecache->Enable_GL_STENCIL_TEST ();
+  if (needStencil) 
+    statecache->Enable_GL_STENCIL_TEST ();
 }
 
 void csGLGraphics3D::DisableStencilClipping ()
 {
   clipping_stencil_enabled = false;
   if (shadow_stencil_enabled) return;
-  if (needStencil) statecache->Disable_GL_STENCIL_TEST ();
+  statecache->Disable_GL_STENCIL_TEST ();
 }
 
 void csGLGraphics3D::SetGlOrtho (bool inverted)
@@ -384,7 +385,11 @@ void csGLGraphics3D::SetupStencil ()
 
   if (clipper)
   {
-#if 0
+#if 0  
+    /*
+     * @@@ Does not work correctly. 
+     * [res: I suspect it inteferes with SetupClipPortals()]
+     */
     if (clipper->GetClipperType() == iClipper2D::clipperBox)
     {
       /*
@@ -396,10 +401,11 @@ void csGLGraphics3D::SetupStencil ()
     }
 #endif
 
-    glMatrixMode (GL_PROJECTION);
+    //glMatrixMode (GL_PROJECTION);
     glPushMatrix ();
     glLoadIdentity ();
     glMatrixMode (GL_MODELVIEW);
+    //glMatrixMode (GL_PROJECTION);
     glPushMatrix ();
     glLoadIdentity ();
     // First set up the stencil area.
@@ -444,8 +450,8 @@ void csGLGraphics3D::SetupStencil ()
     const float clipVertScaleX = 2.0f / (float)viewwidth;
     const float clipVertScaleY = 2.0f / (float)viewheight;
     for (i = 0 ; i < nv ; i++)
-      glVertex2f (v[i].x*clipVertScaleX-1.0f,
-                  v[i].y*clipVertScaleY-1.0f);
+      glVertex2f (v[i].x*clipVertScaleX - 1.0f,
+                  v[i].y*clipVertScaleY - 1.0f);
     glEnd ();
 
     statecache->SetColorMask (wmRed, wmGreen, wmBlue, wmAlpha);
@@ -453,7 +459,8 @@ void csGLGraphics3D::SetupStencil ()
     statecache->SetStencilMask (127);
 
     glPopMatrix ();
-    glMatrixMode (GL_PROJECTION);
+    glMatrixMode (GL_MODELVIEW);
+    //glMatrixMode (GL_PROJECTION);
     glPopMatrix ();
     if (oldz) statecache->Enable_GL_DEPTH_TEST ();
     if (tex2d) statecache->Enable_GL_TEXTURE_2D ();
@@ -758,6 +765,7 @@ bool csGLGraphics3D::Open ()
   // The extension manager requires to initialize all used extensions with
   // a call to Init<ext> first.
   ext->InitGL_ARB_multitexture ();
+  ext->InitGL_ARB_texture_cube_map();
   ext->InitGL_EXT_texture3D ();
   //ext->InitGL_EXT_texture_compression_s3tc (); // not used atm
   ext->InitGL_ARB_vertex_buffer_object ();

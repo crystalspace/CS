@@ -401,3 +401,25 @@ void csShaderProgram::ResolveStaticVars (
     }
   }
 }
+
+void csShaderProgram::DumpProgramInfo (csString& output)
+{
+  output << "Program description: " << 
+    (description ? description : "<none>") << "\n";
+  output << "Program file name: " << programFileName << "\n";
+}
+
+void csShaderProgram::DumpVariableMappings (csString& output)
+{
+  for (int v = 0; v < variablemap.Length(); v++)
+  {
+    const VariableMapEntry& vme = variablemap[v];
+
+    output << strings->Request (vme.name);
+    output << '(' << vme.name << ") -> ";
+    output << vme.destination << ' ';
+    output << vme.userInt << ' ';
+    output << (csString().Format ("0x%.8x", (uint32)vme.userPtr)) << 
+      '\n'; // @@@ fix for 64 bit
+  }
+}

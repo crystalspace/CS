@@ -9,6 +9,16 @@ chronological order.
 6-Jun-2004
 	- Jorrit modified the Jamfile so that the isotest application
 	  is only build with new renderer.
+	- res made the following changes:
+	    - Some places in GL where the COMBINE texenv mode was used also 
+	      check for the presence of the COMBINE ext (and not only the
+	      multitexturing ext.)
+	    - For Cg FPs, you can now also bind render buffers to a texture
+	      coordinates by specifying "texture coordinate <Texture parameter
+	      name>" as the destination.
+	    - Augmented the Cg plugin with a facility to dump out debug info of
+	      the used programs. Can be enabled by enabling the 
+	      "Video.OpenGL.Shader.Cg.DebugDump" config setting.
 5-Jun-2004
 	- res made the following changes:
 	    - Added the *f versions of floor and ceil to csdef.h.

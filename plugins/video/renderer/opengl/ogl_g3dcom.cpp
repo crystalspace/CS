@@ -189,18 +189,6 @@ SCF_IMPLEMENT_IBASE_END
 csGraphics3DOGLCommon* csGraphics3DOGLCommon::ogl_g3d = 0;
 csGLStateCache* csGraphics3DOGLCommon::statecache = 0;
 
-/*#define USE_OGL_EXT(ext) \
-  bool csGraphics3DOGLCommon::ext = false;
-#include "ogl_suppext.h"
-#undef USE_OGL_EXT
-
-# define _CSGLEXT_
-# define CSGL_FOR_ALL
-# define CSGL_FUNCTION(fType,fName) \
-fType  csGraphics3DOGLCommon::fName = (fType) 0;
-# include "csglext.h"
-# undef CSGL_FUNCTION
-*/
 float sAc, sBc, sCc, sDc;
 //csMatrix3 sM;
 //csVector3 sV;
@@ -4880,22 +4868,19 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
       statecache->SetActiveTU (l);
       if (l>0)
         statecache->Disable_GL_TEXTURE_2D ();
-      if (ext->CS_GL_ARB_multitexture)
-      {
-	glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_TEXTURE);
-	glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, GL_SRC_COLOR);
-	glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, GL_PRIMARY_COLOR);
-	glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND1_RGB_ARB, GL_SRC_COLOR);
-	glTexEnvi (GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_MODULATE);
-	glTexEnvf (GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, 1.0f);
-    
-	glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_ALPHA_ARB, GL_TEXTURE);
-	glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND0_ALPHA_ARB, GL_SRC_ALPHA);
-	glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE1_ALPHA_ARB, GL_PRIMARY_COLOR);
-	glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND1_ALPHA_ARB, GL_SRC_ALPHA);
-	glTexEnvi (GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, GL_MODULATE);
-	glTexEnvf (GL_TEXTURE_ENV, GL_ALPHA_SCALE, 1.0f);
-      }
+      glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_TEXTURE);
+      glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, GL_SRC_COLOR);
+      glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, GL_PRIMARY_COLOR);
+      glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND1_RGB_ARB, GL_SRC_COLOR);
+      glTexEnvi (GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_MODULATE);
+      glTexEnvf (GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, 1.0f);
+  
+      glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_ALPHA_ARB, GL_TEXTURE);
+      glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND0_ALPHA_ARB, GL_SRC_ALPHA);
+      glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE1_ALPHA_ARB, GL_PRIMARY_COLOR);
+      glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND1_ALPHA_ARB, GL_SRC_ALPHA);
+      glTexEnvi (GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, GL_MODULATE);
+      glTexEnvf (GL_TEXTURE_ENV, GL_ALPHA_SCALE, 1.0f);
     }
   }
 

@@ -154,6 +154,9 @@ bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr,
 
   cgGLLoadProgram (program);
 
+  if (shaderPlug->debugDump)
+    DoDebugDump();
+
   i = 0;
   while (i < variablemap.Length ())
   {
@@ -196,6 +199,83 @@ bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr,
   variablemap.ShrinkBestFit();
 
   return true;
+}
+
+void csShaderGLCGCommon::DoDebugDump ()
+{
+  csString output;
+  DumpProgramInfo (output);
+  output << "CG program type: " << programType << "\n";
+  output << "CG profile: " << cgGetProgramString (program, 
+    CG_PROGRAM_PROFILE) << "\n";
+  output << "CG entry point: " << (entrypoint ? entrypoint : "main") << 
+    "\n";
+  output << "CG program valid: " << validProgram << "\n";
+  output << "\n";
+
+  output << "Variable mappings:\n";
+  DumpVariableMappings (output);
+  output << "\n";
+
+  CGparameter param = cgGetFirstLeafParameter (program, CG_PROGRAM);
+  while (param)
+  {
+    output << "Parameter: " << cgGetParameterName (param) << "\n";
+    output << " Type: " << 
+      cgGetTypeString (cgGetParameterNamedType (param)) << "\n";
+    output << " Direction: " <<
+      cgGetEnumString (cgGetParameterDirection (param)) << "\n";
+    output << " Semantic: " << cgGetParameterSemantic (param) << "\n";
+    const CGenum var = cgGetParameterVariability (param);
+    output << " Variability: " << cgGetEnumString (var) << "\n";
+    output << " Resource: " <<
+      cgGetResourceString (cgGetParameterResource (param)) << "\n";
+    if ((var == CG_UNIFORM) || (var == CG_CONSTANT))
+    {
+      int nValues;
+      const double* values = cgGetParameterValues (param, 
+	(var == CG_UNIFORM) ? CG_DEFAULT : CG_CONSTANT, &nValues);
+      if (nValues != 0)
+      {
+	output << " Values:";
+	for (int v = 0; v < nValues; v++)
+	{
+	  output << ' ' << values[v];
+	}
+	output << "\n";
+      }
+    }
+
+    param = cgGetNextLeafParameter (param);
+  }
+  output << "\n";
+
+  output << "Program source:\n";
+  output << cgGetProgramString (program, CG_PROGRAM_SOURCE);
+  output << "\n";
+
+  output << "Compiled program:\n";
+  output << cgGetProgramString (program, CG_COMPILED_PROGRAM);
+  output << "\n";
+
+  static int programCounter = 0;
+  csString filename;
+  filename << shaderPlug->dumpDir << (programCounter++) << programType << 
+    ".txt";
+
+  csRef<iVFS> vfs = CS_QUERY_REGISTRY (objectReg, iVFS);
+  if (!vfs->WriteFile (filename, output.GetData(), output.Length()))
+  {
+    csReport (objectReg, CS_REPORTER_SEVERITY_WARNING, 
+      "crystalspace.graphics3d.shader.glcg",
+      "Could not write '%s'", filename.GetData());
+  }
+  else
+  {
+    csReport (objectReg, CS_REPORTER_SEVERITY_NOTIFY, 
+      "crystalspace.graphics3d.shader.glcg",
+      "Dumped Cg program info to '%s'", filename.GetData());
+  }
 }
 
 bool csShaderGLCGCommon::Load(iDocumentNode* program)

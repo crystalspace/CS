@@ -66,11 +66,14 @@ csGLShader_CG::csGLShader_CG(iBase* parent)
 
   enable = false;
   isOpen = false;
+  debugDump = false;
+  dumpDir = 0;
   ext = 0;
 }
 
 csGLShader_CG::~csGLShader_CG()
 {
+  delete[] dumpDir;
   cgDestroyContext (context);
   SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
   SCF_DESTRUCT_IBASE ();
@@ -171,6 +174,11 @@ bool csGLShader_CG::Open()
   }
   ext->InitGL_ARB_vertex_program ();
   ext->InitGL_NV_vertex_program ();
+
+  debugDump = config->GetBool ("Video.OpenGL.Shader.Cg.DebugDump", false);
+  if (debugDump)
+    dumpDir = csStrNew (config->GetStr ("Video.OpenGL.Shader.Cg.DebugDumpDir",
+    "/tmp/cgdump/"));
 
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
     iPluginManager);

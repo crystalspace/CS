@@ -62,6 +62,7 @@ csGLShader_FIXED::csGLShader_FIXED(iBase* parent)
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 
   enable = false;
+  enableFP = false;
   texUnits = 0;
   isOpen = false;
 }
@@ -89,7 +90,7 @@ bool csGLShader_FIXED::SupportType(const char* type)
   Open ();
   if (!enable)
     return false;
-  if ((strcasecmp(type, "fp") == 0) && ext->CS_GL_ARB_multitexture)
+  if ((strcasecmp(type, "fp") == 0) && enableFP)
     return true;
   else if( strcasecmp(type, "vp") == 0)
     return true;
@@ -121,7 +122,6 @@ void csGLShader_FIXED::Open()
   if (!(enable && ext)) return;
 
   ext->InitGL_ARB_multitexture();
-  ext->InitGL_ARB_texture_cube_map();
 
   if (ext->CS_GL_ARB_multitexture)
   {
@@ -132,6 +132,10 @@ void csGLShader_FIXED::Open()
     if (!ext->CS_GL_ARB_texture_env_dot3)
       ext->InitGL_EXT_texture_env_dot3 ();
     glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &texUnits);
+
+    enableFP = ext->CS_GL_ARB_multitexture && 
+      (ext->CS_GL_ARB_texture_env_combine || 
+      ext->CS_GL_EXT_texture_env_combine);
 
   #ifdef FUNNY_TEXTURE_UNIT_COUNT
     const char* descr = 0;

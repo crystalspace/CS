@@ -117,6 +117,8 @@ protected:
   iDocumentNode* GetProgramNode ();
   csPtr<iDataBuffer> GetProgramData ();
   void ResolveStaticVars (csArray<iShaderVariableContext*> &staticContexts);
+  void DumpProgramInfo (csString& output);
+  void DumpVariableMappings (csString& output);
 public:
   SCF_DECLARE_IBASE;
 

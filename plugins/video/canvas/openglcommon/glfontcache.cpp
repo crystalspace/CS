@@ -300,7 +300,7 @@ void csGLFontCache::FlushArrays ()
   if (needStates)
   {
     statecache->Enable_GL_TEXTURE_2D ();
-    if (G2D->ext.CS_GL_ARB_multitexture)
+    if (G2D->useCombineTE)
     {
       glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_PRIMARY_COLOR);
       glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, GL_SRC_COLOR);
@@ -668,7 +668,7 @@ void csGLFontCache::FlushText ()
 
   statecache->Disable_GL_BLEND ();
   statecache->Disable_GL_ALPHA_TEST ();
-  if (G2D->ext.CS_GL_ARB_multitexture)
+  if (G2D->useCombineTE)
   {
     glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_TEXTURE);
     glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, GL_SRC_COLOR);

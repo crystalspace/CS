@@ -55,9 +55,10 @@ void csShaderGLCGVP::Activate()
 
     for(int i = 0; i < matrixtrackers.Length(); ++i)
     {
-      matrixtrackerentry& mt = matrixtrackers[i];
+      const matrixtrackerentry& mt = matrixtrackers[i];
 
-      cgGLSetStateMatrixParameter(mt.cgParameter,mt.nvMatrix,mt.nvTransform);
+      cgGLSetStateMatrixParameter(mt.cgParameter, mt.nvMatrix, 
+	mt.nvTransform);
     }
   }
 }
@@ -242,8 +243,8 @@ bool csShaderGLCGVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
       const char* pname = cgGetParameterName (param);
     #define TRACKERENTRY(Matrix, Modifier)		  \
       matrixtrackerentry map;				  \
-      map.nvMatrix = (CGGLenum)Matrix;				  \
-      map.nvTransform = (CGGLenum)Modifier;			  \
+      map.nvMatrix = (CGGLenum)Matrix;			  \
+      map.nvTransform = (CGGLenum)Modifier;		  \
       map.cgParameter = param; \
       matrixtrackers.Push (map);
     #define NAMEDTRACKERENTRY(Name, Matrix, Modifier)	  \
@@ -254,9 +255,9 @@ bool csShaderGLCGVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
       else
     #define NAMEDENTRIES(Basename, Matrix)		  \
       NAMEDTRACKERENTRY (Basename, Matrix,		  \
-	CG_GL_MATRIX_IDENTITY)					  \
+	CG_GL_MATRIX_IDENTITY)				  \
       NAMEDTRACKERENTRY (Basename "I", Matrix,	  	  \
-	CG_GL_MATRIX_INVERSE)					  \
+	CG_GL_MATRIX_INVERSE)				  \
       NAMEDTRACKERENTRY (Basename "T", Matrix,	  	  \
 	CG_GL_MATRIX_TRANSPOSE)				  \
       NAMEDTRACKERENTRY (Basename "IT", Matrix,	  	  \

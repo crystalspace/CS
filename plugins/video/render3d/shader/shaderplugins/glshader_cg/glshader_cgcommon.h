@@ -52,6 +52,7 @@ protected:
 
   bool DefaultLoadProgram (const char* programStr, CGGLenum type,
     csArray<iShaderVariableContext*> &staticContexts);
+  void DoDebugDump ();
 public:
   csShaderGLCGCommon (csGLShader_CG* shaderPlug, const char* type);
   virtual ~csShaderGLCGCommon ();

@@ -81,6 +81,7 @@ protected:
   int depthBits;
   /// Driver database
   csGLDriverDatabase driverdb;
+  bool useCombineTE;
 public:
   virtual const char* GetRendererString (const char* str);
   virtual const char* GetVersionString (const char* ver);

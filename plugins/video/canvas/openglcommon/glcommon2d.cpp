@@ -45,6 +45,7 @@ csGraphics2DGLCommon::csGraphics2DGLCommon (iBase *iParent) :
   multiSamples = 0;
   multiFavorQuality = false;
   fontCache = 0;
+  useCombineTE = false;
 
   ssPool = 0;
 }
@@ -157,7 +158,12 @@ bool csGraphics2DGLCommon::Open ()
   }
 
   ext.InitGL_ARB_multitexture ();
-  if (ext.CS_GL_ARB_multitexture)
+  ext.InitGL_ARB_texture_env_combine ();
+  if (!ext.CS_GL_ARB_texture_env_combine)
+    ext.InitGL_EXT_texture_env_combine ();
+  useCombineTE = ext.CS_GL_ARB_multitexture && 
+    (ext.CS_GL_ARB_texture_env_combine || ext.CS_GL_EXT_texture_env_combine);
+  if (useCombineTE)
   {
     GLint texUnits;
     glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &texUnits);
@@ -258,7 +264,7 @@ bool csGraphics2DGLCommon::BeginDraw ()
   glClearColor (0., 0., 0., 0.);
 
   statecache->SetShadeModel (GL_FLAT);
-  if (ext.CS_GL_ARB_multitexture)
+  if (useCombineTE)
   {
     glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_TEXTURE);
     glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, GL_SRC_COLOR);
