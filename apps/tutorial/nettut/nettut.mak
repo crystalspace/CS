@@ -1,5 +1,5 @@
 # Application description
-DESCRIPTION.nettut = Crystal Space tutorial part one
+DESCRIPTION.nettut = Crystal Space network tutorial
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
