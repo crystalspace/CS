@@ -37,6 +37,7 @@
 #include "csengine/stats.h"
 #include "csengine/config.h"
 #include "csengine/cspmeter.h"
+#include "csengine/cbuffer.h"
 #include "csgeom/fastsqrt.h"
 #include "csobject/nameobj.h"
 #include "csutil/archive.h"
@@ -65,6 +66,7 @@ csWorld::csWorld () : csObject (), start_vec (0, 0, 0)
   start_sector = NULL;
   piHR = NULL;
   textures = NULL;
+  c_buffer = NULL;
   CHK (cfg_engine = new csEngineConfig ());
   BuildSqrtTable ();
 }
@@ -97,12 +99,27 @@ void csWorld::Clear ()
   CHK (delete [] start_sector); start_sector = NULL;
   CHK (delete textures); textures = NULL;
   CHK (textures = new csTextureList ());
+  CHK (delete c_buffer); c_buffer = NULL;
 }
 
 void csWorld::EnableLightingCache (bool en)
 {
   do_lighting_cache = en;
   if (!do_lighting_cache) csPolygon3D::do_force_recalc = true;
+}
+
+void csWorld::EnableCBuffer (bool en)
+{
+  if (en)
+  {
+    if (c_buffer) return;
+    CHK (c_buffer = new csCBuffer (0, frame_width-1, frame_height));
+  }
+  else
+  {
+    CHK (delete c_buffer);
+    c_buffer = NULL;
+  }
 }
 
 IConfig* csWorld::GetEngineConfigCOM ()
@@ -438,6 +455,11 @@ void csWorld::Draw (IGraphics3D* g3d, csCamera* c, csClipper* view)
   csRenderView rview (*c, view, g3d, g2d);
   rview.clip_plane.Set (0, 0, 1, -1);   //@@@CHECK!!!
   rview.callback = NULL;
+
+  //@@@ Make this a flag.
+  //EnableCBuffer (true);
+
+  if (c_buffer) c_buffer->Initialize ();
 
   csSector* s = c->GetSector ();
   s->Draw (rview);

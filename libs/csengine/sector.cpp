@@ -32,6 +32,7 @@
 #include "csengine/halo.h"
 #include "csengine/stats.h"
 #include "csengine/csppulse.h"
+#include "csengine/cbuffer.h"
 #include "csgeom/bsp.h"
 #include "csobject/nameobj.h"
 #include "ihalo.h"
@@ -321,8 +322,30 @@ void csSector::Draw (csRenderView& rview)
       rview.added_fog_info = true;
     }
     else if (fogmethod != G3DFOGMETHOD_NONE)
+    {
       rview.g3d->OpenFogObject (GetID (), &GetFog ());
+    }
   }
+
+#if 0
+  csCBuffer* c_buffer = csWorld::current_world->GetCBuffer ();
+  if (c_buffer)
+  {
+    csVector3* old_tr3;
+    if (static_thing && do_things)
+    {
+      //static_thing->NewTransformation (old_tr3);
+      //static_thing->TransformWorld2Cam (rview);
+      //static_bsp->Front2Back (rview.GetOrigin (), &TestPolygons, (void*)&rview);
+    }
+    //TestDrawPolygons ((csPolygonParentInt*)this, polygons, num_polygon, (void*)&rview);
+    if (static_thing && do_things)
+    {
+      //static_bsp->Back2Front (rview.GetOrigin (), &DrawVisiblePolygons, (void*)&rview);
+      //static_thing->RestoreTransformation (old_tr3);
+    }
+  }
+#endif
 
   if (bsp)
     bsp->Back2Front (rview.GetOrigin (), &DrawPolygons, (void*)&rview);

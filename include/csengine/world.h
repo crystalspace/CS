@@ -45,6 +45,7 @@ class csLight;
 class csHaloInformation;
 class csIniFile;
 class csEngineConfig;
+class csCBuffer;
 interface IHaloRasterizer;
 interface IGraphics3D;
 interface IGraphicsInfo;
@@ -180,6 +181,9 @@ private:
   /// If true then the lighting cache is enabled.
   bool do_lighting_cache;
 
+  /// Optional c-buffer used for rendering.
+  csCBuffer* c_buffer;
+
   ///
   void ShineLights ();
   ///
@@ -231,6 +235,16 @@ public:
    * locally now).
    */
   bool Prepare (IGraphics3D* g3d);
+
+  /**
+   * Enable/disable c-buffer.
+   */
+  void EnableCBuffer (bool en);
+
+  /**
+   * Return c-buffer (or NULL if not used).
+   */
+  csCBuffer* GetCBuffer () { return c_buffer; }
 
   /**
    * Cache lighting. If true (default) then lighting will be cached in
