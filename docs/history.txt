@@ -13,6 +13,23 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+20-Jul-1999
+	- Gary Haussmann changed the OpenGL X 2D driver to be a little
+	  bit smarter when detecting which supported visuals there are.
+	- Gary also added support for user configurable lightmap blending.
+	  The user can specify the blend mode to use as LIGHTMAP_MODE
+	  in the opengl.cfg file. Also added some init code to properly
+	  position the initialization text so you can read it now.
+	- Fixed lighting of skeleton sprites.
+	- Calculate normals for skeleton sprites (lighting) only once. This
+	  means that it is important to iniatialize the skeleton to some
+	  useful default setup (set up transformations in skeleton template).
+	- Fixed lighting for sprites which are not touched by any light.
+	- Fixed bug with 'delete[]' being called too much with skeleton sprites.
+	- Did some fixes on the changes from Eric Sunshine.
+	- For more fun, Jorrit extended the 'addskel' command so that you
+	  can now give a negative width. In that case the real width at every
+	  node will be random between 1 and -width.
 19-Jul-1999
 	- Added GetXRotation(), GetYRotation() and GetZRotation() to
 	  csMatrix3.
@@ -89,6 +106,7 @@ Short-term cleanups that need to be done:
 	    - Fixed a couple "unused variable" compiler warnings in
 	      mazed/me_app.cpp.
 	    - Fixed a broken .PHONY dependency in walktest.mak.
+	- Fixes to Macintosh port from Robert Bate.
 18-Jul-1999
 	- Thomas Hieber replaced DrawPolygonQuick by DrawPolygonFX. He also
 	  extended DrawPolygonFX with a new FX_Transparent mixing mode.
