@@ -158,6 +158,18 @@ struct iGeneralFactoryState : public iBase
   virtual void GenerateBox (const csBox3& box) = 0;
 
   /**
+   * Enable back to front rendering for the triangles of this genmesh.
+   * This is useful if this factory represents a transparent genmesh
+   * or the material that is being used is itself transparent.
+   */
+  virtual void SetBack2Front (bool b2f) = 0;
+
+  /**
+   * Get the value of the back2front flag.
+   */
+  virtual bool IsBack2Front () const = 0;
+
+  /**
    * @@@NR@@@
    * Adds an independantly named stream, sets to VertexCount
    */

@@ -8,6 +8,16 @@ chronological order.
 
 3-Apr-2004
 	- Jorrit fixed a new compile error in the simple console plugin.
+	- Jorrit added a new 'back2front' keyword for the genmesh factory
+	  loader. This keyword is currently still a placeholder but the idea
+	  is that when this keyword is present then the triangles of the
+	  genmesh will be rendered from back to front. This is useful when
+	  you the mesh is transparent (or uses a transparent material). In
+	  that case you need this flag to have correct rendering. At this
+	  moment the keyword is simply parsed but not used yet.
+	- Jorrit also added iGeneralFactoryState->SetBack2Front() and
+	  IsBack2Front() for this functionality. Still doesn't do anything
+	  yet.
 2-Apr-2004
 	- res made the following changes:
 	    - Replaced the CS_SHADERVAR_STACK #define with a csShaderVarStack

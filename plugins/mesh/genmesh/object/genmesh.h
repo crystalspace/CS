@@ -456,6 +456,8 @@ private:
   bool object_bbox_valid;
   bool initialized;
 
+  bool back2front;
+
   csMeshedPolygon* polygons;
 
   /// Calculate bounding box and radius.
@@ -532,6 +534,8 @@ public:
   void Invalidate ();
   void CalculateNormals ();
   void GenerateBox (const csBox3& box);
+  virtual void SetBack2Front (bool b2f) { back2front = b2f; }
+  virtual bool IsBack2Front () const { return back2front; }
 
   bool AddRenderBuffer (const char *name,
   	csRenderBufferComponentType component_type, int component_size);
@@ -643,6 +647,14 @@ public:
     virtual void GenerateBox (const csBox3& box)
     {
       scfParent->GenerateBox (box);
+    }
+    virtual void SetBack2Front (bool b2f)
+    {
+      scfParent->SetBack2Front (b2f);
+    }
+    virtual bool IsBack2Front () const
+    {
+      return scfParent->IsBack2Front ();
     }
     virtual bool AddRenderBuffer (const char *name, 
       csRenderBufferComponentType component_type, int component_size)

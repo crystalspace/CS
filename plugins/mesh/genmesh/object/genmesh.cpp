@@ -1306,6 +1306,7 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
   material = 0;
   polygons = 0;
   light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
+  back2front = false;
 
 #ifdef CS_USE_NEW_RENDERER
   vertex_buffer = 0;

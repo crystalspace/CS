@@ -62,7 +62,8 @@ enum
   XMLTOKEN_COLORS,
   XMLTOKEN_AUTONORMALS,
   XMLTOKEN_NOSHADOWS,
-  XMLTOKEN_LOCALSHADOWS
+  XMLTOKEN_LOCALSHADOWS,
+  XMLTOKEN_BACK2FRONT
 };
 
 SCF_IMPLEMENT_IBASE (csGeneralFactoryLoader)
@@ -136,6 +137,7 @@ bool csGeneralFactoryLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("autonormals", XMLTOKEN_AUTONORMALS);
   xmltokens.Register ("n", XMLTOKEN_N);
   xmltokens.Register ("renderbuffer", XMLTOKEN_RENDERBUFFER);
+  xmltokens.Register ("back2front", XMLTOKEN_BACK2FRONT);
   return true;
 }
 
@@ -354,6 +356,8 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	break;
       case XMLTOKEN_NUMVT:
         state->SetVertexCount (child->GetContentsValueAsInt ());
+	break;
+      case XMLTOKEN_BACK2FRONT:
 	break;
       case XMLTOKEN_RENDERBUFFER:
 #ifdef CS_USE_NEW_RENDERER
