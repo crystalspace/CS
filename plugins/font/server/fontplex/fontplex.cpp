@@ -65,7 +65,7 @@ bool csFontServerMultiplexor::Initialize (iObjectRegistry *object_reg)
   int errorcount = 0;
   for (idx = 1; ; idx++)
   {
-    sprintf (tag, "FontServer.%d", idx);
+    sprintf (tag, "iFontServer.%d", idx);
     csRef<iBase> b (CS_QUERY_REGISTRY_TAG (object_reg, tag));
     if (!b) 
     {
