@@ -12,6 +12,14 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+22-Jun-99:
+	- Thomas Hieber cleaned up the software renderer some more.
+	  He unified most routines for scanline drawing.
+	- Andrew Zabolotny removed a number of errors in the network
+	  manager, due to comparing unsigned with negative values.
+	  He also removed a few additional warnings.
+	- I applied a few small fixes for DOS as suggested by Seth Galbraith.
+	- I fixed a serious bug in the precalculated lighting routines.
 21-Jun-99:
 	- I fixed the Linux makefile for Shooter since the 'csgame' library
 	  has changed.
@@ -20,9 +28,17 @@ Short-term cleanups that need to be done:
 	  code is not enabled by default yet.
 	- Andrew also moved the csCleanable sub-classes outside the functions.
 	  This should fix a few compilation problems for some compilers.
+	- Andrew also changed several occurances of 'gouroud' to 'gouraud' (I
+	  hope this doesn't break things :-)
+	- Michael Dale Long updated cvsguide.txt for the new IP number.
+	- Thomas Hieber removed a LOT of warnings!
+	- I removed another batch of warnings.
+	- Siu-hang Or patches MazeD for a directory tree problem.
 20-Jun-99:
 	- Thomas Hieber added a quick tutorial for MazeD (received from Andrew).
 	- Thomas added a number of new files to the 'csgame' library.
+	- Denis Dmitriev added MoveTo method in csSprite3D that automatically
+	  searches for the correct sector.
 19-Jun-99:
 	- Added new GetFlags/SetFlags/CheckFlags to csPolygon3D and csThing. Also
 	  added CheckFlags to csLight. This is going to be a new system which
