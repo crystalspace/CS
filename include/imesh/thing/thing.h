@@ -34,7 +34,6 @@ struct iCurve;
 struct iMaterialWrapper;
 struct iMaterialList;
 struct iMovable;
-struct iObject;
 struct iPolyTxtPlane;
 struct csFog;
 
@@ -60,7 +59,7 @@ struct csFog;
 #define CS_THING_MOVE_OFTEN 1
 #define CS_THING_MOVE_OCCASIONAL 2
 
-SCF_VERSION (iThingState, 0, 4, 0);
+SCF_VERSION (iThingState, 0, 5, 0);
 
 /**
  * This is the state interface to access the internals of a thing
@@ -70,9 +69,6 @@ struct iThingState : public iBase
 {
   /// @@@ UGLY
   virtual void* GetPrivateObject () = 0;
-
-  /// Get the object for this thing.
-  virtual iObject* QueryObject () = 0;
 
   /**
    * Compress the vertex table so that all nearly identical vertices

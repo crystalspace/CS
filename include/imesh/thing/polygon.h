@@ -35,7 +35,6 @@ struct iPortal;
 struct iSector;
 struct iThingState;
 struct iPolyTexType;
-struct iObject;
 
 class csReversibleTransform;
 class csPlane3;
@@ -62,7 +61,7 @@ class csColor;
 #define CS_POLY_VISCULL	0x00000004
 
 
-SCF_VERSION (iPolygon3D, 0, 2, 1);
+SCF_VERSION (iPolygon3D, 0, 3, 0);
 
 /**
  * This is the interface to 3D polygons.
@@ -72,8 +71,11 @@ struct iPolygon3D : public iBase
   /// @@@ UGLY! Used by engine to retrieve internal object structure
   virtual csPolygon3D *GetPrivateObject () = 0;
 
-  /// Get the iObject for this polygon.
-  virtual iObject *QueryObject() = 0;
+  /// Get the name of this polygon.
+  virtual const char* GetName () const = 0;
+  /// Set the name of this polygon.
+  virtual void SetName (const char* name) = 0;
+
   /**
    * Get the thing (container) that this polygon belongs to.
    * The reference counter on iThingState is NOT incremented.

@@ -618,8 +618,8 @@ const char* csCurve::ReadFromCache (iFile* file)
       file,
       CURVE_LM_SIZE * csLightMap::lightcell_size,
       CURVE_LM_SIZE * csLightMap::lightcell_size,
+      NULL,
       this,
-      false,
       thing_type->engine);
   LightmapUpToDate = true;
   return error;

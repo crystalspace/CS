@@ -5,6 +5,11 @@ The history order is reversed so that new features are at the top.
 	  forgetting to reset the image pointer to NULL. This means
 	  lots of images remained in memory all the time.
 	- Also added FreeImages() to walktest in case region loading is used.
+	- csPolygon3D and csThing no longer inherit from csObject. This added
+	  unneeded overhead (especially in the case of polygons). The
+	  QueryObject() function has been removed. However it is still
+	  possible to set names on polygons. To do that you can use
+	  SetName() and GetName().
 10-Mar-2003
 	- Added a few timing printfs in region code to debug long load times.
 	- A few optimizations in the spr2d plugin to make particle systems use

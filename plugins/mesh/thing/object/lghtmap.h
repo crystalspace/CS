@@ -210,7 +210,7 @@ public:
    * otherwise a description of the error.
    */
   const char* ReadFromCache (iFile* file, int w, int h,
-    csObject* obj, bool isPolygon, iEngine*);
+    csPolygon3D* poly, csCurve* curve, iEngine*);
 
   /**
    * Write lightmap to a file.

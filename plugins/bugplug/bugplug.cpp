@@ -500,7 +500,7 @@ void csBugPlug::MouseButton3 (iCamera* camera)
   const char* poly_name;
   if (poly)
   {
-    poly_name = poly->QueryObject ()->GetName ();
+    poly_name = poly->GetName ();
     Dump (poly);
   }
   else
@@ -1850,7 +1850,7 @@ void csBugPlug::Dump (iCamera* c)
 
 void csBugPlug::Dump (iPolygon3D* poly)
 {
-  const char* poly_name = poly->QueryObject ()->GetName ();
+  const char* poly_name = poly->GetName ();
   if (!poly_name) poly_name = "<noname>";
   Report (CS_REPORTER_SEVERITY_DEBUG, "Polygon '%s'",
   	poly_name);

@@ -486,7 +486,7 @@ iPolygon3D* add_polygon_template (iThingState* tmpl,
   iPolygon3D* p;
   p = tmpl->CreatePolygon ();
   p->SetMaterial (material);
-  p->QueryObject()->SetName (name);
+  p->SetName (name);
   p->CreateVertex (vt0);
   p->CreateVertex (vt1);
   p->CreateVertex (vt2);

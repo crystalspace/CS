@@ -33,3 +33,64 @@ With this you can enable/disable lightmapping.
 If you want gouraud shaded polygons you should use the @samp{genmesh}
 mesh object plugin instead.
 
+@subheading Bezier Curve Changes
+@cindex Bezier Curve Changes
+@cindex @code{iCurveTemplate}
+@cindex @code{iCurve}
+
+The notion of curve templates has been reworked. @code{iCurveTemplate} has
+been removed and it's functionality has moved to @code{iCurve} itself.
+As a consequence of this change the bezier addon loader has been removed.
+A curve like this in the past:
+@example
+<addon>
+  <plugin>crystalspace.mesh.loader.thing.bezier</plugin>
+  <params>
+    <name>b1</name>
+    <material>mosaic</material>
+    <v>0</v> <v>1</v> <v>2</v>
+    <v>3</v> <v>4</v> <v>5</v>
+    <v>6</v> <v>7</v> <v>8</v>
+  </params>
+</addon>
+<meshfact name="tunnel">
+  <plugin>crystalspace.mesh.loader.factory.thing</plugin>
+  <params>
+    <curvecenter x="0" y="0" z="0" />
+    <curvescale>80</curvescale>
+    <curvecontrol x="5" y="2" z="0" u="1" v="0" />
+    @dots{}
+    <curve name="bez">b1</curve>
+  </params>
+</meshfact>
+@end example
+
+should now become:
+
+@example
+<meshfact name="tunnel">
+  <plugin>crystalspace.mesh.loader.factory.thing</plugin>
+  <params>
+    <curvecenter x="0" y="0" z="0" />
+    <curvescale>80</curvescale>
+    <curvecontrol x="5" y="2" z="0" u="1" v="0" />
+    @dots{}
+    <curve name="b1">
+      <material>mosaic</material>
+      <v>0</v> <v>1</v> <v>2</v>
+      <v>3</v> <v>4</v> <v>5</v>
+      <v>6</v> <v>7</v> <v>8</v>
+    </curve>
+  </params>
+</meshfact>
+@end example
+
+@subheading iThingState and iPolygon3D Changes
+@cindex @code{iThingState}
+@cindex @code{iPolygon3D}
+@cindex @code{iObject}
+
+@code{iPolygon3D} and @code{iThingState} no longer implement @code{iObject}.
+So the @code{QueryObject()} function has been removed. Polygons can still
+have names though. Added @code{SetName()} and @code{GetName()} for that.
+

@@ -65,7 +65,7 @@ CS_IMPLEMENT_PLUGIN
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE_EXT(csThing)
+SCF_IMPLEMENT_IBASE(csThing)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iThingState)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iLightingInfo)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iObjectModel)
@@ -74,7 +74,7 @@ SCF_IMPLEMENT_IBASE_EXT(csThing)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iShadowReceiver)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMeshObjectFactory)
-SCF_IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::ThingState)
   SCF_IMPLEMENTS_INTERFACE(iThingState)
@@ -111,12 +111,12 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 int csThing:: last_thing_id = 0;
 
 csThing::csThing (iBase *parent, csThingObjectType* thing_type) :
-  csObject(parent),
   polygons(64, 64),
   curves(16, 16)
 {
   csThing::thing_type = thing_type;
 
+  SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiThingState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
@@ -2517,7 +2517,7 @@ bool csThing::DrawFoggy (iRenderView *d, iMovable *)
 
   // @@@ Wouldn't it be nice if we checked all vertices against the Z plane?
   {
-    d->GetGraphics3D ()->OpenFogObject (GetID (), &GetFog ());
+    d->GetGraphics3D ()->OpenFogObject (thing_id, &GetFog ());
 
     icam->SetMirrored (!icam->IsMirrored ());
     bool mirrored = icam->IsMirrored ();
@@ -2556,7 +2556,7 @@ bool csThing::DrawFoggy (iRenderView *d, iMovable *)
               p,
               plane_cam,
               icam->IsMirrored (),
-              GetID (),
+              thing_id,
               CS_FOG_BACK);
         }
       }
@@ -2596,7 +2596,7 @@ bool csThing::DrawFoggy (iRenderView *d, iMovable *)
               p,
               plane_cam,
               icam->IsMirrored (),
-              GetID (),
+              thing_id,
               CS_FOG_FRONT);
         }
       }
@@ -2604,7 +2604,7 @@ bool csThing::DrawFoggy (iRenderView *d, iMovable *)
       render_pool->Free (clip);
     }
 
-    d->GetGraphics3D ()->CloseFogObject (GetID ());
+    d->GetGraphics3D ()->CloseFogObject (thing_id);
   }
 
   draw_busy--;
@@ -2850,7 +2850,7 @@ void csThing::MergeTemplate (
     csPolygon3D *p;
     iMaterialWrapper *mat = pt->GetMaterial ();
     p = NewPolygon (mat);
-    p->SetName (pt->QueryObject ()->GetName ());
+    p->SetName (pt->GetName ());
 
     iMaterialWrapper *wrap = pt->GetMaterial ();
     if (!wrap && default_material)

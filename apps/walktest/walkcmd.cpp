@@ -1182,12 +1182,9 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (p)
     {
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"Action polygon '%s'", p->QueryObject ()->GetName ());
-      iThingState* ob = p->GetParent ();
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"in set '%s'", ob->QueryObject ()->GetName ());
+      	"Action polygon '%s'", p->GetName ());
       printf ("ACTION\n");
-      Sys->ActivateObject ((csObject*)(ob->QueryObject ()));
+      //Sys->ActivateObject ((csObject*)(ob->QueryObject ()));
     }
   }
   else if (!strcasecmp (cmd, "saverec"))

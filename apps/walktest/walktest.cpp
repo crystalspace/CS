@@ -1605,35 +1605,3 @@ int main (int argc, char* argv[])
   return 1;
 }
 
-#if 0
-#undef new
-void* operator new (size_t s, void* filename, int line)
-{
-  void* rc = (void*)malloc (s);
-  //printf ("+ %p %s %d %d\n", rc, filename, line, s); fflush (stdout);
-  return rc;
-}
-void* operator new[] (size_t s, void* filename, int line)
-{
-  void* rc = (void*)malloc (s);
-  //printf ("+ %p %s %d %d\n", rc, filename, line, s); fflush (stdout);
-  return rc;
-}
-void operator delete (void* p)
-{
-  if (p)
-  {
-    //printf ("- %p\n", p); fflush (stdout);
-    free (p);
-  }
-}
-void operator delete[] (void* p)
-{
-  if (p)
-  {
-    //printf ("- %p\n", p); fflush (stdout);
-    free (p);
-  }
-}
-#endif
-

@@ -167,7 +167,7 @@ private:
  * Things can also be used for volumetric fog. In that case
  * the Thing must be convex.
  */
-class csThing : public csObject
+class csThing : public iBase
 {
   friend class PolyMeshHelper;
 
@@ -965,14 +965,13 @@ public:
   void DynamicLightDisconnect (iDynLight* dynlight);
   void StaticLightChanged (iStatLight* statlight);
 
-  SCF_DECLARE_IBASE_EXT (csObject);
+  SCF_DECLARE_IBASE;
 
   //------------------------- iThingState interface -------------------------
   struct ThingState : public iThingState
   {
     SCF_DECLARE_EMBEDDED_IBASE (csThing);
     virtual void* GetPrivateObject () { return (void*)scfParent; }
-    virtual iObject* QueryObject () { return scfParent; }
     virtual void CompressVertices () { scfParent->CompressVertices(); }
 
     virtual int GetPolygonCount () { return scfParent->polygons.Length (); }

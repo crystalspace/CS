@@ -232,8 +232,8 @@ const char* csLightMap::ReadFromCache (
   iFile* file,
   int w,
   int h,
-  csObject *obj,
-  bool isPolygon,
+  csPolygon3D* poly,
+  csCurve* curve,
   iEngine *engine)
 {
   PolySave ps, pswanted;
@@ -242,18 +242,14 @@ const char* csLightMap::ReadFromCache (
   iLight *light;
   int i;
 
-  csPolygon3D *poly = NULL;
-  csCurve *curve = NULL;
   csThing* parent;
 
-  if (isPolygon)
+  if (poly)
   {
-    poly = (csPolygon3D *)obj;
     parent = poly->GetParent ();
   }
   else
   {
-    curve = (csCurve *)obj;
     parent = curve->GetParentThing ();
   }
 

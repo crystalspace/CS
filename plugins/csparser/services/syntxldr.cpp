@@ -968,7 +968,7 @@ bool csTextSyntaxService::ParsePoly3d (
 			   tx_uv_i1, tx_uv1,
 			   tx_uv_i2, tx_uv2,
 			   tx_uv_i3, tx_uv3,
-			   plane_name, poly3d->QueryObject ()->GetName ()))
+			   plane_name, poly3d->GetName ()))
 	{
 	  return false;
 	}
@@ -984,7 +984,7 @@ bool csTextSyntaxService::ParsePoly3d (
 	    {
 	      csPrintf ("Duplicate vertex-index found! "
 			"(polygon '%s') ignored ...\n",
-			poly3d->QueryObject ()->GetName ());
+			poly3d->GetName ());
 	      ignore = true;
 	    }
 	  }
@@ -1024,7 +1024,7 @@ bool csTextSyntaxService::ParsePoly3d (
   {
     ReportError ("crystalspace.syntax.polygon", node,
       "Polygon '%s' contains just %d vertices!",
-      poly3d->QueryObject()->GetName(),
+      poly3d->GetName(),
       poly3d->GetVertexCount ());
     return false;
   }
@@ -1102,7 +1102,7 @@ bool csTextSyntaxService::ParsePoly3d (
     {
       ReportError ("crystalspace.syntax.polygon", node,
         "Can't find plane '%s' for polygon '%s'",
-      	plane_name, poly3d->QueryObject ()->GetName ());
+      	plane_name, poly3d->GetName ());
       return false;
     }
     poly3d->SetTextureSpace (pl);

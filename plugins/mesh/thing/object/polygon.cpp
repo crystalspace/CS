@@ -119,24 +119,24 @@ void csPolyTexLightMap::NewTxtPlane (csThingObjectType* thing_type)
 }
 
 //---------------------------------------------------------------------------
-SCF_IMPLEMENT_IBASE_EXT(csPolygon3D)
+SCF_IMPLEMENT_IBASE(csPolygon3D)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPolygon3D)
-SCF_IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csPolygon3D::eiPolygon3D)
   SCF_IMPLEMENTS_INTERFACE(iPolygon3D)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csPolygon3D::csPolygon3D (iMaterialWrapper *material) :
-    csObject(),
-    vertices(4)
+csPolygon3D::csPolygon3D (iMaterialWrapper *material) : vertices(4)
 {
   VectorArray = GetStaticVectorArray();
+  SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
   DG_TYPE ((csObject *)this, "csPolygon3D");
   thing = NULL;
 
   csPolygon3D::material = material;
+  name = NULL;
 
   txt_info = NULL;
 
@@ -157,6 +157,8 @@ csPolygon3D::csPolygon3D (iMaterialWrapper *material) :
 
 csPolygon3D::~csPolygon3D ()
 {
+  delete[] name;
+
   if (txt_info)
   {
     DG_UNLINK ((csObject *)this, txt_info);
@@ -1600,7 +1602,7 @@ const char* csPolygon3D::ReadFromCache (iFile* file)
           txt_info->tex->w_orig,
           txt_info->tex->h,
           this,
-          true,
+	  NULL,
 	  thing->thing_type->engine);
     if (error != NULL)
     {

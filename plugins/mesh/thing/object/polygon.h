@@ -22,6 +22,7 @@
 #include "csutil/scf.h"
 #include "csutil/cscolor.h"
 #include "csutil/flags.h"
+#include "csutil/util.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/polyidx.h"
@@ -193,11 +194,14 @@ public:
  * the texture is filtered in which case it is drawn on top of the other
  * sector.
  */
-class csPolygon3D : public csObject
+class csPolygon3D : public iBase
 {
   friend class csPolyTexture;
 
 private:
+  /// Name of this polygon.
+  char* name;
+
   /*
    * A table of indices into the vertices of the parent csThing
    * (container).
@@ -380,6 +384,17 @@ public:
    * Get the polygonset (container) that this polygons belongs to.
    */
   csThing* GetParent () { return thing; }
+
+  /// Name handling.
+  const char* GetName () const { return name; }
+  void SetName (const char* n)
+  {
+    delete[] name;
+    if (n)
+      name = csStrNew (n);
+    else
+      name = NULL;
+  }
 
   /**
    * Return the plane of this polygon.  This function returns a 3D engine type
@@ -885,7 +900,7 @@ public:
     return txt_info ? txt_info->GetPolyTxtPlane () : NULL;
   }
 
-  SCF_DECLARE_IBASE_EXT (csObject);
+  SCF_DECLARE_IBASE;
 
   //------------------- iPolygon3D interface implementation -------------------
 
@@ -894,7 +909,8 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE (csPolygon3D);
 
     virtual csPolygon3D *GetPrivateObject () { return scfParent; }
-    virtual iObject *QueryObject() {return scfParent;}
+    virtual const char* GetName () const { return scfParent->GetName (); }
+    virtual void SetName (const char* name) { scfParent->SetName (name); }
     virtual iThingState *GetParent ();
     virtual iLightMap *GetLightMap ()
     {
