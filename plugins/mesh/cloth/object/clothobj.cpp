@@ -263,23 +263,31 @@ void csStuffObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
   bbox = object_bbox;  
 }
 
-
- iMeshObjectFactory* csStuffObject::GetFactory () const
- { return factory; };
- void csStuffObject::UpdateLighting (iLight **,int, iMovable *) 
- {
-   SetupMesh();
- };
- void csStuffObject::SetVisibleCallback(iMeshObjectDrawCallback *cb) { vis_cb=cb; };
- iMeshObjectDrawCallback* csStuffObject::GetVisibleCallback () const { return vis_cb; };
- void csStuffObject::NextFrame (unsigned int ticks, const csVector3& /*pos*/)
- {
-   Dynamics->Update(ticks);
- };
- bool csStuffObject::WantToDie () const { return false; };
- void csStuffObject::HardTransform (const csReversibleTransform &) {};
- bool csStuffObject::SupportsHardTransform () const { return false; };
- bool csStuffObject::HitBeamOutline (const csVector3& start,
+iMeshObjectFactory* csStuffObject::GetFactory () const
+ { return factory; }
+ 
+void csStuffObject::UpdateLighting (iLight **,int, iMovable *) 
+ { SetupMesh(); }
+ 
+void csStuffObject::SetVisibleCallback(iMeshObjectDrawCallback *cb) 
+ { vis_cb=cb; }
+ 
+iMeshObjectDrawCallback* csStuffObject::GetVisibleCallback () const 
+ { return vis_cb; }
+ 
+void csStuffObject::NextFrame (unsigned int ticks, const csVector3& /*pos*/)
+ { Dynamics->Update(ticks); }
+ 
+bool csStuffObject::WantToDie () const 
+ { return false; }
+ 
+void csStuffObject::HardTransform (const csReversibleTransform &) 
+ {}
+   
+bool csStuffObject::SupportsHardTransform () const 
+ { return false; }
+ 
+bool csStuffObject::HitBeamOutline (const csVector3& start,
   const csVector3& end, csVector3& isect, float* pr)
     { 
       csSegment3 seg (start, end);
@@ -299,7 +307,7 @@ void csStuffObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
       return false;
     };
 	
- bool csStuffObject::HitBeamObject (const csVector3& start,
+bool csStuffObject::HitBeamObject (const csVector3& start,
   const csVector3& end, csVector3& isect, float* pr)
   {
     // This is now closer to an outline hitting method. It will
@@ -321,14 +329,18 @@ void csStuffObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
       }
     }
     return false;
-  };
+  }
   
- void csStuffObject::SetLogicalParent (iBase *) {};
- iBase *csStuffObject::GetLogicalParent () const { return NULL; };
- // iObjectModel *csStuffObject::GetObjectModel () { return NULL; };
+void csStuffObject::SetLogicalParent (iBase *) 
+ {}
+   
+iBase *csStuffObject::GetLogicalParent () const 
+ { return NULL; }
+ 
+// iObjectModel *csStuffObject::GetObjectModel () { return NULL; };
 
 //-----------Vertex Buffer Manager Client embedded implementation
- void csStuffObject::eiVertexBufferManagerClient::ManagerClosing() { };
+void csStuffObject::eiVertexBufferManagerClient::ManagerClosing() { };
 
 
 
@@ -379,12 +391,18 @@ csPtr<iMeshObject> StuffFactory::NewInstance()
   return csPtr<iMeshObject> (itface);
 }
 
- void StuffFactory::HardTransform (const csReversibleTransform &) { };
- bool StuffFactory::SupportsHardTransform() const { return false; };
- void StuffFactory::SetLogicalParent(iBase *) {};
- iBase *StuffFactory::GetLogicalParent ()const { return NULL; };
+void StuffFactory::HardTransform (const csReversibleTransform &) 
+{ }
 
+bool StuffFactory::SupportsHardTransform() const 
+{ return false; }
 
+void StuffFactory::SetLogicalParent(iBase *) 
+{}
+  
+iBase *StuffFactory::GetLogicalParent ()const 
+  { return NULL; }
+  
 //----------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE (StuffMeshObjectType)
@@ -410,8 +428,7 @@ StuffMeshObjectType::StuffMeshObjectType (iBase* pParent)
 }
 
 StuffMeshObjectType::~StuffMeshObjectType ()
-{
-}
+{}
 
 csPtr<iMeshObjectFactory> StuffMeshObjectType::NewFactory ()
 {
