@@ -1,9 +1,10 @@
-Crystal Space detailed change log.
+﻿Crystal Space detailed change log.
 http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
 2-Apr-2003
+        - Jonathan Tarbox fixed some bugs in csEvent::Flatten/Unflatten
 	- Matze removed the csSome, csConstSome and uint type from cstypes.h
 	- Matze added the movierecorder plugin from Micah Dowty
 	  <micah@navi.picogui.org>
@@ -59,6 +60,9 @@ The history order is reversed so that new features are at the top.
 	    - removed unnecessary gluBuild2DMipmaps(); instead previously in
 	      CreateMipmaps() determined mipmaps are used.
 1-Apr-2003
+        - Jonathan Tarbox Added int64 support to convert_endian.
+        - Jonathan Tarbox Fixed double2longlong/longlong2double.
+        - Jonathan Tarbox Finished the Flatten/Unflatten code in iEvent.
 	- Reverted dllwrap change to win32gcc.mak from 4 days ago since
 	  it prevents debug symbols from being present in plugins.
 	- Added csBlockAllocator class. This is a templated class which

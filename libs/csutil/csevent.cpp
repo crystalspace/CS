@@ -1005,7 +1005,7 @@ bool csEvent::FlattenCrystal(char * buffer)
   //double d;
   
   ui32 = CS_CRYSTAL_PROTOCOL;
-  convert_endian(ui32);
+  ui32 = convert_endian(ui32);
   b.Write((char *)&ui32, sizeof(uint32));         // protocol version
   b.Write((char *)&Type, sizeof(uint8));          // iEvent.Type
   b.Write((char *)&Category, sizeof(uint8));      // iEvent.Category
@@ -1044,7 +1044,7 @@ bool csEvent::FlattenCrystal(char * buffer)
               {
                 // 2 byte name length (little endian)
                 ui16 = strlen(iter.GetKey());
-                convert_endian(ui16);
+                ui16 = convert_endian(ui16);
                 b.Write((char *)&ui16, sizeof(int16));
                 // XX byte name
                 b.Write(iter.GetKey(), ui16);
@@ -1053,7 +1053,7 @@ bool csEvent::FlattenCrystal(char * buffer)
                 b.Write((char *)&ui8, sizeof(uint8));
                 // 4 byte data length
                 ui32 = object->Event->FlattenSize(CS_CRYSTAL_PROTOCOL);
-                convert_endian(ui32);
+                ui32 = convert_endian(ui32);
                 b.Write((char *)&ui32, sizeof(uint32));
                 // XX byte data
                 if (!object->Event->Flatten(b.GetPos() + buffer))
@@ -1065,7 +1065,7 @@ bool csEvent::FlattenCrystal(char * buffer)
             case attribute::tag_databuffer:
               // 2 byte name length (little endian)
               ui16 = strlen(iter.GetKey());
-              convert_endian(ui16);
+              ui16 = convert_endian(ui16);
               b.Write((char *)&ui16, sizeof(int16));
               // XX byte name
               b.Write(iter.GetKey(), ui16);
@@ -1074,7 +1074,7 @@ bool csEvent::FlattenCrystal(char * buffer)
               b.Write((char *)&ui8, sizeof(uint8));
               // 4 byte data length
               ui32 = object->length;
-              convert_endian(ui32);
+              ui32 = convert_endian(ui32);
               b.Write((char *)&ui32, sizeof(uint32));
               // XX byte data
               b.Write(object->String, object->length);
@@ -1082,7 +1082,7 @@ bool csEvent::FlattenCrystal(char * buffer)
             case attribute::tag_string:
               // 2 byte name length (little endian)
               ui16 = strlen(iter.GetKey());
-              convert_endian(ui16);
+              ui16 = convert_endian(ui16);
               b.Write((char *)&ui16, sizeof(int16));
               // XX byte name
               b.Write(iter.GetKey(), ui16);
@@ -1091,7 +1091,7 @@ bool csEvent::FlattenCrystal(char * buffer)
               b.Write((char *)&ui8, sizeof(uint8));
               // 4 byte data length
               ui32 = object->length;
-              convert_endian(ui32);
+              ui32 = convert_endian(ui32);
               b.Write((char *)&ui32, sizeof(uint32));
               // XX byte data
               b.Write(object->String, object->length);
@@ -1099,7 +1099,7 @@ bool csEvent::FlattenCrystal(char * buffer)
             case attribute::tag_bool:
               // 2 byte name length (little endian)
               ui16 = strlen(iter.GetKey());
-              convert_endian(ui16);
+              ui16 = convert_endian(ui16);
               b.Write((char *)&ui16, sizeof(int16));
               // XX byte name
               b.Write(iter.GetKey(), ui16);
@@ -1113,7 +1113,7 @@ bool csEvent::FlattenCrystal(char * buffer)
             case attribute::tag_int8:
               // 2 byte name length (little endian)
               ui16 = strlen(iter.GetKey());
-              convert_endian(ui16);
+              ui16 = convert_endian(ui16);
               b.Write((char *)&ui16, sizeof(int16));
               // XX byte name
               b.Write(iter.GetKey(), ui16);
@@ -1127,7 +1127,7 @@ bool csEvent::FlattenCrystal(char * buffer)
             case attribute::tag_uint8:
               // 2 byte name length (little endian)
               ui16 = strlen(iter.GetKey());
-              convert_endian(ui16);
+              ui16 = convert_endian(ui16);
               b.Write((char *)&ui16, sizeof(int16));
               // XX byte name
               b.Write(iter.GetKey(), ui16);
@@ -1141,7 +1141,7 @@ bool csEvent::FlattenCrystal(char * buffer)
             case attribute::tag_int16:
               // 2 byte name length (little endian)
               ui16 = strlen(iter.GetKey());
-              convert_endian(ui16);
+              ui16 = convert_endian(ui16);
               b.Write((char *)&ui16, sizeof(int16));
               // XX byte name
               b.Write(iter.GetKey(), ui16);
@@ -1150,13 +1150,13 @@ bool csEvent::FlattenCrystal(char * buffer)
               b.Write((char *)&ui8, sizeof(uint8));
               // 2 byte data
               i16 = (int16)object->Integer;
-              convert_endian(i16);
+              i16 = convert_endian(i16);
               b.Write((char *)&i16, sizeof(int16));
               break;
             case attribute::tag_uint16:
               // 2 byte name length (little endian)
               ui16 = strlen(iter.GetKey());
-              convert_endian(ui16);
+              ui16 = convert_endian(ui16);
               b.Write((char *)&ui16, sizeof(int16));
               // XX byte name
               b.Write(iter.GetKey(), ui16);
@@ -1165,13 +1165,13 @@ bool csEvent::FlattenCrystal(char * buffer)
               b.Write((char *)&ui8, sizeof(uint8));
               // 2 byte data (little endian)
               ui16 = (uint16)object->Unsigned;
-              convert_endian(ui16);
+              ui16 = convert_endian(ui16);
               b.Write((char *)&ui16, sizeof(uint16));
               break;
             case attribute::tag_int32:
               // 2 byte name length (little endian)
               ui16 = strlen(iter.GetKey());
-              convert_endian(ui16);
+              ui16 = convert_endian(ui16);
               b.Write((char *)&ui16, sizeof(int16));
               // XX byte name
               b.Write(iter.GetKey(), ui16);
@@ -1180,13 +1180,13 @@ bool csEvent::FlattenCrystal(char * buffer)
               b.Write((char *)&ui8, sizeof(uint8));
               // 4 byte data
               i32 = (int32)object->Integer;
-              convert_endian(i32);
+              i32 = convert_endian(i32);
               b.Write((char *)&i32, sizeof(int32));
               break;
             case attribute::tag_uint32:
               // 2 byte name length (little endian)
               ui16 = strlen(iter.GetKey());
-              convert_endian(ui16);
+              ui16 = convert_endian(ui16);
               b.Write((char *)&ui16, sizeof(int16));
               // XX byte name
               b.Write(iter.GetKey(), ui16);
@@ -1195,13 +1195,13 @@ bool csEvent::FlattenCrystal(char * buffer)
               b.Write((char *)&ui8, sizeof(uint8));
               // 4 byte data (little endian)
               ui32 = (uint32)object->Unsigned;
-              convert_endian(ui32);
+              ui32 = convert_endian(ui32);
               b.Write((char *)&ui32, sizeof(uint32));
               break;
             case attribute::tag_int64:
               // 2 byte name length (little endian)
               ui16 = strlen(iter.GetKey());
-              convert_endian(ui16);
+              ui16 = convert_endian(ui16);
               b.Write((char *)&ui16, sizeof(int16));
               // XX byte name
               b.Write(iter.GetKey(), ui16);
@@ -1210,13 +1210,13 @@ bool csEvent::FlattenCrystal(char * buffer)
               b.Write((char *)&ui8, sizeof(uint8));
               // 4 byte data
               i64 = (int64)object->Integer;
-              convert_endian(i64);
+              i64 = convert_endian(i64);
               b.Write((char *)&i64, sizeof(int64));
               break;
             case attribute::tag_uint64:
               // 2 byte name length (little endian)
               ui16 = strlen(iter.GetKey());
-              convert_endian(ui16);
+              ui16 = convert_endian(ui16);
               b.Write((char *)&ui16, sizeof(int16));
               // XX byte name
               b.Write(iter.GetKey(), ui16);
@@ -1225,13 +1225,13 @@ bool csEvent::FlattenCrystal(char * buffer)
               b.Write((char *)&ui8, sizeof(uint8));
               // 4 byte data (little endian)
               ui64 = (uint64)object->Unsigned;
-              convert_endian(ui64);
+              ui64 = convert_endian(ui64);
               b.Write((char *)&ui64, sizeof(uint64));
               break;
             case attribute::tag_float:
               // 2 byte name length (little endian)
               ui16 = strlen(iter.GetKey());
-              convert_endian(ui16);
+              ui16 = convert_endian(ui16);
               b.Write((char *)&ui16, sizeof(int16));
               // XX byte name
               b.Write(iter.GetKey(), ui16);
@@ -1246,7 +1246,7 @@ bool csEvent::FlattenCrystal(char * buffer)
             case attribute::tag_double:
               // 2 byte name length (little endian)
               ui16 = strlen(iter.GetKey());
-              convert_endian(ui16);
+              ui16 = convert_endian(ui16);
               b.Write((char *)&ui16, sizeof(int16));
               // XX byte name
               b.Write(iter.GetKey(), ui16);
@@ -1274,7 +1274,7 @@ bool csEvent::Unflatten(const char *buffer, uint32 length)
   uint32 v;
   
   b.Read((char *)&v, sizeof(uint32));
-  convert_endian(v);
+  v = convert_endian(v);
   switch (v)
   {
     case CS_CRYSTAL_PROTOCOL:
@@ -1303,9 +1303,8 @@ bool csEvent::UnflattenCrystal(const char *buffer, uint32 length)
   double d;
   char *name;
 
-  uint8 *i_buffer = (uint8*)buffer;
   b.Read((char *)&ui32, sizeof(ui32));
-  convert_endian(ui32);
+  ui32 = convert_endian(ui32);
   if (ui32 != CS_CRYSTAL_PROTOCOL)
   {
     //printf("protocol version invalid: %X\n", ui32);
@@ -1333,7 +1332,7 @@ bool csEvent::UnflattenCrystal(const char *buffer, uint32 length)
   while (!b.AtEOF())
   {
     b.Read((char *)&ui16, sizeof(uint16));
-    convert_endian(ui16);
+    ui16 = convert_endian(ui16);
     name = new char[ui16+1];
     b.Read(name, ui16);
     name[ui16] = 0;
@@ -1351,32 +1350,32 @@ bool csEvent::UnflattenCrystal(const char *buffer, uint32 length)
         break;
       case CS_DATATYPE_INT16:
         b.Read((char *)&i16, sizeof(int16));
-        convert_endian(i16);
+        i16 = convert_endian(i16);
         Add(name, i16);
         break;
       case CS_DATATYPE_UINT16:
         b.Read((char *)&ui16, sizeof(uint16));
-        convert_endian(ui16);
+        ui16 = convert_endian(ui16);
         Add(name, ui16);
         break;
       case CS_DATATYPE_INT32:
         b.Read((char *)&i32, sizeof(int32));
-        convert_endian(i32);
+        i32 = convert_endian(i32);
         Add(name, i32);
         break;
       case CS_DATATYPE_UINT32:
         b.Read((char *)&ui32, sizeof(uint32));
-        convert_endian(ui32);
+        ui32 = convert_endian(ui32);
         Add(name, ui32);
         break;
       case CS_DATATYPE_INT64:
         b.Read((char *)&i64, sizeof(int64));
-        convert_endian(i64);
+        i64 = convert_endian(i64);
         Add(name, i64);
         break;
       case CS_DATATYPE_UINT64:
         b.Read((char *)&ui64, sizeof(uint64));
-        convert_endian(ui64);
+        ui64 = convert_endian(ui64);
         Add(name, ui64);
         break;
       case CS_DATATYPE_FLOAT:
@@ -1396,7 +1395,7 @@ bool csEvent::UnflattenCrystal(const char *buffer, uint32 length)
       case CS_DATATYPE_STRING: 
         {
           b.Read((char *)&ui32, sizeof(uint32));
-          convert_endian(ui32);
+          ui32 = convert_endian(ui32);
           char *str = new char[ui32+1];
           b.Read(str, ui32);
           str[ui32]=0; // null terminate
@@ -1406,7 +1405,7 @@ bool csEvent::UnflattenCrystal(const char *buffer, uint32 length)
       case CS_DATATYPE_DATABUFFER:
         {
           b.Read((char *)&ui32, sizeof(uint32));
-          convert_endian(ui32);
+          ui32 = convert_endian(ui32);
           char *data = new char[ui32];
           b.Read(data, ui32);
           Add(name, data);
@@ -1415,7 +1414,7 @@ bool csEvent::UnflattenCrystal(const char *buffer, uint32 length)
       case CS_DATATYPE_EVENT:
         {
           b.Read((char *)&ui32, sizeof(uint32));
-          convert_endian(ui32);
+          ui32 = convert_endian(ui32);
           csPoolEvent *me = STATIC_CAST(csPoolEvent *, this);
           if (me)
           {
@@ -1458,6 +1457,7 @@ csPoolEvent::csPoolEvent(csEventQueue *q)
  
 void csPoolEvent::DecRef() 
 {
+  //printf("csPoolEvent::DecRef() - ref count = %d\n", scfRefCount);
   if (scfRefCount == 1) 
   {
     // while this should never happen, this will prevent a seg fault if some 
