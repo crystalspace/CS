@@ -96,7 +96,7 @@ unsigned char *csXExtSHM::CreateMemory (int Width, int Height)
   if (!xim)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "XShmCreateImage failed!");
-    return false;
+    return NULL;
   }
   shm_image = *xim;
   shmi.shmid = shmget (IPC_PRIVATE, xim->bytes_per_line*xim->height,
@@ -104,13 +104,13 @@ unsigned char *csXExtSHM::CreateMemory (int Width, int Height)
   if (shmi.shmid == -1)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "shmget failed!");
-    return false;
+    return NULL;
   }
   shmi.shmaddr = (char*)shmat (shmi.shmid, 0, 0);
   if (shmi.shmaddr == (char*) -1)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "shmat failed!");
-    return false;
+    return NULL;
   }
   shmi.readOnly = FALSE;
   XShmAttach (dpy, &shmi);
