@@ -18,20 +18,10 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __ICSOS2_H__
-#define __ICSOS2_H__
+#ifndef __SCANCODE_H__
+#define __SCANCODE_H__
 
-#include "csutil/scf.h"
+// This array can be used to translate scancodes into Crystal Space codes
+extern unsigned short ScanCodeToChar [128];
 
-SCF_VERSION (iOS2SystemDriver, 0, 0, 1);
-
-struct iOS2SystemDriver : public iBase
-{
-  /// Get user settings
-  virtual void GetExtSettings (int &oWindowX, int &oWindowY,
-    int &oWindowWidth, int &oWindowHeight, bool &oHardwareCursor) = 0;
-  /// Put a keyboard event into event queue
-  virtual void KeyboardEvent (int ScanCode, bool Down) = 0;
-};
-
-#endif // __ICSOS2_H__
+#endif // __SCANCODE_H__

@@ -1,8 +1,5 @@
 /*
-    DOS support for Crystal Space 3D library
-    Copyright (C) 1998 by Jorrit Tyberghein
-    Written by David N. Arnold <derek_arnold@fuse.net>
-    Written by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 2000 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -19,17 +16,24 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IDJGPP_H__
-#define __IDJGPP_H__
+#ifndef __OS2_KEYS_H__
+#define __OS2_KEYS_H__
 
-#include "csutil/scf.h"
+// These scancodes are valid only in OS/2
+#define SCANCODE_GRAYENTER  0x5A
+#define SCANCODE_RCTRL      0x5B
+#define SCANCODE_PRINTSCR   0x5D
+#define SCANCODE_RALT       0x5E
+#define SCANCODE_GRAYHOME   0x60
+#define SCANCODE_GRAYUP     0x61
+#define SCANCODE_GRAYPGUP   0x62
+#define SCANCODE_GRAYLEFT   0x63
+#define SCANCODE_GRAYRIGHT  0x64
+#define SCANCODE_GRAYEND    0x65
+#define SCANCODE_GRAYDOWN   0x66
+#define SCANCODE_GRAYPGDN   0x67
+#define SCANCODE_GRAYINS    0x68
+#define SCANCODE_GRAYDEL    0x69
+#define SCANCODE_GRAYSLASH  0x6f
 
-SCF_VERSION (iDosSystemDriver, 0, 0, 1);
-
-struct iDosSystemDriver : public iBase
-{
-  /// Set mouse position since mouse driver is part of system driver
-  virtual bool SetMousePosition (int x, int y) = 0;
-};
-
-#endif // __IDJGPP_H__
+#endif // __OS2_KEYS_H__
