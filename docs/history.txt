@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+31-May-2001
+	- Wyatt Miler did a fix so MacOS/X builds again.
 30-May-2001
 	- Completely removed Crystal Clear from CS. It is now obsolete
 	  and no longer maintained. This removal was done with the permission
@@ -47,6 +49,8 @@ The history order is reversed so that new features are at the top.
 	      existing makefile statements.
 	- Eric Sunshine eliminated a compilation warning in csloader.h
 	  regarding `texh' possibly being used uninitialized.
+	- Michael Voasse added accessor functions to iCameraPosition for
+	  sector, position upward vector and forward vector.
 	- Eric Sunshine added a test to CS/bin/comptest.sh to determine if the
 	  compiler is able to understand CS/include/qsqrt.h.  If the compiler
 	  is unable to deal with this file, then the CS_NO_QSQRT flag is set in
@@ -74,6 +78,20 @@ The history order is reversed so that new features are at the top.
 	    - Updated Robert Bate's email address in several locations.
 	    - Updated out-of-date URLs in the MacOS/X, OpenStep, NextStep
 	      documentation.
+	- Philip Wyett fixed a compile error in externally created MSVC
+	  projects.
+	  This error took the form of "CS_VERSION" and "CS_VERSION_DATE"
+	  being thrown back as undeclared identifiers, even though the header
+	  in which they are contained "version.h" was being included. To
+	  fix this I renamed the file to "csversion.h", to eliminate this
+	  internal MSVC conflict.
+	- Martin Geisse applied a change to Norman's fix (regarding the
+	  assignment of -1 to the unsigned variable scfID_?). The correct
+	  value IS -1, not 0. -1 represents an invalid value, while 0 is the
+	  first valid value. The correct term is therefore (uint32)-1.
+	- Added some asserts in iso plugin in an effort to find a bug in
+	  iso+OpenGL.
+	- Michael Voasse added csversion.h to cswsaux.h and sequence.cpp.
 29-May-2001
 	- Michael Voasse added accessor functions to iCameraPosition for
 	  sector, position upward vector and forward vector.
