@@ -267,7 +267,9 @@ static bool output_heightmap (const char *fname, iImage *ifile)
   int px [3][3];
 
   // Initialized to stop MSVC 5/6/7 whining.
-  px [0][0] = px [0][1] = px [0][2] = px [1][0] = px [1][1] = px [1][2] = 0;
+  px [0][0] = px [1][0] = px [1][0] = px [2][0] =
+    px [0][1] = px [1][1] = px [1][1] = px [2][1] =
+    px [0][2] = px [1][2] = px [1][2] = px [2][2] = 0;
 
   for (y = 0; y < h; y++)
   {
