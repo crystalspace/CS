@@ -337,14 +337,14 @@ enum
   cscmdFocusChanged,
 
   /**
-   * This event is broadcasted to all plugins inside csSystemDriver::Open
-   * right after all drivers were initialized and opened.
+   * This event is broadcasted to all event listeners just after all modules
+   * have been initialized.
    */
   cscmdSystemOpen,
 
   /**
-   * This event is broadcasted to all plugins inside csSystemDriver::Close
-   * right before starting to close all drivers.
+   * This event is broadcasted to all event listeners just before modules are
+   * about to be shutdown and unloaded (that is, the system is shutting down).
    */
   cscmdSystemClose,
 

@@ -106,7 +106,7 @@ char* csExpandPath (const char* path)
   char fullName[MAX_PATH];
   GetFullPathName (path, sizeof(fullName), fullName, 0);
 
-  DWORD result;
+  DWORD result = 0;
   PFNGETLONGPATHNAMEA GetLongPathName = 0;
   // unfortunately, GetLongPathName() is only supported on Win98+/W2k+
   HMODULE hKernel32 = LoadLibrary ("kernel32.dll");

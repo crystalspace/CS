@@ -19,9 +19,7 @@
 #define CS_SYSDEF_PROVIDE_DIR
 #include "cssysdef.h"
 #include "cssys/csshlib.h"
-#include "cssys/sysdriv.h"
 #include "cssys/sysfunc.h"
-#include "cssys/system.h"
 #include "cstool/initapp.h"
 #include "csutil/cfgacc.h"
 #include "csutil/cfgfile.h"
@@ -71,9 +69,7 @@
 #define CS_LOAD_LIB_VERBOSE false
 #endif
 
-static SysSystemDriver* global_sys = 0;
 static bool config_done = false;
-static bool sys_init_done = false;
 static iEventHandler* installed_event_handler = 0;
 
 iObjectRegistry* csInitializer::CreateEnvironment (
@@ -111,9 +107,7 @@ bool csInitializer::InitializeSCF (int argc, const char* const argv[])
 
 iObjectRegistry* csInitializer::CreateObjectRegistry ()
 {
-  csObjectRegistry* r = new csObjectRegistry ();
-  global_sys = new SysSystemDriver (r);
-  return r;
+  return new csObjectRegistry ();
 }
 
 iPluginManager* csInitializer::CreatePluginManager (iObjectRegistry* r)
@@ -335,18 +329,12 @@ bool csInitializer::OpenApplication (iObjectRegistry* r)
 {
   SetupConfigManager (r, 0);
 
-  // @@@ Temporary.
-  if (!sys_init_done)
-  {
-    if (!global_sys->Initialize ()) return false;
-    sys_init_done = true;
-  }
-
   // Pass the open event to all interested listeners.
   csEvent Event (csGetTicks (), csevBroadcast, cscmdSystemOpen);
   csRef<iEventQueue> EventQueue (CS_QUERY_REGISTRY (r, iEventQueue));
   CS_ASSERT (EventQueue != 0);
   EventQueue->Dispatch (Event);
+
   return true;
 }
 
@@ -374,11 +362,6 @@ void csInitializer::DestroyApplication (iObjectRegistry* r)
     if (q)
       q->RemoveAllListeners ();
   }
-
-  // @@@ A throwback to an earlier time.  Remove this once we eliminate the
-  // old csSystemDriver cruft entirely.
-  delete global_sys;
-  global_sys = 0;
 
   // Explicitly unload all plugins from the plugin manager because
   // some plugins hold references to the plugin manager so the plugin

@@ -23,8 +23,10 @@
 #include "cssys/win32/win32.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/event.h"
+#include "iutil/eventh.h"
 #include "iutil/eventq.h"
 #include "iutil/cmdline.h"
+#include "iutil/objreg.h"
 #include "ivideo/natwin.h"
 #include "ivideo/cursor.h"
 #include <stdarg.h>
@@ -218,7 +220,7 @@ DWORD WINAPI s_threadroutine (LPVOID param)
     MessageBox (0, "CreateEvent() Failed!", 0, MB_OK|MB_ICONERROR);
     ExitProcess (1);
   }
-  if (!DuplicateHandle (GetCurrentProcess(), ((SysSystemDriver*)System)->m_hEvent,
+  if (!DuplicateHandle (GetCurrentProcess(), GLOBAL_ASSISTANT->GetEventHandle(),
                         GetCurrentProcess (), &hEvent [1], 0, FALSE, DUPLICATE_SAME_ACCESS))
   {
     MessageBox (0, "DuplicateEvent() Failed!", 0, MB_OK|MB_ICONERROR);
@@ -458,6 +460,9 @@ public:
   void AlertV (HWND window, int type, const char* title, 
     const char* okMsg, const char* msg, va_list args);
   virtual HWND GetApplicationWindow();
+#ifdef DO_DINPUT_KEYBOARD
+  virtual HANDLE GetEventHandle();
+#endif
 };
 
 static Win32Assistant* GLOBAL_ASSISTANT = 0;
@@ -1200,3 +1205,10 @@ HWND Win32Assistant::GetApplicationWindow()
 {
   return ApplicationWnd;
 }
+
+#ifdef DO_DINPUT_KEYBOARD
+HANDLE Win32Assistant::GetEventHandle()
+{
+  return m_hEvent;
+}
+#endif

@@ -707,14 +707,11 @@ The simplest possible application should do the following:
 
 @itemize @bullet
 @item
-Create and initialize a system driver object.
-@item
-Create and initialize an application object (@samp{csApp}) based on the
-system driver.
+Start up the typical facilities required by a @sc{csws} application.
 @item
 Run the application; meaning run the main event processing loop.
 @item
-Finish the application; that is, delete the object.
+Finish the application; that is, shut down.
 @end itemize
 
 @noindent
@@ -725,15 +722,22 @@ Let's try:
 
 int main(int argc, char const* const argv[])
 @{
-  SysSystemDriver sys;
-  if (!sys.Initialize(argc, argv, "/config/cswstest,cfg"))
-    return -1;
-  if (!sys.Open("Crystal Space Windowing System"))
+  iObjectRegistry* object_reg =
+    csInitializer::CreateEnvironment (argc, argv);
+  if (!object_reg) return -1;
+
+  if (!csInitializer::SetupConfigManager (object_reg,
+    "/config/cswstest.cfg")) return -1;
+
+  if (!csInitializer::RequestPlugins (object_reg, CS_REQUEST_END))
     return -1;
 
-  csApp app(&sys);
-  if (app.Initialize("/csws/csws.cfg"))
-    app.Loop();
+  csApp* app = new csApp(object_reg);
+  if (app.Initialize())
+    csDefaultRunLoop(object_reg);
+
+  delete app;
+  csInitializer::DestroyApplication (object_reg);
 @}
 @end example
 
@@ -742,37 +746,46 @@ a mouse and nothing more.  What the program does is:
 
 @itemize @bullet
 @item
-First of all, it creates the system driver object.  You can provide a
-configuration file which contains the list of all plugins to be loaded, in
-addition to other things.  You can use the @file{cswstest.cfg} file as a
-template.  You can also pass @samp{0} as the file name, in which case you
-will have to manually tell to the system driver which plug-ins to load (via the
-@code{iSystem::RequestPlugin()} method).
+First of all, it sets up an environment which hosts the Crystal Space and
+@sc{csws} facilities.  These are all referenced by the object registry which
+is returned from @code{CreateEnvironment()}.
+
+@item
+The configuration facility is then set up and instructed to use a particular
+configuration file for this application.  The configuration file which contains
+the list of all plugins to be loaded, in addition to other things, such as
+which textures to use for windowing system components; where on the textures
+the respective pictures are placed; and other skin-dependent information.  You
+can use the @file{cswstest.cfg} file as a template.  You can also pass @samp{0}
+as the file name, in which case you will have to manually tell to the plugin
+manager which plug-ins to load (via the @code{csInitializer::RequestPlugin()}
+method).  In our case, since we used a configuration file, we do not have to
+ask for any additional plugins in the call to @code{RequestPlugin()}, since it
+will load all of the ones mentioned by the configuration file.
 
 @item
 Second, it creates a @samp{csApp} object called @samp{app}.  To initialize the
-application you pass a pointer to the system driver object.
+application you pass a pointer to the object registry.
 
 @item
-The next step is to call @code{csApp::Initialize()}.  You pass the name of the
-@sc{csws} configuration file (which is different from system configuration
-file).  This configuration file tells @sc{csws} which textures to use for
-windowing system components; where on the textures the respective pictures are
-placed; and other skin-dependent information.  You may want to override this
-method to initialize your application here (after calling the parent's
+The next step is to call @code{csApp::Initialize()}.  You may want to override
+this method to initialize your application here (after calling the parent's
 @code{Initialize()}).  For instance, create a popup menu, insert it onto the
-desktop, add some windows, check configuration files, etc.
+desktop, add some windows, etc.
 
 @item
 And finally we run the main application loop.  The event consuming loop does
 the following.  While there are events in input queue it read an event and
-passes it to @code{HandleEvent()}.  If there weren't any events in the loop,
-it calls @code{Idle()} method to give some time slices to other running
-applications (if @code{csSystemDriver::Sleep()} method is implemented
-properly).  If some window needs redrawing, it is redrawn.  After this the
+dispatches it to interested listeners.  If there were not any events in the
+loop, it calls @code{Idle()} method to give some time slices to other running
+applications.  If some window needs redrawing, it is redrawn.  After this the
 screen is updated and everything starts again from the beginning.
 @end itemize
 
-If you observe, the above program does not delete the @samp{SysSystemDriver}
-or @samp{csApp} objects. That's because they are automatic variables and not
-pointers, so they are automatically deleted when they go out of scope.
+If you observe, the above program allocates the @samp{csApp} object on the
+heap, rather than on the stack as an automatic variable.  This is done so that
+we can manually destroy that object before @code{DestroyApplication()} is
+called.  This is important, because no Crystal Space or @sc{csws} functionality
+should be invoked after @code{DestroyApplication()} has been called.  By
+destroying @code{csApp} first, we ensure that code in its destructor is invoked
+early enough.

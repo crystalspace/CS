@@ -55,13 +55,4 @@ struct iWin32Assistant : public iBase
   virtual HWND GetApplicationWindow() = 0;
 };
 
-// @@@ Delete everything below when the system driver is removed.
-#include "cssys/system.h"
-struct iObjectRegistry;
-class SysSystemDriver : public csSystemDriver
-{
-public:
-  SysSystemDriver(iObjectRegistry* r) : csSystemDriver(r) {}
-};
-
 #endif // __CS_WIN32_H__

@@ -47,7 +47,6 @@ case * :		# posix/unix/linux mode
 		resdir.cpp
 		runloop.cpp 
 		scanplugins.cpp
-		sysinit.cpp
 		sysroot.cpp ;
 }
 

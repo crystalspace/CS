@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 2003 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,36 +16,36 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <unistd.h>
-#include <signal.h>
-#include <string.h>
 #include "cssysdef.h"
-#include "cssys/unix/unix.h"
+#include "cssys/sysfunc.h"
 
-// Put an #ifndef OS_XXX around this if your system does not support locale.
-// In a long-term perspective, if we find such a system, we should add the
-// detection of locale to unixconf.sh
-#define I18N
+// Undefine this if your system does not support locale.  In a long-run, if we
+// find such a platform, we should add the detection of locale to the configure
+// script.
+#define CS_USE_I18N
 
-#ifdef I18N
-#  include <locale.h>
+#ifdef CS_USE_I18N
+#include <locale.h>
 #endif
 
-//------------------------------------------------------ The System driver ---//
-
-SysSystemDriver::SysSystemDriver (iObjectRegistry* object_reg)
-	: csSystemDriver (object_reg)
+bool csPlatformStartup (iObjectRegistry*)
 {
-#ifdef I18N
-  // Never do "LC_ALL" because this will break some things like numeric format
+#ifdef CS_USE_I18N
+  // Never do "LC_ALL" because it would break things such as numeric format.
   setlocale (LC_COLLATE, "");
   setlocale (LC_CTYPE, "");
   setlocale (LC_MESSAGES, "");
   setlocale (LC_TIME, "");
 #endif
+  return true;
+}
+
+bool csPlatformShutdown(iObjectRegistry*)
+{
+  return true;
 }
 
 void csSleep (int SleepTime)

@@ -63,12 +63,10 @@
 
 // CS Sys
 #ifndef NO_CSSYS
-#include "cssys/sysdriv.h"
 #include "cssys/csendian.h"
 #include "cssys/csshlib.h"
 #include "cssys/getopt.h"
 #include "cssys/sysfunc.h"
-#include "cssys/system.h"
 #include "cssys/sockets.h"
 #endif
 
