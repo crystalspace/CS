@@ -24,13 +24,18 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csutil/parser.h"
+#include "csutil/strhash.h"
 
+class csVector3;
+class csQuaternion;
 struct iEngine;
 struct iObjectRegistry;
 struct iVFS;
 struct iMotionManager;
 struct iMotionTemplate;
 struct iLoaderContext;
+struct iObjectRegistry;
+struct iSyntaxService;
 
 /**
  * Motion Loader.
@@ -41,28 +46,32 @@ private:
   iObjectRegistry *object_reg;
   iVFS *vfs;
   iMotionManager *motman;
+  iSyntaxService *synldr;
+  csStringHash xmltokens;
+
+  bool load_transform (iDocumentNode* node, csVector3 &v, csQuaternion &q,
+  	float& time);
 
 public:
   SCF_DECLARE_IBASE;
 
   bool LoadBone (csParser* parser, iMotionTemplate* mot, int bone, char* buf);
+  bool LoadBone (iDocumentNode* node, iMotionTemplate* mot, int bone);
 
   iMotionTemplate* LoadMotion ( const char *fname );
   bool LoadMotion (csParser* parser, iMotionTemplate *mot, char *buf );
+  bool LoadMotion (iDocumentNode* node, iMotionTemplate *mot);
 
   /// Constructor
   csMotionLoader (iBase *);
   virtual ~csMotionLoader();
   virtual bool Initialize( iObjectRegistry *object_reg);
   virtual iBase* Parse (const char* string, 
-    iLoaderContext* ldr_context, iBase *context );
+    iLoaderContext* ldr_context, iBase *context);
 
   /// Parse a given node and return a new object for it.
   virtual iBase* Parse (iDocumentNode* node,
-    iLoaderContext* ldr_context, iBase* context)
-  {
-    return NULL;
-  }
+    iLoaderContext* ldr_context, iBase* context);
 
   void Report (int severity, const char* msg, ...);
 

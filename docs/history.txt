@@ -2,6 +2,10 @@ The history order is reversed so that new features are at the top.
 
 2-Sep-2002
 	- A bad XML token again results in an error as it should.
+	- Converted motion loader so that it loads XML too. The support
+	  for 'file' is removed since that is already supported by
+	  'addon' in the main loader.
+	- Added support for 'EULER' (motion loader) in cs2xml.
 1-Sep-2002
 	- Eric Sunshine changed csVFS::MountRoot() so that it normalizes each
 	  physical path it mounts so that the path ends with only a single

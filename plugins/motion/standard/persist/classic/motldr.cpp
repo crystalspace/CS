@@ -26,8 +26,10 @@
 #include "iutil/comp.h"
 #include "iutil/databuff.h"
 #include "iutil/objreg.h"
+#include "iutil/document.h"
 #include "ivaria/reporter.h"
 #include "imap/ldrctxt.h"
+#include "imap/services.h"
 
 #include "csgeom/transfrm.h"
 #include "csgeom/quaterni.h"
@@ -61,6 +63,22 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF(SCALE_Z)
   CS_TOKEN_DEF(SCALE)
 CS_TOKEN_DEF_END
+
+enum
+{
+  XMLTOKEN_BONE = 1,
+  XMLTOKEN_FILE,
+  XMLTOKEN_FRAME,
+  XMLTOKEN_DURATION,
+  XMLTOKEN_IDENTITY,
+  XMLTOKEN_LOOP,
+  XMLTOKEN_LOOPCOUNT,
+  XMLTOKEN_LOOPFLIP,
+  XMLTOKEN_MOTION,
+  XMLTOKEN_POS,
+  XMLTOKEN_ROT,
+  XMLTOKEN_TIME
+};
 
 SCF_IMPLEMENT_IBASE (csMotionLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
@@ -99,8 +117,9 @@ csMotionLoader::csMotionLoader(iBase *iParent)
 
 csMotionLoader::~csMotionLoader()
 {
-  vfs->DecRef();
-  motman->DecRef();
+  if (vfs) vfs->DecRef ();
+  if (motman) motman->DecRef ();
+  if (synldr) synldr->DecRef ();
 }
 
 bool csMotionLoader::Initialize (iObjectRegistry* object_reg)
@@ -110,16 +129,35 @@ bool csMotionLoader::Initialize (iObjectRegistry* object_reg)
   vfs = CS_QUERY_REGISTRY (object_reg, iVFS );
   if (!vfs)
   {
-	printf("Motion Loader: Virtual file system not loaded.. aborting\n");
-	return false;
+    Report (CS_REPORTER_SEVERITY_ERROR, "VFS not found!");
+    return false;
   }
   motman = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	"crystalspace.motion.manager.default", iMotionManager);
   if (!motman)
   {
-	printf("Motion Loader: Motion manager not loaded... aborting\n");
-	return false;
+    Report (CS_REPORTER_SEVERITY_ERROR, "Motion manager not found!");
+    return false;
   }
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  if (!synldr)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Syntax services not found!");
+    return false;
+  }
+
+  xmltokens.Register ("bone", XMLTOKEN_BONE);
+  xmltokens.Register ("file", XMLTOKEN_FILE);
+  xmltokens.Register ("frame", XMLTOKEN_FRAME);
+  xmltokens.Register ("duration", XMLTOKEN_DURATION);
+  xmltokens.Register ("identity", XMLTOKEN_IDENTITY);
+  xmltokens.Register ("loop", XMLTOKEN_LOOP);
+  xmltokens.Register ("loopcount", XMLTOKEN_LOOPCOUNT);
+  xmltokens.Register ("loopflip", XMLTOKEN_LOOPFLIP);
+  xmltokens.Register ("motion", XMLTOKEN_MOTION);
+  xmltokens.Register ("pos", XMLTOKEN_POS);
+  xmltokens.Register ("rot", XMLTOKEN_ROT);
+  xmltokens.Register ("time", XMLTOKEN_TIME);
   return true;
 }
 
@@ -358,6 +396,60 @@ bool load_transform (csParser* parser, char* buf, csVector3 &v, csQuaternion &q)
   return true;
 }
 
+bool csMotionLoader::load_transform (iDocumentNode* node, csVector3 &v,
+	csQuaternion &q, float& time)
+{
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_TIME:
+        time = child->GetContentsValueAsFloat ();
+	break;
+      case XMLTOKEN_POS:
+        if (!synldr->ParseVector (child, v))
+	  return false;
+        break;
+      case XMLTOKEN_ROT:
+        {
+	  csRef<iDocumentNode> quatnode = child->GetNode ("q");
+	  if (quatnode)
+	  {
+	    q.x = quatnode->GetAttributeValueAsFloat ("x");
+	    q.y = quatnode->GetAttributeValueAsFloat ("y");
+	    q.z = quatnode->GetAttributeValueAsFloat ("z");
+	    q.r = quatnode->GetAttributeValueAsFloat ("r");
+	  }
+	  csRef<iDocumentNode> matnode = child->GetNode ("matrix");
+	  if (matnode)
+	  {
+	    csMatrix3 m;
+	    if (!synldr->ParseMatrix (matnode, m))
+	      return false;
+	    //q.Set (m);
+	  }
+	  csRef<iDocumentNode> eulernode = child->GetNode ("euler");
+	  if (eulernode)
+	  {
+            csVector3 euler;
+	    if (!synldr->ParseVector (eulernode, euler))
+	      return false;
+            q.SetWithEuler (euler);
+	  }
+	}
+	break;
+      default:
+        synldr->ReportBadToken (child);
+        return false;
+    }
+  }
+  return true;
+}
 
 bool csMotionLoader::LoadBone (csParser* parser, iMotionTemplate* mot, int bone, char* buf)
 {
@@ -384,7 +476,7 @@ bool csMotionLoader::LoadBone (csParser* parser, iMotionTemplate* mot, int bone,
         csScanStr(name, "%f", &frametime);
         csVector3 v(0,0,0);
         csQuaternion q(1,0,0,0);
-        load_transform(parser, params, v, q);
+        ::load_transform(parser, params, v, q);
         mot->AddFrameBone(bone, frametime, v, q);
         break;
       }
@@ -395,6 +487,35 @@ bool csMotionLoader::LoadBone (csParser* parser, iMotionTemplate* mot, int bone,
     Report (CS_REPORTER_SEVERITY_ERROR, "Token '%s' not found while parsing the a sprite template!",
         parser->GetLastOffender ());
     return false;
+  }
+  return true;
+}
+
+bool csMotionLoader::LoadBone (iDocumentNode* node, iMotionTemplate* mot,
+	int bone)
+{
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_FRAME:
+        {
+          float frametime = 1;
+          csVector3 v (0,0,0);
+          csQuaternion q (1,0,0,0);
+          load_transform (child, v, q, frametime);
+          mot->AddFrameBone (bone, frametime, v, q);
+        }
+        break;
+      default:
+        synldr->ReportBadToken (child);
+	return false;
+    }
   }
   return true;
 }
@@ -464,6 +585,64 @@ bool csMotionLoader::LoadMotion (csParser* parser, iMotionTemplate* mot, char* b
   return true;
 }
 
+bool csMotionLoader::LoadMotion (iDocumentNode* node, iMotionTemplate* mot)
+{
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_DURATION:
+        {
+	  csRef<iDocumentNodeIterator> child_it = child->GetNodes ();
+	  while (child_it->HasNext ())
+	  {
+	    csRef<iDocumentNode> childchild = child_it->Next ();
+	    if (childchild->GetType () != CS_NODE_ELEMENT) continue;
+	    const char* child_value = childchild->GetValue ();
+	    csStringID child_id = xmltokens.Request (child_value);
+	    switch (child_id)
+	    {
+	      case XMLTOKEN_TIME:
+		mot->SetDuration (childchild->GetContentsValueAsFloat ());
+		break;
+	      case XMLTOKEN_LOOP:
+                mot->SetLoopCount (-1);
+                break;
+	      case XMLTOKEN_LOOPFLIP:
+		mot->SetLoopFlip (1);
+		break;
+              case XMLTOKEN_LOOPCOUNT:
+	        {
+		  int loopcount = childchild->GetAttributeValueAsInt ("count");
+                  mot->SetLoopCount (loopcount);
+                }
+                break;
+	      default:
+	        synldr->ReportBadToken (childchild);
+		return false;
+	    }
+          }
+        }
+        break;
+      case XMLTOKEN_BONE:
+        {
+          int bone = mot->AddBone (child->GetAttributeValue ("name"));
+          LoadBone (child, mot, bone);
+        }
+        break;
+      default:
+	synldr->ReportBadToken (child);
+	return false;
+    }
+  }
+  return true;
+}
+
 
 iBase* csMotionLoader::Parse (const char *string, iLoaderContext* ldr_context,
 	iBase* /* context */ )
@@ -521,6 +700,38 @@ iBase* csMotionLoader::Parse (const char *string, iLoaderContext* ldr_context,
 	  return NULL;
 	}
 	return this;
+}
+
+iBase* csMotionLoader::Parse (iDocumentNode* node, iLoaderContext* ldr_context,
+	iBase* /* context */ )
+{
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_MOTION:
+        {
+	  const char* motname = child->GetAttributeValue ("name");
+	  iMotionTemplate* m = motman->FindMotionByName (motname);
+	  if (!m)
+	  {
+	    m = motman->AddMotion (motname);
+	    if (!LoadMotion (child, m))
+	      return NULL;
+	  }
+	}
+	break;
+      default:
+        synldr->ReportBadToken (child);
+	return NULL;
+    }
+  }
+  return this;
 }
 
 //=============================================================== Motion Saver
