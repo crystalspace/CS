@@ -31,7 +31,6 @@
 #include "csterr/ddgutil.h"
 #include "csterr/ddghemap.h"
 #include "csterr/ddgnoise.h"
-#include "csterr/ddgerror.h"
 #include "csterr/worditer.h"
 
 #define PGM_MAGIC "P2"
@@ -70,14 +69,12 @@ bool ddgHeightMap::writeTGN(char *filename, unsigned int base, unsigned int scal
 	FILE *fptr = filename && filename[0] ? fopen(filename,"wb") : 0;
 
 	if (!fptr) {
-		ddgErrorSet(FileWrite,(char *) (filename ? filename : "(null)"));
 		goto error;
 	}
 
 	// Header
 	if (fwrite("TERRAGENTERRAIN SIZE",1,20,fptr) < 20)
 	{
-		ddgErrorSet(FileWrite,"Couldn't write header.");
 		goto error;
 	}
 
@@ -94,7 +91,6 @@ bool ddgHeightMap::writeTGN(char *filename, unsigned int base, unsigned int scal
 	// XPTS.
 	if (fwrite("XPTS",1,4,fptr) < 4)
 	{
-		ddgErrorSet(FileWrite,"Couldn't write XPTS.");
 		goto error;
 	}
 
@@ -109,7 +105,6 @@ bool ddgHeightMap::writeTGN(char *filename, unsigned int base, unsigned int scal
 	// YPTS.
 	if (fwrite("YPTS",1,4,fptr) < 4)
 	{
-		ddgErrorSet(FileWrite,"Couldn't write YPTS.");
 		goto error;
 	}
 
@@ -124,7 +119,6 @@ bool ddgHeightMap::writeTGN(char *filename, unsigned int base, unsigned int scal
 	// ALTW.
 	if (fwrite("ALTW",1,4,fptr) < 4)
 	{
-		ddgErrorSet(FileWrite,"Couldn't write ALTW.");
 		goto error;
 	}
 
@@ -164,7 +158,6 @@ bool ddgHeightMap::writeTGN(char *filename, unsigned int base, unsigned int scal
 
 error:
 	fclose(fptr);
-	ddgError::report();
 	return false;
 }
 
@@ -176,8 +169,6 @@ bool ddgHeightMap::readTGN(char *file)
 
 	if (!fptr)
 	{
-		ddgErrorSet(FileRead,(char *) (file ? file : "(null)"));
-		ddgError::report();
 		return true;
 	}
 	unsigned char ch1, ch2;
@@ -191,8 +182,6 @@ bool ddgHeightMap::readTGN(char *file)
 	type[8] = '\0';
 	if (strcmp(name,"TERRAGEN") || strcmp(type,"TERRAIN "))
 	{
-		ddgErrorSet(FileRead,(char *) "File is not a TERRAGEN TERRAIN file");
-		ddgError::report();
 		return true;
 	}
 
@@ -234,8 +223,6 @@ bool ddgHeightMap::readTGN(char *file)
 		}
 		else
 		{
-			ddgErrorSet(FileRead,(char *) "Expected YPTS segment, but it was not found.");
-			ddgError::report();
 			return true;
 		}
 	}
@@ -255,8 +242,6 @@ bool ddgHeightMap::readTGN(char *file)
 	}
 	else
 	{
-		ddgErrorSet(FileRead,(char *) "Expected ALTW segment, but it was not found.");
-		ddgError::report();
 		return true;
 	}
 
@@ -271,13 +256,6 @@ bool ddgHeightMap::readTGN(char *file)
 		if ((cnt = fread(&(_pixbuffer[r*_cols]),2,_cols,fptr)) <
 		(int)_cols)
 		{
-			ddgErrorSet(FileRead,(char *) (file ? file : "(null)"));
-			ddgError::report();
-			if (feof(fptr))
-			{
-				ddgErrorSet(FileAccess,"Reached end of file!");
-				ddgError::report();
-			}
 			fclose(fptr);
 			return true;
 		}
