@@ -351,10 +351,10 @@ public:
   csTicks start, end;
 
 public:
-  csTimedOperation (iSequenceTimedOperation* op, iBase* params) : ref (1)
+  csTimedOperation (iSequenceTimedOperation* iop, iBase* iparams) : ref (1)
   {
-    csTimedOperation::op = op;
-    params = params;
+    op = iop;
+    params = iparams;
   }
   virtual ~csTimedOperation () { }
   iBase* GetParams () { return params; }
@@ -405,9 +405,9 @@ public:
   /// This is set to receive the once per frame nothing event.
   virtual bool HandleEvent (iEvent &event);
 
-  virtual void SetCamera (iCamera* camera)
+  virtual void SetCamera (iCamera* c)
   {
-    csEngineSequenceManager::camera = camera;
+    camera = c;
   }
   virtual iCamera* GetCamera () { return camera; }
   virtual iSequenceManager* GetSequenceManager () { return seqmgr; }
@@ -451,10 +451,10 @@ public:
   private:
     csEngineSequenceManager* parent;
   public:
-    EventHandler (csEngineSequenceManager* parent)
+    EventHandler (csEngineSequenceManager* p)
     {
       SCF_CONSTRUCT_IBASE (NULL);
-      EventHandler::parent = parent;
+      parent = p;
     }
     SCF_DECLARE_IBASE;
     virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
