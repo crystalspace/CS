@@ -26,9 +26,9 @@ PLUGINS+=video/canvas/openglx/empty
 
 # uncomment the following to build Glide stuff
 #GLIDE_VERSIONS=2 3
-PLUGINS+= $(addprefix video/renderer/glide, $(GLIDE_VERSIONS))
 ifneq ($(strip $(GLIDE_VERSIONS)),)
 PLUGINS+=video/canvas/unxglide
+PLUGINS+=video/renderer/glide
 endif
 GLIDE2_PATH=-I/usr/include/glide2
 GLIDE3_PATH=-I/usr/include/glide3
