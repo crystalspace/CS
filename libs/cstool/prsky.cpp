@@ -517,7 +517,6 @@ void csProcSky::DrawToTexture (csProcSkyTexture *skytex, csTicks current_time,
   g3d->SetRenderTarget (skytex->GetTextureWrapper ()->GetTextureHandle (),
   	true);
   if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return;
-  iTextureManager *txtmgr = g3d->GetTextureManager ();
 
   csVector3 texelu = txtu / float(width);
   csVector3 texelv = txtv / float(height);

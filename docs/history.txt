@@ -2,10 +2,10 @@ The history order is reversed so that new features are at the top.
 
 1-Nov-2002
 	- Removed userdata from iMovableListener. It is not needed.
-	- Added new iObjectModelListener so you can listen to changes
-	  in an object model. Implemented this partially in all
-	  iObjectModel implementations (i.e. all mesh objects). The listeners
-	  are not yet fired though.
+	- Added new iObjectModelListener so you can listen to changes in an
+	  object model.  Implemented this partially in all iObjectModel
+	  implementations (i.e.  all mesh objects).  The listeners are not yet
+	  fired though.
 	- Eric Sunshine fixed msvcgen.mak so that it no longer instructs the
 	  user to type "cvs add -kb" when adding MSVC7 project files.  These
 	  are plain text XML files which do not require the -kb flag.  The user
@@ -20,6 +20,7 @@ The history order is reversed so that new features are at the top.
 	  extension).
 	- Eric Sunshine fixed a crasher in csLoader::ParseImposterSettings()
 	  reported by Don Lavelle <dll4@lehigh.edu>.
+	- Eric Sunshine eliminated compilation warnings.
 31-Oct-2002
 	- Optimized frustvis and dynavis by removing some SCF_QUERY_INTERFACE
 	  calls.
