@@ -86,7 +86,7 @@
 #  error "Please specify the compiler in the makefile! (COMP=...)"
 #endif
 
-#if !defined(PROC_INTEL) && !defined(PROC_SPARC) && !defined(PROC_UNKNOWN) && !defined(PROC_POWERPC) && !defined(PROC_M68K) && !defined(PROC_HPPA)
+#if !defined(PROC_INTEL) && !defined(PROC_SPARC) && !defined(PROC_MIPS) && !defined(PROC_UNKNOWN) && !defined(PROC_POWERPC) && !defined(PROC_M68K) && !defined(PROC_HPPA)
 #  error "Please specify the processor in the makefile! (PROC=...)"
 #endif
 
@@ -174,8 +174,8 @@
 #define REINTERPRET_CAST(T) CS_CAST(reinterpret_cast,T)
 #define CONST_CAST(T)       CS_CAST(const_cast,T)
 
-//#define SMALL_Z .01
-#define SMALL_Z .1
+//#define SMALL_Z .1
+#define SMALL_Z .01
 
 // Some useful macros: these should be true at least for 32-bit processors
 #define LONGFROM2SHORT(s1,s2) (((short)s1) << 16 | (((short)s2) & 0xffff))
