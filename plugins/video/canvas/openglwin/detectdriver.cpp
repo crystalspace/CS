@@ -130,6 +130,19 @@ void csDetectDriver::DetermineDriver (const char* monitorName)
       }
     }
   }
+  if (glDllName.IsEmpty() && !screenDriverName.IsEmpty())
+  {
+    if (verbose)
+      csPrintf ("csDetectDriver: maybe DLL '%s' exists\n", 
+      screenDriverName.GetData());
+    HMODULE dllHandle = LoadLibraryExA (screenDriverName, 0, 
+      LOAD_LIBRARY_AS_DATAFILE);
+    if (dllHandle != 0)
+    {
+      FreeLibrary (dllHandle);
+      glDllName = screenDriverName;
+    }
+  }
   if (glDllName.IsEmpty())
   {
     if (verbose)

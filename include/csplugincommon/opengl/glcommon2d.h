@@ -129,6 +129,12 @@ protected:
   /// Driver database
   csGLDriverDatabase driverdb;
   bool useCombineTE;
+  /**
+   * It seems that on certain drivers (NV...) glClear() doesn't always do what
+   * it should. In this case Clear() draws a full screen quad instead of 
+   * using glClear().
+   */
+  bool clearWithBox;
 
   void GetPixelFormatString (const GLPixelFormat& format, csString& str);
 public:

@@ -192,6 +192,7 @@ bool csGraphics2DGLCommon::Open ()
       glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB);
     }
   }
+  clearWithBox = config->GetBool ("Video.OpenGL.ClearScreenWithBox", false);
   
   ext.InitGL_ARB_multisample();
 
@@ -424,10 +425,15 @@ void csGraphics2DGLCommon::Clear (int color)
 {
   ((csGLFontCache*)fontCache)->FlushText ();
 
-  float r, g, b, a;
-  DecomposeColor (color, r, g, b, a);
-  glClearColor (r, g, b, a);
-  glClear (GL_COLOR_BUFFER_BIT);
+  if (clearWithBox)
+    DrawBox (0, 0, Width, Height, color);
+  else
+  {
+    float r, g, b, a;
+    DecomposeColor (color, r, g, b, a);
+    glClearColor (r, g, b, a);
+    glClear (GL_COLOR_BUFFER_BIT);
+  }
 }
 
 void csGraphics2DGLCommon::SetRGB (int i, int r, int g, int b)

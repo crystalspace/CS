@@ -444,6 +444,7 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	    "Material definitions in meshes is not considered good style, "
 	    "if you need to define a mesh and material at the same time use "
 	    "libraries.");
+	  styleReminder = false;
 	}
 #endif
         const char *file = child->GetAttributeValue("file");
