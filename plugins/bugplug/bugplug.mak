@@ -61,9 +61,9 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: bugplug bugplugclean bugplugcleandep
 
-bugplug: $(OUTDLL) $(BUGPLUG)
+bugplug: $(OUTDLL) $(OUT.BUGPLUG) $(BUGPLUG)
 
-$(OUT.BUGPLUG)/%$O: $(OUT.BUGPLUG) $(DIR.BUGPLUG)/%.cpp
+$(OUT.BUGPLUG)/%$O: $(DIR.BUGPLUG)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(BUGPLUG): $(OBJ.BUGPLUG) $(LIB.BUGPLUG)
