@@ -28,11 +28,7 @@
 #include "cssys/unix/iunix.h"
 #endif
 #include "csutil/inifile.h"
-#ifdef GLIDE3
-#include "video/renderer/glide3/gllib3.h"
-#else
-#include "video/renderer/glide2/gllib2.h"
-#endif
+#include "video/renderer/glide/gllib.h"
 #include "csutil/csrect.h"
 #include "isystem.h"
 #include "itexture.h"
