@@ -59,18 +59,32 @@ struct iCommandLineParser : public iBase
    * <tt>-option -nooption</tt> would depend on if you either check for
    * "option" or "nooption" using GetOption(), while GetBoolOption() returns
    * false because it looks for the <em>last</em> toggle argument.
-   * \param iName The name of the positive toggle argument. The negative argument is 
-   *		  created by inserting "no" in front of it.
-   * \param defaultValue The default value, if neither of the toggle arguments is
-   *			  found.
+   * \param iName The name of the positive toggle argument.  The negative
+   *	argument is created by inserting "no" in front of it.
+   * \param defaultValue The default value, if neither of the toggle arguments
+   *	is found.
    */
   virtual bool GetBoolOption (const char *iName, 
     bool defaultValue = false) = 0;
     
   /**
-   * Returns the directory of the application binary.
+   * Returns the directory in which the application's resources resides.  On
+   * many platforms, this may be the same as the directory returned by
+   * GetAppDir(); however, on MacOS/X, it is the "Contents" directory within
+   * the Cocoa application wrapper.
+   */
+  virtual const char* GetResourceDir () = 0;
+
+  /**
+   * Returns the directory in which the application executable resides; or the
+   * directory in which the Cocoa application wrapper resides on MacOS/X.
    */
   virtual const char* GetAppDir () = 0;
+
+  /**
+   * Returns the full path to the application executable.
+   */
+  virtual const char* GetAppPath () = 0;
 };
 
 /** @} */

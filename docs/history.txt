@@ -23,6 +23,10 @@ chronological order.
 	  but it should only complain if the entire thing has none.
 	- Jorrit removed the unused csSector::IntersectSphere().
 	- Jorrit removed a few additional declarations of iPolygon3D.
+	- Eric Sunshine added new methods GetResourceDir() and GetAppPath() to
+	  iCommandLineParser to complement the existing GetAppDir() method.
+	  These methods correspond to the lower-level platform-specific
+	  functions csGetResourceDir(), csGetAppDir(), and csGetAppPath().
 9-oct-2003
 	- Jorrit added the following new functions to iThingFactoryState:
 	    - FindPolygonByName (const char*)

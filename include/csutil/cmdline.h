@@ -58,8 +58,12 @@ private:
   /// Find Nth command-line option and return a pointer to the object (or 0)
   csCommandLineOption *FindOption (const char *iName, int iIndex) const;
 
-  /// Directory of application executable
+  /// Directory of application resources.
+  char* resDir;
+  /// Directory of application executable.
   char* appDir;
+  /// Full path of application executable.
+  char* appPath;
 public:
   SCF_DECLARE_IBASE;
 
@@ -98,8 +102,24 @@ public:
   virtual bool GetBoolOption (const char *iName, 
     bool defaultValue = false);
 
-  /// Retrieve directory of application executable
+  /**
+   * Returns the directory in which the application's resources resides.  On
+   * many platforms, this may be the same as the directory returned by
+   * GetAppDir(); however, on MacOS/X, it is the "Contents" directory within
+   * the Cocoa application wrapper.
+   */
+  virtual const char* GetResourceDir ();
+
+  /**
+   * Returns the directory in which the application executable resides; or the
+   * directory in which the Cocoa application wrapper resides on MacOS/X.
+   */
   virtual const char* GetAppDir ();
+
+  /**
+   * Returns the full path to the application executable.
+   */
+  virtual const char* GetAppPath ();
 };
 
 #endif // __CS_CMDLINE_H__
