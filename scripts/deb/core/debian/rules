@@ -166,6 +166,7 @@ install-arch:
 	# Add here commands to install the package into debian/crystalspace.
 	cd CS; DESTDIR=$(CURDIR)/debian/crystalspace $(MAKE) install_bin 
 	cd CS; DESTDIR=$(CURDIR)/debian/crystalspace $(MAKE) install_lib 
+	cd CS; DESTDIR=$(CURDIR)/debian/crystalspace $(MAKE) install_plugin 
 	cd CS; DESTDIR=$(CURDIR)/debian/crystalspace $(MAKE) install_data 
 	cd CS; DESTDIR=$(CURDIR)/debian/crystalspace $(MAKE) install_config 
 
