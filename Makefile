@@ -184,7 +184,6 @@ volatile.tmp: config.mak
 	@echo $"#ifndef __VOLATILE_H__$">>volatile.tmp
 	@echo $"#define __VOLATILE_H__$">>volatile.tmp
 	@$(DO.MAKE.VOLATILE)
-	@echo $"#endif // __VOLATILE_H__$">>volatile.tmp
 	$(subst DEST,include/volatile.h,$(UPD))
 
 endif
