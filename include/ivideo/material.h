@@ -40,8 +40,8 @@ struct csTextureLayer
 {
   iTextureHandle* txt_handle;
   UInt mode;		// Mode: one of CS_FX_ADD ...
-  int uscale, vscale;	// Txt mapping scale relative to parent texture
-  int ushift, vshift;	// Txt mapping shift relative to parent texture
+  float uscale, vscale;	// Txt mapping scale relative to parent texture
+  float ushift, vshift;	// Txt mapping shift relative to parent texture
 };
 
 SCF_VERSION (iMaterial, 0, 0, 4);

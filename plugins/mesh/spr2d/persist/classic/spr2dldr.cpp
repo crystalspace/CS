@@ -42,6 +42,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ALPHA)
   CS_TOKEN_DEF (COPY)
   CS_TOKEN_DEF (KEYCOLOR)
+  CS_TOKEN_DEF (TILING)
   CS_TOKEN_DEF (MULTIPLY2)
   CS_TOKEN_DEF (MULTIPLY)
   CS_TOKEN_DEF (TRANSPARENT)
@@ -162,6 +163,7 @@ static UInt ParseMixmode (iReporter* reporter, char* buf)
     CS_TOKEN_TABLE (ALPHA)
     CS_TOKEN_TABLE (TRANSPARENT)
     CS_TOKEN_TABLE (KEYCOLOR)
+    CS_TOKEN_TABLE (TILING)
   CS_TOKEN_TABLE_END
 
   char* name;
@@ -193,6 +195,7 @@ static UInt ParseMixmode (iReporter* reporter, char* buf)
 	break;
       case CS_TOKEN_TRANSPARENT: Mixmode |= CS_FX_TRANSPARENT; break;
       case CS_TOKEN_KEYCOLOR: Mixmode |= CS_FX_KEYCOLOR; break;
+      case CS_TOKEN_TILING: Mixmode |= CS_FX_TILING; break;
     }
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
@@ -378,6 +381,7 @@ static void WriteMixmode(iStrVector *str, UInt mixmode)
   if(mixmode&CS_FX_MULTIPLY) str->Push(csStrNew(" MULTIPLY ()"));
   if(mixmode&CS_FX_MULTIPLY2) str->Push(csStrNew(" MULTIPLY2 ()"));
   if(mixmode&CS_FX_KEYCOLOR) str->Push(csStrNew(" KEYCOLOR ()"));
+  if(mixmode&CS_FX_TILING) str->Push(csStrNew(" TILING ()"));
   if(mixmode&CS_FX_TRANSPARENT) str->Push(csStrNew(" TRANSPARENT ()"));
   if(mixmode&CS_FX_ALPHA)
   {

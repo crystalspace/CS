@@ -39,7 +39,7 @@ WORLD (
       LAYER (
 	TEXTURE ('spark')
 	SCALE (20,20)
-	MIXMODE (ADD ())
+	MIXMODE (ADD () TILING ())
       )
     )
     MATERIAL 'raindrop' (TEXTURE ('raindrop'))
@@ -49,7 +49,7 @@ WORLD (
       LAYER (
 	TEXTURE ('spark')
 	SCALE (10,10)
-	MIXMODE (ALPHA (.75))
+	MIXMODE (ALPHA (.75) TILING ())
       )
     )
     MATERIAL 'mosaic' (TEXTURE ('mosaic.gif'))

@@ -23,6 +23,15 @@ The history order is reversed so that new features are at the top.
 	  after LoadMapFile(). This is not efficient as LoadMapFile() can
 	  be used multiple times to fill up several reasons. Instead the
 	  plugins are now unloaded in the destructor of the loader plugin.
+	- Changed the scale and shift parameters for a layered texture
+	  from int to float. Also added a logical change. CS_FX_TILING
+	  should now be used when you want the layer texture to tile on
+	  the base texture. This used to be default but it isn't any more.
+	  Note that the OpenGL renderer currently only supports the tiling
+	  option so the presence of CS_FX_TILING or not will not have
+	  an effect currently.
+	- Added support for TILING() keyword in the map loader and all loader
+	  plugins.
 	- Eric Sunshine fixed a nasty plugin-leak in SCF which was introduced
 	  when iBase was substituted for csBase as the base class of
 	  scfSharedLibrary.  The specific problem was that, although SCF

@@ -395,7 +395,7 @@ iMaterialWrapper* csLoader::ParseMaterial (char *name, char* buf, const char *pr
 	  layers[num_txt_layer].vscale = 1;
 	  layers[num_txt_layer].ushift = 0;
 	  layers[num_txt_layer].vshift = 0;
-	  layers[num_txt_layer].mode = CS_FX_ADD;
+	  layers[num_txt_layer].mode = CS_FX_ADD | CS_FX_TILING;
 	  char* params2;
 	  while ((cmd = csGetCommand (&params, layerCommands,
 		&params2)) > 0)
@@ -420,12 +420,12 @@ iMaterialWrapper* csLoader::ParseMaterial (char *name, char* buf, const char *pr
 		}
 		break;
 	      case CS_TOKEN_SCALE:
-	        csScanStr (params2, "%d,%d",
+	        csScanStr (params2, "%f,%f",
 			&layers[num_txt_layer].uscale,
 			&layers[num_txt_layer].vscale);
 	        break;
 	      case CS_TOKEN_SHIFT:
-	        csScanStr (params2, "%d,%d",
+	        csScanStr (params2, "%f,%f",
 			&layers[num_txt_layer].ushift,
 			&layers[num_txt_layer].vshift);
 	        break;

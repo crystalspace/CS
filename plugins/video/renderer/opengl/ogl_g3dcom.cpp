@@ -1414,10 +1414,10 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
       {
         GLfloat* src = queue.gltxt;
         GLfloat* dst = queue.layer_gltxt;
-        int uscale = layer->uscale;
-        int vscale = layer->vscale;
-        int ushift = layer->ushift;
-        int vshift = layer->vshift;
+        float uscale = layer->uscale;
+        float vscale = layer->vscale;
+        float ushift = layer->ushift;
+        float vshift = layer->vshift;
         for (i = 0 ; i < queue.num_vertices ; i++)
         {
 	  *dst++ = (*src++) * uscale + ushift;
@@ -2855,10 +2855,10 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       csVector2* mul_uv = work_uv_verts;
       if (mat->TextureLayerTranslated (j))
       {
-        int uscale = layer->uscale;
-        int vscale = layer->vscale;
-        int ushift = layer->ushift;
-        int vshift = layer->vshift;
+        float uscale = layer->uscale;
+        float vscale = layer->vscale;
+        float ushift = layer->ushift;
+        float vshift = layer->vshift;
 // @@@ Experimental define to see if using a TEXTURE matrix
 // instead of scaling manually is more efficient. Have to try
 // this out on various cards to see the effect.

@@ -49,6 +49,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (SCALE_X)
   CS_TOKEN_DEF (SCALE_Y)
   CS_TOKEN_DEF (SCALE_Z)
+  CS_TOKEN_DEF (TILING)
   CS_TOKEN_DEF (TRANSPARENT)
 CS_TOKEN_DEF_END
 
@@ -191,6 +192,7 @@ UInt csLoader::ParseMixmode (char* buf)
     CS_TOKEN_TABLE (ALPHA)
     CS_TOKEN_TABLE (TRANSPARENT)
     CS_TOKEN_TABLE (KEYCOLOR)
+    CS_TOKEN_TABLE (TILING)
   CS_TOKEN_TABLE_END
 
   char* name;
@@ -211,6 +213,7 @@ UInt csLoader::ParseMixmode (char* buf)
     }
     switch (cmd)
     {
+      case CS_TOKEN_TILING: Mixmode |= CS_FX_TILING; break;
       case CS_TOKEN_COPY: Mixmode |= CS_FX_COPY; break;
       case CS_TOKEN_MULTIPLY: Mixmode |= CS_FX_MULTIPLY; break;
       case CS_TOKEN_MULTIPLY2: Mixmode |= CS_FX_MULTIPLY2; break;

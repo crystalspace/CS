@@ -71,6 +71,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (GOURAUD)
   CS_TOKEN_DEF (IDENTITY)
   CS_TOKEN_DEF (KEYCOLOR)
+  CS_TOKEN_DEF (TILING)
   CS_TOKEN_DEF (LEN)
   CS_TOKEN_DEF (LIGHTING)
   CS_TOKEN_DEF (LIGHTMAP)
@@ -361,6 +362,7 @@ static UInt ParseMixmode (char* buf)
     CS_TOKEN_TABLE (ALPHA)
     CS_TOKEN_TABLE (TRANSPARENT)
     CS_TOKEN_TABLE (KEYCOLOR)
+    CS_TOKEN_TABLE (TILING)
   CS_TOKEN_TABLE_END
 
   char* name;
@@ -390,6 +392,7 @@ static UInt ParseMixmode (char* buf)
 	break;
       case CS_TOKEN_TRANSPARENT: Mixmode |= CS_FX_TRANSPARENT; break;
       case CS_TOKEN_KEYCOLOR: Mixmode |= CS_FX_KEYCOLOR; break;
+      case CS_TOKEN_TILING: Mixmode |= CS_FX_TILING; break;
     }
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
