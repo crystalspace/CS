@@ -22,6 +22,32 @@ chronological order.
 	  virtual function calls).
 	- Jorrit replaced the 'frustum' in csRenderContextFrustum with an
 	  array of csPlane3 instead of an array of csVector3.
+	- Eric Sunshine made the following changes to the Jam-based msvcgen
+	  facility:
+	    - Added --response-file option to msvcgen.pl, which allows
+	      msvcgen.pl to collect pathnames (one per line) from the contents
+	      of specified files in addition to collecting them from the
+	      command-line.
+	    - Added a ResponseFile rule to helper.jam which creates a file from
+	      a set of items (items are emitted one per line).  This rule can
+	      be invoked multiple times for the same file, allowing it to be
+	      populated incrementally.
+	    - Augmented msvcgen.jam to worked around a fatal limitation in Jam
+	      which caused project file creation to bomb out frequently except
+	      when $(TOP) and $(BUILDTOP) were very short pathnames (such as
+	      "C:\CS" or "/home/foo/CS").  Jam places a fairly restrictive
+	      limit on the length of a command-line which it will invoke from
+	      an 'actions' block, and rudely aborts if the command exceeds that
+	      limit.  Even moderately sized projects, such as csutil, easily
+	      exceed Jam's command-line length limit when mentioning its source
+	      and header files in the msvcgen.pl invocation command.  Ditto for
+	      workspaces, which are typically composed of many, many project
+	      files.  To work around this limitation, msvcgen.jam uses the new
+	      ResponseFile rule, and --response-file mechanism of msvcgen.pl to
+	      avoid having to create such lengthy command-lines.
+	    - Renamed the msvcgen6 and msvcgen7 targets to msvc6gen and
+	      msvc7gen, respectively.  Also added mvsc6clean and msvc7clean
+	      targets.
 19-Apr-2004
 	- Eric Sunshine added LGPL license notice to the .m4 and .jam files.
 	- Jorrit fixed a bug in iEngine->CreatePortalContainer(). If there

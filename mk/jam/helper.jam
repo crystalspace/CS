@@ -1,6 +1,7 @@
 #============================================================================
 # Helper rules
 # Copyright (C)2003 by Matze Braun <matzebraun@users.sourceforge.net>
+# Copyright (C)2004 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or modify it
 #    under the terms of the GNU Library General Public License as published by
@@ -122,6 +123,74 @@ rule Recurse
       }
     }
   }
+}
+
+##  ResponseFile file : [ items [ : directory ]]
+##    Jam places a fairly restrictive limit on the length of the command string
+##    emitted by an 'actions' block.  If the limit is exceeded, Jam rudely
+##    aborts.  This problem is easily triggered when actions are invoked
+##    'together' but not 'piecemeal'; especially when the command arguments
+##    involve many lengthy pathnames.  To work around this type of problem,
+##    some tools allow the client to furnish a file containing information
+##    which would otherwise be specified via the command-line.  This is often
+##    called a "response file".  The ResponseFile rule can be used to create a
+##    response file named 'file' in 'directory' containing 'items', one per
+##    line.  If 'directory' is not specified, then the file is placed in
+##    $(LOCATE_TARGET).  If there is a possibility that the same 'file' name
+##    might be used in other contexts, be sure to grist it appropriately to
+##    avoid conflicts.  This rule assumes that 'items' contains bound entries.
+##    If this is not the case, then be sure to invoke NotFile for the contained
+##    items.  This rule may be invoked multiple times for the same 'file' in
+##    order to populate the file incrementally.  The rule returns 'file' to
+##    make it convenient to daisy chain with invocations of other rules, such
+##    as Depends or Always.
+rule ResponseFile
+{
+  local file = $(1) ;
+  local items = $(2) ;
+  local dir = $(3) ;
+
+  if ! $(items)
+  {
+    items = "" ; # Force file creation even if list is empty.
+    NotFile $(items) ;
+  }
+
+  if ! $(dir) { dir = $(LOCATE_TARGET) ; }
+  MakeLocate $(file) : $(dir) ;
+
+  local firsttime = no ;
+  if ! [ IsElem $(file) : $(RESPONSE_FILE_REGISTRY) ]
+  {
+    firsttime = yes ;
+    RESPONSE_FILE_REGISTRY += $(file) ;
+  }
+
+  local i ;
+  for i in $(items)
+  {
+    if $(firsttime) = yes
+    {
+      ResponseFile1 $(file) : $(i) ;
+      firsttime = no ;
+    }
+    else
+    {
+      ResponseFile2 $(file) : $(i) ;
+    }
+  }
+
+  return $(file) ;
+}
+
+actions ResponseFile1
+{
+  echo '$(>)' > $(<)
+}
+
+actions quietly ResponseFile2
+{
+  echo '$(>)' >> $(<)
 }
 
 ##  Prefix list : prefix

@@ -43,7 +43,15 @@
 #==============================================================================
 
 MSVCGEN_BUILD_ROOT = [ ConcatDirs $(BUILDTOP) out ] ;
-MSVCGEN_BUILD_MK = [ ConcatDirs $(MSVCGEN_BUILD_ROOT) mk ] ;
+
+rule msvcgen_build_dir
+{ return [ ConcatDirs $(MSVCGEN_BUILD_ROOT) mk ] ; }
+rule msvcgen_target_dir
+{ return [ ConcatDirs [ msvcgen_build_dir ] visualc$(<) ] ; }
+rule msvcgen_fragment_dir
+{ return [ ConcatDirs [ msvcgen_build_dir ] fragment$(<) ] ; }
+rule msvcgen_template_dir
+{ return [ ConcatDirs $(TOP) mk msvcgen template$(<) ] ; }
 
 if ! $(DO_MSVCGEN)
 {
@@ -87,11 +95,16 @@ rule MsvcGenWorkspace
 ## MsvcGenTarget version
 rule MsvcGenTarget
 {
-  Always msvcgen$(<) ;
-  NotFile msvcgen$(<) ;
-  MSVC_VERSION on msvcgen$(<) = $(<) ;
-  MsvcGen msvcgen$(<) ;
-  Help msvcgen$(<) : "Create MSVC$(<) project files" : verbatim ;
+  Always msvc$(<)gen ;
+  NotFile msvc$(<)gen ;
+  MSVC_VERSION on msvc$(<)gen = $(<) ;
+  MsvcGen msvc$(<)gen ;
+  Depends msvcgen : msvc$(<)gen ;
+  Help msvc$(<)gen : "Create MSVC$(<) project files" : verbatim ;
+  CleanDir msvc$(<)clean :
+    [ msvcgen_target_dir $(<) ] [ msvcgen_fragment_dir $(<) ] ;
+  Depends msvcclean : msvc$(<)clean ;
+  Help msvc$(<)clean : "Remove built MSVC$(<) project files" : verbatim ;
 }
 
 actions MsvcGen
@@ -106,11 +119,10 @@ MsvcGenTarget 7 ;
 
 Always msvcgen ;
 NotFile msvcgen ;
-Depends msvcgen : msvcgen6 msvcgen7 ;
-Help msvcgen : "Create MSVC6 and MSVC7 project files" : verbatim ;
+Help msvcgen : "Create MSVC project files (all versions)" : verbatim ;
 
-CleanDir msvcclean : $(MSVCGEN_BUILD_MK) ;
-Help msvcclean : "Remove built MSVC project files" : verbatim ;
+CleanDir msvcclean : [ msvcgen_build_dir ] ;
+Help msvcclean : "Remove built MSVC project files (all versions)" : verbatim ;
 Depends clean : msvcclean ;
 
 }
@@ -127,12 +139,9 @@ MSVCGEN = $(PERL) [ ConcatDirs $(TOP) mk msvcgen msvcgen.pl ] ;
 MERGERES = $(SHELL) [ ConcatDirs $(TOP) libs csutil win32 mergeres.sh ] ;
 
 MSVC_VERSION ?= 7 ;
-MSVCGEN_LOCATE_TARGET ?=
-  [ ConcatDirs $(MSVCGEN_BUILD_MK) visualc$(MSVC_VERSION) ] ;
-MSVCGEN_LOCATE_FRAGMENT ?=
-  [ ConcatDirs $(MSVCGEN_BUILD_MK) fragment$(MSVC_VERSION) ] ;
-MSVCGEN_TEMPLATEDIR ?=
-  [ ConcatDirs $(TOP) mk msvcgen template$(MSVC_VERSION) ] ;
+MSVCGEN_LOCATE_TARGET   ?= [ msvcgen_target_dir   $(MSVC_VERSION) ] ;
+MSVCGEN_LOCATE_FRAGMENT ?= [ msvcgen_fragment_dir $(MSVC_VERSION) ] ;
+MSVCGEN_TEMPLATEDIR     ?= [ msvcgen_template_dir $(MSVC_VERSION) ] ;
 
 if $(MSVC_VERSION) = 6
 {
@@ -275,7 +284,7 @@ rule MsvcProject
     MakeVersionRc $(versionrc) : $(rawname) ;
     Always $(versionrc) ;
     Win32Resource $(rawname) : $(versionrc) ;
-    RmTemps $(target) : $(versionrc) ;
+    RmTemps $(resource) : $(versionrc) ;
     
     if $(type) = "plugin" 
     {
@@ -288,7 +297,7 @@ rule MsvcProject
       GenerateWin32MetadataRc $(metarc) : $($(rawname)_METAFILE) ;
       Always $(metarc) ;
       Win32Resource $(rawname) : $(metarc) ;
-      RmTemps $(target) : $(metarc) ;
+      RmTemps $(resource) : $(metarc) ;
     }
   
     Always $(resource) ;
@@ -315,10 +324,14 @@ rule MsvcProject
     REJECTS on $(target) = ;
   }
 
+  local filelist = [ ResponseFile $(msvcname:G=msvcgen$(rawname):S=.filelist) :
+    $(files) : $(MSVCGEN_LOCATE_FRAGMENT) ] ;
+  Always $(filelist) ;
+  Depends $(target) : $(files) $(filelist) ;
   Depends msvcgen : $(target) ;
-  Depends $(target) : $(files) $(MSVCGEN_LOCATE_FRAGMENT:G=dir) ;
-  MsvcProjectGen $(target) : $(files) ;
+  MsvcProjectGen $(target) : $(filelist) ;
   Always $(target) ;
+  RmTemps $(target) : $(filelist) ;
 
   if ! $(MSVC.WORKSPACES)
   {
@@ -332,6 +345,29 @@ rule MsvcProject
   }
 
   Clean msvcclean : $(target) ;
+}
+
+# MSVCWorkspace name : fragments : fragmentroot
+rule MSVCWorkspace
+{
+  local name = $(1) ;
+  local fragments = $(2) ;
+  local fragroot = $(3) ;
+  local target = wks$(name) ;
+  target = $(target:G=msvcworkspace:S=$(SUFWSP)) ;
+
+  RAWNAME on $(target) = $(name) ;
+
+  local filelist = [ ResponseFile $(target:G=msvcgen$(name):S=.filelist) :
+    $(fragroot) : $(MSVCGEN_LOCATE_FRAGMENT) ] ;
+  Always $(filelist) ;
+
+  Depends $(target) : $(fragments[1]) $(filelist) ;
+  Depends msvcgen : $(target) ;
+  MakeLocate $(target) : $(MSVCGEN_LOCATE_TARGET) ;
+  MsvcWorkspaceGen $(target) : $(filelist) ;
+  RmTemps $(target) : $(filelist) ;
+  RmTemps msvcgen : $(fragments) ;
 }
 
 #----------------------------------------------------------------------------
@@ -446,24 +482,6 @@ rule ExternalLibs
   }
 }
 
-# MSVCWorkspace name : fragments : fragmentroot
-rule MSVCWorkspace
-{
-  local name = $(1) ;
-  local fragments = $(2) ;
-  local fragroot = $(3) ;
-  local target = wks$(name) ;
-
-  target = $(target:G=msvcworkspace:S=$(SUFWSP)) ;
-  RAWNAME on $(target) = $(name) ;
-
-  Depends msvcgen : $(target) ;
-  Depends $(target) : $(fragments[1]) ;
-  MakeLocate $(target) : $(MSVCGEN_LOCATE_TARGET) ;
-  MsvcWorkspaceGen $(target) : $(fragroot) ;
-  RmTemps msvcgen : $(fragments) ;
-}
-
 rule Win32Resource
 {
   Depends $(<) : $($(<)_RCNAME) ;
@@ -500,7 +518,7 @@ actions MsvcProjectGen
   --strip-root='$(TOP)/' \
   --accept='$(ACCEPTS)' \
   --reject='$(REJECTS)' \
-  $(>)
+  --response-file=$(>)
 }
 
 actions together MsvcWorkspaceGen
@@ -514,7 +532,7 @@ actions together MsvcWorkspaceGen
   --template-dir=$(MSVCGEN_TEMPLATEDIR) \
   --accept='$(MSVC.ACCEPTS.$(RAWNAME))' \
   --reject='$(MSVC.REJECTS.$(RAWNAME))' \
-  $(>)
+  --response-file=$(>)
 }
 
 actions together MergeRcs

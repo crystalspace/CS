@@ -7,8 +7,6 @@ L - Low Priority (only minor function loss)
 W - Wishlist (the build also works without this feature)
 * - Completed
 
-[H] msvcgen.jam: The command line for creating a workspace file overflows Jam's
-    command-line length limit, causing it to fail.
 [H] msvcgen.jam: Either respect ExternaLibs() or fix all the Jamfiles which
     require special Windows libraries to invoke MsvcExternalLibrary().  This is
     necessary for modules such as cssocket and ensocket which require
@@ -93,6 +91,14 @@ W - Wishlist (the build also works without this feature)
     with a message telling that you should rerun configure, or at least emit a
     big warning?
 
+[*] msvcgen.jam: The command line for creating a project and workspace files
+    frequently overflows Jam's command-line length limit, causing it to abort
+    rudely.  This happens easily, even with moderately sized projects, such as
+    csutil, and workspaces, such as wkstypical, when $(TOP) and $(BUILDTOP) are
+    somewhat lengthy pathnames.  When they are "C:\CS", or "/home/foo/CS", then
+    the resulting invocations of msvcgen.pl are sufficiently small for Jam's
+    limited command-line length, but anything beyond those simple, short
+    pathnames results in frequent failure.
 [*] msvcgen.jam: Add support to create multiple, customizable workspaces rather
     than always creating only wksall.  Obvious examples of workspaces are the
     ones presently created by the GNU make system: wksall, wkstypical,

@@ -34,7 +34,7 @@ use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'msvcgen.pl';
-my $PROG_VERSION = 7;
+my $PROG_VERSION = 8;
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000-2004 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
@@ -77,6 +77,8 @@ $main::opt_T = '';	# Alias for 'template-dir'.
 @main::opt_a = ();	# Alias for 'accept'.
 @main::opt_reject = ();
 @main::opt_r = ();	# Alias for 'reject'.
+@main::opt_response_file = ();
+@main::opt_R = ();	# Alias for 'response-file'.
 $main::opt_verbose = 0;
 $main::opt_v = 0;	# Alias for 'verbose'.
 $main::opt_quiet = 0;
@@ -123,6 +125,8 @@ my @script_options = (
     'a=s@',		# Alias for 'accept'.
     'reject=s@',
     'r=s@',		# Alias for 'reject'.
+    'response-file=s@',
+    'R=s@',		# Alias for 'response-file'.
     'verbose!',
     'v!',		# Alias for 'verbose'.
     'quiet!',
@@ -694,6 +698,7 @@ sub process_option_aliases {
     push(@main::opt_strip_root, @main::opt_S);
     push(@main::opt_accept, @main::opt_a);
     push(@main::opt_reject, @main::opt_r);
+    push(@main::opt_response_file, @main::opt_R);
 }
 
 #------------------------------------------------------------------------------
@@ -718,6 +723,39 @@ sub massage_paths {
 	push(@outfiles, $file);
     }
     return @outfiles;
+}
+
+#------------------------------------------------------------------------------
+# Read a response file and return a list of the contained items.
+#------------------------------------------------------------------------------
+sub read_response_file {
+    my $path = shift;
+    my $line;
+    my @items;
+    open(FILE, "<$path") or fatal("Unable to open response file $path: $!");
+    while ($line = <FILE>) {
+	$line =~ s/^\s+//;
+	$line =~ s/#.*$//;
+	$line =~ s/\s+$//;
+	next if $line =~ /^$/;
+	push(@items, $line);
+    }
+    close(FILE);
+    return @items;
+}
+
+#------------------------------------------------------------------------------
+# Return a list of input files specified as arguments on the command-line and
+# via response files.
+#------------------------------------------------------------------------------
+sub input_files {
+    my @items;
+    my $response_file;
+    foreach $response_file (@main::opt_response_file) {
+	push(@items, read_response_file($response_file));
+    }
+    push(@items, @ARGV);
+    return @items;
 }
 
 #------------------------------------------------------------------------------
@@ -762,7 +800,7 @@ sub process_project_options {
     }
     @main::opt_strip_root = @roots;
 
-    my @files = massage_paths(filter(@ARGV));
+    my @files = massage_paths(filter(input_files()));
     ($main::opt_meta_file) = massage_paths($main::opt_meta_file);
     if ($main::opt_meta_file) {
 	my $metafile_rx = quotemeta($main::opt_meta_file);
@@ -793,7 +831,7 @@ sub process_workspace_options {
     add_suffix($main::opt_output, $main::opt_workspace_extension);
 
     my $fragment;
-    foreach $fragment (filter(@ARGV)) {
+    foreach $fragment (filter(input_files())) {
 	my $pjf_frag = $fragment;
 	add_suffix($pjf_frag, 'pjf');
 	push(@main::pjf_fragments, $pjf_frag);
@@ -947,7 +985,7 @@ Global Options:
                  overriden by --reject.  The --accept option may be given any
                  number of times in order to specify any number of patterns.
                  This is a useful option for clients unable to filter the list
-                 filenames themselves.  Example: --accept='\.cc\$'
+                 filenames themselves.  Example: --accept='\\.cc\$'
     -r <pattern>
     --reject=<pattern>
                  Specifies a Perl regular-expression used as a filter against
@@ -957,7 +995,16 @@ Global Options:
                  may be given any number of times in order to specify any
                  number of patterns.  This is a useful option for clients
                  unable to filter the list of filenames themselves.
-                 Example: --reject='\.txt\$'
+                 Example: --reject='\\.txt\$'
+    -R <path>
+    --response-file=<path>
+                 Specifies a file containing pathnames, one per line, which are
+                 treated exactly as if they had been mentioned on the
+                 command-line as <file>.  The --response-file option may be
+                 given any number of times, and is allowed in combination with
+                 <file> arguments actually specified on the command-line.
+                 Comments in the response file begin with '#' and extend to the
+                 end of line.
     -v --verbose Emit informational messages about the processing.  Can be
                  negated with --noverbose.  Deafult is --noverbose.
     -q --quiet   Suppress all output except for error messages.  Can be
