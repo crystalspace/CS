@@ -263,7 +263,7 @@ TrDocumentAttribute& TrXmlElement::GetAttributeRegistered (
 }
 
 TrDocument::TrDocument(char* buf) :
-  blk_element (10000),
+  blk_element (7000),
   blk_text (100)
 {
   error = false;
