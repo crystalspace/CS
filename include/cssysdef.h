@@ -484,27 +484,43 @@ void CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)())        \
  * This will give you a global function GetVertexPool that returns a pointer to a 
  * static variable.
  */
+
+#ifndef CS_IMPLEMENT_STATIC_VAR_EXT
+#define CS_IMPLEMENT_STATIC_VAR_EXT(getterFunc,Type,initParam,kill_how) \
+CS_DECLARE_STATIC_VARIABLE_REGISTRATION                                 \
+extern "C" {                                                            \
+static Type* getterFunc ();                                             \
+static void getterFunc ## _kill ();                                     \
+void getterFunc ## _kill ()                                             \
+{                                                                       \
+  delete getterFunc ();                                                 \
+}                                                                       \
+static void getterFunc ## _kill_array ();                               \
+void getterFunc ## _kill_array ()                                       \
+{                                                                       \
+  delete [] getterFunc ();                                              \
+}                                                                       \
+Type* getterFunc ()                                                     \
+{                                                                       \
+  static Type *v=0;                                                     \
+  if (!v)                                                               \
+  {                                                                     \
+    v = new Type initParam;                                             \
+    CS_REGISTER_STATIC_FOR_DESTRUCTION (getterFunc ## kill_how);        \
+  }                                                                     \
+  return v;                                                             \
+}                                                                       \
+}
+#endif
+
 #ifndef CS_IMPLEMENT_STATIC_VAR
 #define CS_IMPLEMENT_STATIC_VAR(getterFunc,Type,initParam)    \
-CS_DECLARE_STATIC_VARIABLE_REGISTRATION                       \
-extern "C" {                                                  \
-static Type* getterFunc ();                                   \
-static void getterFunc ## _kill ();                           \
-void getterFunc ## _kill ()                                   \
-{                                                             \
-  delete getterFunc ();                                       \
-}                                                             \
-Type* getterFunc ()                                           \
-{                                                             \
-  static Type *v=0;                                           \
-  if (!v)                                                     \
-  {                                                           \
-    v = new Type initParam;                                   \
-    CS_REGISTER_STATIC_FOR_DESTRUCTION (getterFunc ## _kill); \
-  }                                                           \
-  return v;                                                   \
-}                                                             \
-}
+ CS_IMPLEMENT_STATIC_VAR_EXT(getterFunc,Type,initParam,_kill)    
+#endif
+
+#ifndef CS_IMPLEMENT_STATIC_VAR_ARRAY
+#define CS_IMPLEMENT_STATIC_VAR_ARRAY(getterFunc,Type,initParam)    \
+ CS_IMPLEMENT_STATIC_VAR_EXT(getterFunc,Type,initParam,_kill_array)    
 #endif
 
 /**
@@ -519,7 +535,7 @@ static Type *getterFunc ();
 #endif
 
 #ifndef CS_DECLARE_STATIC_CLASSVAR_REF
-#define CS_DECLARE_STATIC_CLASSVAR_REF(var,getterFunc,Type)       \
+#define CS_DECLARE_STATIC_CLASSVAR_REF(var,getterFunc,Type)   \
 static Type *var;                                             \
 static Type &getterFunc ();                                   
 #endif
@@ -533,48 +549,78 @@ static Type &getterFunc ();
  * Example:
  * CS_IMPLEMENT_STATIC_CLASSVAR (csPolygon2D, pool, GetVertexPool, csVertexPool,)
  */
+#ifndef CS_IMPLEMENT_STATIC_CLASSVAR_EXT
+#define CS_IMPLEMENT_STATIC_CLASSVAR_EXT(Class,var,getterFunc,Type,initParam,kill_how)   \
+Type *Class::var = 0;                                                                    \
+extern "C" {                                                                             \
+static void Class ## _ ## getterFunc ## _kill ();                                        \
+void Class ## _ ## getterFunc ## _kill ()                                                \
+{                                                                                        \
+  delete Class::getterFunc ();                                                           \
+}                                                                                        \
+static void Class ## _ ## getterFunc ## _kill_array ();                                  \
+void Class ## _ ## getterFunc ## _kill_array ()                                          \
+{                                                                                        \
+  delete [] Class::getterFunc ();                                                        \
+}                                                                                        \
+}                                                                                        \
+Type* Class::getterFunc ()                                                               \
+{                                                                                        \
+  if (!var)                                                                              \
+  {                                                                                      \
+    var = new Type initParam;                                                            \
+    CS_DECLARE_STATIC_VARIABLE_REGISTRATION                                              \
+    CS_REGISTER_STATIC_FOR_DESTRUCTION (Class ## _ ## getterFunc ## kill_how);           \
+  }                                                                                      \
+  return var;                                                                            \
+}
+#endif
+
 #ifndef CS_IMPLEMENT_STATIC_CLASSVAR
-#define CS_IMPLEMENT_STATIC_CLASSVAR(Class,var,getterFunc,Type,initParam)   \
-Type *Class::var = 0;                                                       \
-extern "C" {                                                                \
-static void Class ## _ ## getterFunc ## _kill ();                           \
-void Class ## _ ## getterFunc ## _kill ()                                   \
-{                                                                           \
-  delete Class::getterFunc ();                                              \
-}                                                                           \
-}                                                                           \
-Type* Class::getterFunc ()                                                  \
-{                                                                           \
-  if (!var)                                                                 \
-  {                                                                         \
-    var = new Type initParam;                                               \
-    CS_DECLARE_STATIC_VARIABLE_REGISTRATION                                 \
-    CS_REGISTER_STATIC_FOR_DESTRUCTION (Class ## _ ## getterFunc ## _kill); \
-  }                                                                         \
-  return var;                                                               \
+#define CS_IMPLEMENT_STATIC_CLASSVAR(Class,var,getterFunc,Type,initParam) \
+        CS_IMPLEMENT_STATIC_CLASSVAR_EXT(Class,var,getterFunc,Type,initParam,_kill)
+#endif
+
+#ifndef CS_IMPLEMENT_STATIC_CLASSVAR_ARRAY
+#define CS_IMPLEMENT_STATIC_CLASSVAR_ARRAY(Class,var,getterFunc,Type,initParam) \
+        CS_IMPLEMENT_STATIC_CLASSVAR_EXT(Class,var,getterFunc,Type,initParam,_kill_array)
+#endif
+
+#ifndef CS_IMPLEMENT_STATIC_CLASSVAR_REF_EXT
+#define CS_IMPLEMENT_STATIC_CLASSVAR_REF_EXT(Class,var,getterFunc,Type,initParam,kill_how)   \
+Type *Class::var = 0;                                                                        \
+extern "C" {                                                                                 \
+static void Class ## _ ## getterFunc ## _kill ();                                            \
+void Class ## _ ## getterFunc ## _kill ()                                                    \
+{                                                                                            \
+  delete &Class::getterFunc ();                                                              \
+}                                                                                            \
+static void Class ## _ ## getterFunc ## _kill_array ();                                      \
+void Class ## _ ## getterFunc ## _kill_array ()                                              \
+{                                                                                            \
+  delete [] &Class::getterFunc ();                                                           \
+}                                                                                            \
+}                                                                                            \
+Type &Class::getterFunc ()                                                                   \
+{                                                                                            \
+  if (!var)                                                                                  \
+  {                                                                                          \
+    var = new Type initParam;                                                                \
+    CS_DECLARE_STATIC_VARIABLE_REGISTRATION                                                  \
+    CS_REGISTER_STATIC_FOR_DESTRUCTION (Class ## _ ## getterFunc ## kill_how);               \
+  }                                                                                          \
+  return *var;                                                                               \
 }
 #endif
 
 #ifndef CS_IMPLEMENT_STATIC_CLASSVAR_REF
 #define CS_IMPLEMENT_STATIC_CLASSVAR_REF(Class,var,getterFunc,Type,initParam)   \
-Type *Class::var = 0;                                                       \
-extern "C" {                                                                \
-static void Class ## _ ## getterFunc ## _kill ();                           \
-void Class ## _ ## getterFunc ## _kill ()                                   \
-{                                                                           \
-  delete &Class::getterFunc ();                                             \
-}                                                                           \
-}                                                                           \
-Type &Class::getterFunc ()                                                  \
-{                                                                           \
-  if (!var)                                                                 \
-  {                                                                         \
-    var = new Type initParam;                                               \
-    CS_DECLARE_STATIC_VARIABLE_REGISTRATION                                 \
-    CS_REGISTER_STATIC_FOR_DESTRUCTION (Class ## _ ## getterFunc ## _kill); \
-  }                                                                         \
-  return *var;                                                              \
-}
+        CS_IMPLEMENT_STATIC_CLASSVAR_REF_EXT(Class,var,getterFunc,Type,initParam,_kill)
+#endif
+
+#ifndef CS_IMPLEMENT_STATIC_CLASSVAR_REF_ARRAY
+#define CS_IMPLEMENT_STATIC_CLASSVAR_REF_ARRAY(Class,var,getterFunc,Type,initParam)   \
+        CS_IMPLEMENT_STATIC_CLASSVAR_REF_EXT(Class,var,getterFunc,Type,initParam,_kill_array)
 #endif
 
 // The following define should only be enabled if you have defined
