@@ -19,19 +19,19 @@
 
 #include "csutil/csstring.h"
 
-NO_MODULE_LOCK(a)
 IMPLEMENT_UNKNOWN(csString)
 
 BEGIN_INTERFACE_TABLE(csString)
 	IMPLEMENTS_INTERFACE(IString)
 END_INTERFACE_TABLE()
 
-STDMETHODIMP csString::xData(DATA *data) {
-	data=Data;
+STDMETHODIMP csString::xData(DATA **data) {
+	*data=Data;
 	return S_OK;
 }
 
-STDMETHODIMP csString::xLength(unsigned long int Size) {
-	return Size;
+STDMETHODIMP csString::xLength(unsigned long int *size) {
+	*size=Size;
+	return S_OK;
 }
 

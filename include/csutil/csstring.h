@@ -53,9 +53,9 @@
 extern const GUID IID_IString;
 
 interface IString:public IUnknown {
-	STDMETHOD(xLength)(unsigned long int Size) PURE;
+	STDMETHOD(xLength)(unsigned long int* Size) PURE;
 
-	STDMETHOD (xData)(DATA* data) PURE;
+	STDMETHOD (xData)(DATA** data) PURE;
 };
 
 class csString:public IString {
@@ -294,14 +294,14 @@ public:
 	void xCopy(IString *istring) {
 		Clear();
 		DATA *data=NULL;
-		istring->xData(data);
+		istring->xData(&data);
 		unsigned long int NewSize=0;
-		istring->xLength(NewSize);
+		istring->xLength(&NewSize);
 		Append(data, NewSize);
 	}
 
-	STDMETHODIMP xLength(unsigned long int Size);
-	STDMETHODIMP xData(DATA* data);
+	STDMETHODIMP xLength(unsigned long int* Size);
+	STDMETHODIMP xData(DATA** data);
 };
 
 inline csSTR operator+(const DATA* op, const csSTR& op2) { return csSTR(op).Append(op2); }
