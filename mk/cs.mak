@@ -128,7 +128,6 @@ clean:
 	-$(RMDIR) $(subst /,,$(OUTBASE))
 	-$(RM) debug.txt
 	-$(RM) precalc.zip
-	-$(RM) config.mak
 
 cleanlib:
 

@@ -223,19 +223,19 @@ ifeq ($(ROOTCONFIG),config)
 # Currently this port does not support dynamic libraries
 override USE_DLL = no
 
-SYSCONFIG += $(NEWLINE)echo override DO_ASM = $(DO_ASM)>>config.tmp
+SYSCONFIG=$(NEWLINE)echo override DO_ASM = $(DO_ASM)>>config.tmp
 ifneq ($(strip $(TARGET_ARCHS)),)
   SYSCONFIG += $(NEWLINE)echo TARGET_ARCHS = $(NEXT.TARGET_ARCHS)>>config.tmp
 endif
 
 endif # ifeq ($(ROOTCONFIG),config)
 
-ifeq ($(ROOTCONFIG),volatile)
+ifeq ($(ROOTCONFIG)/$(MAKESECTION),volatile/rootdefines)
 
 # Add required defines to volatile.h
 MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define OS_NEXT_$(NEXT.FLAVOR)$">>volatile.tmp
 MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define OS_NEXT_DESCRIPTION "$(NEXT.DESCRIPTION)"$">>volatile.tmp
 
-endif # ifeq ($(ROOTCONFIG),volatile)
+endif # ifeq ($(ROOTCONFIG)/$(MAKESECTION),volatile/rootdefines)
 
 endif # ifeq ($(NEXT.FRIEND),yes)
