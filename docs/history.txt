@@ -26,6 +26,7 @@ chronological order.
 	      little_endian_longlong(), causing bogus results.
 	    - Fixed some 64-bit warnings in VFS.
 	- res fixed ivaria/cspace.i for the recent iEvent changes.
+	- Vincent Knecht added instruction for building RPMs in User Manual.
 10-Jul-2004
 	- res fixed the Win32 manifest resource generation code to not emit
 	  non-numerical characters when writing the version number - Windows

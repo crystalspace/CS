@@ -6,6 +6,12 @@
 This section covers all of the Unix-style platforms supported by Crystal Space,
 including Linux, FreeBSD, NetBSD, Solaris, etc.
 
+It is now possible to install Crystal Space using packaging systems:
+
+@menu
+* RPM:: Unix using RPM packages
+@end menu
+
 Crystal Space's X11 canvas optionally supports the @sc{mit} Shared Memory
 Extension (@sc{mit-shm}).  This makes Crystal Space run much faster if your
 server supports it.  The Crystal Space configuration script will detect this
@@ -130,3 +136,5 @@ Alternately, you can choose the software renderer from the command-line:
 
 The software renderer interacts with X11, placing output on the display
 indicated by the @samp{DISPLAY} environment variable.
+
+@importsss{build,platform,unix,rpm.txi}
