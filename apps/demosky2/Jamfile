@@ -1,5 +1,0 @@
-SubDir TOP apps demosky2 ;
-
-Description demosky2 : "sky demo 2" ;
-Application demosky2 : [ Wildcard *.cpp *.h ] : noinstall ;
-LinkWith demosky2 : csgeom csgfx cstool csutil ;

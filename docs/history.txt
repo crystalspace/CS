@@ -90,6 +90,8 @@ chronological order.
 	    cloth       --> CLOTH_OBSOLETE
 	    clothldr    --> CLOTH_OBSOLETE
 	    cocoa2d     --> COCOA2D_OBSOLETE
+	    demosky     --> DEMOSKY_OBSOLETE
+	    demosky2    --> DEMOSKY_OBSOLETE
 	    simplecloth --> CLOTH_OBSOLETE
 1-May-2004
 	- Jorrit added a new data/terrainf/world which is a variant of

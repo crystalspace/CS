@@ -47,11 +47,6 @@ This application tests the Crystal Space Windowing System (@sc{csws}), which
 is designed to provide a clean, effective and cross-platform base for creating
 CrystalSpace-related utilities. @xref{CSWS}.
 
-@cindex @file{demosky}
-@cindex Applications, @file{demosky}
-@item demosky
-An application demonstrating the sky procedural texture.
-
 @cindex @file{g2dtest}
 @cindex Applications, @file{g2dtest}
 @item g2dtest
