@@ -18,6 +18,27 @@ The history order is reversed so that new features are at the top.
 	  between different debug views. Currently two views are supported:
 	  statistics only or statistics + outline overlay. By default
 	  shift-v is assigned to this command in Bugplug.
+	- Added a new view mode for cycle_view (Dynavis) which clears
+	  the screen first.
+	- Dynavis now implements the 'toggle_coverage' command so you can
+	  toggle on/off coverage culling (not implemented yet). The '2' key
+	  in Bugplug is assigned to that command by default.
+	- Dynavis now implements 'clear_stats' command to clear all statistics.
+	  The ctrl-v command in bugplug is assigned to that command by default.
+	- Implement the first primitive and slow version of coverage culling.
+	- Dynavis now implements 'dump_state' command to dump all vis
+	  culling operations that happen during the next frame. This flag
+	  will immediatelly be cleared again after one dump.
+	  The alt-v command in bugplug is assigned to that command by default.
+	- Coverage buffer in Dynavis now also supports a textual dump of
+	  the current coverage tree content.
+	- Fixed a bug in csCoverageBuffer::TestRectangle() which caused
+	  problems with boxes partially outside the view.
+	- Dynavis basically works now. However enabling it currently slows
+	  down as compared to not doing visibility culling. This is
+	  totally expected as the current way to update the coverage buffer
+	  is VERY bad (individual polygons) and defeats the entire purpose
+	  of culling. Here is where the real work starts :-)
 15-May-2002
 	- Fixed a bad bug in csKDTree::Front2Back().
 	- Fixed a bug in the bounding box insertion in the KD-tree.

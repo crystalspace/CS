@@ -644,7 +644,7 @@ bool csCoverageBuffer::TestPolygon (csVector2* verts, int num_verts,
   if (startcol < 0) startcol = 0;
   int endcol = bbox.maxx;
   if (endcol >= width) endcol = width-1;
-  
+
   for (i = startrow ; i <= endrow ; i++)
   {
     int buf_idx = (i<<w_shift) + startcol;
@@ -759,15 +759,17 @@ bool csCoverageBuffer::TestRectangle (const csBox2& rect, float min_depth)
   uint32* scr_buf;
   float* depth_buf;
 
+  if (bbox.miny < 0) bbox.miny = 0;
   int startrow = bbox.miny >> 5;
-  if (startrow < 0) startrow = 0;
+  if (bbox.maxy >= height) bbox.maxy = height-1;
   int endrow = bbox.maxy >> 5;
-  if (endrow >= numrows) endrow = numrows-1;
+  CS_ASSERT (endrow < numrows);
+  if (bbox.minx < 0) bbox.minx = 0;
   int startcol = bbox.minx;
-  if (startcol < 0) startcol = 0;
+  if (bbox.maxx >= width) bbox.maxx = width-1;
   int endcol = bbox.maxx;
-  if (endcol >= width) endcol = width-1;
-  
+  CS_ASSERT (endcol < width);
+
   for (i = startrow ; i <= endrow ; i++)
   {
     uint32 first = ~0;
@@ -858,7 +860,7 @@ bool csCoverageBuffer::TestPoint (const csVector2& point, float min_depth)
 
   int row = yi >> 5;
   int col = xi;
-  
+
   uint32 first = ~0;
   first &= keep_masks[yi & 0x1f];
   first &= ~(first<<1);	// Make sure only one bit is selected.
@@ -938,8 +940,58 @@ static void DrawZoomedPixel (iGraphics2D* g2d, int x, int y, int col, int zoom)
   }
 }
 
+static int count_bits (uint32 bits)
+{
+  int cnt = 0;
+  while (bits)
+  {
+    if (bits & 1) cnt++;
+    bits >>= 1;
+  }
+  return cnt;
+}
+
+iString* csCoverageBuffer::Debug_Dump ()
+{
+  scfString* rc = new scfString ();
+  csString& str = rc->GetCsString ();
+
+  int x, y, i;
+  for (i = 0 ; i < numrows ; i++)
+  {
+    for (y = 3 ; y >= 0 ; y--)
+    {
+      uint32* row = &scr_buffer[(numrows-i-1)<<w_shift];
+      for (x = 0 ; x < width ; x += 8)
+      {
+        uint32 c0 = *row++; c0 = c0 >> y*8; c0 = c0 & 0xff;
+        uint32 c1 = *row++; c1 = c1 >> y*8; c1 = c1 & 0xff;
+        uint32 c2 = *row++; c2 = c2 >> y*8; c2 = c2 & 0xff;
+        uint32 c3 = *row++; c3 = c3 >> y*8; c3 = c3 & 0xff;
+        uint32 c4 = *row++; c4 = c4 >> y*8; c4 = c4 & 0xff;
+        uint32 c5 = *row++; c5 = c5 >> y*8; c5 = c5 & 0xff;
+        uint32 c6 = *row++; c6 = c6 >> y*8; c6 = c6 & 0xff;
+        uint32 c7 = *row++; c7 = c7 >> y*8; c7 = c7 & 0xff;
+	int cnt = count_bits (c0) + count_bits (c1) + count_bits (c2) +
+		  count_bits (c3) + count_bits (c4) + count_bits (c5) +
+		  count_bits (c6) + count_bits (c7);
+	char c;
+        if (cnt == 64) c = '#';
+	else if (cnt > 54) c = '*';
+	else if (cnt == 0) c = ' ';
+	else if (cnt < 10) c = '.';
+	else c = 'x';
+	str.Append (c);
+      }
+      str.Append ('\n');
+    }
+  }
+
+  return rc;
+}
+
 void csCoverageBuffer::Debug_Dump (iGraphics3D* g3d, int zoom)
-{ 
+{
   iGraphics2D* g2d = g3d->GetDriver2D ();
   iTextureManager *txtmgr = g3d->GetTextureManager ();
   int col = txtmgr->FindRGB (200, 200, 200);
@@ -1010,6 +1062,8 @@ bool csCoverageBuffer::Debug_ExtensiveTest (int num_iterations,
 bool csCoverageBuffer::Debug_TestOneIteration (csString& str)
 {
   csVector2 poly[6];
+  csBox2 bbox;
+
   //============================
   // The first part of this test is designed to test the coverage
   // part of the coverage buffer alone. The depth buffer itself is ignored.
@@ -1017,6 +1071,12 @@ bool csCoverageBuffer::Debug_TestOneIteration (csString& str)
   // polygons are tested with 1.0 depth value.
   //============================
   Initialize ();
+
+  // The following case produced a bug in early instantiations of the
+  // coverage buffer.
+  bbox.Set (-11.9428, -163.295, 193.562, 24.843);
+  COV_ASSERT (TestRectangle (bbox, 8.33137) == true, b);
+
   poly[0].Set (5, 5);
   poly[1].Set (635, 5);
   poly[2].Set (635, 475);
@@ -1143,7 +1203,6 @@ bool csCoverageBuffer::Debug_TestOneIteration (csString& str)
   // This part tests the depth buffer part as well.
   //============================
   Initialize ();
-  csBox2 bbox;
   poly[0].Set (160, 120);
   poly[1].Set (320, 120);
   poly[2].Set (320, 240);

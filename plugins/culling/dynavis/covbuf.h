@@ -166,6 +166,7 @@ public:
   iString* Debug_UnitTest ();
   csTicks Debug_Benchmark (int num_iterations);
   void Debug_Dump (iGraphics3D* g3d, int zoom = 1);
+  iString* Debug_Dump ();
 
   struct DebugHelper : public iDebugHelper
   {
@@ -174,7 +175,8 @@ public:
     {
       return CS_DBGHELP_UNITTEST |
       	     CS_DBGHELP_BENCHMARK |
-	     CS_DBGHELP_GFXDUMP;
+	     CS_DBGHELP_GFXDUMP |
+	     CS_DBGHELP_TXTDUMP;
     }
     virtual iString* UnitTest ()
     {
@@ -190,7 +192,7 @@ public:
     }
     virtual iString* Dump ()
     {
-      return NULL;
+      return scfParent->Debug_Dump ();
     }
     virtual void Dump (iGraphics3D* g3d)
     {

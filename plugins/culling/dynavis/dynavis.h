@@ -30,17 +30,25 @@
 class csKDTree;
 class csKDTreeChild;
 class csCoverageBuffer;
+struct iThingState;
+struct iMovable;
+struct iMeshWrapper;
 
 enum csVisReason
 {
   INVISIBLE_PARENT = 0,	// Invisible because some parent node is invisible.
   INVISIBLE_FRUSTUM,	// Invisible because object outside frustum.
+  INVISIBLE_TESTRECT,	// Invisible because covbuf->TestRectangle() failed.
   VISIBLE,		// Just visible.
   LAST_REASON
 };
 
 #define VIEWMODE_STATS 0
 #define VIEWMODE_STATSOVERLAY 1
+#define VIEWMODE_CLEARSTATSOVERLAY 2
+
+#define VIEWMODE_FIRST 0
+#define VIEWMODE_LAST 2
 
 struct VisTest_Front2BackData;
 
@@ -80,17 +88,30 @@ private:
 
   // Various flags to enable/disable parts of the culling algorithm.
   bool do_cull_frustum;
+  bool do_cull_coverage;
 
   // View mode for debugging (one of VIEWMODE_... constants).
   int cfg_view_mode;
 
+  // If this flag is true we will do an extensive dump of the current
+  // visibility culling proceedings during the next frame. This flag
+  // will immediatelly be cleared after that dump.
+  bool do_state_dump;
+
   // Scan all objects, mark them as invisible and check if they
   // have moved since last frame (and update them in the kdtree then).
   void UpdateObjects ();
+
   // Fill the bounding box with the current object status.
   void CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox);
+
   // Calculate a screen bounding box for the given world space bbox.
-  void ProjectBBox (iCamera* camera, const csBox3& bbox, csBox2& sbox);
+  void ProjectBBox (iCamera* camera, const csBox3& bbox, csBox2& sbox,
+  	float& min_depth);
+
+  // Given an occluder, update it in the coverage buffer. @@@ iThingState!
+  void UpdateCoverageBuffer (iCamera* camera, iMovable* movable,
+  	iMeshWrapper* mesh, iThingState* thing);
 
 public:
   SCF_DECLARE_IBASE;
