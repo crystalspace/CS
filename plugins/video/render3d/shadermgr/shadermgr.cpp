@@ -25,6 +25,7 @@
 #include "csutil/strset.h"
 #include "csutil/objreg.h"
 #include "csgeom/vector3.h"
+#include "csgeom/vector4.h"
 #include "csutil/hashmap.h"
 
 #include "igeom/clip2d.h"
@@ -258,7 +259,7 @@ csPtr<iShaderProgram> csShaderManager::CreateShaderProgram(const char* type)
   for(i = 0; i < pluginlist.Length(); ++i)
   {
     if( ((iShaderProgramPlugin*)pluginlist.Get(i))->SupportType(type))
-      return ((iShaderProgramPlugin*)pluginlist.Get(i))->CreateProgram();
+      return ((iShaderProgramPlugin*)pluginlist.Get(i))->CreateProgram(type);
   }
   return NULL;
 }

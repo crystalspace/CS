@@ -21,11 +21,11 @@
 #ifndef __CS_IVIDEO_SHADER_H__
 #define __CS_IVIDEO_SHADER_H__
 
+#include "csgeom/vector4.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
 #include "ivideo/render3d.h"
 
-class csVector3;
 struct iString;
 struct iDataBuffer;
 struct iDocumentNode;
@@ -135,12 +135,12 @@ struct iShaderVariable : iBase
   virtual bool GetValue(float& value) = 0;
   virtual bool GetValue(iString* value) = 0;
   virtual bool GetValue(csVector3& value) = 0;
-//  virtual bool GetValue(csVector4* value) = 0;
+  virtual bool GetValue(csVector4& value) = 0;
   virtual bool SetValue(int value) = 0;
   virtual bool SetValue(float value) = 0;
   virtual bool SetValue(iString* value) = 0;
   virtual bool SetValue(csVector3 value) = 0;
-//  virtual bool SetValue(csVector4* value) = 0;
+  virtual bool SetValue(csVector4 value) = 0;
 };
 
 SCF_VERSION (iShaderTechnique, 0,0,1);

@@ -89,6 +89,14 @@ void csShaderGLAVP::Activate(iShaderPass* current, csRenderMesh* mesh)
                                               v3.x ,v3.y,v3.z,1);
         }
         break;
+      case iShaderVariable::VECTOR4:
+        {
+          csVector4 v4;
+          if(lvar->GetValue(v4))
+            ext->glProgramLocalParameter4fARB(GL_VERTEX_PROGRAM_ARB, e->registernum,
+                                              v4.x ,v4.y,v4.z,v4.w);
+        }
+        break;
       }
     }
   }
