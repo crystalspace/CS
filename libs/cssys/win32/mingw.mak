@@ -5,22 +5,25 @@ DESCRIPTION.mingw = Win32 with Mingw GCC
 
 
 # Choose which drivers you want to build/use
-# video/canvas/ddraw6 video/canvas/ddraw video/renderer/direct3d5
-# video/renderer/direct3d6 video/renderer/opengl
+# video/canvas/ddraw6 video/canvas/ddraw 
+# video/renderer/direct3d5 video/renderer/direct3d6
+# video/renderer/opengl
 #
-PLUGINS+= video/canvas/ddraw video/renderer/software \
-	font/renderer/csfont
+PLUGINS += video/canvas/ddraw video/renderer/software font/renderer/csfont
 # font/renderer/csfont font/renderer/freefont
 # sound/renderer/software video/canvas/ddraw video/renderer/direct3d5 \
 # video/renderer/direct3d6 video/renderer/opengl
 #
-#  Uncomment the following to get a startup console window
-CONSOLE_FLAGS = -DWIN32_USECONSOLE
+
+#  Console window is always generated for OS_WIN32...see LFLAGS.GENERAL
+# Uncomment the following to get an startup console window
+#CONSOLE_FLAGS = -DWIN32_USECONSOLE
+
 
 #---------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
 
-.SUFFIXES: .exe .dll
+.SUFFIXES: .exe .dll .a
 
 # Processor type.
 PROC=INTEL
@@ -47,8 +50,15 @@ ifeq ($(MAKESECTION),defines)
 
 include mk/dos.mak
 
+# OpenGL settings for use with OpenGL Drivers...untested
+#SGI OPENGL SDK v1.1 for Win32
+#OPENGL.LIBS.DEFINED = -lopengl -lglut
+#MS OpenGL
+#OPENGL.LIBS.DEFINED = -lopengl32 -lglut32
+
 # Extra libraries needed on this system (beside drivers)
-LIBS.EXE=
+# -mwindows or -lgdi32 are required for Mingw build
+LIBS.EXE= -mwindows
 
 # Where can the Zlib library be found on this system?
 Z_LIBS=-Llibs/zlib -lz
@@ -75,7 +85,7 @@ CFLAGS.INCLUDE=-Ilibs/zlib -Ilibs/libpng -Ilibs/libjpeg
 
 # General flags for the compiler which are used in any case.
 # Default is Ix386:
-CFLAGS.GENERAL+= -fomit-frame-pointer -fvtable-thunks \
+#CFLAGS.GENERAL+= -fomit-frame-pointer -fvtable-thunks \
 		-DWIN32_VOLATILE -Wall $(CFLAGS.SYSTEM)
 
 # If using Pentium II
@@ -83,8 +93,8 @@ CFLAGS.GENERAL+= -fomit-frame-pointer -fvtable-thunks \
 #		-DWIN32_VOLATILE -Wall $(CFLAGS.SYSTEM)
 
 # If using Pentium Pro or better (Recommended for MMX builds)
-#CFLAGS.GENERAL+=-Dpentiumpro -fomit-frame-pointer -fvtable-thunks \
-#		-DWIN32_VOLATILE -Wall $(CFLAGS.SYSTEM)
+CFLAGS.GENERAL+=-Dpentiumpro -fomit-frame-pointer -fvtable-thunks \
+		-DWIN32_VOLATILE -Wall $(CFLAGS.SYSTEM)
 
 # Flags for the compiler which are used when optimizing.
 CFLAGS.optimize=-s -O3
@@ -99,8 +109,7 @@ CFLAGS.profile=-pg -O -g
 CFLAGS.DLL=
 
 # General flags for the linker which are used in any case.
-# -mwindows is required for COMP_GCC build
-LFLAGS.GENERAL= -mwindows
+LFLAGS.GENERAL =
 
 # Flags for the linker which are used when optimizing.
 LFLAGS.optimize=
@@ -116,11 +125,14 @@ ifeq ($(USE_SHARED_PLUGINS),yes)
 LFLAGS.DLL=--dll
 endif
 
-# Typical extension for objects
-O=.o
-
 # Typical extension for static libraries
 LIB=.a
+
+# Typical extension for object files
+O=.o
+
+# Typical extension for assembler files
+ASM=.asm
 
 LIB_SUFFIX=
 
@@ -144,13 +156,13 @@ SRC.SYS_CSSYS = libs/cssys/win32/printf.cpp \
 SRC.SYS_CSSYS_EXE=libs/cssys/win32/exeentry.cpp
 SRC.SYS_CSSYS_DLL=libs/cssys/win32/dllentry.cpp
 
-# The C compiler
-CC=gcc -c
+# The C compiler for Mingw/GCC
+CC=gcc
 
-# The C++ compiler
-CXX=c++ -c
+# The C++ compiler for Mingw
+CXX=c++
 
-# The linker.
+# The linker for Mingw/G++
 LINK=c++
 
 # Command sequence for creating a directory.
