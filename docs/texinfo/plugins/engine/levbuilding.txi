@@ -214,7 +214,7 @@ Also assume there is another object inside that sphere. If the first technique
 is used (closed object) then @samp{Dynavis} will be most optimal for
 updating the coverage buffer as writing an outline is very cheap. On the
 other hand it will not be able to cull away the object inside the sphere
-as the depth buffer is set to deep. i.e. the object in the sphere will be
+as the depth buffer is set too deep. i.e. the object in the sphere will be
 in front of the depth that is set in the depth buffer.
 
 On the other hand, if the second (non-closed) technique is used then
