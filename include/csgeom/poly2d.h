@@ -139,8 +139,8 @@ public:
 class csPoly2DFactory
 {
 public:
-  /// A static factory that you can use.
-  static csPoly2DFactory factory;
+  /// A shared factory that you can use.
+  static csPoly2DFactory* SharedFactory();
 
   /// Create a poly2d.
   virtual csPoly2D* Create () { CHK (csPoly2D* p = new csPoly2D ()); return p; }

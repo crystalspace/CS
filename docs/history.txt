@@ -34,6 +34,11 @@ Short-term cleanups that need to be done:
 	  csPoly2D.
 	- csClipper now uses a polygon pool instead of creating new
 	  polygons every time we go through a portal.
+	- Eric Sunshine worked around a NextStep compiler bug triggered by
+	  Jorrit's changes to the polygon code.  Specifically, the static
+	  csPolygon2DFactory instance in pol2d.cpp triggered a bug in the
+	  compiler which caused it to consume memory endlessly until all swap
+	  space was exhausted.
 10-Aug-1999
 	- Eric Sunshine fixed a bug in MetaDemo.  It was not parsing its
 	  command line arguments correctly.  Instead of explicitly looking for
@@ -66,13 +71,12 @@ Short-term cleanups that need to be done:
 	  calculations and csWorld::DrawFunc().
 	- Everything seems to work well. Here is the list of currently known
 	  bugs (in the c-buffer/bsp system):
-	  	- A crash at exit when deallocating a csPolygon3D.
-		- Edge display does not work correctly when c-buffer is enabled.
-		- Space warping portals still have problems with c-buffer.
-		- There are still cases that drawing with the BSP tree gives
-		  incorrect results. Very rare though.
-		- The falling blocks in Blocks are not correctly lighted
-		  anymore.
+	    - A crash at exit when deallocating a csPolygon3D.
+	    - Edge display does not work correctly when c-buffer is enabled.
+	    - Space warping portals still have problems with c-buffer.
+	    - There are still cases that drawing with the BSP tree gives
+	      incorrect results.  Very rare though.
+	    - The falling blocks in Blocks are not correctly lighted anymore.
 	- Changes from Andrew Zabolotny. Fix for DJGPP so that volatile.h is
 	  correctly generated. Various other makefile changes.
 	- Andrew Zabolotny fixed bug with 32-bit lighted textures in BGRA

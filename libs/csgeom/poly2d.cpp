@@ -20,7 +20,13 @@
 #include "csgeom/poly2d.h"
 #include "csgeom/polyclip.h"
 
-csPoly2DFactory csPoly2DFactory::factory;
+csPoly2DFactory* csPoly2DFactory::SharedFactory()
+{
+  static csPoly2DFactory* p = 0;
+  if (p == 0)
+    CHK (p = new csPoly2DFactory);
+  return p;
+}
 
 csPoly2D::csPoly2D ()
 {

@@ -69,7 +69,7 @@ csWorld::csWorld () : csObject (), start_vec (0, 0, 0)
   piHR = NULL;
   textures = NULL;
   c_buffer = NULL;
-  CHK (render_pol2d_pool = new csPoly2DPool (&csPolygon2DFactory::factory));
+  CHK (render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory()));
   CHK (cfg_engine = new csEngineConfig ());
   BuildSqrtTable ();
 }
@@ -105,7 +105,7 @@ void csWorld::Clear ()
   CHK (textures = new csTextureList ());
   CHK (delete c_buffer); c_buffer = NULL;
   CHK (delete render_pol2d_pool);
-  CHK (render_pol2d_pool = new csPoly2DPool (&csPolygon2DFactory::factory));
+  CHK (render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory()));
 }
 
 void csWorld::EnableLightingCache (bool en)

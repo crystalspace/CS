@@ -25,7 +25,7 @@
 
 //---------------------------------------------------------------------------
 
-csPoly2DPool csClipper::polypool (&csPoly2DFactory::factory);
+csPoly2DPool csClipper::polypool (csPoly2DFactory::SharedFactory());
 
 bool csBoxClipper::Clip (csVector2 *Polygon, csVector2* dest_poly, int Count,
 	int &OutCount)
