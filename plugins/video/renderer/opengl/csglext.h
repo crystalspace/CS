@@ -34,20 +34,22 @@
 #define __WIN32__
 #endif
 
-#if !defined(OPENSTEP) && (defined(__WIN32__) && !defined(__CYGWIN__))
-#  if defined(_MSC_VER) && defined(BUILD_GL32) /* tag specify we're building mesa as a DLL */
-#    define GLAPI __declspec(dllexport)
-#  elif defined(_MSC_VER) && defined(_DLL) /* tag specifying we're building for DLL runtime support */
-#    define GLAPI __declspec(dllimport)
-#  else /* for use with static link lib build of Win32 edition only */
-#    define GLAPI extern
-#  endif /* _STATIC_MESA support */
-#  define GLAPIENTRY __stdcall
-#else
+#if !defined(GLAPI)
+#  if !defined(OPENSTEP) && (defined(__WIN32__) && !defined(__CYGWIN__))
+#    if defined(_MSC_VER) && defined(BUILD_GL32) /* tag specify we're building mesa as a DLL */
+#      define GLAPI __declspec(dllexport)
+#    elif defined(_MSC_VER) && defined(_DLL) /* tag specifying we're building for DLL runtime support */
+#      define GLAPI __declspec(dllimport)
+#    else /* for use with static link lib build of Win32 edition only */
+#      define GLAPI extern
+#    endif /* _STATIC_MESA support */
+#    define GLAPIENTRY __stdcall
+#  else
 /* non-Windows compilation */
-#  define GLAPI extern
-#  define GLAPIENTRY
-#endif /* WIN32 / CYGWIN bracket */
+#    define GLAPI extern
+#    define GLAPIENTRY
+#  endif /* WIN32 / CYGWIN bracket */
+#endif
 
 //#if defined(_WIN32) && !defined(_WINGDI_) && !defined(__CYGWIN__) && !defined(_GNU_H_WINDOWS32_DEFINES) && !defined(OPENSTEP)
 //#include <gl/mesa_wgl.h>

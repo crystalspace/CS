@@ -3746,7 +3746,6 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
 
   // set up coordinate transform
   GLfloat matrixholder[16];
-  GLfloat my_mvp[16];
 
   //glPushAttrib( GL_ALL_ATTRIB_BITS );
   //glPushClientAttrib(GL_CLIENT_ALL_ATTRIB_BITS);
