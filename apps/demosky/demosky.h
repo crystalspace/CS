@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef SIMPLE_H
-#define SIMPLE_H
+#ifndef DEMOSKY_H
+#define DEMOSKY_H
 
 #include <stdarg.h>
 #include "cssys/sysdriv.h"
@@ -25,6 +25,7 @@
 #include "csgeom/math3d.h"
 
 class csSector;
+struct iSector;
 class csView;
 class csEngine;
 class csDynLight;
@@ -33,6 +34,10 @@ class csProcSky;
 class csProcSkyTexture;
 class csPolygon3D;
 struct iFont;
+struct iMeshWrapper;
+struct iMaterialWrapper;
+
+class Flock;
 
 class Simple : public SysSystemDriver
 {
@@ -43,6 +48,9 @@ private:
   csEngine* engine;
   csMaterialWrapper* matPlasma;
   iFont *font;
+
+  /// the flock of birds
+  Flock *flock;
 
   /// the sky 
   csProcSky *sky;
@@ -67,5 +75,21 @@ public:
   virtual bool HandleEvent (iEvent &Event);
 };
 
-#endif // SIMPLE_H
+
+/** A flock of birds, a collection of sprites*/
+class Flock {
+  /// nr of sprites
+  int nr;
+  /// the sprites
+  iMeshWrapper **spr;
+
+
+public:
+  /// create, nr , texture
+  Flock(csEngine *engine, int num, iMaterialWrapper *mat, iSector *sector);
+  ///
+  ~Flock();
+};
+
+#endif // DEMOSKY_H
 

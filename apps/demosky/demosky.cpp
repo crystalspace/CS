@@ -36,6 +36,8 @@
 #include "itxtmgr.h"
 #include "iconsole.h"
 #include "ifontsrv.h"
+#include "imspr2d.h"
+#include "imeshobj.h"
 
 //------------------------------------------------- We need the 3D engine -----
 
@@ -54,6 +56,7 @@ Simple::Simple ()
   sky_r = NULL;
   sky_u = NULL;
   sky_d = NULL;
+  flock = NULL;
 }
 
 Simple::~Simple ()
@@ -68,6 +71,8 @@ Simple::~Simple ()
   delete sky_r;
   delete sky_u;
   delete sky_d;
+
+  //delete flock;
 }
 
 void cleanup ()
@@ -230,6 +235,11 @@ bool Simple::Initialize (int argc, const char* const argv[],
   SetTexSpace (sky_b, p, 256, p->Vobj (0), p->Vobj (1), 2.*size, p->Vobj(3), 2.*size);
   p->flags.Set(CS_POLY_LIGHTING, 0);
 
+  csLoader::LoadTexture (engine, "seagull", "/lib/std/seagull.gif");
+  csMaterialWrapper *sg = engine->GetMaterials ()->FindByName("seagull");
+  flock = new Flock(engine, 10, QUERY_INTERFACE(sg, iMaterialWrapper), 
+    QUERY_INTERFACE(room, iSector));
+
   engine->Prepare ();
 
   Printf (MSG_INITIALIZATION, "--------------------------------------\n");
@@ -314,6 +324,64 @@ bool Simple::HandleEvent (iEvent &Event)
   return false;
 }
 
+//--- Flock -----------------------
+Flock::Flock(csEngine *engine, int num, iMaterialWrapper *mat, iSector *sector)
+{
+  nr = num;
+  spr = new iMeshWrapper* [nr];
+  int i;
+  iMeshFactoryWrapper *fact = engine->CreateMeshFactory(
+    "crystalspace.mesh.object.sprite.2d", "BirdFactory");
+  iSprite2DFactoryState *state = QUERY_INTERFACE(fact->GetMeshObjectFactory(),
+    iSprite2DFactoryState);
+  state->SetMaterialWrapper(mat);
+  csVector3 startpos(20,20,10);
+  csVector3 pos;
+  for(i=0; i<nr; i++)
+  {
+     pos = startpos;
+     pos.x += (float(rand()+1.)/RAND_MAX)*20. - 10.;
+     pos.z += (float(rand()+1.)/RAND_MAX)*20. - 10.;
+     spr[i] = engine->CreateMeshObject(fact, "Bird", sector, startpos);
+
+     iSprite2DState *sprstate = QUERY_INTERFACE(spr[i], iSprite2DState);
+     sprstate->GetVertices().SetLimit(4);
+     sprstate->GetVertices().SetLength(4);
+     sprstate->GetVertices()[0].color_init.Set(1.0,1.0,1.0);
+     sprstate->GetVertices()[1].color_init.Set(1.0,1.0,1.0);
+     sprstate->GetVertices()[2].color_init.Set(1.0,1.0,1.0);
+     sprstate->GetVertices()[3].color_init.Set(1.0,1.0,1.0);
+     float sz = 0.25;
+     sprstate->GetVertices()[0].pos.Set(-sz, sz);
+     sprstate->GetVertices()[0].u = 0.2;
+     sprstate->GetVertices()[0].v = 0;
+     sprstate->GetVertices()[1].pos.Set(+sz, sz);
+     sprstate->GetVertices()[1].u = 0.8;
+     sprstate->GetVertices()[1].v = 0;
+     sprstate->GetVertices()[2].pos.Set(+sz, -sz);
+     sprstate->GetVertices()[2].u = 0.8;
+     sprstate->GetVertices()[2].v = 1.0;
+     sprstate->GetVertices()[3].pos.Set(-sz, -sz);
+     sprstate->GetVertices()[3].u = 0.2;
+     sprstate->GetVertices()[3].v = 1.0;
+     sprstate->DecRef();
+
+     engine->meshes.Push(spr[i]);
+
+  }
+  state->DecRef();
+  fact->DecRef();
+}
+
+Flock::~Flock()
+{
+  int i;
+  for(i=0; i<nr; i++)
+    spr[i]->DecRef();
+  delete[] spr;
+}
+
+
 /*---------------------------------------------------------------------*
  * Main function
  *---------------------------------------------------------------------*/
@@ -348,3 +416,5 @@ int main (int argc, char* argv[])
 
   return 0;
 }
+
+
