@@ -184,7 +184,9 @@ void csPortal::GetColorFilter (float &r, float &g, float &b) const
 void csPortal::ComputeCameraPlane (const csReversibleTransform& t,
 	csPlane3& camplane)
 {
-  // @@@ TODO
+  csDirtyAccessArray<csVector3>* vt = parent->GetWorldVertices ();
+  csVector3 cam_vert = t.Other2This ((*vt)[0]);
+  t.Other2This (world_plane, cam_vert, camplane);
 }
 
 bool csPortal::IntersectRay (const csVector3 &start,

@@ -169,6 +169,7 @@ public:
   uint32 GetDataNumber () const { return data_nr; }
   void Prepare ();
   csDirtyAccessArray<csVector3>* GetVertices () { return &vertices; }
+  csDirtyAccessArray<csVector3>* GetWorldVertices () { return &world_vertices; }
   const csRefArray<csPortal>& GetPortals () const { return portals; }
 
   SCF_DECLARE_IBASE_EXT (csMeshObject);

@@ -7,6 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 27-Sep-2003
+	- Jorrit implemented csPortal::ComputeCameraPlane().
 	- Eric Sunshine made minor clarifications to the "SCF Changes" section
 	  of the "Release Notes 0.96 to 0.98" appendix in the user manual.
 26-Sep-2003
