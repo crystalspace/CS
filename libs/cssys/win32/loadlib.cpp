@@ -312,7 +312,7 @@ inline static void AddLower (csStringHash& hash, const char* str)
   static int id = 0;
 
   csString tmp (str);
-  tmp.strlwr ();
+  tmp.Downcase ();
   hash.Register (tmp, id++);
 }
 

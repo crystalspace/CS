@@ -42,6 +42,7 @@ chronological order.
 	- Eric Sunshined replaced a bunch of long, ugly copy/paste sprintf()
 	  invocations throughout the project with csMD5::Digest:HexString().
 	- Eric Sunshine removed the unused iShaderProgram::GetProgramID().
+	- Jorrit fixed a missing strlwr() in win32/loadlib.cpp.
 28-Sep-2003
 	- Eric Sunshine corrected erroneous comments in
 	  CS/mk/autoconf/compiler.m4.
