@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2001 by W.C.A. Wijngaards
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,6 +21,7 @@
 #define _RAINLDR_H_
 
 #include "imap/reader.h"
+#include "imap/writer.h"
 
 struct iEngine;
 struct iSystem;
@@ -51,6 +53,33 @@ public:
 };
 
 /**
+ * Rain factory saver.
+ */
+class csRainFactorySaver : public iSaverPlugIn
+{
+private:
+  iSystem* sys;
+
+public:
+  /// Constructor.
+  csRainFactorySaver (iBase*);
+
+  /// Destructor.
+  virtual ~csRainFactorySaver ();
+
+  /// Register plugin with the system driver
+  virtual bool Initialize (iSystem *pSystem);
+
+public:
+  //------------------------ iSaverPlugIn implementation --------------
+  DECLARE_IBASE;
+
+  /// Write down given object and add to string vector.
+  virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
+};
+
+
+/**
  * Rain loader.
  */
 class csRainLoader : public iLoaderPlugIn
@@ -75,6 +104,34 @@ public:
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine);
 };
+
+/**
+ * Rain saver.
+ */
+class csRainSaver : public iSaverPlugIn
+{
+private:
+  iSystem* sys;
+
+public:
+  /// Constructor.
+  csRainSaver (iBase*);
+
+  /// Destructor.
+  virtual ~csRainSaver ();
+
+  /// Register plugin with the system driver
+  virtual bool Initialize (iSystem *pSystem);
+
+public:
+  //------------------------ iSaverPlugIn implementation --------------
+  DECLARE_IBASE;
+
+  /// Write down given object and add to string vector.
+  virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
+};
+
+
 
 #endif // _RAINLDR_H_
 

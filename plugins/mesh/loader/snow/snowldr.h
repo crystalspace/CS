@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2001 by W.C.A. Wijngaards
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,6 +21,7 @@
 #define _SNOWLDR_H_
 
 #include "imap/reader.h"
+#include "imap/writer.h"
 
 struct iEngine;
 struct iSystem;
@@ -51,6 +53,32 @@ public:
 };
 
 /**
+ * Snow factory saver.
+ */
+class csSnowFactorySaver : public iSaverPlugIn
+{
+private:
+  iSystem* sys;
+
+public:
+  /// Constructor.
+  csSnowFactorySaver (iBase*);
+
+  /// Destructor.
+  virtual ~csSnowFactorySaver ();
+
+  /// Register plugin with the system driver
+  virtual bool Initialize (iSystem *pSystem);
+
+public:
+  //------------------------ iSaverPlugIn implementation --------------
+  DECLARE_IBASE;
+
+  /// Write down given object and add to string vector.
+  virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
+};
+
+/**
  * Snow loader.
  */
 class csSnowLoader : public iLoaderPlugIn
@@ -75,6 +103,33 @@ public:
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine);
 };
+
+/**
+ * Snow saver.
+ */
+class csSnowSaver : public iSaverPlugIn
+{
+private:
+  iSystem* sys;
+
+public:
+  /// Constructor.
+  csSnowSaver (iBase*);
+
+  /// Destructor.
+  virtual ~csSnowSaver ();
+
+  /// Register plugin with the system driver
+  virtual bool Initialize (iSystem *pSystem);
+
+public:
+  //------------------------ iSaverPlugIn implementation --------------
+  DECLARE_IBASE;
+
+  /// Write down given object and add to string vector.
+  virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
+};
+
 
 #endif // _SNOWLDR_H_
 

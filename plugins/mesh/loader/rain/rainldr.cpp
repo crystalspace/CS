@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2001 by W.C.A. Wijngaards
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -30,6 +31,11 @@
 #include "imesh/rain.h"
 #include "ivideo/graph3d.h"
 #include "qint.h"
+#include "iutil/strvec.h"
+#include "csutil/util.h"
+#include "iobject/object.h"
+#include "iengine/material.h"
+#include "csengine/material.h"
 
 CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ADD)
@@ -56,19 +62,35 @@ IMPLEMENT_IBASE (csRainFactoryLoader)
   IMPLEMENTS_INTERFACE (iPlugIn)
 IMPLEMENT_IBASE_END
 
+IMPLEMENT_IBASE (csRainFactorySaver)
+  IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+IMPLEMENT_IBASE_END
+
 IMPLEMENT_IBASE (csRainLoader)
   IMPLEMENTS_INTERFACE (iLoaderPlugIn)
   IMPLEMENTS_INTERFACE (iPlugIn)
 IMPLEMENT_IBASE_END
 
+IMPLEMENT_IBASE (csRainSaver)
+  IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+IMPLEMENT_IBASE_END
+
 IMPLEMENT_FACTORY (csRainFactoryLoader)
+IMPLEMENT_FACTORY (csRainFactorySaver)
 IMPLEMENT_FACTORY (csRainLoader)
+IMPLEMENT_FACTORY (csRainSaver)
 
 EXPORT_CLASS_TABLE (rainldr)
   EXPORT_CLASS (csRainFactoryLoader, "crystalspace.mesh.loader.factory.rain",
     "Crystal Space Rain Factory Loader")
+  EXPORT_CLASS (csRainFactorySaver, "crystalspace.mesh.saver.factory.rain",
+    "Crystal Space Rain Factory Saver")
   EXPORT_CLASS (csRainLoader, "crystalspace.mesh.loader.rain",
     "Crystal Space Rain Mesh Loader")
+  EXPORT_CLASS (csRainSaver, "crystalspace.mesh.saver.rain",
+    "Crystal Space Rain Mesh Saver")
 EXPORT_CLASS_TABLE_END
 
 csRainFactoryLoader::csRainFactoryLoader (iBase* pParent)
@@ -99,6 +121,46 @@ iBase* csRainFactoryLoader::Parse (const char* /*string*/, iEngine* /*engine*/)
   return fact;
 }
 
+//---------------------------------------------------------------------------
+csRainFactorySaver::csRainFactorySaver (iBase* pParent)
+{
+  CONSTRUCT_IBASE (pParent);
+}
+
+csRainFactorySaver::~csRainFactorySaver ()
+{
+}
+
+bool csRainFactorySaver::Initialize (iSystem* system)
+{
+  sys = system;
+  return true;
+}
+
+#define MAXLINE 100 /* max number of chars per line... */
+
+static void WriteMixmode(iStrVector *str, UInt mixmode)
+{
+  str->Push(strnew("  MIXMODE ("));
+  if(mixmode&CS_FX_COPY) str->Push(strnew(" COPY ()"));
+  if(mixmode&CS_FX_ADD) str->Push(strnew(" ADD ()"));
+  if(mixmode&CS_FX_MULTIPLY) str->Push(strnew(" MULTIPLY ()"));
+  if(mixmode&CS_FX_MULTIPLY2) str->Push(strnew(" MULTIPLY2 ()"));
+  if(mixmode&CS_FX_KEYCOLOR) str->Push(strnew(" KEYCOLOR ()"));
+  if(mixmode&CS_FX_TRANSPARENT) str->Push(strnew(" TRANSPARENT ()"));
+  if(mixmode&CS_FX_ALPHA) {
+    char buf[MAXLINE];
+    sprintf(buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
+    str->Push(strnew(buf));
+  }
+  str->Push(strnew(")"));
+}
+
+void csRainFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
+  iEngine* /*engine*/)
+{
+  // nothing to do
+}
 //---------------------------------------------------------------------------
 
 csRainLoader::csRainLoader (iBase* pParent)
@@ -290,4 +352,65 @@ iBase* csRainLoader::Parse (const char* string, iEngine* engine)
 
 //---------------------------------------------------------------------------
 
+csRainSaver::csRainSaver (iBase* pParent)
+{
+  CONSTRUCT_IBASE (pParent);
+}
 
+csRainSaver::~csRainSaver ()
+{
+}
+
+bool csRainSaver::Initialize (iSystem* system)
+{
+  sys = system;
+  return true;
+}
+
+void csRainSaver::WriteDown (iBase* obj, iStrVector *str,
+  iEngine* /*engine*/)
+{
+  iFactory *fact = QUERY_INTERFACE (this, iFactory);
+  iParticleState *partstate = QUERY_INTERFACE (obj, iParticleState);
+  iRainState *state = QUERY_INTERFACE (obj, iRainState);
+  char buf[MAXLINE];
+  char name[MAXLINE];
+
+  csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
+  sprintf(buf, "FACTORY ('%s')\n", name);
+  str->Push(strnew(buf));
+
+  if(partstate->GetMixMode() != CS_FX_COPY)
+  {
+    WriteMixmode(str, partstate->GetMixMode());
+  }
+
+  sprintf(buf, "MATERIAL (%s)\n", partstate->GetMaterialWrapper()->
+    GetPrivateObject()->GetName());
+  str->Push(strnew(buf));
+  sprintf(buf, "COLOR (%g, %g, %g)\n", partstate->GetColor().red,
+    partstate->GetColor().green, partstate->GetColor().blue);
+  str->Push(strnew(buf));
+  printf(buf, "NUMBER (%d)\n", state->GetNumberParticles());
+  str->Push(strnew(buf));
+  sprintf(buf, "LIGHTING (%s)\n", state->GetLighting()?"true":"false");
+  str->Push(strnew(buf));
+  float sx = 0.0, sy = 0.0;
+  state->GetDropSize(sx, sy);
+  sprintf(buf, "DROPSIZE (%g, %g)\n", sx, sy);
+  str->Push(strnew(buf));
+  printf(buf, "FALLSPEED (%g, %g, %g)\n", state->GetFallSpeed().x, 
+    state->GetFallSpeed().y, state->GetFallSpeed().z);
+  str->Push(strnew(buf));
+  csVector3 minbox, maxbox;
+  state->GetBox(minbox, maxbox);
+  printf(buf, "BOX (%g,%g,%g, %g,%g,%g)\n", minbox.x, minbox.y, minbox.z, 
+    maxbox.x, maxbox.y, maxbox.z);
+
+  fact->DecRef();
+  partstate->DecRef();
+  state->DecRef();
+}
+
+
+//---------------------------------------------------------------------------

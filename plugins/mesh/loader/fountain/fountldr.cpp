@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2001 by W.C.A. Wijngaards
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -30,6 +31,11 @@
 #include "imesh/fountain.h"
 #include "ivideo/graph3d.h"
 #include "qint.h"
+#include "iutil/strvec.h"
+#include "csutil/util.h"
+#include "iobject/object.h"
+#include "iengine/material.h"
+#include "csengine/material.h"
 
 CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ADD)
@@ -61,19 +67,35 @@ IMPLEMENT_IBASE (csFountainFactoryLoader)
   IMPLEMENTS_INTERFACE (iPlugIn)
 IMPLEMENT_IBASE_END
 
+IMPLEMENT_IBASE (csFountainFactorySaver)
+  IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+IMPLEMENT_IBASE_END
+
 IMPLEMENT_IBASE (csFountainLoader)
   IMPLEMENTS_INTERFACE (iLoaderPlugIn)
   IMPLEMENTS_INTERFACE (iPlugIn)
 IMPLEMENT_IBASE_END
 
+IMPLEMENT_IBASE (csFountainSaver)
+  IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+IMPLEMENT_IBASE_END
+
 IMPLEMENT_FACTORY (csFountainFactoryLoader)
+IMPLEMENT_FACTORY (csFountainFactorySaver)
 IMPLEMENT_FACTORY (csFountainLoader)
+IMPLEMENT_FACTORY (csFountainSaver)
 
 EXPORT_CLASS_TABLE (fountldr)
   EXPORT_CLASS (csFountainFactoryLoader, "crystalspace.mesh.loader.factory.fountain",
     "Crystal Space Fountain Factory Loader")
+  EXPORT_CLASS (csFountainFactorySaver, "crystalspace.mesh.saver.factory.fountain",
+    "Crystal Space Fountain Factory Saver")
   EXPORT_CLASS (csFountainLoader, "crystalspace.mesh.loader.fountain",
     "Crystal Space Fountain Mesh Loader")
+  EXPORT_CLASS (csFountainSaver, "crystalspace.mesh.saver.fountain",
+    "Crystal Space Fountain Mesh Saver")
 EXPORT_CLASS_TABLE_END
 
 csFountainFactoryLoader::csFountainFactoryLoader (iBase* pParent)
@@ -102,6 +124,49 @@ iBase* csFountainFactoryLoader::Parse (const char* /*string*/, iEngine* /*engine
   iMeshObjectFactory* fact = type->NewFactory ();
   type->DecRef ();
   return fact;
+}
+
+//---------------------------------------------------------------------------
+
+csFountainFactorySaver::csFountainFactorySaver (iBase* pParent)
+{
+  CONSTRUCT_IBASE (pParent);
+}
+
+csFountainFactorySaver::~csFountainFactorySaver ()
+{
+}
+
+bool csFountainFactorySaver::Initialize (iSystem* system)
+{
+  sys = system;
+  return true;
+}
+
+#define MAXLINE 100 /* max number of chars per line... */
+
+static void WriteMixmode(iStrVector *str, UInt mixmode)
+{
+  str->Push(strnew("  MIXMODE ("));
+  if(mixmode&CS_FX_COPY) str->Push(strnew(" COPY ()"));
+  if(mixmode&CS_FX_ADD) str->Push(strnew(" ADD ()"));
+  if(mixmode&CS_FX_MULTIPLY) str->Push(strnew(" MULTIPLY ()"));
+  if(mixmode&CS_FX_MULTIPLY2) str->Push(strnew(" MULTIPLY2 ()"));
+  if(mixmode&CS_FX_KEYCOLOR) str->Push(strnew(" KEYCOLOR ()"));
+  if(mixmode&CS_FX_TRANSPARENT) str->Push(strnew(" TRANSPARENT ()"));
+  if(mixmode&CS_FX_ALPHA) {
+    char buf[MAXLINE];
+    sprintf(buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
+    str->Push(strnew(buf));
+  }
+  str->Push(strnew(")"));
+}
+
+
+void csFountainFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
+  iEngine* /*engine*/)
+{
+  // nothing to do
 }
 
 //---------------------------------------------------------------------------
@@ -333,4 +398,74 @@ iBase* csFountainLoader::Parse (const char* string, iEngine* engine)
 
 //---------------------------------------------------------------------------
 
+
+csFountainSaver::csFountainSaver (iBase* pParent)
+{
+  CONSTRUCT_IBASE (pParent);
+}
+
+csFountainSaver::~csFountainSaver ()
+{
+}
+
+bool csFountainSaver::Initialize (iSystem* system)
+{
+  sys = system;
+  return true;
+}
+
+void csFountainSaver::WriteDown (iBase* obj, iStrVector *str,
+  iEngine* /*engine*/)
+{
+  iFactory *fact = QUERY_INTERFACE (this, iFactory);
+  iParticleState *partstate = QUERY_INTERFACE (obj, iParticleState);
+  iFountainState *state = QUERY_INTERFACE (obj, iFountainState);
+  char buf[MAXLINE];
+  char name[MAXLINE];
+
+  csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
+  sprintf(buf, "FACTORY ('%s')\n", name);
+  str->Push(strnew(buf));
+
+  if(partstate->GetMixMode() != CS_FX_COPY)
+  {
+    WriteMixmode(str, partstate->GetMixMode());
+  }
+  sprintf(buf, "MATERIAL (%s)\n", partstate->GetMaterialWrapper()->
+    GetPrivateObject()->GetName());
+  str->Push(strnew(buf));
+  sprintf(buf, "COLOR (%g, %g, %g)\n", partstate->GetColor().red,
+    partstate->GetColor().green, partstate->GetColor().blue);
+  str->Push(strnew(buf));
+  printf(buf, "NUMBER (%d)\n", state->GetNumberParticles());
+  str->Push(strnew(buf));
+  sprintf(buf, "LIGHTING (%s)\n", state->GetLighting()?"true":"false");
+  str->Push(strnew(buf));
+  sprintf(buf, "ORIGIN (%g, %g, %g)\n", state->GetOrigin().x,
+    state->GetOrigin().y, state->GetOrigin().z);
+  str->Push(strnew(buf));
+  float sx = 0.0, sy = 0.0;
+  state->GetDropSize(sx, sy);
+  sprintf(buf, "DROPSIZE (%g, %g)\n", sx, sy);
+  str->Push(strnew(buf));
+  sprintf(buf, "ACCEL (%g, %g, %g)\n", state->GetAcceleration().x,
+    state->GetAcceleration().y, state->GetAcceleration().z);
+  str->Push(strnew(buf));
+  sprintf(buf, "SPEED (%g)\n", state->GetSpeed());
+  str->Push(strnew(buf));
+  sprintf(buf, "OPENING (%g)\n", state->GetOpening());
+  str->Push(strnew(buf));
+  sprintf(buf, "AZIMUTH (%g)\n", state->GetAzimuth());
+  str->Push(strnew(buf));
+  sprintf(buf, "ELEVATION (%g)\n", state->GetElevation());
+  str->Push(strnew(buf));
+  sprintf(buf, "FALLTIME (%g)\n", state->GetFallTime());
+  str->Push(strnew(buf));
+
+  fact->DecRef();
+  partstate->DecRef();
+  state->DecRef();
+}
+
+//---------------------------------------------------------------------------
 
