@@ -3,6 +3,21 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+13-May-2003
+	- res added an iAnimatedImage interface to support animnated images.
+	- res added a plugin for a proctex for animated images.
+	- res fixed a cut'n'paste error in plugins/proctex/standard/Jamfile.
+	- res made the following changes:
+	    - fixed the stupid mistake of having swapped two operands in a
+	      difference in the animated proctex plugin
+	    - improved error handling in the animated proctex plugin
+	    - added iAnimatedImage::IsAnimated()
+	    - updated the JNG plugin to properly handle animated MNGs
+	    - removed the "circular ref" comments from flarge as there aren't
+	      leaks any more
+	    - added a spinning cube animation to stdtex.zip and used it in
+	      flarge (on the street).
+	- res added the ptanimimg plugin to scf.cfg.
 12-May-2003
 	- Philip Wyett brought warning level in MSVC 7 project files down
           to 3 to match MSVC 6 ones. Also cleaned up 'group.tpl' for
@@ -10,9 +25,9 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine eliminated compilation warning about non-virtual
 	  destructor in csScfStringSet.
 	- res fixed the iPolygonMesh issue for the ball plugin.
-	- res changed the Sprite3d and Genmesh objects to emit a notification 
+	- res changed the Sprite3d and Genmesh objects to emit a notification
 	  if iPolygonMesh is queried.
-	- res changed the sequence operations working with sequences in the 
+	- res changed the sequence operations working with sequences in the
 	  'normal' and engine sequence manager to not store references on
 	  sequences. That makes loops etc. possible without causing circular
 	  references. Also updated the interface docs to reflect this change.
@@ -49,23 +64,10 @@ The history order is reversed so that new features are at the top.
 	  been made to the DO.SHARED.PLUGIN.PREAMBLE's invocation of
 	  mergeres.sh as part of Eric's changes yesterday, but DO.LINK.EXE
 	  slipped by unaltered.
-	- res added an iAnimatedImage interface to support animnated images.
-	- res added a plugin for a proctex for animated images.
-	- res fixed a cut'n'paste error in plugins/proctex/standard/Jamfile.
-	- res made the following changes:
-	    - fixed the stupid mistake of having swapped two operands in a
-	      difference in the animated proctex plugin
-	    - improved error handling in the animated proctex plugin
-	    - added iAnimatedImage::IsAnimated()
-	    - updated the JNG plugin to properly handle animated MNGs
-	    - removed the "circular ref" comments from flarge as there aren't 
-	      leaks any more
-	    - added a spinning cube animation to stdtex.zip and used it in
-	      flarge (on the street).
 11-May-2003
 	- Oktal removed one of two instances of the same phony target,
 	  swigperl5gen, in the csperl5 makefile.
-	- groton (groton@gmx.net) added some code to viewmesh application in 
+	- groton (groton@gmx.net) added some code to viewmesh application in
 	  order to allow the passing of the parameter -Scale=XX.XX through
 	  the command line (that option there was already there, but it
 	  was no implemented, i.e. the scale factor was always 1.0, whatever
@@ -191,17 +193,17 @@ The history order is reversed so that new features are at the top.
 	  needed since csperl5 now presumably cleans up after itself, and only
 	  creates its transient files if the module is actually enabled, rather
 	  than always.
-	- res fixed a leak in the engine: csStatLight:: and 
+	- res fixed a leak in the engine: csStatLight:: and
 	  csDynLight::AddAffectedLightingInfo() added the passed lighting info
-	  to a hash and IncRef()ed it. However, the hash only adds it once, 
-	  while the IncRef() always happens, leading to lots of fake 
-	  references. When on destruction the lighting info hash was iterated 
+	  to a hash and IncRef()ed it. However, the hash only adds it once,
+	  while the IncRef() always happens, leading to lots of fake
+	  references. When on destruction the lighting info hash was iterated
 	  over, the lighting info was only DecRef()ed once (because there was
 	  only one copy in the hash.) The lighting info is now only IncRef()ed
 	  when it's not already in the hash.
-	- res improved the thing loader to not produce a heap error in case of 
+	- res improved the thing loader to not produce a heap error in case of
 	  an error. An iPoly3D was DecRef()ed, causing it to delete itself -
-	  which wouldn't work as it was block-allocated. Now the polygon is 
+	  which wouldn't work as it was block-allocated. Now the polygon is
 	  properly removed from the thing factory state.
 	- res changed the Thing object to emit a notification as well if
 	  iPolygonMesh is queried.
@@ -209,7 +211,7 @@ The history order is reversed so that new features are at the top.
 	  iEvents in the queue both smart pointers and manual IncRef()s/
 	  DecRef()s were used, however an iEvent was always IncRef()ed but
 	  not always DecRef()ed, causing leaks under some circumstances.
-	  Removed IncRef()s/DecRef()s and let the smart pointers do their 
+	  Removed IncRef()s/DecRef()s and let the smart pointers do their
 	  work.
 	- res added a remark to iEventQueue::Post() documentation on how
 	  the owner ship of a passed iEvent is treated.
@@ -219,7 +221,7 @@ The history order is reversed so that new features are at the top.
 	  uses csHashMap::AddNoTest() instead of csHashMap::Add() now
 	  (the latter one tests whether a hash object already exists in the
 	  hash, which is never the case here)
-	- Anders Stenberg added SCF wrapper for stringset, and made the new 
+	- Anders Stenberg added SCF wrapper for stringset, and made the new
 	  renderer use it.
 10-May-2003
 	- Philip Wyett eliminated the 88 double to float conversion compiler
