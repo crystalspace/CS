@@ -20,6 +20,7 @@
 
 #include "cssysdef.h"
 #include "metagen.h"
+#include "csgeom/tesselat.h"
 
 static int _tess;
 static float _iso_level;

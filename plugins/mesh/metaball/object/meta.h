@@ -36,13 +36,15 @@ struct iGraphics3D;
 struct iGraphics2D;
 struct iMaterialWrapper;
 struct iMeshObject;
+struct GridCell;
 
-struct GridCell
+#if 0
 {
    csVector3 p[8];
    float val[8];
    GridCell() {} // NextStep 3.3 compiler barfs without this.
 };
+#endif
 
 struct MetaBall
 {
@@ -111,7 +113,6 @@ public:
 
 // Where the real work gets done....
 //  int Tesselate (const GridCell &grid,csVector3 *verts);
-  int Tesselate (const GridCell &grid,csVector3 *verts);
   void CalculateMetaBalls (void);
   void CalculateBlob (int x, int y, int z);
   void FillCell (int x, int y, int z, GridCell &c);

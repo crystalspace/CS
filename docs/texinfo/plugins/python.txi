@@ -1,4 +1,4 @@
-@node csPython, , Dungeon, Plug-In Drivers
+@node csPython, Animation, Dungeon, Plug-In Drivers
 @section csPython
 @cindex csPython Plug-In
 @cindex Python Plug-In

@@ -38,16 +38,8 @@
 struct iSystem;
 struct iGraphics3D;
 struct iGraphics2D;
+struct GridCell;
 
-//--------------- The core of the tesselator -- the grid cell
-struct GridCell
-{
-   csVector3 p[8];
-   float val[8];
-   GridCell() {} // NextStep 3.3 compiler barfs without this.
-};
-
-//----------------------------------- Slices
 struct SliceCharge
 {
   csVector2 pos;
@@ -224,7 +216,6 @@ public:
 // Where the real work gets done....
   inline int _2intY( float fy ) { return int(istepy * (fy - YStart )); }
   inline float _2coordY( int y ) { return y * stepy + YStart; }
-  int Tesselate (const GridCell &grid, csVector3* verts);
   int CalcBlobSurf (MetaField *field);
   int CalcLinSurf (MetaBone *bone);
   void BlobCalc (int x, int y, int z);

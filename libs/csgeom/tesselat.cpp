@@ -1,5 +1,5 @@
 /*
-    Meta Surface Tesselator
+    A General Purpose Tesselator
     Copyright (C) 1999 by Denis Dmitriev
 
     This library is free software; you can redistribute it and/or
@@ -18,7 +18,8 @@
 */
 
 #include "cssysdef.h"
-#include "metagen.h"
+#include "csgeom/vector3.h"
+#include "csgeom/tesselat.h"
 
 #define EPS 0.0001
 
@@ -42,13 +43,13 @@ csVector3 VertexInterp(const csVector3 &p1,const csVector3 &p2,float valp1,float
   return p;
 }
 
-int csMetaGen::Tesselate(const GridCell &grid, csVector3* vrt)
+int Tesselate(const GridCell &grid, csVector3* vrt)
 {
   int i;
   int cubeindex;
   csVector3 vertlist[12];
 
-# include "tables.h"
+#include "csgeom/ttables.h"
 
   cubeindex=0;
 

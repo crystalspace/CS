@@ -45,7 +45,7 @@ endif
 INC.METABALL = $(wildcard plugins/mesh/metaball/object/*.h)
 SRC.METABALL = $(wildcard plugins/mesh/metaball/object/*.cpp)
 OBJ.METABALL = $(addprefix $(OUT),$(notdir $(SRC.METABALL:.cpp=$O)))
-DEP.METABALL = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.METABALL = CSGEOM CSUTIL CSSYS
 
 MSVC.DSP += METABALL
 DSP.METABALL.NAME = metaball
