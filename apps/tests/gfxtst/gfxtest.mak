@@ -28,7 +28,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/tests/gfxtst
 
-LIB.GFXTEST = $(CSGFXLDR.LIB) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+LIB.GFXTEST = $(CSGFXLDR.LIB) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB) $(CSUTIL.LIB) 
 GFXTEST.EXE = gfxtest$(EXE)
 SRC.GFXTEST += apps/tests/gfxtst/gfxtest.cpp
 OBJ.GFXTEST = $(addprefix $(OUT),$(notdir $(SRC.GFXTEST:.cpp=$O)))
