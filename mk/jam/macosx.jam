@@ -13,7 +13,7 @@ if $(PTHREAD.AVAILABLE) = "yes"
 CMD.AR = "ar ru" ;
 NOARUPDATE = true ;
 NOARSCAN = true ;
-action Archive
+actions Archive
 {
   $(CMD.AR) $(<) $(>)
 }
