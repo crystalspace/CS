@@ -39,6 +39,7 @@
 #include "csengine/thing.h"
 #include "csengine/cssprite.h"
 #include "csengine/thingtpl.h"
+#include "csutil/vfs.h"
 
 
 //////////////////////////////////////////////////////////////////////
@@ -88,9 +89,7 @@ int converter::ivcon ( const char* input_filename, bool keep_log,
 
 /******************************************************************************/
 
-  int result;
-
-  Vfs = vfs;
+  int result = ERROR;
 
   if (keep_log)
     logfile = fopen("ivcon.log","a");
@@ -99,8 +98,30 @@ int converter::ivcon ( const char* input_filename, bool keep_log,
 
   init_program_data ();
    
-  result = comline ( input_filename, create_output_file, output_filename );
-  
+/*
+  If using VFS, then copy file from VFS into a temporary "real" file.
+  @@@ FIXME This is an awful hack. Convert entirely to VFS as soon as possible.
+*/
+  if (!vfs)
+    result = comline (input_filename, create_output_file, output_filename);
+  else
+  {
+    size_t size;
+    char* buf = vfs->ReadFile (input_filename, size);
+    csString tmp_file ("convtemp.");
+    tmp_file += file_ext ((char*)input_filename);
+    csString tmp_path ("/this/");
+    tmp_path += tmp_file;
+    if (vfs->WriteFile (tmp_path, buf, size))
+    {
+      result = comline (tmp_file, create_output_file, output_filename);
+      vfs->DeleteFile (tmp_path);
+    }
+    else
+      fprintf ( logfile,  "VFS_CONVERSION - Error!\n" );
+    delete buf;
+  }
+
   if (keep_log)
     fclose(logfile);
 
@@ -679,17 +700,6 @@ int converter::data_read ( void ) {
     fprintf ( logfile,  "DATA_READ: Input file has type %s.\n", filein_type );  
   }
 
-/*
-  copy file from VFS into a temporary file.
-*/
-  if (Vfs)
-  {
-    size_t size;
-    char * buf = Vfs->ReadFile (filein_name, size);
-    Vfs->WriteFile ("/this/temp", buf, size);
-    delete buf;
-  }
-
 /* 
   Open the file. 
 */
@@ -697,10 +707,10 @@ int converter::data_read ( void ) {
        (leqi ( filein_type, "MD2" ) == TRUE ) ||
        (leqi ( filein_type, "MDL" ) == TRUE ) )
   {
-    filein = fopen ( Vfs ? "temp" : filein_name, "rb" );
+    filein = fopen ( filein_name, "rb" );
   }
   else {
-    filein = fopen ( Vfs ? "temp" : filein_name, "r" );
+    filein = fopen ( filein_name, "r" );
   }
 
   if ( filein == NULL ) {

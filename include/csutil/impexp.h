@@ -37,7 +37,7 @@
 #include <string.h>
 #include "def.h"
 #include "csutil/inifile.h"
-#include "csutil/vfs.h"
+class csVFS;
 
 #if _MSC_VER > 1000
 #pragma once
@@ -120,11 +120,9 @@ class converter
 public:
 	converter();
 	virtual ~converter();
-	int      comline ( const char* input_filename,
-	  bool create_output_file, const char* output_filename );
 	int ivcon ( const char* input_filename, bool keep_log = true,
 	  bool create_output_file = true, const char* output_filename = NULL,
-        csVFS * vfs = NULL );
+          csVFS* vfs = NULL );
 
         void ProcessConfig( csIniFile* config );
 	void set_reverse_normals( int yesno );
@@ -135,6 +133,10 @@ public:
 	// frame number.  The minimum frame number is 0.
 	// There must always exist at least one frame, frame 0
 	int set_animation_frame(int framenumber);
+
+protected:
+	int comline ( const char* input_filename,
+	  bool create_output_file, const char* output_filename );
 
 public:
 
@@ -182,9 +184,6 @@ int    num_object;
 int    num_texmap;
 int    num_text;
 char   object_name[81];
-
-/// pointer to a Crystal Space Virtual File System object
-csVFS * Vfs;
 
 private:
 
