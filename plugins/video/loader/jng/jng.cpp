@@ -935,6 +935,9 @@ bool ImageJngFile::Animate (csTicks time, csRect* dirtyrect)
 
   ImageJngFile::dirtyrect = dirtyrect;
 
+  // Prevent very slow updates if the elapsed time is too big.
+  if (time > 500) time = 500;
+
   bool updated = false;
   total_time_elapsed += time;
   time_elapsed += time;

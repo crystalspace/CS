@@ -9,6 +9,14 @@ chronological order.
 24-Sep-2004
 	- Jorrit moved csProcAnimated to cstool so that it is easier to
 	  use animated textures from code.
+	- Jorrit speed up MNG animated images considerably. The problem
+	  is that MNG animation used the elapsed time to update the
+	  right animation. But if an animated texture is not visible for
+	  a long time and then becomes visible again, the elapsed time
+	  will be very large and this causes the MNG image calculator to
+	  do a lot of work. I fixed this by adding a cap to 500 milliseconds
+	  for elapsed time. This is not accurate but it speeds them up
+	  a lot.
 23-Sep-2004
 	- Eric Sunshine augmented configure.ac so that it is no longer a fatal
 	  error for zlib to be missing since that made it unnecessarily
