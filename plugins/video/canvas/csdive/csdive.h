@@ -59,6 +59,8 @@ class csGraphics2DOS2DIVE : public csGraphics2D
   bool dblbuff;
   /// Use native mouse cursor, if possible?
   bool HardwareCursor;
+  /// Active video page
+  int ActivePage;
 
   /// Window position in percents
   int WindowX, WindowY;

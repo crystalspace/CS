@@ -38,6 +38,7 @@ csGraphics2D::csGraphics2D ()
 {
   Memory = NULL;
   FontServer = NULL;
+  LineAddress = NULL;
 }
 
 bool csGraphics2D::Initialize (iSystem* pSystem)
@@ -102,8 +103,8 @@ bool csGraphics2D::Open (const char *Title)
 
 void csGraphics2D::Close ()
 {
-  if (LineAddress)
-  { delete [] LineAddress; LineAddress = NULL; }
+  delete [] LineAddress;
+  LineAddress = NULL;
 }
 
 bool csGraphics2D::BeginDraw ()

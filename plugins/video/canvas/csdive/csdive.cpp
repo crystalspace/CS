@@ -70,6 +70,8 @@ csGraphics2DOS2DIVE::csGraphics2DOS2DIVE (iBase *iParent) :
 #endif
 
   OS2System = NULL;
+  ActivePage = 0;
+  dW = NULL;
 }
 
 csGraphics2DOS2DIVE::~csGraphics2DOS2DIVE ()
@@ -377,7 +379,6 @@ void csGraphics2DOS2DIVE::Close (void)
 
 void csGraphics2DOS2DIVE::Print (csRect *area)
 {
-  long switchmode = dblbuff ? DIVE_NEXTBUFFER : 0;
   // If we're in double-buffering mode, wait previous frame to complete
   if (dblbuff)
     dW->WaitSwitch ();
@@ -405,14 +406,16 @@ void csGraphics2DOS2DIVE::Print (csRect *area)
     rect.yTop = (int) (rect.yTop * AspectY);
     // Increment top & right margin by one pixel to cover calculation errors
     rect.xRight++; rect.yTop++;
-    dW->Switch (switchmode, &rect);
+    dW->Switch (ActivePage, &rect);
   }
   else
-    dW->Switch (switchmode);
+    dW->Switch (ActivePage);
 
   // If we're in single-buffered mode, wait right now for buffer to be printed
   if (!dblbuff)
     dW->WaitSwitch ();
+  else
+    ActivePage ^= 1;
 }
 
 int csGraphics2DOS2DIVE::GetPage ()
@@ -464,9 +467,7 @@ bool csGraphics2DOS2DIVE::BeginDraw ()
     return true;
 
   ULONG bpl;
-  long switchmode = dblbuff ? DIVE_NEXTBUFFER : 0;
-
-  Memory = dW->BeginPaint (&bpl, switchmode);
+  Memory = dW->BeginPaint (&bpl, ActivePage);
   // if paused, return false
   if (Memory == NULL)
   {
