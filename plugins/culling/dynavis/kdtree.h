@@ -314,7 +314,7 @@ public:
   void Debug_Statistics (int& tot_objects,
 	int& tot_nodes, int& tot_leaves, int depth, int& max_depth,
 	float& balance_quality);
-  iString* Debug_Statistics ();
+  csPtr<iString> Debug_Statistics ();
   csTicks Debug_Benchmark (int num_iterations);
 
   struct DebugHelper : public iDebugHelper

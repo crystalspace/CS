@@ -1190,7 +1190,7 @@ void csKDTree::Debug_Statistics (int& tot_objects,
   }
 }
 
-iString* csKDTree::Debug_Statistics ()
+csPtr<iString> csKDTree::Debug_Statistics ()
 {
   scfString* rc = new scfString ();
   csString& str = rc->GetCsString ();
@@ -1208,7 +1208,7 @@ iString* csKDTree::Debug_Statistics ()
   	tot_objects, tot_nodes, tot_leaves, max_depth,
 	balance_quality / float (tot_nodes));
 
-  return rc;
+  return csPtr<iString> ((iString*)rc);
 }
 
 void csKDTree::Debug_Dump (csString& str, int indent)
@@ -1226,7 +1226,7 @@ void csKDTree::Debug_Dump (csString& str, int indent)
   *s = 0;
 
   csString ss;
-  iString* stats = Debug_Statistics ();
+  csRef<iString> stats = Debug_Statistics ();
   ss.Format ("%s KDT obj_bbox(%g,%g,%g)-(%g,%g,%g) disallow_dist=%d\n%s     node_bbox=(%g,%g,%g)-(%g,%g,%g)\n%s %s",
   	spaces, GetObjectBBox ().MinX (), GetObjectBBox ().MinY (),
 	GetObjectBBox ().MinZ (), GetObjectBBox ().MaxX (),

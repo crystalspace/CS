@@ -121,17 +121,31 @@ void csPolygonMeshTools::CalculatePlanes (iPolygonMesh* mesh,
     poly++;
   }
 }
+/// used by CalculateEdges()
+struct LinkedEdge : public csPolygonMeshEdge
+{
+  LinkedEdge* next;
+};
+/// used by CalculateEdges()
+static struct _FreeEdge {
+  LinkedEdge* list;
+  LinkedEdge* next;
+  
+  _FreeEdge(): list(NULL), next(NULL) {};
+  ~_FreeEdge()
+  {
+    while (list)
+    {
+      next = list->next;
+      delete list;
+      list = next;
+    }
+  }
+} FreeEdge;
 
 csPolygonMeshEdge* csPolygonMeshTools::CalculateEdges (iPolygonMesh* mesh,
 	int& num_edges)
 {
-  struct LinkedEdge : public csPolygonMeshEdge
-  {
-    LinkedEdge* next;
-  };
-  // @@@ NOT CLEANED UP
-  static LinkedEdge* free_edges = NULL;
-
   int num_vertices = mesh->GetVertexCount ();
   int num_polygons = mesh->GetPolygonCount ();
 
@@ -191,10 +205,10 @@ csPolygonMeshEdge* csPolygonMeshTools::CalculateEdges (iPolygonMesh* mesh,
         // Not found!
 	num_edges++;
 	// Take a free edge from free_edges if any.
-	if (free_edges)
+	if (FreeEdge.list)
 	{
-	  le = free_edges;
-	  free_edges = free_edges->next;
+	  le = FreeEdge.list;
+	  FreeEdge.list = FreeEdge.list->next;
 	}
 	else
 	{
@@ -231,8 +245,8 @@ csPolygonMeshEdge* csPolygonMeshTools::CalculateEdges (iPolygonMesh* mesh,
     i++;
     LinkedEdge* el = edge_collector;
     edge_collector = edge_collector->next;
-    el->next = free_edges;
-    free_edges = el;
+    el->next = FreeEdge.list;
+    FreeEdge.list = el;
   }
   for (j = 0 ; j < num_vertices ; j++)
   {
@@ -247,8 +261,8 @@ csPolygonMeshEdge* csPolygonMeshTools::CalculateEdges (iPolygonMesh* mesh,
       i++;
       LinkedEdge* el = et;
       et = et->next;
-      el->next = free_edges;
-      free_edges = el;
+      el->next = FreeEdge.list;
+      FreeEdge.list = el;
     }
   }
   delete[] edge_table;
