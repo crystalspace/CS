@@ -41,6 +41,9 @@ chronological order.
 	  apimod100.txi.
 	- Oktal made a couple of fixes to the input binder so it correctly
 	  handles keyboard modifiers.
+	- Oktal fixed a problem in the console input plugin where a '%' sign in
+	  the input would cause problems because of iConsoleOutput::PutText's
+	  printf-style format string.
 10-Aug-2004
 	- PK implemented the csThingFactorySaver.
 	- Jorrit fixed a few places in CS where a reverse size_t loop was done

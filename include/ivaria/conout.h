@@ -91,6 +91,10 @@ struct iConsoleOutput : public iBase
    * is output. That is, you can emmit non-persistent messages
    * this way: PutText ("some text\r"); This message will disappear
    * as soon as any other message will be sent to console.
+   *
+   * Remember that if you are not using the printf-style functionality, and
+   * the string may include '%' signs, you should do PutText("%s", str)
+   * instead of PutText(str).
    */
   virtual void PutText (const char *text, ...) CS_GNUC_PRINTF (2, 3) = 0;
 
