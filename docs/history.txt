@@ -16,6 +16,9 @@ Short-term cleanups that need to be done:
 30-Aug-1999
 	- Eric Sunshine fixed a compilation problem in the BeOS port and also
 	  removed more unused code.
+	- Eric Sunshine updated INSTALL.BeOS so that it provides instructions
+	  for building the JPEG library.  He also updated various other
+	  aspects of this document.
 26-Aug-1999
 	- Eric Sunshine renamed docs/changes.old to changes.txt since Jorrit
 	  recently brought it up to date.  Previously it was extremely out of

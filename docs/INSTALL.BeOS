@@ -1,27 +1,38 @@
 How to run CrystalSpace on BeOS
-====================
+===============================
 By David Huen (david@huen.freeserve.co.uk) 1999/07/01
-Amended by Eric Sunshine (sunshine@sunshineco.com) 1999/08/08
+Amended by Eric Sunshine (sunshine@sunshineco.com) 1999/08/30
 
-CrystalSpace is a full-featured 3D graphics engine and the BeOS port was originally done by Xavier Pianet.  I have sort of picked it up in his apparently prolonged absence (where are you Xavier?).  The project was initiated by Jorrit Tyberghein.  Eric Sunshine also spent a fair amount of time bringing the BeOS port up to date and ensuring that it compiles and runs cleanly "out of the box".  He also updated this document.
+CrystalSpace is a full-featured 3D graphics engine and the BeOS port was originally created by Xavier Pianet.  David Huen sort of picked it up in Xavier's prolonged absence.  Most recently, Eric Sunshine significantly cleaned up and re-engineered the BeOS port, ensuring that all programs compile cleanly and run properly right out of the box.  He also heavily updated the accompanying documentation.
 
-It is assumed that you will have obtained a full set of sources at this stage.  Full sources includes the Crystal Space sources as well as those for the supporting library, libjpeg.  See INSTALL.General for information about obtaining the supporting library.  Install the source code for the jpeg library in CS/libs/libjpeg.  Other required libraries, zlib and libpng are already present on BeOS 4.5, so there is no need to manually install them.
+It is assumed that you will have obtained a full set of sources at this stage.  Full sources includes the Crystal Space sources as well as those for the supporting library, libjpeg.  See INSTALL.General for information about obtaining the supporting library.  Install the source code for the jpeg library in CS/libs/libjpeg.  After installing the JPEG library, you can build it by follow these simple instructions:
+
+cd CS/libs/libjpeg
+sh ./configure
+make libjpeg.a
+
+Other required libraries, zlib and libpng are already present on BeOS 4.5, so there is no need to manually install them.
+
 
 BeOS settings
-========
-You  set up the compilation environment by going into the CS/ directory in terminal and typing:
+=============
+You set up the compilation environment by going into the CS/ directory in terminal and typing:
 make beos
-make depend
+make depend    # Optional.
 
-This sets up everything you should need to compile.
+This sets up everything you should need to compile the system.  After this, the simplest way to build the project is to type:
 
-Next, compile all the basic drivers:
+make all
+
+If you prefer more control over the build process, then you can compile the various modules separately or in batches.  To compile all the basic drivers:
+
 make netdrivers
 make snddrivers
 
-Since sound has not yet been implemented in the BeOS port, this just compiles null driver.
+Note that sound has not yet been implemented in the BeOS port, so this just builds null sound driver.
 
 The graphics libraries consist of a OS-specific 2D driver and a OS-independent 3D renderer.  To get:
+
 1) software renderer
 make be2d
 make soft
@@ -37,38 +48,46 @@ make glide3d
 <<< GLIDE IS CURRENTLY BROKEN <<<
 
 You will need to register the libraries (which are pseudo-COM modules).  First compile the registrar:
+
 make regsvr
 
-then:
-csregsvr netmann.so netmans.so netdrvn.so netdrvs.so snddrvn.so sndrdrn.so
-csregsvr be2d.so softrndr.so   <for software renderer>
-csregsvr glbe2d.so glrender.so <for OpenGL>
-csregsvr glidebe2d.so Glide2xRender.so <for Glide 2.54//Voodoo 2>
+Then register the libraries with these commands:
 
-Finally, you will want to compile and run the example applications.
+csregsvr netmann.so netmans.so netdrvn.so netdrvs.so snddrvn.so sndrdrn.so
+csregsvr be2d.so softrndr.so            # For software renderer.
+csregsvr glbe2d.so glrender.so          # For OpenGL.
+csregsvr glidebe2d.so Glide2xRender.so  # For Glide 2.54//Voodoo 2.
+
+Finally, to build the example applications:
+
 make apps
 
-Program settings
-==========
-You will need to have a world file to do anything!  I suggest downloading fresh_large.zip.  Place this file in data/.
 
-Edit cryst.cfg to set the world file accordingly (used by walktest):-
+Program settings
+================
+You will need to have a world file to do anything.  I suggest downloading flarge.zip.  Place this file in the CS/data directory.
+
+Edit cryst.cfg to set the world file accordingly (used by walktest):
 WORLDFILE=data/flarge.zip
 
 The rest of the settings are mostly self evident and can often be overridden at the command line.
 
+
 Testing
-=====
+=======
 You may want to switch to a different workspace and set the screen resolution to something like 800*600, 16 bit, though this is not strictly necessary.
 
 Form Terminal within this workspace, go to the CS/ folder and type:
-walktest   <this will run with whatever settings are in the cryst.cfg file (usually software renderer>
-walktest -driver opengl <runs in OpenGL mode>
-walktest -driver glide  <runs in Glide mode>
+walktest   This will run the WalkTest example program with the settings from the cryst.cfg file (usually software renderer).  Alternately you can choose the driver by specifying the -driver keyword:
 
-Alt-f will switch you in and out of full screen.
+walktest -driver software  # Runs in software mode.
+walktest -driver opengl    # Runs in OpenGL mode.
+walktest -driver glide     # Runs in Glide mode.
+
+Alt-f will switch you in and out of full screen.  (Note, the software driver does not currently implement full screen mode.)
 
 Note that walktest requires a good world file to show off effectively (like flarge.zip).  Make sure that cryst.cfg is correctly set to identify this file or type it on the command line:
+
 walktest data/flarge.zip
 
 You may have to adjust the AMBIENT_WHITE level in cryst.cfg if the levels appear too dark.  After adjusting the ambient level, specify -recalc on the command line, as in:
@@ -77,12 +96,12 @@ walktest -recalc data/flarge.zip
 
 Other interesting example applications which you can run are blocks, metademo, shooter, and mazed.
 
-You should be able to start experimenting with the BeOS port at this stage!
+You should be able to start experimenting with the BeOS port at this stage.
 
-P.S. There may well be mistakes in this document.  Please feel free to correct them and send the text back to me.
+There may well be mistakes in this document.  Please feel free to correct them and send the text to one of the port maintainers, such as Eric Sunshine <sunshine@sunshineco.com>, David Huen >david@huen.freeserve.co.uk>, or Jorrit Tyberghein <Jorrit.Tyberghein@uz.kuleuven.ac.be>.
 
 
->>> THIS SECTION WILL SOON BE OBSOLETE >>>
+>>> IGNORE: THIS SECTION WILL SOON BE OBSOLETE >>>
 As it currently stands, the Glide renderer can be activated by the following steps.
 
 To get the search paths correct, you need to comment out the following in the makefile:
@@ -93,4 +112,4 @@ LIBS._GLIDE3D+=/boot/develop/lib/x86/glide2x.so
 
 You will also need to comment out the following line in glrender.mak:
 LIBS._GL3D+=-L$(X11_PATH)/lib -lXext -lX11
-<<< THIS SECTION WILL SOON BE OBSOLETE <<<
+<<< IGNORE: THIS SECTION WILL SOON BE OBSOLETE <<<

@@ -1,7 +1,7 @@
 Description of BeOS port internals
 ==================================
 Written by David Huen(smh1008@cus.cam.ac.uk)
-Heavily amended by Eric Sunshine (sunshine@sunshineco.com) 1999/08/23
+Heavily amended by Eric Sunshine (sunshine@sunshineco.com) 1999/08/30
 (on acocunt of his major overhaul and re-engineering of the port).
 
 Contents
@@ -96,10 +96,12 @@ The Print() method displays the bitmap by locking the window, blitting the BBitm
 ========================================
 This is the list of BeOS-specific bugs compiled by Eric Sunshine <sunshine@sunshineco.com>.  These bugs are being actively eradicated.
 
+- Add full-screen support.  Be careful about the resolution, since CS can use any arbitrary window dimension.
+- Application should be able to redraw rendering window when BeOS asks for a redraw even if CS is busy (that is, not pushing out a continuous stream of frames).  There are already cases where this is needed, and will be very important when a pause feature is added.
 - Pause when not foreground application.  Make sure that screen redraws correctly even when paused.
 - The various 2D graphics drivers (software, OpenGL, Glide) should all be derived from a common class rather than being nearly identical copies of one another.
 - It is probably safe to remove Crystal.rsrc from libs/cssys since it is unused at this time.
-- Should be using DirectWindow rather than DirectBitmap where supported since DirectWindow puts much less load on the CPU.  Auto-detect if DirectWindow is available and use it if so.
+- Should be using DirectWindow rather than DirectBitmap where supported since DirectWindow puts much less load on the CPU.  Auto-detect if DirectWindow is available and use it if so.  Note, though, that David Huen says this might not be worthwhile.
 - It is possible to close the window while the application is starting, yet the application does not terminate.
 - Glide driver does not compile.
 - It is probably not safe to be inserting mouse and keyboard events into CS's event queue from the main thread while the queue is being processed by a secondary thread.  It is also probably unsafe to cascade mouse moved events from inside "LoopThread" thread.
@@ -135,3 +137,4 @@ This is the list of problems which have recently been fixed.
 - Update the OpenGL driver to match the implementation of the default 2D (software) driver.
 - Squawk crashes upon initialization when using OpenGL driver.
 - Application bombs at termination when using OpenGL driver.
+- Document building libjpeg.a.  People have trouble with this.
