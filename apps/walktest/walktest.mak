@@ -19,7 +19,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 walkall: walktest vfs soft3d softcanvas csfont csconin simpcon perfstat \
   rapid meshes cssynldr imgplex csgifimg csjpgimg cspngimg csbmpimg reporter \
-  stdrep csparser frustvis bugplug sequence engseq
+  stdrep csparser frustvis bugplug sequence engseq effects
 all apps: walktest
 walktest:
 	$(MAKE_APP)
