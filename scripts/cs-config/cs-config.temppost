@@ -1,5 +1,5 @@
-#	is it a source distribution?
-if test -e "$prefix"; then
+#is it a source distribution?
+if test -e "$prefix/Makefile"; then
 #	look for the lib files...
 #	a more or less dirty hack...
 	if test -e "$prefix/lib/libcssys.a"; then
