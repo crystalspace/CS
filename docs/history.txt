@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+6-Nov-2001
+	- Eric Sunshine fixed the derivation of Win32Assistant.  It was
+	  incorrectly inheriting iEventPlug and iEventHandler privately, rather
+	  than publicly.  I believe that this problem was responsible for the
+	  compilation error reported by C++Builder5 as mentioned on the mailing
+	  list by Stephen Crocker <melkior13@hotmail.com>.
 5-Nov-2001
 	- Fixed a bug in bin/chkheadr.sh which caused that test to always
 	  fail with the result that CS_USE_FAKE_SOCKLEN_TYPE would always

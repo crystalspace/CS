@@ -402,7 +402,10 @@ DWORD WINAPI s_threadroutine (LPVOID param)
 #undef CHK_FAILED
 #endif // DO_DINPUT_KEYBOARD
 
-class Win32Assistant : public iWin32Assistant, iEventPlug, iEventHandler
+class Win32Assistant :
+  public iWin32Assistant,
+  public iEventPlug,
+  public iEventHandler
 {
 private:
   iObjectRegistry* registry;
