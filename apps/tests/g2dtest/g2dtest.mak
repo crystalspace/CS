@@ -31,7 +31,7 @@ LIB.G2DTEST = $(CSSYS.LIB) $(CSUTIL.LIB)
 G2DTEST.EXE = g2dtest$(EXE)
 SRC.G2DTEST += apps/tests/g2dtest/g2dtest.cpp
 OBJ.G2DTEST = $(addprefix $(OUT),$(notdir $(SRC.G2DTEST:.cpp=$O)))
-TO_INSTALL.EXE+=$(G2DTEST.EXE)
+#TO_INSTALL.EXE+=$(G2DTEST.EXE)
 
 DESCRIPTION.$(G2DTEST.EXE) = $(DESCRIPTION.g2dtst)
 

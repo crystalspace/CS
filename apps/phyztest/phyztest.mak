@@ -31,7 +31,7 @@ PHYZTEST.EXE=phyztest$(EXE)
 SRC.PHYZTEST = $(wildcard apps/phyztest/*.cpp) apps/support/static.cpp
 OBJ.PHYZTEST = $(addprefix $(OUT),$(notdir $(SRC.PHYZTEST:.cpp=$O)))
 DESCRIPTION.$(PHYZTEST.EXE) = $(DESCRIPTION.phyz)
-TO_INSTALL.EXE+=$(PHYZTEST.EXE)
+#TO_INSTALL.EXE+=$(PHYZTEST.EXE)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
