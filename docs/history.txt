@@ -8,6 +8,9 @@ The history order is reversed so that new features are at the top.
 	  a ?: conditional had its values the wrong way round.
         - JTarbox fixed it so the fast_mem_copy code is only active
           with a MSVC less then version 7.
+	- res fixed win32 csosdefs.h to use fast_mem_copy only on MSVC.
+	  The recent changes caused that fast_mem_copy was used on VC < 7 
+	  _and_ non-VC platforms.
 27-Jun-2003
 	- Jorrit fixed a bug in genmesh where it would not initialize
 	  normals to 0 if <autonormals/> was not used. The result would

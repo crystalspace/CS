@@ -400,7 +400,7 @@ struct mmioInfo
 // Microsoft Visual C++ compiler includes a very in-efficient 'memcpy'.
 // This also replaces the older 'better_memcpy',which was also not as
 // efficient as it could be ergo...heres a better solution.
-#if (_MSC_VER < 1300)
+#if defined(COMP_VC) && (_MSC_VER < 1300)
 #include <memory.h>
 #define memcpy fast_mem_copy
 static inline void* fast_mem_copy (void *dest, const void *src, int count)
