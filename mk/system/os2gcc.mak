@@ -191,7 +191,7 @@ USE_OMF = yes
 endif
 
 configure:
-	@echo USE_OMF = $(USE_OMF)>>config.mak
+	@echo export USE_OMF = $(USE_OMF)>>config.mak
 	@cmd /c bin\\os2conf.cmd>>config.mak
 
 endif # ifeq ($(MAKESECTION),configure)
