@@ -1,0 +1,164 @@
+@c -*-texinfo-*-
+@node XML File Format, , csParser, csParser
+@subsection Format of Map File (XML)
+@cindex Format of Map File
+@cindex Map File Format
+@cindex XML
+
+This section describes the @sc{xml} format of the Crystal Space map files and
+is a companion to the @sc{xml} Schema file that you can find in
+@file{CS/scripts/xml/cs_world.xsd}. This document is not yet complete
+but it should give you sufficient information to get started. For the
+format of the mesh object loaders you should look at the appropriate
+mesh object documentation at @pxref{MeshObject}. Also look at the
+howto for a simple map file at @pxref{HOWTO Simple Map Example}.
+
+The Crystal Space engine, itself, does not care about the external format of
+world data, nor does it care about how that information was obtained.  It is
+possible to create additional map loaders as plug-in modules which understand
+world data stored in other formats, such as binary.  A map loading plug-in
+module could even load maps over the network from a map file server, or
+generate worlds randomly based upon some set of input properties.  There are
+many possibilities.
+
+The map file syntax described in this section, however, is that which is
+understood by the standard map file loader which accompanies Crystal Space.
+It deals strictly with plain-text files.
+
+@subsection Basic Structure
+
+The basic structure of a map file for Crystal Space is as follows:
+
+@example
+<world>
+  initialization part:
+    one texture specification section.
+    one material specification section.
+    one effects section.
+    one sounds section.
+    one variable section.
+    one render priority section.
+    one plugin section.
+    one settings section.
+    zero or more start locations.
+    zero or more library specifications.
+    zero or more keys.
+  world elements:
+    zero or more addons.
+    zero or more mesh factories.
+  world definition:
+    zero or more sectors.
+    zero or more region specifications.
+    zero or more collections.
+  action section:
+    one sequence section.
+    one trigger section.
+</world>
+@end example
+
+The structure above divides the world in roughly four sections. This is
+only a logical division for explanation purposes because in reality there
+is no such division.
+
+In the initialization part there is everything that is related to
+setting up the level except for geometry related parts. The textures,
+materials, and other needed parts are defined there.
+
+The world elements section defines objects (mesh factories) and optional
+additional features (addon's) which will be used throughout the
+actual world definition. So here geometry is defined but not really used
+yet.
+
+In the world definition section the actual geometry is defined. At the
+highest level you have sectors. In every sector the actual objects are
+placed (see later for more information about this).
+
+Finally there is the action section. In this section sequences and
+triggers are used to define interactions and other special actions on
+objects and other objects in the world.
+
+@subsection Texture Specification Section
+@cindex texture specification (map file)
+
+Here is an example texture specification section:
+
+@example
+<textures>
+  <texture name="wood">
+    <file>/mygamedata/wood.png</file>
+  </texture>
+  <texture name="transp">
+    <file>/mygamedata/stripes.png</file>
+    <transparent red="1" green="0" blue="0"/>
+  </texture>
+  <proctex name="plasma">
+    <type>plasma</type>
+  </proctex>
+</textures>
+@end example
+
+In this example we define three textures. The first one is called
+@samp{wood} and will be loaded from the @sc{vfs} file
+@file{/mygamedata/wood.png}. @xref{VFS}.
+
+The second texture is called @samp{transp} and will be loaded from
+@file{/mygamedata/stripes.png}. The red color will be made fully
+transparent. If you want to use an alpha channel then this is supported
+too. In that case simply load a @sc{png} that has an alpha channel (or
+any other type of image that supports alpha channels).
+
+The third texture is a procedural texture. There are four types of
+procedural textures predefine in Crystal Space: @samp{fire}, @samp{water},
+@samp{dots}, and @samp{plasma}.
+
+@subsection Material Specification Section
+@cindex material specification (map file)
+
+Materials are very important in Crystal Space. Almost all objects will
+use materials to define the surface characteristics of their geometry.
+A material itself is usually made from one or more textures.
+
+Here is an example material section. It uses the textures defined
+in the previous section:
+
+@example
+<materials>
+  <material name="table_material">
+    <texture>wood</texture>
+  </material>
+  <material name="fence_material">
+    <texture>transp</texture>
+  </material>
+  <material name="plasma_wood">
+    <texture>wood</texture>
+    <layer>
+      <texture>plasma</texture>
+      <scale u="10" v="10" />
+      <mixmode>
+        <add />
+	<tiling />
+      </mixmode>
+    </layer>
+  </material>
+</materials>
+@end example
+
+When defining materials you usually use a name that clarifies for what
+you will use the material. That way you can easily replace how the material
+looks like (by swapping textures) without having to change the material
+name itself.
+
+In the example above we first define a @samp{table_material} which simply
+uses the @samp{wood} texture. The second material is @samp{fence_material}
+which uses the semi-transparent @samp{transp} texture.
+
+The last material is interesting. The base of the material is the
+@samp{wood} texture. On top of that there is an additional texture layer
+that uses the @samp{plasma} texture. The layer is scaled 10 times in both
+@samp{u} and @samp{v} direction and it is added to the original texture
+(i.e. the colors are added). The @samp{tiling} flag indicates that the
+@samp{plasma} texture will be repeated when needed (i.e. if the surface
+on which this material is used is large). Note that not all renderers
+support layered materials. In that case the second layer will simply
+not be used.
+

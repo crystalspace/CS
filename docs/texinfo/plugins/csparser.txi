@@ -4,13 +4,13 @@
 @cindex Map File Parser
 @cindex csParser
 
-This section will describe the map file parser (@code{csParser}). Currently
+This section will describe the map file parser. Currently
 there is only a section describing the format of the map files.
 
-@emph{WARNING:} Outdated! Requires new explanation of the XML format.
-
 @menu
-* Map File Format:: Format of Map File
+* XML File Format:: Format of Map File (XML)
+* Old Map File Format:: Old Format of Map File
 @end menu
 
+@imports{plugins,xmlfmt.txi}
 @imports{plugins,mapfmt.txi}

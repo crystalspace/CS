@@ -1,6 +1,7 @@
 The history order is reversed so that new features are at the top.
 
 12-Jan-2002
+	- Started work on new map format document.
 	- Eric Sunshine silenced some warning messages from ActiveState Perl
 	  during configuration process.
 	- Steven Geens made milk2spr add normals to the vertices.

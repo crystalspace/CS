@@ -79,13 +79,17 @@
 @token{)}
 @end macro
 
-@node Map File Format, , csParser, csParser
-@subsection Format of Map File
-@cindex Format of Map File
-@cindex Map File Format
+@node Old Map File Format, , csParser, csParser
+@subsection Old Format of Map File
+@cindex Old Format of Map File
+@cindex Old Map File Format
 
 @noindent
 @emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.}
+
+@emph{Note!} this document is outdated in the sense that we moved
+to @sc{xml}. However some of the information here is still useful and
+not yet transformed to the new XML format. @xref{XML File Format}.
 
 The next couple sections of this document describe the format of the standard
 Crystal Space map file.  The first section describes the syntax of the file.
