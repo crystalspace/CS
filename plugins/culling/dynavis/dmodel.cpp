@@ -31,7 +31,7 @@
 
 //---------------------------------------------------------------------------
 
-csObjectModel::csObjectModel ()
+csDynavisObjectModel::csDynavisObjectModel ()
 {
   planes = NULL;
   num_planes = -1;
@@ -41,13 +41,13 @@ csObjectModel::csObjectModel ()
   has_obb = false;
 }
 
-csObjectModel::~csObjectModel ()
+csDynavisObjectModel::~csDynavisObjectModel ()
 {
   delete[] planes;
   delete[] edges;
 }
 
-void csObjectModel::UpdateOutline (const csVector3& pos)
+void csDynavisObjectModel::UpdateOutline (const csVector3& pos)
 {
   if (!imodel->GetPolygonMeshViscull ()) return;
 
@@ -79,13 +79,13 @@ void csObjectModel::UpdateOutline (const csVector3& pos)
   }
 }
 
-bool csObjectModel::HasOBB ()
+bool csDynavisObjectModel::HasOBB ()
 {
   GetOBB ();
   return has_obb;
 }
 
-const csOBB& csObjectModel::GetOBB ()
+const csOBB& csDynavisObjectModel::GetOBB ()
 {
   if (dirty_obb)
   {
@@ -116,21 +116,21 @@ csObjectModelManager::~csObjectModelManager ()
   csGlobalHashIterator it (&models);
   while (it.HasNext ())
   {
-    csObjectModel* model = (csObjectModel*)it.Next ();
+    csDynavisObjectModel* model = (csDynavisObjectModel*)it.Next ();
     delete model;
   }
 }
 
-csObjectModel* csObjectModelManager::CreateObjectModel (iObjectModel* imodel)
+csDynavisObjectModel* csObjectModelManager::CreateObjectModel (iObjectModel* imodel)
 {
-  csObjectModel* model = (csObjectModel*)models.Get ((csHashKey)imodel);
+  csDynavisObjectModel* model = (csDynavisObjectModel*)models.Get ((csHashKey)imodel);
   if (model)
   {
     model->ref_cnt++;
   }
   else
   {
-    model = new csObjectModel ();
+    model = new csDynavisObjectModel ();
     model->ref_cnt = 1;
     model->imodel = imodel;
     // To make sure we will recalc we set shape_number to one less.
@@ -139,7 +139,7 @@ csObjectModel* csObjectModelManager::CreateObjectModel (iObjectModel* imodel)
   return model;
 }
 
-void csObjectModelManager::ReleaseObjectModel (csObjectModel* model)
+void csObjectModelManager::ReleaseObjectModel (csDynavisObjectModel* model)
 {
   CS_ASSERT (model->ref_cnt > 0);
   if (model->ref_cnt == 1)
@@ -154,7 +154,7 @@ void csObjectModelManager::ReleaseObjectModel (csObjectModel* model)
 
 static int show_notclosed = 6;
 
-bool csObjectModelManager::CheckObjectModel (csObjectModel* model,
+bool csObjectModelManager::CheckObjectModel (csDynavisObjectModel* model,
 	iMeshWrapper* mw)
 {
   CS_ASSERT (model->ref_cnt > 0);

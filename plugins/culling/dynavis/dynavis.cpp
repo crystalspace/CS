@@ -567,7 +567,7 @@ typedef csGrowingArray<csVector3> dynavis_tr_cam;
 CS_IMPLEMENT_STATIC_VAR (GetTrCam, dynavis_tr_cam, ())
 
 void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
-	iVisibilityObject* visobj, csObjectModel* model)
+	iVisibilityObject* visobj, csDynavisObjectModel* model)
 {
   iMovable* movable = visobj->GetMovable ();
   iPolygonMesh* polymesh = visobj->GetObjectModel ()->GetPolygonMeshViscull ();
@@ -735,7 +735,7 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
 }
 
 void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
-	iVisibilityObject* visobj, csObjectModel* model)
+	iVisibilityObject* visobj, csDynavisObjectModel* model)
 {
   iMovable* movable = visobj->GetMovable ();
   iPolygonMesh* polymesh = visobj->GetObjectModel ()->GetPolygonMeshViscull ();
@@ -856,7 +856,7 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
 }
 
 void csDynaVis::AppendWriteQueue (iCamera* camera, iVisibilityObject* visobj,
-  	csObjectModel* /*model*/, csVisibilityObjectWrapper* obj)
+  	csDynavisObjectModel* /*model*/, csVisibilityObjectWrapper* obj)
 {
   if (!obj->model->HasOBB ()) return;	// Object is not ment for writing.
 

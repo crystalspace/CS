@@ -9,6 +9,9 @@ The history order is reversed so that new features are at the top.
 	- Jorrit fixed a bug in csGLExtensionManager. You cannot initialize
 	  variables in the struct/class definition. You must do it in the
 	  constructor. C++ is not Java.
+	- Jorrit renamed csObjectModel in Dynavis to csDynavisObjectModel to
+	  avoid a conflict with csObjectModel in csgeom (prevented static
+	  linking).
 22-May-2003
 	- res made the following changes:
 	    - when using the new renderer, the sector now stores the 

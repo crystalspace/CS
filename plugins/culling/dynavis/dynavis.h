@@ -73,7 +73,7 @@ public:
   csKDTreeChild* child;
   long update_number;	// Last used update_number from movable.
   long shape_number;	// Last used shape_number from model.
-  csObjectModel* model;
+  csDynavisObjectModel* model;
 
   bool hint_closed;
   bool hint_badoccluder;
@@ -190,15 +190,15 @@ private:
 
   // Given an occluder, update it in the coverage buffer.
   void UpdateCoverageBuffer (iCamera* camera, iVisibilityObject* visobj,
-  	csObjectModel* model);
+  	csDynavisObjectModel* model);
 
   // Given an occluder, update it in the coverage buffer. Using the outline.
   void UpdateCoverageBufferOutline (iCamera* camera, iVisibilityObject* visobj,
-  	csObjectModel* model);
+  	csDynavisObjectModel* model);
 
   // Append an occluder to the write queue.
   void AppendWriteQueue (iCamera* camera, iVisibilityObject* visobj,
-  	csObjectModel* model, csVisibilityObjectWrapper* obj);
+  	csDynavisObjectModel* model, csVisibilityObjectWrapper* obj);
 
 public:
   SCF_DECLARE_IBASE;

@@ -24,7 +24,7 @@
 #include "csgeom/obb.h"
 
 struct iObjectModel;
-class csObjectModel;
+class csDynavisObjectModel;
 class csObjectModelManager;
 struct csPolygonMeshEdge;
 struct iMeshWrapper;
@@ -35,7 +35,7 @@ struct iMeshWrapper;
 class csOutlineInfo
 {
   friend class csObjectModelManager;
-  friend class csObjectModel;
+  friend class csDynavisObjectModel;
 
 private:
   csOutlineInfo ()
@@ -68,7 +68,7 @@ public:
  * objects can share the same model. Every instance of this class corresponds
  * to a different iObjectModel from the engine.
  */
-class csObjectModel
+class csDynavisObjectModel
 {
   friend class csObjectModelManager;
 
@@ -94,8 +94,8 @@ private:
   // Outline information (may in future move to a seperate class).
   csOutlineInfo outline_info;
 
-  csObjectModel ();
-  ~csObjectModel ();
+  csDynavisObjectModel ();
+  ~csDynavisObjectModel ();
 
 public:
   /// Get the iObjectModel for this model.
@@ -123,7 +123,7 @@ public:
 
 /**
  * An object model manager. This class will manage instances of
- * csObjectModel for every iObjectModel that is received by the visibility
+ * csDynavisObjectModel for every iObjectModel that is received by the visibility
  * system.
  */
 class csObjectModelManager
@@ -139,20 +139,20 @@ public:
    * Find the model for this iObjectModel. If it already exists, increase
    * the ref count and return it. Otherwise create a new one.
    */
-  csObjectModel* CreateObjectModel (iObjectModel* model);
+  csDynavisObjectModel* CreateObjectModel (iObjectModel* model);
 
   /**
    * Release the model for this iObjectModel. This will possibly delete
    * the given model if this was the last reference.
    */
-  void ReleaseObjectModel (csObjectModel* model);
+  void ReleaseObjectModel (csDynavisObjectModel* model);
 
   /**
    * Check if the object model needs recalculation (if the shape
    * of the object it represents has changed). Returns true if the
    * object has been changed.
    */
-  bool CheckObjectModel (csObjectModel* model, iMeshWrapper* mesh);
+  bool CheckObjectModel (csDynavisObjectModel* model, iMeshWrapper* mesh);
 };
 
 #endif // __CS_DMODEL_H__
