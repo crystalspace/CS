@@ -69,8 +69,7 @@ bool csProcSkyTexture::PrepareAnim ()
 
 void csProcSkyTexture::Animate (cs_time current_time)
 {
-  (void)current_time;
-  sky->DrawToTexture(this);
+  sky->DrawToTexture(this, current_time);
 }
 
 //---------- csProcSky -------------------------------------------
@@ -105,6 +104,19 @@ csProcSky::csProcSky()
   }
 
   animated= true;
+  rerender= true;
+  old_time = 0;
+  startoctaves = new uint8 [octsize*octsize*nr_octaves];
+  endoctaves = new uint8 [octsize*octsize*nr_octaves];
+  periods = new int [nr_octaves];
+  curposition = new int [nr_octaves];
+  int aperiod = 60*1000;
+  for(i=0 ; i<nr_octaves; i++)
+  {
+    periods[i] = aperiod;
+    curposition[i] = 0;
+    aperiod = aperiod*2/3;
+  }
 
   Initialize();
 }
@@ -115,6 +127,10 @@ csProcSky::~csProcSky()
   for(int i=0 ; i<nr_octaves; i++)
     delete[] enlarged[i];
   delete[] enlarged;
+  delete[] startoctaves;
+  delete[] endoctaves;
+  delete[] periods;
+  delete[] curposition;
 }
 
 
@@ -123,7 +139,11 @@ void csProcSky::Initialize()
   /// init every octave
   int i;
   for(i=0 ; i< nr_octaves; i++)
-    InitOctave(i);
+  {
+    InitOctave(octaves, i);
+    InitOctave(startoctaves, i);
+    InitOctave(endoctaves, i);
+  }
   /// fill enlarged octaves
   for(i=0 ; i< nr_octaves; i++)
   {
@@ -131,7 +151,7 @@ void csProcSky::Initialize()
   }
 }
 
-void csProcSky::InitOctave(int nr)
+void csProcSky::InitOctave(uint8 *octs, int nr)
 {
   int sz = octsize*octsize;
   uint8* myoct = new uint8[sz];
@@ -149,7 +169,7 @@ void csProcSky::InitOctave(int nr)
           tot += myoct[(x+ix+octsize)%octsize + 
 	    ((y+iy+octsize)%octsize)*octsize];
       tot /= (2*sm+1)*(2*sm+1);
-      SetOctave(nr,x,y,tot);
+      SetOctave(octs, nr, x, y, tot);
     }
   delete myoct;
 }
@@ -199,6 +219,59 @@ void csProcSky::Enlarge(uint8* dest, uint8* src, int factor, int rshift)
       }
     }
 }
+
+
+void csProcSky::CopyOctave(uint8 *srcocts, int srcnr, uint8 *destocts, 
+  int destnr)
+{
+  memcpy( destocts + octsize*octsize*destnr, srcocts + octsize*octsize*srcnr,
+    octsize*octsize );
+}
+
+
+void csProcSky::Combine(uint8 *dest, uint8 *start, uint8 *end, int pos, 
+  int max, int nr)
+{
+  int sz = octsize * octsize;
+  uint8 *dp = dest + sz * nr;
+  uint8 *sp = start + sz * nr;
+  uint8 *ep = end + sz * nr;
+  int epow = max - pos; // end power, reverse position
+  for(int i=0; i<sz; i++)
+  {
+    *dp++ = (epow*int(*ep++) + pos*int(*sp++))/max;
+  }
+}
+
+
+void csProcSky::AnimOctave(int nr, int elapsed)
+{
+  curposition[nr] += elapsed;
+  if(curposition[nr] >= periods[nr])
+  {
+    // next cycle
+    curposition[nr] -= periods[nr];
+    if(curposition[nr] > periods[nr])
+    {
+      // wow - very long elapsed time, more than two periods
+      // totally new start & end points
+      InitOctave(startoctaves, nr);
+      InitOctave(endoctaves, nr);
+      curposition[nr] %= periods[nr]; // position in new period
+    }
+    else
+    {
+      // end becomes start, make new random end point.
+      CopyOctave(endoctaves, nr, startoctaves, nr);
+      InitOctave(endoctaves, nr);
+    }
+  }
+  //// start & end are OK, we know the current position < period.
+  Combine(octaves, startoctaves, endoctaves, curposition[nr], periods[nr], nr);
+  /// pre-enlarge the octave
+  Enlarge(enlarged[nr], octaves + octsize*octsize*nr, nr_octaves - nr - 1, nr);
+}
+
 
 bool csProcSky::SphereIntersect(const csVector3& point, csVector3& isect)
 {
@@ -368,8 +441,9 @@ uint8 csProcSky::GetCloudVal(int x, int y)
   return (uint8)res;
 }
 
-void csProcSky::DrawToTexture(csProcSkyTexture *skytex)
+void csProcSky::DrawToTexture(csProcSkyTexture *skytex, cs_time current_time)
 {
+  int i;
   csVector3 txtorig, txtu, txtv;
   skytex->GetTextureSpace(txtorig, txtu, txtv);
   int width = skytex->GetWidth();
@@ -378,10 +452,18 @@ void csProcSky::DrawToTexture(csProcSkyTexture *skytex)
   iTextureManager *txtmgr = skytex->GetTextureManager();
 
   /// if it already has a texture cache (it has been drawn to in the past)
-  /// an we do not animate - skip, nothing to be done.
-  if(skytex->GetIntersect() && !animated) return;
+  /// and we do not animate, and no rerender is forced, 
+  /// then nothing needs to be done
+  if(!rerender && skytex->GetIntersect() && !animated) return;
+
   // if the texture has no cache, make one
   if(!skytex->GetIntersect()) MakeIntersectCache(skytex);
+  /// animate the octaves
+  int elapsed_time = int(current_time) - int(old_time);
+  if(elapsed_time > 0)
+    for(i=0; i<nr_octaves; i++)
+      AnimOctave(i, elapsed_time);
+  old_time = current_time;
 
   if (!skytex->GetG3D()->BeginDraw (CSDRAW_2DGRAPHICS))
     return;
@@ -444,6 +526,9 @@ void csProcSky::DrawToTexture(csProcSkyTexture *skytex)
 
   skytex->GetG3D()->FinishDraw();
   skytex->GetG3D()->Print(NULL);
+
+  /// did a rendering
+  rerender = false;
 }
 
 

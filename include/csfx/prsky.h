@@ -111,18 +111,38 @@ class csProcSky {
 
   /// is it animation (if not - no recalculation is performed)
   bool animated;
+  /// force (re)rendering of the next frame
+  bool rerender;
+  /// periods for each octave - total new random after this many msec
+  int *periods;
+  /// current time position (in msec) per octaves
+  int *curposition;
+  /** 
+   * start and end images for each octave; (like octaves but start and
+   * end positions of this period of animation
+   */
+  uint8 *startoctaves, *endoctaves;
+  /// the previous time of animated frame
+  cs_time old_time;
 
   /// init the texture
   void Initialize();
   /// init an octave with new random/smoothed content
-  void InitOctave(int nr);
+  void InitOctave(uint8 *octs, int nr);
   /// enlarge an octave, size is scaled by 2**factor, values >> rshift;
   void Enlarge(uint8 *dest, uint8 *src, int factor, int rshift);
+  /// take weighted average of start&end into dest, pos(0=start) of max(=end).
+  void Combine(uint8 *dest, uint8 *start, uint8 *end, int pos, int max, int nr);
+  /// animate octave nr, given elapsed time (msec);
+  void AnimOctave(int nr, int elapsed);
   /// octave value get/set
-  uint8& GetOctave(int oct, int x, int y) 
+  uint8& GetOctave(uint8 *octaves, int oct, int x, int y) 
   { return octaves [ oct*octsize*octsize + y*octsize + x ]; }
-  void SetOctave(int oct, int x, int y, uint8 val) 
+  void SetOctave(uint8 *octaves, int oct, int x, int y, uint8 val) 
   { octaves[ oct*octsize*octsize + y*octsize + x ] = val; }
+  /// copy one octave to another
+  void CopyOctave(uint8 *srcocts, int srcnr, uint8 *destocts, int destnr);
+
   /// get the intersection with sphere (false = no intersection)
   bool SphereIntersect(const csVector3& point, csVector3& isect);
   /// get sky bluishness at a point on the sphere. below==the ground
@@ -138,7 +158,7 @@ public:
   ~csProcSky();
 
   /// do a nextframe like drawing update
-  void DrawToTexture(csProcSkyTexture *skytex);
+  void DrawToTexture(csProcSkyTexture *skytex, cs_time current_time);
 
   /// Make intersection point cache in a texture
   void MakeIntersectCache(csProcSkyTexture *skytex);
@@ -147,6 +167,10 @@ public:
   void SetAnimated(bool anim=true) {animated=anim;}
   /// See if the prsky is animated
   bool GetAnimated() const {return animated;}
+  /// Force a re-render (only once) of the sky, in the next frame.
+  void ForceRerender() {rerender = true;}
+  /// no longer force a rerender (undo a ForceRerender call)
+  void DonotRerender() {rerender = false;}
 };
 
 #endif // __PROCSKYTEX_H__
