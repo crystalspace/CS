@@ -26,9 +26,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp $(SRCDIR)/plugins/sound/renderer/software \
-  $(SRCDIR)/plugins/sound/renderer/common
-
 # COMP_GCC Linker assumes static libs have extension '.a'.  Mingw/Cygwin both
 # use libdsound.a (static lib) as the place from which to get MS DirectSound.
 ifeq ($(OS),WIN32)
@@ -57,13 +54,17 @@ else
   TO_INSTALL.STATIC_LIBS += $(SNDSOFT)
 endif
 
-INF.SNDSOFT = $(SRCDIR)/plugins/sound/renderer/software/sndsoft.csplugin
-INC.SNDSOFT = $(wildcard $(addprefix $(SRCDIR)/, \
-  plugins/sound/renderer/software/*.h plugins/sound/renderer/common/*.h))
-SRC.SNDSOFT = $(wildcard $(addprefix $(SRCDIR)/, \
-  plugins/sound/renderer/software/*.cpp plugins/sound/renderer/common/*.cpp))
-OBJ.SNDSOFT = $(addprefix $(OUT)/,$(notdir $(SRC.SNDSOFT:.cpp=$O)))
+DIR.SNDSOFT = plugins/sound/renderer/software
+OUT.SNDSOFT = $(OUT)/$(DIR.SNDSOFT)
+INF.SNDSOFT = $(SRCDIR)/$(DIR.SNDSOFT)/sndsoft.csplugin
+INC.SNDSOFT = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.SNDSOFT)/*.h \
+  plugins/sound/renderer/common/*.h))
+SRC.SNDSOFT = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.SNDSOFT)/*.cpp \
+  plugins/sound/renderer/common/*.cpp))
+OBJ.SNDSOFT = $(addprefix $(OUT.SNDSOFT)/,$(notdir $(SRC.SNDSOFT:.cpp=$O)))
 DEP.SNDSOFT = CSUTIL CSGEOM CSSYS CSUTIL
+
+OUTDIRS += $(OUT.SNDSOFT)
 
 MSVC.DSP += SNDSOFT
 DSP.SNDSOFT.NAME = sndsoft
@@ -74,9 +75,15 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: sndsoft sndsoftclean
+.PHONY: sndsoft sndsoftclean sndsoftcleandep
 
 sndsoft: $(OUTDIRS) $(SNDSOFT)
+
+$(OUT.SNDSOFT)/%$O: $(SRCDIR)/$(DIR.SNDSOFT)/%.cpp
+	$(DO.COMPILE.CPP)
+
+$(OUT.SNDSOFT)/%$O: $(SRCDIR)/plugins/sound/renderer/common/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(SNDSOFT): $(OBJ.SNDSOFT) $(LIB.SNDSOFT)
 	$(DO.PLUGIN)
@@ -85,12 +92,16 @@ clean: sndsoftclean
 sndsoftclean:
 	-$(RMDIR) $(SNDSOFT) $(OBJ.SNDSOFT) $(OUTDLL)/$(notdir $(INF.SNDSOFT))
 
+cleandep: sndsoftcleandep
+sndsoftcleandep:
+	-$(RM) $(OUT.SNDSOFT)/sndsoft.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/sndsoft.dep
-$(OUTOS)/sndsoft.dep: $(SRC.SNDSOFT)
-	$(DO.DEP)
+dep: $(OUT.SNDSOFT) $(OUT.SNDSOFT)/sndsoft.dep
+$(OUT.SNDSOFT)/sndsoft.dep: $(SRC.SNDSOFT)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/sndsoft.dep
+-include $(OUT.SNDSOFT)/sndsoft.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

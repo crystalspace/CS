@@ -22,6 +22,11 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine eliminated several compilation warnings from
 	  DirectSound 3D renderer.
 	- Duhprey ported sprite3d to new renderer
+	- Eric Sunshine converted sndds3d.mak and sndsoft.mak over to the new
+	  format where object files and resources are placed in a
+	  module-specific build directory.  This solves several problems where
+	  glwin32, sndsoft, and sndds3d were confusing and mixing source and
+	  object files.
 25-Jun-2003
 	- Oktal manually applied a patch to cssocket that was intended for
 	  ensocket, submitted by Ladislav Foldyna.

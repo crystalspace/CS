@@ -26,8 +26,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp $(SRCDIR)/plugins/sound/renderer/ds3d
-
 ifeq ($(USE_PLUGINS),yes)
   SNDDS3D = $(OUTDLL)/sndds3d$(DLL)
   LIB.SNDDS3D = $(foreach d,$(DEP.SNDDS3D),$($d.LIB))
@@ -41,13 +39,17 @@ else
   TO_INSTALL.STATIC_LIBS += $(SNDDS3D)
 endif
 
-INF.SNDDS3D = $(SRCDIR)/plugins/sound/renderer/ds3d/sndds3d.csplugin
-INC.SNDDS3D = $(wildcard $(addprefix $(SRCDIR)/, \
-  plugins/sound/renderer/ds3d/*.h plugins/sound/renderer/common/*.h))
-SRC.SNDDS3D = $(wildcard $(addprefix $(SRCDIR)/, \
-  plugins/sound/renderer/ds3d/*.cpp plugins/sound/renderer/common/*.cpp))
-OBJ.SNDDS3D = $(addprefix $(OUT)/,$(notdir $(SRC.SNDDS3D:.cpp=$O)))
+DIR.SNDDS3D = plugins/sound/renderer/ds3d
+OUT.SNDDS3D = $(OUT)/$(DIR.SNDDS3D)
+INF.SNDDS3D = $(SRCDIR)/$(DIR.SNDDS3D)/sndds3d.csplugin
+INC.SNDDS3D = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.SNDDS3D)/*.h \
+  plugins/sound/renderer/common/*.h))
+SRC.SNDDS3D = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.SNDDS3D)/*.cpp \
+  plugins/sound/renderer/common/*.cpp))
+OBJ.SNDDS3D = $(addprefix $(OUT.SNDDS3D)/,$(notdir $(SRC.SNDDS3D:.cpp=$O)))
 DEP.SNDDS3D = CSUTIL CSGEOM CSSYS CSUTIL
+
+OUTDIRS += $(OUT.SNDDS3D)
 
 MSVC.DSP += SNDDS3D
 DSP.SNDDS3D.NAME = sndds3d
@@ -59,12 +61,15 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: sndds3d sndds3dclean
+.PHONY: sndds3d sndds3dclean sndds3dcleandep
 
 sndds3d: $(OUTDIRS) $(SNDDS3D)
 
-$(OUT)/%$O: $(SRC.SNDDS3D)
+$(OUT.SNDDS3D)/%$O: $(SRCDIR)/$(DIR.SNDDS3D)/%.cpp
 	$(DO.COMPILE.CPP) $(DIRECTX.CFLAGS)
+
+$(OUT.SNDDS3D)/%$O: $(SRCDIR)/plugins/sound/renderer/common/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(SNDDS3D): $(OBJ.SNDDS3D) $(LIB.SNDDS3D)
 	$(DO.PLUGIN) $(LIB.SNDDS3D.SPECIAL)
@@ -73,12 +78,16 @@ clean: sndds3dclean
 sndds3dclean:
 	-$(RMDIR) $(SNDDS3D) $(OBJ.SNDDS3D) $(OUTDLL)/$(notdir $(INF.SNDDS3D))
 
+cleandep: sndds3dcleandep
+sndds3dcleandep:
+	-$(RM) $(OUT.SNDDS3D)/sndds3d.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/sndds3d.dep
-$(OUTOS)/sndds3d.dep: $(SRC.SNDDS3D)
-	$(DO.DEP)
+dep: $(OUT.SNDDS3D) $(OUT.SNDDS3D)/sndds3d.dep
+$(OUT.SNDDS3D)/sndds3d.dep: $(SRC.SNDDS3D)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/sndds3d.dep
+-include $(OUT.SNDDS3D)/sndds3d.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
