@@ -202,24 +202,27 @@
    }
 #endif // CS_SYSDEF_PROVIDE_TEMP
 
-// The Microsoft Visual C compiler miserably crashes on boxclip.inc
-// because of memcpy(). This is a replacement for memcpy() which is
-// supposed to fix the problem.
+// Microsoft Visual C++ compiler includes a very in-efficient 'memcpy'.
+// This also replaces the older 'better_memcpy',which was also not as
+// efficient as it could be ergo...heres a better solution.
 #ifdef COMP_VC
-#  define memcpy better_memcpy
-static inline void *better_memcpy (void *dst, const void *src, size_t len)
+#define memcpy fast_mem_copy
+static __inline void* fast_mem_copy(void* dest, const void* src, __int32 count)
 {
-  _asm		mov	esi,src
-  _asm		mov	edi,dst
-  _asm		mov	ecx,len
-  _asm		mov	al,cl
-  _asm		shr	ecx,2
-  _asm		cld
-  _asm		rep	movsd
-  _asm		mov	cl,al
-  _asm		and	cl,3
-  _asm		rep	movsb
-  return dst;
+  __asm
+  {
+	mov		ecx, count
+	mov		esi, src
+	mov		edi, dest
+	mov     ebx, ecx
+	shr     ecx, 2
+	and     ebx, 3
+	rep     movsd
+	mov     ecx, ebx
+	rep     movsb
+  }
+  
+  return dest;
 }
 #endif
 
