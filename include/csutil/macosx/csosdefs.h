@@ -2,7 +2,7 @@
 #define __OSX_csosdefs_h
 //=============================================================================
 //
-//	Copyright (C)1999-2004 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999-2005 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -41,13 +41,5 @@
 
 #undef  CS_SOUND_DRIVER
 #define CS_SOUND_DRIVER "crystalspace.sound.driver.coreaudio"
-
-#define CS_NO_IEEE_OPTIMIZATIONS /* Note (1) */
-
-// Note (1)
-//   Matt Reda: I did some rough testing of csQint() and friends on the
-//   PowerPC.  It appears to work ok, but is actually slower.  Some simple
-//   tests show that csQint() is roughly twice as slow as a cast from double to
-//   long
 
 #endif // __OSX_csosdefs_h
