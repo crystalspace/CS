@@ -34,6 +34,7 @@
 #include "cs3d/direct3d5/d3d_txtcache.h"
 #include "cs3d/direct3d5/d3d_txtmgr.h"
 #include "cs3d/common/dtmesh.h"
+#include "cs3d/common/dpmesh.h"
 #include "csutil/scf.h"
 #include "csgeom/transfrm.h"
 #include "cssys/win32/IDDetect.h"
@@ -266,6 +267,12 @@ public:
   virtual void DrawTriangleMesh (G3DTriangleMesh& mesh) 
   {
     DefaultDrawTriangleMesh (mesh, this, m_o2c, m_pClipper, m_Aspect, m_nHalfWidth, m_nHalfHeight);
+  }
+
+  /// Draw a polygon mesh.
+  virtual void DrawPolygonMesh (G3DPolygonMesh& mesh)
+  {
+    DefaultDrawPolygonMesh (mesh, this, o2c, clipper, aspect, width2, height2);
   }
 
   /// Get the ITextureManager.

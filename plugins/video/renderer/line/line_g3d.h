@@ -24,6 +24,7 @@
 #include "csutil/scf.h"
 #include "csgeom/transfrm.h"
 #include "cs3d/common/dtmesh.h"
+#include "cs3d/common/dpmesh.h"
 #include "line_txt.h"
 #include "iconfig.h"
 #include "igraph2d.h"
@@ -195,6 +196,12 @@ public:
   virtual void DrawTriangleMesh (G3DTriangleMesh& mesh)
   {
     DefaultDrawTriangleMesh (mesh, this, o2c, clipper, aspect, width2, height2);
+  }
+
+  /// Draw a polygon mesh.
+  virtual void DrawPolygonMesh (G3DPolygonMesh& mesh)
+  {
+    DefaultDrawPolygonMesh (mesh, this, o2c, clipper, aspect, width2, height2);
   }
 
   /// Get the iGraphics2D driver.

@@ -34,6 +34,7 @@
 #include "glcache3.h"
 #include "gltex3.h"
 #include "cs3d/common/dtmesh.h"
+#include "cs3d/common/dpmesh.h"
 #include "glhalo3.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/polyclip.h"
@@ -247,6 +248,12 @@ public:
   virtual void DrawTriangleMesh (G3DTriangleMesh& mesh) 
   { 
     DefaultDrawTriangleMesh( mesh, this, o2c, clipper, aspect, m_nHalfWidth, m_nHalfHeight );
+  }
+
+  /// Draw a polygon mesh.
+  virtual void DrawPolygonMesh (G3DPolygonMesh& mesh)
+  {
+    DefaultDrawPolygonMesh (mesh, this, o2c, clipper, aspect, m_nHalfWidth, m_nHalfHeight );
   }
 
   /// 

@@ -42,7 +42,7 @@ endif
 DESCRIPTION.$(INF3D) = $(DESCRIPTION.infinite)
 SRC.INF3D = $(wildcard libs/cs3d/inf/*.cpp) \
   libs/cs3d/common/txtmgr.cpp libs/cs3d/common/dtmesh.cpp \
-  $(wildcard $(SRC.COMMON.DRV2D))
+  libs/cs3d/common/dpmesh.cpp $(wildcard $(SRC.COMMON.DRV2D))
 OBJ.INF3D = $(addprefix $(OUT),$(notdir $(subst .asm,$O,$(SRC.INF3D:.cpp=$O))))
 
 endif # ifeq ($(MAKESECTION),postdefines)

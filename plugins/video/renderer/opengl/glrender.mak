@@ -61,7 +61,8 @@ else
 endif
 DESCRIPTION.$(GL3D) = $(DESCRIPTION.gl3d)
 SRC.GL3D = $(wildcard libs/cs3d/opengl/*.cpp) \
-  libs/cs3d/common/txtmgr.cpp libs/cs3d/common/dtmesh.cpp
+  libs/cs3d/common/txtmgr.cpp libs/cs3d/common/dtmesh.cpp \
+  libs/cs3d/common/dpmesh.cpp
 OBJ.GL3D = $(addprefix $(OUT),$(notdir $(SRC.GL3D:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)

@@ -37,6 +37,7 @@
 #include "d3d_states.h"
 #include "d3d_vertcache.h"
 #include "cs3d/common/dtmesh.h"
+#include "cs3d/common/dpmesh.h"
 #include "csutil/scf.h"
 #include "csgeom/transfrm.h"
 #include "cssys/win32/IDDetect.h"
@@ -300,6 +301,12 @@ public:
     DefaultDrawTriangleMesh (mesh, this, m_o2c, m_pClipper, m_Aspect, m_nHalfWidth, m_nHalfHeight);
   }
  
+  /// Draw a polygon mesh.
+  virtual void DrawPolygonMesh (G3DPolygonMesh& mesh)
+  {
+    DefaultDrawPolygonMesh (mesh, this, o2c, clipper, aspect, width2, height2);
+  }
+
   /** Adjust the given texture size to an optimal size. This will take into
    *  consideration maximum sizes, limitations to power of two, max aspect
    *  ratio and so on.

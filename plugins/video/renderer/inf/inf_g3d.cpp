@@ -273,6 +273,21 @@ void csGraphics3DInfinite::DrawTriangleMesh (G3DTriangleMesh& mesh)
   }
 }
 
+void csGraphics3DInfinite::DrawPolygonMesh (G3DPolygonMesh& mesh)
+{
+  num_drawpolygon_mesh++;
+  if (do_fastmesh)
+  {
+    num_drawpolygon_mesh += mesh.num_polygons;
+  }
+  else
+  {
+    in_mesh = true;
+    DefaultDrawPolygonMesh (mesh, this, o2c, clipper, aspect, width2, height2);
+    in_mesh = false;
+  }
+}
+
 void csGraphics3DInfinite::DrawPolygon (G3DPolygonDP& poly)
 {
   if (poly.num < 3) return;

@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #-------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-CFLAGS.GLIDE33+=-I/usr/local/glide/include -DGLIDE3 
+CFLAGS.GLIDE33+=-I/usr/include/glide3 -I/usr/local/include/glide -DGLIDE3 
 LIBS._GLIDE33+=-lglide3x
 
 # The Glide driver
@@ -46,7 +46,7 @@ endif
 DESCRIPTION.$(GLIDE33) = $(DESCRIPTION.glide33)
 SRC.GLIDE33 = $(wildcard libs/cs3d/glide3/*.cpp ) \
   libs/cs3d/common/texmem.cpp libs/cs3d/common/txtmgr.cpp \
-  libs/cs3d/common/dtmesh.cpp
+  libs/cs3d/common/dtmesh.cpp libs/cs3d/common/dpmesh.cpp
 OBJ.GLIDE33 = $(addprefix $(OUT),$(notdir $(SRC.GLIDE33:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)

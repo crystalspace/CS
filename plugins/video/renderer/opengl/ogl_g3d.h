@@ -30,6 +30,7 @@
 
 #include "csutil/scf.h"
 #include "cs3d/common/dtmesh.h"
+#include "cs3d/common/dpmesh.h"
 #include "csgeom/transfrm.h"
 #include "ogl_txtmgr.h"
 #include "igraph3d.h"
@@ -315,6 +316,12 @@ public:
   virtual void SetClipper (csVector2* vertices, int num_vertices);
   /// Draw a triangle mesh.
   virtual void DrawTriangleMesh (G3DTriangleMesh& mesh);
+
+  /// Draw a polygon mesh.
+  virtual void DrawPolygonMesh (G3DPolygonMesh& mesh)
+  {
+    DefaultDrawPolygonMesh (mesh, this, o2c, clipper, aspect, width2, height2);
+  }
 
   /// Get the iGraphics2D driver.
   virtual iGraphics2D *GetDriver2D ()

@@ -24,6 +24,7 @@
 #include "csutil/scf.h"
 #include "csgeom/transfrm.h"
 #include "cs3d/common/dtmesh.h"
+#include "cs3d/common/dpmesh.h"
 #include "cs2d/common/graph2d.h"
 #include "inf_txt.h"
 #include "iconfig.h"
@@ -219,6 +220,9 @@ public:
   virtual void SetClipper (csVector2* vertices, int num_vertices);
   /// Draw a triangle mesh.
   virtual void DrawTriangleMesh (G3DTriangleMesh& mesh);
+
+  /// Draw a polygon mesh.
+  virtual void DrawPolygonMesh (G3DPolygonMesh& mesh);
 
   /// Get the iGraphics2D driver.
   virtual iGraphics2D *GetDriver2D ()
