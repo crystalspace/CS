@@ -1882,6 +1882,8 @@ STDMETHODIMP csGraphics3DSoftware::FinishPolygonQuick ()
   return S_OK;
 }
 
+#define EPS   0.0001
+
 STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygon& poly, bool gouraud)
 {
   int i;
@@ -1929,49 +1931,63 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygon& poly, bool gour
   //  dt/dx = ---------------------------------
   //          (Ax-Cx)*(By-Cy) - (Bx-Cx)*(Ay-Cy)
   //-----
-  float dd = (poly.pi_triangle [0].x - poly.pi_triangle [2].x)
-           * (poly.pi_triangle [1].y - poly.pi_triangle [2].y)
-           - (poly.pi_triangle [1].x - poly.pi_triangle [2].x)
-           * (poly.pi_triangle [0].y - poly.pi_triangle [2].y);
+
+  int last;
+  float dd;
+  for (last=2 ; last<poly.num ; last++)
+  {
+    dd = (poly.vertices [0].sx - poly.vertices [last].sx)
+           * (poly.vertices [1].sy - poly.vertices [last].sy)
+           - (poly.vertices [1].sx - poly.vertices [last].sx)
+           * (poly.vertices [0].sy - poly.vertices [last].sy);
+    if (dd<0)
+      break;
+  }
+
+  // Rejection of back-faced polygons (this renderer will not draw them
+  //  anyway, but this makes everything a little bit faster).
+  if (last==poly.num)
+    return S_OK;
+
   float inv_dd = 1/dd;
 
   int du = 0, dv = 0;
   if (pqinfo.textured)
   {
-    float uu0 = pqinfo.tw * poly.pi_tritexcoords [0].u;
-    float uu1 = pqinfo.tw * poly.pi_tritexcoords [1].u;
-    float uu2 = pqinfo.tw * poly.pi_tritexcoords [2].u;
-    du = QInt16 (((uu0 - uu2) * (poly.pi_triangle [1].y - poly.pi_triangle [2].y)
-                - (uu1 - uu2) * (poly.pi_triangle [0].y - poly.pi_triangle [2].y)) * inv_dd);
-    float vv0 = pqinfo.th * poly.pi_tritexcoords [0].v;
-    float vv1 = pqinfo.th * poly.pi_tritexcoords [1].v;
-    float vv2 = pqinfo.th * poly.pi_tritexcoords [2].v;
-    dv = QInt16 (((vv0 - vv2) * (poly.pi_triangle [1].y - poly.pi_triangle [2].y)
-                - (vv1 - vv2) * (poly.pi_triangle [0].y - poly.pi_triangle [2].y)) * inv_dd);
+    float uu0 = pqinfo.tw * poly.pi_texcoords [0].u;
+    float uu1 = pqinfo.tw * poly.pi_texcoords [1].u;
+    float uu2 = pqinfo.tw * poly.pi_texcoords [last].u;
+    du = QInt16 (((uu0 - uu2) * (poly.vertices [1].sy - poly.vertices [last].sy)
+                - (uu1 - uu2) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
+    float vv0 = pqinfo.th * poly.pi_texcoords [0].v;
+    float vv1 = pqinfo.th * poly.pi_texcoords [1].v;
+    float vv2 = pqinfo.th * poly.pi_texcoords [last].v;
+    dv = QInt16 (((vv0 - vv2) * (poly.vertices [1].sy - poly.vertices [last].sy)
+                - (vv1 - vv2) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
   }
-  float iz0 = poly.pi_tritexcoords [0].z;
-  float iz1 = poly.pi_tritexcoords [1].z;
-  float iz2 = poly.pi_tritexcoords [2].z;
-  int dz = QInt24 (((iz0 - iz2) * (poly.pi_triangle [1].y - poly.pi_triangle [2].y)
-                  - (iz1 - iz2) * (poly.pi_triangle [0].y - poly.pi_triangle [2].y)) * inv_dd);
+  float iz0 = poly.pi_texcoords [0].z;
+  float iz1 = poly.pi_texcoords [1].z;
+  float iz2 = poly.pi_texcoords [last].z;
+  int dz = QInt24 (((iz0 - iz2) * (poly.vertices [1].sy - poly.vertices [last].sy)
+                  - (iz1 - iz2) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
   long dr = 0, dg = 0, db = 0;
   if (gouraud)
   {
-    float rr0 = pqinfo.redFact*(flat_r*poly.pi_tritexcoords [0].r);
-    float rr1 = pqinfo.redFact*(flat_r*poly.pi_tritexcoords [1].r);
-    float rr2 = pqinfo.redFact*(flat_r*poly.pi_tritexcoords [2].r);
-    dr = QInt16 (((rr0 - rr2) * (poly.pi_triangle [1].y - poly.pi_triangle [2].y)
-                - (rr1 - rr2) * (poly.pi_triangle [0].y - poly.pi_triangle [2].y)) * inv_dd);
-    float gg0 = pqinfo.greenFact*(flat_g*poly.pi_tritexcoords [0].g);
-    float gg1 = pqinfo.greenFact*(flat_g*poly.pi_tritexcoords [1].g);
-    float gg2 = pqinfo.greenFact*(flat_g*poly.pi_tritexcoords [2].g);
-    dg = QInt16 (((gg0 - gg2) * (poly.pi_triangle [1].y - poly.pi_triangle [2].y)
-                - (gg1 - gg2) * (poly.pi_triangle [0].y - poly.pi_triangle [2].y)) * inv_dd);
-    float bb0 = pqinfo.blueFact*(flat_b*poly.pi_tritexcoords [0].b);
-    float bb1 = pqinfo.blueFact*(flat_b*poly.pi_tritexcoords [1].b);
-    float bb2 = pqinfo.blueFact*(flat_b*poly.pi_tritexcoords [2].b);
-    db = QInt16 (((bb0 - bb2) * (poly.pi_triangle [1].y - poly.pi_triangle [2].y)
-                - (bb1 - bb2) * (poly.pi_triangle [0].y - poly.pi_triangle [2].y)) * inv_dd);
+    float rr0 = pqinfo.redFact*(flat_r*poly.pi_texcoords [0].r);
+    float rr1 = pqinfo.redFact*(flat_r*poly.pi_texcoords [1].r);
+    float rr2 = pqinfo.redFact*(flat_r*poly.pi_texcoords [last].r);
+    dr = QInt16 (((rr0 - rr2) * (poly.vertices [1].sy - poly.vertices [last].sy)
+                - (rr1 - rr2) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
+    float gg0 = pqinfo.greenFact*(flat_g*poly.pi_texcoords [0].g);
+    float gg1 = pqinfo.greenFact*(flat_g*poly.pi_texcoords [1].g);
+    float gg2 = pqinfo.greenFact*(flat_g*poly.pi_texcoords [last].g);
+    dg = QInt16 (((gg0 - gg2) * (poly.vertices [1].sy - poly.vertices [last].sy)
+                - (gg1 - gg2) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
+    float bb0 = pqinfo.blueFact*(flat_b*poly.pi_texcoords [0].b);
+    float bb1 = pqinfo.blueFact*(flat_b*poly.pi_texcoords [1].b);
+    float bb2 = pqinfo.blueFact*(flat_b*poly.pi_texcoords [last].b);
+    db = QInt16 (((bb0 - bb2) * (poly.vertices [1].sy - poly.vertices [last].sy)
+                - (bb1 - bb2) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
   }
 
   if (!pqinfo.drawline && !pqinfo.drawline_gouraud) return S_OK;
@@ -2009,9 +2025,15 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygon& poly, bool gour
         // Right side needs to be advanced.
         //-----
         // Check first if polygon has been finished
-        if (scanR2 == bot) goto finish;
+a:      if (scanR2 == bot) goto finish;
         scanR1 = scanR2;
         scanR2 = (scanR2 + 1) % poly.num;
+
+        if (fabs (poly.vertices[scanR2].sy-poly.vertices[top].sy)<EPS)
+        {
+          // oops! we have a flat bottom!
+          goto a;
+        }
 
         fyR = QRound (poly.vertices [scanR2].sy);
         float dyR = poly.vertices [scanR1].sy - poly.vertices [scanR2].sy;
@@ -2030,8 +2052,16 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygon& poly, bool gour
         //-----
         // Left side needs to be advanced.
         //-----
+b:      if (scanL2==bot)
+          goto finish;
         scanL1 = scanL2;
         scanL2 = (scanL2 - 1 + poly.num) % poly.num;
+
+        if (fabs (poly.vertices[scanL2].sy-poly.vertices[top].sy)<EPS)
+        {
+          // oops! we have a flat bottom!
+          goto b;
+        }
 
         fyL = QRound (poly.vertices [scanL2].sy);
         float dyL = poly.vertices [scanL1].sy - poly.vertices [scanL2].sy;
@@ -2064,7 +2094,8 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygon& poly, bool gour
             Factor = deltaX / (poly.vertices [scanL2].sx - poly.vertices [scanL1].sx);
           else
             Factor = 0;
-	  if (pqinfo.textured)
+	        
+          if (pqinfo.textured)
 	  {
             uL = QInt16 (uu [scanL1] + (uu [scanL2] - uu [scanL1]) * Factor);
             vL = QInt16 (vv [scanL1] + (vv [scanL2] - vv [scanL1]) * Factor);
@@ -2092,6 +2123,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygon& poly, bool gour
 
     int screenY = height - 1 - sy;
     if (!pqinfo.textured)
+    {
       while (sy > fin_y)
       {
         if ((sy & 1) != do_interlaced)
@@ -2102,22 +2134,38 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygon& poly, bool gour
           int xl = round16 (xL);
           int xr = round16 (xR);
 
-          register long* zbuff = (long *)z_buffer + width * screenY + xl;
-          unsigned char* pixel_at = line_table[screenY] + (xl << pixel_shift);
-	  if (gouraud)
-            pqinfo.drawline_gouraud (pixel_at, xr - xl, zbuff, 0, 0,
-                    0, 0, zL, dz, NULL, 0, rL, gL, bL, dr, dg, db);
-          else
-	    pqinfo.drawline (pixel_at, xr - xl, zbuff, 0, 0,
-                    0, 0, zL, dz, NULL, 0);
-        } /* endif */
+          if (xr>xl)
+          {
+            register long* zbuff = (long *)z_buffer + width * screenY + xl;
+            unsigned char* pixel_at = line_table[screenY] + (xl << pixel_shift);
 
-        xL += dxdyL; xR += dxdyR; zL += dzdyL;
-        if (gouraud) { rL += drdyL; gL += dgdyL; bL += dbdyL; }
+            if (gouraud)
+            {
+              pqinfo.drawline_gouraud (pixel_at, xr-xl, zbuff, 0, 0,
+                    0, 0, zL, dz, NULL, 0, rL, gL, bL, dr, dg, db);
+            }
+            else
+            {
+              pqinfo.drawline (pixel_at, xr - xl, zbuff, 0, 0,
+                      0, 0, zL, dz, NULL, 0);
+            }
+          } /* endif */
+        }
+
+        xL += dxdyL; xR += dxdyR; zL += dzdyL;// zR += dzdyR;
+
+        if(gouraud)
+        {
+          rL += drdyL; gL += dgdyL; bL += dbdyL; 
+//          rR += drdyR; gR += dgdyR; bR += dbdyR;
+        }
+
         sy--;
         screenY++;
       }
+    }
     else
+    {
       while (sy > fin_y)
       {
         if ((sy & 1) != do_interlaced)
@@ -2128,36 +2176,43 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygon& poly, bool gour
           int xl = round16 (xL);
           int xr = round16 (xR);
 
-          register long* zbuff = (long *)z_buffer + width * screenY + xl;
-
-          // Check for texture overflows
-          int uu = uL, vv = vL;
-          int duu = du, dvv = dv;
-          if (uu < 0) uu = 0; if (uu > pqinfo.twfp) uu = pqinfo.twfp;
-          if (vv < 0) vv = 0; if (vv > pqinfo.thfp) vv = pqinfo.thfp;
-          if (xr > xl)
+          if (xr>xl)
           {
-            int tmpu = uu + du * (xr - xl);
-            int tmpv = vv + dv * (xr - xl);
+            register long* zbuff = (long *)z_buffer + width * screenY + xl;
+
+            int l=xr-xl;
+            // Check for texture overflows
+            int uu = uL, vv = vL;
+            int duu = du, dvv = dv;
+            if (uu < 0) uu = 0; if (uu > pqinfo.twfp) uu = pqinfo.twfp;
+            if (vv < 0) vv = 0; if (vv > pqinfo.thfp) vv = pqinfo.thfp;
+          
+            int tmpu = uu + du * l;
+            int tmpv = vv + dv * l;
             if (tmpu < 0 || tmpu > pqinfo.twfp)
             {
               if (tmpu < 0) tmpu = 0; if (tmpu > pqinfo.twfp) tmpu = pqinfo.twfp;
-              duu = (tmpu - uu) / (xr - xl);
+              duu = (tmpu - uu) / l;
             }
             if (tmpv < 0 || tmpv > pqinfo.thfp)
             {
               if (tmpv < 0) tmpv = 0; if (tmpv > pqinfo.thfp) tmpv = pqinfo.thfp;
-              dvv = (tmpv - vv) / (xr - xl);
+              dvv = (tmpv - vv) / l;
+            }
+
+            unsigned char* pixel_at = line_table[screenY] + (xl << pixel_shift);
+
+            if (gouraud)
+            {
+              pqinfo.drawline_gouraud (pixel_at, xr - xl, zbuff, uu, duu,
+                    vv, dvv, zL, dz, pqinfo.bm, pqinfo.shf_w, rL, gL, bL, dr, dg, db);
+            }
+            else
+            {
+              pqinfo.drawline (pixel_at, xr - xl, zbuff, uu, duu,
+                    vv, dvv, zL, dz, pqinfo.bm, pqinfo.shf_w);
             }
           }
-
-          unsigned char* pixel_at = line_table[screenY] + (xl << pixel_shift);
-	  if (gouraud)
-            pqinfo.drawline_gouraud (pixel_at, xr - xl, zbuff, uu, duu,
-                    vv, dvv, zL, dz, pqinfo.bm, pqinfo.shf_w, rL, gL, bL, dr, dg, db);
-          else
-	    pqinfo.drawline (pixel_at, xr - xl, zbuff, uu, duu,
-                    vv, dvv, zL, dz, pqinfo.bm, pqinfo.shf_w);
         }
 
         xL += dxdyL; xR += dxdyR;
@@ -2166,6 +2221,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygon& poly, bool gour
         sy--;
         screenY++;
       }
+    }
   }
 
 finish:
