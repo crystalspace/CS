@@ -2,11 +2,15 @@ Things to Do:
 
 Add InputSprocket support.
 Add SoundSprocket support.
-Add Hardware Accelleration. (RAVE, OpenGL)
+Add Hardware Accelleration. (RAVE)
 Add Network support.
 Optimize everything.
 
 History:
+17-May-99
+	- Adding support for OpenGL.
+14-May-99
+	- Updating to source in CVS.
 5-May-99
 	- Updated to v13r010.
 	- Move zlib, libjpeg and libpng into the cryst folder to be the same as other platforms.
