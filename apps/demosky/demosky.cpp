@@ -528,7 +528,7 @@ int main (int argc, char* argv[])
   srand (time (NULL));
 
   // Create our main class.
-  Simple *System = new Simple ();
+  System = new Simple ();
 
   // We want at least the minimal set of plugins
   System->RequestPlugin ("crystalspace.kernel.vfs:VFS");
