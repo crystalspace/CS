@@ -1323,6 +1323,7 @@ void Blocks::freeze_shape ()
     y = cube_y+(int)cube_info[i].dy;
     z = cube_z+(int)cube_info[i].dz;
     set_cube (x, y, z, true);
+    AddScore (10);
     sprintf (cubename, "cubeAt%d%d%d", x, y, z);
     // Before we let go of the shape (lose the pointer to it) we set it's
     // name according to it's position.
@@ -1412,7 +1413,7 @@ bool Blocks::check_new_shape_rotation (const csMatrix3& rot)
   return true;
 }
 
-void Blocks::updateScore (void)
+void Blocks::UpdateScore ()
 {
   if (screen == SCREEN_GAMEOVER) return;
   int increase = 0;
@@ -1420,15 +1421,16 @@ void Blocks::updateScore (void)
 	
   for (i=0 ; i<ZONE_HEIGHT ; i++)
   {
-    if (filled_planes[i])
-    {
-      increase++;
-      cur_speed += .03;
-      if (cur_speed > MAX_SPEED) cur_speed = MAX_SPEED;
-    }
+    if (filled_planes[i]) increase++;
   }
 
-  score += increase*increase;
+  AddScore (zone_dim*zone_dim*10*increase*increase);
+}
+
+void Blocks::AddScore (int dscore)
+{
+  if (screen == SCREEN_GAMEOVER) return;
+  score += dscore;
 }
 
 void Blocks::HandleStartupMovement (time_t elapsed_time)
@@ -1465,6 +1467,7 @@ void Blocks::HandleGameMovement (time_t elapsed_time)
   {
     // dump_shape ();
     bool stop = !check_new_shape_location (0, 0, -1);
+    if (speed >= MAX_FALL_SPEED) AddScore (1);
     if (stop)
     {
       if (!(rot_px_todo || rot_mx_todo || rot_py_todo || rot_my_todo ||
@@ -1975,7 +1978,7 @@ void Blocks::checkForPlane ()
       removePlane (z);
       // That's how much all the cubes above the plane will lower.
       move_down_todo = CUBE_DIM;
-      updateScore ();
+      UpdateScore ();
     }
   }
 }
@@ -2026,7 +2029,7 @@ void Blocks::HandleTransition (time_t elapsed_time)
   {
     if (CheckEmptyPlayArea ())
     {
-      score += 10;
+      AddScore (800);
     }
     move_down_todo = 0;
     StartNewShape ();
@@ -2174,6 +2177,9 @@ void Blocks::NextFrame (time_t elapsed_time, time_t current_time)
 
   if (!pause)
   {
+    cur_speed += ((float)elapsed_time)/(200.*1000.);
+    if (cur_speed > MAX_SPEED) cur_speed = MAX_SPEED;
+
     // Tell Gfx3D we're going to display 3D things
     if (!Gfx3D->BeginDraw (CSDRAW_3DGRAPHICS)) return;
     view->Draw ();

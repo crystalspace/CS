@@ -103,9 +103,9 @@ enum BlShapeType
 #define MAX_CUBES 30
 
 // Maximum speed (fall down speed).
-#define MAX_FALL_SPEED 12
+#define MAX_FALL_SPEED 16
 // Maximum speed in game.
-#define MAX_SPEED 10
+#define MAX_SPEED 8
 // Slowest speed.
 #define MIN_SPEED .2
 
@@ -464,7 +464,8 @@ public:
 
 
   // Update the score.
-  void updateScore ();
+  void UpdateScore ();
+  void AddScore (int dscore);
 
   // Conveniance functions.
   csMatrix3 create_rotate_x (float angle);

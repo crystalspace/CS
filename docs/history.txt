@@ -18,6 +18,17 @@ Short-term cleanups that need to be done:
 	  when an inline method calls a second inline method before the
 	  compiler has seen the second method.  A simple textual
 	  reorganization of the file solves the problem.
+	- Changed the way Blocks counts score:
+	    - 10 points for every cube of a shape that falls down.
+	    - 1 point for every z-unit that is traversed in high speed
+	        (space bar down).
+	    - PlaneSurface*10*NumPlanes*NumPlanes for every NumPlanes
+	      removed at the same time. PlaneSurface is the number of
+	      cubes on a plane (i.e. 9 for 3x3).
+	    - 800 points if you manage to completely remove all cubes
+	      in the play area.
+	  In addition to that speed now increases with time and not
+	  with the number of removed planes.
 	- Changed description of rotation keys in Blocks keyconfig to yaw,
 	  roll, pitch.
 	- Fixed serious bugs with sprites by using csPoly3D and csPoly2D
