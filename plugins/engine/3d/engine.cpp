@@ -80,6 +80,8 @@
 
 CS_IMPLEMENT_PLUGIN
 
+bool csEngine::do_verbose = false;
+
 //---------------------------------------------------------------------------
 void csEngine::Report (const char *description, ...)
 {
@@ -720,7 +722,6 @@ csEngine *csEngine:: current_engine = 0;
 iEngine *csEngine:: current_iengine = 0;
 bool csEngine:: use_new_radiosity = false;
 int csEngine:: lightcache_mode = CS_ENGINE_CACHE_READ | CS_ENGINE_CACHE_NOUPDATE;
-int csEngine:: lightmap_quality = 3;
 bool csEngine:: do_force_revis = false;
 bool csEngine:: do_rad_debug = false;
 int csEngine:: max_lightmap_w = 0;
@@ -836,6 +837,13 @@ bool csEngine::Initialize (iObjectRegistry *object_reg)
     // engine because it might be useful to use the engine stand-alone
     // (i.e. for calculating lighting and so on).
     Warn ("No 3D driver!");
+  }
+
+  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser);
+  if (cmdline)
+  {
+    do_verbose = cmdline->GetOption ("verbose") != 0;
   }
 
   VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
@@ -1582,7 +1590,11 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
     int lit_cnt = 0;
     while (lit->HasNext ())
     {
-      printf ("Doing light %d\n", lit_cnt); fflush (stdout);
+      if (do_verbose)
+      {
+        printf ("Doing light %d\n", lit_cnt);
+	fflush (stdout);
+      }
       lit_cnt++;
       l = lit->Next ();
       l->GetPrivateObject ()->CalculateLighting ();
@@ -2103,9 +2115,6 @@ iCollection* csEngine::FindCollection (const char* name,
 
 void csEngine::ReadConfig (iConfigFile *Config)
 {
-  csEngine::lightmap_quality = Config->GetInt (
-      "Engine.Lighting.LightmapQuality",
-      3);
   default_max_lightmap_w = 
     Config->GetInt ("Engine.Lighting.MaxLightmapWidth", default_max_lightmap_w);
   max_lightmap_w = default_max_lightmap_w;

@@ -78,6 +78,9 @@
 
 CS_IMPLEMENT_PLUGIN
 
+int csThing::lightmap_quality = 3;
+bool csThingObjectType::do_verbose = false;
+
 //---------------------------------------------------------------------------
 
 class csPolygonHandle : public iPolygonHandle
@@ -2558,7 +2561,7 @@ bool csThing::ReadFromCache (iCacheManager* cache_mgr)
 
   // For error reporting.
   const char* thing_name = 0;
-  if (static_data->thing_type->do_verbose && logparent)
+  if (csThingObjectType::do_verbose && logparent)
   {
     csRef<iMeshWrapper> mw (SCF_QUERY_INTERFACE (logparent, iMeshWrapper));
     if (mw) thing_name = mw->QueryObject ()->GetName ();
@@ -2578,7 +2581,7 @@ bool csThing::ReadFromCache (iCacheManager* cache_mgr)
       if (error != 0)
       {
         rc = false;
-        if (static_data->thing_type->do_verbose)
+        if (csThingObjectType::do_verbose)
 	{
 	  printf ("  Thing '%s' Poly '%s': %s\n",
 	  	thing_name, sp->GetName (), error);
@@ -2589,7 +2592,7 @@ bool csThing::ReadFromCache (iCacheManager* cache_mgr)
   }
   else
   {
-    if (static_data->thing_type->do_verbose)
+    if (csThingObjectType::do_verbose)
     {
       printf ("  Thing '%s': Could not find cached lightmap file for thing!\n",
       	thing_name);
@@ -2933,7 +2936,6 @@ csThingObjectType::csThingObjectType (iBase *pParent) :
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
   lightpatch_pool = 0;
-  do_verbose = false;
   blk_polidx5 = 0;
   blk_polidx6 = 0;
   blk_polidx20 = 0;
@@ -2970,7 +2972,7 @@ bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
   	iCommandLineParser);
   if (cmdline)
   {
-    do_verbose = cmdline->GetOption ("verbose") != 0;
+    csThingObjectType::do_verbose = cmdline->GetOption ("verbose") != 0;
   }
 
   csRef<iTextureManager> txtmgr = g->GetTextureManager ();
@@ -2989,6 +2991,13 @@ bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
   maxLightmapH = MIN (maxLightmapH, maxTH);
   maxSLMSpaceWaste =
     cfg->GetFloat ("Mesh.Thing.MaxSuperlightmapWaste", 0.6f);
+  csThing::lightmap_quality = cfg->GetInt (
+      "Mesh.Thing.LightmapQuality", 3);
+  if (csThingObjectType::do_verbose)
+  {
+    printf ("Lightmap quality=%d\n", csThing::lightmap_quality);
+    fflush (stdout);
+  }
 
   return true;
 }
@@ -3074,7 +3083,8 @@ void csThingObjectType::Notify (const char *description, ...)
 static const csOptionDescription
   config_options[] =
 {
-  { 0, "cosfact", "Cosinus factor for lighting", CSVAR_FLOAT }
+  { 0, "cosfact", "Cosinus factor for lighting", CSVAR_FLOAT },
+  { 1, "lightqual", "Lighting quality", CSVAR_LONG }
 };
 const int NUM_OPTIONS =
   (
@@ -3089,6 +3099,14 @@ bool csThingObjectType::eiConfig::SetOption (int id, csVariant *value)
     case 0:
       csPolyTexture::cfg_cosinus_factor = value->GetFloat ();
       break;
+    case 1:
+      csThing::lightmap_quality = value->GetLong ();
+      if (csThingObjectType::do_verbose)
+      {
+        printf ("Lightmap quality=%d\n", csThing::lightmap_quality);
+        fflush (stdout);
+      }
+      break;
     default:
       return false;
   }
@@ -3101,6 +3119,7 @@ bool csThingObjectType::eiConfig::GetOption (int id, csVariant *value)
   switch (id)
   {
     case 0:   value->SetFloat (csPolyTexture::cfg_cosinus_factor); break;
+    case 1:   value->SetLong (csThing::lightmap_quality); break;
     default:  return false;
   }
 

@@ -707,6 +707,9 @@ private:
   char* GenerateCacheName ();  
 
 public:
+  /// Option variable: quality for lightmap calculation.
+  static int lightmap_quality;
+
   /**
    * Create an empty thing.
    */
@@ -1148,7 +1151,7 @@ class csThingObjectType : public iMeshObjectType
 {
 public:
   iObjectRegistry* object_reg;
-  bool do_verbose;	// Verbose error reporting.
+  static bool do_verbose;	// Verbose error reporting.
   iEngine* engine;
   /**
    * csThingObjectType must keep a reference to G3D because when polygons

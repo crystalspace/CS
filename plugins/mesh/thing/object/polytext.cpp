@@ -267,7 +267,7 @@ void csPolyTexture::FillLightMap (
     shadow_bitmap = new csShadowBitmap (
         lm_w,
         lm_h,
-        3, //@@@@@@@csEngine::lightmap_quality,
+        csThing::lightmap_quality,
         light_frustum->IsInfinite () ? 1 : 0);
 
     lptq->AddPolyTexture (this, subpoly);

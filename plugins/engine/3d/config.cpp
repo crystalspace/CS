@@ -31,9 +31,8 @@ static const csOptionDescription
   { 1, "rad", "Pseudo-radiosity system", CSVAR_BOOL },
   { 2, "reflect", "Max number of reflections for radiosity", CSVAR_LONG },
   { 3, "relight", "Force/inhibit recalculation of lightmaps", CSVAR_BOOL },
-  { 4, "lightqual", "Lighting quality", CSVAR_LONG },
-  { 5, "radstep", "Enable radiosity step-by-step", CSVAR_BOOL },
-  { 6, "renderloop", "Override the default render loop", CSVAR_STRING },
+  { 4, "radstep", "Enable radiosity step-by-step", CSVAR_BOOL },
+  { 5, "renderloop", "Override the default render loop", CSVAR_STRING },
 };
 const int NUM_OPTIONS =
   (
@@ -71,12 +70,9 @@ bool csEngineConfig::SetOption (int id, csVariant *value)
       config_relight (value->GetBool ());
       break;
     case 4:
-      csEngine::lightmap_quality = value->GetLong ();
-      break;
-    case 5:
       csEngine::do_rad_debug = value->GetBool ();
       break;
-    case 6:
+    case 5:
       scfParent->LoadDefaultRenderLoop (value->GetString ());
     default:
       return false;
@@ -93,9 +89,8 @@ bool csEngineConfig::GetOption (int id, csVariant *value)
     case 1:   value->SetBool (csSector::do_radiosity); break;
     case 2:   value->SetLong (csSector::cfg_reflections); break;
     case 3:   value->SetBool (config_relight ()); break;
-    case 4:   value->SetLong (csEngine::lightmap_quality); break;
-    case 5:   value->SetBool (csEngine::do_rad_debug); break;
-    case 6:   value->SetString (""); break; // @@@
+    case 4:   value->SetBool (csEngine::do_rad_debug); break;
+    case 5:   value->SetString (""); break; // @@@
     default:  return false;
   }
 

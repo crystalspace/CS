@@ -6,6 +6,16 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+23-Feb-2004
+	- Jorrit moved the Engine.Lighthing.LightmapQuality config option
+	  from engine.cfg to thing.cfg (and renamed it
+	  to Mesh.Thing.LightmapQuality). In addition also moved the flag that
+	  is controlled by this option from csEngine to csThing. Lightmaps
+	  are part of thing and the engine has nothing to do with them.
+	  This move also fixes the -lightqual option which was broken since
+	  things moved out of the engine.
+	- Jorrit modified the engine to print out more information during
+	  lighting only when -verbose is specified on the commandline.
 22-Feb-2004
 	- Duhprey made null renderer for the NR.  (Shaders currently try to
 	  load with error, but it appears to be harmless.)
