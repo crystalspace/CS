@@ -4,6 +4,8 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 5-Jul-2003
+        - Boyan removed circular reference between ds3d render and listener
+          which prevent to unload ds3d plugin.
 	- Marten added so that NR use gl*Pointer when there are no 
 	  glAttributePointer extension available.
 	- res added a home-grown GetLongPathName () surrogate for older 
