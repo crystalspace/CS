@@ -73,6 +73,11 @@
 #  endif
 #endif
 
+//---------------------------------------------------------------------------
+// filesystem settings
+//---------------------------------------------------------------------------
+#define CS_MAXPATHLEN	256
+#define PATH_SEPARATOR	'/'
 
 //-----------------------------------------------------------------------------
 // The 2D graphics driver used by the software renderer on this platform.

@@ -280,15 +280,12 @@ UnMemoryMapFile(mmioInfo *platform)
 #endif
 
 // Maximal path length
-#ifdef CS_SYSDEF_PROVIDE_PATH
-#  ifndef CS_MAXPATHLEN
-#    ifdef _MAX_FNAME
-#      define CS_MAXPATHLEN _MAX_FNAME
-#    else
-#      define CS_MAXPATHLEN 260 /* not 256 */
-#    endif
-#  endif
+#ifdef _MAX_FNAME
+#  define CS_MAXPATHLEN _MAX_FNAME
+#else
+#  define CS_MAXPATHLEN 260 /* not 256 */
 #endif
+#define PATH_SEPARATOR '\\'
 
 // Windows has built-in var "SystemRoot"
 // (env var on NT, but not 9x; so we provide it this way)
@@ -315,7 +312,7 @@ inline char* __VfsCheckVar(const char* VarName)
 
 // COMP_GCC has generic opendir(), readdir(), closedir()
 
-#if defined(CS_SYSDEF_PROVIDE_DIR) || defined(CS_SYSDEF_PROVIDE_PATH)
+#if defined(CS_SYSDEF_PROVIDE_DIR)
 // Directory read functions
 # if !defined(COMP_GCC)
 #  if !defined(COMP_BC)
@@ -350,7 +347,7 @@ inline char* __VfsCheckVar(const char* VarName)
 # endif
 #endif
 
-#ifdef CS_SYSDEF_PROVIDE_PATH
+#ifdef CS_SYSDEF_PROVIDE_DIR
 #  if defined(COMP_BC) || defined(COMP_GCC)
 #    define __NEED_GENERIC_ISDIR
 #  else

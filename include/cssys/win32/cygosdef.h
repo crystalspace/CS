@@ -142,12 +142,11 @@
 
 #if defined (CS_SYSDEF_PROVIDE_DIR) || defined (CS_SYSDEF_PROVIDE_GETCWD) || defined (CS_SYSDEF_PROVIDE_MKDIR)
 #  include <dirent.h>
+#  define __NEED_GENERIC_ISDIR
 #endif
 
-#ifdef CS_SYSDEF_PROVIDE_PATH
-#    include <dirent.h>
-#    define __NEED_GENERIC_ISDIR
-#endif
+#define CS_MAXPATHLEN	256
+#define PATH_SEPARATOR	'\\'
 
 #ifdef CS_SYSDEF_PROVIDE_MKDIR
 #    define MKDIR(path)	mkdir(path, 0755)

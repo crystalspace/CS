@@ -20,6 +20,10 @@
 #ifndef __CSOSDEFS_H__
 #define __CSOSDEFS_H__
 
+// filesystem settings
+#define CS_MAXPATHLEN	256
+#define PATH_SEPARATOR	'\\'
+
 //--//--//--//--//--//--//--//--//--//--//-- Unconditional definitions --//--//
 #define strcasecmp stricmp
 #define strncasecmp strnicmp
@@ -47,7 +51,7 @@
    }
 #endif
 
-#if defined (CS_SYSDEF_PROVIDE_PATH) || defined (CS_SYSDEF_PROVIDE_DIR)
+#if defined (CS_SYSDEF_PROVIDE_DIR)
 #  include <sys/types.h>
 #  if defined (__EMX__)
 #    include <dirent.h>

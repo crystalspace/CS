@@ -20,6 +20,10 @@
 #ifndef __CSOSDEFS_H__
 #define __CSOSDEFS_H__
 
+// filesystem settings
+#define CS_MAXPATHLEN	256
+#define PATH_SEPARATOR	'\\'
+
 // The 2D graphics driver used by software renderer on this platform
 #define CS_SOFTWARE_2D_DRIVER "crystalspace.graphics2d.dosraw"
 

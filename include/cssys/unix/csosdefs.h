@@ -22,6 +22,10 @@
 
 #include <math.h>
 
+// filesystem settings
+#define CS_MAXPATHLEN	256
+#define PATH_SEPARATOR  '/'
+
 #ifdef CS_SYSDEF_PROVIDE_SOFTWARE2D
 #  define CS_SOFTWARE_2D_DRIVER get_software_2d_driver ()
    static inline char* get_software_2d_driver ()
