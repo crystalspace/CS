@@ -1215,7 +1215,7 @@ void WalkTest::EndWorld() {}
 
 void WalkTest::InitWorld (csWorld* world, csCamera* /*camera*/)
 {
-//  Sys->Printf (MSG_INITIALIZATION, "Computing OBBs ...\n");
+  Sys->Printf (MSG_INITIALIZATION, "Computing OBBs ...\n");
 
   int sn = world->sectors.Length ();
   while (sn > 0)
