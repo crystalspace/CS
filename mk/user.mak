@@ -10,7 +10,7 @@
 
 # Should we build drivers/plugins as loadable modules?
 ifndef USE_SHARED_PLUGINS
-  USE_SHARED_PLUGINS=no
+  USE_SHARED_PLUGINS=yes
 endif
 
 # Should we build libraries as shared/dynamic libraries?
@@ -26,18 +26,18 @@ endif
 
 # Default list of plugins to build
 # Note that you'll link all plugins into executable in the case of static build
-#ifndef PLUGINS
-#  PLUGINS  = video/canvas video/renderer 
-#  PLUGINS += cscon 
-#  PLUGINS += csclear 
-#  PLUGINS += dungeon 
-#  PLUGINS += net/driver/socket net/netman 
-#  PLUGINS += fontrndr/deffrndr 
-#  PLUGINS += fontrndr/ftrndr
-#  PLUGINS += netspace/nstp netspace/nsmgr 
-#  PLUGINS += csauth/simple 
-#  PLUGINS += $(DETECTED_PLUGINS)
-#endif
+ifndef PLUGINS
+  PLUGINS  = video/canvas video/renderer 
+  PLUGINS += cscon 
+  PLUGINS += csclear 
+  PLUGINS += dungeon 
+  PLUGINS += net/driver/socket net/netman 
+  PLUGINS += font/renderer/csfont 
+# PLUGINS += font/renderer/freefont
+  PLUGINS += netspace/nstp netspace/nsmgr 
+  PLUGINS += csauth/simple 
+  PLUGINS += $(DETECTED_PLUGINS)
+endif
 
 # Should we use NASM for assembly?
 ifndef USE_NASM
@@ -62,28 +62,28 @@ DO_BMP=yes
 DO_TGA=yes
 
 # If 'yes' include support for JPG graphic files (not required currently).
-DO_JPG=no
+DO_JPG=yes
 
 # If 'yes' include support for WAL graphic files (not required currently).
-DO_WAL=no
+DO_WAL=yes
 
 # If 'yes' include support for SGI graphic files (not required currently).
-DO_SGI=no
+DO_SGI=yes
 
 # If 'yes' include sound support.
-DO_SOUND=no
+DO_SOUND=yes
 
 # If "yes" include AIFF support
-DO_AIFF=no
+DO_AIFF=yes
 
 # If "yes" include IFF support
-DO_IFF=no
+DO_IFF=yes
 
 # If "yes" include AU support
-DO_AU=no
+DO_AU=yes
 
 # If "yes" include WAV support
-DO_WAV=no
+DO_WAV=yes
 
 # If "yes" include MMX support in software renderer
 DO_MMX=yes
