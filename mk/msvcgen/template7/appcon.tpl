@@ -24,7 +24,7 @@
 				OptimizeForProcessor="1"
 				AdditionalOptions="%cflags%"
 				AdditionalIncludeDirectories="..\..\plugins,..\..,..\..\include\cssys\win32,..\..\include,..\..\libs,..\..\support,..\..\apps"
-				PreprocessorDefinitions="_DEBUG,WIN32,_CONSOLE,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_DEBUG"
+				PreprocessorDefinitions="_DEBUG,WIN32,_CONSOLE,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_DEBUG,CS_EXTENSIVE_MEMDEBUG"
 				MinimalRebuild="TRUE"
 				RuntimeLibrary="3"
 				PrecompiledHeaderFile=".\csdebug\temp\%project%/%project%.pch"

@@ -19,7 +19,30 @@
 #include <stdarg.h>
 #include "cssysdef.h"
 
-#if 0
+#if defined(COMP_VCC)
+
+#include <crtdbg.h>
+
+#ifdef CS_EXTENSIVE_MEMDEBUG
+void* operator new (size_t s, void* filename, int line)
+{
+  return (void*)_malloc_dbg (s, _NORMAL_BLOCK, filename, line);
+}
+void* operator new[] (size_t s, void* filename, int line)
+{
+  return (void*)_malloc_dbg (s, _NORMAL_BLOCK, filename, line);
+}
+void operator delete (void* p)
+{
+  if (p) _free_dbg(p, _NORMAL_BLOCK);
+}
+void operator delete[] (void* p)
+{
+  if (p) _free_dbg(p, _NORMAL_BLOCK);
+}
+#endif
+
+#elif 0
 
 //========================================================================
 // CONFIGURATION OF THE MEMORY DEBUGGER:
