@@ -14,12 +14,18 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 3-Oct-1999
+	- Continued work on quadcube/quadtree lighting. It is almost
+	  working but there are still a few problems here and there.
+	- Fixed bug in archive code with allocation of zero size arrays.
+	- Added optimization to palette creation from Siu-Hang Or.
 	- Eric Sunshine modified the configuration of makedep slightly so
 	  that certain platform-specific porting information is maintained by
 	  the makefile system.  Hopefully this will help to eliminate the need
 	  to actually change makedep's source code as it is ported to new
 	  platforms.
 1-Oct-1999
+	- Finished implementation of csQuadtree. Also added csQuadcube
+	  class which represents a cube of quad-trees.
 	- Eric Sunshine fixed makedep so that it compiles on BeOS.
 	- Eric Sunshine fixed a compiler warning in impexp.cpp where the order
 	  of initialization of instance variables was incorrect.
