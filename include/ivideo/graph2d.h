@@ -102,7 +102,7 @@ struct csImageArea
   { x = sx; y = sy; w = sw; h = sh; data = NULL; }
 };
 
-SCF_VERSION (iGraphics2D, 2, 0, 1);
+SCF_VERSION (iGraphics2D, 2, 0, 2);
 
 /**
  * This is the interface for 2D renderer. The 2D renderer is responsible
@@ -122,9 +122,6 @@ struct iGraphics2D : public iBase
 
   /// Return the height of the framebuffer.
   virtual int GetHeight () = 0;
-
-  /// Returns 'true' if the program is being run full-screen.
-  virtual bool GetFullScreen () = 0;
 
   /// Get active videopage number (starting from zero)
   virtual int GetPage () = 0;
@@ -227,21 +224,14 @@ struct iGraphics2D : public iBase
   virtual void Write (iFont *font, int x, int y, int fg, int bg,
     const char *str) = 0;
 
+  /// Enable/disable canvas resizing
+  virtual void AllowResize (bool iAllow) = 0;
+
+  /// Resize the canvas
+  virtual bool Resize (int w, int h) = 0;
+
   /// Get the active font server (does not do IncRef())
   virtual iFontServer *GetFontServer () = 0;
-
-  /// Set mouse position (relative to top-left of CS window).
-  virtual bool SetMousePosition (int x, int y) = 0;
-
-  /**
-   * Set mouse cursor to one of predefined shape classes
-   * (see csmcXXX enum above). If a specific mouse cursor shape
-   * is not supported, return 'false'; otherwise return 'true'.
-   * If system supports it the cursor should be set to its nearest
-   * system equivalent depending on iShape argument and the routine
-   * should return "true".
-   */
-  virtual bool SetMouseCursor (csMouseCursorID iShape) = 0;
 
   /**
    * Perform a system specific exension.<p>
@@ -267,14 +257,33 @@ struct iGraphics2D : public iBase
      void *buffer, bool alone_hint, csPixelFormat *ipfmt,
      csRGBpixel *palette = NULL, int pal_size = 0) = 0;
 
-  /// Enable/disable canvas resizing
-  virtual void AllowCanvasResize (bool iAllow) = 0;
-
   /**
    * Get the native window corresponding with this canvas.
    * If this is an off-screen canvas then this will return NULL.
    */
   virtual iNativeWindow* GetNativeWindow () = 0;
+
+  /// Returns 'true' if the program is being run full-screen.
+  virtual bool GetFullScreen () = 0;
+
+  /**
+   * Change the fullscreen state of the canvas.
+   */
+  virtual void SetFullScreen (bool b) = 0;
+
+  /// Set mouse position (relative to top-left of CS window).
+  virtual bool SetMousePosition (int x, int y) = 0;
+
+  /**
+   * Set mouse cursor to one of predefined shape classes
+   * (see csmcXXX enum above). If a specific mouse cursor shape
+   * is not supported, return 'false'; otherwise return 'true'.
+   * If system supports it the cursor should be set to its nearest
+   * system equivalent depending on iShape argument and the routine
+   * should return "true".
+   */
+  virtual bool SetMouseCursor (csMouseCursorID iShape) = 0;
+
 };
 
 #endif // __IVIDEO_GRAPH2D_H__

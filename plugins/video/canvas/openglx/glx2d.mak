@@ -33,11 +33,6 @@ ifeq ($(MAKESECTION),postdefines)
 LIB.GLX2D.SYSTEM += -L$(X11_PATH)/lib -lXext -lX11 $(X11_EXTRA_LIBS)
 CFLAGS.GLX2D += -I$(X11_PATH)/include
 
-ifeq ($(USE_XFREE86VM),yes)
-  CFLAGS.GLX2D += -DXFREE86VM
-  LIB.GLX2D.SYSTEM += -lXxf86vm
-endif
-
 ifeq ($(USE_MESA),1)
   ifdef MESA_PATH
     CFLAGS.GLX2D += -I$(MESA_PATH)/include
@@ -67,12 +62,9 @@ else
 endif
 
 INC.GLX2D = $(wildcard plugins/video/canvas/openglx/*.h \
-  $(INC.COMMON.DRV2D.OPENGL) $(INC.COMMON.DRV2D)) \
-  plugins/video/canvas/common/x11comm.h
+  $(INC.COMMON.DRV2D.OPENGL) $(INC.COMMON.DRV2D))
 SRC.GLX2D = $(wildcard plugins/video/canvas/openglx/*.cpp \
-  $(SRC.COMMON.DRV2D.OPENGL) $(SRC.COMMON.DRV2D)) \
-  plugins/video/canvas/common/x11comm.cpp \
-  plugins/video/canvas/common/x11-keys.cpp
+  $(SRC.COMMON.DRV2D.OPENGL) $(SRC.COMMON.DRV2D)) 
 OBJ.GLX2D = $(addprefix $(OUT),$(notdir $(SRC.GLX2D:.cpp=$O)))
 DEP.GLX2D = CSUTIL CSSYS CSGEOM CSUTIL
 

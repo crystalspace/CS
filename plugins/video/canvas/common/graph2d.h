@@ -75,6 +75,8 @@ public:
   int Width, Height, Depth;
   /// True if visual is full-screen
   bool FullScreen;
+  /// Whether to allow resizing
+  bool AllowResizing;
   /// 256-color palette
   csRGBpixel *Palette;
   /// true if some palette entry is already allocated
@@ -85,18 +87,9 @@ public:
    */
   int FrameBufferLocked;
   /**
-   * Change the size of the canvas.
-   * Subclasses can override this to do special processing.
-   */
-  virtual void ChangeDimension (int w, int h);
-  /**
    * Change the depth of the canvas.
    */
   virtual void ChangeDepth (int d);
-  /**
-   * Change the fullscreen state of the canvas.
-   */
-  virtual void ChangeFullscreen (bool b);
 
 public:
   SCF_DECLARE_IBASE;
@@ -214,23 +207,9 @@ public:
   virtual bool ClipLine (float &x1, float &y1, float &x2, float &y2,
     int xmin, int ymin, int xmax, int ymax);
 
-  /// Set mouse cursor position; return success status
-  virtual bool SetMousePosition (int x, int y);
-
   /// Gets the font server
   virtual iFontServer *GetFontServer ()
   { return FontServer; }
-
-  /**
-   * Set mouse cursor to one of predefined shape classes
-   * (see csmcXXX enum above). If a specific mouse cursor shape
-   * is not supported, return 'false'; otherwise return 'true'.
-   * If system supports it and iBitmap != NULL, shape should be
-   * set to the bitmap passed as second argument; otherwise cursor
-   * should be set to its nearest system equivalent depending on
-   * iShape argument.
-   */
-  virtual bool SetMouseCursor (csMouseCursorID iShape);
 
   /// Return the width of the framebuffer.
   virtual int GetWidth ()
@@ -238,9 +217,6 @@ public:
   /// Return the height of the framebuffer.
   virtual int GetHeight ()
   { return Height; }
-  /// Returns 'true' if the program is being run full-screen.
-  virtual bool GetFullScreen ()
-  { return FullScreen; }
 
   /// Get the palette (if there is one)
   virtual csRGBpixel *GetPalette ()
@@ -269,10 +245,37 @@ public:
   (int width, int height, void *buffer, bool alone_hint, 
    csPixelFormat *pfmt = NULL, csRGBpixel *palette = NULL, int pal_size = 0);
 
-  /// Enable/disable canvas resize
-  virtual void AllowCanvasResize (bool /*iAllow*/) { }
+  /// Enable/disable canvas resize (Over-ride in sub classes)
+  virtual void AllowResize (bool /*iAllow*/) { };
 
+  /// Resize the canvas
+  virtual bool Resize (int w, int h);
+
+  /// Return the Native Window interface for this canvas (if it has one)
   virtual iNativeWindow* GetNativeWindow ();
+
+  /// Returns 'true' if the program is being run full-screen.
+  virtual bool GetFullScreen ()
+  { return FullScreen; }
+
+  /**
+   * Change the fullscreen state of the canvas.
+   */
+  virtual void SetFullScreen (bool b);
+
+  /// Set mouse cursor position; return success status
+  virtual bool SetMousePosition (int x, int y);
+
+  /**
+   * Set mouse cursor to one of predefined shape classes
+   * (see csmcXXX enum above). If a specific mouse cursor shape
+   * is not supported, return 'false'; otherwise return 'true'.
+   * If system supports it and iBitmap != NULL, shape should be
+   * set to the bitmap passed as second argument; otherwise cursor
+   * should be set to its nearest system equivalent depending on
+   * iShape argument.
+   */
+  virtual bool SetMouseCursor (csMouseCursorID iShape);
 
   struct eiPlugin : public iPlugin
   {

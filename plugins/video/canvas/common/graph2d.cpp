@@ -122,41 +122,10 @@ bool csGraphics2D::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csGraphics2D::ChangeDimension (int w, int h)
-{
-  if (Width == w && Height == h) return;
-  Width = w;
-  Height = h;
-  return;
-#if 0
-// @@@ Enable this code later when we have proper support
-// for changing dimension after Open() has been called!
-  delete [] LineAddress;
-  LineAddress = NULL;
-
-  // Allocate buffer for address of each scan line to avoid multuplication
-  LineAddress = new int [Height];
-  CS_ASSERT (LineAddress != NULL);
-
-  // Initialize scanline address array
-  int i,addr,bpl = Width * pfmt.PixelBytes;
-  for (i = 0, addr = 0; i < Height; i++, addr += bpl)
-    LineAddress[i] = addr;
-
-  SetClipRect (0, 0, Width - 1, Height - 1);
-#endif
-}
-
 void csGraphics2D::ChangeDepth (int d)
 {
   if (Depth == d) return;
   Depth = d;
-}
-
-void csGraphics2D::ChangeFullscreen (bool b)
-{
-  if (FullScreen == b) return;
-  FullScreen = b;
 }
 
 csGraphics2D::~csGraphics2D ()
@@ -614,17 +583,6 @@ unsigned char *csGraphics2D::GetPixelAt32 (csGraphics2D *This, int x, int y)
   return (This->Memory + ((x<<2) + This->LineAddress[y]));
 }
 
-bool csGraphics2D::SetMousePosition (int x, int y)
-{
-  (void)x; (void)y;
-  return false;
-}
-
-bool csGraphics2D::SetMouseCursor (csMouseCursorID iShape)
-{
-  return (iShape == csmcArrow);
-}
-
 bool csGraphics2D::PerformExtensionV (char const*, va_list)
 {
   return false;
@@ -708,15 +666,59 @@ void csGraphics2D::NativeWindowManager::Alert (int type,
   va_end (arg);
 }
 
+iNativeWindow* csGraphics2D::GetNativeWindow ()
+{
+  return &scfiNativeWindow;
+}
+
 void csGraphics2D::SetTitle (const char* title)
 {
   delete[] win_title;
   win_title = csStrNew (title);
 }
 
-iNativeWindow* csGraphics2D::GetNativeWindow ()
+bool csGraphics2D::Resize (int w, int h)
 {
-  return &scfiNativeWindow;
+  if (!AllowResizing)
+    return false;
+
+  if (Width != w || Height != h) 
+  { 
+    Width = w;
+    Height = h;
+
+    delete [] LineAddress;
+    LineAddress = NULL;
+
+    // Allocate buffer for address of each scan line to avoid multuplication
+    LineAddress = new int [Height];
+    CS_ASSERT (LineAddress != NULL);
+
+    // Initialize scanline address array
+    int i,addr,bpl = Width * pfmt.PixelBytes;
+    for (i = 0, addr = 0; i < Height; i++, addr += bpl)
+      LineAddress[i] = addr;
+
+    SetClipRect (0, 0, Width - 1, Height - 1);
+  }
+  return true;
+}
+
+void csGraphics2D::SetFullScreen (bool b)
+{
+  if (FullScreen == b) return;
+  FullScreen = b;
+}
+
+bool csGraphics2D::SetMousePosition (int x, int y)
+{
+  (void)x; (void)y;
+  return false;
+}
+
+bool csGraphics2D::SetMouseCursor (csMouseCursorID iShape)
+{
+  return (iShape == csmcArrow);
 }
 
 //---------------------------------------------------------------------------
@@ -737,14 +739,14 @@ bool csGraphics2D::CanvasConfig::SetOption (int id, csVariant* value)
   switch (id)
   {
     case 0: scfParent->ChangeDepth (value->GetLong ()); break;
-    case 1: scfParent->ChangeFullscreen (value->GetBool ()); break;
+    case 1: scfParent->SetFullScreen (value->GetBool ()); break;
     case 2:
     {
       const char* buf = value->GetString ();
       int wres, hres;
       if (sscanf (buf, "%dx%d", &wres, &hres) == 2)
       {
-        scfParent->ChangeDimension (wres, hres);
+        scfParent->Resize (wres, hres);
       }
       break;
     }

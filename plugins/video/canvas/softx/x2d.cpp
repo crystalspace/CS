@@ -16,15 +16,15 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#define XK_XKB_KEYS
+
 #include <stdarg.h>
 #include "cssysdef.h"
 #include "csutil/scf.h"
-#include "video/canvas/common/x11comm.h"
-#include "video/canvas/common/scancode.h"
 #include "csgeom/csrect.h"
 #include "isys/system.h"
-#include "isys/event.h"
+#include "iutil/cfgmgr.h"
+#include "csutil/cfgacc.h"
+#include "iutil/cmdline.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 #include "x2d.h"
@@ -42,14 +42,34 @@ SCF_IMPLEMENT_IBASE_EXT (csGraphics2DXLib)
   SCF_IMPLEMENTS_INTERFACE (iEventPlug)
 SCF_IMPLEMENT_IBASE_EXT_END
 
+
+
+#define CS_XWIN_SCF_ID "crystalspace.window.x"
+#define CS_XEXT_SHM_SCF_ID "crystalspace.window.x.extshm"
+#define CS_XEXT_SHM "MIT-SHM"
+
+
 csGraphics2DXLib::csGraphics2DXLib (iBase *iParent) :
-  csGraphics2D (iParent), dpy (NULL), xim (NULL), cmap (0),
-  sim_lt8 (NULL), sim_lt16 (NULL), currently_full_screen (false)
+  csGraphics2D (iParent), xwin (NULL), xshm (NULL),  xim (NULL), 
+  dpy (NULL), cmap (0), resize (false),
+  sim_lt8 (NULL), sim_lt16 (NULL)
 {
-  EmptyMouseCursor = 0;
-  memset (&MouseCursor, 0, sizeof (MouseCursor));
-  leader_window = window = 0;
+  xwin = NULL;
+  xshm = NULL;
+  resize_w = resize_h = 0;
   EventOutlet = NULL;
+}
+
+csGraphics2DXLib::~csGraphics2DXLib(void)
+{
+  Close();
+  delete [] sim_lt8;
+  delete [] sim_lt16;
+
+  if (xshm)
+    xshm->DecRef ();
+  if (xwin)
+    xwin->DecRef ();
 }
 
 void csGraphics2DXLib::Report (int severity, const char* msg, ...)
@@ -72,39 +92,108 @@ bool csGraphics2DXLib::Initialize (iObjectRegistry *object_reg)
   if (!csGraphics2D::Initialize (object_reg))
     return false;
 
-  // Open display
-  dpy = XOpenDisplay (NULL);
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
-  if (!dpy)
+  xwin = CS_LOAD_PLUGIN (plugin_mgr, CS_XWIN_SCF_ID, NULL, iXWindow);
+  if (!xwin)
+    return false;
+
+  dpy = xwin->GetDisplay ();
+  screen_num = xwin->GetScreen ();
+  xwin->SetCanvas ((iGraphics2D *)this);
+
+  bool do_shm;
+  // Query system settings
+  csConfigAccess Config(object_reg, "/config/video.cfg");
+  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+						   iCommandLineParser);
+  sim_depth = Config->GetInt ("Video.SimulateDepth", 0);
+
+  do_shm = Config->GetBool ("Video.XSHM", true);
+  if (cmdline->GetOption ("XSHM")) do_shm = true;
+  if (cmdline->GetOption ("noXSHM")) do_shm = false;
+
+  if (do_shm)
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "FATAL: Cannot open X display");
-    exit (-1);
+    int opcode, first_event, first_error;
+    if (XQueryExtension (dpy, CS_XEXT_SHM, 
+			&opcode, &first_event, &first_error))
+    {
+      xshm = CS_LOAD_PLUGIN (plugin_mgr, CS_XEXT_SHM_SCF_ID, NULL, iXExtSHM);
+      if (xshm)
+	xshm->SetDisplayScreen (dpy, screen_num);
+    }
+    else
+    {
+      Report (CS_REPORTER_SEVERITY_WARNING, 
+	      "No shared memory X-extension detected....disabling\n");
+    }
   }
 
-  // Set user locale for national character support
-  if (XSupportsLocale ())
-    XSetLocaleModifiers ("");
+  // Tell system driver to call us on broadcast messages
+  iSystem* sys = CS_GET_SYSTEM (object_reg);
+  sys->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
+  // Create the event outlet
+  EventOutlet = sys->CreateEventOutlet (this);
 
-  // Query system settings
-  GetX11Settings (object_reg, sim_depth, do_shm, do_hwmouse);
+  return true;
+}
 
-  screen_num = DefaultScreen (dpy);
-  root_window = RootWindow (dpy, screen_num);
-  display_width = DisplayWidth (dpy, screen_num);
-  display_height = DisplayHeight (dpy, screen_num);
+bool csGraphics2DXLib::Open()
+{
+  if (is_open) return true;
 
-  // First make a window which is never mapped (trick from gtk to get the main
-  // window to behave under certain window managers, themes and circumstances)
-  leader_window = XCreateSimpleWindow(dpy, root_window, 10, 10, 10, 10, 0, 0 , 0);
-  XClassHint *class_hint = XAllocClassHint();
-  class_hint->res_name = "Xsoft Crystal Space";
-  class_hint->res_class = "Crystal Space";
-  XmbSetWMProperties (dpy, leader_window,
-                      NULL, NULL, NULL, 0,
-                      NULL, NULL, class_hint);
+  if (!CreateVisuals ())
+    return false;
 
-  XFree (class_hint);
+  xwin->SetVisualInfo (&xvis);
+  xwin->SetColormap (cmap);
 
+  if (!xwin->Open ())
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, 
+	    "Failed to open the X-Window!");
+    return false;
+  }
+  window = xwin->GetWindow ();
+  gc = xwin->GetGC ();
+
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Crystal Space X windows driver");
+  if (xshm)
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "(Using SHM extension plugin)");
+
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Using %d bit %sColor visual",
+              xvis.depth, (xvis.visual->c_class == PseudoColor) ? "Pseudo" : "True");
+
+  // Open your graphic interface
+  if (!csGraphics2D::Open ())
+    return false;
+
+  if (!AllocateMemory ())
+    return false;
+
+  Clear (0);
+  return true;
+}
+
+void csGraphics2DXLib::Close ()
+{
+  if (!is_open) return;
+
+  if (xwin)
+    xwin->Close ();
+
+  if (Memory && sim_depth)
+  {
+    delete [] Memory;
+    Memory = NULL;
+  }
+
+  csGraphics2D::Close ();
+}
+
+bool csGraphics2DXLib::CreateVisuals ()
+{
   // Determine visual information.
   // Try in order:
   //   screen depth
@@ -112,32 +201,27 @@ bool csGraphics2DXLib::Initialize (iObjectRegistry *object_reg)
   //   16 bit TrueColor
   //   15 bit TrueColor
   //   8 bit PseudoColor
-  int d = DefaultDepthOfScreen(DefaultScreenOfDisplay(dpy));
-  if (XMatchVisualInfo(dpy, screen_num, d, (d == 8 ? PseudoColor : TrueColor), &vinfo)
-   || XMatchVisualInfo(dpy, screen_num, 24, TrueColor, &vinfo)
-   || XMatchVisualInfo(dpy, screen_num, 16, TrueColor, &vinfo)
-   || XMatchVisualInfo(dpy, screen_num, 15, TrueColor, &vinfo)
-   || XMatchVisualInfo(dpy, screen_num, 8, PseudoColor, &vinfo))
-  {
-    visual = vinfo.visual;
-    // Visual is supposed to be opaque, sorry for breaking in
-    vclass = visual->c_class;
-  }
-  else
+  int d = DefaultDepthOfScreen (XScreenOfDisplay (dpy, screen_num));
+
+  if (!(XMatchVisualInfo(dpy, screen_num, d, (d == 8 ? PseudoColor : TrueColor), &xvis)
+	|| XMatchVisualInfo(dpy, screen_num, 24, TrueColor, &xvis)
+	|| XMatchVisualInfo(dpy, screen_num, 16, TrueColor, &xvis)
+	|| XMatchVisualInfo(dpy, screen_num, 15, TrueColor, &xvis)
+	|| XMatchVisualInfo(dpy, screen_num, 8, PseudoColor, &xvis)))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "FATAL: Current screen depth not supported (8, 15, 16 or 32 bpp only)");
-    exit (1);
+    return false;
   }
 
-  pfmt.RedMask = vinfo.red_mask;
-  pfmt.GreenMask = vinfo.green_mask;
-  pfmt.BlueMask = vinfo.blue_mask;
+  pfmt.RedMask = xvis.red_mask;
+  pfmt.GreenMask = xvis.green_mask;
+  pfmt.BlueMask = xvis.blue_mask;
 
   pfmt.complete ();
-  pfmt.PalEntries = vinfo.colormap_size;
-  if (vclass == TrueColor)
+  pfmt.PalEntries = xvis.colormap_size;
+  if (xvis.visual->c_class == TrueColor)
     pfmt.PalEntries = 0;
-  if (vinfo.depth == 24 || vinfo.depth == 32)
+  if (xvis.depth == 24 || xvis.depth == 32)
     pfmt.PixelBytes = 4;
   else if (pfmt.PalEntries)
     pfmt.PixelBytes = 1;		// Palette mode
@@ -188,15 +272,16 @@ bool csGraphics2DXLib::Initialize (iObjectRegistry *object_reg)
     pfmt.complete ();
   }
 
-  // Allocate the palette if not truecolor or if simulating truecolor on 8-bit display.
-  if ((sim_depth == 0 && pfmt.PalEntries) || (sim_depth != 0 && real_pfmt.PalEntries))
-    cmap = XCreateColormap (dpy, RootWindow (dpy, screen_num), visual, AllocAll);
-  else
-    cmap = 0;
+  // Allocate the palette if not truecolor or if 
+  // simulating truecolor on 8-bit display.
+  if ((sim_depth == 0 && pfmt.PalEntries) || 
+      (sim_depth != 0 && real_pfmt.PalEntries))
+    cmap = XCreateColormap (dpy, RootWindow (dpy, screen_num), 
+			    xvis.visual, AllocAll);
 
   // If we are simulating truecolor on an 8-bit display then we will create
-  // a truecolor 3:3:2 colormap. This is ugly but simulated depth is for testing
-  // only. So who cares?
+  // a truecolor 3:3:2 colormap. This is ugly but simulated depth is for 
+  // testing only. So who cares?
   if ((sim_depth == 15 || sim_depth == 16 || sim_depth == 32) && cmap)
   {
     int i;
@@ -245,9 +330,6 @@ bool csGraphics2DXLib::Initialize (iObjectRegistry *object_reg)
     // No lookup tables needed.
   }
 
-  xim = NULL;
-  Memory = NULL;
-
   // If in 16-bit mode, redirect drawing routines
   if (pfmt.PixelBytes == 2)
   {
@@ -262,284 +344,7 @@ bool csGraphics2DXLib::Initialize (iObjectRegistry *object_reg)
     _GetPixelAt = GetPixelAt32;
   } /* endif */
 
-  memset (MouseCursor, 0, sizeof (MouseCursor));
-
-  // Tell system driver to call us on every frame
-  iSystem* sys = CS_GET_SYSTEM (object_reg);
-  sys->CallOnEvents (&scfiPlugin, CSMASK_Nothing);
-  // Create the event outlet
-  EventOutlet = sys->CreateEventOutlet (this);
-
   return true;
-}
-
-csGraphics2DXLib::~csGraphics2DXLib(void)
-{
-  Close();
-  delete [] sim_lt8;
-  delete [] sim_lt16;
-  if (EventOutlet)
-    EventOutlet->DecRef ();
-}
-
-bool csGraphics2DXLib::Open()
-{
-  if (is_open) return true;
-  Report (CS_REPORTER_SEVERITY_NOTIFY, "Crystal Space X windows driver");
-  if (do_shm)
-    Report (CS_REPORTER_SEVERITY_NOTIFY, "(Using SHM extension)");
-  Report (CS_REPORTER_SEVERITY_NOTIFY, "Using %d bit %sColor visual",
-              vinfo.depth, (vclass == PseudoColor) ? "Pseudo" : "True");
-
-  // Open your graphic interface
-  if (!csGraphics2D::Open ())
-    return false;
-
-  // Create window
-  XSetWindowAttributes swa;
-  swa.override_redirect = True;
-  swa.background_pixel = 0;
-  swa.border_pixel = 0;
-  swa.colormap = cmap;
-  swa.bit_gravity = CenterGravity;
-
-#ifdef XFREE86VM
-  currently_full_screen = false;
-  fs_window = XCreateWindow (dpy, root_window, 0, 0, 1, 1,
-    0, vinfo.depth, InputOutput, visual,
-    CWOverrideRedirect | CWBorderPixel | (cmap ? CWColormap : 0), &swa);
-  XStoreName (dpy, fs_window, win_title);
-  XSetWindowBackground (dpy, fs_window, BlackPixel (dpy, screen_num));
-#endif
-  wm_width  = Width;
-  wm_height = Height;
-
-  wm_window = XCreateWindow (dpy, root_window, 64, 16, wm_width, wm_height, 4,
-    vinfo.depth, InputOutput, visual, CWBorderPixel | (cmap ? CWColormap : 0), &swa);
-
-  XStoreName (dpy, wm_window, win_title);
-  XSelectInput (dpy, wm_window, FocusChangeMask | KeyPressMask |
-    KeyReleaseMask | StructureNotifyMask);
-
-  // Intern WM_DELETE_WINDOW and set window manager protocol
-  // (Needed to catch user using window manager "delete window" button)
-  wm_delete_window = XInternAtom (dpy, "WM_DELETE_WINDOW", False);
-  XSetWMProtocols (dpy, wm_window, &wm_delete_window, 1);
-
-  window = XCreateWindow (dpy, wm_window, 0, 0,
-    Width, Height, 0, vinfo.depth, InputOutput, visual,
-    CWBackPixel | CWBorderPixel | CWBitGravity | (cmap ? CWColormap : 0), &swa);
-
-  XGCValues values;
-  gc = XCreateGC (dpy, window, 0, &values);
-  XSetForeground (dpy, gc, BlackPixel (dpy, screen_num));
-  XSetLineAttributes (dpy, gc, 0, LineSolid, CapButt, JoinMiter);
-  XSetGraphicsExposures (dpy, gc, False);
-
-  XSelectInput (dpy, window, ExposureMask | KeyPressMask | KeyReleaseMask |
-    FocusChangeMask | PointerMotionMask | ButtonPressMask |
-    ButtonReleaseMask | StructureNotifyMask | KeymapStateMask);
-
-  if (cmap)
-    XSetWindowColormap (dpy, window, cmap);
-
-  // Allow window resizes
-  AllowCanvasResize (true);
-
-  // Now communicate to the window manager our wishes using the non-mapped
-  // leader_window to form a window_group
-  XWMHints wm_hints;
-  wm_hints.flags = InputHint | StateHint | WindowGroupHint;
-  wm_hints.input = True;
-  wm_hints.window_group = leader_window;
-  wm_hints.initial_state = NormalState;
-  XSetWMHints (dpy, wm_window, &wm_hints);
-
-  Atom wm_client_leader = XInternAtom (dpy, "WM_CLIENT_LEADER", False);
-  XChangeProperty (dpy, window, wm_client_leader, XA_WINDOW, 32,
-		   PropModeReplace, (const unsigned char*)&leader_window, 1);
-  XmbSetWMProperties (dpy, window, win_title, win_title,
-                      NULL, 0, NULL, NULL, NULL);
-  XmbSetWMProperties (dpy, wm_window, win_title, win_title,
-                      NULL, 0, NULL, NULL, NULL);
-  XMapWindow (dpy, window);
-  XMapRaised (dpy, wm_window);
-
-  // Create a empty mouse cursor
-  char zero = 0;
-  EmptyPixmap = XCreatePixmapFromBitmapData (dpy, window, &zero, 1, 1, 0, 0, 1);
-  XColor Black;
-  memset (&Black, 0, sizeof (Black));
-  EmptyMouseCursor = XCreatePixmapCursor (dpy, EmptyPixmap, EmptyPixmap,
-    &Black, &Black, 0, 0);
-
-  // Create mouse cursors
-  MouseCursor [csmcArrow] = XCreateFontCursor (dpy, XC_left_ptr);
-//MouseCursor [csmcLens] = XCreateFontCursor (dpy,
-  MouseCursor [csmcCross] = XCreateFontCursor (dpy, 33/*XC_crosshair*/);
-  MouseCursor [csmcPen] = XCreateFontCursor (dpy, /*XC_hand2*/XC_pencil);
-  MouseCursor [csmcMove] = XCreateFontCursor (dpy, XC_fleur);
-  /// Diagonal (\) resizing cursor
-//MouseCursor [csmcSizeNWSE] = XCreateFontCursor (dpy,
-  /// Diagonal (/) resizing cursor
-//MouseCursor [csmcSizeNESW] = XCreateFontCursor (dpy,
-  /// Vertical sizing cursor
-//MouseCursor [csmcSizeNS] = XCreateFontCursor (dpy, XC_sb_v_double_arrow);
-  /// Horizontal sizing cursor
-//MouseCursor [csmcSizeEW] = XCreateFontCursor (dpy, XC_sb_h_double_arrow);
-  /// Invalid operation cursor
-//MouseCursor [csmcStop] = XCreateFontCursor (dpy, XC_pirate);
-  /// Wait (longplay operation) cursor
-  MouseCursor [csmcWait] = XCreateFontCursor (dpy, XC_watch);
-
-  // Wait for expose event
-  XEvent event;
-  for (;;)
-  {
-    XNextEvent (dpy, &event);
-    if (event.type == Expose)
-      break;
-  }
-
-  // Now disable window resizes.
-  // Note that if we do this before expose event, with some window managers
-  // (e.g. Window Maker) it will be unable to resize the window at all.
-  AllowCanvasResize (false);
-
-  if (!AllocateMemory ())
-  {
-#ifdef DO_SHM
-    if (do_shm)
-    {
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "SHM available but could not allocate. "
-        "Trying without SHM.");
-      if(xim) { XDestroyImage(xim); xim=NULL; }
-      do_shm = false;
-      if(!AllocateMemory())
-      {
-#endif //DO_SHM
-      Report (CS_REPORTER_SEVERITY_ERROR, "Unable to allocate memory!");
-      return false;
-#ifdef DO_SHM
-      }
-    }
-#endif //DO_SHM
-  }
-  Clear (0);
-
-  if (FullScreen)
-    EnterFullScreen ();
-
-  return true;
-}
-
-bool csGraphics2DXLib::AllocateMemory ()
-{
-  // Create backing store
-  if (!xim)
-  {
-//    xim = XGetImage (dpy, window, 0, 0, Width, Height, AllPlanes, ZPixmap);
-    int sc = DefaultScreen(dpy);
-    int disp_depth = DefaultDepth(dpy,sc);
-    int bitmap_pad = (disp_depth + 7) / 8;
-
-    bitmap_pad = (bitmap_pad == 3) ? 32 : bitmap_pad*8;
-
-#ifdef DO_SHM
-    if (do_shm && !XShmQueryExtension (dpy))
-    {
-      do_shm = false;
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "SHM extension not available on display!");
-    }
-    if (do_shm)
-    {
-      xim = XShmCreateImage(dpy, DefaultVisual(dpy,sc), disp_depth,
-			    ZPixmap, 0, &shmi, Width, Height);
-      if (!xim)
-      {
-	Report (CS_REPORTER_SEVERITY_ERROR, "XShmCreateImage failed!");
-	return false;
-      }
-      shm_image = *xim;
-      shmi.shmid = shmget (IPC_PRIVATE, xim->bytes_per_line*xim->height,
-        IPC_CREAT | 0777);
-      if (shmi.shmid == -1)
-      {
-	Report (CS_REPORTER_SEVERITY_ERROR, "shmget failed!");
-	return false;
-      }
-      shmi.shmaddr = (char*)shmat (shmi.shmid, 0, 0);
-      if (shmi.shmaddr == (char*) -1)
-      {
-	Report (CS_REPORTER_SEVERITY_ERROR, "shmat failed!");
-	return false;
-      }
-      shmi.readOnly = FALSE;
-      XShmAttach (dpy, &shmi);
-
-      // Delete memory segment. The memory stays available until
-      // the last client detaches from it.
-      XSync (dpy, False);
-      shmctl (shmi.shmid, IPC_RMID, 0);
-
-      shm_image.data = shmi.shmaddr;
-      real_Memory = (unsigned char *)shmi.shmaddr;
-      shm_image.obdata = (char *)&shmi;
-    }
-    else
-#endif /* DO_SHM */
-    {
-      xim = XCreateImage(dpy, DefaultVisual(dpy,sc), disp_depth, ZPixmap, 0,
-			 NULL, Width, Height, bitmap_pad, 0);
-      xim->data = new char[xim->bytes_per_line*xim->height];
-      real_Memory = (unsigned char*)(xim->data);
-    }
-
-    // If not simulating depth then Memory is equal to real_Memory.
-    // If simulating then we allocate a new Memory array in the faked format.
-    if (!sim_depth)
-      Memory = real_Memory;
-    else
-      Memory = new unsigned char [Width*Height*pfmt.PixelBytes];
-  }
-
-  return true;
-}
-
-void csGraphics2DXLib::Close ()
-{
-  if (!is_open) return;
-  LeaveFullScreen ();
-
-  if (EmptyMouseCursor)
-  {
-    XFreeCursor (dpy, EmptyMouseCursor);
-    EmptyMouseCursor = 0;
-    XFreePixmap (dpy, EmptyPixmap);
-    EmptyPixmap = 0;
-  }
-  for (int i = sizeof (MouseCursor) / sizeof (Cursor) - 1; i >= 0; i--)
-  {
-    if (MouseCursor [i])
-      XFreeCursor (dpy, MouseCursor [i]);
-    MouseCursor [i] = None;
-  }
-  if (window)
-  {
-    XDestroyWindow (dpy, window);
-    window = 0;
-  }
-  if (Memory && sim_depth)
-  {
-    delete [] Memory;
-    Memory = NULL;
-  }
-  if (leader_window)
-  {
-    XDestroyWindow (dpy, leader_window);
-    leader_window = 0;
-  }
-  csGraphics2D::Close ();
 }
 
 struct palent
@@ -835,37 +640,33 @@ void csGraphics2DXLib::recompute_grey_palette ()
   Report (CS_REPORTER_SEVERITY_DEBUG, "Done!");
 }
 
-bool csGraphics2DXLib::PerformExtensionV (char const* command, va_list)
+void csGraphics2DXLib::SetRGB(int i, int r, int g, int b)
 {
-  if (!strcasecmp (command, "sim_pal"))
+  // If there is a colormap AND we are not simulating a display with
+  // a colormap then we really set the color.
+  if (cmap && !sim_depth)
   {
-    recompute_simulated_palette ();
-    return true;
+    XColor color;
+    color.pixel = i;
+    color.red = r*256;
+    color.green = g*256;
+    color.blue = b*256;
+    color.flags = DoRed | DoGreen | DoBlue;
+
+    XStoreColor (dpy, cmap, &color);
   }
-  else if (!strcasecmp (command, "sim_grey"))
-  {
-    recompute_grey_palette ();
-    return true;
-  }
-  else if (!strcasecmp (command, "sim_332"))
-  {
-    restore_332_palette ();
-    return true;
-  }
-  else if (!strcasecmp (command, "fullscreen"))
-  {
-    if (currently_full_screen)
-      LeaveFullScreen ();
-    else
-      EnterFullScreen ();
-    return true;
-  }
-  else if (!strcasecmp (command, "flush"))
-  {
-    XSync (dpy, False);
-    return true;
-  }
-  return false;
+
+  // If we are simulating an 8-bit display on truecolor displays then we
+  // need to delete the lookup table. It has to be recomputed after changing
+  // a palette entry.
+  if (sim_depth == 8)
+    if (sim_lt16)
+    {
+      delete [] sim_lt16;
+      sim_lt16 = NULL;
+    }
+
+  csGraphics2D::SetRGB (i, r, g, b);
 }
 
 void csGraphics2DXLib::Print (csRect *area)
@@ -1026,139 +827,102 @@ void csGraphics2DXLib::Print (csRect *area)
     }
   } // end  if (sim_depth)
 
-#ifdef DO_SHM
-  if (do_shm)
-  {
-    if (area)
-      XShmPutImage (dpy, window, gc, &shm_image,
-		    area->xmin, area->ymin, area->xmin, area->ymin,
-		    area->Width (), area->Height (),
-		    False);
-    else
-      XShmPutImage (dpy, window, gc, &shm_image, 0, 0, 0, 0, Width, Height, False);
-    XSync (dpy, False);
-  }
+  if (xshm)
+    xshm->Print (window, gc, area);
+  else if (area)
+    XPutImage (dpy, window, gc, xim,
+	       area->xmin, area->ymin, area->xmin, area->ymin,
+	       area->Width (), area->Height ());
   else
-#endif
-  {
-    if (area)
-      XPutImage (dpy, window, gc, xim,
-		 area->xmin, area->ymin, area->xmin, area->ymin,
-		 area->Width (), area->Height ());
-    else
-      XPutImage (dpy, window, gc, xim, 0, 0, 0, 0, Width, Height);
-  }
+    XPutImage (dpy, window, gc, xim, 0, 0, 0, 0, Width, Height);
 }
 
-void csGraphics2DXLib::SetRGB(int i, int r, int g, int b)
+bool csGraphics2DXLib::AllocateMemory ()
 {
-  // If there is a colormap AND we are not simulating a display with
-  // a colormap then we really set the color.
-  if (cmap && !sim_depth)
+  bool mem_valid = TryAllocateMemory ();
+  if (!mem_valid && xshm)
   {
-    XColor color;
-    color.pixel = i;
-    color.red = r*256;
-    color.green = g*256;
-    color.blue = b*256;
-    color.flags = DoRed | DoGreen | DoBlue;
-
-    XStoreColor (dpy, cmap, &color);
+    Report (CS_REPORTER_SEVERITY_NOTIFY, 
+	    "SHM available but could not allocate. Trying without SHM.");
+    xshm->DecRef ();
+    xshm = NULL;
+    mem_valid = TryAllocateMemory();
   }
 
-  // If we are simulating an 8-bit display on truecolor displays then we
-  // need to delete the lookup table. It has to be recomputed after changing
-  // a palette entry.
-  if (sim_depth == 8)
-    if (sim_lt16)
-    {
-      delete [] sim_lt16;
-      sim_lt16 = NULL;
-    }
-
-  csGraphics2D::SetRGB (i, r, g, b);
-}
-
-bool csGraphics2DXLib::SetMousePosition (int x, int y)
-{
-  XWarpPointer (dpy, None, window, 0, 0, 0, 0, x, y);
+  if (!mem_valid)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Unable to allocate memory!");
+    return false;
+  }
   return true;
 }
 
-bool csGraphics2DXLib::SetMouseCursor (csMouseCursorID iShape)
+bool csGraphics2DXLib::TryAllocateMemory ()
 {
-  if (do_hwmouse
-   && (iShape >= 0)
-   && (iShape <= csmcWait)
-   && (MouseCursor [iShape] != None))
-  {
-    XDefineCursor (dpy, window, MouseCursor [iShape]);
-    return true;
-  }
+  if (xshm)
+    real_Memory = xshm->CreateMemory (Width, Height);
   else
   {
-    XDefineCursor (dpy, window, EmptyMouseCursor);
-    return (iShape == csmcNone);
-  } /* endif */
+    int disp_depth = DefaultDepth(dpy,screen_num);
+    int bitmap_pad = (disp_depth + 7) / 8;
+    bitmap_pad = (bitmap_pad == 3) ? 32 : bitmap_pad*8;
+    xim = XCreateImage(dpy, DefaultVisual(dpy,screen_num), 
+		       disp_depth, ZPixmap, 0, NULL, 
+		       Width, Height, bitmap_pad, 0);
+    xim->data = new char[xim->bytes_per_line*xim->height];
+    real_Memory = (unsigned char*)(xim->data);
+  }
+  if (!real_Memory)
+    return false;
+  
+  // If not simulating depth then Memory is equal to real_Memory.
+  // If simulating then we allocate a new Memory array in the faked format.
+  if (!sim_depth)
+    Memory = real_Memory;
+  else
+    Memory = new unsigned char [Width * Height * pfmt.PixelBytes];
+
+  return true;
 }
 
-void csGraphics2DXLib::AllowCanvasResize (bool iAllow)
+bool csGraphics2DXLib::Resize (int width, int height)
 {
-  XSizeHints normal_hints;
-  normal_hints.flags = PMinSize | PMaxSize | PSize | PResizeInc;
-  normal_hints.width = Width;
-  normal_hints.height = Height;
-  normal_hints.width_inc = 2;
-  normal_hints.height_inc = 2;
-  if (iAllow)
-  {
-    normal_hints.min_width = 32;
-    normal_hints.min_height = 32;
-    normal_hints.max_width = display_width;
-    normal_hints.max_height = display_height;
-  }
+  if (!AllowResizing)
+    return false;
+
+  csGraphics2D::Resize (width, height);
+
+  if (xshm)
+    xshm->DestroyMemory ();
   else
   {
-    normal_hints.min_width =
-    normal_hints.max_width = Width;
-    normal_hints.min_height =
-    normal_hints.max_height = Height;
+    delete [] real_Memory;
+    XDestroyImage (xim);
+    xim = NULL;
   }
-  XSetWMNormalHints (dpy, wm_window, &normal_hints);
-  allow_canvas_resize = iAllow;
+  if (!AllocateMemory())
+    return false;
+//    Clear (0);
+//    XSync (dpy, false);
+  EventOutlet->Broadcast (cscmdContextResize, (iGraphics2D *)this);
+  return true;
 }
 
-static Bool CheckKeyPress (Display* /*dpy*/, XEvent *event, XPointer arg)
-{
-  XEvent *curevent = (XEvent *)arg;
-  if ((event->type == KeyPress)
-   && (event->xkey.keycode == curevent->xkey.keycode)
-   && (event->xkey.state == curevent->xkey.state))
-    return true;
-  return false;
+void csGraphics2DXLib::SetFullScreen (bool yesno)
+{ 
+  csGraphics2D::SetFullScreen (yesno); 
+  xwin->SetFullScreen (yesno); 
 }
 
-// XCheckMaskEvent() doesn't get ClientMessage Events so use XCheckIfEvent()
-// with this Predicate function as a work-around (ClientMessage events
-// are needed in order to catch "WM_DELETE_WINDOW")
-static Bool AlwaysTruePredicate (Display*, XEvent*, char*)
-{
-  return True;
+void csGraphics2DXLib::AllowResize (bool iAllow)
+{ 
+  AllowResizing = iAllow; 
+  xwin->AllowResize (iAllow); 
 }
+
 
 bool csGraphics2DXLib::HandleEvent (iEvent &Event)
 {
-  static int button_mapping[6] = {0, 1, 3, 2, 4, 5};
-  XEvent event;
-  KeySym key;
-  int charcount;
-  char charcode [8];
-  bool down;
-  bool resize = false;
-  bool parent_resize = false;
-  int newWidth = 0;
-  int newHeight = 0;
-
   if ((Event.Type == csevBroadcast)
    && (Event.Command.Code == cscmdCommandLineHelp)
    && object_reg)
@@ -1166,220 +930,41 @@ bool csGraphics2DXLib::HandleEvent (iEvent &Event)
     printf ("Options for X-Windows 2D graphics driver:\n");
     printf ("  -sdepth=<depth>    set simulated depth (8, 15, 16, or 32) (default=none)\n");
     printf ("  -shm/noshm         SHM extension (default '%sshm')\n",
-      do_shm ? "" : "no");
-    printf ("  -[no]sysmouse      use/don't use system mouse cursor (default=%s)\n",
-      do_hwmouse ? "use" : "don't");
+      xshm ? "" : "no");
     return true;
   }
-
-  while (XCheckIfEvent (dpy, &event, AlwaysTruePredicate, 0))
-    switch (event.type)
-    {
-      case ConfigureNotify:
-	if (event.xconfigure.window == wm_window)
- 	{
-          if (wm_width  != event.xconfigure.width
-           || wm_height != event.xconfigure.height)
-	  {
-	    wm_width  = event.xconfigure.width;
-	    wm_height = event.xconfigure.height;
-
-	    if (!currently_full_screen)
-	    {
-	      newWidth  = wm_width;
-	      newHeight = wm_height;
-	      parent_resize = true;
-	    }
-	  }
-	}
-	else if ((event.xconfigure.window == window)
-              && ((Width  != event.xconfigure.width)
-               || (Height != event.xconfigure.height)))
-	{
-	  Width = event.xconfigure.width;
-	  Height = event.xconfigure.height;
-	  resize = true;
-	}
-	break;
-      case MappingNotify:
-        XRefreshKeyboardMapping (&event.xmapping);
-	break;
-      case ClientMessage:
-	if (STATIC_CAST(Atom, event.xclient.data.l[0]) == wm_delete_window)
-	{
-	  EventOutlet->Broadcast (cscmdContextClose, (iGraphics2D *)this);
-	  EventOutlet->Broadcast (cscmdQuit);
-	}
-	break;
-      case ButtonPress:
-        EventOutlet->Mouse (button_mapping [event.xbutton.button],
-          true, event.xbutton.x, event.xbutton.y);
-        break;
-      case ButtonRelease:
-        EventOutlet->Mouse (button_mapping [event.xbutton.button],
-          false, event.xbutton.x, event.xbutton.y);
-        break;
-      case MotionNotify:
-        EventOutlet->Mouse (0, false, event.xbutton.x, event.xbutton.y);
-        break;
-      case KeyPress:
-      case KeyRelease:
-        // Neat trick: look in event queue if we have KeyPress events ahead
-	// with same keycode. If this is the case, discard the KeyUp event
-	// in favour of KeyDown since this is most (sure?) an autorepeat
-        XCheckIfEvent (event.xkey.display, &event, CheckKeyPress, (XPointer)&event);
-        down = (event.type == KeyPress);
-        charcount = XLookupString ((XKeyEvent *)&event, charcode,
-          sizeof (charcode), &key, NULL);
-        switch (key)
-        {
-          case XK_Meta_L:
-	  case XK_Meta_R:
-	  case XK_Alt_L:
-          case XK_Alt_R:      key = CSKEY_ALT; break;
-          case XK_Control_L:
-          case XK_Control_R:  key = CSKEY_CTRL; break;
-          case XK_Shift_L:
-          case XK_Shift_R:    key = CSKEY_SHIFT; break;
-	  case XK_KP_Up:
-	  case XK_KP_8:
-          case XK_Up:         key = CSKEY_UP; break;
-	  case XK_KP_Down:
-	  case XK_KP_2:
-          case XK_Down:       key = CSKEY_DOWN; break;
-	  case XK_KP_Left:
-	  case XK_KP_4:
-          case XK_Left:       key = CSKEY_LEFT; break;
-	  case XK_KP_Right:
-	  case XK_KP_6:
-          case XK_Right:      key = CSKEY_RIGHT; break;
-          case XK_BackSpace:  key = CSKEY_BACKSPACE; break;
-	  case XK_KP_Insert:
-	  case XK_KP_0:
-          case XK_Insert:     key = CSKEY_INS; break;
-	  case XK_KP_Delete:
-	  case XK_KP_Decimal:
-          case XK_Delete:     key = CSKEY_DEL; break;
-	  case XK_KP_Page_Up:
-	  case XK_KP_9:
-          case XK_Page_Up:    key = CSKEY_PGUP; break;
-	  case XK_KP_Page_Down:
-	  case XK_KP_3:
-          case XK_Page_Down:  key = CSKEY_PGDN; break;
-	  case XK_KP_Home:
-	  case XK_KP_7:
-          case XK_Home:       key = CSKEY_HOME; break;
-	  case XK_KP_End:
-	  case XK_KP_1:
-          case XK_End:        key = CSKEY_END; break;
-          case XK_Escape:     key = CSKEY_ESC; break;
-#ifdef XK_ISO_Left_Tab
-          case XK_ISO_Left_Tab:
-#endif
-          case XK_KP_Tab:
-          case XK_Tab:        key = CSKEY_TAB; break;
-          case XK_F1:         key = CSKEY_F1; break;
-          case XK_F2:         key = CSKEY_F2; break;
-          case XK_F3:         key = CSKEY_F3; break;
-          case XK_F4:         key = CSKEY_F4; break;
-          case XK_F5:         key = CSKEY_F5; break;
-          case XK_F6:         key = CSKEY_F6; break;
-          case XK_F7:         key = CSKEY_F7; break;
-          case XK_F8:         key = CSKEY_F8; break;
-          case XK_F9:         key = CSKEY_F9; break;
-          case XK_F10:        key = CSKEY_F10; break;
-          case XK_F11:        key = CSKEY_F11; break;
-          case XK_F12:        key = CSKEY_F12; break;
-          case XK_KP_Add:     key = CSKEY_PADPLUS; break;
-          case XK_KP_Subtract:key = CSKEY_PADMINUS; break;
-          case XK_KP_Multiply:key = CSKEY_PADMULT; break;
-          case XK_KP_Divide:  key = CSKEY_PADDIV; break;
-          case XK_KP_Begin:   key = CSKEY_CENTER; break;
-	  case XK_KP_Enter:
-          case XK_Return:     if (down && event.xkey.state & Mod1Mask)
-                                PerformExtension ("fullscreen"), key = 0;
-                              else
-                                key = CSKEY_ENTER;
-                              break;
-          default:            key = (key <= 127) ? ScanCodeToChar [key] : 0;
-        }
-        if (key)
-          EventOutlet->Key (key, charcount == 1 ? uint8 (charcode [0]) : 0, down);
-        break;
-      case FocusIn:
-      case FocusOut:
-        EventOutlet->Broadcast (cscmdFocusChanged, (void *)(event.type == FocusIn));
-        break;
-      case Expose:
-	if (!resize && !parent_resize)
-        {
-	  csRect rect (event.xexpose.x, event.xexpose.y,
-		       event.xexpose.x + event.xexpose.width,
-		       event.xexpose.y + event.xexpose.height);
-	  Print (&rect);
-	}
-	break;
-      default:
-        break;
-    }
-
-  if (parent_resize)
-    XResizeWindow (dpy, window, newWidth, newHeight);
-
-  if (resize)
-    if (!ReallocateMemory ())
-      EventOutlet->Broadcast (cscmdQuit);
   return false;
 }
 
-bool csGraphics2DXLib::ReallocateMemory ()
+bool csGraphics2DXLib::PerformExtensionV (char const* command, va_list)
 {
-//XSync (dpy, False);
-  if (do_shm)
+  if (!strcasecmp (command, "sim_pal"))
   {
-    XShmDetach (dpy, &shmi);
-    XDestroyImage (xim);
-    shmdt (shmi.shmaddr);
+    recompute_simulated_palette ();
+    return true;
   }
-  else
+  else if (!strcasecmp (command, "sim_grey"))
   {
-    XDestroyImage (xim);
+    recompute_grey_palette ();
+    return true;
   }
-  xim = NULL;
-  if (!AllocateMemory())
+  else if (!strcasecmp (command, "sim_332"))
   {
-#ifdef DO_SHM
-    if (do_shm)
-    {
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "SHM available but could not allocate. "
-        "Trying without SHM.");
-      if(xim) { XDestroyImage(xim); xim=NULL; }
-      do_shm = false;
-      if(!AllocateMemory())
-      {
-#endif //DO_SHM
-        Report (CS_REPORTER_SEVERITY_ERROR, "Unable to allocate memory!");
-        abort();
-#ifdef DO_SHM
-      }
-    }
-#endif //DO_SHM
+    restore_332_palette ();
+    return true;
   }
-
-  delete [] LineAddress;
-  LineAddress = new int [Height];
-  if (LineAddress == NULL) return false;
-
-  // Initialize scanline address array
-  int i,addr,bpl = Width * pfmt.PixelBytes;
-  for (i = 0, addr = 0; i < Height; i++, addr += bpl)
-    LineAddress[i] = addr;
-
-  SetClipRect (0, 0, Width - 1, Height - 1);
-
-  EventOutlet->Broadcast (cscmdContextResize, (iGraphics2D *)this);
-  return true;
+  else if (!strcasecmp (command, "fullscreen"))
+  {
+    xwin->SetFullScreen (!xwin->GetFullScreen ());
+    return true;
+  }
+  else if (!strcasecmp (command, "flush"))
+  {
+    XSync (dpy, False);
+    return true;
+  }
+  return false;
 }
 
-#define X2D_CANVAS csGraphics2DXLib
-#include "x2dfs.inc"
+#undef CS_XWIN_SCF_ID
+#undef CS_XEXT_SHM

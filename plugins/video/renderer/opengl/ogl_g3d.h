@@ -19,6 +19,8 @@
 #ifndef GRAPH3D_OPENGL_H
 #define GRAPH3D_OPENGL_H
 
+#define SCF_DEBUG
+
 // GRAPH3D.H
 // csGraphics3DOpenGL OpenGL rasterizer class.
 

@@ -21,68 +21,35 @@
 
 #include "video/canvas/common/graph2d.h"
 #include "isys/event.h"
+#include "ivideo/xwindow.h"
+#include "ivideo/xextshm.h"
 
 #define XK_MISCELLANY 1
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#include <X11/keysymdef.h>
-#include <X11/cursorfont.h>
 #include <X11/Xatom.h>
-
-#ifdef DO_SHM
-extern "C" {
-#  include <X11/extensions/XShm.h>
-#  include <sys/ipc.h>
-#  include <sys/shm.h>
-}
-#endif /* DO_SHM */
-
-#ifdef XFREE86VM
-#  include <X11/extensions/xf86vmode.h>
-#endif
 
 /// XLIB version.
 class csGraphics2DXLib : public csGraphics2D, public iEventPlug
 {
+  iXWindow *xwin;
+  /// Shared memory extension (manages the shared memory backbuffer)
+  iXExtSHM *xshm;
+  /// Used for back buffer when not using shared memory
+  XImage* xim;
+  /// The event outlet
+  iEventOutlet *EventOutlet;
   // The display context
   Display* dpy;
   int screen_num;
-  int display_width, display_height;
-  Window wm_window;
-  int wm_width;
-  int wm_height;
   Window window;
-  Window leader_window;
-  Window root_window;
-  XImage* xim;
   GC gc;
-  Visual *visual;
-  XVisualInfo vinfo;
-  unsigned int vclass;
-
-  // "WM_DELETE_WINDOW" atom
-  Atom wm_delete_window;
-
+  XVisualInfo xvis;
   // Window colormap
   Colormap cmap;
 
-  //  bool ReallocatedMemory;
-
-  // Use SHM or not?
-  bool do_shm;
-#ifdef DO_SHM
-  XShmSegmentInfo shmi;
-  XImage shm_image;
-#endif
-
-  // Hardware mouse cursor or software emulation?
-  bool do_hwmouse;
-  /// Mouse cursors (if hardware mouse cursors are used)  
-  Cursor MouseCursor [int(csmcWait) + 1];
-  /// Empty mouse cursor (consist of EmptyPixmap)
-  Cursor EmptyMouseCursor;
-  /// A empty pixmap
-  Pixmap EmptyPixmap;
+  bool resize;
+  int resize_w, resize_h;
 
   // Everything for simulated depth
   int sim_depth;
@@ -90,26 +57,22 @@ class csGraphics2DXLib : public csGraphics2D, public iEventPlug
   unsigned char* real_Memory;	// Real memory to the display
   unsigned char* sim_lt8;	// 8-bit lookup table (with 16-bit index) for simulated depth
   UShort* sim_lt16;		// 16-bit lookup table (with 8-bit index) for simulated depth
-  
-  bool currently_full_screen;
-  bool allow_canvas_resize;
 
-  // The event outlet
-  iEventOutlet *EventOutlet;
+  bool CreateVisuals ();
+  bool AllocateMemory ();
+  bool TryAllocateMemory ();
 
 public:
   SCF_DECLARE_IBASE_EXT(csGraphics2D);
-
   csGraphics2DXLib (iBase*);
   virtual ~csGraphics2DXLib ();
 
   virtual bool Initialize (iObjectRegistry*);
   virtual bool Open ();
   virtual void Close ();
+  virtual bool HandleEvent (iEvent &Event);
 
   void Report (int severity, const char* msg, ...);
-
-  virtual bool BeginDraw () { return (Memory != NULL); }
 
   virtual void Print (csRect *area = NULL);
   virtual void SetRGB (int i, int r, int g, int b);
@@ -132,31 +95,37 @@ public:
   /// Use greyscale palette for simulation of 15/16-bit on an 8-bit display.
   void recompute_grey_palette ();
 
-  bool ReallocateMemory ();
-  bool AllocateMemory ();
-
   /// Extensions for X11 port.
   virtual bool PerformExtensionV (char const* command, va_list);
 
+  virtual void AllowResize (bool iAllow);
+
+  virtual bool Resize (int width, int height);
+
+  virtual void SetTitle (const char* title)
+  { xwin->SetTitle (title); }
+
+  virtual bool GetFullScreen ()
+  { return xwin->GetFullScreen (); }
+
+  virtual void SetFullScreen (bool yesno);
+
   /// Set mouse position.
-  virtual bool SetMousePosition (int x, int y);
+  // should be the window manager
+  virtual bool SetMousePosition (int x, int y)
+  { return xwin->SetMousePosition (x, y); }
 
   /// Set mouse cursor shape
-  virtual bool SetMouseCursor (csMouseCursorID iShape);
-
-  /// Called on every frame by system driver
-  virtual bool HandleEvent (iEvent &Event);
-
-  virtual void AllowCanvasResize (bool iAllow);
+  // should be the window manager
+  virtual bool SetMouseCursor (csMouseCursorID iShape)
+  { return xwin->SetMouseCursor (iShape); }
 
   //------------------------ iEventPlug interface ---------------------------//
 
   virtual unsigned GetPotentiallyConflictingEvents ()
-  { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }
+  { return 0; }
   virtual unsigned QueryEventPriority (unsigned /*iType*/)
   { return 150; }
-
-#include "x2dfs.h"
 
 };
 

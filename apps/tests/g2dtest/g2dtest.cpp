@@ -226,7 +226,7 @@ void G2DTestSystemDriver::NextFrame ()
           EnterState (stWaitKey);
           break;
         case stBackBufferON:
-          myG2D->AllowCanvasResize (false);
+          myG2D->AllowResize (false);
           EnterState (stBackBufferOFF);
           if (myG2D->DoubleBuffer (true))
           {
@@ -455,7 +455,7 @@ void G2DTestSystemDriver::DrawWindowScreen ()
   WriteCentered (0,-16*1, green, -1, APP_TITLE);
 
 // By default context resizing should be disabled
-//myG2D->AllowCanvasResize (false);
+//myG2D->AllowResize (false);
   WriteCentered (0, 16*1, white, -1, "Try to resize this window, you should either be");
   WriteCentered (0, 16*2, white, -1, "unable to do it, or the window contents should");
   WriteCentered (0, 16*3, white, -1, "rescale along width window (e.g. the resolution");
@@ -469,7 +469,7 @@ void G2DTestSystemDriver::DrawWindowResizeScreen ()
 {
   DrawWindowScreen ();
 
-  myG2D->AllowCanvasResize (true);
+  myG2D->AllowResize (true);
   myG2D->DrawBox (0, myG2D->GetHeight () / 2 + 16, myG2D->GetWidth (), 16 * 4, blue);
   SetFont (CSFONT_LARGE);
 

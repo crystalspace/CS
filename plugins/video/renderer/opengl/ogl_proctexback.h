@@ -149,12 +149,6 @@ class csOpenGLProcBackBuffer2D : public iGraphics2D
   virtual void FreeArea (csImageArea *Area)
   { g2d->FreeArea (Area); }
 
-  virtual bool SetMousePosition (int /*x*/, int /*y*/)
-  { return false; }
-
-  virtual bool SetMouseCursor (csMouseCursorID /*iShape*/)
-  { return false; }
-
   virtual void SetRGB (int i, int r, int g, int b)
   { g2d->SetRGB (i, r, g, b); }
 
@@ -181,9 +175,6 @@ class csOpenGLProcBackBuffer2D : public iGraphics2D
   virtual int GetWidth ();
   virtual int GetHeight ();
 
-  virtual bool GetFullScreen ()
-  { return false; }
-
   virtual int GetPalEntryCount ()
   { return g2d->GetPalEntryCount (); }
 
@@ -201,14 +192,27 @@ class csOpenGLProcBackBuffer2D : public iGraphics2D
    int /*pal_size = 0*/)
   { return NULL; }
 
-  virtual void AllowCanvasResize (bool /*iAllow*/)
+  virtual void AllowResize (bool /*iAllow*/)
   { }
-
+  virtual bool Resize (int, int)
+  { return false; }
   /// Get the active font server (does not do IncRef())
   virtual iFontServer *GetFontServer ()
   { return g2d->GetFontServer (); }
   /// Get the native window.
   virtual iNativeWindow* GetNativeWindow () { return NULL; }
+
+  virtual bool GetFullScreen ()
+  { return false; }
+  virtual void SetFullScreen (bool)
+  {  }
+
+  virtual bool SetMousePosition (int /*x*/, int /*y*/)
+  { return false; }
+
+  virtual bool SetMouseCursor (csMouseCursorID /*iShape*/)
+  { return false; }
+
 };
 
 #endif // _OGL_PROCTEXBACK_H_

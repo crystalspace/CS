@@ -592,7 +592,7 @@ bool csEngine::HandleEvent (iEvent &Event)
 
         // Allow context resizing since we handle cscmdContextResize
         if (G2D)
-	  G2D->AllowCanvasResize (true);
+	  G2D->AllowResize (true);
 
         StartEngine ();
 

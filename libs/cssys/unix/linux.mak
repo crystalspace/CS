@@ -7,8 +7,15 @@ DESCRIPTION.OS.linux = Linux
 
 # Choose which 2D/3D driver combinations you want to build/use
 PLUGINS+=video/canvas/softx
-PLUGINS+=video/renderer/opengl video/canvas/openglx
-PLUGINS+=video/canvas/linex
+PLUGINS+=video/canvas/openglx video/renderer/opengl
+PLUGINS+=video/canvas/linex video/renderer/line
+
+# The X-Window plugin
+PLUGINS+=video/canvas/xwindow
+# Shared Memory Plugin
+PLUGINS+=video/canvas/xextshm
+# Video Modes Plugin
+PLUGINS+=video/canvas/xextf86vm
 
 # video support
 # formats (this is the wrapping format for the video data)

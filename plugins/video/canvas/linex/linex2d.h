@@ -23,6 +23,7 @@
 #include "video/canvas/common/graph2d.h"
 #include "isys/event.h"
 #include "isys/plugin.h"
+#include "ivideo/xwindow.h"
 
 #define XK_MISCELLANY 1
 #include <X11/Xlib.h>
@@ -31,58 +32,35 @@
 #include <X11/cursorfont.h>
 #include <X11/Xatom.h>
 
-#ifdef XFREE86VM
-#  include <X11/extensions/xf86vmode.h>
-#endif
-
 /// XLIB version.
 class csGraphics2DLineXLib : public csGraphics2D, public iEventPlug
 {
+  iXWindow  *xwin;
+  /// The event outlet
+  iEventOutlet *EventOutlet;
   int screen_num;
-  int display_width, display_height;
-  Window wm_window;
-  int wm_width;
-  int wm_height;
   Window window;
-  Window leader_window;
-  Window root_window;
   Pixmap back;
   GC gc, gc_back;
-  Visual *visual;
-  XVisualInfo vinfo;
-  unsigned int vclass;
+  XVisualInfo xvis;
+  // Window colormap
+  Colormap cmap;
 
   int seg_color;
   XSegment segments[100];
   int nr_segments;
 
-  // "WM_DELETE_WINDOW" atom
-  Atom wm_delete_window;
-
-  // Window colormap
-  Colormap cmap;
-
-  // Hardware mouse cursor or software emulation?
-  bool do_hwmouse;
-  /// Mouse cursors (if hardware mouse cursors are used)  
-  Cursor MouseCursor [int(csmcWait) + 1];
-  /// Empty mouse cursor (consist of EmptyPixmap)
-  Cursor EmptyMouseCursor;
-  /// A empty pixmap
-  Pixmap EmptyPixmap;
-
-  bool currently_full_screen;
-  bool allow_canvas_resize;
-
-  // The event outlet
-  iEventOutlet *EventOutlet;
+  /// helper function which creates the appropriate visual resources
+  bool CreateVisuals ();
+  /// helper function which allocates buffers
+  bool AllocateMemory ();
+  /// helper function which deallocates buffers
+  void DeAllocateMemory ();
 
 public:
+  SCF_DECLARE_IBASE_EXT(csGraphics2D);
   // The display context
   static Display* dpy;
-
-  SCF_DECLARE_IBASE_EXT(csGraphics2D);
-
   csGraphics2DLineXLib (iBase *iParent);
   virtual ~csGraphics2DLineXLib ();
 
@@ -104,31 +82,34 @@ public:
 
   virtual bool PerformExtensionV (char const* command, va_list);
 
+  virtual void AllowResize (bool iAllow);
+
+  virtual bool Resize (int width, int height);
+
+  virtual bool GetFullScreen ()
+  { return xwin->GetFullScreen (); }
+
+  virtual void SetFullScreen (bool yesno);
+
+  virtual void SetTitle (const char* title)
+  { xwin->SetTitle (title); }
   /// Set mouse position.
-  virtual bool SetMousePosition (int x, int y);
+  // should be the window manager
+  virtual bool SetMousePosition (int x, int y)
+  { return xwin->SetMousePosition (x, y); }
 
   /// Set mouse cursor shape
-  virtual bool SetMouseCursor (csMouseCursorID iShape);
-
-  /// Called on every frame by system driver
-  virtual bool HandleEvent (iEvent &Event);
-
-  virtual void AllowCanvasResize (bool iAllow);
-
-  /// helper function which allocates buffers
-  bool AllocateMemory ();
-  /// helper function which deallocates buffers
-  void DeAllocateMemory ();
-  bool ReallocateMemory ();
+  // should be the window manager
+  virtual bool SetMouseCursor (csMouseCursorID iShape)
+  { return xwin->SetMouseCursor (iShape); }
 
   //------------------------ iEventPlug interface ---------------------------//
 
   virtual unsigned GetPotentiallyConflictingEvents ()
-  { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }
+  { return 0; }
   virtual unsigned QueryEventPriority (unsigned /*iType*/)
   { return 150; }
 
-#include "plugins/video/canvas/softx/x2dfs.h"
 };
 
 /**

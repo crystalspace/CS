@@ -29,14 +29,9 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
  
-ifeq ($(USE_XFREE86VM),yes)
-  CFLAGS.X2D += -DXFREE86VM
-  # On some platforms -lxf86vm must appear before -lX11.
-  LIB.X2D.SYSTEM += -lXxf86vm
-endif
-
 CFLAGS.X2D += -I$(X11_PATH)/include
-LIB.X2D.SYSTEM += -L$(X11_PATH)/lib -lXext -lX11 $(X11_EXTRA_LIBS)
+LIB.X2D.SYSTEM += -L$(X11_PATH)/lib -lX11
+#LIB.X2D.SYSTEM += -L$(X11_PATH)/lib -lXext -lX11
 
 ifeq ($(USE_PLUGINS),yes)
   X2D = $(OUTDLL)x2d$(DLL)
@@ -51,11 +46,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(X2D)
 endif
 
-INC.X2D = $(wildcard plugins/video/canvas/softx/*.h $(INC.COMMON.DRV2D)) \
-  plugins/video/canvas/common/x11comm.h
-SRC.X2D = $(wildcard plugins/video/canvas/softx/*.cpp $(SRC.COMMON.DRV2D)) \
-  plugins/video/canvas/common/x11comm.cpp \
-  plugins/video/canvas/common/x11-keys.cpp
+INC.X2D = $(wildcard plugins/video/canvas/softx/*.h $(INC.COMMON.DRV2D)) 
+SRC.X2D = $(wildcard plugins/video/canvas/softx/*.cpp $(SRC.COMMON.DRV2D)) 
 OBJ.X2D = $(addprefix $(OUT),$(notdir $(SRC.X2D:.cpp=$O)))
 DEP.X2D = CSUTIL CSSYS CSGEOM CSUTIL
 
@@ -87,17 +79,3 @@ else
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
-
-#------------------------------------------------------------------ config ---#
-ifeq ($(ROOTCONFIG)/$(MAKESECTION),volatile/rootdefines)
-
-# Default value for DO_SHM
-ifndef DO_SHM
-  DO_SHM = yes
-endif
-
-ifeq ($(DO_SHM)$(findstring DO_SHM,$(MAKE_VOLATILE_H)),yes)
-  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_SHM$">>volatile.tmp
-endif
-
-endif # ifeq ($(ROOTCONFIG)/$(MAKESECTION),volatile/rootdefines)
