@@ -54,6 +54,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/cache.h"
+#include "iutil/cmdline.h"
 #include "iengine/rview.h"
 #include "iengine/fview.h"
 #include "qsqrt.h"
@@ -2720,6 +2721,14 @@ bool csThing::ReadFromCache (iCacheManager* cache_mgr)
   cache_mgr->SetCurrentScope (cachename);
   delete[] cachename;
 
+  // For error reporting.
+  const char* thing_name = NULL;
+  if (thing_type->do_verbose && logparent)
+  {
+    csRef<iMeshWrapper> mw (SCF_QUERY_INTERFACE (logparent, iMeshWrapper));
+    if (mw) thing_name = mw->QueryObject ()->GetName ();
+  }
+
   bool rc = true;
   csRef<iDataBuffer> db = cache_mgr->ReadCache ("thing_lm", NULL, ~0);
   if (db)
@@ -2727,12 +2736,44 @@ bool csThing::ReadFromCache (iCacheManager* cache_mgr)
     csMemFile mf ((const char*)(db->GetData ()), db->GetSize ());
     int i;
     for (i = 0; i < polygons.Length (); i++)
-      if (!polygons.Get (i)->ReadFromCache (&mf)) rc = false;
+    {
+      const char* error = polygons.Get (i)->ReadFromCache (&mf);
+      if (error != NULL)
+      {
+        rc = false;
+        if (thing_type->do_verbose)
+	{
+	  printf ("  Thing '%s' Poly '%s': %s\n",
+	  	thing_name, polygons.Get (i)->GetName (),
+		error);
+	  fflush (stdout);
+        }
+      }
+    }
     for (i = 0; i < GetCurveCount (); i++)
-      if (!curves.Get (i)->ReadFromCache (&mf)) rc = false;
+    {
+      const char* error = curves.Get (i)->ReadFromCache (&mf);
+      if (error != NULL)
+      {
+        rc = false;
+        if (thing_type->do_verbose)
+	{
+	  printf ("  Thing '%s' Curve '%s': %s\n",
+	  	thing_name, curves.Get (i)->GetName (),
+		error);
+	  fflush (stdout);
+        }
+      }
+    }
   }
   else
   {
+    if (thing_type->do_verbose)
+    {
+      printf ("  Thing '%s': Could not find cached lightmap file for thing!\n",
+      	thing_name);
+      fflush (stdout);
+    }
     rc = false;
   }
 
@@ -3024,6 +3065,7 @@ csThingObjectType::csThingObjectType (
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
   lightpatch_pool = NULL;
   render_pol2d_pool = NULL;
+  do_verbose = false;
 }
 
 csThingObjectType::~csThingObjectType ()
@@ -3048,6 +3090,14 @@ bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
 
   lightpatch_pool = new csLightPatchPool ();
   render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory ());
+
+  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser);
+  if (cmdline)
+  {
+    do_verbose = cmdline->GetOption ("verbose") != NULL;
+  }
+
   return true;
 }
 

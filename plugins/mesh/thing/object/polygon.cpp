@@ -1908,26 +1908,25 @@ void csPolygon3D::InitializeDefault ()
   }
 }
 
-bool csPolygon3D::ReadFromCache (iFile* file)
+const char* csPolygon3D::ReadFromCache (iFile* file)
 {
   csPolyTexLightMap *lmi = GetLightMapInfo ();
   if (lmi)
   {
-    if (lmi->tex->lm == NULL) return true;
-    bool rc = true;
-    if (!lmi->tex->lm->ReadFromCache (
+    if (lmi->tex->lm == NULL) return NULL;
+    const char* error = lmi->tex->lm->ReadFromCache (
           file,
           lmi->tex->w_orig,
           lmi->tex->h,
           this,
           true,
-	  thing->thing_type->engine))
+	  thing->thing_type->engine);
+    if (error != NULL)
     {
       lmi->tex->InitLightMaps ();
-      rc = false;
     }
     lmi->lightmap_up_to_date = true;
-    return rc;
+    return error;
   }
 
   csPolyTexGouraud *goi = GetGouraudInfo ();
@@ -1935,24 +1934,24 @@ bool csPolygon3D::ReadFromCache (iFile* file)
   {
     char type[5];
     if (file->Read (type, 4) != 4)
-      return false;
+      return "File too short to read gouraud shading info!";
     type[4] = 0;
     if (strcmp (type, "lmpg") != 0)
-      return false;
+      return "File doesn't appear to be gouraud info (magic number mismatch)!";
 
     uint16 num_vts;
     if (file->Read ((char*)&num_vts, sizeof (num_vts)) != sizeof (num_vts))
-      return false;
+      return "File too short to read gouraud shading info!";
     num_vts = convert_endian (num_vts);
     if (num_vts != GetVertexCount ())
-      return false;
+      return "Number of vertices doesn't match for gouraud shading info!";
 
     float colors[3];
     int i;
     for (i = 0; i < num_vts; i++)
     {
       if (file->Read ((char*)colors, sizeof (float)*3) != sizeof (float)*3)
-        return false;
+        return "File too short to read gouraud shading data!";
       colors[0] = convert_endian (colors[0]);
       colors[1] = convert_endian (colors[1]);
       colors[2] = convert_endian (colors[2]);
@@ -1960,10 +1959,10 @@ bool csPolygon3D::ReadFromCache (iFile* file)
     }
 
     goi->gouraud_up_to_date = true;
-    return true;
+    return NULL;
   }
 
-  return true;
+  return NULL;
 }
 
 bool csPolygon3D::WriteToCache (iFile* file)

@@ -207,9 +207,10 @@ public:
   void DelShadowMap (csShadowMap* plm);
 
   /**
-   * Read lightmap from a file. Return true if succesful.
+   * Read lightmap from a file. Return NULL if succesful and
+   * otherwise a description of the error.
    */
-  bool ReadFromCache (iFile* file, int w, int h,
+  const char* ReadFromCache (iFile* file, int w, int h,
     csObject* obj, bool isPolygon, iEngine*);
 
   /**

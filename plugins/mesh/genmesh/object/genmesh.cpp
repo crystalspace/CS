@@ -44,6 +44,7 @@
 #include "iutil/objreg.h"
 #include "iutil/cache.h"
 #include "iutil/object.h"
+#include "iutil/cmdline.h"
 #include "qsqrt.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -260,35 +261,73 @@ bool csGenmeshMeshObject::ReadFromCache (iCacheManager* cache_mgr)
   cache_mgr->SetCurrentScope (cachename);
   delete[] cachename;
 
-  bool rc = false;
+  const char* error = NULL;
   csRef<iDataBuffer> db = cache_mgr->ReadCache ("genmesh_lm", NULL, ~0);
   if (db)
   {
     csMemFile mf ((const char*)(db->GetData ()), db->GetSize ());
     char magic[5];
-    if (mf.Read (magic, 4) != 4) goto stop;
+    if (mf.Read (magic, 4) != 4)
+    {
+      error = "File too short while reading magic number!";
+      goto stop;
+    }
     magic[4] = 0;
-    if (strcmp (magic, LMMAGIC)) goto stop;
+    if (strcmp (magic, LMMAGIC))
+    {
+      error = "Magic number doesn't match!";
+      goto stop;
+    }
 
     char cont;
-    if (mf.Read ((char*)&cont, 1) != 1) goto stop;
+    if (mf.Read ((char*)&cont, 1) != 1)
+    {
+      error = "File too short while reading continuation data!";
+      goto stop;
+    }
     while (cont)
     {
       char lid[16];
-      if (mf.Read (lid, 16) != 16) goto stop;
+      if (mf.Read (lid, 16) != 16)
+      {
+        error = "File too short while reading light id!";
+        goto stop;
+      }
       iStatLight *il = factory->engine->FindLightID (lid);
-      if (!il) goto stop;
+      if (!il)
+      {
+        error = "Could not find light!";
+        goto stop;
+      }
       iLight* l = il->QueryLight ();
       affecting_lights.Add (l);
       il->AddAffectedLightingInfo (&scfiLightingInfo);
-      if (mf.Read ((char*)&cont, 1) != 1) goto stop;
+      if (mf.Read ((char*)&cont, 1) != 1)
+      {
+        error = "File too short while reading continuation data!";
+        goto stop;
+      }
     }
-    rc = true;
   }
 
 stop:
   cache_mgr->SetCurrentScope (NULL);
-  return rc;
+  if (error != NULL)
+  {
+    bool do_verbose = factory->genmesh_type->do_verbose;
+    if (do_verbose)
+    {
+      const char* genmesh_name = NULL;
+      if (logparent)
+      {
+        csRef<iMeshWrapper> mw (SCF_QUERY_INTERFACE (logparent, iMeshWrapper));
+        if (mw) genmesh_name = mw->QueryObject ()->GetName ();
+      }
+      printf ("  Genmesh '%s': %s\n", genmesh_name, error);
+    }
+    return false;
+  }
+  return true;
 }
 
 bool csGenmeshMeshObject::WriteToCache (iCacheManager* cache_mgr)
@@ -1094,6 +1133,7 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
 #endif
   csGenmeshMeshObjectFactory::object_reg = object_reg;
+  genmesh_type = (csGenmeshMeshObjectType*)pParent;
   logparent = NULL;
   initialized = false;
   object_bbox_valid = false;
@@ -2118,10 +2158,25 @@ csGenmeshMeshObjectType::csGenmeshMeshObjectType (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  do_verbose = false;
 }
 
 csGenmeshMeshObjectType::~csGenmeshMeshObjectType ()
 {
+}
+
+bool csGenmeshMeshObjectType::Initialize (iObjectRegistry* object_reg)
+{
+  csGenmeshMeshObjectType::object_reg = object_reg;
+
+  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser);
+  if (cmdline)
+  {
+    do_verbose = cmdline->GetOption ("verbose") != NULL;
+  }
+
+  return true;
 }
 
 csPtr<iMeshObjectFactory> csGenmeshMeshObjectType::NewFactory ()

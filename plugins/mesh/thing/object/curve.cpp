@@ -603,9 +603,9 @@ void csCurve::InitializeDefaultLighting ()
   LightmapUpToDate = false;
 }
 
-bool csCurve::ReadFromCache (iFile* file)
+const char* csCurve::ReadFromCache (iFile* file)
 {
-  if (!IsLightable ()) return true;
+  if (!IsLightable ()) return NULL;
   LightMap = new csLightMap ();
 
   // Allocate space for the LightMap and initialize it to ambient color.
@@ -618,7 +618,7 @@ bool csCurve::ReadFromCache (iFile* file)
 	int(ambient.green * 255.0f),
       	int(ambient.blue * 255.0f));
 
-  LightMap->ReadFromCache (
+  const char* error = LightMap->ReadFromCache (
       file,
       CURVE_LM_SIZE * csLightMap::lightcell_size,
       CURVE_LM_SIZE * csLightMap::lightcell_size,
@@ -626,7 +626,7 @@ bool csCurve::ReadFromCache (iFile* file)
       false,
       thing_type->engine);
   LightmapUpToDate = true;
-  return true;
+  return error;
 }
 
 bool csCurve::WriteToCache (iFile* file)

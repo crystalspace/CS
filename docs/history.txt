@@ -6,6 +6,16 @@ The history order is reversed so that new features are at the top.
 	- Fixed another mixup in the OpenGL canvas text drawer where
 	  the GL_COLOR_ARRAY state was restored incorrectly.
 	- Both fixes above make sure isotest in OpenGL shows lighting again.
+	- The thing plugin will now try to skip the lightmap data for
+	  a single polygon or curve in case there is a failure. That way
+	  following polygons may still attempt to load their lightmap
+	  data without errors.
+	- If the -verbose commandline option is given then the thing plugin
+	  will report accurate errors explain why the lightmaps failed to
+	  load.
+	- If the -verbose commandline option is given then the genmesh plugin
+	  will report accurate errors explain why the lighting info failed to
+	  load.
 3-Mar-2003
 	- Philip Wyett added libxml2 link flag for msvc project file.
 	- Philip Wyett removed 'divx' dir and '.cvsignore' file from

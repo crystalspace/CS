@@ -244,7 +244,7 @@ public:
   /// Initialize default lighting.
   void InitializeDefaultLighting ();
   /// Read lighting from file.
-  bool ReadFromCache (iFile* file);
+  const char* ReadFromCache (iFile* file);
   /// Cache the curve lightmaps to file.
   bool WriteToCache (iFile* file);
   /// Prepare lighting.

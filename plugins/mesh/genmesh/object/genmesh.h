@@ -46,6 +46,7 @@ struct iShadowBlockList;
 struct iCacheManager;
 struct iEngine;
 class csGenmeshMeshObjectFactory;
+class csGenmeshMeshObjectType;
 class csColor;
 class G3DFogInfo;
 
@@ -525,6 +526,7 @@ private:
 public:
   iObjectRegistry* object_reg;
   iBase* logparent;
+  csGenmeshMeshObjectType* genmesh_type;
 
   iEngine* engine;
 
@@ -719,6 +721,7 @@ class csGenmeshMeshObjectType : public iMeshObjectType
 {
 public:
   iObjectRegistry* object_reg;
+  bool do_verbose;
 
   SCF_DECLARE_IBASE;
 
@@ -729,11 +732,7 @@ public:
   /// Draw.
   virtual csPtr<iMeshObjectFactory> NewFactory ();
   /// Initialize.
-  bool Initialize (iObjectRegistry* object_reg)
-  {
-    csGenmeshMeshObjectType::object_reg = object_reg;
-    return true;
-  }
+  bool Initialize (iObjectRegistry* object_reg);
 
   struct eiComponent : public iComponent
   {

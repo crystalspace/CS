@@ -1330,6 +1330,7 @@ private:
 
 public:
   iObjectRegistry* object_reg;
+  bool do_verbose;	// Verbose error reporting.
   iEngine* engine;
   iGraphics3D* G3D;
   /// An object pool for 2D polygons used by the rendering process.

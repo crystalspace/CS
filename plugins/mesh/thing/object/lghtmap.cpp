@@ -228,7 +228,7 @@ struct LightHeader
   long dyn_cnt;             // Number of dynamic maps
 };
 
-bool csLightMap::ReadFromCache (
+const char* csLightMap::ReadFromCache (
   iFile* file,
   int w,
   int h,
@@ -282,42 +282,78 @@ bool csLightMap::ReadFromCache (
 
   char type[5];
   if (file->Read (type, 4) != 4)
-    return false;
+    return "File too short while reading magic number!";
   type[4] = 0;
   if (strcmp (type, "lmpn") != 0)
-    return false;
+    return "File doesn't appear to be a lightmap (magic number mismatch)!";
 
   if (file->Read ((char*)&ps, sizeof (ps)) != sizeof (ps))
-    return false;
+    return "File too short while reading lightmap info header!";
+
+  //-------------------------------
+  // From this point on we will try to skip the wrong lightmap
+  // so that we can continue processing further lightmaps.
+  //-------------------------------
 
   //-------------------------------
   // Check if cached item is still valid.
   //-------------------------------
-  if (
-    strncmp (ps.header, pswanted.header, 4) != 0 ||
-    (
-      poly &&
-      (
-        ps.lm_cnt != pswanted.lm_cnt ||
-        ps.x1 != pswanted.x1 ||
-        ps.y1 != pswanted.y1 ||
-        ps.z1 != pswanted.z1 ||
-        ps.x2 != pswanted.x2 ||
-        ps.y2 != pswanted.y2 ||
-        ps.z2 != pswanted.z2 ||
-        ps.lm_size != pswanted.lm_size
-      )
-    ))
+  static char error_buf[512];
+  *error_buf = 0;
+  if (strncmp (ps.header, pswanted.header, 4) != 0)
+    sprintf (error_buf, "Cached lightmap header doesn't match!");
+  else if (poly)
+  {
+    if (ps.lm_cnt != pswanted.lm_cnt)
+      sprintf (error_buf,
+      	"Cached lightmap header mismatch (got cnt=%d, expected %d)!",
+	ps.lm_cnt, pswanted.lm_cnt);
+    else if (ps.lm_size != pswanted.lm_size)
+      sprintf (error_buf,
+      	"Cached lightmap base texture mismatch (got size=%d, expected %d)!",
+	ps.lm_size, pswanted.lm_size);
+    else if (ps.x1 != pswanted.x1 || ps.y1 != pswanted.y1
+    		|| ps.z1 != pswanted.z1)
+      sprintf (error_buf, "Cached lightmap first vertex mismatch!");
+    else if (ps.x2 != pswanted.x2 || ps.y2 != pswanted.y2
+    		|| ps.z2 != pswanted.z2)
+      sprintf (error_buf, "Cached lightmap first vertex mismatch!");
+  }
+  if (*error_buf)
   {
     // Invalid.
-    return false;
+    // First try to skip the cached lightmap.
+    char* data = new char [ps.lm_size*3];
+    if (file->Read (data, ps.lm_size*3) != ps.lm_size*3)
+      return error_buf;
+    delete[] data;
+
+    uint8 have_dyn;
+    if (file->Read ((char*)&have_dyn, sizeof (have_dyn)) != sizeof (have_dyn))
+      return error_buf;
+    if (have_dyn)
+    {
+      if (file->Read ((char*)lh.header, 4) != 4)
+        return error_buf;
+      if (file->Read ((char*)&lh.dyn_cnt, 4) != 4)
+        return error_buf;
+      lh.dyn_cnt = convert_endian (lh.dyn_cnt);
+      uint32 size;
+      if (file->Read ((char*)&size, sizeof (size)) != sizeof (size))
+        return error_buf;
+      size = convert_endian (size);
+      data = new char[size];
+      file->Read (data, size);
+      delete[] data;
+    }
+
+    return error_buf;
   }
 
   //-------------------------------
   // The cached item is valid.
   //-------------------------------
   static_lm.Clear ();
-
   static_lm.Alloc (lm_size);
 
   int n = lm_size;
@@ -325,7 +361,7 @@ bool csLightMap::ReadFromCache (
   while (--n >= 0) 
   {
     if (file->Read ((char*)lm_ptr, 3) != 3)
-      return false;
+      return "File too short while reading static lightmap data!";
     lm_ptr += 3;
     *(lm_ptr++) = -127;
   }
@@ -335,7 +371,7 @@ bool csLightMap::ReadFromCache (
   //-------------------------------
   uint8 have_dyn;
   if (file->Read ((char*)&have_dyn, sizeof (have_dyn)) != sizeof (have_dyn))
-    return false;
+    return "File too short while reading pseudo-dynamic lighting indicator!";
   if (have_dyn == 0)
     goto stop;   // No dynamic data. @@@ Recalc dynamic data?
 
@@ -343,14 +379,14 @@ bool csLightMap::ReadFromCache (
   // Now load the dynamic data.
   //-------------------------------
   if (file->Read ((char*)lh.header, 4) != 4)
-    return false;
+    return "File too short at start of dynamic lightmaps!";
   if (file->Read ((char*)&lh.dyn_cnt, 4) != 4)
-    return false;
+    return "File too short at start of dynamic lightmaps!";
   lh.dyn_cnt = convert_endian (lh.dyn_cnt);
 
   uint32 size;
   if (file->Read ((char*)&size, sizeof (size)) != sizeof (size))
-    return false;
+    return "File too short at start of dynamic lightmaps!";
 
   // Calculate the expected size and see if it matches with the
   // size we still have in our data buffer. If it doesn't match
@@ -360,7 +396,14 @@ bool csLightMap::ReadFromCache (
   unsigned int expected_size;
   expected_size = lh.dyn_cnt * (sizeof (LightSave) + lm_size);
   if (expected_size != size)
-    return false;
+  {
+    // Skip the data in the cache so we can potentially proceed
+    // to the next lightmap.
+    char* data = new char[size];
+    file->Read (data, size);
+    delete[] data;
+    return "Mismatch with expected number of pseudo-dynamic lightmaps!";
+  }
 
   iLightingInfo* li;
   li = &(parent->scfiLightingInfo);
@@ -369,7 +412,8 @@ bool csLightMap::ReadFromCache (
   {
     if (file->Read ((char*)&ls.light_id, sizeof (LightSave))
     	!= sizeof (LightSave))
-      return false;
+      return "File too short while reading pseudo-dynamic lightmap header!";
+    size -= sizeof (LightSave);
 
     iStatLight *il = engine->FindLightID (ls.light_id);
     if (il)
@@ -380,19 +424,25 @@ bool csLightMap::ReadFromCache (
       il->AddAffectedLightingInfo (li);
 
       if ((long) file->Read ((char*)(smap->GetArray ()), lm_size) != lm_size)
-        return false;
+        return "File too short while reading pseudo-dynamic lightmap data!";
+      size -= lm_size;
       smap->CalcMaxShadow ();
     }
     else
     {
-      return false;
+      // Skip the data in the cache so we can potentially proceed to the
+      // next lightmap.
+      char* data = new char[size];
+      file->Read (data, size);
+      delete[] data;
+      return "Couldn't find the pseudo-dynamic light for this lightmap!";
     }
   }
 
 stop:
   CalcMaxStatic ();
   
-  return true;
+  return NULL;
 }
 
 void csLightMap::Cache (

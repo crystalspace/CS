@@ -972,8 +972,9 @@ public:
 
   /**
    * This function will try to read the lightmap from the given file.
+   * Return NULL on success or else an error message.
    */
-  bool ReadFromCache (iFile* file);
+  const char* ReadFromCache (iFile* file);
 
   /**
    * Call after calling InitializeDefault() and CalculateLighting to cache
