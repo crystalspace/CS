@@ -221,325 +221,6 @@ iMaterialWrapper *csLoader::FindMaterial (const char *iName)
 
 //---------------------------------------------------------------------------
 
-iCollection* csLoader::load_collection (char* name, char* buf)
-{
-  CS_TOKEN_TABLE_START(commands)
-    CS_TOKEN_TABLE (ADDON)
-    CS_TOKEN_TABLE (MESHOBJ)
-    CS_TOKEN_TABLE (COLLECTION)
-    CS_TOKEN_TABLE (LIGHT)
-    CS_TOKEN_TABLE (SECTOR)
-  CS_TOKEN_TABLE_END
-
-  char* xname;
-  long cmd;
-  char* params;
-
-  iCollection* collection = Engine->CreateCollection(name);
-
-  char str[255];
-  while ((cmd = csGetObject (&buf, commands, &xname, &params)) > 0)
-  {
-    if (!params)
-    {
-      System->Printf (MSG_WARNING, "Expected parameters instead of '%s'!\n", buf);
-      fatal_exit (0, false);
-    }
-    str[0] = 0;
-    switch (cmd)
-    {
-      case CS_TOKEN_ADDON:
-        System->Printf (MSG_WARNING, "ADDON not yet supported in collection!\n");
-      	break;
-      case CS_TOKEN_MESHOBJ:
-        {
-# if 0
-//@@@@@@
-          ScanStr (params, "%s", str);
-	  iMeshWrapper* spr = Engine->FindMeshObject (str, ResolveOnlyRegion);
-          if (!spr)
-          {
-            System->Printf (MSG_WARNING, "Mesh object '%s' not found!\n", str);
-            fatal_exit (0, false);
-          }
-          collection->AddObject (spr->QueryObject());
-# endif
-        }
-        break;
-      case CS_TOKEN_LIGHT:
-        {
-          ScanStr (params, "%s", str);
-	  iStatLight* l = Engine->FindLight (str, ResolveOnlyRegion);
-          if (!l)
-            System->Printf (MSG_WARNING, "Light '%s' not found!\n", str);
-	  else
-	    collection->AddObject (l->QueryObject ());
-        }
-        break;
-      case CS_TOKEN_SECTOR:
-        {
-          ScanStr (params, "%s", str);
-	  iSector* s = Engine->FindSector (str, ResolveOnlyRegion);
-          if (!s)
-          {
-            System->Printf (MSG_WARNING, "Sector '%s' not found!\n", str);
-            fatal_exit (0, false);
-          }
-          collection->AddObject (s->QueryObject ());
-        }
-        break;
-      case CS_TOKEN_COLLECTION:
-        {
-          ScanStr (params, "%s", str);
-	  //@@@$$$ TODO: Collection in regions.
-          iCollection* th = Engine->FindCollection(str, ResolveOnlyRegion);
-          if (!th)
-          {
-            System->Printf (MSG_WARNING, "Collection '%s' not found!\n", str);
-            fatal_exit (0, false);
-          }
-          collection->AddObject (th->QueryObject());
-        }
-        break;
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    System->Printf (MSG_WARNING, "Token '%s' not found while parsing a collection!\n", csGetLastOffender ());
-    fatal_exit (0, false);
-  }
-
-  return collection;
-}
-
-//---------------------------------------------------------------------------
-
-iStatLight* csLoader::load_statlight (char* name, char* buf)
-{
-  CS_TOKEN_TABLE_START(commands)
-    CS_TOKEN_TABLE (ATTENUATION)
-    CS_TOKEN_TABLE (CENTER)
-    CS_TOKEN_TABLE (RADIUS)
-    CS_TOKEN_TABLE (DYNAMIC)
-    CS_TOKEN_TABLE (COLOR)
-    CS_TOKEN_TABLE (HALO)
-    CS_TOKEN_TABLE (KEY)
-  CS_TOKEN_TABLE_END
-
-  long cmd;
-  char* params;
-
-  Stats->lights_loaded++;
-  float x, y, z, dist = 0, r, g, b;
-  int cnt;
-  bool dyn;
-  int attenuation = CS_ATTN_LINEAR;
-  char str [100];
-  struct csHaloDef
-  {
-    int type;
-    union
-    {
-      struct
-      {
-        float Intensity;
-        float Cross;
-      } cross;
-      struct
-      {
-        int Seed;
-        int NumSpokes;
-        float Roundness;
-      } nova;
-    };
-  } halo;
-
-  memset (&halo, 0, sizeof (halo));
-  iKeyValuePair* kvp = NULL;
-
-  if (strchr (buf, ':'))
-  {
-    // Still support old format for backwards compatibility.
-    int d;
-    ScanStr (buf, "%f,%f,%f:%f,%f,%f,%f,%d",
-          &x, &y, &z, &dist, &r, &g, &b, &d);
-    dyn = bool (d);
-  }
-  else
-  {
-    // New format.
-    x = y = z = 0;
-    dist = 1;
-    r = g = b = 1;
-    dyn = false;
-    while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
-    {
-      switch (cmd)
-      {
-        case CS_TOKEN_RADIUS:
-          ScanStr (params, "%f", &dist);
-          break;
-        case CS_TOKEN_CENTER:
-          ScanStr (params, "%f,%f,%f", &x, &y, &z);
-          break;
-        case CS_TOKEN_COLOR:
-          ScanStr (params, "%f,%f,%f", &r, &g, &b);
-          break;
-        case CS_TOKEN_DYNAMIC:
-          dyn = true;
-          break;
-        case CS_TOKEN_KEY:
-          kvp = load_key (params, NULL);
-          break;
-        case CS_TOKEN_HALO:
-	  str[0] = 0;
-          cnt = ScanStr (params, "%s", str);
-          if (cnt == 0 || !strncmp (str, "CROSS", 5))
-          {
-            params = strchr (str, ',');
-            if (params) params++;
-defaulthalo:
-            halo.type = 1;
-            halo.cross.Intensity = 2.0; halo.cross.Cross = 0.45;
-            if (params)
-              ScanStr (params, "%f,%f", &halo.cross.Intensity, &halo.cross.Cross);
-          }
-          else if (!strncmp (str, "NOVA", 5))
-          {
-            params = strchr (str, ',');
-            if (params) params++;
-            halo.type = 2;
-            halo.nova.Seed = 0; halo.nova.NumSpokes = 100; halo.nova.Roundness = 0.5;
-            if (params)
-              ScanStr (params, "%d,%d,%f", &halo.nova.Seed, &halo.nova.NumSpokes, &halo.nova.Roundness);
-          }
-          else
-            goto defaulthalo;
-          break;
-        case CS_TOKEN_ATTENUATION:
-          ScanStr (params, "%s", str);
-          if (strcmp (str, "none")      == 0) attenuation = CS_ATTN_NONE;
-          if (strcmp (str, "linear")    == 0) attenuation = CS_ATTN_LINEAR;
-          if (strcmp (str, "inverse")   == 0) attenuation = CS_ATTN_INVERSE;
-          if (strcmp (str, "realistic") == 0) attenuation = CS_ATTN_REALISTIC;
-      }
-    }
-    if (cmd == CS_PARSERR_TOKENNOTFOUND)
-    {
-      System->Printf (MSG_WARNING, "Token '%s' not found while parsing a light!\n", csGetLastOffender ());
-      fatal_exit (0, false);
-    }
-  }
-
-  // implicit radius
-  if (dist == 0)
-  {
-    if (r > g && r > b) dist = r;
-    else if (g > b) dist = g;
-    else dist = b;
-    switch (attenuation)
-    {
-      case CS_ATTN_NONE      : dist = 100000000; break;
-      case CS_ATTN_LINEAR    : break;
-      case CS_ATTN_INVERSE   : dist = 16 * sqrt (dist); break;
-      case CS_ATTN_REALISTIC : dist = 256 * dist; break;
-    }
-  }
-
-  iStatLight* l = Engine->CreateLight (name, csVector3(x, y, z), dist, csColor(r, g, b), dyn);
-  switch (halo.type)
-  {
-    case 1:
-      l->QueryLight ()->CreateCrossHalo (halo.cross.Intensity, halo.cross.Cross);
-      break;
-    case 2:
-      l->QueryLight ()->CreateNovaHalo (halo.nova.Seed, halo.nova.NumSpokes, halo.nova.Roundness);
-      break;
-  }
-  l->QueryLight ()->SetAttenuation (attenuation);
-  if (kvp)
-  {
-    l->QueryObject ()->ObjAdd (kvp->QueryObject ());
-    kvp->DecRef ();
-  }
-  return l;
-}
-
-iKeyValuePair* csLoader::load_key (char* buf, iObject* pParent)
-{
-  char Key  [256];
-  char Value[10000]; //Value can potentially grow _very_ large.
-  if (ScanStr(buf, "%S,%S", Key, Value) == 2)
-  {
-    iKeyValuePair* kvp = Engine->CreateKeyValuePair (Key, Value);
-    if (pParent)
-      pParent->ObjAdd (kvp->QueryObject ());
-    return kvp;
-  }
-  else
-  {
-    System->Printf (MSG_WARNING, "Illegal Syntax for KEY() command in line %d\n",
-    	csGetParserLine());
-    fatal_exit (0, false);
-    return NULL;
-  }
-}
-
-iMapNode* csLoader::load_node (char* name, char* buf, iSector* sec)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (ADDON)
-    CS_TOKEN_TABLE (KEY)
-    CS_TOKEN_TABLE (POSITION)
-  CS_TOKEN_TABLE_END
-
-  iMapNode* pNode = Engine->CreateMapNode (name);
-  pNode->SetSector (sec);
-
-  long  cmd;
-  char* xname;
-  char* params;
-
-  float x = 0;
-  float y = 0;
-  float z = 0;
-
-  while ((cmd = csGetObject (&buf, commands, &xname, &params)) > 0)
-  {
-    if (!params)
-    {
-      System->Printf (MSG_WARNING, "Expected parameters instead of '%s'!\n", buf);
-      fatal_exit (0, false);
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_ADDON:
-        System->Printf (MSG_WARNING, "ADDON not yet supported in node!\n");
-      	break;
-      case CS_TOKEN_KEY:
-        load_key (params, pNode->QueryObject ());
-        break;
-      case CS_TOKEN_POSITION:
-        ScanStr (params, "%f,%f,%f", &x, &y, &z);
-        break;
-      default:
-        abort ();
-        break;
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    System->Printf (MSG_WARNING, "Token '%s' not found while parsing a thing!\n", csGetLastOffender ());
-    fatal_exit (0, false);
-  }
-
-  pNode->SetPosition(csVector3(x,y,z));
-
-  return pNode;
-}
-
-//---------------------------------------------------------------------------
-
 struct HeightMapData
 {
   iImage* im;
@@ -906,14 +587,12 @@ void csLoader::heightgen_process (char* buf)
 
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    System->Printf (MSG_WARNING,
-    	"Token '%s' not found while parsing a heightgen specification!\n",
-	csGetLastOffender ());
+    TokenError ("a heightgen specification");
     fatal_exit (0, false);
   }
 }
 
-static UInt ParseMixmode (char* buf)
+UInt csLoader::ParseMixmode (char* buf)
 {
   CS_TOKEN_TABLE_START (modes)
     CS_TOKEN_TABLE (COPY)
@@ -956,110 +635,10 @@ static UInt ParseMixmode (char* buf)
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    printf ("Token '%s' not found while parsing the modes!\n",
-    	csGetLastOffender ());
+    TokenError ("the modes");
     return 0;
   }
   return Mixmode;
-}
-
-//---------------------------------------------------------------------------
-
-iSector* csLoader::load_sector (char* secname, char* buf)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (ADDON)
-    CS_TOKEN_TABLE (CULLER)
-    CS_TOKEN_TABLE (FOG)
-    CS_TOKEN_TABLE (LIGHT)
-    CS_TOKEN_TABLE (MESHOBJ)
-    CS_TOKEN_TABLE (TERRAINOBJ)
-    CS_TOKEN_TABLE (NODE)
-    CS_TOKEN_TABLE (KEY)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-
-  bool do_culler = false;
-  char bspname[100];
-
-  iSector *sector = Engine->CreateSector (secname);
-  Stats->sectors_loaded++;
-
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      System->Printf (MSG_WARNING, "Expected parameters instead of '%s'!\n", buf);
-      fatal_exit (0, false);
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_ADDON:
-	LoadAddOn (params, sector);
-      	break;
-      case CS_TOKEN_CULLER:
-        do_culler = true;
-	if (!ScanStr (params, "%s", bspname))
-	{
-          System->Printf (MSG_WARNING,
-	  	"CULLER expects the name of a mesh object!\n");
-          fatal_exit (0, false);
-	}
-        break;
-      case CS_TOKEN_MESHOBJ:
-        {
-	  iMeshWrapper* mesh = Engine->CreateMeshObject(name);
-          LoadMeshObject (mesh, params);
-          mesh->GetMovable ()->SetSector (sector);
-	  mesh->GetMovable ()->UpdateMove ();
-        }
-        break;
-      case CS_TOKEN_TERRAINOBJ:
-        {
-	  iTerrainWrapper *terr = Engine->CreateTerrainObject(name);
-          LoadTerrainObject (terr, params, sector);
-        }
-        break;
-      case CS_TOKEN_LIGHT:
-        sector->AddLight ( load_statlight(name, params) );
-        break;
-      case CS_TOKEN_NODE:
-        {
-          iMapNode *n = load_node(name, params, sector);
-	  if (n)
-	  {
-            sector->QueryObject ()->ObjAdd (n->QueryObject ());
-	    n->DecRef ();
-	  }
-	}
-        break;
-      case CS_TOKEN_FOG:
-        {
-          csFog *f = sector->GetFog ();
-          f->enabled = true;
-          ScanStr (params, "%f,%f,%f,%f", &f->red, &f->green, &f->blue, &f->density);
-        }
-        break;
-      case CS_TOKEN_KEY:
-      {
-        load_key(params, sector->QueryObject());
-        break;
-      }
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    System->Printf (MSG_WARNING,
-    	"Token '%s' not found while parsing a sector!\n", csGetLastOffender ());
-    fatal_exit (0, false);
-  }
-
-  if (!(flags & CS_LOADER_NOBSP))
-    if (do_culler) sector->SetVisibilityCuller (bspname);
-  return sector;
 }
 
 //---------------------------------------------------------------------------
@@ -1174,10 +753,10 @@ bool csLoader::LoadMap (char* buf)
 	  break;
         case CS_TOKEN_SECTOR:
           if (!Engine->FindSector (name, ResolveOnlyRegion))
-            load_sector (name, params);
+            ParseSector (name, params);
           break;
         case CS_TOKEN_COLLECTION:
-          load_collection (name, params);
+          ParseCollection (name, params);
           break;
 	case CS_TOKEN_MAT_SET:
           if (!LoadMaterials (params, name))
@@ -1212,13 +791,13 @@ bool csLoader::LoadMap (char* buf)
           break;
         }
         case CS_TOKEN_KEY:
-          load_key (params, Engine->QueryObject());
+          ParseKey (params, Engine->QueryObject());
           break;
       }
     }
     if (cmd == CS_PARSERR_TOKENNOTFOUND)
     {
-      System->Printf (MSG_WARNING, "Token '%s' not found while parsing a map!\n", csGetLastOffender ());
+      TokenError ("a map");
       fatal_exit (0, false);
     }
   }
@@ -1321,9 +900,7 @@ bool csLoader::LoadPlugins (char* buf)
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    System->Printf (MSG_WARNING,
-    	"Token '%s' not found while parsing plugin descriptors!\n",
-	csGetLastOffender ());
+    TokenError ("plugin descriptors");
     fatal_exit (0, false);
   }
 
@@ -1363,8 +940,7 @@ bool csLoader::LoadTextures (char* buf)
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    System->Printf (MSG_WARNING,
-    	"Token '%s' not found while parsing textures!\n", csGetLastOffender ());
+    TokenError ("textures");
     fatal_exit (0, false);
   }
 
@@ -1397,7 +973,7 @@ bool csLoader::LoadMaterials (char* buf, const char* prefix)
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    System->Printf (MSG_WARNING, "Token '%s' not found while parsing material!\n", csGetLastOffender ());
+    TokenError ("materials");
     fatal_exit (0, false);
   }
 
@@ -1470,7 +1046,7 @@ bool csLoader::LoadLibrary (char* buf)
     }
     if (cmd == CS_PARSERR_TOKENNOTFOUND)
     {
-      System->Printf (MSG_WARNING, "Token '%s' not found while parsing a library file!\n", csGetLastOffender ());
+      TokenError ("a library file");
       return false;
     }
   }
@@ -1544,7 +1120,7 @@ bool csLoader::LoadSounds (char* buf)
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    System->Printf (MSG_WARNING, "Token '%s' not found while parsing the list of sounds!\n", csGetLastOffender ());
+    TokenError ("the list of sounds");
     fatal_exit (0, false);
   }
 
@@ -1795,9 +1371,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf)
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    System->Printf (MSG_WARNING,
-    	"Token '%s' not found while parsing the a mesh factory!\n",
-        csGetLastOffender ());
+    TokenError ("a mesh factory");
     fatal_exit (0, false);
   }
 
@@ -1897,7 +1471,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
         mesh->GetFlags().Set (CS_ENTITY_CONVEX);
         break;
       case CS_TOKEN_KEY:
-        load_key (params, mesh->QueryObject());
+        ParseKey (params, mesh->QueryObject());
         break;
       case CS_TOKEN_MESHOBJ:
         {
@@ -2007,9 +1581,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    System->Printf (MSG_WARNING,
-    	"Token '%s' not found while parsing the mesh object!\n",
-	csGetLastOffender ());
+    TokenError ("a mesh object");
     fatal_exit (0, false);
   }
 
@@ -2090,9 +1662,7 @@ bool csLoader::LoadTerrainObjectFactory (iTerrainFactoryWrapper* pWrapper,
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    System->Printf (MSG_WARNING,
-    	"Token '%s' not found while parsing the a terrain factory!\n",
-        csGetLastOffender ());
+    TokenError ("a terrain factory");
     fatal_exit (0, false);
   }
 
@@ -2129,7 +1699,7 @@ bool csLoader::LoadTerrainObject (iTerrainWrapper *pWrapper,
     switch (cmd)
     {
       case CS_TOKEN_KEY:
-        load_key (params, pWrapper->QueryObject());
+        ParseKey (params, pWrapper->QueryObject());
         break;
       case CS_TOKEN_ADDON:
 	LoadAddOn (params, pWrapper);
@@ -2175,9 +1745,7 @@ bool csLoader::LoadTerrainObject (iTerrainWrapper *pWrapper,
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    System->Printf (MSG_WARNING,
-    	"Token '%s' not found while parsing the mesh object!\n",
-	csGetLastOffender ());
+    TokenError ("a terrain object");
     fatal_exit (0, false);
   }
 
@@ -2235,9 +1803,7 @@ bool csLoader::LoadAddOn (char* buf, iBase* context)
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    System->Printf (MSG_WARNING,
-    	"Token '%s' not found while parsing the plugin!\n",
-	csGetLastOffender ());
+    TokenError ("an add-on");
     fatal_exit (0, false);
   }
 
@@ -2293,9 +1859,7 @@ Use BACK2FRONT, FRONT2BACK, or NONE\n", sorting);
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    System->Printf (MSG_WARNING,
-    	"Token '%s' not found while parsing the render priorities!\n",
-	csGetLastOffender ());
+    TokenError ("the render priorities");
     fatal_exit (0, false);
   }
 
@@ -2420,6 +1984,12 @@ bool csLoader::Initialize(iSystem *iSys)
 void csLoader::SetMode (int iFlags)
 {
   flags = iFlags;
+}
+
+void csLoader::TokenError (const char *Object)
+{
+  System->Printf (MSG_WARNING, "Token '%s' not found while parsing a %s!",
+    csGetLastOffender (), Object);
 }
 
 //--- Image and Texture loading ----------------------------------------------
@@ -2682,7 +2252,7 @@ bool csLoader::ParseColor (char *buf, csRGBcolor &c)
   return true;
 }
 
-//--- Parsing of Textures and Materials -------------------------------------
+//--- Parsing of Engine Objects ---------------------------------------------
 
 iTextureWrapper* csLoader::ParseTexture (char *name, char* buf)
 {
@@ -2768,9 +2338,7 @@ iTextureWrapper* csLoader::ParseTexture (char *name, char* buf)
 
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    System->Printf (MSG_WARNING,
-    	"Token '%s' not found while parsing a texture specification!\n",
-	csGetLastOffender ());
+    TokenError ("a texture specification");
     return NULL;
   }
 
@@ -2907,7 +2475,7 @@ iMaterialWrapper* csLoader::ParseMaterial (char *name, char* buf, const char *pr
 
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    System->Printf (MSG_WARNING, "Token '%s' not found while parsing a material specification!\n", csGetLastOffender ());
+    TokenError ("a material specification");
     return NULL;
   }
 
@@ -2932,4 +2500,400 @@ iMaterialWrapper* csLoader::ParseMaterial (char *name, char* buf, const char *pr
   material->DecRef ();
 
   return mat;
+}
+
+iCollection* csLoader::ParseCollection (char* name, char* buf)
+{
+  CS_TOKEN_TABLE_START(commands)
+    CS_TOKEN_TABLE (ADDON)
+    CS_TOKEN_TABLE (MESHOBJ)
+    CS_TOKEN_TABLE (COLLECTION)
+    CS_TOKEN_TABLE (LIGHT)
+    CS_TOKEN_TABLE (SECTOR)
+  CS_TOKEN_TABLE_END
+
+  char* xname;
+  long cmd;
+  char* params;
+
+  iCollection* collection = Engine->CreateCollection(name);
+
+  char str[255];
+  while ((cmd = csGetObject (&buf, commands, &xname, &params)) > 0)
+  {
+    if (!params)
+    {
+      System->Printf (MSG_WARNING, "Expected parameters instead of '%s'!\n", buf);
+      return NULL;
+    }
+    str[0] = 0;
+    switch (cmd)
+    {
+      case CS_TOKEN_ADDON:
+        System->Printf (MSG_WARNING, "ADDON not yet supported in collection!\n");
+      	break;
+      case CS_TOKEN_MESHOBJ:
+        {
+# if 0
+//@@@@@@
+          ScanStr (params, "%s", str);
+	  iMeshWrapper* spr = Engine->FindMeshObject (str, ResolveOnlyRegion);
+          if (!spr)
+            System->Printf (MSG_WARNING, "Mesh object '%s' not found!\n", str);
+	  else
+            collection->AddObject (spr->QueryObject());
+# endif
+        }
+        break;
+      case CS_TOKEN_LIGHT:
+        {
+          ScanStr (params, "%s", str);
+	  iStatLight* l = Engine->FindLight (str, ResolveOnlyRegion);
+          if (!l)
+            System->Printf (MSG_WARNING, "Light '%s' not found!\n", str);
+	  else
+	    collection->AddObject (l->QueryObject ());
+        }
+        break;
+      case CS_TOKEN_SECTOR:
+        {
+          ScanStr (params, "%s", str);
+	  iSector* s = Engine->FindSector (str, ResolveOnlyRegion);
+          if (!s)
+            System->Printf (MSG_WARNING, "Sector '%s' not found!\n", str);
+	  else
+            collection->AddObject (s->QueryObject ());
+        }
+        break;
+      case CS_TOKEN_COLLECTION:
+        {
+          ScanStr (params, "%s", str);
+	  //@@@$$$ TODO: Collection in regions.
+          iCollection* th = Engine->FindCollection(str, ResolveOnlyRegion);
+          if (!th)
+            System->Printf (MSG_WARNING, "Collection '%s' not found!\n", str);
+	  else
+            collection->AddObject (th->QueryObject());
+        }
+        break;
+    }
+  }
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+    TokenError ("a collection");
+
+  return collection;
+}
+
+iStatLight* csLoader::ParseStatlight (char* name, char* buf)
+{
+  CS_TOKEN_TABLE_START(commands)
+    CS_TOKEN_TABLE (ATTENUATION)
+    CS_TOKEN_TABLE (CENTER)
+    CS_TOKEN_TABLE (RADIUS)
+    CS_TOKEN_TABLE (DYNAMIC)
+    CS_TOKEN_TABLE (COLOR)
+    CS_TOKEN_TABLE (HALO)
+    CS_TOKEN_TABLE (KEY)
+  CS_TOKEN_TABLE_END
+
+  long cmd;
+  char* params;
+
+  Stats->lights_loaded++;
+  float x, y, z, dist = 0, r, g, b;
+  int cnt;
+  bool dyn;
+  int attenuation = CS_ATTN_LINEAR;
+  char str [100];
+  struct csHaloDef
+  {
+    int type;
+    union
+    {
+      struct
+      {
+        float Intensity;
+        float Cross;
+      } cross;
+      struct
+      {
+        int Seed;
+        int NumSpokes;
+        float Roundness;
+      } nova;
+    };
+  } halo;
+
+  // This csObject will contain all key-value pairs as children
+  csObject Keys;
+
+  memset (&halo, 0, sizeof (halo));
+
+  if (strchr (buf, ':'))
+  {
+    // Still support old format for backwards compatibility.
+    int d;
+    ScanStr (buf, "%f,%f,%f:%f,%f,%f,%f,%d",
+          &x, &y, &z, &dist, &r, &g, &b, &d);
+    dyn = bool (d);
+  }
+  else
+  {
+    // New format.
+    x = y = z = 0;
+    dist = 1;
+    r = g = b = 1;
+    dyn = false;
+    while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
+    {
+      switch (cmd)
+      {
+        case CS_TOKEN_RADIUS:
+          ScanStr (params, "%f", &dist);
+          break;
+        case CS_TOKEN_CENTER:
+          ScanStr (params, "%f,%f,%f", &x, &y, &z);
+          break;
+        case CS_TOKEN_COLOR:
+          ScanStr (params, "%f,%f,%f", &r, &g, &b);
+          break;
+        case CS_TOKEN_DYNAMIC:
+          dyn = true;
+          break;
+        case CS_TOKEN_KEY:
+          ParseKey (params, &Keys);
+          break;
+        case CS_TOKEN_HALO:
+	  str[0] = 0;
+          cnt = ScanStr (params, "%s", str);
+          if (cnt == 0 || !strncmp (str, "CROSS", 5))
+          {
+            params = strchr (str, ',');
+            if (params) params++;
+defaulthalo:
+            halo.type = 1;
+            halo.cross.Intensity = 2.0; halo.cross.Cross = 0.45;
+            if (params)
+              ScanStr (params, "%f,%f", &halo.cross.Intensity, &halo.cross.Cross);
+          }
+          else if (!strncmp (str, "NOVA", 5))
+          {
+            params = strchr (str, ',');
+            if (params) params++;
+            halo.type = 2;
+            halo.nova.Seed = 0; halo.nova.NumSpokes = 100; halo.nova.Roundness = 0.5;
+            if (params)
+              ScanStr (params, "%d,%d,%f", &halo.nova.Seed, &halo.nova.NumSpokes, &halo.nova.Roundness);
+          }
+          else
+            goto defaulthalo;
+          break;
+        case CS_TOKEN_ATTENUATION:
+          ScanStr (params, "%s", str);
+          if (strcmp (str, "none")      == 0) attenuation = CS_ATTN_NONE;
+          if (strcmp (str, "linear")    == 0) attenuation = CS_ATTN_LINEAR;
+          if (strcmp (str, "inverse")   == 0) attenuation = CS_ATTN_INVERSE;
+          if (strcmp (str, "realistic") == 0) attenuation = CS_ATTN_REALISTIC;
+      }
+    }
+    if (cmd == CS_PARSERR_TOKENNOTFOUND)
+    {
+      TokenError ("a light");
+      return false;
+    }
+  }
+
+  // implicit radius
+  if (dist == 0)
+  {
+    if (r > g && r > b) dist = r;
+    else if (g > b) dist = g;
+    else dist = b;
+    switch (attenuation)
+    {
+      case CS_ATTN_NONE      : dist = 100000000; break;
+      case CS_ATTN_LINEAR    : break;
+      case CS_ATTN_INVERSE   : dist = 16 * sqrt (dist); break;
+      case CS_ATTN_REALISTIC : dist = 256 * dist; break;
+    }
+  }
+
+  iStatLight* l = Engine->CreateLight (name, csVector3(x, y, z), dist, csColor(r, g, b), dyn);
+  switch (halo.type)
+  {
+    case 1:
+      l->QueryLight ()->CreateCrossHalo (halo.cross.Intensity, halo.cross.Cross);
+      break;
+    case 2:
+      l->QueryLight ()->CreateNovaHalo (halo.nova.Seed, halo.nova.NumSpokes, halo.nova.Roundness);
+      break;
+  }
+  l->QueryLight ()->SetAttenuation (attenuation);
+
+  // Move the key-value pairs from 'Keys' to the light object
+  l->QueryObject ()->ObjAddChildren (&Keys);
+  Keys.ObjRemoveAll ();
+
+  return l;
+}
+
+iKeyValuePair* csLoader::ParseKey (char* buf, iObject* pParent)
+{
+  char Key  [256];
+  char Value[10000]; //Value can potentially grow _very_ large.
+  if (ScanStr(buf, "%S,%S", Key, Value) == 2)
+  {
+    iKeyValuePair* kvp = Engine->CreateKeyValuePair (Key, Value);
+    if (pParent)
+      pParent->ObjAdd (kvp->QueryObject ());
+    return kvp;
+  }
+  else
+  {
+    System->Printf (MSG_WARNING, "Illegal Syntax for KEY() command in line %d\n",
+    	csGetParserLine());
+    return NULL;
+  }
+}
+
+iMapNode* csLoader::ParseNode (char* name, char* buf, iSector* sec)
+{
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (ADDON)
+    CS_TOKEN_TABLE (KEY)
+    CS_TOKEN_TABLE (POSITION)
+  CS_TOKEN_TABLE_END
+
+  iMapNode* pNode = Engine->CreateMapNode (name);
+  pNode->SetSector (sec);
+
+  long  cmd;
+  char* xname;
+  char* params;
+
+  float x = 0;
+  float y = 0;
+  float z = 0;
+
+  while ((cmd = csGetObject (&buf, commands, &xname, &params)) > 0)
+  {
+    if (!params)
+    {
+      System->Printf (MSG_WARNING, "Expected parameters instead of '%s'!\n", buf);
+      break;
+    }
+    switch (cmd)
+    {
+      case CS_TOKEN_ADDON:
+        System->Printf (MSG_WARNING, "ADDON not yet supported in node!\n");
+      	break;
+      case CS_TOKEN_KEY:
+        ParseKey (params, pNode->QueryObject ());
+        break;
+      case CS_TOKEN_POSITION:
+        ScanStr (params, "%f,%f,%f", &x, &y, &z);
+        break;
+      default:
+        abort ();
+        break;
+    }
+  }
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+    TokenError ("a node");
+
+  pNode->SetPosition(csVector3(x,y,z));
+
+  return pNode;
+}
+
+iSector* csLoader::ParseSector (char* secname, char* buf)
+{
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (ADDON)
+    CS_TOKEN_TABLE (CULLER)
+    CS_TOKEN_TABLE (FOG)
+    CS_TOKEN_TABLE (LIGHT)
+    CS_TOKEN_TABLE (MESHOBJ)
+    CS_TOKEN_TABLE (TERRAINOBJ)
+    CS_TOKEN_TABLE (NODE)
+    CS_TOKEN_TABLE (KEY)
+  CS_TOKEN_TABLE_END
+
+  char* name;
+  long cmd;
+  char* params;
+
+  bool do_culler = false;
+  char bspname[100];
+
+  iSector *sector = Engine->CreateSector (secname);
+  Stats->sectors_loaded++;
+
+  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  {
+    if (!params)
+    {
+      System->Printf (MSG_WARNING, "Expected parameters instead of '%s'!\n", buf);
+      break;
+    }
+    switch (cmd)
+    {
+      case CS_TOKEN_ADDON:
+	LoadAddOn (params, sector);
+      	break;
+      case CS_TOKEN_CULLER:
+	if (!ScanStr (params, "%s", bspname))
+	{
+          System->Printf (MSG_WARNING,
+	  	"CULLER expects the name of a mesh object!\n");
+	} else
+          do_culler = true;
+        break;
+      case CS_TOKEN_MESHOBJ:
+        {
+	  iMeshWrapper* mesh = Engine->CreateMeshObject(name);
+          LoadMeshObject (mesh, params);
+          mesh->GetMovable ()->SetSector (sector);
+	  mesh->GetMovable ()->UpdateMove ();
+        }
+        break;
+      case CS_TOKEN_TERRAINOBJ:
+        {
+	  iTerrainWrapper *terr = Engine->CreateTerrainObject(name);
+          LoadTerrainObject (terr, params, sector);
+        }
+        break;
+      case CS_TOKEN_LIGHT:
+        sector->AddLight ( ParseStatlight(name, params) );
+        break;
+      case CS_TOKEN_NODE:
+        {
+          iMapNode *n = ParseNode(name, params, sector);
+	  if (n)
+	  {
+            sector->QueryObject ()->ObjAdd (n->QueryObject ());
+	    n->DecRef ();
+	  }
+	}
+        break;
+      case CS_TOKEN_FOG:
+        {
+          csFog *f = sector->GetFog ();
+          f->enabled = true;
+          ScanStr (params, "%f,%f,%f,%f", &f->red, &f->green, &f->blue, &f->density);
+        }
+        break;
+      case CS_TOKEN_KEY:
+      {
+        ParseKey(params, sector->QueryObject());
+        break;
+      }
+    }
+  }
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+    TokenError ("a sector");
+
+  if (!(flags & CS_LOADER_NOBSP))
+    if (do_culler) sector->SetVisibilityCuller (bspname);
+  return sector;
 }

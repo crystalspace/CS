@@ -76,6 +76,9 @@ public:
   /// Deletes all objects, removing them from the object tree
   virtual void ObjRemoveAll ();
 
+  /// Add all child objects of the given object
+  virtual void ObjAddChildren (iObject *Parent);
+
   /**
    * Look for a child object that implements the given interface. You can
    * optionally pass a name to look for. If FirstName is true then the

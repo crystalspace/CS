@@ -108,17 +108,21 @@ class csLoader : public iLoader
   iTextureWrapper* ParseTexture (char *name, char* buf);
   /// Parse a material definition and add the material to the engine
   iMaterialWrapper* ParseMaterial (char *name, char* buf, const char* prefix = NULL);
+  /// Parse a collection definition and add the collection to the engine
+  iCollection* ParseCollection (char* name, char* buf);
+  /// Parse a static light definition and add the light to the engine
+  iStatLight* ParseStatlight (char* name, char* buf);
+  /// Parse a key definition and add the key to the given object
+  iKeyValuePair* ParseKey (char* buf, iObject* pParent);
+  /// Parse a map node definition and add the node to the given sector
+  iMapNode* ParseNode (char* name, char* buf, iSector* sec);
+  /// Parse a sector definition and add the sector to the engine
+  iSector* ParseSector (char* name, char* buf);
 
   /// -----------------------------------------------------------------------
 
-  /// Parse a collection definition and add it to the engine
-  iCollection* load_collection (char* name, char* buf);
-  /// Parse a static light definition and return a new object
-  iStatLight* load_statlight (char* name, char* buf);
-  /// Parse a key definition and return a new object
-  iKeyValuePair* load_key (char* buf, iObject* pParent);
-  /// Parse a map node definition and return a new object
-  iMapNode* load_node (char* name, char* buf, iSector* sec);
+  /// parse a texture mixing mode specification
+  UInt ParseMixmode (char* buf);
 
   /// For heightgen.
   csGenerateImageTexture* heightgen_txt_process (char* buf);
@@ -126,9 +130,6 @@ class csLoader : public iLoader
   csGenerateImageValue* heightgen_value_process (char* buf);
   /// Parse and load a height texture
   void heightgen_process (char* buf);
-
-  /// Parse a sector definition and return a new object
-  iSector* load_sector (char* secname, char* buf);
 
   /// Resolve the portals of a thing
   void ResolvePortalSectors (iThingState *Mesh);
@@ -197,6 +198,13 @@ class csLoader : public iLoader
 
   /// Find a material (and create one from texture if possible)
   iMaterialWrapper* FindMaterial (const char *iName);
+
+  /**
+   * Print an error about an unknown token. 'object' is the type of object
+   * that was just being parsed, e.g. "a sector". This function will get
+   * the unknown token from csGetLastOffender ().
+   */
+  void TokenError (const char *Object);
 
 public:
   /********** iLoader implementation **********/

@@ -211,6 +211,17 @@ void csObject::ObjRemoveAll ()
   Children->DeleteAll ();
 }
 
+void csObject::ObjAddChildren (iObject *Parent)
+{
+  iObjectIterator *it = Parent->GetIterator ();
+  while (!it->IsFinished ())
+  {
+    ObjAdd (it->GetObject ());
+    it->Next ();
+  }
+  it->DecRef ();
+}
+
 void* csObject::GetChild (int InterfaceID, int Version,
 	const char *Name, bool fn) const
 {

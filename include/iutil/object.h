@@ -105,6 +105,9 @@ struct iObject : public iBase
   /// Remove all child objects.
   virtual void ObjRemoveAll () = 0;
 
+  /// Add all child objects of the given object
+  virtual void ObjAddChildren (iObject *Parent) = 0;
+
   /**
    * Look for a child object that implements the given interface. You can
    * optionally pass a name to look for. If FirstName is true then the
