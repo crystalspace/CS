@@ -9,6 +9,9 @@ LOCATE.DOCS ?= $(BUILDTOP)/out ;
 
 SUBDIRRULES += FixSubDirPath ;
 
+CMD.MKDIR ?= mkdir ;
+CMD.MKDIRS ?= "$(CMD.MKDIR) -p" ;
+
 rule FixSubDirPath
 {
     LOCATE_SOURCE = [ FDirName $(LOCATE.OBJECTS) $(SUBDIR_TOKENS) ] ;
