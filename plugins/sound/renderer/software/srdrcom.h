@@ -61,8 +61,6 @@ public:
 	iSystem* m_piSystem;
 	iSoundDriver *m_piSoundDriver;
 	
-	/// print to the system's device
-	void SysPrintf(int mode, char* str, ...);
 private:
 	/// list of all stored channels
 	Channel *AllChannels;

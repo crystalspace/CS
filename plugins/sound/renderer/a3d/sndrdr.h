@@ -60,9 +60,6 @@ public:
 	IA3d4 *m_p3DAudioRenderer;
 	iSystem* m_piSystem;
 	
-	/// print to the system's device
-	void SysPrintf(int mode, char* str, ...);
-	
 	csSoundListenerA3D* m_pListener;
 };
 

@@ -97,7 +97,7 @@ bool csSoundRenderSoftware::Initialize (iSystem *iSys)
   
 	if ( NULL == m_piSoundDriver )
 	{	
-		SysPrintf(MSG_FATAL_ERROR, "Error! Cant find sound driver %s.\n", szSoundDriver);
+		m_piSystem->Printf(MSG_FATAL_ERROR, "Error! Cant find sound driver %s.\n", szSoundDriver);
 		exit(0);
 	}
 	
@@ -192,14 +192,14 @@ int csSoundRenderSoftware::getFrequency()
 
 bool csSoundRenderSoftware::Open()
 {
-	SysPrintf (MSG_INITIALIZATION, "\nSoundRender Software selected\n");
+	m_piSystem->Printf (MSG_INITIALIZATION, "\nSoundRender Software selected\n");
 	
 	m_piSoundDriver->Open(this,
 		configsndsoft->GetInt("SoundRender.software", "FREQUENCY", 22050),
 		configsndsoft->GetInt("SoundRender.software", "16BITS", true),
 		configsndsoft->GetInt("SoundRender.software", "STEREO", true));
 	
-	SysPrintf (MSG_INITIALIZATION, " Use %d mixing channels maximum\n", numberChannels);
+	m_piSystem->Printf (MSG_INITIALIZATION, " Use %d mixing channels maximum\n", numberChannels);
 	
 	return true;
 }
@@ -415,18 +415,6 @@ void csSoundRenderSoftware::MixingFunction()
 	killChannels ();
 	
 	m_piSoundDriver->UnlockMemory();
-}
-
-void csSoundRenderSoftware::SysPrintf(int mode, char* szMsg, ...)
-{
-	char buf[1024];
-	va_list arg;
-	
-	va_start (arg, szMsg);
-	vsprintf (buf, szMsg, arg);
-	va_end (arg);
-	
-	m_piSystem->Printf(mode, buf);
 }
 
 void csSoundRenderSoftware::addChannel (Channel *c)

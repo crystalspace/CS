@@ -103,7 +103,7 @@ bool csSoundRenderA3D::Open()
 {
 	HRESULT hr;
 	
-	SysPrintf (MSG_INITIALIZATION, "\nSoundRender Aureal3D selected\n");
+	m_piSystem->Printf (MSG_INITIALIZATION, "\nSoundRender Aureal3D selected\n");
 	
 	CoInitialize(NULL);
 	
@@ -111,21 +111,21 @@ bool csSoundRenderA3D::Open()
 		IID_IA3d4, (void **)&m_p3DAudioRenderer);
 	if (FAILED(hr))
 	{
-		SysPrintf(MSG_FATAL_ERROR, "Error : Cannot CoCreateInstance Aureal3D Api !");
+		m_piSystem->Printf(MSG_FATAL_ERROR, "Error : Cannot CoCreateInstance Aureal3D Api !");
 		Close();
 		return false;
 	}
 	
 	if (FAILED(hr = m_p3DAudioRenderer->Init(NULL, NULL, A3DRENDERPREFS_DEFAULT)))
 	{
-		SysPrintf(MSG_FATAL_ERROR, "Error : Cannot Initialize Aureal3D !");
+		m_piSystem->Printf(MSG_FATAL_ERROR, "Error : Cannot Initialize Aureal3D !");
 		Close();
 		return false;
 	}
 	
 	if (FAILED(hr = m_p3DAudioRenderer->SetCooperativeLevel(GetForegroundWindow(), A3D_CL_NORMAL)))
 	{
-		SysPrintf(MSG_FATAL_ERROR, "Error : Cannot Set Cooperative Level!");
+		m_piSystem->Printf(MSG_FATAL_ERROR, "Error : Cannot Set Cooperative Level!");
 		Close();
 		return false;
 	}
@@ -183,14 +183,3 @@ void csSoundRenderA3D::PlayEphemeral(csSoundData *snd, bool loop)
 	}
 }
 
-void csSoundRenderA3D::SysPrintf(int mode, char* szMsg, ...)
-{
-	char buf[1024];
-	va_list arg;
-	
-	va_start (arg, szMsg);
-	vsprintf (buf, szMsg, arg);
-	va_end (arg);
-	
-	m_piSystem->Print(mode, buf);
-}

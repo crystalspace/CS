@@ -107,11 +107,11 @@ bool csSoundRenderEAX::Open()
 {
 	HRESULT hr;
 	
-	SysPrintf (MSG_INITIALIZATION, "\nSoundRender DirectSound3D with EAX selected\n");
+	m_piSystem->Printf (MSG_INITIALIZATION, "\nSoundRender DirectSound3D with EAX selected\n");
 	
 	if (FAILED(hr = EAXDirectSoundCreate(NULL, &m_p3DAudioRenderer, NULL)))
 	{
-		SysPrintf(MSG_FATAL_ERROR, "Error : Cannot Initialize DirectSound3D !");
+		m_piSystem->Printf(MSG_FATAL_ERROR, "Error : Cannot Initialize DirectSound3D !");
 		Close();
 		return false;
 	}
@@ -119,7 +119,7 @@ bool csSoundRenderEAX::Open()
 	DWORD dwLevel = DSSCL_NORMAL;
 	if (FAILED(hr = m_p3DAudioRenderer->SetCooperativeLevel(GetForegroundWindow(), dwLevel)))
 	{
-		SysPrintf(MSG_FATAL_ERROR, "Error : Cannot Set Cooperative Level!");
+		m_piSystem->Printf(MSG_FATAL_ERROR, "Error : Cannot Set Cooperative Level!");
 		Close();
 		return(hr);
 	}
@@ -128,7 +128,7 @@ bool csSoundRenderEAX::Open()
 	
 	if(!m_pListener->m_pDS3DPrimaryBuffer)
 	{
-		SysPrintf(MSG_FATAL_ERROR, "Error : Listener isn't initialized !");
+		m_piSystem->Printf(MSG_FATAL_ERROR, "Error : Listener isn't initialized !");
 		Close();
 		return false;
 	}
@@ -178,14 +178,3 @@ float csSoundRenderEAX::GetVolume()
 	return (float)(dsvol-DSBVOLUME_MIN)/(float)(DSBVOLUME_MAX-DSBVOLUME_MIN);
 }
 
-void csSoundRenderEAX::SysPrintf(int mode, char* szMsg, ...)
-{
-	char buf[1024];
-	va_list arg;
-	
-	va_start (arg, szMsg);
-	vsprintf (buf, szMsg, arg);
-	va_end (arg);
-	
-	m_piSystem->Print(mode, buf);
-}

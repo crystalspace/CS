@@ -59,9 +59,6 @@ public:
 	LPDIRECTSOUND		m_p3DAudioRenderer;
 	iSystem* m_piSystem;
 	
-	/// print to the system's device
-	void SysPrintf(int mode, char* str, ...);
-	
 	csSoundListenerDS3D* m_pListener;
 };
 

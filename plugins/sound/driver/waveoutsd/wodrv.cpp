@@ -81,7 +81,7 @@ csSoundDriverWaveOut::csSoundDriverWaveOut(iBase *piBase)
 
 csSoundDriverWaveOut::~csSoundDriverWaveOut()
 {
-	SysPrintf (MSG_CONSOLE, "\nSoundDriver Destructor !!!!\n");
+	m_piSystem->Printf (MSG_CONSOLE, "\nSoundDriver Destructor !!!!\n");
 }
 
 bool csSoundDriverWaveOut::Initialize (iSystem *iSys)
@@ -92,12 +92,12 @@ bool csSoundDriverWaveOut::Initialize (iSystem *iSys)
 
 bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16, bool stereo)
 {
-  SysPrintf (MSG_INITIALIZATION, "\nSoundDriver waveOut selected\n");
+  m_piSystem->Printf (MSG_INITIALIZATION, "\nSoundDriver waveOut selected\n");
 
   m_piSoundRender = render;
   m_piSoundRender->IncRef();
 
-  SysPrintf (MSG_INITIALIZATION, "\nRender = %d\n",m_piSoundRender);
+  m_piSystem->Printf (MSG_INITIALIZATION, "\nRender = %d\n",m_piSoundRender);
 
   iVFS* v = m_piSystem->GetVFS();
   configwodrv = new csIniFile (v, "/config/wodrv.cfg");
@@ -142,7 +142,7 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16,
   // Open the playback device
   if(threading)
   {
-    SysPrintf (MSG_INITIALIZATION, "SoundDriver use thread method\n");
+    m_piSystem->Printf (MSG_INITIALIZATION, "SoundDriver use thread method\n");
     hThread = CreateThread(NULL, 0, &waveOutThreadProc, this, 0, &dwThread);
     if(hThread)
     {
@@ -150,7 +150,7 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16,
         if(stricmp(ThreadPriority[p].name, thread_func) == 0)
         {
           if(SetThreadPriority(hThread, ThreadPriority[p].priority)!=0)
-            SysPrintf (MSG_INITIALIZATION, "SoundDriver thread set to %s priority\n", ThreadPriority[p].name);
+            m_piSystem->Printf (MSG_INITIALIZATION, "SoundDriver thread set to %s priority\n", ThreadPriority[p].name);
           break;
         }
       res = waveOutOpen(&hwo, WAVE_MAPPER, &format, (LONG)dwThread, 0L, CALLBACK_THREAD);
@@ -160,7 +160,7 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16,
   }
   else
   {
-    SysPrintf (MSG_INITIALIZATION, "SoundDriver use function callback method\n");
+    m_piSystem->Printf (MSG_INITIALIZATION, "SoundDriver use function callback method\n");
     res=waveOutOpen(&hwo, WAVE_MAPPER, &format, (LONG)&waveOutProc, 0L, CALLBACK_FUNCTION);
   }
   if(res!=MMSYSERR_NOERROR)
@@ -168,31 +168,31 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16,
     switch(res)
     {
       case MYMMSYSERR_NOCREATETHREAD:
-        SysPrintf (MSG_FATAL_ERROR, "WaveOut error : Cannot create thread !");
+        m_piSystem->Printf (MSG_FATAL_ERROR, "WaveOut error : Cannot create thread !");
         break;
 
       case MMSYSERR_ALLOCATED:
-        SysPrintf (MSG_FATAL_ERROR, "WaveOut error : Ressource already allocated by an other program !");
+        m_piSystem->Printf (MSG_FATAL_ERROR, "WaveOut error : Ressource already allocated by an other program !");
         break;
 
       case MMSYSERR_BADDEVICEID:
-        SysPrintf (MSG_FATAL_ERROR, "WaveOut error : Bad device !");
+        m_piSystem->Printf (MSG_FATAL_ERROR, "WaveOut error : Bad device !");
         break;
 
       case MMSYSERR_NODRIVER:
-        SysPrintf (MSG_FATAL_ERROR, "WaveOut error : there is no device !");
+        m_piSystem->Printf (MSG_FATAL_ERROR, "WaveOut error : there is no device !");
         break;
 
       case MMSYSERR_NOMEM:
-        SysPrintf (MSG_FATAL_ERROR, "WaveOut error : Unable to allocate memory !");
+        m_piSystem->Printf (MSG_FATAL_ERROR, "WaveOut error : Unable to allocate memory !");
         break;
 
       case WAVERR_BADFORMAT:
-        SysPrintf (MSG_FATAL_ERROR, "WaveOut error : Unsupported audio format !");
+        m_piSystem->Printf (MSG_FATAL_ERROR, "WaveOut error : Unsupported audio format !");
         break;
 
       default:
-        SysPrintf (MSG_FATAL_ERROR, "WaveOut error : Inknown Error !");
+        m_piSystem->Printf (MSG_FATAL_ERROR, "WaveOut error : Inknown Error !");
         break;
     }
     return E_FAIL;
@@ -206,13 +206,13 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16,
   {
     if (MixChunk())
     {
-      SysPrintf (MSG_INITIALIZATION, "SoundDriver initialized to %d Hz %d bits %s\n",
+      m_piSystem->Printf (MSG_INITIALIZATION, "SoundDriver initialized to %d Hz %d bits %s\n",
         m_nFrequency, (m_b16Bits)?16:8, (m_bStereo)?"Stereo":"Mono");
       return S_OK;
     }
   }
 
-  SysPrintf (MSG_FATAL_ERROR, "WaveOut error : Error then prepare chunk");
+  m_piSystem->Printf (MSG_FATAL_ERROR, "WaveOut error : Error then prepare chunk");
   return E_FAIL;
 }
 
@@ -290,18 +290,6 @@ bool csSoundDriverWaveOut::IsHandleVoidSound()
 int csSoundDriverWaveOut::GetFrequency()
 {
   return m_nFrequency;
-}
-
-void csSoundDriverWaveOut::SysPrintf(int mode, char* szMsg, ...)
-{
-  char buf[1024];
-  va_list arg;
-  
-  va_start (arg, szMsg);
-  vsprintf (buf, szMsg, arg);
-  va_end (arg);
-  
-  m_piSystem->Printf(mode, buf);
 }
 
 static bool are_you_playing = false;

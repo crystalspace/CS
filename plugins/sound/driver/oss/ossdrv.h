@@ -95,8 +95,6 @@ public:
   int GetFrequency();
   bool IsHandleVoidSound();
   
-  /// print to the system's device
-  void SysPrintf(int mode, char* str, ...);
 private:
   // used to setup timer when background=true (not currently used)
   bool SetupTimer( int nTimesPerSecond );

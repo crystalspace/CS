@@ -59,10 +59,7 @@ public:
   bool IsStereo();
   int GetFrequency();
   bool IsHandleVoidSound();
-
-  /// print to the system's device
-  void SysPrintf(int mode, char* str, ...);
-  
+ 
   void SndDoubleBackProc( SndChannelPtr channel, SndDoubleBufferPtr doubleBuffer );
   
  private:

@@ -53,8 +53,6 @@ public:
 	int GetFrequency();
 	bool IsHandleVoidSound();
 	
-	/// print to the system's device
-	void SysPrintf(int mode, char* str, ...);
 protected:
   iSystem* m_piSystem;
   iSoundRender *m_piSoundRender;

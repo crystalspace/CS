@@ -271,7 +271,7 @@ bool csSoundDriverOSS::Initialize(iSystem *iSys)
 
 bool csSoundDriverOSS::Open(iSoundRender *render, int frequency, bool bit16, bool stereo)
 {
-  SysPrintf (MSG_INITIALIZATION, "\nSoundDriver OSS selected\n");
+  m_piSystem->Printf (MSG_INITIALIZATION, "\nSoundDriver OSS selected\n");
 
   m_piSoundRender = render;
 
@@ -292,7 +292,7 @@ bool csSoundDriverOSS::Open(iSoundRender *render, int frequency, bool bit16, boo
 	return false;
   }
 
-  SysPrintf (MSG_INITIALIZATION, "Sound initialized to %d Hz %d bits %s\n", m_nFrequency, (m_b16Bits)?16:8, (m_bStereo)?"Stereo":"Mono");
+  m_piSystem->Printf (MSG_INITIALIZATION, "Sound initialized to %d Hz %d bits %s\n", m_nFrequency, (m_b16Bits)?16:8, (m_bStereo)?"Stereo":"Mono");
     
   return true;
 }
@@ -329,14 +329,3 @@ bool csSoundDriverOSS::Is16Bits() { return  m_b16Bits; }
 bool csSoundDriverOSS::IsStereo() { return m_bStereo; }
 int csSoundDriverOSS::GetFrequency() { return m_nFrequency; }
 
-void csSoundDriverOSS::SysPrintf(int mode, char* szMsg, ...)
-{
-  char buf[1024];
-  va_list arg;
-  
-  va_start (arg, szMsg);
-  vsprintf (buf, szMsg, arg);
-  va_end (arg);
-  
-  m_piSystem->Printf(mode, buf);
-}

@@ -71,7 +71,7 @@ bool csSoundDriverMac::Initialize(iSystem *iSys)
 
 bool csSoundDriverMac::Open(iSoundRender *render, int frequency, bool bit16, bool stereo)
 {
-  SysPrintf (MSG_INITIALIZATION, "\nSoundDriver Mac selected\n");
+  m_piSystem->Printf (MSG_INITIALIZATION, "\nSoundDriver Mac selected\n");
   
   m_piSoundRender = render;
   OSErr	theError;
@@ -95,7 +95,7 @@ bool csSoundDriverMac::Open(iSoundRender *render, int frequency, bool bit16, boo
 
   theError = SndNewChannel( &mSoundChannel, sampledSynth, outputChannels, NULL );
   if ( theError != noErr ) {
-    SysPrintf( MSG_FATAL_ERROR, "Unable to open a sound channel.");
+    m_piSystem->Printf( MSG_FATAL_ERROR, "Unable to open a sound channel.");
     return false;
   }
   
@@ -133,7 +133,7 @@ bool csSoundDriverMac::Open(iSoundRender *render, int frequency, bool bit16, boo
     mSoundChannel = NULL;
     DisposeRoutineDescriptor( mSoundDBHeader.dbhDoubleBack );
     mSoundDBHeader.dbhDoubleBack = NULL;
-    SysPrintf( MSG_FATAL_ERROR, "Unable to get the space for the sound buffer.");
+    m_piSystem->Printf( MSG_FATAL_ERROR, "Unable to get the space for the sound buffer.");
     return false;
   }
   mSoundDBHeader.dbhBufferPtr[0]->dbNumFrames = 0L;
@@ -156,7 +156,7 @@ bool csSoundDriverMac::Open(iSoundRender *render, int frequency, bool bit16, boo
     mSoundDBHeader.dbhDoubleBack = NULL;
     DisposePtr( (Ptr)mSoundDBHeader.dbhBufferPtr[0] );
     mSoundDBHeader.dbhBufferPtr[0] = NULL;
-    SysPrintf( MSG_FATAL_ERROR, "Unable to get the space for the sound buffer.");
+    m_piSystem->Printf( MSG_FATAL_ERROR, "Unable to get the space for the sound buffer.");
     return false;
   }
   mSoundDBHeader.dbhBufferPtr[1]->dbNumFrames = 0L;
@@ -181,7 +181,7 @@ bool csSoundDriverMac::Open(iSoundRender *render, int frequency, bool bit16, boo
     mSoundDBHeader.dbhBufferPtr[0] = NULL;
     DisposePtr( (Ptr)mSoundDBHeader.dbhBufferPtr[1] );
     mSoundDBHeader.dbhBufferPtr[1] = NULL;
-    SysPrintf( MSG_FATAL_ERROR, "Unable to start the sound playing.");
+    m_piSystem->Printf( MSG_FATAL_ERROR, "Unable to start the sound playing.");
     return false;
   }
   
@@ -264,18 +264,6 @@ bool csSoundDriverMac::Is16Bits() { return m_b16Bits; }
 bool csSoundDriverMac::IsStereo() { return m_bStereo; }
 int csSoundDriverMac::GetFrequency() { return m_nFrequency; }
 bool csSoundDriverMac::IsHandleVoidSound() { return false; }
-
-void csSoundDriverMac::SysPrintf(int mode, char* szMsg, ...)
-{
-	char buf[1024];
-	va_list arg;
-  
-	va_start (arg, szMsg);
-	vsprintf (buf, szMsg, arg);
-	va_end (arg);
-  
-	m_piSystem->Printf(mode, buf);
-}
 
 void csSoundDriverMac::SndDoubleBackProc(
 	SndChannelPtr		channel,

@@ -116,11 +116,11 @@ int csSoundListenerEAX::CreateListener(iSoundRender * render)
 		}
 		if(!m_bEaxSupported)
 		{
-			renderEAX->SysPrintf (MSG_INITIALIZATION, "WARNING : this device don't support EAX 2.0\n");
+			m_piSystem->Printf(MSG_INITIALIZATION, "WARNING : this device don't support EAX 2.0\n");
 		}
 	}
 	else
-		renderEAX->SysPrintf (MSG_INITIALIZATION, "WARNING : cannot get properties, this device may not support EAX\n");
+		m_piSystem->Printf(MSG_INITIALIZATION, "WARNING : cannot get properties, this device may not support EAX\n");
 	
 	return S_OK;
 }
