@@ -32,8 +32,8 @@ The Crystal Space Developer's Project page is located at:
 @uref{http://sourceforge.net/projects/crystal/}
 
 @noindent
-The released Crystal Space packages can be downloaded directly via @sc{ftp}
-from the following locations:
+The released Crystal Space packages can be downloaded via @sc{http}
+from the following location:
 
 @uref{http://sourceforge.net/project/showfiles.php?group_id=649}
 
