@@ -7,7 +7,7 @@ DESCRIPTION.OS.win32gcc = Win32
 # Choose which drivers you want to build/use
 PLUGINS += sound/renderer/software
 PLUGINS += video/canvas/ddraw
-PLUGINS += video/canvas/ddraw8
+#PLUGINS += video/canvas/ddraw8
 #PLUGINS +=video/format/avi
 #PLUGINS +=video/format/codecs/opendivx
 
