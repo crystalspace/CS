@@ -48,6 +48,11 @@ The history order is reversed so that new features are at the top.
 	  registration to odivx4.csplugin.
 	- Eric Sunshine added missing crystalspace.video.codec.avi.RLE
 	  registration to rlecodec.csplugin.
+	- Oktal added an Event->IncRef() to csEventQueue::Post() that will
+	  only be triggered if the event is from the event pool, otherwise
+	  when the caller's reference to the event goes out of scope, the
+	  event will be removed from the queue and returned to the pool.
+	  This problem was evident in the network manager.
 3-June-2003
 	- Philipp Aumayr fixed the fancycon bug, where the borders
 	  were visibile in SW but not in GL mode. (wrong mixmode at line

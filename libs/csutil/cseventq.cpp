@@ -104,6 +104,7 @@ again:
   }
 
   EventQueue [evqHead] = Event;
+  if (Event->Pooled ()) Event->IncRef ();
   evqHead = newHead;
   Unlock ();
 }
