@@ -49,6 +49,16 @@ csGlideTextureCache::~csGlideTextureCache()
     Clear();
 }
 
+void csGlideTextureCache::Remove (iTextureHandle *texture)
+{
+  if (texture->GetCacheData ())
+  {
+    Unload ((csGlideCacheData*)texture->GetCacheData ());
+    texture->SetCacheData (NULL);
+  }
+    
+}
+
 void csGlideTextureCache::Add(iTextureHandle *texture, bool alpha)
 {
   int size = 0;
@@ -91,15 +101,13 @@ void csGlideTextureCache::Add(iTextureHandle *texture, bool alpha)
       exit(1);
     }
     // unit is not in memory. load it into the cache
+    //      printf( "load a texture of size %d,  TMU can handle %ld\n", size, cache_size );
     while ((total_size + size >= cache_size) || !manager->hasFreeSpace(size))
     {
       // out of memory. remove units from bottom of list.
       cached_texture = tail;
 
       iTextureHandle *texh = (iTextureHandle *)cached_texture->pSource;
-      total_size -= cached_texture->lSize;
-      num--;
-
       texh->SetCacheData (NULL);
       Unload(cached_texture);          // unload it.
     }
@@ -145,8 +153,6 @@ void csGlideTextureCache::Add(iPolygonTexture *polytex)
   if (polytex->RecalculateDynamicLights() && cached_texture)
   {
     piLM->SetCacheData (NULL);
-    num--;
-    total_size -= cached_texture->lSize;
     
     Unload(cached_texture);          // unload it.
     cached_texture = NULL;
@@ -181,9 +187,6 @@ void csGlideTextureCache::Add(iPolygonTexture *polytex)
 
       ilm->SetCacheData(NULL);
 
-      num--;
-      total_size -= cached_texture->lSize;
-      
       Unload(cached_texture);          // unload it.
             
     }
@@ -379,6 +382,8 @@ void csGlideTextureCache::Unload ( csGlideCacheData *d )
   if ( d->prev ) d->prev->next = d->next;
   if ( d->next ) d->next->prev = d->prev;
   manager->freeSpaceMem ( d->mempos );
+  total_size -= d->lSize;
+  num--;
   delete d->mempos;
   delete d;
 }

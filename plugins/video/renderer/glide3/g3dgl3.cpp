@@ -295,7 +295,7 @@ bool csGraphics3DGlide3x::Initialize (iSystem *iSys)
   if (!m_piG2D)
     return false;
 
-  CHK (txtmgr = new csTextureManagerGlide (m_piSystem, m_piG2D, config));
+  CHK (txtmgr = new csTextureManagerGlide (m_piSystem, m_piG2D, this, config));
 
   m_bVRetrace = config->GetYesNo("Glide3x","VRETRACE",FALSE);
   // tell the 2D driver whether to wait for VRETRACE
@@ -578,6 +578,11 @@ bool csGraphics3DGlide3x::BeginDraw (int DrawFlags)
   
   m_nDrawMode = DrawFlags;
   return true;
+}
+
+void csGraphics3DGlide3x::ClearBuffer ()
+{
+  GlideLib_grBufferClear (0,0,GR_WDEPTHVALUE_FARTHEST);
 }
 
 void csGraphics3DGlide3x::ClearBufferUnderTop ()

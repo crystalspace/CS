@@ -23,6 +23,8 @@
 #include "isystem.h"
 
 #include "gltex3.h"
+#include "g3dgl3.h"
+#include "gldyntex.h"
 #include "iimage.h"
 #include "csutil/scanstr.h"
 #include "lightdef.h"
@@ -47,16 +49,32 @@ csTextureGlide::~csTextureGlide ()
   if ( raw ) delete [] raw;
 }
 
-csTextureMMGlide::csTextureMMGlide (iImage* image, int flags) : 
+csTextureMMGlide::csTextureMMGlide ( csGraphics3DGlide3x *g3d, iImage* image, int flags) : 
   csTextureMM (image, flags)
 {
+  this->g3d = g3d;
+  dyn = NULL;
   if ( flags & CS_TEXTURE_3D ) AdjustSizePo2 ();
-  else printf( "no 3d tex: dim %d, %d\n", image->GetWidth(), image->GetHeight() );
+}
+
+csTextureMMGlide::~csTextureMMGlide ()
+{
+  if (dyn) delete dyn;
 }
 
 csTexture *csTextureMMGlide::NewTexture (iImage *Image)
 {
   return new csTextureGlide (this, Image);
+}
+
+iGraphics3D *csTextureMMGlide::GetDynamicTextureInterface()
+{
+  if ( (flags & CS_TEXTURE_DYNAMIC) && dyn == NULL)
+  {
+    dyn = new csGlideDynamic (NULL);
+    dyn->SetTarget (g3d, this);
+  }
+  return dyn;
 }
 
 void csTextureMMGlide::ComputeMeanColor ()
@@ -126,10 +144,11 @@ void csTextureMMGlide::remap_mm ()
 
 //---------------------------------------------------------------------------
 
-csTextureManagerGlide::csTextureManagerGlide (iSystem* iSys, iGraphics2D* iG2D,
-  csIniFile *config) :
-  csTextureManager (iSys, iG2D)
+csTextureManagerGlide::csTextureManagerGlide (iSystem* iSys, iGraphics2D* iG2D, csGraphics3DGlide3x* iG3D, 
+					      csIniFile *config)
+  : csTextureManager (iSys, iG2D)
 {
+  g3d = iG3D;
   read_config (config);
   Clear ();
 }
@@ -157,7 +176,7 @@ iTextureHandle *csTextureManagerGlide::RegisterTexture (iImage* image,
 {
   if (!image) { printf( "NULL image\n"); return NULL; }
 
-  csTextureMMGlide *txt = new csTextureMMGlide (image, flags);
+  csTextureMMGlide *txt = new csTextureMMGlide (g3d, image, flags);
   textures.Push (txt);
   return txt;
 }

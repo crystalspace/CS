@@ -106,8 +106,7 @@ public:
   /// Clear cache
   void Clear ();
 
-  void Remove (iTextureHandle *texture)
-  { if ( texture->GetCacheData() ) Unload ( (csGlideCacheData*)texture->GetCacheData() ); }
+  void Remove (iTextureHandle *texture);
 
   ///
   virtual void Dump ();

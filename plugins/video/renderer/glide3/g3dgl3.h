@@ -40,12 +40,15 @@
 #include "csgeom/polyclip.h"
 #include "video/canvas/glide2common/iglide2d.h"
 
+class csGraphics3DGlide3x;
 class csGlideTextureCache;
+class csTextureManagerGlide; 
 
 /// the Glide implementation of the Graphics3D class.
 class csGraphics3DGlide3x  : public iGraphics3D
 {
 friend class csGlideHalo;
+friend class csGlideDynamic;
 private:
   /// the texture cache.
   csGlideTextureCache *m_pTextureCache, *m_pLightmapCache, *m_pAlphamapCache;
@@ -166,6 +169,10 @@ public:
   virtual ~csGraphics3DGlide3x ();
   
   virtual bool Initialize (iSystem *iSys);
+
+  /// clears the render buffer
+  void ClearBuffer ();
+
   /// opens Glide.
   virtual bool Open(const char* Title);
   /// closes Glide.
