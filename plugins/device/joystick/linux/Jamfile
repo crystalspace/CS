@@ -1,6 +1,6 @@
 SubDir TOP plugins device joystick linux ;
 
-if $(JOYSTICK.AVAILABLE) = "yes" 
+if $(LINUXJOYSTICK.AVAILABLE) = "yes" 
 {
 Plugin joylin
 	: [ Wildcard *.cpp *.h ]
