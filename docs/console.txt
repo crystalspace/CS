@@ -550,6 +550,15 @@ Command: delbot
 Type:    general command
 Action:  Remove the last added bot.
 
+Command: loadsprite
+Type:    general command
+Action:  Load a sprite from a model file (currently 3DS version 3
+         and MD2 are supported) and add it as a sprite template. Later
+	 you can use 'addsprite' to really add the sprite visually.
+	 Parameters are 'filename','templatename','texturename'. The
+	 texture should be one which is already loaded in memory. This
+	 is a current limitation.
+
 Command: addsprite
 Type:    general command
 Action:  Add a sprite from a template already in memory.
