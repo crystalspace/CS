@@ -96,6 +96,7 @@ csFountainMeshObject::csFountainMeshObject (iObjectRegistry* object_reg,
   azimuth = 1;
   elevation = 1;
   number = 50;
+  lighted_particles = false;
 }
 
 csFountainMeshObject::~csFountainMeshObject()
