@@ -24,6 +24,8 @@ The history order is reversed so that new features are at the top.
 	  by mismatch of printf() format directive and incoming argument.
 	- Eric Sunshine eliminated a compilation warning from cthing.cpp
 	  regarding unused variable.
+	- Eric Sunshine fixed a compilation error recently introduced into
+	  bumptest.cpp where the type iTextureWrapper was unknown.
 23-May-2001
 	- Added 'virtual' before the csView destructor and also fixed a
 	  warning in the csView constructor.

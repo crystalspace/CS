@@ -42,6 +42,7 @@
 #include "iengine/view.h"
 #include "iengine/engine.h"
 #include "iengine/material.h"
+#include "iengine/texture.h"
 #include "iengine/polygon.h"
 #include "iengine/thing.h"
 #include "iengine/sector.h"
