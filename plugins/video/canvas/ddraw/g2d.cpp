@@ -713,25 +713,31 @@ HRESULT csGraphics2DDDraw3::InitFail (HRESULT hRet, LPCTSTR szError)
 
 void csGraphics2DDDraw3::ClearSystemPalette ()
 {
-  LOGPALETTE Palette = { 0x300,256 };
+  LOGPALETTE *Palette;
   HPALETTE BlackPal, OldPal;
   HDC hdc;
 
-  Palette.palPalEntry [0].peFlags = 0;
-  Palette.palPalEntry [255].peFlags = 0;
+  Palette = (LOGPALETTE*)malloc(sizeof(LOGPALETTE)+sizeof(PALETTEENTRY)*256);
+
+  Palette->palNumEntries = 256;
+  Palette->palVersion = 0x300;
+  
+  Palette->palPalEntry [0].peFlags = 0;
+  Palette->palPalEntry [255].peFlags = 0;
 
   int c;
   for (c = 0; c < 256; c++)
   {
-    Palette.palPalEntry [c].peRed = 0;
-    Palette.palPalEntry [c].peGreen = 0;
-    Palette.palPalEntry [c].peBlue = 0;
-    Palette.palPalEntry [c].peFlags = PC_NOCOLLAPSE;
+    Palette->palPalEntry [c].peRed = 0;
+    Palette->palPalEntry [c].peGreen = 0;
+    Palette->palPalEntry [c].peBlue = 0;
+    Palette->palPalEntry [c].peFlags = PC_NOCOLLAPSE;
   }
 
   hdc = GetDC (NULL);
 
-  BlackPal = CreatePalette (&Palette);
+  BlackPal = CreatePalette (Palette);
+  free((void*)Palette);
 
   OldPal = SelectPalette (hdc, BlackPal, FALSE);
   RealizePalette (hdc);
@@ -744,23 +750,30 @@ void csGraphics2DDDraw3::ClearSystemPalette ()
 bool csGraphics2DDDraw3::CreateIdentityPalette (csRGBpixel *p)
 {
   int i;
-  LOGPALETTE Palette = { 0x300, 256 };
+  LOGPALETTE *Palette;
 
   if (m_hWndPalette)
     DeleteObject (m_hWndPalette);
 
-  Palette.palPalEntry [0].peFlags = 0;
-  Palette.palPalEntry [255].peFlags = 0;
+  Palette = (LOGPALETTE*)malloc(sizeof(LOGPALETTE)+sizeof(PALETTEENTRY)*256);
+
+  Palette->palNumEntries = 256;
+  Palette->palVersion = 0x300;
+
+  Palette->palPalEntry [0].peFlags = 0;
+  Palette->palPalEntry [255].peFlags = 0;
 
   for (i = 1; i < 255; i++)
   {
-    Palette.palPalEntry [i].peRed = p [i].red;
-    Palette.palPalEntry [i].peGreen = p [i].green;
-    Palette.palPalEntry [i].peBlue = p [i].blue;
-    Palette.palPalEntry [i].peFlags = PC_RESERVED;
+    Palette->palPalEntry [i].peRed = p [i].red;
+    Palette->palPalEntry [i].peGreen = p [i].green;
+    Palette->palPalEntry [i].peBlue = p [i].blue;
+    Palette->palPalEntry [i].peFlags = PC_RESERVED;
   }
 
-  m_hWndPalette = CreatePalette (&Palette);
+  m_hWndPalette = CreatePalette (Palette);
+
+  free((void*)Palette);
 
   if (!m_hWndPalette)
     return false;
