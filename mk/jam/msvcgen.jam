@@ -41,20 +41,19 @@
 
 if "$(MSVCGEN_CONFIG)"
 {
-
 MSVCGEN = "$(PERL) $(TOP)/mk/msvcgen/msvcgen.pl" ;
 MKVERRES = "$(SHELL) $(TOP)/libs/csutil/win32/mkverres.sh" ;
 MKMETADATARES = "$(SHELL) $(TOP)/libs/csutil/win32/mkmetadatares.sh" ;
 MERGERES = "$(SHELL) $(TOP)/libs/csutil/win32/mergeres.sh" ;
 
+MSVC_VERSION ?= 7 ;
 MSVCGEN_BUILD_ROOT = $(BUILDTOP)/out ;
+MSVCGEN_LOCATE_TARGET ?= $(MSVCGEN_BUILD_ROOT)/mk/visualc$(MSVC_VERSION) ;
+MSVCGEN_LOCATE_FRAGMENT ?= $(MSVCGEN_BUILD_ROOT)/mk/fragment$(MSVC_VERSION) ;
+MSVCGEN_TEMPLATEDIR ?= $(TOP)/mk/msvcgen/template$(MSVC_VERSION) ;
 
-MSVC_VERSION ?= 6 ;
 if $(MSVC_VERSION) = 6
 {
-  MSVCGEN_LOCATE_TARGET ?= $(MSVCGEN_BUILD_ROOT)/mk/visualc6 ;
-  MSVCGEN_LOCATE_FRAGMENT ?= $(MSVCGEN_BUILD_ROOT)/mk/fragment6 ;
-  MSVCGEN_TEMPLATEDIR ?= $(TOP)/mk/msvcgen/template6 ;
   MSVCGEN_EXTRA_OPTS = ;
   SSUFPRJ = dsp ;
   SSUFWSP = dsw ;
@@ -63,9 +62,6 @@ if $(MSVC_VERSION) = 6
 }
 else if $(MSVC_VERSION) = 7
 {
-  MSVCGEN_LOCATE_TARGET ?= $(MSVCGEN_BUILD_ROOT)/mk/visualc7 ;
-  MSVCGEN_LOCATE_FRAGMENT ?= $(MSVCGEN_BUILD_ROOT)/mk/fragment7 ;
-  MSVCGEN_TEMPLATEDIR ?= $(TOP)/mk/msvcgen/template7 ;
   MSVCGEN_EXTRA_OPTS = --xml-protect ;
   SSUFPRJ = vcproj ;
   SUFPRJ = .vcproj ;
@@ -74,12 +70,11 @@ else if $(MSVC_VERSION) = 7
 }
 else
 {
-  EXIT "No support for MSVC version $(MSVC_VERSION) yet!" ;
+  EXIT "No msvcgen support for MSVC version $(MSVC_VERSION) yet!" ;
 }
   
 #----------------------------------------------------------------------------
 # Override some rules
-
 
 ## MsvcProject target : sources : type : target-with-ext
 rule MsvcProject
@@ -137,24 +132,20 @@ rule MsvcProject
   # Search at the correct place for the files
   SEARCH on $(files) = $(SEARCH_SOURCE) ;
 
-  # Add resource file
+  # Add resource file.
   if $(3) = "plugin" || $(3) = "appgui" || $(3) = "appcon"
   {
     resource = $(msvcname:S=.rc) ;
-    # @@@ Uber-ugly
-    rcpath = mk/visualc7/$(msvcname:S=.rc) ;
-    #files += $(resource) ;
+    files += $(resource) ;
     Depends $(target) : $(resource) ;
     LOCATE on $(resource) = $(MSVCGEN_LOCATE_TARGET) ;
     SEARCH on $(resource) = $(MSVCGEN_LOCATE_FRAGMENT) ;
     NAME on $(resource) = $(<) ;
-    #RCNAME on $(<) = $(resource) ;
     $(<)_RCNAME = $(resource) ;
-    #ResourceGen $(resource) ;
   
     local versionrc = $(resource:S=.vrctmp) ;
   
-    # normalize version list
+    # Normalize version list.
     local v1, v2, v3, v4 ;
     v1 = $(PACKAGE_VERSION_LIST[1]) ;
     if ! $(v1) { v1 = 0 ; }
@@ -165,9 +156,7 @@ rule MsvcProject
     v4 = $(PACKAGE_VERSION_LIST[4]) ;
     if ! $(v4) { v4 = 0 ; }
     PACKAGE_VERSION_LIST on $(versionrc) = $(v1) $(v2) $(v3) $(v4) ;
-	
     DESCRIPTION on $(versionrc) = $($(<)_help) ;
-	
     LOCATE on $(versionrc) = $(MSVCGEN_LOCATE_FRAGMENT) ;
     
     GenerateWin32VersionRc $(versionrc) ;
@@ -204,8 +193,7 @@ rule MsvcProject
 
   Depends msvcgen : $(target) ;
   Depends $(target) : $(files) $(MSVCGEN_LOCATE_FRAGMENT:G=dir) ;
-  MsvcProjectGen $(target) : $(files) $(rcpath) ;
-  NotFile $(rcpath) ;
+  MsvcProjectGen $(target) : $(files) ;
   Always $(target) ;
 
   MSVCWorkspace wksall : $(fragments) : $(fragroot) ;
@@ -217,7 +205,7 @@ rule MsvcProject
 
 rule Application
 {
-#  _Options $(<) : $(3) ;
+  # _Options $(<) : $(3) ;
 
   local projtype ;
   if $(CONSOLEAPP_$(<)) = "yes"
@@ -238,9 +226,7 @@ rule Plugin
   local metafile ;
   metafile = [ FAppendSuffix $(<) : $(SUFMETA) ] ;
   SEARCH on $(metafile) = $(SEARCH_SOURCE) ;
-
   $(<)_METAFILE = $(metafile) ;
-  
   MsvcProject $(<) : $(>) : plugin : $(<:S=.dll) ;
   CompileGroups $(<) : all plugins ;
 }
@@ -267,6 +253,7 @@ rule RegisterCompileGroup
 
 rule CompileGroups
 {
+  local i ;
   for i in $(>)
   {
     DEPEND on $($(i)_TARGET) += $($(<)_MSVCNAME) ;
@@ -299,7 +286,6 @@ rule LFlags
 rule ExternalLibs
 {
   local i ;
-  
   for i in $(>)
   {
     CFlags $(<) : $($(i).CFLAGS) ;
@@ -331,6 +317,11 @@ rule Win32Resource
 
 #----------------------------------------------------------------------------
 
+# Implementation note: The --strip-root directives are order-sensitive when the
+# build directory is the same as the source directory, in which case TOP is "."
+# and MSVCGEN_BUILD_ROOT is "./out".  If TOP incorrectly appeared first, then
+# it would invalidate the following --strip-root option since TOP is a prefix
+# of MSVCGEN_BUILD_ROOT.
 actions MsvcProjectGen
 {
   $(MSVCGEN) \
@@ -349,8 +340,8 @@ actions MsvcProjectGen
   --library=$(LIBRARIES) \
   --lflags='$(LFLAGS)' \
   --cflags='$(CFLAGS)' \
-  --strip-root='$(TOP)/' \
   --strip-root='$(MSVCGEN_BUILD_ROOT)/' \
+  --strip-root='$(TOP)/' \
   $(>)
 }
 
@@ -381,5 +372,4 @@ Clean clean : $(MSVCGEN_LOCATE_FRAGMENT:G=dir) ;
 Clean clean : $(MSVCGEN_BUILD_ROOT) ;
 Clean msvcclean : $(MSVCGEN_LOCATE_TARGET:G=dir) ;
 Clean msvcclean : $(MSVCGEN_LOCATE_FRAGMENT:G=dir) ;
-
 }

@@ -36,6 +36,12 @@ chronological order.
 	  hack embodied by msvcgen.sh and msvcgen/Jamconfig must be retired.
 	  People should be able to build project files by invoking "jam
 	  -sMSVC_VERSION=7 msvcgen" directly.)
+	- Eric Sunshine eliminated an entirely superfluous and ugly hack in
+	  msvcgen.jam which tried to insure that the resource file (.rc) had
+	  the correct path in the generated project file.  The more correct fix
+	  involved slightly re-ordering the --strip-root options given to
+	  msvcgen.pl.  Also fixed a couple other minor bugs, and did a bit of
+	  cleanup.
 19-Feb-2004
 	- res made the following changes:
 	    - A few minor cosmetic changes.
