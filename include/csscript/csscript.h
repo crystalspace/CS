@@ -61,6 +61,9 @@ public:
   ///
   ~LanguageLayer ();
 
+  void SetCamera (csCamera *cam)
+    { camera = cam; }
+  
   /// Link a new running script into the system.
   void link_run (csRunScript* r);
 

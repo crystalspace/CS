@@ -2,6 +2,13 @@ The history order has been reversed so that new features are at the top.
 
 6-Jul-2000
 	- Samuel Humphreys did the following changes:
+            - Removed indentation from bin/dosupd.bat..hope the unix eol stuff
+              doesnt break it entirely.
+            - Added the last procedural texture. Now you can watch levels on the 
+              wall. Just execute 'dtsimple flarge' to see flarge. To navigate
+              hold down the control key while cursoring around.
+            - Added a method to LanguageLayer to allow delaying of setting of 
+              camera. This will also allow one to change the camera.
             - #ifdefed with OPENGL_1_2 the GL_UNSIGNED_SHORT_5_6_5 data type,
               which Mesa supports but windows doesn't. The native 16bit display
               path for procedural textures now works again.
