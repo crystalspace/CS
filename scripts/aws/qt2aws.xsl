@@ -46,7 +46,7 @@
   </xsl:template>
 
 
-  <xsl:template match="widget[class[text()='QPushButton' or text()='QRadioButton' or text()='QButtonGroup' or text()='QGroupBox' or text()='QCheckBox' or text()='QLineEdit' or text()='QLabel']]">
+  <xsl:template match="widget[class[text()='QPushButton' or text()='QRadioButton' or text()='QButtonGroup' or text()='QGroupBox' or text()='QFrame' or text()='QCheckBox' or text()='QLineEdit' or text()='QLabel']]">
     <xsl:call-template name="spacer"/><xsl:call-template name="component_header"/>
     <xsl:call-template name="spacer"/><xsl:text>{</xsl:text>
     <xsl:apply-templates/>
@@ -171,6 +171,7 @@
       <xsl:when test="class='QRadioButton'">"Radio Button"</xsl:when>
       <xsl:when test="class='QButtonGroup'">"Group Frame"</xsl:when>
       <xsl:when test="class='QGroupBox'">"Group Frame"</xsl:when>
+      <xsl:when test="class='QFrame'">"Group Frame"</xsl:when>
       <xsl:when test="class='QCheckBox'">"Check Box"</xsl:when>
       <xsl:when test="class='QListBox'">"List Box"</xsl:when>
       <xsl:when test="class='QListView'">"List Box"</xsl:when>
@@ -186,6 +187,7 @@
       <xsl:when test="../class='QPushButton' or class='QPushButton'"><xsl:text>b</xsl:text></xsl:when>
       <xsl:when test="../class='QButtonGroup'"><xsl:text>g</xsl:text></xsl:when>
       <xsl:when test="../class='QGroupBox'"><xsl:text>g</xsl:text></xsl:when>
+      <xsl:when test="../class='QFrame'"><xsl:text>g</xsl:text></xsl:when>
       <xsl:when test="../class='QListBox'"><xsl:text>lb</xsl:text></xsl:when>
       <xsl:when test="../class='QListView'"><xsl:text>lb</xsl:text></xsl:when>
       <xsl:when test="../class='QLabel' and ../property/name='pixmap'"><xsl:text>iv</xsl:text></xsl:when>
