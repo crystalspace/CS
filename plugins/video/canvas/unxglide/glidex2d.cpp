@@ -141,7 +141,6 @@ csGraphics2DGlideX::~csGraphics2DGlideX ()
   Close ();
   if (UnixSystem)
     UnixSystem->DecRef ();
-  delete [] Memory;
 }
 
 bool csGraphics2DGlideX::Open(const char *Title)
