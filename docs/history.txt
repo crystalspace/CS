@@ -31,6 +31,9 @@ chronological order.
           runtime, which prevents the spr3d plugin loading when in conjunction
           with the new renderer.
 	- Anders Stenberg fixed pico->pico internal drawing in pgserver.
+	- Anders Stenberg fixed pico->pico internal drawing in pgserver
+	  for real this time. Includes a very nasty, but unfortunately
+	  necessary hack in the pgserver plugin.
 29-Aug-2003
 	- renej added support for using CS from Java. SWIG is needed since
 	  no generated files are in the CVS repository. Building is done

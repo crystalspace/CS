@@ -44,6 +44,7 @@ extern "C"
 class csHwrBitmap
 {
 private:
+  void* CSID;
   bool dirty;
   hwrbitmap bitmap;
   csSimplePixmap* pixmap;
@@ -55,7 +56,7 @@ private:
  public:
   /// Construct a bitmap.
   inline csHwrBitmap (hwrbitmap bitmap0, iGraphics3D* g3d, int shmid0 = 0)
-    : bitmap (bitmap0), shmid (shmid0), pixmap (0), image (0)
+    : bitmap (bitmap0), shmid (shmid0), pixmap (0), image (0), CSID (0)
   { 
     image = new csImageMemory (bitmap->w, bitmap->h, 
       CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA);
@@ -83,7 +84,10 @@ private:
   }
 
   /// Get the pico bitmap
-  inline stdbitmap *GetPicoBitmap () { return bitmap; }
+  // This is a bit ugly, but Pico forces us to do it.
+  // If GetPicoBitmap is called on an erroneously casted stdbitmap*
+  // it will just return "this".
+  inline hwrbitmap GetPicoBitmap () { return CSID?(hwrbitmap)this:bitmap; }
 
   /// Get the CS bitmap (pixmap)
   inline csSimplePixmap* GetCSBitmap () 
