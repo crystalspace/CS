@@ -35,8 +35,8 @@ struct iSaver : public iBase
   virtual bool SaveMapFile(const char *filename) = 0;
   /// Return the current engine contents as a string.
   virtual csRef<iString> SaveMapFile() = 0;
-	/// Save map to DocumentNode
-	virtual bool SaveMapFile(csRef<iDocumentNode> &root) = 0;
+  /// Save map to DocumentNode
+  virtual bool SaveMapFile(csRef<iDocumentNode> &root) = 0;
 };
 
 #endif // __CS_IMAP_SAVER_H__
