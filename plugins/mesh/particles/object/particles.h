@@ -711,7 +711,7 @@ public:
     virtual float GetBaseHeat ()
     { return scfParent->GetBaseHeat (); }
     virtual void GetColorCallback (csColor (**callback)(float time))
-    { return scfParent->GetColorCallback (callback); }
+    { scfParent->GetColorCallback (callback); }
     virtual void SetParticleRadius (float radius)
     { scfParent->SetParticleRadius (radius); }
     virtual int GetParticlesPerSecond ()
