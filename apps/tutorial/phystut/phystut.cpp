@@ -302,8 +302,8 @@ bool Simple::Initialize ()
 
   room = engine->CreateSector ("room");
   walls = engine->CreateSectorWallsMesh (room, "walls");
-  csRef<iThingState> walls_state (
-    SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState));
+  csRef<iThingFactoryState> walls_state (
+    SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingFactoryState));
   iPolygon3DStatic* p;
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
@@ -558,10 +558,11 @@ iRigidBody* Simple::CreateWalls (const csVector3& radius)
   rb->SetPosition (csVector3 (0));
   rb->MakeStatic ();
 
-  csRef<iThingState> walls_state ( SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState));
+  csRef<iThingFactoryState> walls_state (
+  	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingFactoryState));
 
   for(int i = 0; i < walls_state->GetPolygonCount(); i++) {
-      rb->AttachColliderPlane(walls_state->GetPolygonStatic(i)->GetObjectPlane(), 10, 0, 0);
+      rb->AttachColliderPlane(walls_state->GetPolygon(i)->GetObjectPlane(), 10, 0, 0);
   }
 
   return rb;

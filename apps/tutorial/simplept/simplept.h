@@ -35,7 +35,7 @@ struct iView;
 struct iTextureHandle;
 struct iObjectRegistry;
 struct iVirtualClock;
-struct iThingState;
+struct iThingFactoryState;
 struct iMaterialWrapper;
 struct iMeshWrapper;
 struct iGeneralFactoryState;
@@ -58,7 +58,7 @@ private:
   csRef<iMeshWrapper> genmesh;
   csRef<iGeneralFactoryState> factstate;
 
-  void CreatePolygon (iThingState *th, int v1, int v2, int v3, int v4,
+  void CreatePolygon (iThingFactoryState *th, int v1, int v2, int v3, int v4,
     iMaterialWrapper *mat);
 
   int genmesh_resolution;

@@ -99,3 +99,6 @@ have names though. Added @code{SetName()} and @code{GetName()} for that.
 can be put in a factory. Several functions like
 @code{iThingState->CreatePolygon()} will now return @code{iPolygon3DStatic}.
 
+@code{iThingState} has been split in @code{iThingState} and
+@code{iThingFactoryState}.
+

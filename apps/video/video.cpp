@@ -220,8 +220,8 @@ bool Video::Initialize (int argc, const char* const argv[],
 
   room = engine->CreateSector ("room");
   csRef<iMeshWrapper> wallmesh (engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iThingState> walls (
-  	SCF_QUERY_INTERFACE (wallmesh->GetMeshObject (), iThingState));
+  csRef<iThingFactoryState> walls (
+  	SCF_QUERY_INTERFACE (wallmesh->GetMeshObject (), iThingFactoryState));
 
   csVector3
 	   f1 (-5, 20, 5),

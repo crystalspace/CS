@@ -2076,7 +2076,7 @@ void csEngine::GetNearbyObjectList (iSector* sector,
         if (st)
         {
           // Check if there are portals and if they are near the position.
-          int pc = st->GetPortalCount ();
+          int pc = st->GetFactory ()->GetPortalCount ();
           int j;
           for (j = 0 ; j < pc ; j++)
           {

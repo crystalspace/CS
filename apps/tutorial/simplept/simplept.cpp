@@ -59,8 +59,8 @@ CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
 
-void Simple::CreatePolygon (iThingState *th, int v1, int v2, int v3, int v4,
-  iMaterialWrapper *mat)
+void Simple::CreatePolygon (iThingFactoryState *th,
+	int v1, int v2, int v3, int v4, iMaterialWrapper *mat)
 {
   iPolygon3DStatic* p = th->CreatePolygon ();
   p->SetMaterial (mat);
@@ -377,8 +377,8 @@ bool Simple::Initialize ()
   ProcTexture->DecRef ();
   room = engine->CreateSector ("proctex-room");
   csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iThingState> walls_state (SCF_QUERY_INTERFACE (walls->GetMeshObject (),
-  	iThingState));
+  csRef<iThingFactoryState> walls_state (
+  	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingFactoryState));
 
   walls_state->CreateVertex (csVector3 (-8, -8, -5));
   walls_state->CreateVertex (csVector3 (-3, -3, +8));

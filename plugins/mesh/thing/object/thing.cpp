@@ -68,6 +68,7 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE(csThing)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iThingState)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iThingFactoryState)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iLightingInfo)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iObjectModel)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPolygonMesh)
@@ -79,6 +80,10 @@ SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::ThingState)
   SCF_IMPLEMENTS_INTERFACE(iThingState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::ThingFactoryState)
+  SCF_IMPLEMENTS_INTERFACE(iThingFactoryState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::LightingInfo)
@@ -119,6 +124,7 @@ csThing::csThing (iBase *parent, csThingObjectType* thing_type) :
 
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiThingState);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiThingFactoryState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
@@ -148,9 +154,6 @@ csThing::csThing (iBase *parent, csThingObjectType* thing_type) :
   num_cam_verts = 0;
 
   draw_busy = 0;
-#ifndef CS_USE_NEW_RENDERER
-  fog.enabled = false;
-#endif // CS_USE_NEW_RENDERER
   bbox = NULL;
   obj_bbox_valid = false;
 
@@ -908,6 +911,12 @@ csPolygon3D *csThing::GetPolygon3D (const char *name)
 {
   int idx = polygons.FindKey (name);
   return idx >= 0 ? polygons.Get (idx) : NULL;
+}
+
+int csThing::FindPolygonIndex (iPolygon3DStatic *polygon) const
+{
+  csPolygon3D *p = polygon->GetPrivateObject ();
+  return polygons.Find (p);
 }
 
 int csThing::FindPolygonIndex (iPolygon3D *polygon) const
@@ -2404,117 +2413,6 @@ bool csThing::Draw (iRenderView *rview, iMovable *movable, csZBufMode zMode)
   return true;                                  // @@@@ RETURN correct vis info
 }
 
-#ifndef CS_USE_NEW_RENDERER
-bool csThing::DrawFoggy (iRenderView *d, iMovable *)
-{
-  draw_busy++;
-
-  iCamera *icam = d->GetCamera ();
-  const csReversibleTransform &camtrans = icam->GetTransform ();
-  UpdateTransformation (camtrans, icam->GetCameraNumber ());
-
-  csPolygon3D *p;
-  csVector3 *verts;
-  int num_verts;
-  int i;
-  csPoly2DPool *render_pool = thing_type->render_pol2d_pool;
-  csPolygon2D *clip;
-
-  // @@@ Wouldn't it be nice if we checked all vertices against the Z plane?
-  {
-    d->GetGraphics3D ()->OpenFogObject (thing_id, &GetFog ());
-
-    icam->SetMirrored (!icam->IsMirrored ());
-    bool mirrored = icam->IsMirrored ();
-    int fov = icam->GetFOV ();
-    float shift_x = icam->GetShiftX ();
-    float shift_y = icam->GetShiftY ();
-
-    for (i = 0; i < polygons.Length (); i++)
-    {
-      p = GetPolygon3D (i);
-      clip = (csPolygon2D *) (render_pool->Alloc ());
-
-      const csPlane3 &wplane = p->GetWorldPlane ();
-      bool front = csMath3::Visible (camtrans.GetOrigin (), wplane);
-
-      csPlane3 clip_plane, *pclip_plane;
-      bool do_clip_plane = d->GetClipPlane (clip_plane);
-      if (do_clip_plane)
-        pclip_plane = &clip_plane;
-      else
-        pclip_plane = NULL;
-      if (!front && p->ClipToPlane (pclip_plane, camtrans.GetOrigin (),
-            verts,
-            num_verts,
-            false))
-      {
-	csPlane3 plane_cam;
-        p->WorldToCameraPlane (camtrans, verts[0], plane_cam);
-	if (p->DoPerspective (verts, num_verts, clip, mirrored,
-		fov, shift_x, shift_y, plane_cam) &&
-          clip->ClipAgainst (d->GetClipper ()))
-        {
-          clip->AddFogPolygon (
-              d->GetGraphics3D (),
-              p,
-              plane_cam,
-              icam->IsMirrored (),
-              thing_id,
-              CS_FOG_BACK);
-        }
-      }
-
-      render_pool->Free (clip);
-    }
-
-    icam->SetMirrored (!icam->IsMirrored ());
-    mirrored = icam->IsMirrored ();
-    for (i = 0; i < polygons.Length (); i++)
-    {
-      p = GetPolygon3D (i);
-      clip = (csPolygon2D *) (render_pool->Alloc ());
-
-      const csPlane3 &wplane = p->GetWorldPlane ();
-      bool front = csMath3::Visible (camtrans.GetOrigin (), wplane);
-
-      csPlane3 clip_plane, *pclip_plane;
-      bool do_clip_plane = d->GetClipPlane (clip_plane);
-      if (do_clip_plane)
-        pclip_plane = &clip_plane;
-      else
-        pclip_plane = NULL;
-      if (front && p->ClipToPlane (
-            pclip_plane, camtrans.GetOrigin (),
-            verts, num_verts, true))
-      {
-	csPlane3 plane_cam;
-        p->WorldToCameraPlane (camtrans, verts[0], plane_cam);
-        if (p->DoPerspective (verts, num_verts, clip, mirrored,
-		fov, shift_x, shift_y, plane_cam) &&
-            clip->ClipAgainst (d->GetClipper ()))
-        {
-          clip->AddFogPolygon (
-              d->GetGraphics3D (),
-              p,
-              plane_cam,
-              icam->IsMirrored (),
-              thing_id,
-              CS_FOG_FRONT);
-        }
-      }
-
-      render_pool->Free (clip);
-    }
-
-    d->GetGraphics3D ()->CloseFogObject (thing_id);
-  }
-
-  draw_busy--;
-  return true;                                  // @@@@ RETURN correct vis info
-}
-#endif // CS_USE_NEW_RENDERER
-
 //----------------------------------------------------------------------
 
 void csThing::CastShadows (iFrustumView *lview, iMovable *movable)
@@ -2716,7 +2614,7 @@ void csThing::Merge (csThing *other)
 }
 
 void csThing::MergeTemplate (
-  iThingState *tpl,
+  iThingFactoryState *tpl,
   iMaterialWrapper *default_material,
   csVector3 *shift,
   csMatrix3 *transform)
@@ -2725,9 +2623,6 @@ void csThing::MergeTemplate (
   int *merge_vertices;
 
   flags.SetAll (tpl->GetFlags ().Get ());
-
-  //@@@ OBSOLETE: SetZBufMode (tpl->GetZBufMode ());
-  SetMovingOption (tpl->GetMovingOption ());
 
   //TODO should merge? take averages or something?
   curves_center = tpl->GetCurvesCenter ();
@@ -2749,7 +2644,7 @@ void csThing::MergeTemplate (
 
   for (i = 0; i < tpl->GetPolygonCount (); i++)
   {
-    iPolygon3DStatic *pt = tpl->GetPolygonStatic (i);
+    iPolygon3DStatic *pt = tpl->GetPolygon (i);
     csPolygon3D *p;
     iMaterialWrapper *mat = pt->GetMaterial ();
     p = NewPolygon (mat);
@@ -2832,7 +2727,7 @@ void csThing::RemovePortalPolygon (csPolygon3D *poly)
 }
 
 //---------------------------------------------------------------------------
-iCurve *csThing::ThingState::GetCurve (int idx) const
+iCurve *csThing::ThingFactoryState::GetCurve (int idx) const
 {
   csCurve *c = scfParent->GetCurve (idx);
   return &(c->scfiCurve);
@@ -2845,7 +2740,7 @@ iPolygon3D *csThing::ThingState::GetPolygon (int idx)
   return &(p->scfiPolygon3D);
 }
 
-iPolygon3DStatic *csThing::ThingState::GetPolygonStatic (int idx)
+iPolygon3DStatic *csThing::ThingFactoryState::GetPolygon (int idx)
 {
   csPolygon3D *p = scfParent->GetPolygon3D (idx);
   if (!p) return NULL;
@@ -2859,14 +2754,15 @@ iPolygon3D *csThing::ThingState::GetPolygon (const char *name)
   return &(p->scfiPolygon3D);
 }
 
-iPolygon3DStatic *csThing::ThingState::GetPolygonStatic (const char *name)
+iPolygon3DStatic *csThing::ThingFactoryState::GetPolygon (
+	const char *name)
 {
   csPolygon3D *p = scfParent->GetPolygon3D (name);
   if (!p) return NULL;
   return &(p->scfiPolygon3DStatic);
 }
 
-iPolygon3DStatic *csThing::ThingState::CreatePolygon (const char *iName)
+iPolygon3DStatic *csThing::ThingFactoryState::CreatePolygon (const char *iName)
 {
   csPolygon3D *p = new csPolygon3D ((iMaterialWrapper *)NULL);
   if (iName) p->SetName (iName);
@@ -2874,15 +2770,21 @@ iPolygon3DStatic *csThing::ThingState::CreatePolygon (const char *iName)
   return &(p->scfiPolygon3DStatic);
 }
 
-int csThing::ThingState::GetPortalCount () const
+int csThing::ThingFactoryState::GetPortalCount () const
 {
   return scfParent->portal_polygons.Length ();
 }
 
-iPortal *csThing::ThingState::GetPortal (int idx) const
+iPortal *csThing::ThingFactoryState::GetPortal (int idx) const
 {
   csPolygon3D *p = (csPolygon3D *) (scfParent->portal_polygons)[idx];
   return &(p->GetPortal ()->scfiPortal);
+}
+
+iPolygon3DStatic *csThing::ThingFactoryState::GetPortalPolygon (int idx) const
+{
+  csPolygon3D *p = (csPolygon3D *) (scfParent->portal_polygons)[idx];
+  return &(p->scfiPolygon3DStatic);
 }
 
 iPolygon3D *csThing::ThingState::GetPortalPolygon (int idx) const
@@ -2900,6 +2802,16 @@ iPolygon3D* csThing::ThingState::IntersectSegment (const csVector3& start,
   return p ? &(p->scfiPolygon3D) : NULL;
 }
 
+iPolygon3DStatic* csThing::ThingFactoryState::IntersectSegment (
+	const csVector3& start,
+	const csVector3& end, csVector3& isect,
+	float* pr, bool only_portals)
+{
+  csPolygon3D* p = scfParent->IntersectSegment (start, end, isect, pr,
+  	only_portals);
+  return p ? &(p->scfiPolygon3DStatic) : NULL;
+}
+
 //---------------------------------------------------------------------------
 iMeshObjectFactory *csThing::MeshObject::GetFactory () const
 {
@@ -2911,7 +2823,7 @@ iMeshObjectFactory *csThing::MeshObject::GetFactory () const
 csPtr<iMeshObject> csThing::MeshObjectFactory::NewInstance ()
 {
   csThing *thing = new csThing (scfParent, scfParent->thing_type);
-  thing->MergeTemplate (&(scfParent->scfiThingState), NULL);
+  thing->MergeTemplate (&(scfParent->scfiThingFactoryState), NULL);
   return csPtr<iMeshObject> (&thing->scfiMeshObject);
 }
 

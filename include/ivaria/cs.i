@@ -284,7 +284,7 @@ struct iSector : public iBase
 {
 };
 
-struct iThingState : public iBase
+struct iThingFactoryState : public iBase
 {
   iPolygon3DStatic* CreatePolygon (const char* name);
 };

@@ -479,7 +479,7 @@ csMatrix3 Blocks::create_rotate_z (float angle)
   return rotate_z;
 }
 
-iPolygon3DStatic* add_polygon_template (iThingState* tmpl,
+iPolygon3DStatic* add_polygon_template (iThingFactoryState* tmpl,
 	char* name, iMaterialWrapper* material,
 	int vt0, int vt1, int vt2, int vt3 = -1)
 {
@@ -538,8 +538,8 @@ void Blocks::add_pillar_template ()
 {
   pillar_tmpl = CreateMeshFactoryWrapper ("pillar");
   float dim = CUBE_DIM/2.;
-  csRef<iThingState> thing_state (SCF_QUERY_INTERFACE (
-  	pillar_tmpl->GetMeshObjectFactory (), iThingState));
+  csRef<iThingFactoryState> thing_state (SCF_QUERY_INTERFACE (
+  	pillar_tmpl->GetMeshObjectFactory (), iThingFactoryState));
   thing_state->CreateVertex (csVector3 (-dim, 0, dim));
   thing_state->CreateVertex (csVector3 (dim, 0, dim));
   thing_state->CreateVertex (csVector3 (dim, 0, -dim));
@@ -595,8 +595,8 @@ void Blocks::add_vrast_template ()
 {
   vrast_tmpl = CreateMeshFactoryWrapper ("vrast");
   float dim = RAST_DIM;
-  csRef<iThingState> thing_state (SCF_QUERY_INTERFACE (
-  	vrast_tmpl->GetMeshObjectFactory (), iThingState));
+  csRef<iThingFactoryState> thing_state (SCF_QUERY_INTERFACE (
+  	vrast_tmpl->GetMeshObjectFactory (), iThingFactoryState));
   thing_state->CreateVertex (csVector3 (-dim, 0, dim));
   thing_state->CreateVertex (csVector3 (dim, 0, dim));
   thing_state->CreateVertex (csVector3 (-dim, ZONE_HEIGHT*CUBE_DIM, dim));
@@ -628,8 +628,8 @@ void Blocks::add_hrast_template ()
 {
   hrast_tmpl = CreateMeshFactoryWrapper ("hrast");
   float dim = RAST_DIM;
-  csRef<iThingState> thing_state (SCF_QUERY_INTERFACE (
-  	hrast_tmpl->GetMeshObjectFactory (), iThingState));
+  csRef<iThingFactoryState> thing_state (SCF_QUERY_INTERFACE (
+  	hrast_tmpl->GetMeshObjectFactory (), iThingFactoryState));
 
   thing_state->CreateVertex (csVector3 ((-(float)ZONE_DIM/2.)*CUBE_DIM,
   	.02, -dim));
@@ -1928,19 +1928,22 @@ void Blocks::CreateMenuEntry (const char* mat, int menu_nr)
   iMaterialWrapper* tm_front = engine->GetMaterialList ()->FindByName (mat);
 
   csRef<iMeshWrapper> thing_wrap (CreateMeshWrapper ("menu"));
+  csRef<iThingFactoryState> thing_fact_state (
+  	SCF_QUERY_INTERFACE (thing_wrap->GetMeshObject (),
+  	iThingFactoryState));
   csRef<iThingState> thing_state (
   	SCF_QUERY_INTERFACE (thing_wrap->GetMeshObject (),
   	iThingState));
   thing_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
 
-  thing_state->CreateVertex (csVector3 (-1, .25, 0));
-  thing_state->CreateVertex (csVector3 (1, .25, 0));
-  thing_state->CreateVertex (csVector3 (1, -.25, 0));
-  thing_state->CreateVertex (csVector3 (-1, -.25, 0));
+  thing_fact_state->CreateVertex (csVector3 (-1, .25, 0));
+  thing_fact_state->CreateVertex (csVector3 (1, .25, 0));
+  thing_fact_state->CreateVertex (csVector3 (1, -.25, 0));
+  thing_fact_state->CreateVertex (csVector3 (-1, -.25, 0));
 
   iPolygon3DStatic* p;
 
-  p = thing_state->CreatePolygon ();
+  p = thing_fact_state->CreatePolygon ();
   p->SetMaterial (tm_front);
   p->CreateVertex (0);
   p->CreateVertex (1);
@@ -1963,6 +1966,9 @@ csRef<iMeshWrapper> Blocks::CreateMenuArrow (bool left)
   csRef<iThingState> thing_state (
   	SCF_QUERY_INTERFACE (thing_wrap->GetMeshObject (),
   	iThingState));
+  csRef<iThingFactoryState> thing_fact_state (
+  	SCF_QUERY_INTERFACE (thing_wrap->GetMeshObject (),
+  	iThingFactoryState));
   thing_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
 
   float pointx;
@@ -1978,13 +1984,13 @@ csRef<iMeshWrapper> Blocks::CreateMenuArrow (bool left)
     rearx = 1+.1;
   }
 
-  thing_state->CreateVertex (csVector3 (pointx, 0, 0));
-  thing_state->CreateVertex (csVector3 (rearx, .25, 0));
-  thing_state->CreateVertex (csVector3 (rearx, -.25, 0));
+  thing_fact_state->CreateVertex (csVector3 (pointx, 0, 0));
+  thing_fact_state->CreateVertex (csVector3 (rearx, .25, 0));
+  thing_fact_state->CreateVertex (csVector3 (rearx, -.25, 0));
 
   iPolygon3DStatic* p;
 
-  p = thing_state->CreatePolygon ();
+  p = thing_fact_state->CreatePolygon ();
   p->SetMaterial (tm_front);
   if (left)
   {
@@ -2102,8 +2108,8 @@ void Blocks::InitGameRoom ()
   room = Sys->engine->CreateSector ("room");
   csRef<iMeshWrapper> walls (
   	Sys->engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iThingState> walls_state (SCF_QUERY_INTERFACE (walls->GetMeshObject (),
-  	iThingState));
+  csRef<iThingFactoryState> walls_state (
+  	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingFactoryState));
   Sys->set_cube_room (room);
   iPolygon3DStatic* p;
   p = walls_state->CreatePolygon ();
@@ -2202,8 +2208,8 @@ void Blocks::InitDemoRoom ()
   demo_room = Sys->engine->CreateSector ("room");
   csRef<iMeshWrapper> walls (
   	Sys->engine->CreateSectorWallsMesh (demo_room, "walls"));
-  csRef<iThingState> walls_state (SCF_QUERY_INTERFACE (walls->GetMeshObject (),
-  	iThingState));
+  csRef<iThingFactoryState> walls_state (SCF_QUERY_INTERFACE (
+  	walls->GetMeshObject (), iThingFactoryState));
 
   iPolygon3DStatic* p;
   p = walls_state->CreatePolygon ();

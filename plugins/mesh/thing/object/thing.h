@@ -308,11 +308,6 @@ private:
   /// Last movable number that was used for the bounding box in world space.
   long wor_bbox_movablenr;
 
-#ifndef CS_USE_NEW_RENDERER
-  /// Fog information.
-  csFog fog;
-#endif // CS_USE_NEW_RENDERER
-
   /// Dynamic ambient light assigned to this thing.
   csColor dynamic_ambient;
   /**
@@ -517,6 +512,9 @@ public:
   /// Find a polygon index.
   int FindPolygonIndex (iPolygon3D* polygon) const;
 
+  /// Find a polygon index.
+  int FindPolygonIndex (iPolygon3DStatic* polygon) const;
+
   /// Remove a single polygon.
   void RemovePolygon (int idx);
 
@@ -624,7 +622,7 @@ public:
   /**
    * Add polygons and vertices from the specified thing (seen as template).
    */
-  void MergeTemplate (iThingState* tpl,
+  void MergeTemplate (iThingFactoryState* tpl,
   	iMaterialWrapper* default_material = NULL,
 	csVector3* shift = NULL, csMatrix3* transform = NULL);
 
@@ -735,12 +733,6 @@ public:
    * Draw all curves in this thing given a view and transformation.
    */
   bool DrawCurves (iRenderView* rview, iMovable* movable, csZBufMode zMode);
-
-  /**
-   * Draw this thing as a fog volume (only when fog is enabled for
-   * this thing).
-   */
-  bool DrawFoggy (iRenderView* rview, iMovable* movable);
 
   //----------------------------------------------------------------------
   // Lighting
@@ -891,27 +883,6 @@ public:
    */
   int GetMovingOption () const { return cfg_moving; }
 
-#ifndef CS_USE_NEW_RENDERER
-  /// Return true if this has fog.
-  bool HasFog () { return fog.enabled; }
-
-  /// Return fog structure.
-  csFog& GetFog () { return fog; }
-
-  /// Conveniance function to set fog to some setting.
-  void SetFog (float density, const csColor& color)
-  {
-    fog.enabled = true;
-    fog.density = density;
-    fog.red = color.red;
-    fog.green = color.green;
-    fog.blue = color.blue;
-  }
-
-  /// Disable fog.
-  void DisableFog () { fog.enabled = false; }
-#endif // CS_USE_NEW_RENDERER
-
   /// Sets dynamic ambient light for this thing
   void SetDynamicAmbientLight(const csColor& color)
   {
@@ -935,20 +906,18 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  //------------------------- iThingState interface -------------------------
-  struct ThingState : public iThingState
+  //--------------------- iThingFactoryState interface -----------------------
+  struct ThingFactoryState : public iThingFactoryState
   {
     SCF_DECLARE_EMBEDDED_IBASE (csThing);
     virtual void* GetPrivateObject () { return (void*)scfParent; }
     virtual void CompressVertices () { scfParent->CompressVertices(); }
 
     virtual int GetPolygonCount () { return scfParent->polygons.Length (); }
-    virtual iPolygon3D *GetPolygon (int idx);
-    virtual iPolygon3DStatic *GetPolygonStatic (int idx);
-    virtual iPolygon3D *GetPolygon (const char* name);
-    virtual iPolygon3DStatic *GetPolygonStatic (const char* name);
+    virtual iPolygon3DStatic *GetPolygon (int idx);
+    virtual iPolygon3DStatic *GetPolygon (const char* name);
     virtual iPolygon3DStatic *CreatePolygon (const char *iName);
-    virtual int FindPolygonIndex (iPolygon3D* polygon) const
+    virtual int FindPolygonIndex (iPolygon3DStatic* polygon) const
     { return scfParent->FindPolygonIndex (polygon); }
     virtual void RemovePolygon (int idx)
     { scfParent->RemovePolygon (idx); }
@@ -957,21 +926,13 @@ public:
 
     virtual int GetPortalCount () const;
     virtual iPortal* GetPortal (int idx) const;
-    virtual iPolygon3D* GetPortalPolygon (int idx) const;
+    virtual iPolygon3DStatic* GetPortalPolygon (int idx) const;
 
     virtual int GetVertexCount () const { return scfParent->num_vertices; }
     virtual const csVector3 &GetVertex (int i) const
     { return scfParent->obj_verts[i]; }
     virtual const csVector3* GetVertices () const
     { return scfParent->obj_verts; }
-    virtual const csVector3 &GetVertexW (int i) const
-    { return scfParent->wor_verts[i]; }
-    virtual const csVector3* GetVerticesW () const
-    { return scfParent->wor_verts; }
-    virtual const csVector3 &GetVertexC (int i) const
-    { return scfParent->cam_verts[i]; }
-    virtual const csVector3* GetVerticesC () const
-    { return scfParent->cam_verts; }
     virtual int CreateVertex (const csVector3 &iVertex)
     { return scfParent->AddVertex (iVertex.x, iVertex.y, iVertex.z); }
     virtual void SetVertex (int idx, const csVector3& vt)
@@ -982,10 +943,6 @@ public:
     { scfParent->DeleteVertices (from, to); }
 
     virtual csFlags& GetFlags () { return scfParent->flags; }
-    virtual int GetMovingOption () const
-    { return scfParent->GetMovingOption (); }
-    virtual void SetMovingOption (int opt)
-    { scfParent->SetMovingOption (opt); }
 
     virtual const csVector3& GetCurvesCenter () const
     { return scfParent->curves_center; }
@@ -1021,7 +978,7 @@ public:
     virtual void RemoveCurves ()
     { scfParent->RemoveCurves (); }
 
-    virtual void MergeTemplate (iThingState* tpl,
+    virtual void MergeTemplate (iThingFactoryState* tpl,
   	iMaterialWrapper* default_material = NULL,
 	csVector3* shift = NULL, csMatrix3* transform = NULL)
     {
@@ -1036,14 +993,8 @@ public:
     {
       scfParent->AddCurveVertex (v, uv);
     }
-#ifndef CS_USE_NEW_RENDERER
-    virtual bool HasFog () const
-    { return scfParent->HasFog (); }
-    virtual csFog *GetFog () const
-    { return &scfParent->GetFog (); }
-#endif // CS_USE_NEW_RENDERER
 
-    virtual iPolygon3D* IntersectSegment (const csVector3& start,
+    virtual iPolygon3DStatic* IntersectSegment (const csVector3& start,
 	const csVector3& end, csVector3& isect,
 	float* pr = NULL, bool only_portals = false);
 
@@ -1067,14 +1018,6 @@ public:
       return scfParent->GetNormals ();
     }
     
-    /// Prepare.
-    virtual void Prepare ()
-    {
-      scfParent->Prepare ();
-      if (scfParent->flags.Check (CS_THING_FASTMESH))
-        scfParent->PreparePolygonBuffer ();
-    }
-
     virtual float GetCosinusFactor () const
     {
       return scfParent->GetCosinusFactor ();
@@ -1082,6 +1025,51 @@ public:
     virtual void SetCosinusFactor (float cosfact)
     {
       scfParent->SetCosinusFactor (cosfact);
+    }
+  } scfiThingFactoryState;
+  friend struct ThingFactoryState;
+
+  //------------------------- iThingState interface -------------------------
+  struct ThingState : public iThingState
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csThing);
+    virtual void* GetPrivateObject () { return (void*)scfParent; }
+    virtual iThingFactoryState* GetFactory ()
+    {
+      return &(scfParent->scfiThingFactoryState);
+    }
+
+    virtual iPolygon3D *GetPolygon (int idx);
+    virtual iPolygon3D *GetPolygon (const char* name);
+    virtual int FindPolygonIndex (iPolygon3D* polygon) const
+    { return scfParent->FindPolygonIndex (polygon); }
+
+    virtual iPolygon3D* GetPortalPolygon (int idx) const;
+
+    virtual const csVector3 &GetVertexW (int i) const
+    { return scfParent->wor_verts[i]; }
+    virtual const csVector3* GetVerticesW () const
+    { return scfParent->wor_verts; }
+    virtual const csVector3 &GetVertexC (int i) const
+    { return scfParent->cam_verts[i]; }
+    virtual const csVector3* GetVerticesC () const
+    { return scfParent->cam_verts; }
+
+    virtual int GetMovingOption () const
+    { return scfParent->GetMovingOption (); }
+    virtual void SetMovingOption (int opt)
+    { scfParent->SetMovingOption (opt); }
+
+    virtual iPolygon3D* IntersectSegment (const csVector3& start,
+	const csVector3& end, csVector3& isect,
+	float* pr = NULL, bool only_portals = false);
+
+    /// Prepare.
+    virtual void Prepare ()
+    {
+      scfParent->Prepare ();
+      if (scfParent->flags.Check (CS_THING_FASTMESH))
+        scfParent->PreparePolygonBuffer ();
     }
   } scfiThingState;
   friend struct ThingState;

@@ -28,7 +28,7 @@
 
 struct iObjectRegistry;
 struct iPolygon3DStatic;
-struct iThingState;
+struct iThingFactoryState;
 struct iEngine;
 struct iSector;
 struct iMaterialWrapper;
@@ -111,7 +111,8 @@ public:
    			    iLoaderContext* ldr_context,
   			    iEngine* engine, iPolygon3DStatic* poly3d,
 			    float default_texlen,
-			    iThingState* thing_state, int vt_offset);
+			    iThingFactoryState* thing_fact_state,
+			    int vt_offset);
 
   virtual void ReportError (const char* msgid, iDocumentNode* errornode,
 	const char* msg, ...);

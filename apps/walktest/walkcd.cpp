@@ -85,7 +85,8 @@ void WalkTest::CreateColliders ()
   csRef<iMeshObjectFactory> thing_fact (ThingType->NewFactory ());
   csRef<iMeshObject> mesh_obj (SCF_QUERY_INTERFACE (thing_fact, iMeshObject));
   plbody = Engine->CreateMeshWrapper (mesh_obj, "Player's Body");
-  csRef<iThingState> thing_state (SCF_QUERY_INTERFACE (mesh_obj, iThingState));
+  csRef<iThingFactoryState> thing_state (
+  	SCF_QUERY_INTERFACE (mesh_obj, iThingFactoryState));
 
   thing_state->CreateVertex (csVector3 (-DX_2, OY,    -DZ_2));
   thing_state->CreateVertex (csVector3 (-DX_2, OY,    DZ_2));
@@ -134,7 +135,7 @@ void WalkTest::CreateColliders ()
   thing_fact = ThingType->NewFactory ();
   mesh_obj = SCF_QUERY_INTERFACE (thing_fact, iMeshObject);
   pllegs = Engine->CreateMeshWrapper (mesh_obj, "Player's Legs");
-  thing_state = SCF_QUERY_INTERFACE (mesh_obj, iThingState);
+  thing_state = SCF_QUERY_INTERFACE (mesh_obj, iThingFactoryState);
 
   thing_state->CreateVertex (csVector3 (-DX_2L, OYL,     -DZ_2L));
   thing_state->CreateVertex (csVector3 (-DX_2L, OYL,     DZ_2L));

@@ -23,7 +23,7 @@
 
 struct iModelData;
 struct iModelDataObject;
-struct iThingState;
+struct iThingFactoryState;
 struct iSprite3DFactoryState;
 struct iMaterialWrapper;
 struct iEngine;
@@ -41,7 +41,7 @@ struct iCrossBuilder : public iBase
    * Build a thing from a model file. The model data must have its materials
    * stored as material wrappers, otherwise the default material will be used.
    */
-  virtual bool BuildThing (iModelDataObject *Data, iThingState *tgt,
+  virtual bool BuildThing (iModelDataObject *Data, iThingFactoryState *tgt,
 	iMaterialWrapper *DefaultMaterial = NULL) const = 0;
 
   /// Build a sprite factory from a model file

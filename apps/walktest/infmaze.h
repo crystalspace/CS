@@ -29,6 +29,7 @@ struct iEngine;
 struct iSector;
 struct iMeshWrapper;
 struct iThingState;
+struct iThingFactoryState;
 struct iMaterialWrapper;
 struct iMeshWrapper;
 struct iFrustumView;
@@ -42,7 +43,7 @@ struct InfRoomData
   int x, y, z;
   iSector* sector;
   iMeshWrapper* walls;
-  iThingState* walls_state;
+  iThingFactoryState* walls_fact_state;
 };
 
 /**
@@ -62,7 +63,7 @@ public:
 
 
   ///
-  void create_one_side (iThingState* walls_state, char* pname,
+  void create_one_side (iThingFactoryState* walls_state, char* pname,
 	iMaterialWrapper* tm, iMaterialWrapper* tm2,
 	float x1, float y1, float z1,
 	float x2, float y2, float z2,

@@ -445,13 +445,13 @@ void csMeshWrapper::PlaceMesh ()
     if (thing)
     {
       // @@@ This function will currently only consider portals on things
-
       // that cannot move.
       if (thing->GetMovingOption () == CS_THING_MOVE_NEVER)
       {
-        for (j = 0; j < thing->GetPortalCount (); j++)
+        iThingFactoryState* thing_fact = thing->GetFactory ();
+        for (j = 0; j < thing_fact->GetPortalCount (); j++)
         {
-          iPortal *portal = thing->GetPortal (j);
+          iPortal *portal = thing_fact->GetPortal (j);
           iSector *dest_sector = portal->GetSector ();
           if (movable_sectors->Find (dest_sector) == -1)
           {

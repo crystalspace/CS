@@ -45,7 +45,7 @@ public:
   csCrossBuilder (iBase *parent);
 
   /// Build a thing from a model data object
-  virtual bool BuildThing (iModelDataObject *Data, iThingState *tgt,
+  virtual bool BuildThing (iModelDataObject *Data, iThingFactoryState *tgt,
 	iMaterialWrapper *defMat) const;
 
   /// Build a sprite factory from a model data object
@@ -89,8 +89,8 @@ csCrossBuilder::csCrossBuilder (iBase *parent)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
 }
 
-bool csCrossBuilder::BuildThing (iModelDataObject *Object, iThingState *tgt,
-  iMaterialWrapper *DefaultMaterial) const
+bool csCrossBuilder::BuildThing (iModelDataObject *Object,
+	iThingFactoryState *tgt, iMaterialWrapper *DefaultMaterial) const
 {
   int i;
 

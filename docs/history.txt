@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+20-Mar-2003
+	- Split iThingState with iThingState and iThingFactoryState.
+	- Renamed GetPolygonStatic() to GetPolygon().
 19-Mar-2003
 	- Removed a few unused flags from csPolygon3D.
 	- In order to be able to make real thing factories (that don't use

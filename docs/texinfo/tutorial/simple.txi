@@ -419,7 +419,7 @@ the following after the call to @code{csInitializer::RequestPlugins()}:
 @cindex World, Creating, Simple Tutorial
 @cindex iMaterialWrapper
 @cindex iSector
-@cindex iThingState
+@cindex iThingFactoryState
 @cindex iPolygon3D
 @cindex iLight
 @cindex iLightList
@@ -479,8 +479,8 @@ bool Simple::Initialize ()
   room = engine->CreateSector ("room");
   csRef<iMeshWrapper> walls (
     engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iThingState> walls_state (
-    SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState));
+  csRef<iThingFactoryState> walls_state (
+    SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingFactoryState));
   iPolygon3DStatic* p;
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
@@ -575,12 +575,12 @@ object. Because this is a very common case there is a convenience function
 in the engine (called @code{CreateSectorWallsMesh()}) which will create a
 thing mesh and add it to the given sector. The only thing that has to be
 done after this is add polygons to that mesh. To do this we first query
-the interface called @code{iThingState} from the thing mesh object.
+the interface called @code{iThingFactoryState} from the thing mesh object.
 We use the macro @code{SCF_QUERY_INTERFACE} which is part of @sc{scf}
 (@pxref{SCF}). This will see if the mesh object (which is wrapped by
-the mesh wrapper) actually implements @code{iThingState} (which should
+the mesh wrapper) actually implements @code{iThingFactoryState} (which should
 be the case here) and if so it will return a pointer to the implementation
-of @code{iThingState}. All mesh objects implement some kind of state
+of @code{iThingFactoryState}. All mesh objects implement some kind of state
 interface which is used to set up or query the state of that mesh object.
 Note that all interfaces which you query using @code{SCF_QUERY_INTERFACE}
 should be released when you no longer need them (by calling @code{DecRef()}).

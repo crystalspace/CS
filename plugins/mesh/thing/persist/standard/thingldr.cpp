@@ -246,6 +246,7 @@ bool csThingLoader::LoadThingPart (iThingEnvironment* te, iDocumentNode* node,
 	iObjectRegistry* object_reg, iReporter* reporter,
 	iSyntaxService *synldr, ThingLoadInfo& info,
 	iEngine* engine, iThingState* thing_state,
+	iThingFactoryState* thing_fact_state,
 	int vt_offset, bool isParent)
 {
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -282,7 +283,8 @@ bool csThingLoader::LoadThingPart (iThingEnvironment* te, iDocumentNode* node,
 	    child, "'cosfact' flag only for top-level thing!");
 	  return false;
 	}
-        else thing_state->SetCosinusFactor (child->GetContentsValueAsFloat ());
+        else thing_fact_state->SetCosinusFactor (
+		child->GetContentsValueAsFloat ());
         break;
       case XMLTOKEN_FASTMESH:
         if (!isParent)
@@ -292,7 +294,7 @@ bool csThingLoader::LoadThingPart (iThingEnvironment* te, iDocumentNode* node,
 	    child, "'fastmesh' flag only for top-level thing!");
 	  return false;
 	}
-        else thing_state->GetFlags ().Set (CS_THING_FASTMESH);
+        else thing_fact_state->GetFlags ().Set (CS_THING_FASTMESH);
         break;
       case XMLTOKEN_MOVEABLE:
         if (!isParent)
@@ -323,8 +325,8 @@ bool csThingLoader::LoadThingPart (iThingEnvironment* te, iDocumentNode* node,
               child, "Couldn't find thing factory '%s'!", factname);
             return false;
           }
-	  csRef<iThingState> tmpl_thing_state (SCF_QUERY_INTERFACE (
-	  	fact->GetMeshObjectFactory (), iThingState));
+	  csRef<iThingFactoryState> tmpl_thing_state (SCF_QUERY_INTERFACE (
+	  	fact->GetMeshObjectFactory (), iThingFactoryState));
 	  if (!tmpl_thing_state)
 	  {
 	    synldr->ReportError (
@@ -332,10 +334,11 @@ bool csThingLoader::LoadThingPart (iThingEnvironment* te, iDocumentNode* node,
               child, "Object '%s' is not a thing!", factname);
             return false;
 	  }
-	  thing_state->MergeTemplate (tmpl_thing_state, info.default_material);
+	  thing_fact_state->MergeTemplate (tmpl_thing_state,
+	  	info.default_material);
 	  if (info.use_mat_set)
           {
-	    thing_state->ReplaceMaterials (engine->GetMaterialList (),
+	    thing_fact_state->ReplaceMaterials (engine->GetMaterialList (),
 	      info.mat_set_name);
 	    info.use_mat_set = false;
 	  }
@@ -361,8 +364,8 @@ bool csThingLoader::LoadThingPart (iThingEnvironment* te, iDocumentNode* node,
             return false;
           }
 
-	  csRef<iThingState> tmpl_thing_state (SCF_QUERY_INTERFACE (
-	  	wrap->GetMeshObject (), iThingState));
+	  csRef<iThingFactoryState> tmpl_thing_state (SCF_QUERY_INTERFACE (
+	  	wrap->GetMeshObject (), iThingFactoryState));
 	  if (!tmpl_thing_state)
 	  {
 	    synldr->ReportError (
@@ -370,10 +373,11 @@ bool csThingLoader::LoadThingPart (iThingEnvironment* te, iDocumentNode* node,
               child, "Object '%s' is not a thing!", meshname);
             return false;
 	  }
-	  thing_state->MergeTemplate (tmpl_thing_state, info.default_material);
+	  thing_fact_state->MergeTemplate (tmpl_thing_state,
+	  	info.default_material);
 	  if (info.use_mat_set)
           {
-	    thing_state->ReplaceMaterials (engine->GetMaterialList (),
+	    thing_fact_state->ReplaceMaterials (engine->GetMaterialList (),
 	      info.mat_set_name);
 	    info.use_mat_set = false;
 	  }
@@ -381,8 +385,8 @@ bool csThingLoader::LoadThingPart (iThingEnvironment* te, iDocumentNode* node,
         break;
       case XMLTOKEN_PART:
 	if (!LoadThingPart (te, child, ldr_context, object_reg, reporter,
-		synldr, info, engine, thing_state,
-		thing_state->GetVertexCount (), false))
+		synldr, info, engine, thing_state, thing_fact_state,
+		thing_fact_state->GetVertexCount (), false))
 	  return false;
         break;
       case XMLTOKEN_V:
@@ -390,7 +394,7 @@ bool csThingLoader::LoadThingPart (iThingEnvironment* te, iDocumentNode* node,
 	  csVector3 v;
 	  if (!synldr->ParseVector (child, v))
 	    return false;
-          thing_state->CreateVertex (v);
+          thing_fact_state->CreateVertex (v);
         }
         break;
       case XMLTOKEN_FOG:
@@ -402,13 +406,13 @@ Nag to Jorrit about this feature if you want it.");
 
       case XMLTOKEN_P:
         {
-	  iPolygon3DStatic* poly3d = thing_state->CreatePolygon (
+	  iPolygon3DStatic* poly3d = thing_fact_state->CreatePolygon (
 			  child->GetAttributeValue ("name"));
 	  if (info.default_material)
 	    poly3d->SetMaterial (info.default_material);
 	  if (!synldr->ParsePoly3d (child, ldr_context,
 	  			    engine, poly3d,
-				    info.default_texlen, thing_state,
+				    info.default_texlen, thing_fact_state,
 				    vt_offset))
 	  {
 	    poly3d->DecRef ();
@@ -419,7 +423,7 @@ Nag to Jorrit about this feature if you want it.");
 
       case XMLTOKEN_CURVE:
         {
-	  iCurve* p = thing_state->CreateCurve ();
+	  iCurve* p = thing_fact_state->CreateCurve ();
 	  p->QueryObject()->SetName (child->GetAttributeValue ("name"));
 	  if (!ParseCurve (p, ldr_context, child))
 	    return false;
@@ -431,13 +435,13 @@ Nag to Jorrit about this feature if you want it.");
           csVector3 c;
 	  if (!synldr->ParseVector (child, c))
 	    return false;
-          thing_state->SetCurvesCenter (c);
+          thing_fact_state->SetCurvesCenter (c);
         }
         break;
       case XMLTOKEN_CURVESCALE:
         {
 	  float f = child->GetContentsValueAsFloat ();
-	  thing_state->SetCurvesScale (f);
+	  thing_fact_state->SetCurvesScale (f);
           break;
         }
       case XMLTOKEN_CURVECONTROL:
@@ -449,7 +453,7 @@ Nag to Jorrit about this feature if you want it.");
 	  v.z = child->GetAttributeValueAsFloat ("z");
 	  t.x = child->GetAttributeValueAsFloat ("u");
 	  t.y = child->GetAttributeValueAsFloat ("v");
-          thing_state->AddCurveVertex (v, t);
+          thing_fact_state->AddCurveVertex (v, t);
         }
         break;
 
@@ -474,7 +478,7 @@ Nag to Jorrit about this feature if you want it.");
         info.use_mat_set = true;
         break;
       case XMLTOKEN_SMOOTH:
-	thing_state->SetSmoothingFlag (true);
+	thing_fact_state->SetSmoothingFlag (true);
 	break;
       default:
         synldr->ReportBadToken (child);
@@ -509,15 +513,17 @@ csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
 
   csRef<iMeshObjectFactory> fact;
   csRef<iThingState> thing_state;
+  csRef<iThingFactoryState> thing_fact_state;
 
   // We always do NewFactory() even for mesh objects.
   // That's because csThing implements both so a factory is a mesh object.
   fact = type->NewFactory ();
   thing_state = SCF_QUERY_INTERFACE (fact, iThingState);
+  thing_fact_state = SCF_QUERY_INTERFACE (fact, iThingFactoryState);
 
   ThingLoadInfo info;
   if (!LoadThingPart (te, node, ldr_context, object_reg, reporter, synldr, info,
-  	engine, thing_state, 0, true))
+  	engine, thing_state, thing_fact_state, 0, true))
   {
     fact = NULL;
   }

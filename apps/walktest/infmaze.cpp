@@ -42,7 +42,8 @@ InfiniteMaze::~InfiniteMaze ()
   delete infinite_world;
 }
 
-void InfiniteMaze::create_one_side (iThingState* walls_state, char* pname,
+void InfiniteMaze::create_one_side (iThingFactoryState* walls_state,
+	char* pname,
 	iMaterialWrapper* tm, iMaterialWrapper* tm2,
 	float x1, float y1, float z1,
 	float x2, float y2, float z2,
@@ -131,6 +132,8 @@ InfRoomData* InfiniteMaze::create_six_room (iEngine* engine, int x, int y, int z
   csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
   csRef<iThingState> walls_state (SCF_QUERY_INTERFACE (walls->GetMeshObject (),
   	iThingState));
+  csRef<iThingFactoryState> walls_fact_state (SCF_QUERY_INTERFACE (
+  	walls->GetMeshObject (), iThingFactoryState));
   float dx, dy, dz;
   dx = 2.0*(float)x;
   dy = 2.0*(float)y;
@@ -139,18 +142,18 @@ InfRoomData* InfiniteMaze::create_six_room (iEngine* engine, int x, int y, int z
   iMaterialWrapper* t2 = engine->GetMaterialList ()->FindByName ("txt2");
   float s = 1;
 
-  create_one_side (walls_state, "n", t, t2, dx-s,dy+s,dz+s,  dx+s,dy+s,dz+s,
-		   dx+s,dy-s,dz+s,  dx-s,dy-s,dz+s, 0,0,-.1);
-  create_one_side (walls_state, "e", t, t2, dx+s,dy+s,dz+s,  dx+s,dy+s,dz-s,
-		   dx+s,dy-s,dz-s,  dx+s,dy-s,dz+s, -.1,0,0);
-  create_one_side (walls_state, "w", t, t2, dx-s,dy+s,dz+s,  dx-s,dy-s,dz+s,
-		   dx-s,dy-s,dz-s,  dx-s,dy+s,dz-s, .1,0,0);
-  create_one_side (walls_state, "s", t, t2, dx+s,dy+s,dz-s,  dx-s,dy+s,dz-s,
-		   dx-s,dy-s,dz-s,  dx+s,dy-s,dz-s, 0,0,.1);
-  create_one_side (walls_state, "f", t, t2, dx-s,dy-s,dz+s,  dx+s,dy-s,dz+s,
-		   dx+s,dy-s,dz-s,  dx-s,dy-s,dz-s, 0,.1,0);
-  create_one_side (walls_state, "c", t, t2, dx-s,dy+s,dz-s,  dx+s,dy+s,dz-s,
-		   dx+s,dy+s,dz+s,  dx-s,dy+s,dz+s, 0,-.1,0);
+  create_one_side (walls_fact_state, "n", t, t2, dx-s,dy+s,dz+s,
+  		dx+s,dy+s,dz+s, dx+s,dy-s,dz+s,  dx-s,dy-s,dz+s, 0,0,-.1);
+  create_one_side (walls_fact_state, "e", t, t2, dx+s,dy+s,dz+s,
+  		dx+s,dy+s,dz-s, dx+s,dy-s,dz-s,  dx+s,dy-s,dz+s, -.1,0,0);
+  create_one_side (walls_fact_state, "w", t, t2, dx-s,dy+s,dz+s,
+  		dx-s,dy-s,dz+s, dx-s,dy-s,dz-s,  dx-s,dy+s,dz-s, .1,0,0);
+  create_one_side (walls_fact_state, "s", t, t2, dx+s,dy+s,dz-s,
+  		dx-s,dy+s,dz-s, dx-s,dy-s,dz-s,  dx+s,dy-s,dz-s, 0,0,.1);
+  create_one_side (walls_fact_state, "f", t, t2, dx-s,dy-s,dz+s,
+  		dx+s,dy-s,dz+s, dx+s,dy-s,dz-s,  dx-s,dy-s,dz-s, 0,.1,0);
+  create_one_side (walls_fact_state, "c", t, t2, dx-s,dy+s,dz-s,
+  		dx+s,dy+s,dz-s, dx+s,dy+s,dz+s,  dx-s,dy+s,dz+s, 0,-.1,0);
 
   csRef<iStatLight> light (engine->CreateLight ("",
   	csVector3 (dx+rand2 (.9*s), dy+rand2 (.9*s), dz+rand2 (.9*s)),
@@ -165,7 +168,7 @@ InfRoomData* InfiniteMaze::create_six_room (iEngine* engine, int x, int y, int z
   ird->z = z;
   ird->sector = room;
   ird->walls = walls;
-  ird->walls_state = walls_state;
+  ird->walls_fact_state = walls_fact_state;
   infinite_world->Set (x, y, z, (void*)ird);
   csDataObject* irddata = new csDataObject (ird);
   room->QueryObject ()->ObjAdd (irddata);
@@ -189,8 +192,8 @@ void InfiniteMaze::connect_infinite (int x1, int y1, int z1, int x2, int y2, int
   else
     if (x1 < x2) { p1 = "e"; p2 = "w"; }
     else { p1 = "w"; p2 = "e"; }
-  iPolygon3DStatic* po1 = s1->walls_state->GetPolygonStatic (p1);
-  iPolygon3DStatic* po2 = s2->walls_state->GetPolygonStatic (p2);
+  iPolygon3DStatic* po1 = s1->walls_fact_state->GetPolygon (p1);
+  iPolygon3DStatic* po2 = s2->walls_fact_state->GetPolygon (p2);
   if (create_portal1) po1->CreatePortal (s2->sector);
   po2->CreatePortal (s1->sector);
 }
@@ -304,7 +307,7 @@ void InfiniteMaze::create_loose_portal (int x1, int y1, int z1,
     if (x1 < x2) p1 = "e";
     else p1 = "w";
   InfRoomData* s = (InfRoomData*)(infinite_world->Get (x1, y1, z1));
-  iPolygon3DStatic* po = s->walls_state->GetPolygonStatic (p1);
+  iPolygon3DStatic* po = s->walls_fact_state->GetPolygon (p1);
   iPortal* portal = po->CreateNullPortal ();
   InfPortalCS* prt = new InfPortalCS ();
   prt->x1 = x1; prt->y1 = y1; prt->z1 = z1;

@@ -1267,8 +1267,12 @@ static csPtr<iMeshWrapper> CreatePortalThing (const char* name, iSector* room,
     	iMaterialWrapper* tm, iPolygon3DStatic*& portalPoly)
 {
   csRef<iMeshWrapper> thing (CreateMeshWrapper (name));
-  csRef<iThingState> thing_state (SCF_QUERY_INTERFACE (thing->GetMeshObject (),
+  csRef<iThingState> thing_state (
+  	SCF_QUERY_INTERFACE (thing->GetMeshObject (),
   	iThingState));
+  csRef<iThingFactoryState> thing_fact_state (
+  	SCF_QUERY_INTERFACE (thing->GetMeshObject (),
+  	iThingFactoryState));
   thing_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
   thing->GetMovable ()->SetSector (room);
   float dx = 1, dy = 3, dz = .3;
@@ -1276,7 +1280,7 @@ static csPtr<iMeshWrapper> CreatePortalThing (const char* name, iSector* room,
 
   // bottom
   iPolygon3DStatic* p;
-  p = thing_state->CreatePolygon ();
+  p = thing_fact_state->CreatePolygon ();
   p->SetMaterial (tm);
   p->GetFlags ().Reset (CS_POLY_COLLDET);
   p->CreateVertex (csVector3 (-dx, 0, -dz));
@@ -1289,7 +1293,7 @@ static csPtr<iMeshWrapper> CreatePortalThing (const char* name, iSector* room,
       p->GetVertex (2), csVector2 (0.75, 0.75));
 
   // top
-  p = thing_state->CreatePolygon ();
+  p = thing_fact_state->CreatePolygon ();
   p->SetMaterial (tm);
   p->GetFlags ().Reset (CS_POLY_COLLDET);
   p->CreateVertex (csVector3 (-dx, dy, dz));
@@ -1302,7 +1306,7 @@ static csPtr<iMeshWrapper> CreatePortalThing (const char* name, iSector* room,
       p->GetVertex (2), csVector2 (0.75, 0.125));
 
   // back
-  p = thing_state->CreatePolygon ();
+  p = thing_fact_state->CreatePolygon ();
   p->SetMaterial (tm);
   p->GetFlags ().Reset (CS_POLY_COLLDET);
   p->CreateVertex (csVector3 (-dx, 0, dz));
@@ -1315,7 +1319,7 @@ static csPtr<iMeshWrapper> CreatePortalThing (const char* name, iSector* room,
       p->GetVertex (2), csVector2 (0.75, 0.25));
 
   // right
-  p = thing_state->CreatePolygon ();
+  p = thing_fact_state->CreatePolygon ();
   p->SetMaterial (tm);
   p->GetFlags ().Reset (CS_POLY_COLLDET);
   p->CreateVertex (csVector3 (dx, 0, dz));
@@ -1328,7 +1332,7 @@ static csPtr<iMeshWrapper> CreatePortalThing (const char* name, iSector* room,
       p->GetVertex (2), csVector2 (0.875, 0.25));
 
   // left
-  p = thing_state->CreatePolygon ();
+  p = thing_fact_state->CreatePolygon ();
   p->SetMaterial (tm);
   p->GetFlags ().Reset (CS_POLY_COLLDET);
   p->CreateVertex (csVector3 (-dx, 0, -dz));
@@ -1342,7 +1346,7 @@ static csPtr<iMeshWrapper> CreatePortalThing (const char* name, iSector* room,
 
   // front border
   // border top
-  p = thing_state->CreatePolygon ();
+  p = thing_fact_state->CreatePolygon ();
   p->SetMaterial (tm);
   p->GetFlags ().Reset (CS_POLY_COLLDET);
   p->CreateVertex (csVector3 (-dx+border, dy, -dz));
@@ -1354,7 +1358,7 @@ static csPtr<iMeshWrapper> CreatePortalThing (const char* name, iSector* room,
       p->GetVertex (1), csVector2 (0.875, 0.125),
       p->GetVertex (2), csVector2 (0.875, 0.0));
   // border right
-  p = thing_state->CreatePolygon ();
+  p = thing_fact_state->CreatePolygon ();
   p->SetMaterial (tm);
   p->GetFlags ().Reset (CS_POLY_COLLDET);
   p->CreateVertex (csVector3 (dx-border, dy-border, -dz));
@@ -1366,7 +1370,7 @@ static csPtr<iMeshWrapper> CreatePortalThing (const char* name, iSector* room,
       p->GetVertex (1), csVector2 (0.875, 0.125),
       p->GetVertex (2), csVector2 (0.875, 0.875));
   // border bottom
-  p = thing_state->CreatePolygon ();
+  p = thing_fact_state->CreatePolygon ();
   p->SetMaterial (tm);
   p->GetFlags ().Reset (CS_POLY_COLLDET);
   p->CreateVertex (csVector3 (-dx+border, border, -dz));
@@ -1378,7 +1382,7 @@ static csPtr<iMeshWrapper> CreatePortalThing (const char* name, iSector* room,
       p->GetVertex (1), csVector2 (0.875, 1.0),
       p->GetVertex (2), csVector2 (0.875, 0.875));
   // border left
-  p = thing_state->CreatePolygon ();
+  p = thing_fact_state->CreatePolygon ();
   p->SetMaterial (tm);
   p->GetFlags ().Reset (CS_POLY_COLLDET);
   p->CreateVertex (csVector3 (-dx, dy-border, -dz));
@@ -1390,7 +1394,7 @@ static csPtr<iMeshWrapper> CreatePortalThing (const char* name, iSector* room,
       p->GetVertex (1), csVector2 (0.0, 0.125),
       p->GetVertex (2), csVector2 (0.0, 0.875));
   // border topleft
-  p = thing_state->CreatePolygon ();
+  p = thing_fact_state->CreatePolygon ();
   p->SetMaterial (tm);
   p->GetFlags ().Reset (CS_POLY_COLLDET);
   p->CreateVertex (csVector3 (-dx, dy, -dz));
@@ -1402,7 +1406,7 @@ static csPtr<iMeshWrapper> CreatePortalThing (const char* name, iSector* room,
       p->GetVertex (1), csVector2 (0.0, 0.125),
       p->GetVertex (2), csVector2 (0.0, 0.0));
   // border topright
-  p = thing_state->CreatePolygon ();
+  p = thing_fact_state->CreatePolygon ();
   p->SetMaterial (tm);
   p->GetFlags ().Reset (CS_POLY_COLLDET);
   p->CreateVertex (csVector3 (dx-border, dy, -dz));
@@ -1414,7 +1418,7 @@ static csPtr<iMeshWrapper> CreatePortalThing (const char* name, iSector* room,
       p->GetVertex (1), csVector2 (0.875, 0.125),
       p->GetVertex (2), csVector2 (0.875, 0.0));
   // border botright
-  p = thing_state->CreatePolygon ();
+  p = thing_fact_state->CreatePolygon ();
   p->SetMaterial (tm);
   p->GetFlags ().Reset (CS_POLY_COLLDET);
   p->CreateVertex (csVector3 (dx-border, border, -dz));
@@ -1426,7 +1430,7 @@ static csPtr<iMeshWrapper> CreatePortalThing (const char* name, iSector* room,
       p->GetVertex (1), csVector2 (0.875, 1.0),
       p->GetVertex (2), csVector2 (0.875, 0.875));
   // border botleft
-  p = thing_state->CreatePolygon ();
+  p = thing_fact_state->CreatePolygon ();
   p->SetMaterial (tm);
   p->GetFlags ().Reset (CS_POLY_COLLDET);
   p->CreateVertex (csVector3 (-dx, border, -dz));
@@ -1439,7 +1443,7 @@ static csPtr<iMeshWrapper> CreatePortalThing (const char* name, iSector* room,
       p->GetVertex (2), csVector2 (0.0, 0.875));
 
   // front - the portal
-  p = thing_state->CreatePolygon ();
+  p = thing_fact_state->CreatePolygon ();
   p->SetMaterial (tm);
   p->GetFlags ().Reset (CS_POLY_COLLDET);
   // old

@@ -73,6 +73,7 @@ private:
 	iObjectRegistry* object_reg, iReporter* reporter,
 	iSyntaxService *synldr, ThingLoadInfo& info,
 	iEngine* engine, iThingState* thing_state,
+	iThingFactoryState* thing_fact_state,
 	int vt_offset, bool isParent);
 
 public:

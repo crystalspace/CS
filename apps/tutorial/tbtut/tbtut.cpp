@@ -177,8 +177,8 @@ bool TerrBigTut::Initialize ()
   room = engine->CreateSector ("room");
   csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
 
-  csRef<iThingState> walls_state (
-  	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState));
+  csRef<iThingFactoryState> walls_state (
+  	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingFactoryState));
   iPolygon3DStatic* p;
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);

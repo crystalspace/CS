@@ -838,7 +838,7 @@ bool csTextSyntaxService::ParsePoly3d (
 	iLoaderContext* ldr_context,
 	iEngine* , iPolygon3DStatic* poly3d,
 	float default_texlen,
-	iThingState* thing_state, int vt_offset)
+	iThingFactoryState* thing_fact_state, int vt_offset)
 {
   iMaterialWrapper* mat = NULL;
 
@@ -961,14 +961,14 @@ bool csTextSyntaxService::ParsePoly3d (
         }
         break;
       case XMLTOKEN_TEXMAP:
-	if (!ParseTextureMapping (child, thing_state->GetVertices (), texspec,
-			   tx_orig, tx1, tx2, tx_len,
-			   tx_matrix, tx_vector,
-			   uv_shift,
-			   tx_uv_i1, tx_uv1,
-			   tx_uv_i2, tx_uv2,
-			   tx_uv_i3, tx_uv3,
-			   plane_name, poly3d->GetName ()))
+	if (!ParseTextureMapping (child, thing_fact_state->GetVertices (),
+		texspec, tx_orig, tx1, tx2, tx_len,
+		tx_matrix, tx_vector,
+		uv_shift,
+		tx_uv_i1, tx_uv1,
+		tx_uv_i2, tx_uv2,
+		tx_uv_i3, tx_uv3,
+		plane_name, poly3d->GetName ()))
 	{
 	  return false;
 	}

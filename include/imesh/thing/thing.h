@@ -36,7 +36,6 @@ struct iMaterialWrapper;
 struct iMaterialList;
 struct iMovable;
 struct iPolyTxtPlane;
-struct csFog;
 
 /**
  * If CS_THING_FASTMESH is set then this thing will be drawn using
@@ -60,13 +59,14 @@ struct csFog;
 #define CS_THING_MOVE_OFTEN 1
 #define CS_THING_MOVE_OCCASIONAL 2
 
-SCF_VERSION (iThingState, 0, 6, 0);
+
+SCF_VERSION (iThingFactoryState, 0, 0, 1);
 
 /**
  * This is the state interface to access the internals of a thing
- * mesh object and factory (both).
+ * mesh factory.
  */
-struct iThingState : public iBase
+struct iThingFactoryState : public iBase
 {
   /// @@@ UGLY
   virtual void* GetPrivateObject () = 0;
@@ -86,17 +86,13 @@ struct iThingState : public iBase
   /// Query number of polygons in this thing.
   virtual int GetPolygonCount () = 0;
   /// Get a polygon from set by his index.
-  virtual iPolygon3D *GetPolygon (int idx) = 0;
-  /// Get a polygon from set by his index.
-  virtual iPolygon3DStatic *GetPolygonStatic (int idx) = 0;
+  virtual iPolygon3DStatic *GetPolygon (int idx) = 0;
   /// Get a polygon from set by name.
-  virtual iPolygon3D *GetPolygon (const char* name) = 0;
-  /// Get a polygon from set by name.
-  virtual iPolygon3DStatic *GetPolygonStatic (const char* name) = 0;
+  virtual iPolygon3DStatic *GetPolygon (const char* name) = 0;
   /// Create a new polygon and return a pointer to it.
   virtual iPolygon3DStatic *CreatePolygon (const char *iName = NULL) = 0;
   /// Find the index for a polygon. Returns -1 if polygon cannot be found.
-  virtual int FindPolygonIndex (iPolygon3D* polygon) const = 0;
+  virtual int FindPolygonIndex (iPolygon3DStatic* polygon) const = 0;
   /// Delete a polygon given an index.
   virtual void RemovePolygon (int idx) = 0;
   /// Delete all polygons.
@@ -107,7 +103,7 @@ struct iThingState : public iBase
   /// Get a portal.
   virtual iPortal* GetPortal (int idx) const = 0;
   /// Get the polygon for the given portal (with index).
-  virtual iPolygon3D* GetPortalPolygon (int idx) const = 0;
+  virtual iPolygon3DStatic* GetPortalPolygon (int idx) const = 0;
 
   /// Query number of vertices in set
   virtual int GetVertexCount () const = 0;
@@ -115,14 +111,6 @@ struct iThingState : public iBase
   virtual const csVector3 &GetVertex (int idx) const = 0;
   /// Get the vertex coordinates in object space
   virtual const csVector3* GetVertices () const = 0;
-  /// Get the given vertex coordinates in world space
-  virtual const csVector3 &GetVertexW (int idx) const = 0;
-  /// Get the vertex coordinates in world space
-  virtual const csVector3* GetVerticesW () const = 0;
-  /// Get the given vertex coordinates in camera space
-  virtual const csVector3 &GetVertexC (int idx) const = 0;
-  /// Get the vertex coordinates in camera space
-  virtual const csVector3* GetVerticesC () const = 0;
   /// Create a vertex given his object-space coords and return his index
   virtual int CreateVertex (const csVector3& vt) = 0;
   /// Set the object space vertices for a given vertex.
@@ -144,47 +132,6 @@ struct iThingState : public iBase
 
   /// Set thing flags (see CS_THING_... values above)
   virtual csFlags& GetFlags () = 0;
-
-  /**
-   * Get the moving option.
-   */
-  virtual int GetMovingOption () const = 0;
-
-  /**
-   * Control how this thing will be moved.
-   * There are currently three options.
-   * <ul>
-   *   <li>CS_THING_MOVE_NEVER: this option is set for a thing that cannot
-   *       move at all. In this case the movable will be ignored and only
-   *       hard transforms can be used to move a thing with this flag. This
-   *       setting is both efficient for memory (object space coordinates are
-   *       equal to world space coordinates so only one array is kept) and
-   *       render speed (only the camera transform is needed). This option
-   *       is very useful for static geometry like walls.
-   *       This option is default.
-   *   <li>CS_THING_MOVE_OCCASIONAL: this option is set for a thing that
-   *       is movable but doesn't move all the time usually. Setting this
-   *       option means that the world space vertices will be cached (taking
-   *       up more memory that way) but the coordinates will be recalculated
-   *       only at rendertime (and cached at that time). This option has
-   *       the same speed efficiency as MOVE_NEVER when the object doesn't
-   *       move but more memory is used as all the vertices are duplicated.
-   *       Use this option for geometry that is not too big (in number of
-   *       vertices) and only moves occasionally like doors of elevators.
-   *   <li>CS_THING_MOVE_OFTEN: this option is set for a thing that moves
-   *       very often (i.e. almost every frame). Setting this option means
-   *       that the object->world and camera transformations will be combined
-   *       at render time. It has the same memory efficiency as MOVE_NEVER
-   *       but the transforms need to be combined every frame (if the object
-   *       is visible). Use this option for geometry that moves a lot. Also
-   *       very useful for objects that often move and have lots of vertices
-   *       since in that case combining the transforms ones is a lot more
-   *       efficient than doing two transforms on every vertex.
-   *	   <b>WARNING:</b> This option is currently NOT supported!
-   *	   Use CS_THING_MOVE_OCCASIONAL instead.
-   * </ul>
-   */
-  virtual void SetMovingOption (int opt) = 0;
 
   /**
    * Get the center of the curves.
@@ -237,7 +184,7 @@ struct iThingState : public iBase
   /**
    * Add polygons and vertices from the specified thing (seen as template).
    */
-  virtual void MergeTemplate (iThingState* tpl,
+  virtual void MergeTemplate (iThingFactoryState* tpl,
   	iMaterialWrapper* default_material = NULL,
 	csVector3* shift = NULL, csMatrix3* transform = NULL) = 0;
 
@@ -251,19 +198,12 @@ struct iThingState : public iBase
   virtual void ReplaceMaterials (iMaterialList* matList,
   	const char* prefix) = 0;
 
-#ifndef CS_USE_NEW_RENDERER
-  /// Has this thing fog?
-  virtual bool HasFog () const = 0;
-  /// Return the fog structure (even if fog is disabled).
-  virtual csFog* GetFog () const = 0;
-#endif // CS_USE_NEW_RENDERER
-
   /**
    * Intersect a segment with this thing and return the first
    * polygon that is hit. If only_portals == true then only portals
    * will be checked.
    */
-  virtual iPolygon3D* IntersectSegment (const csVector3& start,
+  virtual iPolygon3DStatic* IntersectSegment (const csVector3& start,
 	const csVector3& end, csVector3& isect,
 	float* pr = NULL, bool only_portals = false) = 0;
 
@@ -283,6 +223,101 @@ struct iThingState : public iBase
   virtual csVector3* GetNormals () = 0;
 
   /**
+   * Get cosinus factor.
+   */
+  virtual float GetCosinusFactor () const = 0;
+  /**
+   * Set cosinus factor. This cosinus factor controls how lighting affects
+   * the polygons relative to the angle. If no value is set here then the
+   * default is used.
+   */
+  virtual void SetCosinusFactor (float cosfact) = 0;
+};
+
+SCF_VERSION (iThingState, 0, 6, 0);
+
+/**
+ * This is the state interface to access the internals of a thing
+ * mesh object.
+ */
+struct iThingState : public iBase
+{
+  /// @@@ UGLY
+  virtual void* GetPrivateObject () = 0;
+
+  /// Get the factory.
+  virtual iThingFactoryState* GetFactory () = 0;
+
+  /// Get a polygon from set by his index.
+  virtual iPolygon3D *GetPolygon (int idx) = 0;
+  /// Get a polygon from set by name.
+  virtual iPolygon3D *GetPolygon (const char* name) = 0;
+  /// Find the index for a polygon. Returns -1 if polygon cannot be found.
+  virtual int FindPolygonIndex (iPolygon3D* polygon) const = 0;
+
+  /// Get the polygon for the given portal (with index).
+  virtual iPolygon3D* GetPortalPolygon (int idx) const = 0;
+
+  /// Get the given vertex coordinates in world space
+  virtual const csVector3 &GetVertexW (int idx) const = 0;
+  /// Get the vertex coordinates in world space
+  virtual const csVector3* GetVerticesW () const = 0;
+  /// Get the given vertex coordinates in camera space
+  virtual const csVector3 &GetVertexC (int idx) const = 0;
+  /// Get the vertex coordinates in camera space
+  virtual const csVector3* GetVerticesC () const = 0;
+
+  /**
+   * Get the moving option.
+   */
+  virtual int GetMovingOption () const = 0;
+
+  /**
+   * Control how this thing will be moved.
+   * There are currently three options.
+   * <ul>
+   *   <li>CS_THING_MOVE_NEVER: this option is set for a thing that cannot
+   *       move at all. In this case the movable will be ignored and only
+   *       hard transforms can be used to move a thing with this flag. This
+   *       setting is both efficient for memory (object space coordinates are
+   *       equal to world space coordinates so only one array is kept) and
+   *       render speed (only the camera transform is needed). This option
+   *       is very useful for static geometry like walls.
+   *       This option is default.
+   *   <li>CS_THING_MOVE_OCCASIONAL: this option is set for a thing that
+   *       is movable but doesn't move all the time usually. Setting this
+   *       option means that the world space vertices will be cached (taking
+   *       up more memory that way) but the coordinates will be recalculated
+   *       only at rendertime (and cached at that time). This option has
+   *       the same speed efficiency as MOVE_NEVER when the object doesn't
+   *       move but more memory is used as all the vertices are duplicated.
+   *       Use this option for geometry that is not too big (in number of
+   *       vertices) and only moves occasionally like doors of elevators.
+   *   <li>CS_THING_MOVE_OFTEN: this option is set for a thing that moves
+   *       very often (i.e. almost every frame). Setting this option means
+   *       that the object->world and camera transformations will be combined
+   *       at render time. It has the same memory efficiency as MOVE_NEVER
+   *       but the transforms need to be combined every frame (if the object
+   *       is visible). Use this option for geometry that moves a lot. Also
+   *       very useful for objects that often move and have lots of vertices
+   *       since in that case combining the transforms ones is a lot more
+   *       efficient than doing two transforms on every vertex.
+   *	   <b>WARNING:</b> This option is currently NOT supported!
+   *	   Use CS_THING_MOVE_OCCASIONAL instead.
+   * </ul>
+   */
+  virtual void SetMovingOption (int opt) = 0;
+
+  /**
+   * Intersect a segment with this thing and return the first
+   * polygon that is hit. If only_portals == true then only portals
+   * will be checked.
+   */
+  virtual iPolygon3D* IntersectSegment (const csVector3& start,
+	const csVector3& end, csVector3& isect,
+	float* pr = NULL, bool only_portals = false) = 0;
+
+  /**
    * Prepare the thing to be ready for use. Normally this doesn't have
    * to be called as the engine will call this function automatically
    * as soon as the object is rendered. However, to avoid the (sometimes long)
@@ -291,17 +326,6 @@ struct iThingState : public iBase
    * decrease the time need to setup things later.
    */
   virtual void Prepare () = 0;
-
-  /**
-   * Get cosinus factor.
-   */
-  virtual float GetCosinusFactor () const = 0;
-  /**
-   * Set cosinus factor. This cosinus factor controls how lighting affects
-   * the polygon relative to the angle. If no value is set here then the
-   * default is used.
-   */
-  virtual void SetCosinusFactor (float cosfact) = 0;
 };
 
 SCF_VERSION (iThingEnvironment, 0, 2, 0);

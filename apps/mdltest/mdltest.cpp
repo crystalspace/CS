@@ -454,8 +454,8 @@ bool Simple::Initialize (const char *iConfigName)
 
   csRef<iMeshObjectFactory> ThingFactory (ThingType->NewFactory ());
 
-  csRef<iThingState> fState (
-	SCF_QUERY_INTERFACE (ThingFactory, iThingState));
+  csRef<iThingFactoryState> fState (
+	SCF_QUERY_INTERFACE (ThingFactory, iThingFactoryState));
   csRef<iModelDataObject> mdo (
   	CS_GET_CHILD_OBJECT (Model->QueryObject (), iModelDataObject));
   crossbuilder->BuildThing (mdo, fState, tm);

@@ -36,7 +36,7 @@ struct iPolygon3DStatic;
 struct iEngine;
 struct iSector;
 struct iMaterialWrapper;
-struct iThingState;
+struct iThingFactoryState;
 struct iLoaderContext;
 struct iDocumentNode;
 
@@ -202,7 +202,8 @@ struct iSyntaxService : public iBase
    			    iLoaderContext* ldr_context,
   			    iEngine* engine, iPolygon3DStatic* poly3d,
 			    float default_texlen,
-			    iThingState* thing_state, int vt_offset) = 0;
+			    iThingFactoryState* thing_fact_state,
+			    int vt_offset) = 0;
 
   /**
    * Report an error and also gives a path in the XML tree.

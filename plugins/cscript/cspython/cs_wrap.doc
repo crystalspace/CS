@@ -483,8 +483,8 @@ GetInvFOV()
 1.20.  class iSector
 --------------------
 
-1.21.  class iThingState
-------------------------
+1.21.  class iThingFactoryState
+-------------------------------
 
 CreatePolygon(name)
 

@@ -357,15 +357,15 @@ void GenerateThing (iObjectRegistry* object_reg,
       continue;
     }
     csRef<iMeshObjectFactory> thingFactory (thingType->NewFactory());
-    csRef<iThingState> thingState (
-    	SCF_QUERY_INTERFACE(thingFactory, iThingState));
-    if(!thingState)
+    csRef<iThingFactoryState> thingFactoryState (
+    	SCF_QUERY_INTERFACE(thingFactory, iThingFactoryState));
+    if(!thingFactoryState)
     {
       Sys->Report(CS_REPORTER_SEVERITY_NOTIFY,
 		  "Can't get iThingState Interface!");
       return;
     }
-    if(!Sys->CrossBuilder->BuildThing(mdo,thingState,mat))
+    if(!Sys->CrossBuilder->BuildThing(mdo,thingFactoryState,mat))
     {
       Sys->Report(CS_REPORTER_SEVERITY_NOTIFY,"Can't Build Thing!");
       return;
@@ -905,8 +905,8 @@ void WalkTest::ParseKeyCmds (iObject* src)
       csRef<iMeshWrapper> wrap (SCF_QUERY_INTERFACE (src, iMeshWrapper));
       if (wrap)
       {
-        csRef<iThingState> thing (SCF_QUERY_INTERFACE (
-		wrap->GetMeshObject (), iThingState));
+        csRef<iThingFactoryState> thing (SCF_QUERY_INTERFACE (
+		wrap->GetMeshObject (), iThingFactoryState));
 	if (thing)
 	{
 	  char polyname[255];
@@ -915,7 +915,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
 	  csScanStr (kp->GetValue (), "%s,%d,%f,%f",
 	  	polyname, &xyz, &max_angle, &speed);
 
-	  iPolygon3DStatic* p = thing->GetPolygonStatic (polyname);
+	  iPolygon3DStatic* p = thing->GetPolygon (polyname);
 	  if (!p)
 	  {
 	    Sys->Report (CS_REPORTER_SEVERITY_WARNING,
