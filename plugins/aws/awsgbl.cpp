@@ -606,7 +606,7 @@ awsGridBagLayout::GridBagLayoutInfo * awsGridBagLayout::GetLayoutInfo
           }
 
           /* Assign the remainder to the rightmost cell */
-          r.weightX[px - 1] += weight_diff;
+		  r.weightX[px > 0 ? px - 1 : 0] += weight_diff;
         }
 
         /*
@@ -637,7 +637,7 @@ awsGridBagLayout::GridBagLayoutInfo * awsGridBagLayout::GetLayoutInfo
           }
 
           /* Any leftovers go into the rightmost cell */
-          r.minWidth[px - 1] += pixels_diff;
+		  r.minWidth[px > 0 ? px - 1 : 0] += pixels_diff;
         }
       }
       else if (
@@ -672,7 +672,7 @@ awsGridBagLayout::GridBagLayoutInfo * awsGridBagLayout::GetLayoutInfo
           }
 
           /* Assign the remainder to the bottom cell */
-          r.weightY[py - 1] += weight_diff;
+		  r.weightY[py > 0 ? py - 1 : 0] += weight_diff;
         }
 
         /*
@@ -702,7 +702,7 @@ awsGridBagLayout::GridBagLayoutInfo * awsGridBagLayout::GetLayoutInfo
           }
 
           /* Any leftovers go into the bottom cell */
-          r.minHeight[py - 1] += pixels_diff;
+		  r.minHeight[py > 0 ? py - 1 : 0] += pixels_diff;
         }
       }
       else if (
@@ -711,6 +711,7 @@ awsGridBagLayout::GridBagLayoutInfo * awsGridBagLayout::GetLayoutInfo
         nextSize = constraints->tempHeight;
     }
   }
+
   return r.Clone();
 }
 void awsGridBagLayout::AdjustForGravity (
