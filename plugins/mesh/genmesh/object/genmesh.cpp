@@ -105,6 +105,10 @@ SCF_IMPLEMENT_IBASE (csGenmeshMeshObject::eiRenderBufferAccessor)
   SCF_IMPLEMENTS_INTERFACE (iRenderBufferAccessor)
 SCF_IMPLEMENT_IBASE_END
 
+SCF_IMPLEMENT_IBASE (csGenmeshMeshObject::eiShaderVariableAccessor)
+  SCF_IMPLEMENTS_INTERFACE (iShaderVariableAccessor)
+SCF_IMPLEMENT_IBASE_END
+
 csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory) :
 	pseudoDynInfo (29, 32),
 	affecting_lights (29, 32)
@@ -117,6 +121,7 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory) :
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShadowReceiver);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
 
+  scfiShaderVariableAccessor = new eiShaderVariableAccessor (this);
   scfiRenderBufferAccessor = new eiRenderBufferAccessor (this);
   csGenmeshMeshObject::factory = factory;
   vc = factory->vc;
@@ -640,7 +645,7 @@ void csGenmeshMeshObject::SetupShaderVariableContext ()
     {
       bufferHolder->SetRenderBuffer (userName, 
 	factory->GetUserBuffers().GetRenderBuffer (userBuf));
-      bufferMask &= ~(1 << userName);
+      bufferMask &= ~CS_BUFFER_MAKE_MASKABLE(userName);
     }
     else
     {
@@ -659,12 +664,12 @@ void csGenmeshMeshObject::SetupShaderVariableContext ()
     {
       bufferHolder->SetRenderBuffer (userName, 
 	userBuffers.GetRenderBuffer (userBuf));
-      bufferMask &= ~(1 << userName);
+      bufferMask &= ~CS_BUFFER_MAKE_MASKABLE(userName);
     }
     else
     {
       sv = svcontext->GetVariableAdd (userBuf);
-      sv->SetAccessor (factory->scfiShaderVariableAccessor);
+      sv->SetAccessor (scfiShaderVariableAccessor);
     }
   }
   bufferHolder->SetAccessor (scfiRenderBufferAccessor, bufferMask);
@@ -1105,10 +1110,9 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
 
       bufferHolder->SetRenderBuffer(CS_BUFFER_INDEX, sorted_index_buffer);
       bufferHolder->SetAccessor (scfiRenderBufferAccessor, 
-        CS_BUFFER_ALL_MASK & (~CS_BUFFER_MAKE_MASKABLE(CS_BUFFER_INDEX)));
-    } else {
-      bufferHolder->SetAccessor (scfiRenderBufferAccessor, CS_BUFFER_ALL_MASK);
-    }
+	bufferHolder->GetAccessorMask() 
+	& (~CS_BUFFER_MAKE_MASKABLE (CS_BUFFER_INDEX)));
+    } 
 
     meshPtr->mixmode = MixMode;
     meshPtr->clip_portal = clip_portal;
@@ -1285,8 +1289,17 @@ iObjectModel* csGenmeshMeshObject::GetObjectModel ()
   return factory->GetObjectModel ();
 }
 
-void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder,
-  csRenderBufferName buffer)
+void csGenmeshMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
+{
+  iRenderBuffer *a = userBuffers.GetRenderBuffer (var->GetName());
+  if (a != 0)
+  {
+    var->SetValue (a);
+  }
+}
+
+void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder, 
+					csRenderBufferName buffer)
 {
   if (!holder) return;
   if (anim_ctrl)

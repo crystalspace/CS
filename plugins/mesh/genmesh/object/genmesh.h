@@ -504,6 +504,30 @@ public:
   friend class eiRenderBufferAccessor;
 
   void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
+
+  //------------------ iShaderVariableAccessor implementation ------------
+  class eiShaderVariableAccessor : public iShaderVariableAccessor
+  {
+  public:
+    SCF_DECLARE_IBASE;
+    csGenmeshMeshObject* parent;
+    virtual ~eiShaderVariableAccessor ()
+    {
+      SCF_DESTRUCT_IBASE ();
+    }
+    eiShaderVariableAccessor (csGenmeshMeshObject* parent)
+    {
+      SCF_CONSTRUCT_IBASE (0);
+      eiShaderVariableAccessor::parent = parent;
+    }
+    virtual void PreGetValue (csShaderVariable* variable)
+    {
+      parent->PreGetShaderVariableValue (variable);
+    }
+  } *scfiShaderVariableAccessor;
+  friend class eiShaderVariableAccessor;
+
+  void PreGetShaderVariableValue (csShaderVariable* variable);
 };
 
 /**
