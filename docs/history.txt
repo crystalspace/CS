@@ -34,6 +34,7 @@ The history order is reversed so that new features are at the top.
 	  on a level that doesn't have lighting you will simply get
 	  black lightmaps and no length recalculation phase. The only
 	  way to recalculate lighting is by using -relight or -recalc.
+	- Implemented GenerateCacheName() in genmesh.
 29-Nov-2002
 	- Possibly fixed a bug in HardTransform for skeletal sprites. Instead
 	  of transforming all vertices only the vertices in the root are
