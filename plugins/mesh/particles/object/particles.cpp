@@ -274,7 +274,8 @@ bool csParticlesObject::LoadPhysicsPlugin (const char *plugin_id)
 void csParticlesObject::SetParticleRadius (float rad)
 {
   particle_radius = rad;
-  if (dynDomain) {
+  if (dynDomain)
+  {
     csShaderVariable* sv = dynDomain->GetVariableAdd (radius_name);
     if (sv) sv->SetValue (particle_radius);
   }
@@ -321,9 +322,8 @@ bool csParticlesObject::DrawTest (iRenderView* rview, iMovable* movable)
   if (!rview->ClipBSphere (tr_o2c, s, clip_portal, clip_plane, clip_z_plane))
     return false;
 
-  if (!mesh) {
+  if (!mesh)
     mesh = new csRenderMesh;
-  }
 
   mesh->z_buf_mode = CS_ZBUF_USE;
   mesh->mixmode = CS_FX_ALPHA;
@@ -397,7 +397,7 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
       color_buffer->SetStride (sizeof(csParticlesData));
 
       unsigned int *indices = new unsigned int[buffer_length];
-      for (int i=0;i<buffer_length;i++)
+      for (int i = 0; i < buffer_length; i++)
       {
         indices[i] = i;
       }
@@ -412,7 +412,7 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
       vertex_buffer->SetStride (sizeof(i_vertex));
       color_buffer->SetStride (sizeof(i_vertex));
       int i;
-      for (i=0;i<bufsize-4;i+=4)
+      for (i = 0; i < bufsize - 4; i += 4)
       {
         texcoords[i].x = 0;
         texcoords[i].y = 0;
@@ -425,7 +425,7 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
       }
       unsigned int *indices = new unsigned int[buffer_length * 6];
       int j;
-      for (i=0,j=0;i<bufsize-1;i+=4,j+=6)
+      for (i = 0, j = 0; i < bufsize-1; i += 4, j += 6)
       {
         // First triangle
         indices[j] = i;
@@ -460,7 +460,7 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
       int len = point_data.Length ();
       vertex_data.SetLength (len * 4);
       int i,j;
-      for (i=0, j=0;i<len-1;i++,j+=4)
+      for (i = 0, j = 0; i < len - 1; i++, j += 4)
       {
         csParticlesData &point = point_data[i];
         i_vertex &vertex = vertex_data[j];
@@ -502,7 +502,8 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
 csRenderMesh** csParticlesObject::GetRenderMeshes (int &n)
 {
   n = 1;
-  if (!meshpp) {
+  if (!meshpp)
+  {
     meshpp = new csRenderMesh*[1];
     meshppsize = 1;
   }
@@ -529,16 +530,16 @@ bool csParticlesObject::HitBeamObject (const csVector3& start,
 void csParticlesObject::GetObjectBoundingBox (csBox3& bbox, int type)
 {
   bbox.StartBoundingBox ();
-  switch (type) {
+  switch (type)
+  {
   case CS_BBOX_NORMAL:
     bbox.AddBoundingVertex (-radius, -radius, -radius);
     bbox.AddBoundingVertex (radius, radius, radius);
     break;
   case CS_BBOX_ACCURATE:
     // TODO: Vertices, not just points (and radius)
-    /*for (int i=0;i<max_particles;i++) {
-      bbox.AddBoundingVertex (positions[i]);
-    }*/
+    //for (int i = 0; i < max_particles; i++)
+    //  bbox.AddBoundingVertex (positions[i]);
     bbox.AddBoundingVertex (-radius, -radius, -radius);
     bbox.AddBoundingVertex (radius, radius, radius);
     break;
@@ -564,7 +565,8 @@ void csParticlesObject::Start ()
   buffer_length = 0;
 
   point_data.SetLength (start_size);
-  for (int i=0;i<start_size;i++) {
+  for (int i = 0; i < start_size; i++)
+  {
     csParticlesData &p = point_data.Get (i);
     p.position.z = FLT_MAX;
     p.color.w = 0.0f;
@@ -579,14 +581,15 @@ bool csParticlesObject::Update (float elapsed_time)
 {
   float new_radius = 0.0f;
 
-  if (total_elapsed_time < emit_time) {
+  if (total_elapsed_time < emit_time)
+  {
     total_elapsed_time += elapsed_time;
     new_particles += elapsed_time * (float)particles_per_second;
   }
 
   dead_particles = 0;
 
-  for (int i=0;i<point_data.Length ();i++)
+  for (int i = 0; i < point_data.Length(); i++)
   {
     csParticlesData &point = point_data[i];
 
@@ -700,7 +703,8 @@ bool csParticlesObject::Update (float elapsed_time)
   {
     int oldlen = point_data.Length ();
     point_data.SetLength ((oldlen << 1));
-    for (int i=oldlen;i<point_data.Length ();i++) {
+    for (int i = oldlen; i < point_data.Length(); i++)
+    {
       csParticlesData &p = point_data.Get (i);
       p.position.z = FLT_MAX;
       p.color.w = 0.0f;
