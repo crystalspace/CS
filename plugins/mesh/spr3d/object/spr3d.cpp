@@ -1112,6 +1112,7 @@ void csSprite3DMeshObject::GetTransformedBoundingBox (
   }
   else
   {
+    CS_ASSERT (cur_action != NULL);
     csSpriteFrame* cframe = cur_action->GetCsFrame (cur_frame);
     csBox3 box;
     cframe->GetBoundingBox (box);
@@ -1183,6 +1184,7 @@ void csSprite3DMeshObject::GetObjectBoundingBox (csBox3& b, int /*type*/)
   }
   else
   {
+    CS_ASSERT (cur_action != NULL);
     csSpriteFrame* cframe = cur_action->GetCsFrame (cur_frame);
     cframe->GetBoundingBox (b);
   }
@@ -1204,6 +1206,7 @@ void csSprite3DMeshObject::GetRadius (csVector3& rad, csVector3& cent)
   }
   else
   {
+    CS_ASSERT (cur_action != NULL);
     csSpriteFrame* cframe = cur_action->GetCsFrame (cur_frame);
     cframe->GetRadius (r);
   }
@@ -1328,6 +1331,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 
   UpdateWorkTables (factory->GetVertexCount());
 
+  CS_ASSERT (cur_action != NULL);
   csSpriteFrame * cframe = cur_action->GetCsFrame (cur_frame);
 
   // Get next frame for animation tweening.
