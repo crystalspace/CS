@@ -749,7 +749,8 @@ bool csThingLoader::ParsePoly3d (
       csVector3* portal_verts = new csVector3[cnt];
       int i;
       for (i = 0 ; i < cnt ; i++)
-        portal_verts[i] = thing_fact_state->GetPolygonVertex (CS_POLYINDEX_LAST, i);
+        portal_verts[i] = thing_fact_state->GetPolygonVertex (
+		CS_POLYINDEX_LAST, i);
 
       int portal_pri = portal_pri = engine->GetPortalRenderPriority ();
       if (portal_pri == 0)

@@ -874,14 +874,14 @@ bool csPortalContainer::Draw (iRenderView* rview, iMovable* movable,
   WorldToCamera (camera, camtrans);
 
   // Setup clip and far plane.
-  csPlane3 clip_plane, *pclip_plane;
-  bool do_clip_plane = rview->GetClipPlane (clip_plane);
-  if (do_clip_plane)
-    pclip_plane = &clip_plane;
+  csPlane3 portal_plane, *pportal_plane;
+  bool do_portal_plane = rview->GetClipPlane (portal_plane);
+  if (do_portal_plane)
+    pportal_plane = &portal_plane;
   else
-    pclip_plane = 0;
+    pportal_plane = 0;
 
-  csPlane3 *plclip = camera->GetFarPlane ();
+  csPlane3 *farplane = camera->GetFarPlane ();
   bool mirrored = camera->IsMirrored ();
   int fov = camera->GetFOV ();
   float shift_x = camera->GetShiftX ();
@@ -894,20 +894,20 @@ bool csPortalContainer::Draw (iRenderView* rview, iMovable* movable,
 #endif
 
   int i;
-  //@@@@@@@@@@@@@@@@@ OPTIMIZE for the case when clipping is not needed.
-  if (true)
+  if (clip_plane || clip_portal || clip_z_plane || do_portal_plane || farplane)
   {
     for (i = 0 ; i < portals.Length () ; i++)
     {
       csVector3 *verts;
       int num_verts;
-      if (ClipToPlane (i, pclip_plane, camtrans.GetOrigin (), verts, num_verts))
+      if (ClipToPlane (i, pportal_plane, camtrans.GetOrigin (),
+      	verts, num_verts))
       {
         // The far plane is defined negative. So if the portal is entirely
         // in front of the far plane it is not visible. Otherwise we will render
         // it.
-        if (!plclip ||
-          csPoly3D::Classify (*plclip, verts, num_verts) != CS_POL_FRONT)
+        if (!farplane ||
+          csPoly3D::Classify (*farplane, verts, num_verts) != CS_POL_FRONT)
         {
 	  csPoly2D clip;
 	  if (DoPerspective (verts, num_verts, &clip, mirrored, fov,
@@ -919,6 +919,20 @@ bool csPortalContainer::Draw (iRenderView* rview, iMovable* movable,
 	  }
         }
       }
+    }
+  }
+  else
+  {
+    for (i = 0 ; i < portals.Length () ; i++)
+    {
+      csPoly2D poly;
+      csPortal* prt = portals[i];
+      csDirtyAccessArray<int>& vt = prt->GetVertexIndices ();
+      int num_vertices = vt.Length ();
+      int j;
+      for (j = 0 ; j < num_vertices ; j++)
+        AddPerspective (&poly, camera_vertices[vt[j]], fov, shift_x, shift_y);
+      DrawOnePortal (portals[i], poly, movtrans, rview, camera_planes[i]);
     }
   }
 
