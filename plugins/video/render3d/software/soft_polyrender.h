@@ -64,5 +64,6 @@ public:
   virtual bool IsIndexBuffer() const { return false; }
   virtual size_t GetRangeStart() const { return 0; }
   virtual size_t GetRangeEnd() const { return 0; }
+  virtual size_t GetElementCount() const { return 0; }
 };
 
