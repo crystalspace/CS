@@ -265,6 +265,8 @@ struct sac_move_execution
 
 class csSkelAnimControlRunnable : public iGenMeshSkeletonScript
 {
+public:
+	typedef csHash<bone_transform_data*,csSkelBone*> TransformHash;
 private:
 	csSkelAnimControlScript* script;
 	csGenmeshSkelAnimationControl* anim_control;
@@ -282,8 +284,10 @@ private:
 		csTicks final;
 	} delay;
 
-	csHashMap rotations;
-	csHashMap positions;
+	TransformHash rotations;
+	TransformHash positions;
+
+	void release_tranform_data(TransformHash&);
 
 public:
 	// Return true if one of the bone transforms was actually modified.
@@ -291,10 +295,10 @@ public:
 	bool Do (csTicks current, bool& stop);
 
 	bone_transform_data *GetBoneRotation(csSkelBone *bone);
-	csHashMap & GetRotations() { return rotations; };
+	TransformHash& GetRotations() { return rotations; };
 
 	bone_transform_data *GetBonePosition(csSkelBone *bone);
-	csHashMap & GetPositions() { return positions; };
+	TransformHash& GetPositions() { return positions; };
 
 	//------------------------------------------
 

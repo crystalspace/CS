@@ -128,8 +128,8 @@ void csSkelBone::UpdateRotation()
 	{
 		csQuaternion q;
 		csSkelAnimControlRunnable *script = anim_control->GetRunningScripts ().Get (0);
-		csHashMap & rotations = script->GetRotations ();
-		bone_transform_data *b_rot = (bone_transform_data *)rotations.Get((uint32)this);
+		csSkelAnimControlRunnable::TransformHash& rotations = script->GetRotations ();
+		bone_transform_data *b_rot = rotations.Get(this, 0);
 		if (b_rot)
 		{
 			q = b_rot->quat;
@@ -153,8 +153,8 @@ void csSkelBone::UpdateRotation()
 		for (size_t i = 0; i < scripts_len; i++)
 		{
 			csSkelAnimControlRunnable *script = anim_control->GetRunningScripts ().Get (i);
-			csHashMap & rotations = script->GetRotations ();
-			bone_transform_data *b_rot = (bone_transform_data *)rotations.Get((uint32)this);
+			csSkelAnimControlRunnable::TransformHash& rotations = script->GetRotations ();
+			bone_transform_data *b_rot = rotations.Get(this, 0);
 			if (b_rot && (script->GetFactor() > 0))
 			{
 				script_factors_total += script->GetFactor();
@@ -202,8 +202,8 @@ void csSkelBone::UpdatePosition()
 	for (size_t i = 0; i < anim_control->GetRunningScripts ().Length (); i++)
 	{
 		csSkelAnimControlRunnable *script = anim_control->GetRunningScripts ().Get(i);
-		csHashMap & positions = script->GetPositions ();
-		bone_transform_data *b_pos = (bone_transform_data *)positions.Get((uint32)this);
+		csSkelAnimControlRunnable::TransformHash& positions = script->GetPositions ();
+		bone_transform_data *b_pos = positions.Get(this, 0);
 		if (b_pos)
 		{
 			updated = true;
@@ -360,31 +360,41 @@ csSkelAnimControlRunnable::csSkelAnimControlRunnable (csSkelAnimControlScript* s
 
 csSkelAnimControlRunnable::~csSkelAnimControlRunnable ()
 {
+	release_tranform_data(positions);
+	release_tranform_data(rotations);
 	SCF_DESTRUCT_IBASE ();
+}
+
+void csSkelAnimControlRunnable::release_tranform_data(TransformHash& h)
+{
+	TransformHash::GlobalIterator it(h.GetIterator());
+	while (it.HasNext())
+	  delete it.Next();
 }
 
 bone_transform_data *csSkelAnimControlRunnable::GetBoneRotation(csSkelBone *bone)
 {
-	bone_transform_data *b_rot = (bone_transform_data *)rotations.Get( (uint32)bone);
+	bone_transform_data *b_rot = rotations.Get(bone, 0);
 	if (!b_rot) 
 	{
 		b_rot = new bone_transform_data ();
 		b_rot->quat = bone->GetQuaternion();
-		rotations.Put ( (uint32)bone, b_rot);
+		rotations.Put (bone, b_rot);
 	}
+
 	return b_rot;
 }
 
 bone_transform_data *csSkelAnimControlRunnable::GetBonePosition(csSkelBone *bone)
 {
-	bone_transform_data *b_pos = (bone_transform_data *)positions.Get( (uint32)bone);
+	bone_transform_data *b_pos = positions.Get(bone, 0);
 	if (!b_pos) 
 	{
 		b_pos = new bone_transform_data ();
 		b_pos->x = bone->GetTransform().GetOrigin().x;
 		b_pos->y = bone->GetTransform().GetOrigin().y;
 		b_pos->z = bone->GetTransform().GetOrigin().z;
-		positions.Put ( (uint32)bone, b_pos);
+		positions.Put (bone, b_pos);
 	}	
 	return b_pos;
 }
