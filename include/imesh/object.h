@@ -87,6 +87,8 @@ struct iMeshObject : public iBase
 #ifndef CS_USE_NEW_RENDERER
   virtual bool Draw (iRenderView* rview, iMovable* movable,
   	csZBufMode zbufMode) = 0;
+#else
+  virtual bool Draw (iRenderView* rview, iMovable* movable) = 0;
 #endif // CS_USE_NEW_RENDERER
 
   /**

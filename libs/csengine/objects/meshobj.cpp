@@ -292,6 +292,8 @@ void csMeshWrapper::DrawIntFull (iRenderView *rview)
       UpdateDeferedLighting (movable.GetFullPosition ());
 #ifndef CS_USE_NEW_RENDERER
       mesh->Draw (rview, &movable.scfiMovable, zbufMode);
+#else
+      mesh->Draw (rview, &movable.scfiMovable);
 #endif // CS_USE_NEW_RENDERER
     }
   }
