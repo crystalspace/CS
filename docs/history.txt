@@ -41,6 +41,11 @@ chronological order.
 	  allows the AWS example programs to locate their .def files follwoing
 	  the relocation of those files from data/temp to data/aws on
 	  10-Feb-2004.
+	- Eric Sunshine removed the ugly "additional object files" hack from
+	  the Library rule in library.jam which allowed clients to associate
+	  additional object files with a library target.  This hack was needed
+	  for a while before the cssys sources had been merged physically into
+	  the csutil sources.
 24-Feb-2004
 	- Fritz Elfert fixed conversion of bezier mesh factories in map2cs
 	  and re-enabled them (With wrong cvs log-message: "Before big
