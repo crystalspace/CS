@@ -109,6 +109,7 @@ version @value{VERSION}, last updated @value{UPDATED}.
 * Contributing:: Contributing to Crystal Space
 * FAQ:: Frequently Asked Questions (@sc{faq})
 * Todo:: To-Do List
+* ApiMods17:: Convert From One CS Release to Another
 * History::
 * Index::
 @end menu
