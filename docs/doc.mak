@@ -40,6 +40,7 @@ CSAPI_TOPICS = interfaces $(filter-out %.h %.am CVS,$(notdir $(wildcard include/
 CSAPI_FILES = $(wildcard include/*.h include/*/*.h include/*/*/*.h)
 CSDOC_FILES = $(wildcard *.h */*.h */*/*.h */*/*/*.h */*/*/*/*.h)
 TEX_FILES = $(wildcard $(foreach dir,$(DOCDIRS),$(dir)/*.tex))
+PIC_FILES = $(wildcard $(foreach type,jpg jpeg png gif,newdoc/pics/*.$(type)))
 TTX_FILES = $(wildcard include/$(*F)/*.h)
 TOPIC_FILES = cs-tut.ZZZ cs-inst.ZZZ cs-thry.ZZZ cs-def.ZZZ cs-debu.ZZZ \
   $(addsuffix .ZZZ,$(CSAPI_TOPICS))
@@ -79,7 +80,10 @@ clean: cleandoc
 %.txt: %.pdf
 	pdftotext $<
 
-$(CSAPI_DIR) $(CSDOC_DIR) $(GENDOC_DIR) $(PICS_DIR):
+$(CSAPI_DIR) $(CSDOC_DIR) $(GENDOC_DIR):
+	$(MKDIR)
+
+$(PICS_DIR): $(GENDOC_DIR)
 	$(MKDIR)
 
 $(CSAPI_DIR)/index.html: $(CSAPI_DIR) newdoc/html/docxxbanner.html
@@ -94,11 +98,12 @@ $(HTML_DIR)/index.html:
 	python bin/mshelp.py crystal
 
 pics: $(PICS_DIR)
-	cp newdoc/pics/* $(PICS_DIR)/
+	$(RM) $(PICS_DIR)/*
+	cp $(PIC_FILES) $(PICS_DIR)/
 
-api: csapi/index.html pics
+api: pics csapi/index.html
 
-doc: csdoc/index.html pics
+doc: pics csdoc/index.html
 
 html: doc pics html/index.html
 
