@@ -38,6 +38,23 @@ chronological order.
 	  it attempts to detect the "warning: read-write constraint does not
 	  allow a register" diagnostic emitted by some newer versions of gcc
 	  for the assembly code in csqsqrt.h.
+	- Jorrit added support for meta data in pvscalc. This meta data
+	  can be added like this (in a sector):
+    		<meta plugin="crystalspace.pvscalc">
+		  <minarea>4</minarea>
+      		  <polygon>
+		    <v x="0" y="0" z="0" />
+		    <v x="1" y="0" z="0" />
+		    <v x="1" y="1" z="0" />
+		    <v x="0" y="1" z="0" />
+		  </polygon>
+		</meta>
+	  The polygon will be used as an additional occluder. You can
+	  add more then one polygon in a single meta block.
+	  'minarea' is the minimum polygon area that will be considered
+	  as occluders during PVS calculation. By default this is equal to 2.
+	  Decreasing that value might improve quality of PVS but the
+	  calculation time will be longer.
 15-Feb-2005
 	- Jorrit added csIntersect3::IntersectPolygon() to intersect
 	  a polygon with a segment.

@@ -29,6 +29,42 @@ CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
 
+SCF_IMPLEMENT_IBASE (PVSMetaLoader)
+  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
+SCF_IMPLEMENT_IBASE_END
+
+PVSMetaLoader::PVSMetaLoader (PVSCalc* parent)
+{
+  SCF_CONSTRUCT_IBASE (0);
+  PVSMetaLoader::parent = parent;
+  synserv = CS_QUERY_REGISTRY (parent->GetObjectRegistry (), iSyntaxService);
+}
+
+PVSMetaLoader::~PVSMetaLoader ()
+{
+  SCF_DESTRUCT_IBASE ();
+}
+
+csPtr<iBase> PVSMetaLoader::Parse (iDocumentNode* node,
+	iLoaderContext* /*ldr_context*/, iBase* context)
+{
+  csRef<iSector> sector;
+  if (context)
+    sector = SCF_QUERY_INTERFACE (context, iSector);
+  if (!sector)
+  {
+    synserv->ReportError ("crystalspace.application", node,
+    	"PVSCalc meta information must be used from within a sector!");
+    return 0;
+  }
+
+  parent->RegisterMetaInformation (sector, node);
+  sector->IncRef ();
+  return csPtr<iBase> ((iBase*)sector);
+}
+
+//-----------------------------------------------------------------------------
+
 bool PVSPolygonNode::HitBeam (const csSegment3& seg)
 {
   // First test if this beam hits the box.
@@ -96,6 +132,11 @@ PVSCalcSector::PVSCalcSector (PVSCalc* parent, iSector* sector, iPVSCuller* pvs)
   // @@@ Make dimension configurable?
   plane.covbuf = new csTiledCoverageBuffer (DIM_COVBUFFER, DIM_COVBUFFER);
   plane.covbuf_clipper = 0;
+
+  // Minimum required polygon area.
+  min_polygon_area = 2;
+
+  init_token_table (xmltokens);
 }
 
 PVSCalcSector::~PVSCalcSector ()
@@ -530,6 +571,13 @@ void PVSCalcSector::CollectGeometry (iMeshWrapper* mesh,
 	mesh_flags.Check (CS_MESH_STATICPOS) &&
     	(staticshape_mesh || staticshape_fact))
   {
+    //bool closed = csPolygonMeshTools::IsMeshClosed (polybase);
+    //bool convex = csPolygonMeshTools::IsMeshConvex (polybase);
+    //if (convex || closed)
+    //printf ("closed=%d convex=%d mesh=%s poly=%d %s\n",
+    // closed, convex, mesh->QueryObject ()->GetName (),
+    // polybase->GetPolygonCount (), (closed && convex) ?  "BOTH" : "");
+
     // Increase stats for static objects.
     staticcount++;
     staticbox += mbox;
@@ -598,7 +646,7 @@ void PVSCalcSector::SortPolygonsOnSize ()
   for (i = 0 ; i < polygons_with_area.Length () ; i++)
   {
     poly_with_area& pwa = polygons_with_area[i];
-    if (pwa.area < 2) break;
+    if (pwa.area < min_polygon_area) break;
     sorted_polygons.Push (polygons[pwa.idx]);
   }
   polygons = sorted_polygons;
@@ -699,7 +747,7 @@ bool PVSCalcSector::SetupProjectionPlane (const csBox3& source,
   if (!FindShadowPlane (source, dest, plane.axis, plane.where, where_other))
     return false;
 
-//plane.where = (plane.where + where_other) / 2.0;
+  //plane.where = (1.95 * plane.where + 0.05 * where_other) / 2.0;
 
   // We project the destination box on the given shadow plane as seen
   // from every corner of the source box. ProjectOutline() will add the
@@ -812,7 +860,8 @@ bool PVSCalcSector::CastAreaShadow (const csBox3& source,
       return false;
 
     // Now we construct a clipper from this projected polygon.
-    csPolygonClipper clip (&poly);
+    float area = poly.GetSignedArea ();
+    csPolygonClipper clip (&poly, area > 0);
 
     // Time to clip our 'poly_intersect'.
     if (!poly_intersect.ClipAgainst (&clip))
@@ -1099,6 +1148,14 @@ void PVSCalcSector::Calculate ()
 	allpcount, staticpcount);
   }
 
+  // Now we add all polygons that were added with meta information.
+  for (i = 0 ; i < meta_polygons.Length () ; i++)
+  {
+    csPoly3DBox poly3d (meta_polygons[i]);
+    poly3d.Calculate ();
+    polygons.Push (poly3d);
+  }
+
   // We sort polygons so that the polygons with the biggest area
   // are in front of the list. That way we will first try to fill
   // big polygons during visibility calculation.
@@ -1112,10 +1169,10 @@ void PVSCalcSector::Calculate ()
   	staticbox.MaxX (), staticbox.MaxY (), staticbox.MaxZ ());
   parent->ReportInfo( "%d static and %d total objects",
   	staticcount, allcount);
-  parent->ReportInfo ("%d static and %d total polygons",
-  	staticpcount, allpcount);
-  parent->ReportInfo ("%d static polygons are big enough for building PVS",
-  	polygons.Length ());
+  parent->ReportInfo ("%d static, %d meta, and %d total polygons",
+  	staticpcount, meta_polygons.Length (), allpcount);
+  parent->ReportInfo ("%d static polygons have area larger then %g",
+  	polygons.Length (), min_polygon_area);
   fflush (stdout);
 
   // From all geometry (static and dynamic) we now build the KDtree
@@ -1153,6 +1210,60 @@ void PVSCalcSector::Calculate ()
   {
     parent->ReportError ("Error writing out PVS cache!");
   }
+}
+
+bool PVSCalcSector::FeedMetaInformation (iDocumentNode* node)
+{
+  csRef<iSyntaxService> synserv = CS_QUERY_REGISTRY (
+  	parent->GetObjectRegistry (), iSyntaxService);
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_MINAREA:
+        min_polygon_area = child->GetContentsValueAsFloat ();
+        break;
+      case XMLTOKEN_POLYGON:
+        {
+	  csPoly3D polygon;
+	  csRef<iDocumentNodeIterator> it2 = child->GetNodes ();
+	  while (it2->HasNext ())
+	  {
+            csRef<iDocumentNode> child2 = it2->Next ();
+            if (child2->GetType () != CS_NODE_ELEMENT) continue;
+            const char* value2 = child2->GetValue ();
+            csStringID id2 = xmltokens.Request (value2);
+	    if (id2 == XMLTOKEN_V)
+	    {
+	      csVector3 v;
+	      if (!synserv->ParseVector (child2, v))
+	        return false;
+	      polygon.AddVertex (v);
+	    }
+	    else
+	    {
+	      parent->ReportError (
+		"Unknown token <%s> in <polygon> for PVSCalc meta information!",
+		value2);
+	      return false;
+	    }
+	  }
+	  meta_polygons.Push (polygon);
+	}
+	break;
+      default:
+        parent->ReportError (
+		"Unknown token <%s> for PVSCalc meta information!",
+		value);
+        return false;
+    }
+  }
+  return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -1198,37 +1309,44 @@ bool PVSCalc::OnInitialize (int argc, char* argv[])
   if (!RegisterQueue (GetObjectRegistry ()))
     return ReportError ("Failed to set up event handler!");
 
+  meta_loader.AttachNew (new PVSMetaLoader (this));
+  GetObjectRegistry ()->Register ((iBase*)meta_loader, "crystalspace.pvscalc");
+
   return true;
 }
 
 void PVSCalc::OnExit ()
 {
+  if (meta_loader)
+  {
+    GetObjectRegistry ()->Unregister ((iBase*)meta_loader, "crystalspace.pvscalc");
+  }
 }
 
 bool PVSCalc::Application ()
 {
   // Open the main system. This will open all the previously loaded plug-ins.
   // i.e. all windows will be opened.
-  if (!OpenApplication(GetObjectRegistry()))
+  if (!OpenApplication (GetObjectRegistry ()))
     return ReportError ("Error opening system!");
 
   // Now get the pointer to various modules we need. We fetch them
   // from the object registry. The RequestPlugins() call we did earlier
   // registered all loaded plugins with the object registry.
   // The virtual clock.
-  g3d = CS_QUERY_REGISTRY(GetObjectRegistry(), iGraphics3D);
+  g3d = CS_QUERY_REGISTRY (GetObjectRegistry (), iGraphics3D);
   if (!g3d) return ReportError ("Failed to locate 3D renderer!");
 
-  engine = CS_QUERY_REGISTRY(GetObjectRegistry(), iEngine);
+  engine = CS_QUERY_REGISTRY (GetObjectRegistry (), iEngine);
   if (!engine) return ReportError ("Failed to locate 3D engine!");
 
-  vc = CS_QUERY_REGISTRY(GetObjectRegistry(), iVirtualClock);
+  vc = CS_QUERY_REGISTRY (GetObjectRegistry (), iVirtualClock);
   if (!vc) return ReportError ("Failed to locate Virtual Clock!");
 
-  kbd = CS_QUERY_REGISTRY(GetObjectRegistry(), iKeyboardDriver);
+  kbd = CS_QUERY_REGISTRY (GetObjectRegistry (), iKeyboardDriver);
   if (!kbd) return ReportError ("Failed to locate Keyboard Driver!");
 
-  loader = CS_QUERY_REGISTRY(GetObjectRegistry(), iLoader);
+  loader = CS_QUERY_REGISTRY (GetObjectRegistry (), iLoader);
   if (!loader) return ReportError ("Failed to locate Loader!");
 
   // Here we load our world from a map file.
@@ -1286,10 +1404,18 @@ bool PVSCalc::LoadMap ()
   return true;
 }
 
-void PVSCalc::CalculatePVS (iSector* sector, iPVSCuller* pvs)
+bool PVSCalc::CalculatePVS (iSector* sector, iPVSCuller* pvs)
 {
   PVSCalcSector pvscalcsector (this, sector, pvs);
+  size_t i;
+  for (i = 0 ; i < meta_info.Length () ; i++)
+  {
+    if (meta_info[i].sector == sector)
+      if (!pvscalcsector.FeedMetaInformation (meta_info[i].meta_node))
+        return false;
+  }
   pvscalcsector.Calculate ();
+  return true;
 }
 
 void PVSCalc::CalculatePVS ()
@@ -1311,7 +1437,8 @@ void PVSCalc::CalculatePVS ()
         if (pvs)
 	{
 	  found = true;
-	  CalculatePVS (sector, pvs);
+	  if (!CalculatePVS (sector, pvs))
+	    return;
 	}
       }
     }
@@ -1324,6 +1451,12 @@ void PVSCalc::CalculatePVS ()
       ReportError ("Sector '%s' has no PVS visibility culler!",
       	(const char*)sectorname);
   }
+}
+
+void PVSCalc::RegisterMetaInformation (iSector* sector,
+	iDocumentNode* meta_node)
+{
+  meta_info.Push (PVSMetaInfo (sector, meta_node));
 }
 
 /*---------------------------------------------------------------------*

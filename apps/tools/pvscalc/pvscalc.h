@@ -64,6 +64,9 @@ private:
 
 public:
   csPoly3DBox () : csPoly3D () { }
+  csPoly3DBox (const csPoly3D& other) : csPoly3D (other)
+  {
+  }
   csPoly3DBox (const csPoly3DBox& other) : csPoly3D (other)
   {
     bbox = other.GetBBox ();
@@ -191,13 +194,25 @@ private:
   int total_visnodes;
   csTicks starttime;
 
+  // For parsing meta data.
+  csStringHash xmltokens;
+#define CS_TOKEN_ITEM_FILE "apps/tools/pvscalc/pvscalc.tok"
+#include "cstool/tokenlist.h"
+
   // The shadow KD tree used during calculations.
   PVSCalcNode* shadow_tree;
+
+  // Minimum polygon area before it is being considered for PVS calculation.
+  float min_polygon_area;
 
   // Help variables used during calculation. They are here so that the internal
   // memory that they allocate on construction is reused.
   csPoly2D poly_intersect;
   csPoly2D poly;
+
+  // Polygons add by meta data. Will be merged with the static polygon array
+  // later.
+  csArray<csPoly3D> meta_polygons;
 
   // All static polygons. Will be sorted on size.
   csArray<csPoly3DBox> polygons;
@@ -333,10 +348,6 @@ private:
   void RecurseSourceNodes (PVSCalcNode* sourcenode,
   	csSet<PVSCalcNode*> invisible_nodes, int& nodecounter);
 
-public:
-  PVSCalcSector (PVSCalc* parent, iSector* sector, iPVSCuller* pvs);
-  ~PVSCalcSector ();
-
   /**
    * Collect all geometry from this mesh if static.
    * If not-static the mesh is still used for kdtree generation.
@@ -346,10 +357,54 @@ public:
 	int& allcount, int& staticcount,
 	int& allpcount, int& staticpcount);
 
+public:
+  PVSCalcSector (PVSCalc* parent, iSector* sector, iPVSCuller* pvs);
+  ~PVSCalcSector ();
+
+  /**
+   * Feed meta information into this sector PVS calculator.
+   * Returns false on failure. Error already reported.
+   */
+  bool FeedMetaInformation (iDocumentNode* node);
+
   /**
    * Calculate the PVS for this sector.
    */
   void Calculate ();
+};
+
+/**
+ * A loader addon which will parse the meta data that is useful for the
+ * PVS culler.
+ */
+class PVSMetaLoader : public iLoaderPlugin
+{
+private:
+  PVSCalc* parent;
+  csRef<iSyntaxService> synserv;
+
+public:
+  PVSMetaLoader (PVSCalc* parent);
+  virtual ~PVSMetaLoader ();
+
+  SCF_DECLARE_IBASE;
+
+  virtual csPtr<iBase> Parse (iDocumentNode* node, iLoaderContext* ldr_context,
+  	iBase* context);
+};
+
+/**
+ * Meta information for a sector.
+ */
+struct PVSMetaInfo
+{
+  iSector* sector;
+  csRef<iDocumentNode> meta_node;
+  PVSMetaInfo (iSector* sector, iDocumentNode* meta_node)
+  {
+    PVSMetaInfo::sector = sector;
+    PVSMetaInfo::meta_node = meta_node;
+  }
 };
 
 /**
@@ -376,14 +431,23 @@ private:
   /// The sector we are scanning. Or empty if we scan all.
   csString sectorname;
 
+  /// The meta loader.
+  csRef<PVSMetaLoader> meta_loader;
+
+  /// Meta information per sector.
+  csArray<PVSMetaInfo> meta_info;
+
   /// Here we will load our world from a map file.
   bool LoadMap ();
 
   /// Set the current dir to the requested mapfile.
   bool SetMapDir (const char* map_dir);
 
-  /// Calculate PVS for the given sector and culler.
-  void CalculatePVS (iSector* sector, iPVSCuller* pvs);
+  /**
+   * Calculate PVS for the given sector and culler.
+   * Returns false on failure. Error already reported.
+   */
+  bool CalculatePVS (iSector* sector, iPVSCuller* pvs);
 
   /// Calculate PVS for all sectors as given in 'sectorname'.
   void CalculatePVS ();
@@ -417,6 +481,11 @@ public:
    */
   bool Application ();
 
+  /**
+   * Register meta information with a sector. This is called from within
+   * the meta information parser (PVSMetaLoader).
+   */
+  void RegisterMetaInformation (iSector* sector, iDocumentNode* meta_node);
 };
 
 #endif // __PVSCALC_H__
