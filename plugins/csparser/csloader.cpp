@@ -854,10 +854,10 @@ bool csLoader::LoadSounds (char* buf)
 	    parser.GetLastOffender());
 	  return false;
         }
-        iSoundWrapper *snd =
-	  CS_GET_NAMED_CHILD_OBJECT (Engine->QueryObject (), iSoundWrapper, name);
+        csRef<iSoundWrapper> snd = CS_GET_NAMED_CHILD_OBJECT (
+		Engine->QueryObject (), iSoundWrapper, name);
         if (!snd)
-          LoadSound (name, filename);
+          snd = LoadSound (name, filename);
       }
       break;
     }
@@ -915,9 +915,9 @@ bool csLoader::LoadLodControl (iLODControl* lodctrl, char* buf)
 
 //---------------------------------------------------------------------------
 
-iMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (const char* fname)
+csPtr<iMeshFactoryWrapper> csLoader::LoadMeshObjectFactory (const char* fname)
 {
-  if (!Engine) return NULL;
+  if (!Engine) return csPtr<iMeshFactoryWrapper> (NULL);
 
   ResolveOnlyRegion = false;
   SCF_DEC_REF (ldr_context); ldr_context = NULL;
@@ -929,12 +929,12 @@ iMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (const char* fname)
     ReportError (
 	      "crystalspace.maploader.parse.meshfactory",
     	      "Could not open mesh object file '%s' on VFS!", fname);
-    return NULL;
+    return csPtr<iMeshFactoryWrapper> (NULL);
   }
 
   csRef<iDocument> doc;
   bool er = TestXml (fname, databuff, doc);
-  if (!er) return false;
+  if (!er) return csPtr<iMeshFactoryWrapper> (NULL);
   if (doc)
   {
     csRef<iDocumentNode> meshfactnode = doc->GetRoot ()->GetNode ("meshfact");
@@ -943,13 +943,13 @@ iMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (const char* fname)
       ReportError (
 	      "crystalspace.maploader.parse.map",
     	      "File '%s' does not seem to contain a 'meshfact'!", fname);
-      return NULL;
+      return csPtr<iMeshFactoryWrapper> (NULL);
     }
     iMeshFactoryWrapper* t = Engine->CreateMeshFactory (
       	meshfactnode->GetAttributeValue ("name"));
     if (LoadMeshObjectFactory (t, meshfactnode))
     {
-      return t;
+      return csPtr<iMeshFactoryWrapper> (t);
     }
     else
     {
@@ -957,7 +957,7 @@ iMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (const char* fname)
       iMeshFactoryWrapper* factwrap = Engine->GetMeshFactories ()
       	  ->FindByName (meshfactnode->GetAttributeValue ("name"));
       Engine->GetMeshFactories ()->Remove (factwrap);
-      return NULL;
+      return csPtr<iMeshFactoryWrapper> (NULL);
     }
   }
   else
@@ -977,13 +977,13 @@ iMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (const char* fname)
 	    "crystalspace.maploader.parse.badformat",
 	    "Expected parameters instead of '%s' while parsing mesh factory!",
 	    buf);
-        return NULL;
+        return csPtr<iMeshFactoryWrapper> (NULL);
       }
 
       iMeshFactoryWrapper* t = Engine->CreateMeshFactory (name);
       if (LoadMeshObjectFactory (t, data))
       {
-        return t;
+        return csPtr<iMeshFactoryWrapper> (t);
       }
       else
       {
@@ -991,11 +991,11 @@ iMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (const char* fname)
         iMeshFactoryWrapper* factwrap = Engine->GetMeshFactories ()
       	  ->FindByName (name);
         Engine->GetMeshFactories ()->Remove (factwrap);
-        return NULL;
+        return csPtr<iMeshFactoryWrapper> (NULL);
       }
     }
   }
-  return NULL;
+  return csPtr<iMeshFactoryWrapper> (NULL);
 }
 
 bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
@@ -2368,9 +2368,9 @@ bool csLoader::LoadRenderPriorities (char* buf)
 
 //---------------------------------------------------------------------------
 
-iMeshWrapper* csLoader::LoadMeshObject (const char* fname)
+csPtr<iMeshWrapper> csLoader::LoadMeshObject (const char* fname)
 {
-  if (!Engine) return NULL;
+  if (!Engine) return csPtr<iMeshWrapper> (NULL);
 
   csRef<iDataBuffer> databuff (VFS->ReadFile (fname));
   iMeshWrapper* mesh = NULL;
@@ -2380,12 +2380,12 @@ iMeshWrapper* csLoader::LoadMeshObject (const char* fname)
     ReportError (
 	      "crystalspace.maploader.parse.meshobject",
     	      "Could not open mesh object file '%s' on VFS!", fname);
-    return NULL;
+    return csPtr<iMeshWrapper> (NULL);
   }
 
   csRef<iDocument> doc;
   bool er = TestXml (fname, databuff, doc);
-  if (!er) return false;
+  if (!er) return csPtr<iMeshWrapper> (NULL);
   if (doc)
   {
     csRef<iDocumentNode> meshobjnode = doc->GetRoot ()->GetNode ("meshobj");
@@ -2394,7 +2394,7 @@ iMeshWrapper* csLoader::LoadMeshObject (const char* fname)
       ReportError (
 	      "crystalspace.maploader.parse.map",
     	      "File '%s' does not seem to contain a 'meshobj'!", fname);
-      return NULL;
+      return csPtr<iMeshWrapper> (NULL);
     }
     mesh = Engine->CreateMeshWrapper (
     	meshobjnode->GetAttributeValue ("name"));
@@ -2435,7 +2435,7 @@ iMeshWrapper* csLoader::LoadMeshObject (const char* fname)
       }
     }
   }
-  return mesh;
+  return csPtr<iMeshWrapper> (mesh);
 }
 
 /************ iLoader implementation **************/
@@ -3681,10 +3681,10 @@ bool csLoader::LoadSounds (iDocumentNode* node)
 	  {
 	    filename = filenode->GetContentsValue ();
 	  }
-          iSoundWrapper *snd =
-	    CS_GET_NAMED_CHILD_OBJECT (Engine->QueryObject (), iSoundWrapper, name);
+          csRef<iSoundWrapper> snd = CS_GET_NAMED_CHILD_OBJECT (
+	  	Engine->QueryObject (), iSoundWrapper, name);
           if (!snd)
-            LoadSound (name, filename);
+            snd = LoadSound (name, filename);
         }
         break;
       default:

@@ -534,23 +534,24 @@ public:
 
   virtual void SetMode (int iFlags);
 
-  virtual iImage *LoadImage (const char *fname, int Format);
-  virtual iTextureHandle *LoadTexture (const char* fname,
+  virtual csPtr<iImage> LoadImage (const char *fname, int Format);
+  virtual csPtr<iTextureHandle> LoadTexture (const char* fname,
 	int Flags = CS_TEXTURE_3D, iTextureManager *tm = NULL);
-  virtual iTextureWrapper *LoadTexture (const char *name, const char *fname,
+  virtual csPtr<iTextureWrapper> LoadTexture (const char *name,
+  	const char *fname,
 	int Flags = CS_TEXTURE_3D, iTextureManager *tm = NULL,
 	bool reg = false);
 
-  virtual iSoundData *LoadSoundData (const char *fname);
-  virtual iSoundHandle *LoadSound (const char *fname);
-  virtual iSoundWrapper *LoadSound (const char *name, const char *fname);
+  virtual csPtr<iSoundData> LoadSoundData (const char *fname);
+  virtual csPtr<iSoundHandle> LoadSound (const char *fname);
+  virtual csPtr<iSoundWrapper> LoadSound (const char *name, const char *fname);
 
   virtual bool LoadMapFile (const char* filename, bool clearEngine,
 	bool onlyRegion);
   virtual bool LoadLibraryFile (const char* filename);
 
-  virtual iMeshFactoryWrapper* LoadMeshObjectFactory (const char* fname);
-  virtual iMeshWrapper* LoadMeshObject (const char* fname);
+  virtual csPtr<iMeshFactoryWrapper> LoadMeshObjectFactory (const char* fname);
+  virtual csPtr<iMeshWrapper> LoadMeshObject (const char* fname);
 
   struct eiComponent : public iComponent
   {

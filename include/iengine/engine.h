@@ -298,15 +298,16 @@ struct iEngine : public iBase
 
   /**
    * Create a base material that can be used to give to the texture
-   * manager.
+   * manager. Assign to a csRef or use DecRef().
    */
-  virtual iMaterial* CreateBaseMaterial (iTextureWrapper* txt) = 0;
+  virtual csPtr<iMaterial> CreateBaseMaterial (iTextureWrapper* txt) = 0;
 
   /**
    * Create a base material that can be used to give to the texture
    * manager. This version also supports texture layers.
+   * Assign to a csRef or use DecRef().
    */
-  virtual iMaterial* CreateBaseMaterial (iTextureWrapper* txt,
+  virtual csPtr<iMaterial> CreateBaseMaterial (iTextureWrapper* txt,
   	int num_layers, iTextureWrapper** wrappers, csTextureLayer* layers) = 0;
 
   /// Register a texture to be loaded during Prepare()
@@ -326,16 +327,19 @@ struct iEngine : public iBase
    * it will have #CS_ZBUF_FILL set (so that the Z-buffer will be filled
    * by the polygons of this object) and have 'wall' as render
    * priority. This version creates a mesh wrapper.
+   * Assign to a csRef or use DecRef().
    */
-  virtual iMeshWrapper* CreateSectorWallsMesh (iSector* sector,
+  virtual csPtr<iMeshWrapper> CreateSectorWallsMesh (iSector* sector,
       const char* name) = 0;
   /**
    * Conveniance function to create a thing mesh in a sector.
    * This mesh will have #CS_ZBUF_USE set (use Z-buffer fully)
    * and have 'object' as render priority. This means this function
    * is useful for general objects.
+   * Assign to a csRef or use DecRef().
    */
-  virtual iMeshWrapper* CreateThingMesh (iSector* sector, const char* name) = 0;
+  virtual csPtr<iMeshWrapper> CreateThingMesh (iSector* sector,
+  	const char* name) = 0;
 
   /// Get the list of sectors
   virtual iSectorList* GetSectors () = 0;
@@ -515,18 +519,25 @@ struct iEngine : public iBase
    */
   virtual void ResetWorldSpecificSettings() = 0;  
 
-  /// Create a new camera.
-  virtual iCamera* CreateCamera () = 0;
-  /// Create a static/pseudo-dynamic light. name can be NULL.
-  virtual iStatLight* CreateLight (const char* name, const csVector3& pos,
+  /**
+   * Create a new camera.
+   * Assign to a csRef or use DecRef().
+   */
+  virtual csPtr<iCamera> CreateCamera () = 0;
+  /**
+   * Create a static/pseudo-dynamic light. name can be NULL.
+   * Assign to a csRef or use DecRef().
+   */
+  virtual csPtr<iStatLight> CreateLight (const char* name, const csVector3& pos,
   	float radius, const csColor& color, bool pseudoDyn) = 0;
   /// Find a static/pseudo-dynamic light by name.
   virtual iStatLight* FindLight (const char *Name, bool RegionOnly = false)
     const = 0;
   /**
    * Create an iterator to iterate over all static lights of the engine.
+   * Assign to a csRef or use DecRef().
    */
-  virtual iLightIterator* GetLightIterator (iRegion* region = NULL) = 0;
+  virtual csPtr<iLightIterator> GetLightIterator (iRegion* region = NULL) = 0;
   /// Create a dynamic light.
   virtual iDynLight* CreateDynLight (const csVector3& pos, float radius,
   	const csColor& color) = 0;
@@ -580,30 +591,38 @@ struct iEngine : public iBase
    * no new factory will be created but the found one is returned instead.
    * If the name is NULL then no name will be set and no check will happen
    * if the factory already exists.
+   * Assign to a csRef or use DecRef().
    */
-  virtual iMeshFactoryWrapper* CreateMeshFactory (const char* classId,
+  virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (const char* classId,
   	const char* name) = 0;
 
-  /// Create a mesh factory wrapper for an existing mesh factory
-  virtual iMeshFactoryWrapper* CreateMeshFactory (iMeshObjectFactory *,
+  /**
+   * Create a mesh factory wrapper for an existing mesh factory
+   * Assign to a csRef or use DecRef().
+   */
+  virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (iMeshObjectFactory *,
   	const char* name) = 0;
 
-  /// Create an uninitialized mesh factory wrapper
-  virtual iMeshFactoryWrapper* CreateMeshFactory (const char* name) = 0;
+  /**
+   * Create an uninitialized mesh factory wrapper
+   * Assign to a csRef or use DecRef().
+   */
+  virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (const char* name) = 0;
 
   /**
    * Create a loader context that you can give to loader plugins.
    * It will basically allow loader plugins to find materials, ...
    * If region != NULL then only that region will
-   * be searched. Destroy this object with DecRef(). The engine itself
-   * does not keep track of it.
+   * be searched. Assign to a csRef or use DecRef().
    */
-  virtual iLoaderContext* CreateLoaderContext (iRegion* region = NULL) = 0;
+  virtual csPtr<iLoaderContext> CreateLoaderContext (
+  	iRegion* region = NULL) = 0;
 
   /**
    * Conveniance function to load a mesh factory from a given loader plugin.
+   * Assign to a csRef or use DecRef().
    */
-  virtual iMeshFactoryWrapper* LoadMeshFactory (
+  virtual csPtr<iMeshFactoryWrapper> LoadMeshFactory (
   	const char* name, const char* loaderClassId,
 	iDataBuffer* input) = 0;
 
@@ -613,14 +632,16 @@ struct iEngine : public iBase
    * Returns NULL on failure. The object will be given the specified name.
    * 'name' can be NULL if no name is wanted. Different mesh objects can
    * have the same name (in contrast with factory objects).
+   * Assign to a csRef or use DecRef().
    */
-  virtual iMeshWrapper* CreateMeshWrapper (iMeshFactoryWrapper* factory,
+  virtual csPtr<iMeshWrapper> CreateMeshWrapper (iMeshFactoryWrapper* factory,
   	const char* name, iSector* sector = NULL,
 	const csVector3& pos = csVector3(0, 0, 0)) = 0;
   /**
    * Create a mesh wrapper for an existing mesh object.
+   * Assign to a csRef or use DecRef().
    */
-  virtual iMeshWrapper* CreateMeshWrapper (iMeshObject*,
+  virtual csPtr<iMeshWrapper> CreateMeshWrapper (iMeshObject*,
   	const char* name, iSector* sector = NULL,
 	const csVector3& pos = csVector3(0, 0, 0)) = 0;
   /**
@@ -632,19 +653,23 @@ struct iEngine : public iBase
    * this function is useful to create thing mesh objects (which are both 
    * factory and object at the same time). If that fails this function
    * will call NewInstance() on the factory and return that object then.
+   * Assign to a csRef or use DecRef().
    */
-  virtual iMeshWrapper* CreateMeshWrapper (const char* classid,
+  virtual csPtr<iMeshWrapper> CreateMeshWrapper (const char* classid,
   	const char* name, iSector* sector = NULL,
 	const csVector3& pos = csVector3(0, 0, 0)) = 0;
   /**
    * Create an uninitialized mesh wrapper
+   * Assign to a csRef or use DecRef().
    */
-  virtual iMeshWrapper* CreateMeshWrapper (const char* name) = 0;
+  virtual csPtr<iMeshWrapper> CreateMeshWrapper (const char* name) = 0;
+
   /**
    * Conveniance function to load a mesh object from a given loader plugin.
    * If sector == NULL the object will not be placed in a sector.
+   * Assign to a csRef or use DecRef().
    */
-  virtual iMeshWrapper* LoadMeshWrapper (
+  virtual csPtr<iMeshWrapper> LoadMeshWrapper (
   	const char* name, const char* loaderClassId,
 	iDataBuffer* input, iSector* sector, const csVector3& pos) = 0;
 
@@ -711,9 +736,9 @@ struct iEngine : public iBase
   /**
    * This routine returns an iterator to iterate over
    * all nearby sectors.
-   * Delete the iterator with 'DecRef()' when ready.
+   * Assign to a csRef or use DecRef().
    */
-  virtual iSectorIterator* GetNearbySectors (iSector* sector,
+  virtual csPtr<iSectorIterator> GetNearbySectors (iSector* sector,
   	const csVector3& pos, float radius) = 0;
 
   /**
@@ -721,9 +746,9 @@ struct iEngine : public iBase
    * all objects that are within a radius
    * of a given position. You can use #SCF_QUERY_INTERFACE to get
    * any interface from the returned objects.<p>
-   * Delete the iterator with 'DecRef()' when ready.
+   * Assign to a csRef or use DecRef().
    */
-  virtual iObjectIterator* GetNearbyObjects (iSector* sector,
+  virtual csPtr<iObjectIterator> GetNearbyObjects (iSector* sector,
     const csVector3& pos, float radius) = 0;
 
   /**
@@ -732,9 +757,9 @@ struct iEngine : public iBase
    * This routine assumes full 360 degree visibility.
    * You can use #SCF_QUERY_INTERFACE to get any interface from the
    * returned objects.<p>
-   * Delete the iterator with 'DecRef()' when ready.
+   * Assign to a csRef or use DecRef().
    */
-  virtual iObjectIterator* GetVisibleObjects (iSector* sector,
+  virtual csPtr<iObjectIterator> GetVisibleObjects (iSector* sector,
     const csVector3& pos) = 0;
 
   /**
@@ -743,9 +768,9 @@ struct iEngine : public iBase
    * This routine has a frustum restricting the view.
    * You can use #SCF_QUERY_INTERFACE to get any interface from the
    * returned objects.<p>
-   * Delete the iterator with 'DecRef()' when ready.
+   * Assign to a csRef or use DecRef().
    */
-  virtual iObjectIterator* GetVisibleObjects (iSector* sector,
+  virtual csPtr<iObjectIterator> GetVisibleObjects (iSector* sector,
     const csFrustum& frustum) = 0;
 
   /**

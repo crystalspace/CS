@@ -31,18 +31,20 @@
 #include "isound/loader.h"
 #include "isound/renderer.h"
 
-iSoundData *csLoader::LoadSoundData(const char* filename) {
+csPtr<iSoundData> csLoader::LoadSoundData(const char* filename)
+{
   if (!VFS || !SoundLoader)
-    return NULL;
+    return csPtr<iSoundData> (NULL);
 
   // read the file data
   iDataBuffer *buf = VFS->ReadFile (filename);
-  if (!buf || !buf->GetSize ()) {
+  if (!buf || !buf->GetSize ())
+  {
     if (buf) buf->DecRef ();
     ReportError (
 	      "crystalspace.maploader.parse.sound",
 	      "Cannot open sound file '%s' from VFS!", filename);
-    return NULL;
+    return csPtr<iSoundData> (NULL);
   }
 
   // load the sound
@@ -59,15 +61,16 @@ iSoundData *csLoader::LoadSoundData(const char* filename) {
   else
     Stats->sounds_loaded++;
 
-  return Sound;
+  return csPtr<iSoundData> (Sound);
 }
 
-iSoundHandle *csLoader::LoadSound(const char* filename) {
+csPtr<iSoundHandle> csLoader::LoadSound(const char* filename)
+{
   if (!SoundRender)
-    return NULL;
+    return csPtr<iSoundHandle> (NULL);
 
   iSoundData *Sound = LoadSoundData(filename);
-  if (!Sound) return NULL;
+  if (!Sound) return csPtr<iSoundHandle> (NULL);
 
   /* register the sound */
   iSoundHandle *hdl = SoundRender->RegisterSound(Sound);
@@ -78,19 +81,19 @@ iSoundHandle *csLoader::LoadSound(const char* filename) {
 	      "Cannot register sound '%s'!", filename);
   }
 
-  return hdl;
+  return csPtr<iSoundHandle> (hdl);
 }
 
-iSoundWrapper *csLoader::LoadSound (const char* name, const char* fname) {
+csPtr<iSoundWrapper> csLoader::LoadSound (const char* name, const char* fname)
+{
   // load the sound handle
   iSoundHandle *Sound = LoadSound(fname);
-  if (!Sound) return NULL;
+  if (!Sound) return csPtr<iSoundWrapper> (NULL);
 
   // build wrapper object
   iSoundWrapper* Wrapper = &(new csSoundWrapper (Sound))->scfiSoundWrapper;
   Wrapper->QueryObject ()->SetName (name);
   if (Engine) Engine->QueryObject ()->ObjAdd(Wrapper->QueryObject ());
-  Wrapper->DecRef ();
 
-  return Wrapper;
+  return csPtr<iSoundWrapper> (Wrapper);
 }

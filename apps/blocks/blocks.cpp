@@ -2256,25 +2256,29 @@ void Blocks::InitGameRoom ()
   Sys->add_hrast (2, (player1->zone_dim)-1, CUBE_DIM/2, CUBE_DIM/2, 0);
 
   iLightList* ll = room->GetLights ();
-  iLight *light;
-  ll->Add (light=engine->CreateLight (NULL,
-    csVector3(-3, 5, 0), 10, csColor(.8, .4, .4), false)->QueryLight ());
-  light->DecRef ();
-  ll->Add (light=engine->CreateLight (NULL,
-    csVector3(3, 5, 0), 10, csColor(.4, .4, .8), false)->QueryLight ());
-  light->DecRef ();
-  ll->Add (light=engine->CreateLight (NULL,
-    csVector3(0, 5, -3), 10, csColor(.4, .8, .4), false)->QueryLight ());
-  light->DecRef ();
-  ll->Add (light=engine->CreateLight (NULL,
-    csVector3(0, 5, 3), 10, csColor(.8, .4, .8), false)->QueryLight ());
-  light->DecRef ();
-  ll->Add (light=engine->CreateLight (NULL, csVector3(0, (ZONE_HEIGHT-3-3) *
-    CUBE_DIM+1, 0), CUBE_DIM*10, csColor(.5, .5, .5), false)->QueryLight ());
-  light->DecRef ();
-  ll->Add (light=engine->CreateLight (NULL, csVector3(0, (ZONE_HEIGHT-3+3) *
-    CUBE_DIM+1, 0), CUBE_DIM*10, csColor(.5, .5, .5), false)->QueryLight ());
-  light->DecRef ();
+  csRef<iStatLight> light;
+  light = engine->CreateLight (NULL,
+    csVector3(-3, 5, 0), 10, csColor(.8, .4, .4), false);
+  ll->Add (light->QueryLight ());
+  light = engine->CreateLight (NULL,
+    csVector3(3, 5, 0), 10, csColor(.4, .4, .8), false);
+  ll->Add (light->QueryLight ());
+
+  light = engine->CreateLight (NULL,
+    csVector3(0, 5, -3), 10, csColor(.4, .8, .4), false);
+  ll->Add (light->QueryLight ());
+
+  light = engine->CreateLight (NULL,
+    csVector3(0, 5, 3), 10, csColor(.8, .4, .8), false);
+  ll->Add (light->QueryLight ());
+
+  light = engine->CreateLight (NULL, csVector3(0, (ZONE_HEIGHT-3-3) *
+    CUBE_DIM+1, 0), CUBE_DIM*10, csColor(.5, .5, .5), false);
+  ll->Add (light->QueryLight ());
+
+  light = engine->CreateLight (NULL, csVector3(0, (ZONE_HEIGHT-3+3) *
+    CUBE_DIM+1, 0), CUBE_DIM*10, csColor(.5, .5, .5), false);
+  ll->Add (light->QueryLight ());
 }
 
 void Blocks::InitDemoRoom ()
@@ -2297,11 +2301,10 @@ void Blocks::InitDemoRoom ()
   walls_state->DecRef ();
   walls->DecRef ();
 
-  iLight *light;
-  demo_room->GetLights ()->Add (
-  	light=engine->CreateLight (NULL, csVector3 (0, 0, -2),
-	10, csColor (.4, .4, .4), false)->QueryLight ());
-  light->DecRef ();
+  csRef<iStatLight> light;
+  light = engine->CreateLight (NULL, csVector3 (0, 0, -2),
+	10, csColor (.4, .4, .4), false);
+  demo_room->GetLights ()->Add (light->QueryLight ());
 
   float char_width = CUBE_DIM*4.;
   float offset_x = -char_width * (6/2)+CUBE_DIM*2;

@@ -1335,7 +1335,7 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
     csSector::cfg_reflections = 1;
   }
 
-  iLightIterator *lit = GetLightIterator (iregion);
+  csRef<iLightIterator> lit = GetLightIterator (iregion);
 
   // Count number of lights to process.
   iLight *l;
@@ -1469,9 +1469,8 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
   if (do_relight) Report ("Updating VFS....");
   if (!VFS->Sync()) Warn ("Error updating lighttable cache!");
   if (do_relight) Report ("DONE!");
-
-  lit->DecRef ();
 }
+
 void csEngine::InvalidateLightmaps ()
 {
 #if 0
@@ -2123,16 +2122,17 @@ int csEngine::GetNearbyLights (
   }
 }
 
-iSectorIterator *csEngine::GetNearbySectors (
+csPtr<iSectorIterator> csEngine::GetNearbySectors (
   iSector *sector,
   const csVector3 &pos,
   float radius)
 {
   csSectorIt *it = new csSectorIt (sector->GetPrivateObject (), pos, radius);
-  return it;
+  return csPtr<iSectorIterator> (it);
 }
 
-static void AddObject (iObject**& list, int& num_objects, int& max_objects, iObject* obj)
+static void AddObject (iObject**& list, int& num_objects,
+	int& max_objects, iObject* obj)
 {
   CS_ASSERT (num_objects <= max_objects);
   if (num_objects >= max_objects)
@@ -2239,7 +2239,7 @@ iObject** csEngine::GetNearbyObjectList (iSector* sector,
   return list;
 }
 
-iObjectIterator *csEngine::GetNearbyObjects (
+csPtr<iObjectIterator> csEngine::GetNearbyObjects (
   iSector *sector,
   const csVector3 &pos,
   float radius)
@@ -2247,23 +2247,23 @@ iObjectIterator *csEngine::GetNearbyObjects (
   int num_objects;
   iObject** list = GetNearbyObjectList (sector, pos, radius, num_objects);
   csObjectListIt *it = new csObjectListIt (list, num_objects);
-  return it;
+  return csPtr<iObjectIterator> (it);
 }
 
-iObjectIterator *csEngine::GetVisibleObjects (
+csPtr<iObjectIterator> csEngine::GetVisibleObjects (
   iSector* /*sector*/,
   const csVector3& /*pos*/)
 {
   // @@@ Not implemented yet.
-  return NULL;
+  return csPtr<iObjectIterator> (NULL);
 }
 
-iObjectIterator *csEngine::GetVisibleObjects (
+csPtr<iObjectIterator> csEngine::GetVisibleObjects (
   iSector* /*sector*/,
   const csFrustum& /*frustum*/)
 {
   // @@@ Not implemented yet.
-  return NULL;
+  return csPtr<iObjectIterator> (NULL);
 }
 
 int csEngine::GetTextureFormat () const
@@ -2318,10 +2318,9 @@ iTextureWrapper *csEngine::CreateTexture (
   if (!ImageLoader) return NULL;
 
   // First of all, load the image file
-  iDataBuffer *data = VFS->ReadFile (iFileName);
+  csRef<iDataBuffer> data = VFS->ReadFile (iFileName);
   if (!data || !data->GetSize ())
   {
-    if (data) data->DecRef ();
     Warn ("Cannot read image file \"%s\" from VFS.", iFileName);
     return NULL;
   }
@@ -2330,7 +2329,6 @@ iTextureWrapper *csEngine::CreateTexture (
       data->GetUint8 (),
       data->GetSize (),
       CS_IMGFMT_TRUECOLOR); // GetTextureFormat ());
-  data->DecRef ();
 
   if (!ifile)
   {
@@ -2338,9 +2336,8 @@ iTextureWrapper *csEngine::CreateTexture (
     return NULL;
   }
 
-  iDataBuffer *xname = VFS->ExpandPath (iFileName);
+  csRef<iDataBuffer> xname = VFS->ExpandPath (iFileName);
   ifile->SetName (**xname);
-  xname->DecRef ();
 
   // Okay, now create the respective texture handle object
   iTextureWrapper *tex = GetTextures ()->FindByName (iName);
@@ -2375,7 +2372,7 @@ iMaterialWrapper *csEngine::CreateMaterial (
   return wrapper;
 }
 
-iMeshWrapper *csEngine::CreateThingMesh (
+csPtr<iMeshWrapper> csEngine::CreateThingMesh (
   iSector *sector,
   const char *name)
 {
@@ -2384,10 +2381,10 @@ iMeshWrapper *csEngine::CreateThingMesh (
   thing_wrap->SetZBufMode (CS_ZBUF_USE);
   thing_wrap->SetRenderPriority (GetObjectRenderPriority ());
 
-  return thing_wrap;
+  return csPtr<iMeshWrapper> (thing_wrap);
 }
 
-iMeshWrapper *csEngine::CreateSectorWallsMesh (
+csPtr<iMeshWrapper> csEngine::CreateSectorWallsMesh (
   iSector *sector,
   const char *name)
 {
@@ -2397,7 +2394,7 @@ iMeshWrapper *csEngine::CreateSectorWallsMesh (
   thing_wrap->SetZBufMode (CS_ZBUF_FILL);
   thing_wrap->SetRenderPriority (GetWallRenderPriority ());
 
-  return thing_wrap;
+  return csPtr<iMeshWrapper> (thing_wrap);
 }
 
 iSector *csEngine::CreateSector (const char *iName)
@@ -2410,17 +2407,17 @@ iSector *csEngine::CreateSector (const char *iName)
   return sector;
 }
 
-iMaterial *csEngine::CreateBaseMaterial (iTextureWrapper *txt)
+csPtr<iMaterial> csEngine::CreateBaseMaterial (iTextureWrapper *txt)
 {
   csMaterial *mat = new csMaterial ();
   if (txt) mat->SetTextureWrapper (txt);
 
   iMaterial *imat = SCF_QUERY_INTERFACE (mat, iMaterial);
   imat->DecRef ();
-  return imat;
+  return csPtr<iMaterial> (imat);
 }
 
-iMaterial *csEngine::CreateBaseMaterial (
+csPtr<iMaterial> csEngine::CreateBaseMaterial (
   iTextureWrapper *txt,
   int num_layers,
   iTextureWrapper **wrappers,
@@ -2443,7 +2440,7 @@ iMaterial *csEngine::CreateBaseMaterial (
 
   iMaterial *imat = SCF_QUERY_INTERFACE (mat, iMaterial);
   imat->DecRef ();
-  return imat;
+  return csPtr<iMaterial> (imat);
 }
 
 iTextureList *csEngine::GetTextureList () const
@@ -2461,12 +2458,12 @@ iRegionList *csEngine::GetRegions ()
   return &(regions.scfiRegionList);
 }
 
-iCamera *csEngine::CreateCamera ()
+csPtr<iCamera> csEngine::CreateCamera ()
 {
-  return &(new csCamera ())->scfiCamera;
+  return csPtr<iCamera> (&(new csCamera ())->scfiCamera);
 }
 
-iStatLight *csEngine::CreateLight (
+csPtr<iStatLight> csEngine::CreateLight (
   const char *name,
   const csVector3 &pos,
   float radius,
@@ -2486,7 +2483,7 @@ iStatLight *csEngine::CreateLight (
 
   iStatLight *il = SCF_QUERY_INTERFACE (light, iStatLight);
   il->DecRef ();
-  return il;
+  return csPtr<iStatLight> (il);
 }
 
 iDynLight *csEngine::CreateDynLight (
@@ -2514,7 +2511,7 @@ void csEngine::RemoveDynLight (iDynLight *light)
   RemoveDynLight (light->GetPrivateObject ());
 }
 
-iMeshFactoryWrapper *csEngine::CreateMeshFactory (
+csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (
   const char *classId,
   const char *name)
 {
@@ -2541,10 +2538,10 @@ iMeshFactoryWrapper *csEngine::CreateMeshFactory (
   if (fwrap && name) fwrap->QueryObject ()->SetName (name);
   fact->DecRef ();
   type->DecRef ();
-  return fwrap;
+  return csPtr<iMeshFactoryWrapper> (fwrap);
 }
 
-iMeshFactoryWrapper *csEngine::CreateMeshFactory (
+csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (
   iMeshObjectFactory *fact,
   const char *name)
 {
@@ -2557,10 +2554,10 @@ iMeshFactoryWrapper *csEngine::CreateMeshFactory (
   csMeshFactoryWrapper *mfactwrap = new csMeshFactoryWrapper (fact);
   if (name) mfactwrap->SetName (name);
   GetMeshFactories ()->Add (&(mfactwrap->scfiMeshFactoryWrapper));
-  return &mfactwrap->scfiMeshFactoryWrapper;
+  return csPtr<iMeshFactoryWrapper> (&mfactwrap->scfiMeshFactoryWrapper);
 }
 
-iMeshFactoryWrapper *csEngine::CreateMeshFactory (const char *name)
+csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (const char *name)
 {
   // WARNING! In the past this routine checked if the factory
   // was already created. This is wrong! This routine should not do
@@ -2571,7 +2568,7 @@ iMeshFactoryWrapper *csEngine::CreateMeshFactory (const char *name)
   csMeshFactoryWrapper *mfactwrap = new csMeshFactoryWrapper ();
   if (name) mfactwrap->SetName (name);
   GetMeshFactories ()->Add (&(mfactwrap->scfiMeshFactoryWrapper));
-  return &mfactwrap->scfiMeshFactoryWrapper;
+  return csPtr<iMeshFactoryWrapper> (&mfactwrap->scfiMeshFactoryWrapper);
 }
 
 //------------------------------------------------------------------------
@@ -2648,14 +2645,14 @@ iTextureWrapper* EngineLoaderContext::FindTexture (const char* name)
 
 //------------------------------------------------------------------------
 
-iLoaderContext* csEngine::CreateLoaderContext (iRegion* region)
+csPtr<iLoaderContext> csEngine::CreateLoaderContext (iRegion* region)
 {
-  return new EngineLoaderContext (this, region);
+  return csPtr<iLoaderContext> (new EngineLoaderContext (this, region));
 }
 
 //------------------------------------------------------------------------
 
-iMeshFactoryWrapper *csEngine::LoadMeshFactory (
+csPtr<iMeshFactoryWrapper> csEngine::LoadMeshFactory (
   const char *name,
   const char *loaderClassId,
   iDataBuffer *input)
@@ -2668,10 +2665,10 @@ iMeshFactoryWrapper *csEngine::LoadMeshFactory (
   if (!plug)
     plug = CS_LOAD_PLUGIN (plugin_mgr, loaderClassId, iLoaderPlugin);
   plugin_mgr->DecRef ();
-  if (!plug) return NULL;
+  if (!plug) return csPtr<iMeshFactoryWrapper> (NULL);
 
   iMeshFactoryWrapper *fact = CreateMeshFactory (name);
-  if (!fact) return NULL;
+  if (!fact) return csPtr<iMeshFactoryWrapper> (NULL);
 
   char *buf = **input;
   iLoaderContext* elctxt = CreateLoaderContext ();
@@ -2682,7 +2679,8 @@ iMeshFactoryWrapper *csEngine::LoadMeshFactory (
   if (!mof)
   {
     GetMeshFactories ()->Remove (fact);
-    return NULL;
+    fact->DecRef ();
+    return csPtr<iMeshFactoryWrapper> (NULL);
   }
 
   iMeshObjectFactory *mof2 = SCF_QUERY_INTERFACE (mof, iMeshObjectFactory);
@@ -2690,17 +2688,18 @@ iMeshFactoryWrapper *csEngine::LoadMeshFactory (
   {
     // @@@ ERROR?
     GetMeshFactories ()->Remove (fact);
-    return NULL;
+    fact->DecRef ();
+    return csPtr<iMeshFactoryWrapper> (NULL);
   }
 
   fact->SetMeshObjectFactory (mof2);
   mof2->SetLogicalParent (fact);
   mof2->DecRef ();
   mof->DecRef ();
-  return fact;
+  return csPtr<iMeshFactoryWrapper> (fact);
 }
 
-iMeshWrapper *csEngine::LoadMeshWrapper (
+csPtr<iMeshWrapper> csEngine::LoadMeshWrapper (
   const char *name,
   const char *loaderClassId,
   iDataBuffer *input,
@@ -2715,7 +2714,7 @@ iMeshWrapper *csEngine::LoadMeshWrapper (
   if (!plug)
     plug = CS_LOAD_PLUGIN (plugin_mgr, loaderClassId, iLoaderPlugin);
   plugin_mgr->DecRef ();
-  if (!plug) return NULL;
+  if (!plug) return csPtr<iMeshWrapper> (NULL);
 
   csMeshWrapper *meshwrap = new csMeshWrapper (NULL);
   if (name) meshwrap->SetName (name);
@@ -2739,15 +2738,15 @@ iMeshWrapper *csEngine::LoadMeshWrapper (
   {
     GetMeshes ()->Remove (imw);
     meshwrap->DecRef ();
-    return NULL;
+    return csPtr<iMeshWrapper> (NULL);
   }
 
   meshwrap->SetMeshObject ((iMeshObject *)mof);
   mof->DecRef ();
-  return imw;
+  return csPtr<iMeshWrapper> (imw);
 }
 
-iMeshWrapper *csEngine::CreateMeshWrapper (
+csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
   iMeshFactoryWrapper *factory,
   const char *name,
   iSector *sector,
@@ -2763,10 +2762,10 @@ iMeshWrapper *csEngine::CreateMeshWrapper (
     mesh->GetMovable ()->UpdateMove ();
   }
 
-  return mesh;
+  return csPtr<iMeshWrapper> (mesh);
 }
 
-iMeshWrapper *csEngine::CreateMeshWrapper (
+csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
   iMeshObject *mesh,
   const char *name,
   iSector *sector,
@@ -2782,18 +2781,18 @@ iMeshWrapper *csEngine::CreateMeshWrapper (
     meshwrap->GetMovable ().UpdateMove ();
   }
 
-  return &meshwrap->scfiMeshWrapper;
+  return csPtr<iMeshWrapper> (&meshwrap->scfiMeshWrapper);
 }
 
-iMeshWrapper *csEngine::CreateMeshWrapper (const char *name)
+csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (const char *name)
 {
   csMeshWrapper *meshwrap = new csMeshWrapper (NULL);
   if (name) meshwrap->SetName (name);
   GetMeshes ()->Add (&(meshwrap->scfiMeshWrapper));
-  return &meshwrap->scfiMeshWrapper;
+  return csPtr<iMeshWrapper> (&meshwrap->scfiMeshWrapper);
 }
 
-iMeshWrapper *csEngine::CreateMeshWrapper (
+csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
   const char *classId,
   const char *name,
   iSector *sector,
@@ -2806,11 +2805,11 @@ iMeshWrapper *csEngine::CreateMeshWrapper (
       iMeshObjectType);
   if (!type) type = CS_LOAD_PLUGIN (plugin_mgr, classId, iMeshObjectType);
   plugin_mgr->DecRef ();
-  if (!type) return NULL;
+  if (!type) return csPtr<iMeshWrapper> (NULL);
 
   iMeshObjectFactory *fact = type->NewFactory ();
   type->DecRef ();
-  if (!fact) return NULL;
+  if (!fact) return csPtr<iMeshWrapper> (NULL);
 
   iMeshObject* mo = SCF_QUERY_INTERFACE (fact, iMeshObject);
   if (!mo)
@@ -2823,15 +2822,15 @@ iMeshWrapper *csEngine::CreateMeshWrapper (
     {
       iMeshWrapper* mw = CreateMeshWrapper (mo, name, sector, pos);
       mo->DecRef ();
-      return mw;
+      return csPtr<iMeshWrapper> (mw);
     }
-    return NULL;
+    return csPtr<iMeshWrapper> (NULL);
   }
 
   fact->DecRef ();
   iMeshWrapper* mw = CreateMeshWrapper (mo, name, sector, pos);
   mo->DecRef ();
-  return mw;
+  return csPtr<iMeshWrapper> (mw);
 }
 
 bool csEngine::RemoveObject (iBase *object)

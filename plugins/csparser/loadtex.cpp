@@ -37,10 +37,10 @@
 #include "ivideo/texture.h"
 #include "csgfx/xorpat.h"
 
-iImage* csLoader::LoadImage (const char* name, int Format)
+csPtr<iImage> csLoader::LoadImage (const char* name, int Format)
 {
   if (!ImageLoader)
-     return NULL;
+     return csPtr<iImage> (NULL);
 
   if (Format & CS_IMGFMT_INVALID)
   {
@@ -191,10 +191,10 @@ iImage* csLoader::LoadImage (const char* name, int Format)
   ifile->SetName (**xname);
   xname->DecRef ();
 
-  return ifile;
+  return csPtr<iImage> (ifile);
 }
 
-iTextureHandle *csLoader::LoadTexture (const char *fname, int Flags,
+csPtr<iTextureHandle> csLoader::LoadTexture (const char *fname, int Flags,
 	iTextureManager *tm)
 {
   if (!tm && G3D)
@@ -209,7 +209,7 @@ iTextureHandle *csLoader::LoadTexture (const char *fname, int Flags,
 
   iImage *Image = LoadImage (fname, Format);
   if (!Image)
-    return NULL;
+    return csPtr<iTextureHandle> (NULL);
 
   iTextureHandle *TexHandle;
   if (tm)
@@ -226,11 +226,11 @@ iTextureHandle *csLoader::LoadTexture (const char *fname, int Flags,
     TexHandle = NULL;
   Image->DecRef ();
 
-  return TexHandle;
+  return csPtr<iTextureHandle> (TexHandle);
 }
 
-iTextureWrapper *csLoader::LoadTexture (const char *name, const char *fname,
-	int Flags, iTextureManager *tm, bool reg)
+csPtr<iTextureWrapper> csLoader::LoadTexture (const char *name,
+	const char *fname, int Flags, iTextureManager *tm, bool reg)
 {
   if (!Engine)
     return NULL;

@@ -235,8 +235,7 @@ bool Simple::Initialize ()
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
   room = engine->CreateSector ("room");
-  csRef<iMeshWrapper> walls (csPtr<iMeshWrapper> (
-  	engine->CreateSectorWallsMesh (room, "walls")));
+  csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
   csRef<iThingState> walls_state (
   	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState));
   iPolygon3D* p;
@@ -291,19 +290,16 @@ bool Simple::Initialize ()
   csRef<iStatLight> light;
   iLightList* ll = room->GetLights ();
 
-  light = csPtr<iStatLight> (
-  	engine->CreateLight (NULL, csVector3 (-3, 5, 0), 10,
-  	csColor (1, 0, 0), false));
+  light = engine->CreateLight (NULL, csVector3 (-3, 5, 0), 10,
+  	csColor (1, 0, 0), false);
   ll->Add (light->QueryLight ());
 
-  light = csPtr<iStatLight> (
-  	engine->CreateLight (NULL, csVector3 (3, 5,  0), 10,
-  	csColor (0, 0, 1), false));
+  light = engine->CreateLight (NULL, csVector3 (3, 5,  0), 10,
+  	csColor (0, 0, 1), false);
   ll->Add (light->QueryLight ());
 
-  light = csPtr<iStatLight> (
-  	engine->CreateLight (NULL, csVector3 (0, 5, -3), 10,
-  	csColor (0, 1, 0), false));
+  light = engine->CreateLight (NULL, csVector3 (0, 5, -3), 10,
+  	csColor (0, 1, 0), false);
   ll->Add (light->QueryLight ());
 
   engine->Prepare ();

@@ -72,3 +72,9 @@ binary (without suffix). E.g. @code{walktest} is now built with @code{make
 walktest} instead of @code{malk walk}. However, the 'mass' targets have been
 unchanged. To build @code{walktest} and all required plugins, the target is
 still @code{walkall}.
+
+@subheading Ref count changes
+The @code{iLoader->LoadSound()} that returns an @code{iSoundWrapper}
+now returns a pointer that is increffed (one ref count more compared
+to before).
+

@@ -236,8 +236,7 @@ bool Simple::Initialize ()
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
   room = engine->CreateSector ("room");
-  csRef<iMeshWrapper> walls (csPtr<iMeshWrapper> (
-  	engine->CreateSectorWallsMesh (room, "walls")));
+  csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
   csRef<iThingState> walls_state (
   	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState));
   iPolygon3D* p;
@@ -292,19 +291,16 @@ bool Simple::Initialize ()
   csRef<iStatLight> light;
   iLightList* ll = room->GetLights ();
 
-  light = csPtr<iStatLight> (
-  	engine->CreateLight (NULL, csVector3 (-3, 5, 0), 10,
-  	csColor (1, 0, 0), false));
+  light = engine->CreateLight (NULL, csVector3 (-3, 5, 0), 10,
+  	csColor (1, 0, 0), false);
   ll->Add (light->QueryLight ());
 
-  light = csPtr<iStatLight> (
-  	engine->CreateLight (NULL, csVector3 (3, 5,  0), 10,
-  	csColor (0, 0, 1), false));
+  light = engine->CreateLight (NULL, csVector3 (3, 5,  0), 10,
+  	csColor (0, 0, 1), false);
   ll->Add (light->QueryLight ());
 
-  light = csPtr<iStatLight> (
-  	engine->CreateLight (NULL, csVector3 (0, 5, -3), 10,
-  	csColor (0, 1, 0), false));
+  light = engine->CreateLight (NULL, csVector3 (0, 5, -3), 10,
+  	csColor (0, 1, 0), false);
   ll->Add (light->QueryLight ());
 
   engine->Prepare ();
@@ -330,8 +326,8 @@ bool Simple::Initialize ()
   }
 
   // Load a sprite template from disk.
-  csRef<iMeshFactoryWrapper> imeshfact (csPtr<iMeshFactoryWrapper> (
-  	loader->LoadMeshObjectFactory ("/lib/std/sprite1")));
+  csRef<iMeshFactoryWrapper> imeshfact (
+  	loader->LoadMeshObjectFactory ("/lib/std/sprite1"));
   if (imeshfact == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -341,9 +337,9 @@ bool Simple::Initialize ()
   }
 
   // Create the sprite and add it to the engine.
-  csRef<iMeshWrapper> sprite (csPtr<iMeshWrapper> (engine->CreateMeshWrapper (
+  csRef<iMeshWrapper> sprite (engine->CreateMeshWrapper (
   	imeshfact, "MySprite", room,
-	csVector3 (-3, 5, 3))));
+	csVector3 (-3, 5, 3)));
   csMatrix3 m; m.Identity (); m *= 5.;
   sprite->GetMovable ()->SetTransform (m);
   sprite->GetMovable ()->UpdateMove ();

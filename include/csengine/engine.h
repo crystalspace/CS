@@ -801,17 +801,17 @@ public:
   /**
    * Create a base material.
    */
-  virtual iMaterial* CreateBaseMaterial (iTextureWrapper* txt);
-  virtual iMaterial* CreateBaseMaterial (iTextureWrapper* txt,
+  virtual csPtr<iMaterial> CreateBaseMaterial (iTextureWrapper* txt);
+  virtual csPtr<iMaterial> CreateBaseMaterial (iTextureWrapper* txt,
   	int num_layers, iTextureWrapper** wrappers, csTextureLayer* layers);
 
   virtual iMaterialList* GetMaterialList () const;
   virtual iTextureList* GetTextureList () const;
   virtual iRegionList* GetRegions ();
 
-  virtual iMeshWrapper* CreateSectorWallsMesh (iSector* sector,
+  virtual csPtr<iMeshWrapper> CreateSectorWallsMesh (iSector* sector,
       const char* name);
-  virtual iMeshWrapper* CreateThingMesh (iSector* sector, const char* name);
+  virtual csPtr<iMeshWrapper> CreateThingMesh (iSector* sector, const char* name);
 
   /**
    * Add a dynamic light to the engine.
@@ -854,13 +854,13 @@ public:
    * all nearby sectors.
    * Delete the iterator with 'DecRef()' when ready.
    */
-  virtual iSectorIterator* GetNearbySectors (iSector* sector,
+  virtual csPtr<iSectorIterator> GetNearbySectors (iSector* sector,
   	const csVector3& pos, float radius);
-  virtual iObjectIterator* GetNearbyObjects (iSector* sector,
+  virtual csPtr<iObjectIterator> GetNearbyObjects (iSector* sector,
     const csVector3& pos, float radius);
-  virtual iObjectIterator* GetVisibleObjects (iSector* sector,
+  virtual csPtr<iObjectIterator> GetVisibleObjects (iSector* sector,
     const csVector3& pos);
-  virtual iObjectIterator* GetVisibleObjects (iSector* sector,
+  virtual csPtr<iObjectIterator> GetVisibleObjects (iSector* sector,
     const csFrustum& frustum);
 
   virtual bool RemoveObject (iBase* object);
@@ -897,11 +897,11 @@ public:
   /**
    * Create an iterator to iterate over all static lights of the engine.
    */
-  virtual iLightIterator* GetLightIterator (iRegion* region = NULL)
+  virtual csPtr<iLightIterator> GetLightIterator (iRegion* region = NULL)
   {
     csLightIt* it;
     it = new csLightIt (this, region);
-    return it;
+    return csPtr<iLightIterator> (it);
   }
 
   /**
@@ -1028,10 +1028,10 @@ public:
     { return &camera_positions.scfiCameraPositionList; }
 
   /// Create a new camera.
-  virtual iCamera* CreateCamera ();
+  virtual csPtr<iCamera> CreateCamera ();
 
   /// Create a static/pseudo-dynamic light.
-  virtual iStatLight* CreateLight (const char* name,
+  virtual csPtr<iStatLight> CreateLight (const char* name,
   	const csVector3& pos, float radius,
   	const csColor& color, bool pseudoDyn);
   /// Find a static/pseudo-dynamic light by ID.
@@ -1046,35 +1046,35 @@ public:
   virtual void RemoveDynLight (iDynLight*);
 
   /// Create a mesh factory wrapper from a mesh plugin
-  virtual iMeshFactoryWrapper* CreateMeshFactory (const char* classId,
+  virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (const char* classId,
   	const char* name);
   /// Create a mesh factory wrapper for an existing mesh factory
-  virtual iMeshFactoryWrapper* CreateMeshFactory (iMeshObjectFactory *,
+  virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (iMeshObjectFactory *,
   	const char* name);
   /// Create an uninitialized mesh factory wrapper
-  virtual iMeshFactoryWrapper* CreateMeshFactory (const char* name);
-  virtual iLoaderContext* CreateLoaderContext (iRegion* region = NULL);
+  virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (const char* name);
+  virtual csPtr<iLoaderContext> CreateLoaderContext (iRegion* region = NULL);
   /// Load mesh factory.
-  virtual iMeshFactoryWrapper* LoadMeshFactory (
+  virtual csPtr<iMeshFactoryWrapper> LoadMeshFactory (
   	const char* name, const char* loaderClassId,
 	iDataBuffer* input);
 
   /// Create a mesh wrapper from a mesh factory wrapper
-  virtual iMeshWrapper* CreateMeshWrapper (iMeshFactoryWrapper* factory,
+  virtual csPtr<iMeshWrapper> CreateMeshWrapper (iMeshFactoryWrapper* factory,
   	const char* name, iSector* sector = NULL,
 	const csVector3& pos = csVector3(0, 0, 0));
   /// Create a mesh wrapper for an existing mesh object
-  virtual iMeshWrapper* CreateMeshWrapper (iMeshObject*,
+  virtual csPtr<iMeshWrapper> CreateMeshWrapper (iMeshObject*,
   	const char* name, iSector* sector = NULL,
 	const csVector3& pos = csVector3(0, 0, 0));
   /// Create a mesh wrapper from a class id.
-  virtual iMeshWrapper* CreateMeshWrapper (const char* classid,
+  virtual csPtr<iMeshWrapper> CreateMeshWrapper (const char* classid,
   	const char* name, iSector* sector = NULL,
 	const csVector3& pos = csVector3(0, 0, 0));
   /// Create an uninitialized mesh wrapper
-  virtual iMeshWrapper* CreateMeshWrapper (const char* name);
+  virtual csPtr<iMeshWrapper> CreateMeshWrapper (const char* name);
   /// Load mesh object.
-  virtual iMeshWrapper* LoadMeshWrapper (
+  virtual csPtr<iMeshWrapper> LoadMeshWrapper (
   	const char* name, const char* loaderClassId,
 	iDataBuffer* input, iSector* sector, const csVector3& pos);
 

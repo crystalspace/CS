@@ -70,7 +70,7 @@ struct iLoader : public iBase
    * renderer. If no video renderer exists, this function fails. You may also
    * request an alternate format to override the above sequence.
    */
-  virtual iImage *LoadImage (const char* Filename,
+  virtual csPtr<iImage> LoadImage (const char* Filename,
     int Format = CS_IMGFMT_INVALID) = 0;
   /**
    * Load an image as with LoadImage() and create a texture handle from it.
@@ -79,7 +79,7 @@ struct iLoader : public iBase
    * doesn't make sense here. Instead you may choose an alternate texture
    * manager.
    */
-  virtual iTextureHandle *LoadTexture (const char* Filename,
+  virtual csPtr<iTextureHandle> LoadTexture (const char* Filename,
 	int Flags = CS_TEXTURE_3D, iTextureManager *tm = NULL) = 0;
   /**
    * Load a texture as with LoadTexture() above and register it with the
@@ -90,16 +90,18 @@ struct iLoader : public iBase
    * 'engine->Prepare()' later as that function will take care of registering
    * too.
    */
-  virtual iTextureWrapper *LoadTexture (const char *Name, const char *FileName,
+  virtual csPtr<iTextureWrapper> LoadTexture (const char *Name,
+  	const char *FileName,
 	int Flags = CS_TEXTURE_3D, iTextureManager *tm = NULL,
 	bool reg = false) = 0;
 
   /// Load a sound file and return an iSoundData object
-  virtual iSoundData *LoadSoundData (const char *fname) = 0;
+  virtual csPtr<iSoundData> LoadSoundData (const char *fname) = 0;
   /// Load a sound file and register the sound
-  virtual iSoundHandle *LoadSound (const char *fname) = 0;
+  virtual csPtr<iSoundHandle> LoadSound (const char *fname) = 0;
   /// Load a sound file, register the sound and create a wrapper object for it
-  virtual iSoundWrapper *LoadSound (const char *name, const char *fname) = 0;
+  virtual csPtr<iSoundWrapper> LoadSound (const char *name,
+  	const char *fname) = 0;
 
   /**
    * Load a map file. If 'ClearEngine' is true then the current contents
@@ -115,12 +117,13 @@ struct iLoader : public iBase
   virtual bool LoadLibraryFile (const char* filename) = 0;
 
   /// Load a Mesh Object Factory from the map file.
-  virtual iMeshFactoryWrapper* LoadMeshObjectFactory (const char* fname) = 0;
+  virtual csPtr<iMeshFactoryWrapper> LoadMeshObjectFactory (
+  	const char* fname) = 0;
   /**
    * Load a mesh object from a file.
    * The mesh object is not automatically added to the engine and sector.
    */
-  virtual iMeshWrapper* LoadMeshObject (const char* fname) = 0;
+  virtual csPtr<iMeshWrapper> LoadMeshObject (const char* fname) = 0;
 };
 
 /** } */
