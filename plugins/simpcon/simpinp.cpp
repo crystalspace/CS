@@ -39,7 +39,7 @@ csSimpleInput::csSimpleInput (iBase *iParent) : History (16, 16)
   Prompt = NULL;
   CursorPos = 0;
   Prompt = strnew ("# ");
-  PromptLen = 1;
+  PromptLen = strlen(Prompt);
   HistoryPos = 0;
   History.Push (strnew (""));
   line = new char [linemax = 80];
