@@ -50,7 +50,7 @@ chronological order.
 	  between plugins at load time. Toward this end, renamed
 	  CS.requestPlugin() to CS.requestPlugins(). It now accepts a
 	  java.util.Vector filled with csPluginRequest objects, rather than
-	  accepting only a single plugin name and interface.
+	  accepting only a single plugin name and interface. (bug #858626)
 22-Sep-2004
 	- Jorrit changed the loader so that it only prints certain
 	  notifications if -verbose is given on the commandline. These
