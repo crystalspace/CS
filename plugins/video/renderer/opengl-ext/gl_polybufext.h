@@ -43,12 +43,9 @@
 #include "csgeom/plane3.h"
 #include "csutil/cscolor.h"
 
+#include "gl_polygonbuffermaterialext.h"
 
-#if defined(CS_OPENGL_PATH)
-#include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
-#else
-#include <GL/gl.h>
-#endif
+
 
 /** 
 * the EXT implementation splits up the Polygon into traingles
@@ -62,47 +59,6 @@ class csPolygonBufferEXT : public iPolygonBuffer
 public:
   csPolygonBufferEXT(iGraphics3D *g3d);
   virtual ~csPolygonBufferEXT();
-
-  struct csPolygonBufferEXTLightmap
-  {
-    csPolygonBufferEXTLightmap() : m_lmrects(csRect(0, 0, 256, 256)) // @@@ hard coded lightmap size..
-    {
-      glGenTextures(1, &openglindex);
-      /*
-      TODO: Implement the correct lightmap style bla bla
-      */
-      glBindTexture(GL_TEXTURE_2D, openglindex);
-      
-      
-    };
-
-    ~csPolygonBufferEXTLightmap()
-    {
-      glDeleteTextures(1, &openglindex);
-    };
-
-    unsigned int openglindex;
-    csSubRectangles m_lmrects;
-  };
-
-  struct csPolygonBufferEXTIndices
-  {
-    CS_DECLARE_GROWING_ARRAY(m_indices, int);
-    csPolygonBufferEXTLightmap m_lightmap;
-  };
-
-  struct csPolygonBufferEXTMaterial
-  {
-    /// it's better to have smaller vertex buffers
-    /// otherwise we'd copy all the vertices to AGP memory every frame
-    CS_DECLARE_GROWING_ARRAY (m_vertices, csVector3);
-    CS_DECLARE_GROWING_ARRAY (m_texcoords, csVector2);
-    CS_DECLARE_GROWING_ARRAY (m_lmcoords, csVector2);
-
-
-    iMaterialHandle *m_mat_handle;
-    CS_DECLARE_GROWING_ARRAY (m_lightmaps, csPolygonBufferEXTIndices);
-  };
 
   /**
    * Add a polygon to this buffer. The data pointed to by 'verts'
@@ -162,14 +118,14 @@ public:
   SCF_DECLARE_IBASE;
 
 private:
-  CS_DECLARE_GROWING_ARRAY(m_materials, csPolygonBufferEXTMaterial);
+
+  CS_DECLARE_GROWING_ARRAY(m_materials, csPolygonBufferMaterialEXT);
   iGraphics3D *m_g3d;
   
-  /** this are all the vertices together... 
-  * internally the vertices will by stored per material
-  */  
-  csVector3   *m_vertices;
-  int          m_vertex_count;
+  csRealVertexBuffer m_combverts;
+  
+  csVector3 *m_tempverts;
+  int        m_tempverts_count;
   
 
 };

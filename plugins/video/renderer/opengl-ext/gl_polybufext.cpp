@@ -41,11 +41,12 @@
 #include "csutil/util.h"
 #include "imesh/thing/polygon.h"
 #include "qint.h"
-#include "gl_polybufext.h"
 #include "ivideo/material.h"
 #include "ivideo/texture.h"
 #include "csgeom/transfrm.h"
 #include "imesh/thing/lightmap.h"
+#include "gl_polygonbuffermaterialext.h"
+
 
 SCF_IMPLEMENT_IBASE (csPolygonBufferEXT)
   SCF_IMPLEMENTS_INTERFACE (iPolygonBuffer)
@@ -55,13 +56,12 @@ csPolygonBufferEXT::csPolygonBufferEXT(iGraphics3D *g3d)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   m_g3d = g3d;
-  m_vertices = 0;
-  m_vertex_count = 0;
+  m_tempverts = 0;
+  m_tempverts_count = 0;
 }
  
 csPolygonBufferEXT::~csPolygonBufferEXT()
 {
-  if(m_vertices) delete[] m_vertices;
 }
 
 void csPolygonBufferEXT::AddPolygon (int* verts, int num_verts,
@@ -70,68 +70,19 @@ void csPolygonBufferEXT::AddPolygon (int* verts, int num_verts,
 	const csMatrix3& m_obj2tex, const csVector3& v_obj2tex,
 	iPolygonTexture* poly_texture)
 {
-  csPolygonBufferEXTMaterial &tmpmat = m_materials[mat_index];
-
-  unsigned char r,g,b;
-  tmpmat.m_mat_handle->GetTexture()->GetMeanColor(r,g,b);
-
-  csColor color;
-  color.red   = (float) r / 255.0;
-  color.green = (float) g / 255.0;
-  color.blue  = (float) b / 255.0;
-
-  csVector3 aux;
-  csVector3 curvert;
-  csVector2 curtex;
-  csVector2 curlmcoord;
-  csRect    tmprect;
-  csTransform transform(m_obj2tex, v_obj2tex);
-
-  // 1.)look for lightmap space, 
-  // so that we know where we'll put the indices
-
-  csPolygonBufferEXTIndices *tmplm = NULL;
-  int i;
-  for(i = 0; i < tmpmat.m_lightmaps.Length(); i++)
-  {
-    tmplm = &tmpmat.m_lightmaps[i];
-    if(tmplm->m_lightmap.m_lmrects.Alloc(poly_texture->GetLightMap()->GetWidth(), poly_texture->GetLightMap()->GetHeight(), tmprect))
-      break;
-    else
-      tmplm = NULL; 
-  }
-
-  if(tmplm == NULL) // we didn't find a space in the lightmaps, so we have to create another one..
-  {
-    tmpmat.m_lightmaps.Push(csPolygonBufferEXTIndices());
-    tmplm = &tmpmat.m_lightmaps[tmpmat.m_lightmaps.Length() - 1]; // Get Last one (the one just added)
-    tmplm->m_lightmap.m_lmrects.Alloc(poly_texture->GetLightMap()->GetWidth(), poly_texture->GetLightMap()->GetHeight(), tmprect);
-  }
-
-
-  
-  for(i = 0; i < num_verts; i++)
-  {
-    curvert = m_vertices[verts[i]];
-    aux = transform.Other2This(m_vertices[verts[0]]);
-    curtex.x = aux.x;
-    curtex.y = aux.y;
-  }
 }
 
 void csPolygonBufferEXT::SetVertexArray (csVector3* verts, int num_verts)
 {
-  if(m_vertices) delete[] m_vertices;
-
-  m_vertices = new csVector3[num_verts];
-  memcpy((void*)m_vertices, (void*)verts, num_verts * sizeof(csVector3));
-  m_vertex_count = num_verts;  
+  if(m_tempverts) delete m_tempverts;
+  m_tempverts = new csVector3[num_verts];
+  memcpy(m_tempverts, verts, num_verts);
+  m_tempverts_count = num_verts;
 }
 
 void csPolygonBufferEXT::AddMaterial (iMaterialHandle* mat_handle)
 {
-  csPolygonBufferEXTMaterial newmat;
-  newmat.m_mat_handle = mat_handle;
+  csPolygonBufferMaterialEXT newmat(m_g3d, m_combverts);
   m_materials.Push(newmat);
 }
 
@@ -147,12 +98,12 @@ iMaterialHandle* csPolygonBufferEXT::GetMaterial (int idx) const
 
 int csPolygonBufferEXT::GetVertexCount() const
 {
-  return m_vertex_count;
+  return m_tempverts_count;
 }
 
 csVector3* csPolygonBufferEXT::GetVertices() const
 {
-  return m_vertices;
+  return m_tempverts;
 }
 
 void csPolygonBufferEXT::SetMaterial (int idx, iMaterialHandle* mat_handle)
