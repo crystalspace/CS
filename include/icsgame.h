@@ -24,6 +24,7 @@
 #include "csgeom/vector3.h"
 #include "csgeom/transfrm.h"
 #include "iplugin.h"
+#include "ivfs.h"
 
 struct iEntity;
 struct iEntityClass;
@@ -37,6 +38,8 @@ struct iCollider;
 struct iDataLoader;
 struct iDataSaver; 
 struct iSector;
+
+#define geMAPITERATOR int
 
 //---------------------------------------------------------------------------
 
@@ -623,7 +626,8 @@ struct iColliderSelector : public iBase
 SCF_VERSION (iDataLoader, 0, 1, 0);
 
 /**
- * A Data Loader allows entites to read a structured datafile
+ * A Data Loader allows entites to structured data. Where the data
+ * comes from, is not important for this interface.
  */
 struct iDataLoader : public iBase
 {
@@ -645,30 +649,55 @@ struct iDataLoader : public iBase
    * Gets the name of the first context in the current context, or NULL 
    * if there is no Context at all
    */
-  virtual const char* GetFirstContext() = 0;
+  virtual const char* GetFirstContext(geMAPITERATOR& iter) = 0;
 
   /**
    * Gets the name of the next context in the current context, or NULL 
    * if there is no further Context.
    */
-  virtual const char* GetNextContext() = 0;
+  virtual const char* GetNextContext(geMAPITERATOR& iter) = 0;
 
   /**
    * Gets the name and value of the first element in the current context, 
    * or NULL if there is no element at all
    */
-  virtual bool GetFirstElement(const char*& Key, const char*& Value) = 0;
+  virtual bool GetFirstElement(geMAPITERATOR& iter,
+                               const char*& Key, 
+                               const char*& Value) = 0;
 
   /**
    * Gets the name and value of the next element in the current context, 
    * or NULL if there is no further element.
    */
-  virtual bool GetNextElement(const char*& Key, const char*& Value) = 0;
+  virtual bool GetNextElement(geMAPITERATOR& iter,
+                              const char*& Key, 
+                              const char*& Value) = 0;
 
   /**
    * Gets the value of the Element with the given name
    */
   virtual const char* GetElement(const char* Key) = 0;
+};
+
+//---------------------------------------------------------------------------
+
+SCF_VERSION (iDataLoaderFile, 0, 1, 0);
+
+/**
+ * A Data Loader File ins an interface, that allows you to read structured 
+ * Data from a file. 
+ * Normally this is an additional interface of a class that supports the
+ * iDataFile interface.
+ */
+struct iDataLoaderFile : public iBase
+{
+  /**
+   * Opens a Data File. The file is read completely and is being closed again.
+   * After a call to Read(), you can read the contained data by using the
+   * iDataLoader interface. The function will return false, if something
+   * went wrong loading the file.
+   */
+  virtual bool Read(iVFS* pVFS, const char* filename) = 0;
 };
 
 //---------------------------------------------------------------------------
