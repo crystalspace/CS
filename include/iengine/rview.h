@@ -183,6 +183,13 @@ public:
    * Returning from a portal decreases the number again.
    */
   int draw_rec_level;
+
+  /**
+   * This unique id can be used to check if you are still in the same
+   * render context. Checking on pointers is not safe since render contexts
+   * are reused so a different render context can result in the same pointer.
+   */
+  uint32 context_id;
 };
 
 SCF_VERSION (iRenderView, 0, 4, 0);

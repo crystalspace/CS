@@ -139,48 +139,48 @@ csPtr<iMeshObject> csChunkLodTerrainFactory::NewInstance ()
 void csChunkLodTerrainFactory::GetObjectBoundingBox (csBox3& bbox, int type)
 {
   bbox.StartBoundingBox ();
-  switch (type) {
-  case CS_BBOX_NORMAL:
-    bbox.AddBoundingVertex (
-	- (hm_x * scale.x / 2),
-	FLT_MIN * scale.y,
-	- (hm_y * scale.z / 2));
-    bbox.AddBoundingVertex (
-	hm_x * scale.x / 2,
-	FLT_MAX * scale.y,
-	hm_y * scale.z / 2);
-    break;
-  case CS_BBOX_ACCURATE: {
-    float max = FLT_MIN;
-    float min = FLT_MAX;
-    for (int i = 0; i < hm_x; i ++)
-      for (int j = 0; j < hm_y; j ++) {
-        if (max < datamap[i + j * hm_x].pos.y) 
-	  max = datamap[i + j * hm_x].pos.y;
-	if (min > datamap[i + j * hm_x].pos.y)
-	  min = datamap[i + j * hm_x].pos.y;
-      }
-    bbox.AddBoundingVertex (
-	- (hm_x * scale.x / 2),
-	0,
-	- (hm_y * scale.z / 2));
-    bbox.AddBoundingVertex (
-	hm_x * scale.x / 2,
-	max * scale.y,
-	hm_y * scale.z / 2);
-    break;
-  }
-  case CS_BBOX_MAX:
-    bbox.AddBoundingVertex (-FLT_MAX, -FLT_MAX, -FLT_MAX);
-    bbox.AddBoundingVertex (FLT_MAX, FLT_MAX, FLT_MAX);
-    break;
+  switch (type)
+  {
+    case CS_BBOX_MAX:
+    case CS_BBOX_NORMAL:
+      bbox.AddBoundingVertex (
+	  - (hm_x * scale.x / 2),
+	  -100000.0 * scale.y,
+	  - (hm_y * scale.z / 2));
+      bbox.AddBoundingVertex (
+	  hm_x * scale.x / 2,
+	  100000.0 * scale.y,
+	  hm_y * scale.z / 2);
+      break;
+    case CS_BBOX_ACCURATE:
+    {
+      float max = -100000.0;
+      float min = 100000.0;
+      for (int i = 0; i < hm_x; i ++)
+        for (int j = 0; j < hm_y; j ++)
+	{
+          if (max < datamap[i + j * hm_x].pos.y) 
+	    max = datamap[i + j * hm_x].pos.y;
+	  if (min > datamap[i + j * hm_x].pos.y)
+	    min = datamap[i + j * hm_x].pos.y;
+        }
+      bbox.AddBoundingVertex (
+	  - (hm_x * scale.x / 2),
+	  0,
+	  - (hm_y * scale.z / 2));
+      bbox.AddBoundingVertex (
+	  hm_x * scale.x / 2,
+	  max * scale.y,
+	  hm_y * scale.z / 2);
+      break;
+    }
   }
 }
 
 void csChunkLodTerrainFactory::GetRadius (csVector3& rad, csVector3& c)
 {
   c = csVector3 (0,0,0);
-  rad = scale * csVector3 (hm_x, FLT_MAX, hm_y);
+  rad = scale * csVector3 (hm_x, 100000.0, hm_y);
 }
 
 void csChunkLodTerrainFactory::SetScale (const csVector3& s)
@@ -968,12 +968,12 @@ bool csChunkLodTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
     return false;
 // printf ("avg triangle per mesh %f\n", (float)tricount/(float)meshes.Length());
 // printf ("tricount %d, meshcount %d\n", tricount, meshes.Length());
-  scfiObjectModel.ShapeChanged ();
   return true;
 }
 
-csRenderMesh** csChunkLodTerrainObject::GetRenderMeshes (int &n, iRenderView* rview, 
-                                                         iMovable* movable)
+csRenderMesh** csChunkLodTerrainObject::GetRenderMeshes (
+	int &n, iRenderView* rview, 
+	iMovable* movable)
 {
   int i;
   n = meshes.Length();
@@ -996,8 +996,7 @@ csRenderMesh** csChunkLodTerrainObject::GetRenderMeshes (int &n, iRenderView* rv
 
   if (n > meshppsize)
   {
-    if (meshpp)
-      delete [] meshpp;
+    delete [] meshpp;
     meshpp = new csRenderMesh*[n];
     meshppsize = n;
   }

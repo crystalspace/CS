@@ -338,11 +338,12 @@ csRenderMeshList *csSector::GetVisibleMeshes (iRenderView *rview)
 
   int i;
   uint32 cur_framenr = engine->GetCurrentFrameNumber ();
+  uint32 cur_context_id = rview->GetRenderContext ()->context_id;
   for (i = 0 ; i < visibleMeshCache.Length () ; i++)
   {
     visibleMeshCacheHolder& entry = visibleMeshCache[i];
     if (entry.cachedFrameNumber == cur_framenr &&
-        entry.cachedRenderContext == rview->GetRenderContext ())
+        entry.cached_context_id == cur_context_id)
     {
       return entry.meshList;
     }
@@ -360,7 +361,7 @@ csRenderMeshList *csSector::GetVisibleMeshes (iRenderView *rview)
       GetVisibilityCuller()->VisTest (rview, GetVisMeshCb ());
 
       entry.cachedFrameNumber = cur_framenr;
-      entry.cachedRenderContext = rview->GetRenderContext ();
+      entry.cached_context_id = cur_context_id;
       return entry.meshList;
     }
   }
@@ -368,7 +369,7 @@ csRenderMeshList *csSector::GetVisibleMeshes (iRenderView *rview)
   //create a new cache entry
   visibleMeshCacheHolder holder;
   holder.cachedFrameNumber = cur_framenr;
-  holder.cachedRenderContext = rview->GetRenderContext ();
+  holder.cached_context_id = cur_context_id;
   holder.meshList = new csRenderMeshList (engine);
   usedMeshLists.Push (holder.meshList);
   GetVisMeshCb ()->Setup (holder.meshList, rview);

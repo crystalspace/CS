@@ -62,6 +62,12 @@ private:
     iBase* data;
   };
 
+  /**
+   * The following id is used to populate the context_id in every
+   * csRenderContext.
+   */
+  uint32 context_id;
+
   /// The current render context.
   csRenderContext* ctxt;
 

@@ -18,12 +18,26 @@ chronological order.
 	- Jorrit fixed spr2d so that it compiles again with OR.
 	- Jorrit fixed spr2d Jamfile so that it no longer trys to use
 	  the bcsgeom library (whatever that is :-).
-	- Jorrit fixed a harmless initialization error in Frustvis and
-	  Dynavis.
 	- Jorrit fixed the NR glrender3d target. You can't declare variables
 	  without a type like this:
 		static const textureMinFilters[3] = {GL_NEAREST_MIPMAP_NEAREST, 
 		GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_LINEAR};
+	- Jorrit fixed a harmless initialization error in Frustvis and
+	  Dynavis.
+	- Jorrit fixed a bug with NR and handling of visibility culling and
+	  portals. Previously the NR would reuse the same visibility culling
+	  result if you entered some sector twice (through different portal
+	  paths). But this is invalid since the portal contributes to visibility
+	  culling so for the same sector the visibility culling result can
+	  be different because the portal you entered is different (and other
+	  objects will be visible/invisible). Solved this by adding a
+	  context_id to csRenderContext. This id is used instead of comparing
+	  pointers. Comparing pointers was not safe because render contexts
+	  are reused. The id is never reused (for the same frame).
+	- Jorrit fixed the chunklod terrain engine (NR) so that it no longer
+	  returns bounding boxes that have huge floating point values in them.
+	  The visibility cullers (more specifically the kdtree) cannot cope
+	  with that.
 21-Mar-2004
 	- Luca Cappa committed the res fix to the problem regarding the lack
 	  of the regex.c file in the CSUtil library. The problem was 

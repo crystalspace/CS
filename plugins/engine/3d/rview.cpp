@@ -44,6 +44,7 @@ csRenderView::csRenderView () :
   ctxt = new csRenderContext ();
   memset (ctxt, 0, sizeof (csRenderContext));
   top_frustum = 0;
+  context_id = 0;
 }
 
 csRenderView::csRenderView (iCamera *c) :
@@ -59,6 +60,7 @@ csRenderView::csRenderView (iCamera *c) :
   c->IncRef ();
   ctxt->icamera = c;
   top_frustum = 0;
+  context_id = 0;
 }
 
 csRenderView::csRenderView (
@@ -86,6 +88,7 @@ csRenderView::csRenderView (
   }
 
   top_frustum = 0;
+  context_id = 0;
 }
 
 csRenderView::~csRenderView ()
@@ -1163,6 +1166,11 @@ void csRenderView::CreateRenderContext ()
   if (ctxt->iview) ctxt->iview->IncRef ();
   if (ctxt->iview_frustum) ctxt->iview_frustum->IncRef ();
   ctxt->rcdata = 0;
+  // The camera transform id is copied from the old
+  // context. Only when we do space warping on the camera
+  // do we have to change it (CreateNewCamera() function).
+  context_id++;
+  ctxt->context_id = context_id;
 }
 
 void csRenderView::RestoreRenderContext (csRenderContext *original)

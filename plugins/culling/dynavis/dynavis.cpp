@@ -2150,6 +2150,7 @@ bool csDynaVis::IntersectSegment (const csVector3& start,
   IntersectSegment_Front2BackData data;
   data.seg.Set (start, end);
   data.sqdist = 10000000000.0;
+  data.isect.Set (0, 0, 0);
   data.r = 10000000000.;
   data.mesh = 0;
   data.polygon_idx = -1;

@@ -155,9 +155,13 @@ private:
   struct visibleMeshCacheHolder
   {
     csRenderMeshList *meshList;
+
+    // We consider visibility result to be the same if
+    // the frame number and context id are the same.
+    // The context_id is stored in csRenderContext and
+    // is modified whenever a new csRenderContext is created.
     uint32 cachedFrameNumber;
-    //iRenderView *cachedRView;
-    csRenderContext *cachedRenderContext;
+    uint32 cached_context_id;
 
     visibleMeshCacheHolder() : meshList(0) {}
     ~visibleMeshCacheHolder()
