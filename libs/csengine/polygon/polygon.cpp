@@ -295,6 +295,7 @@ csPolygon3D::csPolygon3D (
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
   DG_TYPE ((csObject *)this, "csPolygon3D");
+  thing = NULL;
   polygon_id = 0;
 
   if (material)
