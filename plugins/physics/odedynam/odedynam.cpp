@@ -365,16 +365,16 @@ int csODEDynamics::CollideMeshBox (dGeomID mesh, dGeomID box, int flags,
       csVector3 contactpos(c->pos[0], c->pos[1], c->pos[2]);
       // make sure the point lies inside the polygon
       int vcount = polycollide[i].num_vertices;
-      int k1 = vcount-1;
-      for (k = 0; k < vcount; k1 = k, k++)
+      int ind1 = polycollide[i].vertices[vcount-1];
+      csVector3 v1 = vertex_table[ind1] / mesht;
+      csVector3 v2;
+      for (k = 0; k < vcount; v1 = v2, k++)
       {
-        int ind1 = polycollide[i].vertices[k1];
         int ind2 = polycollide[i].vertices[k];
-        csVector3 v1 = vertex_table[ind1] / mesht;
-        csVector3 v2 = vertex_table[ind2] / mesht;
+        v2 = vertex_table[ind2] / mesht;
         csPlane3 edgeplane(v1, v2, v2 - plane.Normal());
         //edgeplane.Normalize();
-        if (edgeplane.Classify (contactpos) < SMALL_EPSILON)
+        if (edgeplane.Classify (contactpos) < 0)
 	{
           c->depth = -1;
           break;
@@ -428,27 +428,43 @@ int csODEDynamics::CollideMeshCylinder (dGeomID mesh, dGeomID cyl, int flags,
   MeshInfo *mi = (MeshInfo*)dGeomGetClassData (mesh);
   iMeshWrapper *m = mi->mesh;
   CS_ASSERT (m);
-  iPolygonMesh* p = m->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet();
+  iPolygonMesh* p = m->GetMeshObject()->GetObjectModel()
+  	->GetPolygonMeshColldet();
   csVector3 *vertex_table = p->GetVertices ();
   csMeshedPolygon *polygon_list = p->GetPolygons ();
 
   csReversibleTransform mesht = GetGeomTransform (mesh);
 
+  csPolygonTree* tree = mi->tree;
+  csArray<int> polyidx;
+  csBox3 transformedbox;
+  transformedbox.StartBoundingBox (mesht.Other2This(cylbox.GetCorner(0)));
+  transformedbox.AddBoundingVertexSmart (mesht.Other2This(cylbox.GetCorner(1)));
+  transformedbox.AddBoundingVertexSmart (mesht.Other2This(cylbox.GetCorner(2)));
+  transformedbox.AddBoundingVertexSmart (mesht.Other2This(cylbox.GetCorner(3)));
+  transformedbox.AddBoundingVertexSmart (mesht.Other2This(cylbox.GetCorner(4)));
+  transformedbox.AddBoundingVertexSmart (mesht.Other2This(cylbox.GetCorner(5)));
+  transformedbox.AddBoundingVertexSmart (mesht.Other2This(cylbox.GetCorner(6)));
+  transformedbox.AddBoundingVertexSmart (mesht.Other2This(cylbox.GetCorner(7)));
+  tree->IntersectBox (polyidx, transformedbox);
+  tree->RemoveDoubles (polyidx);
+
   csPolyMeshList polycollide;
   // test for overlap
   int i, j, k;
-  for (i = 0; i < p->GetPolygonCount(); i ++)
+  for (i = 0; i < polyidx.Length (); i ++)
   {
     csBox3 polybox;
-    for (j = 0; j < polygon_list[i].num_vertices; j ++)
+    csMeshedPolygon& poly = polygon_list[polyidx[i]];
+    for (j = 0; j < poly.num_vertices; j ++)
     {
-      polybox.AddBoundingVertex (cylt * (vertex_table[polygon_list[i].vertices[j]] / mesht));
+      polybox.AddBoundingVertex (cylt * (vertex_table[poly.vertices[j]] / mesht));
     }
     // aabb poly against aabb box for overlap.
     // Full collision later will weed out the rest;
     if (polybox.Overlap (cylbox))
     {
-      polycollide.Push (polygon_list[i]);
+      polycollide.Push (poly);
     }
   }
   int outcount = 0;
@@ -458,12 +474,12 @@ int csODEDynamics::CollideMeshCylinder (dGeomID mesh, dGeomID cyl, int flags,
     csPlane3 plane(vertex_table[polycollide[i].vertices[0]] / mesht,
       vertex_table[polycollide[i].vertices[1]] / mesht,
       vertex_table[polycollide[i].vertices[2]] / mesht);
-    plane.Normalize ();
     // dCollideBP only works if box center is on the outside of the plane
     if (plane.Classify (cylt.GetOrigin()) < 0)
     {
       continue;
     }
+    plane.Normalize ();
     dGeomID odeplane = dCreatePlane(0,plane.norm.x, plane.norm.y, plane.norm.z,
       -plane.DD);
     dContactGeom tempcontacts[5];
@@ -475,30 +491,20 @@ int csODEDynamics::CollideMeshCylinder (dGeomID mesh, dGeomID cyl, int flags,
       csVector3 contactpos(c->pos[0], c->pos[1], c->pos[2]);
       // make sure the point lies inside the polygon
       int vcount = polycollide[i].num_vertices;
-      for (k = 0; k < vcount-1; k ++)
+      int ind1 = polycollide[i].vertices[vcount-1];
+      csVector3 v1 = vertex_table[ind1] / mesht;
+      csVector3 v2;
+      for (k = 0; k < vcount; v1 = v2, k++)
       {
-        int ind1 = polycollide[i].vertices[k];
-        int ind2 = polycollide[i].vertices[k+1];
-        csVector3 v1 = vertex_table[ind1] / mesht;
-        csVector3 v2 = vertex_table[ind2] / mesht;
+        int ind2 = polycollide[i].vertices[k];
+        v2 = vertex_table[ind2] / mesht;
         csPlane3 edgeplane(v1, v2, v2 - plane.Normal());
-        edgeplane.Normalize();
+        //edgeplane.Normalize();
         if (edgeplane.Classify (contactpos) < 0)
 	{
           c->depth = -1;
           break;
         }
-      }
-      /* get the wrap around case */
-      int ind1 = polycollide[i].vertices[vcount-1];
-      int ind2 = polycollide[i].vertices[0];
-      csVector3 v1 = vertex_table[ind1] / mesht;
-      csVector3 v2 = vertex_table[ind2] / mesht;
-      csPlane3 edgeplane(v1, v2, v2 - plane.Normal());
-      edgeplane.Normalize();
-      if (edgeplane.Classify (contactpos) < 0)
-      {
-          c->depth = -1;
       }
       if (c->depth >= 0)
       {
@@ -570,13 +576,13 @@ int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
       continue;
     }
     int vcount = poly.num_vertices;
-    int j1 = vcount-1;
-    for (int j = 0; j < vcount; j1 = j, j++)
+    int ind1 = poly.vertices[vcount-1];
+    csVector3 v1 = vertex_table[ind1] / mesht;
+    csVector3 v2;
+    for (int j = 0; j < vcount; v1 = v2, j++)
     {
-      int ind1 = poly.vertices[j1];
       int ind2 = poly.vertices[j];
-      csVector3 v1 = vertex_table[ind1] / mesht;
-      csVector3 v2 = vertex_table[ind2] / mesht;
+      v2 = vertex_table[ind2] / mesht;
       csPlane3 edgeplane(v1, v2, v2 - plane.Normal());
       //edgeplane.Normalize();
       if (edgeplane.Classify (center) < SMALL_EPSILON)

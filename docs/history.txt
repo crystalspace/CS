@@ -17,6 +17,8 @@ chronological order.
 	  Normalize() on all polygon edges.
 	- Jorrit did another optimization with ODE mesh-box and mesh-sphere
 	  intersection routines.
+	- Jorrit also optimized ODE mesh-cylinder and performed further
+	  optimizations on the others.
 20-Aug-2003
 	- Jorrit moved the engine sequence manager documentation out of
 	  the xml format description. Also extended that documentation with
