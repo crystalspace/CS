@@ -18,6 +18,7 @@
 
 #include <stdarg.h>
 
+#define SYSDEF_SOFTWARE2D
 #include "sysdef.h"
 #include "qint.h"
 #include "csgeom/math2d.h"
@@ -47,27 +48,6 @@ IMPLEMENT_IBASE (csGraphics3DLine)
   IMPLEMENTS_INTERFACE (iGraphics3D)
   IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
 IMPLEMENT_IBASE_END
-
-#if defined (OS_LINUX)
-static char* get_software_2d_driver ()
-{
-  if (getenv ("GGI_DISPLAY"))
-    return SOFTWARE_2D_DRIVER_GGI;
-  else if (getenv ("DISPLAY"))
-    return "crystalspace.graphics2d.linexlib";
-  else
-    return SOFTWARE_2D_DRIVER_SVGA;
-}
-#elif defined (OS_UNIX) && !defined (OS_BE)
-// by the way, other unices has SVGALib support too... through GGI ;-)
-static char* get_software_2d_driver ()
-{
-  if (getenv ("GGI_DISPLAY"))
-    return SOFTWARE_2D_DRIVER_GGI;
-  else
-    return "crystalspace.graphics2d.linexlib";
-}
-#endif
 
 csGraphics3DLine::csGraphics3DLine (iBase *iParent) : G2D (NULL)
 {
