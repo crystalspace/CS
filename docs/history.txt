@@ -1,6 +1,9 @@
 The history order is reversed so that new features are at the top.
 
 17-Feb-2003
+	- Christian Bayle made debian package build ok, but it remains some
+	  problems with csdemo that is not installed by make install
+	  and segfault in walktest -video=software (building with gcc3.2.2)
 	- Steven Geens reports: milk2spr now mentions apps/tests/mottest as
 	  it's code example.
 	- Matthias Braun added libxml2 parser. The code only reads xml at the
