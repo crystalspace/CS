@@ -184,7 +184,7 @@ public:
    * \deprecated Use GetKeyColor() instead.
    */
   virtual void GetKeycolor (int &r, int &g, int &b) const
-  { return GetKeyColor(r,g,b); }
+  { GetKeyColor(r,g,b); }
   /// Create a sharpened copy of the image
   virtual csPtr<iImage> Sharpen (csRGBpixel *transp, int strength) const;
   /// Check if image has mipmaps.
