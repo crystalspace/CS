@@ -39,9 +39,9 @@ value @samp{crystalspace.utilities.movierecorder}.  To find out how to do this
 for your particular platform, see the platform-specific intructions for
 manipulating configuration information (@pxref{Config PerUser}).  The movie
 recorder plugin should now load automatically when your application
-initializes.  Last but not least you can use the command line parameter 
-@samp{-plugin=movierecorder} to enable the recorder on a per-application 
-basis.
+initializes.  Last, but not least, you can use the command line argument
+@samp{--plugin=crystalspace.utilities.movierecorder} to enable the recorder on
+a per-application basis.
 
 @subsubheading Using the Movie Recorder
 

@@ -6,18 +6,26 @@
 This section describes how to use a custom font within
 Crystal Space.
 
-Crystal Space has a plugin that specifies the font server
-to use.  The font server that almost all applications use
-is the font plexer (@samp{crystalspace.font.server.multiplexer}) 
-together with the FreeType2 (@samp{crystalspace.font.server.freetype2})
-and the default font server (@samp{crystalspace.font.server.default}).
+Crystal Space has a plugin that specifies the font server to use.  The font
+server that almost all applications use is the font multiplexer, together with
+the FreeType2 and the default font server.  The @sc{scf} class names of these
+modules are:
 
-The font plexer not just searches both the FreeType2 and default font
-server for a font, but also can search multiple fonts for a glyph. This
-is especially important if you plan to internationalize your applications;
-you need to care less whether a font supports the glyphs for a specific
-language or not. (CS comes along with the GNU unifont, which is used as a
-fallback by default. So you have pretty good support for internationalizion
+@itemize @bullet
+@item
+@code{crystalspace.font.server.multiplexer}
+@item
+@code{crystalspace.font.server.freetype2}
+@item
+@code{crystalspace.font.server.default}
+@end itemize
+
+The font multiplexer not only searches both the FreeType2 and default font
+server for a font, but also can search multiple fonts for a glyph.  This is
+especially important if you plan to internationalize your applications; it
+reduces the worry that a particular font supports the glyphs for a specific
+language.  (Crystal Space ships with the @sc{gnu} Unifont, which is used as a
+fallback, so it already pretty good support for internationalization
 out-of-the-box.)
 
 @subsubheading Standard Fonts
@@ -76,12 +84,12 @@ Font = G2D->GetFontServer()->LoadFont ("/fonts/ttf/Vera.ttf", 12);
 @subsubheading Creating New Loadable Fonts
 
 The easiest way to create a loadable font is to
-use the @filename{csfgen} util that comes with CS. It converts 
-a true type font to the @sc{csf} format.
+use the @file{csfgen} util that comes with CS. It converts 
+a True Type font to the @sc{csf} format.
 
 Once the @sc{csf} file is created it can be included
 in the application no matter what platforms are 
 targeted.  The base font does not have to be on
-that system.  This is useful if you don't want or can't
-distribute a font with your program and can't rely on
-the presence of it, either. 
+that system.  This is useful if you do not want or can not
+distribute a font with your program and can not rely upon
+it already being present on the target machine.

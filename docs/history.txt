@@ -14,21 +14,26 @@ chronological order.
 	    - Changed the behaviour of LoadFont() accordingly; now, only for
 	      same font name/font size pairs instances of the same font will
 	      be returned.
-	- res added a note to the movie recorder howto that the plugin can 
+	- res added a note to the movie recorder HOWTO that the plugin can 
 	  also be loaded via the command line.
-	- res partially rewrote the Custom Font howto. It stated that the 
+	- res partially rewrote the Custom Font HOWTO. It stated that the 
 	  best approach for custom fonts would be bitmap fonts converted from
-	  truetypes. However, using fontplex offers better i18n support.
+	  truetypes. However, using fontplex offers better I18N support.
+	- Eric Sunshine fixed `--plugin=' example in the movie recorder HOWTO
+	  so that it shows the proper full SCF class name (which is required by
+	  --plugin=), rather than only the final component of the name.  Also
+	  fixed some typographical, grammatical, and Texinfo mark-up problems;
+	  as well as TeX `hbox' warnings.
 9-Mar-2004
-	- Wouter clarified a comment on iLightingInfo::InitializeDefault.
-	- Reed added "relight" command to walktest.
+	- Wouter clarified a comment on iLightingInfo::InitializeDefault().
+	- Reed added "relight" command to Walktest.
 8-Mar-2004
 	- Philip Wyett eliminated warning in odeparticles.cpp.
 	- Jorrit fixed the old OpenGL renderer so that disabling texture
 	  mapping again works correctly (only lightmaps are rendered).
-	- Wouter removed old comment from sector::GetLights that
+	- Wouter removed old comment from iSector::GetLights() that
 	  instructed the user not to add dynamic lights to the list,
-	  but to use SetSector instead. This method has been removed.
+	  but to use SetSector() instead. This method has been removed.
 	- John Harger finally implemented the cylinder emitter type in 
 	  particles. 
 	- res fixed the movie recorder to emit a proper warning when the movie
