@@ -412,6 +412,8 @@ class csString(_object):
         try:
             if self.thisown: destroy(self)
         except: pass
+    def __lt__(*args): return _cspace.csString___lt__(*args)
+    def __gt__(*args): return _cspace.csString___gt__(*args)
     def __getitem__(*args): return _cspace.csString___getitem__(*args)
     def __setitem__(*args): return _cspace.csString___setitem__(*args)
     def __delitem__(*args): return _cspace.csString___delitem__(*args)
@@ -6476,6 +6478,7 @@ SOUND_LOOP = _cspace.SOUND_LOOP
 SOUND3D_DISABLE = _cspace.SOUND3D_DISABLE
 SOUND3D_RELATIVE = _cspace.SOUND3D_RELATIVE
 SOUND3D_ABSOLUTE = _cspace.SOUND3D_ABSOLUTE
+SOUND_DISTANCE_INFINITE = _cspace.SOUND_DISTANCE_INFINITE
 class iSoundSource(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -6498,6 +6501,10 @@ class iSoundSource(iBase):
     def GetPosition(*args): return _cspace.iSoundSource_GetPosition(*args)
     def SetVelocity(*args): return _cspace.iSoundSource_SetVelocity(*args)
     def GetVelocity(*args): return _cspace.iSoundSource_GetVelocity(*args)
+    def SetMinimumDistance(*args): return _cspace.iSoundSource_SetMinimumDistance(*args)
+    def SetMaximumDistance(*args): return _cspace.iSoundSource_SetMaximumDistance(*args)
+    def GetMinimumDistance(*args): return _cspace.iSoundSource_GetMinimumDistance(*args)
+    def GetMaximumDistance(*args): return _cspace.iSoundSource_GetMaximumDistance(*args)
     def __del__(self, destroy=_cspace.delete_iSoundSource):
         try:
             if self.thisown: destroy(self)
@@ -8977,7 +8984,6 @@ class iGraphics3D(iBase):
     def CreateHalo(*args): return _cspace.iGraphics3D_CreateHalo(*args)
     def DumpCache(*args): return _cspace.iGraphics3D_DumpCache(*args)
     def ClearCache(*args): return _cspace.iGraphics3D_ClearCache(*args)
-    def PrecacheTexture(*args): return _cspace.iGraphics3D_PrecacheTexture(*args)
     def RemoveFromCache(*args): return _cspace.iGraphics3D_RemoveFromCache(*args)
     def GetVertexBufferManager(*args): return _cspace.iGraphics3D_GetVertexBufferManager(*args)
     def IsLightmapOK(*args): return _cspace.iGraphics3D_IsLightmapOK(*args)
@@ -9446,6 +9452,7 @@ class iTextureHandle(iBase):
     def GetAlphaMap(*args): return _cspace.iTextureHandle_GetAlphaMap(*args)
     def GetCanvas(*args): return _cspace.iTextureHandle_GetCanvas(*args)
     def GetAlphaType(*args): return _cspace.iTextureHandle_GetAlphaType(*args)
+    def Precache(*args): return _cspace.iTextureHandle_Precache(*args)
     def __del__(self, destroy=_cspace.delete_iTextureHandle):
         try:
             if self.thisown: destroy(self)
