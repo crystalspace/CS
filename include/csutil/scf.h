@@ -247,14 +247,17 @@ void Class::scfRemoveRefOwners ()					\
 void Class::AddRefOwner (iBase** ref_owner)				\
 {									\
   if (!scfWeakRefOwners)						\
-    scfWeakRefOwners = new csArray<iBase**>;				\
-  scfWeakRefOwners->Push (ref_owner);					\
+    scfWeakRefOwners = new csArray<iBase**> (0, 4);			\
+  scfWeakRefOwners->InsertSorted (ref_owner);				\
 }									\
 void Class::RemoveRefOwner (iBase** ref_owner)				\
 {									\
   if (!scfWeakRefOwners)						\
-    scfWeakRefOwners = new csArray<iBase**>;				\
-  scfWeakRefOwners->Delete (ref_owner);					\
+    scfWeakRefOwners = new csArray<iBase**> (0, 4);			\
+  size_t index = scfWeakRefOwners->FindSortedKey (			\
+    csArrayCmp<iBase**, iBase**> (ref_owner)); 				\
+  if (index != csArrayItemNotFound) scfWeakRefOwners->DeleteIndex (	\
+    index); 								\
 }
 
 /**
@@ -859,7 +862,7 @@ static inline bool scfCompatibleVersion (int iVersion, int iItfVersion)
       && ((iVersion & 0x00ffffff) <= (iItfVersion & 0x00ffffff));
 }
 
-#ifdef CS_DEBUG
+#if defined(CS_DEBUG) || defined(CS_MEMORY_TRACKER)
   struct iObjectRegistry;
 #endif
 
@@ -884,7 +887,7 @@ struct iSCF : public iBase
    */
   static CS_CSUTIL_EXPORT iSCF* SCF;
 
-#ifdef CS_DEBUG
+#if defined(CS_DEBUG) || defined(CS_MEMORY_TRACKER)
   // This is EXTREMELY dirty but I see no other solution for now.
   // For debugging reasons I must have a global (global over the application
   // and all plugins)pointer to the object registry. I have no other
