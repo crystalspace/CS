@@ -94,9 +94,6 @@ csGLRender3D::csGLRender3D (iBase *parent)
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiShaderRenderInterface);
 
-  scfiEventHandler = 0;
-
-
   frustum_valid = false;
 
   do_near_plane = false;
@@ -137,21 +134,14 @@ csGLRender3D::csGLRender3D (iBase *parent)
     texunitenabled[i] = false;
   }
   lastUsedShaderpass = 0;
-
-  txtcache = 0;
-  txtmgr = 0;
 }
 
 csGLRender3D::~csGLRender3D()
 {
-  delete txtcache;
-  delete txtmgr;
-
-  scfiEventHandler->DecRef();
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+  if (q)
+    q->RemoveListener (scfiEventHandler);
 }
-
-
-
 
 ////////////////////////////////////////////////////////////////////
 // Private helpers
@@ -705,7 +695,7 @@ bool csGLRender3D::Open ()
   // a call to Init<ext> first.
   ext->InitGL_ARB_multitexture ();
   ext->InitGL_ARB_texture_compression ();
-  ext->InitGL_ARB_vertex_buffer_object ();
+  //ext->InitGL_ARB_vertex_buffer_object ();
   ext->InitGL_ARB_vertex_program ();
   ext->InitGL_SGIS_generate_mipmap ();
   ext->InitGL_EXT_texture_filter_anisotropic ();
@@ -759,7 +749,8 @@ bool csGLRender3D::Open ()
   shadermgr->AddVariable(shvar_light_0_attenuation);
 
 
-  txtcache = new csGLTextureCache (1024*1024*32, this);
+  txtcache 
+      = csPtr<csGLTextureCache> (new csGLTextureCache (1024*1024*32, this));
   txtmgr.AttachNew (new csGLTextureManager (object_reg, GetDriver2D (), config, this));
 
   glClearDepth (0.0);
@@ -789,7 +780,7 @@ void csGLRender3D::Close ()
   if (txtcache)
   {
     txtcache->Clear ();
-    //delete txtcache; txtcache = 0;
+    // txtcache = 0;
   }
   shadermgr = 0;
 
@@ -1670,7 +1661,7 @@ bool csGLRender3D::Initialize (iObjectRegistry* p)
   object_reg = p;
 
   if (!scfiEventHandler)
-    scfiEventHandler = new EventHandler (this);
+    scfiEventHandler = csPtr<EventHandler> (new EventHandler (this));
 
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q)
