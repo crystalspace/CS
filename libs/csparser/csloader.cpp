@@ -76,6 +76,7 @@ public:
   static int lights_loaded;
   static int curves_loaded;
   static int sprites_loaded;
+  static int sounds_loaded;
   static void Init()
   {
     polygons_loaded = 0;
@@ -85,6 +86,7 @@ public:
     lights_loaded   = 0;
     curves_loaded   = 0;
     sprites_loaded  = 0;
+    sounds_loaded   = 0;
   }
 };
 
@@ -95,6 +97,7 @@ int csLoaderStat::things_loaded   = 0;
 int csLoaderStat::lights_loaded   = 0;
 int csLoaderStat::curves_loaded   = 0;
 int csLoaderStat::sprites_loaded  = 0;
+int csLoaderStat::sounds_loaded	  = 0;
 
 // Define all tokens used through this file
 TOKEN_DEF_START
@@ -4175,8 +4178,8 @@ bool csLoader::LoadWorldFile (csWorld* world, LanguageLayer* layer, const char* 
       csLoaderStat::portals_loaded);
     CsPrintf (MSG_INITIALIZATION, "  %d sectors, %d things, %d sprites, \n", csLoaderStat::sectors_loaded,
       csLoaderStat::things_loaded, csLoaderStat::sprites_loaded);
-    CsPrintf (MSG_INITIALIZATION, "  %d curves and %d lights.\n", csLoaderStat::curves_loaded,
-      csLoaderStat::lights_loaded);
+    CsPrintf (MSG_INITIALIZATION, "  %d curves, %d lights. %d sounds\n", csLoaderStat::curves_loaded,
+      csLoaderStat::lights_loaded, csLoaderStat::sounds_loaded);
   } /* endif */
 
   CHK (delete [] buf);
@@ -4373,7 +4376,11 @@ bool csLoader::LoadSounds (char* buf)
           if (!snd)
           {
             csSoundDataObject *s = load_sound (name, filename);
-            if (s) World->ObjAdd(s);
+            if (s)
+	    {									
+              World->ObjAdd(s);
+              csLoaderStat::sounds_loaded++;    
+	    }
           }
         }
         break;
