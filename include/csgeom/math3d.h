@@ -596,6 +596,9 @@ public:
    * Intersect a 3D segment with a plane.  Returns true if there is an
    * intersection, with the intersection point returned in isect.
    * The distance from u to the intersection point is returned in dist.
+   * The distance that is returned is a normalized distance with respect
+   * to the given input vector. i.e. a distance of 0.5 means that the
+   * intersection point is halfway u and v.
    */
   static bool Plane (
     const csVector3& u, const csVector3& v, // segment
@@ -607,6 +610,9 @@ public:
    * Intersect a 3D segment with a plane.  Returns true if there is an
    * intersection, with the intersection point returned in isect.
    * The distance from u to the intersection point is returned in dist.
+   * The distance that is returned is a normalized distance with respect
+   * to the given input vector. i.e. a distance of 0.5 means that the
+   * intersection point is halfway u and v.
    */
   static bool Plane (
     const csVector3& u, const csVector3& v, // segment

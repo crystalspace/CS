@@ -528,11 +528,10 @@ bool csIntersect3::Plane(const csVector3& u, const csVector3& v,
   denom = A*x + B*y + C*z;
   if (ABS (denom) < SMALL_EPSILON) return false; // they are parallel
 
-  dist = -(A*u.x + B*u.y + C*u.z + D);
-  float dist2 = dist / denom;
-  if (dist2 < -SMALL_EPSILON || dist2 > 1+SMALL_EPSILON) return false;
+  dist = -(A*u.x + B*u.y + C*u.z + D) / denom;
+  if (dist < -SMALL_EPSILON || dist > 1+SMALL_EPSILON) return false;
 
-  isect.x = u.x + dist2*x;  isect.y = u.y + dist2*y;  isect.z = u.z + dist2*z;
+  isect.x = u.x + dist*x;  isect.y = u.y + dist*y;  isect.z = u.z + dist*z;
   return true;
 }
 
@@ -546,11 +545,10 @@ bool csIntersect3::Plane(const csVector3& u, const csVector3& v,
   denom = p.norm.x*x + p.norm.y*y + p.norm.z*z;
   if (ABS (denom) < SMALL_EPSILON) return false; // they are parallel
 
-  dist = -(p.norm*u + p.DD);
-  float dist2 = dist / denom;
-  if (dist2 < -SMALL_EPSILON || dist2 > 1+SMALL_EPSILON) return false;
+  dist = -(p.norm*u + p.DD) / denom;
+  if (dist < -SMALL_EPSILON || dist > 1+SMALL_EPSILON) return false;
 
-  isect.x = u.x + dist2*x;  isect.y = u.y + dist2*y;  isect.z = u.z + dist2*z;
+  isect.x = u.x + dist*x;  isect.y = u.y + dist*y;  isect.z = u.z + dist*z;
   return true;
 }
 
