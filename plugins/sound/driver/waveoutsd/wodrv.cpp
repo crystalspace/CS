@@ -113,8 +113,6 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency,
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Wave-Out Sound Driver selected.");
   ActivateSoundProc = false;
 
-  CheckError ("blah", WAVERR_BADFORMAT);
-
   // store pointer to sound renderer
   if (!render) return false;
   SoundRender = render;
