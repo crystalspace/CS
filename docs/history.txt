@@ -11,6 +11,7 @@ The history order is reversed so that new features are at the top.
 	  engine. If you don't use SetCacheManager() then the engine
 	  will still use the vfs cache manager by default.
 	- Octree is now also saved on the cache manager.
+	- Fixed a memory leak in csOctree::ReadFromCache().
 6-Mar-2002
 	- Matt Reda made the iso engine explicitly remove all mesh factories 
 	  at iso engine destruction for clarity.

@@ -1210,6 +1210,7 @@ bool csOctree::ReadFromCache (
   {
     csEngine::current_engine->Warn (
         "Cached octree not valid! Will be ignored.");
+    data->DecRef ();
     cf->DecRef ();
     return false;               // Bad format!
   }
@@ -1221,6 +1222,7 @@ bool csOctree::ReadFromCache (
         "Mismatched format version. Expected %d, got %ld!",
         100002,
         format_version);
+    data->DecRef ();
     cf->DecRef ();
     return false;
   }
@@ -1243,6 +1245,7 @@ bool csOctree::ReadFromCache (
       new_polygons,
       num);
   delete[] new_polygons;
+  data->DecRef ();
   cf->DecRef ();
   return rc;
 }
