@@ -80,12 +80,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-# This section is specially protected by DO_DOC in order to prevent the lengthy
-# $(wildcard) operations from impacting _all_ other build targets.  DO_DOC is
-# only defined when a top-level documentaiton target is invoked.
-
-ifeq ($(DO_DOC),yes)
-
 PERL = perl
 NODEFIX = bin/nodefix.pl
 TEXI2HTML = bin/texi2html
@@ -125,6 +119,12 @@ OUT.DOC = $(OUTBASE)docs
 # specific output directories, such as $(OUT.DOC.HTML).  The value of this
 # variable must reflect the value of $(OUT.DOC) and $(OUTBASE).
 OUT.DOC.UNDO = ../../..
+
+# This section is specially protected by DO_DOC in order to prevent the lengthy
+# $(wildcard) operations from impacting _all_ other build targets.  DO_DOC is
+# only defined when a top-level documentaiton target is invoked.
+
+ifeq ($(DO_DOC),yes)
 
 # Target directory for each output format.
 OUT.DOC.API.DEV = $(OUT.DOC)/devapi
@@ -356,6 +356,8 @@ infodoc: \
   $(OUT.DOC.INFO).ZAPSOURCE \
   $(OUT.DOC.INFO)/txt.ZAPIMAGES
 
+endif # ifeq ($(DO_DOC),yes)
+
 # Repair out-of-date and broken @node and @menu directives in Texinfo source.
 repairdoc:
 	$(PERL) $(NODEFIX) --include-dir=$(CSMANUAL_DIR) $(CSMANUAL_FILE)
@@ -363,7 +365,5 @@ repairdoc:
 # Remove all target documentation directories.
 cleandoc:
 	$(RMDIR) $(OUT.DOC)
-
-endif # ifeq ($(DO_DOC),yes)
 
 endif # ifeq ($(MAKESECTION),targets)
