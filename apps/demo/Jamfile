@@ -7,5 +7,5 @@ Application csdemo
 ;
 LinkWith csdemo : csgeom csgfx cstool csutil ;
 
-Win32Resource csdemo : $(TOP)/libs/cssys/win32/rsrc/cs1.rc ;
+Win32Resource csdemo : $(TOP)/libs/csutil/win32/rsrc/cs1.rc ;
 

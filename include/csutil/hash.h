@@ -19,7 +19,7 @@
 #ifndef __CS_UTIL_HASH_H__
 #define __CS_UTIL_HASH_H__
 
-#include "csutil/array.h"
+#include "array.h"
 
 /**
  * Compute a hash key for a null-terminated string.

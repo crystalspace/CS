@@ -20,7 +20,7 @@
 #define __CS_PHYSFILE_H__
 
 #include "iutil/vfs.h"
-#include "csutil/csstring.h"
+#include "csstring.h"
 #include <stdio.h>
 
 /**

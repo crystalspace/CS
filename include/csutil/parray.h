@@ -20,7 +20,7 @@
 #ifndef __CS_PTRARR_H__
 #define __CS_PTRARR_H__
 
-#include "csutil/array.h"
+#include "array.h"
 
 template <class T>
 class csPDelArrayElementHandler

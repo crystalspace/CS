@@ -19,7 +19,7 @@
 
 /* ViewMesh: tool for displaying mesh objects (3d sprites) */
 #include "cssysdef.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "csutil/cscolor.h"
 #include "cstool/csview.h"
 #include "cstool/initapp.h"

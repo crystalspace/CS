@@ -20,8 +20,8 @@
 #define __CS_CFGMGR_H__
 
 #include "iutil/cfgmgr.h"
-#include "csutil/refarr.h"
-#include "csutil/array.h"
+#include "refarr.h"
+#include "array.h"
 
 /**
  * A configuration manager makes a number of individual iConfigFile objects

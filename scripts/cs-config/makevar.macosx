@@ -6,7 +6,7 @@ CFLAGS.I = -I
 EXE = .app
 DLL = .csbundle
 MACOSX.APP_EXE  = $@/Contents/MacOS/$(notdir $(basename $@))
-MACOSX.APP_ICON = $(SRCDIR)/libs/cssys/macosx/appicon.icns
+MACOSX.APP_ICON = $(SRCDIR)/libs/csutil/macosx/appicon.icns
 MACOSX.APP_DIR  = .
 CFLAGS.GENERAL = -force_cpusubtype_ALL -Wno-precomp -fno-common -pipe
 LFLAGS.GENERAL = $(MACOSX.LFLAGS.CONFIG)
@@ -17,7 +17,7 @@ LIBS.EXE.PLATFORM=$(LFLAGS.GENERAL) $(LFLAGS.EXE)
 AR = libtool
 ARFLAGS = -static -o
 define DO.LINK.EXE
-  sh $(SRCDIR)/libs/cssys/macosx/appwrap.sh $(notdir $(basename $@)) $(MACOSX.APP_DIR) $(MACOSX.APP_ICON) $(SRCDIR)/include/csver.h
+  sh $(SRCDIR)/libs/csutil/macosx/appwrap.sh $(notdir $(basename $@)) $(MACOSX.APP_DIR) $(MACOSX.APP_ICON) $(SRCDIR)/include/csver.h
   $(NEWLINE)$(LINK) $(LFLAGS) $(LFLAGS.EXE) -o $(MACOSX.APP_EXE) $(^^) $(L^) $(LIBS) $(LIBS.EXE.PLATFORM)
   touch $@
 endef

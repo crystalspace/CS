@@ -19,10 +19,10 @@
 #ifndef __CS_CSUTIL_SYMTABLE_H__
 #define __CS_CSUTIL_SYMTABLE_H__
 
-#include "csutil/scf.h"
-#include "csutil/ref.h"
-#include "csutil/strhash.h"
-#include "csutil/array.h"
+#include "scf.h"
+#include "ref.h"
+#include "strhash.h"
+#include "array.h"
 
 class csShaderVariable;
 

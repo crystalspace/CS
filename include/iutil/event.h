@@ -22,7 +22,7 @@
 
 #include "iutil/evdefs.h"
 #include "csutil/scf.h"
-#include "cssys/csunicode.h"
+#include "csutil/csunicode.h"
 
 /**\file
  * Event system related interfaces

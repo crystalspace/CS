@@ -19,8 +19,8 @@
 
 #define CS_SYSDEF_PROVIDE_GETOPT
 #include "cssysdef.h"
-#include "cssys/csunicode.h"
-#include "cssys/csendian.h"
+#include "csutil/csunicode.h"
+#include "csutil/csendian.h"
 #include "cstool/initapp.h"
 #include "csutil/util.h"
 #include "csutil/memfile.h"

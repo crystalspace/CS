@@ -106,20 +106,20 @@ The graphics library. Here you will find bumpmapping, mipmapping, quantizers,
 and routines to support loading an image file (through the various image
 loading plug-ins).
 
-@item CS/libs/cssys
+@item CS/libs/csutil
 All system-dependent source and make files (non-graphics and non-sound related)
 are located here.  Unlike the other directories within the @file{CS/libs}
 hierarchy, the implementations in this one are not placed into a distinct
 link library.  Instead, they are incorporated into the @file{csutil} library.
 
 @table @code
-@item CS/libs/cssys/general
+@item CS/libs/csutil/generic
 Code which may be shared between system drivers that can make use of it.
-@item CS/libs/cssys/macosx
+@item CS/libs/csutil/macosx
 MacOS/X
-@item CS/libs/cssys/unix
+@item CS/libs/csutil/unix
 Unix, Linux, FreeBSD, NetBSD, Solaris, Irix, etc.
-@item CS/libs/cssys/win32
+@item CS/libs/csutil/win32
 Windows 32-bit (9x, @sc{nt}, @sc{me}, 2000, @sc{xp})
 @end table
 
@@ -133,7 +133,7 @@ This library contains various utilities.  The utilities include an archiver,
 configuration manager, virtual clock, scheduler, strings, hash maps, @sc{scf}
 (@pxref{SCF}), @sc{md5} algorithm, map file parser, command-line parser, event
 structures, and many others.  It also contains platform-specific
-implementations and functions from the @file{CS/libs/cssys} directory.
+implementations and functions from the @file{CS/libs/csutil} directory.
 
 @item CS/libs/csws
 The Crystal Space Windowing System which is nicely integrated with Crystal

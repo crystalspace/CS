@@ -19,7 +19,7 @@
 #ifndef __CS_HASHMAPR_H__
 #define __CS_HASHMAPR_H__
 
-#include "csutil/hashmap.h"
+#include "hashmap.h"
 
 class csHashIteratorReversible;
 

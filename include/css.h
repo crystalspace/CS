@@ -63,10 +63,10 @@
 
 // CS Sys
 #ifndef NO_CSSYS
-#include "cssys/csendian.h"
-#include "cssys/csshlib.h"
-#include "cssys/sysfunc.h"
-#include "cssys/sockets.h"
+#include "csutil/csendian.h"
+#include "csutil/csshlib.h"
+#include "csutil/sysfunc.h"
+#include "csutil/sockets.h"
 #endif
 
 // CS Interfaces
@@ -323,7 +323,7 @@
 // Include this last because it aliases getopt to __getopt on some platforms,
 // which causes problems for other includes (for instance, on MacOS/X, it is
 // reported that it was breaking <unistd.h> in some fashion).
-#include "cssys/getopt.h"
+#include "csutil/getopt.h"
 #endif
 
 #endif // CS_INCLUDE_NOTHING

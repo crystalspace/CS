@@ -21,7 +21,7 @@
 
 #include "iutil/binder.h"
 #include "iutil/eventh.h"
-#include "csutil/hashmap.h"
+#include "hashmap.h"
 
 /**
  * Create a csHashMap key from an iEvent.

@@ -19,7 +19,7 @@
 #ifndef __CS_UTIL_BINTREE_H__
 #define __CS_UTIL_BINTREE_H__
 
-#include "csutil/blockallocator.h"
+#include "blockallocator.h"
 
 /**
  * A generic binary search tree.

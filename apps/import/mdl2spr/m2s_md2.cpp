@@ -25,7 +25,7 @@
 
 #include "cssysdef.h"
 #include "m2s_md2.h"
-#include "cssys/csendian.h"
+#include "csutil/csendian.h"
 
 // This class was stolen from John Burkhardt's MD2 converter
 // (see CS/libs/csparser/impexp/md2.cpp).

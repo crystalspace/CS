@@ -21,8 +21,8 @@
 #define __CS_STRINGARRAY_H__
 
 #include <stdarg.h>
-#include "csutil/util.h"
-#include "csutil/array.h"
+#include "util.h"
+#include "array.h"
 
 class csStringArrayElementHandler
 {

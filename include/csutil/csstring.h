@@ -21,7 +21,7 @@
 
 #include <stdarg.h>
 #include <ctype.h>
-#include "csutil/snprintf.h"
+#include "snprintf.h"
 
 /**
  * This is a string class with a range of useful operators and typesafe

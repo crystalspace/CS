@@ -20,7 +20,7 @@
 #ifndef __CS_CSEVCORD_H__
 #define __CS_CSEVCORD_H__
 
-#include "csutil/scf.h"
+#include "scf.h"
 #include "iutil/event.h"
 struct iEventHandler;
 class csEventOutlet;

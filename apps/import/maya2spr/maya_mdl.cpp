@@ -28,7 +28,7 @@
 #include "maya_mdl.h"
 #include "mayanode.h"
 
-#include "cssys/csendian.h"
+#include "csutil/csendian.h"
 #include "iutil/databuff.h"
 #include "igraphic/imageio.h"
 

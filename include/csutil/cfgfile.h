@@ -21,7 +21,7 @@
 
 #include "iutil/cfgfile.h"
 #include "iutil/vfs.h"
-#include "csutil/array.h"
+#include "array.h"
 
 class csConfigNode;
 class csConfigIterator;

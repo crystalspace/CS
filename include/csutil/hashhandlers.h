@@ -24,9 +24,9 @@
  * Additional key handlers for csHash<>
  */
 
-#include "csutil/hash.h"
-#include "csutil/ref.h"
-#include "csutil/util.h"
+#include "hash.h"
+#include "ref.h"
+#include "util.h"
 
 /**
  * A hash key handler for const char* strings.

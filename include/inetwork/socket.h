@@ -21,7 +21,7 @@
 #define __CS_INETWORK_SOCKET_H__
 
 #include "inetwork/driver.h"
-#include "cssys/sockets.h"
+#include "csutil/sockets.h"
 
 SCF_VERSION (iNetworkSocket, 0, 0, 1);
 

@@ -27,7 +27,7 @@
 #include "m2s_mdl.h"
 #include "m2s_pal.h"
 #include "m2s_img.h"
-#include "cssys/csendian.h"
+#include "csutil/csendian.h"
 #include "iutil/databuff.h"
 #include "igraphic/imageio.h"
 

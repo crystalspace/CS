@@ -24,7 +24,7 @@
 
 #define CS_SYSDEF_PROVIDE_ACCESS
 #include "cssysdef.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "walktest.h"
 #include "infmaze.h"
 #include "command.h"
@@ -1050,8 +1050,8 @@ bool WalkTest::SetMapDir (const char* map_dir)
 
 #if 0
 
-#include "cssys/thread.h"
-#include "cssys/sysfunc.h"
+#include "csutil/thread.h"
+#include "csutil/sysfunc.h"
 #include "iutil/document.h"
 
 class MyThread : public csRunnable

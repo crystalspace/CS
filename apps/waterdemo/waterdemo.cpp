@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "iutil/vfs.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/transfrm.h"

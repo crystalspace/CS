@@ -21,7 +21,7 @@
  * Reversible hash.
  */
 
-#include "csutil/hash.h"
+#include "hash.h"
  
 /// A csHash<> that maintains a reverse hash for indexing keys by values.
 template <class T, class K = uint32, 

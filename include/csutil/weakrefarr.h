@@ -20,8 +20,8 @@
 #ifndef __CS_WEAKREFARR_H__
 #define __CS_WEAKREFARR_H__
 
-#include "csutil/weakref.h"
-#include "csutil/array.h"
+#include "weakref.h"
+#include "array.h"
 
 /**
  * An array of weak references.

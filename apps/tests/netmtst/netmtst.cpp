@@ -20,7 +20,7 @@
 #include "csutil/ref.h"
 #include "cstool/initapp.h"
 #include "csutil/cmdhelp.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "iutil/objreg.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"

@@ -20,7 +20,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/csendian.h"
+#include "csutil/csendian.h"
 #include "csgfx/memimage.h"
 #include "csgfx/rgbpixel.h"
 #include "igraphic/imageio.h"

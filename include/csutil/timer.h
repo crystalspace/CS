@@ -21,7 +21,7 @@
 
 #include <stdarg.h>
 #include <stdio.h>
-#include "csutil/array.h"
+#include "array.h"
 #include "iutil/timer.h"
 
 struct iEvent;

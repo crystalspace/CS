@@ -19,7 +19,7 @@
 #ifndef __CS_OBJPOOL_H__
 #define __CS_OBJPOOL_H__
 
-#include "csutil/parray.h"
+#include "parray.h"
 
 /**
  * This class defines a 'pool' class for the given type.

@@ -26,9 +26,9 @@
  * like keyboard, mouse, and joystick.
  */
 
-#include "csutil/scf.h"
-#include "csutil/array.h"
-#include "csutil/hash.h"
+#include "scf.h"
+#include "array.h"
+#include "hash.h"
 #include "iutil/csinput.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"

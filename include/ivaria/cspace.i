@@ -805,7 +805,7 @@ TYPEMAP_OUT_csWrapPtr
 #endif // CS_MINI_SWIG
 
 %ignore csGetPlatformConfig;
-%include "cssys/sysfunc.h"
+%include "csutil/sysfunc.h"
 
 %ignore csInitializer::RequestPlugins(iObjectRegistry*, ...);
 %rename (_RequestPlugins) csInitializer::RequestPlugins(iObjectRegistry*, csArray<csPluginRequest> const&);

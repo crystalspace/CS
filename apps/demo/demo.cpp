@@ -22,7 +22,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "demo.h"
 #include "demoseq.h"
 #include "csutil/cscolor.h"

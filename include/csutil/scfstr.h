@@ -21,7 +21,7 @@
 #define __CS_SCFSTR_H__
 
 #include "iutil/string.h"
-#include "csutil/csstring.h"
+#include "csstring.h"
 
 /// This is a thin SCF wrapper around csString
 class scfString : public iString

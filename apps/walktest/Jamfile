@@ -61,9 +61,9 @@ Application walktest_static
 ;
 LinkWith walktest_static : csgeom csgfx cstool csutil ;
 LinkStaticPlugins walktest_static : $(STATIC.PLUGINLIST) ;
-Win32Resource walktest_static : $(TOP)/libs/cssys/win32/rsrc/cs1.rc ;
+Win32Resource walktest_static : $(TOP)/libs/csutil/win32/rsrc/cs1.rc ;
 SubVariant ;
 }
 
-Win32Resource walktest : $(TOP)/libs/cssys/win32/rsrc/cs1.rc ;
+Win32Resource walktest : $(TOP)/libs/csutil/win32/rsrc/cs1.rc ;
 

@@ -21,7 +21,7 @@
 
 #include <stdarg.h>
 #include "csutil/scf.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "iutil/objreg.h"
 
 /**\file

@@ -35,7 +35,7 @@ The root components of the MacOS/X port of Crystal Space are contained within
 these directories:
 
 @itemize @bullet
-@item @code{CS/libs/cssys/macosx}
+@item @code{CS/libs/csutil/macosx}
 @item @code{CS/plugins/sound/driver/coreaudio}
 @item @code{CS/plugins/video/canvas/macosx/cocoa}
 @item @code{CS/plugins/video/canvas/macosx/common}
@@ -49,7 +49,7 @@ Functionally, this port is comprised of two types of platform-specific modules:
 @item
 The core components which provide low-level platform-specific functionality to
 the Crystal Space engine.  These files and resources are located in
-@file{CS/libs/cssys/macosx}.
+@file{CS/libs/csutil/macosx}.
 
 @item
 The platform-specific audio and video driver modules.  The files and resources
@@ -65,10 +65,10 @@ system as well as higher-level event-loop processing as provided by Cocoa's
 @table @code
 @item OSXAssistant.h
 Two files share this name.  The first file resides in
-@file{CS/include/cssys/macosx} and declares the abstract @samp{iOSXAssistant}
+@file{CS/include/csutil/macosx} and declares the abstract @samp{iOSXAssistant}
 interface.  This interface declares methods which may be useful to canvases, as
 well as methods which are used by the Objective-C application delegate.  The
-second file resides in @file{CS/libs/cssys/macosx} and declares
+second file resides in @file{CS/libs/csutil/macosx} and declares
 @samp{OSXAssistant} which is a concrete subclass implementing the
 @samp{iOSXAssistant} interface.
 
@@ -129,7 +129,7 @@ functionality (such as checking the @samp{CRYSTAL} environment variable).
 @item csosdefs.h
 Platform-specific definition of operating system services which allows Crystal
 Space to access such services in a uniform manner from platform to platform.
-Located in @file{CS/include/cssys/macosx}.
+Located in @file{CS/include/csutil/macosx}.
 
 @item macosx.cfg
 A configuration file which defines platform-specific settings such as the menu

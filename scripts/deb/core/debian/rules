@@ -75,8 +75,8 @@ endif
 	# Creating menus
 	$(CURDIR)/debian/createmenus $(CURDIR)
 	# Some path adjustment
-	perl -pi -e "s:/usr/local/crystal:/usr/lib/crystalspace:" $(CURDIR)/CS/libs/cssys/general/instpath.cpp
-	perl -pi -e "s:/usr/local/crystal:/usr/lib/crystalspace:" $(CURDIR)/CS/libs/cssys/unix/instpath.cpp
+	perl -pi -e "s:/usr/local/crystal:/usr/lib/crystalspace:" $(CURDIR)/CS/libs/csutil/generic/instpath.cpp
+	perl -pi -e "s:/usr/local/crystal:/usr/lib/crystalspace:" $(CURDIR)/CS/libs/csutil/unix/instpath.cpp
 
 	touch configure-stamp
 

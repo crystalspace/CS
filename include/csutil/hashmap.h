@@ -25,8 +25,8 @@
 #endif
 #endif
 
-#include "csutil/parray.h"
-#include "csutil/array.h"
+#include "parray.h"
+#include "array.h"
 
 class csHashMapReversible;
 class csHashIteratorReversible;

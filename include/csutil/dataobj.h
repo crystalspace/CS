@@ -20,7 +20,7 @@
 #ifndef __CS_DATAOBJ_H_
 #define __CS_DATAOBJ_H_
 
-#include "csutil/csobject.h"
+#include "csobject.h"
 
 /**
  * A generic data object.

@@ -19,8 +19,8 @@
 #ifndef __CS_PLUGLDR_H__
 #define __CS_PLUGLDR_H__
 
-#include "csutil/parray.h"
-#include "csutil/util.h"
+#include "parray.h"
+#include "util.h"
 
 struct iObjectRegistry;
 

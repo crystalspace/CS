@@ -20,7 +20,7 @@
 #define __CS_UTIL_H__
 
 #include <stdio.h>
-#include "cssys/csunicode.h"
+#include "csunicode.h"
 
 /**\file
  */

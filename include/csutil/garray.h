@@ -20,7 +20,7 @@
 #ifndef __CS_GARRAY_H__
 #define __CS_GARRAY_H__
 
-#include "csutil/array.h"
+#include "array.h"
 
 /**\file 
  * vector class interface

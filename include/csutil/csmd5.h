@@ -64,7 +64,7 @@
 #ifndef __CS_CSMD5_H__
 #define __CS_CSMD5_H__
 
-#include "csutil/csstring.h"
+#include "csstring.h"
 
 /**
  * This is an encapsulation of a C-implementation of MD5 digest algorithm by

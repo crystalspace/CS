@@ -30,8 +30,8 @@
 
 class csPluginPaths;
 
-#include "csutil/ref.h"
-#include "csutil/array.h"
+#include "ref.h"
+#include "array.h"
 
 /**
  * Type of registered interface handle used by iBase::QueryInterface().

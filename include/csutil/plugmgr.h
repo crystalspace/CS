@@ -19,9 +19,9 @@
 #ifndef __CS_PLUGMGR_H__
 #define __CS_PLUGMGR_H__
 
-#include "csutil/scf.h"
-#include "csutil/scopedmutexlock.h"
-#include "csutil/parray.h"
+#include "scf.h"
+#include "scopedmutexlock.h"
+#include "parray.h"
 #include "iutil/config.h"
 #include "iutil/plugin.h"
 

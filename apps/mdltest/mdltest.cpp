@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "mdltest.h"
 #include "csutil/cscolor.h"
 #include "cstool/csview.h"

@@ -25,7 +25,7 @@
 #include "cstool/initapp.h"
 #include "iutil/eventq.h"
 #include "csutil/cseventq.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 
 //------------------------------------------------- We need the 3D engine -----
 

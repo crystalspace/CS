@@ -20,8 +20,8 @@
 #ifndef __CS_REFARR_H__
 #define __CS_REFARR_H__
 
-#include "csutil/ref.h"
-#include "csutil/array.h"
+#include "ref.h"
+#include "array.h"
 
 template <class T>
 class csRefArrayElementHandler

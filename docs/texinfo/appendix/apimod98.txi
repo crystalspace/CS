@@ -1009,10 +1009,21 @@ SCF_VERSION(MyProject::iMyInterface, 1, 0, 0);
 The @file{cssys} library has been merged into the @file{csutil} library.  This
 eliminates many problems resulting from the large number of circular
 dependencies which existed between these two libraries.  From the client
-viewpoint, this manifests merely as the removal of the static link library
-@file{libcssys.a} (Unix) or @file{cssys.lib} (Windows).  To account for this
-change, simply eliminate the reference to this library from your build scripts,
-makefiles, or project files.
+viewpoint, this change manifests in two ways:
+
+@itemize @bullet
+@item
+Disappearance of the static link library @file{libcssys.a} (Unix) or
+@file{cssys.lib} (Windows).  To account for this change, simply eliminate the
+reference to this library from your build scripts, makefiles, or project files.
+
+@item
+Disappearance of the @file{CS/include/cssys} directory.  Headers have been
+moved to the @file{csutil} include directory.  To account for this change,
+simply change @code{#include <cssys/header.h>} to
+@code{#include <csutil/header.h>}.
+
+@end itemize
 
 @subheading csEngine Library Removed
 
@@ -1065,7 +1076,7 @@ instead of a portal.
 
 @subheading Directory and Path Queries
 
-The following low-level functions, declared in @file{cssys/syspath.h} can be
+The following low-level functions, declared in @file{csutil/syspath.h} can be
 used to query various directories and paths.  Each of these functions expects
 to be passed @code{argv[0]} obtained from the program's @code{main()} function.
 

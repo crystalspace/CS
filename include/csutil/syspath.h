@@ -20,10 +20,10 @@
 #ifndef __CS_CSSYS_SYSPATH_H__
 #define __CS_CSSYS_SYSPATH_H__
 
-#include "csutil/array.h"
-#include "csutil/csstring.h"
-#include "csutil/ref.h"
-#include "csutil/util.h"
+#include "array.h"
+#include "csstring.h"
+#include "ref.h"
+#include "util.h"
 #include "iutil/stringarray.h"
 
 /**\file

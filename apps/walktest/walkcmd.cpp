@@ -28,7 +28,7 @@
 #include "csutil/util.h"
 #include "csutil/dataobj.h"
 #include "csgeom/math3d.h"
-#include "cssys/csendian.h"
+#include "csutil/csendian.h"
 #include "cstool/keyval.h"
 #include "cstool/collider.h"
 #include "cstool/cspixmap.h"

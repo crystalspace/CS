@@ -27,7 +27,7 @@
 #include "iutil/evdefs.h"
 #include "cstool/initapp.h"
 #include "iutil/objreg.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 //#include "ivaria/gclient.h"
 #include "ivaria/gserver.h"
 

@@ -19,7 +19,7 @@ W - Wishlist (the build also works without this feature)
 [H] The `jobber' scripts on SourceForge should use jam instead of make.
 [H] The MSVC generation rules still have a significant number of problems.  See
     msvcgen.jam for a complete list.
-[H] The MSVC-generated project file for csutil is missing all of the sources
+[*] The MSVC-generated project file for csutil is missing all of the sources
     (and headers) from the cssys directory.
 [H] Write complete documentation about the Jam build system for the CS user
     manual.
@@ -75,7 +75,7 @@ W - Wishlist (the build also works without this feature)
     correct version resource file is hard when doing it purely in jam, but I
     don't want to rely on external shell scripts)
 [*] external projects on win32 and macosx shouldn't fail. The problem here is
-    that the shell scripts in libs/cssys/win32 and libs/cssys/macosx aren't
+    that the shell scripts in libs/csutil/win32 and libs/csutil/macosx aren't
     there in external projects. Should we collect scripts which are used by
     the build system or should we try to avoid these in the jambuild (these 2
     scripts can probably be solved by improving the jamrules)

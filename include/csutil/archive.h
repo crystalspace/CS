@@ -21,9 +21,9 @@
 #define __CS_ARCHIVE_H__
 
 #include <stdio.h>
-#include "csutil/zip.h"
-#include "csutil/parray.h"
-#include "csutil/stringarray.h"
+#include "zip.h"
+#include "parray.h"
+#include "stringarray.h"
 
 struct csFileTime;
 

@@ -19,7 +19,7 @@
 #ifndef __CS_STRHASH_H__
 #define __CS_STRHASH_H__
 
-#include "csutil/hashmap.h"
+#include "hashmap.h"
 
 /**\file
  */

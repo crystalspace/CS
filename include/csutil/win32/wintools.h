@@ -19,7 +19,7 @@
 #ifndef __CS_CSSYS_WIN32_WINTOOLS_H__
 #define __CS_CSSYS_WIN32_WINTOOLS_H__
 
-#include "cssys/csunicode.h"
+#include "csutil/csunicode.h"
 #include "csutil/util.h"
 #include <winnls.h> // contains MultiByteToWideChar()/WideCharToMultiByte()
 

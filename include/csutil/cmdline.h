@@ -20,9 +20,9 @@
 #define __CS_CMDLINE_H__
 
 #include "iutil/cmdline.h"
-#include "csutil/parray.h"
-#include "csutil/stringarray.h"
-#include "csutil/util.h"
+#include "parray.h"
+#include "stringarray.h"
+#include "util.h"
 
 /// Representation of a commandline option.
 struct csCommandLineOption

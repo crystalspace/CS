@@ -22,7 +22,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "apps/demosky/demosky.h"
 #include "cstool/proctex.h"
 #include "cstool/prsky.h"

@@ -11310,7 +11310,7 @@ fi
     case $host_os in
 	mingw*|cygwin*)
 	    cs_host_target=win32gcc
-	    cs_host_makefile=libs/cssys/win32/win32gcc.mak
+	    cs_host_makefile=libs/csutil/win32/win32gcc.mak
 	    cs_host_family=windows
 	    ;;
 	darwin*)
@@ -11418,7 +11418,7 @@ fi
 
     if test $cs_host_macosx = yes; then
   cs_host_target=macosx
-	cs_host_makefile=libs/cssys/macosx/macosx.mak
+	cs_host_makefile=libs/csutil/macosx/macosx.mak
 	cs_host_family=unix
 	cs_host_os_normalized='MacOS/X'
 
@@ -11461,7 +11461,7 @@ echo "${ECHO_T}$cs_cv_prog_objcxx" >&6
 "
 else
   cs_host_target=unix
-	cs_host_makefile=libs/cssys/unix/unix.mak
+	cs_host_makefile=libs/csutil/unix/unix.mak
 	cs_host_family=unix
 fi
 
@@ -11469,7 +11469,7 @@ fi
 	*)
 	    # Everything else is assumed to be Unix or Unix-like.
 	    cs_host_target=unix
-	    cs_host_makefile=libs/cssys/unix/unix.mak
+	    cs_host_makefile=libs/csutil/unix/unix.mak
 	    cs_host_family=unix
 	    ;;
     esac

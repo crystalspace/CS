@@ -27,7 +27,7 @@
 
 #include "iutil/evdefs.h"
 #include "iutil/event.h"
-#include "csutil/csstring.h"
+#include "csstring.h"
 
 struct iEvent;
 

@@ -21,7 +21,7 @@
 #define __CS_SCFSTRINGARRAY_H__
 
 #include "iutil/stringarray.h"
-#include "csutil/stringarray.h"
+#include "stringarray.h"
 
 /// This class is a thin wrapper around csStringArray with SCF capability
 class scfStringArray : public iStringArray

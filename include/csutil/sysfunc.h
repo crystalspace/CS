@@ -31,11 +31,11 @@
 
 #include <stdarg.h>
 #include <stdio.h>
-#include "csutil/ref.h"
-#include "csutil/csstring.h"
+#include "ref.h"
+#include "csstring.h"
+#include "iutil/cfgfile.h"
 
 struct iObjectRegistry;
-struct iConfigFile;
 
 /**
  * Implements a default run-loop for stand-alone applications.<p>

@@ -70,7 +70,7 @@
 /*
  * Pull in platform-specific overrides of the requested functionality.
  */
-#include "cssys/csosdefs.h"
+#include "csutil/csosdefs.h"
 
 /*
  * Default definitions for requested functionality.  Platform-specific
@@ -208,14 +208,14 @@
 #  ifndef __STDC__
 #    define __STDC__ 1
 #  endif
-#  include "cssys/getopt.h"
+#  include "csutil/getopt.h"
 #endif
 
 #ifdef CS_SYSDEF_PROVIDE_SOCKETS
 # ifdef __GNUC__
 #  warning CS_SYSDEF_PROVIDE_SOCKETS is deprecated, include cssys/sockets.h instead
 # endif
-#include "cssys/sockets.h"
+#include "csutil/sockets.h"
 #endif
 
 #ifdef CS_SYSDEF_PROVIDE_SELECT

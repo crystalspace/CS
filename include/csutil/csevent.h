@@ -21,8 +21,8 @@
 #define __CS_CSEVENT_H__
 
 #include "iutil/event.h"
-#include "csutil/hashmapr.h"
-#include "cssys/csendian.h"
+#include "hashmapr.h"
+#include "csendian.h"
 
 /// Various datatypes supported by the event system (csEvent).
 enum

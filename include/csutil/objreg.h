@@ -22,10 +22,10 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include "iutil/objreg.h"
-#include "csutil/scf.h"
-#include "csutil/array.h"
-#include "csutil/stringarray.h"
-#include "csutil/scopedmutexlock.h"
+#include "scf.h"
+#include "array.h"
+#include "stringarray.h"
+#include "scopedmutexlock.h"
 
 /**
  * This is an implementation of iObjectRegistry.

@@ -21,7 +21,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "csutil/scanstr.h"
 #include "csutil/cscolor.h"
 #include "pysimp.h"

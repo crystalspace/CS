@@ -188,7 +188,7 @@ include $(TOP)/mk/jam/build.jam ;
 # Project-specific settings.
 if $(TARGET.OS) = MACOS_X
 {
-  ApplicationIconDefaultOSX appicon.icns : $(TOP) libs cssys macosx ;
+  ApplicationIconDefaultOSX appicon.icns : $(TOP) libs csutil macosx ;
 }
 
 # Common include directory.

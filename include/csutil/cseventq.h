@@ -25,13 +25,13 @@
  * Event Queue interface
  */
 
-#include "csutil/csevent.h"
-#include "csutil/csevcord.h"
-#include "csutil/evoutlet.h"
-#include "csutil/array.h"
-#include "csutil/ref.h"
-#include "csutil/refarr.h"
-#include "cssys/thread.h"
+#include "csevent.h"
+#include "csevcord.h"
+#include "evoutlet.h"
+#include "array.h"
+#include "ref.h"
+#include "refarr.h"
+#include "thread.h"
 #include "iutil/eventq.h"
 
 struct iObjectRegistry;

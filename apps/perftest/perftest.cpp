@@ -18,7 +18,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "cstool/initapp.h"
 #include "apps/perftest/perftest.h"
 #include "apps/perftest/ptests3d.h"

@@ -19,7 +19,7 @@
 #ifndef __CS_CSTREENODE_H__
 #define __CS_CSTREENODE_H__
 
-#include "csutil/array.h"
+#include "array.h"
 
 /**
  * A generic tree class.

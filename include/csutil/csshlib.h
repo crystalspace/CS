@@ -32,8 +32,8 @@
  * @{ */
 
 #include "syspath.h"
-#include "csutil/ref.h"
-#include "csutil/refarr.h"
+#include "ref.h"
+#include "refarr.h"
 #include "iutil/string.h"
 
 typedef void* csLibraryHandle;

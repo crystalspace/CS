@@ -343,19 +343,25 @@ The resources from these packages should be placed in the following locations.
 CS\libjpeg.dll
 CS\png.dll
 CS\zlib.dll
-CS\include\cssys\win32\jconfig.h
-CS\include\cssys\win32\jerror.h
-CS\include\cssys\win32\jinclude.h
-CS\include\cssys\win32\jmorecfg.h
-CS\include\cssys\win32\jpeglib.h
-CS\include\cssys\win32\png.h
-CS\include\cssys\win32\pngconf.h
-CS\include\cssys\win32\zconf.h
-CS\include\cssys\win32\zlib.h
-CS\libs\cssys\win32\libs\zlib.lib
-CS\libs\cssys\win32\libs\png.lib
-CS\libs\cssys\win32\libs\libjpeg.lib
+CS\include\csutil\win32\jconfig.h
+CS\include\csutil\win32\jerror.h
+CS\include\csutil\win32\jinclude.h
+CS\include\csutil\win32\jmorecfg.h
+CS\include\csutil\win32\jpeglib.h
+CS\include\csutil\win32\png.h
+CS\include\csutil\win32\pngconf.h
+CS\include\csutil\win32\zconf.h
+CS\include\csutil\win32\zlib.h
+CS\libs\csutil\win32\libs\zlib.lib
+CS\libs\csutil\win32\libs\png.lib
+CS\libs\csutil\win32\libs\libjpeg.lib
 @end example
+
+Historically, these files were placed in the @file{cssys} directory rather than
+the @file{csutil} directory, however that arrangement is now deprecated.  The
+build process will continue to look for these resources in @file{cssys} during
+a transitional period, but at some point it will be changed to only look for
+resources in @file{csutil}.
 
 Note that the source code package generally already contains the files from the
 @file{include} and @file{libs} directories, so you may not have to bother with

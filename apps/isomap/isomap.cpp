@@ -23,7 +23,7 @@
 // Based heavily on (or cut n paste from) isotest.cpp
 
 #include "cssysdef.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "cstool/initapp.h"
 #include "csutil/cmdhelp.h"
 

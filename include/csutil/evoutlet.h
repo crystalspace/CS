@@ -20,7 +20,7 @@
 #ifndef __CS_UTIL_EVOUTLET_H__
 #define __CS_UTIL_EVOUTLET_H__
 
-#include "cssys/csunicode.h"
+#include "csunicode.h"
 #include "iutil/event.h"
 #include "iutil/csinput.h"
 struct iObjectRegistry;

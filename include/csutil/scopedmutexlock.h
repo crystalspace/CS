@@ -19,7 +19,7 @@
 #ifndef __CSUTIL_SCOPEDMUTEX_H__
 #define __CSUTIL_SCOPEDMUTEX_H__
 
-#include "cssys/thread.h"
+#include "thread.h"
 
 /**
  * This is a utility class for locking a Mutex. If A MutexLock class is

@@ -982,7 +982,7 @@ AC_DEFUN([CS_CHECK_HOST],
     case $host_os in
 	mingw*|cygwin*)
 	    cs_host_target=win32gcc
-	    cs_host_makefile=libs/cssys/win32/win32gcc.mak
+	    cs_host_makefile=libs/csutil/win32/win32gcc.mak
 	    cs_host_family=windows
 	    ;;
 	darwin*)
@@ -991,7 +991,7 @@ AC_DEFUN([CS_CHECK_HOST],
 	*)
 	    # Everything else is assumed to be Unix or Unix-like.
 	    cs_host_target=unix
-	    cs_host_makefile=libs/cssys/unix/unix.mak
+	    cs_host_makefile=libs/csutil/unix/unix.mak
 	    cs_host_family=unix
 	    ;;
     esac])
@@ -1030,7 +1030,7 @@ AC_DEFUN([_CS_CHECK_HOST_DARWIN],
 
     AS_IF([test $cs_host_macosx = yes],
 	[cs_host_target=macosx
-	cs_host_makefile=libs/cssys/macosx/macosx.mak
+	cs_host_makefile=libs/csutil/macosx/macosx.mak
 	cs_host_family=unix
 	cs_host_os_normalized='MacOS/X'
 
@@ -1051,7 +1051,7 @@ AC_DEFUN([_CS_CHECK_HOST_DARWIN],
 	CS_JAMCONFIG_PROPERTY([CMD.OBJC++], [$cs_cv_prog_objcxx])],
 
 	[cs_host_target=unix
-	cs_host_makefile=libs/cssys/unix/unix.mak
+	cs_host_makefile=libs/csutil/unix/unix.mak
 	cs_host_family=unix])])
 
 CS_CHECK_HOST

@@ -19,7 +19,7 @@
 #ifndef __CS_PRFXCFG_H__
 #define __CS_PRFXCFG_H__
 
-#include "csutil/cfgfile.h"
+#include "cfgfile.h"
 
 /**
  * This is an implementation of iConfigFile that stores an ID string

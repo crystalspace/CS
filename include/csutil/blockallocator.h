@@ -19,7 +19,7 @@
 #ifndef __CSUTIL_BLKALLOC_H__
 #define __CSUTIL_BLKALLOC_H__
 
-#include "csutil/array.h"
+#include "array.h"
 
 // hack: work around problems caused by #defining 'new'
 #ifdef CS_EXTENSIVE_MEMDEBUG

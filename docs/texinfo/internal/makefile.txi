@@ -55,7 +55,7 @@ created for Unix:
 @example
 # Automatically generated file, do not edit!
 TARGET = unix
-TARGET_MAKEFILE = libs/cssys/unix/unix.mak
+TARGET_MAKEFILE = libs/csutil/unix/unix.mak
 MODE = optimize
 USE_PLUGINS = yes
 PROC = X86

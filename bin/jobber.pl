@@ -303,7 +303,7 @@ my $MAKE = 'make';
 # minimal config.mak and Makefile.
 my $CONFIGURE = "cat << EOF > config.mak\n" .
     "TARGET = unix\n" .
-    "TARGET_MAKEFILE = libs/cssys/unix/unix.mak\n" .
+    "TARGET_MAKEFILE = libs/csutil/unix/unix.mak\n" .
     "SRCDIR = .\n" .
     "USE_PLUGINS = yes\n" .
     "CMD.MKDIR = mkdir\n" .

@@ -19,7 +19,7 @@
 #ifndef __CS_CFGACC_H__
 #define __CS_CFGACC_H__
 
-#include "csutil/array.h"
+#include "array.h"
 #include "iutil/cfgmgr.h"
 
 struct iConfigFile;

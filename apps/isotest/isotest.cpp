@@ -21,7 +21,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "qsqrt.h"
 #include "cstool/initapp.h"
 #include "csutil/cmdhelp.h"

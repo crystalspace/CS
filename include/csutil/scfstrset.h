@@ -20,7 +20,7 @@
 #define __CS_SCFSTRSET_H__
 
 #include "iutil/strset.h"
-#include "csutil/strset.h"
+#include "strset.h"
 
 /**
  * The string set is a list of strings, all with different content. Each

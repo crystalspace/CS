@@ -23,7 +23,7 @@
  * Platform-independent Memory-Mapped IO
  */
 
-#include "csutil/bitarray.h"
+#include "bitarray.h"
 
 struct iVFS;
 

@@ -17,7 +17,7 @@
 */
 
 #include <cssysdef.h>
-#include <cssys/sysfunc.h>
+#include <csutil/sysfunc.h>
 #include <csver.h>
 
 #include <csutil/csobject.h>

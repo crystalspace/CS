@@ -19,7 +19,7 @@
 #ifndef __CS_STRSET_H__
 #define __CS_STRSET_H__
 
-#include "csutil/strhash.h"
+#include "strhash.h"
 
 /**\file
  */

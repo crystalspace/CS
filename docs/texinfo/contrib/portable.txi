@@ -39,7 +39,7 @@ endian-related problems.  Use the network functions @code{ntohl()},
 @code{ntohs()}, @code{htonl()}, and @code{htons()} to convert numbers to
 canonical format before transmitting them over the network.  You can also make
 use of the Crystal Space endian-related conversion functions found in
-@file{CS/include/cssys/csendian.h}.
+@file{CS/include/csutil/csendian.h}.
 
 @item
 @emph{Data Alignment}

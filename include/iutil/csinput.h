@@ -35,7 +35,7 @@
 
 #include "csutil/scf.h"
 #include "iutil/event.h"
-#include "cssys/csunicode.h"
+#include "csutil/csunicode.h"
 
 /// Maximal number of mouse buttons supported
 #define CS_MAX_MOUSE_BUTTONS	10

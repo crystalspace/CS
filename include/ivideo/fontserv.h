@@ -19,7 +19,7 @@
 #ifndef __CS_IVIDEO_FONTSERV_H__
 #define __CS_IVIDEO_FONTSERV_H__
 
-#include "cssys/csunicode.h"
+#include "csutil/csunicode.h"
 #include "csutil/scf.h"
 #include "csutil/ref.h"
 

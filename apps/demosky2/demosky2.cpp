@@ -21,7 +21,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "apps/demosky2/demosky2.h"
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
