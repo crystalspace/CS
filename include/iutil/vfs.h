@@ -375,7 +375,7 @@ struct iVFS : public iBase
    *        path. If not given then this routine will try to use a suitable
    *        temporary name.
    */
-  virtual bool ChDirAuto (const char* path, const csStringArray* paths,
+  virtual bool ChDirAuto (const char* path, const csStringArray* paths = 0,
   	const char* vfspath = 0) = 0;
 
   /**

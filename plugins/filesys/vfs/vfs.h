@@ -205,7 +205,7 @@ public:
   virtual bool LoadMountsFromFile (iConfigFile* file);
 
   /// Auto-mount ChDir.
-  virtual bool ChDirAuto (const char* path, const csStringArray* paths,
+  virtual bool ChDirAuto (const char* path, const csStringArray* paths = 0,
   	const char* vfspath = 0);
 
   /// Initialize the Virtual File System
