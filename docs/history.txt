@@ -92,6 +92,11 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine eliminated all overfull and underfull `hbox' warnings
 	  reported by TeX following the API changes regarding the SCF_ and CS_
 	  prefixes.
+	- Eric Sunshine changed the Apple/NeXT ports so that they access the
+	  `next.cfg' configuration file via iConfigManager rather than
+	  iConfigFile.  This allows application, plugin module, and
+	  user-specific configuration options to override options from
+	  `next.cfg'.
 24-Jun-2001
 	- 'Fixed' the lightmap overflow bug in software renderer. It is
 	  not really an elegant bug fix as I simply test for overflow

@@ -23,7 +23,7 @@
 #include "cssys/next/NeXTSystemDriver.h"
 #include "cssys/csshlib.h"
 #include "NeXTDelegate.h"
-#include "iutil/cfgfile.h"
+#include "csutil/cfgacc.h"
 #include "csver.h"
 #include <stdarg.h>
 
@@ -85,9 +85,9 @@ bool NeXTSystemDriver::Initialize(int argc, char const* const argv[],
   
   if (superclass::Initialize(argc, argv, cfgfile))
   {
-    iConfigFile* next_config = CreateSeparateConfig("/config/next.cfg");
+    csConfigAccess next_config(this, "/config/next.cfg", true,
+      iConfigManager::PriorityMin);
     init_menu(next_config);
-    next_config->DecRef();
     ok = true;
   }
   return ok;
