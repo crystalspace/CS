@@ -201,3 +201,22 @@ rule SubDir
 	SUBDIRC++FLAGS = ;
 	SUBDIRHDRS = ;
 }
+
+rule FSubDirPath
+{
+	# FSubDirPath TOP d1 ... ;
+
+	# Returns path to named directory.
+
+	# If jam is invoked in a subdirectory of the TOP, then we
+	# need to prepend a ../ for every level we must climb up
+	# (TOP-UP), and then append the directory names we must 
+	# climb down (TOP-DOWN), plus the named directories d1 ...
+	# If TOP was set externally, or computed from another TOP 
+	# that was, we'll have to reroot the whole thing at TOP-ROOT.
+
+	local _r = [ FRelPath $($(<[1])-UP) : $($(<[1])-DOWN) $(<[2-]) ] ;
+
+	return $(_r:R=$($(<[1])-ROOT)) ;
+}
+

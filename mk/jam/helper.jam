@@ -89,6 +89,9 @@ rule Prefix
   return $(>)$(<) ;
 }
 
+if $(JAMVERSION) >= 2.5
+{
+
 ##  IsElem element : list
 ##    Returns "true" if the elemnt is in the least. Otherwise nothing is
 ##    returned.
@@ -107,3 +110,24 @@ rule IsElem
   return ;
 }
 
+}
+else
+{
+
+# jam<2.4's return statement doesn't exit the function
+rule IsElem
+{
+  local i result ;
+
+  for i in $(>)
+  {
+    if $(i) = $(<)
+    {
+      result = "true" ;
+    }
+  }
+
+  return $(result) ;
+}
+
+}
