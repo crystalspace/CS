@@ -36,6 +36,9 @@ chronological order.
 	  Previously, not all provided variables were actually filled.
 	- Jorrit removed the first technique from ambient.xml. The second
 	  technique is more compatible and works fast enough everywhere.
+	- Wouter added a new technique to the NR terrain shader
+	  splatting_bump, that avoid bumpmapping and lighting to
+	  make it work on 2 texture units graphics cards.
 6-Nov-2003
 	- res bumped the version of the iGraphics2D interface and updated
 	  some doxygen comments in include/graph2d.h. (Basically the 
