@@ -1,5 +1,5 @@
- #ifndef __AWSSMPT_H__
- #define __AWSSMPT_H__
+ #ifndef __AWSCSPT_H__
+ #define __AWSCSPT_H__
 /**************************************************************************
     Copyright (C) 2000-2001 by Christopher Nelson 
     	      (c) 2001 F.Richter	
@@ -77,4 +77,4 @@ public:
   virtual void Show (csRect *area = NULL);
 };
 
-#endif // __AWSCMPT_H__
+#endif // __AWSCSPT_H__
