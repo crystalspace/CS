@@ -232,7 +232,7 @@ void Blocks::add_pilar (int x, int y)
   CHK (pilar = new csThing ());
   csNameObject::AddName (*pilar, "pilar");
   pilar->SetSector (room);
-  pilar->SetMoveable (false);
+  pilar->SetFlags (CS_ENTITY_MOVEABLE, 0);
   pilar->MergeTemplate (pilar_tmpl, pilar_txt, 1);
   room->AddThing (pilar);
   csVector3 v ((x-CUBE_DIM/2)*BLOCK_DIM, 0, (y-CUBE_DIM/2)*BLOCK_DIM);
@@ -365,7 +365,7 @@ void Blocks::add_cube (int dx, int dy, int dz, int x, int y, int z)
   CHK (cube = new csThing ());
   csNameObject::AddName (*cube, "cube");
   cube->SetSector (room);
-  cube->SetMoveable (true);
+  cube->SetFlags (CS_ENTITY_MOVEABLE, CS_ENTITY_MOVEABLE);
   csVector3 shift (dx*BLOCK_DIM, dy*BLOCK_DIM, dz*BLOCK_DIM);
   cube->MergeTemplate (cube_tmpl, cube_txt, 1, NULL, &shift, NULL);
 
