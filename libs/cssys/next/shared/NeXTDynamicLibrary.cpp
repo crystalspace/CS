@@ -47,7 +47,7 @@ public:
 class NeXTPluginArray : public csVector
 {
 public:
-  virtual bool FreeItem(csSome p) { delete (NeXTPluginEntry*)p; }
+  virtual bool FreeItem(csSome p) { delete (NeXTPluginEntry*)p; return true; }
   virtual int Compare(csSome p1, csSome p2, int) const
   { return strcmp(((NeXTPluginEntry*)p1)->path,((NeXTPluginEntry*)p2)->path); }
   virtual int CompareKey(csSome p, csConstSome k, int) const
