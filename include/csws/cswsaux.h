@@ -25,7 +25,7 @@
 #include <stdarg.h>
 #include <string.h>
 
-#include "version.h"
+#include "csversion.h"
 #include "csutil/util.h"
 
 #endif // __CSWSAUX_H__
