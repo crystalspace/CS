@@ -2301,7 +2301,7 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
         {
 	  iStatLight* sl = ParseStatlight (name, params);
 	  if (!sl) return NULL; // @@@ Leak
-          sector->AddLight (sl);
+          sector->GetLights ()->AddLight (sl->QueryLight ());
 	}
         break;
       case CS_TOKEN_NODE:

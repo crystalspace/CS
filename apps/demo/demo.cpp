@@ -33,10 +33,9 @@
 #include "iengine/engine.h"
 #include "iengine/sector.h"
 #include "iengine/light.h"
+#include "iengine/statlght.h"
 #include "iengine/camera.h"
 #include "iengine/mesh.h"
-#include "iengine/light.h"
-#include "iengine/statlght.h"
 #include "iengine/movable.h"
 #include "iengine/halo.h"
 #include "imesh/thing/thing.h"
@@ -496,7 +495,7 @@ void Demo::SetupSector ()
   flare->AddComponent (3.3, .15, .15, CS_FX_ADD, ifm2);
 
   il->DecRef ();
-  room->AddLight (light);
+  room->GetLights ()->AddLight (light->QueryLight ());
 }
 
 void Demo::SetupObjects ()

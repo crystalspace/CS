@@ -49,6 +49,8 @@
 #include "iengine/terrain.h"
 #include "iengine/movable.h"
 #include "iengine/camera.h"
+#include "iengine/light.h"
+#include "iengine/statlght.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/eventq.h"
@@ -1026,7 +1028,8 @@ void csBugPlug::Dump (iSector* sector)
   Report (CS_REPORTER_SEVERITY_DEBUG, "    Sector '%s' (%08lx)",
   	sn ? sn : "?", sector);
   Report (CS_REPORTER_SEVERITY_DEBUG, "    %d meshes, %d lights",
-  	sector->GetMeshes ()->GetMeshCount (), sector->GetLightCount ());
+  	sector->GetMeshes ()->GetMeshCount (),
+	sector->GetLights ()->GetLightCount ());
   int i;
   for (i = 0 ; i < sector->GetMeshes ()->GetMeshCount () ; i++)
   {

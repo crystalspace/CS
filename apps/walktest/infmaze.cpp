@@ -27,6 +27,7 @@
 #include "imesh/lighting.h"
 #include "imesh/thing/polygon.h"
 #include "iengine/light.h"
+#include "iengine/statlght.h"
 
 InfiniteMaze::InfiniteMaze ()
 {
@@ -147,7 +148,7 @@ InfRoomData* InfiniteMaze::create_six_room (iEngine* engine, int x, int y, int z
 	1+rand1 (3),
   	csColor (rand1 (1), rand1 (1), rand1 (1)),
 	false);
-  room->AddLight (light);
+  room->GetLights ()->AddLight (light->QueryLight ());
 
   InfRoomData* ird = new InfRoomData ();
   ird->x = x;

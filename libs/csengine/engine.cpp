@@ -171,7 +171,7 @@ csLight* csLightIt::Fetch ()
   // Try next light.
   light_idx++;
 
-  if (light_idx >= sector->GetLightCount ())
+  if (light_idx >= sector->scfiSector.GetLights ()->GetLightCount ())
   {
     // Go to next sector.
     light_idx = -1;
@@ -180,7 +180,8 @@ csLight* csLightIt::Fetch ()
     return Fetch ();
   }
 
-  return sector->GetLight (light_idx);
+  return sector->scfiSector.GetLights ()->GetLight (light_idx)
+  	->GetPrivateObject ();
 }
 
 csSector* csLightIt::GetLastSector ()
@@ -361,13 +362,14 @@ iObject* csObjectIt::Fetch ()
   // Handle csLight.
   if (CurrentList == ITERATE_STATLIGHTS)
   {
-    if (cur_idx >= cur_sector->GetLightCount ())
+    if (cur_idx >= cur_sector->scfiSector.GetLights ()->GetLightCount ())
       StartMeshes ();
     else
     {
+      iLightList* ll = cur_sector->scfiSector.GetLights ();
       do
       {
-        iObject* rc = cur_sector->GetLight (cur_idx)->scfiLight.QueryObject ();
+        iObject* rc = ll->GetLight (cur_idx)->QueryObject ();
         cur_idx++;
 	iStatLight* sl = SCF_QUERY_INTERFACE_FAST (rc, iStatLight);
 	if (sl)
@@ -378,8 +380,8 @@ iObject* csObjectIt::Fetch ()
               return rc;
 	}
       }
-      while (cur_idx < cur_sector->GetLightCount ());
-      if (cur_idx >= cur_sector->GetLightCount ())
+      while (cur_idx < ll->GetLightCount ());
+      if (cur_idx >= ll->GetLightCount ())
         StartMeshes ();
     }
   }
@@ -1339,14 +1341,17 @@ csStatLight* csEngine::FindCsLight (unsigned long light_id) const
 csStatLight* csEngine::FindCsLight (const char* name, bool /*regionOnly*/) const
 {
   //@@@### regionOnly
-  csStatLight* l;
   int sn = sectors.Length ();
   while (sn > 0)
   {
     sn--;
-    csSector* s = sectors[sn]->GetPrivateObject ();
-    l = s->GetLight (name);
-    if (l) return l;
+    iSector* s = sectors[sn];
+    iLight* il = s->GetLights ()->FindByName (name);
+    if (il)
+    {
+      csLight* l = il->GetPrivateObject ();
+      return (csStatLight*)l;
+    }
   }
   return NULL;
 }
@@ -1504,8 +1509,8 @@ static int compare_light (const void* p1, const void* p2)
   return 0;
 }
 
-int csEngine::GetNearbyLights (csSector* sector, const csVector3& pos, ULong flags,
-  	iLight** lights, int max_num_lights)
+int csEngine::GetNearbyLights (csSector* sector, const csVector3& pos,
+	ULong flags, iLight** lights, int max_num_lights)
 {
   int i;
   float sqdist;
@@ -1550,15 +1555,14 @@ int csEngine::GetNearbyLights (csSector* sector, const csVector3& pos, ULong fla
   // Add all static lights to the array (if CS_NLIGHT_STATIC is set).
   if (flags & CS_NLIGHT_STATIC)
   {
-    for (i = 0 ; i < sector->GetLightCount () ; i++)
+    iLightList* ll = sector->scfiSector.GetLights ();
+    for (i = 0 ; i < ll->GetLightCount () ; i++)
     {
-      csStatLight* sl = sector->GetLight (i);
-      sqdist = csSquaredDist::PointPoint (pos, sl->GetCenter ());
-      if (sqdist < sl->GetSquaredRadius ())
+      iLight* l = ll->GetLight (i);
+      sqdist = csSquaredDist::PointPoint (pos, l->GetCenter ());
+      if (sqdist < l->GetSquaredRadius ())
       {
-	iLight* il = SCF_QUERY_INTERFACE_FAST (sl, iLight);
-        light_array->AddLight (il, sqdist);
-	il->DecRef ();
+        light_array->AddLight (l, sqdist);
       }
     }
   }

@@ -29,6 +29,7 @@
 #include "iengine/movable.h"
 #include "iengine/sector.h"
 #include "iengine/mesh.h"
+#include "iengine/light.h"
 #include "ivideo/graph3d.h"
 
 class csEngine;
@@ -46,6 +47,49 @@ struct iVisibilityCuller;
 struct iRenderView;
 struct iMeshWrapper;
 struct iFrustumView;
+
+CS_DECLARE_OBJECT_VECTOR (csLightListHelper, iLight);
+
+/**
+ * List of lights for a sector. This class implements iLightList.
+ */
+class csLightList : public csLightListHelper
+{
+private:
+  csSector* sector;
+public:
+  SCF_DECLARE_IBASE;
+
+  /// constructor
+  csLightList ();
+
+  /// Set the sector.
+  void SetSector (csSector* s) { sector = s; }
+
+  /// Override FreeItem
+  virtual bool FreeItem (csSome Item);
+  /// Add a light.
+  virtual void AddLight (iLight* light);
+  /// Remove a light.
+  virtual void RemoveLight (iLight* light);
+
+  class LightList : public iLightList
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csLightList);
+    virtual int GetLightCount () const;
+    virtual iLight *GetLight (int idx) const;
+    virtual void AddLight (iLight *light)
+    {
+      scfParent->AddLight (light);
+    }
+    virtual void RemoveLight (iLight *light)
+    {
+      scfParent->RemoveLight (light);
+    }
+    virtual iLight *FindByName (const char *name) const;
+    virtual int Find (iLight *light) const;
+  } scfiLightList;
+};
 
 /// A list of meshes for a sector.
 class csSectorMeshList : public csMeshList
@@ -90,9 +134,9 @@ private:
 
   /**
    * All static and pseudo-dynamic lights in this sector.
-   * This vector contains objects of type csStatLight*.
+   * This vector contains objects of type iLight*.
    */
-  csNamedObjVector lights;
+  csLightList lights;
 
   /// Engine handle.
   csEngine* engine;
@@ -195,38 +239,9 @@ public:
   //----------------------------------------------------------------------
 
   /**
-   * Add a static or pseudo-dynamic light to this sector.
+   * Get the list of lights in this sector.
    */
-  void AddLight (csStatLight* light);
-
-  /**
-   * Unlink a light from this sector.
-   */
-  void UnlinkLight (csStatLight* light);
-
-  /**
-   * Get the number of lights in this sector.
-   */
-  int GetLightCount () const
-  {
-    return lights.Length ();
-  }
-
-  /**
-   * Get the specified light.
-   */
-  csStatLight* GetLight (int idx) const
-  {
-    return (csStatLight*)lights[idx];
-  }
-
-  /**
-   * Find a light with the given name.
-   */
-  csStatLight* GetLight (const char* name) const
-  {
-    return (csStatLight*)lights.FindByName (name);
-  }
+  csLightList& GetLights () { return lights; }
 
   /**
    * Find a light with the given position and radius.
@@ -452,11 +467,11 @@ public:
     {
       return &(scfParent->meshes.scfiMeshList);
     }
+    virtual iLightList* GetLights ()
+    {
+      return &(scfParent->lights.scfiLightList);
+    }
 
-    virtual void AddLight (iStatLight *light);
-    virtual int GetLightCount () const { return scfParent->GetLightCount (); }
-    virtual iStatLight *GetLight (int n) const;
-    virtual iStatLight *GetLight (const char* name) const;
     virtual iStatLight *FindLight (float x, float y, float z, float dist) const;
     virtual void ShineLights ()
     { scfParent->ShineLights (); }

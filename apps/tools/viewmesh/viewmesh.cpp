@@ -32,6 +32,7 @@
 #include "iengine/engine.h"
 #include "iengine/camera.h"
 #include "iengine/light.h"
+#include "iengine/statlght.h"
 #include "iengine/texture.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
@@ -234,18 +235,19 @@ bool ViewMesh::Initialize (int argc, const char* const argv[],
   walls_state->DecRef ();
 
   iStatLight* light;
+  iLightList* ll = room->GetLights ();
   light = engine->CreateLight (NULL, csVector3 (-3, 5, 0), 10,
   	csColor (1, .8, .8), false);
-  room->AddLight (light);
+  ll->AddLight (light->QueryLight ());
   light = engine->CreateLight (NULL, csVector3 (3, 5,  0), 10,
   	csColor (.8, .8, 1), false);
-  room->AddLight (light);
+  ll->AddLight (light->QueryLight ());
   light = engine->CreateLight (NULL, csVector3 (0, 5, -3), 10,
   	csColor (.8, 1, .8), false);
-  room->AddLight (light);
+  ll->AddLight (light->QueryLight ());
   light = engine->CreateLight (NULL, csVector3 (0, 5,  3), 10,
   	csColor (.8, .8, 1), false);
-  room->AddLight (light);
+  ll->AddLight (light->QueryLight ());
 
   engine->Prepare ();
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Created.");

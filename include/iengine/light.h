@@ -51,7 +51,7 @@ struct iFlareHalo;
 #define CS_ATTN_INVERSE   2
 #define CS_ATTN_REALISTIC 3
 
-SCF_VERSION (iLight, 0, 0, 5);
+SCF_VERSION (iLight, 0, 0, 6);
 
 /**
  * The iLight interface is the SCF interface for the csLight class. 
@@ -60,6 +60,9 @@ struct iLight : public iBase
 {
   /// Get private pointer to light object. UGLY
   virtual csLight* GetPrivateObject () = 0;
+
+  /// Get the id of this light.
+  virtual unsigned long GetLightID () = 0;
 
   /// Get the iObject for this light.
   virtual iObject *QueryObject() = 0;
@@ -103,6 +106,24 @@ struct iLight : public iBase
 
   /// Get the brightness of a light at a given distance.
   virtual float GetBrightnessAtDistance (float d) = 0;
+};
+
+SCF_VERSION (iLightList, 0, 0, 1);
+
+struct iLightList : public iBase
+{
+  /// Return the number of lights in this list.
+  virtual int GetLightCount () const = 0;
+  /// Return a single light.
+  virtual iLight *GetLight (int idx) const = 0;
+  /// Add a light.
+  virtual void AddLight (iLight *light) = 0;
+  /// Remove a light
+  virtual void RemoveLight (iLight *light) = 0;
+  /// Find a light by name
+  virtual iLight *FindByName (const char *name) const = 0;
+  /// Find a light and return its index
+  virtual int Find (iLight *light) const = 0;
 };
 
 SCF_VERSION (iLightingProcessInfo, 0, 0, 1);

@@ -590,7 +590,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
 	}
 	else
 	{
-	  iStatLight* l = sect->GetLight (light_name);
+	  iLight* l = sect->GetLights ()->FindByName (light_name);
 	  if (!l)
 	  {
 	    Sys->Report (CS_REPORTER_SEVERITY_WARNING,
@@ -599,9 +599,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
 	  }
 	  else
 	  {
-	    iLight* il = SCF_QUERY_INTERFACE (l, iLight);
-	    csLightObject* lobj = new csLightObject (il);
-	    il->DecRef ();
+	    csLightObject* lobj = new csLightObject (l);
 	    lobj->SetColors (start_col, end_col);
 	    lobj->SetTotalTime (act_time);
             src->ObjAdd (lobj);
@@ -650,9 +648,9 @@ void WalkTest::ParseKeyCmds ()
       iMeshWrapper* sprite = ml->GetMesh (j);
       ParseKeyCmds (sprite->QueryObject ());
     }
-    for (j = 0 ; j < sector->GetLightCount () ; j++)
+    for (j = 0 ; j < sector->GetLights ()->GetLightCount () ; j++)
     {
-      iStatLight* l = sector->GetLight (j);
+      iLight* l = sector->GetLights ()->GetLight (j);
       ParseKeyCmds (l->QueryObject ());
     }
   }

@@ -24,6 +24,8 @@
 #include "iengine/camera.h"
 #include "iengine/engine.h"
 #include "iengine/material.h"
+#include "iengine/light.h"
+#include "iengine/statlght.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
 #include "ivaria/polymesh.h"
@@ -331,12 +333,13 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   walls->DecRef ();
 
   iStatLight* light;
+  iLightList* ll = room->GetLights ();
   light = engine->CreateLight (NULL, csVector3 (-3, -4, 0), 10, csColor (1, 0, 0), false);
-  room->AddLight (light);
+  ll->AddLight (light->QueryLight ());
   light = engine->CreateLight (NULL, csVector3 (3, -4, 0), 10, csColor (0, 0, 1), false);
-  room->AddLight (light);
+  ll->AddLight (light->QueryLight ());
   light = engine->CreateLight (NULL, csVector3 (0, -4, -3), 10, csColor (0, 1, 0), false);
-  room->AddLight (light);
+  ll->AddLight (light->QueryLight ());
 
   iMeshWrapper *mw = room->GetMeshes ()->GetMesh (0);
   iPolygonMesh* mesh = SCF_QUERY_INTERFACE (mw->GetMeshObject (), iPolygonMesh);

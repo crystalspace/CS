@@ -61,6 +61,7 @@
 #include "iengine/sector.h"
 #include "iengine/movable.h"
 #include "iengine/light.h"
+#include "iengine/statlght.h"
 #include "iengine/dynlight.h"
 #include "iengine/engine.h"
 #include "iengine/mesh.h"
@@ -2219,18 +2220,19 @@ void Blocks::InitGameRoom ()
   Sys->add_hrast (2, -1, CUBE_DIM/2, CUBE_DIM/2, 0);
   Sys->add_hrast (2, (player1->zone_dim)-1, CUBE_DIM/2, CUBE_DIM/2, 0);
 
-  room->AddLight (engine->CreateLight (NULL,
-    csVector3(-3, 5, 0), 10, csColor(.8, .4, .4), false));
-  room->AddLight (engine->CreateLight (NULL,
-    csVector3(3, 5, 0), 10, csColor(.4, .4, .8), false));
-  room->AddLight (engine->CreateLight (NULL,
-    csVector3(0, 5, -3), 10, csColor(.4, .8, .4), false));
-  room->AddLight (engine->CreateLight (NULL,
-    csVector3(0, 5, 3), 10, csColor(.8, .4, .8), false));
-  room->AddLight (engine->CreateLight (NULL, csVector3(0, (ZONE_HEIGHT-3-3) *
-    CUBE_DIM+1, 0), CUBE_DIM*10, csColor(.5, .5, .5), false));
-  room->AddLight (engine->CreateLight (NULL, csVector3(0, (ZONE_HEIGHT-3+3) *
-    CUBE_DIM+1, 0), CUBE_DIM*10, csColor(.5, .5, .5), false));
+  iLightList* ll = room->GetLights ();
+  ll->AddLight (engine->CreateLight (NULL,
+    csVector3(-3, 5, 0), 10, csColor(.8, .4, .4), false)->QueryLight ());
+  ll->AddLight (engine->CreateLight (NULL,
+    csVector3(3, 5, 0), 10, csColor(.4, .4, .8), false)->QueryLight ());
+  ll->AddLight (engine->CreateLight (NULL,
+    csVector3(0, 5, -3), 10, csColor(.4, .8, .4), false)->QueryLight ());
+  ll->AddLight (engine->CreateLight (NULL,
+    csVector3(0, 5, 3), 10, csColor(.8, .4, .8), false)->QueryLight ());
+  ll->AddLight (engine->CreateLight (NULL, csVector3(0, (ZONE_HEIGHT-3-3) *
+    CUBE_DIM+1, 0), CUBE_DIM*10, csColor(.5, .5, .5), false)->QueryLight ());
+  ll->AddLight (engine->CreateLight (NULL, csVector3(0, (ZONE_HEIGHT-3+3) *
+    CUBE_DIM+1, 0), CUBE_DIM*10, csColor(.5, .5, .5), false)->QueryLight ());
 }
 
 void Blocks::InitDemoRoom ()
@@ -2252,8 +2254,9 @@ void Blocks::InitDemoRoom ()
 
   walls_state->DecRef ();
 
-  demo_room->AddLight (engine->CreateLight (NULL, csVector3 (0, 0, -2),
-    10, csColor (.4, .4, .4), false));
+  demo_room->GetLights ()->AddLight (
+  	engine->CreateLight (NULL, csVector3 (0, 0, -2),
+	10, csColor (.4, .4, .4), false)->QueryLight ());
 
   float char_width = CUBE_DIM*4.;
   float offset_x = -char_width * (6/2)+CUBE_DIM*2;

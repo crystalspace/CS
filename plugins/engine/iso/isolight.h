@@ -99,6 +99,7 @@ public:
 
   //------------ iLight ------------------------------------------
   virtual csLight* GetPrivateObject () {return 0;}
+  virtual unsigned long GetLightID () { return 0; }
   virtual iObject *QueryObject() {return 0;}
   virtual const csVector3& GetCenter () {return isolight->GetPosition();}
   virtual void SetCenter (const csVector3& pos) {isolight->SetPosition(pos);}

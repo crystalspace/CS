@@ -121,6 +121,7 @@ In the source file @file{simple.cpp} we place the following:
 #include "iengine/engine.h"
 #include "iengine/camera.h"
 #include "iengine/light.h"
+#include "iengine/statlght.h"
 #include "iengine/texture.h"
 #include "iengine/movable.h"
 #include "iengine/material.h"
@@ -391,6 +392,8 @@ that the event was not handled at all.
 @cindex iSector
 @cindex iThingState
 @cindex iPolygon3D
+@cindex iLight
+@cindex iLightList
 @cindex iStatLight
 @cindex iMeshWrapper
 
@@ -510,15 +513,16 @@ bool Simple::Initialize (int argc, const char* const argv[],
   walls_state->DecRef ();
 
   iStatLight* light;
+  iLightList* ll = room->GetLights ();
   light = engine->CreateLight (NULL, csVector3 (-3, 5, 0), 10,
   	csColor (1, 0, 0), false);
-  room->AddLight (light);
+  ll->AddLight (light->QueryObject ());
   light = engine->CreateLight (NULL, csVector3 (3, 5,  0), 10,
   	csColor (0, 0, 1), false);
-  room->AddLight (light);
+  ll->AddLight (light->QueryObject ());
   light = engine->CreateLight (NULL, csVector3 (0, 5, -3), 10,
   	csColor (0, 1, 0), false);
-  room->AddLight (light);
+  ll->AddLight (light->QueryObject ());
 
   engine->Prepare ();
   csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
@@ -583,8 +587,15 @@ size.
 Finally we create some lights in our room to make sure that we actually are
 able to see the walls.  The interface @samp{iStatLight} represents a static
 light which can not move and change intensity.  We create three such lights
-and add them to the room with @code{AddLight()}.  When creating a light we use
-several parameters. First we have the name of the light. This is not used
+and add them to the room with @code{AddLight()}. Note that the list of lights
+in a sector is presented by an object implementing @code{iLightList}. To
+get this list you call @code{iSector::GetLights()}. Also note that this light
+list works with lights of type @code{iLight}. @code{iLight} is the base
+interface for all lights in Crystal Space. To get the @code{iLight} from an
+instance of @code{iStatLight} you can do @code{iStatLight::QueryLight()}.
+
+When creating a light we use several parameters.
+First we have the name of the light. This is not used
 often and mostly you can set this to @code{NULL}. The second parameter is
 the location of the light in the world. Then follows a radius. The light will
 not affect polygons which are outside the sphere described by the center of

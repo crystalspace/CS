@@ -22,6 +22,7 @@
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/ptextype.h"
 #include "iengine/movable.h"
+#include "iengine/statlght.h"
 #include "ivaria/reporter.h"
 
 extern WalkTest* Sys;
@@ -415,7 +416,7 @@ iSector* HugeRoom::create_huge_world (iEngine* engine)
     		rand1 (sector_light_max_blue-sector_light_min_blue)
 			+sector_light_min_blue),
 	false);
-    room->AddLight (light);
+    room->GetLights ()->AddLight (light->QueryLight ());
   }
 
 #if defined(ROOM_CITY)

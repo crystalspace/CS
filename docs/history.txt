@@ -1,5 +1,14 @@
 The history order is reversed so that new features are at the top.
 
+28-Aug-2001
+	- Added iLight::GetLightID().
+	- Removed iSector::AddLight, GetLightCount, and GetLight.
+	  Instead there is now GetLights() which returns an object of type
+	  iLightList. Note that iLightList::AddLight() accepts an iLight
+	  instead of iStatLight. You can get the iLight from an iStatLight
+	  by calling QueryLight().
+	- Fixed a bad bug with terrain engine and the new vertex buffers.
+	  This bug would cause crashes in various cases.
 27-Aug-2001
 	- Fixed a linking error in povie.mak.
 	- Did a new change to iPolygonBuffer.  Materials for polygons are now
@@ -137,6 +146,21 @@ The history order is reversed so that new features are at the top.
 	      jobber.pl script in the CVS repository, he neglected to update
 	      the actual live script on the SourceForge shell machine which
 	      gets invoked by `cron'.)
+	- Christopher Nelson writes:
+	  Awstest is the first commit of the AWS test harness. I expect this
+	  code to change often, but I need to be able to demonstrate some of
+	  the bugs that I'm experiencing, and this is as good a place as any.
+	  This project relies on another file which must be in the same
+	  directory as the awstest executable: test.def.  The def file
+	  contains currently acceptable syntax for skin and window
+	  definitions.
+	- Norman Kramer did the following for awstest:
+	    - Fixed paths.
+	    - Changed target names to be different from output (remember on
+	      unix there is no default extension for executables so
+	      awstest$(EXE) will be awstest and if u then have a target
+	      awstest we get a circular dependency).
+	    - Added include of csutil/csevent.h.
 26-Aug-2001
 	- Removed G3DVertex class since this is equivalent to using
 	  csVector2 instead.

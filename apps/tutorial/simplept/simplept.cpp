@@ -31,6 +31,7 @@
 #include "iengine/engine.h"
 #include "iengine/camera.h"
 #include "iengine/light.h"
+#include "iengine/statlght.h"
 #include "iengine/texture.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
@@ -248,7 +249,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   iStatLight* light;
   light = engine->CreateLight (NULL, csVector3 (0, 0, 0), 20,
   	csColor (1, 1, 1), false);
-  room->AddLight (light);
+  room->GetLights ()->AddLight (light->QueryLight ());
 
   engine->Prepare ();
   csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,

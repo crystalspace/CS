@@ -30,6 +30,7 @@ class csBox3;
 class csReversibleTransform;
 struct iMeshWrapper;
 struct iMeshList;
+struct iLightList;
 struct iThing;
 struct iStatLight;
 struct iVisibilityCuller;
@@ -39,7 +40,7 @@ struct iGraphics3D;
 struct iPolygon3D;
 struct iRenderView;
 
-SCF_VERSION (iSector, 0, 3, 13);
+SCF_VERSION (iSector, 0, 4, 0);
 
 /**
  * The iSector interface is used to work with "sectors". A "sector"
@@ -67,15 +68,9 @@ struct iSector : public iBase
 
   /// Get the list of meshes in this sector.
   virtual iMeshList* GetMeshes () = 0;
+  /// Get the list of static and pseudo-dynamic lights in this sector.
+  virtual iLightList* GetLights () = 0;
 
-  /// Return the number of lights in this sector.
-  virtual int GetLightCount () const = 0;
-  /// Return a light by index.
-  virtual iStatLight *GetLight (int n) const = 0;
-  /// Return a light by name.
-  virtual iStatLight *GetLight (const char* name) const = 0;
-  /// Add a static or pseudo-dynamic light to this sector.
-  virtual void AddLight (iStatLight *light) = 0;
   /// Find a light with the given position and radius.
   virtual iStatLight *FindLight (float x, float y, float z, float dist)
     const = 0;

@@ -36,6 +36,8 @@
 #include "iengine/engine.h"
 #include "iengine/campos.h"
 #include "iengine/mesh.h"
+#include "iengine/light.h"
+#include "iengine/statlght.h"
 #include "imesh/object.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
@@ -333,16 +335,17 @@ void ceCswsEngineApp::SetupDefaultWorld ()
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
   walls_state->DecRef ();
 
+  iLightList* ll = room->GetLights ();
   iStatLight* light;
   light = engine->CreateLight (NULL, csVector3(-3, 5, 0), 10,
   	csColor(1, 0, 0), false);
-  room->AddLight (light);
+  ll->AddLight (light->QueryLight ());
   light = engine->CreateLight (NULL, csVector3(3, 5, 0), 10,
   	csColor(0, 0, 1), false);
-  room->AddLight (light);
+  ll->AddLight (light->QueryLight ());
   light = engine->CreateLight (NULL, csVector3(0, 5, -3), 10,
   	csColor(0, 1, 0), false);
-  room->AddLight (light);
+  ll->AddLight (light->QueryLight ());
 }
 
 bool ceCswsEngineApp::Initialize ()

@@ -224,6 +224,8 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE (csLight);
     virtual csLight* GetPrivateObject ()
     { return scfParent; }
+    virtual unsigned long GetLightID ()
+    { return scfParent->GetLightID (); }
     virtual iObject *QueryObject()
     { return scfParent; }
     virtual const csVector3& GetCenter ()

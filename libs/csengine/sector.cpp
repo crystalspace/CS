@@ -47,6 +47,7 @@
 #include "iengine/statlght.h"
 #include "iengine/viscull.h"
 #include "iengine/rview.h"
+#include "iengine/light.h"
 
 // Option variable: render portals?
 bool csSector::do_portals = true;
@@ -54,6 +55,52 @@ bool csSector::do_portals = true;
 int csSector::cfg_reflections = 1;
 // Option variable: do pseudo radiosity?
 bool csSector::do_radiosity = false;
+
+//---------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE (csLightList)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLightList)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csLightList::LightList)
+  SCF_IMPLEMENTS_INTERFACE (iLightList)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+csLightList::csLightList ()
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightList);
+  sector = NULL;
+}
+
+bool csLightList::FreeItem (csSome Item)
+{
+  iLight* light = (iLight*)Item;
+  light->DecRef ();
+  return true;
+}
+
+void csLightList::AddLight (iLight *light)
+{
+  CS_ASSERT (sector != NULL);
+  Push (light);
+  light->SetSector (&(sector->scfiSector));
+}
+
+void csLightList::RemoveLight (iLight *light)
+{
+  int n = Find (light);
+  if (n >= 0) Delete (n); 
+}
+
+int csLightList::LightList::GetLightCount () const
+{ return scfParent->Length (); }
+iLight *csLightList::LightList::GetLight (int idx) const
+{ return scfParent->Get (idx); }
+iLight *csLightList::LightList::FindByName (const char *name) const
+{ return scfParent->FindByName (name); }
+int csLightList::LightList::Find (iLight *light) const
+{ return scfParent->Find (light); }
 
 //---------------------------------------------------------------------------
 
@@ -101,6 +148,7 @@ csSector::csSector (csEngine* engine) : csObject ()
   fog.enabled = false;
   draw_busy = 0;
   meshes.SetSector (this);
+  lights.SetSector (this);
 }
 
 csSector::~csSector ()
@@ -238,29 +286,20 @@ void csSector::RelinkMesh (csMeshWrapper* mesh)
 
 //----------------------------------------------------------------------
 
-void csSector::AddLight (csStatLight* light)
-{
-  lights.Push ((csSome)light);
-  light->SetSector (this);
-}
-
-void csSector::UnlinkLight (csStatLight* light)
-{
-  int idx = lights.Find ((csSome)light);
-  if (idx != -1) { lights[idx] = NULL; lights.Delete (idx); }
-}
-
 csStatLight* csSector::FindLight (float x, float y, float z, float dist) const
 {
   int i;
   for (i = 0 ; i < lights.Length () ; i++)
   {
-    csStatLight* l = (csStatLight*)lights[i];
+    iLight* l = lights.Get (i) ;
     if (ABS (x-l->GetCenter ().x) < SMALL_EPSILON &&
         ABS (y-l->GetCenter ().y) < SMALL_EPSILON &&
         ABS (z-l->GetCenter ().z) < SMALL_EPSILON &&
         ABS (dist-l->GetRadius ()) < SMALL_EPSILON)
-      return l;
+    {
+      csLight* cl = l->GetPrivateObject ();
+      return (csStatLight*)cl;
+    }
   }
   return NULL;
 }
@@ -270,8 +309,12 @@ csStatLight* csSector::FindLight (unsigned long id) const
   int i;
   for (i = 0 ; i < lights.Length () ; i++)
   {
-    csStatLight* l = (csStatLight*)lights[i];
-    if (l->GetLightID () == id) return l;
+    iLight* l = lights.Get (i);
+    if (l->GetLightID () == id)
+    {
+      csLight* cl = l->GetPrivateObject ();
+      return (csStatLight*)cl;
+    }
   }
   return NULL;
 }
@@ -798,7 +841,7 @@ void csSector::Draw (iRenderView* rview)
   // queue all halos in this sector to be drawn.
   for (i = lights.Length () - 1; i >= 0; i--)
     // Tell the engine to try to add this light into the halo queue
-    csEngine::current_engine->AddHalo ((csLight *)lights.Get (i));
+    csEngine::current_engine->AddHalo (lights.Get (i)->GetPrivateObject ());
 
   if (rview->GetCallback ())
   {
@@ -1026,7 +1069,8 @@ void csSector::ShineLights (csProgressPulse* pulse)
   {
     if (pulse != 0)
       pulse->Step();
-    ((csStatLight*)lights[i])->CalculateLighting ();
+    csLight* cl = lights.Get (i)->GetPrivateObject ();
+    ((csStatLight*)cl)->CalculateLighting ();
   }
 }
 
@@ -1037,7 +1081,8 @@ void csSector::ShineLights (iMeshWrapper* mesh, csProgressPulse* pulse)
   {
     if (pulse != 0)
       pulse->Step();
-    ((csStatLight*)lights[i])->CalculateLighting (mesh);
+    csLight* cl = lights.Get (i)->GetPrivateObject ();
+    ((csStatLight*)cl)->CalculateLighting (mesh);
   }
 }
 
@@ -1058,26 +1103,10 @@ void csSector::CalculateSectorBBox (csBox3& bbox,
 
 //---------------------------------------------------------------------------
 
-void csSector::eiSector::AddLight (iStatLight *light)
-{
-  scfParent->AddLight (light->GetPrivateObject ());
-}
-
 iStatLight *csSector::eiSector::FindLight (float x, float y, float z,
 	float dist) const
 {
   return &scfParent->FindLight (x, y, z, dist)->scfiStatLight;
-}
-
-iStatLight* csSector::eiSector::GetLight (int n) const
-{
-  return &(scfParent->GetLight (n)->scfiStatLight);
-}
-
-iStatLight* csSector::eiSector::GetLight (const char *name) const
-{
-  csStatLight* tw = scfParent->GetLight (name);
-  return tw ? &tw->scfiStatLight : NULL;
 }
 
 iPolygon3D* csSector::eiSector::HitBeam (const csVector3& start,

@@ -179,11 +179,12 @@ void draw_map (csRenderView* /*rview*/, int type, void* entity)
   if (type == CALLBACK_SECTOR)
   {
     csSector* sector = (csSector*)entity;
+    iSector* isector = &(sector->scfiSector);
     int i;
-    for (i = 0 ; i < sector->GetLightCount () ; i++)
+    for (i = 0 ; i < isector->GetLights ()->GetLightCount () ; i++)
     {
-      csWfVertex* vt = wf->AddVertex (sector->scfiSector.GetLight (i)->
-        QueryLight ()->GetCenter ());
+      csWfVertex* vt = wf->AddVertex (isector->GetLights ()->GetLight (i)->
+        GetCenter ());
       vt->SetColor (wf->GetRed ());
     }
   }
