@@ -1453,6 +1453,8 @@ CS_CHECK_BUILD([for OpenAL], [cs_cv_libopenal],
 	[CS_AL_INCLUDE([CS_OPENAL_PATH],[AL],[alut.h])],
 	[alutInit(0,0);])],
     [CS_CREATE_TUPLE([-DCS_OPENAL_PATH=OpenAL],[],[-framework OpenAL]) \
+    CS_CREATE_TUPLE([],[],[-lalut -lopenal -ldsound]) \
+    CS_CREATE_TUPLE([],[],[-lalut -lopenal]) \
     CS_CREATE_TUPLE([],[],[-lopenal -ldsound]) \
     CS_CREATE_TUPLE([],[],[-lopenal])], [],
     [CS_MAKEFILE_BUILD_RESULT([cs_cv_libopenal], [OPENAL])])
