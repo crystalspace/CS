@@ -242,6 +242,8 @@ bool IntersectSegmentCull (csPolygonTree* /*tree*/,
 	csPolygonTreeNode* /*node*/,
 	const csVector3& /*pos*/, void* /*data*/)
 {
+  // @@@ at least test if the node we go too is further away
+  // than the end of the segment we want to test.
   return true;
 }
 
