@@ -1401,6 +1401,9 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   cfg_legs_width = cfg->GetFloat ("Walktest.CollDet.LegsWidth", 0.4);
   cfg_legs_depth = cfg->GetFloat ("Walktest.CollDet.LegsDepth", 0.4);
   cfg_legs_offset = cfg->GetFloat ("Walktest.CollDet.LegsOffset", -1.1);
+
+  // Load the default font name
+  const char * cfg_font = cfg->GetStr("Walktest.Font.Default", CSFONT_LARGE);
   cfg->DecRef ();
 
   #ifdef CS_DEBUG
@@ -1426,7 +1429,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   FrameHeight = Gfx2D->GetHeight ();
 
   // Find the font we'll use
-  Font = Gfx2D->GetFontServer ()->LoadFont (CSFONT_LARGE);
+  Font = Gfx2D->GetFontServer ()->LoadFont (cfg_font);
 
   // Open the startup console
   start_console ();

@@ -59,7 +59,7 @@ struct iFontDeleteNotify : public iBase
   virtual void BeforeDelete (iFont* font) = 0;
 };
 
-SCF_VERSION (iFont, 2, 0, 1);
+SCF_VERSION (iFont, 2, 0, 2);
 
 /**
  * A font object.
@@ -97,7 +97,8 @@ struct iFont : public iBase
    * Return character width, height, advance, x- and y-bearing in pixels.
    * Returns false if values could not be determined.
    */
-  virtual bool GetGlyphSize (uint8 c, int &oW, int &oH, int &adv, int &left, int &top) = 0;
+  virtual bool GetGlyphSize (uint8 c, int &oW, int &oH, int &adv,
+  	int &left, int &top) = 0;
 
   /**
    * Return a pointer to a bitmap containing a rendered character.
@@ -109,10 +110,27 @@ struct iFont : public iBase
   /**
    * Return a pointer to a bitmap containing a rendered character.
    * Returns NULL if error occured. The oW and oH parameters are
-   * filled with bitmap width and height. adv holds the advance in x-direction, left and top hold the
-   * x- and y-bearing.
+   * filled with bitmap width and height. adv holds the advance
+   * in x-direction, left and top hold the x- and y-bearing.
    */
-  virtual uint8 *GetGlyphBitmap (uint8 c, int &oW, int &oH, int &adv, int &left, int &top) = 0;
+  virtual uint8 *GetGlyphBitmap (uint8 c, int &oW, int &oH, int &adv,
+  	int &left, int &top) = 0;
+
+  /**
+   * Return a pointer to a bitmap containing the alpha bitmap for the
+   * rendered character. Returns NULL if error occured. The oW and oH
+   * parameters are filled with bitmap width and height.
+   */
+  virtual uint8 *GetGlyphAlphaBitmap (uint8 c, int &oW, int &oH) = 0;
+
+  /**
+   * Return a pointer to a bitmap containing the alpha bitmap for the
+   * rendered character. Returns NULL if error occured. The oW and oH
+   * parameters are filled with bitmap width and height. adv holds the
+   * advance in x-direction, left and top hold the x- and y-bearing.
+   */
+  virtual uint8 *GetGlyphAlphaBitmap (uint8 c, int &oW, int &oH, int &adv,
+  	int &left, int &top) = 0;
 
   /**
    * Return the width and height of text written with this font.
@@ -120,9 +138,11 @@ struct iFont : public iBase
   virtual void GetDimensions (const char *text, int &oW, int &oH) = 0;
 
   /**
-   * Return the width and height of text written with this font. desc gives the maximum descender.
+   * Return the width and height of text written with this font. desc
+   * gives the maximum descender.
    */
-  virtual void GetDimensions (const char *text, int &oW, int &oH, int &desc) = 0;
+  virtual void GetDimensions (const char *text, int &oW, int &oH,
+  	int &desc) = 0;
 
   /**
    * Determine how many characters from this string can be written

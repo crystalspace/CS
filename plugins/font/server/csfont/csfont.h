@@ -47,6 +47,7 @@ public:
   uint8 *FontBitmap;
   uint8 *IndividualWidth;
   uint8 **GlyphBitmap;
+  uint8 **GlyphAlphaBitmap;
   csDefaultFontServer *Parent;
   csVector DeleteCallbacks;
 
@@ -54,7 +55,7 @@ public:
 
   /// Create the font object
   csDefaultFont (csDefaultFontServer *parent, const char *name, int first,
-    int glyphs, int width, int height, int baseline, uint8 *bitmap, uint8 *individualwidth);
+    int glyphs, int width, int height, int baseline, uint8 *bitmap, uint8 *individualwidth, uint8 *alpha=0);
 
   /// Destroy the font object
   virtual ~csDefaultFont ();
@@ -93,6 +94,14 @@ public:
    */
   virtual uint8 *GetGlyphBitmap (uint8 c, int &oW, int &oH, int &adv, int &left, int &top);
   virtual uint8 *GetGlyphBitmap (uint8 c, int &oW, int &oH);
+
+  /**
+   * Return a pointer to the alpha bitmap for rendered character.
+   * Returns NULL if error occured. The oW and oH parameters are
+   * filled with bitmap width and height.
+   */
+  virtual uint8 *GetGlyphAlphaBitmap (uint8 c, int &oW, int &oH, int &adv, int &left, int &top);
+  virtual uint8 *GetGlyphAlphaBitmap (uint8 c, int &oW, int &oH);
 
   /**
    * Return the width and height of text written with this font.

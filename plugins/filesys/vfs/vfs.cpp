@@ -839,7 +839,7 @@ void VfsNode::FindFiles (const char *Suffix, const char *Mask,
       rpl = strlen (tpath);
       if ((rpl > 1)
 #if defined (OS_OS2) || defined (OS_DOS) || defined (OS_WIN32)
-       && ((rpl > 3) || (tpath [1] != ':'))
+       && ((rpl > 2) || (tpath [1] != ':'))
 #endif
        && ((tpath [rpl - 1] == '/') || (tpath [rpl - 1] == PATH_SEPARATOR)))
         tpath [rpl - 1] = 0;		// remove trailing PATH_SEPARATOR
@@ -1383,6 +1383,46 @@ bool csVFS::Exists (const char *Path) const
 
   ArchiveCache->CheckUp ();
   return exists;
+}
+
+iStrVector *csVFS::MountRoot (const char *Path)
+{
+  if (!Path)
+    return NULL;
+
+  scfStrVector * root_list = new scfStrVector(16, 16);
+
+  char * buffer = csFindSystemRoots();
+
+  char *p = buffer;
+  while (*p != '\0')
+  {
+    char * vfs_dir = new char[strlen(p) + strlen(Path) + 2];
+    char * real_dir = new char[strlen(p) + 2];
+
+    strcpy(vfs_dir, Path);
+    strcat(vfs_dir, "/");
+    strcat(vfs_dir, p);
+	vfs_dir[strlen(vfs_dir)-1] = '\0';
+
+    strncpy(real_dir, p, strlen(p)-1);
+	real_dir[strlen(p)-1] = '\0';
+    strcat(real_dir,"$/");
+
+    root_list->Push(vfs_dir);
+    Mount(vfs_dir, real_dir);
+
+    while (*p != '\0')
+      p++;
+    p++;
+
+	delete [] vfs_dir;
+	delete [] real_dir;
+  }
+
+  delete [] buffer;
+
+  return root_list;
 }
 
 iStrVector *csVFS::FindFiles (const char *Path) const

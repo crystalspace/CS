@@ -182,6 +182,9 @@ public:
   virtual bool Mount (const char *VirtualPath, const char *RealPath);
   /// Unmount an VFS path; if RealPath is NULL, entire VirtualPath is unmounted
   virtual bool Unmount (const char *VirtualPath, const char *RealPath);
+  
+  /// Mount the root directory or directories 
+  virtual iStrVector *MountRoot (const char *VirtualPath);
 
   /// Save current configuration back into configuration file
   virtual bool SaveMounts (const char *FileName);

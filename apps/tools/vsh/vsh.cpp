@@ -572,6 +572,8 @@ int main (int argc, char *argv [])
     return -1;
   }
 
+  VFS->MountRoot ("native");
+
   printf ("Welcome to Virtual Shell\n"
           "Type \"help\" to get a short description of commands\n"
           "\n");

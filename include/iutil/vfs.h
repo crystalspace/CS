@@ -127,7 +127,7 @@ struct iFile : public iBase
 };
 
 
-SCF_VERSION (iVFS, 0, 0, 4);
+SCF_VERSION (iVFS, 0, 0, 5);
 
 /**
  * The Virtual Filesystem Class is intended to be the only way for Crystal
@@ -208,6 +208,8 @@ struct iVFS : public iBase
   virtual bool Mount (const char *VirtualPath, const char *RealPath) = 0;
   /// Unmount an VFS path; if RealPath is NULL, entire VirtualPath is unmounted
   virtual bool Unmount (const char *VirtualPath, const char *RealPath) = 0;
+  /// Mount the root directory or directories beneath the specified virtual path
+  virtual iStrVector *MountRoot (const char *VirtualPath) = 0;
 
   /// Save current configuration back into configuration file
   virtual bool SaveMounts (const char *FileName) = 0;

@@ -21,6 +21,19 @@ The history order is reversed so that new features are at the top.
 	- Added example usage of <paramsfile> to flarge. Also added a
 	  new 'sprite3' in standard.zip which only contains the <params> block
 	  so it can be used with <paramsfile>.
+	- Applied a patch from Mendrak <mendrak@worldnet.att.net> which
+	  does the following:
+	      - Added csFindSystemRoots() global function to find all
+	        system roots.
+	      - Add MountRoot() to iVFS so that you can mount the system
+	        dependend roots on a VFS path.
+	      - Extended vsh tool to mount the system roots on 'native'.
+	      - Enhanced default font server so that it can optionally take
+	        an alpha map that defines anti-aliasing information for
+		a font.
+	      - Walktest will now by default use a new font 'arial9.csf'
+	        which you can find in data/tex.
+	      - Added howto on custom fonts.
 22-Aug-2002
 	- Fixed Cs2Xml for DURATION and FRAME commands in motion loader.
 	- Cs2Xml now supports the normal notation for vertices in 3D
