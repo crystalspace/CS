@@ -203,7 +203,7 @@ void csSector::RelinkMesh (iMeshWrapper *mesh)
 //----------------------------------------------------------------------
 bool csSector::UseCuller (const char *meshname)
 {
-  culler = 0;
+  culler = NULL;
 
   // Find the culler with the given name.
   culler_mesh = meshes.FindByName (meshname);
@@ -236,7 +236,7 @@ bool csSector::UseCuller (const char *meshname)
 
 bool csSector::UseCullerPlugin (const char *plugname)
 {
-  culler = 0;
+  culler = NULL;
   culler_mesh = NULL;
 
   // Load the culler plugin.

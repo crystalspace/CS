@@ -169,13 +169,19 @@ csFrustumVis::csFrustumVis (iBase *iParent)
 
 csFrustumVis::~csFrustumVis ()
 {
-  int i;
-  for (i = 0 ; i < visobj_vector.Length () ; i++)
+  while (visobj_vector.Length () > 0)
   {
     csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
-    	visobj_vector[i];
-    visobj_wrap->visobj->DecRef ();
+    	visobj_vector[0];
+    iVisibilityObject* visobj = visobj_wrap->visobj;
+    visobj->GetObjectModel ()->RemoveListener (
+		      (iObjectModelListener*)visobj_wrap);
+    iMovable* movable = visobj->GetMovable ();
+    movable->RemoveListener ((iMovableListener*)visobj_wrap);
+    kdtree->RemoveObject (visobj_wrap->child);
+    visobj->DecRef ();
     delete visobj_wrap;
+    visobj_vector.Delete (0);
   }
   delete kdtree;
 }

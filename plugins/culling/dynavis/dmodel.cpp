@@ -192,12 +192,6 @@ bool csObjectModelManager::CheckObjectModel (csObjectModel* model,
 	  fflush (stdout);
 	  break;
 	}
-      if (model->use_outline_filler)
-      {
-	printf ("Object '%s' is closed.\n", mw != NULL ?
-	  	mw->QueryObject ()->GetName () : "<no mesh>");
-	fflush (stdout);
-      }
     }
     return true;
   }

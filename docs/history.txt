@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+26-Nov-2002
+	- Fixed a bug in the software renderer when materials are used without
+	  textures. Reported by groton.
+	- Dynavis now only complains about open objects.
+	- Fixed Dynavis and Frustvis so they now clean up properly after
+	  destruction.
 25-Nov-2002
 	- Added a new CS_POLY_VISCULL flag with which it is possible to
 	  enable/disable visibility culling for individual polygons (thing

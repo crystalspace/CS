@@ -1560,7 +1560,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
 
   int alpha = poly.mixmode & CS_FX_MASK_ALPHA;
   // Select the right scanline drawing function.
-  if (do_alpha && (alpha || txt_handle->GetKeyColor ()))
+  if (do_alpha && (alpha || (txt_handle && txt_handle->GetKeyColor ())))
     return;
   int scan_index = SCANPROC_FLAT_ZNONE;
   if (z_buf_mode == CS_ZBUF_FILL) scan_index++;
