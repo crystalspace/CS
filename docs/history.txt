@@ -30,6 +30,8 @@ chronological order.
 	- Eric Sunshine removed the unused and unmaintained Arts and EAX sound
 	  renderers. For easy revival, they have been tagged in CVS with
 	  ARTS_OBSOLETE and EAX_OBSOLETE, respectively.
+	- Eric Sunshine removed the unused and unmaintained GLX/Glide driver.
+	  For easy revival, it has been tagged in CVS with GLXGLIDE_OBSOLETE.
 17-Apr-2004
 	- Aren Blondahl updated map2cs to have newly optimized render priority
 	  on entities ('priority' tag in the .map) and fixed map2cs to support

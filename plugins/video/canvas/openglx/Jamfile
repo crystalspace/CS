@@ -14,5 +14,3 @@ CompileGroups glx2d :  drivers2d ;
 CompileGroups glx2d :  openglcanvas ;
 
 }
-
-SubInclude TOP plugins video canvas openglx glide ;
