@@ -21,6 +21,7 @@
 #define __INETWORK_SOCKET_H__
 
 #include "inetwork/driver.h"
+#include "cssys/sockets.h"
 
 //-----------------------------------------------------------------------------
 // Files including this file must also #define CS_SYSDEF_PROVIDE_SOCKETS before
