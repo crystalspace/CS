@@ -3889,47 +3889,46 @@ fi
 #
 # IMPLEMENTATION NOTES
 #
-# We also check for 'make', since it is used to build Jam locally, when needed.
+# The Crystal Space build system supports Jam versions starting with 2.4.
+# Earlier versions are rejected. Examples of rejected versions include Apple's
+# highly modified Jam (based upon 2.2.1), and ftjam (based upon
+# 2.3.2). BoostJam reports its version number as 3.1.9 (or greater), though it
+# is actually based upon Jam 2.4. Since we accept 2.4, and since 3.1.9 passes
+# the "jam -v >= 2.4" assertion, this version anomaly is not a problem.
 #
-# The Jam which ships with MacOS/X is extremely old (version 2.2.1) and is
-# modified by Apple, so we must reject it.
+# We also check for 'make', since it is used to build Jam locally, when needed.
 #------------------------------------------------------------------------------
 
 
-cs_prog_jam_okay=yes
 for ac_prog in jam
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_path_JAM+set}" = set; then
+if test "${ac_cv_prog_JAM+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  case $JAM in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_JAM="$JAM" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH$PATH_SEPARATOR.
+  if test -n "$JAM"; then
+  ac_cv_prog_JAM="$JAM" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
 do
   IFS=$as_save_IFS
   test -z "$as_dir" && as_dir=.
   for ac_exec_ext in '' $ac_executable_extensions; do
   if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_path_JAM="$as_dir/$ac_word$ac_exec_ext"
+    ac_cv_prog_JAM="$ac_prog"
     echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
 done
 done
 
-  ;;
-esac
 fi
-JAM=$ac_cv_path_JAM
-
+fi
+JAM=$ac_cv_prog_JAM
 if test -n "$JAM"; then
   echo "$as_me:$LINENO: result: $JAM" >&5
 echo "${ECHO_T}$JAM" >&6
@@ -3941,17 +3940,78 @@ fi
   test -n "$JAM" && break
 done
 
-if test -z "$JAM"; then
-  cs_prog_jam_okay=no
+#AC_PATH_PROGS([JAM], [jam], [], [$PATH$PATH_SEPARATOR.])
+if test -n "$JAM"; then
+  echo "$as_me:$LINENO: checking if jam version >= 2.4" >&5
+echo $ECHO_N "checking if jam version >= 2.4... $ECHO_C" >&6
+if test "${cs_cv_prog_jam_version_ok_annotated+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  echo "$as_me:$LINENO: checking if $JAM is usable" >&5
-echo $ECHO_N "checking if $JAM is usable... $ECHO_C" >&6
-    if $JAM -v | grep ProjectBuilder > /dev/null 2>&1; then
+  cs_prog_jam_is_version=
+cs_prog_jam_min_version=
+cs_prog_jam_is_suffix=
+cs_prog_jam_min_suffix=
+cs_prog_jam_is_suffix_done=
+cs_prog_jam_min_suffix_done=
+
+
+
+
+test -z $cs_prog_jam_is_version && cs_prog_jam_is_version=`$JAM -v 2>&1 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
+test -n "$cs_prog_jam_is_version" && test -z $cs_prog_jam_is_suffix_done  && { cs_prog_jam_is_suffix_done=yes ; cs_prog_jam_is_suffix= ; }
+
+test -z $cs_prog_jam_is_version && cs_prog_jam_is_version=`$JAM -v 2>&1 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
+test -n "$cs_prog_jam_is_version" && test -z $cs_prog_jam_is_suffix_done  && { cs_prog_jam_is_suffix_done=yes ; cs_prog_jam_is_suffix=.0 ; }
+
+
+
+
+
+
+test -z $cs_prog_jam_min_version && cs_prog_jam_min_version=`echo 2.4 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
+test -n "$cs_prog_jam_min_version" && test -z $cs_prog_jam_min_suffix_done  && { cs_prog_jam_min_suffix_done=yes ; cs_prog_jam_min_suffix= ; }
+
+test -z $cs_prog_jam_min_version && cs_prog_jam_min_version=`echo 2.4 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
+test -n "$cs_prog_jam_min_version" && test -z $cs_prog_jam_min_suffix_done  && { cs_prog_jam_min_suffix_done=yes ; cs_prog_jam_min_suffix=.0 ; }
+
+
+cs_prog_jam_is_ver_1=`echo ${cs_prog_jam_is_version}${cs_prog_jam_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_jam_is_ver_2=`echo ${cs_prog_jam_is_version}${cs_prog_jam_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
+cs_prog_jam_is_ver_3=`echo ${cs_prog_jam_is_version}${cs_prog_jam_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
+
+cs_prog_jam_min_ver_1=`echo $cs_prog_jam_min_version${cs_prog_jam_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_jam_min_ver_2=`echo $cs_prog_jam_min_version${cs_prog_jam_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
+cs_prog_jam_min_ver_3=`echo $cs_prog_jam_min_version${cs_prog_jam_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
+
+cs_cv_prog_jam_version_ok=''
+test -z "$cs_cv_prog_jam_version_ok" && { expr "$cs_prog_jam_is_ver_1" ">=" "$cs_prog_jam_min_ver_1" >/dev/null || cs_cv_prog_jam_version_ok=no ; }
+test -z "$cs_cv_prog_jam_version_ok" && { expr "$cs_prog_jam_min_ver_1" ">=" "$cs_prog_jam_is_ver_1" >/dev/null || cs_cv_prog_jam_version_ok=yes ; }
+test -z "$cs_cv_prog_jam_version_ok" && { expr "$cs_prog_jam_is_ver_2" ">=" "$cs_prog_jam_min_ver_2" >/dev/null || cs_cv_prog_jam_version_ok=no ; }
+test -z "$cs_cv_prog_jam_version_ok" && { expr "$cs_prog_jam_min_ver_2" ">=" "$cs_prog_jam_is_ver_2" >/dev/null || cs_cv_prog_jam_version_ok=yes ; }
+test -z "$cs_cv_prog_jam_version_ok" && { expr "$cs_prog_jam_is_ver_3" ">=" "$cs_prog_jam_min_ver_3" >/dev/null || cs_cv_prog_jam_version_ok=no ; }
+test -z "$cs_cv_prog_jam_version_ok" && { expr "$cs_prog_jam_min_ver_3" ">=" "$cs_prog_jam_is_ver_3" >/dev/null || cs_cv_prog_jam_version_ok=yes ; }
+
+if test -z "$cs_cv_prog_jam_version_ok"; then
+  cs_cv_prog_jam_version_ok=yes
+fi
+
+cs_cv_prog_jam_version_ok_annotated="$cs_cv_prog_jam_version_ok"
+if test -n "$cs_prog_jam_is_version"; then
+  cs_cv_prog_jam_version_ok_annotated="$cs_cv_prog_jam_version_ok_annotated (version $cs_prog_jam_is_version)"
+fi
+
+
+fi
+echo "$as_me:$LINENO: result: $cs_cv_prog_jam_version_ok_annotated" >&5
+echo "${ECHO_T}$cs_cv_prog_jam_version_ok_annotated" >&6
+if test "$cs_cv_prog_jam_version_ok" = yes; then
+  cs_prog_jam_okay=yes
+else
   cs_prog_jam_okay=no
 fi
 
-    echo "$as_me:$LINENO: result: $cs_prog_jam_okay" >&5
-echo "${ECHO_T}$cs_prog_jam_okay" >&6
+else
+  cs_prog_jam_okay=no
 fi
 
 

@@ -8,6 +8,9 @@ chronological order.
 
 14-May-2004
 	- Eric Sunshine worked around VS.NET warning C4345 in blockallocator.h.
+	- Eric Sunshine augmented the Jam check in configure.ac so that it now
+	  rejects 'ftjam' and other overly old versions (in addition to the
+	  Apple-modified Jam, which it had already been rejecting).
 13-May-2004
 	- Eric Sunshine generalized the CS_EMIT_PACKAGEINFO() macro in
 	  packageinfo.m4 so that it can work with any suitable emitter macro,

@@ -130,21 +130,23 @@ AS_IF([test -n "$SWIG"],
 #
 # IMPLEMENTATION NOTES
 #
-# We also check for 'make', since it is used to build Jam locally, when needed.
+# The Crystal Space build system supports Jam versions starting with 2.4.
+# Earlier versions are rejected. Examples of rejected versions include Apple's
+# highly modified Jam (based upon 2.2.1), and ftjam (based upon
+# 2.3.2). BoostJam reports its version number as 3.1.9 (or greater), though it
+# is actually based upon Jam 2.4. Since we accept 2.4, and since 3.1.9 passes
+# the "jam -v >= 2.4" assertion, this version anomaly is not a problem.
 #
-# The Jam which ships with MacOS/X is extremely old (version 2.2.1) and is
-# modified by Apple, so we must reject it.
+# We also check for 'make', since it is used to build Jam locally, when needed.
 #------------------------------------------------------------------------------
 m4_define([cs_jam_local_exe], [jam$EXEEXT])
 
-cs_prog_jam_okay=yes
-AC_PATH_PROGS([JAM], [jam], [], [$PATH$PATH_SEPARATOR.])
-AS_IF([test -z "$JAM"],
-    [cs_prog_jam_okay=no],
-    [AC_MSG_CHECKING([if $JAM is usable])
-    AS_IF([$JAM -v | grep ProjectBuilder > /dev/null 2>&1],
-	[cs_prog_jam_okay=no])
-    AC_MSG_RESULT([$cs_prog_jam_okay])])
+AC_CHECK_PROGS([JAM], [jam])
+#AC_PATH_PROGS([JAM], [jam], [], [$PATH$PATH_SEPARATOR.])
+AS_IF([test -n "$JAM"],
+    [CS_CHECK_PROG_VERSION([jam], [$JAM -v 2>&1], [2.4], [9.9|.9],
+	[cs_prog_jam_okay=yes], [cs_prog_jam_okay=no])],
+    [cs_prog_jam_okay=no])
 
 AS_IF([test $cs_prog_jam_okay != yes],
     [JAM=./cs_jam_local_exe CS_NEED_LOCAL_JAM=yes])
