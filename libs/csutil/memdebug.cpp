@@ -751,7 +751,7 @@ public:
     printf (" current      max current#     max# file\n");
     for (i = 0 ; i < mti_table_count ; i++)
     {
-      MemTrackerInfo* mti = mti_table[0];
+      MemTrackerInfo* mti = mti_table[i];
       printf ("%8d %8d %8d %8d %s\n", mti->current_alloc,
     	  mti->max_alloc, mti->current_count, mti->max_count,
 	  mti->file);
