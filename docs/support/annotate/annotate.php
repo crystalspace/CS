@@ -49,6 +49,7 @@ if ($action=="") {
     }
 
     fclose($h);
+    chmod($file, 0666);
     print "<h3>Comment added!</h3>\n";
     print "<a href=\"$self#comments\">View</a>\n";
 } elseif ($action == "admin") {
