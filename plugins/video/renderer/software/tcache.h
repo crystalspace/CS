@@ -21,7 +21,6 @@
 
 #include "cstypes.h"
 #include "csutil/scf.h"
-#include "csutil/bitset.h"
 #include "imesh/thing/polygon.h"	//@@@
 #include "soft_txt.h"
 
