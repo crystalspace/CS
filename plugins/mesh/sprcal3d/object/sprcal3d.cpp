@@ -2010,7 +2010,14 @@ bool csSpriteCal3DMeshObject::SetVelocity(float vel,csRandomGen *rng)
 
   bool reversed = (vel<0);
   if (reversed)
+  {
     vel = -vel;
+    SetTimeFactor(-1);
+  }
+  else
+  {
+    SetTimeFactor(1);
+  }
 
   is_idling = false;
   // first look for animations with a base velocity that exactly matches
@@ -2058,10 +2065,6 @@ bool csSpriteCal3DMeshObject::SetVelocity(float vel,csRandomGen *rng)
 //     printf("  Adding %s weight=%1.2f\n",factory->anims[i]->name.GetData(),pct);
     }
   }
-  if (reversed)
-    SetTimeFactor(-1);
-  else
-    SetTimeFactor(1);
 
   return true;    
 }

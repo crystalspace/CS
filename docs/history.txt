@@ -16,6 +16,9 @@ chronological order.
 	- res added iFactory::QueryModuleName().
 	- res added a command to bugplug to list the currently loaded plugin
 	  modules.
+	- Keith Fulton fixed problem with sprcal3d animation reversal only 
+	  working in certain cases due to missplaced check for this 
+	  condition after the function might have returned.
 22-Jan-2005
 	- res made the following changes:
 	    - Silenced some compiler warnings on VC2005.
