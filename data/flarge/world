@@ -7887,9 +7887,10 @@ WORLD (
       MIXMODE (ADD ())
       LIGHTING (no)
       PORTAL ('corridor')
+      ; warp without rotation.
+      ;WARP (W(+25.6, -22.0, -12.6) MATRIX(1,0,0, 0,1,0, 0,0,1))
       ; matrix y rotation a is (cos(a),0,-sin(a),0,1,0,sin(a),0,cos(a))
-      WARP (W(+25.6, -22.0, -12.6) MATRIX(1,0,0, 0,1,0, 0,0,1))
-      ;WARP (W(+25.6, -22.0, -12.6) MATRIX(0,0,-1, 0,1,0, 1,0,0))
+      WARP (W(+59.1, -21.70, +2.3) MATRIX(0,0,-1, 0,1,0, 1,0,0))
       TEXTURE (
         MATRIX (0,0,-0.2,0,-0.2,0,0.2,0,0)
         V (34,-14,16)
