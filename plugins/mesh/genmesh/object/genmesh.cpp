@@ -62,6 +62,7 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
   lit_mesh_colors = NULL;
   shapenr = 0;
   do_lighting = true;
+  do_manual_colors = false;
   color.red = 0;
   color.green = 0;
   color.blue = 0;
