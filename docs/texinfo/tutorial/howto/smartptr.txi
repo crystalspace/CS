@@ -25,7 +25,7 @@ as all @sc{scf} classes.  The @code{csRef<>} template is defined in
 @subsubheading How to Use Smart Pointers
 
 This is easy. For example, often you want to keep track of a few
-common objects in your main class (like the pointer to the engine and
+common objects in your main class (such as the pointer to the engine and
 so on). To do this you just declare in your main class:
 
 @example
@@ -36,7 +36,7 @@ class MyClass
 @}
 @end example
 
-Smart pointers don't need to be initialized, so there is no need to write
+Smart pointers do not need to be initialized, so there is no need to write
 @samp{engine = 0} in the constructor of your class.  There is also no need to
 clean them up.  The reference to the engine, in the example, will be cleaned up
 automatically when the instance of @code{MyClass} is destroyed.
@@ -50,8 +50,8 @@ engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 engine->CreateSector ();
 @end example
 
-That's it. For contrast, here is an example of how the same operations would
-have been performed before the introduction of smart pointers:
+That is all there is to it.  For contrast, here is an example of how the same
+operations would have been performed before the introduction of smart pointers:
 
 @example
 class MyClass
@@ -80,7 +80,7 @@ engine->CreateSector (); @dots{}
 The advantage might not seem huge but, in general, it is a @emph{lot} easier to
 use smart pointers than to manually manipulate reference counts.  The nice
 thing about smart pointers is that you can use them exactly like you would use
-a normal pointer (i.e.  you can do things like @code{engine->CreateSector()}).
+a normal pointer (i.e. you can do things like @code{engine->CreateSector()}).
 
 Here is another example illustrating smart pointers:
 
@@ -111,16 +111,17 @@ created by the function on the caller's behalf.  For example:
 @example
 csRef<iFoo> MyFunction ()
 @{
-  iFoo* foo = new Foo(@dots{});
-  foo->SetupFoo();
+  csRef<iFoo> foo;
+  foo.AttachNew(new Foo(@dots{}));
+  foo->FooMethod(@dots{});
   @dots{}
-  return csPtr<iFoo> (foo);
+  return foo;
 @}
 @end example
 
 The reason that this is 100% safe is that the newly created object is correctly
-destroyed (not leaked) even if the caller forgets or neglects to assign it to a
-variable.
+destroyed (not leaked) even if the caller of @code{MyFunction()} forgets or
+neglects to assign it to a variable.
 
 @subsubheading What About csPtr<>?
 
@@ -129,8 +130,9 @@ from the old (pre-smart pointer) @sc{api} to the new one.  The idea was that
 all functions that used to return a pointer, upon which the caller had to
 invoke @code{DecRef()}, now return a @code{csPtr<>}.  These days,
 @code{csPtr<>} is usually used as a micro-optimization when transferring object
-ownership from a function to its caller, and as a shortcut when assigning a new
-object to a @code{csRef<>}.
+ownership from a function to its caller, and as an ugly shortcut when assigning
+a new object to a @code{csRef<>} (instead of the more obvious
+@code{csRef<>::AttachNew()} method).
 
 @code{csPtr<>} represents a single, owned, one-time-transferable reference to
 an object and should be used only as the return value of a function, or when
@@ -139,9 +141,9 @@ creating a brand new object which is assigned directly to a @code{csRef<>}.
 stores the pointer.  @code{csPtr<>} is very specialized, and exists solely as a
 mechanism for transferring an existing reference into a @code{csRef<>}.
 
-Although it is safest and cleanest for a function to transfer ownership of an
-object to its caller by returning a @code{csRef<>}, it is also possible to
-utilize @code{csPtr<>} for this purpose.  This can be done as a
+Although it is safest and cleanest for a function to transfer ownership of a
+new object back to its caller by returning a @code{csRef<>}, it is also
+possible to utilize @code{csPtr<>} for this purpose.  This can be done as a
 micro-optimization in order to avoid the very minor overhead of the extra
 reference-count manipulation incurred when returning a @code{csRef<>} from a
 function.  @emph{Note} carefully, however, that you should never return a
@@ -151,7 +153,7 @@ Returning a @code{csRef<>} ensures that the returned object can never be
 leaked, even if the caller neglects to assign it to a variable.
 
 There is only one valid way to use the result of a function which returns a
-@code{csPtr<>}, and that is to assign it to a @code{csRef<>}.  For example:
+@code{csPtr<>}: assign it to a @code{csRef<>}.  For example:
 
 @example
 // An example interface and method.
@@ -173,13 +175,15 @@ light = engine->CreateLight (@dots{});
 
 When a @code{csPtr<>} is assigned to a @code{csRef<>}, the reference owned by
 the @code{csPtr<>} is transferred to the @code{csRef<>} without an additional
-@code{IncRef()}; that is, @code{csRef<>} inherits the reference owned by the
-@code{csPtr<>}.
+@code{IncRef()}; that is, @code{csRef<>} inherits, steals, or hijacks the
+reference owned by the @code{csPtr<>}.
 
 To make it easier for functions to actually return a @code{csPtr<>} even though
-they are working internally with a @code{csRef<>} there is also an explicit
-conversion from @code{csRef<>} to @code{csPtr<>}.  This means that the
-following code is valid:
+they are working internally with a @code{csRef<>} there is also an
+@emph{explicit} conversion from @code{csRef<>} to @code{csPtr<>}; which means
+that a @code{csPtr<>} can be constructed from a @code{csRef<>} if the
+@code{csPtr<>} constructor is called explicitly with a @code{csRef<>} as its
+sole argument.  This means that the following code is valid:
 
 @example
 csPtr<iFoo> MyFunction ()
@@ -190,12 +194,13 @@ csPtr<iFoo> MyFunction ()
 @}
 @end example
 
-What happens above is that the @code{csPtr<>} constructor which accepts a
-@code{csRef<>} will call @code{IncRef()} on the object.  This is necessary
-because when the @code{csRef<>} inside @code{MyFunction()} goes out of scope it
-will call @code{DecRef()} automatically; potentially destroying the object.
+What happens, in this case, is that the @code{csPtr<>} constructor which
+accepts a @code{csRef<>} will call @code{IncRef()} on the object.  This is
+necessary because when the @code{csRef<>} inside @code{MyFunction()} goes out
+of scope it will call @code{DecRef()} automatically; potentially destroying the
+object.
 
-The following usage is, however, incorrect:
+The following usage, however, is incorrect:
 
 @example
 iFoo* MyFunction ()
@@ -206,11 +211,13 @@ iFoo* MyFunction ()
 @}
 @end example
 
-This is incorrect because nothing here calls @code{IncRef()} on the returned
+This is incorrect because here nothing calls @code{IncRef()} on the returned
 pointer, yet the @code{csRef<>} will still call @code{DecRef()} upon
 destruction, which means, at best, the function is returning ownership of an
 object even though it does not hold ownership, and, at worst, it is potentially
-returning a destroyed object.  As noted above, the transfer of object ownership
+returning a destroyed object.
+
+As noted above, the transfer of object ownership
 to the caller of a function should almost always be handled by returning a
 @code{csRef<>} or a @code{csPtr<>} rather than a bare @code{iFoo*}.  However,
 if you really must return a normal pointer, then you have to ensure that you
@@ -227,21 +234,23 @@ iFoo* MyFunction ()
 @}
 @end example
 
-Another way to use @code{csPtr<>} is as follows:
+If you prefer obscurity and brevity over clarity, you can also use
+@code{csPtr<>} as a shortcut, in place of @code{csRef<>::AttachNew()}, when
+assigning a newly allocated object to a @code{csRef<>}.  The following idiom
+ensures that the reference count of the new object is correctly maintained.
 
 @example
 csRef<iView> view = csPtr<iView> (new csView (@dots{}));
 @end example
 
-This is a very useful idiom for creating a new object and assigning it to a
-@code{csRef<>} while maintaining the proper reference count.  This works
-correctly because the new object (@code{new csView}) already automatically has
+This works
+correctly because the new object (@samp{new csView}) already automatically has
 a reference-count of 1 at construction time.  By encapsulating the new object
 pointer in a @code{csPtr<>}, @code{csRef<>} is instructed to @emph{not} invoke
 @code{IncRef()} on the incoming object, but rather to simply inherit the
 reference already owned by the @code{csPtr<>}.  By contrast, the following code
 is incorrect and will result in a resource leak since the object's
-reference-count will be 2, rather than one: one reference from the @samp{new}
+reference-count will be 2, rather than one; one reference from the @samp{new}
 operation, and one from the @code{IncRef()} invocation performed by the
 @code{csRef<>}.
 
@@ -271,31 +280,32 @@ will not own a reference to the returned object.  If you assign it to a
 assignment time, and decrement it again when the @code{csRef<>} destroyed.
 
 @item
-The function returns a @code{csRef<>}.  In this case the function is requesting
-that you take ownership of the returned object because it (the function) will
-be giving up ownership.  By taking ownership, you ensure that the object does
-not get destroyed prematurely.  You can assign the returned @code{csRef<>} to
-another @code{csRef<>}.  It is also safe to not store the pointer but to
-instead directly use it like this: @code{Function()->DoSomething()}.  It is
-@emph{not} safe to assign the result of a function returning a @code{csRef<>}
-to a normal pointer because that will result in a resource leak since, after
-assignment, an immediate @code{DecRef()} will occur which may cause destruction
-of the object.  Finally, it is safe to ignore the return value from a function
-returning a @code{csRef<>} since the @code{csRef<>} will ensure that the owned
-reference is properly cleaned up even if you neglect to assign it to a variable
-or use it directly.
+The function returns a @code{csRef<>}.  In this case the function is
+@emph{requesting} that you take ownership of the returned object because it
+(the function) will be giving up ownership.  By taking ownership, you ensure
+that the object does not get destroyed prematurely.  You can assign the
+returned @code{csRef<>} to another @code{csRef<>}.  It may also be safe to not
+store the pointer but instead directly use it like this,
+@code{Function()->DoSomething()} (however, some older compilers might destroy
+the @code{csRef<>} before @code{DoSomething()} is actually called, so be
+careful).  It is @emph{not} safe to assign the result of a function returning a
+@code{csRef<>} to a normal pointer because doing so will result in a resource
+leak since, after assignment, an immediate @code{DecRef()} will occur which may
+cause destruction of the object.  Finally, it is safe to ignore the return
+value from a function returning a @code{csRef<>} since the @code{csRef<>} will
+ensure that the owned reference is properly cleaned up even if you neglect to
+assign it to a variable or use it directly.
 
 @item
-The function returns a @code{csPtr<>}.  In this case the function is demanding
-that you take ownership of the returned object because it (the function) will
-be giving up ownership.  You must assign the returned @code{csPtr<>} to a
-@code{csRef<>} in order to utilize it.  The @code{csRef<>} will inherit the
-reference from the @code{csPtr<>}.  When the @code{csRef<>}, to which the
-@code{csPtr<>} was assigned, is finally destroyed, the reference count will be
-decremented properly.  It is @emph{never} safe to ignore the return value from
-a function returning a @code{csPtr<>} since doing so would result in a resource
-leak.
-
+The function returns a @code{csPtr<>}.  In this case the function is
+@emph{demanding} that you take ownership of the returned object because it (the
+function) will be giving up ownership.  You must assign the returned
+@code{csPtr<>} to a @code{csRef<>} in order to utilize it.  The @code{csRef<>}
+will inherit the reference from the @code{csPtr<>}.  When the @code{csRef<>},
+to which the @code{csPtr<>} was assigned, is finally destroyed, the reference
+count will be decremented properly.  It is @emph{never} safe to ignore the
+return value from a function returning a @code{csPtr<>} since doing so would
+result in a resource leak.
 @end itemize
 
 @subsubheading Warnings About csPtr<>!
@@ -324,7 +334,7 @@ engine->CreateLight (@dots{});
 @end example
 
 Note that if you build the project in debug mode, then Crystal Space will add a
-runtime test for this incorrect usage, and will throw an exception if you
+run-time test for this incorrect usage, and will throw an exception if you
 neglect to assign a returned @code{csPtr<>} to a @code{csRef<>}.
 
 @subsubheading Warning About IncRef() and DecRef()!
@@ -342,7 +352,8 @@ mesh = 0;
 @end example
 
 The bogus code in this example will cause the reference-count to be decremented
-@emph{twice}, which is almost certainly not what was intended.
+@emph{twice}---once when @code{DecRef()} is invoked explicitly, and once when 0
+is assigned to @samp{mesh})--which is almost certainly not what was intended.
 
 @subsubheading Warning About DestroyApplication()!
 
@@ -366,11 +377,11 @@ int main (int argc, char* argv[])
 @}
 @end example
 
-The reason this doesn't work is that the @samp{plugin_mgr} reference will be
-cleaned up at the end of @code{main()}, which occurs after
+The reason this doesn't work correctly is that the @samp{plugin_mgr} reference
+will be cleaned up at the end of @code{main()}, which occurs after
 @code{DestroyApplication()} is invoked.  To fix this you can use several
-techniques.  Manually setting @samp{plugin_mgr} to @samp{NULL} just before
-calling @code{DestroyApplication()} is one method.  Another way is to put the
+techniques.  Manually setting @samp{plugin_mgr} to 0 just before calling
+@code{DestroyApplication()} is one method.  Another technique is to put the
 initialization into another routine so that @samp{plugin_mgr} is created in
 another scope; a scope which is destroyed before @code{DestroyApplication()} is
 invoked.
