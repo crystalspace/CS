@@ -26,6 +26,9 @@
 #include "csobject/treeitr.h"
 #include "csutil/csbase.h"
 
+//wingdi will define GetObject to GetObjectA. This will collide with this file!
+#undef GetObject
+
 // Note: this implementation of csObject doesn't include the 'name' field.
 // if a name is necessary, then a csNameObject can be created and attached.
 // Also, it doesn't include the CS_ID number.  I'm not sure about the
