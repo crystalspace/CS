@@ -32,6 +32,12 @@
 // Return YES to indicate the window can close - do some clean up first
 - (BOOL) windowShouldClose:(id) sender;
 
+// Get window
+- (NSWindow*) getWindow;
+
+// Get last event type
+- (int) getLastEventType;
+
 @end
 
 
@@ -43,22 +49,18 @@
 - (id) initWithDriver:(OSXDriver2D) drv
 {
     self = [super init];
-
     if (self != nil)
     {
         window = nil;
         title = nil;
         pausedTitle = nil;
-
         isPaused = NO;
-
         hideMouse = NO;
         trackingMouse = NO;
         trackingMouseTag = 0;
-
         driver = drv;
+	lastEventType = NSMouseMoved;
     }
-
     return self;
 }
 
@@ -248,7 +250,6 @@
 }
 
 
-
 // focusChanged
 // Window focus changed
 - (void) focusChanged:(BOOL) focused shouldPause:(BOOL) pause
@@ -275,11 +276,11 @@
 // Dispatch an event to the driver
 - (void) dispatchEvent:(NSEvent *) ev forView:(NSView *) view
 {
+    lastEventType = [ev type];
     OSXDriver2D_DispatchEvent(driver, ev, view);
 }
 
 @end
-
 
 
 @implementation OSXDelegate2D (PrivateMethods)
@@ -367,6 +368,22 @@
   return YES;
 }
 
+
+// getWindow
+// Return the window
+- (NSWindow*) getWindow
+{
+    return window;
+}
+
+
+// getLastEventType
+// Get last event type
+- (int) getLastEventType
+{
+    return lastEventType;
+}
+
 @end
 
 
@@ -411,6 +428,40 @@ DEL2D_FUNC(BOOL, setMouseCursor)(OSXDelegate2DHandle delegate, csMouseCursorID c
 DEL2D_FUNC(void, focusChanged)(OSXDelegate2DHandle delegate, BOOL focused, BOOL shouldPause)
 {
     [(OSXDelegate2D *) delegate focusChanged:focused shouldPause:shouldPause];
+}
+
+DEL2D_FUNC(void, setLevel)(OSXDelegate2DHandle delegate, int level)
+{
+    [[(OSXDelegate2D *)delegate getWindow] setLevel:level];
+}
+
+DEL2D_FUNC(void, setMousePosition)(OSXDelegate2DHandle delegate, CGPoint point)
+{
+    NSWindow * window = [(OSXDelegate2D*)delegate getWindow];
+    NSPoint windowPoint;
+    CGPoint screenPoint;
+    windowPoint.x = point.x;
+    windowPoint.y = [[window contentView] frame].size.height - point.y;
+    windowPoint = [window convertBaseToScreen:windowPoint];
+    screenPoint.x = windowPoint.x;
+    screenPoint.y = [[window screen] frame].size.height - windowPoint.y + 1;
+    CGSetLocalEventsFilterDuringSupressionState(
+	kCGEventFilterMaskPermitAllEvents,
+	kCGEventSupressionStateSupressionInterval);
+    switch ([(OSXDelegate2D*)delegate getLastEventType])
+    {
+	case NSLeftMouseDown:
+	case NSLeftMouseDragged:
+	    CGPostMouseEvent(screenPoint, YES, 2, YES, NO, nil);
+	    break;
+	case NSRightMouseDown:
+	case NSRightMouseDragged:
+	    CGPostMouseEvent(screenPoint, YES, 2, NO, YES, nil);
+	    break;
+	default:
+	    CGPostMouseEvent(screenPoint, YES, 2, NO, NO, nil);
+	    break;
+    }
 }
 
 #undef DEL2D_FUNC

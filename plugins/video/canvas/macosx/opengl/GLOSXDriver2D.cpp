@@ -10,6 +10,7 @@
 #include "cssysdef.h"
 
 #include "csutil/scf.h"
+#include "csutil/csinput.h"
 #include "iutil/eventq.h"
 #include "ivaria/reporter.h"
 #include "csver.h"
@@ -150,6 +151,15 @@ void GLOSXDriver2D::Print(csRect *area)
 {
     CGLSetCurrentContext(context);
     CGLFlushDrawable(context);
+}
+
+
+// SetMousePosition
+// Set the mouse position
+bool GLOSXDriver2D::SetMousePosition(int x, int y)
+{
+    OSXDelegate2D_setMousePosition(delegate, CGPointMake(x, y));
+    return true;
 }
 
 

@@ -7,8 +7,9 @@
  *
  */
 
-// This code must be callable from the ObjC delegate.  Since that uses the standard C compiler, it doesn't like
-// C++ classes, so we create a C API to some functions of this object
+// This code must be callable from the ObjC delegate.  Since that uses the
+// standard C compiler, it doesn't like C++ classes, so we create a C API to
+// some functions of this object
 
 #ifndef __CS_CGDRIVER2D_H__
 #define __CS_CGDRIVER2D_H__
@@ -48,6 +49,9 @@ public:
 
     // Flip video page (or dump to framebuffer)
     virtual void Print(csRect *area = NULL);
+
+    // Set mouse position
+    virtual bool SetMousePosition(int x, int y);
 
     // Set the mouse cursor
     virtual bool SetMouseCursor(csMouseCursorID cursor);

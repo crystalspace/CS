@@ -53,6 +53,9 @@ public:
     // Flip video page (or dump to framebuffer)
     virtual void Print(csRect *area = NULL);
 
+    // Set mouse position
+    virtual bool SetMousePosition(int x, int y);
+
     // Set the mouse cursor
     virtual bool SetMouseCursor(csMouseCursorID cursor);
 

@@ -42,6 +42,9 @@
 
     // Driver that this object works with
     OSXDriver2D driver;
+
+    // Last processed event type.
+    int lastEventType;
 }
 
 // Initialize with driver
@@ -96,6 +99,8 @@ DEL2D_FUNC(void, closeWindow)(OSXDelegate2D delegate);
 DEL2D_FUNC(void, setTitle)(OSXDelegate2D delegate, char *title);
 DEL2D_FUNC(bool, setMouseCursor)(OSXDelegate2D delegate, csMouseCursorID cursor);
 DEL2D_FUNC(void, focusChanged)(OSXDelegate2D delegate, bool focused, bool shouldPause);
+DEL2D_FUNC(void, setLevel)(OSXDelegate2D delegate, int level);
+DEL2D_FUNC(void, setMousePosition)(OSXDelegate2D delegate, CGPoint point);
 
 #undef DEL2D_FUNC
 

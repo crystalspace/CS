@@ -11,6 +11,7 @@
 #include "cssysdef.h"
 
 #include "csutil/scf.h"
+#include "csutil/csinput.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 #include "ivaria/reporter.h"
@@ -135,6 +136,15 @@ void CGDriver2D::SetTitle(char *title)
 void CGDriver2D::Print(csRect *area)
 {
     OSXDelegate2D_blitToWindow(delegate, Memory, Width, Height, Depth);
+}
+
+
+// SetMousePosition
+// Set the mouse position
+bool CGDriver2D::SetMousePosition(int x, int y)
+{
+    OSXDelegate2D_setMousePosition(delegate, CGPointMake(x, y));
+    return true;
 }
 
 

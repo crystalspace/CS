@@ -44,6 +44,12 @@ The history order is reversed so that new features are at the top.
 	- res removed all member access control directives from the classes
 	  generated when using cstool/tokenlist.h since this seems to cause
 	  problems on some platforms.
+	- Eric Sunshine applied a patch from Mike Vannorsdel which implements
+	  iGraphics2D::SetMousePosition() for the MacOS/X OpenGL canvas.  Also
+	  publishes an OSXDelegate2D_setLevel() function to set the "window
+	  level", though this is not presently used, nor is it easily
+	  accessible.  Eric performed some clean up and normalization of the
+	  patch, and also propagated it to the CoreGraphics canvas.
 18-May-2003
 	- res made the following changes in and around render3d:
 	    - ATI/NV only exts can be disabled all at once via cfg.
