@@ -87,18 +87,18 @@ bool csGLShader_FIXED::SupportType(const char* type)
 {
   if (!enable)
     return false;
-  if ((strcasecmp(type, "gl_fixed_fp") == 0) && ext->CS_GL_ARB_multitexture)
+  if ((strcasecmp(type, "fp") == 0) && ext->CS_GL_ARB_multitexture)
     return true;
-  else if( strcasecmp(type, "gl_fixed_vp") == 0)
+  else if( strcasecmp(type, "vp") == 0)
     return true;
   return false;
 }
 
 csPtr<iShaderProgram> csGLShader_FIXED::CreateProgram(const char* type)
 {
-  if( strcasecmp(type, "gl_fixed_fp") == 0)
+  if( strcasecmp(type, "fp") == 0)
     return csPtr<iShaderProgram>(new csGLShaderFFP (this));
-  else if( strcasecmp(type, "gl_fixed_vp") == 0)
+  else if( strcasecmp(type, "vp") == 0)
     return csPtr<iShaderProgram>(new csGLShaderFVP (this));
   else
     return 0;

@@ -142,7 +142,7 @@ private:
     csStringID textureID[TEXTUREMAX];
     csRef<csShaderVariable> textureRef[TEXTUREMAX];
     csRef<csShaderVariable> autoAlphaTexRef;
-    int textureUnits[TEXTUREMAX];
+    //int textureUnits[TEXTUREMAX];
     int textureCount;
 
     //programs
@@ -171,7 +171,7 @@ private:
 
   static iTextureHandle* last_textures[shaderPass::TEXTUREMAX];
   static iTextureHandle* clear_textures[shaderPass::TEXTUREMAX];
-  //static int textureUnits[shaderPass::TEXTUREMAX];
+  static int textureUnits[shaderPass::TEXTUREMAX];
   static int lastTexturesCount;
 
   //keep this so we can reset in deactivate

@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+30-Nov-2003
+	- res changed the buffer anf texture mapping specification in shader
+	  files for consistency to be like:
+	    <buffer name="vertices" destination="position" />
+	    <texture name="tex diffuse" destination="unit 0" />
+	- res made the 'type' attribute for <fp> and <vp> optional. Defaults
+	  to 'fp' resp 'vp' now.
 28-Nov-2003
 	- res added some NR VC7 projects to csall.
 	- res made lots of changes. Waterdemo now works again.

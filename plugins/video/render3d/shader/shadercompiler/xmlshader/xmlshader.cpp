@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "iutil/comp.h"
 #include "iutil/plugin.h"
+#include "ivideo/rendermesh.h"
 #include "csutil/util.h"
 #include "csutil/scfstr.h"
 #include "csutil/scfstrset.h"
@@ -300,7 +301,7 @@ bool csXMLShaderCompiler::LoadPass(iDocumentNode *node, csXMLShader::shaderPass 
     {
       int a = CS_VATTRIB_IS_SPECIFIC (attrib) ? 
 	attrib - CS_VATTRIB_SPECIFIC_FIRST : attrib;
-      csStringID varID = strings->Request (mapping->GetAttributeValue ("buffer"));
+      csStringID varID = strings->Request (mapping->GetAttributeValue ("name"));
       pass->bufferID[a] = varID; //MUST HAVE STRINGS
       pass->bufferGeneric[a] = CS_VATTRIB_IS_GENERIC (attrib);
 
@@ -330,12 +331,25 @@ bool csXMLShaderCompiler::LoadPass(iDocumentNode *node, csXMLShader::shaderPass 
   {
     csRef<iDocumentNode> mapping = it->Next ();
     if (mapping->GetType() != CS_NODE_ELEMENT) continue;
-    if (mapping->GetAttribute ("name") && mapping->GetAttribute ("unit"))
+    if (mapping->GetAttribute ("name") && mapping->GetAttribute ("destination"))
     {
-      const int texUnit = mapping->GetAttributeValueAsInt ("unit");
+      const char* dest = mapping->GetAttributeValue ("destination");
+      char unitName[8];
+      int i;
+      int texUnit = -1;
+      for (i = 0; i < csXMLShader::shaderPass::TEXTUREMAX; i++)
+      {
+	sprintf (unitName, "unit %d", i);
+	if (strcasecmp(unitName, dest) == 0)
+	{
+	  texUnit = i;
+	  break;
+	}
+      }
+      if (texUnit < 0) continue;
       csStringID varID = strings->Request (mapping->GetAttributeValue ("name"));
       pass->textureID[texUnit] = varID;
-      pass->textureUnits[pass->textureCount] = texUnit;
+      //pass->textureUnits[pass->textureCount] = texUnit;
 
       csShaderVariable *varRef=0;
       //csRef<csShaderVariable>& varRef = pass->bufferRef[a];
@@ -348,11 +362,11 @@ bool csXMLShaderCompiler::LoadPass(iDocumentNode *node, csXMLShader::shaderPass 
       if (!varRef)
       {
 	pass->dynamicVariables.InsertSorted (csShaderVariableProxy (varID, 
-	  0, &pass->textureRef[pass->textureCount]));
+	  0, &pass->textureRef[texUnit]));
       }
 
-      //pass->textureCount = MAX(pass->textureCount, texUnit + 1);
-      pass->textureCount++;
+      pass->textureCount = MAX(pass->textureCount, texUnit + 1);
+      //pass->textureCount++;
     }
   }
 
@@ -425,7 +439,12 @@ csPtr<iShaderProgram> csXMLShaderCompiler::LoadProgram (
       return 0;
   }
 
-  program = plg->CreateProgram (node->GetAttributeValue("type"));
+  const char* programType = node->GetAttributeValue("type");
+  if (programType == 0)
+    programType = node->GetValue ();
+  program = plg->CreateProgram (programType);
+  if (program == 0)
+    return 0;
   program->Load (node);
 
   csArray<iShaderVariableContext*> staticDomains;
@@ -475,7 +494,7 @@ int csXMLShader::lastBufferCount;
 
 iTextureHandle* csXMLShader::last_textures[shaderPass::TEXTUREMAX];
 iTextureHandle* csXMLShader::clear_textures[shaderPass::TEXTUREMAX];
-//int csXMLShader::textureUnits[shaderPass::TEXTUREMAX];
+int csXMLShader::textureUnits[shaderPass::TEXTUREMAX];
 int csXMLShader::lastTexturesCount;
 
 csXMLShader::csXMLShader (iGraphics3D* g3d) : passes(NULL), passesCount(0), 
@@ -484,6 +503,9 @@ csXMLShader::csXMLShader (iGraphics3D* g3d) : passes(NULL), passesCount(0),
   SCF_CONSTRUCT_IBASE(0);
 
   csXMLShader::g3d = g3d;
+  int i;
+  for (i = 0; i < shaderPass::TEXTUREMAX; i++)
+    textureUnits[i] = i;
 }
 
 csXMLShader::~csXMLShader ()
@@ -521,7 +543,7 @@ bool csXMLShader::DeactivatePass ()
     lastBufferCount);
   lastBufferCount=0;
 
-  g3d->SetTextureState(thispass->textureUnits, clear_textures, 
+  g3d->SetTextureState(textureUnits, clear_textures, 
     lastTexturesCount);
   lastTexturesCount=0;
   
@@ -578,13 +600,14 @@ bool csXMLShader::SetupPass (csRenderMesh *mesh,
     else
       last_textures[i] = 0;
   }
-  g3d->SetTextureState (thispass->textureUnits, last_textures, 
+  g3d->SetTextureState (textureUnits, last_textures, 
     thispass->textureCount);
   lastTexturesCount = thispass->textureCount;
 
   g3d->SetWriteMask (thispass->wmRed, thispass->wmGreen, thispass->wmBlue,
     thispass->wmAlpha);
 
+  // @@@ Is it okay to modify the render mesh here?
   // @@@ FIXME: Get those from shader file
   mesh->mixmode = CS_FX_COPY; 
   mesh->alphaType = csAlphaMode::alphaSmooth;

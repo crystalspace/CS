@@ -29,8 +29,10 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 * @{ */
 
 #include "csutil/strset.h"
+#include "csutil/ref.h"
 #include "ivideo/graph3d.h"
 #include "csgeom/transfrm.h"
+#include "ivideo/shader/shader.h"
 
 class csVector3;
 class csVector2;
@@ -39,7 +41,6 @@ class csReversibleTransform;
 struct iTextureHandle;
 struct iMaterialWrapper;
 struct iRenderBufferSource;
-struct iShaderVariableContext;
 
 /// Type of mesh
 enum csRenderMeshType
@@ -117,7 +118,7 @@ public:
   /// Transform to use for this mesh (object->camera)
   csReversibleTransform object2camera;
 
-  iShaderVariableContext* dynDomain;
+  csRef<iShaderVariableContext> dynDomain;
   
   csAlphaMode::AlphaType alphaType;
 };

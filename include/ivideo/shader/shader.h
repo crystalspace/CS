@@ -27,7 +27,6 @@
 #include "csutil/scf.h"
 #include "csutil/strhash.h"
 #include "ivideo/graph3d.h"
-#include "ivideo/rendermesh.h"
 #include "csgfx/shadervar.h"
 
 struct iString;
@@ -39,6 +38,8 @@ struct iShaderManager;
 struct iShaderRenderInterface;
 struct iShader;
 struct iShaderCompiler;
+
+struct csRenderMesh;
 
 SCF_VERSION (iShaderVariableContext, 0, 0, 1);
 

@@ -4,19 +4,19 @@
     <pass>
       <mixmode><copy/></mixmode>
       <!--<streammapping stream="vertices" destination="position" />-->
-      <buffer buffer="vertices" destination="position" />
+      <buffer name="vertices" destination="position" />
       <!--<streammapping stream="texture coordinates" destination="texture coordinate" />-->
       <!--<streammapping stream="normals" destination="normal"/>-->
-      <buffer buffer="normals" destination="normal"/>
-      <vp plugin="glfixed" type="gl_fixed_vp">
+      <buffer name="normals" destination="normal"/>
+      <vp plugin="glfixed">
         <fixedvp>  
           <environment type="reflection" mapping="cube" />
           <!--<ambient/>-->
         </fixedvp>
       </vp>
       <!--<texturemapping unit="0" name="tex diffuse" />-->
-      <texture unit="0" name="tex diffuse" />
-      <fp plugin="glfixed" type="gl_fixed_fp">
+      <texture name="tex diffuse" destination="unit 0" />
+      <fp plugin="glfixed">
         <fixedfp>
           <layer>
             <colorsource num="0" source="texture" modifier="color"/>
