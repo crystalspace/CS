@@ -17,10 +17,11 @@
 */
 
 #include "cssysdef.h"
-#include "csutil/cfgmgr.h"
 #include "csutil/cfgfile.h"
+#include "csutil/cfgmgr.h"
+#include "csutil/strhash.h"
+#include "csutil/csstring.h"
 #include "csutil/util.h"
-#include "csutil/hashmap.h"
 
 /* helper classes */
 
@@ -80,36 +81,25 @@ private:
   csConfigDomain *CurrentDomain;
   csRef<iConfigIterator> CurrentIterator;
   char *Subsection;
-  csHashMap Iterated;
+  csStringHash Iterated;
 public:
   SCF_DECLARE_IBASE;
 
   void ClearIterated()
   {
-    csGlobalHashIterator it (&Iterated);
-    while (it.HasNext())
-    {
-      char *n = (char*)it.Next();
-      delete[] n;
-    }
-    Iterated.DeleteAll();
+    Iterated.Clear();
   }
   bool FindIterated(const char *Key)
   {
-    csHashKey HashKey = csHashCompute(CurrentIterator->GetKey());
-    csHashIterator it (&Iterated, HashKey);
-    while (it.HasNext())
-    {
-      char *n = (char*)it.Next();
-      if (strcasecmp(n, Key)==0)
-        return true;
-    }
-    return false;
+    csString k(Key);
+    k.Downcase();
+    return Iterated.Contains(k);
   }
   void AddIterated(const char *Key)
   {
-    csHashKey HashKey = csHashCompute(Key);
-    Iterated.Put(HashKey, csStrNew(Key));
+    csString k(Key);
+    k.Downcase();
+    Iterated.Register(k);
   }
 
   csConfigManagerIterator(csConfigManager *cfg, const char *sub)

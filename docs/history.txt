@@ -15,6 +15,16 @@ chronological order.
 	  awsGridBagConstraints object which it allocated.
 	- Eric Sunshine converted awsGridBagLayout to use csHash<> rather than
 	  the deprecated csHashMap.
+	- Eric Sunshine added csStringHash::Contains(). Equivalent
+	  functionality was already available by checking if Request(char
+	  const*) returned an error, but Contains() is more idiomatic and
+	  provides better API consistency with other containers.
+	- Eric Sunshine made the second argument of csStringHash::Register(char
+	  const*,csStringID) optional. This allows csStringHash to be used as a
+	  lightweight alternative to csStringSet when you need just a pure
+	  `set' object and don't care about assigning an ID to the string.
+	- Eric Sunshine converted csConfigManagerIterator to use csHash<>
+	  rather than the deprecated csHashMap.
 29-Mar-2005
 	- Jorrit disabled the new `clearWithBox' rule in gldrivers.xml
 	  because it breaks screen clearing on his nVidia card. If this is

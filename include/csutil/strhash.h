@@ -70,8 +70,17 @@ public:
    *   ID will be replaced with the one specified here. If you would like the
    *   convenience of having the ID assigned automatically, then consider using
    *   csStringSet, instead.
+   * <p>
+   * \remarks If you do not care about the ID, but instead simply want to use
+   *   the hash as a string \e set which merely records if a string is present,
+   *   then you can omit \c id. To find out if a string is contained in the
+   *   set, invoke Contains(). The same functionality can be accomplished via
+   *   csStringSet, however csStringSet is more heavyweight because it also
+   *   maintains a reverse-mapping from ID to string. Omitting the \c id makes
+   *   for a good alternative to csStringSet when you do not require its extra
+   *   bulk.
    */
-  const char* Register (const char* s, csStringID id);
+  const char* Register (const char* s, csStringID id = 0);
 
   /**
    * Request the ID for the given string.
@@ -84,11 +93,19 @@ public:
    * Request the string for a given ID.
    * \return The string associated with the given ID, or the null pointer if
    *   the string has not yet been registered.
-   * \remarks This operation is relatively slow.  If you find that you must
-   *   perform this reverse lookup frequently, then consider using csStringSet,
-   *   instead.
+   * \warning This operation is slow.  If you need to perform reverse lookups
+   *   frequently, then instead consider using csStringSet, in which reverse
+   *   lookups are optimized.
    */
   const char* Request (csStringID id) const;
+
+  /**
+   * Check if the hash contains a particular string.
+   * \remarks This is rigidly equivalent to
+   *   \code return Request(s) != csInvalidStringID \endcode.
+   */
+  bool Contains(char const* s) const
+  { return Request(s) != csInvalidStringID; }
 
   /**
    * Delete all stored strings.
