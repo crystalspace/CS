@@ -1090,7 +1090,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "plugins"))
   {
-    int i;
+    int i = 0;
     csRef<iPluginIterator> it = Sys->plugin_mgr->GetPlugins ();
     while (it->HasNext ())
     {
@@ -1107,14 +1107,14 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       int idx;
       sscanf (arg, "%d", &idx);
-      int i;
+      int i = 0;
       iBase* plugin = NULL;
       csRef<iPluginIterator> it = Sys->plugin_mgr->GetPlugins ();
       while (it->HasNext ())
       {
         plugin = it->Next ();
-	if (idx == i) break;
-	plugin = NULL;
+        if (idx == i) break;
+        plugin = NULL;
         i++;
       }
 
@@ -1175,14 +1175,14 @@ bool CommandHandler (const char *cmd, const char *arg)
       char val[256];
       int idx;
       csScanStr (arg, "%d,%s,%s", &idx, name, val);
-      int i;
+      int i = 0;
       iBase* plugin = NULL;
       csRef<iPluginIterator> it = Sys->plugin_mgr->GetPlugins ();
       while (it->HasNext ())
       {
         plugin = it->Next ();
-	if (idx == i) break;
-	plugin = NULL;
+        if (idx == i) break;
+        plugin = NULL;
         i++;
       }
 

@@ -23,6 +23,8 @@ The history order is reversed so that new features are at the top.
 	  because beyond that the overhead of growing the buckets becomes
 	  too high and performance drops a lot. Because of this the default
 	  bucket size in hash map has been reduced to 53 elements.
+	- Philip Wyett initialized counters to zero at decleration. This
+	  fixes compilation warning(s) and possibility of arbitary values.
 23-Apr-2003
 	- Removed iPluginManager->GetPluginCount() and GetPlugin() since
 	  those two functions cannot be used in a thread-safe way. The
