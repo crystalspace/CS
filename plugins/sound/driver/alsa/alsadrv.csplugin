@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- alsadrv.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.sound.driver.alsa</name>
+        <implementation>csSoundDriverALSA</implementation>
+        <description>Crystal Space ALSA Sound Driver</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

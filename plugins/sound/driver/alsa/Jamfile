@@ -1,0 +1,16 @@
+SubDir TOP plugins sound driver alsa ;
+
+if $(ALSA.AVAILABLE) = "yes" && $(TARGET.OS) != "WIN32" 
+{
+Help alsadrv : "Crystal Space ALSA sound driver" ;
+
+Plugin alsadrv
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith ossdrv : csutil ;
+ExternalLibs alsadrv :  ALSA ;
+
+CompileGroups alsadrv :  sounddrivers ;
+
+}
+
