@@ -46,7 +46,6 @@ struct iRenderBufferManager;
 struct iLightingManager;
 
 
-
 /**\name iRender3D::BeginDraw() flags
  * @{ */
 /// We're going to draw 2D graphics

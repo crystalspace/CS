@@ -30,8 +30,8 @@
 
 #include "csutil/strset.h"
 
+#include "ivideo/material.h"
 #include "ivideo/render3d.h"
-#include "iengine/material.h"
 
 class csVector3;
 class csVector2;
@@ -131,7 +131,7 @@ private:
   meshtype type;
   unsigned int indexstart, indexend;
   csRef<iStreamSource> streamsource;
-  csRef<iMaterialWrapper> matwrap;
+  csRef<iMaterialHandle> mathandle;
   const char *defaultvertices;
   const char *defaulttexcoords;
   const char *defaultnormals;
@@ -226,12 +226,12 @@ public:
   virtual meshtype GetType () 
     { return type; }
 
-  /// Set material wrapper
-  virtual void SetMaterialWrapper (iMaterialWrapper* matwrap)
-    { csRenderMesh::matwrap = matwrap; }
-  /// Get material wrapper
-  virtual iMaterialWrapper* GetMaterialWrapper ()
-    { return matwrap; }
+  /// Set material handle
+  virtual void SetMaterialHandle (iMaterialHandle* mathandle)
+    { csRenderMesh::mathandle = mathandle; }
+  /// Get material handle
+  virtual iMaterialHandle* GetMaterialHandle ()
+    { return mathandle; }
 
   /// Get lighting information
   virtual iLightingInfo* GetLightingInfo () { return NULL; }

@@ -637,7 +637,7 @@ bool csGenmeshMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   vbufmgr->UnlockBuffer (vbuf);
 #else
   mesh.SetIndexRange (0, factory->GetTriangleCount () * 3);
-  mesh.SetMaterialWrapper (mater);
+  mesh.SetMaterialHandle (mater->GetMaterialHandle ());
   csRef<iStreamSource> stream = SCF_QUERY_INTERFACE (factory, iStreamSource);
   mesh.SetStreamSource (stream);
   mesh.SetType (csRenderMesh::MESHTYPE_TRIANGLES);
