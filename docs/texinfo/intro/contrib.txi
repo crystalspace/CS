@@ -972,6 +972,13 @@ engine to a plug-in.
 Dan Bogdanov
 
 Dan recently became port maintainer for @sc{djgpp}.
+
+@item
+Matt Reda (@email{mreda@@mac.com})
+
+Matt contributed an OpenGL driver, a CoreGraphics driver, and a CoreAudio
+driver for the MacOS/X port of Crystal Space.  The addition of these drivers
+makes Crystal Space a viable option for game development on Macintosh.
 @end itemize
 
 @noindent
@@ -1025,8 +1032,8 @@ a mailing list for Crystal Space.  Thanks to Marco d'Itri (the system manager)
 for creating this list for me.  Also thanks to those people for creating an
 ftp mirror of this site.
 
-Many thanks to Ted Nguyen for donating a version of Microsoft Visual C++ to
-Eric Sunshine and Jorrit Tyberghein.
+Many thanks to Ted Nguyen for donating a copule copies of Microsoft Visual C++
+5 to the project.
 
 If we have forgotten anyone or missed a contribution, we sincerely apologize.
 Please feel free to notify us of errors or omissions.
