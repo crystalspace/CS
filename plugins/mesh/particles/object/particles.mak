@@ -13,7 +13,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: particles particlesclean
-all plugins: particles
+all meshes plugins: particles
 
 particles:
 	$(MAKE_TARGET) MAKE_DLL=yes

@@ -14,7 +14,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: partphys_simple partphys_simpleclean
-all plugins: partphys_simple
+all meshes plugins: partphys_simple
 
 partphys_simple:
 	$(MAKE_TARGET) MAKE_DLL=yes
