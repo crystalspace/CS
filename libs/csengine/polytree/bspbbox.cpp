@@ -747,7 +747,6 @@ csPolyTreeBBox::csPolyTreeBBox (csObject* owner) : csPolyTreeObject (owner)
 {
   base_stub = csPolyTreeObject::stub_pool.Alloc ();
   base_stub->IncRef (); // Make sure this object is locked.
-  base_stub->SetObject (this);
   is_cam_transf = false;
 }
 

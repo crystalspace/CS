@@ -495,14 +495,61 @@ bool Dumper::check_stubs (csOctreeNode* node)
   return false;
 }
 
-void Dumper::dump_stubs (csPolygonStub* stub, char* name, int level)
+void Dumper::dump_stubs_node (csPolygonStub* stub, char* name, int level)
 {
   while (stub)
   {
-    CsPrintf (MSG_DEBUG_0, "%s %s num_poly=%d this=%08lx obj=%08lx\n",
+    CsPrintf (MSG_DEBUG_0, "%s %s num_poly=%d this=%08lx obj=%08lx node=%08lx\n",
     	spaces (level), name, stub->GetNumPolygons (),
-    	stub, stub->object);
+    	stub, stub->object, stub->node);
+    if (stub->next_tree && stub->next_tree->prev_tree != stub)
+      CsPrintf (MSG_DEBUG_0, "%s !!! next_tree link broken !!!\n", spaces (level));
+    if (stub->prev_tree && stub->prev_tree->next_tree != stub)
+      CsPrintf (MSG_DEBUG_0, "%s !!! prev_tree link broken !!!\n", spaces (level));
+    if (!stub->prev_tree && stub->node->first_stub != stub &&
+    	stub->node->todo_stubs != stub)
+      CsPrintf (MSG_DEBUG_0, "%s !!! stub should be first in node but it isn't !!!\n", spaces (level));
+    if (stub->prev_tree && (stub->node->first_stub == stub ||
+    	stub->node->todo_stubs == stub))
+      CsPrintf (MSG_DEBUG_0, "%s !!! stub should not be first in node but it is !!!\n", spaces (level));
+    if (stub->next_obj && stub->next_obj->prev_obj != stub)
+      CsPrintf (MSG_DEBUG_0, "%s !!! next_obj link broken !!!\n", spaces (level));
+    if (stub->prev_obj && stub->prev_obj->next_obj != stub)
+      CsPrintf (MSG_DEBUG_0, "%s !!! prev_obj link broken !!!\n", spaces (level));
+    if (!stub->prev_obj && stub->object->first_stub != stub)
+      CsPrintf (MSG_DEBUG_0, "%s !!! stub should be first in object but it isn't !!!\n", spaces (level));
+    if (stub->prev_obj && stub->object->first_stub == stub)
+      CsPrintf (MSG_DEBUG_0, "%s !!! stub should not be first in object but it is !!!\n", spaces (level));
     stub = stub->next_tree;
+  }
+}
+
+void Dumper::dump_stubs_obj (csPolygonStub* stub, char* name, int level)
+{
+  while (stub)
+  {
+    CsPrintf (MSG_DEBUG_0, "%s %s num_poly=%d this=%08lx obj=%08lx node=%08lx\n",
+    	spaces (level), name, stub->GetNumPolygons (),
+    	stub, stub->object, stub->node);
+    if (stub->next_tree && stub->next_tree->prev_tree != stub)
+      CsPrintf (MSG_DEBUG_0, "%s !!! next_tree link broken !!!\n", spaces (level));
+    if (stub->prev_tree && stub->prev_tree->next_tree != stub)
+      CsPrintf (MSG_DEBUG_0, "%s !!! prev_tree link broken !!!\n", spaces (level));
+    if (!stub->prev_tree && stub->node->first_stub != stub &&
+    	stub->node->todo_stubs != stub)
+      CsPrintf (MSG_DEBUG_0, "%s !!! stub should be first in node but it isn't !!!\n", spaces (level));
+    if (stub->prev_tree && (stub->node->first_stub == stub ||
+    	stub->node->todo_stubs == stub))
+      CsPrintf (MSG_DEBUG_0, "%s !!! stub should not be first in node but it is !!!\n", spaces (level));
+    if (stub->next_obj && stub->next_obj->prev_obj != stub)
+      CsPrintf (MSG_DEBUG_0, "%s !!! next_obj link broken !!!\n", spaces (level));
+    if (stub->prev_obj && stub->prev_obj->next_obj != stub)
+      CsPrintf (MSG_DEBUG_0, "%s !!! prev_obj link broken !!!\n", spaces (level));
+    if (!stub->prev_obj && stub->object->first_stub != stub)
+      CsPrintf (MSG_DEBUG_0, "%s !!! stub should be first in object but it isn't !!!\n", spaces (level));
+    if (stub->prev_obj && stub->object->first_stub == stub)
+      CsPrintf (MSG_DEBUG_0, "%s !!! stub should not be first in object but it is !!!\n", spaces (level));
+    stub = stub->next_obj;
   }
 }
 
@@ -511,8 +558,8 @@ void Dumper::dump_stubs (csBspNode* bnode, char* name, int level)
   if (!bnode) return;
   CsPrintf (MSG_DEBUG_0, "%s bnode(%s)\n", spaces (level), name);
   if (!check_stubs (bnode)) { CsPrintf (MSG_DEBUG_0, "%s  ..\n", spaces (level)); return; }
-  dump_stubs (bnode->first_stub, "stub", level+1);
-  dump_stubs (bnode->todo_stubs, "todo", level+1);
+  dump_stubs_node (bnode->first_stub, "stub", level+1);
+  dump_stubs_node (bnode->todo_stubs, "todo", level+1);
   dump_stubs (bnode->front, "front", level+1);
   dump_stubs (bnode->back, "back", level+1);
 }
@@ -525,8 +572,8 @@ void Dumper::dump_stubs (csOctreeNode* onode, char* name, int level)
   	onode->bbox.MaxY () - onode->bbox.MinY (),
   	onode->bbox.MaxZ () - onode->bbox.MinZ ());
   if (!check_stubs (onode)) { CsPrintf (MSG_DEBUG_0, "%s  ..\n", spaces (level)); return; }
-  dump_stubs (onode->first_stub, "stub", level+1);
-  dump_stubs (onode->todo_stubs, "todo", level+1);
+  dump_stubs_node (onode->first_stub, "stub", level+1);
+  dump_stubs_node (onode->todo_stubs, "todo", level+1);
   if (onode->minibsp) dump_stubs ((csBspNode*)(onode->minibsp->root),
   	"root", level+1);
   dump_stubs ((csOctreeNode*)onode->children[0], "0", level+1);
@@ -546,4 +593,9 @@ void Dumper::dump_stubs (csOctree* octree)
   dump_stubs ((csOctreeNode*)octree->root, "root", 0);
 }
 
+void Dumper::dump_stubs (csPolyTreeObject* ptobj)
+{
+  CsPrintf (MSG_DEBUG_0, "Dump csPolyTreeObject\n");
+  dump_stubs_obj (ptobj->first_stub, "root", 0);
+}
 

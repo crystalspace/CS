@@ -12,12 +12,26 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+28-Jan-2000
+	- Michael Dale Long did a major update to the CrystalClear input
+	  system. Added a lot of support for the new csConsole plugin.
+	  cctest now sports a simple but interactive console. More
+	  bugfixes in the csConsole backspace handling code, as well.
+	  Support for prompts that shouldn't be deleted by backspacing.
+	- Michael also fixed fixed scftutor.mak (didn't include libraries
+	  in the proper order).
+	- Did some fixes to the dynamic objects in polygon trees.
+	  Now it appears to work correctly (i.e. not crash) but I think
+	  there are still a few memory leaks. Still investigating.
 27-Jan-2000
 	- Update to some docs from Wyatt Miler.
 	- Andrew Zabolotny improved the test for endianess.
 	- Added 'delsprite' console command to delete a sprite.
 	- Improved new Line3D renderer a bit (double buffering and
 	  faster key handling). Also cleaned up all unneeded stuff.
+	- Eric Sunshine eliminated a few warnings in Map2CS and MazeD.
+	- Add more debugging info for dynamic objects in polygon trees.
+	  Still hunting a bug.
 26-Jan-2000
 	- Michael Dale Long added DeleteAt() to csString to delete a range
 	  of characters within a csString.

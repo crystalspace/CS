@@ -435,6 +435,7 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num,
   
   for (i = 0 ; i < num ; i++)
   {
+    if (polygon[i]->GetType () != 1) continue;
     clip = (csPolygon2D*)(render_pool->Alloc ());
     p = (csPolygon3D*)polygon[i];
     p->CamUpdate ();

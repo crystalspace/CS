@@ -41,6 +41,7 @@ void csPolyTreeObject::RemoveFromTree ()
 
 void csPolyTreeObject::UnlinkStub (csPolygonStub* ps)
 {
+  if (!ps->object) return;
   if (ps->next_obj) ps->next_obj->prev_obj = ps->prev_obj;
   if (ps->prev_obj) ps->prev_obj->next_obj = ps->next_obj;
   else first_stub = ps->next_obj;
@@ -55,7 +56,7 @@ void csPolyTreeObject::LinkStub (csPolygonStub* ps)
   ps->prev_obj = NULL;
   if (first_stub) first_stub->prev_obj = ps;
   first_stub = ps;
-  ps->SetObject (this);
+  ps->object = this;
 }
 
 void csPolyTreeObject::SplitWithPlane (csPolygonStub* stub,
@@ -362,15 +363,18 @@ csPolygonStub* csPolygonStubPool::Alloc ()
   alloced = pnew;
   pnew->ps->GetPolygonArray ().Reset ();
   pnew->ps->ref_count = 1;
+  pnew->ps->object = NULL;
+  pnew->ps->node = NULL;
   return pnew->ps;
 }
 
 void csPolygonStubPool::Free (csPolygonStub* ps)
 {
+  csPolyTreeObject* pto = ps->GetObject ();
   ps->RemoveStub ();
   ps->DecRef ();
   if (ps->ref_count > 0) return;
-  if (ps->GetObject ()) ps->GetObject ()->RemovePolygons (ps);
+  if (pto) pto->RemovePolygons (ps);
   if (alloced)
   {
     PoolObj* po = alloced;

@@ -31,6 +31,7 @@ csPolygonTreeNode::~csPolygonTreeNode ()
 
 void csPolygonTreeNode::UnlinkStub (csPolygonStub* ps)
 {
+  if (!ps->node) return;
   if (ps->next_tree) ps->next_tree->prev_tree = ps->prev_tree;
   if (ps->prev_tree) ps->prev_tree->next_tree = ps->next_tree;
   else
@@ -83,5 +84,7 @@ void csPolygonTree::AddObject (csPolyTreeObject* obj)
 {
   csPolygonStub* stub = obj->GetBaseStub ();
   root->LinkStubTodo (stub);
+  obj->LinkStub (stub);
+  stub->IncRef ();
 }
 

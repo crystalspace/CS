@@ -26,6 +26,7 @@ class csPlane;
 class csBox;
 class csCamera;
 class csPolyTxtPlane;
+class csPolyTreeObject;
 class csPolygonStub;
 class csPolygon2D;
 class csPolygon3D;
@@ -59,7 +60,8 @@ private:
   static void dump (csBspTree* tree, csBspNode* node, int indent);
   static void dump (csQuadtreeNode* node, char* buf, int bufdim,
   	int depth, int x1, int y1, int x2, int y2);
-  static void dump_stubs (csPolygonStub* stub, char* name, int level);
+  static void dump_stubs_node (csPolygonStub* stub, char* name, int level);
+  static void dump_stubs_obj (csPolygonStub* stub, char* name, int level);
   static void dump_stubs (csBspNode* bnode, char* name, int level);
   static void dump_stubs (csOctreeNode* onode, char* name, int level);
   static bool check_stubs (csOctreeNode* node);
@@ -89,6 +91,7 @@ public:
   static void dump (csQuadcube* cube);
   static void dump (csQuadtree* tree);
   static void dump_stubs (csOctree* octree);
+  static void dump_stubs (csPolyTreeObject* ptobj);
 };
 
 #endif

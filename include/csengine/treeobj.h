@@ -78,8 +78,6 @@ public:
   /// Unlink this stub from all lists.
   void RemoveStub ();
 
-  /// Set parent object for this stub.
-  void SetObject (csPolyTreeObject* obj) { object = obj; }
   /// Get parent object for this stub.
   csPolyTreeObject* GetObject () { return object; }
 };
@@ -140,6 +138,8 @@ public:
  */
 class csPolyTreeObject
 {
+  friend class Dumper;
+
 private:
   /// Owner (original dynamic object).
   csObject* owner;

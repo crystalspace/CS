@@ -1182,6 +1182,13 @@ static bool CommandHandler (char *cmd, char *arg)
     {
       csOctree* octree = (csOctree*)(c->GetSector ()->GetStaticTree ());
       Dumper::dump_stubs (octree);
+      csNamedObjVector& sprites = Sys->view->GetWorld ()->sprites;
+      int i;
+      for (i = 0 ; i < sprites.Length () ; i++)
+      {
+        csSprite3D* spr = (csSprite3D*)sprites[i];
+	Dumper::dump_stubs (&spr->GetBBoxObject ());
+      }
     }
     //Sys->Printf (MSG_CONSOLE, "No debug0 implementation in this version.\n");
   }
