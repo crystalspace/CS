@@ -49,6 +49,9 @@ chronological order.
 	    - Fixed PNG loader not properly clearing image format alpha flag 
 	      on some images.
 	    - A few documentation tweaks to SV-related stuff.
+	- Keith updated sprcal3d and sprcal3dldr to work with latest cal3d cvs.
+	- Keith updated viewmesh callbacks to work with latest cal3d callback 
+	  prototypes.
 14-Feb-2005
 	- Chris made the minimum polygon UV determinant into a #define
 	  so that it would be more amenable to experimentation. 
