@@ -59,9 +59,10 @@ csMeshWrapper::csMeshWrapper (csObject* theParent, iMeshObject* mesh)
   myOwner = NULL;
   parent = theParent;
   movable.SetObject (this);
-  if (parent->GetType () >= csMeshWrapper::Type)
+
+  csMeshWrapper *sparent = QUERY_OBJECT_TYPE (parent, csMeshWrapper);
+  if (sparent)
   {
-    csMeshWrapper* sparent = (csMeshWrapper*)parent;
     movable.SetParent (&sparent->GetMovable ());
   }
 
@@ -89,9 +90,10 @@ csMeshWrapper::csMeshWrapper (csObject* theParent)
   myOwner = NULL;
   parent = theParent;
   movable.SetObject (this);
-  if (parent->GetType () >= csMeshWrapper::Type)
+
+  csMeshWrapper *sparent = QUERY_OBJECT_TYPE (parent, csMeshWrapper);
+  if (sparent)
   {
-    csMeshWrapper* sparent = (csMeshWrapper*)parent;
     movable.SetParent (&sparent->GetMovable ());
   }
 
@@ -113,9 +115,10 @@ void csMeshWrapper::SetMeshObject (iMeshObject* mesh)
 csMeshWrapper::~csMeshWrapper ()
 {
   if (mesh) mesh->DecRef ();
-  if (parent->GetType () == csEngine::Type)
+
+  csEngine *engine = QUERY_OBJECT_TYPE (parent, csEngine);
+  if (engine)
   {
-    csEngine* engine = (csEngine*)parent;
     engine->UnlinkMesh (this);
   }
 }
@@ -135,13 +138,13 @@ void csMeshWrapper::MoveToSector (csSector* s)
   // Only add this mesh to a sector if the parent is the engine.
   // Otherwise we have a hierarchical object and in that case
   // the parent object controls this.
-  if (parent->GetType () == csEngine::Type)
+  if (QUERY_OBJECT_TYPE (parent, csEngine))
     s->AddMesh (this);
 }
 
 void csMeshWrapper::RemoveFromSectors ()
 {
-  if (parent->GetType () != csEngine::Type) return;
+  if (!QUERY_OBJECT_TYPE (parent, csEngine)) return;
   int i;
   csVector& sectors = movable.GetSectors ();
   for (i = 0 ; i < sectors.Length () ; i++)
@@ -155,7 +158,7 @@ void csMeshWrapper::RemoveFromSectors ()
 void csMeshWrapper::SetRenderPriority (long rp)
 {
   render_priority = rp;
-  if (parent->GetType () != csEngine::Type) return;
+  if (!QUERY_OBJECT_TYPE (parent, csEngine)) return;
   int i;
   csVector& sectors = movable.GetSectors ();
   for (i = 0 ; i < sectors.Length () ; i++)
@@ -385,8 +388,9 @@ void csMeshWrapper::MeshWrapper::AddChild (iMeshWrapper* child)
   csObject* par = c->GetParentContainer ();
   if (par)
   {
-    if (par->GetType () == csEngine::Type)
-      ((csEngine*)par)->UnlinkMesh (c);
+    csEngine *engine = QUERY_OBJECT_TYPE (par, csEngine);
+    if (engine)
+      engine->UnlinkMesh (c);
     else
     {
       csMeshWrapper* old_mesh = (csMeshWrapper*)par;

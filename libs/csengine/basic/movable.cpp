@@ -23,6 +23,7 @@
 #include "csengine/thing.h"
 #include "csengine/meshobj.h"
 #include "csengine/cscoll.h"
+#include "csengine/engine.h"
 #include "iengine/sector.h"
 
 //---------------------------------------------------------------------------
@@ -107,15 +108,14 @@ void csMovable::ClearSectors ()
 {
   if (parent == NULL)
   {
-    if (object->GetType () >= csMeshWrapper::Type)
-    {
-      csMeshWrapper* sp = (csMeshWrapper*)object;
+    csMeshWrapper* sp = QUERY_OBJECT_TYPE (object, csMeshWrapper);
+    if (sp)
       sp->RemoveFromSectors ();
-    }
     else
     {
-      csCollection* col = (csCollection*)object;
-      col->RemoveFromSectors ();
+      csCollection* col = QUERY_OBJECT_TYPE (object, csCollection);
+      if (col)
+        col->RemoveFromSectors ();
     }
     sectors.SetLength (0);
   }
@@ -127,15 +127,14 @@ void csMovable::AddSector (csSector* sector)
   if (parent == NULL)
   {
     sectors.Push (sector);
-    if (object->GetType () >= csMeshWrapper::Type)
-    {
-      csMeshWrapper* sp = (csMeshWrapper*)object;
+    csMeshWrapper* sp = QUERY_OBJECT_TYPE (object, csMeshWrapper);
+    if (sp)
       sp->MoveToSector (sector);
-    }
     else
     {
-      csCollection* col = (csCollection*)object;
-      col->MoveToSector (sector);
+      csCollection* col = QUERY_OBJECT_TYPE (object, csCollection);
+      if (col)
+        col->MoveToSector (sector);
     }
   }
 }

@@ -93,17 +93,21 @@ void csRegion::Region::DeleteAll ()
   // and only then delete the sectors.
   int i;
   for (i = 0 ; i < copy.Length () ; i++)
-    if (((csObject*)copy[i])->GetType () == csCollection::Type)
+    if (copy[i])
     {
-      csCollection* o = (csCollection*)copy[i];
+      csObject* obj = (csObject*)copy[i];
+      csCollection* o = QUERY_OBJECT_TYPE (obj, csCollection);
+      if (!o) continue;
       scfParent->engine->RemoveCollection (o);
       copy[i] = NULL;
     }
 
   for (i = 0 ; i < copy.Length () ; i++)
-    if (copy[i] && ((csObject*)copy[i])->GetType () >= csMeshWrapper::Type)
+    if (copy[i])
     {
-      csMeshWrapper* o = (csMeshWrapper*)copy[i];
+      csObject* obj = (csObject*)copy[i];
+      csMeshWrapper* o = QUERY_OBJECT_TYPE (obj, csMeshWrapper);
+      if (!o) continue;
       scfParent->engine->RemoveMesh (o);
       copy[i] = NULL;
     }
@@ -112,18 +116,22 @@ void csRegion::Region::DeleteAll ()
   // (in other regions) using them? Maybe a ref counter. Also make
   // sure to ObjRelease when you don't delete a mesh factory.
   for (i = 0 ; i < copy.Length () ; i++)
-    if (copy[i] && ((csObject*)copy[i])->GetType () == csMeshFactoryWrapper::Type)
+    if (copy[i])
     {
-      csMeshFactoryWrapper* o = (csMeshFactoryWrapper*)copy[i];
+      csObject* obj = (csObject*)copy[i];
+      csMeshFactoryWrapper* o = QUERY_OBJECT_TYPE (obj, csMeshFactoryWrapper);
+      if (!o) continue;
       scfParent->engine->mesh_factories.Delete (
         scfParent->engine->mesh_factories.Find (o));
       copy[i] = NULL;
     }
 
   for (i = 0 ; i < copy.Length () ; i++)
-    if (copy[i] && ((csObject*)copy[i])->GetType () == csCurveTemplate::Type)
+    if (copy[i])
     {
-      csCurveTemplate* o = (csCurveTemplate*)copy[i];
+      csObject* obj = (csObject*)copy[i];
+      csCurveTemplate* o = QUERY_OBJECT_TYPE (obj, csCurveTemplate);
+      if (!o) continue;
       scfParent->engine->curve_templates.Delete (
         scfParent->engine->curve_templates.Find (o));
       copy[i] = NULL;
@@ -184,9 +192,11 @@ void csRegion::Region::DeleteAll ()
     }
 
   for (i = 0 ; i < copy.Length () ; i++)
-    if (copy[i] && ((csObject*)copy[i])->GetType () == csPolyTxtPlane::Type)
+    if (copy[i])
     {
-      csPolyTxtPlane* o = (csPolyTxtPlane*)copy[i];
+      csObject* obj = (csObject*)copy[i];
+      csPolyTxtPlane* o = QUERY_OBJECT_TYPE (obj, csPolyTxtPlane);
+      if (!o) continue;
       // Do a release here because the plane may still be used by other
       // polygons not belonging to this sector and we want to be sure
       // to release it from this region.

@@ -72,6 +72,7 @@
 #include "iengine/motion.h"
 #include "ivaria/perfstat.h"
 #include "imap/parser.h"
+#include "ivaria/strserv.h"
 
 #if defined(OS_DOS) || defined(OS_WIN32) || defined (OS_OS2)
 #  include <io.h>
@@ -94,6 +95,8 @@ REGISTER_STATIC_LIBRARY (engine)
 REGISTER_STATIC_LIBRARY (lvlload)
 
 //-----------------------------------------------------------------------------
+
+//ALLOCATE_OBJECT_TYPE (csMeshWrapper);
 
 char WalkTest::map_dir [100];
 bool WalkTest::move_3d = false;
@@ -1321,6 +1324,16 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
     return false;
   }
   engine = Engine->GetCsEngine ();
+
+  // Find the string server and initialize object types
+  iStringServer *StringServer = QUERY_PLUGIN_ID (Sys, CS_FUNCID_STRSERV, iStringServer);
+  if (!StringServer)
+  {
+    Printf (MSG_FATAL_ERROR, "No string server plugin!\n");
+    return false;
+  }
+  INITIALIZE_OBJECT_TYPE (StringServer, csMeshWrapper);
+  StringServer->DecRef ();
 
   // Find the level loader plugin
   LevelLoader = QUERY_PLUGIN_ID (Sys, CS_FUNCID_LVLLOADER, iLoader);

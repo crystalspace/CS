@@ -29,6 +29,8 @@ IMPLEMENT_CSOBJTYPE (csDoor, csWalkEntity);
 IMPLEMENT_CSOBJTYPE (csRotatingObject, csWalkEntity);
 IMPLEMENT_CSOBJTYPE (csLightObject, csWalkEntity);
 
+DECLARE_OBJECT_TYPE (csMeshWrapper);
+
 //--------------------------------------------------------------------------
 
 csDoor::csDoor (csMeshWrapper* p)
@@ -78,8 +80,9 @@ csRotatingObject::csRotatingObject (csObject* p)
   tparent = p;
   angles.Set (90, 0, 0);
   remaining = 0;
-  if (p->GetType () >= csMeshWrapper::Type)
-    movable = &((csMeshWrapper*)p)->GetMovable ();
+  csMeshWrapper *mw = QUERY_OBJECT_TYPE (p, csMeshWrapper);
+  if (mw)
+    movable = &mw->GetMovable ();
 }
 
 void csRotatingObject::Activate ()
