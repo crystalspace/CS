@@ -284,16 +284,20 @@
             <sort>NONE</sort>
             <camera />
         </priority>
-        <priority name="wall">
+        <priority name="portal">
             <level>2</level>
             <sort>NONE</sort>
         </priority>
-        <priority name="object">
+        <priority name="wall">
             <level>3</level>
             <sort>NONE</sort>
         </priority>
-        <priority name="alpha">
+        <priority name="object">
             <level>4</level>
+            <sort>NONE</sort>
+        </priority>
+        <priority name="alpha">
+            <level>5</level>
             <sort>BACK2FRONT</sort>
         </priority>
     </renderpriorities>
@@ -4662,7 +4666,41 @@
         </meshobj>
         <meshobj name="rot_door1">
             <plugin>thing</plugin>
+	    <priority>wall</priority>
             <zuse />
+	    <meshobj name="door_overlay">
+                <plugin>thing</plugin>
+	        <priority>object</priority>
+                <zfill />
+		<params>
+                    <v x="-2.5" y="0" z="-0.1" />
+                    <v x="-2.5" y="3.4" z="-0.1" />
+                    <v x="0" y="0" z="-0.1" />
+                    <v x="0" y="3.4" z="-0.1" />
+                    <material>parket</material>
+		    <p name="south">
+                        <v>2</v>
+                        <v>0</v>
+                        <v>1</v>
+                        <v>3</v>
+                        <texmap>
+                            <matrix>
+                                <m11>0.5</m11>
+                                <m12>0</m12>
+                                <m13>0</m13>
+                                <m21>0</m21>
+                                <m22>-0.5</m22>
+                                <m23>0</m23>
+                                <m31>0</m31>
+                                <m32>0</m32>
+                                <m33>0.5</m33>
+                            </matrix>
+                            <v x="-2.5" y="3.4" z="-0.1" />
+                        </texmap>
+                        <alpha>75</alpha>
+                    </p>
+	        </params>
+	    </meshobj>
             <params>
                 <v x="-2.5" y="0" z="-0.1" />
                 <v x="-2.5" y="0" z="0.1" />
@@ -4740,12 +4778,12 @@
                         </matrix>
                         <v x="-2.5" y="3.4" z="-0.1" />
                     </texmap>
-                    <alpha>75</alpha>
+                    <!--<alpha>75</alpha>-->
                     <portal>
                         <sector>large</sector>
                         <mirror />
                         <clip />
-                        <float />
+                        <!--<float />-->
                         <zfill />
                     </portal>
                 </p>
@@ -18701,6 +18739,7 @@
                         <add />
                     </mixmode>
                     <lighting>no</lighting>
+		    <colldet>no</colldet>
                     <portal>
                         <sector>corridor</sector>
                         <w x="59.1" y="-21.7" z="2.3" />
