@@ -54,8 +54,8 @@ public:
   csProgressPulse(bool inherit_global_state = false);
   ~csProgressPulse();
 
-  SetMessageType(int n) { type = n; }
-  GetMessageType() const { return type; }
+  void SetMessageType(int n) { type = n; }
+  int GetMessageType() const { return type; }
 
   void Step();
 };
