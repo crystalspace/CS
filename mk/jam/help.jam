@@ -12,6 +12,7 @@ rule Help
   Depends help : $(target) ;
   NotFile $(>) ;
   PrintHelp $(target) : $(>) ;
+  Always $(target) ;
 }
 
 #----------------------------------------------------------------------------
