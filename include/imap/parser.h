@@ -20,6 +20,10 @@
 #ifndef __IMAP_PARSER_H__
 #define __IMAP_PARSER_H__
 
+/**\file
+ */
+/**\addtogroup loadsave
+ * @{ */
 #include "csutil/scf.h"
 #include "ivideo/txtmgr.h"
 #include "igraphic/image.h"
@@ -34,17 +38,17 @@ struct iMeshWrapper;
 struct iMeshFactoryWrapper;
 struct iSoundWrapper;
 
-/**
- * Bit flags for the loader (used in iLoader::SetMode).
+/**\name Loader bit flags
+ * Used in iLoader::SetMode().
  * Some actions may be unwanted during loading, thus these flags.
- */
+ * @{ */
 /// Do not compress vertices
 #define CS_LOADER_NOCOMPRESS	0x00000001
 /// Do not create BSP/octrees
 #define CS_LOADER_NOBSP		0x00000002
 /// Do not apply transformations to things (and do not create bounding box)
 #define CS_LOADER_NOTRANSFORM	0x00000004
-
+/** @} */
 
 SCF_VERSION (iLoader, 0, 0, 5);
 
@@ -53,7 +57,10 @@ SCF_VERSION (iLoader, 0, 0, 5);
  */
 struct iLoader : public iBase
 {
-  /// Set loader mode (see CS_LOADER_XXX flags above)
+  /**
+   * Set loader mode 
+   * \sa #CS_LOADER_NOBSP
+   */
   virtual void SetMode (int iFlags) = 0;
 
   /**
@@ -114,6 +121,8 @@ struct iLoader : public iBase
    */
   virtual iMeshWrapper* LoadMeshObject (const char* fname) = 0;
 };
+
+/** } */
 
 #endif // __IMAP_PARSER_H__
 

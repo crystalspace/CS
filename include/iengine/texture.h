@@ -22,7 +22,7 @@
 /**\file
  */
 /**
- * \addtogroup engine3d
+ * \addtogroup engine3d_textures
  * @{ */
  
 #include "csutil/scf.h"

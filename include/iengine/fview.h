@@ -19,8 +19,10 @@
 #ifndef __IENGINE_FVIEW_H__
 #define __IENGINE_FVIEW_H__
 
+/**\file
+ */
 /**
- * \addtogroup engine3d
+ * \addtogroup engine3d_vis
  * @{ */
  
 #include "csutil/scf.h"

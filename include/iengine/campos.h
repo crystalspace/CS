@@ -19,8 +19,10 @@
 #ifndef __IENGINE_CAMPOS_H__
 #define __IENGINE_CAMPOS_H__
 
+/**\file
+ */
 /**
- * \addtogroup engine3d
+ * \addtogroup engine3d_views
  * @{ */
  
 #include "csutil/scf.h"

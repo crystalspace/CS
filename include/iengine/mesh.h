@@ -22,7 +22,7 @@
 /**\file
  */
 /**
- * \addtogroup engine3d
+ * \addtogroup engine3d_meshes
  * @{ */
 
 #include "csutil/scf.h"
@@ -46,7 +46,7 @@ struct iLight;
 struct iObject;
 class csFlags;
 
-/** \name Meshwrapper flags.
+/** \name Meshwrapper flags
  * @{ */
 /**
  * If CS_ENTITY_CONVEX is set then this entity is convex (what did

@@ -20,6 +20,9 @@
 #ifndef __IENGINE_COLLECTN_H__
 #define __IENGINE_COLLECTN_H__
 
+/**\file
+ */
+
 #include "csutil/scf.h"
 
 struct iObject;

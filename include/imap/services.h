@@ -19,6 +19,10 @@
 #ifndef _I_SYNTAXSERVICE_H_
 #define _I_SYNTAXSERVICE_H_
 
+/**\file
+ */
+/**\addtogroup loadsave
+ * @{ */
 #include "csutil/scf.h"
 #include "csutil/ref.h"
 
@@ -37,10 +41,17 @@ struct iThingState;
 struct iLoaderContext;
 struct iDocumentNode;
 
-#define CSTEX_UV 1  // UV is given in texture description
-#define CSTEX_V1 2  // vector1 is given in texture description
-#define CSTEX_V2 4  // vector2 is given in texture description
-#define CSTEX_UV_SHIFT 8 // explicit (u,v) <-> vertex mapping is given in texture description
+/**\name Texture transformation description
+ * @{ */
+/// UV is given
+#define CSTEX_UV 1  
+/// vector1 is given
+#define CSTEX_V1 2  
+/// vector2 is given
+#define CSTEX_V2 4  
+/// explicit (u,v) <-> vertex mapping is given
+#define CSTEX_UV_SHIFT 8 
+/** @} */
 
 SCF_VERSION (iSyntaxService, 1, 1, 3);
 
@@ -75,7 +86,7 @@ struct iSyntaxService : public iBase
    * <ul>
    * <li>vref: is the array containing vertices which can be referenced
    *     by indices in the description.
-   * <li>texspex: describes the data found for the texture transformation.
+   * <li>texspec: describes the data found for the texture transformation.
    *     It consists of or'ed CSTEX_.
    * <li>tx_orig, tx1, tx2, len: texture transformation is given by 3
    *     points describing a 3d space (third vector is implicitly given to
@@ -90,6 +101,7 @@ struct iSyntaxService : public iBase
    * <li>polyname: name of polygon to which this texture description belongs.
    *     This is used to make errormessages more verbose.
    * </ul>
+   * \sa #CSTEX_UV
    */
   virtual bool ParseTexture (csParser* parser, 
   			     char *buf, const csVector3* vref, uint &texspec,
@@ -221,7 +233,7 @@ struct iSyntaxService : public iBase
    * <ul>
    * <li>vref: is the array containing vertices which can be referenced
    *     by indices in the description.
-   * <li>texspex: describes the data found for the texture transformation.
+   * <li>texspec: describes the data found for the texture transformation.
    *     It consists of or'ed CSTEX_.
    * <li>tx_orig, tx1, tx2, len: texture transformation is given by 3
    *     points describing a 3d space (third vector is implicitly given to
@@ -236,6 +248,7 @@ struct iSyntaxService : public iBase
    * <li>polyname: name of polygon to which this texture description belongs.
    *     This is used to make errormessages more verbose.
    * </ul>
+   * \sa #CSTEX_UV
    */
   virtual bool ParseTextureMapping (iDocumentNode* node,
   			     const csVector3* vref, uint &texspec,
@@ -281,6 +294,8 @@ struct iSyntaxService : public iBase
    */
   virtual void ReportBadToken (iDocumentNode* badtokennode) = 0;
 };
+
+/** @} */
 
 #endif
 

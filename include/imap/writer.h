@@ -22,6 +22,10 @@
 
 #include "csutil/scf.h"
 
+/**\file
+ */
+/**\addtogroup loadsave	
+ * @{ */
 struct iFile;
 
 SCF_VERSION (iSaverPlugin, 0, 2, 0);
@@ -36,6 +40,8 @@ struct iSaverPlugin : public iBase
    */
   virtual void WriteDown (iBase* obj, iFile* file) = 0;
 };
+
+/** } */
 
 #endif
 

@@ -19,8 +19,12 @@
 #ifndef __IMAP_LDRCTXT_H__
 #define __IMAP_LDRCTXT_H__
 
+/**\file
+ */
 #include "csutil/scf.h"
 
+/**\addtogroup loadsave
+ * @{ */
 struct iMaterialWrapper;
 struct iMeshFactoryWrapper;
 struct iMeshWrapper;
@@ -55,6 +59,8 @@ struct iLoaderContext : public iBase
   /// Returns the parser used.
   virtual csParser* GetParser () = 0;
 };
+
+/** } */
 
 #endif
 

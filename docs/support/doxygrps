@@ -165,6 +165,22 @@
 	 * \defgroup engine3d_light Lighting
 	 */
  
+	/**
+	 * \defgroup engine3d_meshes Mesh support
+	 */
+ 
+	/**
+	 * \defgroup engine3d_textures Textures & Materials
+	 */
+ 
+	/**
+	 * \defgroup engine3d_views Views & Cameras
+	 */
+ 
+	/**
+	 * \defgroup engine3d_vis Visibility
+	 */
+	 
 /** @} */
  
 /**
@@ -177,6 +193,10 @@
  
 /**
  * \defgroup geom_utils Geometry utilities
+ */
+ 
+/**
+ * \defgroup loadsave Loading & Saving support
  */
  
 /**

@@ -21,6 +21,10 @@
 
 #include "csutil/scf.h"
 
+/**\file
+ */
+/**\addtogroup loadsave
+ * @{ */
 struct iLoaderContext;
 struct iDocumentNode;
 
@@ -39,6 +43,8 @@ struct iLoaderPlugin : public iBase
   virtual iBase* Parse (iDocumentNode* node, iLoaderContext* ldr_context,
   	iBase* context) = 0;
 };
+
+/** } */
 
 #endif
 

@@ -23,7 +23,7 @@
  */
 
 /**
- * \addtogroup engine3d
+ * \addtogroup engine3d_views
  * @{ */
 
 #include "csutil/scf.h"

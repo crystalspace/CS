@@ -23,7 +23,7 @@
 /**\file
  */
 /**
- * \addtogroup engine3d
+ * \addtogroup engine3d_light
  * @{ */
  
 #include "csutil/scf.h"
