@@ -576,7 +576,14 @@ struct iSCF : public iBase
    * no matter whenever it is statically or dynamically linked, from the
    * SCF registry.
    */
-  virtual bool UnregisterClass (char *iClassID) = 0;
+  virtual bool UnregisterClass (const char *iClassID) = 0;
+
+  /**
+   * Return the interface ID number that belongs to the given interface.
+   * If the interface is unknown, a new ID is allocated. This number can be
+   * used to quickly determine whether two interfaces are equal.
+   */
+  virtual uint32 GetInterfaceID (const char *iInterface) = 0;
 
   /**
    * This function should be called to finish working with SCF.

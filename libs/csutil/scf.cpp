@@ -26,6 +26,7 @@
 #include "csutil/csvector.h"
 #include "csutil/csobjvec.h"
 #include "csutil/cfgfile.h"
+#include "csutil/strset.h"
 
 /// This is the registry for all class factories
 static class scfClassRegistry *ClassRegistry = NULL;
@@ -42,44 +43,27 @@ class csSCF : public iSCF
 public:
   DECLARE_IBASE;
 
+  /// The global table of all known interface names
+  csStringSet InterfaceRegistry;
+
   /// constructor
   csSCF ();
   /// destructor
   virtual ~csSCF ();
 
-  /// Read config file
   virtual void RegisterConfigClassList (iConfigFile *cfg);
-
-  /// Wrapper for scfClassRegistered ()
   virtual bool ClassRegistered (const char *iClassID);
-
-  /// Wrapper for scfCreateInstance ()
   virtual void *CreateInstance (const char *iClassID,
     const char *iInterfaceID, int iVersion);
-
-  /// Wrapper for scfGetClassDescription ()
   virtual const char *GetClassDescription (const char *iClassID);
-
-  /// Wrapper for scfGetClassDependencies ()
   virtual const char *GetClassDependencies (const char *iClassID);
-
-  /// Wrapper for scfRegisterClass ()
   virtual bool RegisterClass (const char *iClassID,
     const char *iLibraryName, const char *Dependencies = NULL);
-
-  /// Wrapper for scfRegisterStaticClass ()
   virtual bool RegisterStaticClass (scfClassInfo *iClassInfo);
-
-  /// Wrapper for scfRegisterClassList ()
   virtual bool RegisterClassList (scfClassInfo *iClassInfo);
-
-  /// Wrapper for scfUnregisterClass ()
-  virtual bool UnregisterClass (char *iClassID);
-
-  /// Wrapper for scfUnloadUnusedModules
+  virtual bool UnregisterClass (const char *iClassID);
   virtual void UnloadUnusedModules ();
-
-  /// Wrapper for scfFinish ()
+  virtual uint32 GetInterfaceID (const char *iInterface);
   virtual void Finish ();
 };
 
@@ -524,7 +508,7 @@ bool csSCF::RegisterClassList (scfClassInfo *iClassInfo)
   return true;
 }
 
-bool csSCF::UnregisterClass (char *iClassID)
+bool csSCF::UnregisterClass (const char *iClassID)
 {
   // If we have no class registry, we aren't initialized (or were finalized)
   if (!ClassRegistry)
@@ -569,4 +553,9 @@ const char *csSCF::GetClassDependencies (const char *iClassID)
 bool csSCF::ClassRegistered (const char *iClassID)
 {
   return (ClassRegistry->FindKey (iClassID) >= 0);
+}
+
+uint32 csSCF::GetInterfaceID (const char *iInterface)
+{
+  return InterfaceRegistry.Request (iInterface);
 }
