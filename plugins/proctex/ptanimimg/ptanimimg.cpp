@@ -27,6 +27,10 @@
 #include "iengine/material.h"
 #include "iengine/texture.h"
 #include "imap/loader.h"
+#include "imap/services.h"
+#include "ivaria/reporter.h"
+#include "csgfx/xorpat.h"
+#include "csutil/csstring.h"
 
 #include "ptanimimg.h"
 
@@ -72,16 +76,35 @@ csPtr<iBase> csAnimateProctexLoader::Parse (iDocumentNode* node,
 {
   if (!node) return NULL;
 
-  csRef<iDocumentNode> file = node->GetNode ("file");
-  if (!file) return NULL;
-  if (!file->GetContentsValue()) return NULL;
-
   csRef<iLoader> LevelLoader = CS_QUERY_REGISTRY (object_reg, iLoader);
-  if (!LevelLoader) return NULL;
+  if (!LevelLoader) 
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, NULL, "No level loader");
+    return NULL;
+  }
 
-  csRef<iImage> img = LevelLoader->LoadImage (file->GetContentsValue (),
+  csRef<iDocumentNode> file = node->GetNode ("file");
+  if (!file) 
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, node, "No 'file' token");
+    return NULL;
+  }
+  const char* fname;
+  if (!(fname = file->GetContentsValue())) 
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, file, "Empty 'file' token");
+    return NULL;
+  }
+
+  csRef<iImage> img = LevelLoader->LoadImage (fname,
     CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA);
-  if (!img) return NULL;
+  if (!img) 
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING, file, 
+      "Couldn't load image '%s', using checkerboard instead",
+      fname);
+    img = csCreateXORPatternImage (64, 64, 6);
+  }
 
   csRef<csProcTexture> pt = csPtr<csProcTexture> (new csProcAnimated (img));
   if (pt->Initialize (object_reg))
@@ -93,6 +116,34 @@ csPtr<iBase> csAnimateProctexLoader::Parse (iDocumentNode* node,
   {
     return NULL;
   }
+}
+
+void csAnimateProctexLoader::Report (int severity, iDocumentNode* node,
+				     const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+
+  csString text;
+  text.FormatV (msg, arg);
+
+  csRef<iSyntaxService> synserv;
+
+  if (node)
+    synserv = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+
+  if (node && synserv)
+  {
+    synserv->Report ("crystalspace.proctex.loader.animimg",
+      severity, node, "%s", (const char*)text);
+  }
+  else
+  {
+    csReport (object_reg, severity, "crystalspace.proctex.loader.animimg",
+      "%s", (const char*)text);
+  }
+
+  va_end (arg);
 }
 
 //----------------------------------------------------------------------------
@@ -128,7 +179,7 @@ void csProcAnimated::Animate (csTicks current_time)
   
   if (first || animation)
   {
-    if (first || animation->Animate (last_time - current_time))
+    if (first || animation->Animate (current_time - last_time))
     {
       last_time = current_time;
       g3d->SetRenderTarget (tex->GetTextureHandle (), true);

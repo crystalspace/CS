@@ -34,6 +34,8 @@ class csAnimateProctexLoader : public iLoaderPlugin, iComponent
 {
 protected:
   csRef<iObjectRegistry> object_reg;
+
+  void Report (int severity, iDocumentNode* node, const char* msg, ...);
 public:
   SCF_DECLARE_IBASE;
 

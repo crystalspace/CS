@@ -119,6 +119,12 @@
         <texture name="flickernote">
             <file>/lib/stdtex/flicker-note1.png</file>
         </texture>
+	<proctex name="cube256">
+	    <type>crystalspace.proctex.loader.animimg</type>
+	    <params>
+		<file>/lib/stdtex/cube256.mng</file>
+	    </params>
+	</proctex>
     </textures>
     <settings>
         <fastmesh>10</fastmesh>
@@ -258,6 +264,9 @@
         <material name="plasma">
             <texture>plasma</texture>
         </material>
+	<material name="cube256">
+	    <texture>cube256</texture>
+	</material>
     </materials>
     <renderpriorities>
         <priority name="sky">
@@ -12328,6 +12337,31 @@
         </meshobj>
     </sector>
     <sector name="street1">
+        <meshobj name="spincube">
+            <plugin>thing</plugin>
+            <ztest />
+            <priority>alpha</priority>
+            <params>
+                <v x="-3.1" y="8" z="0" />
+                <v x="-3.1" y="8" z="-5" />
+                <v x="-3.1" y="3" z="-5" />
+                <v x="-3.1" y="3" z="0" />
+		<material>cube256</material>
+                <p name="eastB">
+                    <v>0</v>
+                    <v>1</v>
+                    <v>2</v>
+                    <v>3</v>
+		    <!--<mixmode><add /></mixmode>
+		    <lighting>no</lighting>-->
+                    <texmap>
+                        <uv idx="0" u="0" v="1" />
+                        <uv idx="1" u="1" v="1" />
+                        <uv idx="2" u="1" v="0" />
+                    </texmap>
+                </p>
+	    </params>
+	</meshobj>
         <meshobj name="walls">
             <plugin>thing</plugin>
             <zfill />
@@ -22859,7 +22893,6 @@
             <delay time="1000" />
             <fadefog sector="kamer2l" red="0" green="0" blue="1" density="0.02" duration="1000" />
             <delay time="1000" />
-            <!-- @@@ Circular reference!!! Causes leak -->
             <run sequence="fogloop" />
         </sequence>
         <sequence name="fog">
@@ -22900,7 +22933,7 @@
         </sequence>
         <sequence name="light_listener_on">
             <!--
-         *** This light is turned on when the ambient light in 
+         *** This light is turned on when the ambient light in
          *** street gets too dark.
           -->
             <setambient sector="corridor" red=".5" green=".5" blue=".75" />
@@ -22908,7 +22941,7 @@
         </sequence>
         <sequence name="light_listener_off">
             <!--
-         *** This light is turned off when the ambient light in 
+         *** This light is turned off when the ambient light in
          *** street gets bright again.
           -->
             <setambient sector="corridor" red="0" green="0" blue="0" />
@@ -23078,7 +23111,6 @@
 	    <delay time="10000" />
 	    <move mesh="floorplate" duration="10000" x="0" y="10" z="0" />
 	    <delay time="10000" />
-	    /* @@@ Circular reference!!! Causes leak */
 	    <run sequence="movebox" />
 	-->
         </sequence>
@@ -23153,7 +23185,6 @@
                 <v x="0" y="4" z="0" />
             </rotate>
             <delay time="6000" />
-            <!-- @@@ Circular reference!!! Causes leak -->
             <run sequence="openbox" />
         </sequence>
         <sequence name="handle1">

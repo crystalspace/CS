@@ -21,9 +21,11 @@
 
 #include "csgfx/csimage.h"
 #include "igraphic/imageio.h"
+#include "igraphic/animimg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/databuff.h"
+#include "iutil/virtclk.h"
 #include "csutil/csvector.h"
 #include "csutil/memfile.h"
 
@@ -75,7 +77,7 @@ class csJNGImageIO : public iImageIO
  * An csImageFile subclass for reading JNG files.<p>
  * This implementation needs libmng to read .JNG files.
  */
-class ImageJngFile : public csImageFile
+class ImageJngFile : public csImageFile, iAnimatedImage
 {
   friend class csJNGImageIO;
 private:
@@ -84,8 +86,13 @@ private:
   
   uint8 *NewImage;
   iObjectRegistry* object_reg;
+  csRef<iVirtualClock> vc;
 
-  bool ignoreTimer;
+  mng_handle handle; 
+  mng_uint32 timer;
+  csTicks time_elapsed, total_time_elapsed;
+  bool doWait;
+  csRect* dirtyrect;
 
   /// stream read callback for libmng
   static mng_bool MNG_DECL cb_readdata(mng_handle hHandle, mng_ptr pBuf,
@@ -105,10 +112,17 @@ private:
   static mng_bool MNG_DECL cb_settimer (mng_handle hHandle, mng_uint32 iMsecs);
 
   /// Initialize the image object
-  ImageJngFile (int iFormat, iObjectRegistry* p) : csImageFile (iFormat) 
-    { object_reg = p; };
+  ImageJngFile (int iFormat, iObjectRegistry* p);
+  /// Destroy stuff, shutdown libmng if not yet done
+  virtual ~ImageJngFile();
+
   /// Try to read the JNG file from the buffer and return success status
   bool Load (uint8* iBuffer, uint32 iSize);
+public:
+  SCF_DECLARE_IBASE_EXT (csImageFile);
+
+  virtual bool Animate (csTicks time, csRect* dirtyrect = NULL);
+  virtual bool IsAnimated ();
 };
 
 #endif // __CS_JNG_H__

@@ -47,6 +47,12 @@ struct iAnimatedImage : public iBase
    * \return Whether any image data has changed at all.
    */
   virtual bool Animate (csTicks time, csRect* dirtyrect = NULL) = 0;
+
+  /**
+   * Is this image really animated?
+   * E.g. returns false if an animation has just 1 frame.
+   */
+  virtual bool IsAnimated () = 0;
 };
 
 /** @} */

@@ -24,6 +24,7 @@
 #include "cssysdef.h"
 #include "csutil/scf.h"
 #include "cssys/sysfunc.h"
+#include "csgeom/csrect.h"
 #include "csgfx/rgbpixel.h"
 #include "csgfx/packrgb.h"
 #include "csutil/databuf.h"
@@ -66,7 +67,7 @@ SCF_IMPLEMENT_FACTORY (csJNGImageIO);
 
 SCF_EXPORT_CLASS_TABLE (csjngimg)
   SCF_EXPORT_CLASS (csJNGImageIO, "crystalspace.graphic.image.io.jng",
-		"CrystalSpace JNG image format I/O plugin")
+		"CrystalSpace JNG/MNG image format I/O plugin")
 SCF_EXPORT_CLASS_TABLE_END
 
 #define JNG_MIME "image/x-jng" 
@@ -726,6 +727,10 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image, const char *mime,
  * (http://www.libmng.com/MNGsuite) and see for yourself.
  */
 
+SCF_IMPLEMENT_IBASE_EXT (ImageJngFile)
+  SCF_IMPLEMENTS_INTERFACE (iAnimatedImage)
+SCF_IMPLEMENT_IBASE_EXT_END
+
 mng_bool ImageJngFile::cb_readdata (mng_handle hHandle, mng_ptr pBuf,
 					      mng_uint32 iBuflen, mng_uint32 *pRead)
 {
@@ -779,26 +784,52 @@ mng_bool ImageJngFile::cb_imagerefresh (mng_handle hHandle,
 					 mng_uint32 iX, mng_uint32 iY, 
 					 mng_uint32 iWidth, mng_uint32 iHeight)
 {
+  ImageJngFile *this_ = (ImageJngFile *)mng_get_userdata (hHandle);
+
+  if (this_->dirtyrect)
+  {
+    this_->dirtyrect->Join (csRect (iX, iY, iX+iWidth, iY+iHeight));
+  }
   return MNG_TRUE;
 }
 
 mng_uint32 ImageJngFile::cb_gettickcount (mng_handle hHandle)
 {
-  return csGetTicks();      
+  ImageJngFile *this_ = (ImageJngFile *)mng_get_userdata (hHandle);
+
+  return this_->total_time_elapsed;      
 }
 
 mng_bool ImageJngFile::cb_settimer (mng_handle hHandle, mng_uint32 iMsecs)
 {
   ImageJngFile *this_ = (ImageJngFile *)mng_get_userdata (hHandle);
 
-  this_->ignoreTimer = iMsecs > 1;
+  this_->timer = iMsecs;
 
   return MNG_TRUE;
 }
 
+ImageJngFile::ImageJngFile (int iFormat, iObjectRegistry* p) : 
+  csImageFile (iFormat)
+{ 
+  object_reg = p; 
+  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+
+  NewImage = NULL;
+  dirtyrect = NULL;
+  handle = 0;
+  time_elapsed = 0;
+  total_time_elapsed = 0;
+}
+
+ImageJngFile::~ImageJngFile ()
+{
+  if (handle) mng_cleanup (&handle);
+  delete[] NewImage; 
+}
+
 bool ImageJngFile::Load (uint8 *iBuffer, uint32 iSize)
 {
-  NewImage = NULL;
   mng_retcode retcode;
 
   const int magicSize = 8;
@@ -814,8 +845,8 @@ bool ImageJngFile::Load (uint8 *iBuffer, uint32 iSize)
     return false;
   }
 
-  mng_handle handle = mng_initialize (mng_ptr(this), cb_alloc, 
-                                      cb_free, MNG_NULL);
+  handle = mng_initialize (mng_ptr(this), cb_alloc, 
+                           cb_free, MNG_NULL);
   if (!handle)
   {
     Report (object_reg, CS_REPORTER_SEVERITY_WARNING,
@@ -861,9 +892,9 @@ bool ImageJngFile::Load (uint8 *iBuffer, uint32 iSize)
   // Even on still images, libmng issues timer requests.
   // so, as long as the requests are 'immediate' we continue
   // displaying. If a delay is requested we end loading.
-  ignoreTimer = false;
+  timer = 2;
   retcode = mng_display (handle);
-  while ((retcode == MNG_NEEDTIMERWAIT) && !ignoreTimer)
+  while ((retcode == MNG_NEEDTIMERWAIT) && (timer <= 1))
   {
     retcode = mng_display_resume (handle);
   }
@@ -873,16 +904,57 @@ bool ImageJngFile::Load (uint8 *iBuffer, uint32 iSize)
     mng_cleanup (&handle);
     return false;
   }
+  doWait = (retcode == MNG_NEEDTIMERWAIT);
 
   if (NewImage)
   {
     csRGBpixel *rgbImage = csCopyUnpackRGBAtoRGBpixel (NewImage, Width*Height);
-    delete[] NewImage;
     convert_rgba (rgbImage);
     CheckAlpha();
   }
 
-  mng_cleanup (&handle);
+  if (mng_get_sigtype (handle) != mng_it_mng)
+  {
+    delete[] NewImage; NewImage = NULL;
+    mng_cleanup (&handle);
+    handle = 0;
+  }
 
   return true;
 }
+
+bool ImageJngFile::Animate (csTicks time, csRect* dirtyrect)
+{
+  if (dirtyrect) dirtyrect->MakeEmpty ();
+  if (!handle) return false;
+
+  if (!doWait) return false;
+
+  ImageJngFile::dirtyrect = dirtyrect;
+
+  bool updated = false;
+  total_time_elapsed += time;
+  time_elapsed += time;
+  while (doWait && (timer <= time_elapsed))
+  {
+    time_elapsed -= timer;
+    doWait = (mng_display_resume (handle) == MNG_NEEDTIMERWAIT);
+    updated = true;
+  }
+
+  if (updated)
+  {
+    csRGBpixel *rgbImage = csCopyUnpackRGBAtoRGBpixel (NewImage, Width*Height);
+    convert_rgba (rgbImage);
+    CheckAlpha();
+  }
+
+  return updated;
+}
+
+bool ImageJngFile::IsAnimated ()
+{
+  return ((mng_get_sigtype (handle) == mng_it_mng)
+    && (mng_get_framecount (handle) > 1)); 
+}
+
