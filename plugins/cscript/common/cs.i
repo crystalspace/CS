@@ -32,6 +32,7 @@
 
 #include "isys/system.h"
 #include "iengine/camera.h"
+#include "iengine/campos.h"
 #include "imesh/object.h"
 #include "iengine/thing.h"
 #include "csparser/csloader.h"
@@ -182,8 +183,6 @@ struct iMeshWrapper : public iBase
 
 struct iPolygon3D : public iBase
 {
-  const char *GetName () const;
-  void SetName (const char *iName);
   iLightMap *GetLightMap ();
   iMaterialHandle *GetMaterialHandle ();
   void SetMaterial (iMaterialWrapper* material);
@@ -258,6 +257,10 @@ struct iPolygonTexture : public iBase
   void SetCacheData (int idx, void *d);
 };
 
+struct iCameraPosition : public iBase
+{
+};
+
 struct iEngine : public iPlugIn
 {
   virtual int GetTextureFormat () = 0;
@@ -266,7 +269,7 @@ struct iEngine : public iPlugIn
   virtual void DeleteAll () = 0;
   virtual iTextureWrapper* CreateTexture (const char *iName, const char *iFileName, 
     csColor *iTransp, int iFlags) = 0;
-  virtual bool CreateCamera (const char *iName, const char *iSector,
+  virtual iCameraPosition* CreateCameraPosition (const char *iName, const char *iSector,
     const csVector3 &iPos, const csVector3 &iForward,
     const csVector3 &iUpward) = 0;
   virtual bool CreateKey (const char *iName, const char *iValue) = 0;

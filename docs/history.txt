@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+29-Apr-2001
+	- Fixed the python plugin again.
 28-Apr-2001
 	- Removed a type->DecRef() in engine.cpp. The mesh object type
 	  plugins can remain in memory. This DecRef() caused crashes
