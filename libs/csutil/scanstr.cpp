@@ -121,7 +121,7 @@ int ScanStr (char* in, char* format, ...)
 	  }
 	  else
 	  {
-	    char* in2 = in + strspn (in, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789");
+	    char* in2 = in + strspn (in, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789.");
 	    strncpy (a, in, (int)(in2-in));
 	    a[(int)(in2-in)] = 0;
 	    in = in2;
