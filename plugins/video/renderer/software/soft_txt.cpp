@@ -236,13 +236,17 @@ void csTextureMMSoftware::remap_palette_global (csTextureManagerSoftware* new_pa
   ifile->GetSize (size);
   last = dest + size;
 
+  i=0;
   for (; dest < last; dest++, src++)
-  {
-    for (i = 0 ; i < num_col ; i++)
-      if (*src == get_usage(i))
-        break;
-    *dest = trans[i];
-  }
+    *dest = trans[usage->get_palInd()[i++]];
+
+  //for (; dest < last; dest++, src++)
+  //{
+    //for (i = 0 ; i < num_col ; i++)
+      //if (*src == get_usage(i))
+        //break;
+    //*dest = trans[i];
+  //}
 
   CHK (delete [] trans);
 }

@@ -35,8 +35,10 @@ private:
    */
   void calc_table(const RGBPixel* buf, long size);
 
-  ///
-  int num_colors;
+  /// palInd holds the pointer to an index table, each entry in the table 
+  /// contains the index into color_table of that particular pixel. This 
+  /// speeds up the palette con
+  int num_colors, *palInd;
   ///
   RGBPalEntry* color_table;
 
@@ -59,6 +61,8 @@ public:
    * colors first.
    */
   const RGBPalEntry* get_color_table () const { return color_table; }
+
+  const int* get_palInd () const { return palInd; }
 
   /// Returns the number of colors in the image.
   int get_num_colors() const { return num_colors; }

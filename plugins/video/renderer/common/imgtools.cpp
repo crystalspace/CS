@@ -23,6 +23,7 @@
 #include "sysdef.h"
 #include "cs3d/common/imgtools.h"
 #include "csutil/csvector.h"
+static FILE *fp = fopen("error.txt", "w+t");
 
 //---------------------------------------------------------------------------
 
@@ -37,6 +38,7 @@
 struct RGBHash : public RGBPixel
 {
   int count;
+  int palIndex;
   RGBHash* next;
 
   inline static int index(const RGBPixel& c)
@@ -73,12 +75,20 @@ void ImageColorInfo::calc_table(const RGBPixel* buf, long size)
   RGBHash** hash; // hash table for color values
   color_table = NULL;  num_colors = 0;
 
+
+  // allocate the palette entry table for the image
+  palInd = new int [size];
+  // initialize to the first entry in color table
+  for (long k = 0; k < size; k++)
+    palInd[k] = 0;
+
   // create a hash table
   CHK (hash = new RGBHash* [HASH_SIZE]);
   if (!hash) return;
 
   int i;
   long j;
+
   for (i = 0 ; i < HASH_SIZE ; i++) hash[i] = NULL;
 
   const RGBPixel* p = buf;
@@ -100,33 +110,55 @@ void ImageColorInfo::calc_table(const RGBPixel* buf, long size)
     p++;
   } /* for (j) */
 
-  // now create the color table, cleaning up the hash in the process
+  // now create the color table
   CHK (color_table = new RGBPalEntry[num_colors]);
-  for (i = 0, j = 0; i < HASH_SIZE; i++)
-    while (hash[i])
+  for (i = 0, j = 0; i < HASH_SIZE; i++) {
+    RGBHash* h = hash[i];
+    while (h)
      // in theory, both conditions are always true, but we'll check anyways
      if (j <= num_colors && color_table) 
      {
-      RGBHash* h = hash[i];
       color_table[j].red = h->red;
       color_table[j].green = h->green;
       color_table[j].blue = h->blue;
       color_table[j].count = h->count;
+      h->palIndex = j;
       j++;
       h = h->next;
+     }
+  }
+
+  // build the palette entry table for the image
+  p = buf;
+  for (j = 0; j < size; j++)
+  {
+    int idx = RGBHash::index(*p);
+    RGBHash* h = hash[idx];
+    while (h && *h != *p )
+      h = h->next;
+    /// h is supposed to not NULL, but check it anyway
+    if (h)
+      palInd[j] =  h->palIndex ;
+    p++;
+  }
+
+  // delete the hash entry
+  for (i = 0; i < HASH_SIZE; i++)
+    while (hash[i]) {
+      RGBHash* h = hash[i]->next;
       CHK (delete hash[i]);
       hash[i] = h;
-     }
+    }
 
-  // free the hash table that was created
+      // free the hash table that was created
   CHK (delete [] hash);
 
-  qsort (color_table, num_colors, sizeof(RGBPalEntry), RGBPal_cmp);
 }
 
 ImageColorInfo::~ImageColorInfo()
 {
   if (color_table) CHKB( delete[] color_table );
+  if (palInd) CHKB( delete[] palInd );
 }
 
 //---------------------------------------------------------------------------
