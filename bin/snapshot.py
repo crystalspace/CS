@@ -71,6 +71,7 @@ keepsnaps = 4
 #------------------------------------------------------------------------------
 class Snapshot:
     def __init__(self):
+        template = packprefix + "????-??-??.*"
         self.packbase = packprefix + time.strftime(
             "%Y-%m-%d.%H%M%S", time.gmtime(time.time()))
         self.workdir = os.path.join(snapdir, "transient")
@@ -81,10 +82,11 @@ class Snapshot:
         self.logfile = None
         self.packext = ".tgz"
         self.packname = self.packbase + self.packext
-        self.packtemplate = packprefix + "????-??-??.*" + self.packext
+        self.packtemplate = template + self.packext
         self.packlinkname = packprefix + "current-snapshot" + self.packext
         self.diffext = ".diff.gz"
         self.diffname = self.packbase + self.diffext
+        self.difftemplate = template + self.diffext
         self.difflinkname = packprefix + "current-snapshot" + self.diffext
 
     def log(self, msg):
@@ -183,7 +185,7 @@ class Snapshot:
 
     def purgeold(self):
         self.purge(os.path.join(self.logdir, packprefix + "*" + self.logext))
-        self.purge(os.path.join(snapdir, packprefix + "*" + self.diffext))
+        self.purge(os.path.join(snapdir, self.difftemplate))
         self.purge(os.path.join(snapdir, self.packtemplate))
 
     def purgetransient(self):
