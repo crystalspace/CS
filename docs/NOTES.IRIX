@@ -1,0 +1,17 @@
+For full installation instructions consult INSTALL.Unix
+
+Here are a few notes on installing Crystal Space on SGI/IRIX:
+
+ - there still may be a problem with redefinition of BOOL.  As a quick
+     fix, change definition of BOOL from unsigned long to unsinged
+     char.
+
+ - don't forget to change USE_MESA=0 in mk/user.mak, in order to take
+   advantage of hardware OpenGL acceleration.
+
+ - don't forget to set DRIVER to opengl in cryst.cfg
+
+
+Enjoy!
+
+mail comments to dmitryd@linuxfreak.com

@@ -26,9 +26,10 @@ esac
 
 # If MACHINE is contains 'sun' then set it to CPU so that
 # the processor is correctly catched
+# IP30 came up on an IRIX machine (Dmitry)
 case $MACHINE in
-  *sun*)	MACHINE=$CPU
-  ;;
+  *sun*)	MACHINE=$CPU  ;;
+  *IP30*)	MACHINE=$CPU  ;;
 esac
 
 # Now check processor type: add more checks here as needed
@@ -36,6 +37,7 @@ case $MACHINE in
   *ppc*)	echo "PROC = POWERPC" ;;
   *i[3-9]86*)	echo "PROC = INTEL" ;;
   *sparc*)	echo "PROC = SPARC" ;;
+  *mips*)	echo "PROC = MIPS" ;;
   *)		echo "UNKNOWN MACHINE TYPE: Please fix $0!" >&2
 		exit 1
 esac
@@ -85,9 +87,11 @@ fi
 rm -f conftest.asm conftest.o
 
 # Look where is X11 directory
+# lib/ or include/ ? (Dmitry)
 ([ -d /usr/X11 ] && echo "X11_PATH = /usr/X11") || \
 ([ -d /usr/X11R6 ] && echo "X11_PATH = /usr/X11R6") || \
 ([ -d /usr/openwin ] && echo "X11_PATH = /usr/openwin") || \
+([ -d /usr/lib/X11 ] && echo "X11_PATH = /usr/lib/X11") || \
 (echo "$0: Cannot find X11 directory!" >&2 && exit 1)
 
 exit $?

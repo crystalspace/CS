@@ -11,6 +11,8 @@
 #  define OS_VERSION "Solaris"
 #elif defined(OS_LINUX)
 #  define OS_VERSION "Linux"
+#elif defined(OS_IRIX)
+#  define OS_VERSION "IRIX"
 #elif defined(OS_BSD)
 #  define OS_VERSION "BSD"
 #elif defined(OS_IRIX)
@@ -41,6 +43,8 @@
 #  define PR_VERSION "Intel"
 #elif defined(PROC_SPARC)
 #  define PR_VERSION "SPARC"
+#elif defined(PROC_MIPS)
+#  define PR_VERSION "MIPS"
 #elif defined(PROC_POWERPC)
 #  define PR_VERSION "PowerPC"
 #elif defined(PROC_M68K)

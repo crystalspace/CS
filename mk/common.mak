@@ -16,6 +16,7 @@ SPACE=$(EMPTY) $(EMPTY)
 # Friendly names for building environments
 DESCRIPTION.linux	= Linux
 DESCRIPTION.solaris	= Solaris
+DESCRIPTION.irix   	= IRIX
 DESCRIPTION.freebsd	= FreeBSD
 DESCRIPTION.beos	= BeOS
 DESCRIPTION.os2gcc	= OS/2 with GCC/EMX

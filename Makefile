@@ -6,7 +6,7 @@
 
 .PHONY: help all doc api depend clean cleanlib cleandep libs \
 	drivers drivers2d drivers3d snddrivers netdrivers \
-	linux solaris beos os2gcc os2wcc djgpp freebsd nextstep openstep \
+	linux solaris irix beos os2gcc os2wcc djgpp freebsd nextstep openstep \
 	rhapsody amiga
 
 # The default values for configuration variables
@@ -40,6 +40,7 @@ ifeq ($(PROC),invalid)
 	@echo $"Before anything else, you should configure the makefile system as follows:$"
 	@echo $"  make linux        Prepare for building under and for Linux$"
 	@echo $"  make solaris      Prepare for building under and for Solaris$"
+	@echo $"  make irix         Prepare for building under and for IRIX$"
 	@echo $"  make freebsd      Prepare for building under and for FreeBSD$"
 	@echo $"  make beos         Prepare for building under and for BeOS$"
 	@echo $"  make os2gcc       Prepare for building under and for OS/2 using GCC$"
@@ -54,7 +55,7 @@ ifeq ($(PROC),invalid)
 else
 	@echo $"  Configured for $(DESCRIPTION.$(TARGET)) with the following modifiers:$"
 	@echo $"  USE_DLL=$(USE_DLL) MODE=$(MODE) $(SYSMODIFIERS)$"
-	@echo $"  Other platforms are: linux, solaris, freebsd, beos, os2gcc, os2wcc, djgpp,$"
+	@echo $"  Other platforms are: linux, solaris, irix, freebsd, beos, os2gcc, os2wcc, djgpp,$"
 	@echo $"  nextstep, openstep, rhapsody, amiga or win32vc with the following modifiers:$"
 endif
 	@echo $"  USE_DLL=yes$|no    Build dynamic/static modules (drivers, plugins)$"
@@ -98,7 +99,7 @@ endif
 # WARNING: Try to avoid quotes in most important "echo" statements
 # since several systems (OS/2, DOS and WIN32) have a "echo" that does
 # literal output, i.e. they do not strip quotes from string.
-linux solaris beos os2gcc os2wcc djgpp freebsd nextstep openstep rhapsody \
+linux solaris irix beos os2gcc os2wcc djgpp freebsd nextstep openstep rhapsody \
 amiga unknown win32vc:
 	@echo TARGET = $@>config.mak
 	@echo SYSMAKEFILE = mk/system/$@.mak>>config.mak
