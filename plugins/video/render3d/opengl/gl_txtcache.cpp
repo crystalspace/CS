@@ -78,11 +78,10 @@ void csGLTextureCache::Unload (csTxtCacheData *d)
 
 //----------------------------------------------------------------------------//
 
-csGLTextureCache::csGLTextureCache (int max_size, csGLGraphics3D* G3D)
+csGLTextureCache::csGLTextureCache (csGLGraphics3D* G3D)
 {
   SCF_CONSTRUCT_IBASE(0);
   rstate_bilinearmap = 2;
-  cache_size = max_size;
   num = 0;
   head = tail = 0;
   total_size = 0;
@@ -101,43 +100,10 @@ void csGLTextureCache::Cache (iTextureHandle *txt_handle)
   csTxtCacheData *cached_texture = (csTxtCacheData *)
     txt_handle->GetCacheData ();
 
-  if (cached_texture)
-  {
-    // move unit to front (MRU)
-    if (cached_texture != head)
-    {
-      if (cached_texture->prev)
-        cached_texture->prev->next = cached_texture->next;
-      else
-        head = cached_texture->next;
-      if (cached_texture->next)
-        cached_texture->next->prev = cached_texture->prev;
-      else
-        tail = cached_texture->prev;
-
-      cached_texture->prev = 0;
-      cached_texture->next = head;
-      if (head)
-        head->prev = cached_texture;
-      else
-        tail = cached_texture;
-      head = cached_texture;
-    }
-  }
-  else
+  if (!cached_texture)
   {
     csGLTextureHandle *txt_mm = (csGLTextureHandle *)
       txt_handle->GetPrivateObject ();
-
-    // unit is not in memory. load it into the cache
-#if 0
-    while (total_size + txt_mm->size >= cache_size)
-    {
-      // out of memory. remove units from bottom of list.
-      Unload (tail);
-    printf ("XXX\n"); fflush (stdout);
-    }
-#endif
 
     // now load the unit.
     num++;

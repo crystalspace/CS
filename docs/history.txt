@@ -25,6 +25,8 @@ chronological order.
 	  of the memory. The other renderers do nothing with this flag.
 	- Jorrit changed engine->PrecacheDraw() to also call PrecacheTexture()
 	  for all textures.
+	- Jorrit simplified the code of the NR OpenGL texture cache a bit now
+	  that it is no longer a cache.
 29-Sep-2004
 	- Rhad changed csMutexes in the windows software driver to
 	  critical sections.  Per MMsystem documentation, critical sections

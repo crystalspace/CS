@@ -72,17 +72,14 @@ protected:
   /// the head and tail of the cache data
   csTxtCacheData *head, *tail;
 
-  /// the maximum size of the cache
-  long cache_size;
   /// number of items
   int num;
   /// Total size of all loaded textures
   long total_size;
+
 public:
   SCF_DECLARE_IBASE;
-  /// Takes the maximum size of the cache.
-  csGLTextureCache (int max_size, csGLGraphics3D* G3D);
-  ///
+  csGLTextureCache (csGLGraphics3D* G3D);
   virtual ~csGLTextureCache ();
 
   /// Make sure this texture is active in OpenGL.
