@@ -55,13 +55,13 @@ class awsMultiLineEdit : public awsComponent
       }
       return d;
     }
-    static int Compare (void const* Item1, void* Item2)
+    static int Compare (mlEvent const* Item1, mlEvent const* Item2)
     {
-      return DoCompare (&((mlEvent*)Item1)->e, &((mlEvent*)Item2)->e);
+      return DoCompare (&Item1->e, &Item2->e);
     }
-    static int CompareKey (void const* Item, void* Key)
+    static int CompareKey (mlEvent const* Item, void* Key)
     {
-      return DoCompare (&((mlEvent*)Item)->e, (csEvent*)Key);
+      return DoCompare (&Item->e, (csEvent*)Key);
     }
     
     bool Add (const csEvent &e, void (awsMultiLineEdit::*ring)())

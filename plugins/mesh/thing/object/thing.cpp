@@ -2671,21 +2671,15 @@ void csThingObjectType::Clear ()
 
 #ifdef COMBINE_LIGHTMAPS
 
-static int CompareSuperLM (void const* item1, void* item2)
+static int CompareSuperLM (SuperLM* const& slm1, SuperLM* const& slm2)
 {
-  SuperLM* slm1 = (SuperLM*)item1;
-  SuperLM* slm2 = (SuperLM*)item2;
-
   int d = slm2->freeLumels - slm1->freeLumels;
   if (d != 0) return d;
-  return ((uint8*)item2 - (uint8*)item1);
+  return ((uint8*)slm2 - (uint8*)slm1);
 }
 
-static int ComparePolys (void const* item1, void* item2)
+static int ComparePolys (csPolygon3D* const& poly1, csPolygon3D* const& poly2)
 {
-  csPolygon3D* poly1 = (csPolygon3D*)item1;
-  csPolygon3D* poly2 = (csPolygon3D*)item2;
-
   csLightMap* lm1 = poly1->GetPolyTexture ()->GetCSLightMap ();
   csLightMap* lm2 = poly2->GetPolyTexture ()->GetCSLightMap ();
 

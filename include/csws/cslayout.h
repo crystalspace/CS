@@ -59,11 +59,10 @@ class csConstraintVector : public csPDelArray<csLayoutConstraint>
 {
 public:
   /// look up an constraint given a components
-  static int CompareKey (void const* Item1, void* Item2)
+  static int CompareKey (csLayoutConstraint const* Item1, void* Item2)
   {
-    csLayoutConstraint *c1 = (csLayoutConstraint *)Item1;
     csComponent *c2 = (csComponent *)Item2;
-    return (c1->comp < c2 ? -1 : c1->comp > c2 ? 1 : 0);
+    return (Item1->comp < c2 ? -1 : Item1->comp > c2 ? 1 : 0);
   }
 };
 

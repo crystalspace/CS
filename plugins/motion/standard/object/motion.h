@@ -46,7 +46,7 @@ public:
 
   csMotionBone():name(0), hash(0), frames(0), framecount(0) {}
 
-  unsigned int GetHash() { return hash; }
+  unsigned int GetHash() const { return hash; }
   char* GetName() { return name; }
 
   void SelectFrameForTime(float time,float duration, float *weight, int *curframe, int *nextframe);
@@ -73,7 +73,7 @@ public:
   virtual ~csMotionTemplate();
 
   void SetName (const char* name);
-  unsigned int GetHash() { return hash; }
+  unsigned int GetHash() const { return hash; }
 
   virtual const char* GetName ();
   virtual const float GetDuration() {return duration;};
@@ -144,7 +144,7 @@ public:
   csMotionController(iSkeletonBone* Tskel);
   virtual ~csMotionController();
 
-  iSkeletonBone* GetSkeleton() { return skel; }
+  iSkeletonBone* GetSkeleton() const { return skel; }
   void Update(float timedelta);
   void RecalculateBoneCache();
   bool AddToBoneCache(unsigned int hash, int stack, int bone);

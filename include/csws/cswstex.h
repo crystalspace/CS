@@ -80,7 +80,7 @@ public:
   /// Define texture name
   void SetName (const char *iName);
   /// Get texture name
-  const char *GetName ()
+  const char *GetName () const
   { return Name; }
   /// CSWS uses its own reference counting system.
   iTextureHandle *GetHandle ()
@@ -117,7 +117,7 @@ public:
   /// Initialize the texture vector
   csWSTexVector ();
   /// Compare texture with name; used in FindKey ()
-  static int CompareKey (void const* Item, void* Key);
+  static int CompareKey (csWSTexture const* Item, void* Key);
   /// Find a texture by name
   csWSTexture *FindTexture (const char *name)
   {

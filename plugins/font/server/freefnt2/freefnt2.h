@@ -61,13 +61,13 @@ class csFreeType2Font : public iFont
   class csFontDefVector : public csPDelArray<GlyphSet>
   {
   public:
-    static int Compare (void const* Item1, void* Item2)
+    static int Compare (GlyphSet const* Item1, GlyphSet const* Item2)
     {
-      int id1 = ((GlyphSet*)Item1)->size, id2 = ((GlyphSet*)Item2)->size;
+      int id1 = Item1->size, id2 = Item2->size;
       return id1 - id2;
     }
-    static int CompareKey (void const* Item1, void* Key)
-    { int id1 = ((GlyphSet*)Item1)->size; return id1 - (int)Key; }
+    static int CompareKey (GlyphSet const* Item1, void* Key)
+    { int id1 = Item1->size; return id1 - (int)Key; }
   } cache;
 
   GlyphSet *FindGlyphSet (int size)
@@ -185,9 +185,9 @@ class csFreeType2Server : public iFontServer
   class csFontVector : public csRefArray<csFreeType2Font>
   {
   public:
-    static int Compare (void const* Item1, void* Item2)
-    { return strcmp (((csFreeType2Font *)Item1)->name,
-                     ((csFreeType2Font *)Item2)->name); }
+    static int Compare (csFreeType2Font const* Item1,
+    	csFreeType2Font const* Item2)
+    { return strcmp (Item1->name, Item2->name); }
     static int CompareKey (csFreeType2Font* Item1, void* Key)
     {
       // compare the font names

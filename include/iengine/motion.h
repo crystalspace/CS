@@ -85,7 +85,7 @@ SCF_VERSION (iMotionController, 0, 10, 0);
 struct iMotionController : public iBase
 {
   /// Return the Skeleton I control
-  virtual iSkeletonBone* GetSkeleton() = 0;
+  virtual iSkeletonBone* GetSkeleton() const = 0;
   /// Set the motion stack to just this motion
   virtual void SetMotion(iMotionTemplate *motion) = 0;
   /// Blend another motion on the motion stack

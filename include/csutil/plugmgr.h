@@ -65,9 +65,9 @@ private:
     csPluginsVector (int iLimit, int iDelta)
     	: csPDelArray<csPlugin> (iLimit, iDelta) {}
     /// Find a plugin by its address
-    static int CompareAddress (void const* Item, void* Key)
+    static int CompareAddress (csPlugin const* Item, void* Key)
     {
-      return ((csPlugin *)Item)->Plugin == Key ? 0 : 1;
+      return Item->Plugin == Key ? 0 : 1;
     }
   };
 

@@ -22,12 +22,6 @@
 
 #include "csutil/ref.h"
 
-/// This function prototype is used for csPDelArray::Sort()
-typedef int csPDelArraySortCompareFunction (void const* item1,
-	void const* item2);
-/// This function prototype is used for csPDelArray::InsertSorted()
-typedef int csPDelArrayCompareFunction (void const* item1, void* item2);
-
 /**
  * An array of pointers. No ref counting is done on the elements in this
  * array. Use csRefArray if you want ref counting to happen.
@@ -43,6 +37,14 @@ private:
   T** root;
 
 public:
+  /// This function prototype is used for csPDelArray::Sort()
+  typedef int ArraySortCompareFunction (void const* item1,
+	void const* item2);
+  /// This function prototype is used for csPDelArray::InsertSorted()
+  typedef int ArrayCompareFunction (T const* item1, T const* item2);
+  /// This function prototype is used for csPDelArray::FindKey()
+  typedef int ArrayCompareKeyFunction (T const* item1, void* item2);
+
   /**
    * Initialize object to hold initially 'ilimit' elements, and increase
    * storage by 'ithreshold' each time the upper bound is exceeded.
@@ -290,7 +292,7 @@ public:
   /**
    * Find an element based on some key.
    */
-  int FindKey (void* key, csPDelArrayCompareFunction* comparekey) const
+  int FindKey (void* key, ArrayCompareKeyFunction* comparekey) const
   {
     int i;
     for (i = 0 ; i < Length () ; i++)
@@ -303,7 +305,7 @@ public:
    * Find an element based on some key.
    * Assumes array is sorted.
    */
-  int FindSortedKey (void* key, csPDelArrayCompareFunction* comparekey) const
+  int FindSortedKey (void* key, ArrayCompareKeyFunction* comparekey) const
   {
     int l = 0, r = Length () - 1;
     while (l <= r)
@@ -328,7 +330,7 @@ public:
    * to the index of a duplicate item (if found). If no such
    * duplicate item exists it will be set to -1.
    */
-  int InsertSorted (T* item, csPDelArrayCompareFunction* compare,
+  int InsertSorted (T* item, ArrayCompareFunction* compare,
 	int* equal_index = 0)
   {
     int m = 0, l = 0, r = Length () - 1;
@@ -358,7 +360,7 @@ public:
   /**
    * Sort array.
    */
-  void Sort (csPDelArraySortCompareFunction* compare)
+  void Sort (ArraySortCompareFunction* compare)
   {
     qsort (root, Length (), sizeof (T*), compare);
   }

@@ -84,11 +84,10 @@ private:
   {
   public:
     ArchiveEntryVector () : csPDelArray<ArchiveEntry> (256, 256) {}
-    static int Compare (void const* Item1, void* Item2)
-    { return strcmp (((ArchiveEntry *)Item1)->filename,
-	((ArchiveEntry *)Item2)->filename); }
-    static int CompareKey (void const* Item, void* Key)
-    { return strcmp (((ArchiveEntry *)Item)->filename, (char *)Key); }
+    static int Compare (ArchiveEntry const* Item1, ArchiveEntry const* Item2)
+    { return strcmp (Item1->filename, Item2->filename); }
+    static int CompareKey (ArchiveEntry const* Item, void* Key)
+    { return strcmp (Item->filename, (char *)Key); }
   };
 
   ArchiveEntryVector dir;	// Archive directory: chain head (sorted)

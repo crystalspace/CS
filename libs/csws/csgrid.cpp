@@ -167,17 +167,15 @@ void csSparseGrid::csGridRow::SetAt (int col, void* data)
       Delete (key);
 }
 
-int csSparseGrid::csGridRow::Compare (void const* Item1, void* Item2)
+int csSparseGrid::csGridRow::Compare (csGridRowEntry const* Item1,
+	csGridRowEntry const* Item2)
 {
-  csSparseGrid::csGridRowEntry *e1 = (csSparseGrid::csGridRowEntry*)Item1;
-  csSparseGrid::csGridRowEntry *e2 = (csSparseGrid::csGridRowEntry*)Item2;
-  return (e1->col < e2->col ? -1 : e1->col > e2->col ? 1 : 0);
+  return (Item1->col < Item2->col ? -1 : Item1->col > Item2->col ? 1 : 0);
 }
 
-int csSparseGrid::csGridRow::CompareKey (void const* Item1, void* Key)
+int csSparseGrid::csGridRow::CompareKey (csGridRowEntry const* Item1, void* Key)
 {
-  csSparseGrid::csGridRowEntry *e1 = (csSparseGrid::csGridRowEntry*)Item1;
-  return (e1->col < (int)Key ? -1 : e1->col > (int)Key ? 1 : 0);
+  return (Item1->col < (int)Key ? -1 : Item1->col > (int)Key ? 1 : 0);
 }
 
 /******************************************************************************

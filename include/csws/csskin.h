@@ -82,10 +82,10 @@ public:
   virtual ~csSkin () { }
 
   /// Compare a item from this array with some key
-  static int CompareKey (void const* Item, void* Key);
+  static int CompareKey (csSkinSlice const* Item, void* Key);
 
   /// Compare two items from this array
-  static int Compare (void const* Item1, void* Item2);
+  static int Compare (csSkinSlice const* Item1, csSkinSlice const* Item2);
 
   /// Apply this skin to some component and all components inserted into it
   void Apply (csComponent *iComp);
@@ -163,7 +163,7 @@ public:
   virtual void Deinitialize () {}
 
   /// Get the identifier of the component this skin slice is for
-  virtual const char *GetName () = 0;
+  virtual const char *GetName () const = 0;
 
   /// Initialize the object we are responsible for: called once we set the skin
   virtual void Apply (csComponent &This);
@@ -193,7 +193,7 @@ class csButtonSkin : public csSkinSlice
 {
 public:
   /// Get the identifier of the component this skin slice is for
-  virtual const char *GetName ()
+  virtual const char *GetName () const
   { return "Button"; }
 
   /// Suggest the optimal size of the button, given an already filled object
@@ -209,7 +209,7 @@ class csWindowSkin : public csSkinSlice
 {
 public:
   /// Get the identifier of the component this skin slice is for
-  virtual const char *GetName ()
+  virtual const char *GetName () const
   { return "Window"; }
 
   /// Create a button for window's titlebar
@@ -234,7 +234,7 @@ class csDialogSkin : public csSkinSlice
 {
 public:
   /// Get the identifier of the component this skin slice is for
-  virtual const char *GetName ()
+  virtual const char *GetName () const
   { return "Dialog"; }
 
   /// Set dialog border width and height depending on frame style
@@ -250,7 +250,7 @@ class csTitlebarSkin : public csSkinSlice
 {
 public:
   /// Get the identifier of the component this skin slice is for
-  virtual const char *GetName ()
+  virtual const char *GetName () const
   { return "Titlebar"; }
 };
 
@@ -263,7 +263,7 @@ class csListBoxSkin : public csSkinSlice
 {
 public:
   /// Get the identifier of the component this skin slice is for
-  virtual const char *GetName ()
+  virtual const char *GetName () const
   { return "Listbox"; }
 
   /// Suggest the optimal size of the button, given an already filled object
@@ -279,7 +279,7 @@ class csListBoxItemSkin : public csSkinSlice
 {
 public:
   /// Get the identifier of the component this skin slice is for
-  virtual const char *GetName ()
+  virtual const char *GetName () const
   { return "ListboxItem"; }
 };
 
@@ -293,7 +293,7 @@ class csScrollBarSkin : public csSkinSlice
 {
 public:
   /// Get the identifier of the component this skin slice is for
-  virtual const char *GetName ()
+  virtual const char *GetName () const
   { return "ScrollBar"; }
 };
 

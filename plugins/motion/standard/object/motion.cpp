@@ -100,18 +100,15 @@ void csMotionTemplate::SetLoopFlip (bool enable) {
   loopflip=enable;
 }
 
-static int compare_bones (void const* item1, void* item2)
+static int compare_bones (csMotionBone const* mb1, csMotionBone const* mb2)
 {
-  csMotionBone* mb1 = (csMotionBone*)item1;
-  csMotionBone* mb2 = (csMotionBone*)item2;
   unsigned int id1 = mb1->GetHash ();
   unsigned int id2 = mb2->GetHash ();
   return id1-id2;
 }
 
-static int comparekey_bones (void const* item, void* key)
+static int comparekey_bones (csMotionBone const* mb, void* key)
 {
-  csMotionBone* mb = (csMotionBone*)item;
   unsigned int id1 = mb->GetHash ();
   unsigned int id2 = (unsigned int)key;
   return id1-id2;
@@ -452,18 +449,16 @@ bool csMotionManager::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-static int compare_motions (void const* item1, void* item2)
+static int compare_motions (csMotionTemplate const* mb1,
+	csMotionTemplate const* mb2)
 {
-  csMotionTemplate* mb1 = (csMotionTemplate*)item1;
-  csMotionTemplate* mb2 = (csMotionTemplate*)item2;
   unsigned int id1 = mb1->GetHash ();
   unsigned int id2 = mb2->GetHash ();
   return id1-id2;
 }
 
-static int comparekey_motions (void const* item, void* key)
+static int comparekey_motions (csMotionTemplate const* mb, void* key)
 {
-  csMotionTemplate* mb = (csMotionTemplate*)item;
   unsigned int id1 = mb->GetHash ();
   unsigned int id2 = (unsigned int)key;
   return id1-id2;
@@ -499,18 +494,16 @@ void csMotionManager::DeleteMotion( iMotionTemplate* motiontemp )
   motions.Delete((csMotionTemplate*)motiontemp);
 }
 
-static int compare_skeleton (void const* item1, void* item2)
+static int compare_skeleton (csMotionController const* mb1,
+	csMotionController const* mb2)
 {
-  csMotionController* mb1 = (csMotionController*)item1;
-  csMotionController* mb2 = (csMotionController*)item2;
   unsigned int id1 = (unsigned int)mb1->GetSkeleton ();
   unsigned int id2 = (unsigned int)mb2->GetSkeleton ();
   return id1-id2;
 }
 
-static int comparekey_skeleton (void const* item, void* key)
+static int comparekey_skeleton (csMotionController const* mb, void* key)
 {
-  csMotionController* mb = (csMotionController*)item;
   unsigned int id1 = (unsigned int)mb->GetSkeleton ();
   unsigned int id2 = (unsigned int)key;
   return id1-id2;

@@ -50,6 +50,11 @@ chronological order.
 	    - Replaced 'csFontVector' in csFreeType2Server with a
 	      csRefArray<csFreeType2Font>.
 	- Jorrit added csRefArray::FindKey().
+	- Jorrit made the typedefs for compare and compare key functions
+	  for csPDelArray and csArray local to the class. That way they
+	  can use the correct type instead of just void*. This was already
+	  done by csRefArray and cleans up the API considerably.
+	- Jorrit added csArray::FindKey().
 	- Eric Sunshine made the following changes:
 	    - Overhauled the wchar_t checking and configuration since it was
 	      quite broken on MacOS/X.  Now checks for presence of <wchar.h>,

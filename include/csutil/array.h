@@ -25,10 +25,6 @@
 #endif
 #include <new>
 
-/// This function prototype is used for csArray::InsertSorted()
-typedef int csArrayCompareFunction (void const* item1, void* item2);
-
-
 /**
  * A templated array class.  The objects in this class are constructed via
  * copy-constructor and are destroyed when they are removed from the array or
@@ -80,6 +76,11 @@ private:
   }
 
 public:
+  /// This function prototype is used for csArray::InsertSorted()
+  typedef int ArrayCompareFunction (T const& item1, T const& item2);
+  /// This function prototype is used for csArray::FindKey()
+  typedef int ArrayCompareKeyFunction (T const& item1, void* item2);
+
   /**
    * Initialize object to have initial capacity of 'icapacity' elements, and to
    * increase storage by 'ithreshold' each time the upper bound is exceeded.
@@ -282,6 +283,19 @@ public:
     return -1;
   }
 
+  /**
+   * Find an element based on some key.
+   */
+  int FindKey (void* key, ArrayCompareKeyFunction* comparekey) const
+  {
+    int i;
+    for (i = 0 ; i < Length () ; i++)
+      if (comparekey (root[i], key) == 0)
+        return i;
+    return -1;
+  }
+
+
   /// Push an element onto the tail end of the array. Returns index of element.
   int Push (T const& what)
   {
@@ -385,7 +399,7 @@ public:
    * Find an element based on some key.  Assumes that the array is sorted.
    * If it is not sorted, then the result will not be meaningful.
    */
-  int FindSortedKey (void* key, csArrayCompareFunction* comparekey) const
+  int FindSortedKey (void* key, ArrayCompareKeyFunction* comparekey) const
   {
     int l = 0, r = Length () - 1;
     while (l <= r)
@@ -407,7 +421,7 @@ public:
    * Insert an element at a sorted position.
    * Assumes array is already sorted.
    */
-  int InsertSorted (T item, csArrayCompareFunction* compare,
+  int InsertSorted (T item, ArrayCompareFunction* compare,
 	int* equal_index = 0)
   {
     int m = 0, l = 0, r = Length () - 1;
