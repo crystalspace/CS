@@ -959,9 +959,6 @@ int converter::data_write ( void ) {
   else if ( leqi ( fileout_type, "IV" ) == TRUE ) {
     result = iv_write ( fileout );
   }
-  else if ( leqi ( fileout_type, "OBJ" ) == TRUE ) {
-    result = obj_write ( fileout );
-  }
   else if ( leqi ( fileout_type, "SMF" ) == TRUE ) {
     result = smf_write ( fileout );
   }

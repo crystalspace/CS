@@ -22,6 +22,9 @@
 #include "imesh/mdlconv.h"
 #include "cstool/mdldata.h"
 #include "csutil/datastrm.h"
+#include "csutil/databuf.h"
+#include "csutil/csstring.h"
+#include "csutil/objiter.h"
 
 class csModelConverterOBJ : iModelConverter
 {
@@ -72,14 +75,17 @@ SCF_EXPORT_CLASS_TABLE_END
 
 CS_IMPLEMENT_PLUGIN
 
+SCF_DECLARE_FAST_INTERFACE (iModelDataPolygon);
+CS_DECLARE_OBJECT_ITERATOR (csModelDataPolygonIterator, iModelDataPolygon);
+
 csModelConverterOBJ::csModelConverterOBJ (iBase *pBase)
 {
   SCF_CONSTRUCT_IBASE (pBase);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPlugin);
 
   FormatInfo.Name = "obj";
-  FormatInfo.CanLoad = false;
-  FormatInfo.CanSave = false;
+  FormatInfo.CanLoad = true;
+  FormatInfo.CanSave = true;
 }
 
 csModelConverterOBJ::~csModelConverterOBJ ()
@@ -503,5 +509,52 @@ iDataBuffer *csModelConverterOBJ::Save (iModelData *Data, const char *Format)
   if (strcasecmp (Format, "obj"))
     return NULL;
 
-  return NULL;
+  // only the first object is saved
+  iModelDataObject *obj = CS_GET_CHILD_OBJECT (Data->QueryObject (), iModelDataObject);
+  if (!obj) return NULL;
+  iModelDataVertices *ver = obj->GetDefaultVertices ();
+  int i;
+
+  csString out;
+  out << "# Created by Crystal Space.\n\n";
+  out << "g " << obj->QueryObject ()->GetName () << "\n\n";
+
+  // store vertex coordinates
+  for (i=0; i<ver->GetVertexCount (); i++)
+  {
+    csVector3 v = ver->GetVertex (i);
+    out << "v " << v.x << ' ' << v.y << ' ' << v.z << '\n';
+  }
+
+  // store vertex normals
+  for (i=0; i<ver->GetNormalCount (); i++)
+  {
+    csVector3 v = ver->GetNormal (i);
+    out << "vn " << v.x << ' ' << v.y << ' ' << v.z << '\n';
+  }
+
+  // store texel coordinates
+  for (i=0; i<ver->GetTexelCount (); i++)
+  {
+    csVector2 v = ver->GetTexel (i);
+    out << "vt " << v.x << ' ' << v.y << '\n';
+  }
+
+  // store polygons
+  csModelDataPolygonIterator it (obj->QueryObject ());
+  while (!it.IsFinished ())
+  {
+    iModelDataPolygon *poly = it.Get ();
+    out << "f";
+
+    for (i=0; i<poly->GetVertexCount (); i++)
+      out << ' ' << (poly->GetVertex (i)+1) << '/' << (poly->GetTexel (i)+1) <<
+        '/' << (poly->GetNormal (i)+1);
+
+    out << '\n';
+    it.Next ();
+  }
+
+  int Size = out.Length ();
+  return new csDataBuffer (out.Detach (), Size);
 }
