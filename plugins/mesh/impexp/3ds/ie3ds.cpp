@@ -140,12 +140,12 @@ bool csModelConverter3ds::Initialize( iObjectRegistry * )
   return true;
 }
 
-int csModelConverter3ds::GetFormatCount() const
+int csModelConverter3ds::GetFormatCount()
 {
   return 1;
 }
 
-const csModelConverterFormat *csModelConverter3ds::GetFormat( int idx ) const
+const csModelConverterFormat *csModelConverter3ds::GetFormat( int idx )
 {
   if( idx == 0 )
     return &FormatInfo;

@@ -41,6 +41,7 @@ class csMultiplexImageIO : public iImageIO
   csConfigAccess config;
   csRef<iStrVector> classlist;
   csRef<iPluginManager> plugin_mgr;
+  bool global_dither;
 
   void StoreDesc (const csVector& format);
   /**

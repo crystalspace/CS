@@ -86,8 +86,8 @@ public:
   virtual ~csModelConverterMD2 ();
 
   bool Initialize (iObjectRegistry *object_reg);
-  virtual int GetFormatCount() const;
-  virtual const csModelConverterFormat *GetFormat( int idx ) const;
+  virtual int GetFormatCount();
+  virtual const csModelConverterFormat *GetFormat( int idx );
   virtual csPtr<iModelData> Load( uint8* Buffer, uint32 size );
   virtual csPtr<iDataBuffer> Save( iModelData*, const char *format );
 
@@ -139,12 +139,12 @@ bool csModelConverterMD2::Initialize (iObjectRegistry *)
   return true;
 }
 
-int csModelConverterMD2::GetFormatCount () const
+int csModelConverterMD2::GetFormatCount ()
 {
   return 1;
 }
 
-const csModelConverterFormat *csModelConverterMD2::GetFormat (int idx) const
+const csModelConverterFormat *csModelConverterMD2::GetFormat (int idx)
 {
   return (idx == 0) ? &FormatInfo : NULL;
 }

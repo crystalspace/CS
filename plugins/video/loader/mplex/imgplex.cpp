@@ -51,6 +51,8 @@ csMultiplexImageIO::csMultiplexImageIO (iBase *pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+
+  global_dither = false;
 }
 
 csMultiplexImageIO::~csMultiplexImageIO ()
@@ -105,6 +107,7 @@ bool csMultiplexImageIO::LoadNextPlugin ()
     plugin = CS_LOAD_PLUGIN (plugin_mgr, classname, iImageIO);
     if (plugin)
     {
+      plugin->SetDithering (global_dither);
       // remember the plugin
       list.Push (plugin);
       // and load its description, since we gonna return it on request
@@ -120,6 +123,13 @@ const csVector& csMultiplexImageIO::GetDescription ()
   // need all plugins.
   while (LoadNextPlugin()); 
   return formats;
+}
+
+void csMultiplexImageIO::SetDithering (bool iEnable)
+{
+  global_dither = iEnable;
+  for (int i = 0; i < list.Length (); i++)
+    list[i]->SetDithering (global_dither);
 }
 
 csPtr<iImage> csMultiplexImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
@@ -157,18 +167,6 @@ csPtr<iImage> csMultiplexImageIO::Load (uint8* iBuffer, uint32 iSize, int iForma
     consecutive = true;
   } while (LoadNextPlugin());
   return NULL;
-}
-
-/**
- * Set global image dithering option.<p>
- * By default this option is disabled. If you enable it, all images will
- * be dithered both after loading and after mipmapping/scaling. This will
- * affect all truecolor->paletted image conversions.
- */
-void csMultiplexImageIO::SetDithering (bool iEnable)
-{
-  extern bool csImage_dither;
-  csImage_dither = iEnable;
 }
 
 csPtr<iDataBuffer> csMultiplexImageIO::Save (
