@@ -315,11 +315,11 @@ bool Md2::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
   }
 
   // begin hard work now
-  fprintf(f, "MESHFACT '%s' (\n", spritename);
-  fprintf(f, "\tPLUGIN ('crystalspace.mesh.loader.factory.sprite.3d')\n");
-  fprintf(f, "\tPARAMS (\n");
+  fprintf(f, "<meshfact name=\"%s\">\n", spritename);
+  fprintf(f, "\t<plugin>crystalspace.mesh.loader.factory.sprite.3d</plugin>\n");
+  fprintf(f, "\t<params>\n");
 
-  fprintf(f, "\t\tMATERIAL ('%s')\n", skinname);
+  fprintf(f, "\t\t<material>%s</material>\n", skinname);
 
   // extract only n frames if maxFrames was specified
   int outFrames = nbframes;
@@ -330,7 +330,7 @@ bool Md2::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
   int const klim = modelvertices.vertexindexcount();
   for (i = 0; i < outFrames; i++)
   {
-    fprintf(f, "\t\tFRAME '%s' (", frames[i].name);
+    fprintf(f, "\t\t<frame name=\"%s\">\n", frames[i].name);
     for (k = 0; k < klim; k++)
     {
       short xyzindex, texindex;
@@ -356,9 +356,10 @@ bool Md2::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
       u = u / (float) skinwidth;
       v = v / (float) skinheight;
 
-      fprintf(f, " V (%.3f,%.3f,%.3f:%.2f,%.2f)", x, y, z, u, v);
+      fprintf(f, " <v x=\"%.3f\" y=\"%.3f\" z=\"%.3f\" u=\"%.2f\" v=\"%.2f\"/>",
+      	x, y, z, u, v);
     }
-    fprintf(f, " )\n");
+    fprintf(f, " </frame>\n");
   }
 
   if (actionNamingMdl)
@@ -368,7 +369,7 @@ bool Md2::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
     {
       if (!isdigit(frames[i].name[strlen(frames[i].name)-1]))
       {
-        fprintf(f, "\t\tACTION '%s' ( F ('%s', %d) )\n",
+        fprintf(f, "\t\t<action name=\"%s\">\n\t\t\t<f name=\"%s\" delay=\"%d\"/>\n\t\t</action>\n",
 	  frames[i].name, frames[i].name, delayMdl);
       }
       else
@@ -382,17 +383,17 @@ bool Md2::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
             break;
         if(strlen(frames[i].name) > (unsigned int) j + 3)
         {
-            base_action=j + 2;
+          base_action=j + 2;
         }
         else
         {
-            base_action=j + 1;
+          base_action=j + 1;
         }
         strncpy(name_action, frames[i].name, base_action);
 
-        fprintf(f, "\t\tACTION '%s' (", name_action);
+        fprintf(f, "\t\t<action name=\"%s\">", name_action);
 
-        fprintf(f, " F ('%s', %d)", frames[i].name, delayMdl);
+        fprintf(f, " <f name=\"%s\" delay=\"%d\"/>", frames[i].name, delayMdl);
         for (j=i + 1; j < outFrames; j++, i++)
         {
           char toy[64], toy2[64];
@@ -414,11 +415,11 @@ bool Md2::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
 	    break;
 
           if (strncmp(name_action, frames[j].name, base_action) == 0)
-            fprintf(f, " F ('%s', %d)", frames[j].name, delayMdl);
+            fprintf(f, " <f name=\"%s\" delay=\"%d\"/>", frames[j].name, delayMdl);
           else
 	    break;
         }
-        fprintf(f, " )\n");
+        fprintf(f, " </action>\n");
       }
     }
   }
@@ -426,9 +427,9 @@ bool Md2::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
   printf("Generate Triangles\n");
   short const* tri = triangles;
   for (i = 0; i < nbtriangles; i++, tri += 3)
-    fprintf(f, "\t\tTRIANGLE (%d,%d,%d)\n", *tri, *(tri + 1), *(tri + 2));
+    fprintf(f, "\t\t<t v1=\"%d\" v2=\"%d\" v3=\"%d\"/>\n", *tri, *(tri + 1), *(tri + 2));
 
-  fprintf(f, "\t)\n)\n");
+  fprintf(f, "\t</params>\n</meshfact>\n");
   fclose(f);
   return true;
 }

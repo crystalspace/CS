@@ -51,6 +51,8 @@ chronological order.
 	- Jorrit started work on a small csBSPTree class. Unfinished.
 	- Jorrit started work on actually implementing back2front sorting
 	  in genmesh. Unfinished.
+	- Jorrit did a quick untested change to mdl2spr so that it should
+	  now output XML instead of the old map format.
 4-Apr-2004
 	- res moved the attenuation texture generation to the light iter 
 	  plugin. Still the same texture for all lights, though. Plan is to
