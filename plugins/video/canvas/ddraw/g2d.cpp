@@ -562,7 +562,7 @@ HRESULT csGraphics2DDDraw3::InitSurfaces ()
   if (FullScreen)
   {
     // Set FS video mode
-
+#if DIRECTDRAW_VERSION >= 0x0700
     // changing the display frequency is a dd7+ feature
     LPDIRECTDRAW7 lpDD7;
     if (m_lpDD->QueryInterface (IID_IDirectDraw7, (LPVOID*)&lpDD7) == S_OK)
@@ -570,6 +570,9 @@ HRESULT csGraphics2DDDraw3::InitSurfaces ()
       hRet = lpDD7->SetDisplayMode (Width, Height, Depth, m_nDisplayFrequency, 0);
       lpDD7->Release ();
     }
+#else
+    int lpDD7 = 0;
+#endif
     // either we have no dd7 or the modeswitch failed
     if ((!lpDD7) || (hRet != DD_OK))
     {
