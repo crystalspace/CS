@@ -146,12 +146,16 @@ void csProcSky::SetAnimated(bool anim, cs_time current_time)
   if(animated && (current_time != 0)) {
     old_time = current_time;
   }
-  /// force rerender of all skytextures (to bring to equal time)
-  csProcSkyTexture *p = firstsky;
-  while(p)
+  if(!animated)
   {
-    p->ForceRerender();
-    p = p->GetNextSky();
+    /// force rerender of all skytextures (to bring to equal time)
+    csProcSkyTexture *p = firstsky;
+    while(p)
+    {
+      p->ForceRerender(); 
+      //DrawToTexture(p, current_time);
+      p = p->GetNextSky();
+    }
   }
 }
 
