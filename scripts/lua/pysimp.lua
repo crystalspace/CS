@@ -1,7 +1,7 @@
 
 function CreateRoom(matname)
 	print('Start creating polygons from Lua script...')
-	engine=iSystem_Query_iEngine(system)
+	engine=iObjectRegistry_Query_iEngine(object_reg)
 
 	room=iEngine_FindSector(engine, "room")
 	walls=iEngine_CreateSectorWallsMesh(engine,room,"walls")

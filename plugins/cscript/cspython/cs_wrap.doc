@@ -391,7 +391,7 @@ ScreenShot()
 
 CreateOffScreenCanvas(width,height,buffer,alone_hint,ipfmt,palette,pal_size)
 
-AllowCanvasResize(iAllow)
+AllowResize(iAllow)
 
 1.16.  class iHalo
 ------------------

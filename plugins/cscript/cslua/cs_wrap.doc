@@ -225,10 +225,7 @@ functions in inner loops or other intensive operations.
 
 
 
-         typedef void (*DeleteNotify) (iFont *, void *);
-         virtual void AddDeleteCallback (DeleteNotify func, void *databag) = 0;
-         virtual bool RemoveDeleteCallback (DeleteNotify func, void *databag) = 0;
-        
+
 1.14.  class iFontServer
 ------------------------
 
@@ -602,12 +599,8 @@ functions in inner loops or other intensive operations.
 
 
 
-
-
-
-
-1.31.  class iSystem
---------------------
+1.31.  class iObjectRegistry
+----------------------------
 
 
 

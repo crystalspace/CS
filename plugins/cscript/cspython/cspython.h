@@ -34,12 +34,11 @@ public:
   static csPython* shared_instance;
   iObjectRegistry* object_reg;
   int Mode;
-  void* Storage;
 
   bool Initialize(iObjectRegistry* object_reg);
   bool RunText(const char *Text);
   bool LoadModule(const char *Text);
-	bool Store(const char* type, const char* name, void* data);
+  bool Store(const char* name, void* data, void* tag);
   void ShowError();
   void Print(bool Error, const char *msg);
 

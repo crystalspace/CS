@@ -91,11 +91,8 @@ bool csPython::Initialize(iObjectRegistry* object_reg)
   Mode = CS_REPORTER_SEVERITY_NOTIFY;
 
   // Store the object registry pointer in 'cspace.object_reg'.
-  char command[256];
-  char sysPtr[100];
-  SWIG_MakePtr (sysPtr, object_reg, "_iObjectRegistry_p");
-  sprintf (command, "cspace.object_reg=cspace.iObjectRegistryPtr(\"%s\")", sysPtr);
-  RunText (command);
+  Store("cspace.object_reg_ptr", object_reg, (void*)"_iObjectRegistry_p");
+  RunText("cspace.object_reg=cspace.iObjectRegistryPtr(cspace.object_reg_ptr)");
 
   return true;
 }
@@ -119,13 +116,14 @@ bool csPython::RunText(const char* Text)
   return worked;
 }
 
-bool csPython::Store(const char* type, const char* name, void* data)
+bool csPython::Store(const char* name, void* data, void* tag)
 {
-  Storage=data;
-  csString s;
-  s << name << "=cspacec.ptrcast(cspacec.GetMyPtr(), '" << type << "')";
-  RunText(s);
-  Storage=NULL;
+  char command[256];
+  char sysPtr[100];
+  SWIG_MakePtr (sysPtr, data, (char*)tag);
+  sprintf (command, "%s=\"%s\"", name, sysPtr);
+  RunText (command);
+
   return true;
 }
 

@@ -47,7 +47,7 @@ SCF_EXPORT_CLASS_TABLE_END
 
 csLua* csLua::shared_instance = NULL;
 
-csLua::csLua(iBase *iParent) :Sys(NULL), Mode(CS_REPORTER_SEVERITY_NOTIFY),
+csLua::csLua(iBase *iParent) :object_reg(NULL), Mode(CS_REPORTER_SEVERITY_NOTIFY),
 	lua_state(NULL)
 {
   SCF_CONSTRUCT_IBASE(iParent);
@@ -87,9 +87,8 @@ bool csLua::Initialize(iObjectRegistry* object_reg)
 
   Mode=CS_REPORTER_SEVERITY_NOTIFY;
 
-  // Store the system pointer in 'cspace.system'.
-  lua_pushusertag(LUA_STATE(), (void*)object_reg, iObjectRegistry_tag);
-  lua_setglobal(LUA_STATE(), "object_reg");
+  // Store the object_reg ptr.
+  Store("object_reg", object_reg, &iObjectRegistry_tag);
 
   return true;
 }
@@ -116,9 +115,11 @@ bool csLua::RunText(const char* Text)
   return 1;
 }
 
-bool csLua::Store(const char* type, const char* name, void* data)
+bool csLua::Store(const char* name, void* data, void* tag)
 {
-//Write me
+  lua_pushusertag(LUA_STATE(), data, *(int*)tag);
+  lua_setglobal(LUA_STATE(), name);
+
   return 0;
 }
 
@@ -131,17 +132,16 @@ bool csLua::LoadModule(const char* name)
 
 void csLua::Print(bool Error, const char *msg)
 {
-  iObjectRegistry* object_reg = Sys->GetObjectRegistry ();
-  iReporter* reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  if (!reporter)
+  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  if (!rep)
     csPrintf ("%s\n", msg);
   else
   {
     if(Error)
-      reporter->Report (CS_REPORTER_SEVERITY_ERROR, "crystalspace.script.lua",
+      rep->Report (CS_REPORTER_SEVERITY_ERROR, "crystalspace.script.lua",
       	"CrystalScript Error: %s", msg);
     else
-      reporter->Report (Mode, "crystalspace.script.lua",
+      rep->Report (Mode, "crystalspace.script.lua",
       	"%s", msg);
   }
 }

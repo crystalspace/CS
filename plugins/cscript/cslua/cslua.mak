@@ -39,8 +39,10 @@ CFLAGS.LUA += $(CFLAGS.D)LUA_MS
 # The actual static link library usually resides in a "config" subdirectory of
 # the library directory.  The library's name is the same as the directory,
 # thus in this example, the library would be called "liblua1.5.a".
-LIB.CSLUA.SYSTEM +=  \
-  $(LFLAGS.l)lua -llualib
+LIB.CSLUA.SYSTEM += $(LFLAGS.l)lua $(LFLAGS.l)lualib
+
+#Needed by luaswig
+LIB.CSLUA.SYSTEM += $(LFLAGS.l)luaswig40
 
 ifeq ($(USE_PLUGINS),yes)
   CSLUA = $(OUTDLL)cslua$(DLL)

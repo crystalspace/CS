@@ -36,8 +36,8 @@ struct iScript : public iBase
   virtual bool RunText (const char *iStr) = 0;
   /// LoadModule
   virtual bool LoadModule (const char *iStr) = 0;
-  /// Store
-  virtual bool Store (const char* type, const char* name, void* data) = 0;
+  /// Store (Data in Name, Tag is specific to script language)
+  virtual bool Store(const char* name, void* data, void* tag) = 0;
 };
 
 #endif // __IVARIA_SCRIPT_H__
