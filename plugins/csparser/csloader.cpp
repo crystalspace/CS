@@ -587,7 +587,7 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
   Stats->Init ();
   if (iClearEngine) Engine->DeleteAll ();
   ResolveOnlyRegion = iOnlyRegion;
-  SCF_DEC_REF (ldr_context); ldr_context = NULL;
+  ldr_context = NULL;
 
   csRef<iDataBuffer> buf (VFS->ReadFile (file));
 
@@ -798,7 +798,7 @@ bool csLoader::LoadLibraryFile (const char* fname)
   }
 
   ResolveOnlyRegion = false;
-  SCF_DEC_REF (ldr_context); ldr_context = NULL;
+  ldr_context = NULL;
 
   csRef<iDocument> doc;
   bool er = TestXml (fname, buf, doc);
@@ -923,7 +923,7 @@ csPtr<iMeshFactoryWrapper> csLoader::LoadMeshObjectFactory (const char* fname)
   if (!Engine) return NULL;
 
   ResolveOnlyRegion = false;
-  SCF_DEC_REF (ldr_context); ldr_context = NULL;
+  ldr_context = NULL;
 
   csRef<iDataBuffer> databuff (VFS->ReadFile (fname));
 
@@ -2468,8 +2468,8 @@ iLoaderContext* csLoader::GetLoaderContext ()
 {
   if (!ldr_context)
   {
-    ldr_context = new StdLoaderContext (Engine, ResolveOnlyRegion,
-      &parser, this);
+    ldr_context = csPtr<iLoaderContext> (
+    	new StdLoaderContext (Engine, ResolveOnlyRegion, &parser, this));
   }
   return ldr_context;
 }

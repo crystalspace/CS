@@ -346,6 +346,7 @@ bool Simple::Initialize ()
   csRef<iSprite3DState> spstate (
   	SCF_QUERY_INTERFACE (sprite->GetMeshObject (), iSprite3DState));
   spstate->SetAction ("default");
+  //spstate->SetMixMode (CS_FX_SETALPHA (.5));
 
   // The following two calls are not needed since CS_ZBUF_USE and
   // Object render priority are the default but they show how you

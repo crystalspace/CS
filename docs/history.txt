@@ -11,6 +11,11 @@ The history order is reversed so that new features are at the top.
 	  pointer flag is set, CS will also (at runtime) test if you are
 	  actually assigning the csPtr result to a csRef. If not you have
 	  a memory leak and this will cause an assert error.
+	- Fixed several bugs in the standard loader with regards
+	  to ldr_context.
+	- Fixed ref counting bugs in iEngine->CreateMeshFactory(). The engine
+	  forgot to do IncRef().
+	- Fixed similar bug in CreateMeshWrapper().
 10-Sep-2002
 	- iLoaderPlugin and iBinaryLoaderPlugin->Parse() now return a
 	  csPtr.

@@ -2342,8 +2342,7 @@ csPtr<iMeshWrapper> csEngine::CreateThingMesh (
   	"crystalspace.mesh.object.thing", name, sector));
   thing_wrap->SetZBufMode (CS_ZBUF_USE);
   thing_wrap->SetRenderPriority (GetObjectRenderPriority ());
-
-  thing_wrap->IncRef ();	// Avoid release of smart pointer.
+  if (thing_wrap) thing_wrap->IncRef ();	// Avoid smart pointer release.
   return csPtr<iMeshWrapper> (thing_wrap);
 }
 
@@ -2356,8 +2355,7 @@ csPtr<iMeshWrapper> csEngine::CreateSectorWallsMesh (
   thing_wrap->GetFlags ().Set (CS_ENTITY_CONVEX);
   thing_wrap->SetZBufMode (CS_ZBUF_FILL);
   thing_wrap->SetRenderPriority (GetWallRenderPriority ());
-
-  thing_wrap->IncRef ();	// Avoid release of smart pointer.
+  if (thing_wrap) thing_wrap->IncRef ();	// Avoid smart pointer release.
   return csPtr<iMeshWrapper> (thing_wrap);
 }
 
@@ -2513,6 +2511,7 @@ csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (
   csMeshFactoryWrapper *mfactwrap = new csMeshFactoryWrapper (fact);
   if (name) mfactwrap->SetName (name);
   GetMeshFactories ()->Add (&(mfactwrap->scfiMeshFactoryWrapper));
+  mfactwrap->IncRef ();	// Ref count for Add().
   return csPtr<iMeshFactoryWrapper> (&mfactwrap->scfiMeshFactoryWrapper);
 }
 
@@ -2527,6 +2526,7 @@ csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (const char *name)
   csMeshFactoryWrapper *mfactwrap = new csMeshFactoryWrapper ();
   if (name) mfactwrap->SetName (name);
   GetMeshFactories ()->Add (&(mfactwrap->scfiMeshFactoryWrapper));
+  mfactwrap->IncRef ();	// Ref count for Add().
   return csPtr<iMeshFactoryWrapper> (&mfactwrap->scfiMeshFactoryWrapper);
 }
 
@@ -2708,6 +2708,7 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
   iMeshWrapper *mesh = factory->CreateMeshWrapper ();
   if (name) mesh->QueryObject ()->SetName (name);
   GetMeshes ()->Add (mesh);
+  mesh->IncRef ();	// Ref count for the engine.
   if (sector)
   {
     mesh->GetMovable ()->SetSector (sector);
@@ -2727,6 +2728,7 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
   csMeshWrapper *meshwrap = new csMeshWrapper (NULL, mesh);
   if (name) meshwrap->SetName (name);
   GetMeshes ()->Add (&(meshwrap->scfiMeshWrapper));
+  meshwrap->IncRef ();	// Ref count for the engine.
   if (sector)
   {
     meshwrap->GetMovable ().SetSector (sector);
@@ -2742,6 +2744,7 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (const char *name)
   csMeshWrapper *meshwrap = new csMeshWrapper (NULL);
   if (name) meshwrap->SetName (name);
   GetMeshes ()->Add (&(meshwrap->scfiMeshWrapper));
+  meshwrap->IncRef ();	// Ref count for the engine.
   return csPtr<iMeshWrapper> (&meshwrap->scfiMeshWrapper);
 }
 
@@ -2754,9 +2757,7 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
   csRef<iPluginManager> plugin_mgr (
   	CS_QUERY_REGISTRY (object_reg, iPluginManager));
   csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (
-      plugin_mgr,
-      classId,
-      iMeshObjectType));
+      plugin_mgr, classId, iMeshObjectType));
   if (!type) type = CS_LOAD_PLUGIN (plugin_mgr, classId, iMeshObjectType);
   if (!type) return NULL;
 
@@ -2770,17 +2771,11 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
     // factory can return a working mesh object.
     mo = fact->NewInstance ();
     if (mo)
-    {
-      csRef<iMeshWrapper> mw (CreateMeshWrapper (mo, name, sector, pos));
-      mw->IncRef ();	// To avoid smart pointer release.
-      return csPtr<iMeshWrapper> (mw);
-    }
+      return CreateMeshWrapper (mo, name, sector, pos);
     return NULL;
   }
 
-  csRef<iMeshWrapper> mw (CreateMeshWrapper (mo, name, sector, pos));
-  mw->IncRef ();	// To avoid smart pointer release.
-  return csPtr<iMeshWrapper> (mw);
+  return CreateMeshWrapper (mo, name, sector, pos);
 }
 
 bool csEngine::RemoveObject (iBase *object)
