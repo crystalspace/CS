@@ -256,7 +256,7 @@ csPtr<iModelData> csModelConverterOBJ::Load (uint8 *Buffer, uint32 Size)
 	}
 
 	// look for EOF or errors
-	if (sep == EOF)
+	if (sep == (char)EOF)
 	{
 	  break;
 	}

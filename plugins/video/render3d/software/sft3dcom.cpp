@@ -3172,7 +3172,7 @@ void csSoftwareGraphics3DCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
   struct
   {
     // Start and final vertex number
-    char sv, fv;
+    signed char sv, fv;
     // The X coordinates and its per-scanline delta; also the final Y coordinate
     int x, dxdy, fy;
     // The `U/V/Z' texture coordinates and their per-scanline delta
