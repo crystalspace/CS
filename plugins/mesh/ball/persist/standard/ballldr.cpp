@@ -189,8 +189,11 @@ bool csBallFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
   if (!parent) return false; //you never know...
   
-  parent->CreateNodeBefore(CS_NODE_COMMENT, 0);
-  parent->SetValue("iSaverPlugin not yet supported for this mesh");
+  csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  paramsNode->SetValue("params");
+  paramsNode->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
+    ("iSaverPlugin not yet supported for ball mesh");
+  paramsNode=0;
   
   return true;
 }
@@ -385,9 +388,62 @@ bool csBallSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
   if (!parent) return false; //you never know...
   
-  parent->CreateNodeBefore(CS_NODE_COMMENT, 0);
-  parent->SetValue("iSaverPlugin not yet supported for this mesh");
+  csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  paramsNode->SetValue("params");
+  if (obj)
+  {
+    csRef<iBallState> ball = SCF_QUERY_INTERFACE (obj, iBallState);
+    csRef<iMeshObject> mesh = SCF_QUERY_INTERFACE (obj, iMeshObject);
+    if (!ball) return false;
+    if (!mesh) return false;
+
+    //Writedown Factory tag
+    csRef<iMeshFactoryWrapper> fact = 
+      SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), iMeshFactoryWrapper);
+    if (fact)
+    {
+      const char* factname = fact->QueryObject()->GetName();
+      if (factname && *factname)
+      {
+        csRef<iDocumentNode> factNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        factNode->SetValue("factory");
+        csRef<iDocumentNode> factnameNode = factNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        factnameNode->SetValue(factname);
+      }    
+    }    
+    
+    //Writedown Radius tag
+    float rx,ry,rz;
+    ball->GetRadius(rx,ry,rz);
+    csRef<iDocumentNode> radiusNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    radiusNode->SetValue("radius");
+    radiusNode->SetAttributeAsFloat("x", rx);
+    radiusNode->SetAttributeAsFloat("y", ry);
+    radiusNode->SetAttributeAsFloat("z", rz);
+
+    //Writedown Shift tag
+    csVector3 shift = ball->GetShift();
+    csRef<iDocumentNode> shiftNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    shiftNode->SetValue("shift");
+    shiftNode->SetAttributeAsFloat("x", shift.x);
+    shiftNode->SetAttributeAsFloat("y", shift.y);
+    shiftNode->SetAttributeAsFloat("z", shift.z);
+  }
+      
+  paramsNode=0;
   
   return true;
 }
+
+/*
+<factory>ballFact</factory>
+<material>plasma</material>
+<numrim>16</numrim>
+<radius x="1" y="1" z="1" />
+<shift x="0" y="0" z="0" />
+<mixmode>
+  <multiply />
+</mixmode>
+*/
+
 

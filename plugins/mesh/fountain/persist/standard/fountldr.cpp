@@ -359,8 +359,11 @@ bool csFountainSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
   if (!parent) return false; //you never know...
   
-  parent->CreateNodeBefore(CS_NODE_COMMENT, 0);
-  parent->SetValue("iSaverPlugin not yet supported for this mesh");
+  csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  paramsNode->SetValue("params");
+  paramsNode->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
+    ("iSaverPlugin not yet supported for fountain mesh");
+  paramsNode=0;
   
   return true;
 }
