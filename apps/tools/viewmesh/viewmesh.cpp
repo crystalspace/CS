@@ -91,8 +91,8 @@ CS_IMPLEMENT_APPLICATION
 #define VIEWMESH_COMMAND_ATTACH_SOCKET  80000
 
 #define DEFAULT_SOCKET_X_ROTATION -PI/2.0f
-#define DEFAULT_SOCKET_Y_ROTATION 0
-#define DEFAULT_SOCKET_Z_ROTATION 0
+#define DEFAULT_SOCKET_Y_ROTATION 0.0f
+#define DEFAULT_SOCKET_Z_ROTATION 0.0f
 
 //-----------------------------------------------------------------------------
 
@@ -1096,7 +1096,7 @@ void ViewMesh::CreateRotationWindow(int socket, char* filename)
   il = new csInputLine (client, 40, csifsThickRect);
   il->id = 1002;
   il->SetRect (15, 80, 100, 96);
-  sprintf(buffer, "%f", DEFAULT_SOCKET_Y_ROTATION ),  
+  sprintf(buffer, "%f", DEFAULT_SOCKET_Y_ROTATION),
   il->SetText (buffer);        
         
   stat = new csStatic (client, 0, "RotZ", csscsFrameLabel);
@@ -1104,7 +1104,7 @@ void ViewMesh::CreateRotationWindow(int socket, char* filename)
   il = new csInputLine (client, 40, csifsThickRect);
   il->id = 1003;
   il->SetRect (15, 140, 100, 157);
-  sprintf(buffer, "%f", DEFAULT_SOCKET_Z_ROTATION ),
+  sprintf(buffer, "%f", DEFAULT_SOCKET_Z_ROTATION),
   il->SetText (buffer);        
         
   csButton* b = new csButton (client, cscmdStopModal, CSBS_DEFAULTVALUE | CSBS_DISMISS);
