@@ -120,6 +120,7 @@ void awsSink::RegisterTrigger (
 awsSource::awsSource (iAwsComponent *_owner) :
   owner(_owner)
 {
+  SCF_CONSTRUCT_IBASE (NULL);
 }
 
 awsSource::~awsSource ()
@@ -191,6 +192,7 @@ void awsSource::Broadcast (unsigned long signal)
 ///////////////////////////////////// Slots ////////////////////////////////////////////////////////
 awsSlot::awsSlot ()
 {
+  SCF_CONSTRUCT_IBASE (NULL);
 }
 
 awsSlot::~awsSlot ()
