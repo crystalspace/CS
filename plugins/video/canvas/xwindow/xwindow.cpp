@@ -412,6 +412,7 @@ void csXWindow::Close ()
   }
   if (ctx_win)
   {
+    XFreeGC (dpy, gc);
     XDestroyWindow (dpy, ctx_win);
     ctx_win = 0;
   }
