@@ -615,6 +615,7 @@ public:
       scfParent->CalculateSectorBBox (bbox, do_things, do_meshes, do_terrain);
     }
   } scfiSector;
+  friend struct eiSector;
 };
 
 #endif // __CS_SECTOR_H__
