@@ -109,7 +109,7 @@ DO.COMPILE.CPP = $(CXX) $(CFLAGS.@) $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
 # How to compile a GAS source
 DO.COMPILE.S = $(CC) $(CFLAGS.@) -x assembler-with-cpp $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
 # How to compile a NASM source
-DO.COMPILE.ASM = $(NASM) $(NASM.@) $(NASMFLAGS) $(<<)
+DO.COMPILE.ASM = $(NASM.BIN) $(NASM.@) $(NASMFLAGS) $(<<)
 # How to make a static library
 DO.STATIC.LIBRARY = $(AR) $(ARFLAGS) $(ARFLAGS.@) $(^^)
 # How to make a shared/dynamic library

@@ -15,7 +15,7 @@ endif
 ifeq ($(NASM.INSTALLED),yes)
 
 # The executable name
-NASM = nasm
+NASM.BIN = nasm
 
 # NASM flags (well, PROC= is not quite useful (for now?))
 NASMFLAGS = -DOS=$(OS) -DCOMP=$(COMP) -DPROC=$(PROC) $(NASMFLAGS.SYSTEM)
