@@ -23,6 +23,8 @@ chronological order.
 		MSVC.PREFIX.library   (default "lib")
 		MSVC.PREFIX.plugin    (default "plg")
 		MSVC.PREFIX.workspace (default "wks")
+	- Eric Sunshine eliminated Swig complaint about new
+	  iGraphics2D::GetRGB() overload for alpha.
 26-Oct-2004
 	- Eric Sunshine added an optional argument to iDocument::Parse() which
 	  controls whether or not whitespace in CS_NODE_TEXT nodes is
