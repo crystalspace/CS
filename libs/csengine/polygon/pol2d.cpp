@@ -502,15 +502,8 @@ void CalculateFogPolygon (csRenderView* rview, G3DPolygonDPFX& poly)
 //---------------------------------------------------------------------------
 
 void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
-	csPolyPlane* plane, csPolyTxtPlane* txt_plane,
-	bool use_z_buf)
+	csPolyPlane* plane, bool use_z_buf)
 {
-  //@@@
-  static G3DPolygonDPFX g3dpolyfx;
-  csVector2 orig_triangle[3];
-  csPolygon3D* unsplit;
-  //@@@
-
   int i;
   bool debug = false;
   bool mirror = rview->IsMirrored ();
@@ -531,7 +524,7 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
   {
     // We have a gouraud shaded polygon.
     // Add all dynamic lights if polygon is dirty.
-    //@@@csPolygon3D* unsplit;
+    csPolygon3D* unsplit;
     unsplit = poly->GetBasePolygon ();
     const bool do_light = poly->CheckFlags (CS_POLY_LIGHTING);
     if (do_light)
@@ -563,8 +556,8 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
       }
     }
 
-    //@@@static G3DPolygonDPFX g3dpolyfx;
-    //@@@csVector2 orig_triangle[3];
+    static G3DPolygonDPFX g3dpolyfx;
+    csVector2 orig_triangle[3];
     csGouraudShaded* gs = poly->GetGouraudInfo ();
 
     g3dpolyfx.num = num_vertices;
@@ -666,8 +659,12 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
       g3dpoly.poly_texture[mipmaplevel] = poly->GetLightMapInfo ()->GetPolyTex
       	(mipmaplevel);
 
-    g3dpoly.plane.m_cam2tex = &txt_plane->m_cam2tex;
-    g3dpoly.plane.v_cam2tex = &txt_plane->v_cam2tex;
+    csPolyTxtPlane* txt_plane = poly->GetLightMapInfo ()->GetTxtPlane ();
+    csMatrix3 m_cam2tex;
+    csVector3 v_cam2tex;
+    txt_plane->WorldToCamera (*rview, m_cam2tex, v_cam2tex);
+    g3dpoly.plane.m_cam2tex = &m_cam2tex;
+    g3dpoly.plane.v_cam2tex = &v_cam2tex;
 
     float Ac, Bc, Cc, Dc;
     plane->GetCameraNormal (&Ac, &Bc, &Cc, &Dc);

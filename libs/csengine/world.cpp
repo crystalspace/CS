@@ -257,10 +257,12 @@ bool csWorld::Initialize (iSystem* sys)
 {
 printf ("csPolygon3D %d\n", sizeof (csPolygon3D));
 printf ("csPolyPlane %d\n", sizeof (csPolyPlane));
+printf ("csPolyTxtPlane %d\n", sizeof (csPolyTxtPlane));
 printf ("csPolyTexture %d\n", sizeof (csPolyTexture));
 printf ("csPolygonSet %d\n", sizeof (csPolygonSet));
 printf ("csLightMapped %d\n", sizeof (csLightMapped));
 printf ("csGouraudShaded %d\n", sizeof (csGouraudShaded));
+printf ("csLightMap %d\n", sizeof (csLightMap));
 
   System = sys;
 

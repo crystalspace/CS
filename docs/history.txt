@@ -13,6 +13,14 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+31-Dec-1999
+	- First significant memory optimization in csPolyTxtPlane. The
+	  camera transformation fields are removed and calculated only
+	  when needed (right before rendering). This improves both rendering
+	  speed and memory usage (48 bytes less) for every lightmapped
+	  polygon.
+	- Shaved another 16 bytes from the csLightMapped class by removing
+	  the duplicated lightmap pointers.
 30-Dec-1999
 	- Continued work on new csPolyTxtPlane class.
 	- Added IncRef/DecRef to csPolyPlane and csPolyTxtPlane.
@@ -26,6 +34,10 @@ Short-term cleanups that need to be done:
 	- Started work on seperating the plane component from the
 	  texture mapping stuff. This is so that we can preserve memory
 	  for polygons that use gouraud shading.
+	- Thomas Hieber added support for Quake 3 Arena in map2cs.
+	  Support for curved surfaces is still lacking.
+28-Dec-1999
+	- Thomas Hieber did some changes to DDraw support.
 27-Dec-1999
 	- Further changes to MazeD and handling of flat colors from
 	  Norman Kramer.

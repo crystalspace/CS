@@ -91,8 +91,6 @@ void Dumper::dump (csPolyTxtPlane* p)
   dump (&p->v_obj2tex, "Vot");
   dump (&p->m_world2tex, "Mwt");
   dump (&p->v_world2tex, "Vwt");
-  dump (&p->m_cam2tex, "Mct");
-  dump (&p->v_cam2tex, "Vct");
 }
 
 void Dumper::dump (csPolygon3D* p)

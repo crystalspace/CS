@@ -399,9 +399,6 @@ void csThing::DrawFoggy (csRenderView& d)
         clip->ClipAgainst (d.view))
       {
         p->GetPlane ()->WorldToCamera (d, verts[0]);
-	csLightMapped* lmi = p->GetLightMapInfo ();
-	if (lmi)
-          lmi->GetTxtPlane ()->WorldToCamera (d, verts[0]);
 	if (d.callback)
 	{
           d.callback (&d, CALLBACK_POLYGON, (void*)p);
@@ -411,8 +408,8 @@ void csThing::DrawFoggy (csRenderView& d)
         Stats::polygons_drawn++;
 
 	if (!d.callback)
-          clip->AddFogPolygon (d.g3d, p, p->GetPlane (), d.IsMirrored (), GetID (),
-	  	CS_FOG_BACK);
+          clip->AddFogPolygon (d.g3d, p, p->GetPlane (), d.IsMirrored (),
+	  	GetID (), CS_FOG_BACK);
       }
       render_pool->Free (clip);
     }
@@ -425,15 +422,13 @@ void csThing::DrawFoggy (csRenderView& d)
       bool front = p->GetPlane ()->VisibleFromPoint (d.GetOrigin ());
 
       if (front &&
-        p->ClipToPlane (d.do_clip_plane ? &d.clip_plane : (csPlane*)NULL, d.GetOrigin (),
-            verts, num_verts, true) &&
-        p->DoPerspective (d, verts, num_verts, clip, orig_triangle, d.IsMirrored ()) &&
+        p->ClipToPlane (d.do_clip_plane ? &d.clip_plane : (csPlane*)NULL,
+		d.GetOrigin (), verts, num_verts, true) &&
+        p->DoPerspective (d, verts, num_verts, clip, orig_triangle,
+		d.IsMirrored ()) &&
         clip->ClipAgainst (d.view))
       {
         p->GetPlane ()->WorldToCamera (d, verts[0]);
-	csLightMapped* lmi = p->GetLightMapInfo ();
-	if (lmi)
-          lmi->GetTxtPlane ()->WorldToCamera (d, verts[0]);
 	if (d.callback)
 	{
           d.callback (&d, CALLBACK_POLYGON, (void*)p);
@@ -443,8 +438,8 @@ void csThing::DrawFoggy (csRenderView& d)
         Stats::polygons_drawn++;
 
         if (!d.callback)
-	  clip->AddFogPolygon (d.g3d, p, p->GetPlane (), d.IsMirrored (), GetID (),
-	  	CS_FOG_FRONT);
+	  clip->AddFogPolygon (d.g3d, p, p->GetPlane (), d.IsMirrored (),
+	  	GetID (), CS_FOG_FRONT);
       }
       render_pool->Free (clip);
     }

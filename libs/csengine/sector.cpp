@@ -376,9 +376,6 @@ void csSector::DrawPolygonsFromQueue (csPolygon2DQueue* queue,
   {
     poly3d->CamUpdate ();
     poly3d->GetPlane ()->WorldToCamera (*rview, poly3d->Vcam (0));
-    csLightMapped* lmi = poly3d->GetLightMapInfo ();
-    if (lmi)
-      lmi->GetTxtPlane ()->WorldToCamera (*rview, poly3d->Vcam (0));
     DrawOnePolygon (poly3d, poly2d, rview, false);
     render_pool->Free (poly2d);
   }

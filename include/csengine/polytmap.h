@@ -49,16 +49,6 @@ private:
   /// Translation from world to texture space.
   csVector3 v_world2tex;
 
-  /**
-   * Transformed texture space transformation. This transforms a
-   * coordinate from camera space to texture space. This transformation
-   * is obtained by using m_world2tex and v_world2tex with the camera
-   * transformation.
-   */
-  csMatrix3 m_cam2tex;
-  ///
-  csVector3 v_cam2tex;
-
   /// Reference count.
   int ref_count;
 
@@ -76,21 +66,17 @@ public:
 
   /**
    * Transform this plane from object space to world space using
-   * the given matrices. One vertex on the plane is also given so
-   * that we can more easily recompute the 'D' component of the plane.
-   * The given vertex should be in world space.
+   * the given transform.
    */
-  void ObjectToWorld (const csReversibleTransform& obj,
-  	const csVector3& vertex1);
+  void ObjectToWorld (const csReversibleTransform& obj);
 
   /**
    * Transform this plane from world space to camera space using
-   * the given matrices. One vertex on the plane is also given so
-   * that we can more easily recompute the 'D' component of the plane.
-   * The given vertex should be in camera space.
+   * the given transform. The resulting transform is put in m_cam2tex
+   * and v_cam2tex.
    */
   void WorldToCamera (const csReversibleTransform& t,
-  	const csVector3& vertex1);
+  	csMatrix3& m_cam2tex, csVector3& v_cam2tex);
 
   ///
   void SetTextureSpace (const csVector3& v_orig,

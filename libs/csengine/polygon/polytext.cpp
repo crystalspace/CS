@@ -62,6 +62,7 @@ csPolyTexture::csPolyTexture ()
 
 csPolyTexture::~csPolyTexture ()
 {
+  if (lm) lm->DecRef ();
   CHK (delete [] dirty_matrix);
 }
 

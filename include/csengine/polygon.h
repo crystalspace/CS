@@ -28,6 +28,7 @@
 #include "csengine/polyset.h"
 #include "csengine/portal.h"
 #include "csengine/cscolor.h"
+#include "csengine/polytext.h"
 #include "ipolygon.h"
 
 class csSector;
@@ -145,14 +146,6 @@ private:
   csPolyTexture* tex2;
   /// A mipmapped texture: three steps further.
   csPolyTexture* tex3;
-  /// The light-map for this polygon.
-  csLightMap* lightmap;
-  /// The light-map for this polygon (mipmap level 1)
-  csLightMap* lightmap1;
-  /// The light-map for this polygon (mipmap level 2)
-  csLightMap* lightmap2;
-  /// The light-map for this polygon (mipmap level 3)
-  csLightMap* lightmap3;
 
   /**
    * The csPolyTxtPlane for this polygon.
@@ -210,7 +203,7 @@ public:
   /**
    * Get the lightmap belonging with this polygon.
    */
-  csLightMap* GetLightMap () { return lightmap; }
+  iLightMap* GetLightMap () { return tex->GetLightMap (); }
 
   /**
    * Set the uniform dynamic light.

@@ -128,7 +128,7 @@ void csPolyTxtPlane::GetTextureSpace (csMatrix3& tx_matrix, csVector3& tx_vector
 
 void csPolyTxtPlane::WorldToCamera (
 	const csReversibleTransform& t,
-	const csVector3& vertex1)
+	csMatrix3& m_cam2tex, csVector3& v_cam2tex)
 {
   // Create the matrix to transform camera space to texture space.
   // From: T = Mwt * (W - Vwt)
@@ -151,8 +151,7 @@ void csPolyTxtPlane::WorldToCamera (
 }
 
 void csPolyTxtPlane::ObjectToWorld (
-	const csReversibleTransform& obj,
-	const csVector3& vertex1)
+	const csReversibleTransform& obj)
 {
   // From: T = Mot * (O - Vot)
   //       W = Mow * O - Vow
