@@ -49,7 +49,9 @@ m4_define([cs_lib_paths_default],
 
 #------------------------------------------------------------------------------
 # Replacement for AS_MKDIR_P() from m4sugar/m4sh.m4 which fixes two problems
-# which are present at least as recently as Autoconfg 2.57.
+# which are present at least as recently as Autoconf 2.57.  This bug, along
+# with a patch, was submitted to the Autoconf GNATS database by Eric Sunshine
+# as #227.
 #
 # 1) Removes bogus "-p" directory which the stock AS_MKDIR_P() leaves laying
 #    around in the working directory if the mkdir command does not recognize
@@ -105,10 +107,10 @@ AC_DEFUN([CS_TRIM], [`echo x$1 | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`])
 #	the text with AS_ESCAPE().
 #
 # CS_TEXT_CACHE_PREPEND(VARIABLE, TEXT)
-#	Prepend text verbatim to the contents of the named shell variable.  If
-#	the text contains references to shell variables (such as $foo), then
-#	those references will be expanded.  If expansion is not desired, then
-#	protect the text with AS_ESCAPE().
+#	Prepend text to the contents of the named shell variable.  If the text
+#	contains references to shell variables (such as $foo), then those
+#	references will be expanded.  If expansion is not desired, then protect
+#	the text with AS_ESCAPE().
 #
 # CS_TEXT_CACHE_OUTPUT(VARIABLE, FILENAME)
 #	Instruct config.status to write the contents of the named shell
@@ -117,7 +119,14 @@ AC_DEFUN([CS_TRIM], [`echo x$1 | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`])
 #	already exists, and if the cached text is identical to the contents of
 #	the existing file, then the existing file is left alone, thus its time
 #	stamp remains unmolested.  This heuristic may help to minimize rebuilds
-#	when the file is listed as a dependency in a makefile.
+#	when the file is listed as a dependency in a makefile.  NOTE: There is
+#	a bug in Autoconf, at least as recently as 2.57, which forces us to
+#	invoke AS_MKDIR_P in the third argument to AC_CONFIG_COMMANDS (the
+#	`init-cmds') rather than the second (the `cmds') This is undesirable
+#	because it means that the directory will be created anytime
+#	config.status is invoked (even for a simple --help), rather than being
+#	created only when requested to output the text cache.  This bug was
+#	submitted to the Autoconf GNATS database by Eric Sunshine as #228.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_TEXT_CACHE_APPEND], [$1="${$1}$2"])
 AC_DEFUN([CS_TEXT_CACHE_PREPEND], [$1="$2${$1}"])
