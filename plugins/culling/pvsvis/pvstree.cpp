@@ -45,27 +45,7 @@ void csStaticPVSNode::PropagateBBox (const csBox3& box)
   node_bbox = box;
   if (child1 == 0 && child2 == 0) return;
   csBox3 box1, box2;
-  switch (axis)
-  {
-    case 0:
-      box1.Set (box.MinX (), box.MinY (), box.MinZ (),
-      		where,       box.MaxY (), box.MaxZ ());
-      box2.Set (where,       box.MinY (), box.MinZ (),
-      		box.MaxX (), box.MaxY (), box.MaxZ ());
-      break;
-    case 1:
-      box1.Set (box.MinX (), box.MinY (), box.MinZ (),
-      		box.MaxX (), where,       box.MaxZ ());
-      box2.Set (box.MinX (), where,       box.MinZ (),
-      		box.MaxX (), box.MaxY (), box.MaxZ ());
-      break;
-    case 2:
-      box1.Set (box.MinX (), box.MinY (), box.MinZ (),
-      		box.MaxX (), box.MaxY (), where);
-      box2.Set (box.MinX (), box.MinY (), where,
-      		box.MaxX (), box.MaxY (), box.MaxZ ());
-      break;
-  }
+  box.Split (axis, where, box1, box2);
   if (child1) child1->PropagateBBox (box1);
   if (child2) child2->PropagateBBox (box2);
 }

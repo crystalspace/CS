@@ -21,6 +21,61 @@
 
 #include <crystalspace.h>
 
+class PVSCalc;
+
+/**
+ * The PVS calculator for one sector.
+ */
+class PVSCalcSector
+{
+private:
+  PVSCalc* parent;
+  iSector* sector;
+  iPVSCuller* pvs;
+  iStaticPVSTree* pvstree;
+
+  // All static polygons. Will be sorted on size.
+  csArray<csPoly3D> polygons;
+  // All world boxes for all objects. Will be used for calculating kdtree.
+  csArray<csBox3> boxes;
+
+  /**
+   * Count distribution of boxes for the three axii.
+   * distx, disty, and distz will contain the difference between
+   * left and right distribution. So the smallest value is best.
+   */
+  void CountDistribution (
+	const csArray<csBox3>& boxlist,
+	float wherex, float wherey, float wherez,
+	int& distx, int& disty, int& distz);
+  /// Distribute a set of boxes to left/right.
+  void DistributeBoxes (int axis, float where,
+	const csArray<csBox3>& boxlist,
+	csArray<csBox3>& boxlist_left,
+	csArray<csBox3>& boxlist_right);
+  /// Build the kdtree.
+  void BuildKDTree ();
+  void BuildKDTree (void* node, const csArray<csBox3>& boxlist,
+	const csBox3& bbox, const csVector3& minsize);
+
+public:
+  PVSCalcSector (PVSCalc* parent, iSector* sector, iPVSCuller* pvs);
+
+  /**
+   * Collect all geometry from this mesh if static.
+   * If not-static the mesh is still used for kdtree generation.
+   */
+  void CollectGeometry (iMeshWrapper* mesh,
+  	csBox3& allbox, csBox3& staticbox,
+	int& allcount, int& staticcount,
+	int& allpcount, int& staticpcount);
+
+  /**
+   * Calculate the PVS for this sector.
+   */
+  void Calculate ();
+};
+
 /**
  * PVS calculator application. This is for the PVS visibility culler.
  */

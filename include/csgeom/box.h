@@ -924,6 +924,47 @@ public:
   }
 
   /**
+   * Split this box along an axis and construct two new boxes.
+   */
+  void Split (int axis, float where, csBox3& bl, csBox3& br) const
+  {
+    switch (axis)
+    {
+      case 0:
+        bl.Set (minbox.x, minbox.y, minbox.z,
+      	        where,    maxbox.y, maxbox.z);
+        br.Set (where,    minbox.y, minbox.z,
+      	        maxbox.x, maxbox.y, maxbox.z);
+        break;
+      case 1:
+        bl.Set (minbox.x, minbox.y, minbox.z,
+      	        maxbox.x, where,    maxbox.z);
+        br.Set (minbox.x, where,    minbox.z,
+      	        maxbox.x, maxbox.y, maxbox.z);
+        break;
+      case 2:
+        bl.Set (minbox.x, minbox.y, minbox.z,
+      	        maxbox.x, maxbox.y, where);
+        br.Set (minbox.x, minbox.y, where,
+      	        maxbox.x, maxbox.y, maxbox.z);
+        break;
+    }
+  }
+
+  /**
+   * Test if this box intersects with the given axis aligned plane.
+   * Returns < 0 if box is completely in left half.
+   * Returns > 0 if box is completely in right half.
+   * Returns 0 if box is intersected.
+   */
+  int TestSplit (int axis, float where) const
+  {
+    if (maxbox[axis] < where) return -1;
+    if (minbox[axis] > where) return 1;
+    return 0;
+  }
+
+  /**
    * Test if this box is adjacent to the other on the X side.
    */
   bool AdjacentX (const csBox3& other) const;
