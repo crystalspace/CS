@@ -20,6 +20,7 @@
 #define __IMESHBALL_H__
 
 #include "csutil/scf.h"
+class csVector3;
 
 struct iMaterialWrapper;
 
@@ -35,10 +36,16 @@ struct iBallState : public iBase
 {
   /// Set x, y, and z radius of ball.
   virtual void SetRadius (float radx, float rady, float radz) = 0;
+  /// Get radius x, y and z
+  virtual void GetRadius (float& radx, float& rady, float& radz) const = 0;
   /// Set shift of ball.
   virtual void SetShift (float shiftx, float shifty, float shiftz) = 0;
+  /// Get shift x, y and z
+  virtual const csVector3& GetShift () const = 0;
   /// Set number of vertices on outer circle of ball.
   virtual void SetRimVertices (int num) = 0;
+  /// Get number of vertices on outer circle of ball.
+  virtual int GetRimVertices () const = 0;
   /// Set material of ball.
   virtual void SetMaterialWrapper (iMaterialWrapper* material) = 0;
   /// Get material of ball.

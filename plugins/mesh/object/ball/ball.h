@@ -98,12 +98,15 @@ public:
   /// Get mixmode.
   UInt GetMixMode () { return MixMode; }
   void SetRadius (float radiusx, float radiusy, float radiusz);
+  void GetRadius (float& radx, float& rady, float& radz) const 
+  { radx=radiusx; rady=radiusy; radz=radiusz; }
   void SetShift (float shiftx, float shifty, float shiftz)
   {
     initialized = false;
     shapenr++;
     shift.Set (shiftx, shifty, shiftz);
   }
+  const csVector3& GetShift () const {return shift;}
   void SetRimVertices (int num)
   {
     initialized = false;
@@ -111,6 +114,7 @@ public:
     if (verts_circle <= 1) verts_circle = 2;
     else if (verts_circle >= 60) verts_circle = 59;
   }
+  int GetRimVertices () const {return verts_circle;}
 
   ///------------------------ iMeshObject implementation ------------------------
   DECLARE_IBASE;
@@ -147,13 +151,25 @@ public:
     {
       scfParent->SetRadius (radiusx, radiusy, radiusz);
     }
+    virtual void GetRadius (float& radx, float& rady, float& radz) const
+    { 
+      return scfParent->GetRadius (radx, rady, radz);
+    }
     virtual void SetShift (float shiftx, float shifty, float shiftz)
     {
       scfParent->SetShift (shiftx, shifty, shiftz);
     }
+    virtual const csVector3& GetShift () const
+    { 
+      return scfParent->GetShift ();
+    }
     virtual void SetRimVertices (int num)
     {
       scfParent->SetRimVertices (num);
+    }
+    virtual int GetRimVertices () const
+    {
+      return scfParent->GetRimVertices ();
     }
     virtual void SetMaterialWrapper (iMaterialWrapper* material)
     {

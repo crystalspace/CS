@@ -29,6 +29,12 @@
 #include "imesh/imball.h"
 #include "ivideo/igraph3d.h"
 #include "qint.h"
+#include "iutil/istrvec.h"
+#include "csutil/util.h"
+#include "iobject/iobject.h"
+#include "iengine/imater.h"
+#include "csengine/material.h"
+#include "iengine/imovable.h"
 
 CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ADD)
@@ -52,19 +58,35 @@ IMPLEMENT_IBASE (csBallFactoryLoader)
   IMPLEMENTS_INTERFACE (iPlugIn)
 IMPLEMENT_IBASE_END
 
+IMPLEMENT_IBASE (csBallFactorySaver)
+  IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+IMPLEMENT_IBASE_END
+
 IMPLEMENT_IBASE (csBallLoader)
   IMPLEMENTS_INTERFACE (iLoaderPlugIn)
   IMPLEMENTS_INTERFACE (iPlugIn)
 IMPLEMENT_IBASE_END
 
+IMPLEMENT_IBASE (csBallSaver)
+  IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+IMPLEMENT_IBASE_END
+
 IMPLEMENT_FACTORY (csBallFactoryLoader)
+IMPLEMENT_FACTORY (csBallFactorySaver)
 IMPLEMENT_FACTORY (csBallLoader)
+IMPLEMENT_FACTORY (csBallSaver)
 
 EXPORT_CLASS_TABLE (ballldr)
   EXPORT_CLASS (csBallFactoryLoader, "crystalspace.mesh.loader.factory.ball",
     "Crystal Space Ball Factory Loader")
+  EXPORT_CLASS (csBallFactorySaver, "crystalspace.mesh.saver.factory.ball",
+    "Crystal Space Ball Factory Saver")
   EXPORT_CLASS (csBallLoader, "crystalspace.mesh.loader.ball",
     "Crystal Space Ball Mesh Loader")
+  EXPORT_CLASS (csBallSaver, "crystalspace.mesh.saver.ball",
+    "Crystal Space Ball Mesh Saver")
 EXPORT_CLASS_TABLE_END
 
 csBallFactoryLoader::csBallFactoryLoader (iBase* pParent)
@@ -93,6 +115,42 @@ iBase* csBallFactoryLoader::Parse (const char* /*string*/, iEngine* /*engine*/)
   iMeshObjectFactory* fact = type->NewFactory ();
   type->DecRef ();
   return fact;
+}
+
+//---------------------------------------------------------------------------
+
+csBallFactorySaver::csBallFactorySaver (iBase* pParent)
+{
+  CONSTRUCT_IBASE (pParent);
+}
+
+csBallFactorySaver::~csBallFactorySaver ()
+{
+}
+
+bool csBallFactorySaver::Initialize (iSystem* system)
+{
+  sys = system;
+  return true;
+}
+
+#define MAXLINE 100 /* max number of chars per line... */
+
+void csBallFactorySaver::WriteDown (iBase* obj, iStrVector *str,
+  iEngine* /*engine*/)
+{
+  iFactory *fact = QUERY_INTERFACE (this, iFactory);
+  char buf[MAXLINE];
+  char name[MAXLINE];
+  csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
+  sprintf(buf, "MESHOBJ '%s' (\n", name);
+  str->Push(strnew(buf));
+  csFindReplace(name, fact->QueryClassID (), "saver", "loader", MAXLINE);
+  sprintf(buf, "  PLUGIN ('%s')\n", name);
+  str->Push(strnew(buf));
+  str->Push(strnew("  PARAMS ()\n"));
+  str->Push(strnew(")\n"));
+  fact->DecRef();
 }
 
 //---------------------------------------------------------------------------
@@ -253,3 +311,117 @@ iBase* csBallLoader::Parse (const char* string, iEngine* engine)
 //---------------------------------------------------------------------------
 
 
+csBallSaver::csBallSaver (iBase* pParent)
+{
+  CONSTRUCT_IBASE (pParent);
+}
+
+csBallSaver::~csBallSaver ()
+{
+}
+
+bool csBallSaver::Initialize (iSystem* system)
+{
+  sys = system;
+  return true;
+}
+
+static void WriteMixmode(iStrVector *str, UInt mixmode)
+{
+  str->Push(strnew("  MIXMODE ("));
+  if(mixmode&CS_FX_COPY) str->Push(strnew(" COPY ()"));
+  if(mixmode&CS_FX_ADD) str->Push(strnew(" ADD ()"));
+  if(mixmode&CS_FX_MULTIPLY) str->Push(strnew(" MULTIPLY ()"));
+  if(mixmode&CS_FX_MULTIPLY2) str->Push(strnew(" MULTIPLY2 ()"));
+  if(mixmode&CS_FX_KEYCOLOR) str->Push(strnew(" KEYCOLOR ()"));
+  if(mixmode&CS_FX_TRANSPARENT) str->Push(strnew(" TRANSPARENT ()"));
+  if(mixmode&CS_FX_ALPHA) {
+    char buf[MAXLINE];
+    sprintf(buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
+    str->Push(strnew(buf));
+  }
+  str->Push(strnew(")"));
+}
+
+void csBallSaver::WriteDown (iBase* obj, iStrVector *str,
+  iEngine* /*engine*/)
+{
+  iFactory *fact = QUERY_INTERFACE (this, iFactory);
+  iMeshObject *mesh = QUERY_INTERFACE(obj, iMeshObject);
+  if(!mesh)
+  {
+    printf("Error: non-mesh given to %s.\n", 
+      fact->QueryDescription () );
+    fact->DecRef();
+    return;
+  }
+  iBallState *state = QUERY_INTERFACE(obj, iBallState);
+  if(!state)
+  {
+    printf("Error: invalid mesh given to %s.\n", 
+      fact->QueryDescription () );
+    fact->DecRef();
+    mesh->DecRef();
+    return;
+  }
+  const char* objname = "Untitled";
+  iObject *objinterface = QUERY_INTERFACE(obj, iObject); 
+  if(objinterface)
+  {
+    objname = objinterface->GetName ();
+  }
+
+  char buf[MAXLINE];
+  char name[MAXLINE];
+  sprintf(buf, "MESHOBJ '%s' (\n", objname);
+  str->Push(strnew(buf));
+  csFindReplace(name, fact->QueryClassID (), "saver", "loader", MAXLINE);
+  sprintf(buf, "  PLUGIN ('%s')\n", name);
+  str->Push(strnew(buf));
+  str->Push(strnew("  PARAMS (\n"));
+  csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
+  sprintf(buf, "    FACTORY ('%s')\n", name);
+  str->Push(strnew(buf));
+  if(state->GetMixMode() != CS_FX_COPY)
+  {
+    str->Push(strnew("    "));
+    WriteMixmode(str, state->GetMixMode());
+  }
+
+  // Mesh information
+  float x=0, y=0, z=0;
+  state->GetRadius(x, y, z);
+  sprintf(buf, "    RADIUS (%g, %g, %g)\n", x, y, z);
+  str->Push(strnew(buf));
+  sprintf(buf, "    SHIFT (%g, %g, %g)\n", state->GetShift ().x, 
+    state->GetShift ().y, state->GetShift ().z);
+  str->Push(strnew(buf));
+  sprintf(buf, "    NUMRIM (%d)\n", state->GetRimVertices());
+  str->Push(strnew(buf));
+  sprintf(buf, "    MATERIAL (%s)\n", state->GetMaterialWrapper()->
+    GetPrivateObject()->GetName());
+  str->Push(strnew(buf));
+
+  
+
+  str->Push(strnew("  )\n"));
+  iMovable *movable = QUERY_INTERFACE(obj, iMovable);
+  if(movable)
+  {
+    sprintf(buf, "  MOVE (%g, %g, %g)\n", movable->GetPosition().x,
+      movable->GetPosition().y, movable->GetPosition().z);
+    str->Push(strnew(buf));
+  }
+  str->Push(strnew(")\n"));
+  
+  if(movable)
+    movable->DecRef();
+  if(objinterface)
+    objinterface->DecRef();
+  fact->DecRef();
+  mesh->DecRef();
+  state->DecRef();
+
+}
+
+//---------------------------------------------------------------------------
