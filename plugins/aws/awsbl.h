@@ -71,11 +71,12 @@ public:
   };
 public:
   /// Constructor, clears all components to 0.
-  awsBorderLayout (iAwsComponent *owner, 
+  awsBorderLayout (
+    iAwsComponent *owner,
     iAwsComponentNode* settings,
-		iAwsPrefManager *pm);
+    iAwsPrefManager *pm);
 
-  /// Empty destructor
+  /// Empty destructor.
   virtual ~awsBorderLayout () {}
 
   /**

@@ -24,6 +24,7 @@
 
 class awsBarChart : public awsPanel
 {
+private:
   /// Flag for inner frame style.
   int inner_frame_style;
 
@@ -66,8 +67,6 @@ class awsBarChart : public awsPanel
 public:
   awsBarChart ();
   virtual ~awsBarChart ();
-
-  /******* Chart Options **********************/
   
   /**
    * The chart rolls, so that when it has reached MaxItems width, the
@@ -76,29 +75,27 @@ public:
    */
   static const int coRolling;
 
-  /// Chart rolls left
+  /// Chart rolls left.
   static const int coRollLeft;
 
-  /// Chart rolls right
+  /// Chart rolls right.
   static const int coRollRight;
 
-  /// Chart has vertical gridlines
+  /// Chart has vertical gridlines.
   static const int coVertGridLines;
 
-  /// Chart has horizontal gridlines
+  /// Chart has horizontal gridlines.
   static const int coHorzGridLines;
 
-  /// Chart is vertical rather than horizontal
+  /// Chart is vertical rather than horizontal.
   static const int coVerticalChart;
 
-  /******* Signals **********************/
-
-  /// An up and down motion for the button
+  /// An up and down motion for the button.
   static const int signalClicked;
 
   /// A signal that tells the app it should update the rolling chart.
   static const int signalTimer;
-public:
+
   /// Get's the texture handle and the title, plus style if there is one.
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
@@ -114,17 +111,15 @@ public:
   /// Returns the named TYPE of the component, like "Radio Button", etc.
   virtual const char *Type ();
 
-public:
-
   /// Triggered when the component needs to draw.
   virtual void OnDraw (csRect clip);
 
 protected:
   /// Add a new item to the top.
-  void Push (BarItem &i, bool normal=true);
+  void Push (BarItem &i, bool normal = true);
 
   /// Kill an item from the bottom .
-  void Pop (bool normal=true);
+  void Pop (bool normal = true);
 };
 
 class awsBarChartFactory : public awsComponentFactory
