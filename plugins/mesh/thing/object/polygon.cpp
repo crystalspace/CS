@@ -1038,9 +1038,7 @@ csPolygon3D::csPolygon3D ()
 
 csPolygon3D::~csPolygon3D ()
 {
-  thing->GetStaticData ()->thing_type->blk_polytex.Free (txt_info);
-  //delete txt_info;
-
+  RemovePolyTexture ();
   if (thing)
   {
     while (lightpatches)
@@ -1052,6 +1050,22 @@ csPolygon3D::~csPolygon3D ()
       thing->GetStaticData ()->thing_type->lightpatch_pool->Free (lightpatches);
     }
   }
+}
+
+void csPolygon3D::RemovePolyTexture ()
+{
+  if (!txt_info) return;
+  if (GetParent ())
+  {
+    iGraphics3D* G3D = GetParent()->GetStaticData()->thing_type->G3D;
+    if (G3D && txt_info->rlm) G3D->RemoveFromCache (txt_info->rlm);
+  }
+  if (txt_info->lm)
+  {
+    GetParent ()->GetStaticData ()->thing_type->blk_lightmap.Free (txt_info->lm);
+  }
+  thing->GetStaticData ()->thing_type->blk_polytex.Free (txt_info);
+  txt_info = 0;
 }
 
 void csPolygon3D::SetStaticPoly (csPolygon3DStatic* static_poly)
@@ -1066,9 +1080,7 @@ void csPolygon3D::SetParent (csThing *thing)
 
 void csPolygon3D::RefreshFromStaticData ()
 {
-  thing->GetStaticData ()->thing_type->blk_polytex.Free (txt_info);
-  //delete txt_info;
-  txt_info = 0;
+  RemovePolyTexture ();
   if (static_poly->IsTextureMappingEnabled ())
   {
     txt_info = static_poly->thing_static->thing_type->blk_polytex.Alloc ();
@@ -1098,7 +1110,6 @@ void csPolygon3D::Finish ()
 
   if (static_poly->IsTextureMappingEnabled ())
   {
-    txt_info->SetPolygon (this);
     txt_info->SetLightMap (0);
     if (static_poly->flags.Check (CS_POLY_LIGHTING))
     {

@@ -2841,8 +2841,8 @@ void csThing::UpdateDirtyLMs ()
         lmi->ObjectToWorld (m_obj2tex, v_obj2tex,
 		o2c, m_world2tex, v_world2tex);
       }
-      if (lmi->DynamicLightsDirty () && lmi->RecalculateDynamicLights (
-      	m_world2tex, v_world2tex))	
+      if (lmi->GetLightVersion () != GetLightVersion () && lmi->RecalculateDynamicLights (
+      	m_world2tex, v_world2tex, poly))	
       {
 	litPolys[i]->lightmaps[j]->SetData (
 	  lmi->GetLightMap ()->GetMapData ());

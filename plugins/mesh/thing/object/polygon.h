@@ -544,6 +544,9 @@ public:
    */
   ~csPolygon3D ();
 
+  /// Remove the polygon texture.
+  void RemovePolyTexture ();
+
   /**
    * Get the lightmap information.
    */

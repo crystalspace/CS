@@ -56,6 +56,7 @@ struct csLightingPolyTexQueue : public iLightingProcessData
 private:
   // Vector containing csPolygonTexture pointers.
   csArray<csPolyTexture*> polytxts;
+  csArray<csPolygon3D*> polygons;
   iLight* light;
 
 public:
@@ -67,7 +68,7 @@ public:
    * polytexture is not already there! A csPolyTexture should be
    * added to the queue when it gets a shadow_bitmap.
    */
-  void AddPolyTexture (csPolyTexture* pt);
+  void AddPolyTexture (csPolyTexture* pt, csPolygon3D* polygon);
 
   /**
    * Update all lightmaps or shadowmaps mentioned in the queue.
@@ -243,11 +244,7 @@ private:
    */
   bool lightmap_up_to_date;
 
-  /// The corresponding polygon.
-  csPolygon3D* polygon;
-
   /// How to map the lightmap on the polygon.
-  //csLightMapMapping* mapping;
   csPolyTextureMapping* tmapping;
   csRef<iRendererLightmap> rlm;
 
@@ -283,16 +280,6 @@ public:
   void SetRendererLightmap (iRendererLightmap* rlm);
 
   /**
-   * Set the corresponding polygon for this polytexture.
-   */
-  void SetPolygon (csPolygon3D* p);
-
-  /**
-   * Return the polygon corresponding to this texture
-   */
-  csPolygon3D *GetCSPolygon () { return polygon; }
-
-  /**
    * Set the lightmap for this polytexture (and call IncRef()
    * on the lightmap). Can also be used to clear the reference
    * to the lightmap if 'lightmap' is 0.
@@ -325,7 +312,8 @@ public:
   void UpdateFromShadowBitmap (iLight* light, const csVector3& lightpos,
   	const csColor& lightcolor,
 	const csMatrix3& m_world2tex,
-	const csVector3& v_world2tex);
+	const csVector3& v_world2tex,
+	csPolygon3D* polygon);
 
   /**
    * Update the real lightmap for a given csLightPatch
@@ -333,7 +321,8 @@ public:
    */
   void ShineDynLightMap (csLightPatch* lp,
 	const csMatrix3& m_world2tex,
-	const csVector3& v_world2tex);
+	const csVector3& v_world2tex,
+	csPolygon3D* polygon);
 
   /**
    * Transform this plane from object space to world space using
@@ -344,14 +333,15 @@ public:
 	csMatrix3& m_world2tex,
 	csVector3& v_world2tex);
 
-  iMaterialHandle *GetMaterialHandle ();
+  //iMaterialHandle *GetMaterialHandle ();
   iRendererLightmap* GetRendererLightmap () const
   {
     return rlm;
   }
 
-  /// Check if dynamic lighting information should be recalculated
-  bool DynamicLightsDirty ();
+  /// Get light version.
+  uint32 GetLightVersion () const { return light_version; }
+
   /**
    * Recalculate all pseudo and real dynamic lights if the
    * texture is dirty. The function returns true if there
@@ -360,7 +350,8 @@ public:
    */
   bool RecalculateDynamicLights (
 	const csMatrix3& m_world2tex,
-	const csVector3& v_world2tex);
+	const csVector3& v_world2tex,
+	csPolygon3D* polygon);
 
   /// Query the size of one light cell
   int GetLightCellSize ();

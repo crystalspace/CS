@@ -44,7 +44,7 @@ float csPolyTexture::cfg_cosinus_factor = 0;
 csPolyTexture::csPolyTexture ()
 {
   lm = 0;
-  polygon = 0;
+  //polygon = 0;
   shadow_bitmap = 0;
   light_version = 0;
   tmapping = 0;
@@ -83,22 +83,13 @@ void csPolyTexture::SetRendererLightmap (iRendererLightmap* rlm)
 
 csPolyTexture::~csPolyTexture ()
 {
-  if (polygon && polygon->GetParent ())
-  {
-    iGraphics3D* G3D = polygon->GetParent()->GetStaticData()->thing_type->G3D;
-    if (G3D && rlm) G3D->RemoveFromCache (/*thismapping, tmapping, */ rlm);
-  }
   delete shadow_bitmap;
-  if (polygon && lm)
-  {
-    polygon->GetParent ()->GetStaticData ()->thing_type->blk_lightmap.Free (lm);
-  }
 }
 
-iMaterialHandle *csPolyTexture::GetMaterialHandle ()
-{
-  return polygon->GetStaticPoly ()->GetMaterialHandle ();
-}
+//iMaterialHandle *csPolyTexture::GetMaterialHandle ()
+//{
+  //return polygon->GetStaticPoly ()->GetMaterialHandle ();
+//}
 
 void csPolyTexture::SetLightMap (csLightMap *lightmap)
 {
@@ -107,7 +98,8 @@ void csPolyTexture::SetLightMap (csLightMap *lightmap)
 
 bool csPolyTexture::RecalculateDynamicLights (
 	const csMatrix3& m_world2tex,
-	const csVector3& v_world2tex)
+	const csVector3& v_world2tex,
+	csPolygon3D* polygon)
 {
   if (!lm) return false;
 
@@ -129,7 +121,7 @@ bool csPolyTexture::RecalculateDynamicLights (
   csLightPatch *lp = polygon->GetLightpatches ();
   while (lp)
   {
-    ShineDynLightMap (lp, m_world2tex, v_world2tex);
+    ShineDynLightMap (lp, m_world2tex, v_world2tex, polygon);
     lp = lp->GetNext ();
   }
 
@@ -249,7 +241,7 @@ void csPolyTexture::FillLightMap (
   iFrustumView *lview,
   csLightingPolyTexQueue* lptq,
   bool vis,
-  csPolygon3D *subpoly,
+  csPolygon3D* subpoly,
   const csMatrix3& m_world2tex,
   const csVector3& v_world2tex)
 {
@@ -261,7 +253,7 @@ void csPolyTexture::FillLightMap (
   csVector3 &lightpos = light_frustum->GetOrigin ();
   float inv_lightcell_size = 1.0f / csLightMap::lightcell_size;
   int ww, hh;
-  iMaterialHandle* mat_handle = polygon->static_poly->GetMaterialHandle ();
+  iMaterialHandle* mat_handle = subpoly->static_poly->GetMaterialHandle ();
   if (mat_handle && mat_handle->GetTexture ())
     mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
   else
@@ -277,7 +269,7 @@ void csPolyTexture::FillLightMap (
         3, //@@@@@@@csEngine::lightmap_quality,
         light_frustum->IsInfinite () ? 1 : 0);
 
-    lptq->AddPolyTexture (this);
+    lptq->AddPolyTexture (this, subpoly);
   }
 
   if (shadow_bitmap->IsFullyShadowed ()) return ;
@@ -285,11 +277,10 @@ void csPolyTexture::FillLightMap (
   // Room for our shadow in lightmap space.
   csVector2 s2d[MAX_OUTPUT_VERTICES];
 
-  if (!vis && (subpoly == polygon))
+  if (!vis)
   {
-    // If the subpoly is equal to the polygon and it is completely
-    // shadowed due to external causes (i.e. c-buffer) then we just
-    // fill it as entirely shadowed.
+    // If completely shadowed due to external causes (i.e. c-buffer)
+    // then we just fill it as entirely shadowed.
     shadow_bitmap->RenderTotal (1);
   }
   else
@@ -302,7 +293,7 @@ void csPolyTexture::FillLightMap (
     // on the polygon plane but I'm not sure yet how to do that efficiently.
     // poly will be the polygon to which we clip all frustums.
     csVector3 poly[4];
-    csPolygon3D *base_poly = polygon;
+    csPolygon3D *base_poly = subpoly;
     int num_vertices = 4;
     csMatrix3 m_t2w = m_world2tex.GetInverse ();
     const csVector3 &v_t2w = v_world2tex;
@@ -462,7 +453,8 @@ void csPolyTexture::FillLightMap (
 /* Modified by me to correct some lightmap's border problems -- D.D. */
 void csPolyTexture::ShineDynLightMap (csLightPatch *lp,
   const csMatrix3& m_world2tex,
-  const csVector3& v_world2tex)
+  const csVector3& v_world2tex,
+  csPolygon3D* polygon)
 {
   int lw = 1 +
     ((tmapping->w_orig + csLightMap::lightcell_size - 1) >>
@@ -769,7 +761,8 @@ void csPolyTexture::UpdateFromShadowBitmap (
   const csVector3 &lightpos,
   const csColor &lightcolor,
   const csMatrix3& m_world2tex,
-  const csVector3& v_world2tex)
+  const csVector3& v_world2tex,
+  csPolygon3D* polygon)
 {
   CS_ASSERT (shadow_bitmap != 0);
 
@@ -859,16 +852,6 @@ void csPolyTexture::UpdateFromShadowBitmap (
 
   delete shadow_bitmap;
   shadow_bitmap = 0;
-}
-
-void csPolyTexture::SetPolygon (csPolygon3D *p)
-{
-  polygon = p;
-}
-
-bool csPolyTexture::DynamicLightsDirty ()
-{
-  return polygon->GetParent ()->GetLightVersion () != light_version;
 }
 
 int csPolyTexture::GetLightCellSize ()
@@ -1563,9 +1546,10 @@ csLightingPolyTexQueue::~csLightingPolyTexQueue ()
   SCF_DESTRUCT_IBASE ();
 }
 
-void csLightingPolyTexQueue::AddPolyTexture (csPolyTexture *pt)
+void csLightingPolyTexQueue::AddPolyTexture (csPolyTexture *pt, csPolygon3D* polygon)
 {
   polytxts.Push (pt);
+  polygons.Push (polygon);
 }
 
 void csLightingPolyTexQueue::UpdateMaps (
@@ -1580,7 +1564,7 @@ void csLightingPolyTexQueue::UpdateMaps (
   for (i = 0; i < polytxts.Length (); i++)
   {
     csPolyTexture *pt = polytxts[i];
-    csPolygon3D* pol = pt->GetCSPolygon ();
+    csPolygon3D* pol = polygons[i];
     pol->GetParent ()->WorUpdate ();
     iMovable* mov = pol->GetParent ()->GetCachedMovable ();
     csMatrix3 m_world2tex;
@@ -1600,8 +1584,9 @@ void csLightingPolyTexQueue::UpdateMaps (
 	m_world2tex, v_world2tex);
     }
     pt->UpdateFromShadowBitmap (light, lightpos, lightcolor,
-    	m_world2tex, v_world2tex);
+    	m_world2tex, v_world2tex, pol);
   }
 
   polytxts.DeleteAll ();
+  polygons.DeleteAll ();
 }

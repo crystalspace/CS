@@ -56,6 +56,8 @@ chronological order.
 	  object. This way it is less confusing because csThing also uses
 	  'static_data' to refer to the static thing.
 	- Jorrit removed two unnused functions from thing mesh plugin.
+	- Jorrit removed 4 bytes for every polygon (removed a pointer back
+	  to the polygon in csPolyTexture).
 17-Feb-2004
 	- Jorrit fixed a bug in csPolygonMeshTools::Triangulate(). It would
 	  try to allocate a 0 size array in some cases.
