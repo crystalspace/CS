@@ -42,6 +42,13 @@ chronological order.
 	  SRC.GL3D and INC.GL3D variables were not populated correctly when the
 	  build directory differed from the source directory.  Specifically,
 	  everything from the opengl/effects subdirectory was missed.
+	- Eric Sunshine devised and implemented a scheme which allows `msvcgen'
+	  to synthesize the familiar pseudo-group projects "grpall", "grpapps",
+	  "grplibs", and "grpplugins" despite the fact that the contents of
+	  these groups differ from workspace to workspace.  (These groups were
+	  originally removed on 4-Feb-2004 with the introduction of multiple,
+	  customized workspaces, because the old scheme of createing the group
+	  projects was incompatible with customized workspaces.)
 9-Feb-2004
 	- Eric Sunshine fixed bug in csKeyValuePair where it was incorrectly
 	  invoking SCF_CONSTRUCT_IBASE() even though it should not have been

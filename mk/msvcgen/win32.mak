@@ -21,9 +21,12 @@
 #------------------------------------------------------------------------------
 # win32.mak
 #
-#	This makfile component extends the value of MSVC.DSP with extra
-#	targets which are specific to Windows or which are not otherwise
-#	represented by stand-alone makefiles within the project hierarchy.
+#	This makfile component optionally extends the value of MSVC.DSP with
+#	extra targets which are specific to Windows or which are not otherwise
+#	represented by stand-alone makefiles within the project hierarchy.  It
+#	can also define and adjust variables needed to ensure that generation
+#	of Windows resources is performed correctly even when synthesis is done
+#	from non-Windows platforms.
 #
 # *NOTE* SYS_CSUTIL
 #	We override the SRC.SYS_CSUTIL and INC.SYS_CSUTIL variables from the

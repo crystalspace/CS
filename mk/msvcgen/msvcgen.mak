@@ -70,6 +70,9 @@
 #	  makefile.  For example, soft3d.mak, modifies this variable with the
 #	  expression "MSVC.DSP += SOFT3D".
 #
+#	o MSVC.GROUPS -- Master list of pseudo-project groups which should
+#	  appear in each generated workspace.  See groups.mak for full details.
+#
 #	o DSP.PROJECT.NAME -- Base name (such as "soft3d") for the generated
 #	  project and target.  This name is used to compose the project file
 #	  name, the end target name (such as "soft3d.dll"), and the displayed
@@ -131,9 +134,13 @@
 #	The automatic MSVC project file generation mechanism also employs
 #	additional makefile components from the CS/mk/msvcgen directory.
 #
-#	o win32.mak -- Extends MSVC.DSP with extra project targets which are
-#	  specific to Windows or which are not otherwise represented by
-#	  stand-alone makefiles within the project hierarchy.
+#	o win32.mak -- Optionally extends MSVC.DSP with extra project targets
+#	  which are specific to Windows or which are not otherwise represented
+#	  by stand-alone makefiles within the project hierarchy.  Also defines
+#	  MSVC.GROUPS with a list of pseudo-project groups which should appear
+#	  in each workspace.  Finally, provides any special defines needed to
+#	  ensure that the generated files are correct for Windows even when
+#	  synthesized from a non-Windows platform.
 #
 #	o required.mak -- Populates MSVC.PLUGINS.REQUIRED and
 #	  MSVC.MAKE.FLAGS variables.  MSVC.PLUGINS.REQUIRED supplements the
@@ -144,6 +151,9 @@
 #	  additional flags to be sent to the child "make" invocation.  This is
 #	  useful when one needs to define additional make variables which
 #	  affect the synthesis process.
+#
+#	o groups.mak -- Populates MSVC.GROUPS, which is a list of
+#	  pseudo-project groups which should appear in each workspace.
 #
 #	o workspaces.mak -- Populates MSVC.WORKSPACES, which is a list of
 #	  workspaces (SLN/DSW) to create.
@@ -353,22 +363,52 @@ MSVC.VERSIONRC.OUT.group   =
 # Define extra Windows-specific targets which do not have associated makefiles.
 include $(SRCDIR)/mk/msvcgen/win32.mak
 
-# Define workspaces.
+# Define workspaces and groups.
 include $(SRCDIR)/mk/msvcgen/workspaces.mak
+include $(SRCDIR)/mk/msvcgen/groups.mak
+
+# Macro which returns first element of $* when $* is "element1/element2".
+MSVC.CAR = $(patsubst %/,%,$(dir $*))
+
+# Macro which returns second element of $* when $* is "element1/element2".
+MSVC.CDR = $(notdir $*)
+
+# Macro which returns "project-workspace" if $* is "workspace/project",
+# otherwise returns "project" if $* is "project".
+MSVC.FORMAT = $(MSVC.FORMAT.PRE)$(MSVC.FORMAT.MID)$(MSVC.FORMAT.POST)
+MSVC.FORMAT.PRE  = $(DSP.$(MSVC.CDR).NAME)
+MSVC.FORMAT.MID  = $(MSVC.FORMAT.$(words $(subst /, ,$*)))
+MSVC.FORMAT.POST = $(MSVC.WORKSPACE.$(MSVC.CAR).NAME)
+MSVC.FORMAT.1 =
+MSVC.FORMAT.2 = -
+
+# Macro to determine workspace base name. (ex: "TYPICAL" becomes "typical")
+# If $* contains a slash, then only the text before the slash is used.
+MSVC.WORKSPACE.CORE = $(MSVC.WORKSPACE.$(MSVC.CAR).NAME)
 
 # Macro to compose workspace name. (ex: "TYPICAL" becomes "wkstypical.sln")
+# If $* contains a slash, then only the text before the slash is used.
 MSVC.WORKSPACE = \
-  $(MSVC.PFX.WORKSPACE)$(MSVC.WORKSPACE.$*.NAME).$(MSVC.EXT.WORKSPACE)
+  $(MSVC.PFX.WORKSPACE)$(MSVC.WORKSPACE.CORE).$(MSVC.EXT.WORKSPACE)
 
 # Macro to compose project name. (ex: "CSGEOM" becomes "libcsgeom")
-MSVC.PROJECT = $(MSVC.PREFIX.$(DSP.$*.TYPE))$(DSP.$*.NAME)
+# If $* is of the form "workspace/proj", then the composed project name is
+# augmented by the workspace name. (ex: "TYPICAL/GEOM" becomes
+# "libcsgeom-typical")
+MSVC.PROJECT = $(MSVC.PREFIX.$(DSP.$(MSVC.CDR).TYPE))$(MSVC.FORMAT)
 
 # Macro to compose full project pathname.
-# (ex: "CSGEOM" becomes "out/mk/visualc/libcsgeom.dsp")
+# (ex: "CSGEOM" becomes "out/mk/visualc7/libcsgeom.vcproj")
+# If $* is of the form "workspace/proj", then the composed project pathname is
+# augmented by the workspace name. (ex: "TYPICAL/GEOM" becomes
+# "out/mk/visucalc7/libcsgeom-typical.vcproj")
 MSVC.OUTPUT = $(MSVC.OUT.DIR)/$(MSVC.PROJECT).$(MSVC.EXT.PROJECT)
 
 # Macro to compose full fragment pathname.
-# (ex: "CSGEOM" becomes "out/mk/fragment/libcsgeom.frag")
+# (ex: "CSGEOM" becomes "out/mk/fragment7/libcsgeom.frag")
+# If $* is of the form "workspace/proj", then the composed fragment pathname is
+# augmented by the workspace name. (ex: "TYPICAL/GEOM" becomes
+# "out/mk/fragment7/libcsgeom-typical.frag")
 MSVC.FRAGMENT = $(MSVC.OUT.FRAGMENT)/$(MSVC.PROJECT).$(MSVC.EXT.FRAGMENT)
 
 # Macros to compose project.rc filename for standard and build locations.
@@ -419,8 +459,10 @@ MSVC.METAFILE.DIRECTIVE = \
 # appgui, appcon, plugin, library, etc.).  Items in these lists are indirect
 # project names (i.e. "CSGEOM") which are tranformed into actual project names
 # (i.e. "libcsgeom") via the variables DSP.PROJECT.NAME and DSP.PROJECT.TYPE.
-MSVC.DEPEND.LIST = $(foreach d,$(sort \
-  $(DEP.$*) $(DSP.$*.DEPEND) $(MSVC.DEPEND.$(DSP.$*.TYPE))),\
+# If $* contains a slash, the only the text following the slash is used in
+# composition of the names.
+MSVC.DEPEND.LIST = $(foreach d,$(sort $(DEP.$(MSVC.CDR)) \
+  $(DSP.$(MSVC.CDR).DEPEND) $(MSVC.DEPEND.$(DSP.$(MSVC.CDR).TYPE))),\
   $(MSVC.PREFIX.$(DSP.$d.TYPE))$(DSP.$d.NAME))
 
 # Macro to compose list of --depend directives from MSVC.DEPEND.LIST.
@@ -433,11 +475,11 @@ MSVC.LIBRARY.DIRECTIVES = \
   $(addprefix --delaylib=,$(DSP.$*.DELAYLIBS))
 
 # Macros to compose list of --accept and --reject directives from
-# MSVC.WORKSPACE definitions.
+# MSVC.WORKSPACE definitions.  Workspace is $(dir) portion of $*.
 MSVC.ACCEPT.DIRECTIVES = \
-  $(foreach d,$(MSVC.WORKSPACE.$*.ACCEPT),--accept='$d')
+  $(foreach d,$(MSVC.WORKSPACE.$(MSVC.CAR).ACCEPT),--accept='$d')
 MSVC.REJECT.DIRECTIVES = \
-  $(foreach d,$(MSVC.WORKSPACE.$*.REJECT),--reject='$d')
+  $(foreach d,$(MSVC.WORKSPACE.$(MSVC.CAR).REJECT),--reject='$d')
 
 # Macros to compose --lflags and --cflags directives from DSP.PROJECT.LFLAGS
 # and DSP.PROJECT.CFLAGS.  These are slightly complicated because it is valid
@@ -521,6 +563,26 @@ ifeq ($(MAKESECTION),targets)
 	$(MSVCGEN.EXTRA) \
 	$(MSVC.CONTENTS)
 
+# Build a pseudo-group project for a workspace.  Invoke this target as
+# workspace/group.MAKEGROUP where 'workspace' is the name of a workspace listed
+# in the MSVC.WORKSPACES array and 'group' is the name of a group listed in the
+# MSVC.GROUPS array.
+%.MAKEGROUP:
+	$(MSVC.SILENT)$(MSVCGEN) \
+	--quiet \
+	--project \
+	--project-extension=$(MSVC.EXT.PROJECT) \
+	--name=$(MSVC.FORMAT) \
+	--template=$(DSP.$(MSVC.CDR).TYPE) \
+	--template-dir=$(MSVC.TEMPLATE.DIR) \
+	--project-name=$(MSVC.PROJECT) \
+	--output=$(MSVC.OUTPUT) \
+	--fragment=$(MSVC.FRAGMENT) \
+	$(MSVC.DEPEND.DIRECTIVES) \
+	$(MSVC.ACCEPT.DIRECTIVES) \
+	$(MSVC.REJECT.DIRECTIVES) \
+	$(MSVCGEN.EXTRA)
+
 # Build the a workspace file (.sln/.dsw).
 %.MAKEWORKSPACE:
 	$(MSVC.SILENT)$(MSVCGEN) \
@@ -541,7 +603,9 @@ msvcgen: \
   msvcgenclean \
   $(OUTDIRS) \
   $(addsuffix .MAKEPROJECT,$(MSVC.DSP)) \
-  $(addsuffix .MAKEWORKSPACE,$(MSVC.WORKSPACES))
+  $(foreach w,$(MSVC.WORKSPACES), \
+    $(addprefix $w/,$(addsuffix .MAKEGROUP,$(MSVC.GROUPS)))) \
+  $(addsuffix /ignore.MAKEWORKSPACE,$(MSVC.WORKSPACES))
 
 # Install the generated project files in place of the files from the CVS
 # repository and inform the user as to which CVS commands must be manually

@@ -2,7 +2,7 @@
 #==============================================================================
 #
 #    Microsoft Visual C++ project and workspace file generator.
-#    Copyright (C) 2000-2003 by Eric Sunshine <sunshine@sunshineco.com>
+#    Copyright (C) 2000-2004 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -34,10 +34,10 @@ use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'msvcgen.pl';
-my $PROG_VERSION = 6;
+my $PROG_VERSION = 7;
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
-my $COPYRIGHT = "Copyright (C) 2000-2003 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
+my $COPYRIGHT = "Copyright (C) 2000-2004 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
 
 $main::opt_project = 0;
 $main::opt_p = 0;	# Alias for 'project'.
@@ -697,10 +697,10 @@ sub process_option_aliases {
 }
 
 #------------------------------------------------------------------------------
-# Filter a list of input filenames based upon --accept and --reject options.
+# Filter an input list based upon --accept and --reject options.
 #------------------------------------------------------------------------------
-sub filter_pathnames {
-    return grep(/$main::accept_patterns/ && !/$main::reject_patterns/, @_);
+sub filter {
+    return grep(/$main::accept_patterns/i && !/$main::reject_patterns/i, @_);
 }
 
 #------------------------------------------------------------------------------
@@ -748,7 +748,7 @@ sub process_project_options {
 
     my @depends;
     my $depend;
-    foreach $depend (@main::opt_depend) {
+    foreach $depend (filter(@main::opt_depend)) {
 	remove_suffix($depend, $main::opt_project_extension);
 	push(@depends, $depend);
     }
@@ -762,7 +762,7 @@ sub process_project_options {
     }
     @main::opt_strip_root = @roots;
 
-    my @files = massage_paths(filter_pathnames(@ARGV));
+    my @files = massage_paths(filter(@ARGV));
     ($main::opt_meta_file) = massage_paths($main::opt_meta_file);
     if ($main::opt_meta_file) {
 	my $metafile_rx = quotemeta($main::opt_meta_file);
@@ -793,7 +793,7 @@ sub process_workspace_options {
     add_suffix($main::opt_output, $main::opt_workspace_extension);
 
     my $fragment;
-    foreach $fragment (filter_pathnames(@ARGV)) {
+    foreach $fragment (filter(@ARGV)) {
 	my $pjf_frag = $fragment;
 	add_suffix($pjf_frag, 'pjf');
 	push(@main::pjf_fragments, $pjf_frag);
@@ -1100,8 +1100,9 @@ Project Options:
                  replacement value for the \%depend\% variable in the wsdep.tpi
                  template.  The --depend option may be specified any number of
                  times, or not at all if the project has no dependencies (which
-                 is often the case for "library" projects).  This option can be
-                 used only in conjunction with the --fragment option.
+                 is often the case for "library" projects).  Dependencies are
+                 subject to filtering by --accept and --reject.  This option
+                 can be used only in conjunction with the --fragment option.
     -S <prefix>
     --strip-root=<prefix>
                  It is generally wise for the source, header, and resource
