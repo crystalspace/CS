@@ -25,6 +25,12 @@
 
 static bool console_ok = false;
 
+/*
+
+//Thomas Hieber, 2000-07-12: It looks like console_open and 
+//console_close have been removed. I don't know why, or how 
+//to do things now. So I just uncommented the following.
+
 // to be called before all printf() calls
 void csSystemDriver::console_open ()
 {
@@ -46,10 +52,11 @@ void csSystemDriver::console_close ()
   FreeConsole();
 #endif
 }
+*/
 
 // to be called instead of printf
 void csSystemDriver::console_out (const char *str)
 {
-  if (console_ok)
+  //if (console_ok)
     fputs (str, stdout);
 }  
