@@ -65,7 +65,8 @@ private:
     csRef<iTextureHandle> tex;
     if (g3d && g3d->GetTextureManager ())
     {
-      tex = g3d->GetTextureManager ()->RegisterTexture (image, CS_TEXTURE_2D);
+      tex = g3d->GetTextureManager ()->RegisterTexture (
+        image, CS_TEXTURE_2D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS);
       if (tex)
       {
         tex->Prepare ();

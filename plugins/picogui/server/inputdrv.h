@@ -57,6 +57,7 @@ class csPGInputDriver
   static g_error RegFunc (inlib *);
   static g_error Init ();
   static void Close ();
+  static void Poll ();
   static void csPGInputDriver::FDInit (int *, fd_set *, timeval *);
 
 };

@@ -55,7 +55,7 @@ g_error csPGInputDriver::RegFunc (inlib *i)
   i->close		= Close;
   i->fd_init		= FDInit;
   i->fd_activate	= 0;
-  i->poll		= 0;
+  i->poll		= Poll;
   i->ispending		= 0;
   i->message		= 0;
   return 0;
@@ -86,6 +86,15 @@ void csPGInputDriver::Close ()
 
   EvH = 0;
   EvQ = 0;
+}
+
+void csPGInputDriver::Poll ()
+{
+  divtree *p; 
+  for (p=dts->top;p;p=p->next)
+    p->flags |= DIVTREE_ALL_REDRAW;
+  update (NULL, 0);
+  vid->sprite_showall();
 }
 
 bool csPGInputHandler::HandleEvent (iEvent &ev)
