@@ -502,8 +502,8 @@ void WinKeyTrans (csSystemDriver* pSystemDriver, WPARAM wParam, bool down)
     case VK_CONTROL: key = CSKEY_CTRL;
     case VK_SHIFT:   key = CSKEY_SHIFT;
   }
-  if (key && System)
-    System->QueueKeyEvent (key, down);
+  if (key)
+    pSystemDriver->QueueKeyEvent (key, down);
 }
 #endif
 
