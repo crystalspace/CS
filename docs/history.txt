@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+10-May-2001
+	- Fixed a bug in clipper detection for OpenGL. In some cases it
+	  would select 'N' for the required clipper which is not allowed.
 9-May-2001
 	- Martin Geisse added a version of typed vectors that don't delete
 	  their elements.
@@ -32,6 +35,27 @@ The history order is reversed so that new features are at the top.
 	  put on screen after this performance test to data/config/opengl.cfg.
 	  The lines are the one with Video.OpenGL.Clip*.
 	- Added missing support for fog in terrfunc terrain engine.
+	- Christopher Nelson fixed his broken CVS commit from yesterday.
+	  Here are his changes:
+	    - csListBox is now skinnable, and has been for a while. I just
+	      forgot to mention it. 
+	    - csListBox has 3 new framestyles: Textured, Bitmap, and
+	      BitmapNoFrame.  Just as with the other controls, you can set
+	      a bitmap with transparency to be the background.  Listbox items
+	      were also skinned, but nothing special was done with them.
+	      I may in the future implement a function which lets you set a
+	      bitmap for the highlight.  Currently the highlight is the same
+	      as it always has been.
+	    - csButton has a new member called SetDrawTextOnHighlightOnly().
+	      I know it's long, but I wasn't sure how to reduce it's size and
+	      still keep the meaning clear.  If you pass true to this member,
+	      button text will only be drawn when the mouse is over this
+	      button, or when the button is pressed.  This is very useful if
+	      your buttons are all bitmaps, and you have the text displaying
+	      beneath them.  If this doesn't make any sense, there is an
+	      attatched .jpg file which shows a screen shot of what can be
+	      done with the current version of csws using the bitmap frame
+	      types.
 8-May-2001
 	- Martin Geisse did some changes in the RTTI macros:
 	    - Extended object interfaces now use DECLARE_OBJECT_INTERFACE,

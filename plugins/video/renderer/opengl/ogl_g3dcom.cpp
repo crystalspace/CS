@@ -571,7 +571,7 @@ void csGraphics3DOGLCommon::PerfTest ()
     for (i = 0 ; i < 3 ; i++)
     {
       while (j < test_mode_cnt &&
-    	  (test_modes[j].mode == 'z' || test_modes[j].mode == 'Z')) j++;
+    	  (test_modes[j].mode == 'n' || test_modes[j].mode == 'N')) j++;
       if (j >= test_mode_cnt) clip_required[i] = '0';
       else clip_required[i] = test_modes[j].mode;
       j++;
