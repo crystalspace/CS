@@ -27,7 +27,7 @@
 #include "iengine/texture.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
-#include "csgfxldr/rgbpixel.h"
+#include "csgfx/rgbpixel.h"
 
 class csTexture;
 class csTextureManager;

@@ -22,8 +22,8 @@
 #include "ivideo/graph2d.h"
 #include "soft_txt.h"
 #include "tcache.h"
-#include "csgfxldr/memimage.h"
-#include "csgfxldr/rgbpixel.h"
+#include "csgfx/memimage.h"
+#include "csgfx/rgbpixel.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 

@@ -20,7 +20,7 @@
 #define __PROCSKYTEX_H__
 
 #include "csgeom/math3d.h"
-#include "csgfxldr/rgbpixel.h"
+#include "csgfx/rgbpixel.h"
 #include "csutil/cscolor.h"
 #include "csfx/proctex.h"
 

@@ -53,7 +53,7 @@ SRC.INF3D = $(wildcard plugins/video/renderer/inf/*.cpp \
   plugins/video/renderer/common/dpmesh.cpp \
   $(SRC.COMMON.DRV2D))
 OBJ.INF3D = $(addprefix $(OUT),$(notdir $(SRC.INF3D:.cpp=$O)))
-DEP.INF3D = CSGEOM CSGFXLDR CSUTIL CSSYS
+DEP.INF3D = CSGEOM CSGFX CSUTIL CSSYS
 
 MSVC.DSP += INF3D
 DSP.INF3D.NAME = inf3d

@@ -1,6 +1,6 @@
 /*
 
-    Graphics File Loader: a test program for csgfxldr library
+    Graphics File Loader: a test program for the image loader plugin
     Copyright (C) 2000 Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
@@ -22,14 +22,17 @@
 #define SYSDEF_PATH
 #define SYSDEF_GETOPT
 #include "cssysdef.h"
-#include "csgfxldr/csimage.h"
-#include "csgfxldr/pngsave.h"
+#include "csgfx/csimage.h"
+#include "csgfx/pngsave.h"
 #include "csutil/util.h"
+#include "csutil/cfgfile.h"
+#include "igraphic/loader.h"
 
 #include <string.h>
 
 char *programversion = "0.0.1";
 char *programname;
+iImageLoader *ImageLoader = NULL;
 
 /*
 
@@ -338,7 +341,7 @@ static bool process_file (const char *fname)
   else
     fmt = CS_IMGFMT_ANY;
 
-  iImage *ifile = csImageLoader::Load (buffer, fsize, fmt | CS_IMGFMT_ALPHA);
+  iImage *ifile = ImageLoader->Load (buffer, fsize, fmt | CS_IMGFMT_ALPHA);
   delete [] buffer;
   if (!ifile)
   {
@@ -416,6 +419,22 @@ int main (int argc, char *argv[])
 #if defined (__EMX__)	// Expand wildcards on OS/2+GCC+EMX
   _wildcard (&argc, &argv);
 #endif
+
+  // create the image loader. @@@ This is a quick hack that only works
+  // because the image loader doesn't ever use the system driver!
+  // If this changes then gfxtest needs a system driver too!
+  scfInitialize(new csConfigFile("scf.cfg"));
+  ImageLoader = CREATE_INSTANCE("crystalspace.image.loader", iImageLoader);
+  if (!ImageLoader)
+  {
+    printf("could not load image loader");
+    return -1;
+  }
+  if (!ImageLoader->Initialize(NULL))
+  {
+    printf("could not initialize image loader");
+    return -1;
+  }
 
   programname = argv [0];
 
@@ -509,11 +528,14 @@ int main (int argc, char *argv[])
   if (optind >= argc)
     return display_help ();
 
-  csImageLoader::SetDithering (opt.dither);
+  ImageLoader->SetDithering (opt.dither);
 
   for (; optind < argc; ++optind)
     if (!process_file (argv [optind]))
       return -1;
+
+  ImageLoader->DecRef();
+  scfFinish();
 
   return 0;
 }

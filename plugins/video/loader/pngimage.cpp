@@ -27,14 +27,13 @@ extern "C"
 #include <png.h>
 }
 
-#include "csgfxldr/pngimage.h"
+#include "pngimage.h"
 
 //---------------------------------------------------------------------------
 
 bool RegisterPNG ()
 {
-  static csPNGImageLoader loader;
-  return csImageLoader::Register (&loader);
+  return csImageLoader::Register (new csPNGImageLoader());
 }
 
 csImageFile* csPNGImageLoader::LoadImage (UByte* iBuffer, ULong iSize,

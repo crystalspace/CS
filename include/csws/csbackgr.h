@@ -20,7 +20,7 @@
 #ifndef __CSBACKGR_H__
 #define __CSBACKGR_H__
 
-#include "csgfxldr/rgbpixel.h"
+#include "csgfx/rgbpixel.h"
 
 struct iTextureHandle;
 class csApp;

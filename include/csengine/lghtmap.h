@@ -20,7 +20,7 @@
 #define __CS_LIGHTMAP_H__
 
 #include "csutil/scf.h"
-#include "csgfxldr/rgbpixel.h"
+#include "csgfx/rgbpixel.h"
 #include "iengine/lightmap.h"
 
 class csPolyTexture;

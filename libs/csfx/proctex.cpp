@@ -26,7 +26,7 @@
 #include "isys/system.h"
 #include "ivideo/txtmgr.h"
 
-#include "csgfxldr/memimage.h"
+#include "csgfx/memimage.h"
 #include "csengine/texture.h"
 #include "csengine/material.h"
 #include "csengine/engine.h"

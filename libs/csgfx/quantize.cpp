@@ -19,8 +19,8 @@
 
 #define SYSDEF_ALLOCA
 #include "cssysdef.h"
-#include "csgfxldr/quantize.h"
-#include "csgfxldr/inv_cmap.h"
+#include "csgfx/quantize.h"
+#include "csgfx/inv_cmap.h"
 #include <string.h>
 #include <stdlib.h>
 

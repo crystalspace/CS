@@ -19,7 +19,7 @@
 #ifndef __CS_MATERIAL_H__
 #define __CS_MATERIAL_H__
 
-#include "csgfxldr/rgbpixel.h"
+#include "csgfx/rgbpixel.h"
 #include "csobject/csobject.h"
 #include "csobject/pobject.h"
 #include "csobject/nobjvec.h"

@@ -22,10 +22,11 @@
 #include "apps/perftest/perftest.h"
 #include "apps/perftest/ptests3d.h"
 #include "apps/perftest/ptests2d.h"
-#include "csgfxldr/csimage.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "ivaria/conout.h"
+#include "igraphic/loader.h"
+#include "igraphic/image.h"
 
 //-----------------------------------------------------------------------------
 
@@ -33,10 +34,12 @@ PerfTest::PerfTest ()
 {
   draw_3d = true;
   draw_2d = true;
+  ImageLoader = NULL;
 }
 
 PerfTest::~PerfTest ()
 {
+  if (ImageLoader) ImageLoader->DecRef();
 }
 
 void cleanup ()
@@ -55,7 +58,7 @@ iMaterialHandle* PerfTest::LoadMaterial (char* file)
     Printf (MSG_FATAL_ERROR, "Error loading texture '%s'!\n", file);
     exit (-1);
   }
-  image = csImageLoader::Load (buf->GetUint8 (), buf->GetSize (),
+  image = ImageLoader->Load (buf->GetUint8 (), buf->GetSize (),
   	txtmgr->GetTextureFormat ());
   buf->DecRef ();
   if (!image) exit (-1);
@@ -78,6 +81,12 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
     Printf (MSG_FATAL_ERROR, "Error opening system!\n");
     cleanup ();
     exit (1);
+  }
+
+  ImageLoader = QUERY_PLUGIN_ID(this, CS_FUNCID_IMGLOADER, iImageLoader);
+  if (!ImageLoader) {
+    Printf (MSG_FATAL_ERROR, "No image loader plugin!\n");
+    return false;
   }
 
   // Setup the texture manager

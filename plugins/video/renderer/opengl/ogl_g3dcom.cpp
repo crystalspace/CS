@@ -43,7 +43,7 @@
 #include "ivideo/graph2d.h"
 #include "csutil/garray.h"
 #include "csutil/cscolor.h"
-#include "csgfxldr/rgbpixel.h"
+#include "csgfx/rgbpixel.h"
 
 #include <GL/gl.h>
 

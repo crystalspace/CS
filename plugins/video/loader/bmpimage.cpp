@@ -22,13 +22,12 @@
 #include "cssysdef.h"
 #include "cstypes.h"
 #include "csgeom/math3d.h"
-#include "csgfxldr/bmpimage.h"
+#include "bmpimage.h"
 #include "cssys/csendian.h"
 
 bool RegisterBMP ()
 {
-  static csBMPImageLoader loader;
-  return csImageLoader::Register (&loader);
+  return csImageLoader::Register (new csBMPImageLoader());
 }
 
 csImageFile* csBMPImageLoader::LoadImage (UByte* iBuffer, ULong iSize,

@@ -30,7 +30,8 @@
 #include "csutil/csrect.h"
 #include "csutil/csstring.h"
 #include "csutil/cfgacc.h"
-#include "csgfxldr/csimage.h"
+#include "igraphic/image.h"
+#include "igraphic/loader.h"
 
 IMPLEMENT_IBASE(csFancyConsole)
   IMPLEMENTS_INTERFACE(iConsoleOutput)
@@ -50,7 +51,8 @@ EXPORT_CLASS_TABLE_END
 
 csFancyConsole::csFancyConsole (iBase *p) :
   System(0), VFS(0), base(0), G2D(0), G3D(0), border_computed(false),
-  pix_loaded(false), system_ready(false), auto_update(true), visible(true)
+  pix_loaded(false), system_ready(false), auto_update(true), visible(true),
+  ImageLoader(NULL)
 {
   CONSTRUCT_IBASE (p);
   CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
@@ -58,6 +60,8 @@ csFancyConsole::csFancyConsole (iBase *p) :
 
 csFancyConsole::~csFancyConsole ()
 {
+  if (ImageLoader)
+    ImageLoader->DecRef();
   if (G2D)
     G2D->DecRef ();
   if (G3D)
@@ -90,6 +94,10 @@ bool csFancyConsole::Initialize (iSystem *system)
     return false;
   G2D = G3D->GetDriver2D ();
   G2D->IncRef ();
+
+  ImageLoader = QUERY_PLUGIN_ID (System, CS_FUNCID_IMGLOADER, iImageLoader);
+  if (!ImageLoader)
+    return false;
 
   // Tell system driver that we want to handle broadcast events
   if (!System->CallOnEvents (&scfiPlugIn, CSMASK_Broadcast))
@@ -461,7 +469,7 @@ void csFancyConsole::PrepPix (iConfigFile *ini, const char *sect,
     {
       iTextureManager *tm = G3D->GetTextureManager ();
       iImage *image =
-        csImageLoader::Load ((UByte *)data, len, tm->GetTextureFormat ());
+        ImageLoader->Load ((UByte *)data, len, tm->GetTextureFormat ());
       if (image)
       {
 	iTextureHandle* txt =

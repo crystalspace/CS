@@ -22,7 +22,7 @@
 #include <string.h>
 
 #include "cssysdef.h"
-#include "csgfxldr/jpgimage.h"
+#include "jpgimage.h"
 
 extern "C"
 {
@@ -39,8 +39,7 @@ extern "C"
 //---------------------------------------------------------------------------
 bool RegisterJPG ()
 {
-  static csJPGImageLoader loader;
-  return csImageLoader::Register (&loader);
+  return csImageLoader::Register (new csJPGImageLoader());
 }
 
 csImageFile* csJPGImageLoader::LoadImage (UByte* iBuffer, ULong iSize, int iFormat)

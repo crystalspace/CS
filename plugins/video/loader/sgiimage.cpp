@@ -22,7 +22,7 @@
 #include <stdio.h>
 
 #include "cssysdef.h"
-#include "csgfxldr/sgiimage.h"
+#include "sgiimage.h"
 
 //---------------------------------------------------------------------------
 
@@ -48,8 +48,7 @@ static struct SGIHeader
 
 bool RegisterSGI ()
 {
-  static csSGIImageLoader loader;
-  return csImageLoader::Register (&loader);
+  return csImageLoader::Register (new csSGIImageLoader());
 }
 
 csImageFile* csSGIImageLoader::LoadImage (UByte* iBuffer, ULong iSize, int iFormat)

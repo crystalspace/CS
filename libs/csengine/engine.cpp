@@ -52,10 +52,11 @@
 #include "csengine/region.h"
 #include "csgeom/fastsqrt.h"
 #include "csgeom/polypool.h"
-#include "csgfxldr/csimage.h"
+#include "csgfx/csimage.h"
 #include "csutil/util.h"
 #include "csutil/cfgacc.h"
 #include "igraphic/image.h"
+#include "igraphic/loader.h"
 #include "isys/vfs.h"
 #include "ivideo/halo.h"
 #include "ivideo/txtmgr.h"
@@ -585,7 +586,8 @@ IMPLEMENT_FACTORY (csEngine)
 
 EXPORT_CLASS_TABLE (engine)
   EXPORT_CLASS_DEP (csEngine, "crystalspace.engine.core",
-    "Crystal Space 3D Engine", "crystalspace.kernel., crystalspace.graphics3d.")
+    "Crystal Space 3D Engine",
+      "crystalspace.kernel., crystalspace.graphics3d., crystalspace.image.loader")
 EXPORT_CLASS_TABLE_END
 
 csEngine::csEngine (iBase *iParent) : csObject (), camera_positions (16, 16)
@@ -598,6 +600,7 @@ csEngine::csEngine (iBase *iParent) : csObject (), camera_positions (16, 16)
   VFS = NULL;
   G3D = NULL;
   G2D = NULL;
+  ImageLoader = NULL;
   textures = NULL;
   materials = NULL;
   c_buffer = NULL;
@@ -643,6 +646,7 @@ csEngine::~csEngine ()
 {
   Clear ();
   if (G3D) G3D->DecRef ();
+  if (ImageLoader) ImageLoader->DecRef();
   if (VFS) VFS->DecRef ();
   if (System) System->DecRef ();
   delete textures;
@@ -684,6 +688,11 @@ bool csEngine::Initialize (iSystem* sys)
     return false;
 
   G2D = G3D->GetDriver2D ();
+
+  // don't check for failure; the engine can work without the image loader
+  ImageLoader = QUERY_PLUGIN_ID (sys, CS_FUNCID_IMGLOADER, iImageLoader);
+  if (!ImageLoader)
+    CsPrintf (MSG_WARNING, "No image loader. Loading images will fail.\n");
 
   // Tell system driver that we want to handle broadcast events
   if (!System->CallOnEvents (this, CSMASK_Broadcast))
@@ -1868,6 +1877,9 @@ void csEngine::DeleteAll ()
 iTextureWrapper* csEngine::CreateTexture (const char *iName, const char *iFileName,
   csColor *iTransp, int iFlags)
 {
+  if (!ImageLoader)
+    return NULL;
+
   // First of all, load the image file
   iDataBuffer *data = VFS->ReadFile (iFileName);
   if (!data || !data->GetSize ())
@@ -1878,7 +1890,7 @@ iTextureWrapper* csEngine::CreateTexture (const char *iName, const char *iFileNa
     return NULL;
   }
 
-  iImage *ifile = csImageLoader::Load (data->GetUint8 (), data->GetSize (),
+  iImage *ifile = ImageLoader->Load (data->GetUint8 (), data->GetSize (),
     CS_IMGFMT_TRUECOLOR);// GetTextureFormat ());
   data->DecRef ();
 

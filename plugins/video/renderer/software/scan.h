@@ -20,7 +20,7 @@
 #define __CS_SCAN_H__
 
 #include "csutil/scf.h"
-#include "csgfxldr/rgbpixel.h"
+#include "csgfx/rgbpixel.h"
 
 //---//---//---//---//---//---//---//---//---//---/ Forward declarations //---//
 

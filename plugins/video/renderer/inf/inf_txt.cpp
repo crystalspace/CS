@@ -21,7 +21,7 @@
 
 #include "cssysdef.h"
 #include "inf_txt.h"
-#include "csgfxldr/quantize.h"
+#include "csgfx/quantize.h"
 #include "csutil/scanstr.h"
 #include "isys/system.h"
 #include "igraphic/image.h"

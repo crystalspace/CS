@@ -64,6 +64,7 @@ struct iVFS;
 struct iMaterialWrapper;
 struct iRegion;
 struct iLight;
+struct iImageLoader;
 
 
 /**
@@ -514,6 +515,8 @@ public:
   iGraphics3D* G3D;
   /// The 2D driver
   iGraphics2D* G2D;
+  /// The graphics loader
+  iImageLoader* ImageLoader;
   /// The fog mode this G3D implements
   G3D_FOGMETHOD fogmethod;
   /// Does the 3D driver require power-of-two lightmaps?

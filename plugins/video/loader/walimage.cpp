@@ -33,7 +33,7 @@
 
 #include "cssysdef.h"
 #include "cssys/csendian.h"
-#include "csgfxldr/walimage.h"
+#include "walimage.h"
 #include "walpal.h"
 
 /* Header definition. */
@@ -52,8 +52,7 @@ struct WALHeader
 //---------------------------------------------------------------------------
 bool RegisterWAL ()
 {
-  static csWALImageLoader loader;
-  return csImageLoader::Register (&loader);
+  return csImageLoader::Register (new csWALImageLoader());
 }
 
 csImageFile* csWALImageLoader::LoadImage (UByte* iBuffer, ULong iSize, int iFormat)

@@ -26,7 +26,7 @@
 #include "iengine/material.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
-#include "csgfxldr/memimage.h"
+#include "csgfx/memimage.h"
 #include "iavicdec.h"
 
 class csAVIStreamVideo : public iVideoStream

@@ -32,14 +32,13 @@
 #include <stdio.h>
 
 #include "cssysdef.h"
-#include "csgfxldr/tgaimage.h"
+#include "tgaimage.h"
 
 //---------------------------------------------------------------------------
 
 bool RegisterTGA ()
 {
-  static csTGAImageLoader loader;
-  return csImageLoader::Register (&loader);
+  return csImageLoader::Register (new csTGAImageLoader());
 }
 
 csImageFile* csTGAImageLoader::LoadImage (UByte* iBuffer, ULong iSize, int iFormat)

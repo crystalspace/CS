@@ -21,7 +21,7 @@
 
 #include "ivideo/codec.h"
 #include "plugins/video/format/avi/iavicdec.h"
-#include "csgfxldr/rgbpixel.h"
+#include "csgfx/rgbpixel.h"
 
 class csRLECodec : public iAVICodec
 {

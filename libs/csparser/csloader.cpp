@@ -39,7 +39,6 @@
 #include "csengine/textrans.h"
 #include "csengine/texture.h"
 #include "csengine/thing.h"
-#include "csgfxldr/csimage.h"
 #include "cssys/system.h"
 #include "csutil/cfgfile.h"
 #include "csutil/parser.h"
@@ -59,6 +58,9 @@
 #include "iengine/terrain.h"
 #include "ivideo/txtmgr.h"
 #include "isys/vfs.h"
+#include "igraphic/image.h"
+#include "igraphic/loader.h"
+#include "csgfx/csimage.h"
 
 #include "iterrain/ddg.h"
 
@@ -1808,18 +1810,34 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
 
 iImage* csLoader::load_image (const char* name)
 {
+  static bool TriedToLoadImage = false;
+  iImageLoader *ImageLoader =
+    QUERY_PLUGIN_ID (System, CS_FUNCID_IMGLOADER, iImageLoader);
+  if (ImageLoader == NULL)
+  {
+    if (!TriedToLoadImage)
+    {
+      CsPrintf (MSG_WARNING, "Trying to load image \"%s\" without "
+        "image loader\n", name);
+      TriedToLoadImage = true;
+    }
+    return NULL;
+  }
+
   iImage *ifile = NULL;
   iDataBuffer *buf = System->VFS->ReadFile (name);
 
   if (!buf || !buf->GetSize ())
   {
     if (buf) buf->DecRef ();
+    ImageLoader->DecRef ();
     CsPrintf (MSG_WARNING, "Cannot read image file \"%s\" from VFS\n", name);
     return NULL;
   }
 
-  ifile = csImageLoader::Load (buf->GetUint8 (), buf->GetSize (), Engine->GetTextureFormat ());
+  ifile = ImageLoader->Load (buf->GetUint8 (), buf->GetSize (), Engine->GetTextureFormat ());
   buf->DecRef ();
+  ImageLoader->DecRef ();
 
   if (!ifile)
   {

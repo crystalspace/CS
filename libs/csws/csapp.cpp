@@ -37,6 +37,7 @@
 #include "isys/vfs.h"
 #include "ivideo/txtmgr.h"
 #include "isys/event.h"
+#include "igraphic/loader.h"
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//- csAppPlugIn //--
 
@@ -102,6 +103,7 @@ csApp::csApp (iSystem *sys, csSkin &Skin)
   VFS = NULL;
   DefaultFont = NULL;
   InFrame = false;
+  ImageLoader = NULL;
   (System = sys)->IncRef ();
 
   OldMouseCursorID = csmcNone;
@@ -130,6 +132,8 @@ csApp::~csApp ()
     DefaultFont->DecRef ();
   if (FontServer)
     FontServer->DecRef ();
+  if (ImageLoader)
+    ImageLoader->DecRef ();
   // Delete all textures prior to deleting the texture manager
   Textures.DeleteAll ();
 
@@ -162,6 +166,11 @@ bool csApp::Initialize ()
   FontServer = QUERY_PLUGIN_ID (System, CS_FUNCID_FONTSERVER, iFontServer);
   DefaultFont = FontServer->LoadFont (CSFONT_COURIER);
   DefaultFontSize = 8;
+
+  ImageLoader = QUERY_PLUGIN_ID (System, CS_FUNCID_IMGLOADER, iImageLoader);
+  if (!ImageLoader)
+    System->Printf (MSG_WARNING,
+      "No image loader. Loading images will fail.\n");
 
   // Now initialize all skin slices
   InitializeSkin ();
@@ -320,6 +329,9 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
   if (Textures.FindTexture (iTexName))
     return false;
 
+  if (!ImageLoader)
+    return false;
+
   char *filename = NULL;
   float tr = -1, tg = -1, tb = -1;
 
@@ -383,7 +395,7 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
   delete [] filename;
 
   iTextureManager *txtmgr = GfxPpl.G3D->GetTextureManager ();
-  iImage *image = csImageLoader::Load (fbuffer->GetUint8 (), fbuffer->GetSize (),
+  iImage *image = ImageLoader->Load (fbuffer->GetUint8 (), fbuffer->GetSize (),
     txtmgr->GetTextureFormat ());
   fbuffer->DecRef ();
 

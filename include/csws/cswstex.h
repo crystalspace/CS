@@ -20,7 +20,7 @@
 #ifndef __CSWSTEX_H__
 #define __CSWSTEX_H__
 
-#include "csgfxldr/csimage.h"
+#include "csgfx/csimage.h"
 #include "csutil/csvector.h"
 
 struct iTextureHandle;

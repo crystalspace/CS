@@ -22,7 +22,7 @@
 #include "ivaria/conout.h"
 #include "isys/plugin.h"
 #include "csutil/csrect.h"
-#include "csgfxldr/rgbpixel.h"
+#include "csgfx/rgbpixel.h"
 
 struct iGraphics2D;
 struct iGraphics3D;

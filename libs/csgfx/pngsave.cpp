@@ -27,8 +27,8 @@ extern "C"
 #include <png.h>
 }
 
-#include "csgfxldr/pngsave.h"
-#include "csgfxldr/rgbpixel.h"
+#include "csgfx/pngsave.h"
+#include "csgfx/rgbpixel.h"
 
 static void png_write (png_structp png, png_bytep data, png_size_t length)
 {

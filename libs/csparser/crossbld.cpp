@@ -27,7 +27,7 @@
 #include "csengine/texture.h"
 #include "csengine/thing.h"
 #include "csengine/polygon.h"
-#include "csgfxldr/csimage.h"
+#include "csgfx/csimage.h"
 #include "cssys/system.h"
 #include "csutil/scfstrv.h"
 #include "ivideo/texture.h"
@@ -36,6 +36,19 @@
 #include "imesh/sprite3d.h"
 #include "imesh/object.h"
 #include "iengine/mesh.h"
+#include "igraphic/loader.h"
+
+// helper function for image loading
+
+iImage *LoadImage (UByte* iBuffer, ULong iSize, int iFormat)
+{
+  iImageLoader *ImageLoader =
+    QUERY_PLUGIN_ID (System, CS_FUNCID_IMGLOADER, iImageLoader);
+  if (!ImageLoader) return NULL;
+  iImage *img = ImageLoader->Load(iBuffer, iSize, iFormat);
+  ImageLoader->DecRef();
+  return img;
+}
 
 //
 // definitions of method for the base csCrossBuild_Factory
@@ -442,7 +455,7 @@ csTextureWrapper *csCrossBuild_Quake2Importer::Import_Quake2Textures (
     {
       iDataBuffer *imagedata = localVFS.ReadFile(skinfilename);
 
-      iImage *newskin = csImageLoader::Load(imagedata->GetUint8 (),
+      iImage *newskin = LoadImage(imagedata->GetUint8 (),
         imagedata->GetSize (), importdestination->GetTextureFormat ());
 
       imagedata->DecRef ();

@@ -21,13 +21,12 @@
 #include <string.h>
 
 #include "cssysdef.h"
-#include "csgfxldr/gifimage.h"
+#include "gifimage.h"
 
 //---------------------------------------------------------------------------
 bool RegisterGIF ()
 {
-  static csGIFImageLoader loader;
-  return csImageLoader::Register (&loader);
+  return csImageLoader::Register (new csGIFImageLoader());
 }
 
 csImageFile* csGIFImageLoader::LoadImage (UByte* iBuffer, ULong iSize, int iFormat)

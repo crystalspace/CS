@@ -21,8 +21,8 @@
 
 #include "cssysdef.h"
 #include "soft_txt.h"
-#include "csgfxldr/inv_cmap.h"
-#include "csgfxldr/quantize.h"
+#include "csgfx/inv_cmap.h"
+#include "csgfx/quantize.h"
 #include "csutil/scanstr.h"
 #include "isys/event.h"
 #include "isys/system.h"

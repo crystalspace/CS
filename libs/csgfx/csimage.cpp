@@ -24,8 +24,8 @@
 #include "cssysdef.h"
 #include "isys/system.h"
 #include "qint.h"
-#include "csgfxldr/csimage.h"
-#include "csgfxldr/quantize.h"
+#include "csgfx/csimage.h"
+#include "csgfx/quantize.h"
 #include "csutil/util.h"
 
 //------------------------------------------------------ Helper functions -----
@@ -653,3 +653,4 @@ iImage *csImageFile::Crop ( int x, int y, int width, int height )
 
   return nimg;
 }
+

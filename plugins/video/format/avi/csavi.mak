@@ -42,7 +42,7 @@ OBJ.CSAVI = $(addprefix $(OUT),$(notdir $(subst .asm,$O,$(SRC.CSAVI:.cpp=$O))))
 
 NASMFLAGS.CSAVI = -i./plugins/video/renderer/software/i386/
 
-DEP.CSAVI = CSGFXLDR CSUTIL CSSYS
+DEP.CSAVI = CSGFX CSUTIL CSSYS
 CFG.CSAVI = 
 
 TO_INSTALL.CONFIG += $(CFG.CSAVI)

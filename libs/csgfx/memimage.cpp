@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "csgfxldr/memimage.h"
-#include "csgfxldr/rgbpixel.h"
+#include "csgfx/memimage.h"
+#include "csgfx/rgbpixel.h"
 
 csImageMemory::csImageMemory (int width, int height)
   : csImageFile (CS_IMGFMT_TRUECOLOR)

@@ -34,7 +34,7 @@
  */
 
 #include "cssysdef.h"
-#include "csgfxldr/inv_cmap.h"
+#include "csgfx/inv_cmap.h"
 
 static int bcenter, gcenter, rcenter;
 static long gdist, rdist, cdist;

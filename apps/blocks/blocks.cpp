@@ -33,7 +33,7 @@
 #include "cssys/system.h"
 #include "csparser/csloader.h"
 #include "csutil/csstring.h"
-#include "csgfxldr/csimage.h"
+#include "csgfx/csimage.h"
 #include "csengine/dumper.h"
 #include "csengine/engine.h"
 #include "csengine/texture.h"

@@ -20,7 +20,7 @@
 #define __IVIDEO_GRAPH2D_H__
 
 #include "csutil/scf.h"
-#include "csgfxldr/rgbpixel.h"
+#include "csgfx/rgbpixel.h"
 #include "isys/plugin.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"

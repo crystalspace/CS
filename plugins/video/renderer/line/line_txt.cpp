@@ -21,8 +21,8 @@
 
 #include "cssysdef.h"
 #include "line_txt.h"
-#include "csgfxldr/inv_cmap.h"
-#include "csgfxldr/quantize.h"
+#include "csgfx/inv_cmap.h"
+#include "csgfx/quantize.h"
 #include "csutil/scanstr.h"
 #include "iutil/cfgfile.h"
 #include "isys/event.h"

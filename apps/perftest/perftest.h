@@ -23,6 +23,7 @@
 
 class PerfTest;
 struct iMaterialHandle;
+struct iImageLoader;
 
 class Tester
 {
@@ -50,6 +51,7 @@ private:
   iMaterialHandle* materials[4];
   // Load a material.
   iMaterialHandle* LoadMaterial (char* file);
+  iImageLoader *ImageLoader;
 
 public:
   PerfTest ();

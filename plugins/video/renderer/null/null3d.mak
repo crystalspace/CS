@@ -47,7 +47,7 @@ INC.NULL3D = $(wildcard plugins/video/renderer/null/*.h) \
 SRC.NULL3D = $(wildcard plugins/video/renderer/null/*.cpp) \
   plugins/video/renderer/common/txtmgr.cpp
 OBJ.NULL3D = $(addprefix $(OUT),$(notdir $(SRC.NULL3D:.cpp=$O)))
-DEP.NULL3D = CSGFXLDR CSUTIL CSSYS CSGEOM
+DEP.NULL3D = CSGFX CSUTIL CSSYS CSGEOM
 CFG.NULL3D = data/config/null3d.cfg
 
 TO_INSTALL.CONFIG += $(CFG.NULL3D)
