@@ -839,8 +839,9 @@ uint32 csEvent::FlattenSizeCrystal()
 {
   csHashIteratorReversible iter(&attributes);
   // Start count with the initial header
-  // Version(4) + Type(1) + Cat(1) + SubCat(1) + Flags(1) + Time(4) + Joystick(5*4)
-  uint32 size = 32;
+  // Version(4) + packet length(4) + Type(1) + Cat(1) + SubCat(1) 
+  //    + Flags(1) + Time(4) + Joystick(5*4)
+  uint32 size = 36;
 
   while (iter.HasNext())
   {
@@ -992,7 +993,6 @@ bool csEvent::FlattenXML(char * buffer)
 bool csEvent::FlattenCrystal(char * buffer)
 {
   csHashIteratorReversible iter(&attributes);
-  csMemFile b(buffer,FlattenSizeCrystal(),csMemFile::DISPOSITION_IGNORE);
   uint8 ui8;
   int8 i8;
   uint16 ui16;
@@ -1002,11 +1002,14 @@ bool csEvent::FlattenCrystal(char * buffer)
   int64 i64;
   uint64 ui64;
   float f;
-  //double d;
+  uint32 size = FlattenSizeCrystal();
+  csMemFile b(buffer, size, csMemFile::DISPOSITION_IGNORE);
   
   ui32 = CS_CRYSTAL_PROTOCOL;
   ui32 = convert_endian(ui32);
   b.Write((char *)&ui32, sizeof(uint32));         // protocol version
+  size = convert_endian(size);
+  b.Write((char *)&size, sizeof(uint32));         // packet size
   b.Write((char *)&Type, sizeof(uint8));          // iEvent.Type
   b.Write((char *)&Category, sizeof(uint8));      // iEvent.Category
   b.Write((char *)&SubCategory, sizeof(uint8));   // iEvent.SubCategory
@@ -1302,6 +1305,7 @@ bool csEvent::UnflattenCrystal(const char *buffer, uint32 length)
   float f;
   double d;
   char *name;
+  uint32 size;
 
   b.Read((char *)&ui32, sizeof(ui32));
   ui32 = convert_endian(ui32);
@@ -1310,6 +1314,8 @@ bool csEvent::UnflattenCrystal(const char *buffer, uint32 length)
     //printf("protocol version invalid: %X\n", ui32);
     return false;
   }
+  b.Read((char *)&ui32, sizeof(uint32));
+  size = convert_endian(ui32);
   b.Read((char *)&Type, sizeof(uint8));          // iEvent.Type
   b.Read((char *)&Category, sizeof(uint8));      // iEvent.Category
   b.Read((char *)&SubCategory, sizeof(uint8));   // iEvent.SubCategory
@@ -1329,7 +1335,7 @@ bool csEvent::UnflattenCrystal(const char *buffer, uint32 length)
   b.Read((char *)&i32, sizeof(int32));
   Joystick.Modifiers = convert_endian(i32);
 
-  while (!b.AtEOF())
+  while (b.GetPos() < size)
   {
     b.Read((char *)&ui16, sizeof(uint16));
     ui16 = convert_endian(ui16);

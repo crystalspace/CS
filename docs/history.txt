@@ -3,6 +3,8 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+6-Apr-2003
+        - JTarbox Added a packet size to the event serialization protocol
 5-Apr-2003
         - Rhad improved the Direct Sound 3d sound renderer.
           Design is similar to OpenAL renderer.
