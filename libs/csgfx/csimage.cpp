@@ -89,7 +89,7 @@ SCF_IMPLEMENT_IBASE (csImageFile)
   SCF_IMPLEMENTS_INTERFACE (iImage)
 SCF_IMPLEMENT_IBASE_END
 
-csImageFile::csImageFile (int iFormat)
+csImageFile::csImageFile (int iFormat) : iImage()
 {
   SCF_CONSTRUCT_IBASE (NULL);
   DG_ADDI (this, NULL);
