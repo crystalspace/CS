@@ -50,8 +50,8 @@
     </material>
     <material name="Base">
       <texture>materialmap_base.png</texture>
-      <shader type="ambient">splatting_scattering_base</shader>
       <!-- <shader type="ambient">splatting_scattering_base</shader> -->
+      <shader type="ambient">splatting_scattering_base</shader>
     </material>
     <material name="Marble">
       <texture>andrew_marble4.jpg</texture>
