@@ -39,6 +39,7 @@ The history order is reversed so that new features are at the top.
 	- Removed unneeded reference to plugin manager in csfont.
 	- Updated the glossary. Added several new entries and fixed
 	  several old entries.
+	- Updated the FAQ.
 18-Oct-2001
 	- Michael Voase shifted water and fire proctex down to the basement.
 	- Removed usage of cs_snprintf in cfgfile.cpp and

@@ -12,7 +12,8 @@ some questions about Crystal Space, try consulting this list first.
 From where can I download Crystal Space?
 
 @strong{A}: The latest release of Crystal Space is always available from the
-Crystal Space home page, and from the Crystal Space @sc{ftp} site.  You can
+Crystal Space home page, and from the Crystal Space @sc{ftp} site
+@uref{ftp://sunsite.dk/projects/crystal/}. You can
 also access the bleeding-edge developmental version.  @xref{Where to Get}.
 
 @item
@@ -21,7 +22,7 @@ What do I need to compile Crystal Space?
 @strong{A}: You need the source code, which you can obtain in a variety of
 ways.  @xref{Where to Get}.  You also need a compiler and development system
 for the platform which you are using.  Some of the supported compilers are
-@sc{gcc}, @sc{msvc} and Code Warrior.
+@sc{gcc} (including @sc{MingW} and @sc{Cygwin}), @sc{msvc} and Code Warrior.
 
 @item
 What do you need to run Crystal Space?
@@ -101,9 +102,9 @@ specifying the map file on on the command-line, like this:
 @end example
 
 Where @samp{flarge} is the name of the map file you wish to use.  In this case,
-@samp{flarge} corresponds to the @file{flarge.zip} file which you downloaded.
-Also note that @file{flarge.zip} itself requires the file @file{stdtex.zip}
-which contains all the textures.
+@samp{flarge} corresponds to the @file{flarge} directory which is included
+with CS.  Also note that @file{flarge} itself requires the file
+@file{stdtex.zip} which contains all the textures.
 
 Alternately, for WalkTest, you can change the @samp{WorldFile} setting in its
 configuration file @file{CS/data/config/walktest.cfg}.  For example:
@@ -157,7 +158,7 @@ yet been fully optimized.  You might try using smaller window dimensions
 with the @samp{-mode=} option.  @xref{Common Command Line Options}.
 
 @strong{A2}: Use a hardware accelerated graphics card and driver.  Such cards
-are quite popular these days and can perform extremely well, especially wnen
+are quite popular these days and can perform extremely well, especially when
 compared to Crystal Space's software renderer.
 
 @item
@@ -174,7 +175,9 @@ good palette.
 
 @strong{A2}: The width and height of a texture must be a power of 2 (such as
 8, 16, 32, 64, @dots{}).  That's about the only restriction.  Textures need
-not be square.  You can have textures with sizes like 16x256.
+not be square.  You can have textures with sizes like 16x256. If a texture
+does not conform to the above mentioned limitations then it will be scaled.
+This may mean that there is quality degradation though!
 
 @strong{A3}: Crystal Space textures may be in any of the supported image
 formats, such as @sc{png}, @sc{tga}, @sc{bmp}, @sc{jpg}, and @sc{gif}.
@@ -230,11 +233,8 @@ you can and cannot do, see the license, @ref{License}.
 @item
 How stable is the @sc{api} for Crystal Space?
 
-@strong{A}: This depends. If you use @sc{scf} interfaces (i.e. interfaces
-defined in the @file{include} folder) then you should be relatively safe.
-In the future (for the 1.0 release) we will put more stuff in plugins which
-means they will be accessible through @sc{scf} interfaces. So for now I
-would say that there are likely to be API changes. Note that we try to
-minimize that as much as possible and we also document them with every
-release to make the transition easier.
+@strong{A}: The API which you can find in the 0.90 release should be about
+95% stable as compared to the 1.0 release. After 1.0 we will make sure
+to keep backwards compatibility (until we release 2.0 :-)
 @end itemize
+
