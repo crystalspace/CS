@@ -85,6 +85,7 @@ void RelightTask::doTask()
 csVosA3DL::csVosA3DL (iBase *parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
+  relightCounter = 0;
 }
 
 csVosA3DL::~csVosA3DL()
