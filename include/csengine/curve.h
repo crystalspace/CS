@@ -42,6 +42,7 @@ class csBspContainer;
 class csFrustumView;
 struct csCoverageMatrix;
 struct iMaterialHandle;
+struct iVertexBuffer;
 
 /**
  * Tesselated curve. This is basicly a list of triangles.
@@ -117,6 +118,9 @@ private:
   /// Last used ID.
   static unsigned long LastCurveID;
 
+  /// Vertex buffer.
+  iVertexBuffer* vbuf;
+
   /// Material for this curve
   iMaterialWrapper* Material;
 
@@ -168,6 +172,9 @@ public:
 
   /// Get the ID of this curve.
   inline unsigned long GetCurveID () const;
+
+  /// Get the vertex buffer for this curve.
+  iVertexBuffer* GetVertexBuffer () const { return vbuf; }
 
   /// Return the material handle for this curve
   inline iMaterialHandle* GetMaterialHandle () const;

@@ -24,11 +24,13 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/material.h"
+#include "ivideo/vbufmgr.h"
 #include "iengine/material.h"
 #include "iengine/camera.h"
 #include "igeom/clip2d.h"
 #include "iengine/engine.h"
 #include "iengine/light.h"
+#include "iutil/objreg.h"
 #include "qsqrt.h"
 
 //#define SURF_DEBUG
@@ -58,7 +60,7 @@ csSurfMeshObject::csSurfMeshObject (iMeshObjectFactory* factory)
   material = NULL;
   MixMode = 0;
   vis_cb = NULL;
-  mesh.vertices[0] = NULL;
+  surf_vertices = NULL;
   mesh.vertex_colors[0] = NULL;
   mesh.texels[0] = NULL;
   mesh.triangles = NULL;
@@ -71,12 +73,14 @@ csSurfMeshObject::csSurfMeshObject (iMeshObjectFactory* factory)
   color.blue = 0;
   current_lod = 1;
   current_features = ALL_FEATURES;
+  vbuf = NULL;
 }
 
 csSurfMeshObject::~csSurfMeshObject ()
 {
   if (vis_cb) vis_cb->DecRef ();
-  delete[] mesh.vertices[0];
+  if (vbuf) vbuf->DecRef ();
+  delete[] surf_vertices;
   delete[] mesh.vertex_colors[0];
   delete[] mesh.texels[0];
   delete[] mesh.triangles;
@@ -193,9 +197,9 @@ void csSurfMeshObject::GenerateSurface (G3DTriangleMesh& mesh)
   }
 
   // Setup the mesh and normal array.
-  mesh.num_vertices = num_vertices;
-  mesh.vertices[0] = new csVector3[num_vertices];
-  memcpy (mesh.vertices[0], vertices, sizeof(csVector3)*num_vertices);
+  num_surf_vertices = num_vertices;
+  surf_vertices = new csVector3[num_vertices];
+  memcpy (surf_vertices, vertices, sizeof(csVector3)*num_vertices);
   mesh.texels[0] = new csVector2[num_vertices];
   memcpy (mesh.texels[0], uvverts, sizeof(csVector2)*num_vertices);
   mesh.vertex_colors[0] = new csColor[num_vertices];
@@ -227,8 +231,8 @@ void csSurfMeshObject::RecalcObjectBBox ()
 
 void csSurfMeshObject::RecalcSurfaceNormal ()
 {
-  csVector3 v1 = mesh.vertices[0][1] - mesh.vertices[0][0];
-  csVector3 v2 = mesh.vertices[0][xres+1] - mesh.vertices[0][0];
+  csVector3 v1 = surf_vertices[1] - surf_vertices[0];
+  csVector3 v2 = surf_vertices[xres+1] - surf_vertices[0];
   surface_normal = v1 % v2;
   surface_normal.Normalize ();
 }
@@ -238,12 +242,12 @@ void csSurfMeshObject::SetupObject ()
   if (!initialized)
   {
     initialized = true;
-    delete[] mesh.vertices[0];
+    delete[] surf_vertices;
     delete[] mesh.vertex_colors[0];
     delete[] mesh.texels[0];
     delete[] mesh.triangles;
     delete[] mesh.vertex_fog;
-    mesh.vertices[0] = NULL;
+    surf_vertices = NULL;
     mesh.vertex_colors[0] = NULL;
     mesh.texels[0] = NULL;
     mesh.triangles = NULL;
@@ -257,6 +261,15 @@ void csSurfMeshObject::SetupObject ()
     mesh.do_morph_texels = false;
     mesh.do_morph_colors = false;
     mesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
+
+    if (!vbuf)
+    {
+      iObjectRegistry* object_reg = ((csSurfMeshObjectFactory*)factory)
+      	->object_reg;
+      iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+      // @@@ priority should be a parameter
+      g3d->GetVertexBufferManager ()->CreateBuffer (0);
+    }
   }
 }
 
@@ -313,7 +326,7 @@ void csSurfMeshObject::UpdateLighting (iLight** lights, int num_lights,
   csColor* colors = mesh.vertex_colors[0];
 
   // Set all colors to ambient light (@@@ NEED TO GET AMBIENT!)
-  for (i = 0 ; i < mesh.num_vertices ; i++)
+  for (i = 0 ; i < num_surf_vertices ; i++)
     colors[i] = color;
   if (!do_lighting) return;
     // @@@ it is not effiecient to do this all the time.
@@ -349,13 +362,13 @@ void csSurfMeshObject::UpdateLighting (iLight** lights, int num_lights,
       color = light_color;
       if (obj_sq_dist >= SMALL_EPSILON) cosinus *= in_obj_dist;
       if (cosinus < 1) color *= cosinus;
-      for (i = 0 ; i < mesh.num_vertices ; i++)
+      for (i = 0 ; i < num_surf_vertices ; i++)
 	colors[i] += color;
     }
   }
 
   // Clamp all vertex colors to 2.
-  for (i = 0 ; i < mesh.num_vertices ; i++)
+  for (i = 0 ; i < num_surf_vertices ; i++)
   {
     colors[i].ClampDown ();
     colors[i].Clamp (2., 2., 2.);
@@ -382,6 +395,7 @@ bool csSurfMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
 
   iGraphics3D* g3d = rview->GetGraphics3D ();
+  iVertexBufferManager* vbufmgr = g3d->GetVertexBufferManager ();
 
   // Prepare for rendering.
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);
@@ -390,8 +404,11 @@ bool csSurfMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   mesh.mat_handle = mat;
   mesh.use_vertex_color = true;
   mesh.fxmode = MixMode | CS_FX_GOURAUD;
+  CS_ASSERT (!vbuf->IsLocked ());
+  vbufmgr->LockBuffer (vbuf, surf_vertices, num_surf_vertices, 0);
   rview->CalculateFogMesh (g3d->GetObjectToCamera (), mesh);
   g3d->DrawTriangleMesh (mesh);
+  vbufmgr->UnlockBuffer (vbuf);
 
   return true;
 }
@@ -406,8 +423,8 @@ void csSurfMeshObject::HardTransform (const csReversibleTransform& t)
 {
   SetupObject ();
   int i;
-  for (i = 0 ; i < mesh.num_vertices ; i++)
-    mesh.vertices[0][i] = t.This2Other (mesh.vertices[0][i]);
+  for (i = 0 ; i < num_surf_vertices ; i++)
+    surf_vertices[i] = t.This2Other (surf_vertices[i]);
   for (i = 0; i < 4; i++ )
 	corner[i] = t.This2Other(corner[i]);
   RecalcObjectBBox ();
@@ -450,9 +467,11 @@ SCF_IMPLEMENT_IBASE (csSurfMeshObjectFactory)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
 SCF_IMPLEMENT_IBASE_END
 
-csSurfMeshObjectFactory::csSurfMeshObjectFactory (iBase *pParent)
+csSurfMeshObjectFactory::csSurfMeshObjectFactory (iBase *pParent,
+	iObjectRegistry* object_reg)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  csSurfMeshObjectFactory::object_reg = object_reg;
 }
 
 csSurfMeshObjectFactory::~csSurfMeshObjectFactory ()
@@ -497,8 +516,10 @@ csSurfMeshObjectType::~csSurfMeshObjectType ()
 
 iMeshObjectFactory* csSurfMeshObjectType::NewFactory ()
 {
-  csSurfMeshObjectFactory* cm = new csSurfMeshObjectFactory (this);
+  csSurfMeshObjectFactory* cm = new csSurfMeshObjectFactory (this,
+  	object_reg);
   iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;
 }
+

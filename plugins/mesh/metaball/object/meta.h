@@ -34,6 +34,7 @@
 class csMaterialHandle;
 struct G3DTriangleMesh;
 struct iObjectRegistry;
+struct iVertexBuffer;
 struct iGraphics3D;
 struct iGraphics2D;
 struct iMaterialWrapper;
@@ -57,6 +58,9 @@ class csMetaBall : public iMeshObject
   MetaParameters mp;
   iObjectRegistry *object_reg;
   iMaterialWrapper *th;
+  iVertexBuffer* vbuf;
+  csVector3* mesh_vertices;
+  int num_mesh_vertices;
   G3DTriangleMesh mesh;
   MetaBall *meta_balls;
   char frame;

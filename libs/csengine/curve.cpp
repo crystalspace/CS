@@ -28,6 +28,8 @@
 #include "csengine/thing.h"
 #include "csengine/engine.h"
 #include "csengine/lppool.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/vbufmgr.h"
 
 struct csCoverageMatrix
 {
@@ -140,6 +142,10 @@ csCurve::csCurve (csCurveTemplate* parent_tmpl) : csObject (),
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCurve);
   CurveID = LastCurveID++;
   Material = NULL;
+  iVertexBufferManager* vbufmgr = csEngine::current_engine->G3D
+  	->GetVertexBufferManager ();
+  // @@@ priority should be a parameter.
+  vbuf = vbufmgr->CreateBuffer (2);
 } 
 
 csCurve::~csCurve ()
@@ -151,6 +157,7 @@ csCurve::~csCurve ()
   delete[] uv2World;
   delete[] uv2Normal;
   SCF_DEC_REF (Material);
+  vbuf->DecRef ();
 }
 
 void csCurve::SetMaterial (iMaterialWrapper *m)

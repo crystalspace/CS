@@ -571,6 +571,11 @@ iTextureManager *csOpenGLProcSoftware::GetTextureManager ()
   return parent_g3d->GetTextureManager (); 
 }
 
+iVertexBufferManager *csOpenGLProcSoftware::GetVertexBufferManager ()
+{ 
+  return parent_g3d->GetVertexBufferManager (); 
+}
+
 iHalo *csOpenGLProcSoftware::CreateHalo (float iR, float iG, float iB, 
 	                         unsigned char *iAlpha, int iWidth, int iHeight)
 { 

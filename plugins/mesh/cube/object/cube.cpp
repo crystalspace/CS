@@ -24,10 +24,12 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/material.h"
+#include "ivideo/vbufmgr.h"
 #include "iengine/material.h"
 #include "iengine/camera.h"
 #include "igeom/clip2d.h"
 #include "iengine/light.h"
+#include "iutil/objreg.h"
 #include "qsqrt.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -59,11 +61,13 @@ csCubeMeshObject::csCubeMeshObject (csCubeMeshObjectFactory* factory)
   shapenr = 0;
   current_lod = 1;
   current_features = ALL_FEATURES;
+  vbuf = NULL;
 }
 
 csCubeMeshObject::~csCubeMeshObject ()
 {
   if (vis_cb) vis_cb->DecRef ();
+  if (vbuf) vbuf->DecRef ();
   if (ifactory) ifactory->DecRef ();
 }
 
@@ -155,7 +159,7 @@ void csCubeMeshObject::SetupObject ()
     int i;
     object_bbox.StartBoundingBox (vertices[0]);
     object_bbox.AddBoundingVertex (vertices[7]);
-	
+
     for (i = 0 ; i < 8 ; i++)
     {
       normals[i] = vertices[i]; normals[i].Normalize ();
@@ -189,8 +193,15 @@ void csCubeMeshObject::SetupObject ()
     triangles[9].a = 6; triangles[9].b = 3; triangles[9].c = 2;
     triangles[10].a = 0; triangles[10].b = 1; triangles[10].c = 4;
     triangles[11].a = 1; triangles[11].b = 5; triangles[11].c = 4;
-    mesh.num_vertices = 8;
-    mesh.vertices[0] = vertices;
+    if (!vbuf)
+    {
+      iObjectRegistry* object_reg = ((csCubeMeshObjectFactory*)factory)
+      	->object_reg;
+      iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+      // @@@ priority should be a parameter.
+      vbuf = g3d->GetVertexBufferManager ()->CreateBuffer (0);
+    }
+    mesh.buffers[0] = vbuf;
     mesh.texels[0] = uv;
     mesh.vertex_colors[0] = colors;
     mesh.morph_factor = 0;
@@ -324,6 +335,7 @@ bool csCubeMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
 
   iGraphics3D* g3d = rview->GetGraphics3D ();
+  iVertexBufferManager* vbufmgr = g3d->GetVertexBufferManager ();
 
   // Prepare for rendering.
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);
@@ -332,8 +344,11 @@ bool csCubeMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   mesh.mat_handle = mat;
   mesh.use_vertex_color = true;
   mesh.fxmode = factory->GetMixMode () | CS_FX_GOURAUD;
+  CS_ASSERT (!vbuf->IsLocked ());
+  vbufmgr->LockBuffer (vbuf, vertices, 8, 0);
   rview->CalculateFogMesh (g3d->GetObjectToCamera (), mesh);
   g3d->DrawTriangleMesh (mesh);
+  vbufmgr->UnlockBuffer (vbuf);
 
   return true;
 }
@@ -384,7 +399,8 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csCubeMeshObjectFactory::CubeFactoryState)
   SCF_IMPLEMENTS_INTERFACE (iCubeFactoryState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csCubeMeshObjectFactory::csCubeMeshObjectFactory (iBase *pParent)
+csCubeMeshObjectFactory::csCubeMeshObjectFactory (iBase *pParent,
+	iObjectRegistry* object_reg)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCubeFactoryState);
@@ -394,6 +410,7 @@ csCubeMeshObjectFactory::csCubeMeshObjectFactory (iBase *pParent)
   shift.Set (0, 0, 0);
   material = NULL;
   MixMode = 0;
+  csCubeMeshObjectFactory::object_reg = object_reg;
 }
 
 csCubeMeshObjectFactory::~csCubeMeshObjectFactory ()
@@ -449,7 +466,8 @@ csCubeMeshObjectType::~csCubeMeshObjectType ()
 
 iMeshObjectFactory* csCubeMeshObjectType::NewFactory ()
 {
-  csCubeMeshObjectFactory* cm = new csCubeMeshObjectFactory (this);
+  csCubeMeshObjectFactory* cm = new csCubeMeshObjectFactory (this,
+  	object_reg);
   iCubeFactoryState* cubeLook = SCF_QUERY_INTERFACE (cm, iCubeFactoryState);
   cubeLook->SetSize (default_sizex, default_sizey, default_sizez);
   cubeLook->SetShift (default_shift.x, default_shift.y, default_shift.z);

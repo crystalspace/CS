@@ -24,6 +24,8 @@
 #include "ivideo/graph3d.h"
 #include "apps/perftest/perftest.h"
 
+struct iVertexBuffer;
+
 // Number of horizontal and vertical polygons for every multi-polygon test.
 #define NUM_MULTIPOLTEST 24
 
@@ -141,6 +143,9 @@ class MeshTester : public Tester
 {
 private:
   G3DTriangleMesh mesh;
+  int num_mesh_vertices;
+  csVector3* mesh_vertices;
+  iVertexBuffer* vbuf;
 
 public:
   virtual void Setup (iGraphics3D* g3d, PerfTest* perftest);

@@ -37,6 +37,7 @@
 #include "csutil/hashmap.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
+#include "ivideo/vbufmgr.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 #include "iengine/shadcast.h"
@@ -1505,6 +1506,9 @@ bool csThing::DrawCurves (iRenderView* rview, iMovable* movable,
   mesh.do_morph_colors = false;
   mesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
 
+  iVertexBufferManager* vbufmgr = rview->GetGraphics3D ()
+    	->GetVertexBufferManager ();
+
   // Loop over all curves
   csCurve* c;
   for (i = 0 ; i < GetCurveCount () ; i++)
@@ -1537,9 +1541,10 @@ bool csThing::DrawCurves (iRenderView* rview, iMovable* movable,
     }
 
     c->GetMaterial ()->Visit ();
+    iVertexBuffer* vbuf = c->GetVertexBuffer ();
+
     mesh.mat_handle = c->GetMaterialHandle ();
-    mesh.num_vertices = tess->GetVertexCount ();
-    mesh.vertices[0] = tess->GetVertices ();
+    mesh.buffers[0] = vbuf;
     mesh.texels[0] = tess->GetTxtCoords ();
     mesh.vertex_colors[0] = tess->GetColors ();
     mesh.num_triangles = tess->GetTriangleCount ();
@@ -1556,9 +1561,13 @@ bool csThing::DrawCurves (iRenderView* rview, iMovable* movable,
       csEngine::current_engine->Warn ("Warning! Curve without material!");
       continue;
     }
-    rview->CalculateFogMesh (obj_cam, mesh);
 
+    CS_ASSERT (!vbuf->IsLocked ());
+    vbufmgr->LockBuffer (vbuf, tess->GetVertices (),
+    	tess->GetVertexCount (), 0);
+    rview->CalculateFogMesh (obj_cam, mesh);
     rview->GetGraphics3D ()->DrawTriangleMesh (mesh);
+    vbufmgr->UnlockBuffer (vbuf);
   }
 
   return true;//@@@ RETURN correct vis info

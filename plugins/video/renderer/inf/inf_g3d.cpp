@@ -77,6 +77,7 @@ csGraphics3DInfinite::csGraphics3DInfinite (iBase *iParent) :
 
   clipper = NULL;
   texman = NULL;
+  vbufmgr = NULL;
 
   Caps.CanClip = false;
   Caps.minTexHeight = 2;
@@ -110,6 +111,7 @@ csGraphics3DInfinite::~csGraphics3DInfinite ()
   Close ();
   texman->Clear();
   texman->DecRef(); texman = NULL;
+  vbufmgr->DecRef (); vbufmgr = NULL;
   if (G2D) G2D->DecRef ();
 }
 
@@ -128,6 +130,7 @@ bool csGraphics3DInfinite::Initialize (iObjectRegistry *object_reg)
     return false;
 
   texman = new csTextureManagerInfinite (object_reg, G2D, config);
+  vbufmgr = new csVertexBufferManager (object_reg);
   iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
   sys->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
 
@@ -208,6 +211,7 @@ void csGraphics3DInfinite::Close()
 
   texman->Clear();
   texman->DecRef(); texman = NULL;
+  vbufmgr->DecRef (); vbufmgr = NULL;
 
   if ((width == height) && (width == -1))
     return;

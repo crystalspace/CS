@@ -29,6 +29,8 @@
 #include "isys/plugin.h"
 
 struct iMaterialWrapper;
+struct iObjectRegistry;
+struct iVertexBuffer;
 class csCubeMeshObjectFactory;
 
 #define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING)
@@ -48,6 +50,7 @@ private:
   csTriangle triangles[12];
   G3DFogInfo fog[8];
   G3DTriangleMesh mesh;
+  iVertexBuffer* vbuf;
   bool initialized;
   csBox3 object_bbox;
   iMeshObjectDrawCallback* vis_cb;
@@ -156,8 +159,10 @@ private:
   UInt MixMode;
 
 public:
+  iObjectRegistry* object_reg;
+
   /// Constructor.
-  csCubeMeshObjectFactory (iBase *pParent);
+  csCubeMeshObjectFactory (iBase *pParent, iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csCubeMeshObjectFactory ();
@@ -232,6 +237,8 @@ private:
   UInt default_MixMode;
 
 public:
+  iObjectRegistry* object_reg;
+
   SCF_DECLARE_IBASE;
 
   /// Constructor.
@@ -244,6 +251,12 @@ public:
   virtual uint32 GetFeatures () const
   {
     return ALL_FEATURES;
+  }
+  /// Initialize.
+  bool Initialize (iObjectRegistry* object_reg)
+  {
+    csCubeMeshObjectType::object_reg = object_reg;
+    return true;
   }
 
   //------------------- iConfig interface implementation -------------------
@@ -260,7 +273,10 @@ public:
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csCubeMeshObjectType);
-    virtual bool Initialize (iObjectRegistry*) { return true; }
+    virtual bool Initialize (iObjectRegistry* object_reg)
+    {
+      return scfParent->Initialize (object_reg);
+    }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
 };

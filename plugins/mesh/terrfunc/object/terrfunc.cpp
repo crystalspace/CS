@@ -27,11 +27,13 @@
 #include "iengine/engine.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/material.h"
+#include "ivideo/vbufmgr.h"
 #include "iengine/material.h"
 #include "iengine/rview.h"
 #include "isys/system.h"
 #include "ivideo/txtmgr.h"
 #include "igraphic/image.h"
+#include "iutil/objreg.h"
 #include "csgfx/rgbpixel.h"
 #include "isys/vfs.h"
 #include "terrfunc.h"
@@ -60,6 +62,8 @@ csTerrBlock::csTerrBlock ()
     memset (&mesh[i], 0, sizeof (G3DTriangleMesh));
     normals[i] = NULL;
     dirlight_numbers[i] = -1;
+    mesh_vertices[i] = NULL;
+    vbuf[i] = NULL;
   }
   material = NULL;
   node = NULL;
@@ -70,7 +74,8 @@ csTerrBlock::~csTerrBlock ()
   int i;
   for (i = 0 ; i < LOD_LEVELS ; i++)
   {
-    delete[] mesh[i].vertices[0];
+    if (vbuf[i]) vbuf[i]->DecRef ();
+    delete[] mesh_vertices[i];
     delete[] mesh[i].vertex_colors[0];
     delete[] mesh[i].texels[0];
     delete[] mesh[i].vertex_fog;
@@ -330,6 +335,7 @@ private:
 public:
   // Build vertex table for a triangle mesh.
   csTriangleVertices (const G3DTriangleMesh& mesh,
+  	csVector3* mesh_vertices, int num_mesh_vertices,
   	csTerrFuncObject* terrfunc);
   ///
   ~csTriangleVertices ();
@@ -595,12 +601,14 @@ void csTriangleVertex::CalculateCost (csTriangleVertices* vertices,
 }
 
 csTriangleVertices::csTriangleVertices (const G3DTriangleMesh& mesh,
+	csVector3* mesh_vertices,
+	int num_mesh_vertices,
 	csTerrFuncObject* terrfunc)
 {
   int i, j;
 
-  vertices = new csTriangleVertex [mesh.num_vertices];
-  num_vertices = mesh.num_vertices;
+  vertices = new csTriangleVertex [num_mesh_vertices];
+  num_vertices = num_mesh_vertices;
 
   // First build a bounding box in 2D for all vertices of this mesh.
   // This bounding box will be used to detect if a vertex is on the
@@ -609,7 +617,7 @@ csTriangleVertices::csTriangleVertices (const G3DTriangleMesh& mesh,
   box.StartBoundingBox ();
   for (i = 0 ; i < num_vertices ; i++)
   {
-    csVector3 v = mesh.vertices[0][i] - terrfunc->topleft;
+    csVector3 v = mesh_vertices[i] - terrfunc->topleft;
     box.AddBoundingVertex (csVector2 (v.x, v.z));
   }
 
@@ -617,7 +625,7 @@ csTriangleVertices::csTriangleVertices (const G3DTriangleMesh& mesh,
   csTriangle* triangles = mesh.triangles;
   for (i = 0 ; i < num_vertices ; i++)
   {
-    vertices[i].pos = mesh.vertices[0][i];
+    vertices[i].pos = mesh_vertices[i];
     csVector3 v = vertices[i].pos - terrfunc->topleft;
     bool at_hor_edge = ABS (v.z-box.MinY ()) < .001 ||
       		       ABS (v.z-box.MaxY ()) < .001;
@@ -679,7 +687,12 @@ void csTriangleVertices::CalculateCost (csTerrFuncObject* terrfunc)
 //---------------------------------------------------------------------------
 
 void csTerrFuncObject::ComputeLODLevel (
-	const G3DTriangleMesh& source, G3DTriangleMesh& dest,
+	const G3DTriangleMesh& source,
+	csVector3* source_vertices,
+	int num_source_vertices,
+	G3DTriangleMesh& dest,
+	csVector3*& dest_vertices,
+	int& num_dest_vertices,
 	float maxcost, int& del_tri, int& tot_tri)
 {
   // Here is a short explanation on the algorithm we are using.
@@ -714,7 +727,8 @@ void csTerrFuncObject::ComputeLODLevel (
 
   int i;
   // Calculate connectivity information.
-  csTriangleVertices* verts = new csTriangleVertices (source, this);
+  csTriangleVertices* verts = new csTriangleVertices (source,
+  	source_vertices, num_source_vertices, this);
 
   // First copy the triangles table. While doing the lod we will
   // modify the triangles in this table.
@@ -771,31 +785,31 @@ void csTerrFuncObject::ComputeLODLevel (
   // Now we are going to fill the destination with the vertices
   // and triangles. First we count how many vertices and triangles
   // are really left.
-  dest.num_vertices = 0;
-  int* translate = new int[source.num_vertices];
-  for (i = 0 ; i < source.num_vertices ; i++)
+  num_dest_vertices = 0;
+  int* translate = new int[num_source_vertices];
+  for (i = 0 ; i < num_source_vertices ; i++)
   {
     if (!verts->GetVertex (i).deleted)
     {
-      translate[i] = dest.num_vertices;
-      dest.num_vertices++;
+      translate[i] = num_dest_vertices;
+      num_dest_vertices++;
     }
     else
       translate[i] = -1;
   }
-  dest.vertices[0] = new csVector3[dest.num_vertices];
-  dest.vertex_fog = new G3DFogInfo[dest.num_vertices];
-  dest.vertex_colors[0] = new csColor[dest.num_vertices];
-  dest.texels[0] = new csVector2[dest.num_vertices];
-  dest.num_vertices = 0;
-  for (i = 0 ; i < source.num_vertices ; i++)
+  dest_vertices = new csVector3[num_dest_vertices];
+  dest.vertex_fog = new G3DFogInfo[num_dest_vertices];
+  dest.vertex_colors[0] = new csColor[num_dest_vertices];
+  dest.texels[0] = new csVector2[num_dest_vertices];
+  num_dest_vertices = 0;
+  for (i = 0 ; i < num_source_vertices ; i++)
   {
     if (translate[i] != -1)
     {
-      dest.texels[0][dest.num_vertices] = source.texels[0][i];
-      dest.vertex_fog[dest.num_vertices] = source.vertex_fog[i];
-      dest.vertex_colors[0][dest.num_vertices] = source.vertex_colors[0][i];
-      dest.vertices[0][dest.num_vertices++] = source.vertices[0][i];
+      dest.texels[0][num_dest_vertices] = source.texels[0][i];
+      dest.vertex_fog[num_dest_vertices] = source.vertex_fog[i];
+      dest.vertex_colors[0][num_dest_vertices] = source.vertex_colors[0][i];
+      dest_vertices[num_dest_vertices++] = source_vertices[i];
     }
   }
   dest.num_triangles = 0;
@@ -835,17 +849,19 @@ void csTerrFuncObject::ComputeLODLevel (
 }
 
 void csTerrFuncObject::ComputeNormals (const G3DTriangleMesh& mesh,
+	csVector3* mesh_vertices,
+	int num_mesh_vertices,
     	csVector3** pNormals)
 {
-  csVector3* normals = new csVector3 [mesh.num_vertices];
+  csVector3* normals = new csVector3 [num_mesh_vertices];
   *pNormals = normals;
   float inv_totx = .5 / float (1+blockxy*gridx);
   float inv_toty = .5 / float (1+blockxy*gridy);
   csVector3 v[8];
   int i;
-  for (i = 0 ; i < mesh.num_vertices ; i++)
+  for (i = 0 ; i < num_mesh_vertices ; i++)
   {
-    csVector3 vv = mesh.vertices[0][i] - topleft;
+    csVector3 vv = mesh_vertices[i] - topleft;
     vv.x /= scale.x * float (blockxy);
     vv.z /= scale.z * float (blockxy);
     float dx = vv.x, dy = vv.z;
@@ -885,16 +901,21 @@ void csTerrFuncObject::ComputeNormals ()
       for (bx = 0 ; bx < blockxy ; bx++)
       {
 	int blidx = by*blockxy + bx;
-	ComputeNormals (blocks[blidx].mesh[lod], &blocks[blidx].normals[lod]);
+	ComputeNormals (blocks[blidx].mesh[lod],
+		blocks[blidx].mesh_vertices[lod],
+		blocks[blidx].num_mesh_vertices[lod],
+		&blocks[blidx].normals[lod]);
       }
 }
 
-void csTerrFuncObject::ComputeBBox (const G3DTriangleMesh& mesh, csBox3& bbox)
+void csTerrFuncObject::ComputeBBox (const G3DTriangleMesh& mesh,
+	csVector3* mesh_vertices,
+	int num_mesh_vertices, csBox3& bbox)
 {
   int i;
   bbox.StartBoundingBox ();
-  for (i = 0 ; i < mesh.num_vertices ; i++)
-    bbox.AddBoundingVertex (mesh.vertices[0][i]);
+  for (i = 0 ; i < num_mesh_vertices ; i++)
+    bbox.AddBoundingVertex (mesh_vertices[i]);
 }
 
 void csTerrFuncObject::ComputeBBoxes ()
@@ -912,7 +933,9 @@ void csTerrFuncObject::ComputeBBoxes ()
       for (lod = 0 ; lod < LOD_LEVELS ; lod++)
       {
 	csBox3 bb;
-	ComputeBBox (blocks[blidx].mesh[lod], bb);
+	ComputeBBox (blocks[blidx].mesh[lod],
+		blocks[blidx].mesh_vertices[lod],
+		blocks[blidx].num_mesh_vertices[lod], bb);
 	blocks[blidx].bbox += bb;
       }
       global_bbox += blocks[blidx].bbox;
@@ -921,16 +944,17 @@ void csTerrFuncObject::ComputeBBoxes ()
   t = (v.x - rad_center.x)*(v.x - rad_center.x) +
       (v.y - rad_center.y)*(v.y - rad_center.y) +
 	  (v.z - rad_center.z)*(v.z - rad_center.z);
-  t = qsqrt(t);
-  radius = csVector3(t,t,t);
+  t = qsqrt (t);
+  radius = csVector3 (t,t,t);
 }
 
-void csTerrFuncObject::InitMesh (G3DTriangleMesh& mesh)
+void csTerrFuncObject::InitMesh (G3DTriangleMesh& mesh,
+	csVector3*& mesh_vertices)
 {
   delete[] mesh.vertex_colors[0];
   mesh.vertex_colors[0] = NULL;
-  delete[] mesh.vertices[0];
-  mesh.vertices[0] = NULL;
+  delete[] mesh_vertices;
+  mesh_vertices = NULL;
   delete[] mesh.texels[0];
   mesh.texels[0] = NULL;
   delete[] mesh.vertex_fog;
@@ -945,13 +969,14 @@ void csTerrFuncObject::InitMesh (G3DTriangleMesh& mesh)
   mesh.fxmode = CS_FX_GOURAUD;
 }
 
-void csTerrFuncObject::SetupBaseMesh (G3DTriangleMesh& mesh, int bx, int by)
+void csTerrFuncObject::SetupBaseMesh (G3DTriangleMesh& mesh,
+	csVector3*& mesh_vertices, int& num_mesh_vertices, int bx, int by)
 {
-  mesh.num_vertices = (gridx+1) * (gridy+1);
-  mesh.vertices[0] = new csVector3[mesh.num_vertices];
-  mesh.texels[0] = new csVector2[mesh.num_vertices];
-  mesh.vertex_fog = new G3DFogInfo [mesh.num_vertices];
-  mesh.vertex_colors[0] = new csColor[mesh.num_vertices];
+  num_mesh_vertices = (gridx+1) * (gridy+1);
+  mesh_vertices = new csVector3[num_mesh_vertices];
+  mesh.texels[0] = new csVector2[num_mesh_vertices];
+  mesh.vertex_fog = new G3DFogInfo [num_mesh_vertices];
+  mesh.vertex_colors[0] = new csColor[num_mesh_vertices];
   csVector3 tl = topleft;
   tl.x += bx*scale.x;
   tl.y += 0;
@@ -974,7 +999,7 @@ void csTerrFuncObject::SetupBaseMesh (G3DTriangleMesh& mesh, int bx, int by)
       v.x += gx*scale.x / float (gridx);
       v.y += height_func->GetHeight (dx, dy) * scale.y;
       v.z += gy*scale.z / float (gridy);
-      mesh.vertices[0][vtidx] = v;
+      mesh_vertices[vtidx] = v;
       csVector2 uv = tluv;
 #if 0
       uv.x += float (gx) / float (blockxy*gridx);
@@ -1149,14 +1174,32 @@ void csTerrFuncObject::SetupObject ()
 	  int blidx = by*blockxy+bx;
 	  csTerrBlock& block = blocks[blidx];
 	  block.dirlight_numbers[lod] = -1;
-	  InitMesh (block.mesh[lod]);
+	  if (!block.vbuf[lod])
+	  {
+	    iObjectRegistry* object_reg = ((csTerrFuncObjectFactory*)pFactory)
+	    	->object_reg;
+	    iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+	    // @@@ priority should be a parameter.
+	    block.vbuf[lod] = g3d->GetVertexBufferManager ()
+	    	->CreateBuffer (1);
+	  }
+	  InitMesh (block.mesh[lod], block.mesh_vertices[lod]);
+	  block.mesh[lod].buffers[lod] = block.vbuf[lod];
 	  if (lod == 0)
-	    SetupBaseMesh (block.mesh[lod], bx, by);
+	    SetupBaseMesh (block.mesh[lod],
+	    	block.mesh_vertices[lod],
+		block.num_mesh_vertices[lod], bx, by);
 	  else
 	  {
-	    G3DTriangleMesh& mprev = block.mesh[lod-1];
 	    int dt, tt;
-	    ComputeLODLevel (mprev, block.mesh[lod], max_cost[lod-1], dt, tt);
+	    ComputeLODLevel (
+	      block.mesh[lod-1],
+	      block.mesh_vertices[lod-1],
+	      block.num_mesh_vertices[lod-1],
+	      block.mesh[lod],
+	      block.mesh_vertices[lod],
+	      block.num_mesh_vertices[lod],
+	      max_cost[lod-1], dt, tt);
 	    del_tri += dt;
 	    tot_tri += tt;
 	  }
@@ -1187,7 +1230,7 @@ void csTerrFuncObject::RecomputeLighting (int lod, int bx, int by)
     csColor* vtcols = m->vertex_colors[0];
     csVector3* norms = block.normals[lod];
     int i;
-    for (i = 0 ; i < m->num_vertices ; i++, vtcols++)
+    for (i = 0 ; i < block.num_mesh_vertices[lod] ; i++, vtcols++)
     {
       float l = dirlight * *(norms++);
       if (l <= 0)
@@ -1297,6 +1340,7 @@ bool csTerrFuncObject::Draw (iRenderView* rview, iMovable* /*movable*/,
     TestVisibility (rview);
 
   iGraphics3D* pG3D = rview->GetGraphics3D ();
+  iVertexBufferManager* vbufmgr = pG3D->GetVertexBufferManager ();
   iCamera* pCamera = rview->GetCamera ();
 
   csReversibleTransform& camtrans = pCamera->GetTransform ();
@@ -1335,8 +1379,15 @@ bool csTerrFuncObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 	m->clip_portal = clip_portal;
 	m->clip_plane = clip_plane;
 	m->clip_z_plane = clip_z_plane;
+	CS_ASSERT (block.vbuf[lod]);
+	CS_ASSERT (!block.vbuf[lod]->IsLocked ());
+	CS_ASSERT (block.mesh_vertices[lod] != NULL);
+	vbufmgr->LockBuffer (block.vbuf[lod],
+		block.mesh_vertices[lod], block.num_mesh_vertices[lod],
+		0);
 	rview->CalculateFogMesh (camtrans, *m);
         pG3D->DrawTriangleMesh (*m);
+	vbufmgr->UnlockBuffer (block.vbuf[lod]);
       }
     }
   }
@@ -1418,7 +1469,7 @@ bool csTerrFuncObject::HitBeamOutline (const csVector3& start,
     if (csIntersect3::BoxSegment (tbox, seg, isect, NULL) > -1) 
     {
       max = blocks[index].mesh[0].num_triangles;
-      vrt = blocks[index].mesh[0].vertices[0];
+      vrt = blocks[index].mesh_vertices[0];
       tr = blocks[index].mesh[0].triangles;
       for (i = 0 ; i < max ; i++)
       { // Check each triangle in both orientations. This is the slow version
@@ -1482,7 +1533,7 @@ bool csTerrFuncObject::HitBeamObject (const csVector3& start,
     if (csIntersect3::BoxSegment (tbox, seg, st, NULL) > -1) 
     {
       max = blocks[index].mesh[0].num_triangles;
-      vrt = blocks[index].mesh[0].vertices[0];
+      vrt = blocks[index].mesh_vertices[0];
       tr = blocks[index].mesh[0].triangles;
       for (i = 0 ; i < max ; i++)
       { // Check each triangle in both orientations. This is the slow version

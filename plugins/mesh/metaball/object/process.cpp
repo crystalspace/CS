@@ -165,7 +165,7 @@ void csMetaBall::CalculateBlob(int dx,int dy,int dz)
     FillCell(_x,_y,_z,_cell);
 
     int num =
-      csTesselator::Tesselate(_cell, mesh.vertices[0] + vertices_tesselated);
+      csTesselator::Tesselate(_cell, mesh_vertices + vertices_tesselated);
 
     if(!num)
       goto skip;

@@ -33,6 +33,8 @@ class csColor;
 
 struct iGraphics2D;
 struct iPolygonTexture;
+struct iVertexBuffer;
+struct iVertexBufferManager;
 struct iTextureManager;
 struct iTextureHandle;
 struct iMaterialHandle;
@@ -362,8 +364,6 @@ struct G3DTriangleMesh
     MAX_VERTEXPOOL = 2,
   };
 
-  /// Number of vertices for each pool.
-  int num_vertices;
   /// Number of vertex sets, if > 1, morphing will be applied.
   int num_vertices_pool;
 
@@ -403,7 +403,11 @@ struct G3DTriangleMesh
   /// DrawPolygonFX flag.
   UInt fxmode;
   float morph_factor;
-  csVector3* vertices[MAX_VERTEXPOOL];
+  /**
+   * Vertex buffers. Note that all vertex buffers used here MUST
+   * have the same number of vertices.
+   */
+  iVertexBuffer* buffers[MAX_VERTEXPOOL];
   csVector2* texels[MAX_VERTEXPOOL];
   iMaterialHandle* mat_handle;
   /// Precalculated vertex color list.
@@ -512,7 +516,7 @@ struct csFog
   float blue;
 };
 
-SCF_VERSION (iGraphics3D, 5, 0, 1);
+SCF_VERSION (iGraphics3D, 5, 0, 2);
 
 /**
  * This is the standard 3D graphics interface.
@@ -745,6 +749,12 @@ struct iGraphics3D : public iBase
    * (csPolygon3D destructor will do that).
    */
   virtual void RemoveFromCache (iPolygonTexture* poly_texture) = 0;
+
+  /**
+   * Get the vertex buffer manager. This will not increment the ref count
+   * of the vertex buffer manager!
+   */
+  virtual iVertexBufferManager* GetVertexBufferManager () = 0;
 };
 
 #endif // __IVIDEO_GRAPH3D_H__

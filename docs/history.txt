@@ -1,6 +1,40 @@
 The history order is reversed so that new features are at the top.
 
+23-Aug-2001
+	- Fog should now work for the metaballs plugin.
+	- Started work on vertex buffer support in the 3D renderers. There is
+	  now a new iVertexBufferManager which you can get by calling
+	  iGraphics3D::GetVertexBufferManager(). The vertex buffer manager
+	  manages objects of type iVertexBuffer. The plan is that everything
+	  that wants to use vertex buffers creates one using the
+	  vertex buffer manager. When the vertex buffer is going to be
+	  used it must be locked.
+	- Modified G3DTriangleMesh to use the new vertex buffers. The
+	  'num_vertices' field has gone (since that is now part of the vertex
+	  buffer) and the 'vertices' array is replaced with a 'buffers'
+	  array (DrawTriangleMesh currently supports maximum two such buffers).
+	- Put a default implementation of vertex buffers in
+	  plugins/video/renderer/common/vbufmgr.*.
+	- Modified all renderers in cvs to support the vertex buffer feature
+	  although the current implementation doesn't do anything special
+	  yet (i.e. it will not perform better than the old system at the
+	  moment).
+	- Modified all mesh object plugins in cvs to support the new
+	  vertex buffer feature. The current implementation in case of
+	  3D sprites is very naive at the moment. It will just use one
+	  vertex buffer which is modified every time. This has to be fixed
+	  later.
+	- Note that one implication of all this is that
+	  iRenderView::CalculateFogMesh() for G3DTriangleMesh can only operate
+	  on a mesh with locked vertex buffers.
+	- Added CS_ASSERT() at various places to make sure the locked status
+	  of the vertex buffer is as expected.
 22-Aug-2001
+	- Norman Kramer made a few comments in polygon.h a bit better.
+	- Norman saved a few cycles in min_z calculation in software
+	  renderer.
+	- Philip Wyett removed ';' at end of 'if()' which was creating a
+	  compiler warning and empty control statement.
 	- Received a patch from Matze Braun <matze@braunis.de> which fixes
 	  the apps crashing when plugins (reporter and standard reporter)
 	  are missing. Added a bool return value to csInitializeApplication

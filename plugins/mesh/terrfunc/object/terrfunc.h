@@ -30,6 +30,7 @@
 struct iEngine;
 struct iMaterialWrapper;
 struct iObjectRegistry;
+struct iVertexBuffer;
 class csTerrainQuad;
 
 #define LOD_LEVELS 4
@@ -43,6 +44,9 @@ class csTerrainQuad;
 class csTerrBlock
 {
 public:
+  iVertexBuffer* vbuf[LOD_LEVELS];	// Vertex buffer for every LOD level.
+  csVector3* mesh_vertices[LOD_LEVELS];
+  int num_mesh_vertices[LOD_LEVELS];
   G3DTriangleMesh mesh[LOD_LEVELS];	// Mesh with four LOD levels.
   csVector3* normals[LOD_LEVELS];	// Array of normals for the LOD levels.
   iMaterialWrapper* material;		// Material for this block.
@@ -121,14 +125,15 @@ private:
    * Clear a mesh and initialize it for new usage (call before
    * SetupBaseMesh() or ComputeLODLevel() (as dest)).
    */
-  void InitMesh (G3DTriangleMesh& mesh);
+  void InitMesh (G3DTriangleMesh& mesh, csVector3*& mesh_vertices);
 
   /**
    * Setup the base mesh (lod level 0). This will basically
    * initialize the mesh by sampling the height function at regular
    * intervals (gridx/gridy resolution).
    */
-  void SetupBaseMesh (G3DTriangleMesh& mesh, int bx, int by);
+  void SetupBaseMesh (G3DTriangleMesh& mesh,
+  	csVector3*& mesh_vertices, int& num_mesh_vertices, int bx, int by);
 
   /**
    * Setup the visibility tree.
@@ -162,13 +167,17 @@ private:
    * by reducing triangles.
    */
   void ComputeLODLevel (
-	const G3DTriangleMesh& source, G3DTriangleMesh& dest,
+	const G3DTriangleMesh& source, csVector3* source_vertices,
+	int num_source_vertices,
+	G3DTriangleMesh& dest, csVector3*& dest_vertices,
+	int& num_dest_vertices,
 	float maxcost, int& del_tri, int& tot_tri);
 
   /**
    * Compute the bounding box of a triangle mesh.
    */
-  void ComputeBBox (const G3DTriangleMesh& mesh, csBox3& bbox);
+  void ComputeBBox (const G3DTriangleMesh& mesh,
+  	csVector3* mesh_vertices, int num_mesh_vertices, csBox3& bbox);
 
   /**
    * Compute all bounding boxes.
@@ -179,7 +188,8 @@ private:
    * Allocate normal array and compute normals for one mesh and put
    * result in pNormals.
    */
-  void ComputeNormals (const G3DTriangleMesh& mesh, csVector3** pNormals);
+  void ComputeNormals (const G3DTriangleMesh& mesh,
+  	csVector3* mesh_vertices, int num_mesh_vertices, csVector3** pNormals);
 
   /**
    * Compute all normal arrays (all lod levels and all blocks).
@@ -618,10 +628,9 @@ public:
  */
 class csTerrFuncObjectFactory : public iMeshObjectFactory
 {
-private:
+public:
   iObjectRegistry *object_reg;
 
-public:
   /// Constructor.
   csTerrFuncObjectFactory (iObjectRegistry* object_reg);
 

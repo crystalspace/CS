@@ -28,6 +28,8 @@
 #include "isys/plugin.h"
 
 struct iMaterialWrapper;
+struct iVertexBuffer;
+struct iObjectRegistry;
 class csBallMeshObjectFactory;
 
 #define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING)
@@ -54,7 +56,10 @@ private:
   uint32 current_features;
 
   int verts_circle;
+  iVertexBuffer* vbuf;
   G3DTriangleMesh top_mesh;
+  csVector3* ball_vertices;
+  int num_ball_vertices;
   csVector3* top_normals;
   bool initialized;
   csBox3 object_bbox;
@@ -276,8 +281,10 @@ public:
 class csBallMeshObjectFactory : public iMeshObjectFactory
 {
 public:
+  iObjectRegistry* object_reg;
+
   /// Constructor.
-  csBallMeshObjectFactory (iBase *pParent);
+  csBallMeshObjectFactory (iBase *pParent, iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csBallMeshObjectFactory ();
@@ -297,6 +304,8 @@ public:
 class csBallMeshObjectType : public iMeshObjectType
 {
 public:
+  iObjectRegistry* object_reg;
+
   SCF_DECLARE_IBASE;
 
   /// Constructor.
@@ -310,11 +319,20 @@ public:
   {
     return ALL_FEATURES;
   }
+  /// Initialize.
+  bool Initialize (iObjectRegistry* object_reg)
+  {
+    csBallMeshObjectType::object_reg = object_reg;
+    return true;
+  }
 
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csBallMeshObjectType);
-    virtual bool Initialize (iObjectRegistry*) { return true; }
+    virtual bool Initialize (iObjectRegistry* object_reg)
+    {
+      return scfParent->Initialize (object_reg);
+    }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
 };

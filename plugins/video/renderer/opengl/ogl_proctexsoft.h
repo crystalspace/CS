@@ -28,6 +28,7 @@ class csTextureProcOpenGL;
 class TxtHandleVector;
 struct iSoftProcTexture;
 struct iNativeWindow;
+struct iVertexBufferManager;
 
 /**
  * This class implements the functionality required to utilise a software
@@ -161,6 +162,7 @@ class csOpenGLProcSoftware : public iGraphics3D
   virtual bool HasNearPlane () { return g3d->HasNearPlane (); }
   virtual iGraphics2D *GetDriver2D ();
   virtual iTextureManager *GetTextureManager ();
+  virtual iVertexBufferManager* GetVertexBufferManager ();
   virtual iHalo *CreateHalo (float iR, float iG, float iB, 
 			     unsigned char *iAlpha, int iWidth, int iHeight);
   virtual void DrawPixmap (iTextureHandle*, int sx, int sy, int sw, int sh,
@@ -181,6 +183,7 @@ class csOpenGLProcSoftware2D : public iGraphics2D
   }
 
   iTextureManager *soft_texman;
+  iVertexBufferManager* soft_vbufmgr;
   csPixelFormat *gl_pfmt;
 
  public:
@@ -191,6 +194,7 @@ class csOpenGLProcSoftware2D : public iGraphics2D
     SCF_CONSTRUCT_IBASE (NULL);
     g2d = g3d->GetDriver2D ();
     soft_texman = g3d->GetTextureManager ();
+    soft_vbufmgr = g3d->GetVertexBufferManager ();
     gl_pfmt = pfmt;
   }
 

@@ -129,6 +129,7 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
   texture_cache = NULL;
   lightmap_cache = NULL;
   txtmgr = NULL;
+  vbufmgr = NULL;
   m_fogtexturehandle = 0;
   fps_limit = 0;
   debug_edges = false;
@@ -259,6 +260,7 @@ bool csGraphics3DOGLCommon::NewInitialize ()
     return false;
 
   txtmgr = new csTextureManagerOpenGL (object_reg, G2D, config, this);
+  vbufmgr = new csVertexBufferManager (object_reg);
 
   m_renderstate.dither = config->GetBool ("Video.OpenGL.EnableDither", false);
   z_buf_mode = CS_ZBUF_NONE;
@@ -393,7 +395,7 @@ void csGraphics3DOGLCommon::PerfTest ()
 
   G3DTriangleMesh mesh;
   int res = 64;
-  mesh.num_vertices = (res+1)*(res+1);
+  int num_vertices = (res+1)*(res+1);
   mesh.num_triangles = res*res*2;
   mesh.num_vertices_pool = 1;
   mesh.clip_portal = CS_CLIP_NEEDED;
@@ -409,9 +411,9 @@ void csGraphics3DOGLCommon::PerfTest ()
   mesh.mat_handle = NULL;
   mesh.vertex_fog = NULL;
   mesh.triangles = new csTriangle [mesh.num_triangles];
-  mesh.vertices[0] = new csVector3 [mesh.num_vertices];
-  mesh.texels[0] = new csVector2 [mesh.num_vertices];
-  mesh.vertex_colors[0] = new csColor [mesh.num_vertices];
+  csVector3* vertices = new csVector3 [num_vertices];
+  mesh.texels[0] = new csVector2 [num_vertices];
+  mesh.vertex_colors[0] = new csColor [num_vertices];
 
   float zx, zy, z;
   // First we calculate the z which will bring the top-left vertex
@@ -430,7 +432,7 @@ void csGraphics3DOGLCommon::PerfTest ()
     for (x = 0 ; x <= res ; x++)
     {
       fx = float (x) / float (res) - .5;
-      mesh.vertices[0][i].Set (10.*fx, 10.*fy, z);
+      vertices[i].Set (10.*fx, 10.*fy, z);
       mesh.texels[0][i].Set (0, 0);
       mesh.vertex_colors[0][i].Set (1, 0, 0);
       i++;
@@ -485,6 +487,10 @@ void csGraphics3DOGLCommon::PerfTest ()
     test_modes[test_mode_cnt].mode = 'P';
     test_modes[test_mode_cnt++].pref_order = 4;
   }
+
+  iVertexBuffer* vbuf = GetVertexBufferManager ()->CreateBuffer (0);
+  GetVertexBufferManager ()->LockBuffer (vbuf, vertices, num_vertices, 0);
+  mesh.buffers[0] = vbuf;
 
   if (compute_outer && !GLCaps.need_screen_clipping)
   {
@@ -543,8 +549,8 @@ void csGraphics3DOGLCommon::PerfTest ()
   zy = -5. / ((dh-asp_center_y) * inv_aspect);
   if (zy > zx) z = zy;
   else z = zx;
-  for (i = 0 ; i < mesh.num_vertices ; i++)
-    mesh.vertices[0][i].z = z;
+  for (i = 0 ; i < num_vertices ; i++)
+    vertices[i].z = z;
   for (i = 0 ; i < test_mode_cnt ; i++)
   {
     if (test_modes[i].mode == 'z') test_modes[i].mode = 'n';
@@ -566,6 +572,8 @@ void csGraphics3DOGLCommon::PerfTest ()
     Report (CS_REPORTER_SEVERITY_NOTIFY, "    %d FPS for %c (small clipper)", cnt,
     	test_modes[i].mode); fflush (stdout);
   }
+  GetVertexBufferManager ()->UnlockBuffer (vbuf);
+  vbuf->DecRef ();
 
   // Sort the results.
   qsort (test_modes, test_mode_cnt, sizeof (ModRes), compare_mode);
@@ -622,6 +630,7 @@ void csGraphics3DOGLCommon::PerfTest ()
 void csGraphics3DOGLCommon::SharedInitialize (csGraphics3DOGLCommon *d)
 {
   txtmgr = d->txtmgr;
+  vbufmgr = d->vbufmgr;
   z_buf_mode = CS_ZBUF_NONE;
   width = height = -1;
 
@@ -849,8 +858,9 @@ void csGraphics3DOGLCommon::Close ()
     return;
 
   // we should remove all texture handles before we kill the graphics context
-  txtmgr->Clear();
-  txtmgr->DecRef(); txtmgr = NULL;
+  txtmgr->Clear ();
+  txtmgr->DecRef (); txtmgr = NULL;
+  vbufmgr->DecRef (); vbufmgr = NULL;
   delete texture_cache; texture_cache = NULL;
   delete lightmap_cache; lightmap_cache = NULL;
   if (clipper)
@@ -2441,6 +2451,16 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
 
 void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 {
+#if CS_DEBUG
+  // Check if the vertex buffers are locked.
+  CS_ASSERT (mesh.buffers[0]->IsLocked ());
+  if (mesh.num_vertices_pool > 1)
+  {
+    CS_ASSERT (mesh.buffers[1]->IsLocked ());
+  }
+#endif
+  int num_vertices = mesh.buffers[0]->GetVertexCount ();
+
   FlushDrawPolygon ();
   lightmap_cache->FlushIfNeeded ();
   if (!CompatibleZBufModes (fog_queue.z_buf_mode, z_buf_mode))
@@ -2562,7 +2582,6 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   //===========
   // Update work tables.
   //===========
-  int num_vertices = mesh.num_vertices;
   int num_triangles = mesh.num_triangles;
   if (num_vertices > tr_verts.Limit ())
   {
@@ -2576,7 +2595,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   // if any of those are needed. When this is done 'verts' will
   // point to an array of camera vertices.
   //===========
-  csVector3* f1 = mesh.vertices[0];
+  csVector3* f1 = mesh.buffers[0]->GetVertices ();
   csVector2* uv1 = mesh.texels[0];
   csColor* col1 = mesh.vertex_colors[0];
   if (!col1) mesh.do_morph_colors = false;
@@ -2589,7 +2608,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     // Vertex morphing.
     float tr = mesh.morph_factor;
     float remainder = 1 - tr;
-    csVector3* f2 = mesh.vertices[1];
+    csVector3* f2 = mesh.buffers[1]->GetVertices ();
     csVector2* uv2 = mesh.texels[1];
     csColor* col2 = mesh.vertex_colors[1];
     for (i = 0 ; i < num_vertices ; i++)

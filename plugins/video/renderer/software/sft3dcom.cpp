@@ -235,6 +235,7 @@ csGraphics3DSoftwareCommon::csGraphics3DSoftwareCommon (iBase* parent) :
 
   tcache = NULL;
   texman = NULL;
+  vbufmgr = NULL;
   partner = NULL;
   clipper = NULL;
   cliptype = CS_CLIPPER_NONE;
@@ -283,7 +284,12 @@ csGraphics3DSoftwareCommon::~csGraphics3DSoftwareCommon ()
   Close ();
   if (G2D) G2D->DecRef ();
   if (partner) partner->DecRef ();
-  if (clipper) { clipper->DecRef (); clipper = NULL; cliptype = CS_CLIPPER_NONE; }
+  if (clipper)
+  {
+    clipper->DecRef ();
+    clipper = NULL;
+    cliptype = CS_CLIPPER_NONE;
+  }
 }
 
 bool csGraphics3DSoftwareCommon::Initialize (iObjectRegistry* p)
@@ -436,6 +442,9 @@ bool csGraphics3DSoftwareCommon::NewOpen ()
   texman = new csTextureManagerSoftware (object_reg, this, config);
   texman->SetPixelFormat (pfmt);
 
+  // Create the vertex buffer manager.
+  vbufmgr = new csVertexBufferManager (object_reg);
+
   tcache = new csTextureCacheSoftware (texman);
   const char *cache_size = config->GetStr
         ("Video.Software.TextureManager.Cache", NULL);
@@ -482,6 +491,7 @@ bool csGraphics3DSoftwareCommon::SharedOpen ()
   cpu_mmx = partner->cpu_mmx;
 #endif
   texman = partner->texman;
+  vbufmgr = partner->vbufmgr;
   tcache = partner->tcache;
   ScanSetup ();
   SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE, do_interlaced == 0);
@@ -1240,6 +1250,7 @@ void csGraphics3DSoftwareCommon::Close ()
     tcache = NULL; 
     texman->Clear();
     texman->DecRef(); texman = NULL;
+    vbufmgr->DecRef (); vbufmgr = NULL;
   }
   if (clipper) 
   { 

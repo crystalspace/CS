@@ -35,6 +35,7 @@
 #include "csutil/cfgacc.h"
 #include "video/renderer/common/dtmesh.h"
 #include "video/renderer/common/dpmesh.h"
+#include "video/renderer/common/vbufmgr.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/poly3d.h"
 #include "ogl_txtmgr.h"
@@ -473,6 +474,8 @@ public:
   OpenGLTextureCache* texture_cache;
   /// The texture manager
   csTextureManagerOpenGL* txtmgr;
+  /// The vertex buffer manager.
+  csVertexBufferManager* vbufmgr;
 
   /// The lightmap cache.
   OpenGLLightmapCache* lightmap_cache;
@@ -662,6 +665,10 @@ public:
   /// Get the iTextureManager.
   virtual iTextureManager *GetTextureManager ()
   { return txtmgr; }
+
+  /// Get the vertex buffer manager.
+  virtual iVertexBufferManager* GetVertexBufferManager ()
+  { return vbufmgr; }
 
   /**
    * Initiate a volumetric fog object. This function will be called

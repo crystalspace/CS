@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2000-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -30,6 +30,7 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/halo.h"
 #include "isys/plugin.h"
+#include "video/renderer/common/vbufmgr.h"
 
 class csReversibleTransform;
 struct iGraphics2D;
@@ -82,6 +83,8 @@ public:
 
   /// The texture manager.
   csTextureManagerNull* texman;
+  /// The vertex buffer manager.
+  csVertexBufferManager* vbufmgr;
 
   /// The System interface.
   iObjectRegistry* object_reg;
@@ -235,6 +238,10 @@ public:
   /// Get the ITextureManager.
   virtual iTextureManager *GetTextureManager ()
   { return texman; }
+
+  /// Get the vertex buffer manager.
+  virtual iVertexBufferManager* GetVertexBufferManager ()
+  { return vbufmgr; }
 
   /// Get Z-buffer value at given X,Y position
   virtual float GetZBuffValue (int, int) { return 0; }

@@ -24,11 +24,13 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/material.h"
+#include "ivideo/vbufmgr.h"
 #include "iengine/material.h"
 #include "iengine/camera.h"
 #include "igeom/clip2d.h"
 #include "iengine/engine.h"
 #include "iengine/light.h"
+#include "iutil/objreg.h"
 #include "qsqrt.h"
 
 //#define BALL_DEBUG
@@ -60,7 +62,7 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   MixMode = 0;
   vis_cb = NULL;
   top_normals = NULL;
-  top_mesh.vertices[0] = NULL;
+  ball_vertices = NULL;
   top_mesh.vertex_colors[0] = NULL;
   top_mesh.texels[0] = NULL;
   top_mesh.triangles = NULL;
@@ -75,13 +77,15 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   color.blue = 0;
   current_lod = 1;
   current_features = ALL_FEATURES;
+  vbuf = NULL;
 }
 
 csBallMeshObject::~csBallMeshObject ()
 {
   if (vis_cb) vis_cb->DecRef ();
+  if (vbuf) vbuf->DecRef ();
   delete[] top_normals;
-  delete[] top_mesh.vertices[0];
+  delete[] ball_vertices;
   delete[] top_mesh.vertex_colors[0];
   delete[] top_mesh.texels[0];
   delete[] top_mesh.triangles;
@@ -390,9 +394,9 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
   }
 
   // Setup the mesh and normal array.
-  mesh.num_vertices = num_vertices;
-  mesh.vertices[0] = new csVector3[num_vertices];
-  memcpy (mesh.vertices[0], vertices, sizeof(csVector3)*num_vertices);
+  num_ball_vertices = num_vertices;
+  ball_vertices = new csVector3[num_vertices];
+  memcpy (ball_vertices, vertices, sizeof(csVector3)*num_vertices);
   mesh.texels[0] = new csVector2[num_vertices];
   memcpy (mesh.texels[0], uvverts, sizeof(csVector2)*num_vertices);
   mesh.vertex_colors[0] = new csColor[num_vertices];
@@ -414,14 +418,23 @@ void csBallMeshObject::SetupObject ()
   if (!initialized)
   {
     initialized = true;
+    if (!vbuf)
+    {
+      iObjectRegistry* object_reg = ((csBallMeshObjectFactory*)factory)
+      	->object_reg;
+      iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+      // @@@ priority should be a parameter.
+      vbuf = g3d->GetVertexBufferManager ()->CreateBuffer (0);
+    }
     delete[] top_normals;
-    delete[] top_mesh.vertices[0];
+    delete[] ball_vertices;
     delete[] top_mesh.vertex_colors[0];
     delete[] top_mesh.texels[0];
     delete[] top_mesh.triangles;
     delete[] top_mesh.vertex_fog;
     top_normals = NULL;
-    top_mesh.vertices[0] = NULL;
+    ball_vertices = NULL;
+    top_mesh.buffers[0] = vbuf;
     top_mesh.vertex_colors[0] = NULL;
     top_mesh.texels[0] = NULL;
     top_mesh.triangles = NULL;
@@ -492,7 +505,7 @@ void csBallMeshObject::UpdateLighting (iLight** lights, int num_lights,
   csColor* colors = top_mesh.vertex_colors[0];
 
   // Set all colors to ambient light (@@@ NEED TO GET AMBIENT!)
-  for (i = 0 ; i < top_mesh.num_vertices ; i++)
+  for (i = 0 ; i < num_ball_vertices ; i++)
     colors[i] = color;
   if (!do_lighting) return;
     // @@@ it is not effiecient to do this all the time.
@@ -519,7 +532,7 @@ void csBallMeshObject::UpdateLighting (iLight** lights, int num_lights,
     csColor light_color = li->GetColor () * (256. / NORMAL_LIGHT_LEVEL)
       * li->GetBrightnessAtDistance (qsqrt (wor_sq_dist));
 
-    for (i = 0 ; i < top_mesh.num_vertices ; i++)
+    for (i = 0 ; i < num_ball_vertices ; i++)
     {
       csVector3 normal = top_normals[i];
       float cosinus;
@@ -537,7 +550,7 @@ void csBallMeshObject::UpdateLighting (iLight** lights, int num_lights,
   }
 
   // Clamp all vertex colors to 2.
-  for (i = 0 ; i < top_mesh.num_vertices ; i++)
+  for (i = 0 ; i < num_ball_vertices ; i++)
     colors[i].Clamp (2., 2., 2.);
 }
 
@@ -567,8 +580,12 @@ bool csBallMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   top_mesh.mat_handle = mat;
   top_mesh.use_vertex_color = true;
   top_mesh.fxmode = MixMode | CS_FX_GOURAUD;
+  CS_ASSERT (!vbuf->IsLocked ());
+  g3d->GetVertexBufferManager ()->LockBuffer (vbuf,
+  	ball_vertices, num_ball_vertices, 0);
   rview->CalculateFogMesh (g3d->GetObjectToCamera (), top_mesh);
   g3d->DrawTriangleMesh (top_mesh);
+  g3d->GetVertexBufferManager ()->UnlockBuffer (vbuf);
 
   return true;
 }
@@ -603,7 +620,7 @@ bool csBallMeshObject::HitBeamOutline (const csVector3& start,
   csSegment3 seg (start, end);
   int i, max = top_mesh.num_triangles;
   csTriangle *tr = top_mesh.triangles;
-  csVector3 *vrt = top_mesh.vertices[0];
+  csVector3 *vrt = ball_vertices;
   for (i = 0 ; i < max ; i++)
   {
     if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],
@@ -632,7 +649,7 @@ bool csBallMeshObject::HitBeamObject(const csVector3& start,
   float dist, temp; 
   float itot_dist = 1 / tot_dist;
   dist = temp = tot_dist;
-  csVector3 *vrt = top_mesh.vertices[0], tmp;
+  csVector3 *vrt = ball_vertices, tmp;
   csTriangle *tr = top_mesh.triangles;
   for (i = 0 ; i < max ; i++)
   {
@@ -659,9 +676,11 @@ SCF_IMPLEMENT_IBASE (csBallMeshObjectFactory)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
 SCF_IMPLEMENT_IBASE_END
 
-csBallMeshObjectFactory::csBallMeshObjectFactory (iBase *pParent)
+csBallMeshObjectFactory::csBallMeshObjectFactory (iBase *pParent,
+	iObjectRegistry* object_reg)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  csBallMeshObjectFactory::object_reg = object_reg;
 }
 
 csBallMeshObjectFactory::~csBallMeshObjectFactory ()
@@ -706,7 +725,8 @@ csBallMeshObjectType::~csBallMeshObjectType ()
 
 iMeshObjectFactory* csBallMeshObjectType::NewFactory ()
 {
-  csBallMeshObjectFactory* cm = new csBallMeshObjectFactory (this);
+  csBallMeshObjectFactory* cm = new csBallMeshObjectFactory (this,
+  	object_reg);
   iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;

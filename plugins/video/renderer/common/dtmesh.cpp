@@ -21,6 +21,7 @@
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 #include "ivideo/material.h"
+#include "ivideo/vbufmgr.h"
 #include "iengine/material.h"
 #include "qint.h"
 #include "csutil/garray.h"
@@ -287,23 +288,33 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
 {
   int i;
 
+#if CS_DEBUG
+  // Check if the vertex buffers are locked.
+  CS_ASSERT (mesh.buffers[0]->IsLocked ());
+  if (mesh.num_vertices_pool > 1)
+  {
+    CS_ASSERT (mesh.buffers[1]->IsLocked ());
+  }
+#endif
+
   // @@@ Currently we don't implement multi-texture
   // in the generic implementation. This is a todo...
+  int num_vertices = mesh.buffers[0]->GetVertexCount ();
 
   // Update work tables.
-  if (mesh.num_vertices > tr_verts.Limit ())
+  if (num_vertices > tr_verts.Limit ())
   {
-    tr_verts.SetLimit (mesh.num_vertices);
-    z_verts.SetLimit (mesh.num_vertices);
-    uv_verts.SetLimit (mesh.num_vertices);
-    persp.SetLimit (mesh.num_vertices);
-    color_verts.SetLimit (mesh.num_vertices);
+    tr_verts.SetLimit (num_vertices);
+    z_verts.SetLimit (num_vertices);
+    uv_verts.SetLimit (num_vertices);
+    persp.SetLimit (num_vertices);
+    color_verts.SetLimit (num_vertices);
   }
 
   // Do vertex tweening and/or transformation to camera space
   // if any of those are needed. When this is done 'verts' will
   // point to an array of camera vertices.
-  csVector3* f1 = mesh.vertices[0];
+  csVector3* f1 = mesh.buffers[0]->GetVertices ();
   csVector2* uv1 = mesh.texels[0];
   csVector3* work_verts;
   csVector2* work_uv_verts;
@@ -317,35 +328,41 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
     // Vertex morphing.
     float tween_ratio = mesh.morph_factor;
     float remainder = 1 - tween_ratio;
-    csVector3* f2 = mesh.vertices[1];
+    csVector3* f2 = mesh.buffers[1]->GetVertices ();
     csVector2* uv2 = mesh.texels[1];
     csColor* col2 = NULL;
     if (mesh.use_vertex_color)
       col2 = mesh.vertex_colors[1];
     if (mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE)
-      for (i = 0 ; i < mesh.num_vertices ; i++)
+      for (i = 0 ; i < num_vertices ; i++)
       {
         tr_verts[i] = o2c * (tween_ratio * f2[i] + remainder * f1[i]);
 	if (mesh.do_morph_texels)
 	  uv_verts[i] = tween_ratio * uv2[i] + remainder * uv1[i];
 	if (mesh.do_morph_colors && mesh.use_vertex_color)
 	{
-	  color_verts[i].red = tween_ratio * col2[i].red + remainder * col1[i].red;
-	  color_verts[i].green = tween_ratio * col2[i].green + remainder * col1[i].green;
-	  color_verts[i].blue = tween_ratio * col2[i].blue + remainder * col1[i].blue;
+	  color_verts[i].red = tween_ratio * col2[i].red
+	  	+ remainder * col1[i].red;
+	  color_verts[i].green = tween_ratio * col2[i].green
+	  	+ remainder * col1[i].green;
+	  color_verts[i].blue = tween_ratio * col2[i].blue
+	  	+ remainder * col1[i].blue;
 	}
       }
     else
-      for (i = 0 ; i < mesh.num_vertices ; i++)
+      for (i = 0 ; i < num_vertices ; i++)
       {
         tr_verts[i] = tween_ratio * f2[i] + remainder * f1[i];
 	if (mesh.do_morph_texels)
 	  uv_verts[i] = tween_ratio * uv2[i] + remainder * uv1[i];
 	if (mesh.do_morph_colors && mesh.use_vertex_color)
 	{
-	  color_verts[i].red = tween_ratio * col2[i].red + remainder * col1[i].red;
-	  color_verts[i].green = tween_ratio * col2[i].green + remainder * col1[i].green;
-	  color_verts[i].blue = tween_ratio * col2[i].blue + remainder * col1[i].blue;
+	  color_verts[i].red = tween_ratio * col2[i].red
+	  	+ remainder * col1[i].red;
+	  color_verts[i].green = tween_ratio * col2[i].green
+	  	+ remainder * col1[i].green;
+	  color_verts[i].blue = tween_ratio * col2[i].blue
+	  	+ remainder * col1[i].blue;
 	}
       }
     work_verts = tr_verts.GetArray ();
@@ -362,7 +379,7 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
   {
     if (mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE)
     {
-      for (i = 0 ; i < mesh.num_vertices ; i++)
+      for (i = 0 ; i < num_vertices ; i++)
         tr_verts[i] = o2c * f1[i];
       work_verts = tr_verts.GetArray ();
     }
@@ -373,7 +390,7 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
   }
 
   // Perspective project.
-  for (i = 0 ; i < mesh.num_vertices ; i++)
+  for (i = 0 ; i < num_vertices ; i++)
   {
     if (work_verts[i].z >= SMALL_Z)
     {
@@ -611,6 +628,5 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
       	pa, pc, pd, trivert2,
 	zv, uv, work_col ? col : NULL, fog, do_clip);
     }
-
   }
 }

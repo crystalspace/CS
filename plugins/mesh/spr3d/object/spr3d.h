@@ -41,6 +41,7 @@
 #define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING|CS_OBJECT_FEATURE_ANIMATION)
 
 struct iObjectRegistry;
+struct iVertexBuffer;
 
 /**
  * A frame for 3D sprite animation.
@@ -702,7 +703,6 @@ public:
   static float global_lod_level;
  
 private:
- 
   /**
    * Used to determine where to look for the lod detail level.
    * The possible values are:
@@ -940,6 +940,21 @@ private:
   G3DTriangleMesh g3dmesh;
 
   bool initialized;
+
+  /**
+   * Our vertex buffer.
+   * This is only temporarily here. I suppose it is better to
+   * origanize this so that the vertex buffer is shared accross several
+   * sprites using the same factory. On the other hand there are lots
+   * of frames. Do we create a vertex buffer for every frame?
+   * @@@
+   */
+  iVertexBuffer* vbuf;
+  /// Vertex buffer for tweening.
+  iVertexBuffer* vbuf_tween;
+  /// Data for vertex buffer (initialize by DrawTest, needed by Draw).
+  csVector3* vbuf_verts, * vbuf_tween_verts;
+  int vbuf_num_vertices;
 
   /// Setup this object.
   void SetupObject ();

@@ -28,12 +28,14 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/material.h"
+#include "ivideo/vbufmgr.h"
 #include "iengine/engine.h"
 #include "iengine/material.h"
 #include "iengine/camera.h"
 #include "iengine/light.h"
 #include "igeom/clip2d.h"
 #include "iutil/cfgmgr.h"
+#include "iutil/objreg.h"
 #include "isys/system.h"
 
 #include "meta.h"
@@ -79,14 +81,16 @@ csMetaBall::csMetaBall (iMeshObjectFactory *fact)
   mp.rate = 0.03;
   current_lod = 1;
   current_features = ALL_FEATURES;
+  vbuf = NULL;
 }
 
 csMetaBall::~csMetaBall ()
 {
+  if (vbuf) vbuf->DecRef ();
   if (vis_cb) vis_cb->DecRef ();
   delete [] meta_balls;
   delete [] mesh.triangles;
-  delete [] mesh.vertices[0];
+  delete [] mesh_vertices;
   delete [] mesh.texels[0];
   delete [] mesh.vertex_colors[0];
   initialize = false;
@@ -122,15 +126,22 @@ bool csMetaBall::Initialize ()
     initialize = true;
     meta_balls = new MetaBall[num_meta_balls];
     memset(&mesh,0,sizeof(G3DTriangleMesh));
+    if (!vbuf)
+    {
+      iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+      // @@@ priority should be a parameter.
+      vbuf = g3d->GetVertexBufferManager ()->CreateBuffer (0);
+    }
+    mesh.buffers[0] = vbuf;
     mesh.num_vertices_pool = 1;
     mesh.triangles = new csTriangle[int(max_vertices/3)];
-    mesh.vertices[0] = new csVector3[max_vertices];
+    mesh_vertices = new csVector3[max_vertices];
     mesh.texels[0] = new csVector2[max_vertices];
     mesh.vertex_colors[0] = new csColor[max_vertices];
 	int i;
     for (i = 0; i < max_vertices; i++)
     {
-      mesh.vertices[0][i].Set(0,0,0);
+      mesh_vertices[i].Set(0,0,0);
       mesh.texels[0][i].Set(0,0);
       mesh.vertex_colors[0][i].Set(1,1,1);
     }
@@ -217,9 +228,9 @@ void csMetaBall::UpdateLighting( iLight **, int, iMovable * )
 	  int k;
       for(k = 0; k < num_meta_balls; k++)
       {
-        csVector3 rv(mesh.vertices[0][m].x - meta_balls[k].center.x,
-          mesh.vertices[0][m].y - meta_balls[k].center.y,
-          mesh.vertices[0][m].z - meta_balls[k].center.z);
+        csVector3 rv(mesh_vertices[m].x - meta_balls[k].center.x,
+          mesh_vertices[m].y - meta_balls[k].center.y,
+          mesh_vertices[m].z - meta_balls[k].center.z);
 
         float r = rv.Norm();
         float c = mp.charge / (r*r*r);
@@ -255,19 +266,19 @@ void csMetaBall::CreateBoundingBox()
   int maxxi = 0, maxyi = 0, maxzi = 0, minxi = 0, minyi = 0, minzi = 0;
 
   int i;
-  for (i = 0; i < mesh.num_vertices; i++)
+  for (i = 0; i < num_mesh_vertices; i++)
   {
-	if ( mesh.vertices[0][i].x < minx ) {minx = mesh.vertices[0][i].x; minxi = i; }
+	if ( mesh_vertices[i].x < minx ) {minx = mesh_vertices[i].x; minxi = i; }
 	else
-	if ( mesh.vertices[0][i].x > maxx ) {maxx = mesh.vertices[0][i].x; maxxi = i; }
+	if ( mesh_vertices[i].x > maxx ) {maxx = mesh_vertices[i].x; maxxi = i; }
 
-	if ( mesh.vertices[0][i].y < miny ) {miny = mesh.vertices[0][i].y; minyi = i; }
+	if ( mesh_vertices[i].y < miny ) {miny = mesh_vertices[i].y; minyi = i; }
 	else
-	if ( mesh.vertices[0][i].y > maxy ) {maxy = mesh.vertices[0][i].y; maxyi = i; }
+	if ( mesh_vertices[i].y > maxy ) {maxy = mesh_vertices[i].y; maxyi = i; }
 
-	if ( mesh.vertices[0][i].z < minz ) {minz = mesh.vertices[0][i].z; minzi = i; }
+	if ( mesh_vertices[i].z < minz ) {minz = mesh_vertices[i].z; minzi = i; }
 	else
-	if ( mesh.vertices[0][i].z > maxz ) {maxz = mesh.vertices[0][i].z; maxzi = i; }
+	if ( mesh_vertices[i].z > maxz ) {maxz = mesh_vertices[i].z; maxzi = i; }
   }
   bb.StartBoundingBox( csVector3(minx,miny,minz));
   bb.AddBoundingVertexSmart( csVector3(maxx,maxy,maxz));
@@ -280,8 +291,8 @@ void csMetaBall::CreateBoundingBox()
   printf("Maximum bounding found at %d,%d,%d\n", maxxi, maxyi, maxzi);
   printf("Minimum bounding vertex at (%f,%f,%f)\n", minx, miny, minz);
   printf("Maximum bounding vertex at (%f,%f,%f)\n", maxx, maxy, maxz);
-  printf("Vertex zero : (%f,%f,%f)\n",mesh.vertices[0][0].x, mesh.vertices[0][0].y, mesh.vertices[0][0].z);
-  printf("Num verts : %d\n", mesh.num_vertices);
+  printf("Vertex zero : (%f,%f,%f)\n",mesh_vertices[0].x, mesh_vertices[0].y, mesh_vertices[0].z);
+  printf("Num verts : %d\n", num_mesh_vertices);
 #endif
 
 }
@@ -338,8 +349,8 @@ bool csMetaBall::HitBeamOutline (const csVector3& start, const csVector3& end,
   int i, max = int(vertices_tesselated/3);
   for (i = 0 ; i < max ; i++)
   {
-    if (csIntersect3::IntersectTriangle (mesh.vertices[0][i+2], mesh.vertices[0][i+1],
-    	mesh.vertices[0][i], seg, isect))
+    if (csIntersect3::IntersectTriangle (mesh_vertices[i+2], mesh_vertices[i+1],
+    	mesh_vertices[i], seg, isect))
     {
       if (pr)
       {
@@ -364,8 +375,8 @@ bool csMetaBall::HitBeamObject( const csVector3& start, const csVector3& end,
   float itot_dist = 1. / tot_dist;
   for (i = 0 ; i < max ; i++)
   {
-    if (csIntersect3::IntersectTriangle (mesh.vertices[0][i+2], mesh.vertices[0][i+1],
-    	mesh.vertices[0][i], seg, tmp))
+    if (csIntersect3::IntersectTriangle (mesh_vertices[i+2], mesh_vertices[i+1],
+    	mesh_vertices[i], seg, tmp))
     {
       if ( dist > (temp = csSquaredDist::PointPoint (start, tmp)))
       {
@@ -382,12 +393,12 @@ bool csMetaBall::HitBeamObject( const csVector3& start, const csVector3& end,
 
 void csMetaBall::NextFrame(csTicks)
 {
-  if ((mesh.num_vertices == 0) || (mp.rate != 0))
+  if ((num_mesh_vertices == 0) || (mp.rate != 0))
   {
   int i,j,m;
   float l = ( do_lighting ) ? 1.0 : 0.0;
   alpha += mp.rate;
-  mesh.num_vertices = 0;
+  num_mesh_vertices = 0;
   mesh.num_triangles = 0;
 //-------------------------------- MetaBall - Set position -------
 // Below is the generic position calculation that was supplied with
@@ -434,9 +445,9 @@ void csMetaBall::NextFrame(csTicks)
       csVector3 n(0, 0, 0);
       for(k = 0; k < num_meta_balls; k++)
       {
-      	csVector3 rv(mesh.vertices[0][m].x - meta_balls[k].center.x,
-          mesh.vertices[0][m].y - meta_balls[k].center.y,
-          mesh.vertices[0][m].z - meta_balls[k].center.z);
+      	csVector3 rv(mesh_vertices[m].x - meta_balls[k].center.x,
+          mesh_vertices[m].y - meta_balls[k].center.y,
+          mesh_vertices[m].z - meta_balls[k].center.z);
 
         float r = rv.Norm();
         float c = mp.charge / (r*r*r);
@@ -451,7 +462,7 @@ void csMetaBall::NextFrame(csTicks)
 	}
   }
   mesh.num_triangles = trigs;
-  mesh.num_vertices = vertices_tesselated;
+  num_mesh_vertices = vertices_tesselated;
   CreateBoundingBox();
   } // If Rate != 0
 }
@@ -474,10 +485,10 @@ bool csMetaBall::Draw( iRenderView* rview, iMovable* /* movable */,
 
 #if 0
   int i;
-  printf("Dumping Triangles: %d Vertices: %d\n", mesh.num_triangles, mesh.num_vertices );
-  for (i = 0; i < mesh.num_vertices; i++)
+  printf("Dumping Triangles: %d Vertices: %d\n", mesh.num_triangles, num_mesh_vertices );
+  for (i = 0; i < num_mesh_vertices; i++)
   {
-	csVector3 v = mesh.vertices[0][i];
+	csVector3 v = mesh_vertices[i];
 	printf("V(%f,%f,%f) ; %d\n", v.x,v.y,v.z, i);
   }
   for (i = 0; i < mesh.num_triangles; i++)
@@ -490,9 +501,14 @@ bool csMetaBall::Draw( iRenderView* rview, iMovable* /* movable */,
 
   if (vis_cb) if (!vis_cb->BeforeDrawing ( this, rview )) return false;
   iGraphics3D* G3D = rview->GetGraphics3D();
+  iVertexBufferManager* vbufmgr = G3D->GetVertexBufferManager ();
   G3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);
   mesh.fxmode = MixMode | CS_FX_GOURAUD;
+  CS_ASSERT (!vbuf->IsLocked ());
+  vbufmgr->LockBuffer (vbuf, mesh_vertices, num_mesh_vertices, 0);
+  rview->CalculateFogMesh (G3D->GetObjectToCamera (), mesh);
   G3D->DrawTriangleMesh(mesh);
+  vbufmgr->UnlockBuffer (vbuf);
   return true;
 }
 

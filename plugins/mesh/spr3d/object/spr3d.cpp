@@ -23,6 +23,7 @@
 #include "csutil/garray.h"
 #include "csutil/rng.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/vbufmgr.h"
 #include "isys/system.h"
 #include "iengine/camera.h"
 #include "iengine/rview.h"
@@ -654,11 +655,16 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
   shapenr = 0;
   current_lod = 1;
   current_features = ALL_FEATURES;
+
+  vbuf = NULL;
+  vbuf_tween = NULL;
 }
 
 csSprite3DMeshObject::~csSprite3DMeshObject ()
 {
   if (vis_cb) vis_cb->DecRef ();
+  if (vbuf) vbuf->DecRef ();
+  if (vbuf_tween) vbuf_tween->DecRef ();
   uv_verts.DecRef ();
   tr_verts.DecRef ();
   fog_verts.DecRef ();
@@ -914,7 +920,8 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 
   if (!factory->cstxt)
   {
-    factory->Report (CS_REPORTER_SEVERITY_ERROR, "Error! Trying to draw a sprite with no material!");
+    factory->Report (CS_REPORTER_SEVERITY_ERROR,
+    	"Error! Trying to draw a sprite with no material!");
     return false;
   }
  
@@ -951,11 +958,6 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
  
   UpdateWorkTables (factory->GetVertexCount());
   
-// Moving the lighting to below the lod.
-//  UpdateDeferedLighting (movable.GetPosition ());
-// The sprite is visible now but we first calculate LOD so that
-// lighting can use it.
-
   csSpriteFrame * cframe = cur_action->GetCsFrame (cur_frame);
 
   // Get next frame for animation tweening.
@@ -1096,20 +1098,30 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
     factory->cstxt->Visit ();
   }
   if (!vertex_colors) AddVertexColor (0, csColor (0, 0, 0));
-  g3dmesh.num_vertices = num_verts_for_lod;
-  g3dmesh.vertices[0] = verts;
+  vbuf_verts = verts;
+  vbuf_num_vertices = num_verts_for_lod;
+
+  // @@@ The priority of the vertex buffer should be a parameter for the sprite.
+  if (!vbuf)
+    vbuf = g3d->GetVertexBufferManager ()->CreateBuffer (1);
+
+  g3dmesh.buffers[0] = vbuf;
   g3dmesh.texels[0] = real_uv_verts;
   g3dmesh.vertex_colors[0] = vertex_colors;
   if (do_tween)
   {
+    vbuf_tween_verts = real_tween_verts;
+    if (!vbuf_tween)
+      vbuf_tween = g3d->GetVertexBufferManager ()->CreateBuffer (0);
+    g3dmesh.buffers[1] = vbuf_tween;
     g3dmesh.morph_factor = tween_ratio;
     g3dmesh.num_vertices_pool = 2;
-    g3dmesh.vertices[1] = real_tween_verts;
     g3dmesh.texels[1] = real_uv_verts;
     g3dmesh.vertex_colors[1] = vertex_colors;
   }
   else
   {
+    vbuf_tween_verts = NULL;
     g3dmesh.morph_factor = 0;
     g3dmesh.num_vertices_pool = 1;
   }
@@ -1132,8 +1144,6 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
     g3dmesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
   g3dmesh.fxmode = MixMode | (vertex_colors ? CS_FX_GOURAUD : 0);
 
-  rview->CalculateFogMesh (tr_o2c, g3dmesh);
-
   return true;
 }
 
@@ -1144,10 +1154,27 @@ bool csSprite3DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
     //rview.callback (&rview, CALLBACK_MESH, (void*)&g3dmesh);
   //else
   iGraphics3D* g3d = rview->GetGraphics3D ();
+  iVertexBufferManager* vbufmgr = g3d->GetVertexBufferManager ();
+
+  CS_ASSERT (!vbuf->IsLocked ());
+  vbufmgr->LockBuffer (vbuf, vbuf_verts, vbuf_num_vertices, 0);
+  if (vbuf_tween_verts)
+  {
+    CS_ASSERT (!vbuf_tween->IsLocked ());
+    vbufmgr->LockBuffer (vbuf_tween, vbuf_tween_verts, vbuf_num_vertices, 0);
+  }
+
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);
+  rview->CalculateFogMesh (g3d->GetObjectToCamera (), g3dmesh);
   g3d->DrawTriangleMesh (g3dmesh);
-  //else
-  // @@@ Provide functionality for visible edges here...
+
+  CS_ASSERT (vbuf->IsLocked ());
+  vbufmgr->UnlockBuffer (vbuf);
+  if (vbuf_tween_verts)
+  {
+    CS_ASSERT (vbuf_tween->IsLocked ());
+    vbufmgr->UnlockBuffer (vbuf_tween);
+  }
 
   if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
   return true;
@@ -1157,7 +1184,8 @@ void csSprite3DMeshObject::InitSprite ()
 {
   if (!factory)
   {
-    factory->Report (CS_REPORTER_SEVERITY_ERROR, "There is no defined template for this sprite!");
+    factory->Report (CS_REPORTER_SEVERITY_ERROR,
+    	"There is no defined template for this sprite!");
     return;
   }
 

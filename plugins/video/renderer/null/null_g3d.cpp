@@ -58,6 +58,7 @@ csGraphics3DNull::csGraphics3DNull (iBase *iParent) : G2D (NULL)
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
 
   texman = NULL;
+  vbufmgr = NULL;
 
   Caps.CanClip = false;
   Caps.minTexHeight = 2;
@@ -72,8 +73,9 @@ csGraphics3DNull::csGraphics3DNull (iBase *iParent) : G2D (NULL)
 csGraphics3DNull::~csGraphics3DNull ()
 {
   Close ();
-  texman->Clear();
-  texman->DecRef(); texman = NULL;
+  texman->Clear ();
+  texman->DecRef (); texman = NULL;
+  vbufmgr->DecRef (); vbufmgr = NULL;
   if (G2D)
     G2D->DecRef ();
 }
@@ -98,6 +100,7 @@ bool csGraphics3DNull::Initialize (iObjectRegistry *object_reg)
     return false;
 
   texman = new csTextureManagerNull (object_reg, G2D, config);
+  vbufmgr = new csVertexBufferManager (object_reg);
   iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
   sys->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
 
@@ -176,8 +179,9 @@ void csGraphics3DNull::Close()
   if ((width == height) && (width == -1))
     return;
 
-  texman->Clear();
-  texman->DecRef(); texman = NULL;
+  texman->Clear ();
+  texman->DecRef (); texman = NULL;
+  vbufmgr->DecRef (); vbufmgr = NULL;
   
   G2D->Close ();
   width = height = -1;

@@ -30,6 +30,8 @@
 #define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING)
 
 struct iMaterialWrapper;
+struct iObjectRegistry;
+struct iVertexBuffer;
 class csSurfMeshObjectFactory;
 
 /**
@@ -50,6 +52,9 @@ private:
   float current_lod;
   uint32 current_features;
 
+  csVector3* surf_vertices;
+  int num_surf_vertices;
+  iVertexBuffer* vbuf;
   G3DTriangleMesh mesh;
   bool initialized;
   csBox3 object_bbox;
@@ -265,8 +270,10 @@ public:
 class csSurfMeshObjectFactory : public iMeshObjectFactory
 {
 public:
+  iObjectRegistry* object_reg;
+
   /// Constructor.
-  csSurfMeshObjectFactory (iBase *pParent);
+  csSurfMeshObjectFactory (iBase *pParent, iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csSurfMeshObjectFactory ();
@@ -286,6 +293,8 @@ public:
 class csSurfMeshObjectType : public iMeshObjectType
 {
 public:
+  iObjectRegistry* object_reg;
+
   SCF_DECLARE_IBASE;
 
   /// Constructor.
@@ -300,11 +309,20 @@ public:
   {
     return ALL_FEATURES;
   }
+  /// Initialize.
+  bool Initialize (iObjectRegistry* object_reg)
+  {
+    csSurfMeshObjectType::object_reg = object_reg;
+    return true;
+  }
 
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSurfMeshObjectType);
-    virtual bool Initialize (iObjectRegistry*) { return true; }
+    virtual bool Initialize (iObjectRegistry* object_reg)
+    {
+      return scfParent->Initialize (object_reg);
+    }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
 };

@@ -85,6 +85,7 @@ csGraphics3DLine::csGraphics3DLine (iBase *iParent) : G2D (NULL)
 
   clipper = NULL;
   texman = NULL;
+  vbufmgr = NULL;
 
   Caps.CanClip = false;
   Caps.minTexHeight = 2;
@@ -101,6 +102,7 @@ csGraphics3DLine::~csGraphics3DLine ()
   Close ();
   texman->Clear();
   texman->DecRef(); texman = NULL;
+  vbufmgr->DecRef (); vbufmgr = NULL;
   if (G2D)
     G2D->DecRef ();
 }
@@ -125,6 +127,7 @@ bool csGraphics3DLine::Initialize (iObjectRegistry *object_reg)
     return false;
 
   texman = new csTextureManagerLine (object_reg, G2D, config);
+  vbufmgr = new csVertexBufferManager (object_reg);
   iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
   sys->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
 
@@ -206,6 +209,7 @@ void csGraphics3DLine::Close()
 
   texman->Clear();
   texman->DecRef(); texman = NULL;
+  vbufmgr->DecRef (); vbufmgr = NULL;
 
   if (clipper) { clipper->DecRef (); clipper = NULL; }
   G2D->Close ();

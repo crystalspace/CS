@@ -22,6 +22,7 @@
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 #include "ivideo/material.h"
+#include "ivideo/vbufmgr.h"
 #include "iengine/material.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
@@ -283,7 +284,7 @@ Tester* MultiTexture2Tester::NextTester ()
 void MeshTester::Setup (iGraphics3D* g3d, PerfTest* perftest)
 {
   draw = 0;
-  mesh.num_vertices = (NUM_MULTIPOLTEST+1)*(NUM_MULTIPOLTEST/2+1);
+  num_mesh_vertices = (NUM_MULTIPOLTEST+1)*(NUM_MULTIPOLTEST/2+1);
   mesh.num_vertices_pool = 1;
   mesh.num_triangles = NUM_MULTIPOLTEST*NUM_MULTIPOLTEST;
   mesh.triangles = new csTriangle [mesh.num_triangles];
@@ -297,9 +298,10 @@ void MeshTester::Setup (iGraphics3D* g3d, PerfTest* perftest)
   mesh.vertex_mode = G3DTriangleMesh::VM_VIEWSPACE;
   mesh.fxmode = CS_FX_COPY;
   mesh.morph_factor = 0;
-  mesh.vertices[0] = new csVector3 [mesh.num_vertices];
-  mesh.texels[0] = new csVector2 [mesh.num_vertices];
+  mesh_vertices = new csVector3 [num_mesh_vertices];
+  mesh.texels[0] = new csVector2 [num_mesh_vertices];
   mesh.mat_handle = perftest->GetMaterial (0);
+  vbuf = g3d->GetVertexBufferManager ()->CreateBuffer (0);
   int i;
   int x, y;
   float w = (g3d->GetWidth ()-20)/2;
@@ -308,7 +310,7 @@ void MeshTester::Setup (iGraphics3D* g3d, PerfTest* perftest)
   for (y = 0 ; y <= NUM_MULTIPOLTEST/2 ; y++)
     for (x = 0 ; x <= NUM_MULTIPOLTEST ; x++)
     {
-      mesh.vertices[0][i].Set (
+      mesh_vertices[i].Set (
       	w * float (x-NUM_MULTIPOLTEST/2) / float (NUM_MULTIPOLTEST/2),
       	h * float (y-NUM_MULTIPOLTEST/2) / float (NUM_MULTIPOLTEST/2) + h/2,
 	1.);
@@ -340,14 +342,18 @@ void MeshTester::Draw (iGraphics3D* g3d)
   //g3d->SetObjectToCamera ();
   g3d->SetClipper (NULL, CS_CLIPPER_NONE);
   g3d->SetPerspectiveAspect (1);//g3d->GetHeight ());
+  g3d->GetVertexBufferManager ()->LockBuffer (vbuf, mesh_vertices,
+  	num_mesh_vertices, 0);
   g3d->DrawTriangleMesh (mesh);
+  g3d->GetVertexBufferManager ()->UnlockBuffer (vbuf);
 }
 
 Tester* MeshTester::NextTester ()
 {
   delete [] mesh.triangles;
-  delete [] mesh.vertices[0];
+  delete [] mesh_vertices;
   delete [] mesh.texels[0];
+  vbuf->DecRef ();
   return new PixmapTester ();
 }
 

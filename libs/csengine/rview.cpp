@@ -24,6 +24,7 @@
 #include "csengine/sector.h"
 #include "csgeom/polyclip.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/vbufmgr.h"
 #include "igeom/clip2d.h"
 #include "iengine/camera.h"
 
@@ -357,7 +358,8 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDPFX& poly)
   }
 }
 
-void csRenderView::CalculateFogMesh (const csTransform& tr_o2c, G3DTriangleMesh& mesh)
+void csRenderView::CalculateFogMesh (const csTransform& tr_o2c,
+	G3DTriangleMesh& mesh)
 {
   if (!ctxt->fog_info) { mesh.do_fog = false; return; }
   mesh.do_fog = true;
@@ -367,9 +369,12 @@ void csRenderView::CalculateFogMesh (const csTransform& tr_o2c, G3DTriangleMesh&
     InitializeFogTable ();
 #endif
 
+  CS_ASSERT (mesh.buffers[0]->IsLocked ());
+
   int i;
-  csVector3* verts = mesh.vertices[0];
-  for (i = 0 ; i < mesh.num_vertices ; i++)
+  int num_vertices = mesh.buffers[0]->GetVertexCount ();
+  csVector3* verts = mesh.buffers[0]->GetVertices ();
+  for (i = 0 ; i < num_vertices ; i++)
   {
     // This is stupid!!! The purpose of DrawTriangleMesh is to be
     // able to avoid doing camera transformation in the engine at all.

@@ -24,6 +24,7 @@
 #include "soft_txt.h"
 #include "video/renderer/common/dtmesh.h"
 #include "video/renderer/common/dpmesh.h"
+#include "video/renderer/common/vbufmgr.h"
 #include "csutil/cfgacc.h"
 #include "scan.h"
 #include "ivideo/halo.h"
@@ -32,6 +33,7 @@
 #include "ivideo/graph3d.h"
 
 class csTextureCacheSoftware;
+class csVertexBufferManager;
 struct iConfigFile;
 
 // Maximum number of fog tables in indexed (8-bit) modes.  This is maximum
@@ -219,6 +221,8 @@ public:
 
   /// The texture manager.
   csTextureManagerSoftware* texman;
+  /// The vertex buffer manager.
+  csVertexBufferManager* vbufmgr;
 
   /// The texture cache.
   csTextureCacheSoftware *tcache;
@@ -457,6 +461,10 @@ public:
   virtual iTextureManager *GetTextureManager ()
   { return texman; }
 
+  /// Get the vertex buffer manager.
+  virtual iVertexBufferManager* GetVertexBufferManager ()
+  { return vbufmgr; }
+
   /// Get Z-buffer value at given X,Y position
   virtual float GetZBuffValue (int x, int y);
 
@@ -476,7 +484,10 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DSoftwareCommon);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
-    virtual bool HandleEvent (iEvent& ev) { return scfParent->HandleEvent (ev); }
+    virtual bool HandleEvent (iEvent& ev)
+    {
+      return scfParent->HandleEvent (ev);
+    }
   } scfiPlugin;
 };
 

@@ -45,11 +45,13 @@ endif
 INC.SOFT3D = $(wildcard plugins/video/renderer/software/*.h) \
   plugins/video/renderer/common/txtmgr.h \
   plugins/video/renderer/common/dtmesh.h \
-  plugins/video/renderer/common/dpmesh.h
+  plugins/video/renderer/common/dpmesh.h \
+  plugins/video/renderer/common/vbufmgr.h
 SRC.SOFT3D = $(wildcard plugins/video/renderer/software/*.cpp) \
   plugins/video/renderer/common/txtmgr.cpp \
   plugins/video/renderer/common/dtmesh.cpp \
-  plugins/video/renderer/common/dpmesh.cpp
+  plugins/video/renderer/common/dpmesh.cpp \
+  plugins/video/renderer/common/vbufmgr.cpp
 ifeq ($(NASM.INSTALLED),yes)
   SRC.SOFT3D += $(wildcard plugins/video/renderer/software/i386/*.asm)
 endif
