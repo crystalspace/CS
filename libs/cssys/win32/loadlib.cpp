@@ -54,13 +54,14 @@ csLibraryHandle csLoadLibrary (const char* iName)
   if (handle == NULL)
   {
     char *buf;
+    DWORD errorCode = GetLastError();
     FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER | 
         FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-        NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        NULL, errorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
         (LPTSTR) &buf, 0, NULL);
     char *str = new char[strlen(buf) + strlen(iName) + 50];
     sprintf(str, "LoadLibrary('%s') error %d: %s",
-	iName, (int)GetLastError(), buf);
+	iName, (int)errorCode, buf);
     ErrorMessages.Push(str);
     LocalFree (buf);
   }
