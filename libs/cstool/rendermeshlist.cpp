@@ -44,7 +44,8 @@ void csRenderMeshList::AddRenderMeshes (csRenderMesh** meshes, int num,
   renderMeshListInfo* entry;
 
   //check if we have rp or need to add it
-  if (renderPriority > renderList.Length () - 1)
+  if (renderPriority > renderList.Length () - 1 || renderList.Get
+    ((uint32)renderPriority) == 0)
   {
     entry = new renderMeshListInfo;
     entry->renderPriority = renderPriority;

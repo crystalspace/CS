@@ -13,6 +13,11 @@ chronological order.
           textures used in r3dtest and a new texture for the donut in flarge.
           Also moved it a bit so it's only half shadowed.
 	- Jorrit added 'cstool' library to rendstep_std plugin.
+	- Jorrit fixed an accidental cvs conflict stuff that got into
+	  plugins/video/render3d/opengl/gl_txtcache.cpp.
+	- Jorrit fixed an accidental commit in thing.cpp.
+	- Jorrit fixed a bug in rendermeshlist.cpp which would sometimes try
+	  to use a 0 render priority.
 8-Sep-2003
 	- Jorrit added csgfx to the stdsteps renderloop plugin (for Jam).
 	- Jorrit did the following changes to bring new and old renderer
