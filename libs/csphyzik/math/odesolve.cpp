@@ -24,18 +24,18 @@
 
 OdeSolver::OdeSolver()
 {
-	state_size = 0;
+  state_size = 0;
 
-	dy = NULL;
-	Iy = NULL;
+  dy = NULL;
+  Iy = NULL;
 }
 
 
 // clean up
 OdeSolver::~OdeSolver()
 {
-	if (dy) delete [] dy;
-	if (Iy) delete [] Iy;
+  if (dy) delete [] dy;
+  if (Iy) delete [] Iy;
 
 }
 
@@ -43,44 +43,46 @@ OdeSolver::~OdeSolver()
 // reallocate memory for all work variables
 void OdeSolver::ode_realloc(int new_size)
 {
-	if (dy) delete [] dy;
-	if (Iy) delete [] Iy;
+  if (dy) delete [] dy;
+  if (Iy) delete [] Iy;
 
-	state_size = new_size;
+  state_size = new_size;
 
-	dy = new real[state_size];
-	Iy = new real[state_size];
+  dy = new real[state_size];
+  Iy = new real[state_size];
+  assert(dy);
+  assert(Iy);
 }
 
 
 //*****************************
-//*		Runga-Kutta
+//*   Runga-Kutta
 //*****************************
 
 OdeRungaKutta4::OdeRungaKutta4()
 {
-	k1 = NULL;
-	k2 = NULL;
-	k3 = NULL;
-	k4 = NULL;
+  k1 = NULL;
+  k2 = NULL;
+  k3 = NULL;
+  k4 = NULL;
 
-	ode_realloc(ODE_INITIAL_STATE_SIZE);
+  ode_realloc(ODE_INITIAL_STATE_SIZE);
 }
 
 // clean up
 OdeRungaKutta4::~OdeRungaKutta4()
 {
-	if (k1)	delete [] k1;
-	if (k2)	delete [] k2;
-	if (k3)	delete [] k3;
-	if (k4)	delete [] k4;
+  if (k1) delete [] k1;
+  if (k2) delete [] k2;
+  if (k3) delete [] k3;
+  if (k4) delete [] k4;
 }
 
 // compute a step.  current state in t0, state after time step t0 -> t1 is put in y1
 // fourth order runga-kutta
 void OdeRungaKutta4::calc_step(real y0[], real y1[], unsigned int len, real t0, real t1, dydt_function dydt)
 {
-	unsigned int i;
+  unsigned int i;
   // reallocate if necessary
   if (len > state_size)
     ode_realloc(len);
@@ -129,30 +131,31 @@ void OdeRungaKutta4::calc_step(real y0[], real y1[], unsigned int len, real t0, 
 // reallocate memory for all work variables
 void OdeRungaKutta4::ode_realloc(int new_size)
 {
-	OdeSolver::ode_realloc( new_size );
-	if (k1)   delete [] k1;
-	if (k2)   delete [] k2;
-	if (k3)   delete [] k3;
-	if (k4)   delete [] k4;
+  OdeSolver::ode_realloc( new_size );
+  if (k1)   delete [] k1;
+  if (k2)   delete [] k2;
+  if (k3)   delete [] k3;
+  if (k4)   delete [] k4;
 
-	state_size = new_size;
+  state_size = new_size;
 
-	k1 = new real[state_size];
-	k2 = new real[state_size];
-	k3 = new real[state_size];
-	k4 = new real[state_size];
+  k1 = new real[state_size];
+  k2 = new real[state_size];
+  k3 = new real[state_size];
+  k4 = new real[state_size];
+  assert(k1); assert(k2); assert(k3); assert(k4);
 }
 
 
 // euler integration.  Real dumb. Real fast.
 OdeEuler::OdeEuler()
 {
-	ode_realloc(ODE_INITIAL_STATE_SIZE);
+  ode_realloc(ODE_INITIAL_STATE_SIZE);
 }
 
 void OdeEuler::calc_step(real y0[], real y1[], unsigned int len, real t0, real t1, dydt_function dydt)
 {
-	unsigned int i;
+  unsigned int i;
   // reallocate if necessary
   if (len > state_size)
     ode_realloc(len);
@@ -171,17 +174,17 @@ void OdeEuler::calc_step(real y0[], real y1[], unsigned int len, real t0, real t
 // mid-point integration.  Not so dumb. pretty fast.
 OdeMidPoint::OdeMidPoint()
 {
-	ode_realloc(ODE_INITIAL_STATE_SIZE);
+  ode_realloc(ODE_INITIAL_STATE_SIZE);
 }
 
 // k1 = f( t, x )  : eval F and T at (t, x)
 // k2 = f( t + dt/2, x + dt/2*k1 ) 
-//		x + dt/2*k1 -> take step of size dt/2 from x. AddRB( k2, k1, dt/2,  
+//    x + dt/2*k1 -> take step of size dt/2 from x. AddRB( k2, k1, dt/2,  
 //      f()         -> eval F and T at stepped ( t + dt/2, x + dt/2*k1 ) postion  
 // y' = y + dt*k2   -> take step of size dt from x
 void OdeMidPoint::calc_step(real y0[], real y1[], unsigned int len, real t0, real t1, dydt_function dydt)
 {
-	unsigned int i;
+  unsigned int i;
   // reallocate if necessary
   if (len > state_size)
     ode_realloc(len);
