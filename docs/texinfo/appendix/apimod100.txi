@@ -1421,10 +1421,10 @@ callback functions are likewise impacted.
 @code{csTreeItem::ForEachItem()}
 @end itemize
 
-The @sc{aws} plugin (Alternate Window System) and its interfaces have been been
-updated for 64-bit platform conformance.  Specifically, the following methods
-now deal with @samp{intptr_t} rather than @samp{void*} for all of @sc{aws}'s
-opaque data needs.
+The @sc{aws} plugin (Alternate Windowing System) and its interfaces have been
+been updated for 64-bit platform conformance.  Specifically, the following
+methods now deal with @samp{intptr_t} rather than @samp{void*} for all of
+@sc{aws}'s opaque data needs.
 
 @itemize @bullet
 @item
