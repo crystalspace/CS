@@ -25,10 +25,11 @@
 
 //--//--//--//--//--//--//--//--//--//--//--//-- Windowing system texture --//--
 
-csWSTexture::csWSTexture (const char *iName, iImage *Image,
+csWSTexture::csWSTexture (const char *iName, iImage *inImage,
   bool i2D, bool i3D)
 {
-  (csWSTexture::Image = Image)->IncRef ();
+  Image = inImage;
+  Image->IncRef ();
   for2D = i2D;
   for3D = i3D;
   IsTransp = false;
