@@ -108,6 +108,7 @@ csXWindow::~csXWindow ()
     xf86vm->DecRef ();
   if (EventOutlet)
     EventOutlet->DecRef ();
+  delete [] win_title;
 }
 
 bool csXWindow::Initialize (iObjectRegistry *object_reg)
