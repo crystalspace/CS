@@ -98,6 +98,8 @@ public:
 
   /// Constructor
   csModelDataAction ();
+  /// Destructor
+  virtual ~csModelDataAction () { }
   
   /// Return the number of key frames
   virtual int GetFrameCount () const;
