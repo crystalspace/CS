@@ -38,7 +38,7 @@ return to this document and continue reading with the next section.
 
 To run Crystal Space you need at least the following:
 
-    1. An executable (cryst.exe, cryst, wincryst.exe, ...)
+    1. An executable (walktest.exe, walktest, ...)
     2. standard.zip (not really required but recommended)
     3. unless you are using a statically linked version of CS
        you should also have a 3D rasterizer library (for example
@@ -69,18 +69,7 @@ Otherwise you can edit cryst.cfg and set WORLDFILE=data/level.zip
 as a configuration option.
 
 Note that Crystal Space currently only supports 256-color displays
-(with a colormap) or 15/16-bit truecolor displays (note that Crystal
-Space may not support 15/16-bit mode on all systems).
-
-When Crystal Space starts it will begin calculating several tables.
-Depending on the type of your display (8-bit or 15/16-bit) and on
-several configuration values it will need to calculate a different
-number of tables. In 8-bit mode it is possible that the calculation
-of these tables takes such a long time that Crystal Space will cache
-them inside the level file (Crystal Space will automatically add the
-needed tables to the zip file if they are not already there).
-Note that all levels available on my home page already contain these
-tables if they need them.
+(with a colormap) or 15/16/32-bit truecolor displays.
 
 
 3. Special Comments for X Windows Version
@@ -112,9 +101,9 @@ always override the default.
 Some interesting options to play with are:
   -mode 640x480
         (or an other value). Use this option to set the size of the display.
-  -nocolldet
-        If you experience problems with the current collision detection
-        system you can disable it with this option.
+  -driver opengl
+        (or direct3d, glide, software, ...). Use this option to select
+        another kind of display driver.
 
 The configuration file ('cryst.cfg') is useful for keeping options that
 you use often. Not all options can be set with the configuration file
@@ -126,8 +115,9 @@ configuration file options.
 5. The Console
 --------------
 
-Starting with version 0.06 there is also an input/output console that
-you can use. Press 'tab' to toggle between the console and normal output.
-There are several commands that you can use. Type 'help' to get the
-list of commands. There is a document docs/console.txt describing
-all these commands.
+There is also an input/output console that you can use (similar to
+the one in Quake). Press 'tab' to toggle between the console and
+normal output. There are several commands that you can use. Type
+'help' to get the list of commands. There is a document docs/console.txt
+describing all these commands.
+

@@ -12,6 +12,65 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+5-Jul-99:
+	- I completely removed support for the 'map' command from the engine
+	  and moved all of it to WalkTest using the new 'DrawFunc()' system.
+	  Again the engine becomes a little cleaner :-)
+	- Added csLight::LightingFunc() which is similar to csWorld::DrawFunc()
+	  but now for the lighting frustrum calculations.
+	- I fixed the crash in OpenGL when pressing on the WalkTest
+	  window with third mouse button.
+	- Moved polygon and lighting selection from engine to WalkTest.
+	- The 'frustrum' command has been moved from apps/support/command.cpp
+	  to apps/walktest/walktest.cpp.
+	- Frustrum dumping works again (enable edge drawing, select a light with
+	  the right mouse button and enable the 'frustrum' command) and is moved
+	  from the engine to WalkTest. So I removed the DumpFrustrum()
+	  function which existed in several classes (but wasn't functional).
+	- Removed csPolygon3D::hilight and moved to WalkTest.
+	- Following a suggestion from Martin Geisse
+	  <Hellwig.Geisse@mni.fh-giessen.de> I created a
+	  csSpriteTemplate::NewSprite() function which creates a sprite from
+	  a template. This is easier and more logical.
+	- Patch from Andrew Zabolotny with a signficant speedup in the
+	  alpha transparent texture mappers (16 and 32 bit).
+	- Other changes from Andrew have to do with cleanup with regards to
+	  indentation and also a few fixes to the collision detection system.
+	- I removed csSector::HitBeam() with four parameters and
+	  csSector::FollowBeam() since they were never used and no longer
+	  served a useful function.
+	- I changed MetaDemo and Simple so that they also load standard.zip
+	  if present. They will try to load stone4.gif from standard.zip.
+	- Made documentation a bit (INSTALL, README, walkthru.txt).
+4-Jul-99:
+	- Renamed csMath3::PlanesClose() to csMath3::PlanesEqual() and
+	  added new csMath3::PlanesClose() function which is more correct (it
+	  also normalizes the planes before testing equality).
+	- Improved MarkRelevantShadowFrustrums() so that it also discards
+	  shadow frustrums for shadow objects which are on the same plane
+	  as the object being shadowed. This improves shadow calculation
+	  for things somewhat (as well as optimizing it) but we're still not
+	  completely ready. Polygon of things can sometimes shadow other
+	  polygons even if this should not happen.
+	- Added csView::GetClipper().
+	- Added csWorld::DrawFunc(). This is a special version of csWorld::Draw()
+	  which does not draw but instead calls a callback function which you can
+	  give it. Using this it is possible to dump debug information for what
+	  you can see on screen. I plan to change some of the existing features
+	  this way so that they are removed from the engine and moved to game
+	  specific code (i.e. WalkTest in this case).
+	- I implemented edge display using the new system. Display of edges is now
+	  completely done by the application and not by the engine nor the 3D
+	  rasterizers. I removed G3DRENDERSTATE_EDGESENABLE from all 3D renderers.
+	  There are three advantages from this change:
+	  	1. The 'e' key will work on Windows now since edge drawing is done
+		   in 2D mode.
+		2. The 'e' key also works for all 3D renderers which support line
+		   drawing. Previously only software supported it.
+		3. The engine became cleaner (smaller).
+	- The 'edges' command has been moved from apps/support/command.cpp to
+	  apps/walktest/walktest.cpp.
+	- Increased speed of walking in 3D mode.
 2-Jul-99:
 	- I optimized the new movement system of Denis so that the gravity/CD
 	  tests are only done when the camera moves. This increases
@@ -25,6 +84,12 @@ Short-term cleanups that need to be done:
 	  glide2common directory which other Glide ports should use (similar
 	  to openglcommon).
 	- *** Release of 0.13_012 ***
+	- I added the optimization back with csVector3 having no constructor.
+	  But I did some VERY extensive testing before doing this. First I
+	  created a constructor which initialized the value to 12345678.9.
+	  Then I also added a CHECK() function which checked for that value
+	  and was called in EVERY csVector3 function. I did find a few
+	  problems and solved them.
 1-Jul-99:
 	- Thomas Hieber enabled snap-to-grid in MazeD and he also increased
 	  the size of the crosses for vertices.
