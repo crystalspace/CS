@@ -158,11 +158,22 @@ static inline long csQint (double inval)
 /**
  * Round a floating-point value and convert to integer
  */
+#ifdef CS_QINT_WORKAROUND
+static inline long csQround (double inval)
+{
+  union { double dtemp; long result; } x;
+
+  x.dtemp = (FIST_MAGIC_QINT + 0.5f) + inval;
+  x.result = CS_LONG_AT_BYTE (x.dtemp, 2);
+  return x.result < 0 ? (x.result >> 1) + 1 : x.result;
+}
+#else
 static inline long csQround (double inval)
 {
   double dtemp = FIST_MAGIC_QROUND + inval;
   return CS_LONG_AT_BYTE (dtemp, CS_LOWER_WORD_BYTE) - 0x80000000;
 }
+#endif
 
 /**\internal
  * Add this constant to convert a floating-point value to 24.8
@@ -171,11 +182,22 @@ static inline long csQround (double inval)
 #define FIST_MAGIC_QINT8 (((65536.0 * 16.0) + 0.5) * 65536.0 * 256.0)
 
 /// Convert a floating-point number to 24.8 fixed-point value.
+#ifdef CS_QINT_WORKAROUND
+inline long csQint8 (float inval)
+{
+  union { double dtemp; long result; } x;
+
+  x.dtemp = FIST_MAGIC_QINT8 + inval;
+  x.result = CS_LONG_AT_BYTE (x.dtemp, CS_LOWER_WORD_BYTE);
+  return x.result - 0x80000000;
+}
+#else
 inline long csQint8 (float inval)
 {
   double dtemp = FIST_MAGIC_QINT8 + inval;
   return CS_LONG_AT_BYTE (dtemp, CS_LOWER_WORD_BYTE) - 0x80000000;
 }
+#endif
 
 /**\internal
  * Add this constant to convert a floating-point value to 16.16
@@ -184,11 +206,22 @@ inline long csQint8 (float inval)
 #define FIST_MAGIC_QINT16 (((65536.0 * 16.0) + 0.5) * 65536.0)
 
 /// Convert a floating-point number to 16.16 fixed-point value.
+#ifdef CS_QINT_WORKAROUND
+inline long csQint16 (float inval)
+{
+  union { double dtemp; long result; } x;
+
+  x.dtemp = FIST_MAGIC_QINT16 + inval;
+  x.result = CS_LONG_AT_BYTE (x.dtemp, CS_LOWER_WORD_BYTE);
+  return x.result - 0x80000000;
+}
+#else
 inline long csQint16 (float inval)
 {
   double dtemp = FIST_MAGIC_QINT16 + inval;
   return CS_LONG_AT_BYTE (dtemp, CS_LOWER_WORD_BYTE) - 0x80000000;
 }
+#endif
 
 /**\internal
  * Add this constant to convert a floating-point value to 8.24
@@ -197,11 +230,22 @@ inline long csQint16 (float inval)
 #define FIST_MAGIC_QINT24 (((65536.0 * 16.0) + 0.5) * 256.0)
 
 /// Convert a floating-point number to 8.24 fixed-point value.
+#ifdef CS_QINT_WORKAROUND
+inline long csQint24 (float inval)
+{
+  union { double dtemp; long result; } x;
+
+  x.dtemp = FIST_MAGIC_QINT24 + inval;
+  x.result = CS_LONG_AT_BYTE (x.dtemp, CS_LOWER_WORD_BYTE);
+  return x.result - 0x80000000;
+}
+#else
 inline long csQint24 (float inval)
 {
   double dtemp = FIST_MAGIC_QINT24 + inval;
   return CS_LONG_AT_BYTE (dtemp, CS_LOWER_WORD_BYTE) - 0x80000000;
 }
+#endif
 
 /** @} */
     
