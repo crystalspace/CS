@@ -92,7 +92,7 @@ csScreenShot::csScreenShot (iGraphics2D *G2D)
 csScreenShot::~csScreenShot ()
 {
   if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
-    delete [] (RGBPixel *)Data;
-  else
     delete [] (UByte *)Data;
+  else
+    delete [] (RGBPixel *)Data;
 }
