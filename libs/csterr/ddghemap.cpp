@@ -64,8 +64,6 @@ bool ddgHeightMap::readMemory( unsigned short *buf )
 bool ddgHeightMap::writeTGN(char *filename, unsigned int base, unsigned int scale)
 {
 	FILE *fptr = filename && filename[0] ? fopen(filename,"wb") : 0;
-	unsigned long test_value = 0x12345678L;
-	bool endian = (*((unsigned char*)&test_value) == 0x12);
 
 	if (!fptr) {
 		ddgErrorSet(FileWrite,(char *) (filename ? filename : "(null)"));
