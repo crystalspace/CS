@@ -30,6 +30,7 @@
 #include "igeom/objmodel.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/vbufmgr.h"
+#include "igeom/polymesh.h"
 
 struct iMaterialWrapper;
 struct iObjectRegistry;
@@ -88,6 +89,8 @@ private:
   long cur_cameranr;
   /// Current movable number.
   long cur_movablenr;
+
+  csMeshedPolygon* polygons;
 
   /**
    * Setup this object. This function will check if setup is needed.
@@ -208,6 +211,16 @@ public:
   void AddListener (iObjectModelListener* listener);
   void RemoveListener (iObjectModelListener* listener);
 
+  /**
+   * Calculate polygons for iPolygonMesh.
+   */
+  csMeshedPolygon* GetPolygons ();
+
+  int GetVertexCount () { SetupObject(); return num_ball_vertices; }
+  csVector3* GetVertices () { SetupObject (); return ball_vertices; }
+  int GetTriangleCount () { SetupObject(); return top_mesh.num_triangles; }
+  csTriangle* GetTriangles () { SetupObject (); return top_mesh.triangles; }
+
   //----------------------- iMeshObject implementation ------------------------
   SCF_DECLARE_IBASE;
 
@@ -242,7 +255,9 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csBallMeshObject);
     virtual long GetShapeNumber () const { return scfParent->shapenr; }
-    virtual iPolygonMesh* GetPolygonMeshColldet () { return NULL; }
+    virtual iPolygonMesh* GetPolygonMeshColldet () {
+      return &(scfParent->scfiPolygonMesh);
+    }
     virtual iPolygonMesh* GetPolygonMeshViscull () { return NULL; }
     virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float)
     { return NULL; }
@@ -345,6 +360,25 @@ public:
     }
   } scfiBallState;
   friend class BallState;
+
+  //------------------ iPolygonMesh interface implementation ----------------//
+  struct PolyMesh : public iPolygonMesh
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csBallMeshObject);
+
+    virtual int GetVertexCount ();
+    virtual csVector3* GetVertices ();
+    virtual int GetPolygonCount ();
+    virtual csMeshedPolygon* GetPolygons ();
+    virtual void Cleanup ();
+    
+    virtual bool IsDeformable () const { return false;  }
+    virtual uint32 GetChangeNumber() const { return 0; }
+
+    PolyMesh () { }
+    virtual ~PolyMesh () { }
+  } scfiPolygonMesh;
+  friend struct PolyMesh;
 };
 
 /**

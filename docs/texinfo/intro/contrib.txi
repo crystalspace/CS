@@ -48,6 +48,11 @@ Andon patched 3ds2lev so it works correctly for
 non-texture mapped @sc{3ds} objects.
 
 @item
+James Baicoianu (@email{james@@baicoianu.com})
+
+James added iPolygonMesh implementation to the ball mesh plugin.
+
+@item
 Charles Al' Quarra (@email{charsquarra@@hotmail.com})
 
 Charles added the OPCODE and cloth plugins to CS.

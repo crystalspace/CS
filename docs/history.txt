@@ -38,6 +38,9 @@ The history order is reversed so that new features are at the top.
 	  changed. This *can* potentially lead to culling errors.
 	- In addition to the bug above the particle systems were also not
 	  calling FireListeners() to notify cullers about possible changes.
+	- Got a patch from James Baicoianu <james@baicoianu.com> which
+	  implements iPolygonMesh for the ball mesh object so it can be used
+	  for collision detection
 12-Feb-2003
 	- Performed several optimizations on the tinyxml parser. Hopefully
 	  it is now a little faster.
