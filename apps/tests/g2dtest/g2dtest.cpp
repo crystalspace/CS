@@ -20,6 +20,7 @@
 
 #include <stdarg.h>
 
+#define SYSDEF_ALLOCA
 #define SYSDEF_SOFTWARE2D
 #include "cssysdef.h"
 #include "cssys/sysdriv.h"
