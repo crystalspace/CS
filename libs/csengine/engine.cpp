@@ -1398,14 +1398,16 @@ struct LightAndDist
 
 // csLightArray is a subclass of csCleanable which is registered
 // to csEngine.cleanup.
-class csLightArray : public csBase
+class csLightArray : public iBase
 {
 public:
+  DECLARE_IBASE;
+  
   LightAndDist* array;
   // Size is the physical size of the array. num_lights is the number of lights in it.
   int size, num_lights;
 
-  csLightArray () : array (NULL), size (0), num_lights (0) { }
+  csLightArray () : array (NULL), size (0), num_lights (0) { CONSTRUCT_IBASE(NULL); }
   virtual ~csLightArray () { delete [] array; }
   void Reset () { num_lights = 0; }
   void AddLight (iLight* l, float sqdist)
@@ -1427,6 +1429,10 @@ public:
   };
   iLight* GetLight (int i) { return array[i].light; }
 };
+
+IMPLEMENT_IBASE(csLightArray)
+ IMPLEMENTS_INTERFACE (iBase)
+IMPLEMENT_IBASE_END;
 
 int compare_light (const void* p1, const void* p2)
 {
