@@ -346,9 +346,6 @@ public:
   /// Called from csTextureHandleSoftware destructor to deregister before death
   void UnregisterTexture (csTextureHandleSoftware* handle);
 
-  virtual void UnregisterTexture (iTextureHandle* handle)
-  { UnregisterTexture((csTextureHandleSoftware *)handle); }
-
   /// Set gamma correction value.
   void SetGamma (float iGamma);
 

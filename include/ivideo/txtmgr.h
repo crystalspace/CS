@@ -130,15 +130,11 @@ struct iTextureManager : public iBase
    *<p>
    * The texture manager will reject the texture if it is an inappropiate
    * format (see GetTextureFormat () method).
+   *<p>
+   * The texture is unregistered at destruction, i.e. as soon as the last
+   * reference to the texture handle is released.
    */
   virtual iTextureHandle *RegisterTexture (iImage *image, int flags) = 0;
-
-  /**
-   * Unregister texture. Remember, if you use this, you MUST have 
-   * a reference on the handle. Release your reference after unregistering
-   */
-
-  virtual void UnregisterTexture(iTextureHandle *texhand) = 0;
 
   /**
    * After all textures have been added, this function does all
@@ -159,25 +155,24 @@ struct iTextureManager : public iBase
   virtual void FreeImages () = 0;
 
   /**
-   * Register a material. The input material wrapper is IncRef'd and DecRef'ed
+   * Register a material. The input material is IncRef'd and DecRef'ed
    * later when FreeMaterials () is called or the material handle is destroyed
    * by calling DecRef on it enough times. If you want to keep the input
-   * material make sure you have called IncRef yourselves.
+   * material make sure you have called IncRef yourselves. <p>
+   *
+   * The material is unregistered at destruction, i.e. as soon as the last
+   * reference to the material handle is released.
    */
   virtual iMaterialHandle* RegisterMaterial (iMaterial* material) = 0;
 
   /**
    * Register a material based on a texture handle. This is a short-cut
    * to quickly make materials based on a single texture.
+   *
+   * The material is unregistered at destruction, i.e. as soon as the last
+   * reference to the material handle is released.
    */
   virtual iMaterialHandle* RegisterMaterial (iTextureHandle* txthandle) = 0;
-
-  /**
-   * Unregister material. Remember, if you use these, you MUST have 
-   * a reference on the handle. Release your reference after unregistering
-   */
-   
-  virtual void UnregisterMaterial(iMaterialHandle* mathand) = 0;
 
   /**
    * Prepare all materials.

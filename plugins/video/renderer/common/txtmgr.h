@@ -344,8 +344,6 @@ public:
    */
   void UnregisterMaterial (csMaterialHandle* handle);
 
-  virtual void  UnregisterMaterial(iMaterialHandle* handle)
-  { UnregisterMaterial((csMaterialHandle *)handle); }
   /// Clear (free) all textures
   virtual void Clear ()
   {

@@ -271,7 +271,7 @@ void PicViewApp::LoadNextImage (int idx, int step)
   buf->DecRef ();
   if (image_view->image)
   {
-    txtmgr->UnregisterTexture (image_view->image->GetTextureHandle ());
+    image_view->image->GetTextureHandle ()->DecRef ();
     delete image_view->image;
     image_view->image = NULL;
     image_view->SetSize(5, 5);

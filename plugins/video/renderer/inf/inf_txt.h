@@ -127,8 +127,6 @@ public:
   virtual void PrepareTextures ();
   virtual iTextureHandle *RegisterTexture (iImage* image, int flags);
   virtual void UnregisterTexture (csTextureHandleInfinite* handle);
-  virtual void UnregisterTexture (iTextureHandle* handle)
-  { UnregisterTexture((csTextureHandleInfinite *)handle); }
 };
 
 #endif // __INF_TXT_H__

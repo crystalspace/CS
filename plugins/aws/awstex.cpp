@@ -166,8 +166,6 @@ awsTextureManager::GetTexturebyID(unsigned long id, char *filename, bool replace
   }
   else
   {
-    txtmgr->UnregisterTexture(awstxt->tex);
-
     awstxt->img->DecRef();
     awstxt->tex->DecRef();
   }

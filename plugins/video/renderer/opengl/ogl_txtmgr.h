@@ -197,9 +197,6 @@ class csTextureManagerOpenGL : public csTextureManager
   void SetPixelFormat (csPixelFormat &PixelFormat);
   /// Called by texture's destructor
   void UnregisterTexture (csTextureHandleOpenGL *handle);
-  /// Called by applications
-  virtual void UnregisterTexture(iTextureHandle* handle)
-  { UnregisterTexture((csTextureHandleOpenGL *)handle); }
 
   /// remove all textures and materials
   virtual void Clear ();
