@@ -221,8 +221,10 @@ csString &csString::Collapse()
     bool saw_white = false;
     for ( ; src < slim; src++)
     {
-      char const c = *src;
-      if (isspace(c))
+      // if c is signed char isspace() may trigger an
+      // assertion for chars >= 0x80
+      unsigned char const c = *src;
+      if (isspace(c)) 
         saw_white = true;
       else
       {
