@@ -29,6 +29,10 @@ chronological order.
 	- Eric Sunshine added csRef<> constructor and assignment operator to
 	  csWeakRef<> in order to avoid ambiguous overloads when assigning
 	  csRef<> to csWeakRef<>.
+	- Eric Sunshine eliminated compilation warnings throughout the project.
+	- Eric Sunshine fixed bug in LFlags rule (flags.jam) where it neglected
+	  to apply linker flags set on plugin modules to "static" variants,
+	  such as walktest_static, thus resulting in link failure.
 28-Jun-2004
 	- Eric Sunshine fixed csApplicationFramework destructor so that it does
 	  not bomb out if csApplicationFramework::Main() was not called.

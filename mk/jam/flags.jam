@@ -64,6 +64,11 @@ rule CFlags
 rule LFlags
 {
   LINKLIBS on $($(<)_TARGET) += $(>) ;
+
+  if $($(<)_TYPE) = plugin
+  {
+    LFlags $(<)_static : $(>) ;
+  }
 }
 
 ##  ExternalLibs target : identifier
@@ -86,10 +91,6 @@ rule ExternalLibs
     CFlags $(<) : $($(i).CFLAGS) ;
     LFlags $(<) : $($(i).LFLAGS) ;
     
-    if $($(<)_TYPE) = plugin
-    {
-      $(<)_static.LFLAGS += $($(i).LFLAGS) ;
-    }
     if $($(<)_TYPE) = library
     {
       $(<).EXTERNALLIBS += $(i) ;
