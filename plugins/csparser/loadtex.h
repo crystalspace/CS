@@ -41,6 +41,7 @@ public:
   SCF_DECLARE_IBASE;
 
   TextureLoaderContext ();
+  virtual ~TextureLoaderContext ();
 
   void SetFlags (int Flags);
   virtual bool HasFlags ();
