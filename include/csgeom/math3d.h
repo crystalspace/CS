@@ -175,7 +175,7 @@ public:
 
   /// Divide this vector by a scalar.
   inline csVector3& operator/= (float f)
-  { x /= f; y /= f; z /= f; return *this; }
+  { float inv_f = 1 / f; x *= inv_f; y *= inv_f; z *= inv_f; return *this; }
 
   /// Unary + operator.
   inline csVector3 operator+ () const { return *this; }
@@ -188,6 +188,10 @@ public:
 
   /// Returns the norm of this vector.
   float Norm () const;
+
+  /// Return the squared norm (magnitude) of this vector.
+  float SquaredNorm () const
+  { return x * x + y * y + z * z; }
 
   /**
    * Returns the unit vector in the direction of this vector.
@@ -611,7 +615,7 @@ public:
   static void CalcPlane (const csVector3& v1, const csVector3& v2,
          const csVector3& v3, csVector3& normal, float& D)
   {
-    normal = (v1-v2)%(v1-v3);
+    CalcNormal (normal, v1, v2, v3);
     D = - (normal * v1);
   }
 

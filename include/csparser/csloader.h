@@ -44,6 +44,17 @@ class csMapNode;
 class csFrame;
 
 /**
+ * Bit flags for the loader (used in csLoader::SetMode).
+ * Some actions may be unwanted during loading, thus these flags.
+ */
+/// Do not compress vertices
+#define CS_LOADER_NOCOMPRESS	0x00000001
+/// Do not create BSP/octrees
+#define CS_LOADER_NOBSP		0x00000002
+/// Do not apply transformations to things (and do not create bounding box)
+#define CS_LOADER_NOTRANSFORM	0x00000004
+
+/**
  * The loader for Crystal Space worlds.
  */
 class csLoader
@@ -183,6 +194,9 @@ public:
   /// Load a image and return an iImage object
   static iImage* LoadImage (const char* name)
   { return load_image (name); }
+
+  /// Set loader mode (see CS_LOADER_XXX flags above)
+  static void SetMode (int iFlags);
 };
 
 #endif

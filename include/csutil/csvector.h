@@ -189,7 +189,7 @@ inline void csVector::QuickSort (int Mode)
     { return BASE::Insert (n, (csSome)Item); }			\
     virtual bool FreeItem (TYPE* Item)				\
     { delete (TYPE*)Item; return true; }			\
-  };
+  }
 
 /**
  * Declares a new vector type NAME as a subclass of csVector.  Elements of
