@@ -143,6 +143,7 @@ ifneq ($(strip $(OUTDLL)),)
 	-$(RMDIR) $(subst /,,$(OUTDLL))
 endif
 	-$(RM) debug.txt
+	-$(RM) ivcon.log
 	-$(RM) precalc.zip
 
 cleanlib:
