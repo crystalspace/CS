@@ -17,8 +17,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_CANVAS_COMMON_FONTCACHE_H__
-#define __CS_CANVAS_COMMON_FONTCACHE_H__
+#ifndef __CS_CSPLUGINCOMMON_CANVAS_FONTCACHE_H__
+#define __CS_CSPLUGINCOMMON_CANVAS_FONTCACHE_H__
+
+/**\file
+ * Font glyph cache base
+ */
 
 #include "csextern.h"
 #include "csutil/csunicode.h"
@@ -28,6 +32,10 @@
 #include "csutil/refcount.h"
 #include "ivideo/fontserv.h"
 #include "ivideo/graph2d.h"
+
+/**
+ * \addtogroup plugincommon
+ * @{ */
 
 #define GLYPH_INDEX_UPPER_SHIFT	    9
 #define GLYPH_INDEX_LOWER_COUNT	    512
@@ -235,4 +243,6 @@ public:
     const utf8_char* text, uint flags);
 };
 
-#endif // __CS_CANVAS_COMMON_FONTCACHE_H__
+/** @} */
+
+#endif // __CS_CSPLUGINCOMMON_CANVAS_FONTCACHE_H__

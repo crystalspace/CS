@@ -16,13 +16,22 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_SCRSHOT_H__
-#define __CS_SCRSHOT_H__
+#ifndef __CS_CSPLUGINCOMMON_CANVAS_SCRSHOT_H__
+#define __CS_CSPLUGINCOMMON_CANVAS_SCRSHOT_H__
+
+/**\file
+ * Simple iImage implementation for canvas screenshots.
+ */
 
 #include "csextern.h"
 #include "ivideo/graph2d.h"
 #include "csgfx/imagebase.h"
 
+/**
+ * \addtogroup plugincommon
+ * @{ */
+
+/// Simple iImage implementation for canvas screenshots.
 class CS_CSPLUGINCOMMON_EXPORT csScreenShot : public csImageBase
 {
   int Format;
@@ -55,5 +64,7 @@ public:
   /// Get alpha map for 8-bit paletted image.
 };
 
-#endif // __CS_SCRSHOT_H__
+/** @} */
+
+#endif // __CS_CSPLUGINCOMMON_CANVAS_SCRSHOT_H__
 

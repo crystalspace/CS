@@ -27,6 +27,10 @@
 #include "draw_common.h"
 #include "csqint.h"
 
+/**
+ * \addtogroup plugincommon
+ * @{ */
+
 /// Class to draw a line.
 template<class Tpixel, class Tpixmixer>
 class csG2DDrawLine
@@ -106,5 +110,7 @@ public:
     
   }
 };
+
+/** @} */
 
 #endif // __CS_CSPLUGINCOMMON_CANVAS_DRAW_LINE_H__

@@ -29,6 +29,10 @@
 #include "csplugincommon/canvas/softfontcache.h"
 
 /**
+ * \addtogroup plugincommon
+ * @{ */
+
+/**
  * Class to write some text.
  * Needs 3 PixMixers: one for to mix with the foreground color, 
  * one to mix with the background color, one to interpolate between
@@ -378,5 +382,7 @@ public:
     
   }
 };
+
+/** @} */
 
 #endif // __CS_CSPLUGINCOMMON_CANVAS_DRAW_TEXT_H___

@@ -17,14 +17,26 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_CANVAS_COMMON_SOFTFONTCACHE_H__
-#define __CS_CANVAS_COMMON_SOFTFONTCACHE_H__
+#ifndef __CS_CSPLUGINCOMMON_CANVAS_SOFTFONTCACHE_H__
+#define __CS_CSPLUGINCOMMON_CANVAS_SOFTFONTCACHE_H__
+
+/**\file
+ * Font cache base class for software canvases.
+ */
 
 #include "csextern.h"
 #include "fontcache.h"
 
+/**
+ * \addtogroup plugincommon
+ * @{ */
+
 class csGraphics2D;
 
+/**
+ * Font cache base class for software canvases.
+ * \sa csSoftFontCacheImpl
+ */
 class CS_CSPLUGINCOMMON_EXPORT csSoftFontCache : public csFontCache
 {
 public:
@@ -51,4 +63,6 @@ public:
   virtual ~csSoftFontCache ();
 };
 
-#endif // __CS_CANVAS_COMMON_SOFTFONTCACHE_H__
+/** @} */
+
+#endif // __CS_CSPLUGINCOMMON_CANVAS_SOFTFONTCACHE_H__

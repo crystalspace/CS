@@ -17,12 +17,26 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_CANVAS_COMMON_SOFTFONTCACHEIMPL_H__
-#define __CS_CANVAS_COMMON_SOFTFONTCACHEIMPL_H__
+#ifndef __CS_CSPLUGINCOMMON_CANVAS_SOFTFONTCACHEIMPL_H__
+#define __CS_CSPLUGINCOMMON_CANVAS_SOFTFONTCACHEIMPL_H__
+
+/**\file
+ * Actual implementation of a font cache for software canvases.
+ */
 
 #include "graph2d.h"
 #include "draw_text.h"
 
+/**
+ * \addtogroup plugincommon
+ * @{ */
+
+/**
+ * An actual implementation of a font cache for software canvases.
+ * Templated to allow flexible support for different pixel formats.
+ * \a Tpixel defines how a pixel is stored in video memory (usually
+ * uint16 or uint32), \a Tpixmixer defines the color encoding.
+ */
 template <class Tpixel, class Tpixmixer>
 class csSoftFontCacheImpl : public csSoftFontCache
 {
@@ -103,4 +117,6 @@ public:
   }
 };
 
-#endif // __CS_CANVAS_COMMON_SOFTFONTCACHEIMPL_H__
+/** @} */
+
+#endif // __CS_CSPLUGINCOMMON_CANVAS_SOFTFONTCACHEIMPL_H__

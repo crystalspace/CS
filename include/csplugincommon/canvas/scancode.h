@@ -18,10 +18,19 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_SCANCODE_H__
-#define __CS_SCANCODE_H__
+#ifndef __CS_CSPLUGINCOMMON_CANVAS_SCANCODE_H__
+#define __CS_CSPLUGINCOMMON_CANVAS_SCANCODE_H__
 
-// This array can be used to translate scancodes into Crystal Space codes
+/**\file
+ */
+
+/**
+ * \addtogroup plugincommon
+ * @{ */
+
+/// This array can be used to translate scancodes into Crystal Space codes
 extern CS_CSPLUGINCOMMON_EXPORT unsigned short ScanCodeToChar [128];
 
-#endif // __CS_SCANCODE_H__
+/** @} */
+
+#endif // __CS_CSPLUGINCOMMON_CANVAS_SCANCODE_H__

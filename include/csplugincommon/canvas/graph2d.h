@@ -17,8 +17,11 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_GRAPH2D_H__
-#define __CS_GRAPH2D_H__
+#ifndef __CS_CSPLUGINCOMMON_CANVAS_GRAPH2D_H__
+#define __CS_CSPLUGINCOMMON_CANVAS_GRAPH2D_H__
+
+/**\file
+ */
 
 #include "csextern.h"
 #include "csutil/scf.h"
@@ -35,13 +38,17 @@
 
 #include "fontcache.h"
 
+/**
+ * \addtogroup plugincommon
+ * @{ */
+
 struct iObjectRegistry;
 struct iPluginManager;
 
 /**
- * This is the base class for 2D renderer. System-dependent ports
- * should derive their own SysGraphics2D class from this one and
- * implement required (marked with an asterisk (*)) functions.
+ * This is the base class for 2D canvases. Plugins should derive their 
+ * own class from this one and implement required (marked with an 
+ * asterisk (*)) functions.
  * Functions not marked with an asterisk are optional, but possibly
  * slow since they are too general.
  */
@@ -470,4 +477,6 @@ protected:
   friend struct eiDebugHelper;
 };
 
-#endif // __CS_GRAPH2D_H__
+/** @} */
+
+#endif // __CS_CSPLUGINCOMMON_CANVAS_GRAPH2D_H__

@@ -2862,8 +2862,6 @@ bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
   G3D = g;
   if (!g) return false;
 
-  stringset = CS_QUERY_REGISTRY (object_reg, iStringSet);
-
   lightpatch_pool = new csLightPatchPool ();
 
   csRef<iVerbosityManager> verbosemgr (

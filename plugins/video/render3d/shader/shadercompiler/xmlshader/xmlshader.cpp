@@ -292,9 +292,20 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
     if (found)
     {
       const char* cname = mapping->GetAttributeValue("customsource");
-      if (cname) 
+      const char *source = mapping->GetAttributeValue ("source");
+      if ((source == 0) && (cname == 0))
+      {
+        SetFailReason ("invalid buffermapping, source missing.");
+        return false;
+      }
+      csRenderBufferName sourceName = 
+	csRenderBuffer::GetBufferNameFromDescr (source);
+      if ((sourceName == CS_BUFFER_NONE) || (cname != 0)) 
       {
         //custom name
+	if (cname == 0)
+	  cname = source;
+
         csStringID varID = strings->Request (cname);
         pass->custommapping_id.Push (varID);
         //pass->bufferGeneric[pass->bufferCount] = CS_VATTRIB_IS_GENERIC (attrib);
@@ -310,20 +321,11 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
       }
       else
       {
-        csRenderBufferName sourceName = CS_BUFFER_NONE;
         //default mapping
-        const char *source = mapping->GetAttributeValue ("source");
-        if (!source)
-        {
-          SetFailReason ("invalid buffermapping, source missing.");
-          return false;
-        }
-
-	sourceName = csRenderBuffer::GetBufferNameFromDescr (source);
 	if (sourceName < CS_BUFFER_POSITION)
         {
-          SetFailReason ("invalid buffermapping, '%s' not %s here.",
-	    (sourceName == CS_BUFFER_NONE) ? "recognized" : "allowed");
+          SetFailReason ("invalid buffermapping, '%s' not allowed here.",
+	    source);
           return false;
         }
         

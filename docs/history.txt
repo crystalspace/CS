@@ -12,6 +12,9 @@ chronological order.
 	- res fixed a printf() format warning in vfscache.cpp on Cygwin.
 	- res added missing SCF_CONSTRUCT_IBASE/SCF_DESTRUCT_IBASE to 
 	  BufferNameIter class (in userrndbuf.cpp).
+	- res changed xmlshader to accept both stock and custom buffer names
+	  in the source attribute of a buffer mapping.
+	- res made some doc changes to the headers in csplugincommon/canvas.
 26-Feb-2005
 	- res renamed "anonymous render buffers" to user render buffers,
 	  simplified csUserRenderBufferManager, added a render buffer parser

@@ -27,6 +27,10 @@
 #include "draw_common.h"
 
 /**
+ * \addtogroup plugincommon
+ * @{ */
+
+/**
  * Draw a box to a (software) canvas.
  * \c Tpixel defines the type of a pixel (e.g. uint32...),
  * \c Tpixmixer a matching mixer class.
@@ -49,5 +53,7 @@ public:
     } /* endwhile */
   }
 };
+
+/** @} */
 
 #endif // __CS_CSPLUGINCOMMON_CANVAS_DRAW_BOX_H__

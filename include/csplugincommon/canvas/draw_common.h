@@ -17,13 +17,18 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_CANVAS_COMMON_DRAW_COMMON_H__
-#define __CS_CANVAS_COMMON_DRAW_COMMON_H__
+#ifndef __CS_CSPLUGINCOMMON_CANVAS_DRAW_COMMON_H__
+#define __CS_CSPLUGINCOMMON_CANVAS_DRAW_COMMON_H__
 
 /**\file
  * Common software canvas drawing tools.
  */
+
 #include "graph2d.h"
+
+/**
+ * \addtogroup plugincommon
+ * @{ */
 
 /// Split a g2d color into the color and alpha part.
 template<class Tpixel>
@@ -96,4 +101,6 @@ public:
   { }
 };
 
-#endif // __CS_CANVAS_COMMON_DRAW_COMMON_H__
+/** @} */
+
+#endif // __CS_CSPLUGINCOMMON_CANVAS_DRAW_COMMON_H__
