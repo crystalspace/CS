@@ -40,6 +40,6 @@ int access (const char *path, int mode);
 #  define CS_BIG_ENDIAN
 #else
 #  error "Please define a suitable CS_XXX_ENDIAN macro in mac/csosdefs.h!"
-#define
+#endif
 
 #endif // OSDEFS_H
