@@ -244,6 +244,10 @@ int ImageGifFile::decode_gif (UByte* iBuffer, long iSize, int* Prefix,
 	  // get transparent color index - (ch==4), so the 3'th byte
 	  transp_index = gptr[3];
 	  csRGBcolor tcol = palette(transp_index);
+	  has_keycolour = 1;
+	  keycolour_r = tcol.red;
+	  keycolour_g = tcol.green;
+	  keycolour_b = tcol.blue;
 #ifdef CS_DEBUG
 	  printf("Transparent colour index is %d (%d,%d,%d).\n", 
 	    transp_index, tcol.red, tcol.green, tcol.blue);

@@ -147,6 +147,10 @@ csImageFile::csImageFile (int iFormat)
   fName = NULL;
   Alpha = NULL;
   Format = iFormat;
+  has_keycolour = 0;
+  keycolour_r = 0;
+  keycolour_g = 0;
+  keycolour_b = 0;
 }
 
 csImageFile::~csImageFile ()

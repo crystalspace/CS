@@ -48,6 +48,8 @@ protected:
   char *fName;
   /// Image format (see CS_IMGFMT_XXX above)
   int Format;
+  /// if it has a keycolour, and the keycolour values.
+  uint8 has_keycolour, keycolour_r, keycolour_g, keycolour_b;
 
   /**
    * csImageFile constructor.
