@@ -5,4 +5,20 @@
 @noindent
 @emph{Written by Philip Wyett @email{philipwyett@@dsl.pipex.com}.}
 @noindent
-@emph{Last updated 28 May 2003.}
+@emph{Last updated 2 June 2003.}
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap0}
+@end ifnotinfo
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap1}
+@end ifnotinfo
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap2}
+@end ifnotinfo
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap3}
+@end ifnotinfo
