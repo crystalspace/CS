@@ -53,7 +53,7 @@ INC.GLSHADER_FIXED = \
 SRC.GLSHADER_FIXED = \
   $(wildcard $(addprefix $(SRCDIR)/,\
   plugins/video/render3d/shader/shaderplugins/glshader_fixed/*.cpp\
-  plugins/video/render3d/shader/common/*.h))
+  plugins/video/render3d/shader/common/*.cpp))
 OBJ.GLSHADER_FIXED = $(addprefix $(OUT)/,$(notdir $(SRC.GLSHADER_FIXED:.cpp=$O)))
 DEP.GLSHADER_FIXED = CSGFX CSGEOM CSUTIL
 CFG.GLSHADER_FIXED =

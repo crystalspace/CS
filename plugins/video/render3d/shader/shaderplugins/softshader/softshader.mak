@@ -51,7 +51,7 @@ INC.SOFTSHADER = \
 SRC.SOFTSHADER = \
   $(wildcard $(addprefix $(SRCDIR)/,\
   plugins/video/render3d/shader/shaderplugins/softshader/*.cpp\
-  plugins/video/render3d/shader/common/*.h))
+  plugins/video/render3d/shader/common/*.cpp))
 OBJ.SOFTSHADER = $(addprefix $(OUT)/,$(notdir $(SRC.SOFTSHADER :.cpp=$O)))
 
 DEP.SOFTSHADER = CSGEOM CSUTIL CSUTIL CSGFX

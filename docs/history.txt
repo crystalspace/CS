@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Dec-2003
+	- Eric Sunshine fixed bugs in glshader_fixed.mak and softshader.mak
+	  where header files (.h) were being listed in SRC.GLSHADER_FIXED and
+	  SRC.SOFTSHADER.  This resulted in the values of OBJ.GLSHADER_FIXED
+	  and OBJ.SOFTSHADER becoming corrupted, which caused the build to
+	  fail.
 17-Dec-2003
 	- Jorrit fixed an initialition bug in the xmlshader compiler.
 	  It would not initialize the writemask which means that you could
