@@ -180,16 +180,17 @@ static void MIPMAP_NAME (unsigned w, unsigned h
 #endif
 
   const unsigned nh = h >> MIPMAP_LEVEL;
+  const unsigned nw = w >> MIPMAP_LEVEL;
   // Compute the adjusted width of mipmap
   const unsigned w1 = (w & ~((1 << MIPMAP_LEVEL) - 1)) - 1;
 
 #if MIPMAP_LEVEL == 1
-  if (nh == 0 && w1 == 0) return;
-  if (nh == 0 || w1 == 0)
+  if (nh == 0 && nw == 0) return;
+  if (nh == 0 || nw == 0)
   {
 #undef FINALLY
 #define FINALLY
-    unsigned int n = MAX (1, nh) * MAX (1, w1);
+    unsigned int n = MAX (1, nh) * MAX (1, nw);
     for (x = 0; x <= n; x += MIPMAP_STEP)
     {
 #ifndef MIPMAP_ALPHA
