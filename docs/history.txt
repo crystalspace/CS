@@ -37,6 +37,8 @@ chronological order.
 	  the thing mesh plugin because they break compilation. This will
 	  now most likely break compilation on the older compiler but I'm
 	  uncertain how to fix this.
+	- Eric Sunshine added a few more csGeom classes and interfaces to
+	  cspace.i at user request.
 23-Feb-2004
 	- Jorrit moved the Engine.Lighthing.LightmapQuality config option
 	  from engine.cfg to thing.cfg (and renamed it
