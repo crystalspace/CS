@@ -260,10 +260,13 @@ bool csNewParticleSystem::Draw (iRenderView* rview, iMovable* mov,
       csVector3 effectiveAxis = objspace.Other2ThisRelative (
         (ParticleFlags & CS_PARTICLE_SEP_AXIS) ? AxisArray [i] : Axis);
 
-      if (ParticleFlags & CS_PARTICLE_ALIGN_Y) {
+      if (ParticleFlags & CS_PARTICLE_ALIGN_Y)
+      {
         y_axis = effectiveAxis;
         x_axis = csVector3 (0, 0, -1) % y_axis;
-      } else {
+      }
+      else
+      {
         x_axis = effectiveAxis;
         y_axis = csVector3 (0, 0, +1) % x_axis;
       }
@@ -408,3 +411,4 @@ void csNewParticleSystem::SetLighting (bool enable)
   if (Lighting) LitColors = new csColor [StorageCount];
   else LitColors = 0;
 }
+

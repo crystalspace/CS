@@ -88,7 +88,6 @@ private:
   csRef<iGraphics3D> g3d;
   bool mesh_colors_dirty_flag;
 
-  csReversibleTransform tr_o2c;
   uint buffers_version;
   csRef<iRenderBuffer> color_buffer;
   iMovable* lighting_movable;

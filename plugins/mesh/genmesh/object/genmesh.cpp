@@ -572,9 +572,7 @@ bool csGenmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   // ->
   //   C = Mwc * (Mow * O - Vow - Vwc)
   //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
-#ifndef CS_USE_NEW_RENDERER
   csReversibleTransform tr_o2c;
-#endif
   // Shouldn't this be done in the renderer?
   tr_o2c = camera->GetTransform ();
   if (!movable->IsFullTransformIdentity ())
