@@ -41,22 +41,22 @@ public:
   /// remove a configuration domain
   virtual void RemoveDomain(char const* path, iVFS*);
   /// return a pointer to a single config domain
-  virtual iConfigFileNew* LookupDomain(char const* path, iVFS*);
+  virtual iConfigFileNew* LookupDomain(char const* path, iVFS*) const;
   /// set the priority of a config domain
   virtual void SetDomainPriority(char const* path, iVFS*, int priority);
   /// set the priority of a config domain
   virtual void SetDomainPriority(iConfigFileNew*, int priority);
   /// return the priority of a config domain
-  virtual int GetDomainPriority(char const* path, iVFS*) const = 0;
+  virtual int GetDomainPriority(char const* path, iVFS*) const;
   /// return the priority of a config domain
-  virtual int GetDomainPriority(iConfigFileNew*) const = 0;
+  virtual int GetDomainPriority(iConfigFileNew*) const;
 
   /// return a pointer to the dynamic config domain
-  virtual iConfigFileNew *GetDynamicDomain();
+  virtual iConfigFileNew *GetDynamicDomain() const;
   /// set the priority of the dynamic config domain
   virtual void SetDynamicDomainPriority(int priority);
   /// return the priority of the dynamic config domain
-  virtual int GetDynamicDomainPriority() const = 0;
+  virtual int GetDynamicDomainPriority() const;
 
   /**
    * Get configuration file name.  Also consult GetVFS() to determine which

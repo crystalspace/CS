@@ -212,7 +212,7 @@ void csConfigManager::RemoveDomain(char const *path, iVFS *vfs)
   delete d;
 }
 
-iConfigFileNew* csConfigManager::LookupDomain(char const *path, iVFS *vfs)
+iConfigFileNew* csConfigManager::LookupDomain(char const *path, iVFS *vfs) const
 {
   csConfigDomain *d = FindConfig(path, vfs);
   return d ? d->Cfg : NULL;
@@ -250,7 +250,7 @@ int csConfigManager::GetDomainPriority(iConfigFileNew *cfg) const
   return d ? d->Pri : PriorityMedium;
 }
 
-iConfigFileNew *csConfigManager::GetDynamicDomain()
+iConfigFileNew *csConfigManager::GetDynamicDomain() const
 {
   return DynamicDomain->Cfg;
 }
