@@ -195,6 +195,8 @@ struct iThingState : public iBase
    *       very useful for objects that often move and have lots of vertices
    *       since in that case combining the transforms ones is a lot more
    *       efficient than doing two transforms on every vertex.
+   *	   <b>WARNING:</b> This option is currently NOT supported!
+   *	   Use CS_THING_MOVE_OCCASIONAL instead.
    * </ul>
    */
   virtual void SetMovingOption (int opt) = 0;
