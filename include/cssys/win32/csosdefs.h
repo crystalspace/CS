@@ -76,6 +76,8 @@
   #undef  CRASH
   #define CRASH { ::DebugBreak(); }
 
+  #define DEBUG_BREAK_MSG
+
 #else
   #define ASSERT(expression)
   #define VERIFY_SUCCESS(expression) expression

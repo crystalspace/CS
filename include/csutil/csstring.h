@@ -103,7 +103,7 @@ public:
 #ifdef CS_DEBUG
     if (n >= Size)
       DEBUG_BREAK_MSG (("Trying to set string`%s' at position %lu\n",
-        Data ? Data : "<null>", (unsigned long)n))
+        Data ? Data : "<null>", (unsigned long)n));
 #endif
     Data [n] = c;
   }
