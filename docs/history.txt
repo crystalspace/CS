@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+9-Aug-2001
+	- Martin Geisse reverted recent changes to csObject because they
+	  contradict with the ideas of reference counting.
 8-Aug-2001
 	- Michael Voase did the following:
 	  csObject: Changed the vector used to CS_TYPED_VECTOR_DECREF()
@@ -11,6 +14,16 @@ The history order is reversed so that new features are at the top.
 	- Samuel Humphreys did several fixes to get -mode working again for
 	  X windows. He broke this yesterday. He additionally fixed a few
 	  other 2D clipping bugs.
+	- Philip Wyett fixed the python plugin through MSVC. Also updated
+	  the python plugin to AllowResize().
+	- Martin Geisse fixed bugs in csModelDataTools, csObject and
+	  the convertor multiplexer. csModelDataTools::Describe() also
+	  prints the RefCount of all objects now. mdltest now uses
+	  the converter multiplexer.
+	- Matthew Tang added a full export plugin for Blender to export
+	  CS world files complete with sectors, things and portals.
+	  There is also a tutorial included. Check it out in
+	  scripts/blender/blend2cs.
 7-Aug-2001
 	- Removed PerformExtension() in the Windows system driver. Instead
 	  the Windows system driver now creates an object Win32Helper which
