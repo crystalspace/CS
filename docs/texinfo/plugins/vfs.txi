@@ -85,6 +85,31 @@ archive not been tested.
 @cindex @sc{vfs} Configuration File
 @cindex @file{vfs.cfg}, @sc{vfs} Configuration File
 
+When the @sc{vfs} plugin is loaded, it searches for a configuration file named
+@file{vfs.cfg} in the following locations in the order shown:
+
+@itemize @bullet
+@item
+Application resource directory; typically, the directory in which the
+application executable resides but, on MacOS/X, it is the @file{Resources}
+directory within the Cocoa application wrapper for @sc{gui} programs. (Returned
+by @code{csGetResourceDir()}.)
+
+@item
+Directory where application executable resides, or the directory where Cocoa
+application wrapper resides on MacOS/X. (Returned by @code{csGetAppDir()}.)
+
+@item
+Crystal Space installation directory. (Returned by @code{csGetConfigPath()}.)
+@end itemize
+
+@noindent
+The full set of directories mounted by @sc{vfs} after it scans for
+configuration files is the union of the entries in all of the discovered
+@file{vfs.cfg} files. If there are conflicting entries, then mounts and
+variable assignments specified in configuration files discovered earlier in the
+scan take precedence over those discovered later.
+
 Keys in the @file{vfs.cfg} configuration file with names starting with
 @samp{VFS.Mount.} describe the layout of the @dfn{virtual} file system.
 Imagine a clean disk drive onto which you start to create directories by making
@@ -147,7 +172,7 @@ Windows.
 Crystal Space installation directory.
 
 @item $*
-Application resource directory; typically the directory in which the
+Application resource directory; typically, the directory in which the
 application executable resides but, on MacOS/X, it is the @file{Resources}
 directory within the Cocoa application wrapper for @sc{gui} programs.
 

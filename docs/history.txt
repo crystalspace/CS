@@ -47,6 +47,19 @@ chronological order.
 	  instance variable when the containing object is not able to populate
 	  the manager immediately upon construction.
 	- Eric Sunshine added a csConfigFile::IsEmpty() method.
+	- Eric Sunshine updated VFS so that, at initialization time, it now
+	  merges all vfs.cfg files located during its start-up scan. It
+	  searches for a file named vfs.cfg in the application resource
+	  directory (csGetResourceDir()), then in the directory containing the
+	  application (csGetAppDir()), and finally in the Crystal Space
+	  installation directory (csGetConfigPath()).  The full set of
+	  directories mounted by VFS following the initial configuration file
+	  scan is the union of the entries in all of the discovered vfs.cfg
+	  files. If there are conflicting entries, then mounts and variable
+	  assignments specified in configuration files discovered earlier in
+	  the scan take precedence over those discovered later.  Previously,
+	  VFS stopped searching for configuration information at the first
+	  directory containing a file named vfs.cfg, and loaded only that file.
 5-Dec-2004
 	- res made the following changes:
 	    - Fixed the Win32 shared library linking.

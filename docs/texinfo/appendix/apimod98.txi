@@ -1273,6 +1273,8 @@ to the shared @samp{iCommandLineParser} from the object registry,
 @end itemize
 
 @subheading @sc{vfs} Changes
+@cindex @sc{vfs} Configuration File
+@cindex @file{vfs.cfg}, @sc{vfs} Configuration File
 
 @sc{vfs} (@pxref{VFS}) now understands two new pseudo-variables, @samp{$*} and
 @samp{$^}, in its configuration file, @file{vfs.cfg}, and during programmatic

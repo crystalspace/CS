@@ -213,7 +213,7 @@ Space header tree is now installed (via @samp{make install} or
 being installed directly in the top-level system directory. For example,
 assuming the default installation location, the Crystal Space headers are now
 installed in @file{/usr/local/include/crystalspace}. Previously, they would
-have been installed directly into @file{/usr/local/include}. The
+have been deposited directly into @file{/usr/local/include}. The
 @samp{cs-config} utility script properly returns the new header location in
 response to the @samp{--includedir}, @samp{--cflags}, and @samp{--cxxflags}
 options, so this relocation should be mostly transparent to external projects.
@@ -656,3 +656,22 @@ into the internal texture format (that is, uploaded to the graphics hardware).
 The Java bindings for Crystal Space have been fully integrated into the project
 and are now well-supported. It is now possible to write Crystal Space program
 entirely in Java. @xref{Java Bindings}.
+
+@subheading @sc{vfs} Changes
+@cindex @sc{vfs} Configuration File
+@cindex @file{vfs.cfg}, @sc{vfs} Configuration File
+
+At initialization time, @sc{vfs} now merges all @file{vfs.cfg} files located
+during its start-up scan. It searches for a file named @file{vfs.cfg} in the
+application resource directory (@code{csGetResourceDir()}), then in the
+directory containing the application (@code{csGetAppDir()}), and finally in the
+Crystal Space installation directory (@code{csGetConfigPath()}).  The full set
+of directories mounted by @sc{vfs} following the initial configuration file
+scan is the union of the entries in all of the discovered @file{vfs.cfg}
+files. If there are conflicting entries, then mounts and variable assignments
+specified in configuration files discovered earlier in the scan take precedence
+over those discovered later.
+
+Previously, @sc{vfs} stopped searching for configuration information at the
+first directory containing a file named @file{vfs.cfg}, and loaded only that
+file.

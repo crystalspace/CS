@@ -23,16 +23,17 @@
 #include <sys/stat.h>
 
 #include "cssysdef.h"
-#include "csutil/sysfunc.h"
-#include "csutil/syspath.h"
 #include "vfs.h"
 #include "csutil/archive.h"
-#include "csutil/util.h"
-#include "csutil/scfstringarray.h"
-#include "csutil/databuf.h"
-#include "csutil/csstring.h"
-#include "csutil/parray.h"
 #include "csutil/cmdline.h"
+#include "csutil/csstring.h"
+#include "csutil/databuf.h"
+#include "csutil/parray.h"
+#include "csutil/scfstringarray.h"
+#include "csutil/strset.h"
+#include "csutil/sysfunc.h"
+#include "csutil/syspath.h"
+#include "csutil/util.h"
 #include "iutil/objreg.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -1524,7 +1525,8 @@ static char* alloc_normalized_path(char const* s)
   return t;
 }
 
-static bool load_vfs_config(csConfigFile& config, char const* dir)
+static bool load_vfs_config(csConfigFile& cfg, char const* dir,
+  csStringSet& seen, bool verbose)
 {
   bool ok = false;
   if (dir != 0)
@@ -1532,28 +1534,44 @@ static bool load_vfs_config(csConfigFile& config, char const* dir)
     csString s(dir);
     add_final_delimiter(s);
     s << "vfs.cfg";
-    ok = config.Load(s);
+    if (seen.Contains(s))
+      ok = true;
+    else
+    {
+      seen.Request(s);
+      bool const merge = !cfg.IsEmpty();
+      ok = cfg.Load(s, 0, merge, false);
+      if (ok && verbose)
+      {
+	char const* t = merge ? "merged" : "loaded";
+	csPrintf("VFS_NOTIFY: %s configuration file: %s\n", t, s.GetData());
+      }
+    }
   }
   return ok;
 }
 
-bool csVFS::Initialize (iObjectRegistry *object_reg)
+bool csVFS::Initialize (iObjectRegistry* r)
 {
-  csVFS::object_reg = object_reg;
-
+  bool verbose = false;
+  object_reg = r;
   basedir = alloc_normalized_path(csGetConfigPath());
 
   csRef<iCommandLineParser> cmdline =
     CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
   if (cmdline)
   {
+    verbose = cmdline->GetOption("verbose") != 0;
     resdir = alloc_normalized_path(cmdline->GetResourceDir());
     appdir = alloc_normalized_path(cmdline->GetAppDir());
   }
   
-  if (!load_vfs_config(config, resdir) &&
-      !load_vfs_config(config, appdir))
-       load_vfs_config(config, basedir);
+  // Order-sensitive: Mounts in first-loaded configuration file take precedence
+  // over conflicting mounts in files loaded later.
+  csStringSet seen;
+  load_vfs_config(config, resdir,  seen, verbose);
+  load_vfs_config(config, appdir,  seen, verbose);
+  load_vfs_config(config, basedir, seen, verbose);
 
   return ReadConfig ();
 }
@@ -1958,7 +1976,7 @@ bool csVFS::Mount (const char *VirtualPath, const char *RealPath)
   if (!VirtualPath || !RealPath)
     return false;
 #ifdef VFS_DEBUG
-  printf("Mounted VFS dir: Vpath %s, Rpath %s",VirtualPath, RealPath);
+  printf("VFS: Mounted dir: Vpath %s, Rpath %s",VirtualPath, RealPath);
 #endif
   VfsNode *node;
   char suffix [2];
@@ -2059,8 +2077,7 @@ bool csVFS::LoadMountsFromFile (iConfigFile* file)
     const char *rpath = iter->GetKey (true);
     const char *vpath = iter->GetStr ();
     if (!Mount (rpath, vpath)) {
-      fprintf (stderr, "crystalspace.vfs: cannot mount \"%s\" to \"%s\"\n", 
-	       rpath, vpath);
+      csPrintfErr("VFS_WARNING: cannot mount \"%s\" to \"%s\"\n", rpath,vpath);
       success = false;
     }
   }
