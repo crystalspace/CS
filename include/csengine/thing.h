@@ -147,6 +147,12 @@ private:
 
   /// The array of polygons forming the outside of the set
   csPolygonArray polygons;
+  /**
+   * A vector with polygons that contain portals (optimization).
+   * csPolygon3D will make sure to call AddPortalPolygon() and
+   * RemovePortalPolygon() when appropriate.
+   */
+  csVector portal_polygons;
 
   /// The array of curves forming the outside of the set
   csCurvesArray curves;
@@ -550,7 +556,19 @@ public:
   /**
    * Get the radius in object space for this polygon set.
    */
-  void GetRadius ( csVector3& rad, csVector3& cent);
+  void GetRadius (csVector3& rad, csVector3& cent);
+
+  /**
+   * Add a polygon to the list of polygons having a portal.
+   * This function is called by a csPolygon3D in this thing
+   * whenever it gets a portal.
+   */
+  void AddPortalPolygon (csPolygon3D* poly);
+
+  /**
+   * Remove a polygon from the list of polygons having a portal.
+   */
+  void RemovePortalPolygon (csPolygon3D* poly);
 
   //----------------------------------------------------------------------
   // Visibility culler
@@ -662,11 +680,13 @@ public:
    *
    * If 'pr' != NULL it will also return a value between 0 and 1
    * indicating where on the 'start'-'end' vector the intersection
-   * happened.
+   * happened.<p>
+   *
+   * If only_portals == true then only portals are checked.
    */
   csPolygon3D* IntersectSegment (const csVector3& start, 
-                                       const csVector3& end, csVector3& isect,
-				       float* pr = NULL);
+	const csVector3& end, csVector3& isect,
+	float* pr = NULL, bool only_portals = false);
 
   /**
    * Check frustum visibility on this thing.
@@ -900,6 +920,8 @@ public:
     {
       return scfParent->VisTest (irview);
     }
+    virtual iPolygon3D* IntersectSegment (const csVector3& start,
+      const csVector3& end, csVector3& isect, float* pr = NULL);
     virtual bool SupportsShadowCasting ()
     {
       return true;

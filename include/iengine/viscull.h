@@ -27,9 +27,10 @@ struct iFrustumView;
 struct iVisibilityObject;
 struct iMovable;
 struct iShadowReceiver;
+struct iPolygon3D;
 class csBox3;
 
-SCF_VERSION (iVisibilityCuller, 0, 0, 2);
+SCF_VERSION (iVisibilityCuller, 0, 0, 3);
 
 /**
  * This interface represents a visibility culling system.
@@ -62,6 +63,13 @@ struct iVisibilityCuller : public iBase
    * be considered visible.
    */
   virtual bool VisTest (iRenderView* irview) = 0;
+
+  /**
+   * Intersect a beam using this culler and return the intersection
+   * point and polygon.
+   */
+  virtual iPolygon3D* IntersectSegment (const csVector3& start,
+    const csVector3& end, csVector3& isect, float* pr = NULL) = 0;
 
   /// Returns true if shadow casting is supported.
   virtual bool SupportsShadowCasting () = 0;

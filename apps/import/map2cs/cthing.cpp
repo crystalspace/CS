@@ -64,13 +64,6 @@ bool CCSThing::Write(CIWorld* pIWorld, CISector* pISector)
   pWorld->WriteIndent();
   fprintf(fd, "PRIORITY('object')\n");
 
-  //If things are moveable, they need special tagging. (needed for scripting)
-  if (IsMoveable())
-  {
-    pWorld->WriteIndent();
-    fprintf(fd, "MOVEABLE ()\n"); 
-  } 
-
   //Activate a script
   char scriptname[99] = "none";
   const char* activateval = m_pOriginalEntity->GetValueOfKey("activate");
@@ -132,6 +125,13 @@ bool CCSThing::WriteAsPart(CIWorld* pIWorld, CISector* pISector)
   assert(fd);
 
   int i, j;
+
+  //If things are moveable, they need special tagging. (needed for scripting)
+  if (IsMoveable())
+  {
+    pWorld->WriteIndent();
+    fprintf(fd, "MOVEABLE ()\n"); 
+  } 
 
   pWorld->WriteIndent();
   fprintf(fd, "PART 'part_%s' (\n", GetName());

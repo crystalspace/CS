@@ -460,11 +460,21 @@ private:
 
   /**
    * The physical parent of this polygon.
+   * Important note for CS developers. If the parent of a polygon
+   * is changed in any way and this polygon has a portal then the
+   * portal needs to be removed from the old thing and added to the
+   * new thing (things keep a list of all polygons having a portal
+   * on them).
    */
   csThing* thing;
 
   /**
    * If not-null, this polygon is a portal.
+   * Important note for CS developers. If the portal is changed
+   * in any way (deleted or set) then the parent thing has to
+   * be notified (csThing::AddPortalPolygon() and
+   * csThing::RemovePortalPolygon()) so that it can update its list
+   * of portal polygons.
    */
   csPortal* portal;
 

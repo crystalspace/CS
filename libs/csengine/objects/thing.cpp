@@ -571,30 +571,151 @@ void csThing::HardTransform (const csReversibleTransform& t)
   }
 }
 
-csPolygon3D* csThing::IntersectSegment (const csVector3& start, 
-  const csVector3& end, csVector3& isect, float* pr)
+struct ISectData
 {
+  csSegment3 seg;
+  csVector3 isect;
+  float r;
+};
+
+/*
+ * @@@
+ * This function does not yet do anything but it should
+ * use the PVS as soon as we have that to make IntersectSegment
+ * even faster.
+ */
+static bool IntersectSegmentCull (csPolygonTree* /*tree*/,
+	csPolygonTreeNode* node,
+	const csVector3& /*pos*/, void* data)
+{
+  if (!node) return false;
+  if (node->Type () != NODE_OCTREE) return true;
+
+  ISectData* idata = (ISectData*)data;
+  csOctreeNode* onode = (csOctreeNode*)node;
+  csVector3 isect;
+  if (csIntersect3::BoxSegment (onode->GetBox (), idata->seg, isect) > -1)
+    return true;
+  // Segment does not intersect with node so we return false here.
+  return false;
+}
+
+static void* IntersectSegmentTestPol (csThing* thing,
+	csPolygonInt** polygon, int num, bool /*same_plane*/, void* data)
+{
+  ISectData* idata = (ISectData*)data;
   int i;
-  float r, best_r = 2000000000.;
-  csVector3 cur_isect;
-  csPolygon3D* best_p = NULL;
-  // @@@ This routine is not very optimal. Especially for things
-  // with large number of polygons.
-  for (i = 0 ; i < polygons.Length () ; i++)
+  for (i = 0 ; i < num ; i++)
   {
-    csPolygon3D* p = polygons.Get (i);
-    if (p->IntersectSegment (start, end, cur_isect, &r))
+    // @@@ What about other types of polygons?
+    if (polygon[i]->GetType () == 1)
     {
-      if (r < best_r)
+      csPolygon3D* p = (csPolygon3D*)polygon[i];
+      if (p->IntersectSegment (idata->seg.Start (), idata->seg.End (),
+      		idata->isect, &(idata->r)))
+        return (void*)p;
+    }
+    else if (polygon[i]->GetType () == 3)
+    {
+      csBspPolygon* bsppol = (csBspPolygon*)polygon[i];
+      csVisObjInfo* obj = bsppol->GetOriginator ();
+      iMeshWrapper* mesh = SCF_QUERY_INTERFACE_FAST (obj->visobj,
+	    iMeshWrapper);
+      if (mesh)
       {
-	best_r = r;
-	best_p = p;
-	isect = cur_isect;
+	mesh->DecRef ();
+        if (mesh->GetMeshObject () == &(thing->scfiMeshObject))
+	  continue;
+        if (bsppol->IntersectSegment (idata->seg.Start (), idata->seg.End (),
+      		idata->isect, NULL))
+        {
+	  iThingState* thing = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+	      	iThingState);
+	  if (thing)
+	  {
+	    //@@@@@@ UGLY!
+	    csThing* th = (csThing*)(thing->GetPrivateObject ());
+	    thing->DecRef ();
+	    csPolygon3D* p = th->IntersectSegment (
+			idata->seg.Start (),
+			idata->seg.End (),
+			idata->isect, &(idata->r));
+	    if (p)
+	      return p;
+	  }
+	}
       }
     }
   }
-  if (pr) *pr = best_r;
-  return best_p;
+  return NULL;
+}
+
+csPolygon3D* csThing::IntersectSegment (const csVector3& start, 
+  const csVector3& end, csVector3& isect, float* pr, bool only_portals)
+{
+  if (only_portals)
+  {
+    int i;
+    float r, best_r = 2000000000.;
+    csVector3 cur_isect;
+    csPolygon3D* best_p = NULL;
+    for (i = 0 ; i < portal_polygons.Length () ; i++)
+    {
+      csPolygon3D* p = (csPolygon3D*)portal_polygons[i];
+      if (p->IntersectSegment (start, end, cur_isect, &r))
+      {
+        if (r < best_r)
+        {
+	  best_r = r;
+	  best_p = p;
+	  isect = cur_isect;
+        }
+      }
+    }
+    if (pr) *pr = best_r;
+    return best_p;
+  }
+  
+  if (static_tree)
+  {
+    // Version with culler.
+    ISectData idata;
+    idata.seg.Set (start, end);
+    void* rc = static_tree->Front2Back (start, IntersectSegmentTestPol,
+      (void*)&idata, IntersectSegmentCull, (void*)&idata);
+    if (rc)
+    {
+      if (pr) *pr = idata.r;
+      isect = idata.isect;
+      return (csPolygon3D*)rc;
+    }
+    return NULL;
+  }
+  else
+  {
+    // Version without culler.
+    int i;
+    float r, best_r = 2000000000.;
+    csVector3 cur_isect;
+    csPolygon3D* best_p = NULL;
+    // @@@ This routine is not very optimal. Especially for things
+    // with large number of polygons.
+    for (i = 0 ; i < polygons.Length () ; i++)
+    {
+      csPolygon3D* p = polygons.Get (i);
+      if (p->IntersectSegment (start, end, cur_isect, &r))
+      {
+        if (r < best_r)
+        {
+	  best_r = r;
+	  best_p = p;
+	  isect = cur_isect;
+        }
+      }
+    }
+    if (pr) *pr = best_r;
+    return best_p;
+  }
 }
 
 void csThing::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
@@ -2401,6 +2522,25 @@ void csThing::ReplaceMaterials (iMaterialList* matList, const char* prefix)
   }
 }
 
+void csThing::AddPortalPolygon (csPolygon3D* poly)
+{
+#ifdef CS_DEBUG
+  int idx = portal_polygons.Find (poly);
+  CS_ASSERT (idx == -1);
+#endif
+  CS_ASSERT (poly->GetPortal () != NULL);
+  CS_ASSERT (poly->GetParent () == this);
+  portal_polygons.Push (poly);
+}
+
+void csThing::RemovePortalPolygon (csPolygon3D* poly)
+{
+  int idx = portal_polygons.Find (poly);
+  CS_ASSERT (idx != -1);
+  CS_ASSERT (poly->GetPortal () == NULL || poly->GetParent () != this);
+  portal_polygons.Delete (idx);
+}
+
 //---------------------------------------------------------------------------
 
 iCurve *csThing::ThingState::GetCurve (int idx)
@@ -2437,6 +2577,18 @@ iMeshObjectFactory* csThing::MeshObject::GetFactory () const
 {
   if (!scfParent->ParentTemplate) return NULL;
   return &scfParent->ParentTemplate->scfiMeshObjectFactory;
+}
+
+//---------------------------------------------------------------------------
+
+iPolygon3D* csThing::VisCull::IntersectSegment (const csVector3& start, 
+  const csVector3& end, csVector3& isect, float* pr)
+{
+  csPolygon3D* p = scfParent->IntersectSegment (start, end, isect, pr);
+  if (p)
+    return &(p->scfiPolygon3D);
+  else
+    return NULL;
 }
 
 //---------------------------------------------------------------------------

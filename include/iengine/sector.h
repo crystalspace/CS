@@ -147,10 +147,15 @@ struct iSector : public iBase
    * really go to the new position.<p>
    *
    * This function returns the resulting sector and new_position will be set
-   * to the last position that you can go to before hitting a wall.
+   * to the last position that you can go to before hitting a wall.<p>
+   *
+   * If only_portals is true then only portals will be checked. This
+   * means that intersection with normal polygons is not checked. This
+   * is a lot faster but it does mean that you need to use another
+   * collision detection system to test with walls.
    */
   virtual iSector* FollowSegment (csReversibleTransform& t,
-  	csVector3& new_position, bool& mirror) = 0;
+  	csVector3& new_position, bool& mirror, bool only_portals = false) = 0;
 
   /// Draw the sector with the given render view
   virtual void Draw (iRenderView* rview) = 0;

@@ -52,6 +52,7 @@ csCamera::csCamera () : csOrthoTransform()
   use_farplane = false;
   fp = NULL;
   cameranr = cur_cameranr++;
+  only_portals = true;
 }
 
 csCamera::csCamera (csCamera* c) : csOrthoTransform ()
@@ -86,7 +87,8 @@ void csCamera::MoveWorld (const csVector3& v, bool cd)
   if (sector)
   {
     csVector3 remember_position = new_position;
-    csSector* new_sector = sector->FollowSegment (*this, new_position, mirror);
+    csSector* new_sector = sector->FollowSegment (*this, new_position,
+	mirror, only_portals);
     if (new_sector == sector)
     {
       if (!cd) new_position = remember_position;

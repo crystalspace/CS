@@ -41,7 +41,7 @@ class csVector3;
 class csVector2;
 struct iSector;
 
-SCF_VERSION (iCamera, 0, 0, 11);
+SCF_VERSION (iCamera, 0, 0, 12);
 
 /// Camera class.
 struct iCamera : public iBase
@@ -147,6 +147,18 @@ struct iCamera : public iBase
   /// Calculate inverse perspective corrected point for this camera.
   virtual void InvPerspective (const csVector2& p, float z,
   	csVector3& v) const = 0;
+
+  /**
+   * If the hit-only-portals flag is true then only portals will be
+   * checked with the 'MoveWorld()' function. This is a lot faster
+   * but it does mean that you will have to do collision detection with
+   * non-portal polygons using another technique. The default for this
+   * flag is true.
+   */
+  virtual void OnlyPortals (bool hop) = 0;
+
+  /// Get the hit-only-portals flag.
+  virtual bool GetOnlyPortals () = 0;
 };
 
 #endif

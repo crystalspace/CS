@@ -309,6 +309,10 @@ csPolygon3D::csPolygon3D (csPolygon3D& poly) : csPolygonInt (),
     polygon_id = 0;
 
   portal = poly.portal;
+  if (portal && thing)
+  {
+    thing->AddPortalPolygon (this);
+  }
 
   plane = poly.plane;
   plane->IncRef ();
@@ -347,6 +351,7 @@ csPolygon3D::~csPolygon3D ()
     portal->SetSector (NULL);
     delete portal;
     portal = NULL;
+    if (thing) thing->RemovePortalPolygon (this);
   }
   while (light_info.lightpatches)
     csEngine::current_engine->lightpatch_pool->Free (light_info.lightpatches);
@@ -358,8 +363,12 @@ csPolygon3D::~csPolygon3D ()
 
 void csPolygon3D::SetParent (csThing* thing)
 {
+  if (csPolygon3D::thing && portal)
+    csPolygon3D::thing->RemovePortalPolygon (this);
   csPolygon3D::thing = thing;
   polygon_id = thing->GetNewPolygonID ();
+  if (portal)
+    thing->AddPortalPolygon (this);
 }
 
 void csPolygon3D::SetTextureType (int type)
@@ -436,7 +445,11 @@ void csPolygon3D::SetCSPortal (csSector* sector, bool null)
 {
   if (portal && portal->GetSector ()->GetPrivateObject () == sector) return;
   if (portal && flags.Check (CS_POLY_DELETE_PORTAL))
-  { delete portal; portal = NULL; }
+  {
+    delete portal;
+    portal = NULL;
+    if (thing) thing->RemovePortalPolygon (this);
+  }
   if (!null && !sector) return;
   portal = new csPortal ();
   flags.Set (CS_POLY_DELETE_PORTAL);
@@ -446,16 +459,23 @@ void csPolygon3D::SetCSPortal (csSector* sector, bool null)
   else
     portal->SetSector (NULL);
   flags.Reset (CS_POLY_COLLDET); // Disable CD by default for portals.
+  if (thing) thing->AddPortalPolygon (this);
   //portal->SetTexture (texh->get_texture_handle ());
 }
 
 void csPolygon3D::SetPortal (csPortal* prt)
 {
   if (portal && flags.Check (CS_POLY_DELETE_PORTAL))
-  { portal->SetSector (NULL); delete portal; portal = NULL; }
+  {
+    portal->SetSector (NULL);
+    delete portal;
+    portal = NULL;
+    if (thing) thing->RemovePortalPolygon (this);
+  }
   portal = prt;
   flags.Set (CS_POLY_DELETE_PORTAL);
   flags.Reset (CS_POLY_COLLDET); // Disable CD by default for portals.
+  if (thing) thing->AddPortalPolygon (this);
 }
 
 void csPolygon3D::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,

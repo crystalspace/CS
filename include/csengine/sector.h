@@ -338,10 +338,15 @@ public:
    * really go to the new position.<p>
    *
    * This function returns the resulting sector and new_position will be set
-   * to the last position that you can go to before hitting a wall.
+   * to the last position that you can go to before hitting a wall.<p>
+   *
+   * If only_portals is true then only portals will be checked. This
+   * means that intersection with normal polygons is not checked. This
+   * is a lot faster but it does mean that you need to use another
+   * collision detection system to test with walls.
    */
   csSector* FollowSegment (csReversibleTransform& t, csVector3& new_position, 
-                          bool& mirror);
+                          bool& mirror, bool only_portals = false);
 
   /**
    * Intersect world-space segment with polygons of this sector. Return
@@ -353,11 +358,13 @@ public:
    * happened.<p>
    *
    * This function is an extension of csPolygonSet::intersect_segment in
-   * that it will also test for hits against things.
+   * that it will also test for hits against things.<p>
+   *
+   * If 'only_portals' == true only portals are checked.
    */
   virtual csPolygon3D* IntersectSegment (const csVector3& start,
-                                       const csVector3& end, csVector3& isect,
-				       float* pr = NULL);
+	const csVector3& end, csVector3& isect,
+	float* pr = NULL, bool only_portals = false);
 
   /**
    * Calculate the bounding box of all objects in this sector.
@@ -472,7 +479,7 @@ public:
     virtual iObject* HitBeam (const csVector3& start, const csVector3& end,
   	csVector3& intersect, iPolygon3D** polygonPtr);
     virtual iSector* FollowSegment (csReversibleTransform& t,
-  	csVector3& new_position, bool& mirror);
+  	csVector3& new_position, bool& mirror, bool only_portals = false);
     virtual void Draw (iRenderView* rview)
     { scfParent->Draw (rview); }
   } scfiSector;

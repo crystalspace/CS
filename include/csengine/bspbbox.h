@@ -178,6 +178,13 @@ public:
    * Not implemented yet! @@@
    */
   bool Overlaps (csPolygonInt* /*overlapped*/) { return false; }
+
+  /**
+   * Intersect object-space segment with this polygon. Return
+   * true if it intersects and the intersection point in world coordinates.
+   */
+  bool IntersectSegment (const csVector3& start, const csVector3& end,
+                          csVector3& isect, float* pr = NULL);
 };
 
 /**

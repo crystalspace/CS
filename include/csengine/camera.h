@@ -40,6 +40,11 @@ private:
   csSector* sector;
   /// If true we are in a mirrored world.
   bool mirror;
+  /**
+   * If true then we only check collision with portals and not
+   * with other polygons.
+   */
+  bool only_portals;
 
   /// a farplane to cut everything thats behind it
   csPlaneClip *fp;
@@ -416,6 +421,14 @@ public:
     	csVector3& v) const
     {
       scfParent->InvPerspective (p, z, v);
+    }
+    virtual void OnlyPortals (bool hop)
+    {
+      scfParent->only_portals = hop;
+    }
+    virtual bool GetOnlyPortals ()
+    {
+      return scfParent->only_portals;
     }
   } scfiCamera;
   friend struct Camera;

@@ -329,8 +329,8 @@ csObject* csSector::HitBeam (const csVector3& start, const csVector3& end, csVec
       if (r < best_mesh_r)
       {
         best_mesh_r = r;
-		near_mesh = mesh;
-		tsect = isect;
+	near_mesh = mesh;
+	tsect = isect;
       }
     }
   }
@@ -361,56 +361,9 @@ csObject* csSector::HitBeam (const csVector3& start, const csVector3& end, csVec
   return (csObject*)near_mesh;
 }
 
-struct ISectData
-{
-  csSegment3 seg;
-  csVector3 isect;
-  float r;
-};
-
-/*
- * @@@
- * This function does not yet do anything but it should
- * use the PVS as soon as we have that to make csSector::IntersectSegment
- * even faster.
- */
-bool IntersectSegmentCull (csPolygonTree* /*tree*/,
-	csPolygonTreeNode* node,
-	const csVector3& /*pos*/, void* data)
-{
-  if (!node) return false;
-  if (node->Type () != NODE_OCTREE) return true;
-
-  ISectData* idata = (ISectData*)data;
-  csOctreeNode* onode = (csOctreeNode*)node;
-  csVector3 isect;
-  if (csIntersect3::BoxSegment (onode->GetBox (), idata->seg, isect) > -1)
-    return true;
-  // Segment does not intersect with node so we return false here.
-  return false;
-}
-
-void* IntersectSegmentTestPol (csThing*,
-	csPolygonInt** polygon, int num, bool /*same_plane*/, void* data)
-{
-  ISectData* idata = (ISectData*)data;
-  int i;
-  for (i = 0 ; i < num ; i++)
-  {
-    // @@@ What about other types of polygons?
-    if (polygon[i]->GetType () == 1)
-    {
-      csPolygon3D* p = (csPolygon3D*)polygon[i];
-      if (p->IntersectSegment (idata->seg.Start (), idata->seg.End (),
-      		idata->isect, &(idata->r)))
-        return (void*)p;
-    }
-  }
-  return NULL;
-}
 
 csPolygon3D* csSector::IntersectSegment (const csVector3& start,
-  const csVector3& end, csVector3& isect, float* pr)
+  const csVector3& end, csVector3& isect, float* pr, bool only_portals)
 {
   float r, best_r = 10000000000.;
   csVector3 cur_isect;
@@ -418,12 +371,21 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
   csVector3 obj_start, obj_end, obj_isect;
   csReversibleTransform movtrans;
 
-  int i;
-  for (i = 0 ; i < meshes.Length () ; i++)
+  if (culler_mesh && !only_portals)
   {
-    csMeshWrapper* mesh = (csMeshWrapper*)meshes[i];
-    if (mesh != culler_mesh)
+    // culler_mesh has option CS_THING_MOVE_NEVER so
+    // object space == world space.
+    iPolygon3D* ip = culler->IntersectSegment (start, end,
+	isect, pr);
+    if (ip) return ip->GetPrivateObject ();
+    else return NULL;
+  }
+  else
+  {
+    int i;
+    for (i = 0 ; i < meshes.Length () ; i++)
     {
+      csMeshWrapper* mesh = (csMeshWrapper*)meshes[i];
       // @@@ UGLY!!!
       iThingState* ith = SCF_QUERY_INTERFACE_FAST (mesh->GetMeshObject (), iThingState);
       if (ith)
@@ -443,7 +405,7 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
 	  obj_end = movtrans.Other2This (end);
         }
         csPolygon3D* p = sp->IntersectSegment (obj_start, obj_end,
-		obj_isect, &r);
+		obj_isect, &r, only_portals);
         if (sp->GetMovingOption () == CS_THING_MOVE_NEVER)
           cur_isect = obj_isect;
         else
@@ -458,41 +420,17 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
         ith->DecRef ();
       }
     }
+    if (pr) *pr = best_r;
+    return best_p;
   }
-
-  if (culler_mesh)
-  {
-    // culler_mesh has option CS_THING_MOVE_NEVER so
-    // object space == world space.
-    // @@@ UGLY!!! We need another abstraction for this.
-    iThingState* ith = SCF_QUERY_INTERFACE_FAST (
-    	culler_mesh->GetMeshObject (), iThingState);
-    csThing* sp = (csThing*)(ith->GetPrivateObject ());
-    ith->DecRef ();
-
-    csPolygonTree* static_tree = sp->GetStaticTree ();
-    // Handle the octree.
-    ISectData idata;
-    idata.seg.Set (start, end);
-    void* rc = static_tree->Front2Back (start, IntersectSegmentTestPol,
-      (void*)&idata, IntersectSegmentCull, (void*)&idata);
-    if (rc && idata.r < best_r)
-    {
-      best_r = idata.r;
-      best_p = (csPolygon3D*)rc;
-      isect = idata.isect;
-    }
-  }
-
-  if (pr) *pr = best_r;
-  return best_p;
 }
 
 csSector* csSector::FollowSegment (csReversibleTransform& t,
-  csVector3& new_position, bool& mirror)
+  csVector3& new_position, bool& mirror, bool only_portals)
 {
   csVector3 isect;
-  csPolygon3D* p = IntersectSegment (t.GetOrigin (), new_position, isect);
+  csPolygon3D* p = IntersectSegment (t.GetOrigin (), new_position, isect,
+      NULL, only_portals);
   csPortal* po;
 
   if (p)
@@ -1166,9 +1104,10 @@ iObject* csSector::eiSector::HitBeam (const csVector3& start,
 }
 
 iSector* csSector::eiSector::FollowSegment (csReversibleTransform& t,
-  	csVector3& new_position, bool& mirror)
+  	csVector3& new_position, bool& mirror, bool only_portals)
 {
-  csSector* s = scfParent->FollowSegment (t, new_position, mirror);
+  csSector* s = scfParent->FollowSegment (t, new_position, mirror,
+      only_portals);
   if (s) return &(s->scfiSector);
   else return NULL;
 }

@@ -7,6 +7,38 @@ The history order is reversed so that new features are at the top.
 	  lightmap calculator. This would prevent cslight from writing
 	  out a precalc_info file.
 	- Added the Crystal Space logo to cslight.
+	- Extended iVisibilityCuller with IntersectSegment().
+	- Moved the implementation of IntersectSegment() from csSector
+	  to csThing. There it is now implemented much more efficiently
+	  by using the visibility algorithms for detail objects.
+	- The above optimizations greatly optimize speed of moving
+	  around in very big levels that use an octree for visibility
+	  culling (several factors faster).
+	- Things now keep a list of polygons which have a portal.
+	  This is maintained by csPolygon3D itself through the
+	  functions csThing::AddPortalPolygon() and
+	  csThing::RemovePortalPolygon(). This list is going to be
+	  used for a more optimal camera movement system. The camera
+	  movement system currently does a full FollowSegment() but
+	  this is rather expensive in big maps considering that it
+	  has to test ALL objects and polygons. It is much more
+	  efficient to just test the portals and let collision detection
+	  do the rest.
+	- Added 'only_portals' parameter to iSector::FollowSegment()
+	  and csSector::FollowSegment(). When this flag is true (default
+	  and old behaviour is false) then only portals will be checked
+	  and no collision detection with walls will happen. This is a lot
+	  faster but it does mean that the application will need another
+	  way to do collision detection with objects and walls.
+	- Added equivalent 'only_portals' flag to
+	  csThing::IntersectSegment() and csSector::IntersectSegment().
+	- Added OnlyPortals() and GetOnlyPortals() functions to iCamera
+	  with which you can control if MoveWorld() will check collision
+	  with portals alone or also with other polygons. By default
+	  this is 'true' (which is a lot faster).
+	- Fixed a bug with map2cs where it would put the MOVEABLE()
+	  keyword outside the PARAMS() block. It must go inside the
+	  PARAMS() block instead.
 6-Jul-2001
 	- Fixed a bug in Blocks with the vertical raster lines. Some of
 	  them were visible from the wrong side.
