@@ -1820,7 +1820,9 @@ AC_DEFUN([CS_CHECK_LIBCG],
 	    [[#include <Cg/cg.h>]],
 	    [CGcontext c = cgCreateContext()])],
 	[], [], [], [],
-	[$cs_cv_libm_cflags], [$cs_cv_libm_lflags], [$cs_cv_libm_libs],
+	[$cs_cv_libm_cflags $cs_cv_sys_pthread_cflags], 
+	[$cs_cv_libm_lflags $cs_cv_sys_pthread_lflags], 
+	[$cs_cv_libm_libs   $cs_cv_sys_pthread_libs],
 	[cg CG])
 
     AS_IF([test $cs_cv_libCg = yes],
