@@ -421,7 +421,7 @@ void csGraphics2D::Blit (int x, int y, int w, int h,
   if (hor_clip_needed)
     data += 4*(x-orig_x);
 
-  int r, g, b;
+  int r, g, b, a;
   unsigned char* d;
   switch (pfmt.PixelBytes)
   {
@@ -465,8 +465,8 @@ void csGraphics2D::Blit (int x, int y, int w, int h,
     d = data;
     while (w2 > 0)
     {
-      r = *d++; g = *d++; b = *d++; d++;
-      *vram++ = FindRGB (r, g, b);
+      r = *d++; g = *d++; b = *d++; a = *d++;
+      *vram++ = FindRGB (r, g, b) | (a<<24);
       w2--;
     }
         data += 4*orig_w;
