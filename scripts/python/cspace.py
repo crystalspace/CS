@@ -8803,9 +8803,9 @@ class csSimpleRenderMesh(_object):
     __swig_setmethods__["mixmode"] = _cspace.csSimpleRenderMesh_mixmode_set
     __swig_getmethods__["mixmode"] = _cspace.csSimpleRenderMesh_mixmode_get
     if _newclass:mixmode = property(_cspace.csSimpleRenderMesh_mixmode_get, _cspace.csSimpleRenderMesh_mixmode_set)
-    __swig_setmethods__["object2camera"] = _cspace.csSimpleRenderMesh_object2camera_set
-    __swig_getmethods__["object2camera"] = _cspace.csSimpleRenderMesh_object2camera_get
-    if _newclass:object2camera = property(_cspace.csSimpleRenderMesh_object2camera_get, _cspace.csSimpleRenderMesh_object2camera_set)
+    __swig_setmethods__["object2world"] = _cspace.csSimpleRenderMesh_object2world_set
+    __swig_getmethods__["object2world"] = _cspace.csSimpleRenderMesh_object2world_get
+    if _newclass:object2world = property(_cspace.csSimpleRenderMesh_object2world_get, _cspace.csSimpleRenderMesh_object2world_set)
     def __init__(self, *args):
         _swig_setattr(self, csSimpleRenderMesh, 'this', _cspace.new_csSimpleRenderMesh(*args))
         _swig_setattr(self, csSimpleRenderMesh, 'thisown', 1)
@@ -8843,15 +8843,18 @@ class iGraphics3D(iBase):
     def GetPerspectiveCenter(*args): return _cspace.iGraphics3D_GetPerspectiveCenter(*args)
     def SetPerspectiveAspect(*args): return _cspace.iGraphics3D_SetPerspectiveAspect(*args)
     def GetPerspectiveAspect(*args): return _cspace.iGraphics3D_GetPerspectiveAspect(*args)
-    def SetObjectToCamera(*args): return _cspace.iGraphics3D_SetObjectToCamera(*args)
-    def GetObjectToCamera(*args): return _cspace.iGraphics3D_GetObjectToCamera(*args)
     def SetRenderTarget(*args): return _cspace.iGraphics3D_SetRenderTarget(*args)
     def GetRenderTarget(*args): return _cspace.iGraphics3D_GetRenderTarget(*args)
     def BeginDraw(*args): return _cspace.iGraphics3D_BeginDraw(*args)
     def FinishDraw(*args): return _cspace.iGraphics3D_FinishDraw(*args)
     def Print(*args): return _cspace.iGraphics3D_Print(*args)
+    def DrawMesh(*args): return _cspace.iGraphics3D_DrawMesh(*args)
+    def DrawSimpleMesh(*args): return _cspace.iGraphics3D_DrawSimpleMesh(*args)
     def DrawPixmap(*args): return _cspace.iGraphics3D_DrawPixmap(*args)
     def DrawLine(*args): return _cspace.iGraphics3D_DrawLine(*args)
+    def ActivateBuffers(*args): return _cspace.iGraphics3D_ActivateBuffers(*args)
+    def DeactivateBuffers(*args): return _cspace.iGraphics3D_DeactivateBuffers(*args)
+    def SetTextureState(*args): return _cspace.iGraphics3D_SetTextureState(*args)
     def SetClipper(*args): return _cspace.iGraphics3D_SetClipper(*args)
     def GetClipper(*args): return _cspace.iGraphics3D_GetClipper(*args)
     def GetClipType(*args): return _cspace.iGraphics3D_GetClipType(*args)
@@ -8862,13 +8865,10 @@ class iGraphics3D(iBase):
     def SetRenderState(*args): return _cspace.iGraphics3D_SetRenderState(*args)
     def GetRenderState(*args): return _cspace.iGraphics3D_GetRenderState(*args)
     def SetOption(*args): return _cspace.iGraphics3D_SetOption(*args)
-    def ActivateBuffers(*args): return _cspace.iGraphics3D_ActivateBuffers(*args)
-    def DeactivateBuffers(*args): return _cspace.iGraphics3D_DeactivateBuffers(*args)
-    def SetTextureState(*args): return _cspace.iGraphics3D_SetTextureState(*args)
-    def DrawMesh(*args): return _cspace.iGraphics3D_DrawMesh(*args)
     def SetWriteMask(*args): return _cspace.iGraphics3D_SetWriteMask(*args)
     def GetWriteMask(*args): return _cspace.iGraphics3D_GetWriteMask(*args)
     def SetZMode(*args): return _cspace.iGraphics3D_SetZMode(*args)
+    def GetZMode(*args): return _cspace.iGraphics3D_GetZMode(*args)
     def EnableZOffset(*args): return _cspace.iGraphics3D_EnableZOffset(*args)
     def DisableZOffset(*args): return _cspace.iGraphics3D_DisableZOffset(*args)
     def SetShadowState(*args): return _cspace.iGraphics3D_SetShadowState(*args)
@@ -8877,11 +8877,8 @@ class iGraphics3D(iBase):
     def ClosePortal(*args): return _cspace.iGraphics3D_ClosePortal(*args)
     def CreateHalo(*args): return _cspace.iGraphics3D_CreateHalo(*args)
     def RemoveFromCache(*args): return _cspace.iGraphics3D_RemoveFromCache(*args)
-    def IsLightmapOK(*args): return _cspace.iGraphics3D_IsLightmapOK(*args)
     def CreatePolygonRenderer(*args): return _cspace.iGraphics3D_CreatePolygonRenderer(*args)
     def SetWorldToCamera(*args): return _cspace.iGraphics3D_SetWorldToCamera(*args)
-    def DrawSimpleMesh(*args): return _cspace.iGraphics3D_DrawSimpleMesh(*args)
-    def GetZMode(*args): return _cspace.iGraphics3D_GetZMode(*args)
     def __del__(self, destroy=_cspace.delete_iGraphics3D):
         try:
             if self.thisown: destroy(self)
