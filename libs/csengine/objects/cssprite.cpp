@@ -319,6 +319,8 @@ csSpriteAction* csSpriteTemplate::FindAction (const char *n)
 
 void csSpriteTemplate::MergeVertices (const char * action, int frame)
 {
+  (void)action;
+  (void)frame;
   // Minimize the number of 3D coordinates:
 
   // create an array of ints which maps old vertex indices to new ones
@@ -353,6 +355,8 @@ void csSpriteTemplate::MergeVertices (const char * action, int frame)
 
 void csSpriteTemplate::MergeNormals (const char * action, int frame)
 {
+  (void)action;
+  (void)frame;
   // Combine normals of adjacent vertices based on one special frame:
 
   // create an array of ints which maps old vertex indices to new ones
@@ -393,8 +397,8 @@ void csSpriteTemplate::MergeTexels ()
   // Merge identical texel frames:
 
   // start a count and a list of unique texel maps
-  csVector2* unique_texel_maps [num_vertices];
   int unique_texel_map_count;
+  csVector2** unique_texel_maps = new csVector2* [num_vertices];
 
   // add the first frame to the unique texel map list
   unique_texel_maps [0] = ((csFrame*)frames[0])->GetTexels();
@@ -455,6 +459,7 @@ void csSpriteTemplate::MergeTexels ()
     // to determine the number of bytes saved.
     (frames.Length() - unique_texel_map_count) * num_vertices * sizeof(csVector2));
 */
+  delete[] unique_texel_maps;
 }
 
 //=============================================================================
@@ -474,8 +479,9 @@ static DECLARE_GROWING_ARRAY (visible, bool)
 /// The list of lights that hit the sprite
 static DECLARE_GROWING_ARRAY (light_worktable, csLight*)
 
-csSprite3D::csSprite3D () : csObject (), bbox (this)
+csSprite3D::csSprite3D () : csObject (), bbox (NULL)
 {
+  bbox.SetOwner (this);
   v_obj2world.x = 0;
   v_obj2world.y = 0;
   v_obj2world.z = 0;
