@@ -1,8 +1,8 @@
-# This is a subinclude file used to define the rules needed
-# to build the bugplug plug-in.
+#------------------------------------------------------------------------------
+# Bugplug subemakefile
+#------------------------------------------------------------------------------
 
-# Driver description
-DESCRIPTION.bugplug = Crystal Space Debugger plug-in
+DESCRIPTION.bugplug = Crystal Space Debugging aid plug-in
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -42,9 +42,11 @@ else
   TO_INSTALL.STATIC_LIBS += $(BUGPLUG)
 endif
 
-INC.BUGPLUG = $(wildcard plugins/bugplug/*.h)
-SRC.BUGPLUG = $(wildcard plugins/bugplug/*.cpp)
-OBJ.BUGPLUG = $(addprefix $(OUT)/,$(notdir $(SRC.BUGPLUG:.cpp=$O)))
+DIR.BUGPLUG = plugins/bugplug
+OUT.BUGPLUG = $(OUT)/$(DIR.BUGPLUG)
+INC.BUGPLUG = $(wildcard $(DIR.BUGPLUG)/*.h)
+SRC.BUGPLUG = $(wildcard $(DIR.BUGPLUG)/*.cpp)
+OBJ.BUGPLUG = $(addprefix $(OUT.BUGPLUG)/,$(notdir $(SRC.BUGPLUG:.cpp=$O)))
 DEP.BUGPLUG = CSTOOL CSGEOM CSUTIL CSSYS CSUTIL
 CFG.BUGPLUG = data/config/bugplug.cfg
 
@@ -61,21 +63,31 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: bugplug bugplugclean
 
-bugplug: $(OUTDIRS) $(BUGPLUG)
+bugplug: $(OUT.BUGPLUG) $(BUGPLUG)
+
+$(OUT.BUGPLUG)/%$O: $(DIR.BUGPLUG)/%.cpp
+	$(DO.COMPILE.CPP)
+
+$(OUT.BUGPLUG):
+	$(MKDIRS)
 
 $(BUGPLUG): $(OBJ.BUGPLUG) $(LIB.BUGPLUG)
 	$(DO.PLUGIN)
 
 clean: bugplugclean
 bugplugclean:
-	$(RM) $(BUGPLUG) $(OBJ.BUGPLUG)
+	-$(RM) $(BUGPLUG) $(OBJ.BUGPLUG)
+
+cleandep: bugplugcleandep
+bugplugcleandep:
+	-$(RM) $(OUT.BUGPLUG)/bugplug.dep
 
 ifdef DO_DEPEND
-dep: $(OUTOS)/bugplug.dep
-$(OUTOS)/bugplug.dep: $(SRC.BUGPLUG)
+dep: $(OUT.BUGPLUG) $(OUT.BUGPLUG)/bugplug.dep
+$(OUT.BUGPLUG)/bugplug.dep: $(SRC.BUGPLUG)
 	$(DO.DEP)
 else
--include $(OUTOS)/bugplug.dep
+-include $(OUT.BUGPLUG)/bugplug.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

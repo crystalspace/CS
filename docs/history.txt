@@ -47,6 +47,16 @@ The history order is reversed so that new features are at the top.
 	- Removed userData pointer in tinyxml node structure. We are not using
 	  it and the XML data is already taking way too much memory. So this
 	  is four bytes less memory for every XML node.
+	- res made the following changes to bugplug:
+	    * Now uses a config file to read certain settings.
+	      Right now these are the name of the keybinding file and some
+	      screen capture options.
+	    * Slightly changed appearance of the "Press key" box
+	- res fixed a bug in stdrep where format qualifiers contained in 
+	  messages output via console or nativewm where errorneously 
+	  expanded.
+	- res changed the bugplug makefile to be in the same style as the
+	  ISO plugin after ES' recent changes.
 2-Mar-2003
         - Rudolf Potucek updated makefiles in the apps/ directory to 
 	  remove vpath and generate object files in individual 
