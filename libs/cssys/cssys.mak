@@ -43,8 +43,7 @@ ifneq ($(MEM),)
   SRC.SYS_CSSYS_DLL+=memory.cpp
 endif
 
-SRC.CSSYS = libs/cssys/common/csendian.cpp libs/cssys/common/system.cpp \
-  $(SRC.SYS_CSSYS)
+SRC.CSSYS = $(wildcard libs/cssys/common/*.cpp $(SRC.SYS_CSSYS))
 ifeq ($(MAKE_DLL),yes)
   CSSYS.LIB = $(OUT)$(LIB_PREFIX)cssys_D$(LIB)
   SRC.CSSYS += $(SRC.SYS_CSSYS_DLL)
