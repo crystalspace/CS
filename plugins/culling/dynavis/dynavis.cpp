@@ -27,6 +27,7 @@
 #include "csgeom/math3d.h"
 #include "igeom/polymesh.h"
 #include "igeom/objmodel.h"
+#include "csgeom/obb.h"
 #include "iutil/objreg.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
@@ -228,7 +229,7 @@ void csDynaVis::UpdateObjects ()
       visobj_wrap->update_number = movable->GetUpdateNumber ();
     }
     visobj->MarkInvisible ();
-    visobj_wrap->reason = INVISIBLE_PARENT;
+    visobj_wrap->history->reason = INVISIBLE_PARENT;
   }
 }
 
@@ -565,13 +566,17 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
 void csDynaVis::AppendWriteQueue (iCamera* camera, iVisibilityObject* visobj,
   	csObjectModel* model, csVisibilityObjectWrapper* obj)
 {
-  //@@@@ Use OBB instead of AABB to project to camera space!
-  // Much more accurate.
+  iMovable* movable = visobj->GetMovable ();
+  csReversibleTransform movtrans = movable->GetFullTransform ();
+  const csReversibleTransform& camtrans = camera->GetTransform ();
+  csReversibleTransform trans = camtrans / movtrans;
 
-  const csBox3& obj_bbox = obj->child->GetBBox ();
+  const csOBB& obb = obj->model->GetOBB ();
+  csOBBFrozen frozen_obb (obb, trans);
+
   float min_depth, max_depth;
   csBox2 box;
-  if (obj_bbox.ProjectBox (camera->GetTransform (), camera->GetFOV (),
+  if (frozen_obb.ProjectOBB (camera->GetFOV (),
     	camera->GetShiftX (), camera->GetShiftY (), box,
 	min_depth, max_depth))
   {
@@ -605,11 +610,13 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   csBox2 sbox;
   float min_depth = 0;
 
+  csVisibilityObjectHistory* hist = obj->history;
+
   if (!obj->visobj->IsVisible ())
   {
-    if (do_cull_history && obj->vis_cnt > 0)
+    if (do_cull_history && hist->vis_cnt > 0)
     {
-      obj->MarkVisible (VISIBLE_HISTORY, obj->vis_cnt-1);
+      obj->MarkVisible (VISIBLE_HISTORY, hist->vis_cnt-1);
       do_write_object = true;
       goto end;
     }
@@ -627,7 +634,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
     if (do_cull_frustum && !csIntersect3::BoxFrustum (obj_bbox, data->frustum,
 		data->frustum_mask, new_mask))
     {
-      obj->reason = INVISIBLE_FRUSTUM;
+      hist->reason = INVISIBLE_FRUSTUM;
       vis = false;
       goto end;
     }
@@ -635,8 +642,17 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
     if (do_cull_coverage != COVERAGE_NONE)
     {
       iCamera* camera = data->rview->GetCamera ();
+      iMovable* movable = obj->visobj->GetMovable ();
+      csReversibleTransform movtrans = movable->GetFullTransform ();
+      const csReversibleTransform& camtrans = camera->GetTransform ();
+      csReversibleTransform trans = camtrans / movtrans;
+
+      const csOBB& obb = obj->model->GetOBB ();
+      csOBBFrozen frozen_obb (obb, trans);
+
       float max_depth;
-      if (obj_bbox.ProjectBox (camera->GetTransform (), camera->GetFOV (),
+
+      if (frozen_obb.ProjectOBB (camera->GetFOV (),
     	  camera->GetShiftX (), camera->GetShiftY (), sbox,
 	  min_depth, max_depth))
       {
@@ -684,7 +700,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
               if (!rc)
 	      {
 	        // It really is invisible.
-                obj->reason = INVISIBLE_TESTRECT;
+                hist->reason = INVISIBLE_TESTRECT;
 	        vis = false;
                 goto end;
 	      }
@@ -693,7 +709,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 	}
 	else
 	{
-          obj->reason = INVISIBLE_TESTRECT;
+          hist->reason = INVISIBLE_TESTRECT;
 	  vis = false;
           goto end;
         }
@@ -740,16 +756,16 @@ end:
     	obj_bbox.MinX (), obj_bbox.MinY (), obj_bbox.MinZ (),
     	obj_bbox.MaxX (), obj_bbox.MaxY (), obj_bbox.MaxZ (),
 	(iobj && iobj->GetName ()) ? iobj->GetName () : "<noname>",
-	obj->reason == INVISIBLE_FRUSTUM ? "outside frustum" :
-	obj->reason == INVISIBLE_TESTRECT ? "covered" :
-	obj->reason == VISIBLE_INSIDE ? "visible inside" :
-	obj->reason == VISIBLE_HISTORY ? "visible history" :
-	obj->reason == VISIBLE ? "visible" :
+	hist->reason == INVISIBLE_FRUSTUM ? "outside frustum" :
+	hist->reason == INVISIBLE_TESTRECT ? "covered" :
+	hist->reason == VISIBLE_INSIDE ? "visible inside" :
+	hist->reason == VISIBLE_HISTORY ? "visible history" :
+	hist->reason == VISIBLE ? "visible" :
 	"?"
 	);
     if (iobj) iobj->DecRef ();
-    if (obj->reason != INVISIBLE_FRUSTUM && obj->reason != VISIBLE_INSIDE
-    	&& obj->reason != VISIBLE_HISTORY)
+    if (hist->reason != INVISIBLE_FRUSTUM && hist->reason != VISIBLE_INSIDE
+    	&& hist->reason != VISIBLE_HISTORY)
     {
       printf ("  (%g,%g)-(%g,%g) min_depth=%g\n",
       	sbox.MinX (), sbox.MinY (),
@@ -1057,7 +1073,7 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
       {
         csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
     	  visobj_vector[i];
-        int col = reason_cols[visobj_wrap->reason];
+        int col = reason_cols[visobj_wrap->history->reason];
         const csBox3& b = visobj_wrap->child->GetBBox ();
         g3d->DrawLine (
       	  trans.Other2This (b.GetCorner (CS_BOX_CORNER_xyz)),
@@ -1353,9 +1369,9 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
 	csBox3 box;
 	CalculateVisObjBBox (visobj, box);
 	bugplug->DebugSectorBox (box,
-		float (reason_colors[visobj_wrap->reason].r) / 256.0,
-		float (reason_colors[visobj_wrap->reason].g) / 256.0,
-		float (reason_colors[visobj_wrap->reason].b) / 256.0);
+		float (reason_colors[visobj_wrap->history->reason].r) / 256.0,
+		float (reason_colors[visobj_wrap->history->reason].g) / 256.0,
+		float (reason_colors[visobj_wrap->history->reason].b) / 256.0);
       }
       csVector3 origin (0);
       const csReversibleTransform& trans = debug_camera->GetTransform ();
@@ -1590,7 +1606,7 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
 	  tot_vis_exact++;
 	  tot_poly_exact += polymesh->GetPolygonCount ();
 	}
-	if (visobj_wrap->reason >= VISIBLE)
+	if (visobj_wrap->history->reason >= VISIBLE)
 	{
 	  tot_vis_dynavis++;
 	  tot_poly_dynavis += polymesh->GetPolygonCount ();
@@ -1600,15 +1616,16 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
         printf ("  obj(%d,'%s')  vis=%s   vispix=%d totpix=%d      %s\n",
       	  i,
 	  (iobj && iobj->GetName ()) ? iobj->GetName () : "?",
-	  visobj_wrap->reason == INVISIBLE_PARENT ? "invis parent" :
-	  visobj_wrap->reason == INVISIBLE_FRUSTUM ? "invis frustum" :
-	  visobj_wrap->reason == INVISIBLE_TESTRECT ? "invis testrect" :
-	  visobj_wrap->reason == VISIBLE ? "vis" :
-	  visobj_wrap->reason == VISIBLE_INSIDE ? "vis inside" :
-	  visobj_wrap->reason == VISIBLE_HISTORY ? "vis history" :
+	  visobj_wrap->history->reason == INVISIBLE_PARENT ? "invis parent" :
+	  visobj_wrap->history->reason == INVISIBLE_FRUSTUM ? "invis frustum" :
+	  visobj_wrap->history->reason == INVISIBLE_TESTRECT ? "invis testrect" :
+	  visobj_wrap->history->reason == VISIBLE ? "vis" :
+	  visobj_wrap->history->reason == VISIBLE_INSIDE ? "vis inside" :
+	  visobj_wrap->history->reason == VISIBLE_HISTORY ? "vis history" :
 	  "?",
 	  vispix, totpix,
-	  vispix != 0 && visobj_wrap->reason < VISIBLE ? "????!!!!" : "");
+	  vispix != 0 && visobj_wrap->history->reason < VISIBLE
+	  	? "????!!!!" : "");
         if (iobj) iobj->DecRef ();
       }
     }

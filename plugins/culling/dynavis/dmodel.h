@@ -21,6 +21,7 @@
 
 #include "csutil/scf.h"
 #include "csutil/hashmap.h"
+#include "csgeom/obb.h"
 
 struct iObjectModel;
 class csObjectModel;
@@ -77,6 +78,9 @@ private:
   int num_planes;
   csPlane3* planes;	// Planes for this model.
 
+  bool dirty_obb;	// If true obb is dirty and requires calculation.
+  csOBB obb;		// OBB for this model.
+
   csPolygonMeshEdge* edges;
   int num_edges;
 
@@ -99,6 +103,9 @@ public:
 
   /// Get outline information.
   const csOutlineInfo& GetOutlineInfo () const { return outline_info; }
+
+  /// Get the OBB for this model.
+  const csOBB& GetOBB ();
 };
 
 /**

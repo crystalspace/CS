@@ -24,9 +24,10 @@
 #include "csgeom/matrix3.h"
 
 class csVector3;
+class csReversibleTransform;
 
 /**
- * Oriented bounding box (OBB) version of csBox3. This is basically
+ * Oriented bounding box (OBB). This is basically
  * a csBox3 with a matrix to rotate it.
  */
 class csOBB : public csBox3
@@ -57,7 +58,8 @@ public:
    * dir2 is the two vertices after moving them to the plane perpendicular
    * to dir1 and dir3 is the cross of dir1 and dir2.
    */
-  csOBB (const csVector3 &dir1, const csVector3 &dir2, const csVector3 &dir3);
+  csOBB (const csVector3 &dir1, const csVector3 &dir2,
+  	const csVector3 &dir3);
 
   void AddBoundingVertex (const csVector3 &v);
   csVector3 GetCorner (int corner) const; 
@@ -86,6 +88,59 @@ public:
    * OBB.
    */
   void FindOBBAccurate (const csVector3 *vertex_table, int num);
+};
+
+/**
+ * Version of the csOBB with frozen corners (for optimization purposes).
+ */
+class csOBBFrozen
+{
+private:
+  csVector3 corners[8];
+
+public:
+  /**
+   * Copy a normal OBB and freeze the corners.
+   */
+  void Copy (const csOBB& obb)
+  {
+    for (int i = 0 ; i < 8 ; i++)
+    {
+      corners[i] = obb.GetCorner (i);
+    }
+  }
+
+  /**
+   * Create a frozen OBB from a normal OBB.
+   */
+  csOBBFrozen (const csOBB& obb)
+  {
+    Copy (obb);
+  }
+
+  /**
+   * Create a frozen OBB from a normal OBB.
+   * The given transform is applied to the vertices
+   * AFTER the matrix of the obb is applied (using
+   * Other2This).
+   */
+  csOBBFrozen (const csOBB& obb, const csReversibleTransform& trans);
+
+  /**
+   * Get one corner from the OBB.
+   */
+  const csVector3& GetCorner (int corner) const
+  {
+    CS_ASSERT (corner >= 0 && corner < 8);
+    return corners[corner];
+  }
+
+  /**
+   * Project this OBB to a 2D screen space box.
+   * Returns false if OBB is not on screen.
+   */
+  bool ProjectOBB (float fov, float sx, float sy, csBox2& sbox,
+	float& min_z, float& max_z);
 };
 
 #endif

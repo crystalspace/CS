@@ -64,6 +64,26 @@ enum csVisReason
 struct VisTest_Front2BackData;
 
 /**
+ * This class holds all historical data relevant to visibility
+ * culling from previous frame. It is used both for regular objects
+ * as for kdtree nodes.
+ */
+class csVisibilityObjectHistory
+{
+public:
+  csVisReason reason;	// Reason object is visible/invisible.
+
+  // If the folloging counter > 0 then the object will be assumed visible
+  // automatically. The counter will be decremented then.
+  int vis_cnt;
+
+  csVisibilityObjectHistory ()
+  {
+    vis_cnt = 0;
+  }
+};
+
+/**
  * This object is a wrapper for an iVisibilityObject from the engine.
  */
 class csVisibilityObjectWrapper
@@ -73,23 +93,23 @@ public:
   csKDTreeChild* child;
   long update_number;	// Last used update_number from movable.
   long shape_number;	// Last used shape_number from model.
-  csVisReason reason;	// Reason object is visible/invisible.
   csObjectModel* model;
-
-  // If the folloging counter > 0 then the object will be assumed visible
-  // automatically. The counter will be decremented then.
-  int vis_cnt;
+  csVisibilityObjectHistory* history;
 
   csVisibilityObjectWrapper ()
   {
-    vis_cnt = 0;
+    history = new csVisibilityObjectHistory ();
+  }
+  ~csVisibilityObjectWrapper ()
+  {
+    delete history;
   }
 
   void MarkVisible (csVisReason reason, int cnt)
   {
     visobj->MarkVisible ();
-    csVisibilityObjectWrapper::reason = reason;
-    vis_cnt = cnt;
+    history->reason = reason;
+    history->vis_cnt = cnt;
   }
 };
 

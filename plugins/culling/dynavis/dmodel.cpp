@@ -35,6 +35,7 @@ csObjectModel::csObjectModel ()
   num_planes = -1;
   edges = NULL;
   num_edges = -1;
+  dirty_obb = true;
 }
 
 csObjectModel::~csObjectModel ()
@@ -73,6 +74,18 @@ void csObjectModel::UpdateOutline (const csVector3& pos)
 	outline_info.valid_radius);
     outline_info.outline_pos = pos;
   }
+}
+
+const csOBB& csObjectModel::GetOBB ()
+{
+  if (dirty_obb)
+  {
+    int num_vertices = imodel->GetSmallerPolygonMesh ()->GetVertexCount ();
+    csVector3* verts = imodel->GetSmallerPolygonMesh ()->GetVertices ();
+    obb.FindOBB (verts, num_vertices);
+    dirty_obb = false;
+  }
+  return obb;
 }
 
 //---------------------------------------------------------------------------
@@ -129,6 +142,7 @@ bool csObjectModelManager::CheckObjectModel (csObjectModel* model)
   {
     model->shape_number = model->imodel->GetShapeNumber ();
     model->outline_info.Clear ();
+    model->dirty_obb = true;
     iPolygonMesh* mesh = model->imodel->GetSmallerPolygonMesh ();
     if (mesh)
     {

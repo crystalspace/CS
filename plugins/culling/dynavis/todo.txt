@@ -22,11 +22,19 @@
 
 - Automatic rebalancing of KD-tree.
 
-- Only calculate planes, edges, active edges in model when REALLY
+- Only calculate OBB, planes, edges, active edges in model when REALLY
   needed (i.e. delay).
 
 - Also process history and VPT for kdtree nodes.
 
 - Seperate all camera dependend/history data so we can use Dynavis
-  for multiple camera positions.
+  for multiple camera positions. In fact all information related to an
+  object can be split into three classes:
+  	- Information on the model itself. This is independent of where
+	  the model is at some time (movable) and also independent
+	  of the camera position.
+	- Information on the current location of the object. This is
+	  independent from the camera but depends on the movable and will
+	  be updated when the movable is updated.
+	- Information depending on camera position.
 

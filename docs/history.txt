@@ -11,6 +11,18 @@ The history order is reversed so that new features are at the top.
 	- Added csOBB class to csgeom. This is a subclass of csBox3
 	  representing an oriented bounding box (OBB). Thanks to Daniel
 	  Duhprey for making this.
+	- Added csOBBFrozen which is a frozen (more optimal) version of
+	  csOBB. It will do the transformation once and cache them.
+	- Dynavis now uses OBB instead of AABB for the write queue
+	  and for test object visibility (TestRectangle). This improves
+	  the culling ability of Dynavis considerably.
+	- Added csOBBFrozen::ProjectOBB() to project an OBB to a
+	  screen space box (similar to csBox3::ProjectBox()).
+	- Started work on csVisibilityObjectHistory class. This class
+	  contains all history-related visibility information for an
+	  object (and in the future also kdtree node). The reason
+	  for this seperation is to make it easier later on to redesign
+	  this to support multiple camera positions.
 19-Jun-2002
 	- Clarified an API comment to indicate that the OFTEN moving
 	  option for things doesn't work yet.

@@ -20,7 +20,63 @@
 #include <cssysdef.h>
 #include "csgeom/obb.h"
 #include "csgeom/obb_priv.h"
+#include "csgeom/transfrm.h"
 #include "qsqrt.h"
+
+//=============================================================================
+
+csOBBFrozen::csOBBFrozen (const csOBB& obb, const csReversibleTransform& trans)
+{
+  csReversibleTransform newtrans;
+  csMatrix3 mat_transp = obb.GetMatrix ().GetTranspose ();
+  newtrans.SetO2T (trans.GetO2T () * mat_transp);
+  newtrans.SetO2TTranslation (obb.GetMatrix () * trans.GetO2TTranslation ());
+  for (int i = 0 ; i < 8 ; i++)
+  {
+    corners[i] = newtrans.Other2This (((csBox3)obb).GetCorner (i));
+  }
+}
+
+static void Perspective (const csVector3& v, csVector2& p, float fov,
+    	float sx, float sy)
+{
+  float iz = fov / v.z;
+  p.x = v.x * iz + sx;
+  p.y = v.y * iz + sy;
+}
+
+bool csOBBFrozen::ProjectOBB (
+	float fov, float sx, float sy, csBox2& sbox,
+	float& min_z, float& max_z)
+{
+  csVector2 v;
+  Perspective (GetCorner (0), v, fov, sx, sy);
+  sbox.StartBoundingBox (v);
+  min_z = GetCorner (0).z;
+  max_z = GetCorner (0).z;
+  int i;
+  for (i = 1; i < 8; i++)
+  {
+    Perspective (GetCorner (i), v, fov, sx, sy);
+    sbox.AddBoundingVertexSmart (v);
+    float z = GetCorner (i).z;
+    if (z < min_z) min_z = z;
+    else if (z > max_z) max_z = z;
+  }
+
+  if (max_z < 0.01) return false;
+  if (min_z < 0.01)
+  {
+    //@@@ Is there a better solution to this?
+    sbox.Set (-10000, -10000, 10000, 10000);
+    return true;
+  }
+
+  return true;
+}
+
+
+//=============================================================================
 
 csOBB::csOBB (const csVector3 &dir1, const csVector3 &dir2,
   const csVector3 &dir3)
