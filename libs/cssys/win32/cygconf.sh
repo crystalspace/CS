@@ -14,7 +14,7 @@ INSTALL_DIR=$1
 BIN_DIR=bin
 
 # Helper function for finding apps
-.${BIN_DIR}/checkprog.sh
+. ${BIN_DIR}/checkprog.sh
 
 # find out architecture
 . ${BIN_DIR}/arch.sh
