@@ -114,7 +114,7 @@ csMemoryMappedIO::~csMemoryMappedIO()
   {
     CacheBlock *cp, *np;
 
-    cp=cache.blocks[i];
+    cp=cache[i];
     while(cp)
     {
      np=cp->next;
@@ -164,8 +164,8 @@ csMemoryMappedIO::CachePage(unsigned int page)
     ++cache_block_count;
 
     // Insert it into the bucket.
-    cp->next=cache.blocks[bucket];
-    cache.blocks[bucket]=cp;
+    cp->next=cache[bucket];
+    cache[bucket]=cp;
 
     // Initialize it
     cp->data = new unsigned char[block_size * cache_block_size];
@@ -175,7 +175,7 @@ csMemoryMappedIO::CachePage(unsigned int page)
     CacheBlock *block;
    
     // Find the least used block in this bucket.
-    cp=cache.blocks[bucket];
+    cp=cache[bucket];
     block=cp->next;
 
     while(block)
@@ -206,7 +206,7 @@ csMemoryMappedIO::CachePage(unsigned int page)
 void *
 csMemoryMappedIO::LookupIndex(unsigned int page, unsigned int index)
 {
-  CacheBlock *cp = cache.blocks[page % csmmioDefaultHashSize];
+  CacheBlock *cp = cache[page % csmmioDefaultHashSize];
 
   while(cp)
   { 
