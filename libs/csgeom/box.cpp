@@ -37,6 +37,13 @@ csBox2::bEdge csBox2:: edges[8] =
   { CS_BOX_CORNER_xy, CS_BOX_CORNER_xY }
 };
 
+csString csBox2::Description() const
+{
+  csString s;
+  s.Format("(%g,%g)-(%g,%g)", MinX(), MinY(), MaxX(), MaxY());
+  return s;
+}
+
 csVector2 csBox2::GetCorner (int corner) const
 {
   switch (corner)
@@ -404,6 +411,14 @@ csBox3::bFace csBox3:: faces[6] =
   { CS_BOX_EDGE_XYZ_xYZ, CS_BOX_EDGE_xYZ_xyZ, CS_BOX_EDGE_xyZ_XyZ,
       CS_BOX_EDGE_XyZ_XYZ }
 };
+
+csString csBox3::Description() const
+{
+  csString s;
+  s.Format("(%g,%g,%g)-(%g,%g,%g)",
+    MinX(), MinY(), MinZ(), MaxX(), MaxY(), MaxZ());
+  return s;
+}
 
 csVector3 csBox3::GetCorner (int corner) const
 {

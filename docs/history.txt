@@ -24,6 +24,23 @@ chronological order.
 	  failed to compile with MSVC6 on account of missing ULONG_PTR type.
 	- res fixed the missing IID_ symbols on MinGW by having 
 	  csplugincommon_dx provide them via INITGUID.
+	- Eric Sunshine reverted the change to csPrintf() of 18-Feb-2005 where
+	  it was modified to understand %b, %2b, %v, and %2v as formatting
+	  directives for csBox3, csBox2, csVector3, and csVector2,
+	  respectively.  This "enhancement" was problematic for a couple
+	  reasons:
+	    (1) It introduced a highly undesirable circular dependency between
+	        csgeom and csutil.
+	    (2) The change was made to the underlying snprintf.c implementation
+	        from the Apache project, however, we would like to avoid
+	        changing this file if at all possible since we may want to drop
+	        in a new version of the file in the future without having to
+	        re-apply a large set of changes. (Presently, the only
+	        specializations we have made to it are the #inclusion of
+	        cssysdef.h and a couple `#pragma warning()' directives for MSVC
+	        which, are minimal and simple to re-apply.)
+	  Also added Description() convenience methods to csBox3, csBox2,
+	  csVector3, and csVector2.
 23-Feb-2005
 	- res moved the code from the various "common" libraries into a
 	  library "csplugincommon" (and libraries with Win32, OpenGL and

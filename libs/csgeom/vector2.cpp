@@ -22,7 +22,13 @@
 #include "csqsqrt.h"
 #include "csgeom/vector2.h"
 
-//---------------------------------------------------------------------------
+csString csVector2::Description() const
+{
+  csString s;
+  s.Format("%g,%g", x, y);
+  return s;
+}
+
 float csVector2::Norm (const csVector2 &v)
 {
   return csQsqrt (v * v);
@@ -42,7 +48,6 @@ void csVector2::Rotate (float angle)
   x = nx;
 }
 
-//---------------------------------------------------------------------------
 csVector2 operator+ (const csVector2 &v1, const csVector2 &v2)
 {
   return csVector2 (v1.x + v2.x, v1.y + v2.y);
@@ -83,5 +88,3 @@ bool operator!= (const csVector2 &v1, const csVector2 &v2)
 {
   return (v1.x != v2.x) || (v1.y != v2.y);
 }
-
-//---------------------------------------------------------------------------

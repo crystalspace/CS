@@ -36,6 +36,7 @@
 #include "segment.h"
 
 #include "csutil/array.h"
+#include "csutil/csstring.h"
 
 class csPlane3;
 class csTransform;
@@ -96,7 +97,7 @@ class CS_CSGEOM_EXPORT csBox2
 private:
   struct bEdge
   {
-    uint8 v1, v2;	// Indices of vertex in bounding box (CS_BOX_CORNER_...)
+    uint8 v1, v2; // Indices of vertex in bounding box (CS_BOX_CORNER_...)
   };
   // Index by edge number. Edge e and e+1 with e even are opposite edges.
   // (CS_BOX_EDGE_...)
@@ -368,20 +369,6 @@ public:
     return AddBoundingVertexSmartTest (v.x, v.y);
   }
 
-  //-----
-  // Maintenance Note: The csBox2 constructors and Set() appear at this point
-  // in the file, rather than earlier, in order to appease the OpenStep 4.2
-  // compiler.  Specifically, the problem is that the compiler botches code
-  // generation if an unseen method (which is later declared inline) is
-  // called from within another inline method.  For instance, if the
-  // constructors were listed at the top of the file, rather than here, the
-  // compiler would see calls to Empty() and StartBoundingBox() before seeing
-  // declarations for them.  In such a situation, the buggy compiler
-  // generates a broken object file.  The simple work-around of textually
-  // reorganizing the file ensures that the declarations for Empty() and
-  // StartBoundingBox() are seen before they are called.
-  //-----
-
   /// Initialize this box to empty.
   csBox2 () : minbox (CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE),
 	     maxbox (-CS_BOUNDINGBOX_MAXVALUE, -CS_BOUNDINGBOX_MAXVALUE) {}
@@ -425,6 +412,12 @@ public:
     if (idx == 1) maxbox.y = val;
     else maxbox.x = val;
   }
+
+  /**
+   * Return a textual representation of the box in the form
+   * "(minx,miny)-(maxx,maxy)".
+   */
+  csString Description() const;
 
   /// Compute the union of two bounding boxes.
   csBox2& operator+= (const csBox2& box);
@@ -628,7 +621,8 @@ public:
 
   /**
    * Given an edge index (#CS_BOX_EDGE_Xyz_xyz etc.) return the two vertices
-   * (index #CS_BOX_CORNER_xyz etc.) and left/right faces (#CS_BOX_SIDE_x etc.).
+   * (index #CS_BOX_CORNER_xyz, etc.) and left/right faces
+   * (#CS_BOX_SIDE_x, etc.).
    */
   void GetEdgeInfo (int edge, int& v1, int& v2, int& fleft, int& fright) const
   {
@@ -855,20 +849,6 @@ public:
     return AddBoundingVertexSmartTest (v.x, v.y, v.z);
   }
 
-  //-----
-  // Maintenance Note: The csBox3 constructors and Set() appear at this point
-  // in the file, rather than earlier, in order to appease the OpenStep 4.2
-  // compiler.  Specifically, the problem is that the compiler botches code
-  // generation if an unseen method (which is later declared inline) is
-  // called from within another inline method.  For instance, if the
-  // constructors were listed at the top of the file, rather than here, the
-  // compiler would see calls to Empty() and StartBoundingBox() before seeing
-  // declarations for them.  In such a situation, the buggy compiler
-  // generated a broken object file.  The simple work-around of textually
-  // reorganizing the file ensures that the declarations for Empty() and
-  // StartBoundingBox() are seen before they are called.
-  //-----
-
   /// Initialize this box to empty.
   csBox3 () :
     minbox ( CS_BOUNDINGBOX_MAXVALUE,
@@ -924,6 +904,12 @@ public:
     else if (idx == 0) maxbox.x = val;
     else maxbox.z = val;
   }
+
+  /**
+   * Return a textual representation of the box in the form
+   * "(minx,miny,minz)-(maxx,maxy,maxz)".
+   */
+  csString Description() const;
 
   /**
    * Split this box along an axis and construct two new boxes.

@@ -24,7 +24,13 @@
 #include "csqsqrt.h"
 #include "csgeom/vector3.h"
 
-//---------------------------------------------------------------------------
+csString csVector3::Description() const
+{
+  csString s;
+  s.Format("%g,%g,%g", x, y, z);
+  return s;
+}
+
 float csVector3::Norm () const
 {
   return csQsqrt (x * x + y * y + z * z);
@@ -45,5 +51,3 @@ csVector3::csVector3 (const csDVector3 &v)
   y = (float)v.y;
   z = (float)v.z;
 }
-
-//---------------------------------------------------------------------------

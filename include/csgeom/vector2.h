@@ -27,6 +27,7 @@
  * @{ */
 
 #include "csextern.h"
+#include "csutil/csstring.h"
 
 /**
  * A 2D vector.
@@ -34,9 +35,9 @@
 class CS_CSGEOM_EXPORT csVector2
 {
 public:
-  ///
+  /// X component of vector.
   float x;
-  ///
+  /// Y component of vector.
   float y;
 
   /// Make a new vector. No initialization is done.
@@ -44,6 +45,9 @@ public:
 
   /// Make a new vector and initialize with the given values.
   csVector2 (float x, float y) { csVector2::x = x; csVector2::y = y; }
+
+  /// Return a textual representation of the vector in the form "x,y".
+  csString Description() const;
 
   /// Set vector to given values.
   inline void Set (float ix, float iy)

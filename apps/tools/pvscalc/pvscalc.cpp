@@ -20,12 +20,41 @@
 
 CS_IMPLEMENT_APPLICATION
 
+#define PVSCALC_DEBUG_LEVEL 1
+
 #undef DB
-//#define DB(x) csPrintf x
+#if (PVSCALC_DEBUG_LEVEL > 1)
+#define DB(x) csPrintf x
+#else
 #define DB(x)
+#endif
 
 #undef DBA
+#if (PVSCALC_DEBUG_LEVEL > 0)
 #define DBA(x) csPrintf x
+#else
+#define DBA(x)
+#endif
+
+#undef B2F
+#undef B3F
+#undef B2D
+#undef B3D
+#define B2F "(%g,%g)-(%g,%g)"
+#define B3F "(%g,%g,%g)-(%g,%g,%g)"
+#define B2D(X) (X).MinX(), (X).MinY(), (X).MaxX(), (X).MaxY()
+#define B3D(X) \
+  (X).MinX(), (X).MinY(), (X).MinZ(), (X).MaxX(), (X).MaxY(), (X).MaxZ()
+
+#undef V2F
+#undef V3F
+#undef V2D
+#undef V3D
+#define V2F "%g,%g"
+#define V3F "%g,%g,%g"
+#define V2D(X) (X).x, (X).y
+#define V3D(X) (X).x, (X).y, (X).z
+
 
 //-----------------------------------------------------------------------------
 
@@ -120,7 +149,7 @@ bool PVSCalcNode::HitBeam (const csSegment3& seg)
 
 //-----------------------------------------------------------------------------
 
-PVSCalcSector::PVSCalcSector (PVSCalc* parent, iSector* sector, iPVSCuller* pvs)
+PVSCalcSector::PVSCalcSector(PVSCalc* parent, iSector* sector, iPVSCuller* pvs)
 {
   PVSCalcSector::parent = parent;
   PVSCalcSector::sector = sector;
@@ -395,7 +424,8 @@ float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
 
       float qual_cut = 1.0 - (float (cut) * inv_num_objects);
       float qual_balance = 1.0 - (float (ABS (left-right)) * inv_num_objects);
-      qual = .6 + (6.0 * qual_cut + qual_balance);	// Bonus for using axis plane.
+      // Bonus for using axis plane.
+      qual = 0.6 + (6.0 * qual_cut + qual_balance);
       if (solid)
       {
         qual += 5.0f;	// Very high bonus!
@@ -670,7 +700,8 @@ void PVSCalcSector::BuildShadowTreePolygons (PVSPolygonNode* node,
   bbox_node.Split (node->axis, node->where, box1, box2);
   csArray<csPoly3DBox*> polygons_left;
   csArray<csPoly3DBox*> polygons_right;
-  DistributePolygons (node->axis, node->where, polygons, polygons_left, polygons_right);
+  DistributePolygons (node->axis, node->where, polygons, polygons_left,
+    polygons_right);
   node->child1 = new PVSPolygonNode ();
   node->child2 = new PVSPolygonNode ();
   BuildShadowTreePolygons (node->child1, box1, polygons_left);
@@ -979,8 +1010,8 @@ bool PVSCalcSector::SetupProjectionPlane (const csBox3& source,
   plane.offset = bbox.Min ();
   plane.scale.x = float (DIM_COVBUFFER) / (bbox.MaxX ()-bbox.MinX ());
   plane.scale.y = float (DIM_COVBUFFER) / (bbox.MaxY ()-bbox.MinY ());
-  DB(("  Hull box: %2b scale=%2v offset=%2v\n", &bbox,
-	&plane.scale, &plane.offset));
+  DB(("  Hull box: " B2F "scale=" V2F " offset=" V2F "\n",
+    B2D(bbox), V2D(plane.scale), V2D(plane.offset)));
 
   // Clear the coverage buffer.
   plane.covbuf->Initialize ();
@@ -992,10 +1023,10 @@ bool PVSCalcSector::SetupProjectionPlane (const csBox3& source,
   DB(("  Hull:\n"));
   for (i = 0 ; i < (size_t)hull_points ; i++)
   {
-    DB(("    N:%d (%2v)\n", i, &hull[i]));
+    DB(("    N:%d (" V2F ")\n", i, V2D(hull[i])));
     hull[i].x = (hull[i].x-plane.offset.x) * plane.scale.x;
     hull[i].y = (hull[i].y-plane.offset.y) * plane.scale.y;
-    DB(("    C:%d (%2v)\n", i, &hull[i]));
+    DB(("    C:%d (" V2F ")\n", i, V2D(hull[i])));
   }
   plane.covbuf->InsertPolygonInvertedNoDepth (hull, hull_points);
 
@@ -1019,7 +1050,7 @@ bool PVSCalcSector::CastAreaShadow (const csBox3& source,
   size_t j;
   for (j = 0 ; j < polygon.GetVertexCount () ; j++)
   {
-    DB((" (%v)", &polygon[j]));
+    DB((" (" V3F ")", V3D(polygon[j])));
   }
   DB(("\n"));
 
@@ -1067,7 +1098,7 @@ bool PVSCalcSector::CastAreaShadow (const csBox3& source,
   {
     pi_verts[i].x = (pi_verts[i].x-plane.offset.x) * plane.scale.x;
     pi_verts[i].y = (pi_verts[i].y-plane.offset.y) * plane.scale.y;
-    DB((" (%2v)", &pi_verts[i]));
+    DB((" (" V2F ")", V2D(pi_verts[i])));
   }
   DB(("\n"));
   int nummod = plane.covbuf->InsertPolygonNoDepth (
@@ -1204,7 +1235,7 @@ bool PVSCalcSector::RecurseDestNodes (PVSCalcNode* sourcenode,
   // traversing to the children so we only skip the testing part.
   if (!dest.Overlap (source))
   {
-    DB(("\nTEST %b -> %b\n", &source, &dest));
+    DB(("\nTEST " B3F " -> " B3F "\n", B3D(source), B3D(dest)));
 
     // First we do a trivial test to see if the nodes can surely see each
     // other.
@@ -1232,16 +1263,16 @@ bool PVSCalcSector::RecurseDestNodes (PVSCalcNode* sourcenode,
 	  int destrep = destnode->represented_nodes;
           total_invisnodes += destrep;
 	  DBA(("%d ", destrep));
-          DB(("Marked invisible %b to %b\n", &source, &dest));
+          DB(("Marked invisible " B3F " to " B3F "\n",
+	    B3D(source), B3D(dest)));
 
-	  // If visibility for the destination node was already calculated
-	  // and we are here then that means that this node was considered visible
+	  // If visibility for the destination node was already calculated and
+	  // we are here then that means that this node was considered visible
 	  // for the destination node (otherwise we wouldn't have done these
 	  // calculations because of the symmetry test in the beginning of this
-	  // function).
-	  // But now we know that the destination node is invisible for this
-	  // node so we make use of symmetry and also mark this source node as
-	  // invisible in the destination node.
+	  // function).  But now we know that the destination node is invisible
+	  // for this node so we make use of symmetry and also mark this source
+	  // node as invisible in the destination node.
 	  if (destnode->calculated_pvs)
 	  {
             pvstree->MarkInvisible (destnode->node, sourcenode->node);
@@ -1267,8 +1298,8 @@ bool PVSCalcSector::RecurseDestNodes (PVSCalcNode* sourcenode,
   // children of the destination node.
   if (destnode->child1)
   {
-    bool vis1 = RecurseDestNodes (sourcenode, destnode->child1, invisible_nodes);
-    bool vis2 = RecurseDestNodes (sourcenode, destnode->child2, invisible_nodes);
+    bool vis1 = RecurseDestNodes(sourcenode,destnode->child1,invisible_nodes);
+    bool vis2 = RecurseDestNodes(sourcenode,destnode->child2,invisible_nodes);
     if (vis1 && vis2)
     {
       // Both children are invisible. Then we mark this node invisible too.
@@ -1292,8 +1323,8 @@ void PVSCalcSector::RecurseSourceNodes (PVSCalcNode* sourcenode,
   csTicks totaltime = currenttime - starttime;
   float average = float (totaltime) / float (totalnodes-nodecounter);
   csTicks remaining = (csTicks)(average * nodecounter);
-  float cull_quality = 100.0 * float (total_invisnodes)
-  	/ float (1 + total_visnodes + total_invisnodes);
+  float cull_quality = 100.0 * float (total_invisnodes) /
+  	float (1 + total_visnodes + total_invisnodes);
   printf ("\n#n=%d cnt=%d (tot=%ds rem=%ds avg=%gms) (cq=%g%%) ",
   	sourcenode->represented_nodes, nodecounter,
 	totaltime / 1000, remaining / 1000, average,
@@ -1454,9 +1485,8 @@ bool PVSCalcSector::FeedMetaInformation (iDocumentNode* node)
 	    }
 	    else
 	    {
-	      parent->ReportError (
-		"Unknown token <%s> in <polygon> for PVSCalc meta information!",
-		value2);
+	      parent->ReportError ("Unknown token <%s> in <polygon> for "
+                "PVSCalc meta information!", value2);
 	      return false;
 	    }
 	  }
@@ -1465,8 +1495,7 @@ bool PVSCalcSector::FeedMetaInformation (iDocumentNode* node)
 	break;
       default:
         parent->ReportError (
-		"Unknown token <%s> for PVSCalc meta information!",
-		value);
+		"Unknown token <%s> for PVSCalc meta information!", value);
         return false;
     }
   }
@@ -1526,7 +1555,8 @@ void PVSCalc::OnExit ()
 {
   if (meta_loader)
   {
-    GetObjectRegistry ()->Unregister ((iBase*)meta_loader, "crystalspace.pvscalc");
+    GetObjectRegistry ()->Unregister ((iBase*)meta_loader,
+      "crystalspace.pvscalc");
   }
 }
 

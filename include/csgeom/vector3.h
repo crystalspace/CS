@@ -27,7 +27,8 @@
  * @{ */
 
 #include "csextern.h"
-#include "csgeom/math3d_d.h"
+#include "math3d_d.h"
+#include "csutil/csstring.h"
 
 #define CS_AXIS_NONE -1
 #define CS_AXIS_X 0
@@ -70,36 +71,39 @@ public:
   /// Conversion from double precision vector to single.
   csVector3 (const csDVector3&);
 
+  /// Return a textual representation of the vector in the form "x,y,z".
+  csString Description() const;
+
   /// Add two vectors.
-  inline friend csVector3 operator+ (const csVector3& v1, const csVector3& v2)
+  inline friend csVector3 operator+(const csVector3& v1, const csVector3& v2)
   { return csVector3(v1.x+v2.x, v1.y+v2.y, v1.z+v2.z); }
 
   /// Add two vectors of differing type, raise the csVector3 to DVector3.
-  inline friend csDVector3 operator+ (const csDVector3& v1, const csVector3& v2)
+  inline friend csDVector3 operator+(const csDVector3& v1, const csVector3& v2)
   { return csDVector3(v1.x+v2.x, v1.y+v2.y, v1.z+v2.z); }
 
   /// Add two vectors of differing type, raise the csVector3 to DVector3.
-  inline friend csDVector3 operator+ (const csVector3& v1, const csDVector3& v2)
+  inline friend csDVector3 operator+(const csVector3& v1, const csDVector3& v2)
   { return csDVector3(v1.x+v2.x, v1.y+v2.y, v1.z+v2.z); }
 
   /// Subtract two vectors.
-  inline friend csVector3 operator- (const csVector3& v1, const csVector3& v2)
+  inline friend csVector3 operator-(const csVector3& v1, const csVector3& v2)
   { return csVector3(v1.x-v2.x, v1.y-v2.y, v1.z-v2.z); }
 
   /// Subtract two vectors of differing type, cast to double.
-  inline friend csDVector3 operator- (const csVector3& v1, const csDVector3& v2)
+  inline friend csDVector3 operator-(const csVector3& v1, const csDVector3& v2)
   { return csDVector3(v1.x-v2.x, v1.y-v2.y, v1.z-v2.z); }
 
   /// Subtract two vectors of differing type, cast to double.
-  inline friend csDVector3 operator- (const csDVector3& v1, const csVector3& v2)
+  inline friend csDVector3 operator-(const csDVector3& v1, const csVector3& v2)
   { return csDVector3(v1.x-v2.x, v1.y-v2.y, v1.z-v2.z); }
 
   /// Take the dot product of two vectors.
-  inline friend float operator* (const csVector3& v1, const csVector3& v2)
+  inline friend float operator*(const csVector3& v1, const csVector3& v2)
   { return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z; }
 
   /// Take the cross product of two vectors.
-  inline friend csVector3 operator% (const csVector3& v1, const csVector3& v2)
+  inline friend csVector3 operator%(const csVector3& v1, const csVector3& v2)
   {
     return csVector3 (v1.y*v2.z-v1.z*v2.y,
                       v1.z*v2.x-v1.x*v2.z,
