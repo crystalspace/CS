@@ -3,6 +3,15 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+8-Jun-2003
+	- Eric Sunshine fixed problems in csInitializer::CloseApplication() and
+	  csInitializer::DestroyApplication() where they threw assertion
+	  failures if a shared event queue was not present.  Since the idea of
+	  the various initialization and setup functions in csInitializer is to
+	  allow clients to pick and choose which components to use, it was
+	  wrong for these shutdown functions to make the assertion that certain
+	  components must be present.  This issue was reported by Troy Chard
+	  <troy.chard@shaw.ca>.
 6-June-2003
 	- res did further fixes related to the new shader var stuff.
 	  r3dtest now seems to run fine (for me, at least.)

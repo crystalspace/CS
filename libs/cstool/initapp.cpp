@@ -400,10 +400,12 @@ bool csInitializer::OpenApplication (iObjectRegistry* r)
 void csInitializer::CloseApplication (iObjectRegistry* r)
 {
   // Notify all interested listeners that the system is going down
-  csEvent Event (csGetTicks (), csevBroadcast, cscmdSystemClose);
   csRef<iEventQueue> EventQueue (CS_QUERY_REGISTRY (r, iEventQueue));
-  CS_ASSERT (EventQueue != 0);
-  EventQueue->Dispatch (Event);
+  if (EventQueue)
+  {
+    csEvent Event (csGetTicks (), csevBroadcast, cscmdSystemClose);
+    EventQueue->Dispatch (Event);
+  }
 }
 
 void csInitializer::DestroyApplication (iObjectRegistry* r)
@@ -411,16 +413,19 @@ void csInitializer::DestroyApplication (iObjectRegistry* r)
   CloseApplication (r);
   csPlatformShutdown (r);
 
-  //  if (installed_event_handler)
+  // This will remove the installed_event_handler (if used) as well as free
+  // all other event handlers which are registered through plug-ins or
+  // other sources.
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (r, iEventQueue));
-    CS_ASSERT (q != 0);
-    // This will remove the installed_event_handler (if used) as well as free
-    // all other event handlers which are registered through plug-ins or
-    // other sources.
-    q->RemoveAllListeners ();
+    if (q)
+      q->RemoveAllListeners ();
   }
+
+  // @@@ A throwback to an earlier time.  Remove this once we eliminate the
+  // old csSystemDriver cruft entirely.
   delete global_sys;
+  global_sys = 0;
 
   // Explicitly unload all plugins from the plugin manager because
   // some plugins hold references to the plugin manager so the plugin
@@ -439,7 +444,7 @@ void csInitializer::DestroyApplication (iObjectRegistry* r)
   // make SCF queries as they are destroyed, so this must occur before SCF is
   // finalized (see below).
   r->Clear ();
-  r->DecRef ();
+  r->DecRef (); // @@@ Why is this being done? !!!
 
   // Destroy all static variables created by CS_IMPLEMENT_STATIC_VAR() or one
   // of its cousins.
