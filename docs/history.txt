@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+7-Jan-2005
+	- Jorrit added missing SCF_VERSION for iSectorMeshCallback.
+	- Jorrit added a new iEngineSectorCallback system to the engine. This
+	  can be used to discover when sectors are added or removed to the
+	  engine.
 6-Jan-2005
 	- Jorrit removed GetPrivateObject() from iThingState and iBezierState.
 	- Eric Sunshine applied a patch from Brian DeVries

@@ -82,6 +82,7 @@ struct iCacheManager;
 struct iSharedVariableList;
 struct iRenderLoopManager;
 struct iRenderLoop;
+struct iEngine;
 
 /** \name SetLightingCacheMode() settings
  * @{ */
@@ -118,6 +119,27 @@ struct iRenderLoop;
  */
 #define CS_RENDPRI_FRONT2BACK 2
 /** @} */
+
+
+SCF_VERSION (iEngineSectorCallback, 0, 0, 1);
+
+/**
+ * A callback that will be fired whenever a sector is created or
+ * removed from the engine.
+ */
+struct iEngineSectorCallback : public iBase
+{
+  /**
+   * New sector.
+   */
+  virtual void NewSector (iEngine* engine, iSector* sector) = 0;
+
+  /**
+   * Remove sector.
+   */
+  virtual void RemoveSector (iEngine* engine, iSector* sector) = 0;
+};
+
 
 SCF_VERSION (iEngine, 0, 23, 0);
 
@@ -371,6 +393,17 @@ struct iEngine : public iBase
    * \param name the sector name
    */
   virtual iSector *CreateSector (const char *name) = 0;
+
+  /**
+   * Add a sector callback. This will call IncRef() on the callback
+   * So make sure you call DecRef() to release your own reference.
+   */
+  virtual void AddEngineSectorCallback (iEngineSectorCallback* cb) = 0;
+
+  /**
+   * Remove a sector callback.
+   */
+  virtual void RemoveEngineSectorCallback (iEngineSectorCallback* cb) = 0;
 
   /**
    * Convenience function to create the thing containing the

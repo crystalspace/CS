@@ -69,6 +69,8 @@ struct iSectorCallback : public iBase
   virtual void Traverse (iSector* sector, iBase* context) = 0;
 };
 
+SCF_VERSION (iSectorMeshCallback, 0, 0, 1);
+
 /**
  * Set a callback which is called when a mesh is added or removed
  * from this sector.

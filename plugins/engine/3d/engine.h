@@ -394,6 +394,9 @@ private:
   /// Thing mesh object type for convenience.
   csRef<iMeshObjectType> thing_type;
 
+  /// Sector callbacks.
+  csRefArray<iEngineSectorCallback> sector_callbacks;
+
   /// Current render context (proc texture) or 0 if global.
   iTextureHandle* render_context;
 
@@ -921,16 +924,21 @@ public:
   virtual void DeleteAll ();
 
   /// Register a texture to be loaded during Prepare()
-  virtual iTextureWrapper* CreateTexture (const char *iName,
+  virtual iTextureWrapper* CreateTexture (const char *name,
   	const char *iFileName, csColor *iTransp, int iFlags);
   virtual iTextureWrapper* CreateBlackTexture (const char *name,
 	int w, int h, csColor *iTransp, int iFlags);
   /// Register a material to be loaded during Prepare()
-  virtual iMaterialWrapper* CreateMaterial (const char *iName,
+  virtual iMaterialWrapper* CreateMaterial (const char *name,
   	iTextureWrapper* texture);
 
   /// Create a empty sector with given name.
-  virtual iSector *CreateSector (const char *iName);
+  virtual iSector *CreateSector (const char *name);
+
+  virtual void AddEngineSectorCallback (iEngineSectorCallback* cb);
+  virtual void RemoveEngineSectorCallback (iEngineSectorCallback* cb);
+  void FireNewSector (iSector* sector);
+  void FireRemoveSector (iSector* sector);
 
   /// Return the list of sectors
   virtual iSectorList *GetSectors ()

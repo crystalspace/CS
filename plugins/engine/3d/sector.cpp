@@ -964,6 +964,7 @@ int csSectorList::Add (iSector *obj)
 
 bool csSectorList::Remove (iSector *obj)
 {
+  csEngine::current_engine->FireRemoveSector (obj);
   FreeSector (obj);
   return list.Delete (obj);
 }

@@ -1097,6 +1097,11 @@ iMeshObjectType* csEngine::GetThingType ()
 
 void csEngine::DeleteAll ()
 {
+  // First notify all sector removal callbacks.
+  int i;
+  for (i = 0 ; i < sectors.GetCount () ; i++)
+    FireRemoveSector (sectors.Get (i));
+
   nextframe_pending = 0;
   halos.DeleteAll ();
   collections.DeleteAll ();
@@ -2772,7 +2777,7 @@ iRegion* csEngine::CreateRegion (const char *name)
 }
 
 iTextureWrapper *csEngine::CreateTexture (
-  const char *iName,
+  const char *name,
   const char *iFileName,
   csColor *iTransp,
   int iFlags)
@@ -2803,14 +2808,14 @@ iTextureWrapper *csEngine::CreateTexture (
   ifile->SetName (**xname);
 
   // Okay, now create the respective texture handle object
-  iTextureWrapper *tex = GetTextures ()->FindByName (iName);
+  iTextureWrapper *tex = GetTextures ()->FindByName (name);
   if (tex)
     tex->SetImageFile (ifile);
   else
     tex = GetTextures ()->NewTexture (ifile);
 
   tex->SetFlags (iFlags);
-  tex->QueryObject ()->SetName (iName);
+  tex->QueryObject ()->SetName (name);
 
   if (iTransp)
     tex->SetKeyColor (
@@ -2852,12 +2857,12 @@ iTextureWrapper *csEngine::CreateBlackTexture (
 }
 
 iMaterialWrapper *csEngine::CreateMaterial (
-  const char *iName,
+  const char *name,
   iTextureWrapper *texture)
 {
   csMaterial *mat = new csMaterial (this, texture);
   iMaterialWrapper *wrapper = materials->NewMaterial (mat);
-  wrapper->QueryObject ()->SetName (iName);
+  wrapper->QueryObject ()->SetName (name);
 
   mat->SetShader (default_shadertype, default_shader);
   mat->shadersCustomized = false;
@@ -2882,21 +2887,47 @@ csPtr<iMeshWrapper> csEngine::CreateSectorWallsMesh (
   iSector *sector,
   const char *name)
 {
-  csRef<iMeshWrapper> thing_wrap (CreateMeshWrapper (
-  	"crystalspace.mesh.object.thing", name, sector));
+  csRef<iMeshWrapper> thing_wrap = CreateMeshWrapper (
+  	"crystalspace.mesh.object.thing", name, sector);
   thing_wrap->SetZBufMode (CS_ZBUF_FILL);
   thing_wrap->SetRenderPriority (GetWallRenderPriority ());
   return csPtr<iMeshWrapper> (thing_wrap);
 }
 
-iSector *csEngine::CreateSector (const char *iName)
+iSector *csEngine::CreateSector (const char *name)
 {
   iSector *sector = &(new csSector (this))->scfiSector;
-  sector->QueryObject ()->SetName (iName);
+  sector->QueryObject ()->SetName (name);
   sectors.Add (sector);
   sector->DecRef ();
 
+  FireNewSector (sector);
+
   return sector;
+}
+
+void csEngine::AddEngineSectorCallback (iEngineSectorCallback* cb)
+{
+  sector_callbacks.Push (cb);
+}
+
+void csEngine::RemoveEngineSectorCallback (iEngineSectorCallback* cb)
+{
+  sector_callbacks.Delete (cb);
+}
+
+void csEngine::FireNewSector (iSector* sector)
+{
+  size_t i;
+  for (i = 0 ; i < sector_callbacks.Length () ; i++)
+    sector_callbacks[i]->NewSector (this, sector);
+}
+
+void csEngine::FireRemoveSector (iSector* sector)
+{
+  size_t i;
+  for (i = 0 ; i < sector_callbacks.Length () ; i++)
+    sector_callbacks[i]->RemoveSector (this, sector);
 }
 
 csPtr<iMaterial> csEngine::CreateBaseMaterial (iTextureWrapper *txt)
