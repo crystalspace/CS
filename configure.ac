@@ -1101,11 +1101,19 @@ AS_IF([test $enable_cpu_specific_optimizations != no],
     [AC_CACHE_CHECK([for code generation flags], [cs_cv_prog_cxx_code_gen],
 	[cs_cv_prog_cxx_code_gen=no
 	AS_IF([test $enable_cpu_specific_optimizations = maximum],
-	    [CS_CHECK_CODE_GEN_FLAG([athlon], [-mcpu=athlon -march=athlon])
+	    [CS_CHECK_CODE_GEN_FLAG([athlon], [-march=athlon])
+	    CS_CHECK_CODE_GEN_FLAG([athlon], [-mcpu=athlon -march=athlon])
+	    CS_CHECK_CODE_GEN_FLAG([athlon], [-mcpu=athlon])
+	    CS_CHECK_CODE_GEN_FLAG([*686], [-march=i686])
 	    CS_CHECK_CODE_GEN_FLAG([*686], [-mcpu=pentiumpro -march=i686])
-	    CS_CHECK_CODE_GEN_FLAG([*686], [-mpentiumpro -march=i686])])
+	    CS_CHECK_CODE_GEN_FLAG([*686], [-mcpu=pentiumpro])
+	    CS_CHECK_CODE_GEN_FLAG([*686], [-mpentiumpro -march=i686])
+	    CS_CHECK_CODE_GEN_FLAG([*686], [-mpentiumpro])])
+	CS_CHECK_CODE_GEN_FLAG([[*[5-6]86]], [-march=i586])
 	CS_CHECK_CODE_GEN_FLAG([[*[5-6]86]], [-mcpu=pentium -march=i586])
+	CS_CHECK_CODE_GEN_FLAG([[*[5-6]86]], [-mcpu=pentium])
 	CS_CHECK_CODE_GEN_FLAG([[*[5-6]86]], [-mpentium -march=i586])
+	CS_CHECK_CODE_GEN_FLAG([[*[5-6]86]], [-mpentium])
 	CS_CHECK_CODE_GEN_FLAG([[*[3-9]86]], [-mcpu=i486])
 	CS_CHECK_CODE_GEN_FLAG([[*[3-9]86]], [-m486])
 	CS_CHECK_CODE_GEN_FLAG([alpha], [-mieee])])
