@@ -107,8 +107,8 @@ real internal_f;
 
 		// try to limit instability conditions. 
 		// friction force is never more than some factor of external force.
-		if( fabs(internal_f) > 0.20*fabs(external_f) ){
-			internal_f *= 0.20*fabs(external_f/internal_f);
+		if( fabs(internal_f) > 0.25*fabs(external_f) ){
+			internal_f *= 0.25*fabs(external_f/internal_f);
 		}
 		//!me attempt to limit overshoot.  not working well....
 /*		if( external_f > 0 ){
