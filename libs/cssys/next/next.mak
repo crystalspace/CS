@@ -4,7 +4,7 @@
 # Only one of the cover makefiles should be including this file.  Ignore others.
 ifeq ($(NEXT.FRIEND),yes)
 
-# We don't want assembly for now
+# None of the NeXT platforms can grok the assembly used by CS
 override DO_ASM=no
 
 # Choose which drivers you want to build/use
@@ -58,6 +58,8 @@ endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 #------------------------------------------------------------------ defines ---#
 ifeq ($(MAKESECTION),defines)
 
+include mk/unix.mak
+
 # Multi-architecture binary (MAB) support.
 NEXT.ARCH_FLAGS=$(foreach arch,$(NEXT.TARGET_ARCHS),-arch $(arch))
 
@@ -67,17 +69,8 @@ NEXT.SHARED=shared
 NEXT.SEARCH_PATH=$(NEXT.SOURCE_DIRS) $(NEXT.SHARED)
 NEXT.SOURCE_PATHS=$(addprefix libs/cssys/next/,$(NEXT.SEARCH_PATH))
 
-# Typical extension for executables on this system (e.g. EXE=.exe)
-EXE=
-
 # Typical extension for dynamic libraries on this system.
 DLL=.dylib
-
-# Typical extension for static libraries
-LIB=.a
-
-# Typical prefix for library filenames
-LIB_PREFIX=lib
 
 # Does this system require libsocket.a?
 NEED_SOCKET_LIB=no
@@ -139,9 +132,6 @@ NASMFLAGS.SYSTEM=
 SRC.SYS_CSSYS = libs/cssys/general/printf.cpp \
   $(wildcard $(addsuffix /*.cpp,$(NEXT.SOURCE_PATHS)) support/gnu/getopt*.c)
 
-# Where to put the dynamic libraries on this system?
-OUTDLL=
-
 # The C compiler.
 CC=cc -c
 
@@ -155,29 +145,8 @@ LINK=cc
 AR=libtool
 ARFLAGS=-static -o
 
-# Command sequence for creating a directory.
-# Note that directories will have forward slashes. Please
-# make sure that this command accepts that (or use 'subst' first).
-MKDIR=mkdir $(@:/=)
-
-# The command to remove all specified files.
-RM=rm -f
-
-# The command to remove a directory tree.
-RMDIR=rm -rf
-
 # Extra parameters for 'sed' which are used for doing 'make depend'.
 SYS_SED_DEPEND=-e "s/\.cpp\.o \:/\.o\:/g"
-
-#==================================================
-# Extra operation system dependent options.
-#==================================================
-
-# Include support for the XSHM extension in Crystal Space.
-# Note that you don't need to disable this if you don't have XSHM
-# support in your X server because Crystal Space will autodetect
-# the availability of XSHM.
-DO_SHM=no
 
 # We don't need separate directories for dynamic libraries
 OUTSUFX.yes=

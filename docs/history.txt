@@ -50,6 +50,12 @@ Short-term cleanups that need to be done:
 	      complete yet but already something to look at :-)
 	- Texinfo update from Martin Geisse.  Conversions for authors.html,
 	  cvsguid.txt, and Makefile.txt.  Updated msdos.txi.
+	- Eric Sunshine created makefile stubs mk/unix.mak and mk/dos.mak.
+	  These stubs each define makefile variables common to a particular
+	  class of platforms.  Platform-specific makefiles now include one of
+	  these files (if desired) and possibly override the defined values
+	  (if necessary).  Also modified all existing platform-specific
+	  makefiles to utilize these new stubs.
 12-Mar-2000
 	- Paul Garceau restored several of the changes he did yesterday
 	  because his changes are broken.

@@ -35,17 +35,7 @@ endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 #------------------------------------------------------------------ defines ---#
 ifeq ($(MAKESECTION),defines)
 
-# Typical extension for executables on this system (e.g. EXE=.exe)
-EXE=.exe
-
-# Typical extension for dynamic libraries on this system.
-DLL=.dll
-
-# Typical extension for static libraries
-LIB=.lib
-
-# Typical prefix for library filenames
-LIB_PREFIX=
+#include mk/dos.mak
 
 # Does this system require libsocket.a?
 NEED_SOCKET_LIB=no
@@ -109,9 +99,6 @@ SRC.SYS_CSSYS = libs/cssys/unix/unix.cpp libs/cssys/unix/loadlib.cpp \
  libs/cssys/general/printf.cpp libs/cssys/unix/utiming.cpp
 SRC.SYS_CSSYS_DLL = libs/cssys/unix/dummy.cpp
 
-# Where to put the dynamic libraries on this system?
-OUTDLL=
-
 # The C compiler.
 CC=g++ -c
 
@@ -129,12 +116,6 @@ ARFLAGS=cr
 # Note that directories will have forward slashes. Please
 # make sure that this command accepts that (or use 'subst' first).
 MKDIR=mkdir $(@:/=)
-
-# The command to remove all specified files.
-RM=rm -f
-
-# The command to remove a directory tree.
-RMDIR=rm -rf
 
 # Extra parameters for 'sed' which are used for doing 'make depend'.
 SYS_SED_DEPEND=

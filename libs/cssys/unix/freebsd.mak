@@ -25,17 +25,7 @@ endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 #------------------------------------------------------------------ defines ---#
 ifeq ($(MAKESECTION),defines)
 
-# Typical extension for executables on this system (e.g. EXE=.exe)
-EXE=
-
-# Typical extension for dynamic libraries on this system.
-DLL=.so
-
-# Typical extension for static libraries
-LIB=.a
-
-# Typical prefix for library filenames
-LIB_PREFIX=lib
+include mk/unix.mak
 
 # Does this system require libsocket.a?
 NEED_SOCKET_LIB=no
@@ -95,9 +85,6 @@ SRC.SYS_CSSYS = libs/cssys/unix/unix.cpp libs/cssys/unix/loadlib.cpp \
   support/gnu/getopt.c support/gnu/getopt1.c
 SRC.SYS_CSSYS_DLL = libs/cssys/unix/dummy.cpp
 
-# Where to put the dynamic libraries on this system?
-OUTDLL=
-
 # The C compiler.
 CC=gcc -c
 
@@ -106,39 +93,6 @@ CXX=g++ -c
 
 # The linker.
 LINK=g++
-
-# The library (archive) manager
-AR=ar
-ARFLAGS=cr
-
-# Command sequence for creating a directory.
-# Note that directories will have forward slashes. Please
-# make sure that this command accepts that (or use 'subst' first).
-MKDIR=mkdir $(@:/=)
-
-# The command to remove all specified files.
-RM=rm -f
-
-# The command to remove a directory tree.
-RMDIR=rm -rf
-
-# Extra parameters for 'sed' which are used for doing 'make depend'.
-SYS_SED_DEPEND=
-
-# If we don't use -fpic we don't need separate output directories
-ifeq ($(CFLAGS.DLL),)
-OUTSUFX.yes=
-endif
-
-#==================================================
-# Extra operation system dependent options.
-#==================================================
-
-# Include support for the XSHM extension in Crystal Space.
-# Note that you don't need to disable this if you don't have XSHM
-# support in your X server because Crystal Space will autodetect
-# the availability of XSHM.
-DO_SHM=yes
 
 endif # ifeq ($(MAKESECTION),defines)
 

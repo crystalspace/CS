@@ -45,14 +45,7 @@ endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 #------------------------------------------------------------------ defines ---#
 ifeq ($(MAKESECTION),defines)
 
-# Typical extension for executables on this system (e.g. EXE=.exe)
-EXE=.exe
-
-# Typical extension for dynamic libraries on this system.
-DLL=.dll
-
-# Typical prefix for library filenames
-LIB_PREFIX=
+include mk/dos.mak
 
 # Extra libraries needed on this system (beside drivers)
 LIBS.EXE=
@@ -123,6 +116,7 @@ ifeq ($(USE_OMF),yes)
   LFLAGS.GENERAL += -Zomf
   NASMFLAGS.SYSTEM=-f obj
 else
+  O=.o
   LIB=.a
   define AR
 	@rm -f $@
@@ -137,9 +131,6 @@ SRC.SYS_CSSYS = libs/cssys/general/printf.cpp libs/cssys/general/timing.cpp \
   libs/cssys/os2/csos2.cpp libs/cssys/os2/loadlib.cpp \
   libs/cssys/os2/scancode.cpp support/gnu/getopt.c support/gnu/getopt1.c
 SRC.SYS_CSSYS_DLL=libs/cssys/os2/dllentry.cpp
-
-# Where to put the dynamic libraries on this system?
-OUTDLL=
 
 # The C compiler (autodetected)
 #CC=gcc -c
@@ -160,29 +151,20 @@ else
   MKDIR = mkdir $@
 endif
 
-# The command to remove all specified files.
-RM=rm -f
-
-# The command to remove a directory tree.
-RMDIR=rm -rf
-
 # For using sockets we should link with sockets library
 NETSOCK_LIBS=-lsocket
-
-# Extra parameters for 'sed' which are used for doing 'make depend'.
-SYS_SED_DEPEND=-e "s/\.ob*j*\:/\$$O:/g"
 
 # Override linker with os2link.exe
 LINK=@$(OS2LINK) --linker=$(LD) --description="$(DESCRIPTION.$@)" --verbose --out=$(OUT)
 LFLAGS.CONSOLE.EXE=--console
 
-# We don't need separate directories for dynamic libraries
-OUTSUFX.yes=
-
 # Defineds for OpenGL 3D driver
 OPENGL.LIBS.DEFINED=1
 CFLAGS.GL3D+=-I/toolkit/h
 LIBS.LOCAL.GL3D+=-lopengl
+
+# Extra parameters for 'sed' which are used for doing 'make depend'.
+SYS_SED_DEPEND=-e "s/\.ob*j*\:/\$$O:/g"
 
 # Use makedep to build dependencies
 DEPEND_TOOL=mkdep

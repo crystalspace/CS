@@ -35,11 +35,7 @@ endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 #------------------------------------------------------------------ defines ---#
 ifeq ($(MAKESECTION),defines)
 
-# Typical extension for executables on this system (e.g. EXE=.exe)
-EXE=.exe
-
-# Typical extension for dynamic libraries on this system.
-DLL=.dll
+include mk/dos.mak
 
 # Typical prefix for library filenames
 LIB_PREFIX=lib
@@ -113,9 +109,6 @@ SRC.SYS_CSSYS = libs/cssys/win32/printf.cpp libs/cssys/win32/timing.cpp \
 SRC.SYS_CSSYS_EXE=libs/cssys/win32/exeentry.cpp
 SRC.SYS_CSSYS_DLL=libs/cssys/win32/dllentry.cpp
 
-# Where to put the dynamic libraries on this system?
-OUTDLL=
-
 # The C compiler
 CC=gcc -c
 
@@ -134,12 +127,6 @@ else
   MKDIR = mkdir $@
 endif
 
-# The command to remove all specified files.
-RM=rm -f
-
-# The command to remove a directory tree.
-RMDIR=rm -rf
-
 # For using sockets we should link with sockets library
 NETSOCK_LIBS=
 
@@ -149,9 +136,6 @@ SYS_SED_DEPEND=-e "s/\.ob*j*\:/\$$O:/g"
 # Flags for linking a GUI and a console executable
 LFLAGS.EXE=-mwindows
 LFLAGS.CONSOLE.EXE=
-
-# We don't need separate directories for dynamic libraries
-OUTSUFX.yes=
 
 # Use makedep to build dependencies
 DEPEND_TOOL=mkdep

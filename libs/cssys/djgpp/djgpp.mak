@@ -35,10 +35,9 @@ endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 #------------------------------------------------------------------ defines ---#
 ifeq ($(MAKESECTION),defines)
 
-vpath %.s libs/cssys/djgpp
+include mk/dos.mak
 
-# Typical extension for executables on this system (e.g. EXE=.exe)
-EXE=.exe
+vpath %.s libs/cssys/djgpp
 
 # Typical extension for dynamic libraries on this system.
 DLL=
@@ -107,9 +106,6 @@ SRC.SYS_CSSYS = libs/cssys/djgpp/djgpp.cpp libs/cssys/djgpp/printf.cpp \
 	libs/cssys/djgpp/djmousys.s libs/cssys/djgpp/djkeysys.s \
 	libs/cssys/general/timing.cpp support/gnu/getopt*.c
 
-# Where to put the dynamic libraries on this system?
-OUTDLL=
-
 # The C compiler.
 CC=gcc -c
 
@@ -118,17 +114,6 @@ CXX=gcc -c
 
 # The linker.
 LINK=gcc
-
-# Command sequence for creating a directory.
-# Note that directories will have forward slashes. Please
-# make sure that this command accepts that (or use 'subst' first).
-MKDIR=-mkdir $(subst /,\,$(@:/=))
-
-# The command to remove all specified files.
-RM=rm -f
-
-# The command to remove a directory tree.
-RMDIR=rm -rf
 
 # Extra parameters for 'sed' which are used for doing 'make depend'.
 SYS_SED_DEPEND=

@@ -53,19 +53,11 @@ endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 #------------------------------------------------------------------ defines ---#
 ifeq ($(MAKESECTION),defines)
 
-# Typical extension for executables on this system (e.g. EXE=.exe)
-EXE=.exe
+include mk/dos.mak
 
-# Typical extension for dynamic libraries on this system.
-DLL=.dll
-
-# Typical extension for static libraries
-LIB=.lib
+# Static library creation command and flags
 AR=wlib
 ARFLAGS=-b -c -fo -n
-
-# Typical prefix for library filenames
-LIB_PREFIX=
 
 # Extra libraries needed on this system.
 ifeq ($(USE_SHARED_PLUGINS),no)
@@ -151,9 +143,6 @@ SRC.SYS_CSSYS = libs/cssys/general/printf.cpp libs/cssys/general/timing.cpp \
   libs/cssys/os2/scancode.cpp support/gnu/getopt.c support/gnu/getopt1.c
 SRC.SYS_CSSYS_DLL=libs/cssys/os2/dllentry.cpp
 
-# Where to put the dynamic libraries on this system?
-OUTDLL=
-
 # The C compiler.
 CC=wcc386
 
@@ -177,20 +166,8 @@ RCFLAGS=-n -I .
 # make sure that this command accepts that (or use 'subst' first).
 MKDIR = mkdir $(subst /,\,$(@:/=))
 
-# The command to remove all specified files.
-RM=rm -f
-
-# The command to remove a directory tree.
-RMDIR=rm -rf
-
 # Extra parameters for 'sed' which are used for doing 'make depend'.
 SYS_SED_DEPEND=-e "s/\.o/$$O/g"
-
-# Object file extension
-O=.obj
-
-# We don't need separate directories for dynamic libraries
-OUTSUFX.yes=
 
 # Use makedep to build dependencies
 DEPEND_TOOL=mkdep

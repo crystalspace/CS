@@ -36,23 +36,15 @@ endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 #------------------------------------------------------------------ defines ---#
 ifeq ($(MAKESECTION),defines)
 
+include mk/dos.mak
+
 # Save the LIB variable for MSVC linker
 MSVCLIB:=$(LIB_SUFFIX)
 
-# Typical extension for executables on this system (e.g. EXE=.exe)
-EXE=.exe
-
-# Typical extension for dynamic libraries on this system.
-DLL=.dll
-
-# Typical extension for static libraries
-LIB_SUFFIX=.lib
+# Static library command and flags
 AR=lib
 ARFLAGS=-nologo
 ARFLAGS.@=-out:$@
-
-# Typical prefix for library filenames
-LIB_PREFIX=
 
 # Where can the Zlib library be found on this system?
 Z_LIBS=-libpath:libs/zlib zdll.lib
@@ -86,12 +78,6 @@ CFLAGS.DLL=-GD
 
 # Flags for compiler to direct output to rule target file
 CFLAGS.@=-Fo$@
-
-# Flags for compiler to define a macro
-CFLAGS.D=-D
-
-# Flags for compiler to define a include directory
-CFLAGS.I=-I
 
 # General flags for the linker which are used in any case.
 LFLAGS.GENERAL=-nologo -implib:$(OUT)null.lib \
@@ -133,9 +119,6 @@ SRC.SYS_CSSYS = libs/cssys/win32/printf.cpp libs/cssys/win32/timing.cpp \
 SRC.SYS_CSSYS_EXE=libs/cssys/win32/exeentry.cpp
 SRC.SYS_CSSYS_DLL=libs/cssys/win32/dllentry.cpp
 
-# Where to put the dynamic libraries on this system?
-OUTDLL=
-
 # The C compiler.
 CC=cl -c
 
@@ -153,25 +136,8 @@ endef
 RC=rc
 RCFLAGS=-r
 
-# Command sequence for creating a directory.
-# Note that directories will have forward slashes. Please
-# make sure that this command accepts that (or use 'subst' first).
-MKDIR = mkdir $(subst /,\,$(@:/=))
-
-# The command to remove all specified files.
-RM=rm -f
-
-# The command to remove a directory tree.
-RMDIR=rm -rf
-
 # Extra parameters for 'sed' which are used for doing 'make depend'.
 SYS_SED_DEPEND=-e "s/\.o/$$O/g"
-
-# Object file extension
-O=.obj
-
-# We don't need separate directories for dynamic libraries
-OUTSUFX.yes=
 
 # Use makedep to build dependencies
 DEPEND_TOOL=mkdep

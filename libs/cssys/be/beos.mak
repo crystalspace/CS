@@ -10,7 +10,7 @@ DRIVERS+=cs3d/software cs3d/line cs2d/be cs2d/openglbe cs3d/opengl \
 # Uncomment the following if you want to build/use Glide.
 # DRIVERS+=cs2d/beglide2 cs3d/glide2
 
-# We don't want assembly for now
+# Be compiler does not currently grok CS assembly
 override DO_ASM=no
 
 #---------------------------------------------------- rootdefines & defines ---#
@@ -25,17 +25,15 @@ OS=BE
 # Compiler. Can be one of: GCC, WCC (Watcom C++), MPWERKS, VC (Visual C++), UNKNOWN
 COMP=GCC
 
-# Typical extension for executables on this system (e.g. EXE=.exe)
-EXE=
+endif # ifneq (,$(findstring defines,$(MAKESECTION)))
+
+#------------------------------------------------------------------ defines ---#
+ifeq ($(MAKESECTION),defines)
+
+include mk/unix.mak
 
 # Typical extension for dynamic libraries on this system.
 DLL=.plugin
-
-# Typical extension for static libraries
-LIB=.a
-
-# Typical prefix for library filenames
-LIB_PREFIX=lib
 
 # Does this system require libsocket.a?
 NEED_SOCKET_LIB=no
@@ -100,36 +98,6 @@ CXX=gcc -c
 
 # The linker.
 LINK=gcc
-
-# The 'make' executable. This should be the GNU make!
-MAKE=make
-
-# Command sequence for creating a directory.
-# Note that directories will have forward slashes. Please
-# make sure that this command accepts that (or use 'subst' first).
-MKDIR=mkdir '$(@:/=)'
-
-# The command to remove all specified files.
-RM=rm -f
-
-# The command to remove a directory tree.
-RMDIR=rm -rf
-
-# Extra parameters for 'sed' which are used for doing 'make depend'.
-SYS_SED_DEPEND=
-
-#==================================================
-# Extra operation system dependent options.
-#==================================================
-
-# Include support for the XSHM extension in Crystal Space.
-# Note that you don't need to disable this if you don't have XSHM
-# support in your X server because Crystal Space will autodetect
-# the availability of XSHM.
-DO_SHM=no
-
-# We don't need separate directories for dynamic libraries
-OUTSUFX.yes=
 
 # Defineds for OpenGL 3D driver
 OPENGL.LIBS.DEFINED=1
