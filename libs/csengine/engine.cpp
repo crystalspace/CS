@@ -1101,6 +1101,15 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
 
   char *reason = NULL;
 
+  bool do_relight = false;
+  if (!(lightcache_mode & CS_ENGINE_CACHE_READ))
+  {
+    if (!(lightcache_mode & CS_ENGINE_CACHE_NOUPDATE))
+      do_relight = true;
+    else if (lightcache_mode & CS_ENGINE_CACHE_WRITE)
+      do_relight = true;
+  }
+
   iCacheManager* cm = GetCacheManager ();
   csRef<iDataBuffer> data (cm->ReadCache ("lm_precalc_info", NULL, ~0));
   if (!data)
@@ -1163,11 +1172,20 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
     {
       cm->CacheData (data, strlen (data), "lm_precalc_info", NULL, ~0);
     }
-    Report ("Lightmap data is not up to date (reason: %s).", reason);
+    if (do_relight)
+    {
+      Report ("Lightmaps are not up to date (%s).", reason);
+    }
+    else
+    {
+      Warn ("Lightmaps are not up to date (%s).", reason);
+      Warn ("Use -relight cmd option to calc lighting.");
+    }
     lightcache_mode &= ~CS_ENGINE_CACHE_READ;
   }
 
-  bool do_relight = false;
+  // Recalculate do_relight since the cache mode might have changed.
+  do_relight = false;
   if (!(lightcache_mode & CS_ENGINE_CACHE_READ))
   {
     if (!(lightcache_mode & CS_ENGINE_CACHE_NOUPDATE))
@@ -1179,12 +1197,6 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
   if (do_relight)
   {
     Report ("Recalculation of lightmaps forced.");
-    Report (
-      "  Pseudo-radiosity system %s.",
-      csSector::do_radiosity ? "enabled" : "disabled");
-    Report (
-      "  Maximum number of visits per sector = %d.",
-      csSector::cfg_reflections);
   }
   else
   {
@@ -1219,6 +1231,7 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
     }
   }
 
+  int failed = 0;
   for (sn = 0; sn < num_meshes; sn++)
   {
     iMeshWrapper *s = (iMeshWrapper *)meshes[sn];
@@ -1230,11 +1243,17 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
         if (do_relight)
           linfo->InitializeDefault ();
         else
-          linfo->ReadFromCache (cm);
+          if (!linfo->ReadFromCache (cm))
+	    failed++;
       }
     }
 
     if (do_relight && meter) meter->Step ();
+  }
+  if (failed > 0)
+  {
+    Warn ("Couldn't load cached lighting for %d objects!", failed);
+    Warn ("Use -relight cmd option to refresh lighting.");
   }
 
   csTicks start, stop;
@@ -1320,7 +1339,11 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
   if (do_relight && (lightcache_mode & CS_ENGINE_CACHE_WRITE))
   {
     Report ("Updating VFS....");
-    if (!VFS->Sync()) Warn ("Error updating lighttable cache!");
+    if (!VFS->Sync())
+    {
+      Warn ("Error updating lighttable cache!");
+      Warn ("Perhaps disk full or no write permission?");
+    }
     Report ("DONE!");
   }
 }
@@ -1365,12 +1388,12 @@ iEngineSequenceManager* csEngine::GetEngineSequenceManager ()
     	  "crystalspace.utilities.sequence.engine", iEngineSequenceManager);
       if (!eseqmgr)
       {
-        Report ("Could not load the engine sequence manager!");
+        Warn ("Could not load the engine sequence manager!");
         return NULL;
       }
       if (!object_reg->Register (eseqmgr, "iEngineSequenceManager"))
       {
-        Report ("Could not register the engine sequence manager!");
+        Warn ("Could not register the engine sequence manager!");
         return NULL;
       }
     }

@@ -25,10 +25,36 @@
 #include "ivaria/stdrep.h"
 #include "ivaria/reporter.h"
 #include "csutil/csstring.h"
+#include "csutil/refcount.h"
+#include "csutil/refarr.h"
+#include "csutil/util.h"
 
 struct iConsoleOutput;
 struct iFile;
 struct iNativeWindowManager;
+
+/**
+ * Class to keep track of timed messages.
+ */
+class csTimedMessage : public csRefCount
+{
+public:
+  char* msg;
+  csTicks time;
+
+  csTimedMessage () : msg (NULL) { }
+  csTimedMessage (const char* m)
+  {
+    msg = csStrNew (m);
+    time = 0;
+  }
+
+protected:
+  virtual ~csTimedMessage ()
+  {
+    delete[] msg;
+  }
+};
 
 /**
  * This plugin will listen to a reporter plugin and uses the console,
@@ -49,8 +75,10 @@ private:
   bool dest_console[5];
   bool dest_alert[5];
   bool dest_debug[5];
+  bool dest_popup[5];
   bool msg_remove[5];
   bool show_msgid[5];
+  csRefArray<csTimedMessage> messages;
 
   static csString DefaultDebugFilename();
 
@@ -60,6 +88,7 @@ public:
   csReporterListener (iBase *iParent);
   virtual ~csReporterListener ();
   virtual bool Initialize (iObjectRegistry *object_reg);
+  bool HandleEvent (iEvent& event);
 
   virtual void SetOutputConsole (iConsoleOutput* console);
   virtual void SetNativeWindowManager (iNativeWindowManager* wm);
@@ -68,7 +97,7 @@ public:
   virtual void SetDefaults ();
   virtual void SetMessageDestination (int severity,
   	bool do_stdout, bool do_stderr, bool do_console,
-	bool do_alert, bool do_debug);
+	bool do_alert, bool do_debug, bool do_popup = false);
   virtual void RemoveMessages (int severity, bool remove);
   virtual void ShowMessageID (int severity, bool showid);
 
@@ -91,6 +120,27 @@ public:
       return scfParent->Report (reporter, severity, msgId, description);
     }
   } scfiReporterListener;
+
+  // This is not an embedded interface in order to avoid
+  // a circular reference between this registered event handler
+  // and the parent object.
+  class EventHandler : public iEventHandler
+  {
+  private:
+    csReporterListener* parent;
+  public:
+    EventHandler (csReporterListener* parent)
+    {
+      SCF_CONSTRUCT_IBASE (NULL);
+      EventHandler::parent = parent;
+    }
+    virtual ~EventHandler () { }
+    SCF_DECLARE_IBASE;
+    virtual bool HandleEvent (iEvent& ev)
+    {
+      return parent->HandleEvent (ev);
+    }
+  } *scfiEventHandler;
 };
 
 #endif // __CS_STDREP_H__

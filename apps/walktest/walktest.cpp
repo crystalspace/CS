@@ -1348,13 +1348,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     return false;
   }
 
-  // performance statistics module, also takes care of fps
+  // performance statistics module.
   perf_stats = CS_QUERY_REGISTRY (object_reg, iPerfStats);
-  if (!perf_stats)
-  {
-    Report (CS_REPORTER_SEVERITY_WARNING,
-    	"No iPerfStats plugin: you will have no performance statistics!");
-  }
 
   // csView is a view encapsulating both a camera and a clipper.
   // You don't have to use csView as you can do the same by

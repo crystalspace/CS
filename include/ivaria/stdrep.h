@@ -25,7 +25,7 @@ struct iConsoleOutput;
 struct iNativeWindowManager;
 struct iReporter;
 
-SCF_VERSION (iStandardReporterListener, 0, 0, 1);
+SCF_VERSION (iStandardReporterListener, 0, 0, 2);
 
 /**
  * Interface to control the settings of the reporter listener plugin.
@@ -55,7 +55,7 @@ struct iStandardReporterListener : public iBase
    */
   virtual void SetMessageDestination (int severity,
   	bool do_stdout, bool do_stderr, bool do_console,
-	bool do_alert, bool do_debug) = 0;
+	bool do_alert, bool do_debug, bool do_popup = false) = 0;
 
   /**
    * Control if this reporter listener should remove messages of a certain

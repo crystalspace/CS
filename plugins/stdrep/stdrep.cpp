@@ -23,11 +23,15 @@
 #include "csutil/scf.h"
 #include "csutil/util.h"
 #include "cssys/sysfunc.h"
+#include "iutil/event.h"
 #include "iutil/eventh.h"
+#include "iutil/eventq.h"
+#include "iutil/evdefs.h"
 #include "iutil/comp.h"
 #include "iutil/objreg.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
+#include "ivideo/fontserv.h"
 #include "ivideo/natwin.h"
 #include "ivaria/conout.h"
 
@@ -40,6 +44,10 @@ SCF_EXPORT_CLASS_TABLE (stdrep)
     "Standard Reporter Listener",
     "crystalspace.utilities.reporter, crystalspace.console.output.")
 SCF_EXPORT_CLASS_TABLE_END
+
+SCF_IMPLEMENT_IBASE (csReporterListener::EventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
+SCF_IMPLEMENT_IBASE_END
 
 void csReporterListener::DecRef ()
 {
@@ -91,29 +99,31 @@ csReporterListener::csReporterListener (iBase *iParent)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiReporterListener);
   object_reg = NULL;
   reporter = NULL;
-  debug_filename = DefaultDebugFilename();
+  scfiEventHandler = NULL;
+
+  debug_filename = DefaultDebugFilename ();
 #ifdef CS_DEBUG
   SetMessageDestination (
-  	CS_REPORTER_SEVERITY_BUG, false, true, true, true, true);
+  	CS_REPORTER_SEVERITY_BUG, false, true, true, true, true, false);
   SetMessageDestination (
-  	CS_REPORTER_SEVERITY_ERROR, false, true, true, true, true);
+  	CS_REPORTER_SEVERITY_ERROR, false, true, true, true, true, false);
   SetMessageDestination (
-  	CS_REPORTER_SEVERITY_WARNING, true, false, true, false, true);
+  	CS_REPORTER_SEVERITY_WARNING, true, false, true, false, true, true);
   SetMessageDestination (
-  	CS_REPORTER_SEVERITY_NOTIFY, true, false, true, false, true);
+  	CS_REPORTER_SEVERITY_NOTIFY, true, false, true, false, true, false);
   SetMessageDestination (
-  	CS_REPORTER_SEVERITY_DEBUG, true, false, true, false, true);
+  	CS_REPORTER_SEVERITY_DEBUG, true, false, true, false, true, false);
 #else
   SetMessageDestination (
-  	CS_REPORTER_SEVERITY_BUG, false, true, true, true, true);
+  	CS_REPORTER_SEVERITY_BUG, false, true, true, true, true, false);
   SetMessageDestination (
-  	CS_REPORTER_SEVERITY_ERROR, false, true, true, true, true);
+  	CS_REPORTER_SEVERITY_ERROR, false, true, true, true, true, false);
   SetMessageDestination (
-  	CS_REPORTER_SEVERITY_WARNING, true, false, true, false, false);
+  	CS_REPORTER_SEVERITY_WARNING, true, false, true, false, false, true);
   SetMessageDestination (
-  	CS_REPORTER_SEVERITY_NOTIFY, false, false, true, false, false);
+  	CS_REPORTER_SEVERITY_NOTIFY, false, false, true, false, false, false);
   SetMessageDestination (
-  	CS_REPORTER_SEVERITY_DEBUG, false, false, false, false, true);
+  	CS_REPORTER_SEVERITY_DEBUG, false, false, false, false, true, false);
 #endif
   RemoveMessages (CS_REPORTER_SEVERITY_BUG, true);
   RemoveMessages (CS_REPORTER_SEVERITY_ERROR, true);
@@ -148,12 +158,29 @@ csReporterListener::~csReporterListener ()
     if (rep == reporter)
       reporter->RemoveReporterListener (&scfiReporterListener);
   }
+
+  if (scfiEventHandler)
+  {
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+    if (q)
+      q->RemoveListener (scfiEventHandler);
+    scfiEventHandler->DecRef ();
+  }
 }
 
 bool csReporterListener::Initialize (iObjectRegistry* r)
 {
   object_reg = r;
   SetDefaults ();
+
+  if (!scfiEventHandler)
+  {
+    scfiEventHandler = new EventHandler (this);
+  }
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+  if (q != 0)
+    q->RegisterListener (scfiEventHandler, CSMASK_Nothing);
+
   return true;
 }
 
@@ -178,17 +205,83 @@ bool csReporterListener::Report (iReporter*, int severity,
   {
     if (!debug_file.IsValid())
     {
-      csRef<iVFS> vfs(CS_QUERY_REGISTRY(object_reg, iVFS));
+      csRef<iVFS> vfs (CS_QUERY_REGISTRY (object_reg, iVFS));
       if (vfs.IsValid())
-        debug_file = vfs->Open(debug_filename, VFS_FILE_WRITE);
+        debug_file = vfs->Open (debug_filename, VFS_FILE_WRITE);
     }
     if (debug_file.IsValid())
     {
-      debug_file->Write(msg.GetData(), msg.Length());
-      debug_file->Flush();
+      debug_file->Write (msg.GetData(), msg.Length());
+      debug_file->Flush ();
     }
   }
+  if (dest_popup[severity])
+  {
+    csRef<csTimedMessage> tm = csPtr<csTimedMessage> (
+    	new csTimedMessage (msg.GetData ()));
+    messages.Push (tm);
+  }
   return msg_remove[severity];
+}
+
+bool csReporterListener::HandleEvent (iEvent& event)
+{
+  if (event.Type == csevBroadcast)
+  {
+    if (event.Command.Code == cscmdPostProcess)
+    {
+      int l = messages.Length ();
+      if (l > 0)
+      {
+	int i;
+        csRef<iGraphics2D> g2d = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
+        iFontServer* fntsvr = g2d->GetFontServer ();
+        if (fntsvr)
+        {
+          csRef<iFont> fnt (fntsvr->GetFont (0));
+	  if (fnt)
+	  {
+	    int sw = g2d->GetWidth ();
+	    int sh = g2d->GetHeight ();
+	    int fw, fh;
+	    fnt->GetMaxSize (fw, fh);
+	    int fg = g2d->FindRGB (0, 0, 0);
+	    int bg = g2d->FindRGB (255, 255, 0);
+	    int max_l = (sh-4-6-4-6) / (fh+4);
+	    if (l > max_l) l = max_l;
+	    g2d->DrawBox (4, 4, sw-8, 6 + l*(fh+4)-4 + 6, bg);
+	    for (i = 0 ; i < l ; i++)
+	    {
+	      csTimedMessage* tm = messages[i];
+              g2d->Write (fnt, 4+6, 4+6+i*(fh+4), fg, bg, tm->msg);
+	      // Set the time the first time we could actually display it.
+	      if (tm->time == 0) tm->time = csGetTicks () + 10000;
+	    }
+	    csTicks t = csGetTicks ();
+	    i = 0;
+	    // We only time out the messages we could actually display.
+	    // That way the messages that didn't have a chance to display
+	    // will be displayed later.
+	    while (i < l)
+	    {
+	      csTimedMessage* tm = messages[i];
+	      if (tm->time != 0 && t > tm->time)
+	      {
+	        messages.Delete (i);
+	        l--;
+	      }
+	      else
+	      {
+	        i++;
+	      }
+	    }
+          }
+        }
+      }
+    }
+  }
+
+  return false;
 }
 
 void csReporterListener::SetOutputConsole (iConsoleOutput* console)
@@ -249,7 +342,7 @@ void csReporterListener::SetDefaults ()
 
 void csReporterListener::SetMessageDestination (int severity,
   	bool do_stdout, bool do_stderr, bool do_console,
-	bool do_alert, bool do_debug)
+	bool do_alert, bool do_debug, bool do_popup)
 {
   CS_ASSERT (severity >= 0 && severity <= 4);
   dest_stdout[severity] = do_stdout;
@@ -257,6 +350,7 @@ void csReporterListener::SetMessageDestination (int severity,
   dest_console[severity] = do_console;
   dest_alert[severity] = do_alert;
   dest_debug[severity] = do_debug;
+  dest_popup[severity] = do_popup;
 }
 
 void csReporterListener::RemoveMessages (int severity, bool remove)

@@ -2,6 +2,19 @@ The history order is reversed so that new features are at the top.
 
 17-Dec-2002
 	- Fixed the fix on reparenting of a mesh object for the culler.
+	- Added 'do_popup' parameter to iStandardReporterListener->
+	  SetMessageDestination(). This has default 'false' as value so
+	  it remains backwards compatible. When this flag is set the
+	  message will appear on a graphical dialog that goes away
+	  after a while (currently 10 seconds).
+	- Removed misleading comment from missing iPerfStats plugin.
+	  It is now bugplug that does fps.
+	- Engine now gives a clearly visible warning if relighting is needed.
+	- Engine now reports (using the new popup warning) the number of
+	  objects for which it couldn't load cached lighting and also
+	  indicates that -relight is needed to fix that.
+	- Made engine reporting a little less verbose to avoid confusing
+	  people.
 16-Dec-2002
 	- Completely removed the old octree culler. This has a great impact
 	  on the internal engine structure. It greatly simplifies both
