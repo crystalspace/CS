@@ -126,9 +126,11 @@ bool csTerrain::Initialize (char* heightmap)
 }
 
 // Z depth queue iterator
-static ddgSplayIterator		*_qzi = NULL, *qri;
+// static ddgSplayIterator	*_qzi = NULL, *qri;
+static ddgSplayIterator		*qri;
 // Z depth queue.
-static ddgQueue		*_qz = NULL, *qr;
+// static ddgQueue		*_qz = NULL, *qr;
+static ddgQueue			*qr;
 
 void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
 {
