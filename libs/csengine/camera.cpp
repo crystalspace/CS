@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998, 2000 by Jorrit Tyberghein
     Camera code written by Ivan Avramovic <ivan@avramovic.com>
   
     This library is free software; you can redistribute it and/or
@@ -29,6 +29,7 @@ IMPLEMENT_IBASE_END
 
 int csCamera::default_aspect = 0;
 float csCamera::default_inv_aspect = 0;
+float csCamera::default_fov_angle = 90;
 
 csCamera::csCamera () : csOrthoTransform()
 {
@@ -37,6 +38,7 @@ csCamera::csCamera () : csOrthoTransform()
   sector = NULL;
   aspect = default_aspect;
   inv_aspect = default_inv_aspect;
+  fov_angle = default_fov_angle;
   shift_x = csWorld::frame_width / 2;
   shift_y = csWorld::frame_height / 2;
   use_farplane = false;
@@ -48,6 +50,7 @@ csCamera::csCamera (csCamera* c) : csOrthoTransform (*c)
   mirror = c->mirror;
   sector = c->sector;
   aspect = c->aspect;
+  fov_angle = c->fov_angle;
   inv_aspect = c->inv_aspect;
   shift_x = c->shift_x;
   shift_y = c->shift_y;
@@ -196,12 +199,29 @@ void csCamera::Correct (int n, float* vals[])
   *vals[0] = r*cos(angle);  *vals[1] = r*sin(angle); 
 }
 
-float csCamera::GetAspect ()
+void csCamera::SetFOVAngle (float a, int width)
 {
-  return inv_aspect;
+  float disp_width = (float)width/2.;
+  float disp_radius = disp_width / cos (a/(2.*(360./(2.*M_PI))));
+  float rview_fov = sqrt (disp_radius*disp_radius - disp_width*disp_width);
+  aspect = int (rview_fov*2.);
+  inv_aspect = 1.0f / (rview_fov*2.);
+  fov_angle = a;
 }
 
-float csCamera::GetInvAspect ()
+void csCamera::ComputeAngle (int width)
 {
-  return aspect;
+  float rview_fov = (float)GetFOV ()/2.;
+  float disp_width = (float)width/2.;
+  float disp_radius = sqrt (rview_fov*rview_fov + disp_width*disp_width);
+  fov_angle = 2. * acos (disp_width / disp_radius) * (360./(2.*M_PI));
 }
+
+void csCamera::ComputeDefaultAngle (int width)
+{
+  float rview_fov = (float)GetDefaultFOV ()/2.;
+  float disp_width = (float)width/2.;
+  float disp_radius = sqrt (rview_fov*rview_fov + disp_width*disp_width);
+  default_fov_angle = 2. * acos (disp_width / disp_radius) * (360./(2.*M_PI));
+}
+

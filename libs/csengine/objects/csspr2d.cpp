@@ -125,7 +125,7 @@ void csSprite2D::UpdateLighting (csLight** lights, int num_lights)
   if (!lighting) return;
   csColor color (0, 0, 0);
 
-  csSector* sect = GetSector (0);
+  csSector* sect = movable.GetSector (0);
   if (sect)
   {
     int r, g, b;

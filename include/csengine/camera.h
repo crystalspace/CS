@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,2000 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -71,6 +71,14 @@ private:
   float shift_x;
   float shift_y;
 
+  /// FOV in angles (degrees).
+  float fov_angle;
+  static float default_fov_angle;
+
+  /// Compute above angle.
+  void ComputeAngle (int width);
+  static void ComputeDefaultAngle (int width);
+
 public:
   ///
   csCamera ();
@@ -86,23 +94,39 @@ public:
   csPolygon3D* GetHit (csVector3& v);
 
   /// Set the default FOV for new cameras.
-  static void SetDefaultFOV (int fov)
+  static void SetDefaultFOV (int fov, int width)
   {
     default_aspect = fov;
     default_inv_aspect = 1.0f / default_aspect;
+    ComputeDefaultAngle (width);
   }
 
   /// Get the default FOV for new cameras.
   static int GetDefaultFOV () { return default_aspect; }
   /// Get the default inverse FOV for new cameras.
   static float GetDefaultInvFOV () { return default_inv_aspect; }
+  /// Get the default FOV in angles (degrees).
+  static float GetDefaultFOVAngle () { return default_fov_angle; }
 
   /// Set the FOV for this camera.
-  virtual void SetFOV (int a) { aspect = a; inv_aspect = 1.0f / a; }
+  void SetFOV (int a, int width)
+  {
+    aspect = a;
+    inv_aspect = 1.0f / a;
+    ComputeAngle (width);
+  }
   /// Get the FOV for this camera
   int GetFOV () const { return aspect; }
   /// Get the inverse FOV for this camera.
   float GetInvFOV () const { return inv_aspect; }
+
+  /// Set the FOV in angles (degrees).
+  void SetFOVAngle (float a, int width);
+  /// Get the FOV in angles (degrees).
+  float GetFOVAngle ()
+  {
+    return fov_angle;
+  }
 
   /// Get the X shift value.
   float GetShiftX () const { return shift_x; }
@@ -293,9 +317,9 @@ public:
   ///------------------------ iCamera implementation ------------------------
   DECLARE_IBASE;
   ///
-  virtual float GetAspect ();
+  virtual float GetAspect () { return aspect; }
   ///
-  virtual float GetInvAspect ();
+  virtual float GetInvAspect () { return inv_aspect; }
 
 private:
   ///

@@ -59,6 +59,9 @@ to the height (in pixels) of the current display. Press @key{f} or
 corresponds with the @code{-fov} commandline option and with the FOV
 configuration option.
 
+@item fovangle
+Control the FOV (Field Of Vision) of the display in angles (degrees).
+
 @item cosfact
 Control the cosinus factor (default 0) used for lighting. For details,
 @xref{Config Lighting}.

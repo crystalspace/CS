@@ -64,20 +64,6 @@ bool csFrustumView::DeregisterCleanup (csFrustrumViewCleanup *action)
 
 //---------------------------------------------------------------------------
 
-void csRenderView::ComputeAngle ()
-{
-  float rview_fov = (float)GetFOV ()/2.;
-  float disp_width = (float)g3d->GetWidth ()/2.;
-  float disp_radius = sqrt (rview_fov*rview_fov + disp_width*disp_width);
-  fov_angle = 2. * acos (disp_width / disp_radius) * (360./(2.*M_PI));
-}
-
-void csRenderView::SetFOV (int a)
-{
-  csCamera::SetFOV (a);
-  ComputeAngle ();
-}
-
 csRenderView::csRenderView () :
     csCamera (), world (NULL), view (NULL), g3d (NULL), g2d (NULL),
     portal_polygon (NULL), previous_sector (NULL), this_sector (NULL),
@@ -85,7 +71,6 @@ csRenderView::csRenderView () :
     callback (NULL), callback_data (NULL), fog_info (NULL),
     added_fog_info (false)
 {
-  ComputeAngle ();
 }
 
 csRenderView::csRenderView (const csCamera& c) :
@@ -95,7 +80,6 @@ csRenderView::csRenderView (const csCamera& c) :
     callback (NULL), callback_data (NULL), fog_info (NULL),
     added_fog_info (false)
 {
-  ComputeAngle ();
 }
 
 csRenderView::csRenderView (const csCamera& c, csClipper* v, iGraphics3D* ig3d,
@@ -106,6 +90,5 @@ csRenderView::csRenderView (const csCamera& c, csClipper* v, iGraphics3D* ig3d,
     callback (NULL), callback_data (NULL), fog_info (NULL),
     added_fog_info (false)
 {
-  ComputeAngle ();
 }
 

@@ -1,5 +1,20 @@
 The history order has been reversed so that new features are at the top.
 
+30-Aug-2000
+	- Removed csSprite::GetSector and GetSectors since that is now
+	  part of the csMovable. Forgot to do that yesterday.
+	- iCamera::GetAspect and GetInvAspect returned the wrong values
+	  (GetAspect returned inv_aspect and vice versa).
+	- Moved calculation of the FOV angle to csCamera. This makes
+	  the engine a bit more efficient since this was now done every
+	  time a portal was traversed. This saves four divides, five
+	  multiplies, an acos, and an sqrt for every portal every frame.
+	- Added csCamera::SetFOVAngle() to set the FOV using an angle
+	  in degrees.
+	- Added a 'width' parameter to csCamera::SetDefaultFOV() and
+	  csCamera::SetFOV() so that the FOV in angles can be computed.
+	- Added 'fovangle' console command to get/set the FOV with degrees
+	  as a parameter.
 29-Aug-2000
 	- Integrated a new SDL canvas made by George Yohng
 	  <cspace@mmts.nsys.by>.

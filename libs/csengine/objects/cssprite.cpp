@@ -370,6 +370,11 @@ csSprite::csSprite (csObject* theParent) : csObject ()
   myOwner = NULL;
   parent = theParent;
   movable.SetObject (this);
+  if (parent->GetType () >= csSprite::Type)
+  {
+    csSprite* sparent = (csSprite*)parent;
+    movable.SetParent (&sparent->GetMovable ());
+  }
 }
 
 csSprite::~csSprite ()
@@ -414,17 +419,6 @@ void csSprite::RemoveFromSectors ()
   }
 }
 
-csVector& csSprite::GetSectors ()
-{
-  if (parent->GetType () == csWorld::Type) return movable.GetSectors ();
-  else if (parent->GetType () >= csSprite::Type)
-  {
-    csSprite* sppar = (csSprite*)parent;
-    return sppar->GetSectors ();
-  }
-  else return movable.GetSectors ();	// @@@ Not valid!
-}
-
 /// The list of lights that hit the sprite
 static DECLARE_GROWING_ARRAY_REF (light_worktable, csLight*);
 
@@ -435,7 +429,7 @@ void csSprite::UpdateDeferedLighting (const csVector3& pos)
     if (defered_num_lights > light_worktable.Limit ())
       light_worktable.SetLimit (defered_num_lights);
 
-    csSector* sect = GetSector (0);
+    csSector* sect = movable.GetSector (0);
     int num_lights = csWorld::current_world->GetNearbyLights (sect,
       pos, defered_lighting_flags,
       light_worktable.GetArray (), defered_num_lights);
@@ -699,7 +693,7 @@ void csSprite3D::UpdateInPolygonTrees ()
   // moving in normal convex sectors.
   int i;
   csPolygonTree* tree = NULL;
-  csVector& sects = GetSectors ();
+  csVector& sects = movable.GetSectors ();
   for (i = 0 ; i < sects.Length () ; i++)
   {
     tree = ((csSector*)sects[i])->GetStaticTree ();
@@ -1160,7 +1154,7 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
   // this is so that sprite gets blackened if no light strikes it
   AddVertexColor (0, csColor (0, 0, 0));
 
-  csSector * sect = GetSector (0);
+  csSector * sect = movable.GetSector (0);
   if (sect)
   {
     int r, g, b;

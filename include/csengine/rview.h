@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,2000 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -95,13 +95,6 @@ public:
  */
 class csRenderView : public csCamera
 {
-private:
-  /// FOV in angles (degrees).
-  float fov_angle;
-
-  /// Compute above angle.
-  void ComputeAngle ();
-
 public:
   /// A pointer to the world.
   csWorld* world;
@@ -200,18 +193,6 @@ public:
     rightx = rx;
     topy = ty;
     boty = by;
-  }
-
-  /**
-   * Override SetFOV from csCamera so that we can calculate the FOV
-   * in angles here.
-   */
-  virtual void SetFOV (int a);
-
-  /// Get the FOV in angles (degrees).
-  float GetFOVAngle ()
-  {
-    return fov_angle;
   }
 };
 

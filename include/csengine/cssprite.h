@@ -392,8 +392,6 @@ protected:
 protected:
   /**
    * Position in the world.
-   * The list of sectors in this object is only valid
-   * if the sprite is connected directly to the world (ugly!@@@).
    */
   csMovable movable;
 
@@ -427,20 +425,6 @@ public:
   void SetParentContainer (csObject* newParent) { parent = newParent; }
   /// Get parent container for this sprite.
   csObject* GetParentContainer () { return parent; }
-
-  /**
-   * Get list of sectors for this sprite. This is either the
-   * list of sectors for this sprite itself if the sprite is linked
-   * directly to the world or else the list of sectors for the parent
-   * object that contains this sprite.
-   */
-  csVector& GetSectors ();
-
-  /**
-   * Get the specified sector where this sprite lives.
-   * (conveniance function).
-   */
-  csSector* GetSector (int idx) { return (csSector*)GetSectors ()[idx]; }
 
   /// Get the pointer to the object to place in the polygon tree.
   csPolyTreeObject* GetPolyTreeObject ()

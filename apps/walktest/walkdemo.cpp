@@ -700,7 +700,7 @@ extern int num_our_cd;
 void move_ghost (csSprite3D* spr)
 {
   csCollider* col = csCollider::GetCollider (*spr);
-  csSector* first_sector = spr->GetSector (0);
+  csSector* first_sector = spr->GetMovable ().GetSector (0);
 
   // Create a transformation 'test' which indicates where the ghost
   // is moving too.

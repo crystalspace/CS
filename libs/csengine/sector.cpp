@@ -1042,7 +1042,7 @@ void csSector::Draw (csRenderView& rview)
       if (sprite_queue) sp = sprite_queue[i];
       else sp = (csSprite*)sprites[i];
 
-      if (!previous_sector || sp->GetSectors ().Find (previous_sector) == -1)
+      if (!previous_sector || sp->GetMovable ().GetSectors ().Find (previous_sector) == -1)
       {
         // Sprite is not in the previous sector or there is no previous sector.
         sp->Draw (rview);

@@ -668,7 +668,7 @@ bool csWorld::HandleEvent (iEvent &Event)
         frame_width = G3D->GetWidth ();
         frame_height = G3D->GetHeight ();
         if (csCamera::GetDefaultFOV () == 0)
-          csCamera::SetDefaultFOV (frame_height);
+          csCamera::SetDefaultFOV (frame_height, frame_width);
 
         // @@@ Ugly hack to always have a camera in current_camera.
         // This is needed for the lighting routines.

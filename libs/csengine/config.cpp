@@ -64,7 +64,7 @@ bool csWorld::csWorldConfig::SetOption (int id, csVariant* value)
 {
   switch (id)
   {
-    case 0:  csCamera::SetDefaultFOV (value->v.l); break;
+    case 0:  csCamera::SetDefaultFOV (value->v.l, scfParent->G3D->GetWidth ()); break;
     case 1:  csSector::do_radiosity = value->v.b; break;
     case 2:  csPolyTexture::cfg_cosinus_factor = value->v.f; break;
     case 3:  csSector::cfg_reflections = value->v.l; break;
