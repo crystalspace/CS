@@ -195,15 +195,14 @@ int csNetworkSocket2::SetSocketBroadcast (bool broadcast)
     else
     {
       broadcasting = broadcast;
-      char const flag = (broadcast ? 0x00 : 0xff);
-      if (setsockopt(socketfd,SOL_SOCKET,SO_BROADCAST,&flag,sizeof(flag)) == 0)
+      if (setsockopt(socketfd, SOL_SOCKET, SO_BROADCAST, (char *)&broadcast, sizeof(int)) == 0)
         last_error = CS_NET_SOCKET_NOERROR;
       else
         last_error = CS_NET_SOCKET_BROADCAST_ERROR;
     }
   }
   else
-    last_error = CS_NET_SOCKET_NOTCONNECTED;
+    last_error = CS_NET_SOCKET_BROADCAST_ERROR;
   return last_error;
 }
 
@@ -217,14 +216,17 @@ int csNetworkSocket2::SetBroadcastOptions (int port, const char* addr)
     }
     else
     {
-      local_addr.sin_family = AF_INET;
-      local_addr.sin_port = htons(port);
-      local_addr.sin_addr.s_addr = inet_addr(addr);
+      broadcast_addr.sin_family = AF_INET;
+      broadcast_addr.sin_port = htons(port);
+      if(addr)
+        broadcast_addr.sin_addr.s_addr = inet_addr(addr);
+      else
+	broadcast_addr.sin_addr.s_addr = INADDR_BROADCAST;
       last_error = CS_NET_SOCKET_NOERROR;
     }
   }
   else
-    last_error = CS_NET_SOCKET_NOTCONNECTED;
+    last_error = CS_NET_SOCKET_BROADCAST_ERROR;
   return last_error;
 }
 
@@ -422,12 +424,17 @@ int csNetworkSocket2::Send (char const* buff, size_t size)
   else // (connected || proto_type == SOCK_DGRAM)
   {
     if (proto_type == SOCK_DGRAM)
-    {
+    {																
       if(broadcasting)
        result = sendto(socketfd, buff, size, 0, (struct sockaddr*)&broadcast_addr,
           sizeof(struct sockaddr));
       else
+      if(connected)
        result = sendto(socketfd, buff, size, 0, (struct sockaddr*)&remote_addr,
+         sizeof(struct sockaddr));
+      else 
+       // in this case we send data to user that is not connected (if user sends broadcast data)
+       result = sendto(socketfd, buff, size, 0, (struct sockaddr*)&local_addr,
           sizeof(struct sockaddr));
     }
     else
