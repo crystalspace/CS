@@ -342,9 +342,7 @@ void csStuffObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
  iMeshObjectDrawCallback* csStuffObject::GetVisibleCallback () const { return vis_cb; };
  void csStuffObject::NextFrame (unsigned int ticks)
  {
-	// while(time<ticks) 
-	 //{
-	 if ( time!=0 ) 
+     if ( time!=0 ) 
 	 {
 	      while ( ticks>time ) 
 		  {		  
@@ -355,10 +353,6 @@ void csStuffObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
     {
 	time=ticks;  	
 	};	 
-		 //time++;
-	   //printf(" %u %u \n",time,ticks);
-	 //};
-   //UpdateMesh();
  };
  bool csStuffObject::WantToDie () const { return false; };
  void csStuffObject::HardTransform (const csReversibleTransform &) {};
