@@ -22,7 +22,7 @@
 #include "qint.h"
 #include "qsqrt.h"
 #include "csgeom/math3d.h"
-#include "kdtree.h"
+#include "csgeom/kdtree.h"
 
 //---------------------------------------------------------------------------
 

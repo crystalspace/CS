@@ -4,7 +4,9 @@ The history order is reversed so that new features are at the top.
 	- Philip Wyett fixed some old legacy instructions reported
 	  by 'Sqee' (docs mailing list) in the MSVC7 build documentation,
 	  still around from before we had MSVC7 projects files in CVS.
-	    - Removed '.cvsignore' and thus 'lib3ds' dir as it's not needed.
+	- Moved the kdtree code from Dynavis and Frustvis to csgeom. That
+	  way the code can be shared and used for other purposes too.
+	- Removed '.cvsignore' and thus 'lib3ds' dir as it's not needed.
 6-Mar-2003
 	- Reworked the notion of curve templates. The iCurveTemplate has
 	  been removed and it's functionality has moved to iCurve itself.

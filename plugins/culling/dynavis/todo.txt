@@ -1,5 +1,3 @@
-- IMPORTANT: fix bug with moving objects with dynavis AND frustvis.
-
 - Seperate the outline info from csObjectModel. An outline is not attached
   to a model but to an instance of a model (perhaps make
   csObjectModelInstance?).
@@ -15,8 +13,6 @@
 - Predict quality of occluders.
 
 - VPT (Visible Point Tracking).
-
-- Automatic rebalancing of KD-tree.
 
 - Only calculate planes, edges, active edges in model when REALLY
   needed (i.e. delay).

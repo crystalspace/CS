@@ -33,8 +33,8 @@
 #include "iengine/mesh.h"
 #include "imesh/thing/thing.h"
 
-class csSimpleKDTree;
-class csSimpleKDTreeChild;
+class csKDTree;
+class csKDTreeChild;
 class csFrustumVis;
 struct iPolygonMesh;
 struct iMovable;
@@ -52,7 +52,7 @@ class csFrustVisObjectWrapper : public iObjectModelListener,
 public:
   csFrustumVis* frustvis;
   iVisibilityObject* visobj;
-  csSimpleKDTreeChild* child;
+  csKDTreeChild* child;
   long update_number;	// Last used update_number from movable.
   long shape_number;	// Last used shape_number from model.
 
@@ -92,7 +92,7 @@ public:
 
 private:
   iObjectRegistry *object_reg;
-  csSimpleKDTree* kdtree;
+  csKDTree* kdtree;
   csVector visobj_vector;
   int scr_width, scr_height;	// Screen dimensions.
   uint32 current_visnr;
@@ -121,7 +121,7 @@ public:
   // Test visibility for the given node. Returns true if visible.
   // This function will also modify the frustum_mask in 'data'. So
   // take care to restore this later if you recurse down.
-  bool TestNodeVisibility (csSimpleKDTree* treenode,
+  bool TestNodeVisibility (csKDTree* treenode,
   	FrustTest_Front2BackData* data, uint32& frustum_mask);
 
   // Test visibility for the given object. Returns true if visible.

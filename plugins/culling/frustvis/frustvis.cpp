@@ -29,6 +29,7 @@
 #include "csgeom/obb.h"
 #include "csgeom/segment.h"
 #include "csgeom/sphere.h"
+#include "csgeom/kdtree.h"
 #include "igeom/polymesh.h"
 #include "igeom/objmodel.h"
 #include "csutil/flags.h"
@@ -49,7 +50,6 @@
 #include "iutil/object.h"
 #include "ivaria/reporter.h"
 #include "frustvis.h"
-#include "fkdtree.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -204,7 +204,7 @@ bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
     scr_height = 480;
   }
 
-  kdtree = new csSimpleKDTree (NULL);
+  kdtree = new csKDTree (NULL);
 
   return true;
 }
@@ -354,7 +354,7 @@ struct FrustTest_Front2BackData
   csPlane3 frustum[32];
 };
 
-bool csFrustumVis::TestNodeVisibility (csSimpleKDTree* treenode,
+bool csFrustumVis::TestNodeVisibility (csKDTree* treenode,
 	FrustTest_Front2BackData* data, uint32& frustum_mask)
 {
   const csBox3& node_bbox = treenode->GetNodeBBox ();
@@ -401,7 +401,7 @@ bool csFrustumVis::TestObjectVisibility (csFrustVisObjectWrapper* obj,
 
 //======== VisTest =========================================================
 
-static bool FrustTest_Front2Back (csSimpleKDTree* treenode, void* userdata,
+static bool FrustTest_Front2Back (csKDTree* treenode, void* userdata,
 	uint32 cur_timestamp, uint32& frustum_mask)
 {
   FrustTest_Front2BackData* data = (FrustTest_Front2BackData*)userdata;
@@ -415,7 +415,7 @@ static bool FrustTest_Front2Back (csSimpleKDTree* treenode, void* userdata,
   treenode->Distribute ();
 
   int num_objects;
-  csSimpleKDTreeChild** objects;
+  csKDTreeChild** objects;
   num_objects = treenode->GetObjectCount ();
   objects = treenode->GetObjects ();
   int i;
@@ -491,7 +491,7 @@ struct FrustTestPlanes_Front2BackData
   csPlane3* frustum;
 };
 
-static bool FrustTestPlanes_Front2Back (csSimpleKDTree* treenode,
+static bool FrustTestPlanes_Front2Back (csKDTree* treenode,
 	void* userdata, uint32 cur_timestamp, uint32& frustum_mask)
 {
   FrustTestPlanes_Front2BackData* data
@@ -512,7 +512,7 @@ static bool FrustTestPlanes_Front2Back (csSimpleKDTree* treenode,
   treenode->Distribute ();
 
   int num_objects;
-  csSimpleKDTreeChild** objects;
+  csKDTreeChild** objects;
   num_objects = treenode->GetObjectCount ();
   objects = treenode->GetObjects ();
   int i;
@@ -582,7 +582,7 @@ struct FrustTestBox_Front2BackData
   csVector* vistest_objects;
 };
 
-static bool FrustTestBox_Front2Back (csSimpleKDTree* treenode, void* userdata,
+static bool FrustTestBox_Front2Back (csKDTree* treenode, void* userdata,
 	uint32 cur_timestamp, uint32&)
 {
   FrustTestBox_Front2BackData* data = (FrustTestBox_Front2BackData*)userdata;
@@ -599,7 +599,7 @@ static bool FrustTestBox_Front2Back (csSimpleKDTree* treenode, void* userdata,
   treenode->Distribute ();
 
   int num_objects;
-  csSimpleKDTreeChild** objects;
+  csKDTreeChild** objects;
   num_objects = treenode->GetObjectCount ();
   objects = treenode->GetObjects ();
 
@@ -665,7 +665,7 @@ struct FrustTestSphere_Front2BackData
   csVector* vistest_objects;
 };
 
-static bool FrustTestSphere_Front2Back (csSimpleKDTree* treenode,
+static bool FrustTestSphere_Front2Back (csKDTree* treenode,
 	void* userdata, uint32 cur_timestamp, uint32&)
 {
   FrustTestSphere_Front2BackData* data =
@@ -683,7 +683,7 @@ static bool FrustTestSphere_Front2Back (csSimpleKDTree* treenode,
   treenode->Distribute ();
 
   int num_objects;
-  csSimpleKDTreeChild** objects;
+  csKDTreeChild** objects;
   num_objects = treenode->GetObjectCount ();
   objects = treenode->GetObjects ();
 
@@ -753,7 +753,7 @@ struct IntersectSegment_Front2BackData
   csVector* vector;	// If not-null we need all objects.
 };
 
-static bool IntersectSegment_Front2Back (csSimpleKDTree* treenode,
+static bool IntersectSegment_Front2Back (csKDTree* treenode,
 	void* userdata, uint32 cur_timestamp, uint32&)
 {
   IntersectSegment_Front2BackData* data
@@ -784,7 +784,7 @@ static bool IntersectSegment_Front2Back (csSimpleKDTree* treenode,
   treenode->Distribute ();
 
   int num_objects;
-  csSimpleKDTreeChild** objects;
+  csKDTreeChild** objects;
   num_objects = treenode->GetObjectCount ();
   objects = treenode->GetObjects ();
 
@@ -947,7 +947,7 @@ static int compare_shadobj (const void* el1, const void* el2)
   return 0;
 }
 
-static bool CastShadows_Front2Back (csSimpleKDTree* treenode, void* userdata,
+static bool CastShadows_Front2Back (csKDTree* treenode, void* userdata,
 	uint32 cur_timestamp, uint32& planes_mask)
 {
   CastShadows_Front2BackData* data = (CastShadows_Front2BackData*)userdata;
@@ -978,7 +978,7 @@ static bool CastShadows_Front2Back (csSimpleKDTree* treenode, void* userdata,
   treenode->Distribute ();
 
   int num_objects;
-  csSimpleKDTreeChild** objects;
+  csKDTreeChild** objects;
   num_objects = treenode->GetObjectCount ();
   objects = treenode->GetObjects ();
 
