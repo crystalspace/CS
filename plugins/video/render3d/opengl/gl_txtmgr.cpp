@@ -484,7 +484,7 @@ void csGLTextureHandle::AdjustSizePo2 ()
     if (!csIsPowerOf2(orig_width))
       orig_width = csFindNearestPowerOf2 ((*images)[i]->GetWidth ()) / 2;
 
-    if (!csIsPowerOf2 (newheight))
+    if (!csIsPowerOf2 (orig_height))
       orig_height = csFindNearestPowerOf2 ((*images)[i]->GetHeight ()) / 2;
 
     int newwidth  = orig_width;
