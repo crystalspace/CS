@@ -32,10 +32,10 @@ refer to the Developer's Project page at SourceForge:
 
 There are already a few projects starting to use CS. Crystal Space is also
 not fully optimized yet. Performance is adequate provided you have a Pentium
-but things could certainly be better.
+(133 MHz) or equivalent processor but things could certainly be better.
 
-We also have a very active list of developers working to make Crystal Space as useable as
-possible.  We are are getting there :-)
+We also have a very active list of developers working to make Crystal Space as usable as
+possible.
 
 @node UsingForProject, Feature List, Current Status, CS Introduction
 @section Using Crystal Space For Your Project
