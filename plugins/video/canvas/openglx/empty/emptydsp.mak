@@ -71,7 +71,7 @@ oglemptyclean:
 	$(RM) $(oglempty) $(OBJ.oglempty)
  
 ifdef DO_DEPEND
-depend: $(OUTOS)oglempty.dep
+dep: $(OUTOS)oglempty.dep
 $(OUTOS)oglempty.dep: $(SRC.oglempty)
 	$(DO.DEP)
 else

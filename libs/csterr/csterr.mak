@@ -49,7 +49,7 @@ csterrclean:
 	-$(RM) $(CSTERR.LIB) $(OBJ.CSTERR)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)csterr.dep
+dep: $(OUTOS)csterr.dep
 $(OUTOS)csterr.dep: $(SRC.CSTERR)
 	$(DO.DEP)
 else

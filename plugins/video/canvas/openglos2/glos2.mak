@@ -77,7 +77,7 @@ glos2clean:
 	$(RM) $(GLOS2) $(OBJ.GLOS2)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)glos2.dep
+dep: $(OUTOS)glos2.dep
 $(OUTOS)glos2.dep: $(SRC.GLOS2)
 	$(DO.DEP)
 else

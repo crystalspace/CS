@@ -49,7 +49,7 @@ csphyzikclean:
 	-$(RM) $(CSPHYZIK.LIB) $(OBJ.CSPHYZIK)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)csphyzik.dep
+dep: $(OUTOS)csphyzik.dep
 $(OUTOS)csphyzik.dep: $(SRC.CSPHYZIK)
 	$(DO.DEP)
 else

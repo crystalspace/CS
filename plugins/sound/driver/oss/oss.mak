@@ -63,7 +63,7 @@ ossclean:
 	$(RM) $(SNDOSS) $(OBJ.SNDOSS)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)oss.dep
+dep: $(OUTOS)oss.dep
 $(OUTOS)oss.dep: $(SRC.SNDOSS)
 	$(DO.DEP)
 else

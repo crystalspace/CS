@@ -72,7 +72,7 @@ glbeclean:
 	$(RM) $(GLBE2D) $(OBJ.GLBE2D)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)glbe2d.dep
+dep: $(OUTOS)glbe2d.dep
 $(OUTOS)glbe2d.dep: $(SRC.GLBE2D)
 	$(DO.DEP) $(CFLAGS.GLBE2D)
 else

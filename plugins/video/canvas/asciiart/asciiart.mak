@@ -72,7 +72,7 @@ asciiartclean:
 	$(RM) $(ASCIIART) $(OBJ.ASCIIART)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)asciiart.dep
+dep: $(OUTOS)asciiart.dep
 $(OUTOS)asciiart.dep: $(SRC.ASCIIART)
 	$(DO.DEP)
 else

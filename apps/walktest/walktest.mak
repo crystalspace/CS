@@ -54,7 +54,7 @@ walkclean:
 	-$(RM) $(WALKTEST.EXE) $(OBJ.WALKTEST)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)walktest.dep
+dep: $(OUTOS)walktest.dep
 $(OUTOS)walktest.dep: $(SRC.WALKTEST)
 	$(DO.DEP)
 else

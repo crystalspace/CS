@@ -66,7 +66,7 @@ lineclean:
 	$(RM) $(LINE3D) $(OBJ.LINE3D)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)line3d.dep
+dep: $(OUTOS)line3d.dep
 $(OUTOS)line3d.dep: $(SRC.LINE3D)
 	$(DO.DEP)
 else

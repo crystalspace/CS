@@ -64,7 +64,7 @@ sndrdrsclean:
 	$(RM) $(SNDRDRS) $(OBJ.SNDRDRS)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)sndrdrs.dep
+dep: $(OUTOS)sndrdrs.dep
 $(OUTOS)sndrdrs.dep: $(SRC.SNDRDRS)
 	$(DO.DEP)
 else

@@ -83,8 +83,10 @@ include mk/subs.mak
 help: banner showconfig driverhelp pluginhelp libhelp apphelp dochelp \
   pseudohelp
 
-depend:
+dep:
 	@$(MAKE) --no-print-directory -f mk/cs.mak $@ DO_DEPEND=yes
+
+depend: cleandep dep
 
 clean cleanlib cleandep distclean:
 	@$(MAKE) --no-print-directory -f mk/cs.mak $@

@@ -62,7 +62,7 @@ csconclean:
 	-$(RM) $(CSCON) $(OBJ.CSCON) $(OUTOS)cscon.dep
 
 ifdef DO_DEPEND
-depend: $(OUTOS)cscon.dep
+dep: $(OUTOS)cscon.dep
 $(OUTOS)cscon.dep: $(SRC.CSCON)
 	$(DO.DEP)
 else

@@ -70,7 +70,7 @@ x2dclean:
 	$(RM) $(XLIB2D) $(OBJ.XLIB2D)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)x2d.dep
+dep: $(OUTOS)x2d.dep
 $(OUTOS)x2d.dep: $(SRC.XLIB2D)
 	$(DO.DEP1) $(CFLAGS.X2D) $(DO.DEP2)
 else

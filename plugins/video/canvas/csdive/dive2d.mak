@@ -75,7 +75,7 @@ csdiveclean:
 	$(RM) $(CSDIVE) $(OBJ.CSDIVE)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)csdive.dep
+dep: $(OUTOS)csdive.dep
 $(OUTOS)csdive.dep: $(SRC.CSDIVE)
 	$(DO.DEP)
 else

@@ -52,7 +52,7 @@ phyzclean:
 	-$(RM) $(PHYZTEST.EXE)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)phyztest.dep
+dep: $(OUTOS)phyztest.dep
 $(OUTOS)phyztest.dep: $(SRC.PHYZTEST)
 	$(DO.DEP)
 else

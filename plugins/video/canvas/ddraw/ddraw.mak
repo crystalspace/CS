@@ -67,7 +67,7 @@ ddrawclean:
 	$(RM) $(DDRAW) $(OBJ.DDRAW)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)ddraw.dep
+dep: $(OUTOS)ddraw.dep
 $(OUTOS)ddraw.dep: $(SRC.DDRAW)
 	$(DO.DEP)
 else

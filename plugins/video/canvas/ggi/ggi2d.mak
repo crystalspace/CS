@@ -73,7 +73,7 @@ ggi2dclean:
 	$(RM) $(GGI2D) $(OBJ.GGI2D)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)ggi2d.dep
+dep: $(OUTOS)ggi2d.dep
 $(OUTOS)ggi2d.dep: $(SRC.GGI2D)
 	$(DO.DEP)
 else

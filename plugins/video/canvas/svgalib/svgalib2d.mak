@@ -69,7 +69,7 @@ svgalib2dclean:
 	$(RM) $(SVGA2D) $(OBJ.SVGA2D)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)svgalib2d.dep
+dep: $(OUTOS)svgalib2d.dep
 $(OUTOS)svgalib2d.dep: $(SRC.SVGA2D)
 	$(DO.DEP)
 else

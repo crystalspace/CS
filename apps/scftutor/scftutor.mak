@@ -73,7 +73,7 @@ scftutclean:
 	-$(RM) $(ZOO.EXE) $(DOG.DLL) $(WORM.DLL) $(OBJ.ZOO) $(OBJ.DOG) $(OBJ.WORM)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)scftut.dep
+dep: $(OUTOS)scftut.dep
 $(OUTOS)scftut.dep: $(SRC.ZOO) $(SRC.DOG) $(SRC.WORM)
 	$(DO.DEP)
 else

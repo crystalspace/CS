@@ -51,7 +51,7 @@ csengineclean:
 	-$(RM) $(CSENGINE.LIB) $(OBJ.CSENGINE)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)csengine.dep
+dep: $(OUTOS)csengine.dep
 $(OUTOS)csengine.dep: $(SRC.CSENGINE)
 	$(DO.DEP)
 else

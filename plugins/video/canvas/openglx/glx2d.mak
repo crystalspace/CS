@@ -85,7 +85,7 @@ glx2dclean:
 	$(RM) $(GLX2D) $(OBJ.GLX2D)
  
 ifdef DO_DEPEND
-depend: $(OUTOS)glx2d.dep
+dep: $(OUTOS)glx2d.dep
 $(OUTOS)glx2d.dep: $(SRC.GLX2D)
 	$(DO.DEP1) $(CFLAGS.GLX2D) $(DO.DEP2)
 else

@@ -78,7 +78,7 @@ softclean:
 	$(RM) $(SOFT3D) $(OBJ.SOFT3D)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)soft3d.dep
+dep: $(OUTOS)soft3d.dep
 $(OUTOS)soft3d.dep: $(SRC.SOFT3D)
 	$(DO.DEP)
 else

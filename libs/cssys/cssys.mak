@@ -73,7 +73,7 @@ cssysclean:
 	-$(RM) $(CSSYS.LIB) $(OBJ.CSSYS)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)cssys.dep
+dep: $(OUTOS)cssys.dep
 $(OUTOS)cssys.dep: $(SRC.CSSYS)
 	$(DO.DEP)
 else

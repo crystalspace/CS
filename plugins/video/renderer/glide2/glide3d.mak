@@ -71,7 +71,7 @@ glide3dclean:
 	$(RM) $(GLIDE3D) $(OBJ.GLIDE3D)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)glide3d.dep
+dep: $(OUTOS)glide3d.dep
 $(OUTOS)glide3d.dep: $(SRC.GLIDE3D)
 	$(DO.DEP1) $(CFLAGS.GLIDE3D) $(DO.DEP2)
 else

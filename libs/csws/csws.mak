@@ -49,7 +49,7 @@ cswsclean:
 	-$(RM) $(CSWS.LIB) $(OBJ.CSWS)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)csws.dep
+dep: $(OUTOS)csws.dep
 $(OUTOS)csws.dep: $(SRC.CSWS)
 	$(DO.DEP)
 else

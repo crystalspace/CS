@@ -49,7 +49,7 @@ csparserclean:
 	-$(RM) $(CSPARSER.LIB) $(OBJ.CSPARSER) ivcon.log
 
 ifdef DO_DEPEND
-depend: $(OUTOS)csparser.dep
+dep: $(OUTOS)csparser.dep
 $(OUTOS)csparser.dep: $(SRC.CSPARSER)
 	$(DO.DEP)
 else

@@ -55,7 +55,7 @@ pysimpleclean:
 	-$(RM) $(PYSIMP.EXE)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)pysimp.dep
+dep: $(OUTOS)pysimp.dep
 $(OUTOS)pysimp.dep: $(SRC.PYSIMP)
 	$(DO.DEP)
 else

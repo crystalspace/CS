@@ -66,7 +66,7 @@ infiniteclean:
 	$(RM) $(INF3D) $(OBJ.INF3D)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)inf3d.dep
+dep: $(OUTOS)inf3d.dep
 $(OUTOS)inf3d.dep: $(SRC.INF3D)
 	$(DO.DEP)
 else

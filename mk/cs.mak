@@ -138,7 +138,7 @@ ifndef DO.DEP
     ifeq ($(DEPEND_TOOL),mkdep)
       # If mkdep is already installed, don't build it
       ifneq ($(DEPEND_TOOL.INSTALLED),yes)
-        depend: mkdep
+        dep: mkdep
       endif
       DO.DEP = makedep $(MEM) $(subst $(CFLAGS.I),-I,$(CFLAGS.INCLUDE) ) \
         $(filter-out %.asm,$^) -o $(BUCK)O -p $(OUT) -r -c -f $@
@@ -163,7 +163,7 @@ LIBS.EXE := $(sort $(LIBS.EXE))
 
 all: $(OUTDIRS)
 
-depend: $(OUTBASE) $(OUTOS)
+dep: $(OUTBASE) $(OUTOS)
 
 distclean: clean
 	-$(RM) config.mak include/volatile.h

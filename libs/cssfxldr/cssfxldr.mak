@@ -64,7 +64,7 @@ cssfxldrclean:
 	-$(RM) $(CSSFXLDR.LIB)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)cssfxldr.dep
+dep: $(OUTOS)cssfxldr.dep
 $(OUTOS)cssfxldr.dep: $(SRC.CSSFXLDR)
 	$(DO.DEP)
 else

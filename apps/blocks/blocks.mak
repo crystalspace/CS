@@ -52,7 +52,7 @@ blksclean:
 	-$(RM) $(BLOCKS.EXE)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)blocks.dep
+dep: $(OUTOS)blocks.dep
 $(OUTOS)blocks.dep: $(SRC.BLOCKS)
 	$(DO.DEP)
 else

@@ -79,7 +79,7 @@ glidex2dclean:
 	$(RM) $(GLIDEX2D) $(OBJ.GLIDEX2D)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)glidex2d.dep
+dep: $(OUTOS)glidex2d.dep
 $(OUTOS)glidex2d.dep: $(SRC.GLIDEX2D)
 	$(DO.DEP1) $(CFLAGS.GLIDEX2D) $(DO.DEP2)
 else

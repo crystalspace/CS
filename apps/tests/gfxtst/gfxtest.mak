@@ -53,7 +53,7 @@ gfxtstclean:
 	-$(RM) $(GFXTEST.EXE) $(OBJ.GFXTEST)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)gfxtst.dep
+dep: $(OUTOS)gfxtst.dep
 $(OUTOS)gfxtst.dep: $(SRC.GFXTEST)
 	$(DO.DEP)
 else

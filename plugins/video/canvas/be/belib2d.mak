@@ -65,7 +65,7 @@ be2dclean:
 	$(RM) $(BE2D) $(OBJ.BE2D)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)be2d.dep
+dep: $(OUTOS)be2d.dep
 $(OUTOS)be2d.dep: $(SRC.BE2D)
 	$(DO.DEP)
 else

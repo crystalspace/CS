@@ -50,7 +50,7 @@ wstestclean:
 	-$(RM) $(CSWSTEST.EXE)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)cswstest.dep
+dep: $(OUTOS)cswstest.dep
 $(OUTOS)cswstest.dep: $(SRC.CSWSTEST)
 	$(DO.DEP)
 else

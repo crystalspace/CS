@@ -74,7 +74,7 @@ oglglideclean:
 	$(RM) $(oglglide) $(OBJ.OGLGLIDE)
  
 ifdef DO_DEPEND
-depend: $(OUTOS)oglglide.dep
+dep: $(OUTOS)oglglide.dep
 $(OUTOS)oglglide.dep: $(SRC.OGLGLIDE)
 	$(DO.DEP) $(CFLAGS.OGLGLIDE)
 else

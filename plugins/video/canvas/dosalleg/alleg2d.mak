@@ -57,7 +57,7 @@ alleg2dclean:
 	$(RM) $(ALLEG2D) $(OBJ.ALLEG2D)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)alleg2d.dep
+dep: $(OUTOS)alleg2d.dep
 $(OUTOS)alleg2d.dep: $(SRC.ALLEG2D)
 	$(DO.DEP)
 else

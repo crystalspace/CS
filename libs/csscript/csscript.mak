@@ -49,7 +49,7 @@ csscriptclean:
 	-$(RM) $(CSSCRIPT.LIB)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)csscript.dep
+dep: $(OUTOS)csscript.dep
 $(OUTOS)csscript.dep: $(SRC.CSSCRIPT)
 	$(DO.DEP)
 else

@@ -49,7 +49,7 @@ csutilclean:
 	-$(RM) $(CSUTIL.LIB) $(OBJ.CSUTIL)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)csutil.dep
+dep: $(OUTOS)csutil.dep
 $(OUTOS)csutil.dep: $(SRC.CSUTIL)
 	$(DO.DEP)
 else

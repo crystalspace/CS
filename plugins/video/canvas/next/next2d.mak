@@ -71,7 +71,7 @@ next2dclean:
 	$(RM) $(NEXT2D) $(OBJ.NEXT2D)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)next2d.dep
+dep: $(OUTOS)next2d.dep
 $(OUTOS)next2d.dep: $(SRC.NEXT2D)
 	$(DO.DEP)
 else

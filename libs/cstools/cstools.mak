@@ -49,7 +49,7 @@ cstoolsclean:
 	-$(RM) $(CSTOOLS.LIB) $(OBJ.CSTOOLS)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)cstools.dep
+dep: $(OUTOS)cstools.dep
 $(OUTOS)cstools.dep: $(SRC.CSTOOLS)
 	$(DO.DEP)
 else

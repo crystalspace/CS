@@ -75,7 +75,7 @@ stdldrclean:
 	-$(RM) $(OBJ.STDLDR) $(STDLDR)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)stdldr.dep
+dep: $(OUTOS)stdldr.dep
 $(OUTOS)stdldr.dep: $(SRC.STDLDR)
 	$(DO.DEP)
 else

@@ -72,7 +72,7 @@ glidebeclean:
 	$(RM) $(GLIDEBE2D) $(OBJ.GLIDEBE2D)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)glidebe2d.dep
+dep: $(OUTOS)glidebe2d.dep
 $(OUTOS)glidebe2d.dep: $(SRC.GLIDEBE2D)
 	$(DO.DEP) $(CFLAGS.GLIDEBE2D)
 else

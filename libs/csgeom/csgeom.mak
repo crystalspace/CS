@@ -49,7 +49,7 @@ csgeomclean:
 	-$(RM) $(CSGEOM.LIB) $(OBJ.CSGEOM)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)csgeom.dep
+dep: $(OUTOS)csgeom.dep
 $(OUTOS)csgeom.dep: $(SRC.CSGEOM)
 	$(DO.DEP)
 else

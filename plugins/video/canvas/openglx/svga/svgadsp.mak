@@ -68,7 +68,7 @@ oglsvgaclean:
 	$(RM) $(oglsvga) $(OBJ.OGLSVGA)
  
 ifdef DO_DEPEND
-depend: $(OUTOS)oglsvga.dep
+dep: $(OUTOS)oglsvga.dep
 $(OUTOS)oglsvga.dep: $(SRC.OGLSVGA)
 	$(DO.DEP)
 else

@@ -70,7 +70,7 @@ linelibxclean:
 	$(RM) $(LINEXLIB2D) $(OBJ.LINEXLIB2D)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)linex2d.dep
+dep: $(OUTOS)linex2d.dep
 $(OUTOS)linex2d.dep: $(SRC.LINEXLIB2D)
 	$(DO.DEP1) $(CFLAGS.LINEX2D) $(DO.DEP2)
 else

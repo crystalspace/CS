@@ -71,7 +71,7 @@ glide33clean:
 	$(RM) $(GLIDE33) $(OBJ.GLIDE33)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)glide33.dep
+dep: $(OUTOS)glide33.dep
 $(OUTOS)glide33.dep: $(SRC.GLIDE33)
 	$(DO.DEP1) $(CFLAGS.GLIDE33) $(DO.DEP2)
 else

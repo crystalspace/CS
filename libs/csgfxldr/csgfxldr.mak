@@ -89,7 +89,7 @@ csgfxldrclean:
 	-$(RM) $(CSGFXLDR.LIB) $(OBJ.CSGFXLDR)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)csgfxldr.dep
+dep: $(OUTOS)csgfxldr.dep
 $(OUTOS)csgfxldr.dep: $(SRC.CSGFXLDR)
 	$(DO.DEP)
 else

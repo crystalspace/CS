@@ -57,7 +57,7 @@ raw2dclean:
 	$(RM) $(RAW2D) $(OBJ.RAW2D)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)raw2d.dep
+dep: $(OUTOS)raw2d.dep
 $(OUTOS)raw2d.dep: $(SRC.RAW2D)
 	$(DO.DEP)
 else

@@ -76,7 +76,7 @@ glidex23clean:
 	$(RM) $(GLIDEX23) $(OBJ.GLIDEX23)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)glidex23.dep
+dep: $(OUTOS)glidex23.dep
 $(OUTOS)glidex23.dep: $(SRC.GLIDEX23)
 	$(DO.DEP1) $(CFLAGS.GLIDEX23) $(DO.DEP2)
 else

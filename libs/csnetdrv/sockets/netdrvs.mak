@@ -70,7 +70,7 @@ netdrvsclean:
 	$(RM) $(NETDRVS) $(OBJ.NETDRVS)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)netdrvs.dep
+dep: $(OUTOS)netdrvs.dep
 $(OUTOS)netdrvs.dep: $(SRC.NETDRVS)
 	$(DO.DEP)
 else
