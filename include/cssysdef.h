@@ -592,7 +592,7 @@ extern void* operator new[] (size_t s, void* filename, int line);
 #    define CS_DEPRECATED_METHOD		__attribute__ ((deprecated))
 #  elif defined(CS_COMPILER_MSVC)
 #    define CS_DEPRECATED_METHOD		/*__declspec(deprecated)*/
-      /* Disabled: Unfortunately, VC is to overzealous with warnings; 
+      /* Disabled: Unfortunately, MSVC is overzealous with warnings; 
 	 it even emits one when a deprecated method is overridden, e.g. when 
 	 implementing an interface method. */
 #  else
