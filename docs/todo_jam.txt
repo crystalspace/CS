@@ -7,11 +7,6 @@ L - Low Priority (only minor function loss)
 W - Wishlist (the build also works without this feature)
 * - Completed
 
-[H] msvcgen.jam: Auto-generated MSVC project files should be generated into the
-    build directory rather than the source tree, since the source tree might be
-    read-only or shared.  We should provide rules to copy the generated files
-    back to the source tree upon explicit request so that they can be committed
-    to the CVS respository if desired.
 [H] msvcgen.jam: Add support to create multiple, customizable workspaces rather
     than always creating only wksall.  Obvious examples of workspaces are the
     ones presently created by the GNU make system: wksall, wkstypical,
@@ -47,18 +42,27 @@ W - Wishlist (the build also works without this feature)
     project?).  Another interesting topic would be integrating Crystal Space
     with other build systems like Automake or Ant.
 [M] Re-work the provided m4 scripts to provide functionality like CS_CHECK_HOST
-    and INITJAMFILE. Would be also nice to extract more of the detection scripts
-    in CS (perl, python, nasm, problematic cflags?)
+    and INITJAMFILE. Would be also nice to extract more of the detection
+    scripts in CS (perl, python, nasm, problematic cflags?)
+[M] msvcgen.jam: Eliminate dependency upon external scripts for creation of the
+    .rc resources. win32.jam is already capable of performing these tasks
+    stand-alone, so it should be possible to do the same for msvcgen.jam,
+    possibly by invoking the rules provided by win32.jam.
 
 [L] msvcgen.jam: Overhaul the "configuration" file handling rule so that it
     associates configuration files with built targets.  This will allow the
     generated projects to reference configuration files.  Rather than the
     present InstallConfig rule, we either need a ConfigFile:<target>:<configs>
     rule, or we should upgrade the Application and Plugin rules to also accept
-    configuration files. (The GNU msvcgen does this.)
+    configuration files. (The GNU msvcgen does this.) Note that this is just a
+    convenience for the user of the project file; the project file itself will
+    function correctly without this information.
 [L] msvcgen.jam: Provide a generic Resources() rule which allows specification
     of additional textual resources for inclusion in generated projects.  (The
     GNU msvcgen does this.)
+[L] msvcgen.jam: Provide rules to copy the generated files back to the source
+    tree upon explicit request so that they can be committed to the CVS
+    respository if desired.
 [L] Eliminate the need for the documentation-building shell scripts. Jam is
     sufficiently expressive that it should be able to handle the image-copying
     and other functionality without depending upon these external tools.
@@ -83,6 +87,9 @@ W - Wishlist (the build also works without this feature)
     Jam with a message telling that you should rerun configure, or at least
     emit a big warning?
 
+[*] msvcgen.jam: Auto-generated MSVC project files should be generated into the
+    build directory rather than the source tree, since the source tree might be
+    read-only or shared.
 [*] msvcgen.jam: When PERL5.AVAILABLE is "yes", Jam reports that it doesn't
     know how to locate or create <grist>csperlxs.c.
 [*] When Bison and Flex are installed, the generated MSVC project file for AWS
