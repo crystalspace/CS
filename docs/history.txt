@@ -20,6 +20,8 @@ chronological order.
 	  aren't supported yet though, and there are some redraw issues.
 	- DeSigna fixed up an exit crasher in PGUI plugin caused by a
 	  reference held past DestroyApplication. 
+	- Anders Stenberg reenabled pixmap drawing with csPixmap derivates in
+	  the new renderer, which was disabled.
 29-Aug-2003
 	- renej added support for using CS from Java. SWIG is needed since
 	  no generated files are in the CVS repository. Building is done

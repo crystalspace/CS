@@ -50,18 +50,14 @@ csSimplePixmap::~csSimplePixmap ()
 void csSimplePixmap::DrawScaled (iGraphics3D* g3d, int sx, int sy, int sw,
     int sh, uint8 Alpha)
 {
-#ifndef CS_USE_NEW_RENDERER
   if (hTex) g3d->DrawPixmap (hTex, sx, sy, sw, sh, tx, ty, tw, th, Alpha);
-#endif
 }
 
 void csSimplePixmap::DrawTiled (iGraphics3D* g3d, int sx, int sy,
   int sw, int sh, int orgx, int orgy, uint8 Alpha)
 {
-#ifndef CS_USE_NEW_RENDERER
   if (hTex) g3d->DrawPixmap
     (hTex, sx, sy, sw, sh, sx - orgx, sy - orgy, sw, sh, Alpha);
-#endif
 }
 
 int csSimplePixmap::Width () { return tw; }
