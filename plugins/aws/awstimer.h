@@ -16,24 +16,23 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
 #ifndef __CS_AWS_TIMER_H__
 #define __CS_AWS_TIMER_H__
 
-# include "awsslot.h"
-# include "iutil/eventh.h"
-# include "iutil/eventq.h"
-# include "iutil/virtclk.h"
-# include "iutil/objreg.h"
+#include "awsslot.h"
+#include "iutil/eventh.h"
+#include "iutil/eventq.h"
+#include "iutil/virtclk.h"
+#include "iutil/objreg.h"
 
-class awsTimer :
-  public awsSource
+class awsTimer : public awsSource
 {
 protected:
-
-  // everything ready to go ?
+  /// Everything ready to go?
   bool bSetup;
 
-  // flag to halt the ticker
+  /// Flag to halt the ticker.
   bool stopped;
 
   csTicks start, nTicks;
@@ -41,12 +40,13 @@ protected:
   csRef<iVirtualClock> vc;
   iObjectRegistry *object_reg;
 
-  // try to set up everything needed
+  /// Try to set up everything needed.
   bool Setup ();
 public:
   static const int signalTick;
 
-  SCF_DECLARE_IBASE_EXT(awsSource);
+  SCF_DECLARE_IBASE_EXT (awsSource);
+
   awsTimer (iObjectRegistry *object_reg, iAwsComponent *comp);
   virtual ~awsTimer ();
 
@@ -58,7 +58,7 @@ public:
 
   struct eiEventHandler : public iEventHandler
   {
-    SCF_DECLARE_EMBEDDED_IBASE(awsTimer);
+    SCF_DECLARE_EMBEDDED_IBASE (awsTimer);
     virtual bool HandleEvent (iEvent &Event)
     {
       return scfParent->HandleEvent (Event);
@@ -66,4 +66,5 @@ public:
   }
   scfiEventHandler;
 };
+
 #endif // __CS_AWS_TIMER_H__
