@@ -22,9 +22,6 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-//Conor's Modification file. Done Late at night, please check!
-//A few simple modifications. Enough to squeeze a couple of cycles!
-
 #ifndef __SCANLN16_H__
 #define __SCANLN16_H__
 
@@ -40,9 +37,6 @@ static int sxx;
 static UShort *s_destend;
 static long sdzz;
 static unsigned long *sz_buffer;
-
-//Jorrit, or who ever coded below, those multiplies are just unbearable. I mean, what if the compiler
-//didn't pick them up? And even worse it may use a shift instead of an add?
 
 #define I386_SCANLINE_MAP16 \
     s = srcTex + ((vv >> 16) << shifter) + (uu >> 16);              \
@@ -69,8 +63,7 @@ __asm   mov     dx, WORD PTR [esi]          /*2 cycles*/\
 __asm   cmp     ah, 80h                     \
 __asm   adc     ecx,ecx                     /*1 cycle*/\
 __asm   and     eax, 0xffff7fff             \
-//__asm shl     edx,16                      /*3 cycles*/\
-__asm   bswap           edx                                     /       /*1 Cycle pairs ~Conor*/
+__asm   shl     edx,16                      /*3 cycles*/\
 __asm   add     esi, DWORD PTR [ecx*4+dudvInt]\
                                             \
 __asm   add     eax, ebx                    /*1 cycle*/\
@@ -78,19 +71,18 @@ __asm   setc    cl                          /*2 cycles*/\
 __asm   mov     dx, WORD PTR [esi]          /*2 cycles*/\
 __asm   cmp     ah, 80h                     \
 __asm   adc     ecx,ecx                     /*1 cycle*/\
-//__asm   and       eax, 0xffff7fff             \
+/*__asm   and       eax, 0xffff7fff */\
 __asm   mov     DWORD PTR [edi], edx        /*3 cycles*/\
-__asm   and     eax, 0xffff7fff             \       /*1 cycle, should ease off memory and may pair~Conor*/
+__asm   and     eax, 0xffff7fff             /*1 cycle, should ease off memory and may pair~Conor*/ \
 __asm   add     esi, DWORD PTR [ecx*4+dudvInt]\
-                                    \
+                                            \
 __asm   add     eax, ebx                    /*1 cycle*/\
 __asm   setc    cl                          /*2 cycles*/\
 __asm   mov     dx, WORD PTR [esi]          /*2 cycles*/\
 __asm   cmp     ah, 80h                     \
 __asm   adc     ecx,ecx                     /*1 cycle*/\
 __asm   and     eax, 0xffff7fff             \
-//__asm shl     edx,16                      /*3 cycles*/\
-__asm   bswap           edx                                      \       /*1 cycle pairs ~Conor*/
+__asm   shl     edx,16                      /*3 cycles*/\
 __asm   add     esi, DWORD PTR [ecx*4+dudvInt]\
                                             \
 __asm   add     eax, ebx                    /*1 cycle*/\
@@ -108,8 +100,7 @@ __asm   mov     dx, WORD PTR [esi]          /*2 cycles*/\
 __asm   cmp     ah, 80h                     \
 __asm   adc     ecx,ecx                     /*1 cycle*/\
 __asm   and     eax, 0xffff7fff             \
-//__asm shl     edx,16                      /*3 cycles*/\
-__asm   bswap           edx                                      \       /*1 cycle pairs ~Conor*/
+__asm   shl     edx,16                      /*3 cycles*/\
 __asm   add     esi, DWORD PTR [ecx*4+dudvInt]\
                                     \
 __asm   add     eax, ebx                    /*1 cycle*/\
@@ -127,8 +118,7 @@ __asm   mov     dx, WORD PTR [esi]          /*2 cycles*/\
 __asm   cmp     ah, 80h                     \
 __asm   adc     ecx,ecx                     /*1 cycle*/\
 __asm   and     eax, 0xffff7fff             \
-//__asm shl     edx,16                      /*3 cycles*/\
-__asm   bswap           edx                                      \       /*1 cycle pairs ~Conor*/
+__asm   shl     edx,16                      /*3 cycles*/\
 __asm   add     esi, DWORD PTR [ecx*4+dudvInt]\
                                             \
 __asm   add     eax, ebx                    /*1 cycle*/\
@@ -141,7 +131,7 @@ __asm   and     eax, 0xffff7fff             \
 __asm   add     esi, DWORD PTR [ecx*4+dudvInt]\
                                             \
 __asm   add     edi,16                      \
-__asm   cmp     edi,[_destend]                 \ /*Compare from memory?*/
+__asm   cmp     edi,[_destend]              /*Compare from memory?*/\
 __asm   jbe label0                          \
 __asm   jmp     label9                      \
                                             \
@@ -156,17 +146,13 @@ __asm   and     eax, 0xffff7fff             \
 __asm   add     esi, DWORD PTR [ecx*4+dudvInt]\
                                             \
 __asm   add     edi,2                       \
-__asm   cmp     edi,_destend                   \
+__asm   cmp     edi,_destend                \
 __asm   jbe label8                          \
 __asm   label9:                             \
 __asm   mov     _dest,edi                   \
 }                                           \
     uu = uu1;                               \
     vv = vv1;
-
-//Most of those where simple changes, bswap is a little documented command, it simply swaps the high
-//And low words, effectively either a shl 16 or shr 16. It is also fast. I also moved the and between the
-//Memory to ease the load on the cache and to pair down the pipes. Check my code please someone.
 
 #undef SCANFUNC
 #undef SCANEND
@@ -184,7 +170,7 @@ __asm   mov     _dest,edi                   \
     }                               \
     while (z_buffer <= lastZbuf)
 
-#include "render/softw16/scanln16.inc"
+#include "cs3d/software/scanln16.inc"
 
 #undef SCANFUNC
 #undef SCANEND
@@ -207,8 +193,6 @@ __asm   mov     _dest,edi                   \
     sz_buffer = z_buffer;                   \
                                             \
     /* Sidenote: unrolling loop gives no gain??? (because of jump?) */  \
-    /*No because of pairing ;-)*/
-
 __asm {                                     \
 __asm   mov     edi, _dest                  \
 __asm   mov     ecx, izz                    \
@@ -245,7 +229,7 @@ __asm   mov     _dest,edi      }        \
     vv = vv1;                           \
     z_buffer = sz_buffer;
 
-#include "render/softw16/scanln16.inc"
+#include "cs3d/software/scanln16.inc"
 
 #define I386_SCANLINE_MAP_ALPHA50_16                        \
     static UShort alpha = Textures::alpha_mask;             \
@@ -280,8 +264,7 @@ __asm   shr     bp,1                    /* pixel/2*/        \
 __asm   add     dx,bp                   /* texel/2 + pixel/2*/  \
 __asm   add     eax, ebx                /*1 cycle*/\
 __asm   setc    cl                      /*2 cycles*/\
-//__asm shl     edx, 16                 \
-__asm   bswap   edx
+__asm   shl     edx, 16                 \
 __asm   cmp     ah, 80h                 \
 __asm   adc     ecx,ecx                 /*1 cycle*/\
 __asm   and     eax, 0xffff7fff         \
@@ -311,7 +294,7 @@ __asm   shr     bp,1                /* pixel/2*/        \
 __asm   add     dx,bp               /* texel/2 + pixel/2*/  \
 __asm   add     eax, ebx                    /*1 cycle*/\
 __asm   setc    cl                          /*2 cycles*/\
-__asm   bswap   edx
+__asm   shl     edx,16                      \
 __asm   cmp     ah, 80h                     \
 __asm   adc     ecx,ecx                     /*1 cycle*/\
 __asm   and     eax, 0xffff7fff             \
@@ -341,7 +324,7 @@ __asm   shr     bp,1                /* pixel/2*/        \
 __asm   add     dx,bp               /* texel/2 + pixel/2*/  \
 __asm   add     eax, ebx                    /*1 cycle*/\
 __asm   setc    cl                          /*2 cycles*/\
-__asm   bswap   edx
+__asm   shl     edx,16                      \
 __asm   cmp     ah, 80h                     \
 __asm   adc     ecx,ecx                     /*1 cycle*/\
 __asm   and     eax, 0xffff7fff             \
@@ -371,8 +354,7 @@ __asm   shr     bp,1                /* pixel/2*/        \
 __asm   add     dx,bp               /* texel/2 + pixel/2*/  \
 __asm   add     eax, ebx                    /*1 cycle*/\
 __asm   setc    cl                          /*2 cycles*/\
-//__asm shl     edx, 16                     \
-__asm   bswap   edx
+__asm   shl     edx, 16                     \
 __asm   cmp     ah, 80h                     \
 __asm   adc     ecx,ecx                     /*1 cycle*/\
 __asm   and     eax, 0xffff7fff             \
@@ -391,7 +373,7 @@ __asm   mov     DWORD PTR [edi+12], edx/* Put pixel*/       \
 __asm   cmp     ah, 80h                     \
 __asm   adc     ecx,ecx                     /*1 cycle*/\
 __asm   and     eax, 0xffff7fff             \
-__asm   add     esi, DWORD PTR [ecx*4+dudvInt]\         /*now this is naughty! hmmm never use a memory adress over an add!*/
+__asm   add     esi, DWORD PTR [ecx*4+dudvInt]\
                                     \
 __asm   add     edi,16                  \
 __asm   cmp     edi,s_destend              \
@@ -429,37 +411,37 @@ __asm   mov     _dest, edi         }                \
 #undef SCANMAP
 
 
-
+#if 0	// commented out since it looks like Jorrit changed the things a bit
 #pragma message( "draw_scanline_map_alpha25" )
 #define NO_draw_scanline_map_alpha25
 #define SCANFUNC draw_scanline_map_alpha25
 #define SCANMAP 1
 #define SCANLOOP I386_SCANLINE_MAP_ALPHA50_16
-#include "render/softw16/scanln16.inc"
+#include "cs3d/software/scanln16.inc"
 
 #undef SCANFUNC
 #undef SCANEND
 #undef SCANLOOP
 #undef SCANMAP
-
-
 
 #pragma message( "draw_scanline_map_alpha50" )
 #define NO_draw_scanline_map_alpha50
 #define SCANFUNC draw_scanline_map_alpha50
 #define SCANMAP 1
 #define SCANLOOP I386_SCANLINE_MAP_ALPHA50_16
-#include "render/softw16/scanln16.inc"
+#include "cs3d/software/scanln16.inc"
 
 #undef SCANFUNC
 #undef SCANEND
 #undef SCANLOOP
 #undef SCANMAP
+
 #define NO_draw_scanline_map_alpha75
 #define SCANFUNC draw_scanline_map_alpha75
 #define SCANMAP 1
 #define SCANLOOP I386_SCANLINE_MAP_ALPHA50_16
-#include "render/softw16/scanln16.inc"
+#include "cs3d/software/scanln16.inc"
+#endif
 
 #if defined (DO_MMX)
 
@@ -471,7 +453,7 @@ __asm   mov     _dest, edi         }                \
 #define SCANMAP 1
 #define SCANLOOP I386_SCANLINE_MAP16
 #define SCANEND MMX_FILLZBUFFER
-#include "render/softw16/scanln16.inc"
+#include "cs3d/software/scanln16.inc"
 #define NO_mmx_draw_scanline_map
 
 #undef SCANFUNC
@@ -488,7 +470,7 @@ __asm   mov     _dest, edi         }                \
     }                                   \
     while (_dest <= _destend)
 #define SCANEND MMX_FILLZBUFFER
-#include "render/softw16/scanln16.inc"
+#include "cs3d/software/scanln16.inc"
 #define NO_mmx_draw_scanline
 
 #endif
@@ -510,11 +492,11 @@ void Scan16::draw_pi_scanline (void *_dest, int len, long *zbuff, long uu, long 
     Frac  = (uu << 16) | ((vv >> 1) & 0x7FFF);
     dFrac = (duu<< 16) | ((dvv>> 1) & 0x7FFF);
     sdzz = dz;
-	sz_buffer = (unsigned long *)zbuff;
+    sz_buffer = (unsigned long *)zbuff;
 
   // Sidenote: unrolling loop gives no gain???
 __asm {
-		mov     edi, dd
+		mov     edi, _dest
 		mov     ecx, z
 		mov     esi, s
 		mov		eax, Frac
@@ -523,7 +505,7 @@ __asm {
 		mov     oldEBP, ebp
 		mov		ebp, sz_buffer
 
-label0:	cmp		ecx, DWORD PTR [ebp]
+label0:		cmp		ecx, DWORD PTR [ebp]
 		jb	label1
 /*Do You thrive off cache murder?*/
 /*This won't pair! At ALL!*/
@@ -550,10 +532,9 @@ label1:
 		add		edi, 2			; dest++
 		add		ebp, 4			; zbuff++
 		add		esi, DWORD PTR [edx*4+dudvInt]
-		cmp		edi, slastD		; dest < lastD?
+		cmp		edi, s_destend		; dest < lastD?
 		jb	label0
 		mov		ebp,oldEBP
-
 	}
 }
 
@@ -561,6 +542,7 @@ label1:
 
 //Okay Please check over my changes! This was done very late at night!
 
+#define NO_mmx_draw_pi_scanline
 void Scan16::mmx_draw_pi_scanline (void *dest, int len, long *zbuff, long u, long du,
   long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w)
 {

@@ -156,7 +156,7 @@ __asm   mov     _dest, edi                  \
       izz += dzz;                   \
     }                               \
     while (z_buffer <= lastZbuf)
-#include "render/software/scanline.inc"
+#include "cs3d/software/scanline.inc"
 
 #undef SCANFUNC
 #undef SCANEND
@@ -213,7 +213,7 @@ __asm   mov     izz, ebx  }             \
     uu = uu1;                           \
     vv = vv1;                           \
     z_buffer = sz_buffer;
-#include "render/software/scanline.inc"
+#include "cs3d/software/scanline.inc"
 
 #undef SCANFUNC
 #undef SCANEND
@@ -344,7 +344,7 @@ __asm   mov     ebp, oldEBP     /* Restore EBP*/ \
 __asm   mov     _dest, edi }    \
     uu = uu1;                   \
     vv = vv1;
-#include "render/software/scanline.inc"
+#include "cs3d/software/scanline.inc"
 
 #undef SCANFUNC
 #undef SCANEND
@@ -475,7 +475,7 @@ __asm   mov     ebp, oldEBP     /* Restore EBP*/ \
 __asm   mov     _dest, edi }    \
     uu = uu1;                   \
     vv = vv1;
-#include "render/software/scanline.inc"
+#include "cs3d/software/scanline.inc"
 
 #if defined (DO_MMX)
 
@@ -488,7 +488,7 @@ __asm   mov     _dest, edi }    \
 #define SCANMAP 1
 #define SCANLOOP I386_SCANLINE_MAP8
 #define SCANEND MMX_FILLZBUFFER
-#include "render/software/scanline.inc"
+#include "cs3d/software/scanline.inc"
 #define NO_mmx_draw_scanline_map
 
 #undef SCANFUNC
@@ -507,7 +507,7 @@ __asm   mov     _dest, edi }    \
     }                                   \
     while (_dest <= _destend)
 #define SCANEND MMX_FILLZBUFFER
-#include "render/software/scanline.inc"
+#include "cs3d/software/scanline.inc"
 #define NO_mmx_draw_scanline
 
 #endif // DO_MMX
@@ -564,6 +564,7 @@ label1: add     ax, dvFrac                  ; v = v + dv
 
 #ifdef DO_MMX
 
+#define NO_mmx_draw_pi_scanline
 void Scan::mmx_draw_pi_scanline (void *dest, int len, long *zbuff, long u, long du,
   long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w)
 {
