@@ -202,7 +202,8 @@ private:
 
   // Append an occluder to the write queue.
   void AppendWriteQueue (iCamera* camera, iVisibilityObject* visobj,
-  	csDynavisObjectModel* model, csVisibilityObjectWrapper* obj);
+  	csDynavisObjectModel* model, csVisibilityObjectWrapper* obj,
+	const csBox2& sbox, float min_depth, float maximum);
 
 public:
   SCF_DECLARE_IBASE;

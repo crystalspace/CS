@@ -897,34 +897,35 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
 }
 
 void csDynaVis::AppendWriteQueue (iCamera* camera, iVisibilityObject* visobj,
-  	csDynavisObjectModel* /*model*/, csVisibilityObjectWrapper* obj)
+  	csDynavisObjectModel* /*model*/, csVisibilityObjectWrapper* obj,
+	const csBox2& sbox, float min_depth, float max_depth)
 {
   if (!obj->model->HasOBB ()) return;	// Object is not ment for writing.
 
-  iMovable* movable = visobj->GetMovable ();
+  //iMovable* movable = visobj->GetMovable ();
 
-  csReversibleTransform trans = camera->GetTransform ();
-  if (!movable->IsFullTransformIdentity ())
+  //csReversibleTransform trans = camera->GetTransform ();
+  //if (!movable->IsFullTransformIdentity ())
+  //{
+    //csReversibleTransform movtrans = movable->GetFullTransform ();
+    //trans /= movtrans;
+  //}
+
+  //const csOBB& obb = obj->model->GetOBB ();
+  //csOBBFrozen frozen_obb (obb, trans);
+
+  //float min_depth, max_depth;
+  //csBox2 sbox;
+  //if (frozen_obb.ProjectOBB (camera->GetFOV (),
+    	//camera->GetShiftX (), camera->GetShiftY (), sbox,
+	//min_depth, max_depth))
   {
-    csReversibleTransform movtrans = movable->GetFullTransform ();
-    trans /= movtrans;
-  }
-
-  const csOBB& obb = obj->model->GetOBB ();
-  csOBBFrozen frozen_obb (obb, trans);
-
-  float min_depth, max_depth;
-  csBox2 box;
-  if (frozen_obb.ProjectOBB (camera->GetFOV (),
-    	camera->GetShiftX (), camera->GetShiftY (), box,
-	min_depth, max_depth))
-  {
-    // Then append to queue if box is actually on screen.
-    if (box.MaxX () > 0 && box.MaxY () > 0 &&
-        box.MinX () < scr_width && box.MinY () < scr_height)
+    // Then append to queue if sbox is actually on screen.
+    if (sbox.MaxX () > 0 && sbox.MaxY () > 0 &&
+        sbox.MinX () < scr_width && sbox.MinY () < scr_height)
     {
       if (do_cull_ignoresmall)
-	if ((box.MaxX ()-box.MinX ()) < 10 && (box.MaxY ()-box.MinY ()) < 10)
+	if ((sbox.MaxX ()-sbox.MinX ())<10 && (sbox.MaxY ()-sbox.MinY ())<10)
 	  return;
 
       float depth = max_depth;
@@ -935,7 +936,7 @@ void csDynaVis::AppendWriteQueue (iCamera* camera, iVisibilityObject* visobj,
       if (obj->hint_goodoccluder)
         depth = min_depth;
 
-      write_queue->Append (box, depth, obj);
+      write_queue->Append (sbox, depth, obj);
 #     ifdef CS_DEBUG
       if (do_state_dump)
       {
@@ -956,243 +957,263 @@ void csDynaVis::AppendWriteQueue (iCamera* camera, iVisibilityObject* visobj,
 bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   	VisTest_Front2BackData* data, uint32 frustum_mask)
 {
-  bool vis = true;
-
   // For coverage test.
   csBox2 sbox;
   float min_depth = 0;
+  float max_depth;
+
+  const csBox3& obj_bbox = obj->child->GetBBox ();
+  const csVector3& pos = data->pos;
 
   csVisibilityObjectHistory* hist = obj->history;
 
-  if (obj->last_visible_vistestnr != current_vistest_nr)
+  // If already marked visible this frame we don't do anything.
+  if (obj->last_visible_vistestnr == current_vistest_nr)
+    return true;
+
+  iCamera* camera = data->rview->GetCamera ();
+  const csReversibleTransform& camtrans = camera->GetTransform ();
+  iMovable* movable = obj->visobj->GetMovable ();
+  csOBBFrozen frozen_obb;
+
+  uint32 new_mask2;
+  bool vis = false;
+  // Before we do anything else we test history culling (if enabled)
+  // and also if the position of the camera is inside the bounding box.
+  // Finally we test view frustum culling.
+  if (do_cull_history && hist->vis_cnt > 0)
   {
-    if (do_cull_history && hist->vis_cnt > 0)
-    {
-      obj->MarkVisible (VISIBLE_HISTORY, hist->vis_cnt-1, current_vistest_nr,
+    obj->MarkVisible (VISIBLE_HISTORY, hist->vis_cnt-1, current_vistest_nr,
 		      history_frame_cnt);
-      data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
-      cnt_visible++;
-      goto end;
+    data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
+    cnt_visible++;
+    vis = true;
+  }
+  else if (obj_bbox.Contains (pos))
+  {
+    obj->MarkVisible (VISIBLE_INSIDE, RAND_HISTORY, current_vistest_nr,
+		      history_frame_cnt);
+    data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
+    cnt_visible++;
+    vis = true;
+  }
+  else if (do_cull_frustum && !csIntersect3::BoxFrustum (obj_bbox,
+	data->frustum, frustum_mask, new_mask2))
+  {
+    hist->reason = INVISIBLE_FRUSTUM;
+    hist->has_vpt_point = false;
+    goto end;
+  }
+
+  // If we come here we know that either the object is already marked
+  // visible because of history culling of inside-box test or else the
+  // object is at least not invisible due to frustum culling. In this case
+  // we calculate the screen bounding box since we know we are going to need
+  // it both for additional visibility testing and also for the write queue.
+
+  float fov; fov = camera->GetFOV ();
+  float sx; sx = camera->GetShiftX ();
+  float sy; sy = camera->GetShiftY ();
+
+  bool sbox_rc;	// Is screen box visible.
+  if (obj->model->HasOBB ())
+  {
+    csReversibleTransform trans = camtrans;
+    if (!movable->IsFullTransformIdentity ())
+    {
+      csReversibleTransform movtrans = movable->GetFullTransform ();
+      trans /= movtrans;
+    }
+    const csOBB& obb = obj->model->GetOBB ();
+    frozen_obb.Copy (obb, trans);
+    sbox_rc = frozen_obb.ProjectOBB (fov, sx, sy, sbox, min_depth, max_depth);
+  }
+  else
+  {
+    // No OBB, so use AABB instead.
+    sbox_rc = obj_bbox.ProjectBox (camtrans, fov, sx, sy, sbox,
+		min_depth, max_depth);
+  }
+
+  // If previously marked visible we stop here.
+  if (vis) goto end;
+  // Now assume that the object is visible. In the following code we
+  // will attempt to prove that it is not visible.
+  vis = true;
+
+  if (do_cull_coverage != COVERAGE_NONE)
+  {
+    bool rc = false;
+
+    if (do_cull_vpt && hist->has_vpt_point)
+    {
+      csVector3 cam_center = camtrans * hist->vpt_point;
+      if (cam_center.z >= .1)
+      {
+	csVector2 sbox_center;
+	Perspective (cam_center, sbox_center, fov, sx, sy);
+	rc = tcovbuf->TestPoint (sbox_center, cam_center.z);
+	if (rc)
+	{
+	  // The point is visible. If we have write queue enabled we
+	  // have to test further.
+	  if (do_cull_writequeue)
+	    if (write_queue->IsPointAffected (sbox_center, cam_center.z))
+	      rc = false;
+	}
+
+	if (rc)
+	{
+	  // Point is visible. So we know the entire object is visible.
+	  obj->MarkVisible (VISIBLE_VPT, RAND_HISTORY, current_vistest_nr,
+	      	  history_frame_cnt);
+	  data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
+	  cnt_visible++;
+	  goto end;
+	}
+      }
     }
 
-    const csBox3& obj_bbox = obj->child->GetBBox ();
-    const csVector3& pos = data->pos;
-    if (obj_bbox.Contains (pos))
+    rc = sbox_rc;
+
+    csTestRectData testrect_data;
+    bool cont_check = true;
+    if (rc)
     {
-      obj->MarkVisible (VISIBLE_INSIDE, RAND_HISTORY, current_vistest_nr,
-		      history_frame_cnt);
-      data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
-      cnt_visible++;
-      goto end;
+#     ifdef CS_DEBUG
+      if (do_state_dump)
+      {
+        csRef<iString> str = tcovbuf->Debug_Dump ();
+        printf ("Before obj test:\n%s\n", str->GetData ());
+      }
+#     endif
+      rc = tcovbuf->PrepareTestRectangle (sbox, testrect_data);
+      if (rc)
+      {
+	rc = tcovbuf->TestRectangle (testrect_data, min_depth);
+      }
+      else
+      {
+	// If PrepareTestRectangle() fails then we know that the rectangle
+	// test fails regardless of write queue contents. So we don't have
+	// to continue.
+	cont_check = false;
+      }
     }
-  
-    uint32 new_mask2;
-    if (do_cull_frustum && !csIntersect3::BoxFrustum (obj_bbox, data->frustum,
-		frustum_mask, new_mask2))
+
+    if (rc && cont_check)
     {
-      hist->reason = INVISIBLE_FRUSTUM;
+      // Object is visible. If we have a write queue we will first
+      // test if there are objects in the queue that may mark the
+      // object as non-visible.
+      if (do_cull_writequeue)
+      {
+	// If the write queue is enabled we try to see if there
+	// are occluders that are relevant (intersect with this object
+	// to test). We will insert those object with the coverage
+	// buffer and test again.
+	float out_depth;
+	csVisibilityObjectWrapper* qobj = (csVisibilityObjectWrapper*)
+	    	write_queue->Fetch (sbox, min_depth, out_depth);
+	if (qobj)
+	{
+#         ifdef CS_DEBUG
+	  if (do_state_dump)
+	  {
+	    printf ("Adding objects from write queue!\n");
+	    fflush (stdout);
+	  }
+#         endif
+	  // We have found one such object. Insert them all.
+	  do
+	  {
+	    // Yes! We found such an object. Insert it now.
+	    if (do_cull_coverage == COVERAGE_POLYGON
+			|| !qobj->use_outline_filler)
+	      UpdateCoverageBuffer (data->rview->GetCamera (), qobj->visobj,
+		    qobj->model);
+	    else
+	      UpdateCoverageBufferOutline (data->rview->GetCamera (),
+		    qobj->visobj, qobj->model);
+	      // Now try again.
+            rc = tcovbuf->TestRectangle (testrect_data, min_depth);
+            if (!rc)
+	    {
+	      // It really is invisible.
+              hist->reason = INVISIBLE_TESTRECT;
+	      hist->has_vpt_point = false;
+	      vis = false;
+              goto end;
+	    }
+	    qobj = (csVisibilityObjectWrapper*)
+	    	  write_queue->Fetch (sbox, min_depth, out_depth);
+	  }
+	  while (qobj);
+	}
+      }
+    }
+    else
+    {
+      hist->reason = INVISIBLE_TESTRECT;
       hist->has_vpt_point = false;
       vis = false;
       goto end;
     }
 
-    if (do_cull_coverage != COVERAGE_NONE)
+    // If we come here we are visible and we can update a point for
+    // VPT tracking.
+    if (do_cull_vpt)
     {
-      iCamera* camera = data->rview->GetCamera ();
-      iMovable* movable = obj->visobj->GetMovable ();
-      float fov = camera->GetFOV ();
-      float sx = camera->GetShiftX ();
-      float sy = camera->GetShiftY ();
-
-      const csReversibleTransform& camtrans = camera->GetTransform ();
-      csReversibleTransform trans = camtrans;
-      if (!movable->IsFullTransformIdentity ())
-      {
-        csReversibleTransform movtrans = movable->GetFullTransform ();
-        trans /= movtrans;
-      }
-
-      bool rc = false;
-      float max_depth;
-
-      if (do_cull_vpt && hist->has_vpt_point)
-      {
-	csVector3 cam_center = camtrans * hist->vpt_point;
-	if (cam_center.z >= .1)
-	{
-	  csVector2 sbox_center;
-	  Perspective (cam_center, sbox_center, fov, sx, sy);
-	  rc = tcovbuf->TestPoint (sbox_center, cam_center.z);
-	  if (rc)
-	  {
-	    // The point is visible. If we have write queue enabled we have to test
-	    // further.
-	    if (do_cull_writequeue)
-	      if (write_queue->IsPointAffected (sbox_center, cam_center.z))
-	        rc = false;
-	  }
-
-	  if (rc)
-	  {
-	    // Point is visible. So we know the entire object is visible.
-	    obj->MarkVisible (VISIBLE_VPT, RAND_HISTORY, current_vistest_nr,
-	      	  history_frame_cnt);
-	    data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
-	    cnt_visible++;
-	    goto end;
-	  }
-        }
-      }
-
-      csOBBFrozen frozen_obb;
+      hist->has_vpt_point = false;
+      int i;
+      // First we try to find a visible point on the OBB or AABB.
       if (obj->model->HasOBB ())
       {
-        const csOBB& obb = obj->model->GetOBB ();
-        frozen_obb.Copy (obb, trans);
-        rc = frozen_obb.ProjectOBB (fov, sx, sy, sbox, min_depth, max_depth);
-      }
-      else
-      {
-	// No OBB, so use AABB instead.
-        rc = obj_bbox.ProjectBox (camtrans, fov, sx, sy, sbox, min_depth, max_depth);
-      }
-
-      csTestRectData testrect_data;
-      bool cont_check = true;
-      if (rc)
-      {
-#       ifdef CS_DEBUG
-        if (do_state_dump)
-        {
-          csRef<iString> str = tcovbuf->Debug_Dump ();
-          printf ("Before obj test:\n%s\n", str->GetData ());
-        }
-#       endif
-	rc = tcovbuf->PrepareTestRectangle (sbox, testrect_data);
-	if (rc)
+	for (i = 0 ; i < 8 ; i++)
 	{
-	  rc = tcovbuf->TestRectangle (testrect_data, min_depth);
-	}
-	else
-	{
-	  // If PrepareTestRectangle() fails then we know that the rectangle
-	  // test fails regardless of write queue contents. So we don't have
-	  // to continue.
-	  cont_check = false;
-	}
-      }
-
-      if (rc && cont_check)
-      {
-	// Object is visible. If we have a write queue we will first
-	// test if there are objects in the queue that may mark the
-	// object as non-visible.
-	if (do_cull_writequeue)
-	{
-	  // If the write queue is enabled we try to see if there
-	  // are occluders that are relevant (intersect with this object
-	  // to test). We will insert those object with the coverage
-	  // buffer and test again.
-	  float out_depth;
-	  csVisibilityObjectWrapper* qobj = (csVisibilityObjectWrapper*)
-	    	write_queue->Fetch (sbox, min_depth, out_depth);
-	  if (qobj)
+	  csVector3 v = frozen_obb.GetCorner (i);
+	  if (v.z >= .1)
 	  {
-#           ifdef CS_DEBUG
-	    if (do_state_dump)
+	    csVector2 p;
+	    Perspective (v, p, fov, sx, sy);
+	    bool test = tcovbuf->TestPoint (p, v.z);
+	    if (test)
 	    {
-	      printf ("Adding objects from write queue!\n");
-	      fflush (stdout);
+	      hist->vpt_point = frozen_obb.GetCorner (i);
+	      hist->has_vpt_point = true;
+	      break;
 	    }
-#           endif
-	    // We have found one such object. Insert them all.
-	    do
-	    {
-	      // Yes! We found such an object. Insert it now.
-	      if (do_cull_coverage == COVERAGE_POLYGON || !qobj->use_outline_filler)
-		UpdateCoverageBuffer (data->rview->GetCamera (), qobj->visobj,
-		    qobj->model);
-	      else
-		UpdateCoverageBufferOutline (data->rview->GetCamera (),
-		    qobj->visobj, qobj->model);
-	      // Now try again.
-              rc = tcovbuf->TestRectangle (testrect_data, min_depth);
-              if (!rc)
-	      {
-	        // It really is invisible.
-                hist->reason = INVISIBLE_TESTRECT;
-	        hist->has_vpt_point = false;
-	        vis = false;
-                goto end;
-	      }
-	      qobj = (csVisibilityObjectWrapper*)
-	    	  write_queue->Fetch (sbox, min_depth, out_depth);
-	    }
-	    while (qobj);
 	  }
 	}
       }
       else
       {
-        hist->reason = INVISIBLE_TESTRECT;
-	hist->has_vpt_point = false;
-	vis = false;
-        goto end;
-      }
-
-      // If we come here we are visible and we can update a point for VPT tracking.
-      if (do_cull_vpt)
-      {
-	hist->has_vpt_point = false;
-        int i;
-	// First we try to find a visible point on the OBB or AABB.
-        if (obj->model->HasOBB ())
-        {
-	  for (i = 0 ; i < 8 ; i++)
-	  {
-	    csVector3 v = frozen_obb.GetCorner (i);
-	    if (v.z >= .1)
-	    {
-	      csVector2 p;
-	      Perspective (v, p, fov, sx, sy);
-	      bool test = tcovbuf->TestPoint (p, v.z);
-	      if (test)
-	      {
-		hist->vpt_point = frozen_obb.GetCorner (i);
-		hist->has_vpt_point = true;
-		break;
-	      }
-	    }
-	  }
-	}
-	else
+	for (i = 0 ; i < 9 ; i++)	// Also include CS_BOX_CENTER3
 	{
-	  for (i = 0 ; i < 9 ; i++)	// Also include CS_BOX_CENTER3
+	  csVector3 v = camtrans * obj_bbox.GetCorner (i);
+	  if (v.z >= .1)
 	  {
-	    csVector3 v = camtrans * obj_bbox.GetCorner (i);
-	    if (v.z >= .1)
+	    csVector2 p;
+	    Perspective (v, p, fov, sx, sy);
+	    bool test = tcovbuf->TestPoint (p, v.z);
+	    if (test)
 	    {
-	      csVector2 p;
-	      Perspective (v, p, fov, sx, sy);
-	      bool test = tcovbuf->TestPoint (p, v.z);
-	      if (test)
-	      {
-		hist->vpt_point = obj_bbox.GetCorner (i);
-		hist->has_vpt_point = true;
-		break;
-	      }
+	      hist->vpt_point = obj_bbox.GetCorner (i);
+	      hist->has_vpt_point = true;
+	      break;
 	    }
 	  }
 	}
       }
     }
-
-    //---------------------------------------------------------------
-    // Object is visible so we should write it to the coverage buffer.
-    obj->MarkVisible (VISIBLE, RAND_HISTORY, current_vistest_nr, history_frame_cnt);
-    data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
-    cnt_visible++;
   }
+
+  //---------------------------------------------------------------
+  // Object is visible so we should write it to the coverage buffer.
+  obj->MarkVisible (VISIBLE, RAND_HISTORY, current_vistest_nr,
+    	history_frame_cnt);
+  data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
+  cnt_visible++;
 
 end:
   if (vis && do_cull_coverage != COVERAGE_NONE &&
@@ -1205,8 +1226,9 @@ end:
       {
         // We are using the write queue so we insert the object there
         // for later culling.
-        AppendWriteQueue (data->rview->GetCamera (), obj->visobj, obj->model,
-      	  obj);
+	if (sbox_rc)
+          AppendWriteQueue (data->rview->GetCamera (), obj->visobj, obj->model,
+      	    obj, sbox, min_depth, max_depth);
       }
       else
       {

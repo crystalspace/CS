@@ -25,6 +25,8 @@ chronological order.
 	  lot of MSVC compilation warnings when building PlaneShift, the
 	  project files of which use a higher warning level than the CS project
 	  files.
+	- Jorrit cleaned up the main routine in Dynavis that tests object
+	  visibility and also optimized it slightly.
 28-Oct-2003
 	- Jorrit did various optimizations to the tiled coverage buffer
 	  in Dynavis. Added several new special cases to Flush() and
