@@ -6,3 +6,7 @@
 config.mak*
 cache.mak*
 out
+Jamconfig
+Makefile
+config.*
+
