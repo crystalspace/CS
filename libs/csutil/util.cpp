@@ -242,3 +242,30 @@ void ByteSwap16bitBuffer( register unsigned short* place, register unsigned long
     *place = (( value >> 8 ) & 0x000000FF ) | (( value << 8 ) & 0x0000FF00 );
   }
 }
+
+
+// finds the smallest number that is a power of two and is larger or equal to n
+int FindNearestPowerOf2 (int n)
+{
+  int w=1;
+
+  while (n > w)  w <<= 1;
+
+  return w;
+}
+
+
+// returns true if n is a power of two
+bool IsPowerOf2 (int n)
+{
+  int i;
+  int po2 = 1;
+
+  if (!n) return false; 
+    
+  for (i=0; i<32; i++, po2<<=1)
+    if (n==po2) return true;
+
+  return false;
+}
+

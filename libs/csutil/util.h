@@ -85,4 +85,10 @@ void ByteSwap32bitBuffer( register unsigned long* const place, register unsigned
 ///	Byte swap 16 bit data in a buffer
 void ByteSwap16bitBuffer( register unsigned short* const place, register unsigned long count );
 
+/// finds the smallest number that is a power of two and is larger or equal to n
+int FindNearestPowerOf2 (int n);
+
+/// returns true if n is a power of two
+bool IsPowerOf2 (int n);
+
 #endif // __UTIL_H__
