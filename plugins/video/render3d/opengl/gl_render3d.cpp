@@ -44,6 +44,14 @@
 #include "ivideo/effects/efpass.h"
 #include "ivideo/effects/eflayer.h"
 
+CS_IMPLEMENT_PLUGIN
+
+SCF_IMPLEMENT_FACTORY (csGLRender3D)
+
+SCF_EXPORT_CLASS_TABLE (gl_render3d)
+  SCF_EXPORT_CLASS_DEP (csGLRender3D, "crystalspace.render3d.opengl",
+    "OpenGL Render3D graphics driver for Crystal Space", "crystalspace.font.server.")
+SCF_EXPORT_CLASS_TABLE_END
 
 
 SCF_IMPLEMENT_IBASE(csGLRender3D)
