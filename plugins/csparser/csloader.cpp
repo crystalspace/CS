@@ -1253,7 +1253,7 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* node)
         case XMLTOKEN_SHADERS:
 	  shader_given = true;
 #ifdef CS_USE_NEW_RENDERER
-          ParseShaderList (child);
+          ParseShaderList (ldr_context, child);
 #endif //CS_USE_NEW_RENDERER
           break;
 	default:
@@ -1348,7 +1348,7 @@ bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* node)
           break;
         case XMLTOKEN_SHADERS:
 #ifdef CS_USE_NEW_RENDERER
-          ParseShaderList (child);
+          ParseShaderList (ldr_context, child);
 #endif //CS_USE_NEW_RENDERER
           break;
 	case  XMLTOKEN_VARIABLELIST:
@@ -4885,7 +4885,8 @@ bool csLoader::ParseSharedVariable (iLoaderContext* ldr_context,
 //========================================================================
 
 #ifdef CS_USE_NEW_RENDERER
-bool csLoader::ParseShaderList (iDocumentNode* node)
+bool csLoader::ParseShaderList (iLoaderContext* ldr_context,
+	iDocumentNode* node)
 {
   csRef<iShaderManager> shaderMgr (
     CS_QUERY_REGISTRY (csLoader::object_reg, iShaderManager));
@@ -4905,7 +4906,7 @@ bool csLoader::ParseShaderList (iDocumentNode* node)
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
-    case XMLTOKEN_SHADER:
+      case XMLTOKEN_SHADER:
       {
         /*csRef<iShader> shader (shaderMgr->CreateShader ());
         //test if we have a childnode named file, if so load from file, else
@@ -4926,9 +4927,10 @@ bool csLoader::ParseShaderList (iDocumentNode* node)
 
 	csRef<iDocumentNode> shaderNode;
         csRef<iDocumentNode> fileChild = child->GetNode ("file");
+
         if (fileChild)
         {
-	  csRef<iVFS> vfs (CS_QUERY_REGISTRY(object_reg, iVFS));
+	  csRef<iVFS> vfs = CS_QUERY_REGISTRY(object_reg, iVFS);
 	  csRef<iFile> shaderFile = vfs->Open (
 	    fileChild->GetContentsValue (), VFS_FILE_READ);
 
@@ -4940,8 +4942,8 @@ bool csLoader::ParseShaderList (iDocumentNode* node)
 	    break;
 	  }
 
-	  csRef<iDocumentSystem> docsys (
-	    CS_QUERY_REGISTRY(object_reg, iDocumentSystem));
+	  csRef<iDocumentSystem> docsys =
+	    CS_QUERY_REGISTRY(object_reg, iDocumentSystem);
 	  if (docsys == 0)
 	    docsys.AttachNew (new csTinyDocumentSystem ());
 	  csRef<iDocument> shaderDoc = docsys->CreateDocument ();
@@ -4960,8 +4962,13 @@ bool csLoader::ParseShaderList (iDocumentNode* node)
 	  shaderNode = child->GetNode ("shader");
 	}
 
-	csRef<iShaderManager> shmgr (CS_QUERY_REGISTRY(object_reg, 
-	  iShaderManager));
+	if (ldr_context->CheckDupes ())
+	{
+          const char* name = shaderNode->GetAttributeValue ("name");
+	  iShader* m = shaderMgr->GetShader (name);
+	  if (m) return true;
+	}
+
         const char* type = shaderNode->GetAttributeValue ("type");
 	if (type == 0)
 	{
@@ -4969,9 +4976,9 @@ bool csLoader::ParseShaderList (iDocumentNode* node)
 	    "'type' attribute is missing!");
 	  return false;
 	}
-	csRef<iShaderCompiler> shcom (shmgr->GetCompiler (type));
-	csRef<iShader> shader = 
-	  shcom->CompileShader (shaderNode);
+	csRef<iShaderCompiler> shcom = shaderMgr->GetCompiler (type);
+	csRef<iShader> shader = shcom->CompileShader (shaderNode);
+	AddToRegion (ldr_context, shader->QueryObject ());
 
 	shaderMgr->RegisterShader (shader);
       }
@@ -4982,21 +4989,20 @@ bool csLoader::ParseShaderList (iDocumentNode* node)
 }
 #endif //CS_USE_NEW_RENDERER
 
-void csLoader::CollectAllChildren (iMeshWrapper* meshWrapper, csRefArray<iMeshWrapper>&
-  meshesArray)
+void csLoader::CollectAllChildren (iMeshWrapper* meshWrapper,
+	csRefArray<iMeshWrapper>& meshesArray)
 {  
   size_t lastMeshVisited = 0;
   meshesArray.Push (meshWrapper);
     
   while (lastMeshVisited < meshesArray.Length ())
   {
-    //
-    //Get the children of the current mesh (ie 'mesh').
+    // Get the children of the current mesh (ie 'mesh').
     csRef<iMeshList> mL = meshesArray[lastMeshVisited++]->GetChildren ();
     int i;
     for (i = 0; i < mL->GetCount (); i++)
       meshesArray.Push (mL->Get (i));
-  }//while
+  }
 
   return;
 }

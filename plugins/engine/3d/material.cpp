@@ -487,7 +487,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 csMaterialWrapper::csMaterialWrapper (iMaterial *m) : csObject()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
-  DG_TYPE (this, "csMaterialWrapper");
   material = m;
   matEngine = SCF_QUERY_INTERFACE (material, iMaterialEngine);
 }
@@ -495,27 +494,21 @@ csMaterialWrapper::csMaterialWrapper (iMaterial *m) : csObject()
 csMaterialWrapper::csMaterialWrapper (iMaterialHandle *ith) : csObject()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
-  DG_TYPE (this, "csMaterialWrapper");
 
   handle = ith;
-  DG_LINK (this, handle);
 }
 
 csMaterialWrapper::csMaterialWrapper (csMaterialWrapper &w) : csObject(w)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
-  DG_TYPE (this, "csMaterialWrapper");
 
   material = w.material;
   matEngine = w.matEngine;
   handle = w.handle;
-  DG_LINK (this, handle);
 }
 
 csMaterialWrapper::~csMaterialWrapper ()
 {
-  if (handle)
-    DG_UNLINK (this, handle);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
 }
 
@@ -530,24 +523,12 @@ void csMaterialWrapper::SetMaterialHandle (iMaterialHandle *m)
   material = 0;
   matEngine = 0;
 
-  if (handle)
-  {
-    DG_UNLINK (this, handle);
-  }
-
   handle = m;
-  DG_LINK (this, handle);
 }
 
 void csMaterialWrapper::Register (iTextureManager *txtmgr)
 {
-  if (handle)
-  {
-    DG_UNLINK (this, handle);
-  }
-
   handle = txtmgr->RegisterMaterial (material);
-  DG_LINK (this, handle);
 }
 
 void csMaterialWrapper::Visit ()

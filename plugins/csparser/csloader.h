@@ -543,7 +543,7 @@ private:
 
 #ifdef CS_USE_NEW_RENDERER
   /// Parse a shaderlist
-  bool ParseShaderList (iDocumentNode* node);
+  bool ParseShaderList (iLoaderContext* ldr_context, iDocumentNode* node);
 #endif //CS_USE_NEW_RENDERER
 
   /// For heightgen.

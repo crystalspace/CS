@@ -21,6 +21,7 @@
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
 #include "ivideo/material.h"
+#include "ivideo/shader/shader.h"
 #include "plugins/engine/3d/region.h"
 #include "plugins/engine/3d/engine.h"
 #include "iengine/sector.h"
@@ -220,6 +221,25 @@ void csRegion::DeleteAll ()
       copy[i] = 0;
     }
   }
+
+#ifdef CS_USE_NEW_RENDERER
+  csRef<iShaderManager> shmgr = CS_QUERY_REGISTRY (
+  	csEngine::current_engine->object_reg, iShaderManager);
+  if (shmgr)
+    for (i = 0; i < copy.Length (); i++)
+    {
+      if (copy[i])
+      {
+        iObject *obj = copy[i];
+        csRef<iShader> o (SCF_QUERY_INTERFACE (obj, iShader));
+        if (!o) continue;
+
+        shmgr->UnregisterShader (o);
+        ObjRemove (obj);
+        copy[i] = 0;
+      }
+    }
+#endif
 
   for (i = 0; i < copy.Length (); i++)
   {

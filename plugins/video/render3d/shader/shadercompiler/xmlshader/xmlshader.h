@@ -19,6 +19,8 @@
 #ifndef __XMLSHADER_H__
 #define __XMLSHADER_H__
 
+#include "csutil/weakref.h"
+#include "csutil/csobject.h"
 #include "ivideo/material.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
@@ -29,25 +31,21 @@
 
 class csXMLShaderCompiler;
 
-class csXMLShader : public iShader
+class csXMLShader : public iShader, public csObject
 {
 public:
-  SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE_EXT (csObject);
 
   csXMLShader (iGraphics3D* g3d);
   virtual ~csXMLShader();
-
-  /// Retrieve name of shader
-  virtual const char* GetName ()
-  {
-    return name;
-  }
 
   /// Get number of passes this shader have
   virtual int GetNumberOfPasses ()
   {
     return passesCount;
   }
+
+  virtual iObject* QueryObject () { return (iObject*)(csObject*)this; }
 
   /// Activate a pass for rendering
   virtual bool ActivatePass (unsigned int number);
@@ -165,10 +163,8 @@ private:
 
   unsigned int currentPass;
 
-  char* name;
-
   //Holders
-  csRef<iGraphics3D> g3d;
+  csWeakRef<iGraphics3D> g3d;
 public:
   int GetPassNumber (shaderPass* pass);
 };

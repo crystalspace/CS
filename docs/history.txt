@@ -10,6 +10,16 @@ chronological order.
 	- Jorrit added support for key/value pairs to materials and textures
 	  in the loader.
         - Philip Wyett fixed mismatched delete/delete[] in dds.cpp
+	- Jorrit fixed csXMLShader so that it holds a weak reference to g3d
+	  instead of a real reference. Should reduce the chance of memory
+	  leaks a bit.
+	- Jorrit fixed csXMLShader so that it now implements iObject.
+	- Jorrit fixed the loader so that it adds shaders to the right region.
+	- Jorrit fixed the loader so that it no longer adds a shader if
+	  a shader with the same name is already there (if CheckDupes() is
+	  true).
+	- Jorrit added iShaderManager::UnregisterShader().
+	- Jorrit fixed regions so that they can now unload shaders.
 18-Aug-2004
 	- Jorrit fixed the NR null renderer so that it also returns a
 	  valid iPolygonRenderer instance on calling

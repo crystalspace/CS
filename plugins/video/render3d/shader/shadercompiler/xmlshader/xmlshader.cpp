@@ -39,9 +39,9 @@ SCF_IMPLEMENT_IBASE(csXMLShaderCompiler)
   SCF_IMPLEMENTS_INTERFACE(iShaderCompiler)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_IBASE(csXMLShader)
+SCF_IMPLEMENT_IBASE_EXT(csXMLShader)
   SCF_IMPLEMENTS_INTERFACE(iShader)
-SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE_EXT_END
 
 csXMLShaderCompiler::csXMLShaderCompiler(iBase* parent)
 {
@@ -264,7 +264,7 @@ csPtr<csXMLShader> csXMLShaderCompiler::CompileTechnique (
     TagForbidden, forbiddenCount);
 
   csRef<csXMLShader> newShader = csPtr<csXMLShader> (new csXMLShader (g3d));
-  newShader->name = csStrNew (shaderName);
+  newShader->SetName (shaderName);
 
   int requiredPresent = 0;
   csRef<iDocumentNodeIterator> it = node->GetNodes (
@@ -829,9 +829,6 @@ int csXMLShader::lastTexturesCount;
 csXMLShader::csXMLShader (iGraphics3D* g3d) : passes(NULL), passesCount(0), 
   currentPass(~0)
 {
-  SCF_CONSTRUCT_IBASE(0);
-
-  name = 0; 
   csXMLShader::g3d = g3d;
   int i;
   for (i = 0; i < shaderPass::TEXTUREMAX; i++)
@@ -841,8 +838,6 @@ csXMLShader::csXMLShader (iGraphics3D* g3d) : passes(NULL), passesCount(0),
 csXMLShader::~csXMLShader ()
 {
   delete [] passes;
-  delete[] name;
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csXMLShader::ActivatePass (unsigned int number)

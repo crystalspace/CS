@@ -27,6 +27,7 @@
 #include "csgeom/vector3.h"
 #include "csutil/objreg.h"
 #include "csutil/scfstr.h"
+#include "iutil/object.h"
 #include "csgeom/vector4.h"
 #include "csutil/hashmap.h"
 #include "csutil/xmltiny.h"
@@ -232,7 +233,13 @@ bool csShaderManager::HandleEvent(iEvent& event)
 void csShaderManager::RegisterShader (iShader* shader)
 {
   if (shader != 0)
-    shaders.Push(shader);
+    shaders.Push (shader);
+}
+
+void csShaderManager::UnregisterShader (iShader* shader)
+{
+  if (shader != 0)
+    shaders.Delete (shader);
 }
 
 iShader* csShaderManager::GetShader(const char* name)
@@ -241,7 +248,7 @@ iShader* csShaderManager::GetShader(const char* name)
   for (i = 0; i < shaders.Length(); ++i)
   {
     iShader* shader = shaders.Get(i);
-    if (strcasecmp(shader->GetName(), name) == 0)
+    if (strcasecmp(shader->QueryObject ()->GetName(), name) == 0)
       return shader;
   }
   return 0;

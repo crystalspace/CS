@@ -98,6 +98,7 @@ public:
    * shaders.
    */
   virtual void RegisterShader (iShader* shader);
+  virtual void UnregisterShader (iShader* shader);
   /// Get a shader by name
   virtual iShader* GetShader (const char* name);
   /// Returns all shaders that have been created

@@ -38,6 +38,7 @@ struct iString;
 struct iDataBuffer;
 struct iDocumentNode;
 struct iMaterial;
+struct iObject;
 
 struct iShaderManager;
 struct iShaderRenderInterface;
@@ -128,9 +129,11 @@ struct iShaderManager : public iShaderVariableContext
    * Register a shader to the shadermanager.
    * Compiler should register all shaders
    */
-  virtual void RegisterShader(iShader* shader) = 0;
+  virtual void RegisterShader (iShader* shader) = 0;
+  /// Unregister a shader.
+  virtual void UnregisterShader (iShader* shader) = 0;
   /// Get a shader by name
-  virtual iShader* GetShader(const char* name) = 0;
+  virtual iShader* GetShader (const char* name) = 0;
   /// Returns all shaders that have been created
   virtual const csRefArray<iShader> &GetShaders ()  = 0;
 
@@ -183,8 +186,8 @@ SCF_VERSION (iShader, 0, 1, 0);
  */
 struct iShader : public iShaderVariableContext
 {
-  /// Retrieve name of shader
-  virtual const char* GetName() = 0;
+  /// Query the object.
+  virtual iObject* QueryObject () = 0;
 
   /// Get number of passes this shader have
   virtual int GetNumberOfPasses() = 0;
