@@ -321,34 +321,41 @@ iBase* csTerrFuncLoader::Parse (const char* pString,
 	  iVFS* vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
 	  if (!vfs)
 	  {
+	    // @@@ Use reporter!
 	    printf ("No VFS!\n");
-	    exit (0);
+	    return NULL;
 	  }
 	  iImageIO* loader = CS_QUERY_REGISTRY (object_reg, iImageIO);
 	  if (!loader)
 	  {
+	    vfs->DecRef ();
+	    // @@@ Use reporter!
 	    printf ("No image loader!\n");
-	    exit (0);
+	    return NULL;
 	  }
 
 	  iDataBuffer* buf = vfs->ReadFile (pStr);
+	  vfs->DecRef ();
 	  if (!buf || !buf->GetSize ())
 	  {
+	    loader->DecRef ();
+	    // @@@ Use reporter!
 	    printf ("Can't open file '%s' in vfs!\n", pStr);
-	    exit (0);
+	    return NULL;
 	  }
 	  iImage* ifile = loader->Load (buf->GetUint8 (), buf->GetSize (),
 	  	CS_IMGFMT_TRUECOLOR);
+	  loader->DecRef ();
 	  if (!ifile)
 	  {
+	    buf->DecRef ();
+	    // @@@ Use reporter!
 	    printf ("Error loading image '%s'!\n", pStr);
-	    exit (0);
+	    return NULL;
 	  }
 	  iTerrainState->SetHeightMap (ifile, hscale, hshift);
 	  ifile->DecRef ();
 	  buf->DecRef ();
-	  vfs->DecRef ();
-	  loader->DecRef ();
 	}
 	break;
     }

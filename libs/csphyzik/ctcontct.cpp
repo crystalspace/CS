@@ -435,8 +435,9 @@ void ctContactSolver::compute_contact_force_matrix
   //!me changes were ok
   for ( i = 0; i < ncontacts; i++ )
     for ( j = 0; j < ncontacts; j++ )
-      if ( a[i][j] != a[j][i] )
-        exit (-2);
+    {
+      CS_ASSERT ( a[i][j] == a[j][i] );
+    }
 }
 
 real ctContactSolver::compute_aij ( ctContact &ci, ctContact &cj )

@@ -55,9 +55,10 @@ int kbhit(void)
 void init ()
 {
   /* Get the current terminal settings */
-  if (tcgetattr(0,&save)!=0) {
+  if (tcgetattr(0,&save)!=0)
+  {
     fputs("Failed to init",stderr);
-    exit (1);
+    return;	// @@@ Use reporter and failure value!
   }
 
   /* We'll use save as a copy to restore the original

@@ -272,9 +272,7 @@ void csPoly3D::SplitWithPlane (
       if (sideA < 0)
       {
         // Compute the intersection point of the line
-
         // from point A to point B with the partition
-
         // plane. This is a simple ray-plane intersection.
         csVector3 v = ptB;
         v -= ptA;
@@ -294,9 +292,7 @@ void csPoly3D::SplitWithPlane (
       if (sideA > 0)
       {
         // Compute the intersection point of the line
-
         // from point A to point B with the partition
-
         // plane. This is a simple ray-plane intersection.
         csVector3 v = ptB;
         v -= ptA;
@@ -344,9 +340,7 @@ void csPoly3D::CutToPlane (const csPlane3 &split_plane)
       if (sideA < 0)
       {
         // Compute the intersection point of the line
-
         // from point A to point B with the partition
-
         // plane. This is a simple ray-plane intersection.
         csVector3 v = ptB;
         v -= ptA;
@@ -363,9 +357,7 @@ void csPoly3D::CutToPlane (const csPlane3 &split_plane)
       if (sideA > 0)
       {
         // Compute the intersection point of the line
-
         // from point A to point B with the partition
-
         // plane. This is a simple ray-plane intersection.
         csVector3 v = ptB;
         v -= ptA;
@@ -414,9 +406,7 @@ void csPoly3D::SplitWithPlaneX (
       if (sideA < 0)
       {
         // Compute the intersection point of the line
-
         // from point A to point B with the partition
-
         // plane. This is a simple ray-plane intersection.
         csVector3 v = ptB;
         v -= ptA;
@@ -435,9 +425,7 @@ void csPoly3D::SplitWithPlaneX (
       if (sideA > 0)
       {
         // Compute the intersection point of the line
-
         // from point A to point B with the partition
-
         // plane. This is a simple ray-plane intersection.
         csVector3 v = ptB;
         v -= ptA;
@@ -487,9 +475,7 @@ void csPoly3D::SplitWithPlaneY (
       if (sideA < 0)
       {
         // Compute the intersection point of the line
-
         // from point A to point B with the partition
-
         // plane. This is a simple ray-plane intersection.
         csVector3 v = ptB;
         v -= ptA;
@@ -508,9 +494,7 @@ void csPoly3D::SplitWithPlaneY (
       if (sideA > 0)
       {
         // Compute the intersection point of the line
-
         // from point A to point B with the partition
-
         // plane. This is a simple ray-plane intersection.
         csVector3 v = ptB;
         v -= ptA;
@@ -560,9 +544,7 @@ void csPoly3D::SplitWithPlaneZ (
       if (sideA < 0)
       {
         // Compute the intersection point of the line
-
         // from point A to point B with the partition
-
         // plane. This is a simple ray-plane intersection.
         csVector3 v = ptB;
         v -= ptA;
@@ -581,9 +563,7 @@ void csPoly3D::SplitWithPlaneZ (
       if (sideA > 0)
       {
         // Compute the intersection point of the line
-
         // from point A to point B with the partition
-
         // plane. This is a simple ray-plane intersection.
         csVector3 v = ptB;
         v -= ptA;

@@ -197,7 +197,6 @@ void csGraphics2DGLBe::ApplyDepthInfo(color_space cs)
     default:
       printf("Unimplemented color depth in Be 2D OpenGL driver (depth=%i)\n",
         Depth);
-      exit(1);
-      break;
+      return;	// @@@ Use reporter and return code.
   }
 }

@@ -70,9 +70,7 @@ void csTextureTrans::compute_texture_space (
   float x2, y2, z2;
 
   // The cross product of the given vector and the normal of
-
   // the polygon plane is a vector which is perpendicular on
-
   // both (and thus is also on the plane).
   x2 = y1 * C - z1 * B;
   y2 = z1 * A - x1 * C;

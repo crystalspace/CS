@@ -84,7 +84,7 @@ bool csGraphics2DDOSRAW::Initialize (iObjectRegistry *object_reg)
         rm, gm, bm))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Cannot find a suitable videomode match");
-    exit (-1);
+    return false;
   }
 
   pfmt.RedMask = (uint32)rm;
@@ -129,7 +129,7 @@ bool csGraphics2DDOSRAW::Open ()
   if (rc)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "ERROR! Could not set graphics mode.");
-    exit (-1);
+    return false;
   }
 
   _vdata = create_bitmap (Width, Height);

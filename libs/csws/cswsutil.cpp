@@ -268,14 +268,14 @@ void ParseConfigBitmap (csApp *app, const char *prefix, const char *section,
   {
     app->Printf (CS_REPORTER_SEVERITY_ERROR, "Cannot find bitmap definition %s.%s\n",
       section, id);
-    exit (-1);	// @@@ Please replace with return value!!!
+    return;	// @@@ Please replace with return value!!!
   }
 
   if (csScanStr (butdef, "%d,%d,%d,%d", &x, &y, &w, &h) != 4)
   {
     app->Printf (CS_REPORTER_SEVERITY_ERROR, "%s.%s): parse error in string: %s\n",
       section, id, butdef);
-    exit (-1);	// @@@ Please replace with return value!!!
+    return;	// @@@ Please replace with return value!!!
   }
 }
 

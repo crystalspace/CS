@@ -159,7 +159,7 @@ bool csGraphics2DAlleg::Open ()
   {
     Report (CS_REPORTER_SEVERITY_ERROR,
     	"ERROR! Could not set graphics mode.");
-    exit (-1);
+    return false;
   }
 
   bitmap = create_bitmap (Width, Height);

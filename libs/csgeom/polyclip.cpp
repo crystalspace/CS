@@ -199,7 +199,7 @@ void csPolygonClipper::Prepare ()
     ClipData[vert].x = ClipPoly[next].x - ClipPoly[vert].x;
     ClipData[vert].y = ClipPoly[next].y - ClipPoly[vert].y;
     if (vert) ClipBox.AddBoundingVertex (ClipPoly[vert]);
-  } /* endfor */
+  }
 }
 
 int csPolygonClipper::ClassifyBox (const csBox2 &box)
@@ -220,11 +220,7 @@ bool csPolygonClipper::IsInside (const csVector2 &v)
   // Detailed test
   int vert;
   for (vert = 0; vert < ClipPolyVertices; vert++)
-    if (
-      (
-        v.x -
-        ClipPoly[vert].x
-      ) *
+    if ((v.x - ClipPoly[vert].x) *
           ClipData[vert].y -
           (v.y - ClipPoly[vert].y) *
           ClipData[vert].x < 0)

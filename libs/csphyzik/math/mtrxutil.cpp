@@ -81,13 +81,10 @@ void linear_solve( real **A, int dim, double *x, double *b )
         //!me column space to row space first ). Cool!?!?!
 
 	factor = 0.0;  // the whole row was 0.0, so fail nicely
-//				printf( "shit singular matrix\n");
-//				exit(1);
       }
       else
       {
 	if ( fabs(A[elimrow][elimcol]) < MIN_REAL )
-	  //			exit(1);
 	  factor = MAX_REAL;
 	else
 	  factor = A[order[target_row]][elimcol]/A[elimrow][elimcol];

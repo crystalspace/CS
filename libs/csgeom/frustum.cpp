@@ -15,14 +15,13 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
 #include "cssysdef.h"
 #include "csgeom/frustum.h"
 #include "csgeom/transfrm.h"
 
 // OpenStep compiler generates corrupt assembly output (with unresolveable
-
 // symbols) when this method is defined inline in the interface, so it is
-
 // implemented here instead.
 void csClipInfo::Clear ()
 {
@@ -100,12 +99,7 @@ csFrustum::csFrustum (const csFrustum &copy)
 
 csFrustum::~csFrustum ()
 {
-  if (ref_count != 1)
-  {
-    printf ("###### Ref_count wrong!\n");
-    DEBUG_BREAK;
-  }
-
+  CS_ASSERT (ref_count == 1);
   Clear ();
 }
 
@@ -176,7 +170,6 @@ void csFrustum::Transform (csTransform *trans)
 void csFrustum::ClipPolyToPlane (csPlane3 *plane)
 {
   // First classify all vertices of the current polygon with regards to this
-
   // plane.
   int i, i1;
 
@@ -191,7 +184,6 @@ void csFrustum::ClipPolyToPlane (csPlane3 *plane)
   if (count_front == 0)
   {
     // None of the vertices of the new polygon are in front of the back
-
     // plane of this frustum. So intersection is empty.
     MakeEmpty ();
     return ;
@@ -204,7 +196,6 @@ void csFrustum::ClipPolyToPlane (csPlane3 *plane)
   }
 
   // Some of the vertices are in front, others are behind. So we
-
   // need to do real clipping.
   bool zs, z1s;
   csVector3 clipped_verts[100]; // @@@ Hard coded limit.
@@ -274,11 +265,11 @@ void csFrustum::ClipToPlane (csVector3 &v1, csVector3 &v2)
   int i;
 
   // Make sure that we have space in the array for at least three extra
-
   // vertices.
   if (num_vertices >= max_vertices - 3) ExtendVertexArray (3);
 
-  // Do the check only once at the beginning instead of twice during the routine.
+  // Do the check only once at the beginning instead of twice during the
+  // routine.
   if (mirrored)
     Plane_Normal = v2 % v1;
   else
@@ -299,7 +290,8 @@ void csFrustum::ClipToPlane (csVector3 &v1, csVector3 &v2)
   if (cw_offset == -1)
   {
     // Return, if there is no intersection.
-    if (first_vertex_side) MakeEmpty ();      // The whole polygon is behind the plane because the first is.
+    if (first_vertex_side)
+      MakeEmpty (); // The whole polygon is behind the plane because first is.
     return ;
   }
 
@@ -380,7 +372,8 @@ void csFrustum::ClipToPlane (
   if (cw_offset == -1)
   {
     // Return, if there is no intersection.
-    if (first_vertex_side) num_vertices = 0;  // The whole polygon is behind the plane
+    if (first_vertex_side)
+      num_vertices = 0;  // The whole polygon is behind the plane.
 
     // because the first is.
     return ;
@@ -525,7 +518,8 @@ void csFrustum::ClipToPlane (
   if (cw_offset == -1)
   {
     // Return, if there is no intersection.
-    if (first_vertex_side) num_vertices = 0;  // The whole polygon is behind the plane
+    if (first_vertex_side)
+      num_vertices = 0;  // The whole polygon is behind the plane.
 
     // because the first is.
     return ;
@@ -663,9 +657,7 @@ csFrustum *csFrustum::Intersect (
   csFrustum *new_frustum;
 
   // General case. Create a new frustum from the given polygon with
-
   // the origin of this frustum and clip it to every plane from this
-
   // frustum.
   new_frustum = new csFrustum (frust_origin);
   new_frustum->AddVertex (v1);
@@ -700,9 +692,7 @@ csFrustum *csFrustum::Intersect (
   csFrustum *new_frustum;
 
   // General case. Create a new frustum from the given polygon with
-
   // the origin of this frustum and clip it to every plane from this
-
   // frustum.
   new_frustum = new csFrustum (frust_origin, poly, num);
 
@@ -730,7 +720,6 @@ csFrustum *csFrustum::Intersect (csVector3 *poly, int num)
   if (IsInfinite ())
   {
     // If this frustum is infinite then the intersection of this
-
     // frustum with the other is equal to the other.
     new_frustum = new csFrustum (origin, poly, num);
     new_frustum->SetMirrored (IsMirrored ());
@@ -738,16 +727,13 @@ csFrustum *csFrustum::Intersect (csVector3 *poly, int num)
   else if (IsEmpty ())
   {
     // If this frustum is empty then the intersection will be empty
-
     // as well.
     return NULL;
   }
   else
   {
     // General case. Create a new frustum from the given polygon with
-
     // the origin of this frustum and clip it to every plane from this
-
     // frustum.
     new_frustum = new csFrustum (GetOrigin (), poly, num);
     new_frustum->SetMirrored (IsMirrored ());
@@ -768,7 +754,6 @@ csFrustum *csFrustum::Intersect (csVector3 *poly, int num)
     }
 
     // If this frustum has a back plane then we also need to clip the polygon
-
     // in the new frustum to that.
     if (backplane)
     {
@@ -843,9 +828,7 @@ int csFrustum::Classify (
   for (fv = 0, fvp = num_frust - 1; fv < num_frust; fvp = fv++)
   {
     // Find the equation of the Nth plane
-
     // Since the origin of frustum is at (0,0,0) the plane equation
-
     // has the form A*x + B*y + C*z = 0, where (A,B,C) is the plane normal.
     csVector3 &v1 = frustum[fvp];
     csVector3 &v2 = frustum[fv];
@@ -867,31 +850,21 @@ int csFrustum::Classify (
             return CS_FRUST_PARTIAL;
 
         //float f1 = (poly [pvp] % v1) * poly [pv];
-
         //float f2 = (v2 % poly [pvp]) * poly [pv];
-
         //if (!(f1 > 0 || f2 > 0)
-
         //|| (f1 == 0) || (f2 == 0))
-
         //return CS_FRUST_PARTIAL;
 #else
         // If the segment intersects with the frustum plane somewhere
-
         // between two limiting lines, we have the CS_FRUST_PARTIAL case.
         csVector3 p = poly[pvp] - (poly[pv] - poly[pvp]) *
           (prev_d / (d - prev_d));
 
         // If the vector product between both vectors making the frustum
-
         // plane and the intersection point between polygon edge and plane
-
         // have same sign, the intersection point is outside frustum
-
         //@@@ This is the old code but I think this code
-
         // should test against the frustum.
-
         //--- if ((poly [pvp] % p) * (poly [pv] % p) < 0)
         if ((v1 % p) * (v2 % p) <= 0) return CS_FRUST_PARTIAL;
 #endif
@@ -904,21 +877,13 @@ int csFrustum::Classify (
   if (all_inside) return CS_FRUST_INSIDE;
 
   // Now we know that all polygon vertices are outside frustum and no polygon
-
   // edge crosses the frustum. We should choose between CS_FRUST_OUTSIDE and
-
   // CS_FRUST_COVERED cases. For this we check if all frustum vertices are
-
   // inside the frustum created by polygon (reverse roles). In fact it is
-
   // enough to check just the first vertex of frustum is outside polygon
-
   // frustum: this lets us make the right decision.
-
   // Note: except if this first vertex happens to coincide with polygon.
-
   // In that case we need to select another vertex. If all vertices
-
   // coincide with the polygon then we have COVERED too.
   int test_point = 0;
   bool stop = true;
@@ -984,21 +949,15 @@ int csFrustum::BatchClassify (
 
 #else
         // If the segment intersects with the frustum plane somewhere
-
         // between two limiting lines, we have the CS_FRUST_PARTIAL case.
         csVector3 p = poly[pvp] - (poly[pv] - poly[pvp]) *
           (prev_d / (d - prev_d));
 
         // If the vector product between both vectors making the frustum
-
         // plane and the intersection point between polygon edge and plane
-
         // have same sign, the intersection point is outside frustum
-
         //@@@ This is the old code but I think this code
-
         // should test against the frustum.
-
         //--- if ((poly [pvp] % p) * (poly [pv] % p) < 0)
         if ((v1 % p) * (v2 % p) <= 0) return CS_FRUST_PARTIAL;
 #endif
@@ -1011,21 +970,13 @@ int csFrustum::BatchClassify (
   if (all_inside) return CS_FRUST_INSIDE;
 
   // Now we know that all polygon vertices are outside frustum and no polygon
-
   // edge crosses the frustum. We should choose between CS_FRUST_OUTSIDE and
-
   // CS_FRUST_COVERED cases. For this we check if all frustum vertices are
-
   // inside the frustum created by polygon (reverse roles). In fact it is
-
   // enough to check just the first vertex of frustum is outside polygon
-
   // frustum: this lets us make the right decision.
-
   // Note: except if this first vertex happens to coincide with polygon.
-
   // In that case we need to select another vertex. If all vertices
-
   // coincide with the polygon then we have COVERED too.
   int test_point = 0;
   bool stop = true;

@@ -127,8 +127,7 @@ void __poly_fill (csVector2 *iVertices, int iVertexCount)
           (
             sub_x -
             iVertices[prev].x
-          ) /
-              (iVertices[cur].x - iVertices[prev].x);
+          ) / (iVertices[cur].x - iVertices[prev].x);
 
         // Add the intersection point to both polygons
         p2[0][n2[0]++] = p2[1][n2[1]++] = csVector2 (sub_x, y);
@@ -153,7 +152,6 @@ void __poly_fill (csVector2 *iVertices, int iVertexCount)
   else
   {
     // Split the polygon horizontally by the line "y = sub_y"
-
     // (p[0] -- top poly, p[1] -- bottom poly)
     int sub_y = Grid->ymin + height / 2;
     int where_are_we = iVertices[0].y > sub_y;
@@ -178,8 +176,7 @@ void __poly_fill (csVector2 *iVertices, int iVertexCount)
           (
             sub_y -
             iVertices[prev].y
-          ) /
-              (iVertices[cur].y - iVertices[prev].y);
+          ) / (iVertices[cur].y - iVertices[prev].y);
 
         // Add the intersection point to both polygons
         p2[0][n2[0]++] = p2[1][n2[1]++] = csVector2 (x, sub_y);

@@ -279,28 +279,20 @@ bool operator!= (const csDMatrix3 &m1, const csDMatrix3 &m2)
 bool operator < (const csDMatrix3 &m, double f)
 {
   return
-  ABS(m.m11)
-  < f &&
-  ABS(m.m12)
-  < f &&
-  ABS(m.m13)
-  < f &&
-  ABS(m.m21)
-  < f &&
-  ABS(m.m22)
-  < f &&
-  ABS(m.m23)
-  < f &&
-  ABS(m.m31)
-  < f &&
-  ABS(m.m32)
-  < f &&
-  ABS(m.m33)
-  < f;
+    ABS(m.m11) < f &&
+    ABS(m.m12) < f &&
+    ABS(m.m13) < f &&
+    ABS(m.m21) < f &&
+    ABS(m.m22) < f &&
+    ABS(m.m23) < f &&
+    ABS(m.m31) < f &&
+    ABS(m.m32) < f &&
+    ABS(m.m33) < f;
 }
 bool operator> (double f, const csDMatrix3 &m)
 {
-  return ABS (m.m11) < f &&
+  return
+    ABS (m.m11) < f &&
     ABS (m.m12) < f &&
     ABS (m.m13) < f &&
     ABS (m.m21) < f &&
@@ -520,19 +512,12 @@ bool csDIntersect3::Planes (
   csDVector3 &isect)
 {
   //To find the one point that is on all three planes, we need to solve
-
   //the following equation system (we need to find the x, y and z which
-
   //are true for all equations):
-
   // A1*x+B1*y+C1*z+D1=0 //plane1
-
   // A2*x+B2*y+C2*z+D2=0 //plane2
-
   // A3*x+B3*y+C3*z+D3=0 //plane3
-
   //This can be solved according to Cramers rule by looking at the
-
   //determinants of the equation system.
   csDMatrix3 mdet (
               p1.A (),

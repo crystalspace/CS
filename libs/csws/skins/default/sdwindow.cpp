@@ -40,7 +40,7 @@ void csDefaultWindowSkin::Initialize (csApp *iApp, csSkin *Parent)
   {
     iApp->Printf (CS_REPORTER_SEVERITY_ERROR,
       "Cannot find texture %s for default window skin\n", TITLEBAR_TEXTURE_NAME);
-    exit (-1);	// @@@ Should not exit application!
+    return;	// @@@ Return value?
   }
 
   Parent->Load (Back, "Window", "Background");

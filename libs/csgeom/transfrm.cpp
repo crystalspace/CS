@@ -26,27 +26,16 @@
 csTransform csTransform::GetReflect (const csPlane3 &pl)
 {
   // Suppose that n is the plane normal in the direction of th reflection.
-
   // Suppose that u is the unit vector in the direction of the reflection
-
   // normal.  For any vector v, the component of v in the direction of
-
   // u is equal to (v * u) * u.  Thus, if v is reflected across a plane
-
   // through the origin with the given normal, the resulting vector is
-
   //  v' = v - 2 * [ (v * u) * u ] = v - 2 [ (v * n) * n ] / (n * n)
-
   //
-
   // x = <1,0,0>  =>  x' = <1,0,0> - 2 ( n.x * n ) / (n*n)
-
   // y = <0,1,0>  =>  y' = <0,1,0> - 2 ( n.y * n ) / (n*n)
-
   // z = <0,0,1>  =>  z' = <0,0,1> - 2 ( n.z * n ) / (n*n)
-
   //
-
   // 3x3 transformation matrix = [x' y' z']
   float i_normsq = 1 / (pl.norm * pl.norm);
   csVector3 xvec = (-2 * pl.norm.x * i_normsq) * pl.norm;
@@ -76,39 +65,22 @@ csPlane3 csTransform::Other2This (const csPlane3 &p) const
   csVector3 newnorm = m_o2t * p.norm;
 
   // let N represent norm <A,B,C>, and X represent point <x,y,z>
-
   //
-
   // Old plane equation: N*X + D = 0
-
   // There exists point X = <r*A,r*B,r*C> = r*N which satisfies the
-
   // plane equation.
-
   //  => r*(N*N) + D = 0
-
   //  => r = -D/(N*N)
-
   //
-
   // New plane equation: N'*X' + D' = 0
-
   // If M is the transformation matrix, and V the transformation vector,
-
   // N' = M*N, and X' = M*(X-V).  Assume that N' is already calculated.
-
   //  => N'*(M*(X-V)) + D' = 0
-
   //  => D' = -N'*(M*X) + N'*(M*V)
-
   //        = -N'*(M*(r*N)) + N'*(M*V)
-
   //        = -r*(N'*N') + N'*(M*V) = D*(N'*N')/(N*N) + N'*(M*V)
-
   // Since N' is a rotation of N, (N'*N') = (N*N), thus
-
   //  D' = D + N'*(M*V)
-
   //
   return csPlane3 (newnorm, p.DD + newnorm * (m_o2t * v_o2t));
 }
@@ -134,11 +106,8 @@ csSphere csTransform::Other2This (const csSphere &s) const
   news.SetCenter (Other2This (s.GetCenter ()));
 
   // @@@ It would be nice if we could quickly detect if a given
-
   // transformation is orthonormal. In that case we don't need to transform
-
   // the radius.
-
   // To transform the radius we transform a vector with the radius
 
   // relative to the transform.
@@ -200,13 +169,9 @@ csSphere &operator*= (csSphere &p, const csTransform &t)
   p.SetCenter (t.Other2This (p.GetCenter ()));
 
   // @@@ It would be nice if we could quickly detect if a given
-
   // transformation is orthonormal. In that case we don't need to transform
-
   // the radius.
-
   // To transform the radius we transform a vector with the radius
-
   // relative to the transform.
   csVector3 v_radius (p.GetRadius ());
   v_radius = t.Other2ThisRelative (v_radius);
@@ -261,13 +226,9 @@ csSphere csReversibleTransform::This2Other (const csSphere &s) const
   news.SetCenter (This2Other (s.GetCenter ()));
 
   // @@@ It would be nice if we could quickly detect if a given
-
   // transformation is orthonormal. In that case we don't need to transform
-
   // the radius.
-
   // To transform the radius we transform a vector with the radius
-
   // relative to the transform.
   csVector3 v_radius (s.GetRadius ());
   v_radius = This2OtherRelative (v_radius);

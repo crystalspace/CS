@@ -351,7 +351,7 @@ static void III_get_side_info(struct III_sideinfo *si,int stereo,
 
          if(gr_info->block_type == 0) {
            fprintf(stderr,"Blocktype == 0 and window-switching == 1 not allowed.\n");
-           exit(1);
+           return;	// @@@ Error return and reporter?
          }
 
          /* region_count/start parameters are implicit in this case. */
@@ -431,7 +431,7 @@ static void III_get_side_info_2(struct III_sideinfo *si,int stereo,
 
          if(gr_info->block_type == 0) {
            fprintf(stderr,"Blocktype == 0 and window-switching == 1 not allowed.\n");
-           exit(1);
+           return;	// @@@ Error return and reporter?
          }
          /* region_count/start parameters are implicit in this case. */
 /* check this again! */

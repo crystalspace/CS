@@ -1034,6 +1034,7 @@ TrianglesNode* csTriangleArrayPolygonBuffer::GetFirst()
 {
    return polygons.first;
 }
+
 TrianglesNode* csTriangleArrayPolygonBuffer::GetNext(TrianglesNode* t)
 {
   if (t == NULL) return NULL; //better if exit 1?

@@ -315,7 +315,7 @@ bool csGraphics2DSDL::Open()
   {
     Report (CS_REPORTER_SEVERITY_ERROR,
       "Couldn't initialize SDL: %s", SDL_GetError());
-    exit (1);
+    return false;
   }
 
   screen = SDL_SetVideoMode(Width,Height,Depth,SDL_SWSURFACE);

@@ -130,13 +130,14 @@ bool operator!= (const csBox2 &box1, const csBox2 &box2)
     (box1.maxbox.y != box2.maxbox.y);
 }
 
-bool operator < (const csBox2 &box1, const csBox2 &box2)
+bool operator< (const csBox2 &box1, const csBox2 &box2)
 {
   return (box1.minbox.x >= box2.minbox.x) &&
     (box1.minbox.y >= box2.minbox.y) &&
     (box1.maxbox.x <= box2.maxbox.x) &&
     (box1.maxbox.y <= box2.maxbox.y);
 }
+
 bool operator> (const csBox2 &box1, const csBox2 &box2)
 {
   return (box2.minbox.x >= box1.minbox.x) &&
@@ -145,10 +146,12 @@ bool operator> (const csBox2 &box1, const csBox2 &box2)
     (box2.maxbox.y <= box1.maxbox.y);
 }
 
-bool operator < (const csVector2 &point, const csBox2 &box)
+bool operator< (const csVector2 &point, const csBox2 &box)
 {
-  return (point.x >= box.minbox.x) && (point.x <= box.maxbox.x) && (point.y >= box.minbox.y) && (point.y <= box.maxbox.y);
+  return (point.x >= box.minbox.x) && (point.x <= box.maxbox.x)
+  	&& (point.y >= box.minbox.y) && (point.y <= box.maxbox.y);
 }
+
 bool csBox2::Intersect (
   float minx,
   float miny,
@@ -215,7 +218,6 @@ bool csBox2::Intersect (
 float csBox2::SquaredOriginDist () const
 {
   // Thanks to Ivan Avramovic for the original.
-
   // Adapted by Norman Kramer, Jorrit Tyberghein and Wouter Wijngaards.
   float res = 0;
   if (minbox.x > 0)
@@ -232,7 +234,6 @@ float csBox2::SquaredOriginDist () const
 float csBox2::SquaredOriginMaxDist () const
 {
   // Thanks to Ivan Avramovic for the original.
-
   // Adapted by Norman Kramer, Jorrit Tyberghein and Wouter Wijngaards.
   float res;
   if (minbox.x > 0)
@@ -630,7 +631,6 @@ void csBox3::GetConvexOutline (
 bool csBox3::Between (const csBox3 &box1, const csBox3 &box2) const
 {
   // First the trival test to see if the coordinates are
-
   // at least within the right intervals.
   if (
     (
@@ -647,7 +647,6 @@ bool csBox3::Between (const csBox3 &box1, const csBox3 &box2) const
     ))
   {
     // @@@ Ok, let's just return true here. Maybe this test is already
-
     // enough? We could have used the planes as well.
     return true;
   }
@@ -680,7 +679,6 @@ void csBox3::ManhattanDistance (const csBox3 &other, csVector3 &dist) const
 float csBox3::SquaredOriginDist () const
 {
   // Thanks to Ivan Avramovic for the original.
-
   // Adapted by Norman Kramer, Jorrit Tyberghein and Wouter Wijngaards.
   float res = 0;
   if (minbox.x > 0)
@@ -701,7 +699,6 @@ float csBox3::SquaredOriginDist () const
 float csBox3::SquaredOriginMaxDist () const
 {
   // Thanks to Ivan Avramovic for the original.
-
   // Adapted by Norman Kramer, Jorrit Tyberghein and Wouter Wijngaards.
   float res;
   if (minbox.x > 0)

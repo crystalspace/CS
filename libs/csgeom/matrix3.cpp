@@ -135,7 +135,9 @@ csMatrix3 csMatrix3::GetTranspose () const
 
 float csMatrix3::Determinant () const
 {
-  return m11 * (m22 * m33 - m23 * m32) - m12 * (m21 * m33 - m23 * m31) + m13 * (m21 * m32 - m22 * m31);
+  return m11 * (m22 * m33 - m23 * m32)
+  	- m12 * (m21 * m33 - m23 * m31)
+	+ m13 * (m21 * m32 - m22 * m31);
 }
 
 void csMatrix3::Set (const csQuaternion &quat)
@@ -284,28 +286,20 @@ bool operator!= (const csMatrix3 &m1, const csMatrix3 &m2)
 bool operator < (const csMatrix3 &m, float f)
 {
   return
-  ABS(m.m11)
-  < f &&
-  ABS(m.m12)
-  < f &&
-  ABS(m.m13)
-  < f &&
-  ABS(m.m21)
-  < f &&
-  ABS(m.m22)
-  < f &&
-  ABS(m.m23)
-  < f &&
-  ABS(m.m31)
-  < f &&
-  ABS(m.m32)
-  < f &&
-  ABS(m.m33)
-  < f;
+    ABS(m.m11) < f &&
+    ABS(m.m12) < f &&
+    ABS(m.m13) < f &&
+    ABS(m.m21) < f &&
+    ABS(m.m22) < f &&
+    ABS(m.m23) < f &&
+    ABS(m.m31) < f &&
+    ABS(m.m32) < f &&
+    ABS(m.m33) < f;
 }
 bool operator> (float f, const csMatrix3 &m)
 {
-  return ABS (m.m11) < f &&
+  return
+    ABS (m.m11) < f &&
     ABS (m.m12) < f &&
     ABS (m.m13) < f &&
     ABS (m.m21) < f &&

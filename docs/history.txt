@@ -10,6 +10,11 @@ The history order is reversed so that new features are at the top.
 	- 'res' fixed a bug in the OpenGL renderer where sometimes
 	  textures where multiplied with texture mean color. This caused
 	  color seams.
+	- Cleaned up lots of engine/csgeom comments.
+	- Removed lots of exit() calls from all over CS. A module in CS
+	  should almost never do exit but instead return an appropriate
+	  error to the caller (using the reporter and a return code for
+	  example).
 2-Apr-2002
 	- Eric Sunshine fixed a problem which caused a host of HTML pages in
 	  the user manual to be blank.  The culprit was a missing closing brace

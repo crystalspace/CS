@@ -2563,7 +2563,7 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id,
     {
       Report (CS_REPORTER_SEVERITY_BUG,
       	"ENGINE FAILURE! Fog object not open!");
-      exit (0);
+      return;
     }
 
     Scan.FogDensity = QRound (fb->density * 100);

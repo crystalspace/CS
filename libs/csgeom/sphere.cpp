@@ -47,13 +47,13 @@ void csSphere::Union (const csVector3 &ocenter, float oradius)
   else if (ABS (distance) < SMALL_EPSILON)
   {
     // Spheres very close to each other. Because the two tests above
-
     // succeeded the spheres are actually equal. So nothing has to be done.
   }
   else
   {
     csVector3 direction = (center - ocenter) / distance;
-    center = (center + direction * radius + ocenter + direction * oradius) * 0.5f;
+    center = (center + direction * radius + ocenter + direction * oradius)
+    	* 0.5f;
     radius = (radius + oradius + distance) * 0.5f;
   }
 }
