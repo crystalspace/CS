@@ -470,7 +470,8 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[], const char 
   if (!VFS)
     VFS = QUERY_PLUGIN_ID (this, CS_FUNCID_VFS, iVFS);
   G3D = QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
-  if (G3D) (G2D = G3D->GetDriver2D ())->IncRef ();
+  if (G3D) 
+    (G2D = G3D->GetDriver2D ())->IncRef ();
   Sound = QUERY_PLUGIN_ID (this, CS_FUNCID_SOUND, iSoundRender);
   NetDrv = QUERY_PLUGIN_ID (this, CS_FUNCID_NETDRV, iNetworkDriver);
   NetMan = QUERY_PLUGIN_ID (this, CS_FUNCID_NETMAN, iNetworkManager);
@@ -623,14 +624,17 @@ void csSystemDriver::CollectOptions (int argc, const char* const argv[])
       char *arg = strchr (opt, '=');
       if (arg)
       {
-        char *newopt = new char [arg - opt + 1];
-        memcpy (newopt, opt, arg - opt);
 	int n = arg - opt;
+        char *newopt = new char [n + 1];
+        memcpy (newopt, opt, n);
         (opt = newopt) [n] = 0;
         arg = strnew (arg + 1);
       }
       else
+      {
         opt = strnew (opt);
+	arg = strnew ("");
+      }
       CommandLine.Push (new csCommandLineOption (opt, arg));
     }
     else
