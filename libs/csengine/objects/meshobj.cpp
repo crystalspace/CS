@@ -53,19 +53,14 @@ IMPLEMENT_IBASE_EXT_INCREF(csMeshWrapper)
 
 void csMeshWrapper::DecRef()
 {
-  CS_ASSERT (scfRefCount >= 0);
-  if (scfRefCount <= 1) // About to be deleted...
+  CS_ASSERT (scfRefCount > 0);
+#if CS_DEBUG
+  if (scfRefCount == 1)
   {
-    iEngine *engine = QUERY_INTERFACE_FAST (parent, iEngine);
-    if (engine)
-    {
-      // First increase the ref count here because engine::RemoveMesh()
-      // will decrease it again.
-      scfRefCount++;
-      engine->GetCsEngine ()->RemoveMesh (this);
-      engine->DecRef ();
-    }
+    int idx = csEngine::current_engine->meshes.Find (this);
+    CS_ASSERT (idx == -1);
   }
+#endif
   __scf_superclass::DecRef();
 }
 

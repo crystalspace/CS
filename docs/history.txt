@@ -29,6 +29,16 @@ The history order is reversed so that new features are at the top.
 	- Fixed static linking for apps using the engine as a plugin by
 	  adding engine/3d to the PLUGINS section (instead of PLUGINS.DYNAMIC)
 	  in mk/user.mak.
+	- Fixed a bug in csMeshWrapper::DecRef()
+	  (and csTerrainWrapper::DecRef()). The custom code there would
+	  do scfRefCount++ in the assumption that the engine would
+	  decrease it again. But this only happens if the object was in
+	  the engine which is not always the case (in fact it should never
+	  be the case now). So this was a big memory leak. I kept the custom
+	  DecRef() and put some testing code there (using CS_ASSERT) to make
+	  sure that it is not misused.
+	- Fixed handling of csRegion::DeleteAll(). It should now work a lot
+	  better and actually delete everything.
 	- Norman Kramer removed UnlinkCollection() from csEngine.
 	- Fixed a problem with the transparent sphere in flarge.
 20-Jun-2001

@@ -104,6 +104,7 @@ void csRegion::Region::DeleteAll ()
       if (!o) continue;
       o->DecRef ();	// Remove ref from QUERY_INTERFACE_FAST.
       scfParent->engine->RemoveMesh (o);
+
       scfParent->ObjRemove (obj);	// Remove from this region.
       copy[i] = NULL;
     }
