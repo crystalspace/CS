@@ -1139,8 +1139,8 @@ bool csGLRender3D::ActivateTexture (iTextureHandle *txthandle, int unit)
       glBindTexture (GL_TEXTURE_2D, cachedata->Handle );
     if (ext.CS_GL_EXT_texture_lod_bias)
     {
-//      glTexEnvi (GL_TEXTURE_FILTER_CONTROL_EXT, 
-//	GL_TEXTURE_LOD_BIAS_EXT, textureLodBias); //big hack
+      glTexEnvi (GL_TEXTURE_FILTER_CONTROL_EXT, 
+	GL_TEXTURE_LOD_BIAS_EXT, textureLodBias); //big hack
     }
     texunit[unit] = txthandle;
     texunitenabled[unit] = true;
@@ -1218,7 +1218,11 @@ bool csGLRender3D::ActivateTexture (iMaterialHandle *mathandle, int layer, int u
     statecache->Enable_GL_TEXTURE_2D (unit);
     if (bind)
       glBindTexture (GL_TEXTURE_2D, cachedata->Handle );
-    glTexEnvi (GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, -2); //big hack
+    if (ext.CS_GL_EXT_texture_lod_bias)
+    {
+      glTexEnvi (GL_TEXTURE_FILTER_CONTROL_EXT, 
+	GL_TEXTURE_LOD_BIAS_EXT, textureLodBias); //big hack
+    }
     texunit[unit] = txthandle;
     texunitenabled[unit] = true;
     break;
