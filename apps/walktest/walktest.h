@@ -538,4 +538,7 @@ extern bool LoadCamera (iVFS*, const char *fName);
 /// Apply lights to all static objects (currently only meshes)
 void light_statics ();
 
+// The global system driver
+extern WalkTest *Sys;
+
 #endif // __WALKTEST_H

@@ -63,7 +63,8 @@ void sys_fatalerror(char *s)
   exit (1);
 }
 
-extern csSystemDriver* System; // Global pointer to system that can be used by event handler
+// @@@ Get rid of this!
+static SysSystemDriver* System = NULL;
 static iEventOutlet *EventOutlet;
 
 //-----------------------------------------------// The System Driver //------//
@@ -418,6 +419,8 @@ SCF_IMPLEMENT_IBASE_EXT_END
 
 SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 {
+  System = this;
+
   if (ModuleHandle == NULL)
     ModuleHandle = GetModuleHandle(NULL);
 
@@ -450,6 +453,8 @@ SysSystemDriver::~SysSystemDriver ()
 
   if (need_console)
     FreeConsole();
+
+  System = NULL;
 }
 
 bool SysSystemDriver::Open (const char *Title)
@@ -511,7 +516,7 @@ void SysSystemDriver::Alert (const char* s)
   bool FullScreen = false;
   int width, height, depth;
 
-  System->GetSettings(width, height, depth, FullScreen);
+  GetSettings(width, height, depth, FullScreen);
 
   if (FullScreen)
   {
@@ -689,7 +694,7 @@ long FAR PASCAL SysSystemDriver::WindowProc (HWND hWnd, UINT message,
         short (LOWORD (lParam)), short (HIWORD (lParam)));
       return TRUE;
     case WM_MOUSEMOVE:
-      SetCursor (((SysSystemDriver *)System)->m_hCursor);
+      SetCursor (System->m_hCursor);
       EventOutlet->Mouse (0, false,
         short (LOWORD (lParam)), short (HIWORD (lParam)));
       return TRUE;

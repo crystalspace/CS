@@ -43,6 +43,9 @@ CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
 
+// The global system driver
+Simple *System;
+
 Simple::Simple ()
 {
   view = NULL;

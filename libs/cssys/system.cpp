@@ -43,9 +43,6 @@
 #include "ivideo/graph2d.h"
 #include "iengine/motion.h"
 
-// The global system variable
-csSystemDriver *System = NULL;
-
 // This is the default fatal exit function. The user can replace
 // it by some other function that lonjumps somewhere, for example.
 // The 'canreturn' indicates a error that can be ignored (i.e. a
@@ -295,7 +292,6 @@ csSystemDriver::csSystemDriver () : PlugIns (8, 8), EventQueue (),
   // Create the default system event outlet
   EventOutlets.Push (new csEventOutlet (NULL, this));
 
-  System = this;
   FullScreen = false;
 
   VFS = NULL;
@@ -320,8 +316,6 @@ csSystemDriver::~csSystemDriver ()
 
   // Free all plugin options (also decrefs their iConfig interfaces)
   OptionList.DeleteAll ();
-
-  System = NULL;
 
   // Deregister all known drivers and plugins
   if (Console) Console->DecRef ();

@@ -33,6 +33,9 @@ CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
 
+// The global system driver
+PerfTest *System;
+
 PerfTest::PerfTest ()
 {
   draw_3d = true;

@@ -306,7 +306,7 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
   }
 
   // convert data from the 'filedata' structure into a CS sprite template
-  csCrossBuild_SpriteTemplateFactory builder (System);
+  csCrossBuild_SpriteTemplateFactory builder (Sys);
   iMeshObjectFactory *result = (iMeshObjectFactory *)builder.CrossBuild (*filedata);
   delete filedata;
 
@@ -920,7 +920,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "bugplug"))
   {
-    (void)CS_LOAD_PLUGIN (System, "crystalspace.utilities.bugplug", "BugPlug", iPlugIn);
+    (void)_CS_LOAD_PLUGIN (Sys, "crystalspace.utilities.bugplug", "BugPlug");
   }
   else if (!strcasecmp (cmd, "fps"))
     csCommandProcessor::change_boolean (arg, &Sys->do_fps, "fps");

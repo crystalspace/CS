@@ -1063,7 +1063,7 @@ void CaptureScreen ()
   } while (i < 1000 && Sys->myVFS->Exists(name));
   if (i >= 1000)
   {
-    System->Printf (CS_MSG_CONSOLE, "Too many screenshot files in current directory\n");
+    Sys->Printf (CS_MSG_CONSOLE, "Too many screenshot files in current directory\n");
     return;
   }
 
@@ -1213,7 +1213,7 @@ void WalkTest::Create2DSprites(void)
 bool WalkTest::Initialize (int argc, const char* const argv[],
 	const char *iConfigName)
 {
-  System->RequestPlugin ("crystalspace.utilities.reporter:Reporter");
+  Sys->RequestPlugin ("crystalspace.utilities.reporter:Reporter");
 
   if (!SysSystemDriver::Initialize (argc, argv, iConfigName))
   {
@@ -1343,7 +1343,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 
   // Initialize the command processor with the engine and camera.
   csCommandProcessor::Initialize (Engine, view->GetCamera (),
-    Gfx3D, Sys->myConsole, System);
+    Gfx3D, Sys->myConsole, Sys);
 
   // Now we have two choices. Either we create an infinite
   // maze (random). This happens when the '-infinite' commandline
@@ -1518,7 +1518,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   {
     myConsole->SetVisible (false);
     myConsole->AutoUpdate (false);
-    ConsoleInput = CS_QUERY_PLUGIN (System, iConsoleInput);
+    ConsoleInput = CS_QUERY_PLUGIN (Sys, iConsoleInput);
     if (ConsoleInput)
     {
       ConsoleInput->Bind (myConsole);

@@ -285,7 +285,7 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
   }
 
   if (!strcasecmp (cmd, "quit"))
-    csEngine::System->GetSystemEventOutlet ()->Broadcast (cscmdQuit);
+    Sys->GetSystemEventOutlet ()->Broadcast (cscmdQuit);
   else if (!strcasecmp (cmd, "help"))
   {
     CsPrintf (CS_MSG_CONSOLE, "-*- General commands -*-\n");

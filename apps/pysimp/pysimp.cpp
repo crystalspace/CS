@@ -39,6 +39,9 @@ SCF_REGISTER_STATIC_LIBRARY (engine)
 
 //-----------------------------------------------------------------------------
 
+// The global system driver
+PySimple *System;
+
 PySimple::PySimple ()
 {
   view = NULL;
@@ -226,8 +229,6 @@ int main (int argc, char* argv[])
 
   // Create our main class.
   System = new PySimple ();
-  // temp hack until we find a better way
-  csEngine::System = System;
 
   // We want at least the minimal set of plugins
   System->RequestPlugin ("crystalspace.kernel.vfs:VFS");

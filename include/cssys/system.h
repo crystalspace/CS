@@ -454,9 +454,6 @@ public:
   virtual iCommandLineParser *GetCommandLine ();
 };
 
-// CrystalSpace global variables
-extern csSystemDriver *System;
-
 // Fatal exit routine (which can be replaced if neccessary)
 extern void (*fatal_exit) (int errorcode, bool canreturn);
 

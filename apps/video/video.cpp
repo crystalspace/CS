@@ -45,6 +45,9 @@ SCF_REGISTER_STATIC_LIBRARY (engine)
 
 //-----------------------------------------------------------------------------
 
+// The global system driver
+Video *System;
+
 Video::Video ()
 {
   view = NULL;

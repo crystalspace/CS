@@ -84,8 +84,7 @@ Simple::~Simple ()
 
   //delete flock;
 
-  System->console_out ("Cleaning up...\n");
-  delete System;
+  console_out ("Cleaning up...\n");
 }
 
 void Simple::SetTexSpace(csProcSkyTexture *skytex, iPolygon3D *poly, 
@@ -346,7 +345,7 @@ bool Simple::HandleEvent (iEvent &Event)
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == 't'))
   {
     /// toggle animation
-    sky->SetAnimated( !sky->GetAnimated(), System->GetTime());
+    sky->SetAnimated( !sky->GetAnimated(), GetTime());
     return true;
   }
 
@@ -497,7 +496,7 @@ int main (int argc, char* argv[])
   srand (time (NULL));
 
   // Create our main class.
-  System = new Simple ();
+  Simple *System = new Simple ();
 
   // We want at least the minimal set of plugins
   System->RequestPlugin ("crystalspace.kernel.vfs:VFS");
@@ -518,6 +517,9 @@ int main (int argc, char* argv[])
 
   // Main loop.
   System->Loop ();
+
+  // cleanup
+  delete System;
 
   return 0;
 }

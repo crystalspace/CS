@@ -54,6 +54,9 @@ CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
 
+// The global system driver
+Demo *System;
+
 #define  QUERY_PLUG(myPlug, iFace, errMsg) \
   myPlug = CS_QUERY_PLUGIN (this, iFace); \
   if (!myPlug) \

@@ -62,6 +62,9 @@ SCF_REGISTER_STATIC_LIBRARY (engine)
 
 //-----------------------------------------------------------------------------
 
+// the global system driver variable
+BumpTest *System;
+
 BumpTest::BumpTest ()
 {
   view = NULL;

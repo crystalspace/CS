@@ -38,6 +38,9 @@
 
 CS_IMPLEMENT_APPLICATION
 
+// The global system driver
+IsoTest *System;
+
 IsoTest::IsoTest ()
 {
   engine = NULL;

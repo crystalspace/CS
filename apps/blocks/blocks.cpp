@@ -1456,7 +1456,7 @@ void Blocks::HandleDemoKey (int key, bool /*shf*/, bool /*alt*/, bool /*ctl*/)
 	  TerminateConnection ();
 	  // Finish networking stuff.
 #endif
-	  System->Shutdown = true;
+	  Shutdown = true;
 	  break;
       }
       break;
@@ -2813,7 +2813,7 @@ const char* Blocks::KeyName (const KeyMapping& map)
 
 void Blocks::ReadConfig ()
 {
-  iConfigFile *keys = System->GetConfig();
+  iConfigFile *keys = GetConfig();
   NamedKey (keys->GetStr ("Blocks.Keys.Up", "up"), key_up);
   NamedKey (keys->GetStr ("Blocks.Keys.Down", "down"), key_down);
   NamedKey (keys->GetStr ("Blocks.Keys.Left", "left"), key_left);
@@ -2858,7 +2858,7 @@ void Blocks::ReadConfig ()
 
 void Blocks::WriteConfig ()
 {
-  iConfigFile *keys = System->GetConfig();
+  iConfigFile *keys = GetConfig();
   keys->SetStr ("Blocks.Keys.Up", KeyName (key_up));
   keys->SetStr ("Blocks.Keys.Down", KeyName (key_down));
   keys->SetStr ("Blocks.Keys.Left", KeyName (key_left));

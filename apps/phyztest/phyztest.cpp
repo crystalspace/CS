@@ -52,7 +52,7 @@ SCF_REGISTER_STATIC_LIBRARY (engine)
 
 // The physics world.  Main object for physics stuff
 ctWorld phyz_world;
-Phyztest *Sys;
+Phyztest *System;
 
 // data for mass on spring demo
 csMeshWrapper *bot = NULL;
@@ -145,8 +145,8 @@ Phyztest::~Phyztest ()
 
 void cleanup ()
 {
-  Sys->console_out ("Cleaning up...\n");
-  delete Sys;
+  System->console_out ("Cleaning up...\n");
+  delete System;
 }
 
 bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConfigName)
@@ -203,7 +203,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
     exit (1);
   }
 
-  cdsys = CS_LOAD_PLUGIN (Sys, "crystalspace.collisiondetection.rapid", "CollDet", iCollideSystem);
+  cdsys = CS_LOAD_PLUGIN (System, "crystalspace.collisiondetection.rapid", "CollDet", iCollideSystem);
 
   // Some commercials...
   Printf (CS_MSG_INITIALIZATION, "Phyztest Crystal Space Application version 0.1.\n");
@@ -664,9 +664,7 @@ int main (int argc, char* argv[])
   phyz_world.register_catastrophe_manager( cdm );
 
   // Create our main class.
-  Sys = new Phyztest ();
-  // temp hack until we find a better way
-  csEngine::System = Sys;
+  System = new Phyztest ();
 
   // We want at least the minimal set of plugins
   System->RequestPlugin ("crystalspace.kernel.vfs:VFS");
@@ -677,15 +675,15 @@ int main (int argc, char* argv[])
   System->RequestPlugin ("crystalspace.level.loader:LevelLoader");
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.
-  if (!Sys->Initialize (argc, argv, NULL))
+  if (!System->Initialize (argc, argv, NULL))
   {
-    Sys->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
+    System->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
     cleanup ();
     exit (1);
   }
 
   // Main loop.
-  Sys->Loop ();
+  System->Loop ();
 
   // Cleanup.
   cleanup ();
