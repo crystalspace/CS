@@ -5730,6 +5730,7 @@ class iSpriteCal3DState(iBase):
     def GetAnimCount(*args): return _cspace.iSpriteCal3DState_GetAnimCount(*args)
     def GetAnimName(*args): return _cspace.iSpriteCal3DState_GetAnimName(*args)
     def GetAnimType(*args): return _cspace.iSpriteCal3DState_GetAnimType(*args)
+    def FindAnim(*args): return _cspace.iSpriteCal3DState_FindAnim(*args)
     def ClearAllAnims(*args): return _cspace.iSpriteCal3DState_ClearAllAnims(*args)
     def SetAnimCycle(*args): return _cspace.iSpriteCal3DState_SetAnimCycle(*args)
     def AddAnimCycle(*args): return _cspace.iSpriteCal3DState_AddAnimCycle(*args)
