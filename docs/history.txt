@@ -4,6 +4,12 @@ The history order has been reversed so that new features are at the top.
 	- Fixed a serious bug in csMeshWrapper::SetMeshObject(). This
 	  function would do a DecRef() on the given mesh (possibly
 	  deleting it).
+	- Fixed a bug in WalkTest. It would not release the reference
+	  to all created particle systems. This caused memory leaks.
+	- Fixed another bug in WalkTest where the particle system was
+	  created with the wrong position. Actually, it is the right position
+	  but set through the wrong method. Now correctly uses
+	  movable.SetPosition() to set the position.
 14-Jan-2001
 	- Eric Sunshine fixed vfs.cfg so that it works with MacOS/X Server
 	  again following Andrew's change to the meaning of CS_PLATFORM_NAME.

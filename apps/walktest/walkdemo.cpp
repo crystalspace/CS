@@ -142,6 +142,7 @@ void add_particles_rain (csSector* sector, char* matname, int num, float speed)
     iMeshObjectFactory* factory = type->NewFactory ();
     iMeshObject* mesh = factory->NewInstance ();
     csMeshWrapper* exp = new csMeshWrapper (Sys->view->GetEngine (), mesh);
+    mesh->DecRef ();
     Sys->view->GetEngine ()->sprites.Push (exp);
     exp->GetMovable ().SetSector (sector);
     exp->GetMovable ().UpdateMove ();
@@ -217,6 +218,7 @@ void add_particles_snow (csSector* sector, char* matname, int num, float speed)
     iMeshObjectFactory* factory = type->NewFactory ();
     iMeshObject* mesh = factory->NewInstance ();
     csMeshWrapper* exp = new csMeshWrapper (Sys->view->GetEngine (), mesh);
+    mesh->DecRef ();
     Sys->view->GetEngine ()->sprites.Push (exp);
     exp->GetMovable ().SetSector (sector);
     exp->GetMovable ().UpdateMove ();
@@ -259,6 +261,7 @@ void add_particles_fire (csSector* sector, char* matname, int num,
   iMeshObjectFactory* factory = type->NewFactory ();
   iMeshObject* mesh = factory->NewInstance ();
   csMeshWrapper* exp = new csMeshWrapper (Sys->view->GetEngine (), mesh);
+  mesh->DecRef ();
   Sys->view->GetEngine ()->sprites.Push (exp);
   exp->GetMovable ().SetSector (sector);
   exp->GetMovable ().UpdateMove ();
@@ -300,8 +303,10 @@ void add_particles_fountain (csSector* sector, char* matname, int num,
   iMeshObjectFactory* factory = type->NewFactory ();
   iMeshObject* mesh = factory->NewInstance ();
   csMeshWrapper* exp = new csMeshWrapper (Sys->view->GetEngine (), mesh);
+  mesh->DecRef ();
   Sys->view->GetEngine ()->sprites.Push (exp);
   exp->GetMovable ().SetSector (sector);
+  exp->GetMovable ().SetPosition (origin);
   exp->GetMovable ().UpdateMove ();
 
   iParticleState* partstate = QUERY_INTERFACE (mesh, iParticleState);
@@ -313,7 +318,7 @@ void add_particles_fountain (csSector* sector, char* matname, int num,
   iFountainState* fountstate = QUERY_INTERFACE (mesh, iFountainState);
   fountstate->SetNumberParticles (num);
   fountstate->SetDropSize (.1, .1);
-  fountstate->SetOrigin (origin);
+  fountstate->SetOrigin (csVector3 (0, 0, 0));
   fountstate->SetAcceleration (csVector3 (0, -1., 0));
   fountstate->SetFallTime (5.0);
   fountstate->SetSpeed (3.0);
@@ -344,8 +349,10 @@ void add_particles_explosion (csSector* sector, const csVector3& center, char* m
   iMeshObjectFactory* factory = type->NewFactory ();
   iMeshObject* mesh = factory->NewInstance ();
   csMeshWrapper* exp = new csMeshWrapper (Sys->view->GetEngine (), mesh);
+  mesh->DecRef ();
   Sys->view->GetEngine ()->sprites.Push (exp);
   exp->GetMovable ().SetSector (sector);
+  exp->GetMovable ().SetPosition (center);
   exp->GetMovable ().UpdateMove ();
 
   iParticleState* partstate = QUERY_INTERFACE (mesh, iParticleState);
@@ -358,7 +365,7 @@ void add_particles_explosion (csSector* sector, const csVector3& center, char* m
 
   iExplosionState* expstate = QUERY_INTERFACE (mesh, iExplosionState);
   expstate->SetNumberParticles (100);
-  expstate->SetCenter (center);
+  expstate->SetCenter (csVector3 (0, 0, 0));
   expstate->SetPush (csVector3 (0, 0, 0));
   expstate->SetNrSides (6);
   expstate->SetPartRadius (0.15);
@@ -393,8 +400,10 @@ void add_particles_spiral (csSector* sector, const csVector3& bottom, char* matn
   iMeshObjectFactory* factory = type->NewFactory ();
   iMeshObject* mesh = factory->NewInstance ();
   csMeshWrapper* exp = new csMeshWrapper (Sys->view->GetEngine (), mesh);
+  mesh->DecRef ();
   Sys->view->GetEngine ()->sprites.Push (exp);
   exp->GetMovable ().SetSector (sector);
+  exp->GetMovable ().SetPosition (bottom);
   exp->GetMovable ().UpdateMove ();
 
   iParticleState* partstate = QUERY_INTERFACE (mesh, iParticleState);
@@ -405,7 +414,7 @@ void add_particles_spiral (csSector* sector, const csVector3& bottom, char* matn
 
   iSpiralState* spirstate = QUERY_INTERFACE (mesh, iSpiralState);
   spirstate->SetNumberParticles (500);
-  spirstate->SetSource (bottom);
+  spirstate->SetSource (csVector3 (0, 0, 0));
 }
 
 //===========================================================================
