@@ -23,6 +23,8 @@
 #include "cs2d/common/graph2d.h"
 #include "cssys/unix/iunix.h"
 #include "cs2d/openglx/gl2d_font.h"
+#include "cs3d/opengl/ogl_txtmgr.h"
+#include "cs3d/opengl/ogl_txtcache.h"
 
 #include <GL/glx.h>
 
@@ -39,6 +41,7 @@
 #endif /* DO_SHM */
 
 interface ITextureHandle;
+class OpenGLTextureCache;
 
 // The CLSID to create csGraphics2DGLX instances
 extern const CLSID CLSID_GLXGraphics2D;
@@ -71,6 +74,9 @@ class csGraphics2DGLX : public csGraphics2D
 
   // Window colormap
   Colormap cmap;
+
+  // my own private texture cache--for sprites!
+  static OpenGLTextureCache *texture_cache; 
 
   // Use SHM or not?
   bool do_shm;
