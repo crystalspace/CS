@@ -265,7 +265,7 @@ class csOpenGLProcSoftware2D : public iGraphics2D
   ///
   virtual void Write (iFont *font, int x, int y, int fg, int bg, const char *s)
   { 
-    int cbg = (bg == -1) ? ConvertColour (bg) : bg;
+    int cbg = (bg != -1) ? ConvertColour (bg) : bg;
     g2d->Write (font, x, y, ConvertColour (fg), cbg, s);
   }
 
