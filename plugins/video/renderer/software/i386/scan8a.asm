@@ -780,7 +780,7 @@
 ;   long u, long du, long v, long dv, unsigned long z, long dz,
 ;   unsigned char *bitmap, int bitmap_log2w
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
-proc		csScan_8_draw_pi_scanline_tex_zuse,20,ebx,esi,edi,ebp
+proc		csScan_8_draw_pi_scanline_tex_zuse,24,ebx,esi,edi,ebp
 		targ	%$dest		; void *dest
 		targ	%$width		; int width
 		targ	%$zbuff		; long *zbuff
@@ -797,6 +797,7 @@ proc		csScan_8_draw_pi_scanline_tex_zuse,20,ebx,esi,edi,ebp
 		tloc	%$duFP		; fixed-point duu
 		tloc	%$dvFP		; fixed-point dvv
 		tloc	%$destend
+		tloc	%$paltable	; index->palette conversion table
 ; if (len <= 0)
 ;   return;
 		mov	eax,%$width
@@ -805,7 +806,9 @@ proc		csScan_8_draw_pi_scanline_tex_zuse,20,ebx,esi,edi,ebp
 		exit	le
 
 		add	eax,edi
+		mov	ebp,PaletteTable
 		mov	%$destend,eax
+		mov	%$paltable,ebp
 
 ; dudvInt[1] = ((dv >> 16) << bitmap_log2w) + (du >> 16);
 		mov	eax,%$dv		; eax = dv		; 0
@@ -857,8 +860,12 @@ proc		csScan_8_draw_pi_scanline_tex_zuse,20,ebx,esi,edi,ebp
 
 %$sloop:	cmp	ecx,[ebp]		; Check Z-buffer	; 0
 		jb	%$zbelow		; We're below surface	; 0
-		mov	dl,[esi]		; Get texel		; 1
+		xor	edx,edx
 		mov	[ebp],ecx		; *zbuff = z		; 1
+		mov	ecx,%$paltable		; Get 8->16 table	; 2
+		mov	dl,[esi]		; Get texel		; 1
+		mov	dl,[ecx+edx]		; Convert to pal	; 3/2
+		mov	ecx,[ebp]		; z = *zbuff		; 3
 		mov	[edi],dl		; Put texel		; 2
 
 %$zbelow:	add	ebx,%$dvFP		; v = v + dv		; 2
