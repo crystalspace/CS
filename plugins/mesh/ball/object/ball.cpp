@@ -790,7 +790,6 @@ bool csBallMeshObject::DrawTest (iRenderView* rview, iMovable* movable,
   int clip_portal, clip_plane, clip_z_plane;
   rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
   	clip_z_plane);
-  csVector3 camera_origin = tr_o2c.GetT2OTranslation ();
 
 #ifndef CS_USE_NEW_RENDERER
   iGraphics3D* g3d = rview->GetGraphics3D ();
