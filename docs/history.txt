@@ -36,6 +36,12 @@ The history order is reversed so that new features are at the top.
 	  issues, and invalid expansion of makefile variables by the shell when
 	  the shell synthesized the makefile fragment in response to
 	  --makevars.
+	- Eric Sunshine changed csconf.mak so that cs-config now has real
+	  dependencies, which means that it will be rebuilt only when its
+	  dependencies change, rather than being rebuilt each time the target
+	  is invoked.  The current dependencies are config.mak, mk/user.mak,
+	  and the currently configured platform-specific makefile (i.e.
+	  linux.mak).
 8-Aug-2002
 	- Removed support/doom2cs again. This doom2cs utility can now be
 	  found at ftp://sunsite.dk/projects/crystal/contrib/doom2cs.zip

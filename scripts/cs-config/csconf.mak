@@ -1,5 +1,5 @@
 # Target description
-DESCRIPTION.csconfig = cs-config compile help script
+DESCRIPTION.csconfig = cs-config build options script
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -26,6 +26,7 @@ endif
 ifeq ($(MAKESECTION),postdefines)
 
 CSCONFIG.EXE = cs-config
+CSCONFIG.DEP = config.mak mk/user.mak $(TARGET_MAKEFILE)
 CSCONFIG.TMP = $(OUT)/csconfig.tmp
 
 TO_INSTALL.EXE	+= $(CSCONFIG.EXE)
@@ -35,7 +36,7 @@ endif
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: csconfig csconfigclean $(CSCONFIG.EXE)
+.PHONY: csconfig csconfigclean
 
 all: $(CSCONFIG.EXE)
 csconfig: $(OUTDIRS) $(CSCONFIG.EXE)
@@ -69,7 +70,7 @@ CSCONFIG.PLUGIN.POSTFLAGS = \
   $(subst $@,$$@,$(PLUGIN.POSTFLAGS))
 
 # Create csconfig.tmp for the make variables that need to be transferred.
-$(CSCONFIG.EXE):
+$(CSCONFIG.EXE): $(CSCONFIG.DEP)
 	@echo Generating cs-config script...
 	@$(RM) cs-config
 
