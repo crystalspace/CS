@@ -1,16 +1,16 @@
 /*
     Copyright (C) 1998 by Jorrit Tyberghein
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -40,7 +40,7 @@
 
 CSOBJTYPE_IMPL(csThing,csPolygonSet);
 
-csThing::csThing () : csPolygonSet (), obj() 
+csThing::csThing () : csPolygonSet (), obj()
 {
   moveable = false;
   merged = NULL;
@@ -176,194 +176,236 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
 {
   int i;
   int res=1;
-  
+
   // Calculate tesselation resolution
   csVector3 wv = curves_center;
   csVector3 world_coord = obj.This2Other (wv);
   csVector3 camera_coord = rview.Other2This (world_coord);
-  
+
 
   if (camera_coord.z >= SMALL_Z)
-    {
-      res=(int)(curves_scale/camera_coord.z);
-//Jorrit: moved the code that was here to the relevant bezier, as clamping the
-// allowed tesselation resolutions is part of the curve itself I think...      
-    }
-    else
-      res=1000; // some big tesselation value...
+  {
+    res=(int)(curves_scale/camera_coord.z);
+  }
+  else
+    res=1000; // some big tesselation value...
 
-  //CsPrintf(MSG_WARNING,"res=%d\n",res);
-  
+  // Variables for drawing curves.
+  csVector3* varr[3];
+  csVector2* texes[3];
+  int control_x[3];
+  int control_y[3];
+  csVector2 persp[3];
+  UByte* mapR, * mapG, * mapB;
+  int lm_width, lm_height;
+
   // Loop over all curves
   csCurve* c;
   for (i = 0 ; i < num_curves ; i++)
+  {
+    int j;
+    c = curves[i];
+    csCurveTesselated* tess = c->Tesselate (res);
+
+    // First I transform all tesselated vertices from object to
+    // world space and then from world to camera space. @@@ NOTE!
+    // These transformations should be combined for better efficiency!
+    for (j = 0 ;  j < tess->GetNumVertices () ; j++)
     {
-      int j;
-      c = curves[i];
-      csCurveTesselated* tess = c->Tesselate (res);
-      
-      // First I transform all tesselated vertices from object to
-      // world space and then from world to camera space. @@@ NOTE!
-      // These transformations should be combined for better efficiency!
-      for (j = 0 ;  j < tess->GetNumVertices () ; j++)
-	{
-	  csCurveVertex& cv = tess->GetVertex (j);
-	  cv.world_coord = obj.This2Other (cv.object_coord);
-	  cv.camera_coord = rview.Other2This (cv.world_coord);
-	}
-      
-      // Clipped polygon (assume it cannot have more than 64 vertices)
-      
-      // Draw all the triangles within this curve
-      G3DPolygon poly;
-      memset (&poly, 0, sizeof(G3DPolygon));
-      poly.txt_handle = c->GetTextureHandle ();
-      if (poly.txt_handle == NULL)
-      {
-        CsPrintf (MSG_STDOUT, "Warning! Curve without texture!\n");
-        continue;
-      }
-      csVector2 persp[3];
-      CHK (poly.pi_texcoords = new G3DPolygon::poly_texture_def [64]);
-      rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, use_z_buf);
-      rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
-      rview.g3d->StartPolygonQuick (poly.txt_handle, false);
-
-      for (j = 0 ; j < tess->GetNumTriangles () ; j++)
-	{
-	  csCurveTriangle& ct = tess->GetTriangle (j);
-	  
-	  // Transform all vertices from camera space to perspective 
-	  // correct coords
-	  
-	  csVector3* varr[3];
-	  varr[0] = &tess->GetVertex (ct.i1).camera_coord;
-	  varr[1] = &tess->GetVertex (ct.i2).camera_coord;
-	  varr[2] = &tess->GetVertex (ct.i3).camera_coord;
-	  
-	  csVector2* texes[3];
-	  texes[0] = &tess->GetVertex (ct.i1).txt_coord;
-	  texes[1] = &tess->GetVertex (ct.i2).txt_coord;
-	  texes[2] = &tess->GetVertex (ct.i3).txt_coord;
-	  
-	  int visible = true;
-	  int k;
-	  for (k = 0 ; k < 3 ; k++)
-	    {
-	      if (varr[k]->z >= SMALL_Z)
-		{
-		  float iz = csCamera::aspect/varr[k]->z;
-		  persp[k].x = varr[k]->x * iz + csWorld::shift_x;
-		  persp[k].y = varr[k]->y * iz + csWorld::shift_y;
-		}
-	      else
-		visible = false;
-	    }
-	  
-	  // Draw all triangles.
-	  if (visible)
-	    {
-	      //-----
-	      // Do backface culling.
-	      //-----
-	      if (csMath2::Area2 (persp [0].x, persp [0].y,
-				  persp [1].x, persp [1].y,
-				  persp [2].x, persp [2].y) >= 0)
-		continue;
-
-	      
-	      // Clip triangle
-	      int rescount;
-	      csVector2 *cpoly = rview.view->Clip (persp, 3, rescount);
-	      if (!cpoly)
-		{
-		  continue;
-		}
-	      
-	      // Compute U & V in vertices of the polygon
-	      // Find first the topmost triangle vertex
-	      int top;
-	      if (persp [0].y < persp [1].y)
-		if (persp [0].y < persp [2].y)
-		  top = 0;
-		else
-		  top = 2;
-	      else
-		if (persp [1].y < persp [2].y)
-		  top = 1;
-		else
-		  top = 2;
-	      
-	      poly.num = rescount;
-	      
-	      poly.pi_triangle = (csVector2 *)persp;
-	      int j;
-	      for (j = 0; j < 3; j++)
-		{
-		  if (varr[j]->z > 0.0001)
-		    poly.pi_tritexcoords [j].z = 1 / varr[j]->z;
-		  poly.pi_tritexcoords [j].u = texes[j]->x;
-		  poly.pi_tritexcoords [j].v = texes[j]->y;
-		} // endfor 
-	      
-	      for (j = 0; j < rescount; j++)
-		{
-		  float x = poly.vertices [j].sx = cpoly [j].x;
-		  float y = poly.vertices [j].sy = cpoly [j].y;
-		  
-		  // Find the triangle left/right edges between which
-		  // is located given x,y point
-		  int vtl, vtr, vbl, vbr;
-		  vtl = vtr = top;
-		  vbl = (vtl + 1) % 3;
-		  vbr = (vtl + 3 - 1) % 3;
-		  if (y > persp [vbl].y)
-		    {
-		      vtl = vbl;
-		      vbl = (vbl + 1) % 3;
-		    } 
-		  else if (y > persp [vbr].y)
-		    {
-		      vtr = vbr;
-		      vbr = (vbr + 3 - 1) % 3;
-		    } // endif 
-		  
-		  // Now interpolate Z,U,V by Y
-		  float tL = persp [vbl].y - persp [vtl].y;
-		  if (tL< -0.001 || tL>0.001)
-		    tL = (y - persp [vtl].y) / tL;
-		  float tR = persp [vbr].y - persp [vtr].y;
-		  if (tR< -0.001 || tR>0.001)
-		    tR = (y - persp [vtr].y) / tR;
-		  float xL = persp [vtl].x + tL * (persp [vbl].x - persp [vtl].x);
-		  float xR = persp [vtr].x + tR * (persp [vbr].x - persp [vtr].x);
-		  float tX = xR - xL;
-		  if (tX< -0.001 || tX>0.001)
-		    tX = (x - xL) / tX;
-		  
-		  // Calculate Z
-		  INTERPOLATE (poly.pi_texcoords [j].z,
-			       poly.pi_tritexcoords [vtl].z, poly.pi_tritexcoords [vbl].z,
-			       poly.pi_tritexcoords [vtr].z, poly.pi_tritexcoords [vbr].z);
-		  // Calculate U
-		  INTERPOLATE (poly.pi_texcoords [j].u,
-			       poly.pi_tritexcoords [vtl].u, poly.pi_tritexcoords [vbl].u,
-			       poly.pi_tritexcoords [vtr].u, poly.pi_tritexcoords [vbr].u);
-		  // Calculate V
-		  INTERPOLATE (poly.pi_texcoords [j].v,
-			       poly.pi_tritexcoords [vtl].v, poly.pi_tritexcoords [vbl].v,
-			       poly.pi_tritexcoords [vtr].v, poly.pi_tritexcoords [vbr].v);
-		} // endfor 
-	      CHK (delete[] cpoly);
-	      // Draw resulting polygon
-
-	      rview.g3d->DrawPolygonQuick (poly, false);
-	    }
-	}
-      rview.g3d->FinishPolygonQuick ();
-
-      CHK (delete [] poly.pi_texcoords);
+      csCurveVertex& cv = tess->GetVertex (j);
+      cv.world_coord = obj.This2Other (cv.object_coord);
+      cv.camera_coord = rview.Other2This (cv.world_coord);
     }
+
+    // Clipped polygon (assume it cannot have more than 64 vertices)
+
+    // Draw all the triangles within this curve
+    G3DPolygon poly;
+    memset (&poly, 0, sizeof(G3DPolygon));
+    poly.txt_handle = c->GetTextureHandle ();
+    if (poly.txt_handle == NULL)
+    {
+      CsPrintf (MSG_STDOUT, "Warning! Curve without texture!\n");
+      continue;
+    }
+    bool gouraud = false;
+    if (c->lightmap)
+    {
+      gouraud = true;
+      csRGBLightMap& map = c->lightmap->GetStaticMap ();
+      mapR = map.mapR;
+      mapG = map.mapG;
+      mapB = map.mapB;
+      lm_width = c->lightmap->GetWidth ()-2;
+      lm_height = c->lightmap->GetWidth ()-2;
+    }
+    CHK (poly.pi_texcoords = new G3DPolygon::poly_texture_def [64]);
+    rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, use_z_buf);
+    rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
+    rview.g3d->StartPolygonQuick (poly.txt_handle, gouraud);
+
+    for (j = 0 ; j < tess->GetNumTriangles () ; j++)
+    {
+      csCurveTriangle& ct = tess->GetTriangle (j);
+
+      // Transform all vertices from camera space to perspective
+      // correct coords
+
+      varr[0] = &tess->GetVertex (ct.i1).camera_coord;
+      varr[1] = &tess->GetVertex (ct.i2).camera_coord;
+      varr[2] = &tess->GetVertex (ct.i3).camera_coord;
+
+      texes[0] = &tess->GetVertex (ct.i1).txt_coord;
+      texes[1] = &tess->GetVertex (ct.i2).txt_coord;
+      texes[2] = &tess->GetVertex (ct.i3).txt_coord;
+
+      if (gouraud)
+      {
+        control_x[0] = tess->GetVertex (ct.i1).control.x*lm_width;
+        control_y[0] = tess->GetVertex (ct.i1).control.y*lm_height;
+        control_x[1] = tess->GetVertex (ct.i2).control.x*lm_width;
+        control_y[1] = tess->GetVertex (ct.i2).control.y*lm_height;
+        control_x[2] = tess->GetVertex (ct.i3).control.x*lm_width;
+        control_y[2] = tess->GetVertex (ct.i3).control.y*lm_height;
+      }
+
+      bool visible = true;
+      int k;
+      for (k = 0 ; k < 3 ; k++)
+      {
+	if (varr[k]->z >= SMALL_Z)
+	{
+	  float iz = csCamera::aspect/varr[k]->z;
+	  persp[k].x = varr[k]->x * iz + csWorld::shift_x;
+	  persp[k].y = varr[k]->y * iz + csWorld::shift_y;
+	}
+	else
+	  visible = false;
+      }
+
+      // Draw all triangles.
+      if (visible)
+      {
+	//-----
+	// Do backface culling.
+	//-----
+	if (csMath2::Area2 (persp [0].x, persp [0].y,
+			    persp [1].x, persp [1].y,
+			    persp [2].x, persp [2].y) >= 0)
+	  continue;
+
+	// Clip triangle
+	int rescount;
+	csVector2 *cpoly = rview.view->Clip (persp, 3, rescount);
+	if (!cpoly) continue;
+
+	// Compute U & V in vertices of the polygon
+	// Find first the topmost triangle vertex
+	int top;
+	if (persp [0].y < persp [1].y)
+	  if (persp [0].y < persp [2].y)
+	    top = 0;
+	  else
+	    top = 2;
+	else
+	  if (persp [1].y < persp [2].y)
+	    top = 1;
+	  else
+	    top = 2;
+
+	poly.num = rescount;
+
+	poly.pi_triangle = (csVector2 *)persp;
+	int j;
+	for (j = 0; j < 3; j++)
+	{
+	  if (varr[j]->z > 0.0001)
+	    poly.pi_tritexcoords [j].z = 1 / varr[j]->z;
+	  poly.pi_tritexcoords [j].u = texes[j]->x;
+	  poly.pi_tritexcoords [j].v = texes[j]->y;
+	  if (gouraud)
+	  {
+	    int lm_idx = control_y[j]*(lm_width+2) + control_x[j];
+	    //@@@ NOT EFFICIENT!
+	    poly.pi_tritexcoords[j].r = ((float)mapR[lm_idx])/256.;
+	    poly.pi_tritexcoords[j].g = ((float)mapG[lm_idx])/256.;
+	    poly.pi_tritexcoords[j].b = ((float)mapB[lm_idx])/256.;
+	  }
+	} // endfor
+
+	for (j = 0; j < rescount; j++)
+	{
+	  float x = poly.vertices [j].sx = cpoly [j].x;
+	  float y = poly.vertices [j].sy = cpoly [j].y;
+
+	  // Find the triangle left/right edges between which
+	  // is located given x,y point
+	  int vtl, vtr, vbl, vbr;
+	  vtl = vtr = top;
+	  vbl = (vtl + 1) % 3;
+	  vbr = (vtl + 3 - 1) % 3;
+	  if (y > persp [vbl].y)
+	  {
+	    vtl = vbl;
+	    vbl = (vbl + 1) % 3;
+	  }
+	  else if (y > persp [vbr].y)
+	  {
+	    vtr = vbr;
+	    vbr = (vbr + 3 - 1) % 3;
+	  }
+
+	  // Now interpolate Z,U,V by Y
+	  float tL = persp [vbl].y - persp [vtl].y;
+	  if (tL< -0.001 || tL>0.001)
+	    tL = (y - persp [vtl].y) / tL;
+	  float tR = persp [vbr].y - persp [vtr].y;
+	  if (tR< -0.001 || tR>0.001)
+	    tR = (y - persp [vtr].y) / tR;
+	  float xL = persp [vtl].x + tL * (persp [vbl].x - persp [vtl].x);
+	  float xR = persp [vtr].x + tR * (persp [vbr].x - persp [vtr].x);
+	  float tX = xR - xL;
+	  if (tX< -0.001 || tX>0.001)
+	    tX = (x - xL) / tX;
+
+	  // Calculate Z
+	  INTERPOLATE (poly.pi_texcoords [j].z,
+		       poly.pi_tritexcoords [vtl].z, poly.pi_tritexcoords [vbl].z,
+		       poly.pi_tritexcoords [vtr].z, poly.pi_tritexcoords [vbr].z);
+	  // Calculate U
+	  INTERPOLATE (poly.pi_texcoords [j].u,
+		       poly.pi_tritexcoords [vtl].u, poly.pi_tritexcoords [vbl].u,
+		       poly.pi_tritexcoords [vtr].u, poly.pi_tritexcoords [vbr].u);
+	  // Calculate V
+	  INTERPOLATE (poly.pi_texcoords [j].v,
+		       poly.pi_tritexcoords [vtl].v, poly.pi_tritexcoords [vbl].v,
+		       poly.pi_tritexcoords [vtr].v, poly.pi_tritexcoords [vbr].v);
+	  if (gouraud)
+          {
+            // Calculate R
+            INTERPOLATE (poly.pi_texcoords [j].r,
+			 poly.pi_tritexcoords [vtl].r, poly.pi_tritexcoords [vbl].r,
+			 poly.pi_tritexcoords [vtr].r, poly.pi_tritexcoords [vbr].r);
+            // Calculate G
+            INTERPOLATE (poly.pi_texcoords [j].g,
+			 poly.pi_tritexcoords [vtl].g, poly.pi_tritexcoords [vbl].g,
+			 poly.pi_tritexcoords [vtr].g, poly.pi_tritexcoords [vbr].g);
+            // Calculate B
+            INTERPOLATE (poly.pi_texcoords [j].b,
+			 poly.pi_tritexcoords [vtl].b, poly.pi_tritexcoords [vbl].b,
+			 poly.pi_tritexcoords [vtr].b, poly.pi_tritexcoords [vbr].b);
+          }
+	}
+	CHK (delete[] cpoly);
+	// Draw resulting polygon
+
+	rview.g3d->DrawPolygonQuick (poly, gouraud);
+      }
+    }
+  rview.g3d->FinishPolygonQuick ();
+
+  CHK (delete [] poly.pi_texcoords);
+  }
 }
 
 void csThing::Draw (csRenderView& rview, bool use_z_buf)
@@ -588,6 +630,14 @@ void csThing::ShineLightmaps (csLightView& lview)
     }
   }
 
+  // Loop over all curves
+  csCurve* c;
+  for (i = 0 ; i < num_curves ; i++)
+  {
+    c = curves[i];
+    c->ShineLightmaps (lview);
+  }
+
   RestoreTransformation (old);
   draw_busy--;
 }
@@ -646,6 +696,8 @@ void csThing::InitLightmaps (bool do_cache)
   int i;
   for (i = 0 ; i < num_polygon ; i++)
     ((csPolygon3D*)polygons[i])->InitLightmaps (this, do_cache, i);
+  for (i = 0 ; i < num_curves ; i++)
+    ((csCurve*)curves[i])->InitLightmaps (this, do_cache, num_polygon+i);
 }
 
 void csThing::CacheLightmaps ()
@@ -653,6 +705,8 @@ void csThing::CacheLightmaps ()
   int i;
   for (i = 0 ; i < num_polygon ; i++)
     ((csPolygon3D*)polygons[i])->CacheLightmaps (this, i);
+  for (i = 0 ; i < num_curves ; i++)
+    ((csCurve*)curves[i])->CacheLightmaps (this, num_polygon+i);
 }
 
 void csThing::Merge (csThing* other)
@@ -698,7 +752,7 @@ void csThing::MergeTemplate (csThingTemplate* tpl,
     if (shift) v += *shift;
     merge_vertices[i] = AddVertexSmart (v);
   }
-  
+
   for (i = 0 ; i < tpl->GetNumPolygon () ; i++)
   {
     csPolygonTemplate* pt = tpl->GetPolygon (i);

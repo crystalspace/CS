@@ -17,9 +17,14 @@
 */
 
 #include "sysdef.h"
+#include "qint.h"
 #include "csengine/bezier.h"
 #include "csengine/curve.h"
 #include "csengine/basic/polyset.h"
+#include "csengine/light/light.h"
+#include "csengine/polygon/polytext.h"
+#include "csengine/polygon/polygon.h"
+#include "csengine/world.h"
 
 static csBezierCache theBezierCache;
 
@@ -92,6 +97,9 @@ csCurveTesselated* csBezier::Tesselate (int res)
     //
     vtx.txt_coord.x    = point[3];
     vtx.txt_coord.y    = point[4];
+    //
+    vtx.control.x      = ((float)i)/(float)res;
+    vtx.control.y      = ((float)j)/(float)res;
   }
 
   for (i=0;i<res;i++)
@@ -120,30 +128,118 @@ csCurveTesselated* csBezier::Tesselate (int res)
   return previous_tesselation;
 }
 
+csCurve::~csCurve ()
+{
+  CHK (delete lightmap);
+}
 
 // Default IsLightable returns false, because we don't know how to calculate
 // x,y,z and normals for the curve by default
-int csCurve::IsLightable()
+bool csCurve::IsLightable()
 {
-  return 0;
+  return false;
 }
 
 // Default PosInSpace does nothing
-void csCurve::PosInSpace(csVector3& vec, double u, double v)
+void csCurve::PosInSpace (csVector3& vec, double u, double v)
 {
   return;
 }
 
 // Default Normal does nothing
-void csCurve::Normal(csVector3& vec, double u, double v)
+void csCurve::Normal (csVector3& vec, double u, double v)
 {
   return;
 }
 
-void ShineLights()
+void csCurve::InitLightmaps (csPolygonSet* owner, bool do_cache, int index)
 {
-  return;
+  if (!IsLightable ()) return;
+  CHK (lightmap = new csLightMap ());
+  lightmap->Alloc (256, 256, 16, NULL);
+  if (!do_cache) { lightmap_up_to_date = false; return; }
+  if (csPolygon3D::do_force_recalc) lightmap_up_to_date = false;
+  else if (!lightmap->ReadFromCache (256, 256, 16, owner, NULL, index, csWorld::current_world))
+    lightmap_up_to_date = true;
+  else lightmap_up_to_date = true;
 }
+
+void csCurve::ShineLightmaps (csLightView& lview)
+{
+  if (!lightmap) return;
+  if (lightmap_up_to_date) return;
+  int lmw, lmh;
+  lmw = lightmap->GetWidth ()-2;
+  lmh = lightmap->GetHeight ()-2;
+  csRGBLightMap& map = lightmap->GetStaticMap ();
+  UByte* mapR = map.mapR;
+  UByte* mapG = map.mapG;
+  UByte* mapB = map.mapB;
+  csStatLight* light = (csStatLight*)lview.l;
+
+  float r200d = lview.r * NORMAL_LIGHT_LEVEL / light->GetRadius ();
+  float g200d = lview.g * NORMAL_LIGHT_LEVEL / light->GetRadius ();
+  float b200d = lview.b * NORMAL_LIGHT_LEVEL / light->GetRadius ();
+  int l1, l2, l3;
+
+  float cosfact = csPolyTexture::cfg_cosinus_factor;
+
+  csVector3 pos;
+  csVector3 normal;
+  float d;
+  float u, v;
+  int ui, vi;
+  int uv;
+  for (ui = 0 ; ui <= lmw ; ui++)
+  {
+    u = ((float)ui)/(float)lmw;
+    for (vi = 0 ; vi <= lmh ; vi++)
+    {
+      v = ((float)vi)/(float)lmh;
+      uv = vi*(lmw+2)+ui;
+      PosInSpace (pos, u, v);
+      d = csSquaredDist::PointPoint (light->GetCenter (), pos);
+      if (d >= light->GetSquaredRadius ()) continue;
+      d = sqrt (d);
+      Normal (normal, u, v);
+      float cosinus = (pos-light->GetCenter ())*normal;
+      cosinus /= d;
+      cosinus += cosfact;
+      if (cosinus < 0) cosinus = 0;
+      else if (cosinus > 1) cosinus = 1;
+      if (lview.r > 0)
+      {
+        l1 = mapR[uv] + QRound (cosinus * r200d*(light->GetRadius () - d));
+        if (l1 > 255) l1 = 255;
+        mapR[uv] = l1;
+      }
+      if (lview.g > 0 && mapG)
+      {
+        l2 = mapG[uv] + QRound (cosinus * g200d*(light->GetRadius () - d));
+        if (l2 > 255) l2 = 255;
+        mapG[uv] = l2;
+      }
+      if (lview.b > 0 && mapB)
+      {
+        l3 = mapB[uv] + QRound (cosinus * b200d*(light->GetRadius () - d));
+        if (l3 > 255) l3 = 255;
+        mapB[uv] = l3;
+      }
+    }
+  }
+}
+
+void csCurve::CacheLightmaps (csPolygonSet* owner, int index)
+{
+  if (!lightmap) return;
+  if (!lightmap_up_to_date)
+  {
+    lightmap_up_to_date = true;
+    lightmap->Cache (owner, NULL, index, csWorld::current_world);
+  }
+  lightmap->ConvertToMixingMode ();
+}
+
 
 
 
@@ -178,11 +274,11 @@ void csBezier::SetControlPoint(int index, int control_id)
 }
 
 
-int csBezier::IsLightable()
+bool csBezier::IsLightable ()
 {
-  return 1;
+  return true;
 }
-void csBezier::PosInSpace(csVector3& vec, double u, double v)
+void csBezier::PosInSpace (csVector3& vec, double u, double v)
 {
   TDtDouble point[3];
   TDtDouble *controls[9] = 
@@ -196,7 +292,7 @@ void csBezier::PosInSpace(csVector3& vec, double u, double v)
   vec.z = point[2];
 }
 
-void csBezier::Normal(csVector3& vec, double u, double v)
+void csBezier::Normal (csVector3& vec, double u, double v)
 {
   TDtDouble point[3];
   TDtDouble *controls[9] = 
@@ -211,7 +307,7 @@ void csBezier::Normal(csVector3& vec, double u, double v)
 }
 
 
-csBezierTemplate::csBezierTemplate()
+csBezierTemplate::csBezierTemplate ()
   : csCurveTemplate () 
 {
   parent = NULL;

@@ -373,13 +373,14 @@ bool csLightMap::ReadFromCache (int w, int h, int lms, csPolygonSet* owner, csPo
   //-------------------------------
   // Check if cached item is still valid.
   //-------------------------------
-  if (	ABS (ps.x1 - poly->Vobj (0).x) > EPSILON ||
+  if (  poly &&
+       (ABS (ps.x1 - poly->Vobj (0).x) > EPSILON ||
   	ABS (ps.y1 - poly->Vobj (0).y) > EPSILON ||
   	ABS (ps.z1 - poly->Vobj (0).z) > EPSILON ||
   	ABS (ps.x2 - poly->Vobj (1).x) > EPSILON ||
   	ABS (ps.y2 - poly->Vobj (1).y) > EPSILON ||
   	ABS (ps.z2 - poly->Vobj (1).z) > EPSILON ||
-	ps.lm_size != lm_size)
+	ps.lm_size != lm_size))
   {
     // Invalid.
     CHK (delete [] data);
@@ -431,7 +432,7 @@ bool csLightMap::ReadFromCache (int w, int h, int lms, csPolygonSet* owner, csPo
     ls.dist = convert_endian (ls.dist);
 
     light = world->FindLight (ls.x, ls.y, ls.z, ls.dist);
-    if (light->GetType () == csStatLight::Type())
+    if (light->GetType () == csStatLight::Type() && poly)
     {
       csStatLight* slight = (csStatLight*)light;
       slight->RegisterPolygon (poly);
@@ -456,12 +457,15 @@ void csLightMap::Cache (csPolygonSet* owner, csPolygon3D* poly, int index, csWor
   Archive* ar = world->GetWorldFile ();
 
   strcpy (ps.header, "MAPL");
-  ps.x1 = poly->Vobj (0).x;
-  ps.y1 = poly->Vobj (0).y;
-  ps.z1 = poly->Vobj (0).z;
-  ps.x2 = poly->Vobj (1).x;
-  ps.y2 = poly->Vobj (1).y;
-  ps.z2 = poly->Vobj (1).z;
+  if (poly)
+  {
+    ps.x1 = poly->Vobj (0).x;
+    ps.y1 = poly->Vobj (0).y;
+    ps.z1 = poly->Vobj (0).z;
+    ps.x2 = poly->Vobj (1).x;
+    ps.y2 = poly->Vobj (1).y;
+    ps.z2 = poly->Vobj (1).z;
+  }
   ps.lm_size = lm_size;
   ps.lm_cnt = 0;
   if (static_lm.mapR) ps.lm_cnt++;

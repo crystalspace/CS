@@ -25,6 +25,7 @@
 #include "csengine/bezier.h"
 #include "csengine/texture.h"
 #include "csengine/light/lghtmap.h"
+#include "csengine/rview.h"
 #include "csobject/csobj.h"
 
 interface ITextureHandle;
@@ -43,6 +44,8 @@ public:
   csVector3 camera_coord;
   /// Texture coordinates.
   csVector2 txt_coord;
+  /// Original control points.
+  csVector2 control;
 };
 
 /**
@@ -100,12 +103,13 @@ public:
   csPolygonSet* parent;
 
   // This is the lightmap to be placed on the curve.
-  csLightMap lightmap;
+  csLightMap* lightmap;
+  bool lightmap_up_to_date;
 
 public:
-  csCurve () : csObject (),cstxt(NULL),parent(NULL) {} 
+  csCurve () : csObject (),cstxt(NULL),parent(NULL), lightmap (NULL), lightmap_up_to_date (false) {} 
   ///
-  virtual ~csCurve () { }
+  virtual ~csCurve ();
 
   void SetParent (csPolygonSet* p) { parent = p; }
   /**
@@ -131,10 +135,12 @@ public:
    * Default behaviour is to allow for unlighted curves. Derive these if you do
    * want them lighted.
    */
-  virtual int IsLightable();
-  virtual void PosInSpace(csVector3& vec, double u, double v);
-  virtual void Normal(csVector3& vec, double u, double v);
-  void ShineLights();
+  virtual bool IsLightable ();
+  virtual void PosInSpace (csVector3& vec, double u, double v);
+  virtual void Normal (csVector3& vec, double u, double v);
+  void InitLightmaps (csPolygonSet* owner, bool do_cache, int index);
+  void ShineLightmaps (csLightView& lview);
+  void CacheLightmaps (csPolygonSet* owner, int index);
   
   CSOBJTYPE;
 };
@@ -229,9 +235,9 @@ public:
   /// Get the texture coordinate of a curve point.
   inline csVector2& GetTextureCoord (int i) { return texture_coords[i/3][i-(i/3)*3]; }
 
-  virtual int IsLightable();
-  virtual void PosInSpace(csVector3& vec, double u, double v);
-  virtual void Normal(csVector3& vec, double u, double v);
+  virtual bool IsLightable ();
+  virtual void PosInSpace (csVector3& vec, double u, double v);
+  virtual void Normal (csVector3& vec, double u, double v);
 
   CSOBJTYPE;
 };
