@@ -89,7 +89,7 @@ csPtr<iSoundHandle> csLoader::LoadSound(const char* filename)
 csPtr<iSoundWrapper> csLoader::LoadSound (const char* name, const char* fname)
 {
   // load the sound handle
-  csPtr<iSoundHandle> Sound (LoadSound(fname));
+  csRef<iSoundHandle> Sound (LoadSound(fname));
   if (!Sound) return NULL;
 
   // build wrapper object

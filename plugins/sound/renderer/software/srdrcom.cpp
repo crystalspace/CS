@@ -208,6 +208,7 @@ csPtr<iSoundHandle> csSoundRenderSoftware::RegisterSound(iSoundData *snd)
   // create the sound handle
   csSoundHandleSoftware *hdl = new csSoundHandleSoftware(this, snd);
   SoundHandles.Push(hdl);
+  hdl->IncRef ();	// Prevent smart pointer release.
   return csPtr<iSoundHandle> (hdl);
 }
 

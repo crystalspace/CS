@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+13-Sep-2002
+	- Reverted sound fix from Norman since that doesn't work
+	  with STRICT_SMART_POINTERS enabled. Also it seems wrong.
+	  Need to investigate further.
+	- Fixed the real sound bug which was in the RegisterSound()
+	  function of the software sound renderer.
 12-Sep-2002
 	- Fixed a crash at exit bug in Blocks.
 	- Fixed stupid bug in star loader that crashed csdemo.
