@@ -1118,6 +1118,15 @@ private:
   /// Is action running in reverse?  This is either 1 or -1 depending.
   int frame_increment;
 
+  /// The action to restore after running an override action
+  csSpriteAction2* last_action;
+  /// The loop setting to restore after running an override action
+  bool last_loop;
+  /// The speed setting to restore after running an override action
+  float last_speed;
+  /// The reversal setting to restore after an override action
+  bool last_reverse;
+
   /// The last frame time action.
   csTicks last_time;
   /// The last frame position (used for displacement calcs).
@@ -1129,6 +1138,8 @@ private:
 
   /// Enable tweening.
   bool do_tweening;
+  /// Enable single-step mode on actions
+  bool single_step;
 
   /// Enable or disable lighting.
   bool do_lighting;
@@ -1352,6 +1363,7 @@ public:
     speedfactor = speed;
     loopaction = loop;
     fullstop = false;
+    single_step = false;
     SetReverseAction(false); // always go forward by default.
     csSpriteAction2 *act;
     if ((act = factory->FindAction (name)) != NULL)
@@ -1365,9 +1377,23 @@ public:
   }
 
   void SetReverseAction(bool reverse)
-  { frame_increment = (reverse) ? -1:1;
+  { 
+    frame_increment = (reverse) ? -1:1;
     if (cur_action)
 	cur_action->SetReverseAction(reverse);
+  }
+
+  void SetSingleStepAction(bool singlestep)
+  { single_step = singlestep; }
+
+  bool SetOverrideAction (const char *name,float speed = 1)
+  {
+    last_action = cur_action;
+    last_loop   = loopaction;
+    last_speed  = speedfactor;
+    last_reverse = (frame_increment==-1)?true:false;
+
+    return SetAction (name,false,speed);
   }
 
   /**
@@ -1467,7 +1493,7 @@ public:
   }
   virtual void NextFrame (csTicks current_time,const csVector3& new_pos)
   {   
-    OldNextFrame (current_time, new_pos, !loopaction, !loopaction);
+    OldNextFrame (current_time, new_pos, single_step, !loopaction);
   }
   virtual bool WantToDie () const { return false; }
   virtual void HardTransform (const csReversibleTransform&) { }
@@ -1617,6 +1643,14 @@ public:
     virtual void SetReverseAction (bool reverse)
     {
       scfParent->SetReverseAction (reverse);
+    }
+    virtual bool SetOverrideAction (const char *name,float speed = 1)
+    {
+      return scfParent->SetOverrideAction (name,speed);
+    }
+    virtual void SetSingleStepAction(bool singlestep)
+    {
+	scfParent->SetSingleStepAction(singlestep);
     }
 
     virtual bool PropagateAction (const char *name)

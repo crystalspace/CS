@@ -940,6 +940,7 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
   speedfactor = 1;
   loopaction = true;
   fullstop = false;
+  last_action = NULL;
 
   vbufmgr = NULL;
 }
@@ -1686,19 +1687,52 @@ bool csSprite3DMeshObject::OldNextFrame (csTicks current_time,
 {
   bool ret = false;
 
+  /**
+   * First check if the animation is over.  If it is over, there
+   * is no updating to do unless another animation was overridden
+   * by this one, in which case we need to restore that one to
+   * be active again.
+   */ 
   if (fullstop)
   {
-    return true;
+    if (!last_action)  // no overridden action to revert to
+      return true;
+    else
+    {
+      // Restore overridden action
+      SetAction(last_action->GetName(),last_loop,last_speed);
+      SetReverseAction(last_reverse);
+      last_action = NULL;
+      return true;
+    }
   }
+
+  /**
+   * Here we know the animation is active.  There are two ways frames
+   * get advanced.  The first is the "onestep" way, which ensures that
+   * no keyframes are skipped, no matter how slow the framerate.  The
+   * second method updates to whatever is the most accurate frame based
+   * on either the timing or position, even if multiple keyframes are
+   * skipped.  This is much more accurate, and should always be used
+   * unless you have a specific effect you need.
+   */
+
+  // Calculate distance moved by sprite since last frame drawn.
   float cur_displacement = qsqrt (csSquaredDist::PointPoint (last_pos, cur_pos));
   last_pos = cur_pos;
-//  float save_displacement = cur_displacement;
 
   // If the sprite has only one frame we disable tweening here.
   if (cur_action->GetFrameCount () <= 1) do_tweening = false;
 
+  // Single-step mode starts here
   if (onestep)
   {
+    /**
+     * This if statement says that if we have a time delay frame
+     * and enough time has passed, or if we have a displacement frame
+     * and the sprite has moved far enough, then advance the anim
+     * one frame.  (Note "advance" could mean go backwards also.)
+     */
     if (((cur_action->GetFrameDelay (cur_frame) ) &&
 	 (current_time > last_time+
     	   cur_action->GetFrameDelay (cur_frame)/speedfactor)) || 
@@ -1708,12 +1742,15 @@ bool csSprite3DMeshObject::OldNextFrame (csTicks current_time,
 	)
     {
       last_time = current_time;
- //     last_pos = cur_pos;
       last_displacement = cur_displacement + last_displacement -
 	          cur_action->GetFrameDisplacement (cur_frame)/speedfactor;
       cur_frame+=frame_increment;
+      
+      // Reset frame to end of anim if advancing in reverse
       if (cur_frame<0)
 	  cur_frame=cur_action->GetFrameCount() - 1;
+
+      // Now check for end of non-looping animation
       if (stoptoend && cur_frame + 1 >= cur_action->GetFrameCount ())
       {
         ret = true;
@@ -1727,20 +1764,38 @@ bool csSprite3DMeshObject::OldNextFrame (csTicks current_time,
       }
     }
   }
-  else
+  else  // not in single frame advance mode
   {
+    /**
+     * Here it is the same basic process, but we loop because more than
+     * one key frame may have elapsed since the last displayed frame.
+     */
+
+    // Update the distance moved to include any unused distance from before.
     cur_displacement += last_displacement;  // include partial from last frame
 
     while (1)
     {
-      if (cur_action->GetFrameDelay(cur_frame)) // time based frame delays
+      // If the current frame is a time-delayed frame, 
+      if (cur_action->GetFrameDelay(cur_frame))
       {
+        // If enough time has gone by to switch to the next frame
         if (current_time > last_time+
       	   cur_action->GetFrameDelay (cur_frame)/speedfactor)
         {
+	  /**
+	   * Add the time taken by this frame to the last keyframe time used.
+	   * We have to track this because even with advancing this frame,
+	   * we still may have excess elapsed time and may need to advance
+	   * another frame, or the excess will affect our tweening between
+	   * key frames.
+	   */
           last_time += csTicks(cur_action->GetFrameDelay (cur_frame)/speedfactor);
           cur_frame+=frame_increment;
 	  cur_displacement = 0;
+
+	  // Make sure to wrap the counter around to implement the looping
+	  // Note: bidirectional in case of reversed actions
           if (cur_frame >= cur_action->GetFrameCount ())
           {
             cur_frame = 0;
@@ -1752,15 +1807,34 @@ bool csSprite3DMeshObject::OldNextFrame (csTicks current_time,
 	    ret = true;
 	  }
         }
-        else break;
+        else 
+	{
+	  /**
+	   * This break means that not enough time has gone by to advance
+	   * another frame, so the loop is done.  Excess time will be
+	   * accommodated for by the tweening done below.
+	   */
+	  break;
+	}
       }
-      else  // distance based frame delays
+      else  // distance based frame delays handled below
       {
+        /**
+	 * If the sprite has moved in space more than the displacement
+	 * of the keyframe, then we need to advance key frames.
+	 */
         if (cur_displacement > 
       	     cur_action->GetFrameDisplacement (cur_frame)/speedfactor)
         {
+	  /**
+	   * Again we need to track how much displacement is used up
+	   * by this frame, so we subtract instead, in case we need
+	   * to advance again next time through the loop.
+	   */
           cur_displacement -= cur_action->GetFrameDisplacement (cur_frame)/speedfactor;
           cur_frame+=frame_increment;
+
+	  // Again loop the frame counter around if necessary
           if (cur_frame >= cur_action->GetFrameCount ())
           {
             cur_frame = 0;
@@ -1774,13 +1848,33 @@ bool csSprite3DMeshObject::OldNextFrame (csTicks current_time,
         }
         else
 	{
+	  /* 
+	   * Remember how much displacement we've had in total since last key frame switch
+	   */
           last_displacement = cur_displacement;
 	  break;
 	}
       }
     }
+
+    // Now that we have advanced enough, see if we have exhausted
+    // a non-looping anim and flag it for next time if so.
+    if (!loopaction)
+    {
+      if (cur_frame + 1 >= cur_action->GetFrameCount () )
+      {
+	  fullstop = true;
+      }
+    }
   }
 
+  /**
+   * Ok now regardless how which method was used, or how many frames
+   * were advanced (including zero), we will probably have to interpolate
+   * between keyframes.  This section determines the % interpolation
+   * based on the excess time or excess displacement.  The Draw code
+   * actually does the tweening of the vertices.
+   */
   if (do_tweening)
   {
     if (cur_action->GetFrameDelay(cur_frame))
