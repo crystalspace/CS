@@ -34,7 +34,7 @@ csGlideProcedural::csGlideProcedural (iBase * pParent)
   g3d=NULL; 
 }
 
-void csGlideProcedural::SetTarget (csGraphics3DGlide *g3d, csTextureMMGlide *tex)
+void csGlideProcedural::SetTarget (csGraphics3DGlide *g3d, csTextureHandleGlide *tex)
 { 
   this->g3d = g3d;
   this->tex = tex;

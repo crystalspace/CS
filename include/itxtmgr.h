@@ -69,14 +69,14 @@ struct iMaterialHandle;
  */
 #define CS_TEXTURE_PROC  		0x00000010
 /**
- * Set this flag if you want mip-mapping but wish to control when the mip-mapping
- * actually occurs by calling iTextureHandle->ProcTextureSync ()
+ * Set this flag if you want mip-mapping but wish to control when the
+ * mip-mapping actually occurs by calling iTextureHandle->ProcTextureSync ()
  */
 #define CS_TEXTURE_PROC_MIPMAP_ON_SYNC  0x00000020
 /**
- * By setting this flag it guarantess that the procedural texture buffers contents
- * persists between frames. There is a small performance penalty on the opengl and
- * glide implementations with this flag.
+ * By setting this flag it guarantess that the procedural texture buffers
+ * contents persists between frames. There is a small performance penalty
+ * on the opengl and glide implementations with this flag.
  */
 #define CS_TEXTURE_PROC_PERSISTENT  	0x00000040
 /**
@@ -95,9 +95,7 @@ struct iMaterialHandle;
 #define CS_TEXTURE_PROC_ALONE_HINT      0x00000080
 
 
-
-
-SCF_VERSION (iTextureManager, 1, 1, 0);
+SCF_VERSION (iTextureManager, 2, 0, 0);
 
 /**
  * This is the standard texture manager interface.
@@ -136,22 +134,6 @@ struct iTextureManager : public iBase
   virtual iTextureHandle *RegisterTexture (iImage *image, int flags) = 0;
 
   /**
-   * Unregister a texture. Note that this will have no effect on the
-   * possible palette and lookup tables until after PrepareTextures ()
-   * is called again. Note that the texture will be deleted only when
-   * you will remove all references to this texture (i.e. you will do
-   * DecRef () as much times as you did IncRef () plus one)
-   */
-  virtual void UnregisterTexture (iTextureHandle *handle) = 0;
-
-  /**
-   * Merge this texture into current palette, compute mipmaps and so on.
-   * You should call either PrepareTexture() or PrepareTextures() before
-   * using any texture.
-   */
-  virtual void PrepareTexture (iTextureHandle *handle) = 0;
-
-  /**
    * After all textures have been added, this function does all
    * needed calculations (palette, lookup tables, mipmaps, ...).
    * PrepareTextures () must be able to handle being called twice
@@ -170,8 +152,9 @@ struct iTextureManager : public iBase
   virtual void FreeImages () = 0;
 
   /**
-   * Register a material. The given input image is IncRef'd and DecRef'ed
-   * later when FreeMaterials () is called. If you want to keep the input
+   * Register a material. The input material wrapper is IncRef'd and DecRef'ed
+   * later when FreeMaterials () is called or the material handle is destroyed
+   * by calling DecRef on it enough times. If you want to keep the input
    * material make sure you have called IncRef yourselves.
    */
   virtual iMaterialHandle* RegisterMaterial (iMaterial* material) = 0;
@@ -181,16 +164,6 @@ struct iTextureManager : public iBase
    * to quickly make materials based on a single texture.
    */
   virtual iMaterialHandle* RegisterMaterial (iTextureHandle* txthandle) = 0;
-
-  /**
-   * Unregister a material.
-   */
-  virtual void UnregisterMaterial (iMaterialHandle* handle) = 0;
-
-  /**
-   * Prepare this material.
-   */
-  virtual void PrepareMaterial (iMaterialHandle *handle) = 0;
 
   /**
    * Prepare all materials.

@@ -1134,12 +1134,6 @@ void csGraphics3DDirect3DDx6::CacheTexture (iPolygonTexture *texture)
     m_pLightmapCache->cache_lightmap (texture); //THFIXME
 }
 
-void csGraphics3DDirect3DDx6::UncacheTexture (iTextureHandle *handle)
-{
-  (void) handle;
-  //@@guess what.... right, todo.
-}
-
 void csGraphics3DDirect3DDx6::SetupPolygon (G3DPolygonDP& poly,
   float& J1, float& J2, float& J3,
   float& K1, float& K2, float& K3,
@@ -1241,8 +1235,8 @@ void csGraphics3DDirect3DDx6::MultitextureDrawPolygon (G3DPolygonDP &poly)
   CacheTexture (pTex);
 
   // retrieve the texture from the cache by handle.
-  csTextureMMDirect3D *txt_mm =
-    (csTextureMMDirect3D *)poly.mat_handle->GetTexture ()->GetPrivateObject ();
+  csTextureHandleDirect3D *txt_mm =
+    (csTextureHandleDirect3D *)poly.mat_handle->GetTexture ()->GetPrivateObject ();
   pTexCache = (csD3DCacheData *)txt_mm->GetCacheData ();
 
   bColorKeyed = txt_mm->GetKeyColor ();
@@ -1455,8 +1449,8 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
   CacheTexture (pTex);
 
   // retrieve the texture from the cache by handle.
-  csTextureMMDirect3D* txt_mm =
-    (csTextureMMDirect3D *)poly.mat_handle->GetTexture ()->GetPrivateObject ();
+  csTextureHandleDirect3D* txt_mm =
+    (csTextureHandleDirect3D *)poly.mat_handle->GetTexture ()->GetPrivateObject ();
   pTexCache = (csD3DCacheData *)txt_mm->GetCacheData ();
 
   bColorKeyed = txt_mm->GetKeyColor ();
@@ -1611,8 +1605,8 @@ void csGraphics3DDirect3DDx6::StartPolygonFX (iMaterialHandle* handle, UInt mode
   csD3DCacheData *pTexData = NULL;
   if (handle)
   {
-    csTextureMMDirect3D *txt_mm =
-      (csTextureMMDirect3D*)handle->GetTexture ()->GetPrivateObject ();
+    csTextureHandleDirect3D *txt_mm =
+      (csTextureHandleDirect3D*)handle->GetTexture ()->GetPrivateObject ();
     m_pTextureCache->cache_texture (handle->GetTexture ());
 
     pTexData = (csD3DCacheData *)txt_mm->GetCacheData ();

@@ -22,7 +22,7 @@
 #include "sft3dcom.h"
 #include "isprotex.h"
 
-class csTextureMMSoftware;
+class csTextureHandleSoftware;
 class csTextureCacheSoftware;
 
 class csSoftProcTexture3D : public csGraphics3DSoftwareCommon, 
@@ -33,9 +33,9 @@ class csSoftProcTexture3D : public csGraphics3DSoftwareCommon,
   /// True when it is necessary to reprepare a texture each update.
   bool reprepare;
   /// If reprepare is true soft_tex_mm is reprepared
-  csTextureMMSoftware *soft_tex_mm;
+  csTextureHandleSoftware *soft_tex_mm;
   /// The parent procedural texture as registered with the main texture manager
-  csTextureMMSoftware *parent_tex_mm;
+  csTextureHandleSoftware *parent_tex_mm;
   /// The main gfx contexts texture cache
   csTextureCacheSoftware *parent_tcache;
 
@@ -46,7 +46,7 @@ public:
   virtual ~csSoftProcTexture3D ();
 
   bool Prepare (csTextureManagerSoftware *parent_texman, 
-		csTextureMMSoftware *tex_mm, 
+		csTextureHandleSoftware *tex_mm, 
 		void *buffer, uint8 *bitmap);
 
   virtual bool Initialize (iSystem *iSys);

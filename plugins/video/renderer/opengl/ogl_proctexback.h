@@ -39,14 +39,14 @@
 #include "ogl_g3dcom.h"
 #include "csgeom/transfrm.h"
 
-class csTextureMMOpenGL;
+class csTextureHandleOpenGL;
 class csTextureProcOpenGL;
 class csClipper;
 
 class csOpenGLProcBackBuffer : public csGraphics3DOGLCommon
 {
  protected:
-  csTextureMMOpenGL *tex_mm;
+  csTextureHandleOpenGL *tex_mm;
   csTextureProcOpenGL *tex_0;
 
   int frame_width, frame_height, pixel_bytes;
@@ -70,7 +70,7 @@ class csOpenGLProcBackBuffer : public csGraphics3DOGLCommon
 
   virtual ~csOpenGLProcBackBuffer ();
 
-  void Prepare (csGraphics3DOGLCommon *g3d, csTextureMMOpenGL *tex, 
+  void Prepare (csGraphics3DOGLCommon *g3d, csTextureHandleOpenGL *tex, 
 		csPixelFormat *ipfmt, bool bpersistent);
 
   virtual bool Initialize (iSystem* /*System*/)

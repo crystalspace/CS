@@ -20,8 +20,10 @@
 #include "cssysdef.h"
 #include "csws/csdialog.h"
 #include "csws/csapp.h"
+#include "csws/cswsutil.h"
 #include "csws/sdefault.h"
 #include "icfgfile.h"
+#include "qint.h"
 
 void csDefaultDialogSkin::Initialize (csApp *iApp, csSkin *Parent)
 {
@@ -70,9 +72,17 @@ void csDefaultDialogSkin::Draw (csComponent &This)
 
   int bw, bh;
   This.GetBorderSize (bw, bh);
-  if (Back.GetType () == csbgNone)
+  if ((Back.GetType () == csbgNone)
+   && (Back.GetColor () != CSPAL_DIALOG_BACKGROUND))
   {
+    float r, g, b;
+    csGetRGB (This.GetColor (CSPAL_DIALOG_BACKGROUND), This.app, r, g, b);
+    csRGBcolor rgb (QInt (r * 255.9), QInt (g * 255.9), QInt (b * 255.9));
     Back.SetColor (CSPAL_DIALOG_BACKGROUND);
+    Back.SetColor (0, rgb);
+    Back.SetColor (1, rgb);
+    Back.SetColor (2, rgb);
+    Back.SetColor (3, rgb);
     Back.SetType (csbgNone);
   }
 

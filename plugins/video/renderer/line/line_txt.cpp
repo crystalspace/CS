@@ -121,24 +121,27 @@ int csColorMapLine::FreeEntries ()
   return colors;
 }
 
-//-------------------------------------------------------- csTextureMMLine ---//
+//-------------------------------------------------------- csTextureHandleLine ---//
 
-csTextureMMLine::csTextureMMLine (iImage *image, int flags) :
-  csTextureMM (image, flags)
+csTextureHandleLine::csTextureHandleLine (csTextureManagerLine *txtmgr,
+  iImage *image, int flags) : csTextureHandle (image, flags)
 {
   pal2glob = NULL;
+  (texman = txtmgr)->IncRef ();
 }
 
-csTextureMMLine::~csTextureMMLine ()
+csTextureHandleLine::~csTextureHandleLine ()
 {
+  texman->UnregisterTexture (this);
+  texman->DecRef ();
 }
 
-csTexture *csTextureMMLine::NewTexture (iImage *Image)
+csTexture *csTextureHandleLine::NewTexture (iImage *Image)
 {
   return new csTextureLine (this, Image);
 }
 
-void csTextureMMLine::ComputeMeanColor ()
+void csTextureHandleLine::ComputeMeanColor ()
 {
   int i;
 
@@ -191,7 +194,7 @@ void csTextureMMLine::ComputeMeanColor ()
   mean_color.blue  = b / palette_size;
 }
 
-void csTextureMMLine::remap_texture (csTextureManager *texman)
+void csTextureHandleLine::remap_texture (csTextureManager *texman)
 {
   int i;
   csTextureManagerLine *txm = (csTextureManagerLine *)texman;
@@ -219,6 +222,12 @@ void csTextureMMLine::remap_texture (csTextureManager *texman)
           palette [i].green, palette [i].blue);
       break;
   }
+}
+
+void csTextureHandleLine::Prepare ()
+{
+  CreateMipmaps ();
+  remap_texture (texman);
 }
 
 //----------------------------------------------- csTextureManagerLine ---//
@@ -392,7 +401,7 @@ void csTextureManagerLine::compute_palette ()
 
   for (int t = textures.Length () - 1; t >= 0; t--)
   {
-    csTextureMMLine *txt = (csTextureMMLine *)textures [t];
+    csTextureHandleLine *txt = (csTextureHandleLine *)textures [t];
     csRGBpixel *colormap = txt->GetColorMap ();
     int colormapsize = txt->GetColorMapSize ();
     if (txt->GetKeyColor ())
@@ -450,7 +459,7 @@ void csTextureManagerLine::PrepareTextures ()
   int i;
   for (i = 0; i < textures.Length (); i++)
   {
-    csTextureMM *txt = textures.Get (i);
+    csTextureHandle *txt = textures.Get (i);
     txt->CreateMipmaps ();
   }
 
@@ -460,7 +469,7 @@ void csTextureManagerLine::PrepareTextures ()
 
   // Remap all textures according to the new colormap.
   for (i = 0; i < textures.Length (); i++)
-    ((csTextureMMLine*)textures[i])->remap_texture (this);
+    ((csTextureHandleLine*)textures[i])->remap_texture (this);
 }
 
 iTextureHandle *csTextureManagerLine::RegisterTexture (iImage* image,
@@ -468,24 +477,14 @@ iTextureHandle *csTextureManagerLine::RegisterTexture (iImage* image,
 {
   if (!image) return NULL;
 
-  csTextureMMLine *txt = new csTextureMMLine (image, flags);
+  csTextureHandleLine *txt = new csTextureHandleLine (this, image, flags);
   textures.Push (txt);
   return txt;
 }
 
-void csTextureManagerLine::PrepareTexture (iTextureHandle *handle)
+void csTextureManagerLine::UnregisterTexture (csTextureHandleLine* handle)
 {
-  if (!handle) return;
-
-  csTextureMMLine *txt = (csTextureMMLine *)handle->GetPrivateObject ();
-  txt->CreateMipmaps ();
-  txt->remap_texture (this);
-}
-
-void csTextureManagerLine::UnregisterTexture (iTextureHandle* handle)
-{
-  csTextureMMLine *tex_mm = (csTextureMMLine *)handle->GetPrivateObject ();
-  int idx = textures.Find (tex_mm);
+  int idx = textures.Find (handle);
   if (idx >= 0) textures.Delete (idx);
 }
 

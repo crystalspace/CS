@@ -45,11 +45,13 @@
 /// Dismiss parent dialog when this button is pressed
 #define CSBS_DISMISS		0x00000080
 /// Text placement relative to bitmap: value mask
-#define CSBS_TEXTPLACEMENT	0x00000300
+#define CSBS_TEXTPLACEMENT	0x00030000
 /// Draw text above bitmap
 #define CSBS_TEXTABOVE		0x00000000
 /// Draw text below the bitmap
-#define CSBS_TEXTBELOW		0x00000100
+#define CSBS_TEXTBELOW		0x00010000
+/// Draw text on top of the bitmap (bitmap as background)
+#define CSBS_TEXTONTOP		0x00020000
 
 /// Default button styles
 #define CSBS_DEFAULTVALUE	(CSBS_SHIFT | CSBS_SELECTABLE | \

@@ -121,27 +121,30 @@ int csColorMapLine::FreeEntries ()
   return colors;
 }
 
-//-------------------------------------------------------- csTextureMMNull ---//
+//-------------------------------------------------------- csTextureHandleNull ---//
 
-csTextureMMNull::csTextureMMNull (iImage *image, int flags) :
-  csTextureMM (image, flags)
+csTextureHandleNull::csTextureHandleNull (csTextureManagerNull *txtmgr,
+  iImage *image, int flags) : csTextureHandle (image, flags)
 {
   pal2glob = NULL;
   pal2glob8 = NULL;
+  (texman = txtmgr)->IncRef ();
 }
 
-csTextureMMNull::~csTextureMMNull ()
+csTextureHandleNull::~csTextureHandleNull ()
 {
+  texman->UnregisterTexture (this);
+  texman->DecRef ();
   delete [] (UByte *)pal2glob;
   delete [] pal2glob8;
 }
 
-csTexture *csTextureMMNull::NewTexture (iImage *Image)
+csTexture *csTextureHandleNull::NewTexture (iImage *Image)
 {
   return new csTextureNull (this, Image);
 }
 
-void csTextureMMNull::ComputeMeanColor ()
+void csTextureHandleNull::ComputeMeanColor ()
 {
   int i;
 
@@ -175,6 +178,23 @@ void csTextureMMNull::ComputeMeanColor ()
         csQuantizeRemap ((csRGBpixel *)t->image->GetImageData (),
           t->get_size (), t->bitmap, tc);
 
+      // Get the alpha map for the texture, if present
+      if (t->image->GetFormat () & CS_IMGFMT_ALPHA)
+      {
+        csRGBpixel *srcimg = (csRGBpixel *)t->image->GetImageData ();
+        size_t imgsize = t->get_size ();
+        uint8 *dstalpha = t->alphamap = new uint8 [imgsize];
+        // In 8- and 16-bit modes we limit the alpha to 5 bits (32 values)
+        // This is related to the internal implementation of alphamap
+        // routine and is quite enough for 5-5-5 and 5-6-5 modes.
+        if (texman->pfmt.PixelBytes != 4)
+          while (imgsize--)
+            *dstalpha++ = srcimg++->alpha >> 3;
+        else
+          while (imgsize--)
+            *dstalpha++ = srcimg++->alpha;
+      }
+
       // Very well, we don't need the iImage anymore, so free it
       t->image->DecRef ();
       t->image = NULL;
@@ -197,7 +217,7 @@ void csTextureMMNull::ComputeMeanColor ()
   mean_color.blue  = b / palette_size;
 }
 
-void csTextureMMNull::remap_texture (csTextureManager *texman)
+void csTextureHandleNull::remap_texture (csTextureManager *texman)
 {
   int i;
   csTextureManagerNull *txm = (csTextureManagerNull *)texman;
@@ -233,6 +253,12 @@ void csTextureMMNull::remap_texture (csTextureManager *texman)
   }
 }
 
+void csTextureHandleNull::Prepare ()
+{
+  CreateMipmaps ();
+  remap_texture (texman);
+}
+
 //----------------------------------------------- csTextureManagerNull ---//
 
 csTextureManagerNull::csTextureManagerNull (iSystem *iSys,
@@ -243,6 +269,12 @@ csTextureManagerNull::csTextureManagerNull (iSystem *iSys,
   G2D = iG2D;
   inv_cmap = NULL;
   GlobalCMap = NULL;
+}
+
+csTextureManagerNull::~csTextureManagerNull ()
+{
+  Clear ();
+  delete [] GlobalCMap;
 }
 
 void csTextureManagerNull::SetPixelFormat (csPixelFormat &PixelFormat)
@@ -261,12 +293,6 @@ void csTextureManagerNull::read_config (iConfigFile *config)
   prefered_dist = config->GetInt ("TextureManager", "RGB_DIST", PREFERED_DIST);
   uniform_bias = config->GetInt ("TextureManager", "UNIFORM_BIAS", 75);
   if (uniform_bias > 100) uniform_bias = 100;
-}
-
-csTextureManagerNull::~csTextureManagerNull ()
-{
-  Clear ();
-  delete [] GlobalCMap;
 }
 
 void csTextureManagerNull::Clear ()
@@ -347,7 +373,7 @@ void csTextureManagerNull::compute_palette ()
 
   for (int t = textures.Length () - 1; t >= 0; t--)
   {
-    csTextureMMNull *txt = (csTextureMMNull *)textures [t];
+    csTextureHandleNull *txt = (csTextureHandleNull *)textures [t];
     csRGBpixel *colormap = txt->GetColorMap ();
     int colormapsize = txt->GetColorMapSize ();
     if (txt->GetAlphaMap ())
@@ -402,7 +428,7 @@ void csTextureManagerNull::PrepareTextures ()
   int i;
   for (i = 0; i < textures.Length (); i++)
   {
-    csTextureMM *txt = textures.Get (i);
+    csTextureHandle *txt = textures.Get (i);
     txt->CreateMipmaps ();
   }
 
@@ -412,7 +438,7 @@ void csTextureManagerNull::PrepareTextures ()
 
   // Remap all textures according to the new colormap.
   for (i = 0; i < textures.Length (); i++)
-    ((csTextureMMNull*)textures[i])->remap_texture (this);
+    ((csTextureHandleNull*)textures[i])->remap_texture (this);
 }
 
 iTextureHandle *csTextureManagerNull::RegisterTexture (iImage* image,
@@ -420,24 +446,14 @@ iTextureHandle *csTextureManagerNull::RegisterTexture (iImage* image,
 {
   if (!image) return NULL;
 
-  csTextureMMNull *txt = new csTextureMMNull (image, flags);
+  csTextureHandleNull *txt = new csTextureHandleNull (this, image, flags);
   textures.Push (txt);
   return txt;
 }
 
-void csTextureManagerNull::PrepareTexture (iTextureHandle *handle)
+void csTextureManagerNull::UnregisterTexture (csTextureHandleNull* handle)
 {
-  if (!handle) return;
-
-  csTextureMMNull *txt = (csTextureMMNull *)handle->GetPrivateObject ();
-  txt->CreateMipmaps ();
-  txt->remap_texture (this);
-}
-
-void csTextureManagerNull::UnregisterTexture (iTextureHandle* handle)
-{
-  csTextureMMNull *tex_mm = (csTextureMMNull *)handle->GetPrivateObject ();
-  int idx = textures.Find (tex_mm);
+  int idx = textures.Find (handle);
   if (idx >= 0) textures.Delete (idx);
 }
 

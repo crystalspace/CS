@@ -35,7 +35,7 @@
 
 //---------------------------------------------------------------------------
 
-csTextureOpenGL::csTextureOpenGL (csTextureMM *Parent, iImage *Image)
+csTextureOpenGL::csTextureOpenGL (csTextureHandle *Parent, iImage *Image)
   : csTexture (Parent)
 {
   image = Image;
@@ -56,19 +56,22 @@ csTextureProcOpenGL::~csTextureProcOpenGL ()
 
 //---------------------------------------------------------------------------
 
-csTextureMMOpenGL::csTextureMMOpenGL (iImage *image, int flags,
-  csGraphics3DOGLCommon *iG3D) : csTextureMM (image, flags)
+csTextureHandleOpenGL::csTextureHandleOpenGL (iImage *image, int flags,
+  csGraphics3DOGLCommon *iG3D) : csTextureHandle (image, flags)
 {
-  G3D = iG3D;
+  (G3D = iG3D)->IncRef ();
+  has_alpha = false;
 }
 
-csTextureMMOpenGL::~csTextureMMOpenGL ()
+csTextureHandleOpenGL::~csTextureHandleOpenGL ()
 {
-  if (G3D && G3D->texture_cache)
+  if (G3D->texture_cache)
     G3D->texture_cache->Uncache (this);
+  G3D->txtmgr->UnregisterTexture (this);
+  G3D->DecRef ();
 }
 
-csTexture *csTextureMMOpenGL::NewTexture (iImage *Image)
+csTexture *csTextureHandleOpenGL::NewTexture (iImage *Image)
 {
   if ((flags & CS_TEXTURE_PROC) == CS_TEXTURE_PROC)
     return new csTextureProcOpenGL (this, Image);
@@ -76,8 +79,8 @@ csTexture *csTextureMMOpenGL::NewTexture (iImage *Image)
     return new csTextureOpenGL (this, Image);
 }
 
-void csTextureMMOpenGL::InitTexture (csTextureManagerOpenGL *texman, 
-				     csPixelFormat *pfmt)
+void csTextureHandleOpenGL::InitTexture (csTextureManagerOpenGL *texman,
+  csPixelFormat *pfmt)
 {
   // Preserve original width/height so that in DrawPixmap subregions of
   // textures are calculated correctly. In other words, the app writer need
@@ -141,8 +144,7 @@ void csTextureMMOpenGL::InitTexture (csTextureManagerOpenGL *texman,
   }
 }
 
-
-void csTextureMMOpenGL::ComputeMeanColor ()
+void csTextureHandleOpenGL::ComputeMeanColor ()
 {
   // Compute the mean color from the smallest mipmap available
   csTextureOpenGL *tex = NULL;
@@ -157,24 +159,32 @@ void csTextureMMOpenGL::ComputeMeanColor ()
   csRGBpixel *src = tex->get_image_data ();
   unsigned r = 0, g = 0, b = 0;
   int count = pixels;
+  has_alpha = false;
   while (count--)
   {
     csRGBpixel pix = *src++;
     r += pix.red;
     g += pix.green;
     b += pix.blue;
+    if (pix.alpha < 255)
+      has_alpha = true;
   }
   mean_color.red   = r / pixels;
   mean_color.green = g / pixels;
   mean_color.blue  = b / pixels;
 }
 
-iGraphics3D *csTextureMMOpenGL::GetProcTextureInterface ()
+iGraphics3D *csTextureHandleOpenGL::GetProcTextureInterface ()
 {
   if ((flags & CS_TEXTURE_PROC) != CS_TEXTURE_PROC)
     return NULL;
 
   return ((csTextureProcOpenGL*)tex[0])->texG3D;
+}
+
+void csTextureHandleOpenGL::Prepare ()
+{
+  InitTexture (G3D->txtmgr, &G3D->txtmgr->pfmt);
 }
 
 //---------------------------------------------------------------------------
@@ -209,21 +219,20 @@ void csTextureManagerOpenGL::read_config (iConfigFile *config)
     proc_tex_type = BACK_BUFFER_TEXTURE;
 }
 
+void csTextureManagerOpenGL::SetPixelFormat (csPixelFormat &PixelFormat)
+{
+  pfmt = PixelFormat;
+  max_tex_size = G3D->max_texture_size;
+}
+
 void csTextureManagerOpenGL::PrepareTextures ()
 {
-  // hack, pixel format is now not yet determined until G2D is opened
-  pfmt = *G3D->GetDriver2D()->GetPixelFormat ();
-  max_tex_size = G3D->max_texture_size;
-
   if (verbose) SysPrintf(MSG_INITIALIZATION, "Preparing textures...\n");
   if (verbose) SysPrintf(MSG_INITIALIZATION, "  Creating texture mipmaps...\n");
 
   // Create mipmaps for all textures
   for (int i = 0; i < textures.Length (); i++)
-  {
-    csTextureMMOpenGL* txt =(csTextureMMOpenGL *)textures.Get (i);
-    txt->InitTexture (this, &pfmt);
-  }
+    textures.Get (i)->Prepare ();
 }
 
 iTextureHandle *csTextureManagerOpenGL::RegisterTexture (iImage* image,
@@ -231,25 +240,13 @@ iTextureHandle *csTextureManagerOpenGL::RegisterTexture (iImage* image,
 {
   if (!image) return NULL;
 
-  csTextureMMOpenGL* txt = new csTextureMMOpenGL (image, flags, G3D);
+  csTextureHandleOpenGL* txt = new csTextureHandleOpenGL (image, flags, G3D);
   textures.Push (txt);
   return txt;
 }
 
-void csTextureManagerOpenGL::PrepareTexture (iTextureHandle *handle)
+void csTextureManagerOpenGL::UnregisterTexture (csTextureHandleOpenGL *handle)
 {
-  if (!handle) return;
-  // hack, pixel format is now not yet determined until G2D is opened
-  pfmt = *G3D->GetDriver2D()->GetPixelFormat ();
-  max_tex_size = G3D->max_texture_size;
-
-  ((csTextureMMOpenGL*)handle->GetPrivateObject ())->InitTexture (this, &pfmt);
-}
-
-void csTextureManagerOpenGL::UnregisterTexture (iTextureHandle* handle)
-{
-  csTextureMMOpenGL *tex_mm = (csTextureMMOpenGL *)handle->GetPrivateObject ();
-  G3D->UncacheTexture (handle);
-  int idx = textures.Find (tex_mm);
+  int idx = textures.Find (handle);
   if (idx >= 0) textures.Delete (idx);
 }

@@ -69,7 +69,7 @@ static void DP_NAME (iGraphics2D *G2D, iTextureHandle *hTex,
   bool alpha_chan = hTex->GetAlphaMap ();
   bool transp = hTex->GetKeyColor ();
 
-  csTextureMMSoftware *tex_mm = (csTextureMMSoftware *)hTex->GetPrivateObject ();
+  csTextureHandleSoftware *tex_mm = (csTextureHandleSoftware *)hTex->GetPrivateObject ();
   csTextureSoftware *txt_unl = (csTextureSoftware *)tex_mm->get_texture (0);
 
   int bw = txt_unl->get_width ();

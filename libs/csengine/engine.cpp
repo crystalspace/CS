@@ -728,7 +728,15 @@ bool csEngine::HandleEvent (iEvent &Event)
         StartEngine ();
 
         return true;
-      } /* endif */
+      }
+      case cscmdSystemClose:
+      {
+        // We must free all material and texture handles since after
+        // G3D->Close() they all become invalid, no matter whenever
+        // we did or didn't an IncRef on them.
+        Clear ();
+        return true;
+      }
       case cscmdContextResize:
       {
 	if (engine_states)

@@ -61,7 +61,7 @@ void D3DCache::cache_texture (iTextureHandle *texture)
     
   size *= bpp/8;
     
-  csTextureMMDirect3D *txt_mm = (csTextureMMDirect3D *)texture->GetPrivateObject ();
+  csTextureHandleDirect3D *txt_mm = (csTextureHandleDirect3D *)texture->GetPrivateObject ();
   csD3DCacheData *cached_texture = (csD3DCacheData *)txt_mm->GetCacheData ();
   if (cached_texture)
   {
@@ -298,7 +298,7 @@ void D3DTextureCache::Dump ()
 void D3DTextureCache::Load (csD3DCacheData* cached_texture)
 {
   iTextureHandle* txt_handle = (iTextureHandle *)cached_texture->pSource;
-  csTextureMM*    txt_mm     = (csTextureMM *)   txt_handle->GetPrivateObject ();
+  csTextureHandle*    txt_mm     = (csTextureHandle *)   txt_handle->GetPrivateObject ();
 
   txt_handle->IncRef();
 

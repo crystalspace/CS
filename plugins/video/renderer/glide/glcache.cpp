@@ -391,7 +391,7 @@ void csGlideTextureCache::Unload ( csGlideCacheData *d )
 void csGlideTextureCache::LoadTex(csGlideCacheData *d, int nMM)
 {
   iTextureHandle* txt_handle = (iTextureHandle*)d->pSource;
-  csTextureMM* txt_mm = (csTextureMM*)txt_handle->GetPrivateObject ();
+  csTextureHandle* txt_mm = (csTextureHandle*)txt_handle->GetPrivateObject ();
   csTextureGlide* txt_unl = (csTextureGlide *)txt_mm->get_texture (0);
   int i;
   int width = txt_unl->get_width ();

@@ -73,7 +73,6 @@ private:
   int  poly_alpha;
   bool poly_fog;
 
-  csTextureManagerGlide* txtmgr; 
   /// Does require multipass rendering for lightmap (if TRUE, then there is only one TMU!)
   bool m_iMultiPass;
 
@@ -165,6 +164,9 @@ private:
 
   void ClearBufferUnderTop();  
 public:
+  /// The Glide texture manager
+  csTextureManagerGlide* txtmgr; 
+
   DECLARE_IBASE;
 
   /// The constructor. Pass all arguments to this.

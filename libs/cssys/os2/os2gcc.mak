@@ -113,7 +113,7 @@ ifeq ($(USE_OMF),yes)
 	rm -f $@
 	emxomfar
   endef
-  ARFLAGS=-p32 cr
+  ARFLAGS=-p64 cr
   CFLAGS.GENERAL += -Zomf
   LFLAGS.GENERAL += -Zomf
   NASMFLAGS.SYSTEM=-f obj
@@ -156,7 +156,7 @@ else
 endif
 
 # For using sockets we should link with sockets library
-NETSOCK_LIBS=-lsocket
+LIBS.SOCKET.SYSTEM=-lsocket
 
 # Override linker with os2link.exe
 LINK=@$(OS2LINK) --linker=$(LD) --description="$(DESCRIPTION.$@)" \

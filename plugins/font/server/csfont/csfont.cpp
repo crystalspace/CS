@@ -302,6 +302,7 @@ csDefaultFont::~csDefaultFont ()
     delete [] FontBitmap;
     delete [] IndividualWidth;
   }
+  delete [] GlyphBitmap;
 }
 
 void csDefaultFont::SetSize (int iSize)

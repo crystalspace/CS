@@ -53,7 +53,7 @@
 	  covers a 16x16 square of texels on the texture. The prefix for
 	  intermediate variables related to the lightmap is "lm".
 	- csTexture is the actual unlighted (original) texture in
-          driver-dependent format. The csTextureMMSoftware object
+          driver-dependent format. The csTextureHandleSoftware object
 	  contains four of these objects - one for each mipmap level.
 	  The intermediate variables related to csTexture are prefixed
 	  with "tx".
@@ -62,7 +62,7 @@
 #include "pixtype.inc"
 
 void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct, 
-	      csTextureMMSoftware *texmm, csTextureManagerSoftware *texman,
+	      csTextureHandleSoftware *texmm, csTextureManagerSoftware *texman,
 	      float u_min, float v_min, float u_max, float v_max)
 {
   int mipmap = ct->mipmap;

@@ -27,10 +27,10 @@
 class csGraphics3DGlide;
 class csGlideProcedural;
 /**
- * csTextureMMGlide represents a texture and all its mipmapped
+ * csTextureHandleGlide represents a texture and all its mipmapped
  * variants.
  */
-class csTextureMMGlide : public csTextureMM
+class csTextureHandleGlide : public csTextureHandle
 {
 private:
   csGraphics3DGlide *g3d;
@@ -38,8 +38,8 @@ private:
 
 public:
   /// Create a mipmapped texture object
-  csTextureMMGlide (csGraphics3DGlide *g3d, iImage* image, int flags);
-  virtual ~csTextureMMGlide ();
+  csTextureHandleGlide (csGraphics3DGlide *g3d, iImage* image, int flags);
+  virtual ~csTextureHandleGlide ();
   /// Create a new csTextureGlide object
   virtual csTexture *NewTexture (iImage *Image);
   /// Compute the mean color
@@ -47,8 +47,9 @@ public:
   /// Encode 24 bit data into 16 bit ( 565 RGB scheme )
   virtual void remap_mm ();
   virtual iGraphics3D *GetProcTextureInterface();
-  bool GetAlphaMap ()
+  virtual bool GetAlphaMap ()
   { return false; }
+  virtual void Prepare ();
 };
 
 /**
@@ -56,14 +57,14 @@ public:
 */
 class csTextureGlide : public csTexture
 {
-  friend class csTextureMMGlide;
+  friend class csTextureHandleGlide;
   /// the original image
   iImage *image;
   /// 16 bit encoded raw image data
   UShort *raw;
 public:
   /// Create a new texture object
-  csTextureGlide (csTextureMM *Parent, iImage *Image);
+  csTextureGlide (csTextureHandle *Parent, iImage *Image);
   /// Destroy the texture object
   virtual ~csTextureGlide ();
   /// Get the raw bitmap data
@@ -83,8 +84,7 @@ public:
  */
 class csTextureManagerGlide : public csTextureManager
 {
-
- protected:
+protected:
   csGraphics3DGlide *g3d;
 
 public:
@@ -99,10 +99,7 @@ public:
   ///
   virtual iTextureHandle *RegisterTexture (iImage* image, int flags);
   ///
-  virtual void PrepareTexture (iTextureHandle *handle);
-  ///
-  virtual void UnregisterTexture (iTextureHandle* handle);
-
+  void UnregisterTexture (csTextureHandleGlide *handle);
 };
 
 #endif 

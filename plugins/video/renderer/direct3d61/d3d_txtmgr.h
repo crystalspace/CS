@@ -30,7 +30,7 @@ struct iImage;
 /**
  * A mipmapped texture for Direct3D.
  */
-class csTextureMMDirect3D : public csTextureMM
+class csTextureHandleDirect3D : public csTextureHandle
 {
   csTextureDirect3D* m_pTexture2d;
 
@@ -39,10 +39,10 @@ public:
   csGraphics3DDirect3DDx6 *G3D;
 
   /// Initialize the object
-  csTextureMMDirect3D (iImage* image, int flags, csGraphics3DDirect3DDx6 *iG3D);
+  csTextureHandleDirect3D (iImage* image, int flags, csGraphics3DDirect3DDx6 *iG3D);
 
   /// Delete all members
-  ~csTextureMMDirect3D();
+  ~csTextureHandleDirect3D();
   /// Create a new texture object
   virtual csTexture *NewTexture (iImage *Image);
   /// Compute the mean color for the just-created texture
@@ -50,6 +50,8 @@ public:
 
   /// Create all mipmapped bitmaps from the first level.
   virtual void CreateMipmaps ();
+  /// Prepare texture for further usage
+  virtual void Prepare ();
 };
 
 /**
@@ -65,7 +67,7 @@ class csTextureDirect3D : public csTexture
 
 public:
   /// Create a csTexture object
-  csTextureDirect3D (csTextureMM *Parent, iImage *Image, csGraphics3DDirect3DDx6 *iG3D, bool For2d);
+  csTextureDirect3D (csTextureHandle *Parent, iImage *Image, csGraphics3DDirect3DDx6 *iG3D, bool For2d);
   /// Destroy the texture
   virtual ~csTextureDirect3D ();
   /// Get image data
@@ -104,9 +106,7 @@ public:
   ///
   virtual iTextureHandle *RegisterTexture (iImage* image, int flags);
   ///
-  virtual void PrepareTexture (iTextureHandle *handle);
-  ///
-  virtual void UnregisterTexture (iTextureHandle* handle);
+  virtual void UnregisterTexture (csTextureHandleDirect3D* handle);
 };
 
 #endif // TXTMGR_DIRECT3D_H

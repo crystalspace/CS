@@ -29,7 +29,9 @@ SCF_VERSION (iMaterial, 0, 0, 1);
 /**
  * This class represents a material as seen from the engine
  * view. You need to register this to the texture manager to get
- * a handle to an internal compiled material.
+ * a handle to an internal compiled material. This interface
+ * plays same role related to iMaterialHandle as iImage plays
+ * related to iTextureHandle.
  */
 struct iMaterial : public iBase
 {
@@ -37,18 +39,20 @@ struct iMaterial : public iBase
    * Get a texture from the material.
    */
   virtual iTextureHandle *GetTexture () = 0;
+
   /**
    * Get the flat color. If the material has a texture assigned, this
    * will return the mean texture color.
    */
   virtual void GetFlatColor (csRGBpixel &oColor) = 0;
+
   /**
    * Get light reflection parameters for this material.
    */
   virtual void GetReflection (float &oDiffuse, float &oAmbient, float &oReflection) = 0;
 };
 
-SCF_VERSION (iMaterialHandle, 0, 0, 1);
+SCF_VERSION (iMaterialHandle, 0, 0, 2);
 
 /**
  * This class represents a material handle (compiled material)
@@ -60,15 +64,25 @@ struct iMaterialHandle : public iBase
    * Get a texture from the material.
    */
   virtual iTextureHandle *GetTexture () = 0;
+
   /**
    * Get the flat color. If the material has a texture assigned, this
    * will return the mean texture color.
    */
   virtual void GetFlatColor (csRGBpixel &oColor) = 0;
+
   /**
    * Get light reflection parameters for this material.
    */
   virtual void GetReflection (float &oDiffuse, float &oAmbient, float &oReflection) = 0;
+
+  /**
+   * Prepare this material. The material wrapper (remembered during
+   * RegisterMaterial()) is queried again for material parameters
+   * and a new material descriptor (internal to the texture manager)
+   * is associated with given material handle.
+   */
+  virtual void Prepare () = 0;
 };
 
 SCF_VERSION (iMaterialWrapper, 0, 0, 1);

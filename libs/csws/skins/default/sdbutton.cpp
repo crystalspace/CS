@@ -152,6 +152,9 @@ void csDefaultButtonSkin::Draw (csComponent &This)
           imgy -= fh / 2;
           txty = imgy + img->Height () + 1;
           break;
+        case CSBS_TEXTONTOP:
+          txty = (This.bound.Height () - fh) / 2;
+          break;
       } /* endswitch */
     else
       txty = (This.bound.Height () - fh) / 2;

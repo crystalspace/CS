@@ -86,10 +86,10 @@ public:
 };
 
 /**
- * csTextureMMLine represents a texture and all its mipmapped
+ * csTextureHandleLine represents a texture and all its mipmapped
  * variants.
  */
-class csTextureMMLine : public csTextureMM
+class csTextureHandleLine : public csTextureHandle
 {
 protected:
   /**
@@ -106,6 +106,9 @@ protected:
   /// Number of used colors in palette
   int palette_size;
 
+  /// The texture manager
+  csTextureManagerLine *texman;
+
   /// Create a new texture object
   virtual csTexture *NewTexture (iImage *Image);
 
@@ -114,9 +117,9 @@ protected:
 
 public:
   /// Create the mipmapped texture object
-  csTextureMMLine (iImage *image, int flags);
+  csTextureHandleLine (csTextureManagerLine *txtmgr, iImage *image, int flags);
   /// Destroy the object and free all associated storage
-  virtual ~csTextureMMLine ();
+  virtual ~csTextureHandleLine ();
 
   /**
    * Create the [Private colormap] -> global colormap table.
@@ -133,6 +136,9 @@ public:
 
   /// Query palette -> native format table
   void *GetPaletteToGlobal () { return pal2glob; }
+
+  /// Prepare the texture for usage
+  virtual void Prepare ();
 };
 
 /**
@@ -140,7 +146,7 @@ public:
  * all the additional functionality required by the software renderer.
  * Every csTextureSoftware is a 8-bit paletted image with a private
  * colormap. The private colormap is common for all mipmapped variants.
- * The colormap is stored inside the parent csTextureMM object.
+ * The colormap is stored inside the parent csTextureHandle object.
  */
 class csTextureLine : public csTexture
 {
@@ -151,7 +157,7 @@ public:
   iImage *image;
 
   /// Create a csTexture object
-  csTextureLine (csTextureMM *Parent, iImage *Image) : csTexture (Parent)
+  csTextureLine (csTextureHandle *Parent, iImage *Image) : csTexture (Parent)
   {
     bitmap = NULL;
     image = Image;
@@ -255,9 +261,7 @@ public:
   ///
   virtual iTextureHandle *RegisterTexture (iImage* image, int flags);
   ///
-  virtual void PrepareTexture (iTextureHandle *handle);
-  ///
-  virtual void UnregisterTexture (iTextureHandle* handle);
+  virtual void UnregisterTexture (csTextureHandleLine* handle);
   /// Clear the palette (including all reserved colors)
   virtual void ResetPalette ();
   /// Reserve a color in palette (if any)

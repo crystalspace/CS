@@ -65,7 +65,7 @@ protected:
   long cache_size;
   /// number of items
   int num;
-
+  /// Total size of all loaded textures
   long total_size;
 
 public:
@@ -92,7 +92,7 @@ protected:
   ///
   virtual void Load (csGLCacheData *d) = 0;
   ///
-  virtual void Unload (csGLCacheData *d) = 0;
+  void Unload (csGLCacheData *d);
 };
 
 ///
@@ -116,8 +116,6 @@ public:
 protected:
   ///
   virtual void Load (csGLCacheData *d);
-  ///
-  virtual void Unload (csGLCacheData *d);
 };
 
 ///
@@ -132,8 +130,6 @@ public:
 protected:
   ///
   virtual void Load (csGLCacheData *d);
-  ///
-  virtual void Unload (csGLCacheData *d);
 };
 
 #endif // __GL_TEXTURECACHE_H__

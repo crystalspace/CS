@@ -85,6 +85,10 @@ public:
   void SetColor (int iColor)
   { color = iColor; type = csbgColor; }
 
+  /// Get the flat color of this background
+  int GetColor ()
+  { return color; }
+
   /// Set background type
   void SetType (csBackgroundType iType)
   { type = iType; }

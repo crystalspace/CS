@@ -2,26 +2,26 @@
 # to build the 3D line rendering driver.
 
 # Driver description
-DESCRIPTION.line = Crystal Space line 3D renderer
+DESCRIPTION.line3d = Crystal Space line 3D renderer
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
 DRIVERHELP += \
-  $(NEWLINE)echo $"  make line         Make the $(DESCRIPTION.line)$"
+  $(NEWLINE)echo $"  make line3d       Make the $(DESCRIPTION.line3d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: line
-all plugins drivers drivers3d: line
+.PHONY: line3d
+all plugins drivers drivers3d: line3d
 
-line:
+line3d:
 	$(MAKE_TARGET) MAKE_DLL=yes
-lineclean:
+line3dclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -36,7 +36,7 @@ ifeq ($(USE_PLUGINS),yes)
   LIB.LINE3D = $(foreach d,$(DEP.LINE3D),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(LINE3D)
 else
-  LINE3D = $(OUT)$(LIB_PREFIX)line$(LIB)
+  LINE3D = $(OUT)$(LIB_PREFIX)line3d$(LIB)
   DEP.EXE += $(LINE3D)
   SCF.STATIC += line3d
   TO_INSTALL.STATIC_LIBS += $(LINE3D)
@@ -62,18 +62,18 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: line lineclean
+.PHONY: line3d line3dclean
 
 # Chain rules
 all: $(LINE3D)
-clean: lineclean
+clean: line3dclean
 
-line: $(OUTDIRS) $(LINE3D)
+line3d: $(OUTDIRS) $(LINE3D)
 
 $(LINE3D): $(OBJ.LINE3D) $(LIB.LINE3D)
 	$(DO.PLUGIN)
 
-lineclean:
+line3dclean:
 	$(RM) $(LINE3D) $(OBJ.LINE3D) $(OUTOS)line3d.dep
 
 ifdef DO_DEPEND

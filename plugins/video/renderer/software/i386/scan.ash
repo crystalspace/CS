@@ -102,16 +102,16 @@ __TEXT_SECT__
 		%define	%1 dword [Scan+csScanSetup.%1]
 	%endif
 %endmacro
-%define int			__dword_field
-%define float			__dword_field
-%define unsigned_long		__dword_field
-%define csTextureMMSoftware_P	__dword_field
-%define unsigned_char_P		__dword_field
-%define unsigned_int		__dword_field
-%define unsigned_short_P	__dword_field
-%define RGB8map_P		__dword_field
-%define int_P			__dword_field
-%define unsigned_int_P		__dword_field
+%define int				__dword_field
+%define float				__dword_field
+%define unsigned_long			__dword_field
+%define csTextureHandleSoftware_P	__dword_field
+%define unsigned_char_P			__dword_field
+%define unsigned_int			__dword_field
+%define unsigned_short_P		__dword_field
+%define RGB8map_P			__dword_field
+%define int_P				__dword_field
+%define unsigned_int_P			__dword_field
 
 ; A coefficient for planar fog density: bigger is denser
 %define PLANAR_FOG_DENSITY_COEF	6
@@ -141,7 +141,7 @@ struc csScanSetup
   unsigned_char_P Fog8;
 
   ; A pointer to the texture.
-  csTextureMMSoftware_P Texture;
+  csTextureHandleSoftware_P Texture;
 
   ; The lighted texture bitmap from the texture cache.
   unsigned_char_P bitmap2;
@@ -253,7 +253,7 @@ extvar	Scan
 %undef	int
 %undef	float
 %undef	unsigned_long
-%undef	csTextureMMSoftware_P
+%undef	csTextureHandleSoftware_P
 %undef	unsigned_char_P
 %undef	unsigned_int
 %undef	unsigned_short_P

@@ -954,7 +954,7 @@ void csGraphics3DGlide::StartPolygonFX (iMaterialHandle *mathandle,  UInt mode)
   if ( m_renderstate.textured && mathandle )
   {
     handle = mathandle->GetTexture ();
-    csTextureMMGlide* txt_mm = (csTextureMMGlide*)handle->GetPrivateObject ();
+    csTextureHandleGlide* txt_mm = (csTextureHandleGlide*)handle->GetPrivateObject ();
     csGlideCacheData* tcache;
     m_pTextureCache->Add (handle, false);
     tcache = (csGlideCacheData *)txt_mm->GetCacheData ();
@@ -1410,7 +1410,7 @@ void csGraphics3DGlide::DrawPixmap ( iTextureHandle *hTex,
   spr2d.vertices[2].z = 1;
   spr2d.vertices[3].z = 1;
   
-  csTextureMMGlide* txt_mm = (csTextureMMGlide*)hTex->GetPrivateObject ();
+  csTextureHandleGlide* txt_mm = (csTextureHandleGlide*)hTex->GetPrivateObject ();
   csGlideCacheData* tcache;
   m_pTextureCache->Add (hTex, false);
   tcache = (csGlideCacheData *)txt_mm->GetCacheData ();

@@ -131,27 +131,29 @@ csTextureSoftwareProc::~csTextureSoftwareProc ()
   if (image) image->DecRef ();
 }
 
-//---------------------------------------------------- csTextureMMSoftware ---//
+//---------------------------------------------------- csTextureHandleSoftware ---//
 
-csTextureMMSoftware::csTextureMMSoftware (csTextureManagerSoftware *texman, 
-  iImage *image, int flags) : csTextureMM (image, flags)
+csTextureHandleSoftware::csTextureHandleSoftware (csTextureManagerSoftware *texman, 
+  iImage *image, int flags) : csTextureHandle (image, flags)
 {
   pal2glob = NULL;
   pal2glob8 = NULL;
   if (flags & CS_TEXTURE_3D)
     AdjustSizePo2 ();
   orig_palette = NULL;
-  this->texman = texman;
+  (this->texman = texman)->IncRef ();
 }
 
-csTextureMMSoftware::~csTextureMMSoftware ()
+csTextureHandleSoftware::~csTextureHandleSoftware ()
 {
+  texman->UnregisterTexture (this);
+  texman->DecRef ();
   delete [] (UByte *)pal2glob;
   delete [] pal2glob8;
   delete [] orig_palette;
 }
 
-csTexture *csTextureMMSoftware::NewTexture (iImage *Image)
+csTexture *csTextureHandleSoftware::NewTexture (iImage *Image)
 {
   if ((flags & CS_TEXTURE_PROC) == CS_TEXTURE_PROC)
     return new csTextureSoftwareProc (this, Image);
@@ -159,7 +161,7 @@ csTexture *csTextureMMSoftware::NewTexture (iImage *Image)
     return new csTextureSoftware (this, Image);
 }
 
-void csTextureMMSoftware::ApplyGamma (UByte *GammaTable)
+void csTextureHandleSoftware::ApplyGamma (UByte *GammaTable)
 {
   if (!orig_palette)
     return;
@@ -175,7 +177,7 @@ void csTextureMMSoftware::ApplyGamma (UByte *GammaTable)
   }
 } 
 
-void csTextureMMSoftware::ComputeMeanColor ()
+void csTextureHandleSoftware::ComputeMeanColor ()
 {
   int i;
 
@@ -246,7 +248,7 @@ void csTextureMMSoftware::ComputeMeanColor ()
   SetupFromPalette ();
 }
 
-void csTextureMMSoftware::SetupFromPalette ()
+void csTextureHandleSoftware::SetupFromPalette ()
 {
   int i;
   // Compute the mean color from the palette
@@ -277,7 +279,7 @@ void csTextureMMSoftware::SetupFromPalette ()
   }
 }
 
-void csTextureMMSoftware::GetOriginalColormap (csRGBpixel *oPalette, int &oCount)
+void csTextureHandleSoftware::GetOriginalColormap (csRGBpixel *oPalette, int &oCount)
 {
   oCount = palette_size;
   UByte *src = orig_palette;
@@ -291,7 +293,7 @@ void csTextureMMSoftware::GetOriginalColormap (csRGBpixel *oPalette, int &oCount
   }
 }
 
-void csTextureMMSoftware::remap_texture ()
+void csTextureHandleSoftware::remap_texture ()
 {
   int i;
   ApplyGamma (texman->GammaTable);
@@ -327,7 +329,7 @@ void csTextureMMSoftware::remap_texture ()
   }
 }
 
-void csTextureMMSoftware::RemapProcToGlobalPalette (csTextureManagerSoftware *txtmgr)
+void csTextureHandleSoftware::RemapProcToGlobalPalette (csTextureManagerSoftware *txtmgr)
 {
   // This instance of the texture manager is fully 8bit and is either managing 
   // all the textures in the system or just a set of proc textures.
@@ -337,7 +339,7 @@ void csTextureMMSoftware::RemapProcToGlobalPalette (csTextureManagerSoftware *tx
     return;
 
   // Copy the global palette to the texture palette
-  memcpy (palette, &txtmgr->cmap.palette[0], sizeof(csRGBpixel)*256);
+  memcpy (palette, &txtmgr->cmap.palette [0], sizeof (csRGBpixel) * 256);
   // Remap image according to new palette if persistent
   if ((flags & CS_TEXTURE_PROC_PERSISTENT) == CS_TEXTURE_PROC_PERSISTENT)
   {
@@ -360,18 +362,18 @@ void csTextureMMSoftware::RemapProcToGlobalPalette (csTextureManagerSoftware *tx
   t->proc_ok = true;
 }
 
-void csTextureMMSoftware::ProcTextureSync ()
+void csTextureHandleSoftware::ProcTextureSync ()
 {
 
 }
 
-void csTextureMMSoftware::ReprepareProcTexture ()
+void csTextureHandleSoftware::ReprepareProcTexture ()
 {
   ComputeMeanColor ();
   remap_texture ();
 }
 
-iGraphics3D *csTextureMMSoftware::GetProcTextureInterface ()
+iGraphics3D *csTextureHandleSoftware::GetProcTextureInterface ()
 {
   if ((flags & CS_TEXTURE_PROC) != CS_TEXTURE_PROC)
     return NULL;
@@ -401,6 +403,16 @@ iGraphics3D *csTextureMMSoftware::GetProcTextureInterface ()
     }
   }
   return ((csTextureSoftwareProc*)tex[0])->texG3D;
+}
+
+void csTextureHandleSoftware::Prepare ()
+{
+  CreateMipmaps ();
+  if ((texman->pfmt.PixelBytes == 1)
+   && (flags & CS_TEXTURE_PROC))
+    RemapProcToGlobalPalette (texman);
+  else
+    remap_texture ();
 }
 
 //----------------------------------------------- csTextureManagerSoftware ---//
@@ -449,7 +461,7 @@ void csTextureManagerSoftware::SetGamma (float iGamma)
   // Remap all textures according to the new colormap.
   if (truecolor)
     for (i = 0; i < textures.Length (); i++)
-      ((csTextureMMSoftware*)textures.Get (i))->remap_texture ();
+      ((csTextureHandleSoftware*)textures.Get (i))->remap_texture ();
   else if (textures.Length ())
     SetPalette ();
 }
@@ -613,8 +625,8 @@ void csTextureManagerSoftware::compute_palette ()
 
   for (int t = textures.Length () - 1; t >= 0; t--)
   {
-    csTextureMMSoftware *txt = (csTextureMMSoftware *)textures [t];
-    if ((txt->GetFlags() & CS_TEXTURE_PROC) == CS_TEXTURE_PROC)
+    csTextureHandleSoftware *txt = (csTextureHandleSoftware *)textures [t];
+    if ((txt->GetFlags () & CS_TEXTURE_PROC) == CS_TEXTURE_PROC)
       continue;
     csRGBpixel colormap [256];
     int colormapsize;
@@ -679,9 +691,9 @@ void csTextureManagerSoftware::PrepareTextures ()
   // Create mipmaps for all textures
   for (i = 0; i < textures.Length (); i++)
   {
-    csTextureMM *txt = textures.Get (i);
-    if (((txt->GetFlags () & CS_TEXTURE_PROC) == CS_TEXTURE_PROC) &&
-	txt->get_texture (0))
+    csTextureHandle *txt = textures.Get (i);
+    if (((txt->GetFlags () & CS_TEXTURE_PROC) == CS_TEXTURE_PROC)
+     && txt->get_texture (0))
       continue;
     txt->CreateMipmaps ();
   }
@@ -693,10 +705,10 @@ void csTextureManagerSoftware::PrepareTextures ()
   // Remap all textures according to the new colormap.
   for (i = 0; i < textures.Length (); i++)
   {
-    csTextureMMSoftware* txt = (csTextureMMSoftware*)textures.Get (i);
+    csTextureHandleSoftware* txt = (csTextureHandleSoftware*)textures.Get (i);
     if ((pfmt.PixelBytes == 1) && 
        ((txt->GetFlags() & CS_TEXTURE_PROC) == CS_TEXTURE_PROC))
-      ((csTextureMMSoftware*)txt)->RemapProcToGlobalPalette (this);
+      ((csTextureHandleSoftware*)txt)->RemapProcToGlobalPalette (this);
     else
       txt->remap_texture ();
   }
@@ -712,31 +724,14 @@ iTextureHandle *csTextureManagerSoftware::RegisterTexture (iImage* image,
   int flags)
 {
   if (!image) return NULL;
-  csTextureMMSoftware *txt = new csTextureMMSoftware (this, image, flags);
+  csTextureHandleSoftware *txt = new csTextureHandleSoftware (this, image, flags);
   textures.Push (txt);
   return txt;
 }
 
-void csTextureManagerSoftware::PrepareTexture (iTextureHandle *handle)
+void csTextureManagerSoftware::UnregisterTexture (csTextureHandleSoftware* handle)
 {
-  if (!handle) return;
-
-  csTextureMMSoftware *txt = (csTextureMMSoftware *)handle->GetPrivateObject ();
-  txt->CreateMipmaps ();
-  if ((pfmt.PixelBytes == 1) && 
-      ((txt->GetFlags() & CS_TEXTURE_PROC) == CS_TEXTURE_PROC))
-    ((csTextureMMSoftware*)txt)->RemapProcToGlobalPalette (this);
-  else
-    txt->remap_texture ();
-
-  if (main_txtmgr)
-    main_txtmgr->Reprepare8BitProcs ();
-}
-
-void csTextureManagerSoftware::UnregisterTexture (iTextureHandle* handle)
-{
-  csTextureMMSoftware *tex_mm = (csTextureMMSoftware *)handle->GetPrivateObject ();
-  int idx = textures.Find (tex_mm);
+  int idx = textures.Find (handle);
   if (idx >= 0) textures.Delete (idx);
 }
 
@@ -783,9 +778,9 @@ void csTextureManagerSoftware::Reprepare8BitProcs ()
   // Remap all proc textures according to the new colormap.
   for (int i = 0; i < textures.Length (); i++)
   {
-    csTextureMMSoftware* txt = (csTextureMMSoftware*)textures.Get (i);
+    csTextureHandleSoftware* txt = (csTextureHandleSoftware*)textures.Get (i);
     if ((txt->GetFlags() & (CS_TEXTURE_PROC | CS_TEXTURE_PROC_ALONE_HINT)) 
 	== (CS_TEXTURE_PROC | CS_TEXTURE_PROC_ALONE_HINT))
-      ((csTextureMMSoftware*)txt)->RemapProcToGlobalPalette (proc_txtmgr);
+      ((csTextureHandleSoftware*)txt)->RemapProcToGlobalPalette (proc_txtmgr);
   }
 }

@@ -28,6 +28,7 @@
 #include "csgfxldr/rgbpixel.h"
 
 class csTexture;
+class csTextureManager;
 struct iImage;
 struct iConfigFile;
 
@@ -37,19 +38,19 @@ struct iConfigFile;
  * each a single image. A csTexture object is created for
  * each mipmap and for the 2D texture. This class is responsible
  * for creating these textures and filling them with the correct
- * info. The csTextureMM class is private to the 3D driver, the
+ * info. The csTextureHandle class is private to the 3D driver, the
  * driver clients see just the iTextureHandle interface.
  * <p>
  * The handle is initialized by giving the 3D driver a iImage object.
  * At the time client calls TextureManager::PrepareTextures() the
  * mipmaps and the 2D textures are created, if needed. After this
  * you can call TextureManager::FreeImages() which in turn will call
- * csTextureMM::FreeImage () for each registered texture and the
+ * csTextureHandle::FreeImage () for each registered texture and the
  * original texture will be released. This means you will free the
  * memory occupied by the original textures, but it also means you
  * cannot call TextureManager::Prepare() again.
  */
-class csTextureMM : public iTextureHandle
+class csTextureHandle : public iTextureHandle
 {
 protected:
   /// The original image object.
@@ -73,9 +74,9 @@ protected:
 
 public:
   ///
-  csTextureMM (iImage *Image, int Flags);
+  csTextureHandle (iImage *Image, int Flags);
   ///
-  virtual ~csTextureMM ();
+  virtual ~csTextureHandle ();
 
   /// Get texture usage flags
   int GetFlags () { return flags; }
@@ -138,9 +139,9 @@ public:
   virtual void SetCacheData (void *d)
   { cachedata = d; }
 
-  /// Get the csTextureMM object associated with the texture handle
+  /// Get the csTextureHandle object associated with the texture handle
   virtual void *GetPrivateObject ()
-  { return (csTextureMM *)this; }
+  { return (csTextureHandle *)this; }
 
   virtual iGraphics3D *GetProcTextureInterface ()
   { return NULL; }
@@ -158,12 +159,12 @@ public:
 
 /**
  * A simple texture.
- * Every csTextureMM contains several csTexture objects.
+ * Every csTextureHandle contains several csTexture objects.
  * Every csTexture is just a single image and all associated parameters -
  * width, height, shifts and so on. For performance reasons textures
  * are allowed to be only power-of-two sizes (both horizontal and vertical).
  * This allows us to use simple binary shift/and instead of mul/div.
- * It is the responsability of csTextureMM to resize textures if they
+ * It is the responsability of csTextureHandle to resize textures if they
  * do not fulfil this requirement.
  *<p>
  * The actual csTexture class does not implement any storage for the
@@ -174,8 +175,8 @@ public:
 class csTexture
 {
 protected:
-  /// The parent csTextureMM object
-  csTextureMM *parent;
+  /// The parent csTextureHandle object
+  csTextureHandle *parent;
   /// Width and height
   int w, h;
   /// log2(width) and log2(height)
@@ -188,7 +189,7 @@ protected:
 
 public:
   /// Create a csTexture object
-  csTexture (csTextureMM *Parent) { parent = Parent; }
+  csTexture (csTextureHandle *Parent) { parent = Parent; }
   /// Destroy the texture object
   virtual ~csTexture () {}
 
@@ -207,13 +208,11 @@ public:
   /// Query image size (alas we can't do (h << shf_w))
   int get_size () { return w * h; }
   ///
-  csTextureMM *get_parent () { return parent; }
+  csTextureHandle *get_parent () { return parent; }
 };
 
 /**
  * This class is the top-level representation of a material.
- * Stub implementation only at the moment. Materials are not
- * yet implemented.
  */
 class csMaterialHandle : public iMaterialHandle
 {
@@ -226,12 +225,14 @@ protected:
   float diffuse, ambient, reflection;
   /// Original material.
   iMaterial *material;
+  /// Parent texture manager
+  csTextureManager *texman;
 
 public:
   ///
-  csMaterialHandle (iMaterial* material);
+  csMaterialHandle (iMaterial* material, csTextureManager *parent);
   ///
-  csMaterialHandle (iTextureHandle* texture);
+  csMaterialHandle (iTextureHandle* texture, csTextureManager *parent);
   ///
   virtual ~csMaterialHandle ();
 
@@ -245,16 +246,26 @@ public:
    * Get a texture from the material.
    */
   virtual iTextureHandle *GetTexture () { return texture; }
+
   /**
    * Get the flat color. If the material has a texture assigned, this
    * will return the mean texture color.
    */
   virtual void GetFlatColor (csRGBpixel &oColor) { oColor = flat_color; }
+
   /**
    * Get light reflection parameters for this material.
    */
   virtual void GetReflection (float &oDiffuse, float &oAmbient, float &oReflection)
   { oDiffuse = diffuse; oAmbient = ambient; oReflection = reflection; }
+
+  /**
+   * Prepare this material. The material wrapper (remembered during
+   * RegisterMaterial()) is queried again for material parameters
+   * and a new material descriptor (internal to the texture manager)
+   * is associated with given material handle.
+   */
+  virtual void Prepare ();
 };
 
 /**
@@ -265,28 +276,16 @@ public:
 class csTextureManager : public iTextureManager
 {
 protected:
-  // Private class used to keep a list of objects derived from csTextureMM
+  // Private class used to keep a list of objects derived from csTextureHandle
   class csTexVector : public csVector
   {
   public:
     // Initialize the array
     csTexVector (int iLimit, int iDelta) : csVector (iLimit, iDelta) 
     { }
-    // Free all textures when the object is destroyed
-    virtual ~csTexVector ()
-    { DeleteAll (); }
     // Shortcut to avoid typecasts
-    csTextureMM *Get (int index)
-    { return (csTextureMM *)csVector::Get (index); }
-    // Free a single texture
-    virtual bool FreeItem (csSome Item)
-    {
-      if (Item) ((csTextureMM *)Item)->DecRef ();
-      return true;
-    }
-    // Add a texture to this list
-    int Push (csTextureMM *what)
-    { what->IncRef (); return csVector::Push (what); }
+    csTextureHandle *Get (int index)
+    { return (csTextureHandle *)csVector::Get (index); }
   };
 
   /// List of textures.
@@ -299,21 +298,9 @@ protected:
     // Initialize the array
     csMatVector (int iLimit, int iDelta) : csVector (iLimit, iDelta) 
     { }
-    // Free all materials when the object is destroyed
-    virtual ~csMatVector ()
-    { DeleteAll (); }
     // Shortcut to avoid typecasts
     csMaterialHandle *Get (int index)
     { return (csMaterialHandle *)csVector::Get (index); }
-    // Free a single texture
-    virtual bool FreeItem (csSome Item)
-    {
-      if (Item) ((csMaterialHandle *)Item)->DecRef ();
-      return true;
-    }
-    // Add a material to this list
-    int Push (csMaterialHandle *what)
-    { what->IncRef (); return csVector::Push (what); }
   };
 
   /// List of materials.
@@ -338,6 +325,12 @@ public:
   csTextureManager (iSystem* iSys, iGraphics2D *iG2D);
   /// Destroy the texture manager
   virtual ~csTextureManager ();
+
+  /**
+   * Called from csMaterialHandle destructor to notify parent texture
+   * manager that a material is going to be destroyed.
+   */
+  void UnregisterMaterial (csMaterialHandle* handle);
 
   /// Clear (free) all textures
   virtual void Clear ()
@@ -371,36 +364,18 @@ public:
   virtual void SetPalette ();
 
   /**
-   * Query if the texture has an alpha channel.<p>
-   * This depends both on whenever the original image had an alpha channel
-   * and of the fact whenever the renderer supports alpha maps at all.
-   */
-  virtual bool GetAlphaMap ()
-  { return false; }
-
-  /**
-   * Default stub implementation until the
-   * material system is actually working.
+   * Register a material. The input material wrapper is IncRef'd and DecRef'ed
+   * later when FreeMaterials () is called or the material handle is destroyed
+   * by calling DecRef on it enough times. If you want to keep the input
+   * material make sure you have called IncRef yourselves.
    */
   virtual iMaterialHandle* RegisterMaterial (iMaterial* material);
 
   /**
-   * Default stub implementation until the
-   * material system is actually working.
+   * Register a material based on a texture handle. This is a short-cut
+   * to quickly make materials based on a single texture.
    */
   virtual iMaterialHandle* RegisterMaterial (iTextureHandle* txthandle);
-
-  /**
-   * Default stub implementation until the
-   * material system is actually working.
-   */
-  virtual void UnregisterMaterial (iMaterialHandle* handle);
-
-  /**
-   * Default stub implementation until the
-   * material system is actually working.
-   */
-  virtual void PrepareMaterial (iMaterialHandle* handle);
 
   /**
    * Default stub implementation until the

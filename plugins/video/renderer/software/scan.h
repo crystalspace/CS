@@ -26,7 +26,7 @@
 //---//---//---//---//---//---//---//---//---//---/ Forward declarations //---//
 
 class csTextureSoftware;
-class csTextureMMSoftware;
+class csTextureHandleSoftware;
 class csGraphics3DSoftwareCommon;
 struct iPolygonTexture;
 
@@ -88,7 +88,7 @@ struct csScanSetup
   unsigned char *Fog8;
 
   /// A pointer to the texture.
-  csTextureMMSoftware *Texture;
+  csTextureHandleSoftware *Texture;
 
   /// The lighted texture bitmap from the texture cache.
   unsigned char *bitmap2;
@@ -243,7 +243,7 @@ void csScan_Finalize ();
 void csScan_CalcBlendTables (int rbits, int gbits, int bbits);
 /// Initialize the scanline variables
 void csScan_InitDraw (int MipMap, csGraphics3DSoftwareCommon* g3d,
-  iPolygonTexture* tex, csTextureMMSoftware* texture, csTextureSoftware *untxt);
+  iPolygonTexture* tex, csTextureHandleSoftware* texture, csTextureSoftware *untxt);
 /// Dump debugging information about last polygon
 void csScan_dump (csGraphics3DSoftwareCommon* pG3D);
 /// Pixel-depth independent routine

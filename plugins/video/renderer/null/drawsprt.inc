@@ -68,15 +68,17 @@ static void DP_NAME (iGraphics2D *G2D, csTextureManagerNull *texman,
   if (Alpha == 255)
     return;
 
+  bool alpha_chan = hTex->GetAlphaMap ();
   bool transp = hTex->GetKeyColor ();
 
-  csTextureMMNull *tex_mm = (csTextureMMNull *)hTex->GetPrivateObject ();
+  csTextureHandleNull *tex_mm = (csTextureHandleNull *)hTex->GetPrivateObject ();
   csTextureNull *txt_unl = (csTextureNull *)tex_mm->get_texture (0);
 
   int bw = txt_unl->get_width ();
   int bh = txt_unl->get_height ();
 
   UByte *bitmap = txt_unl->get_bitmap ();
+  UByte *alpha_map = txt_unl->get_alphamap ();
   DP_PIXTYPE *palette = (DP_PIXTYPE *)tex_mm->GetPaletteToGlobal ();
 #ifdef DP_PIXFORM_INDEX8
   uint16 *PrivateCMap = tex_mm->GetPaletteToGlobal8 ();
@@ -126,10 +128,96 @@ static void DP_NAME (iGraphics2D *G2D, csTextureManagerNull *texman,
   if (!tile)
   {
     bitmap += ty * bw + tx;
+    alpha_map += ty * bw + tx;
     ty = 0;
   }
 
-  if (Alpha)
+  if (alpha_chan)
+  {
+    if (tile)
+    {
+      uint bwm = (bw << 16) - 1, bhm = (bh << 16) - 1;
+      tx <<= 16;
+      for (ty = (ty << 16) & bhm; sh > 0; sh--, ty = (ty + dy) & bhm, sy++)
+      {
+        DP_PIXTYPE *VRAM = (DP_PIXTYPE *)G2D->GetPixelAt (sx, sy);
+        UByte *data = bitmap + (ty >> 16) * bw;
+        UByte *alpha = alpha_map + (ty >> 16) * bw;
+        int _tx = tx;
+        if (transp)
+          for (int w = sw; w; w--)
+          {
+            UByte pixel = data [(_tx & bwm) >> 16];
+            if (pixel)
+	    {
+	      register uint8
+#ifdef DP_PIXFORM_R8G8B8
+	      dstf = (255-alpha[(_tx & bwm)>>16]), srcf = dstf ^ 0xff;
+#else
+	      dstf = (31-alpha[(_tx & bwm)>>16]), srcf = dstf ^ 0x1f;
+#endif
+              ALPHA_MIX (*VRAM, pixel);
+	    }
+            VRAM++;
+            _tx += dx;
+          } /* endfor */
+        else
+          for (int w = sw; w; w--)
+          {
+	    register uint8
+#ifdef DP_PIXFORM_R8G8B8
+	    dstf = (255-alpha[(_tx & bwm)>>16]), srcf = dstf ^ 0xff;
+#else
+	    dstf = (31-alpha[(_tx & bwm)>>16]), srcf = dstf ^ 0x1f;
+#endif
+            ALPHA_MIX (*VRAM, data [(_tx & bwm) >> 16]);
+            VRAM++;
+            _tx += dx;
+          } /* endfor */
+      } /* endfor */
+    }
+    else
+    {
+      for (; sh > 0; sh--, ty += dy, sy++)
+      {
+        DP_PIXTYPE *VRAM = (DP_PIXTYPE *)G2D->GetPixelAt (sx, sy);
+        UByte *data = bitmap + (ty >> 16) * bw;
+        UByte *alpha = alpha_map + (ty >> 16) * bw;
+        int tx = 0;
+        if (transp)
+          for (int w = sw; w; w--)
+          {
+            UByte pixel = data [tx >> 16];
+            if (pixel)
+	    {
+	      register uint8
+#ifdef DP_PIXFORM_R8G8B8
+	      dstf = (255-alpha[tx>>16]), srcf = dstf ^ 0xff;
+#else
+	      dstf = (31-alpha[tx>>16]), srcf = dstf ^ 0x1f;
+#endif
+              ALPHA_MIX (*VRAM, pixel);
+	    }
+            VRAM++;
+            tx += dx;
+          } /* endfor */
+        else
+          for (int w = sw; w; w--)
+          {
+	    register uint8
+#ifdef DP_PIXFORM_R8G8B8
+	    dstf = (255-alpha[tx>>16]), srcf = dstf ^ 0xff;
+#else
+	    dstf = (31-alpha[tx>>16]), srcf = dstf ^ 0x1f;
+#endif
+            ALPHA_MIX (*VRAM, data [tx >> 16]);
+            VRAM++;
+            tx += dx;
+          } /* endfor */
+      } /* endfor */
+    }
+  }
+  else if (Alpha)
   {
     register uint8
 #ifdef DP_PIXFORM_R8G8B8

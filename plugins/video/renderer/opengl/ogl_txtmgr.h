@@ -36,33 +36,6 @@ enum csGLProcTexType
 };
 
 /**
- * This is a class derived from csTextureMM that performs additional
- * functions required for texture management with OpenGL renderer.
- */
-class csTextureMMOpenGL : public csTextureMM
-{
-public:
-  /// Retains original size of image before any readjustment
-  int orig_width, orig_height;
-  /// A pointer to the 3D driver object
-  csGraphics3DOGLCommon *G3D;
-
-  /// Initialize the object
-  csTextureMMOpenGL (iImage *image, int flags, csGraphics3DOGLCommon *iG3D);
-  /// Delete the texture object
-  virtual ~csTextureMMOpenGL ();
-  /// Adjust size, mipmap, create procedural texture etc
-  void InitTexture (csTextureManagerOpenGL *texman, csPixelFormat *pfmt);
-
-  /// Create a new texture object
-  virtual csTexture *NewTexture (iImage *Image);
-  /// Compute the mean color for the just-created texture
-  virtual void ComputeMeanColor ();
-  /// Returns dynamic texture interface if any.
-  virtual iGraphics3D *GetProcTextureInterface ();
-};
-
-/**
  * csTextureOpenGL is a class derived from csTexture that implements
  * all the additional functionality required by the OpenGL renderer.
  * Every csTextureOpenGL is a RGBA paletted image.
@@ -75,7 +48,7 @@ protected:
 
 public:
   /// Create a csTexture object
-  csTextureOpenGL (csTextureMM *Parent, iImage *Image);
+  csTextureOpenGL (csTextureHandle *Parent, iImage *Image);
   /// Destroy the texture
   virtual ~csTextureOpenGL ();
   /// Get image data
@@ -87,13 +60,51 @@ public:
 };
 
 /**
+ * This is a class derived from csTextureHandle that performs additional
+ * functions required for texture management with OpenGL renderer.
+ */
+class csTextureHandleOpenGL : public csTextureHandle
+{
+public:
+  /// Retains original size of image before any readjustment
+  int orig_width, orig_height;
+  /// A pointer to the 3D driver object
+  csGraphics3DOGLCommon *G3D;
+  /// True if the texture has alphamap
+  bool has_alpha;
+
+  /// Initialize the object
+  csTextureHandleOpenGL (iImage *image, int flags, csGraphics3DOGLCommon *iG3D);
+  /// Delete the texture object
+  virtual ~csTextureHandleOpenGL ();
+  /// Adjust size, mipmap, create procedural texture etc
+  void InitTexture (csTextureManagerOpenGL *texman, csPixelFormat *pfmt);
+
+  /// Create a new texture object
+  virtual csTexture *NewTexture (iImage *Image);
+  /// Compute the mean color for the just-created texture
+  virtual void ComputeMeanColor ();
+  /// Returns dynamic texture interface if any.
+  virtual iGraphics3D *GetProcTextureInterface ();
+  /// Prepare the texture for usage
+  virtual void Prepare ();
+  /**
+   * Query if the texture has an alpha channel.<p>
+   * This depends both on whenever the original image had an alpha channel
+   * and of the fact whenever the renderer supports alpha maps at all.
+   */
+  virtual bool GetAlphaMap ()
+  { return has_alpha; }
+};
+
+/**
  * The procedural texture object.
  */
 class csTextureProcOpenGL : public csTextureOpenGL
 {
 public:
   iGraphics3D *texG3D;
-  csTextureProcOpenGL (csTextureMM *Parent, iImage *Image)
+  csTextureProcOpenGL (csTextureHandle *Parent, iImage *Image)
     : csTextureOpenGL (Parent, Image), texG3D (NULL)
   {};
   /// Destroy the texture
@@ -105,7 +116,6 @@ public:
  */
 class csTextureManagerOpenGL : public csTextureManager
 {
-
 public:
   /// A pointer to the 3D driver object
   csGraphics3DOGLCommon *G3D;
@@ -119,16 +129,18 @@ public:
     csGraphics3DOGLCommon *iG3D);
   ///
   virtual ~csTextureManagerOpenGL ();
+
+  /// Called from G3D::Open ()
+  void SetPixelFormat (csPixelFormat &PixelFormat);
+  /// Called by texture's destructor
+  void UnregisterTexture (csTextureHandleOpenGL *handle);
+
   /// Read configuration values from config file.
   virtual void read_config (iConfigFile *config);
   ///
   virtual void PrepareTextures ();
   ///
   virtual iTextureHandle *RegisterTexture (iImage* image, int flags);
-  ///
-  virtual void PrepareTexture (iTextureHandle *handle);
-  ///
-  virtual void UnregisterTexture (iTextureHandle* handle);
 };
 
 #endif // TXTMGR_OPENGL_H

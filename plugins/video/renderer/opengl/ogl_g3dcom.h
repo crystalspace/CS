@@ -196,14 +196,13 @@ protected:
   /// DrawFlags on last BeginDraw ()
   int DrawMode;
 
-  /// The texture manager
-  csTextureManagerOpenGL* txtmgr;
-
 public:
   /// The maximum texture size
   GLint max_texture_size;
   /// The texture cache.
   OpenGLTextureCache* texture_cache;
+  /// The texture manager
+  csTextureManagerOpenGL* txtmgr;
 
   /// The lightmap cache.
   OpenGLLightmapCache* lightmap_cache;
@@ -276,17 +275,6 @@ public:
 
   /// Give a texture to csGraphics3DOGLCommon to cache it.
   void CacheTexture (iPolygonTexture *texture);
-
-  /// Remove a texture from cache (perhaps because it's being unregistered)
-  void UncacheTexture (iTextureHandle* /*handle*/) {/*@@todo*/}
-
-  /**
-   * Allocate a 'lighted texture' in which the base texture and lightmap
-   * are pre-mixed in software and then presented to OpenGL to render.
-   * This emulates multi-texturing which is needed for transparent
-   * lighted portals
-   */
-  void CacheLightedTexture (iPolygonTexture *texture);
 
   /// Set a renderstate boolean.
   virtual bool SetRenderState (G3D_RENDERSTATEOPTION op, long val);

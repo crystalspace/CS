@@ -1417,8 +1417,8 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
         + Q3 * poly.plane.v_cam2tex->z);
 
   iPolygonTexture *tex = poly.poly_texture;
-  csTextureMMSoftware *tex_mm =
-    (csTextureMMSoftware *)poly.mat_handle->GetTexture ()->GetPrivateObject ();
+  csTextureHandleSoftware *tex_mm =
+    (csTextureHandleSoftware *)poly.mat_handle->GetTexture ()->GetPrivateObject ();
 
   float fdu, fdv;
   if (tex)
@@ -2202,7 +2202,7 @@ void csGraphics3DSoftwareCommon::StartPolygonFX (iMaterialHandle* handle,
   iTextureHandle *txt_handle = handle ? handle->GetTexture () : NULL;
   if (txt_handle)
   {
-    csTextureMMSoftware *tex_mm = (csTextureMMSoftware*)txt_handle->GetPrivateObject ();
+    csTextureHandleSoftware *tex_mm = (csTextureHandleSoftware*)txt_handle->GetPrivateObject ();
     csTextureSoftware *txt_unl = (csTextureSoftware *)tex_mm->get_texture (0);
     pqinfo.bm = txt_unl->get_bitmap ();
     pqinfo.tw = txt_unl->get_width ();

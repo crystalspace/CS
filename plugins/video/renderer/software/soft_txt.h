@@ -26,7 +26,7 @@
 
 class csGraphics3DSoftwareCommon;
 class csTextureManagerSoftware;
-class csTextureMMSoftware;
+class csTextureHandleSoftware;
 class csSoftProcTexture3D;
 /**
  * In 8-bit modes we build a 32K inverse colormap for converting
@@ -93,7 +93,7 @@ public:
  * all the additional functionality required by the software renderer.
  * Every csTextureSoftware is a 8-bit paletted image with a private
  * colormap. The private colormap is common for all mipmapped variants.
- * The colormap is stored inside the parent csTextureMM object.
+ * The colormap is stored inside the parent csTextureHandle object.
  */
 class csTextureSoftware : public csTexture
 {
@@ -106,7 +106,7 @@ public:
   iImage *image;
 
   /// Create a csTexture object
-  csTextureSoftware (csTextureMM *Parent, iImage *Image) : csTexture (Parent)
+  csTextureSoftware (csTextureHandle *Parent, iImage *Image) : csTexture (Parent)
   {
     bitmap = NULL;
     alphamap = NULL;
@@ -132,7 +132,7 @@ public:
  * implements the additional functionality to allow acess to the texture
  * memory via iGraphics2D/3D interfaces. Internally iGraphics2D/3D are 
  * initialised in 8bit mode and use the palette as calculated by 
- * csTextureMMSoftware, so you can render to them as usual without
+ * csTextureHandleSoftware, so you can render to them as usual without
  * requiring recalculation of palettes each frame. 
  */
 class csTextureSoftwareProc : public csTextureSoftware
@@ -141,20 +141,19 @@ public:
   csSoftProcTexture3D *texG3D;
   bool proc_ok;
 
-  csTextureSoftwareProc (csTextureMM *Parent, iImage *Image)
+  csTextureSoftwareProc (csTextureHandle *Parent, iImage *Image)
     : csTextureSoftware (Parent, Image), texG3D(NULL), proc_ok(false)
   {};
   /// Destroy the texture
   virtual ~csTextureSoftwareProc ();
-
 };
 
 
 /**
- * csTextureMMSoftware represents a texture and all its mipmapped
+ * csTextureHandleSoftware represents a texture and all its mipmapped
  * variants.
  */
-class csTextureMMSoftware : public csTextureMM
+class csTextureHandleSoftware : public csTextureHandle
 {
 protected:
   /**
@@ -191,10 +190,10 @@ protected:
 
 public:
   /// Create the mipmapped texture object
-  csTextureMMSoftware (csTextureManagerSoftware *texman, iImage *image, 
+  csTextureHandleSoftware (csTextureManagerSoftware *texman, iImage *image, 
 		       int flags);
   /// Destroy the object and free all associated storage
-  virtual ~csTextureMMSoftware ();
+  virtual ~csTextureHandleSoftware ();
 
   /**
    * Create the [Private colormap] -> global colormap table.
@@ -228,6 +227,13 @@ public:
   virtual bool GetAlphaMap ()
   { return !!((csTextureSoftware *)get_texture (0))->get_alphamap (); }
 
+  /**
+   * Merge this texture into current palette, compute mipmaps and so on.
+   * You should call either Prepare() or iTextureManager::PrepareTextures()
+   * before using any texture.
+   */
+  virtual void Prepare ();
+
   //-------------------------------Procedural Texture support--------------------
   /// Return the interfaces to the procedural texture buffer
   virtual iGraphics3D *GetProcTextureInterface ();
@@ -248,7 +254,6 @@ public:
    */
   void RemapProcToGlobalPalette (csTextureManagerSoftware *txtmgr);
 };
-
 
 /**
  * Software version of the texture manager. This instance of the
@@ -331,6 +336,9 @@ public:
    */
   void compute_palette ();
 
+  /// Called from csTextureHandleSoftware destructor to deregister before death
+  void UnregisterTexture (csTextureHandleSoftware* handle);
+
   /// Set gamma correction value.
   void SetGamma (float iGamma);
 
@@ -352,10 +360,6 @@ public:
   virtual void PrepareTextures ();
   ///
   virtual iTextureHandle *RegisterTexture (iImage* image, int flags);
-  ///
-  virtual void PrepareTexture (iTextureHandle *handle);
-  ///
-  virtual void UnregisterTexture (iTextureHandle* handle);
   /// Clear the palette (including all reserved colors)
   virtual void ResetPalette ();
   /// Reserve a color in palette (if any)
@@ -394,7 +398,6 @@ private:
 
   /// The main txtmgr (if this is the dedicated procedural texture manager)
   csTextureManagerSoftware *main_txtmgr;
-
 };
 
 #endif // __SOFT_TXT_H__

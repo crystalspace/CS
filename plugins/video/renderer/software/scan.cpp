@@ -176,7 +176,7 @@ void csScan_Finalize ()
 }
 
 void csScan_InitDraw (int MipMap, csGraphics3DSoftwareCommon* g3d,
-  iPolygonTexture* tex, csTextureMMSoftware* texture, csTextureSoftware *untxt)
+  iPolygonTexture* tex, csTextureHandleSoftware* texture, csTextureSoftware *untxt)
 {
   Scan.Texture = texture;
   Scan.bitmap = untxt->get_bitmap ();

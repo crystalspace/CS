@@ -32,7 +32,7 @@
 
 #define RESERVED_COLOR(c) ((c == 0) || (c == 255))
 
-csTextureGlide::csTextureGlide (csTextureMM *Parent, iImage *Image)
+csTextureGlide::csTextureGlide (csTextureHandle *Parent, iImage *Image)
   : csTexture (Parent)
 {
   image = Image;
@@ -48,25 +48,26 @@ csTextureGlide::~csTextureGlide ()
   if ( raw ) delete [] raw;
 }
 
-csTextureMMGlide::csTextureMMGlide ( csGraphics3DGlide *g3d, iImage* image, int flags) : 
-  csTextureMM (image, flags)
+csTextureHandleGlide::csTextureHandleGlide (csGraphics3DGlide *g3d,
+  iImage* image, int flags) : csTextureHandle (image, flags)
 {
   this->g3d = g3d;
   dyn = NULL;
   if ( flags & CS_TEXTURE_3D ) AdjustSizePo2 ();
 }
 
-csTextureMMGlide::~csTextureMMGlide ()
+csTextureHandleGlide::~csTextureHandleGlide ()
 {
+  g3d->txtmgr->UnregisterTexture (this);
   if (dyn) delete dyn;
 }
 
-csTexture *csTextureMMGlide::NewTexture (iImage *Image)
+csTexture *csTextureHandleGlide::NewTexture (iImage *Image)
 {
   return new csTextureGlide (this, Image);
 }
 
-iGraphics3D *csTextureMMGlide::GetProcTextureInterface()
+iGraphics3D *csTextureHandleGlide::GetProcTextureInterface()
 {
   if ( (flags & CS_TEXTURE_PROC) && dyn == NULL)
   {
@@ -76,7 +77,7 @@ iGraphics3D *csTextureMMGlide::GetProcTextureInterface()
   return dyn;
 }
 
-void csTextureMMGlide::ComputeMeanColor ()
+void csTextureHandleGlide::ComputeMeanColor ()
 {
   csTextureGlide *tex;
   int i, pixels;
@@ -106,7 +107,7 @@ void csTextureMMGlide::ComputeMeanColor ()
   mean_color.blue  = b / pixels;
 }
 
-void csTextureMMGlide::remap_mm ()
+void csTextureHandleGlide::remap_mm ()
 {
   csTextureGlide *tex;
   int w, h, i;
@@ -141,6 +142,12 @@ void csTextureMMGlide::remap_mm ()
   }
 }
 
+void csTextureHandleGlide::Prepare ()
+{
+  CreateMipmaps ();
+  remap_mm ();
+}
+
 //---------------------------------------------------------------------------
 
 csTextureManagerGlide::csTextureManagerGlide (iSystem* iSys, iGraphics2D* iG2D,
@@ -164,9 +171,9 @@ void csTextureManagerGlide::PrepareTextures ()
   if (verbose) SysPrintf (MSG_INITIALIZATION, "  Creating texture mipmaps...\n");
   for (i = 0 ; i < textures.Length () ; i++)
   {
-    csTextureMM* txt = textures.Get (i);
+    csTextureHandle* txt = textures.Get (i);
     txt->CreateMipmaps ();
-    ((csTextureMMGlide *)txt)->remap_mm();
+    ((csTextureHandleGlide *)txt)->remap_mm();
   }
 }
 
@@ -175,23 +182,13 @@ iTextureHandle *csTextureManagerGlide::RegisterTexture (iImage* image,
 {
   if (!image) { printf( "NULL image\n"); return NULL; }
 
-  csTextureMMGlide *txt = new csTextureMMGlide (g3d, image, flags);
+  csTextureHandleGlide *txt = new csTextureHandleGlide (g3d, image, flags);
   textures.Push (txt);
   return txt;
 }
 
-void csTextureManagerGlide::PrepareTexture (iTextureHandle *handle)
+void csTextureManagerGlide::UnregisterTexture (csTextureHandleGlide *handle)
 {
-  if (!handle) { printf( "NULL image\n"); return; }
-
-  csTextureMMGlide *txt = (csTextureMMGlide *)handle->GetPrivateObject ();
-  txt->CreateMipmaps ();
-  txt->remap_mm ();
+  int idx = textures.Find (handle);
+  if (idx >= 0) textures.Delete (idx);
 }
-
-void csTextureManagerGlide::UnregisterTexture (iTextureHandle* handle)
-{
-  (void)handle;
-  //@@@ Not implemented yet.
-}
-

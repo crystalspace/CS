@@ -29,23 +29,26 @@
 
 #define SysPrintf System->Printf
 
-//-------------------------------------------------------- csTextureMMInfinite ---//
+//-------------------------------------------------------- csTextureHandleInfinite ---//
 
-csTextureMMInfinite::csTextureMMInfinite (iImage *image, int flags) :
-  csTextureMM (image, flags)
+csTextureHandleInfinite::csTextureHandleInfinite (csTextureManagerInfinite *txtmgr,
+  iImage *image, int flags) : csTextureHandle (image, flags)
 {
+  (texman = txtmgr)->IncRef ();
 }
 
-csTextureMMInfinite::~csTextureMMInfinite ()
+csTextureHandleInfinite::~csTextureHandleInfinite ()
 {
+  texman->UnregisterTexture (this);
+  texman->DecRef ();
 }
 
-csTexture *csTextureMMInfinite::NewTexture (iImage *Image)
+csTexture *csTextureHandleInfinite::NewTexture (iImage *Image)
 {
   return new csTextureInfinite (this, Image);
 }
 
-void csTextureMMInfinite::ComputeMeanColor ()
+void csTextureHandleInfinite::ComputeMeanColor ()
 {
   int i;
 
@@ -88,6 +91,11 @@ void csTextureMMInfinite::ComputeMeanColor ()
   mean_color.blue  = 0;
 }
 
+void csTextureHandleInfinite::Prepare ()
+{
+  CreateMipmaps ();
+}
+
 //----------------------------------------------- csTextureManagerInfinite ---//
 
 csTextureManagerInfinite::csTextureManagerInfinite (iSystem *iSys,
@@ -114,7 +122,7 @@ void csTextureManagerInfinite::PrepareTextures ()
   int i;
   for (i = 0; i < textures.Length (); i++)
   {
-    csTextureMM *txt = textures.Get (i);
+    csTextureHandle *txt = textures.Get (i);
     txt->CreateMipmaps ();
   }
 }
@@ -124,22 +132,13 @@ iTextureHandle *csTextureManagerInfinite::RegisterTexture (iImage* image,
 {
   if (!image) return NULL;
 
-  csTextureMMInfinite *txt = new csTextureMMInfinite (image, flags);
+  csTextureHandleInfinite *txt = new csTextureHandleInfinite (this, image, flags);
   textures.Push (txt);
   return txt;
 }
 
-void csTextureManagerInfinite::PrepareTexture (iTextureHandle *handle)
+void csTextureManagerInfinite::UnregisterTexture (csTextureHandleInfinite* handle)
 {
-  if (!handle) return;
-
-  csTextureMMInfinite *txt = (csTextureMMInfinite *)handle->GetPrivateObject ();
-  txt->CreateMipmaps ();
-}
-
-void csTextureManagerInfinite::UnregisterTexture (iTextureHandle* handle)
-{
-  csTextureMMInfinite *tex_mm = (csTextureMMInfinite *)handle->GetPrivateObject ();
-  int idx = textures.Find (tex_mm);
+  int idx = textures.Find (handle);
   if (idx >= 0) textures.Delete (idx);
 }

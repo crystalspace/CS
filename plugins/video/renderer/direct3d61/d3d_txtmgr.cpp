@@ -31,10 +31,8 @@
 
 //---------------------------------------------------------------------------
 
-csTextureDirect3D::csTextureDirect3D (csTextureMM*             Parent, 
-                                      iImage*                  Image,
-                                      csGraphics3DDirect3DDx6* iG3D,
-                                      bool                     For2d) 
+csTextureDirect3D::csTextureDirect3D (csTextureHandle *Parent,
+  iImage *Image, csGraphics3DDirect3DDx6 *iG3D, bool For2d)
   : csTexture (Parent)
 {
   w = Image->GetWidth ();
@@ -153,10 +151,10 @@ csTextureDirect3D::~csTextureDirect3D ()
 
 //---------------------------------------------------------------------------
 
-csTextureMMDirect3D::csTextureMMDirect3D (iImage* image, int flags,
-  csGraphics3DDirect3DDx6 *iG3D) : csTextureMM (image, flags)
+csTextureHandleDirect3D::csTextureHandleDirect3D (iImage* image, int flags,
+  csGraphics3DDirect3DDx6 *iG3D) : csTextureHandle (image, flags)
 {
-  G3D          = iG3D;
+  G3D = iG3D;
   m_pTexture2d = NULL;
 
   // Resize the image to fullfill device requirements
@@ -169,17 +167,18 @@ csTextureMMDirect3D::csTextureMMDirect3D (iImage* image, int flags,
   image->Rescale (w, h);
 }
 
-csTextureMMDirect3D::~csTextureMMDirect3D()
+csTextureHandleDirect3D::~csTextureHandleDirect3D()
 {
+  G3D->txtmgr->UnregisterTexture (this);
   delete m_pTexture2d;
 }
 
-csTexture *csTextureMMDirect3D::NewTexture (iImage *Image)
+csTexture *csTextureHandleDirect3D::NewTexture (iImage *Image)
 {
   return new csTextureDirect3D (this, Image, G3D, false);
 }
 
-void csTextureMMDirect3D::ComputeMeanColor ()
+void csTextureHandleDirect3D::ComputeMeanColor ()
 {
   int pixels = image->GetWidth () * image->GetHeight ();
   csRGBpixel *src = (csRGBpixel *)image->GetImageData ();
@@ -201,7 +200,7 @@ void csTextureMMDirect3D::ComputeMeanColor ()
     mean_color = csRGBpixel (0, 0, 0);
 }
 
-void csTextureMMDirect3D::CreateMipmaps ()
+void csTextureHandleDirect3D::CreateMipmaps ()
 {
   if (!image) return;
 
@@ -242,6 +241,11 @@ void csTextureMMDirect3D::CreateMipmaps ()
   ComputeMeanColor ();
 }
 
+void csTextureHandleDirect3D::Prepare ()
+{
+  CreateMipmaps ();
+}
+
 //---------------------------------------------------------------------------
 
 csTextureManagerDirect3D::csTextureManagerDirect3D (iSystem *iSys,
@@ -280,7 +284,7 @@ void csTextureManagerDirect3D::PrepareTextures ()
   // Create mipmaps for all textures
   for (int i = 0; i < textures.Length (); i++)
   {
-    csTextureMM *txt = textures.Get (i);
+    csTextureHandle *txt = textures.Get (i);
     txt->CreateMipmaps ();
   }
 }
@@ -290,23 +294,13 @@ iTextureHandle *csTextureManagerDirect3D::RegisterTexture (
 {
   if (!image) return NULL;
 
-  csTextureMMDirect3D* txt = new csTextureMMDirect3D (image, flags, m_pG3D);
+  csTextureHandleDirect3D* txt = new csTextureHandleDirect3D (image, flags, m_pG3D);
   textures.Push (txt);
   return txt;
 }
 
-void csTextureManagerDirect3D::PrepareTexture (iTextureHandle *handle)
+void csTextureManagerDirect3D::UnregisterTexture (csTextureHandleDirect3D* handle)
 {
-  if (!handle) return;
-
-  csTextureMMDirect3D *txt = (csTextureMMDirect3D *)handle->GetPrivateObject ();
-  txt->CreateMipmaps ();
-}
-
-void csTextureManagerDirect3D::UnregisterTexture (iTextureHandle* handle)
-{
-  csTextureMMDirect3D*     pTextureMM = (csTextureMMDirect3D*)handle->GetPrivateObject ();
-  m_pG3D->UncacheTexture (handle);
-  int idx = textures.Find (pTextureMM);
+  int idx = textures.Find (handle);
   if (idx >= 0) textures.Delete (idx);
 }

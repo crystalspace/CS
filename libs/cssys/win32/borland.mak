@@ -139,9 +139,6 @@ else
   MKDIR = mkdir $@
 endif
 
-# For using sockets we should link with sockets library
-NETSOCK_LIBS=
-
 # Extra parameters for 'sed' which are used for doing 'make depend'.
 SYS_SED_DEPEND=-e "s/\.ob*j*\:/\$$O:/g"
 

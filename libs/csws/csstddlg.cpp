@@ -743,6 +743,14 @@ bool cspColorDialog::HandleEvent (iEvent &Event)
 
 csWindow *csColorDialog (csComponent *iParent, char *iTitle, int iColor)
 {
+  float r,g,b;
+  csGetRGB (iColor, iParent->app, r, g, b);
+  return csColorDialog (iParent, iTitle, r, g, b);
+}
+
+csWindow *csColorDialog (csComponent *iParent, char *iTitle,
+  float iR, float iG, float iB)
+{
   csWindow *w = new csWindow (iParent, iTitle,
     CSWS_BUTSYSMENU | CSWS_BUTCLOSE | CSWS_TITLEBAR);
   cspColorDialog *d = new cspColorDialog (w);
@@ -820,8 +828,8 @@ csWindow *csColorDialog (csComponent *iParent, char *iTitle, int iColor)
   st->SetPos (CD_WIDTH - 50, 132);
 
   // Set starting color value
-  d->SetColor (iColor);
-  d->SetHLSmode (false);
+  d->SetRGB (iR, iG, iB);
+  d->SetHLSmode (true);
 
   // and now set window size and center it.
   w->SetSize (4 + CD_WIDTH + 4, 230);

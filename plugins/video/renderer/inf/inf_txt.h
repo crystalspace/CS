@@ -26,10 +26,10 @@
 class csTextureManagerInfinite;
 
 /**
- * csTextureMMInfinite represents a texture and all its mipmapped
+ * csTextureHandleInfinite represents a texture and all its mipmapped
  * variants.
  */
-class csTextureMMInfinite : public csTextureMM
+class csTextureHandleInfinite : public csTextureHandle
 {
 protected:
   /// The private palette
@@ -37,6 +37,9 @@ protected:
 
   /// Number of used colors in palette
   int palette_size;
+
+  /// The texture manager
+  csTextureManagerInfinite *texman;
 
   /// Create a new texture object
   virtual csTexture *NewTexture (iImage *Image);
@@ -46,14 +49,16 @@ protected:
 
 public:
   /// Create the mipmapped texture object
-  csTextureMMInfinite (iImage *image, int flags);
+  csTextureHandleInfinite (csTextureManagerInfinite *txtmgr, iImage *image, int flags);
   /// Destroy the object and free all associated storage
-  virtual ~csTextureMMInfinite ();
+  virtual ~csTextureHandleInfinite ();
 
   /// Query the private texture colormap
   csRGBpixel *GetColorMap () { return palette; }
   /// Query the number of colors in the colormap
   int GetColorMapSize () { return palette_size; }
+  /// Prepare texture for usage
+  virtual void Prepare ();
 };
 
 /**
@@ -61,7 +66,7 @@ public:
  * all the additional functionality required by the software renderer.
  * Every csTextureSoftware is a 8-bit paletted image with a private
  * colormap. The private colormap is common for all mipmapped variants.
- * The colormap is stored inside the parent csTextureMM object.
+ * The colormap is stored inside the parent csTextureHandle object.
  */
 class csTextureInfinite : public csTexture
 {
@@ -72,7 +77,7 @@ public:
   iImage *image;
 
   /// Create a csTexture object
-  csTextureInfinite (csTextureMM *Parent, iImage *Image) : csTexture (Parent)
+  csTextureInfinite (csTextureHandle *Parent, iImage *Image) : csTexture (Parent)
   {
     bitmap = NULL;
     image = Image;
@@ -120,8 +125,7 @@ public:
 
   virtual void PrepareTextures ();
   virtual iTextureHandle *RegisterTexture (iImage* image, int flags);
-  virtual void PrepareTexture (iTextureHandle *handle);
-  virtual void UnregisterTexture (iTextureHandle* handle);
+  virtual void UnregisterTexture (csTextureHandleInfinite* handle);
 };
 
 #endif // __INF_TXT_H__

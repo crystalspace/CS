@@ -248,9 +248,6 @@ public:
   /// Give a texture to Graphics3D to cache it.
   void CacheTexture (iPolygonTexture *handle);
 
-  /// Remove a texture from cache (perhaps because it's being unregistered)
-  void UncacheTexture (iTextureHandle *texture);
-  
   /// Get the capabilities of this driver: NOT IMPLEMENTED.
   virtual csGraphics3DCaps *GetCaps ()
   { return &m_Caps; }

@@ -103,6 +103,9 @@ extern void csQueryFileDialog (csWindow *iFileDialog, char *iFileName,
 
 /// Create and return a new color choose dialog
 extern csWindow *csColorDialog (csComponent *iParent, char *iTitle, int iColor = 0);
+/// Same but accepts R/G/B separately
+csWindow *csColorDialog (csComponent *iParent, char *iTitle,
+  float iR, float iG, float iB);
 /// Query color dialog contents as a single color value
 extern void csQueryColorDialog (csWindow *iColorDialog, int &oColor);
 /// Query color dialog contents as R,G,B floating-point numbers

@@ -69,6 +69,8 @@ public:
   { oColor.Set (0,0,0); }
   virtual void GetReflection (float &oDiffuse, float &oAmbient, float &oReflection)
   { oDiffuse = oAmbient = oReflection = 0; }
+  virtual void Prepare ()
+  { }
 };
 
 IMPLEMENT_IBASE (dummyMaterial)
@@ -108,10 +110,10 @@ public:
 
 iTextureHandle *TxtHandleVector::RegisterAndPrepare (iTextureHandle *ogl_txt)
 {
-  csTextureMM *txtmm = (csTextureMM*)ogl_txt->GetPrivateObject();
+  csTextureHandle *txtmm = (csTextureHandle*)ogl_txt->GetPrivateObject();
   iImage *image = ((csTextureOpenGL*) txtmm->get_texture (0))->get_image();
 
-  int flags = ((csTextureMMOpenGL*)txtmm)->GetFlags ();
+  int flags = ((csTextureHandleOpenGL*)txtmm)->GetFlags ();
 #ifdef CS_DEBUG
   if ((flags & CS_TEXTURE_PROC) == CS_TEXTURE_PROC) 
   {
@@ -133,9 +135,7 @@ iTextureHandle *TxtHandleVector::RegisterAndPrepare (iTextureHandle *ogl_txt)
   }
 
   Push (new txt_handles (hstxt, ogl_txt));
-
-  soft_man->PrepareTexture (hstxt);
-  soft_man->SetPalette ();
+  hstxt->Prepare ();
   return hstxt;
 }
 
@@ -143,7 +143,6 @@ void TxtHandleVector::AddTextureHandles (iTextureHandle *soft,
 					 iTextureHandle *ogl)
 {
   Push (new txt_handles (soft, ogl));
-  
 }
 
 
@@ -195,7 +194,7 @@ void csOpenGLProcSoftware::ConvertAloneMode ()
 
 bool csOpenGLProcSoftware::Prepare
  (csGraphics3DOGLCommon *parent_g3d, csOpenGLProcSoftware *head_soft_tex,
-  csTextureMMOpenGL *tex, csPixelFormat *ipfmt, void *buffer, bool alone_hint)
+  csTextureHandleOpenGL *tex, csPixelFormat *ipfmt, void *buffer, bool alone_hint)
 { 
   // We generate a 32 bit pfmt taking into account endianness and whether
   // frame buffer is RGB or BGR...there must be a better way...

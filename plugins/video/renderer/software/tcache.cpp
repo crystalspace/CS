@@ -271,7 +271,7 @@ SoftwareCachedTexture *csTextureCacheSoftware::cache_texture
 }
 
 void csTextureCacheSoftware::fill_texture (int MipMap, iPolygonTexture* pt,
-    csTextureMMSoftware *tex_mm, float u_min, float v_min, float u_max, float v_max)
+    csTextureHandleSoftware *tex_mm, float u_min, float v_min, float u_max, float v_max)
 {
   // Recalculate the lightmaps
   // @@@ Note for Andrew: this function returns true if something

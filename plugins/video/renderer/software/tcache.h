@@ -26,7 +26,7 @@
 
 class csGraphics3DSoftwareCommon;
 class csTextureManagerSoftware;
-class csTextureMMSoftware;
+class csTextureHandleSoftware;
 struct csPixelFormat;
 struct iTextureHandle;
 
@@ -125,23 +125,23 @@ protected:
 public:
   void (csTextureCacheSoftware::*create_lighted_texture) 
                         (iPolygonTexture *pt, SoftwareCachedTexture *ct, 
-		   csTextureMMSoftware *texmm, csTextureManagerSoftware *texman,
+		   csTextureHandleSoftware *texmm, csTextureManagerSoftware *texman,
 		         float u_min, float v_min, float u_max, float v_max);
 
   void create_lighted_texture_8 (iPolygonTexture *pt, SoftwareCachedTexture *ct,
-                   csTextureMMSoftware *texmm, csTextureManagerSoftware *texman,
+                   csTextureHandleSoftware *texmm, csTextureManagerSoftware *texman,
 		        float u_min, float v_min, float u_max, float v_max);
 
   void create_lighted_texture_555(iPolygonTexture *pt,SoftwareCachedTexture *ct,
-                   csTextureMMSoftware *texmm, csTextureManagerSoftware *texman,
+                   csTextureHandleSoftware *texmm, csTextureManagerSoftware *texman,
 		        float u_min, float v_min, float u_max, float v_max);
 
   void create_lighted_texture_565(iPolygonTexture *pt,SoftwareCachedTexture *ct,
-                   csTextureMMSoftware *texmm, csTextureManagerSoftware *texman,
+                   csTextureHandleSoftware *texmm, csTextureManagerSoftware *texman,
 		        float u_min, float v_min, float u_max, float v_max);
 
   void create_lighted_texture_888(iPolygonTexture *pt,SoftwareCachedTexture *ct,
-                   csTextureMMSoftware *texmm, csTextureManagerSoftware *texman,
+                   csTextureHandleSoftware *texmm, csTextureManagerSoftware *texman,
 		        float u_min, float v_min, float u_max, float v_max);
 
   /// Current frame number
@@ -181,7 +181,7 @@ public:
    * will be recomputed.
    */
   void fill_texture (int MipMap, iPolygonTexture* pt, 
-		     csTextureMMSoftware *tex_mm, 
+		     csTextureHandleSoftware *tex_mm, 
 		     float u_min, float v_min, float u_max, float v_max);
 
   /**

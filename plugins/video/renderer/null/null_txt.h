@@ -73,10 +73,48 @@ public:
 };
 
 /**
- * csTextureMMNull represents a texture and all its mipmapped
+ * csTextureNull is a class derived from csTexture that implements
+ * all the additional functionality required by the software renderer.
+ * Every csTextureSoftware is a 8-bit paletted image with a private
+ * colormap. The private colormap is common for all mipmapped variants.
+ * The colormap is stored inside the parent csTextureHandle object.
+ */
+class csTextureNull : public csTexture
+{
+public:
+  /// The bitmap
+  UByte *bitmap;
+  /// The alpha map (NULL if no alphamap)
+  uint8 *alphamap;
+  /// The image (temporary storage)
+  iImage *image;
+
+  /// Create a csTexture object
+  csTextureNull (csTextureHandle *Parent, iImage *Image) : csTexture (Parent)
+  {
+    bitmap = NULL;
+    alphamap = NULL;
+    image = Image;
+    w = Image->GetWidth ();
+    h = Image->GetHeight ();
+    compute_masks ();
+  }
+  /// Destroy the texture
+  virtual ~csTextureNull ()
+  { delete [] bitmap; delete [] alphamap; if (image) image->DecRef (); }
+  /// Return a pointer to texture data
+  UByte *get_bitmap ()
+  { return bitmap; }
+  /// Return a pointer to alpha map data
+  uint8 *get_alphamap ()
+  { return alphamap; }
+};
+
+/**
+ * csTextureHandleNull represents a texture and all its mipmapped
  * variants.
  */
-class csTextureMMNull : public csTextureMM
+class csTextureHandleNull : public csTextureHandle
 {
 protected:
   /**
@@ -96,6 +134,9 @@ protected:
   /// Number of used colors in palette
   int palette_size;
 
+  /// The texture manager
+  csTextureManagerNull *texman;
+
   /// Create a new texture object
   virtual csTexture *NewTexture (iImage *Image);
 
@@ -104,9 +145,9 @@ protected:
 
 public:
   /// Create the mipmapped texture object
-  csTextureMMNull (iImage *image, int flags);
+  csTextureHandleNull (csTextureManagerNull *txtmgr, iImage *image, int flags);
   /// Destroy the object and free all associated storage
-  virtual ~csTextureMMNull ();
+  virtual ~csTextureHandleNull ();
 
   /**
    * Create the [Private colormap] -> global colormap table.
@@ -125,38 +166,17 @@ public:
   void *GetPaletteToGlobal () { return pal2glob; }
   /// Query palette -> 16-bit values table for 8-bit modes
   uint16 *GetPaletteToGlobal8 () { return pal2glob8; }
-};
 
-/**
- * csTextureNull is a class derived from csTexture that implements
- * all the additional functionality required by the software renderer.
- * Every csTextureSoftware is a 8-bit paletted image with a private
- * colormap. The private colormap is common for all mipmapped variants.
- * The colormap is stored inside the parent csTextureMM object.
- */
-class csTextureNull : public csTexture
-{
-public:
-  /// The bitmap
-  UByte *bitmap;
-  /// The image (temporary storage)
-  iImage *image;
+  /**
+   * Query if the texture has an alpha channel.<p>
+   * This depends both on whenever the original image had an alpha channel
+   * and of the fact whenever the renderer supports alpha maps at all.
+   */
+  virtual bool GetAlphaMap ()
+  { return !!((csTextureNull *)get_texture (0))->get_alphamap (); }
 
-  /// Create a csTexture object
-  csTextureNull (csTextureMM *Parent, iImage *Image) : csTexture (Parent)
-  {
-    bitmap = NULL;
-    image = Image;
-    w = Image->GetWidth ();
-    h = Image->GetHeight ();
-    compute_masks ();
-  }
-  /// Destroy the texture
-  virtual ~csTextureNull ()
-  { delete [] bitmap; if (image) image->DecRef (); }
-  /// Return a pointer to texture data
-  UByte *get_bitmap ()
-  { return bitmap; }
+  /// Prepare the texture for usage
+  virtual void Prepare ();
 };
 
 /**
@@ -244,9 +264,7 @@ public:
   ///
   virtual iTextureHandle *RegisterTexture (iImage* image, int flags);
   ///
-  virtual void PrepareTexture (iTextureHandle *handle);
-  ///
-  virtual void UnregisterTexture (iTextureHandle* handle);
+  virtual void UnregisterTexture (csTextureHandleNull* handle);
   /// Clear the palette (including all reserved colors)
   virtual void ResetPalette ();
   /// Reserve a color in palette (if any)

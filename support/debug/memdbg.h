@@ -46,7 +46,30 @@ typedef void *address;
 #endif
 
 /**
- * This is a trick that should work on many platforms.
+ * Some C runtime libraries provide an alternative name for malloc() and
+ * company. If this is the case, we'll be able to debug malloc/free's as
+ * well as new/delete calls.
+ */
+#if defined (OS_LINUX)
+#  define DEBUG_MALLOC
+#  define MALLOC  __libc_malloc
+#  define CALLOC  __libc_calloc
+#  define FREE    __libc_free
+#  define REALLOC __libc_realloc
+#elif defined (OS_OS2)
+#  define DEBUG_MALLOC
+#  define MALLOC  _malloc
+#  define CALLOC  _calloc
+#  define FREE    _free
+#  define REALLOC _realloc
+#else
+#  define MALLOC  malloc
+#  define FREE    free
+#  define REALLOC realloc
+#endif
+
+/**
+ * This is a trick that should work on x86 platforms.
  * Since the standard C calling convention says that the address of
  * function arguments should increase from first to last argument, we
  * suppose that the previous machine word on stack contains the return
@@ -144,7 +167,7 @@ typedef void *address;
 #define MDF_DEFAULT	MDF_ALLOCFILL | MDF_LISTUNFREED | MDF_SUMMARY | \
 			MDF_CHECKBOUNDS | MDF_LOGFILE
 
-/// Load executable memory map from stdin
+/// Load executable memory map from memdbg.map
 void mdbLoadMap ();
 /// Query file name and line number given address
 void mdbGetPos (address addr, const char *&file, const char *&func, int &line);

@@ -271,7 +271,10 @@ bool csIniFile::_Load (const char *Data, size_t DataSize)
       // Check if string is a valid BASE64 string
       for (i = 0; i < len; i++)
         if (strchr (INIbase64, cur[i]) == NULL)
+        {
+          b64mode = false;
           goto plain;
+        }
 
       if (!CurBranch)
         goto error;
@@ -298,12 +301,15 @@ bool csIniFile::_Load (const char *Data, size_t DataSize)
       b64top &= 7;
       b64acc = tmp[len];
       branch = (PrvINInode *)((*CurBranch)[CurBranch->Length () - 1]);
-      i = branch->Data.Size;
+
+      char *newdata = new char [branch->Data.Size + len + 1];
+      memcpy (newdata, branch->Data.Pointer, branch->Data.Size);
+      memcpy (newdata + branch->Data.Size, tmp, len);
+      newdata [branch->Data.Size + len] = 0;
+
+      delete [] (char *)branch->Data.Pointer;
       branch->Data.Size += len;
-      branch->Data.Pointer =
-        realloc (branch->Data.Pointer, branch->Data.Size + 1);
-      memcpy (((char *)branch->Data.Pointer) + i, tmp, len);
-      ((char *) branch->Data.Pointer)[branch->Data.Size] = 0;
+      branch->Data.Pointer = newdata;
 
       if (finish)
       {
@@ -375,6 +381,7 @@ error:    if (Error (LineNo, buff, int (cur - buff)))
             continue;
         }
         strncpy (tmp, cur, i = int (eq - cur));
+        b64mode = (eq [1] == '=') && (!eq [2]);
         while (i && strchr (CS_INISPACE, tmp[i - 1]))
           i--;
         tmp[i] = 0;
@@ -389,20 +396,20 @@ error:    if (Error (LineNo, buff, int (cur - buff)))
 
         strcpy (tmp, cur);
         i = strlen (cur);
-        if (i)
+        if (b64mode)
+        {
+          branch->Data.Size = 0;
+          branch->Data.Pointer = NULL;
+          b64mode = true;
+          SkipComment = true;
+        }
+        else
         {
           while (i && strchr (CS_INISPACE, tmp[i - 1]))
             i--;
           tmp[i] = 0;
 	  branch->Data.Size = i;
           branch->Data.Pointer = strnew (tmp);
-        }
-        else
-        {
-          branch->Data.Size = 0;
-          branch->Data.Pointer = NULL;
-          b64mode = true;
-          SkipComment = true;
         }
         CurBranch->Push (branch);
         Comments = NULL;
@@ -441,7 +448,7 @@ void csIniFile::SaveData (const char* Name, csSome Data, size_t DataSize,
 {
   const char* data = (const char*)Data;
   SaveComments (comments, s);
-  s << Name << " = ";
+  s << Name << " =";
   if (Data && DataSize)
   {
     size_t i;
@@ -460,8 +467,12 @@ void csIniFile::SaveData (const char* Name, csSome Data, size_t DataSize,
           binary = true;
           break;
         }
+
     if (!binary)
+    {
+      s.Append (" ", 1);
       s.Append ((const char*)Data, DataSize);
+    }
     else                         // Save in Base64 mode
     {
       char tmp[CS_B64INILINELEN];
@@ -469,6 +480,7 @@ void csIniFile::SaveData (const char* Name, csSome Data, size_t DataSize,
       unsigned char acc = 0;
       char endofbin[3] = {CommentChar, '/', 0};
 
+      s.Append ("=", 1);
       memset (tmp, 0, sizeof (tmp));
       while (DataSize)
       {

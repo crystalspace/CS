@@ -37,6 +37,41 @@
 
 extern void csglBindTexture (GLenum target, GLuint handle);
 
+//----------------------------------------------------------------------------//
+
+/// Unload a texture cache element (common for both caches)
+void OpenGLCache::Unload (csGLCacheData *d)
+{
+  if (d->next)
+    d->next->prev = d->prev;
+  else
+    tail = d->prev;
+
+  if (d->prev)
+    d->prev->next = d->next;
+  else
+    head = d->next;
+
+  glDeleteTextures (1, &d->Handle);
+  d->Handle = 0;
+
+  num--;
+  total_size -= d->Size;
+
+  if (type == CS_TEXTURE)
+  {
+    iTextureHandle *texh = (iTextureHandle *)d->Source;
+    if (texh) texh->SetCacheData (NULL);
+  }
+  else if (type == CS_LIGHTMAP)
+  {
+    iLightMap *lm = (iLightMap *)d->Source;
+    if (lm) lm->SetCacheData (NULL);
+  }
+
+  delete d;
+}
+
 #define Printf system->Printf
 //----------------------------------------------------------------------------//
 
@@ -99,26 +134,8 @@ void OpenGLCache::cache_texture (iTextureHandle *txt_handle)
   {
     // unit is not in memory. load it into the cache
     while (total_size + size >= cache_size)
-    {
       // out of memory. remove units from bottom of list.
-      csGLCacheData *cached_texture = tail;
-      iTextureHandle *texh = (iTextureHandle *)cached_texture->Source;
-      texh->SetCacheData (NULL);
-
-      tail = tail->prev;
-      if (tail)
-        tail->next = NULL;
-      else
-        head = NULL;
-      cached_texture->prev = NULL;
-
-      Unload (cached_texture);          // unload it.
-
-      num--;
-      total_size -= cached_texture->Size;
-
-      delete cached_texture;
-    }
+      Unload (tail);
 
     // now load the unit.
     num++;
@@ -141,8 +158,6 @@ void OpenGLCache::cache_texture (iTextureHandle *txt_handle)
   }
 }
 
-
-
 void OpenGLCache::cache_lightmap (iPolygonTexture *polytex)
 {
   csGLCacheData *cached_texture;
@@ -161,21 +176,7 @@ void OpenGLCache::cache_lightmap (iPolygonTexture *polytex)
   cached_texture = (csGLCacheData *)piLM->GetCacheData ();
   if (polytex->RecalculateDynamicLights () && cached_texture)
   {
-    if (cached_texture->next != NULL)
-      cached_texture->next->prev = cached_texture->prev;
-    if (cached_texture->prev != NULL)
-      cached_texture->prev->next = cached_texture->next;
-    piLM->SetCacheData (NULL);
-
-    Unload (cached_texture);                         // unload it.
-
-    num--;
-    total_size -= cached_texture->Size;
-
-    if (head == cached_texture) head = NULL;
-    if (tail == cached_texture) tail = NULL;
-
-    delete cached_texture;
+    Unload (cached_texture);
     cached_texture = NULL;
   }
 
@@ -206,25 +207,8 @@ void OpenGLCache::cache_lightmap (iPolygonTexture *polytex)
   {
     // unit is not in memory. load it into the cache
     while (total_size + size >= cache_size)
-    {
       // out of memory. remove units from bottom of list.
-      cached_texture = tail;
-      tail = tail->prev;
-      if (tail)
-        tail->next = NULL;
-      else
-        head = NULL;
-
-      iLightMap *lm = (iLightMap *)cached_texture->Source;
-      lm->SetCacheData (NULL);
-      cached_texture->prev = NULL;
-      Unload (cached_texture);                       // unload it.
-
-      num--;
-      total_size -= cached_texture->Size;
-
-      delete cached_texture;
-    }
+      Unload (tail);
 
     // now load the unit.
     num++;
@@ -281,37 +265,12 @@ void OpenGLCache::cache_lightmap (iPolygonTexture *polytex)
 void OpenGLCache::Clear ()
 {
   while (head)
-  {
-    csGLCacheData *n = head->next;
-
-    head->next = head->prev = NULL;
-
     Unload (head);
 
-    if (type == CS_TEXTURE)
-    {
-      iTextureHandle *texh = (iTextureHandle *)head->Source;
-
-      if (texh)
-        texh->SetCacheData (NULL);
-    }
-    else if (type == CS_LIGHTMAP)
-    {
-      iLightMap *lm = (iLightMap *)head->Source;
-
-      if (lm)
-        lm->SetCacheData (NULL);
-    }
-
-    Unload (head);
-    delete head;
-
-    head = n;
-  }
-
-  head = tail = NULL;
-  total_size = 0;
-  num = 0;
+  CS_ASSERT (!head)
+  CS_ASSERT (!tail)
+  CS_ASSERT (!total_size)
+  CS_ASSERT (!num)
 }
 
 //----------------------------------------------------------------------------//
@@ -329,30 +288,14 @@ OpenGLTextureCache::~OpenGLTextureCache ()
 void OpenGLTextureCache::Uncache (iTextureHandle *texh)
 {
   csGLCacheData *cached_texture = (csGLCacheData *)texh->GetCacheData ();
-  if (!cached_texture)
-    return;
-
-  texh->SetCacheData (NULL);
-  Unload (cached_texture);
-
-  csGLCacheData *n = cached_texture->next;
-  if (n && n->next)
-    n->prev = cached_texture->prev;
-  else
-    tail = cached_texture->prev;
-  if (cached_texture->prev)
-    cached_texture->prev->next = n;
-  else
-    head = n;
-
-  total_size -= cached_texture->Size;
-  delete cached_texture;
+  if (cached_texture)
+    Unload (cached_texture);
 }
 
 void OpenGLTextureCache::Load (csGLCacheData *d)
 {
   iTextureHandle *txt_handle = (iTextureHandle *)d->Source;
-  csTextureMM *txt_mm = (csTextureMM *)txt_handle->GetPrivateObject ();
+  csTextureHandle *txt_mm = (csTextureHandle *)txt_handle->GetPrivateObject ();
 
   GLuint texturehandle;
   glGenTextures (1, &texturehandle);
@@ -507,17 +450,6 @@ void OpenGLTextureCache::Load (csGLCacheData *d)
   d->Handle = texturehandle;
 }
 
-///
-void OpenGLTextureCache::Unload (csGLCacheData *d)
-{
-  if (d && d->Handle)
-  {
-    glDeleteTextures(1, &d->Handle);
-    d->Handle = 0;
-  }
-}
-
-
 //----------------------------------------------------------------------------//
 OpenGLLightmapCache::OpenGLLightmapCache(int size, int bitdepth)
   : OpenGLCache(size,CS_LIGHTMAP,bitdepth)
@@ -643,14 +575,4 @@ void OpenGLLightmapCache::Load(csGLCacheData *d)
 */
 
   d->Handle = lightmaphandle;
-}
-
-///
-void OpenGLLightmapCache::Unload(csGLCacheData *d)
-{
-  if (d && d->Handle)
-  {
-    glDeleteTextures (1, &d->Handle);
-    d->Handle = 0;
-  }
 }

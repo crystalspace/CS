@@ -36,7 +36,7 @@
 IMPLEMENT_FACTORY (csGraphics3DNull)
 
 EXPORT_CLASS_TABLE (null3d)
-  EXPORT_CLASS_DEP (csGraphics3DNull, "crystalspace.graphics3d.null3d",
+  EXPORT_CLASS_DEP (csGraphics3DNull, "crystalspace.graphics3d.null",
     "NULL 3D graphics driver for Crystal Space", "crystalspace.font.server.")
 EXPORT_CLASS_TABLE_END
 

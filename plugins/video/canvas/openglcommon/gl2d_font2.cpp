@@ -106,6 +106,12 @@ bool GLFontCache::GLGlyphVector::FreeItem (csSome Item)
 
 //-------------------------------------------------------// GLFontCache //----//
 
+static void FontDeleteNotify (iFont *font, void *glyphset)
+{
+  GLFontCache *This = (GLFontCache *)glyphset;
+  This->CacheFree (font);
+}
+
 GLFontCache::GLFontCache (iFontServer *fs) : FontCache (8, 8)
 {
   int i = 0;
@@ -120,12 +126,6 @@ GLFontCache::~GLFontCache ()
   // when the font cache object will be already deleted
   for (int i = 0; i < FontCache.Length (); i++)
     FontCache.Get (i)->font->RemoveDeleteCallback (FontDeleteNotify, this);
-}
-
-static void FontDeleteNotify (iFont *font, void *glyphset)
-{
-  GLFontCache *This = (GLFontCache *)glyphset;
-  This->CacheFree (font);
 }
 
 GLGlyphSet *GLFontCache::CacheFont (iFont *font)

@@ -61,7 +61,7 @@ void csOpenGLProcBackBuffer::Close ()
 }
 
 void csOpenGLProcBackBuffer::Prepare (csGraphics3DOGLCommon *g3d, 
-  csTextureMMOpenGL *tex_mm, csPixelFormat *ipfmt, bool bpersistent)
+  csTextureHandleOpenGL *tex_mm, csPixelFormat *ipfmt, bool bpersistent)
 { 
   memcpy (&pfmt, ipfmt, sizeof(csPixelFormat));
   persistent = bpersistent;

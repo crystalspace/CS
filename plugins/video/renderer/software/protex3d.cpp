@@ -74,7 +74,7 @@ void csSoftProcTexture3D::Print (csRect *area)
     parent_tcache->uncache_texture (0, (iTextureHandle*)parent_tex_mm);
 }
 
-bool csSoftProcTexture3D::Prepare (csTextureManagerSoftware *parent_texman, csTextureMMSoftware *tex_mm, void *buffer,  uint8 *bitmap)
+bool csSoftProcTexture3D::Prepare (csTextureManagerSoftware *parent_texman, csTextureHandleSoftware *tex_mm, void *buffer,  uint8 *bitmap)
 {
   csGraphics3DSoftwareCommon* parent_g3d = parent_texman->G3D;
   iGraphics2D *g2d = parent_g3d->GetDriver2D ();
@@ -121,7 +121,7 @@ bool csSoftProcTexture3D::Prepare (csTextureManagerSoftware *parent_texman, csTe
       soft_tex_mm = tex_mm;
 
       G2D = g2d->CreateOffScreenCanvas (width, height, buffer, false,
-			&parent_texman->pfmt, parent_tex_mm->GetColorMap (), 256);
+        &parent_texman->pfmt, parent_tex_mm->GetColorMap (), 256);
 
       SharedInitialize (parent_g3d);
       if (!Open (NULL) || !SharedOpen ())
@@ -129,75 +129,72 @@ bool csSoftProcTexture3D::Prepare (csTextureManagerSoftware *parent_texman, csTe
 
 #ifdef CS_DEBUG
       System->Printf (MSG_INITIALIZATION, "%sbit procedural texture\n",
-		      parent_texman->pfmt.PixelBytes == 2 ? "16" : "32");
+        parent_texman->pfmt.PixelBytes == 2 ? "16" : "32");
 #endif
     }
     else
     {
       reprepare = false;
       G2D = g2d->CreateOffScreenCanvas (width, height, bitmap, true,
-			 &parent_texman->pfmt, parent_tex_mm->GetColorMap (), 256);
+        &parent_texman->pfmt, parent_tex_mm->GetColorMap (), 256);
       if (!G2D) return false;
 
       if (!parent_texman->GetFirst8bitProcTexture ())
       {
-	sharing = false;
-	// We are the first procedural texture utilising a dedicated 
-	// procedural texture manager working in 8bit
-	NewInitialize ();
-	if (!Open (NULL) || !NewOpen ())
-	  return false;
-	// Inform each texture manager aboout the other
-	texman->SetMainTextureManager (parent_texman);
-	parent_texman->SetProcTextureManager (texman);
-	texman->ResetPalette ();
+        sharing = false;
+        // We are the first procedural texture utilising a dedicated 
+        // procedural texture manager working in 8bit
+        NewInitialize ();
+        if (!Open (NULL) || !NewOpen ())
+          return false;
+        // Inform each texture manager aboout the other
+        texman->SetMainTextureManager (parent_texman);
+        parent_texman->SetProcTextureManager (texman);
+        texman->ResetPalette ();
 #ifdef CS_DEBUG
-	System->Printf (MSG_INITIALIZATION, 
-			"Preparing dedicated procedural texture manager\n");
+        System->Printf (MSG_INITIALIZATION, 
+          "Preparing dedicated procedural texture manager\n");
 #endif
-	// Initialize the texture manager
-	int r,g,b;
-	for (r = 0; r < 8; r++)
-	  for (g = 0; g < 8; g++)
-	    for (b = 0; b < 4; b++)
-	      texman->ReserveColor (r * 32, g * 32, b * 64);
-	texman->PrepareTextures ();
+        // Initialize the texture manager
+        int r,g,b;
+        for (r = 0; r < 8; r++)
+          for (g = 0; g < 8; g++)
+            for (b = 0; b < 4; b++)
+              texman->ReserveColor (r * 32, g * 32, b * 64);
+        texman->PrepareTextures ();
       }
       else
       {
-	sharing = true;
-	SharedInitialize (parent_texman->GetFirst8bitProcTexture ());
-	if (!Open (NULL) || !SharedOpen ())
-	  return false;
+        sharing = true;
+        SharedInitialize (parent_texman->GetFirst8bitProcTexture ());
+        if (!Open (NULL) || !SharedOpen ())
+          return false;
       }
 
       if (buffer)
       {
-	// In order to keep the palette synchronised 
-	iImage *im = (iImage*) new csImageMemory (width, height, 
-						  (csRGBpixel*) buffer, false);
-	iTextureHandle *dummy =
-	  texman->RegisterTexture (im, CS_TEXTURE_2D | CS_TEXTURE_PROC);
-	texman->PrepareTexture (dummy);
-	texman->UnregisterTexture (dummy);
-	dummy->DecRef ();
+        // In order to keep the palette synchronised 
+        iImage *im = (iImage*) new csImageMemory (width, height, 
+          (csRGBpixel *) buffer, false);
+        iTextureHandle *dummy =
+          texman->RegisterTexture (im, CS_TEXTURE_2D | CS_TEXTURE_PROC);
+        dummy->Prepare ();
+        dummy->DecRef ();
       }
 
 #ifdef CS_DEBUG
       System->Printf (MSG_INITIALIZATION, "%s/8bit procedural texture\n",
-		      parent_texman->pfmt.PixelBytes == 2 ? "16" : "32");
+        parent_texman->pfmt.PixelBytes == 2 ? "16" : "32");
 #endif
     }
   }
   return true;
 }
 
-
-
-  // The entry point for other than software graphics drivers..
-iTextureHandle *csSoftProcTexture3D::CreateOffScreenRenderer 
-    (iGraphics3D *parent_g3d, iGraphics3D* g3d_partner, int width, int height, 
-     void *buffer, csPixelFormat *ipfmt, int flags)
+// The entry point for other than software graphics drivers..
+iTextureHandle *csSoftProcTexture3D::CreateOffScreenRenderer
+  (iGraphics3D *parent_g3d, iGraphics3D* g3d_partner, int width, int height, 
+   void *buffer, csPixelFormat *ipfmt, int flags)
 {
   // Always in 32bit
   // Here we create additional images for this texture which are registered as 
@@ -249,9 +246,9 @@ iTextureHandle *csSoftProcTexture3D::CreateOffScreenRenderer
   iImage *tex_image = new csImageMemory (width, height, 
 					 (csRGBpixel*)buffer, false);
 
-  soft_tex_mm = (csTextureMMSoftware *) texman->RegisterTexture (tex_image,
+  soft_tex_mm = (csTextureHandleSoftware *) texman->RegisterTexture (tex_image,
 						 CS_TEXTURE_PROC | CS_TEXTURE_2D);
-  texman->PrepareTexture ((iTextureHandle*)soft_tex_mm);
+  soft_tex_mm->Prepare ();
 
   // Return the software texture managers handle for this procedural texture.
   return soft_tex_mm;

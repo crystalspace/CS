@@ -23,7 +23,7 @@
 #include "igraph2d.h" // for csPixelFormat
 
 class csGraphics3DOGLCommon;
-class csTextureMMOpenGL;
+class csTextureHandleOpenGL;
 class csTextureProcOpenGL;
 class TxtHandleVector;
 struct iSoftProcTexture;
@@ -53,7 +53,7 @@ class csOpenGLProcSoftware : public iGraphics3D
   csPixelFormat pfmt;
   /// The interface to the software procedural texture
   iSoftProcTexture *isoft_proc;
-  csTextureMMOpenGL *tex;
+  csTextureHandleOpenGL *tex;
   /// The main renderer
   csGraphics3DOGLCommon *parent_g3d;
 
@@ -96,7 +96,7 @@ class csOpenGLProcSoftware : public iGraphics3D
   /// Prepare.
   bool Prepare 
     (csGraphics3DOGLCommon *parent_g3d, csOpenGLProcSoftware *partner_tex, 
-    csTextureMMOpenGL *tex, csPixelFormat *pfmt, void *buffer, bool alone_hint);
+    csTextureHandleOpenGL *tex, csPixelFormat *pfmt, void *buffer, bool alone_hint);
 
   virtual bool Initialize (iSystem * /*pSystem*/){ return false; }
   virtual bool Open (const char * /*Title*/){ return false; }

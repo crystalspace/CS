@@ -33,13 +33,13 @@
 #include "igraph3d.h"
 
 class csGraphics3DGlide;
-class csTextureMMGlide;
+class csTextureHandleGlide;
 class csTextureGlide;
 
 class csGlideProcedural : public iGraphics3D
 {
  protected:
-  csTextureMMGlide *tex;
+  csTextureHandleGlide *tex;
   csTextureGlide *tex_0;
   csGraphics3DGlide *g3d;
   int Width, Height, nPixelBytes;
@@ -51,7 +51,7 @@ class csGlideProcedural : public iGraphics3D
   csGlideProcedural (iBase * pParent);
   virtual ~csGlideProcedural (){}
 
-  void SetTarget (csGraphics3DGlide *g3d, csTextureMMGlide *tex);
+  void SetTarget (csGraphics3DGlide *g3d, csTextureHandleGlide *tex);
 
   virtual bool Initialize (iSystem */*pSystem*/){ return true; }
   virtual bool Open (const char */*Title*/){ return true; }

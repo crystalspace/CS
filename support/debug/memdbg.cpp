@@ -89,6 +89,8 @@ struct mdbBlock
   address alloc_addr, free_addr;
   // The block is free already?
   bool free;
+  // The block was allocated with malloc or with new?
+  bool malloc;
 } *mdbChain = NULL;
 static int mdbChainLen = 0, mdbChainMaxLen = 0;
 // A rudimentary lock to partially protect mdbChain in multithreaded environments
@@ -110,6 +112,14 @@ static address *break_free = NULL, *break_free_addr = NULL;
 static int break_alloc_count = -1, break_free_count = -1;
 static int break_alloc_max = -1, break_free_max = -1;
 
+#ifdef DEBUG_MALLOC
+// Declare some simple prototypes for alternative malloc and company
+extern "C" void *MALLOC (size_t);
+extern "C" void *CALLOC (size_t, size_t);
+extern "C" void *REALLOC (void *, size_t);
+extern "C" void FREE (void *);
+#endif
+
 /// The function used to output to both console and log file
 static void output (const char *format, ...)
 {
@@ -121,29 +131,30 @@ static void output (const char *format, ...)
 
   if (mdbLog)
   {
-    if (fprintf (mdbLog, outbuff) < 0)
+    if (fprintf (mdbLog, "%s", outbuff) < 0)
     {
       // Some runtimes (e.g. DJGPP) closes all opened files before exiting
       mdbLog = fopen ("memdbg.log", "a");
-      fprintf (mdbLog, outbuff);
+      fprintf (mdbLog, "%s", outbuff);
     }
   }
   else
-    printf (outbuff);
+    printf ("MEMDBG: %s", outbuff);
 }
 
-static void *__new (address addr, size_t s)
+static void *__new (address addr, size_t s, bool malloc)
 {
   if (!mdbMapOK)
     mdbLoadMap ();
 
   if (mdbFlags & MDF_VERBOSE)
-    output ("MEMDBG: alloc (%lu) at 0x%08lX (%s)\n", s, addr, mdbLocation (addr));
+    output ("%s (%lu) at 0x%08lX (%s)\n", malloc ? "malloc" : "new",
+      s, addr, mdbLocation (addr));
 
   if (mdbFlags & MDF_CHECKBOUNDS)
     s += MDB_FENCE_SIZE * 2;
 
-  char *p = (char *)malloc (s);
+  char *p = (char *)MALLOC (s);
   if (!p)
   {
     if (mdbFlags & MDF_DEBUGBREAK)
@@ -166,7 +177,7 @@ static void *__new (address addr, size_t s)
   if (mdbChainLen >= mdbChainMaxLen)
   {
     mdbChainMaxLen += 1024;
-    mdbChain = (mdbBlock *)realloc (mdbChain, mdbChainMaxLen * sizeof (mdbBlock));
+    mdbChain = (mdbBlock *)REALLOC (mdbChain, mdbChainMaxLen * sizeof (mdbBlock));
   }
 
   // Find the nearest memory block and insert the new block there
@@ -175,6 +186,7 @@ static void *__new (address addr, size_t s)
   b->size = s;
   b->alloc_addr = addr;
   b->free = false;
+  b->malloc = malloc;
 
   // Now collect some statistics
   mdbStat.totalsize += s;
@@ -208,7 +220,7 @@ static void *__new (address addr, size_t s)
   MDB_UNLOCK;
 
   for (i = 0; i <= break_alloc_count; i++)
-    if (break_alloc [i] == p
+    if ((!break_alloc [i] || break_alloc [i] == p)
      && (!break_alloc_addr [i] || break_alloc_addr [i] == addr))
     {
       DEBUG_BREAK;
@@ -218,7 +230,7 @@ static void *__new (address addr, size_t s)
   return p;
 }
 
-static void __delete (address addr, void *p)
+static void __delete (address addr, void *p, bool malloc)
 {
   if (!mdbMapOK)
     mdbLoadMap ();
@@ -229,7 +241,7 @@ static void __delete (address addr, void *p)
 
   int i;
   for (i = 0; i <= break_free_count; i++)
-    if (break_free [i] == p
+    if ((!break_free [i] || break_free [i] == p)
      && (!break_free_addr [i] || break_free_addr [i] == addr))
     {
       DEBUG_BREAK;
@@ -252,7 +264,7 @@ static void __delete (address addr, void *p)
 
   if (!c)
   {
-    output ("MEMDBG: Trying to free unallocated memory, details:\n");
+    output ("Trying to free unallocated memory, details:\n");
     if (mdbFlags & MDF_DEBUGBREAK)
       DEBUG_BREAK;
     goto info;
@@ -260,11 +272,19 @@ static void __delete (address addr, void *p)
 
   if (c->free)
   {
-    output ("MEMDBG: Trying to free memory block more than once, details:\n");
+    output ("Trying to free memory block more than once, details:\n");
     if (mdbFlags & MDF_DEBUGBREAK)
       DEBUG_BREAK;
     ext_info = true;
     goto info;
+  }
+
+  if (c->malloc != malloc)
+  {
+    output ("Allocation and free operators do not match, details:\n");
+    if (mdbFlags & MDF_DEBUGBREAK)
+      DEBUG_BREAK;
+    ext_info = true;
   }
 
   // Check if inter-block fence is intact
@@ -273,7 +293,7 @@ static void __delete (address addr, void *p)
     if (strncmp (((char *)p) - MDB_FENCE_SIZE, MDB_FENCE, MDB_FENCE_SIZE)
      || strncmp (((char *)p) + c->size, MDB_FENCE, MDB_FENCE_SIZE))
     {
-      output ("MEMDBG: Memory write outside block bounds detected, details:\n");
+      output ("Memory write outside block bounds detected, details:\n");
       ext_info = true;
 
       if (mdbFlags & MDF_DEBUGBREAK)
@@ -295,7 +315,7 @@ static void __delete (address addr, void *p)
   }
   else
   {
-    free (p);
+    FREE (p);
     memmove (&mdbChain [mbi], &mdbChain [mbi + 1], (mdbChainLen - mbi - 1) * sizeof (mdbBlock));
     mdbChainLen--;
   }
@@ -307,9 +327,10 @@ static void __delete (address addr, void *p)
   if (ext_info || (mdbFlags & MDF_VERBOSE))
   {
 info:
-    output ("MEMDBG: free (%p) at 0x%08lX (%s)\n", p, addr, mdbLocation (addr));
+    output ("%s (%p) at 0x%08lX (%s)\n", malloc ? "free" : "delete",
+      p, addr, mdbLocation (addr));
     if (ext_info)
-      output ("MEMDBG: block was allocated at 0x%08lX (%s)\n",
+      output ("block was allocated at 0x%08lX (%s)\n",
         alloc_addr, mdbLocation (alloc_addr));
   }
   MDB_UNLOCK;
@@ -318,26 +339,93 @@ info:
 void *operator new (size_t s)
 {
   GET_CALL_ADDRESS (s);
-  return __new (addr, s);
+  return __new (addr, s, false);
 }
 
 void operator delete (void* p)
 {
   GET_CALL_ADDRESS (p);
-  __delete (addr, p);
+  __delete (addr, p, false);
 }
 
 void *operator new [] (size_t s)
 {
   GET_CALL_ADDRESS (s);
-  return __new (addr, s);
+  return __new (addr, s, false);
 }
 
 void operator delete [] (void* p)
 {
   GET_CALL_ADDRESS (p);
-  __delete (addr, p);
+  __delete (addr, p, false);
 }
+
+#ifdef DEBUG_MALLOC
+
+void *malloc (size_t s)
+{
+  GET_CALL_ADDRESS (s);
+  return __new (addr, s, true);
+}
+
+void *calloc (size_t n, size_t s)
+{
+  GET_CALL_ADDRESS (s);
+  void *ret = __new (addr, n * s, true);
+  memset (ret, 0, n * s);
+  return ret;
+}
+
+void *realloc (void *p, size_t s)
+{
+  GET_CALL_ADDRESS (s);
+
+  size_t oldsize = 0;
+  if (p)
+  {
+    MDB_LOCK;
+    // Find the memory block in our list
+    int mbi;
+    for (mbi = mdbChainLen - 1; mbi >= 0; mbi--)
+      if (p == mdbChain [mbi].mem)
+        break;
+    mdbBlock *c = NULL;
+    if (mbi >= 0)
+      c = &mdbChain [mbi];
+
+    if (!c)
+    {
+      output ("Trying to realloc unallocated memory, details:\n");
+      if (mdbFlags & MDF_DEBUGBREAK)
+        DEBUG_BREAK;
+      output ("realloc (%p) at 0x%08lX (%s)\n", p, addr, mdbLocation (addr));
+      return NULL;
+    }
+    if (!c->malloc)
+    {
+      output ("Trying to realloc new'd memory, details:\n");
+      if (mdbFlags & MDF_DEBUGBREAK)
+        DEBUG_BREAK;
+      output ("realloc (%p) at 0x%08lX (%s)\n", p, addr, mdbLocation (addr));
+      return NULL;
+    }
+    oldsize = c->size;
+    MDB_UNLOCK;
+  }
+
+  void *ret = __new (addr, s, true);
+  memcpy (ret, p, oldsize > s ? s : oldsize);
+  __delete (addr, p, true);
+  return ret;
+}
+
+void free (void *p)
+{
+  GET_CALL_ADDRESS (s);
+  __delete (addr, p, true);
+}
+
+#endif // DEBUG_MALLOC
 
 //---------------------------------// Executable memory map management //-----//
 
@@ -418,7 +506,7 @@ void mdbLoadMap ()
   //
 
   // Reserve size for some number of source file descriptions
-  mdbMap = (mdbSourceFile *)malloc ((mdbMaxFiles = 16) * sizeof (mdbSourceFile));
+  mdbMap = (mdbSourceFile *)MALLOC ((mdbMaxFiles = 16) * sizeof (mdbSourceFile));
   // Current file we are working with
   int CurFile = -1;
   int CurFunc = -1;
@@ -477,8 +565,8 @@ void mdbLoadMap ()
               if (++break_alloc_count > break_alloc_max)
               {
                 break_alloc_max += 16;
-                break_alloc = (address *)realloc (break_alloc, break_alloc_max * sizeof (address));
-                break_alloc_addr = (address *)realloc (break_alloc_addr, break_alloc_max * sizeof (address));
+                break_alloc = (address *)REALLOC (break_alloc, break_alloc_max * sizeof (address));
+                break_alloc_addr = (address *)REALLOC (break_alloc_addr, break_alloc_max * sizeof (address));
               }
               break_alloc [break_alloc_count] = addr;
               break_alloc_addr [break_alloc_count] = prog_addr;
@@ -487,8 +575,8 @@ void mdbLoadMap ()
               if (++break_free_count > break_free_max)
               {
                 break_free_max += 16;
-                break_free = (address *)realloc (break_free, break_free_max * sizeof (address));
-                break_free_addr = (address *)realloc (break_free_addr, break_free_max * sizeof (address));
+                break_free = (address *)REALLOC (break_free, break_free_max * sizeof (address));
+                break_free_addr = (address *)REALLOC (break_free_addr, break_free_max * sizeof (address));
               }
               break_free [break_free_count] = addr;
               break_free_addr [break_free_count] = prog_addr;
@@ -513,10 +601,10 @@ void mdbLoadMap ()
             CurFile++;
           // Enlarge the file array if required
           if (CurFile >= mdbMaxFiles)
-            mdbMap = (mdbSourceFile *)realloc (mdbMap,
+            mdbMap = (mdbSourceFile *)REALLOC (mdbMap,
               (mdbMaxFiles += 16) * sizeof (mdbSourceFile));
           mdbSourceFile &mdbFile = mdbMap [CurFile];
-          mdbFile.Name = (char *)malloc (strlen (tmp) + 1);
+          mdbFile.Name = (char *)MALLOC (strlen (tmp) + 1);
           strcpy (mdbFile.Name, tmp);
           mdbFile.Start = 0;
           mdbFile.MaxFunctions = mdbFile.Functions = 0;
@@ -542,10 +630,10 @@ void mdbLoadMap ()
           mdbFile.Functions = CurFunc + 1;
           // Enlarge the function array if required
           if (CurFunc >= mdbFile.MaxFunctions)
-            mdbFile.Function = (mdbFunction *)realloc (mdbFile.Function,
+            mdbFile.Function = (mdbFunction *)REALLOC (mdbFile.Function,
               (mdbFile.MaxFunctions += 16) * sizeof (mdbFunction));
           mdbFunction &mdbFunc = mdbFile.Function [CurFunc];
-          mdbFunc.Name = (char *)malloc (strlen (tmp) + 1);
+          mdbFunc.Name = (char *)MALLOC (strlen (tmp) + 1);
           strcpy (mdbFunc.Name, tmp);
           mdbFunc.Start = addr;
           mdbFunc.End = addr;
@@ -569,7 +657,7 @@ void mdbLoadMap ()
           mdbFunc.Lines = CurLine + 1;
           // Enlarge the line array if required
           if (CurLine >= mdbFunc.MaxLines)
-            mdbFunc.Line = (mdbLine *)realloc (mdbFunc.Line,
+            mdbFunc.Line = (mdbLine *)REALLOC (mdbFunc.Line,
               (mdbFunc.MaxLines += 64) * sizeof (mdbLine));
           mdbLine &mdbLN = mdbFunc.Line [CurLine];
           mdbLN.Line = atoi (tmp);
@@ -729,7 +817,7 @@ void mdbFinish ()
       {
         if (mdbFlags & MDF_DEBUGBREAK)
           DEBUG_BREAK;
-        output ("MEMDBG: Memory has been overwritten after being freed! Details:\n");
+        output ("Memory has been overwritten after being freed! Details:\n");
         output ("size:%8lu allocated at %s\n", c->size, mdbLocation (c->alloc_addr));
       }
     }

@@ -22,9 +22,9 @@
 #include "csutil/scf.h"
 #include "cstypes.h"
 
-SCF_VERSION (iTextureHandle, 2, 0, 0);
-
 struct iGraphics3D;
+
+SCF_VERSION (iTextureHandle, 2, 0, 1);
 
 /** 
  * A texture handle as returned by iTextureManager.
@@ -90,6 +90,13 @@ struct iTextureHandle : public iBase
    * and of the fact whenever the renderer supports alpha maps at all.
    */
   virtual bool GetAlphaMap () = 0;
+
+  /**
+   * Merge this texture into current palette, compute mipmaps and so on.
+   * You should call either Prepare() or iTextureManager::PrepareTextures()
+   * before using any texture.
+   */
+  virtual void Prepare () = 0;
 };
 
 SCF_VERSION (iTextureWrapper, 0, 0, 1);

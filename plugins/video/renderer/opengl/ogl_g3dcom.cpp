@@ -71,6 +71,8 @@
 void csGraphics3DOGLCommon::DetectExtensions() {}
 #endif
 
+#define BYTE_TO_FLOAT(x) ((x) * (1.0 / 255.0))
+
 //@@@ Another experimental optimization:
 // This optimization alone doesn't appear to be enough.
 // We need better state caching. I keep it here to remind
@@ -279,9 +281,6 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
   DetectExtensions ();
 #endif
 
-  // now that we know what pixelformat we use, clue the texture manager in
-  txtmgr->pfmt = *G2D->GetPixelFormat ();
-
   if (m_renderstate.dither)
     glEnable (GL_DITHER);
   else
@@ -417,6 +416,9 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
   glCullFace (GL_FRONT);
   glEnable (GL_CULL_FACE);
 
+  // now that we know what pixelformat we use, clue the texture manager in
+  txtmgr->SetPixelFormat (*G2D->GetPixelFormat ());
+
   return true;
 }
 
@@ -445,7 +447,6 @@ void csGraphics3DOGLCommon::SharedOpen (csGraphics3DOGLCommon *d)
   m_fogtexturehandle = d->m_fogtexturehandle;
   texture_cache = d->texture_cache;
   lightmap_cache = d->lightmap_cache;
-
 }
 
 void csGraphics3DOGLCommon::Close ()
@@ -626,7 +627,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
 
   iPolygonTexture *tex = poly.poly_texture;
   iTextureHandle* txt_handle = poly.mat_handle->GetTexture ();
-  csTextureMMOpenGL *txt_mm = (csTextureMMOpenGL *) txt_handle->GetPrivateObject ();
+  csTextureHandleOpenGL *txt_mm = (csTextureHandleOpenGL *) txt_handle->GetPrivateObject ();
 
   // find lightmap information, if any
   iLightMap *thelightmap = tex->GetLightMap ();
@@ -679,7 +680,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
 
   csGLCacheData *texturecache_data;
   texturecache_data = (csGLCacheData *)txt_mm->GetCacheData ();
-  tex_transp = txt_mm->GetKeyColor ();
+  tex_transp = txt_mm->GetKeyColor () || txt_mm->GetAlphaMap ();
   GLuint texturehandle = texturecache_data->Handle;
 
   float flat_r = 1., flat_g = 1., flat_b = 1.;
@@ -766,9 +767,9 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
       glDisable (GL_TEXTURE_2D);
       UByte r, g, b;
       poly.mat_handle->GetTexture ()->GetMeanColor (r, g, b);
-      flat_r = float (r) / 255.;
-      flat_g = float (g) / 255.;
-      flat_b = float (b) / 255.;
+      flat_r = BYTE_TO_FLOAT (r);
+      flat_g = BYTE_TO_FLOAT (g);
+      flat_b = BYTE_TO_FLOAT (b);
     }
     SetGLZBufferFlags ();
 
@@ -779,7 +780,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
       glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
       glEnable (GL_BLEND);
       if (poly_alpha > 0)
-        glColor4f (flat_r, flat_g, flat_b, 1.0 - (float) poly_alpha / 255.0);
+        glColor4f (flat_r, flat_g, flat_b, 1.0 - BYTE_TO_FLOAT (poly_alpha));
       else
         glColor4f (flat_r, flat_g, flat_b, 1.0);
     }
@@ -803,9 +804,9 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
     glDisable (GL_TEXTURE_2D);
     UByte r, g, b;
     poly.mat_handle->GetTexture ()->GetMeanColor (r, g, b);
-    flat_r = float (r) / 255.;
-    flat_g = float (g) / 255.;
-    flat_b = float (b) / 255.;
+    flat_r = BYTE_TO_FLOAT (r);
+    flat_g = BYTE_TO_FLOAT (g);
+    flat_b = BYTE_TO_FLOAT (b);
   }
 
   SetGLZBufferFlags ();
@@ -816,7 +817,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
     glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glEnable (GL_BLEND);
     if (poly_alpha > 0)
-      glColor4f (flat_r, flat_g, flat_b, 1.0 - (float) poly_alpha / 255.0);
+      glColor4f (flat_r, flat_g, flat_b, 1.0 - BYTE_TO_FLOAT (poly_alpha));
     else
     {
       glColor4f (flat_r, flat_g, flat_b, 1.0);
@@ -1121,16 +1122,19 @@ void csGraphics3DOGLCommon::StartPolygonFX (iMaterialHandle * handle, UInt mode)
 
   m_gouraud = m_renderstate.lighting && m_renderstate.gouraud && ((mode & CS_FX_GOURAUD) != 0);
   m_mixmode = mode;
-  m_alpha = 1.0f - float (mode & CS_FX_MASK_ALPHA) / 255.;
+  m_alpha = 1.0f - BYTE_TO_FLOAT (mode & CS_FX_MASK_ALPHA);
 
   GLuint texturehandle = 0;
+  bool has_alpha = false;
   if (handle && m_renderstate.textured)
   {
     iTextureHandle* txt_handle = handle->GetTexture ();
-    csTextureMMOpenGL *txt_mm = (csTextureMMOpenGL *) txt_handle->GetPrivateObject ();
+    csTextureHandleOpenGL *txt_mm = (csTextureHandleOpenGL *) txt_handle->GetPrivateObject ();
     texture_cache->cache_texture (txt_handle);
     csGLCacheData *cachedata = (csGLCacheData *)txt_mm->GetCacheData ();
     texturehandle = cachedata->Handle;
+    if (txt_handle)
+      has_alpha = txt_handle->GetKeyColor () || txt_handle->GetAlphaMap ();
   }
   if ((mode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)
     m_gouraud = true;
@@ -1175,16 +1179,16 @@ void csGraphics3DOGLCommon::StartPolygonFX (iMaterialHandle * handle, UInt mode)
       break;
     case CS_FX_TRANSPARENT:
       // Color = 1 * DEST + 0 * SRC
-      m_alpha = 1.0f;
+      m_alpha = 0.0f;
       glBlendFunc (GL_ZERO, GL_ONE);
       glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
       break;
     case CS_FX_COPY:
     default:
-      enable_blending = false;
+      enable_blending = has_alpha;
       // Color = 0 * DEST + 1 * SRC = SRC
       m_alpha = 1.0f;
-      glBlendFunc (GL_ONE, GL_ZERO);
+      glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
       break;
   }
@@ -1222,9 +1226,9 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
   float flat_r = 1., flat_g = 1., flat_b = 1.;
   if (!m_textured)
   {
-    flat_r = poly.flat_color_r / 255.;
-    flat_g = poly.flat_color_g / 255.;
-    flat_b = poly.flat_color_b / 255.;
+    flat_r = BYTE_TO_FLOAT (poly.flat_color_r);
+    flat_g = BYTE_TO_FLOAT (poly.flat_color_g);
+    flat_b = BYTE_TO_FLOAT (poly.flat_color_b);
   }
   glBegin (GL_TRIANGLE_FAN);
   float sx, sy;
@@ -1313,8 +1317,6 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
       glShadeModel (GL_FLAT);
   }
 }
-
-
 
 void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 {
@@ -1528,9 +1530,9 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       // Fill flat color if renderer decide to paint it flat-shaded
       UByte r,g,b;
       mesh.mat_handle[0]->GetTexture ()->GetMeanColor (r, g, b);
-      flat_r = float(r) / 255.;
-      flat_g = float(g) / 255.;
-      flat_b = float(b) / 255.;
+      flat_r = BYTE_TO_FLOAT (r);
+      flat_g = BYTE_TO_FLOAT (g);
+      flat_b = BYTE_TO_FLOAT (b);
     }
     glColor4f (flat_r, flat_g, flat_b, m_alpha);
   }
@@ -1615,10 +1617,6 @@ void csGraphics3DOGLCommon::CacheTexture (iPolygonTexture *texture)
   texture_cache->cache_texture (txt_handle);
   if (m_renderstate.lighting)
     lightmap_cache->cache_lightmap (texture);
-}
-
-void csGraphics3DOGLCommon::CacheLightedTexture (iPolygonTexture* /*texture*/)
-{
 }
 
 bool csGraphics3DOGLCommon::SetRenderState (G3D_RENDERSTATEOPTION op, long value)
@@ -1857,7 +1855,7 @@ bool csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
 
   tex = poly.poly_texture;
   iTextureHandle* txt_handle = poly.mat_handle->GetTexture ();
-  csTextureMMOpenGL *txt_mm = (csTextureMMOpenGL *) txt_handle->GetPrivateObject ();
+  csTextureHandleOpenGL *txt_mm = (csTextureHandleOpenGL *) txt_handle->GetPrivateObject ();
 
   // find lightmap information, if any
   thelightmap = tex->GetLightMap ();
@@ -1924,7 +1922,7 @@ bool csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
     glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glEnable (GL_BLEND);
     if (poly_alpha > 0)
-      glColor4f (flat_r, flat_g, flat_b, 1.0 - (float) poly_alpha / 255.0);
+      glColor4f (flat_r, flat_g, flat_b, 1.0 - BYTE_TO_FLOAT (poly_alpha));
     else
       glColor4f (flat_r, flat_g, flat_b, 1.0);
   }
@@ -2063,7 +2061,7 @@ void csGraphics3DOGLCommon::DrawPixmap (iTextureHandle *hTex,
   texture_cache->cache_texture (hTex);
 
   // Get texture handle
-  csTextureMMOpenGL *txt_mm = (csTextureMMOpenGL *)hTex->GetPrivateObject ();
+  csTextureHandleOpenGL *txt_mm = (csTextureHandleOpenGL *)hTex->GetPrivateObject ();
   GLuint texturehandle = ((csGLCacheData *)txt_mm->GetCacheData ())->Handle;
 
   // as we are drawing in 2D, we disable some of the commonly used features
@@ -2074,7 +2072,7 @@ void csGraphics3DOGLCommon::DrawPixmap (iTextureHandle *hTex,
 
   // if the texture has transparent bits, we have to tweak the
   // OpenGL blend mode so that it handles the transparent pixels correctly
-  if (hTex->GetKeyColor () || hTex->GetAlphaMap ())
+  if (hTex->GetKeyColor () || hTex->GetAlphaMap () || Alpha)
   {
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -2083,7 +2081,7 @@ void csGraphics3DOGLCommon::DrawPixmap (iTextureHandle *hTex,
     glDisable (GL_BLEND);
 
   glEnable (GL_TEXTURE_2D);
-  glColor4f (1.,1.,1.,1.);
+  glColor4f (1.0, 1.0, 1.0, Alpha ? (1.0 - BYTE_TO_FLOAT (Alpha)) : 1.0);
   csglBindTexture (GL_TEXTURE_2D, texturehandle);
 
   int bitmapwidth = 0, bitmapheight = 0;
@@ -2119,8 +2117,6 @@ void csGraphics3DOGLCommon::DrawPixmap (iTextureHandle *hTex,
   glVertex2i (sx, height - (sy+1 + sh));
   glEnd ();
 }
-
-
 
 /* this function is called when the user configures the OpenGL renderer to use
  * 'auto' blend mode.  It tries to figure out how well the driver supports

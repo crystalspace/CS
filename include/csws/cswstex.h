@@ -51,8 +51,6 @@ class csWSTexture
   char *Name;
   // VFS file name
   char *FileName;
-  // A pointer to the texture manager (WARNING: NO INCREF/DECREF)
-  iTextureManager *TexMan;
 
 public:
   /// Create the 2D texture

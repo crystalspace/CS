@@ -29,13 +29,13 @@
 #include "isystem.h"
 #include "igraph2d.h"
 
-//---------------------------------------------------------- csTextureMM -----//
+//---------------------------------------------------------- csTextureHandle -----//
 
-IMPLEMENT_IBASE (csTextureMM)
+IMPLEMENT_IBASE (csTextureHandle)
   IMPLEMENTS_INTERFACE (iTextureHandle)
 IMPLEMENT_IBASE_END
 
-csTextureMM::csTextureMM (iImage* Image, int Flags)
+csTextureHandle::csTextureHandle (iImage* Image, int Flags)
 {
   CONSTRUCT_IBASE (NULL);
 
@@ -47,7 +47,7 @@ csTextureMM::csTextureMM (iImage* Image, int Flags)
   transp = false;
   transp_color.red = transp_color.green = transp_color.blue = 0;
 
-  if(image->HasKeycolor ())
+  if (image->HasKeycolor ())
   {
     int r,g,b;
     image->GetKeycolor (r,g,b);
@@ -59,32 +59,33 @@ csTextureMM::csTextureMM (iImage* Image, int Flags)
   cachedata = NULL;
 }
 
-csTextureMM::~csTextureMM ()
+csTextureHandle::~csTextureHandle ()
 {
   for (int i = 0; i < 4; i++)
     delete tex [i];
   FreeImage ();
 }
 
-void csTextureMM::FreeImage ()
+void csTextureHandle::FreeImage ()
 {
   if (!image) return;
   image->DecRef ();
   image = NULL;
 }
 
-void csTextureMM::CreateMipmaps ()
+void csTextureHandle::CreateMipmaps ()
 {
   if (!image) return;
 
   csRGBpixel *tc = transp ? &transp_color : (csRGBpixel *)NULL;
 
-  image->IncRef ();
-
   // Delete existing mipmaps, if any
   for (int i = 0; i < 4; i++)
     delete tex [i];
 
+  // Increment reference counter on image since NewTexture() expects
+  // a image with an already incremented reference counter
+  image->IncRef ();
   tex [0] = NewTexture (image);
 
   // 2D textures uses just the top-level mipmap
@@ -103,13 +104,13 @@ void csTextureMM::CreateMipmaps ()
   ComputeMeanColor ();
 }
 
-void csTextureMM::SetKeyColor (bool Enable)
+void csTextureHandle::SetKeyColor (bool Enable)
 {
   transp = Enable;
 }
 
 // This function must be called BEFORE calling TextureManager::Update().
-void csTextureMM::SetKeyColor (UByte red, UByte green, UByte blue)
+void csTextureHandle::SetKeyColor (UByte red, UByte green, UByte blue)
 {
   transp_color.red = red;
   transp_color.green = green;
@@ -118,26 +119,26 @@ void csTextureMM::SetKeyColor (UByte red, UByte green, UByte blue)
 }
 
 /// Get the transparent color
-void csTextureMM::GetKeyColor (UByte &r, UByte &g, UByte &b)
+void csTextureHandle::GetKeyColor (UByte &r, UByte &g, UByte &b)
 {
   r = transp_color.red;
   g = transp_color.green;
   b = transp_color.blue;
 }
 
-bool csTextureMM::GetKeyColor ()
+bool csTextureHandle::GetKeyColor ()
 {
   return transp;
 }
 
-void csTextureMM::GetMeanColor (UByte &r, UByte &g, UByte &b)
+void csTextureHandle::GetMeanColor (UByte &r, UByte &g, UByte &b)
 { 
   r = mean_color.red;
   g = mean_color.green;
   b = mean_color.blue;
 }
 
-bool csTextureMM::GetMipMapDimensions (int mipmap, int& w, int& h) 
+bool csTextureHandle::GetMipMapDimensions (int mipmap, int& w, int& h) 
 { 
   csTexture *txt = get_texture (mipmap);
   if (txt)
@@ -149,7 +150,7 @@ bool csTextureMM::GetMipMapDimensions (int mipmap, int& w, int& h)
   return false;
 }
 
-void csTextureMM::AdjustSizePo2 ()
+void csTextureHandle::AdjustSizePo2 ()
 {
   int newwidth  = image->GetWidth();
   int newheight = image->GetHeight();
@@ -170,7 +171,7 @@ IMPLEMENT_IBASE (csMaterialHandle)
   IMPLEMENTS_INTERFACE (iMaterialHandle)
 IMPLEMENT_IBASE_END
 
-csMaterialHandle::csMaterialHandle (iMaterial* m)
+csMaterialHandle::csMaterialHandle (iMaterial* m, csTextureManager *parent)
 {
   CONSTRUCT_IBASE (NULL);
   if ((material = m) != 0)
@@ -181,20 +182,24 @@ csMaterialHandle::csMaterialHandle (iMaterial* m)
     material->GetReflection (diffuse, ambient, reflection);
     material->GetFlatColor (flat_color);
   }
+  (texman = parent)->IncRef ();
 }
 
-csMaterialHandle::csMaterialHandle (iTextureHandle* t)
+csMaterialHandle::csMaterialHandle (iTextureHandle* t, csTextureManager *parent)
 {
   CONSTRUCT_IBASE (NULL);
   material = NULL;
   diffuse = 0.7; ambient = 0; reflection = 0;
   if ((texture = t) != 0)
     texture->IncRef ();
+  (texman = parent)->IncRef ();
 }
 
 csMaterialHandle::~csMaterialHandle ()
 {
   FreeMaterial ();
+  texman->UnregisterMaterial (this);
+  texman->DecRef ();
 }
 
 void csMaterialHandle::FreeMaterial ()
@@ -209,6 +214,11 @@ void csMaterialHandle::FreeMaterial ()
     texture->DecRef ();
     texture = NULL;
   }
+}
+
+void csMaterialHandle::Prepare ()
+{
+  // nothing to do
 }
 
 //------------------------------------------------------------ csTexture -----//
@@ -230,6 +240,7 @@ IMPLEMENT_IBASE_END
 csTextureManager::csTextureManager (iSystem* iSys, iGraphics2D *iG2D)
   : textures (16, 16), materials (16, 16)
 {
+  CONSTRUCT_IBASE (NULL);
   System = iSys;
   verbose = false;
 
@@ -282,7 +293,7 @@ void csTextureManager::ResetPalette ()
 iMaterialHandle* csTextureManager::RegisterMaterial (iMaterial* material)
 {
   if (!material) return NULL;
-  csMaterialHandle *mat = new csMaterialHandle (material);
+  csMaterialHandle *mat = new csMaterialHandle (material, this);
   materials.Push (mat);
   return mat;
 }
@@ -290,30 +301,25 @@ iMaterialHandle* csTextureManager::RegisterMaterial (iMaterial* material)
 iMaterialHandle* csTextureManager::RegisterMaterial (iTextureHandle* txthandle)
 {
   if (!txthandle) return NULL;
-  csMaterialHandle *mat = new csMaterialHandle (txthandle);
+  csMaterialHandle *mat = new csMaterialHandle (txthandle, this);
   materials.Push (mat);
   return mat;
 }
 
-void csTextureManager::UnregisterMaterial (iMaterialHandle* handle)
+void csTextureManager::UnregisterMaterial (csMaterialHandle* handle)
 {
-  csMaterialHandle* mat = (csMaterialHandle*)handle;
-  int idx = materials.Find (mat);
+  int idx = materials.Find (handle);
   if (idx >= 0) materials.Delete (idx);
-}
-
-void csTextureManager::PrepareMaterial (iMaterialHandle* handle)
-{
-  (void)handle;
 }
 
 void csTextureManager::PrepareMaterials ()
 {
+  for (int i = 0; i < materials.Length (); i++)
+    materials.Get (i)->Prepare ();
 }
 
 void csTextureManager::FreeMaterials ()
 {
-  for (int i = 0 ; i < materials.Length () ; i++)
+  for (int i = 0; i < materials.Length (); i++)
     materials.Get (i)->FreeMaterial ();
 }
-

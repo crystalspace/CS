@@ -208,6 +208,8 @@ class csSystemDriver : public iSystem
   public:
     csEventOutletsVector () : csVector (16, 16)
     { }
+    virtual ~csEventOutletsVector ()
+    { DeleteAll (); }
     virtual bool FreeItem (csSome Item)
     { delete (csEventOutlet *)Item; return true; }
     csEventOutlet *Get (int idx)
@@ -222,6 +224,8 @@ class csSystemDriver : public iSystem
   public:
     csEventCordsVector () : csVector (16, 16)
     { }
+    virtual ~csEventCordsVector ()
+    { DeleteAll (); }
     virtual bool FreeItem (csSome Item)
     { delete (csEventCord *)Item; return true; }
     csEventCord *Get (int idx)

@@ -14,7 +14,7 @@ PLUGINS+=video/canvas/linex
 # in section Display of opengl.cfg
 #PLUGINS+=video/canvas/openglx/glide
 #PLUGINS+=video/canvas/openglx/svga
-PLUGINS+=video/canvas/openglx/empty
+#PLUGINS+=video/canvas/openglx/empty
 
 # Uncomment the following to build GGI 2D driver
 #PLUGINS+=video/canvas/ggi
