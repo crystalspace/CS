@@ -99,6 +99,8 @@ private:
   bool eval_oper(int oper, oper_arg arg1, oper_arg arg2, oper_arg & output);
   /// Evaluate an operator with a single argument
   bool eval_oper(int oper, oper_arg arg1, oper_arg & output);
+  /// Evaluate an operator without any arguments
+  bool eval_oper(int oper, oper_arg & output);
 
   /// Add operator
   bool eval_add(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const;
@@ -125,6 +127,15 @@ private:
   /// Tangent operator
   bool eval_tan(const oper_arg & arg1, oper_arg & output) const;
 
+  /// Time function
+  bool eval_time(oper_arg & output) const;
+  /// Frame function
+  bool eval_frame(oper_arg & output) const;
+
+  /// Internal set vector element 1 and 2
+  bool eval_selt12(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const;
+  /// Internal set vector element 3 and 4
+  bool eval_selt34(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const;
   /// Internal load operator
   bool eval_load(const oper_arg & arg1, oper_arg & output) const;
 

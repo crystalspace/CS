@@ -62,18 +62,23 @@ enum {
   OP_FUNC_COS,
   OP_FUNC_TAN,
 
+  OP_FUNC_TIME,
+  OP_FUNC_FRAME,
+
+  // Pseudo-ops, special case weird stuff
+  OP_PS_MAKE_VEC2,
+  OP_PS_MAKE_VEC3,
+  OP_PS_MAKE_VEC4,
+
   OP_LIMIT,
 
   // XML Special identifiers
   OP_XML_ATOM,
   OP_XML_SEXP,
   
-  // S-EXP Special identifiers
-  OP_SEXP_VEC2,
-  OP_SEXP_VEC3,
-  OP_SEXP_VEC4,
-
   // Internal ops
+  OP_INT_SELT12,
+  OP_INT_SELT34,
   OP_INT_LOAD,
 };
   
@@ -101,6 +106,49 @@ struct cons {
   cons * cdr; // That's all it can be
   cons * cdr_rev; // Double-linked list for CDR.
 };
+
+struct op_args_info {
+  int min_args; /* -1 means no limit */
+  int max_args;
+  bool can_fold; /* if args < minimum, can this op be folded back into 
+		    the parent cons list ? eg: (+ (+ 1) 2) == (+ 1 2) */
+};
+
+/*
+  Currently supported patterns:
+  0, 0  - No args
+  1, 1  - 1 arg
+  2, -1 - 2+ args, able to be parsed as (op 1 2 3 4) == (op 1 (op 2 (op 3 4))) 
+  x, y  - This will not do anything to atomic arguments. x <= y. Most of these will
+          require special handling during the compile stage.
+*/
+static op_args_info optimize_arg_table[] = {
+  { 0, 0, false }, //  OP_INVALID
+    
+  { 2, -1, true }, //  OP_ADD
+  { 2, -1, true }, //  OP_SUB
+  { 2, -1, true }, //  OP_MUL
+  { 2, -1, true }, //  OP_DIV
+   
+  { 1, 1, false }, //  OP_VEC_ELT1
+  { 1, 1, false }, //  OP_VEC_ELT2
+  { 1, 1, false }, //  OP_VEC_ELT3
+  { 1, 1, false }, //  OP_VEC_ELT4
+    
+  { 1, 1, false }, //  OP_FUNC_SIN
+  { 1, 1, false }, //  OP_FUNC_COS
+  { 1, 1, false }, //  OP_FUNC_TAN
+
+  { 0, 0, false }, // OP_FUNC_TIME
+  { 0, 0, false }, // OP_FUNC_FRAME
+
+  { 2, 2, false }, // OP_PS_MAKE_VEC2
+  { 3, 3, false }, // OP_PS_MAKE_VEC2
+  { 4, 4, false }, // OP_PS_MAKE_VEC2
+
+  { 0, 0, false }, //  OP_LIMIT
+};
+  
 
 bool csShaderExpression::loaded = false;
 csStringHash csShaderExpression::xmltokens;
@@ -130,6 +178,13 @@ csShaderExpression::csShaderExpression(iObjectRegistry * objr) :
     xmltokens.Register("cos", OP_FUNC_COS);
     xmltokens.Register("tan", OP_FUNC_TAN);
     
+    xmltokens.Register("time", OP_FUNC_TIME);
+    xmltokens.Register("frame", OP_FUNC_FRAME);
+
+    xmltokens.Register("make-vec2", OP_PS_MAKE_VEC2);
+    xmltokens.Register("make-vec3", OP_PS_MAKE_VEC3);
+    xmltokens.Register("make-vec4", OP_PS_MAKE_VEC4);
+
     xmltokens.Register("atom", OP_XML_ATOM);
     xmltokens.Register("sexp", OP_XML_SEXP);
 
@@ -153,9 +208,12 @@ csShaderExpression::csShaderExpression(iObjectRegistry * objr) :
     sexptokens.Register("cos", OP_FUNC_COS);
     sexptokens.Register("tan", OP_FUNC_TAN);
     
-    sexptokens.Register("vec2", OP_SEXP_VEC2);
-    sexptokens.Register("vec3", OP_SEXP_VEC3);
-    sexptokens.Register("vec4", OP_SEXP_VEC4);
+    sexptokens.Register("time", OP_FUNC_TIME);
+    sexptokens.Register("frame", OP_FUNC_FRAME);
+
+    sexptokens.Register("make-vec2", OP_PS_MAKE_VEC2);
+    sexptokens.Register("make-vec3", OP_PS_MAKE_VEC3);
+    sexptokens.Register("make-vec4", OP_PS_MAKE_VEC4);
 
     /* for debugging, can be removed */
     mnemonics.Register("ADD", OP_ADD);
@@ -172,6 +230,11 @@ csShaderExpression::csShaderExpression(iObjectRegistry * objr) :
     mnemonics.Register("COS", OP_FUNC_COS);
     mnemonics.Register("TAN", OP_FUNC_TAN);
 
+    mnemonics.Register("FRM", OP_FUNC_FRAME);
+    mnemonics.Register("TIM", OP_FUNC_TIME);
+
+    mnemonics.Register("SELT12", OP_INT_SELT12);
+    mnemonics.Register("SELT34", OP_INT_SELT34);
     mnemonics.Register("ILD", OP_INT_LOAD);
   }
 }
@@ -201,7 +264,7 @@ bool csShaderExpression::Parse(iDocumentNode * node, csSymbolTable * stab) {
     return false;
   }
   
-#if 0
+#if 1
   print_cons(head);
   printf("\n***************\n");
 #endif
@@ -214,7 +277,7 @@ bool csShaderExpression::Parse(iDocumentNode * node, csSymbolTable * stab) {
     return false;
   }
 
-#if 0
+#if 1
   print_cons(head);
   printf("\n***************\n");
 #endif
@@ -228,7 +291,7 @@ bool csShaderExpression::Parse(iDocumentNode * node, csSymbolTable * stab) {
     return false;
   }
 
-  //  print_ops(opcodes);
+  print_ops(opcodes);
 
   opcodes.ShrinkBestFit();
 
@@ -251,9 +314,8 @@ bool csShaderExpression::Evaluate(csShaderVariable * var) {
     const oper & op = iter.Next();
 
     if (op.arg1.type == TYPE_INVALID) {
-      DEBUG_PRINTF("Still doing support for no-argument operations.\n");
-
-      return false;
+      if (!eval_oper(op.opcode, accstack.Get(op.acc)))
+	return false;
     } else if (op.arg2.type == TYPE_INVALID) {
       if (!eval_oper(op.opcode, op.arg1, accstack.Get(op.acc)))
 	return false;
@@ -272,11 +334,13 @@ bool csShaderExpression::Evaluate(csShaderVariable * var) {
 bool csShaderExpression::eval_const(cons *& head) {
   /* This pass is expected to do the following:
       - Ensure that arguments are correct. No arg-less ops or multiple-arg
-        operators with single arguments. 
+        operators with single arguments.
       - In the case of single argument'd multi-arg ops, they are 
         inserted into the parent cons list, and the sub-cons 
 	removed. This works nicely with the currently used constant 
 	reduction algorithm. (+ (+ 1) 2) becomes (+ 1 2).
+      - In the case of set # of argument ops, error if there aren't enough
+        or too many.
       - (- <atom>) is resolved to (- 0 <atom>)
       - Sanity check, ensure that atom types are correct within 
         the cons tree (currently via CS_ASSERT).
@@ -298,10 +362,20 @@ bool csShaderExpression::eval_const(cons *& head) {
   oper = head->car.oper;
   cell = head->cdr;
 
-  if (!cell) {
-    DEBUG_PRINTF("Operator with no arguments?\n");
+  if ((oper >= OP_LIMIT || oper <= OP_INVALID)) {
+    DEBUG_PRINTF("Unknown operator type in optimizer: %i.\n", oper);
 
     return false;
+  }    
+
+  if (!cell) {
+    if (optimize_arg_table[oper].min_args != 0) {
+      DEBUG_PRINTF("Operator with no arguments?\n");
+      
+      return false;
+    } else {
+      return true;
+    }
   }
 
   /* Special case: (- 45) is functionally equiv to -45 or 0 - 45 */
@@ -321,9 +395,10 @@ bool csShaderExpression::eval_const(cons *& head) {
     cell = zero;
   }
 
-  switch (oper) {
-  case OP_VEC_ELT1:  case OP_VEC_ELT2:  case OP_VEC_ELT3:  case OP_VEC_ELT4: /* operators with 1 argument */
-  case OP_FUNC_SIN:  case OP_FUNC_COS:  case OP_FUNC_TAN: 
+  /* @@@ this is begging to be broken up into functions */
+  if (optimize_arg_table[oper].min_args == 1) {
+    /* It is assumed in here that the output opcodes require only 1 argument. */
+
     if (cell->cdr) {
       DEBUG_PRINTF("Single argument operator \'%s\' has more than 1 argument.\n", sexptokens.Request(oper));
 
@@ -337,7 +412,7 @@ bool csShaderExpression::eval_const(cons *& head) {
 
       cons * subcell = cell->car.cell;
       
-      if (!subcell->cdr) {
+      if (!subcell->cdr && subcell->car.type != TYPE_OPER) {
 	CS_ASSERT(subcell->car.type == TYPE_NUMBER  ||
 		  subcell->car.type == TYPE_VECTOR2 ||
 		  subcell->car.type == TYPE_VECTOR3 ||
@@ -373,9 +448,10 @@ bool csShaderExpression::eval_const(cons *& head) {
       return false;
     }
 
-    break;
+  } else if (optimize_arg_table[oper].min_args > 1 && optimize_arg_table[oper].max_args < 0) {
+    /* No limit to arguments. It is assumed that (op 1 2 3 4) can be chained, 
+       eg: (op 1 (op 2 (op 3 4))), and that opcodes require 2 arguments */
 
-  case OP_ADD:  case OP_SUB:  case OP_MUL:  case OP_DIV: /* operators with multiple arguments */
     while (cell) {
       switch (cell->car.type) {
       case TYPE_CONS: {
@@ -385,20 +461,26 @@ bool csShaderExpression::eval_const(cons *& head) {
 	cons * subcell = cell->car.cell;
       
 	if (!subcell->cdr) {
-	  CS_ASSERT(subcell->car.type == TYPE_NUMBER  ||
-		    subcell->car.type == TYPE_VECTOR2 ||
-		    subcell->car.type == TYPE_VECTOR3 ||
-		    subcell->car.type == TYPE_VECTOR4);
-	
-	  cell->car = subcell->car;
-	  destruct_cons(subcell);
-	
-	  last = cell->cdr_rev;
-	
-	  if (last->car.type == TYPE_OPER ||
-	      last->car.type == TYPE_VARIABLE) {
+	  if (subcell->car.type == TYPE_OPER) {
+	    cell = cell->cdr;
 	    last = NULL;
-	  } 
+	  } else {
+	    CS_ASSERT(subcell->car.type == TYPE_NUMBER  ||
+		      subcell->car.type == TYPE_VECTOR2 ||
+		      subcell->car.type == TYPE_VECTOR3 ||
+		      subcell->car.type == TYPE_VECTOR4);
+	    
+	    cell->car = subcell->car;
+	    destruct_cons(subcell);
+	    
+	    last = cell->cdr_rev;
+	    
+	    if (last->car.type == TYPE_OPER ||
+		last->car.type == TYPE_VARIABLE ||
+		last->car.type == TYPE_CONS) {
+	      last = NULL;
+	    } 
+	  }
 	} else {
 	  cell = cell->cdr;
 	}
@@ -441,19 +523,46 @@ bool csShaderExpression::eval_const(cons *& head) {
 	return false;
       }
     }
+  } else if (optimize_arg_table[oper].min_args <= optimize_arg_table[oper].max_args) {
+    int argcount = 0;
 
-    if (head && head->cdr && !head->cdr->cdr) { // operator + single argument
-      head->car = head->cdr->car;
-      destruct_cons(head->cdr);
-      head->cdr = NULL;
+    /* x, x where both X's are equal. Will not reduce arguments using the parent op, 
+       but will try to optimize arguments to constant atoms. */
+
+    while (cell) {
+      if (cell->car.type == TYPE_CONS) {
+	if (!eval_const(cell->car.cell))
+	  return false;
+
+	cons * subcell = cell->car.cell;
+
+	if (!subcell->cdr && subcell->car.type != TYPE_OPER) {
+	  CS_ASSERT(subcell->car.type == TYPE_NUMBER  ||
+		    subcell->car.type == TYPE_VECTOR2 ||
+		    subcell->car.type == TYPE_VECTOR3 ||
+		    subcell->car.type == TYPE_VECTOR4);
+	  
+	  cell->car = subcell->car;
+	  destruct_cons(subcell);
+	}	
+      }
+      
+      argcount++;
+      cell = cell->cdr;
     }
 
-    break;
+    if (argcount < optimize_arg_table[oper].min_args || argcount > optimize_arg_table[oper].max_args) {
+      DEBUG_PRINTF("Incorrect # of args (%i) to operator %s.\n", argcount, sexptokens.Request(oper));
 
-  default:
-    DEBUG_PRINTF("Unknown operator type in optimizer: %i.\n", oper);
+      return false;
+    }
+  }
 
-    return false;
+  if (optimize_arg_table[oper].can_fold &&
+      head && head->cdr && !head->cdr->cdr) { // operator + single argument
+    head->car = head->cdr->car;
+    destruct_cons(head->cdr);
+    head->cdr = NULL;
   }
 
   return true;
@@ -573,6 +682,8 @@ bool csShaderExpression::eval_oper(int oper, oper_arg arg1, oper_arg arg2, oper_
   case OP_SUB:  return eval_sub(arg1, arg2, output);
   case OP_MUL:  return eval_mul(arg1, arg2, output);
   case OP_DIV:  return eval_div(arg1, arg2, output);
+  case OP_INT_SELT12: return eval_selt12(arg1, arg2, output);
+  case OP_INT_SELT34: return eval_selt34(arg1, arg2, output);
 
   default:
     DEBUG_PRINTF("Unknown multi-arg operator %s (%i).\n", sexptokens.Request(oper), oper);
@@ -612,6 +723,18 @@ bool csShaderExpression::eval_oper(int oper, oper_arg arg1, oper_arg & output) {
   return false;
 }
 
+bool csShaderExpression::eval_oper(int oper, oper_arg & output) {
+  switch (oper) {
+  case OP_FUNC_TIME: return eval_time(output);
+  case OP_FUNC_FRAME: return eval_frame(output);
+
+  default:
+    DEBUG_PRINTF("Unknown single-arg operator %s (%i).\n", sexptokens.Request(oper), oper);
+  }
+   
+  return false;
+}
+
 bool csShaderExpression::eval_add(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const {
   if (arg1.type == TYPE_NUMBER && arg2.type == TYPE_NUMBER) {
     output.type = TYPE_NUMBER;
@@ -628,7 +751,7 @@ bool csShaderExpression::eval_add(const oper_arg & arg1, const oper_arg & arg2, 
     output.type = (arg1.type > arg2.type) ? arg1.type : arg2.type; // largest vector type, 
     output.vec4 = arg1.vec4 + arg2.vec4;                           // you can coerce a vector up, eg. vec2->vec3, using a dummy expr, but not down.
   } else {
-    DEBUG_PRINTF("Invalid types for operator, %s + %s.\n", get_type_name(arg1.type), get_type_name(arg2.type));
+    DEBUG_PRINTF("Invalid types for operator, %s(%i) + %s(%i).\n", get_type_name(arg1.type), arg1.type, get_type_name(arg2.type), arg2.type);
 
     return false;
   }
@@ -803,6 +926,28 @@ bool csShaderExpression::eval_tan(const oper_arg & arg1, oper_arg & output) cons
   return true;  
 }
 
+bool csShaderExpression::eval_time(oper_arg & output) const {
+  output.type = TYPE_NUMBER;
+  output.num = 128;
+
+  return true;
+}
+
+bool csShaderExpression::eval_frame(oper_arg & output) const {
+  output.type = TYPE_NUMBER;
+  output.num = 256;
+
+  return true;
+}
+
+bool csShaderExpression::eval_selt12(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const {
+  return false;
+}
+
+bool csShaderExpression::eval_selt34(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const {
+  return false;
+}
+
 bool csShaderExpression::eval_load(const oper_arg & arg1, oper_arg & output) const {
   /* I really hope this is optimized by the compiler. */
 
@@ -816,38 +961,7 @@ bool csShaderExpression::parse_xml(cons * head, iDocumentNode * node) {
   cons * cptr = head;
   csStringID tok = xmltokens.Request(node->GetValue());
 
-  switch (tok) {
-  case OP_ADD:      case OP_SUB:      case OP_MUL:      case OP_DIV:
-  case OP_VEC_ELT1: case OP_VEC_ELT2: case OP_VEC_ELT3: case OP_VEC_ELT4:
-  case OP_FUNC_SIN: case OP_FUNC_COS: case OP_FUNC_TAN:
-
-    cptr->car.type = TYPE_OPER;
-    cptr->car.oper = tok;
-    cptr->cdr = NULL;
-
-    while (iter->HasNext()) {
-      cptr->cdr = new cons;
-      cptr->cdr->cdr_rev = cptr;
-      cptr = cptr->cdr;
-
-      csRef<iDocumentNode> next_node (iter->Next());
-      csStringID sub_tok = xmltokens.Request(next_node->GetValue());
-
-      if (sub_tok != OP_XML_ATOM) {
-	cptr->car.type = TYPE_CONS;
-	cptr->car.cell = new cons;
-	
-	if (!parse_xml(cptr->car.cell, next_node)) 
-	  return false;
-
-      } else {
-	if (!parse_xml(cptr, next_node))
-	  return false;
-      }
-
-    } break;
-    
-  case OP_XML_ATOM: {
+  if (tok == OP_XML_ATOM) {
     const char * type = node->GetAttributeValue("type"), 
                * val  = node->GetContentsValue();
     
@@ -859,18 +973,43 @@ bool csShaderExpression::parse_xml(cons * head, iDocumentNode * node) {
     }
 
     cptr->cdr = NULL;
+  } else if (tok == OP_XML_SEXP) {
+    DEBUG_PRINTF("S-expressions not ready yet.\n");
 
-  } break;
-
-  case OP_XML_SEXP:
-    /* fallthrough */
-
-  default:
+    return false;
+  } else if (tok <= OP_INVALID || tok >= OP_LIMIT) {
     DEBUG_PRINTF("Invalid XML token: %s.\n", node->GetValue());
 
     return false;
+  } else {
+
+    cptr->car.type = TYPE_OPER;
+    cptr->car.oper = tok;
+    cptr->cdr = NULL;
+    
+    while (iter->HasNext()) {
+      cptr->cdr = new cons;
+      cptr->cdr->cdr_rev = cptr;
+      cptr = cptr->cdr;
+      
+      csRef<iDocumentNode> next_node (iter->Next());
+      csStringID sub_tok = xmltokens.Request(next_node->GetValue());
+      
+      if (sub_tok != OP_XML_ATOM) {
+	cptr->car.type = TYPE_CONS;
+	cptr->car.cell = new cons;
+	
+	if (!parse_xml(cptr->car.cell, next_node)) 
+	  return false;
+	
+      } else {
+	if (!parse_xml(cptr, next_node))
+	  return false;
+      }
+    
+    }
   }
-  
+    
   cptr->cdr = NULL;
 
   return true;
@@ -972,6 +1111,21 @@ bool csShaderExpression::compile_cons(const cons * cell, int & acc_top) {
 
   if (this_acc > accstack_max)
     accstack_max = this_acc;
+
+  if (!cptr) { /* zero arg func */
+    oper tmp;
+
+    tmp.opcode = op;
+    tmp.acc = this_acc;
+    acc_top++;
+    
+    tmp.arg1.type = TYPE_INVALID;
+    tmp.arg2.type = TYPE_INVALID;
+    
+    opcodes.Push(tmp);
+
+    return true;
+  }
 
   while (cptr) {
     oper tmp;

@@ -6,6 +6,16 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Oct-2003
+	- DeSigna:
+	  - Considerable cleanups to the csShaderExpression optimizer pass.
+	  - Added support for zero-arg and fixed arg operations to optimizer.
+	  - Added support for zero-arg ops to the compiler. Fixed arg ops require
+	    special handling in the compiler, not done yet.
+	  - Added various sanity checks in the optimizer.
+	  - Fixed a severe optimizer bug, where it didn't check if the reverse CDR
+	    was a cons cell, and tried to feed it through argument reduction as an 
+	    atom.
 17-Oct-2003
 	- res added some files he forgot with his recent commit.
 	- Jorrit fixed the engine sequence manager a better way. With
