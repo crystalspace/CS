@@ -815,15 +815,16 @@ bool SysSystemDriver::GetInstallPath (char *oInstallPath, size_t iBufferSize)
 got_value:
   // got the value in oInstallPath, check for ending '/' or '\'.
   int len = strlen(oInstallPath);
-  if(len == 0) return;
+  if(len == 0) return false;
   if( oInstallPath[len-1] == '/' || oInstallPath[len-1] == '\' )
     return;
   if(len+1 >= iBufferSize)
   {
     strncpy(oInstallPath, "", iBufferSize); //make empty if possible
-    return;
+    return false;
   }
   oInstallPath[len] = '\';
   oInstallPath[len+1] = 0;
+  return true;
 }
 

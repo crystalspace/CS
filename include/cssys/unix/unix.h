@@ -33,6 +33,8 @@ public:
 
   // Sleep for given number of 1/1000 seconds
   virtual void Sleep (int SleepTime);
+  /// Get the installation path.
+  virtual bool GetInstallPath (char *oInstallPath, size_t iBufferSize);
 };
 
 #endif // __UNIX_H__

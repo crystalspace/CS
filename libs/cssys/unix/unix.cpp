@@ -43,3 +43,29 @@ void SysSystemDriver::Sleep (int SleepTime)
 {
   usleep (SleepTime * 1000);
 }
+
+bool SysSystemDriver::GetInstallPath (char *oInstallPath, size_t iBufferSize)
+{
+  char *path = getenv ("CRYSTAL");
+  if(!path || !*path)
+  {
+    // no setting, use the default.
+    strncpy(oInstallPath, "/usr/local/crystal/", iBufferSize);
+    return true;
+  }
+  strncpy(oInstallPath, path, iBufferSize);
+  // check for ending '/'
+  int len = strlen(oInstallPath);
+  if(len == 0) return false;
+  if( oInstallPath[len-1] == '/' )
+    return;
+  if(len+1 >= iBufferSize)
+  {
+    strncpy(oInstallPath, "", iBufferSize); //make empty if possible
+    return false;
+  }
+  oInstallPath[len] = '/';
+  oInstallPath[len+1] = 0;
+  return true;
+}
+
