@@ -2,7 +2,7 @@
 #==============================================================================
 #
 #    Eric's File Editor (tm)
-#    Copyright (C) 2000 by Eric Sunshine <sunshine@sunshineco.com>
+#    Copyright (C) 2000,2001 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -32,10 +32,10 @@ use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'efed.pl';
-my $PROG_VERSION = 3;
+my $PROG_VERSION = 4;
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
-my $COPYRIGHT = "Copyright (C) 2000 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
+my $COPYRIGHT = "Copyright (C) 2000,2001 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
 
 @main::opt_edit = ();
 @main::opt_rename = ();
@@ -319,8 +319,11 @@ sub process_path {
 	process_rename($path, $newpath) if $renamed;
     }
     else {
-	my $content = load_file($path);
-	my $edits = apply_edits($content);
+	my ($content, $edits) = (undef, 0);
+	if (@main::opt_edits) {
+	    $content = load_file($path);
+	    $edits = apply_edits($content);
+	}
     
 	if ($edits) {
 	    $main::total_files_edited++;

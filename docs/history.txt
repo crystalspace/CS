@@ -9,6 +9,10 @@ The history order has been reversed so that new features are at the top.
 	- Changed several of the routines in csPolygon3D to operate on
 	  object space coordinates instead of world space. This it make
 	  it easier to make the world space coordinate array optional.
+	- Eric Sunshine applied an obvious optimization to efed.pl.  It no
+	  longer bothers reading the content of each file if the user only
+	  requested file-rename operations (that is, no content-edit
+	  operations).
 4-Mar-2001
 	- Finalized the first rewrite of the data structures that are used
 	  in CheckFrustum. A further rewrite and conversion to SCF will
@@ -27,6 +31,11 @@ The history order has been reversed so that new features are at the top.
 	  systems. Martin also added documentation for the user config
 	  domain.
 1-Mar-2001
+	- Eric Sunshine fixed a compilation error which was recently introduced
+	  into NeXTSystemDriver.cpp.
+	- Eric Sunshine fixed a bug in NeXTSystemDriver where it was
+	  incorrectly requesting next.cfg from a physical volume rather than a
+	  VFS volume.
 	- Brandon Ehle added modifications for Lua scripting language:
 	  The SWIGLua modifications were fairly easy, so here's the "goop."
 	  Everything, SHOULD work now.  I don't know much about LUA, but it
