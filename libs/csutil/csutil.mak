@@ -27,11 +27,13 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp libs/csutil
+vpath %.c libs/csutil
 
 CSUTIL.LIB = $(OUT)$(LIB_PREFIX)csutil$(LIB_SUFFIX)
 INC.CSUTIL = $(wildcard include/csutil/*.h)
-SRC.CSUTIL = $(wildcard libs/csutil/*.cpp)
-OBJ.CSUTIL = $(addprefix $(OUT),$(notdir $(SRC.CSUTIL:.cpp=$O)))
+SRC.CSUTIL = $(wildcard libs/csutil/*.cpp libs/csutil/*.c)
+OBJ.CSUTIL = \
+  $(addprefix $(OUT),$(notdir $(patsubst %.c,%$O,$(SRC.CSUTIL:.cpp=$O))))
 CFG.CSUTIL = scf.cfg data/config/mouse.cfg
 
 TO_INSTALL.ROOT += $(CFG.CSUTIL)
