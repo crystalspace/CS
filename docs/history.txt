@@ -16,6 +16,8 @@ chronological order.
 	  API. Also calling it will be slightly more efficient for the engine
 	  as the virtual call is avoided.
 	- Jorrit also removed iLight->GetPrivateObject() in a similar way.
+	- Jorrit submitted a patch from Constantine Dymnikov which implements
+	  Clone() for the thing factory.
 	- PK removed the csws dependency from the Viewmesh and Picview Jamfiles.
 2-Jan-2005
 	- res made some more fixes to GL text drawing, among it the use of

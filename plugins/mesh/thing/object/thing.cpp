@@ -983,6 +983,12 @@ csPtr<csThingStatic> csThingStatic::CloneStatic ()
   return csPtr<csThingStatic> (clone);
 }
 
+csPtr<iMeshObjectFactory> csThingStatic::Clone ()
+{
+  csRef<csThingStatic> clone=CloneStatic ();
+  return csPtr<iMeshObjectFactory> (clone);
+}
+
 void csThingStatic::HardTransform (const csReversibleTransform &t)
 {
   int i;
@@ -3024,3 +3030,4 @@ bool csThingObjectType::eiConfig::GetOptionDescription (
 }
 
 //---------------------------------------------------------------------------
+
