@@ -103,7 +103,7 @@ LFLAGS.debug=-g
 LFLAGS.profile=-pg
 
 # Flags for the linker which are used when building a shared library.
-LFLAGS.DLL=
+LFLAGS.DLL=-Llibs/cssys/djgpp/libs/libpng -Llibs/cssys/djgpp/libs/libjpeg -Llibs/cssys/djgpp/libs/zlib
 
 # System-dependent flags to pass to NASM
 NASMFLAGS.SYSTEM=-f coff -DEXTERNC_UNDERSCORE
@@ -144,7 +144,7 @@ endif # ifeq ($(MAKESECTION),defines)
 ifeq ($(MAKESECTION),postdefines)
 
 # How to make a shared AKA dynamic library
-DO.SHARED.PLUGIN.CORE = dxe2gen -o $@ $(^^) $(L^) -U -E $(patsubst %.dxe,%,$(notdir $@))_GetClassTable -E djgpp $(LFLAGS.DLL) $(LFLAGS.L)$(OUT)
+DO.SHARED.PLUGIN.CORE = dxe2gen -o $@ $(^^) $(L^) -U -E $(patsubst %.dxe,%,$(notdir $@))_ -E djgpp $(LFLAGS.DLL) $(LFLAGS.L)$(OUT)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -161,6 +161,7 @@ ifeq ($(MAKESECTION)/$(ROOTCONFIG),rootdefines/config)
 
 #SYSCONFIG=cmd /E:8192 /C libs\cssys\djgpp\dosconf.bat
 SYSCONFIG=command /E:8192 /C libs\cssys\djgpp\dosconf.bat
+#SYSCONFIG=libs\cssys\djgpp\dosconf.bat
 # Check if "echo" executable is not installed (thus using dumb COMMAND.COM's echo)
 ifeq ($(shell echo ""),"")
 SYSCONFIG += $(NEWLINE)type libs\cssys\djgpp\dosconf.var>>config.tmp
