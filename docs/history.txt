@@ -21,6 +21,8 @@ The history order is reversed so that new features are at the top.
 	  latest changes.
 	- Updated several of the howto's with regards to recent global
 	  changes.
+	- Updated version of CS to 0.90 to indicate the imminent release
+	  of CS 0.90.
 18-Oct-2001
 	- Michael Voase shifted water and fire proctex down to the basement.
 	- Removed usage of cs_snprintf in cfgfile.cpp and
