@@ -17,6 +17,8 @@ chronological order.
 	  paradigm shift in the way this glue file is handled.  The present
 	  scheme is completely incompatible with the notion of project files.
 	  Details of the problem are avalable in cscript/csperl5/Jamfile.)
+	- Jorrit added an entry to the GL driver database so that stencil
+	  clipping is prefered for ATI Radeon style cards.
 15-Apr-2004
 	- Eric Sunshine added a blurb to the Unix and MacOS/X build
 	  instructions cautioning about potential problems caused by

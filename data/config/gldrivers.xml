@@ -155,7 +155,7 @@
 	<usecfg>3dfxhacks</usecfg>
       </applicable>
     </rule>
-    <rule description="GeForce settings: Texture Compression">
+    <rule description="GeForce setting: Texture Compression">
       <conditions>
 	<regexp string="renderer" pattern="^GeForce" />
       </conditions>
@@ -163,12 +163,20 @@
 	<usecfg>texturecompression</usecfg>
       </applicable>
     </rule>
-    <rule description="ATI r300+ settings">
+    <rule description="ATI r300+ setting: Texture Compression">
       <conditions>
 	<regexp string="renderer" pattern="^R\(ADEON\|adeon\) 9\(5\|6\|7\|8\)00" />
       </conditions>
       <applicable>
 	<usecfg>texturecompression</usecfg>
+      </applicable>
+    </rule>
+    <rule description="ATI Cards: Prefer Stencil">
+      <conditions>
+	<regexp string="renderer" pattern="^R\(ADEON\|adeon\)" />
+      </conditions>
+      <applicable>
+	<usecfg>preferstencil</usecfg>
       </applicable>
     </rule>
     <rule description="GeForce MX/Go class HW: Prefer Stencil">
