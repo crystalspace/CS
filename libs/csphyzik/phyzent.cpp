@@ -22,6 +22,7 @@
 #include "csphyzik/refframe.h"
 #include "csphyzik/mathutil.h"
 #include "csphyzik/solver.h"
+#include "csphyzik/debug.h"
 
 ctPhysicalEntity::ctPhysicalEntity() : RF( ctReferenceFrame::universe() )
 {
@@ -151,6 +152,19 @@ ctMatrix3 M;
 	RF.set_R( M );
 	return ctPhysicalEntity::get_state_size();
 }
+
+
+void ctPhysicalEntity::set_v( const ctVector3 &pv )
+{
+
+  v = pv; 
+}
+
+void ctPhysicalEntity::set_angular_v( const ctVector3 &pw )
+{ 
+  w = pw; 
+}
+
 
 //************ ctDynamicEntity
 
