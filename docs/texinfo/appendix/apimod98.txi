@@ -546,11 +546,13 @@ but you still have to be careful because @code{csRefArray<>} will automatically
 incref objects that are pushed on the array. In other cases you probably
 need to handle deletion manually.
 
-@samp{csVector} also allowed to override @code{Compare()} and
-@code{CompareKey()} in order to drive @code{QuickSort()},
-@code{FindSortedKey()}, @code{InsertSorted()}, and @code{FindKey()}.  This is
-no longer possible.  Instead you can do the following transformation.  First
-the old code:
+@samp{csVector} also allowed you to override @code{Compare()} and
+@code{CompareKey()}, and these methods were utilized automatically by
+@code{QuickSort()}, @code{FindSortedKey()}, @code{InsertSorted()}, and
+@code{FindKey()}.  @code{csArray<>}, on the other hand, accepts comparison
+functions as arguments to its sorting and searching methods, thus providing
+much greater flexibility than @samp{csVector}.  You can transform your
+@code{csVector}-based code as follows.  First, the old code:
 
 @example
 class MyVector : public csVector
@@ -575,7 +577,8 @@ public:
 @};
 @end example
 
-This could be transformed roughly to the following class:
+@noindent
+This can be transformed roughly to the following class:
 
 @example
 class MyVector : public csPDelArray<MyType>
@@ -592,8 +595,44 @@ public:
 @};
 @end example
 
-In the calls to @code{InsertSorted()}, @code{FindKey()}, etc., you then
-pass in one of the static functions to drive the comparison.
+@noindent
+The methods @code{csArray<>::Sort()} and @code{csArray<>::InsertSorted()}
+accept an optional comparison function (@code{MyVector::Compare()}, in the
+example).  If you do not provide a comparison function, then the array elements
+are compared against each other with @samp{<} and @samp{>}.  To use a custom
+comparison function, invoke these functions like this:
+
+@example
+MyVector v = @dots{};
+v.Sort(MyVector::Compare);
+@dots{}
+MyType o = @dots{};
+v.InsertSorted(o, MyVector::Compare);
+@end example
+
+@noindent
+The methods @code{csArray<>::FindKey()} and @code{csArray<>::FindSortedKey()}
+accept a comparison @dfn{functor} which is constructed from a comparision
+function (@code{MyVector::CompareKey()}, in the example) and the key for which
+you are searching.  Invoke these functions like this:
+
+@example
+int r;
+MyKey key = @dots{};
+MyVector v = @dots{};
+r = v.FindKey(csArrayCmp<MyType,MyKey>(key, MyVector::CompareKey));
+r = v.FindSortedKey(
+              csArrayCmp<MyType,MyKey>(key, MyVector::CompareKey));
+@end example
+
+@noindent
+In this example, the key's type is @samp{MyKey} (the type expected by
+@code{MyVector::CompareKey()}).  It is possible and often convenient for
+@samp{MyType} and @samp{MyKey} to be the same type (for instance, you might
+search for an integer in an array of integers).  When the types of
+@samp{MyType} and @samp{MyKey} differ, @samp{MyType} is often a composite type,
+and @samp{MyKey} is the type of one attribute of @samp{MyType}, however you are
+not in any way limited to this arrangements.
 
 @subheading Hash and Set Templates
 @cindex @code{csHash}
