@@ -1,0 +1,68 @@
+@c -*-texinfo-*-
+@node AWS Notebook, AWS Notebook Page, AWS Multiline Edit, AWS Signals and Actions Reference
+@subsubsection Notebook
+
+An notebooks type is ``Notebook''.
+
+@subsubheading Signals
+
+Notebooks do not send signals.
+
+@subsubheading Attributes
+
+Notebooks publish the following attributes.
+
+@table @code
+@item Style
+The following styles manipulate the appearance of the components frame:
+@itemize
+@item nbfsBump
+@item nbfsSimple
+@item nbfsRaised
+@item nbfsSunken
+@item nbfsFlat
+@item nbfsNone
+@end itemize
+
+@item Location
+This defines the location of the buttonbar. Valid values are
+@itemize
+@item nbTop
+@item nbBottom
+@end itemize
+
+@item Alpha
+The alpha of the applied background textures.
+@end table
+
+@subsubheading Skin Attributes
+
+Notebooks support the following skin attributes.
+
+@table @code
+@item Texture
+Texture used to draw the components background.
+
+@item OverlayTextureAlpha
+The default alpha value used when drawing the background texture.
+
+@end table
+
+@subsubheading Properties
+
+Notebooks publish the following properties.
+
+@table @code
+@item Style
+The frame style of the notebook
+
+@item Location
+The frame style of the notebook
+@end table
+
+@node AWS Notebook Page, , AWS Notebook, AWS Signals and Actions Reference
+@subsubsection Notebook Page
+
+An notebook pages type is ``Notebook Page''.
+
+... more to come after i return from work :)

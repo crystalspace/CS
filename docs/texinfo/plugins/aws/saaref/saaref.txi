@@ -18,6 +18,8 @@ standard @sc{aws} components.
 * AWS Textbox:: Textbox
 * AWS Image View:: Image View
 * AWS Multiline Edit:: Multiline Edit
+* AWS Notebook:: Notebook
+* AWS Notebook Page:: Notebook Page
 @end menu
 
 @importsss{plugins,aws,saaref,all.txi}
@@ -31,3 +33,4 @@ standard @sc{aws} components.
 @importsss{plugins,aws,saaref,textbox.txi}
 @importsss{plugins,aws,saaref,imagview.txi}
 @importsss{plugins,aws,saaref,mledit.txi}
+@importsss{plugins,aws,saaref,notebook.txi}

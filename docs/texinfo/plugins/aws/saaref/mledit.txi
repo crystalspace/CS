@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node AWS Multiline Edit, , AWS Image View, AWS Signals and Actions Reference
+@node AWS Multiline Edit, AWS Notebook, AWS Image View, AWS Signals and Actions Reference
 @subsubsection Multiline Edit
 
 A multi line edit controls type is ``Multiline Edit''.
