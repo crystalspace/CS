@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+18-Feb-2003
+	- Eric Sunshine applied Matze's fix for TO_INSTALL.CONFIG in demo.mak
+	  to the 0.96 branch.
 17-Feb-2003
 	- Christian Bayle made debian package build ok, but it remains some
 	  problems with csdemo that is not installed by make install and
