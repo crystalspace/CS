@@ -31,7 +31,7 @@
 #define byte unsigned char
 
 #ifndef WIN32
-  #include "xfermem.h"
+  #include "xfermem/xfermem.h"
 #endif
 
 #define         SBLIMIT                 32

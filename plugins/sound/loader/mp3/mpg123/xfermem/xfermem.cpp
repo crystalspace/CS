@@ -24,7 +24,7 @@
 #include <sys/select.h>
 #endif
 
-#include "mpg123.h"
+#include "../mpg123.h"
 
 #ifndef NOXFERMEM
 
