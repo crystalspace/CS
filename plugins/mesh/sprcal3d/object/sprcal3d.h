@@ -23,7 +23,6 @@
 #include "csutil/cscolor.h"
 #include "csutil/parray.h"
 #include "csutil/garray.h"
-#include "csutil/randomgen.h"
 #include "csutil/refarr.h"
 #include "csutil/hash.h"
 #include "csgeom/math3d.h"
@@ -780,7 +779,7 @@ public:
   int  GetActiveAnims(char *buffer,int max_length);
   void SetActiveAnims(const char *buffer,int anim_count);
   bool SetAnimAction(const char *name, float delayIn, float delayOut);
-  bool SetVelocity(float vel,csRandomGen *rng=NULL);
+  bool SetVelocity(float vel,csRandomGen *rng=0);
   void SetLOD(float lod);
   
   bool AttachCoreMesh(const char *meshname);
@@ -863,7 +862,7 @@ public:
 	return scfParent->SetAnimAction(name,delayIn,delayOut);
     }
 
-    virtual bool SetVelocity(float vel,csRandomGen *rng=NULL)
+    virtual bool SetVelocity(float vel,csRandomGen *rng=0)
     {
 	return scfParent->SetVelocity(vel,rng);
     }
