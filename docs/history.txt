@@ -29,6 +29,21 @@ chronological order.
 	      signatures.
 	    - Rewrote the event-related section of apimod98.txi in order to
 	      clarify what was otherwise confused mumbo-jumbo.
+	- Eric Sunshine changed cspace.i so that it does a much more thorough
+	  job of restricting the portions of csString which it exports to the
+	  scripting side.  (All higher-level languages for which CS bindings
+	  exist already have powerful string classes, so we can safely export
+	  a bare-bones csString interface.)
+	- Eric Sunshine pared down the methods exported by cspace.i for
+	  csArray<csPluginRequest> to avoid problems with languages, such as
+	  Java, for which Swig does not correctly handle the case of both const
+	  and non-const versions of the same method.
+	- Eric Sunshine renamed csString::GetData() to toString() in javapre.i
+	  to be consistent with other Java classes from which a string
+	  representation can be extracted.
+	- Eric Sunshine fixed javapre.i and javapost.i so that they work
+	  correctly in the presence of the CS_MICRO_SWIG and CS_MINI_SWIG
+	  macros.
 8-Feb-2004
 	- Eric Sunshine corrected Reed Hedges' changes to evdefs.h so that they
 	  are correct for plain-C compilers.  This file is processed by non-C++

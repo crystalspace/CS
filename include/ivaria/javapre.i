@@ -76,6 +76,9 @@
 %rename(bitOrAssign) *::operator|=;
 %rename(bitXorAssign) *::operator^=;
 
+// csutil/csstring.h
+%rename(toString) csString::GetData() const;
+
 // csgeom/plane3.h
 %ignore csPlane3::Normal () const;
 
@@ -87,11 +90,13 @@
 
 // csgeom/transfrm.h
 %rename(mul2) csTransform::operator * (const csReversibleTransform &);
+#ifndef CS_MINI_SWIG
 %extend csReversibleTransform
 {
 	csTransform operator * (const csReversibleTransform & t) const
 		{ return *self * t; } 
 }
+#endif // CS_MINI_SWIG
 
 // iengine/camera.h
 %ignore iCamera::GetTransform () const;
