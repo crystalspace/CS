@@ -23,6 +23,7 @@
 #include "iutil/objref.h"
 
 class csReversibleTransform;
+class csPlane3;
 
 /**
  * If this flag is set then this portal will clip all geometry in
