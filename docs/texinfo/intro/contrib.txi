@@ -61,7 +61,13 @@ non-texture mapped @sc{3ds} objects.
 @item
 Boyan Hristov (@email{boyan_hristov@@newmail.ru})
 
-Boyan added a lightning plugin to CS.
+Boyan added a lightning plugin to CS. Boyan also worked on AWS where he
+added several features.
+
+@item
+Troy Chard (@email{troy.chard@@shaw.ca})
+
+Troy contributed several improvements to 3ds2lev.
 
 @item
 James Baicoianu (@email{james@@baicoianu.com})
