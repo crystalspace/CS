@@ -138,30 +138,31 @@ public:
  * event creation was needed.  Thus, the event pool was born, and
  * there are the events that reside within it.
  */
- class csPoolEvent : public csEvent {
-     // make csEventQueue and csEvent as a friend class
-     friend class csEventQueue;
-     friend class csEvent;
-     private:
-         // As per the XML pool, keep a reference to the pool container obejct
-         // and this also allows our overridden DecRef() to place the event back
-         // into the pool when users are done with it.
-         csRef<csEventQueue> pool;
+class csPoolEvent : public csEvent
+{
+  // make csEventQueue and csEvent as a friend class
+  friend class csEventQueue;
+  friend class csEvent;
+
+private:
+  // As per the XML pool, keep a reference to the pool container obejct
+  // and this also allows our overridden DecRef() to place the event back
+  // into the pool when users are done with it.
+  csRef<csEventQueue> pool;
  
-         // The next event in the pool, or null if the event is in use.
-         csPoolEvent *next;
+  // The next event in the pool, or null if the event is in use.
+  csPoolEvent *next;
  
-         // The 'real' DecRef() call that deletes the event, should in theory only be 
-         // called from the csEventQueue;
-         void Free() { csEvent::DecRef(); }
+  // The 'real' DecRef() call that deletes the event, should in theory only be 
+  // called from the csEventQueue;
+  void Free() { csEvent::DecRef(); }
  
-     public:
-         /// The constructor, this should only be called from within the csEventQueue
-         csPoolEvent(csEventQueue *q);
+public:
+  /// The constructor, this should only be called from within the csEventQueue
+  csPoolEvent(csEventQueue *q);
  
-         /// The DecRef() that places the event back into the pool at a ref count of 1
-         void DecRef();
- };
- 
+  /// The DecRef() that places the event back into the pool at a ref count of 1
+  void DecRef();
+};
 
 #endif // __CS_CSEVENT_H__

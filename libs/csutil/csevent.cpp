@@ -29,15 +29,17 @@ SCF_IMPLEMENT_IBASE_END
 
 typedef struct attribute_tag
 {
-  union {
+  union
+  {
     int32 Integer;
 	  uint32 Unsigned;
     double Double;
     char *String;
     bool Bool;
-	  csEvent *Event;
+    csEvent *Event;
   };
-  enum Type {
+  enum Type
+  {
     tag_int8,
     tag_uint8,
     tag_int16,
@@ -56,7 +58,7 @@ typedef struct attribute_tag
   ~attribute_tag() 
   { 
     if (type == tag_string) delete String; 
-	  if (type == tag_event) Event->DecRef();
+    if (type == tag_event) Event->DecRef();
   }
 } attribute;
 
@@ -64,30 +66,18 @@ char *GetTypeName(attribute::Type t)
 {
   switch (t)
   {
-    case attribute::tag_int8:
-      return "int8";
-    case attribute::tag_uint8:
-      return "uint8";
-    case attribute::tag_int16:
-      return "int16";
-    case attribute::tag_uint16:
-      return "uint16";
-    case attribute::tag_int32:
-      return "int32";
-    case attribute::tag_uint32:
-      return "uint32";
-    case attribute::tag_float:
-      return "float";
-    case attribute::tag_double:
-      return "double";
-    case attribute::tag_bool:
-      return "bool";
-    case attribute::tag_string:
-      return "string";
-    case attribute::tag_databuffer:
-      return "databuffer";
-    case attribute::tag_event:
-      return "event";
+    case attribute::tag_int8: return "int8";
+    case attribute::tag_uint8: return "uint8";
+    case attribute::tag_int16: return "int16";
+    case attribute::tag_uint16: return "uint16";
+    case attribute::tag_int32: return "int32";
+    case attribute::tag_uint32: return "uint32";
+    case attribute::tag_float: return "float";
+    case attribute::tag_double: return "double";
+    case attribute::tag_bool: return "bool";
+    case attribute::tag_string: return "string";
+    case attribute::tag_databuffer: return "databuffer";
+    case attribute::tag_event: return "event";
   }
   return "unknown";
 }
@@ -258,7 +248,9 @@ bool csEvent::Add(const char *name, int32 v, bool force_boolean)
     object->Bool = v;
   }
   else
+  {
     object->Integer = v;
+  }
   csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
   if (!v1) 
   {
@@ -326,7 +318,9 @@ bool csEvent::Add(const char *name, bool v, bool force_boolean)
     object->Integer = v;
   }
   else
+  {
     object->Bool = v;
+  }
   csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
   if (!v1) 
   {
@@ -619,7 +613,9 @@ bool csEvent::Remove(const char *name, int index)
             object->Event->DecRef();
           }
           else
+	  {
             delete object;
+	  }
         }
         count--;
       }
@@ -644,7 +640,9 @@ bool csEvent::Remove(const char *name, int index)
           object->Event->DecRef();
         }
         else
+	{
           delete object;
+	}
         count--;
         return true;
       }
@@ -706,7 +704,8 @@ bool csEvent::Print(int level)
         {
           IndentLevel(level); printf ("------\n");
           IndentLevel(level); printf ("Name: %s\n", iter.GetKey());
-          IndentLevel(level); printf (" Datatype: %s\n",  GetTypeName(object->type));
+          IndentLevel(level); printf (" Datatype: %s\n",
+	  	GetTypeName(object->type));
           if (object->type == attribute::tag_event)
           {
             if (strcmp("_parent", iter.GetKey()) != 0)
@@ -715,20 +714,26 @@ bool csEvent::Print(int level)
               object->Event->Print(level+1);
             }
           }
-          if ((object->type == attribute::tag_int8) || (object->type == attribute::tag_uint8)
-            || (object->type == attribute::tag_int16) || (object->type == attribute::tag_uint16)
-            || (object->type == attribute::tag_int32) || (object->type == attribute::tag_uint32))
+          if ((object->type == attribute::tag_int8)
+	  	|| (object->type == attribute::tag_uint8)
+		|| (object->type == attribute::tag_int16)
+		|| (object->type == attribute::tag_uint16)
+		|| (object->type == attribute::tag_int32)
+		|| (object->type == attribute::tag_uint32))
           {
             IndentLevel(level); printf (" Value: %ld\n", object->Integer);
           }
           
-          if ((object->type == attribute::tag_float) || (object->type == attribute::tag_double))
+          if ((object->type == attribute::tag_float)
+	  	|| (object->type == attribute::tag_double))
           {
-            IndentLevel(level); printf (" Value: %f\n", object->Double);
+            IndentLevel(level);
+	    printf (" Value: %f\n", object->Double);
           }
           if (object->type == attribute::tag_bool)
           {
-            IndentLevel(level); printf (" Value: %s\n", object->Bool ? "true" : "false");
+            IndentLevel(level);
+	    printf (" Value: %s\n", object->Bool ? "true" : "false");
           }
           if (object->type == attribute::tag_databuffer)
           {
@@ -788,10 +793,12 @@ uint32 csEvent::FlattenSizeCrystal()
               // 1 for type id
               // 4 for data length
               // 1 for data
-              size += 7 + strlen(iter.GetKey()) + object->Event->FlattenSize(CS_CRYSTAL_PROTOCOL);
+              size += 7 + strlen(iter.GetKey())
+	      	+ object->Event->FlattenSize(CS_CRYSTAL_PROTOCOL);
             }
           }
-          if ((object->type == attribute::tag_int8) || (object->type == attribute::tag_uint8))
+          if ((object->type == attribute::tag_int8)
+	  	|| (object->type == attribute::tag_uint8))
           {
             // 2 for name length
             // X for name string
@@ -799,7 +806,8 @@ uint32 csEvent::FlattenSizeCrystal()
             // 1 for data
             size += 4 + strlen(iter.GetKey());
           }
-          if ((object->type == attribute::tag_int16) || (object->type == attribute::tag_uint16))
+          if ((object->type == attribute::tag_int16)
+	  	|| (object->type == attribute::tag_uint16))
           {
             // 2 for name length
             // X for name string
@@ -807,8 +815,9 @@ uint32 csEvent::FlattenSizeCrystal()
             // 2 for data
             size += 5 + strlen(iter.GetKey());
           }
-          if ((object->type == attribute::tag_int32) || (object->type == attribute::tag_uint32)
-            || (object->type == attribute::tag_float))
+          if ((object->type == attribute::tag_int32)
+	  	|| (object->type == attribute::tag_uint32)
+		|| (object->type == attribute::tag_float))
           {
             // 2 for name length
             // X for name string
@@ -885,16 +894,16 @@ bool csEvent::Flatten(char * buffer, int format)
 
 bool csEvent::FlattenMuscle(char * buffer)
 {
-// Format:  0. Protocol revision number (4 bytes, always set to MUSCLE_PROTOCOL)
-   //          1. 'what' code (4 bytes)
-   //          2. Number of entries (4 bytes)
-   //          3. Entry name length (4 bytes)
-   //          4. Entry name string (flattened String)
-   //          5. Entry type code (4 bytes)
-   //          6. Entry data length (4 bytes)
-   //          7. Entry data (n bytes)
-   //          8. loop to 3 as necessary
-
+  // Format:  0. Protocol revision number (4 bytes, always set to
+  // MUSCLE_PROTOCOL)
+  //          1. 'what' code (4 bytes)
+  //          2. Number of entries (4 bytes)
+  //          3. Entry name length (4 bytes)
+  //          4. Entry name string (flattened String)
+  //          5. Entry type code (4 bytes)
+  //          6. Entry data length (4 bytes)
+  //          7. Entry data (n bytes)
+  //          8. loop to 3 as necessary
   csMemFile b(buffer,FlattenSizeMuscle());
 
   uint32 v = CS_MUSCLE_PROTOCOL;
@@ -1225,39 +1234,40 @@ bool csEvent::UnflattenCrystal(const char *buffer, uint32 length)
         break;
       case CS_DATATYPE_STRING: 
         {
-        b.Read((char *)&ui32, sizeof(uint32));
-        convert_endian(ui32);
-        char *str = new char[ui32+1];
-        b.Read(str, ui32);
-        str[ui32]=0; // null terminate
-        Add(name, str);
+          b.Read((char *)&ui32, sizeof(uint32));
+          convert_endian(ui32);
+          char *str = new char[ui32+1];
+          b.Read(str, ui32);
+          str[ui32]=0; // null terminate
+          Add(name, str);
         }
         break;
       case CS_DATATYPE_DATABUFFER:
         {
-        b.Read((char *)&ui32, sizeof(uint32));
-        convert_endian(ui32);
-        char *data = new char[ui32];
-        b.Read(data, ui32);
-        Add(name, data);
+          b.Read((char *)&ui32, sizeof(uint32));
+          convert_endian(ui32);
+          char *data = new char[ui32];
+          b.Read(data, ui32);
+          Add(name, data);
         }
         break;
       case CS_DATATYPE_EVENT:
         {
-        b.Read((char *)&ui32, sizeof(uint32));
-        convert_endian(ui32);
-        csPoolEvent *me = STATIC_CAST(csPoolEvent *, this);
-        if (me)
-        {
-          csRef<iEvent> e = me->pool->CreateEvent(0);
-          Add(name, e);
-          e->Unflatten(buffer+b.GetPos(), ui32);
-        } else
-        {
-          csEvent *e = new csEvent();
-          Add(name, STATIC_CAST(iEvent *,e));
-          e->Unflatten(buffer+b.GetPos(), ui32);
-        }
+          b.Read((char *)&ui32, sizeof(uint32));
+          convert_endian(ui32);
+          csPoolEvent *me = STATIC_CAST(csPoolEvent *, this);
+          if (me)
+          {
+            csRef<iEvent> e = me->pool->CreateEvent(0);
+            Add(name, e);
+            e->Unflatten(buffer+b.GetPos(), ui32);
+          }
+	  else
+          {
+            csEvent *e = new csEvent();
+            Add(name, STATIC_CAST(iEvent *,e));
+            e->Unflatten(buffer+b.GetPos(), ui32);
+          }
         }
         break;
       default:
@@ -1302,5 +1312,7 @@ void csPoolEvent::DecRef()
     Command.Info = 0;
   }
   else
+  {
     scfRefCount--;
+  }
 }

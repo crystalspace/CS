@@ -65,7 +65,7 @@ uint32 csEventQueue::CountPool()
   while (e)
   {
     count++;
-	e = e->next;
+    e = e->next;
   }
   return count;
 }
@@ -100,7 +100,7 @@ again:
     Unlock ();
     Resize (Length * 2); // Normally queue should not be more than half full.
     goto again;
-  } /* endif */
+  }
 
   EventQueue [evqHead] = Event;
   evqHead = newHead;
@@ -118,7 +118,7 @@ csPtr<iEvent> csEventQueue::Get ()
       evqTail = 0;
     ev = (iEvent*)EventQueue [oldTail];
     Unlock ();
-  } /* endif */
+  }
   return ev;
 }
 
@@ -158,8 +158,8 @@ void csEventQueue::Resize (size_t iLength)
       EventQueue [evqHead++] = oldEventQueue [oldTail++];
       if (oldTail == oldLength)
         oldTail = 0;
-    } /* endwhile */
-  } /* endif */
+    }
+  }
 
   delete[] oldEventQueue;
   Unlock ();

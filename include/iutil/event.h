@@ -159,7 +159,6 @@ struct iEvent : public iBase
   virtual uint32 FlattenSize(int format = CS_CRYSTAL_PROTOCOL) = 0;
   virtual bool Flatten(char *buffer, int format = CS_CRYSTAL_PROTOCOL) = 0;
   virtual bool Unflatten(const char *buffer, uint32 length) = 0;
-
 };
 
 /** \page EventFlow Overall structure of the basic event flow in Crystal Space
@@ -199,7 +198,6 @@ struct iEvent : public iBase
  * and deliver events immediately in a prioritizied chain to specific plugins
  * which request the categories.
  */
-
 SCF_VERSION (iEventPlug, 0, 0, 1);
 
 /**
