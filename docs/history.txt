@@ -13,6 +13,13 @@ chronological order.
 	  cursor plugin.
 	- Eric Sunshine fixed copy/paste error in the new partphys_ode.make
 	  which broke the makefile.
+	- Eric Sunshine fixed awsScrollBar::Setup() so that it positions the
+	  components of the horizontal scrollbar properly.  Previously, it was
+	  using magic constants (2, 4, 6) to adjust the component positions,
+	  but these constants were incorrect even for the default skin.
+	  Positioning of the components is now completely independent of magic
+	  constants, and is also entirely consistent with the way the
+	  components of the vertical scrollbar are positioned.
 13-Jan-2004
 	- Jorrit added a version of Top() to csArray that is not const.
 	- Jorrit multiplied the values in the two glPolygonOffset() calls
