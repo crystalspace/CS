@@ -10,14 +10,12 @@
 #include "iutil/eventh.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
-#include "iengine/engine.h"
-#include "iengine/sector.h"
 
-class csVosA3DL : public iComponent, iEventHandler, iVosA3DL
+class csVosA3DL : public iComponent, public iEventHandler, public iVosA3DL
 {
 private:
     csRef<iEventQueue> eventq;
-    csRef<iObjectRegistry> objreg;
+    iObjectRegistry *objreg;
 
     VOS::vRef<VOS::Site> localsite;
 public:

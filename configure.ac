@@ -248,14 +248,18 @@ AC_PROG_MAKE_SET
 # MSVC, Mingw/MSYS, and Cygwin users.
 #------------------------------------------------------------------------------
 AC_CHECK_TOOLS([CSLIBS_CONFIG], [cslibs-config])
-AS_IF([test -n "$CSLIBS_CONFIG"],
-    [CSLIBS_CFLAGS=`AC_RUN_LOG([$CSLIBS_CONFIG --cflags])`
-    CSLIBS_LFLAGS=`AC_RUN_LOG([$CSLIBS_CONFIG --lflags])`
-    CSLIBS_BINPATH=`AC_RUN_LOG([$CSLIBS_CONFIG --binpath])`
-    CFLAGS="$CFLAGS $CSLIBS_CFLAGS"
-    CPPFLAGS="$CPPFLAGS $CSLIBS_CFLAGS"
-    LDFLAGS="$LDFLAGS $CSLIBS_LFLAGS"
-    PATH="$CSLIBS_BINPATH:$PATH"])
+AC_CACHE_CHECK([for cslibs package], [cs_cv_cslibs],
+    [AS_IF([test -n "$CSLIBS_CONFIG"],
+	[cs_cv_cslibs=yes
+	cs_cv_cslibs_cflags=`AC_RUN_LOG([$CSLIBS_CONFIG --cflags])`
+	cs_cv_cslibs_lflags=`AC_RUN_LOG([$CSLIBS_CONFIG --lflags])`
+	cs_cv_cslibs_binpath=`AC_RUN_LOG([$CSLIBS_CONFIG --binpath])`],
+	[cs_cv_cslibs=no])])
+AS_IF([test $cs_cv_cslibs = yes],
+    [CFLAGS="$CFLAGS $cs_cv_cslibs_cflags"
+    CPPFLAGS="$CPPFLAGS $cs_cv_cslibs_cflags"
+    LDFLAGS="$LDFLAGS $cs_cv_cslibs_lflags"
+    PATH="$cs_cv_cslibs_binpath:$PATH"])
 
 
 
@@ -431,49 +435,54 @@ AS_IF([test -n "$PERL" && test "$with_perl" != no],
     [AC_CACHE_CHECK([for perl ExtUtils::Embed module], [cs_cv_perl_mod_embed],
 	[AS_IF([AC_RUN_LOG([$PERL -MExtUtils::Embed -e 0 1>&2])],
 	    [cs_cv_perl_mod_embed=yes], [cs_cv_perl_mod_embed=no])])
+
     AS_IF([test $cs_cv_perl_mod_embed = yes],
 	[CS_BUILD_PROPERTY([PERL5.EXTUTILS.EMBED.AVAILABLE], [yes])
-
 	AC_CACHE_CHECK([for perl DynaLoader module],
 	    [cs_cv_perl_mod_dynaloader],
 	    [AS_IF([AC_RUN_LOG([$PERL -MDynaLoader -e 0 1>&2])],
 		[cs_cv_perl_mod_dynaloader=yes],
 		[cs_cv_perl_mod_dynaloader=no])])
 	AS_IF([test $cs_cv_perl_mod_dynaloader = yes],
-	    [CS_BUILD_PROPERTY([PERL5.DYNALOADER.AVAILABLE], [yes])])
-
-	cs_cv_perl_cflags=`AC_RUN_LOG([$PERL -MExtUtils::Embed -e ccopts])`
-	cs_cv_perl_lflags=`AC_RUN_LOG([$PERL -MExtUtils::Embed -e ldopts])`],
-
-	# ExtUtils::Embed absent.
-	[AC_MSG_NOTICE([Recommend you install a recent release of Perl 5.])
+	    [CS_BUILD_PROPERTY([PERL5.DYNALOADER.AVAILABLE], [yes])])],
+	[# ExtUtils::Embed absent.
+	AC_MSG_NOTICE([Recommend you install a recent release of Perl 5.])
 	AC_MSG_NOTICE([http://www.perl.org/])
-
 	AC_CACHE_CHECK([for perl Config module], [cs_cv_perl_mod_config],
 	    [AS_IF([AC_RUN_LOG([$PERL -MConfig -e 0 1>&2])],
-		[cs_cv_perl_mod_config=yes], [cs_cv_perl_mod_config=no])])
-	AS_IF([test $cs_cv_perl_mod_config = yes],
-	    [cs_perl_core=`$PERL -MConfig -e 'print $Config{sitearch}'`
-	    cs_perl_core="${cs_perl_core}/CORE"
-	    cs_cv_perl_cflags=`$PERL -MConfig -e 'print $Config{ccflags}'`
-	    cs_cv_perl_cflags="${cs_cv_perl_cflags} -I${cs_perl_core}"
-	    cs_cv_perl_lflags=`$PERL -MConfig -e \
-		'print $Config{ldflags}, " ", $Config{libs}'`
-	    cs_cv_perl_lflags="${cs_cv_perl_lflags} -L${cs_perl_core}"],
-	    [cs_perl_core=`$PERL -V:sitearch | \
-		$PERL -e '<STDIN> =~ m/\x27(.*)\x27/; print $1'`
-	    cs_perl_core="${cs_perl_core}/CORE"
-	    cs_cv_perl_cflags=`$PERL -V:ccflags | \
-		$PERL -e '<STDIN> =~ m/\x27(.*)\x27/; print $1'`
-	    cs_cv_perl_cflags="${cs_cv_perl_cflags} -I${cs_perl_core}"
-	    cs_cv_perl_lflags=`$PERL -V:ldflags | \
-		$PERL -e '<STDIN> =~ m/\x27(.*)\x27/; print $1'`
-	    cs_cv_perl_lflags="${cs_cv_perl_lflags} `$PERL -V:libs | \
-		$PERL -e '<STDIN> =~ m/\x27(.*)\x27/; print $1'`"
-	    cs_cv_perl_lflags="${cs_cv_perl_lflags} -L${cs_perl_core}"])])
+		[cs_cv_perl_mod_config=yes], [cs_cv_perl_mod_config=no])])])
 
-    cs_cv_perl_cflags=CS_TRIM([$cs_cv_perl_cflags])
-    cs_cv_perl_lflags=CS_TRIM([$cs_cv_perl_lflags])
+    AS_VAR_SET_IF([cs_cv_perl_cflags], [],
+	[AS_IF([test $cs_cv_perl_mod_embed = yes],
+	    [cs_cv_perl_cflags=`AC_RUN_LOG(
+		[$PERL -MExtUtils::Embed -e ccopts])`
+	    cs_cv_perl_lflags=`AC_RUN_LOG(
+		[$PERL -MExtUtils::Embed -e ldopts])`],
+	    [AS_IF([test $cs_cv_perl_mod_config = yes],
+		[cs_perl_core=`AC_RUN_LOG(
+		    [$PERL -MConfig -e 'print $Config{archlib}'])`
+		cs_perl_core="${cs_perl_core}/CORE"
+		cs_cv_perl_cflags=`AC_RUN_LOG(
+		    [$PERL -MConfig -e 'print $Config{ccflags}'])`
+		cs_cv_perl_cflags="${cs_cv_perl_cflags} -I${cs_perl_core}"
+		cs_cv_perl_lflags=`AC_RUN_LOG([$PERL -MConfig -e \
+		    'print $Config{ldflags}, " ", $Config{libs}'])`
+		cs_cv_perl_lflags="${cs_cv_perl_lflags} -L${cs_perl_core}"],
+		[cs_perl_core=`AC_RUN_LOG([$PERL -V:archlib | \
+		    $PERL -e '<STDIN> =~ m/\x27(.*)\x27/; print $1'])`
+		cs_perl_core="${cs_perl_core}/CORE"
+		cs_cv_perl_cflags=`AC_RUN_LOG([$PERL -V:ccflags | \
+		    $PERL -e '<STDIN> =~ m/\x27(.*)\x27/; print $1'])`
+		cs_cv_perl_cflags="${cs_cv_perl_cflags} -I${cs_perl_core}"
+		cs_cv_perl_lflags=`AC_RUN_LOG([$PERL -V:ldflags | \
+		    $PERL -e '<STDIN> =~ m/\x27(.*)\x27/; print $1'])`
+		cs_perl_lflags_tmp=`AC_RUN_LOG([$PERL -V:libs | \
+		    $PERL -e '<STDIN> =~ m/\x27(.*)\x27/; print $1'])`
+		cs_cv_perl_lflags="${cs_cv_perl_lflags} ${cs_perl_lflags_tmp}
+		    -L${cs_perl_core}"])])
+	cs_cv_perl_cflags=CS_TRIM([$cs_cv_perl_cflags])
+	cs_cv_perl_lflags=CS_TRIM([$cs_cv_perl_lflags])])
+
     AS_IF([test -n "$cs_cv_perl_cflags$cs_cv_perl_lflags"],
 	[CS_CHECK_BUILD([if Perl SDK is usable], [cs_cv_perl],
 	    [AC_LANG_PROGRAM(
@@ -1547,12 +1556,16 @@ CS_CHECK_LIBOPENAL
 # Check for FreeType2.
 #------------------------------------------------------------------------------
 AC_CHECK_TOOLS([FT2CONFIG], [freetype-config])
-AS_IF([test -n "$FT2CONFIG"],
-    [cs_cv_libft2=yes
-    cs_cv_libft2_cflags=`AC_RUN_LOG([$FT2CONFIG --cflags])`
-    cs_cv_libft2_lflags=''
-    cs_cv_libft2_libs=`AC_RUN_LOG([$FT2CONFIG --libs])`
-    CS_CHECK_BUILD([if freetype2 is sufficiently recent], [cs_cv_ft2_recent],
+AC_CACHE_CHECK([for FreeType2], [cs_cv_libft2],
+    [AS_IF([test -n "$FT2CONFIG"],
+	[cs_cv_libft2=yes
+	cs_cv_libft2_cflags=`AC_RUN_LOG([$FT2CONFIG --cflags])`
+	cs_cv_libft2_lflags=''
+	cs_cv_libft2_libs=`AC_RUN_LOG([$FT2CONFIG --libs])`],
+	[cs_cv_libft2=no])])
+
+AS_IF([test $cs_cv_libft2 = yes],
+    [CS_CHECK_BUILD([if freetype2 is sufficiently recent], [cs_cv_ft2_recent],
 	[AC_LANG_PROGRAM(
 	    [[#include <ft2build.h>
 	    #include FT_INTERNAL_OBJECTS_H
@@ -1631,29 +1644,38 @@ AS_IF([test $cs_cv_libcal3d = yes],
 # Check for SDL.
 #------------------------------------------------------------------------------
 AC_CHECK_TOOLS([SDLCONFIG], [sdl12-config sdl11-config sdl-config])
-AS_IF([test -n "$SDLCONFIG"],
-    [cs_cv_libsdl=yes
-    cs_cv_libsdl_cflags=`AC_RUN_LOG([$SDLCONFIG --cflags])`
-    cs_cv_libsdl_lflags=''
-    cs_cv_libsdl_libs=`AC_RUN_LOG([$SDLCONFIG --libs])`
-    CS_EMIT_BUILD_RESULT([cs_cv_libsdl], [SDL])
+AC_CACHE_CHECK([for SDL], [cs_cv_libsdl],
+    [AS_IF([test -n "$SDLCONFIG"],
+	[cs_cv_libsdl=yes
+	cs_cv_libsdl_cflags=`AC_RUN_LOG([$SDLCONFIG --cflags])`
+	cs_cv_libsdl_lflags=''
+	cs_cv_libsdl_libs=`AC_RUN_LOG([$SDLCONFIG --libs])`],
+	[cs_cv_libsdl=no])])
+AS_IF([test $cs_cv_libsdl = yes],
+    [CS_EMIT_BUILD_RESULT([cs_cv_libsdl], [SDL])
     CS_MAKEFILE_PROPERTY([HAS_SDL], [yes])])
+
+
 
 #------------------------------------------------------------------------------
 # Check for VOS.
 #------------------------------------------------------------------------------
 AC_CHECK_TOOLS([PKGCONFIG], [pkg-config])
-AS_IF([test -n "$SDLCONFIG"],
-	AC_MSG_CHECKING([for VOS])
-	AS_IF([$PKGCONFIG --exists libmetaobject_a3dl],
+AC_CACHE_CHECK([for VOS], [cs_cv_libvos],
+    [AS_IF([test -n "$PKGCONFIG"],
+	[AS_IF([AC_RUN_LOG([$PKGCONFIG --exists libmetaobject_a3dl])],
 	    [cs_cv_libvos=yes
-	    cs_cv_libvos_cflags=`AC_RUN_LOG([$PKGCONFIG --cflags libmetaobject_a3dl libmetaobject_misc])`
+	    cs_cv_libvos_cflags=`AC_RUN_LOG(
+		[$PKGCONFIG --cflags libmetaobject_a3dl libmetaobject_misc])`
 	    cs_cv_libvos_lflags=''
-	    cs_cv_libvos_libs=`AC_RUN_LOG([$PKGCONFIG --libs libmetaobject_a3dl libmetaobject_misc])`
-	    CS_EMIT_BUILD_RESULT([cs_cv_libvos], [VOS])
-	    CS_MAKEFILE_PROPERTY([HAS_VOS], [yes])
-        AC_MSG_RESULT([yes])],
-        AC_MSG_RESULT([no])))
+	    cs_cv_libvos_libs=`AC_RUN_LOG(
+		[$PKGCONFIG --libs libmetaobject_a3dl libmetaobject_misc])`],
+	    [cs_cv_libvos=no])],
+	[cs_cv_libvos=no])])
+AS_IF([test $cs_cv_libvos = yes],
+    [CS_EMIT_BUILD_RESULT([cs_cv_libvos], [VOS])])
+
+
 
 #------------------------------------------------------------------------------
 # Check if Linux joystick API is present.

@@ -3,10 +3,6 @@
 
 #include "inetwork/vosa3dl.h"
 #include "iutil/objreg.h"
-#include "iutil/comp.h"
-#include "iutil/eventh.h"
-#include "iutil/event.h"
-#include "iutil/eventq.h"
 #include "iengine/engine.h"
 #include "iengine/sector.h"
 
@@ -14,7 +10,7 @@ class csVosSector : public iVosSector
 {
 private:
     char* url;
-    csRef<iObjectRegistry> objreg;
+    iObjectRegistry* objreg;
     csRef<iEngine> engine;
     csRef<iSector> sector;
     csVosA3DL* vosa3dl;

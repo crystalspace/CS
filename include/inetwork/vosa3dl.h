@@ -22,31 +22,29 @@
 
 #include "csutil/scf.h"
 #include "csutil/ref.h"
-
-struct iString;
-struct iSector;
-struct iMeshWrapper;
+#include "iengine/mesh.h"
+#include "iengine/sector.h"
 
 SCF_VERSION (iVosSector, 0, 1, 1);
 
 struct iVosSector : public iBase
 {
-    virtual void Load() = 0;
-    virtual csRef<iSector> GetSector() = 0;
+  virtual void Load() = 0;
+  virtual csRef<iSector> GetSector() = 0;
 };
 
 SCF_VERSION (iVosA3DL, 0, 1, 1);
 
 struct iVosA3DL : public iBase
 {
-    virtual csRef<iVosSector> GetSector(const char* s) = 0;
+  virtual csRef<iVosSector> GetSector(const char*) = 0;
 };
 
 SCF_VERSION (iVosObject3D, 0, 1, 1);
 
 struct iVosObject3D : public iBase
 {
-    virtual csRef<iMeshWrapper> GetMeshWrapper() = 0;
+  virtual csRef<iMeshWrapper> GetMeshWrapper() = 0;
 };
 
 #endif

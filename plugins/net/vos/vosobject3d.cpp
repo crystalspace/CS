@@ -1,8 +1,5 @@
 #include "cssysdef.h"
-#include "iengine/mesh.h"
-
 #include "vosobject3d.h"
-
 #include <vos/metaobjects/a3dl/a3dl.hh>
 
 using namespace VOS;
@@ -13,8 +10,14 @@ SCF_IMPLEMENT_IBASE_END
 
 /// csVosObject3D ///
 
+csVosObject3D::csVosObject3D()
+{
+    SCF_CONSTRUCT_IBASE (0);
+}
+
 csVosObject3D::~csVosObject3D()
 {
+    SCF_DESTRUCT_IBASE();
 }
 
 csRef<iMeshWrapper> csVosObject3D::GetMeshWrapper()
@@ -34,12 +37,17 @@ csMetaObject3D::csMetaObject3D(VobjectBase* superobject) : A3DL::Object3D(supero
     csvobj3d = new csVosObject3D();
 }
 
+csMetaObject3D::~csMetaObject3D()
+{
+    delete csvobj3d;
+}
+
 MetaObject* csMetaObject3D::new_csMetaObject3D(VobjectBase* superobject, const std::string& type)
 {
     return new csMetaObject3D(superobject);
 }
 
-void csMetaObject3D::setup(csVosA3DL* vosa3dl)
+void csMetaObject3D::setup(csVosA3DL* /*vosa3dl*/)
 {
 }
 

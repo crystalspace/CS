@@ -33,7 +33,9 @@ csVosA3DL::~csVosA3DL()
 
 csRef<iVosSector> csVosA3DL::GetSector(const char* s)
 {
-    return new csVosSector(objreg, this, s);
+    csRef<iVosSector> r;
+    r.AttachNew(new csVosSector(objreg, this, s));
+    return r;
 }
 
 bool csVosA3DL::Initialize (iObjectRegistry *o)
@@ -46,7 +48,7 @@ bool csVosA3DL::Initialize (iObjectRegistry *o)
     objreg = o;
     eventq = CS_QUERY_REGISTRY (objreg, iEventQueue);
     if (! eventq) return false;
-    eventq->RegisterListener (this, CSMASK_Nothing);
+    eventq->RegisterListener (this, CSMASK_FrameProcess);
 
     localsite.assign(new Site(true), false);
     localsite->addSiteExtension(new LocalSocketSiteExtension());
@@ -56,8 +58,10 @@ bool csVosA3DL::Initialize (iObjectRegistry *o)
 
 bool csVosA3DL::HandleEvent (iEvent &ev)
 {
-    if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess){
-        while(! mainThreadTasks.empty()) {
+    if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
+    {
+        while(! mainThreadTasks.empty())
+	{
             Task* t = mainThreadTasks.pop();
             t->doTask();
             delete t;
@@ -65,5 +69,3 @@ bool csVosA3DL::HandleEvent (iEvent &ev)
     }
     return false;
 }
-
-

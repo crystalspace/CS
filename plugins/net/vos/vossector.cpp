@@ -35,12 +35,12 @@ LoadSectorTask::~LoadSectorTask()
 void LoadSectorTask::doTask()
 {
     vRef<A3DL::Sector> sec = meta_cast<A3DL::Sector>(Vobject::findObjectFromRoot(url));
-    for(ChildListIterator ci = sec->getChildren(); ci.hasMore(); ci++) {
+    for (ChildListIterator ci = sec->getChildren(); ci.hasMore(); ci++)
+    {
         vRef<csMetaObject3D> obj3d = meta_cast<csMetaObject3D>((*ci)->getChild());
         std::cout << "looking at " << (*ci)->getChild()->getURLstr() << " " << obj3d.isValid() << std::endl;
-        if(obj3d.isValid()) {
+        if(obj3d.isValid())
             obj3d->setup(vosa3dl);
-        }
     }
 }
 
@@ -48,6 +48,7 @@ void LoadSectorTask::doTask()
 
 csVosSector::csVosSector(csRef<iObjectRegistry> o, csVosA3DL* va, const char* s)
 {
+    SCF_CONSTRUCT_IBASE(0);
     objreg = o;
     url = strdup(s);
     vosa3dl = va;
@@ -57,8 +58,8 @@ csVosSector::csVosSector(csRef<iObjectRegistry> o, csVosA3DL* va, const char* s)
 
 csVosSector::~csVosSector()
 {
-    SCF_DESTRUCT_IBASE();
     free(url);
+    SCF_DESTRUCT_IBASE();
 }
 
 void csVosSector::Load()
@@ -70,4 +71,3 @@ csRef<iSector> csVosSector::GetSector()
 {
     return sector;
 }
-

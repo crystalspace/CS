@@ -2,16 +2,8 @@
 #define _CSVOSOBJECT3D_H_
 
 #include <vos/metaobjects/a3dl/object3d.hh>
-
 #include "inetwork/vosa3dl.h"
-#include "iutil/objreg.h"
-#include "iutil/comp.h"
-#include "iutil/eventh.h"
-#include "iutil/event.h"
-#include "iutil/eventq.h"
-#include "iengine/engine.h"
-#include "iengine/sector.h"
-
+#include "iengine/mesh.h"
 #include "csvosa3dl.h"
 
 class csVosObject3D : public iVosObject3D
@@ -22,6 +14,7 @@ private:
 public:
     SCF_DECLARE_IBASE;
 
+    csVosObject3D();
     virtual ~csVosObject3D();
 
     virtual csRef<iMeshWrapper> GetMeshWrapper();
@@ -35,6 +28,7 @@ protected:
     csVosObject3D* csvobj3d;
 public:
     csMetaObject3D(VOS::VobjectBase* superobject);
+    virtual csMetaObject3D();
 
     static VOS::MetaObject* new_csMetaObject3D(VOS::VobjectBase* superobject, const std::string& type);
 

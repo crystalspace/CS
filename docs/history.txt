@@ -14,6 +14,57 @@ chronological order.
 	  flickering but it helps considerably.
 	- Neil Mosafi changed the custom cursor plugin to use iReporter instead
 	  of a comment and also to use csHash<> instead of csHashMapReversible
+	- Eric Sunshine fixed memory leak in csVosA3DL::GetSector().  It was
+	  assigning a 'new' csVosSector directly to a csRef<>, thus leaking a
+	  reference.
+	- Eric Sunshine fixed a number of cases in the csvosa3dl plugin where
+	  it was accidentally and incorrectly using private inheritance.  Note
+	  that "class Foo : public Bar, Cow, Smoo" is not the same as "class
+	  Foo : public Bar, public Cow, public Smoo".
+	- Eric Sunshine fixed csVosA3DL and csVosSector so that they do not use
+	  csRef<> for storing iObjectRegistry, since this tends to lead to
+	  circular reference loops.
+	- Eric Sunshine removed numerous unnecessary #includes from csvosa3dl
+	  plugin.
+	- Eric Sunshine fixed bug in csVosObject3D.  It failed to invoke
+	  SCF_CONSTRUCT_IBASE() and SCF_DESTRUCT_EMBEDDED_IBASE().
+	- Eric Sunshine fixed bug in csMetaObject3D.  It was leaking a
+	  csVosObject3D.
+	- Eric Sunshine fixed bug in csVosSector.  It failed to invoke
+	  SCF_CONSTRUCT_IBASE().
+	- Eric Sunshine added a makefile for the csvosa3dl plugin.
+	- Eric Sunshine fixed bug in csvosa3dl Jamfile.  It was incorrectly
+	  assigning $(COMPILER.CFLAGS) to the global C++FLAGS, which impacts
+	  _all_ modules.  Presumably, this was done to work around some
+	  unspecified issue, but it was an incorrect solution.  (Peter, if you
+	  can provide information about the issue you were dealing with,
+	  perhaps we can devise a more appropriate solution.)
+	- Eric Sunshine fixed vosa3dl.h so that it #includes headers for
+	  classes used as template arguments, rather than simply forward
+	  declaring them.  This will allow it to work correctly with older
+	  compilers, such as the Borland compiler, which must see the entire
+	  class delcaration before the class is used as a template argument.
+	- Eric Sunshine protected vostest.mak via a conditional so that the
+	  vostest application is built only if VOS has been detected.
+	- Eric Sunshine fixed bad copy/paste error in the configure.ac VOS
+	  check, where it was testing against $(SDLCONFIG), thus VOS would only
+	  be found if SDL was also present.
+	- Eric Sunshine fixed incorrect m4 quoting in the VOS configure.ac
+	  check.
+	- Eric Sunshine changed the VOS configure.ac test so that it no longer
+	  unnecessarily emits the HAS_VOS makefile property.
+	- Eric Sunshine added cache support to the VOS, SDL, FreeType2, Perl,
+	  and cslibs configure.ac checks.
+	- Eric Sunshine fixed bug in configure.ac's Perl SDK check where it was
+	  accessing Config.pm's `sitearch' value, when it should have been
+	  accessing `archlib'.
+	- Eric Sunshine fixed configure.ac's Perl SDK check so that it wraps
+	  all invocations of external programs inside AC_RUN_LOG().
+	  Previously, it only wrapped some such invocations.
+	- Eric Sunshine fixed bug in sprcal3d.mak.  It neglected to add
+	  $(CAL3D.LFLAGS) to LIBS.EXE for static build.  Also updated makefile
+	  to new style in which object files are placed in custom subdirectory
+	  of $(OUT) rather than polluting $(OUT).
 12-Jan-2004
 	- Peter Amstutz added a preliminary version of a VOS 
 	  plugin for CS, along with a test program.  The configure script

@@ -1,5 +1,8 @@
+# Application target only valid if module is listed in PLUGINS.
+ifneq (,$(findstring net/vos,$(PLUGINS) $(PLUGINS.DYNAMIC)))
+
 # Application description
-DESCRIPTION.vostest = Crystal Space VOS test
+DESCRIPTION.vostest = Virtual Object System test
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -29,10 +32,10 @@ ifeq ($(MAKESECTION),postdefines)
 VOSTEST.EXE = vostest$(EXE)
 DIR.VOSTEST = apps/tests/vostest
 OUT.VOSTEST = $(OUT)/$(DIR.VOSTEST)
-INC.VOSTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.VOSTEST)/*.h ))
-SRC.VOSTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.VOSTEST)/*.cpp ))
+INC.VOSTEST = $(wildcard $(SRCDIR)/$(DIR.VOSTEST)/*.h)
+SRC.VOSTEST = $(wildcard $(SRCDIR)/$(DIR.VOSTEST)/*.cpp)
 OBJ.VOSTEST = $(addprefix $(OUT.VOSTEST)/,$(notdir $(SRC.VOSTEST:.cpp=$O)))
-DEP.VOSTEST = CSTOOL CSGFX CSUTIL CSGEOM CSUTIL
+DEP.VOSTEST = CSTOOL CSGFX CSGEOM CSUTIL
 LIB.VOSTEST = $(foreach d,$(DEP.VOSTEST),$($d.LIB))
 
 OUTDIRS += $(OUT.VOSTEST)
@@ -76,3 +79,5 @@ else
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
+
+endif # ifneq (,$(findstring net/vos,$(PLUGINS) $(PLUGINS.DYNAMIC)))

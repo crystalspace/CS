@@ -1,13 +1,11 @@
 SubDir TOP plugins net vos ;
 
-if $(VOS.AVAILABLE) = "yes" {
-
-C++FLAGS = $(COMPILER.CFLAGS) ;
+if $(VOS.AVAILABLE) = "yes"
+{
+Help csvosa3dl : "Virtual Object System abstract 3D layer" ;
 
 Plugin csvosa3dl : [ Wildcard *.cpp *.h ] ;
 
-LinkWith csvosa3dl : csutil csutil ;
+LinkWith csvosa3dl : csutil ;
 ExternalLibs csvosa3dl : VOS  ;
-
-Help csvosa3dl : "Abstract 3D Layer for Crystal Space" ;
 }
