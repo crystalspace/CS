@@ -542,7 +542,6 @@ public:
   }
 
 	DEFAULT_COM(World);
-	DECLARE_IOBJECT();
 
 	STDMETHODIMP GetSpriteTemplate(IString *name, ISpriteTemplate** itmpl);
 

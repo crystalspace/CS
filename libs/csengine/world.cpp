@@ -187,7 +187,6 @@ csVFS *csWorld::vfs = NULL;
 CSOBJTYPE_IMPL(csWorld,csObject);
 
 IMPLEMENT_DEFAULT_COM(World)
-IMPLEMENT_OBJECT(csWorld)
 
 csWorld::csWorld () : csObject (), start_vec (0, 0, 0)
 {

@@ -75,7 +75,7 @@ public:
 
 class csExtensionInfoVector:public csVector {};
 
-class csExtensions:public csBase {
+class csExtensions:public csObject {
 protected:
 	/// Array of IExtensionLoaders & their supported file extensions (* would be a valid extension)
 	csExtensionInfoVector Extensions;

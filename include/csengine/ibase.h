@@ -25,7 +25,7 @@
 
 interface IWorld;
 interface IString;
-
+/*
 #define DECLARE_IOBJECT() STDMETHODIMP AddName(IString *name);
 
 #define IMPLEMENT_OBJECT(ClassName) \
@@ -34,13 +34,26 @@ STDMETHODIMP ClassName::AddName(IString *iname) { \
 	csNameObject::AddName(*this, name); \
 	return S_OK; \
 }
+*/
+extern const GUID IID_IBase;
+
+/// Interface for csBase
+interface IBase : public IUnknown
+{
+};
+
+class rBase:public IBase {
+  csBase* ptr;
+public:
+	rBase(csBase* base)
+		:ptr(base) {}
+};
 
 extern const GUID IID_IObject;
 
 interface IObject:public IBase {
 	STDMETHOD (AddName) (IString *name) PURE;
 };
-
 
 extern const GUID IID_IFrame;
 

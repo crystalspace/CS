@@ -26,6 +26,7 @@
 #include "csobject/fakertti.h"
 #include "csobject/treeitr.h"
 #include "csutil/csbase.h"
+#include "csengine/ibase.h"
 
 // Note: this implementation of csObject doesn't include the 'name' field.
 // if a name is necessary, then a csNameObject can be created and attached.
@@ -38,7 +39,7 @@
  * csObject, the class must contain "CSOBJTYPE;" in the declaration.  The
  * corresponding .cpp file should contain "CSOBJTYPE(newClass,parentClass);"
  */ 
-class csObject : public csBase
+class csObject : public csBase, IObject
 {
 private:
   ///
@@ -82,6 +83,9 @@ public:
   ///
   CS_ID GetID () const { return csid_value; }
 #endif
+
+	DEFAULT_COM(Object)
+  STDMETHODIMP AddName(IString *name);
   
   CSOBJTYPE;
 };

@@ -20,6 +20,15 @@
 #include "sysdef.h"
 #include "csobject/csobj.h"
 #include "csobject/objtree.h"
+#include "csobject/nameobj.h"
+
+IMPLEMENT_DEFAULT_COM(Object);
+
+STDMETHODIMP csObject::AddName(IString *iname) {
+	csSTR name(iname);
+	csNameObject::AddName(*this, name);
+	return S_OK;
+}
 
 CSOBJTYPE_IMPL(csObject,NULLCLASS);
 
