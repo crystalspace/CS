@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+20-Jun-2001
+	- Eric Sunshine fixed the following problems in win32gcc.txi:
+	    - Repaired some incorrect Texinfo mark-up.
+	    - Removed a redundant @noindent.
+	    - Re-wrote the new Troubleshooting section in order to eliminate
+	      sentence fragments and other incomprehensible wordage.
 19-Jun-2001
 	- Removed verbose output of lightmap calculation if recalculation
 	  of lighting is not enabled. Now the progress bars are only

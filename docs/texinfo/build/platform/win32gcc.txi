@@ -5,7 +5,7 @@
 @noindent
 @emph{Philip Wyett @email{philipwyett@@redeye-entertainment.co.uk}.}
 @noindent
-@emph{Last updated 24 March 2001}
+@emph{Last updated 20 June 2001}
 
 These instructions are for building Crystal Space with Mingw --- a @sc{gnu}
 compiler for Windows.  There are many different versions of the @sc{gnu}
@@ -29,7 +29,6 @@ releases i.e.  all the files necessary to compile Crystal Space successfully.
 @uref{/linuxgames/crystal/support/mingw32/}
 @end iftex
 @ifnottex
-@noindent
 @noindent
 @uref{http://www.3ddownloads.com/?directory=/linuxgames/crystal/support/mingw32/}
 @end ifnottex
@@ -143,9 +142,8 @@ plugins you wish to compile.
 
 @subsubheading Troubleshooting
 
-If you successfully compile Crystal, yet cannot run the applications from
-the @samp{CS\} root directory. A possible cause could be you have a installed
-Crystal Space in or sub of a directory with a space in it i.e. @samp{crystal space}.
-
-To get round this problem, you should remove the space from your directory i.e.
-change @samp{crystal space} to @samp{crystal_space} or similar.
+If you successfully compiled Crystal Space, yet find that you cannot run the
+applications from the @file{CS\} root directory, a possible cause might be that
+the pathname leading up to the @file{CS\} directory may have whitespace in it.
+For instance, if you installed the project in @file{C:\my stuff\CS}, try
+renaming the path to @file{C:\my_stuff\CS} or @file{C:\mystuff\CS}.
