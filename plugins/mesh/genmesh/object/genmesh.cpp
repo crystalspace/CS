@@ -897,7 +897,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 #endif
 
 csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
-	iObjectRegistry* object_reg)
+      iObjectRegistry* object_reg) : anon_buffers(object_reg)
 {
   SCF_CONSTRUCT_IBASE (pParent);
 #ifdef CS_USE_NEW_RENDERER
@@ -944,9 +944,6 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
   texel_buffer = 0;
   color_buffer = 0;
   index_buffer = 0;
-
-  anon_buffers.SetLength (0);
-  anon_names.SetLength (0);
 
   r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
 
@@ -1172,14 +1169,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetRenderBuffer (csStringID name)
     }
     return 0;
   }
-  for (int i = 0; i < anon_names.Length(); i ++)
-  {
-    if (anon_names[i] == name) 
-    {
-      return anon_buffers[i];
-    }
-  }
-  return 0;
+  return anon_buffers.GetRenderBuffer(name);
 }
 
 #endif
@@ -1481,127 +1471,32 @@ void csGenmeshMeshObjectFactory::GenerateBox (const csBox3& box)
 }
 
 #ifdef CS_USE_NEW_RENDERER
-bool csGenmeshMeshObjectFactory::AddStream (const char *name, 
+bool csGenmeshMeshObjectFactory::AddRenderBuffer (const char *name, 
   csRenderBufferComponentType component_type, int component_size)
 {
-  csRef<iRender3D> r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
-
-  csRef<iStringSet> strings = 
-    CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-    "crystalspace.renderer.stringset", iStringSet);
-  anon_names.Push(strings->Request (name));
-  int size = 0;
-  switch (component_type)
-  {
-  case CS_BUFCOMP_BYTE:
-    size = sizeof(char);
-    break;
-  case CS_BUFCOMP_UNSIGNED_BYTE:
-    size = sizeof(unsigned char);
-    break;
-  case CS_BUFCOMP_SHORT:
-    size = sizeof(short);
-    break;
-  case CS_BUFCOMP_UNSIGNED_SHORT:
-    size = sizeof(unsigned short);
-    break;
-  case CS_BUFCOMP_INT:
-    size = sizeof(int);
-    break;
-  case CS_BUFCOMP_UNSIGNED_INT:
-    size = sizeof(unsigned int);
-    break;
-  case CS_BUFCOMP_FLOAT:
-    size = sizeof(float);
-    break;
-  case CS_BUFCOMP_DOUBLE:
-    size = sizeof(double);
-    break;
-  }
-  csRef<iRenderBuffer> b = r3d->CreateRenderBuffer (
-        size*component_size*(num_mesh_vertices), CS_BUF_STATIC,
-        component_type, component_size);
-  anon_buffers.Push(b);
-  anon_size.Push(component_size);
-  return true;
+  return anon_buffers.AddRenderBuffer(name, component_type, component_size, num_mesh_vertices);
 }
 
-bool csGenmeshMeshObjectFactory::SetStreamComponent (const char *name,
+bool csGenmeshMeshObjectFactory::SetRenderBufferComponent (const char *name,
 	int index, int component, float value)
 {
-  csRef<iStringSet> strings = 
-    CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-    "crystalspace.renderer.stringset", iStringSet);
-  csStringID nameid = strings->Request (name);
-  int i;
-  for (i = 0; i < anon_names.Length(); i ++)
-  {
-    if (nameid == anon_names[i]) break;
-  }
-  if (i == anon_names.Length()) return false;
-
-  float *buf = (float *)anon_buffers[i]->Lock(CS_BUF_LOCK_NORMAL);
-  buf[index * anon_size[i] + component] = value;
-  anon_buffers[i]->Release ();
-  return true;
+  return anon_buffers.SetRenderBufferComponent(name, index, component, value);
 }
 
-bool csGenmeshMeshObjectFactory::SetStreamComponent (const char *name,
+bool csGenmeshMeshObjectFactory::SetRenderBufferComponent (const char *name,
 	int index, int component, int value)
 {
-  csRef<iStringSet> strings = 
-    CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-    "crystalspace.renderer.stringset", iStringSet);
-  csStringID nameid = strings->Request (name);
-  int i;
-  for (i = 0; i < anon_names.Length(); i ++)
-  {
-    if (nameid == anon_names[i]) break;
-  }
-  if (i == anon_names.Length()) return false;
-
-  int *buf = (int *)anon_buffers[i]->Lock(CS_BUF_LOCK_NORMAL);
-  buf[index * anon_size[i] + component] = value;
-  anon_buffers[i]->Release ();
-  return true;
+  return anon_buffers.SetRenderBufferComponent(name, index, component, value);
 }
 
-bool csGenmeshMeshObjectFactory::SetStream (const char *name, float *value)
+bool csGenmeshMeshObjectFactory::SetRenderBuffer (const char *name, float *value)
 {
-  csRef<iStringSet> strings = 
-    CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-    "crystalspace.renderer.stringset", iStringSet);
-  csStringID nameid = strings->Request (name);
-  int i;
-  for (i = 0; i < anon_names.Length(); i ++)
-  {
-    if (nameid == anon_names[i]) break;
-  }
-  if (i == anon_names.Length()) return false;
-
-  float *buf = (float *)anon_buffers[i]->Lock(CS_BUF_LOCK_NORMAL);
-  memcpy (buf, value, sizeof (float) * anon_size[i] * num_mesh_vertices);
-  anon_buffers[i]->Release ();
-  return true;
+  return anon_buffers.SetRenderBuffer (name, value, num_mesh_vertices);
 }
 
-bool csGenmeshMeshObjectFactory::SetStream (const char *name, int *value)
+bool csGenmeshMeshObjectFactory::SetRenderBuffer (const char *name, int *value)
 {
-  csRef<iStringSet> strings = 
-    CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-    "crystalspace.renderer.stringset", iStringSet);
-  csStringID nameid = strings->Request (name);
-  int i;
-  for (i = 0; i < anon_names.Length(); i ++)
-  {
-    if (nameid == anon_names[i]) break;
-  }
-  if (i == anon_names.Length()) return false;
-
-  int *buf = (int *)anon_buffers[i]->Lock(CS_BUF_LOCK_NORMAL);
-  memcpy (buf, value, sizeof (int) * anon_size[i] * num_mesh_vertices);
-  anon_buffers[i]->Release ();
-  return true;
+  return anon_buffers.SetRenderBuffer(name, value, num_mesh_vertices);
 }
 
 #endif

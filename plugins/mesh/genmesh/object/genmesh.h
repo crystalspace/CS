@@ -40,6 +40,7 @@
 #include "ivideo/rndbuf.h"
 #include "csutil/csvector.h"
 #include "ivideo/rendermesh.h"
+#include "csutil/anonrndbuf.h"
 #endif
 
 struct iMaterialWrapper;
@@ -224,8 +225,9 @@ public:
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
 #ifdef CS_USE_NEW_RENDERER
+
   iRenderBuffer *GetRenderBuffer (csStringID name);
-  //------------------------- iRenderBufferSource implementation ----------------
+  //------------------------- iStreamSource implementation ----------------
   class BufferSource : public iRenderBufferSource 
   {
     SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObject);
@@ -233,6 +235,7 @@ public:
 	{ return scfParent->GetRenderBuffer (name); }
   } scfiRenderBufferSource;
   friend class BufferSource;
+
 #endif
 
   virtual iObjectModel* GetObjectModel ();
@@ -422,9 +425,10 @@ private:
 
   csStringID vertex_name, texel_name, normal_name, color_name, index_name;
 
-  csRefArray<iRenderBuffer> anon_buffers;
+  csAnonRenderBufferManager anon_buffers;
+  /*csRefArray<iRenderBuffer> anon_buffers;
   csGrowingArray<csStringID> anon_names;
-  csGrowingArray<int> anon_size;
+  csGrowingArray<int> anon_size;*/
 #endif
 
   csVector3 radius;
@@ -515,11 +519,11 @@ public:
   void CalculateNormals ();
   void GenerateBox (const csBox3& box);
 #ifdef CS_USE_NEW_RENDERER
-  bool AddStream (const char *name, csRenderBufferComponentType component_type, int component_size);
-  bool SetStreamComponent (const char *name, int index, int component, float value);
-  bool SetStreamComponent (const char *name, int index, int component, int value);
-  bool SetStream (const char *name, float *value);
-  bool SetStream (const char *name, int *value);
+  bool AddRenderBuffer (const char *name, csRenderBufferComponentType component_type, int component_size);
+  bool SetRenderBufferComponent (const char *name, int index, int component, float value);
+  bool SetRenderBufferComponent (const char *name, int index, int component, int value);
+  bool SetRenderBuffer (const char *name, float *value);
+  bool SetRenderBuffer (const char *name, int *value);
 #endif
   const csBox3& GetObjectBoundingBox ();
   const csVector3& GetRadius ();
@@ -626,26 +630,26 @@ public:
       scfParent->GenerateBox (box);
     }
 #ifdef CS_USE_NEW_RENDERER
-    virtual bool AddStream (const char *name, 
+    virtual bool AddRenderBuffer (const char *name, 
       csRenderBufferComponentType component_type, int component_size)
     {
-      return scfParent->AddStream (name, component_type, component_size);
+      return scfParent->AddRenderBuffer (name, component_type, component_size);
     }
-    virtual bool SetStreamComponent (const char *name, int index, int component, float value)
+    virtual bool SetRenderBufferComponent (const char *name, int index, int component, float value)
     {
-      return scfParent->SetStreamComponent (name, index, component, value);
+      return scfParent->SetRenderBufferComponent (name, index, component, value);
     }
-    virtual bool SetStreamComponent (const char *name, int index, int component, int value)
+    virtual bool SetRenderBufferComponent (const char *name, int index, int component, int value)
     {
-      return scfParent->SetStreamComponent (name, index, component, value);
+      return scfParent->SetRenderBufferComponent (name, index, component, value);
     }
-    virtual bool SetStream (const char *name, float *value) 
+    virtual bool SetRenderBuffer (const char *name, float *value) 
     {
-      return scfParent->SetStream (name, value);
+      return scfParent->SetRenderBuffer (name, value);
     }
-    virtual bool SetStream (const char *name, int *value) 
+    virtual bool SetRenderBuffer (const char *name, int *value) 
     {
-      return scfParent->SetStream (name, value);
+      return scfParent->SetRenderBuffer (name, value);
     }
 #endif
   } scfiGeneralFactoryState;

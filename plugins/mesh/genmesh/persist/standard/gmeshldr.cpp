@@ -186,8 +186,8 @@ bool csGeneralFactoryLoader::ParseStream(iDocumentNode *node,
       }
     };
 
-    state->AddStream(name, CS_BUFCOMP_FLOAT, compcount);
-    state->SetStream(name, floatarray);
+    state->AddRenderBuffer(name, CS_BUFCOMP_FLOAT, compcount);
+    state->SetRenderBuffer(name, floatarray);
     delete[] floatarray;
   }
   if(strcmp(comptype, "int") == 0)
@@ -215,8 +215,8 @@ bool csGeneralFactoryLoader::ParseStream(iDocumentNode *node,
       }
     };
 
-    state->AddStream(name, CS_BUFCOMP_INT, compcount);
-    state->SetStream(name, intarray);
+    state->AddRenderBuffer(name, CS_BUFCOMP_INT, compcount);
+    state->SetRenderBuffer(name, intarray);
     delete[] intarray;
   }
   else if(strcmp(comptype, "short") == 0)
@@ -245,8 +245,8 @@ bool csGeneralFactoryLoader::ParseStream(iDocumentNode *node,
       }
     };
 
-    state->AddStream(name, CS_BUFCOMP_SHORT, compcount);
-    state->SetStream(name, (int*)shortarray);
+    state->AddRenderBuffer(name, CS_BUFCOMP_SHORT, compcount);
+    state->SetRenderBuffer(name, (int*)shortarray);
     delete[] shortarray;
   }
   else if(strcmp(comptype, "byte") == 0)
@@ -275,8 +275,8 @@ bool csGeneralFactoryLoader::ParseStream(iDocumentNode *node,
       }
     };
 
-    state->AddStream(name, CS_BUFCOMP_BYTE, compcount);
-    state->SetStream(name, (int*)bytearray);
+    state->AddRenderBuffer(name, CS_BUFCOMP_BYTE, compcount);
+    state->SetRenderBuffer(name, (int*)bytearray);
   
     delete[] bytearray;
   }
