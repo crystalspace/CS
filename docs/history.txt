@@ -20,6 +20,8 @@ for each given day, however, are in normal (ascending) chronological order.
 	- Norman Kraemer fixed his fixes to pythmod_setup.py and changed 
 	  cspython.mak to pass the location of CS libaries to the python
 	  dist package.
+	- Norman also removed a few dozen warnings about using char as array 
+	  index in the software renderer.
 24-Jul-2003
 	- Reed Hedges made some minor updates to the AWS "Quick Start" section
 	  and API Changes appendix for the recent changes to AWS (15-Jul-2003).
