@@ -334,7 +334,7 @@ csPtr<iBase> csSprite3DFactoryLoader::Parse (iDocumentNode* node,
 	    {
               case XMLTOKEN_F:
 	        {
-		  char* fn = childchild->GetAttributeValue ("name");
+		  const char* fn = childchild->GetAttributeValue ("name");
 		  int d = childchild->GetAttributeValueAsInt ("delay");
 		  float disp = childchild->GetAttributeValueAsFloat ("displacement");
                   iSpriteFrame* ff = spr3dLook->FindFrame (fn);
