@@ -585,8 +585,6 @@ void csGraphics3DOGLCommon::PerfTest ()
       j++;
     }
   }
-	SysPrintf(MSG_INITIALIZATION, "    Video.OpenGL.ClipOuter = %c%c%c\n", clip_outer[0],
-		clip_outer[1], clip_outer[2]);
   SysPrintf(MSG_INITIALIZATION, "    Video.OpenGL.ClipOuter = %c%c%c\n", clip_outer[0],
   	clip_outer[1], clip_outer[2]);
   SysPrintf(MSG_INITIALIZATION, "    Video.OpenGL.ClipRequired = %c%c%c\n", clip_required[0],
