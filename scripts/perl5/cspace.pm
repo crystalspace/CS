@@ -585,6 +585,8 @@ package cspace::csString;
 *GetDataSafe = *cspacec::csString_GetDataSafe;
 *Length = *cspacec::csString_Length;
 *IsEmpty = *cspacec::csString_IsEmpty;
+*FindStr = *cspacec::csString_FindStr;
+*FindReplace = *cspacec::csString_FindReplace;
 *StartsWith = *cspacec::csString_StartsWith;
 sub new {
     my $pkg = shift;
@@ -4792,6 +4794,8 @@ package cspace::iEngine;
 *GetCurrentDefaultRenderloop = *cspacec::iEngine_GetCurrentDefaultRenderloop;
 *SetCurrentDefaultRenderloop = *cspacec::iEngine_SetCurrentDefaultRenderloop;
 *GetCurrentFrameNumber = *cspacec::iEngine_GetCurrentFrameNumber;
+*SetSaveableFlag = *cspacec::iEngine_SetSaveableFlag;
+*GetSaveableFlag = *cspacec::iEngine_GetSaveableFlag;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -10433,7 +10437,6 @@ package cspace::iTextureHandle;
 *CS_TEXTURE_CUBE_NEG_Z = *cspacec::iTextureHandle_CS_TEXTURE_CUBE_NEG_Z;
 *GetRendererDimensions = *cspacec::iTextureHandle_GetRendererDimensions;
 *GetOriginalDimensions = *cspacec::iTextureHandle_GetOriginalDimensions;
-*SetTextureTarget = *cspacec::iTextureHandle_SetTextureTarget;
 *GetTextureTarget = *cspacec::iTextureHandle_GetTextureTarget;
 *Blit = *cspacec::iTextureHandle_Blit;
 *GetImageName = *cspacec::iTextureHandle_GetImageName;
