@@ -6,8 +6,10 @@ The history order is reversed so that new features are at the top.
 	  'CS\include\cssys\win32'. Also updated .cvsignore to take account
 	  of latest msvc_libs changes those in 0.97dev001 and the
 	  upcoming ones in 0.97dev002.
+	- Fixed a bug I introduced yesterday in csHashMap::Delete().
 	- Philip Wyett updated links to the msvc_libs packages in the docs.
-	  Added xml2 plugin to MSVC build process and updated MSVC project files.
+	  Added xml2 plugin to MSVC build process and updated MSVC project
+	  files.
 2-Mar-2003
         - Rudolf Potucek updated makefiles in the apps/ directory to 
 	  remove vpath and generate object files in individual 

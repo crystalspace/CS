@@ -166,7 +166,7 @@ void csHashMap::Delete (csHashKey key, csHashObject object)
   uint32 idx = key % NumBuckets;
   if (!Buckets[idx]) return;
   csHashBucket* bucket = Buckets[idx];
-  uint32 i;
+  int i;
   for (i = bucket->Length ()-1 ; i >= 0 ; i--)
   {
     csHashElement* element = bucket->Get(i);
