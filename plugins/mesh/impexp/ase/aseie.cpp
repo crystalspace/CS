@@ -520,7 +520,6 @@ iModelData *csModelConverterASE::Load (UByte *Buffer, ULong Size)
     // give the line to the current interpreter
     if (!(*interp) (this, Line, Token))
     {
-      CRASH;
       if (Scene) Scene->DecRef ();
       Scene = NULL;
       if (Object) Object->DecRef ();

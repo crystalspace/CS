@@ -24,7 +24,6 @@
 #include "csutil/scanstr.h"
 #include "cstool/gentrtex.h"
 #include "cstool/keyval.h"
-#include "cstool/crossb.h"
 #include "cstool/sndwrap.h"
 #include "cstool/mapnode.h"
 #include "cstool/mdltool.h"
@@ -829,62 +828,37 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
       case CS_TOKEN_FILE:
         {
           csScanStr (params, "%s", str);
-	  converter* filedata = new converter;
-	  if (filedata->ivcon (str, true, false, NULL, VFS) == ERROR)
+          iDataBuffer *buf = VFS->ReadFile (str);
+	  if (!buf)
 	  {
-	    iDataBuffer *buf = VFS->ReadFile (str);
-	    if (!buf)
-	    {
-              ReportError (
-	        "crystalspace.maploader.parse.loadingmodel",
-	        "Error opening file model '%s'!", str);
-  	      delete filedata;
-	      return false;
-	    }
-
-	    iModelData *Model = ModelConverter->Load (buf->GetUint8 (),
-	    	buf->GetSize ());
-	    buf->DecRef ();
-            if (!Model) {
-              ReportError (
- 	        "crystalspace.maploader.parse.loadingmodel",
-	        "Error loading file model '%s'!", str);
-	      delete filedata;
-	      return false;
-	    }
-
-	    csModelDataTools::SplitObjectsByMaterial (Model);
-	    csModelDataTools::MergeObjects (Model, false);
-	    iMeshFactoryWrapper *stemp2 =
-	      CrossBuilder->BuildSpriteFactoryHierarchy (Model, Engine, mat);
-	    Model->DecRef ();
-
-	    stemp->SetMeshObjectFactory (stemp2->GetMeshObjectFactory ());
-	    int i;
-	    iMeshFactoryList* mfl2 = stemp2->GetChildren ();
-	    iMeshFactoryList* mfl = stemp->GetChildren ();
-	    for (i=0; i<mfl2->GetMeshFactoryCount (); i++)
-	      mfl->AddMeshFactory (mfl2->GetMeshFactory (i));
+            ReportError (
+	      "crystalspace.maploader.parse.loadingmodel",
+	      "Error opening file model '%s'!", str);
+	    return false;
 	  }
-	  else
-	  {
-  	    iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-	  	"crystalspace.mesh.object.sprite.3d", "MeshObj",
-		iMeshObjectType);
-  	    if (!type)
-  	    {
-      	      type = CS_LOAD_PLUGIN (plugin_mgr,
-	      	"crystalspace.mesh.object.sprite.3d", "MeshObj",
-		iMeshObjectType);
-    	      printf ("Load TYPE plugin crystalspace.mesh.object.sprite.3d\n");
-  	    }
-	    iMeshObjectFactory* fact = type->NewFactory ();
-	    stemp->SetMeshObjectFactory (fact);
-	    fact->DecRef ();
-	    csCrossBuild_SpriteTemplateFactory builder (object_reg);
-	    builder.CrossBuild (fact, *filedata);
+
+	  iModelData *Model = ModelConverter->Load (buf->GetUint8 (),
+	  	buf->GetSize ());
+	  buf->DecRef ();
+          if (!Model) {
+            ReportError (
+ 	      "crystalspace.maploader.parse.loadingmodel",
+	      "Error loading file model '%s'!", str);
+	    return false;
 	  }
-          delete filedata;
+
+	  csModelDataTools::SplitObjectsByMaterial (Model);
+	  csModelDataTools::MergeObjects (Model, false);
+	  iMeshFactoryWrapper *stemp2 =
+	    CrossBuilder->BuildSpriteFactoryHierarchy (Model, Engine, mat);
+	  Model->DecRef ();
+
+	  stemp->SetMeshObjectFactory (stemp2->GetMeshObjectFactory ());
+	  int i;
+	  iMeshFactoryList* mfl2 = stemp2->GetChildren ();
+	  iMeshFactoryList* mfl = stemp->GetChildren ();
+	  for (i=0; i<mfl2->GetMeshFactoryCount (); i++)
+	    mfl->AddMeshFactory (mfl2->GetMeshFactory (i));
         }
         break;
 

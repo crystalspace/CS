@@ -27,9 +27,7 @@
 #include "csutil/scanstr.h"
 #include "csutil/csstring.h"
 #include "csutil/util.h"
-#include "cstool/impexp.h"
 #include "csutil/dataobj.h"
-#include "cstool/crossb.h"
 #include "csgeom/math3d.h"
 #include "cssys/system.h"
 #include "cssys/csendian.h"
@@ -307,47 +305,30 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
   }
 
   // read in the model file
-  converter * filedata = new converter;
-  if (filedata->ivcon (filename, true, false, NULL, Sys->myVFS) != ERROR) {
-    // convert data from the 'filedata' structure into a CS sprite template
-    csCrossBuild_SpriteTemplateFactory builder (Sys->object_reg);
-    iMeshObjectFactory *result = (iMeshObjectFactory *)builder.CrossBuild (*filedata);
-
-    // Add this sprite template to the engine.
-    iSprite3DFactoryState* fstate = SCF_QUERY_INTERFACE (result, iSprite3DFactoryState);
-    fstate->SetMaterialWrapper (Sys->Engine->GetMaterialList ()->FindByName (txtname));
-    fstate->DecRef ();
-    Sys->Engine->CreateMeshFactory (result, templatename);
-  } else {
-    iDataBuffer *buf = Sys->myVFS->ReadFile (filename);
-    if (!buf)
-    {
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-    	"There was an error reading the data!");
-      delete filedata;
-      return;
-    }
-
-    iModelData *Model = Sys->ModelConverter->Load (buf->GetUint8 (), buf->GetSize ());
-    buf->DecRef ();
-    if (!Model)
-    {
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-    	"There was an error reading the data!");
-      delete filedata;
-      return;
-    }
-
-    csModelDataTools::SplitObjectsByMaterial (Model);
-    csModelDataTools::MergeObjects (Model, false);
-    iMeshFactoryWrapper *wrap =
-      Sys->CrossBuilder->BuildSpriteFactoryHierarchy (Model, Sys->Engine,
-      Sys->Engine->GetMaterialList ()->FindByName (txtname));
-    Model->DecRef ();
-    wrap->QueryObject ()->SetName (templatename);
+  iDataBuffer *buf = Sys->myVFS->ReadFile (filename);
+  if (!buf)
+  {
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+  	"There was an error reading the data!");
+    return;
   }
 
-  delete filedata;
+  iModelData *Model = Sys->ModelConverter->Load (buf->GetUint8 (), buf->GetSize ());
+  buf->DecRef ();
+  if (!Model)
+  {
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+  	"There was an error reading the data!");
+    return;
+  }
+
+  csModelDataTools::SplitObjectsByMaterial (Model);
+  csModelDataTools::MergeObjects (Model, false);
+  iMeshFactoryWrapper *wrap =
+    Sys->CrossBuilder->BuildSpriteFactoryHierarchy (Model, Sys->Engine,
+    Sys->Engine->GetMaterialList ()->FindByName (txtname));
+  Model->DecRef ();
+  wrap->QueryObject ()->SetName (templatename);
 }
 
 iMeshWrapper* add_meshobj (char* tname, char* sname, iSector* where,

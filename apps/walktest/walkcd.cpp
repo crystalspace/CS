@@ -25,7 +25,6 @@
 #include "ivaria/view.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/terrfunc.h"
-#include "cstool/impexp.h"
 #include "csgeom/csrect.h"
 #include "csutil/dataobj.h"
 #include "cstool/keyval.h"

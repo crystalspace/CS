@@ -29,7 +29,6 @@
 #include "iengine/region.h"
 #include "iengine/light.h"
 #include "iengine/motion.h"
-#include "cstool/impexp.h"
 #include "csgeom/csrect.h"
 #include "csutil/scanstr.h"
 #include "csutil/dataobj.h"
@@ -88,7 +87,6 @@
 #include "debug/fpu80x86.h"	// for debugging numerical instabilities
 
 WalkTest *Sys;
-converter *ImportExport;
 
 #define Gfx3D Sys->myG3D
 #define Gfx2D Sys->myG2D
