@@ -16,6 +16,7 @@ The history order has been reversed so that new features are at the top.
 	    isound/isnddrv.h   --> isound/driver.h
 	    isound/isndlstn.h  --> isound/listener.h
 	    ivideo/imater.h    --> ivideo/material.h
+	- Fixed Python scripting after the changes from Eric.
 15-Mar-2001
 	- Let csShadowIterator implement iShadowIterator.
 	- Let csShadowBlock implement iShadowBlock.

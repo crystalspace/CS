@@ -30,7 +30,7 @@
     return SCF_CONSTRUCT_VERSION(version0, version1, version2);
   }
 
-#include "isys/isystem.h"
+#include "isys/system.h"
 #include "csparser/csloader.h"
 #include "plugins/cscript/cspython/cspython.h"
 iSystem* GetSystem()
