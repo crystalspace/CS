@@ -404,6 +404,9 @@ void csSoundSourceSoftware::AddToBufferStatic(void *mem, long size)
   iSoundData *snd = SoundHandle->Data;
   if (!snd) return;
 
+  // Process any stream reset that may have been queued
+  SoundHandle->ProcessReset();
+
   long InBPS = (snd->GetFormat()->Bits/8) * (snd->GetFormat()->Channels);
   long OutBPS = (SoundRender->is16Bits() ? 2 : 1) *
                 (SoundRender->isStereo() ? 2 : 1);

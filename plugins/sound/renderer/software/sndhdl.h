@@ -38,7 +38,12 @@ public:
   virtual void IncSourceCount();
   virtual void DecSourceCount();
 
+  virtual void ResetStream();
+
+  void ProcessReset();
+
 private:
+  bool need_reset;
   int source_count;
 };
 

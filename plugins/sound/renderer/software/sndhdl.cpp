@@ -58,6 +58,22 @@ void csSoundHandleSoftware::vUpdate(void *buf, long Num)
   }
 }
 
+void csSoundHandleSoftware::ResetStream()
+{
+  // The software renderer is threaded, a reset must be handled by the background thread
+  need_reset=true;
+}
+
+void csSoundHandleSoftware::ProcessReset()
+{
+  if (need_reset)
+  {
+    if (!Data->IsStatic())
+      Data->ResetStreamed();
+    need_reset=false;
+  }
+}
+
 void csSoundHandleSoftware::IncSourceCount()
 {
   source_count++;
