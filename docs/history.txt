@@ -20,6 +20,9 @@ chronological order.
 	    - Added a selector that selects nothing.
 	- Jorrit added support for key-value pairs to portals (only when
 	  specified outside things).
+	- Jorrit fixed a bug in csBitArray where it would do a memcpy
+	  from address X to address X (i.e. same address). valgrind reported
+	  this.
 17-Aug-2004
 	- Jorrit did some more work on lighter config parsing.
 	- Jorrit did the following lighter changes:

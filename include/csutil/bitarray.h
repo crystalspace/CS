@@ -76,8 +76,11 @@ private:
     if (newLength > 0)
     {
       if (mLength > 0)
-	memcpy (newStore, mpStore, 
-	  (MIN (mLength, newLength)) * sizeof (store_type));
+      {
+	if (newStore != mpStore)
+	  memcpy (newStore, mpStore, 
+	    (MIN (mLength, newLength)) * sizeof (store_type));
+      }
       else
 	memset (newStore, 0, newLength * sizeof (store_type));
     }
