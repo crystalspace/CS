@@ -122,9 +122,8 @@ bool awsNotebook::SetProperty (const char *name, void *parm)
   return false;
 }
 
-void awsNotebook::OnDraw (csRect )
+void awsNotebook::OnDraw (csRect r)
 {
-
   csRect f (Frame ());
   if (bb_location == nbTop)
     f.ymin += tab_ctrl.Frame ().Height ();
@@ -141,7 +140,8 @@ void awsNotebook::AddChild (iAwsComponent *child)
 {
   child->ResizeTo (csRect(0, tab_ctrl.Frame ().Height ()+2, 
 	                      Frame ().Width (), Frame ().Height ()));
-  child->Hide();
+  if (GetChildCount() > 1) // the first we keep active, others we hide
+    child->Hide();
   awsComponent::AddChild (child);
 
   iString *str = NULL;

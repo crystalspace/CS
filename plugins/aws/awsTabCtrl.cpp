@@ -507,6 +507,7 @@ iAwsSource* awsTabCtrl::AddTab (iString* caption, void* user_param)
     active = 0;
     ActivateTab(btn);
     btn->SetFirst (true);
+    btn->SetActive (true);
   }
 
   AddChild (btn);
@@ -680,7 +681,7 @@ void awsTabCtrl::ActivateTab (int idx)
   int old_active = active;
   active = idx;
   vTabs.Get (idx)->SetActive(true);
-  if(old_active >= 0)
+  if(old_active >= 0 && old_active != active)
 	vTabs.Get (old_active)->SetActive (false);
 }
 
