@@ -164,7 +164,7 @@ void csConsole::Draw(csRect *area)
   // Make sure we erase everything we need to erase
   if(!(invalid.IsEmpty()||transparent)) {
     piG2D->SetClipRect(invalid.xmin, invalid.ymin, invalid.xmax, invalid.ymax);
-    piG2D->Clear(bg);
+    piG2D->DrawBox(invalid.xmin, invalid.ymin, invalid.xmax, invalid.ymax, bg);
     if(area)
       area->Union(invalid);
   }
@@ -191,7 +191,7 @@ void csConsole::Draw(csRect *area)
       piG2D->SetClipRect(line.xmin, line.ymin, line.xmax, line.ymax);
       // Clear the bg if necessary
       if(!transparent)
-	piG2D->Clear(bg);
+	piG2D->DrawBox(line.xmin, line.ymin, line.xmax, line.ymax, bg);
       // Write the line
       piG2D->Write(1 + size.xmin, (i * height) + size.ymin, fg, -1, text->GetData());
     }
