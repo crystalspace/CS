@@ -405,23 +405,25 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
       }
     case XMLTOKEN_MATERIAL:
       {
-	const char *file = child->GetAttributeValue("file");
-	if (!LoadMaterialTag(newspr,child,ldr_context,file))
-	  return 0;
-	break;
+        const char *file = child->GetAttributeValue("file");
+        const char *matName = child->GetAttributeValue("name");
+        if (!LoadMaterialTag(newspr,child,ldr_context,file, matName))
+          return 0;
+        break;
       }
 
     case XMLTOKEN_SOCKET:
       {
-	int a = child->GetAttributeValueAsInt ("tri");
-	int submesh = child->GetAttributeValueAsInt ("submesh");
-	int mesh = child->GetAttributeValueAsInt ("mesh");
-	iSpriteCal3DSocket* sprite_socket = newspr->AddSocket ();
-	sprite_socket->SetName (child->GetAttributeValue ("name"));
-	sprite_socket->SetTriangleIndex (a);
-	sprite_socket->SetSubmeshIndex (submesh);
-	sprite_socket->SetMeshIndex (mesh);
-	break;
+        int a = child->GetAttributeValueAsInt ("tri");
+        int submesh = child->GetAttributeValueAsInt ("submesh");
+        int mesh = child->GetAttributeValueAsInt ("mesh");
+        iSpriteCal3DSocket* sprite_socket = newspr->AddSocket ();
+        sprite_socket->SetName (child->GetAttributeValue ("name"));
+        sprite_socket->SetTriangleIndex (a);
+        sprite_socket->SetSubmeshIndex (submesh);
+        sprite_socket->SetMeshIndex (mesh);
+    
+        break;
       }
 
       break;
@@ -440,7 +442,8 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 iMaterialWrapper *csSpriteCal3DFactoryLoader::LoadMaterialTag(iSpriteCal3DFactoryState *newspr,
 							      iDocumentNode* child,
 							      iLoaderContext* ldr_context,
-							      const char *file)
+							      const char *file, 
+                                  const char* name)
 {
   iMaterialWrapper* mat=0;
   if (file)
@@ -453,6 +456,12 @@ iMaterialWrapper *csSpriteCal3DFactoryLoader::LoadMaterialTag(iSpriteCal3DFactor
 	child, "Couldn't find material named '%s'", file);
       return 0;
     }
+    
+    if ( name )
+    {
+      mat->QueryObject()->SetName(name);
+    }
+    
     newspr->AddCoreMaterial(mat);
   }
   else
