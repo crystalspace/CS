@@ -43,7 +43,7 @@ private:
   }
   void DestroyElement (int n)
   {
-    (root + n)->~T();
+    (root + n)->T::~T();
   }
 
   // Set array length.  NOTE: Do not make this public since it does not
