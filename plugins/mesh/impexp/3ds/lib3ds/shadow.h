@@ -40,13 +40,13 @@ struct _Lib3dsShadow {
     Lib3dsFloat lo_bias;
     Lib3dsFloat hi_bias;
     Lib3dsIntw samples;
-    Lib3dsIntw range;
+    Lib3dsIntd range;
     Lib3dsFloat filter;
     Lib3dsFloat ray_bias;
 };
 
-extern LIB3DSAPI Lib3dsBool lib3ds_shadow_read(Lib3dsShadow *shadow, FILE *f);
-extern LIB3DSAPI Lib3dsBool lib3ds_shadow_write(Lib3dsShadow *shadow, FILE *f);
+extern LIB3DSAPI Lib3dsBool lib3ds_shadow_read(Lib3dsShadow *shadow, Lib3dsIo *io);
+extern LIB3DSAPI Lib3dsBool lib3ds_shadow_write(Lib3dsShadow *shadow, Lib3dsIo *io);
 
 #ifdef __cplusplus
 };

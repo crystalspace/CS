@@ -26,7 +26,7 @@
 extern "C" {
 #endif
 
-#if defined(_WIN32) && (!defined(__GNUC__))
+#if defined (_LIB3DS_DLL) && defined(_WIN32) && (!defined(__GNUC__))
 #ifdef LIB3DS_EXPORT
 #define LIB3DSAPI __declspec(dllexport)
 #else               
@@ -82,6 +82,7 @@ typedef float Lib3dsRgba[4];
   #define LIB3DS_ERROR_LOG
 #endif
 
+typedef struct _Lib3dsIo Lib3dsIo;
 typedef struct _Lib3dsFile Lib3dsFile;
 typedef struct _Lib3dsBackground Lib3dsBackground;
 typedef struct _Lib3dsAtmosphere Lib3dsAtmosphere;
