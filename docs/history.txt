@@ -19,6 +19,8 @@ chronological order.
 	    - Augmented the Cg plugin with a facility to dump out debug info of
 	      the used programs. Can be enabled by enabling the 
 	      "Video.OpenGL.Shader.Cg.DebugDump" config setting.
+	- res disabled static lighting for the mesh in waterdemo, added a 
+	  missing FinishDraw() call and made some code cleanups.
 5-Jun-2004
 	- res made the following changes:
 	    - Added the *f versions of floor and ceil to csdef.h.

@@ -197,6 +197,7 @@ void csWaterDemo::SetupFrame ()
 
 void csWaterDemo::FinishFrame ()
 {
+  r3d->FinishDraw();
   r3d->Print (0);
 }
 
@@ -421,13 +422,17 @@ bool csWaterDemo::Initialize ()
 
   r3d->GetDriver2D ()->SetMouseCursor( csmcNone );
 
+  csRef<iPluginManager> plugin_mgr (
+    CS_QUERY_REGISTRY (object_reg, iPluginManager));
+
+  csRef<iStringSet> strings = 
+    CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
+    "crystalspace.shared.stringset", iStringSet);
+
 #ifdef CS_USE_NEW_RENDERER
   //get a custom renderloop
   csRef<iRenderLoop> rl = engine->GetRenderLoopManager ()->Create ();
   
-  csRef<iPluginManager> plugin_mgr (
-    CS_QUERY_REGISTRY (object_reg, iPluginManager));
-
   csRef<iRenderStepType> genType =
     CS_LOAD_PLUGIN (plugin_mgr,
     "crystalspace.renderloop.step.generic.type",
@@ -449,12 +454,6 @@ bool csWaterDemo::Initialize ()
   engine->GetRenderLoopManager ()->Register ("waterdemoRL", rl);
   engine->SetCurrentDefaultRenderloop (rl);
 
-  csRef<iStringSet> strings = 
-    CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-    "crystalspace.shared.stringset", iStringSet);
-
-
-
   // Load in lighting shaders
   csRef<iVFS> vfs (CS_QUERY_REGISTRY(object_reg, iVFS));
   csRef<iFile> shaderFile = vfs->Open ("/shader/water.xml", VFS_FILE_READ);
@@ -465,35 +464,9 @@ bool csWaterDemo::Initialize ()
   shaderDoc->Parse (shaderFile);
 
   csRef<iShader> shader;
-  /*csRef<iShaderCompiler> shcom (CS_LOAD_PLUGIN (plugin_mgr,
-    "crystalspace.graphics3d.shadercompiler.xmlshader",
-    iShaderCompiler));*/
   csRef<iShaderManager> shmgr (CS_QUERY_REGISTRY(object_reg, iShaderManager));
-  //shmgr->RegisterCompiler (shcom);
   csRef<iShaderCompiler> shcom (shmgr->GetCompiler ("XMLShader"));
   shader = shcom->CompileShader (shaderDoc->GetRoot ()->GetNode ("shader"));
-#if 0
-  if(shmgr)
-  {
-    shader = shmgr->CreateShader();
-    if(shader)
-    {
-      shader->Load(csRef<iDataBuffer>(vfs->ReadFile("/shader/water.xml")));
-      shader->SetName ("water");
-      if(shader->Prepare())
-      {
-        /*
-        for (int i=0; i<engine->GetMaterialList ()->GetCount (); i++)
-                {
-        	  csRef<iShaderWrapper> wrapper (shmgr->CreateWrapper (shader));
-                  engine->GetMaterialList ()->Get (i)->GetMaterial ()->
-                    SetShader(strings->Request ("general"), wrapper);
-                }*/
-      }
-    }
-  }
-#endif
-
 #endif // CS_USE_NEW_RENDERER
 
   // setup the mesh 
@@ -520,6 +493,8 @@ bool csWaterDemo::Initialize ()
 
   gMesh = gFact->NewInstance ();
   gMeshState = SCF_QUERY_INTERFACE(gMesh, iGeneralMeshState);
+  gMeshState->SetShadowCasting (false);
+  gMeshState->SetShadowReceiving (false);
 
   //setup a wrapper too
   gMeshW = engine->CreateMeshWrapper (gMesh, "water", room);
@@ -531,7 +506,9 @@ bool csWaterDemo::Initialize ()
   
   //setup a material
   csRef<iMaterial> mat = engine->CreateBaseMaterial (0);
-  mat->SetShader (strings->Request ("general"), shader/*shmgr->GetShader ("water")*/);
+#ifdef CS_USE_NEW_RENDERER
+  mat->SetShader (strings->Request ("general"), shader);
+#endif
   csRef<iMaterialWrapper> matW = engine->GetMaterialList ()->NewMaterial (mat);
   matW->QueryObject ()->SetName ("waterMaterial");
 
@@ -563,9 +540,6 @@ bool csWaterDemo::Initialize ()
     imgvec, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS, 
     iTextureHandle::CS_TEX_IMG_CUBEMAP);
 
-  //csRef<iTextureHandle> myTex = loader->LoadTexture ("/lib/std/stone4.gif");
-  /*csRef<csShaderVariable> attvar = shmgr->CreateVariable(
-    strings->Request ("tex diffuse"));*/
   csRef<csShaderVariable> attvar (csPtr<csShaderVariable> (
     new csShaderVariable (strings->Request ("tex diffuse"))));
   attvar->SetValue (tex);

@@ -152,6 +152,9 @@ struct iClipper2D : public iBase
     /// This clipper contains a box. Can be used for some optimizations.
     clipperBox
   };
+  /**
+   * Retrieve the type of this clipper.
+   */
   virtual ClipperType GetClipperType() const = 0;
 };
 
