@@ -19,6 +19,8 @@ chronological order.
 	  order to pacify Borland C++Builder based upon a list of compiler
 	  diagnostic messages (and very loosely based upon a patch) provided by
 	  Randall Foreman <eidpers@comcast.net>.
+	- duhprey updated ODE so it now optionally updates on 
+	  cscmdPreProcess instead of calling Step
 4-Jan-2004
 	- Luca fixed a compilation error for the VC6 compiler.
 	- res added the creation of a global string set to InitApplication().
