@@ -16,6 +16,19 @@ chronological order.
 	- Eric Sunshine changed the `objcopy' check in configure.ac to employ
 	  AC_CHECK_TOOL() rather AC_CHECK_PROGS() in order to support
 	  cross-builds.
+	- Marten Svanfeldt made these changes
+	    - Added GetCurrentFrameNumber() to [cs/i]Engine. It will return a 
+	      number which is incremented on each Engine::Draw.
+	    - Added Empty () to csRenderMeshList. It will empty all meshlists, 
+	      but keep the renderpriority structs.
+	    - Added Sector::GetVisibleMeshes(iRenderView*). It will return
+	      all visible meshes for a given sector and rview. These will
+	      be cached, and only updated once each frame. This is to avoid 
+	      doing culling so many times when using multipass rendering.
+	      Also made the generic renderstep to use it.
+	    - Fixed a nasty bug in csGLRender3D where CS_ASSERT() was set around
+	      an important statement in the VBO renderbuffer implementation.
+	      This had the sideeffect that VBO didn't work in releasemode.
 20-Sep-2003
 	- Jorrit reverted nearly all his changes of yesterday. The only two
 	  changes that remain are the iPortalContainer object (but now
