@@ -72,6 +72,12 @@ public:
 		csTicks duration);
   void AddOperationTriggerState (csTicks time, iSequenceTrigger* trigger,
 		  bool en);
+  void AddOperationCheckTrigger (csTicks time,
+  		  iSequenceTrigger* trigger, csTicks delay);
+  void AddOperationTestTrigger (csTicks time,
+  		  iSequenceTrigger* trigger,
+		  iSequence* trueSequence,
+		  iSequence* falseSequence);
 
   SCF_DECLARE_IBASE_EXT (csObject);
 
@@ -150,6 +156,19 @@ public:
     {
       scfParent->AddOperationTriggerState (time, trigger, en);
     }
+    virtual void AddOperationCheckTrigger (csTicks time,
+  		  iSequenceTrigger* trigger, csTicks delay)
+    {
+      scfParent->AddOperationCheckTrigger (time, trigger, delay);
+    }
+    virtual void AddOperationTestTrigger (csTicks time,
+  		  iSequenceTrigger* trigger,
+		  iSequence* trueSequence,
+		  iSequence* falseSequence)
+    {
+      scfParent->AddOperationTestTrigger (time, trigger,
+		      trueSequence, falseSequence);
+    }
   } scfiSequenceWrapper;
   friend struct SequenceWrapper;
 };
@@ -186,11 +205,15 @@ class csSequenceTrigger : public csObject
 {
 private:
   bool enabled;
+  bool enable_onetest;
   csRef<iSequenceWrapper> fire_sequence;
   csEngineSequenceManager* eseqmgr;
   csTicks fire_delay;
   uint32 framenr;
   csRefArray<csConditionCleanup> condition_cleanups;
+
+  bool last_trigger_state;
+  csTicks condtest_delay;
 
   int total_conditions;
   int fired_conditions;
@@ -211,6 +234,11 @@ public:
   void Trigger ();
   void FireSequence (csTicks delay, iSequenceWrapper* seq);
   iSequenceWrapper* GetFiredSequence () { return fire_sequence; }
+  void TestConditions (csTicks delay);
+  bool CheckState () { return last_trigger_state; }
+
+  csTicks GetConditionTestDelay () const { return condtest_delay; }
+  void EnableOneTest () { enable_onetest = true; }
 
   csEngineSequenceManager* GetEngineSequenceManager () const
   {
@@ -286,6 +314,14 @@ public:
     virtual iSequenceWrapper* GetFiredSequence ()
     {
       return scfParent->GetFiredSequence ();
+    }
+    virtual void TestConditions (csTicks delay)
+    {
+      scfParent->TestConditions (delay);
+    }
+    virtual bool CheckState ()
+    {
+      return scfParent->CheckState ();
     }
   } scfiSequenceTrigger;
   friend struct SequenceTrigger;

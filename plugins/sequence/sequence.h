@@ -92,8 +92,8 @@ public:
   protected:
     virtual ~RunCondition ()
     {
-      trueSequence->DecRef ();
-      falseSequence->DecRef ();
+      if (trueSequence) trueSequence->DecRef ();
+      if (falseSequence) falseSequence->DecRef ();
       condition->DecRef ();
     }
   public:
@@ -102,8 +102,8 @@ public:
 	StandardOperation (sm), condition (cond), trueSequence (trueSeq),
 	falseSequence (falseSeq)
     {
-      trueSeq->IncRef ();
-      falseSeq->IncRef ();
+      if (trueSeq) trueSeq->IncRef ();
+      if (falseSeq) falseSeq->IncRef ();
       cond->IncRef ();
     }
     virtual void Do (csTicks dt);

@@ -23064,10 +23064,28 @@
 	    <!-- Disable both triggers because the door is now open -->
 	    <disabletrigger>opendoor1</disabletrigger>
 	    <disabletrigger>opendoor2</disabletrigger>
+	    <!-- <checktrigger trigger="opendoor1" delay="1000" />
+	    <checktrigger trigger="opendoor2" delay="1000" /> -->
 	    <rotate mesh="rot_door1" duration="2000">
 	        <roty>-1.5707963</roty>
                 <v x="-2.5" y="-1" z="20" />
 	    </rotate>
+	    <!-- <runsequence>testdoor</runsequence> -->
+        </sequence>
+	<sequence name="testdoor">
+	    <delay>1000</delay>
+	    <testtrigger trigger="opendoor1" truesequence="testdoor" />
+	    <testtrigger trigger="opendoor2" truesequence="testdoor" />
+	    <!-- Close door again -->
+	    <checktrigger trigger="opendoor1" delay="0" />
+	    <checktrigger trigger="opendoor2" delay="0" />
+	    <rotate mesh="rot_door1" duration="2000">
+	        <roty>1.5707963</roty>
+                <v x="-2.5" y="-1" z="20" />
+	    </rotate>
+	    <delay>2000</delay>
+	    <enabletrigger>opendoor1</enabletrigger>
+	    <enabletrigger>opendoor2</enabletrigger>
         </sequence>
     </sequences>
 
@@ -23119,7 +23137,6 @@
 	    </sectorvis>
 	    <fire delay=0>opendoor</fire>
 	</trigger>
-
 	<trigger name="opendoor2">
 	    <sectorvis>
 	        <sector>room3</sector>

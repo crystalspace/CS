@@ -129,6 +129,24 @@ struct iSequenceWrapper : public iBase
    */
   virtual void AddOperationTriggerState (csTicks time,
   		  iSequenceTrigger* trigger, bool en) = 0;
+
+  /**
+   * Operation: enable checking of trigger state every 'delay'
+   * milliseconds (or disable with delay == 0). Use this in
+   * combination with AddOperationTestTrigger().
+   */
+  virtual void AddOperationCheckTrigger (csTicks time,
+  		  iSequenceTrigger* trigger, csTicks delay) = 0;
+  /**
+   * Operation: test trigger state and run a sequence if trigger
+   * is still valid or another sequence if not (both sequences
+   * can be NULL in which case nothing is run).
+   * Use in combination with AddOperationCheckTrigger().
+   */
+  virtual void AddOperationTestTrigger (csTicks time,
+  		  iSequenceTrigger* trigger,
+		  iSequence* trueSequence,
+		  iSequence* falseSequence) = 0;
 };
 
 SCF_VERSION (iSequenceTrigger, 0, 0, 1);
@@ -220,6 +238,22 @@ struct iSequenceTrigger : public iBase
    * Get the attached sequence.
    */
   virtual iSequenceWrapper* GetFiredSequence () = 0;
+
+  /**
+   * Test the conditions of this trigger every 'delay' milliseconds.
+   * Use this in combination with CheckState(). If 'delay' == 0
+   * then this testing is disabled (default).
+   */
+  virtual void TestConditions (csTicks delay) = 0;
+
+  /**
+   * This function returns true if the trigger conditions are
+   * valid. This only works if TestConditions() has been called
+   * and it doesn't work immediatelly after TestConditions() because
+   * TestConditions() needs to take some time before it actually
+   * can retest the conditions.
+   */
+  virtual bool CheckState () = 0;
 };
 
 SCF_VERSION (iSequenceTimedOperation, 0, 0, 1);

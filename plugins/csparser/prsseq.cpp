@@ -399,6 +399,41 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
 	  	trigger, false);
 	}
         break;
+      case XMLTOKEN_CHECKTRIGGER:
+        {
+	  const char* trigname = child->GetAttributeValue ("trigger");
+	  iSequenceTrigger* trigger = FindCreateTrigger (
+		GetEngineSequenceManager (), trigname);
+	  csTicks delay = child->GetAttributeValueAsInt ("delay");
+	  sequence->AddOperationCheckTrigger (cur_time,
+	  	trigger, delay);
+	}
+        break;
+      case XMLTOKEN_TESTTRIGGER:
+        {
+	  const char* trigname = child->GetAttributeValue ("trigger");
+	  iSequenceTrigger* trigger = FindCreateTrigger (
+		GetEngineSequenceManager (), trigname);
+	  iSequence* trueseq = NULL;
+	  const char* trueseqname = child->GetAttributeValue ("truesequence");
+	  if (trueseqname)
+	  {
+	    iSequenceWrapper* trueseqwrap = FindCreateSequence (
+		GetEngineSequenceManager (), trueseqname);
+	    trueseq = trueseqwrap->GetSequence ();
+	  }
+	  iSequence* falseseq = NULL;
+	  const char* falseseqname = child->GetAttributeValue ("falsesequence");
+	  if (falseseqname)
+	  {
+	    iSequenceWrapper* falseseqwrap = FindCreateSequence (
+		GetEngineSequenceManager (), falseseqname);
+	    falseseq = falseseqwrap->GetSequence ();
+	  }
+	  sequence->AddOperationTestTrigger (cur_time,
+	  	trigger, trueseq, falseseq);
+	}
+        break;
       default:
         SyntaxService->ReportBadToken (child);
 	return NULL;

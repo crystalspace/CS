@@ -132,9 +132,15 @@ void csSequence::AddCondition (csTicks time, iSequenceCondition* condition,
 void csSequence::RunCondition::Do (csTicks dt)
 {
   if (condition->Condition (dt))
-    seqmgr->RunSequence (-(signed)dt, trueSequence);
+  {
+    if (trueSequence)
+      seqmgr->RunSequence (-(signed)dt, trueSequence);
+  }
   else
-    seqmgr->RunSequence (-(signed)dt, falseSequence);
+  {
+    if (falseSequence)
+      seqmgr->RunSequence (-(signed)dt, falseSequence);
+  }
 }
 
 void csSequence::AddLoop (csTicks time, iSequenceCondition* condition,

@@ -63,6 +63,23 @@ SCF_IMPLEMENT_IBASE (OpStandard)
   SCF_IMPLEMENTS_INTERFACE (iSequenceOperation)
 SCF_IMPLEMENT_IBASE_END
 
+/**
+ * The superclass of all sequence conditions.
+ */
+class CondStandard : public iSequenceCondition
+{
+protected:
+  virtual ~CondStandard () { }
+
+public:
+  CondStandard () { SCF_CONSTRUCT_IBASE (NULL); }
+  SCF_DECLARE_IBASE;
+};
+
+SCF_IMPLEMENT_IBASE (CondStandard)
+  SCF_IMPLEMENTS_INTERFACE (iSequenceCondition)
+SCF_IMPLEMENT_IBASE_END
+
 //---------------------------------------------------------------------------
 
 /**
@@ -450,6 +467,52 @@ public:
 
 //---------------------------------------------------------------------------
 
+/**
+ * Check trigger.
+ */
+class OpCheckTrigger : public OpStandard
+{
+private:
+  csRef<iSequenceTrigger> trigger;
+  csTicks delay;
+
+public:
+  OpCheckTrigger (iSequenceTrigger* trigger, csTicks delay)
+  {
+    OpCheckTrigger::trigger = trigger;
+    OpCheckTrigger::delay = delay;
+  }
+
+  virtual void Do (csTicks dt)
+  {
+    trigger->TestConditions (delay);
+  }
+};
+
+//---------------------------------------------------------------------------
+
+/**
+ * Condition to test a trigger.
+ */
+class CondTestTrigger : public CondStandard
+{
+private:
+  iSequenceTrigger* trigger;
+
+public:
+  CondTestTrigger (iSequenceTrigger* trigger)
+  {
+    CondTestTrigger::trigger = trigger;
+  }
+
+  virtual bool Condition (csTicks dt)
+  {
+    return trigger->CheckState ();
+  }
+};
+
+//---------------------------------------------------------------------------
+
 SCF_IMPLEMENT_IBASE_EXT(csSequenceWrapper)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iSequenceWrapper)
 SCF_IMPLEMENT_IBASE_EXT_END
@@ -554,6 +617,24 @@ void csSequenceWrapper::AddOperationTriggerState (csTicks time,
   OpTriggerState* op = new OpTriggerState (trigger, en);
   sequence->AddOperation (time, op);
   op->DecRef ();
+}
+
+void csSequenceWrapper::AddOperationCheckTrigger (csTicks time,
+  		  iSequenceTrigger* trigger, csTicks delay)
+{
+  OpCheckTrigger* op = new OpCheckTrigger (trigger, delay);
+  sequence->AddOperation (time, op);
+  op->DecRef ();
+}
+
+void csSequenceWrapper::AddOperationTestTrigger (csTicks time,
+  		  iSequenceTrigger* trigger,
+		  iSequence* trueSequence,
+		  iSequence* falseSequence)
+{
+  CondTestTrigger* cond = new CondTestTrigger (trigger);
+  sequence->AddCondition (time, cond, trueSequence, falseSequence);
+  cond->DecRef ();
 }
 
 //---------------------------------------------------------------------------
@@ -683,10 +764,13 @@ csSequenceTrigger::csSequenceTrigger (csEngineSequenceManager* eseqmgr)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSequenceTrigger);
   enabled = true;
+  enable_onetest = false;
   fire_delay = 0;
   csSequenceTrigger::eseqmgr = eseqmgr;
   framenr = 0;
   total_conditions = 0;
+  last_trigger_state = false;
+  condtest_delay = 0;
 }
 
 csSequenceTrigger::~csSequenceTrigger ()
@@ -747,8 +831,10 @@ void csSequenceTrigger::FireSequence (csTicks delay, iSequenceWrapper* seq)
 
 void csSequenceTrigger::Fire ()
 {
-  if (!enabled) return;
+  if (!enabled && !enable_onetest) return;
+  enable_onetest = false;
 
+  last_trigger_state = false;
   uint32 global_framenr = eseqmgr->GetGlobalFrameNr ();
   if (framenr != global_framenr)
   {
@@ -758,10 +844,59 @@ void csSequenceTrigger::Fire ()
   fired_conditions++;
   if (fired_conditions >= total_conditions)
   {
+    last_trigger_state = true;
     eseqmgr->GetSequenceManager ()->RunSequence (fire_delay,
     	fire_sequence->GetSequence ());
     fired_conditions = 0;
     enabled = false;
+  }
+}
+
+/**
+ * Condition to loop for TestConditions().
+ */
+class CondTestConditions : public CondStandard
+{
+private:
+  csSequenceTrigger* trigger;
+  csTicks delay;
+
+public:
+  CondTestConditions (csSequenceTrigger* trigger, csTicks delay)
+  {
+    CondTestConditions::trigger = trigger;
+    CondTestConditions::delay = delay;
+  }
+
+  virtual bool Condition (csTicks dt)
+  {
+    // The sequence which loops this condition will end
+    // automatically when the delay in the trigger is
+    // different from this one.
+    if (delay != trigger->GetConditionTestDelay ())
+      return false;
+    trigger->EnableOneTest ();
+    return true;
+  }
+};
+
+void csSequenceTrigger::TestConditions (csTicks delay)
+{
+  if (condtest_delay == delay) return;
+
+  // By setting the condtest_delay to a different value we will
+  // end the condition test sequence that is already running as soon
+  // as it fires again.
+  condtest_delay = delay;
+  if (delay > 0)
+  {
+    // Here we already start a new sequence with the new delay.
+    csRef<iSequence> seq (csPtr<iSequence> (
+	eseqmgr->GetSequenceManager ()->NewSequence ()));
+    CondTestConditions* cond = new CondTestConditions (this, delay);
+    seq->AddLoop (delay, cond, seq);
+    cond->DecRef ();
+    eseqmgr->GetSequenceManager ()->RunSequence (0, seq);
   }
 }
 

@@ -1,6 +1,12 @@
 The history order is reversed so that new features are at the top.
 
 25-Sep-2002
+	- Sequence manager (the old one) can now cope with null
+	  trueSequence and falseSequence in the condition.
+	- Added the ability to validate triggers from within a sequence.
+	  Using this I added the ability for the door in flarge to close
+	  again once the camera moves away from the door.
+	  Disabled for now due to bugs...
 	- Eric Sunshine fixed spoofdir.php so that synthesis valid URLs for
 	  pathnames containing embedded spaces and other special characters.
 	- Eric Sunshine changed the Mingw port so that the CC and CXX compiler
