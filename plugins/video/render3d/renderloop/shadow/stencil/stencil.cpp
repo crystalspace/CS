@@ -593,6 +593,8 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector, iLight* 
 
   csRef<iVisibilityObjectIterator> objInLight = culler->VisTest (lightSphere);
 #endif
+
+  r3d->SetZMode (CS_ZBUF_TEST);
   
   csVector3 rad, center;
   float maxRadius = 0;
