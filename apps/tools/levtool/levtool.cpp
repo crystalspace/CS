@@ -1643,6 +1643,11 @@ LevTool::~LevTool ()
     csString* str = (csString*)plane_plugins.Get (i);
     delete str;
   }
+  for (i = 0 ; i < thing_nodes.Length () ; i++)
+  {
+    ltDocNodeWrap* w = (ltDocNodeWrap*)thing_nodes.Get (i);
+    delete w;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -1677,43 +1682,56 @@ void LevTool::Main ()
   if (op == OP_HELP)
   {
     printf ("levtool <options> <zipfile>\n");
-    printf ("  -list:      List world contents.\n");
-    printf ("  -analyze:   Analyze all things and show the distribution of size.\n");
+    printf ("  -list:\n");      
+    printf ("     List world contents.\n");
+    printf ("  -analyze:\n");         
+    printf ("     Analyze all things and show the distribution of size.\n");
     printf ("              You can use this to decide on the 'minsize' parameter.\n");
-    printf ("  -validate:  Validate world contents. This will currently check\n");
+    printf ("  -validate:\n");        
+    printf ("     Validate world contents. This will currently check\n");
     printf ("              only for non-coplanar polygons.\n");
-    printf ("  -compress : Compress all vertices and remove duplicate and unused vertices.\n");
-    printf ("              Unless you specify -nocompress, -dynavis does this by default.\n");
-    printf ("  -dynavis:   Convert to Dynavis. This takes a level that uses\n");
-    printf ("              old style octree culler and convert it to Dynavis.\n");
-    printf ("              All objects will be split in their logical parts.\n");
-    printf ("  -splitunit: Split large things into seperate units. A seperate unit\n");
-    printf ("              is defined as a collection of connected polygons that doesn't\n");
-    printf ("              connect with any other polygon from the thing.\n");
-    printf ("              This option will first do -compress.\n");
-    printf ("              -minsize=<percent>: Only split objects larger than the given\n");
-    printf ("              percentage. Default 20%%.\n");
-    printf ("  -splitgeom: Split large things geometrically. After doing this you\n");
-    printf ("              should run levtool with -compress option for efficiency.\n");
-    printf ("              -minsize=<percent>: Only split objects larger than the given\n");
-    printf ("              percentage. Default 20%%.\n");
-    printf ("  -flagclear: Clear all goodoccluder/badoccluder flags.\n");
-    printf ("  -flaggood:  Add goodoccluder flag for all things that satisfy\n");
-    printf ("              conditions defined by the following flags:\n");
-    printf ("              -minsize=<percent>: min object size (default 10%%).\n");
-    printf ("              -maxsize=<percent>: max object size (default 100%%).\n");
-    printf ("              -minpoly=<number>: min number of polygons (default 1).\n");
-    printf ("              -maxpoly=<number>: max number of polygons (default 50).\n");
-    printf ("  -flagbad:   Add badoccluder flag for all things that satisfy\n");
-    printf ("              conditions defined by the following flags:\n");
-    printf ("              -minsize=<percent>: mim object size (default 0%%).\n");
-    printf ("              -maxsize=<percent>: max object size (default 3%%).\n");
-    printf ("              -minpoly=<number>: min number of polygons (default 6).\n");
-    printf ("              -maxpoly=<number>: max number of polygons (default 1000000000).\n");
-    printf ("  -planes:    Move all 'addon' planes to the polygons that use them.\n");
-    printf ("  -inds=<plugin>: Documents system plugin for reading world.\n");
-    printf ("  -outds=<plugin>: Documents system plugin for writing world.\n");
-    exit (0);
+    printf ("  -compress:\n");        
+    printf ("     Compress all vertices and remove duplicate and unused vertices.\n");
+    printf ("     Unless you specify -nocompress, -dynavis does this by default.\n");
+    printf ("  -dynavis:\n");         
+    printf ("     Convert to Dynavis. This takes a level that uses\n");
+    printf ("     old style octree culler and convert it to Dynavis.\n");
+    printf ("     All objects will be split in their logical parts.\n");
+    printf ("  -splitunit:\n");       
+    printf ("     Split large things into seperate units. A seperate unit\n");
+    printf ("     is defined as a collection of connected polygons that doesn't\n");
+    printf ("     connect with any other polygon from the thing.\n");
+    printf ("     This option will first do -compress.\n");
+    printf ("     -minsize=<percent>: Only split objects larger than the given\n");
+    printf ("     percentage. Default 20%%.\n");
+    printf ("  -splitgeom:\n");       
+    printf ("     Split large things geometrically. After doing this you\n");
+    printf ("     should run levtool with -compress option for efficiency.\n");
+    printf ("     -minsize=<percent>: Only split objects larger than the given\n");
+    printf ("     percentage. Default 20%%.\n");
+    printf ("  -flagclear:\n");       
+    printf ("     Clear all goodoccluder/badoccluder flags.\n");
+    printf ("  -flaggood:\n");        
+    printf ("     Add goodoccluder flag for all things that satisfy\n");
+    printf ("     conditions defined by the following flags:\n");
+    printf ("     -minsize=<percent>: min object size (default 10%%).\n");
+    printf ("     -maxsize=<percent>: max object size (default 100%%).\n");
+    printf ("     -minpoly=<number>: min number of polygons (default 1).\n");
+    printf ("     -maxpoly=<number>: max number of polygons (default 50).\n");
+    printf ("  -flagbad:\n");         
+    printf ("     Add badoccluder flag for all things that satisfy\n");
+    printf ("     conditions defined by the following flags:\n");
+    printf ("     -minsize=<percent>: mim object size (default 0%%).\n");
+    printf ("     -maxsize=<percent>: max object size (default 3%%).\n");
+    printf ("     -minpoly=<number>: min number of polygons (default 6).\n");
+    printf ("     -maxpoly=<number>: max number of polygons (default 1000000000).\n");
+    printf ("  -planes:\n");          
+    printf ("     Move all 'addon' planes to the polygons that use them.\n");
+    printf ("  -inds=<plugin>:\n");       
+    printf ("     Document system plugin for reading world.\n");
+    printf ("  -outds=<plugin>:\n");       
+    printf ("     Document system plugin for writing world.\n");
+    return;
   }
 
   int minsize, maxsize;

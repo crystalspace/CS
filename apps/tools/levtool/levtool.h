@@ -24,6 +24,7 @@
 #include "csgeom/vector3.h"
 #include "csgeom/box.h"
 #include "csutil/csvector.h"
+#include "csutil/ptrarr.h"
 
 struct iVFS;
 struct iCommandLineParser;
