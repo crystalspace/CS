@@ -34,7 +34,7 @@ class csRigidSpaceTimeObj : public csSpaceTimeObj
 {
 public:
 	static csRigidSpaceTimeObj *space_time_continuum[ MAX_SPACE_TIME_NUM ];
-	static long continuum_end = 0;
+	static long continuum_end;
 
   static void evolve_system( real t1, real t2, ctWorld *time_world, csWorld *space_world );
 
