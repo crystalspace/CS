@@ -246,23 +246,7 @@ bool csSector::UseCullerPlugin (const char *plugname)
   // Load the culler plugin.
   iPluginManager* plugmgr = CS_QUERY_REGISTRY (csEngine::object_reg,
   	iPluginManager);
-  culler = CS_QUERY_PLUGIN_CLASS (plugmgr, plugname, iVisibilityCuller);
-  if (culler)
-  {
-    // Culler is already loaded. Create new instance.
-    culler->DecRef ();
-    //@@@ This is not good! We should use SCF_CREATE_INSTANCE here but for
-    // some reason that doesn't work!!!
-    //culler = SCF_CREATE_INSTANCE (plugname, iVisibilityCuller);
-    culler = CS_LOAD_PLUGIN (plugmgr, plugname, iVisibilityCuller);
-    printf ("Create culler '%s' -> %p\n", plugname, culler); fflush (stdout);
-  }
-  else
-  {
-    // Plugin is not yet loaded.
-    culler = CS_LOAD_PLUGIN (plugmgr, plugname, iVisibilityCuller);
-    printf ("Load culler '%s' -> %p\n", plugname, culler); fflush (stdout);
-  }
+  culler = CS_LOAD_PLUGIN (plugmgr, plugname, iVisibilityCuller);
   plugmgr->DecRef ();
 
   if (!culler)

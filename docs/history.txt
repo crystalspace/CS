@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+12-Jul-2002
+	- csPluginManager::LoadPlugin() is now a bit smarter. If a plugin
+	  is already on the plugin list it will not add it anymore. So you
+	  can now safely do CS_LOAD_PLUGIN multiple times to create multiple
+	  instances of the same plugin.
 10-Jul-2002
 	- Further work on levtool.
 9-Jul-2002

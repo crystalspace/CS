@@ -147,7 +147,27 @@ iBase *csPluginManager::LoadPlugin (const char *classID,
   }
   else
   {
-    int index = Plugins.Push (new csPlugin (p, classID));
+    int index = -1;
+    // See if the plugin is already in our plugin list.
+    for (int i = 0 ; i < Plugins.Length () ; i++)
+    {
+      csPlugin* pl = Plugins.Get (i);
+      if (pl->ClassID)
+        if (pl->ClassID == classID || !strcmp (pl->ClassID, classID))
+	{
+	  index = i;
+	  break;
+	}
+    }
+
+    bool added_here = false;
+    if (index == -1)
+    {
+      // The plugin wasn't in our plugin list yet. Add it here.
+      index = Plugins.Push (new csPlugin (p, classID));
+      added_here = true;
+    }
+
     if (p->Initialize (object_reg))
     {
       iBase *ret;
@@ -165,7 +185,9 @@ iBase *csPluginManager::LoadPlugin (const char *classID,
     csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
     	"crystalspace.pluginmgr.loadplugin",
     	"WARNING: failed to initialize plugin '%s'", classID);
-    Plugins.Delete (index);
+    // If we added this plugin in this call then we remove it here as well.
+    if (added_here)
+      Plugins.Delete (index);
   }
   return NULL;
 }
