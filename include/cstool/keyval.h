@@ -33,7 +33,7 @@
  * One way to attach key value pairs to CS objects is to add the following
  * xml to your object: <key name="somename" value="somevalue" />
  */
-class CS_CSTOOL_EXPORT csKeyValuePair : public csObject
+class CS_CSTOOL_EXPORT csKeyValuePair : public csObject, public iKeyValuePair
 {
 public:
   /// The constructor. Requires both key and value. Data is being copied!
@@ -41,30 +41,13 @@ public:
   /// The destructor as usual
   virtual ~csKeyValuePair ();
 
-  /// Get the key string of the pair.
-  const char *GetKey () const;
-
-  /// Set the key string of the pair.
-  void SetKey (const char *s);
-
-  /// Get the value string of the pair
-  const char *GetValue () const;
-
-  /// Set the value of a key in an object.
-  void SetValue (const char* value);
-
   SCF_DECLARE_IBASE_EXT (csObject);
   //----------------------- iKeyValuePair --------------------------
-  /// iKeyValuePair implementation.
-  struct KeyValuePair : public iKeyValuePair
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csKeyValuePair);
-    virtual iObject *QueryObject() { return scfParent; }
-    virtual const char *GetKey () const { return scfParent->GetKey (); }
-    virtual void SetKey (const char* s) { scfParent->SetKey (s); }
-    virtual const char *GetValue () const { return scfParent->GetValue (); }
-    virtual void SetValue (const char* value) { scfParent->SetValue (value); }
-  } scfiKeyValuePair;
+  virtual iObject *QueryObject() { return (csObject*)this; }
+  virtual const char *GetKey () const;
+  virtual void SetKey (const char* s);
+  virtual const char *GetValue () const;
+  virtual void SetValue (const char* value);
 
 private:
   char *m_Value;

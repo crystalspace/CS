@@ -64,6 +64,17 @@ SCF_VERSION (iParameterESM, 0, 0, 1);
  *     a resolver that returns a constant value. This is useful for
  *     operations where the object to operate on is known in advance.
  * </ul>
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>Own implementions
+ *   <li>iEngineSequenceParameters::CreateParameterESM()
+ *   <li>iEngineSequenceManager::CreateParameterESM()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iSequenceWrapper
+ *   </ul>
  */
 struct iParameterESM : public iBase
 {
@@ -98,6 +109,21 @@ SCF_VERSION (iEngineSequenceParameters, 0, 0, 2);
  * base parameter block and then fill in the values.<br>
  * To use a value from this parameter block you can call CreateParameterESM()
  * which will return a parameter that you can give to an operation.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iSequenceWrapper::CreateBaseParameterBlock()
+ *   <li>iSequenceWrapper::CreateParameterBlock ()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iSequenceWrapper::GetBaseParameterBlock ()
+ *   <li>iSequenceTrigger::GetParameters ()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iSequenceWrapper
+ *   </ul>
  */
 struct iEngineSequenceParameters : public iBase
 {
@@ -164,6 +190,20 @@ SCF_VERSION (iSequenceWrapper, 0, 3, 0);
  * <p>
  * Note that many parameters given to the AddOperation functions
  * are of type iParameterESM.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iEngineSequenceManager::CreateSequence ()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iEngineSequenceManager::GetSequence()
+ *   <li>iEngineSequenceManager::FindSequenceByName()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iEngineSequenceManager
+ *   </ul>
  */
 struct iSequenceWrapper : public iBase
 {
@@ -468,6 +508,20 @@ SCF_VERSION (iSequenceTrigger, 0, 0, 3);
  * A sequence trigger. When all conditions in a trigger are
  * true it will run a sequence. Note that after the succesfull firing
  * of a trigger it will automatically be disabled.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iEngineSequenceManager::CreateTrigger ()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iEngineSequenceManager::GetTrigger()
+ *   <li>iEngineSequenceManager::FindTriggerByName()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iEngineSequenceManager
+ *   </ul>
  */
 struct iSequenceTrigger : public iBase
 {
@@ -612,6 +666,16 @@ SCF_VERSION (iSequenceTimedOperation, 0, 0, 1);
  * 1) then the operation will be deleted automatically.
  * Timed operations are usually fired from within a sequence operation
  * (iSequenceOperation).
+ * <p>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>Application specific. Instances of this are also created
+ *       internally by the engine sequence manager plugin.
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iEngineSequenceManager::FireTimedOperation()
+ *   </ul>
  */
 struct iSequenceTimedOperation : public iBase
 {
@@ -626,6 +690,15 @@ SCF_VERSION (iEngineSequenceManager, 0, 0, 3);
 /**
  * Sequence manager specifically designed for working on
  * the engine.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>Engine Sequence Manager plugin (crystalsapce.utilities.sequence.engine)
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>CS_QUERY_REGISTRY()
+ *   </ul>
  */
 struct iEngineSequenceManager : public iBase
 {

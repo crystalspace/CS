@@ -41,6 +41,19 @@ SCF_VERSION (iCollider, 0, 2, 0);
 
 /**
  * A mesh collider.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iCollideSystem::CreateCollider()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>csColliderWrapper::GetCollider()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>csColliderWrapper
+ *   </ul>
  */
 struct iCollider : public iBase
 {
@@ -53,6 +66,21 @@ SCF_VERSION (iCollideSystem, 0, 0, 3);
  * iCollider entities. A collider represents an entity in the
  * collision detection world. It uses the geometry data as given by
  * iPolygonMesh.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>RAPID plugin (crystalspace.collisiondetection.rapid)
+ *   <li>OPCODE plugin (crystalspace.collisiondetection.opcode)
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>CS_QUERY_REGISTRY()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>csColliderWrapper
+ *   <li>csColliderHelper
+ *   </ul>
  */
 struct iCollideSystem : public iBase
 {

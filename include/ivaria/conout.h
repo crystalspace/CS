@@ -64,6 +64,22 @@ SCF_VERSION (iConsoleOutput, 2, 1, 0);
  * This is the Crystal Space Console interface.  It is an output only system.
  * It can be used in conjunction with the iConsoleInput interface to form an
  * interactive console.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>Simple output console plugin (crystalspace.console.output.simple)
+ *   <li>Standard output console plugin (crystalspace.console.output.standard)
+ *   <li>Fancy output console plugin (crystalspace.console.output.fancy)
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>CS_QUERY_REGISTRY()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iConsoleInput
+ *   <li>iStandardReporterListener
+ *   </ul>
  */
 struct iConsoleOutput : public iBase
 {

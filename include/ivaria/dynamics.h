@@ -44,6 +44,19 @@ SCF_VERSION (iDynamics, 0, 0, 2);
 /**
  * This is the interface for the actual plugin.
  * It is responsible for creating iDynamicSystem.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>ODE Physics plugin (crystalspace.dynamics.ode)
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>CS_QUERY_REGISTRY()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>Dynamics loader plugin (crystalspace.dynamics.loader)
+ *   </ul>
  */
 struct iDynamics : public iBase
 {
@@ -67,6 +80,15 @@ SCF_VERSION (iDynamicSystem, 0, 0, 2);
  * It handles all bookkeeping for rigid bodies and joints.
  * It also handles collision response.
  * Collision detection is done in another plugin.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iDynamicSystem::CreateSystem()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iDynamicSystem::FindSystem()
+ *   </ul>
  */
 struct iDynamicSystem : public iBase
 {
@@ -204,6 +226,16 @@ SCF_VERSION (iDynamicsMoveCallback, 0, 0, 1);
 /**
  * This is the interface for a dynamics move callback.
  * Set on iRigidBody, it can update attachments after each step.
+ * <p>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>application specific
+ *   <li>iDynamicSystem::GetDefaultMoveCallback()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iDynamicSystem
+ *   </ul>
  */
 struct iDynamicsMoveCallback : public iBase
 {
@@ -216,6 +248,15 @@ SCF_VERSION (iDynamicsCollisionCallback, 0, 0, 1);
 
 /**
  * This is the interface for attaching a collider callback to the body
+ * <p>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>application specific
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iDynamicSystem
+ *   </ul>
  */
 struct iDynamicsCollisionCallback : public iBase
 {
@@ -230,6 +271,19 @@ SCF_VERSION (iBodyGroup, 0, 0, 1);
  * certain collisions.  For instance if you have a car built of
  * many different bodies.  The bodies can be collected into a group
  * and the car will be treated as a single object.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iDynamicSystem::CreateGroup()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iRigidBody::GetGroup()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iDynamicSystem
+ *   </ul>
  */
 struct iBodyGroup : public iBase
 {
@@ -248,6 +302,19 @@ SCF_VERSION (iRigidBody, 0, 0, 2);
  * It keeps all properties for the body.
  * It can also be attached to a movable or a bone,
  * to automatically update it.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iDynamicSystem::CreateBody()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iDynamicSystem::FindBody()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iDynamicSystem
+ *   </ul>
  */
 struct iRigidBody : public iBase
 {
@@ -470,6 +537,15 @@ SCF_VERSION (iJoint, 0, 0, 1);
  * instance if all motion in along the local X axis is constrained
  * then the bodies will stay motionless relative to each other
  * along an x axis rotated and positioned by the Joint's transform.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iDynamicSystem::CreateJoint()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iDynamicSystem
+ *   </ul>
  */
 struct iJoint : public iBase
 {

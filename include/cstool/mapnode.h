@@ -30,7 +30,7 @@
  * A node. This is an iObject that is bound to a position and a sector in
  * the world.
  */
-class CS_CSTOOL_EXPORT csMapNode : public csObject
+class CS_CSTOOL_EXPORT csMapNode : public csObject, public iMapNode
 {
 public:
   /// The constructor. Requires the Nodes name!
@@ -38,37 +38,17 @@ public:
   /// The destructor as usual
   virtual ~csMapNode ();
 
-  /// Set the position of the node
-  void SetPosition (const csVector3& pos);
-  /// Get the position of the node
-  const csVector3& GetPosition () const;
-
-  /// Set the sector of the node
-  void SetSector (iSector *pSector);
-  /// Get the sector of the node
-  iSector *GetSector () const;
-
   /// Get a node with the given name and a given classname. (shortcut)
   static iMapNode *GetNode (iSector *pSector, const char *name,
     const char *classname = 0);
 
   SCF_DECLARE_IBASE_EXT (csObject);
   //----------------------- iMapNode --------------------------
-  /// iMapNode implementation.
-  struct MapNode : public iMapNode
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csMapNode);
-    virtual iObject *QueryObject()
-    { return scfParent; }
-    virtual void SetPosition (const csVector3& pos)
-    { scfParent->SetPosition (pos); }
-    virtual const csVector3& GetPosition () const
-    { return scfParent->GetPosition (); }
-    virtual void SetSector (iSector *sec)
-    { scfParent->SetSector (sec); }
-    virtual iSector *GetSector () const
-    { return scfParent->GetSector (); }
-  } scfiMapNode;
+  virtual iObject *QueryObject() { return (csObject*)this; }
+  virtual void SetPosition (const csVector3& pos);
+  virtual const csVector3& GetPosition () const;
+  virtual void SetSector (iSector *sec);
+  virtual iSector *GetSector () const;
 
 private:
   iSector *m_pSector;

@@ -31,6 +31,17 @@ SCF_VERSION (iKeyValuePair, 0, 0, 1);
  * Typically key value pairs are specified in map files (using the <key> tag).
  * They allow a game developer to tag game specific information to any Crystal
  * Space object.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>The main loader creates instances of this internally.
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>SCF_QUERY_INTERFACE() from iObject instances you get by
+ *       calling iObject::GetIterator() on iObject instances you
+ *       get from CS objects (typically using QueryObject()).
+ *   </ul>
  */
 struct iKeyValuePair : public iBase
 {

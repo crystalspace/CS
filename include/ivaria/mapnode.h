@@ -30,6 +30,17 @@ SCF_VERSION (iMapNode, 0, 0, 1);
  * A node. This is an iObject that is bound to a position and a sector in
  * the world. Nodes are typically created from a map file using the <node>
  * attribute.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>The main loader creates instances of this internally.
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>SCF_QUERY_INTERFACE() from iObject instances you get by
+ *       calling iObject::GetIterator() on iObject instances you
+ *       get from iSector::QueryObject().
+ *   </ul>
  */
 struct iMapNode : public iBase
 {

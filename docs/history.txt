@@ -10,6 +10,16 @@ chronological order.
 	- Jorrit changed the PreferClipPlane default to enabled for the new
 	  renderer. Now clipping planes are enabled by default and only
 	  disabled in some cases (like on GF Go hardware).
+	- Jorrit changed csKeyValuePair and csMapNode so that they no
+	  longer use embedding to implement iKeyValuePair and iMapNode.
+	- Jorrit started enhancing the API documentation by adding three
+	  sections to every common interface definition:
+	    - Main creators of instances implementing this interface
+	    - Main ways to get pointers to this interface
+	    - Main users of this interface
+	  The idea is to make it easier for the user to find out how
+	  to obtain instances of some interface and how those interfaces
+	  are supposed to be used.
 12-Apr-2004
 	- Luca added some code to csloader.cpp/*.h to recursively handle the
 	  flags in meshes' children if needed.

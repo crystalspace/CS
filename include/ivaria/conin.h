@@ -49,6 +49,15 @@ SCF_VERSION (iConsoleInput, 1, 0, 1);
  * that may (or may not) be implemented by the console and register
  * that to the event queue. This doesn't work properly. Instead register
  * your own event handler and call HandleEvent() from that.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>Standard input console plugin (crystalspace.console.input.standard)
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>CS_QUERY_REGISTRY()
+ *   </ul>
  */
 struct iConsoleInput : public iBase
 {

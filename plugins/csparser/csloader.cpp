@@ -4238,8 +4238,8 @@ iKeyValuePair* csLoader::ParseKey (iDocumentNode* node, iObject* pParent)
 
 iMapNode* csLoader::ParseNode (iDocumentNode* node, iSector* sec)
 {
-  iMapNode* pNode = &(new csMapNode (
-  	node->GetAttributeValue ("name")))->scfiMapNode;
+  iMapNode* pNode = (iMapNode*)(new csMapNode (
+  	node->GetAttributeValue ("name")));
   pNode->SetSector (sec);
 
   csVector3 pos;
