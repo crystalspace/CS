@@ -92,7 +92,9 @@ Bugs to fix:
 	     map.  Problem is probably the hierarchical mesh factory there.
 	     [Bug 747995]
 	[S]  The frame around the fancy console looks "strange" (Matze's
-	     phrasing).
+	     phrasing). With software renderer the border looks ok but with
+	     OpenGL it is simply not there.
+	     [Bug 748166]
 	[O]  Mark polygons as being visible, used for shadow casting, used for
 	     culling, used for collision detection, ... (more general system).
 	[O]  Implement splatting in Dynavis.
