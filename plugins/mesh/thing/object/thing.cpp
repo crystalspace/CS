@@ -1574,8 +1574,6 @@ csThing::csThing (iBase *parent, csThingStatic* static_data) :
 
   mixmode = CS_FX_COPY;
 
-  ParentTemplate = 0;
-
   movablenr = -1;
   wor_bbox_movablenr = -1;
   cached_movable = 0;
@@ -3106,8 +3104,7 @@ void csThing::UpdateDirtyLMs ()
 
 iMeshObjectFactory *csThing::MeshObject::GetFactory () const
 {
-  if (!scfParent->ParentTemplate) return 0;
-  return (iMeshObjectFactory*)(scfParent->ParentTemplate->GetStaticData ());
+  return (iMeshObjectFactory*)(scfParent->GetStaticData ());
 }
 
 //---------------------------------------------------------------------------

@@ -626,8 +626,6 @@ private:
    */
   uint32 light_version;
 
-  /// Pointer to the Thing Template which it derived from.
-  csThing* ParentTemplate;
   /// Pointer to logical parent.
   iBase* logparent;
 
@@ -800,14 +798,6 @@ public:
    * recalculated.
    */
   void Unprepare ();
-
-  /// Set parent template.
-  void SetTemplate (csThing *t)
-  { ParentTemplate = t; }
-
-  /// Query parent template.
-  csThing *GetTemplate () const
-  { return ParentTemplate; }
 
   /// Find the real material to use if it was replaced (or 0 if not).
   iMaterialWrapper* FindRealMaterial (iMaterialWrapper* old_mat);

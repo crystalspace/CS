@@ -12,6 +12,8 @@ chronological order.
 	    - Started with the iLight dump in iSaver.
 	    - Changed some code to fit the codingstyle in iSaver.
 	    - Fixed the default code of the iSaverPlugin implementation.
+	- Jorrit fixed the GetFactory() in the thing mesh object so that
+	  it actually works now.
 18-Jul-2004
 	- PK changed iSaver and iSaverPlugin to support the iDocumentNode system
 	- PK added iBinarySaverPlugin and changed SprCal3dbinldr to support it
