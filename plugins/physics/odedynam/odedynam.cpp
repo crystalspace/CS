@@ -112,7 +112,7 @@ csPtr<iDynamicSystem> csODEDynamics::CreateSystem ()
 {
   csODEDynamicSystem* system = new csODEDynamicSystem ();
   csRef<iDynamicSystem> isystem (SCF_QUERY_INTERFACE (system, iDynamicSystem));
-  systems.Push (system);
+  systems.Push (isystem);
   return csPtr<iDynamicSystem> (isystem);
 }
 
@@ -632,7 +632,7 @@ void csODEDynamicSystem::RemoveBody (iRigidBody* body)
 
 iRigidBody *csODEDynamicSystem::FindBody (const char *name)
 {
-  return (iRigidBody *)bodies.FindByName (name);
+  return &((csODERigidBody *)bodies.FindByName (name))->scfiRigidBody;
 }
 
 csPtr<iBodyGroup> csODEDynamicSystem::CreateGroup ()
