@@ -741,7 +741,8 @@ void csWorld::ShineLights ()
 
   // Render radiosity
   // -- could put his before scaling to have high quality radiosity
-  if(use_new_radiosity)
+  if(use_new_radiosity && !csPolygon3D::do_not_force_recalc &&
+     csPolygon3D::do_force_recalc)
   {
     start = System->GetTime ();
     csRadiosity *rad = new csRadiosity(this);
