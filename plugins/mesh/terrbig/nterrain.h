@@ -11,13 +11,17 @@
 #include "csutil/csvector.h"
 #include "csutil/csrgbvct.h"
 #include "iutil/vfs.h"
+#include "iutil/comp.h"
 #include "ivideo/graph3d.h"
 #include "iengine/rview.h"
+#include "igeom/objmodel.h"
+#include "imesh/terrbig.h"
 #include <string.h>
 #include <stdio.h>
 
 struct iMeshObject;
 struct iVertexBufferManager;
+struct iImageIO;
 
 const int NTERRAIN_QUADTREE_ROOT=1;
 
@@ -60,7 +64,7 @@ struct nRect
 
 
 /// The length of the nBlock structure
-unsigned const nBlockLen=18;
+unsigned const nBlockLen=34;
 
 typedef unsigned short ti_type;
 
@@ -70,16 +74,16 @@ typedef unsigned short ti_type;
 struct nBlock
 {
   /// Height for vertices
-  unsigned short ne, nw, se, sw, center;
+  float ne, nw, se, sw, center;
 
   /// Variance for block
-  unsigned short variance;
+  float variance;
 
   /// Radius of block
-  unsigned short radius;
+  float radius;
 
   /// Middle height of the block
-  unsigned short midh;
+  float midh;
 
   /// Texture index
   ti_type ti;
@@ -211,7 +215,6 @@ class nTerrain
   // Map mode, whether we are looking up stuff in rgb_colors or pal_colors.
   int map_mode;
   
-private:
   /// Calculates the binary logarithm of n
   int ilogb (unsigned n) 
   {
@@ -224,190 +227,33 @@ private:
   }
 
   /// Sets the variance and radius of a partially filled in block.
-  void SetVarianceAndRadius(nBlock &b, nRect &bounds)
-  {
-    unsigned short low=0xffff;
-    unsigned short high=0x0;
-    unsigned short radius;
-
-    if (b.ne<low)  low=b.ne;
-    if (b.ne>high) high=b.ne;
-
-    if (b.nw<low)  low=b.nw;
-    if (b.nw>high) high=b.nw;
-
-    if (b.se<low)  low=b.se;
-    if (b.se>high) high=b.se;
-
-    if (b.sw<low)  low=b.sw;
-    if (b.sw>high) high=b.sw;
-
-    if (b.center<low)  low=b.center;
-    if (b.center>high) high=b.center;
-
-    // Store variance
-    b.variance = high-low;
-    b.midh = low + b.variance;
-    
-    // Generate radius, start with variance/2.
-    radius = (b.variance>>1);
-
-    // Check and see if the width/2 is bigger.
-    if (radius<bounds.w>>1) radius=bounds.w>>1;
-
-    // Store radius
-    b.radius = radius;
-  }
+  void SetVarianceAndRadius(nBlock &b, const nRect &bounds);
 
   /// Does the work of tree building, heightmap is the height data (0..1), w is the edge length of the heightmap, which must be square.
-  void BuildTreeNode(FILE *f, unsigned int level, unsigned int parent_index, unsigned int child_num, nRect bounds, float *heightmap, unsigned int w)
-  {
-    unsigned int my_index = (parent_index<<2) + child_num + NTERRAIN_QUADTREE_ROOT;
-    unsigned int mid = (bounds.w>>1)+1;
-    nBlock b;
-
-    // Get heights.
-    b.ne = STATIC_CAST(unsigned short int, heightmap[bounds.x +              (bounds.y * w)] * 65535);
-    b.nw = STATIC_CAST(unsigned short int, heightmap[bounds.x + bounds.w +   (bounds.y * w)] * 65535);
-    b.se = STATIC_CAST(unsigned short int, heightmap[bounds.x +              ((bounds.y + bounds.h) * w)] * 65535);
-    b.sw = STATIC_CAST(unsigned short int, heightmap[bounds.x + bounds.w +   ((bounds.y + bounds.h) * w)] * 65535);
-    b.center = STATIC_CAST(unsigned short int, heightmap[bounds.x +  mid  +  ((bounds.y + mid) * w)] * 65535);
-
-    // Set the variance for this block (the difference between the highest and lowest points.)
-    SetVarianceAndRadius(b, bounds);
-
-    // Store the block in the file.
-    fseek(f, my_index*nBlockLen, SEEK_SET);
-    fwrite(&b, nBlockLen, 1, f);
-
-    // Expand the quadtree until we get to the max resolution.
-    if (level<max_levels)
-    {
-      BuildTreeNode(f, level+1, my_index, 0, nRect(bounds.x,bounds.y,mid,mid), heightmap, w);
-      BuildTreeNode(f, level+1, my_index, 1, nRect(bounds.x+mid,bounds.y,mid,mid), heightmap, w);
-      BuildTreeNode(f, level+1, my_index, 2, nRect(bounds.x,bounds.y+mid,mid,mid), heightmap, w);
-      BuildTreeNode(f, level+1, my_index, 3, nRect(bounds.x+mid,bounds.y+mid,mid,mid), heightmap, w);
-    }
-  }
+  void BuildTreeNode(FILE *f, unsigned int level, unsigned int parent_index, unsigned int child_num, nRect bounds, float *heightmap, unsigned int w);
 
   /// Buffers the node passed into it for later drawing, bounds are needed to generate all the verts.
-  void BufferTreeNode(nBlock *b, nRect bounds)
-  {
-        
-    int ne = info->vertices.Push(csVector3(bounds.x, b->ne, bounds.y)),
-        nw = info->vertices.Push(csVector3(bounds.x, b->ne, bounds.y)),
-        se = info->vertices.Push(csVector3(bounds.x, b->ne, bounds.y)),
-        sw = info->vertices.Push(csVector3(bounds.x, b->ne, bounds.y)),
-        center = info->vertices.Push(csVector3(bounds.x, b->ne, bounds.y));
-   
-
-    /** Build texture indices.  The northeast corner is 0,0 for the texture, and the
-     * southwest corner is 1,1.  That makes the other corners respective of their places,
-     * 0, 1; 1, 0; and .5, .5
-     */
-    info->texels.Push(csVector2(0.0, 0.0));
-    info->texels.Push(csVector2(1.0, 0.0));
-    info->texels.Push(csVector2(0.0, 1.0));
-    info->texels.Push(csVector2(1.0, 1.0));
-    info->texels.Push(csVector2(0.5, 0.5));
-    
-    /** Build triangle stacks, for each block output four triangles.
-     * No need to merge and split because each block is at full resolution,
-     * we have no partial resolution blocks.
-     */
-    info->triq[b->ti].triangles.Push(csTriangle(se, center, sw));
-    info->triq[b->ti].triangles.Push(csTriangle(sw, center, nw));
-    info->triq[b->ti].triangles.Push(csTriangle(ne, center, nw));
-    info->triq[b->ti].triangles.Push(csTriangle(ne, center, se));
-  }
+  void BufferTreeNode(nBlock *b, nRect bounds);
 
   /// Processes a node for buffering, checks for visibility and detail levels.
-  void ProcessTreeNode(iRenderView *rv, unsigned int level, unsigned int parent_index, unsigned int child_num, nRect bounds)
-  {
-    unsigned int my_index = (parent_index<<2) + child_num + NTERRAIN_QUADTREE_ROOT;
-    unsigned int mid = (bounds.w>>1)+1;
-    bool render_this=false;
-    nBlock *b;
+  void ProcessTreeNode(iRenderView *rv, unsigned int level, unsigned int parent_index, unsigned int child_num, nRect bounds);
     
-    // Get the block we're currently checking.
-    b=(nBlock *)hm->GetPointer(my_index);
-
-    // Create a bounding sphere.
-    csSphere bs(csVector3(bounds.x+mid, b->midh, bounds.y+mid), b->radius);
-
-    // Test it for culling, return if it's not visible.
-    if (!rv->TestBSphere(obj2cam, bs)) return;
-
-    // If we are at the bottom level, we HAVE to render this block, so don't bother with the calcs.
-    if (level<max_levels)
-      render_this=true;
-
-    else
-    {
-      // Get distance from center of block to camera, plus a small epsilon to avoid division by zero.
-      float distance = ((cam-bs.GetCenter()).SquaredNorm())+0.0001;
-
-      // Get the error metric, in this case it's the ratio between variance and distance.
-      float error_metric = STATIC_CAST(float, b->variance) / distance;
-
-      if (error_metric<=error_metric_tolerance)
-        render_this=true;
-    }
-
-    // Don't render this block, resolve to the next level.
-    if (!render_this)
-    {
-      ProcessTreeNode(rv, level+1, my_index, 0, nRect(bounds.x,bounds.y,mid,mid));
-      ProcessTreeNode(rv, level+1, my_index, 1, nRect(bounds.x+mid,bounds.y,mid,mid));
-      ProcessTreeNode(rv, level+1, my_index, 2, nRect(bounds.x,bounds.y+mid,mid,mid));
-      ProcessTreeNode(rv, level+1, my_index, 3, nRect(bounds.x+mid,bounds.y+mid,mid,mid));
-    }
-    // Render this block to the buffer for later drawing.
-    else
-      BufferTreeNode(b, bounds);
-
-  }
-
 public:
+  /// Sets the heightmap file
+  void SetHeightMapFile (const char *filename) 
+    {
+    if (hm) { delete hm; }
+    hm = new csMemoryMappedIO (nBlockLen, (char *)filename);
+    }
   /** Builds a full-resolution quadtree terrain mesh object on disk, 
    *  heightmap is the data, w is the width and height (map must be square
    *  and MUST be a power of two + 1, e.g. 129x129, 257x257, 513x513.)
    */
-  void BuildTree(FILE*f, float *heightmap, unsigned int w)
-  {
-    max_levels = ilogb(w-1);
+  void BuildTree(FILE *f, float *heightmap, unsigned int w);
 
-    unsigned int mid = (w>>1)+1;
-    unsigned int x=0, y=0;
+  /// Assembles the terrain into the buffer when called by the engine.  
+  void AssembleTerrain(iRenderView *rv, nTerrainInfo *terrinfo);
 
-    BuildTreeNode(f, 1, 0, 0, nRect(x,y,mid,mid), heightmap, w);
-    BuildTreeNode(f, 1, 0, 1, nRect(x+mid,y,mid,mid), heightmap, w);
-    BuildTreeNode(f, 1, 0, 2, nRect(x,y+mid,mid,mid), heightmap, w);
-    BuildTreeNode(f, 1, 0, 3, nRect(x+mid,y+mid,mid,mid), heightmap, w);
-  }
-
-  /** Assembles the terrain into the buffer when called by the engine.  
-   */
-  void AssembleTerrain(iRenderView *rv, nTerrainInfo *terrinfo)
-  {
-    // Clear mesh lists
-    info = terrinfo;   
-
-    unsigned int mid = (terrain_w>>1)+1;
-    unsigned int x=0, y=0;
-
-    
-    //  Buffer entire viewable terrain by first doing view culling on the block, then checking for the
-    // error metric.  If the error metric fails, then we need to drop down another level. Begin that
-    // process here.
-    
-    ProcessTreeNode(rv, 1, 0, 0, nRect(x,y,mid,mid));
-    ProcessTreeNode(rv, 1, 0, 1, nRect(x+mid,y,mid,mid));
-    ProcessTreeNode(rv, 1, 0, 2, nRect(x,y+mid,mid,mid));
-    ProcessTreeNode(rv, 1, 0, 3, nRect(x+mid,y+mid,mid,mid));
-  }
-
-public:
   /// Sets the object to camera transform
   void SetObjectToCamera(csReversibleTransform &o2c)
   { obj2cam = o2c; }
@@ -417,17 +263,7 @@ public:
   { cam=camv; }
 
   /// Set the materials list, copies the passed in list.
-  void SetMaterialsList(iMaterialHandle **matlist, unsigned int nMaterials)
-  {
-    int i;
-    if (materials) delete [] materials;
-
-    materials = new iMaterialHandle *[nMaterials];
-    for(i=0; i<nMaterials; ++i)
-      materials[i]=matlist[i];
-
-    // @@@ Should I incref each material?  Then decref on closing?
-  }
+  void SetMaterialsList(iMaterialHandle **matlist, unsigned int nMaterials);
 
   iMaterialHandle **GetMaterialsList()
   {
@@ -443,64 +279,11 @@ public:
    * the file.  This function should only be called WHEN CREATING a terrain file.
    * When loading the terrain for render, call LoadMaterialMap(). 
    */
-  void CreateMaterialMap(iFile *matmap, iImage *terrtex)
-  {
-    char mode[128];
-    char matname[512];
-    
-    char *data = new char[matmap->GetSize()];
-    matmap->Read(data, matmap->GetSize());
+  void CreateMaterialMap(iFile *matmap, iImage *terrtex);
 
-    int index=0;
-    int read;
-    int r,g,b;
-
-    const MAP_MODE_RGB = 0;
-    const MAP_MODE_8BIT = 1;
-    
-    while(index<matmap->GetSize())
-    {
-
-      // Get some settings
-      if ((read=csScanStr(&data[index], "scale: %d", &map_scale))!=-1)
-	index+=read;
-
-      else if ((read=csScanStr(&data[index], "mode: %s", mode))!=-1)
-      {
-	index+=read;
-	if (strcmp(mode, "RGB")==0)
-	  map_mode=MAP_MODE_RGB;
-	else
-  	  map_mode=MAP_MODE_8BIT;
-      }
-      else if (map_mode==MAP_MODE_RGB && (read=csScanStr(&data[index], "%d,%d,%d: %s", &r, &g, &b, matname))!=-1)
-      {
-	index+=read;
-	csRGBcolor *color = new csRGBcolor;
-
-	color->red=r;
-	color->green=g;
-	color->blue=b;
-
-	rgb_colors.Push(color);
-      }
-
-      else if (map_mode==MAP_MODE_8BIT && (read=csScanStr(&data[index], "%d: %s", &r, matname))!=-1)
-      {
-	index+=read;
-	
-	pal_colors.Push((void *)r);
-      }
-    }
-
-    // Now sort the list
-    if (map_mode==MAP_MODE_RGB) rgb_colors.QuickSort();
-    else pal_colors.QuickSort();
-  }
-
-public:
-  nTerrain():max_levels(0), error_metric_tolerance(0.5), 
-	     info(NULL), hm(NULL), materials(NULL), 
+  nTerrain(csMemoryMappedIO *phm=NULL):max_levels(0), 
+             error_metric_tolerance(0.000001), 
+	     info(NULL), hm(phm), materials(NULL), 
 	     map_scale(0), map_mode(0) {}
 
   ~nTerrain()
@@ -559,11 +342,64 @@ protected:
   void InitMesh (nTerrainInfo *info);
 
 public:
-  ////////////////////////////// iMeshObject implementation ///////////////////////////
+  ////////////////////////////// iTerrBigState implementation ///////////////////////////
   SCF_DECLARE_IBASE;
+
+  struct eiTerrBigState : public iTerrBigState
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csBigTerrainObject);
+    virtual bool LoadHeightMapFile (const char *hm) 
+    { return scfParent->LoadHeightMapFile (hm); }
+    virtual bool ConvertImageToMapFile (iFile *input, iImageIO *imageio, const char *hm)
+    { return scfParent->ConvertImageToMapFile (input, imageio, hm); }
+    virtual void SetMaterialsList(iMaterialHandle **matlist, unsigned int nMaterials)
+    { return scfParent->SetMaterialsList(matlist, nMaterials); }
+  } scfiTerrBigState;
+  friend class eiTerrBigState;
+
+  ////////////////////////////// iObjectModel implementation ///////////////////////////
+
+	struct eiObjectModel : public	iObjectModel
+	{
+		SCF_DECLARE_EMBEDDED_IBASE (csBigTerrainObject);
+		virtual	long GetShapeNumber()	const	
+		{	
+			return scfParent->GetShapeNumber(); 
+		}
+		virtual	iPolygonMesh*	GetPolygonMesh() { return	NULL;	}
+		virtual	iPolygonMesh*	GetSmallerPolygonMesh()	{	return NULL; }
+		virtual	iPolygonMesh*	CreateLowerDetailPolygonMesh(	float	)	{	return NULL; }
+		virtual	void GetObjectBoundingBox( csBox3& bBBox,	int	iType	=	CS_BBOX_NORMAL )
+		{
+			return scfParent->GetObjectBoundingBox(	bBBox, iType );
+		}
+		virtual	void GetRadius(	csVector3& rad,	csVector3& cent	)
+		{
+			return scfParent->GetRadius( rad, cent );
+		}
+	}	scfiObjectModel;
+  friend class eiObjectModel;
+
+  ////////////////////////////// iVertexBufferManagerClient implementation ///////////////////////////
+
+	void ManagerClosing() {}
+
+  struct eiVertexBufferManagerClient : public iVertexBufferManagerClient
+  {
+    SCF_DECLARE_EMBEDDED_IBASE( csBigTerrainObject );
+    void ManagerClosing()
+		{
+			return scfParent->ManagerClosing();
+		}
+  } scfiVertexBufferManagerClient;
+
+
 
   csBigTerrainObject(iObjectRegistry* _obj_reg, iMeshObjectFactory *_pFactory);
   virtual ~csBigTerrainObject();
+
+  virtual bool LoadHeightMapFile (const char *hm);
+  virtual bool ConvertImageToMapFile (iFile *input, iImageIO *imageio, const char *hm);
 
   /// Returns a pointer to the factory that made this.
   virtual iMeshObjectFactory* GetFactory () const { return pFactory; }
@@ -612,6 +448,9 @@ public:
   /// Get logical parent.
   virtual iBase* GetLogicalParent () const { return logparent; }
 
+  /// Get object model
+  virtual iObjectModel *GetObjectModel () { return &scfiObjectModel; }
+
   /// Get write object.
   virtual iPolygonMesh* GetWriteObject () { return NULL; }
 
@@ -645,7 +484,7 @@ public:
   iObjectRegistry *object_reg;
 
   /// Constructor.
-  csBigTerrainObjectFactory (iObjectRegistry* object_reg);
+  csBigTerrainObjectFactory (iBase *pParent, iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csBigTerrainObjectFactory ();
@@ -660,5 +499,36 @@ public:
   virtual iBase* GetLogicalParent () const { return logparent; }
 };
 
+/**
+ * Terrbig Type.  This is the plugin one uses to create the 
+ * csBigTerrainMeshObjectFactory.
+ */
+class csBigTerrainObjectType : public iMeshObjectType
+{
+public:
+  iObjectRegistry *object_reg;
+
+  SCF_DECLARE_IBASE;
+
+  /// Constructor
+  csBigTerrainObjectType (iBase*);
+  /// Destructor
+  virtual ~csBigTerrainObjectType ();
+  /// Create an instance of csBigTerrainObjectFactory
+  virtual iMeshObjectFactory* NewFactory ();
+  /// Initialize
+  bool Initialize (iObjectRegistry* oreg)
+  {
+    object_reg = oreg;
+    return true;
+  }
+  
+  struct eiComponent : public iComponent
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csBigTerrainObjectType);
+    virtual bool Initialize (iObjectRegistry* object_reg)
+    { return scfParent->Initialize (object_reg); }
+  } scfiComponent;
+};
 
 #endif
