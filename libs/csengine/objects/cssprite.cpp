@@ -108,6 +108,7 @@ csSpriteTemplate::csSpriteTemplate ()
   texel_mesh = new csTriangleMesh ();
 
   tri_verts = NULL;
+  do_tweening = true;
 }
 
 csSpriteTemplate::~csSpriteTemplate ()
@@ -536,7 +537,7 @@ csSprite3D::csSprite3D (csObject* theParent) : csSprite (theParent), bbox (NULL)
   tween_verts.IncRef ();
   light_worktable.IncRef ();
 
-  do_tweening = false;
+  do_tweening = true;
 }
 
 csSprite3D::~csSprite3D ()
