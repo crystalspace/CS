@@ -1028,11 +1028,21 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
   }
   else if (drawflags & CSDRAW_2DGRAPHICS)
   {
+    /*
+      Turn off some stuff that isn't needed for 2d (or even can
+      cause visual glitches.)
+     */
     if (use_hw_render_buffers)
     {
       ext->glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
       ext->glBindBufferARB (GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
     }
+    if (ext->CS_GL_ARB_multitexture)
+    {
+      ext->glActiveTextureARB(GL_TEXTURE0_ARB);
+      ext->glClientActiveTextureARB(GL_TEXTURE0_ARB);
+    }
+    statecache->Disable_GL_ALPHA_TEST ();
 
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
