@@ -5,8 +5,11 @@ The overall history is in reverse (descending) chronological order, so that
 each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
+
 5-Aug-2003
-        - Boyan fixed errors in broadcasting in iNetworkSocket2
+	- Jorrit fixed metaball.mak. Was missing a CSUTIL dependency after
+	  CSSYS.
+        - Boyan fixed errors in broadcasting in iNetworkSocket2.
 4-Aug-2003
 	- Oktal added the following to csutil:
 	    - A template class, csHash<T>, intended to replace csHashMap soon.
