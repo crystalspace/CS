@@ -1098,7 +1098,7 @@ void WalkTest::rotate (float speed,int keep_old)
 
   static bool pressed = false;
   static float angle_accel = 0;
-  static long start_time;
+  static long start_time = Time ();
 
   long cur_time = Time ();
   if (!keep_old)
