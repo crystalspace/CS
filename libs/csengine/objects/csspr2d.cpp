@@ -37,7 +37,6 @@ csSprite2D::csSprite2D () : csSprite (), position (0, 0, 0)
 
 csSprite2D::~csSprite2D ()
 {
-  csWorld::current_world->UnlinkSprite (this);
 }
 
 
@@ -95,7 +94,7 @@ void csSprite2D::SetColor (const csColor& col)
 void csSprite2D::AddColor (const csColor& col)
 {
   for (int i=0; i<vertices.Length(); i++)
-    vertices[i].color_init = col;
+    vertices[i].color_init += col;
 }
 
 
