@@ -1065,7 +1065,7 @@ void csGraphics3DGlide::FinishPolygonFX ()
 
 void csGraphics3DGlide::DrawPolygonFX (G3DPolygonDPFX& poly)
 {
-  if (poly.num >= 3 && (m_thTex || !m_renderstate.textured))
+  if (poly.num >= 3)
   {
     if ( poly.num  > m_vertsize )
     {
@@ -1091,7 +1091,7 @@ void csGraphics3DGlide::DrawPolygonFX (G3DPolygonDPFX& poly)
         m_verts[i].b = 255;
       }
       m_verts[i].oow = 1./poly.vertices[i].z;
-      if ( m_renderstate.textured ){
+      if ( m_renderstate.textured && m_thTex){
         m_verts[i].tmuvtx[1].sow = m_verts[i].tmuvtx[0].sow = poly.vertices[i].u*m_thTex->width*m_verts[i].oow;
         m_verts[i].tmuvtx[1].tow = m_verts[i].tmuvtx[0].tow = poly.vertices[i].v*m_thTex->height*m_verts[i].oow;
       }
