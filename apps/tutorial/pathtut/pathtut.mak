@@ -41,7 +41,7 @@ OUTDIRS += $(OUT.PATHTUT)
 
 MSVC.DSP += PATHTUT
 DSP.PATHTUT.NAME = pathtut
-DSP.PATHTUT.TYPE = appcon
+DSP.PATHTUT.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

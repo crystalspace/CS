@@ -41,7 +41,7 @@ TO_INSTALL.EXE += $(CSLIGHT.EXE)
 
 MSVC.DSP += CSLIGHT
 DSP.CSLIGHT.NAME = cslight
-DSP.CSLIGHT.TYPE = appcon
+DSP.CSLIGHT.TYPE = appgui
 
 $(CSLIGHT.EXE).WINRSRC = $(SRCDIR)/apps/tools/cslight/cslight.rc
 

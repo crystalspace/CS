@@ -2,7 +2,7 @@
 #==============================================================================
 #
 #    Microsoft Visual C++ project and workspace file generator.
-#    Copyright (C) 2000-2002 by Eric Sunshine <sunshine@sunshineco.com>
+#    Copyright (C) 2000-2003 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -34,26 +34,26 @@ use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'msvcgen.pl';
-my $PROG_VERSION = 4;
+my $PROG_VERSION = 5;
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
-my $COPYRIGHT = "Copyright (C) 2000-2002 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
+my $COPYRIGHT = "Copyright (C) 2000-2003 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
 
 $main::opt_project = 0;
 $main::opt_p = 0;	# Alias for 'project'.
-$main::opt_projext = '';
-$main::opt_px = '';	# Alias for 'projext'.
+$main::opt_project_extension = '';
+$main::opt_P = '';	# Alias for 'project-extension'.
 $main::opt_workspace = 0;
 $main::opt_w = 0;	# Alias for 'workspace'.
-$main::opt_wsext = '';
-$main::opt_wx = '';	# Alias for 'wsext'.
+$main::opt_workspace_extension = '';
+$main::opt_W = '';	# Alias for 'workspace-extension'.
 $main::opt_name = '';
 $main::opt_N = '';	# Alias for 'name'.
 $main::opt_template = '';
 $main::opt_t = '';	# Alias for 'template'.
-$main::opt_projname = '';
-$main::opt_htmlents = 0;
-$main::opt_H = 0;	# Alias for 'htmlents'.
+$main::opt_project_name = '';
+$main::opt_xml_protect = 0;
+$main::opt_X = 0;	# Alias for 'xml-protect'.
 $main::opt_target = '';
 $main::opt_g = '';	# Alias for 'target'.
 @main::opt_library = ();
@@ -69,6 +69,8 @@ $main::opt_fragment = undef;
 @main::opt_D = ();	# Alias for 'depend'.
 $main::opt_template_dir = '';
 $main::opt_T = '';	# Alias for 'template-dir'.
+@main::opt_strip_root = ();
+@main::opt_S = ();	# Alias for 'strip-root'.
 $main::opt_verbose = 0;
 $main::opt_v = 0;	# Alias for 'verbose'.
 $main::opt_quiet = 0;
@@ -79,19 +81,19 @@ $main::opt_help = 0;
 my @script_options = (
     'project',
     'p',		# Alias for 'project'.
-    'projext=s',
-    'px=s', 		# Alias for 'projext'.
+    'project-extension=s',
+    'P=s', 		# Alias for 'project-extension'.
     'workspace',
     'w',		# Alias for 'workspace'.
-    'wsext=s',	
-    'wx=s',		# Alias for 'wsext'.
+    'workspace-extension=s',
+    'W=s',		# Alias for 'workspace-extension'.
     'name=s',
     'N=s',		# Alias for 'name'.
     'template=s',
     't=s',		# Alias for 'template'.
-    'projname=s',
-    'htmlents',		
-    'H',		# Alias for 'htmlents'.
+    'project-name=s',
+    'xml-protect',
+    'X',		# Alias for 'xml-protect'.
     'target=s',
     'g=s',		# Alias for 'target'.
     'library=s@',
@@ -107,6 +109,8 @@ my @script_options = (
     'D=s@',		# Alias for 'depend'.
     'template-dir=s',
     'T=s',		# Alias for 'template-dir'.
+    'strip-root=s@',
+    'S=s@',		# Alias for 'strip-root'.
     'verbose!',
     'v!',		# Alias for 'verbose'.
     'quiet!',
@@ -119,9 +123,9 @@ $main::verbosity = 0;
 $main::makefile = '';
 $main::guid = '';
 $main::groups = {};
-@main::pji_fragments = ();
-@main::dpi_fragments = ();
-@main::cfi_fragments = ();
+@main::pjf_fragments = ();
+@main::dpf_fragments = ();
+@main::cff_fragments = ();
 
 $main::project_template = '';
 $main::project_group_template = '';
@@ -136,11 +140,11 @@ $main::workspace_config_template = '';
 $main::patterns = {
     'sources'     => {
 	'name'    => 'Source Files',
-	'pattern' => '(?i)\.(c|cc|cpp)$'
+	'pattern' => '(?i)\.(c|cc|cpp|C|m|mm|M)$'
     },
     'headers'     => {
 	'name'    => 'Header Files',
-	'pattern' => '(?i)\.h$'
+	'pattern' => '(?i)\.(h|hpp|H)$'
     },
     'resources'   => {
 	'name'    => 'Resource Files'
@@ -148,19 +152,19 @@ $main::patterns = {
 };
 
 $main::targets = {
-    'appgui'  => {
+    'appgui' => {
 	'suffix' => 'exe'
     },
-    'appcon'  => {
+    'appcon' => {
 	'suffix' => 'exe'
     },
-    'plugin'  => {
+    'plugin' => {
 	'suffix' => 'dll'
     },
     'library' => {
 	'suffix' => 'lib'
     },
-    'group'   => {
+    'group' => {
 	'suffix' => ''
     }
 };
@@ -222,15 +226,15 @@ sub remove_suffix {
 }
 
 #------------------------------------------------------------------------------
-# create a unique guid from a project name.
+# Create a unique GUID from a project name.
 #------------------------------------------------------------------------------
 sub guid_from_name {
-    my ($projname) = @_;
+    my $projname = shift;
     my $rawguid = md5_hex($projname);
     my $shapedguid = '{' .
 	substr($rawguid,  0,  8) . '-' .
 	substr($rawguid,  8,  4) . '-' .
-	substr($rawguid, 12,  4) . '-' . 
+	substr($rawguid, 12,  4) . '-' .
 	substr($rawguid, 16,  4) . '-' .
 	substr($rawguid, 20, 12) .
 	'}';
@@ -238,11 +242,10 @@ sub guid_from_name {
 }
 
 #------------------------------------------------------------------------------
-# insert html entities
+# Protect XML special characters with appropriate XML entity references.
 #------------------------------------------------------------------------------
-sub clean_string {
-    my ($result) = @_;
-    $result = join(' ', @{$result}) if ref($result) and ref($result) eq 'ARRAY';
+sub xmlize {
+    my $result = shift;
     $result =~ s/\"/\&quot\;/g;
     $result =~ s/\</\&lt\;/g;
     $result =~ s/\>/\&gt\;/g;
@@ -250,16 +253,15 @@ sub clean_string {
 }
 
 #------------------------------------------------------------------------------
-# only insert html entities when --htmlents option is set
+# Protect XML special characters with appropriate XML entity references if the
+# --xml-protect option was specified.  If the value is an array reference
+# rather than a string, then convert the elements to a single string delimited
+# by spaces before applying the XML translation.
 #------------------------------------------------------------------------------
-sub wellformed_string {
-    my ($result) = @_;
-    $result = join(' ', @{$result}) if ref($result) and ref($result) eq 'ARRAY';
-    if ($main::opt_htmlents) {
-    	return clean_string($result);
-    } else {
-    	return $result;
-    }
+sub xmlprotect {
+    my $result = shift;
+    $result = join(' ',@{$result}) if ref($result) and ref($result) eq 'ARRAY';
+    return $main::opt_xml_protect ? xmlize($result) : $result;
 }
 
 #------------------------------------------------------------------------------
@@ -308,10 +310,10 @@ sub load_templates {
     }
     else {
 	$main::project_template = load_template("$main::opt_template", 'tpl');
-	$main::project_group_template  = load_template('prjgroup', 'tpi');
-	$main::project_file_template   = load_template('prjfile', 'tpi');
-	$main::project_delaylib_template   = load_template('prjdelay', 'tpi');
-	$main::workspace_project_template  = load_template('wsgroup', 'tpi');
+	$main::project_group_template = load_template('prjgroup', 'tpi');
+	$main::project_file_template = load_template('prjfile', 'tpi');
+	$main::project_delaylib_template = load_template('prjdelay', 'tpi');
+	$main::workspace_project_template = load_template('wsgroup', 'tpi');
 	$main::workspace_depend_template = load_template('wsdep', 'tpi');
 	$main::workspace_config_template = load_template('wscfg', 'tpi');
     }
@@ -349,12 +351,15 @@ sub interpolate_items {
 #------------------------------------------------------------------------------
 sub interpolate_project_group {
     my $group = shift;
-    my $result = $main::project_group_template;
-    my $name = $main::patterns->{$group}->{'name'};
     my $files = $main::groups->{$group};
     my $files_buffer =
 	interpolate_items($files, '%file%', $main::project_file_template);
-    interpolate('%group%', $name, \$result);
+
+    my $group_name = $main::patterns->{$group}->{'name'};
+    my $result = $main::project_group_template;
+    interpolate('%name%', $main::opt_name, \$files_buffer);
+    interpolate('%name%', $main::opt_name, \$result);
+    interpolate('%group%', $group_name, \$result);
     interpolate('%files%', $files_buffer, \$result);
     return $result;
 }
@@ -376,19 +381,21 @@ sub interpolate_project_groups {
 #------------------------------------------------------------------------------
 sub interpolate_project {
     my $result = $main::project_template;
-    my $delaylibs = "";
-    foreach my $delaylib (@main::opt_delaylib) {
+    my $delaylibs = '';
+    my $delaylib;
+    foreach $delaylib (@main::opt_delaylib) {
     	$delaylibs .= $main::project_delaylib_template;
     	interpolate('%delaylib%', $delaylib, \$delaylibs);
     }
-    interpolate('%project%',   wellformed_string($main::opt_projname), \$result);
-    interpolate('%makefile%',  wellformed_string($main::makefile),     \$result);
-    interpolate('%target%',    wellformed_string($main::opt_target),   \$result);
-    interpolate('%libs%',      wellformed_string(\@main::opt_library), \$result);
-    interpolate('%delaylibs%', wellformed_string($delaylibs), 	       \$result);
-    interpolate('%lflags%',    wellformed_string(\@main::opt_lflags),  \$result);
-    interpolate('%cflags%',    wellformed_string(\@main::opt_cflags),  \$result);
-    interpolate('%groups%',    interpolate_project_groups(),           \$result);
+    interpolate('%name%',      $main::opt_name,                     \$result);
+    interpolate('%project%',   xmlprotect($main::opt_project_name), \$result);
+    interpolate('%makefile%',  xmlprotect($main::makefile),         \$result);
+    interpolate('%target%',    xmlprotect($main::opt_target),       \$result);
+    interpolate('%libs%',      xmlprotect(\@main::opt_library),     \$result);
+    interpolate('%delaylibs%', xmlprotect($delaylibs), 	            \$result);
+    interpolate('%lflags%',    xmlprotect(\@main::opt_lflags),      \$result);
+    interpolate('%cflags%',    xmlprotect(\@main::opt_cflags),      \$result);
+    interpolate('%groups%',    interpolate_project_groups(),        \$result);
     return $result;
 }
 
@@ -401,6 +408,7 @@ sub interpolate_ws_dependency {
     my $dependency;
     foreach $dependency (sort(@main::opt_depend)) {
 	my $buffer = $main::workspace_depend_template;
+	interpolate('%name%', $main::opt_name, \$buffer);
 	interpolate('%depnum%', $depcnt, \$buffer);
 	interpolate('%guid%', $main::guid, \$buffer);
 	interpolate('%depguid%', guid_from_name($dependency), \$buffer);
@@ -417,7 +425,8 @@ sub interpolate_ws_dependency {
 sub interpolate_ws_project {
     my $depends_buffer = shift;
     my $result = $main::workspace_project_template;
-    interpolate('%project%', $main::opt_projname, \$result);
+    interpolate('%name%', $main::opt_name, \$result);
+    interpolate('%project%', $main::opt_project_name, \$result);
     interpolate('%projfile%', basename($main::opt_output), \$result);
     interpolate('%depends%', $depends_buffer, \$result);
     interpolate('%guid%', $main::guid, \$result);
@@ -425,10 +434,11 @@ sub interpolate_ws_project {
 }
 
 #------------------------------------------------------------------------------
-# Build the contents of workspace config group fragment.
+# Build the contents of workspace configuration group fragment.
 #------------------------------------------------------------------------------
 sub interpolate_ws_config {
     my $result = $main::workspace_config_template;
+    interpolate('%name%', $main::opt_name, \$result);
     interpolate('%guid%', $main::guid, \$result);
     return $result;
 }
@@ -441,16 +451,17 @@ sub interpolate_workspace {
     my $depends_buffer = '';
     my $config_buffer = '';
     my $fragment;
-    foreach $fragment (sort(@main::pji_fragments)) {
+    foreach $fragment (sort(@main::pjf_fragments)) {
 	$proj_buffer .= load_file($fragment);
     }
-    foreach $fragment (sort(@main::dpi_fragments)) {
+    foreach $fragment (sort(@main::dpf_fragments)) {
 	$depends_buffer .= load_file($fragment);
     }
-    foreach $fragment (sort(@main::cfi_fragments)) {
+    foreach $fragment (sort(@main::cff_fragments)) {
 	$config_buffer .= load_file($fragment);
     }
     my $result = $main::workspace_template;
+    interpolate('%name%', $main::opt_name, \$result);
     interpolate('%projects%', $proj_buffer, \$result);
     interpolate('%depends%', $depends_buffer, \$result);
     interpolate('%configs%', $config_buffer, \$result);
@@ -458,38 +469,35 @@ sub interpolate_workspace {
 }
 
 #------------------------------------------------------------------------------
-# Create a DSP file and optionally a DSW dependency fragment file.
+# Create a DSP/VCPROJ file and optionally a DSW/SLN dependency fragment file.
 #------------------------------------------------------------------------------
 sub create_project {
     save_file($main::opt_output, interpolate_project());
     print "Generated: $main::opt_output\n" unless quiet();
-    
+
     if (defined($main::opt_fragment)) {
-    	$main::guid = guid_from_name($main::opt_projname);
-    	
-	save_file($main::opt_fragment, "Dummy file.\n");
-	print "Generated: $main::opt_fragment\n" unless quiet();
-	
+    	$main::guid = guid_from_name($main::opt_project_name);
+
     	my $dependencies = interpolate_ws_dependency();
-    	my $dpi_frag = $main::opt_fragment;
-    	add_suffix ($dpi_frag, 'dpi');
-	save_file($dpi_frag, $dependencies);
-	print "Generated: $dpi_frag\n" unless quiet();
+    	my $dpf_frag = $main::opt_fragment;
+    	add_suffix ($dpf_frag, 'dpf');
+	save_file($dpf_frag, $dependencies);
+	print "Generated: $dpf_frag\n" unless quiet();
 
-    	my $pji_frag = $main::opt_fragment;
-    	add_suffix ($pji_frag, 'pji');
-	save_file($pji_frag, interpolate_ws_project($dependencies));
-	print "Generated: $pji_frag\n" unless quiet();
+    	my $pjf_frag = $main::opt_fragment;
+    	add_suffix ($pjf_frag, 'pjf');
+	save_file($pjf_frag, interpolate_ws_project($dependencies));
+	print "Generated: $pjf_frag\n" unless quiet();
 
-    	my $cfi_frag = $main::opt_fragment;
-    	add_suffix ($cfi_frag, 'cfi');
-	save_file($cfi_frag, interpolate_ws_config());
-	print "Generated: $cfi_frag\n" unless quiet();
+    	my $cff_frag = $main::opt_fragment;
+    	add_suffix ($cff_frag, 'cff');
+	save_file($cff_frag, interpolate_ws_config());
+	print "Generated: $cff_frag\n" unless quiet();
     }
 }
 
 #------------------------------------------------------------------------------
-# Create a DSW file.
+# Create a DSW/SLN workspace file.
 #------------------------------------------------------------------------------
 sub create_workspace {
     save_file($main::opt_output, interpolate_workspace());
@@ -497,13 +505,13 @@ sub create_workspace {
 }
 
 #------------------------------------------------------------------------------
-# Display DSW option summary.
+# Display DSW/SLN option summary.
 #------------------------------------------------------------------------------
 sub summarize_workspace_options {
     print "Mode:      workspace\n";
     print "Name:      $main::opt_name\n" if $main::opt_name;
     print "Output:    $main::opt_output\n";
-    print "Extension: $main::opt_wsext\n";
+    print "Extension: $main::opt_workspace_extension\n";
 }
 
 #------------------------------------------------------------------------------
@@ -514,14 +522,14 @@ sub summarize_project_options {
 Mode:      project
 Name:      $main::opt_name
 Output:    $main::opt_output
-Extension: $main::opt_projext
+Extension: $main::opt_project_extension
 EOT
     print <<"EOT" if defined($main::opt_fragment);
 Fragment:  $main::opt_fragment
 EOT
     print <<"EOT";
 Template:  $main::opt_template
-Project:   $main::opt_projname
+Project:   $main::opt_project_name
 Target:    $main::opt_target
 Makefile:  $main::makefile
 EOT
@@ -560,8 +568,10 @@ sub validate_project_options {
     usage_error("Unrecognized template type.")
 	unless $main::targets->{$main::opt_template};
     usage_error("Must specify a name for the project.") unless $main::opt_name;
-    usage_error("Must specify --projext.")
-    	unless $main::opt_projext;
+    usage_error("Must specify --project-extension.")
+	unless $main::opt_project_extension;
+    usage_error("The option --workspace-extension can be used only with " .
+	"--workspace") if $main::opt_workspace_extension;
 }
 
 #------------------------------------------------------------------------------
@@ -570,8 +580,6 @@ sub validate_project_options {
 sub validate_workspace_options {
     usage_error("The --template option can be used only with --project.")
 	if $main::opt_template;
-    usage_error("The --project option can be used only with --project.")
-	if $main::opt_project;
     usage_error("The --target option can be used only with --project.")
 	if $main::opt_target;
     usage_error("The --library option can be used only with --project.")
@@ -584,12 +592,18 @@ sub validate_workspace_options {
 	if defined($main::opt_fragment);
     usage_error("The --depend option can be used only with --project.")
 	if @main::opt_depend;
+    usage_error("The --delay-lib option can be used only with --project.")
+	if @main::opt_delaylib;
+    usage_error("The --strip-root option can be used only with --project.")
+	if @main::opt_strip_root;
     usage_error("Must specify --name or --output.")
 	unless $main::opt_name or $main::opt_output;
     usage_error("Must specify --name or --output, but not both.")
 	if $main::opt_name and $main::opt_output;
-    usage_error("Must specify --projext and --wsext.")
-    	unless $main::opt_projext and $main::opt_wsext;
+    usage_error("Must specify --workspace-extension.")
+    	unless $main::opt_workspace_extension;
+    usage_error("The option --project-extension can be used only with " .
+	"--project") if $main::opt_project_extension;
 }
 
 #------------------------------------------------------------------------------
@@ -606,12 +620,11 @@ sub validate_options {
 }
 
 #------------------------------------------------------------------------------
-# Process options which apply to DSW and DSP.
+# Process options which apply globally (workspace or project mode).
 #------------------------------------------------------------------------------
 sub process_global_options {
     $main::verbosity =  1 if $main::opt_verbose;
     $main::verbosity = -1 if $main::opt_quiet;
-    $main::opt_output = $main::opt_name unless $main::opt_output;
     $main::opt_template_dir = '.' unless $main::opt_template_dir;
 }
 
@@ -623,30 +636,36 @@ sub process_option_aliases {
     $main::opt_version = 1 if $main::opt_V;
     $main::opt_project = 1 if $main::opt_p;
     $main::opt_workspace = 1 if $main::opt_w;
-    $main::opt_projext = $main::opt_px unless $main::opt_projext;
-    $main::opt_wsext = $main::opt_wx unless $main::opt_wsext;
+    $main::opt_project_extension = $main::opt_P
+	unless $main::opt_project_extension;
+    $main::opt_workspace_extension = $main::opt_W
+	unless $main::opt_workspace_extension;
     $main::opt_name = $main::opt_N unless $main::opt_name;
     $main::opt_target = $main::opt_g unless $main::opt_target;
     $main::opt_template = $main::opt_t unless $main::opt_template;
     $main::opt_template_dir = $main::opt_T unless $main::opt_template_dir;
     push(@main::opt_library, @main::opt_L);
     push(@main::opt_delaylib, @main::opt_Y);
-    push(@main::opt_lflags,  @main::opt_l);
-    push(@main::opt_depend,  @main::opt_D);
-    $main::opt_htmlents = 1 if $main::opt_H;
+    push(@main::opt_lflags, @main::opt_l);
+    push(@main::opt_depend, @main::opt_D);
+    push(@main::opt_strip_root, @main::opt_S);
+    $main::opt_xml_protect = 1 if $main::opt_X;
 }
 
 #------------------------------------------------------------------------------
-# Process DSP command-line options.
+# Process DSP/VCPROJ project command-line options.
 #------------------------------------------------------------------------------
 sub process_project_options {
-    add_suffix($main::opt_output, $main::opt_projext);
+    $main::opt_output = $main::opt_name unless $main::opt_output;
+    add_suffix($main::opt_output, $main::opt_project_extension);
     ($main::makefile = basename($main::opt_output)) =~ s/(?i)\.dsp$/\.mak/;
     $main::opt_project = $main::opt_name unless $main::opt_project;
 
     my $target_ext = $main::targets->{$main::opt_template}->{'suffix'};
     $main::opt_target = $main::opt_name unless $main::opt_target;
     add_suffix($main::opt_target, $target_ext) if $target_ext;
+
+    $main::opt_project_name = $main::opt_name unless $main::opt_project_name;
 
     $main::opt_fragment = $main::opt_name
 	if defined($main::opt_fragment) and !$main::opt_fragment;
@@ -662,15 +681,26 @@ sub process_project_options {
     my @depends;
     my $depend;
     foreach $depend (@main::opt_depend) {
-	remove_suffix($depend, $main::opt_projext);
+	remove_suffix($depend, $main::opt_project_extension);
 	push(@depends, $depend);
     }
     @main::opt_depend = @depends;
+
+    my @roots;
+    my $root;
+    foreach $root (@main::opt_strip_root) {
+	$root =~ tr:/:\\:;
+	push(@roots, quotemeta($root));
+    }
+    @main::opt_strip_root = @roots;
 
     my @files;
     my $file;
     foreach $file (@ARGV) {
 	$file =~ tr:/:\\:;
+	foreach $root (@main::opt_strip_root) {
+	    last if $file =~ s/^$root//;
+	}
 	push(@files, $file);
     }
 
@@ -689,24 +719,27 @@ sub process_project_options {
 }
 
 #------------------------------------------------------------------------------
-# Process DSW command-line options.
+# Process DSW/SLN workspace command-line options.
 #------------------------------------------------------------------------------
 sub process_workspace_options {
-    add_suffix($main::opt_output, $main::opt_wsext);
+    $main::opt_name = $main::opt_output unless $main::opt_name;
+    remove_suffix($main::opt_name, $main::opt_workspace_extension);
+    $main::opt_output = $main::opt_name unless $main::opt_output;
+    add_suffix($main::opt_output, $main::opt_workspace_extension);
 
-   my $fragment;
+    my $fragment;
     foreach $fragment (@ARGV) {
-	my $pji_frag = $fragment;    	
-	add_suffix($pji_frag, 'pji');
-	push(@main::pji_fragments, $pji_frag);
-	
-	my $dpi_frag = $fragment;    	
-	add_suffix($dpi_frag, 'dpi');
-	push(@main::dpi_fragments, $dpi_frag);
-	
-	my $cfi_frag = $fragment;    	
-	add_suffix($cfi_frag, 'cfi');
-	push(@main::cfi_fragments, $cfi_frag);
+	my $pjf_frag = $fragment;
+	add_suffix($pjf_frag, 'pjf');
+	push(@main::pjf_fragments, $pjf_frag);
+
+	my $dpf_frag = $fragment;
+	add_suffix($dpf_frag, 'dpf');
+	push(@main::dpf_fragments, $dpf_frag);
+
+	my $cff_frag = $fragment;
+	add_suffix($cff_frag, 'cff');
+	push(@main::cff_fragments, $cff_frag);
     }
 }
 
@@ -730,100 +763,116 @@ sub print_usage {
 Given a set of input files and project dependencies, generates Microsoft
 Visual C++ workspace and project project files from a set of templates.
 
-Project files and workspaces can be built for both MSVC 6 and 7, given the 
-appropriate templates. The command line options are the same except for the 
-following: --projext and --wsext set the suffixes appended to the project and 
-workspace file names. for MSVC 6, those are 'dsp'/'dsw' and 'vcproj'/'sln' for 
-MSVC 7 (without quotes and dot). When specifying --htmlents, in all the 
-strings that appear in project files ", < and > are replaced with the HTML 
-entities &quot;, &lt; and &gt; as needed for the XML'ish MSVC 7 project files.
+Project files and workspaces can be built for both MSVC 6 and 7, given the
+appropriate templates.  The command line options are the same for each version.
+The MSVC version for which to generate files is controlled by providing a
+suitable set of templates via --template-dir; and via --project-extension and
+--workspace-extension to set the filename suffixes for the generated files.
+For MSVC 6, 'dsp' should be used as the suffix for project files, and 'dsw' for
+workspace files.  For MSVC 7, use 'vcproj' and 'sln' for project and workspace
+files, respectively.  The --xml-protect option should be used when creating
+MSVC 7 project files in order to ensure that special characters (such as ", <,
+and >) get encoded via XML character references.  This is required since MSVC 7
+files are stored in XML format.
 
-A project file is generated when --project is specified.  The type of project 
-represented by the project file is selected using the --template option.  The 
-template can be one of "appcon", "plugin", "library", or "group"; which 
-represent a console application, a dynamic link library (DLL), a static 
-library (LIB), or an group project, respectively. The "group" project type is 
-used for creating pseudo-dependency targets within a workspace but does not 
-actually generate any resources.
+A project file is generated when --project is specified.  The type of project
+represented by the project file is selected using the --template option.  The
+template can be one of "appgui", "appcon", "plugin", "library", or "group";
+which represent a GUI application, a console application, a dynamic link
+library (DLL), a static library (LIB), or an group project, respectively.  The
+"group" project type is used for creating pseudo-dependency targets within a
+workspace but does not actually generate any resources.
 
-Template files are loaded from the current working directory or from a named
-template directory.  The template files appcon.tpl, plugin.tpl,
-library.tpl, and group.tpl correspond to the project types available via the
---template option.  Template files may contain the variables \%project\%,
-\%target\%, \%makefile\%, \%groups\%, \%libs\%, \%lflags\%, and \%cflags\%.
-The variables \%project\%, \%target\%, \%libs\%, \%flags\%, and \%cflags\%
-are replaced with values specified via the --projname, --target, --library,
---lflags, and --cflags options, respectively.  The replacement value for
-\%makefile\% is the same as the name of the generated project file with the
-exception that .mak is substituted for the suffix.
+Template files are loaded from the current working directory or from the
+directory named via --template-dir.  The template files appgui.tpl, appcon.tpl,
+plugin.tpl, library.tpl, and group.tpl correspond to the project types
+available via the --template option.  Template files may contain the variables
+\%name\%, \%project\%, \%target\%, \%makefile\%, \%groups\%, \%libs\%,
+%delaylibs%, \%lflags\%, and \%cflags\%.  The variables \%name\%, \%project\%,
+\%target\%, \%libs\%, \%cflags\%, and \%lflags\% are replaced with values
+specified via the --name, --projectname, --target, --library, --cflags, and
+--lflags options, respectively.  The \%name\% variable can be used in any
+template file.  The replacement value for \%makefile\% is the same as the name
+of the generated project file except that .mak is substituted for the suffix.
 
 The template prjgroup.tpi is used multiple times to build a value for the
-\%groups\% variable mentioned above.  This template is used to create the
-file groups "Source Files", "Header Files", and "Resource Files", as needed,
-within the generated project file.  This template may contain the variables
-\%group\% and \%files\%.  The \%group\% variable is automatically replaced
-by the name of the group being generated (for instance "Source Files").
+\%groups\% variable mentioned above.  This template is used to create the file
+groups "Source Files", "Header Files", and "Resource Files", as needed, within
+the generated project file.  This template may contain the variables \%group\%,
+\%files\%, and \%name\%.  The \%group\% variable is automatically replaced by
+the name of the group being generated (for instance "Source Files").
 
 The template prjfile.tpi is used multiple times to build a value for the
-\%files\% variable mentioned above.  This template is used to specify each
-file which makes up a file group (represented by dspgroup.tpi).  This
-template may contain the variable \%file\% which represents a file name
-provided as an argument to this script during DSP generation.
+\%files\% variable mentioned above.  This template is used to specify each file
+which makes up a file group (represented by prjgroup.tpi).  This template may
+contain the variable \%file\% which represents a file name provided as an
+argument to this script during DSP/VCPROJ generation.  It may also reference
+the variable \%name\%.
 
-During project file generation, a couple of workspace fragment files (for 
-project, configuration, and dependency information) can also be generated with 
-the --fragment option and zero or more --depend options. The generated 
-fragment files can later be used to create a complete workspace file 
-containing all projects, configuration information and dependency graph for 
-the entire project (That is, to create a complete, valid workspace). Note: 
-MSVC 6 projects only need the dependency information; the templates for the 
-other fragments can be empty.
+The template prjdelay.tpi is used multiple times to bulid a value for the
+\%delaylibs\% variable mentioned above.  This template is used to specify each
+delayed-load library given via the --delaylib option.  The entire content of
+this template should be placed on a single line and should not end with a line
+terminator.  This template may contain the variables \%delaylib\% and \%name\%.
+The value of \%delaylib\% will be a name of a DLL specified with --delaylib.
 
-The dependency fragment file is created from the template dswgroup.tpi.
-This template may contain the variables \%project\%, \%dsp\%, and
-\%depends\%.  The \%project\% variable has the same meaning as it does when
-used with the templates specified via --template.  The \%dsp\% variable is
-replaced by the name of the generated DSP file (see --output), except that
-the directory portion of the path is stripped off.
+During project file generation, a couple of workspace fragment files (for
+project, configuration, and dependency information) can also be generated with
+the --fragment option and zero or more --depend options.  The generated
+fragment files can later be used to create a complete workspace file containing
+all projects, configuration information, and dependency graph for the entire
+project (to wit, to create a complete, valid workspace referencing all the
+project files generated individually).  Note: MSVC 6 projects require only the
+dependency information; the templates for the other fragments may be empty.
 
-The project fragment file is created from the template wsgroup.tpi. This 
-template may contain the variables \%project\%, \%projfile\%, and \%guid\%. 
-The \%project\% variable has the same meaning as it does when used with the 
-templates specified via --template.  The \%projfile\% variable is replaced by 
-the name of the generated project file (see --output), except that the 
-directory portion of the path is stripped off. \%guid\% contains a unique 
-identifier every project in a MSVC7 Solution must have. 
+The project fragment file is created from the template wsgroup.tpi.  This
+template may contain the variables \%project\%, \%projfile\%, \%depends\%,
+\%guid\%, and \%name\%.  The \%project\% variable has the same meaning as it
+does when used with the templates specified via --template.  The \%projfile\%
+variable is replaced by the name of the generated project file (see --output),
+except that the directory portion of the path is stripped off.  The \%depends\%
+variable contains a collection of inter-project dependency information for
+projects contained in the workspace.  The value of \%guid\% is a unique
+identifier which is required by every MSVC 7 project.  This value is composed
+automatically from the project name.
 
-To create configuration fragments, the template wscfg.tpi is used. The only 
-variable it may contain is \%guid\%.
+To create configuration fragments, the template wscfg.tpi is used.  The only
+variable it may contain is \%guid\%.  This template is required only by MSVC 7,
+but it must also be present when creating MSVC 6 files, though it may left
+empty.
 
-The template wsdep.tpi is used multiple times to build a value for the 
-\%depends\% variable mentioned above.  This template is used to specify each 
-project guid which makes up a dependency group (represented by wsgroup.tpi) 
-for a specific project  This template may contain the variable \%guid\%, 
-\%depguid\%, \%depnum\% and \%depend\%. \%depguid\% represents a project guid 
-upon which the generated project file depends (see --depend), \%depend\% is 
-this project's name. \%depnum\% is simply a counter, beginning with 0.
+The template wsdep.tpi is used multiple times to build a value for the
+\%depends\% variable mentioned above.  This template is used to specify
+inter-project dependencies within a workspace file.  This template may contain
+the variables \%guid\%, \%depguid\%, \%depnum\%, \%depend\%, and \%name\%.
+\%guid\% is the unique project identifier discussed above.  \%depguid\% is the
+unique project identifier of a project upon which this project depends (see
+--depend), \%depend\% is the name of a project upon which this project depends
+(see --depend).  Each project named by --depend is also assigned a small number
+(starting at zero with the first --depend encountered).  When processing the
+named dependency, the associated number is available as \%depnum\%.
 
-Finally, a workspace file is generated when --workspace is specified. The SLN 
-file is created by merging the contents of fragment files into the template 
-ws.tpl.  This template may contain the variable \%groups\%, \%depends\% and 
-\%configs\%, which are replaced by the collected contents of all fragments 
-named as arguments to this script during workspace generation.
+Finally, a workspace file is generated when --workspace is specified.  The
+DSW/SLN file is created by merging the contents of fragment files into the
+template ws.tpl.  This template may contain the variable \%projects\%,
+\%depends\% and \%configs\%, which are replaced by the collected contents of
+all project, dependency, and configuration fragments named as arguments to this
+script for workspace synthesis.
 
 Usage: $PROG_NAME [options] <file> ...
 
 Global Options:
-    -p --project     Generate a project file.
-    -w --workspace   Generate a workspace file.
-    -px --projext    Suffix for project files.
-    -wx --wsext	     Suffix for workspace files.
-    -H --htmlents    Insert HTML entities in strings in project files.
+    -p --project Generate a project file.
+    -w --workspace
+                 Generate a workspace file.
+    -X --xml-protect
+                 Use XML character references in strings inserted into
+                 generated files in place of "special" characters.
     -T <path>
     --template-dir=<path>
-                 Specifies the directory where the template files reside.
-                 If not specified, then template files are assumed to exist
-                 in the current working directory.
+                 Specifies the directory where the template files reside.  If
+                 not specified, then template files are assumed to exist in the
+                 current working directory.
     -v --verbose Emit informational messages about the processing.  Can be
                  negated with --noverbose.  Deafult is --noverbose.
     -q --quiet   Suppress all output except for error messages.  Can be
@@ -832,35 +881,41 @@ Global Options:
     -h --help    Display this usage message.
 
 Project Options:
-<file> Path of a file which belongs to the project represented by this project.
-       Any number of files may be specified, or none if the project contains
-       no files.  Files with the suffixes .c, .cc, and .cpp are placed in
-       the project's "Source Files" group; files with the suffix .h are
-       placed in the "Header Files" group; and all other files are placed in
-       the "Resource Files" group.  Each mentioned file replaces the
-       variable \%file\% in the prjfile.tpi template.
-
+    <file>       Path of a file which belongs to the project represented by
+                 this project.  Any number of files may be specified, or none
+                 if the project contains no files.  Files with the suffixes .c,
+                 .cc, .cpp, .C, .m, .mm, and .M are placed in the project's
+                 "Source Files" group; files with the suffixes .h, .hpp, and .H
+                 are placed in the "Header Files" group; and all other files
+                 are placed in the "Resource Files" group.  Each mentioned file
+                 replaces the variable \%file\% in the prjfile.tpi template.
     -N <name>
     --name=<name>
-                 The basic name associated with this project file.  This name 
+                 The basic name associated with this project file.  This name
                  is used for automatic generation of other required names (such
-                 as output name, target name, fragment name) if those names
-                 are not explicitly specified.
+                 as output name, target name, fragment name) if those names are
+                 not explicitly specified.  It is also available in template
+                 files as the \%name\% variable.
     -o <path>
     --output=<path>
-                 Specifies the full path of the generated project file.  A 
-                 suffix is automatically appended if absent.  If not
-                 specified, then the name given with --name is used as the
-                 output name and the file is written to the current working
-                 directory.
+                 Specifies the full path of the generated project file.  A
+                 suffix (see --project-extension) is automatically appended if
+                 absent.  If this option is not specified, then the name given
+                 with --name (plus extension) is used as the output name and
+                 the file is written to the current working directory.
+    -P <ext>
+    --project-extension=<ext>
+                 Use <ext> as suffix for project file.  The extension 'dsp'
+                 should be used for MSVC 6 project files; and 'vcproj' for
+                 MSVC 7 project files.
     -t <type>
     --template=<type>
                  Specifies the template type for this project.  The type may be
-                 one of "appcon", "plugin", "library", or "group".
+                 one of "appgui", "appcon", "plugin", "library", or "group".
                  See the discussion of project generation (above) for an
                  explanation of the various template types.
     -p <name>
-    --projname=<name>
+    --project-name=<name>
                  Specifies the display name of the project for the Microsoft
                  Visual C++ IDE.  This is the replacement value for the
                  \%project\% variable in template files.  If not specified,
@@ -869,99 +924,127 @@ Project Options:
     --target=<name>
                  Specifies the name of the actual target generated by this
                  project.  This is the replacement value for the \%target\%
-                 variable in the template files.  For GUI and console
-                 programs, this is the name of the resultant executable
-                 (EXE); for plugins it is the dynamic link library (DLL);
-                 and for libraries, it is the static library (LIB).  If not
-                 specified, then the name given with --name is used as the
-                 target name.  If the name does not end with an appropriate
-                 suffix (one of .exe, .dll, or .lib), then the suffix is
-                 added automatically.
+                 variable in the template files.  For applications, this is the
+                 name of the resultant executable (EXE); for plugins it is the
+                 dynamic link library (DLL); and for libraries, it is the
+                 static library (LIB).  If not specified, then the name given
+                 with --name is used as the target name.  If the name does not
+                 end with an appropriate suffix (one of .exe, .dll, or .lib),
+                 then the suffix is added automatically.
     -L <name>
     --library=<name>
-                 Specifies the name of an extra Windows library with which
-                 the project should be linked in addition to those which are
-                 already mentioned in the template file.  This is the
-                 replacement value for the \%libs\% variable in the template
-                 files.  Typically, libraries are only specified for
-                 executable and plug-in templates.  A .lib suffix is added
-                 to the name automatically if absent.  The --library option
-                 may be given any number of times to specify any number of
-                 additional libraries, or not at all if no additional
-                 libraries are required.  The --library option differs from
-                 the --depend option in that it refers to libraries which
-                 exist outside of the project graph, whereas --depend always
-                 refers to projects which are members of the project graph.
+                 Specifies the name of an extra Windows library with which the
+                 project should be linked in addition to those which are
+                 already mentioned in the template file.  The named library
+                 will become part of the replacement value for the \%libs\%
+                 variable in the template files.  Typically, libraries are only
+                 specified for executable and plug-in templates.  A .lib suffix
+                 is added to the name automatically if absent.  The --library
+                 option may be given any number of times to specify any number
+                 of additional libraries, or not at all if no additional
+                 libraries are required.  The --library option differs from the
+                 --depend option in that it refers to libraries which exist
+                 outside of the project graph, whereas --depend always refers
+                 to projects which are members of the project graph.
     -Y <name>
-    --delayload=<name>
-    		 Specified the name of a DLL which should be delay loaded.
-    		 In prjdelay.tpi, \%delaylib\% is replaced with this value. 
-    		 All resulting strings are concatenated and replaced for
-    		 \%delaylibs\% in the project template.
+    --delaylib=<name>
+                 Specifies the name of a DLL which should be delay-loaded.  In
+                 prjdelay.tpi, \%delaylib\% is replaced with this value.  The
+                 concatentation of each invocation of prjdelay.tpi becomes the
+                 value of the \%delaylibs\% variable in the project template
+                 (see --template).
     -l <flags>
     --lflags=<flags>
                  Specifies extra linker options which should be used in
                  addition to those already mentioned in the template file.
-                 This is the replacement value for the \%lflags\% variable
-                 in the template files.  Typically, linker options are only
-                 specified for executable and plug-in templates.  The
-                 --lflags option may be specified any number of times, in
-                 which case the effects are cumulative, or not at all if no
-                 extra linker options are required.
+                 This is the replacement value for the \%lflags\% variable in
+                 the project template files.  Typically, linker options are
+                 only specified for executable and plug-in templates.  The
+                 --lflags option may be specified any number of times, in which
+                 case the effects are cumulative, or not at all if no extra
+                 linker options are required.
     -c <flags>
     --cflags=<flags>
                  Specifies extra compiler options which should be used in
                  addition to those already mentioned in the template file.
-                 This is the replacement value for the \%cflags\% variable
-                 in the template files.  The --cflags option may be
-                 specified any number of times, in which case the effects
-                 are cumulative, or not at all if no extra compiler options
-                 are required.  As an example, a pre-processor macro named
+                 This is the replacement value for the \%cflags\% variable in
+                 the project template files.  The --cflags option may be
+                 specified any number of times, in which case the effects are
+                 cumulative, or not at all if no extra compiler options are
+                 required.  As an example, a pre-processor macro named
                  __FOOBAR__ can be defined with: --cflags='/D "__FOOBAR__"'
     -f
     -f <path>
     --fragment
     --fragment=<path>
-                 Specifies whether or not to generate workspace fragment files 
-                 along with the project file.  Fragment files list the other 
-                 projects upon which this project relies and some other stuff 
-                 needed for the solution.  If not specified, then no fragments 
-                 are generated.  If specified, but no path is given, then the 
-                 name given with --name is used as the fragment name. Fragment 
-                 files use the suffixes .frag, .frag.pji, .frag.cfi and 
-                 .frag.dpi.  This suffixes are added automatically if absent. 
-                 Generated fragments can later be incorporated into a 
-                 workspace file to collectively define a complete solution for 
-                 the entire project. each dependency specified with the --
-                 depend option is listed in the generated fragments.
+                 Specifies whether or not to generate workspace fragment files
+                 along with the project file.  Fragment files list the other
+                 projects upon which this project relies, as well as other
+                 information needed to fully synthesize workspace files.  If
+                 not specified, then no fragments are generated.  If specified,
+                 but no path is given, then the name given with --name is used
+                 as the fragment name.  Fragment files are given the suffixes
+                 .pjf, .cff and .dpf.  The suffixes are added automatically to
+                 the specified path.  Generated fragments can later be
+                 incorporated into a workspace file collectively to define a
+                 complete workspace for the entire project.  Each dependency
+                 specified with the --depend option is listed in the generated
+                 depedency fragment.
     -D <project>
     --depend=<project>
-                 Specifies the name of a project upon which this project 
-                 depends. Each project name is written to the workspace 
-                 dependency fragment file for this project and is the 
-                 replacement value for the \%depend\% variable in the 
-                 wsdep.tpi template.  The --depend option may be specified any 
-                 number of times, or not at all if the project has no 
-                 dependencies (which is often the case for "library" 
-                 projects).  This option can only be used in conjunction with 
-                 the --fragment option.
-                 
-Workspace Options:
-<file> Path of a fragment file emitted during a project generation phase
-       See the discussion of fragment file generation (above) for details.
+                 Specifies the name of a project upon which this project
+                 depends.  Each project name is written to the workspace
+                 dependency fragment file for this project, and is the
+                 replacement value for the \%depend\% variable in the wsdep.tpi
+                 template.  The --depend option may be specified any number of
+                 times, or not at all if the project has no dependencies (which
+                 is often the case for "library" projects).  This option can be
+                 used only in conjunction with the --fragment option.
+    -S <prefix>
+    --strip-root=<prefix>
+                 It is generally wise for the source, header, and resource
+                 files mentioned by the generated project file, and referenced
+                 by the \%file\% interpolation variable, to be referenced by
+                 paths relative to the root (or some other location within) the
+                 project hierarchy, rather than by absolute paths.  This allows
+                 the entire project source tree, along with the contained
+                 project files, to be moved from location to location without
+                 breakage.  Typically, this is accomplished by providing
+                 relative pathnames for the files mentioned on the command-line
+                 when the --project option is specified.  Alternately, if
+                 absolute pathnames are given, then the --strip-root option can
+                 be used to remove a prefix portion of each mentioned file.
+                 The --strip-root option may be specified any number of times,
+                 providing a different prefix on each occassion, or not at all,
+                 if all mentioned files are specified via relative pathnames.
 
+Workspace Options:
+    <file>       Path of a fragment file emitted during a project generation
+                 phase.  This is the basename for fragment files, as specified
+                 via the --fragment option during project file generation.  The
+                 name should not have a .pjf, .cff, or .dpf extension; the
+                 appropriate extension will be added automatically to the
+                 basename in order to locate the actual fragment files.  See
+                 the discussion of fragment file generation (above) for
+                 details.
     -N <name>
     --name=<name>
-                 Specifies the base name of the generated workspace file.  A 
-                 suffix is automatically appended to generate the final output 
-                 name and the file is created in the current working 
-                 directory. This option and the --output option are mutually 
-                 exclusive.
+                 Specifies the base name of the generated workspace file.  A
+                 suffix (see --workspace-extension) is automatically appended
+                 to generate the final output name and the file is created in
+                 the current working directory.  This option and the --output
+                 option are mutually exclusive.
     -o <path>
     --output=<path>
-                 Specifies the full path of the generated DSW file.  A suffix 
-                 is automatically appended if absent.  This option and the --
-                 name option are mutually exclusive.
+                 Specifies the full path of the generated DSW/SLN workspace
+                 file.  A suffix (see --workspace-extension) is automatically
+                 appended if absent.  This option and the --name option are
+                 mutually exclusive.
+    -W <ext>
+    --workspace-extension=<ext>
+                 Use <ext> as suffix for workspace file.  The extension 'dsw'
+                 should be used for MSVC 6 workspace files; and 'sln' for
+                 MSVC 7 workspace files.
 EOT
 }
 

@@ -43,7 +43,7 @@ OUTDIRS += $(OUT.BUMPTEST)
 
 MSVC.DSP += BUMPTEST
 DSP.BUMPTEST.NAME = bumptest
-DSP.BUMPTEST.TYPE = appcon
+DSP.BUMPTEST.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

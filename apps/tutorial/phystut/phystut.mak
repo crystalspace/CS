@@ -41,7 +41,7 @@ TO_INSTALL.EXE += $(PHYSTUT.EXE)
 
 MSVC.DSP += PHYSTUT
 DSP.PHYSTUT.NAME = phystut
-DSP.PHYSTUT.TYPE = appcon
+DSP.PHYSTUT.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

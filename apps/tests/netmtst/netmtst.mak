@@ -40,7 +40,7 @@ OUTDIRS += $(OUT.NETMANTEST)
 
 MSVC.DSP += NETMANTEST
 DSP.NETMANTEST.NAME = netmtst
-DSP.NETMANTEST.TYPE = appcon
+DSP.NETMANTEST.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

@@ -17,11 +17,114 @@ The history order is reversed so that new features are at the top.
 	- Oktal added a test to the csperl5 makefile, so it will only attempt
 	  to rebuild the Swig-generated files if the required version of Swig
 	  was detected by configure.
-	- Philip Wyett updated MSVC 6 project files. Lowered warning level
-          (developers can raise locally). This eliminates alot of spurious
-          warnings. Also enabled C++ exeception handling, which I thought
-          was enabled, but whatever.
-            - Made awscG2D public.
+	- Philip Wyett made the following changes:
+	    - Updated MSVC 6 project files.  Lowered warning level (developers
+	      can raise locally).  This eliminates alot of spurious warnings.
+	      Also enabled C++ exeception handling, which I thought was
+	      enabled, but whatever.
+            - Made awscG2D public for some unknown reason.
+	- Eric Sunshine made the following changes:
+	    - Added the new variable %name% to msvcgen.pl which can be
+	      interpolated into any template file.  The value of this variable
+	      is the name provided by the --name option.
+	    - Performed some code clean up of msvcgen.pl following the merge of
+	      msvcgen.pl and msvc7gen.pl (which occurred some time ago).
+	    - Cleaned up a bunch of errors in the documentation and added
+	      documentation which should have been added when msvcgen.pl and
+	      msvc7gen.pl were merged.
+	    - Renamed msvcgen.pl options --projext, -px, --wsext, -wx,
+	      --projname, and --htmlent to --project-extension, -P,
+	      --workspace-extension, -W, --project-name, --xml-protect,
+	      respectively.
+	    - Changed msvcgen.pl so that it no longer creates the unused
+	      "dummy" fragment file.  This file seems to have been an ugly
+	      artifact to slighly simplify msvcgen.mak following the msvcgen.pl
+	      and msvc7gen.pl merge.  A slight modification of msvcgen.mak
+	      obviated the need for this hack.
+	    - Fixed bug in msvcgen.pl where it failed to use the value from
+	      --name as the default for --project-name if --project-name was
+	      not specified.
+	    - The extensions .C, .m, .mm, and .M are now recognized as source
+	      files (in addition to .c, .cc, and .cpp) by msvcgen.pl.  The
+	      extensions .hpp and .H are now recognized as header files (in
+	      addition to .h).
+	    - Added --strip-root option to msvcgen.pl which allows
+	      specification of zero or more prefixes which should be stripped
+	      from filenames/resources mentioned on the command-line and which
+	      are referenced by generated project files.  This is desirable
+	      because it is a good idea to record only relative paths in
+	      project files, rather than absolute.  This switch can be employed
+	      by tools which are unable to provide relative paths to
+	      msvcgen.pl.
+	    - Revived the DSP.PROJECT.RESOURCES variable.  This variable is
+	      useful for inserting additional human-readable resources into the
+	      generated project files.  It is not clear why this variable was
+	      removed when the $(PROJECT.EXE).WINRSRC functionality (which is
+	      completely different in purpose) was added to msvcgen.mak.
+	    - Revived the "appgui" project type which had been removed some
+	      time back.  Although the project files for GUI (appgui) and
+	      console (appcon) applications might not differ at present, it is
+	      still useful to be able to make this distinction (especially
+	      since it might be needed again in the future).
+	    - Cleaned up some documentation in msvcgen.mak following the merge
+	      of msvcgen.mak and msvc7gen.mak (some time ago).
+	    - Fixed problem with mergeres.sh where it failed to perform path
+	      "fix-up" properly if the build hierarchy differed from the source
+	      hierarchy.  One manifestation of this problem was that the .rc
+	      files generated via msvcgen.mak from a build hierarchy
+	      outside the source hierarchy differed from those generated
+	      directly in the source hierarchy.  On a related note,
+	      win32gcc.mak and msvcgen.jam were providing "fix-up" argument to
+	      mergeres.sh which failed to take $(SRCDIR) into account, thus
+	      causing the fix-up to fail.
+	    - Fixed bug in msvcgen.jam where it failed to specify the location
+	      of csver.h when invoking mkverres.sh, thus it failed when
+	      generating project files from a build hierarchy which differed
+	      from the source hierarchy.
+	    - Fixed bug in msvcgen.jam where it failed to use --xmlprotect (nee
+	      --htmlent) when building MSVC7 project files.
+	    - Fixed bug in msvcgen.jam where it was incorrectly specifying
+	      external libraries via --depend.  The correct option is
+	      --library.
+	    - Fixed bug in msvcgen.jam where it was incorrectly specifying
+	      linker flags via --library.  The correct option is --lflags.
+	    - Fixed bug in msvcgen.jam where it failed to normalize the source,
+	      header, and resource paths which it passed to msvcgen.pl for
+	      mention in the generated project files.  This was a problem when
+	      the build directory differed from the CS source directory, since
+	      the paths recorded in the project file would be relative to the
+	      build directory or absolute, rather than relative within the
+	      source directory.
+	    - Fixed bug in msvcgen.jam where it would insert the wrong file
+	      into a generated project if the filename was not unique between
+	      all directories.  For instance, in the generated libcsutil
+	      project, plugins\documentsystem\xmltiny\xmltiny.cpp would
+	      incorrectly appear in place of libs\csutil\xmltiny.cpp.
+	    - msvcgen.jam is almost usable.  Still to-do: Make it respect
+	      ExternaLibs() or fix all the Jamfiles which require special
+	      Windows libraries to invoke MsvcExternalLibrary().  Overhaul the
+	      "config" file handling rule so that it associates configuration
+	      files with built targets.  This will allow the generated projects
+	      to reference configuration files.  Likewise, provide a generic
+	      Resources rule which allows specification of additional textual
+	      resources for inclusion in generated projects.  Upgrade module
+	      Jamfiles to mention headers from the CS/include/foobar directory.
+	      This will allow related headers to appear in the generated
+	      project files.  For instance, the libcsutil project should
+	      mention headers from CS/include/csengine, in addition to the ones
+	      from CS/libs/csengine, which it currently mentions.
+	    - Renamed CS/mk/visualc to CS/mk/visualc6.
+	    - Renamed CS/mk/msvcgen/template to CS/mk/msvcgen/template6.
+	    - Renamed the msvcgen and msvcinst makefile targets to msvc6gen
+	      and msvc6inst.
+	    - Fixed problem in Jam build where it would attempt to invoke
+	      Bourne scripts using C-shell if user's login shell was C-shell or
+	      compatible.
+	    - Fixed csperl5/Jamefile so that it is only enabled if the Perl
+	      SDK was detected, rather than if the Perl command is available.
+	      This is an important distinction because the presence of the Perl
+	      command alone does not necessarily imply the presence of a
+	      working SDK.
 10-May-2003
 	- Philip Wyett eliminated the 88 double to float conversion compiler
           warnings in gtreeldr.cpp under MSVC 6.

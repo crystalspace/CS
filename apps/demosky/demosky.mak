@@ -41,7 +41,7 @@ OUTDIRS += $(OUT.DEMOSKY)
 
 MSVC.DSP += DEMOSKY
 DSP.DEMOSKY.NAME = demosky
-DSP.DEMOSKY.TYPE = appcon
+DSP.DEMOSKY.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

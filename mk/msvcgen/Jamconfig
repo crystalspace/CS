@@ -15,15 +15,23 @@ USE_PLUGINS = "yes" ;
 # msvcgen flags
 MSVC.DEPEND = ;
 MSVC.LIBRARY = ;
+MSVC.LFLAGS = ;
 MSVC.CFLAGS = ;
+MSVC.DEPEND.appgui = ;
+MSVC.LIBRARY.appgui = ;
+MSVC.LFLAGS.appgui = ;
+MSVC.CFLAGS.appgui = ;
 MSVC.DEPEND.appcon = ;
 MSVC.LIBRARY.appcon = ;
+MSVC.LFLAGS.appcon = ;
 MSVC.CFLAGS.appcon = ;
 MSVC.DEPEND.plugin = ;
 MSVC.LIBRARY.plugin = ;
+MSVC.LFLAGS.plugin = ;
 MSVC.CFLAGS.plugin = ;
 MSVC.DEPEND.library = ;
 MSVC.LIBRARY.library = ;
+MSVC.LFLAGS.library = ;
 MSVC.CFLAGS.library = ;
 
 # common flags (ignored from msvcgen)

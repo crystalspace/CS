@@ -41,7 +41,7 @@ OUTDIRS += $(OUT.CSFEDIT)
 
 MSVC.DSP += CSFEDIT
 DSP.CSFEDIT.NAME = csfedit
-DSP.CSFEDIT.TYPE = appcon
+DSP.CSFEDIT.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

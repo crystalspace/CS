@@ -45,7 +45,7 @@ OUTDIRS += $(OUT.MOTTEST)
 
 MSVC.DSP += MOTTEST
 DSP.MOTTEST.NAME = mottest
-DSP.MOTTEST.TYPE = appcon
+DSP.MOTTEST.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

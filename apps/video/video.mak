@@ -43,7 +43,7 @@ OUTDIRS += $(OUT.CSVID)
 
 MSVC.DSP += CSVID
 DSP.CSVID.NAME = csvid
-DSP.CSVID.TYPE = appcon
+DSP.CSVID.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

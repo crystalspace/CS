@@ -43,7 +43,7 @@ TO_INSTALL.DATA   += $(SRCDIR)/data/isomap/world
 
 MSVC.DSP += ISOMAP
 DSP.ISOMAP.NAME = isomap
-DSP.ISOMAP.TYPE = appcon
+DSP.ISOMAP.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

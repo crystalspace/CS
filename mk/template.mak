@@ -149,6 +149,7 @@ TO_INSTALL.DATA += $(SRCDIR)/data/foobar.zip
 MSVC.DSP += FOOBAR
 DSP.FOOBAR.NAME = foobar
 # Choose only one of the following.
+DSP.FOOBAR.TYPE = appgui
 DSP.FOOBAR.TYPE = appcon
 DSP.FOOBAR.TYPE = library
 DSP.FOOBAR.TYPE = plugin

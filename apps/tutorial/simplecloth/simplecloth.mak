@@ -42,7 +42,7 @@ OUTDIRS += $(OUT.SIMPLECLOTH)
 
 MSVC.DSP += SIMPLECLOTH
 DSP.SIMPLECLOTH.NAME = simplecloth
-DSP.SIMPLECLOTH.TYPE = appcon
+DSP.SIMPLECLOTH.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

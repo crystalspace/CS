@@ -42,7 +42,7 @@ OUTDIRS += $(OUT.LGHTNGTEST)
 
 MSVC.DSP += LGHTNGTEST
 DSP.LGHTNGTEST.NAME = lghtngtest
-DSP.LGHTNGTEST.TYPE = appcon
+DSP.LGHTNGTEST.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

@@ -43,7 +43,7 @@ TO_INSTALL.EXE    += $(ISOTEST.EXE)
 
 MSVC.DSP += ISOTEST
 DSP.ISOTEST.NAME = isotest
-DSP.ISOTEST.TYPE = appcon
+DSP.ISOTEST.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

@@ -44,7 +44,7 @@ OUTDIRS += $(OUT.PYSIMP)
 
 MSVC.DSP += PYSIMP
 DSP.PYSIMP.NAME = pysimp
-DSP.PYSIMP.TYPE = appcon
+DSP.PYSIMP.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

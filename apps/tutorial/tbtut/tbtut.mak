@@ -41,7 +41,7 @@ OUTDIRS += $(OUT.TBTUT)
 
 MSVC.DSP += TBTUT
 DSP.TBTUT.NAME = tbtut
-DSP.TBTUT.TYPE = appcon
+DSP.TBTUT.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

@@ -42,7 +42,7 @@ TO_INSTALL.CONFIG += $(CFG.CSDEMO)
 
 MSVC.DSP += CSDEMO
 DSP.CSDEMO.NAME = csdemo
-DSP.CSDEMO.TYPE = appcon
+DSP.CSDEMO.TYPE = appgui
 
 $(CSDEMO.EXE).WINRSRC = $(SRCDIR)/libs/cssys/win32/rsrc/cs1.rc
 

@@ -42,7 +42,7 @@ OUTDIRS += $(OUT.CSWSENG)
 
 MSVC.DSP += CSWSENG
 DSP.CSWSENG.NAME = cswseng
-DSP.CSWSENG.TYPE = appcon
+DSP.CSWSENG.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

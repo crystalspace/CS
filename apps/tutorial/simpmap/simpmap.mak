@@ -41,7 +41,7 @@ OUTDIRS += $(OUT.SIMPMAP)
 
 MSVC.DSP += SIMPMAP
 DSP.SIMPMAP.NAME = simpmap
-DSP.SIMPMAP.TYPE = appcon
+DSP.SIMPMAP.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

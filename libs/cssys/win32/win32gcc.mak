@@ -140,7 +140,7 @@ MERGERES = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mergeres.sh
 DO.SHARED.PLUGIN.PREAMBLE = \
   $(MAKEVERSIONINFO) $(OUT)/$(@:$(DLL)=-version.rc) \
     "$(DESCRIPTION.$(TARGET.RAW))" $(COMMAND_DELIM) \
-  $(MERGERES) $(OUT)/$(@:$(DLL)=-rsrc.rc) ./ \
+  $(MERGERES) $(OUT)/$(@:$(DLL)=-rsrc.rc) $(SRCDIR) $(SRCDIR) \
     $(OUT)/$(@:$(DLL)=-version.rc) $($@.WINRSRC) $(COMMAND_DELIM) \
   $(COMPILE_RES) -i $(OUT)/$(@:$(DLL)=-rsrc.rc) \
     -o $(OUT)/$(@:$(DLL)=-rsrc.o) $(COMMAND_DELIM)

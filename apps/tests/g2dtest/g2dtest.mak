@@ -40,7 +40,7 @@ OUTDIRS += $(OUT.G2DTEST)
 
 MSVC.DSP += G2DTEST
 DSP.G2DTEST.NAME = g2dtest
-DSP.G2DTEST.TYPE = appcon
+DSP.G2DTEST.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

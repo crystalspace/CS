@@ -42,7 +42,7 @@ OUTDIRS += $(OUT.CSWSTEST)
 
 MSVC.DSP += CSWSTEST
 DSP.CSWSTEST.NAME = cswstest
-DSP.CSWSTEST.TYPE = appcon
+DSP.CSWSTEST.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

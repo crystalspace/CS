@@ -40,7 +40,7 @@ OUTDIRS += $(OUT.PGTEST)
 
 MSVC.DSP += PGTEST
 DSP.PGTEST.NAME = pgtest
-DSP.PGTEST.TYPE = appcon
+DSP.PGTEST.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

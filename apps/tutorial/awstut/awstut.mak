@@ -45,7 +45,7 @@ OUTDIRS += $(OUT.AWSTUT)
 
 MSVC.DSP += AWSTUT
 DSP.AWSTUT.NAME = awstut
-DSP.AWSTUT.TYPE = appcon
+DSP.AWSTUT.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

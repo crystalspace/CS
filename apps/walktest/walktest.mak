@@ -52,7 +52,7 @@ TO_INSTALL.DATA   += $(addprefix $(SRCDIR)/, \
 
 MSVC.DSP += WALKTEST
 DSP.WALKTEST.NAME = walktest
-DSP.WALKTEST.TYPE = appcon
+DSP.WALKTEST.TYPE = appgui
 
 $(WALKTEST.EXE).WINRSRC = $(SRCDIR)/libs/cssys/win32/rsrc/cs1.rc
 

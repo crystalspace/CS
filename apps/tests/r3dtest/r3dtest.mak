@@ -41,7 +41,7 @@ OUTDIRS += $(OUT.R3DTEST)
 
 MSVC.DSP += R3DTEST
 DSP.R3DTEST.NAME = r3dtest
-DSP.R3DTEST.TYPE = appcon
+DSP.R3DTEST.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

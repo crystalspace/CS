@@ -41,7 +41,7 @@ OUTDIRS += $(OUT.MDLTEST)
 
 MSVC.DSP += MDLTEST
 DSP.MDLTEST.NAME = mdltest
-DSP.MDLTEST.TYPE = appcon
+DSP.MDLTEST.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

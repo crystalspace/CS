@@ -42,7 +42,7 @@ OUTDIRS += $(OUT.PICVIEW)
 
 MSVC.DSP += PICVIEW
 DSP.PICVIEW.NAME = picview
-DSP.PICVIEW.TYPE = appcon
+DSP.PICVIEW.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

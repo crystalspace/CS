@@ -41,7 +41,7 @@ OUTDIRS += $(OUT.SIMPLEPT)
 
 MSVC.DSP += SIMPLEPT
 DSP.SIMPLEPT.NAME = simplept
-DSP.SIMPLEPT.TYPE = appcon
+DSP.SIMPLEPT.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

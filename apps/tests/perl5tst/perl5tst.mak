@@ -42,7 +42,7 @@ OUTDIRS += $(OUT.PERL5TEST)
 
 MSVC.DSP += PERL5TEST
 DSP.PERL5TEST.NAME = perl5tst
-DSP.PERL5TEST.TYPE = appcon
+DSP.PERL5TEST.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

@@ -23,6 +23,17 @@ if $(JAMVERSION) < 2.4
     EXIT "Error: This buildsystem requires jam version 2.4 or later." ;
 }
 
+# All scripts invoked by the build system expect a Bourne or compatible shell.
+# Reject C-shell and its variants (such as tcsh).  Unfortunately, this is a bit
+# of an ugly hack.  It would be nicer to perform this logic at the very end of
+# this file as a last-minute assertion.  Unfortunately, however, it seems that
+# references to $(SHELL) in any of the included files get bound at the point
+# of reference, thus we need to perform this filtering as early as possible.
+if [ Match (csh) : $(SHELL) ]
+{
+  SHELL = "/bin/sh" ;
+}
+
 mkdir = $(TOP)/mk/jam ;
 
 include $(mkdir)/subdir.jam ;
@@ -69,4 +80,3 @@ case * :
   echo "WARNING: TARGET.OS not defined. Using unix" ;
   include $(mkdir)/unix.jam ;
 }
-

@@ -63,7 +63,7 @@
 #    * Generalize into a "job" processing mechanism.  Each job should reside
 #      within its own source file.  There can be jobs to check out files from
 #      CVS, run the various `make' commands (make htmldoc, make repairdoc, make
-#      msvcgen, etc.), and perform the comparision and commit of generated
+#      msvc7gen, etc.), and perform the comparision and commit of generated
 #      files.
 #    * The mechanism used to publish packages for download and online browsing
 #      needs to be generalized further.  It is still somewhat geared toward
@@ -198,9 +198,9 @@ my @BINARY = ('(?i)\.(dsw|dsp)$');
 my @TARGETS =
     ({ 'name'    => 'Visual-C++ DSW and DSP files',
        'action'  => 'Repairing',
-       'make'    => 'msvcgen',
-       'newdirs' => ['out/mk/msvcgen/visualc'],
-       'olddirs' => ['mk/visualc'],
+       'make'    => 'msvc6gen',
+       'newdirs' => ['out/mk/msvcgen/visualc6'],
+       'olddirs' => ['mk/visualc6'],
        'log'     => 'Automated Visual-C++ DSW and DSP project file repair.' },
      { 'name'    => 'Visual-C++ SLN and VCPROJ files',
        'action'  => 'Repairing',

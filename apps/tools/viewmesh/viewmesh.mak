@@ -41,7 +41,7 @@ TO_INSTALL.EXE += $(VIEWMESH.EXE)
 
 MSVC.DSP += VIEWMESH
 DSP.VIEWMESH.NAME = viewmesh
-DSP.VIEWMESH.TYPE = appcon
+DSP.VIEWMESH.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

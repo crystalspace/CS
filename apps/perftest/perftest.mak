@@ -41,7 +41,7 @@ TO_INSTALL.EXE += $(PERFTEST.EXE)
 
 MSVC.DSP += PERFTEST
 DSP.PERFTEST.NAME = perftest
-DSP.PERFTEST.TYPE = appcon
+DSP.PERFTEST.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
