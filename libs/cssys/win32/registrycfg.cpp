@@ -19,6 +19,8 @@
 
 #include "cssysdef.h"
 
+#include "csutil/util.h"
+
 #include "registrycfg.h"
 
 csPtr<iConfigFile> csGetPlatformConfig (const char* key)
@@ -31,8 +33,6 @@ csPtr<iConfigFile> csGetPlatformConfig (const char* key)
   return csPtr<iConfigFile> (cfg);
 }
 
-#define REG_KEY_ACCESS	      KEY_READ | KEY_WRITE
-
 SCF_IMPLEMENT_IBASE (csRegistryConfig)
   SCF_IMPLEMENTS_INTERFACE (iConfigFile)
 SCF_IMPLEMENT_IBASE_END
@@ -43,12 +43,15 @@ csRegistryConfig::csRegistryConfig ()
 
   Prefix = 0;
   hKey = 0;
+  Key = 0;
   status = new rcStatus ();
+  writeAccess = false;
 }
 
 csRegistryConfig::~csRegistryConfig()
 {
   delete status;
+  delete[] Key;
 
   if (hKey != 0)
   {
@@ -66,22 +69,42 @@ void csRegistryConfig::ReplaceSeparators (char* key) const
   }
 }
 
-bool csRegistryConfig::Open (const char* Key)
+bool csRegistryConfig::TryOpen (HKEY& regKey, DWORD access, 
+				const char* keyName, bool create)
 {
+  regKey = 0;
+
   // Empty string would cause messing around in HKCU\Software -> dangerous
-  if (!Key || (*Key == 0))
+  if (!keyName || (*keyName == 0))
     return false;
+
+  delete[] Key;
+  Key = csStrNew (keyName);
 
   CS_ALLOC_STACK_ARRAY (char, key, 9 + strlen (Key) + 1); // 9 = Length "Software\"
   sprintf (key, "Software\\%s", Key);
   ReplaceSeparators (key);
 
-  LONG err = RegCreateKeyEx (HKEY_CURRENT_USER,
-    key, 0, 0, 0, 
-    REG_KEY_ACCESS, 
-    0, &hKey, 0);
+  LONG err;
+  if (create)
+  {
+    err = RegCreateKeyEx (HKEY_CURRENT_USER,
+      key, 0, 0, 0, 
+      access, 
+      0, &regKey, 0);
+  }
+  else
+  {
+    err = RegOpenKeyEx (HKEY_CURRENT_USER,
+      key, 0, access, &regKey);
+  }
 
-  return (err == ERROR_SUCCESS);
+  return true;
+}
+
+bool csRegistryConfig::Open (const char* Key)
+{
+  return TryOpen (hKey, KEY_READ, Key, false);
 }
 
 const char* csRegistryConfig::GetFileName () const
@@ -122,18 +145,21 @@ void csRegistryConfig::Clear ()
     iters.Get(i)->Rewind();
   }
 
-  int index = 0;
-  char Name[256];
-  LONG err;
-  DWORD nlen = sizeof (Name);
-
-  while ((err = RegEnumValue (hKey, index, Name,
-    &nlen, 0, 0, 0, 0)) == ERROR_SUCCESS)
+  if (WriteAccess())
   {
-    RegDeleteValue (hKey, Name);
+    int index = 0;
+    char Name[256];
+    LONG err;
+    DWORD nlen = sizeof (Name);
 
-    nlen = sizeof (Name);
-    index++;
+    while ((err = RegEnumValue (hKey, index, Name,
+      &nlen, 0, 0, 0, 0)) == ERROR_SUCCESS)
+    {
+      RegDeleteValue (hKey, Name);
+
+      nlen = sizeof (Name);
+      index++;
+    }
   }
 }
 
@@ -148,6 +174,8 @@ csPtr<iConfigIterator> csRegistryConfig::Enumerate (const char *Subsection)
 
 bool csRegistryConfig::KeyExists (const char *Key) const
 {
+  if (hKey == 0) return false;
+
   LONG err = RegQueryValueEx (hKey,
     Key, 0, 0, 0, 0);
 
@@ -156,6 +184,8 @@ bool csRegistryConfig::KeyExists (const char *Key) const
 
 bool csRegistryConfig::SubsectionExists (const char *Subsection) const
 {
+  if (hKey == 0) return false;
+
   char Name[256];
   DWORD namelen;
   DWORD index = 0;
@@ -285,8 +315,27 @@ bool csRegistryConfig::RegToBool (DWORD type, Block_O_Mem& data,
   }
 }
 
+bool csRegistryConfig::WriteAccess()
+{
+  if (writeAccess) return true;
+
+  RegCloseKey (hKey);
+  if (!TryOpen (hKey, KEY_READ | KEY_WRITE, Key, true))
+  {
+    TryOpen (hKey, KEY_READ, Key, false);
+    return false;
+  }
+  else
+  {
+    writeAccess = true;
+    return true;
+  }
+}
+
 int csRegistryConfig::GetInt (const char *Key, int Def) const
 {
+  if (hKey == 0) return Def;
+
   DWORD type;
 
   Block_O_Mem data;
@@ -302,6 +351,8 @@ int csRegistryConfig::GetInt (const char *Key, int Def) const
 
 float csRegistryConfig::GetFloat (const char *Key, float Def) const
 {
+  if (hKey == 0) return Def;
+
   DWORD type;
 
   Block_O_Mem data;
@@ -317,6 +368,8 @@ float csRegistryConfig::GetFloat (const char *Key, float Def) const
 
 const char *csRegistryConfig::GetStr (const char *Key, const char *Def) const
 {
+  if (hKey == 0) return Def;
+
   DWORD type;
 
   Block_O_Mem data;
@@ -332,6 +385,8 @@ const char *csRegistryConfig::GetStr (const char *Key, const char *Def) const
 
 bool csRegistryConfig::GetBool (const char *Key, bool Def) const
 {
+  if (hKey == 0) return Def;
+
   DWORD type;
 
   Block_O_Mem data;
@@ -353,6 +408,8 @@ const char *csRegistryConfig::GetComment (const char *Key) const
 bool csRegistryConfig::InternalSetValue (const char* Key,
     DWORD type, const void* data, DWORD datasize)
 {
+  if (!WriteAccess()) return false;
+
   LONG err = RegSetValueEx (hKey,
     Key, 0, type, (BYTE*)data, datasize);
 
@@ -394,6 +451,8 @@ bool csRegistryConfig::SetComment (const char *Key, const char *Text)
 
 void csRegistryConfig::DeleteKey (const char *Key)
 {
+  if (!WriteAccess()) return;
+
   RegDeleteValue (hKey, Key);
 }
 

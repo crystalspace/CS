@@ -39,6 +39,9 @@ private:
 
   HKEY hKey;
   char* Prefix;
+  // whether this key is opened w/ write access.
+  bool writeAccess;
+  char* Key;
 
   typedef struct 
   {
@@ -50,6 +53,8 @@ private:
 
   // convert CS "x.y.z" keys to registry "x\y\z"
   void ReplaceSeparators (char* key) const;
+
+  bool TryOpen (HKEY& regKey, DWORD access, const char* keyName, bool create);
 
   // convenience class, used to delete[] a buffer on function return
   struct Block_O_Mem
@@ -76,6 +81,9 @@ private:
   float RegToFloat (DWORD type, Block_O_Mem& data, float Def) const;
   const char* RegToStr (DWORD type, Block_O_Mem& data, const char* Def) const;
   bool RegToBool (DWORD type, Block_O_Mem& data, bool Def) const;
+
+  // Check whether we have registry write access.
+  bool WriteAccess();
 public:
   SCF_DECLARE_IBASE;
 

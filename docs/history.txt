@@ -48,6 +48,9 @@ The history order is reversed so that new features are at the top.
 	  instead of binaries for better human readability.
 	- Matze implemented platform config on unix. Now config files are
 	  created in $HOME/.crystal
+	- res changed the Win32 registry to create a key only if a value is
+	  written to reduce registry clutter. The old behaviour was to create
+	  a key every time a config object was just requested.
 9-Jun-2003
 	- Jorrit made a new csStringArray class.
 	- res made the following changes:
