@@ -174,20 +174,25 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
 		     rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
   }
 
-  if ((txt_mm->GetFlags () & (CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS)) == CS_TEXTURE_3D)
+  if ((txt_mm->GetFlags () & (CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS))
+  	== CS_TEXTURE_3D)
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-		     rstate_bilinearmap ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_NEAREST);
+		     rstate_bilinearmap
+		     	?  GL_LINEAR_MIPMAP_LINEAR
+			: GL_NEAREST_MIPMAP_NEAREST);
 
   for (int i=0; i < txt_mm->vTex.Length (); i++)
   {
     csTextureOpenGL *togl = txt_mm->vTex[i];
     if (togl->compressed == GL_FALSE)
-      glTexImage2D (GL_TEXTURE_2D, i, txt_mm->TargetFormat (), togl->get_width (), togl->get_height (),
-		    0, txt_mm->SourceFormat (), txt_mm->SourceType (), togl->image_data);
+      glTexImage2D (GL_TEXTURE_2D, i, txt_mm->TargetFormat (),
+      	togl->get_width (), togl->get_height (),
+	0, txt_mm->SourceFormat (), txt_mm->SourceType (), togl->image_data);
     else
-      csGraphics3DOGLCommon::glCompressedTexImage2DARB (GL_TEXTURE_2D, i, (GLenum)togl->internalFormat,
-							togl->get_width (), togl->get_height (), 0,
-							togl->size, togl->image_data);
+      csGraphics3DOGLCommon::glCompressedTexImage2DARB (
+      	GL_TEXTURE_2D, i, (GLenum)togl->internalFormat,
+	togl->get_width (), togl->get_height (), 0,
+	togl->size, togl->image_data);
   }
 }
 
