@@ -1247,7 +1247,6 @@ void csGraphics3DGlide2x::StartPolygonFX (iTextureHandle *handle,  UInt mode)
 
   if ( mode & CS_FX_KEYCOLOR )
   {
-    // makes color 0 ( BLACK ) transparent
     GlideLib_grChromakeyMode (GR_CHROMAKEY_ENABLE);
     handle->GetTransparent ( r, g, b );
     GlideLib_grChromakeyValue (0xff << 24 | r << 16 | g << 8 | b );
@@ -1513,13 +1512,14 @@ void csGraphics3DGlide2x::DrawPixmap ( iTextureHandle *hTex,
   // properly retrieve the bitmap data and dimensions) but I would recommend
   // re-implementing it using hardware acceleration. -- A.Z.
 
-#if 0
   /// Clipping code - sprites should be clipped against G2D's clipping rectangle
 
 
   /// Retrieve clipping rectangle
+  static G3DPolygonDPFX spr2d;
   int ClipX1, ClipY1, ClipX2, ClipY2;
-  G2D->GetClipRect (ClipX1, ClipY1, ClipX2, ClipY2);
+  int h = GetHeight()-1;
+  m_piG2D->GetClipRect (ClipX1, ClipY1, ClipX2, ClipY2);
 
   // Texture coordinates (floats)
   float _tx = tx, _ty = ty, _tw = tw, _th = th;
@@ -1557,97 +1557,41 @@ void csGraphics3DGlide2x::DrawPixmap ( iTextureHandle *hTex,
 
   // now use _tx,_ty,_tw and _th instead of tx, ty, tw and th
   // since they can be fractional values
-
-#endif
-
-#if 0
-  bool transp = hTex->GetTransparent ();
+  
   int bw, bh;
-  hTex->GetMipMapDimensions (0, bw, bh);
-  UShort *bitmap = (UShort *)hTex->GetMipMapData (0);
-  UShort tp;
+  hTex->GetMipMapDimensions ( 0, bw, bh );
+  spr2d.num = 4;
+  spr2d.vertices[0].sx = sx;
+  spr2d.vertices[0].sy = h-sy;
+  spr2d.vertices[1].sx = sx + sw;
+  spr2d.vertices[1].sy = h-sy;
+  spr2d.vertices[2].sx = sx + sw;
+  spr2d.vertices[2].sy = h-sy-sh;
+  spr2d.vertices[3].sx = sx;
+  spr2d.vertices[3].sy = h-sy-sh;
+  
+  float ntx1, ntx2, nty1, nty2;
+  ntx1 = _tx / bw;
+  ntx2 = (_tx + _tw) / bw;
+  nty1 = _ty / bh;
+  nty2 = (_ty + _th) / bh;
+  
+  spr2d.vertices[0].u = ntx1;
+  spr2d.vertices[0].v = nty1;
+  spr2d.vertices[1].u = ntx2;
+  spr2d.vertices[1].v = nty1;
+  spr2d.vertices[2].u = ntx2;
+  spr2d.vertices[2].v = nty2;
+  spr2d.vertices[3].u = ntx1;
+  spr2d.vertices[3].v = nty2;
 
-  int dx = (tw << 16) / sw;
-  int dy = (th << 16) / sh;
-
-  // Clipping
-  if ((sx >= ClipX2) || (sy >= ClipY2) ||
-      (sx + sw <= ClipX1) || (sy + sh <= ClipY1))
-    return;				// Sprite is totally invisible
-  if (sx < ClipX1)		// Left margin crossed?
-  {
-    int nw = sw - (ClipX1 - sx);	// New width
-    tx += (ClipX1 - sx) * tw / sw;// Adjust X coord on texture
-    tw = (tw * nw) / sw;		// Adjust width on texture
-    sw = nw; sx = ClipX1;
-  } /* endif */
-  if (sx + sw > ClipX2)		// Right margin crossed?
-  {
-    int nw = ClipX2 - sx;		// New width
-    tw = (tw * nw) / sw;		// Adjust width on texture
-    sw = nw;
-  } /* endif */
-  if (sy < ClipY1)		// Top margin crossed?
-  {
-    int nh = sh - (ClipY1 - sy);	// New height
-    ty += (ClipY1 - sy) * th / sh;// Adjust Y coord on texture
-    th = (th * nh) / sh;		// Adjust height on texture
-    sh = nh; sy = ClipY1;
-  } /* endif */
-  if (sy + sh > ClipY2)		// Bottom margin crossed?
-  {
-    int nh = ClipY2 - sy;		// New height
-    th = (th * nh) / sh;		// Adjust height on texture
-    sh = nh;
-  } /* endif */
-
-  if (transp){
-    UByte r,g,b;
-    hTex->GetTransparent (r, g, b);
-    tp = ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3);
-  }
-      
-  bitmap += ty * bw + tx;
-  ty = 0;
-
-  if (sw == tw)
-    for (; sh > 0; sh--, ty += dy, sy++)
-    {
-      UShort *VRAM = (UShort *)GetPixelAt (sx, sy);
-      UShort *data = bitmap + (ty >> 16) * bw;
-      if (transp)
-        for (int w = sw; w; w--)
-        {
-          if (*data != tp )
-            *VRAM = *data;
-          VRAM++;
-          data++;
-        } /* endfor */
-      else
-        for (int w = sw; w; w--)
-          *VRAM++ = *data++;
-    } /* endfor */
-  else
-    for (; sh > 0; sh--, ty += dy, sy++)
-    {
-      UShort *VRAM = (UShort *)GetPixelAt (sx, sy);
-      UShort *data = bitmap + (ty >> 16) * bw;
-      int tx = 0;
-      if (transp)
-        for (int w = sw; w; w--)
-        {
-          UShort pixel = *(data + (tx >> 16));
-          if (pixel != tp)
-            *VRAM = pixel;
-          VRAM++;
-          tx += dx;
-        } /* endfor */
-      else
-        for (int w = sw; w; w--)
-        {
-          *VRAM++ = *(data + (tx >> 16));
-          tx += dx;
-        } /* endfor */
-    } /* endfor */
-#endif
+  spr2d.vertices[0].z = 1;
+  spr2d.vertices[1].z = 1;
+  spr2d.vertices[2].z = 1;
+  spr2d.vertices[3].z = 1;
+  
+  spr2d.txt_handle = hTex;
+  StartPolygonFX ( hTex, CS_FX_COPY | ( hTex->GetTransparent() ? CS_FX_KEYCOLOR : 0 ) );
+  DrawPolygonFX ( spr2d );
+  FinishPolygonFX ();
 }
