@@ -139,7 +139,6 @@ extern PFNGLMULTITEXCOORD4DVARB glMultiTexCoord4dvARB;
 #include "sysdef.h"
 #include <windows.h>
 #include "../ogl_g3d.h"
-#include "ogl_ext.h"
 
 //Just for printing debug info.
 #define MSG_INITIALIZATION 4
