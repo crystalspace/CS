@@ -43,7 +43,6 @@
 #endif
 //
 #if defined (COMP_GCC)
-#include <strstream.h>
 #include <stdlib.h>			// For exit() COMP_GCC
 #endif
 //
