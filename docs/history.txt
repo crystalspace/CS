@@ -5,6 +5,7 @@ The history order is reversed so that new features are at the top.
 	  code in the OpenGL renderer. This is still very experimental
 	  so I'm going to continue working on this. There are also no
 	  substantial performance improvements yet.
+	- Additional small optimization in the super lightmap cache handling.
 	- Matthias Braun made plugin makefiles using the CFLAGS from external
 	  libraries (3ds, mikmod, ogg/vorbis, openal, ode plugins)
 	- Eric Sunshine fixed problem in the various OpenGL renderer and canvas
