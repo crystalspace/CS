@@ -91,9 +91,9 @@ BumpTest::BumpTest ()
 
 BumpTest::~BumpTest ()
 {
+  delete prBump;
   if (view) view->DecRef ();
   if (engine) engine->DecRef ();
-  delete prBump;
   if (LevelLoader) LevelLoader->DecRef();
   if (myG3D) myG3D->DecRef ();
   if (kbd) kbd->DecRef ();
@@ -133,7 +133,6 @@ bool BumpTest::InitProcDemo ()
 
   iImage *map = bptex->GetImageFile();
   prBump = new csProcBump (map);
-  bptex->DecRef ();
 
   matBump = prBump->Initialize (GetObjectRegistry (), engine, txtmgr, "bumps");
   prBump->PrepareAnim ();
@@ -193,6 +192,7 @@ bool BumpTest::InitProcDemo ()
   p->CreateVertex (csVector3 (-dx, -dy, -dz) + csVector3(2.5,0,0));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 1.0);
 
+  //  /*
   p = thing_state->CreatePolygon ();
   p->SetMaterial (ibp);
   p->CreateVertex (csVector3 (-dx, +0, -dz) + csVector3(2.5,1,0));
@@ -200,9 +200,9 @@ bool BumpTest::InitProcDemo ()
   p->CreateVertex (csVector3 (+0, -dy, -dz) + csVector3(2.5,1,0));
   p->CreateVertex (csVector3 (-dx, -dy, -dz) + csVector3(2.5,1,0));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 1.0);
-
+  //  */
+  
   iMeshWrapper* thing_wrap = engine->CreateMeshWrapper ("Bumpy");
-  thing_obj->DecRef ();
 
   thing_wrap->SetMeshObject (thing_obj);
   thing_wrap->HardTransform (csTransform (csMatrix3 (), csVector3 (0, 5, 1)));
@@ -215,7 +215,9 @@ bool BumpTest::InitProcDemo ()
   room->ShineLights (thing_wrap);
   linfo->PrepareLighting ();
   linfo->DecRef ();
+  thing_obj->DecRef ();
   thing_wrap->DecRef ();
+  
   imatBump->DecRef ();
 
 
