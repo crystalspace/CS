@@ -43,6 +43,27 @@ class csFrustrumList;
 interface IPolygonSet;
 
 /**
+ * This structure keeps the indices of the vertices which
+ * define the bounding box of a csPolygonSet. It is calculated
+ * by CreateBoundingBox() and stored with the csPolygonSet.<p>
+ *
+ * The following are six polygons which describe the faces
+ * of the bounding box (clock-wise vertex order):<br>
+ * <ul>
+ *   <li>i2,i1,i3,i4
+ *   <li>i6,i2,i4,i8
+ *   <li>i5,i6,i8,i7
+ *   <li>i1,i5,i7,i3
+ *   <li>i1,i2,i6,i5
+ *   <li>i7,i8,i4,i3
+ * </ul>
+ */
+struct csPolygonSetBBox
+{
+  int i1, i2, i3, i4, i5, i6, i7, i8;
+};
+
+/**
  * A PolygonSet class is a set of polygons (amazing, isn't it :-)
  * A PolygonSet describes a set of polygons that form a convex and
  * (probably) closed hull. All polygons in a set share vertices
@@ -118,6 +139,9 @@ protected:
 
   /// Optional bsp tree.
   csBspTree* bsp;
+
+  /// Optional oriented bounding box.
+  csPolygonSetBBox* bbox;
 
   /**
    * Light frame number. Using this number one can see if gouroud shaded
@@ -198,7 +222,6 @@ public:
   int num_curve_vertices;
   /// Maximum number of vertices.
   int max_curve_vertices;
-
 
   /**
    * Construct a csPolygonSet. 'type' is the csObject type and should
@@ -402,6 +425,26 @@ public:
    * origin of the light.
    */
   csFrustrumList* GetShadows (csVector3& origin);
+
+  /**
+   * Create an oriented bounding box (currently not oriented yet@@@)
+   * for this polygon set. This function will add the vertices for the
+   * bounding box to the set itself so that they will get translated
+   * together with the other vertices. The indices of the vertices
+   * are added to the csPolygonSetBBox structure which is returned here.
+   * Note that this creation is done in object space. The newly added
+   * vertices will not have been translated to world/camera space yet.<p>
+   *
+   * @@@WARNING! Currently the bounding box does not look at the
+   * curved surfaces present in this polygon set. So you can't use the
+   * bounding box safely when curves are present.
+   */
+  void CreateBoundingBox ();
+
+  /**
+   * Get the oriented bounding box created by CreateBoundingBox().
+   */
+  csPolygonSetBBox* GetBoundingBox () { return bbox; }
 
   /**
    * Return true if this has fog.
