@@ -1,5 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
+7-Sep-2000
+	- Eric Sunshine updated the documentation-related URLs in the User's
+	  Manual Texinfo files.  Also added several new links to resource.txi.
 6-Sep-2000
 	- Patch from Mark Welch to fix a compile error on MSVC.
 	- Small fix to OpenGL canvas from Nicholas Blumire.
