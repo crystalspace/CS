@@ -1821,23 +1821,27 @@ csPtr<iRenderLoop> csEngine::CreateDefaultRenderLoop ()
   csRef<iPluginManager> plugin_mgr (
   	CS_QUERY_REGISTRY (object_reg, iPluginManager));
 
+  char const* const stdstep = "crystalspace.renderloop.step.generic.type";
   csRef<iRenderStepType> genType =
-    CS_LOAD_PLUGIN (plugin_mgr,
-      "crystalspace.renderloop.step.generic.type",
-      iRenderStepType);
+    CS_LOAD_PLUGIN (plugin_mgr, stdstep, iRenderStepType);
 
-  csRef<iRenderStepFactory> genFact = genType->NewFactory ();
+  if (genType.IsValid())
+  {
+    csRef<iRenderStepFactory> genFact = genType->NewFactory ();
 
-  csRef<iRenderStep> step;
-  csRef<iGenericRenderStep> genStep;
+    csRef<iRenderStep> step;
+    csRef<iGenericRenderStep> genStep;
 
-  step = genFact->Create ();
-  loop->AddStep (step);
-  genStep = SCF_QUERY_INTERFACE (step, iGenericRenderStep);
+    step = genFact->Create ();
+    loop->AddStep (step);
+    genStep = SCF_QUERY_INTERFACE (step, iGenericRenderStep);
   
-  genStep->SetShaderType ("OR compatibility");
-  genStep->SetZBufMode (CS_ZBUF_MESH);
-  genStep->SetZOffset (false);
+    genStep->SetShaderType ("OR compatibility");
+    genStep->SetZBufMode (CS_ZBUF_MESH);
+    genStep->SetZOffset (false);
+  }
+  else
+    Error("Failed to load plugin %s; pandemonium will ensue.", stdstep);
 
   return csPtr<iRenderLoop> (loop);
 }

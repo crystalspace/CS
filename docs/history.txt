@@ -45,6 +45,9 @@ chronological order.
 	  propogates documentation to group members when only the first member
 	  is documented.  (This is common, for instance, when all elements of a
 	  group want the same documentation string.)
+	- Eric Sunshine fixed csEngine::CreateDefaultRenderLoop() so that it
+	  does not crash outright if it fails to load the
+	  crystalspace.renderloop.step.generic.type plugin.
 10-Apr-2004
 	- Jorrit fixed a bug in spr3d with new renderer. It would try to
 	  tween vertices also for skeletal animation. That would cause
