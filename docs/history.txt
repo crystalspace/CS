@@ -1,41 +1,40 @@
 The history order is reversed so that new features are at the top.
 
 29-Aug-2001
-	- Andrew Zabolotny reports:
-	  OS/2 port strikes back :-)
+	- Andrew Zabolotny reports: OS/2 port strikes back :-)
 	    - Fixed csdive plugin.
-	    - Renamed xextf86vm plugin to xext86vm because OS/2 doesn't
-	      allow shared libraries with basename length >8 :-(
+	    - Renamed xextf86vm plugin to xext86vm because OS/2 doesn't allow
+	      shared libraries with basename length >8 :-(
 	- Andrew Zabolotny also fixed csConfigAccess so that it won't crash
-	  when object_reg is NULL in destructor (this can happen for example
-	  if you compiled imgplex but didn't compile the individual GIF, BMP
+	  when object_reg is NULL in destructor (this can happen for example if
+	  you compiled imgplex but didn't compile the individual GIF, BMP
 	  etc... loaders).
 	- Corrected the ^M chars in csstring.cpp. These prevented proper
 	  compilation.
-	- Added patch to fix ie3ds loader from Norman Kramer.
+	- Added patch to fix 3dsie loader from Norman Kramer.
 	- Fixed md2ie for the latest csString changes.
-	- Added a new constructor for csPlane3 which accepts two vectors.
-	  This will calculate the plane through the origin and the two
-	  given points. Also added an equivalent Set() function.
+	- Added a new constructor for csPlane3 which accepts two vectors.  This
+	  will calculate the plane through the origin and the two given points.
+	  Also added an equivalent Set() function.
 	- Fixed reference counting in csRenderView with regards to iview
 	  (clipper).
-	- Added csRenderContextFrustum which holds the bounding frustum for
-	  the current clipper (for csRenderView).
+	- Added csRenderContextFrustum which holds the bounding frustum for the
+	  current clipper (for csRenderView).
 	- Added iRenderView::ClipBSphere() which is equivalent to
-	  iRenderView::ClipBBox() except that it clips the bounding sphere
-	  to the current render view. It is considerably faster but slightly
-	  less accurate since a bounding sphere is in many cases larger than
-	  a bounding box (not in all cases though).
+	  iRenderView::ClipBBox() except that it clips the bounding sphere to
+	  the current render view.  It is considerably faster but slightly less
+	  accurate since a bounding sphere is in many cases larger than a
+	  bounding box (not in all cases though).
 	- Added iRenderView::GetTopFrustum() which returns a
 	  csRenderContextFrustum for the top-level portal.
-	- Fixed the fake iRenderView implementation in the isometric engine
-	  to also implement the new functions.
-	- 3D sprites and cube mesh plugin now use the new ClipBSphere()
-	  as opposed to ClipBBox(). I didn't convert the other mesh objects
-	  yet as I first want be sure that everything is ok. ClipBSphere()
-	  hasn't been tested a lot yet.
-	- Removed iMeshObject::HitBeamBBox(). The implementation of this
-	  is (nearly) always the same (except for spr2d but that's not very
+	- Fixed the fake iRenderView implementation in the isometric engine to
+	  also implement the new functions.
+	- 3D sprites and cube mesh plugin now use the new ClipBSphere() as
+	  opposed to ClipBBox().  I didn't convert the other mesh objects yet
+	  as I first want be sure that everything is ok.  ClipBSphere() hasn't
+	  been tested a lot yet.
+	- Removed iMeshObject::HitBeamBBox().  The implementation of this is
+	  (nearly) always the same (except for spr2d but that's not very
 	  important) so the implementation is now put in
 	  csMeshWrapper::HitBeamBBox() instead.
 	- Eric Sunshine reverted his changes to next2d.mak since they caused
@@ -47,6 +46,29 @@ The history order is reversed so that new features are at the top.
 	  fixed) were causing next2d.mak to misbehave.
 	- Eric Sunshine eliminated several printf()-related compilation
 	  warnings from AWS.
+	- Eric Sunshine made the following changes to the project:
+	    - Upgraded the build environment to work with MacOS/X 10.1.  Made
+	      every effort to keep changes compatible with 10.0, though I am
+	      unable to actually test compatibility (but I am reasonably
+	      confident that I succeeded).
+	    - Eliminated use of the "-undefined suppress" linker flag for
+	      building plugins since this flag is incompatible with 10.1's new
+	      two-level namespace symbol scheme.
+	    - No longer links command-line utilities with "-framework AppKit",
+	      as this causes even those applications to attempt to make a
+	      connection to the window server (which is obviously undesirable).
+	      In the past, linking with this framework was a no-op if the
+	      application did not explicitly use anything from the framework.
+	    - Added the configuration script CS/libs/cssys/next/macosx.sh which
+	      checks if the linker recognizes the "-multiply_defined suppress"
+	      option.  This option is needed with 10.1 when an application is
+	      linked against the Foundation framework if that application does
+	      not actually employ any Objective-C.  In the past, linking a
+	      program against the Foundation framework was a no-op if the
+	      application did not use Objective-C, but 10.1 is less forgiving
+	      (i.e. more broken).  The macosx.sh configuration script is
+	      invoked at makefile configuration time, and augments
+	      CS/config.mak as needed.
 28-Aug-2001
 	- Norman Kramer reported a fix for the freefont plugin.
 	- Added aws and ie3ds to mk/user.mak.
