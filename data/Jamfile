@@ -16,7 +16,8 @@ maps =
   partsys
   r3dtest
   stenciltest
-  terrain ;
+  terrain
+  terrainf ;
 for map in $(maps)
 {
     local mapfiles = [ Wildcard $(map) : *.jpg *.png *.map *.tga world ] ;
