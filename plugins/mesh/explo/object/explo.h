@@ -31,7 +31,6 @@
 struct iMaterialWrapper;
 struct iSector;
 struct iEngine;
-struct iDynLight;
 
 /**
  * An explosive particle system.
@@ -42,15 +41,6 @@ class csExploMeshObject : public csNewtonianParticleSystem
 protected:
   /// Center of explosion.
   csVector3 center;
-  /// Dynamic light at center.
-  bool has_light;
-  iSector* light_sector;
-  iEngine* light_engine;
-  // Both pointers represent the same light but ilight points to the
-  // iLight interface.
-  csRef<iDynLight> explight;
-  csRef<iLight> ilight;
-  csTicks light_fade;
   /// scaling of particles.
   bool scale_particles;
   csTicks fade_particles;
@@ -177,16 +167,6 @@ public:
     fade_time = fade_particles; return true;
   }
 
-  /// Explosion has a dynamic light at the center?
-  bool HasLight () const { return has_light; }
-  /**
-   * Add a light at explosion center. add msec when light starts fading,
-   * which is used when time_to_live is set / SelfDestruct is used.
-   */
-  void AddLight (iEngine*, iSector*, csTicks fade = 200);
-  /// Remove the light.
-  void RemoveLight ();
-
   /// Update the particle system.
   virtual void Update (csTicks elapsed_time);
 
@@ -279,10 +259,6 @@ public:
     virtual bool GetFadeSprites (csTicks& fade_time) const
     {
       return scfParent->GetFadeSprites (fade_time);
-    }
-    virtual void AddLight (iEngine* engine, iSector* sector, csTicks fade = 200)
-    {
-      scfParent->AddLight (engine, sector, fade);
     }
   } scfiExplosionState;
   friend class ExplosionState;

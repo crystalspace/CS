@@ -312,7 +312,6 @@ void add_particles_explosion (iSector* sector, const csVector3& center, char* ma
   expstate->SetSpreadSpeed (2.);
   expstate->SetSpreadAcceleration (2.);
   expstate->SetFadeSprites (500);
-  expstate->AddLight (Sys->Engine, sector, 1000);
 
   exp->PlaceMesh ();
 }

@@ -35,14 +35,6 @@ Bugs to fix:
 	     (optimize mode)
 	     Note by Jorrit: this will most likely not be fixed soon as it is
 	     a rather fundamental problem.
-	[S]  In walktest, if you fire a rocket and manually delete its dynamic
-	     light, walktest crashes when the rocket later tries to delete the
-	     light itself.  To reproduce: a) Launch walktest.  b) Fire a
-	     rocket.  c) While the rocket is still in flight or still
-	     exploding, press shift-1.  to delete the dynamic light.  d) Wait
-	     momentarily for the rocket to delete its own light.  e) Crash.
-	     (optimize mode)
-	     [Bug 747978]
 	[S]  perftest used to print a message at the bottom of the window
 	     briefly describing each test.  These messages are no longer
 	     present.
@@ -140,12 +132,6 @@ Bugs to fix:
 	     the fact that the lighting system has changed.  It now works with
 	     the shadow bitmaps.
 	     [Bug 429283]
-	[F]  Gouraud shaded polygons are not supported well: you can only
-	     define triangles that are gouraud shaded and not polygons in
-	     general.  After closing inspection it seems that this *almost*
-	     works perfectly now.  However there are cases when texture mapping
-	     is wrong.
-	     [Bug 202768]
 	[V]  Investigate if skeletal sprites work nicely with the visibility
 	     culling system.  Major problem is that calculating a bounding box
 	     for a skeletal sprite is not easy.  We have to find an efficient
@@ -159,9 +145,6 @@ Bugs to fix:
 	     vertices that are connected to triangles that have vertices from
 	     other limbs.
 	     [Bug 493454]
-	[V]  Light with explosion particle system is not correctly positioned.
-	     The question is if this light is a desired feature.
-	     [Bug 231392]
 	[V]  The software renderer implementation of DrawTriangleMesh is still
 	     missing a few clipping features.  In general it would be nice to
 	     investigate the use of the OpenGL clipping routines for software
@@ -184,6 +167,10 @@ Bugs to fix:
 	[F]  Support space warping portals for GetNearbyObjects(), for
 	     PlaceMesh() and for lighting.
 	[F]  Support lights for GetNearbyObjects().
+	[**] Light with explosion particle system is not correctly positioned.
+	     The question is if this light is a desired feature.
+	     Note: fixed by removing feature.
+	     [Bug 231392]
 	[**] CAMERA entity bug and vis culling causes bizarre HOM effects and
 	     disappearing/reappearing stars in csdemo.  Also probably affects
 	     other programs and maps, in which sudden and drastic pops in
@@ -197,6 +184,14 @@ Bugs to fix:
 	     Start new game.  3) Press ESC to get back to menu.  4) Select Quit
 	     item.  5) Crash.  Note that this crash occurs randomly.  (optimize
 	     mode)
+	[**] In walktest, if you fire a rocket and manually delete its dynamic
+	     light, walktest crashes when the rocket later tries to delete the
+	     light itself.  To reproduce: a) Launch walktest.  b) Fire a
+	     rocket.  c) While the rocket is still in flight or still
+	     exploding, press shift-1.  to delete the dynamic light.  d) Wait
+	     momentarily for the rocket to delete its own light.  e) Crash.
+	     (optimize mode)
+	     [Bug 747978]
 	[**] walktest crashes randomly at exit time if a static light is added
 	     using either renderer.  To reproduce: 1) Launch walktest with
 	     flarge.  2) Go to main hall.  3) Add a light (shift-L).  4) Quit

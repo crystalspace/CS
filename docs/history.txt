@@ -24,6 +24,11 @@ The history order is reversed so that new features are at the top.
 	  a given material assumed that when mat_handle is given then there
 	  is always an iMaterial but that assumption is not true.
 	  This fixes a crash with perftest with OpenGL.
+	- Jorrit removed the light feature from the explosion particle
+	  system. This feature caused more trouble then good because there
+	  were several bugs related to this. If you need a light at an
+	  explosion point then there are other ways to accomplish this (more
+	  application controlled ways).
 2-June-2003
 	- Philip Wyett updated the docs to reflect a new msvc_libs release.
 	- Jorrit fixed genmesh in case the genmesh object (not the factory)

@@ -25,8 +25,6 @@
 #include "ivideo/material.h"
 #include "iengine/material.h"
 #include "iengine/engine.h"
-#include "iengine/dynlight.h"
-#include "iengine/light.h"
 #include "qsqrt.h"
 #include <math.h>
 #include <stdlib.h>
@@ -93,8 +91,6 @@ csExploMeshObject::csExploMeshObject (iObjectRegistry* object_reg,
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiExplosionState);
   /// defaults
-  has_light = false;
-  light_sector = 0;
   scale_particles = false;
   push.Set (0, 0, 0);
   center.Set (0, 0, 0);
@@ -108,7 +104,6 @@ csExploMeshObject::csExploMeshObject (iObjectRegistry* object_reg,
 
 csExploMeshObject::~csExploMeshObject()
 {
-  if (has_light) RemoveLight();
 }
 
 
@@ -124,39 +119,6 @@ void csExploMeshObject::Update (csTicks elapsed_time)
   // size of particles is exponentially reduced in fade time.
   if (scale_particles && self_destruct && time_to_live < fade_particles)
     ScaleBy (1.0 - (fade_particles - time_to_live)/((float)fade_particles));
-  if (!has_light) return;
-  csColor newcol;
-  newcol.red =   1.0 - 0.3*sin(time_to_live/10. + center.x);
-  newcol.green = 1.0 - 0.3*sin(time_to_live/15. + center.y);
-  newcol.blue =  0.3 + 0.3*sin(time_to_live/10. + center.z);
-  if (self_destruct && time_to_live < light_fade)
-    newcol *= 1.0 - (light_fade - time_to_live)/((float)light_fade);
-  ilight->SetColor (newcol);
-}
-
-void csExploMeshObject::AddLight (iEngine *engine, iSector *sec, csTicks fade)
-{
-  if (has_light) return;
-  light_engine = engine;
-  light_sector = sec;
-  light_fade = fade;
-  has_light = true;
-  explight = engine->CreateDynLight (center, 5, csColor (1, 1, 0));
-  ilight = SCF_QUERY_INTERFACE (explight, iLight);
-  ilight->SetSector (light_sector);
-  explight->Setup ();
-}
-
-
-void csExploMeshObject::RemoveLight ()
-{
-  if (!has_light) return;
-  has_light = false;
-  light_engine->RemoveDynLight (explight);
-  explight = 0;
-  ilight = 0;
-  light_sector = 0;
-  light_engine = 0;
 }
 
 void csExploMeshObject::HardTransform (const csReversibleTransform& t)

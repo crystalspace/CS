@@ -25,7 +25,7 @@ class csColor;
 struct iEngine;
 struct iSector;
 
-SCF_VERSION (iExplosionState, 0, 0, 1);
+SCF_VERSION (iExplosionState, 0, 0, 2);
 
 /**
  * This interface describes the API for the explosion mesh object.
@@ -75,11 +75,6 @@ struct iExplosionState : public iBase
   virtual void SetFadeSprites (csTicks fade_time) = 0;
   /// See if particles are faded (returns true), and returns fade time too.
   virtual bool GetFadeSprites (csTicks& fade_time) const = 0;
-  /**
-   * Add a light at explosion center. add msec when light starts fading,
-   * which is used when time_to_live is set / SelfDestruct is used.
-   */
-  virtual void AddLight (iEngine*, iSector*, csTicks fade = 200) = 0;
 };
 
 #endif // __CS_IMESH_EXPLODE_H__
