@@ -680,6 +680,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 	        case CSVAR_LONG: sscanf (val, "%ld", &var.v.l); break;
 	        case CSVAR_BOOL: ScanStr (val, "%b", &var.v.b); break;
 	        case CSVAR_FLOAT: ScanStr (val, "%f", &var.v.f); break;
+		default: break;
 	      }
 	      config->SetOption (i, &var);
 	    }
