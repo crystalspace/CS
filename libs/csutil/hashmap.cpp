@@ -194,7 +194,7 @@ csHashObject csHashIterator::Next ()
 csHashObject csHashIterator::NextConst ()
 {
   CS_ASSERT(cbucket);
-  csHashObject obj = ((*bucket)[element_index]).object;
+  csHashObject obj = ((*cbucket)[element_index]).object;
   current_index = element_index;
   GotoNextSameKeyConst ();
   return obj;

@@ -102,7 +102,7 @@ public:
    * \return The string's ID or csInvalidStringID if the string has not yet
    *   been registered.
    */
-  csStringID Request (const char* s);
+  csStringID Request (const char* s) const;
 
   /**
    * Request the string for a given ID.
@@ -112,7 +112,7 @@ public:
    *   perform this reverse lookup frequently, then consider using csStringSet,
    *   instead.
    */
-  const char* Request (csStringID id);
+  const char* Request (csStringID id) const;
 
   /**
    * Delete all stored strings.

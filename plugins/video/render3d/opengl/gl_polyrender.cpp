@@ -219,13 +219,16 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
 	But it's simpler for now :)
       */
       csTransform tangentTF (t_m.GetInverse (), csVector3 (0));
-      csVector3 tangent = tangentTF.Other2This (csVector3 (1, 0, 0));
+      csVector3 origin = tangentTF.Other2This (csVector3 (0, 0, 0));
+      csVector3 tangent = 
+	tangentTF.Other2This (csVector3 (1, 0, 0)) - origin;
       tangent.Normalize ();
 
       /*
 	Calculate the 'binormal' vector of this poly, needed for dot3.
       */
-      csVector3 binormal = tangentTF.Other2This (csVector3 (0, -1, 0));
+      csVector3 binormal = 
+	tangentTF.Other2This (csVector3 (0, 1, 0)) - origin;
       binormal.Normalize ();
 
       // First, fill the normal/texel/vertex buffers.

@@ -63,7 +63,7 @@ const char* csStringHash::Register (const char *Name, csStringID id)
   return itf->String;
 }
 
-csStringID csStringHash::Request (const char *Name)
+csStringID csStringHash::Request (const char *Name) const
 {
   csRegisteredString *itf;
   csHashKey hkey = csHashCompute (Name);
@@ -71,7 +71,7 @@ csStringID csStringHash::Request (const char *Name)
   csHashIterator it (&Registry, hkey);
   while (it.HasNext ())
   {
-    itf = (csRegisteredString*) it.Next ();
+    itf = (csRegisteredString*) it.NextConst ();
     if (strcmp (itf->String, Name)==0)
       return itf->ID;
   }
@@ -79,14 +79,14 @@ csStringID csStringHash::Request (const char *Name)
   return csInvalidStringID;
 }
 
-const char* csStringHash::Request (csStringID id)
+const char* csStringHash::Request (csStringID id) const
 {
   csRegisteredString *itf;
 
   csGlobalHashIterator it (&Registry);
   while (it.HasNext ())
   {
-    itf = (csRegisteredString*) it.Next ();
+    itf = (csRegisteredString*) it.NextConst ();
     if (itf->ID == id)
       return itf->String;
   }

@@ -16,6 +16,14 @@ chronological order.
 	  essentially transparent to clients.
 	- Eric Sunshine fixed bug in cs-config where the --libdir option always
 	  returned the empty string.
+	- res changed the Thing bitangent calculation to use the +Y instead of 
+	  the -Y axis. This seems to give better results.
+	- res changed the Thing tangent/bitangent calculation to more properly 
+	  use the difference to the origin in texture space instead of just 
+	  the +X/+Y directions in texture space.
+	- res changed phystut so the angular velocity of spawned objects 
+	  doesn't cause them to immediately go left when touching a wall.
+	- res made the csStringHash::Request() methods const.
 2-Aug-2004
 	- Eric Sunshine localized the faked-up `socklen_t' from csdef.h to
 	  csutil/sockets.h so that the type is faked up only if requested by
@@ -27,6 +35,12 @@ chronological order.
 	  typedef to morph into a semantic error.
 	- Eric Sunshine retired the long-deprecated CS_SYSDEF_PROVIDE_SOCKETS.
 	  Instead, #include <csutil/sockets.h> explicitly.
+	- res made the following changes:
+	    - Added remarks to some functions taking UTF-8 strings about the 
+	      fact that they take UTF-8 strings.
+	    - Changing phystut so it spawns new objects a bit into the 
+	      viewing direction.
+	    - Updated sprcal3d to latest cal3d CVS.
 	- Eric Sunshine updated the cal3d "sufficiently recent" check in
 	  configure.ac so that it demands the latest CVS version of cal3d.
 1-Aug-2004

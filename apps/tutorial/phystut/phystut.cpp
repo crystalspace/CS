@@ -97,7 +97,7 @@ void Simple::SetupFrame ()
 
 
   // Take small steps.
-  const float maxStep = 0.001f;
+  const float maxStep = 0.01f;
   float ta = 0;
   float tb = speed;
   while (ta < speed)
@@ -110,11 +110,11 @@ void Simple::SetupFrame ()
     tb = speed;
 
     view->GetCamera()->GetTransform().SetOrigin(avatar->GetMovable()->GetTransform().GetOrigin());
-    avatarbody->SetTransform(view->GetCamera()->GetTransform());
+    //avatarbody->SetTransform(view->GetCamera()->GetTransform());
   }
 
   view->GetCamera()->GetTransform().SetOrigin(avatar->GetMovable()->GetTransform().GetOrigin());
-  avatar->GetMovable()->SetTransform(view->GetCamera()->GetTransform());
+  //avatar->GetMovable()->SetTransform(view->GetCamera()->GetTransform());
 
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
@@ -442,7 +442,7 @@ iRigidBody* Simple::CreateBox (void)
 
   // Fling the body.
   rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
-  rb->SetAngularVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
+  rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
 
   return rb;
 }
@@ -470,7 +470,7 @@ iRigidBody* Simple::CreateSphere (void)
   // Create a body and attach the mesh.
   csRef<iRigidBody> rb = dynSys->CreateBody ();
   rb->SetProperties (radius.Norm()/2, csVector3 (0), csMatrix3 ());
-  rb->SetPosition (tc.GetOrigin ());
+  rb->SetPosition (tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 1));
   rb->AttachMesh (mesh);
 
   // Create and attach a sphere collider.
@@ -478,7 +478,7 @@ iRigidBody* Simple::CreateSphere (void)
 
   // Fling the body.
   rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 6));
-  rb->SetAngularVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
+  rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
 
   return rb;
 }
