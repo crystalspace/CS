@@ -749,7 +749,7 @@ LaTeX documentation. Later Brandon worked on a cal3d convertor for Crystal Space
 and a motion manager plugin.
 
 @item
-Toni Gonzalez (@email{e3445510@@est.fib.upc.es})
+Toni Asco Gonzalez (@email{e3445510@@est.fib.upc.es})
 
 Toni implemented a faster version of DrawPolygonMesh() for OpenGL. He also
 fixed some bugs in 3ds2lev. Toni additionally did some modifications on map2cs
