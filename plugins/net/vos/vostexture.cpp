@@ -25,7 +25,9 @@
 
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
-#include "imap/loader.h"
+#include "ivideo/txtmgr.h"
+//#include "imap/loader.h"
+#include "igraphic/imageio.h"
 #include "iutil/vfs.h"
 #include "vostexture.h"
 
@@ -62,15 +64,15 @@ ConstructTextureTask::~ConstructTextureTask()
 
 void ConstructTextureTask::doTask()
 {
+  csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   csRef<iTextureManager> txtmgr = g3d->GetTextureManager();
-  csRef<iLoader> loader = CS_QUERY_REGISTRY (object_reg, iLoader);
-  csRef<iVFS> VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+  csRef<iImageIO> io = CS_QUERY_REGISTRY (object_reg, iImageIO);
 
-  if(! loader)
+  if (!io)
   {
     LOG("ConstructTextureTask", 1,
-	  "Error: Could not get the iLoader plugin from object registry!");
+      "Error: Could not get the iLoader plugin from object registry!");
     return;
   }
   if(!txtmgr)
@@ -79,26 +81,23 @@ void ConstructTextureTask::doTask()
     return;
   }
 
-  if(! VFS->WriteFile (cachefilename.c_str(), texturedata.c_str(),
-    	texturedata.size()) )
-  {
-    LOG("ConstructTextureTask", 1, "Error writing "
-		<< cachefilename << "!");
-    return;
-  }
+  csRef<iImage> image (io->Load ((uint8*) texturedata.c_str(),
+			  					 texturedata.size(), 
+								 engine->GetTextureFormat()));
 
-  csRef<iTextureWrapper> texture = loader->LoadTexture (
-    	texturename.c_str(), cachefilename.c_str());
+  csRef<iTextureHandle> handle (txtmgr->RegisterTexture (image, CS_TEXTURE_3D));
 
+  csRef<iTextureWrapper> texture = engine->GetTextureList()->NewTexture ( handle);
+  
   if(!texture)
   {
     LOG("ConstructTextureTask", 1,
-	  "Error: could not load texture from cache file \""
-	  << cachefilename << "\"!");
+      "Error: could not create texture (would be in cache file \""
+      << cachefilename << "\")!");
     return;
   }
 
-  texture->Register (txtmgr);
+//  texture->Register (txtmgr);
   texture->GetTextureHandle()->Prepare ();
 
   metatxt->texturewrapper = texture;
@@ -135,8 +134,8 @@ void csMetaTexture::Setup(csVosA3DL* vosa3dl)
   }
 
   ConstructTextureTask* ctt = new ConstructTextureTask(
-  	vosa3dl->GetObjectRegistry(), getURLstr(),
-	cachefilename, this);
+                   vosa3dl->GetObjectRegistry(), getURLstr(),
+                   cachefilename, this);
   imagedata->read(ctt->texturedata);
   vosa3dl->mainThreadTasks.push(ctt);
   alreadyLoaded = true;
@@ -215,7 +214,7 @@ void csMetaTexture::notifyChildRemoved(VobjectEvent& event)
 }
 
 MetaObject* csMetaTexture::new_csMetaTexture(VobjectBase* superobject,
-	const std::string& type)
+                                             const std::string& type)
 {
   return new csMetaTexture(superobject);
 }

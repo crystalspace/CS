@@ -29,11 +29,13 @@
 #include <vos/metaobjects/property/propertylistener.hh>
 #include <vos/metaobjects/a3dl/a3dl.hh>
 
+#include "iengine/engine.h"
 #include "iengine/texture.h"
 #include "iutil/objreg.h"
 #include "csvosa3dl.h"
 
 class ConstructTextureTask;
+struct iImageIO;
 
 class csMetaTexture :
   public A3DL::Texture,
