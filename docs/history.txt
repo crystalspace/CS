@@ -4,6 +4,7 @@ The history order is reversed so that new features are at the top.
 	- Changed iModelConverter->Load() to return csPtr.
 	- Changed iModelConverter->Save() to return csPtr.
 	- Fixed a lot of uses of iDataBuffer in CS to work with csRef.
+	- Changed iCacheManager->ReadCache() to return csPtr.
 7-Sep-2002
 	- Changed all config related Enumerate() calls to return csPtr.
 	- Changed iImageIO->Load() to return csPtr.

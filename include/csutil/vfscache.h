@@ -80,7 +80,7 @@ public:
    * Retrieve some data from the cache. Returns NULL if the
    * data could not be found in the cache.
    */
-  virtual iDataBuffer* ReadCache (const char* type, const char* scope,
+  virtual csPtr<iDataBuffer> ReadCache (const char* type, const char* scope,
   	uint32 id);
   /**
    * Clear items from the cache. 

@@ -1182,7 +1182,7 @@ bool csOctree::ReadFromCache (
   csPolygonInt **polygons,
   int num)
 {
-  csRef<iDataBuffer> data (csPtr<iDataBuffer> (cache_mgr->ReadCache ("octree", NULL, 0)));
+  csRef<iDataBuffer> data (cache_mgr->ReadCache ("octree", NULL, 0));
   if (!data) return false;	// File doesn't exist
 
   csMemFile* cf = new csMemFile ((char*)data->GetData (), data->GetSize (),

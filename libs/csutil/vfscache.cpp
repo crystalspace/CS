@@ -117,7 +117,7 @@ bool csVfsCacheManager::CacheData (void* data, uint32 size,
   return true;
 }
 
-iDataBuffer* csVfsCacheManager::ReadCache (
+csPtr<iDataBuffer> csVfsCacheManager::ReadCache (
   	const char* type, const char* scope, uint32 id)
 {
   char buf[512];
@@ -125,17 +125,18 @@ iDataBuffer* csVfsCacheManager::ReadCache (
   GetVFS ()->ChDir (vfsdir);
   CacheName (buf, type ? type : current_type,
   	scope ? scope : current_scope, id);
-  iDataBuffer* data = GetVFS ()->ReadFile (buf);
+  csRef<iDataBuffer> data (GetVFS ()->ReadFile (buf));
   GetVFS ()->PopDir ();
 
   if (!data)
   {
     // This is not an error. It is possible that the item
     // simply hasn't been cached.
-    return NULL;
+    return csPtr<iDataBuffer> (NULL);
   }
 
-  return data;
+  data->IncRef();	// To make sure smart pointer doesn't release.
+  return csPtr<iDataBuffer> (data);
 }
 
 bool csVfsCacheManager::ClearCache (const char* type, const char* scope,

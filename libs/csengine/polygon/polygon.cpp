@@ -1955,7 +1955,7 @@ bool csPolygon3D::ReadFromCache (iCacheManager* cache_mgr, int id)
     char* type = "lmpol_g";
     uint32 uid = GetPolygonID ();
 
-    csRef<iDataBuffer> data (csPtr<iDataBuffer> (cache_mgr->ReadCache (type, NULL, uid)));
+    csRef<iDataBuffer> data (cache_mgr->ReadCache (type, NULL, uid));
     if (!data) return false;
 
     char *d = **data;

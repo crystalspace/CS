@@ -264,7 +264,7 @@ bool csLightMap::ReadFromCache (
   pswanted.lm_size = convert_endian (lm_size);
   pswanted.lm_cnt = convert_endian ((int32) 111);
 
-  csRef<iDataBuffer> data (csPtr<iDataBuffer> (cache_mgr->ReadCache (type, NULL, uid)));
+  csRef<iDataBuffer> data (cache_mgr->ReadCache (type, NULL, uid));
   if (!data) return false;
 
   char *d = **data;
@@ -338,7 +338,7 @@ bool csLightMap::ReadFromCache (
   else
     type = "lmcur_d";
 
-  data = csPtr<iDataBuffer> (cache_mgr->ReadCache (type, NULL, uid));
+  data = cache_mgr->ReadCache (type, NULL, uid);
   if (!data) return true;   // No dynamic data. @@@ Recalc dynamic data?
   int size = data->GetSize ();
   d = **data;

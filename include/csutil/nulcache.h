@@ -64,7 +64,7 @@ public:
   /**
    * Always returns NULL.
    */
-  virtual iDataBuffer* ReadCache (const char* type, const char* scope,
+  virtual csPtr<iDataBuffer> ReadCache (const char* type, const char* scope,
   	uint32 id);
   /**
    * Does nothing. 

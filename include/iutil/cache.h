@@ -82,7 +82,7 @@ struct iCacheManager : public iBase
    * The returned data buffer should be DecRef()'ed if you are
    * ready with it.
    */
-  virtual iDataBuffer* ReadCache (
+  virtual csPtr<iDataBuffer> ReadCache (
   	const char* type, const char* scope, uint32 id) = 0;
 
   /**
