@@ -8,7 +8,7 @@
 @cindex @code{iObject}
 @cindex @code{iMeshWrapper}
 @cindex collision detection
-@cindex RAPID
+@cindex OPCODE
 
 Collision detection in CS is one of the more complicated issues. In this
 section I give a quick description of all the classes and interfaces in CS
@@ -18,8 +18,8 @@ and what you should do to use them.
 
 The basis of the collision detection system is the @samp{iCollideSystem}.
 This is an interface which is implemented by some collision detection plugin.
-At this moment we have implementations of @sc{rapid} and @sc{opcode} collision
-detection systems.
+At this moment we have an implementation using the @sc{opcode} collision
+detection system.
 
 To load a collision detection system you can use the following code:
 
@@ -43,7 +43,7 @@ if (!cd_sys)
 
 This is a very general example.  It will first get the preferred collision
 detection plugin from the config file.  If the config file doesn't specify it
-then it will use 'crystalspace.collisiondetection.rapid' which is the only one
+then it will use 'crystalspace.collisiondetection.opcode' which is the one
 we have at the moment.  If you don't want to let the users choose another
 plugin then you can also hardcode the string.  The cd_sys should be stored
 somewhere central (i.e. your application class).
@@ -221,10 +221,10 @@ void Player::Move (csVector3 move)
 This example is limited in that it will run into an infinite loop if the
 player walks into a corner, but it serves as an example.
 
-@subsubheading Limitation of RAPID and OPCODE
+@subsubheading Limitation of OPCODE
 
-The current @sc{rapid} and @sc{opcode} collision detection implementations
-have one important limitation. They assume that the transform from object
+The current @sc{opcode} collision detection implementation
+has one important limitation. It assumes that the transform from object
 to world space will not change the size of the object. i.e. you cannot scale the
 object using the object to world transformation (which is kept in the
 @samp{iMovable}) and expect collision detection to be ok. The only way

@@ -173,7 +173,7 @@ Pull-down console that you can integrate in your own games.
 @xref{Config Console}.
 
 @item
-Collision detection (using @sc{rapid} or @sc{opcode}).
+Collision detection (using @sc{opcode}).
 @xref{HOWTO Collision Detection}.
 
 @item

@@ -72,8 +72,8 @@ PNG, JPG, ...).
 @item
 @emph{Collision Detection}
 
-There are currently two collision plug-ins, one using the @sc{rapid} algorithm
-and the other one using @sc{opcode}.
+There is currently one collision plug-in using @sc{opcode} (the old
+plugin based on @sc{rapid} was removed).
 Collision is based on testing for intersection of two objects.
 
 @item

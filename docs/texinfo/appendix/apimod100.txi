@@ -1336,3 +1336,9 @@ Likewise, the following string-related functions have been renamed:
 @item
 @code{csFindReplace()} @result{} @code{csReplaceAll()}
 @end itemize
+
+@subheading @sc{rapid} Collision Detection Plugin
+
+The @sc{rapid} collision detection plugin has been removed. You can now
+use the @sc{opcode} plugin instead. It is faster and uses less memory.
+

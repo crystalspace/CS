@@ -156,13 +156,9 @@ Crystal Space debugger.
 Collision detection plugins.
 
 @table @code
-@item CS/plugins/collide/rapid
-This is the @sc{rapid} collision detection plugin.
-
 @item CS/plugins/collide/opcode
 This is the Opcode collision detection plugin which is based upon the Opcode
-library. This plugin is generally much faster then @sc{rapid} and also uses
-less memory.
+library.
 @end table
 
 @item CS/plugins/console

@@ -78,7 +78,6 @@ SCF_VERSION (iCollideSystem, 0, 0, 4);
  * <p>
  * Main creators of instances implementing this interface:
  *   <ul>
- *   <li>RAPID plugin (crystalspace.collisiondetection.rapid)
  *   <li>OPCODE plugin (crystalspace.collisiondetection.opcode)
  *   </ul>
  * Main ways to get pointers to this interface:

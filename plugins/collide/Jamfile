@@ -1,4 +1,3 @@
 SubDir TOP plugins collide ;
 
 SubInclude TOP plugins collide opcode ;
-SubInclude TOP plugins collide rapid ;

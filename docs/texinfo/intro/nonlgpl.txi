@@ -22,12 +22,6 @@ at:
 
 Licensed under the @sc{gnu} General Public License.
 
-@item
-@code{rapid} plugin
-
-@sc{rapid} can only be used for non-commercial usage. If you want commercial
-usage consider using the @sc{opcode} plugin instead.
-
 @end itemize
 
 In addition, some plugins may need to link to external libraries covered 

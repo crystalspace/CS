@@ -99,8 +99,8 @@ static int DoStuff (iObjectRegistry* object_reg)
   printf ("================================================================\n");
 
   csRef<iCollideSystem> cdsys (CS_LOAD_PLUGIN (plugmgr,
-  	"crystalspace.collisiondetection.rapid", iCollideSystem));
-  Test (cdsys, "Rapid");
+  	"crystalspace.collisiondetection.opcode", iCollideSystem));
+  Test (cdsys, "Opcode");
 
   printf ("================================================================\n");
 
