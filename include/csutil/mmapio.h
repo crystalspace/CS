@@ -140,8 +140,6 @@ private:
   /// Reads a cache-page in from the disk.
   void CachePage(unsigned int page);
 
-  /// Returns the pointer to the memory location we need
-  void *LookupIndex(unsigned int page, unsigned int index);
 };
 
 #endif
