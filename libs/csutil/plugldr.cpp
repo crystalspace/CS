@@ -101,7 +101,7 @@ bool csPluginList::Sort (iObjectRegistry* object_reg)
   memset (matrix, 0, len * len * sizeof (bool));
   for (row = 0; row < len; row++)
   {
-    const char *dep = iSCF::SCF->GetClassDependencies (Get (row).ClassID);
+    const char *dep = iSCF::SCF->GetClassDependencies (Get (row)->ClassID);
     while (dep && *dep)
     {
       char tmp [100];
@@ -120,8 +120,8 @@ bool csPluginList::Sort (iObjectRegistry* object_reg)
       bool wildcard = tmp [sl - 1] == '.';
       for (col = 0; col < len; col++)
         if ((col != row)
-         && (wildcard ? strncmp (tmp, Get (col).ClassID, sl) :
-             strcmp (tmp, Get (col).ClassID)) == 0)
+         && (wildcard ? strncmp (tmp, Get (col)->ClassID, sl) :
+             strcmp (tmp, Get (col)->ClassID)) == 0)
           matrix [row * len + col] = true;
       dep = comma;
       while (*dep == ',' || *dep == ' ' || *dep == '\t')
@@ -141,10 +141,12 @@ bool csPluginList::Sort (iObjectRegistry* object_reg)
       error = true;
 
   // Reorder plugin list according to "order" array
-  void** newroot = (void**) malloc (len * sizeof (void*));
+  csPluginLoadRec** newroot = new csPluginLoadRec*[len];
   for (row = 0; row < len; row++)
-    newroot [row] = root [order [row] - 1];
-  free (root); root = newroot;
+    newroot [row] = GetAndClear (order [row] - 1);
+  for (row = 0; row < len; row++)
+    Put (row, newroot[row]);
+  delete[] newroot;
 
   return !error;
 }
@@ -192,7 +194,7 @@ bool csPluginList::RecurseSort (iObjectRegistry *object_reg,
 	    "crystalspace.pluginloader.recursesort",
             "   %s %s",
             x == startx ? "+->" : loop [x + 1] ? "| |" : "<-+",
-            Get (loop [x] - 1).ClassID);
+            Get (loop [x] - 1)->ClassID);
 	}
         error = true;
         break;
@@ -318,13 +320,13 @@ bool csPluginLoader::LoadPlugins ()
   int i;
   for (i = 0 ; i < requested_plugins.Length () ; i++)
   {
-    csPluginLoadRec& req_plugin = requested_plugins.Get (i);
+    csPluginLoadRec* req_plugin = requested_plugins.Get (i);
     int j;
     bool present = false;
     for (j = 0 ; j < PluginList.Length () ; j++)
     {
-      csPluginLoadRec& plugin = PluginList.Get (j);
-      if (plugin.Tag && !strcmp (plugin.Tag, req_plugin.Tag))
+      csPluginLoadRec* plugin = PluginList.Get (j);
+      if (plugin->Tag && !strcmp (plugin->Tag, req_plugin->Tag))
       {
         present = true;
 	break;
@@ -332,8 +334,8 @@ bool csPluginLoader::LoadPlugins ()
     }
     if (!present)
     {
-      PluginList.Push (new csPluginLoadRec (req_plugin.Tag,
-      	req_plugin.ClassID));
+      PluginList.Push (new csPluginLoadRec (req_plugin->Tag,
+      	req_plugin->ClassID));
     }
   }
 
@@ -349,25 +351,25 @@ bool csPluginLoader::LoadPlugins ()
   // Load all plugins
   for (n = 0; n < PluginList.Length (); n++)
   {
-    csPluginLoadRec& r = PluginList.Get(n);
+    csPluginLoadRec* r = PluginList.Get(n);
     // If plugin is VFS then skip if already loaded earlier.
-    r.plugin = 0;
-    if (VFS && r.Tag && strcmp (r.Tag, "iVFS") == 0)
+    r->plugin = 0;
+    if (VFS && r->Tag && strcmp (r->Tag, "iVFS") == 0)
       continue;
-    iBase *plg = plugin_mgr->LoadPlugin (r.ClassID, 0, 0, false);
-    r.plugin = plg;
+    iBase *plg = plugin_mgr->LoadPlugin (r->ClassID, 0, 0, false);
+    r->plugin = plg;
     if (plg)
     {
-      if (!object_reg->Register (plg, r.Tag))
+      if (!object_reg->Register (plg, r->Tag))
       {
-        if (r.Tag)
+        if (r->Tag)
           csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	    "crystalspace.pluginloader.loadplugins",
-    	    "Duplicate tag '%s' found for plugin '%s'!", r.Tag, r.ClassID);
+    	    "Duplicate tag '%s' found for plugin '%s'!", r->Tag, r->ClassID);
         else
           csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	    "crystalspace.pluginloader.loadplugins",
-    	    "Could not register plugin '%s'!", r.ClassID);
+    	    "Could not register plugin '%s'!", r->ClassID);
         return false;
       }
       plg->DecRef ();
@@ -377,10 +379,10 @@ bool csPluginLoader::LoadPlugins ()
   // Initialize all plugins.
   for (n = 0; n < PluginList.Length (); n++)
   {
-    const csPluginLoadRec& r = PluginList.Get(n);
-    if (r.plugin)
+    const csPluginLoadRec* r = PluginList.Get(n);
+    if (r->plugin)
     {
-      csRef<iComponent> comp (SCF_QUERY_INTERFACE (r.plugin, iComponent));
+      csRef<iComponent> comp (SCF_QUERY_INTERFACE (r->plugin, iComponent));
       if (comp)
         comp->Initialize (object_reg);
     }
@@ -389,10 +391,10 @@ bool csPluginLoader::LoadPlugins ()
   // Query all commandline options for plugins.
   for (n = 0; n < PluginList.Length (); n++)
   {
-    const csPluginLoadRec& r = PluginList.Get(n);
-    if (r.plugin)
+    const csPluginLoadRec* r = PluginList.Get(n);
+    if (r->plugin)
     {
-      csRef<iComponent> comp (SCF_QUERY_INTERFACE (r.plugin, iComponent));
+      csRef<iComponent> comp (SCF_QUERY_INTERFACE (r->plugin, iComponent));
       if (comp)
         plugin_mgr->QueryOptions (comp);
     }

@@ -19,7 +19,7 @@
 #ifndef __CS_PLUGLDR_H__
 #define __CS_PLUGLDR_H__
 
-#include "csutil/csvector.h"
+#include "csutil/parray.h"
 #include "csutil/util.h"
 
 struct iObjectRegistry;
@@ -38,16 +38,10 @@ struct csPluginLoadRec
 };
 
 /// \internal Helper class for csPluginLoader.
-class csPluginList : public csVector
+class csPluginList : public csPDelArray<csPluginLoadRec>
 {
 public:
-  virtual ~csPluginList ()
-  { DeleteAll (); }
   bool Sort (iObjectRegistry* object_reg);
-  csPluginLoadRec &Get (int idx)
-  { return *(csPluginLoadRec *)csVector::Get (idx); }
-  virtual bool FreeItem (void* Item)
-  { delete (csPluginLoadRec *)Item; return true; }
 private:
   bool RecurseSort (iObjectRegistry*, int row, int *order, int *loop,
     bool *matrix);

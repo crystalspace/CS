@@ -21,6 +21,16 @@ chronological order.
 	  csPDelArrayCompareFunction. Also added csArrayCompareFunction
 	  which is specific to csArray. So csArray no longer has to include
 	  "parray.h".
+	- Jorrit replaced various occurances of csVector:
+	    - Replaced 'csPluginList' for csPluginLoader with a
+	      csPDelArray<csPluginLoadRec>.
+	    - Replaced 'csPluginsVector' in csPluginManager with a
+	      csPDelArray<csPlugin>.
+	    - Replaced 'csGridRow' in csSparseGrid with a
+	      csPDelArray<csGridRowEntry>.
+	    - csRegionTree2D::FindRegion() now uses csArray instead of
+	      csVector.
+	- Jorrit added csPDelArray::FindKey().
 31-Jul-2003
 	- Jorrit replaced various occurances of csVector:
 	    - Replaced 'vTex' in OpenGL texture manager with

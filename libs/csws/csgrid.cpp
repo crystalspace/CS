@@ -120,7 +120,8 @@ void csRegionTree2D::Insert (csRect &area, void* data)
 /**
  * Returns a list of leaves that do all contain parts of area.
  */
-void csRegionTree2D::FindRegion (const csRect &area, csVector &vLeafList)
+void csRegionTree2D::FindRegion (const csRect &area,
+	csArray<csRegionTree2D*> &vLeafList)
 {
   if (children [0])
   {
@@ -154,16 +155,11 @@ csSparseGrid::csGridRow::csGridRow (int theCol)
   col = theCol;
 }
 
-csSparseGrid::csGridRow::~csGridRow ()
-{
-  DeleteAll ();
-}
-
 void csSparseGrid::csGridRow::SetAt (int col, void* data)
 {
-  int key = FindSortedKey ((const void*)col);
+  int key = FindSortedKey ((void*)col, CompareKey);
   if (key == -1 && data)
-    key = InsertSorted (new csGridRowEntry (col, data));
+    key = InsertSorted (new csGridRowEntry (col, data), Compare);
   else
     if (data)
       Get (key)->data = data;
@@ -171,30 +167,17 @@ void csSparseGrid::csGridRow::SetAt (int col, void* data)
       Delete (key);
 }
 
-csSparseGrid::csGridRowEntry* csSparseGrid::csGridRow::Get (int index)
+int csSparseGrid::csGridRow::Compare (void const* Item1, void* Item2)
 {
-  return (csSparseGrid::csGridRowEntry*)csVector::Get (index);
-}
-
-int csSparseGrid::csGridRow::Compare (void* Item1, void* Item2, int Mode) const
-{
-  (void)Mode;
   csSparseGrid::csGridRowEntry *e1 = (csSparseGrid::csGridRowEntry*)Item1;
   csSparseGrid::csGridRowEntry *e2 = (csSparseGrid::csGridRowEntry*)Item2;
   return (e1->col < e2->col ? -1 : e1->col > e2->col ? 1 : 0);
 }
 
-int csSparseGrid::csGridRow::CompareKey (void* Item1, const void* Key, int Mode) const
+int csSparseGrid::csGridRow::CompareKey (void const* Item1, void* Key)
 {
-  (void)Mode;
   csSparseGrid::csGridRowEntry *e1 = (csSparseGrid::csGridRowEntry*)Item1;
   return (e1->col < (int)Key ? -1 : e1->col > (int)Key ? 1 : 0);
-}
-
-bool csSparseGrid::csGridRow::FreeItem (void* Item)
-{
-  delete (csSparseGrid::csGridRowEntry*)Item;
-  return true;
 }
 
 /******************************************************************************
@@ -377,7 +360,7 @@ void csGridView::PlaceItems ()
 
   // count the number of cells visible in the first row
   // (exact would be the minimum of cells in a row in the visible area)
-  csVector vRegionList;
+  csArray<csRegionTree2D*> vRegionList;
   csRect rc;
   int i = 0, w1 = 0, w2 = 0;
   int nRowCells = 0, nColCells = 0;
@@ -416,7 +399,7 @@ void csGridView::PlaceItems ()
     hsbstatus.pagestep = MAX (nRowCells, 1);
     hscroll->SendCommand (cscmdScrollBarSet, &hsbstatus);
 
-    vRegionList.SetLength (0);
+    vRegionList.DeleteAll ();
     i = 0; w1 = 0; w2 = 0;
   }
 
@@ -472,14 +455,14 @@ void csGridView::CooAt (int theX, int theY, int &theRow, int &theCol)
   int actCol = col;
   csRect rc;
   csRegionTree2D *r;
-  csVector vRegions;
+  csArray<csRegionTree2D*> vRegions;
   csGridCell *cell = 0;
 
   theCol = area.xmin -1;
   theRow = area.ymin -1;
 
   rc.Set (actCol, actRow, actCol+1, area.ymax);
-  vRegions.SetLength (0);
+  vRegions.DeleteAll ();
   pGrid->regions->FindRegion (rc, vRegions);
   n = 0;
   c = actRow;
@@ -498,7 +481,7 @@ void csGridView::CooAt (int theX, int theY, int &theRow, int &theCol)
   {
     actRow--;
     rc.Set (actCol, actRow, area.xmax, actRow+1);
-    vRegions.SetLength (0);
+    vRegions.DeleteAll ();
     pGrid->regions->FindRegion (rc, vRegions);
     x = 0;
     n = 0;
@@ -532,7 +515,7 @@ void csGridView::Draw ()
   int c, actRow = row;
   csRect rc;
   csRegionTree2D *r;
-  csVector vRegions;
+  csArray<csRegionTree2D*> vRegions;
   csGridCell *cell = 0;
   int cs = pGrid->GetCursorStyle ();
   int cr, cc;
@@ -543,7 +526,7 @@ void csGridView::Draw ()
   while (y < bound.Height ()-GRIDVIEW_BORDER_SIZE && actRow < area.ymax)
   {
     rc.Set (col, actRow, area.xmax, actRow + 1);
-    vRegions.SetLength (0);
+    vRegions.DeleteAll ();
     pGrid->regions->FindRegion (rc, vRegions);
     if (vRegions.Length () == 0)
       break; // no more rows to draw
@@ -798,7 +781,7 @@ bool csGrid::HandleEvent (iEvent &Event)
           int x, y;
           sl->GetPos (x, y);
           csRect rc (x, y, x + 1, y + 1);
-          csVector vSpl;
+          csArray<csRegionTree2D*> vSpl;
           viewlayout->FindRegion (rc, vSpl);
           if (vSpl.Length () == 1)
           {

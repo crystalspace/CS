@@ -29,8 +29,8 @@
  * @{ */
  
 #include "csws/csscrbar.h"
-#include "csutil/csvector.h"
 #include "csutil/array.h"
+#include "csutil/parray.h"
 #include "csutil/csstring.h"
 
 /**
@@ -77,7 +77,7 @@ public:
   /**
    * Returns a list of leaves that do all contain parts of area.
    */
-  void FindRegion (const csRect &area, csVector &vLeafList);
+  void FindRegion (const csRect &area, csArray<csRegionTree2D*> &vLeafList);
 
   /**
    * Traverse the tree and call user supplied function for every node.
@@ -106,30 +106,24 @@ class csSparseGrid
 
   /*
    * A "grid row" is a horizontal stripe of cells which makes up the
-   * entire grid. Every data item in this csVector is a csGridRowEntry.
+   * entire grid. Every data item in this array is a csGridRowEntry.
    * The grid row object does not contain all the cells as separate objects;
    * this would waste too much memory. Instead, we keep only those cell
    * objects which have associated data items. The cells are kept sorted
    * by column number for faster searching.
    */
-  class csGridRow : public csVector
+  class csGridRow : public csPDelArray<csGridRowEntry>
   {
     int col;
   public:
     // Initialize the object
     csGridRow (int theCol);
-    // Destroy the object
-    virtual ~csGridRow ();
     // Set the data at given column
     void SetAt (int col, void* data);
-    // Get the row entry at given column
-    csGridRowEntry *Get (int index);
     // Compare two row entries
-    virtual int Compare (void* Item1, void* Item2, int Mode) const;
+    static int Compare (void const* Item1, void* Item2);
     // Compare a row entry with a key
-    virtual int CompareKey (void* Item1, const void* Key, int Mode) const;
-    // Free a row entry item
-    virtual bool FreeItem (void* Item);
+    static int CompareKey (void const* Item1, void* Key);
   };
   friend class csSparseGrid::csGridRow;
 
@@ -142,18 +136,6 @@ class csSparseGrid
   public:
     // Initialize the grid row set object
     csGridRowSet (int theRow) : csGridRow (theRow) {}
-    // destructor
-    virtual ~csGridRowSet () {DeleteAll ();}
-    // Free a particular grid row object
-    virtual bool FreeItem (void* Item)
-    {
-      // XXX: Don't free the data here. It seems we're missing a good policy
-      // here on who should delete the data in the rows... Sometimes it's
-      // freed sometimes not.
-      //delete (csGridRow *)((csGridRowEntry *)Item)->data;
-      delete (csGridRowEntry *)Item;
-      return true;
-    }
   };
 
   // The Grid (AKA The Matrix :)
@@ -167,11 +149,11 @@ public:
   void* GetAt (int row, int col)
   {
     void* result = 0;
-    int idx1 = rows.FindSortedKey ((const void*)row);
+    int idx1 = rows.FindSortedKey ((void*)row, rows.CompareKey);
     if (idx1 != -1)
     {
-      int idx2 = ((csGridRow *)rows.Get (idx1)->data)->FindSortedKey ((const
-	    void*)col);
+      int idx2 = ((csGridRow *)rows.Get (idx1)->data)->FindSortedKey (
+      	(void*)col, rows.CompareKey);
       if (idx2 != -1)
 	result = ((csGridRow *)rows.Get (idx1)->data)->Get (idx2)->data;
     }
@@ -181,9 +163,10 @@ public:
   // Set the data at given row/column
   void SetAt (int row, int col, void* data)
   {
-    int idx = rows.FindSortedKey ((const void*)row);
+    int idx = rows.FindSortedKey ((void*)row, rows.CompareKey);
     if (idx == -1)
-      idx = rows.InsertSorted (new csGridRowEntry (row, new csGridRow (row)));
+      idx = rows.InsertSorted (new csGridRowEntry (row, new csGridRow (row)),
+      	rows.Compare);
     ((csGridRow *)rows.Get (idx)->data)->SetAt (col, data);
   }
 };

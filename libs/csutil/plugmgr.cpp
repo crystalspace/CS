@@ -318,7 +318,7 @@ iBase *csPluginManager::QueryPlugin (const char* classID,
 bool csPluginManager::UnloadPlugin (iComponent* obj)
 {
   csScopedMutexLock lock (mutex);
-  int idx = Plugins.FindKey (obj);
+  int idx = Plugins.FindKey (obj, Plugins.CompareAddress);
   if (idx < 0)
     return false;
 

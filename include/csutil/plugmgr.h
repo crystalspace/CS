@@ -21,7 +21,6 @@
 
 #include "csutil/scf.h"
 #include "csutil/scopedmutexlock.h"
-#include "csutil/csvector.h"
 #include "csutil/parray.h"
 #include "iutil/config.h"
 #include "iutil/plugin.h"
@@ -57,26 +56,19 @@ private:
   };
 
   /**
-   * This is a superset of csVector that can find by pointer a plugin.
+   * This is a superset of csPDelArray that can find by pointer a plugin.
    */
-  class csPluginsVector : public csVector
+  class csPluginsVector : public csPDelArray<csPlugin>
   {
   public:
     /// Create the vector
-    csPluginsVector (int iLimit, int iDelta) : csVector (iLimit, iDelta) {}
-    /// Destroy the vector.
-    virtual ~csPluginsVector () { DeleteAll (); }
+    csPluginsVector (int iLimit, int iDelta)
+    	: csPDelArray<csPlugin> (iLimit, iDelta) {}
     /// Find a plugin by its address
-    virtual int CompareKey (void* Item, const void* Key, int /*Mode*/) const
+    static int CompareAddress (void const* Item, void* Key)
     {
       return ((csPlugin *)Item)->Plugin == Key ? 0 : 1;
     }
-    /// Overrided Get() to avoid typecasts
-    csPlugin *Get (int idx)
-    { return (csPlugin *)csVector::Get (idx); }
-
-    virtual bool FreeItem (void* Item)
-    { delete (csPlugin*)Item; return true; }
   };
 
   /**
