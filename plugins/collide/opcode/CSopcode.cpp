@@ -189,15 +189,16 @@ bool csOPCODECollideSystem::Collide (
         	int i;
 	int j;     
 	int size=(int)(udword(TreeCollider.GetNbPairs() ));
+	int oldN=0;
 	 if ( pairs ) {
 	csCollisionPair* temporal;
           temporal=new csCollisionPair[N_pairs + size ]	;
            memcpy (temporal , pairs , sizeof(csCollisionPair)*N_pairs );	   
 	    delete[](pairs); 
-	      };
          pairs = temporal;               //new csCollisionPair[ size ];
-	 int oldN=N_pairs;
-	 N_pairs+=size;
+	 oldN=N_pairs;
+	      };
+        N_pairs+=size;
 	 for (i= oldN ;i< N_pairs ;i++) {
 		 j =  3*colPairs[i].id0;
 		 current = &vertholder0[ indexholder0 [ j ] ];		 
