@@ -2103,6 +2103,10 @@ void csGraphics3DSoftware::DrawPolygonFX (G3DPolygonDPFX& poly)
     flat_b = poly.flat_color_b;
   }
   Scan.FlatRGB = RGBPixel (flat_r, flat_g, flat_b);
+  if (pfmt.PixelBytes >= 2)
+    Scan.FlatColor = texman->encode_rgb (flat_r, flat_g, flat_b);
+  else
+    Scan.FlatColor = texman->find_rgb (flat_r, flat_g, flat_b);
 
   //-----
   // Get the values from the polygon for more conveniant local access.
