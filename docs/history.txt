@@ -15,6 +15,8 @@ chronological order.
 	  enabled.
 	- Eric Sunshine upgraded ODE check in configure.ac to require 0.039
 	  rather than 0.035 since `odedynam' now requires 0.039.
+	- Eric Sunshine fixed compilation problem: csRGBVector::CompareKey()
+	  was using static_cast<> where reinterpret_cast<> was required.
 29-Sep-2003
 	- Jorrit moved ParseTextureMapping() and ParsePoly3d() from syntax
 	  services to thing loader. It doesn't make much sense to make those
