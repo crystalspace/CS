@@ -68,7 +68,7 @@
  * `Interface' is a interface name (iGraphics2D, iVFS and so on).
  */
 #define LOAD_PLUGIN(Object,ClassID,Interface)				\
-  (Interface *)Object->LoadPlugIn (ClassID, #Interface, VERSION_##Interface)
+  (Interface *)(Object)->LoadPlugIn ((ClassID), #Interface, VERSION_##Interface)
 
 struct iPlugIn;
 
