@@ -29,7 +29,7 @@ static bool map_window(csMemMapInfo* info, int fd, unsigned int offset,
 {
   unsigned char* p = (unsigned char*)mmap(
     0, len, PROT_READ | (writable ? PROT_WRITE : 0), MAP_PRIVATE, fd, offset);
-  if ((int)p != -1)
+  if (p != (void*) -1)
   {
     info->hMappedFile = fd;
     info->data = p;
