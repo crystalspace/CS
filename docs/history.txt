@@ -19,6 +19,10 @@ The history order is reversed so that new features are at the top.
 	  loading correctly.
 	- Fixed a bug with pseudo-dynamic lights not setup correctly if
 	  the lighting is recalculated (i.e. not read from lm cache).
+	- Started new doc for api modifications from 0.18 to 0.19. Far from
+	  finished though.
+	- Worked a bit on the howto section again. Added section about pixmaps.
+	  Completed section about level loading.
 13-May-2001
 	- Added CS_ASSERT to some of the functions in growing arrays to
 	  make sure we catch those kinds of errors early.

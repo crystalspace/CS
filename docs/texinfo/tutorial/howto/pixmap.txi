@@ -1,0 +1,98 @@
+@c -*-texinfo-*-
+@node HOWTO Pixmaps, , , HOWTO
+@subsection Loading Images for Pixmaps
+@cindex @code{csSimplePixmap}
+@cindex loading images
+@cindex @sc{VFS}
+@cindex @sc{CSWS}
+@cindex @code{iImageIO}
+@cindex @code{iImage}
+
+This howto describes how you can load an image and use it on a pixmap.
+A pixmap is a small graphics class that can be used independently from
+the engine. It is very useful for CSWS, to draw a logo on screen or to use
+for a HUD.
+
+@subsubheading Getting the Image Loader Plugin
+
+To load an image you need the image loader plugin. There are two
+ways to make sure you have this plugin in your application. You can put
+a line in your config file like this:
+
+@example
+  System.PlugIns.ImageLoader = crystalspace.graphic.image.io.multiplex
+@end example
+
+Or you can put the following line in your @code{main} routine right
+before calling @code{csSystemDriver::Initialize()}:
+
+@example
+  System->RequestPlugin ("crystalspace.graphic.image.io.multiplex:ImageLoader");
+  ...
+  if (!System->Initialize (argc, argv, NULL))
+  @{
+    ...
+@end example
+
+To finally be able to use the image loader in your application you
+need to do:
+
+@example
+  iImageIO* imgldr = QUERY_PLUGIN (System, iImageIO);
+@end example
+
+When you don't need it anymore you must call @code{imgldr->DecRef ()}.
+
+@subsubheading Loading the Image from @sc{VFS}
+
+To learn more about @sc{VFS} go to the @pxref{VFS} documentation.
+In this section I show you how you can use @sc{VFS} and the image
+loader to load an image:
+
+@example
+  iDataBuffer* buf = VFS->ReadFile ("/lib/mydata/test.jpg");
+  iImage* ifile = imgldr->Load (buf->GetUint8 (),
+  	buf->GetSize (), txtmgr->GetTextureFormat ());
+  buf->DecRef ();
+  iTextureHandle* txt = txtmgr->RegisterTexture (ifile, CS_TEXTURE_2D);
+  txt->Prepare ();
+  ifile->DecRef ();
+@end example
+
+This code will first use @sc{VFS} to load the image from the given @sc{VFS}
+path. This will only load the image data. @sc{VFS} doesn't know how to parse
+images. This is the responsibility of the image loader. This is what the
+next line does. Here you give the loaded buffer to the image loader which
+will return the loaded image with an @code{iImage} pointer.
+
+After this is done you free the loaded buffer with @code{buf->DecRef()}.
+
+Now you have to make sure the image becomes a texture that is usable for
+drawing on screen. This is done with @code{txtmgr->RegisterTexture()}. Because
+we are going to use the texture for a pixmap (which is 2D) we use the
+@code{CS_TEXTURE_2D} flag. After registering the texture we have to
+@code{Prepare()} it for use.
+
+When that is done we can free up the loaded image (it is now held by the
+texture) with @code{ifile->DecRef()}.
+
+@subsubheading Using the Texture in a Pixmap
+
+To create a pixmap using this texture you can simply do:
+
+@example
+  csSimplePixmap* pixmap = new csSimplePixmap (txt);
+@end example
+
+@subsubheading Drawing the Pixmap
+
+There are various ways to draw the pixmap. Check out the API documentation
+for more info. But here is one example:
+
+@example
+  pixmap->DrawScaled (G3D, 10, 10, 400, 400);
+@end example
+
+This will draw the pixmap at location 10, 10 with dimension 400, 400.
+If needed it will scale so that the pixmap really fits there.
+

@@ -1,12 +1,74 @@
 @c -*-texinfo-*-
 @node HOWTO Level Loading, , HOWTO Pseudo DynLight, HOWTO
 @subsection Loading a Level
+@cindex @code{iLoader}
 
 This section describes how you can load a level in your game.
 
-@subsubheading Loading a Level
+@subsubheading Setting up the Plugin
 
-@@@ TODO: Waiting until loader is a full plugin.
+At this moment the level loader is not yet a plugin but already
+behaves like one. For that reason you still have to do:
 
+@example
+  REGISTER_STATIC_LIBRARY (lvlload)
+@end example
+
+Somewhere in the beginning of your program (this is a declaration, put
+it outside code). This line will not be needed anymore as soon as the
+level loader becomes a real plugin.
+
+@subsubheading Getting the Level Loader Plugin
+
+To load a level you need the level loader plugin. There are two
+ways to make sure you have this plugin in your application. You can put
+a line in your config file like this:
+
+@example
+  System.PlugIns.LevelLoader = crystalspace.level.loader
+@end example
+
+Or you can put the following line in your @code{main} routine right
+before calling @code{csSystemDriver::Initialize()}:
+
+@example
+  System->RequestPlugin ("crystalspace.level.loader:LevelLoader");
+  ...
+  if (!System->Initialize (argc, argv, NULL))
+  @{
+    ...
+@end example
+
+To finally be able to use the level loader in your application you
+need to do:
+
+@example
+  iLoader* level_loader = QUERY_PLUGIN_ID (System,
+  	CS_FUNCID_LVLLOADER, iLoader);
+@end example
+
+When you don't need it anymore you must call @code{level_loader->DecRef ()}.
+
+@subsubheading Loading a Map
+
+Loading a map is simple. You just do:
+
+@example
+  VFS->ChDir ("/lev/mymap");
+  level_loader->LoadMapFile ("world");
+  engine->Prepare ();
+@end example
+
+This will first set the current directory to the right @sc{VFS} dir
+(See @xpref{VFS} for more information) and then it will load the map
+file which is called 'world' (this is not a requirement).
+
+Note that this will clear all other geometry that might have been
+loaded in the engine before. If you don't want that then you need to
+set the second parameter of @code{LoadMapFile} to @code{false}.
+
+The line @code{engine->Prepare()} will make sure that everything that
+is loaded is correctly set up (i.e. materials and texture will be registered,
+lightmaps will be loaded from the cache, ...).
 
 

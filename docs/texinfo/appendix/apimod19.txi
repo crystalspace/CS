@@ -1,0 +1,89 @@
+@c -*-texinfo-*-
+@node API Modifications 19, , , 
+@appendixsec @sc{api} Changes from 0.18 to 0.19
+@cindex @sc{api} Changes
+
+This section documents the major changes between versions 0.18 and 0.19 of of
+Crystal Space.
+
+@subheading Image Loading
+@cindex @code{csImageLoader}
+@cindex @code{iImageIO}
+
+@code{csImageLoader} is gone and has now become a plugin which implements
+the @code{iImageIO} interface. To use it you typically use the following
+code:
+
+@example
+  #include "igraphic/imageio.h"
+  ...
+  iDataBuffer* buf = ...;
+  iImageIO* imgldr = QUERY_PlUGIN (System, iImageIO);
+  imgldr->Load (buf->GetUint8 (), buf->GetSize (),
+    txtmgr->GetTextureFormat ());
+
+  ...
+  imgldr->DecRef ();
+@end example
+
+@subheading Level Loading (csLoader)
+@cindex @code{csLoader}
+@cindex @code{iLoader}
+@cindex Level Loading
+
+At this moment the level loader is not yet a plugin but already
+behaves like one. For that reason you still have to do:
+
+@example
+  REGISTER_STATIC_LIBRARY (lvlload)
+@end example
+
+Somewhere in the beginning of your program (this is a declaration, put
+it outside code).
+
+Then make sure you have the level loader plugin by putting the following
+in your config file:
+
+@example
+  System.PlugIns.LevelLoader = crystalspace.level.loader
+@end example
+
+or else put the following line in your @code{main} routine right
+before calling @code{csSystemDriver::Initialize()}:
+
+@example
+  System->RequestPlugin ("crystalspace.level.loader:LevelLoader");
+@end example
+
+Then you can get the level loader with:
+
+@example
+  iLoader* level_loader = QUERY_PLUGIN_ID (System,
+  	CS_FUNCID_LVLLOADER, iLoader);
+@end example
+
+When you don't need it anymore you must call @code{level_loader->DecRef ()}.
+Check the API reference to see what functions you can use on level_loader.
+There are functions to load a map, textures, mesh objects, ...
+
+@subheading Things are Mesh Objects
+@cindex @code{csThing}
+@cindex mesh objects
+
+@@@ TODO
+
+@subheading String Server
+
+@@@ TODO
+
+@subheading Map File Changes
+
+@@@ TODO
+PLANE -> ADDON
+THING -> MESHOBJ
+MESHOBJ -> MESHFACT (for factories)
+BEZIER -> ADDON
+MATERIALS
+RENDERPRIORITIES
+PLUGINS
+
