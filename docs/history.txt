@@ -46,6 +46,9 @@ chronological order.
 	  csmingwlibs); and by dropping support for Python 1.x, which involved
 	  manually parsing Python's installed makefile.  (The cspython module
 	  dropped Python 1.x support a long time ago.)
+	- Eric Sunshine added a hack to sound/loader/ogg/oggdata.h which works
+	  around a build problem with some installations of Ogg/Vorbis on
+	  Cygwin where it attempts to #include the non-existent <_G_config.h>.
 8-Apr-2004
 	- Jorrit committed a patch to map2cs from Aren Blondahl:
 	    - Added Support for "_color" tag in light entities for support

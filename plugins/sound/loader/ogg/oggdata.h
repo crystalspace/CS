@@ -24,6 +24,17 @@
  */
 
 #include "isound/data.h"
+
+// This hack works around a build problem with some installations of Ogg/Vorbis
+// on Cygwin where it attempts to #include the non-existent <_G_config.h>.  We
+// must ensure that _WIN32 is not defined prior to #including the Vorbis
+// headers.  This problem is specific to C++ builds; it does not occur with
+// plain C builds (which explains why the CS configure check does not require
+// this hack).
+#ifdef __CYGWIN__
+#undef _WIN32
+#endif
+
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
 
@@ -60,10 +71,10 @@ class csOggSoundData : public iSoundData
   struct cs_ov_callbacks
   {
     cs_ov_callbacks ();
-    size_t (*read_func)  (void *ptr, size_t size, size_t nmemb, void *datasource);
-    int    (*seek_func)  (void *datasource, ogg_int64_t offset, int whence);
-    int    (*close_func) (void *datasource);
-    long   (*tell_func)  (void *datasource);
+    size_t (*read_func) (void *ptr, size_t sz, size_t nmemb, void *datasource);
+    int    (*seek_func) (void *datasource, ogg_int64_t offset, int whence);
+    int    (*close_func)(void *datasource);
+    long   (*tell_func) (void *datasource);
   };
 
  protected:
