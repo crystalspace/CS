@@ -268,8 +268,8 @@ ifneq ($(strip $(TARGET_ARCHS)),)
   SYSCONFIG += $(NEWLINE)echo TARGET_ARCHS = $(NEXT.TARGET_ARCHS)>>config.tmp
 endif
 SYSCONFIG += $(NEXT.SYSCONFIG) \
-  $(NEWLINE)bin/comptest.sh cc>>config.tmp \
-  $(NEWLINE)bin/haspythn.sh>> config.tmp \
+  $(NEWLINE)sh bin/comptest.sh cc>>config.tmp \
+  $(NEWLINE)sh bin/haspythn.sh>> config.tmp \
   $(NEWLINE)echo override DO_ASM = $(DO_ASM)>>config.tmp
 
 endif # ifeq ($(ROOTCONFIG),config)
