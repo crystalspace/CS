@@ -7,6 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 5-Apr-2005
+	- mdmkolbe fixed some slight string format errors in
+	  CS/libs/csutil/win32/callstack.cpp
 	- res replaced use of printf() and relatives with csPrintf() and 
 	  relatives and use of sprintf() with use of csStrings.
 	- res fixed some 64bit warnings on VC7.0.
