@@ -1042,12 +1042,14 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
     SetGlOrtho (false);
-    glViewport (1, -1, viewwidth+1, viewheight+1);
+    glViewport (0, 0, viewwidth, viewheight);
 
     glMatrixMode (GL_MODELVIEW);
     glLoadIdentity ();
 
     SetZMode (CS_ZBUF_NONE);
+    
+    SetMixMode (CS_FX_COPY);
     return G2D->BeginDraw ();
   }
 

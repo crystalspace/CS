@@ -134,6 +134,7 @@ csKDTree::csKDTree ()
   child1 = 0;
   child2 = 0;
   objects = 0;
+  parent = 0;
   num_objects = max_objects = 0;
   disallow_distribute = false;
   split_axis = CS_KDTREE_AXISINVALID;

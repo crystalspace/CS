@@ -1,43 +1,45 @@
-<shader name="splatting_scattering">
-  <declare name="STANDARD_LIGHT_AMBIENT" type="vector3" default="0.2, 0.2, 0.2" />
-  <!-- beta1 = Rayleigh -->
-  <!-- .2
-  <declare name="beta' 1" type="vector3" default="8.3215e-06, 1.4072e-05, 2.9180e-05" /> 
-  <declare name="beta' 1" type="vector3" default="3.3286e-05, 5.6288e-05, 1.1672e-04" /> 
-  <declare name="beta' 1" type="vector3" default="4.1608e-06, 7.0360e-06, 1.4590e-05" /> 
-  -->
-  <declare name="beta' 1" type="vector3" default="8.3215e-06, 1.4072e-05, 2.9180e-05" /> 
-  <!-- beta2 = Mie -->
-  <!-- .01
-  <declare name="beta' 2" type="vector3" default="1.3338e-05, 1.7345e-05, 2.4976e-05" />
-  <declare name="beta' 2" type="vector3" default="0.00026676, 0.00034689, 0.00049952" />
-  <declare name="beta' 2" type="vector3" default="0.00066689, 0.00086723, 0.00124881" />
-  -->
-  <declare name="beta' 2" type="vector3" default="1.3338e-05, 1.7345e-05, 2.4976e-05" />
-  <!--
-  <declare name="beta1 + beta2" type="vector3" default="0.00019683, 0.00030978, 0.00059405" />
-  <declare name="beta1 + beta2" type="vector3" default="0.0017058, 0.0024231, 0.0040585" />
-  <declare name="beta1 + beta2" type="vector3" default="0.0029400, 0.0038177, 0.0055016" />
-  -->
-  <declare name="beta1 + beta2" type="vector3" default="0.00019683, 0.00030978, 0.00059405" />
-  <!-- g = 0.8, hg = 1-g^2, 1+g, 2g -->
-  <declare name="hg" type="vector3" default="0.36, 1.8, 1.6" />
-  <!-- inscatter = .3 -->
-  <declare name="inscattering term" type="vector3" default="0.3, 0.3, 0.3" />
+<shader type="xmlshader" name="splatting_scattering">
+  <shadervar>
+    <define name="STANDARD_LIGHT_AMBIENT" type="vector3" default="0.2, 0.2, 0.2" />
+    <!-- beta1 = Rayleigh -->
+    <!-- .2
+    <define name="beta' 1" type="vector3" default="8.3215e-06, 1.4072e-05, 2.9180e-05" /> 
+    <define name="beta' 1" type="vector3" default="3.3286e-05, 5.6288e-05, 1.1672e-04" /> 
+    <define name="beta' 1" type="vector3" default="4.1608e-06, 7.0360e-06, 1.4590e-05" /> 
+    -->
+    <define name="beta' 1" type="vector3" default="8.3215e-06, 1.4072e-05, 2.9180e-05" /> 
+    <!-- beta2 = Mie -->
+    <!-- .01
+    <define name="beta' 2" type="vector3" default="1.3338e-05, 1.7345e-05, 2.4976e-05" />
+    <define name="beta' 2" type="vector3" default="0.00026676, 0.00034689, 0.00049952" />
+    <define name="beta' 2" type="vector3" default="0.00066689, 0.00086723, 0.00124881" />
+    -->
+    <define name="beta' 2" type="vector3" default="1.3338e-05, 1.7345e-05, 2.4976e-05" />
+    <!--
+    <define name="beta1 + beta2" type="vector3" default="0.00019683, 0.00030978, 0.00059405" />
+    <define name="beta1 + beta2" type="vector3" default="0.0017058, 0.0024231, 0.0040585" />
+    <define name="beta1 + beta2" type="vector3" default="0.0029400, 0.0038177, 0.0055016" />
+    -->
+    <define name="beta1 + beta2" type="vector3" default="0.00019683, 0.00030978, 0.00059405" />
+    <!-- g = 0.8, hg = 1-g^2, 1+g, 2g -->
+    <define name="hg" type="vector3" default="0.36, 1.8, 1.6" />
+    <!-- inscatter = .3 -->
+    <define name="inscattering term" type="vector3" default="0.3, 0.3, 0.3" />
+  </shadervar>
 
   <!-- compressed buffers -->
   <technique priority="100"> 
     <pass>
       <mixmode><add/></mixmode>
-      <streammapping stream="vertices" destination="attribute 0" />
-      <streammapping stream="compressed normals" destination="attribute 1" />
-      <streammapping stream="texture coordinates" destination="attribute 2" />
-      <vp type="gl_arb_vp" file="/shader/compressed_splatting_scattering.avp" />
-      <texturemapping unit="0" name="standardtex normalization map" />
-      <texturemapping unit="1" name="tex normal" />
-      <texturemapping unit="2" name="tex diffuse"/>
-      <texturemapping unit="3" name="splat alpha map"/>
-      <fp type="gl_fixed_fp">
+      <buffer name="vertices" destination="attribute 0" />
+      <buffer name="compressed normals" destination="attribute 1" />
+      <buffer name="texture coordinates" destination="attribute 2" />
+      <vp plugin="glarb" file="/shader/compressed_splatting_scattering.avp" />
+      <texture destination="unit 0" name="standardtex normalization map" />
+      <texture destination="unit 1" name="tex normal" />
+      <texture destination="unit 2" name="tex diffuse"/>
+      <texture destination="unit 3" name="splat alpha map"/>
+      <fp plugin="glfixed">
         <fixedfp>
           <layer> 
             <colorsource num="0" source="texture" modifier="color"/>
@@ -68,17 +70,17 @@
   <technique priority="50">
     <pass>
       <mixmode><srcalphaadd/></mixmode>
-      <streammapping stream="vertices" destination="attribute 0" />
-      <streammapping stream="normals" destination="attribute 1" />
-      <streammapping stream="texture coordinates" destination="attribute 2" />
-      <streammapping stream="tangents" destination="attribute 3" />
-      <streammapping stream="binormals" destination="attribute 4" />
-      <vp type="gl_arb_vp" file="/shader/splatting_scattering.avp" />
-      <texturemapping unit="0" name="standardtex normalization map" />
-      <texturemapping unit="1" name="tex normal" />
-      <texturemapping unit="2" name="tex diffuse"/>
-      <texturemapping unit="3" name="splat alpha map"/>
-      <fp type="gl_fixed_fp">
+      <buffer name="vertices" destination="attribute 0" />
+      <buffer name="normals" destination="attribute 1" />
+      <buffer name="texture coordinates" destination="attribute 2" />
+      <buffer name="tangents" destination="attribute 3" />
+      <buffer name="binormals" destination="attribute 4" />
+      <vp plugin="glarb" file="/shader/splatting_scattering.avp" />
+      <texture destination="unit 0" name="standardtex normalization map" />
+      <texture destination="unit 1" name="tex normal" />
+      <texture destination="unit 2" name="tex diffuse"/>
+      <texture destination="unit 3" name="splat alpha map"/>
+      <fp plugin="glfixed">
         <fixedfp>
           <layer> 
             <colorsource num="0" source="texture" modifier="color"/>

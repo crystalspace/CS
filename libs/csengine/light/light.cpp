@@ -261,12 +261,12 @@ void csLight::SetInfluenceRadius (float radius)
   influenceRadius = radius;
   influenceRadiusSq = radius*radius;
   inv_dist = 1.0 / influenceRadius;
-  influenceValid = true;
 //#ifdef CS_USE_NEW_RENDERER
   int oldatt = attenuation;
   CalculateAttenuationVector (attenuation, radius, 
     1.0f / influenceIntensityFraction);
   attenuation = oldatt;
+  influenceValid = true;
 //#endif
 }
 

@@ -158,6 +158,8 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   ball_normals_dirty_flag = false;
   ball_colors_dirty_flag = false;
   ball_triangle_dirty_flag = false;
+
+  dynDomain.AttachNew (new csShaderVariableContext);
 #endif
 }
 

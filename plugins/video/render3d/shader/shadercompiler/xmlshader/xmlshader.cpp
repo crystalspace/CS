@@ -21,6 +21,7 @@
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"
 #include "imap/services.h"
+#include "ivaria/reporter.h"
 #include "ivideo/rendermesh.h"
 #include "csutil/util.h"
 #include "csutil/scfstr.h"
@@ -54,6 +55,15 @@ csXMLShaderCompiler::csXMLShaderCompiler(iBase* parent)
 csXMLShaderCompiler::~csXMLShaderCompiler()
 {
 
+}
+
+void csXMLShaderCompiler::Report (int severity, const char* msg, ...)
+{
+  va_list args;
+  va_start (args, msg);
+  csReportV (objectreg, severity, 
+    "crystalspace.graphics3d.shadercompiler.xmlshader", msg, args);
+  va_end (args);
 }
 
 bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
@@ -104,41 +114,49 @@ csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ)
     {
       //save it
       unsigned int p = child->GetAttributeValueAsInt ("priority");
-      techniquesTmp.Push (techniqueKeeper(child, p));
+      techniquesTmp.Push (techniqueKeeper (child, p));
     }
   }
 
   techniquesTmp.Sort (&CompareTechniqueKeeper);
 
   //now try to load them one in a time, until we are successful
-  csXMLShader* shader;
+  csRef<csXMLShader> shader;
+  const char* shaderName = templ->GetAttributeValue ("name");
   csArray<techniqueKeeper>::Iterator techIt = techniquesTmp.GetIterator ();
-  while (techIt.HasNext())
+  while (techIt.HasNext ())
   {
     techniqueKeeper tk = techIt.Next();
-    shader = CompileTechnique (tk.node, templ);
+    shader = CompileTechnique (tk.node, shaderName, templ);
     if (shader != 0) break;
   }
 
-  if (shader != 0)
-    shader->name = csStrNew ((const char*)templ->GetAttributeValue("name"));
+  if (shader == 0)
+  {
+    // @@@ Or a warning instead?
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
+      "No technique validated for shader '%s'", shaderName);
+  }
 
-  return shader;
+  return csPtr<iShader> (csRef<iShader> (shader));
 }
 
-csXMLShader* csXMLShaderCompiler::CompileTechnique (iDocumentNode *node,
-						    iDocumentNode *parentSV)
+csPtr<csXMLShader> csXMLShaderCompiler::CompileTechnique (iDocumentNode *node,
+							  const char* shaderName,
+							  iDocumentNode *parentSV)
 {
   //check nodetype
   if (node->GetType()!=CS_NODE_ELEMENT || 
     xmltokens.Request (node->GetValue()) != XMLTOKEN_TECHNIQUE)
     return 0;
 
-  csXMLShader* newShader = new csXMLShader (g3d);
+  csRef<csXMLShader> newShader (csPtr<csXMLShader> (new csXMLShader (g3d)));
+  newShader->name = csStrNew (shaderName);
 
   //count passes
   newShader->passesCount = 0;
-  csRef<iDocumentNodeIterator> it = node->GetNodes(xmltokens.Request (XMLTOKEN_PASS));
+  csRef<iDocumentNodeIterator> it = node->GetNodes (
+    xmltokens.Request (XMLTOKEN_PASS));
   while(it->HasNext ())
   {
     it->Next ();
@@ -183,13 +201,12 @@ csXMLShader* csXMLShaderCompiler::CompileTechnique (iDocumentNode *node,
     newShader->passes[currentPassNr].owner = newShader;
     if (!LoadPass(passNode, &newShader->passes[currentPassNr++]))
     {
-      newShader->DecRef ();
       return 0;
     }
   }
 
 
-  return newShader;
+  return csPtr<csXMLShader> (newShader);
 }
 
 bool csXMLShaderCompiler::LoadPass (iDocumentNode *node, 
@@ -214,7 +231,9 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
       pass->vp = program;
     else
     {
-      //report error!!
+      Report (CS_REPORTER_SEVERITY_WARNING, 
+	"Vertex Program for shader '%s' failed to load",
+	pass->owner->GetName ());
       return false;
     }
   }
@@ -228,7 +247,9 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
       pass->fp = program;
     else
     {
-      //report error!!
+      Report (CS_REPORTER_SEVERITY_WARNING, 
+	"Fragment Program for shader '%s' failed to load",
+	pass->owner->GetName ());
       return false;
     }
   }
@@ -387,6 +408,14 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
     }
   }
 
+  if (pass->bufferCount == 0)
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING,
+      "Shader '%s', pass %d has no buffer mappings",
+      pass->owner->GetName (), pass->owner->GetPassNumber (pass));
+    
+  }
+
   //get texturemappings
   pass->textureCount = 0;
   it = node->GetNodes (xmltokens.Request (XMLTOKEN_TEXTURE));
@@ -435,6 +464,14 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
     }
   }
 
+  if (pass->textureCount == 0)
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING,
+      "Shader '%s', pass %d has no texture mappings",
+      pass->owner->GetName (), pass->owner->GetPassNumber (pass));
+    
+  }
+
   return true;
 }
 
@@ -481,8 +518,12 @@ csPtr<iShaderProgram> csXMLShaderCompiler::LoadProgram (
   iDocumentNode *node, csXMLShader::shaderPass *pass)
 {
   if (node->GetAttributeValue("plugin") == 0)
-    // @@@ Report
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING,
+      "No shader program plugin specified for <%s> in shader '%s'",
+      node->GetValue (), pass->owner->GetName ());
     return 0;
+  }
 
   csRef<iShaderProgram> program;
 
@@ -491,7 +532,8 @@ csPtr<iShaderProgram> csXMLShaderCompiler::LoadProgram (
   strcpy (plugin, pluginprefix);
 
   strncat (plugin, node->GetAttributeValue("plugin"), 255);
-  
+  // @@@ Also check if 'plugin' is a full class ID
+
   //load the plugin
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY  (objectreg,
     iPluginManager);
@@ -502,7 +544,12 @@ csPtr<iShaderProgram> csXMLShaderCompiler::LoadProgram (
   {
     plg = CS_LOAD_PLUGIN(plugin_mgr, plugin, iShaderProgramPlugin);
     if (!plg)
+    {
+      Report (CS_REPORTER_SEVERITY_WARNING,
+	"Couldn't retrieve shader plugin '%s' for <%s> in shader '%s'",
+	plugin, node->GetValue (), pass->owner->GetName ());
       return 0;
+    }
   }
 
   const char* programType = node->GetAttributeValue("type");
@@ -568,9 +615,16 @@ bool csXMLShaderCompiler::IsTemplateToCompiler(iDocumentNode *templ)
   if (xmltokens.Request (templ->GetValue())!=XMLTOKEN_SHADER) return false;
 
   //Check the type-string in <shader>
-  if ((templ->GetAttributeValue ("type") == 0) || (xmltokens.Request (
-    templ->GetAttributeValue ("type")) != XMLTOKEN_XMLSHADER))
+  const char* shaderName = templ->GetAttributeValue ("name");
+  const char* shaderType = templ->GetAttributeValue ("type");
+  if ((shaderType == 0) || (xmltokens.Request (shaderType) != 
+    XMLTOKEN_XMLSHADER))
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING, 
+      "Type of shader '%s' is not 'xmlshader', but '%s'",
+      shaderName, shaderType);
     return false;
+  }
 
   //Check that we have children, no children == not a template to this one at least
   if (!templ->GetNodes()->HasNext()) return false;
@@ -594,6 +648,7 @@ csXMLShader::csXMLShader (iGraphics3D* g3d) : passes(NULL), passesCount(0),
 {
   SCF_CONSTRUCT_IBASE(0);
 
+  name = 0; 
   csXMLShader::g3d = g3d;
   int i;
   for (i = 0; i < shaderPass::TEXTUREMAX; i++)
@@ -603,6 +658,7 @@ csXMLShader::csXMLShader (iGraphics3D* g3d) : passes(NULL), passesCount(0),
 csXMLShader::~csXMLShader ()
 {
   delete [] passes;
+  delete[] name;
   SCF_DESTRUCT_IBASE();
 }
 
@@ -729,4 +785,14 @@ bool csXMLShader::TeardownPass ()
   if(thispass->fp) thispass->fp->ResetState ();
 
   return true;
+}
+
+int csXMLShader::GetPassNumber (shaderPass* pass)
+{
+  if ((pass >= passes) && (pass < passes + passesCount))
+  {
+    return pass - passes;
+  }
+  else
+    return -1;
 }

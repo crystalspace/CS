@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-Dec-2003
+	- res updated the terrain-related shaders.
+	- res fixed the distorted 2D with the GL NR.
+	- res fixed csLight::SetInfluenceRadius() to work as expected.
+	- res fixed an uninitialized member of csKDTree.
+	- res fixed the uninitialized dynDomain in the ball plugin.
+	- res made the XML shader compiler more verbose in case of errors.
 09-Dec-2003
 	- Marten fixed stencil shadow renderloop plugin.
 	- Marten fixed so CLOD and ballmesh compiles, not tested yet though.

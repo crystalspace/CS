@@ -38,7 +38,8 @@ public:
   virtual ~csXMLShader();
 
   /// Retrieve name of shader
-  virtual const char* GetName(){
+  virtual const char* GetName()
+  {
     return name;
   }
 
@@ -189,6 +190,8 @@ private:
 
   //Holders
   csRef<iGraphics3D> g3d;
+public:
+  int GetPassNumber (shaderPass* pass);
 };
 
 class csXMLShaderCompiler : public iShaderCompiler, public iComponent
@@ -215,6 +218,8 @@ public:
   virtual bool IsTemplateToCompiler (iDocumentNode *templ);
 
 private:
+  void Report (int severity, const char* msg, ...);
+
   //struct to hold all techniques, until we decide which to use
   struct techniqueKeeper
   {
@@ -227,7 +232,8 @@ private:
   static int CompareTechniqueKeeper(void const* item1, void const* item2);
   
   //load one technique, and create shader from it
-  csXMLShader* CompileTechnique (iDocumentNode *node, iDocumentNode *parentSV = 0);
+  csPtr<csXMLShader> CompileTechnique (iDocumentNode *node, 
+    const char* shaderName, iDocumentNode *parentSV = 0);
 
   //load one pass, return false if it fails
   bool LoadPass (iDocumentNode *node, csXMLShader::shaderPass *pass);
