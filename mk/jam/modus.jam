@@ -10,7 +10,7 @@ if $(MODE) != "debug" && $(MODE) != "optimize" && $(MODE) != "profile"
 # Set modus related flags
 CCFLAGS += $(COMPILER.CFLAGS.$(MODE)) ;
 C++FLAGS += $(COMPILER.CFLAGS.$(MODE)) $(COMPILER.C++FLAGS.$(MODE)) ;
-LINKLIBS += $(COMPILER.LFLAGS.$(MODE)) ;
+LINKLIBS += $(COMPILER.LFLAGS) $(COMPILER.LFLAGS.$(MODE)) ;
 LOCATE.OBJECTS = $(LOCATE.OBJECTS)/$(MODE) ;
 
 # Configuration for debug/optimized mode

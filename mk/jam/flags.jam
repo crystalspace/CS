@@ -13,6 +13,8 @@ rule LinkWith
   DEPENDS $($(<)_target) : $(deplibs) ;
   NEEDLIBS on $($(<)_target) += $(deplibs) ;
 
+  echo LINKWITH $(<): $(deplibs) ;
+
   if $(USE_PLUGINS) = no && $($(<)_type) = plugin
       && [ IsElem $(<) : $(STATIC.PLUGINLIST) ]
   {
