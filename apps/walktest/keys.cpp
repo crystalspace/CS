@@ -1024,19 +1024,18 @@ void light_statics ()
   csWorld *w = Sys->view->GetWorld ();
   for (int i = 0 ; i < w->sprites.Length () ; i++)
   {
-    csSprite3D *spr = (csSprite3D *)w->sprites [i];
-    csSkeletonState* sk_state = spr->GetSkeletonState ();
-    if (sk_state)
+    csSprite *sp = (csSprite*)w->sprites [i];
+    if (sp->GetType () == csSprite3D::Type)
     {
-      const char* name = spr->GetName ();
-      //if (!strcmp (name, "__skeltree__")) animate_skeleton_tree (sk_state);
-      if (!strcmp (name, "__skelghost__"))
+      csSprite3D *sp3d = (csSprite3D *)sp;
+      csSkeletonState* sk_state = sp3d->GetSkeletonState ();
+      if (sk_state)
       {
-        //animate_skeleton_ghost (sk_state);
-        move_ghost (spr);
+        const char* name = sp3d->GetName ();
+        if (!strcmp (name, "__skelghost__")) move_ghost (sp3d);
       }
     }
-    spr->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+    sp->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   }
 }
 
@@ -1202,7 +1201,7 @@ static bool CommandHandler (char *cmd, char *arg)
       int i;
       for (i = 0 ; i < sprites.Length () ; i++)
       {
-        csSprite3D* spr = (csSprite3D*)sprites[i];
+        csSprite* spr = (csSprite*)sprites[i];
 	Dumper::dump_stubs (&spr->GetBBoxObject ());
       }
     }
@@ -1428,7 +1427,7 @@ static bool CommandHandler (char *cmd, char *arg)
       ScanStr (arg, "%s", name);
       csObject* obj = Sys->view->GetWorld ()->sprites.FindByName (name);
       if (obj)
-        Sys->view->GetWorld ()->RemoveSprite ((csSprite3D*)obj);
+        Sys->view->GetWorld ()->RemoveSprite ((csSprite*)obj);
       else
         CsPrintf (MSG_CONSOLE, "Can't find sprite with that name!\n");
     }
@@ -2309,9 +2308,12 @@ csSprite3D *FindNextClosestSprite(csSprite3D *baseSprite, csCamera *camera, csVe
     closestZLocation = 32000;
   }
 
+  // @@@ This routine ignores 2D sprites for the moment.
   for (spriteIndex = 0; spriteIndex < Sys->world->sprites.Length(); spriteIndex++)
   {
-    nextSprite = (csSprite3D*)Sys->world->sprites[spriteIndex];
+    csSprite* sp = (csSprite*)Sys->world->sprites[spriteIndex];
+    if (sp->GetType () != csSprite3D::Type) continue;
+    nextSprite = (csSprite3D*)sp;
 
 //  Sys->Printf(MSG_CONSOLE, "Checking sprite %s\n", nextSprite->GetName ());
     if (nextSprite != baseSprite)

@@ -178,8 +178,12 @@ void Dumper::dump (csSector* s)
   int i;
   for (i = 0 ; i < s->sprites.Length () ; i++)
   {
-    csSprite3D* sp3d = (csSprite3D*)s->sprites[i];
-    dump (sp3d);
+    csSprite* sp = (csSprite*)s->sprites[i];
+    if (sp->GetType () == csSprite3D::Type)
+    {
+      csSprite3D* sp3d = (csSprite3D*)sp;
+      dump (sp3d);
+    }
   }
   csThing* th = s->first_thing;
   while (th)

@@ -31,8 +31,8 @@
 #include "iconfig.h"
 
 class csSector;
+class csSprite;
 class csTextureList;
-class csSprite3D;
 class csPolygon3D;
 class csCamera;
 class csThing;
@@ -228,7 +228,7 @@ public:
 
   /**
    * List of all sprites in the world. This vector contains objects
-   * of type csSprite3D*. Use UnlinkSprite() and RemoveSprite()
+   * of type csSprite*. Use UnlinkSprite() and RemoveSprite()
    * to unlink and/or remove sprites from this list. These functions
    * take care of correctly removing the sprites from all sectors
    * as well. Note that after you add a sprite to the list you still
@@ -571,13 +571,13 @@ public:
    * Unlink a sprite from the world (but do not delete it).
    * It is also removed from all sectors.
    */
-  void UnlinkSprite (csSprite3D* sprite);
+  void UnlinkSprite (csSprite* sprite);
 
   /**
    * Unlink and delete a sprite from the world.
    * It is also removed from all sectors.
    */
-  void RemoveSprite (csSprite3D* sprite);
+  void RemoveSprite (csSprite* sprite);
 
   /**
    * Create an iterator to iterate over all polygons of the world.

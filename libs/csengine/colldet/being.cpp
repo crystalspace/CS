@@ -132,12 +132,15 @@ int csBeing::InitWorld (csWorld* world, csCamera* /*camera*/)
     }
   }
   // Initialize all sprites for collision detection.
+  // @@@ This function ignores 2D sprites for now.
   csSprite3D* spp;
   int i;
   for (i = 0 ; i < world->sprites.Length () ; i++)
   {
-    spp = (csSprite3D*)world->sprites[i];
-    
+    csSprite* sp = (csSprite*)world->sprites[i];
+    if (sp->GetType () != csSprite3D::Type) continue;
+
+    spp = (csSprite3D*)sp;
     // TODO: Should create beings for these.
     CHK(csCollider* pCollider = new csCollider(spp));
     csColliderPointerObject::SetCollider(*spp, pCollider, true);
@@ -174,12 +177,15 @@ int csBeing::_CollisionDetect (csSector* sp, csTransform *cdt)
   }
 
   // Check collision of with the sprites in this sector.
+  // @@@ This function ignores 2D sprites for now.
   csSprite3D* sp3d = 0;
   csTransform cds;
   int i;
   for (i = 0 ; i < _world->sprites.Length () ; i++)
   {
-    sp3d = (csSprite3D*)_world->sprites[i];
+    csSprite* sp = (csSprite*)_world->sprites[i];
+    if (sp->GetType () != csSprite3D::Type) continue;
+    sp3d = (csSprite3D*)sp;
     cds.SetO2T (sp3d->GetW2T ());
     cds.SetOrigin (sp3d->GetW2TTranslation ());
     csCollider* pCollider = csColliderPointerObject::GetCollider(*sp3d);

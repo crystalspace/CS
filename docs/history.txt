@@ -21,6 +21,21 @@ Short-term cleanups that need to be done:
 	  argv[].
 	- More Texinfo update from Martin to account for limitations of the
 	  info format where whitespace is concerned.
+	- Fixed several cases where the 'sprites' array in csWorld was
+	  being used. With my latest additions it is possible to have
+	  both csSprite2D and csSprite3D instances on that list so all
+	  code needs to be modified to test for that.
+	- Fixed prototype for G2D->DrawBox so that it correctly resembles
+	  the x,y,w,h fields that should be passed along instead of
+	  x1,x2,y1,y2.
+	- Andrew Zabolotny fixed fixed the "virtual method called" problem
+	  when calling destructors for plugins from
+	  csSystemDriver::~csSystemDriver by implementing iBase directly in
+	  csSystemDriver class. The derived system drivers can override
+	  QueryInterface (and they do it indeed) to provide additional
+	  interfaces.
+	- Norman Kramer fixed a bug in loop for search free texture
+	  memory blocks (glide).
 5-Mar-2000
 	- Thomas Hieber did some general reworking of polygon handling in
 	  Map2CS. Allows a much cleaner way to add specific effects like

@@ -1199,8 +1199,12 @@ void csWorld::AdvanceSpriteFrames (time_t current_time)
   int i;
   for (i = 0 ; i < sprites.Length () ; i++)
   {
-    csSprite3D* s = (csSprite3D*)sprites[i];
-    s->NextFrame (current_time);
+    csSprite* sp = (csSprite*)sprites[i];
+    if (sp->GetType () == csSprite3D::Type)
+    {
+      csSprite3D* s = (csSprite3D*)sp;
+      s->NextFrame (current_time);
+    }
   }
 }
 
@@ -1225,7 +1229,7 @@ void csWorld::ReadConfig ()
   //Textures::Gamma = System->ConfigGetFloat ("TextureMapper", "GAMMA", 1.0);
 }
 
-void csWorld::UnlinkSprite (csSprite3D* sprite)
+void csWorld::UnlinkSprite (csSprite* sprite)
 {
   sprite->RemoveFromSectors ();
   int idx = sprites.Find (sprite);
@@ -1234,7 +1238,7 @@ void csWorld::UnlinkSprite (csSprite3D* sprite)
   sprites.Delete (idx);
 }
 
-void csWorld::RemoveSprite (csSprite3D* sprite)
+void csWorld::RemoveSprite (csSprite* sprite)
 {
   sprite->RemoveFromSectors ();
   int idx = sprites.Find (sprite);

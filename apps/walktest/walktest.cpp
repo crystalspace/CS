@@ -1162,11 +1162,14 @@ void WalkTest::InitWorld (csWorld* world, csCamera* /*camera*/)
     }
   }
   // Initialize all sprites for collision detection.
+  // @@@ This routine ignores 2D sprites for the moment.
   csSprite3D* spp;
   int i;
   for (i = 0 ; i < world->sprites.Length () ; i++)
   {
-    spp = (csSprite3D*)world->sprites[i];
+    csSprite* sp = (csSprite*)world->sprites[i];
+    if (sp->GetType () != csSprite3D::Type) continue;
+    spp = (csSprite3D*)sp;
 
     // TODO: Should create beings for these.
     CHK(csCollider* pCollider = new csCollider(spp));

@@ -482,17 +482,17 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
     {
       // We're dealing with a csBspPolygon.
       csBspPolygon* bsppol = (csBspPolygon*)polygon[i];
-      csSprite3D* sp3d = (csSprite3D*)(bsppol->GetOriginator ());
+      csSprite* sp = (csSprite*)(bsppol->GetOriginator ());
 
       // If the sprite is already marked visible then we don't have
       // to do any of the other processing for this polygon.
-      if (!sp3d->IsVisible ())
+      if (!sp->IsVisible ())
       {
-        if (!sp3d->GetBBoxObject ().IsTransformed ())
+        if (!sp->GetBBoxObject ().IsTransformed ())
 	{
 	  // The bbox of this sprite has not yet been transformed
 	  // to camera space.
-	  sp3d->GetBBoxObject ().World2Camera (*d);
+	  sp->GetBBoxObject ().World2Camera (*d);
 	}
 
         // Transform it to screen space and perform clipping to Z plane.
@@ -508,17 +508,17 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	  {
 	    if (quadtree->TestPolygon (clip->GetVertices (),
 	    	clip->GetNumVertices (), clip->GetBoundingBox ()))
-              sp3d->MarkVisible ();
+              sp->MarkVisible ();
 	  }
 	  else if (covtree)
 	  {
 	    if (covtree->TestPolygon (clip->GetVertices (),
 	    	clip->GetNumVertices (), clip->GetBoundingBox ()))
-              sp3d->MarkVisible ();
+              sp->MarkVisible ();
 	  }
 	  else if (c_buffer->TestPolygon (clip->GetVertices (),
 	  	clip->GetNumVertices ()))
-            sp3d->MarkVisible ();
+            sp->MarkVisible ();
         }
         render_pool->Free (clip);
       }

@@ -188,7 +188,7 @@ struct iGraphics2D : public iPlugIn
   /// Draw a line.
   virtual void DrawLine (float x1, float y1, float x2, float y2, int color) = 0;
   /// Draw a box
-  virtual void DrawBox (int x1, int x2, int y1, int y2, int color) = 0;
+  virtual void DrawBox (int x, int y, int w, int h, int color) = 0;
  /**
   * Clip a line against given rectangle.
   * Function returns true if line is not visible.
