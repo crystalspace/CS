@@ -243,8 +243,8 @@ TOKEN_DEF_START
   TOKEN_DEF (TEXTURE_LIGHTING)
   TOKEN_DEF (TEXTURE_MIPMAP)
   TOKEN_DEF (TEXTURE_SCALE)
-  TOKEN_DEF (TEX_SET)
-  TOKEN_DEF (TEX_SET_SELECT)
+  TOKEN_DEF (MAT_SET)
+  TOKEN_DEF (MAT_SET_SELECT)
   TOKEN_DEF (THING)
   TOKEN_DEF (TOTALTIME)
   TOKEN_DEF (TRANSFORM)
@@ -1389,10 +1389,10 @@ csPolygonSet& csLoader::ps_process (csPolygonSet& ps, csSector* sector,
     case TOKEN_TEXLEN:
       ScanStr (params, "%f", &info.default_texlen);
       break;
-    case TOKEN_TEX_SET_SELECT:
+    case TOKEN_MAT_SET_SELECT:
       ScanStr(params, "%s", str);
       info.SetTextureSet( str );
-      info.use_tex_set=true;
+      info.use_mat_set=true;
       break;
     case TOKEN_LIGHTX:
       CsPrintf (MSG_WARNING, "Warning! LIGHTX statement is obsolete"
@@ -1707,7 +1707,7 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec)
     TOKEN_TABLE (CIRCLE)
     TOKEN_TABLE (POLYGON)
     TOKEN_TABLE (BEZIER)
-    TOKEN_TABLE (TEX_SET_SELECT)
+    TOKEN_TABLE (MAT_SET_SELECT)
     TOKEN_TABLE (TEXNR)
     TOKEN_TABLE (MATERIAL)
     TOKEN_TABLE (TEXLEN)
@@ -1806,11 +1806,11 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec)
             CsPrintf (MSG_FATAL_ERROR, "Couldn't find thing template '%s'!\n", str);
             fatal_exit (0, false);
           }
-	  if (info.use_tex_set)
+	  if (info.use_mat_set)
           {
-            thing->MergeTemplate (t, World->GetMaterials (), info.tex_set_name,
+            thing->MergeTemplate (t, World->GetMaterials (), info.mat_set_name,
               info.default_material, info.default_texlen, info.default_lightx);
-            info.use_tex_set = false;
+            info.use_mat_set = false;
 	  }
           else
             thing->MergeTemplate (t, info.default_material, info.default_texlen,
@@ -2506,7 +2506,7 @@ iImage* csLoader::load_image (const char* name)
   return ifile;
 }
 
-void csLoader::txt_process (char *name, char* buf, const char* prefix)
+void csLoader::txt_process (char *name, char* buf)
 {
   TOKEN_TABLE_START (commands)
     TOKEN_TABLE (TRANSPARENT)
@@ -2604,21 +2604,7 @@ void csLoader::txt_process (char *name, char* buf, const char* prefix)
   csTextureWrapper *tex = World->GetTextures ()->NewTexture (image);
 //material->SetTextureWrapper (tex);
   tex->flags = flags;
-  if (prefix)
-  {
-    char *prefixedname = new char [strlen (name) + strlen (prefix) + 2];
-    strcpy (prefixedname, prefix);
-    strcat (prefixedname, "_");
-    strcat (prefixedname, name);
-    tex->SetName (prefixedname);
-//  mat->SetName (prefixedname);
-    delete [] prefixedname;
-  }
-  else
-  {
-    tex->SetName (name);
-//  mat->SetName (name);
-  }
+  tex->SetName (name);
   // dereference image pointer since tex already incremented it
   image->DecRef ();
 //material->DecRef ();
@@ -2628,7 +2614,7 @@ void csLoader::txt_process (char *name, char* buf, const char* prefix)
       QInt (transp.green * 255.99), QInt (transp.blue * 255.99));
 }
 
-void csLoader::mat_process (char *name, char* buf)
+void csLoader::mat_process (char *name, char* buf, const char *prefix)
 {
   TOKEN_TABLE_START (commands)
     TOKEN_TABLE (TEXTURE)
@@ -2687,7 +2673,17 @@ void csLoader::mat_process (char *name, char* buf)
   }
 
   csMaterialWrapper *mat = World->GetMaterials ()->NewMaterial (material);
-  mat->SetName (name);
+  if (prefix)
+  {
+    char *prefixedname = new char [strlen (name) + strlen (prefix) + 2];
+    strcpy (prefixedname, prefix);
+    strcat (prefixedname, "_");
+    strcat (prefixedname, name);
+    mat->SetName (prefixedname);
+    delete [] prefixedname;
+  }
+  else
+    mat->SetName (name);
   // dereference material since mat already incremented it
   material->DecRef ();
 }
@@ -4727,7 +4723,7 @@ bool csLoader::LoadWorld (char* buf)
     TOKEN_TABLE (SCRIPT)
     TOKEN_TABLE (TEXTURES)
     TOKEN_TABLE (MATERIALS)
-    TOKEN_TABLE (TEX_SET)
+    TOKEN_TABLE (MAT_SET)
     TOKEN_TABLE (LIGHTX)
     TOKEN_TABLE (THING)
     TOKEN_TABLE (SIXFACE)
@@ -4796,8 +4792,8 @@ bool csLoader::LoadWorld (char* buf)
           CsPrintf (MSG_WARNING, "Warning! SCRIPT statement is obsolete"
                                  " and does not do anything!\n");
           break;
-	case TOKEN_TEX_SET:
-          if (!LoadTextures (params, name))
+	case TOKEN_MAT_SET:
+          if (!LoadMaterials (params, name))
             return false;
           break;
         case TOKEN_TEXTURES:
@@ -4937,7 +4933,7 @@ bool csLoader::LoadWorldFile (csWorld* world, const char* file)
 
 //---------------------------------------------------------------------------
 
-bool csLoader::LoadTextures (char* buf, const char* prefix)
+bool csLoader::LoadTextures (char* buf)
 {
   TOKEN_TABLE_START (commands)
     TOKEN_TABLE (MAX_TEXTURES)
@@ -4961,7 +4957,7 @@ bool csLoader::LoadTextures (char* buf, const char* prefix)
         // ignored for backward compatibility
         break;
       case TOKEN_TEXTURE:
-        txt_process (name, params, prefix);
+        txt_process (name, params);
         break;
     }
   }
@@ -4974,7 +4970,7 @@ bool csLoader::LoadTextures (char* buf, const char* prefix)
   return true;
 }
 
-bool csLoader::LoadMaterials (char* buf)
+bool csLoader::LoadMaterials (char* buf, const char* prefix)
 {
   TOKEN_TABLE_START (commands)
     TOKEN_TABLE (MATERIAL)
@@ -4994,13 +4990,13 @@ bool csLoader::LoadMaterials (char* buf)
     switch (cmd)
     {
       case TOKEN_MATERIAL:
-        mat_process (name, params);
+        mat_process (name, params, prefix);
         break;
     }
   }
   if (cmd == PARSERR_TOKENNOTFOUND)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a matrix!\n", csGetLastOffender ());
+    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing material!\n", csGetLastOffender ());
     fatal_exit (0, false);
   }
 
