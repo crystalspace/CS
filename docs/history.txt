@@ -7,6 +7,9 @@ The history order has been reversed so that new features are at the top.
 	  the old colldet dir in csengine will be removed.
 	- csPolygonSet and csSprite3D also implement (through embedding)
 	  iPolygonMesh now so that they can be used with the CD system.
+	- Norman Kramer fixed Yet Another csFrustum::Classify(). This
+	  function must hold the record for one of the most difficult
+	  ones to get right :-)
 25-Jul-2000
 	- Thomas Hieber did a small maintainance release to Map2CS
 	  (labeled 0.82):
