@@ -1546,11 +1546,13 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawHalo(csVector3* pCenter, float fIntens
 {
   if(m_bHaloEffect)
   {
+    int dont_forget_to_return_false=0;
+    
     if (haloInfo == NULL)
       return E_INVALIDARG;
     
-    if (pCenter->x > m_nWidth || pCenter->x < 0 || pCenter->y > m_nHeight || pCenter->y < 0  ) 
-      return S_FALSE;
+    if (pCenter->x > m_nWidth || pCenter->x < 0 || pCenter->y > m_nHeight || pCenter->y < 0 ) 
+      dont_forget_to_return_false=1;
 /*
     int izz = QInt24 (1.0f / pCenter->z);
     HRESULT hRes = S_OK;
@@ -1563,6 +1565,7 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawHalo(csVector3* pCenter, float fIntens
 */
     D3DTLVERTEX vx;
     
+    float len = (m_nWidth/6);
 
     m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, TRUE);
     m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVSRCCOLOR);
@@ -1574,33 +1577,96 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawHalo(csVector3* pCenter, float fIntens
     VERIFY_SUCCESS( m_lpd3dDevice->Begin(D3DPT_TRIANGLEFAN, D3DVT_TLVERTEX, D3DDP_DONOTUPDATEEXTENTS) == DD_OK );
   
     vx.sz = SCALE_FACTOR / pCenter->z;
-    vx.rhw = pCenter->y;
+    vx.rhw = pCenter->z;
+
+    if(fIntensity<=0.f)
+      return S_FALSE;
+
 //    vx.color = D3DRGBA(1, 1, 1, fIntensity);
     vx.color = D3DRGBA(fIntensity, fIntensity, fIntensity, fIntensity);
     vx.specular = D3DRGB(0.0, 0.0, 0.0);
 
-    float len = (m_nWidth/6);
+    /**
+     * Everything jumps ;(. Probably it could be cool to add random noise, since that's all
+     * opticsp; and dust, and everything you could only dream about affects that stuff. But
+     * screen coords are integer, and the values after rotation are not. This could be workarounded
+     * by toying with texture coords, but I'm too lazy RIGHT NOW ;). Someday I'll return to that
+     * stuff. -- D.D.
+     */
+#if 0
+    // Let's add some pretty random noise ;)
+    float alpha=M_PI*rand()/RAND_MAX/75.0;
+    float ca=cos(alpha),sa=sin(alpha);
+
+    // Probably I will always have to derive that. It's my destiny:
+    //   (x+iy)*(cos(a)+isin(a))=(x*cos(a)-y*sin(a))+i(y*cos(a)+x*sin(a)) !..
+
+    csVector2 rc;
+    csVector2 dc(-len,-len);
+
+    rc.x=dc.x*ca-dc.y*sa;
+    rc.y=dc.y*ca+dc.x*sa;
+
+    vx.sx = pCenter->x + rc.x + 0.5;
+    vx.sy = pCenter->y + rc.y + 0.5;
+    vx.tu = 0;
+    vx.tv = 0;
+    m_lpd3dDevice->Vertex( &vx );
+
+    dc.Set(+len,-len);
+    rc.x=dc.x*ca-dc.y*sa;
+    rc.y=dc.y*ca+dc.x*sa;
+
+    vx.sx = pCenter->x + rc.x + 0.5;
+    vx.sy = pCenter->y + rc.y + 0.5;
+    vx.tu = 1;
+    vx.tv = 0;
+    m_lpd3dDevice->Vertex( &vx );
+
+    dc.Set(+len,+len);
+    rc.x=dc.x*ca-dc.y*sa;
+    rc.y=dc.y*ca+dc.x*sa;
+
+    vx.sx = pCenter->x + rc.x + 0.5;
+    vx.sy = pCenter->y + rc.y + 0.5;
+    vx.tu = 1;
+    vx.tv = 1;
+    m_lpd3dDevice->Vertex( &vx );
+
+    dc.Set(-len,+len);
+    rc.x=dc.x*ca-dc.y*sa;
+    rc.y=dc.y*ca+dc.x*sa;
+
+    vx.sx = pCenter->x + rc.x + 0.5;
+    vx.sy = pCenter->y + rc.y + 0.5;
+    vx.tu = 0;
+    vx.tv = 1;
+    m_lpd3dDevice->Vertex( &vx );
+#else
+    vx.sx = pCenter->x - len;
+    vx.sy = pCenter->y - len;
+    vx.tu = 0;
+    vx.tv = 0;
+    m_lpd3dDevice->Vertex( &vx );
+
+    vx.sx = pCenter->x + len;
+    vx.sy = pCenter->y - len;
+    vx.tu = 1;
+    vx.tv = 0;
+    m_lpd3dDevice->Vertex( &vx );
+
+    vx.sx = pCenter->x + len;
+    vx.sy = pCenter->y + len;
+    vx.tu = 1;
+    vx.tv = 1;
+    m_lpd3dDevice->Vertex( &vx );
 
     vx.sx = pCenter->x - len;
-    vx.sy = pCenter->y - len;
-    vx.tu = 0;
-    vx.tv = 0;
-    m_lpd3dDevice->Vertex( &vx );
-    vx.sx = pCenter->x + len;
-    vx.sy = pCenter->y - len;
-    vx.tu = 1;
-    vx.tv = 0;
-    m_lpd3dDevice->Vertex( &vx );
-    vx.sx = pCenter->x + len;
-    vx.sy = pCenter->y + len;
-    vx.tu = 1;
-    vx.tv = 1;
-    m_lpd3dDevice->Vertex( &vx );
-    vx.sx = pCenter->x - len;
     vx.sy = pCenter->y + len;
     vx.tu = 0;
     vx.tv = 1;
     m_lpd3dDevice->Vertex( &vx );
+#endif
 
     VERIFY_SUCCESS( m_lpd3dDevice->End(0) == DD_OK );
 
@@ -1610,7 +1676,7 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawHalo(csVector3* pCenter, float fIntens
     m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
     m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ZERO);
 
-    return S_OK;
+    return dont_forget_to_return_false?S_FALSE:S_OK;
   }
   return S_FALSE;
 };
@@ -1669,6 +1735,39 @@ csGraphics3DDirect3DDx5::csHaloDrawer::csHaloDrawer(IGraphics2D* piG2D, float r,
   mRed = r; mGreen = b; mBlue = b;
   mx = my = dim / 2;
 
+  int i,j;
+
+  float power=1.0/2.5;
+  float power_dist=pow(dim*dim/4,power);
+
+#define LEVEL_OF_DISTORTION   5
+
+  for(i=0,y=-dim/2;i<dim;i++,y++)
+  {
+    for(j=0,x=-dim/2;j<dim;j++,x++)
+    {
+      float dist=pow(x*x+y*y,power);
+      if(dist>power_dist)
+        continue;
+      int alpha=255*cos(0.5*M_PI*dist/power_dist)+0.5;
+
+      alpha+=rand()%(2*LEVEL_OF_DISTORTION+1)-LEVEL_OF_DISTORTION;
+      if(alpha<0)
+        alpha=0;
+      if(alpha>255)
+        alpha=255;
+
+      int zr=r*alpha;
+      int zg=g*alpha;
+      int zb=b*alpha;
+
+      int c = (zr << 16) | (zg << 8) | zb;
+      unsigned long final_color=(alpha<<24)|c;
+      mpBuffer[j+i*dim]=final_color;
+    }
+  }
+
+#if 0
   ////// Draw the outer rim //////
 
   drawline_outerrim(-y, y, x);
@@ -1747,6 +1846,8 @@ csGraphics3DDirect3DDx5::csHaloDrawer::csHaloDrawer(IGraphics2D* piG2D, float r,
   }
 
   drawline_vertical(mx, y1, y2);
+#endif
+
 #endif
 
   FINAL_RELEASE(piGI);
