@@ -69,7 +69,7 @@ JPG_LIBS=$(LFLAGS.l)jpeg
 SOUND_LIBS=
 
 # Indicate where special include files can be found.
-CFLAGS.INCLUDE=$(CFLAGS.I)/usr/pkg/include
+CFLAGS.INCLUDE=$(CFLAGS.I)/usr/pkg/include $(CFLAGS.I)/usr/include
 
 # General flags for the compiler which are used in any case.
 CFLAGS.GENERAL=-Wall
@@ -88,7 +88,7 @@ CFLAGS.profile=-pg -O -g
 CFLAGS.DLL=
 
 # General flags for the linker which are used in any case.
-LFLAGS.GENERAL=
+LFLAGS.GENERAL=-Wl,-E
 
 # Flags for the linker which are used when debugging.
 LFLAGS.debug=-g3
