@@ -568,8 +568,6 @@ bool awsManager::ComponentIsDirty (iAwsComponent *win)
 
 bool awsManager::ComponentIsInTransition(iAwsComponent *win)
 {
-  int i;
-
   if (win->isHidden ())
     return false;
 

@@ -94,6 +94,8 @@ chronological order.
 	      from the source tree (which, after all, is the purpose of a
 	      "maintainerclean" target).
 	    - csperl5clean now also cleans Swig-generated files.
+	- Wouter fixed unused int i in awsmgr, and a printf format error 
+	  in a dynavis debug statement.
 3-Nov-2003
 	- Chris Matuszewski added some explicit type casts to stop msvc6 from
 	  emitting warning messages in csgfx/rgbpixel.h and shadervar.h.
