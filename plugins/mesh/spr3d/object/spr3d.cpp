@@ -392,9 +392,10 @@ void csSprite3DMeshObjectFactory::GenerateLOD ()
       int* tr = translate;
       for (i = 0; i < GetVertexCount(); i++)
       {
-	int f;
-        cf->Read ((char*)&f, 4); f = convert_endian (f);
-	*tr++ = f;
+	int32 f;
+        cf->Read ((char*)&f, 4);
+	f = convert_endian (f);
+	*tr++ = CS_STATIC_CAST(int,f);
       }
   
       cf->DecRef ();
@@ -462,12 +463,12 @@ void csSprite3DMeshObjectFactory::GenerateLOD ()
     csMemFile m;
     csRef<iFile> mf (SCF_QUERY_INTERFACE ((&m), iFile));
 
-    int* tr = translate;
+    int const* tr = translate;
     for (i = 0; i < GetVertexCount(); i++)
     {
-      int f;
-      f = convert_endian (*tr++);
-      mf->Write ((char *) &f, 4);
+      int const n = *tr++;
+      int32 f = convert_endian (CS_STATIC_CAST(int32,n));
+      mf->Write ((char const*) &f, 4);
     }
 
     cache_mgr->CacheData ((void*)(m.GetData ()), m.GetSize (),

@@ -86,6 +86,8 @@ chronological order.
 	  extremely ugly const_cast<>'s to allow invocation of
 	  iVertexBuffer::LockBuffer() to compile. (Someone, please fix this in
 	  the cleanest way possible.)
+	- Eric Sunshine fixed ambiguous invocations of convert_endian() in
+	  spr3d.cpp.
 12-Sep-2004
 	- Jorrit fixed genmesh so it compiles with OR again.
 	- Jorrit did some more work on gmeshanim. Still unfinished.
