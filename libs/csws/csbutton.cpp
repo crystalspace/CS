@@ -215,8 +215,8 @@ void csButton::Draw ()
   // Draw text
   if (text)
   {
-    Text (txtx, txty, GetState (CSS_DISABLED) ? CSPAL_BUTTON_DTEXT
-      : CSPAL_BUTTON_TEXT, -1, text);
+    Text (txtx, txty, GetState (CSS_DISABLED) ? CSPAL_BUTTON_DTEXT :
+      CSPAL_BUTTON_TEXT, -1, text);
     if (!GetState (CSS_DISABLED))
       DrawUnderline (txtx, txty, text, underline_pos, CSPAL_BUTTON_TEXT);
   }

@@ -257,11 +257,15 @@ void csGraphics2DDOSRAW::SetRGB (int i, int r, int g, int b)
 
 bool csGraphics2DDOSRAW::BeginDraw ()
 {
+  csGraphics2D::BeginDraw ();
+  if (FrameBufferLocked != 1)
+    return true;
+
 #if !USE_ALLEGRO
   Memory = VS.BackBuffer ();
   return (Memory != NULL);
 #else
-  return csGraphics2D::BeginDraw ();
+  return true;
 #endif
 }
 
@@ -274,6 +278,10 @@ void csGraphics2DDOSRAW::Clear (int color)
 
 void csGraphics2DDOSRAW::FinishDraw ()
 {
+  csGraphics2D::FinishDraw ();
+  if (FrameBufferLocked)
+    return;
+
   Memory = NULL;
 }
 

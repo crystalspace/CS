@@ -324,21 +324,29 @@ void csGraphics2DOpenGL::Print( csRect *area )
 
 bool csGraphics2DOpenGL::BeginDraw()
 {
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(0.,(GLdouble)Width,0.,(GLdouble)Height,-1.0,100.0);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+  csGraphics2D::BeginDraw ();
+  if (FrameBufferLocked != 1)
+    return true;
 
-	return true;
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  glOrtho(0.,(GLdouble)Width,0.,(GLdouble)Height,-1.0,100.0);
+  glMatrixMode (GL_MODELVIEW);
+  glLoadIdentity ();
+
+  return true;
 }
 
 void csGraphics2DOpenGL::FinishDraw()
 {
-	if (mActivePage == 0)
-		mActivePage = 1;
-	else
-		mActivePage = 0;
+  csGraphics2D::FinishDraw ();
+  if (FrameBufferLocked)
+    return;
+
+  if (mActivePage == 0)
+    mActivePage = 1;
+  else
+    mActivePage = 0;
 }
 
 void csGraphics2DOpenGL::SetColorPalette()

@@ -38,6 +38,8 @@ csTextureMM::csTextureMM (iImageFile* image)
   t1 = t2 = t3 = t4 = t2d = NULL;
   rs24 = 16; gs24 = 8; bs24 = 0;
 
+  transp_color.red = transp_color.green = transp_color.blue = 0;
+
   usage = NULL;
   istransp = false;
 
@@ -224,10 +226,13 @@ void csTextureMM::free_usage_table ()
 // This function must be called BEFORE color remapping.
 void csTextureMM::SetTransparent (int red, int green, int blue)
 {
-  transp_color.red = red;
-  transp_color.green = green;
-  transp_color.blue = blue;
-  istransp = true;
+  istransp = (red >= 0) && (green >= 0) && (blue >= 0);
+  if (istransp)
+  {
+    transp_color.red = red;
+    transp_color.green = green;
+    transp_color.blue = blue;
+  }
 }
 
 csTexture* csTextureMM::get_texture (int lev)

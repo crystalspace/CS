@@ -143,7 +143,7 @@ void HighColorCache::Add(iPolygonTexture *polytex)
 {
     csHighColorCacheData *cached_texture;
     csHighColorCacheData* l = NULL;
-    
+
     iLightMap *piLM = polytex->GetLightMap ();
     if (!piLM)
       return;

@@ -651,6 +651,10 @@ unsigned char *csGraphics2DDDraw3::LockBackBuf()
 
 void csGraphics2DDDraw3::FinishDraw ()
 {
+  csGraphics2D::FinishDraw ();
+  if (FrameBufferLocked)
+    return;
+
   m_lpddsBack->Unlock(NULL);
   m_bLocked = false;
   Memory = NULL;
@@ -701,7 +705,12 @@ HRESULT csGraphics2DDDraw3::SetColorPalette()
 
 bool csGraphics2DDDraw3::BeginDraw()
 {
-  if (m_bDisableDoubleBuffer) Print (NULL);
+  csGraphics2D::BeginDraw ();
+  if (FrameBufferLocked != 1)
+    return true;
+
+  if (m_bDisableDoubleBuffer)
+    Print (NULL);
   Memory = LockBackBuf();
   return (Memory != NULL);
 }

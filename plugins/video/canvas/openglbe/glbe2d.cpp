@@ -112,6 +112,10 @@ void csGraphics2DGLBe::Close()
 
 bool csGraphics2DGLBe::BeginDraw ()
 {
+  csGraphics2D::BeginDraw ();
+  if (FrameBufferLocked != 1)
+    return true;
+
 #if 0
   // if fConnectionDisabled, then I will suspend the drawing thread and await shutdown.
   // fConnectionDisabled is set true by the csGraphics2DBeLib destructor.
@@ -137,6 +141,10 @@ bool csGraphics2DGLBe::BeginDraw ()
 
 void csGraphics2DGLBe::FinishDraw ()
 {
+  csGraphics2D::FinishDraw ();
+  if (FrameBufferLocked)
+    return;
+
 //window->locker->Unlock();// uncomment for conventional DirectConnected.
   dpy->UnlockGL();
 }

@@ -396,13 +396,19 @@ void csGraphics2DOpenGL::Print (csRect* /*area*/)
 
 bool csGraphics2DOpenGL::BeginDraw()
 {
-  return true;
+  return csGraphics2D::BeginDraw ();
 }
 
 void csGraphics2DOpenGL::FinishDraw ()
 {
-  if (m_nActivePage == 0) m_nActivePage = 1;
-  else m_nActivePage = 0;
+  csGraphics2D::FinishDraw ();
+  if (FrameBufferLocked)
+    return;
+
+  if (m_nActivePage == 0)
+    m_nActivePage = 1;
+  else
+    m_nActivePage = 0;
 }
 
 HRESULT csGraphics2DOpenGL::SetColorPalette()

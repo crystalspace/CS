@@ -291,6 +291,10 @@ public:
   bool SetMouseCursor (csMouseCursorID Shape, iTextureHandle *hBitmap)
   { return GfxPpl->SetMouseCursor (Shape, hBitmap); }
 
+  /// Get R,G,B at given screen location
+  void GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB)
+  { GfxPpl->GetPixel (x, y, oR, oG, oB); }
+
 protected:
   /// Initialize configuration data: load csws.cfg
   virtual void LoadConfig ();

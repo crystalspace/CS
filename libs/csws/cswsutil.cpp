@@ -1155,7 +1155,7 @@ csWindow *csColorDialog (csComponent *iParent, char *iTitle, int iColor)
 
   // Set starting color value
   d->SetColor (iColor);
-  d->SetHLSmode (true);
+  d->SetHLSmode (false);
 
   // and now set window size and center it.
   w->SetSize (4 + CD_WIDTH + 4, 230);

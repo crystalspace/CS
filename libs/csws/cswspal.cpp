@@ -90,6 +90,7 @@ static int palette_csStatic[] =
   cs_Color_Gray_D,			// static component background
   cs_Color_Cyan_D,			// static component text / inactive
   cs_Color_Cyan_M,			// static component text / active
+  cs_Color_Gray_D,			// static component text / disabled
   cs_Color_Gray_D,			// 3D border dark
   cs_Color_White			// 3D border light
 };

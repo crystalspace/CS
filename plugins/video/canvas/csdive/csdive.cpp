@@ -465,6 +465,10 @@ void csGraphics2DOS2DIVE::SetRGB (int i, int r, int g, int b)
 
 bool csGraphics2DOS2DIVE::BeginDraw ()
 {
+  csGraphics2D::BeginDraw ();
+  if (FrameBufferLocked != 1)
+    return true;
+
   ULONG bpl;
   long switchmode = dblbuff ? DIVE_NEXTBUFFER : 0;
 
@@ -495,6 +499,10 @@ bool csGraphics2DOS2DIVE::BeginDraw ()
 
 void csGraphics2DOS2DIVE::FinishDraw ()
 {
+  csGraphics2D::FinishDraw ();
+  if (FrameBufferLocked)
+    return;
+
   dW->EndPaint ();
   Memory = NULL;
 }

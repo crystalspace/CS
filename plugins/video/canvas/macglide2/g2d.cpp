@@ -246,6 +246,10 @@ void csGraphics2DGlide2x::Print (csRect *area)
 
 bool csGraphics2DGlide2x::BeginDraw(/*int Flag*/)
 {
+  csGraphics2D::BeginDraw ();
+  if (FrameBufferLocked != 1)
+    return true;
+
 	FxBool bret;
 	lfbInfo.size=sizeof(GrLfbInfo_t);
 /*	switch(Flag&(CSDRAW_2DGRAPHICS_READ|CSDRAW_2DGRAPHICS_WRITE))
@@ -292,6 +296,10 @@ bool csGraphics2DGlide2x::BeginDraw(/*int Flag*/)
 
 void csGraphics2DGlide2x::FinishDraw ()
 {
+  csGraphics2D::FinishDraw ();
+  if (FrameBufferLocked)
+    return;
+
   Memory=NULL;
   for(int i = 0; i < Height; i++)
 		LineAddress [i] = 0;

@@ -36,7 +36,7 @@ scfInterface iSystem;
 /**
  * Graphics System pipeline class<p>
  * This class implements all drawing operations (which are then passed to
- * System->piG2D object). All drawing operations are put on hold until
+ * System->G2D object). All drawing operations are put on hold until
  * Flush() is called. This routine is usually called once per frame.<p>
  * All methods and variables of this class are private. Only csApp should
  * have access to its internals, all graphics pipeline management is done
@@ -133,9 +133,9 @@ private:
   int FrameWidth, FrameHeight;
 
   // The 2D graphics driver
-  iGraphics2D *iG2D;
+  iGraphics2D *G2D;
   // The 3D graphics driver
-  iGraphics3D *iG3D;
+  iGraphics3D *G3D;
 
   // Used to clear screen
   int ClearPage,ClearColor;
@@ -205,6 +205,9 @@ private:
   /// Clip a line against a rectangle and return true if its clipped out
   bool ClipLine (float &x1, float &y1, float &x2, float &y2,
     int ClipX1, int ClipY1, int ClipX2, int ClipY2);
+
+  /// Get R,G,B at given screen location
+  void GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB);
 
   /// Change system mouse cursor and return success status
   bool SetMouseCursor (csMouseCursorID Shape, iTextureHandle *hBitmap);

@@ -72,7 +72,9 @@ void csStatic::Init (csStaticStyle iStyle)
 
 void csStatic::Draw ()
 {
-  int textcolor = linkactive ? CSPAL_STATIC_ATEXT : CSPAL_STATIC_ITEXT;
+  int disabled = link ? link->GetState (CSS_DISABLED) : false;
+  int textcolor = disabled ? CSPAL_STATIC_DTEXT :
+    linkactive ? CSPAL_STATIC_ATEXT : CSPAL_STATIC_ITEXT;
   switch (style)
   {
     case csscsEmpty:

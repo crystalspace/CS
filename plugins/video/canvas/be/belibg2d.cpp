@@ -131,6 +131,10 @@ void csGraphics2DBeLib::Close()
 
 bool csGraphics2DBeLib::BeginDraw()
 {
+  csGraphics2D::BeginDraw ();
+  if (FrameBufferLocked != 1)
+    return true;
+
   if (Memory == NULL) return false;
 #if 0
   // if fConnectionDisabled, then I will suspend the drawing thread and await shutdown.
@@ -156,8 +160,12 @@ bool csGraphics2DBeLib::BeginDraw()
 
 void csGraphics2DBeLib::FinishDraw ()
 {
+  csGraphics2D::FinishDraw ();
+  if (FrameBufferLocked)
+    return;
+
 #if 0
-	locker->Unlock();
+  locker->Unlock();
 #endif
 }
 

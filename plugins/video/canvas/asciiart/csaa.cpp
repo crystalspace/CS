@@ -266,12 +266,20 @@ void csGraphics2DAA::SetRGB (int i, int r, int g, int b)
 
 bool csGraphics2DAA::BeginDraw ()
 {
+  csGraphics2D::BeginDraw ();
+  if (FrameBufferLocked != 1)
+    return true;
+
   Memory = aa_image (context);
   return true;
 }
 
 void csGraphics2DAA::FinishDraw ()
 {
+  csGraphics2D::FinishDraw ();
+  if (FrameBufferLocked)
+    return;
+
   Memory = NULL;
 }
 

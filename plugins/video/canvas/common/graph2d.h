@@ -76,6 +76,8 @@ public:
   RGBpaletteEntry Palette[256];
   /// true if some palette entry is already allocated
   bool PaletteAlloc[256];
+  // The counter that is incremented inside BeginDraw and decremented in FinishDraw
+  int FrameBufferLocked;
 
 public:
   /// Create csGraphics2D object
@@ -238,6 +240,9 @@ public:
   /// Get the palette (if there is one)
   virtual RGBpaletteEntry *GetPalette ()
   { return pfmt.PalEntries ? Palette : NULL; }
+
+  /// Query pixel R,G,B at given screen location
+  virtual void GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB);
 
   /**
    * Perform a system specific extension. Return false if extension

@@ -181,10 +181,12 @@ extern csPaletteExport cswsPalette[];
 #define CSPAL_STATIC_ITEXT		1
 /// static component text / active
 #define CSPAL_STATIC_ATEXT		2
+/// static component text / disabled
+#define CSPAL_STATIC_DTEXT		3
 /// 3D border dark
-#define CSPAL_STATIC_DARK3D		3
+#define CSPAL_STATIC_DARK3D		4
 /// 3D border light
-#define CSPAL_STATIC_LIGHT3D		4
+#define CSPAL_STATIC_LIGHT3D		5
 
 /**
  * csTitleBar class color palette indexes.<p>

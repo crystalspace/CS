@@ -59,6 +59,8 @@ public:
   ~csWSTexture ();
   /// Set texture transparent color
   void SetTransparent (int iR, int iG, int iB);
+  /// Set whenever texture has transparent holes or not
+  void SetTransparent (bool iTransparent);
   /// Get texture transparent color
   void GetTransparent (int &oR, int &oG, int &oB)
   { oR = tr; oG = tg; oB = tb; }

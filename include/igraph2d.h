@@ -131,7 +131,7 @@ struct csImageArea
  * for all 2D operations such as creating the window, switching pages,
  * returning pixel format and so on.
  */
-SCF_INTERFACE (iGraphics2D, 0, 0, 1) : public iPlugIn
+SCF_INTERFACE (iGraphics2D, 0, 0, 2) : public iPlugIn
 {
   /// Open the device.
   virtual bool Open (const char *Title) = 0;
@@ -261,6 +261,9 @@ SCF_INTERFACE (iGraphics2D, 0, 0, 1) : public iPlugIn
   virtual int GetTextWidth (int FontID, const char *text) = 0;
   /// Get the height of given font
   virtual int GetTextHeight (int FontID) = 0;
+
+  /// Query pixel R,G,B at given screen location
+  virtual void GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB) = 0;
 };
 
 #endif // __IGRAPH2D_H__

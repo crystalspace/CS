@@ -136,6 +136,10 @@ void csGraphics2DBeGlide::Print (csRect *area)
 
 bool csGraphics2DBeGlide::BeginDraw(/*int Flag*/)
 {
+  csGraphics2D::BeginDraw ();
+  if (FrameBufferLocked != 1)
+    return true;
+
   FxBool bret;
   lfbInfo.size=sizeof(GrLfbInfo_t);
   
@@ -200,7 +204,10 @@ void csGraphics2DBeGlide::FXgetImage()
 
 void csGraphics2DBeGlide::FinishDraw ()
 {
- 
+  csGraphics2D::FinishDraw ();
+  if (FrameBufferLocked)
+    return;
+
   Memory=NULL;
   for (int i = 0; i < Height; i++) LineAddress [i] = 0;
   if (locked) 

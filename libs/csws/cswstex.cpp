@@ -41,10 +41,8 @@ csWSTexture::csWSTexture (const char *iName, iImageFile *iImage,
 csWSTexture::~csWSTexture ()
 {
   Unregister ();
-  if (Name)
-    delete [] Name;
-  if (FileName)
-    delete [] FileName;
+  CHK (delete [] Name);
+  CHK (delete [] FileName);
   if (Image)
     Image->DecRef ();
   if (Handle)
@@ -54,7 +52,20 @@ csWSTexture::~csWSTexture ()
 void csWSTexture::SetTransparent (int iR, int iG, int iB)
 {
   IsTransp = (iR >= 0) && (iG >= 0) && (iB >= 0);
-  tr = iR; tg = iG; tb = iB;
+  if (IsTransp)
+    tr = iR; tg = iG; tb = iB;
+  if (Handle)
+    Handle->SetTransparent (iR, iG, iB);
+}
+
+void csWSTexture::SetTransparent (bool iTransparent)
+{
+  IsTransp = iTransparent;
+  if (Handle)
+    if (IsTransp)
+      Handle->SetTransparent (tr, tg, tb);
+    else
+      Handle->SetTransparent (-1, -1, -1);
 }
 
 void csWSTexture::Register (iTextureManager *iTexMan)
@@ -80,15 +91,13 @@ void csWSTexture::Unregister ()
 
 void csWSTexture::SetName (const char *iName)
 {
-  if (Name)
-    delete [] Name;
+  CHK (delete [] Name);
   Name = strnew (iName);
 }
 
 void csWSTexture::SetFileName (const char *iFileName)
 {
-  if (FileName)
-    delete [] FileName;
+  CHK (delete [] FileName);
   FileName = strnew (iFileName);
 }
 
@@ -103,8 +112,7 @@ csWSTexVector::~csWSTexVector ()
 
 bool csWSTexVector::FreeItem (csSome Item)
 {
-  if (Item)
-    delete (csWSTexture *)Item;
+  CHK (delete (csWSTexture *)Item);
   return true;
 }
 

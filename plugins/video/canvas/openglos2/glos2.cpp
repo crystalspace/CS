@@ -247,11 +247,13 @@ bool csGraphics2DOS2GL::BeginDraw ()
     glW->SetPalette (GLPalette, 256);
     UpdatePalette = FALSE;
   }
-  return true;
+
+  return csGraphics2D::BeginDraw ();
 }
 
 void csGraphics2DOS2GL::FinishDraw ()
 {
+  csGraphics2D::FinishDraw ();
 }
 
 bool csGraphics2DOS2GL::SetMousePosition (int x, int y)

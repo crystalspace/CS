@@ -73,6 +73,8 @@ bool csGraphics2D::Open (const char *Title)
 {
   (void)Title;
 
+  FrameBufferLocked = 0;
+
   // Allocate buffer for address of each scan line to avoid multuplication
   CHK (LineAddress = new int [Height]);
   if (LineAddress == NULL) return false;
@@ -113,13 +115,14 @@ void csGraphics2D::complete_pixel_format ()
 
 bool csGraphics2D::BeginDraw ()
 {
-  // no operation
+  FrameBufferLocked++;
   return true;
 }
 
 void csGraphics2D::FinishDraw ()
 {
-  // no operation
+  if (FrameBufferLocked)
+    FrameBufferLocked--;
 }
 
 void csGraphics2D::Clear(int color)
@@ -538,4 +541,37 @@ void csGraphics2D::CsPrintf (int mode, const char* text, ...)
   va_end (arg);
 	
   System->Print (mode, buf);
+}
+
+void csGraphics2D::GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB)
+{
+  oR = oG = oB = 0;
+
+  if (x < 0 || y < 0 || x >= Width || y >= Height)
+    return;
+
+  UByte *vram = GetPixelAt (x, y);
+  if (!vram)
+    return;
+
+  if (pfmt.PalEntries)
+  {
+    UByte pix = *vram;
+    oR = Palette [pix].red;
+    oG = Palette [pix].green;
+    oB = Palette [pix].blue;
+  }
+  else
+  {
+    ULong pix = 0;
+    switch (pfmt.PixelBytes)
+    {
+      case 1: pix = *vram; break;
+      case 2: pix = *(UShort *)vram; break;
+      case 3: pix = *(ULong *)vram; break;
+    }
+    oR = ((pix & pfmt.RedMask)   >> pfmt.RedShift)   << (8 - pfmt.RedBits);
+    oG = ((pix & pfmt.GreenMask) >> pfmt.GreenShift) << (8 - pfmt.GreenBits);
+    oB = ((pix & pfmt.BlueMask)  >> pfmt.BlueShift)  << (8 - pfmt.BlueBits);
+  }
 }
