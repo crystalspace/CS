@@ -48,6 +48,9 @@ The history order is reversed so that new features are at the top.
 	  This should have fixed the problem with the explosion mesh not
 	  visible when it crosses a portal but it doesn't. So PlaceMesh()
 	  needs some debugging.
+	- Eric Sunshine re-added `gcc' to C++ compiler search list used by
+	  unixconf.sh.  Also added `cc' to the C++ compiler search list, since
+	  `cc' is a valid way to invoke the C++ back-end on some platforms.
 15-Oct-2001
 	- All func-id's are now changed so that they are equal to their
 	  interface name. Basically this means:

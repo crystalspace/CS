@@ -65,9 +65,10 @@ echo "PROC = ${PROC}"
 
 # Find the C++ compiler
 [ -z "${CXX}" ] && CXX=`which g++ 2>&1 | grep -v "[Nn]o"`
+[ -z "${CXX}" ] && CXX=`which gcc 2>&1 | grep -v "[Nn]o"`
 [ -z "${CXX}" ] && CXX=`which egcs 2>&1 | grep -v "[Nn]o"`
 [ -z "${CXX}" ] && CXX=`which c++ 2>&1 | grep -v "[Nn]o"`
-
+[ -z "${CXX}" ] && CXX=`which cc 2>&1 | grep -v "[Nn]o"`
 
 if [ -z "${CXX}" ]; then
   echo "$0: Cannot find an installed C++ compiler!" >&2
