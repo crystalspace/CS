@@ -745,7 +745,6 @@ void csMeshFactoryList::AddMeshFactory (iMeshFactoryWrapper *mesh)
 {
   printf ("+++++++++++++++++++++ adding %s\n", ((csMeshFactoryWrapper*)mesh->GetPrivateObject ())->GetName ());
   Push (mesh);
-  csMeshFactoryWrapper* mm = (csMeshFactoryWrapper*)mesh->GetPrivateObject ();
 }
 
 void csMeshFactoryList::RemoveMeshFactory (iMeshFactoryWrapper *mesh)
