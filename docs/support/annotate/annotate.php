@@ -31,6 +31,7 @@ if ($action=="") {
     $newentry->email=$emailname;
     if ($authorname=="" && $emailname=="")
 	die ("Please give name or email!\n");
+    $newentry->date=time();
     $newentry->text=nl2br($texttext);
     $entries[] = $newentry;
     $h= fopen ($file, "w");
@@ -68,12 +69,14 @@ class entry
     var $author;
     var $email;
     var $text;
+    var $date;
 
     function entry()
     {
-	$This->author="";
+	$this->author="";
 	$this->email="";
 	$this->text="";
+	$this->data=0;
     }
 
     function writeE($h)
@@ -85,6 +88,7 @@ class entry
 	fputs ($h, "<comment>\n");
 	fputs ($h, "<author>".$this->author."</author>\n");
 	fputs ($h, "<email>".$this->email."</email>\n");
+	fputs ($h, "<date>".$this->date."</date>\n");
 	fputs ($h, "<?text ".$this->text ."?>\n");
 	fputs ($h, "</comment>\n");
     }
@@ -93,14 +97,21 @@ class entry
 function printEntries()
 {
     global $entries;
+    print "<br><br>\n";
 
     foreach ($entries as $e) {
-	print "<table width=\"100%\" bgcolor=\"#ff88cc\" celspacing=\"0\" celpadding=\"0\">\n";
+	print "<table width=\"100%\" bgcolor=\"#88bbff\" celspacing=\"0\" celpadding=\"0\">\n";
 	print "<tr><td>".$e->author."</td>";
+	if ($e->date != 0)
+	{
+	    print "<td align=\"center\">";
+	    print gmdate('d M Y H:i:s', $e->date) . " UTC<br>\n";
+	    print "</td>\n";
+	}
 	print "<td align=\"right\">";
 	print "<a href=\"mailto:".$e->email."\">".$e->email."</a></td></tr>\n";
 	print "</table>";
-	print "<table bgcolor=\"#eeeeee\"><tr><td>";
+	print "<table width=\"100%\" bgcolor=\"#eeeeee\"><tr><td>";
 	print $e->text;
 	print "</td></tr></table>\n";
 	print "<br>\n";
@@ -172,6 +183,10 @@ function startElement($parser, $name, $attrs) {
 		$status="email";
 		$aentry->email = $xmlglobdata;
 	    }
+	    if ($name == "DATE") {
+		$status="date";
+		$aentry->date = (int)$xmlglobdata;
+	    }
 	    if ($name == "TEXT") {
 		$status="text";
 		$aentry->text = $xmlglobdata;
@@ -199,6 +214,10 @@ function endElement($parser, $name) {
 	    break;
 	case "email":
 	    $aentry->email = $xmlglobdata;
+	    $status="comment";
+	    break;
+	case "date":
+	    $aentry->date = (int)$xmlglobdata;
 	    $status="comment";
 	    break;
 	case "text":
