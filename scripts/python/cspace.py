@@ -1525,7 +1525,11 @@ class csPoly3D(_object):
     def SplitWithPlaneZ(*args): return _cspace.csPoly3D_SplitWithPlaneZ(*args)
     __swig_getmethods__["ComputeNormal"] = lambda x: _cspace.csPoly3D_ComputeNormal
     if _newclass:ComputeNormal = staticmethod(_cspace.csPoly3D_ComputeNormal)
+    __swig_getmethods__["ComputeNormal"] = lambda x: _cspace.csPoly3D_ComputeNormal
+    if _newclass:ComputeNormal = staticmethod(_cspace.csPoly3D_ComputeNormal)
     def ComputeNormal(*args): return _cspace.csPoly3D_ComputeNormal(*args)
+    __swig_getmethods__["ComputePlane"] = lambda x: _cspace.csPoly3D_ComputePlane
+    if _newclass:ComputePlane = staticmethod(_cspace.csPoly3D_ComputePlane)
     __swig_getmethods__["ComputePlane"] = lambda x: _cspace.csPoly3D_ComputePlane
     if _newclass:ComputePlane = staticmethod(_cspace.csPoly3D_ComputePlane)
     def ComputePlane(*args): return _cspace.csPoly3D_ComputePlane(*args)
@@ -3989,6 +3993,7 @@ class iEngine(iBase):
     def LoadMeshWrapper(*args): return _cspace.iEngine_LoadMeshWrapper(*args)
     def CreatePortalContainer(*args): return _cspace.iEngine_CreatePortalContainer(*args)
     def CreatePortal(*args): return _cspace.iEngine_CreatePortal(*args)
+    def PrecacheDraw(*args): return _cspace.iEngine_PrecacheDraw(*args)
     def Draw(*args): return _cspace.iEngine_Draw(*args)
     def SetContext(*args): return _cspace.iEngine_SetContext(*args)
     def GetContext(*args): return _cspace.iEngine_GetContext(*args)
@@ -4802,6 +4807,7 @@ class iVisibilityCuller(iBase):
     def Setup(*args): return _cspace.iVisibilityCuller_Setup(*args)
     def RegisterVisObject(*args): return _cspace.iVisibilityCuller_RegisterVisObject(*args)
     def UnregisterVisObject(*args): return _cspace.iVisibilityCuller_UnregisterVisObject(*args)
+    def PrecacheCulling(*args): return _cspace.iVisibilityCuller_PrecacheCulling(*args)
     def VisTest(*args): return _cspace.iVisibilityCuller_VisTest(*args)
     def IntersectSegment(*args): return _cspace.iVisibilityCuller_IntersectSegment(*args)
     def CastShadows(*args): return _cspace.iVisibilityCuller_CastShadows(*args)
