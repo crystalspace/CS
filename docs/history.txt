@@ -25,6 +25,10 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine fixed the Terrain and Phyziks libraries so that they
 	  once again compile on OpenStep (taking into account OpenStep
 	  compiler bugs).
+	- Eric Sunshine fixed the Big Red Big Endian bug which appeared
+	  recently with one of Andrew's Big Changes.  This bug caused CS to
+	  display all rendered graphics entirely in red on big-endian
+	  platforms.
 29-Feb-2000
 	- Norman Kramer fixed a divide by zero bug in Glide.
 	- Eric Sunshine fixed a compilation bug in MazeD.

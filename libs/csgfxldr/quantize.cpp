@@ -22,8 +22,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define CS_LITTLE_ENDIAN
-
 /*
  * The algorithm presented here is a variation of well-known and widely-used
  * Heckbert quantization algorithm. It works in the following way: first,
