@@ -132,14 +132,18 @@ SED_DEPEND=-e "s/^\([^ ].*\)/$$\(OUT\)\1/" $(SYS_SED_DEPEND)
 ifndef DO.DEP
   ifeq ($(DEPEND_TOOL),cc)
     DO.DEP = $(CC) -MM $(CFLAGS) $(CFLAGS.INCLUDE) $(filter-out %.asm,$^) | sed $(SED_DEPEND) >$@
+    DO.DEP1 = $(CC) -MM $(CFLAGS) $(CFLAGS.INCLUDE)  
+    DO.DEP2 = $(filter-out %.asm,$^) | sed $(SED_DEPEND) >$@
   else
     ifeq ($(DEPEND_TOOL),mkdep)
       # If mkdep is already installed, don't build it
       ifneq ($(DEPEND_TOOL.INSTALLED),yes)
         depend: mkdep
       endif
-      DO.DEP = makedep $(MEM) $(subst $(CFLAGS.I),-I,$(CFLAGS.INCLUDE)) \
+      DO.DEP = makedep $(MEM) $(subst $(CFLAGS.I),-I,$(CFLAGS.INCLUDE) ) \
         $(filter-out %.asm,$^) -o $(BUCK)O -p $(OUT) -r -c -f $@
+      DO.DEP1 = makedep $(MEM) $(subst $(CFLAGS.I),-I,$(CFLAGS.INCLUDE) ) 
+      DO.DEP2 = $(filter-out %.asm,$^) -o $(BUCK)O -p $(OUT) -r -c -f $@
     else
       DO.DEP = echo Building dependencies is not supported on this platform
     endif
