@@ -955,15 +955,13 @@ bool csODERigidBody::AttachColliderSphere (float radius, const csVector3 &offset
   return true;
 }
 
-bool csODERigidBody::AttachColliderPlane (const csPlane3 &plane,
+bool csODERigidBody::AttachColliderPlane (const csPlane3& plane,
   float friction, float density, float elasticity)
 {
   dSpaceID space = dynsys->GetSpaceID();
-  dGeomID id = dCreatePlane (space, plane.norm.x, plane.norm.y, plane.norm.z,
-   -plane.DD);
+  dGeomID id = dCreatePlane (space, plane.A(), plane.B(), plane.C(), plane.D());
 
   dGeomSetBody (id, bodyID);
-  dGeomGroupAdd (groupID, id);
 
   float *f = new float[2];
   f[0] = friction;
