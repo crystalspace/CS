@@ -54,22 +54,36 @@ public:
 	bool IsHandleVoidSound();
 	
 protected:
+  // system driver
   iSystem* m_piSystem;
+
+  // sound renderer
   iSoundRender *m_piSoundRender;
+
+  // sound memory
   void * Memory;
   int MemorySize;
-  float volume;
+
+  // system volume (restored when the driver is closed)
   unsigned long old_Volume;
 
+  // global volume setting
+  float volume;
+  // sound format
   int m_nFrequency;
   bool m_b16Bits;
   bool m_bStereo;
 
-  bool MixChunk();
+  // this function is called again and again in 'function' playback
   static void CALLBACK waveOutProc(HWAVEOUT hwo, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2);
+  // this function is called once in 'thread' playback
   static DWORD CALLBACK waveOutThreadProc( LPVOID dwParam); 
+  // this actually sends the sound data to wave-out (used by both of the above functions).
+  void SoundProc(LPWAVEHDR OldHeader);
 
+  // wave-out device?
   HWAVEOUT hwo;
+  // ???
   HANDLE hThread;
   DWORD dwThread;
 };

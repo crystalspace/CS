@@ -80,13 +80,13 @@ csSoundDriverWaveOut::csSoundDriverWaveOut(iBase *piBase)
 
 csSoundDriverWaveOut::~csSoundDriverWaveOut()
 {
-	m_piSystem->Printf (MSG_CONSOLE, "\nSoundDriver Destructor !!!!\n");
+  m_piSystem->Printf (MSG_CONSOLE, "\nSoundDriver Destructor !!!!\n");
 }
 
 bool csSoundDriverWaveOut::Initialize (iSystem *iSys)
 {
-	m_piSystem = iSys;
-	return true;
+  m_piSystem = iSys;
+  return true;
 }
 
 bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16, bool stereo)
@@ -104,7 +104,7 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16,
 
   MMRESULT res;
   WAVEFORMATEX format;
-  memset(&format, 0, sizeof(PCMWAVEFORMAT));
+  memset(&format, 0, sizeof(WAVEFORMATEX));
   format.wFormatTag = WAVE_FORMAT_PCM;
   if(stereo)
     format.nChannels = 2;
@@ -132,7 +132,7 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16,
 
   unsigned int refresh=configwodrv->GetInt("SoundDriver.waveOut", "REFRESH", 5);
 
-  if(refresh>format.nAvgBytesPerSec) refresh=format.nAvgBytesPerSec;
+//  if(refresh>format.nAvgBytesPerSec) refresh=format.nAvgBytesPerSec;
 
   MemorySize = format.nAvgBytesPerSec/refresh;
   MemorySize -=(MemorySize%format.nBlockAlign);
@@ -201,18 +201,10 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16,
   int old_v2=old_Volume&0xffff;
   SetVolume((float)old_v2/(float)65535.0);
 	
-  if (MixChunk())
-  {
-    if (MixChunk())
-    {
-      m_piSystem->Printf (MSG_INITIALIZATION, "SoundDriver initialized to %d Hz %d bits %s\n",
-        m_nFrequency, (m_b16Bits)?16:8, (m_bStereo)?"Stereo":"Mono");
-      return S_OK;
-    }
-  }
-
-  m_piSystem->Printf (MSG_FATAL_ERROR, "WaveOut error : Error then prepare chunk");
-  return E_FAIL;
+  SoundProc(NULL);
+  m_piSystem->Printf (MSG_INITIALIZATION, "SoundDriver initialized to %d Hz %d bits %s\n",
+    m_nFrequency, (m_b16Bits)?16:8, (m_bStereo)?"Stereo":"Mono");
+  return S_OK;
 }
 
 void csSoundDriverWaveOut::Close()
@@ -295,62 +287,20 @@ static bool are_you_playing = false;
 
 DWORD WINAPI csSoundDriverWaveOut::waveOutThreadProc( LPVOID dwParam)
 {
-  MSG msg;
   csSoundDriverWaveOut *snd = (csSoundDriverWaveOut *)dwParam;
+  MSG msg;
 
-  while(1)
-  {
+  while(1) {
     WaitMessage();
-    if(GetMessage( &msg, NULL, 0, 0 ) )
-    {
-      if(msg.message==MM_WOM_DONE && !are_you_playing)
-      {
+    if(GetMessage( &msg, NULL, 0, 0 ) ) {
+      if(msg.message==MM_WOM_DONE) {
         if(snd==NULL || snd->hwo==NULL) continue;
-        
-        are_you_playing = true;
-        
-        SoundBlock * block = new SoundBlock;
-        
-        // Allocate memory for both the header and the actual sound data itself
-        block->driver = snd;
-        block->hHeader = GlobalAlloc(GMEM_MOVEABLE | GMEM_SHARE, sizeof(WAVEHDR)+snd->MemorySize);
-        block->lpSoundData = (LPBYTE)GlobalLock(block->hHeader);
-        
-        // Set up various pointers
-        LPWAVEHDR lpWaveHdr = (LPWAVEHDR)block->lpSoundData;
-        
-        snd->Memory = (unsigned char *)&block->lpSoundData[sizeof(WAVEHDR)];
-        
-        if(snd->Memory == NULL) continue;
-        
-        snd->m_piSoundRender->MixingFunction();
-        
-        // Set up and prepare header. 
-        lpWaveHdr->lpData = (char *)snd->Memory;
-        lpWaveHdr->dwBufferLength = snd->MemorySize;
-        lpWaveHdr->dwFlags = 0L;
-        lpWaveHdr->dwLoops = 0L;
-        lpWaveHdr->dwUser = (DWORD)block;
-        waveOutPrepareHeader(snd->hwo, lpWaveHdr, sizeof(WAVEHDR));
-        
-        // Now the data block can be sent to the output device. The 
-        // waveOutWrite function returns immediately and waveform 
-        // data is sent to the output device in the background.
-        MMRESULT result = waveOutWrite(snd->hwo, lpWaveHdr, sizeof(WAVEHDR));
-        
-        // Free this block up
-        waveOutUnprepareHeader(snd->hwo, lpWaveHdr, sizeof(WAVEHDR));
-        GlobalUnlock(block->hHeader);
-        GlobalFree(block->hHeader);
-        delete block;
-        
-        are_you_playing = false;
+        LPWAVEHDR OldHeader=(LPWAVEHDR)(msg.lParam);
+        snd->SoundProc(OldHeader);
       }
-      
       TranslateMessage(&msg); 
       DispatchMessage(&msg);
-    }
-    else return msg.wParam;
+    } else return msg.wParam;
   }
   return 0xFFFFFFFF;
 }
@@ -358,74 +308,68 @@ DWORD WINAPI csSoundDriverWaveOut::waveOutThreadProc( LPVOID dwParam)
 void CALLBACK csSoundDriverWaveOut::waveOutProc(HWAVEOUT /*hwo*/, UINT uMsg, DWORD /*dwInstance*/, 
                                                 DWORD dwParam1, DWORD /*dwParam2*/)
 {
-  if (uMsg==MM_WOM_DONE)
-  {
-    if(are_you_playing) return;
-
-    are_you_playing = true;
-
-    LPWAVEHDR lpWaveHdr = (LPWAVEHDR)dwParam1;
+  if (uMsg==MM_WOM_DONE) {
+    LPWAVEHDR OldHeader = (LPWAVEHDR)dwParam1;
     // void data ?
-    if(lpWaveHdr->dwUser==NULL
-		|| lpWaveHdr->dwUser==0xcdcdcdcd ) return;
-
-    SoundBlock * block = (SoundBlock *)lpWaveHdr->dwUser;
-
-    csSoundDriverWaveOut *me = block->driver;
-
-    if(me==NULL) return;
-
-    // Free this block up
-    waveOutUnprepareHeader(me->hwo, lpWaveHdr, sizeof(WAVEHDR));
-    GlobalUnlock(block->hHeader);
-    GlobalFree(block->hHeader);
-    delete block;
-
-    // If we're still playing then mix another chunk
-	me->MixChunk();
-    
-    are_you_playing = false;
-  } 
+    if(OldHeader->dwUser==NULL || OldHeader->dwUser==0xcdcdcdcd ) return;
+    SoundBlock *block = (SoundBlock *)OldHeader->dwUser;
+    csSoundDriverWaveOut *Driver = block->driver;
+    Driver->SoundProc(OldHeader);
+  }
 }
 
-bool csSoundDriverWaveOut::MixChunk()
-{
-  if(hwo==NULL) return false;
+void csSoundDriverWaveOut::SoundProc(LPWAVEHDR OldHeader) {
+  // wait for the previous call to exit
+  while (are_you_playing);
+  // lock this function
+  are_you_playing = true;
 
-	SoundBlock * block = new SoundBlock;
+  SoundBlock *Block;
 
-	// Allocate memory for both the header and the actual sound data itself
-	block->driver = this;
-	block->hHeader = GlobalAlloc(GMEM_MOVEABLE | GMEM_SHARE, sizeof(WAVEHDR)+MemorySize);
-	block->lpSoundData = (LPBYTE)GlobalLock(block->hHeader);
+  if (OldHeader) {
+    // get the previous sound block
+    Block = (SoundBlock *)(OldHeader->dwUser);
 
-	// Set up various pointers
-	LPWAVEHDR lpWaveHdr = (LPWAVEHDR)block->lpSoundData;
+    // Free this block up
+    waveOutUnprepareHeader(hwo, OldHeader, sizeof(WAVEHDR));
+    GlobalUnlock(Block->hHeader);
+    GlobalFree(Block->hHeader);
+    delete Block;
+  }
 
-	Memory = (unsigned char *)&block->lpSoundData[sizeof(WAVEHDR)];
+  // create a new block
+  Block = new SoundBlock();
+  Block->driver = this;
+  Block->hHeader = GlobalAlloc(GMEM_MOVEABLE | GMEM_SHARE, sizeof(WAVEHDR)+MemorySize);
+  Block->lpSoundData = (LPBYTE)GlobalLock(Block->hHeader);
 
-  if(Memory == NULL) return false;
+  // Set up various pointers
+  LPWAVEHDR lpWaveHdr = (LPWAVEHDR)Block->lpSoundData;
+  Memory = (unsigned char *)&Block->lpSoundData[sizeof(WAVEHDR)];
+  if(Memory == NULL) return;
 
+  // call the sound renderer mixing function
   m_piSoundRender->MixingFunction();
+  
+  // Set up and prepare header. 
+  lpWaveHdr->lpData = (char *)Memory;
+  lpWaveHdr->dwBufferLength = MemorySize;
+  lpWaveHdr->dwFlags = 0L;
+  lpWaveHdr->dwLoops = 0L;
+  lpWaveHdr->dwUser = (DWORD)Block;
+  waveOutPrepareHeader(hwo, lpWaveHdr, sizeof(WAVEHDR));
 
-	// Set up and prepare header. 
-	lpWaveHdr->lpData = (char *)Memory;
-	lpWaveHdr->dwBufferLength = MemorySize;
-	lpWaveHdr->dwFlags = 0L;
-	lpWaveHdr->dwLoops = 0L;
-	lpWaveHdr->dwUser = (DWORD)block;
-	waveOutPrepareHeader(hwo, lpWaveHdr, sizeof(WAVEHDR));
- 
-	// Now the data block can be sent to the output device. The 
-	// waveOutWrite function returns immediately and waveform 
-	// data is sent to the output device in the background.
-	MMRESULT result = waveOutWrite(hwo, lpWaveHdr, sizeof(WAVEHDR)); 
-	if (result != 0) 
-	{ 
-		waveOutUnprepareHeader(hwo, lpWaveHdr, sizeof(WAVEHDR)); 
-		GlobalUnlock(block->hHeader);
-		GlobalFree(block->hHeader);
-    return false;
-	}
-  return true;
+  // Now the data block can be sent to the output device. The 
+  // waveOutWrite function returns immediately and waveform 
+  // data is sent to the output device in the background.
+  MMRESULT result = waveOutWrite(hwo, lpWaveHdr, sizeof(WAVEHDR)); 
+  if (result != 0) { 
+    waveOutUnprepareHeader(hwo, lpWaveHdr, sizeof(WAVEHDR)); 
+    GlobalUnlock(Block->hHeader);
+    GlobalFree(Block->hHeader);
+    delete Block;
+  }
+  
+  // unlock this function
+  are_you_playing = false;
 }
