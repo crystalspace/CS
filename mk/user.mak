@@ -38,8 +38,10 @@ ifeq ($(ZLIB.AVAILABLE),yes)
 PLUGINS += filesys/vfs
 endif
 PLUGINS += video/renderer/software
+ifneq ($(USE_NEW_RENDERER),yes)
 ifeq ($(GL.AVAILABLE),yes)
 PLUGINS += video/renderer/opengl
+endif
 endif
 PLUGINS += video/loader/mplex
 PLUGINS += video/loader/gif

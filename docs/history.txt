@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Dec-2003
+	- Eric Sunshine changed user.mak so the old OpenGL renderer is not
+	  built when USE_NEW_RENDERER is 'yes'.
 28-Dec-2003
 	- Philip Wyett fixed a few config files so Freetype2 could again be
 	  invoked.
@@ -13,8 +16,8 @@ chronological order.
 	  child, csTicks time) and an empty implementation for each of its
 	  subclasses. He also added code to the OR to place hierarchical
 	  children with this method.
-	- Steven Geens changed spr3d so it now uses PositionChild and not
-	  DrawTest to place hierarchical children.
+	- Steven Geens changed spr3d so it now uses PositionChild() and not
+	  DrawTest() to place hierarchical children.
 27-Dec-2003
 	- Philip Wyett continued a general cleanup of CS code formatting.
 	- Philip Wyett added 'docconv' to the root CS directory .cvsignore.
