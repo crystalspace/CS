@@ -301,7 +301,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   imeshfact->DecRef ();
   spstate->DecRef ();
   sprite->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
-
+  sprite->DecRef ();
   return true;
 }
 
