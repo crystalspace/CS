@@ -85,3 +85,8 @@ csCollider* csCollider::GetCollider (csObject &object)
   return GET_CHILD_OBJECT_FAST (&object, csCollider);
 }
 
+csCollider* csCollider::GetCollider (iObject* object) 
+{
+  return GET_CHILD_OBJECT_FAST (object, csCollider);
+}
+

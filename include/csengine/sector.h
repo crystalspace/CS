@@ -582,7 +582,8 @@ public:
   	csVector3& isect);
     virtual iObject* HitBeam (const csVector3& start, const csVector3& end,
   	iPolygon3D** polygonPtr);
-
+    virtual iSector* FollowSegment (csReversibleTransform& t,
+  	csVector3& new_position, bool& mirror);
   } scfiSector;
   friend struct eiSector;
 };

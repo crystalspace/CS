@@ -34,14 +34,14 @@
 #include "isys/vfs.h"
 #include "ivideo/fontserv.h"
 
-class csRegion;
 class WalkTest;
 class csView;
-class csEngine;
 class csPixmap;
 class csWireFrameCam;
 class InfiniteMaze;
 class HugeRoom;
+struct iEngine;
+struct iRegion;
 struct iSoundHandle;
 struct iCollideSystem;
 struct iPerfStats;
@@ -89,7 +89,7 @@ struct csRecordedCamera
   csVector3 vec;
   csVector3 angle;
   bool mirror;
-  csSector* sector;
+  iSector* sector;
   char *cmd;
   char *arg;
   ~csRecordedCamera ()
@@ -268,10 +268,10 @@ public:
   csColor fs_shadevert_topcol;
   csColor fs_shadevert_botcol;
 
-  /// Engine plug-in handle.
-  csEngine *engine;
-  /// The main engine interface
-  /// (when interface will be complete, csEngine will not be needed anymore)
+  /**
+   * The main engine interface
+   * (when interface will be complete, csEngine will not be needed anymore)
+   */
   iEngine *Engine;
   /// The level loader
   iLoader *LevelLoader;
@@ -375,13 +375,13 @@ public:
     const char *iConfigName);
 
   /// Fire all commands on an object (run time execution).
-  virtual void ActivateObject (csObject* object);
+  virtual void ActivateObject (iObject* object);
 
   /**
    * Find all key commands attached to an object and execute
    * them (load time execution).
    */
-  virtual void ParseKeyCmds (csObject* src);
+  virtual void ParseKeyCmds (iObject* src);
 
   /**
    * Find all key commands attached to objects and execute
@@ -454,7 +454,7 @@ public:
   virtual void Help ();
 
   /// Inits all the collision detection stuff
-  virtual void InitCollDet (csEngine* engine, csRegion* region);
+  virtual void InitCollDet (iEngine* engine, iRegion* region);
 
   /// Destroys all the collision detection stuff
   virtual void EndEngine();

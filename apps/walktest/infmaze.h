@@ -23,12 +23,12 @@
 #include "csengine/portal.h"
 #include "csengine/lview.h"
 
-class csEngine;
 class csSparse3D;
 class csWideSparse3D;
-class csSector;
-class csMeshWrapper;
 class csFrustumContext;
+struct iEngine;
+struct iSector;
+struct iMeshWrapper;
 struct iThingState;
 struct iMaterialWrapper;
 struct iMeshWrapper;
@@ -40,8 +40,7 @@ struct iFrustumView;
 struct InfRoomData
 {
   int x, y, z;
-  csSector* sector;
-  iSector* isector;
+  iSector* sector;
   iMeshWrapper* walls;
   iThingState* walls_state;
 };
@@ -74,7 +73,7 @@ public:
    * Create a six-sided room. This is used by the infinite maze.
    * x, y, z are the coordinates in integer units.
    */
-  InfRoomData* create_six_room (csEngine* engine, int x, int y, int z);
+  InfRoomData* create_six_room (iEngine* engine, int x, int y, int z);
 
   ///
   void connect_infinite (int x1, int y1, int z1, int x2, int y2, int z2, bool create_portal1 = true);

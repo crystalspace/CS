@@ -80,15 +80,15 @@ void RandomColor (float& r, float& g, float& b)
   }
 }
 
-extern iMeshWrapper* add_meshobj (char* tname, char* sname, csSector* where,
+extern iMeshWrapper* add_meshobj (char* tname, char* sname, iSector* where,
 	csVector3 const& pos, float size);
-extern void move_mesh (csMeshWrapper* sprite, csSector* where,
+extern void move_mesh (iMeshWrapper* sprite, iSector* where,
 	csVector3 const& pos);
 
 //===========================================================================
 // Demo particle system (rain).
 //===========================================================================
-void add_particles_rain (csSector* sector, char* matname, int num, float speed)
+void add_particles_rain (iSector* sector, char* matname, int num, float speed)
 {
   // First check if the material exists.
   iMaterialWrapper* mat = Sys->view->GetEngine ()->FindMaterial (matname);
@@ -108,7 +108,8 @@ void add_particles_rain (csSector* sector, char* matname, int num, float speed)
     	  "MeshObj", iMeshObjectType);
   iMeshObjectFactory* factory = type->NewFactory ();
   iMeshObject* mesh = factory->NewInstance ();
-  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshObject (mesh, NULL, &sector->scfiSector);
+  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshObject (mesh, NULL,
+  	sector);
   type->DecRef ();
   factory->DecRef ();
   mesh->DecRef ();
@@ -133,7 +134,7 @@ void add_particles_rain (csSector* sector, char* matname, int num, float speed)
 //===========================================================================
 // Demo particle system (snow).
 //===========================================================================
-void add_particles_snow (csSector* sector, char* matname, int num, float speed)
+void add_particles_snow (iSector* sector, char* matname, int num, float speed)
 {
   // First check if the material exists.
   iMaterialWrapper* mat = Sys->view->GetEngine ()->FindMaterial (matname);
@@ -153,7 +154,8 @@ void add_particles_snow (csSector* sector, char* matname, int num, float speed)
     	  "MeshObj", iMeshObjectType);
   iMeshObjectFactory* factory = type->NewFactory ();
   iMeshObject* mesh = factory->NewInstance ();
-  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshObject (mesh, NULL, &sector->scfiSector);
+  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshObject (mesh, NULL,
+  	sector);
   type->DecRef ();
   factory->DecRef ();
   mesh->DecRef ();
@@ -179,7 +181,7 @@ void add_particles_snow (csSector* sector, char* matname, int num, float speed)
 //===========================================================================
 // Demo particle system (fire).
 //===========================================================================
-void add_particles_fire (csSector* sector, char* matname, int num,
+void add_particles_fire (iSector* sector, char* matname, int num,
 	const csVector3& origin)
 {
   // First check if the material exists.
@@ -197,7 +199,8 @@ void add_particles_fire (csSector* sector, char* matname, int num,
       	"MeshObj", iMeshObjectType);
   iMeshObjectFactory* factory = type->NewFactory ();
   iMeshObject* mesh = factory->NewInstance ();
-  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshObject (mesh, NULL, &sector->scfiSector);
+  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshObject (mesh, NULL,
+  	sector);
   type->DecRef ();
   factory->DecRef ();
   mesh->DecRef ();
@@ -225,7 +228,7 @@ void add_particles_fire (csSector* sector, char* matname, int num,
 //===========================================================================
 // Demo particle system (fountain).
 //===========================================================================
-void add_particles_fountain (csSector* sector, char* matname, int num,
+void add_particles_fountain (iSector* sector, char* matname, int num,
 	const csVector3& origin)
 {
   // First check if the material exists.
@@ -243,7 +246,8 @@ void add_particles_fountain (csSector* sector, char* matname, int num,
       	"MeshObj", iMeshObjectType);
   iMeshObjectFactory* factory = type->NewFactory ();
   iMeshObject* mesh = factory->NewInstance ();
-  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshObject (mesh, NULL, &sector->scfiSector, origin);
+  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshObject (mesh, NULL,
+  	sector, origin);
   type->DecRef ();
   factory->DecRef ();
   mesh->DecRef ();
@@ -273,7 +277,7 @@ void add_particles_fountain (csSector* sector, char* matname, int num,
 //===========================================================================
 // Demo particle system (explosion).
 //===========================================================================
-void add_particles_explosion (csSector* sector, const csVector3& center, char* matname)
+void add_particles_explosion (iSector* sector, const csVector3& center, char* matname)
 {
   // First check if the material exists.
   iMaterialWrapper* mat = Sys->view->GetEngine ()->FindMaterial (matname);
@@ -290,7 +294,8 @@ void add_particles_explosion (csSector* sector, const csVector3& center, char* m
       	"MeshObj", iMeshObjectType);
   iMeshObjectFactory* factory = type->NewFactory ();
   iMeshObject* mesh = factory->NewInstance ();
-  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshObject (mesh, NULL, &sector->scfiSector, center);
+  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshObject (mesh, NULL,
+  	sector, center);
   type->DecRef ();
   factory->DecRef ();
   mesh->DecRef ();
@@ -317,14 +322,14 @@ void add_particles_explosion (csSector* sector, const csVector3& center, char* m
   expstate->SetSpreadSpeed (2.);
   expstate->SetSpreadAcceleration (2.);
   expstate->SetFadeSprites (500);
-  expstate->AddLight (Sys->engine, &sector->scfiSector, 1000);
+  expstate->AddLight (Sys->Engine, sector, 1000);
   expstate->DecRef ();
 }
 
 //===========================================================================
 // Demo particle system (spiral).
 //===========================================================================
-void add_particles_spiral (csSector* sector, const csVector3& bottom, char* matname)
+void add_particles_spiral (iSector* sector, const csVector3& bottom, char* matname)
 {
   // First check if the material exists.
   iMaterialWrapper* mat = Sys->view->GetEngine ()->FindMaterial (matname);
@@ -342,7 +347,7 @@ void add_particles_spiral (csSector* sector, const csVector3& bottom, char* matn
   iMeshObjectFactory* factory = type->NewFactory ();
   iMeshObject* mesh = factory->NewInstance ();
   iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshObject
-    (mesh, NULL, &sector->scfiSector, bottom);
+    (mesh, NULL, sector, bottom);
   type->DecRef ();
   factory->DecRef ();
   mesh->DecRef ();
@@ -531,15 +536,15 @@ void animate_skeleton_tree_cb (iMeshWrapper* spr, iRenderView* /*rview*/, void* 
 
 // Add a skeletal tree sprite. If needed it will also create
 // the template for this.
-void add_skeleton_tree (csSector* where, csVector3 const& pos, int depth,
+void add_skeleton_tree (iSector* where, csVector3 const& pos, int depth,
 	int width)
 {
   char skelname[50];
   sprintf (skelname, "__skeltree__%d,%d\n", depth, width);
-  iMeshFactoryWrapper* tmpl = Sys->engine->FindMeshFactory (skelname);
+  iMeshFactoryWrapper* tmpl = Sys->Engine->FindMeshFactory (skelname);
   if (!tmpl)
   {
-    tmpl = Sys->engine->CreateMeshFactory (
+    tmpl = Sys->Engine->CreateMeshFactory (
     	"crystalspace.mesh.object.sprite.3d", skelname);
     if (tmpl == NULL)
     {
@@ -548,7 +553,7 @@ void add_skeleton_tree (csSector* where, csVector3 const& pos, int depth,
     }
     iMeshObjectFactory* fact = tmpl->GetMeshObjectFactory ();
     iSprite3DFactoryState* state = QUERY_INTERFACE (fact, iSprite3DFactoryState);
-    state->SetMaterialWrapper (Sys->engine->FindMaterial ("white"));
+    state->SetMaterialWrapper (Sys->Engine->FindMaterial ("white"));
     int vertex_idx = 0;
     iSpriteFrame* fr = state->AddFrame ();
     fr->SetName ("f");
@@ -750,15 +755,15 @@ void animate_skeleton_ghost_cb (iMeshWrapper* spr, iRenderView* /*rview*/, void*
 
 // Add a skeletal ghost sprite. If needed it will also create
 // the template for this.
-void add_skeleton_ghost (csSector* where, csVector3 const& pos, int maxdepth,
+void add_skeleton_ghost (iSector* where, csVector3 const& pos, int maxdepth,
 	int width)
 {
   char skelname[50];
   sprintf (skelname, "__skelghost__\n");
-  iMeshFactoryWrapper* tmpl = Sys->engine->FindMeshFactory (skelname);
+  iMeshFactoryWrapper* tmpl = Sys->Engine->FindMeshFactory (skelname);
   if (!tmpl)
   {
-    tmpl = Sys->engine->CreateMeshFactory (
+    tmpl = Sys->Engine->CreateMeshFactory (
     	"crystalspace.mesh.object.sprite.3d", skelname);
     if (tmpl == NULL)
     {
@@ -767,7 +772,7 @@ void add_skeleton_ghost (csSector* where, csVector3 const& pos, int maxdepth,
     }
     iMeshObjectFactory* fact = tmpl->GetMeshObjectFactory ();
     iSprite3DFactoryState* state = QUERY_INTERFACE (fact, iSprite3DFactoryState);
-    state->SetMaterialWrapper (Sys->engine->FindMaterial ("green"));
+    state->SetMaterialWrapper (Sys->Engine->FindMaterial ("green"));
     int vertex_idx = 0;
     iSpriteFrame* fr = state->AddFrame ();
     fr->SetName ("f");
@@ -797,27 +802,27 @@ void add_skeleton_ghost (csSector* where, csVector3 const& pos, int maxdepth,
 
 #define MAXSECTORSOCCUPIED  20
 
-extern int FindSectors (csVector3 v, csVector3 d, csSector *s, csSector **sa);
-extern int CollisionDetect (csCollider *c, csSector* sp, csTransform *cdt);
+extern int FindSectors (csVector3 v, csVector3 d, iSector *s, iSector **sa);
+extern int CollisionDetect (csCollider *c, iSector* sp, csTransform *cdt);
 extern csCollisionPair our_cd_contact[1000];//=0;
 extern int num_our_cd;
 
-void move_ghost (csMeshWrapper* spr)
+void move_ghost (iMeshWrapper* spr)
 {
-  csCollider* col = csCollider::GetCollider (*spr);
-  csSector* first_sector = spr->GetMovable ().GetSector (0);
+  csCollider* col = csCollider::GetCollider (spr->QueryObject ());
+  iSector* first_sector = spr->GetMovable ()->GetSector (0);
 
   // Create a transformation 'test' which indicates where the ghost
   // is moving too.
-  const csVector3& pos = spr->GetMovable ().GetPosition ();
+  const csVector3& pos = spr->GetMovable ()->GetPosition ();
   csVector3 vel (0, 0, .1);
-  vel = spr->GetMovable ().GetTransform ().GetO2T () * vel;
+  vel = spr->GetMovable ()->GetTransform ().GetO2T () * vel;
   csVector3 new_pos = pos+vel;
   csMatrix3 m;
   csOrthoTransform test (m, new_pos);
 
   // Find all sectors that the ghost will occupy on the new position.
-  csSector *n[MAXSECTORSOCCUPIED];
+  iSector *n[MAXSECTORSOCCUPIED];
   int num_sectors = FindSectors (new_pos, 4.0f*spr->GetRadius(),
   	first_sector, n);
 
@@ -846,12 +851,13 @@ void move_ghost (csMeshWrapper* spr)
     test = csReversibleTransform (csMatrix3 (), pos);
     bool mirror = true;
     first_sector = first_sector->FollowSegment (test, new_pos, mirror);
-    spr->GetMovable ().SetSector (first_sector);
-    spr->GetMovable ().SetPosition (new_pos);
+    spr->GetMovable ()->SetSector (first_sector);
+    spr->GetMovable ()->SetPosition (new_pos);
   }
 
   // Turn around at random intervals.
-  GhostSpriteInfo* gh_info = GET_CHILD_OBJECT_FAST(spr, GhostSpriteInfo);
+  GhostSpriteInfo* gh_info = GET_CHILD_OBJECT_FAST(spr->QueryObject (),
+  	GhostSpriteInfo);
   if (rand () % 40 == 1) gh_info->dir = -gh_info->dir;
 
   // OpenStep compiler bug prevents Transform(GetYRotation()), which is why
@@ -860,20 +866,20 @@ void move_ghost (csMeshWrapper* spr)
   {
     // We did not move much. Turn around quickly.
     csMatrix3 m = csYRotMatrix3 (gh_info->dir*.2);
-    spr->GetMovable ().Transform (m);
+    spr->GetMovable ()->Transform (m);
   }
   else if (vel < 0.05f)
   {
     // We did a bit. Turn around slightly.
     csMatrix3 m = csYRotMatrix3 (gh_info->dir*.1);
-    spr->GetMovable ().Transform (m);
+    spr->GetMovable ()->Transform (m);
   }
   else
   {
     csMatrix3 m = csYRotMatrix3 (gh_info->dir*.01);
-    spr->GetMovable ().Transform (m);
+    spr->GetMovable ()->Transform (m);
   }
-  spr->GetMovable ().UpdateMove ();
+  spr->GetMovable ()->UpdateMove ();
 }
 
 //===========================================================================
@@ -884,7 +890,7 @@ Bot* first_bot = NULL;
 bool do_bots = false;
 
 // Add a bot with some size at the specified positin.
-void add_bot (float size, csSector* where, csVector3 const& pos,
+void add_bot (float size, iSector* where, csVector3 const& pos,
 	float dyn_radius)
 {
   iDynLight* dyn = NULL;
@@ -894,7 +900,7 @@ void add_bot (float size, csSector* where, csVector3 const& pos,
     RandomColor (r, g, b);
     //@@@ MEMORY LEAK?
     dyn = Sys->view->GetEngine ()->CreateDynLight (pos, dyn_radius, csColor(r, g, b));
-    dyn->QueryLight ()->SetSector (&where->scfiSector);
+    dyn->QueryLight ()->SetSector (where);
     dyn->Setup ();
   }
   csMeshFactoryWrapper* tmpl = (csMeshFactoryWrapper*)
@@ -906,7 +912,7 @@ void add_bot (float size, csSector* where, csVector3 const& pos,
   botmesh->DecRef ();
   bot->SetName ("bot");
   Sys->view->GetEngine ()->GetCsEngine ()->meshes.Push (bot);
-  bot->GetMovable ().SetSector (where);
+  bot->GetMovable ().SetSector (where->GetPrivateObject ());
   csMatrix3 m; m.Identity (); m = m * size;
   bot->GetMovable ().SetTransform (m);
   bot->set_bot_move (pos);
@@ -979,18 +985,20 @@ struct RandomLight
   float dyn_r1, dyn_g1, dyn_b1;
 };
 
-void HandleDynLight (csDynLight* dyn)
+void HandleDynLight (iDynLight* dyn)
 {
-  LightStruct* ls = (LightStruct*)(csDataObject::GetData(*dyn));
+  LightStruct* ls = (LightStruct*)(csDataObject::GetData(*(dyn->GetPrivateObject ())));
+  iLight* l = QUERY_INTERFACE (dyn, iLight);
+  l->DecRef ();
   switch (ls->type)
   {
     case DYN_TYPE_MISSILE:
     {
-      MissileStruct* ms = (MissileStruct*)(csDataObject::GetData(*dyn));
+      MissileStruct* ms = (MissileStruct*)(csDataObject::GetData(*(dyn->GetPrivateObject ())));
       csVector3 v (0, 0, 2.5);
-      csVector3 old = dyn->GetCenter ();
+      csVector3 old = l->GetCenter ();
       v = old + ms->dir.GetT2O () * v;
-      csSector* s = dyn->GetSector ();
+      iSector* s = l->GetSector ();
       bool mirror = false;
       csVector3 old_v = v;
       s = s->FollowSegment (ms->dir, v, mirror);
@@ -1006,12 +1014,13 @@ void HandleDynLight (csDynLight* dyn)
 	    int i;
 	    if (do_bots)
 	      for (i = 0 ; i < 40 ; i++)
-            add_bot (1, dyn->GetSector (), dyn->GetCenter (), 0);
+            add_bot (1, l->GetSector (), l->GetCenter (), 0);
 	  }
 	  ms->sprite->GetMovable ().ClearSectors ();
 	  Sys->view->GetEngine ()->GetCsEngine ()->RemoveMesh (ms->sprite);
 	}
-        dyn->ObjRemove(dyn->GetChild (csDataObject::Type));
+        dyn->QueryObject ()->ObjRemove
+		(dyn->GetPrivateObject ()->GetChild (csDataObject::Type));
         if (ms->snd)
         {
           ms->snd->Stop();
@@ -1033,21 +1042,22 @@ void HandleDynLight (csDynLight* dyn)
         es->radius = 2;
         es->dir = 1;
         csDataObject* esdata = new csDataObject (es);
-        dyn->ObjAdd (esdata);
-        add_particles_explosion (dyn->GetSector (), dyn->GetCenter (), "explo");
+        dyn->GetPrivateObject ()->ObjAdd (esdata);
+        add_particles_explosion (l->GetSector (), l->GetCenter (), "explo");
         return;
       }
       else ms->dir.SetOrigin (v);
-      dyn->SetSector (s);
-      dyn->SetCenter (v);
+      l->SetSector (s);
+      l->SetCenter (v);
       dyn->Setup ();
-      if (ms->sprite) move_mesh (ms->sprite, s, v);
+      if (ms->sprite) move_mesh (&(ms->sprite->scfiMeshWrapper), s, v);
       if (Sys->Sound && ms->snd) ms->snd->SetPosition (v);
       break;
     }
     case DYN_TYPE_EXPLOSION:
     {
-      ExplosionStruct* es = (ExplosionStruct*)(csDataObject::GetData(*dyn));
+      ExplosionStruct* es = (ExplosionStruct*)(csDataObject::GetData(
+      	*(dyn->GetPrivateObject ())));
       if (es->dir == 1)
       {
         es->radius += 3;
@@ -1064,25 +1074,25 @@ void HandleDynLight (csDynLight* dyn)
 	  return;
 	}
       }
-      dyn->SetRadius (es->radius);
+      l->SetRadius (es->radius);
       dyn->Setup ();
       break;
     }
     case DYN_TYPE_RANDOM:
     {
-      RandomLight* rl = (RandomLight*)(csDataObject::GetData(*dyn));
+      RandomLight* rl = (RandomLight*)(csDataObject::GetData(*(dyn->GetPrivateObject ())));
       rl->dyn_move += rl->dyn_move_dir;
       if (rl->dyn_move < 0 || rl->dyn_move > 2)
       	rl->dyn_move_dir = -rl->dyn_move_dir;
-      if (ABS (rl->dyn_r1-dyn->GetColor ().red) < .01 &&
-      	  ABS (rl->dyn_g1-dyn->GetColor ().green) < .01 &&
-	  ABS (rl->dyn_b1-dyn->GetColor ().blue) < .01)
+      if (ABS (rl->dyn_r1-l->GetColor ().red) < .01 &&
+      	  ABS (rl->dyn_g1-l->GetColor ().green) < .01 &&
+	  ABS (rl->dyn_b1-l->GetColor ().blue) < .01)
         RandomColor (rl->dyn_r1, rl->dyn_g1, rl->dyn_b1);
       else
-        dyn->SetColor (csColor ((rl->dyn_r1+7.*dyn->GetColor ().red)/8.,
-		(rl->dyn_g1+7.*dyn->GetColor ().green)/8.,
-		(rl->dyn_b1+7.*dyn->GetColor ().blue)/8.));
-      dyn->SetCenter (dyn->GetCenter () + csVector3 (0, rl->dyn_move_dir, 0));
+        l->SetColor (csColor ((rl->dyn_r1+7.*l->GetColor ().red)/8.,
+		(rl->dyn_g1+7.*l->GetColor ().green)/8.,
+		(rl->dyn_b1+7.*l->GetColor ().blue)/8.));
+      l->SetCenter (l->GetCenter () + csVector3 (0, rl->dyn_move_dir, 0));
       dyn->Setup ();
       break;
     }
@@ -1128,7 +1138,7 @@ void fire_missile ()
     sp->GetMovable ()->SetPosition (pos);
     csMatrix3 m = ms->dir.GetT2O ();
     sp->GetMovable ()->SetTransform (m);
-    move_mesh (sp->GetPrivateObject (), Sys->view->GetCamera ()->GetSector ()->GetPrivateObject (), pos);
+    move_mesh (sp, Sys->view->GetCamera ()->GetSector (), pos);
     sp->GetMovable ()->UpdateMove ();
   } 
 }
@@ -1161,7 +1171,7 @@ void light_statics ()
       if (state->GetSkeletonState ())
       {
         const char* name = sp->QueryObject ()->GetName ();
-        if (!strcmp (name, "__skelghost__")) move_ghost (sp->GetPrivateObject ());
+        if (!strcmp (name, "__skelghost__")) move_ghost (sp);
       }
       state->DecRef ();
     }
@@ -1173,23 +1183,23 @@ void light_statics ()
 
 static iMeshWrapper* CreateMeshWrapper (const char* name)
 {
-  iMeshObjectFactory* thing_fact = Sys->engine->GetThingType ()->NewFactory ();
+  iMeshObjectFactory* thing_fact = Sys->Engine->GetThingType ()->NewFactory ();
   iMeshObject* mesh_obj = QUERY_INTERFACE (thing_fact, iMeshObject);
   thing_fact->DecRef ();
 
-  iMeshWrapper* mesh_wrap = Sys->engine->CreateMeshObject (mesh_obj, name);
+  iMeshWrapper* mesh_wrap = Sys->Engine->CreateMeshObject (mesh_obj, name);
   mesh_obj->DecRef ();
   return mesh_wrap;
 }
 
-iMeshWrapper* CreatePortalThing (const char* name, csSector* room,
+iMeshWrapper* CreatePortalThing (const char* name, iSector* room,
     	iMaterialWrapper* tm, iPolygon3D*& portalPoly)
 {
   iMeshWrapper* thing = CreateMeshWrapper (name);
   iThingState* thing_state = QUERY_INTERFACE (thing->GetMeshObject (),
   	iThingState);
   thing_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
-  thing->GetMovable ()->SetSector (&room->scfiSector);
+  thing->GetMovable ()->SetSector (room);
   float dx = 1, dy = 3, dz = .3;
   float border = 0.3; // width of border around the portal
 
@@ -1391,15 +1401,15 @@ iMeshWrapper* CreatePortalThing (const char* name, csSector* room,
 
 void OpenPortal (iLoader *LevelLoader, csView* view, char* lev)
 {
-  csSector* room = view->GetCamera ()->GetSector ()->GetPrivateObject ();
+  iSector* room = view->GetCamera ()->GetSector ();
   csVector3 pos = view->GetCamera ()->GetTransform ().This2Other (csVector3 (0, 0, 1));
-  iMaterialWrapper* tm = Sys->engine->FindMaterial ("portal");
+  iMaterialWrapper* tm = Sys->Engine->FindMaterial ("portal");
 
   iPolygon3D* portalPoly;
   iMeshWrapper* thing = CreatePortalThing ("portalTo", room, tm, portalPoly);
 
-  bool regionExists = (Sys->engine->FindRegion(lev) != NULL);
-  Sys->engine->SelectRegion (lev);
+  bool regionExists = (Sys->Engine->FindRegion(lev) != NULL);
+  Sys->Engine->SelectRegion (lev);
   // If the region did not already exist then we load the level in it.
   if (!regionExists)
   {
@@ -1408,7 +1418,7 @@ void OpenPortal (iLoader *LevelLoader, csView* view, char* lev)
     sprintf (buf, "/lev/%s", lev);
     Sys->VFS->ChDir (buf);
     LevelLoader->LoadMapFile ("world", false);
-    Sys->engine->GetCurrentRegion ()->Prepare ();
+    Sys->Engine->GetCurrentRegion ()->Prepare ();
   }
 
   thing->GetMovable ()->SetPosition (pos + csVector3 (0, Sys->cfg_legs_offset, 0));
@@ -1416,14 +1426,14 @@ void OpenPortal (iLoader *LevelLoader, csView* view, char* lev)
   thing->GetMovable ()->UpdateMove ();
 
   // First make a portal to the new level.
-  csCameraPosition* cp = (csCameraPosition*)
-    	Sys->engine->GetCurrentRegion ()->FindCameraPosition ("Start");
+  iCameraPosition* cp = Sys->Engine->GetCurrentRegion ()->
+  	FindCameraPosition ("Start");
   const char* room_name;
   csVector3 topos;
-  if (cp) { room_name = cp->Sector; topos = cp->Position; }
+  if (cp) { room_name = cp->GetSector (); topos = cp->GetPosition (); }
   else { room_name = "room"; topos.Set (0, 0, 0); }
   topos.y -= Sys->cfg_eye_offset;
-  iSector* start_sector = Sys->engine->GetCurrentRegion ()->FindSector (room_name);
+  iSector* start_sector = Sys->Engine->GetCurrentRegion ()->FindSector (room_name);
   if (start_sector)
   {
     iPortal* portal = portalPoly->CreatePortal (start_sector);
@@ -1438,7 +1448,7 @@ void OpenPortal (iLoader *LevelLoader, csView* view, char* lev)
       // one portal back.
       iPolygon3D* portalPolyBack;
       iMeshWrapper* thingBack = CreatePortalThing ("portalFrom",
-	  	start_sector->GetPrivateObject (), tm, portalPolyBack);
+	  	start_sector, tm, portalPolyBack);
       thingBack->GetMovable ()->SetPosition (topos + csVector3 (0, Sys->cfg_legs_offset, -.1));
       thingBack->GetMovable ()->Transform (csYRotMatrix3 (M_PI));//view->GetCamera ()->GetW2C ());
       thingBack->GetMovable ()->UpdateMove ();
@@ -1452,7 +1462,7 @@ void OpenPortal (iLoader *LevelLoader, csView* view, char* lev)
   }
 
   if (!regionExists)
-    Sys->InitCollDet (Sys->engine, Sys->engine->GetCsCurrentRegion ());
-  Sys->engine->SelectRegion (NULL);
+    Sys->InitCollDet (Sys->Engine, Sys->Engine->GetCurrentRegion ());
+  Sys->Engine->SelectRegion (NULL);
 }
 

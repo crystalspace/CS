@@ -26,8 +26,8 @@
 #include "csutil/cscolor.h"
 #include "csutil/csvector.h"
 
-class csLight;
-class csMeshWrapper;
+struct iLight;
+struct iMeshWrapper;
 
 
 SCF_VERSION (csWalkEntity, 0, 0, 1);
@@ -67,11 +67,11 @@ private:
    */
   float transition;
   /// Parent mesh.
-  csMeshWrapper* tparent;
+  iMeshWrapper* tparent;
 
 public:
   /// Create this door.
-  csDoor (csMeshWrapper* p);
+  csDoor (iMeshWrapper* p);
 
   /// Set hinge location.
   void SetHinge (const csVector3& h) { hinge = h; }
@@ -96,15 +96,15 @@ private:
   /// The rotation angles.
   csVector3 angles;
   /// Parent.
-  csObject* tparent;
+  iObject* tparent;
   /// Movable of the parent.
-  csMovable* movable;
+  iMovable* movable;
   /// Time remaining before we stop rotating (if always == false).
   float remaining;
 
 public:
   /// Create this object.
-  csRotatingObject (csObject* p);
+  csRotatingObject (iObject* p);
 
   /// Set rotation angles.
   void SetAngles (const csVector3& a) { angles = a; }
@@ -128,7 +128,7 @@ class csLightObject : public csWalkEntity
 {
 private:
   /// The light that is controlled by this entity.
-  csLight* light;
+  iLight* light;
   /// The color to set this light to on activation.
   csColor start_color;
   /// The color we will end up with when activation ends.
@@ -140,7 +140,7 @@ private:
 
 public:
   /// Create this object.
-  csLightObject (csLight* p);
+  csLightObject (iLight* p);
 
   /// Set colors.
   void SetColors (const csColor& start_color, const csColor& end_color)

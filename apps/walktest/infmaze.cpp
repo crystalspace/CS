@@ -124,11 +124,11 @@ float rand2 (float max)
   return max*(f/(RAND_MAX/2)-1);
 }
 
-InfRoomData* InfiniteMaze::create_six_room (csEngine* engine, int x, int y, int z)
+InfRoomData* InfiniteMaze::create_six_room (iEngine* engine, int x, int y, int z)
 {
   char buf[50];
   sprintf (buf, "r%d_%d_%d", x, y, z);
-  csSector* room = engine->CreateCsSector (buf);
+  iSector* room = engine->CreateSector (buf);
   iMeshWrapper* walls = engine->CreateSectorWallsMesh (room, "walls");
   iThingState* walls_state = QUERY_INTERFACE (walls->GetMeshObject (),
   	iThingState);
@@ -147,8 +147,11 @@ InfRoomData* InfiniteMaze::create_six_room (csEngine* engine, int x, int y, int 
   create_one_side (walls_state, "f", t, t2, dx-s,dy-s,dz+s,  dx+s,dy-s,dz+s,  dx+s,dy-s,dz-s,  dx-s,dy-s,dz-s, 0,.1,0);
   create_one_side (walls_state, "c", t, t2, dx-s,dy+s,dz-s,  dx+s,dy+s,dz-s,  dx+s,dy+s,dz+s,  dx-s,dy+s,dz+s, 0,-.1,0);
 
-  csStatLight* light = new csStatLight (dx+rand2 (.9*s), dy+rand2 (.9*s), dz+rand2 (.9*s), 1+rand1 (3),
-  	rand1 (1), rand1 (1), rand1 (1), false);
+  iStatLight* light = engine->CreateLight ("",
+  	csVector3 (dx+rand2 (.9*s), dy+rand2 (.9*s), dz+rand2 (.9*s)),
+	1+rand1 (3),
+  	csColor (rand1 (1), rand1 (1), rand1 (1)),
+	false);
   room->AddLight (light);
 
   InfRoomData* ird = new InfRoomData ();
@@ -156,12 +159,11 @@ InfRoomData* InfiniteMaze::create_six_room (csEngine* engine, int x, int y, int 
   ird->y = y;
   ird->z = z;
   ird->sector = room;
-  ird->isector = QUERY_INTERFACE (room, iSector);
   ird->walls = walls;
   ird->walls_state = walls_state;
   infinite_world->Set (x, y, z, (void*)ird);
   csDataObject* irddata = new csDataObject (ird);
-  room->ObjAdd (irddata);
+  room->QueryObject ()->ObjAdd (irddata);
   return ird;
 }
 
@@ -182,8 +184,8 @@ void InfiniteMaze::connect_infinite (int x1, int y1, int z1, int x2, int y2, int
     else { p1 = "w"; p2 = "e"; }
   iPolygon3D* po1 = s1->walls_state->GetPolygon (p1);
   iPolygon3D* po2 = s2->walls_state->GetPolygon (p2);
-  if (create_portal1) po1->CreatePortal (s2->isector);
-  po2->CreatePortal (s1->isector);
+  if (create_portal1) po1->CreatePortal (s2->sector);
+  po2->CreatePortal (s1->sector);
 }
 
 static bool CompleteSectorCB (iPortal* portal, iBase* context, void* data)
@@ -213,10 +215,10 @@ static bool CompleteSectorCB (iPortal* portal, iBase* context, void* data)
   {
     extern WalkTest* Sys;
     InfiniteMaze* infinite_maze = Sys->infinite_maze;
-    InfRoomData* ird = infinite_maze->create_six_room (Sys->engine,
+    InfRoomData* ird = infinite_maze->create_six_room (Sys->Engine,
     	ipc->x2, ipc->y2, ipc->z2);
-    csSector* s = ird->sector;
-    iSector* is = ird->isector;
+    iSector* is = ird->sector;
+    csSector* s = is->GetPrivateObject (); //@@@
     infinite_maze->connect_infinite (ipc->x1, ipc->y1, ipc->z1,
     	ipc->x2, ipc->y2, ipc->z2, false);
     portal->SetPortal (is);

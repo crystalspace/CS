@@ -46,6 +46,11 @@ The history order is reversed so that new features are at the top.
 	  it would actually subtract from the base color. Thanks to Wouter
 	  Wijngaards for spotting this. This also improves speed of dynamic
 	  lighting because there is no more need to clamp down.
+	- Further improved walktest by removing references to csBla classes
+	  and replacing them with iBla.
+	- Added iMeshWrapper::GetScreenBoundingBox().
+	- Added GetCollider() which works with iObject.
+	- Added iSector::FollowSegment().
 	- Eric Sunshine removed obsolete references to
 	  crystalspace.string.server from several files.
 	- Eric Sunshine worked around a NextStep compiler limitation where it

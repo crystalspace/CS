@@ -409,6 +409,8 @@ public:
     {
       scfParent->GetTransformedBoundingBox (trans, cbox);
     }
+    virtual float GetScreenBoundingBox (iCamera* camera, csBox2& sbox,
+  	csBox3& cbox);
     virtual void AddChild (iMeshWrapper* child);
     virtual int GetChildCount () { return scfParent->GetChildren ().Length (); }
     virtual iMeshWrapper* GetChild (int idx);

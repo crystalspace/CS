@@ -21,10 +21,9 @@
 
 #include "csgeom/math3d.h"
 
-class csEngine;
-class csSector;
-class csPolyTxtPlane;
-class csMeshWrapper;
+struct iEngine;
+struct iSector;
+struct iMeshWrapper;
 struct iPolygon3D;
 struct iThingState;
 
@@ -35,7 +34,7 @@ class HugeRoom
 {
 private:
   ///
-  csEngine* engine;
+  iEngine* engine;
   ///
   unsigned int seed;
   /// Dimensions of outer wall.
@@ -88,10 +87,10 @@ private:
 
 private:
   ///
-  csMeshWrapper* create_thing (csSector* sector, const csVector3& pos);
+  iMeshWrapper* create_thing (iSector* sector, const csVector3& pos);
 
   ///
-  csMeshWrapper* create_building (csSector* sector, const csVector3& pos,
+  iMeshWrapper* create_building (iSector* sector, const csVector3& pos,
 	float xdim, float ydim, float zdim, float angle_y);
 
   ///
@@ -112,7 +111,7 @@ public:
   ~HugeRoom () { }
 
   ///
-  csSector* create_huge_world (csEngine* engine);
+  iSector* create_huge_world (iEngine* engine);
 };
 
 #endif //HUGEROOM_H

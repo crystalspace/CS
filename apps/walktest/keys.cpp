@@ -50,7 +50,7 @@ extern WalkTest* Sys;
 
 csKeyMap* mapping = NULL;
 
-csMeshWrapper *FindNextClosestMesh (csMeshWrapper *baseMesh, csCamera *camera, csVector2 *screenCoord);
+iMeshWrapper *FindNextClosestMesh (iMeshWrapper *baseMesh, iCamera *camera, csVector2 *screenCoord);
 
 //===========================================================================
 // Everything for key mapping and binding.
@@ -240,7 +240,7 @@ void free_keymap ()
  * systems).
  *------------------------------------------------------------------*/
 
-extern csCamera c;
+extern iCamera* c;
 extern WalkTest* Sys;
 
 void WalkTest::strafe (float speed,int keep_old)
@@ -652,13 +652,14 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
 void WalkTest::MouseClick3Handler(iEvent &Event)
 {
   csVector2   screenPoint;
-  csMeshWrapper *closestMesh;
+  iMeshWrapper *closestMesh;
 
   screenPoint.x = Event.Mouse.x;
   screenPoint.y = Event.Mouse.y;
-  closestMesh = FindNextClosestMesh (NULL, view->GetCamera()->GetPrivateObject (), &screenPoint);
+  closestMesh = FindNextClosestMesh (NULL, view->GetCamera(), &screenPoint);
   if (closestMesh)
-    Sys->Printf (MSG_CONSOLE, "Selected mesh %s\n", closestMesh->GetName ());
+    Sys->Printf (MSG_CONSOLE, "Selected mesh %s\n", closestMesh->
+    	QueryObject ()->GetName ());
   else
     Sys->Printf (MSG_CONSOLE, "No mesh selected!\n");
 }
@@ -742,21 +743,22 @@ bool WalkTest::HandleEvent (iEvent &Event)
   return false;
 }
 
-csMeshWrapper *FindNextClosestMesh (csMeshWrapper *baseMesh,
-	csCamera *camera, csVector2 *screenCoord)
+iMeshWrapper *FindNextClosestMesh (iMeshWrapper *baseMesh,
+	iCamera *camera, csVector2 *screenCoord)
 {
   int meshIndex;
   float thisZLocation;
   float closestZLocation;
-  csMeshWrapper *closestMesh;
-  csMeshWrapper *nextMesh;
+  iMeshWrapper *closestMesh;
+  iMeshWrapper *nextMesh;
   csBox2 screenBoundingBox;
   csBox3 bbox3;
   
   if (baseMesh)
   {
     closestMesh = baseMesh;
-    closestZLocation = baseMesh->GetScreenBoundingBox(*camera, screenBoundingBox, bbox3);
+    closestZLocation = baseMesh->GetScreenBoundingBox
+    	(camera, screenBoundingBox, bbox3);
     // if the baseMesh isn't in front of the camera, return
     if (closestZLocation < 0)
       return NULL;
@@ -768,13 +770,14 @@ csMeshWrapper *FindNextClosestMesh (csMeshWrapper *baseMesh,
   }
 
   // @@@ This routine ignores 2D meshes for the moment.
-  for (meshIndex = 0; meshIndex < Sys->engine->meshes.Length(); meshIndex++)
+  for (meshIndex = 0; meshIndex < Sys->Engine->GetNumMeshObjects (); meshIndex++)
   {
-    nextMesh = (csMeshWrapper*)Sys->engine->meshes[meshIndex];
+    nextMesh = Sys->Engine->GetMeshObject (meshIndex);
 
     if (nextMesh != baseMesh)
     {
-      thisZLocation = nextMesh->GetScreenBoundingBox(*camera, screenBoundingBox, bbox3);
+      thisZLocation = nextMesh->GetScreenBoundingBox(camera,
+      	screenBoundingBox, bbox3);
       if ((thisZLocation > 0) && (thisZLocation < closestZLocation))
       {
         if (screenBoundingBox.In(screenCoord->x, screenCoord->y))

@@ -54,7 +54,7 @@ void Bot::move (cs_time elapsed_time)
   csVector3 rd = (8.*(float)elapsed_time)/1000. * d;
   follow += rd;
   csVector3 new_pos = follow;
-  csSector* s = f_sector;
+  iSector* s = f_sector;
   bool mirror = false;
   csVector3 v_old_pos = new_pos;
   s = s->FollowSegment (old_pos, new_pos, mirror);
@@ -84,19 +84,21 @@ void Bot::move (cs_time elapsed_time)
   csVector3 new_p = old_p + ((3.*(float)elapsed_time)/1000.)*dir;
   GetMovable ().SetPosition (new_p);
 
-  s = GetMovable ().GetSector (0);
+  //@@@
+  s = &(GetMovable ().GetSector (0)->scfiSector);
   mirror = false;
   csOrthoTransform old_pos2 (GetMovable ().GetTransform ().GetO2T (), old_p);
   s = s->FollowSegment (old_pos2, new_p, mirror);
   if (s)
   {
-    GetMovable ().SetSector (s);
+    GetMovable ().SetSector (s->GetPrivateObject ());
     iLight* lights[2];
-    int num_lights = engine->GetNearbyLights (s, new_p, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
+    int num_lights = engine->GetNearbyLights (s->GetPrivateObject (),
+    	new_p, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
     UpdateLighting (lights, num_lights);
     if (light)
     {
-      light->SetSector (s);
+      light->SetSector (s->GetPrivateObject ());
       light->SetCenter (new_p);
       light->Setup ();
     }

@@ -40,7 +40,7 @@ private:
   /// Position that is followed.
   csVector3 follow;
   /// Corresponding sector.
-  csSector* f_sector;
+  iSector* f_sector;
 
 public:
   /// Next bot.
@@ -60,7 +60,7 @@ public:
   /// Set movement vector.
   void set_bot_move (const csVector3& v);
   /// Set bot's sector.
-  void set_bot_sector (csSector* s) { f_sector = s; }
+  void set_bot_sector (iSector* s) { f_sector = s; }
 
   CSOBJTYPE;
 };

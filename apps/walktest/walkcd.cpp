@@ -82,10 +82,10 @@ void WalkTest::CreateColliders ()
 {
   iPolygon3D *p;
   iPolygonMesh* mesh;
-  iMeshObjectFactory* thing_fact = engine->GetThingType ()->NewFactory ();
+  iMeshObjectFactory* thing_fact = Engine->GetThingType ()->NewFactory ();
   iMeshObject* mesh_obj = QUERY_INTERFACE (thing_fact, iMeshObject);
   thing_fact->DecRef ();
-  plbody = engine->CreateMeshObject (mesh_obj, "Player's Body");
+  plbody = Engine->CreateMeshObject (mesh_obj, "Player's Body");
   iThingState* thing_state = QUERY_INTERFACE (mesh_obj, iThingState);
   mesh_obj->DecRef ();
 
@@ -134,10 +134,10 @@ void WalkTest::CreateColliders ()
   mesh->DecRef ();
   thing_state->DecRef ();
 
-  thing_fact = engine->GetThingType ()-> NewFactory ();
+  thing_fact = Engine->GetThingType ()-> NewFactory ();
   mesh_obj = QUERY_INTERFACE (thing_fact, iMeshObject);
   thing_fact->DecRef ();
-  pllegs = engine->CreateMeshObject (mesh_obj, "Player's Legs");
+  pllegs = Engine->CreateMeshObject (mesh_obj, "Player's Legs");
   thing_state = QUERY_INTERFACE (mesh_obj, iThingState);
   mesh_obj->DecRef ();
 
@@ -201,7 +201,9 @@ int FindSectors (csVector3 v, csVector3 d, csSector *s, csSector **sa)
   int c = 0;
   // @@@ Avoid this sqrt somehow? i.e. by having it in the objects.
   float size = sqrt (d.x * d.x + d.y * d.y + d.z * d.z);
-  csSectorIt* it = Sys->engine->GetNearbySectors (s, v, size);
+  //@@@@@@@@@@@
+  csEngine* engine = (csEngine*)(Sys->Engine);
+  csSectorIt* it = engine->GetNearbySectors (s, v, size);
   csSector* sector;
   while ((sector = it->Fetch ()) != NULL)
   {

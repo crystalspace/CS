@@ -121,7 +121,7 @@ WalkTest::WalkTest () :
   wMissile_boom = NULL;
   wMissile_whoosh = NULL;
   cslogo = NULL;
-  engine = NULL;
+  Engine = NULL;
   LevelLoader = NULL;
   anim_sky = NULL;
   anim_dirlight = NULL;
@@ -417,7 +417,7 @@ void WalkTest::MoveSystems (cs_time elapsed_time, cs_time current_time)
   }
 
   // Move all particle systems and meshes.
-  Sys->engine->NextFrame (current_time);
+  Sys->Engine->NextFrame (current_time);
 
   // Record the first time this routine is called.
   extern bool do_bots;
@@ -544,7 +544,8 @@ void WalkTest::DrawFrameDebug ()
 
 void WalkTest::DrawFrameExtraDebug ()
 {
-  csCoverageMaskTree* covtree = Sys->engine->GetCovtree ();
+  csEngine* engine = (csEngine*)Engine;
+  csCoverageMaskTree* covtree = engine->GetCovtree ();
   if (covtree)
   {
     Gfx2D->Clear (0);
@@ -727,12 +728,13 @@ void WalkTest::DrawFullScreenFX3D (cs_time /*elapsed_time*/,
 void WalkTest::DrawFrame3D (int drawflags, cs_time /*current_time*/)
 {
   // Tell Gfx3D we're going to display 3D things
-  if (!Gfx3D->BeginDraw (engine->GetBeginDrawFlags () | drawflags
+  if (!Gfx3D->BeginDraw (Engine->GetBeginDrawFlags () | drawflags
   	| CSDRAW_3DGRAPHICS))
     return;
 
   // Apply lighting BEFORE the very first frame
-  csDynLight* dyn = Sys->engine->GetFirstDynLight ();
+  csEngine* engine = (csEngine*)Engine;
+  csDynLight* dyn = engine->GetFirstDynLight ();
   while (dyn)
   {
     extern void HandleDynLight (csDynLight*);
@@ -891,9 +893,9 @@ void WalkTest::DrawFrame (cs_time elapsed_time, cs_time current_time)
     {
       // @@@ Memory leak!
       csRecordedCamera* reccam = new csRecordedCamera ();
-      csCamera* c = view->GetCamera ()->GetPrivateObject ();
-      const csMatrix3& m = c->GetO2T ();
-      const csVector3& v = c->GetOrigin ();
+      iCamera* c = view->GetCamera ();
+      const csMatrix3& m = c->GetTransform ().GetO2T ();
+      const csVector3& v = c->GetTransform ().GetOrigin ();
       reccam->mat = m;
       reccam->vec = v;
       reccam->mirror = c->IsMirrored ();
@@ -923,12 +925,12 @@ void WalkTest::DrawFrame (cs_time elapsed_time, cs_time current_time)
 		       recorded_perf_stats_name);
 	}
       }
-      csCamera* c = view->GetCamera ()->GetPrivateObject ();
+      iCamera* c = view->GetCamera ();
       Sys->angle = reccam->angle;
       c->SetSector (reccam->sector);
       c->SetMirrored (reccam->mirror);
-      c->SetO2T (reccam->mat);
-      c->SetOrigin (reccam->vec);
+      c->GetTransform ().SetO2T (reccam->mat);
+      c->GetTransform ().SetOrigin (reccam->vec);
     }
   }
 
@@ -1142,7 +1144,7 @@ void debug_dump ()
   Sys->Printf (MSG_DEBUG_0, "Camera saved in /temp/walktest.bug\n");
   Dumper::dump (Sys->view->GetCamera ()->GetPrivateObject ());
   Sys->Printf (MSG_DEBUG_0, "Camera dumped in debug.txt\n");
-  Dumper::dump (Sys->engine);
+  Dumper::dump ((csEngine*)(Sys->Engine));
   Sys->Printf (MSG_DEBUG_0, "Engine dumped in debug.txt\n");
 }
 
@@ -1180,7 +1182,7 @@ void WalkTest::EndEngine ()
   delete view; view = NULL;
 }
 
-void WalkTest::InitCollDet (csEngine* engine, csRegion* region)
+void WalkTest::InitCollDet (iEngine* engine, iRegion* region)
 {
   Sys->Printf (MSG_INITIALIZATION, "Computing OBBs ...\n");
 
@@ -1234,6 +1236,7 @@ void WalkTest::LoadLibraryData(void)
 void WalkTest::Inititalize2DTextures ()
 {
   csTextureWrapper *texh;
+  csEngine* engine = (csEngine*)Engine;
   csTextureList *texlist = engine->GetTextures ();
 
   // Find the Crystal Space logo and set the renderer Flag to for_2d, to allow
@@ -1249,6 +1252,7 @@ void WalkTest::Create2DSprites(void)
   int w, h;
   csTextureWrapper *texh;
   iTextureHandle* phTex;
+  csEngine* engine = (csEngine*)engine;
   csTextureList *texlist = engine->GetTextures ();
 
   // Create a 2D sprite for the Logo.
@@ -1336,7 +1340,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
     Printf (MSG_FATAL_ERROR, "No iEngine plugin!\n");
     return false;
   }
-  engine = Engine->GetCsEngine ();
 
   // initialize interface IDs (for QUERY_INTERFACE_FAST)
   INITIALIZE_INTERFACE_VAR (csWalkEntity);
@@ -1369,7 +1372,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   // You don't have to use csView as you can do the same by
   // manually creating a camera and a clipper but it makes things a little
   // easier.
-  view = new csView (engine, Gfx3D);
+  view = new csView ((csEngine*)Engine, Gfx3D);
 
   // Get the collide system plugin.
   const char* p = Config->GetStr ("Walktest.Settings.CollDetPlugIn",
@@ -1382,14 +1385,14 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   }
 
   // Initialize the command processor with the engine and camera.
-  csCommandProcessor::Initialize (engine,
+  csCommandProcessor::Initialize ((csEngine*)Engine,
     view->GetCamera ()->GetPrivateObject (), Gfx3D,
     System->Console, System);
 
   // Now we have two choices. Either we create an infinite
   // maze (random). This happens when the '-infinite' commandline
   // option is given. Otherwise we load the given map.
-  csSector* room;
+  iSector* room;
 
   if (do_infinite || do_huge)
   {
@@ -1402,7 +1405,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
     }
 
     Printf (MSG_INITIALIZATION, "Creating initial room!...\n");
-    engine->EnableLightingCache (false);
+    Engine->EnableLightingCache (false);
 
     // Unfortunately the current movement system does not allow the user to
     // move around the maze unless collision detection is enabled, even
@@ -1419,20 +1422,20 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
     {
       // Create the initial (non-random) part of the maze.
       infinite_maze = new InfiniteMaze ();
-      room = infinite_maze->create_six_room (engine, 0, 0, 0)->sector;
-      infinite_maze->create_six_room (engine, 0, 0, 1);
-      infinite_maze->create_six_room (engine, 0, 0, 2);
-      infinite_maze->create_six_room (engine, 1, 0, 2);
-      infinite_maze->create_six_room (engine, 0, 1, 2);
-      infinite_maze->create_six_room (engine, 1, 1, 2);
-      infinite_maze->create_six_room (engine, 0, 0, 3);
-      infinite_maze->create_six_room (engine, 0, 0, 4);
-      infinite_maze->create_six_room (engine, -1, 0, 4);
-      infinite_maze->create_six_room (engine, -2, 0, 4);
-      infinite_maze->create_six_room (engine, 0, -1, 3);
-      infinite_maze->create_six_room (engine, 0, -2, 3);
-      infinite_maze->create_six_room (engine, 0, 1, 3);
-      infinite_maze->create_six_room (engine, 0, 2, 3);
+      room = infinite_maze->create_six_room (Engine, 0, 0, 0)->sector;
+      infinite_maze->create_six_room (Engine, 0, 0, 1);
+      infinite_maze->create_six_room (Engine, 0, 0, 2);
+      infinite_maze->create_six_room (Engine, 1, 0, 2);
+      infinite_maze->create_six_room (Engine, 0, 1, 2);
+      infinite_maze->create_six_room (Engine, 1, 1, 2);
+      infinite_maze->create_six_room (Engine, 0, 0, 3);
+      infinite_maze->create_six_room (Engine, 0, 0, 4);
+      infinite_maze->create_six_room (Engine, -1, 0, 4);
+      infinite_maze->create_six_room (Engine, -2, 0, 4);
+      infinite_maze->create_six_room (Engine, 0, -1, 3);
+      infinite_maze->create_six_room (Engine, 0, -2, 3);
+      infinite_maze->create_six_room (Engine, 0, 1, 3);
+      infinite_maze->create_six_room (Engine, 0, 2, 3);
       infinite_maze->connect_infinite (0, 0, 0, 0, 0, 1);
       infinite_maze->connect_infinite (0, 0, 1, 0, 0, 2);
       infinite_maze->connect_infinite (0, 0, 2, 0, 0, 3);
@@ -1453,12 +1456,12 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
     {
       // Create the huge world.
       huge_room = new HugeRoom ();
-      room = huge_room->create_huge_world (engine);
+      room = huge_room->create_huge_world (Engine);
     }
 
     // Prepare the engine. This will calculate all lighting and
     // prepare the lightmaps for the 3D rasterizer.
-    engine->Prepare ();
+    Engine->Prepare ();
   }
   else
   {
@@ -1507,11 +1510,12 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
 
     // Prepare the engine. This will calculate all lighting and
     // prepare the lightmaps for the 3D rasterizer.
-    engine->Prepare ();
+    Engine->Prepare ();
 
     Create2DSprites ();
 
     // Look for the start sector in this map.
+    csEngine* engine = (csEngine*)Engine;
     csCameraPosition *cp = (csCameraPosition *)engine->camera_positions.FindByName ("Start");
     const char *room_name;
     if (cp)
@@ -1523,7 +1527,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
     else
       room_name = "room";
 
-    room = (csSector *)engine->sectors.FindByName (room_name);
+    room = Engine->FindSector (room_name);
     if (!room)
     {
       Printf (MSG_FATAL_ERROR,  "Map does not contain a room called '%s'"
@@ -1533,18 +1537,18 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   }
 
   // Initialize collision detection system (even if disabled so that we can enable it later).
-  InitCollDet (engine, NULL);
+  InitCollDet (Engine, NULL);
 
   // Create a wireframe object which will be used for debugging.
   wf = new csWireFrameCam (txtmgr);
 
   // Load a few sounds.
 #ifdef DO_SOUND
-  iSoundWrapper *w = GET_NAMED_CHILD_OBJECT_FAST (engine->QueryObject (),
+  iSoundWrapper *w = GET_NAMED_CHILD_OBJECT_FAST (Engine->QueryObject (),
     iSoundWrapper, "boom.wav");
   wMissile_boom = w ? w->GetSound () : NULL;
 
-  w = GET_NAMED_CHILD_OBJECT_FAST (engine->QueryObject (),
+  w = GET_NAMED_CHILD_OBJECT_FAST (Engine->QueryObject (),
     iSoundWrapper, "whoosh.wav");
   wMissile_whoosh = w ? w->GetSound () : NULL;
 #endif
@@ -1584,7 +1588,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   if (Console) Console->Clear ();
 
   // Initialize our 3D view.
-  view->GetCamera ()->SetSector (&room->scfiSector);
+  view->GetCamera ()->SetSector (room);
   // We use the width and height from the 3D renderer because this
   // can be different from the frame size (rendering in less res than
   // real window for example).

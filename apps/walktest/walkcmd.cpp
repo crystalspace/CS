@@ -75,7 +75,7 @@ void SaveRecording (iVFS* vfs, const char* fName)
   cf->Write ((char*)&l, sizeof (l));
   int i;
   csRecordedCameraFile camint;
-  csSector* prev_sector = NULL;
+  iSector* prev_sector = NULL;
   for (i = 0 ; i < Sys->recording.Length () ; i++)
   {
     csRecordedCamera* reccam = (csRecordedCamera*)Sys->recording[i];
@@ -104,10 +104,10 @@ void SaveRecording (iVFS* vfs, const char* fName)
     }
     else
     {
-      len = strlen (reccam->sector->GetName ());
+      len = strlen (reccam->sector->QueryObject ()->GetName ());
       cf->Write ((char*)&len, 1);
-      cf->Write (reccam->sector->GetName (),
-      	1+strlen (reccam->sector->GetName ()));
+      cf->Write (reccam->sector->QueryObject ()->GetName (),
+      	1+strlen (reccam->sector->QueryObject ()->GetName ()));
     }
     prev_sector = reccam->sector;
     if (reccam->cmd)
@@ -148,7 +148,7 @@ void LoadRecording (iVFS* vfs, const char* fName)
   cf->Read ((char*)&l, sizeof (l));
   l = convert_endian (l);
   csRecordedCameraFile camint;
-  csSector* prev_sector = NULL;
+  iSector* prev_sector = NULL;
   int i;
   for (i = 0 ; i < l ; i++)
   {
@@ -172,7 +172,7 @@ void LoadRecording (iVFS* vfs, const char* fName)
     reccam->mirror = camint.mirror;
     unsigned char len;
     cf->Read ((char*)&len, 1);
-    csSector* s;
+    iSector* s;
     if (len == 255)
     {
       s = prev_sector;
@@ -181,7 +181,7 @@ void LoadRecording (iVFS* vfs, const char* fName)
     {
       char buf[100];
       cf->Read (buf, 1+len);
-      s = (csSector*)Sys->engine->sectors.FindByName (buf);
+      s = Sys->Engine->FindSector (buf);
     }
     reccam->sector = s;
     prev_sector = s;
@@ -267,7 +267,7 @@ bool LoadCamera (iVFS* vfs, const char *fName)
     &imirror,
     &Sys->angle.x, &Sys->angle.y, &Sys->angle.z);
 
-  csSector* s = (csSector*)Sys->engine->sectors.FindByName (sector_name);
+  iSector* s = Sys->Engine->FindSector (sector_name);
   delete[] sector_name;
   data->DecRef ();
   if (!s)
@@ -278,18 +278,18 @@ bool LoadCamera (iVFS* vfs, const char *fName)
   }
 
   iCamera *c = Sys->view->GetCamera ();
-  c->SetSector (&s->scfiSector);
+  c->SetSector (s);
   c->SetMirrored ((bool)imirror);
   c->GetTransform ().SetO2T (m);
   c->GetTransform ().SetOrigin (v);
   return true;
 }
 
-void move_mesh (csMeshWrapper* sprite, csSector* where, csVector3 const& pos)
+void move_mesh (iMeshWrapper* sprite, iSector* where, csVector3 const& pos)
 {
-  sprite->GetMovable ().SetPosition (pos);
-  sprite->GetMovable ().SetSector (where);
-  sprite->GetMovable ().UpdateMove ();
+  sprite->GetMovable ()->SetPosition (pos);
+  sprite->GetMovable ()->SetSector (where);
+  sprite->GetMovable ()->UpdateMove ();
 }
 
 // Load a mesh object factory from a general format (3DS, MD2, ...)
@@ -319,25 +319,23 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
 
   // Add this sprite template to the engine.
   iSprite3DFactoryState* fstate = QUERY_INTERFACE (result, iSprite3DFactoryState);
-  fstate->SetMaterialWrapper (Sys->engine->FindMaterial (txtname));
+  fstate->SetMaterialWrapper (Sys->Engine->FindMaterial (txtname));
   fstate->DecRef ();
 
-  csMeshFactoryWrapper* meshwrap = new csMeshFactoryWrapper (result);
-  meshwrap->SetName (templatename);
-  Sys->engine->mesh_factories.Push (meshwrap);
+  Sys->Engine->CreateMeshFactory (result, templatename);
 }
 
-iMeshWrapper* add_meshobj (char* tname, char* sname, csSector* where,
+iMeshWrapper* add_meshobj (char* tname, char* sname, iSector* where,
 	csVector3 const& pos, float size)
 {
-  iMeshFactoryWrapper* tmpl = Sys->engine->FindMeshFactory (tname);
+  iMeshFactoryWrapper* tmpl = Sys->Engine->FindMeshFactory (tname);
   if (!tmpl)
   {
     Sys->Printf (MSG_CONSOLE, "Unknown mesh factory '%s'!\n", tname);
     return NULL;
   }
   iSector* isector = QUERY_INTERFACE (where, iSector);
-  iMeshWrapper* spr = Sys->engine->CreateMeshObject (tmpl, sname,
+  iMeshWrapper* spr = Sys->Engine->CreateMeshObject (tmpl, sname,
   	isector, pos);
   isector->DecRef ();
   csMatrix3 m; m.Identity (); m = m * size;
@@ -353,14 +351,14 @@ void list_meshes (void)
 {
   int num_meshes;
   const char* mesh_name;
-  csMeshWrapper* mesh;
+  iMeshWrapper* mesh;
 
-  num_meshes = Sys->engine->meshes.Length();
+  num_meshes = Sys->Engine->GetNumMeshObjects ();
 
   for(int i = 0; i < num_meshes; i++)
   {
-    mesh = (csMeshWrapper*) Sys->engine->meshes[i];
-    mesh_name = mesh->GetName();
+    mesh = Sys->Engine->GetMeshObject (i);
+    mesh_name = mesh->QueryObject ()->GetName();
 
     if (mesh_name)
       Sys->Printf (MSG_CONSOLE, "%s\n", mesh_name);
@@ -368,7 +366,7 @@ void list_meshes (void)
       Sys->Printf (MSG_CONSOLE, "A mesh with no name.\n");
   }
   Sys->Printf (MSG_CONSOLE, "There are:%d meshes\n",
-	       Sys->engine->meshes.Length());
+	       Sys->Engine->GetNumMeshObjects ());
 }
 
 //===========================================================================
@@ -451,7 +449,7 @@ bool GetConfigOption (iBase* plugin, const char* optName, csVariant& optValue)
 
 //===========================================================================
 
-void WalkTest::ParseKeyCmds (csObject* src)
+void WalkTest::ParseKeyCmds (iObject* src)
 {
   iObjectIterator *it = src->GetIterator ();
   while (!it->IsFinished ())
@@ -501,7 +499,7 @@ void WalkTest::ParseKeyCmds (csObject* src)
       {
         csVector3 hinge;
         ScanStr (kp->GetValue (), "%f,%f,%f", &hinge.x, &hinge.y, &hinge.z);
-	csDoor* door = new csDoor (wrap->GetPrivateObject ());
+	csDoor* door = new csDoor (wrap);
 	door->SetHinge (hinge);
         src->ObjAdd (door);
 	wrap->DecRef ();
@@ -533,7 +531,7 @@ void WalkTest::ParseKeyCmds (csObject* src)
 	  sector_name, light_name,
 	  &start_col.red, &start_col.green, &start_col.blue,
 	  &end_col.red, &end_col.green, &end_col.blue, &act_time);
-	csSector* sect = (csSector*)engine->sectors.FindByName (sector_name);
+	iSector* sect = Engine->FindSector (sector_name);
 	if (!sect)
 	{
 	  CsPrintf (MSG_WARNING, "Sector '%s' not found! 'entity_Light' is ignored!\n",
@@ -541,7 +539,7 @@ void WalkTest::ParseKeyCmds (csObject* src)
 	}
 	else
 	{
-	  csLight* l = (csLight*)sect->GetLight (light_name);
+	  iStatLight* l = sect->GetLight (light_name);
 	  if (!l)
 	  {
 	    CsPrintf (MSG_WARNING, "Light '%s' not found! 'entity_Light' is ignored!\n",
@@ -549,7 +547,9 @@ void WalkTest::ParseKeyCmds (csObject* src)
 	  }
 	  else
 	  {
-	    csLightObject* lobj = new csLightObject (l);
+	    iLight* il = QUERY_INTERFACE (l, iLight);
+	    csLightObject* lobj = new csLightObject (il);
+	    il->DecRef ();
 	    lobj->SetColors (start_col, end_col);
 	    lobj->SetTotalTime (act_time);
             src->ObjAdd (lobj);
@@ -573,8 +573,8 @@ void WalkTest::ParseKeyCmds (csObject* src)
     int k;
     for (k = 0 ; k < mesh->GetChildCount () ; k++)
     {
-      csMeshWrapper* spr = mesh->GetChild (k)->GetPrivateObject ();
-      ParseKeyCmds (spr);
+      iMeshWrapper* spr = mesh->GetChild (k);
+      ParseKeyCmds (spr->QueryObject ());
     }
     mesh->DecRef ();
   }
@@ -584,31 +584,31 @@ void WalkTest::ParseKeyCmds (csObject* src)
 void WalkTest::ParseKeyCmds ()
 {
   int i;
-  for (i = 0 ; i < engine->sectors.Length () ; i++)
+  for (i = 0 ; i < Engine->GetSectorCount () ; i++)
   {
-    csSector* sector = (csSector*)engine->sectors[i];
-    ParseKeyCmds (sector);
+    iSector* sector = Engine->GetSector (i);
+    ParseKeyCmds (sector->QueryObject ());
 
     int j;
     for (j = 0 ; j < sector->GetMeshCount () ; j++)
     {
-      csMeshWrapper* sprite = sector->GetMesh (j);
-      ParseKeyCmds (sprite);
+      iMeshWrapper* sprite = sector->GetMesh (j);
+      ParseKeyCmds (sprite->QueryObject ());
     }
     for (j = 0 ; j < sector->GetTerrainCount () ; j++)
     {
-      csTerrainWrapper* terr = sector->GetTerrain (j);
-      ParseKeyCmds (terr);
+      iTerrainWrapper* terr = sector->GetTerrain (j);
+      ParseKeyCmds (terr->QueryObject ());
     }
     for (j = 0 ; j < sector->GetLightCount () ; j++)
     {
-      csStatLight* l = sector->GetLight (j);
-      ParseKeyCmds (l);
+      iStatLight* l = sector->GetLight (j);
+      ParseKeyCmds (l->QueryObject ());
     }
   }
 }
 
-void WalkTest::ActivateObject (csObject* src)
+void WalkTest::ActivateObject (iObject* src)
 {
   iObjectIterator *it = src->GetIterator ();
   while (!it->IsFinished ())
@@ -976,7 +976,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
 #if 0
 //@@@
-    csSector* room = Sys->view->GetCamera ()->GetSector ();
+    iSector* room = Sys->view->GetCamera ()->GetSector ();
     csThing* stat = room->GetStaticThing ();
     if (stat)
     {
@@ -997,7 +997,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
 #if 0
 //@@@
-    csSector* room = Sys->view->GetCamera ()->GetSector ();
+    iSector* room = Sys->view->GetCamera ()->GetSector ();
     csThing* stat = room->GetStaticThing ();
     if (stat)
     {
@@ -1018,7 +1018,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
 #if 0
 //@@@
-    csSector* room = Sys->view->GetCamera ()->GetSector ();
+    iSector* room = Sys->view->GetCamera ()->GetSector ();
     csThing* stat = room->GetStaticThing ();
     if (stat)
     {
@@ -1042,7 +1042,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
 #if 0
 //@@@
-    csSector* room = Sys->view->GetCamera ()->GetSector ();
+    iSector* room = Sys->view->GetCamera ()->GetSector ();
     csThing* stat = room->GetStaticThing ();
     if (stat)
     {
@@ -1067,7 +1067,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
 #if 0
 //@@@
-    csSector* room = Sys->view->GetCamera ()->GetSector ();
+    iSector* room = Sys->view->GetCamera ()->GetSector ();
     csThing* stat = room->GetStaticThing ();
     if (stat)
     {
@@ -1088,21 +1088,22 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
 #if 0
 //@@@
-    extern void CreateSolidThings (csEngine*, csSector*, csOctreeNode*, int);
-    csSector* room = Sys->view->GetCamera ()->GetSector ();
+    extern void CreateSolidThings (csEngine*, iSector*, csOctreeNode*, int);
+    iSector* room = Sys->view->GetCamera ()->GetSector ();
     csThing* stat = room->GetStaticThing ();
     if (stat)
     {
       csPolygonTree* tree = stat->GetStaticTree ();
       csOctree* otree = (csOctree*)tree;
-      CreateSolidThings (Sys->engine, room, otree->GetRoot (), 0);
+      CreateSolidThings (Sys->Engine, room, otree->GetRoot (), 0);
     }
 #endif
   }
   else if (!strcasecmp (cmd, "db_radstep"))
   {
     csRadiosity* rad;
-    if ((rad = Sys->engine->GetRadiosity ()) != NULL)
+    csEngine* engine = (csEngine*)(Sys->Engine);
+    if ((rad = engine->GetRadiosity ()) != NULL)
     {
       int steps;
       if (arg)
@@ -1111,22 +1112,24 @@ bool CommandHandler (const char *cmd, const char *arg)
         steps = 1;
       if (steps < 1) steps = 1;
       rad->DoRadiosityStep (steps);
-      Sys->engine->InvalidateLightmaps ();
+      engine->InvalidateLightmaps ();
     }
   }
   else if (!strcasecmp (cmd, "db_radtodo"))
   {
     csRadiosity* rad;
-    if ((rad = Sys->engine->GetRadiosity ()) != NULL)
+    csEngine* engine = (csEngine*)(Sys->Engine);
+    if ((rad = engine->GetRadiosity ()) != NULL)
     {
       rad->ToggleShowDeltaMaps ();
-      Sys->engine->InvalidateLightmaps ();
+      engine->InvalidateLightmaps ();
     }
   }
   else if (!strcasecmp (cmd, "db_radhi"))
   {
     csRadiosity* rad;
-    if ((rad = Sys->engine->GetRadiosity ()) != NULL)
+    csEngine* engine = (csEngine*)(Sys->Engine);
+    if ((rad = engine->GetRadiosity ()) != NULL)
     {
       Sys->selected_polygon = QUERY_INTERFACE (rad->GetNextPolygon (),
       	iPolygon3D);
@@ -1139,45 +1142,50 @@ bool CommandHandler (const char *cmd, const char *arg)
     csCommandProcessor::change_boolean (arg, &Sys->move_3d, "move3d");
   else if (!strcasecmp (cmd, "pvs"))
   {
-    bool en = Sys->engine->IsPVS ();
+    csEngine* engine = (csEngine*)(Sys->Engine);
+    bool en = engine->IsPVS ();
     csCommandProcessor::change_boolean (arg, &en, "pvs");
     if (en) 
-      Sys->engine->EnablePVS ();
+      engine->EnablePVS ();
     else
-      Sys->engine->DisablePVS ();
+      engine->DisablePVS ();
   }
   else if (!strcasecmp (cmd, "pvsonly"))
   {
-    bool en = Sys->engine->IsPVSOnly ();
+    csEngine* engine = (csEngine*)(Sys->Engine);
+    bool en = engine->IsPVSOnly ();
     csCommandProcessor::change_boolean (arg, &en, "pvs only");
     if (en) 
-      Sys->engine->EnablePVSOnly ();
+      engine->EnablePVSOnly ();
     else
-      Sys->engine->DisablePVSOnly ();
+      engine->DisablePVSOnly ();
   }
   else if (!strcasecmp (cmd, "freezepvs"))
   {
-    bool en = Sys->engine->IsPVSFrozen ();
+    csEngine* engine = (csEngine*)(Sys->Engine);
+    bool en = engine->IsPVSFrozen ();
     csCommandProcessor::change_boolean (arg, &en, "freeze pvs");
     if (en) 
-      Sys->engine->FreezePVS (Sys->view->GetCamera ()->GetTransform ().GetOrigin ());
+      engine->FreezePVS (Sys->view->GetCamera ()->GetTransform ().GetOrigin ());
     else
-      Sys->engine->UnfreezePVS ();
+      engine->UnfreezePVS ();
   }
   else if (!strcasecmp (cmd, "culler"))
   {
+    csEngine* engine = (csEngine*)(Sys->Engine);
     const char* const choices[4] = { "cbuffer", "quad3d", "covtree", NULL };
-    int culler = Sys->engine->GetCuller ();
+    int culler = engine->GetCuller ();
     csCommandProcessor::change_choice (arg, &culler, "culler", choices, 3);
-    Sys->engine->SetCuller (culler);
+    engine->SetCuller (culler);
   }
   else if (!strcasecmp (cmd, "emode"))
   {
     const char* const choices[5] = { "auto", "back2front", "front2back",
     	"zbuffer", NULL };
-    int emode = Sys->engine->GetEngineMode ();
+    int emode = Sys->Engine->GetEngineMode ();
     csCommandProcessor::change_choice (arg, &emode, "engine mode", choices, 4);
-    Sys->engine->SetEngineMode (emode);
+    csEngine* engine = (csEngine*)(Sys->Engine);
+    engine->SetEngineMode (emode);
   }
   else if (!strcasecmp (cmd, "freelook"))
   {
@@ -1545,12 +1553,12 @@ bool CommandHandler (const char *cmd, const char *arg)
     int num = 0;
     float speed = 0;
     if (arg) cnt = ScanStr (arg, "%s,%d,%f", txtname, &num, &speed);
-    extern void add_particles_rain (csSector* sector, char* txtname,
+    extern void add_particles_rain (iSector* sector, char* txtname,
     	int num, float speed);
     if (cnt <= 2) speed = 2;
     if (cnt <= 1) num = 500;
     if (cnt <= 0) strcpy (txtname, "raindrop");
-    add_particles_rain (Sys->view->GetCamera ()->GetSector ()->GetPrivateObject (),
+    add_particles_rain (Sys->view->GetCamera ()->GetSector (),
     	txtname, num, speed);
   }
   else if (!strcasecmp (cmd, "snow"))
@@ -1562,12 +1570,12 @@ bool CommandHandler (const char *cmd, const char *arg)
     int num = 0;
     float speed = 0;
     if (arg) cnt = ScanStr (arg, "%s,%d,%f", txtname, &num, &speed);
-    extern void add_particles_snow (csSector* sector, char* txtname,
+    extern void add_particles_snow (iSector* sector, char* txtname,
     	int num, float speed);
     if (cnt <= 2) speed = .3;
     if (cnt <= 1) num = 500;
     if (cnt <= 0) strcpy (txtname, "snow");
-    add_particles_snow (Sys->view->GetCamera ()->GetSector ()->GetPrivateObject (),
+    add_particles_snow (Sys->view->GetCamera ()->GetSector (),
     	txtname, num, speed);
   }
   else if (!strcasecmp (cmd, "flame"))
@@ -1577,11 +1585,11 @@ bool CommandHandler (const char *cmd, const char *arg)
     int cnt = 0;
     int num = 0;
     if (arg) cnt = ScanStr (arg, "%s,%d", txtname, &num);
-    extern void add_particles_fire (csSector* sector, char* txtname,
+    extern void add_particles_fire (iSector* sector, char* txtname,
     	int num, const csVector3& origin);
     if (cnt <= 1) num = 200;
     if (cnt <= 0) strcpy (txtname, "raindrop");
-    add_particles_fire (Sys->view->GetCamera ()->GetSector ()->GetPrivateObject (),
+    add_particles_fire (Sys->view->GetCamera ()->GetSector (),
     	txtname, num, Sys->view->GetCamera ()->GetTransform ().GetOrigin ()-
 	csVector3 (0, Sys->cfg_body_height, 0));
   }
@@ -1592,11 +1600,11 @@ bool CommandHandler (const char *cmd, const char *arg)
     int cnt = 0;
     int num = 0;
     if (arg) cnt = ScanStr (arg, "%s,%d", txtname, &num);
-    extern void add_particles_fountain (csSector* sector, char* txtname,
+    extern void add_particles_fountain (iSector* sector, char* txtname,
     	int num, const csVector3& origin);
     if (cnt <= 1) num = 400;
     if (cnt <= 0) strcpy (txtname, "spark");
-    add_particles_fountain (Sys->view->GetCamera ()->GetSector ()->GetPrivateObject (),
+    add_particles_fountain (Sys->view->GetCamera ()->GetSector (),
     	txtname, num, Sys->view->GetCamera ()->GetTransform ().GetOrigin ()-
 	csVector3 (0, Sys->cfg_body_height, 0));
   }
@@ -1605,14 +1613,14 @@ bool CommandHandler (const char *cmd, const char *arg)
     char txtname[100];
     int cnt = 0;
     if (arg) cnt = ScanStr (arg, "%s", txtname);
-    extern void add_particles_explosion (csSector* sector, const csVector3& center,
+    extern void add_particles_explosion (iSector* sector, const csVector3& center,
     	char* txtname);
     if (cnt != 1)
     {
       Sys->Printf (MSG_CONSOLE, "Expected parameter 'texture'!\n");
     }
     else
-      add_particles_explosion (Sys->view->GetCamera ()->GetSector ()->GetPrivateObject (),
+      add_particles_explosion (Sys->view->GetCamera ()->GetSector (),
     	Sys->view->GetCamera ()->GetTransform ().GetOrigin (), txtname);
   }
   else if (!strcasecmp (cmd, "spiral"))
@@ -1620,14 +1628,14 @@ bool CommandHandler (const char *cmd, const char *arg)
     char txtname[100];
     int cnt = 0;
     if (arg) cnt = ScanStr (arg, "%s", txtname);
-    extern void add_particles_spiral (csSector* sector, const csVector3& bottom,
+    extern void add_particles_spiral (iSector* sector, const csVector3& bottom,
     	char* txtname);
     if (cnt != 1)
     {
       Sys->Printf (MSG_CONSOLE, "Expected parameter 'texture'!\n");
     }
     else
-      add_particles_spiral (Sys->view->GetCamera ()->GetSector ()->GetPrivateObject (),
+      add_particles_spiral (Sys->view->GetCamera ()->GetSector (),
     	Sys->view->GetCamera ()->GetTransform ().GetOrigin (), txtname);
   }
   else if (!strcasecmp (cmd, "loadmesh"))
@@ -1655,7 +1663,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
     else
     {
-      add_meshobj (tname, sname, Sys->view->GetCamera ()->GetSector ()->GetPrivateObject (),
+      add_meshobj (tname, sname, Sys->view->GetCamera ()->GetSector (),
     	          Sys->view->GetCamera ()->GetTransform ().GetOrigin (), size);
     }
   }
@@ -1729,12 +1737,13 @@ bool CommandHandler (const char *cmd, const char *arg)
     else
     {
       // Test to see if the mesh exists.
-      csMeshWrapper* wrap = (csMeshWrapper *) Sys->engine->meshes.FindByName(name);
+      iMeshWrapper* wrap = Sys->Engine->FindMeshObject (name);
       if (!wrap)
         Sys->Printf (MSG_CONSOLE, "No such mesh!\n");
       else
       {
-        iSprite3DState* state = QUERY_INTERFACE (wrap->GetMeshObject (), iSprite3DState);
+        iSprite3DState* state = QUERY_INTERFACE (wrap->GetMeshObject (),
+		iSprite3DState);
         if (state)
         {
           // Test to see if the action exists for that sprite.
@@ -1766,20 +1775,23 @@ bool CommandHandler (const char *cmd, const char *arg)
     else
     {
       // Test to see if the mesh exists.
-      csMeshWrapper* wrap = (csMeshWrapper*) Sys->engine->meshes.FindByName (name);
+      iMeshWrapper* wrap = Sys->Engine->FindMeshObject (name);
       if (!wrap)
         Sys->Printf (MSG_CONSOLE, "No such mesh!\n");
       else
       {
-	iSprite3DState* state = QUERY_INTERFACE (wrap->GetMeshObject (), iSprite3DState);
+	iSprite3DState* state = QUERY_INTERFACE (wrap->GetMeshObject (),
+		iSprite3DState);
         if (state)
         {
-	  iSkeletonBone *sb=QUERY_INTERFACE(state->GetSkeletonState(), iSkeletonBone);
+	  iSkeletonBone *sb=QUERY_INTERFACE(state->GetSkeletonState(),
+	  	iSkeletonBone);
 	  if (sb)
 	  {
 	    if (System->MotionMan)
 	    {
-	      if (!System->MotionMan->ApplyMotion(sb, motion, motion, true, false, 1.0, 0, false))
+	      if (!System->MotionMan->ApplyMotion(sb, motion, motion, true,
+	      	false, 1.0, 0, false))
 	        Sys->Printf (MSG_CONSOLE, "That motion does not exist!\n");
 	    }
 	    else
@@ -1804,9 +1816,9 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (arg) ScanStr (arg, "%d,%d", &depth, &width);
     if (depth < 1) depth = 3; 
     if (width < 1) width = 3;
-    extern void add_skeleton_tree (csSector* where, csVector3 const& pos,
+    extern void add_skeleton_tree (iSector* where, csVector3 const& pos,
     	int depth, int width);
-    add_skeleton_tree (Sys->view->GetCamera ()->GetSector ()->GetPrivateObject (),
+    add_skeleton_tree (Sys->view->GetCamera ()->GetSector (),
     	Sys->view->GetCamera ()->GetTransform ().GetOrigin (), depth, width);
   }
   else if (!strcasecmp (cmd, "addghost"))
@@ -1815,9 +1827,9 @@ bool CommandHandler (const char *cmd, const char *arg)
     int depth, width;
     if (arg) ScanStr (arg, "%d,%d", &depth, &width);
     else { depth = 5; width = 8; }
-    extern void add_skeleton_ghost (csSector* where, csVector3 const& pos,
+    extern void add_skeleton_ghost (iSector* where, csVector3 const& pos,
     	int maxdepth, int width);
-    add_skeleton_ghost (Sys->view->GetCamera ()->GetSector ()->GetPrivateObject (),
+    add_skeleton_ghost (Sys->view->GetCamera ()->GetSector (),
     	Sys->view->GetCamera ()->GetTransform ().GetOrigin (), depth, width);
   }
   else if (!strcasecmp (cmd, "addbot"))
@@ -1825,9 +1837,9 @@ bool CommandHandler (const char *cmd, const char *arg)
     RECORD_ARGS (cmd, arg);
     float radius = 0;
     if (arg) ScanStr (arg, "%f", &radius);
-    extern void add_bot (float size, csSector* where, csVector3 const& pos,
+    extern void add_bot (float size, iSector* where, csVector3 const& pos,
 	float dyn_radius);
-    add_bot (2, Sys->view->GetCamera ()->GetSector ()->GetPrivateObject (),
+    add_bot (2, Sys->view->GetCamera ()->GetSector (),
     	Sys->view->GetCamera ()->GetTransform ().GetOrigin (), radius);
   }
   else if (!strcasecmp (cmd, "delbot"))
@@ -1838,7 +1850,8 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "clrlights"))
   {
     RECORD_CMD (cmd);
-    csLightIt* lit = Sys->view->GetEngine ()->GetCsEngine ()->NewLightIterator ();
+    csLightIt* lit = Sys->view->GetEngine ()->GetCsEngine ()
+    	->NewLightIterator ();
     csLight* l;
     while ((l = lit->Fetch ()) != NULL)
     {

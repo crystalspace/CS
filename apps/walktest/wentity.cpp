@@ -35,7 +35,7 @@ IMPLEMENT_IBASE_EXT_END
 
 //--------------------------------------------------------------------------
 
-csDoor::csDoor (csMeshWrapper* p)
+csDoor::csDoor (iMeshWrapper* p)
 {
   is_open = false;
   transition = 0;
@@ -69,14 +69,14 @@ printf ("Done opening door.\n");
   if (transition < 0) transition = 0;
   csYRotMatrix3 mat ((M_PI/2.)*transition);
   mat.Invert ();
-  tparent->GetMovable ().SetTransform (mat);
-  tparent->GetMovable ().UpdateMove ();
+  tparent->GetMovable ()->SetTransform (mat);
+  tparent->GetMovable ()->UpdateMove ();
 }
 
 //--------------------------------------------------------------------------
 
 
-csRotatingObject::csRotatingObject (csObject* p)
+csRotatingObject::csRotatingObject (iObject* p)
 {
   always = true;
   tparent = p;
@@ -85,7 +85,7 @@ csRotatingObject::csRotatingObject (csObject* p)
   iMeshWrapper *mw = QUERY_INTERFACE_FAST (p, iMeshWrapper);
   if (mw)
   {
-    movable = &mw->GetPrivateObject ()->GetMovable ();
+    movable = mw->GetMovable ();
     mw->DecRef ();
   }
 }
@@ -125,7 +125,7 @@ void csRotatingObject::NextFrame (float elapsed_time)
 
 //--------------------------------------------------------------------------
 
-csLightObject::csLightObject (csLight* p)
+csLightObject::csLightObject (iLight* p)
 {
   light = p;
   act_time = 1000;

@@ -1289,3 +1289,11 @@ iObject* csSector::eiSector::HitBeam (const csVector3& start,
   else return NULL;
 }
 
+iSector* csSector::eiSector::FollowSegment (csReversibleTransform& t,
+  	csVector3& new_position, bool& mirror)
+{
+  csSector* s = scfParent->FollowSegment (t, new_position, mirror);
+  if (s) return &(s->scfiSector);
+  else return NULL;
+}
+

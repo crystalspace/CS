@@ -25,6 +25,7 @@
 #include "ivideo/graph3d.h"
 
 struct iMeshObject;
+struct iCamera;
 struct iMeshObjectFactory;
 struct iMeshWrapper;
 class csMeshWrapper;
@@ -96,7 +97,7 @@ class csFlags;
 typedef void (csDrawCallback) (iMeshWrapper* spr, iRenderView* rview,
 	void* callbackData);
 
-SCF_VERSION (iMeshWrapper, 0, 0, 9);
+SCF_VERSION (iMeshWrapper, 0, 0, 10);
 
 /**
  * This interface corresponds to the object in the engine
@@ -229,6 +230,14 @@ struct iMeshWrapper : public iBase
    * box of the object in object space and then transform this bounding box.
    */
   virtual void GetTransformedBoundingBox (const csReversibleTransform& trans,
+  	csBox3& cbox) = 0;
+
+  /**
+   * Get a very inaccurate bounding box of the object in screen space.
+   * Returns -1 if object behind the camera or else the distance between
+   * the camera and the furthest point of the 3D box.
+   */
+  virtual float GetScreenBoundingBox (iCamera* camera, csBox2& sbox,
   	csBox3& cbox) = 0;
 
   /// Get the number of children.

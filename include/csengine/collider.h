@@ -28,9 +28,10 @@ class csTransform;
 struct iPolygonMesh;
 struct iCollideSystem;
 struct iCollider;
+struct iObject;
 
 
-SCF_VERSION (csCollider, 0, 0, 1);
+SCF_VERSION (csCollider, 0, 0, 2);
 
 /**
  * This is a conveniance object that you can use in your own
@@ -84,6 +85,12 @@ public:
    * is returned.
    */
   static csCollider* GetCollider (csObject& object);
+
+  /**
+   * If object has a child of type csCollider it is returned. Otherwise 0
+   * is returned.
+   */
+  static csCollider* GetCollider (iObject* object);
 
   CSOBJTYPE;
   DECLARE_IBASE_EXT (csPObject);

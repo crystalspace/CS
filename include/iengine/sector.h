@@ -26,6 +26,7 @@
 class csSector;
 class csColor;
 class csBox3;
+class csReversibleTransform;
 struct iCollection;
 struct iTerrainWrapper;
 struct iMeshWrapper;
@@ -37,7 +38,7 @@ struct csFog;
 struct iGraphics3D;
 struct iPolygon3D;
 
-SCF_VERSION (iSector, 0, 2, 10);
+SCF_VERSION (iSector, 0, 2, 11);
 
 /**
  * The iSector interface is used to work with "sectors". A "sector"
@@ -178,6 +179,21 @@ struct iSector : public iBase
   virtual iObject* HitBeam (const csVector3& start, const csVector3& end,
   	iPolygon3D** polygonPtr) = 0;
 
+  /**
+   * Follow a segment starting at this sector. If the segment intersects
+   * with a polygon it will stop there unless the polygon is a portal in which
+   * case it will recursively go to that sector (possibly applying warping
+   * transformations) and continue there.<p>
+   *
+   * This routine will modify all the given parameters to reflect space warping.
+   * These should be used as the new camera transformation when you decide to
+   * really go to the new position.<p>
+   *
+   * This function returns the resulting sector and new_position will be set
+   * to the last position that you can go to before hitting a wall.
+   */
+  virtual iSector* FollowSegment (csReversibleTransform& t,
+  	csVector3& new_position, bool& mirror) = 0;
 };
 
 #endif // __IENGINE_SECTOR_H__

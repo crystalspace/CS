@@ -140,21 +140,19 @@ iPolygon3D* HugeRoom::create_polygon (iThingState* thing_state,
 //#define ROOM_SMALL
 #define ROOM_CITY
 
-static csMeshWrapper* CreateMeshWrapper (const char* name)
+static iMeshWrapper* CreateMeshWrapper (const char* name)
 {
-  iMeshObjectFactory* thing_fact = Sys->engine->GetThingType ()->NewFactory ();
+  iMeshObjectFactory* thing_fact = Sys->Engine->GetThingType ()->NewFactory ();
   iMeshObject* mesh_obj = QUERY_INTERFACE (thing_fact, iMeshObject);
   thing_fact->DecRef ();
-  csMeshWrapper* mesh_wrap = new csMeshWrapper (Sys->engine, mesh_obj);
+  iMeshWrapper* mesh_wrap = Sys->Engine->CreateMeshObject (mesh_obj, name);
   mesh_obj->DecRef ();
-  mesh_wrap->SetName (name);
-  Sys->engine->meshes.Push (mesh_wrap);
   return mesh_wrap;
 }
 
-csMeshWrapper* HugeRoom::create_thing (csSector* sector, const csVector3& pos)
+iMeshWrapper* HugeRoom::create_thing (iSector* sector, const csVector3& pos)
 {
-  csMeshWrapper* thing = CreateMeshWrapper ("t");
+  iMeshWrapper* thing = CreateMeshWrapper ("t");
   iThingState* thing_state = QUERY_INTERFACE (thing->GetMeshObject (),
   	iThingState);
 
@@ -215,23 +213,23 @@ csMeshWrapper* HugeRoom::create_thing (csSector* sector, const csVector3& pos)
   }
 #endif
 
-  csMovable& move = thing->GetMovable ();
-  move.SetSector (sector);
+  iMovable* move = thing->GetMovable ();
+  move->SetSector (sector);
   csReversibleTransform obj;
   obj.SetT2O (csMatrix3 ());
   obj.SetOrigin (pos);
-  move.SetTransform (obj);
-  move.UpdateMove ();
+  move->SetTransform (obj);
+  move->UpdateMove ();
   thing_state->DecRef ();
 
   return thing;
 }
 
-csMeshWrapper* HugeRoom::create_building (csSector* sector,
+iMeshWrapper* HugeRoom::create_building (iSector* sector,
 	const csVector3& pos,
 	float xdim, float ydim, float zdim, float angle_y)
 {
-  csMeshWrapper* thing = CreateMeshWrapper ("t");
+  iMeshWrapper* thing = CreateMeshWrapper ("t");
   iThingState* thing_state = QUERY_INTERFACE (thing->GetMeshObject (),
   	iThingState);
 
@@ -254,23 +252,23 @@ csMeshWrapper* HugeRoom::create_building (csSector* sector,
   create_wall (thing_state, p5, p8, p4, p1, hor_div, ver_div, txt);	// Left
   create_wall (thing_state, p6, p5, p1, p2, hor_div, ver_div, txt);	// Back
 
-  csMovable& move = thing->GetMovable ();
-  move.SetSector (sector);
+  iMovable* move = thing->GetMovable ();
+  move->SetSector (sector);
   csReversibleTransform obj;
   obj.SetT2O (csYRotMatrix3 (angle_y));
   obj.SetOrigin (pos);
-  move.SetTransform (obj);
-  move.UpdateMove ();
+  move->SetTransform (obj);
+  move->UpdateMove ();
   thing_state->DecRef ();
 
   return thing;
 }
 
 
-csSector* HugeRoom::create_huge_world (csEngine* engine)
+iSector* HugeRoom::create_huge_world (iEngine* engine)
 {
   this->engine = engine;
-  csSector* room = engine->CreateCsSector ("sector");
+  iSector* room = engine->CreateSector ("sector");
 
   if (seed == 0) seed = rand ();
   srand (seed);
@@ -405,17 +403,25 @@ csSector* HugeRoom::create_huge_world (csEngine* engine)
   num = ((rand () >> 3) % (sector_max_lights-sector_min_lights+1)) + sector_min_lights;
   for (i = 0 ; i < num ; i++)
   {
-    csStatLight* light = new csStatLight (
-    	rand2 (sector_light_max_pos), rand2 (sector_light_max_pos), rand2 (sector_light_max_pos),
-    	sector_light_min_radius+rand1 (sector_light_max_radius-sector_light_min_radius+1),
-    	rand1 (sector_light_max_red-sector_light_min_red)+sector_light_min_red,
-    	rand1 (sector_light_max_green-sector_light_min_green)+sector_light_min_green,
-    	rand1 (sector_light_max_blue-sector_light_min_blue)+sector_light_min_blue, false);
+    iStatLight* light = engine->CreateLight ("",
+    	csVector3 (rand2 (sector_light_max_pos),
+		   rand2 (sector_light_max_pos),
+		   rand2 (sector_light_max_pos)),
+    	sector_light_min_radius+rand1 (sector_light_max_radius
+		-sector_light_min_radius+1),
+	csColor (
+    		rand1 (sector_light_max_red-sector_light_min_red)
+			+sector_light_min_red,
+    		rand1 (sector_light_max_green-sector_light_min_green)
+			+sector_light_min_green,
+    		rand1 (sector_light_max_blue-sector_light_min_blue)
+			+sector_light_min_blue),
+	false);
     room->AddLight (light);
   }
 
 #if defined(ROOM_CITY)
-  csMeshWrapper* floorthing = CreateMeshWrapper ("floor");
+  iMeshWrapper* floorthing = CreateMeshWrapper ("floor");
   iThingState* thing_state = QUERY_INTERFACE (floorthing->GetMeshObject (),
   	iThingState);
   create_wall (thing_state,
@@ -424,10 +430,10 @@ csSector* HugeRoom::create_huge_world (csEngine* engine)
   	csVector3 (wall_dim, -wall_dim+1, -wall_dim),
 	csVector3 (-wall_dim, -wall_dim+1, -wall_dim), 40, 40, 0);
   thing_state->DecRef ();
-  floorthing->GetMovable ().SetSector (room);
-  floorthing->GetMovable ().UpdateMove ();
+  floorthing->GetMovable ()->SetSector (room);
+  floorthing->GetMovable ()->UpdateMove ();
 #elif !defined(ROOM_SMALL)
-  csMeshWrapper* floorthing = CreateMeshWrapper ("floor");
+  iMeshWrapper* floorthing = CreateMeshWrapper ("floor");
   iThingState* thing_state = QUERY_INTERFACE (floorthing->GetMeshObject (),
   	iThingState);
   create_wall (thing_state, csVector3 (-3, -1, 3), csVector3 (3, -1, 3),
@@ -435,8 +441,8 @@ csSector* HugeRoom::create_huge_world (csEngine* engine)
   create_wall (thing_state, csVector3 (-3, -1, -3), csVector3 (3, -1, -3),
   	csVector3 (3, -1, 3), csVector3 (-3, -1, 3), 4, 4, 0);
   thing_state->DecRef ();
-  floorthing->GetMovable ().SetSector (room);
-  floorthing->GetMovable ().UpdateMove ();
+  floorthing->GetMovable ()->SetSector (room);
+  floorthing->GetMovable ()->UpdateMove ();
 #endif
 
   iMeshWrapper* walls = engine->CreateSectorWallsMesh (room, "walls");
@@ -469,7 +475,7 @@ csSector* HugeRoom::create_huge_world (csEngine* engine)
   thing_state->DecRef ();
 
   Sys->Printf (MSG_INITIALIZATION, "Number of polygons: %d\n", pol_nr);
-  room->UseCuller ("@@@ (NOT WORKING!!!)");
+  //room->UseCuller ("@@@ (NOT WORKING!!!)");
   return room;
 }
 

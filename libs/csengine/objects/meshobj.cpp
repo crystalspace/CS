@@ -417,6 +417,13 @@ iMeshWrapper* csMeshWrapper::MeshWrapper::GetChild (int idx)
   return &(child->scfiMeshWrapper);
 }
 
+float csMeshWrapper::MeshWrapper::GetScreenBoundingBox (iCamera* camera,
+	csBox2& sbox, csBox3& cbox)
+{
+  return scfParent->GetScreenBoundingBox (camera->GetPrivateObject (),
+  	sbox, cbox);
+}
+
 //--------------------------------------------------------------------------
 
 IMPLEMENT_IBASE (csMeshFactoryWrapper)
