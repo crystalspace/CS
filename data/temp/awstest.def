@@ -44,6 +44,11 @@ window "Another"
     Frame: (20, 30) - (90, 50)
     Style: bfsNormal
     Caption: "Red"
+
+    connect 
+    {
+      signalCmdButtonClicked -> testButtonSink::RedClicked
+    }
   }
 
   component "Green" is "Command Button"
@@ -51,6 +56,11 @@ window "Another"
     Frame: (20, 60) - (90, 80)
     Style: bfsNormal
     Caption: "Green"
+	
+    connect 
+    {
+      signalCmdButtonClicked -> testButtonSink::GreenClicked
+    }
   }
 
   component "Blue" is "Command Button"
@@ -58,6 +68,11 @@ window "Another"
     Frame: (20, 90) - (90, 110)
     Style: bfsNormal
     Caption: "Blue"
+
+    connect 
+    {
+     signalCmdButtonClicked -> testButtonSink::BlueClicked
+    }
   }
   
 }
