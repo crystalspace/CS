@@ -38,7 +38,6 @@
 #include "csengine/stats.h"
 #include "csengine/config.h"
 #include "csengine/cspmeter.h"
-#include "csengine/csppulse.h"
 #include "csengine/cbuffer.h"
 #include "csengine/lppool.h"
 #include "csgeom/fastsqrt.h"
@@ -542,7 +541,6 @@ void csWorld::ShineLights ()
   int sn = 0;
   int num_sectors = sectors.Length ();
   csProgressMeter meter;
-  csProgressPulse pulse;
   CsPrintf (MSG_INITIALIZATION, "Initializing lightmaps (%d sectors total):\n  ", num_sectors);
 
   meter.SetTotal (num_sectors);

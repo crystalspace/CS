@@ -888,7 +888,7 @@ bool CullOctreeNodeLighting (csPolygonTree* tree, csPolygonTreeNode* node,
 {
   if (!node) return false;
   if (node->Type () != NODE_OCTREE) return true;
-  int i;
+
   csOctreeNode* onode = (csOctreeNode*)node;
   csLightView* lview = (csLightView*)data;
 
