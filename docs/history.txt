@@ -39,6 +39,9 @@ chronological order.
 	  "plugin_compiler" to fail with Borland since GetProcAddress() is not
 	  smart enough to try both "plugin_compiler" and "_plugin_compiler",
 	  whereas csGetLibrarySymbol() is.
+	- Wouter Wijngaards fixed an off-by-one bug in csconin, where if
+	  you pressed the up arrow you would get the line before the previous 
+	  line instead of the previous line.
 13-Dec-2003
 	- Eric Sunshine applied patch from Randall Foreman
           <eidpers@comcast.net>.  csModelConverterASE was accidentally

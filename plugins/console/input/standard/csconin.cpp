@@ -220,7 +220,7 @@ bool csConsoleInput::HandleEvent (iEvent &Event)
 	      while (History.Length () > MaxLines)
 		History.DeleteIndex (0);
   	      if(HistoryPos >= History.Length ())
-    	        HistoryPos = History.Length () - 1;
+    	        HistoryPos = History.Length ();
 	    }
 	    line.Replace ("");
 	    strCursorPos = 0;
