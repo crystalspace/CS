@@ -34,7 +34,7 @@ csProcDots::csProcDots () : csProcTexture()
   mat_h = 16;
 
   texFlags = CS_TEXTURE_3D | CS_TEXTURE_PROC | CS_TEXTURE_NOMIPMAPS |
-    CS_TEXTURE_PROC_ALONE_HINT;
+    CS_TEXTURE_PROC_ALONE_HINT | CS_TEXTURE_PROC_PERSISTENT ;
 }
 
 csProcDots::~csProcDots ()
