@@ -720,7 +720,7 @@ bool TiDocument::LoadFile( const char* filename )
 		}
 		fclose( file );
 
-		Parse( data.c_str() );
+		Parse( this, data.c_str() );
 		if (  !Error() )
 		{
 			return true;

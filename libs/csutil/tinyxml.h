@@ -219,7 +219,7 @@ protected:
 
 	virtual void StreamOut (TIXML_OSTREAM *) const = 0;
 
-	virtual const char* Parse( const char* p ) = 0;
+	virtual const char* Parse( TiDocument* document, const char* p ) = 0;
 
 	// If an entity has been found, transform it into a character.
 	static const char* GetEntity( const char* in, char* value );
@@ -227,7 +227,6 @@ protected:
 	// Get a character, while interpreting entities.
 	inline static const char* GetChar( const char* p, char* value )
 	{
-		assert( p );
 		if ( *p == '&' )
 		{
 			return GetEntity( p, value );
@@ -435,7 +434,7 @@ protected:
 	TiDocumentNode* LinkEndChild( TiDocumentNode* addThis );
 
 	// Figure out what is at *p, and parse it. Returns null if it is not an xml node.
-	TiDocumentNode* Identify( const char* start );
+	TiDocumentNode* Identify( TiDocument* document, const char* start );
 	void CopyToClone( TiDocumentNode* target ) const
 	{
 	  target->SetValue (Value () );
@@ -621,13 +620,13 @@ protected:
 		Attribtue parsing starts: next char past '<'
 						 returns: next char past '>'
 	*/
-	virtual const char* Parse( const char* p );
+	virtual const char* Parse( TiDocument* document, const char* p );
 
 	/*	[internal use]
 		Reads the "value" of the element -- another element, or text.
 		This should terminate with the current end tag.
 	*/
-	const char* ReadValue( const char* in );
+	const char* ReadValue( TiDocument* document, const char* in );
 
 private:
 	TiDocumentAttributeSet attributeSet;
@@ -659,7 +658,7 @@ protected:
 		Attribtue parsing starts: at the ! of the !--
 						 returns: next char past '>'
 	*/
-	virtual const char* Parse( const char* p );
+	virtual const char* Parse( TiDocument* document, const char* p );
 	TIXML_STRING	value;
 };
 
@@ -692,7 +691,7 @@ protected :
 			Attribtue parsing starts: First char of the text
 							 returns: next char past '>'
 		*/
-	virtual const char* Parse( const char* p );
+	virtual const char* Parse( TiDocument* document,  const char* p );
 	TIXML_STRING	value;
 };
 
@@ -716,7 +715,7 @@ public:
 	virtual void SetValue (const char * _value) { value = _value;}
 
 protected :
-	virtual const char* Parse( const char* p );
+	virtual const char* Parse( TiDocument* document,  const char* p );
 	TIXML_STRING	value;
 };
 
@@ -767,7 +766,7 @@ protected:
 	//	Attribtue parsing starts: next char past '<'
 	//					 returns: next char past '>'
 
-	virtual const char* Parse( const char* p );
+	virtual const char* Parse( TiDocument* document,  const char* p );
 
 private:
 	TIXML_STRING version;
@@ -802,7 +801,7 @@ protected:
 		Attribute parsing starts: First char of the text
 						 returns: next char past '>'
 	*/
-	virtual const char* Parse( const char* p );
+	virtual const char* Parse( TiDocument* document,  const char* p );
 	TIXML_STRING	value;
 };
 
@@ -841,7 +840,7 @@ public:
 	bool SaveFile( const char * filename ) const;
 
 	/// Parse the given null terminated block of xml data.
-	virtual const char* Parse( const char* p );
+	virtual const char* Parse( TiDocument* document,  const char* p );
 
 	/** Get the root element -- the only top level element -- of the document.
 		In well formed XML, there should only be one. TinyXml is tolerant of

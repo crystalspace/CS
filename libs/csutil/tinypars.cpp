@@ -47,44 +47,29 @@ const char* TiXmlBase::SkipWhiteSpace( const char* p )
 	{
 		return 0;
 	}
-	while ( p && *p )
-	{
-		if ( isspace( *p ) || *p == '\n' || *p =='\r' )		// Still using old rules for white space.
-			++p;
-		else
-			break;
-	}
-
+	while ( isspace (*p)) p++;
 	return p;
 }
 
 const char* TiXmlBase::ReadName( const char* p, char* name)
 {
-	char* pname = name;
-	*pname = 0;
-	//assert( p );
-
-	// Names start with letters or underscores.
-	// After that, they can be letters, underscores, numbers,
-	// hyphens, or colons. (Colons are valid ony for namespaces,
-	// but tinyxml can't tell namespaces from names.)
-	if (    p && *p 
-		 && ( isalpha( (unsigned char) *p ) || *p == '_' ) )
-	{
-		while(		p && *p
-				&&	(		isalnum( (unsigned char ) *p ) 
-						 || *p == '_'
-						 || *p == '-'
-						 || *p == ':' ) )
-		{
-			*pname++ = *p;
-			++p;
-		}
-		*pname = 0;
-		return p;
-	}
-	*name = 0;
-	return 0;
+  // Names start with letters or underscores.
+  // After that, they can be letters, underscores, numbers,
+  // hyphens, or colons. (Colons are valid ony for namespaces,
+  // but tinyxml can't tell namespaces from names.)
+  if (p && *p && (isalpha ((unsigned char) *p) || *p == '_'))
+  {
+    char* pname = name;
+    while ((isalnum ((unsigned char) *p) 
+	|| *p == '_' || *p == '-' || *p == ':'))
+    {
+      *pname++ = *p++;
+    }
+    *pname = 0;
+    return p;
+  }
+  *name = 0;
+  return 0;
 }
 
 const char* TiXmlBase::ReadName( const char* p, TIXML_STRING * name )
@@ -96,10 +81,10 @@ const char* TiXmlBase::ReadName( const char* p, TIXML_STRING * name )
 	// After that, they can be letters, underscores, numbers,
 	// hyphens, or colons. (Colons are valid ony for namespaces,
 	// but tinyxml can't tell namespaces from names.)
-	if (    p && *p 
+	if (*p 
 		 && ( isalpha( (unsigned char) *p ) || *p == '_' ) )
 	{
-		while(		p && *p
+		while(*p
 				&&	(		isalnum( (unsigned char ) *p ) 
 						 || *p == '_'
 						 || *p == '-'
@@ -211,9 +196,7 @@ const char* TiXmlBase::ReadText(	const char* p,
 	    || !condenseWhiteSpace )	// if true, whitespace is always kept
 	{
 		// Keep all the white space.
-		while (	   p && *p
-				&& !StringEqual ( p, endTag)
-			  )
+		while (*p && !StringEqual ( p, endTag))
 		{
 			char c;
 			p = GetChar( p, &c );
@@ -228,15 +211,9 @@ const char* TiXmlBase::ReadText(	const char* p,
 
 		// Remove leading white space:
 		p = SkipWhiteSpace( p );
-		while (	   p && *p
-				&& !StringEqual ( p, endTag) )
+		while (	*p && !StringEqual ( p, endTag) )
 		{
-			if ( *p == '\r' || *p == '\n' )
-			{
-				whitespace = true;
-				++p;
-			}
-			else if ( isspace( *p ) )
+			if ( isspace( *p ) )
 			{
 				whitespace = true;
 				++p;
@@ -322,7 +299,7 @@ const char* TiXmlBase::ReadText(	const char* p,
 	return p + strlen( endTag );
 }
 
-const char* TiDocument::Parse( const char* p )
+const char* TiDocument::Parse( TiDocument*,  const char* p )
 {
 	// Parse away, at the document level. Since a document
 	// contains nothing but other tags, most of what happens
@@ -347,10 +324,10 @@ const char* TiDocument::Parse( const char* p )
 
 	while ( p && *p )
 	{
-		TiDocumentNode* node = Identify( p );
+		TiDocumentNode* node = Identify( this, p );
 		if ( node )
 		{
-			p = node->Parse( p );
+			p = node->Parse( this, p );
 			LinkEndChild( node );
 		}
 		else
@@ -364,7 +341,7 @@ const char* TiDocument::Parse( const char* p )
 }
 
 
-TiDocumentNode* TiDocumentNode::Identify( const char* p )
+TiDocumentNode* TiDocumentNode::Identify( TiDocument* document, const char* p )
 {
 	TiDocumentNode* returnNode = 0;
 
@@ -374,7 +351,6 @@ TiDocumentNode* TiDocumentNode::Identify( const char* p )
 		return 0;
 	}
 
-	TiDocument* doc = GetDocument();
 	p = SkipWhiteSpace( p );
 
 	if ( !p || !*p )
@@ -430,20 +406,18 @@ TiDocumentNode* TiDocumentNode::Identify( const char* p )
 	}
 	else
 	{
-		if ( doc )
-			doc->SetError( TIXML_ERROR_OUT_OF_MEMORY );
+		document->SetError( TIXML_ERROR_OUT_OF_MEMORY );
 	}
 	return returnNode;
 }
 
-const char* TiXmlElement::Parse( const char* p )
+const char* TiXmlElement::Parse( TiDocument* document, const char* p )
 {
 	p = SkipWhiteSpace( p );
-	TiDocument* document = GetDocument();
 
 	if ( !p || !*p || *p != '<' )
 	{
-		if ( document ) document->SetError( TIXML_ERROR_PARSING_ELEMENT );
+		document->SetError( TIXML_ERROR_PARSING_ELEMENT );
 		return 0;
 	}
 
@@ -454,7 +428,7 @@ const char* TiXmlElement::Parse( const char* p )
 	p = ReadName( p, inname );
 	if ( !p || !*p )
 	{
-		if ( document )	document->SetError( TIXML_ERROR_FAILED_TO_READ_ELEMENT_NAME );
+		document->SetError( TIXML_ERROR_FAILED_TO_READ_ELEMENT_NAME );
 		return 0;
 	}
 	csStringID name_id = document->strings.Request (inname);
@@ -472,7 +446,7 @@ const char* TiXmlElement::Parse( const char* p )
 		p = SkipWhiteSpace( p );
 		if ( !p || !*p )
 		{
-			if ( document ) document->SetError( TIXML_ERROR_READING_ATTRIBUTES );
+			document->SetError( TIXML_ERROR_READING_ATTRIBUTES );
 			return 0;
 		}
 		if ( *p == '/' )
@@ -481,7 +455,7 @@ const char* TiXmlElement::Parse( const char* p )
 			// Empty tag.
 			if ( *p  != '>' )
 			{
-				if ( document ) document->SetError( TIXML_ERROR_PARSING_EMPTY );		
+				document->SetError( TIXML_ERROR_PARSING_EMPTY );		
 				return 0;
 			}
 			attributeSet.set.ShrinkBestFit ();
@@ -493,7 +467,7 @@ const char* TiXmlElement::Parse( const char* p )
 			// Read the value -- which can include other
 			// elements -- read the end tag, and return.
 			++p;
-			p = ReadValue( p );		// Note this is an Element method, and will set the error if one happens.
+			p = ReadValue( document, p );		// Note this is an Element method, and will set the error if one happens.
 			if ( !p || !*p )
 			{
 				attributeSet.set.ShrinkBestFit ();
@@ -509,7 +483,7 @@ const char* TiXmlElement::Parse( const char* p )
 			}
 			else
 			{
-				if ( document ) document->SetError( TIXML_ERROR_READING_END_TAG );
+				document->SetError( TIXML_ERROR_READING_END_TAG );
 				return 0;
 			}
 		}
@@ -517,11 +491,12 @@ const char* TiXmlElement::Parse( const char* p )
 		{
 			// Try to read an element:
 			TiDocumentAttribute attrib;
+			// @@@ OPTIMIZE
 			p = attrib.Parse( document, p );
 
 			if ( !p || !*p )
 			{
-				if ( document ) document->SetError( TIXML_ERROR_PARSING_ELEMENT );
+				document->SetError( TIXML_ERROR_PARSING_ELEMENT );
 				return 0;
 			}
 			GetAttributeRegistered (attrib.Name()).
@@ -534,10 +509,8 @@ const char* TiXmlElement::Parse( const char* p )
 }
 
 
-const char* TiXmlElement::ReadValue( const char* p )
+const char* TiXmlElement::ReadValue( TiDocument* document, const char* p )
 {
-	TiDocument* document = GetDocument();
-
 	// Read in text and elements in any order.
 	p = SkipWhiteSpace( p );
 	while ( p && *p )
@@ -549,11 +522,11 @@ const char* TiXmlElement::ReadValue( const char* p )
 
 			if ( !textNode )
 			{
-				if ( document ) document->SetError( TIXML_ERROR_OUT_OF_MEMORY );
+				document->SetError( TIXML_ERROR_OUT_OF_MEMORY );
 				    return 0;
 			}
 
-			p = textNode->Parse( p );
+			p = textNode->Parse( document, p );
 
 			if ( !textNode->Blank() )
 				LinkEndChild( textNode );
@@ -566,11 +539,11 @@ const char* TiXmlElement::ReadValue( const char* p )
 
 			if ( !cdataNode )
 			{
-				if ( document ) document->SetError( TIXML_ERROR_OUT_OF_MEMORY );
+				document->SetError( TIXML_ERROR_OUT_OF_MEMORY );
 				    return 0;
 			}
 
-			p = cdataNode->Parse( p );
+			p = cdataNode->Parse( document, p );
 
 			if ( !cdataNode->Blank() )
 				LinkEndChild( cdataNode );
@@ -587,10 +560,10 @@ const char* TiXmlElement::ReadValue( const char* p )
 			}
 			else
 			{
-				TiDocumentNode* node = Identify( p );
+				TiDocumentNode* node = Identify( document, p );
 				if ( node )
 				{
-					p = node->Parse( p );
+					p = node->Parse( document, p );
 					LinkEndChild( node );
 				}				
 				else
@@ -604,19 +577,18 @@ const char* TiXmlElement::ReadValue( const char* p )
 
 	if ( !p )
 	{
-		if ( document ) document->SetError( TIXML_ERROR_READING_ELEMENT_VALUE );
+		document->SetError( TIXML_ERROR_READING_ELEMENT_VALUE );
 	}	
 	return p;
 }
 
 
-const char* TiXmlUnknown::Parse( const char* p )
+const char* TiXmlUnknown::Parse( TiDocument* document, const char* p )
 {
-	TiDocument* document = GetDocument();
 	p = SkipWhiteSpace( p );
 	if ( !p || !*p || *p != '<' )
 	{
-		if ( document ) document->SetError( TIXML_ERROR_PARSING_UNKNOWN );
+		document->SetError( TIXML_ERROR_PARSING_UNKNOWN );
 		return 0;
 	}
 	++p;
@@ -630,16 +602,15 @@ const char* TiXmlUnknown::Parse( const char* p )
 
 	if ( !p )
 	{
-		if ( document )	document->SetError( TIXML_ERROR_PARSING_UNKNOWN );
+		document->SetError( TIXML_ERROR_PARSING_UNKNOWN );
 	}
 	if ( *p == '>' )
 		return p+1;
 	return p;
 }
 
-const char* TiXmlComment::Parse( const char* p )
+const char* TiXmlComment::Parse( TiDocument* document, const char* p )
 {
-	TiDocument* document = GetDocument();
 	value = "";
 
 	p = SkipWhiteSpace( p );
@@ -668,7 +639,7 @@ const char* TiDocumentAttribute::Parse( TiDocument* document, const char* p )
 
 	if ( !p || !*p )
 	{
-		if ( document ) document->SetError( TIXML_ERROR_READING_ATTRIBUTES );
+		document->SetError( TIXML_ERROR_READING_ATTRIBUTES );
 		return 0;
 	}
 
@@ -679,7 +650,7 @@ const char* TiDocumentAttribute::Parse( TiDocument* document, const char* p )
 	p = TiXmlBase::SkipWhiteSpace( p );
 	if ( !p || !*p || *p != '=' )
 	{
-		if ( document ) document->SetError( TIXML_ERROR_READING_ATTRIBUTES );
+		document->SetError( TIXML_ERROR_READING_ATTRIBUTES );
 		return 0;
 	}
 
@@ -687,7 +658,7 @@ const char* TiDocumentAttribute::Parse( TiDocument* document, const char* p )
 	p = TiXmlBase::SkipWhiteSpace( p );
 	if ( !p || !*p )
 	{
-		if ( document ) document->SetError( TIXML_ERROR_READING_ATTRIBUTES );
+		document->SetError( TIXML_ERROR_READING_ATTRIBUTES );
 		return 0;
 	}
 	
@@ -726,7 +697,7 @@ const char* TiDocumentAttribute::Parse( TiDocument* document, const char* p )
 	return p;
 }
 
-const char* TiXmlText::Parse( const char* p )
+const char* TiXmlText::Parse( TiDocument*, const char* p )
 {
 	value = "";
 
@@ -741,7 +712,7 @@ const char* TiXmlText::Parse( const char* p )
 	return 0;
 }
 
-const char* TiXmlCData::Parse( const char* p )
+const char* TiXmlCData::Parse( TiDocument*, const char* p )
 {
 	value = "";
 
@@ -757,15 +728,14 @@ const char* TiXmlCData::Parse( const char* p )
 	return 0;
 }
 
-const char* TiXmlDeclaration::Parse( const char* p )
+const char* TiXmlDeclaration::Parse( TiDocument* document, const char* p )
 {
 	p = SkipWhiteSpace( p );
 	// Find the beginning, find the end, and look for
 	// the stuff in-between.
-	TiDocument* document = GetDocument();
 	if ( !p || !*p || !StringEqual( p, "<?xml") )
 	{
-		if ( document ) document->SetError( TIXML_ERROR_PARSING_DECLARATION );
+		document->SetError( TIXML_ERROR_PARSING_DECLARATION );
 		return 0;
 	}
 

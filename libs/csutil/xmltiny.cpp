@@ -543,7 +543,7 @@ const char* csTinyXmlDocument::Parse (const char* buf)
   CreateRoot ();
   TiDocument* doc = (TiDocument*)(((csTinyXmlNode*)(iDocumentNode*)root)
   	->GetTiNode ());
-  doc->Parse (buf);
+  doc->Parse (doc, buf);
   if (doc->Error ())
     return doc->ErrorDesc ();
   return NULL;
