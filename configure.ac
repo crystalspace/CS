@@ -490,7 +490,19 @@ CS_CHECK_BUILD([if python SDK is usable], [cs_cv_python],
     [$cs_cv_python_base_cflags], [$cs_cv_python_base_lflags],
     [$cs_cv_python_base_libs])
 
+#------------------------------------------------------------------------------
+# Use the CXXFLAGS and CFLAGS passed to configure
+#------------------------------------------------------------------------------
 
+# autoconf has some stupid defaults :-( so we need to filter all -O and -g
+# flags here
+CFLAGS=`echo "$CFLAGS" | sed 's/\-O.//g;s/\-g.//g'`
+CXXFLAGS=`echo "$CXXFLAGS" | sed 's/\-O.//g;s/-g.//g'`
+
+# append CPPFLAGS to both CFLAGS and CXXFLAGS
+CS_BUILD_PROPERTY([CFLAGS.SYSTEM],[$CPPFLAGS $CFLAGS])
+CS_BUILD_PROPERTY([CXXFLAGS.SYSTEM], [$CPPFLAGS $CXXFLAGS])
+CS_BUILD_PROPERTY([LIBS.SYSTEM], [$LDFLAGS])
 
 #------------------------------------------------------------------------------
 # Check how to enable compilation warnings.  Note that on some platforms, it is

@@ -3927,12 +3927,12 @@ else
   (exit $ac_status); }`
 	    cs_cv_python_base_libs=`{ (echo "$as_me:$LINENO: \$PYTHON -c \\
 		'import distutils.sysconfig ; \\
-		print distutils.sysconfig.get_config_var(\"LIBS\") + \" \" + \\
-		distutils.sysconfig.get_config_var(\"SYSLIBS\")'") >&5
+		print (distutils.sysconfig.get_config_var(\"LIBS\") or \"\") + \" \" + \\
+		(distutils.sysconfig.get_config_var(\"SYSLIBS\") or \"\")'") >&5
   ($PYTHON -c \
 		'import distutils.sysconfig ; \
-		print distutils.sysconfig.get_config_var("LIBS") + " " + \
-		distutils.sysconfig.get_config_var("SYSLIBS")') 2>&5
+		print (distutils.sysconfig.get_config_var("LIBS") or "") + " " + \
+		(distutils.sysconfig.get_config_var("SYSLIBS") or "")') 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }`
@@ -4407,7 +4407,28 @@ else
 fi
 
 
+#------------------------------------------------------------------------------
+# Use the CXXFLAGS and CFLAGS passed to configure
+#------------------------------------------------------------------------------
 
+# autoconf has some stupid defaults :-( so we need to filter all -O and -g
+# flags here
+CFLAGS=`echo "$CFLAGS" | sed 's/\-O.//g;s/\-g.//g'`
+CXXFLAGS=`echo "$CXXFLAGS" | sed 's/\-O.//g;s/-g.//g'`
+
+# append CPPFLAGS to both CFLAGS and CXXFLAGS
+cs_makefile_text="${cs_makefile_text}CFLAGS.SYSTEM = $CPPFLAGS $CFLAGS
+"
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS ?= \"$CPPFLAGS $CFLAGS\" ;
+"
+cs_makefile_text="${cs_makefile_text}CXXFLAGS.SYSTEM = $CPPFLAGS $CXXFLAGS
+"
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS ?= \"$CPPFLAGS $CXXFLAGS\" ;
+"
+cs_makefile_text="${cs_makefile_text}LIBS.SYSTEM = $LDFLAGS
+"
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS ?= \"$LDFLAGS\" ;
+"
 
 #------------------------------------------------------------------------------
 # Check how to enable compilation warnings.  Note that on some platforms, it is
