@@ -93,6 +93,7 @@ private:
 
   int asp_center_x, asp_center_y;
   float aspect;
+  bool needProjectionUpdate;
   float fov;
   int viewwidth, viewheight;
   csPoly3D frustum;
@@ -202,6 +203,7 @@ private:
   void SetupClipper (int clip_portal, int clip_plane, int clip_z_plane);
 
   void ApplyObjectToCamera ();
+  void SetupProjection ();
 
   void CacheTexture(iTextureHandle* itex);
 
@@ -289,6 +291,7 @@ public:
     asp_center_x = x;
     asp_center_y = y;
     frustum_valid = false;
+    needProjectionUpdate = true;
   }
   
   /// Get center of projection.
@@ -303,6 +306,7 @@ public:
   {
     csGLGraphics3D::aspect = aspect;
     frustum_valid = false;
+    needProjectionUpdate = true;
   }
 
   /// Get perspective aspect.

@@ -24,6 +24,9 @@ chronological order.
 	- res fixed a GCC warning in the PS1 plugin.
 	- res fixed glrender3d to use the actual perspective center instead
 	  of a hardcoded "center of screen".
+	- res changed glrender3d to set up the projection matrix lazily. Also
+	  updates this matrix when the perspective center or aspect changes
+	  (which can happen if multiple views are drawn subsequently).
 29-Mar-2004
 	- Jorrit changed the NR null3d renderer so it uses the soft canvas
 	  instead of the OpenGL canvas by default.

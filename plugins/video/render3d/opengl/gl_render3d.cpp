@@ -616,6 +616,26 @@ void csGLGraphics3D::ApplyObjectToCamera ()
   glTranslatef (-translation.x, -translation.y, -translation.z);
 }
 
+void csGLGraphics3D::SetupProjection ()
+{
+  if (!needProjectionUpdate) return;
+
+  glMatrixMode (GL_PROJECTION);
+  glLoadIdentity ();
+  SetGlOrtho (false);
+  glTranslatef (asp_center_x, asp_center_y, 0);
+
+  GLfloat matrixholder[16];
+  for (int i = 0 ; i < 16 ; i++) matrixholder[i] = 0.0;
+  matrixholder[0] = matrixholder[5] = 1.0;
+  matrixholder[11] = 1.0/aspect;
+  matrixholder[14] = -matrixholder[11];
+  glMultMatrixf (matrixholder);
+
+  glMatrixMode (GL_MODELVIEW);
+  needProjectionUpdate = false;
+}
+
 ////////////////////////////////////////////////////////////////////
 // iGraphics3D
 ////////////////////////////////////////////////////////////////////
@@ -1103,18 +1123,8 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
 
   if (drawflags & CSDRAW_3DGRAPHICS)
   {
-    glMatrixMode (GL_PROJECTION);
-    glLoadIdentity ();
-    SetGlOrtho (false);
     glViewport (0, 0, viewwidth, viewheight);
-    glTranslatef (asp_center_x, asp_center_y, 0);
-
-    GLfloat matrixholder[16];
-    for (int i = 0 ; i < 16 ; i++) matrixholder[i] = 0.0;
-    matrixholder[0] = matrixholder[5] = 1.0;
-    matrixholder[11] = 1.0/aspect;
-    matrixholder[14] = -matrixholder[11];
-    glMultMatrixf (matrixholder);
+    needProjectionUpdate = true;
 
     glMatrixMode (GL_MODELVIEW);
     glLoadIdentity ();
@@ -1595,6 +1605,8 @@ void csGLGraphics3D::SetTextureState (int* units, iTextureHandle** textures,
 void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh,
   const CS_SHADERVAR_STACK &stacks)
 {
+  SetupProjection ();
+
   SetupClipper (mymesh->clip_portal, 
                 mymesh->clip_plane, 
                 mymesh->clip_z_plane);
