@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2000 by W.C.A. Wijngaards
+    Copyright (C) 2004 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -77,6 +78,7 @@ public:
   void SetParticleCount (int num)
   {
     SetCount (num);
+    scfiObjectModel.ShapeChanged ();
   }
   /// Get the number of particles used.
   int GetParticleCount () const { return ParticleCount; }

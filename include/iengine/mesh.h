@@ -72,11 +72,21 @@ class csFlags;
 #define CS_ENTITY_CAMERA 4
 
 /**
+ * If CS_ENTITY_INVISIBLEMESH is set then this thing will not be
+ * rendered. It will still cast shadows and be present otherwise.
+ * Use the CS_ENTITY_NOSHADOWS flag to disable shadows. Using this
+ * flag does NOT automatically imply that HitBeam() will ignore this
+ * mesh. For that you need to set CS_ENTITY_NOHITBEAM.
+ */
+#define CS_ENTITY_INVISIBLEMESH 8
+
+/**
  * If CS_ENTITY_INVISIBLE is set then this thing will not be rendered.
  * It will still cast shadows and be present otherwise. Use the
- * CS_ENTITY_NOSHADOWS flag to disable shadows.
+ * CS_ENTITY_NOSHADOWS flag to disable shadows. Making a mesh invisible
+ * will also imply that HitBeam() will ignore it.
  */
-#define CS_ENTITY_INVISIBLE 8
+#define CS_ENTITY_INVISIBLE (CS_ENTITY_INVISIBLEMESH+CS_ENTITY_NOHITBEAM)
 
 /**
  * If CS_ENTITY_NOSHADOWS is set then this thing will not cast
@@ -91,6 +101,13 @@ class csFlags;
  * to disable that.
  */
 #define CS_ENTITY_NOLIGHTING 32
+
+/**
+ * If CS_ENTITY_NOHITBEAM is set then this thing will not react to
+ * HitBeam calls.
+ */
+#define CS_ENTITY_NOHITBEAM 64
+
 /** @} */
 
 /** \name SetLightingUpdate flags

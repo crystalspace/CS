@@ -40,6 +40,29 @@ chronological order.
 	  this I discovered that the image loader plugins are not working.
 	- Jorrit fixed a compile error in the image loader multiplexer. This
 	  fixes CS again.
+	- Jorrit added CS_ENTITY_INVISIBLEMESH and CS_ENTITY_NOHITBEAM flags.
+	  The first flag controls the visibility of the mesh (ONLY the
+	  visibility of the mesh, HitBeam() is not affected). The second flag
+	  controls if HitBeam() will hit the mesh. The original
+	  CS_ENTITY_INVISIBLE flag is redefined as a combination of
+	  CS_ENTITY_INVISIBLEMESH and CS_ENTITY_NOHITBEAM.
+	- Jorrit added equivalent flags to the loader: 'invisiblemesh'
+	  and 'nohitbeam'.
+	- Jorrit modified the culler plugins to respect the new
+	  CS_ENTITY_NOHITBEAM flag. They will ignore CS_ENTITY_INVISIBLEMESH.
+	- Jorrit modified the engine to respect CS_ENTITY_INVISIBLEMESH and
+	  ignore CS_ENTITY_NOHITBEAM (for drawing).
+	- Jorrit modified the engine to respect CS_ENTITY_NOHITBEAM when
+	  calculating intersections.
+	- Jorrit fixed the visibility cullers so that they now respect the
+	  CS_ENTITY_INVISIBLEMESH flag when doing visibility culling. Previously
+	  the engine had to do that later on after the visibility culler did
+	  its job. This even fixes a bug with Dynavis where an invisible mesh
+	  would still contribute to culling.
+	- Jorrit did a significant change in the way visibility of child
+	  meshes is handled. A child mesh is no longer considered to be
+	  automatically invisible when the parent is invisible. You have to
+	  set the invisible flag individually on every child if you want that.
 17-Mar-2004
 	- Duhprey added a simple terraformer loader plugin
 	- Eric Sunshine fixed copy/paste error in terraformer loader makefile

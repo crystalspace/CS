@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2000-2004 by Jorrit Tyberghein
     (C) W.C.A. Wijngaards, 2000
 
     This library is free software; you can redistribute it and/or

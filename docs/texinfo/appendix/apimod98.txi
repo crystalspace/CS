@@ -1411,3 +1411,19 @@ Should be changed to:
 csRef<iFont> font = fontserver->LoadFont ("myfont.ttf", 23);
 g2d->Write (font, @dots{});
 @end example
+
+@subheading Mesh flag change
+@cindex @code{CS_ENTITY_INVISIBLE}
+@cindex @code{CS_ENTITY_INVISIBLEMESH}
+@cindex @code{CS_ENTITY_NOHITBEAM}
+
+There is a new flag @code{CS_ENTITY_INVISIBLEMESH} which controls visibility
+(and ONLY visibility) of a mesh. There is also a new flag
+@code{CS_ENTITY_NOHITBEAM} which controls if calling @code{HitBeam()} will
+ever return that mesh. The old @code{CS_ENTITY_INVISIBLE} has been changed
+so that it is now a combination of both flags.
+
+An important change is that setting the @code{CS_ENTITY_INVISIBLEMESH} flag
+on a parent in a hierarchy will no longer make the children invisible. You
+now have to set the invisible flag manually on all children in the hierarchy.
+

@@ -1250,6 +1250,9 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   if (obj->last_visible_vistestnr == current_vistest_nr)
     return true;
 
+  if (obj->mesh && obj->mesh->GetFlags ().Check (CS_ENTITY_INVISIBLEMESH))
+    return false;
+
   iCamera* camera = data->rview->GetCamera ();
   const csReversibleTransform& camtrans = camera->GetTransform ();
   iMovable* movable = obj->visobj->GetMovable ();
@@ -2078,7 +2081,7 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode, void* userdata,
         // This object is possibly intersected by this beam.
 	if (visobj_wrap->mesh)
 	{
-	  if (!visobj_wrap->mesh->GetFlags ().Check (CS_ENTITY_INVISIBLE))
+	  if (!visobj_wrap->mesh->GetFlags ().Check (CS_ENTITY_NOHITBEAM))
 	  {
 	    // Transform our vector to object space.
 	    csVector3 obj_start;

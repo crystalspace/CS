@@ -285,7 +285,7 @@ const csArray<iLight*>& csMeshWrapper::GetRelevantLights (int /*maxLights*/,
 
 void csMeshWrapper::Draw (iRenderView *rview)
 {
-  if (flags.Check (CS_ENTITY_INVISIBLE)) return;
+  if (flags.Check (CS_ENTITY_INVISIBLEMESH)) return;
   if (csParent && !csParent->IsChildVisible (&scfiMeshWrapper, rview)) return;
   DrawInt (rview);
 }
@@ -420,8 +420,6 @@ bool csMeshWrapper::CheckImposterRelevant (iRenderView *rview)
 
 bool csMeshWrapper::IsChildVisible (iMeshWrapper* child, iRenderView* rview)
 {
-  if (flags.Check (CS_ENTITY_INVISIBLE)) return false;
-
   if (static_lod)
   {
     uint32 visnr = ((csSector::eiSector*)rview->GetThisSector ())->

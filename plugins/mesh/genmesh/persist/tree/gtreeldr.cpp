@@ -727,9 +727,6 @@ csPtr<iBase> csGeneralTreeFactoryLoader::Parse (
   construction->AddConstructionObject (0, csReversibleTransform (),
   	6, vtidx, 0, co_tree);
 #endif
-printf ("tri:%d vt:%d\n", construction->GetTriangleCount (),
-		construction->GetVertexCount ());
-
   state->SetVertexCount (construction->GetVertexCount ());
   csVector3* vt = state->GetVertices ();
   memcpy (vt, construction->GetVertices (),

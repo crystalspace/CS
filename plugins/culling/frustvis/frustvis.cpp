@@ -367,6 +367,9 @@ bool csFrustumVis::TestObjectVisibility (csFrustVisObjectWrapper* obj,
 {
   if (obj->last_visible_vistest_nr != current_vistest_nr)
   {
+    if (obj->mesh && obj->mesh->GetFlags ().Check (CS_ENTITY_INVISIBLEMESH))
+      return false;
+
     const csBox3& obj_bbox = obj->child->GetBBox ();
     if (obj_bbox.Contains (data->pos))
     {
@@ -847,7 +850,7 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode,
         // This object is possibly intersected by this beam.
 	if (visobj_wrap->mesh)
 	{
-	  if (!visobj_wrap->mesh->GetFlags ().Check (CS_ENTITY_INVISIBLE))
+	  if (!visobj_wrap->mesh->GetFlags ().Check (CS_ENTITY_NOHITBEAM))
 	  {
 	    // Transform our vector to object space.
 	    csVector3 obj_start;

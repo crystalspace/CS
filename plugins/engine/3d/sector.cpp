@@ -466,7 +466,7 @@ int csSector::IntersectSegment (
   {
     iVisibilityObject* vo = visit->Next ();
     iMeshWrapper* mesh = vo->GetMeshWrapper ();
-    if (!mesh || mesh->GetFlags ().Check (CS_ENTITY_INVISIBLE)) continue;
+    if (!mesh || mesh->GetFlags ().Check (CS_ENTITY_NOHITBEAM)) continue;
 
     // Only operate on portal objects.
     if (!mesh->GetPortalContainer ()) continue;

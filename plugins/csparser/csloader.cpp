@@ -957,6 +957,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("hardmove", XMLTOKEN_HARDMOVE);
   xmltokens.Register ("heightgen", XMLTOKEN_HEIGHTGEN);
   xmltokens.Register ("influenceradius", XMLTOKEN_INFLUENCERADIUS);
+  xmltokens.Register ("invisiblemesh", XMLTOKEN_INVISIBLEMESH);
   xmltokens.Register ("invisible", XMLTOKEN_INVISIBLE);
   xmltokens.Register ("keepimage", XMLTOKEN_KEEPIMAGE);
   xmltokens.Register ("key", XMLTOKEN_KEY);
@@ -984,6 +985,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("noshadows", XMLTOKEN_NOSHADOWS);
   xmltokens.Register ("notclosed", XMLTOKEN_NOTCLOSED);
   xmltokens.Register ("notconvex", XMLTOKEN_NOTCONVEX);
+  xmltokens.Register ("nohitbeam", XMLTOKEN_NOHITBEAM);
   xmltokens.Register ("nullmesh", XMLTOKEN_NULLMESH);
   xmltokens.Register ("params", XMLTOKEN_PARAMS);
   xmltokens.Register ("paramsfile", XMLTOKEN_PARAMSFILE);
@@ -2437,6 +2439,14 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
     case XMLTOKEN_NOSHADOWS:
       TEST_MISSING_MESH
       mesh->GetFlags().Set (CS_ENTITY_NOSHADOWS);
+      break;
+    case XMLTOKEN_NOHITBEAM:
+      TEST_MISSING_MESH
+      mesh->GetFlags().Set (CS_ENTITY_NOHITBEAM);
+      break;
+    case XMLTOKEN_INVISIBLEMESH:
+      TEST_MISSING_MESH
+      mesh->GetFlags().Set (CS_ENTITY_INVISIBLEMESH);
       break;
     case XMLTOKEN_INVISIBLE:
       TEST_MISSING_MESH
