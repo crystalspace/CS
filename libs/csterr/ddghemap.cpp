@@ -284,12 +284,13 @@ bool ddgHeightMap::readTGN(char *file)
 	{
 		char s;
 		int i;
+		char* _pixchar = (char*)_pixbuffer;
 
 		for (i = 0; i < 2 * _rows * _cols; i=i+2)
 		{
-			s = _pixbuffer[i];
-			_pixbuffer[i] = _pixbuffer[i+1];
-			_pixbuffer[i+1] = s;
+			s = _pixchar[i];
+			_pixchar[i] = _pixchar[i+1];
+			_pixchar[i+1] = s;
 		}
 	}
 
