@@ -66,6 +66,10 @@ W - Wishlist (the build also works without this feature)
     might be wise to scan the file for common problems, such as error messages
     (denoted by "!") and warnings (such as the common 'hbox' warning) and
     present those messages to the user.
+[L] The dvi, ps, pdf documentation rules name the resulting file
+    cs-unix.{dvi,ps,pdf} rather than crystalspace.{dvi,ps,pdf}.
+[L] The info rule names the resulting file crystal.info, rather than
+    crystalspace.info.
 [L] Add support to create Microsoft CHM format documentation packages.
 
 [W] See if there's a way to create some suitable MSVC templates for external
