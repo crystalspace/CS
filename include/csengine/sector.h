@@ -362,7 +362,7 @@ public:
   void ShineLights (csThing*, csProgressPulse* = 0);
 
   CSOBJTYPE;
-  DECLARE_IBASE_EXT (csSector);
+  DECLARE_IBASE_EXT (csPolygonSet);
 
   //------------------------- iSector interface -------------------------------
   struct SectorInterface : public iSector
