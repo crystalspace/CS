@@ -33,7 +33,8 @@ following sections for information about how to obtain them.
 Note that all libraries except @code{zlib} are optional. CrystalSpace will
 compile and work, but not all plugins will be available.
 
-@subheading The ``cs-win32libs'' package
+@subheading The ``cs-win32libs'' Package
+@anchor{cs-win32libs}
 
 Microsoft Visual C++ 6 and above, MinGW/MSYS and Cygwin users can download a 
 single package which contains all headers, pre-built library files, and dynamic 

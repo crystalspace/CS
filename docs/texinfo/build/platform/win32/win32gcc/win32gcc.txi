@@ -41,8 +41,7 @@ the question marks stand for the actual version number.
 The most recent Crystal Space Win32 Libs package.  This package provides a
 minimal set of additional resources needed to build Crystal Space, such as
 zlib, libpng, libjpeg, @sc{ode} @sc{sdk}, Python @sc{sdk}, @sc{nasm}, the
-Netwide Assembler, etc.  
-To obtain the package @pxref{The ``cs-win32libs'' package}.
+Netwide Assembler, etc.  @xref{cs-win32libs}.
 @end itemize
 
 @subsubheading Installation

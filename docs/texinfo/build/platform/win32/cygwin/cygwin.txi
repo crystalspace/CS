@@ -167,8 +167,7 @@ installation process.
 @subsubheading Using cs-win32libs
 
 You can use the ``cs-win32libs'' package to obtain the third-party libraries
-to build Crystal Space.  To obtain the package 
-@pxref{The ``cs-win32libs'' package}.
+to build Crystal Space.  @xref{cs-win32libs}.
 
 You may want to select ``Cygwin typical'' in the ``Select Components'' screen. 
 You can further adjust the selection of installed components depending on your 

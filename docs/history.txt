@@ -29,6 +29,8 @@ chronological order.
 	  so there should be no need to do so again in win32.mak.  If there is
 	  some configuration in which this is failing, please report so that it
 	  can be fixed correctly.
+	- Eric Sunshine fixed a number of Texinfo errors in the CS manual which
+	  were introduced yesterday.
 20-Mar-2004
 	- Anders Stenberg fixed procedural textures in NR. Visit for
 	  textures wasn't called, and is now called on access in the shader

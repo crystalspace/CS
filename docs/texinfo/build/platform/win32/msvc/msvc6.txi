@@ -34,7 +34,7 @@ Before you attempt to compile Crystal Space, you must download
 and install the ``cs-win32libs'' archive.  This archive contains alot of the
 third party header, pre-built libraries and dll files used by Crystal
 Space, i.e. @file{libz.dll}, @file{libjpeg.dll}, @file{libpng.dll}, etc.
-To obtain the package @pxref{The ``cs-win32libs'' package}.
+@xref{cs-win32libs}.
 
 Once you have downloaded the cs-win32libs package, execute the binary and
 follow the setup instructions.  You may want to select ``VC typical'' in the
@@ -471,7 +471,7 @@ have the @file{zlib.dll} installed, the @sc{vfs} plugin is dependent upon it.
 
 If you have previously used the @file{msvc_libs} package, it's recommended you
 remove it before installing the @file{cs-win32libs} package as outlined above.
-Unfortunately, the @file{msvc_libs} package was a simple @sc{ZIP} file with no
+Unfortunately, the @file{msvc_libs} package was a simple @sc{zip} file with no
 means of uninstalling whatsoever. However, the header and library files were
 located in the @file{include\cssys\win32} resp. @file{libs\cssys\win32\cssys}
 directories, but as the @code{cssys} library has been merged into @code{csutil},
