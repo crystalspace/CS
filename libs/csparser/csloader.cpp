@@ -67,19 +67,25 @@
 
 //---------------------------------------------------------------------------
 
-class csLoaderStat
+class csLoaderStats
 {
 public:
-  static int polygons_loaded;
-  static int portals_loaded;
-  static int sectors_loaded;
-  static int things_loaded;
-  static int lights_loaded;
-  static int curves_loaded;
-  static int meshes_loaded;
-  static int terrains_loaded;
-  static int sounds_loaded;
-  static void Init()
+  int polygons_loaded;
+  int portals_loaded;
+  int sectors_loaded;
+  int things_loaded;
+  int lights_loaded;
+  int curves_loaded;
+  int meshes_loaded;
+  int terrains_loaded;
+  int sounds_loaded;
+
+  csLoaderStats()
+  {
+    Init();
+  }
+
+  void Init()
   {
     polygons_loaded = 0;
     portals_loaded  = 0;
@@ -87,21 +93,11 @@ public:
     things_loaded   = 0;
     lights_loaded   = 0;
     curves_loaded   = 0;
-    meshes_loaded  = 0;
-    terrains_loaded  = 0;
+    meshes_loaded   = 0;
+    terrains_loaded = 0;
     sounds_loaded   = 0;
   }
 };
-
-int csLoaderStat::polygons_loaded = 0;
-int csLoaderStat::portals_loaded  = 0;
-int csLoaderStat::sectors_loaded  = 0;
-int csLoaderStat::things_loaded   = 0;
-int csLoaderStat::lights_loaded   = 0;
-int csLoaderStat::curves_loaded   = 0;
-int csLoaderStat::meshes_loaded  = 0;
-int csLoaderStat::terrains_loaded = 0;
-int csLoaderStat::sounds_loaded   = 0;
 
 // Define all tokens used through this file
 CS_TOKEN_DEF_START
@@ -307,16 +303,16 @@ bool csLoader::load_color (char *buf, csRGBcolor &c)
 
 csMaterialWrapper *csLoader::FindMaterial (const char *iName, bool onlyRegion)
 {
-  csMaterialWrapper *mat = Engine->GetCsEngine()->FindCsMaterial (iName, onlyRegion);
+  iMaterialWrapper *mat = Engine->FindMaterial (iName, onlyRegion);
   if (mat)
-    return mat;
+    return mat->GetPrivateObject();
 
-  csTextureWrapper *tex = Engine->GetCsEngine()->FindCsTexture (iName, onlyRegion);
+  iTextureWrapper *tex = Engine->FindTexture (iName, onlyRegion);
   if (tex)
   {
     // Add a default material with the same name as the texture
     csMaterial *material = new csMaterial ();
-    material->SetTextureWrapper (tex);
+    material->SetTextureWrapper (tex->GetPrivateObject());
     csMaterialWrapper *mat = Engine->GetCsEngine()->GetMaterials ()->NewMaterial (material);
     mat->SetName (iName);
     material->DecRef ();
@@ -438,7 +434,7 @@ csStatLight* csLoader::load_statlight (char* name, char* buf)
   long cmd;
   char* params;
 
-  csLoaderStat::lights_loaded++;
+  Stats->lights_loaded++;
   float x, y, z, dist = 0, r, g, b;
   int cnt;
   int dyn, attenuation = CS_ATTN_LINEAR;
@@ -830,7 +826,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
   csSector* sector = new csSector (Engine->GetCsEngine()) ;
   sector->SetName (secname);
 
-  csLoaderStat::sectors_loaded++;
+  Stats->sectors_loaded++;
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
@@ -905,7 +901,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
 
 //---------------------------------------------------------------------------
 
-static void ResolvePortalSectors (csEngine* Engine, bool onlyRegion,
+static void ResolvePortalSectors (iEngine* Engine, bool onlyRegion,
 	csThing* ps)
 {
   for (int i=0;  i < ps->GetNumPolygons ();  i++)
@@ -1130,7 +1126,7 @@ bool csLoader::LoadMapFile (const char* file)
 
 bool csLoader::AppendMapFile (const char* file, bool onlyRegion)
 {
-  csLoaderStat::Init ();
+  Stats->Init ();
 
   iDataBuffer *buf = System->VFS->ReadFile (file);
 
@@ -1154,15 +1150,15 @@ bool csLoader::AppendMapFile (const char* file, bool onlyRegion)
   if (!LoadMap (**buf, onlyRegion))
     return false;
 
-  if (csLoaderStat::polygons_loaded)
+  if (Stats->polygons_loaded)
   {
     CsPrintf (MSG_INITIALIZATION, "Loaded map file:\n");
-    CsPrintf (MSG_INITIALIZATION, "  %d polygons (%d portals),\n", csLoaderStat::polygons_loaded,
-      csLoaderStat::portals_loaded);
-    CsPrintf (MSG_INITIALIZATION, "  %d sectors, %d things, %d meshes, \n", csLoaderStat::sectors_loaded,
-      csLoaderStat::things_loaded, csLoaderStat::meshes_loaded);
-    CsPrintf (MSG_INITIALIZATION, "  %d curves, %d lights, %d sounds.\n", csLoaderStat::curves_loaded,
-      csLoaderStat::lights_loaded, csLoaderStat::sounds_loaded);
+    CsPrintf (MSG_INITIALIZATION, "  %d polygons (%d portals),\n", Stats->polygons_loaded,
+      Stats->portals_loaded);
+    CsPrintf (MSG_INITIALIZATION, "  %d sectors, %d things, %d meshes, \n", Stats->sectors_loaded,
+      Stats->things_loaded, Stats->meshes_loaded);
+    CsPrintf (MSG_INITIALIZATION, "  %d curves, %d lights, %d sounds.\n", Stats->curves_loaded,
+      Stats->lights_loaded, Stats->sounds_loaded);
   } /* endif */
 
   buf->DecRef ();
@@ -1419,7 +1415,7 @@ bool csLoader::LoadSounds (char* buf)
           if (s)
           {
             Engine->GetCsEngine()->ObjAdd(s);
-            csLoaderStat::sounds_loaded++;
+            Stats->sounds_loaded++;
           }
         }
       }
@@ -1727,7 +1723,7 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
   str[0] = 0;
   char priority[255]; priority[0] = 0;
 
-  csLoaderStat::meshes_loaded++;
+  Stats->meshes_loaded++;
   iLoaderPlugIn* plug = NULL;
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
@@ -2000,7 +1996,7 @@ bool csLoader::LoadTerrainObject (csTerrainWrapper *pWrapper,
   char *pStr = new char[255];
   pStr[0] = 0;
 
-  csLoaderStat::terrains_loaded++;
+  Stats->terrains_loaded++;
   iLoaderPlugIn* iPlugIn = NULL;
 
   while ((cmd = csGetObject (&pBuf, commands, &name, &params) ) > 0)
@@ -2406,6 +2402,7 @@ csLoader::csLoader(iBase *p)
 
   flags = 0;
   onlyRegion = false;
+  Stats = new csLoaderStats();
 }
 
 csLoader::~csLoader()
@@ -2416,6 +2413,7 @@ csLoader::~csLoader()
   DEC_REF(Engine);
   DEC_REF(G3D);
   DEC_REF(SoundRender);
+  delete Stats;
 }
 
 #define GET_PLUGIN(var, func, intf, msgname)		\

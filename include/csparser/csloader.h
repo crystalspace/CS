@@ -93,6 +93,8 @@ class csLoader : public iLoader
   int flags;
   /// If true the we only load in the current region
   bool onlyRegion;
+  /// Statistics
+  class csLoaderStats *Stats;
   
   /// Parse a matrix definition
   bool load_matrix (char* buf, csMatrix3 &m);
