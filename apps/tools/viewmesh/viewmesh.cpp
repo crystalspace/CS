@@ -54,7 +54,7 @@
 #include "igraphic/imageio.h"
 #include "imap/parser.h"
 #include "ivaria/reporter.h"
-#include "isys/vfs.h"
+#include "iutil/vfs.h"
 
 CS_IMPLEMENT_APPLICATION
 

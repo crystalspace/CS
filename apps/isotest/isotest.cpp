@@ -47,8 +47,8 @@
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
 #include "genmaze.h"
-#include "isys/plugin.h"
-#include "isys/vfs.h"
+#include "iutil/plugin.h"
+#include "iutil/vfs.h"
 #include "iengine/material.h"
 
 CS_IMPLEMENT_APPLICATION

@@ -26,18 +26,12 @@
 #include "csutil/csstrvec.h"
 #include "csutil/csobjvec.h"
 #include "csutil/typedvec.h"
-#include "isys/vfs.h"
-#include "isys/plugin.h"
+#include "iutil/vfs.h"
+#include "iutil/plugin.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/config.h"
 #include "iutil/objreg.h"
-
-struct iGraphics3D;
-struct iGraphics2D;
-struct iConfig;
-struct iConfigManager;
-class csPluginList;
 
 /**
  * This is the interface to operating system.<p>
@@ -56,190 +50,23 @@ class csPluginList;
  */
 class csSystemDriver : public iBase
 {
-  friend class csPluginList;
   friend class SysSystemDriver;
-
-private:
-  /*
-   * This is a private structure used to keep the list of plugins.
-   */
-  class csPlugin
-  {
-  public:
-    // The plugin itself
-    iComponent *Plugin;
-    // The class ID of the plugin, and their functionality ID
-    char *ClassID, *FuncID;
-
-    // Construct the object that represents a plugin
-    csPlugin (iComponent *iObject, const char *iClassID, const char *iFuncID);
-    // Free storage
-    virtual ~csPlugin ();
-  };
-
-  /*
-   * This is a superset of csVector that can find by pointer a plugin.
-   */
-  class csPluginsVector : public csVector
-  {
-  public:
-    // Create the vector
-    csPluginsVector (int iLimit, int iDelta) : csVector (iLimit, iDelta) {}
-    // Find a plugin either by its address or by his function ID
-    virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const
-    {
-      if (Mode == 0)
-        return ((csPlugin *)Item)->Plugin == Key ? 0 : 1;
-      else
-        return ((csPlugin *)Item)->FuncID
-	     ? strcmp (((csPlugin *)Item)->FuncID, (char *)Key)
-             : ((csPlugin *)Item)->FuncID == Key ? 0 : 1;
-    }
-    // Overrided Get() to avoid typecasts
-    csPlugin *Get (int idx)
-    { return (csPlugin *)csVector::Get (idx); }
-    
-    virtual bool FreeItem (csSome Item)
-    { delete (csPlugin*)Item; return true; }
-  };
-
-  /*
-   * Class to collect all options for all plug-in modules in the system.
-   */
-  class csPluginOption
-  {
-  public:
-    char *Name;
-    csVariantType Type;
-    int ID;
-    bool Value;				// If Type is CSVAR_BOOL
-    iConfig *Config;
-
-    csPluginOption (const char *iName, csVariantType iType, int iID,
-      bool iValue, iConfig* iConfig)
-    {
-      Name = csStrNew (iName);
-      Type = iType;
-      ID = iID;
-      Value = iValue;
-      (Config = iConfig)->IncRef ();
-    }
-    virtual ~csPluginOption ()
-    {
-      Config->DecRef ();
-      delete [] Name;
-    }
-  };
-
-  // Query all options supported by given plugin and place into OptionList
-  void QueryOptions (iComponent *iObject);
 
 protected:
   // The object registry.
   iObjectRegistry* object_reg;
 
-private: //@@@
-  /// Print something to the reporter.
-  void ReportSys (int severity, const char* msg, ...);
-
-  /// -------------------------- plug-ins --------------------------
-
-  /// The list of all plug-ins
-  csPluginsVector Plugins;
-
-  /// List of all options for all plug-in modules.
-  CS_DECLARE_TYPED_VECTOR (csOptionVector, csPluginOption) OptionList;
-
 public:
   /// Initialize system-dependent data
   csSystemDriver (iObjectRegistry* object_reg);
   /// Deinitialize system-dependent parts
-  virtual ~csSystemDriver ();
+  virtual ~csSystemDriver () { }
 
   /// This is usually called right after object creation.
-  virtual bool Initialize ();
+  virtual bool Initialize () { return true; }
 
-// @@@ The following (and some of the above) should all move to the
-// specific implementation of the plugin manager when we have that.
-
-  /// A shortcut for requesting to load a plugin (before Initialize())
-  void RequestPlugin (const char *iPluginName);
-
-private:
-  /// Load a plugin and initialize it.
-  iBase *LoadPlugin (const char *iClassID, const char *iFuncID,
-    const char *iInterface, int iVersion);
-  /// Get first of the loaded plugins that supports given interface ID.
-  iBase *QueryPlugin (const char *iInterface, int iVersion);
-  /// Find a plugin given his functionality ID.
-  iBase *QueryPlugin (const char *iFuncID, const char *iInterface,
-  	int iVersion);
-  /// Find a plugin given his class ID and functionality ID.
-  iBase *QueryPlugin (const char* iClassID, const char *iFuncID,
-  	const char *iInterface, int iVersion);
-  /// Remove a plugin from system driver's plugin list.
-  bool UnloadPlugin (iComponent *iObject);
-  /// Register a object that implements the iComponent interface as a plugin.
-  bool RegisterPlugin (const char *iClassID, const char *iFuncID,
-  	iComponent *iObject);
-  /// Get the number of loaded plugins in the plugin manager.
-  int GetPluginCount ();
-  /// Get the specified plugin from the plugin manager.
-  iBase* GetPlugin (int idx);
-
-public:
   SCF_DECLARE_IBASE;
-
-  class PluginManager : public iPluginManager
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csSystemDriver);
-    virtual iBase *LoadPlugin (const char *iClassID, const char *iFuncID,
-          const char *iInterface = NULL, int iVersion = 0)
-    {
-      return scfParent->LoadPlugin (iClassID, iFuncID, iInterface,
-        iVersion);
-    }
-    virtual iBase *QueryPlugin (const char *iInterface, int iVersion)
-    {
-      return scfParent->QueryPlugin (iInterface, iVersion);
-    }
-    virtual iBase *QueryPlugin (const char *iFuncID, const char *iInterface,
-  	  int iVersion)
-    {
-      return scfParent->QueryPlugin (iFuncID, iInterface, iVersion);
-    }
-    virtual iBase *QueryPlugin (const char* iClassID, const char *iFuncID,
-  	  const char *iInterface, int iVersion)
-    {
-      return scfParent->QueryPlugin (iClassID, iFuncID, iInterface, iVersion);
-    }
-    virtual bool UnloadPlugin (iComponent *iObject)
-    {
-      return scfParent->UnloadPlugin (iObject);
-    }
-    virtual bool RegisterPlugin (const char *iClassID, const char *iFuncID,
-          iComponent *iObject)
-    {
-      return scfParent->RegisterPlugin (iClassID, iFuncID, iObject);
-    }
-    virtual int GetPluginCount ()
-    {
-      return scfParent->GetPluginCount ();
-    }
-    virtual iBase* GetPlugin (int idx)
-    {
-      return scfParent->GetPlugin (idx);
-    }
-  } scfiPluginManager;
-  friend class PluginManager;
-
-  //------------------------------------------------------------------
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csSystemDriver);
-    virtual bool Initialize (iObjectRegistry*) { return true; }
-  } scfiComponent;
 };
 
 #endif // __CS_SYSTEM_H__
+

@@ -27,7 +27,7 @@
 #include "iengine/mesh.h"
 #include "iengine/rview.h"
 #include "iengine/camera.h"
-#include "isys/plugin.h"
+#include "iutil/plugin.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "imesh/sprite2d.h"

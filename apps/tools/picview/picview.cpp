@@ -39,8 +39,8 @@
 #include "iutil/comp.h"
 #include "iutil/strvec.h"
 #include "ivaria/reporter.h"
-#include "isys/plugin.h"
-#include "isys/vfs.h"
+#include "iutil/plugin.h"
+#include "iutil/vfs.h"
 #include "igraphic/imageio.h"
 
 CS_IMPLEMENT_APPLICATION

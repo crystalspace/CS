@@ -28,7 +28,7 @@
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "isys/plugin.h"
+#include "iutil/plugin.h"
 #include "ivaria/reporter.h"
 #include "ivideo/sproctxt.h"
 #include "ivideo/txtmgr.h"

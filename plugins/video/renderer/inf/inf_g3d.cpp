@@ -35,7 +35,7 @@
 #include "ivaria/reporter.h"
 #include "ivideo/graph2d.h"
 #include "qint.h"
-#include "isys/plugin.h"
+#include "iutil/plugin.h"
 
 ///---------------------------------------------------------------------------
 

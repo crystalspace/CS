@@ -22,7 +22,7 @@
 
 #include "csutil/cfgfile.h"
 #include "csutil/csstrvec.h"
-#include "isys/vfs.h"
+#include "iutil/vfs.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 

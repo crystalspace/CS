@@ -52,8 +52,8 @@
 #include "csgeom/math3d.h"
 #include "csengine/meshobj.h"
 #include "cstso.h"
-#include "isys/plugin.h"
-#include "isys/vfs.h"
+#include "iutil/plugin.h"
+#include "iutil/vfs.h"
 
 // PHYZTEST DEMO
 // hit del key to create a swinging chain

@@ -38,8 +38,8 @@
 #include "cstool/initapp.h"
 #include "csutil/cmdhelp.h"
 
-#include "isys/vfs.h"
-#include "isys/plugin.h"
+#include "iutil/vfs.h"
+#include "iutil/plugin.h"
 #include "iutil/eventh.h"
 #include "iutil/eventq.h"
 #include "iutil/comp.h"

@@ -42,7 +42,7 @@
 #include "ivideo/graph3d.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "isys/plugin.h"
+#include "iutil/plugin.h"
 
 struct iGraphics2D;
 class OpenGLTextureCache;

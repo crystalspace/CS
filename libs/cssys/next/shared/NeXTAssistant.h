@@ -25,7 +25,7 @@
 #include "cssys/next/NeXTAssistant.h"
 #include "cssys/next/NeXTSystemDriver.h"
 #include "iutil/event.h"
-#include "isys/system.h"
+#include "iutil/system.h"
 struct iObjectRegistry;
 struct iVirtualClock;
 typedef void* NeXTDelegateHandle;

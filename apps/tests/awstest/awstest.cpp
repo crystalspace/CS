@@ -56,8 +56,8 @@
 #include "ivaria/reporter.h"
 #include "iutil/eventq.h"
 #include "iutil/virtclk.h"
-#include "isys/plugin.h"
-#include "isys/vfs.h"
+#include "iutil/plugin.h"
+#include "iutil/vfs.h"
 #include "qsqrt.h"
 
 #include "csgeom/csrect.h"

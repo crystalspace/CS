@@ -30,8 +30,8 @@
 #include "iengine/fview.h"
 #include "ivaria/conout.h"
 #include "ivaria/conin.h"
-#include "isys/vfs.h"
-#include "isys/plugin.h"
+#include "iutil/vfs.h"
+#include "iutil/plugin.h"
 #include "ivideo/fontserv.h"
 
 #include "csengine/engine.h"

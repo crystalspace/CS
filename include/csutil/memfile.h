@@ -19,7 +19,7 @@
 #ifndef __CS_MEMFILE_H__
 #define __CS_MEMFILE_H__
 
-#include "isys/vfs.h"
+#include "iutil/vfs.h"
 
 /**
  * Essentially a raw memory buffer which implements the abstract iFile

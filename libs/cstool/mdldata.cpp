@@ -26,7 +26,7 @@
 #include "ivideo/material.h"
 #include "iengine/material.h"
 #include "iutil/databuff.h"
-#include "isys/vfs.h"
+#include "iutil/vfs.h"
 
 #define CS_IMPLEMENT_ARRAY_INTERFACE_NONUM(clname,type,sing_name,mult_name) \
   type clname::Get##sing_name (int n) const				\

@@ -48,7 +48,7 @@
 #include "iengine/skelbone.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
-#include "isys/vfs.h"
+#include "iutil/vfs.h"
 #include "iengine/motion.h"
 #include "iengine/light.h"
 #include "ivaria/perfstat.h"

@@ -51,7 +51,7 @@
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
 #include "csutil/cmdhelp.h"
-#include "isys/vfs.h"
+#include "iutil/vfs.h"
 
 CS_IMPLEMENT_APPLICATION
 

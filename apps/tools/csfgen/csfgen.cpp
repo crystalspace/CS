@@ -26,8 +26,8 @@
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "isys/plugin.h"
-#include "isys/vfs.h"
+#include "iutil/plugin.h"
+#include "iutil/vfs.h"
 
 CS_IMPLEMENT_APPLICATION
 

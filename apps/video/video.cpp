@@ -49,8 +49,8 @@
 #include "iutil/csinput.h"
 #include "iutil/virtclk.h"
 #include "ivaria/reporter.h"
-#include "isys/plugin.h"
-#include "isys/vfs.h"
+#include "iutil/plugin.h"
+#include "iutil/vfs.h"
 
 //------------------------------------------------- We need the 3D engine -----
 

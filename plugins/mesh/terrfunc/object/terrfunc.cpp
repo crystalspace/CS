@@ -34,7 +34,7 @@
 #include "igraphic/image.h"
 #include "iutil/objreg.h"
 #include "csgfx/rgbpixel.h"
-#include "isys/vfs.h"
+#include "iutil/vfs.h"
 #include "terrfunc.h"
 #include "terrvis.h"
 #include "qint.h"

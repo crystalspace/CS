@@ -36,6 +36,7 @@
 
 class SysSystemDriver;
 struct iObjectRegistry;
+struct iConfigManager;
 
 /**
  * Implementation class for iWin32Helper.

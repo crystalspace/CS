@@ -23,7 +23,7 @@
 
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
-#include "isys/plugin.h"
+#include "iutil/plugin.h"
 #include "iutil/cfgfile.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"

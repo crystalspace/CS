@@ -50,7 +50,7 @@
 #include "iutil/objreg.h"
 #include "iutil/csinput.h"
 #include "iutil/virtclk.h"
-#include "isys/vfs.h"
+#include "iutil/vfs.h"
 
 //------------------------------------------------- We need the 3D engine -----
 

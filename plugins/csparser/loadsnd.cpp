@@ -25,7 +25,7 @@
 #include "csloader.h"
 #include "cstool/sndwrap.h"
 #include "iutil/databuff.h"
-#include "isys/vfs.h"
+#include "iutil/vfs.h"
 #include "iengine/engine.h"
 #include "isound/data.h"
 #include "isound/loader.h"

@@ -30,7 +30,7 @@
 #include "csengine/polygon.h"
 #include "csengine/thing.h"
 #include "csutil/memfile.h"
-#include "isys/vfs.h"
+#include "iutil/vfs.h"
 
 //---------------------------------------------------------------------------
 

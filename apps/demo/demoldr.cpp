@@ -28,7 +28,7 @@
 #include "ivaria/sequence.h"
 #include "ivaria/reporter.h"
 #include "iutil/databuff.h"
-#include "isys/vfs.h"
+#include "iutil/vfs.h"
 #include "qsqrt.h"
 
 // Define all tokens used through this file

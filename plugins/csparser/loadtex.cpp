@@ -25,7 +25,7 @@
 #include "csloader.h"
 #include "iutil/databuff.h"
 #include "iutil/object.h"
-#include "isys/vfs.h"
+#include "iutil/vfs.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
 #include "iengine/engine.h"

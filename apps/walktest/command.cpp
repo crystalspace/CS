@@ -43,7 +43,7 @@
 #include "imesh/object.h"
 #include "iengine/mesh.h"
 #include "ivaria/reporter.h"
-#include "isys/plugin.h"
+#include "iutil/plugin.h"
 
 extern WalkTest* Sys;
 

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __ISYS_VFS_H__
-#define __ISYS_VFS_H__
+#ifndef __IUTIL_VFS_H__
+#define __IUTIL_VFS_H__
 
 #include "csutil/scf.h"
 #include "iutil/databuff.h"
@@ -205,4 +205,5 @@ struct iVFS : public iBase
   virtual iDataBuffer *GetRealPath (const char *FileName) = 0;
 };
 
-#endif // __ISYS_VFS_H__
+#endif // __IUTIL_VFS_H__
+

@@ -30,7 +30,7 @@
 #include "iengine/engine.h"
 #include "iengine/camera.h"
 #include "iengine/sector.h"
-#include "isys/vfs.h"
+#include "iutil/vfs.h"
 
 csEngineProcTex::csEngineProcTex()
 {

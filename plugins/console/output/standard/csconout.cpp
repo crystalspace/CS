@@ -26,7 +26,7 @@
 #include "ivaria/conout.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
-#include "isys/plugin.h"
+#include "iutil/plugin.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/fontserv.h"
 #include "csutil/csevent.h"

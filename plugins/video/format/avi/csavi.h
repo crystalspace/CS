@@ -22,7 +22,7 @@
 #include "ivideo/codec.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "isys/vfs.h"
+#include "iutil/vfs.h"
 #include "csutil/csvector.h"
 #include "cssys/csendian.h"
 

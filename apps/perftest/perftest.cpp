@@ -40,8 +40,8 @@
 #include "iutil/virtclk.h"
 #include "csutil/cmdhelp.h"
 #include "ivaria/reporter.h"
-#include "isys/plugin.h"
-#include "isys/vfs.h"
+#include "iutil/plugin.h"
+#include "iutil/vfs.h"
 
 CS_IMPLEMENT_APPLICATION
 

@@ -25,7 +25,7 @@
 #include "csutil/util.h"
 #include "csutil/csvector.h"
 #include "ivideo/graph3d.h"
-#include "isys/plugin.h"
+#include "iutil/plugin.h"
 
 struct iObjectRegistry;
 struct iEngine;

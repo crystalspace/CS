@@ -25,7 +25,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csutil/typedvec.h"
-#include "isys/plugin.h"
+#include "iutil/plugin.h"
 
 struct iObjectRegistry;
 struct iPluginManager;

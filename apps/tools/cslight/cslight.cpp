@@ -36,7 +36,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/virtclk.h"
-#include "isys/vfs.h"
+#include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 #include "igraphic/imageio.h"
 

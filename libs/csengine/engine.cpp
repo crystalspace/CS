@@ -47,7 +47,7 @@
 #include "csutil/cfgacc.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
-#include "isys/vfs.h"
+#include "iutil/vfs.h"
 #include "ivideo/halo.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/graph3d.h"
@@ -62,7 +62,7 @@
 #include "imap/reader.h"
 #include "imesh/lighting.h"
 #include "ivaria/reporter.h"
-#include "isys/plugin.h"
+#include "iutil/plugin.h"
 
 //---------------------------------------------------------------------------
 

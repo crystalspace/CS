@@ -1,5 +1,5 @@
 #include "cssysdef.h"
-#include "isys/plugin.h"
+#include "iutil/plugin.h"
 #include "aws.h"
 #include "awsprefs.h"
 #include "ivideo/txtmgr.h"

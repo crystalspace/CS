@@ -1,5 +1,20 @@
 The history order is reversed so that new features are at the top.
 
+11-Oct-2001
+	- Moved the plugin manager implementation out of the system driver
+	  into csPluginManager (in csutil/plugmgr.h). Modified
+	  csInitializer::CreatePluginManager() to create an instance
+	  of csPluginManager.
+	- Created a new class csPluginLoader (in csutil/plugldr.h) which
+	  will take the requested plugins, the config file, and the
+	  commandline and try to load all plugins it can find there. This
+	  functionality used to be in the system driver.
+	  csInitializer::RequestPlugins() now uses this class.
+	- The two above changes mean that the csSystemDriver is now
+	  completely empty. It cannot yet be removed because some subclasses
+	  of csSystemDriver (system specific subclasses) contain some
+	  code.
+	- Moved isys/vfs.h and isys/plugin.h to iutil.
 10-Oct-2001
 	- Slight optimization in csSector::IntersectSegment() where it
 	  would transform back the intersection point even if there

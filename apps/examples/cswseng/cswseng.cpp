@@ -50,8 +50,8 @@
 #include "iutil/virtclk.h"
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
-#include "isys/plugin.h"
-#include "isys/vfs.h"
+#include "iutil/plugin.h"
+#include "iutil/vfs.h"
 
 #define SET_BIT(var,mask,state) \
   var = (var & ~(mask)) | ((state) ? (mask) : 0);

@@ -26,7 +26,7 @@
 #include "csutil/csvector.h"
 #include "csutil/util.h"
 #include "csgeom/quaterni.h"
-#include "isys/plugin.h"
+#include "iutil/plugin.h"
 
 class csGenerateImageTexture;
 class csGenerateImageValue;

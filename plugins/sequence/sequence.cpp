@@ -27,7 +27,7 @@
 #include "iutil/eventq.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
-#include "isys/vfs.h"
+#include "iutil/vfs.h"
 
 CS_IMPLEMENT_PLUGIN
 

@@ -28,7 +28,7 @@
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
-#include "isys/plugin.h"
+#include "iutil/plugin.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "ivideo/graph2d.h"

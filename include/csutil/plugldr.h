@@ -16,22 +16,35 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
+#ifndef __CS_PLUGLDR_H__
+#define __CS_PLUGLDR_H__
 
-#include "cssysdef.h"
-#include "cssys/system.h"
-#include "cssys/sysdriv.h"
+struct iObjectRegistry;
 
-SCF_IMPLEMENT_IBASE (csSystemDriver)
-SCF_IMPLEMENT_IBASE_END
-
-csSystemDriver::csSystemDriver (iObjectRegistry* object_reg)
+/**
+ * This utility class helps to load plugins based on request,
+ * config file, and commandline.
+ */
+class csPluginLoader
 {
-  SCF_CONSTRUCT_IBASE (NULL);
+  friend class csPluginList;
 
-  csSystemDriver::object_reg = object_reg;
-}
+private:
+  // The object registry.
+  iObjectRegistry* object_reg;
 
+public:
+  /// Initialize.
+  csPluginLoader (iObjectRegistry* object_reg);
+  /// Deinitialize.
+  virtual ~csPluginLoader ();
+
+  /// A shortcut for requesting to load a plugin (before LoadPlugins()).
+  void RequestPlugin (const char *iPluginName);
+
+  /// Load the plugins.
+  bool LoadPlugins ();
+};
+
+#endif // __CS_PLUGLDR_H__
 

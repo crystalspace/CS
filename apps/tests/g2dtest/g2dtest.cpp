@@ -30,8 +30,8 @@
 #include "ivaria/reporter.h"
 #include "qint.h"
 
-#include "isys/vfs.h"
-#include "isys/plugin.h"
+#include "iutil/vfs.h"
+#include "iutil/plugin.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "ivideo/graph2d.h"

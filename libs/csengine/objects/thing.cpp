@@ -41,7 +41,7 @@
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 #include "iengine/shadcast.h"
-#include "isys/vfs.h"
+#include "iutil/vfs.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iengine/rview.h"

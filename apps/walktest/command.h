@@ -20,8 +20,8 @@
 #define COMMAND_H
 
 #include "ivideo/graph3d.h"
-#include "isys/vfs.h"
-#include "isys/plugin.h"
+#include "iutil/vfs.h"
+#include "iutil/plugin.h"
 #include "ivaria/conin.h"
 
 struct iEngine;

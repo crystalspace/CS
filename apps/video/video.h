@@ -24,7 +24,7 @@
 #include "csgeom/math3d.h"
 #include "ivideo/codec.h"
 #include "imap/parser.h"
-#include "isys/plugin.h"
+#include "iutil/plugin.h"
 
 struct iSector;
 struct iView;

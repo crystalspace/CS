@@ -25,7 +25,7 @@
 #include "imesh/object.h"
 #include "iengine/mesh.h"
 #include "iengine/engine.h"
-#include "isys/plugin.h"
+#include "iutil/plugin.h"
 #include "imesh/cube.h"
 #include "imap/services.h"
 #include "ivideo/graph3d.h"

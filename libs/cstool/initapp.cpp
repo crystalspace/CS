@@ -32,11 +32,11 @@
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
 #include "ivaria/conout.h"
-#include "isys/vfs.h"
+#include "iutil/vfs.h"
 #include "igraphic/imageio.h"
 #include "ivideo/fontserv.h"
 #include "imap/parser.h"
-#include "isys/plugin.h"
+#include "iutil/plugin.h"
 #include "csutil/cseventq.h"
 #include "csutil/cmdline.h"
 #include "csutil/cfgfile.h"
@@ -46,6 +46,8 @@
 #include "csutil/objreg.h"
 #include "csutil/virtclk.h"
 #include "csutil/csinput.h"
+#include "csutil/plugmgr.h"
+#include "csutil/plugldr.h"
 #include "iutil/eventq.h"
 #include "iutil/evdefs.h"
 #include "iutil/virtclk.h"
@@ -105,7 +107,10 @@ iObjectRegistry* csInitializer::CreateObjectRegistry ()
 iPluginManager* csInitializer::CreatePluginManager (
 	iObjectRegistry* object_reg)
 {
-  return CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  csPluginManager* plugmgr = new csPluginManager (object_reg);
+  object_reg->Register (plugmgr, NULL);
+  plugmgr->DecRef ();
+  return plugmgr;
 }
 
 iEventQueue* csInitializer::CreateEventQueue (iObjectRegistry* object_reg)
@@ -242,6 +247,8 @@ bool csInitializer::RequestPlugins (iObjectRegistry* object_reg,
 {
   if (!config_done) SetupConfigManager (object_reg, NULL);
 
+  csPluginLoader* plugldr = new csPluginLoader (object_reg);
+
   va_list arg;
   va_start (arg, object_reg);
   char* plugName = va_arg (arg, char*);
@@ -251,11 +258,14 @@ bool csInitializer::RequestPlugins (iObjectRegistry* object_reg,
     int version = va_arg (arg, int);
     // scfId and version are unused for now.
     (void)scfId; (void)version;
-    global_sys->RequestPlugin (plugName);
+    plugldr->RequestPlugin (plugName);
     plugName = va_arg (arg, char*);
   }
   va_end (arg);
-  return true;
+
+  bool rc = plugldr->LoadPlugins ();
+  delete plugldr;
+  return rc;
 }
 
 bool csInitializer::Initialize (iObjectRegistry* object_reg)

@@ -20,8 +20,8 @@
 
 #include "cssysdef.h"
 #include "csfont.h"
-#include "isys/vfs.h"
-#include "isys/plugin.h"
+#include "iutil/vfs.h"
+#include "iutil/plugin.h"
 #include "csutil/util.h"
 #include "csutil/csvector.h"
 #include "iutil/objreg.h"

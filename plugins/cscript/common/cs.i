@@ -30,7 +30,7 @@
     return SCF_CONSTRUCT_VERSION(version0, version1, version2);
   }
 
-#include "isys/plugin.h"
+#include "iutil/plugin.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/event.h"

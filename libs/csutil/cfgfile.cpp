@@ -21,7 +21,7 @@
 #include "csutil/databuf.h"
 #include "csutil/csstring.h"
 #include "csutil/util.h"
-#include "isys/vfs.h"
+#include "iutil/vfs.h"
 #include <ctype.h>
 
 /* config node */

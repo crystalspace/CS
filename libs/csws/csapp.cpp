@@ -36,7 +36,7 @@
 #include "csws/cswsaux.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "isys/vfs.h"
+#include "iutil/vfs.h"
 #include "ivideo/txtmgr.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
@@ -45,7 +45,7 @@
 #include "iutil/virtclk.h"
 #include "igraphic/imageio.h"
 #include "ivaria/reporter.h"
-#include "isys/plugin.h"
+#include "iutil/plugin.h"
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//- csAppPlugin //--
 

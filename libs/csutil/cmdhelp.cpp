@@ -25,7 +25,7 @@
 #include "iutil/cmdline.h"
 #include "iutil/config.h"
 #include "iutil/eventq.h"
-#include "isys/plugin.h"
+#include "iutil/plugin.h"
 
 void csCommandLineHelper::Help (iConfig* config)
 {

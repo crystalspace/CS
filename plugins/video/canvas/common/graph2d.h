@@ -29,7 +29,7 @@
 #include "iutil/comp.h"
 #include "iutil/config.h"
 #include "csutil/cfgacc.h"
-#include "isys/plugin.h"
+#include "iutil/plugin.h"
 
 struct iObjectRegistry;
 struct iPluginManager;

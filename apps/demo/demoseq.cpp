@@ -43,7 +43,7 @@
 #include "csutil/cscolor.h"
 #include "csgeom/path.h"
 #include "cstool/csfxscr.h"
-#include "isys/plugin.h"
+#include "iutil/plugin.h"
 
 //-----------------------------------------------------------------------------
 

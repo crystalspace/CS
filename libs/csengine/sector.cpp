@@ -43,7 +43,7 @@
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
-#include "isys/vfs.h"
+#include "iutil/vfs.h"
 #include "iengine/statlght.h"
 #include "iengine/viscull.h"
 #include "iengine/rview.h"

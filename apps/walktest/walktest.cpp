@@ -73,7 +73,7 @@
 #include "imesh/crossbld.h"
 #include "iengine/movable.h"
 #include "iengine/campos.h"
-#include "isys/plugin.h"
+#include "iutil/plugin.h"
 
 #include "csengine/wirefrm.h"
 #include "csengine/cbuffer.h"
