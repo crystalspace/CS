@@ -199,8 +199,10 @@ void csGenmeshMeshObject::AddSubMesh (unsigned int *triangles,
   subMesh->index_buffer = csRenderBuffer::CreateIndexRenderBuffer (
     sizeof (unsigned int)*tricount*3,
     CS_BUF_DYNAMIC, CS_BUFCOMP_UNSIGNED_INT, 0, factory->GetVertexCount() - 1);
-  csTriangle *triangleData = (csTriangle*)subMesh->index_buffer->Lock(CS_BUF_LOCK_NORMAL);
-  //subMesh->index_buffer->CopyToBuffer (triangles, tricount*sizeof (unsigned int)*3);
+  csTriangle *triangleData =
+    (csTriangle*)subMesh->index_buffer->Lock(CS_BUF_LOCK_NORMAL);
+  //subMesh->index_buffer->CopyToBuffer (triangles,
+    tricount*sizeof (unsigned int)*3);
 
   for (int i=0; i<tricount; ++i)
   {
@@ -209,7 +211,8 @@ void csGenmeshMeshObject::AddSubMesh (unsigned int *triangles,
   subMesh->tricount = tricount;
 
   subMesh->bufferHolder.AttachNew (new csRenderBufferHolder);
-  subMesh->bufferHolder->SetRenderBuffer(CS_BUFFER_INDEX, subMesh->index_buffer);
+  subMesh->bufferHolder->SetRenderBuffer(CS_BUFFER_INDEX,
+    subMesh->index_buffer);
   subMesh->bufferHolder->SetAccessor (scfiRenderBufferAccessor, 
     CS_BUFFER_ALL_MASK & (~CS_BUFFER_MAKE_MASKABLE(CS_BUFFER_INDEX)));
 
@@ -708,7 +711,7 @@ void csGenmeshMeshObject::SetupObject ()
     colors, the intensities of the pseudo-dynamic lights are multiplied
     with the actual colors of that lights and added as well, and finally,
     dynamic lighst are calculated.
- */
+*/
 void csGenmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
 {
   SetupObject ();
@@ -1073,8 +1076,8 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
     if (factory->back2front)
     {
       sorted_index_buffer = csRenderBuffer::CreateIndexRenderBuffer (
-      	factory->GetTriangleCount()*3,
-	CS_BUF_DYNAMIC, CS_BUFCOMP_UNSIGNED_INT, 0, factory->GetVertexCount() - 1);
+      	factory->GetTriangleCount() * 3, CS_BUF_DYNAMIC,
+	CS_BUFCOMP_UNSIGNED_INT, 0, factory->GetVertexCount() - 1);
 
       if (num_sorted_mesh_triangles != factory->GetTriangleCount ())
       {
@@ -1282,7 +1285,8 @@ iObjectModel* csGenmeshMeshObject::GetObjectModel ()
   return factory->GetObjectModel ();
 }
 
-void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer)
+void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder,
+  csRenderBufferName buffer)
 {
   if (!holder) return;
   if (anim_ctrl)
@@ -1426,7 +1430,7 @@ SCF_IMPLEMENT_IBASE (csGenmeshMeshObjectFactory)
       scfCompatibleVersion(iVersion, scfInterface<iPolygonMesh>::GetVersion()))
     {
       printf ("Deprecated feature use: iPolygonMesh queried from GenMesh "
-    "factory; use iObjectModel->GetPolygonMeshColldet() instead.\n");
+        "factory; use iObjectModel->GetPolygonMeshColldet() instead.\n");
       iPolygonMesh* Object = scfiObjectModel.GetPolygonMeshColldet();
       (Object)->IncRef ();
       return CS_STATIC_CAST(iPolygonMesh*, Object);
@@ -1452,8 +1456,8 @@ SCF_IMPLEMENT_IBASE (csGenmeshMeshObjectFactory::eiRenderBufferAccessor)
   SCF_IMPLEMENTS_INTERFACE (iRenderBufferAccessor)
 SCF_IMPLEMENT_IBASE_END
 
-csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iMeshObjectType *pParent,
-      iObjectRegistry* object_reg)
+csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (
+  iMeshObjectType *pParent, iObjectRegistry* object_reg)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiGeneralFactoryState);
@@ -1701,8 +1705,8 @@ void csGenmeshMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder,
 
       delete[] tangentData;
     }
-    holder->SetRenderBuffer (buffer, (buffer == CS_BUFFER_TANGENT) ? tangent_buffer : 
-      binormal_buffer);
+    holder->SetRenderBuffer (buffer, (buffer == CS_BUFFER_TANGENT) ?
+      tangent_buffer : binormal_buffer);
     return;
   }
   if (buffer == CS_BUFFER_INDEX && !back2front)
@@ -2314,24 +2318,3 @@ bool csGenmeshMeshObjectType::Initialize (iObjectRegistry* object_reg)
 
   return true;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
