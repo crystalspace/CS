@@ -32,7 +32,7 @@ if $(CMD.FLEX)
   # compatibility problems with msvc.
   actions Flex
   {
-    $(CMD.FLEX) -S$(TOP)/experimental/support/flex.skl -t $(FLEXFLAGS) $(>) > $(<)
+    $(CMD.FLEX) -S$(TOP)/mk/support/flex.skl -t $(FLEXFLAGS) $(>) > $(<)
   }
 }
 
@@ -63,7 +63,7 @@ if $(CMD.BISON)
   }
   actions Bison
   {
-    $(BISONBIN) -d $(BISONFLAGS) -o $(<) $(>)
+    $(CMD.BISON) -d $(BISONFLAGS) -o $(<) $(>)
   }
 }
 

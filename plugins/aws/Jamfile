@@ -9,9 +9,10 @@ FILES = av3dtxt.cpp av3dtxtm.cpp aws3dfrm.cpp awsadler.cpp awsbarct.cpp
 	awsradbt.cpp awsscrbr.cpp awsscr.cpp awsslot.cpp awsstbar.cpp 
 	awsstdsk.cpp awsTabCtrl.cpp awstex.cpp awstimer.cpp awstxtbx.cpp
 	awswin.cpp ;
-if $(BISONBIN) && $(FLEXBIN)
+if $(CMD.BISON) && $(CMD.FLEX)
 {
-  FILES += skinlex.ll skinpars.yy ;
+  FILES = [ Filter $(FILES) : skinlex.cpp skinpars.cpp ] 
+	  skinlex.ll skinpars.yy ;
   # ugly...
   BISONFLAGS += -p aws ;
 }
