@@ -143,6 +143,10 @@ void csRadPoly :: ComputePriority()
     sum += deltamap->GetMap()[x] * lumel_coverage_map[x%size];
   float mean_lightval = sum / (float)(size*3);
   total_unshot_light = GetDiffuse() * area * mean_lightval;
+  // to prevent loops, polygons with several repeats (at the same
+  // priority) are ignored.
+  if(num_repeats > 5)
+    total_unshot_light = 0.0;
   //CsPrintf(MSG_STDOUT, "RP %s, pri %g, area %g, sum %d, meanval %g ",
   //  polygon->GetName(), total_unshot_light, area, sum, mean_lightval);
   //CsPrintf(MSG_STDOUT, "w %d, h %d, size %d\n", width, height, size);
@@ -718,7 +722,7 @@ csRadPoly* csRadiosity :: FetchNext()
   /// possibly a ''medium quality fast mode' could be:
   stop_value = start_priority / 1000.0;
   int max_iterations = 1000; // after this amount of shoot src's we stop.
-  int max_repeats = 4; // after n loops, stop.
+  int max_repeats = 10; // after n loops, stop.
 
   csRadPoly *p = list->PopHighest();
 
