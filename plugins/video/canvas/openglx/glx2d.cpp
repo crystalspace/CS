@@ -344,7 +344,7 @@ bool csGraphics2DGLX::SetMouseCursor (int iShape, ITextureHandle* /*iBitmap*/)
 
 void csGraphics2DGLX::ProcessEvents (void *Param)
 {
-  static int button_mapping[4] = {0, 1, 3, 2};
+  static int button_mapping[6] = {0, 1, 3, 2, 4, 5};
   csGraphics2DGLX *Self = (csGraphics2DGLX *)Param;
   XEvent event;
   int state, key;

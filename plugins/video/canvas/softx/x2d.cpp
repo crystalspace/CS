@@ -963,7 +963,7 @@ bool csGraphics2DXLib::SetMouseCursor (int iShape, ITextureHandle* hBitmap)
 
 void csGraphics2DXLib::ProcessEvents (void *Param)
 {
-  static int button_mapping[4] = {0, 1, 3, 2};
+  static int button_mapping[6] = {0, 1, 3, 2, 4, 5};
   csGraphics2DXLib *Self = (csGraphics2DXLib *)Param;
   XEvent event;
   int state, key;

@@ -412,7 +412,7 @@ bool csGraphics2DGlideX::SetMouseCursor (int iShape, ITextureHandle* /*iBitmap*/
 
 void csGraphics2DGlideX::ProcessEvents (void *Param)
 {
-  static int button_mapping[4] = {0, 1, 3, 2};
+  static int button_mapping[6] = {0, 1, 3, 2, 4, 5};
   csGraphics2DGlideX *Self = (csGraphics2DGlideX *)Param;
   XEvent event;
   int state, key;
