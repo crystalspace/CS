@@ -78,7 +78,7 @@ struct iInputBinder : public iBase
    * of the range if it goes beyond the minimum or maximum value.
    */
   virtual void BindAxis (const csInputDefinition &def, unsigned cmd,
-    int sensitivity = 1, int min = ~0, int max = ~0, bool wrap = true) = 0;
+    int sensitivity = 1) = 0;
 
   /// Remove a binding.
   virtual bool UnbindButton (unsigned cmd) = 0;
