@@ -445,7 +445,7 @@ void csConsole::ScrollTo(int top, bool snap)
   switch (top)
   {
     case csConPageUp:
-      buffer->SetTopLine (buffer->GetTopLine () - buffer->GetPageSize ());
+      buffer->SetTopLine (MAX (0, buffer->GetTopLine () - buffer->GetPageSize ()));
       break;
     case csConPageDown:
       buffer->SetTopLine (buffer->GetTopLine () + buffer->GetPageSize ());
@@ -460,9 +460,10 @@ void csConsole::ScrollTo(int top, bool snap)
       buffer->SetTopLine (top);
       break;
   }
+
   if ((buffer->GetCurLine () >= buffer->GetTopLine ())
    && (buffer->GetCurLine () <= buffer->GetTopLine () + buffer->GetPageSize ()))
-    cy = buffer->GetCurLine () - buffer->GetTopLine ();
+    cy = MAX (buffer->GetCurLine () - buffer->GetTopLine (), 0);
   else
     cy = -1;
   do_snap = snap;
@@ -499,11 +500,14 @@ void csConsole::SetCursorPos(int x, int y)
 
 void csConsole::SetCursorPos (int iCharNo)
 {
-  int max_x;
-  const csString *curline = buffer->GetLine (cy);
-
-  max_x = curline ? curline->Length () : 0;
-  cx = (iCharNo > max_x) ? max_x : (iCharNo <= 0) ? 0 : iCharNo;
+  if (cy>-1)
+  {
+    int max_x;
+    const csString *curline = buffer->GetLine (cy);
+ 
+    max_x = curline ? curline->Length () : 0;
+    cx = (iCharNo > max_x) ? max_x : (iCharNo <= 0) ? 0 : iCharNo;
+  }    
 }
 
 void csConsole::SetVisible (bool iShow)
