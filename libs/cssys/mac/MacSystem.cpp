@@ -266,7 +266,7 @@ void SysSystemDriver::Loop(void)
 
 			theMouse = anEvent.where;
 			if (( piG2D ) && ( piG2D->PointInWindow( &theMouse ) )) {
-				Mouse->do_motion( theMouse.h, theMouse.v );
+				QueueMouseEvent( 0, 0, theMouse.h, theMouse.v );
 			}
 		}
 		current_time = Time();
@@ -385,9 +385,9 @@ void SysSystemDriver::HandleMouseEvent( time_t current_time, EventRecord *theEve
 					theMouse = theEvent->where;
 					::GlobalToLocal( &theMouse );
 					if ( theEvent->what == mouseDown )
-    					Mouse->do_press( 1, theMouse.h, theMouse.v);
+    					QueueMouseEvent( 1, 1, theMouse.h, theMouse.v);
     				else
-    					Mouse->do_release( 1, theMouse.h, theMouse.v );
+    					QueueMouseEvent( 1, 0, theMouse.h, theMouse.v);
 				} else {
 					// If the window wasn't active, make it active.
 					
@@ -787,9 +787,9 @@ void SysSystemDriver::ScanKeyboard( time_t current_time )
 					theChar = KeyToChar[ ( i * 32 ) + j ];
 					if ( theChar != '\0' ) {
 						if ( keys & 1 )
-        					Keyboard.do_press( current_time, theChar );
+        					QueueKeyEvent( theChar, true );
         				else
-        					Keyboard.do_release( current_time, theChar );
+        					QueueKeyEvent( theChar, false );
         			}
 				}
 			}
@@ -800,7 +800,12 @@ void SysSystemDriver::ScanKeyboard( time_t current_time )
 		mKeyboardState[i] = km[i];
 }
 
-void SysSystemDriver::HandleKey( time_t current_time, const char key, const char /* keycode */, const short modifiers, bool /* down */ )
+void SysSystemDriver::HandleKey(
+	time_t current_time,
+	const char key,
+	const char /* keycode */,
+	const short modifiers,
+	bool /* down */ )
 {
 	// A key has been pressed -- handle typical cases.
 	if (modifiers & cmdKey) {
@@ -879,7 +884,7 @@ void SysSystemDriver::HandleOSEvent( time_t current_time, EventRecord *theEvent,
 
 		theMouse = theEvent->where;
 		if (( piG2D ) && ( piG2D->PointInWindow( &theMouse ) )) {
-			Mouse->do_motion( theMouse.h, theMouse.v );
+			QueueMouseEvent( 0, 0, theMouse.h, theMouse.v );
 		}
 	} else if (osEvtFlag == suspendResumeMessage) {
 		if (theEvent->message & resumeFlag) {
@@ -989,7 +994,7 @@ OSErr SysSystemDriver::HandleAppleEvent( AppleEvent *theEvent )
 					if (err == noErr) {
 						for (i = 1; i <= numFiles; i++) {
 							err = AEGetNthPtr( &fileListDesc, i, typeFSS, &actualKeyword,
-												&actualType, (Ptr)&filespec, sizeof(filespec), &actualSize );
+								&actualType, (Ptr)&filespec, sizeof(filespec), &actualSize );
 							if ( err == noErr ) {
 								FSpGetFInfo( &filespec, &theFileInfo );
 								if ( theFileInfo.fdType == 'TEXT' ) {
