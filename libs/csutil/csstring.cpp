@@ -272,8 +272,8 @@ csString &csString::Format(const char *format, ...)
 #endif // DISABLED
 
 #define STR_FORMAT(TYPE,FMT,SZ) \
-csString csString::Format(TYPE v) \
-{ char s[SZ]; sprintf(s, #FMT, v); return csString ().Append (s); }
+csString csString::Format (TYPE v) \
+{ char s[SZ]; sprintf (s, #FMT, v); return csString ().Append (s); }
   STR_FORMAT(short, %hd, 32)
   STR_FORMAT(unsigned short, %hu, 32)
   STR_FORMAT(int, %d, 32)
@@ -283,6 +283,28 @@ csString csString::Format(TYPE v) \
   STR_FORMAT(float, %g, 64)
   STR_FORMAT(double, %g, 64)
 #undef STR_FORMAT
+
+#define STR_FORMAT_INT(TYPE,FMT) \
+csString csString::Format (TYPE v, int width, int prec/*=0*/) \
+{ char s[32], s1[32]; \
+  sprintf (s1, "%%%d.%d"#FMT, width, prec); sprintf (s, s1, v); \
+  return csString ().Append (s); }
+  STR_FORMAT_INT(short, hd)
+  STR_FORMAT_INT(unsigned short, hu)
+  STR_FORMAT_INT(int, d)
+  STR_FORMAT_INT(unsigned int, u)
+  STR_FORMAT_INT(long, ld)
+  STR_FORMAT_INT(unsigned long, lu)
+#undef STR_FORMAT_INT
+
+#define STR_FORMAT_FLOAT(TYPE) \
+csString csString::Format (TYPE v, int width, int prec/*=6*/) \
+{ char s[64], s1[32]; \
+  sprintf (s1, "%%%d.%dg", width, prec); sprintf (s, s1, v); \
+  return csString ().Append (s); }
+  STR_FORMAT_FLOAT(float)
+  STR_FORMAT_FLOAT(double)
+#undef STR_FORMAT_FLOAT
 
 csString &csString::PadLeft (size_t iNewSize, char iChar)
 {
