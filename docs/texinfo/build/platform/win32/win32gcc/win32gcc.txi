@@ -40,7 +40,7 @@ the question marks stand for the actual version number.
 @item
 The most recent Crystal Space Win32 Libs package.  This package provides a set
 of additional required and optional resources used when building Crystal Space,
-such as zlib, libpng, libjpeg, @sc{ode}, @sc{nasm} ( the Netwide Assembler),
+such as zlib, libpng, libjpeg, @sc{ode}, @sc{nasm} (the Netwide Assembler),
 etc.  @xref{cs-win32libs}.
 @end itemize
 
