@@ -27,6 +27,7 @@
 #include "csgeom/pmtools.h"
 #include "plugins/engine/3d/portal.h"
 #include "cstool/meshobjtmpl.h"
+#include "cstool/rendermeshholder.h"
 #include "iengine/shadcast.h"
 #include "ivideo/rendermesh.h"
 
@@ -156,8 +157,7 @@ private:
 	const csReversibleTransform& movtrans, iRenderView *rview,
 	const csPlane3& camera_plane);
 
-  csDirtyAccessArray<csRenderMesh*> meshes;
-  csRenderMesh *lastMeshPtr;
+  csRenderMeshHolderSingle rmHolder;
 
   csFlags flags;
   csMeshWrapper* meshwrapper;

@@ -5,6 +5,6 @@ Help thing : "Thing mesh object plug-in" ;
 Plugin thing
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith thing : csgfx csgeom csutil ;
+LinkWith thing : cstool csgfx csgeom csutil ;
 
 CompileGroups thing :  meshes ;

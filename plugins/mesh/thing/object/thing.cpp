@@ -1575,9 +1575,6 @@ csThing::csThing (iBase *parent, csThingStatic* static_data) :
 
 #ifndef CS_USE_NEW_RENDERER
   polybuf = 0;
-#else
-  rmHolderList.Push (new rmHolder);
-  rmHolderListIndex = 0;
 #endif // CS_USE_NEW_RENDERER
   current_visnr = 1;
 
@@ -1600,10 +1597,6 @@ csThing::~csThing ()
 
   polygons.DeleteAll ();
   delete[] polygon_world_planes;
-
-#ifdef CS_USE_NEW_RENDERER
-  ClearRenderMeshes ();
-#endif
 
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiThingState);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
@@ -2598,42 +2591,28 @@ void csThing::PrepareLighting ()
 
 #ifdef CS_USE_NEW_RENDERER
 
-void csThing::PrepareRenderMeshes ()
+void csThing::PrepareRenderMeshes (
+  csDirtyAccessArray<csRenderMesh*>& renderMeshes)
 {
   int i;
-  rmHolder *rmH = rmHolderList[rmHolderListIndex];
 
-  for (i = 0; i < rmH->renderMeshes.Length () ; i++)
+  for (i = 0; i < renderMeshes.Length () ; i++)
   {
     // @@@ Is this needed?
-    if (rmH->renderMeshes[i]->variablecontext != 0)
-      rmH->renderMeshes[i]->variablecontext->DecRef ();
-    delete rmH->renderMeshes[i];
+    if (renderMeshes[i]->variablecontext != 0)
+      renderMeshes[i]->variablecontext->DecRef ();
+    delete renderMeshes[i];
   }
-  rmH->renderMeshes.DeleteAll ();
-  static_data->FillRenderMeshes (rmH->renderMeshes, replace_materials, mixmode);
+  renderMeshes.DeleteAll ();
+  static_data->FillRenderMeshes (renderMeshes, replace_materials, mixmode);
+  renderMeshes.ShrinkBestFit ();
   materials_to_visit.DeleteAll ();
-  for (i = 0 ; i < rmH->renderMeshes.Length () ; i++)
+  for (i = 0 ; i < renderMeshes.Length () ; i++)
   {
-    if (rmH->renderMeshes[i]->material->IsVisitRequired ())
-      materials_to_visit.Push (rmH->renderMeshes[i]->material);
+    if (renderMeshes[i]->material->IsVisitRequired ())
+      materials_to_visit.Push (renderMeshes[i]->material);
   }
-}
-
-void csThing::ClearRenderMeshes ()
-{
-  rmHolder *rmH;
-  while (rmHolderList.Length() > 0)
-  {
-    rmH = rmHolderList.Pop();
-    for (int i = 0; i < rmH->renderMeshes.Length(); i++)
-    {
-      delete rmH->renderMeshes[i];
-    }
-    rmH->renderMeshes.DeleteAll ();
-    delete rmH;
-  }
-  rmHolderList.DeleteAll();
+  materials_to_visit.ShrinkBestFit ();
 }
 
 #endif
@@ -2675,45 +2654,25 @@ csRenderMesh **csThing::GetRenderMeshes (int &num, iRenderView* rview,
   	clip_z_plane);
   csVector3 camera_origin = tr_o2c.GetT2OTranslation ();
 
-  rmHolder *rmH = rmHolderList[rmHolderListIndex];
-
-  if (rmH->renderMeshes.Length() > 0 && rmH->renderMeshes[0]->inUse)
-  {
-    rmHolderListIndex = -1;
-    //find an empty rmH
-    for(i = 0; i < rmHolderList.Length(); i++)
-    {
-      rmH = rmHolderList[i];
-      if (rmH->renderMeshes.Length() == 0 ||
-	  rmH->renderMeshes[0]->inUse == false)
-      {
-        rmHolderListIndex = i;
-        break;
-      }
-    }
-    if (rmHolderListIndex == -1)
-    {
-      rmHolderList.Push (new rmHolder);
-      rmHolderListIndex = rmHolderList.Length()-1;
-      rmH = rmHolderList[rmHolderListIndex];
-    }
-  }
+  const uint currentFrame = rview->GetCurrentFrameNumber ();
+  csDirtyAccessArray<csRenderMesh*>& renderMeshes =
+    rmHolder.GetUnusedMeshes (currentFrame);
   
-  if (rmH->renderMeshes.Length() == 0)
+  if (renderMeshes.Length() == 0)
   {
-    PrepareRenderMeshes ();
+    PrepareRenderMeshes (renderMeshes);
   }
 
-  for (i = 0; i < rmH->renderMeshes.Length(); i++)
+  for (i = 0; i < renderMeshes.Length(); i++)
   {
-    csRenderMesh* rm = rmH->renderMeshes[i];
+    csRenderMesh* rm = renderMeshes[i];
     rm->object2camera = tr_o2c;
     rm->camera_origin = camera_origin;
     rm->clip_portal = clip_portal;
     rm->clip_plane = clip_plane;
     rm->clip_z_plane = clip_z_plane;
     rm->do_mirror = icam->IsMirrored ();
-    rm->inUse = true;
+    rm->lastFrame = currentFrame;
 
     rm->variablecontext->GetVariable (static_data->texLightmapName)->
       SetValue (i < litPolys.Length() ? litPolys[i]->SLM->GetTexture() : 0);
@@ -2721,13 +2680,13 @@ csRenderMesh **csThing::GetRenderMeshes (int &num, iRenderView* rview,
 
   UpdateDirtyLMs (); // @@@ Here?
 
-  num = rmH->renderMeshes.Length ();
+  num = renderMeshes.Length ();
   for (i = 0; i < materials_to_visit.Length (); i++)
   {
     materials_to_visit[i]->Visit ();
   }
 
-  return rmH->renderMeshes.GetArray ();
+  return renderMeshes.GetArray ();
 #else
   return 0;
 #endif

@@ -42,6 +42,7 @@
 #include "ivideo/rndbuf.h"
 #include "ivideo/rendermesh.h"
 #include "cstool/anonrndbuf.h"
+#include "cstool/rendermeshholder.h"
 #include "csgfx/shadervar.h"
 #include "csgfx/shadervarcontext.h"
 
@@ -84,8 +85,7 @@ class csGenmeshMeshObject : public iMeshObject
 {
 private:
 #ifdef CS_USE_NEW_RENDERER
-  csDirtyAccessArray<csRenderMesh*> meshes;
-  csRenderMesh *lastMeshPtr;
+  csRenderMeshHolderSingle rmHolder;
   csShaderVariableContext* svcontext;
   csRef<iGraphics3D> g3d;
   bool mesh_colors_dirty_flag;

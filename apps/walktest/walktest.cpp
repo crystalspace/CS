@@ -1110,6 +1110,24 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     return false;
   }
 
+  csRef<iConfigManager> cfg (CS_QUERY_REGISTRY (object_reg, iConfigManager));
+#if defined(OS_WIN32)
+  const bool mdumpDefault =
+#if defined(COMP_VC)
+    true;
+#else
+    false;
+#endif
+  if (!cfg->GetBool ("Walktest.Win32.Minidumps", mdumpDefault))
+  {
+    cswinMinidumpWriter::DisableCrashMinidumps ();
+  }
+  else
+  {
+    cswinMinidumpWriter::EnableCrashMinidumps ();
+  }
+#endif
+
   if (!csInitializer::RequestPlugins (object_reg,
   	CS_REQUEST_REPORTER,
   	CS_REQUEST_REPORTERLISTENER,
@@ -1175,7 +1193,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Created by Jorrit Tyberghein and others...");
 
   // Get all collision detection and movement config file parameters.
-  csRef<iConfigManager> cfg (CS_QUERY_REGISTRY (object_reg, iConfigManager));
   cfg_jumpspeed = cfg->GetFloat ("Walktest.CollDet.JumpSpeed", 0.08f);
   cfg_walk_accelerate = cfg->GetFloat ("Walktest.CollDet.WalkAccelerate", 0.007f);
   cfg_walk_maxspeed = cfg->GetFloat ("Walktest.CollDet.WalkMaxSpeed", 0.1f);
@@ -1615,7 +1632,7 @@ static void CreateSystem(void)
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-#if defined(OS_WIN32)
+#if defined(OS_WIN32) && defined(COMP_VC)
   cswinMinidumpWriter::EnableCrashMinidumps ();
 #endif
   // Initialize the random number generator

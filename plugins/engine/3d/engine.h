@@ -424,7 +424,7 @@ private:
   csRef<iVirtualClock> virtual_clock;
 
   /// Store the current framenumber. Is incremented every Draw ()
-  uint32 current_framenumber;
+  uint current_framenumber;
 
   /// Default shader to attach to all materials
   csRef<iShader> default_shader;
@@ -1052,7 +1052,7 @@ public:
   /**
    * Get the current framenumber. This should be incremented once every Draw
    */
-  virtual uint32 GetCurrentFrameNumber ()
+  virtual uint GetCurrentFrameNumber () const
   { return current_framenumber; };
 
 private:

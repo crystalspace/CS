@@ -271,6 +271,8 @@ public:
   virtual iSector* GetPreviousSector () {return 0;}
   virtual iPortal* GetLastPortal () {return 0;}
   virtual iCamera* GetOriginalCamera () const { return 0; }
+  virtual uint GetCurrentFrameNumber () const 
+  { return 0; /* @@@ Iso engine doesn't have frame number */}
 };
 
 SCF_IMPLEMENT_IBASE (csIsoFakeRenderView)

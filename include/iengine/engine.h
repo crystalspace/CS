@@ -1102,7 +1102,7 @@ struct iEngine : public iBase
   /**
    * Get the current framenumber. This should be incremented once every Draw
    */
-  virtual uint32 GetCurrentFrameNumber () = 0;
+  virtual uint GetCurrentFrameNumber () const = 0;
 };
 
 /** @} */

@@ -320,6 +320,9 @@ public:
 
   /// Get the last portal.
   virtual iPortal* GetLastPortal () { return ctxt->last_portal; }
+
+  /// Get the number of the current frame.
+  virtual uint GetCurrentFrameNumber () const;
 };
 
 #endif // __CS_RVIEW_H__

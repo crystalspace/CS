@@ -36,6 +36,7 @@
 #include "iengine/lightmgr.h"
 #include "csgfx/shadervarcontext.h"
 #include "csutil/garray.h"
+#include "cstool/rendermeshholder.h"
 
 struct iMaterialWrapper;
 struct iObjectRegistry;
@@ -82,8 +83,7 @@ private:
   unsigned int* ball_indices;
   int ball_triangles;
   
-  csDirtyAccessArray<csRenderMesh*> meshes;
-  csRenderMesh *lastMeshPtr;
+  csRenderMeshHolderSingle rmHolder;
 
   csRef<iRenderBuffer> vertex_buffer;
   csRef<iRenderBuffer> texel_buffer;

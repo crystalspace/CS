@@ -36,6 +36,7 @@
 #include "csutil/parray.h"
 #include "csutil/refarr.h"
 #include "csutil/util.h"
+#include "cstool/rendermeshholder.h"
 #include "iengine/mesh.h"
 #include "iengine/rview.h"
 #include "iengine/shadcast.h"
@@ -645,15 +646,9 @@ private:
   csFlags flags;
 
 #ifdef CS_USE_NEW_RENDERER
-  struct rmHolder
-  {
-    csDirtyAccessArray<csRenderMesh*> renderMeshes;
-  };
-  csArray<rmHolder*> rmHolderList;
-  int rmHolderListIndex;
+  csRenderMeshHolderMultiple rmHolder;
 
-  void PrepareRenderMeshes ();
-  void ClearRenderMeshes ();
+  void PrepareRenderMeshes (csDirtyAccessArray<csRenderMesh*>& renderMeshes);
 #else
   int clip_portal, clip_plane, clip_z_plane;
 #endif

@@ -265,7 +265,8 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
     return 0;
   }
 
-  csDirtyAccessArray<csRenderMesh*>& meshes = rmHolder.GetUnusedMeshes();
+  csDirtyAccessArray<csRenderMesh*>& meshes = 
+    rmHolder.GetUnusedMeshes (rview->GetCurrentFrameNumber ());
   meshes.Empty();
 
   for (int i = 0 ; i < particles.Length() ; i++)

@@ -165,7 +165,7 @@ public:
   uint32 context_id;
 };
 
-SCF_VERSION (iRenderView, 0, 5, 0);
+SCF_VERSION (iRenderView, 0, 5, 1);
 
 /**
  * This interface represents all information needed to render
@@ -284,6 +284,11 @@ struct iRenderView : public iBase
    * the camera before any space warping portals.
    */
   virtual iCamera* GetOriginalCamera () const = 0;
+
+  /**
+   * Get the number of the current frame.
+   */
+  virtual uint GetCurrentFrameNumber () const = 0;
 };
 
 /** @} */

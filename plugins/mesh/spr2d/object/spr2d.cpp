@@ -481,7 +481,8 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
   tr_o2c.SetO2TTranslation (-temp.Other2This (offset));
 
   bool meshCreated;
-  csRenderMesh*& rm = rmHolder.GetUnusedMesh(meshCreated);
+  csRenderMesh*& rm = rmHolder.GetUnusedMesh (meshCreated,
+    rview->GetCurrentFrameNumber ());
   if (meshCreated)
   {
     rm->meshtype = CS_MESHTYPE_TRIANGLEFAN;
@@ -501,7 +502,6 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
      */
   rm->indexstart = 0;
   rm->indexend = vertices.Length();
-  rm->inUse = true;
   rm->object2camera = tr_o2c;
   rm->camera_origin = camera_origin;
 

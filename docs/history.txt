@@ -41,6 +41,14 @@ chronological order.
 	  If this is specified then portals will be rendered in that
 	  renderstep. In most cases this should probably be specified
 	  for the first step (i.e. ambient).
+	- res replaced the 'inUse' member of csRenderMesh with a frame number
+	  counter. If this counter is equal to the engine's frame count, it 
+	  means the render mesh is still in use. This change removes the need
+	  to set inUse to false (and fixes some bugs where this occasionally
+	  didn't happen).
+	- res changed WT to allow disabling crash dumps via the 
+	  Walktest.Win32.Minidumps config setting. Also, for non-VC compilers
+	  it's now disabled by default (not much useful there anyway).
 27-Apr-2004
 	- Jorrit removed ClipBSphere() from iRenderView.
 	- Jorrit added a private implementation of ClipBSphere() to

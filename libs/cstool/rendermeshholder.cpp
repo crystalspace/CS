@@ -26,6 +26,7 @@
 csRenderMeshHolderSingle::csRenderMeshHolderSingle ()
 {
   lastMesh = 0;
+  nextShrink = 0;
 }
 
 csRenderMeshHolderSingle::~csRenderMeshHolderSingle ()
@@ -33,22 +34,23 @@ csRenderMeshHolderSingle::~csRenderMeshHolderSingle ()
   while (meshes.Length () > 0)
   {
     csRenderMesh *mesh = meshes.Pop ();
-    CS_ASSERT (mesh->inUse == false);
     delete mesh;
   }
 }
 
-csRenderMesh*& csRenderMeshHolderSingle::GetUnusedMesh (bool& created)
+csRenderMesh*& csRenderMeshHolderSingle::GetUnusedMesh (bool& created,
+							uint frameNumber)
 {
   created = false;
-  if ((meshes.Length() == 0) || (meshes[lastMesh]->inUse == true))
+  if ((meshes.Length() == 0) || 
+    (meshes[lastMesh]->lastFrame == frameNumber))
   {
     lastMesh = -1;
     //check the list
     int i;
     for(i = 0; i<meshes.Length (); i++)
     {
-      if (meshes[i]->inUse == false)
+      if (meshes[i]->lastFrame != frameNumber)
       {
         lastMesh = i;
         break;
@@ -58,11 +60,18 @@ csRenderMesh*& csRenderMeshHolderSingle::GetUnusedMesh (bool& created)
     {
       lastMesh = meshes.Push (new csRenderMesh);
       created = true;
+      nextShrink = frameNumber + 1;
     }
   }
 
+  // Conserve some memory
+  if (!created && (frameNumber <= nextShrink))
+  {
+    meshes.ShrinkBestFit ();
+  }
+
   csRenderMesh*& mesh = meshes[lastMesh];
-  mesh->inUse = true;
+  mesh->lastFrame = frameNumber;
   return mesh;
 }
 
@@ -85,7 +94,6 @@ csRenderMeshHolderMultiple::~csRenderMeshHolderMultiple ()
       for (int j = 0; j < holder->Length(); j++)
       {
 	csRenderMesh* rm = (*holder)[j];
-	CS_ASSERT (rm->inUse == false);
 	delete rm;
       }
     }
@@ -94,18 +102,18 @@ csRenderMeshHolderMultiple::~csRenderMeshHolderMultiple ()
 }
 
 csDirtyAccessArray<csRenderMesh*>& 
-csRenderMeshHolderMultiple::GetUnusedMeshes()
+csRenderMeshHolderMultiple::GetUnusedMeshes(uint frameNumber)
 {
   csDirtyAccessArray<csRenderMesh*>* rmH = rmHolderList[rmHolderListIndex];
 
-  if (rmH->Length() > 0 && (*rmH)[0]->inUse)
+  if (rmH->Length() > 0 && ((*rmH)[0]->lastFrame == frameNumber))
   {
     rmHolderListIndex = -1;
     //find an empty rmH
     for(int i = 0; i < rmHolderList.Length(); i++)
     {
       rmH = rmHolderList[i];
-      if ((rmH->Length() == 0) || !(*rmH)[0]->inUse)
+      if ((rmH->Length() == 0) || ((*rmH)[0]->lastFrame != frameNumber))
       {
         rmHolderListIndex = i;
         break;

@@ -122,23 +122,10 @@ csPortalContainer::csPortalContainer (iEngine* engine) :
   scfiPolygonMesh.SetPortalContainer (this);
   scfiPolygonMeshCD.SetPortalContainer (this);
   scfiPolygonMeshLOD.SetPortalContainer (this);
-
-#ifdef CS_USE_NEW_RENDERER
-  lastMeshPtr = new csRenderMesh;
-  meshes.Push (lastMeshPtr);
-#endif
 }
 
 csPortalContainer::~csPortalContainer ()
 {
-  #ifdef CS_USE_NEW_RENDERER
-  //clear up rendermeshes
-  while (meshes.Length () > 0)
-  {
-    csRenderMesh *mesh = meshes.Pop ();
-    delete mesh;
-  }
-#endif
 }
 
 csRenderMesh** csPortalContainer::GetRenderMeshes (int& num,
@@ -152,34 +139,16 @@ csRenderMesh** csPortalContainer::GetRenderMeshes (int& num,
     return 0;
   }
 
-  // first, check if we have any usable mesh.
-  if (lastMeshPtr->inUse == true)
-  {
-    lastMeshPtr = 0;
-    //check the list
-    int i;
-    for (i = 0; i<meshes.Length (); i++)
-    {
-      if (meshes[i]->inUse == false)
-      {
-        lastMeshPtr = meshes[i];
-        break;
-      }
-    }
-    if (lastMeshPtr == 0)
-    {
-      lastMeshPtr = new csRenderMesh;
-      meshes.Push (lastMeshPtr);
-    }
-  }
+  bool rmCreated;
+  csRenderMesh*& meshPtr = rmHolder.GetUnusedMesh (rmCreated,
+    rview->GetCurrentFrameNumber ());
 
-  lastMeshPtr->inUse = true;
-  lastMeshPtr->portal = this;
-  lastMeshPtr->material = 0;
-  lastMeshPtr->object2camera = tr_o2c;
-  lastMeshPtr->camera_origin = camera_origin;
+  meshPtr->portal = this;
+  meshPtr->material = 0;
+  meshPtr->object2camera = tr_o2c;
+  meshPtr->camera_origin = camera_origin;
   num = 1;
-  return &lastMeshPtr;
+  return &meshPtr;
 }
 
 void csPortalContainer::Prepare ()

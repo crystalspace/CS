@@ -26,7 +26,8 @@ class csIsoRenderBucket;
 /**
  *  isometric rendering view, used during rendering
 */
-class csIsoRenderView : public iIsoRenderView {
+class csIsoRenderView : public iIsoRenderView 
+{
 private:
   /// view to use
   iIsoView *view;

@@ -1647,7 +1647,8 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n,
   csVector3 camera_origin = tr_o2c.GetT2OTranslation ();
 
   bool rmCreated;
-  csRenderMesh*& rmesh = rmHolder.GetUnusedMesh (rmCreated);
+  csRenderMesh*& rmesh = rmHolder.GetUnusedMesh (rmCreated,
+    rview->GetCurrentFrameNumber ());
 
   UpdateWorkTables (factory->GetVertexCount());
 
@@ -1814,7 +1815,6 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n,
     rmesh->variablecontext = &svcontext;
   }
   rmesh->meshtype = CS_MESHTYPE_TRIANGLES;
-  rmesh->inUse = true;
   n = 1;
   return &rmesh;
 #else

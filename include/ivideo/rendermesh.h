@@ -66,15 +66,18 @@ struct csRenderMesh
     indexstart = indexend = 0;
     portal = 0;
     geometryInstance = 0;
-    inUse = false;
+    lastFrame = ~0;
     
     db_mesh_name = "<unknown>";
   }
 
   ~csRenderMesh () {}
 
-  /// In use by the rendering system
-  bool inUse;
+  /**
+   * Number of the frame this rendermesh was used in last. Can be used
+   * to determine whether a rendermesh is currently in use.
+   */
+  uint lastFrame;
 
   /// Z mode to use
   csZBufMode z_buf_mode;

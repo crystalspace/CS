@@ -1098,3 +1098,7 @@ iCamera *csRenderView::CreateNewCamera ()
   return ctxt->icamera;
 }
 
+uint csRenderView::GetCurrentFrameNumber () const
+{
+  return engine->GetCurrentFrameNumber ();
+}

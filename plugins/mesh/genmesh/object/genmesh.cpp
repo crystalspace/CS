@@ -151,9 +151,6 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory) :
   g3d = CS_QUERY_REGISTRY (factory->object_reg, iGraphics3D);
   buffers_version = (uint)-1;
   mesh_colors_dirty_flag = true;
-
-  lastMeshPtr = new csRenderMesh;
-  meshes.Push (lastMeshPtr);
 #endif
 }
 
@@ -167,15 +164,6 @@ csGenmeshMeshObject::~csGenmeshMeshObject ()
 #endif
 
   ClearPseudoDynLights ();
-
-#ifdef CS_USE_NEW_RENDERER
-  //clear up rendermeshes
-  while (meshes.Length () > 0)
-  {
-    csRenderMesh *mesh = meshes.Pop ();
-    delete mesh;
-  }
-#endif
 
 #ifdef CS_USE_NEW_RENDERER
   scfiShaderVariableAccessor->DecRef ();
@@ -1026,26 +1014,9 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
 
   if (material_needs_visit) mater->Visit ();
 
-  // First check if we have any usable mesh
-  if (lastMeshPtr->inUse == true)
-  {
-    lastMeshPtr = 0;
-    //check the list
-    int i;
-    for (i = 0; i<meshes.Length (); i++)
-    {
-      if (meshes[i]->inUse == false)
-      {
-        lastMeshPtr = meshes[i];
-        break;
-      }
-    }
-    if (lastMeshPtr == 0)
-    {
-      lastMeshPtr = new csRenderMesh;
-      meshes.Push (lastMeshPtr);
-    }
-  }
+  bool rmCreated;
+  csRenderMesh*& meshPtr = rmHolder.GetUnusedMesh (rmCreated,
+    rview->GetCurrentFrameNumber ());
 
   if (factory->back2front)
   {
@@ -1085,23 +1056,23 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
     sv->SetValue (sorted_index_buffer);
   }
 
-  lastMeshPtr->inUse = true;
-  lastMeshPtr->mixmode = MixMode;
-  lastMeshPtr->clip_portal = clip_portal;
-  lastMeshPtr->clip_plane = clip_plane;
-  lastMeshPtr->clip_z_plane = clip_z_plane;
-  lastMeshPtr->do_mirror = camera->IsMirrored ();
-  lastMeshPtr->meshtype = CS_MESHTYPE_TRIANGLES;
-  lastMeshPtr->indexstart = 0;
-  lastMeshPtr->indexend = factory->GetTriangleCount () * 3;
-  lastMeshPtr->material = mater;
-  lastMeshPtr->object2camera = tr_o2c;
-  lastMeshPtr->camera_origin = camera_origin;
-  lastMeshPtr->variablecontext = svcontext;
-  lastMeshPtr->geometryInstance = (void*)factory;
+  meshPtr->mixmode = MixMode;
+  meshPtr->clip_portal = clip_portal;
+  meshPtr->clip_plane = clip_plane;
+  meshPtr->clip_z_plane = clip_z_plane;
+  meshPtr->do_mirror = camera->IsMirrored ();
+  meshPtr->meshtype = CS_MESHTYPE_TRIANGLES;
+  meshPtr->indexstart = 0;
+  meshPtr->indexend = factory->GetTriangleCount () * 3;
+  meshPtr->material = mater;
+  meshPtr->object2camera = tr_o2c;
+  meshPtr->camera_origin = camera_origin;
+  if (rmCreated)
+    meshPtr->variablecontext = svcontext;
+  meshPtr->geometryInstance = (void*)factory;
  
   n = 1;
-  return &lastMeshPtr;
+  return &meshPtr;
 #else
   n = 0;
   return 0;

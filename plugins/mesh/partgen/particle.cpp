@@ -530,7 +530,8 @@ csRenderMesh **csNewParticleSystem::GetRenderMeshes (int &num,
       	sizeof (unsigned int) * TriangleCount *3);
 
   bool meshCreated;
-  csRenderMesh*& rm = rmHolder.GetUnusedMesh (meshCreated);
+  csRenderMesh*& rm = rmHolder.GetUnusedMesh (meshCreated, 
+    rview->GetCurrentFrameNumber ());
 
   if (meshCreated)
   {
@@ -538,7 +539,6 @@ csRenderMesh **csNewParticleSystem::GetRenderMeshes (int &num,
   }
 
   // Prepare for rendering.
-  rm->inUse = true;
   rm->mixmode = MixMode;
   rm->clip_portal = ClipPortal;
   rm->clip_plane = ClipPlane;

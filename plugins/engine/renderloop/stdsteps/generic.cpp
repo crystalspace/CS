@@ -234,7 +234,6 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
       if (mesh->variablecontext)
         mesh->variablecontext->PopVariables (stacks);
       shadervars.PopVariables (stacks);
-      mesh->inUse = false;
     }
     shader->DeactivatePass ();
   }
@@ -290,7 +289,6 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
 #endif
   int num = meshlist->SortMeshLists ();
   CS_ALLOC_STACK_ARRAY (csRenderMesh*, sameShaderMeshes, num);
-  csArray<csRenderMesh> saveMeshes;
   meshlist->GetSortedMeshes (sameShaderMeshes);
  
   int lastidx = 0;
@@ -349,8 +347,6 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
       ToggleStepSettings (g3d, false);
       
       mesh->portal->Draw (rview);
-      mesh->inUse = false;
-      
     }
     else 
     {

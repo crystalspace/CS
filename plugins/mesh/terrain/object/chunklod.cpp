@@ -809,7 +809,8 @@ bool csChunkLodTerrainObject::DrawTestQuad (iRenderView* rv,
   else 
   {
     bool meshCreated;
-    csRenderMesh*& rm = rmHolder.GetUnusedMesh (meshCreated);
+    csRenderMesh*& rm = rmHolder.GetUnusedMesh (meshCreated,
+      rv->GetCurrentFrameNumber ());
     rm->object2camera = tr_o2c;
     rm->camera_origin = camera_origin;
     rm->clip_portal = clip_portal;
@@ -833,7 +834,8 @@ bool csChunkLodTerrainObject::DrawTestQuad (iRenderView* rv,
     {
       for (int i = 0; i < palette.Length(); i ++)
       {
-	csRenderMesh*& rm = rmHolder.GetUnusedMesh (meshCreated);
+	csRenderMesh*& rm = rmHolder.GetUnusedMesh (meshCreated,
+	  rv->GetCurrentFrameNumber ());
         rm->object2camera = tr_o2c;
         rm->camera_origin = camera_origin;
         rm->clip_portal = clip_portal;
@@ -867,7 +869,8 @@ bool csChunkLodTerrainObject::DrawTest (iRenderView* rview, iMovable* movable,
 
   float kappa = error_tolerance * cam->GetInvFOV() * 
 	2*tan(cam->GetFOVAngle()/180.0*PI/2);
-  returnMeshes = &returnMeshesHolder.GetUnusedMeshes ();
+  returnMeshes = &returnMeshesHolder.GetUnusedMeshes (
+    rview->GetCurrentFrameNumber ());
   returnMeshes->Empty ();
   tricount = 0;
   uint32 frustum_mask;
@@ -896,7 +899,8 @@ csRenderMesh** csChunkLodTerrainObject::GetRenderMeshes (
   {
     // pass back root node as default always
     bool meshCreated;
-    csRenderMesh*& rm = rmHolder.GetUnusedMesh (meshCreated);
+    csRenderMesh*& rm = rmHolder.GetUnusedMesh (meshCreated,
+      rview->GetCurrentFrameNumber ());
     rm->z_buf_mode = CS_ZBUF_TEST;
     rm->mixmode = CS_FX_COPY;
     rm->variablecontext = rootNode->svcontext;

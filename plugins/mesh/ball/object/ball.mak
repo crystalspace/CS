@@ -39,7 +39,7 @@ INF.BALL = $(SRCDIR)/plugins/mesh/ball/object/ball.csplugin
 INC.BALL = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/ball/object/*.h))
 SRC.BALL = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/ball/object/*.cpp))
 OBJ.BALL = $(addprefix $(OUT)/,$(notdir $(SRC.BALL:.cpp=$O)))
-DEP.BALL = CSGFX CSGEOM CSUTIL
+DEP.BALL = CSTOOL CSGFX CSGEOM CSUTIL
 
 MSVC.DSP += BALL
 DSP.BALL.NAME = ball

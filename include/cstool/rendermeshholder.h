@@ -41,6 +41,7 @@ class CS_CSTOOL_EXPORT csRenderMeshHolderSingle
 {
   csArray<csRenderMesh*> meshes;
   int lastMesh;
+  uint nextShrink;
 public:
   csRenderMeshHolderSingle ();
   ~csRenderMeshHolderSingle ();
@@ -50,8 +51,10 @@ public:
    * \param created \a True if a new csRenderMesh was allocated, \a False
    *  if one was reused. Can be used to determine whether all or only a
    *  subset of the csRenderMesh values have to be initialized.
+   * \param frameNumber Current frame number - used to determine unused 
+   *  meshes.
    */
-  csRenderMesh*& GetUnusedMesh (bool& created);
+  csRenderMesh*& GetUnusedMesh (bool& created, uint frameNumber);
 };
 
 /**
@@ -80,8 +83,10 @@ public:
 
   /**
    * Retrieve an unused array of csRenderMesh*.
+   * \param frameNumber Current frame number - used to determine unused 
+   *  meshes.
    */
-  csDirtyAccessArray<csRenderMesh*>& GetUnusedMeshes ();
+  csDirtyAccessArray<csRenderMesh*>& GetUnusedMeshes (uint frameNumber);
 };
 
 #endif // __CS_CSTOOL_RENDERMESHHOLDER_H__

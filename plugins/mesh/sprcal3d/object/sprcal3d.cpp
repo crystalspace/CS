@@ -1465,7 +1465,8 @@ csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n,
   csVector3 camera_origin = tr_o2c.GetT2OTranslation ();
 
   SetupRenderMeshes ();
-  csDirtyAccessArray<csRenderMesh*>& meshes = rmHolder.GetUnusedMeshes ();
+  csDirtyAccessArray<csRenderMesh*>& meshes = 
+    rmHolder.GetUnusedMeshes (rview->GetCurrentFrameNumber ());
 
   for (int m = 0; m < allRenderMeshes.Length(); m++)
   {
@@ -1481,7 +1482,6 @@ csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n,
       *rm = *allRenderMeshes[m];
     }
 
-    rm->inUse = true;
     rm->clip_portal = clip_portal;
     rm->clip_plane = clip_plane;
     rm->clip_z_plane = clip_z_plane;
