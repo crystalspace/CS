@@ -1,6 +1,6 @@
 %define name    crystalspace
-%define version 20040209
-%define release 3
+%define version 20040228
+%define release 1
 %define prefix	/usr
 Group: Applications/Development
 Source: cs-current-snapshot.tar.bz2
@@ -22,7 +22,7 @@ Crystal Space is a free (LGPL) and portable 3D SDK written in C++.
 # Dev package
 %package -n %{name}-devel
 Summary: C++ headers for Crystal Space free 3D SDK.
-Group: Application/development
+Group: Application/Development
 Provides:       %{name}-devel = %{version}-%{release}
 %description -n %{name}-devel
 Headers and files needed for building a Crystal Space apps
@@ -44,6 +44,9 @@ jam
 
 %install
 jam -sDESTDIR=%{buildroot} install
+
+CRYSTAL=%{buildroot}%{prefix} CS_DATADIR=%{buildroot}%{prefix}/share/crystal CS_MAPDIR=%{buildroot}%{prefix}/share/crystal/maps %{buildroot}%{prefix}/bin/cslight -video=null flarge
+CRYSTAL=%{buildroot}%{prefix} CS_DATADIR=%{buildroot}%{prefix}/share/crystal CS_MAPDIR=%{buildroot}%{prefix}/share/crystal/maps %{buildroot}%{prefix}/bin/cslight -video=null partsys
 
 %clean
 rm -rf "$RPM_BUILD_ROOT"
@@ -108,6 +111,9 @@ rm -rf "$RPM_BUILD_ROOT"
 %{prefix}/include/igraphic/*.h
 
 %changelog
+* Fri Feb 28 2004 Vincent Knecht <vknecht@users.sourceforge.net> 20040228-1
+- Added lightmaps cache computation for flarge and partsys
+
 * Sat Feb 28 2004 Philip Wyett <philip@wyett.net>
 - Removed reference to 'include/imesh/thing/ dir.
 
