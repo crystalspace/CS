@@ -605,8 +605,8 @@ bool csPolygon3DStatic::Finish (iBase* thing_logparent)
       thing_static->thing_type->Notify ("Oversize lightmap (%dx%d > %dx%d) "
         "for polygon '%s/%s'", lmw, lmh,
         max_lmw, max_lmh, mname, GetName());
+      flags.Reset (CS_POLY_LIGHTING);
     }
-    flags.Reset (CS_POLY_LIGHTING);
   }
 
   return rc;
