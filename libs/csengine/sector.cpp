@@ -219,8 +219,38 @@ void csSector::UseStaticTree (int mode, bool octree)
   static_thing->CompressVertices ();
   CsPrintf (MSG_INITIALIZATION, "Build vertex tables...\n");
   if (octree) { ((csOctree*)static_tree)->BuildVertexTables (); }
-  //CsPrintf (MSG_INITIALIZATION, "Build PVS...\n");
-  //if (octree) { ((csOctree*)static_tree)->BuildPVS (static_thing); }
+
+  // Everything for PVS.
+  str = "vis/pvs_";
+  str += GetName ();
+  bool recalc_pvs = true;
+  if ((!csWorld::do_force_revis || csWorld::do_not_force_revis) &&
+  	w->VFS->Exists ((const char*)str))
+  {
+    recalc_pvs = false;
+    CsPrintf (MSG_INITIALIZATION, "Loading PVS...\n");
+    recalc_pvs = !((csOctree*)static_tree)->ReadFromCachePVS (
+    	w->VFS, (const char*)str);;
+  }
+  if (csWorld::do_not_force_revis) recalc_pvs = false;
+  if (recalc_pvs)
+  {
+#   if 0
+    if (octree)
+    {
+      CsPrintf (MSG_INITIALIZATION, "Build PVS...\n");
+      ((csOctree*)static_tree)->BuildPVS (static_thing);
+    }
+#   else
+    if (octree)
+    {
+      CsPrintf (MSG_INITIALIZATION, "Build Dummy PVS...\n");
+      ((csOctree*)static_tree)->SetupDummyPVS ();
+    }
+#   endif
+    CsPrintf (MSG_INITIALIZATION, "Caching PVS...\n");
+    ((csOctree*)static_tree)->CachePVS (w->VFS, (const char*)str);
+  }
   CsPrintf (MSG_INITIALIZATION, "DONE!\n");
 }
 

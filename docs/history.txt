@@ -1,5 +1,21 @@
 The history order has been reversed so that new features are at the top.
 
+11-May-2000
+	- Changes from Michael Dale Long:
+	    - Added a CHK_DECREF() macro to cctest.h that checks if an
+	      object is not NULL and performs a DecRef() on it if so.
+	      Should be used only used when it is _possible_ for a SCF
+	      interface to be NULL (i.e. aborted init).
+	    - Rewrote iPawn interface (include/csclear/ipawn.h). I plan
+	      to begin implementing it soon.
+	- Frank O'Connor added dtSimple to application build list.
+	- Frank updated VC project files for dynamic textures (OpenGL).
+	- Paul Garceau did a modification for software renderer makefile.
+	  Changed vpath to consider plugins/video/renderer/common
+	  as well as plugins/video/renderer/software.
+	- Finished caching of PVS. Also added dummy PVS calculator that
+	  is used for now and just creates a PVS that says that everything
+	  is visible :-)
 10-May-2000
 	- Michael Dale Long did a major update for CrystalClear.  A lot of
 	  work has been done on iActor.  The main thing was adding multiple
@@ -72,6 +88,17 @@ The history order has been reversed so that new features are at the top.
 	      to link with extra libraries required by plug-in modules which
 	      they might end up loading.  In particular, scfreg makefile was
 	      considerably simplified.
+	- Frank O'Connor switched dtsimple to use cryst.cfg.
+	- Robert Bate updated the Mac port and project files again.
+	  He fixed up access paths and runtime libraries and added a
+	  shared library target.
+	  He also moved projects that make plugins to the new
+	  MakePlugins.mcp project.
+	- Norman Kramer added dynamic texture rendering support for Glide.
+	  His support does not use the software renderer but native hardware
+	  rendering.
+	- Frank O'Connor added a check to the OpenGL texture manager before
+	  calling DecRef in destructor.
 9-May-2000
 	- -revis commandline option will now work to force recalculation
 	  of the octree. -norevis will not work for this as CS cannot

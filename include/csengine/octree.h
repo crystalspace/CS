@@ -328,6 +328,16 @@ private:
    */
   void BuildPVS (csThing* thing, csOctreeNode* node);
 
+  /**
+   * Add all nodes of a tree to the PVS of 'leaf'.
+   */
+  void AddDummyPVSNodes (csOctreeNode* leaf, csOctreeNode* node);
+
+  /**
+   * Set up a dummy PVS for this node.
+   */
+  void SetupDummyPVS (csOctreeNode* node);
+
   /// Cache this node and children.
   void Cache (csOctreeNode* node, iFile* cf);
 
@@ -340,6 +350,12 @@ private:
   bool ReadFromCachePVS (iFile* cf, csOctreeNode* node);
   /// Cache the PVS for this node and children to VFS.
   void CachePVS (csOctreeNode* node, iFile* cf);
+
+  /**
+   * Get the node for this path.
+   */
+  csOctreeNode* GetNodeFromPath (csOctreeNode* node,
+	unsigned char* path, int path_len);
 
   /**
    * Get the path to a node in the tree.
@@ -416,6 +432,14 @@ public:
    * to which this octree belongs.
    */
   void BuildPVS (csThing* thing);
+
+  /**
+   * Set up a dummy PVS (i.e. mark everything as visible).
+   */
+  void SetupDummyPVS ()
+  {
+    SetupDummyPVS ((csOctreeNode*)root);
+  }
 
   /**
    * Build vertex tables for minibsp leaves. These tables are

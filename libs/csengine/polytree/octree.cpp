@@ -1185,6 +1185,36 @@ void csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
   }
 }
 
+void csOctree::AddDummyPVSNodes (csOctreeNode* leaf, csOctreeNode* node)
+{
+  if (!node) return;
+  csPVS& pvs = leaf->GetPVS ();
+  csOctreeVisible* ovis = pvs.Add ();
+  ovis->SetOctreeNode (node);
+  // Traverse to the children.
+  int i;
+  for (i = 0 ; i < 8 ; i++)
+    AddDummyPVSNodes (leaf, (csOctreeNode*)node->children[i]);
+}
+
+void csOctree::SetupDummyPVS (csOctreeNode* node)
+{
+  if (!node) return;
+  if (node->IsLeaf ())
+  {
+    csPVS& pvs = node->GetPVS ();
+    pvs.Clear ();
+    AddDummyPVSNodes (node, (csOctreeNode*)root);
+  }
+  else
+  {
+    // Traverse to the children.
+    int i;
+    for (i = 0 ; i < 8 ; i++)
+      SetupDummyPVS ((csOctreeNode*)node->children[i]);
+  }
+}
+
 void csOctree::BuildPVS (csThing* thing,
 	csOctreeNode* node)
 {
@@ -1487,14 +1517,64 @@ bool csOctree::ReadFromCache (iVFS* vfs, const char* name,
   return rc;
 }
 
+void csOctree::GetNodePath (csOctreeNode* node, csOctreeNode* child,
+	unsigned char* path, int& path_len)
+{
+  if (node == child) return;
+
+  int i;
+  for (i = 0 ; i < 8 ; i++)
+    if (node->children[i])
+    {
+      csOctreeNode* onode = (csOctreeNode*)node->children[i];
+      if (onode == child)
+      {
+        path[path_len++] = i+1;
+	return;
+      }
+      if (onode->bbox.In (child->GetCenter ()))
+      {
+        path[path_len++] = i+1;
+	GetNodePath (onode, child, path, path_len);
+	return;
+      }
+    }
+}
+
+csOctreeNode* csOctree::GetNodeFromPath (csOctreeNode* node,
+	unsigned char* path, int path_len)
+{
+  int i;
+  for (i = 0 ; i < path_len ; i++)
+  {
+    node = (csOctreeNode*)node->children[path[i]-1];
+  }
+  printf ("\n");
+  return node;
+}
+
 bool csOctree::ReadFromCachePVS (iFile* cf, csOctreeNode* node)
 {
-  (void)cf; (void)node;
-  //csPVS& pvs = node->GetPVS ();
-  //pvs.Clear ();
-  //csOctreeVisible* ovis = pvs.Add ();
-  //ovis->SetOctreeNode (occludee);
-  return false;
+  if (!node) return true;
+  unsigned char buf[255];
+  csPVS& pvs = node->GetPVS ();
+  pvs.Clear ();
+  unsigned char b = ReadByte (cf);
+  while (b)
+  {
+    b--;
+    if (b) ReadString (cf, (char*)buf, b);
+    csOctreeVisible* ovis = pvs.Add ();
+    csOctreeNode* occludee = GetNodeFromPath ((csOctreeNode*)root,
+    	buf, b);
+    ovis->SetOctreeNode (occludee);
+    b = ReadByte (cf);
+  }
+  int i;
+  for (i = 0 ; i < 8 ; i++)
+    if (!ReadFromCachePVS (cf, (csOctreeNode*)node->children[i]))
+      return false;
+  return true;
 }
 
 bool csOctree::ReadFromCachePVS (iVFS* vfs, const char* name)
@@ -1523,31 +1603,9 @@ bool csOctree::ReadFromCachePVS (iVFS* vfs, const char* name)
   return rc;
 }
 
-void csOctree::GetNodePath (csOctreeNode* node, csOctreeNode* child,
-	unsigned char* path, int& path_len)
-{
-  int i;
-  for (i = 0 ; i < 8 ; i++)
-    if (node->children[i])
-    {
-      csOctreeNode* onode = (csOctreeNode*)node->children[i];
-      if (onode == child)
-      {
-        path[path_len++] = i;
-	return;
-      }
-      if (onode->bbox.In (child->GetCenter ()))
-      {
-        path[path_len++] = i;
-	GetNodePath (onode, child, path, path_len);
-	return;
-      }
-    }
-}
-
 void csOctree::CachePVS (csOctreeNode* node, iFile* cf)
 {
-  WriteString (cf, "NPVS", 4);
+  if (!node) return;
   csPVS& pvs = node->GetPVS ();
   csOctreeVisible* ovis = pvs.GetFirst ();
   unsigned char path[255];
@@ -1555,12 +1613,15 @@ void csOctree::CachePVS (csOctreeNode* node, iFile* cf)
   while (ovis)
   {
     path_len = 0;
-    GetNodePath ((csOctreeNode*)root, node, path, path_len);
+    GetNodePath ((csOctreeNode*)root, ovis->GetOctreeNode (), path, path_len);
     WriteByte (cf, path_len+1);		// First write length of path + 1
-    WriteString (cf, (char*)path, path_len);
+    if (path_len) WriteString (cf, (char*)path, path_len);
     ovis = pvs.GetNext (ovis);
   }
   WriteByte (cf, 0);	// End marker
+  int i;
+  for (i = 0 ; i < 8 ; i++)
+    CachePVS ((csOctreeNode*)node->children[i], cf);
 }
 
 void csOctree::CachePVS (iVFS* vfs, const char* name)
