@@ -11,6 +11,8 @@ chronological order.
 	  invalidate the frustum mask that is used for hierarchical frustum
 	  culling. This is now fixed by remembering the last frustum mask
 	  and using that in combination with the mask we have so far.
+	- Chris Matuszewski fixed an incomplete SCF interface in iPath.
+	  Added a virtual destructor to csCatmullRomSpline.
 31-Oct-2003
 	- Eric Sunshine performed additional cleanup of the various "Release
 	  Notes" sections of the user manual.  Repaired some Texinfo mark-up

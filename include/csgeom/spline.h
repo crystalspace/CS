@@ -211,6 +211,9 @@ protected:
 public:
   /// Create a CatmullRom spline with d dimensions and p points.
   csCatmullRomSpline (int d, int p) : csBSpline (d, p) { }
+
+  /// Destroy the spline.
+  virtual ~csCatmullRomSpline () {}
 };
 
 /** @} */

@@ -65,7 +65,10 @@ public:
   SCF_DECLARE_IBASE;
 
   /// Create a path with p points.
-  csPath (int p) : csCatmullRomSpline (9, p) { }
+  csPath (int p) : csCatmullRomSpline (9, p)
+  {
+    SCF_CONSTRUCT_IBASE (0);
+  }
 
   /// Destroy the path.
   virtual ~csPath () { }
