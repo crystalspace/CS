@@ -2,7 +2,7 @@
 #ifndef __CS_3DS2LEV_H__
 #define __CS_3DS2LEV_H__
 
-#include "lib3ds/types.h"
+#include <lib3ds/types.h>
 
 #define  FLAG_VERBOSE       0x0001    /* Verbose mode on                  */
 #define  FLAG_VERYVERBOSE   0x0002    /* Very verbose mode on             */
