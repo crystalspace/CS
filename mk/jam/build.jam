@@ -41,6 +41,7 @@ include $(mkdir)/compiler.jam ;
 include $(mkdir)/objectivec.jam ;
 include $(mkdir)/assembler.jam ;
 include $(mkdir)/bisonflex.jam ;
+include $(mkdir)/swig.jam ;
 
 include $(mkdir)/flags.jam ;
 include $(mkdir)/library.jam ;
