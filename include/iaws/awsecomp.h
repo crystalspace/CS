@@ -460,6 +460,14 @@ public:
   virtual csRect getPreferredSize()
   { return comp->getPreferredSize (); }
 
+  /// Set the preferred size of the component.
+  virtual void setPreferredSize (const csRect& size)
+  { comp->setPreferredSize(size); }
+
+  /// Clear the manually set preferred size.
+  virtual void clearPreferredSize ()
+  { comp->clearPreferredSize(); }
+
   /// get the components minimal size, used by layout manager
   virtual csRect getMinimumSize()
   { return comp->getMinimumSize (); }
