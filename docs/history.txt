@@ -10,6 +10,7 @@ The history order is reversed so that new features are at the top.
 	  The API is now fully implemented, and there are no compile errors
 	  (except possibly the shader plugin .cpp's, which I can't test since
 	  I don't have a proper GL installation.)
+	- Anders Stenberg fixed a few compile errors Oktal introduced.
 18-Jul-2003
 	- Anders Stenberg fixed compile errors introduced by Oktal. New
 	  renderer should compile, although variable functionality is

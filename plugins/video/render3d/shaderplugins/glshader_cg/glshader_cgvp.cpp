@@ -46,9 +46,10 @@ SCF_IMPLEMENT_IBASE_END
 
 void csShaderGLCGVP::Activate(iShaderPass* current, csRenderMesh* mesh)
 {
+  int i;
+
 #if 0
   // set variables
-  int i;
   for(i = 0; i < variablemap.Length(); ++i)
   {
     variablemapentry* e = (variablemapentry*)variablemap.Get(i);

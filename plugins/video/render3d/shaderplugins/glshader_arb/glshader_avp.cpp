@@ -226,10 +226,10 @@ bool csShaderGLAVP::Load(iDocumentNode* program)
         }
           break;
       case XMLTOKEN_DECLARE:
-        {
 #if 0
+        {
           //create a new variable
-          /*csRef<iShaderVariable> var = 
+          csRef<iShaderVariable> var = 
             shadermgr->CreateVariable (child->GetAttributeValue ("name"));
           csStringID idtype = xmltokens.Request( child->GetAttributeValue("type") );
           idtype -= 100;
@@ -254,7 +254,7 @@ bool csShaderGLAVP::Load(iDocumentNode* program)
           }
           // @@@ I'll blame Matze if this is bad :) /Anders Stenberg
           var->IncRef (); 
-          variables.Put( csHashCompute(var->GetName()), var);*/
+          variables.Put( csHashCompute(var->GetName()), var);
         }
 #endif
         break;
