@@ -73,11 +73,14 @@ csSoundDriverWaveOut::csSoundDriverWaveOut(iBase *piBase)
   hwo = NULL;
   hThread = NULL;
   dwThread = 0;
+  Config = 0;
 }
 
 csSoundDriverWaveOut::~csSoundDriverWaveOut()
 {
   m_piSystem->Printf (MSG_CONSOLE, "\nSoundDriver Destructor !!!!\n");
+  if (Config)
+    Config->DecRef();
 }
 
 bool csSoundDriverWaveOut::Initialize (iSystem *iSys)
