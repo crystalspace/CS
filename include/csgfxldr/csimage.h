@@ -40,7 +40,6 @@ struct Filter5x5;
 class AlphaMapFile
 {
 // @@@ FIXME: None of this is implemented anywhere.
-// @@@ FIXME: The COM stuff is completely broken.
 #if 0
 private:
   int width;

@@ -22,7 +22,7 @@
     that allows on-the-fly generation of .DEF files driven through
     command-line arguments. This wrapper is highly Crystal-Space specific
     in the terms that it generates .def file for DLLs explicitly for
-    Crystal Space COM model. It was originally a REXX script, but it
+    Crystal Space SCF model. It was originally a REXX script, but it
     was rewriten as a C++ program because CMD.EXE has an annoying
     limit of 1024 characters on the length of the command line passed
     to any subprocess (including REXX scripts); if this limit is exceeded

@@ -40,7 +40,7 @@ scfInterface iNetworkManager;
 scfInterface iSoundRender;
 scfInterface iConfig;
 
-/// Class to collect all options for all COM modules in the system.
+/// Class to collect all options for all plug-in modules in the system.
 class csColOption
 {
 public:
@@ -158,7 +158,7 @@ public:
   static bool ConsoleReady;
   /// true if CrystalSpace visual is active (focused)
   bool IsFocused;
-  /// List of all options for all COM modules.
+  /// List of all options for all plug-in modules.
   csColOption* OptionList;
   /// System configuration file name
   char *ConfigName;

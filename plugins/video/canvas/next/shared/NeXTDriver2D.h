@@ -18,7 +18,6 @@
 //	functionality via the AppKit.
 //
 //-----------------------------------------------------------------------------
-#include "sysdef.h"	// Defines wchar_t required by com.h below.
 #include "csutil/scf.h"
 #include "cs2d/common/graph2d.h"
 #include "cssys/next/shared/NeXTSystemInterface.h"

@@ -24,7 +24,7 @@
 #include "cs2d/common/graph2d.h"
 #include "cssys/djgpp/idjgpp.h"
 
-/// DOS Allegro 2D graphics driver COM class
+/// DOS Allegro 2D graphics driver
 class csGraphics2DDOSAlleg : public csGraphics2D
 {
   /// Palette has been changed?

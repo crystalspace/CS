@@ -26,7 +26,7 @@
 #include "cs2d/common/graph2d.h"
 #include "cssys/djgpp/idjgpp.h"
 
-/// Raw DOS SVGA 2D graphics driver COM class
+/// Raw DOS SVGA 2D graphics driver
 class csGraphics2DDOSRAW : public csGraphics2D
 {
   /// Palette has been changed?

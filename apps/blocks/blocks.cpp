@@ -841,8 +841,8 @@ int main (int argc, char* argv[])
   // temp hack until we find a better way
   csWorld::System = Sys;
 
-  // Initialize the main system. This will load all needed
-  // COM drivers (3D, 2D, network, sound, ...) and initialize them.
+  // Initialize the main system. This will load all needed plug-ins
+  // (3D, 2D, network, sound, ...) and initialize them.
   if (!Sys->Initialize (argc, argv, "blocks.cfg"))
   {
     Sys->Printf (MSG_FATAL_ERROR, "Error initializing system!\n");
@@ -850,8 +850,7 @@ int main (int argc, char* argv[])
     fatal_exit (0, false);
   }
 
-  // Open the main system. This will open all the previously loaded
-  // COM drivers.
+  // Open the main system. This will open all the previously loaded plug-ins.
   if (!Sys->Open ("3D Blocks"))
   {
     Sys->Printf (MSG_FATAL_ERROR, "Error opening system!\n");

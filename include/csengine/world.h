@@ -377,7 +377,7 @@ public:
   void StartWorld ();
 
   /**
-   * Get the Halo Rasterizer COM interface if supported (NULL if not).
+   * Get the Halo Rasterizer SCF interface if supported (NULL if not).
    */
   iHaloRasterizer* GetHaloRastizer () { return HaloRast; }
 

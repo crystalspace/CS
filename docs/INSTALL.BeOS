@@ -47,17 +47,6 @@ make glidebe2d
 make glide3d
 <<< GLIDE IS CURRENTLY BROKEN <<<
 
-You will need to register the libraries (which are pseudo-COM modules).  First compile the registrar:
-
-make regsvr
-
-Then register the libraries with these commands:
-
-csregsvr netmann.so netmans.so netdrvn.so netdrvs.so snddrvn.so sndrdrn.so
-csregsvr be2d.so softrndr.so            # For software renderer.
-csregsvr glbe2d.so glrender.so          # For OpenGL.
-csregsvr glidebe2d.so Glide2xRender.so  # For Glide 2.54//Voodoo 2.
-
 Finally, to build the example applications:
 
 make apps

@@ -111,12 +111,11 @@ can downloaded are compressed with 'gzip' and you first need to decompress
 them before you can run them.
 <br>
 <b>A4. </b>
-If you are using a dynamicly linked executable (like the ones on Linux,
+If you are using a dynamicly linked executable (like the ones on Unix,
 Windows, BeOS, Macintosh, and OS/2) then you should not forget to register
-the COM drivers included with CS (the 3D Rasterizer, the 2D Graphics Driver
-and the networking drivers). On Windows this is done with the RegSvr32 utility
-(just type RegSvr32 ???.dll). On Linux/Unix this is done with the 'csregsvr' utility
-(just type csregsvr *.so). Instructions on other systems will be similar.
+the SCF drivers included with CS (the 3D Rasterizer, the 2D Graphics Driver
+and the networking drivers).  This is done with the 'scfregsvr' utility.
+Just type scfregsvr *.so.  Instructions on other systems will be similar.
 <br>
 <b>A5. </b>
 Are you sure it is trying to load the correct level? If you are running with a

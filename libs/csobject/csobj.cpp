@@ -22,17 +22,6 @@
 #include "csobject/objtree.h"
 #include "csobject/nameobj.h"
 
-#if 0 // BRANDON!!!!!!!!!!
-
-IMPLEMENT_DEFAULT_COM(Object);
-
-STDMETHODIMP csObject::AddName(IString *iname)
-{
-  csSTR name(iname);
-  SetName (name);
-  return S_OK;
-}
-#endif
 CSOBJTYPE_IMPL(csObject,NULLCLASS);
 
 csObject::csObject() : csBase(), objtree(NULL)

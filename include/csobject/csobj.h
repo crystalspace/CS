@@ -89,9 +89,6 @@ public:
   CS_ID GetID () const { return csid_value; }
 #endif
 
-  //	DEFAULT_COM(Object)
-  //  STDMETHODIMP AddName(IString *name);
-  
   CSOBJTYPE;
 };
 

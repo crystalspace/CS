@@ -30,8 +30,8 @@
 #include "sysdef.h"
 #endif
 
-//Com
-#ifndef NO_CSCOM
+//SCF
+#ifndef NO_CSSCF
 #include "csutil/scf.h"
 #include "itxtmgr.h"
 #endif
