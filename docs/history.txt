@@ -35,12 +35,16 @@ chronological order.
 	- Jorrit changed the lightmap allocator in the OpenGL renderer to
 	  use a global block allocator instead of one per superlightmap.
 	  Also did this optimization to the NR OpenGL renderer.
-	- Keith added FindNamedMaterial and FindNamedTexture to enable
-	  loaders to get materials and textures which have different names
-	  from their filenames while not breaking backward compability with
-	  prior behavior.
-	- This material change required changing .cal3d file format so that
-	  <mesh> tags now require material names instead of filenames.
+	- Keith added iEngine::FindNamedMaterial() and FindNamedTexture() to
+	  allow loaders to get materials and textures which have different
+	  names from their filenames while not breaking backward compability
+	  with prior behavior. This material change required changing .cal3d
+	  file format so that <mesh> tags now require material names instead of
+	  filenames.
+	- Eric Sunshine fixed bugs in aws.mak and aws/Jamfile where they
+	  neglected to link the plugin against txtmgr.o (from renderer/common)
+	  despite the fact that AWS's csTextureHandleNull is derived from
+	  csTextureHandle in txtmgr.o.
 12-Feb-2004
 	- Jorrit did several documentation enhancements:
 	    - Added a link to the new level building section in the
