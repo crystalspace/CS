@@ -10,8 +10,8 @@ chronological order.
         - Fritz Elfert fixed conversion of bezier mesh factories in map2cs
           and re-enabled them (With wrong cvs log-message: "Before big
           camera change", sorry).
-	- res added a "mesh" mixmode. Works similar to the "mesh" zmode, if 
-	  used as the mixmode in a shader pass the rendered mesh's resp. 
+	- res added a "mesh" mixmode. Works similar to the "mesh" zmode, if
+	  used as the mixmode in a shader pass the rendered mesh's resp.
 	  mixmode will be used.
 	- res made some fixes so NR properly respects the "alpha" mixmode.
         - Fritz Elfert fixed an msvc compile error in the null renderer.
@@ -23,7 +23,7 @@ chronological order.
 	- Jorrit fixed a bug in the thing mesh object which he introduced
 	  yesterday. This bug caused weird stripes on lightmapped polygons.
 	- Duhprey made the software renderer compile with NR, but broke the
-	  polyrenderer 
+	  polyrenderer
 	- Eric Sunshine replaced a few forward declarations in some Thing
 	  headers with #includes to ensure that class declarations are seen
 	  before the classes are used in csArray<> templates.  This should
@@ -76,7 +76,7 @@ chronological order.
 	  the Clone() in csThings can use that. This also fixes a bug
 	  because res2k added fields to csPolyTextureMapping and forgot
 	  to update Clone().
-	- res fixed a crash-at-exit in xmlread. An object was deleted, 
+	- res fixed a crash-at-exit in xmlread. An object was deleted,
 	  although apparently instances of it were referenced in other places.
 	  Now the object isn't forcibly deleted any more, and further, the
 	  xmlread plugin won't get unloaded as long as documents (or document
@@ -98,14 +98,14 @@ chronological order.
 	  new nullrender3d module.
         - Andrew Craig fixed a ref problem in imgplex plugin that caused it
           the initialization function to segfault.
-	- res unified the shader var syntax for materials and shaders. Both 
+	- res unified the shader var syntax for materials and shaders. Both
 	  the material parser in csloader and the shaderparse in xmlshader
 	  utilize iSyntaxService->ParseShaderVar(). The syntax for a shadervar
 	  is now:
-	    <shadervar name="..." 
+	    <shadervar name="..."
 	     type="[float|vector2|vector3|vector4|int|texture]">
 	     texture|x[,y[,z[,w]]]</shadervar>
-	  For SV blocks in shaders the syntax is now 
+	  For SV blocks in shaders the syntax is now
 	  <shadervars>...</shadervars>.
 20-Feb-2004
 	- Jorrit added a csArray::GetIndex() function which will return the
@@ -386,8 +386,8 @@ chronological order.
 	- John Harger cleaned up the particles interface a bit, using Eric's
 	  suggestion of the iParticlesBase SCF interface for all shared
 	  functions
-    - Andrew Craig added a GetDefaultMaterial() to the sprcal3d factory that
-      returns the name of the default material on a submesh.
+	- Andrew Craig added a GetDefaultMaterial() to the sprcal3d factory
+	  that returns the name of the default material on a submesh.
 15-Feb-2004
 	- Norman Kraemer removed inclusion of recently removed av3dtxt.h in AWS
 	  screencanvas header.
@@ -1594,8 +1594,8 @@ chronological order.
 	- res changed the particle_basic shader to not use fixed function
 	  lighting any more.
 	- Philip Wyett moved decleration of 'iPortal *po' into better scope.
-	- acraig added the ability for sprcal3dldr to name materials inside the
-	  .cal3d file new material tag is where name is optional:
+	- Andrew Craig added the ability for sprcal3dldr to name materials
+	  inside the .cal3d file new material tag is where name is optional:
 	    <material file="image file" name="material name"/>
 	- John Harger changed the internal memory structure of the particles
 	  there is no longer an upper maximum, and it should work better
@@ -3089,8 +3089,8 @@ chronological order.
 	- Eric Sunshine split Class::scfRemoveRefOwners() implementation in
 	  scf.h out into its own SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS() macro
 	  rather than having it bundled into SCF_IMPLEMENT_IBASE_DECREF().
-        - acraig fixed up some calls to SCF_DESTRUCT_IBASE() that had a 0 as
-          a param.
+        - Andrew Craig fixed up some calls to SCF_DESTRUCT_IBASE() that had a 0
+	  as a param.
 	- res added a 'flags' parameter to iGraphics2D::Write(). At the moment
 	  you can specify flags to write on a baseline and disable font glyph
 	  antialiasing. As the functionality of WriteBaseline() is now
@@ -5277,7 +5277,7 @@ chronological order.
 	      desired end result of my changes is that the CS_USE_NEW_RENDERER
 	      flag will be removed and all plugins will automatically function
 	      for both old and new renderer. We're not there yet though...
-        - acraig fixed a problem in sprcal3d where it was using the old
+        - Andrew Craig fixed a problem in sprcal3d where it was using the old
           renderer iLight::GetSquaredRadius() function that no longer exists.
 	- Anders Stenberg added attenuation shader for PPL
 6-Sep-2003
@@ -7115,7 +7115,7 @@ chronological order.
 	  csInitializer::SetupConfigManager to use that function.
 	- res committed some forgotten files and fixed some cut'n'paste and
 	  similar stupid errors.
-        - acraig added missing #include<wchar.h> in csutil/util.cpp
+        - Andrew Craig added missing #include<wchar.h> in csutil/util.cpp
 28-Jul-2003
 	- Jorrit removed several csVector's throughout CS:
 	    - Replaced 'render_priorities' in the engine with csStringArray.
@@ -7207,7 +7207,7 @@ chronological order.
 25-Jul-2003
 	- Norman Kraemer fixed pythmod_setup.py for cases with no lib entries
 	  between the enclosing '--'.
-	- acraig added in missing include for va_start in stringarray.h.
+	- Andrew Craig added in missing include for va_start in stringarray.h.
 	- Keith Fulton added a FormatPush member to stringarray.h.
 	- Eric Sunshine made the following user manual-related changes:
 	    - Continued updating the user manual to reflect recent SCF changes.
@@ -8601,7 +8601,7 @@ chronological order.
 	- Jorrit removed Blocks from CS. Blocks is now a separate project
 	  (http://sf.net/projects/blocks3d).
 	- Jorrit removed several entries to Blocks from the documentation.
-	- acraig fixed the csList<T>::Delete() to use pre-increment.
+	- Andrew Craig fixed the csList<T>::Delete() to use pre-increment.
 	- res started to fix the incomplete shader variable stuff. The shader
 	  manager compiles+links now, at least.
 4-June-2003
