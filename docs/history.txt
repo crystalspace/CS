@@ -16,6 +16,11 @@ The history order has been reversed so that new features are at the top.
 	- Finished caching of PVS. Also added dummy PVS calculator that
 	  is used for now and just creates a PVS that says that everything
 	  is visible :-)
+	- Added quick and dirty memory debugger in WalkTest that's a bit
+	  easier to setup than the one from Andrew and also works immediatelly
+	  in a debugger. Just go to the end of WalkTest and change #if 1
+	  to #if 0. It catches memory overwrites, double deletes, and
+	  allocs with 0 bytes.
 10-May-2000
 	- Michael Dale Long did a major update for CrystalClear.  A lot of
 	  work has been done on iActor.  The main thing was adding multiple

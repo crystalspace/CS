@@ -1188,5 +1188,62 @@ void* operator new (size_t s)
   }
   return (void*)malloc (s);
 }
+
 #endif
 
+#if 0
+
+#define DETECT_SIZE 20
+#define DETECT     "ABCDabcd01234567890+"
+#define DETECTAR   "abcdABCD+09876543210"
+#define DETECTFREE "@*@*@*@*@*@*@*@*@*@*"
+
+void* operator new (size_t s)
+{
+  if (s <= 0) printf ("BAD SIZE in new %d\n", s);
+  char* rc = (char*)malloc (s+4+DETECT_SIZE+DETECT_SIZE);
+  memcpy (rc, DETECT, DETECT_SIZE);
+  memcpy (rc+DETECT_SIZE, &s, 4);
+  memcpy (rc+DETECT_SIZE+4+s, DETECT, DETECT_SIZE);
+  return (void*)(rc+4+DETECT_SIZE);
+}
+
+void* operator new[] (size_t s)
+{
+  if (s <= 0) printf ("BAD SIZE in new[] %d\n", s);
+  char* rc = (char*)malloc (s+4+DETECT_SIZE+DETECT_SIZE);
+  memcpy (rc, DETECTAR, DETECT_SIZE);
+  memcpy (rc+DETECT_SIZE, &s, 4);
+  memcpy (rc+DETECT_SIZE+4+s, DETECTAR, DETECT_SIZE);
+  return (void*)(rc+4+DETECT_SIZE);
+}
+
+void operator delete (void* p)
+{
+  if (!p) return;
+  char* rc = (char*)p;
+  rc -= 4+DETECT_SIZE;
+  size_t s;
+  memcpy (&s, rc+DETECT_SIZE, 4);
+  if (strncmp (rc, DETECT, DETECT_SIZE) != 0) { printf ("operator delete: BAD START!\n"); CRASH; }
+  if (strncmp (rc+4+DETECT_SIZE+s, DETECT, DETECT_SIZE) != 0) { printf ("operator delete: BAD END!\n"); CRASH; }
+  memcpy (rc, DETECTFREE, DETECT_SIZE);
+  memcpy (rc+4+s+DETECT_SIZE, DETECTFREE, DETECT_SIZE);
+  free (rc);
+}
+
+void operator delete[] (void* p)
+{
+  if (!p) return;
+  char* rc = (char*)p;
+  rc -= 4+DETECT_SIZE;
+  size_t s;
+  memcpy (&s, rc+DETECT_SIZE, 4);
+  if (strncmp (rc, DETECTAR, DETECT_SIZE) != 0) { printf ("operator delete[]: BAD START!\n"); CRASH; }
+  if (strncmp (rc+4+DETECT_SIZE+s, DETECTAR, DETECT_SIZE) != 0) { printf ("operator delete[]: BAD END!\n"); CRASH; }
+  memcpy (rc, DETECTFREE, DETECT_SIZE);
+  memcpy (rc+4+s+DETECT_SIZE, DETECTFREE, DETECT_SIZE);
+  free (rc);
+}
+
+#endif
