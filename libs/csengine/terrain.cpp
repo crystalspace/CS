@@ -193,7 +193,7 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
   ddgVector3 p(translation.x, translation.y, translation.z);
 
   // Compute the camera's foward facing vector in world space.
-  const csVector3 cforward (0,0,-1);
+  const csVector3 cforward (0,0,1);
   const csVector3 wforward = rview.This2OtherRelative (cforward);
   ddgVector3 f(wforward.x,wforward.y,wforward.z);
   f.normalize();
