@@ -209,6 +209,24 @@
         <material name="flickernote">
             <texture>flickernote</texture>
         </material>
+        <material name="flare_center">
+            <texture>flare_center</texture>
+        </material>
+        <material name="flare_spark1">
+            <texture>flare_spark1</texture>
+        </material>
+        <material name="flare_spark2">
+            <texture>flare_spark2</texture>
+        </material>
+        <material name="flare_spark3">
+            <texture>flare_spark3</texture>
+        </material>
+        <material name="flare_spark4">
+            <texture>flare_spark4</texture>
+        </material>
+        <material name="flare_spark5">
+            <texture>flare_spark5</texture>
+        </material>
     </materials>
     <renderpriorities>
         <priority name="sky">
