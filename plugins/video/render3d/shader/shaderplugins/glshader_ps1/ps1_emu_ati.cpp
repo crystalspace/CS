@@ -91,7 +91,9 @@ void csShaderGLPS1_ATI::ResetState ()
 bool csShaderGLPS1_ATI::GetATIShaderCommand
   (const csPSProgramInstruction &instr)
 {
-  if(instr.instruction == CS_PS_INS_NOP) return true;
+  if ((instr.instruction == CS_PS_INS_NOP) ||
+    (instr.instruction == CS_PS_INS_PHASE))
+    return true;
 
   csGLExtensionManager *ext = shaderPlug->ext;
   if(instr.instruction == CS_PS_INS_TEXLD
@@ -176,6 +178,15 @@ bool csShaderGLPS1_ATI::GetATIShaderCommand
       argmod[i] |= GL_NEGATE_BIT_ATI;
     if(instr.src_reg_mods[i] & CS_PS_RMOD_SCALE)
       argmod[i] |= GL_2X_BIT_ATI;
+
+    if (instr.src_reg_mods[i] & CS_PS_RMOD_REP_RED)
+      argrep[i] = GL_RED;
+    if (instr.src_reg_mods[i] & CS_PS_RMOD_REP_GREEN)
+      argrep[i] = GL_GREEN;
+    if (instr.src_reg_mods[i] & CS_PS_RMOD_REP_BLUE)
+      argrep[i] = GL_BLUE;
+    if (instr.src_reg_mods[i] & CS_PS_RMOD_REP_ALPHA)
+      argrep[i] = GL_ALPHA;
   }
   args = i;
 

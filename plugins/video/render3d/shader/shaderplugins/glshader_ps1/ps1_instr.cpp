@@ -21,20 +21,28 @@
 
 #include "ps1_instr.h"
 
-const csPixelShaderInstructionData csPixelShaderInstructions[CS_PS_INS_END_OF_LIST] =
-{
-  // Just to make sure something doesn't accidentally get
-  // mapped to the INVALID instruction placeholder
-  {"[invalid]", 0, 0},
-#define PS_INSTR(instr, args, psversion)	\
-  {#instr, psversion, args},
-#include "ps1_instr.inc"
-};
-
 const char* GetInstructionName (int instrID)
 {
-  if ((instrID <= CS_PS_INS_INVALID) || (instrID >= CS_PS_INS_END_OF_LIST))
-    return csPixelShaderInstructions[CS_PS_INS_INVALID].name;
+#define PS_INSTR(instr, args, psversion)	      \
+  if (instrID == CS_PS_INS_ ## instr)		      \
+    return #instr;				      \
+  else 
+#define PS_VER_INSTR(x,y)			      \
+  if (instrID == CS_PS_INS_PS_ ## x ## _ ## y)	      \
+    return "PS_" #x "_" #y;			      \
+  else
+#include "ps1_instr.inc"
+  return "[invalid]";
+}
 
-  return csPixelShaderInstructions[instrID].name;
+const char* GetVersionString (csPixelShaderVersion ver)
+{
+  switch (ver)
+  {
+    case CS_PS_1_1: return "1.1";
+    case CS_PS_1_2: return "1.2";
+    case CS_PS_1_3: return "1.3";
+    case CS_PS_1_4: return "1.4";
+    default: return "[invalid]";
+  }
 }

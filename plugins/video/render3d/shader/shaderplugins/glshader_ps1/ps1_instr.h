@@ -36,19 +36,11 @@ enum csPixelShaderInstruction
 {
   CS_PS_INS_INVALID = 0,
 #define PS_INSTR(instr, args, psversion)	CS_PS_INS_ ## instr,
+#define PS_VER_INSTR(x,y)			\
+  CS_PS_INS_PS_ ## x ## _ ## y,			
 #include "ps1_instr.inc"
   CS_PS_INS_END_OF_LIST
 };
-
-struct csPixelShaderInstructionData
-{
-  const char* name;
-  unsigned versions;
-  short arguments;
-};
-
-extern const csPixelShaderInstructionData 
-  csPixelShaderInstructions[CS_PS_INS_END_OF_LIST];
 
 enum csInstructionModifier
 {
@@ -98,5 +90,6 @@ enum csPSRegisterType
 };
 
 extern const char* GetInstructionName (int instrID);
+extern const char* GetVersionString (csPixelShaderVersion ver);
 
 #endif // __GLSHADER_PS1_INSTR_H__

@@ -63,6 +63,11 @@ chronological order.
 	- res added a sanity check to csShaderVariableContext::PopVariables().
 	- res fixed the shader expressions so atomic expressions are accepted
 	  and added pow, min and max functions.
+	- res did various changed and fixes to the glshader_ps1 plugin: 
+	  changed the way instruction are declared, the version is parsed,
+	  fixed replication for ps1.4 programs, fixed dealing with phase in
+	  ps1.4 programs, fixed parsing of the destination write mask for 1.4
+	  programs, now deals with the pairing modifier.
 27-Mar-2004
 	- Anders Stenberg did the following NR changes:
 	    - Added the possibility to route Cg programs through

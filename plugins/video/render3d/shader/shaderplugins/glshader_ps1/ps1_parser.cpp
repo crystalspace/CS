@@ -44,15 +44,23 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 void csPixelShaderParser::RegisterInstructions ()
 {
-  for(int i=0;i<CS_PS_INS_END_OF_LIST;i++)
-  {
-    memcpy (&PS_Instructions[i], &csPixelShaderInstructions[i],
-      sizeof (csPixelShaderInstructionData));
-    PS_Instructions[i].id = 
-      strings.Request (csPixelShaderInstructions[i].name);
-    PS_Instructions[i].supported = (i != CS_PS_INS_INVALID) &&
-      (i != CS_PS_INS_BEM);
-  }
+  PS_Instructions[CS_PS_INS_INVALID].arguments = 0;
+  PS_Instructions[CS_PS_INS_INVALID].supported = false;
+  PS_Instructions[CS_PS_INS_INVALID].versions = 0;
+#define PS_INSTR(instr, args, psversion)				    \
+  PS_Instructions[CS_PS_INS_ ## instr].arguments = args;		    \
+  PS_Instructions[CS_PS_INS_ ## instr].versions = psversion;		    \
+  PS_Instructions[CS_PS_INS_ ## instr].supported = true;		    \
+  instrStrings.Register (#instr, CS_PS_INS_ ## instr);
+#define PS_VER_INSTR(x,y)						    \
+  PS_Instructions[CS_PS_INS_PS_ ## x ## _ ## y].arguments = 0;		    \
+  PS_Instructions[CS_PS_INS_PS_ ## x ## _ ## y].versions = CS_PS_ALLVERSIONS;\
+  PS_Instructions[CS_PS_INS_PS_ ## x ## _ ## y].supported = true;	    \
+  instrStrings.Register ("PS_" #x "_" #y, CS_PS_INS_PS_ ## x ## _ ## y);    \
+  instrStrings.Register ("PS." #x "." #y, CS_PS_INS_PS_ ## x ## _ ## y);   
+#include "ps1_instr.inc"
+
+  PS_Instructions[CS_PS_INS_BEM].supported = false;
 }
 
 void csPixelShaderParser::Report (int severity, const char* msg, ...)
@@ -112,20 +120,33 @@ int csPixelShaderParser::GetArguments (const csString &str, csString &dest,
 unsigned short csPixelShaderParser::GetDestRegMask (const char *reg)
 {
   unsigned short mods = CS_PS_WMASK_NONE;
-  if(version == CS_PS_1_4)
+  const char* dot = strchr (reg, '.');
+  if (dot != 0)
   {
-    if(strstr(reg, ".r")) mods |= CS_PS_WMASK_RED;
-    if(strstr(reg, ".g")) mods |= CS_PS_WMASK_GREEN;
-    if(strstr(reg, ".b")) mods |= CS_PS_WMASK_BLUE;
-    if(strstr(reg, ".a")) mods |= CS_PS_WMASK_ALPHA;
-  }
-  else
-  {
-    if(strstr(reg, ".rgba")) mods = (CS_PS_WMASK_RED |
-      CS_PS_WMASK_GREEN | CS_PS_WMASK_BLUE | CS_PS_WMASK_ALPHA);
-    else if(strstr(reg, ".rgb")) mods = (CS_PS_WMASK_RED |
-      CS_PS_WMASK_GREEN | CS_PS_WMASK_BLUE);
-    else if(strstr(reg, ".a")) mods = CS_PS_WMASK_ALPHA;
+    if(version == CS_PS_1_4)
+    {
+      if(strstr (dot + 1, "r")) mods |= CS_PS_WMASK_RED;
+      if(strstr (dot + 1, "x")) mods |= CS_PS_WMASK_RED;
+      if(strstr (dot + 1, "g")) mods |= CS_PS_WMASK_GREEN;
+      if(strstr (dot + 1, "y")) mods |= CS_PS_WMASK_GREEN;
+      if(strstr (dot + 1, "b")) mods |= CS_PS_WMASK_BLUE;
+      if(strstr (dot + 1, "z")) mods |= CS_PS_WMASK_BLUE;
+      if(strstr (dot + 1, "a")) mods |= CS_PS_WMASK_ALPHA;
+      if(strstr (dot + 1, "w")) mods |= CS_PS_WMASK_ALPHA;
+    }
+    else
+    {
+      if(strcmp (dot + 1, "rgba") == 0) mods = (CS_PS_WMASK_RED |
+	CS_PS_WMASK_GREEN | CS_PS_WMASK_BLUE | CS_PS_WMASK_ALPHA);
+      else if(strcmp (dot + 1, "xyzw") == 0) mods = (CS_PS_WMASK_RED |
+	CS_PS_WMASK_GREEN | CS_PS_WMASK_BLUE | CS_PS_WMASK_ALPHA);
+      else if(strcmp (dot + 1, "rgb") == 0) mods = (CS_PS_WMASK_RED |
+	CS_PS_WMASK_GREEN | CS_PS_WMASK_BLUE);
+      else if(strcmp (dot + 1, "xyz") == 0) mods = (CS_PS_WMASK_RED |
+	CS_PS_WMASK_GREEN | CS_PS_WMASK_BLUE);
+      else if(strcmp (dot + 1, "a") == 0) mods = CS_PS_WMASK_ALPHA;
+      else if(strcmp (dot + 1, "w") == 0) mods = CS_PS_WMASK_ALPHA;
+    }
   }
   return mods;
 }
@@ -162,8 +183,6 @@ bool csPixelShaderParser::GetInstruction (const char *str,
   // Initialize the struct to an invalid instruction
   inst.instruction = CS_PS_INS_INVALID;
 
-  if(version==CS_PS_INVALID) return false;
-
   csString line (str);
   line.Downcase ();
 
@@ -180,6 +199,23 @@ bool csPixelShaderParser::GetInstruction (const char *str,
   line.SubString (istr, 0, line.FindFirst (' '));
   istr.Upcase();
   csStringID inst_id = (csStringID)~0;
+
+  if(version == CS_PS_INVALID) 
+  {
+    inst_id = instrStrings.Request (istr);
+    if (inst_id != csInvalidStringID)
+    {
+      inst.instruction = inst_id;
+      return true;
+    }
+  }
+
+  // Ignore pairing modifier
+  if (istr.GetAt (0) == '+')
+  {
+    istr.DeleteAt (0);
+    istr.Trim ();
+  }
 
   if(!strcmp(istr, "DEF"))
   {
@@ -201,33 +237,26 @@ bool csPixelShaderParser::GetInstruction (const char *str,
     return true;
   }
 
-  int mod_pos = line.FindFirst ('_');
+  int mod_pos = istr.FindFirst ('_');
   if(mod_pos >= 0)
   {
     csString unmod;
     istr.SubString (unmod, 0, mod_pos);
-    inst_id = strings.Request (unmod);
+    inst_id = instrStrings.Request (unmod);
   }
   else
   {
-    inst_id = strings.Request (istr);
+    inst_id = instrStrings.Request (istr);
   }
 
-  // Find the instruction based on its string ID
-  int i;
-  for(i=0;i<CS_PS_INS_END_OF_LIST;i++)
+  if (inst_id == csInvalidStringID)
   {
-    if(PS_Instructions[i].id == inst_id) break;
-  }
-  if(i==CS_PS_INS_INVALID || i==CS_PS_INS_END_OF_LIST) return false;
-  if(!(version & PS_Instructions[i].versions))
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, 
-      "Pixel Shader version %s does not support instruction '%s'",
-      version_string.GetData (), istr.GetData ());
+    Report (CS_REPORTER_SEVERITY_WARNING, 
+      "Unknown pixel shader instruction '%s'",
+      istr.GetData ());
     return false;
   }
-  if(!PS_Instructions[i].supported)
+  if(!PS_Instructions[inst_id].supported)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, 
       "Pixel shader instruction '%s' is not supported at this time",
@@ -235,7 +264,7 @@ bool csPixelShaderParser::GetInstruction (const char *str,
     return false;
   }
   
-  inst.instruction = i;
+  inst.instruction = inst_id;
 
   // Find the instruction modifier(s)
 
@@ -248,11 +277,11 @@ bool csPixelShaderParser::GetInstruction (const char *str,
   else if(strstr(istr, "_D4")) inst.inst_mods |= CS_PS_IMOD_D4;
   else if(strstr(istr, "_D8")) inst.inst_mods |= CS_PS_IMOD_D8;
   // _sat can be combined with _xn or _dn
-  if(strstr(istr, "_sat")) inst.inst_mods |= CS_PS_IMOD_SAT;
+  if(strstr(istr, "_SAT")) inst.inst_mods |= CS_PS_IMOD_SAT;
 
   csString dest, src1, src2, src3, trash;
   if(GetArguments(line, dest, src1, src2, src3, trash)
-    != PS_Instructions[i].arguments)
+    != PS_Instructions[inst_id].arguments)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, 
       "Incorrect number of arguments for Pixel Shader instruction '%s'!",
@@ -260,82 +289,81 @@ bool csPixelShaderParser::GetInstruction (const char *str,
     return false;
   }
 
-  // Get destination argument
-  switch(dest.GetAt (0))
+  if (PS_Instructions[inst_id].arguments > 0)
   {
-  case 'c':
-    Report (CS_REPORTER_SEVERITY_ERROR, 
-      "Destination register can not be a constant register!");
-    return false;
-  case 'v':
-    Report (CS_REPORTER_SEVERITY_ERROR, 
-      "Destination register can not be a color register!");
-    return false;
-  case 't':
-    inst.dest_reg = CS_PS_REG_TEX;
-    break;
-  case 'r':
-    inst.dest_reg = CS_PS_REG_TEMP;
-    break;
-  }
-
-  inst.dest_reg_mods = GetDestRegMask (dest.GetData ());
-  inst.dest_reg_num = dest.GetAt (1) - '0';
-
-  if(inst.dest_reg_num >= max_registers[inst.dest_reg])
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR,
-      "Destination register out of range, max for version '%s' is '%d'!",
-      version_string.GetData(),
-      max_registers[inst.dest_reg]);
-    return false;
-  }
-
-  inst.src_reg[0] = CS_PS_REG_NONE;
-  inst.src_reg[1] = CS_PS_REG_NONE;
-  inst.src_reg[2] = CS_PS_REG_NONE;
-
-  // Get source register(s)
-  for(int j=0;j<PS_Instructions[i].arguments - 1;j++)
-  {
-    const char *reg = NULL;
-    switch(j)
+    // Get destination argument
+    switch(dest.GetAt (0))
     {
-    default:
-    case 0: reg = src1.GetData (); break;
-    case 1: reg = src2.GetData (); break;
-    case 2: reg = src3.GetData (); break;
-    }
-    if(reg==NULL) break;
-
-    const char *p = reg;
-    while(p[0] != 'c' && p[0] != 'v' && p[0] != 't' && p[0] != 'r' && p[0]!='\0') p++;
-    if(p[0]=='\0') return false;
-    switch(p[0])
-    {
-    case 'c':
-      inst.src_reg[j] = CS_PS_REG_CONSTANT;
-      break;
-    case 'v':
-      inst.src_reg[j] = CS_PS_REG_COLOR;
-      break;
-    case 't':
-      inst.src_reg[j] = CS_PS_REG_TEX;
-      break;
-    case 'r':
-      inst.src_reg[j] = CS_PS_REG_TEMP;
-      break;
+      case 'c':
+	Report (CS_REPORTER_SEVERITY_ERROR, 
+	  "Destination register can not be a constant register!");
+	return false;
+      case 'v':
+	Report (CS_REPORTER_SEVERITY_ERROR, 
+	  "Destination register can not be a color register!");
+	return false;
+      case 't':
+	inst.dest_reg = CS_PS_REG_TEX;
+	break;
+      case 'r':
+	inst.dest_reg = CS_PS_REG_TEMP;
+	break;
     }
 
-    inst.src_reg_mods[j] = GetSrcRegMods (reg);
-    inst.src_reg_num[j] = reg[1] - '0';
-    if(inst.src_reg_num[j] >= max_registers[inst.src_reg[j]])
+    inst.dest_reg_mods = GetDestRegMask (dest.GetData ());
+    inst.dest_reg_num = dest.GetAt (1) - '0';
+
+    if(inst.dest_reg_num >= max_registers[inst.dest_reg])
     {
       Report (CS_REPORTER_SEVERITY_ERROR,
-        "Source register out of range, max for version '%s' is '%d'!",
-        version_string.GetData(),
-        max_registers[inst.src_reg[j]]);
+	"Destination register out of range, max for version '%s' is '%d'!",
+	version_string.GetData(),
+	max_registers[inst.dest_reg]);
       return false;
+    }
+
+    // Get source register(s)
+    for(int j = 0; j < PS_Instructions[inst_id].arguments - 1; j++)
+    {
+      const char *reg = NULL;
+      switch(j)
+      {
+	default:
+	case 0: reg = src1.GetData (); break;
+	case 1: reg = src2.GetData (); break;
+	case 2: reg = src3.GetData (); break;
+      }
+      if(reg==NULL) break;
+
+      const char *p = reg;
+      while(p[0] != 'c' && p[0] != 'v' && p[0] != 't' && p[0] != 'r' && p[0]!='\0') p++;
+      if(p[0]=='\0') return false;
+      switch(p[0])
+      {
+	case 'c':
+	  inst.src_reg[j] = CS_PS_REG_CONSTANT;
+	  break;
+	case 'v':
+	  inst.src_reg[j] = CS_PS_REG_COLOR;
+	  break;
+	case 't':
+	  inst.src_reg[j] = CS_PS_REG_TEX;
+	  break;
+	case 'r':
+	  inst.src_reg[j] = CS_PS_REG_TEMP;
+	  break;
+      }
+
+      inst.src_reg_mods[j] = GetSrcRegMods (reg);
+      inst.src_reg_num[j] = reg[1] - '0';
+      if(inst.src_reg_num[j] >= max_registers[inst.src_reg[j]])
+      {
+	Report (CS_REPORTER_SEVERITY_ERROR,
+	  "Source register out of range, max for version '%s' is '%d'!",
+	  version_string.GetData(),
+	  max_registers[inst.src_reg[j]]);
+	return false;
+      }
     }
   }
 
@@ -351,15 +379,7 @@ bool csPixelShaderParser::ParseProgram (const char *program)
   // Trim any leading/trailing blank lines
   prog.Trim ();
 
-  int pos = 0, len = prog.Length ();
-
-  // Remove leading comments (//)
-  while(pos < len && !strncmp(prog.GetData ()+pos, "//", 2))
-  {
-    int end = prog.FindFirst ('\n', pos);
-    if(end<0) end = len;
-    pos = end + 1;
-  }
+  int len = prog.Length ();
 
   if (len == 0)
   {
@@ -374,40 +394,72 @@ bool csPixelShaderParser::ParseProgram (const char *program)
   max_registers[CS_PS_REG_CONSTANT] = 8;
   max_registers[CS_PS_REG_COLOR] = 2;
 
-  // Identify the version
-  if(!strncmp(prog, "ps_1_1", 6)) version = CS_PS_1_1;
-  else if(!strncmp(prog+pos, "ps.1.1", 6)) version = CS_PS_1_1;
-  else if(!strncmp(prog+pos, "ps_1_2", 6)) version = CS_PS_1_2;
-  else if(!strncmp(prog+pos, "ps.1.2", 6)) version = CS_PS_1_2;
-  else if(!strncmp(prog+pos, "ps_1_3", 6)) version = CS_PS_1_3;
-  else if(!strncmp(prog+pos, "ps.1.3", 6)) version = CS_PS_1_3;
-  else if(!strncmp(prog+pos, "ps_1_4", 6)) 
-  {
-    max_registers[CS_PS_REG_TEX] = 6;
-    max_registers[CS_PS_REG_TEMP] = 6;
-    version = CS_PS_1_4;
-  }
-  else
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, 
-      "No version instruction found!");
-    return false;
-  }
-
-  prog.DeleteAt (0, pos+6);
-
+  bool hasVersion = false;
   csStringReader reader (prog);
   csString line;
+  int lineCount = 0;
   while (reader.HasMoreLines ())
   {
     if (!reader.GetLine (line)) break;
+    lineCount++;
     csPSProgramInstruction inst;
     if(!GetInstruction (line, inst)) return false;
 
     // Probably a blank line or comment ... ignore
     if(inst.instruction == CS_PS_INS_INVALID) continue;
 
-    program_instructions.Push (inst);
+    // Identify the version
+    bool isVerInstr = (inst.instruction >= CS_PS_INS_PS_1_1) &&
+      (inst.instruction <= CS_PS_INS_PS_1_4);
+    if (!hasVersion)
+    {
+      if (!isVerInstr)
+      {
+	Report (CS_REPORTER_SEVERITY_WARNING, 
+	  "Expected version, got %s", GetInstructionName (inst.instruction));
+	return false;
+      }
+
+      switch (inst.instruction)
+      {
+	case CS_PS_INS_PS_1_1:
+	  version = CS_PS_1_1;
+	  hasVersion = true;
+	  break;
+	case CS_PS_INS_PS_1_2:
+	  version = CS_PS_1_2;
+	  hasVersion = true;
+	  break;
+	case CS_PS_INS_PS_1_3:
+	  version = CS_PS_1_3;
+	  hasVersion = true;
+	  break;
+	case CS_PS_INS_PS_1_4:
+	  version = CS_PS_1_4;
+	  hasVersion = true;
+	  max_registers[CS_PS_REG_TEX] = 6;
+	  max_registers[CS_PS_REG_TEMP] = 6;
+	  break;
+      }
+    }
+    else if (isVerInstr)
+    {
+      Report (CS_REPORTER_SEVERITY_WARNING, 
+	"Invalid version instruction %s in line %d", 
+	GetInstructionName (inst.instruction), lineCount);
+      return false;
+    }
+
+    if(!(version & PS_Instructions[inst.instruction].versions))
+    {
+      Report (CS_REPORTER_SEVERITY_ERROR, 
+	"Pixel Shader version %s does not support instruction '%s'",
+	GetVersionString (version), GetInstructionName (inst.instruction));
+      return false;
+    }
+
+    if (!isVerInstr)
+      program_instructions.Push (inst);
   }
 
   return true;

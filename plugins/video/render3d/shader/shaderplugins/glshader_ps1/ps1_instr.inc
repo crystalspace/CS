@@ -53,5 +53,11 @@ PS_INSTR(TEXREG2GB,     2, CS_PS_1_2 | CS_PS_1_3)
 PS_INSTR(TEXREG2RGB,    2, CS_PS_1_2 | CS_PS_1_3)
 // Phase Instruction (PS 1.4 only)
 PS_INSTR(PHASE,         0, CS_PS_1_4)
+// Version instructions
+PS_VER_INSTR(1,1)
+PS_VER_INSTR(1,2)
+PS_VER_INSTR(1,3)
+PS_VER_INSTR(1,4)
 
+#undef PS_VER_INSTR
 #undef PS_INSTR
