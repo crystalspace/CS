@@ -23,6 +23,8 @@ chronological order.
 	  extensions to the GL extension manager and made some other small
 	  tweaks in the ext manager.
 	- res fixed a cut'n'paste error in metaglext.xml.
+	- res removed his EXT_stencil_two_side definition - there already was
+	  one in metaglext.xml.
 3-Sep-2003
 	- Peter Amstutz changed nullmesh to properly initialize it's
 	  bounding box to a legal (albeit extremely small) value.

@@ -7815,17 +7815,6 @@ typedef GLvoid (csAPIENTRY* csGLGETBUFFERPARAMETERIVARB) (GLenum target, GLenum 
 typedef GLvoid (csAPIENTRY* csGLSTENCILOPSEPARATEATI) (GLenum face, GLenum sfail, GLenum dpfail, GLenum dppass);
 typedef GLvoid (csAPIENTRY* csGLSTENCILFUNCSEPARATEATI) (GLenum frontfunc, GLenum backfunc, GLint ref, GLuint mask);
 
-// GL_EXT_stencil_two_side
-#ifndef GL_STENCIL_TEST_TWO_SIDE_EXT
-#define GL_STENCIL_TEST_TWO_SIDE_EXT                                 0x8910
-#endif
-
-#ifndef GL_ACTIVE_STENCIL_FACE_EXT
-#define GL_ACTIVE_STENCIL_FACE_EXT                                   0x8911
-#endif
-
-
-
 
 
 // end of definitions
@@ -11950,8 +11939,6 @@ public:
   #endif
 
 
-  // GL_EXT_stencil_two_side
-
 
 
   // end of functions
@@ -12106,7 +12093,6 @@ public:
   bool CS_GL_NV_vertex_program2;
   bool CS_GL_ARB_vertex_buffer_object;
   bool CS_GL_ATI_separate_stencil;
-  bool CS_GL_EXT_stencil_two_side;
 
 private:
   bool tested_CS_GL_version_1_2;
@@ -12259,7 +12245,6 @@ private:
   bool tested_CS_GL_NV_vertex_program2;
   bool tested_CS_GL_ARB_vertex_buffer_object;
   bool tested_CS_GL_ATI_separate_stencil;
-  bool tested_CS_GL_EXT_stencil_two_side;
 
 public:
   void Reset ()
@@ -12569,8 +12554,6 @@ public:
     tested_CS_GL_ARB_vertex_buffer_object = false;
     CS_GL_ATI_separate_stencil = false;
     tested_CS_GL_ATI_separate_stencil = false;
-    CS_GL_EXT_stencil_two_side = false;
-    tested_CS_GL_EXT_stencil_two_side = false;
 
   }
   
@@ -16988,31 +16971,6 @@ public:
       EXTMGR_FUNC_INIT(glStencilFuncSeparateATI, GLSTENCILFUNCSEPARATEATI);
 
       EXTMGR_REPORT_INIT_RESULT("GL", GL_ATI_separate_stencil)
-    }
-    else
-    {
-      Report (msgExtNotFound, "GL", ext);
-    }
-  }
-  
-  void InitGL_EXT_stencil_two_side ()
-  {
-    if (tested_CS_GL_EXT_stencil_two_side) return;
-    tested_CS_GL_EXT_stencil_two_side = true;
-    const char* ext = "GL_EXT_stencil_two_side";
-    char cfgkey[26 + 23 + 1];
-    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-    
-    CS_GL_EXT_stencil_two_side = (strstr (extstrGL, ext) != 0);
-
-    bool allclear, funcTest;
-    (void)funcTest; // shut up "variable unused" warnings
-    if (CS_GL_EXT_stencil_two_side)
-    {
-      allclear = true;
-      EXTMGR_FUNC_INIT(glActiveStencilFaceEXT, GLACTIVESTENCILFACEEXT);
-
-      EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_stencil_two_side)
     }
     else
     {
