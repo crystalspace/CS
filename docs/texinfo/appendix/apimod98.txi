@@ -410,6 +410,20 @@ public:
 In the calls to @code{InsertSorted}, @code{FindKey}, @dots{} you would then
 pass in one of the static functions to use.
 
+@subheading Array changes
+@cindex @code{csArray}
+@cindex @code{csPDelArray}
+@cindex @code{csRefArray}
+@cindex @code{csStringArray}
+@cindex @code{csGrowingArray}
+@cindex @code{csDirtyAccessArray}
+
+All arrays have been modified to inherit from @code{csArray}. This means
+that there are some slight @sc{api} changes because many functions were
+not consistent with @code{csArray}.
+
+Also @code{csGrowingArray} has been renamed to @code{csDirtyAccessArray}.
+
 @subheading iEventQueue clients now responsible for their own references
 @cindex @code{csEventQueue}
 @cindex @code{iEventQueue}

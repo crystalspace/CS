@@ -16,7 +16,7 @@ type-safe.  See later sections for additional information.
 @item
 @code{csArray<T>},
 @item
-@code{csGrowingArray<T>}
+@code{csDirtyAccessArray<T>}
 @item
 @code{csRefArray<T>}
 @item
@@ -100,8 +100,8 @@ construction and destruction of objects as they are added to, and removed from
 the array.  Include file is @file{csutil/array.h}.
 
 @item
-@code{csGrowingArray<T>}: Similar to @code{csArray<T>}, this array type can be
-used to store arbitrary objects, with the exception that it @emph{does not
+@code{csDirtyAccessArray<T>}: Similar to @code{csArray<T>}, this array type can
+be used to store arbitrary objects, with the exception that it @emph{does not
 invoke constructors and destructors} of contained objects.  Use this class at
 your own peril; @code{csArray<T>} is almost always a better choice.  The only
 conceivable instance in which use of this class might be warranted is when

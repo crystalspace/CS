@@ -37,6 +37,8 @@ chronological order.
 	- Jorrit removed csBitSet since nothing is now using it. If you really
 	  need a bit array then use csBitArray instead.
 	- Jorrit renamed csGrowingArray to csDirtyAccessArray.
+	- Jorrit updated the documentation with regards to the csGrowingArray
+	  change.
 10-Aug-2003
 	- Peter Amstutz added a check to "scan.cpp" of the software
 	  renderer so that it would not defer a null pointer (and hence crash)
