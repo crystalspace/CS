@@ -186,9 +186,11 @@ ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(ROOTCONFIG),config)
 SYSCONFIG=
 endif # ifeq ($(ROOTCONFIG),config)
+#---------------------------------------------------------------- volatile ---#
 
 ifeq ($(ROOTCONFIG),volatile)
-override DO.MAKE.VOLATILE=$(subst \#,\\\#,$(VOLATILE_H.ALL))
+
+
 endif # ifeq ($(ROOTCONFIG),volatile)
 
 endif # ifeq ($(MAKESECTION),rootdefines)
