@@ -12,6 +12,12 @@ chronological order.
 	  like-named resources would be installed at the wrong location. For
 	  instance, win32/csosdefs.h was being installed as csutil/csosdefs.h,
 	  macosx/csosdef.h, unix/csosdefs.h, and win32/csosdefs.h.
+	- Jorrit unified the NR and OR engine a bit more. The csEngine::Draw()
+	  and StartDraw() functions are now almost the same. To do that
+	  I moved some stuff out of the render loop into the engine again
+	  (I don't know why that stuff was put in the render loop in the
+	  first place). Removed one version of Draw() from iRenderLoop. It
+	  is no longer needed now.
 29-Apr-2004
 	- Marten fixed a bug in xmlshader where it assumed the syntax-service
 	  was already loaded.  Now it loads it if needed.

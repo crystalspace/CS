@@ -53,7 +53,6 @@ SCF_VERSION (iRenderLoop, 0, 0, 3);
  */
 struct iRenderLoop : public iRenderStepContainer
 {
-  virtual void Draw (iCamera* c, iClipper2D* clipper) = 0;
   virtual void Draw (iRenderView *rview, iSector *s) = 0;
 };
 

@@ -56,71 +56,11 @@ csRenderLoop::~csRenderLoop ()
   SCF_DESTRUCT_IBASE ();
 }
 
-void csRenderLoop::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)
+void csRenderLoop::Draw (iRenderView *rview, iSector *s)
 {
-  rview.SetEngine (engine);
-  rview.SetOriginalCamera (c);
-  engine->SetTopLevelClipper (&rview);
-
-/*  iEngineSequenceManager* eseqmgr = GetEngineSequenceManager ();
-  if (eseqmgr)
-  {
-    eseqmgr->SetCamera (c);
-  }*/
-
-  // This flag is set in HandleEvent on a cscmdContextResize event
-/*  if (resize)
-  {
-    resize = false;
-    Resize ();
-  }*/
-
-  rview.GetClipPlane ().Set (0, 0, -1, 0);
-
-  // Calculate frustum for screen dimensions (at z=1).
-  float leftx = -c->GetShiftX () * c->GetInvFOV ();
-  float rightx = (engine->frame_width - c->GetShiftX ()) * c->GetInvFOV ();
-  float topy = -c->GetShiftY () * c->GetInvFOV ();
-  float boty = (engine->frame_height - c->GetShiftY ()) * c->GetInvFOV ();
-  rview.SetFrustum (leftx, rightx, topy, boty);
-}
-
-void csRenderLoop::Draw (iCamera *c, iClipper2D *view)
-{
-  engine->ControlMeshes ();
-
-  csRenderView rview (c, view, engine->G3D, engine->G2D);
-  StartDraw (c, view, rview);
-
   if (!shadermanager)
     shadermanager = CS_QUERY_REGISTRY (engine->object_reg, iShaderManager);
 
-  // First initialize G3D with the right clipper.
-  engine->G3D->SetClipper (view, CS_CLIPPER_TOPLEVEL);  // We are at top-level.
-  engine->G3D->ResetNearPlane ();
-  engine->G3D->SetPerspectiveAspect (c->GetFOV ());
-  
-  
-  Draw (&rview, c->GetSector());
-  
-  // draw all halos on the screen
-  /*
-    @@@ Would be nice to have that more NR-like - go through renderloop,
-    use shaders ...
-   */
-  if (engine->halos.Length () > 0)
-  {
-    csTicks elapsed = engine->virtual_clock->GetElapsedTicks ();
-    for (int halo = engine->halos.Length () - 1; halo >= 0; halo--)
-      if (!engine->halos[halo]->Process (elapsed, c, engine)) 
-	engine->halos.DeleteIndex (halo);
-  }
-
-  engine->G3D->SetClipper (0, CS_CLIPPER_NONE);
-}
-
-void csRenderLoop::Draw (iRenderView *rview, iSector *s)
-{
   //if (s) s->Draw (&rview);
   if (s)
   {

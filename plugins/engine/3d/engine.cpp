@@ -1704,15 +1704,8 @@ iEngineSequenceManager* csEngine::GetEngineSequenceManager ()
   return eseqmgr;
 }
 
-#if !defined(CS_USE_NEW_RENDERER)
 void csEngine::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)
 {
-  Stats::polygons_considered = 0;
-  Stats::polygons_drawn = 0;
-  Stats::portals_drawn = 0;
-  Stats::polygons_rejected = 0;
-  Stats::polygons_accepted = 0;
-
   current_camera = c;
   rview.SetEngine (this);
   rview.SetOriginalCamera (c);
@@ -1744,10 +1737,8 @@ void csEngine::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)
 
 void csEngine::Draw (iCamera *c, iClipper2D *view)
 {
-  ControlMeshes ();
-  
   current_framenumber++;
-
+  ControlMeshes ();
   csRenderView rview (c, view, G3D, G2D);
   StartDraw (c, view, rview);
 
@@ -1757,7 +1748,13 @@ void csEngine::Draw (iCamera *c, iClipper2D *view)
   G3D->SetPerspectiveAspect (c->GetFOV ());
 
   iSector *s = c->GetSector ();
+#if defined(CS_USE_NEW_RENDERER)
+  csReversibleTransform camTransR = c->GetTransform();
+  G3D->SetWorldToCamera (&camTransR);
+  defaultRenderLoop->Draw (&rview, s);
+#else
   if (s) s->Draw (&rview);
+#endif	// CS_USE_NEW_RENDERER
 
   // draw all halos on the screen
   if (halos.Length () > 0)
@@ -1767,25 +1764,11 @@ void csEngine::Draw (iCamera *c, iClipper2D *view)
       if (!halos[halo]->Process (elapsed, c, this))
 	halos.DeleteIndex (halo);
   }
-
   G3D->SetClipper (0, CS_CLIPPER_NONE);
 }
-#endif
+
 
 #if defined(CS_USE_NEW_RENDERER)
-void csEngine::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)
-{
-}
-
-void csEngine::Draw (iCamera *c, iClipper2D *view)
-{
-  csReversibleTransform camTransR = 
-    c->GetTransform();
-  G3D->SetWorldToCamera (&camTransR);
-  current_framenumber++;
-  defaultRenderLoop->Draw (c, view);
-}
-
 csPtr<iRenderLoop> csEngine::CreateDefaultRenderLoop ()
 {
   csRef<iRenderLoop> loop = renderLoopManager->Create ();
