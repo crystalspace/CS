@@ -87,10 +87,8 @@ private:
   VariableType Type;
 
   int Int;
-  float Float;
   csRef<iString> String;
-  csVector3 Vector3;
-  csVector4 Vector4;
+  csVector4 VectorValue;
 
 public:
   SCF_DECLARE_IBASE;
@@ -99,31 +97,21 @@ public:
   virtual ~csShaderVariable () {}
 
   virtual VariableType GetType() const { return Type; }
-  virtual void SetType(VariableType t) { Type = t; }
+  virtual void SetType (VariableType t) { Type = t; }
 
   virtual csStringID GetName() const { return Name; }
 
-  virtual bool GetValue(int& value) const
-    { CS_ASSERT(Type == INT); value = Int; return true; }
-  virtual bool GetValue(float& value) const
-    { CS_ASSERT(Type == FLOAT); value = Float; return true; }
-  virtual bool GetValue(iString*& value) const
-    { CS_ASSERT(Type == STRING); value = String; return true; }
-  virtual bool GetValue(csVector3& value) const
-    { CS_ASSERT(Type == VECTOR3); value = Vector3; return true; }
-  virtual bool GetValue(csVector4& value) const
-    { CS_ASSERT(Type == VECTOR4); value = Vector4; return true; }
+  virtual bool GetValue (int& value) const;
+  virtual bool GetValue (float& value) const;
+  virtual bool GetValue (iString*& value) const;
+  virtual bool GetValue (csVector3& value) const;
+  virtual bool GetValue (csVector4& value) const;
 
-  virtual bool SetValue(int value)
-    { Type = INT; Int = value; return true; }
-  virtual bool SetValue(float value)
-    { Type = FLOAT; Float = value; return true; }
-  virtual bool SetValue(iString* value)
-    { Type = STRING; String = value; return true; }
-  virtual bool SetValue(const csVector3 &value)
-    { Type = VECTOR3; Vector3 = value; return true; }
-  virtual bool SetValue(const csVector4 &value)
-    { Type = VECTOR4; Vector4 = value; return true; }
+  virtual bool SetValue (int value);
+  virtual bool SetValue (float value);
+  virtual bool SetValue (iString* value);
+  virtual bool SetValue (const csVector3 &value);
+  virtual bool SetValue (const csVector4 &value);
 };
 
 class csShaderManager : public iShaderManager

@@ -87,6 +87,108 @@ SCF_IMPLEMENT_IBASE (csShaderVariable)
   SCF_IMPLEMENTS_INTERFACE (iShaderVariable)
 SCF_IMPLEMENT_IBASE_END
 
+bool csShaderVariable::GetValue(int& value) const
+{ 
+  value = Int; 
+  return true; 
+}
+
+bool csShaderVariable::GetValue(float& value) const
+{ 
+  value = VectorValue.x; 
+  return true; 
+}
+
+bool csShaderVariable::GetValue(iString*& value) const
+{ 
+/*  value = String; 
+  switch (Type)
+  {
+    case STRING:
+      break;
+    case INT:
+      String->Format ("%d", Int);
+      break;
+    case FLOAT:
+      String->Format ("%g", VectorValue.x);
+      break;
+    case VECTOR3:
+      String->Format ("%g %g %g", VectorValue.x, VectorValue.y, VectorValue.z);
+      break;
+    case VECTOR4:
+      String->Format ("%g %g %g %g", VectorValue.x, VectorValue.y, 
+	VectorValue.z, VectorValue.w);
+      break;
+  }
+  return true; */
+  if (Type != STRING) 
+  {
+    value = 0;
+    return false;
+  }
+  value = String; 
+  return true;
+}
+
+bool csShaderVariable::GetValue(csVector3& value) const
+{ 
+  value.Set (VectorValue.x, VectorValue.y, VectorValue.z);
+  return true; 
+}
+
+bool csShaderVariable::GetValue(csVector4& value) const
+{ 
+  value = VectorValue; 
+  return true; 
+}
+
+bool csShaderVariable::SetValue(int value)
+{ 
+  Type = INT; 
+  Int = value; 
+  float f = value;
+  VectorValue.Set (f, f, f, f);
+  return true; 
+}
+
+bool csShaderVariable::SetValue(float value)
+{ 
+  Type = FLOAT; 
+  Int = (int)value;
+  VectorValue.Set (value, value, value, value);
+  return true; 
+}
+
+bool csShaderVariable::SetValue(iString* value)
+{ 
+  Type = STRING; 
+  String = value; 
+  float floats[4];
+  floats[0] = floats[1] = floats[2] = 0.0f;
+  floats[3] = 1.0f;
+  sscanf (value->GetData (), "%f %f %f %f", 
+    floats[0], floats[1], floats[2], floats[3]);
+  VectorValue.Set (floats[0], floats[1], floats[2], floats[3]);
+  Int = (int)VectorValue.x;
+  return true; 
+}
+
+bool csShaderVariable::SetValue(const csVector3 &value)
+{ 
+  Type = VECTOR3; 
+  VectorValue.Set (value.x, value.y, value.z, 1.0f);
+  Int = (int)value.x;
+  return true; 
+}
+
+bool csShaderVariable::SetValue(const csVector4 &value)
+{ 
+  Type = VECTOR4; 
+  VectorValue.Set (value.x, value.y, value.z, value.w);
+  Int = (int)value.x;
+  return true; 
+}
+
 //=================== csShaderWrapper ================//
 
 SCF_IMPLEMENT_IBASE (csShaderWrapper)
@@ -463,7 +565,7 @@ bool csShader::Prepare()
     qsort(primap, techniques->Length()-1, sizeof(priority_mapping), pricompare);
 
   bool isPrep = false;
-  int prepNr;
+  //int prepNr;
 
   csArray<iShaderTechnique*>* newTArr = new csArray<iShaderTechnique*>;
 
@@ -562,7 +664,7 @@ void csShaderPass::SetupState (csRenderMesh *mesh)
 
 void csShaderPass::ResetState ()
 {
-  int i;
+  //int i;
   /*for (i=0; i<STREAMMAX; i++)
   {
     if (streammapping[i] != csInvalidStringID)

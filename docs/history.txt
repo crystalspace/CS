@@ -50,6 +50,14 @@ chronological order.
 	  csStringArray<const char*,...>.
 	- Jorrit made copy constructor, assignment operator and Section()
 	  in csPDelArray private so that people cannot mistakenly use those.
+	- res further worked on NR materials & shader variables. Changes 
+	  include:
+	    - Creation of material handles from texture handles fixed.
+	    - Added a generic implementation for iShaderBranch.
+	    - Enhanced the default shader variable implementation so "casting"
+	      takes place. E.g. you can set the value as a single float, but
+	      requesting a Vector3 will work (in this case, all components 
+	      have the same value.)	      
 7-Aug-2003
 	- Jorrit did the following array related changes:
 	    - Added Put() to csArray.

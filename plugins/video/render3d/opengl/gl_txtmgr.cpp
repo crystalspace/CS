@@ -32,6 +32,7 @@
 #include "csutil/util.h"
 #include "csgfx/csimgvec.h"
 #include "csutil/array.h"
+#include "cstool/shaderbranch.h"
 
 #include "video/canvas/openglcommon/glextmanager.h"
 
@@ -752,6 +753,7 @@ csGLMaterialHandle::csGLMaterialHandle (iMaterial* m, csGLTextureManager *parent
 {
   SCF_CONSTRUCT_IBASE (0);
   material = m;
+  branch = SCF_QUERY_INTERFACE (m, iShaderBranch);
   texman = parent;
 }
 
@@ -759,6 +761,8 @@ csGLMaterialHandle::csGLMaterialHandle (iTextureHandle* t, csGLTextureManager *p
 {
   SCF_CONSTRUCT_IBASE (0);
   texman = parent;
+  branch = csPtr<iShaderBranch> (new csShaderBranch ());
+  texture = t;
 }
 
 csGLMaterialHandle::~csGLMaterialHandle ()
@@ -772,6 +776,11 @@ void csGLMaterialHandle::FreeMaterial ()
   material = 0;
 }
 
+iShaderWrapper* csGLMaterialHandle::GetShader (csStringID type)
+{ 
+  return material ? material->GetShader (type) : 0; 
+}
+
 iTextureHandle* csGLMaterialHandle::GetTexture ()
 {
   if (material)
@@ -780,7 +789,34 @@ iTextureHandle* csGLMaterialHandle::GetTexture ()
   }
   else
   {
-    return 0;
+    return texture;
+  }
+}
+
+void csGLMaterialHandle::GetFlatColor (csRGBpixel &oColor) 
+{ 
+  if (material)
+  {
+    material->GetFlatColor (oColor);
+  }
+  else
+  {
+    texture->GetMeanColor (oColor.red, oColor.green, oColor.blue);
+  }
+}
+
+void csGLMaterialHandle::GetReflection (float &oDiffuse, float &oAmbient,
+  float &oReflection)
+{ 
+  if (material)
+  {
+    material->GetReflection (oDiffuse, oAmbient, oReflection);
+  }
+  else
+  {
+    oDiffuse = CS_DEFMAT_DIFFUSE;
+    oAmbient = CS_DEFMAT_AMBIENT;
+    oReflection = CS_DEFMAT_REFLECTION;
   }
 }
 
@@ -796,6 +832,11 @@ void csGLMaterialHandle::Prepare ()
     material->GetFlatColor (flat_color);
   }*/
 }
+
+iShaderBranch* csGLMaterialHandle::QueryShaderBranch ()
+{ 
+  return branch;
+} 
 
 /*
 *

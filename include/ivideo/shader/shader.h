@@ -109,7 +109,7 @@ struct iShaderBranch : public iBase
   virtual void AddVariable(iShaderVariable* variable) = 0;
 
   /// Get variable
-  virtual iShaderVariable* GetVariable(csStringID) = 0;
+  virtual iShaderVariable* GetVariable(csStringID name) = 0;
 
   /// Get the symbol table (used by the implementation to store the variables)
   virtual csSymbolTable* GetSymbolTable() = 0;

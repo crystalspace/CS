@@ -260,6 +260,10 @@ class csGLMaterialHandle : public iMaterialHandle
 protected:
   /// Original material.
   csRef<iMaterial> material;
+  /// Shader branch
+  csRef<iShaderBranch> branch;
+  /// Texture handle, if created from one
+  csRef<iTextureHandle> texture;
   /// Parent texture manager
   //csRef<csGLTextureManager> texman;
   csGLTextureManager* texman;
@@ -284,8 +288,7 @@ public:
   /**
    * Get associated shader
    */
-  virtual iShaderWrapper* GetShader (csStringID type) 
-  { return material->GetShader (type); }
+  virtual iShaderWrapper* GetShader (csStringID type);
 
   /**
    * Get a texture from the material.
@@ -296,19 +299,13 @@ public:
    * Get the flat color. If the material has a texture assigned, this
    * will return the mean texture color.
    */
-  virtual void GetFlatColor (csRGBpixel &oColor) 
-  { 
-    material->GetFlatColor (oColor);
-  }
+  virtual void GetFlatColor (csRGBpixel &oColor);
 
   /**
    * Get light reflection parameters for this material.
    */
   virtual void GetReflection (float &oDiffuse, float &oAmbient,
-    float &oReflection)
-  { 
-    material->GetReflection (oDiffuse, oAmbient, oReflection);
-  }
+    float &oReflection);
 
   /**
    * Prepare this material. The material wrapper (remembered during
@@ -318,8 +315,7 @@ public:
    */
   virtual void Prepare ();
 
-  virtual iShaderBranch* QueryShaderBranch ()
-  { return (iShaderBranch*)this; } // @@@ Evil cast?
+  virtual iShaderBranch* QueryShaderBranch ();
 };
 
 /*
