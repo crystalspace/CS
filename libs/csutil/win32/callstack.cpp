@@ -482,7 +482,7 @@ csCallStack* cswinCallStackHelper::CreateCallStack (HANDLE hProc,
   frame.AddrFrame.Offset = context.Ebp;
   frame.AddrFrame.Mode = AddrModeFlat;
 #else
-  #error 'Do not know how to stack walk for your platform.'
+#error Do not know how to stack walk for your platform.
 #endif
 
   int count = 0;
