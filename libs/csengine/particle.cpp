@@ -27,8 +27,8 @@
 
 
 IMPLEMENT_CSOBJTYPE (csParticleSystem, csObject)
-IMPLEMENT_CSOBJTYPE (csNewtonianParticleSystem, csObject)
-IMPLEMENT_CSOBJTYPE (csParSysExplosion, csObject)
+IMPLEMENT_CSOBJTYPE (csNewtonianParticleSystem, csParticleSystem)
+IMPLEMENT_CSOBJTYPE (csParSysExplosion, csNewtonianParticleSystem)
 
 csParticleSystem :: csParticleSystem(int max_part)
   : csObject()
