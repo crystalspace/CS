@@ -28,6 +28,9 @@ chronological order.
 	      unreliable /this.
 	- Jorrit fixed an initialization error in DrawSimpleMesh() of the
 	  NR OpenGL renderer.
+	- Jorrit fixed a bug in the NR OpenGL renderer DrawMesh implementation
+	  which would not correctly set alpha and keycolor mode in some
+	  situations.
 9-Feb-2004
 	- Eric Sunshine fixed bug in csKeyValuePair where it was incorrectly
 	  invoking SCF_CONSTRUCT_IBASE() even though it should not have been

@@ -1638,7 +1638,7 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
   void* bufData = indexbuf->RenderLock (CS_GLBUF_RENDERLOCK_ELEMENTS);
   if (bufData != (void*)-1)
   {
-    if (mymesh->mixmode != CS_FX_COPY)
+    if ((mymesh->mixmode & CS_FX_MASK_MIXMODE) != CS_FX_COPY)
       SetMixMode (mymesh->mixmode);
     else
       SetAlphaType (mymesh->alphaType);
