@@ -1707,7 +1707,7 @@ iEngineSequenceManager* csEngine::GetEngineSequenceManager ()
         return 0;
       }
     }
-    eseqmgr = es;
+    eseqmgr = (iEngineSequenceManager*)es;
   }
   return eseqmgr;
 }
