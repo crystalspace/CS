@@ -38,6 +38,8 @@ chronological order.
 	  iCacheManager->Flush() now.
 	- Eric Sunshine worked around warnings reported by Swig 1.3.22 for
 	  Perl5.
+	- Eric Sunshine worked around a slew of warnings reported by Swig
+	  1.3.22 for Python.
 25-Oct-2004
 	- Jorrit disabled VBO by default now. It gives too many problems
 	  (both on ATI and nVidia). Having this option on by default can

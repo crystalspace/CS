@@ -24,6 +24,20 @@
 
 #ifdef SWIGPYTHON
 
+%ignore ::operator+;
+%ignore ::operator-;
+%ignore ::operator*;
+%ignore ::operator/;
+%ignore ::operator%;
+%ignore ::operator<;
+%ignore ::operator>;
+%ignore ::operator==;
+%ignore ::operator!=;
+%ignore ::operator*=;
+%ignore ::operator/=;
+%ignore ::operator>>;
+%ignore ::operator<<;
+
 %rename(assign) *::operator=;
 
 // iutil/databuff.h
