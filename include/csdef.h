@@ -38,6 +38,9 @@
 #include <errno.h>
 #include <string.h>
 #include <assert.h>
+#ifdef CS_HAS_SYS_PARAM_H
+#include <sys/param.h>
+#endif
 
 #ifndef MIN
   #define MIN(a,b) ((a)<(b)?(a):(b))
