@@ -65,6 +65,16 @@ The history order is reversed so that new features are at the top.
 	- Oktal fixed some non-ANSI code in pythpre.i that could cause
 	  compilation of the Python cspace module to fail on some compilers.
 16-Apr-2003
+	- Rene Jager updated Python scripting.
+	  The cspython plugin can now access CS almost completely.
+	  A python module can be built by "make pythmod" which allows for writing
+	  CS application python.
+	  Base on Python 2.2.x and SWIG 1.3.17. For platforms where Python 2.2.x
+	  is run by the command "python2", use "PYTHON=python2" before
+	  "./configure" and "make *" commands.
+	  Changes made to include/igraphic/imageio.h, include/iutil/event.h and
+	  include/ivideo/graph3d.h to make struct's usable for SWIG, without
+	  breaking existing code.
 	- Rhad altered the rapid triangle collision test to ignore
 	  degenerate triangles.
 	    - Added a couple tests for degenerate tris that should 
