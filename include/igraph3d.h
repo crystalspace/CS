@@ -42,7 +42,7 @@ interface ITextureHandle;
 #define CS_FOG_VIEW 2
 #define CS_FOG_PLANE 3
 
-///Vertex Structure for use with G3DPolygonDP and G3DPolygonAFP
+/// Vertex Structure for use with G3DPolygonDP and G3DPolygonAFP
 class G3DVertex
 {
 public:
@@ -52,7 +52,7 @@ public:
   float sy;
 };
 
-///Vertex Structure for use with G3DPolygonDPQ
+/// Vertex Structure for use with G3DPolygonDPQ
 class G3DTexturedVertex : public G3DVertex
 {
 public:
@@ -64,6 +64,18 @@ public:
 
   //Lighting info (Used only with Gouroud shading (between 0 and 1))
   float r, g, b;
+};
+
+/// Extra information for vertex fogging.
+class G3DFogInfo
+{
+public:
+  /// Color.
+  float r, g, b;
+  /// Density.
+  float density;
+  /// Thickness at this point.
+  float thickness;
 };
 
 ///
@@ -97,7 +109,11 @@ struct G3DPolygonDPFX
   /// Current number of vertices.
   int num;
   /// Vertices that form the polygon.
-  G3DTexturedVertex vertices[200];
+  G3DTexturedVertex vertices[100];
+  /// Extra optional fog information.
+  G3DFogInfo fog_info[100];
+  /// Use fog info?
+  bool use_fog;
 
   /// Invert aspect ratio that was used to perspective project the vertices (1/fov)
   float inv_aspect;
@@ -117,7 +133,11 @@ struct G3DPolygonDP
   /// Current number of vertices.
   int num;
   /// Vertices that form the polygon.
-  G3DVertex vertices[200];
+  G3DVertex vertices[100];
+  /// Extra optional fog information.
+  G3DFogInfo fog_info[100];
+  /// Use fog info?
+  bool use_fog;
 
   /// Invert aspect ratio that was used to perspective project the vertices (1/fov)
   float inv_aspect;
@@ -160,7 +180,7 @@ struct G3DPolygonAFP
   /// Current number of vertices.
   int num;
   /// Vertices that form the polygon.
-  G3DVertex vertices[200];
+  G3DVertex vertices[100];
 
   /// Invert aspect ratio that was used to perspective project the vertices (1/fov)
   float inv_aspect;
@@ -285,7 +305,8 @@ enum G3D_FOGMETHOD
 {
   G3DFOGMETHOD_NONE = 0x00,
   G3DFOGMETHOD_ZBUFFER = 0x01,
-  G3DFOGMETHOD_PLANES = 0x02
+  G3DFOGMETHOD_PLANES = 0x02,
+  G3DFOGMETHOD_VERTEX = 0x04
 };
 
 ///
