@@ -13,6 +13,9 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+6-Sep-1999
+	- Eric Sunshine imported Squawk version 13 from Seth Galbraith.
+	- Eric Sunshine imported Siu-Hang Or's MazeD documentation.
 2-Sep-1999
 	- Octree visibility culling works.  Preliminary results on a 50000
 	  polygon level are encouraging.
