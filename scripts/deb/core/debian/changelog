@@ -1,3 +1,22 @@
+crystalspace (0.96-20030609-7) unstable; urgency=low
+
+  * Repared stupid error giving configure options 
+
+ -- Christian Bayle <bayle@debian.org>  Mon, 14 Jul 2003 22:17:55 +0200
+
+crystalspace (0.96-20030609-6) unstable; urgency=low
+
+  * Now really removed lib3ds and libode on hppa and alpha 
+
+ -- Christian Bayle <bayle@debian.org>  Mon, 14 Jul 2003 16:48:03 +0200
+
+crystalspace (0.96-20030609-5) unstable; urgency=low
+
+  * Removed support for lib3ds and libode on hppa and alpha
+  This always to try to (Closes: bug#198921)
+
+ -- Christian Bayle <bayle@debian.org>  Mon, 14 Jul 2003 03:53:01 +0200
+
 crystalspace (0.96-20030609-4) unstable; urgency=low
 
   * Readd 3ds support, since I NMUed lib3ds to compile with -fPIC on hppa
