@@ -128,8 +128,6 @@
 #include "imesh/terrfunc.h"
 #include "imesh/bezier.h"
 #include "imesh/thing.h"
-#include "inetwork/driver.h"
-#include "inetwork/socket.h"
 #include "isound/data.h"
 #include "isound/driver.h"
 #include "isound/handle.h"

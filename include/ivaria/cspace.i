@@ -144,9 +144,6 @@
 #include "csutil/event.h"
 #include "csutil/xmltiny.h"
 #include "igeom/objmodel.h"
-#include "inetwork/sockerr.h"
-#include "inetwork/netman.h"
-#include "inetwork/socket2.h"
 #include "iengine/portalcontainer.h"
 
 // Mark Gossage: somewhere in winuser.h there are a couple of #defines to
@@ -218,13 +215,6 @@
 	INTERFACE_APPLY(iModelConverter)
 	INTERFACE_APPLY(iMovable)
 	INTERFACE_APPLY(iMovableListener)
-	INTERFACE_APPLY(iNetworkConnection)
-	INTERFACE_APPLY(iNetworkDriver)
-	INTERFACE_APPLY(iNetworkEndPoint)
-	INTERFACE_APPLY(iNetworkListener)
-	INTERFACE_APPLY(iNetworkManager)
-	INTERFACE_APPLY(iNetworkPacket)
-	INTERFACE_APPLY(iNetworkSocket2)
 	INTERFACE_APPLY(iObject)
 	INTERFACE_APPLY(iObjectModel)
 	INTERFACE_APPLY(iObjectModelListener)
@@ -1009,11 +999,6 @@ TYPEMAP_OUT_csWrapPtr
 %rename(GetObject) iScriptObject::Get(const char*, csRef<iStringObject>&);
 %include "ivaria/script.h"
 
-%include "inetwork/netman.h"
-%include "inetwork/sockerr.h"
-%include "inetwork/driver.h"
-%include "inetwork/socket2.h"
-
 %include "csutil/csobject.h"
 
 %include "cstool/csview.h"
@@ -1137,16 +1122,6 @@ APPLY_FOR_EACH_INTERFACE
 	const csEventMouseData Mouse;
 	const csEventJoystickData Joystick;
 	const csEventCommandData Command;
-	const csEventNetworkData Network;
-}
-
-// iutil/event.h
-%extend csEventNetworkData
-{
-	const iNetworkConnection * const From;
-	const iNetworkSocket2 * const From2;
-	const iNetworkPacket * const Data;
-	const iNetworkPacket2 * const Data2;
 }
 
 // iutil/event.h
@@ -1157,17 +1132,6 @@ APPLY_FOR_EACH_INTERFACE
 		{ return &event->Joystick; }
 	csEventCommandData * iEvent_Command_get (iEvent * event)
 		{ return &event->Command; }
-	csEventNetworkData * iEvent_Network_get (iEvent * event)
-		{ return &event->Network; }
-
-	iNetworkConnection * csEventNetworkData_From_get (csEventNetworkData * data)
-		{ return data->From; }
-	iNetworkSocket2 * csEventNetworkData_From2_get (csEventNetworkData * data)
-		{ return data->From2; }
-	iNetworkPacket * csEventNetworkData_Data_get (csEventNetworkData * data)
-		{ return data->Data; }
-	iNetworkPacket2 * csEventNetworkData_Data2_get (csEventNetworkData * data)
-		{ return data->Data2; }
 %}
 
 // iutil/evdefs.h
@@ -1183,9 +1147,6 @@ bool _CS_IS_JOYSTICK_EVENT (const iEvent &);
 #define _CS_IS_INPUT_EVENT(e) CS_IS_INPUT_EVENT(e)
 #undef CS_IS_INPUT_EVENT
 bool _CS_IS_INPUT_EVENT (const iEvent &);
-#define _CS_IS_NETWORK_EVENT(e) CS_IS_NETWORK_EVENT(e)
-#undef CS_IS_NETWORK_EVENT
-bool _CS_IS_NETWORK_EVENT (const iEvent &);
 
 // iutil/objreg.h
 #define _CS_QUERY_REGISTRY_TAG(a, b) CS_QUERY_REGISTRY_TAG(a, b)
