@@ -903,14 +903,15 @@ However, the project now resides at SourceForge:
 @item
 Brandon Ehle (@email{azverkan@@yahoo.com})
 
-Brandon added a new plug-in system to Crystal Space.  He also contributed
-@file{csPython} and @file{csLua} for scripting.  Using @file{csPython} he
-wrote an Unreal map to Crystal Space convertor.  Brandon also added project
-files for Borland 4. Brandon also worked on the Playstation2 port. He
-improved @code{csQuaternion} a lot. Brandon also added @sc{cssh} (Crystal
-Space Shell). He added the (now non-existant) @file{newdoc} directory with
-LaTeX documentation. Later Brandon worked on a cal3d convertor for Crystal Space
-and a motion manager plugin.
+Brandon contributed the original @file{csPython} and @file{csLua} modules for
+scripting.  (The Python module has undergone complete re-write by Rene Jager
+since that time, and the Lua module has been dropped for lack of maintenance.)
+Using @file{csPython} he wrote an Unreal map to Crystal Space convertor.
+Brandon also added project files for Borland 4. Brandon also worked on the
+never completed Playstation2 port. He improved @code{csQuaternion}.  He added
+the (now non-existant) @file{newdoc} directory with LaTeX documentation (which
+was dropped in favor of Texinfo). Later Brandon worked on a cal3d convertor for
+Crystal Space and a motion manager plugin.
 
 @item
 Oriol Esteve

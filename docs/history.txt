@@ -11,20 +11,22 @@ chronological order.
 	- res fixed cssaver plugin so it compiles with NR.
 	- res fixed some error messages in csparser where parameters were
 	  mixed up.
-        - Old_Belge fixed libs/csws/csstddlg.cpp to use 
+        - Old_Belge fixed libs/csws/csstddlg.cpp to use
           CaseInsensitiveCompareSort so the conversion of char to void wouldn't
           bother the compiler.
-        - Old_Belge added CaseInsensitiveCompare to include/csutil/stringarray.h
-          , it seemed to be missing.
+        - Old_Belge added CaseInsensitiveCompare to stringarray.h; it seemed to
+          be missing.
+	- Eric Sunshine removed the last couple references to luaswig and
+          cslua.
 26-Oct-2003
 	- Eric Sunshine updated `simple1' tutorial in the user manual to
 	  reflect recent changes to keyboard-related event handling.
 	- res changed the VFS cache to read files not null terminated.
         - Philip Wyett eliminated warnings by bad casting to float right
           before initialization of an integer.
-	- Marten Svanfeldt changed the ways shader variables work in new renderer.
-	  The current way works, but is somewhat messy code and unclean design.
-	  It should be fixed in the following week(s).
+	- Marten Svanfeldt changed the ways shader variables work in new
+          renderer.  The current way works, but is somewhat messy code and
+          unclean design.  It should be fixed in the following week(s).
 	- Rhad added a call to broadcast signalTextBoxFocused when a textbox 
 	  gains focus by any means - not just when it's set programatically.
 25-Oct-2003
