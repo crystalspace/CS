@@ -31,7 +31,7 @@
 #include "csutil/csstring.h"
 #include "funcon.h"
 #include "conbuffr.h"
-#include "icfgfile.h"
+#include "icfgnew.h"
 #include "csgfxldr/csimage.h"
 
 IMPLEMENT_IBASE(funConsole)
@@ -335,34 +335,34 @@ void funConsole::GetPosition (int &x, int &y, int &width, int &height) const
 
 void funConsole::LoadPix ()
 {
-  iConfigFile *ini = System->CreateConfig ("/config/funcon.cfg");
-  const char* dir = ini->GetStr ("funcon", "zip");
-  const char* mountdir = ini->GetStr ("funcon", "mount");
+  iConfigFileNew *ini = System->CreateConfigNew ("/config/funcon.cfg");
+  const char* dir = ini->GetStr ("FunCon.General.Zip");
+  const char* mountdir = ini->GetStr ("FunCon.General.Mount");
   if (VFS->Mount (mountdir, dir))
   {
     VFS->PushDir ();
     VFS->ChDir (mountdir);
 
     // scan in all sections
-    PrepPix (ini, "background", deco.bgnd, true);
-    PrepPix (ini, "topleft", deco.border[0], false);
-    PrepPix (ini, "top", deco.border[1], false);
-    PrepPix (ini, "topright", deco.border[2], false);
-    PrepPix (ini, "right", deco.border[3], false);
-    PrepPix (ini, "bottomright", deco.border[4], false);
-    PrepPix (ini, "bottom", deco.border[5], false);
-    PrepPix (ini, "bottomleft", deco.border[6], false);
-    PrepPix (ini, "left", deco.border[7], false);
+    PrepPix (ini, "Background", deco.bgnd, true);
+    PrepPix (ini, "TopLeft", deco.border[0], false);
+    PrepPix (ini, "Top", deco.border[1], false);
+    PrepPix (ini, "TopRight", deco.border[2], false);
+    PrepPix (ini, "Right", deco.border[3], false);
+    PrepPix (ini, "BottomRight", deco.border[4], false);
+    PrepPix (ini, "Bottom", deco.border[5], false);
+    PrepPix (ini, "BottomLeft", deco.border[6], false);
+    PrepPix (ini, "Left", deco.border[7], false);
 
     // internal increase/decrease
-    deco.p2lx = ini->GetInt ("funcon", "p2lx");
-    deco.p2rx = ini->GetInt ("funcon", "p2rx");
-    deco.p2ty = ini->GetInt ("funcon", "p2ty");
-    deco.p2by = ini->GetInt ("funcon", "p2by");
-    deco.lx = ini->GetInt ("funcon", "lx");
-    deco.rx = ini->GetInt ("funcon", "rx");
-    deco.ty = ini->GetInt ("funcon", "ty");
-    deco.by = ini->GetInt ("funcon", "by");
+    deco.p2lx = ini->GetInt ("FunCon.General.p2lx");
+    deco.p2rx = ini->GetInt ("FunCon.General.p2rx");
+    deco.p2ty = ini->GetInt ("FunCon.General.p2ty");
+    deco.p2by = ini->GetInt ("FunCon.General.p2by");
+    deco.lx = ini->GetInt ("FunCon.General.lx");
+    deco.rx = ini->GetInt ("FunCon.General.rx");
+    deco.ty = ini->GetInt ("FunCon.General.ty");
+    deco.by = ini->GetInt ("FunCon.General.by");
 
     VFS->PopDir ();
     VFS->Unmount (mountdir, dir);
@@ -373,10 +373,13 @@ void funConsole::LoadPix ()
   ini->DecRef ();
 }
 
-void funConsole::PrepPix (iConfigFile *ini, const char *sect,
+void funConsole::PrepPix (iConfigFileNew *ini, const char *sect,
   ConDecoBorder &border, bool bgnd)
 {
-  const char* pix = ini->GetStr (sect, "pic", "");
+  csString Keyname;
+
+  Keyname.Clear() << "FunCon." << sect << ".pic";
+  const char* pix = ini->GetStr (Keyname, "");
 
   border.mat = NULL;
   border.do_keycolor = false;
@@ -406,20 +409,25 @@ void funConsole::PrepPix (iConfigFile *ini, const char *sect,
 	border.mat = mat;
 	image->DecRef();
 
-	border.offx = ini->GetInt (sect, "x", 0);
-        border.offy = ini->GetInt (sect, "y", 0);
+        Keyname.Clear() << "FunCon." << sect << ".x";
+	border.offx = ini->GetInt (Keyname, 0);
+        Keyname.Clear() << "FunCon." << sect << ".y";
+        border.offy = ini->GetInt (Keyname, 0);
 
-	border.do_keycolor = ini->GetYesNo (sect, "do_keycolor", false);
+        Keyname.Clear() << "FunCon." << sect << ".do_keycolor";
+	border.do_keycolor = ini->GetBool (Keyname, false);
 	if (border.do_keycolor)
         {
 	  int r,g,b;
-	  const char *kc = ini->GetStr( sect, "keycolor", "0,0,0" );
+          Keyname.Clear() << "FunCon." << sect << ".keycolor";
+	  const char *kc = ini->GetStr(Keyname, "0,0,0" );
 	  sscanf( kc, "%d,%d,%d", &r, &g, &b );
 	  border.kr=r; border.kg=g; border.kb=b;
 	  border.mat->GetTexture ()->SetKeyColor ( border.kr, border.kg, border.kb );
 	}
 
-	border.do_stretch = ini->GetYesNo (sect, "do_stretch", false);
+        Keyname.Clear() << "FunCon." << sect << ".do_stretch";
+	border.do_stretch = ini->GetBool (Keyname, false);
       }
 
       delete [] data;
@@ -428,15 +436,19 @@ void funConsole::PrepPix (iConfigFile *ini, const char *sect,
       printf ("couldnt read %s\n", pix);
   }
 
-  border.do_alpha = ini->GetYesNo (sect, "do_alpha", false);
+  Keyname.Clear() << "FunCon." << sect << ".do_alpha";
+  border.do_alpha = ini->GetBool (Keyname, false);
   if (border.do_alpha)
-    border.alpha = ini->GetFloat (sect, "alpha", 0.0);
+    Keyname.Clear() << "FunCon." << sect << ".alpha";
+    border.alpha = ini->GetFloat (Keyname, 0.0);
   
   if (bgnd)
   {
     int r,g,b;
-    border.do_keycolor = ini->GetYesNo (sect, "do_keycolor", false);
-    const char *kc = ini->GetStr (sect, "keycolor", "1,1,1");
+    Keyname.Clear() << "FunCon." << sect << ".do_keycolor";
+    border.do_keycolor = ini->GetBool (Keyname, false);
+    Keyname.Clear() << "FunCon." << sect << ".keycolor";
+    const char *kc = ini->GetStr (Keyname, "1,1,1");
     sscanf (kc, "%d,%d,%d", &r, &g, &b);
     border.kr = r; border.kg = g; border.kb = b;
   }
