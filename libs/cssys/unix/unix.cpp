@@ -52,6 +52,12 @@ void SysSystemDriver::Loop(void)
   }
 }
 
+#ifdef OS_SOLARIS
+extern "C" {
+int usleep(unsigned int);
+}
+#endif
+
 void SysSystemDriver::Sleep (int SleepTime)
 {
   usleep (SleepTime * 1000);
