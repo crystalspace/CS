@@ -1,6 +1,6 @@
 %define name    crystalspace
 %define version 0.99
-%define release 2
+%define release 3
 %define prefix	/usr
 
 %define with_DEBUG 0
@@ -115,36 +115,39 @@ rm -rf "$RPM_BUILD_ROOT"
 %files -n %{name}-devel
 %defattr(-,root,root)
 %{prefix}/lib/*.a
-%{prefix}/include/*.h
-%{prefix}/include/csws/*.h
-%{prefix}/include/iaws/*.h
-%{prefix}/include/imap/*.h
-%{prefix}/include/csgfx/*.h
-%{prefix}/include/igeom/*.h
-%{prefix}/include/imesh/*.h
-%{prefix}/include/iutil/*.h
-%{prefix}/include/csgeom/*.h
-%{prefix}/include/cstool/*.h
-%{prefix}/include/csutil/*.h
-%{prefix}/include/csutil/*.inc
-%{prefix}/include/csutil/win32/*.h
-%{prefix}/include/csutil/win32/*.inc
-%{prefix}/include/csutil/win32/*.fun
-%{prefix}/include/csutil/macosx/*.h
-%{prefix}/include/csutil/unix/*.h
+%{prefix}/include/%{name}/*.h
+%{prefix}/include/%{name}/csws/*.h
+%{prefix}/include/%{name}/iaws/*.h
+%{prefix}/include/%{name}/imap/*.h
+%{prefix}/include/%{name}/csgfx/*.h
+%{prefix}/include/%{name}/igeom/*.h
+%{prefix}/include/%{name}/imesh/*.h
+%{prefix}/include/%{name}/iutil/*.h
+%{prefix}/include/%{name}/csgeom/*.h
+%{prefix}/include/%{name}/cstool/*.h
+%{prefix}/include/%{name}/csutil/*.h
+%{prefix}/include/%{name}/csutil/*.inc
+%{prefix}/include/%{name}/csutil/win32/*.h
+%{prefix}/include/%{name}/csutil/win32/*.inc
+%{prefix}/include/%{name}/csutil/win32/*.fun
+%{prefix}/include/%{name}/csutil/macosx/*.h
+%{prefix}/include/%{name}/csutil/unix/*.h
 
-%{prefix}/include/isound/*.h
-%{prefix}/include/ivaria/*.h
-%{prefix}/include/ivaria/*.i
-%{prefix}/include/ivideo/*.h
-%{prefix}/include/ivideo/shader/*.h
-%{prefix}/include/itexture/*.h
-%{prefix}/include/iengine/*.h
-%{prefix}/include/iengine/rendersteps/*.h
-%{prefix}/include/inetwork/*.h
-%{prefix}/include/igraphic/*.h
+%{prefix}/include/%{name}/isound/*.h
+%{prefix}/include/%{name}/ivaria/*.h
+%{prefix}/include/%{name}/ivaria/*.i
+%{prefix}/include/%{name}/ivideo/*.h
+%{prefix}/include/%{name}/ivideo/shader/*.h
+%{prefix}/include/%{name}/itexture/*.h
+%{prefix}/include/%{name}/iengine/*.h
+%{prefix}/include/%{name}/iengine/rendersteps/*.h
+%{prefix}/include/%{name}/inetwork/*.h
+%{prefix}/include/%{name}/igraphic/*.h
 
 %changelog
+* Sat Aug 07 2004 Vincent Knecht <vknecht@users.sourceforge.net> 0.99-3
+- Upgraded for new headers installation directory.
+
 * Fri Jul 09 2004 Vincent Knecht <vknecht@users.sourceforge.net> 0.99-2
 - Simplified and re-enabled levels relighting.
 

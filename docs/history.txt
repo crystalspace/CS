@@ -13,6 +13,8 @@ chronological order.
 	  is missing.
 	- Jorrit changed the engine so it reports upto 100 missing lightmaps
 	  objects if -verbose is used.
+	- Vincent Knecht upgraded cs.spec for new headers installation
+	  directory.
 6-Aug-2004
 	- Jorrit changed the engine so that the plane of the portal is always
 	  used for culling but only used for exact clipping in the renderer
