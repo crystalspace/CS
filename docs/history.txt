@@ -17,6 +17,8 @@ chronological order.
 	- Eric Sunshine fixed bugs in walktest/Jamfile and walktest.mak where
 	  `walkall' target unconditionally tried to build the OpenGL canvas and
 	  renderer even if OpenGL was not detected.
+	- Eric Sunshine fixed bug in aws/skinpars.yy.  The `expf' lacked a
+	  terminating semi-colon.
 4-Feb-2004
 	- Jorrit started the removal of the old effect system (used in OR).
 	  This is unused and doesn't work properly as well.  Removed support

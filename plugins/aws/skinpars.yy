@@ -276,6 +276,7 @@ expf:	TOKEN_FLOAT		{ $$ = $1; }
 	| expf '/' expf		{ $$ = $1 / $3; }
 	| '-' expf %prec NEG	{ $$ = -$2; }
 	| '(' expf ')'		{ $$ = $2; }
+;
 
 exp:    TOKEN_NUM		{ $$ = $1; }
 	| constant_item		{ $$ = $1; }
@@ -295,4 +296,3 @@ awserror(char *s)
   static_awsparser->ReportError (s);
   return 0;
 }
-
