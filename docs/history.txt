@@ -52,6 +52,14 @@ The history order is reversed so that new features are at the top.
 	    - use of extensions can be enabled/disabled via config.
 	- res changed the OpenGL canvases to use the extension manager (to ease
 	  use of OpenGL extensions)
+	- duhprey (and also Dentoid) did the following (new renderer only):
+	    - changed sector so the engine is now responsible for coordinating draw
+	      by setting the shader and then drawing all objects which use that
+	      shader.
+	    - instead of drawing the objects now prepare the csRenderMesh for
+	      the engine
+	    - The renderer now expects the shader to be set before any calls to
+	      draw 
 27-Apr-2003
 	- Philip Wyett fixed the DDS plugin compilation under MSVC, by
 	  replacing struct with static (don't ask) and giving the the array an
