@@ -53,11 +53,8 @@ by the copyright holders.
 @subtitle Edition @value{EDITION} for Crystal Space @value{VERSION}
 @subtitle Last updated @value{UPDATED}
 @author Jorrit Tyberghein
-@author Andrew Zabolotny
 @author Eric Sunshine
-@author Thomas Hieber
-@author Michael Ewert
-@author Seth Galbraith
+@author Andrew Zabolotny
 
 @page
 @vskip 0pt plus 1filll
