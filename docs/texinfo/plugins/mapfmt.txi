@@ -79,7 +79,7 @@
 @token{)}
 @end macro
 
-@node Old Map File Format, , csParser, csParser
+@node Old Map File Format, , XML File Format, csParser
 @subsection Old Format of Map File
 @cindex Old Format of Map File
 @cindex Old Map File Format
@@ -114,7 +114,7 @@ It deals strictly with plain-text files.
 * Map File Hints:: Hints
 @end menu
 
-@node Map File Grammar, Map File Syntax, Map File Format, Map File Format
+@node Map File Grammar, Map File Syntax, Old Map File Format, Old Map File Format
 @subsubsection Grammar
 
 @noindent
@@ -158,7 +158,7 @@ WAGER EITHER (81, 15)
 WAGER (72, 91)
 @end example
 
-@node Map File Syntax, Map File Hints, Map File Grammar, Map File Format
+@node Map File Syntax, Map File Hints, Map File Grammar, Old Map File Format
 @subsubsection Syntax
 
 @noindent
@@ -644,7 +644,7 @@ Same remark as for mesh objects: the stuff that is inside the
 @production{library,
     @token{LIBRARY} @LP{} [ @nonterm{library-comp} @dots{} ] @RP{}}
 
-@node Map File Hints, , Map File Syntax, Map File Format
+@node Map File Hints, , Map File Syntax, Old Map File Format
 @subsubsection Hints
 
 @noindent

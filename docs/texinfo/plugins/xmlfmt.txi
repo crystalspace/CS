@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node XML File Format, , csParser, csParser
+@node XML File Format, Old Map File Format, csParser, csParser
 @subsection Format of Map File (XML)
 @cindex Format of Map File
 @cindex Map File Format
