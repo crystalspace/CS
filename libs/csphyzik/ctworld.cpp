@@ -579,7 +579,11 @@ ctCollidingContact *head_cont = cont;
 
       // bottom part of equation
       bottom = ma_inv + mb_inv + rota + rotb;
-      
+
+      //!me hack to keep objects appart
+      if( v_rel > -0.1 )
+        cont->restitution = 4.0;
+
       if( prev != cont->body_b ){
         j_magnitude = -(1.0 + cont->restitution ) * v_rel / bottom;
       }else{
