@@ -4859,7 +4859,7 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
 
   // Draw all triangles.
   csTriangle* triangles = (csTriangle*)workIndices;
-  for (i = indexstart/3 ; i < indexend/3 ; i++)
+  for (i = indexstart/3 ; i < (unsigned int)(indexend/3) ; i++)
   {
     int a = triangles[i].a;
     int b = triangles[i].b;
