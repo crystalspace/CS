@@ -23,6 +23,8 @@ The history order is reversed so that new features are at the top.
 	    texture manager. Handles should now clean up with
 	    a DecRef() the same as most other engine objects.
 	    The handle will unregister itself.
+	- Philip Wyett removed lua from MSVC compilation process.
+	- Philip fixed compile error in csfgen.
 6-Aug-2001
 	- Removed almost all usage of iSystem in the entire CS system. Instead
 	  a pointer to the object registry (iObjectRegistry) is used. This
