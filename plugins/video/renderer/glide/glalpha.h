@@ -125,6 +125,7 @@ public:
   virtual iGraphics3D* GetProcTextureInterface () { return NULL;}
   virtual void ProcTextureSync () {}    
   void savemap();
+  int GetFlags () { return 0; }
 };
 
 #endif //ALPHAMAP_H
