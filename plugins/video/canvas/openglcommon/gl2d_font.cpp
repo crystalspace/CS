@@ -27,9 +27,6 @@
 #include "video/canvas/common/graph2d.h"
 #include "video/canvas/openglcommon/iglstates.h"
 
-// #include "iostream.h"
-#include "fstream.h"
-
 #include "gl2d_font.h"
 
 #if !defined (OPENGL_BITMAP_FONT)
@@ -188,8 +185,6 @@ GLGlyphSet *GLFontCache::CacheFont (iFont *font)
   GLuint *nTexNames = new GLuint [nTextures];
   glGenTextures (nTextures, nTexNames);
 
-  ofstream debug_log("font_info2.txt");
-
   int nCurrentTex = 0;
   int x = 256, y = 256;
   for (c = 0; c < 256; c++)
@@ -235,31 +230,28 @@ GLGlyphSet *GLFontCache::CacheFont (iFont *font)
     // - characters are laid out in a grid format, going across and
     //   then down
 
-	int alpha_width,alpha_height;
-	uint8 * alphasource = font->GetGlyphAlphaBitmap(c, alpha_width, alpha_height);
+    int alpha_width,alpha_height;
+    uint8 * alphasource = font->GetGlyphAlphaBitmap (
+    	c, alpha_width, alpha_height);
 
     // grab bits from the source, and stuff them into the font bitmap
     // one at a time
     uint8 currentsourcebyte = *fontsourcebits;
-  int pixelx, pixely;
+    int pixelx, pixely;
     for (pixely = 0; pixely < maxheight; pixely++)
     {
       for (pixelx = 0; pixelx < width; pixelx++)
       {
-		if (alphasource == NULL)
-		{
-			// strip a bit off and dump it into the base bitmap
-			*characterbitmapbase++ = (currentsourcebyte & 128) ? 255 : 0;
-			debug_log << "x=" << pixelx << " y=" << pixely << " " <<
-		    (int)*(characterbitmapbase-1) << "\n";
-		}
-		else
-		{
-			// Copy the value from the alphasource to bitmap
-			*characterbitmapbase++ = alphasource[pixely * width + pixelx];
-			debug_log << "x=" << pixelx << " y=" << pixely << " " <<
-			  (int)alphasource[pixely * width + pixelx] << "\n";
-		}
+	if (alphasource == NULL)
+	{
+	  // strip a bit off and dump it into the base bitmap
+	  *characterbitmapbase++ = (currentsourcebyte & 128) ? 255 : 0;
+	}
+	else
+	{
+	  // Copy the value from the alphasource to bitmap
+	  *characterbitmapbase++ = alphasource[pixely * width + pixelx];
+	}
 
         if ((pixelx & 7) == 7)
           currentsourcebyte = *++fontsourcebits;
