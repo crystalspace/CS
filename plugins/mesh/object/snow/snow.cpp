@@ -132,9 +132,8 @@ void csSnowMeshObject::Update (cs_time elapsed_time)
   }
 }
 
-void csSnowMeshObject::HardTransform (const csReversibleTransform& t)
+void csSnowMeshObject::HardTransform (const csReversibleTransform& /*t*/)
 {
-  (void)t;
 }
 
 //----------------------------------------------------------------------
