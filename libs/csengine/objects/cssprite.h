@@ -40,7 +40,8 @@ class csFrame : public csBase
 private:
   csVector3* vertices;
   csVector2* texels;
-  char *name;
+  csVector3* normals;
+  char* name;
   int max_vertex;
 
 public:
@@ -71,6 +72,12 @@ public:
   csVector3* GetVertices () { return vertices; }
   ///
   csVector2& GetTexel (int i) { return texels[i]; }
+
+  ///
+  csVector3& GetNormal (int i) { return normals[i]; }
+  /// Return true if this frame has calculated normals.
+  bool HasNormals () { return normals != NULL; }
+
   ///
   char* GetName () { return name; }
 
@@ -87,6 +94,12 @@ public:
    * result is the new number.
    */
   void RemapVertices (int* mapping, int num_vertices);
+
+  /**
+   * Compute all normals in this frame given the
+   * mesh which connects the vertices in the frame.
+   */
+  void ComputeNormals (csTriangleMesh* mesh, int num_vertices);
 };
 
 /**
@@ -313,10 +326,29 @@ public:
   void SetVertexColor (int i, const csColor& col);
 
   /**
+   * Add a color for a vertex.
+   * As soon as you use this function this sprite will be rendered
+   * using gouraud shading. Calling this function for the first time
+   * will initialize all colors to black.
+   */
+  void AddVertexColor (int i, const csColor& col);
+
+  /**
    * Reset the color list. If you call this function then the
    * sprite will no longer use gouraud shading.
    */
   void ResetVertexColors ();
+
+  /**
+   * Light sprite according to the given array of lights (i.e.
+   * fill the vertex color array).
+   * No shadow calculation will be done. This is assumed to have
+   * been done earlier. This is a primitive lighting process
+   * based on the lights which hit one point of the sprite (usually
+   * the center). More elaborate lighting systems are possible
+   * but this will do for now.
+   */
+  void UpdateLighting (csLight** lights, int num_lights);
 
   ///
   void UnsetTexture ()

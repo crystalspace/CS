@@ -20,12 +20,15 @@
 #include "csengine/sysitf.h"
 #include "csengine/polygon/pol2d.h"
 #include "csengine/objects/cssprite.h"
+#include "csengine/light/light.h"
 #include "csengine/basic/triangle.h"
 #include "csengine/camera.h"
 #include "csengine/world.h"
 #include "csengine/texture.h"
 #include "csengine/sector.h"
+#include "csengine/dumper.h"
 #include "csgeom/polyclip.h"
+#include "csgeom/fastsqrt.h"
 #include "igraph3d.h"
 
 csFrame::csFrame (int num_vertices)
@@ -34,12 +37,14 @@ csFrame::csFrame (int num_vertices)
   CHK (vertices = new csVector3 [num_vertices]);
   name = NULL;
   max_vertex = num_vertices;
+  normals = NULL;
 }
 
 csFrame::~csFrame ()
 {
   CHK (delete [] texels);
   CHK (delete [] vertices);
+  CHK (delete [] normals);
   CHK (delete [] name);
 }
 
@@ -87,6 +92,26 @@ void csFrame::RemapVertices (int* mapping, int num_vertices)
   CHK (delete [] texels);
   vertices = new_vertices;
   texels = new_texels;
+}
+
+void csFrame::ComputeNormals (csTriangleMesh* mesh, int num_vertices)
+{
+  CHK (delete [] normals);
+  CHK (normals = new csVector3 [num_vertices]);
+  CHK (csTriangleVertices* tr_verts = new csTriangleVertices (mesh, vertices, num_vertices));
+  int i, j;
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    csTriangleVertex& vt = tr_verts->GetVertex (i);
+    if (vt.num_con_vertices)
+    {
+      normals[i] = vertices[vt.con_vertices[0]] - vertices[i];
+      for (j = 1 ; j < vt.num_con_vertices ; j++)
+        normals[i] = normals[i] % (vertices[vt.con_vertices[j]] - vertices[i]);
+      if (normals[i].Norm ()) normals[i] = normals[i].Unit ();
+    }
+  }
+  CHK (delete tr_verts);
 }
 
 
@@ -354,6 +379,20 @@ void csSprite3D::SetVertexColor (int i, const csColor& col)
       vertex_colors[j].Set (0, 0, 0);
   }
   vertex_colors[i] = col;
+}
+
+void csSprite3D::AddVertexColor (int i, const csColor& col)
+{
+  if (!vertex_colors)
+  {
+    CHK (vertex_colors = new csColor [tpl->GetNumVertices ()]);
+    int j;
+    for (j = 0 ; j < tpl->GetNumVertices (); j++)
+      vertex_colors[j].Set (0, 0, 0);
+  }
+  vertex_colors[i].red += col.red;
+  vertex_colors[i].green += col.green;
+  vertex_colors[i].blue += col.blue;
 }
 
 void csSprite3D::ResetVertexColors ()
@@ -629,6 +668,45 @@ void csSprite3D::RemoveFromSectors ()
     int idx = ss->sprites.Find (this);
     ss->sprites[idx] = NULL;
     ss->sprites.Delete (idx);
+  }
+}
+
+void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
+{
+  int i, j;
+  csColor color;
+  float dist, cosinus;
+  float r200d, g200d, b200d;
+  csVector3 pos;
+
+  // Choose one point of the sprite.
+  // @@@ Note! we should try to use the center point here.
+  csFrame* this_frame = tpl->GetFrame (cur_frame);
+  if (!this_frame->HasNormals ()) this_frame->ComputeNormals (tpl->GetBaseMesh (), tpl->GetNumVertices ());
+
+  ResetVertexColors ();
+  for (i = 0 ; i < num_lights ; i++)
+  {
+    r200d = lights[i]->GetColor ().red * ((float)NORMAL_LIGHT_LEVEL/256.) / lights[i]->GetRadius ();
+    g200d = lights[i]->GetColor ().green * ((float)NORMAL_LIGHT_LEVEL/256.) / lights[i]->GetRadius ();
+    b200d = lights[i]->GetColor ().blue * ((float)NORMAL_LIGHT_LEVEL/256.) / lights[i]->GetRadius ();
+
+    for (j = 0 ; j < tpl->GetNumVertices () ; j++)
+    {
+      // @@@ Transformation here is not efficient. First we should do the
+      // inverse transformation on the light.
+      pos = m_obj2world * this_frame->GetVertex (j) - v_obj2world;
+      dist = FastSqrt (csSquaredDist::PointPoint (lights[i]->GetCenter (), pos));	//@@@NOT EFFICIENT!!!
+      cosinus = (pos-lights[i]->GetCenter ())*(m_obj2world * this_frame->GetNormal (j));
+      cosinus /= dist;
+      if (cosinus < 0) cosinus = 0;
+      else if (cosinus > 1) cosinus = 1;
+
+      color.red = cosinus * r200d*(lights[i]->GetRadius () - dist);
+      color.green = cosinus * g200d*(lights[i]->GetRadius () - dist);
+      color.blue = cosinus * b200d*(lights[i]->GetRadius () - dist);
+      AddVertexColor (j, color);
+    }
   }
 }
 
