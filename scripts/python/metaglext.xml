@@ -1,5 +1,5 @@
 <extensionlist>
-  <extension name="GL_version_1_2" type="GL">
+  <extension name="GL_version_1_2" type="GLver">
     <token name="GL_UNSIGNED_BYTE_3_3_2" value="32818" />
     <token name="GL_UNSIGNED_SHORT_4_4_4_4" value="32819" />
     <token name="GL_UNSIGNED_SHORT_5_5_5_1" value="32820" />
@@ -85,7 +85,7 @@
       <arg name="height" type="GLsizei" const="false" pointer="false" />
     </function>
   </extension>
-  <extension name="GL_version_1_3" type="GL">
+  <extension name="GL_version_1_3" type="GLver">
     <token name="GL_TEXTURE0" value="33984" />
     <token name="GL_TEXTURE1" value="33985" />
     <token name="GL_TEXTURE2" value="33986" />

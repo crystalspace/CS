@@ -30,6 +30,16 @@ def concat(list):
 def getTemplateK (template, kind):
   return getTemplate (template + "_" + kind);
 
+def extensionUrl (ext):
+  urlPrefix = "http://oss.sgi.com/projects/ogl-sample/registry/";
+  if ext.startswith("GL_"):
+    ext = ext[3:];
+    extsplit = ext.split ("_", 1);
+    return urlPrefix + extsplit[0] + "/" + extsplit[1] + ".txt";
+  elif ext.startswith("WGL_"):
+    extsplit = ext.split ("_", 2);
+    return urlPrefix + extsplit[1] + "/" + extsplit[0].lower() + "_" + extsplit[2] + ".txt";
+
 def interpolate (strings, values):
   resStrings = list();
   for string in strings:
@@ -50,11 +60,14 @@ def interpolate (strings, values):
 	  if key.isupper():
 	    value = value.upper();
 	  if len (ksplit) > 1:
-	    width = int (ksplit[1]);
-	    if width > 0:
-	      value = value.ljust (width);
-	    if width < 0:
-	      value = value.rjust (-width);
+	    if ksplit[1] == "url":
+	      value = extensionUrl (value);
+	    else:
+	      width = int (ksplit[1]);
+	      if width > 0:
+		value = value.ljust (width);
+	      if width < 0:
+		value = value.rjust (-width);
 	  result = result + value;  
 	i = i + 2;
     while i < len (words):
@@ -103,7 +116,8 @@ def getArgument (arg, prevarg):
 
 def getDefinitions (ext):
     name = ext.getAttribute ("name");
-    type = ((name.split ("_"))[0]).lower();
+    #type = ((name.split ("_"))[0]).lower();
+    type = ext.getAttribute ("type")
     values = { "name" : name, "tokens" : "", "functiontypes" : "" };
     for const in ext.getElementsByTagName ("token"):
       values["tokens"] = values["tokens"] + join (getConstant (const), "");
@@ -122,11 +136,14 @@ def getExtensions (extensions):
     funcs = list();
     initext = list();
     for ext in extensions:
-      print ext.getAttribute ("name") + "...";
-      values = { "name" : ext.getAttribute ("name") };
+      name = ext.getAttribute ("name");
+      #type = ((name.split ("_"))[0]).lower();
+      type = ext.getAttribute ("type")
+      print name + "...";
+      values = { "name" : name };
       print " flags...";
       tflags += interpolate (getTemplate ("ext_tested"), values);
-      dflags += interpolate (getTemplate ("ext_flag"), values);
+      dflags += interpolate (getTemplateK ("ext_flag", type), values);
       initflags += interpolate (getTemplate ("ext_init"), values);
       print " tokens...";
       defs += getDefinitions (ext);
@@ -147,7 +164,8 @@ def getExtensions (extensions):
 def getFunctions (ext):
   funcs = list();
   name = ext.getAttribute ("name");
-  type = ((name.split ("_"))[0]).lower();
+  #type = ((name.split ("_"))[0]).lower();
+  type = ext.getAttribute ("type")
   for func in ext.getElementsByTagName ("function"):
     values = { "name" : func.getAttribute("name") };
     if func.getAttribute("name") not in writtenFuncs:
@@ -166,11 +184,10 @@ def getInitExtensions (ext):
       "cfglen" : str (len (cfgprefix)),
       "functionsinit" : "",
       "depcheck" : "" };
-    type = ((name.split ("_"))[0]).lower();
+    #type = ((name.split ("_"))[0]).lower();
+    type = ext.getAttribute ("type")
     ettype = type;
     specials = ( 
-      "GL_version_1_2",
-      "GL_version_1_3",
       "WGL_ARB_extensions_string"
       );
     if name in specials:

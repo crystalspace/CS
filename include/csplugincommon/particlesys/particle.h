@@ -16,8 +16,11 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_PARTICLE_H__
-#define __CS_PARTICLE_H__
+#ifndef __CS_CSPLUGINCOMMON_PARTICLESYS_PARTICLE_H__
+#define __CS_CSPLUGINCOMMON_PARTICLESYS_PARTICLE_H__
+
+/**\file
+ */
 
 #include "csextern.h"
 #include "cstool/meshobjtmpl.h"
@@ -28,6 +31,9 @@
 #include "csgfx/shadervarcontext.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/weakref.h"
+
+/**\addtogroup plugincommon
+ * @{ */
 
 /**
  * flag value to indicate that the system should be deleted when all
@@ -365,4 +371,6 @@ public:
   friend struct eiParticleState;
 };
 
-#endif // __CS_PARTICLE_H__
+/** @} */
+
+#endif // __CS_CSPLUGINCOMMON_PARTICLESYS_PARTICLE_H__

@@ -67,7 +67,14 @@ static int cs_fputsn (FILE* file, const char* str, size_t len)
 	  // Catch char that couldn't be encoded, print ? instead
 	  if (fputs (mbstr, file) == EOF) return EOF;
 	  if (fputc ('?', file) == EOF) return EOF;
-	  wcsPtr++;
+	  if (CS_UC_IS_HIGH_SURROGATE (*wcsPtr))
+	  {
+	    wcsPtr++;
+	    if (CS_UC_IS_LOW_SURROGATE (*wcsPtr))
+	      wcsPtr++;
+	  }
+	  else
+	    wcsPtr++;
 	  continue;
 	}
 	break;

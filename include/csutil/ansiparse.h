@@ -36,18 +36,25 @@ public:
   {
     /// Command was unrecognized
     cmdUnknown,
-    /// 
+    /// Reset all attributes
     cmdFormatAttrReset,
+    /// 'Enable attribute' 
     cmdFormatAttrEnable,
+    /// 'Disable attribute'
     cmdFormatAttrDisable,
+    /// 'Set foreground color'
     cmdFormatAttrForeground,
+    /// 'Set background color'
     cmdFormatAttrBackground,
   };
+  /// Classification of the command sequence
   enum CommandClass
   {
     /// No ANSI sequence was found
     classNone,
+    /// An ANSI sequence was found, but not recognized.
     classUnknown,
+    /// A formatting sequence was found.
     classFormat
   };
   /**
@@ -100,7 +107,9 @@ public:
   {
     union
     {
+      /// Color for cmdFormatAttrForeground and cmdFormatAttrBackground commands
       FormatColor colorVal;
+      /// Attribute for cmdFormatAttrEnable and cmdFormatAttrDisable commands
       FormatAttr attrVal;
     };
   };
@@ -113,6 +122,14 @@ public:
    */
   static bool CS_CSUTIL_EXPORT ParseAnsi (const char* str,
     size_t& ansiCommandLen, CommandClass& cmdClass, size_t& textLen);
+  /**
+   * Decode an ANSI code sequence.
+   * Decodes a part of an ANSI code sequence, if known. Returns whether the
+   * decoding was was successful. \a cmd is updated to point to the start
+   * of the next sequence part.
+   * \remark Multiple sequences might occur, repeated call this function
+   *  until <tt>false</tt> is returned.
+   */
   static bool CS_CSUTIL_EXPORT DecodeCommand (const char*& cmd,
     size_t& cmdLen, Command& command, CommandParams& commandParams);
 };

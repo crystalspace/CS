@@ -803,6 +803,9 @@ public:
   }
   /** @} */
 
+  /**\name Character mappings
+   * @{ */
+   
   /**
    * Map a character to its upper case equivalent(s).
    * \param ch Char to be mapped.
@@ -814,17 +817,18 @@ public:
     size_t destSize);
   /**
    * Map a character to its lower case equivalent(s).
-   * \copydoc MapToUpper(const utf32_ch, utf33_char*, size_t)
+   * \copydoc MapToUpper(const utf32_char, utf32_char*, size_t)
    */
   static size_t MapToLower (const utf32_char ch, utf32_char* dest, 
     size_t destSize);
   /**
    * Map a character to its fold equivalent(s).
    * Fold mapping is useful for binary comparison of two Unicode strings.
-   * \copydoc MapToUpper(const utf32_ch, utf33_char*, size_t)
+   * \copydoc MapToUpper(const utf32_char, utf32_char*, size_t)
    */
   static size_t MapToFold (const utf32_char ch, utf32_char* dest, 
     size_t destSize);
+  /** @} */
 };
 
 /** @} */

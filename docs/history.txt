@@ -27,6 +27,10 @@ chronological order.
 	  polygons on the destination node and projects those on the
 	  coverage buffer too before projecting the other polygons
 	  that are between the two nodes.
+	- res fixed a dumb oversight in csGLVBOBufferManager::ParseByteSize)
+	  that caused it to bark if no suffix is present at all.
+	- res changed the generic csPrintf() to better deal with surrogates.
+	- res made a couple of small doxygen changes/improvements.
 1-Mar-2005
 	- res fixed the use of 'return' in a void method in glrender3d.cpp.
 	- Marten fixed a bug related to attenuation of lights in r3dtest. 

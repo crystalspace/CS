@@ -635,7 +635,9 @@ INCLUDE_FILE_PATTERNS  =
 # or name=definition (no spaces). If the definition and the = are 
 # omitted =1 is assumed. 
 
-PREDEFINED             = CS_COMPILER_GCC \
+PREDEFINED             = DOXYGEN_RUN \
+			 CS_COMPILER_GCC \
+			 CS_HAS_INT64_C \
 			 "CS_GNUC_PRINTF(a,b)=" \
 			 "CS_GNUC_SCANF(a,b)=" \
 			 CS_IEEE_DOUBLE_FORMAT \
@@ -675,7 +677,8 @@ EXPAND_AS_DEFINED      =  STR_APPEND		\
 			  STR_PADCENTER		\
 			  STR_ASSIGN		\
 			  STR_SHIFT		\
-			  STR_OP_APPEND
+			  STR_OP_APPEND		\
+			  csAPIENTRY
 
 
 #---------------------------------------------------------------------------

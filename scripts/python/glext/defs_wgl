@@ -1,6 +1,14 @@
-// %Name%
 #ifdef _WIN32
+/**\name %Name% constants
+ * For a description of what this ext does, see <a href="%Name:url%">%Name:url%</a>.
+ * @{ */
 %Tokens%
+/** @} */
+
+/**\name %Name% functions
+ * For a description of what this ext does, see <a href="%Name:url%">%Name:url%</a>.
+ * @{ */
 %FunctionTypes%
+/** @} */
 #endif
 

@@ -29,6 +29,10 @@
  
  */
 
+/**\file
+ * GL extensions manager
+ */
+
 #ifndef __CS_GLEXTENSIONMANAGER_H__
 #define __CS_GLEXTENSIONMANAGER_H__
 
@@ -98,10 +102,22 @@
  * End system-specific stuff.
  **********************************************************************/
 
-#if defined(CS_OPENGL_PATH)
-#include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
+#ifdef DOXYGEN_RUN
+typedef void GLvoid;
+typedef int GLint;
+typedef uint GLuint;
+typedef int GLsizei;
+typedef enum GLenum;
+typedef float GLfloat;
+typedef double GLdouble;
+typedef unsigned char GLubyte;
+#  define _WIN32
 #else
-#include <GL/gl.h>
+#  if defined(CS_OPENGL_PATH)
+#    include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
+#  else
+#    include <GL/gl.h>
+#  endif
 #endif
 
 #include "cssysdef.h"
@@ -159,6 +175,7 @@ typedef unsigned int GLhandleARB;
         Report (msgExtInitFail, exttype, ext); \
       } 
 
+/// Struct containing all GL extension functions.
 struct csGLExtensionFunctions
 {
 public:
@@ -166,6 +183,7 @@ public:
 // end of functions
 };
 
+/// Struct containing all GL extension test flags.
 struct csGLExtensionFlags
 {
 public:
@@ -174,6 +192,10 @@ protected:
 %ExtFlagsTested%
 };
 
+/**
+ * GL extensions manager. Checks for the presence of specific GL extensions
+ * and fetches all function pointers if present.
+ */
 struct csGLExtensionManager : public csGLExtensionFunctions,
 			      public csGLExtensionFlags
 {

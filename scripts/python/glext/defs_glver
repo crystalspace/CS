@@ -1,0 +1,13 @@
+/**\name %Name% constants
+ * This is not a real OpenGL extension. The OpenGL canvases will 'initialize'
+ * this extension when teh appropriate GL version was detected. 
+ * @{ */
+%Tokens%
+/** @} */
+
+/**\name %Name% functions
+ * This is not a real OpenGL extension. The OpenGL canvases will 'initialize'
+ * this extension when teh appropriate GL version was detected. 
+ * @{ */
+%FunctionTypes%
+/** @} */

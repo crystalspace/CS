@@ -41,7 +41,7 @@
 #include <inttypes.h>
 #endif
 
-/**\name Specific sized types.
+/**\name Specific sized types
  * These types should be used ONLY when you need a variable of an explicit
  * number of bits.  For all other cases, you should use normal char, short,
  * int, long, etc., types since they are treated as "natural" types and will
@@ -127,7 +127,9 @@ typedef int64_t int64;
 // all else fails, then we fake up these types on our own.
 #include <stddef.h>
 #if !defined(CS_HAS_INTPTR_T) && !defined(_INTPTR_T_DEFINED)
+/// Integer as wide as a pointer
 typedef int intptr_t;
+/// Unsigned integer as wide as a pointer
 typedef unsigned int uintptr_t;
 #define _INTPTR_T_DEFINED
 #define _UINTPTR_T_DEFINED

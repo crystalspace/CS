@@ -17,8 +17,11 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_PARTGEN_H__
-#define __CS_PARTGEN_H__
+#ifndef __CS_CSPLUGINCOMMON_PARTICLESYS_PARTGEN_H__
+#define __CS_CSPLUGINCOMMON_PARTICLESYS_PARTGEN_H__
+
+/**\file
+ */
 
 #include "csextern.h"
 #include "csgeom/box.h"
@@ -36,6 +39,9 @@
 #include "imesh/partsys.h"
 #include "imesh/sprite2d.h"
 #include "ivideo/graph3d.h"
+
+/**\addtogroup plugincommon
+ * @{ */
 
 struct iMeshObjectFactory;
 struct iMaterialWrapper;
@@ -495,4 +501,6 @@ public:
   { part_accel[idx] = acl; }
 };
 
-#endif // __CS_PARTGEN_H__
+/** @} */
+
+#endif // __CS_CSPLUGINCOMMON_PARTICLESYS_PARTGEN_H__

@@ -33,6 +33,10 @@
  
  */
 
+/**\file
+ * GL extensions manager
+ */
+
 #ifndef __CS_GLEXTENSIONMANAGER_H__
 #define __CS_GLEXTENSIONMANAGER_H__
 
@@ -102,10 +106,22 @@
  * End system-specific stuff.
  **********************************************************************/
 
-#if defined(CS_OPENGL_PATH)
-#include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
+#ifdef DOXYGEN_RUN
+typedef void GLvoid;
+typedef int GLint;
+typedef uint GLuint;
+typedef int GLsizei;
+typedef enum GLenum;
+typedef float GLfloat;
+typedef double GLdouble;
+typedef unsigned char GLubyte;
+#  define _WIN32
 #else
-#include <GL/gl.h>
+#  if defined(CS_OPENGL_PATH)
+#    include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
+#  else
+#    include <GL/gl.h>
+#  endif
 #endif
 
 #include "cssysdef.h"
@@ -126,7 +142,10 @@ typedef unsigned int GLhandleARB;
 #include "ivideo/graph2d.h"
 #include "csutil/cfgacc.h"
 
-// GL_version_1_2
+/**\name GL_version_1_2 constants
+ * This is not a real OpenGL extension. The OpenGL canvases will 'initialize'
+ * this extension when teh appropriate GL version was detected. 
+ * @{ */
 #ifndef GL_UNSIGNED_BYTE_3_3_2
 #define GL_UNSIGNED_BYTE_3_3_2                                        32818
 #endif
@@ -288,12 +307,22 @@ typedef unsigned int GLhandleARB;
 #endif
 
 
+/** @} */
+
+/**\name GL_version_1_2 functions
+ * This is not a real OpenGL extension. The OpenGL canvases will 'initialize'
+ * this extension when teh appropriate GL version was detected. 
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLDRAWRANGEELEMENTS) (GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, const GLvoid* indices);
 typedef GLvoid (csAPIENTRY* csGLTEXIMAGE3D) (GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, const GLvoid* pixels);
 typedef GLvoid (csAPIENTRY* csGLTEXSUBIMAGE3D) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, const GLvoid* pixels);
 typedef GLvoid (csAPIENTRY* csGLCOPYTEXSUBIMAGE3D) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLint x, GLint y, GLsizei width, GLsizei height);
 
-// GL_version_1_3
+/** @} */
+/**\name GL_version_1_3 constants
+ * This is not a real OpenGL extension. The OpenGL canvases will 'initialize'
+ * this extension when teh appropriate GL version was detected. 
+ * @{ */
 #ifndef GL_TEXTURE0
 #define GL_TEXTURE0                                                   33984
 #endif
@@ -683,6 +712,12 @@ typedef GLvoid (csAPIENTRY* csGLCOPYTEXSUBIMAGE3D) (GLenum target, GLint level, 
 #endif
 
 
+/** @} */
+
+/**\name GL_version_1_3 functions
+ * This is not a real OpenGL extension. The OpenGL canvases will 'initialize'
+ * this extension when teh appropriate GL version was detected. 
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLACTIVETEXTURE) (GLenum texture);
 typedef GLvoid (csAPIENTRY* csGLCLIENTACTIVETEXTURE) (GLenum texture);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD1D) (GLenum target, GLdouble s);
@@ -730,7 +765,10 @@ typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXSUBIMAGE2D) (GLenum target, GLint l
 typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXSUBIMAGE1D) (GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLsizei imageSize, const GLvoid* data);
 typedef GLvoid (csAPIENTRY* csGLGETCOMPRESSEDTEXIMAGE) (GLenum target, GLint level, GLvoid* img);
 
-// GL_ARB_imaging
+/** @} */
+/**\name GL_ARB_imaging constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/imaging.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/imaging.txt</a>.
+ * @{ */
 #ifndef GL_CONSTANT_COLOR
 #define GL_CONSTANT_COLOR                                             32769
 #endif
@@ -1040,6 +1078,11 @@ typedef GLvoid (csAPIENTRY* csGLGETCOMPRESSEDTEXIMAGE) (GLenum target, GLint lev
 #endif
 
 
+/** @} */
+
+/**\name GL_ARB_imaging functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/imaging.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/imaging.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLCOLORTABLE) (GLenum target, GLenum internalformat, GLsizei width, GLenum format, GLenum type, const GLvoid* table);
 typedef GLvoid (csAPIENTRY* csGLCOLORTABLEPARAMETERFV) (GLenum target, GLenum pname, const GLfloat* params);
 typedef GLvoid (csAPIENTRY* csGLCOLORTABLEPARAMETERIV) (GLenum target, GLenum pname, const GLint* params);
@@ -1075,7 +1118,10 @@ typedef GLvoid (csAPIENTRY* csGLRESETMINMAX) (GLenum target);
 typedef GLvoid (csAPIENTRY* csGLBLENDCOLOR) (GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha);
 typedef GLvoid (csAPIENTRY* csGLBLENDEQUATION) (GLenum mode);
 
-// GL_ARB_multitexture
+/** @} */
+/**\name GL_ARB_multitexture constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/multitexture.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/multitexture.txt</a>.
+ * @{ */
 #ifndef GL_TEXTURE0_ARB
 #define GL_TEXTURE0_ARB                                               33984
 #endif
@@ -1217,6 +1263,11 @@ typedef GLvoid (csAPIENTRY* csGLBLENDEQUATION) (GLenum mode);
 #endif
 
 
+/** @} */
+
+/**\name GL_ARB_multitexture functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/multitexture.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/multitexture.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLACTIVETEXTUREARB) (GLenum texture);
 typedef GLvoid (csAPIENTRY* csGLCLIENTACTIVETEXTUREARB) (GLenum texture);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD1DARB) (GLenum target, GLdouble s);
@@ -1252,7 +1303,10 @@ typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD4IVARB) (GLenum target, const GLint
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD4SARB) (GLenum target, GLshort s, GLshort t, GLshort r, GLshort q);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD4SVARB) (GLenum target, const GLshort* v);
 
-// GL_ARB_transpose_matrix
+/** @} */
+/**\name GL_ARB_transpose_matrix constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/transpose_matrix.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/transpose_matrix.txt</a>.
+ * @{ */
 #ifndef GL_TRANSPOSE_MODELVIEW_MATRIX_ARB
 #define GL_TRANSPOSE_MODELVIEW_MATRIX_ARB                             34019
 #endif
@@ -1270,12 +1324,20 @@ typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD4SVARB) (GLenum target, const GLsho
 #endif
 
 
+/** @} */
+
+/**\name GL_ARB_transpose_matrix functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/transpose_matrix.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/transpose_matrix.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLLOADTRANSPOSEMATRIXFARB) (GLfloat* m);
 typedef GLvoid (csAPIENTRY* csGLLOADTRANSPOSEMATRIXDARB) (GLdouble* m);
 typedef GLvoid (csAPIENTRY* csGLMULTTRANSPOSEMATRIXFARB) (GLfloat* m);
 typedef GLvoid (csAPIENTRY* csGLMULTTRANSPOSEMATRIXDARB) (GLdouble* m);
 
-// GL_ARB_multisample
+/** @} */
+/**\name GL_ARB_multisample constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/multisample.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/multisample.txt</a>.
+ * @{ */
 #ifndef WGL_SAMPLE_BUFFERS_ARB
 #define WGL_SAMPLE_BUFFERS_ARB                                         8257
 #endif
@@ -1321,20 +1383,44 @@ typedef GLvoid (csAPIENTRY* csGLMULTTRANSPOSEMATRIXDARB) (GLdouble* m);
 #endif
 
 
+/** @} */
+
+/**\name GL_ARB_multisample functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/multisample.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/multisample.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLSAMPLECOVERAGEARB) (GLclampf value, GLboolean invert);
 
-// GL_ARB_texture_env_add
+/** @} */
+/**\name GL_ARB_texture_env_add constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_env_add.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_env_add.txt</a>.
+ * @{ */
 
+/** @} */
 
-// WGL_ARB_extensions_string
+/**\name GL_ARB_texture_env_add functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_env_add.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_env_add.txt</a>.
+ * @{ */
+
+/** @} */
 #ifdef _WIN32
+/**\name WGL_ARB_extensions_string constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_extensions_string.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_extensions_string.txt</a>.
+ * @{ */
 
+/** @} */
+
+/**\name WGL_ARB_extensions_string functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_extensions_string.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_extensions_string.txt</a>.
+ * @{ */
 typedef char* (csAPIENTRY* csWGLGETEXTENSIONSSTRINGARB) (HDC hdc);
 
+/** @} */
 #endif
 
-// WGL_ARB_buffer_region
 #ifdef _WIN32
+/**\name WGL_ARB_buffer_region constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_buffer_region.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_buffer_region.txt</a>.
+ * @{ */
 #ifndef WGL_FRONT_COLOR_BUFFER_BIT_ARB
 #define WGL_FRONT_COLOR_BUFFER_BIT_ARB                                    1
 #endif
@@ -1352,14 +1438,22 @@ typedef char* (csAPIENTRY* csWGLGETEXTENSIONSSTRINGARB) (HDC hdc);
 #endif
 
 
+/** @} */
+
+/**\name WGL_ARB_buffer_region functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_buffer_region.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_buffer_region.txt</a>.
+ * @{ */
 typedef HANDLE (csAPIENTRY* csWGLCREATEBUFFERREGIONARB) (HDC hDC, GLint iLayerPlane, GLuint uType);
 typedef GLvoid (csAPIENTRY* csWGLDELETEBUFFERREGIONARB) (HANDLE hRegion);
 typedef BOOL (csAPIENTRY* csWGLSAVEBUFFERREGIONARB) (HANDLE hRegion, GLint x, GLint y, GLint width, GLint height);
 typedef BOOL (csAPIENTRY* csWGLRESTOREBUFFERREGIONARB) (HANDLE hRegion, GLint x, GLint y, GLint width, GLint height, GLint xSrc, GLint ySrc);
 
+/** @} */
 #endif
 
-// GL_ARB_texture_cube_map
+/**\name GL_ARB_texture_cube_map constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_cube_map.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_cube_map.txt</a>.
+ * @{ */
 #ifndef GL_NORMAL_MAP_ARB
 #define GL_NORMAL_MAP_ARB                                             34065
 #endif
@@ -1409,8 +1503,16 @@ typedef BOOL (csAPIENTRY* csWGLRESTOREBUFFERREGIONARB) (HANDLE hRegion, GLint x,
 #endif
 
 
+/** @} */
 
-// GL_ARB_depth_texture
+/**\name GL_ARB_texture_cube_map functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_cube_map.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_cube_map.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_ARB_depth_texture constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/depth_texture.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/depth_texture.txt</a>.
+ * @{ */
 #ifndef GL_DEPTH_COMPONENT16_ARB
 #define GL_DEPTH_COMPONENT16_ARB                                      33189
 #endif
@@ -1432,8 +1534,16 @@ typedef BOOL (csAPIENTRY* csWGLRESTOREBUFFERREGIONARB) (HANDLE hRegion, GLint x,
 #endif
 
 
+/** @} */
 
-// GL_ARB_point_parameters
+/**\name GL_ARB_depth_texture functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/depth_texture.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/depth_texture.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_ARB_point_parameters constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/point_parameters.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/point_parameters.txt</a>.
+ * @{ */
 #ifndef GL_POINT_SIZE_MIN_ARB
 #define GL_POINT_SIZE_MIN_ARB                                         33062
 #endif
@@ -1451,10 +1561,18 @@ typedef BOOL (csAPIENTRY* csWGLRESTOREBUFFERREGIONARB) (HANDLE hRegion, GLint x,
 #endif
 
 
+/** @} */
+
+/**\name GL_ARB_point_parameters functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/point_parameters.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/point_parameters.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLPOINTPARAMETERFARB) (GLenum pname, GLfloat param);
 typedef GLvoid (csAPIENTRY* csGLPOINTPARAMETERFVARB) (GLenum pname, GLfloat* params);
 
-// GL_ARB_shadow
+/** @} */
+/**\name GL_ARB_shadow constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/shadow.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/shadow.txt</a>.
+ * @{ */
 #ifndef GL_TEXTURE_COMPARE_MODE_ARB
 #define GL_TEXTURE_COMPARE_MODE_ARB                                   34892
 #endif
@@ -1468,22 +1586,46 @@ typedef GLvoid (csAPIENTRY* csGLPOINTPARAMETERFVARB) (GLenum pname, GLfloat* par
 #endif
 
 
+/** @} */
 
-// GL_ARB_shadow_ambient
+/**\name GL_ARB_shadow functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/shadow.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/shadow.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_ARB_shadow_ambient constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/shadow_ambient.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/shadow_ambient.txt</a>.
+ * @{ */
 #ifndef GL_TEXTURE_COMPARE_FAIL_VALUE_ARB
 #define GL_TEXTURE_COMPARE_FAIL_VALUE_ARB                             32959
 #endif
 
 
+/** @} */
 
-// GL_ARB_texture_border_clamp
+/**\name GL_ARB_shadow_ambient functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/shadow_ambient.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/shadow_ambient.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_ARB_texture_border_clamp constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_border_clamp.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_border_clamp.txt</a>.
+ * @{ */
 #ifndef GL_CLAMP_TO_BORDER_ARB
 #define GL_CLAMP_TO_BORDER_ARB                                        33069
 #endif
 
 
+/** @} */
 
-// GL_ARB_texture_compression
+/**\name GL_ARB_texture_border_clamp functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_border_clamp.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_border_clamp.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_ARB_texture_compression constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_compression.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_compression.txt</a>.
+ * @{ */
 #ifndef GL_COMPRESSED_ALPHA_ARB
 #define GL_COMPRESSED_ALPHA_ARB                                       34025
 #endif
@@ -1529,6 +1671,11 @@ typedef GLvoid (csAPIENTRY* csGLPOINTPARAMETERFVARB) (GLenum pname, GLfloat* par
 #endif
 
 
+/** @} */
+
+/**\name GL_ARB_texture_compression functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_compression.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_compression.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXIMAGE3DARB) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLsizei imageSize, const GLvoid* data);
 typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXIMAGE2DARB) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid* data);
 typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXIMAGE1DARB) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLint border, GLsizei imageSize, const GLvoid* data);
@@ -1537,7 +1684,10 @@ typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXSUBIMAGE2DARB) (GLenum target, GLin
 typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXSUBIMAGE1DARB) (GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLsizei imageSize, const GLvoid* data);
 typedef GLvoid (csAPIENTRY* csGLGETCOMPRESSEDTEXIMAGEARB) (GLenum target, GLint lod, GLvoid* img);
 
-// GL_ARB_texture_env_combine
+/** @} */
+/**\name GL_ARB_texture_env_combine constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_env_combine.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_env_combine.txt</a>.
+ * @{ */
 #ifndef GL_COMBINE_ARB
 #define GL_COMBINE_ARB                                                34160
 #endif
@@ -1627,11 +1777,27 @@ typedef GLvoid (csAPIENTRY* csGLGETCOMPRESSEDTEXIMAGEARB) (GLenum target, GLint 
 #endif
 
 
+/** @} */
 
-// GL_ARB_texture_env_crossbar
+/**\name GL_ARB_texture_env_combine functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_env_combine.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_env_combine.txt</a>.
+ * @{ */
 
+/** @} */
+/**\name GL_ARB_texture_env_crossbar constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_env_crossbar.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_env_crossbar.txt</a>.
+ * @{ */
 
-// GL_ARB_texture_env_dot3
+/** @} */
+
+/**\name GL_ARB_texture_env_crossbar functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_env_crossbar.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_env_crossbar.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_ARB_texture_env_dot3 constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_env_dot3.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_env_dot3.txt</a>.
+ * @{ */
 #ifndef GL_DOT3_RGB_ARB
 #define GL_DOT3_RGB_ARB                                               34478
 #endif
@@ -1641,15 +1807,31 @@ typedef GLvoid (csAPIENTRY* csGLGETCOMPRESSEDTEXIMAGEARB) (GLenum target, GLint 
 #endif
 
 
+/** @} */
 
-// GL_ARB_texture_mirrored_repeat
+/**\name GL_ARB_texture_env_dot3 functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_env_dot3.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_env_dot3.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_ARB_texture_mirrored_repeat constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_mirrored_repeat.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_mirrored_repeat.txt</a>.
+ * @{ */
 #ifndef GL_MIRRORED_REPEAT_ARB
 #define GL_MIRRORED_REPEAT_ARB                                        33648
 #endif
 
 
+/** @} */
 
-// GL_ARB_vertex_blend
+/**\name GL_ARB_texture_mirrored_repeat functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_mirrored_repeat.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_mirrored_repeat.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_ARB_vertex_blend constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_blend.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_blend.txt</a>.
+ * @{ */
 #ifndef GL_MAX_VERTEX_UNITS_ARB
 #define GL_MAX_VERTEX_UNITS_ARB                                       34468
 #endif
@@ -1819,6 +2001,11 @@ typedef GLvoid (csAPIENTRY* csGLGETCOMPRESSEDTEXIMAGEARB) (GLenum target, GLint 
 #endif
 
 
+/** @} */
+
+/**\name GL_ARB_vertex_blend functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_blend.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_blend.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLWEIGHTBVARB) (GLint size, GLbyte* weights);
 typedef GLvoid (csAPIENTRY* csGLWEIGHTSVARB) (GLint size, GLshort* weights);
 typedef GLvoid (csAPIENTRY* csGLWEIGHTIVARB) (GLint size, GLint* weights);
@@ -1831,7 +2018,10 @@ typedef GLvoid (csAPIENTRY* csGLWEIGHTUIVARB) (GLint size, GLuint* weights);
 typedef GLvoid (csAPIENTRY* csGLWEIGHTPOINTERARB) (GLint size, GLenum type, GLsizei stride, GLvoid* pointer);
 typedef GLvoid (csAPIENTRY* csGLVERTEXBLENDARB) (GLint count);
 
-// GL_ARB_vertex_program
+/** @} */
+/**\name GL_ARB_vertex_program constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_program.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_program.txt</a>.
+ * @{ */
 #ifndef GL_VERTEX_PROGRAM_ARB
 #define GL_VERTEX_PROGRAM_ARB                                         34336
 #endif
@@ -2149,6 +2339,11 @@ typedef GLvoid (csAPIENTRY* csGLVERTEXBLENDARB) (GLint count);
 #endif
 
 
+/** @} */
+
+/**\name GL_ARB_vertex_program functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_program.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_program.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB1SARB) (GLuint index, GLshort x);
 typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB1FARB) (GLuint index, GLfloat x);
 typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB1DARB) (GLuint index, GLdouble x);
@@ -2212,8 +2407,16 @@ typedef GLvoid (csAPIENTRY* csGLGETVERTEXATTRIBIVARB) (GLuint index, GLenum pnam
 typedef GLvoid (csAPIENTRY* csGLGETVERTEXATTRIBPOINTERVARB) (GLuint index, GLenum pname, GLvoid** pointer);
 typedef GLboolean (csAPIENTRY* csGLISPROGRAMARB) (GLuint program);
 
-// GL_ARB_window_pos
+/** @} */
+/**\name GL_ARB_window_pos constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/window_pos.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/window_pos.txt</a>.
+ * @{ */
 
+/** @} */
+
+/**\name GL_ARB_window_pos functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/window_pos.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/window_pos.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2DARB) (GLdouble x, GLdouble y);
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2FARB) (GLfloat x, GLfloat y);
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2IARB) (GLint x, GLint y);
@@ -2231,7 +2434,10 @@ typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3FVARB) (const GLfloat* p);
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3IVARB) (const GLint* p);
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3SVARB) (const GLshort* p);
 
-// GL_EXT_422_pixels
+/** @} */
+/**\name GL_EXT_422_pixels constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/422_pixels.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/422_pixels.txt</a>.
+ * @{ */
 #ifndef GL_422_EXT
 #define GL_422_EXT                                                    32972
 #endif
@@ -2249,15 +2455,31 @@ typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3SVARB) (const GLshort* p);
 #endif
 
 
+/** @} */
 
-// GL_EXT_abgr
+/**\name GL_EXT_422_pixels functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/422_pixels.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/422_pixels.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_EXT_abgr constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/abgr.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/abgr.txt</a>.
+ * @{ */
 #ifndef GL_ABGR_EXT
 #define GL_ABGR_EXT                                                   32768
 #endif
 
 
+/** @} */
 
-// GL_EXT_bgra
+/**\name GL_EXT_abgr functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/abgr.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/abgr.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_EXT_bgra constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/bgra.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/bgra.txt</a>.
+ * @{ */
 #ifndef GL_BGR_EXT
 #define GL_BGR_EXT                                                    32992
 #endif
@@ -2267,8 +2489,16 @@ typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3SVARB) (const GLshort* p);
 #endif
 
 
+/** @} */
 
-// GL_EXT_blend_color
+/**\name GL_EXT_bgra functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/bgra.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/bgra.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_EXT_blend_color constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_color.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_color.txt</a>.
+ * @{ */
 #ifndef GL_CONSTANT_COLOR_EXT
 #define GL_CONSTANT_COLOR_EXT                                         32769
 #endif
@@ -2290,9 +2520,17 @@ typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3SVARB) (const GLshort* p);
 #endif
 
 
+/** @} */
+
+/**\name GL_EXT_blend_color functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_color.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_color.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLBLENDCOLOREXT) (GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha);
 
-// GL_EXT_blend_func_separate
+/** @} */
+/**\name GL_EXT_blend_func_separate constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_func_separate.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_func_separate.txt</a>.
+ * @{ */
 #ifndef GL_BLEND_DST_RGB_EXT
 #define GL_BLEND_DST_RGB_EXT                                          32968
 #endif
@@ -2310,12 +2548,28 @@ typedef GLvoid (csAPIENTRY* csGLBLENDCOLOREXT) (GLclampf red, GLclampf green, GL
 #endif
 
 
+/** @} */
+
+/**\name GL_EXT_blend_func_separate functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_func_separate.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_func_separate.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLBLENDFUNCSEPARATEEXT) (GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha);
 
-// GL_EXT_blend_logic_op
+/** @} */
+/**\name GL_EXT_blend_logic_op constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_logic_op.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_logic_op.txt</a>.
+ * @{ */
 
+/** @} */
 
-// GL_EXT_blend_minmax
+/**\name GL_EXT_blend_logic_op functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_logic_op.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_logic_op.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_EXT_blend_minmax constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_minmax.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_minmax.txt</a>.
+ * @{ */
 #ifndef GL_FUNC_ADD_EXT
 #define GL_FUNC_ADD_EXT                                               32774
 #endif
@@ -2333,9 +2587,17 @@ typedef GLvoid (csAPIENTRY* csGLBLENDFUNCSEPARATEEXT) (GLenum sfactorRGB, GLenum
 #endif
 
 
+/** @} */
+
+/**\name GL_EXT_blend_minmax functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_minmax.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_minmax.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLBLENDEQUATIONEXT) (GLenum mode);
 
-// GL_EXT_blend_subtract
+/** @} */
+/**\name GL_EXT_blend_subtract constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_subtract.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_subtract.txt</a>.
+ * @{ */
 #ifndef GL_FUNC_SUBTRACT_EXT
 #define GL_FUNC_SUBTRACT_EXT                                          32778
 #endif
@@ -2345,20 +2607,44 @@ typedef GLvoid (csAPIENTRY* csGLBLENDEQUATIONEXT) (GLenum mode);
 #endif
 
 
+/** @} */
 
-// GL_EXT_clip_volume_hint
+/**\name GL_EXT_blend_subtract functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_subtract.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_subtract.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_EXT_clip_volume_hint constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/clip_volume_hint.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/clip_volume_hint.txt</a>.
+ * @{ */
 #ifndef GL_CLIP_VOLUME_CLIPPING_HINT_EXT
 #define GL_CLIP_VOLUME_CLIPPING_HINT_EXT                              33008
 #endif
 
 
+/** @} */
 
-// GL_EXT_color_subtable
+/**\name GL_EXT_clip_volume_hint functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/clip_volume_hint.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/clip_volume_hint.txt</a>.
+ * @{ */
 
+/** @} */
+/**\name GL_EXT_color_subtable constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/color_subtable.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/color_subtable.txt</a>.
+ * @{ */
+
+/** @} */
+
+/**\name GL_EXT_color_subtable functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/color_subtable.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/color_subtable.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLCOLORSUBTABLEEXT) (GLenum target, GLsizei start, GLsizei count, GLenum format, GLenum type, const GLvoid* data);
 typedef GLvoid (csAPIENTRY* csGLCOPYCOLORSUBTABLEEXT) (GLenum target, GLsizei start, GLint x, GLint y, GLsizei width);
 
-// GL_EXT_compiled_vertex_array
+/** @} */
+/**\name GL_EXT_compiled_vertex_array constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/compiled_vertex_array.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/compiled_vertex_array.txt</a>.
+ * @{ */
 #ifndef GL_ARRAY_ELEMENT_LOCK_FIRST_EXT
 #define GL_ARRAY_ELEMENT_LOCK_FIRST_EXT                               33192
 #endif
@@ -2368,10 +2654,18 @@ typedef GLvoid (csAPIENTRY* csGLCOPYCOLORSUBTABLEEXT) (GLenum target, GLsizei st
 #endif
 
 
+/** @} */
+
+/**\name GL_EXT_compiled_vertex_array functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/compiled_vertex_array.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/compiled_vertex_array.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLLOCKARRAYSEXT) (GLint first, GLsizei count);
 typedef GLvoid (csAPIENTRY* csGLUNLOCKARRAYSEXT) ();
 
-// GL_EXT_convolution
+/** @} */
+/**\name GL_EXT_convolution constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/convolution.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/convolution.txt</a>.
+ * @{ */
 #ifndef GL_CONVOLUTION_1D_EXT
 #define GL_CONVOLUTION_1D_EXT                                         32784
 #endif
@@ -2453,6 +2747,11 @@ typedef GLvoid (csAPIENTRY* csGLUNLOCKARRAYSEXT) ();
 #endif
 
 
+/** @} */
+
+/**\name GL_EXT_convolution functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/convolution.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/convolution.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONFILTER1DEXT) (GLenum target, GLenum internalformat, GLsizei width, GLenum format, GLenum type, const GLvoid* image);
 typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONFILTER2DEXT) (GLenum target, GLenum internalformat, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid* image);
 typedef GLvoid (csAPIENTRY* csGLCOPYCONVOLUTIONFILTER1DEXT) (GLenum target, GLenum internalformat, GLint x, GLint y, GLsizei width);
@@ -2467,7 +2766,10 @@ typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONPARAMETERFVEXT) (GLenum target, GLenu
 typedef GLvoid (csAPIENTRY* csGLGETCONVOLUTIONPARAMETERIVEXT) (GLenum target, GLenum pname, GLint* params);
 typedef GLvoid (csAPIENTRY* csGLGETCONVOLUTIONPARAMETERFVEXT) (GLenum target, GLenum pname, GLfloat* params);
 
-// GL_EXT_fog_coord
+/** @} */
+/**\name GL_EXT_fog_coord constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/fog_coord.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/fog_coord.txt</a>.
+ * @{ */
 #ifndef GL_FOG_COORDINATE_SOURCE_EXT
 #define GL_FOG_COORDINATE_SOURCE_EXT                                  33872
 #endif
@@ -2501,13 +2803,21 @@ typedef GLvoid (csAPIENTRY* csGLGETCONVOLUTIONPARAMETERFVEXT) (GLenum target, GL
 #endif
 
 
+/** @} */
+
+/**\name GL_EXT_fog_coord functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/fog_coord.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/fog_coord.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLFOGCOORDFEXFLOAT) (GLfloat coord);
 typedef GLvoid (csAPIENTRY* csGLFOGCOORDDEXDOUBLE) (GLdouble coord);
 typedef GLvoid (csAPIENTRY* csGLFOGCOORDFVEXFLOAT) (GLfloat coord);
 typedef GLvoid (csAPIENTRY* csGLFOGCOORDDVEXDOUBLE) (GLdouble coord);
 typedef GLvoid (csAPIENTRY* csGLFOGCOORDPOINTEREXT) (GLenum type, GLsizei stride, GLvoid* pointer);
 
-// GL_EXT_histogram
+/** @} */
+/**\name GL_EXT_histogram constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/histogram.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/histogram.txt</a>.
+ * @{ */
 #ifndef GL_HISTOGRAM_EXT
 #define GL_HISTOGRAM_EXT                                              32804
 #endif
@@ -2561,6 +2871,11 @@ typedef GLvoid (csAPIENTRY* csGLFOGCOORDPOINTEREXT) (GLenum type, GLsizei stride
 #endif
 
 
+/** @} */
+
+/**\name GL_EXT_histogram functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/histogram.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/histogram.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLHISTOGRAMEXT) (GLenum target, GLsizei width, GLenum internalformat, GLboolean sink);
 typedef GLvoid (csAPIENTRY* csGLRESETHISTOGRAMEXT) (GLenum target);
 typedef GLvoid (csAPIENTRY* csGLGETHISTOGRAMEXT) (GLenum target, GLboolean reset, GLenum format, GLenum type, GLvoid* values);
@@ -2572,12 +2887,23 @@ typedef GLvoid (csAPIENTRY* csGLGETMINMAXEXT) (GLenum target, GLboolean reset, G
 typedef GLvoid (csAPIENTRY* csGLGETMINMAXPARAMETERIVEXT) (GLenum target, GLenum pname, GLint* params);
 typedef GLvoid (csAPIENTRY* csGLGETMINMAXPARAMETERFVEXT) (GLenum target, GLenum pname, GLfloat* params);
 
-// GL_EXT_multi_draw_arrays
+/** @} */
+/**\name GL_EXT_multi_draw_arrays constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/multi_draw_arrays.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/multi_draw_arrays.txt</a>.
+ * @{ */
 
+/** @} */
+
+/**\name GL_EXT_multi_draw_arrays functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/multi_draw_arrays.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/multi_draw_arrays.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLMULTIDRAWARRAYSEXT) (GLenum mode, GLint* first, GLsizei* count, GLsizei primcount);
 typedef GLvoid (csAPIENTRY* csGLMULTIDRAWELEMENTSEXT) (GLenum mode, GLsizei* count, GLenum type, const GLvoid* indices, GLsizei primcount);
 
-// GL_EXT_packed_pixels
+/** @} */
+/**\name GL_EXT_packed_pixels constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/packed_pixels.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/packed_pixels.txt</a>.
+ * @{ */
 #ifndef GL_UNSIGNED_BYTE_3_3_2_EXT
 #define GL_UNSIGNED_BYTE_3_3_2_EXT                                    32818
 #endif
@@ -2599,8 +2925,16 @@ typedef GLvoid (csAPIENTRY* csGLMULTIDRAWELEMENTSEXT) (GLenum mode, GLsizei* cou
 #endif
 
 
+/** @} */
 
-// GL_EXT_paletted_texture
+/**\name GL_EXT_packed_pixels functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/packed_pixels.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/packed_pixels.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_EXT_paletted_texture constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/paletted_texture.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/paletted_texture.txt</a>.
+ * @{ */
 #ifndef GL_COLOR_INDEX1_EXT
 #define GL_COLOR_INDEX1_EXT                                           32994
 #endif
@@ -2710,12 +3044,20 @@ typedef GLvoid (csAPIENTRY* csGLMULTIDRAWELEMENTSEXT) (GLenum mode, GLsizei* cou
 #endif
 
 
+/** @} */
+
+/**\name GL_EXT_paletted_texture functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/paletted_texture.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/paletted_texture.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLCOLORTABLEEXT) (GLenum target, GLenum internalFormat, GLsizei width, GLenum format, GLenum type, const GLvoid* data);
 typedef GLvoid (csAPIENTRY* csGLGETCOLORTABLEEXT) (GLenum target, GLenum format, GLenum type, GLvoid* data);
 typedef GLvoid (csAPIENTRY* csGLGETCOLORTABLEPARAMETERIVEXT) (GLenum target, GLenum pname, GLint* params);
 typedef GLvoid (csAPIENTRY* csGLGETCOLORTABLEPARAMETERFVEXT) (GLenum target, GLenum pname, GLfloat* params);
 
-// GL_EXT_point_parameters
+/** @} */
+/**\name GL_EXT_point_parameters constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/point_parameters.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/point_parameters.txt</a>.
+ * @{ */
 #ifndef GL_POINT_SIZE_MIN_EXT
 #define GL_POINT_SIZE_MIN_EXT                                         33062
 #endif
@@ -2733,10 +3075,18 @@ typedef GLvoid (csAPIENTRY* csGLGETCOLORTABLEPARAMETERFVEXT) (GLenum target, GLe
 #endif
 
 
+/** @} */
+
+/**\name GL_EXT_point_parameters functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/point_parameters.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/point_parameters.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLPOINTPARAMETERFEXT) (GLenum pname, GLfloat param);
 typedef GLvoid (csAPIENTRY* csGLPOINTPARAMETERFVEXT) (GLenum pname, GLfloat* params);
 
-// GL_EXT_polygon_offset
+/** @} */
+/**\name GL_EXT_polygon_offset constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/polygon_offset.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/polygon_offset.txt</a>.
+ * @{ */
 #ifndef GL_POLYGON_OFFSET_EXT
 #define GL_POLYGON_OFFSET_EXT                                         32823
 #endif
@@ -2750,9 +3100,17 @@ typedef GLvoid (csAPIENTRY* csGLPOINTPARAMETERFVEXT) (GLenum pname, GLfloat* par
 #endif
 
 
+/** @} */
+
+/**\name GL_EXT_polygon_offset functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/polygon_offset.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/polygon_offset.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLPOLYGONOFFSETEXT) (GLfloat factor, GLfloat bias);
 
-// GL_EXT_secondary_color
+/** @} */
+/**\name GL_EXT_secondary_color constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/secondary_color.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/secondary_color.txt</a>.
+ * @{ */
 #ifndef GL_COLOR_SUM_EXT
 #define GL_COLOR_SUM_EXT                                              33880
 #endif
@@ -2782,6 +3140,11 @@ typedef GLvoid (csAPIENTRY* csGLPOLYGONOFFSETEXT) (GLfloat factor, GLfloat bias)
 #endif
 
 
+/** @} */
+
+/**\name GL_EXT_secondary_color functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/secondary_color.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/secondary_color.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3BEXT) (GLbyte components);
 typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3SEXT) (GLshort components);
 typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3IEXT) (GLint components);
@@ -2800,7 +3163,10 @@ typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3USVEXT) (GLushort components);
 typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3UIVEXT) (GLuint components);
 typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLORPOINTEREXT) (GLint size, GLenum type, GLsizei stride, GLvoid* pointer);
 
-// GL_EXT_separate_specular_color
+/** @} */
+/**\name GL_EXT_separate_specular_color constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/separate_specular_color.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/separate_specular_color.txt</a>.
+ * @{ */
 #ifndef GL_LIGHT_MODEL_COLOR_CONTROL_EXT
 #define GL_LIGHT_MODEL_COLOR_CONTROL_EXT                              33272
 #endif
@@ -2814,18 +3180,42 @@ typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLORPOINTEREXT) (GLint size, GLenum ty
 #endif
 
 
+/** @} */
 
-// GL_EXT_shadow_funcs
+/**\name GL_EXT_separate_specular_color functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/separate_specular_color.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/separate_specular_color.txt</a>.
+ * @{ */
 
+/** @} */
+/**\name GL_EXT_shadow_funcs constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/shadow_funcs.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/shadow_funcs.txt</a>.
+ * @{ */
 
-// GL_EXT_shared_texture_palette
+/** @} */
+
+/**\name GL_EXT_shadow_funcs functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/shadow_funcs.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/shadow_funcs.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_EXT_shared_texture_palette constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/shared_texture_palette.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/shared_texture_palette.txt</a>.
+ * @{ */
 #ifndef GL_SHARED_TEXTURE_PALETTE_EXT
 #define GL_SHARED_TEXTURE_PALETTE_EXT                                 33275
 #endif
 
 
+/** @} */
 
-// GL_EXT_stencil_two_side
+/**\name GL_EXT_shared_texture_palette functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/shared_texture_palette.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/shared_texture_palette.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_EXT_stencil_two_side constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/stencil_two_side.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/stencil_two_side.txt</a>.
+ * @{ */
 #ifndef GL_STENCIL_TEST_TWO_SIDE_EXT
 #define GL_STENCIL_TEST_TWO_SIDE_EXT                                  35088
 #endif
@@ -2835,9 +3225,17 @@ typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLORPOINTEREXT) (GLint size, GLenum ty
 #endif
 
 
+/** @} */
+
+/**\name GL_EXT_stencil_two_side functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/stencil_two_side.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/stencil_two_side.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLACTIVESTENCILFACEEXT) (GLenum face);
 
-// GL_EXT_stencil_wrap
+/** @} */
+/**\name GL_EXT_stencil_wrap constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/stencil_wrap.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/stencil_wrap.txt</a>.
+ * @{ */
 #ifndef GL_INCR_WRAP_EXT
 #define GL_INCR_WRAP_EXT                                              34055
 #endif
@@ -2847,14 +3245,30 @@ typedef GLvoid (csAPIENTRY* csGLACTIVESTENCILFACEEXT) (GLenum face);
 #endif
 
 
+/** @} */
 
-// GL_EXT_subtexture
+/**\name GL_EXT_stencil_wrap functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/stencil_wrap.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/stencil_wrap.txt</a>.
+ * @{ */
 
+/** @} */
+/**\name GL_EXT_subtexture constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/subtexture.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/subtexture.txt</a>.
+ * @{ */
+
+/** @} */
+
+/**\name GL_EXT_subtexture functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/subtexture.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/subtexture.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLTEXSUBIMAGE1DEXT) (GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLenum type, const GLvoid* pixels);
 typedef GLvoid (csAPIENTRY* csGLTEXSUBIMAGE2DEXT) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid* pixels);
 typedef GLvoid (csAPIENTRY* csGLTEXSUBIMAGE3DEXT) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, const GLvoid* pixels);
 
-// GL_EXT_texture3D
+/** @} */
+/**\name GL_EXT_texture3D constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture3D.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture3D.txt</a>.
+ * @{ */
 #ifndef GL_PACK_SKIP_IMAGES_EXT
 #define GL_PACK_SKIP_IMAGES_EXT                                       32875
 #endif
@@ -2892,9 +3306,17 @@ typedef GLvoid (csAPIENTRY* csGLTEXSUBIMAGE3DEXT) (GLenum target, GLint level, G
 #endif
 
 
+/** @} */
+
+/**\name GL_EXT_texture3D functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture3D.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture3D.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLTEXIMAGE3DEXT) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, const GLvoid* pixels);
 
-// GL_EXT_texture_compression_s3tc
+/** @} */
+/**\name GL_EXT_texture_compression_s3tc constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_compression_s3tc.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_compression_s3tc.txt</a>.
+ * @{ */
 #ifndef GL_COMPRESSED_RGB_S3TC_DXT1_EXT
 #define GL_COMPRESSED_RGB_S3TC_DXT1_EXT                               33776
 #endif
@@ -2912,11 +3334,27 @@ typedef GLvoid (csAPIENTRY* csGLTEXIMAGE3DEXT) (GLenum target, GLint level, GLen
 #endif
 
 
+/** @} */
 
-// GL_EXT_texture_env_add
+/**\name GL_EXT_texture_compression_s3tc functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_compression_s3tc.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_compression_s3tc.txt</a>.
+ * @{ */
 
+/** @} */
+/**\name GL_EXT_texture_env_add constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_env_add.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_env_add.txt</a>.
+ * @{ */
 
-// GL_EXT_texture_env_combine
+/** @} */
+
+/**\name GL_EXT_texture_env_add functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_env_add.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_env_add.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_EXT_texture_env_combine constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_env_combine.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_env_combine.txt</a>.
+ * @{ */
 #ifndef GL_COMBINE_EXT
 #define GL_COMBINE_EXT                                                34160
 #endif
@@ -3002,8 +3440,16 @@ typedef GLvoid (csAPIENTRY* csGLTEXIMAGE3DEXT) (GLenum target, GLint level, GLen
 #endif
 
 
+/** @} */
 
-// GL_EXT_texture_env_dot3
+/**\name GL_EXT_texture_env_combine functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_env_combine.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_env_combine.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_EXT_texture_env_dot3 constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_env_dot3.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_env_dot3.txt</a>.
+ * @{ */
 #ifndef GL_DOT3_RGB_EXT
 #define GL_DOT3_RGB_EXT                                               34624
 #endif
@@ -3013,8 +3459,16 @@ typedef GLvoid (csAPIENTRY* csGLTEXIMAGE3DEXT) (GLenum target, GLint level, GLen
 #endif
 
 
+/** @} */
 
-// GL_EXT_texture_filter_anisotropic
+/**\name GL_EXT_texture_env_dot3 functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_env_dot3.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_env_dot3.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_EXT_texture_filter_anisotropic constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_filter_anisotropic.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_filter_anisotropic.txt</a>.
+ * @{ */
 #ifndef GL_TEXTURE_MAX_ANISOTROPY_EXT
 #define GL_TEXTURE_MAX_ANISOTROPY_EXT                                 34046
 #endif
@@ -3024,8 +3478,16 @@ typedef GLvoid (csAPIENTRY* csGLTEXIMAGE3DEXT) (GLenum target, GLint level, GLen
 #endif
 
 
+/** @} */
 
-// GL_EXT_texture_lod_bias
+/**\name GL_EXT_texture_filter_anisotropic functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_filter_anisotropic.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_filter_anisotropic.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_EXT_texture_lod_bias constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_lod_bias.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_lod_bias.txt</a>.
+ * @{ */
 #ifndef GL_TEXTURE_FILTER_CONTROL_EXT
 #define GL_TEXTURE_FILTER_CONTROL_EXT                                 34048
 #endif
@@ -3039,8 +3501,16 @@ typedef GLvoid (csAPIENTRY* csGLTEXIMAGE3DEXT) (GLenum target, GLint level, GLen
 #endif
 
 
+/** @} */
 
-// GL_EXT_texture_object
+/**\name GL_EXT_texture_lod_bias functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_lod_bias.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_lod_bias.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_EXT_texture_object constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_object.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_object.txt</a>.
+ * @{ */
 #ifndef GL_TEXTURE_PRIORITY_EXT
 #define GL_TEXTURE_PRIORITY_EXT                                       32870
 #endif
@@ -3062,6 +3532,11 @@ typedef GLvoid (csAPIENTRY* csGLTEXIMAGE3DEXT) (GLenum target, GLint level, GLen
 #endif
 
 
+/** @} */
+
+/**\name GL_EXT_texture_object functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_object.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_object.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLGENTEXTURESEXT) (GLsizei n, GLuint* textures);
 typedef GLvoid (csAPIENTRY* csGLDELETETEXTURESEXT) (GLsizei n, const GLuint* textures);
 typedef GLvoid (csAPIENTRY* csGLBINDTEXTUREEXT) (GLenum target, GLuint texture);
@@ -3069,7 +3544,10 @@ typedef GLvoid (csAPIENTRY* csGLPRIORITIZETEXTURESEXT) (GLsizei n, const GLuint*
 typedef GLboolean (csAPIENTRY* csGLARETEXTURESRESIDENTEXT) (GLsizei n, const GLuint* textures, GLboolean* residences);
 typedef GLboolean (csAPIENTRY* csGLISTEXTUREEXT) (GLuint texture);
 
-// GL_EXT_vertex_array
+/** @} */
+/**\name GL_EXT_vertex_array constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/vertex_array.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/vertex_array.txt</a>.
+ * @{ */
 #ifndef GL_VERTEX_ARRAY_EXT
 #define GL_VERTEX_ARRAY_EXT                                           32884
 #endif
@@ -3203,6 +3681,11 @@ typedef GLboolean (csAPIENTRY* csGLISTEXTUREEXT) (GLuint texture);
 #endif
 
 
+/** @} */
+
+/**\name GL_EXT_vertex_array functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/vertex_array.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/vertex_array.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLARRAYELEMENTEXT) (GLint i);
 typedef GLvoid (csAPIENTRY* csGLDRAWARRAYSEXT) (GLenum mode, GLint first, GLsizei count);
 typedef GLvoid (csAPIENTRY* csGLVERTEXPOINTEREXT) (GLint size, GLenum type, GLsizei stride, GLsizei count, const GLvoid* pointer);
@@ -3213,7 +3696,10 @@ typedef GLvoid (csAPIENTRY* csGLTEXCOORDPOINTEREXT) (GLint size, GLenum type, GL
 typedef GLvoid (csAPIENTRY* csGLEDGEFLAGPOINTEREXT) (GLsizei stride, GLsizei count, const GLboolean* pointer);
 typedef GLvoid (csAPIENTRY* csGLGETPOINTERVEXT) (GLenum pname, GLvoid* params);
 
-// GL_EXT_vertex_shader
+/** @} */
+/**\name GL_EXT_vertex_shader constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/vertex_shader.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/vertex_shader.txt</a>.
+ * @{ */
 #ifndef GL_VERTEX_SHADER_EXT
 #define GL_VERTEX_SHADER_EXT                                          34688
 #endif
@@ -3655,6 +4141,11 @@ typedef GLvoid (csAPIENTRY* csGLGETPOINTERVEXT) (GLenum pname, GLvoid* params);
 #endif
 
 
+/** @} */
+
+/**\name GL_EXT_vertex_shader functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/vertex_shader.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/vertex_shader.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLBEGINVERTEXSHADEREXT) ();
 typedef GLvoid (csAPIENTRY* csGLENDVERTEXSHADEREXT) ();
 typedef GLvoid (csAPIENTRY* csGLBINDVERTEXSHADEREXT) (GLuint id);
@@ -3698,7 +4189,10 @@ typedef GLvoid (csAPIENTRY* csGLGETLOCALCONSTANTBOOLEANVEXT) (GLuint id, GLenum 
 typedef GLvoid (csAPIENTRY* csGLGETLOCALCONSTANTINTEGERVEXT) (GLuint id, GLenum value, GLint* data);
 typedef GLvoid (csAPIENTRY* csGLGETLOCALCONSTANTFLOATVEXT) (GLuint id, GLenum value, GLfloat* data);
 
-// GL_EXT_vertex_weighting
+/** @} */
+/**\name GL_EXT_vertex_weighting constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/vertex_weighting.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/vertex_weighting.txt</a>.
+ * @{ */
 #ifndef GL_VERTEX_WEIGHTING_EXT
 #define GL_VERTEX_WEIGHTING_EXT                                       34057
 #endif
@@ -3752,11 +4246,19 @@ typedef GLvoid (csAPIENTRY* csGLGETLOCALCONSTANTFLOATVEXT) (GLuint id, GLenum va
 #endif
 
 
+/** @} */
+
+/**\name GL_EXT_vertex_weighting functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/vertex_weighting.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/vertex_weighting.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLVERTEXWEIGHTFEXT) (GLfloat weight);
 typedef GLvoid (csAPIENTRY* csGLVERTEXWEIGHTFVEXT) (GLfloat* weight);
 typedef GLvoid (csAPIENTRY* csGLVERTEXWEIGHTPOINTEREXT) (GLint size, GLenum type, GLsizei stride, GLvoid* pointer);
 
-// GL_HP_occlusion_test
+/** @} */
+/**\name GL_HP_occlusion_test constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/HP/occlusion_test.txt">http://oss.sgi.com/projects/ogl-sample/registry/HP/occlusion_test.txt</a>.
+ * @{ */
 #ifndef GL_OCCLUSION_TEST_HP
 #define GL_OCCLUSION_TEST_HP                                          33125
 #endif
@@ -3766,11 +4268,27 @@ typedef GLvoid (csAPIENTRY* csGLVERTEXWEIGHTPOINTEREXT) (GLint size, GLenum type
 #endif
 
 
+/** @} */
 
-// GL_NV_blend_square
+/**\name GL_HP_occlusion_test functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/HP/occlusion_test.txt">http://oss.sgi.com/projects/ogl-sample/registry/HP/occlusion_test.txt</a>.
+ * @{ */
 
+/** @} */
+/**\name GL_NV_blend_square constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/blend_square.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/blend_square.txt</a>.
+ * @{ */
 
-// GL_NV_copy_depth_to_color
+/** @} */
+
+/**\name GL_NV_blend_square functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/blend_square.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/blend_square.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_NV_copy_depth_to_color constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/copy_depth_to_color.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/copy_depth_to_color.txt</a>.
+ * @{ */
 #ifndef GL_DEPTH_STENCIL_TO_RGBA_NV
 #define GL_DEPTH_STENCIL_TO_RGBA_NV                                   34926
 #endif
@@ -3780,15 +4298,31 @@ typedef GLvoid (csAPIENTRY* csGLVERTEXWEIGHTPOINTEREXT) (GLint size, GLenum type
 #endif
 
 
+/** @} */
 
-// GL_NV_depth_clamp
+/**\name GL_NV_copy_depth_to_color functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/copy_depth_to_color.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/copy_depth_to_color.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_NV_depth_clamp constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/depth_clamp.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/depth_clamp.txt</a>.
+ * @{ */
 #ifndef GL_DEPTH_CLAMP_NV
 #define GL_DEPTH_CLAMP_NV                                             34383
 #endif
 
 
+/** @} */
 
-// GL_NV_evaluators
+/**\name GL_NV_depth_clamp functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/depth_clamp.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/depth_clamp.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_NV_evaluators constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/evaluators.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/evaluators.txt</a>.
+ * @{ */
 #ifndef GL_EVAL_2D_NV
 #define GL_EVAL_2D_NV                                                 34496
 #endif
@@ -3886,6 +4420,11 @@ typedef GLvoid (csAPIENTRY* csGLVERTEXWEIGHTPOINTEREXT) (GLint size, GLenum type
 #endif
 
 
+/** @} */
+
+/**\name GL_NV_evaluators functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/evaluators.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/evaluators.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLMAPCONTROLPOINTSNV) (GLenum target, GLuint index, GLenum type, GLsizei ustride, GLsizei vstride, GLint uorder, GLint vorder, GLboolean packed, const GLvoid* points);
 typedef GLvoid (csAPIENTRY* csGLMAPPARAMETERIVNV) (GLenum target, GLenum pname, const GLint* params);
 typedef GLvoid (csAPIENTRY* csGLMAPPARAMETERFVNV) (GLenum target, GLenum pname, const GLfloat* params);
@@ -3896,7 +4435,10 @@ typedef GLvoid (csAPIENTRY* csGLGETMAPATTRIBPARAMETERIVNV) (GLenum target, GLuin
 typedef GLvoid (csAPIENTRY* csGLGETMAPATTRIBPARAMETERFVNV) (GLenum target, GLuint index, GLenum pname, GLfloat* params);
 typedef GLvoid (csAPIENTRY* csGLEVALMAPSNV) (GLenum target, GLenum mode);
 
-// GL_NV_fence
+/** @} */
+/**\name GL_NV_fence constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/fence.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/fence.txt</a>.
+ * @{ */
 #ifndef GL_ALL_COMPLETED_NV
 #define GL_ALL_COMPLETED_NV                                           34034
 #endif
@@ -3910,6 +4452,11 @@ typedef GLvoid (csAPIENTRY* csGLEVALMAPSNV) (GLenum target, GLenum mode);
 #endif
 
 
+/** @} */
+
+/**\name GL_NV_fence functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/fence.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/fence.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLGENFENCESNV) (GLsizei n, GLuint* fences);
 typedef GLvoid (csAPIENTRY* csGLDELETEFENCESNV) (GLsizei n, const GLuint* fences);
 typedef GLvoid (csAPIENTRY* csGLSETFENCENV) (GLuint fence, GLenum condition);
@@ -3918,7 +4465,10 @@ typedef GLvoid (csAPIENTRY* csGLFINISHFENCENV) (GLuint fence);
 typedef GLboolean (csAPIENTRY* csGLISFENCENV) (GLuint fence);
 typedef GLvoid (csAPIENTRY* csGLGETFENCEIVNV) (GLuint fence, GLenum pname, GLint* params);
 
-// GL_NV_fog_distance
+/** @} */
+/**\name GL_NV_fog_distance constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/fog_distance.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/fog_distance.txt</a>.
+ * @{ */
 #ifndef GL_FOG_DISTANCE_MODE_NV
 #define GL_FOG_DISTANCE_MODE_NV                                       34138
 #endif
@@ -3932,8 +4482,16 @@ typedef GLvoid (csAPIENTRY* csGLGETFENCEIVNV) (GLuint fence, GLenum pname, GLint
 #endif
 
 
+/** @} */
 
-// GL_NV_light_max_exponent
+/**\name GL_NV_fog_distance functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/fog_distance.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/fog_distance.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_NV_light_max_exponent constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/light_max_exponent.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/light_max_exponent.txt</a>.
+ * @{ */
 #ifndef GL_MAX_SHININESS_NV
 #define GL_MAX_SHININESS_NV                                           34052
 #endif
@@ -3943,15 +4501,31 @@ typedef GLvoid (csAPIENTRY* csGLGETFENCEIVNV) (GLuint fence, GLenum pname, GLint
 #endif
 
 
+/** @} */
 
-// GL_NV_multisample_filter_hint
+/**\name GL_NV_light_max_exponent functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/light_max_exponent.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/light_max_exponent.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_NV_multisample_filter_hint constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/multisample_filter_hint.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/multisample_filter_hint.txt</a>.
+ * @{ */
 #ifndef GL_MULTISAMPLE_FILTER_HINT_NV
 #define GL_MULTISAMPLE_FILTER_HINT_NV                                 34100
 #endif
 
 
+/** @} */
 
-// GL_NV_occlusion_query
+/**\name GL_NV_multisample_filter_hint functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/multisample_filter_hint.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/multisample_filter_hint.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_NV_occlusion_query constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/occlusion_query.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/occlusion_query.txt</a>.
+ * @{ */
 #ifndef GL_OCCLUSION_TEST_HP
 #define GL_OCCLUSION_TEST_HP                                          33125
 #endif
@@ -3977,6 +4551,11 @@ typedef GLvoid (csAPIENTRY* csGLGETFENCEIVNV) (GLuint fence, GLenum pname, GLint
 #endif
 
 
+/** @} */
+
+/**\name GL_NV_occlusion_query functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/occlusion_query.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/occlusion_query.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLGENOCCLUSIONQUERIESNV) (GLsizei n, GLuint* ids);
 typedef GLvoid (csAPIENTRY* csGLDELETEOCCLUSIONQUERIESNV) (GLsizei n, const GLuint* ids);
 typedef GLboolean (csAPIENTRY* csGLISOCCLUSIONQUERYNV) (GLuint id);
@@ -3985,7 +4564,10 @@ typedef GLvoid (csAPIENTRY* csGLENDOCCLUSIONQUERYNV) ();
 typedef GLvoid (csAPIENTRY* csGLGETOCCLUSIONQUERYIVNV) (GLuint id, GLenum pname, GLint* params);
 typedef GLvoid (csAPIENTRY* csGLGETOCCLUSIONQUERYUIVNV) (GLuint id, GLenum pname, GLuint* params);
 
-// GL_NV_packed_depth_stencil
+/** @} */
+/**\name GL_NV_packed_depth_stencil constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/packed_depth_stencil.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/packed_depth_stencil.txt</a>.
+ * @{ */
 #ifndef GL_DEPTH_STENCIL_NV
 #define GL_DEPTH_STENCIL_NV                                           34041
 #endif
@@ -3995,8 +4577,16 @@ typedef GLvoid (csAPIENTRY* csGLGETOCCLUSIONQUERYUIVNV) (GLuint id, GLenum pname
 #endif
 
 
+/** @} */
 
-// GL_NV_point_sprite
+/**\name GL_NV_packed_depth_stencil functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/packed_depth_stencil.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/packed_depth_stencil.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_NV_point_sprite constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/point_sprite.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/point_sprite.txt</a>.
+ * @{ */
 #ifndef GL_POINT_SPRITE_NV
 #define GL_POINT_SPRITE_NV                                            34913
 #endif
@@ -4010,10 +4600,18 @@ typedef GLvoid (csAPIENTRY* csGLGETOCCLUSIONQUERYUIVNV) (GLuint id, GLenum pname
 #endif
 
 
+/** @} */
+
+/**\name GL_NV_point_sprite functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/point_sprite.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/point_sprite.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLPOINTPARAMETERINV) (GLenum pname, GLint param);
 typedef GLvoid (csAPIENTRY* csGLPOINTPARAMETERIVNV) (GLenum pname, const GLint* params);
 
-// GL_NV_register_combiners
+/** @} */
+/**\name GL_NV_register_combiners constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/register_combiners.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/register_combiners.txt</a>.
+ * @{ */
 #ifndef GL_REGISTER_COMBINERS_NV
 #define GL_REGISTER_COMBINERS_NV                                      34082
 #endif
@@ -4219,6 +4817,11 @@ typedef GLvoid (csAPIENTRY* csGLPOINTPARAMETERIVNV) (GLenum pname, const GLint* 
 #endif
 
 
+/** @} */
+
+/**\name GL_NV_register_combiners functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/register_combiners.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/register_combiners.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLCOMBINERPARAMETERFVNV) (GLenum pname, const GLfloat* params);
 typedef GLvoid (csAPIENTRY* csGLCOMBINERPARAMETERIVNV) (GLenum pname, const GLint* params);
 typedef GLvoid (csAPIENTRY* csGLCOMBINERPARAMETERFNV) (GLenum pname, GLfloat param);
@@ -4233,16 +4836,27 @@ typedef GLvoid (csAPIENTRY* csGLGETCOMBINEROUTPUTPARAMETERIVNV) (GLenum stage, G
 typedef GLvoid (csAPIENTRY* csGLGETFINALCOMBINERINPUTPARAMETERFVNV) (GLenum variable, GLenum pname, GLfloat* params);
 typedef GLvoid (csAPIENTRY* csGLGETFINALCOMBINERINPUTPARAMETERIVNV) (GLenum variable, GLenum pname, GLint* params);
 
-// GL_NV_register_combiners2
+/** @} */
+/**\name GL_NV_register_combiners2 constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/register_combiners2.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/register_combiners2.txt</a>.
+ * @{ */
 #ifndef GL_PER_STAGE_CONSTANTS_NV
 #define GL_PER_STAGE_CONSTANTS_NV                                     34101
 #endif
 
 
+/** @} */
+
+/**\name GL_NV_register_combiners2 functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/register_combiners2.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/register_combiners2.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLCOMBINERSTAGEPARAMETERFVNV) (GLenum stage, GLenum pname, const GLfloat* params);
 typedef GLvoid (csAPIENTRY* csGLGETCOMBINERSTAGEPARAMETERFVNV) (GLenum stage, GLenum pname, GLfloat* params);
 
-// GL_NV_texgen_emboss
+/** @} */
+/**\name GL_NV_texgen_emboss constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texgen_emboss.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/texgen_emboss.txt</a>.
+ * @{ */
 #ifndef GL_EMBOSS_MAP_NV
 #define GL_EMBOSS_MAP_NV                                              34143
 #endif
@@ -4256,8 +4870,16 @@ typedef GLvoid (csAPIENTRY* csGLGETCOMBINERSTAGEPARAMETERFVNV) (GLenum stage, GL
 #endif
 
 
+/** @} */
 
-// GL_NV_texgen_reflection
+/**\name GL_NV_texgen_emboss functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texgen_emboss.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/texgen_emboss.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_NV_texgen_reflection constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texgen_reflection.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/texgen_reflection.txt</a>.
+ * @{ */
 #ifndef GL_NORMAL_MAP_NV
 #define GL_NORMAL_MAP_NV                                              34065
 #endif
@@ -4267,8 +4889,16 @@ typedef GLvoid (csAPIENTRY* csGLGETCOMBINERSTAGEPARAMETERFVNV) (GLenum stage, GL
 #endif
 
 
+/** @} */
 
-// GL_NV_texture_compression_vtc
+/**\name GL_NV_texgen_reflection functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texgen_reflection.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/texgen_reflection.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_NV_texture_compression_vtc constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_compression_vtc.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_compression_vtc.txt</a>.
+ * @{ */
 #ifndef GL_COMPRESSED_RGB_S3TC_DXT1_EXT
 #define GL_COMPRESSED_RGB_S3TC_DXT1_EXT                               33776
 #endif
@@ -4286,8 +4916,16 @@ typedef GLvoid (csAPIENTRY* csGLGETCOMBINERSTAGEPARAMETERFVNV) (GLenum stage, GL
 #endif
 
 
+/** @} */
 
-// GL_NV_texture_env_combine4
+/**\name GL_NV_texture_compression_vtc functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_compression_vtc.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_compression_vtc.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_NV_texture_env_combine4 constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_env_combine4.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_env_combine4.txt</a>.
+ * @{ */
 #ifndef GL_COMBINE4_NV
 #define GL_COMBINE4_NV                                                34051
 #endif
@@ -4309,8 +4947,16 @@ typedef GLvoid (csAPIENTRY* csGLGETCOMBINERSTAGEPARAMETERFVNV) (GLenum stage, GL
 #endif
 
 
+/** @} */
 
-// GL_NV_texture_rectangle
+/**\name GL_NV_texture_env_combine4 functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_env_combine4.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_env_combine4.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_NV_texture_rectangle constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_rectangle.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_rectangle.txt</a>.
+ * @{ */
 #ifndef GL_TEXTURE_RECTANGLE_NV
 #define GL_TEXTURE_RECTANGLE_NV                                       34037
 #endif
@@ -4328,8 +4974,16 @@ typedef GLvoid (csAPIENTRY* csGLGETCOMBINERSTAGEPARAMETERFVNV) (GLenum stage, GL
 #endif
 
 
+/** @} */
 
-// GL_NV_texture_shader
+/**\name GL_NV_texture_rectangle functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_rectangle.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_rectangle.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_NV_texture_shader constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_shader.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_shader.txt</a>.
+ * @{ */
 #ifndef GL_TEXTURE_SHADER_NV
 #define GL_TEXTURE_SHADER_NV                                          34526
 #endif
@@ -4611,8 +5265,16 @@ typedef GLvoid (csAPIENTRY* csGLGETCOMBINERSTAGEPARAMETERFVNV) (GLenum stage, GL
 #endif
 
 
+/** @} */
 
-// GL_NV_texture_shader2
+/**\name GL_NV_texture_shader functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_shader.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_shader.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_NV_texture_shader2 constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_shader2.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_shader2.txt</a>.
+ * @{ */
 #ifndef GL_DOT_PRODUCT_TEXTURE_3D_NV
 #define GL_DOT_PRODUCT_TEXTURE_3D_NV                                  34543
 #endif
@@ -4726,8 +5388,16 @@ typedef GLvoid (csAPIENTRY* csGLGETCOMBINERSTAGEPARAMETERFVNV) (GLenum stage, GL
 #endif
 
 
+/** @} */
 
-// GL_NV_texture_shader3
+/**\name GL_NV_texture_shader2 functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_shader2.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_shader2.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_NV_texture_shader3 constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_shader3.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_shader3.txt</a>.
+ * @{ */
 #ifndef GL_OFFSET_PROJECTIVE_TEXTURE_2D_NV
 #define GL_OFFSET_PROJECTIVE_TEXTURE_2D_NV                            34896
 #endif
@@ -4797,8 +5467,16 @@ typedef GLvoid (csAPIENTRY* csGLGETCOMBINERSTAGEPARAMETERFVNV) (GLenum stage, GL
 #endif
 
 
+/** @} */
 
-// GL_NV_vertex_array_range
+/**\name GL_NV_texture_shader3 functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_shader3.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_shader3.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_NV_vertex_array_range constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_array_range.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_array_range.txt</a>.
+ * @{ */
 #ifndef GL_VERTEX_ARRAY_RANGE_NV
 #define GL_VERTEX_ARRAY_RANGE_NV                                      34077
 #endif
@@ -4820,19 +5498,35 @@ typedef GLvoid (csAPIENTRY* csGLGETCOMBINERSTAGEPARAMETERFVNV) (GLenum stage, GL
 #endif
 
 
+/** @} */
+
+/**\name GL_NV_vertex_array_range functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_array_range.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_array_range.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLVERTEXARRAYRANGENV) (GLsizei length, GLvoid* pointer);
 typedef GLvoid (csAPIENTRY* csGLFLUSHVERTEXARRAYRANGENV) ();
 typedef GLvoid* (csAPIENTRY* csWGLALLOCATEMEMORYNV) (GLsizei size, GLfloat readFrequency, GLfloat writeFrequency, GLfloat priority);
 typedef GLvoid (csAPIENTRY* csWGLFREEMEMORYNV) (GLvoid* pointer);
 
-// GL_NV_vertex_array_range2
+/** @} */
+/**\name GL_NV_vertex_array_range2 constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_array_range2.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_array_range2.txt</a>.
+ * @{ */
 #ifndef GL_VERTEX_ARRAY_RANGE_WITHOUT_FLUSH_NV
 #define GL_VERTEX_ARRAY_RANGE_WITHOUT_FLUSH_NV                        34099
 #endif
 
 
+/** @} */
 
-// GL_NV_vertex_program
+/**\name GL_NV_vertex_array_range2 functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_array_range2.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_array_range2.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_NV_vertex_program constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_program.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_program.txt</a>.
+ * @{ */
 #ifndef GL_VERTEX_PROGRAM_NV
 #define GL_VERTEX_PROGRAM_NV                                          34336
 #endif
@@ -5166,6 +5860,11 @@ typedef GLvoid (csAPIENTRY* csWGLFREEMEMORYNV) (GLvoid* pointer);
 #endif
 
 
+/** @} */
+
+/**\name GL_NV_vertex_program functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_program.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_program.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLBINDPROGRAMNV) (GLenum target, GLuint id);
 typedef GLvoid (csAPIENTRY* csGLDELETEPROGRAMSNV) (GLsizei n, const GLuint* ids);
 typedef GLvoid (csAPIENTRY* csGLEXECUTEPROGRAMNV) (GLenum target, GLuint id, const GLfloat* params);
@@ -5229,10 +5928,21 @@ typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBS4FVNV) (GLuint index, GLsizei n, co
 typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBS4DVNV) (GLuint index, GLsizei n, const GLdouble* v);
 typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBS4UBVNV) (GLuint index, GLsizei n, const GLubyte* v);
 
-// GL_NV_vertex_program1_1
+/** @} */
+/**\name GL_NV_vertex_program1_1 constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_program1_1.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_program1_1.txt</a>.
+ * @{ */
 
+/** @} */
 
-// GL_ATI_element_array
+/**\name GL_NV_vertex_program1_1 functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_program1_1.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_program1_1.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_ATI_element_array constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/element_array.txt">http://oss.sgi.com/projects/ogl-sample/registry/ATI/element_array.txt</a>.
+ * @{ */
 #ifndef GL_ELEMENT_ARRAY_ATI
 #define GL_ELEMENT_ARRAY_ATI                                          34664
 #endif
@@ -5246,11 +5956,19 @@ typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBS4UBVNV) (GLuint index, GLsizei n, c
 #endif
 
 
+/** @} */
+
+/**\name GL_ATI_element_array functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/element_array.txt">http://oss.sgi.com/projects/ogl-sample/registry/ATI/element_array.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLELEMENTPOINTERATI) (GLenum type, const GLvoid* pointer);
 typedef GLvoid (csAPIENTRY* csGLDRAWELEMENTARRAYATI) (GLenum mode, GLsizei count);
 typedef GLvoid (csAPIENTRY* csGLDRAWRANGEELEMENTARRAYATI) (GLenum mode, GLuint start, GLuint end, GLsizei count);
 
-// GL_ATI_envmap_bumpmap
+/** @} */
+/**\name GL_ATI_envmap_bumpmap constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/envmap_bumpmap.txt">http://oss.sgi.com/projects/ogl-sample/registry/ATI/envmap_bumpmap.txt</a>.
+ * @{ */
 #ifndef GL_BUMP_ROT_MATRIX_ATI
 #define GL_BUMP_ROT_MATRIX_ATI                                        34677
 #endif
@@ -5284,12 +6002,20 @@ typedef GLvoid (csAPIENTRY* csGLDRAWRANGEELEMENTARRAYATI) (GLenum mode, GLuint s
 #endif
 
 
+/** @} */
+
+/**\name GL_ATI_envmap_bumpmap functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/envmap_bumpmap.txt">http://oss.sgi.com/projects/ogl-sample/registry/ATI/envmap_bumpmap.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLTEXBUMPPARAMETERIVATI) (GLenum pname, GLint* param);
 typedef GLvoid (csAPIENTRY* csGLTEXBUMPPARAMETERFVATI) (GLenum pname, GLfloat* param);
 typedef GLvoid (csAPIENTRY* csGLGETTEXBUMPPARAMETERIVATI) (GLenum pname, GLint* param);
 typedef GLvoid (csAPIENTRY* csGLGETTEXBUMPPARAMETERFVATI) (GLenum pname, GLfloat* param);
 
-// GL_ATI_fragment_shader
+/** @} */
+/**\name GL_ATI_fragment_shader constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/fragment_shader.txt">http://oss.sgi.com/projects/ogl-sample/registry/ATI/fragment_shader.txt</a>.
+ * @{ */
 #ifndef GL_FRAGMENT_SHADER_ATI
 #define GL_FRAGMENT_SHADER_ATI                                        35104
 #endif
@@ -5471,6 +6197,11 @@ typedef GLvoid (csAPIENTRY* csGLGETTEXBUMPPARAMETERFVATI) (GLenum pname, GLfloat
 #endif
 
 
+/** @} */
+
+/**\name GL_ATI_fragment_shader functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/fragment_shader.txt">http://oss.sgi.com/projects/ogl-sample/registry/ATI/fragment_shader.txt</a>.
+ * @{ */
 typedef GLuint (csAPIENTRY* csGLGENFRAGMENTSHADERSATI) (GLuint range);
 typedef GLvoid (csAPIENTRY* csGLBINDFRAGMENTSHADERATI) (GLuint id);
 typedef GLvoid (csAPIENTRY* csGLDELETEFRAGMENTSHADERATI) (GLuint id);
@@ -5486,7 +6217,10 @@ typedef GLvoid (csAPIENTRY* csGLALPHAFRAGMENTOP2ATI) (GLenum op, GLuint dst, GLu
 typedef GLvoid (csAPIENTRY* csGLALPHAFRAGMENTOP3ATI) (GLenum op, GLuint dst, GLuint dstMod, GLuint arg1, GLuint arg1Rep, GLuint arg1Mod, GLuint arg2, GLuint arg2Rep, GLuint arg2Mod, GLuint arg3, GLuint arg3Rep, GLuint arg3Mod);
 typedef GLvoid (csAPIENTRY* csGLSETFRAGMENTSHADERCONSTANTATI) (GLuint dst, const GLfloat* value);
 
-// GL_ATI_pn_triangles
+/** @} */
+/**\name GL_ATI_pn_triangles constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/pn_triangles.txt">http://oss.sgi.com/projects/ogl-sample/registry/ATI/pn_triangles.txt</a>.
+ * @{ */
 #ifndef GL_PN_TRIANGLES_ATI
 #define GL_PN_TRIANGLES_ATI                                           34800
 #endif
@@ -5524,10 +6258,18 @@ typedef GLvoid (csAPIENTRY* csGLSETFRAGMENTSHADERCONSTANTATI) (GLuint dst, const
 #endif
 
 
+/** @} */
+
+/**\name GL_ATI_pn_triangles functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/pn_triangles.txt">http://oss.sgi.com/projects/ogl-sample/registry/ATI/pn_triangles.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLPNTRIANGLESIATI) (GLenum pname, GLint param);
 typedef GLvoid (csAPIENTRY* csGLPNTRIANGLESFATI) (GLenum pname, GLfloat param);
 
-// GL_ATI_texture_mirror_once
+/** @} */
+/**\name GL_ATI_texture_mirror_once constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/texture_mirror_once.txt">http://oss.sgi.com/projects/ogl-sample/registry/ATI/texture_mirror_once.txt</a>.
+ * @{ */
 #ifndef GL_MIRROR_CLAMP_ATI
 #define GL_MIRROR_CLAMP_ATI                                           34626
 #endif
@@ -5537,8 +6279,16 @@ typedef GLvoid (csAPIENTRY* csGLPNTRIANGLESFATI) (GLenum pname, GLfloat param);
 #endif
 
 
+/** @} */
 
-// GL_ATI_vertex_array_object
+/**\name GL_ATI_texture_mirror_once functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/texture_mirror_once.txt">http://oss.sgi.com/projects/ogl-sample/registry/ATI/texture_mirror_once.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_ATI_vertex_array_object constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/vertex_array_object.txt">http://oss.sgi.com/projects/ogl-sample/registry/ATI/vertex_array_object.txt</a>.
+ * @{ */
 #ifndef GL_STATIC_ATI
 #define GL_STATIC_ATI                                                 34656
 #endif
@@ -5572,6 +6322,11 @@ typedef GLvoid (csAPIENTRY* csGLPNTRIANGLESFATI) (GLenum pname, GLfloat param);
 #endif
 
 
+/** @} */
+
+/**\name GL_ATI_vertex_array_object functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/vertex_array_object.txt">http://oss.sgi.com/projects/ogl-sample/registry/ATI/vertex_array_object.txt</a>.
+ * @{ */
 typedef GLuint (csAPIENTRY* csGLNEWOBJECTBUFFERATI) (GLsizei size, const GLvoid* pointer, GLenum usage);
 typedef GLboolean (csAPIENTRY* csGLISOBJECTBUFFERATI) (GLuint buffer);
 typedef GLvoid (csAPIENTRY* csGLUPDATEOBJECTBUFFERATI) (GLuint buffer, GLuint offset, GLsizei size, const GLvoid* pointer, GLenum preserve);
@@ -5585,13 +6340,24 @@ typedef GLvoid (csAPIENTRY* csGLVARIANTARRAYOBJECTATI) (GLuint id, GLenum type, 
 typedef GLvoid (csAPIENTRY* csGLGETVARIANTARRAYOBJECTFVATI) (GLuint id, GLenum pname, GLfloat* params);
 typedef GLvoid (csAPIENTRY* csGLGETVARIANTARRAYOBJECTIVATI) (GLuint id, GLenum pname, GLint* params);
 
-// GL_ATI_vertex_attrib_array_object
+/** @} */
+/**\name GL_ATI_vertex_attrib_array_object constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/vertex_attrib_array_object.txt">http://oss.sgi.com/projects/ogl-sample/registry/ATI/vertex_attrib_array_object.txt</a>.
+ * @{ */
 
+/** @} */
+
+/**\name GL_ATI_vertex_attrib_array_object functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/vertex_attrib_array_object.txt">http://oss.sgi.com/projects/ogl-sample/registry/ATI/vertex_attrib_array_object.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBARRAYOBJECTATI) (GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, GLuint buffer, GLuint offset);
 typedef GLvoid (csAPIENTRY* csGLGETVERTEXATTRIBARRAYOBJECTFVATI) (GLuint index, GLenum pname, GLfloat* params);
 typedef GLvoid (csAPIENTRY* csGLGETVERTEXATTRIBARRAYOBJECTIVATI) (GLuint index, GLenum pname, GLint* params);
 
-// GL_ATI_vertex_streams
+/** @} */
+/**\name GL_ATI_vertex_streams constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/vertex_streams.txt">http://oss.sgi.com/projects/ogl-sample/registry/ATI/vertex_streams.txt</a>.
+ * @{ */
 #ifndef GL_MAX_VERTEX_STREAMS_ATI
 #define GL_MAX_VERTEX_STREAMS_ATI                                     34667
 #endif
@@ -5633,6 +6399,11 @@ typedef GLvoid (csAPIENTRY* csGLGETVERTEXATTRIBARRAYOBJECTIVATI) (GLuint index, 
 #endif
 
 
+/** @} */
+
+/**\name GL_ATI_vertex_streams functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/vertex_streams.txt">http://oss.sgi.com/projects/ogl-sample/registry/ATI/vertex_streams.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLVERTEXSTREAM1S) (GLenum stream, GLshort coords);
 typedef GLvoid (csAPIENTRY* csGLVERTEXSTREAM1I) (GLenum stream, GLint coords);
 typedef GLvoid (csAPIENTRY* csGLVERTEXSTREAM1F) (GLenum stream, GLfloat coords);
@@ -5679,8 +6450,11 @@ typedef GLvoid (csAPIENTRY* csGLCLIENTACTIVEVERTEXSTREAM) (GLenum stream);
 typedef GLvoid (csAPIENTRY* csGLVERTEXBLENDENVI) (GLenum pname, GLint param);
 typedef GLvoid (csAPIENTRY* csGLVERTEXBLENDENVF) (GLenum pname, GLfloat param);
 
-// WGL_I3D_image_buffer
+/** @} */
 #ifdef _WIN32
+/**\name WGL_I3D_image_buffer constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_image_buffer.txt">http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_image_buffer.txt</a>.
+ * @{ */
 #ifndef WGL_IMAGE_BUFFER_MIN_ACCESS_I3D
 #define WGL_IMAGE_BUFFER_MIN_ACCESS_I3D                                   1
 #endif
@@ -5690,34 +6464,58 @@ typedef GLvoid (csAPIENTRY* csGLVERTEXBLENDENVF) (GLenum pname, GLfloat param);
 #endif
 
 
+/** @} */
+
+/**\name WGL_I3D_image_buffer functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_image_buffer.txt">http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_image_buffer.txt</a>.
+ * @{ */
 typedef GLvoid* (csAPIENTRY* csWGLCREATEIMAGEBUFFERI3D) (HDC hDC, DWORD dwSize, UINT uFlags);
 typedef BOOL (csAPIENTRY* csWGLDESTROYIMAGEBUFFERI3D) (HDC hDC, GLvoid* pAddress);
 typedef BOOL (csAPIENTRY* csWGLASSOCIATEIMAGEBUFFEREVENTSI3D) (HDC hdc, HANDLE* pEvent, GLvoid* pAddress, DWORD* pSize, UINT count);
 typedef BOOL (csAPIENTRY* csWGLRELEASEIMAGEBUFFEREVENTSI3D) (HDC hdc, GLvoid* pAddress, UINT count);
 
+/** @} */
 #endif
 
-// WGL_I3D_swap_frame_lock
 #ifdef _WIN32
+/**\name WGL_I3D_swap_frame_lock constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_swap_frame_lock.txt">http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_swap_frame_lock.txt</a>.
+ * @{ */
 
+/** @} */
+
+/**\name WGL_I3D_swap_frame_lock functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_swap_frame_lock.txt">http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_swap_frame_lock.txt</a>.
+ * @{ */
 typedef BOOL (csAPIENTRY* csWGLENABLEFRAMELOCKI3D) ();
 typedef BOOL (csAPIENTRY* csWGLDISABLEFRAMELOCKI3D) ();
 typedef BOOL (csAPIENTRY* csWGLISENABLEDFRAMELOCKI3D) (BOOL* pFlag);
 typedef BOOL (csAPIENTRY* csWGLQUERYFRAMELOCKMASTERI3D) (BOOL* pFlag);
 
+/** @} */
 #endif
 
-// WGL_I3D_swap_frame_usage
 #ifdef _WIN32
+/**\name WGL_I3D_swap_frame_usage constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_swap_frame_usage.txt">http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_swap_frame_usage.txt</a>.
+ * @{ */
 
+/** @} */
+
+/**\name WGL_I3D_swap_frame_usage functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_swap_frame_usage.txt">http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_swap_frame_usage.txt</a>.
+ * @{ */
 typedef BOOL (csAPIENTRY* csWGLGETFRAMEUSAGEI3D) (GLfloat* pUsage);
 typedef BOOL (csAPIENTRY* csWGLBEGINFRAMETRACKINGI3D) ();
 typedef BOOL (csAPIENTRY* csWGLENDFRAMETRACKINGI3D) ();
 typedef BOOL (csAPIENTRY* csWGLQUERYFRAMETRACKINGI3D) (DWORD* pFrameCount, DWORD* pMissedFrames, GLfloat* pLastMissedUsage);
 
+/** @} */
 #endif
 
-// GL_3DFX_texture_compression_FXT1
+/**\name GL_3DFX_texture_compression_FXT1 constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/3DFX/texture_compression_FXT1.txt">http://oss.sgi.com/projects/ogl-sample/registry/3DFX/texture_compression_FXT1.txt</a>.
+ * @{ */
 #ifndef GL_COMPRESSED_RGB_FXT1_3DFX
 #define GL_COMPRESSED_RGB_FXT1_3DFX                                   34480
 #endif
@@ -5727,34 +6525,74 @@ typedef BOOL (csAPIENTRY* csWGLQUERYFRAMETRACKINGI3D) (DWORD* pFrameCount, DWORD
 #endif
 
 
+/** @} */
 
-// GL_IBM_cull_vertex
+/**\name GL_3DFX_texture_compression_FXT1 functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/3DFX/texture_compression_FXT1.txt">http://oss.sgi.com/projects/ogl-sample/registry/3DFX/texture_compression_FXT1.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_IBM_cull_vertex constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/IBM/cull_vertex.txt">http://oss.sgi.com/projects/ogl-sample/registry/IBM/cull_vertex.txt</a>.
+ * @{ */
 #ifndef GL_CULL_VERTEX_IBM
 #define GL_CULL_VERTEX_IBM                                           103050
 #endif
 
 
+/** @} */
 
-// GL_IBM_multimode_draw_arrays
+/**\name GL_IBM_cull_vertex functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/IBM/cull_vertex.txt">http://oss.sgi.com/projects/ogl-sample/registry/IBM/cull_vertex.txt</a>.
+ * @{ */
 
+/** @} */
+/**\name GL_IBM_multimode_draw_arrays constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/IBM/multimode_draw_arrays.txt">http://oss.sgi.com/projects/ogl-sample/registry/IBM/multimode_draw_arrays.txt</a>.
+ * @{ */
+
+/** @} */
+
+/**\name GL_IBM_multimode_draw_arrays functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/IBM/multimode_draw_arrays.txt">http://oss.sgi.com/projects/ogl-sample/registry/IBM/multimode_draw_arrays.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLMULTIMODEDRAWARRAYSIBM) (GLenum* mode, GLint* first, GLsizei* count, GLsizei primcount, GLint modestride);
 typedef GLvoid (csAPIENTRY* csGLMULTIMODEDRAWELEMENTSIBM) (GLenum* mode, GLsizei* count, GLenum type, const GLvoid* indices, GLsizei primcount, GLint modestride);
 
-// GL_IBM_raster_pos_clip
+/** @} */
+/**\name GL_IBM_raster_pos_clip constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/IBM/raster_pos_clip.txt">http://oss.sgi.com/projects/ogl-sample/registry/IBM/raster_pos_clip.txt</a>.
+ * @{ */
 #ifndef GL_RASTER_POSITION_UNCLIPPED_IBM
 #define GL_RASTER_POSITION_UNCLIPPED_IBM                             103010
 #endif
 
 
+/** @} */
 
-// GL_IBM_texture_mirrored_repeat
+/**\name GL_IBM_raster_pos_clip functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/IBM/raster_pos_clip.txt">http://oss.sgi.com/projects/ogl-sample/registry/IBM/raster_pos_clip.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_IBM_texture_mirrored_repeat constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/IBM/texture_mirrored_repeat.txt">http://oss.sgi.com/projects/ogl-sample/registry/IBM/texture_mirrored_repeat.txt</a>.
+ * @{ */
 #ifndef GL_MIRRORED_REPEAT_IBM
 #define GL_MIRRORED_REPEAT_IBM                                        33648
 #endif
 
 
+/** @} */
 
-// GL_IBM_vertex_array_lists
+/**\name GL_IBM_texture_mirrored_repeat functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/IBM/texture_mirrored_repeat.txt">http://oss.sgi.com/projects/ogl-sample/registry/IBM/texture_mirrored_repeat.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_IBM_vertex_array_lists constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/IBM/vertex_array_lists.txt">http://oss.sgi.com/projects/ogl-sample/registry/IBM/vertex_array_lists.txt</a>.
+ * @{ */
 #ifndef GL_VERTEX_ARRAY_LIST_IBM
 #define GL_VERTEX_ARRAY_LIST_IBM                                     103070
 #endif
@@ -5820,6 +6658,11 @@ typedef GLvoid (csAPIENTRY* csGLMULTIMODEDRAWELEMENTSIBM) (GLenum* mode, GLsizei
 #endif
 
 
+/** @} */
+
+/**\name GL_IBM_vertex_array_lists functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/IBM/vertex_array_lists.txt">http://oss.sgi.com/projects/ogl-sample/registry/IBM/vertex_array_lists.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLCOLORPOINTERLISTIBM) (GLint size, GLenum type, GLint stride, const GLvoid* pointer, GLint ptrstride);
 typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLORPOINTERLISTIBM) (GLint size, GLenum type, GLint stride, const GLvoid* pointer, GLint ptrstride);
 typedef GLvoid (csAPIENTRY* csGLEDGEFLAGPOINTERLISTIBM) (GLint stride, const GLboolean* pointer, GLint ptrstride);
@@ -5828,12 +6671,28 @@ typedef GLvoid (csAPIENTRY* csGLNORMALPOINTERLISTIBM) (GLenum type, GLint stride
 typedef GLvoid (csAPIENTRY* csGLTEXCOORDPOINTERLISTIBM) (GLint size, GLenum type, GLint stride, const GLvoid* pointer, GLint ptrstride);
 typedef GLvoid (csAPIENTRY* csGLVERTEXPOINTERLISTIBM) (GLint size, GLenum type, GLint stride, const GLvoid* pointer, GLint ptrstride);
 
-// GL_MESA_resize_buffers
+/** @} */
+/**\name GL_MESA_resize_buffers constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/MESA/resize_buffers.txt">http://oss.sgi.com/projects/ogl-sample/registry/MESA/resize_buffers.txt</a>.
+ * @{ */
 
+/** @} */
+
+/**\name GL_MESA_resize_buffers functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/MESA/resize_buffers.txt">http://oss.sgi.com/projects/ogl-sample/registry/MESA/resize_buffers.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLRESIZEBUFFERSMESA) ();
 
-// GL_MESA_window_pos
+/** @} */
+/**\name GL_MESA_window_pos constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/MESA/window_pos.txt">http://oss.sgi.com/projects/ogl-sample/registry/MESA/window_pos.txt</a>.
+ * @{ */
 
+/** @} */
+
+/**\name GL_MESA_window_pos functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/MESA/window_pos.txt">http://oss.sgi.com/projects/ogl-sample/registry/MESA/window_pos.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2DMESA) (GLdouble x, GLdouble y);
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2FMESA) (GLfloat x, GLfloat y);
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2IMESA) (GLint x, GLint y);
@@ -5859,7 +6718,10 @@ typedef GLvoid (csAPIENTRY* csGLWINDOWPOS4SVMESA) (const GLshort* p);
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS4FVMESA) (const GLfloat* p);
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS4DVMESA) (const GLdouble* p);
 
-// GL_OML_interlace
+/** @} */
+/**\name GL_OML_interlace constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/OML/interlace.txt">http://oss.sgi.com/projects/ogl-sample/registry/OML/interlace.txt</a>.
+ * @{ */
 #ifndef GL_INTERLACE_OML
 #define GL_INTERLACE_OML                                              35200
 #endif
@@ -5869,8 +6731,16 @@ typedef GLvoid (csAPIENTRY* csGLWINDOWPOS4DVMESA) (const GLdouble* p);
 #endif
 
 
+/** @} */
 
-// GL_OML_resample
+/**\name GL_OML_interlace functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/OML/interlace.txt">http://oss.sgi.com/projects/ogl-sample/registry/OML/interlace.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_OML_resample constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/OML/resample.txt">http://oss.sgi.com/projects/ogl-sample/registry/OML/resample.txt</a>.
+ * @{ */
 #ifndef GL_PACK_RESAMPLE_OML
 #define GL_PACK_RESAMPLE_OML                                          35204
 #endif
@@ -5900,8 +6770,16 @@ typedef GLvoid (csAPIENTRY* csGLWINDOWPOS4DVMESA) (const GLdouble* p);
 #endif
 
 
+/** @} */
 
-// GL_OML_subsample
+/**\name GL_OML_resample functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/OML/resample.txt">http://oss.sgi.com/projects/ogl-sample/registry/OML/resample.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_OML_subsample constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/OML/subsample.txt">http://oss.sgi.com/projects/ogl-sample/registry/OML/subsample.txt</a>.
+ * @{ */
 #ifndef GL_FORMAT_SUBSAMPLE_24_24_OML
 #define GL_FORMAT_SUBSAMPLE_24_24_OML                                 35202
 #endif
@@ -5911,8 +6789,16 @@ typedef GLvoid (csAPIENTRY* csGLWINDOWPOS4DVMESA) (const GLdouble* p);
 #endif
 
 
+/** @} */
 
-// GL_SGIS_generate_mipmap
+/**\name GL_OML_subsample functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/OML/subsample.txt">http://oss.sgi.com/projects/ogl-sample/registry/OML/subsample.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_SGIS_generate_mipmap constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/generate_mipmap.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIS/generate_mipmap.txt</a>.
+ * @{ */
 #ifndef GL_GENERATE_MIPMAP_SGIS
 #define GL_GENERATE_MIPMAP_SGIS                                       33169
 #endif
@@ -5922,8 +6808,16 @@ typedef GLvoid (csAPIENTRY* csGLWINDOWPOS4DVMESA) (const GLdouble* p);
 #endif
 
 
+/** @} */
 
-// GL_SGIS_multisample
+/**\name GL_SGIS_generate_mipmap functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/generate_mipmap.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIS/generate_mipmap.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_SGIS_multisample constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/multisample.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIS/multisample.txt</a>.
+ * @{ */
 #ifndef GLX_SAMPLE_BUFFERS_SGIS
 #define GLX_SAMPLE_BUFFERS_SGIS                                      100000
 #endif
@@ -6001,10 +6895,18 @@ typedef GLvoid (csAPIENTRY* csGLWINDOWPOS4DVMESA) (const GLdouble* p);
 #endif
 
 
+/** @} */
+
+/**\name GL_SGIS_multisample functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/multisample.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIS/multisample.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLSAMPLEMASKSGIS) (GLclampf value, GLboolean invert);
 typedef GLvoid (csAPIENTRY* csGLSAMPLEPATTERNSGIS) (GLenum pattern);
 
-// GL_SGIS_pixel_texture
+/** @} */
+/**\name GL_SGIS_pixel_texture constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/pixel_texture.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIS/pixel_texture.txt</a>.
+ * @{ */
 #ifndef GL_PIXEL_TEXTURE_SGIS
 #define GL_PIXEL_TEXTURE_SGIS                                         33619
 #endif
@@ -6022,34 +6924,66 @@ typedef GLvoid (csAPIENTRY* csGLSAMPLEPATTERNSGIS) (GLenum pattern);
 #endif
 
 
+/** @} */
+
+/**\name GL_SGIS_pixel_texture functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/pixel_texture.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIS/pixel_texture.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLPIXELTEXGENPARAMETERISGIS) (GLenum pname, GLint param);
 typedef GLvoid (csAPIENTRY* csGLPIXELTEXGENPARAMETERFSGIS) (GLenum pname, GLfloat param);
 typedef GLvoid (csAPIENTRY* csGLGETPIXELTEXGENPARAMETERIVSGIS) (GLenum pname, GLint params);
 typedef GLvoid (csAPIENTRY* csGLGETPIXELTEXGENPARAMETERFVSGIS) (GLenum pname, GLfloat params);
 
-// GL_SGIS_texture_border_clamp
+/** @} */
+/**\name GL_SGIS_texture_border_clamp constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/texture_border_clamp.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIS/texture_border_clamp.txt</a>.
+ * @{ */
 #ifndef GL_CLAMP_TO_BORDER_SGIS
 #define GL_CLAMP_TO_BORDER_SGIS                                       33069
 #endif
 
 
+/** @} */
 
-// GL_SGIS_texture_color_mask
+/**\name GL_SGIS_texture_border_clamp functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/texture_border_clamp.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIS/texture_border_clamp.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_SGIS_texture_color_mask constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/texture_color_mask.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIS/texture_color_mask.txt</a>.
+ * @{ */
 #ifndef GL_TEXTURE_COLOR_WRITEMASK_SGIS
 #define GL_TEXTURE_COLOR_WRITEMASK_SGIS                               33263
 #endif
 
 
+/** @} */
+
+/**\name GL_SGIS_texture_color_mask functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/texture_color_mask.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIS/texture_color_mask.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLTEXTURECOLORMASKSGIS) (GLboolean r, GLboolean g, GLboolean b, GLboolean a);
 
-// GL_SGIS_texture_edge_clamp
+/** @} */
+/**\name GL_SGIS_texture_edge_clamp constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/texture_edge_clamp.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIS/texture_edge_clamp.txt</a>.
+ * @{ */
 #ifndef GL_CLAMP_TO_EDGE_SGIS
 #define GL_CLAMP_TO_EDGE_SGIS                                         33071
 #endif
 
 
+/** @} */
 
-// GL_SGIS_texture_lod
+/**\name GL_SGIS_texture_edge_clamp functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/texture_edge_clamp.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIS/texture_edge_clamp.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_SGIS_texture_lod constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/texture_lod.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIS/texture_lod.txt</a>.
+ * @{ */
 #ifndef GL_TEXTURE_MIN_LOD_SGIS
 #define GL_TEXTURE_MIN_LOD_SGIS                                       33082
 #endif
@@ -6067,8 +7001,16 @@ typedef GLvoid (csAPIENTRY* csGLTEXTURECOLORMASKSGIS) (GLboolean r, GLboolean g,
 #endif
 
 
+/** @} */
 
-// GL_SGIS_depth_texture
+/**\name GL_SGIS_texture_lod functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/texture_lod.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIS/texture_lod.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_SGIS_depth_texture constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/depth_texture.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIS/depth_texture.txt</a>.
+ * @{ */
 #ifndef GL_DEPTH_COMPONENT16_SGIX
 #define GL_DEPTH_COMPONENT16_SGIX                                     33189
 #endif
@@ -6082,8 +7024,16 @@ typedef GLvoid (csAPIENTRY* csGLTEXTURECOLORMASKSGIS) (GLboolean r, GLboolean g,
 #endif
 
 
+/** @} */
 
-// GL_SGIX_fog_offset
+/**\name GL_SGIS_depth_texture functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/depth_texture.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIS/depth_texture.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_SGIX_fog_offset constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIX/fog_offset.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIX/fog_offset.txt</a>.
+ * @{ */
 #ifndef GL_FOG_OFFSET_SGIX
 #define GL_FOG_OFFSET_SGIX                                            33176
 #endif
@@ -6093,22 +7043,46 @@ typedef GLvoid (csAPIENTRY* csGLTEXTURECOLORMASKSGIS) (GLboolean r, GLboolean g,
 #endif
 
 
+/** @} */
 
-// GL_SGIX_interlace
+/**\name GL_SGIX_fog_offset functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIX/fog_offset.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIX/fog_offset.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_SGIX_interlace constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIX/interlace.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIX/interlace.txt</a>.
+ * @{ */
 #ifndef GL_INTERLACE_SGIX
 #define GL_INTERLACE_SGIX                                             32916
 #endif
 
 
+/** @} */
 
-// GL_SGIX_shadow_ambient
+/**\name GL_SGIX_interlace functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIX/interlace.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIX/interlace.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_SGIX_shadow_ambient constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIX/shadow_ambient.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIX/shadow_ambient.txt</a>.
+ * @{ */
 #ifndef GL_SHADOW_AMBIENT_SGIX
 #define GL_SHADOW_AMBIENT_SGIX                                        32959
 #endif
 
 
+/** @} */
 
-// GL_SGI_color_matrix
+/**\name GL_SGIX_shadow_ambient functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIX/shadow_ambient.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIX/shadow_ambient.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_SGI_color_matrix constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGI/color_matrix.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGI/color_matrix.txt</a>.
+ * @{ */
 #ifndef GL_COLOR_MATRIX_SGI
 #define GL_COLOR_MATRIX_SGI                                           32945
 #endif
@@ -6154,8 +7128,16 @@ typedef GLvoid (csAPIENTRY* csGLTEXTURECOLORMASKSGIS) (GLboolean r, GLboolean g,
 #endif
 
 
+/** @} */
 
-// GL_SGI_color_table
+/**\name GL_SGI_color_matrix functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGI/color_matrix.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGI/color_matrix.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_SGI_color_table constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGI/color_table.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGI/color_table.txt</a>.
+ * @{ */
 #ifndef GL_COLOR_TABLE_SGI
 #define GL_COLOR_TABLE_SGI                                            32976
 #endif
@@ -6221,6 +7203,11 @@ typedef GLvoid (csAPIENTRY* csGLTEXTURECOLORMASKSGIS) (GLboolean r, GLboolean g,
 #endif
 
 
+/** @} */
+
+/**\name GL_SGI_color_table functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGI/color_table.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGI/color_table.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLCOLORTABLESGI) (GLenum target, GLenum internalformat, GLsizei width, GLenum format, GLenum type, const GLvoid* table);
 typedef GLvoid (csAPIENTRY* csGLCOPYCOLORTABLESGI) (GLenum target, GLenum internalformat, GLint x, GLint y, GLsizei width);
 typedef GLvoid (csAPIENTRY* csGLCOLORTABLEPARAMETERIVSGI) (GLenum target, GLenum pname, const GLint* params);
@@ -6229,7 +7216,10 @@ typedef GLvoid (csAPIENTRY* csGLGETCOLORTABLESGI) (GLenum target, GLenum format,
 typedef GLvoid (csAPIENTRY* csGLGETCOLORTABLEPARAMETERIVSGI) (GLenum target, GLenum pname, GLint* params);
 typedef GLvoid (csAPIENTRY* csGLGETCOLORTABLEPARAMETERFVSGI) (GLenum target, GLenum pname, GLfloat* params);
 
-// GL_SGI_texture_color_table
+/** @} */
+/**\name GL_SGI_texture_color_table constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGI/texture_color_table.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGI/texture_color_table.txt</a>.
+ * @{ */
 #ifndef GL_TEXTURE_COLOR_TABLE_SGI
 #define GL_TEXTURE_COLOR_TABLE_SGI                                    32956
 #endif
@@ -6239,9 +7229,22 @@ typedef GLvoid (csAPIENTRY* csGLGETCOLORTABLEPARAMETERFVSGI) (GLenum target, GLe
 #endif
 
 
+/** @} */
 
-// GL_SUN_vertex
+/**\name GL_SGI_texture_color_table functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGI/texture_color_table.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGI/texture_color_table.txt</a>.
+ * @{ */
 
+/** @} */
+/**\name GL_SUN_vertex constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SUN/vertex.txt">http://oss.sgi.com/projects/ogl-sample/registry/SUN/vertex.txt</a>.
+ * @{ */
+
+/** @} */
+
+/**\name GL_SUN_vertex functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SUN/vertex.txt">http://oss.sgi.com/projects/ogl-sample/registry/SUN/vertex.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLCOLOR4UBVERTEX2FSUN) (GLubyte r, GLubyte g, GLubyte b, GLubyte a, GLfloat x, GLfloat y);
 typedef GLvoid (csAPIENTRY* csGLCOLOR4UBVERTEX2FVSUN) (const GLubyte* c, const GLfloat* v);
 typedef GLvoid (csAPIENTRY* csGLCOLOR4UBVERTEX3FSUN) (GLubyte r, GLubyte g, GLubyte b, GLubyte a, GLfloat x, GLfloat y, GLfloat z);
@@ -6283,7 +7286,10 @@ typedef GLvoid (csAPIENTRY* csGLREPLACEMENTCODEUITEXCOORD2FNORMAL3FVERTEX3FVSUN)
 typedef GLvoid (csAPIENTRY* csGLREPLACEMENTCODEUITEXCOORD2FCOLOR4FNORMAL3FVERTEX3FSUN) (GLuint rc, GLfloat s, GLfloat t, GLfloat r, GLfloat g, GLfloat b, GLfloat a, GLfloat nx, GLfloat ny, GLfloat nz, GLfloat x, GLfloat y, GLfloat z);
 typedef GLvoid (csAPIENTRY* csGLREPLACEMENTCODEUITEXCOORD2FCOLOR4FNORMAL3FVERTEX3FVSUN) (const GLuint* rc, const GLfloat* tc, const GLfloat* c, const GLfloat* n, const GLfloat* v);
 
-// GL_ARB_fragment_program
+/** @} */
+/**\name GL_ARB_fragment_program constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/fragment_program.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/fragment_program.txt</a>.
+ * @{ */
 #ifndef GL_FRAGMENT_PROGRAM_ARB
 #define GL_FRAGMENT_PROGRAM_ARB                                       34820
 #endif
@@ -6597,22 +7603,46 @@ typedef GLvoid (csAPIENTRY* csGLREPLACEMENTCODEUITEXCOORD2FCOLOR4FNORMAL3FVERTEX
 #endif
 
 
+/** @} */
 
-// GL_ATI_text_fragment_shader
+/**\name GL_ARB_fragment_program functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/fragment_program.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/fragment_program.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_ATI_text_fragment_shader constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/text_fragment_shader.txt">http://oss.sgi.com/projects/ogl-sample/registry/ATI/text_fragment_shader.txt</a>.
+ * @{ */
 #ifndef GL_TEXT_FRAGMENT_SHADER_ATI
 #define GL_TEXT_FRAGMENT_SHADER_ATI                                   33280
 #endif
 
 
+/** @} */
 
-// GL_APPLE_client_storage
+/**\name GL_ATI_text_fragment_shader functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/text_fragment_shader.txt">http://oss.sgi.com/projects/ogl-sample/registry/ATI/text_fragment_shader.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_APPLE_client_storage constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/APPLE/client_storage.txt">http://oss.sgi.com/projects/ogl-sample/registry/APPLE/client_storage.txt</a>.
+ * @{ */
 #ifndef GL_UNPACK_CLIENT_STORAGE_APPLE
 #define GL_UNPACK_CLIENT_STORAGE_APPLE                                34226
 #endif
 
 
+/** @} */
 
-// GL_APPLE_element_array
+/**\name GL_APPLE_client_storage functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/APPLE/client_storage.txt">http://oss.sgi.com/projects/ogl-sample/registry/APPLE/client_storage.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_APPLE_element_array constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/APPLE/element_array.txt">http://oss.sgi.com/projects/ogl-sample/registry/APPLE/element_array.txt</a>.
+ * @{ */
 #ifndef GL_ELEMENT_ARRAY_APPLE
 #define GL_ELEMENT_ARRAY_APPLE                                        34664
 #endif
@@ -6626,13 +7656,21 @@ typedef GLvoid (csAPIENTRY* csGLREPLACEMENTCODEUITEXCOORD2FCOLOR4FNORMAL3FVERTEX
 #endif
 
 
+/** @} */
+
+/**\name GL_APPLE_element_array functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/APPLE/element_array.txt">http://oss.sgi.com/projects/ogl-sample/registry/APPLE/element_array.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLELEMENTPOINTERAPPLE) (GLenum type, const GLvoid* pointer);
 typedef GLvoid (csAPIENTRY* csGLDRAWELEMENTARRAYAPPLE) (GLenum mode, GLint first, GLsizei count);
 typedef GLvoid (csAPIENTRY* csGLDRAWRANGEELEMENTARRAYAPPLE) (GLenum mode, GLuint start, GLuint end, GLint first, GLsizei count);
 typedef GLvoid (csAPIENTRY* csGLMULTIDRAWELEMENTARRAYAPPLE) (GLenum mode, const GLint* first, const GLsizei* count, GLsizei primcount);
 typedef GLvoid (csAPIENTRY* csGLMULTIDRAWRANGEELEMENTARRAYAPPLE) (GLenum mode, GLuint start, GLuint end, const GLint* first, const GLsizei* count, GLsizei primcount);
 
-// GL_APPLE_fence
+/** @} */
+/**\name GL_APPLE_fence constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/APPLE/fence.txt">http://oss.sgi.com/projects/ogl-sample/registry/APPLE/fence.txt</a>.
+ * @{ */
 #ifndef GL_DRAW_PIXELS_APPLE
 #define GL_DRAW_PIXELS_APPLE                                          35338
 #endif
@@ -6642,6 +7680,11 @@ typedef GLvoid (csAPIENTRY* csGLMULTIDRAWRANGEELEMENTARRAYAPPLE) (GLenum mode, G
 #endif
 
 
+/** @} */
+
+/**\name GL_APPLE_fence functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/APPLE/fence.txt">http://oss.sgi.com/projects/ogl-sample/registry/APPLE/fence.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLGENFENCESAPPLE) (GLsizei n, GLuint* fences);
 typedef GLvoid (csAPIENTRY* csGLDELETEFENCESAPPLE) (GLsizei n, const GLuint* fences);
 typedef GLvoid (csAPIENTRY* csGLSETFENCEAPPLE) (GLuint fence);
@@ -6651,18 +7694,29 @@ typedef GLvoid (csAPIENTRY* csGLFINISHFENCEAPPLE) (GLuint fence);
 typedef GLboolean (csAPIENTRY* csGLTESTOBJECTAPPLE) (GLenum object, GLuint name);
 typedef GLvoid (csAPIENTRY* csGLFINISHOBJECTAPPLE) (GLenum object, GLint name);
 
-// GL_APPLE_vertex_array_object
+/** @} */
+/**\name GL_APPLE_vertex_array_object constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/APPLE/vertex_array_object.txt">http://oss.sgi.com/projects/ogl-sample/registry/APPLE/vertex_array_object.txt</a>.
+ * @{ */
 #ifndef GL_VERTEX_ARRAY_BINDING_APPLE
 #define GL_VERTEX_ARRAY_BINDING_APPLE                                 34229
 #endif
 
 
+/** @} */
+
+/**\name GL_APPLE_vertex_array_object functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/APPLE/vertex_array_object.txt">http://oss.sgi.com/projects/ogl-sample/registry/APPLE/vertex_array_object.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLBINDVERTEXARRAYAPPLE) (GLuint array);
 typedef GLvoid (csAPIENTRY* csGLDELETEVERTEXARRAYSAPPLE) (GLsizei n, const GLuint* arrays);
 typedef GLvoid (csAPIENTRY* csGLGENVERTEXARRAYSAPPLE) (GLsizei n, const GLuint* arrays);
 typedef GLboolean (csAPIENTRY* csGLISVERTEXARRAYAPPLE) (GLuint array);
 
-// GL_APPLE_vertex_array_range
+/** @} */
+/**\name GL_APPLE_vertex_array_range constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/APPLE/vertex_array_range.txt">http://oss.sgi.com/projects/ogl-sample/registry/APPLE/vertex_array_range.txt</a>.
+ * @{ */
 #ifndef GL_VERTEX_ARRAY_RANGE_APPLE
 #define GL_VERTEX_ARRAY_RANGE_APPLE                                   34077
 #endif
@@ -6692,12 +7746,20 @@ typedef GLboolean (csAPIENTRY* csGLISVERTEXARRAYAPPLE) (GLuint array);
 #endif
 
 
+/** @} */
+
+/**\name GL_APPLE_vertex_array_range functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/APPLE/vertex_array_range.txt">http://oss.sgi.com/projects/ogl-sample/registry/APPLE/vertex_array_range.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLVERTEXARRAYRANGEAPPLE) (GLsizei length, GLvoid* pointer);
 typedef GLvoid (csAPIENTRY* csGLFLUSHVERTEXARRAYRANGEAPPLE) (GLsizei length, GLvoid* pointer);
 typedef GLvoid (csAPIENTRY* csGLVERTEXARRAYPARAMETERIAPPLE) (GLenum pname, GLint param);
 
-// WGL_ARB_pixel_format
+/** @} */
 #ifdef _WIN32
+/**\name WGL_ARB_pixel_format constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_pixel_format.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_pixel_format.txt</a>.
+ * @{ */
 #ifndef WGL_NUMBER_PIXEL_FORMATS_ARB
 #define WGL_NUMBER_PIXEL_FORMATS_ARB                                   8192
 #endif
@@ -6895,14 +7957,22 @@ typedef GLvoid (csAPIENTRY* csGLVERTEXARRAYPARAMETERIAPPLE) (GLenum pname, GLint
 #endif
 
 
+/** @} */
+
+/**\name WGL_ARB_pixel_format functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_pixel_format.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_pixel_format.txt</a>.
+ * @{ */
 typedef BOOL (csAPIENTRY* csWGLGETPIXELFORMATATTRIBIVARB) (HDC hdc, GLint iPixelFormat, GLint iLayerPlane, GLuint nAttributes, const GLint* piAttributes, GLint* piValues);
 typedef BOOL (csAPIENTRY* csWGLGETPIXELFORMATATTRIBFVARB) (HDC hdc, GLint iPixelFormat, GLint iLayerPlane, GLuint nAttributes, const GLint* piAttributes, GLfloat* pfValues);
 typedef BOOL (csAPIENTRY* csWGLCHOOSEPIXELFORMATARB) (HDC hdc, const GLint* piAttribIList, const GLfloat* pfAttribFList, GLuint nMaxFormats, GLint* piFormats, GLuint* nNumFormats);
 
+/** @} */
 #endif
 
-// WGL_ARB_make_current_read
 #ifdef _WIN32
+/**\name WGL_ARB_make_current_read constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_make_current_read.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_make_current_read.txt</a>.
+ * @{ */
 #ifndef WGL_ERROR_INVALID_PIXEL_TYPE_ARB
 #define WGL_ERROR_INVALID_PIXEL_TYPE_ARB                               8259
 #endif
@@ -6912,13 +7982,21 @@ typedef BOOL (csAPIENTRY* csWGLCHOOSEPIXELFORMATARB) (HDC hdc, const GLint* piAt
 #endif
 
 
+/** @} */
+
+/**\name WGL_ARB_make_current_read functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_make_current_read.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_make_current_read.txt</a>.
+ * @{ */
 typedef BOOL (csAPIENTRY* csWGLMAKECONTEXTCURRENTARB) (HDC hDrawDC, HDC hReadDC, HGLRC hglrc);
 typedef HDC (csAPIENTRY* csWGLGETCURRENTREADDCARB) ();
 
+/** @} */
 #endif
 
-// WGL_ARB_pbuffer
 #ifdef _WIN32
+/**\name WGL_ARB_pbuffer constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_pbuffer.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_pbuffer.txt</a>.
+ * @{ */
 #ifndef WGL_DRAW_TO_PBUFFER_ARB
 #define WGL_DRAW_TO_PBUFFER_ARB                                        8237
 #endif
@@ -6956,24 +8034,40 @@ typedef HDC (csAPIENTRY* csWGLGETCURRENTREADDCARB) ();
 #endif
 
 
+/** @} */
+
+/**\name WGL_ARB_pbuffer functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_pbuffer.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_pbuffer.txt</a>.
+ * @{ */
 typedef HANDLE (csAPIENTRY* csWGLCREATEPBUFFERARB) (HDC hDC, GLint iPixelFormat, GLint iWidth, GLint iHeight, const GLint* piAttribList);
 typedef HDC (csAPIENTRY* csWGLGETPBUFFERDCARB) (HANDLE hPbuffer);
 typedef GLint (csAPIENTRY* csWGLRELEASEPBUFFERDCARB) (HANDLE hPbuffer, HDC hDC);
 typedef BOOL (csAPIENTRY* csWGLDESTROYPBUFFERARB) (HANDLE hPbuffer);
 typedef BOOL (csAPIENTRY* csWGLQUERYPBUFFERARB) (HANDLE hPbuffer, GLint iAttribute, GLint* piValue);
 
+/** @} */
 #endif
 
-// WGL_EXT_swap_control
 #ifdef _WIN32
+/**\name WGL_EXT_swap_control constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_swap_control.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_swap_control.txt</a>.
+ * @{ */
 
+/** @} */
+
+/**\name WGL_EXT_swap_control functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_swap_control.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_swap_control.txt</a>.
+ * @{ */
 typedef BOOL (csAPIENTRY* csWGLSWAPINTERVALEXT) (GLint interval);
 typedef GLint (csAPIENTRY* csWGLGETSWAPINTERVALEXT) ();
 
+/** @} */
 #endif
 
-// WGL_ARB_render_texture
 #ifdef _WIN32
+/**\name WGL_ARB_render_texture constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_render_texture.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_render_texture.txt</a>.
+ * @{ */
 #ifndef WGL_BIND_TO_TEXTURE_RGB_ARB
 #define WGL_BIND_TO_TEXTURE_RGB_ARB                                    8304
 #endif
@@ -7111,29 +8205,53 @@ typedef GLint (csAPIENTRY* csWGLGETSWAPINTERVALEXT) ();
 #endif
 
 
+/** @} */
+
+/**\name WGL_ARB_render_texture functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_render_texture.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_render_texture.txt</a>.
+ * @{ */
 typedef BOOL (csAPIENTRY* csWGLBINDTEXIMAGEARB) (HANDLE hPbuffer, GLint iBuffer);
 typedef BOOL (csAPIENTRY* csWGLRELEASETEXIMAGEARB) (HANDLE hPbuffer, GLint iBuffer);
 typedef BOOL (csAPIENTRY* csWGLSETPBUFFERATTRIBARB) (HANDLE hPbuffer, const GLint* piAttribList);
 
+/** @} */
 #endif
 
-// WGL_EXT_extensions_string
 #ifdef _WIN32
+/**\name WGL_EXT_extensions_string constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_extensions_string.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_extensions_string.txt</a>.
+ * @{ */
 
+/** @} */
+
+/**\name WGL_EXT_extensions_string functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_extensions_string.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_extensions_string.txt</a>.
+ * @{ */
 typedef char* (csAPIENTRY* csWGLGETEXTENSIONSSTRINGEXT) ();
 
+/** @} */
 #endif
 
-// WGL_EXT_make_current_read
 #ifdef _WIN32
+/**\name WGL_EXT_make_current_read constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_make_current_read.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_make_current_read.txt</a>.
+ * @{ */
 
+/** @} */
+
+/**\name WGL_EXT_make_current_read functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_make_current_read.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_make_current_read.txt</a>.
+ * @{ */
 typedef BOOL (csAPIENTRY* csWGLMAKECONTEXTCURRENTEXT) (HDC hDrawDC, HDC hReadDC, HGLRC hglrc);
 typedef HDC (csAPIENTRY* csWGLGETCURRENTREADDCEXT) ();
 
+/** @} */
 #endif
 
-// WGL_EXT_pbuffer
 #ifdef _WIN32
+/**\name WGL_EXT_pbuffer constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_pbuffer.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_pbuffer.txt</a>.
+ * @{ */
 #ifndef WGL_DRAW_TO_PBUFFER_EXT
 #define WGL_DRAW_TO_PBUFFER_EXT                                        8237
 #endif
@@ -7171,16 +8289,24 @@ typedef HDC (csAPIENTRY* csWGLGETCURRENTREADDCEXT) ();
 #endif
 
 
+/** @} */
+
+/**\name WGL_EXT_pbuffer functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_pbuffer.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_pbuffer.txt</a>.
+ * @{ */
 typedef HANDLE (csAPIENTRY* csWGLCREATEPBUFFEREXT) (HDC hDC, GLint iPixelFormat, GLint iWidth, GLint iHeight, const GLint* piAttribList);
 typedef HDC (csAPIENTRY* csWGLGETPBUFFERDCEXT) (HANDLE hPbuffer);
 typedef GLint (csAPIENTRY* csWGLRELEASEPBUFFERDCEXT) (HANDLE hPbuffer, HDC hDC);
 typedef BOOL (csAPIENTRY* csWGLDESTROYPBUFFEREXT) (HANDLE hPbuffer);
 typedef BOOL (csAPIENTRY* csWGLQUERYPBUFFEREXT) (HANDLE hPbuffer, GLint iAttribute, GLint* piValue);
 
+/** @} */
 #endif
 
-// WGL_EXT_pixel_format
 #ifdef _WIN32
+/**\name WGL_EXT_pixel_format constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_pixel_format.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_pixel_format.txt</a>.
+ * @{ */
 #ifndef WGL_NUMBER_PIXEL_FORMATS_EXT
 #define WGL_NUMBER_PIXEL_FORMATS_EXT                                   8192
 #endif
@@ -7362,14 +8488,22 @@ typedef BOOL (csAPIENTRY* csWGLQUERYPBUFFEREXT) (HANDLE hPbuffer, GLint iAttribu
 #endif
 
 
+/** @} */
+
+/**\name WGL_EXT_pixel_format functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_pixel_format.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_pixel_format.txt</a>.
+ * @{ */
 typedef BOOL (csAPIENTRY* csWGLGETPIXELFORMATATTRIBIVEXT) (HDC hdc, GLint iPixelFormat, GLint iLayerPlane, GLuint nAttributes, GLint* piAttributes, GLint* piValues);
 typedef BOOL (csAPIENTRY* csWGLGETPIXELFORMATATTRIBFVEXT) (HDC hdc, GLint iPixelFormat, GLint iLayerPlane, GLuint nAttributes, GLint* piAttributes, GLfloat* pfValues);
 typedef BOOL (csAPIENTRY* csWGLCHOOSEPIXELFORMATEXT) (HDC hdc, const GLint* piAttribIList, const GLfloat* pfAttribFList, GLuint nMaxFormats, GLint* piFormats, GLuint* nNumFormats);
 
+/** @} */
 #endif
 
-// WGL_I3D_digital_video_control
 #ifdef _WIN32
+/**\name WGL_I3D_digital_video_control constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_digital_video_control.txt">http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_digital_video_control.txt</a>.
+ * @{ */
 #ifndef WGL_DIGITAL_VIDEO_CURSOR_ALPHA_FRAMEBUFFER_I3D
 #define WGL_DIGITAL_VIDEO_CURSOR_ALPHA_FRAMEBUFFER_I3D                 8272
 #endif
@@ -7387,13 +8521,21 @@ typedef BOOL (csAPIENTRY* csWGLCHOOSEPIXELFORMATEXT) (HDC hdc, const GLint* piAt
 #endif
 
 
+/** @} */
+
+/**\name WGL_I3D_digital_video_control functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_digital_video_control.txt">http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_digital_video_control.txt</a>.
+ * @{ */
 typedef BOOL (csAPIENTRY* csWGLGETDIGITALVIDEOPARAMETERSI3D) (HDC hDC, GLint iAttribute, GLint* piValue);
 typedef BOOL (csAPIENTRY* csWGLSETDIGITALVIDEOPARAMETERSI3D) (HDC hDC, GLint iAttribute, const GLint* piValue);
 
+/** @} */
 #endif
 
-// WGL_I3D_gamma
 #ifdef _WIN32
+/**\name WGL_I3D_gamma constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_gamma.txt">http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_gamma.txt</a>.
+ * @{ */
 #ifndef WGL_GAMMA_TABLE_SIZE_I3D
 #define WGL_GAMMA_TABLE_SIZE_I3D                                       8270
 #endif
@@ -7407,15 +8549,23 @@ typedef BOOL (csAPIENTRY* csWGLSETDIGITALVIDEOPARAMETERSI3D) (HDC hDC, GLint iAt
 #endif
 
 
+/** @} */
+
+/**\name WGL_I3D_gamma functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_gamma.txt">http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_gamma.txt</a>.
+ * @{ */
 typedef BOOL (csAPIENTRY* csWGLGETGAMMATABLEPARAMETERSI3D) (HDC hDC, GLint iAttribute, GLint* piValue);
 typedef BOOL (csAPIENTRY* csWGLSETGAMMATABLEPARAMETERSI3D) (HDC hDC, GLint iAttribute, const GLint* piValue);
 typedef BOOL (csAPIENTRY* csWGLGETGAMMATABLEI3D) (HDC hDC, GLint iEntries, GLushort* puRed, GLushort* puGreen, GLushort* puBlue);
 typedef BOOL (csAPIENTRY* csWGLSETGAMMATABLEI3D) (HDC hDC, GLint iEntries, const GLushort* puRed, const GLushort* puGreen, const GLushort* puBlue);
 
+/** @} */
 #endif
 
-// WGL_I3D_genlock
 #ifdef _WIN32
+/**\name WGL_I3D_genlock constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_genlock.txt">http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_genlock.txt</a>.
+ * @{ */
 #ifndef WGL_GENLOCK_SOURCE_MULTIVIEW_I3D
 #define WGL_GENLOCK_SOURCE_MULTIVIEW_I3D                               8260
 #endif
@@ -7453,6 +8603,11 @@ typedef BOOL (csAPIENTRY* csWGLSETGAMMATABLEI3D) (HDC hDC, GLint iEntries, const
 #endif
 
 
+/** @} */
+
+/**\name WGL_I3D_genlock functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_genlock.txt">http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_genlock.txt</a>.
+ * @{ */
 typedef BOOL (csAPIENTRY* csWGLENABLEGENLOCKI3D) (HDC hDC);
 typedef BOOL (csAPIENTRY* csWGLDISABLEGENLOCKI3D) (HDC hDC);
 typedef BOOL (csAPIENTRY* csWGLISENABLEDGENLOCKI3D) (HDC hDC, BOOL* pFlag);
@@ -7466,9 +8621,12 @@ typedef BOOL (csAPIENTRY* csWGLGENLOCKSOURCEDELAYI3D) (HDC hDC, GLuint uDelay);
 typedef BOOL (csAPIENTRY* csWGLGETGENLOCKSOURCEDELAYI3D) (HDC hDC, GLuint* uDelay);
 typedef BOOL (csAPIENTRY* csWGLQUERYGENLOCKMAXSOURCEDELAYI3D) (HDC hDC, GLuint* uMaxLineDelay, GLuint* uMaxPixelDelay);
 
+/** @} */
 #endif
 
-// GL_ARB_matrix_palette
+/**\name GL_ARB_matrix_palette constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/matrix_palette.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/matrix_palette.txt</a>.
+ * @{ */
 #ifndef GL_MATRIX_PALETTE_ARB
 #define GL_MATRIX_PALETTE_ARB                                         34880
 #endif
@@ -7510,13 +8668,21 @@ typedef BOOL (csAPIENTRY* csWGLQUERYGENLOCKMAXSOURCEDELAYI3D) (HDC hDC, GLuint* 
 #endif
 
 
+/** @} */
+
+/**\name GL_ARB_matrix_palette functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/matrix_palette.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/matrix_palette.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLCURRENTPALETTEMATRIXARB) (GLint index);
 typedef GLvoid (csAPIENTRY* csGLMATRIXINDEXUBVARB) (GLint size, GLubyte* indices);
 typedef GLvoid (csAPIENTRY* csGLMATRIXINDEXUSVARB) (GLint size, GLushort* indices);
 typedef GLvoid (csAPIENTRY* csGLMATRIXINDEXUIVARB) (GLint size, GLuint* indices);
 typedef GLvoid (csAPIENTRY* csGLMATRIXINDEXPOINTERARB) (GLint size, GLenum type, GLsizei stride, GLvoid* pointer);
 
-// GL_NV_element_array
+/** @} */
+/**\name GL_NV_element_array constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/element_array.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/element_array.txt</a>.
+ * @{ */
 #ifndef GL_ELEMENT_ARRAY_TYPE_NV
 #define GL_ELEMENT_ARRAY_TYPE_NV                                      34665
 #endif
@@ -7526,13 +8692,21 @@ typedef GLvoid (csAPIENTRY* csGLMATRIXINDEXPOINTERARB) (GLint size, GLenum type,
 #endif
 
 
+/** @} */
+
+/**\name GL_NV_element_array functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/element_array.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/element_array.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLELEMENTPOINTERNV) (GLenum type, const GLvoid* pointer);
 typedef GLvoid (csAPIENTRY* csGLDRAWELEMENTARRAYNV) (GLenum mode, GLint first, GLsizei count);
 typedef GLvoid (csAPIENTRY* csGLDRAWRANGEELEMENTARRAYNV) (GLenum mode, GLuint start, GLuint end, GLint first, GLsizei count);
 typedef GLvoid (csAPIENTRY* csGLMULTIDRAWELEMENTARRAYNV) (GLenum mode, const GLint* first, const GLsizei* count, GLsizei primcount);
 typedef GLvoid (csAPIENTRY* csGLMULTIDRAWRANGEELEMENTARRAYNV) (GLenum mode, GLuint start, GLuint end, const GLint* first, const GLsizei* count, GLsizei primcount);
 
-// GL_NV_float_buffer
+/** @} */
+/**\name GL_NV_float_buffer constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/float_buffer.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/float_buffer.txt</a>.
+ * @{ */
 #ifndef GL_FLOAT_R_NV
 #define GL_FLOAT_R_NV                                                 34944
 #endif
@@ -7630,8 +8804,16 @@ typedef GLvoid (csAPIENTRY* csGLMULTIDRAWRANGEELEMENTARRAYNV) (GLenum mode, GLui
 #endif
 
 
+/** @} */
 
-// GL_NV_fragment_program
+/**\name GL_NV_float_buffer functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/float_buffer.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/float_buffer.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_NV_fragment_program constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/fragment_program.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/fragment_program.txt</a>.
+ * @{ */
 #ifndef GL_FRAGMENT_PROGRAM_NV
 #define GL_FRAGMENT_PROGRAM_NV                                        34928
 #endif
@@ -7657,12 +8839,20 @@ typedef GLvoid (csAPIENTRY* csGLMULTIDRAWRANGEELEMENTARRAYNV) (GLenum mode, GLui
 #endif
 
 
+/** @} */
+
+/**\name GL_NV_fragment_program functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/fragment_program.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/fragment_program.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLPROGRAMNAMEDPARAMETER4FNV) (GLuint id, GLsizei len, const GLubyte* name, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
 typedef GLvoid (csAPIENTRY* csGLPROGRAMNAMEDPARAMETER4DNV) (GLuint id, GLsizei len, const GLubyte* name, GLdouble x, GLdouble y, GLdouble z, GLdouble w);
 typedef GLvoid (csAPIENTRY* csGLGETPROGRAMNAMEDPARAMETERFVNV) (GLuint id, GLsizei len, const GLubyte* name, GLfloat* params);
 typedef GLvoid (csAPIENTRY* csGLGETPROGRAMNAMEDPARAMETERDVNV) (GLuint id, GLsizei len, const GLubyte* name, GLdouble* params);
 
-// GL_NV_primitive_restart
+/** @} */
+/**\name GL_NV_primitive_restart constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/primitive_restart.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/primitive_restart.txt</a>.
+ * @{ */
 #ifndef GL_PRIMITIVE_RESTART_NV
 #define GL_PRIMITIVE_RESTART_NV                                       34136
 #endif
@@ -7672,13 +8862,29 @@ typedef GLvoid (csAPIENTRY* csGLGETPROGRAMNAMEDPARAMETERDVNV) (GLuint id, GLsize
 #endif
 
 
+/** @} */
+
+/**\name GL_NV_primitive_restart functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/primitive_restart.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/primitive_restart.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLPRIMITIVERESTARTNV) ();
 typedef GLvoid (csAPIENTRY* csGLPRIMITIVERESTARTINDEXNV) (GLuint index);
 
-// GL_NV_vertex_program2
+/** @} */
+/**\name GL_NV_vertex_program2 constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_program2.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_program2.txt</a>.
+ * @{ */
 
+/** @} */
 
-// GL_ARB_vertex_buffer_object
+/**\name GL_NV_vertex_program2 functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_program2.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_program2.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_ARB_vertex_buffer_object constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_buffer_object.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_buffer_object.txt</a>.
+ * @{ */
 #ifndef GL_ARRAY_BUFFER_ARB
 #define GL_ARRAY_BUFFER_ARB                                           34962
 #endif
@@ -7804,6 +9010,11 @@ typedef GLvoid (csAPIENTRY* csGLPRIMITIVERESTARTINDEXNV) (GLuint index);
 #endif
 
 
+/** @} */
+
+/**\name GL_ARB_vertex_buffer_object functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_buffer_object.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_buffer_object.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLBINDBUFFERARB) (GLenum target, GLuint buffer);
 typedef GLvoid (csAPIENTRY* csGLDELETEBUFFERSARB) (GLsizei n, const GLuint* buffers);
 typedef GLvoid (csAPIENTRY* csGLGENBUFFERSARB) (GLsizei n, GLuint* buffers);
@@ -7816,7 +9027,10 @@ typedef GLvoid (csAPIENTRY* csGLGETBUFFERSUBDATAARB) (GLenum target, GLsizei off
 typedef GLvoid (csAPIENTRY* csGLGETBUFFERPOINTERVARB) (GLenum target, GLenum pname, GLvoid** params);
 typedef GLvoid (csAPIENTRY* csGLGETBUFFERPARAMETERIVARB) (GLenum target, GLenum pname, GLint* params);
 
-// GL_ATI_separate_stencil
+/** @} */
+/**\name GL_ATI_separate_stencil constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/separate_stencil.txt">http://oss.sgi.com/projects/ogl-sample/registry/ATI/separate_stencil.txt</a>.
+ * @{ */
 #ifndef GL_STENCIL_BACK_FUNC_ATI
 #define GL_STENCIL_BACK_FUNC_ATI                                     0x8800
 #endif
@@ -7834,13 +9048,29 @@ typedef GLvoid (csAPIENTRY* csGLGETBUFFERPARAMETERIVARB) (GLenum target, GLenum 
 #endif
 
 
+/** @} */
+
+/**\name GL_ATI_separate_stencil functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/separate_stencil.txt">http://oss.sgi.com/projects/ogl-sample/registry/ATI/separate_stencil.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLSTENCILOPSEPARATEATI) (GLenum face, GLenum sfail, GLenum dpfail, GLenum dppass);
 typedef GLvoid (csAPIENTRY* csGLSTENCILFUNCSEPARATEATI) (GLenum frontfunc, GLenum backfunc, GLint ref, GLuint mask);
 
-// GL_ARB_texture_non_power_of_two
+/** @} */
+/**\name GL_ARB_texture_non_power_of_two constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_non_power_of_two.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_non_power_of_two.txt</a>.
+ * @{ */
 
+/** @} */
 
-// GL_ARB_point_sprite
+/**\name GL_ARB_texture_non_power_of_two functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_non_power_of_two.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_non_power_of_two.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_ARB_point_sprite constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/point_sprite.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/point_sprite.txt</a>.
+ * @{ */
 #ifndef GL_POINT_SPRITE_ARB
 #define GL_POINT_SPRITE_ARB                                          0x8861
 #endif
@@ -7850,11 +9080,27 @@ typedef GLvoid (csAPIENTRY* csGLSTENCILFUNCSEPARATEATI) (GLenum frontfunc, GLenu
 #endif
 
 
+/** @} */
 
-// GL_ARB_shading_language_100
+/**\name GL_ARB_point_sprite functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/point_sprite.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/point_sprite.txt</a>.
+ * @{ */
 
+/** @} */
+/**\name GL_ARB_shading_language_100 constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/shading_language_100.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/shading_language_100.txt</a>.
+ * @{ */
 
-// GL_ARB_shader_objects
+/** @} */
+
+/**\name GL_ARB_shading_language_100 functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/shading_language_100.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/shading_language_100.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_ARB_shader_objects constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/shader_objects.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/shader_objects.txt</a>.
+ * @{ */
 #ifndef GL_PROGRAM_OBJECT_ARB
 #define GL_PROGRAM_OBJECT_ARB                                        0x8B40
 #endif
@@ -7960,6 +9206,11 @@ typedef GLvoid (csAPIENTRY* csGLSTENCILFUNCSEPARATEATI) (GLenum frontfunc, GLenu
 #endif
 
 
+/** @} */
+
+/**\name GL_ARB_shader_objects functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/shader_objects.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/shader_objects.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLDELETEOBJECTARB) (GLhandleARB obj);
 typedef GLhandleARB (csAPIENTRY* csGLGETHANDLEARB) (GLenum pname);
 typedef GLvoid (csAPIENTRY* csGLDETACHOBJECTARB) (GLhandleARB containerObj, GLhandleARB attachedObj);
@@ -8000,7 +9251,10 @@ typedef GLint (csAPIENTRY* csGLGETUNIFORMFVARB) (GLhandleARB programObj, GLint l
 typedef GLint (csAPIENTRY* csGLGETUNIFORMIVARB) (GLhandleARB programObj, GLint location, GLint* params);
 typedef GLvoid (csAPIENTRY* csGLGETSHADERSOURCEARB) (GLhandleARB obj, GLsizei maxLength, GLsizei* length, GLcharARB* source);
 
-// GL_ARB_fragment_shader
+/** @} */
+/**\name GL_ARB_fragment_shader constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/fragment_shader.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/fragment_shader.txt</a>.
+ * @{ */
 #ifndef GL_FRAGMENT_SHADER_ARB
 #define GL_FRAGMENT_SHADER_ARB                                       0x8B30
 #endif
@@ -8030,8 +9284,16 @@ typedef GLvoid (csAPIENTRY* csGLGETSHADERSOURCEARB) (GLhandleARB obj, GLsizei ma
 #endif
 
 
+/** @} */
 
-// GL_ARB_vertex_shader
+/**\name GL_ARB_fragment_shader functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/fragment_shader.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/fragment_shader.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_ARB_vertex_shader constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_shader.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_shader.txt</a>.
+ * @{ */
 #ifndef GL_VERTEX_SHADER_ARB
 #define GL_VERTEX_SHADER_ARB                                         0x8B31
 #endif
@@ -8145,11 +9407,19 @@ typedef GLvoid (csAPIENTRY* csGLGETSHADERSOURCEARB) (GLhandleARB obj, GLsizei ma
 #endif
 
 
+/** @} */
+
+/**\name GL_ARB_vertex_shader functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_shader.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_shader.txt</a>.
+ * @{ */
 typedef GLvoid (csAPIENTRY* csGLBINDATTRIBLOCATIONARB) (GLhandleARB programObj, GLuint index, const GLcharARB* name);
 typedef GLvoid (csAPIENTRY* csGLGETACTIVEATTRIBARB) (GLhandleARB programObj, GLuint index, GLsizei maxLength, GLsizei* length, GLint* size, GLenum* type, GLcharARB* name);
 typedef GLint (csAPIENTRY* csGLGETATTRIBLOCATIONARB) (GLhandleARB programObj, const GLcharARB* name);
 
-// GL_ARB_pixel_buffer_object
+/** @} */
+/**\name GL_ARB_pixel_buffer_object constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/pixel_buffer_object.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/pixel_buffer_object.txt</a>.
+ * @{ */
 #ifndef GL_PIXEL_PACK_BUFFER_ARB
 #define GL_PIXEL_PACK_BUFFER_ARB                                     0x88EB
 #endif
@@ -8167,8 +9437,16 @@ typedef GLint (csAPIENTRY* csGLGETATTRIBLOCATIONARB) (GLhandleARB programObj, co
 #endif
 
 
+/** @} */
 
-// GL_ARB_texture_rectangle
+/**\name GL_ARB_pixel_buffer_object functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/pixel_buffer_object.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/pixel_buffer_object.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_ARB_texture_rectangle constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_rectangle.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_rectangle.txt</a>.
+ * @{ */
 #ifndef GL_TEXTURE_RECTANGLE_ARB
 #define GL_TEXTURE_RECTANGLE_ARB                                     0x84F5
 #endif
@@ -8186,7 +9464,13 @@ typedef GLint (csAPIENTRY* csGLGETATTRIBLOCATIONARB) (GLhandleARB programObj, co
 #endif
 
 
+/** @} */
 
+/**\name GL_ARB_texture_rectangle functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_rectangle.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_rectangle.txt</a>.
+ * @{ */
+
+/** @} */
 
 
 // end of definitions
@@ -8224,10 +9508,14 @@ typedef GLint (csAPIENTRY* csGLGETATTRIBLOCATIONARB) (GLhandleARB programObj, co
         Report (msgExtInitFail, exttype, ext); \
       } 
 
+/// Struct containing all GL extension functions.
 struct csGLExtensionFunctions
 {
 public:
-  // GL_version_1_2
+  /**\name GL_version_1_2 functions
+   * This is not a real OpenGL extension. The OpenGL canvases will 'initialize'
+   * this extension when teh appropriate GL version was detected. 
+   * @{ */
   #ifndef GLDRAWRANGEELEMENTS_DECL
   #define GLDRAWRANGEELEMENTS_DECL
   csGLDRAWRANGEELEMENTS glDrawRangeElements;
@@ -8249,7 +9537,11 @@ public:
   #endif
 
 
-  // GL_version_1_3
+  /** @} */
+  /**\name GL_version_1_3 functions
+   * This is not a real OpenGL extension. The OpenGL canvases will 'initialize'
+   * this extension when teh appropriate GL version was detected. 
+   * @{ */
   #ifndef GLACTIVETEXTURE_DECL
   #define GLACTIVETEXTURE_DECL
   csGLACTIVETEXTURE glActiveTexture;
@@ -8481,7 +9773,10 @@ public:
   #endif
 
 
-  // GL_ARB_imaging
+  /** @} */
+  /**\name GL_ARB_imaging functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/imaging.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/imaging.txt</a>.
+   * @{ */
   #ifndef GLCOLORTABLE_DECL
   #define GLCOLORTABLE_DECL
   csGLCOLORTABLE glColorTable;
@@ -8653,7 +9948,10 @@ public:
   #endif
 
 
-  // GL_ARB_multitexture
+  /** @} */
+  /**\name GL_ARB_multitexture functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/multitexture.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/multitexture.txt</a>.
+   * @{ */
   #ifndef GLACTIVETEXTUREARB_DECL
   #define GLACTIVETEXTUREARB_DECL
   csGLACTIVETEXTUREARB glActiveTextureARB;
@@ -8825,7 +10123,10 @@ public:
   #endif
 
 
-  // GL_ARB_transpose_matrix
+  /** @} */
+  /**\name GL_ARB_transpose_matrix functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/transpose_matrix.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/transpose_matrix.txt</a>.
+   * @{ */
   #ifndef GLLOADTRANSPOSEMATRIXFARB_DECL
   #define GLLOADTRANSPOSEMATRIXFARB_DECL
   csGLLOADTRANSPOSEMATRIXFARB glLoadTransposeMatrixfARB;
@@ -8847,27 +10148,39 @@ public:
   #endif
 
 
-  // GL_ARB_multisample
+  /** @} */
+  /**\name GL_ARB_multisample functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/multisample.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/multisample.txt</a>.
+   * @{ */
   #ifndef GLSAMPLECOVERAGEARB_DECL
   #define GLSAMPLECOVERAGEARB_DECL
   csGLSAMPLECOVERAGEARB glSampleCoverageARB;
   #endif
 
 
-  // GL_ARB_texture_env_add
+  /** @} */
+  /**\name GL_ARB_texture_env_add functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_env_add.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_env_add.txt</a>.
+   * @{ */
 
-  // WGL_ARB_extensions_string
+  /** @} */
 #ifdef _WIN32
+  /**\name WGL_ARB_extensions_string functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_extensions_string.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_extensions_string.txt</a>.
+   * @{ */
   #ifndef WGLGETEXTENSIONSSTRINGARB_DECL
   #define WGLGETEXTENSIONSSTRINGARB_DECL
   csWGLGETEXTENSIONSSTRINGARB wglGetExtensionsStringARB;
   #endif
 
 
+  /** @} */
 #endif // _WIN32
 
-  // WGL_ARB_buffer_region
 #ifdef _WIN32
+  /**\name WGL_ARB_buffer_region functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_buffer_region.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_buffer_region.txt</a>.
+   * @{ */
   #ifndef WGLCREATEBUFFERREGIONARB_DECL
   #define WGLCREATEBUFFERREGIONARB_DECL
   csWGLCREATEBUFFERREGIONARB wglCreateBufferRegionARB;
@@ -8889,13 +10202,22 @@ public:
   #endif
 
 
+  /** @} */
 #endif // _WIN32
 
-  // GL_ARB_texture_cube_map
+  /**\name GL_ARB_texture_cube_map functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_cube_map.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_cube_map.txt</a>.
+   * @{ */
 
-  // GL_ARB_depth_texture
+  /** @} */
+  /**\name GL_ARB_depth_texture functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/depth_texture.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/depth_texture.txt</a>.
+   * @{ */
 
-  // GL_ARB_point_parameters
+  /** @} */
+  /**\name GL_ARB_point_parameters functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/point_parameters.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/point_parameters.txt</a>.
+   * @{ */
   #ifndef GLPOINTPARAMETERFARB_DECL
   #define GLPOINTPARAMETERFARB_DECL
   csGLPOINTPARAMETERFARB glPointParameterfARB;
@@ -8907,13 +10229,25 @@ public:
   #endif
 
 
-  // GL_ARB_shadow
+  /** @} */
+  /**\name GL_ARB_shadow functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/shadow.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/shadow.txt</a>.
+   * @{ */
 
-  // GL_ARB_shadow_ambient
+  /** @} */
+  /**\name GL_ARB_shadow_ambient functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/shadow_ambient.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/shadow_ambient.txt</a>.
+   * @{ */
 
-  // GL_ARB_texture_border_clamp
+  /** @} */
+  /**\name GL_ARB_texture_border_clamp functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_border_clamp.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_border_clamp.txt</a>.
+   * @{ */
 
-  // GL_ARB_texture_compression
+  /** @} */
+  /**\name GL_ARB_texture_compression functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_compression.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_compression.txt</a>.
+   * @{ */
   #ifndef GLCOMPRESSEDTEXIMAGE3DARB_DECL
   #define GLCOMPRESSEDTEXIMAGE3DARB_DECL
   csGLCOMPRESSEDTEXIMAGE3DARB glCompressedTexImage3DARB;
@@ -8950,15 +10284,30 @@ public:
   #endif
 
 
-  // GL_ARB_texture_env_combine
+  /** @} */
+  /**\name GL_ARB_texture_env_combine functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_env_combine.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_env_combine.txt</a>.
+   * @{ */
 
-  // GL_ARB_texture_env_crossbar
+  /** @} */
+  /**\name GL_ARB_texture_env_crossbar functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_env_crossbar.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_env_crossbar.txt</a>.
+   * @{ */
 
-  // GL_ARB_texture_env_dot3
+  /** @} */
+  /**\name GL_ARB_texture_env_dot3 functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_env_dot3.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_env_dot3.txt</a>.
+   * @{ */
 
-  // GL_ARB_texture_mirrored_repeat
+  /** @} */
+  /**\name GL_ARB_texture_mirrored_repeat functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_mirrored_repeat.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_mirrored_repeat.txt</a>.
+   * @{ */
 
-  // GL_ARB_vertex_blend
+  /** @} */
+  /**\name GL_ARB_vertex_blend functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_blend.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_blend.txt</a>.
+   * @{ */
   #ifndef GLWEIGHTBVARB_DECL
   #define GLWEIGHTBVARB_DECL
   csGLWEIGHTBVARB glWeightbvARB;
@@ -9015,7 +10364,10 @@ public:
   #endif
 
 
-  // GL_ARB_vertex_program
+  /** @} */
+  /**\name GL_ARB_vertex_program functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_program.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_program.txt</a>.
+   * @{ */
   #ifndef GLVERTEXATTRIB1SARB_DECL
   #define GLVERTEXATTRIB1SARB_DECL
   csGLVERTEXATTRIB1SARB glVertexAttrib1sARB;
@@ -9327,7 +10679,10 @@ public:
   #endif
 
 
-  // GL_ARB_window_pos
+  /** @} */
+  /**\name GL_ARB_window_pos functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/window_pos.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/window_pos.txt</a>.
+   * @{ */
   #ifndef GLWINDOWPOS2DARB_DECL
   #define GLWINDOWPOS2DARB_DECL
   csGLWINDOWPOS2DARB glWindowPos2dARB;
@@ -9409,40 +10764,70 @@ public:
   #endif
 
 
-  // GL_EXT_422_pixels
+  /** @} */
+  /**\name GL_EXT_422_pixels functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/422_pixels.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/422_pixels.txt</a>.
+   * @{ */
 
-  // GL_EXT_abgr
+  /** @} */
+  /**\name GL_EXT_abgr functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/abgr.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/abgr.txt</a>.
+   * @{ */
 
-  // GL_EXT_bgra
+  /** @} */
+  /**\name GL_EXT_bgra functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/bgra.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/bgra.txt</a>.
+   * @{ */
 
-  // GL_EXT_blend_color
+  /** @} */
+  /**\name GL_EXT_blend_color functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_color.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_color.txt</a>.
+   * @{ */
   #ifndef GLBLENDCOLOREXT_DECL
   #define GLBLENDCOLOREXT_DECL
   csGLBLENDCOLOREXT glBlendColorEXT;
   #endif
 
 
-  // GL_EXT_blend_func_separate
+  /** @} */
+  /**\name GL_EXT_blend_func_separate functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_func_separate.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_func_separate.txt</a>.
+   * @{ */
   #ifndef GLBLENDFUNCSEPARATEEXT_DECL
   #define GLBLENDFUNCSEPARATEEXT_DECL
   csGLBLENDFUNCSEPARATEEXT glBlendFuncSeparateEXT;
   #endif
 
 
-  // GL_EXT_blend_logic_op
+  /** @} */
+  /**\name GL_EXT_blend_logic_op functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_logic_op.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_logic_op.txt</a>.
+   * @{ */
 
-  // GL_EXT_blend_minmax
+  /** @} */
+  /**\name GL_EXT_blend_minmax functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_minmax.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_minmax.txt</a>.
+   * @{ */
   #ifndef GLBLENDEQUATIONEXT_DECL
   #define GLBLENDEQUATIONEXT_DECL
   csGLBLENDEQUATIONEXT glBlendEquationEXT;
   #endif
 
 
-  // GL_EXT_blend_subtract
+  /** @} */
+  /**\name GL_EXT_blend_subtract functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_subtract.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_subtract.txt</a>.
+   * @{ */
 
-  // GL_EXT_clip_volume_hint
+  /** @} */
+  /**\name GL_EXT_clip_volume_hint functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/clip_volume_hint.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/clip_volume_hint.txt</a>.
+   * @{ */
 
-  // GL_EXT_color_subtable
+  /** @} */
+  /**\name GL_EXT_color_subtable functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/color_subtable.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/color_subtable.txt</a>.
+   * @{ */
   #ifndef GLCOLORSUBTABLEEXT_DECL
   #define GLCOLORSUBTABLEEXT_DECL
   csGLCOLORSUBTABLEEXT glColorSubTableEXT;
@@ -9454,7 +10839,10 @@ public:
   #endif
 
 
-  // GL_EXT_compiled_vertex_array
+  /** @} */
+  /**\name GL_EXT_compiled_vertex_array functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/compiled_vertex_array.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/compiled_vertex_array.txt</a>.
+   * @{ */
   #ifndef GLLOCKARRAYSEXT_DECL
   #define GLLOCKARRAYSEXT_DECL
   csGLLOCKARRAYSEXT glLockArraysEXT;
@@ -9466,7 +10854,10 @@ public:
   #endif
 
 
-  // GL_EXT_convolution
+  /** @} */
+  /**\name GL_EXT_convolution functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/convolution.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/convolution.txt</a>.
+   * @{ */
   #ifndef GLCONVOLUTIONFILTER1DEXT_DECL
   #define GLCONVOLUTIONFILTER1DEXT_DECL
   csGLCONVOLUTIONFILTER1DEXT glConvolutionFilter1DEXT;
@@ -9533,7 +10924,10 @@ public:
   #endif
 
 
-  // GL_EXT_fog_coord
+  /** @} */
+  /**\name GL_EXT_fog_coord functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/fog_coord.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/fog_coord.txt</a>.
+   * @{ */
   #ifndef GLFOGCOORDFEXFLOAT_DECL
   #define GLFOGCOORDFEXFLOAT_DECL
   csGLFOGCOORDFEXFLOAT glFogCoordfEXfloat;
@@ -9560,7 +10954,10 @@ public:
   #endif
 
 
-  // GL_EXT_histogram
+  /** @} */
+  /**\name GL_EXT_histogram functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/histogram.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/histogram.txt</a>.
+   * @{ */
   #ifndef GLHISTOGRAMEXT_DECL
   #define GLHISTOGRAMEXT_DECL
   csGLHISTOGRAMEXT glHistogramEXT;
@@ -9612,7 +11009,10 @@ public:
   #endif
 
 
-  // GL_EXT_multi_draw_arrays
+  /** @} */
+  /**\name GL_EXT_multi_draw_arrays functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/multi_draw_arrays.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/multi_draw_arrays.txt</a>.
+   * @{ */
   #ifndef GLMULTIDRAWARRAYSEXT_DECL
   #define GLMULTIDRAWARRAYSEXT_DECL
   csGLMULTIDRAWARRAYSEXT glMultiDrawArraysEXT;
@@ -9624,9 +11024,15 @@ public:
   #endif
 
 
-  // GL_EXT_packed_pixels
+  /** @} */
+  /**\name GL_EXT_packed_pixels functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/packed_pixels.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/packed_pixels.txt</a>.
+   * @{ */
 
-  // GL_EXT_paletted_texture
+  /** @} */
+  /**\name GL_EXT_paletted_texture functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/paletted_texture.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/paletted_texture.txt</a>.
+   * @{ */
   #ifndef GLCOLORTABLEEXT_DECL
   #define GLCOLORTABLEEXT_DECL
   csGLCOLORTABLEEXT glColorTableEXT;
@@ -9648,7 +11054,10 @@ public:
   #endif
 
 
-  // GL_EXT_point_parameters
+  /** @} */
+  /**\name GL_EXT_point_parameters functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/point_parameters.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/point_parameters.txt</a>.
+   * @{ */
   #ifndef GLPOINTPARAMETERFEXT_DECL
   #define GLPOINTPARAMETERFEXT_DECL
   csGLPOINTPARAMETERFEXT glPointParameterfEXT;
@@ -9660,14 +11069,20 @@ public:
   #endif
 
 
-  // GL_EXT_polygon_offset
+  /** @} */
+  /**\name GL_EXT_polygon_offset functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/polygon_offset.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/polygon_offset.txt</a>.
+   * @{ */
   #ifndef GLPOLYGONOFFSETEXT_DECL
   #define GLPOLYGONOFFSETEXT_DECL
   csGLPOLYGONOFFSETEXT glPolygonOffsetEXT;
   #endif
 
 
-  // GL_EXT_secondary_color
+  /** @} */
+  /**\name GL_EXT_secondary_color functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/secondary_color.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/secondary_color.txt</a>.
+   * @{ */
   #ifndef GLSECONDARYCOLOR3BEXT_DECL
   #define GLSECONDARYCOLOR3BEXT_DECL
   csGLSECONDARYCOLOR3BEXT glSecondaryColor3bEXT;
@@ -9754,22 +11169,40 @@ public:
   #endif
 
 
-  // GL_EXT_separate_specular_color
+  /** @} */
+  /**\name GL_EXT_separate_specular_color functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/separate_specular_color.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/separate_specular_color.txt</a>.
+   * @{ */
 
-  // GL_EXT_shadow_funcs
+  /** @} */
+  /**\name GL_EXT_shadow_funcs functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/shadow_funcs.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/shadow_funcs.txt</a>.
+   * @{ */
 
-  // GL_EXT_shared_texture_palette
+  /** @} */
+  /**\name GL_EXT_shared_texture_palette functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/shared_texture_palette.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/shared_texture_palette.txt</a>.
+   * @{ */
 
-  // GL_EXT_stencil_two_side
+  /** @} */
+  /**\name GL_EXT_stencil_two_side functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/stencil_two_side.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/stencil_two_side.txt</a>.
+   * @{ */
   #ifndef GLACTIVESTENCILFACEEXT_DECL
   #define GLACTIVESTENCILFACEEXT_DECL
   csGLACTIVESTENCILFACEEXT glActiveStencilFaceEXT;
   #endif
 
 
-  // GL_EXT_stencil_wrap
+  /** @} */
+  /**\name GL_EXT_stencil_wrap functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/stencil_wrap.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/stencil_wrap.txt</a>.
+   * @{ */
 
-  // GL_EXT_subtexture
+  /** @} */
+  /**\name GL_EXT_subtexture functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/subtexture.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/subtexture.txt</a>.
+   * @{ */
   #ifndef GLTEXSUBIMAGE1DEXT_DECL
   #define GLTEXSUBIMAGE1DEXT_DECL
   csGLTEXSUBIMAGE1DEXT glTexSubImage1DEXT;
@@ -9786,26 +11219,50 @@ public:
   #endif
 
 
-  // GL_EXT_texture3D
+  /** @} */
+  /**\name GL_EXT_texture3D functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture3D.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture3D.txt</a>.
+   * @{ */
   #ifndef GLTEXIMAGE3DEXT_DECL
   #define GLTEXIMAGE3DEXT_DECL
   csGLTEXIMAGE3DEXT glTexImage3DEXT;
   #endif
 
 
-  // GL_EXT_texture_compression_s3tc
+  /** @} */
+  /**\name GL_EXT_texture_compression_s3tc functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_compression_s3tc.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_compression_s3tc.txt</a>.
+   * @{ */
 
-  // GL_EXT_texture_env_add
+  /** @} */
+  /**\name GL_EXT_texture_env_add functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_env_add.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_env_add.txt</a>.
+   * @{ */
 
-  // GL_EXT_texture_env_combine
+  /** @} */
+  /**\name GL_EXT_texture_env_combine functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_env_combine.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_env_combine.txt</a>.
+   * @{ */
 
-  // GL_EXT_texture_env_dot3
+  /** @} */
+  /**\name GL_EXT_texture_env_dot3 functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_env_dot3.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_env_dot3.txt</a>.
+   * @{ */
 
-  // GL_EXT_texture_filter_anisotropic
+  /** @} */
+  /**\name GL_EXT_texture_filter_anisotropic functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_filter_anisotropic.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_filter_anisotropic.txt</a>.
+   * @{ */
 
-  // GL_EXT_texture_lod_bias
+  /** @} */
+  /**\name GL_EXT_texture_lod_bias functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_lod_bias.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_lod_bias.txt</a>.
+   * @{ */
 
-  // GL_EXT_texture_object
+  /** @} */
+  /**\name GL_EXT_texture_object functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_object.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_object.txt</a>.
+   * @{ */
   #ifndef GLGENTEXTURESEXT_DECL
   #define GLGENTEXTURESEXT_DECL
   csGLGENTEXTURESEXT glGenTexturesEXT;
@@ -9837,7 +11294,10 @@ public:
   #endif
 
 
-  // GL_EXT_vertex_array
+  /** @} */
+  /**\name GL_EXT_vertex_array functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/vertex_array.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/vertex_array.txt</a>.
+   * @{ */
   #ifndef GLARRAYELEMENTEXT_DECL
   #define GLARRAYELEMENTEXT_DECL
   csGLARRAYELEMENTEXT glArrayElementEXT;
@@ -9884,7 +11344,10 @@ public:
   #endif
 
 
-  // GL_EXT_vertex_shader
+  /** @} */
+  /**\name GL_EXT_vertex_shader functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/vertex_shader.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/vertex_shader.txt</a>.
+   * @{ */
   #ifndef GLBEGINVERTEXSHADEREXT_DECL
   #define GLBEGINVERTEXSHADEREXT_DECL
   csGLBEGINVERTEXSHADEREXT glBeginVertexShaderEXT;
@@ -10096,7 +11559,10 @@ public:
   #endif
 
 
-  // GL_EXT_vertex_weighting
+  /** @} */
+  /**\name GL_EXT_vertex_weighting functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/vertex_weighting.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/vertex_weighting.txt</a>.
+   * @{ */
   #ifndef GLVERTEXWEIGHTFEXT_DECL
   #define GLVERTEXWEIGHTFEXT_DECL
   csGLVERTEXWEIGHTFEXT glVertexWeightfEXT;
@@ -10113,15 +11579,30 @@ public:
   #endif
 
 
-  // GL_HP_occlusion_test
+  /** @} */
+  /**\name GL_HP_occlusion_test functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/HP/occlusion_test.txt">http://oss.sgi.com/projects/ogl-sample/registry/HP/occlusion_test.txt</a>.
+   * @{ */
 
-  // GL_NV_blend_square
+  /** @} */
+  /**\name GL_NV_blend_square functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/blend_square.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/blend_square.txt</a>.
+   * @{ */
 
-  // GL_NV_copy_depth_to_color
+  /** @} */
+  /**\name GL_NV_copy_depth_to_color functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/copy_depth_to_color.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/copy_depth_to_color.txt</a>.
+   * @{ */
 
-  // GL_NV_depth_clamp
+  /** @} */
+  /**\name GL_NV_depth_clamp functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/depth_clamp.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/depth_clamp.txt</a>.
+   * @{ */
 
-  // GL_NV_evaluators
+  /** @} */
+  /**\name GL_NV_evaluators functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/evaluators.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/evaluators.txt</a>.
+   * @{ */
   #ifndef GLMAPCONTROLPOINTSNV_DECL
   #define GLMAPCONTROLPOINTSNV_DECL
   csGLMAPCONTROLPOINTSNV glMapControlPointsNV;
@@ -10168,7 +11649,10 @@ public:
   #endif
 
 
-  // GL_NV_fence
+  /** @} */
+  /**\name GL_NV_fence functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/fence.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/fence.txt</a>.
+   * @{ */
   #ifndef GLGENFENCESNV_DECL
   #define GLGENFENCESNV_DECL
   csGLGENFENCESNV glGenFencesNV;
@@ -10205,13 +11689,25 @@ public:
   #endif
 
 
-  // GL_NV_fog_distance
+  /** @} */
+  /**\name GL_NV_fog_distance functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/fog_distance.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/fog_distance.txt</a>.
+   * @{ */
 
-  // GL_NV_light_max_exponent
+  /** @} */
+  /**\name GL_NV_light_max_exponent functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/light_max_exponent.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/light_max_exponent.txt</a>.
+   * @{ */
 
-  // GL_NV_multisample_filter_hint
+  /** @} */
+  /**\name GL_NV_multisample_filter_hint functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/multisample_filter_hint.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/multisample_filter_hint.txt</a>.
+   * @{ */
 
-  // GL_NV_occlusion_query
+  /** @} */
+  /**\name GL_NV_occlusion_query functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/occlusion_query.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/occlusion_query.txt</a>.
+   * @{ */
   #ifndef GLGENOCCLUSIONQUERIESNV_DECL
   #define GLGENOCCLUSIONQUERIESNV_DECL
   csGLGENOCCLUSIONQUERIESNV glGenOcclusionQueriesNV;
@@ -10248,9 +11744,15 @@ public:
   #endif
 
 
-  // GL_NV_packed_depth_stencil
+  /** @} */
+  /**\name GL_NV_packed_depth_stencil functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/packed_depth_stencil.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/packed_depth_stencil.txt</a>.
+   * @{ */
 
-  // GL_NV_point_sprite
+  /** @} */
+  /**\name GL_NV_point_sprite functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/point_sprite.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/point_sprite.txt</a>.
+   * @{ */
   #ifndef GLPOINTPARAMETERINV_DECL
   #define GLPOINTPARAMETERINV_DECL
   csGLPOINTPARAMETERINV glPointParameteriNV;
@@ -10262,7 +11764,10 @@ public:
   #endif
 
 
-  // GL_NV_register_combiners
+  /** @} */
+  /**\name GL_NV_register_combiners functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/register_combiners.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/register_combiners.txt</a>.
+   * @{ */
   #ifndef GLCOMBINERPARAMETERFVNV_DECL
   #define GLCOMBINERPARAMETERFVNV_DECL
   csGLCOMBINERPARAMETERFVNV glCombinerParameterfvNV;
@@ -10329,7 +11834,10 @@ public:
   #endif
 
 
-  // GL_NV_register_combiners2
+  /** @} */
+  /**\name GL_NV_register_combiners2 functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/register_combiners2.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/register_combiners2.txt</a>.
+   * @{ */
   #ifndef GLCOMBINERSTAGEPARAMETERFVNV_DECL
   #define GLCOMBINERSTAGEPARAMETERFVNV_DECL
   csGLCOMBINERSTAGEPARAMETERFVNV glCombinerStageParameterfvNV;
@@ -10341,23 +11849,50 @@ public:
   #endif
 
 
-  // GL_NV_texgen_emboss
+  /** @} */
+  /**\name GL_NV_texgen_emboss functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texgen_emboss.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/texgen_emboss.txt</a>.
+   * @{ */
 
-  // GL_NV_texgen_reflection
+  /** @} */
+  /**\name GL_NV_texgen_reflection functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texgen_reflection.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/texgen_reflection.txt</a>.
+   * @{ */
 
-  // GL_NV_texture_compression_vtc
+  /** @} */
+  /**\name GL_NV_texture_compression_vtc functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_compression_vtc.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_compression_vtc.txt</a>.
+   * @{ */
 
-  // GL_NV_texture_env_combine4
+  /** @} */
+  /**\name GL_NV_texture_env_combine4 functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_env_combine4.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_env_combine4.txt</a>.
+   * @{ */
 
-  // GL_NV_texture_rectangle
+  /** @} */
+  /**\name GL_NV_texture_rectangle functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_rectangle.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_rectangle.txt</a>.
+   * @{ */
 
-  // GL_NV_texture_shader
+  /** @} */
+  /**\name GL_NV_texture_shader functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_shader.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_shader.txt</a>.
+   * @{ */
 
-  // GL_NV_texture_shader2
+  /** @} */
+  /**\name GL_NV_texture_shader2 functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_shader2.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_shader2.txt</a>.
+   * @{ */
 
-  // GL_NV_texture_shader3
+  /** @} */
+  /**\name GL_NV_texture_shader3 functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_shader3.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_shader3.txt</a>.
+   * @{ */
 
-  // GL_NV_vertex_array_range
+  /** @} */
+  /**\name GL_NV_vertex_array_range functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_array_range.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_array_range.txt</a>.
+   * @{ */
   #ifndef GLVERTEXARRAYRANGENV_DECL
   #define GLVERTEXARRAYRANGENV_DECL
   csGLVERTEXARRAYRANGENV glVertexArrayRangeNV;
@@ -10379,9 +11914,15 @@ public:
   #endif
 
 
-  // GL_NV_vertex_array_range2
+  /** @} */
+  /**\name GL_NV_vertex_array_range2 functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_array_range2.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_array_range2.txt</a>.
+   * @{ */
 
-  // GL_NV_vertex_program
+  /** @} */
+  /**\name GL_NV_vertex_program functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_program.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_program.txt</a>.
+   * @{ */
   #ifndef GLBINDPROGRAMNV_DECL
   #define GLBINDPROGRAMNV_DECL
   csGLBINDPROGRAMNV glBindProgramNV;
@@ -10693,9 +12234,15 @@ public:
   #endif
 
 
-  // GL_NV_vertex_program1_1
+  /** @} */
+  /**\name GL_NV_vertex_program1_1 functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_program1_1.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_program1_1.txt</a>.
+   * @{ */
 
-  // GL_ATI_element_array
+  /** @} */
+  /**\name GL_ATI_element_array functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/element_array.txt">http://oss.sgi.com/projects/ogl-sample/registry/ATI/element_array.txt</a>.
+   * @{ */
   #ifndef GLELEMENTPOINTERATI_DECL
   #define GLELEMENTPOINTERATI_DECL
   csGLELEMENTPOINTERATI glElementPointerATI;
@@ -10712,7 +12259,10 @@ public:
   #endif
 
 
-  // GL_ATI_envmap_bumpmap
+  /** @} */
+  /**\name GL_ATI_envmap_bumpmap functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/envmap_bumpmap.txt">http://oss.sgi.com/projects/ogl-sample/registry/ATI/envmap_bumpmap.txt</a>.
+   * @{ */
   #ifndef GLTEXBUMPPARAMETERIVATI_DECL
   #define GLTEXBUMPPARAMETERIVATI_DECL
   csGLTEXBUMPPARAMETERIVATI glTexBumpParameterivATI;
@@ -10734,7 +12284,10 @@ public:
   #endif
 
 
-  // GL_ATI_fragment_shader
+  /** @} */
+  /**\name GL_ATI_fragment_shader functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/fragment_shader.txt">http://oss.sgi.com/projects/ogl-sample/registry/ATI/fragment_shader.txt</a>.
+   * @{ */
   #ifndef GLGENFRAGMENTSHADERSATI_DECL
   #define GLGENFRAGMENTSHADERSATI_DECL
   csGLGENFRAGMENTSHADERSATI glGenFragmentShadersATI;
@@ -10806,7 +12359,10 @@ public:
   #endif
 
 
-  // GL_ATI_pn_triangles
+  /** @} */
+  /**\name GL_ATI_pn_triangles functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/pn_triangles.txt">http://oss.sgi.com/projects/ogl-sample/registry/ATI/pn_triangles.txt</a>.
+   * @{ */
   #ifndef GLPNTRIANGLESIATI_DECL
   #define GLPNTRIANGLESIATI_DECL
   csGLPNTRIANGLESIATI glPNTrianglesiATI;
@@ -10818,9 +12374,15 @@ public:
   #endif
 
 
-  // GL_ATI_texture_mirror_once
+  /** @} */
+  /**\name GL_ATI_texture_mirror_once functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/texture_mirror_once.txt">http://oss.sgi.com/projects/ogl-sample/registry/ATI/texture_mirror_once.txt</a>.
+   * @{ */
 
-  // GL_ATI_vertex_array_object
+  /** @} */
+  /**\name GL_ATI_vertex_array_object functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/vertex_array_object.txt">http://oss.sgi.com/projects/ogl-sample/registry/ATI/vertex_array_object.txt</a>.
+   * @{ */
   #ifndef GLNEWOBJECTBUFFERATI_DECL
   #define GLNEWOBJECTBUFFERATI_DECL
   csGLNEWOBJECTBUFFERATI glNewObjectBufferATI;
@@ -10882,7 +12444,10 @@ public:
   #endif
 
 
-  // GL_ATI_vertex_attrib_array_object
+  /** @} */
+  /**\name GL_ATI_vertex_attrib_array_object functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/vertex_attrib_array_object.txt">http://oss.sgi.com/projects/ogl-sample/registry/ATI/vertex_attrib_array_object.txt</a>.
+   * @{ */
   #ifndef GLVERTEXATTRIBARRAYOBJECTATI_DECL
   #define GLVERTEXATTRIBARRAYOBJECTATI_DECL
   csGLVERTEXATTRIBARRAYOBJECTATI glVertexAttribArrayObjectATI;
@@ -10899,7 +12464,10 @@ public:
   #endif
 
 
-  // GL_ATI_vertex_streams
+  /** @} */
+  /**\name GL_ATI_vertex_streams functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/vertex_streams.txt">http://oss.sgi.com/projects/ogl-sample/registry/ATI/vertex_streams.txt</a>.
+   * @{ */
   #ifndef GLVERTEXSTREAM1S_DECL
   #define GLVERTEXSTREAM1S_DECL
   csGLVERTEXSTREAM1S glVertexStream1s;
@@ -11126,8 +12694,11 @@ public:
   #endif
 
 
-  // WGL_I3D_image_buffer
+  /** @} */
 #ifdef _WIN32
+  /**\name WGL_I3D_image_buffer functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_image_buffer.txt">http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_image_buffer.txt</a>.
+   * @{ */
   #ifndef WGLCREATEIMAGEBUFFERI3D_DECL
   #define WGLCREATEIMAGEBUFFERI3D_DECL
   csWGLCREATEIMAGEBUFFERI3D wglCreateImageBufferI3D;
@@ -11149,10 +12720,13 @@ public:
   #endif
 
 
+  /** @} */
 #endif // _WIN32
 
-  // WGL_I3D_swap_frame_lock
 #ifdef _WIN32
+  /**\name WGL_I3D_swap_frame_lock functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_swap_frame_lock.txt">http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_swap_frame_lock.txt</a>.
+   * @{ */
   #ifndef WGLENABLEFRAMELOCKI3D_DECL
   #define WGLENABLEFRAMELOCKI3D_DECL
   csWGLENABLEFRAMELOCKI3D wglEnableFrameLockI3D;
@@ -11174,10 +12748,13 @@ public:
   #endif
 
 
+  /** @} */
 #endif // _WIN32
 
-  // WGL_I3D_swap_frame_usage
 #ifdef _WIN32
+  /**\name WGL_I3D_swap_frame_usage functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_swap_frame_usage.txt">http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_swap_frame_usage.txt</a>.
+   * @{ */
   #ifndef WGLGETFRAMEUSAGEI3D_DECL
   #define WGLGETFRAMEUSAGEI3D_DECL
   csWGLGETFRAMEUSAGEI3D wglGetFrameUsageI3D;
@@ -11199,13 +12776,22 @@ public:
   #endif
 
 
+  /** @} */
 #endif // _WIN32
 
-  // GL_3DFX_texture_compression_FXT1
+  /**\name GL_3DFX_texture_compression_FXT1 functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/3DFX/texture_compression_FXT1.txt">http://oss.sgi.com/projects/ogl-sample/registry/3DFX/texture_compression_FXT1.txt</a>.
+   * @{ */
 
-  // GL_IBM_cull_vertex
+  /** @} */
+  /**\name GL_IBM_cull_vertex functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/IBM/cull_vertex.txt">http://oss.sgi.com/projects/ogl-sample/registry/IBM/cull_vertex.txt</a>.
+   * @{ */
 
-  // GL_IBM_multimode_draw_arrays
+  /** @} */
+  /**\name GL_IBM_multimode_draw_arrays functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/IBM/multimode_draw_arrays.txt">http://oss.sgi.com/projects/ogl-sample/registry/IBM/multimode_draw_arrays.txt</a>.
+   * @{ */
   #ifndef GLMULTIMODEDRAWARRAYSIBM_DECL
   #define GLMULTIMODEDRAWARRAYSIBM_DECL
   csGLMULTIMODEDRAWARRAYSIBM glMultiModeDrawArraysIBM;
@@ -11217,11 +12803,20 @@ public:
   #endif
 
 
-  // GL_IBM_raster_pos_clip
+  /** @} */
+  /**\name GL_IBM_raster_pos_clip functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/IBM/raster_pos_clip.txt">http://oss.sgi.com/projects/ogl-sample/registry/IBM/raster_pos_clip.txt</a>.
+   * @{ */
 
-  // GL_IBM_texture_mirrored_repeat
+  /** @} */
+  /**\name GL_IBM_texture_mirrored_repeat functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/IBM/texture_mirrored_repeat.txt">http://oss.sgi.com/projects/ogl-sample/registry/IBM/texture_mirrored_repeat.txt</a>.
+   * @{ */
 
-  // GL_IBM_vertex_array_lists
+  /** @} */
+  /**\name GL_IBM_vertex_array_lists functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/IBM/vertex_array_lists.txt">http://oss.sgi.com/projects/ogl-sample/registry/IBM/vertex_array_lists.txt</a>.
+   * @{ */
   #ifndef GLCOLORPOINTERLISTIBM_DECL
   #define GLCOLORPOINTERLISTIBM_DECL
   csGLCOLORPOINTERLISTIBM glColorPointerListIBM;
@@ -11258,14 +12853,20 @@ public:
   #endif
 
 
-  // GL_MESA_resize_buffers
+  /** @} */
+  /**\name GL_MESA_resize_buffers functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/MESA/resize_buffers.txt">http://oss.sgi.com/projects/ogl-sample/registry/MESA/resize_buffers.txt</a>.
+   * @{ */
   #ifndef GLRESIZEBUFFERSMESA_DECL
   #define GLRESIZEBUFFERSMESA_DECL
   csGLRESIZEBUFFERSMESA glResizeBuffersMESA;
   #endif
 
 
-  // GL_MESA_window_pos
+  /** @} */
+  /**\name GL_MESA_window_pos functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/MESA/window_pos.txt">http://oss.sgi.com/projects/ogl-sample/registry/MESA/window_pos.txt</a>.
+   * @{ */
   #ifndef GLWINDOWPOS2DMESA_DECL
   #define GLWINDOWPOS2DMESA_DECL
   csGLWINDOWPOS2DMESA glWindowPos2dMESA;
@@ -11387,15 +12988,30 @@ public:
   #endif
 
 
-  // GL_OML_interlace
+  /** @} */
+  /**\name GL_OML_interlace functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/OML/interlace.txt">http://oss.sgi.com/projects/ogl-sample/registry/OML/interlace.txt</a>.
+   * @{ */
 
-  // GL_OML_resample
+  /** @} */
+  /**\name GL_OML_resample functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/OML/resample.txt">http://oss.sgi.com/projects/ogl-sample/registry/OML/resample.txt</a>.
+   * @{ */
 
-  // GL_OML_subsample
+  /** @} */
+  /**\name GL_OML_subsample functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/OML/subsample.txt">http://oss.sgi.com/projects/ogl-sample/registry/OML/subsample.txt</a>.
+   * @{ */
 
-  // GL_SGIS_generate_mipmap
+  /** @} */
+  /**\name GL_SGIS_generate_mipmap functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/generate_mipmap.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIS/generate_mipmap.txt</a>.
+   * @{ */
 
-  // GL_SGIS_multisample
+  /** @} */
+  /**\name GL_SGIS_multisample functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/multisample.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIS/multisample.txt</a>.
+   * @{ */
   #ifndef GLSAMPLEMASKSGIS_DECL
   #define GLSAMPLEMASKSGIS_DECL
   csGLSAMPLEMASKSGIS glSampleMaskSGIS;
@@ -11407,7 +13023,10 @@ public:
   #endif
 
 
-  // GL_SGIS_pixel_texture
+  /** @} */
+  /**\name GL_SGIS_pixel_texture functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/pixel_texture.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIS/pixel_texture.txt</a>.
+   * @{ */
   #ifndef GLPIXELTEXGENPARAMETERISGIS_DECL
   #define GLPIXELTEXGENPARAMETERISGIS_DECL
   csGLPIXELTEXGENPARAMETERISGIS glPixelTexGenParameteriSGIS;
@@ -11429,30 +13048,60 @@ public:
   #endif
 
 
-  // GL_SGIS_texture_border_clamp
+  /** @} */
+  /**\name GL_SGIS_texture_border_clamp functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/texture_border_clamp.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIS/texture_border_clamp.txt</a>.
+   * @{ */
 
-  // GL_SGIS_texture_color_mask
+  /** @} */
+  /**\name GL_SGIS_texture_color_mask functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/texture_color_mask.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIS/texture_color_mask.txt</a>.
+   * @{ */
   #ifndef GLTEXTURECOLORMASKSGIS_DECL
   #define GLTEXTURECOLORMASKSGIS_DECL
   csGLTEXTURECOLORMASKSGIS glTextureColorMaskSGIS;
   #endif
 
 
-  // GL_SGIS_texture_edge_clamp
+  /** @} */
+  /**\name GL_SGIS_texture_edge_clamp functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/texture_edge_clamp.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIS/texture_edge_clamp.txt</a>.
+   * @{ */
 
-  // GL_SGIS_texture_lod
+  /** @} */
+  /**\name GL_SGIS_texture_lod functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/texture_lod.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIS/texture_lod.txt</a>.
+   * @{ */
 
-  // GL_SGIS_depth_texture
+  /** @} */
+  /**\name GL_SGIS_depth_texture functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/depth_texture.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIS/depth_texture.txt</a>.
+   * @{ */
 
-  // GL_SGIX_fog_offset
+  /** @} */
+  /**\name GL_SGIX_fog_offset functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIX/fog_offset.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIX/fog_offset.txt</a>.
+   * @{ */
 
-  // GL_SGIX_interlace
+  /** @} */
+  /**\name GL_SGIX_interlace functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIX/interlace.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIX/interlace.txt</a>.
+   * @{ */
 
-  // GL_SGIX_shadow_ambient
+  /** @} */
+  /**\name GL_SGIX_shadow_ambient functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIX/shadow_ambient.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGIX/shadow_ambient.txt</a>.
+   * @{ */
 
-  // GL_SGI_color_matrix
+  /** @} */
+  /**\name GL_SGI_color_matrix functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGI/color_matrix.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGI/color_matrix.txt</a>.
+   * @{ */
 
-  // GL_SGI_color_table
+  /** @} */
+  /**\name GL_SGI_color_table functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGI/color_table.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGI/color_table.txt</a>.
+   * @{ */
   #ifndef GLCOLORTABLESGI_DECL
   #define GLCOLORTABLESGI_DECL
   csGLCOLORTABLESGI glColorTableSGI;
@@ -11489,9 +13138,15 @@ public:
   #endif
 
 
-  // GL_SGI_texture_color_table
+  /** @} */
+  /**\name GL_SGI_texture_color_table functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGI/texture_color_table.txt">http://oss.sgi.com/projects/ogl-sample/registry/SGI/texture_color_table.txt</a>.
+   * @{ */
 
-  // GL_SUN_vertex
+  /** @} */
+  /**\name GL_SUN_vertex functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/SUN/vertex.txt">http://oss.sgi.com/projects/ogl-sample/registry/SUN/vertex.txt</a>.
+   * @{ */
   #ifndef GLCOLOR4UBVERTEX2FSUN_DECL
   #define GLCOLOR4UBVERTEX2FSUN_DECL
   csGLCOLOR4UBVERTEX2FSUN glColor4ubVertex2fSUN;
@@ -11693,13 +13348,25 @@ public:
   #endif
 
 
-  // GL_ARB_fragment_program
+  /** @} */
+  /**\name GL_ARB_fragment_program functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/fragment_program.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/fragment_program.txt</a>.
+   * @{ */
 
-  // GL_ATI_text_fragment_shader
+  /** @} */
+  /**\name GL_ATI_text_fragment_shader functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/text_fragment_shader.txt">http://oss.sgi.com/projects/ogl-sample/registry/ATI/text_fragment_shader.txt</a>.
+   * @{ */
 
-  // GL_APPLE_client_storage
+  /** @} */
+  /**\name GL_APPLE_client_storage functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/APPLE/client_storage.txt">http://oss.sgi.com/projects/ogl-sample/registry/APPLE/client_storage.txt</a>.
+   * @{ */
 
-  // GL_APPLE_element_array
+  /** @} */
+  /**\name GL_APPLE_element_array functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/APPLE/element_array.txt">http://oss.sgi.com/projects/ogl-sample/registry/APPLE/element_array.txt</a>.
+   * @{ */
   #ifndef GLELEMENTPOINTERAPPLE_DECL
   #define GLELEMENTPOINTERAPPLE_DECL
   csGLELEMENTPOINTERAPPLE glElementPointerAPPLE;
@@ -11726,7 +13393,10 @@ public:
   #endif
 
 
-  // GL_APPLE_fence
+  /** @} */
+  /**\name GL_APPLE_fence functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/APPLE/fence.txt">http://oss.sgi.com/projects/ogl-sample/registry/APPLE/fence.txt</a>.
+   * @{ */
   #ifndef GLGENFENCESAPPLE_DECL
   #define GLGENFENCESAPPLE_DECL
   csGLGENFENCESAPPLE glGenFencesAPPLE;
@@ -11768,7 +13438,10 @@ public:
   #endif
 
 
-  // GL_APPLE_vertex_array_object
+  /** @} */
+  /**\name GL_APPLE_vertex_array_object functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/APPLE/vertex_array_object.txt">http://oss.sgi.com/projects/ogl-sample/registry/APPLE/vertex_array_object.txt</a>.
+   * @{ */
   #ifndef GLBINDVERTEXARRAYAPPLE_DECL
   #define GLBINDVERTEXARRAYAPPLE_DECL
   csGLBINDVERTEXARRAYAPPLE glBindVertexArrayAPPLE;
@@ -11790,7 +13463,10 @@ public:
   #endif
 
 
-  // GL_APPLE_vertex_array_range
+  /** @} */
+  /**\name GL_APPLE_vertex_array_range functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/APPLE/vertex_array_range.txt">http://oss.sgi.com/projects/ogl-sample/registry/APPLE/vertex_array_range.txt</a>.
+   * @{ */
   #ifndef GLVERTEXARRAYRANGEAPPLE_DECL
   #define GLVERTEXARRAYRANGEAPPLE_DECL
   csGLVERTEXARRAYRANGEAPPLE glVertexArrayRangeAPPLE;
@@ -11807,8 +13483,11 @@ public:
   #endif
 
 
-  // WGL_ARB_pixel_format
+  /** @} */
 #ifdef _WIN32
+  /**\name WGL_ARB_pixel_format functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_pixel_format.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_pixel_format.txt</a>.
+   * @{ */
   #ifndef WGLGETPIXELFORMATATTRIBIVARB_DECL
   #define WGLGETPIXELFORMATATTRIBIVARB_DECL
   csWGLGETPIXELFORMATATTRIBIVARB wglGetPixelFormatAttribivARB;
@@ -11825,10 +13504,13 @@ public:
   #endif
 
 
+  /** @} */
 #endif // _WIN32
 
-  // WGL_ARB_make_current_read
 #ifdef _WIN32
+  /**\name WGL_ARB_make_current_read functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_make_current_read.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_make_current_read.txt</a>.
+   * @{ */
   #ifndef WGLMAKECONTEXTCURRENTARB_DECL
   #define WGLMAKECONTEXTCURRENTARB_DECL
   csWGLMAKECONTEXTCURRENTARB wglMakeContextCurrentARB;
@@ -11840,10 +13522,13 @@ public:
   #endif
 
 
+  /** @} */
 #endif // _WIN32
 
-  // WGL_ARB_pbuffer
 #ifdef _WIN32
+  /**\name WGL_ARB_pbuffer functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_pbuffer.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_pbuffer.txt</a>.
+   * @{ */
   #ifndef WGLCREATEPBUFFERARB_DECL
   #define WGLCREATEPBUFFERARB_DECL
   csWGLCREATEPBUFFERARB wglCreatePbufferARB;
@@ -11870,10 +13555,13 @@ public:
   #endif
 
 
+  /** @} */
 #endif // _WIN32
 
-  // WGL_EXT_swap_control
 #ifdef _WIN32
+  /**\name WGL_EXT_swap_control functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_swap_control.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_swap_control.txt</a>.
+   * @{ */
   #ifndef WGLSWAPINTERVALEXT_DECL
   #define WGLSWAPINTERVALEXT_DECL
   csWGLSWAPINTERVALEXT wglSwapIntervalEXT;
@@ -11885,10 +13573,13 @@ public:
   #endif
 
 
+  /** @} */
 #endif // _WIN32
 
-  // WGL_ARB_render_texture
 #ifdef _WIN32
+  /**\name WGL_ARB_render_texture functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_render_texture.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_render_texture.txt</a>.
+   * @{ */
   #ifndef WGLBINDTEXIMAGEARB_DECL
   #define WGLBINDTEXIMAGEARB_DECL
   csWGLBINDTEXIMAGEARB wglBindTexImageARB;
@@ -11905,20 +13596,26 @@ public:
   #endif
 
 
+  /** @} */
 #endif // _WIN32
 
-  // WGL_EXT_extensions_string
 #ifdef _WIN32
+  /**\name WGL_EXT_extensions_string functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_extensions_string.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_extensions_string.txt</a>.
+   * @{ */
   #ifndef WGLGETEXTENSIONSSTRINGEXT_DECL
   #define WGLGETEXTENSIONSSTRINGEXT_DECL
   csWGLGETEXTENSIONSSTRINGEXT wglGetExtensionsStringEXT;
   #endif
 
 
+  /** @} */
 #endif // _WIN32
 
-  // WGL_EXT_make_current_read
 #ifdef _WIN32
+  /**\name WGL_EXT_make_current_read functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_make_current_read.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_make_current_read.txt</a>.
+   * @{ */
   #ifndef WGLMAKECONTEXTCURRENTEXT_DECL
   #define WGLMAKECONTEXTCURRENTEXT_DECL
   csWGLMAKECONTEXTCURRENTEXT wglMakeContextCurrentEXT;
@@ -11930,10 +13627,13 @@ public:
   #endif
 
 
+  /** @} */
 #endif // _WIN32
 
-  // WGL_EXT_pbuffer
 #ifdef _WIN32
+  /**\name WGL_EXT_pbuffer functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_pbuffer.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_pbuffer.txt</a>.
+   * @{ */
   #ifndef WGLCREATEPBUFFEREXT_DECL
   #define WGLCREATEPBUFFEREXT_DECL
   csWGLCREATEPBUFFEREXT wglCreatePbufferEXT;
@@ -11960,10 +13660,13 @@ public:
   #endif
 
 
+  /** @} */
 #endif // _WIN32
 
-  // WGL_EXT_pixel_format
 #ifdef _WIN32
+  /**\name WGL_EXT_pixel_format functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_pixel_format.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_pixel_format.txt</a>.
+   * @{ */
   #ifndef WGLGETPIXELFORMATATTRIBIVEXT_DECL
   #define WGLGETPIXELFORMATATTRIBIVEXT_DECL
   csWGLGETPIXELFORMATATTRIBIVEXT wglGetPixelFormatAttribivEXT;
@@ -11980,10 +13683,13 @@ public:
   #endif
 
 
+  /** @} */
 #endif // _WIN32
 
-  // WGL_I3D_digital_video_control
 #ifdef _WIN32
+  /**\name WGL_I3D_digital_video_control functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_digital_video_control.txt">http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_digital_video_control.txt</a>.
+   * @{ */
   #ifndef WGLGETDIGITALVIDEOPARAMETERSI3D_DECL
   #define WGLGETDIGITALVIDEOPARAMETERSI3D_DECL
   csWGLGETDIGITALVIDEOPARAMETERSI3D wglGetDigitalVideoParametersI3D;
@@ -11995,10 +13701,13 @@ public:
   #endif
 
 
+  /** @} */
 #endif // _WIN32
 
-  // WGL_I3D_gamma
 #ifdef _WIN32
+  /**\name WGL_I3D_gamma functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_gamma.txt">http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_gamma.txt</a>.
+   * @{ */
   #ifndef WGLGETGAMMATABLEPARAMETERSI3D_DECL
   #define WGLGETGAMMATABLEPARAMETERSI3D_DECL
   csWGLGETGAMMATABLEPARAMETERSI3D wglGetGammaTableParametersI3D;
@@ -12020,10 +13729,13 @@ public:
   #endif
 
 
+  /** @} */
 #endif // _WIN32
 
-  // WGL_I3D_genlock
 #ifdef _WIN32
+  /**\name WGL_I3D_genlock functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_genlock.txt">http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_genlock.txt</a>.
+   * @{ */
   #ifndef WGLENABLEGENLOCKI3D_DECL
   #define WGLENABLEGENLOCKI3D_DECL
   csWGLENABLEGENLOCKI3D wglEnableGenlockI3D;
@@ -12085,9 +13797,12 @@ public:
   #endif
 
 
+  /** @} */
 #endif // _WIN32
 
-  // GL_ARB_matrix_palette
+  /**\name GL_ARB_matrix_palette functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/matrix_palette.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/matrix_palette.txt</a>.
+   * @{ */
   #ifndef GLCURRENTPALETTEMATRIXARB_DECL
   #define GLCURRENTPALETTEMATRIXARB_DECL
   csGLCURRENTPALETTEMATRIXARB glCurrentPaletteMatrixARB;
@@ -12114,7 +13829,10 @@ public:
   #endif
 
 
-  // GL_NV_element_array
+  /** @} */
+  /**\name GL_NV_element_array functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/element_array.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/element_array.txt</a>.
+   * @{ */
   #ifndef GLELEMENTPOINTERNV_DECL
   #define GLELEMENTPOINTERNV_DECL
   csGLELEMENTPOINTERNV glElementPointerNV;
@@ -12141,9 +13859,15 @@ public:
   #endif
 
 
-  // GL_NV_float_buffer
+  /** @} */
+  /**\name GL_NV_float_buffer functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/float_buffer.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/float_buffer.txt</a>.
+   * @{ */
 
-  // GL_NV_fragment_program
+  /** @} */
+  /**\name GL_NV_fragment_program functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/fragment_program.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/fragment_program.txt</a>.
+   * @{ */
   #ifndef GLPROGRAMNAMEDPARAMETER4FNV_DECL
   #define GLPROGRAMNAMEDPARAMETER4FNV_DECL
   csGLPROGRAMNAMEDPARAMETER4FNV glProgramNamedParameter4fNV;
@@ -12165,7 +13889,10 @@ public:
   #endif
 
 
-  // GL_NV_primitive_restart
+  /** @} */
+  /**\name GL_NV_primitive_restart functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/primitive_restart.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/primitive_restart.txt</a>.
+   * @{ */
   #ifndef GLPRIMITIVERESTARTNV_DECL
   #define GLPRIMITIVERESTARTNV_DECL
   csGLPRIMITIVERESTARTNV glPrimitiveRestartNV;
@@ -12177,9 +13904,15 @@ public:
   #endif
 
 
-  // GL_NV_vertex_program2
+  /** @} */
+  /**\name GL_NV_vertex_program2 functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_program2.txt">http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_program2.txt</a>.
+   * @{ */
 
-  // GL_ARB_vertex_buffer_object
+  /** @} */
+  /**\name GL_ARB_vertex_buffer_object functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_buffer_object.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_buffer_object.txt</a>.
+   * @{ */
   #ifndef GLBINDBUFFERARB_DECL
   #define GLBINDBUFFERARB_DECL
   csGLBINDBUFFERARB glBindBufferARB;
@@ -12236,7 +13969,10 @@ public:
   #endif
 
 
-  // GL_ATI_separate_stencil
+  /** @} */
+  /**\name GL_ATI_separate_stencil functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/separate_stencil.txt">http://oss.sgi.com/projects/ogl-sample/registry/ATI/separate_stencil.txt</a>.
+   * @{ */
   #ifndef GLSTENCILOPSEPARATEATI_DECL
   #define GLSTENCILOPSEPARATEATI_DECL
   csGLSTENCILOPSEPARATEATI glStencilOpSeparateATI;
@@ -12248,13 +13984,25 @@ public:
   #endif
 
 
-  // GL_ARB_texture_non_power_of_two
+  /** @} */
+  /**\name GL_ARB_texture_non_power_of_two functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_non_power_of_two.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_non_power_of_two.txt</a>.
+   * @{ */
 
-  // GL_ARB_point_sprite
+  /** @} */
+  /**\name GL_ARB_point_sprite functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/point_sprite.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/point_sprite.txt</a>.
+   * @{ */
 
-  // GL_ARB_shading_language_100
+  /** @} */
+  /**\name GL_ARB_shading_language_100 functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/shading_language_100.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/shading_language_100.txt</a>.
+   * @{ */
 
-  // GL_ARB_shader_objects
+  /** @} */
+  /**\name GL_ARB_shader_objects functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/shader_objects.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/shader_objects.txt</a>.
+   * @{ */
   #ifndef GLDELETEOBJECTARB_DECL
   #define GLDELETEOBJECTARB_DECL
   csGLDELETEOBJECTARB glDeleteObjectARB;
@@ -12451,9 +14199,15 @@ public:
   #endif
 
 
-  // GL_ARB_fragment_shader
+  /** @} */
+  /**\name GL_ARB_fragment_shader functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/fragment_shader.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/fragment_shader.txt</a>.
+   * @{ */
 
-  // GL_ARB_vertex_shader
+  /** @} */
+  /**\name GL_ARB_vertex_shader functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_shader.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_shader.txt</a>.
+   * @{ */
   #ifndef GLBINDATTRIBLOCATIONARB_DECL
   #define GLBINDATTRIBLOCATIONARB_DECL
   csGLBINDATTRIBLOCATIONARB glBindAttribLocationARB;
@@ -12470,174 +14224,496 @@ public:
   #endif
 
 
-  // GL_ARB_pixel_buffer_object
+  /** @} */
+  /**\name GL_ARB_pixel_buffer_object functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/pixel_buffer_object.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/pixel_buffer_object.txt</a>.
+   * @{ */
 
-  // GL_ARB_texture_rectangle
+  /** @} */
+  /**\name GL_ARB_texture_rectangle functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_rectangle.txt">http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_rectangle.txt</a>.
+   * @{ */
 
+  /** @} */
 
 // end of functions
 };
 
+/// Struct containing all GL extension test flags.
 struct csGLExtensionFlags
 {
 public:
+  /** Whether the corresponding GL version is supported. */
   bool CS_GL_version_1_2;
+  /** Whether the corresponding GL version is supported. */
   bool CS_GL_version_1_3;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/imaging.txt">GL_ARB_imaging</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_imaging(). */
   bool CS_GL_ARB_imaging;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/multitexture.txt">GL_ARB_multitexture</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_multitexture(). */
   bool CS_GL_ARB_multitexture;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/transpose_matrix.txt">GL_ARB_transpose_matrix</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_transpose_matrix(). */
   bool CS_GL_ARB_transpose_matrix;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/multisample.txt">GL_ARB_multisample</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_multisample(). */
   bool CS_GL_ARB_multisample;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_env_add.txt">GL_ARB_texture_env_add</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_texture_env_add(). */
   bool CS_GL_ARB_texture_env_add;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_extensions_string.txt">WGL_ARB_extensions_string</a> extension was found. 
+   * Set by csGLExtensionManager::InitWGL_ARB_extensions_string(). */
   bool CS_WGL_ARB_extensions_string;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_buffer_region.txt">WGL_ARB_buffer_region</a> extension was found. 
+   * Set by csGLExtensionManager::InitWGL_ARB_buffer_region(). */
   bool CS_WGL_ARB_buffer_region;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_cube_map.txt">GL_ARB_texture_cube_map</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_texture_cube_map(). */
   bool CS_GL_ARB_texture_cube_map;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/depth_texture.txt">GL_ARB_depth_texture</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_depth_texture(). */
   bool CS_GL_ARB_depth_texture;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/point_parameters.txt">GL_ARB_point_parameters</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_point_parameters(). */
   bool CS_GL_ARB_point_parameters;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/shadow.txt">GL_ARB_shadow</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_shadow(). */
   bool CS_GL_ARB_shadow;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/shadow_ambient.txt">GL_ARB_shadow_ambient</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_shadow_ambient(). */
   bool CS_GL_ARB_shadow_ambient;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_border_clamp.txt">GL_ARB_texture_border_clamp</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_texture_border_clamp(). */
   bool CS_GL_ARB_texture_border_clamp;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_compression.txt">GL_ARB_texture_compression</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_texture_compression(). */
   bool CS_GL_ARB_texture_compression;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_env_combine.txt">GL_ARB_texture_env_combine</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_texture_env_combine(). */
   bool CS_GL_ARB_texture_env_combine;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_env_crossbar.txt">GL_ARB_texture_env_crossbar</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_texture_env_crossbar(). */
   bool CS_GL_ARB_texture_env_crossbar;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_env_dot3.txt">GL_ARB_texture_env_dot3</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_texture_env_dot3(). */
   bool CS_GL_ARB_texture_env_dot3;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_mirrored_repeat.txt">GL_ARB_texture_mirrored_repeat</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_texture_mirrored_repeat(). */
   bool CS_GL_ARB_texture_mirrored_repeat;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_blend.txt">GL_ARB_vertex_blend</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_vertex_blend(). */
   bool CS_GL_ARB_vertex_blend;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_program.txt">GL_ARB_vertex_program</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_vertex_program(). */
   bool CS_GL_ARB_vertex_program;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/window_pos.txt">GL_ARB_window_pos</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_window_pos(). */
   bool CS_GL_ARB_window_pos;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/422_pixels.txt">GL_EXT_422_pixels</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_422_pixels(). */
   bool CS_GL_EXT_422_pixels;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/abgr.txt">GL_EXT_abgr</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_abgr(). */
   bool CS_GL_EXT_abgr;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/bgra.txt">GL_EXT_bgra</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_bgra(). */
   bool CS_GL_EXT_bgra;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_color.txt">GL_EXT_blend_color</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_blend_color(). */
   bool CS_GL_EXT_blend_color;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_func_separate.txt">GL_EXT_blend_func_separate</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_blend_func_separate(). */
   bool CS_GL_EXT_blend_func_separate;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_logic_op.txt">GL_EXT_blend_logic_op</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_blend_logic_op(). */
   bool CS_GL_EXT_blend_logic_op;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_minmax.txt">GL_EXT_blend_minmax</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_blend_minmax(). */
   bool CS_GL_EXT_blend_minmax;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_subtract.txt">GL_EXT_blend_subtract</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_blend_subtract(). */
   bool CS_GL_EXT_blend_subtract;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/clip_volume_hint.txt">GL_EXT_clip_volume_hint</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_clip_volume_hint(). */
   bool CS_GL_EXT_clip_volume_hint;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/color_subtable.txt">GL_EXT_color_subtable</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_color_subtable(). */
   bool CS_GL_EXT_color_subtable;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/compiled_vertex_array.txt">GL_EXT_compiled_vertex_array</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_compiled_vertex_array(). */
   bool CS_GL_EXT_compiled_vertex_array;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/convolution.txt">GL_EXT_convolution</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_convolution(). */
   bool CS_GL_EXT_convolution;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/fog_coord.txt">GL_EXT_fog_coord</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_fog_coord(). */
   bool CS_GL_EXT_fog_coord;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/histogram.txt">GL_EXT_histogram</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_histogram(). */
   bool CS_GL_EXT_histogram;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/multi_draw_arrays.txt">GL_EXT_multi_draw_arrays</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_multi_draw_arrays(). */
   bool CS_GL_EXT_multi_draw_arrays;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/packed_pixels.txt">GL_EXT_packed_pixels</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_packed_pixels(). */
   bool CS_GL_EXT_packed_pixels;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/paletted_texture.txt">GL_EXT_paletted_texture</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_paletted_texture(). */
   bool CS_GL_EXT_paletted_texture;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/point_parameters.txt">GL_EXT_point_parameters</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_point_parameters(). */
   bool CS_GL_EXT_point_parameters;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/polygon_offset.txt">GL_EXT_polygon_offset</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_polygon_offset(). */
   bool CS_GL_EXT_polygon_offset;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/secondary_color.txt">GL_EXT_secondary_color</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_secondary_color(). */
   bool CS_GL_EXT_secondary_color;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/separate_specular_color.txt">GL_EXT_separate_specular_color</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_separate_specular_color(). */
   bool CS_GL_EXT_separate_specular_color;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/shadow_funcs.txt">GL_EXT_shadow_funcs</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_shadow_funcs(). */
   bool CS_GL_EXT_shadow_funcs;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/shared_texture_palette.txt">GL_EXT_shared_texture_palette</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_shared_texture_palette(). */
   bool CS_GL_EXT_shared_texture_palette;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/stencil_two_side.txt">GL_EXT_stencil_two_side</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_stencil_two_side(). */
   bool CS_GL_EXT_stencil_two_side;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/stencil_wrap.txt">GL_EXT_stencil_wrap</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_stencil_wrap(). */
   bool CS_GL_EXT_stencil_wrap;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/subtexture.txt">GL_EXT_subtexture</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_subtexture(). */
   bool CS_GL_EXT_subtexture;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture3D.txt">GL_EXT_texture3D</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_texture3D(). */
   bool CS_GL_EXT_texture3D;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_compression_s3tc.txt">GL_EXT_texture_compression_s3tc</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_texture_compression_s3tc(). */
   bool CS_GL_EXT_texture_compression_s3tc;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_env_add.txt">GL_EXT_texture_env_add</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_texture_env_add(). */
   bool CS_GL_EXT_texture_env_add;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_env_combine.txt">GL_EXT_texture_env_combine</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_texture_env_combine(). */
   bool CS_GL_EXT_texture_env_combine;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_env_dot3.txt">GL_EXT_texture_env_dot3</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_texture_env_dot3(). */
   bool CS_GL_EXT_texture_env_dot3;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_filter_anisotropic.txt">GL_EXT_texture_filter_anisotropic</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_texture_filter_anisotropic(). */
   bool CS_GL_EXT_texture_filter_anisotropic;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_lod_bias.txt">GL_EXT_texture_lod_bias</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_texture_lod_bias(). */
   bool CS_GL_EXT_texture_lod_bias;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_object.txt">GL_EXT_texture_object</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_texture_object(). */
   bool CS_GL_EXT_texture_object;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/vertex_array.txt">GL_EXT_vertex_array</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_vertex_array(). */
   bool CS_GL_EXT_vertex_array;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/vertex_shader.txt">GL_EXT_vertex_shader</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_vertex_shader(). */
   bool CS_GL_EXT_vertex_shader;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/vertex_weighting.txt">GL_EXT_vertex_weighting</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_vertex_weighting(). */
   bool CS_GL_EXT_vertex_weighting;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/HP/occlusion_test.txt">GL_HP_occlusion_test</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_HP_occlusion_test(). */
   bool CS_GL_HP_occlusion_test;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/blend_square.txt">GL_NV_blend_square</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_NV_blend_square(). */
   bool CS_GL_NV_blend_square;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/copy_depth_to_color.txt">GL_NV_copy_depth_to_color</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_NV_copy_depth_to_color(). */
   bool CS_GL_NV_copy_depth_to_color;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/depth_clamp.txt">GL_NV_depth_clamp</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_NV_depth_clamp(). */
   bool CS_GL_NV_depth_clamp;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/evaluators.txt">GL_NV_evaluators</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_NV_evaluators(). */
   bool CS_GL_NV_evaluators;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/fence.txt">GL_NV_fence</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_NV_fence(). */
   bool CS_GL_NV_fence;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/fog_distance.txt">GL_NV_fog_distance</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_NV_fog_distance(). */
   bool CS_GL_NV_fog_distance;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/light_max_exponent.txt">GL_NV_light_max_exponent</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_NV_light_max_exponent(). */
   bool CS_GL_NV_light_max_exponent;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/multisample_filter_hint.txt">GL_NV_multisample_filter_hint</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_NV_multisample_filter_hint(). */
   bool CS_GL_NV_multisample_filter_hint;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/occlusion_query.txt">GL_NV_occlusion_query</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_NV_occlusion_query(). */
   bool CS_GL_NV_occlusion_query;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/packed_depth_stencil.txt">GL_NV_packed_depth_stencil</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_NV_packed_depth_stencil(). */
   bool CS_GL_NV_packed_depth_stencil;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/point_sprite.txt">GL_NV_point_sprite</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_NV_point_sprite(). */
   bool CS_GL_NV_point_sprite;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/register_combiners.txt">GL_NV_register_combiners</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_NV_register_combiners(). */
   bool CS_GL_NV_register_combiners;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/register_combiners2.txt">GL_NV_register_combiners2</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_NV_register_combiners2(). */
   bool CS_GL_NV_register_combiners2;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texgen_emboss.txt">GL_NV_texgen_emboss</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_NV_texgen_emboss(). */
   bool CS_GL_NV_texgen_emboss;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texgen_reflection.txt">GL_NV_texgen_reflection</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_NV_texgen_reflection(). */
   bool CS_GL_NV_texgen_reflection;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_compression_vtc.txt">GL_NV_texture_compression_vtc</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_NV_texture_compression_vtc(). */
   bool CS_GL_NV_texture_compression_vtc;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_env_combine4.txt">GL_NV_texture_env_combine4</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_NV_texture_env_combine4(). */
   bool CS_GL_NV_texture_env_combine4;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_rectangle.txt">GL_NV_texture_rectangle</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_NV_texture_rectangle(). */
   bool CS_GL_NV_texture_rectangle;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_shader.txt">GL_NV_texture_shader</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_NV_texture_shader(). */
   bool CS_GL_NV_texture_shader;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_shader2.txt">GL_NV_texture_shader2</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_NV_texture_shader2(). */
   bool CS_GL_NV_texture_shader2;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_shader3.txt">GL_NV_texture_shader3</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_NV_texture_shader3(). */
   bool CS_GL_NV_texture_shader3;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_array_range.txt">GL_NV_vertex_array_range</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_NV_vertex_array_range(). */
   bool CS_GL_NV_vertex_array_range;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_array_range2.txt">GL_NV_vertex_array_range2</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_NV_vertex_array_range2(). */
   bool CS_GL_NV_vertex_array_range2;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_program.txt">GL_NV_vertex_program</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_NV_vertex_program(). */
   bool CS_GL_NV_vertex_program;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_program1_1.txt">GL_NV_vertex_program1_1</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_NV_vertex_program1_1(). */
   bool CS_GL_NV_vertex_program1_1;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/element_array.txt">GL_ATI_element_array</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ATI_element_array(). */
   bool CS_GL_ATI_element_array;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/envmap_bumpmap.txt">GL_ATI_envmap_bumpmap</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ATI_envmap_bumpmap(). */
   bool CS_GL_ATI_envmap_bumpmap;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/fragment_shader.txt">GL_ATI_fragment_shader</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ATI_fragment_shader(). */
   bool CS_GL_ATI_fragment_shader;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/pn_triangles.txt">GL_ATI_pn_triangles</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ATI_pn_triangles(). */
   bool CS_GL_ATI_pn_triangles;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/texture_mirror_once.txt">GL_ATI_texture_mirror_once</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ATI_texture_mirror_once(). */
   bool CS_GL_ATI_texture_mirror_once;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/vertex_array_object.txt">GL_ATI_vertex_array_object</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ATI_vertex_array_object(). */
   bool CS_GL_ATI_vertex_array_object;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/vertex_attrib_array_object.txt">GL_ATI_vertex_attrib_array_object</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ATI_vertex_attrib_array_object(). */
   bool CS_GL_ATI_vertex_attrib_array_object;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/vertex_streams.txt">GL_ATI_vertex_streams</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ATI_vertex_streams(). */
   bool CS_GL_ATI_vertex_streams;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_image_buffer.txt">WGL_I3D_image_buffer</a> extension was found. 
+   * Set by csGLExtensionManager::InitWGL_I3D_image_buffer(). */
   bool CS_WGL_I3D_image_buffer;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_swap_frame_lock.txt">WGL_I3D_swap_frame_lock</a> extension was found. 
+   * Set by csGLExtensionManager::InitWGL_I3D_swap_frame_lock(). */
   bool CS_WGL_I3D_swap_frame_lock;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_swap_frame_usage.txt">WGL_I3D_swap_frame_usage</a> extension was found. 
+   * Set by csGLExtensionManager::InitWGL_I3D_swap_frame_usage(). */
   bool CS_WGL_I3D_swap_frame_usage;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/3DFX/texture_compression_FXT1.txt">GL_3DFX_texture_compression_FXT1</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_3DFX_texture_compression_FXT1(). */
   bool CS_GL_3DFX_texture_compression_FXT1;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/IBM/cull_vertex.txt">GL_IBM_cull_vertex</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_IBM_cull_vertex(). */
   bool CS_GL_IBM_cull_vertex;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/IBM/multimode_draw_arrays.txt">GL_IBM_multimode_draw_arrays</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_IBM_multimode_draw_arrays(). */
   bool CS_GL_IBM_multimode_draw_arrays;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/IBM/raster_pos_clip.txt">GL_IBM_raster_pos_clip</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_IBM_raster_pos_clip(). */
   bool CS_GL_IBM_raster_pos_clip;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/IBM/texture_mirrored_repeat.txt">GL_IBM_texture_mirrored_repeat</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_IBM_texture_mirrored_repeat(). */
   bool CS_GL_IBM_texture_mirrored_repeat;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/IBM/vertex_array_lists.txt">GL_IBM_vertex_array_lists</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_IBM_vertex_array_lists(). */
   bool CS_GL_IBM_vertex_array_lists;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/MESA/resize_buffers.txt">GL_MESA_resize_buffers</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_MESA_resize_buffers(). */
   bool CS_GL_MESA_resize_buffers;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/MESA/window_pos.txt">GL_MESA_window_pos</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_MESA_window_pos(). */
   bool CS_GL_MESA_window_pos;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/OML/interlace.txt">GL_OML_interlace</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_OML_interlace(). */
   bool CS_GL_OML_interlace;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/OML/resample.txt">GL_OML_resample</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_OML_resample(). */
   bool CS_GL_OML_resample;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/OML/subsample.txt">GL_OML_subsample</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_OML_subsample(). */
   bool CS_GL_OML_subsample;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/generate_mipmap.txt">GL_SGIS_generate_mipmap</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_SGIS_generate_mipmap(). */
   bool CS_GL_SGIS_generate_mipmap;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/multisample.txt">GL_SGIS_multisample</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_SGIS_multisample(). */
   bool CS_GL_SGIS_multisample;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/pixel_texture.txt">GL_SGIS_pixel_texture</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_SGIS_pixel_texture(). */
   bool CS_GL_SGIS_pixel_texture;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/texture_border_clamp.txt">GL_SGIS_texture_border_clamp</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_SGIS_texture_border_clamp(). */
   bool CS_GL_SGIS_texture_border_clamp;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/texture_color_mask.txt">GL_SGIS_texture_color_mask</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_SGIS_texture_color_mask(). */
   bool CS_GL_SGIS_texture_color_mask;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/texture_edge_clamp.txt">GL_SGIS_texture_edge_clamp</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_SGIS_texture_edge_clamp(). */
   bool CS_GL_SGIS_texture_edge_clamp;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/texture_lod.txt">GL_SGIS_texture_lod</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_SGIS_texture_lod(). */
   bool CS_GL_SGIS_texture_lod;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/depth_texture.txt">GL_SGIS_depth_texture</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_SGIS_depth_texture(). */
   bool CS_GL_SGIS_depth_texture;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIX/fog_offset.txt">GL_SGIX_fog_offset</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_SGIX_fog_offset(). */
   bool CS_GL_SGIX_fog_offset;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIX/interlace.txt">GL_SGIX_interlace</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_SGIX_interlace(). */
   bool CS_GL_SGIX_interlace;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIX/shadow_ambient.txt">GL_SGIX_shadow_ambient</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_SGIX_shadow_ambient(). */
   bool CS_GL_SGIX_shadow_ambient;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGI/color_matrix.txt">GL_SGI_color_matrix</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_SGI_color_matrix(). */
   bool CS_GL_SGI_color_matrix;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGI/color_table.txt">GL_SGI_color_table</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_SGI_color_table(). */
   bool CS_GL_SGI_color_table;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGI/texture_color_table.txt">GL_SGI_texture_color_table</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_SGI_texture_color_table(). */
   bool CS_GL_SGI_texture_color_table;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/SUN/vertex.txt">GL_SUN_vertex</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_SUN_vertex(). */
   bool CS_GL_SUN_vertex;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/fragment_program.txt">GL_ARB_fragment_program</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_fragment_program(). */
   bool CS_GL_ARB_fragment_program;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/text_fragment_shader.txt">GL_ATI_text_fragment_shader</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ATI_text_fragment_shader(). */
   bool CS_GL_ATI_text_fragment_shader;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/APPLE/client_storage.txt">GL_APPLE_client_storage</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_APPLE_client_storage(). */
   bool CS_GL_APPLE_client_storage;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/APPLE/element_array.txt">GL_APPLE_element_array</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_APPLE_element_array(). */
   bool CS_GL_APPLE_element_array;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/APPLE/fence.txt">GL_APPLE_fence</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_APPLE_fence(). */
   bool CS_GL_APPLE_fence;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/APPLE/vertex_array_object.txt">GL_APPLE_vertex_array_object</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_APPLE_vertex_array_object(). */
   bool CS_GL_APPLE_vertex_array_object;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/APPLE/vertex_array_range.txt">GL_APPLE_vertex_array_range</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_APPLE_vertex_array_range(). */
   bool CS_GL_APPLE_vertex_array_range;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_pixel_format.txt">WGL_ARB_pixel_format</a> extension was found. 
+   * Set by csGLExtensionManager::InitWGL_ARB_pixel_format(). */
   bool CS_WGL_ARB_pixel_format;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_make_current_read.txt">WGL_ARB_make_current_read</a> extension was found. 
+   * Set by csGLExtensionManager::InitWGL_ARB_make_current_read(). */
   bool CS_WGL_ARB_make_current_read;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_pbuffer.txt">WGL_ARB_pbuffer</a> extension was found. 
+   * Set by csGLExtensionManager::InitWGL_ARB_pbuffer(). */
   bool CS_WGL_ARB_pbuffer;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_swap_control.txt">WGL_EXT_swap_control</a> extension was found. 
+   * Set by csGLExtensionManager::InitWGL_EXT_swap_control(). */
   bool CS_WGL_EXT_swap_control;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_render_texture.txt">WGL_ARB_render_texture</a> extension was found. 
+   * Set by csGLExtensionManager::InitWGL_ARB_render_texture(). */
   bool CS_WGL_ARB_render_texture;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_extensions_string.txt">WGL_EXT_extensions_string</a> extension was found. 
+   * Set by csGLExtensionManager::InitWGL_EXT_extensions_string(). */
   bool CS_WGL_EXT_extensions_string;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_make_current_read.txt">WGL_EXT_make_current_read</a> extension was found. 
+   * Set by csGLExtensionManager::InitWGL_EXT_make_current_read(). */
   bool CS_WGL_EXT_make_current_read;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_pbuffer.txt">WGL_EXT_pbuffer</a> extension was found. 
+   * Set by csGLExtensionManager::InitWGL_EXT_pbuffer(). */
   bool CS_WGL_EXT_pbuffer;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_pixel_format.txt">WGL_EXT_pixel_format</a> extension was found. 
+   * Set by csGLExtensionManager::InitWGL_EXT_pixel_format(). */
   bool CS_WGL_EXT_pixel_format;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_digital_video_control.txt">WGL_I3D_digital_video_control</a> extension was found. 
+   * Set by csGLExtensionManager::InitWGL_I3D_digital_video_control(). */
   bool CS_WGL_I3D_digital_video_control;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_gamma.txt">WGL_I3D_gamma</a> extension was found. 
+   * Set by csGLExtensionManager::InitWGL_I3D_gamma(). */
   bool CS_WGL_I3D_gamma;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_genlock.txt">WGL_I3D_genlock</a> extension was found. 
+   * Set by csGLExtensionManager::InitWGL_I3D_genlock(). */
   bool CS_WGL_I3D_genlock;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/matrix_palette.txt">GL_ARB_matrix_palette</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_matrix_palette(). */
   bool CS_GL_ARB_matrix_palette;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/element_array.txt">GL_NV_element_array</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_NV_element_array(). */
   bool CS_GL_NV_element_array;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/float_buffer.txt">GL_NV_float_buffer</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_NV_float_buffer(). */
   bool CS_GL_NV_float_buffer;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/fragment_program.txt">GL_NV_fragment_program</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_NV_fragment_program(). */
   bool CS_GL_NV_fragment_program;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/primitive_restart.txt">GL_NV_primitive_restart</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_NV_primitive_restart(). */
   bool CS_GL_NV_primitive_restart;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_program2.txt">GL_NV_vertex_program2</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_NV_vertex_program2(). */
   bool CS_GL_NV_vertex_program2;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_buffer_object.txt">GL_ARB_vertex_buffer_object</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_vertex_buffer_object(). */
   bool CS_GL_ARB_vertex_buffer_object;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/separate_stencil.txt">GL_ATI_separate_stencil</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ATI_separate_stencil(). */
   bool CS_GL_ATI_separate_stencil;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_non_power_of_two.txt">GL_ARB_texture_non_power_of_two</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_texture_non_power_of_two(). */
   bool CS_GL_ARB_texture_non_power_of_two;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/point_sprite.txt">GL_ARB_point_sprite</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_point_sprite(). */
   bool CS_GL_ARB_point_sprite;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/shading_language_100.txt">GL_ARB_shading_language_100</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_shading_language_100(). */
   bool CS_GL_ARB_shading_language_100;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/shader_objects.txt">GL_ARB_shader_objects</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_shader_objects(). */
   bool CS_GL_ARB_shader_objects;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/fragment_shader.txt">GL_ARB_fragment_shader</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_fragment_shader(). */
   bool CS_GL_ARB_fragment_shader;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_shader.txt">GL_ARB_vertex_shader</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_vertex_shader(). */
   bool CS_GL_ARB_vertex_shader;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/pixel_buffer_object.txt">GL_ARB_pixel_buffer_object</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_pixel_buffer_object(). */
   bool CS_GL_ARB_pixel_buffer_object;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_rectangle.txt">GL_ARB_texture_rectangle</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_texture_rectangle(). */
   bool CS_GL_ARB_texture_rectangle;
 
 protected:
@@ -12802,6 +14878,10 @@ protected:
 
 };
 
+/**
+ * GL extensions manager. Checks for the presence of specific GL extensions
+ * and fetches all function pointers if present.
+ */
 struct csGLExtensionManager : public csGLExtensionFunctions,
 			      public csGLExtensionFlags
 {
@@ -12901,6 +14981,7 @@ public:
     Reset ();
   }
   
+  /**\internal Initialize GL_version_1_2 pseudo-extension. */
   void InitGL_version_1_2 ()
   {
     if (tested_CS_GL_version_1_2) return;
@@ -12932,6 +15013,7 @@ public:
     }
   }
   
+  /**\internal Initialize GL_version_1_3 pseudo-extension. */
   void InitGL_version_1_3 ()
   {
     if (tested_CS_GL_version_1_3) return;
@@ -13005,6 +15087,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/imaging.txt">GL_ARB_imaging</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_imaging. */
   void InitGL_ARB_imaging ()
   {
     if (tested_CS_GL_ARB_imaging) return;
@@ -13066,6 +15150,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/multitexture.txt">GL_ARB_multitexture</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_multitexture. */
   void InitGL_ARB_multitexture ()
   {
     if (tested_CS_GL_ARB_multitexture) return;
@@ -13127,6 +15213,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/transpose_matrix.txt">GL_ARB_transpose_matrix</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_transpose_matrix. */
   void InitGL_ARB_transpose_matrix ()
   {
     if (tested_CS_GL_ARB_transpose_matrix) return;
@@ -13158,6 +15246,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/multisample.txt">GL_ARB_multisample</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_multisample. */
   void InitGL_ARB_multisample ()
   {
     if (tested_CS_GL_ARB_multisample) return;
@@ -13186,6 +15276,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_env_add.txt">GL_ARB_texture_env_add</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_texture_env_add. */
   void InitGL_ARB_texture_env_add ()
   {
     if (tested_CS_GL_ARB_texture_env_add) return;
@@ -13214,6 +15306,8 @@ public:
   }
   
 #ifdef _WIN32
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_extensions_string.txt">WGL_ARB_extensions_string</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_WGL_ARB_extensions_string. */
   void InitWGL_ARB_extensions_string (HDC hDC)
   {
     if (tested_CS_WGL_ARB_extensions_string) return;
@@ -13243,6 +15337,8 @@ public:
 #endif
 
 #ifdef _WIN32
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_buffer_region.txt">WGL_ARB_buffer_region</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_WGL_ARB_buffer_region. */
   void InitWGL_ARB_buffer_region (HDC hDC)
   {
     if (tested_CS_WGL_ARB_buffer_region) return;
@@ -13276,6 +15372,8 @@ public:
   }
 #endif
 
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_cube_map.txt">GL_ARB_texture_cube_map</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_texture_cube_map. */
   void InitGL_ARB_texture_cube_map ()
   {
     if (tested_CS_GL_ARB_texture_cube_map) return;
@@ -13303,6 +15401,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/depth_texture.txt">GL_ARB_depth_texture</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_depth_texture. */
   void InitGL_ARB_depth_texture ()
   {
     if (tested_CS_GL_ARB_depth_texture) return;
@@ -13330,6 +15430,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/point_parameters.txt">GL_ARB_point_parameters</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_point_parameters. */
   void InitGL_ARB_point_parameters ()
   {
     if (tested_CS_GL_ARB_point_parameters) return;
@@ -13359,6 +15461,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/shadow.txt">GL_ARB_shadow</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_shadow. */
   void InitGL_ARB_shadow ()
   {
     if (tested_CS_GL_ARB_shadow) return;
@@ -13386,6 +15490,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/shadow_ambient.txt">GL_ARB_shadow_ambient</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_shadow_ambient. */
   void InitGL_ARB_shadow_ambient ()
   {
     if (tested_CS_GL_ARB_shadow_ambient) return;
@@ -13413,6 +15519,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_border_clamp.txt">GL_ARB_texture_border_clamp</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_texture_border_clamp. */
   void InitGL_ARB_texture_border_clamp ()
   {
     if (tested_CS_GL_ARB_texture_border_clamp) return;
@@ -13440,6 +15548,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_compression.txt">GL_ARB_texture_compression</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_texture_compression. */
   void InitGL_ARB_texture_compression ()
   {
     if (tested_CS_GL_ARB_texture_compression) return;
@@ -13474,6 +15584,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_env_combine.txt">GL_ARB_texture_env_combine</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_texture_env_combine. */
   void InitGL_ARB_texture_env_combine ()
   {
     if (tested_CS_GL_ARB_texture_env_combine) return;
@@ -13501,6 +15613,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_env_crossbar.txt">GL_ARB_texture_env_crossbar</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_texture_env_crossbar. */
   void InitGL_ARB_texture_env_crossbar ()
   {
     if (tested_CS_GL_ARB_texture_env_crossbar) return;
@@ -13528,6 +15642,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_env_dot3.txt">GL_ARB_texture_env_dot3</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_texture_env_dot3. */
   void InitGL_ARB_texture_env_dot3 ()
   {
     if (tested_CS_GL_ARB_texture_env_dot3) return;
@@ -13555,6 +15671,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_mirrored_repeat.txt">GL_ARB_texture_mirrored_repeat</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_texture_mirrored_repeat. */
   void InitGL_ARB_texture_mirrored_repeat ()
   {
     if (tested_CS_GL_ARB_texture_mirrored_repeat) return;
@@ -13582,6 +15700,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_blend.txt">GL_ARB_vertex_blend</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_vertex_blend. */
   void InitGL_ARB_vertex_blend ()
   {
     if (tested_CS_GL_ARB_vertex_blend) return;
@@ -13620,6 +15740,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_program.txt">GL_ARB_vertex_program</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_vertex_program. */
   void InitGL_ARB_vertex_program ()
   {
     if (tested_CS_GL_ARB_vertex_program) return;
@@ -13709,6 +15831,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/window_pos.txt">GL_ARB_window_pos</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_window_pos. */
   void InitGL_ARB_window_pos ()
   {
     if (tested_CS_GL_ARB_window_pos) return;
@@ -13752,6 +15876,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/422_pixels.txt">GL_EXT_422_pixels</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_422_pixels. */
   void InitGL_EXT_422_pixels ()
   {
     if (tested_CS_GL_EXT_422_pixels) return;
@@ -13779,6 +15905,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/abgr.txt">GL_EXT_abgr</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_abgr. */
   void InitGL_EXT_abgr ()
   {
     if (tested_CS_GL_EXT_abgr) return;
@@ -13806,6 +15934,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/bgra.txt">GL_EXT_bgra</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_bgra. */
   void InitGL_EXT_bgra ()
   {
     if (tested_CS_GL_EXT_bgra) return;
@@ -13833,6 +15963,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_color.txt">GL_EXT_blend_color</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_blend_color. */
   void InitGL_EXT_blend_color ()
   {
     if (tested_CS_GL_EXT_blend_color) return;
@@ -13861,6 +15993,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_func_separate.txt">GL_EXT_blend_func_separate</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_blend_func_separate. */
   void InitGL_EXT_blend_func_separate ()
   {
     if (tested_CS_GL_EXT_blend_func_separate) return;
@@ -13889,6 +16023,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_logic_op.txt">GL_EXT_blend_logic_op</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_blend_logic_op. */
   void InitGL_EXT_blend_logic_op ()
   {
     if (tested_CS_GL_EXT_blend_logic_op) return;
@@ -13916,6 +16052,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_minmax.txt">GL_EXT_blend_minmax</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_blend_minmax. */
   void InitGL_EXT_blend_minmax ()
   {
     if (tested_CS_GL_EXT_blend_minmax) return;
@@ -13944,6 +16082,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/blend_subtract.txt">GL_EXT_blend_subtract</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_blend_subtract. */
   void InitGL_EXT_blend_subtract ()
   {
     if (tested_CS_GL_EXT_blend_subtract) return;
@@ -13971,6 +16111,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/clip_volume_hint.txt">GL_EXT_clip_volume_hint</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_clip_volume_hint. */
   void InitGL_EXT_clip_volume_hint ()
   {
     if (tested_CS_GL_EXT_clip_volume_hint) return;
@@ -13998,6 +16140,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/color_subtable.txt">GL_EXT_color_subtable</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_color_subtable. */
   void InitGL_EXT_color_subtable ()
   {
     if (tested_CS_GL_EXT_color_subtable) return;
@@ -14027,6 +16171,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/compiled_vertex_array.txt">GL_EXT_compiled_vertex_array</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_compiled_vertex_array. */
   void InitGL_EXT_compiled_vertex_array ()
   {
     if (tested_CS_GL_EXT_compiled_vertex_array) return;
@@ -14056,6 +16202,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/convolution.txt">GL_EXT_convolution</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_convolution. */
   void InitGL_EXT_convolution ()
   {
     if (tested_CS_GL_EXT_convolution) return;
@@ -14096,6 +16244,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/fog_coord.txt">GL_EXT_fog_coord</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_fog_coord. */
   void InitGL_EXT_fog_coord ()
   {
     if (tested_CS_GL_EXT_fog_coord) return;
@@ -14128,6 +16278,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/histogram.txt">GL_EXT_histogram</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_histogram. */
   void InitGL_EXT_histogram ()
   {
     if (tested_CS_GL_EXT_histogram) return;
@@ -14165,6 +16317,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/multi_draw_arrays.txt">GL_EXT_multi_draw_arrays</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_multi_draw_arrays. */
   void InitGL_EXT_multi_draw_arrays ()
   {
     if (tested_CS_GL_EXT_multi_draw_arrays) return;
@@ -14194,6 +16348,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/packed_pixels.txt">GL_EXT_packed_pixels</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_packed_pixels. */
   void InitGL_EXT_packed_pixels ()
   {
     if (tested_CS_GL_EXT_packed_pixels) return;
@@ -14221,6 +16377,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/paletted_texture.txt">GL_EXT_paletted_texture</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_paletted_texture. */
   void InitGL_EXT_paletted_texture ()
   {
     if (tested_CS_GL_EXT_paletted_texture) return;
@@ -14253,6 +16411,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/point_parameters.txt">GL_EXT_point_parameters</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_point_parameters. */
   void InitGL_EXT_point_parameters ()
   {
     if (tested_CS_GL_EXT_point_parameters) return;
@@ -14282,6 +16442,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/polygon_offset.txt">GL_EXT_polygon_offset</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_polygon_offset. */
   void InitGL_EXT_polygon_offset ()
   {
     if (tested_CS_GL_EXT_polygon_offset) return;
@@ -14310,6 +16472,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/secondary_color.txt">GL_EXT_secondary_color</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_secondary_color. */
   void InitGL_EXT_secondary_color ()
   {
     if (tested_CS_GL_EXT_secondary_color) return;
@@ -14354,6 +16518,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/separate_specular_color.txt">GL_EXT_separate_specular_color</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_separate_specular_color. */
   void InitGL_EXT_separate_specular_color ()
   {
     if (tested_CS_GL_EXT_separate_specular_color) return;
@@ -14381,6 +16547,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/shadow_funcs.txt">GL_EXT_shadow_funcs</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_shadow_funcs. */
   void InitGL_EXT_shadow_funcs ()
   {
     if (tested_CS_GL_EXT_shadow_funcs) return;
@@ -14408,6 +16576,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/shared_texture_palette.txt">GL_EXT_shared_texture_palette</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_shared_texture_palette. */
   void InitGL_EXT_shared_texture_palette ()
   {
     if (tested_CS_GL_EXT_shared_texture_palette) return;
@@ -14435,6 +16605,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/stencil_two_side.txt">GL_EXT_stencil_two_side</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_stencil_two_side. */
   void InitGL_EXT_stencil_two_side ()
   {
     if (tested_CS_GL_EXT_stencil_two_side) return;
@@ -14463,6 +16635,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/stencil_wrap.txt">GL_EXT_stencil_wrap</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_stencil_wrap. */
   void InitGL_EXT_stencil_wrap ()
   {
     if (tested_CS_GL_EXT_stencil_wrap) return;
@@ -14490,6 +16664,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/subtexture.txt">GL_EXT_subtexture</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_subtexture. */
   void InitGL_EXT_subtexture ()
   {
     if (tested_CS_GL_EXT_subtexture) return;
@@ -14520,6 +16696,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture3D.txt">GL_EXT_texture3D</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_texture3D. */
   void InitGL_EXT_texture3D ()
   {
     if (tested_CS_GL_EXT_texture3D) return;
@@ -14548,6 +16726,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_compression_s3tc.txt">GL_EXT_texture_compression_s3tc</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_texture_compression_s3tc. */
   void InitGL_EXT_texture_compression_s3tc ()
   {
     if (tested_CS_GL_EXT_texture_compression_s3tc) return;
@@ -14575,6 +16755,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_env_add.txt">GL_EXT_texture_env_add</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_texture_env_add. */
   void InitGL_EXT_texture_env_add ()
   {
     if (tested_CS_GL_EXT_texture_env_add) return;
@@ -14602,6 +16784,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_env_combine.txt">GL_EXT_texture_env_combine</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_texture_env_combine. */
   void InitGL_EXT_texture_env_combine ()
   {
     if (tested_CS_GL_EXT_texture_env_combine) return;
@@ -14629,6 +16813,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_env_dot3.txt">GL_EXT_texture_env_dot3</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_texture_env_dot3. */
   void InitGL_EXT_texture_env_dot3 ()
   {
     if (tested_CS_GL_EXT_texture_env_dot3) return;
@@ -14656,6 +16842,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_filter_anisotropic.txt">GL_EXT_texture_filter_anisotropic</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_texture_filter_anisotropic. */
   void InitGL_EXT_texture_filter_anisotropic ()
   {
     if (tested_CS_GL_EXT_texture_filter_anisotropic) return;
@@ -14683,6 +16871,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_lod_bias.txt">GL_EXT_texture_lod_bias</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_texture_lod_bias. */
   void InitGL_EXT_texture_lod_bias ()
   {
     if (tested_CS_GL_EXT_texture_lod_bias) return;
@@ -14710,6 +16900,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_object.txt">GL_EXT_texture_object</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_texture_object. */
   void InitGL_EXT_texture_object ()
   {
     if (tested_CS_GL_EXT_texture_object) return;
@@ -14743,6 +16935,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/vertex_array.txt">GL_EXT_vertex_array</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_vertex_array. */
   void InitGL_EXT_vertex_array ()
   {
     if (tested_CS_GL_EXT_vertex_array) return;
@@ -14779,6 +16973,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/vertex_shader.txt">GL_EXT_vertex_shader</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_vertex_shader. */
   void InitGL_EXT_vertex_shader ()
   {
     if (tested_CS_GL_EXT_vertex_shader) return;
@@ -14848,6 +17044,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/vertex_weighting.txt">GL_EXT_vertex_weighting</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_vertex_weighting. */
   void InitGL_EXT_vertex_weighting ()
   {
     if (tested_CS_GL_EXT_vertex_weighting) return;
@@ -14878,6 +17076,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/HP/occlusion_test.txt">GL_HP_occlusion_test</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_HP_occlusion_test. */
   void InitGL_HP_occlusion_test ()
   {
     if (tested_CS_GL_HP_occlusion_test) return;
@@ -14905,6 +17105,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/blend_square.txt">GL_NV_blend_square</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_NV_blend_square. */
   void InitGL_NV_blend_square ()
   {
     if (tested_CS_GL_NV_blend_square) return;
@@ -14932,6 +17134,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/copy_depth_to_color.txt">GL_NV_copy_depth_to_color</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_NV_copy_depth_to_color. */
   void InitGL_NV_copy_depth_to_color ()
   {
     if (tested_CS_GL_NV_copy_depth_to_color) return;
@@ -14959,6 +17163,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/depth_clamp.txt">GL_NV_depth_clamp</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_NV_depth_clamp. */
   void InitGL_NV_depth_clamp ()
   {
     if (tested_CS_GL_NV_depth_clamp) return;
@@ -14986,6 +17192,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/evaluators.txt">GL_NV_evaluators</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_NV_evaluators. */
   void InitGL_NV_evaluators ()
   {
     if (tested_CS_GL_NV_evaluators) return;
@@ -15022,6 +17230,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/fence.txt">GL_NV_fence</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_NV_fence. */
   void InitGL_NV_fence ()
   {
     if (tested_CS_GL_NV_fence) return;
@@ -15056,6 +17266,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/fog_distance.txt">GL_NV_fog_distance</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_NV_fog_distance. */
   void InitGL_NV_fog_distance ()
   {
     if (tested_CS_GL_NV_fog_distance) return;
@@ -15083,6 +17295,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/light_max_exponent.txt">GL_NV_light_max_exponent</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_NV_light_max_exponent. */
   void InitGL_NV_light_max_exponent ()
   {
     if (tested_CS_GL_NV_light_max_exponent) return;
@@ -15110,6 +17324,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/multisample_filter_hint.txt">GL_NV_multisample_filter_hint</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_NV_multisample_filter_hint. */
   void InitGL_NV_multisample_filter_hint ()
   {
     if (tested_CS_GL_NV_multisample_filter_hint) return;
@@ -15137,6 +17353,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/occlusion_query.txt">GL_NV_occlusion_query</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_NV_occlusion_query. */
   void InitGL_NV_occlusion_query ()
   {
     if (tested_CS_GL_NV_occlusion_query) return;
@@ -15171,6 +17389,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/packed_depth_stencil.txt">GL_NV_packed_depth_stencil</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_NV_packed_depth_stencil. */
   void InitGL_NV_packed_depth_stencil ()
   {
     if (tested_CS_GL_NV_packed_depth_stencil) return;
@@ -15198,6 +17418,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/point_sprite.txt">GL_NV_point_sprite</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_NV_point_sprite. */
   void InitGL_NV_point_sprite ()
   {
     if (tested_CS_GL_NV_point_sprite) return;
@@ -15227,6 +17449,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/register_combiners.txt">GL_NV_register_combiners</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_NV_register_combiners. */
   void InitGL_NV_register_combiners ()
   {
     if (tested_CS_GL_NV_register_combiners) return;
@@ -15267,6 +17491,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/register_combiners2.txt">GL_NV_register_combiners2</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_NV_register_combiners2. */
   void InitGL_NV_register_combiners2 ()
   {
     if (tested_CS_GL_NV_register_combiners2) return;
@@ -15296,6 +17522,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texgen_emboss.txt">GL_NV_texgen_emboss</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_NV_texgen_emboss. */
   void InitGL_NV_texgen_emboss ()
   {
     if (tested_CS_GL_NV_texgen_emboss) return;
@@ -15323,6 +17551,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texgen_reflection.txt">GL_NV_texgen_reflection</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_NV_texgen_reflection. */
   void InitGL_NV_texgen_reflection ()
   {
     if (tested_CS_GL_NV_texgen_reflection) return;
@@ -15350,6 +17580,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_compression_vtc.txt">GL_NV_texture_compression_vtc</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_NV_texture_compression_vtc. */
   void InitGL_NV_texture_compression_vtc ()
   {
     if (tested_CS_GL_NV_texture_compression_vtc) return;
@@ -15377,6 +17609,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_env_combine4.txt">GL_NV_texture_env_combine4</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_NV_texture_env_combine4. */
   void InitGL_NV_texture_env_combine4 ()
   {
     if (tested_CS_GL_NV_texture_env_combine4) return;
@@ -15404,6 +17638,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_rectangle.txt">GL_NV_texture_rectangle</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_NV_texture_rectangle. */
   void InitGL_NV_texture_rectangle ()
   {
     if (tested_CS_GL_NV_texture_rectangle) return;
@@ -15431,6 +17667,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_shader.txt">GL_NV_texture_shader</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_NV_texture_shader. */
   void InitGL_NV_texture_shader ()
   {
     if (tested_CS_GL_NV_texture_shader) return;
@@ -15458,6 +17696,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_shader2.txt">GL_NV_texture_shader2</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_NV_texture_shader2. */
   void InitGL_NV_texture_shader2 ()
   {
     if (tested_CS_GL_NV_texture_shader2) return;
@@ -15485,6 +17725,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/texture_shader3.txt">GL_NV_texture_shader3</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_NV_texture_shader3. */
   void InitGL_NV_texture_shader3 ()
   {
     if (tested_CS_GL_NV_texture_shader3) return;
@@ -15512,6 +17754,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_array_range.txt">GL_NV_vertex_array_range</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_NV_vertex_array_range. */
   void InitGL_NV_vertex_array_range ()
   {
     if (tested_CS_GL_NV_vertex_array_range) return;
@@ -15543,6 +17787,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_array_range2.txt">GL_NV_vertex_array_range2</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_NV_vertex_array_range2. */
   void InitGL_NV_vertex_array_range2 ()
   {
     if (tested_CS_GL_NV_vertex_array_range2) return;
@@ -15570,6 +17816,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_program.txt">GL_NV_vertex_program</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_NV_vertex_program. */
   void InitGL_NV_vertex_program ()
   {
     if (tested_CS_GL_NV_vertex_program) return;
@@ -15659,6 +17907,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_program1_1.txt">GL_NV_vertex_program1_1</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_NV_vertex_program1_1. */
   void InitGL_NV_vertex_program1_1 ()
   {
     if (tested_CS_GL_NV_vertex_program1_1) return;
@@ -15686,6 +17936,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/element_array.txt">GL_ATI_element_array</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ATI_element_array. */
   void InitGL_ATI_element_array ()
   {
     if (tested_CS_GL_ATI_element_array) return;
@@ -15716,6 +17968,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/envmap_bumpmap.txt">GL_ATI_envmap_bumpmap</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ATI_envmap_bumpmap. */
   void InitGL_ATI_envmap_bumpmap ()
   {
     if (tested_CS_GL_ATI_envmap_bumpmap) return;
@@ -15747,6 +18001,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/fragment_shader.txt">GL_ATI_fragment_shader</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ATI_fragment_shader. */
   void InitGL_ATI_fragment_shader ()
   {
     if (tested_CS_GL_ATI_fragment_shader) return;
@@ -15788,6 +18044,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/pn_triangles.txt">GL_ATI_pn_triangles</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ATI_pn_triangles. */
   void InitGL_ATI_pn_triangles ()
   {
     if (tested_CS_GL_ATI_pn_triangles) return;
@@ -15817,6 +18075,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/texture_mirror_once.txt">GL_ATI_texture_mirror_once</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ATI_texture_mirror_once. */
   void InitGL_ATI_texture_mirror_once ()
   {
     if (tested_CS_GL_ATI_texture_mirror_once) return;
@@ -15844,6 +18104,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/vertex_array_object.txt">GL_ATI_vertex_array_object</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ATI_vertex_array_object. */
   void InitGL_ATI_vertex_array_object ()
   {
     if (tested_CS_GL_ATI_vertex_array_object) return;
@@ -15883,6 +18145,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/vertex_attrib_array_object.txt">GL_ATI_vertex_attrib_array_object</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ATI_vertex_attrib_array_object. */
   void InitGL_ATI_vertex_attrib_array_object ()
   {
     if (tested_CS_GL_ATI_vertex_attrib_array_object) return;
@@ -15913,6 +18177,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/vertex_streams.txt">GL_ATI_vertex_streams</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ATI_vertex_streams. */
   void InitGL_ATI_vertex_streams ()
   {
     if (tested_CS_GL_ATI_vertex_streams) return;
@@ -15986,6 +18252,8 @@ public:
   }
   
 #ifdef _WIN32
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_image_buffer.txt">WGL_I3D_image_buffer</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_WGL_I3D_image_buffer. */
   void InitWGL_I3D_image_buffer (HDC hDC)
   {
     if (tested_CS_WGL_I3D_image_buffer) return;
@@ -16020,6 +18288,8 @@ public:
 #endif
 
 #ifdef _WIN32
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_swap_frame_lock.txt">WGL_I3D_swap_frame_lock</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_WGL_I3D_swap_frame_lock. */
   void InitWGL_I3D_swap_frame_lock (HDC hDC)
   {
     if (tested_CS_WGL_I3D_swap_frame_lock) return;
@@ -16054,6 +18324,8 @@ public:
 #endif
 
 #ifdef _WIN32
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_swap_frame_usage.txt">WGL_I3D_swap_frame_usage</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_WGL_I3D_swap_frame_usage. */
   void InitWGL_I3D_swap_frame_usage (HDC hDC)
   {
     if (tested_CS_WGL_I3D_swap_frame_usage) return;
@@ -16087,6 +18359,8 @@ public:
   }
 #endif
 
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/3DFX/texture_compression_FXT1.txt">GL_3DFX_texture_compression_FXT1</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_3DFX_texture_compression_FXT1. */
   void InitGL_3DFX_texture_compression_FXT1 ()
   {
     if (tested_CS_GL_3DFX_texture_compression_FXT1) return;
@@ -16114,6 +18388,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/IBM/cull_vertex.txt">GL_IBM_cull_vertex</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_IBM_cull_vertex. */
   void InitGL_IBM_cull_vertex ()
   {
     if (tested_CS_GL_IBM_cull_vertex) return;
@@ -16141,6 +18417,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/IBM/multimode_draw_arrays.txt">GL_IBM_multimode_draw_arrays</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_IBM_multimode_draw_arrays. */
   void InitGL_IBM_multimode_draw_arrays ()
   {
     if (tested_CS_GL_IBM_multimode_draw_arrays) return;
@@ -16170,6 +18448,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/IBM/raster_pos_clip.txt">GL_IBM_raster_pos_clip</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_IBM_raster_pos_clip. */
   void InitGL_IBM_raster_pos_clip ()
   {
     if (tested_CS_GL_IBM_raster_pos_clip) return;
@@ -16197,6 +18477,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/IBM/texture_mirrored_repeat.txt">GL_IBM_texture_mirrored_repeat</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_IBM_texture_mirrored_repeat. */
   void InitGL_IBM_texture_mirrored_repeat ()
   {
     if (tested_CS_GL_IBM_texture_mirrored_repeat) return;
@@ -16224,6 +18506,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/IBM/vertex_array_lists.txt">GL_IBM_vertex_array_lists</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_IBM_vertex_array_lists. */
   void InitGL_IBM_vertex_array_lists ()
   {
     if (tested_CS_GL_IBM_vertex_array_lists) return;
@@ -16258,6 +18542,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/MESA/resize_buffers.txt">GL_MESA_resize_buffers</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_MESA_resize_buffers. */
   void InitGL_MESA_resize_buffers ()
   {
     if (tested_CS_GL_MESA_resize_buffers) return;
@@ -16286,6 +18572,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/MESA/window_pos.txt">GL_MESA_window_pos</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_MESA_window_pos. */
   void InitGL_MESA_window_pos ()
   {
     if (tested_CS_GL_MESA_window_pos) return;
@@ -16337,6 +18625,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/OML/interlace.txt">GL_OML_interlace</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_OML_interlace. */
   void InitGL_OML_interlace ()
   {
     if (tested_CS_GL_OML_interlace) return;
@@ -16364,6 +18654,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/OML/resample.txt">GL_OML_resample</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_OML_resample. */
   void InitGL_OML_resample ()
   {
     if (tested_CS_GL_OML_resample) return;
@@ -16391,6 +18683,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/OML/subsample.txt">GL_OML_subsample</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_OML_subsample. */
   void InitGL_OML_subsample ()
   {
     if (tested_CS_GL_OML_subsample) return;
@@ -16418,6 +18712,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/generate_mipmap.txt">GL_SGIS_generate_mipmap</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_SGIS_generate_mipmap. */
   void InitGL_SGIS_generate_mipmap ()
   {
     if (tested_CS_GL_SGIS_generate_mipmap) return;
@@ -16445,6 +18741,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/multisample.txt">GL_SGIS_multisample</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_SGIS_multisample. */
   void InitGL_SGIS_multisample ()
   {
     if (tested_CS_GL_SGIS_multisample) return;
@@ -16474,6 +18772,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/pixel_texture.txt">GL_SGIS_pixel_texture</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_SGIS_pixel_texture. */
   void InitGL_SGIS_pixel_texture ()
   {
     if (tested_CS_GL_SGIS_pixel_texture) return;
@@ -16505,6 +18805,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/texture_border_clamp.txt">GL_SGIS_texture_border_clamp</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_SGIS_texture_border_clamp. */
   void InitGL_SGIS_texture_border_clamp ()
   {
     if (tested_CS_GL_SGIS_texture_border_clamp) return;
@@ -16532,6 +18834,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/texture_color_mask.txt">GL_SGIS_texture_color_mask</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_SGIS_texture_color_mask. */
   void InitGL_SGIS_texture_color_mask ()
   {
     if (tested_CS_GL_SGIS_texture_color_mask) return;
@@ -16560,6 +18864,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/texture_edge_clamp.txt">GL_SGIS_texture_edge_clamp</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_SGIS_texture_edge_clamp. */
   void InitGL_SGIS_texture_edge_clamp ()
   {
     if (tested_CS_GL_SGIS_texture_edge_clamp) return;
@@ -16587,6 +18893,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/texture_lod.txt">GL_SGIS_texture_lod</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_SGIS_texture_lod. */
   void InitGL_SGIS_texture_lod ()
   {
     if (tested_CS_GL_SGIS_texture_lod) return;
@@ -16614,6 +18922,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIS/depth_texture.txt">GL_SGIS_depth_texture</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_SGIS_depth_texture. */
   void InitGL_SGIS_depth_texture ()
   {
     if (tested_CS_GL_SGIS_depth_texture) return;
@@ -16641,6 +18951,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIX/fog_offset.txt">GL_SGIX_fog_offset</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_SGIX_fog_offset. */
   void InitGL_SGIX_fog_offset ()
   {
     if (tested_CS_GL_SGIX_fog_offset) return;
@@ -16668,6 +18980,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIX/interlace.txt">GL_SGIX_interlace</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_SGIX_interlace. */
   void InitGL_SGIX_interlace ()
   {
     if (tested_CS_GL_SGIX_interlace) return;
@@ -16695,6 +19009,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGIX/shadow_ambient.txt">GL_SGIX_shadow_ambient</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_SGIX_shadow_ambient. */
   void InitGL_SGIX_shadow_ambient ()
   {
     if (tested_CS_GL_SGIX_shadow_ambient) return;
@@ -16722,6 +19038,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGI/color_matrix.txt">GL_SGI_color_matrix</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_SGI_color_matrix. */
   void InitGL_SGI_color_matrix ()
   {
     if (tested_CS_GL_SGI_color_matrix) return;
@@ -16749,6 +19067,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGI/color_table.txt">GL_SGI_color_table</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_SGI_color_table. */
   void InitGL_SGI_color_table ()
   {
     if (tested_CS_GL_SGI_color_table) return;
@@ -16783,6 +19103,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/SGI/texture_color_table.txt">GL_SGI_texture_color_table</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_SGI_texture_color_table. */
   void InitGL_SGI_texture_color_table ()
   {
     if (tested_CS_GL_SGI_texture_color_table) return;
@@ -16810,6 +19132,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/SUN/vertex.txt">GL_SUN_vertex</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_SUN_vertex. */
   void InitGL_SUN_vertex ()
   {
     if (tested_CS_GL_SUN_vertex) return;
@@ -16877,6 +19201,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/fragment_program.txt">GL_ARB_fragment_program</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_fragment_program. */
   void InitGL_ARB_fragment_program ()
   {
     if (tested_CS_GL_ARB_fragment_program) return;
@@ -16923,6 +19249,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/text_fragment_shader.txt">GL_ATI_text_fragment_shader</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ATI_text_fragment_shader. */
   void InitGL_ATI_text_fragment_shader ()
   {
     if (tested_CS_GL_ATI_text_fragment_shader) return;
@@ -16950,6 +19278,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/APPLE/client_storage.txt">GL_APPLE_client_storage</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_APPLE_client_storage. */
   void InitGL_APPLE_client_storage ()
   {
     if (tested_CS_GL_APPLE_client_storage) return;
@@ -16977,6 +19307,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/APPLE/element_array.txt">GL_APPLE_element_array</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_APPLE_element_array. */
   void InitGL_APPLE_element_array ()
   {
     if (tested_CS_GL_APPLE_element_array) return;
@@ -17009,6 +19341,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/APPLE/fence.txt">GL_APPLE_fence</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_APPLE_fence. */
   void InitGL_APPLE_fence ()
   {
     if (tested_CS_GL_APPLE_fence) return;
@@ -17044,6 +19378,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/APPLE/vertex_array_object.txt">GL_APPLE_vertex_array_object</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_APPLE_vertex_array_object. */
   void InitGL_APPLE_vertex_array_object ()
   {
     if (tested_CS_GL_APPLE_vertex_array_object) return;
@@ -17075,6 +19411,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/APPLE/vertex_array_range.txt">GL_APPLE_vertex_array_range</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_APPLE_vertex_array_range. */
   void InitGL_APPLE_vertex_array_range ()
   {
     if (tested_CS_GL_APPLE_vertex_array_range) return;
@@ -17106,6 +19444,8 @@ public:
   }
   
 #ifdef _WIN32
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_pixel_format.txt">WGL_ARB_pixel_format</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_WGL_ARB_pixel_format. */
   void InitWGL_ARB_pixel_format (HDC hDC)
   {
     if (tested_CS_WGL_ARB_pixel_format) return;
@@ -17139,6 +19479,8 @@ public:
 #endif
 
 #ifdef _WIN32
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_make_current_read.txt">WGL_ARB_make_current_read</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_WGL_ARB_make_current_read. */
   void InitWGL_ARB_make_current_read (HDC hDC)
   {
     if (tested_CS_WGL_ARB_make_current_read) return;
@@ -17171,6 +19513,8 @@ public:
 #endif
 
 #ifdef _WIN32
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_pbuffer.txt">WGL_ARB_pbuffer</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_WGL_ARB_pbuffer. */
   void InitWGL_ARB_pbuffer (HDC hDC)
   {
     if (tested_CS_WGL_ARB_pbuffer) return;
@@ -17206,6 +19550,8 @@ public:
 #endif
 
 #ifdef _WIN32
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_swap_control.txt">WGL_EXT_swap_control</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_WGL_EXT_swap_control. */
   void InitWGL_EXT_swap_control (HDC hDC)
   {
     if (tested_CS_WGL_EXT_swap_control) return;
@@ -17238,6 +19584,8 @@ public:
 #endif
 
 #ifdef _WIN32
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/wgl_render_texture.txt">WGL_ARB_render_texture</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_WGL_ARB_render_texture. */
   void InitWGL_ARB_render_texture (HDC hDC)
   {
     if (tested_CS_WGL_ARB_render_texture) return;
@@ -17271,6 +19619,8 @@ public:
 #endif
 
 #ifdef _WIN32
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_extensions_string.txt">WGL_EXT_extensions_string</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_WGL_EXT_extensions_string. */
   void InitWGL_EXT_extensions_string (HDC hDC)
   {
     if (tested_CS_WGL_EXT_extensions_string) return;
@@ -17302,6 +19652,8 @@ public:
 #endif
 
 #ifdef _WIN32
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_make_current_read.txt">WGL_EXT_make_current_read</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_WGL_EXT_make_current_read. */
   void InitWGL_EXT_make_current_read (HDC hDC)
   {
     if (tested_CS_WGL_EXT_make_current_read) return;
@@ -17334,6 +19686,8 @@ public:
 #endif
 
 #ifdef _WIN32
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_pbuffer.txt">WGL_EXT_pbuffer</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_WGL_EXT_pbuffer. */
   void InitWGL_EXT_pbuffer (HDC hDC)
   {
     if (tested_CS_WGL_EXT_pbuffer) return;
@@ -17369,6 +19723,8 @@ public:
 #endif
 
 #ifdef _WIN32
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_pixel_format.txt">WGL_EXT_pixel_format</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_WGL_EXT_pixel_format. */
   void InitWGL_EXT_pixel_format (HDC hDC)
   {
     if (tested_CS_WGL_EXT_pixel_format) return;
@@ -17402,6 +19758,8 @@ public:
 #endif
 
 #ifdef _WIN32
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_digital_video_control.txt">WGL_I3D_digital_video_control</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_WGL_I3D_digital_video_control. */
   void InitWGL_I3D_digital_video_control (HDC hDC)
   {
     if (tested_CS_WGL_I3D_digital_video_control) return;
@@ -17434,6 +19792,8 @@ public:
 #endif
 
 #ifdef _WIN32
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_gamma.txt">WGL_I3D_gamma</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_WGL_I3D_gamma. */
   void InitWGL_I3D_gamma (HDC hDC)
   {
     if (tested_CS_WGL_I3D_gamma) return;
@@ -17468,6 +19828,8 @@ public:
 #endif
 
 #ifdef _WIN32
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/I3D/wgl_genlock.txt">WGL_I3D_genlock</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_WGL_I3D_genlock. */
   void InitWGL_I3D_genlock (HDC hDC)
   {
     if (tested_CS_WGL_I3D_genlock) return;
@@ -17509,6 +19871,8 @@ public:
   }
 #endif
 
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/matrix_palette.txt">GL_ARB_matrix_palette</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_matrix_palette. */
   void InitGL_ARB_matrix_palette ()
   {
     if (tested_CS_GL_ARB_matrix_palette) return;
@@ -17541,6 +19905,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/element_array.txt">GL_NV_element_array</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_NV_element_array. */
   void InitGL_NV_element_array ()
   {
     if (tested_CS_GL_NV_element_array) return;
@@ -17573,6 +19939,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/float_buffer.txt">GL_NV_float_buffer</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_NV_float_buffer. */
   void InitGL_NV_float_buffer ()
   {
     if (tested_CS_GL_NV_float_buffer) return;
@@ -17600,6 +19968,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/fragment_program.txt">GL_NV_fragment_program</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_NV_fragment_program. */
   void InitGL_NV_fragment_program ()
   {
     if (tested_CS_GL_NV_fragment_program) return;
@@ -17637,6 +20007,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/primitive_restart.txt">GL_NV_primitive_restart</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_NV_primitive_restart. */
   void InitGL_NV_primitive_restart ()
   {
     if (tested_CS_GL_NV_primitive_restart) return;
@@ -17666,6 +20038,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/NV/vertex_program2.txt">GL_NV_vertex_program2</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_NV_vertex_program2. */
   void InitGL_NV_vertex_program2 ()
   {
     if (tested_CS_GL_NV_vertex_program2) return;
@@ -17693,6 +20067,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_buffer_object.txt">GL_ARB_vertex_buffer_object</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_vertex_buffer_object. */
   void InitGL_ARB_vertex_buffer_object ()
   {
     if (tested_CS_GL_ARB_vertex_buffer_object) return;
@@ -17731,6 +20107,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ATI/separate_stencil.txt">GL_ATI_separate_stencil</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ATI_separate_stencil. */
   void InitGL_ATI_separate_stencil ()
   {
     if (tested_CS_GL_ATI_separate_stencil) return;
@@ -17760,6 +20138,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_non_power_of_two.txt">GL_ARB_texture_non_power_of_two</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_texture_non_power_of_two. */
   void InitGL_ARB_texture_non_power_of_two ()
   {
     if (tested_CS_GL_ARB_texture_non_power_of_two) return;
@@ -17787,6 +20167,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/point_sprite.txt">GL_ARB_point_sprite</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_point_sprite. */
   void InitGL_ARB_point_sprite ()
   {
     if (tested_CS_GL_ARB_point_sprite) return;
@@ -17814,6 +20196,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/shading_language_100.txt">GL_ARB_shading_language_100</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_shading_language_100. */
   void InitGL_ARB_shading_language_100 ()
   {
     if (tested_CS_GL_ARB_shading_language_100) return;
@@ -17841,6 +20225,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/shader_objects.txt">GL_ARB_shader_objects</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_shader_objects. */
   void InitGL_ARB_shader_objects ()
   {
     if (tested_CS_GL_ARB_shader_objects) return;
@@ -17907,6 +20293,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/fragment_shader.txt">GL_ARB_fragment_shader</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_fragment_shader. */
   void InitGL_ARB_fragment_shader ()
   {
     if (tested_CS_GL_ARB_fragment_shader) return;
@@ -17934,6 +20322,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_shader.txt">GL_ARB_vertex_shader</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_vertex_shader. */
   void InitGL_ARB_vertex_shader ()
   {
     if (tested_CS_GL_ARB_vertex_shader) return;
@@ -18004,6 +20394,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/pixel_buffer_object.txt">GL_ARB_pixel_buffer_object</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_pixel_buffer_object. */
   void InitGL_ARB_pixel_buffer_object ()
   {
     if (tested_CS_GL_ARB_pixel_buffer_object) return;
@@ -18036,6 +20428,8 @@ public:
     }
   }
   
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_rectangle.txt">GL_ARB_texture_rectangle</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_texture_rectangle. */
   void InitGL_ARB_texture_rectangle ()
   {
     if (tested_CS_GL_ARB_texture_rectangle) return;

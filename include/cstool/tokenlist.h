@@ -93,11 +93,12 @@
  * 
  * @{ */
 
-/**
- * A token list entry.
- */
 #ifndef CS_TOKEN_LIST_TOKEN_PREFIX
 #define CS_TOKEN_LIST_TOKEN_PREFIX_DEFAULT
+/**\def CS_TOKEN_LIST_TOKEN_PREFIX
+ * Prefix for the generated enumeration value. Can be overridden by the user
+ * by defining it prior to CS_TOKEN_LIST_TOKEN use.
+ */
 #define CS_TOKEN_LIST_TOKEN_PREFIX XMLTOKEN_
 #endif
 
@@ -128,11 +129,18 @@ enum {
 #endif
 
 #undef CS_TOKEN_LIST_TOKEN
+/**\def CS_TOKEN_LIST_TOKEN(X)
+ * A token list entry.
+ */
 #define CS_TOKEN_LIST_TOKEN(X) s = #X; s.Downcase(); \
   t.Register(s, CS_TOKEN_LIST_PASTE(CS_TOKEN_LIST_TOKEN_PREFIX,X));
 
 #ifndef CS_INIT_TOKEN_TABLE_NAME
 #define CS_INIT_TOKEN_TABLE_NAME_DEFAULT
+/**\def CS_INIT_TOKEN_TABLE_NAME
+ * Name of the token table initialization method. Can be overridden by the user
+ * by defining it prior to CS_TOKEN_LIST_TOKEN use.
+ */
 #define CS_INIT_TOKEN_TABLE_NAME InitTokenTable
 #endif
   

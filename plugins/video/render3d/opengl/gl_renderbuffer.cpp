@@ -39,7 +39,7 @@ void csGLVBOBufferManager::ParseByteSize (const char* sizeStr, size_t& size)
     sizeFactor = 1024; 	 
   else if ((*end == 'm') || (*end == 'M')) 	 
     sizeFactor = 1024*1024; 	 
-  else 	 
+  else if (*end != 0)
   { 	 
     Report (CS_REPORTER_SEVERITY_WARNING, 	 
       "Unknown suffix '%s' in maximum buffer size '%s'.", end, sizeStr); 	 

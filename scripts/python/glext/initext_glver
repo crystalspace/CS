@@ -1,5 +1,4 @@
-  /** Initialize <a href="%Name:url%">%Name%</a> extension. 
-   * Check presence with csGLExtensionFlags::CS_%Name%. */
+  /**\internal Initialize %Name% pseudo-extension. */
   void Init%Name% ()
   {
     if (tested_CS_%Name%) return;
