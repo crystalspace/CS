@@ -231,21 +231,6 @@ TrXmlElement::~TrXmlElement()
 }
 
 
-void TrXmlElement::SetValue (const char * name)
-{
-  if (name == NULL)
-  {
-    value = NULL;
-  }
-  else
-  {
-    TrDocument* document = GetDocument ();
-    csStringID name_id = document->strings.Request (name);
-    const char* reg_name = document->strings.Request (name_id);
-    value = reg_name;
-  }
-}
-
 const char * TrXmlElement::Attribute( const char * name ) const
 {
   int nodeidx = attributeSet.Find (name);
@@ -271,15 +256,6 @@ const char * TrXmlElement::Attribute( const char * name, int* i ) const
 }
 
 
-void TrXmlElement::SetAttribute( TrDocument* document,
-  const char * name, int val )
-{  
-  char buf[64];
-  sprintf( buf, "%d", val );
-  SetAttribute( document, name, buf );
-}
-
-
 TrDocumentAttribute& TrXmlElement::GetAttributeRegistered (
   const char * reg_name)
 {
@@ -293,14 +269,6 @@ TrDocumentAttribute& TrXmlElement::GetAttributeRegistered (
   int idx = attributeSet.set.Push (at);
   attributeSet.set[idx].SetName (reg_name);
   return attributeSet.set[idx];
-}
-
-void TrXmlElement::SetAttribute (TrDocument* document,
-  const char * name, const char * value)
-{
-  csStringID name_id = document->strings.Request (name);
-  const char* reg_name = document->strings.Request (name_id);
-  GetAttributeRegistered (reg_name).SetValue (value);
 }
 
 TrDocument::TrDocument() :
@@ -331,20 +299,6 @@ TrDocument::~TrDocument ()
   Clear ();
 }
 
-void TrDocumentAttribute::SetIntValue( int value )
-{
-  char buf [64];
-  sprintf (buf, "%d", value);
-  SetValue (buf);
-}
-
-void TrDocumentAttribute::SetDoubleValue( double value )
-{
-  char buf [64];
-  sprintf (buf, "%f", value);
-  SetValue (buf);
-}
-
 const int TrDocumentAttribute::IntValue() const
 {
   return atoi (value);
@@ -353,21 +307,6 @@ const int TrDocumentAttribute::IntValue() const
 const double  TrDocumentAttribute::DoubleValue() const
 {
   return atof (value);
-}
-
-void TrXmlText::SetValue (const char * name)
-{
-  if (name == NULL)
-  {
-    value = NULL;
-  }
-  else
-  {
-    TrDocument* document = GetDocument ();
-    csStringID name_id = document->strings.Request (name);
-    const char* reg_name = document->strings.Request (name_id);
-    value = reg_name;
-  }
 }
 
 TrXmlDeclaration::TrXmlDeclaration( const char * _version,

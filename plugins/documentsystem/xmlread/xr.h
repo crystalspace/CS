@@ -221,11 +221,6 @@ public:
    */
   virtual const char * Value () const = 0;
 
-  /**
-   * Changes the value of the node.
-   */
-  virtual void SetValue (const char * _value) = 0;
-
   /// One step up the DOM.
   TrDocumentNodeChildren* Parent() const{ return parent; }
 
@@ -329,19 +324,11 @@ public:
   const double DoubleValue() const;
 
   void SetName( const char* _name )  { name = _name; }
-  void SetValue( const char* _value )
-  {
-    delete[] value;
-    value = csStrNew (_value);
-  }
   /// Take over value so that this attribute has ownership.
   void TakeOverValue( char* _value )
   {
     value = _value;
   }
-
-  void SetIntValue( int value );
-  void SetDoubleValue( double value );
 
   bool operator==( const TrDocumentAttribute& rhs ) const
   {
@@ -416,20 +403,8 @@ public:
    */
   const char* Attribute( const char* name, int* i ) const;
 
-  /**
-   * Sets an attribute of name to a given value. The attribute
-   * will be created if it does not exist, or changed if it does.
-   */
-  void SetAttribute(TrDocument* document,
-    const char* reg_name, const char * value );
   /// Get attribute with registered name.
   TrDocumentAttribute& GetAttributeRegistered (const char * reg_name);
-
-  /**
-   * Sets an attribute of name to a given value. The attribute
-   * will be created if it does not exist, or changed if it does.
-   */
-  void SetAttribute( TrDocument* document, const char * name, int value );
 
   /// Get number of attributes.
   int GetAttributeCount () const { return attributeSet.set.Length (); }
@@ -454,7 +429,6 @@ public:
   {
     value = _value;
   }
-  virtual void SetValue (const char * _value);
 
 protected:
   /*  [internal use]
@@ -486,14 +460,6 @@ public:
   virtual ~TrXmlComment() { delete[] value; }
 
   virtual const char * Value () const { return value; }
-  virtual void SetValue (const char * _value)
-  {
-    delete[] value;
-    if (_value)
-      value = csStrNew (_value);
-    else
-      value = NULL;
-  }
 
 protected:
   /*  [internal use]
@@ -527,7 +493,6 @@ public:
   {
     value = _value;
   }
-  virtual void SetValue (const char * _value);
 
 protected :
   // [internal use]
@@ -594,7 +559,6 @@ public:
   const char * Standalone() const { return standalone.c_str (); }
 
   virtual const char * Value () const { return value.c_str (); }
-  virtual void SetValue (const char * _value) { value = _value;}
 
 protected:
   //  [internal use]
@@ -623,7 +587,6 @@ public:
   virtual ~TrXmlUnknown() {}
 
   virtual const char * Value () const { return value.c_str (); }
-  virtual void SetValue (const char * _value) { value = _value;}
 protected:
   /*  [internal use]
    * Attribute parsing starts: First char of the text
@@ -675,7 +638,6 @@ public:
   }
 
   virtual const char * Value () const { return value.c_str (); }
-  virtual void SetValue (const char * _value) { value = _value;}
 
   /// Parse the given null terminated block of xml data.
   virtual const char* Parse( TrDocument* document,  const char* p );
