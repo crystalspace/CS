@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+9-Jul-2002
+	- DynaVis now correctly does frustum culling in mirrored sectors.
+	  Apparently the fix that I did yesterday for FrustVis has the
+	  wrong effect for DynaVis. I have no clue why but for the moment
+	  Dynavis seems to work for mirrored sectors.
 8-Jul-2002
 	- Implemented CastShadows() in Dynavis. Not fully optimal yet
 	  (i.e. no culling is actually done except for frustum culling).

@@ -966,13 +966,15 @@ bool csDynaVis::VisTest (iRenderView* rview)
   data.frustum[3].Set (origin, p3, p0);
   //data.frustum[4].Set (origin, p0, p1);	// @@@ DO z=0 plane too!
   data.frustum_mask = 0xf;
-  if (rview->GetCamera ()->IsMirrored ())
-  {
-    data.frustum[0].Invert ();
-    data.frustum[1].Invert ();
-    data.frustum[2].Invert ();
-    data.frustum[3].Invert ();
-  }
+  //@@@ NOTE! I don't understand why Dynavis doesn't require this mirroring
+  // and FrustVis does require it!
+  //if (rview->GetCamera ()->IsMirrored ())
+  //{
+    //data.frustum[0].Invert ();
+    //data.frustum[1].Invert ();
+    //data.frustum[2].Invert ();
+    //data.frustum[3].Invert ();
+  //}
 
   if (do_state_dump)
   {
