@@ -33,7 +33,7 @@ ifndef PLUGINS
   PLUGINS += dungeon 
   PLUGINS += net/driver/socket net/netman 
   PLUGINS += fontrndr/deffrndr 
-  PLUGINS += fontrndr/ftrndr
+#  PLUGINS += fontrndr/ftrndr
   PLUGINS += netspace/nstp netspace/nsmgr 
   PLUGINS += csauth/simple 
   PLUGINS += $(DETECTED_PLUGINS)
