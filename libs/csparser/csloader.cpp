@@ -4481,7 +4481,7 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
           csFrame* frame = LoadFrame (stemp, params);
           CsPrintf (MSG_INITIALIZATION, "MERGE_NORMALS: ");
           int new_vertex_count = stemp->MergeNormals (frame);
-          CsPrintf (MSG_INITIALIZATION, "%d unique vertices found.\n",
+          CsPrintf (MSG_INITIALIZATION, "%d redundant vertices found.\n",
             new_vertex_count);
         }
         break;
@@ -4504,7 +4504,7 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
         {
           csFrame* frame = LoadFrame (stemp, params);
           int new_vertex_count = stemp->MergeVertices (frame);
-          CsPrintf (MSG_INITIALIZATION, "MERGE_VERTICES: %d unique vertices found.\n",
+          CsPrintf (MSG_INITIALIZATION, "MERGE_VERTICES: %d redundant vertices found.\n",
             new_vertex_count);
         }
         break;

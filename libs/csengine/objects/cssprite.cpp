@@ -199,6 +199,7 @@ csSprite3D* csSpriteTemplate::NewSprite ()
 void csSpriteTemplate::GenerateLOD ()
 {
 #if 1
+
   int i;
 
   //@@@ turn this into a parameter or member variable?
@@ -432,28 +433,40 @@ int csSpriteTemplate::MergeVertices (csFrame * frame)
       new_vertex_count++;
     }
   }
+  int redundant_vertex_count = GetNumVertices() - new_vertex_count;
 
-  // At this point we can compare the old vertex count to the new one
-
-  // Each vertex of difference is one more vertex that does not have
-  // to be transformed by motion, camera movement, or skeletal animation
-
-  // Calculation of memory saved is a bit complicated
-  // Don't forget to subtract the size of one extra Triangle mesh
+#if 0
 
   // STOP!  The rest of these steps will no doubt break some things:
 
   // FOR each animation frame
-  //   create a new vertex array
-  //   copy the old vertex positions into the new array
-  //   replace the old vertex array with the new one
+  for (int frame_number = 0; frame_number < frames.Length(); frame_number++)
+  {
+    // create a new vertex array
+    csPoly3D* newverts = new csPoly3D (new_vertex_count);
 
-  // Create a new anim_mesh with indices to new vertex array
+    verts = (csPoly3D*)(vertices.Get(frame_number));
+    // copy the old vertex positions into the new array
+    for (int v = 0; v < new_vertex_count; v++)
+      (*newverts)[v] = (*verts)[new_vertices[v]];
 
-  delete [] new_vertices;
-  delete [] old_vertices;
+    // replace the old vertex array with the new one
+    vertices.Replace (frame_number, newverts);
+  }
 
-  return new_vertex_count;
+  // remap texel_to_vertex array
+  int * ttv = new int [GetNumTexels()];
+  for (int i = 0; i < GetNumTexels(); i++)
+    ttv[i] = old_vertices[texel_to_vertex[i]];
+  CHK (delete [] texel_to_vertex);
+  texel_to_vertex = ttv;
+
+#endif
+
+  CHK (delete [] new_vertices);
+  CHK (delete [] old_vertices);
+
+  return redundant_vertex_count;
 }
 
 int csSpriteTemplate::MergeNormals (csFrame * frame)
@@ -501,30 +514,41 @@ int csSpriteTemplate::MergeNormals (csFrame * frame)
       new_vertex_count++;
     }
   }
+  int redundant_vertex_count = GetNumVertices() - new_vertex_count;
 
-  // At this point we can compare the old normals count to the new one
-
-  // The main purpose of this function is not to save space
-  // but it will save some space in many cases
-
-  // Calculation of memory saved is a bit complicated
-  // Don't forget to subtract the size of one extra Triangle mesh
-
-  // Also each combined normal is one more normal that does not have
-  // to be transformed by motion, camera movement, or skeletal animation
+#if 0
 
   // STOP!  The rest of these steps will no doubt break some things:
 
   // FOR each animation frame
-  //   create a new normals array
-  //   copy the old normals into the new array
-  //   replace the old normals array with the new one
+  for (int frame_number = 0; frame_number < frames.Length(); frame_number++)
+  {
+    // create a new normals array
+    csPoly3D* newverts = new csPoly3D (new_vertex_count);
 
-  // Create a new norm_mesh with indices to new vertex array
+    verts = (csPoly3D*)(normals.Get(frame_number));
 
-  delete [] new_vertices;
+    // copy the old normals into the new array
+    for (int v = 0; v < new_vertex_count; v++)
+      (*newverts)[v] = (*verts)[new_vertices[v]];
 
-  return new_vertex_count;
+    // replace the old normals array with the new one
+    normals.Replace (frame_number, newverts);
+  }
+
+  // remap texel_to_normal array
+  int * ttn = new int [GetNumTexels()];
+  for (int i = 0; i < GetNumTexels(); i++)
+    ttn[i] = old_vertices[texel_to_normal[i]];
+  CHK (delete [] texel_to_normal);
+  texel_to_normal = ttn;
+
+#endif
+
+  CHK (delete [] new_vertices);
+  CHK (delete [] old_vertices);
+
+  return redundant_vertex_count;
 }
 
 int csSpriteTemplate::MergeTexels ()
