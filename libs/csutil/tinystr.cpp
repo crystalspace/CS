@@ -165,6 +165,7 @@ void TiXmlString::append( const char* str, int len )
         // we know we can safely append the new string
 	strncpy (cstring + length(), str, len);
 	clength += len;
+	cstring [clength] = 0;
      }
 }
 
