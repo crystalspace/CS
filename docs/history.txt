@@ -6,6 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-Dec-2004
+	- Eric Sunshine generalized `jobber.pl' to make it project-agnostic. It
+	  can now be used by any project for performing maintenance tasks.  The
+	  task list and project-specific configuration are now read from an
+	  external configuration file.  (For instance, it can now re-generate
+	  project files and publish online documentation for CEL by reading a
+	  configuration file specific to CEL; it is no longer tied to CS.)
+	  Also added `jobber.cfg-template', an example configuration file which
+	  projects can copy and modify as needed.
 20-Dec-2004
 	- Jorrit added csFastRandFloat() which is a fast random number
 	  generator routine that returns a number between 0 and 1.
