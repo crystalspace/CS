@@ -21,10 +21,10 @@
 
 #include <gl/gl.h>
 #include "csutil/scf.h"
-#include "cs2d/common/graph2d.h"
+#include "video/canvas/common/graph2d.h"
 #include "cssys/win32/win32itf.h"
-#include "cs2d/openglcommon/gl2d_font.h"
-#include "cs2d/openglcommon/glcommon2d.h"
+#include "video/canvas/openglcommon/gl2d_font.h"
+#include "video/canvas/openglcommon/glcommon2d.h"
 
 /// Windows version.
 class csGraphics2DOpenGL : public csGraphics2DGLCommon

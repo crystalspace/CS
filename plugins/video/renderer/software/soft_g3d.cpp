@@ -37,7 +37,7 @@
 #include "ilghtmap.h"
 
 #if defined (DO_MMX)
-#  include "cs3d/software/i386/cpuid.h"
+#  include "video/renderer/software/i386/cpuid.h"
 #endif
 
 #define SysPrintf System->Printf

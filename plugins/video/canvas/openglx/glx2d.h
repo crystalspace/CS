@@ -21,7 +21,7 @@
 
 #include "csutil/scf.h"
 #include "cssys/unix/iunix.h"
-#include "cs2d/openglcommon/glcommon2d.h"
+#include "video/canvas/openglcommon/glcommon2d.h"
 
 #include <GL/glx.h>
 

@@ -24,7 +24,7 @@
 #include <string.h>
 
 #include "sysdef.h"
-#include "cs2d/beglide2/glidebe2d.h"
+#include "video/canvas/beglide2/glidebe2d.h"
 
 #ifndef CRYST_GLIDEWINDOW_H
 #define CRYST_GLIDEWINDOW_H

@@ -45,7 +45,7 @@ else
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_DIVE2D
 endif
 DESCRIPTION.$(CSDIVE)=$(DESCRIPTION.csdive)
-SRC.CSDIVE = $(wildcard libs/cs2d/csdive/*.cpp $(SRC.COMMON.DRV2D))
+SRC.CSDIVE = $(wildcard plugins/video/canvas/csdive/*.cpp $(SRC.COMMON.DRV2D))
 OBJ.CSDIVE = $(addprefix $(OUT),$(notdir $(SRC.CSDIVE:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -53,7 +53,7 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #------------------------------------------------------------------ targets ---#
 ifeq ($(MAKESECTION),targets)
 
-vpath %.cpp libs/cs2d/csdive
+vpath %.cpp plugins/video/canvas/csdive
 
 .PHONY: csdive csdiveclean
 
@@ -65,10 +65,10 @@ csdive: $(OUTDIRS) $(CSDIVE)
 $(CSDIVE): $(OBJ.CSDIVE) $(DEP.CSDIVE)
 	$(DO.PLUGIN)
 
-$(CSOS2.LIB): libs/cs2d/csdive/csdive.imp
+$(CSOS2.LIB): plugins/video/canvas/csdive/csdive.imp
 	emximp -o $@ $<
 
-$(DIVE2D.RES): libs/cs2d/csdive/libDIVE.rc
+$(DIVE2D.RES): plugins/video/canvas/csdive/libDIVE.rc
 	$(RC) $(RCFLAGS) $< $@
 
 csdiveclean:

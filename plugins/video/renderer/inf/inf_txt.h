@@ -20,7 +20,7 @@
 #ifndef __INF_TXT_H__
 #define __INF_TXT_H__
 
-#include "cs3d/common/txtmgr.h"
+#include "video/renderer/common/txtmgr.h"
 #include "iimage.h"
 
 class csTextureManagerInfinite;

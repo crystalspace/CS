@@ -45,7 +45,7 @@ else
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_oglsvga
 endif
 DESCRIPTION.$(oglsvga) = $(DESCRIPTION.OGLSVGA)
-SRC.OGLSVGA = $(wildcard libs/cs2d/openglx/svga/*.cpp)
+SRC.OGLSVGA = $(wildcard plugins/video/canvas/openglx/svga/*.cpp)
 OBJ.OGLSVGA = $(addprefix $(OUT),$(notdir $(SRC.OGLSVGA:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -54,7 +54,7 @@ endif # ifeq ($(MAKESECTION),postdefines)
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: oglsvga oglsvgaclean
-vpath %.cpp libs/cs2d/openglx/svga
+vpath %.cpp plugins/video/canvas/openglx/svga
 
 # Chain rules
 clean: oglsvgaclean

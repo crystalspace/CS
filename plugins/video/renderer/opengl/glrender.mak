@@ -60,9 +60,9 @@ else
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_OPENGL3D
 endif
 DESCRIPTION.$(GL3D) = $(DESCRIPTION.gl3d)
-SRC.GL3D = $(wildcard libs/cs3d/opengl/*.cpp) \
-  libs/cs3d/common/txtmgr.cpp libs/cs3d/common/dtmesh.cpp \
-  libs/cs3d/common/dpmesh.cpp
+SRC.GL3D = $(wildcard plugins/video/renderer/opengl/*.cpp) \
+  plugins/video/renderer/common/txtmgr.cpp plugins/video/renderer/common/dtmesh.cpp \
+  plugins/video/renderer/common/dpmesh.cpp
 OBJ.GL3D = $(addprefix $(OUT),$(notdir $(SRC.GL3D:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -77,7 +77,7 @@ clean: gl3dclean
 
 gl3d: $(OUTDIRS) $(GL3D)
 
-$(OUT)%$O: libs/cs3d/opengl/%.cpp
+$(OUT)%$O: plugins/video/renderer/opengl/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GL3D)
  
 $(GL3D): $(OBJ.GL3D) $(DEP.GL3D)

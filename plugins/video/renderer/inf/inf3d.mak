@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #-------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp libs/cs3d/inf
+vpath %.cpp plugins/video/renderer/inf
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
   INF3D=$(OUTDLL)inf3d$(DLL)
@@ -40,9 +40,9 @@ else
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_INF3D
 endif
 DESCRIPTION.$(INF3D) = $(DESCRIPTION.infinite)
-SRC.INF3D = $(wildcard libs/cs3d/inf/*.cpp) \
-  libs/cs3d/common/txtmgr.cpp libs/cs3d/common/dtmesh.cpp \
-  libs/cs3d/common/dpmesh.cpp $(wildcard $(SRC.COMMON.DRV2D))
+SRC.INF3D = $(wildcard plugins/video/renderer/inf/*.cpp) \
+  plugins/video/renderer/common/txtmgr.cpp plugins/video/renderer/common/dtmesh.cpp \
+  plugins/video/renderer/common/dpmesh.cpp $(wildcard $(SRC.COMMON.DRV2D))
 OBJ.INF3D = $(addprefix $(OUT),$(notdir $(subst .asm,$O,$(SRC.INF3D:.cpp=$O))))
 
 endif # ifeq ($(MAKESECTION),postdefines)

@@ -25,7 +25,7 @@
 #include <vgamouse.h>
 
 #include "csutil/scf.h"
-#include "cs2d/common/graph2d.h"
+#include "video/canvas/common/graph2d.h"
 #include "cssys/unix/iunix.h"
 
 /// SVGALIB version.

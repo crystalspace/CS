@@ -23,8 +23,8 @@
 #include "sysdef.h"
 #include "cssys/system.h"
 
-#include "cs3d/direct3d5/d3d_hicache.h"
-#include "cs3d/direct3d5/d3d_txtmgr.h"
+#include "video/renderer/direct3d5/d3d_hicache.h"
+#include "video/renderer/direct3d5/d3d_txtmgr.h"
 #include "itexture.h"
 #include "ipolygon.h"
 #include "ilghtmap.h"

@@ -18,8 +18,8 @@
 
 #include "sysdef.h"
 #include "cssys/sysdriv.h"
-#include "cs2d/openglcommon/glcommon2d.h"
-#include "cs2d/common/scrshot.h"
+#include "video/canvas/openglcommon/glcommon2d.h"
+#include "video/canvas/common/scrshot.h"
 #include "csutil/csrect.h"
 #include "isystem.h"
 

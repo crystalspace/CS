@@ -20,7 +20,7 @@
 #include "sysdef.h"
 #include "csutil/scf.h"
 #include "svgadsp.h"
-#include "cs2d/openglx/iogldisp.h"
+#include "video/canvas/openglx/iogldisp.h"
 #include "iplugin.h"
 #include "isystem.h"
 

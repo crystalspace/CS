@@ -44,7 +44,7 @@ else
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_SVGALIB2D
 endif
 DESCRIPTION.$(SVGA2D) = $(DESCRIPTION.svgalib2d)
-SRC.SVGA2D = $(wildcard libs/cs2d/svgalib/*.cpp $(SRC.COMMON.DRV2D))
+SRC.SVGA2D = $(wildcard plugins/video/canvas/svgalib/*.cpp $(SRC.COMMON.DRV2D))
 OBJ.SVGA2D = $(addprefix $(OUT),$(notdir $(SRC.SVGA2D:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -59,7 +59,7 @@ clean: svgalib2dclean
 
 svgalib2d: $(OUTDIRS) $(SVGA2D)
 
-$(OUT)%$O: libs/cs2d/svgalib/%.cpp
+$(OUT)%$O: plugins/video/canvas/svgalib/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.SVGA2D)
  
 $(SVGA2D): $(OBJ.SVGA2D) $(DEP.SVGA2D)

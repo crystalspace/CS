@@ -45,11 +45,11 @@
 #include "qint.h"
 
 #if defined (OS_WIN32)
-#include "cs2d/winglide2/g2d.h"
-#include "cs2d/winglide2/ig2d.h"
+#include "video/canvas/winglide2/g2d.h"
+#include "video/canvas/winglide2/ig2d.h"
 #elif defined (OS_MACOS)
-#include "cs2d/macglide2/g2d.h"
-#include "cs2d/macglide2/ig2d.h"
+#include "video/canvas/macglide2/g2d.h"
+#include "video/canvas/macglide2/ig2d.h"
 #include "cssys/mac/MacRSRCS.h"
 #else //Is there another platform Glide runs on?
 #endif

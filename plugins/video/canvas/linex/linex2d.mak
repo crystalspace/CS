@@ -45,7 +45,7 @@ else
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_LINEX2D
 endif
 DESCRIPTION.$(LINEXLIB2D) = $(DESCRIPTION.linex2d)
-SRC.LINEXLIB2D = $(wildcard libs/cs2d/linex/*.cpp $(SRC.COMMON.DRV2D))
+SRC.LINEXLIB2D = $(wildcard plugins/video/canvas/linex/*.cpp $(SRC.COMMON.DRV2D))
 OBJ.LINEXLIB2D = $(addprefix $(OUT),$(notdir $(SRC.LINEXLIB2D:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -60,7 +60,7 @@ clean: linelibxclean
 
 linex2d: $(OUTDIRS) $(LINEXLIB2D)
 
-$(OUT)%$O: libs/cs2d/linex/%.cpp
+$(OUT)%$O: plugins/video/canvas/linex/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.LINEX2D)
  
 $(LINEXLIB2D): $(OBJ.LINEXLIB2D) $(DEP.LINEX2D)

@@ -21,7 +21,7 @@
 #include "csutil/scf.h"
 #include "cssys/unix/iunix.h"
 #include "cssys/csevent.h"
-#include "cs2d/linex/linex2d.h"
+#include "video/canvas/linex/linex2d.h"
 #include "csutil/csrect.h"
 #include "isystem.h"
 

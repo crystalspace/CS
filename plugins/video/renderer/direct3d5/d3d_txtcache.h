@@ -26,8 +26,8 @@
 
 #include "IGraph3d.h"
 
-#include "cs3d/direct3d5/d3d_g3d.h"
-#include "cs3d/direct3d5/d3d_hicache.h"
+#include "video/renderer/direct3d5/d3d_g3d.h"
+#include "video/renderer/direct3d5/d3d_hicache.h"
 
 ///
 struct D3DTextureCache_Data 

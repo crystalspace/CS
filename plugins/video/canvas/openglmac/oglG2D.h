@@ -24,8 +24,8 @@
 #include <gl/gl.h>
 #include <agl.h>
 #include "csutil/scf.h"
-#include "cs2d/mac/iMacGraphics.h"
-#include "cs2d/openglcommon/glcommon2d.h"
+#include "video/canvas/mac/iMacGraphics.h"
+#include "video/canvas/openglcommon/glcommon2d.h"
 
 /// Macintosh version.
 class csGraphics2DOpenGL : public csGraphics2DGLCommon, public iMacGraphics

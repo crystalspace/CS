@@ -20,7 +20,7 @@
 #define __LINEX2D_H__
 
 #include "csutil/scf.h"
-#include "cs2d/common/graph2d.h"
+#include "video/canvas/common/graph2d.h"
 #include "cssys/unix/iunix.h"
 
 #define XK_MISCELLANY 1

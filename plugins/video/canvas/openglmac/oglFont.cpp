@@ -20,9 +20,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "sysdef.h"
-#include "cs2d/common/graph2d.h"
+#include "video/canvas/common/graph2d.h"
 #include "isystem.h"
-#include "cs2d/openglmac/oglFont.h"
+#include "video/canvas/openglmac/oglFont.h"
 
 /** The constructor initializes it member variables and constructs the
  * first font, if one was passed into the constructor */

@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #-------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp libs/cs3d/line
+vpath %.cpp plugins/video/renderer/line
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
   LINE3D=$(OUTDLL)line3d$(DLL)
@@ -40,9 +40,9 @@ else
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_LINE3D
 endif
 DESCRIPTION.$(LINE3D) = $(DESCRIPTION.line)
-SRC.LINE3D = $(wildcard libs/cs3d/line/*.cpp) \
-  libs/cs3d/common/txtmgr.cpp libs/cs3d/common/dtmesh.cpp \
-  libs/cs3d/common/dpmesh.cpp
+SRC.LINE3D = $(wildcard plugins/video/renderer/line/*.cpp) \
+  plugins/video/renderer/common/txtmgr.cpp plugins/video/renderer/common/dtmesh.cpp \
+  plugins/video/renderer/common/dpmesh.cpp
 OBJ.LINE3D = $(addprefix $(OUT),$(notdir $(subst .asm,$O,$(SRC.LINE3D:.cpp=$O))))
 
 endif # ifeq ($(MAKESECTION),postdefines)

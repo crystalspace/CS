@@ -23,8 +23,8 @@
 
 #include "csutil/scf.h"
 #include "csgeom/transfrm.h"
-#include "cs3d/common/dtmesh.h"
-#include "cs3d/common/dpmesh.h"
+#include "video/renderer/common/dtmesh.h"
+#include "video/renderer/common/dpmesh.h"
 #include "line_txt.h"
 #include "iconfig.h"
 #include "igraph2d.h"

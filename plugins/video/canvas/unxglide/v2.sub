@@ -45,7 +45,7 @@ else
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_GLIDX2D2
 endif
 DESCRIPTION.$(GLIDX2D2) = $(DESCRIPTION.glidx2d2)
-SRC.GLIDX2D2 = libs/cs2d/unxglide/glidex2d.cpp libs/cs2d/glide2common/glide2common2d.cpp \
+SRC.GLIDX2D2 = plugins/video/canvas/unxglide/glidex2d.cpp plugins/video/canvas/glide2common/glide2common2d.cpp \
                $(SRC.COMMON.DRV2D)
 OBJ.GLIDX2D2 = $(OUT)glidx2d2$O $(OUT)glide2common2d$O \
                $(addprefix $(OUT),$(notdir $(SRC.COMMON.DRV2D:.cpp=$O)))
@@ -63,11 +63,11 @@ clean: glidx2d2clean
 
 glidx2d2: $(OUTDIRS) $(GLIDX2D2)
 
-$(OUT)glidx2d2$O: libs/cs2d/unxglide/glidex2d.cpp
+$(OUT)glidx2d2$O: plugins/video/canvas/unxglide/glidex2d.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLIDX2D2)
-$(OUT)glide2common2d$O: libs/cs2d/glide2common/glide2common2d.cpp libs/cs2d/glide2common/glidcurs.h
+$(OUT)glide2common2d$O: plugins/video/canvas/glide2common/glide2common2d.cpp plugins/video/canvas/glide2common/glidcurs.h
 	$(DO.COMPILE.CPP) $(CFLAGS.GLIDX2D2)
-$(OUT)%$O: libs/cs2d/common/%.cpp
+$(OUT)%$O: plugins/video/canvas/common/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLIDX2D2)
  
 $(GLIDX2D2): $(OBJ.GLIDX2D2) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)

@@ -28,8 +28,8 @@
 #include <d3d.h>
 #include <d3dcaps.h>
 
-#include "cs3d/direct3d5/d3d_txtcache.h"
-#include "cs3d/direct3d5/d3d_g3d.h"
+#include "video/renderer/direct3d5/d3d_txtcache.h"
+#include "video/renderer/direct3d5/d3d_g3d.h"
 #include "itexture.h"
 #include "ilghtmap.h"
 #include "IGraph3d.h"

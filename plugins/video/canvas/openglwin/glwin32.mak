@@ -44,7 +44,7 @@ else
   LIBS.EXE+=-lGL
 endif
 DESCRIPTION.$(GLWIN32) = $(DESCRIPTION.glwin32)
-SRC.GLWIN32 = $(wildcard libs/cs2d/openglwin/*.cpp \
+SRC.GLWIN32 = $(wildcard plugins/video/canvas/openglwin/*.cpp \
   $(SRC.COMMON.DRV2D.OPENGL) $(SRC.COMMON.DRV2D))
 OBJ.GLWIN32 = $(addprefix $(OUT),$(notdir $(SRC.GLWIN32:.cpp=$O)))
 
@@ -60,9 +60,9 @@ clean: glbeclean
 
 glwin32: $(OUTDIRS) $(GLWIN32)
 
-$(OUT)%$O: libs/cs2d/openglwin/%.cpp
+$(OUT)%$O: plugins/video/canvas/openglwin/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLWIN32)
-$(OUT)%$O: libs/cs2d/openglcommon/%.cpp
+$(OUT)%$O: plugins/video/canvas/openglcommon/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLWIN32)
 
 $(GLWIN32): $(OBJ.GLWIN32) $(DEP.BE2D)

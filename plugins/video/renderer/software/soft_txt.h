@@ -20,7 +20,7 @@
 #ifndef __SOFT_TXT_H__
 #define __SOFT_TXT_H__
 
-#include "cs3d/common/txtmgr.h"
+#include "video/renderer/common/txtmgr.h"
 #include "iimage.h"
 
 class csTextureManagerSoftware;

@@ -20,7 +20,7 @@
 #define __GLIDECOMMON2D_H__
 
 #include "csutil/scf.h"
-#include "cs2d/common/graph2d.h"
+#include "video/canvas/common/graph2d.h"
 #if defined(OS_BE)	// dh: is this OS-dependence necessary? 
 #include "cssys/be/beitf.h"
 #else

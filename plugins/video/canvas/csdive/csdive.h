@@ -20,7 +20,7 @@
 #ifndef __CSDIVE_H__
 #define __CSDIVE_H__
 
-#include "cs2d/common/graph2d.h"
+#include "video/canvas/common/graph2d.h"
 #include "cssys/os2/icsos2.h"
 
 // avoid including os2.h

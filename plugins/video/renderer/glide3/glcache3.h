@@ -29,7 +29,7 @@
 #include "itexture.h"
 #include "ilghtmap.h"
 #include "glalpha3.h"
-#include "cs3d/common/texmem.h"
+#include "video/renderer/common/texmem.h"
 #include <glide.h>
 
 /// supported texture types

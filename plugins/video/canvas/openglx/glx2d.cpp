@@ -17,7 +17,7 @@
 */
 
 #include "sysdef.h"
-#include "cs2d/openglx/glx2d.h"
+#include "video/canvas/openglx/glx2d.h"
 #include "csutil/scf.h"
 #include "cssys/csevent.h"
 #include "cssys/csinput.h"

@@ -33,7 +33,7 @@ ifeq ($(MAKESECTION),postdefines)
 ALLEG2D=$(OUT)$(LIB_PREFIX)alleg2d$(LIB)
 DEP.EXE+=$(ALLEG2D)
 DESCRIPTION.$(ALLEG2D) = $(DESCRIPTION.alleg2d)
-SRC.ALLEG2D=$(wildcard libs/cs2d/dosalleg/*.cpp $(SRC.COMMON.DRV2D))
+SRC.ALLEG2D=$(wildcard plugins/video/canvas/dosalleg/*.cpp $(SRC.COMMON.DRV2D))
 OBJ.ALLEG2D = $(addprefix $(OUT),$(notdir $(SRC.ALLEG2D:.cpp=$O)))
 CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_ALLEG2D
 
@@ -42,7 +42,7 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #------------------------------------------------------------------ targets ---#
 ifeq ($(MAKESECTION),targets)
 
-vpath %.cpp libs/cs2d/dosalleg
+vpath %.cpp plugins/video/canvas/dosalleg
 
 .PHONY: alleg2d alleg2dclean
 

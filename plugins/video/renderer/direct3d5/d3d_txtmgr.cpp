@@ -20,7 +20,7 @@
 #include <stdarg.h>
 #include <math.h>
 
-#include "cs3d/direct3d5/d3d_txtmgr.h"
+#include "video/renderer/direct3d5/d3d_txtmgr.h"
 #include "csutil/scanstr.h"
 #include "iimage.h"
 #include "isystem.h"

@@ -20,7 +20,7 @@
 #define __OPENGLGLIDEDISP_H__
 
 #include "csutil/scf.h"
-#include "cs2d/openglx/iogldisp.h"
+#include "video/canvas/openglx/iogldisp.h"
 
 class csOpenGLGlideDisp : public iOpenGLDisp
 {

@@ -33,12 +33,12 @@
 #include "icamera.h"
 #include "glcache2.h"
 #include "gltex2.h"
-#include "cs3d/common/dtmesh.h"
-#include "cs3d/common/dpmesh.h"
+#include "video/renderer/common/dtmesh.h"
+#include "video/renderer/common/dpmesh.h"
 #include "glhalo2.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/polyclip.h"
-#include "cs2d/glide2common/iglide2d.h"
+#include "video/canvas/glide2common/iglide2d.h"
 
 class csGlideTextureCache;
 

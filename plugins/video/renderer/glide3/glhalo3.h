@@ -25,7 +25,7 @@
 #include "g3dgl3.h"
 #include "glcache3.h"
 #include "glalpha3.h"
-#include "libs/cs2d/glide2common/iglide2d.h"
+#include "video/canvas/glide2common/iglide2d.h"
 
 class csGraphics3DGlide3x;
 

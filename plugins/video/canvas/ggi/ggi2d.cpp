@@ -20,7 +20,7 @@
 
 #include "sysdef.h"
 #include "csutil/scf.h"
-#include "cs2d/ggi/ggi2d.h"
+#include "video/canvas/ggi/ggi2d.h"
 #include "cssys/unix/iunix.h"
 #include "csutil/csrect.h"
 #include "cssys/csinput.h"

@@ -24,7 +24,7 @@
 
 #include "sysdef.h"
 #include "csutil/scf.h"
-#include "cs2d/openglmac/oglg2d.h"
+#include "video/canvas/openglmac/oglg2d.h"
 #include "cssys/mac/MacRSRCS.h"
 #include "isystem.h"
 

@@ -46,7 +46,7 @@ else
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_oglempty
 endif
 DESCRIPTION.$(oglempty) = $(DESCRIPTION.oglempty)
-SRC.oglempty = $(wildcard libs/cs2d/openglx/empty/*.cpp)
+SRC.oglempty = $(wildcard plugins/video/canvas/openglx/empty/*.cpp)
 OBJ.oglempty = $(addprefix $(OUT),$(notdir $(SRC.oglempty:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -61,7 +61,7 @@ clean: oglemptyclean
 
 oglempty: $(OUTDIRS) $(oglempty)
 
-$(OUT)%$O: libs/cs2d/openglx/empty/%.cpp
+$(OUT)%$O: plugins/video/canvas/openglx/empty/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.oglempty)
  
 $(oglempty): $(OBJ.oglempty) $(DEP.oglempty)

@@ -56,7 +56,7 @@ else
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_GLX2D
 endif
 DESCRIPTION.$(GLX2D) = $(DESCRIPTION.glx2d)
-SRC.GLX2D = $(wildcard libs/cs2d/openglx/*.cpp \
+SRC.GLX2D = $(wildcard plugins/video/canvas/openglx/*.cpp \
   $(SRC.COMMON.DRV2D.OPENGL) $(SRC.COMMON.DRV2D))
 OBJ.GLX2D = $(addprefix $(OUT),$(notdir $(SRC.GLX2D:.cpp=$O)))
 
@@ -72,10 +72,10 @@ clean: glxclean
 
 glx2d: $(OUTDIRS) $(GLX2D)
 
-$(OUT)%$O: libs/cs2d/openglx/%.cpp
+$(OUT)%$O: plugins/video/canvas/openglx/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLX2D)
  
-$(OUT)%$O: libs/cs2d/openglcommon/%.cpp
+$(OUT)%$O: plugins/video/canvas/openglcommon/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLX2D)
  
 $(GLX2D): $(OBJ.GLX2D) $(DEP.GLX2D)

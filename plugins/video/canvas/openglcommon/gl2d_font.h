@@ -20,7 +20,7 @@
 #define __GL2D_FONT_H__
 
 #include <GL/gl.h>
-#include "cs2d/common/graph2d.h"
+#include "video/canvas/common/graph2d.h"
 
 /**
   This class contains

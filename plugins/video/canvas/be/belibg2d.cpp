@@ -23,8 +23,8 @@
 #include <Screen.h>
 #include "sysdef.h"
 #include "csutil/scf.h"
-#include "cs2d/be/belibg2d.h"
-#include "cs2d/be/CrystWindow.h"
+#include "video/canvas/be/belibg2d.h"
+#include "video/canvas/be/CrystWindow.h"
 #include "csutil/csrect.h"
 #include "isystem.h"
 

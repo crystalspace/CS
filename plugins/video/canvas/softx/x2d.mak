@@ -45,7 +45,7 @@ else
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_X2D
 endif
 DESCRIPTION.$(XLIB2D) = $(DESCRIPTION.x2d)
-SRC.XLIB2D = $(wildcard libs/cs2d/softx/*.cpp $(SRC.COMMON.DRV2D))
+SRC.XLIB2D = $(wildcard plugins/video/canvas/softx/*.cpp $(SRC.COMMON.DRV2D))
 OBJ.XLIB2D = $(addprefix $(OUT),$(notdir $(SRC.XLIB2D:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -60,7 +60,7 @@ clean: x2dclean
 
 x2d: $(OUTDIRS) $(XLIB2D)
 
-$(OUT)%$O: libs/cs2d/softx/%.cpp
+$(OUT)%$O: plugins/video/canvas/softx/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.X2D)
  
 $(XLIB2D): $(OBJ.XLIB2D) $(DEP.X2D)

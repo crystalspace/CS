@@ -20,10 +20,10 @@
 
 #include "sysdef.h"
 #include "graph2d.h"			// FontDef definition
-#include "cs2d/common/police.fnt"
-#include "cs2d/common/courier.fnt"	// font (C) Andrew Zabolotny
-#include "cs2d/common/tiny.fnt"		// font (C) Andrew Zabolotny
-#include "cs2d/common/italic.fnt"	// font (C) Andrew Zabolotny
+#include "video/canvas/common/police.fnt"
+#include "video/canvas/common/courier.fnt"	// font (C) Andrew Zabolotny
+#include "video/canvas/common/tiny.fnt"		// font (C) Andrew Zabolotny
+#include "video/canvas/common/italic.fnt"	// font (C) Andrew Zabolotny
 
 FontDef FontList[] =
 {

@@ -50,7 +50,7 @@ else
   CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_MGL2D
 endif
 DESCRIPTION.$(MGL2D) = $(DESCRIPTION.mgl2d)
-SRC.MGL2D = $(wildcard libs/cs2d/mgl2d/*.cpp $(SRC.COMMON.DRV2D))
+SRC.MGL2D = $(wildcard plugins/video/canvas/mgl2d/*.cpp $(SRC.COMMON.DRV2D))
 OBJ.MGL2D = $(addprefix $(OUT),$(notdir $(SRC.MGL2D:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -65,7 +65,7 @@ clean: mgl2dclean
 
 mgl2d: $(OUTDIRS) $(MGL2D)
 
-$(OUT)%$O: libs/cs2d/mgl2d/%.cpp
+$(OUT)%$O: plugins/video/canvas/mgl2d/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.MGL2D)
  
 $(MGL2D): $(OBJ.MGL2D) $(DEP.MGL2D)

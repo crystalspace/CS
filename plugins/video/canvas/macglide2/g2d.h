@@ -26,11 +26,11 @@
 #include <glide.h>
  
 #include "csutil/scf.h"
-#include "cs2d/common/graph2d.h"
-#include "cs2d/glide2common/iglide2d.h"
-#include "cs2d/glide2common/glide2common2d.h"
+#include "video/canvas/common/graph2d.h"
+#include "video/canvas/glide2common/iglide2d.h"
+#include "video/canvas/glide2common/glide2common2d.h"
 // whats that ?
-//#include "cs2d/macglide2/xg2d.h"
+//#include "video/canvas/macglide2/xg2d.h"
 
 #if defined(DISP_X11)
   #define XK_MISCELLANY 1

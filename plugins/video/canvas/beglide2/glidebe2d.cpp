@@ -18,13 +18,13 @@
 
 #include <stdarg.h>
 #include "sysdef.h"
-#include "cs2d/beglide2/glidebe2d.h"
+#include "video/canvas/beglide2/glidebe2d.h"
 #include "csutil/scf.h"
 #include "cssys/csevent.h"
 #include "cssys/csinput.h"
 #include "cssys/be/beitf.h"
 #include "csutil/csrect.h"
-#include "cs3d/glide2/gllib2.h"
+#include "video/renderer/glide2/gllib2.h"
 #include "isystem.h"
 
 IMPLEMENT_FACTORY (csGraphics2DBeGlide)

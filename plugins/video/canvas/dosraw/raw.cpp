@@ -21,7 +21,7 @@
 
 #include <stdarg.h>
 #include "sysdef.h"
-#include "cs2d/dosraw/raw.h"
+#include "video/canvas/dosraw/raw.h"
 #include "cssys/djgpp/idjgpp.h"
 #include "csutil/csrect.h"
 #include "isystem.h"

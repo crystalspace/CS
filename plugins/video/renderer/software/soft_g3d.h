@@ -24,9 +24,9 @@
 
 #include "csutil/scf.h"
 #include "csgeom/transfrm.h"
-#include "cs3d/software/soft_txt.h"
-#include "cs3d/common/dtmesh.h"
-#include "cs3d/common/dpmesh.h"
+#include "video/renderer/software/soft_txt.h"
+#include "video/renderer/common/dtmesh.h"
+#include "video/renderer/common/dpmesh.h"
 #include "iconfig.h"
 #include "igraph2d.h"
 #include "igraph3d.h"

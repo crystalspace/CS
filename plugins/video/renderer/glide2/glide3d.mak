@@ -44,9 +44,9 @@ else
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_GLIDE23D
 endif
 DESCRIPTION.$(GLIDE3D) = $(DESCRIPTION.glide3d)
-SRC.GLIDE3D = $(wildcard libs/cs3d/glide2/*.cpp) \
-  libs/cs3d/common/texmem.cpp libs/cs3d/common/txtmgr.cpp \
-  libs/cs3d/common/dtmesh.cpp libs/cs3d/common/dpmesh.cpp
+SRC.GLIDE3D = $(wildcard plugins/video/renderer/glide2/*.cpp) \
+  plugins/video/renderer/common/texmem.cpp plugins/video/renderer/common/txtmgr.cpp \
+  plugins/video/renderer/common/dtmesh.cpp plugins/video/renderer/common/dpmesh.cpp
 OBJ.GLIDE3D = $(addprefix $(OUT),$(notdir $(SRC.GLIDE3D:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -61,7 +61,10 @@ clean: glide3dclean
 
 glide3d: $(OUTDIRS) $(GLIDE3D)
 
-$(OUT)%$O: libs/cs3d/glide2/%.cpp
+$(OUT)%$O: plugins/video/renderer/glide2/%.cpp
+	$(DO.COMPILE.CPP) $(CFLAGS.GLIDE3D)
+
+$(OUT)%$O: plugins/video/renderer/common/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLIDE3D)
 
 $(GLIDE3D): $(OBJ.GLIDE3D) $(DEP.GLIDE3D)

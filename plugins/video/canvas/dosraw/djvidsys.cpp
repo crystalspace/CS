@@ -30,7 +30,7 @@
  *   - Added support for 16 X-modes
  */
 #include "sysdef.h"
-#include "cs2d/dosraw/djvidsys.h"
+#include "video/canvas/dosraw/djvidsys.h"
 
 static struct
 {

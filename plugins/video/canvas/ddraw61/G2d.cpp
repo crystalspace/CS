@@ -18,7 +18,7 @@
 
 #include "sysdef.h"
 #include "csutil/scf.h"
-#include "cs2d/ddraw61/g2d.h"
+#include "video/canvas/ddraw61/g2d.h"
 #include "cssys/win32/directdetection.h"
 #include "isystem.h"
 

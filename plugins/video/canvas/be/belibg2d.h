@@ -24,7 +24,7 @@
 #include <GraphicsDefs.h>
 #include <Rect.h>
 #include "csutil/scf.h"
-#include "cs2d/common/graph2d.h"
+#include "video/canvas/common/graph2d.h"
 #include "cssys/be/icsbe.h"
 
 class CrystView;

@@ -20,8 +20,8 @@
 #define __GLCOMMON2D_H__
 
 #include "csutil/scf.h"
-#include "cs2d/common/graph2d.h"
-#include "cs2d/openglcommon/gl2d_font.h"
+#include "video/canvas/common/graph2d.h"
+#include "video/canvas/openglcommon/gl2d_font.h"
 
 class OpenGLTextureCache;
 

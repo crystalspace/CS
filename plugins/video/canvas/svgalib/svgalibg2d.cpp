@@ -19,7 +19,7 @@
 #include <stdarg.h>
 
 #include "sysdef.h"
-#include "cs2d/svgalib/svga.h"
+#include "video/canvas/svgalib/svga.h"
 #include "cssys/unix/iunix.h"
 #include "csutil/csrect.h"
 #include "cssys/csinput.h"

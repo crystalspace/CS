@@ -20,7 +20,7 @@
 #define TXTMGR_DIRECT3D_H
 
 #include "csutil/scf.h"
-#include "cs3d/common/txtmgr.h"
+#include "video/renderer/common/txtmgr.h"
 #include "itexture.h"
 
 class csGraphics3DDirect3DDx6;

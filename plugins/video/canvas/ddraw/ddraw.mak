@@ -57,7 +57,7 @@ endif
 
 DESCRIPTION.$(DDRAW)=$(DESCRIPTION.ddraw)
 
-SRC.DDRAW = $(wildcard libs/cs2d/ddraw/*.cpp $(SRC.COMMON.DRV2D)) \
+SRC.DDRAW = $(wildcard plugins/video/canvas/ddraw/*.cpp $(SRC.COMMON.DRV2D)) \
 	libs/cssys/win32/directdetection.cpp
 OBJ.DDRAW = $(addprefix $(OUT),$(notdir $(SRC.DDRAW:.cpp=$O)))
 
@@ -66,7 +66,7 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #------------------------------------------------------------------ targets ---#
 ifeq ($(MAKESECTION),targets)
 
-vpath %.cpp libs/cs2d/ddraw
+vpath %.cpp plugins/video/canvas/ddraw
 
 .PHONY: ddraw ddrawclean
 

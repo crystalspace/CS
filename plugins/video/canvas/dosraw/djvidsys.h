@@ -36,7 +36,7 @@
 #include <go32.h>
 #include <pc.h>
 
-#include "cs2d/common/graph2d.h"
+#include "video/canvas/common/graph2d.h"
 
 #pragma pack (1)
 

@@ -20,10 +20,10 @@
 #define __GLIDEX2D_H__
 
 #include "csutil/scf.h"
-#include "cs2d/common/graph2d.h"
+#include "video/canvas/common/graph2d.h"
 #include "cssys/unix/iunix.h"
-#include "cs2d/glide2common/iglide2d.h"
-#include "cs2d/glide2common/glide2common2d.h"
+#include "video/canvas/glide2common/iglide2d.h"
+#include "video/canvas/glide2common/glide2common2d.h"
 
 #include <glide.h>
 

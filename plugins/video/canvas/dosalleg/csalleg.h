@@ -21,7 +21,7 @@
 #define __ALLEGRO_H__
 
 #include "csutil/scf.h"
-#include "cs2d/common/graph2d.h"
+#include "video/canvas/common/graph2d.h"
 #include "cssys/djgpp/idjgpp.h"
 
 /// DOS Allegro 2D graphics driver

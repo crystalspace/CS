@@ -49,7 +49,7 @@ else
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_GL2DOS2
 endif
 DESCRIPTION.$(GLOS2)=$(DESCRIPTION.glos2)
-SRC.GLOS2 = $(wildcard libs/cs2d/openglos2/*.cpp \
+SRC.GLOS2 = $(wildcard plugins/video/canvas/openglos2/*.cpp \
   $(SRC.COMMON.DRV2D.OPENGL) $(SRC.COMMON.DRV2D))
 OBJ.GLOS2 = $(addprefix $(OUT),$(notdir $(SRC.GLOS2:.cpp=$O)))
 
@@ -58,7 +58,7 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #------------------------------------------------------------------ targets ---#
 ifeq ($(MAKESECTION),targets)
 
-vpath %.cpp libs/cs2d/openglos2 libs/cs2d/openglcommon
+vpath %.cpp plugins/video/canvas/openglos2 plugins/video/canvas/openglcommon
 
 .PHONY: glos2 glos2clean
 
@@ -70,7 +70,7 @@ glos2: $(OUTDIRS) $(GLOS2)
 $(GLOS2): $(OBJ.GLOS2) $(DEP.GLOS2)
 	$(DO.PLUGIN) $(LIBS.LOCAL.GLOS2)
 
-$(GLOS2.RES): libs/cs2d/openglos2/libGL.rc
+$(GLOS2.RES): plugins/video/canvas/openglos2/libGL.rc
 	$(RC) $(RCFLAGS) $< $@
 
 glos2clean:

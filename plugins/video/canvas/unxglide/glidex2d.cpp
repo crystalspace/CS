@@ -28,7 +28,7 @@
 #include "isystem.h"
 
 #ifdef GLIDE3
-#include "cs3d/glide3/gllib3.h"
+#include "video/renderer/glide3/gllib3.h"
 
 IMPLEMENT_FACTORY (csGraphics2DGlideX)
 
@@ -38,7 +38,7 @@ EXPORT_CLASS_TABLE (glidx2d3)
 EXPORT_CLASS_TABLE_END
 
 #else
-#include "cs3d/glide2/gllib2.h"
+#include "video/renderer/glide2/gllib2.h"
 
 IMPLEMENT_FACTORY (csGraphics2DGlideX)
 
@@ -156,9 +156,10 @@ bool csGraphics2DGlideX::Open(const char *Title)
   if (m_DoGlideInWindow)
     window = XCreateSimpleWindow (dpy, DefaultRootWindow (dpy), 64, 16,
                                       Width, Height, 4, 0, 0);
-  else
-    window = XCreateSimpleWindow (dpy, DefaultRootWindow (dpy), 64, 16,
+ else
+    window = XCreateSimpleWindow (dpy, DefaultRootWindow (dpy), 0, 0,
                                       display_width, display_height, 4, 0, 0);
+
   XMapWindow (dpy, window);
   XStoreName (dpy, window, Title);
   XGCValues values;

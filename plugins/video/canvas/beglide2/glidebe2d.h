@@ -20,17 +20,17 @@
 #define __GLIDEBE2D_H__
 
 #include "csutil/scf.h"
-#include "cs2d/common/graph2d.h"
+#include "video/canvas/common/graph2d.h"
 #include "cssys/be/csbe.h"
-#include "cs2d/glide2common/glide2common2d.h"
-#include "cs2d/glide2common/iglide2d.h"
+#include "video/canvas/glide2common/glide2common2d.h"
+#include "video/canvas/glide2common/iglide2d.h"
 
 #include <glide.h>
 
 #ifndef CRYST_GLIDE_WINDOW_H
-#include "cs2d/beglide2/CrystGlideWindow.h"
+#include "video/canvas/beglide2/CrystGlideWindow.h"
 #endif
-#include "cs2d/beglide2/xg2d.h"
+#include "video/canvas/beglide2/xg2d.h"
 
 /// BeOS version.
 class csGraphics2DBeGlide : public csGraphics2DGlideCommon

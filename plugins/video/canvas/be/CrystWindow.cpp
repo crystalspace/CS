@@ -24,7 +24,7 @@
 #include <sys/param.h>
 #include "sysdef.h"
 #include "isystem.h"
-#include "cs2d/be/CrystWindow.h"
+#include "video/canvas/be/CrystWindow.h"
 #include "cssys/be/icsbe.h"
 
 CrystView::CrystView(BRect frame, iBeLibSystemDriver* isys) :

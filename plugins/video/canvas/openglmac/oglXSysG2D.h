@@ -1,6 +1,6 @@
 
 #include "csutil/scf.h"
-#include "cs2d/mac/ISysG2D.h"
+#include "video/canvas/mac/ISysG2D.h"
 
 #ifndef __XSYSG2D_H__
 #define __XSYSG2D_H__

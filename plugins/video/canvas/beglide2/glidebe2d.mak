@@ -4,7 +4,7 @@
 # Driver description
 DESCRIPTION.glidebe2d = Crystal Space BeOS/Glide 2D driver
 
-include libs/cs2d/glide2common/glide2common2d.mak
+include plugins/video/canvas/glide2common/glide2common2d.mak
 
 #-------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -46,7 +46,7 @@ else
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_GLIDEBE2D
 endif
 DESCRIPTION.$(GLIDEBE2D) = $(DESCRIPTION.glidebe2d)
-SRC.GLIDEBE2D = $(wildcard libs/cs2d/beglide2/*.cpp \
+SRC.GLIDEBE2D = $(wildcard plugins/video/canvas/beglide2/*.cpp \
 	$(SRC.COMMON.DRV2D.GLIDE) $(SRC.COMMON.DRV2D))
 OBJ.GLIDEBE2D = $(addprefix $(OUT),$(notdir $(SRC.GLIDEBE2D:.cpp=$O)))
 
@@ -62,7 +62,7 @@ clean: glidebeclean
 
 glidebe2d: $(OUTDIRS) $(GLIDEBE2D)
 
-$(OUT)%$O: libs/cs2d/beglide2/%.cpp
+$(OUT)%$O: plugins/video/canvas/beglide2/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLIDEBE2D)
  
 $(GLIDEBE2D): $(OBJ.GLIDEBE2D) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)

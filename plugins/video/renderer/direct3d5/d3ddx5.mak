@@ -41,8 +41,8 @@ else
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_OPEND3DDX5
 endif
 DESCRIPTION.$(D3DDX5) = $(DESCRIPTION.d3ddx5)
-SRC.D3DDX5 = $(wildcard libs/cs3d/opengl/*.cpp) \
-  libs/cs3d/common/txtmgr.cpp libs/cs3d/common/dtmesh.cpp
+SRC.D3DDX5 = $(wildcard plugins/video/renderer/opengl/*.cpp) \
+  plugins/video/renderer/common/txtmgr.cpp plugins/video/renderer/common/dtmesh.cpp
 OBJ.D3DDX5 = $(addprefix $(OUT),$(notdir $(SRC.D3DDX5:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -57,7 +57,7 @@ clean: d3ddx5clean
 
 d3ddx5: $(OUTDIRS) $(D3DDX5)
 
-$(OUT)%$O: libs/cs3d/direct3d5/%.cpp
+$(OUT)%$O: plugins/video/renderer/direct3d5/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.D3DDX5)
  
 $(D3DDX5): $(OBJ.D3DDX5) $(DEP.D3DDX5)

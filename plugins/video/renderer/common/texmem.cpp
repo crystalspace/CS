@@ -19,7 +19,7 @@
 
 #include <stdio.h>
 #include "sysdef.h"
-#include "cs3d/common/texmem.h"
+#include "texmem.h"
 #include "isystem.h"
 
 /**

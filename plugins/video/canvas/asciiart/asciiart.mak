@@ -48,7 +48,7 @@ else
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_ASCII2D
 endif
 DESCRIPTION.$(ASCIIART)=$(DESCRIPTION.asciiart)
-SRC.ASCIIART = $(wildcard libs/cs2d/asciiart/*.cpp $(SRC.COMMON.DRV2D))
+SRC.ASCIIART = $(wildcard plugins/video/canvas/asciiart/*.cpp $(SRC.COMMON.DRV2D))
 OBJ.ASCIIART = $(addprefix $(OUT),$(notdir $(SRC.ASCIIART:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -56,7 +56,7 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #------------------------------------------------------------------ targets ---#
 ifeq ($(MAKESECTION),targets)
 
-vpath %.cpp libs/cs2d/asciiart
+vpath %.cpp plugins/video/canvas/asciiart
 
 .PHONY: asciiart asciiartclean
 

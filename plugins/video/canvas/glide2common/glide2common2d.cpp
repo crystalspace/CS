@@ -29,9 +29,9 @@
 #endif
 #include "csutil/inifile.h"
 #ifdef GLIDE3
-#include "cs3d/glide3/gllib3.h"
+#include "video/renderer/glide3/gllib3.h"
 #else
-#include "cs3d/glide2/gllib2.h"
+#include "video/renderer/glide2/gllib2.h"
 #endif
 #include "csutil/csrect.h"
 #include "isystem.h"
@@ -65,7 +65,6 @@ bool csGraphics2DGlideCommon::Initialize (iSystem *pSystem)
 {
   if (!csGraphics2D::Initialize (pSystem))
     return false;
-
   // see if we need to go fullscreen or not...
   csIniFile* config = new csIniFile("cryst.cfg");
   m_DoGlideInWindow = (!config->GetYesNo("VideoDriver","FullScreen",FALSE));

@@ -49,7 +49,7 @@ else
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_oglglide
 endif
 DESCRIPTION.$(oglglide) = $(DESCRIPTION.OGLGLIDE)
-SRC.OGLGLIDE = $(wildcard libs/cs2d/openglx/glide/*.cpp)
+SRC.OGLGLIDE = $(wildcard plugins/video/canvas/openglx/glide/*.cpp)
 OBJ.OGLGLIDE = $(addprefix $(OUT),$(notdir $(SRC.OGLGLIDE:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -64,7 +64,7 @@ clean: oglglideclean
 
 oglglide: $(OUTDIRS) $(oglglide)
 
-$(OUT)%$O: libs/cs2d/openglx/glide/%.cpp
+$(OUT)%$O: plugins/video/canvas/openglx/glide/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.OGLGLIDE)
  
 $(oglglide): $(OBJ.OGLGLIDE) $(DEP.OGLGLIDE)

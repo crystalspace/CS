@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #-------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp libs/cs2d/be
+vpath %.cpp plugins/video/canvas/be
 
 # The 2D Belib driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
@@ -41,7 +41,7 @@ else
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_BE2D
 endif
 DESCRIPTION.$(BE2D) = $(DESCRIPTION.be2d)
-SRC.BE2D = $(wildcard libs/cs2d/be/*.cpp $(SRC.COMMON.DRV2D))
+SRC.BE2D = $(wildcard plugins/video/canvas/be/*.cpp $(SRC.COMMON.DRV2D))
 OBJ.BE2D = $(addprefix $(OUT),$(notdir $(SRC.BE2D:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -49,7 +49,7 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #------------------------------------------------------------------ targets ---#
 ifeq ($(MAKESECTION),targets)
 
-vpath %.cpp libs/cs2d/be
+vpath %.cpp plugins/video/canvas/be
 
 .PHONY: be2d be2dclean
 

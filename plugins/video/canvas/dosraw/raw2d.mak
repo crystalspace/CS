@@ -33,7 +33,7 @@ ifeq ($(MAKESECTION),postdefines)
 RAW2D=$(OUT)$(LIB_PREFIX)raw2d$(LIB)
 DEP.EXE+=$(RAW2D)
 DESCRIPTION.$(RAW2D) = $(DESCRIPTION.raw2d)
-SRC.RAW2D=$(wildcard libs/cs2d/dosraw/*.cpp $(SRC.COMMON.DRV2D))
+SRC.RAW2D=$(wildcard plugins/video/canvas/dosraw/*.cpp $(SRC.COMMON.DRV2D))
 OBJ.RAW2D = $(addprefix $(OUT),$(notdir $(SRC.RAW2D:.cpp=$O)))
 CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_RAW2D
 
@@ -42,7 +42,7 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #------------------------------------------------------------------ targets ---#
 ifeq ($(MAKESECTION),targets)
 
-vpath %.cpp libs/cs2d/dosraw
+vpath %.cpp plugins/video/canvas/dosraw
 
 .PHONY: raw2d raw2dclean
 

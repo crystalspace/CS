@@ -4,13 +4,13 @@
 #-------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp libs/cs2d/common
+vpath %.cpp plugins/video/canvas/common
 
-SRC.COMMON.DRV2D=libs/cs2d/common/graph2d.cpp \
-  libs/cs2d/common/fonts.cpp libs/cs2d/common/scrshot.cpp
+SRC.COMMON.DRV2D=plugins/video/canvas/common/graph2d.cpp \
+  plugins/video/canvas/common/fonts.cpp plugins/video/canvas/common/scrshot.cpp
 
-SRC.COMMON.DRV2D.OPENGL=libs/cs2d/openglcommon/*.cpp
+SRC.COMMON.DRV2D.OPENGL=plugins/video/canvas/openglcommon/*.cpp
 
-SRC.COMMON.DRV2D.GLIDE = libs/cs2d/glide2common/*.cpp
+SRC.COMMON.DRV2D.GLIDE = plugins/video/canvas/glide2common/*.cpp
 
 endif # ifeq ($(MAKESECTION),postdefines)

@@ -34,11 +34,11 @@
 extern void sys_fatalerror(char *str, HRESULT hRes = S_OK);
 extern void out(char *str, ...);
 
-#include "cs2d/winglide2/g2d.h"
-#include "cs2d/winglide2/ig2d.h"
-#include "cs2d/winglide2/xg2d.h"
-#include "cs3d/glide2/g3dglide.h"
-#include "cs3d/glide2/gllib2.h"
+#include "video/canvas/winglide2/g2d.h"
+#include "video/canvas/winglide2/ig2d.h"
+#include "video/canvas/winglide2/xg2d.h"
+#include "video/renderer/glide2/g3dglide.h"
+#include "video/renderer/glide2/gllib2.h"
 
 IMPLEMENT_FACTORY (csGraphics2DGlide2x)
 

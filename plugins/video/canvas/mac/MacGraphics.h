@@ -23,7 +23,7 @@
 #include <Palettes.h>
 #include <DrawSprocket.h>
 #include "csutil/scf.h"
-#include "cs2d/common/graph2d.h"
+#include "video/canvas/common/graph2d.h"
 #include "IMacGraphics.h"
 
 /// Macintosh version.

@@ -20,7 +20,7 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include "sysdef.h"
-#include "cs2d/common/graph2d.h"
+#include "video/canvas/common/graph2d.h"
 #include "qint.h"
 #include "scrshot.h"
 #include "isystem.h"
@@ -29,7 +29,7 @@
 
 #if defined(PROC_INTEL) && !defined(NO_ASSEMBLER)
 #  if defined(COMP_VC)
-#    include "cs2d/common/i386/drline.h"
+#    include "video/canvas/common/i386/drline.h"
 #  endif
 #endif
 

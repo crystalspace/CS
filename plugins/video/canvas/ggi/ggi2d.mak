@@ -43,7 +43,7 @@ else
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_GGI2D
 endif
 DESCRIPTION.$(GGI2D) = $(DESCRIPTION.ggi2d)
-SRC.GGI2D = $(wildcard libs/cs2d/ggi/*.cpp $(SRC.COMMON.DRV2D))
+SRC.GGI2D = $(wildcard plugins/video/canvas/ggi/*.cpp $(SRC.COMMON.DRV2D))
 OBJ.GGI2D = $(addprefix $(OUT),$(notdir $(SRC.GGI2D:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -51,7 +51,7 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #------------------------------------------------------------------ targets ---#
 ifeq ($(MAKESECTION),targets)
 
-vpath %.cpp libs/cs2d/ggi
+vpath %.cpp plugins/video/canvas/ggi
 
 .PHONY: ggi2d ggi2dclean
 
@@ -63,7 +63,7 @@ ggi2d: $(OUTDIRS) $(GGI2D)
 $(GGI2D): $(OBJ.GGI2D)
 #	$(DO.PLUGIN) $(LIBS.GGI2D)
 
-$(OUT)%$O: libs/cs2d/ggi/%.cpp
+$(OUT)%$O: plugins/video/canvas/ggi/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GGI2D)
 
 $(GGI2D): $(OBJ.GGILIB2D) $(DEP.GGI2D)

@@ -23,7 +23,7 @@
 
 #include "csutil/scf.h"
 #include "cssys/os2/icsos2.h"
-#include "cs2d/openglcommon/glcommon2d.h"
+#include "video/canvas/openglcommon/glcommon2d.h"
 
 // avoid including os2.h
 class glWindow;

@@ -22,10 +22,10 @@
 
 #include "sysdef.h"
 #include "cssys/sysdriv.h"
-#include "cs2d/common/graph2d.h"
+#include "video/canvas/common/graph2d.h"
 #include "csutil/util.h"
 
-#include "cs2d/openglcommon/gl2d_font.h"
+#include "video/canvas/openglcommon/gl2d_font.h"
 
 /// we need a definition of GLFontInfo, declared in the header file
 class csGraphics2DOpenGLFontServer::GLFontInfo

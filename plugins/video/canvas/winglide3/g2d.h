@@ -26,11 +26,11 @@
 #include <glide.h>
  
 #include "csutil/scf.h"
-#include "cs2d/common/graph2d.h"
+#include "video/canvas/common/graph2d.h"
 // whats that ?
-//#include "cs2d/winglide3/xg2d.h"
-#include "cs2d/glide2common2d/iglide2d.h"
-#include "cs2d/glide2common2d/glide2common2d.h"
+//#include "video/canvas/winglide3/xg2d.h"
+#include "video/canvas/glide2common2d/iglide2d.h"
+#include "video/canvas/glide2common2d/glide2common2d.h"
 
 class csGraphics2DGlide3x : public csGraphics2DGlideCommon
 {

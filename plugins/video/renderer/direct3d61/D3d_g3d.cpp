@@ -38,7 +38,7 @@
 #include "csgeom/plane3.h"
 #include "d3d_g3d.h"
 #include "d3d_txtcache.h"
-#include "cs2d/ddraw61/IG2D.h"
+#include "video/canvas/ddraw61/IG2D.h"
 #include "cssys/win32/iDDetect.h"
 #include "csutil/inifile.h"
 #include "csgeom/polyclip.h"
