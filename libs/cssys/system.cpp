@@ -308,6 +308,7 @@ csSystemDriver::csSystemDriver () : PlugIns (8, 8), EventQueue (),
   MotionMan = NULL;
 
   Console = NULL;
+  Config = NULL;
 
   debug_level = 0;
   Shutdown = false;
