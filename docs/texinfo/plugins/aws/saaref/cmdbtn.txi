@@ -20,6 +20,12 @@ Command buttons publish the following properties.
 @table @code
 @item Caption
 Used to change the text on the button.
+@item State
+Holds the state of button being pressed or released.
+This attribute is read-only.
+@item Image
+For styles bfsNormal and bfsToobar you can optionally set an image.
+This property is write-only.
 @end table
 
 @subsubheading Frame Styles
@@ -28,10 +34,10 @@ Command buttons may be configured to display the following frame styles.
 
 @table @code
 @item bfsNormal
-A normal frame with text, a 3D border, and an optional image.
+A normal frame with text, a 3D border, and an optional image or an icon that is aligned left, right, below or above the button text.
 
 @item bfsToolbar
-A normal frame without text, but may have an image.
+A normal frame without text, but may have an image or an icon that is aligned left, right, below or above the button text.
 
 @item bfsBitmap
 A frame whose appearance is entirely dictated by images. This
@@ -53,6 +59,19 @@ Alpha level of the button. Only used for @samp{bfsBitmap} style.
 
 @item Caption
 The button's caption (title).
+
+@item Icon
+An optional icon for bfsNormal and bfsToolbar styles. The value of this attribute is a vfs path to picture.
+
+@item IconAlign
+An optional alignment for the optional icon for bfsNormal and bfsToolbar styles. 
+Values can be:
+@itemize
+@item biaLeft
+@item biaRight
+@item biaTop
+@item biaBottom
+@end itemize
 @end table
 
 @subsubheading Skin Attributes

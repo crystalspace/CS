@@ -1,0 +1,77 @@
+@c -*-texinfo-*-
+@node AWS Image View, AWS Multiline Edit, AWS Textbox, AWS Signals and Actions Reference
+@subsubsection Image View
+
+An image views  type is ``Image View''.
+
+@subsubheading Signals
+
+Image views send the following signals.
+
+@table @code
+@item signalMouseDown
+Generated when the mouse has been pressed within the controls rectangle.
+
+@item signalMouseUp
+Generated when the mouse has been released within the controls rectangle.
+
+@item signalMouseMoved
+Generated when the mouse has been moved within the control rectangle.
+
+@item signalClicked
+Generated when the mouse has been released within the controls rectangle after it has was pressed within the area.
+
+@end table
+
+@subsubheading Attributes
+
+Image views publish the following attributes.
+
+@table @code
+@item Style
+The following styles manipulate the appearance of the components frame:
+@itemize
+@item ivfsBump
+@item ivfsSimple
+@item ivfsRaised
+@item ivfsSunken
+@item ivfsFlat
+@item ivfsNone
+@end itemize
+These styles manipulate the drawing of the actual image:
+@itemize
+@item ivfsScaled:
+The image is scaled to fit in the controls rectangle.
+@item ivfsTiled:
+The image is tiled across the controls rectangle.
+@item ivfsFixed:
+The image is displayed unmodified. If the image is larger than the controls rectangle, only the upper left subrectangle that fits in the controls rectangle is shown.
+@end itemize
+
+@item Alpha
+The alpha of the applied background textures.
+
+@item Image
+This is the image that is drawn inside the control. If it's not given, then the image given by @samp{Texture} is drawn instead.
+
+@item KeyColor
+This optional triplet denotes the image's key color. If not given the default value of 255,0,255 is used.
+@end table
+
+@subsubheading Skin Attributes
+
+Image views support the following skin attributes.
+
+@table @code
+@item Texture
+Texture used to draw the components background.
+
+@item OverlayTextureAlpha
+The default alpha value used when drawing the background texture.
+
+@end table
+
+@subsubheading Properties
+
+Image views do not publish any properties.
+

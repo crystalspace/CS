@@ -1,8 +1,77 @@
 @c -*-texinfo-*-
-@node AWS List Box, , AWS Group Frame, AWS Signals and Actions Reference
+@node AWS List Box, AWS Scrollbar, AWS Group Frame, AWS Signals and Actions Reference
 @subsubsection List Box
 
 A list box's type is ``List Box''.
+
+@subsubheading Attributes
+
+Listboxes publish the following attributes.
+
+@table @code
+@item Style
+One of @samp{lbfsBump}, @samp{lbfsSimple}, @samp{lbfsSunken},
+@samp{lbfsRaised}, @samp{lbfsNone} or @samp{lbfsFlat}. Determines the style of frame for the
+component.
+
+@item Alpha
+The alpha of the overlay texture.
+
+@item HiAlpha
+The alpha of the selection bar texture.
+
+@item Columns
+The number of columns in the list control. For every column the following properties are present (@emph{X} denotes the current cloumn number):
+@itemize
+@item ColumnXImg
+An image for the column header
+@item ColumnXCaption
+The caption of the columns header
+@item ColumnXWidth
+The width of the column
+@item ColumnXAlign
+Alignment of the headers caption text
+@end itemize
+
+@item DefaultSortCol
+List rows are sorted based on the content of this column.
+
+@item Background
+Texture to use as background.
+
+@item Highlight
+Texture to use for the selection bar.
+
+@end table
+
+@subsubheading Skin Attributes
+
+Listboxes support the following skin attributes.
+
+@table @code
+@item OverlayTextureAlpha
+The alpha value of the overlay texture.
+
+@item Texture
+Used for overlaying the frame area with the global texture.
+
+@item TreeCollapsed
+Used to depict the item as collapsed (if it has any children)
+@item TreeExpanded
+Used to depict the item as expanded (if it has any children)
+@item TreeVertLine
+Used to connect to items on the same tree level.
+@item TreeHorzLine
+Used to connect to and item with its parent.
+@item TreeChkUnmarked
+Stateful entries can be marked/unmarked. This is used to draw the unmarked case.
+@item TreeChkMarked
+Stateful entries can be marked/unmarked. This is used to draw the marked case.
+@item TreeGrpUnmarked
+Grouped entries are either marked or unmarked. This is used to draw the unmarked case.
+@item TreeGrpMarked
+Grouped entries are either marked or unmarked. This is used to draw the marked case.
+@end table
 
 @subsubheading Signals
 
@@ -16,9 +85,17 @@ Occurs when the currently selected item changes.
 @subsubheading Actions
 
 List boxes understand the following actions.
+@itemize
+@item @ref{listboxInsertItem,,InsertItem}
+@item @ref{listboxDeleteItem,,DeleteItem}
+@item @ref{listboxGetSelectedItem,,GetSelectedItem}
+@item @ref{listboxGetItem,,GetItem}
+@item @ref{listboxClearList,,ClearList}
+@end itemize
 
+@anchor{listboxInsertItem}
 @table @code
-@item InsertItem
+@item @strong{InsertItem}
 Inserts a new item. See below for parameters. Note that an item
 does not need to have text or image or state, but it should have
 one of the above.
@@ -73,6 +150,10 @@ there is state, it will be aligned with the text.
 @tab This is the same as @samp{aligntxtX}, except that it operates on the
 image.
 
+@item @code{paramX}
+@tab @code{int}
+@tab An optional parameter you can attach to an item in the row.
+
 @item @code{parent}
 @tab @code{int}
 @tab Key that identifies the parent of which this item should be a child.  This
@@ -89,10 +170,183 @@ This sections describes the output parameters of the list box's
 @tab @emph{Type}
 @tab @emph{Description}
 
-@item @samp{key}
+@item @samp{id}
 @tab @samp{int}
 @tab Unique key of this item.  This can be saved and used as the value of a
 parent when adding children to an item, or it may be saved and used with the
 @samp{GetState} action.
 
 @end multitable
+
+@anchor{listboxDeleteItem}
+@table @code
+@item @strong{DeleteItem}
+Deletes a row from the listbox.
+@end table
+
+@subsubheading Input Parameters
+
+This sections describes the input parameters understood by the list box's
+@samp{DeleteItem} action.
+
+@multitable @columnfractions .15 .2 .55
+@item @emph{Name}
+@tab @emph{Type}
+@tab @emph{Description}
+
+@item @code{text}
+@tab @code{iString*}
+@tab This string is looked up is the listbox' sorting column. If it is found the corresponding row is deleted.
+
+@item @code{id}
+@tab @code{iString*}
+@tab This string is looked up is the listbox' sorting column. If it is found the corresponding row is deleted.
+
+@end multitable
+
+@subsubheading Output Parameters
+
+This sections describes the output parameters of the list box's
+@samp{DeleteItem} action.
+
+@multitable @columnfractions .15 .2 .55
+@item @emph{Name}
+@tab @emph{Type}
+@tab @emph{Description}
+
+@item @samp{result}
+@tab @samp{int}
+@tab The row number of the deleted row. If deletion failed -1 is returned.
+@end multitable
+
+@anchor{listboxGetSelectedItem}
+@table @code
+@item @strong{GetSelectedItem}
+Returns the text, state and param values of the selected item if there is one.
+@end table
+
+@subsubheading Input Parameters
+
+This sections describes the input parameters understood by the list box's
+@samp{GetSelectedItem} action.
+
+@multitable @columnfractions .15 .2 .55
+@item @emph{Name}
+@tab @emph{Type}
+@tab @emph{Description}
+
+@item @code{textX}
+@tab @code{iString*}
+@tab Requests the text for the item in column @emph{X}.
+
+@item @code{stateX}
+@tab @code{bool}
+@tab Requests the state of the item in column @emph{X}.
+
+@item @code{paramX}
+@tab @code{int}
+@tab  Requests the param value of the item in column @emph{X}.
+
+@end multitable
+
+@subsubheading Output Parameters
+
+This sections describes the output parameters of the list box's
+@samp{GetSelectedItem} action.
+
+@multitable @columnfractions .15 .2 .55
+@item @emph{Name}
+@tab @emph{Type}
+@tab @emph{Description}
+
+@item @code{textX}
+@tab @code{iString*}
+@tab Contains the text for the item in column @emph{X} if it was requested.
+
+@item @code{stateX}
+@tab @code{bool}
+@tab Contains the state of the item in column @emph{X} if it was requested.
+
+@item @code{paramX}
+@tab @code{int}
+@tab  Contains the param value of the item in column @emph{X} if it was requested.
+
+@item @samp{success}
+@tab @samp{bool}
+@tab Is true, if there is data returned. False if not (e.g. no item was selected)
+@end multitable
+
+@anchor{listboxGetItem}
+@table @code
+@item @strong{GetItem}
+Returns the text, state and param values of a specific row.
+@end table
+
+@subsubheading Input Parameters
+
+This sections describes the input parameters understood by the list box's
+@samp{GetItem} action.
+
+@multitable @columnfractions .15 .2 .55
+@item @emph{Name}
+@tab @emph{Type}
+@tab @emph{Description}
+
+@item @code{row}
+@tab @code{int}
+@tab Specifies the row number of the item we are interested in.
+
+@item @code{textX}
+@tab @code{iString*}
+@tab Requests the text for the item in column @emph{X}.
+
+@item @code{stateX}
+@tab @code{bool}
+@tab Requests the state of the item in column @emph{X}.
+
+@item @code{paramX}
+@tab @code{int}
+@tab  Requests the param value of the item in column @emph{X}.
+
+@end multitable
+
+@subsubheading Output Parameters
+
+This sections describes the output parameters of the list box's
+@samp{GetItem} action.
+
+@multitable @columnfractions .15 .2 .55
+@item @emph{Name}
+@tab @emph{Type}
+@tab @emph{Description}
+
+@item @code{textX}
+@tab @code{iString*}
+@tab Contains the text for the item in column @emph{X} if it was requested.
+
+@item @code{stateX}
+@tab @code{bool}
+@tab Contains the state of the item in column @emph{X} if it was requested.
+
+@item @code{paramX}
+@tab @code{int}
+@tab  Contains the param value of the item in column @emph{X} if it was requested.
+
+@item @code{success}
+@tab @code{bool}
+@tab Is true, if there is data returned. False if not (e.g. the row does not exist)
+@end multitable
+
+@anchor{listboxClearList}
+@table @code
+@item @strong{ClearList}
+Deletes all entries from the list.
+@end table
+
+@subsubheading Input Parameters
+
+None.
+
+@subsubheading Output Parameters
+
+None.

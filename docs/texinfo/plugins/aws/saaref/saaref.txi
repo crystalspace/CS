@@ -14,6 +14,10 @@ standard @sc{aws} components.
 * AWS Radio Button:: Radio Button
 * AWS Group Frame:: Group Frame
 * AWS List Box:: List Box
+* AWS Scrollbar:: Scrollbar
+* AWS Textbox:: Textbox
+* AWS Image View:: Image View
+* AWS Multiline Edit:: Multiline Edit
 @end menu
 
 @importsss{plugins,aws,saaref,all.txi}
@@ -23,3 +27,7 @@ standard @sc{aws} components.
 @importsss{plugins,aws,saaref,radiobtn.txi}
 @importsss{plugins,aws,saaref,grpframe.txi}
 @importsss{plugins,aws,saaref,listbox.txi}
+@importsss{plugins,aws,saaref,scrolbar.txi}
+@importsss{plugins,aws,saaref,textbox.txi}
+@importsss{plugins,aws,saaref,imagview.txi}
+@importsss{plugins,aws,saaref,mledit.txi}

@@ -2,7 +2,7 @@
 @node AWS Label, AWS Check Box, AWS Command Button, AWS Signals and Actions Reference
 @subsubsection Label
 
-A label's type if ``Label''.
+A label's type is ``Label''.
 
 @subsubheading Signals
 
@@ -20,6 +20,13 @@ Labels publish the following attributes.
 @table @code
 @item Caption
 The text of the label.
+@item Align
+The alignment of the label.
+@itemize
+@item lblAlignLeft: align label text left
+@item lblAlignCenter: align label text in the center of the control
+@item lblAlignRight: align label text right
+@end itemize
 @end table
 
 @subsubheading Properties

@@ -1,0 +1,305 @@
+@c -*-texinfo-*-
+@node AWS Multiline Edit, , AWS Image View, AWS Signals and Actions Reference
+@subsubsection Multiline Edit
+
+A multi line edit controls type is ``Multiline Edit''.
+
+@subsubheading Signals
+
+Multi line edit controls send the following signals.
+
+@table @code
+@item signalPaste
+Generated when the clipboard has been pasted.
+
+@item signalCopy
+Generated when the marked area has been copied into the clipboard.
+
+@item signalCut
+Generated when the marked area has been cut into the clipboard.
+
+@item signalEnter
+Generated when the event occured the appends/inserts a new line (usually the Enter key).
+
+@item signalRowChanged
+Generated when the cursor enters a new row.
+
+@item signalColChanged
+Generated when the cursor enters a new column.
+
+@item signalLostFocus
+Generated when the component has lost it's input focus.
+
+@end table
+
+@subsubheading Attributes
+
+Textboxes publish the following attributes.
+
+@table @code
+@item Style
+The following styles manipulate the appearance of the components frame:
+@itemize
+@item fsBump
+@item fsSimple
+@item fsRaised
+@item fsSunken
+@item fsFlat
+@item fsNone
+@end itemize
+These styles define what background is used.
+@itemize
+@item meNormal:
+The skins @samp{Texture} is used to draw the background.
+@item meBitmap:
+The texture defined in attribute @samp{Bitmap} is used to draw the background.
+@end itemize
+
+@item Alpha
+The alpha of the applied background textures.
+
+@item CursorColor
+This triplet defines the color of the cursor. If not given the skins @samp{TextForeColor} is used.
+
+@item Font
+A font name. This font is used to draw the content of this control. It is tried to load it from the systems fontserver.
+If it fails the default font of @sc{aws} is used.
+
+@item Bitmap
+If the style is @samp{fsBitmap} then this attribute is used to define the image used as the controls background image.
+
+@end table
+
+@subsubheading Skin Attributes
+
+Multiline edit controls support the following skin attributes.
+
+@table @code
+@item Texture
+Texture used to draw the components background
+
+@item ButtonTextureAlpha
+The default alpha value used when drawing the background texture.
+
+@item TextForeColor
+The default color used to draw the cursor.
+
+@end table
+
+@subsubheading Properties
+
+Multiline edit controls publish the following properties.
+
+@table @code
+@item Font
+A font name for a font to use when drawing text. This property is write-only.
+
+@item iFont
+A pointer to an iFont to use when drawing text. This property is write-only.
+
+@end table
+
+@subsubheading Actions
+
+Multiline edit controls understand the following actions.
+
+@itemize
+@item @ref{mledInsertRow,,InsertRow}
+@item @ref{mledDeleteRow,,DeleteRow}
+@item @ref{mledReplaceRow,,ReplaceRow}
+@item @ref{mledGetRow,,GetRow}
+@item @ref{mledGetRowCount,,GetRowCount}
+@item @ref{mledGetText,,GetText}
+@item @ref{mledSetText,,SetText}
+@item @ref{mledClear,,Clear}
+@end itemize
+
+@anchor{mledInsertRow}
+@table @code
+@item @strong{InsertRow}
+Inserts a new string at a specified row position.
+@end table
+
+@subsubheading Input Parameters
+
+@multitable @columnfractions .15 .2 .55
+@item @emph{Name}
+@tab @emph{Type}
+@tab @emph{Description}
+
+@item @code{row}
+@tab @code{int}
+@tab The row number the new string should become.
+
+@item @code{string}
+@tab @code{iString*}
+@tab The actual string that will be displayed in the new row.
+
+@end multitable
+
+@subsubheading Output Parameters
+
+None.
+
+@anchor{mledDeleteRow}
+@table @code
+@item @strong{DeleteRow}
+Deletes the row at a specified row position.
+@end table
+
+@subsubheading Input Parameters
+
+@multitable @columnfractions .15 .2 .55
+@item @emph{Name}
+@tab @emph{Type}
+@tab @emph{Description}
+
+@item @code{row}
+@tab @code{int}
+@tab The row to delete.
+
+@end multitable
+
+@subsubheading Output Parameters
+
+None.
+
+@anchor{mledReplaceRow}
+@table @code
+@item @strong{ReplaceRow}
+Replaces the text of a specied row.
+@end table
+
+@subsubheading Input Parameters
+
+@multitable @columnfractions .15 .2 .55
+@item @emph{Name}
+@tab @emph{Type}
+@tab @emph{Description}
+
+@item @code{row}
+@tab @code{int}
+@tab The row that will receive the new text.
+
+@item @code{string}
+@tab @code{iString*}
+@tab The text that will be displayed in the row.
+
+@end multitable
+
+@subsubheading Output Parameters
+
+None.
+
+@anchor{mledGetRow}
+@table @code
+@item @strong{GetRow}
+Request the text of a specified row.
+@end table
+
+@subsubheading Input Parameters
+
+@multitable @columnfractions .15 .2 .55
+@item @emph{Name}
+@tab @emph{Type}
+@tab @emph{Description}
+
+@item @code{row}
+@tab @code{int}
+@tab The row we will request the text from.
+
+@end multitable
+
+@subsubheading Output Parameters
+
+@multitable @columnfractions .15 .2 .55
+@item @emph{Name}
+@tab @emph{Type}
+@tab @emph{Description}
+
+@item @samp{string}
+@tab @samp{iString}
+@tab The text of the row.
+@end multitable
+
+@anchor{mledGetRowCount}
+@table @code
+@item @strong{GetRowCount}
+Returns the number of rows in this edit control.
+@end table
+
+@subsubheading Input Parameters
+
+None.
+
+@subsubheading Output Parameters
+
+@multitable @columnfractions .15 .2 .55
+@item @emph{Name}
+@tab @emph{Type}
+@tab @emph{Description}
+
+@item @samp{count}
+@tab @samp{int}
+@tab The number of rows in this control.
+@end multitable
+
+@anchor{mledClear}
+@table @code
+@item @strong{Clear}
+Deletes all lines.
+@end table
+
+@subsubheading Input Parameters
+
+None.
+
+@subsubheading Output Parameters
+
+None.
+
+@anchor{mledGetText}
+@table @code
+@item @strong{GetText}
+Returns the whole content of the edit control. Lines are concatenated with a linefeed character @samp{\n}.
+@end table
+
+@subsubheading Input Parameters
+
+None.
+
+@subsubheading Output Parameters
+
+@multitable @columnfractions .15 .2 .55
+@item @emph{Name}
+@tab @emph{Type}
+@tab @emph{Description}
+
+@item @samp{text}
+@tab @samp{iString*}
+@tab The content of this edit control. The lines are concatenated with a linefeed character @samp{\n}.
+@end multitable
+
+@anchor{mledSetText}
+@table @code
+@item @strong{SetText}
+Sets the content of the control.
+@end table
+
+@subsubheading Input Parameters
+
+@multitable @columnfractions .15 .2 .55
+@item @emph{Name}
+@tab @emph{Type}
+@tab @emph{Description}
+
+@item @code{text}
+@tab @code{iString*}
+@tab Contains the a string that will become the content of control. The string is broken up at linefeeds @samp{\n}.
+
+@end multitable
+
+@subsubheading Output Parameters
+
+None.
+

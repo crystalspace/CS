@@ -56,4 +56,5 @@ The caption (title) of the radio button.
 
 @item State
 Whether the component is ``on'' or ``off''.
+This property is read-only.
 @end table

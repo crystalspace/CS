@@ -1,0 +1,76 @@
+@c -*-texinfo-*-
+@node AWS Textbox, AWS Image View, AWS Scrollbar, AWS Signals and Actions Reference
+@subsubsection Textbox
+
+A textbox' type is ``Text Box''.
+
+@subsubheading Signals
+
+Textboxes send the following signals.
+
+@table @code
+@item signalChanged
+Generated when the content of the textbox has changed.
+
+@item signalLostFocus
+Generated when the textbox has lost it's input focus.
+@end table
+
+@subsubheading Attributes
+
+Textboxes publish the following attributes.
+
+@table @code
+@item Style
+This sets the style of the textbox. Valid values are @samp{tbfsNormal} and @samp{tbfsBitmap}.
+If the style is @samp{tbfsNormal} the @samp{Texture} from the skin definition is used to draw the components background.
+Otherwise the texture defined by attribute @samp{Bitmap} is used to draw the background.
+
+@item Alpha
+The alpha of the applied background textures.
+
+@item Masked
+This defines how the content is drawn. Either the normal characters are used to draw the text or a special character is used to draw all the text. This allows you for instance to use this control for password input and let the input display as @samp{*}.
+
+@item MaskChar
+This defines the actual character used if the content should be drawn masked.
+
+@item Text
+This attribute sets the initial content of the control.
+
+@item Disallow
+This lets you define a set of characters that are not allowed as input.
+
+@item Bitmap
+If the style is @samp{tbfsBitmap} then this attribute is used to define the image used as the controls background image.
+
+@end table
+
+@subsubheading Skin Attributes
+
+Textboxes support the following skin attributes.
+
+@table @code
+@item Texture
+Texture used to draw the components background
+
+@item ButtonTextureAlpha
+The default alpha value used when drawing the background texture.
+
+@end table
+
+@subsubheading Properties
+
+Textboxes publish the following properties.
+
+@table @code
+@item Text
+The content of the control.
+
+@item Disallow
+A set of characters that are not allowed as input.
+
+@item Blink
+Toggle the blinking of the cursor. This property is write-only.
+
+@end table

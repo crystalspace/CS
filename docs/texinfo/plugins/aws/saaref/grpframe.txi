@@ -10,8 +10,8 @@ Group frames publish the following attributes.
 
 @table @code
 @item Style
-One of @samp{gfsBump}, @samp{gfsSimple}, @samp{gfsSunken}, or
-@samp{gfsRaised}. Determines the style of frame for the
+One of @samp{gfsBump}, @samp{gfsSimple}, @samp{gfsSunken},
+@samp{gfsRaised}, @samp{gfsNone} or @samp{gfsFlat}. Determines the style of frame for the
 component.
 
 @item Caption
@@ -29,4 +29,13 @@ The alpha value of the overlay texture.
 
 @item Texture
 Used for overlaying the frame area with the global texture.
+@end table
+
+@subsubheading Properties
+
+Group frames publish the following properties.
+
+@table @code
+@item Caption
+The caption (title) of the group frame.
 @end table
