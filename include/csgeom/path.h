@@ -70,6 +70,29 @@ public:
   /// Destroy the path.
   virtual ~csPath () { }
 
+  /// Get the number of vector points in this spline
+  int Length ()
+  {
+    return GetPointCount();
+  }
+  /// Calculate
+  void CalculateAtTime (float time)
+  {
+    Calculate (time);
+  }
+  int GetCurrentIndex ()
+  {
+    return csCatmullRomSpline::GetCurrentIndex();
+  }
+  float GetTime (int idx)
+  {
+    return GetTimeValue(idx);
+  }
+  void SetTime (int idx, float t)
+  {
+    SetTimeValue(idx,t);
+  }
+
   /// Set the position vectors (first three dimensions of the cubic spline).
   void SetPositionVectors (csVector3* v)
   {
