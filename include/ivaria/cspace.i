@@ -489,28 +489,29 @@ TYPEMAP_OUT_csWrapPtr
 // place after all %include's are done, mentioning the header(s) it is
 // related to.
 
-%ignore csArray::operator=;
-%ignore csArray::operator[];
-%ignore csArray::InitRegion;
-%ignore csArray::TransferTo;
-%ignore csArray::SetLength;
 %ignore csArray::Capacity;
-%ignore csArray::GetExtend;
-%ignore csArray::FindKey;
-%ignore csArray::PushSmart;
-%ignore csArray::Section;
 %ignore csArray::DefaultCompare;
 %ignore csArray::DefaultCompareKey;
-%ignore csArray::FindSortedKey;
-%ignore csArray::InsertSorted;
-%ignore csArray::Find;
-%ignore csArray::Sort;
-%ignore csArray::DeleteAll;
-%ignore csArray::SetCapacity;
-%ignore csArray::ShrinkBestFit;
 %ignore csArray::Delete;
-%ignore csArray::Iterator;
+%ignore csArray::DeleteAll;
+%ignore csArray::Find;
+%ignore csArray::FindKey;
+%ignore csArray::FindSortedKey;
+%ignore csArray::GetExtend;
+%ignore csArray::GetIndex;
 %ignore csArray::GetIterator;
+%ignore csArray::InitRegion;
+%ignore csArray::InsertSorted;
+%ignore csArray::Iterator;
+%ignore csArray::PushSmart;
+%ignore csArray::Section;
+%ignore csArray::SetCapacity;
+%ignore csArray::SetLength;
+%ignore csArray::ShrinkBestFit;
+%ignore csArray::Sort;
+%ignore csArray::TransferTo;
+%ignore csArray::operator=;
+%ignore csArray::operator[];
 %ignore csArrayElementHandler::Construct;
 %ignore csArrayElementHandler::Destroy;
 %ignore csArrayElementHandler::InitRegion;
@@ -760,6 +761,7 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csArray<csPluginRequest>::Put;
 %ignore csArray<csPluginRequest>::Get(int); // Non-const.
 %ignore csArray<csPluginRequest>::Top();    // Non-const.
+%ignore csArray<csPluginRequest>::GetIndex;
 %template(csPluginRequestArray) csArray<csPluginRequest>;
 
 #ifndef CS_MINI_SWIG
@@ -953,6 +955,11 @@ TYPEMAP_OUT_csWrapPtr
 %include "cstool/csview.h"
 %include "cstool/collider.h"
 %include "cstool/csfxscr.h"
+
+%ignore csPixmap;
+%rename(csPixmap) csSimplePixmap;
+%include "cstool/cspixmap.h"
+
 #endif // CS_MINI_SWIG
 
 %define INTERFACE_POST(T)
