@@ -31,13 +31,13 @@
 
 csObjectModel::csObjectModel ()
 {
-  normals = NULL;
-  num_normals = -1;
+  planes = NULL;
+  num_planes = -1;
 }
 
 csObjectModel::~csObjectModel ()
 {
-  delete[] normals;
+  delete[] planes;
 }
 
 //---------------------------------------------------------------------------
@@ -96,19 +96,19 @@ bool csObjectModelManager::CheckObjectModel (csObjectModel* model)
     iPolygonMesh* mesh = model->imodel->GetSmallerPolygonMesh ();
     if (!mesh)
     {
-      delete[] model->normals;
-      model->normals = NULL;
-      model->num_normals = -1;
+      delete[] model->planes;
+      model->planes = NULL;
+      model->num_planes = -1;
     }
     else
     {
-      if (model->num_normals != mesh->GetPolygonCount ())
+      if (model->num_planes != mesh->GetPolygonCount ())
       {
-        delete[] model->normals;
-        model->num_normals = mesh->GetPolygonCount ();
-        model->normals = new csVector3 [model->num_normals];
+        delete[] model->planes;
+        model->num_planes = mesh->GetPolygonCount ();
+        model->planes = new csPlane3 [model->num_planes];
       }
-      csPolygonMeshTools::CalculateNormals (mesh, model->normals);
+      csPolygonMeshTools::CalculatePlanes (mesh, model->planes);
     }
     return true;
   }

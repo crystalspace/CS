@@ -3,6 +3,12 @@ The history order is reversed so that new features are at the top.
 23-May-2002
 	- Put back the fflush() in engine.cpp. An fflush() can NEVER
 	  cause crashes unless your environment is screwed up a lot.
+	- Changed csPolygonMeshTools::CalculateOutline() so that it returns
+	  the output edges as sets of vertex indices instead of edge
+	  indices.
+	- Extended the unit tester for CalculateOutline().
+	- Replaced the normals with planes in the csObjectModelManager from
+	  Dynavis.
 22-May-2002
 	- Updated apimod96 for new csParser class.
 	- Some minor code cleanup in the new csParser class. It was already

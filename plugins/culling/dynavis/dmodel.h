@@ -38,8 +38,8 @@ private:
   iObjectModel* imodel;
   long shape_number;	// Last used shape_number from model.
   int ref_cnt;		// Number of objects in vis system using this model.
-  int num_normals;
-  csVector3* normals;	// Normals for this model.
+  int num_planes;
+  csPlane3* planes;	// Planes for this model.
 
   csObjectModel ();
   ~csObjectModel ();
@@ -49,8 +49,8 @@ public:
   iObjectModel* GetModel () const { return imodel; }
   /// Get the shape number.
   long GetShapeNumber () const { return shape_number; }
-  /// Get the normals.
-  const csVector3* GetNormals () const { return normals; }
+  /// Get the planes.
+  const csPlane3* GetPlanes () const { return planes; }
 };
 
 /**

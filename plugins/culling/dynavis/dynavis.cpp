@@ -376,11 +376,11 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
 
   // Then insert all polygons.
   csMeshedPolygon* poly = polymesh->GetPolygons ();
-  const csVector3* normals = model->GetNormals ();
+  const csPlane3* planes = model->GetPlanes ();
   csVector2 verts2d[64];
   for (i = 0 ; i < poly_count ; i++, poly++)
   {
-    if (normals[i] * campos_object <= 0.0)
+    if (planes[i].Classify (campos_object) <= 0.0)
       continue;
 
     int num_verts = poly->num_vertices;

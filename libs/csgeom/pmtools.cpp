@@ -302,7 +302,8 @@ void csPolygonMeshTools::CalculateOutline (
     {
       // If the edge is attached to only one edge it is an outline
       // edge automatically.
-      *outline_edges++ = i;
+      *outline_edges++ = e->vt1;
+      *outline_edges++ = e->vt2;
       num_outline_edges++;
       CS_ASSERT (e->vt1 >= 0 && e->vt1 < num_vertices);
       CS_ASSERT (e->vt2 >= 0 && e->vt2 < num_vertices);
@@ -320,7 +321,8 @@ void csPolygonMeshTools::CalculateOutline (
       if ((cl1 < 0 && cl2 > 0) || (cl1 > 0 && cl2 < 0))
       {
         // Sign is different. So this is an outline.
-        *outline_edges++ = i;
+        *outline_edges++ = e->vt1;
+        *outline_edges++ = e->vt2;
         num_outline_edges++;
         CS_ASSERT (e->vt1 >= 0 && e->vt1 < num_vertices);
         CS_ASSERT (e->vt2 >= 0 && e->vt2 < num_vertices);

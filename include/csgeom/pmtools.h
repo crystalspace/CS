@@ -85,16 +85,20 @@ public:
    * in space. This function will calculate an outline that is valid from
    * that position. This outline will be given as an array of vertex
    * indices that are used (so these have to be transformed from 3D to 2D)
-   * and also an array of edge indices that form the outline.
+   * and also an array of double vertex indices (every set of two vertex
+   * indices forms one edge) that form the outline.
    * This function will also return a radius. As long as the position
    * doesn't move outside this radius the outline will be valid.
    * The two input tables should have enough space for the returned
    * number of edges and vertex indices. The safest way is to allocate
-   * enough edges as are active in the input edge table and enough
-   * vertices as the polygon mesh supports.
+   * double the amount of vertices as there are active edges in the input
+   * edge table and enough vertices as the polygon mesh supports.
    * <br>
    * Note: this function requires that the given edges are marked as
    * active or not (use CheckActiveEdges()).
+   * <br>
+   * Note: num_outline_edges will be the amount of edges (which means
+   * that there will be twice as much vertices in the 'outline_edges' table.
    */
   static void CalculateOutline (csPolygonMeshEdge* edges, int num_edges,
   	csPlane3* planes, int num_vertices,
