@@ -51,15 +51,10 @@ csNewParticleSystem::csNewParticleSystem (
   StorageCount = 0;
   PositionArray = 0;
   Scale = csVector2 (1.0f, 1.0f);
-  ScaleArray = 0;
   Angle = 0.0f;
-  AngleArray = 0;
   Color = csColor (0, 0, 0);
-  ColorArray = 0;
   Material = 0;
-  MaterialArray = 0;
   Axis = csVector3 (0, 1, 0);
-  AxisArray = 0;
   PrevTime = 0;
   MixMode = CS_FX_COPY;
   Lighting = true;
@@ -71,41 +66,33 @@ csNewParticleSystem::csNewParticleSystem (
 #ifdef CS_USE_NEW_RENDERER 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 
-  initialized = false;
   vertices = 0;
-  colors = 0;
-  texels = 0;
-  triangles = 0;
 
   mesh.dynDomain.AttachNew (new csShaderVariableContext);
   mesh.object2camera = csReversibleTransform ();
   mesh.meshtype = CS_MESHTYPE_TRIANGLES;
   meshPtr = &mesh;
 #endif
+
+  texels = 0;
+  triangles = 0;
+  colors = 0;
+  initialized = false;
 }
 
 csNewParticleSystem::~csNewParticleSystem ()
 {
   delete[] PositionArray;
-  delete[] ScaleArray;
-  delete[] AngleArray;
-  delete[] ColorArray;
-  delete[] MaterialArray;
-  delete[] AxisArray;
   delete[] LitColors;
-#ifdef CS_USE_NEW_RENDERER 
-  delete[] vertices;
-  delete[] colors;
   delete[] texels;
   delete[] triangles;
+  delete[] colors;
+#ifdef CS_USE_NEW_RENDERER 
+  delete[] vertices;
 #else
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
 #endif
 }
-
-#define UPDATE_ARRAY_FLAG(FLAG,NAME,TYPE)                               \
-  if (ParticleFlags & FLAG)                                             \
-    UPDATE_ARRAY_ALWAYS (NAME, TYPE);
 
 #define UPDATE_ARRAY_ALWAYS(NAME,TYPE) {                                \
   TYPE *old = NAME;                                                     \
@@ -117,21 +104,7 @@ csNewParticleSystem::~csNewParticleSystem ()
 void csNewParticleSystem::Allocate (int newsize, int copysize)
 {
   UPDATE_ARRAY_ALWAYS (PositionArray, csVector3);
-  UPDATE_ARRAY_FLAG (CS_PARTICLE_SEP_SCALE, ScaleArray, csVector2);
-  UPDATE_ARRAY_FLAG (CS_PARTICLE_SEP_ROTATE, AngleArray, float);
-  UPDATE_ARRAY_FLAG (CS_PARTICLE_SEP_COLOR, ColorArray, csColor);
-  UPDATE_ARRAY_FLAG (CS_PARTICLE_SEP_AXIS, AxisArray, csVector3);
   if (Lighting) UPDATE_ARRAY_ALWAYS (LitColors, csColor);
-
-  /// special handling for material references
-  if (ParticleFlags & CS_PARTICLE_SEP_MATERIAL)
-  {
-    csRef<iMaterialWrapper> *old = MaterialArray;
-    MaterialArray = new csRef<iMaterialWrapper> [newsize];
-    for (int i=0; i<StorageCount; i++)
-      MaterialArray [i] = old [i];
-    delete[] old;
-  }
 
   StorageCount = newsize;
 }
@@ -141,9 +114,7 @@ void csNewParticleSystem::SetCount (int c)
   if (c > StorageCount)
     Allocate (c, ParticleCount);
   ParticleCount = c;
-#ifdef CS_USE_NEW_RENDERER
   initialized = false;
-#endif
 }
 
 void csNewParticleSystem::Compact ()
@@ -166,9 +137,38 @@ iMeshObjectFactory* csNewParticleSystem::GetFactory () const
 
 void csNewParticleSystem::SetupObject ()
 {
-#ifdef CS_USE_NEW_RENDERER
   if (!initialized)
   {
+    initialized = true;
+    delete[] texels;
+    texels = new csVector2 [ParticleCount * 4];
+    delete[] triangles;
+    triangles = new csTriangle [ParticleCount * 2];
+    delete[] colors;
+    colors = new csColor [ParticleCount * 4];
+
+    int i;
+    csVector2* txt = texels;
+    csTriangle* tri = triangles;
+    csColor* c = colors;
+    for (i = 0 ; i < ParticleCount ; i++)
+    {
+      // fill the texel table
+      *txt++ = csVector2 (0, 0);
+      *txt++ = csVector2 (0, 1);
+      *txt++ = csVector2 (1, 1);
+      *txt++ = csVector2 (1, 0);
+      // fill the triangle table
+      *tri++ = csTriangle (i*4+0, i*4+1, i*4+2);
+      *tri++ = csTriangle (i*4+0, i*4+2, i*4+3);
+      // fill the color table
+      *c++ = Color;
+      *c++ = Color;
+      *c++ = Color;
+      *c++ = Color;
+    }
+
+#ifdef CS_USE_NEW_RENDERER
     csStringID vertex_name, texel_name, normal_name, color_name, index_name;
     csMeshFactory* mf = (csMeshFactory*)Factory;
     iObjectRegistry* object_reg = mf->GetObjectRegistry ();
@@ -181,16 +181,9 @@ void csNewParticleSystem::SetupObject ()
     index_name = strings->Request ("indices");
 
     delete[] vertices;
-    delete[] colors;
-    delete[] texels;
-    delete[] triangles;
-    initialized = true;
     VertexCount = ParticleCount * 4;
     TriangleCount = ParticleCount * 2;
     vertices = new csVector3 [VertexCount];
-    colors = new csColor [VertexCount];
-    texels = new csVector2 [VertexCount];
-    triangles = new csTriangle [TriangleCount];
     vertex_buffer = g3d->CreateRenderBuffer (
         sizeof (csVector3)*VertexCount, CS_BUF_STATIC, 
         CS_BUFCOMP_FLOAT, 3, false);
@@ -221,8 +214,98 @@ void csNewParticleSystem::SetupObject ()
     sv->SetValue (color_buffer);
     sv = mesh.dynDomain->GetVariableAdd (index_name);
     sv->SetValue (index_buffer);
-  }
 #endif
+  }
+}
+
+void csNewParticleSystem::SetupParticles (
+  const csReversibleTransform& trans,
+  csVector3* vertices,
+  csBox3& bbox)	// Not for CS_USE_NEW_RENDERER
+{
+  int i;
+
+  // compute modified axes for rotation or axis alignment
+  csVector3 x_axis, y_axis;
+
+  if (ParticleFlags & CS_PARTICLE_ROTATE)
+  {
+    float cosa, sina;
+    cosa = cos (Angle);
+    sina = sin (Angle);
+    x_axis = csVector3 (cosa, sina, 0);
+    y_axis = csVector3 (-sina, cosa, 0);
+  }
+  else if (ParticleFlags & CS_PARTICLE_AXIS)
+  {
+    csVector3 effectiveAxis = trans.Other2ThisRelative (Axis);
+    if (ParticleFlags & CS_PARTICLE_ALIGN_Y)
+    {
+      y_axis = effectiveAxis;
+      x_axis = csVector3 (0, 0, -1) % y_axis;
+    }
+    else
+    {
+      x_axis = effectiveAxis;
+      y_axis = csVector3 (0, 0, +1) % x_axis;
+    }
+
+    float norm = x_axis.Norm ();
+    if (ABS (norm) < EPSILON) return;	// @@@?
+    x_axis /= norm;
+
+    norm = y_axis.Norm ();
+    if (ABS (norm) < EPSILON) return;	// @@@?
+    y_axis /= norm;
+  }
+  else
+  {
+    x_axis = csVector3 (1, 0, 0);
+    y_axis = csVector3 (0, 1, 0);
+  }
+
+  // apply scaling
+  if (ParticleFlags & CS_PARTICLE_SCALE)
+  {
+    x_axis *= Scale.x;
+    y_axis *= Scale.y;
+  }
+
+  // compute the actual vertices
+  x_axis /= 2;
+  y_axis /= 2;
+
+  // set up the data for DrawTriangleMesh
+  for (i = 0; i<ParticleCount; i++)
+  {
+    // transform to eye coordinates
+    csVector3 pos = trans.Other2This (PositionArray [i]);
+
+    *vertices = pos - x_axis - y_axis;
+#ifndef CS_USE_NEW_RENDERER
+    bbox.AddBoundingVertex (*vertices++);
+#else
+    vertices++;
+#endif
+    *vertices = pos - x_axis + y_axis;
+#ifndef CS_USE_NEW_RENDERER
+    bbox.AddBoundingVertex (*vertices++);
+#else
+    vertices++;
+#endif
+    *vertices = pos + x_axis + y_axis;
+#ifndef CS_USE_NEW_RENDERER
+    bbox.AddBoundingVertex (*vertices++);
+#else
+    vertices++;
+#endif
+    *vertices = pos + x_axis - y_axis;
+#ifndef CS_USE_NEW_RENDERER
+    bbox.AddBoundingVertex (*vertices++);
+#else
+    vertices++;
+#endif
+  }
 }
 
 bool csNewParticleSystem::DrawTest (iRenderView* rview, iMovable* movable)
@@ -275,92 +358,11 @@ bool csNewParticleSystem::DrawTest (iRenderView* rview, iMovable* movable)
   mesh.clip_portal = ClipPortal;
   mesh.clip_plane = ClipPlane;
   mesh.clip_z_plane = ClipZ;
-  mesh.do_mirror = camera->IsMirrored ();  
+  mesh.do_mirror = camera->IsMirrored ();
+  mesh.object2camera = csReversibleTransform ();
 
-  // set up the data for DrawTriangleMesh
-  for (i = 0; i<ParticleCount; i++)
-  {
-    // transform to eye coordinates
-    csVector3 pos = trans.Other2This (PositionArray [i]);
-
-    // compute modified axes for rotation or axis alignment
-    csVector3 x_axis, y_axis;
-
-    if (ParticleFlags & CS_PARTICLE_ROTATE)
-    {
-      float an = (ParticleFlags & CS_PARTICLE_SEP_ROTATE) ?
-        AngleArray [i] : Angle;
-      x_axis = csVector3 (cos (an), sin (an), 0);
-      y_axis = csVector3 (-sin (an), cos (an), 0);
-    }
-    else if (ParticleFlags & CS_PARTICLE_AXIS)
-    {
-      csVector3 effectiveAxis = trans.Other2ThisRelative (
-        (ParticleFlags & CS_PARTICLE_SEP_AXIS) ? AxisArray [i] : Axis);
-
-      if (ParticleFlags & CS_PARTICLE_ALIGN_Y)
-      {
-        y_axis = effectiveAxis;
-        x_axis = csVector3 (0, 0, -1) % y_axis;
-      }
-      else
-      {
-        x_axis = effectiveAxis;
-        y_axis = csVector3 (0, 0, +1) % x_axis;
-      }
-
-      float norm = x_axis.Norm ();
-      if (ABS (norm) < EPSILON) continue;
-      x_axis /= norm;
-
-      norm = y_axis.Norm ();
-      if (ABS (norm) < EPSILON) continue;
-      y_axis /= norm;
-    }
-    else
-    {
-      x_axis = csVector3 (1, 0, 0);
-      y_axis = csVector3 (0, 1, 0);
-    }
-
-
-    // apply scaling
-    if (ParticleFlags & CS_PARTICLE_SCALE)
-    {
-      csVector2 sc = (ParticleFlags & CS_PARTICLE_SEP_SCALE) ?
-        ScaleArray [i] : Scale;
-      x_axis *= sc.x;
-      y_axis *= sc.y;
-    }
-
-    // compute the actual vertices
-    x_axis /= 2;
-    y_axis /= 2;
-    vertices [i*4+0] = pos - x_axis - y_axis;
-    vertices [i*4+1] = pos - x_axis + y_axis;
-    vertices [i*4+2] = pos + x_axis + y_axis;
-    vertices [i*4+3] = pos + x_axis - y_axis;
-
-    // fill the color table
-    csColor col = Lighting ? LitColors [i] :
-      (ParticleFlags & CS_PARTICLE_SEP_COLOR) ?
-          ColorArray [i] : Color;
-    colors [i*4+0] = col;
-    colors [i*4+1] = col;
-    colors [i*4+2] = col;
-    colors [i*4+3] = col;
-
-    // fill the texel table
-    texels [i*4+0] = csVector2 (0, 0);
-    texels [i*4+1] = csVector2 (0, 1);
-    texels [i*4+2] = csVector2 (1, 1);
-    texels [i*4+3] = csVector2 (1, 0);
-
-    // fill the triangle table
-    triangles [i*2+0] = csTriangle (i*4+0, i*4+1, i*4+2);
-    triangles [i*2+1] = csTriangle (i*4+0, i*4+2, i*4+3);
-  }
-
+  csBox3 box;
+  SetupParticles (trans, vertices, box);
 #endif
 
   if (light_mgr)
@@ -381,8 +383,7 @@ void csNewParticleSystem::UpdateLighting (const csArray<iLight*>& lights,
 
   for (int i=0; i<ParticleCount; i++)
   {
-    csColor lightColor = (ParticleFlags & CS_PARTICLE_SEP_COLOR) ?
-      ColorArray [i] : Color;
+    csColor lightColor = Color;
     csVector3 wpos = transform.This2Other (PositionArray [i]);
 
     int num = lights.Length ();
@@ -418,110 +419,17 @@ bool csNewParticleSystem::Draw (iRenderView* rview, iMovable* mov,
   csReversibleTransform objspace = camera->GetTransform ();
   if (!mov->IsFullTransformIdentity ())
     objspace /= mov->GetFullTransform ();
+  csReversibleTransform tr_ident;
+  g3d->SetObjectToCamera (&tr_ident);
 
   // these are the final data chunks for DrawTriangleMesh
   int VertexCount = ParticleCount * 4;
-  int TriangleCount = ParticleCount * 2;
   CS_ALLOC_STACK_ARRAY (csVector3, vertices, VertexCount);
-  CS_ALLOC_STACK_ARRAY (csColor, colors, VertexCount);
-  CS_ALLOC_STACK_ARRAY (csVector2, texels, VertexCount);
-  CS_ALLOC_STACK_ARRAY (csTriangle, triangles, TriangleCount);
   csBox3 bbox;
 
-  // if the particles use separate materials, sort them
-  if (ParticleFlags & CS_PARTICLE_SEP_MATERIAL)
-  {
-    // @@@
-  }
   Material->Visit ();
 
-  // set up the data for DrawTriangleMesh
-  for (int i=0; i<ParticleCount; i++)
-  {
-    // transform to eye coordinates
-    csVector3 pos = objspace.Other2This (PositionArray [i]);
-
-    // compute modified axes for rotation or axis alignment
-    csVector3 x_axis, y_axis;
-
-    if (ParticleFlags & CS_PARTICLE_ROTATE)
-    {
-      float an = (ParticleFlags & CS_PARTICLE_SEP_ROTATE) ?
-        AngleArray [i] : Angle;
-      x_axis = csVector3 (cos (an), sin (an), 0);
-      y_axis = csVector3 (-sin (an), cos (an), 0);
-    }
-    else if (ParticleFlags & CS_PARTICLE_AXIS)
-    {
-      csVector3 effectiveAxis = objspace.Other2ThisRelative (
-        (ParticleFlags & CS_PARTICLE_SEP_AXIS) ? AxisArray [i] : Axis);
-
-      if (ParticleFlags & CS_PARTICLE_ALIGN_Y)
-      {
-        y_axis = effectiveAxis;
-        x_axis = csVector3 (0, 0, -1) % y_axis;
-      }
-      else
-      {
-        x_axis = effectiveAxis;
-        y_axis = csVector3 (0, 0, +1) % x_axis;
-      }
-
-      float norm = x_axis.Norm ();
-      if (ABS (norm) < EPSILON) continue;
-      x_axis /= norm;
-
-      norm = y_axis.Norm ();
-      if (ABS (norm) < EPSILON) continue;
-      y_axis /= norm;
-    }
-    else
-    {
-      x_axis = csVector3 (1, 0, 0);
-      y_axis = csVector3 (0, 1, 0);
-    }
-
-
-    // apply scaling
-    if (ParticleFlags & CS_PARTICLE_SCALE)
-    {
-      csVector2 sc = (ParticleFlags & CS_PARTICLE_SEP_SCALE) ?
-        ScaleArray [i] : Scale;
-      x_axis *= sc.x;
-      y_axis *= sc.y;
-    }
-
-    // compute the actual vertices
-    x_axis /= 2;
-    y_axis /= 2;
-    vertices [i*4+0] = pos - x_axis - y_axis;
-    vertices [i*4+1] = pos - x_axis + y_axis;
-    vertices [i*4+2] = pos + x_axis + y_axis;
-    vertices [i*4+3] = pos + x_axis - y_axis;
-    bbox.AddBoundingVertex (vertices [i*4+0]);
-    bbox.AddBoundingVertex (vertices [i*4+1]);
-    bbox.AddBoundingVertex (vertices [i*4+2]);
-    bbox.AddBoundingVertex (vertices [i*4+3]);
-
-    // fill the color table
-    csColor col = Lighting ? LitColors [i] :
-      (ParticleFlags & CS_PARTICLE_SEP_COLOR) ?
-          ColorArray [i] : Color;
-    colors [i*4+0] = col;
-    colors [i*4+1] = col;
-    colors [i*4+2] = col;
-    colors [i*4+3] = col;
-
-    // fill the texel table
-    texels [i*4+0] = csVector2 (0, 0);
-    texels [i*4+1] = csVector2 (0, 1);
-    texels [i*4+2] = csVector2 (1, 1);
-    texels [i*4+3] = csVector2 (1, 0);
-
-    // fill the triangle table
-    triangles [i*2+0] = csTriangle (i*4+0, i*4+1, i*4+2);
-    triangles [i*2+1] = csTriangle (i*4+0, i*4+2, i*4+3);
-  }
+  SetupParticles (objspace, vertices, bbox);
 
   // set up a vertex buffer
   iVertexBufferManager *vbufmgr = g3d->GetVertexBufferManager ();
@@ -552,7 +460,8 @@ bool csNewParticleSystem::Draw (iRenderView* rview, iMovable* mov,
   trimesh.vertex_fog = 0;
 
   // draw it!
-  vbufmgr->LockBuffer (vbuf, vertices, texels, colors, VertexCount, 0, bbox);
+  vbufmgr->LockBuffer (vbuf, vertices, texels,
+  	Lighting ? LitColors : colors, VertexCount, 0, bbox);
   g3d->DrawTriangleMesh (trimesh);
   vbufmgr->UnlockBuffer (vbuf);
 #endif
@@ -567,16 +476,12 @@ csRenderMesh **csNewParticleSystem::GetRenderMeshes (int &num)
   // some generic setup
   //@@@?if (VisCallback) VisCallback->BeforeDrawing (this, rview);
 
-  // if the particles use separate materials, sort them
-  if (ParticleFlags & CS_PARTICLE_SEP_MATERIAL)
-  {
-    // @@@
-  }
   Material->Visit ();
 
   vertex_buffer->CopyToBuffer (vertices, sizeof (csVector3) * VertexCount);
   texel_buffer->CopyToBuffer (texels, sizeof (csVector2) * VertexCount);
-  color_buffer->CopyToBuffer (colors, sizeof (csColor) * VertexCount);
+  color_buffer->CopyToBuffer (Lighting ? LitColors : colors,
+  	sizeof (csColor) * VertexCount);
   index_buffer->CopyToBuffer (triangles,
       	sizeof (unsigned int) * TriangleCount *3);
 
@@ -603,29 +508,39 @@ void csNewParticleSystem::NextFrame (csTicks current, const csVector3&)
 
 bool csNewParticleSystem::SetColor (const csColor& c)
 {
-  if (ParticleFlags & CS_PARTICLE_SEP_COLOR) return false;
   Color = c;
+  // If already initialized we fix the color table.
+  if (initialized)
+  {
+    csColor* c = colors;
+    int i;
+    for (i = 0 ; i < ParticleCount ; i++)
+    {
+      // fill the color table
+      *c++ = Color;
+      *c++ = Color;
+      *c++ = Color;
+      *c++ = Color;
+    }
+  }
   return true;
 }
 
 bool csNewParticleSystem::GetColor (csColor& c) const
 {
-  if (ParticleFlags & CS_PARTICLE_SEP_COLOR) return false;
   c = Color;
   return true;
 }
 
 bool csNewParticleSystem::SetMaterialWrapper (iMaterialWrapper* m)
 {
-  if (ParticleFlags & CS_PARTICLE_SEP_MATERIAL) return false;
   Material = m;
   return true;
 }
 
 iMaterialWrapper* csNewParticleSystem::GetMaterialWrapper () const
 {
-  if (ParticleFlags & CS_PARTICLE_SEP_MATERIAL) return 0;
-  else return Material;
+  return Material;
 }
 
 bool csNewParticleSystem::GetLighting () const

@@ -81,10 +81,10 @@ void csRainMeshObject::Update (csTicks elapsed_time)
     v += Speed * (float)elapsed_time / 1000.0f;
     while (!Bounds.In (v))
     {
-      // can't simply place it randomly (the user would notice that). Also can't
-      // simply put it somewhere at the top of the box since the falling direction
-      // might not be straight downwards and so part of the box would never get
-      // get if we did.
+      // Can't simply place it randomly (the user would notice that). Also
+      // can't simply put it somewhere at the top of the box since the
+      // falling direction might not be straight downwards and so part of
+      // the box would never get get if we did.
       if (v.x < Bounds.MinX ()) v.x += Bounds.MaxX () - Bounds.MinX ();
       if (v.y < Bounds.MinY ()) v.y += Bounds.MaxY () - Bounds.MinY ();
       if (v.z < Bounds.MinZ ()) v.z += Bounds.MaxZ () - Bounds.MinZ ();

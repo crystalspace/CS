@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+11-Feb-2004
+	- Jorrit optimized the csNewParticleSystem slightly (used by the
+	  rain mesh plugin) and also cleaned it up a bit.
+	- Jorrit also simplified csNewParticleSystem by removing all
+	  functions to use seperate materials, rotation, scale, ... for
+	  particles. By doing that Jorrit managed to significantly optimize
+	  csNewParticleSystem again.
 10-Feb-2004
 	- Eric Sunshine fixed CS/data/Jamfile so that it no longer tries to
 	  install the non-existent unifont.csf file.  (Bug reported by Frank

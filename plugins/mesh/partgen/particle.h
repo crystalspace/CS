@@ -41,21 +41,6 @@ const int CS_PARTICLE_ROTATE            = 4;
 /// enable axis alignment (screen alignment otherwise)
 const int CS_PARTICLE_AXIS              = 8;
 
-/// use separate scaling values per particle
-const int CS_PARTICLE_SEP_SCALE         = 16;
-
-/// use separate rotation values per particle
-const int CS_PARTICLE_SEP_ROTATE        = 32;
-
-/// use separate base colors per particle (uniform color otherwise)
-const int CS_PARTICLE_SEP_COLOR         = 64;
-
-/// use separate materials per particle (uniform material otherwise)
-const int CS_PARTICLE_SEP_MATERIAL      = 128;
-
-/// use separate axes per particle
-const int CS_PARTICLE_SEP_AXIS          = 256;
-
 /// use the y axis for alignment instead of x
 const int CS_PARTICLE_ALIGN_Y           = 512;
 
@@ -75,17 +60,14 @@ protected:
   iMeshObjectFactory *Factory;
   csRef<iLightManager> light_mgr;
 
-#ifdef CS_USE_NEW_RENDERER
   bool initialized;
+#ifdef CS_USE_NEW_RENDERER
   csRenderMesh mesh;
   csRenderMesh* meshPtr;
 
   int VertexCount;
   int TriangleCount;
   csVector3* vertices;
-  csColor* colors;
-  csVector2* texels;
-  csTriangle* triangles;
   csRef<iRenderBuffer> vertex_buffer;
   csRef<iRenderBuffer> texel_buffer;
   csRef<iRenderBuffer> normal_buffer;
@@ -97,6 +79,10 @@ protected:
   /// The vertex buffer.
   csRef<iVertexBuffer> vbuf;
 #endif
+
+  csTriangle* triangles;
+  csVector2* texels;
+  csColor* colors;
 
   /// currently allocated amount of storage for particles
   int StorageCount;
@@ -113,20 +99,11 @@ protected:
   /// uniform scaling
   csVector2 Scale;
 
-  /// per-particle scaling
-  csVector2 *ScaleArray;
-
   /// uniform rotation
   float Angle;
 
-  /// per-particle rotation
-  float *AngleArray;
-
   /// uniform base color
   csColor Color;
-
-  /// per-particle base color
-  csColor *ColorArray;
 
   /// mixing mode
   uint MixMode;
@@ -134,14 +111,8 @@ protected:
   /// uniform material
   csRef<iMaterialWrapper> Material;
 
-  /// per-particle material
-  csRef<iMaterialWrapper> *MaterialArray;
-
   /// uniform axis alignment
   csVector3 Axis;
-
-  /// per-particle axis alignment
-  csVector3 *AxisArray;
 
   /// previous time in the NextFrame() method
   csTicks PrevTime;
@@ -166,6 +137,14 @@ protected:
   virtual void Allocate (int newsize, int copysize);
 
   void SetupObject ();
+
+  /**
+   * Setup particles in the given tables right before they are drawn.
+   */
+  void SetupParticles (
+    const csReversibleTransform& trans,
+    csVector3* vertices,
+    csBox3& box);	// @@@ Not for CS_USE_NEW_RENDERER
 
 public:
   /// constructor
@@ -204,16 +183,16 @@ public:
   /// calls Update() with the amount of time passed since the previous call
   virtual void NextFrame (csTicks current_time, const csVector3& pos);
 
-  /// Set the base color (only if a global base color is used)
+  /// Set the base color
   virtual bool SetColor (const csColor& color);
 
-  /// Return the base color (only if a global base color is used)
+  /// Return the base color
   virtual bool GetColor (csColor& color) const;
 
-  /// Set the material to use (only if a global material is used)
+  /// Set the material to use
   virtual bool SetMaterialWrapper (iMaterialWrapper* material);
 
-  /// Return the current material (only if a global material is used)
+  /// Return the current material
   virtual iMaterialWrapper* GetMaterialWrapper () const;
 
   /// Return whether this particle system applies lighting
