@@ -12,6 +12,9 @@ chronological order.
 	- Jorrit added another optimization to Dynavis. Dynavis now attempts
 	  to check if adding items from the write queue will help make
 	  the object invisible. If not it will not flush the write queue.
+	- Jorrit optimized Dynavis so that nodes also use the write queue
+	  now. Not sure if this really is an optimization. Have to do further
+	  tests.
 11-Nov-2003
 	- Eric Sunshine fixed MacOS/X application menu malfunction introduced
 	  on August 1, 2003 when configuration was changed so that OSXDelegate

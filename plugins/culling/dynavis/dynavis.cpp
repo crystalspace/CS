@@ -511,6 +511,7 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
   {
     hist->reason = VISIBLE_INSIDE;
     hist->vis_cnt = history_frame_cnt + dist_history ();
+    hist->no_writequeue_vis_cnt = 0;
     hist->history_frustum_mask = frustum_mask;
     cnt_node_visible++;
     goto end;
@@ -523,6 +524,7 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
     	new_mask))
     {
       hist->reason = INVISIBLE_FRUSTUM;
+      hist->no_writequeue_vis_cnt = 0;
       vis = false;
       goto end;
     }
@@ -542,6 +544,7 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
     float sy = camera->GetShiftY ();
     float max_depth;
 #define DO_OUTLINE_TEST 0
+#define DO_WRITEQUEUE_TEST 1
 #if DO_OUTLINE_TEST
     static csPoly2D outline;
     outline.MakeEmpty ();
@@ -560,16 +563,59 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
       }
 #     endif
       // @@@ VPT tracking for nodes!!!
-      csTestRectData data;
-      bool rc = tcovbuf->PrepareTestRectangle (sbox, data);
-      if (rc) rc = tcovbuf->TestRectangle (data, min_depth);
+      csTestRectData testrect_data;
+      bool rc = tcovbuf->PrepareTestRectangle (sbox, testrect_data);
+      if (rc) rc = tcovbuf->TestRectangle (testrect_data, min_depth);
 
       if (!rc)
       {
         hist->reason = INVISIBLE_TESTRECT;
+        hist->no_writequeue_vis_cnt = 0;
         vis = false;
         goto end;
       }
+#if DO_WRITEQUEUE_TEST
+      else if (do_cull_writequeue &&
+      	 hist->no_writequeue_vis_cnt <= history_frame_cnt)
+      {
+	bool use_wq = TestWriteQueueRelevance (min_depth, testrect_data, sbox);
+	if (use_wq)
+	{
+	  float out_depth;
+	  csVisibilityObjectWrapper* qobj = (csVisibilityObjectWrapper*)
+	    	write_queue->Fetch (sbox, min_depth, out_depth);
+	  if (qobj)
+	  {
+#           ifdef CS_DEBUG
+	    if (do_state_dump)
+	    {
+	      printf ("Adding objects from write queue (for node)!\n");
+	      fflush (stdout);
+	    }
+#           endif
+	    // We have found one such object. Insert them all.
+	    do
+	    {
+	      // Yes! We found such an object. Insert it now.
+	      UpdateCoverageBuffer (camera, qobj);
+	      // Now try again.
+              rc = tcovbuf->TestRectangle (testrect_data, min_depth);
+              if (!rc)
+	      {
+	        // It really is invisible.
+		hist->reason = INVISIBLE_TESTRECT;
+		hist->no_writequeue_vis_cnt = 0;
+	        vis = false;
+                goto end;
+	      }
+	      qobj = (csVisibilityObjectWrapper*)
+	    	    write_queue->Fetch (sbox, min_depth, out_depth);
+	    }
+	    while (qobj);
+	  }
+	}
+      }
+#endif
 #if DO_OUTLINE_TEST
       else
       {
@@ -580,6 +626,7 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
         if (!rc)
         {
           hist->reason = INVISIBLE_TESTRECT;
+	  hist->no_writequeue_vis_cnt = 0;
           vis = false;
           goto end;
         }
@@ -590,6 +637,9 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
 
   hist->reason = VISIBLE;
   hist->vis_cnt = history_frame_cnt + dist_history ();
+#if DO_WRITEQUEUE_TEST
+  hist->no_writequeue_vis_cnt = hist->vis_cnt + dist_nowritequeue ();
+#endif
   hist->history_frustum_mask = frustum_mask;
   cnt_node_visible++;
 
@@ -920,6 +970,47 @@ void csDynaVis::AppendWriteQueue (iCamera* camera, iVisibilityObject* visobj,
 # endif
 }
 
+bool csDynaVis::TestWriteQueueRelevance (float min_depth,
+	const csTestRectData& testrect_data, const csBox2& sbox)
+{
+  bool use_wq = false;
+  csWriteQueueElement* el = write_queue->GetFirst ();
+  if (el && el->depth <= min_depth)
+  {
+    // If there are potentially relevant items in the write queue
+    // we first attempt to guess if those items can actually contribute
+    // to culling (i.e. can mark the object invisible). To do that we
+    // do a very quick and rough test where we see if the combined
+    // rectangles from the write queue and the current contents of the
+    // coverage buffer actually cover the entire rectangle we are
+    // testing. For every element in the write queue we also set
+    // the 'relevant' flag to true if the element is potentially
+    // relevant.
+    int tiles_remaining = tcovbuf->PrepareWriteQueueTest (
+	  	testrect_data, min_depth);
+    while (el)
+    {
+      if (el->depth > min_depth) break;
+      if (el->box.TestIntersect (sbox))
+      {
+	csTestRectData td;
+	tcovbuf->PrepareTestRectangle (el->box, td);
+	int affecting_tiles = tcovbuf->AddWriteQueueTest (testrect_data,
+	      	  td, el->relevant);
+	if (tiles_remaining > 0)
+	  tiles_remaining -= affecting_tiles;
+      }
+      else
+      {
+	el->relevant = false;
+      }
+      el = el->next;
+    }
+    if (tiles_remaining <= 0) use_wq = true;
+  }
+  return use_wq;
+}
+
 bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   	VisTest_Front2BackData* data, uint32 frustum_mask)
 {
@@ -1080,41 +1171,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
       if (do_cull_writequeue &&
       	 hist->no_writequeue_vis_cnt <= history_frame_cnt)
       {
-        bool use_wq = false;
-	csWriteQueueElement* el = write_queue->GetFirst ();
-	if (el && el->depth <= min_depth)
-	{
-	  // If there are potentially relevant items in the write queue
-	  // we first attempt to guess if those items can actually contribute
-	  // to culling (i.e. can mark the object invisible). To do that we
-	  // do a very quick and rough test where we see if the combined
-	  // rectangles from the write queue and the current contents of the
-	  // coverage buffer actually cover the entire rectangle we are
-	  // testing. For every element in the write queue we also set
-	  // the 'relevant' flag to true if the element is potentially
-	  // relevant.
-	  int tiles_remaining = tcovbuf->PrepareWriteQueueTest (
-	  	testrect_data, min_depth);
-	  while (el)
-	  {
-	    if (el->depth > min_depth) break;
-	    if (el->box.TestIntersect (sbox))
-	    {
-	      csTestRectData td;
-	      tcovbuf->PrepareTestRectangle (el->box, td);
-	      int affecting_tiles = tcovbuf->AddWriteQueueTest (testrect_data,
-	      	  td, el->relevant);
-	      if (tiles_remaining > 0)
-	        tiles_remaining -= affecting_tiles;
-	    }
-	    else
-	    {
-	      el->relevant = false;
-	    }
-	    el = el->next;
-	  }
-	  if (tiles_remaining <= 0) use_wq = true;
-	}
+        bool use_wq = TestWriteQueueRelevance (min_depth, testrect_data, sbox);
 
 	// If the write queue is enabled we try to see if there
 	// are occluders that are relevant (intersect with this object

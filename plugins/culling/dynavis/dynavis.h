@@ -39,6 +39,7 @@ class csCoverageBuffer;
 class csTiledCoverageBuffer;
 class csWriteQueue;
 class csDynaVis;
+struct csTestRectData;
 struct iPolygonMesh;
 struct iMovable;
 struct iMeshWrapper;
@@ -222,6 +223,12 @@ private:
   void AppendWriteQueue (iCamera* camera, iVisibilityObject* visobj,
   	csDynavisObjectModel* model, csVisibilityObjectWrapper* obj,
 	const csBox2& sbox, float min_depth, float maximum);
+
+  // Test if using the write queue is relevant for the given rectangle.
+  // If not return false. This function will also mark all write queue
+  // elements with 'relevant' true or false.
+  bool TestWriteQueueRelevance (float min_depth,
+	const csTestRectData& testrect_data, const csBox2& sbox);
 
 public:
   SCF_DECLARE_IBASE;
