@@ -12,6 +12,7 @@ chronological order.
         - res added some cheesy new textures to stdtex.zip: normalmaps for the
           textures used in r3dtest and a new texture for the donut in flarge.
           Also moved it a bit so it's only half shadowed.
+	- Jorrit added 'cstool' library to rendstep_std plugin.
 8-Sep-2003
 	- Jorrit added csgfx to the stdsteps renderloop plugin (for Jam).
 	- Jorrit did the following changes to bring new and old renderer
@@ -67,7 +68,8 @@ chronological order.
 	- Anders Stenberg added three pass PPL technique for cards with just 
 	  two texture units. Also inlined all FFPs.
 	- Marten Svanfeldt made the following changes:
-	    - Added a Reset() member to csArray<T>::Iterator to reset the iterator.
+	    - Added a Reset() member to csArray<T>::Iterator to reset the
+	      iterator.
 	    - Added the class csRenderMeshList which is a utilityclass used by
 	      the rendersteps to collect csRenderMeshes after culling and sort
 	      those correctly according to renderpriority and z-order.
