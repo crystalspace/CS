@@ -134,10 +134,6 @@ LFLAGS.EXE= $(NEXT.LFLAGS.EXE)
 # Flags for the linker which are used when building a shared library.
 LFLAGS.DLL= $(NEXT.LFLAGS.DLL)
 
-# Inhibit linking $(LIBS) into a DLL (otherwise the dynamic loader complains).
-# Non-NeXT platforms, though, seem to thrive on linking with $(LIBS).
-INHIBIT_DLL_LIBS=yes
-
 # System-dependent flags to pass to NASM
 NASMFLAGS.SYSTEM=
 
@@ -189,6 +185,15 @@ DO_SHM=no
 OUTSUFX.yes=
 
 endif # ifeq ($(MAKESECTION),defines)
+
+#-------------------------------------------------------------- postdefines ---#
+ifeq ($(MAKESECTION),postdefines)
+
+# Other platforms link all $(LIBS) into DLL, but doing so breaks DLLs on
+# NeXT, so a custom link statement is required.
+DO.DYNAMIC.LIBRARY = $(LINK) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(LFLAGS)
+
+endif # ifeq ($(MAKESECTION),postdefines)
 
 #--------------------------------------------------------------- confighelp ---#
 ifeq ($(MAKESECTION),confighelp)
