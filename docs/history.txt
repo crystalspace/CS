@@ -16,6 +16,8 @@ The history order is reversed so that new features are at the top.
               the 1s compliment and a fixed and easily identifiable error
               code, rather than leaving them to work out what result is.
               Feel free to change for preference.
+            - Reverted previous and changed to cast method to eliminate
+              GCC compiler warning.
 26-Apr-2003
 	- Norman Kraemer added a swig.jam file for custom swig rules and
 	  used the new power to rebuild the cs_pyth.cpp from cspace.i if
