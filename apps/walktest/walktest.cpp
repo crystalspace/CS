@@ -40,7 +40,6 @@
 #include "csengine/scripts/csscript.h"
 #include "csengine/scripts/intscri.h"
 #include "csengine/colldet/being.h"
-#include "csengine/2d/csspr2d.h"
 #include "csutil/sparse3d.h"
 #include "csutil/inifile.h"
 #include "csobject/nameobj.h"
@@ -70,7 +69,7 @@ void DrawZbuffer ()
   {
     int gi_pixelbytes;
     System->piGI->GetPixelBytes (gi_pixelbytes);
-
+  
     if (gi_pixelbytes == 4)
     {
       //@@@
@@ -79,21 +78,21 @@ void DrawZbuffer ()
     {
       UShort *dest;
       Gfx2D->GetPixelAt(0, y, (unsigned char**)&dest);
-
+      
       ULong *zbuf;
       Gfx3D->GetZBufPoint (0, y, &zbuf);
-
+      
       for (int x = 0; x < FRAME_WIDTH; x++)
         *dest++ = (unsigned short)(*zbuf++ >> 13);
-    }
+    } 
     else
     {
       unsigned char *dest;
       Gfx2D->GetPixelAt(0, y, &dest);
-
+      
       ULong *zbuf;
       Gfx3D->GetZBufPoint(0, y, &zbuf);
-
+      
       for (int x = 0; x < FRAME_WIDTH; x++)
         *dest++ = (unsigned char)(*zbuf++ >> 16);
     }
@@ -135,7 +134,7 @@ void WalkTest::DrawFrame (long elapsed_time, long current_time)
       if (dyn->GetObject(csDataObject::Type())) HandleDynLight (dyn);
       dyn = dn;
     }
-  }
+  } 
 
   // Start drawing 2D graphics
   if (Gfx3D->BeginDraw (drawflags | CSDRAW_2DGRAPHICS) != S_OK)
@@ -176,7 +175,7 @@ void WalkTest::DrawFrame (long elapsed_time, long current_time)
     {
       char buffer[200], names[30];
       sprintf (buffer,"CD %d cam pos %2.2f,%2.2f,%2.2f %c %c",
-         collcount,
+         collcount, 
          view->GetCamera ()->GetW2CTranslation ().x, view->GetCamera ()->GetW2CTranslation ().y,
          view->GetCamera ()->GetW2CTranslation ().z,
          csBeing::player->falling?'F':' ', csBeing::player->climbing?'C':' ');
@@ -192,14 +191,6 @@ void WalkTest::DrawFrame (long elapsed_time, long current_time)
       Gfx2D->Write(8-1, FRAME_HEIGHT-21, 0, -1, buffer);
       Gfx2D->Write(8, FRAME_HEIGHT-20, scon->get_fg (), -1, buffer);
     } /* endif */
-
-    int w  = cslogo->Width()  * FRAME_WIDTH  / 640;
-    int h  = cslogo->Height() * FRAME_HEIGHT / 480;
-
-    if (cslogo)
-    {
-      cslogo->Draw(Gfx2D, 2,2,w,h);
-    }
   } /* endif */
 
   // Drawing code ends here
@@ -226,7 +217,7 @@ void WalkTest::PrepareFrame (long elapsed_time, long current_time)
     // Load camera location into player.
     csBeing::player->sector = view->GetCamera ()->GetSector ();
     csBeing::player->transform = view->GetCamera ();
-    collcount = csBeing::player->CollisionDetect ();
+    collcount = csBeing::player->CollisionDetect ();    
     // Load player transformation back into camera.
     view->GetCamera ()->SetW2C (csBeing::player->transform->GetO2T ());
     view->GetCamera ()->SetPosition (csBeing::player->transform->GetO2TTranslation ());
@@ -303,10 +294,10 @@ void CaptureScreen (void)
   extern void WritePCX (char *name, unsigned char *data, UByte *pal,
 			int width,int height);
   Gfx3D->BeginDraw(CSDRAW_2DGRAPHICS);
-
+  
   unsigned char* pFirstPixel;
   Gfx2D->GetPixelAt(0,0, &pFirstPixel);
-
+  
   WritePCX (name, pFirstPixel, pall, FRAME_WIDTH, FRAME_HEIGHT);
   Gfx3D->FinishDraw();
   Sys->Printf (MSG_CONSOLE, "Screenshot: %s", name);
@@ -376,13 +367,10 @@ void WalkTest::DemoWrite (const char* buf)
     if (Gfx2D)
     {
       VERIFY_SUCCESS (Gfx2D->BeginDraw ());
-      csRect area;
-      bool dblbuff;
-      Gfx2D->GetDoubleBufferState (dblbuff);
       Gfx2D->Clear (0);
-      if (dblbuff)
-        area.Union (0, 0, FRAME_WIDTH - 1, FRAME_HEIGHT - 1);
       Console->PutText ("%s", buf);
+
+      csRect area;
       Console->Print (&area);
       Gfx2D->FinishDraw ();
       Gfx2D->Print (&area);
@@ -400,12 +388,11 @@ void start_demo ()
 
   ITextureManager* txtmgr;
   Gfx3D->GetTextureManager (&txtmgr);
-//Gfx2D->DoubleBuffer (false);
   demo_info->world->Initialize (GetISystemFromSystem (System), System->piGI, config);
   txtmgr->Prepare ();
   ((SimpleConsole *)System->Console)->SetupColors (txtmgr);
   ((SimpleConsole *)System->Console)->SetMaxLines (1000);       // Some arbitrary high value.
-  ((SimpleConsole *)System->Console)->SetTransparent (0);
+  ((SimpleConsole *)System->Console)->SetTransparent (1);
   txtmgr->AllocPalette ();
 
   if (Gfx2D->BeginDraw() == S_OK)
@@ -617,25 +604,9 @@ int main (int argc, char* argv[])
       fatal_exit (0, false);
     }
 
-    //Find the Crystal Space logo and set the renderer Flag to for_2d, to allow 
-    //the use in the 2D part.
-    csTextureList *texlist = world->GetTextures ();
-    ASSERT(texlist);
-    csTextureHandle *texh = texlist->GetTextureMM ("cslogo.gif");
-    if (texh)
-    {
-      texh->for_2d = true;
-    }
-
     // Prepare the world. This will calculate all lighting and
     // prepare the lightmaps for the 3D rasterizer.
     world->Prepare (Gfx3D);
-
-    //Create a 2D sprite for the Logo
-    int w, h;
-    ITextureHandle* phTex = texh->GetTextureHandle();
-    phTex->GetBitmapDimensions(w,h);
-    Sys->cslogo = new csSprite2D (texh, 0, 0, w, h);
 
     // Look for the start sector in this world.
     char* strt = (char*)(world->start_sector ? world->start_sector : "room");
