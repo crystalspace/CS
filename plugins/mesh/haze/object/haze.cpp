@@ -858,8 +858,9 @@ bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
     //printf("drawing a polygon\n");
     //DrawPoly(rview, g3d, mat, 3, tri_pts, tri_uvs);
     float quality = 0.90;
+    int maxdepth = 10;
     DrawPolyAdapt(rview, g3d, mat, 3, tri_pts, tri_uvs, layer_scale,
-      quality);
+      quality, 0, maxdepth);
 
 #if 0
     // debug drawing of the outline
@@ -968,7 +969,7 @@ bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
 
 void csHazeMeshObject::DrawPolyAdapt(iRenderView *rview, iGraphics3D *g3d,
      iMaterialHandle *mat, int num_sides, csVector3* pts, csVector2* uvs,
-     float layer_scale, float quality)
+     float layer_scale, float quality, int depth, int maxdepth)
 {
   /// only triangles
   (void)num_sides;
@@ -984,7 +985,7 @@ void csHazeMeshObject::DrawPolyAdapt(iRenderView *rview, iGraphics3D *g3d,
   csVector2 normdir2 = dir2 / dir2.Norm();
   float cosangle = normdir1 * normdir2;
   //printf("cosangle %g, quality %g\n", cosangle, quality);
-  if(cosangle > quality)
+  if(cosangle > quality || depth >= maxdepth)
   {
     // draw it
     DrawPoly(rview, g3d, mat, 3, pts, uvs);
@@ -1000,7 +1001,8 @@ void csHazeMeshObject::DrawPolyAdapt(iRenderView *rview, iGraphics3D *g3d,
   newdir /= newdir.Norm();
   uvs[2].Set(0.5, 0.5);
   uvs[2] += newdir * layer_scale;
-  DrawPolyAdapt(rview, g3d, mat, 3, pts, uvs, layer_scale, quality);
+  DrawPolyAdapt(rview, g3d, mat, 3, pts, uvs, layer_scale, quality, 
+    depth+1, maxdepth);
   // other half
   csVector3 oldpos1 = pts[1];
   csVector2 olduv1 = uvs[1];
@@ -1008,7 +1010,8 @@ void csHazeMeshObject::DrawPolyAdapt(iRenderView *rview, iGraphics3D *g3d,
   uvs[1] = uvs[2];
   pts[2] = oldpos;
   uvs[2] = olduv;
-  DrawPolyAdapt(rview, g3d, mat, 3, pts, uvs, layer_scale, quality);
+  DrawPolyAdapt(rview, g3d, mat, 3, pts, uvs, layer_scale, quality, 
+    depth+1, maxdepth);
   pts[1] = oldpos1;
   uvs[1] = olduv1;
 }

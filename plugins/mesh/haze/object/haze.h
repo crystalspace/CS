@@ -300,10 +300,11 @@ public:
       0.70 is lower quality.
       0.50 is low quality.
       -1 is lowest quality (no adaptation)
+    recursion will only go until >= maxdepth. Pass depth=0 at start.
     */
   void DrawPolyAdapt(iRenderView *rview, iGraphics3D *g3d, iMaterialHandle *mat,
     int num_sides, csVector3* pts, csVector2* uvs,
-    float layer_scale, float quality);
+    float layer_scale, float quality, int depth, int maxdepth);
   void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
   void GetRadius (csVector3& rad, csVector3& cent)
   { rad =  radius; cent.Set(0,0,0); }
