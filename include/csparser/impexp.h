@@ -247,6 +247,7 @@ void               set_cor3_normal ( void );
 void               set_vertex_normal ( void );
 int                smf_read ( FILE *filein );
 int                smf_write ( FILE *fileout );
+int                spr_write ( FILE *fileout );
 int                stla_read ( FILE *filein );
 int                stla_write ( FILE *fileout );
 void               tds_pre_process ( void );
