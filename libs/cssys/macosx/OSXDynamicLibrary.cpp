@@ -88,7 +88,7 @@ csLibraryHandle csLoadLibrary(char const* path)
   
   if (path_len >= plugin_len && 					// *1*
     strcasecmp(bin_name + path_len - plugin_len, CSPLUGIN_EXT) == 0)
-    strcpy(bin_name + path_len - plugin_len, CSPLUGIN_EXT);
+    strcpy(bin_name + path_len - plugin_len, CSBUNDLE_EXT);
   else if (path_len >= bundle_len && 
     strcasecmp(bin_name + path_len - bundle_len, CSBUNDLE_EXT) != 0)
     strcat(bin_name, CSBUNDLE_EXT);

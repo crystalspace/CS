@@ -27,6 +27,10 @@ The history order is reversed so that new features are at the top.
 	  module-specific build directory.  This solves several problems where
 	  glwin32, sndsoft, and sndds3d were confusing and mixing source and
 	  object files.
+	- Eric Sunshine fixed silly bug in csLoadLibrary() for MacOS/X.  It was
+	  supposed to transform the incoming .csplugin suffix on the pathname
+	  with .csbundle, but instead uselessly replaced .csplugin with
+	  .csplugin.
 25-Jun-2003
 	- Oktal manually applied a patch to cssocket that was intended for
 	  ensocket, submitted by Ladislav Foldyna.
