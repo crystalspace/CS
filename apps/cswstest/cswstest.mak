@@ -14,7 +14,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: wstest
 
-all: wstest
+all apps: wstest
 wstest:
 	$(MAKE_TARGET)
 
@@ -53,7 +53,7 @@ wstestclean:
 
 ifdef DO_DEPEND
 $(OUTOS)cswstest.dep: $(SRC.CSWSTEST)
-	$(DO.DEP) $(OUTOS)cswstest.dep
+	$(DO.DEP)
 endif
 
 -include $(OUTOS)cswstest.dep

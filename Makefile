@@ -49,6 +49,7 @@ ifeq ($(PROC),invalid)
 	@echo $"  make openstep     Prepare for building under and for OpenStep 4.2$"
 	@echo $"  make rhapsody     Prepare for building under and for Rhapsody (MacOS/X) DR2$"
 	@echo $"  make amiga        Prepare for building under and for Amiga using GCC$"
+	@echo $"  make win32vc      Prepare for building under and for Win32 using MSVC$"
 	@echo $"  -*- Modifiers -*-$"
 	@echo $"  USE_DLL=yes$|no    Build dynamic/static modules (drivers, plugins)$"
 	@echo $"  MODE=optimize$|debug$|profile  Select how to compile everything.$"
@@ -56,7 +57,7 @@ ifeq ($(PROC),invalid)
 else
 	@echo $"  Configured for $(DESCRIPTION.$(TARGET)) USE_DLL=$(USE_DLL) MODE=$(MODE) $(SYSMODIFIERS)$"
 	@echo $"  Other platforms are: linux, solaris, freebsd, beos, os2gcc, os2wcc, djgpp,$"
-	@echo $"  nextstep, openstep, rhapsody, or amiga with the following modifiers:$"
+	@echo $"  nextstep, openstep, rhapsody, amiga or win32vc with the following modifiers:$"
 	@echo $"  USE_DLL=yes$|no    Build dynamic/static modules (drivers, plugins)$"
 	@echo $"  MODE=optimize$|debug$|profile  Select how to compile everything.$"
 ifdef SYSMODIFIERSHELP
@@ -70,6 +71,7 @@ endif
 	@echo $"+-----------------------------------------------------------------------------+$"
 	@$(APPHELP)
 	@echo $"+-----------------------------------------------------------------------------+$"
+	@echo $"  make apps         Make all applications$"
 	@echo $"  make libs         Make all static libraries$"
 	@echo $"  make drivers      Make all dynamic libraries (COM drivers)$"
 	@echo $"  make drivers2d    Make all supported 2D graphics drivers$"
@@ -96,7 +98,8 @@ endif
 # WARNING: Try to avoid quotes in most important "echo" statements
 # since several systems (OS/2, DOS and WIN32) have a "echo" that does
 # literal output, i.e. they do not strip quotes from string.
-linux solaris beos os2gcc os2wcc djgpp freebsd nextstep openstep rhapsody amiga unknown:
+linux solaris beos os2gcc os2wcc djgpp freebsd nextstep openstep rhapsody \
+amiga unknown win32vc:
 	@echo TARGET = $@>config.mak
 	@echo SYSMAKEFILE = mk/system/$@.mak>>config.mak
 	@echo MODE = $(MODE)>>config.mak

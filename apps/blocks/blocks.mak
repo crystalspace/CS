@@ -14,7 +14,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: blks
 
-all: blks
+all apps: blks
 blks:
 	$(MAKE_TARGET)
 
@@ -53,7 +53,7 @@ blksclean:
 
 ifdef DO_DEPEND
 $(OUTOS)blocks.dep: $(SRC.BLOCKS)
-	$(DO.DEP) $(OUTOS)blocks.dep
+	$(DO.DEP)
 endif
 
 -include $(OUTOS)blocks.dep

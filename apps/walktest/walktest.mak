@@ -14,7 +14,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: walk
 
-all: walk
+all apps: walk
 walk:
 	$(MAKE_TARGET)
 
@@ -53,7 +53,7 @@ walkclean:
 
 ifdef DO_DEPEND
 $(OUTOS)walktest.dep: $(SRC.WALKTEST)
-	$(DO.DEP) $(OUTOS)walktest.dep
+	$(DO.DEP)
 endif
 
 -include $(OUTOS)walktest.dep
