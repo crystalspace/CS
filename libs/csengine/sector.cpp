@@ -126,20 +126,23 @@ void csSector::UseStaticTree (int mode, bool /*octree*/)
   static_thing = new csThing (world);
   static_thing->SetName ("__static__");
 
+  // First copy the vector of things locally.
+  csVector copy_things;
   int i;
+  for (i = 0 ; i < things.Length () ; i++)
+    copy_things.Push (things[i]);
+  
   i = 0;
-  while (i < things.Length ())
+  while (i < copy_things.Length ())
   {
-    csThing* sp = (csThing*)things[i];
+    csThing* sp = (csThing*)copy_things[i];
     if (!sp->flags.Check (CS_ENTITY_MOVEABLE | CS_ENTITY_DETAIL) && !sp->GetFog ().enabled
     	&& sp->GetNumCurves () == 0)
     {
       static_thing->Merge (sp);
       delete sp;
-      things[i] = NULL;
-      things.Delete (i);
     }
-    else i++;
+    i++;
   }
   static_thing->GetMovable ().SetSector (this);
   static_thing->GetMovable ().UpdateMove ();
@@ -198,8 +201,8 @@ void csSector::UseStaticTree (int mode, bool /*octree*/)
     CsPrintf (MSG_INITIALIZATION, "Build PVS...\n");
     ((csOctree*)static_tree)->BuildPVS (static_thing);
 #   else
-    CsPrintf (MSG_INITIALIZATION, "Build Dummy PVS...\n");
-    ((csOctree*)static_tree)->SetupDummyPVS ();
+    //CsPrintf (MSG_INITIALIZATION, "Build Dummy PVS...\n");
+    //((csOctree*)static_tree)->SetupDummyPVS ();
 #   endif
     CsPrintf (MSG_INITIALIZATION, "Caching PVS...\n");
     ((csOctree*)static_tree)->CachePVS (w->VFS, (const char*)str);
@@ -320,6 +323,7 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
     csThing* sp = (csThing*)things[i];
     if (sp != static_thing)
     {
+      r = best_r;
       csPolygon3D* p = sp->IntersectSegment (start, end, cur_isect, &r);
       if (p && r < best_r)
       {

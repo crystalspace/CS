@@ -1,5 +1,19 @@
 The history order has been reversed so that new features are at the top.
 
+22-Sep-2000
+	- Fixed csPolygonSet::IntersectSegment so that it actually
+	  returns the first polygon. This also fixes csSector::HitBeam.
+	- Fixed a bad bug in the creation of the octree. On average
+	  half of the things that should be used for the octree were
+	  just deleted and ignored.
+	- Improved memory usage a lot by just removing the PVS for now.
+	  It is unfinished anyway and needs to be rewritten in any case.
+	  For one big level this improved memory usage from 80Megs to
+	  30Megs.
+	- WalkTest doesn't use g3d->GetZBufValue anymore to calculate
+	  the selected polygon (right mouse click) but only uses engine
+	  information.
+	- The bsp trees are a little bit more memory efficient (not much).
 21-Sep-2000
 	- Eric Sunshine created a new tool, efed.pl (Eric's File Editor),
 	  which is a regular-expression-based, batch-oriented file editor.

@@ -370,12 +370,25 @@ csPolygon3D* csPolygonSet::IntersectSegment (const csVector3& start,
   const csVector3& end, csVector3& isect, float* pr)
 {
   int i;
+  float r;
+  csVector3 cur_isect;
+  csPolygon3D* best_p = NULL;
+  // @@@ This routine is not very optimal. Especially for things
+  // with large number of polygons.
   for (i = 0 ; i < polygons.Length () ; i++)
   {
     csPolygon3D* p = polygons.Get (i);
-    if (p->IntersectSegment (start, end, isect, pr)) return p;
+    if (p->IntersectSegment (start, end, cur_isect, &r))
+    {
+      if (r < *pr)
+      {
+	*pr = r;
+	best_p = p;
+	isect = cur_isect;
+      }
+    }
   }
-  return NULL;
+  return best_p;
 }
 
 void csPolygonSet::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,

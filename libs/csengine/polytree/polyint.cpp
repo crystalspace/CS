@@ -34,7 +34,7 @@ void csPolygonIntArray::AddPolygon (csPolygonInt* poly)
 {
   if (!polygons)
   {
-    max = 6;
+    max = 2;
     polygons = new csPolygonInt* [max];
   }
 

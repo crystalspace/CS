@@ -604,18 +604,20 @@ void WalkTest::MouseClick1Handler(iEvent &Event)
 void WalkTest::MouseClick2Handler(iEvent &Event)
 {
   csVector3 v;
-  v.z = System->G3D->GetZBuffValue(Event.Mouse.x, Event.Mouse.y);
-  v.x = (Event.Mouse.x-FRAME_WIDTH/2) * v.z / view->GetCamera ()->GetFOV ();
-  v.y = (FRAME_HEIGHT-1-Event.Mouse.y-FRAME_HEIGHT/2) * v.z / view->GetCamera ()->GetFOV ();
+  csVector2 p (Event.Mouse.x, FRAME_HEIGHT-Event.Mouse.y);
+  view->GetCamera ()->InvPerspective (p, 1, v);
   csVector3 vw = view->GetCamera ()->Camera2World (v);
-
-  Sys->Printf (MSG_CONSOLE, "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)\n", v.x, v.y, v.z, vw.x, vw.y, vw.z);
-  Sys->Printf (MSG_DEBUG_0, "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)\n", v.x, v.y, v.z, vw.x, vw.y, vw.z);
 
   csSector* sector = view->GetCamera ()->GetSector ();
   csVector3 origin = view->GetCamera ()->GetW2CTranslation ();
   csVector3 isect;
-  csPolygon3D* sel = sector->HitBeam (origin, origin + (vw-origin) * 10, isect);
+  csPolygon3D* sel = sector->HitBeam (origin, origin + (vw-origin) * 20, isect);
+
+  vw = isect;
+  v = view->GetCamera ()->World2Camera (vw);
+  Sys->Printf (MSG_CONSOLE, "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)\n", v.x, v.y, v.z, vw.x, vw.y, vw.z);
+  Sys->Printf (MSG_DEBUG_0, "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)\n", v.x, v.y, v.z, vw.x, vw.y, vw.z);
+
   if (sel)
   {
     if (Sys->selected_polygon == sel)
