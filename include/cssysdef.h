@@ -289,6 +289,12 @@
 #  define CS_IMPLEMENT_PLATFORM_APPLICATION
 #endif
 
+/**\def CS_INITIALIZE_PLATFORM_APPLICATION
+ * Perform platform-specific application initializations.
+ * This macro should be invoked very near to the "beginning" of the 
+ * application.
+ * \remark NB: It is invoked in csInitializer::CreateEnvironment().
+ */
 #ifndef CS_INITIALIZE_PLATFORM_APPLICATION
 #  define CS_INITIALIZE_PLATFORM_APPLICATION
 #endif
@@ -363,6 +369,7 @@ void CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)())        \
 #  endif
 
 #endif
+
 /**\def CS_IMPLEMENT_APPLICATION
  * The CS_IMPLEMENT_APPLICATION macro should be placed at the global scope in
  * exactly one compilation unit comprising an application.  For maximum

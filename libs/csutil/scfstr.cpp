@@ -99,7 +99,7 @@ size_t scfString::FindFirst (const char c, size_t p)
 
 size_t scfString::FindLast (const char c, size_t p)
 {
-  s.FindLast(c, p);
+  return s.FindLast(c, p);
 }
 
 void scfString::Format (const char* format, ...)

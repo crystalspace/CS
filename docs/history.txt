@@ -35,6 +35,14 @@ The history order is reversed so that new features are at the top.
 	  only immediately before the plugin is unloaded.  This problem was
 	  introduced with Eric's large SCF changes on June 5, 2003.
 	- Jorrit renamed strarr.h to stringarray.h.
+	- res made the following changes:
+	    - Moved CS_INITIALIZE_PLATFORM_APPLICATION invokation to 
+	      csInitializer::CreateEnvironment() and also augment the doxygen
+	      documentation, as suggested by ES.
+	    - Added iWin32Assistant::GetApplicationWindow().
+	    - Replace use of GetForegroundWindow() in DirectSound3D renderer
+	      with above (bug 751779).
+	    - Fixed scfString::FindLast() not returning a value.
 9-Jun-2003
 	- Jorrit made a new csStringArray class.
 	- res made the following changes:

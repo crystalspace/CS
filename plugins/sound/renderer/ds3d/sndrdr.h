@@ -30,7 +30,7 @@
 #include "csutil/ref.h"
 #include "csutil/refarr.h"
 #include "cssys/thread.h"
-
+#include "cssys/win32/win32.h"
 
 #include "dsound.h"
 
@@ -99,6 +99,7 @@ public:
   /// Pointer to the DirectSound interface
   LPDIRECTSOUND AudioRenderer;
  
+  csRef<iWin32Assistant> win32Assistant;
   csRef<iObjectRegistry> object_reg;
   /// Contains information about how the sound should be heard
   csRef<csSoundListenerDS3D> Listener;

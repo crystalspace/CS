@@ -78,9 +78,18 @@ bool csSoundRenderDS3D::Initialize(iObjectRegistry *r)
   if (q != 0)
     q->RegisterListener (&scfiEventHandler,
     CSMASK_Command | CSMASK_Broadcast | CSMASK_Nothing);
+  
+  win32Assistant = CS_QUERY_REGISTRY (object_reg, iWin32Assistant);
+  if (!win32Assistant)
+  {
+    MessageBox (0, "No iWin32Assistant!", "DS3D error", MB_OK | MB_ICONSTOP);
+    return false;
+  }
+
   LoadFormat.Bits = -1;
   LoadFormat.Freq = -1;
   LoadFormat.Channels = -1;
+  
   Config.AddConfig(object_reg, "/config/sound.cfg");
   return true;
 }
@@ -120,7 +129,8 @@ bool csSoundRenderDS3D::Open()
     }
 
     DWORD dwLevel = DSSCL_EXCLUSIVE;
-    r = AudioRenderer->SetCooperativeLevel(GetForegroundWindow(), dwLevel);
+    r = AudioRenderer->SetCooperativeLevel(
+      win32Assistant->GetApplicationWindow(), dwLevel);
     if (r != DS_OK)
     {
       if (reporter)

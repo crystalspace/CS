@@ -78,6 +78,8 @@ static iEventHandler* installed_event_handler = 0;
 iObjectRegistry* csInitializer::CreateEnvironment (
   int argc, char const* const argv[])
 {
+  CS_INITIALIZE_PLATFORM_APPLICATION;
+
   iObjectRegistry* reg = 0;
   if (InitializeSCF())
   {
@@ -133,8 +135,6 @@ static void ScanScfDir (const char* dir)
 
 bool csInitializer::InitializeSCF ()
 {
-  CS_INITIALIZE_PLATFORM_APPLICATION;
-
   scfInitialize();
 
 #ifndef CS_STATIC_LINKED

@@ -49,6 +49,10 @@ struct iWin32Assistant : public iBase
   /// Display a nice message box
   virtual void AlertV (HWND window, int type, const char* title, 
     const char* okMsg, const char* msg, va_list args) = 0;
+  /**
+   * Returns the handle to the main application window.
+   */
+  virtual HWND GetApplicationWindow() = 0;
 };
 
 // @@@ Delete everything below when the system driver is removed.

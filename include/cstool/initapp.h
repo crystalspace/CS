@@ -103,17 +103,26 @@ public:
    * Create everything needed to get a CS application operational.
    * This function is completely equivalent to calling:
    * <ul>
-   * <li>InitializeSCF()
-   * <li>CreateObjectRegistry()
-   * <li>CreatePluginManager()
-   * <li>CreateEventQueue()
-   * <li>CreateVirtualClock()
-   * <li>CreateCommandLineParser()
-   * <li>CreateConfigManager()
-   * <li>CreateInputDrivers()
-   * <li>csPlatformStartup()
+   * <li>#CS_INITIALIZE_PLATFORM_APPLICATION macro</li>
+   * <li>InitializeSCF()</li>
+   * <li>CreateObjectRegistry()</li>
+   * <li>CreatePluginManager()</li>
+   * <li>CreateEventQueue()</li>
+   * <li>CreateVirtualClock()</li>
+   * <li>CreateCommandLineParser()</li>
+   * <li>CreateConfigManager()</li>
+   * <li>CreateInputDrivers()</li>
+   * <li>csPlatformStartup()</li>
    * </ul>
-   * This function will return the pointer to the object registry where
+   * You may want to call all or some of those manually if you don't wish
+   * to use this function. It is suggested that 
+   * #CS_INITIALIZE_PLATFORM_APPLICATION, InitializeSCF() and 
+   * csPlatformStartup() are always invoked; the other calls can be replaced 
+   * with manual creation of the respective objects. However, the order above
+   * should be retained when doing so.
+   * \param argc argc argument from main().
+   * \param argv argv argument from main().
+   * \return This function will return the pointer to the object registry where
    * all the created objects will be registered.
    */
   static iObjectRegistry* CreateEnvironment(int argc, char const* const argv[]);

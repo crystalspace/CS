@@ -411,6 +411,8 @@ private:
   bool ApplicationActive;
   HINSTANCE ModuleHandle;
   int ApplicationShow;
+  /// Handle of the main window.
+  HWND ApplicationWnd;
 
   iObjectRegistry* registry;
   /// is a console window to be displayed?
@@ -422,7 +424,10 @@ private:
   HCURSOR m_hCursor;
   csRef<iEventOutlet> EventOutlet;
 
+  // @@@ The following aren't thread-safe. Prolly use TLS.
+  /// The "Ok" button text passsed to Alert(),
   const char* msgOkMsg;
+  /// Hook that will change the OK button text.
   HHOOK msgBoxOkChanger;
 
   void SetWinCursor (HCURSOR);
@@ -451,6 +456,7 @@ public:
   virtual void DisableConsole ();
   void AlertV (HWND window, int type, const char* title, 
     const char* okMsg, const char* msg, va_list args);
+  virtual HWND GetApplicationWindow();
 };
 
 static Win32Assistant* GLOBAL_ASSISTANT = 0;
@@ -576,7 +582,7 @@ bool csPlatformShutdown(iObjectRegistry* r)
 Win32Assistant::Win32Assistant (iObjectRegistry* r) :
   ApplicationActive (true),
   ModuleHandle (0),
-  ApplicationShow (SW_SHOWNORMAL),
+  ApplicationWnd (0),
   console_window (false),  
   is_console_app(false),
   cmdline_help_wanted(false),
@@ -916,6 +922,7 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
     case WM_CREATE:
       if (GLOBAL_ASSISTANT != 0)
       {
+	GLOBAL_ASSISTANT->ApplicationWnd = hWnd;
 	// a window is created. Hide the console window, if requested.
 	if (GLOBAL_ASSISTANT->is_console_app && 
 	  !GLOBAL_ASSISTANT->console_window)
@@ -1181,3 +1188,7 @@ void Win32Assistant::AlertV (HWND window, int type, const char* title,
   }
 }
 
+HWND Win32Assistant::GetApplicationWindow()
+{
+  return ApplicationWnd;
+}
