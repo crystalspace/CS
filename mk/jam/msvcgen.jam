@@ -195,8 +195,6 @@ MSVCGEN_SILENT ?= no ;
 JAM ?= jam ;
 if $(MSVCGEN_SILENT) = yes { JAM += -d0 ; }
 
-JAM += -dx ;
-
 ## MsvcGenConfig variable : value
 ##   (See documentation above.)
 rule MsvcGenConfig1
