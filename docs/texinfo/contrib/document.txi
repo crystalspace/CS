@@ -18,15 +18,106 @@ file into several parts, and 'sections' is the next subdivision.  ToC means
 
 Please follow these guidelines when writing documentation for Crystal Space.
 
+@subsubheading General
+Write documentation using the Texinfo mark-up language. You can get more
+information at @uref{www.texinfo.org}.
+
+The documentation is converted from Texinfo to other formats, such as
+@sc{html}. Conversion to most important formats happens automatically within
+the @sc{cvs} repository, so you only have to commit the Texinfo docs if you
+make any changes.
+
+To make writing the documentation easier, @samp{@@node} and @samp{@@menu}
+directives in the Texinfo sources can be repaired, which means that the
+links to the previous, next and top nodes are generated automatically. So you
+can write the following line, and these links are generated:
+
+@example
+@@node MySection
+@@section MySection
+@end example
+This is also done automatically in the @sc{cvs} repository.
+
+@subsubheading Conversion and Maintenance via Makefile Targets
+If you are using the @sc{gnu} makefile system, you can use the following
+makefile targets to convert the Texinfo documents to different formats.
+The output will be placed in @file{CS/out/docs/}.
+
+@table @code
+@item devapi
+Create developer @sc{api} reference via Doxygen.
+
+@item pubapi
+Create public @sc{api} reference via Doxygen
+
+@item htmldoc
+Convert to @sc{html} format.
+
+@item dvidoc
+Convert to @sc{dvi} format.
+
+@item psdoc
+Convert to @emph{PostScript} format.
+
+@item pdfdoc
+Convert to @sc{pdf} format.
+
+@item infodoc
+Convert to @emph{Info} format.
+
+@item cleandoc
+Delete all converted documents.
+
+@item repairdoc
+Repair all node and menu directives in the Texinfo sources.
+@end table
+
+@subsubheading Manual Conversion
+Manual conversion to @sc{html} happens with the perl script @file{texi2html}.
+This script is already included in the Crystal Space package. You can run the
+script with the following line (assuming you are in @file{CS/docs/texinfo}):
+@example
+perl ..\..\bin\texi2html -init_file ..\support\texi2html.init
+  -prefix cs -subdir ../html cs-unix.txi
+@end example
+The @samp{subdir} option controls where the output files are placed. Replace
+@file{cs-unix.txi} by @file{cs-dos.txi} or @file{cs-mac.txi} for
+@sc{dos}/Windows or Macintosh systems.
+@end itemize
+
+@subsubheading Directory Structure
+The @file{docs/texinfo} directory contains:
 @itemize @bullet
 @item
-Write documentation using the Texinfo mark-up language.
+A table-of-contents file named @file{cs.txi}.
 
 @item
-The @file{docs/texinfo} directory contains a table-of-contents file named
-@file{cs.txi} and one subdirectory for each chapter.  Each chapter directory
-contains at least one file called @file{chapter.txi}.
+System-dependent configuration files, like @file{macdef.txi},
+@file{unixdef.txi}, etc.
 
+@item
+System-dependent wrapper files, like @file{cs-mac.txi}, @file{cs-unix.txi},
+etc. These are the root files for the whole documentation. They import the
+system-dependent configration and the ToC file.
+
+@item
+Other configuration files, like @file{version.txi}, @file{cpyright.txi}, ...,
+and helper files for conversion to other formats, like @file{texinfo.tex}.
+
+@item
+One subdirectory for each chapter. Each chapter directory contains at least
+one file called @file{chapter.txi}, which is the root import file for this
+chapter. So the ToC file will only include @file{chapter.txi}, which then
+includes one file in this directory for every section.
+
+If one section in a chapter is too big for a single file, this section is
+split into several files by subsections. These files are again put into a
+subdirectory. There is currently no general guideline how this is done,
+like a main @file{section.txi} in this subdirectory.
+@end itemize
+
+@subsubheading Format Conventions
+@itemize @bullet
 @item
 Please restrict the names of documentation files to eight characters with a
 file extension of no more than three characters.  This allows @sc{dos} users
@@ -39,9 +130,19 @@ When creating @code{@@itemize} lists, one blank line should separate each
 @item
 Do not indent the text of each item within @code{@@itemize} or
 @code{@@table} blocks.  Allow the formatting tools to perform the indentation
-automatically.
+automatically. This also applies to @code{@@example} blocks, but here you
+may indent sub-blocks. For example, you may want to create a block like this:
+
+@example
+int Increase(int n)
+@{
+  return n + 1;
+@}
+@end example
+Then you may of course indent the @samp{return} line, but not the other lines.
 
 @item
 Attempt to keep the content of Texinfo source files under 80-columns in width
 if possible.  This is a general guidelines rather than a hard rule.
 @end itemize
+
