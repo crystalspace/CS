@@ -52,6 +52,13 @@ chronological order.
 	  utilize the portable FDefines and FIncludes rules instead of
 	  harcoding -D and -I.
 	- Jorrit fixed a compile error in spr3d for OR.
+	- Jorrit added a new iRenderView::ClipBBox(). This versions works
+	  with an object space bbox instead of a camera space bbox. This
+	  has the advantage of being much more accurate. Instead of transforming
+	  the object bbox to camera space (which will make it larger)
+	  the frustum is now transformed from camera to object space.
+	- Jorrit changed chunklod mesh object plugin to use this new
+	  ClipBBox() routine.
 19-Apr-2004
 	- Eric Sunshine added LGPL license notice to the .m4 and .jam files.
 	- Jorrit fixed a bug in iEngine->CreatePortalContainer(). If there

@@ -1157,6 +1157,96 @@ bool csRenderView::ClipBBox (
 }
 
 bool csRenderView::ClipBBox (
+  const csReversibleTransform& tr_o2c,
+  const csBox3 &obox,
+  int &clip_portal,
+  int &clip_plane,
+  int &clip_z_plane)
+{
+  //------
+  // Test if there is a chance we must clip to current portal.
+  //------
+  uint32 frustum_mask;
+  csPlane3 cam_frustum[7];
+  csPlane3* frust = ctxt->iview_frustum->frustum;
+  csVector3 o2tmult = tr_o2c.GetO2T () * tr_o2c.GetO2TTranslation ();
+  cam_frustum[0].Set (tr_o2c.GetT2O() * frust[0].norm, -frust[0].norm*o2tmult);
+  cam_frustum[1].Set (tr_o2c.GetT2O() * frust[1].norm, -frust[1].norm*o2tmult);
+  cam_frustum[2].Set (tr_o2c.GetT2O() * frust[2].norm, -frust[2].norm*o2tmult);
+  cam_frustum[3].Set (tr_o2c.GetT2O() * frust[3].norm, -frust[3].norm*o2tmult);
+  csPlane3 pz0 (0, 0, 1, 0);	// Inverted!!!.
+  cam_frustum[4] = tr_o2c.This2Other (pz0);
+  if (ctxt->do_clip_plane)
+  {
+    // We have a real near clipping plane. In that case
+    // we add both the Z=0 plane and the near clipping plane.
+    csPlane3 pznear = ctxt->clip_plane;
+    pznear.Invert ();
+    cam_frustum[5] = tr_o2c.This2Other (pznear);
+    frustum_mask = 0x3f;
+  }
+  else
+  {
+    frustum_mask = 0x1f;
+  }
+  csPlane3 *far_plane = ctxt->icamera->GetFarPlane ();
+  if (far_plane)
+  {
+    csPlane3 fp = *far_plane;
+    cam_frustum[6] = tr_o2c.This2Other (fp);
+    frustum_mask |= 0x40;
+  }
+
+  uint32 outClipMask;
+  if (!csIntersect3::BoxFrustum (obox, cam_frustum, frustum_mask, outClipMask))
+    return false;	// Not visible.
+
+  if (outClipMask & 0xf == 0xf)
+    clip_portal = CS_CLIP_NOT;
+  else
+    clip_portal = CS_CLIP_NEEDED;
+
+  if (outClipMask & 0x10)
+    clip_z_plane = CS_CLIP_NEEDED;
+  else
+    clip_z_plane = CS_CLIP_NOT;
+
+  if (outClipMask & 0x20)
+    clip_plane = CS_CLIP_NEEDED;
+  else
+    clip_plane = CS_CLIP_NOT;
+
+  //------
+  // If we don't need to clip to the current portal then we
+  // test if we need to clip to the top-level portal.
+  // Top-level clipping is always required unless we are totally
+  // within the top-level frustum.
+  // IF it is decided that we need to clip here then we still
+  // clip to the inner portal. We have to do clipping anyway so
+  // why not do it to the smallest possible clip area.
+  //------
+  if ((!ctxt->do_clip_frustum) || clip_portal != CS_CLIP_NEEDED)
+  {
+    csRenderView* top_rview = engine->GetCsTopLevelClipper ();
+    csRenderContext* top_ctxt = top_rview->ctxt;
+    csPlane3* frust = top_ctxt->iview_frustum->frustum;
+    cam_frustum[0].Set (tr_o2c.GetT2O()*frust[0].norm, -frust[0].norm*o2tmult);
+    cam_frustum[1].Set (tr_o2c.GetT2O()*frust[1].norm, -frust[1].norm*o2tmult);
+    cam_frustum[2].Set (tr_o2c.GetT2O()*frust[2].norm, -frust[2].norm*o2tmult);
+    cam_frustum[3].Set (tr_o2c.GetT2O()*frust[3].norm, -frust[3].norm*o2tmult);
+    if (!csIntersect3::BoxFrustum (obox, cam_frustum, 0xf,
+  	outClipMask))
+    {
+      CS_ASSERT (false);	// This is not possible!
+      return false;
+    }
+    if (outClipMask != 0xf) clip_portal = CS_CLIP_TOPLEVEL;
+  }
+
+  return true;
+}
+
+bool csRenderView::ClipBBox (
   const csBox2 &sbox,
   const csBox3 &cbox,
   int &clip_portal,

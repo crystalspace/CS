@@ -834,24 +834,12 @@ bool csChunkLodTerrainObject::DrawTestQuad (iRenderView* rv,
 	csChunkLodTerrainFactory::MeshTreeNode* node, float kappa) 
 {
   int clip_portal, clip_plane, clip_z_plane;
-  csSphere s(node->Center (), node->Radius ());
-  csVector3 camera_origin;
-  if (!rv->ClipBSphere (tr_o2c, s, clip_portal, clip_plane, clip_z_plane,
-  	camera_origin))
-    return false;
-  csBox3 cbox;
-  cbox.StartBoundingBox (tr_o2c * node->BBox().GetCorner(0));
-  cbox.AddBoundingVertexSmart (tr_o2c * node->BBox().GetCorner(1));
-  cbox.AddBoundingVertexSmart (tr_o2c * node->BBox().GetCorner(2));
-  cbox.AddBoundingVertexSmart (tr_o2c * node->BBox().GetCorner(3));
-  cbox.AddBoundingVertexSmart (tr_o2c * node->BBox().GetCorner(4));
-  cbox.AddBoundingVertexSmart (tr_o2c * node->BBox().GetCorner(5));
-  cbox.AddBoundingVertexSmart (tr_o2c * node->BBox().GetCorner(6));
-  cbox.AddBoundingVertexSmart (tr_o2c * node->BBox().GetCorner(7));
-  if ((cbox.MinZ() < 0) && (cbox.MaxZ () < 0))
+  if (!rv->ClipBBox (tr_o2c, node->BBox (), clip_portal, clip_plane,
+  	clip_z_plane))
     return false;
 
-  float sq_dist = (tr_o2c * node->Center()).SquaredNorm ();
+  csVector3 camera_origin = tr_o2c * node->Center ();
+  float sq_dist = camera_origin.SquaredNorm ();
   float error_projection = node->Error() / kappa + node->Radius();
   error_projection *= error_projection;
   if (error_projection > sq_dist && node->GetChild(0) != 0)

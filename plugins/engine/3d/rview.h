@@ -266,6 +266,9 @@ public:
         int& clip_portal, int& clip_plane, int& clip_z_plane);
   virtual bool ClipBBox (const csBox3& cbox,
         int& clip_portal, int& clip_plane, int& clip_z_plane);
+  virtual bool ClipBBox (const csReversibleTransform& tr_o2c,
+  	const csBox3& cbox,
+        int& clip_portal, int& clip_plane, int& clip_z_plane);
 
   /**
    * Get current sector.
