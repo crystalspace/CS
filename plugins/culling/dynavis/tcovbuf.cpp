@@ -1499,6 +1499,7 @@ bool csTiledCoverageBuffer::TestPoint (const csVector2& point, float min_depth)
   return tile->TestPoint (xi & 31, yi & 63, min_depth);
 }
 
+#if defined(THIS_IS_UNUSED)
 static void DrawZoomedPixel (iGraphics2D* g2d, int x, int y, int col, int zoom)
 {
   if (zoom == 1)
@@ -1527,6 +1528,7 @@ static void DrawZoomedPixel (iGraphics2D* g2d, int x, int y, int col, int zoom)
     g2d->DrawPixel (x+2, y+2, col);
   }
 }
+#endif
 
 iString* csTiledCoverageBuffer::Debug_Dump ()
 {
