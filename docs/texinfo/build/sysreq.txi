@@ -115,7 +115,7 @@ example shows it being installed in the user's private @file{$HOME/bin}
 directory):
 
 @example
-sudo ./jam0 -sBINDIR=$HOME/bin install
+./jam0 -sBINDIR=$HOME/bin install
 @end example
 
 @item The Netwide Assembler
