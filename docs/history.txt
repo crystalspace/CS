@@ -11,6 +11,8 @@ The history order is reversed so that new features are at the top.
 	  even sending movement information over a network.
 	- Changed lights in phystut a bit.
 	- Further fixes on Dynavis. Doesn't crash now but culls incorrectly.
+	- Enabled more plugins in win32gcc.mak since mingw installation
+	  now has the needed libraries (or soon will have at least).
 12-Jun-2002
 	- Enabled stencil again in opengl.cfg. For some reason it
 	  was disabled.
