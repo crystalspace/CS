@@ -38,6 +38,8 @@ chronological order.
 	- Eric Sunshine fixed bug in CS_CHECK_BUILD_FLAGS() in checkbuild.m4
 	  where it gave different results between cached and uncached
 	  configuration runs.
+	- Eric Sunshine fixed bug in glrender.mak.  `gl3dclean' was no declared
+	  "phony" in `roottargets'.
 20-Oct-2003
         - Philip Wyett added 'joytest' to CS/ root .cvsignore file.
 	- Jorrit added thing.cfg.
