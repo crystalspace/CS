@@ -284,8 +284,8 @@ void csApp::LoadConfig ()
   if (!dialogdefs)
     dialogdefs = new csStrVector (16, 16);
 
-  size_t cswscfglen;
-  iDataBuffer *cswscfg = VFS->ReadFile (CSWS_CFG, cswscfglen);
+  //size_t cswscfglen;
+  iDataBuffer *cswscfg = VFS->ReadFile (CSWS_CFG);
   if (!cswscfg)
   {
     printf (MSG_FATAL_ERROR, "ERROR: CSWS config file `%s' not found\n", CSWS_CFG);
