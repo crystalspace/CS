@@ -162,7 +162,7 @@ bool csOPCODECollideSystem::Collide (
 	int i;
 	int j;     
 	int size=(int)(udword(TreeCollider.GetNbPairs() ));
-         pairs = new(csCollisionPair[ size ]);
+         pairs = new csCollisionPair[ size ];
 	 for (i=0;i< size ;i++) {
 		 j =  3*colPairs[i].id0;
 		 current = &vertholder0[ indexholder0 [ j ] ];		 
