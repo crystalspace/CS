@@ -56,7 +56,7 @@ void csOpenGLDynamicSoftware::SetTarget (csGraphics3DOpenGL *parent_g3d,
   tex_0 = (csTextureOpenGLDynamic*) tex->get_texture (0);
 }
 
-void csOpenGLDynamicSoftware::Print (csRect */*area*/)
+void csOpenGLDynamicSoftware::Print (csRect * /*area*/)
 {
   glEnable (GL_TEXTURE_2D);
   glDisable (GL_BLEND);
@@ -83,7 +83,7 @@ void csOpenGLDynamicSoftware::Print (csRect */*area*/)
 }
 
 iGraphics3D *csOpenGLDynamicSoftware::CreateOffScreenRenderer 
-  (iGraphics2D */*parent_g2d*/, int width, int height, csPixelFormat *pfmt, 
+  (iGraphics2D * /*parent_g2d*/, int width, int height, csPixelFormat *pfmt, 
    void *buffer, RGBPixel *palette, int pal_size)
 {
   g3d = LOAD_PLUGIN (system, 

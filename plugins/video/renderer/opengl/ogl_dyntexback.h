@@ -57,8 +57,8 @@ class csOpenGLDynamicBackBuffer : public iGraphics3D
 
   void SetTarget (csGraphics3DOpenGL *g3d, csTextureMMOpenGL *tex);
 
-  virtual bool Initialize (iSystem */*pSystem*/){ return true; }
-  virtual bool Open (const char */*Title*/){ return true; }
+  virtual bool Initialize (iSystem * /*pSystem*/){ return true; }
+  virtual bool Open (const char * /*Title*/){ return true; }
   virtual void Close () {}
   virtual void SetDimensions (int /*width*/, int /*height*/){}
 
