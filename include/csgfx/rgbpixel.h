@@ -83,9 +83,9 @@ struct csRGBcolor
   /// add two csRGBcolors
   csRGBcolor operator + (const csRGBcolor& c) const
   { return csRGBcolor (
-    (unsigned char)c.red + red,
-    (unsigned char)c.green + green,
-    (unsigned char)c.blue + blue); }
+    (unsigned char)(c.red + red),
+    (unsigned char)(c.green + green),
+    (unsigned char)(c.blue + blue)); }
 } CS_STRUCT_ALIGN_4BYTE_END;
 
 

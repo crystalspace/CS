@@ -155,7 +155,7 @@ public:
   { 
     Type = INT; 
     Int = value; 
-    float f = value;
+    float f = (float)value;
     VectorValue.Set (f, f, f, f);
     return true; 
   }
