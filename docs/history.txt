@@ -23,6 +23,9 @@ chronological order.
 	- Keith Fulton added csMenu->GetCheck() to allow the calling
 	  application to determine what menu items are currently checked
 	  and not checked.
+	- Eric Sunshine resolved circular forward-reference problems between
+	  awsListRow and awsListRowVector which arose following migration to
+	  csArray<>.
 7-Aug-2003
 	- Jorrit did the following array related changes:
 	    - Added Put() to csArray.

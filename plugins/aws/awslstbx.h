@@ -19,10 +19,11 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
 # include "awsPanel.h"
-# include "awsitmv.h"
 # include "awsscr.h"
 # include "awsscrbr.h"
 # include "csutil/parray.h"
+
+class awsListRowVector;
 
 /// Knows how to draw items that have several properties.
 struct awsListItem
@@ -84,6 +85,25 @@ struct awsListRow
 
   /// Destroys a list row properly ( but not it's children. )
   ~awsListRow();
+};
+
+/// Holds a vector of awsListRows
+class awsListRowVector : public csPDelArray<awsListRow>
+{
+public:
+  int local_sortcol;
+  static int sortcol;
+public:
+  awsListRowVector () : local_sortcol (0) { }
+
+  /// Compare two array elements in given Mode
+  static int Compare (awsListRow* const& Item1, awsListRow* const& Item2);
+
+  /// Compare entry with a key
+  static int CompareKey (awsListRow* const& Item, void* Key);
+
+  /// Set the sort column
+  void SetSortCol (int sc)  { local_sortcol = sc; }
 };
 
 /// Manages a column of items
