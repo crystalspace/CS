@@ -256,7 +256,8 @@ csMeshWrapper* csSector::HitBeam (const csVector3& start,
   for (i = 0 ; i < meshes.Length () ; i++)
   {
     iMeshWrapper* mesh = meshes.Get (i);
-    if (mesh->HitBeam (start, end, isect, &r))
+    if (!mesh->GetFlags ().Check (CS_ENTITY_INVISIBLE) &&
+    	mesh->HitBeam (start, end, isect, &r))
     {
       if (r < best_mesh_r)
       {
@@ -326,6 +327,8 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
   for (i = 0 ; i < meshes.Length () ; i++)
   {
     iMeshWrapper* mesh = meshes.Get (i);
+    if (mesh->GetFlags ().Check (CS_ENTITY_INVISIBLE))
+      continue;
     if (culler_mesh && !only_portals && mesh == culler_mesh)
       continue;	// Already handled above.
     // @@@ UGLY!!!
@@ -644,17 +647,21 @@ void csSector::Draw (iRenderView* rview)
         Check (CS_PORTAL_WARP);
 
     // draw the meshes
-    for (i = 0 ; i < RenderQueues.GetQueueCount () ; i++) {
+    for (i = 0 ; i < RenderQueues.GetQueueCount () ; i++)
+    {
       csMeshVectorNodelete *v = RenderQueues.GetQueue (i);
       if (!v) continue;
 
-      for (j = 0 ; j < v->Length () ; j++) {
+      for (j = 0 ; j < v->Length () ; j++)
+      {
         iMeshWrapper* sp = v->Get (j);
-        if (!UseCuller || sp->GetPrivateObject ()->IsVisible ()) {
+        if (!UseCuller || sp->GetPrivateObject ()->IsVisible ())
+	{
           if (!PreviousSector || sp->GetMovable ()->GetSectors ()->
     	      Find (PreviousSector) == -1)
 	  {
-            // Mesh is not in the previous sector or there is no previous sector.
+            // Mesh is not in the previous sector or there is no previous
+	    // sector.
             sp->Draw (rview);
           }
 	  else if (DrawMeshesFromPreviousSector)

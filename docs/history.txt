@@ -8,6 +8,8 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug in spr3d->SetAction(). This function will now
 	  correctly reset the 'last_time' for frame interpolation so that
 	  frame interpolation works nicely when SetAction() is done.
+	- Fixed iSector::HitBeam() and IntersectSegment() routines so that
+	  they ignore invisible meshes (CS_ENTITY_INVISIBLE) flag.
 	- Eric Sunshine fixed a problem which affected several model- and
 	  sprite-related modules where memory allocated with malloc() was being
 	  destroyed via delete[].  This problem occurred in a number of places
