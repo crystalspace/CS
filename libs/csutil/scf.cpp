@@ -23,7 +23,7 @@
 #include "cssys/csshlib.h"
 #include "csutil/scf.h"
 #include "csutil/cfgfile.h"
-#include "csutil/csobjvec.h"
+#include "csutil/csvector.h"
 #include "csutil/scfstrv.h"
 #include "csutil/strset.h"
 #include "csutil/util.h"
@@ -68,10 +68,10 @@ public:
 
 #ifndef CS_STATIC_LINKED
 
-class scfLibraryVector : public csObjVector
+class scfLibraryVector : public csVector
 {
 public:
-  /// Find a shared library by name
+  virtual bool FreeItem (csSome Item);
   virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
 };
 
@@ -79,7 +79,7 @@ public:
 static scfLibraryVector *LibraryRegistry = 0;
 
 /// A object of this class represents a shared library
-class scfSharedLibrary : public iBase
+class scfSharedLibrary
 {
   friend class scfLibraryVector;
   // Shared library name
@@ -98,10 +98,6 @@ public:
   /// Destroy a shared library object
   virtual ~scfSharedLibrary ();
 
-  ///
-  virtual void *QueryInterface (scfInterfaceID iInterfaceID, int iVersion)
-  { return this;}
-  
   /// Check if library object is okay
   bool ok ()
   { return (LibraryHandle != NULL) && (ClassTable != NULL); }
@@ -172,6 +168,12 @@ scfClassInfo *scfSharedLibrary::Find (const char *iClassID)
     if (strcmp (iClassID, cur->ClassID) == 0)
       return cur;
   return NULL;
+}
+
+bool scfLibraryVector::FreeItem (csSome Item)
+{
+  delete (scfSharedLibrary *)Item;
+  return true;
 }
 
 int scfLibraryVector::CompareKey (csSome Item, csConstSome Key, int) const

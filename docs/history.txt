@@ -23,6 +23,13 @@ The history order is reversed so that new features are at the top.
 	  after LoadMapFile(). This is not efficient as LoadMapFile() can
 	  be used multiple times to fill up several reasons. Instead the
 	  plugins are now unloaded in the destructor of the loader plugin.
+	- Eric Sunshine fixed a nasty plugin-leak in SCF which was introduced
+	  when iBase was substituted for csBase as the base class of
+	  scfSharedLibrary.  The specific problem was that, although SCF
+	  removed scfSharedLibrary objects from its list of loaded plugins, the
+	  scfSharedLibrary objects were never actually getting destroyed.  The
+	  result was that the dynamically loaded plugin code never got unloaded
+	  even though SCF though that it had.
 3-Jul-2001
 	- Fixed the Python plugin after Martin's changes.
 	- Added iEngine::GetCameraPosition() which takes a name as a parameter
