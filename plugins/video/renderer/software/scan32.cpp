@@ -128,7 +128,7 @@ void csScan_32_draw_scanline_fog_view (int xx, unsigned char* d,
         register int r = (fd * ((pix & 0x00ff0000) - Scan.FogR) >> 8) + Scan.FogR;
         register int g = (fd * ((pix & 0x0000ff00) - Scan.FogG) >> 8) + Scan.FogG;
         register int b = (fd * ((pix & 0x000000ff) - Scan.FogB) >> 8) + Scan.FogB;
-        *_dest = FIG_POST ((r & 0x00ff0000) | (g & 0x0000ff00) | b);
+        *_dest = FOG_POST ((r & 0x00ff0000) | (g & 0x0000ff00) | b);
       }
       else
         *_dest = fog_pix;
