@@ -3611,6 +3611,9 @@ CS_ATTN_LINEAR = _cspace.CS_ATTN_LINEAR
 CS_ATTN_INVERSE = _cspace.CS_ATTN_INVERSE
 CS_ATTN_REALISTIC = _cspace.CS_ATTN_REALISTIC
 CS_ATTN_CLQ = _cspace.CS_ATTN_CLQ
+CS_LIGHT_POINTLIGHT = _cspace.CS_LIGHT_POINTLIGHT
+CS_LIGHT_DIRECTIONAL = _cspace.CS_LIGHT_DIRECTIONAL
+CS_LIGHT_SPOTLIGHT = _cspace.CS_LIGHT_SPOTLIGHT
 class iLightCallback(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -3655,8 +3658,15 @@ class iLight(iBase):
     def GetCenter(*args): return _cspace.iLight_GetCenter(*args)
     def SetCenter(*args): return _cspace.iLight_SetCenter(*args)
     def GetSector(*args): return _cspace.iLight_GetSector(*args)
+    def GetMovable(*args): return _cspace.iLight_GetMovable(*args)
     def GetColor(*args): return _cspace.iLight_GetColor(*args)
     def SetColor(*args): return _cspace.iLight_SetColor(*args)
+    def GetType(*args): return _cspace.iLight_GetType(*args)
+    def SetType(*args): return _cspace.iLight_SetType(*args)
+    def GetDirection(*args): return _cspace.iLight_GetDirection(*args)
+    def SetDirection(*args): return _cspace.iLight_SetDirection(*args)
+    def GetSpotFalloff(*args): return _cspace.iLight_GetSpotFalloff(*args)
+    def SetSpotFalloff(*args): return _cspace.iLight_SetSpotFalloff(*args)
     def GetInfluenceRadius(*args): return _cspace.iLight_GetInfluenceRadius(*args)
     def GetInfluenceRadiusSq(*args): return _cspace.iLight_GetInfluenceRadiusSq(*args)
     def SetInfluenceRadius(*args): return _cspace.iLight_SetInfluenceRadius(*args)
