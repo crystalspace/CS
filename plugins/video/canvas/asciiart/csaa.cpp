@@ -252,7 +252,7 @@ void csGraphics2DAA::Close ()
 
 static int oldmousebut = 0;
 static int oldmousex = -1, oldmousey = -1;
-static bool shiftstate = 0;
+static bool shift_state = false, ctrl_state = false, alt_state = false;
 
 void csGraphics2DAA::Print (csRect *area)
 {
@@ -280,32 +280,42 @@ void csGraphics2DAA::Print (csRect *area)
 
   /* Get all events from keyboard and mouse and put them into the system queue */
   int event;
+  int shiftmask =
+    (shift_state ? CSMASK_SHIFT : 0) |
+    (ctrl_state ? CSMASK_CTRL : 0) |
+    (alt_state ? CSMASK_ALT : 0);
   while ((event = aa_getevent (context, 0)) != AA_NONE)
     switch (event)
     {
       case AA_MOUSE:
-        if ((oldmousex != context->mousex)
-         || (oldmousey != context->mousey))
-          System->QueueMouseEvent (0, 0, oldmousex = context->mousex, oldmousey = context->mousey,
-            shiftstate ? CSKEY_SHIFT : 0);
-        if (oldmousebut != context->buttons)
+      {
+        int x, y, b;
+        aa_getmouse (context, &x, &y, &b);
+        x = (x * Width) / aa_scrwidth (context);
+        y = (y * Height) / aa_scrheight (context);
+        if ((oldmousex != x)
+         || (oldmousey != y))
         {
+          System->QueueMouseEvent (0, 0, x, y, shiftmask);
+          oldmousex = x; oldmousey = y;
+        }
+        if (oldmousebut != b)
+        {
+          static int but [3] = { 1, 3, 2 };
           for (int i = 0; i <= 2; i++)
-            if ((oldmousebut ^ context->buttons) & (1 << i))
-              System->QueueMouseEvent (i, (context->buttons & (1 << i)) != 0,
-                context->mousex, context->mousey, shiftstate ? CSKEY_SHIFT : 0);
-          oldmousebut = context->buttons;
+            if ((oldmousebut ^ b) & (1 << i))
+              System->QueueMouseEvent (but [i], (b & (1 << i)) != 0, x, y, shiftmask);
+          oldmousebut = b;
         }
         break;
+      }
+      case AA_UNKNOWN:
       case AA_RESIZE:
         break;
       default:
       {
-        if (shiftstate && (event >= 'a') && (event <= 'z'))
-          shiftstate = false;
-        else if (!shiftstate && (event >= 'A') && (event <= 'Z'))
-          shiftstate = true;
-        bool down = (event < AA_RELEASE);
+        bool down = (event & AA_RELEASE) == 0;
+        event &= ~AA_RELEASE;
         switch (event)
         {
           case AA_UP:		event = CSKEY_UP;	break;
@@ -314,9 +324,35 @@ void csGraphics2DAA::Print (csRect *area)
           case AA_RIGHT:	event = CSKEY_RIGHT;	break;
           case AA_BACKSPACE:	event = CSKEY_BACKSPACE;break;
           case AA_ESC:		event = CSKEY_ESC;	break;
-          case 13:		event = CSKEY_ENTER;	break;
-          default:		event &= ~AA_RELEASE;	break;
+          case AA_INS:		event = CSKEY_INS;	break;
+          case AA_DEL:		event = CSKEY_DEL;	break;
+          case AA_HOME:		event = CSKEY_HOME;	break;
+          case AA_END:		event = CSKEY_END;	break;
+          case AA_PGUP:		event = CSKEY_PGUP;	break;
+          case AA_PGDN:		event = CSKEY_PGDN;	break;
+          case AA_SHIFT:	event = CSKEY_SHIFT;	break;
+          case AA_CTRL:		event = CSKEY_CTRL;	break;
+          case AA_ALT:		event = CSKEY_ALT;	break;
+          case AA_F1:		event = CSKEY_F1;	break;
+          case AA_F2:		event = CSKEY_F2;	break;
+          case AA_F3:		event = CSKEY_F3;	break;
+          case AA_F4:		event = CSKEY_F4;	break;
+          case AA_F5:		event = CSKEY_F5;	break;
+          case AA_F6:		event = CSKEY_F6;	break;
+          case AA_F7:		event = CSKEY_F7;	break;
+          case AA_F8:		event = CSKEY_F8;	break;
+          case AA_F9:		event = CSKEY_F9;	break;
+          case AA_F10:		event = CSKEY_F10;	break;
+          case AA_F11:		event = CSKEY_F11;	break;
+          case AA_F12:		event = CSKEY_F12;	break;
+          case '\n':		event = CSKEY_ENTER;	break;
         }
+        if (event == CSKEY_SHIFT)
+          shift_state = down;
+        if (event == CSKEY_ALT)
+          alt_state = down;
+        if (event == CSKEY_CTRL)
+          ctrl_state = down;
         System->QueueKeyEvent (event, down);
       }
     }
@@ -324,7 +360,6 @@ void csGraphics2DAA::Print (csRect *area)
 
 void csGraphics2DAA::SetRGB (int i, int r, int g, int b)
 {
-printf ("%d: %d,%d,%d\n", i, r, g, b);
   aa_setpalette (palette, i, r, g, b);
   csGraphics2D::SetRGB (i, r, g, b);
 }
