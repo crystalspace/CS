@@ -88,6 +88,7 @@ void csIsoGrid::AddSprite(iIsoSprite *sprite, const csVector3& pos)
   {
     // avoid recalc of entire grid by lighting this sprite only.
     // if recalc of entire grid is scheduled anyway, it isn't needed.
+    // Shine static lights on sprite
     sprite->SetAllStaticColors(csColor(0,0,0));
     for(int l=0; l<lights.Length(); l++)
       ((iIsoLight*)(lights[l]))->ShineSprite(sprite);
@@ -266,7 +267,7 @@ void csIsoGrid::Draw(iIsoRenderView *rview)
     if(recalc_staticlight) RecalcStaticLight();
     // calculate dyn lighting
     ResetAllLight();
-	int l;
+    int l;
     for(l=0; l<dynamiclights.Length(); l++)
       ((iIsoLight*)(dynamiclights[l]))->ShineGrid();
     // reset fakelight array

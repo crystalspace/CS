@@ -6,6 +6,8 @@ The history order is reversed so that new features are at the top.
 6-June-2003
 	- res did further fixes related to the new shader var stuff.
 	  r3dtest now seems to run fine (for me, at least.)
+	- Wouter fixed up the iso engine. When a sprite is added to 
+	  a grid, then the sprite is lighted by the static lights.
 5-June-2003
 	- Oktal removed the setting to 0 of event category and subcategory
 	  now that the event queue does that for us.
