@@ -1,85 +1,114 @@
+/*
+    Copyright (C) 2001 by Martin Geisse <mgeisse@gmx.net>
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
 
 #ifndef __ICFGNEW_H__
 #define __ICFGNEW_H__
 
 #include "csutil/scf.h"
-
 struct iConfigIterator;
 struct iVFS;
 
-
-SCF_VERSION(iConfigFileNew, 0, 0, 1);
+SCF_VERSION(iConfigFileNew, 0, 0, 2);
 
 /**
- * @@@ Document me !!!
+ * Configuration file interface.
  */
 struct iConfigFileNew : public iBase
 {
   /**
-   * Get config file name. It is recommended that all files
-   * be loaded from VFS, thus no special means to determine
-   * whenever the path is on VFS or not is provided.
+   * Get configuration file name.  Also consult GetVFS() to determine which
+   * (if any) VFS object was used for the file's storage.
    */
-  virtual const char *GetFileName () const = 0;
-  
+  virtual const char* GetFileName () const = 0;
+
+  /**
+   * Get the VFS object on which this file is stored (if any).  Returns NULL
+   * if this file resides within the real (non-VFS) filesystem.
+   */
+  virtual iVFS* GetVFS () const = 0;
+
   /**
    * Set config file name. You can use this if you want Save()
    * to write to another file. This will set the dirty flag.
    */
-  virtual void SetFileName (const char *fn, iVFS *vfs) = 0;
+  virtual void SetFileName (const char*, iVFS*) = 0;
 
   /**
-   * Load INI from a file on a VFS volume (vfs != NULL) or
-   * from a physical file. This will clear all options before
-   * loading the new options, even if the file cannot be opened. <p>
-   *
-   * You can set the Insert flag to keep the old options. If you do this,
-   * nothing will happen if the file doesn't exist. The Overwrite flag
-   * determines whether the old (false) or new (true, default) options
-   * will be loaded in case of a name conflict. The internally stored
-   * file name will not be modified when the Insert flag is set.
+   * Load a configuration file.
+   * <p>
+   * If the file resides in a real filesystem, rather than a VFS filesystem,
+   * then pass NULL for the VFS argument.  This will clear all options before
+   * loading the new options, even if the file cannot be opened.
+   * <p>
+   * You can set the Merge flag to merge the newly loaded configuration
+   * information into the existing information.  If you do so, nothing will
+   * happen if the named file doesn't exist.  The NewWins flag determines
+   * the behavior in case of configuration key conflicts.  If true, then the
+   * new configuration value replaces the old for that key.  If false, then the
+   * old value is kept, and the new value is ignored.  The recorded file name
+   * will be set to the name of the newly loaded file if the Merge flag is
+   * false; otherwise it will retain the old name.
    */
-  virtual bool Load (const char* fName, iVFS *vfs = NULL,
-    bool Insert = false, bool Overwrite = true) = 0;
+  virtual bool Load (const char* iFileName, iVFS* = NULL, bool Merge = false,
+    bool NewWins = true) = 0;
 
-  /// Save INI to the same place it was loaded from.
-  virtual bool Save () const = 0;
-  
   /**
-   * Save INI into the given file (on VFS or on the physical filesystem).
-   * If the second parameter is skipped, the file will be stored to
-   * the physical filesystem, otherwise it is stored on given VFS object.
-   * This will not change the internally stored file name.
+   * Save configuration to the same place from which it was loaded.  Returns
+   * true if the save operation succeeded.
    */
-  virtual bool Save (const char *iFileName, iVFS *vfs = NULL) const = 0;
+  virtual bool Save () = 0;
 
-  /// delete all options and rewind all iterators.
+  /**
+   * Save configuration into the given file (on VFS or on the physical
+   * filesystem).  If the second parameter is skipped, the file will be written
+   * to the physical filesystem, otherwise it is stored on given VFS
+   * filesystem.  This method does not change the internally stored file name.
+   */
+  virtual bool Save (const char *iFileName, iVFS* = NULL) = 0;
+
+  /// Delete all options and rewind all iterators.
   virtual void Clear() = 0;
 
   /**
-   * Enumerate all keys. If a subsection is given, only those keys are
-   * enumerated that begin with this string. The returned iterator does
-   * not yet point to a valid key. You must call Next() once to set it
-   * to the first key. <p>
+   * Enumerate selected keys.  If a subsection is given, only those keys which
+   * are prefixed by the subsection string will be enumerated.  The returned
+   * iterator does not yet point to a valid key.  You must call Next() to set
+   * it to the first key.
    */
-  virtual iConfigIterator *Enumerate(const char *Subsection = NULL) const = 0;
-  
+  virtual iConfigIterator *Enumerate(const char *Subsection = NULL) = 0;
+
   /// Test if a key exists.
-  virtual bool KeyExist(const char *Key) const = 0;
-  
+  virtual bool KeyExists(const char *Key) const = 0;
+  /// Test if at least one key exists with the given Subsection prefix.
+  virtual bool SubsectionExists(const char *Subsection) const = 0;
+
   /// Get an integer value from the configuration.
   virtual int GetInt(const char *Key, int Def = 0) const = 0;
   /// Get a float value from the configuration.
   virtual float GetFloat(const char *Key, float Def = 0.0) const = 0;
   /// Get a string value from the configuration.
-  virtual const char *GetStr(const char *Key, const char *Def = "")
-      const = 0;
+  virtual const char *GetStr(const char *Key, const char *Def = "") const = 0;
   /// Get a boolean value from the configuration.
   virtual bool GetBool(const char *Key, bool Def = false) const = 0;
   /// Get the comment of the given key, or NULL if no comment exists.
   virtual const char *GetComment(const char *Key) const = 0;
-  
-  /// Set an asciiz value.
+
+  /// Set an null-terminated string value.
   virtual void SetStr (const char *Key, const char *Val) = 0;
   /// Set an integer value.
   virtual void SetInt (const char *Key, int Value) = 0;
@@ -88,21 +117,22 @@ struct iConfigFileNew : public iBase
   /// Set a boolean value.
   virtual void SetBool (const char *Key, bool Value) = 0;
   /**
-   * Set the comment for given key. Set Text="" to put an empty comment
-   * line before this key. Set Text = NULL to remove the comment. The
-   * comment may contain newline characters.
+   * Set the comment for given key.  In addition to an actual comment, you can
+   * use "" for Text to place an empty comment line before this key, or NULL to
+   * remove the comment entirely.  The comment may contain newline characters.
    * Returns false if the key does not exist.
    */
   virtual bool SetComment (const char *Key, const char *Text) = 0;
-  /// Delete a key and its comment.
-  virtual void DeleteKey(const char *Name) = 0;
+  /// Delete a key and its value and comment.
+  virtual void DeleteKey(const char *Key) = 0;
 };
 
 
 SCF_VERSION(iConfigIterator, 0, 0, 1);
 
 /**
- * @@@ Document me !!!
+ * Iterator which allows sequential access to configuration information
+ * contained in an iConfigFileNew object.
  */
 struct iConfigIterator : public iBase
 {
@@ -117,10 +147,12 @@ struct iConfigIterator : public iBase
   virtual bool Prev () = 0;
   /// Move to the next valid key. Returns false if no more keys exist.
   virtual bool Next() = 0;
-  
+
   /**
-   * Get the current key name. Set Local to true to return only the local
-   * name inside the iterated subsection.
+   * Get the current key name.  Set Local to true to return only the local name
+   * inside the iterated subsection.  This is the portion of the key string
+   * which follows the subsection prefix which was used to create this
+   * iterator.
    */
   virtual const char *GetKey(bool Local = false) const = 0;
   /// Get an integer value from the configuration.
@@ -135,4 +167,4 @@ struct iConfigIterator : public iBase
   virtual const char *GetComment() const = 0;
 };
 
-#endif
+#endif // __ICFGNEW_H__

@@ -1,11 +1,72 @@
+/*
+    Copyright (C) 2001 by Martin Geisse <mgeisse@gmx.net>
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
 
 #include "cssysdef.h"
-#include "ivfs.h"
 #include "csutil/cfgfile.h"
 #include "csutil/databuf.h"
 #include "csutil/csstring.h"
+#include "csutil/util.h"
+#include "ivfs.h"
+#include <ctype.h>
 
 /* config node */
+
+class csConfigNode
+{
+public:
+  // create a new config node. Set name to NULL to create the initial node.
+  csConfigNode(const char *Name);
+  // delete this node
+  ~csConfigNode();
+  // delete all nodes will non-NULL name
+  void DeleteDataNodes();
+  // insert this node after the given node
+  void InsertAfter(csConfigNode *Where);
+  // remove this node from its list
+  void Remove();
+  // get the name of this node
+  const char *GetName() const;
+  // set the data for this key
+  void SetStr(const char*);
+  void SetInt(int);
+  void SetFloat(float);
+  void SetBool(bool);
+  void SetComment(const char*);
+  // get data
+  const char *GetStr() const;
+  int GetInt() const;
+  float GetFloat() const;
+  bool GetBool() const;
+  const char *GetComment() const;
+  // return prev and next node
+  csConfigNode *GetPrev() const;
+  csConfigNode *GetNext() const;
+
+private:
+  // previous and next node
+  csConfigNode *Prev, *Next;
+  // key name
+  char *Name;
+  // key data
+  char *Data;
+  // comment
+  char *Comment;
+};
 
 csConfigNode::csConfigNode(const char *Keyname)
 {
@@ -22,17 +83,17 @@ csConfigNode::~csConfigNode()
   if (Comment) delete[] Comment;
 }
 
-const char *csConfigNode::GetName()
+const char *csConfigNode::GetName() const
 {
   return Name;
 }
 
-csConfigNode *csConfigNode::GetPrev()
+csConfigNode *csConfigNode::GetPrev() const
 {
   return Prev;
 }
 
-csConfigNode *csConfigNode::GetNext()
+csConfigNode *csConfigNode::GetNext() const
 {
   return Next;
 }
@@ -68,8 +129,7 @@ void csConfigNode::SetStr(const char *s)
 void csConfigNode::SetInt(int n)
 {
   if (Data) delete[] Data;
-
-  char output [20];
+  char output [32];
   sprintf (output, "%d", n);
   SetStr (output);
 }
@@ -77,8 +137,7 @@ void csConfigNode::SetInt(int n)
 void csConfigNode::SetFloat(float f)
 {
   if (Data) delete[] Data;
-
-  char output [20];
+  char output [64];
   sprintf (output, "%g", f);
   SetStr (output);
 }
@@ -86,9 +145,7 @@ void csConfigNode::SetFloat(float f)
 void csConfigNode::SetBool(bool b)
 {
   if (Data) delete[] Data;
-
-  if (b) SetStr("true");
-  else SetStr("false");
+  SetStr(b ? "true" : "false");
 }
 
 void csConfigNode::SetComment(const char *s)
@@ -97,60 +154,110 @@ void csConfigNode::SetComment(const char *s)
   Comment = strnew(s);
 }
 
-const char *csConfigNode::GetStr()
+const char *csConfigNode::GetStr() const
 {
-  if (!Data) return "";
-  return Data;
+  return (Data ? Data : "");
 }
 
-int csConfigNode::GetInt()
+int csConfigNode::GetInt() const
 {
-  if (!Data) return 0;
-  return atoi(Data);
+  return (Data ? atoi(Data) : 0);
 }
 
-float csConfigNode::GetFloat()
+float csConfigNode::GetFloat() const
 {
-  if (!Data) return 0.0;
-  return atof(Data);
+  return (Data ? atof(Data) : 0);
 }
 
-bool csConfigNode::GetBool()
+bool csConfigNode::GetBool() const
 {
-  if (!Data) return false;
-  if (strcasecmp(Data, "yes") == 0) return true;
-  if (strcasecmp(Data, "true") == 0) return true;
-  if (strcasecmp(Data, "on") == 0) return true;
-  return false;
+  return (Data &&
+    (strcasecmp(Data, "true") == 0 ||
+     strcasecmp(Data, "yes" ) == 0 ||
+     strcasecmp(Data, "on"  ) == 0 ||
+     strcasecmp(Data, "1"   ) == 0));
 }
 
-const char *csConfigNode::GetComment()
+const char *csConfigNode::GetComment() const
 {
   return Comment;
 }
 
 /* config iterator */
 
+class csConfigIterator : public iConfigIterator
+{
+public:
+  DECLARE_IBASE;
+
+  /// Returns the configuration object for this iterator.
+  virtual iConfigFileNew *GetConfigFile() const;
+  /// Returns the subsection in the configuruation.
+  virtual const char *GetSubsection() const;
+
+  /// Rewind the iterator (points to nowhere after this)
+  virtual void Rewind ();
+  /// Move to previous item and return true if the position is valid
+  virtual bool Prev ();
+  /// Move to the next valid key. Returns false if no more keys exist.
+  virtual bool Next();
+
+  /**
+   * Get the current key name.  Set Local to true to return only the local name
+   * inside the iterated subsection.  This is the portion of the key string
+   * which follows the subsection prefix which was used to create this
+   * iterator.
+   */
+  virtual const char *GetKey(bool Local = false) const;
+  /// Get an integer value from the configuration.
+  virtual int GetInt() const;
+  /// Get a float value from the configuration.
+  virtual float GetFloat() const;
+  /// Get a string value from the configuration.
+  virtual const char *GetStr() const;
+  /// Get a boolean value from the configuration.
+  virtual bool GetBool() const;
+  /// Get the comment of the given key, or NULL if no comment exists.
+  virtual const char *GetComment() const;
+
+private:
+  friend class csConfigFile;
+  csConfigFile *Config;
+  csConfigNode *Node;
+  char *Subsection;
+  int SubsectionLength;
+
+  // Create a new iterator.
+  csConfigIterator(csConfigFile *Config, const char *Subsection);
+  // Delete this iterator
+  virtual ~csConfigIterator();
+  // Utility function to check if a key meets subsection requirement
+  bool CheckSubsection(const char *Key) const;
+  // Move to the previous node, ignoring subsection
+  bool DoPrev();
+  // Move to the next node, ignoring subsection
+  bool DoNext();
+};
+
 IMPLEMENT_IBASE(csConfigIterator);
   IMPLEMENTS_INTERFACE(iConfigIterator);
 IMPLEMENT_IBASE_END;
 
-csConfigIterator::csConfigIterator(const csConfigFile *c, const char *sub)
+csConfigIterator::csConfigIterator(csConfigFile *c, const char *sub)
 {
   CONSTRUCT_IBASE(NULL);
   Config = c;
   Node = Config->FirstNode;
   Subsection = strnew(sub);
-  if (Subsection) SubsectionLength = strlen(Subsection);
-  else SubsectionLength = 0;
-  ((csConfigFile*)Config)->IncRef();
+  SubsectionLength = (SubsectionLength ? strlen(Subsection) : 0);
+  Config->IncRef();
 }
 
 csConfigIterator::~csConfigIterator()
 {
   Config->RemoveIterator(this);
   if (Subsection) delete[] Subsection;
-  ((csConfigFile*)Config)->DecRef();
+  Config->DecRef();
 }
 
 iConfigFileNew *csConfigIterator::GetConfigFile() const
@@ -182,17 +289,20 @@ bool csConfigIterator::DoNext()
   return (Node->GetName() != NULL);
 }
 
-bool CheckSubsection(const char *Key, const char *Subsection) {
-  return (strstr(Key, Subsection) == Key);
+bool csConfigIterator::CheckSubsection(const char *Key) const
+{
+  return (SubsectionLength == 0 ||
+    strncmp(Key, Subsection, SubsectionLength) == 0);
 }
 
 bool csConfigIterator::Prev ()
 {
   if (!Subsection) return DoPrev();
 
-  while (1) {
+  while (1)
+  {
     if (!DoPrev()) return false;
-    if (CheckSubsection(Node->GetName(), Subsection)) return true;
+    if (CheckSubsection(Node->GetName())) return true;
   }
 }
 
@@ -200,16 +310,16 @@ bool csConfigIterator::Next()
 {
   if (!Subsection) return DoNext();
 
-  while (1) {
+  while (1)
+  {
     if (!DoNext()) return false;
-    if (CheckSubsection(Node->GetName(), Subsection)) return true;
+    if (CheckSubsection(Node->GetName())) return true;
   }
 }
 
 const char *csConfigIterator::GetKey(bool Local) const
 {
-  if (Local) return Node->GetName() + SubsectionLength;
-  else return Node->GetName();
+  return Node->GetName() + (Local ? SubsectionLength : 0);
 }
 
 int csConfigIterator::GetInt() const
@@ -248,7 +358,7 @@ csConfigFile::csConfigFile(iBase *pBase)
   csConfigFile (NULL, NULL);
   CONSTRUCT_IBASE (pBase);
 }
-  
+
 csConfigFile::csConfigFile(const char *file, iVFS *vfs)
 {
   CONSTRUCT_IBASE(NULL);
@@ -262,8 +372,9 @@ csConfigFile::csConfigFile(const char *file, iVFS *vfs)
   Filename = NULL;
   VFS = NULL;
   Dirty = false;
-  
-  if (file) Load(file, vfs);
+
+  if (file)
+    Load(file, vfs);
 }
 
 csConfigFile::~csConfigFile()
@@ -279,9 +390,14 @@ csConfigFile::~csConfigFile()
   if (VFS) VFS->DecRef();
 }
 
-const char *csConfigFile::GetFileName() const
+const char* csConfigFile::GetFileName() const
 {
   return Filename;
+}
+
+iVFS* csConfigFile::GetVFS() const
+{
+  return VFS;
 }
 
 void csConfigFile::SetFileName(const char *fName, iVFS *vfs)
@@ -295,13 +411,15 @@ void csConfigFile::SetFileName(const char *fName, iVFS *vfs)
   Dirty = true;
 }
 
-bool csConfigFile::Load (const char* fName, iVFS *vfs, bool Insert, bool Overwrite)
+bool csConfigFile::Load(const char* fName, iVFS *vfs, bool Merge, bool NewWins)
 {
   // We want these changes even if the new config file does not exist:
-  if (!Insert) {
-    // replace current configuration. Clear all options, change file name and
-    // set the dirty flag. In case the file cannot be opened our configuration
-    // IS dirty. If we can open it successfully, the flag will be cleared later.
+  if (!Merge)
+  {
+    // Replace current configuration.  Clear all options, change file name and
+    // set the dirty flag.  In case the file cannot be opened our configuration
+    // IS dirty.  If we can open it successfully, the flag will be cleared
+    // later.
     Clear();
     SetFileName(fName, vfs);
     Dirty = true;
@@ -309,10 +427,13 @@ bool csConfigFile::Load (const char* fName, iVFS *vfs, bool Insert, bool Overwri
 
   // load the file buffer
   iDataBuffer *Filedata;
-  if (vfs) {
+  if (vfs)
+  {
     Filedata = vfs->ReadFile(fName);
     if (!Filedata) return false;
-  } else {
+  }
+  else
+  {
     FILE *fp = fopen(fName, "rb");
     if (!fp) return false;
     fseek(fp, 0, SEEK_END);
@@ -325,10 +446,11 @@ bool csConfigFile::Load (const char* fName, iVFS *vfs, bool Insert, bool Overwri
   }
 
   // parse the data
-  LoadFromBuffer(Filedata->GetInt8(), Overwrite);
+  LoadFromBuffer(Filedata->GetInt8(), NewWins);
   Filedata->DecRef();
 
-  if (!Insert) {
+  if (!Merge)
+  {
     // the file has successfully replaced the old configuration. Now the
     // configuration is in sync with the file, so clear the dirty flag.
     Dirty = false;
@@ -338,23 +460,24 @@ bool csConfigFile::Load (const char* fName, iVFS *vfs, bool Insert, bool Overwri
   return true;
 }
 
-bool csConfigFile::Save() const
+bool csConfigFile::Save()
 {
   if (!Dirty) return true;
-  ((csConfigFile*)this)->Dirty = false;
+  Dirty = false;
   return SaveNow(Filename, VFS);
 }
 
-bool csConfigFile::Save(const char *file, iVFS *vfs) const
+bool csConfigFile::Save(const char *file, iVFS *vfs)
 {
   // detect bad parameters
   if (!file) return false;
 
   // look if we are trying to save to 'our' file. This is only a rough
   // check and will not detect if these are the same files in all cases.
-  if (strcmp(Filename, file)==0 && VFS==vfs) {
+  if (strcmp(Filename, file)==0 && VFS==vfs)
+  {
     if (!Dirty) return true;
-    ((csConfigFile*)this)->Dirty = false;
+    Dirty = false;
   }
 
   return SaveNow(file, vfs);
@@ -367,34 +490,42 @@ bool csConfigFile::SaveNow(const char *file, iVFS *vfs) const
   csString Filedata;
   csConfigNode *n;
 
-  for (n=FirstNode;n!=NULL;n=n->GetNext())
+  for (n = FirstNode; n != NULL; n = n->GetNext())
   {
     // don't write first and last nodes
     if (n->GetName() == NULL) continue;
 
     // write comment
-    if (n->GetComment())
-      if (*(n->GetComment()) != 0)
+    const char* s = n->GetComment();
+    if (s != 0)
     {
-      char *a = (char*)n->GetComment(), *b;
-
-      for (b=strchr(a,'\n'); b!=NULL; b=strchr(a,'\n'))
+      for (const char* b = strchr(s,'\n'); b != NULL; b = strchr(s,'\n'))
       {
-        *b = 0;
-        Filedata << "; " << a << '\n';
-        *b = '\n';
-        a = b+1;
+        if (*s != '\n' && *s != ';') // Prepend comment character if absent.
+          Filedata << "; ";
+        Filedata.Append(s, b - s + 1);
+        s = b + 1;
       }
-      Filedata << "; " << a << '\n';
+      if (*s)
+      {
+        if (*s != ';')
+          Filedata << "; ";
+        Filedata << s;
+      }
+      if (!Filedata.IsEmpty() && Filedata.GetAt(Filedata.Length()-1) != '\n')
+        Filedata << '\n';
     }
 
     // write key line
     Filedata << n->GetName() << " = " << n->GetStr() << '\n';
   }
 
-  if (vfs) {
+  if (vfs)
+  {
     return vfs->WriteFile(file, Filedata.GetData(), Filedata.Length());
-  } else {
+  }
+  else
+  {
     FILE *fp = fopen(file, "wb");
     if (!fp) return false;
     fwrite(Filedata.GetData(), sizeof(char), Filedata.Length(), fp);
@@ -408,26 +539,29 @@ void csConfigFile::Clear()
   // delete all nodes but the first and last one
   FirstNode->DeleteDataNodes();
   // rewind all iterators
-  long i;
-  for (i=0;i<Iterators->Length();i++)
+  for (long i = 0; i < Iterators->Length(); i++)
   {
     csConfigIterator *it = (csConfigIterator*)Iterators->Get(i);
     it->Rewind();
   }
-
   Dirty = true;
 }
 
-iConfigIterator *csConfigFile::Enumerate(const char *Subsection) const
+iConfigIterator *csConfigFile::Enumerate(const char *Subsection)
 {
   iConfigIterator *it = new csConfigIterator(this, Subsection);
   Iterators->Push(it);
   return it;
 }
-  
-bool csConfigFile::KeyExist(const char *Key) const
+
+bool csConfigFile::KeyExists(const char *Key) const
 {
   return (FindNode(Key) != 0);
+}
+
+bool csConfigFile::SubsectionExists(const char *Subsection) const
+{
+  return (FindNode(Subsection, true) != 0);
 }
 
 int csConfigFile::GetInt(const char *Key, int Def) const
@@ -464,9 +598,14 @@ void csConfigFile::SetStr (const char *Key, const char *Val)
 {
   csConfigNode *Node = FindNode(Key);
   if (!Node) Node = CreateNode(Key);
-  if (Node) {
-    Node->SetStr(Val);
-    Dirty = true;
+  if (Node)
+  {
+    const char* s = Node->GetStr();
+    if ((s && !Val) || (!s && Val) || (Val && strcmp(s,Val) != 0))
+    { // The new value differs from the old.
+      Node->SetStr(Val);
+      Dirty = true;
+    }
   }
 }
 
@@ -474,7 +613,8 @@ void csConfigFile::SetInt (const char *Key, int Value)
 {
   csConfigNode *Node = FindNode(Key);
   if (!Node) Node = CreateNode(Key);
-  if (Node) {
+  if (Node && Value != Node->GetInt())
+  {
     Node->SetInt(Value);
     Dirty = true;
   }
@@ -484,7 +624,8 @@ void csConfigFile::SetFloat (const char *Key, float Value)
 {
   csConfigNode *Node = FindNode(Key);
   if (!Node) Node = CreateNode(Key);
-  if (Node) {
+  if (Node && Value != Node->GetFloat())
+  {
     Node->SetFloat(Value);
     Dirty = true;
   }
@@ -494,7 +635,8 @@ void csConfigFile::SetBool (const char *Key, bool Value)
 {
   csConfigNode *Node = FindNode(Key);
   if (!Node) Node = CreateNode(Key);
-  if (Node) {
+  if (Node && Value != Node->GetBool())
+  {
     Node->SetBool(Value);
     Dirty = true;
   }
@@ -504,8 +646,12 @@ bool csConfigFile::SetComment (const char *Key, const char *Text)
 {
   csConfigNode *Node = FindNode(Key);
   if (!Node) return false;
-  Node->SetComment(Text);
-  Dirty = true;
+  const char* s = Node->GetComment();
+  if ((s && !Text) || (!s && Text) || (Text && strcmp(s,Text) != 0))
+  { // The new comment differs from the old.
+    Node->SetComment(Text);
+    Dirty = true;
+  }
   return true;
 }
 
@@ -513,10 +659,10 @@ void csConfigFile::DeleteKey(const char *Name)
 {
   csConfigNode *Node = FindNode(Name);
   if (!Node) return;
-  
+
   // look for iterators on that node
-  long i;
-  for (i=0;i<Iterators->Length();i++) {
+  for (long i = 0; i < Iterators->Length(); i++)
+  {
     csConfigIterator *it = (csConfigIterator*)Iterators->Get(i);
     if (it->Node == Node) it->Prev();
   }
@@ -530,73 +676,84 @@ void csConfigFile::DeleteKey(const char *Name)
 void csConfigFile::LoadFromBuffer(char *Filedata, bool overwrite)
 {
   csString CurrentComment;
-
-  while (1) {
-    char *s = Filedata + strcspn(Filedata, "\n\r"), *t;
-    bool LastLine = (*s == 0);
+  char* s = 0;
+  int SkipCount = 0;
+  bool LastLine = false;
+  for (int Line = 1; !LastLine; Line++, Filedata = s + SkipCount)
+  {
+    s = Filedata + strcspn(Filedata, "\n\r");
+    LastLine = (*s == 0);
+    // Advance past LF, CR, or CRLF.
+    SkipCount = (!LastLine && *s == '\r' && *(s+1) == '\n' ? 2 : 1);
     *s = 0;
 
     // Filedata is now a null-terminated string containing the current line
     // skip initial whitespace
-    while (*Filedata == ' ') Filedata++;
-    // check for empty line
-    if (*Filedata == 0) goto NextLine;
+    while (isspace(*Filedata)) Filedata++;
     // delete whitespace at end of line
-    t = s;
-    while (*(t-1) == ' ') t--;
-    *t = 0;
+    char* t = s;
+    if (Filedata + 1 != t)
+      while (isspace(*(t-1))) t--;
+        *t = 0;
 
-    // check if this is a comment
-    if (*Filedata == ';') {
-      // this is a comment. skip one space between comment sign and text
-      Filedata++;
-      if (*Filedata == ' ') Filedata++;
-
-      if (CurrentComment.Length() > 0)
-        CurrentComment << '\n';
-      CurrentComment << Filedata;
-    } else {
+    // check if this is a comment or a blank line
+    if (*Filedata == '\0' || *Filedata == ';')
+      CurrentComment << Filedata << '\n';
+    else
+    {
       // this is a key. Find equal sign
       t = strchr(Filedata, '=');
       // if no equal sign, this is an invalid line
-      if (!t) goto NextLine;
+      if (!t)
+      {
+        fprintf(stderr, "Missing `=' on line %d of %s\n", Line,
+	  (Filename ? Filename : "configuration data"));
+        continue;
+      }
       // check for missing key name
-      if (t == Filedata) goto NextLine;
+      if (t == Filedata)
+      {
+        fprintf(stderr, "Missing key name (before `=') on line %d of %s\n",
+	  Line, (Filename ? Filename : "configuration data"));
+        continue;
+      }
       // delete whitespace before equal sign
       char *u = t;
-      while (*(u-1) == ' ') u--;
+      while (isspace(*(u-1))) u--;
       *u = 0;
       // check if node already exists and create node
       csConfigNode *Node = FindNode(Filedata);
-      if (Node && !overwrite) goto NextLine;
+      if (Node && !overwrite) continue;
       if (!Node) Node = CreateNode(Filedata);
       // skip whitespace after equal sign
       Filedata = t+1;
-      while (*Filedata == ' ') Filedata++;
+      while (isspace(*Filedata)) Filedata++;
       // extract key value
       Node->SetStr(Filedata);
       // apply comment
-      Node->SetComment(CurrentComment);
-      CurrentComment.Clear();
+      if (!CurrentComment.IsEmpty())
+      {
+        Node->SetComment(CurrentComment);
+        CurrentComment.Clear();
+      }
       // set dirty flag
       Dirty = true;
     }
-
-    NextLine:
-    if (LastLine) break;
-    Filedata = s+1;
   }
 }
 
-csConfigNode *csConfigFile::FindNode(const char *Name) const
+csConfigNode *csConfigFile::FindNode(const char *Name, bool isSubsection) const
 {
   if (!Name) return NULL;
 
   csConfigNode *n = FirstNode;
-  while (n) {
-    if (n->GetName())
-      if (strcmp(n->GetName(), Name) == 0)
-        return n;
+  const int sz = (isSubsection ? strlen(Name) : 0);
+  while (n)
+  {
+    const char* s = n->GetName();
+    if (s && ((isSubsection && strncmp(s, Name, sz) == 0) ||
+       (strcmp(s, Name) == 0)))
+      return n;
     n = n->GetNext();
   }
   return NULL;

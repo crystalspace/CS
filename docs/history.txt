@@ -2,6 +2,54 @@ The history order has been reversed so that new features are at the top.
 
 24-Jan-2001
 	- Small update to Python scripting system.
+	- Eric Sunshine made the following changes to csConfigFile and
+	  iConfigFileNew:
+	    - Added SubsectionExists(), which is similar to KeyExists() except
+	      that it tests if at least one key exists with the supplied
+	      prefix, rather than testing if a particular key exists.
+	    - Renamed KeyExist() to KeyExists().
+	    - Added GetVFS() to complement existing GetFileName().
+	    - Renamed arguments in several method prototypes to clarify and
+	      better document their usage and intention.
+	    - Upgraded and clarified header comments.  Also removed incorrect
+	      references to INI-format files from comments.
+	- Eric Sunshine made the following changes to csConfigFile:
+	    - Now preserves blank lines in configuration files at save time
+	      instead of folding them out.  The blank lines are considered part
+	      of the comments.
+	    - Fixed bug: SaveNow() was not respecting assertion made by
+	      comments in header that a comment could be present but empty.
+	    - Now performs more thorough whitespace checking in
+	      LoadFromBuffer().
+	    - Eliminated the ugly `goto' statements from LoadFromBuffer().
+	    - Fixed bug: LoadFromBuffer() was not properly handling CRLF line
+	      terminators (though it was handling LF and CR individually).
+	    - LoadFromBuffer() now keeps track of the line number of the file
+	      being parsed.
+	    - LoadFromBuffer() now emits diagnostic messages if it encounters
+	      parse errors rather than silently ignoring them.
+	    - Fixed bug: LoadFromBuffer() was setting the comment on a node
+	      even if the source file did not include a comment.
+	    - The methods SetStr(), SetInt(), SetFloat(), SetBool(), and
+	      SetComment() are now much smarter about setting the Dirty flag,
+	      and only do so if the new value actually differs from the old.
+	    - GetBool() now recognizes the string "1" as true in addition to
+	      "true", "yes", and "on".
+	    - Augmented FindNode() so that it can search for a subsection as
+	      well as a full key.  This functionality is used by the new
+	      SubsectionExists() method.
+	    - csConfigIterator::CheckSubsection() now works correctly when
+	      enumerating the entire database (rather than just a subsection).
+	    - Resolved several const vs.  non-const issues.  Eliminated the
+	      ugly casting of pointers from const to non-const.
+	    - Moved the csConfigNode and csConfigIterator class declarations
+	      out of cfgfile.h and into cfgfile.cpp.  These are entirely
+	      private classes, so there was no need to publish them in a public
+	      header.
+	- Eric Sunshine fixed scfreg so that it works with the new csConfigFile
+	  class.  (Martin forgot to do this when he converted SCF to use the
+	  new configuration file format.  The result was that scfreg would
+	  blast the contents of scf.cfg.)
 23-Jan-2001
 	- Martin Geisse moved the following to the new config system:
 	    - SCF.
