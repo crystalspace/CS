@@ -37,7 +37,7 @@
 #include "iutil/eventh.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/render3d.h"
-#include "ivideo/effects/efclient.h"
+#include "ivideo/shader/shader.h"
 #include "video/canvas/openglcommon/iglstates.h"
 
 #include "glextmanager.h"
@@ -54,9 +54,6 @@ struct iTextureManager;
 struct iRenderBufferManager;
 struct iLightingManager;
 
-struct iEffectServer;
-struct iEffectDefinition;
-struct iEffectTechnique;
 struct iEvent;
 
 
@@ -73,20 +70,21 @@ struct iEvent;
 
 class csGLRender3D : public iRender3D
 {
+private:
   //friend declarations
   friend class csVARRenderBufferManager;
   friend class csSysRenderBufferManager;
   friend class csVARRenderBuffer;
- private:
   friend class csGLTextureHandle;
   friend class csGLTextureCache;
   friend class csGLTextureManager;
+  friend class eiShaderRenderInterface;
 
   csRef<iObjectRegistry> object_reg;
   csRef<iGraphics2D> G2D;
   csRef<iRenderBufferManager> buffermgr;
   csRef<iLightingManager> lightmgr;
-  csRef<iEffectServer> effectserver;
+  csRef<iShaderManager> shadermgr;
 
   static csRef<iGLStateCache> statecache;
 
@@ -345,18 +343,26 @@ public:
     { return strings; }
 
   ////////////////////////////////////////////////////////////////////
-  //                         iEffectClient
+  //                         iShaderRenderInterface
   ////////////////////////////////////////////////////////////////////
 
-  bool Validate (iEffectDefinition* effect, iEffectTechnique* technique);
-
-  struct eiEffectClient : public iEffectClient
+  class eiShaderRenderInterface : public iShaderRenderInterface
   {
+  private:
+    csRef<iObjectRegistry> object_reg;
+    csBasicVector pluginlist;
+  public:
     SCF_DECLARE_EMBEDDED_IBASE(csGLRender3D);
-    virtual bool Validate (
-      iEffectDefinition* effect, iEffectTechnique* technique)
-      { return scfParent->Validate (effect, technique); }
-  } scfiEffectClient;
+    eiShaderRenderInterface();
+    virtual ~eiShaderRenderInterface();
+
+    virtual void Initialize( iObjectRegistry *reg);
+
+    /// Create a shaderprogram from a string describing it
+    virtual csPtr<iShaderProgram> CreateShaderProgram(const char* programstring, void* parameters, const char* type);
+
+    virtual csSome GetObject(const char* name);
+  } scfiShaderRenderInterface;
 
   ////////////////////////////////////////////////////////////////////
   //                          iComponent

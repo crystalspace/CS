@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2002 by Mårten Svanfeldt
-Anders Stenberg
+                      Anders Stenberg
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -41,17 +41,13 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/render3d.h"
 #include "ivideo/rndbuf.h"
 
+#include "ivideo/shader/shader.h"
+
 #include "gl_render3d.h"
 #include "gl_sysbufmgr.h"
 #include "gl_txtcache.h"
 #include "gl_txtmgr.h"
 #include "glextmanager.h"
-
-#include "ivideo/effects/efserver.h"
-#include "ivideo/effects/efdef.h"
-#include "ivideo/effects/eftech.h"
-#include "ivideo/effects/efpass.h"
-#include "ivideo/effects/eflayer.h"
 
 
 csRef<iGLStateCache> csGLRender3D::statecache;
@@ -71,15 +67,15 @@ SCF_EXPORT_CLASS_TABLE_END
 SCF_IMPLEMENT_IBASE(csGLRender3D)
 SCF_IMPLEMENTS_INTERFACE(iRender3D)
 SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEffectClient)
+SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iShaderRenderInterface)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGLRender3D::eiComponent)
 SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGLRender3D::eiEffectClient)
-SCF_IMPLEMENTS_INTERFACE (iEffectClient)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGLRender3D::eiShaderRenderInterface)
+SCF_IMPLEMENTS_INTERFACE (iShaderRenderInterface)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csGLRender3D::EventHandler)
@@ -91,7 +87,7 @@ csGLRender3D::csGLRender3D (iBase *parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEffectClient);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiShaderRenderInterface);
 
   scfiEventHandler = NULL;
 
@@ -569,6 +565,13 @@ bool csGLRender3D::Open ()
   object_reg->Register (effectserver, "iEffectServer");
   }*/
 
+  shadermgr = CS_QUERY_REGISTRY(object_reg, iShaderManager);
+  if( !shadermgr )
+  {
+    shadermgr = CS_LOAD_PLUGIN(plugin_mgr, "crystalspace.render3d.shadermanager", iShaderManager);
+    object_reg->Register( shadermgr, "iShaderManager");
+  }
+
   csRef<iOpenGLInterface> gl = SCF_QUERY_INTERFACE (G2D, iOpenGLInterface);
   ext.InitExtensions (gl);
 
@@ -877,6 +880,8 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
 
   statecache->SetShadeModel (GL_SMOOTH);
 
+  /// HACK: Dentoid, help!! how should i do this
+
   glDrawElements (
     GL_TRIANGLES,
     mymesh->GetIndexEnd ()-mymesh->GetIndexStart (),
@@ -953,21 +958,6 @@ void csGLRender3D::SetLightParameter (int i, int param, csVector3 value)
 
 
 ////////////////////////////////////////////////////////////////////
-// iEffectClient
-////////////////////////////////////////////////////////////////////
-
-
-
-
-bool csGLRender3D::Validate (iEffectDefinition* effect, iEffectTechnique* technique)
-{
-  return false;
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////
 // iComponent
 ////////////////////////////////////////////////////////////////////
 
@@ -985,7 +975,7 @@ bool csGLRender3D::Initialize (iObjectRegistry* p)
   if (q)
     q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
 
-
+  scfiShaderRenderInterface.Initialize(p);
   return true;
 }
 
@@ -1016,4 +1006,68 @@ bool csGLRender3D::HandleEvent (iEvent& Event)
       }
   }
   return false;
+}
+
+
+////////////////////////////////////////////////////////////////////
+//                    iShaderRenderInterface
+////////////////////////////////////////////////////////////////////
+csPtr<iShaderProgram> csGLRender3D::eiShaderRenderInterface::CreateShaderProgram(const char* programstring, void* parameters, const char* type)
+{
+  int i;
+  for(i = 0; i < pluginlist.Length(); ++i)
+  {
+    if( ((iShaderProgramPlugin*)pluginlist.Get(i))->SupportType(type))
+      return ((iShaderProgramPlugin*)pluginlist.Get(i))->CreateShaderProgram(programstring, parameters, type);
+  }
+  return NULL;
+}
+
+csGLRender3D::eiShaderRenderInterface::eiShaderRenderInterface()
+{
+}
+
+csGLRender3D::eiShaderRenderInterface::~eiShaderRenderInterface()
+{
+  int i;
+  for(i = 0; i < pluginlist.Length(); ++i)
+  {
+    iShaderProgramPlugin* sp = (iShaderProgramPlugin*)pluginlist.Pop();
+    sp->DecRef();
+  }
+}
+
+csSome csGLRender3D::eiShaderRenderInterface::GetObject(const char* name)
+{
+  if(strcasecmp(name, "ext") == 0)
+    return (void*) (&scfParent->ext);
+  return NULL;
+}
+
+void csGLRender3D::eiShaderRenderInterface::Initialize(iObjectRegistry *reg)
+{
+  object_reg = reg;
+  if(object_reg)
+  {
+    csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY(object_reg, iPluginManager);
+
+    iStrVector* classlist = iSCF::SCF->QueryClassList("crystalspace.render3d.shader.");
+    int const nmatches = classlist->Length();
+    if(nmatches != 0)
+    {
+      int i;
+      for(i = 0; i < nmatches; ++i)
+      {
+        const char* classname = classlist->Get(i);
+        csRef<iShaderProgramPlugin> plugin = CS_LOAD_PLUGIN(plugin_mgr, classname, iShaderProgramPlugin);
+        if(plugin)
+        {
+          scfParent->Report( CS_REPORTER_SEVERITY_NOTIFY, "Loaded plugin %s", classname);
+          pluginlist.Push(plugin);
+          plugin->IncRef();
+          plugin->Open();
+        }
+      }
+    }
+  }
 }
