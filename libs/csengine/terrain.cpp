@@ -71,18 +71,14 @@ int csTerrain::GetNumTextures ()
 {
 #if DDG_FIXME
   return mesh->getBinTreeNo ()/2;
-#endif
+#else
   return 0;
-}
-
-#if DDG_FIXME
-static csRenderView *grview = NULL;
 #endif
+}
 
 bool csTerrain::Initialize (const void* heightMapFile, unsigned long size)
 {
 #if DDG_FIXME
-  grview = NULL;
   heightMap = new ddgHeightMap ();
   if (heightMap->readTGN (heightMapFile, size))
     return false;
@@ -93,12 +89,12 @@ bool csTerrain::Initialize (const void* heightMapFile, unsigned long size)
 
   vbuf = new ddgVArray ();
 
-  vbuf->size (25000);
-  vbuf->renderMode (true, false, true);
-  vbuf->init ();
-  vbuf->reset ();
   mesh->init (context);
 
+  vbuf->size((mesh->absMaxDetail()*3*11)/10);
+  vbuf->init ();
+  vbuf->reset ();
+/*
 JORRIT:  Create mesh->getBinTreeNo()/2  CS textures
          and put them in an array so I can reach them in the 
 		 Draw method.
@@ -114,50 +110,9 @@ JORRIT:  Create mesh->getBinTreeNo()/2  CS textures
 		 myTerrain128.jpg
 		 
 	 Here is how DDG does it, but I use the ddgTexture class which is
-	 openGL specific:  unsigned int i, r = 0, c = 0, k;
-  _texturescale = 8;			// Texture is 8x the resolution of terrain
-  unsigned int	width = heightMap->rows()*_texturescale;
-  unsigned int height = heightMap->cols()*_texturescale;
-  // Input texture is size 2^n+1 x 2^m+1
-  // Assumption:
-  // bintree pairs each form a square region on the mother texture.
-  // Eg. 0/1  is bottom left n-1/n is top right of mother texture.
-  // each bintree pair can be mapped left to right, top to bottom
-  // onto the mother texture.
+	 openGL specific:
+*/
 
-  k = width * height;
-  // Calculate size of split textures.
-  k = 2*k / mesh->getBinTreeNo();
-  k = sqrt(k);
-
-
-
-  char fileNameBuf[32];
-  ddgStr	tbasename("terrainTexture.tga");
-  for (i = 0; i < mesh->getBinTreeNo()/2; i++)
-  {
-    ostrstream msg(fileNameBuf,32);
-    msg << tbasename.s << i << ".tga" << '\0';
-    ddgStr sname;
-    sname.assign(fileNameBuf);
-    ddgImage *simg = new ddgImage();
-    // Load the file if it exists, otherwise create if from the texture.
-    if (simg->readFile(sname)== ddgFailure)
-      return false;			// Failed to load texture file.
-		_texture[i] = new ddgTexture(simg);
-		_texture[i]->linear(true);
-		_texture[i]->repeat(false);
-		_texture[i]->scale( k, k);
-		_texture[i]->mode(_meshcolor ? ddgTexture::MODULATE : ddgTexture::DECAL);
-		_texture[i]->init();
-
-    c = c + k;
-    if (c + 1 >= width)
-	{
-      r += k;
-      c = 0;
-	}
-  }
 
   // We are going to get texture coords from the terrain engine
   // ranging from 0 to rows and 0 to cols.
@@ -177,12 +132,10 @@ JORRIT:  Create mesh->getBinTreeNo()/2  CS textures
  *  Retrieve info for a single triangle.
  *  Returns true if triangle should be rendered at all.
  */
-#if !DDG_FIXME
-bool csTerrain::drawTriangle(ddgTBinTree *bt, unsigned int tvc, ddgVArray *vbuf)
-  { return false; }
-#else
 bool csTerrain::drawTriangle( ddgTBinTree *bt, ddgVBIndex tvc, ddgVArray *vbuf )
 {
+	return false;
+#if DDG_FIXME
 	if ( !bt->visible(tvc))
 		return ddgFailure;
 
@@ -215,12 +168,13 @@ bool csTerrain::drawTriangle( ddgTBinTree *bt, ddgVBIndex tvc, ddgVArray *vbuf )
     vbuf->pushTriangle(i1,i2,i3);
 
     return ddgSuccess;
-}
 #endif
+}
 
 void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
 {
-#if DDG_FIXME
+#if 0
+//////////////////// OLD FUNCTION INITIALIZATION.
   G3DPolygonDPFX poly;
 
   bool moved = false;
@@ -234,123 +188,87 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
   poly.txt_handle = _textureMap->GetTextureHandle ();
   rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
     false ? CS_ZBUF_USE : CS_ZBUF_FILL);
-  rview.g3d->StartPolygonFX (poly.txt_handle, CS_FX_GOURAUD);
-  grview = &rview;
+  rview.g3d->StartPolygonFX (poly.txt_handle, CS_FX_GOURAUD)
+#endif
 
-  // See if viewpoint changed.
-  {
-    static csVector3 po1 (0, 0, 0), po2 (0, 0, 0), po3 (0, 0, 0);
-    csVector3 pt1, pt2, pt3;
-    pt1 = transformer (csVector3 (1, 0, 0));
-    pt2 = transformer (csVector3 (0, 1, 0));
-    pt3 = transformer (csVector3 (0, 0, 1));
-    if (pt1 != po1 || pt2 != po2 || pt3 != po3)
-    {
-      moved = true;
-      po1 = pt1;
-      po2 = pt2;
-      po3 = pt3;
-    }
-    mesh->dirty (moved);
-  }
-
-  ddgTBinTree::initWtoC(clipbox);
-  modified = mesh->calculate ();
-  // For each frame.
-  if (true)//modified)
-  {
-    // Something changed, update the vertex buffer.
-    vbuf->reset();
-    // Get all the visible triangles.
-    mesh->qsi()->reset();
-    while (!mesh->qsi()->end())
-    {
-      ddgTriIndex tvc = mesh->indexSQ(mesh->qsi());
-      ddgTBinTree *bt = mesh->treeSQ(mesh->qsi());
-      PushTriangle(bt, tvc, vbuf);
-      mesh->qsi ()->next ();
-    }
-    // Render all the leaf nodes.
-    mesh->qmi()->reset();
-    unsigned int nearLeaf = mesh->leafTriNo()/2;
-    while (!mesh->qmi()->end() )
-    {
-      ddgTriIndex tvc = mesh->indexSQ(mesh->qmi());
-      if (tvc >= nearLeaf)
-      {
-        ddgTBinTree *bt = mesh->treeSQ(mesh->qmi());
-        PushTriangle(bt, ddgTBinTree::left(tvc), vbuf);
-        PushTriangle(bt, ddgTBinTree::right(tvc), vbuf);
-        ddgTriIndex n = bt->neighbour(tvc);
-        if (n)
-        {
-          PushTriangle(bt->neighbourTree(n), ddgTBinTree::left(n), vbuf);
-          PushTriangle(bt->neighbourTree(n), ddgTBinTree::right(n), vbuf);
-        }
-      }
-      mesh->qmi()->next();
-    }
-
-    // Perform Qsort on VBuffer->_ibuf.
-    vbuf->sort ();
-  }
-
-
+#if DDG_FIXME
   ////////////// HERE IS HOW DDG RENDERS THE TRIANGLE MESH PER TEXTURE
+	bool modified = true;
+	context->extractPlanes(context->frustrum());
+	// Optimize the mesh w.r.t. the current viewing location.
+	modified = mesh->calculate(context);
 
-  		unsigned int i = 0, s = 0;
-		ddgTBinTree *bt;
+  	unsigned int i = 0, s = 0;
+	ddgTBinTree *bt;
 
-		// If our orientation has changed, reload the buffer.
-		if (modified)
+	// If our orientation has changed, reload the buffer.
+	if (modified)
+	{
+		vbuf->reset();
+		// Update the vertex buffers.
+		ddgCacheIndex ci = 0;
+		while (i < mesh->getBinTreeNo())
 		{
-			ddgVBuffer::reset();
-			// Update the vertex buffers.
-			ddgCacheIndex ci = 0;
-			while (i < _mesh->getBinTreeNo())
+			if (bt = mesh->getBinTree(i))
 			{
-				if (bt = _mesh->getBinTree(i))
+				unsigned int v = 0;
+				// Render each triangle.
+				ci = bt->chain();
+				// Render each triangle.
+				while (ci)
 				{
-					unsigned int v = 0;
-					// Render each triangle.
-					ci = bt->chain();
-					// Render each triangle.
-					while (ci)
-					{
-						ddgTNode *tn = (ddgTNode*) _mesh->tcache()->get(ci);
- 						if (drawTriangle(bt, tn->tindex(), ctx) == ddgSuccess)
-							v++;
-						ci = tn->next();
-					}
-					bt->visTriangle(v);
+					ddgTNode *tn = (ddgTNode*) mesh->tcache()->get(ci);
+ 					if (drawTriangle(bt, tn->tindex(), vbuf) == ddgSuccess)
+						v++;
+					ci = tn->next();
 				}
-				i++;
-			}
-
-		}
-
-		// Render the vertex buffer piece by piece.
-		i = 0;
-		while (i < _mesh->getBinTreeNo())
-		{
-			if (mode.flags.texture && _texture && (i%2 == 0) && _texture[i/2])
-				_texture[i/2]->activate();
-
-			if ((bt = _mesh->getBinTree(i)) && (bt->visTriangle() > 0))
-			{
-				// Render this bintree.
-				range(s,bt->visTriangle());
-
-				super::draw(ctx);
-				s = s+bt->visTriangle();
+				bt->visTriangle(v);
 			}
 			i++;
 		}
 
 	}
-	if (mode.flags.texture && _texture )
-		_texture[0]->deactivate();
 
+	// Render the vertex buffer piece by piece.
+	i = 0;
+	while (i < mesh->getBinTreeNo())
+	{
+//		JORRIT: Switch textures here.
+//
+//			if (_textureMap && (i%2 == 0) && _textureMap[i/2])
+//				_textureMap[i/2]->activate();
+
+		if ((bt = mesh->getBinTree(i)) && (bt->visTriangle() > 0))
+		{
+			// Render this bintree.
+
+			ddgAssert(s >= 0 && s + bt->visTriangle() <= vbuf->inum());
+/*
+	JORRIT: Here is how I render triangles in DDG.
+
+				Really render the vertex array.  Open GL example
+			if (s == 0)
+			{
+				glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+				glTexCoordPointer (2, GL_FLOAT, 0, vbuf->tbuf);
+			}
+			// Vertex array for rendering.
+			glEnableClientState (GL_VERTEX_ARRAY);
+			glVertexPointer ( 3, GL_FLOAT, 12, vbuf->vbuf); // 3 floats = 16 bytes.
+			glDrawElements(GL_TRIANGLES, bt->visTriangle()*3, GL_UNSIGNED_INT, &(vbuf->ibuf[s*3]));
+			if (bt->visTriangle() + s == vbuf->inum()/3)
+			{
+				glDisableClientState (GL_VERTEX_ARRAY);
+				glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+			}
+*/
+			s = s+bt->visTriangle();
+		}
+		i++;
+	}
+
+#endif
+#if 0
   ///////////////////// OLD CS TERRAIN CODE ///////////////////////
   // Render
   csVector3 *p1, *p2, *p3;
@@ -429,48 +347,6 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
   rview.g3d->FinishPolygonFX ();
 #endif
 }
-
-#if DDG_FIXME
-// Define a player object which can handle collision detection against
-// the terrain.
-class ddgPlayer : public ddgControl
-{
-	typedef	ddgControl super;
-public:
-	ddgPlayer( ddgVector3 *p, ddgVector3 *o) : super(p,o) {}
-	///  Update the current position and orientation.
-	bool update(void)
-	{
-		if( super::update())
-		{
-			float terrainHeight;
-			// Keep camera above the terrain and within bounds.
-			ddgVector3 campos(position());
-
-			// Stay within x,z limits.
-			if (campos[0] < 0) campos[0] = 0;
-			if (campos[2] < 0) campos[2] = 0;
-			if (campos[0] > tsize) campos[0] = tsize;
-			if (campos[2] > tsize) campos[2] = tsize;
-
-			// Follow terrain.
-			terrainHeight = mesh ? mesh->height(campos[0],campos[2]) : 0.0;
-			// Don't go below sea level.
-			if (terrainHeight < sealevel)
-				terrainHeight = sealevel;
-
-			terrainHeight +=  groundHeight;
-			if (campos[1] < terrainHeight)
-				campos[1] = terrainHeight;
-			position()->set(campos[0],campos[1],campos[2]);
-			return true;
-		}
-		else
-			return false;
-	}
-};
-static ddgPlayer *player = 0;
-#endif
 
 // If we hit this terrain adjust our position to be on top of it.
 int csTerrain::CollisionDetect( csTransform *transform )
