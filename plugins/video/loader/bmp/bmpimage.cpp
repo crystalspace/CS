@@ -294,7 +294,7 @@ bool ImageBMPFile::LoadWindowsBitmap (uint8* iBuffer, uint32 iSize)
   int  buffer_y = Width * (Height - 1);
   bool blip     = false;
 
-  if (BITCOUNT(iBuffer) == _256Color && BICLRUSED(iBuffer))
+  if (BITCOUNT(iBuffer) == _256Color)
   {
     uint8    *buffer  = new uint8 [bmp_size];
     csRGBpixel *palette = new csRGBpixel [256];
@@ -378,7 +378,7 @@ bool ImageBMPFile::LoadWindowsBitmap (uint8* iBuffer, uint32 iSize)
     convert_pal8 (buffer, palette);
     return true;
   }
-  else if (!BICLRUSED(iBuffer) && BITCOUNT(iBuffer) == TRUECOLOR24)
+  else if (BITCOUNT(iBuffer) == TRUECOLOR24)
   {
     csRGBpixel *buffer = new csRGBpixel [bmp_size];
 
