@@ -1,6 +1,10 @@
 The history order has been reversed so that new features are at the top.
 
 11-Apr-2001
+	- Wouter Wijngaards added an isometric engine plugin. This is only
+	  the first version and it still needs a lot of work. But it
+	  compiles and runs. There is an isometric engine plugin and
+	  an isotest application.
 	- Added the notion of recursion level in csRenderContext. Also added
 	  GetRenderRecursionLevel() and SetRenderRecursionLevel() to
 	  iRenderView. Using this the engine will be able to test how deep
