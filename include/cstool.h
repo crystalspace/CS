@@ -18,7 +18,6 @@
 */
 
 #include "cssysdef.h"
-#include "cstool/userrndbuf.h"
 #include "cstool/basetexfact.h"
 #include "cstool/collider.h"
 #include "cstool/csanim2d.h"
@@ -45,6 +44,7 @@
 #include "cstool/rendermeshlist.h"
 #include "cstool/sndwrap.h"
 #include "cstool/sprbuild.h"
+#include "cstool/userrndbuf.h"
 #include "cstool/vidprefs.h"
 #endif /* __CSTOOL_H__ */
 
