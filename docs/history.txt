@@ -54,6 +54,7 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine fixed out-of-date key names in several configuration
 	  files (in data/config) following renaming which Andrew performed in
 	  the source code.
+	- Eric Sunshine fixed the 'clean' target for ndrvdem.
 30-May-2000
 	- Alex Pfaffe did some minor fixes and cleanup in the terrain
 	  engine. Alex also fixed a bug w.r.t. vertex reuse in buffers.
