@@ -138,13 +138,21 @@ COMPILE_RES = windres --use-temp-file --include-dir include $(RCFLAGS)
 MAKEVERSIONINFO = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mkverres.sh
 MERGERES = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mergeres.sh
 MAKEDEFFILE = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mkdef.sh
+MAKEMETADATA = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mkmetadatares.sh
+
+# For metadata generation, insert the following lines between 
+# the $(MAKEVERSIONINFO) and $(MERGERES) commands:
+#  $(MAKEMETADATA) $(OUT)/$(@:$(DLL)=-meta.rc) $(INF.$(TARGET.RAW.UPCASE)) \
+#    $(COMMAND_DELIM) \
+# Also add $(OUT)/$(@:$(DLL)=-meta.rc) add the end of the $(MERGERES) command.
 
 DO.SHARED.PLUGIN.PREAMBLE += \
   $(MAKEVERSIONINFO) $(OUT)/$(@:$(DLL)=-version.rc) \
-    "$(DESCRIPTION.$(TARGET.RAW))" $(COMMAND_DELIM) \
+    "$(DESCRIPTION.$(TARGET.RAW))" \
+    "$(SRCDIR)/include/csver.h" $(COMMAND_DELIM) \
   $(MERGERES) $(OUT)/$(@:$(DLL)=-rsrc.rc) $(SRCDIR) $(SRCDIR) \
     $(OUT)/$(@:$(DLL)=-version.rc) $($@.WINRSRC) $(COMMAND_DELIM) \
-  $(COMPILE_RES) -i $(OUT)/$(@:$(DLL)=-rsrc.rc) \
+  $(COMPILE_RES) -i $(OUT)/$(@:$(DLL)=-rsrc.rc) --include-dir "$(SRCDIR)/include" \
     -o $(OUT)/$(@:$(DLL)=-rsrc.o) $(COMMAND_DELIM) \
   $(MAKEDEFFILE) $(INF.$(TARGET.RAW.UPCASE)) $(OUT)/$(TARGET.RAW).def $(COMMAND_DELIM)
 DO.SHARED.PLUGIN.CORE = \

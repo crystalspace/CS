@@ -32,6 +32,11 @@ The history order is reversed so that new features are at the top.
 	  in the main (), if the Initialize() method would fail, there will be a
 	  memory leak due to the non-destruction of the awsTutorial class
 	  instance.
+	- res fixed win32gcc.mak where the resourcer merger and compiler 
+	  invokation didn't respect $(SRCDIR) causing "file not found"
+	  errors.
+	- res added a script to package XML metadata into a Windows resource
+	  script.
 11-Jun-2003
 	- Eric Sunshine removed an invocation of class_scfFinalize() from
 	  SCF_REGISTER_STATIC_CLASS() which should have been removed yesterday
