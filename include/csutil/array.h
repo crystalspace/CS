@@ -796,7 +796,7 @@ public:
   }
 
   /**
-   * Find a element in array.
+   * Find an element in array.
    * \return csArrayItemNotFound if not found, else the item index.
    * \warning Performs a slow linear search. For faster searching, sort the
    *   array and then use FindSortedKey().
