@@ -44,10 +44,6 @@
     int Limit;								\
     int RefCount;							\
   public:								\
-    __##Name ()								\
-    { Limit = 0; RefCount = 0; root = NULL; }				\
-    ~__##Name ()							\
-    { SetLimit (0); }							\
     int GetLimit ()							\
     { return Limit; }							\
     void SetLimit (int iLimit)						\
@@ -68,6 +64,10 @@
     { return root [n]; }						\
     Type *GetArray ()							\
     { return root; }							\
+    __##Name ()								\
+    { Limit = 0; RefCount = 0; root = NULL; }				\
+    ~__##Name ()							\
+    { SetLimit (0); }							\
   } Name;
 
 #endif // __GARRAY_H__
