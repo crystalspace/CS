@@ -29,7 +29,7 @@
  */
 enum {
   DN_DESECTORIZE=0,
-  DN_AUTOCONNECTIONS,
+  DN_CROSSCONNECT,
   DN_ADDTEXTURES,
   DN_CLEARPRECALC,
   DN_PRINTLOG,
@@ -45,7 +45,7 @@ enum {
  */
 class dnStats : public csBase {
 public:
-  long NumAreas,NumAreaTemplates,NumAutoCons;
+  long NumAreas,NumAreaTemplates,NumCrossCons;
   char **AreaTemplateNames;
   long *AreaTemplates;
   long NumDirectCons,NumAngleCons,NumDAngleCons;
