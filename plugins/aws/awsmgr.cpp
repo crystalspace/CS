@@ -528,8 +528,10 @@ awsManager::CreateChildrenFromDef(iAws *wmgr, iAwsComponent *parent, awsComponen
   for(i=0; i<settings->GetLength(); ++i)
   {
     awsKey *key = settings->GetItemAt(i); 
+
+    if (key==NULL) continue;
     
-    if (key != NULL && key->Type() == KEY_COMPONENT)
+    if (key->Type() == KEY_COMPONENT)
     {
       awsComponentNode *comp_node = (awsComponentNode *)key;
       awsComponentFactory *factory = FindComponentFactory(comp_node->ComponentTypeName()->GetData());
@@ -551,8 +553,23 @@ awsManager::CreateChildrenFromDef(iAws *wmgr, iAwsComponent *parent, awsComponen
       }
       
     }
+    else if (key->Type() == KEY_CONNECTIONMAP)
+    {
+      int j;
+      awsConnectionNode *conmap = (awsConnectionNode *)key;
+      awsSlot *slot = new awsSlot();
       
-  }
+      for(j=0; j<conmap->GetLength(); ++j)
+      {
+        awsConnectionKey *con = (awsConnectionKey *)conmap->GetItemAt(j);
+
+        slot->Connect(parent, con->Signal(), con->Sink(), con->Trigger());
+        
+      } // end for count of connections
+
+    } // end else
+      
+  } // end for count of keys
   
   
 }

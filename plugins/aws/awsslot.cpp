@@ -198,27 +198,16 @@ awsSource::Broadcast(unsigned long signal)
 
 ///////////////////////////////////// Slots ////////////////////////////////////////////////////////
 
-awsSlot::awsSlot():sink(NULL) 
-{
-}
+awsSlot::awsSlot()
+{}
 
 awsSlot::~awsSlot() 
-{
-  if (sink)
-    sink->DecRef();
-}
+{}
 
 void 
-awsSlot::Initialize(iAwsSink *_sink)
+awsSlot::Connect(iAwsSource *source, unsigned long signal, iAwsSink *sink, unsigned long trigger)
 {
- sink = _sink;
- sink->IncRef();
-}
-
-void 
-awsSlot::Connect(iAwsSource &source, unsigned long signal, unsigned long trigger)
-{
-  source.RegisterSlot(this, signal);
+  source->RegisterSlot(this, signal);
 
   int i;
   
@@ -226,20 +215,21 @@ awsSlot::Connect(iAwsSource &source, unsigned long signal, unsigned long trigger
   {
     SignalTriggerMap *stm = (SignalTriggerMap *)stmap[i];
 
-    if (stm->signal==signal && stm->trigger==trigger)
+    if (stm->signal==signal && stm->trigger==trigger && stm->sink==sink)
     {
       stm->refs++;
+      stm->sink->IncRef();
       return;
     }
   }
 
-  stmap.Push(new SignalTriggerMap(signal, trigger, 1)); 
+  stmap.Push(new SignalTriggerMap(signal, sink, trigger, 1)); 
 }
 
 void 
-awsSlot::Disconnect(iAwsSource &source, unsigned long signal, unsigned long trigger)
+awsSlot::Disconnect(iAwsSource *source, unsigned long signal, iAwsSink *sink, unsigned long trigger)
 {
-  source.UnregisterSlot(this, signal);
+  source->UnregisterSlot(this, signal);
 
   int i;
 
@@ -247,9 +237,10 @@ awsSlot::Disconnect(iAwsSource &source, unsigned long signal, unsigned long trig
   {
     SignalTriggerMap *stm = (SignalTriggerMap *)stmap[i];
 
-    if (stm->signal==signal && stm->trigger==trigger)
+    if (stm->signal==signal && stm->trigger==trigger && stm->sink==sink)
     {
       stm->refs--;
+      stm->sink->DecRef();
 
       if (stm->refs==0)
         stmap.Delete(i);
@@ -263,8 +254,6 @@ awsSlot::Disconnect(iAwsSource &source, unsigned long signal, unsigned long trig
 void 
 awsSlot::Emit(iAwsSource &source, unsigned long signal)
 {
-    if (sink != 0)
-    {
       int i;
 
       for(i=0; i<stmap.Length(); ++i)
@@ -272,8 +261,6 @@ awsSlot::Emit(iAwsSource &source, unsigned long signal)
         SignalTriggerMap *stm = (SignalTriggerMap *)stmap[i];
 
         if (stm->signal==signal)
-          sink->HandleTrigger(stm->trigger, &source);
+          stm->sink->HandleTrigger(stm->trigger, &source);
       }
-      
-    }
 }

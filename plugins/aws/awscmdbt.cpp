@@ -204,6 +204,9 @@ awsCmdButton::OnMouseDown(int button, int x, int y)
 bool 
 awsCmdButton::OnMouseUp(int button, int x, int y)
 {
+  if (is_down)
+    Broadcast(signalClicked);
+
   is_down=false;
   Invalidate();
   return false;
