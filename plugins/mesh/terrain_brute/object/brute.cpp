@@ -1347,6 +1347,7 @@ void csTerrainObject::CastShadows (iMovable* movable, iFrustumView* fview)
   	iCommandLineParser);
   bool verbose = cmdline->GetOption ("verbose") != 0;
   size_t i;
+  float light_radiussq = li->GetInfluenceRadiusSq ();
   for (i = 0 ; i < staticLights.Length() ; i++)
   {
     if (verbose)
@@ -1372,7 +1373,7 @@ void csTerrainObject::CastShadows (iMovable* movable, iFrustumView* fview)
 
     float vrt_sq_dist = csSquaredDist::PointPoint (obj_light_pos,
       lm_vertices[i]);
-    if (vrt_sq_dist >= li->GetInfluenceRadiusSq ()) continue;
+    if (vrt_sq_dist >= light_radiussq) continue;
 
     bool inShadow = false;
     shadowIt->Reset ();
@@ -1387,9 +1388,6 @@ void csTerrainObject::CastShadows (iMovable* movable, iFrustumView* fview)
     }
     if (inShadow) continue;
 
-    float in_vrt_dist =
-      (vrt_sq_dist >= SMALL_EPSILON) ? csQisqrt (vrt_sq_dist) : 1.0f;
-
     float cosinus;
     if (vrt_sq_dist < SMALL_EPSILON) cosinus = 1;
     else cosinus = (obj_light_pos - lm_vertices[i]) * lm_normals[i];
@@ -1398,8 +1396,9 @@ void csTerrainObject::CastShadows (iMovable* movable, iFrustumView* fview)
 
     if (cosinus > 0)
     {
-      if (vrt_sq_dist >= SMALL_EPSILON) cosinus *= in_vrt_dist;
-      float bright = li->GetBrightnessAtDistance (csQsqrt (vrt_sq_dist));
+      float vrt_dist = csQsqrt (vrt_sq_dist);
+      if (vrt_sq_dist >= SMALL_EPSILON) cosinus /= vrt_dist;
+      float bright = li->GetBrightnessAtDistance (vrt_dist);
       if (cosinus < 1) bright *= cosinus;
       if (pseudoDyn)
       {
