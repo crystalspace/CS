@@ -294,6 +294,9 @@ public:
   /// get aging data
   void GetAgingMoment(int i, int& time, csColor& color, float &alpha,
         float& swirl, float& rotspeed, float& scale);
+  /// replace an age
+  void ReplaceAge(int time, const csColor& color, float alpha,
+        float swirl, float rotspeed, float scale);
 
   /// set rectangular particles
   void SetRectParticles(float w, float h)
@@ -363,6 +366,9 @@ public:
     virtual void GetAgingMoment(int i, int& time, csColor& color, float &alpha,
         float& swirl, float& rotspeed, float& scale)
     {scfParent->GetAgingMoment(i, time, color, alpha, swirl, rotspeed, scale);}
+    virtual void ReplaceAge(int time, const csColor& color, float alpha,
+        float swirl, float rotspeed, float scale)
+    { scfParent->ReplaceAge(time, color, alpha, swirl, rotspeed, scale);}
     virtual void SetRectParticles(float w, float h)
     { scfParent->SetRectParticles(w,h); }
     virtual void SetRegularParticles(int s, float r)

@@ -880,6 +880,25 @@ void csEmitMeshObject::GetAgingMoment(int i, int& time, csColor& color,
   scale = p->scale;
 }
 
+void csEmitMeshObject::ReplaceAge(int time, const csColor& color, float alpha,
+        float swirl, float rotspeed, float scale)
+{
+  // find in linked list;
+  csEmitAge *p = aging;
+  while(p && (p->time != time))
+  {
+    if(fabs(p->time-time) < SMALL_EPSILON)
+      break;  /// almost the same, assume the diff is due to float inaccuracy
+    p=p->next;
+  }
+  if(!p) return;
+  //so, p->time = time;
+  p->color = color;
+  p->alpha = alpha;
+  p->swirl = swirl;
+  p->rotspeed = rotspeed;
+  p->scale = scale;
+}
 
 //----------------------------------------------------------------------
 

@@ -223,6 +223,9 @@ struct iEmitState : public iBase
   /// get the settings of aging moment i (0..number-1)
   virtual void GetAgingMoment(int i, int& time, csColor& color, float &alpha,
     float& swirl, float& rotspeed, float& scale) = 0;
+  /// replace the settings for the age at the timepoint given.
+  virtual void ReplaceAge(int time, const csColor& color, float alpha,
+    float swirl, float rotspeed, float scale) = 0;
 
   /// Set the particle system to use rectangular particles, given w, h
   virtual void SetRectParticles(float w, float h) = 0;
