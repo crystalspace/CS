@@ -28,6 +28,8 @@ chronological order.
 	  with clearer names (i.e. PrepareMesh, PrepareSector, PrepareLight,
 	  and PrepareFactory). That makes it easier to grep for them and
 	  also makes it easier to read code that uses those functions.
+	- Jorrit changed pubapi target so that it no longer includes
+	  csengine documentation.
 18-Sep-2003
 	- res reverted Paul's change made to libs/cssys/win32/shellstuff.h
 	  yesterday which caused SHGetFolderPathW() to be used when present.
