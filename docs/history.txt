@@ -61,6 +61,8 @@ The history order is reversed so that new features are at the top.
 	  csprocessorcap.h.
 	- res fixed a couple of NR makefiles for proper MSVC project 
 	  generation.
+	- res removed sysinit.cpp from win32 cssys. Win32 has it's own version
+	  of those functions.
 16-Jun-2003
 	- Oktal separated a multiple-argument %ignore directive into several
 	  single-argument ones, in perlpre.i, in order to support older

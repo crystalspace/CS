@@ -98,13 +98,12 @@ NASMFLAGS.SYSTEM = -f win32 $(CFLAGS.D)EXTERNC_UNDERSCORE
 
 # System dependent source files included into CSSYS library
 SRC.SYS_CSSYS = $(wildcard $(SRCDIR)/libs/cssys/win32/*.cpp) \
+  $(SRCDIR)/libs/cssys/general/csprocessorcap.cpp \
   $(SRCDIR)/libs/cssys/general/findlib.cpp \
   $(SRCDIR)/libs/cssys/general/getopt.cpp \
+  $(SRCDIR)/libs/cssys/general/pluginpaths.cpp \
   $(SRCDIR)/libs/cssys/general/printf.cpp \
   $(SRCDIR)/libs/cssys/general/runloop.cpp \
-  $(SRCDIR)/libs/cssys/general/sysinit.cpp \
-  $(SRCDIR)/libs/cssys/general/csprocessorcap.cpp \
-  $(SRCDIR)/libs/cssys/general/pluginpaths.cpp \
   $(CSTHREAD.SRC)
 INC.SYS_CSSYS = $(wildcard $(SRCDIR)/libs/cssys/win32/*.h) $(CSTHREAD.INC)
 
