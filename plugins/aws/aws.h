@@ -18,6 +18,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
 #include "iaws/iaws.h"
+#include "iaws/iawsparm.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csgeom/csrect.h"
@@ -220,10 +221,12 @@ protected:
 public:
     /// Instantiates a window based on a window definition.
     virtual iAwsWindow *CreateWindowFrom(char *defname);
-
     
     /// Creates a new embeddable component
     virtual iAwsComponent *CreateEmbeddableComponent();
+
+    /// Creates a new parameter list
+    virtual iAwsParmList *CreateParmList();
 
 public:
     /// Set the contexts however you want

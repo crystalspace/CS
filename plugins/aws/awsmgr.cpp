@@ -2,6 +2,7 @@
 #include "iutil/plugin.h"
 #include "aws.h"
 #include "awsprefs.h"
+#include "awsfparm.h"
 #include "ivideo/txtmgr.h"
 #include "iengine/engine.h"
 #include "iutil/eventh.h"
@@ -520,6 +521,12 @@ awsManager::RecursiveDrawChildren(iAwsComponent *cmp, csRect &dirtyarea)
 
    if (DEBUG_MANAGER) printf("aws-debug: finished drawing children.\n");
 
+}
+
+iAwsParmList *
+awsManager::CreateParmList()
+{
+  return new awsParmList;
 }
 
 iAwsWindow *

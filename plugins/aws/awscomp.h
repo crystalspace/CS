@@ -110,7 +110,7 @@ public:
     virtual bool SetProperty(char *name, void *parm);
 
     /// Executes a scriptable action
-    virtual bool Execute(char *action, awsParmList &parmlist);
+    virtual bool Execute(char *action, iAwsParmList &parmlist);
 
     /// Invalidation routine: allow the component to be redrawn when you call this
     virtual void Invalidate();

@@ -13,11 +13,20 @@ const int awsParmList::RECT=5;
 const int awsParmList::POINT=6;
 const int awsParmList::BOOL=7;
 
+SCF_IMPLEMENT_IBASE(awsParmList)
+  SCF_IMPLEMENTS_INTERFACE(iAwsParmList)
+SCF_IMPLEMENT_IBASE_END
+
 static unsigned long
 NameToID(char *name)
 {
  return aws_adler32(aws_adler32(0, NULL, 0), (unsigned char *)name, strlen(name));
 }
+
+
+awsParmList::awsParmList() {}
+
+awsParmList::~awsParmList() {}
 
 awsParmList::parmItem *
 awsParmList::FindParm(char *_name, int type)

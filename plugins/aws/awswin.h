@@ -289,7 +289,7 @@ public:
     bool SetProperty(char *name, void *parm);
 
     /// Executes scriptable actions for this window
-    bool Execute(char *action, awsParmList &parmlist);
+    bool Execute(char *action, iAwsParmList &parmlist);
 
 public:
     /// Event triggered when a window is about to be raised

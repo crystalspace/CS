@@ -1,6 +1,7 @@
 #ifndef __AWS_FLEXIBLE_PARAMETER_LIST__
 #define __AWS_FLEXIBLE_PARAMETER_LIST__
 
+#include "iaws/iawsparm.h"
 #include "csgeom/csrect.h"
 #include "csgeom/cspoint.h"
 #include "csutil/scfstr.h"
@@ -14,7 +15,7 @@
  * in.  This means that you should NOT use an awsParmList if any parm it references
  * has gone out of scope!
  ***********************************************************************************/
-class awsParmList
+class awsParmList : public iAwsParmList
 {
   csBasicVector parms;
 
@@ -49,39 +50,45 @@ private:
   parmItem *FindParm(char *name, int type);
 
 public:
+  awsParmList();
+  virtual ~awsParmList();
+
+  SCF_DECLARE_IBASE;
+  ////////////////////
+
   /// Adds an integer to the parmeter list
-  void AddInt(char *name, int value);
+  virtual void AddInt(char *name, int value);
   /// Adds a float to the parmeter list
-  void AddFloat(char *name, float value);
+  virtual void AddFloat(char *name, float value);
   /// Adds a bool to the parmeter list
-  void AddBool(char *name, bool value);
+  virtual void AddBool(char *name, bool value);
   /// Adds a string to the parmeter list
-  void AddString(char *name, iString* value);
+  virtual void AddString(char *name, iString* value);
   /// Adds a vector to the parmeter list
-  void AddBasicVector(char *name, csBasicVector* value);
+  virtual void AddBasicVector(char *name, csBasicVector* value);
   /// Adds a string vector to the parmeter list
-  void AddStringVector(char *name, csStrVector* value);
+  virtual void AddStringVector(char *name, csStrVector* value);
   /// Adds a rect to the parmeter list
-  void AddRect(char *name, csRect *value);
+  virtual void AddRect(char *name, csRect *value);
   /// Adds a point to the parmeter list
-  void AddPoint(char *name, csPoint *value);
+  virtual void AddPoint(char *name, csPoint *value);
 
   /// Returns the int named "name" in value.  True if it was found, otherwise false.
-  bool GetInt(char *name, int *value);
+  virtual bool GetInt(char *name, int *value);
   /// Returns the float named "name" in value.  True if it was found, otherwise false.
-  bool GetFloat(char *name, float *value);
+  virtual bool GetFloat(char *name, float *value);
   /// Returns the bool named "name" in value.  True if it was found, otherwise false.
-  bool GetBool(char *name, bool *value);
+  virtual bool GetBool(char *name, bool *value);
   /// Returns the string named "name" in value.  True if it was found, otherwise false.
-  bool GetString(char *name, iString **value);
+  virtual bool GetString(char *name, iString **value);
   /// Returns the basic vector named "name" in value.  True if it was found, otherwise false.
-  bool GetBasicVector(char *name, csBasicVector **value);
+  virtual bool GetBasicVector(char *name, csBasicVector **value);
   /// Returns the string vector named "name" in value.  True if it was found, otherwise false.
-  bool GetStringVector(char *name, csStrVector **value);
+  virtual bool GetStringVector(char *name, csStrVector **value);
   /// Returns the rect named "name" in value.  True if it was found, otherwise false.
-  bool GetRect(char *name, csRect **value);
+  virtual bool GetRect(char *name, csRect **value);
   /// Returns the point named "name" in value.  True if it was found, otherwise false.
-  bool GetPoint(char *name, csPoint **value);
+  virtual bool GetPoint(char *name, csPoint **value);
 };
 
 #endif
