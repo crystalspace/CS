@@ -23,7 +23,7 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/fontserv.h"
-#include "iutil/event.h"
+#include "csutil/event.h"
 #include "iutil/evdefs.h"
 #include "cstool/initapp.h"
 #include "iutil/objreg.h"
@@ -36,22 +36,24 @@ CS_IMPLEMENT_APPLICATION
 iObjectRegistry *objreg;
 csRef<iGraphics3D> G3D;
 
-bool HandleEvent (iEvent &ev)
+bool HandleEvent (iEvent &Event)
 {
-  if (ev.Type == csevBroadcast)
+  if (Event.Type == csevBroadcast)
   {
-    if (ev.Command.Code == cscmdPreProcess)
+    if (Event.Command.Code == cscmdPreProcess)
     {
       G3D->BeginDraw (CSDRAW_2DGRAPHICS);
     }
-    else if (ev.Command.Code == cscmdPostProcess)
+    else if (Event.Command.Code == cscmdPostProcess)
     {
       G3D->FinishDraw ();
       G3D->Print (0);
     }
     else return false;
   }
-  else if (ev.Type == csevKeyDown && ev.Key.Char == 'q')
+  else if ((Event.Type == csevKeyboard) &&
+    (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown) &&
+    (csKeyEventHelper::GetCookedCode (&Event) == 'q'))
   {
     csInitializer::CloseApplication (objreg);
   }

@@ -7,6 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 6-Nov-2003
+        - Andreas Busch changed pgtest to use new keyeventhandling.
 	- res bumped the version of the iGraphics2D interface and updated
 	  some doxygen comments in include/graph2d.h. (Basically the 
 	  differences between his local copy he forgot to commit and 
