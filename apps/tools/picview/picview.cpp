@@ -274,6 +274,7 @@ void PicViewApp::LoadNextImage (int idx, int step)
     int h = ifile->GetHeight ();
     csRef<iTextureHandle> txt (txtmgr->RegisterTexture (ifile, CS_TEXTURE_2D
     	| CS_TEXTURE_DITHER));
+    txt->IncRef ();	// Avoid DecRef from smart pointer.
     txtmgr->ResetPalette ();
     txtmgr->PrepareTextures ();
     txtmgr->SetPalette ();
