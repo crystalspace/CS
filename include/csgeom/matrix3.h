@@ -61,6 +61,32 @@ public:
 	m31(am31), m32(am32), m33(am33)
   {}
 
+  /// Construct a matrix from axis-angle specifier.
+  csMatrix3 (float x,float y, float z, float angle)
+  {
+    float c = cos(angle);
+    float s = sin(angle);
+    float t = 1.0 - c;
+    m11 = c + x*x*t;
+    m22 = c + y*y*t;
+    m33 = c + z*z*t;
+
+
+    double tmp1 = x*y*t;
+    double tmp2 = z*s;
+    m21 = tmp1 + tmp2;
+    m12 = tmp1 - tmp2;
+
+    tmp1 = x*z*t;
+    tmp2 = y*s;
+    m31 = tmp1 - tmp2;
+    m13 = tmp1 + tmp2;
+    tmp1 = y*z*t;
+    tmp2 = x*s;
+    m32 = tmp1 + tmp2;
+    m23 = tmp1 - tmp2;
+  }
+
   /// Construct a matrix with a quaternion.
   explicit csMatrix3 (const csQuaternion &quat) { Set (quat); }
 
