@@ -119,7 +119,7 @@ rule csLibraryFromObjects
 
   Archive $(target) : $(>) ;
 
-  if $(RANLIB) { Ranlib $(target) ; }
+  if $(CMD.RANLIB) { Ranlib $(target) ; }
 
   # If we can't scan the library, we have to leave the .o's around.
   if ! ( $(NOARSCAN) || $(NOARUPDATE) ) { RmTemps $(target) : $(>) ; }
@@ -190,6 +190,11 @@ rule Option_shared
 }
 rule Option_static
 {
+}
+
+actions together Ranlib
+{
+  $(CMD.RANLIB) $(<)
 }
 
 # Construct pseudo target libs which is used instead of the pseudo target lib
