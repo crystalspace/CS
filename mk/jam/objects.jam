@@ -175,7 +175,7 @@ rule HeaderRule
     }
     else if $(JAM_DEBUG)
     {
-      echo "No Header rule for $(i:S) file $(i) " ;
+      #echo "No Header rule for $(i:S) file $(i) " ;
     }
   }
 }
