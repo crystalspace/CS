@@ -35,6 +35,7 @@ protected:
   int draw;
 
 public:
+  virtual ~Tester() {}
   virtual void Setup (iGraphics3D* g3d, PerfTest* perftest) = 0;
   virtual void Draw (iGraphics3D* g3d) = 0;
   virtual void Description (char* dst) = 0;
