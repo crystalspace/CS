@@ -250,13 +250,15 @@ GLGlyphSet *GLFontCache::CacheFont (iFont *font)
 		{
 			// strip a bit off and dump it into the base bitmap
 			*characterbitmapbase++ = (currentsourcebyte & 128) ? 255 : 0;
-			debug_log << "x=" << pixelx << " y=" << pixely << " " << (int)*(characterbitmapbase-1) << endl;
+			debug_log << "x=" << pixelx << " y=" << pixely << " " <<
+		    (int)*(characterbitmapbase-1) << "\n";
 		}
 		else
 		{
 			// Copy the value from the alphasource to bitmap
 			*characterbitmapbase++ = alphasource[pixely * width + pixelx];
-			debug_log << "x=" << pixelx << " y=" << pixely << " " << (int)alphasource[pixely * width + pixelx] << endl;
+			debug_log << "x=" << pixelx << " y=" << pixely << " " <<
+			  (int)alphasource[pixely * width + pixelx] << "\n";
 		}
 
         if ((pixelx & 7) == 7)
