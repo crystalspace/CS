@@ -25,7 +25,7 @@
 	2/1999		-	Added support for 32 bit pixels.
 	
 ----------------------------------------------------------------*/
-#define SYSDEF_2DDRIVER_DEFS
+
 #include "sysdef.h"
 #include "cscom/com.h"
 #include "cssys/common/system.h"
@@ -52,6 +52,7 @@
 
 #include "csutil/inifile.h"
 #include <stdarg.h>
+#include "cssys/mac/MacRSRCS.h"
 
 
 /////The 2D Graphics Driver//////////////
