@@ -152,7 +152,7 @@ The history order is reversed so that new features are at the top.
 	  makefiles to fail when USE_PLUGINS=no.  Problem was that win32gcc.mak
 	  was setting DO.PLUGIN.POSTAMBLE rather than
 	  DO.SHARED.PLUGIN.POSTAMBLE.
-	- Eric Sunshine propogated Greg Block's change to the R0_96 branch:
+	- Eric Sunshine propagated Greg Block's change to the R0_96 branch:
 	  Greg Block committed changes to the MacOS/X GL canvas to correctly
 	  support the necessary CS interfaces for loading extensions and being
 	  recognized as the correct SCF type.
