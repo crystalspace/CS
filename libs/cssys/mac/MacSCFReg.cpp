@@ -714,7 +714,7 @@ bool RegisterServer (char *SharedLibraryFilename, csConfigFile *ini, bool Regist
       char comment [200];
       sprintf (comment, " %s", ClassTable->Description);
       ini->SetStr (ClassTable->ClassID, base);
-      ini->DeleteComment (ClassTable->ClassID);
+//    ini->DeleteComment (ClassTable->ClassID);
       ini->SetComment (ClassTable->ClassID, comment);
     }
     else
