@@ -27,9 +27,10 @@
 #include "csengine/texture.h"
 #include "csengine/colldet/collp.h"
 
-class csTextureList;
 class Dumper;
+class csTextureList;
 class csTextureHandle;
+class csTriangleMesh;
 interface ITextureHandle;
 
 /**
@@ -66,19 +67,27 @@ public:
   void SetName (char * n);
 
   ///
-  csVector3& GetVertex (int i)
-  { return vertices[i]; }
+  csVector3& GetVertex (int i) { return vertices[i]; }
   ///
-  csVector2& GetTexel (int i)
-  { return texels[i]; }
+  csVector3* GetVertices () { return vertices; }
+  ///
+  csVector2& GetTexel (int i) { return texels[i]; }
   ///
   char* GetName () { return name; }
 
   ///
   void AddVertex (int num_vertices);
   ///
-  int GetMaxVertices ()
-  { return max_vertex; }
+  int GetMaxVertices () { return max_vertex; }
+
+  /**
+   * Reorder vertices in this frame according to a mapping.
+   * This is used after LOD precalculation to remap the vertices
+   * in a more efficient ordering.
+   * The index to 'mapping' is the old vertex number. The
+   * result is the new number.
+   */
+  void RemapVertices (int* mapping, int num_vertices);
 };
 
 /**
@@ -115,89 +124,6 @@ private:
   csVector delays;
 };
 
-// A triangle for 3D sprites.
-struct csTriangle
-{
-  int a, b, c;
-};
-
-class csSprite3D;
-class csSpriteTemplate;
-class csSpriteEdges;
-
-/**
- * A LOD level for a sprite.
- * This is basicly a collection of triangles. At any one time
- * one LOD is active for the sprite.
- */
-class csSpriteLOD
-{
-private:
-  /// The triangles.
-  csTriangle* triangles;
-  int num_triangles;
-  int max_triangles;
-
-public:
-  ///
-  csSpriteLOD ();
-  ///
-  ~csSpriteLOD ();
-
-  /// Add a triangle to the LOD level.
-  void AddTriangle (int a, int b, int c);
-  /// Query the array of LOD triangles.
-  csTriangle* GetTriangles () { return triangles; }
-  /// Query the number of LOD triangles.
-  int GetNumTriangles () { return num_triangles; }
-
-  /**
-   * Generate a lower-level LOD for this LOD by using
-   * the given edge table (unsorted). The 'pct' parameter is the
-   * percentage of triangles to retain. A 'pct' of 20%
-   * means that the new set of triangles will only have
-   * 20% of the triangles of the base set.
-   */
-  csSpriteLOD* GenerateLOD (int pct, csSpriteEdges* edges);
-};
-
-class csSpriteEdge
-{
-  public:
-    int triangles[10];	// Maximum 10 triangles for every edge@@@!!!
-    int num_triangles;	// Number of triangles that this edge connects.
-    float sqlength;	// Squared length of this edge.
-    int v1, v2;		// Vertex index a and b for this edge.
-};
-
-/**
- * A class which holds edge information for a sprite
- * template. It is temporary and created specifically for
- * making LOD levels.
- */
-class csSpriteEdges
-{
-private:
-  csSpriteEdge* edges;
-  int num_edges;
-
-  void AddEdge (int v1, int v2, int triangle, csVector3& vec1, csVector3& vec2);
-
-public:
-  /// Build edge table for this sprite.
-  csSpriteEdges (csSpriteTemplate* tpl);
-  ///
-  ~csSpriteEdges ();
-
-  /// Sort the edges based on some criterium.
-  void SortEdges ();
-
-  ///
-  int GetNumEdges () { return num_edges; }
-  ///
-  csSpriteEdge& GetEdge (int idx) { return edges[idx]; }
-};
-
 /**
  * A 3D sprite based on a triangle mesh with a single texture.
  * Animation is done with frames.
@@ -219,8 +145,16 @@ private:
   int num_vertices;
 
   /// The triangles.
-  csSpriteLOD* lod;
-  csSpriteLOD* lod2;
+  csTriangleMesh* base_mesh;
+
+  /**
+   * The order in which to introduce levels in order to get to a higher LOD.
+   * The index of this array is the vertex number which is introduced.
+   * The vertices of this template were reordered (by GenerateLOD()) so that
+   * the first vertices are used in low-detail. The contents of this array
+   * is the vertex number to emerge from.
+   */
+  int* emerge_from;
 
   /// The frames
   csObjVector frames;
@@ -234,17 +168,22 @@ public:
   virtual ~csSpriteTemplate ();
 
   /// Query the number of vertices
-  int GetNumVertices ()
-  { return num_vertices; }
+  int GetNumVertices () { return num_vertices; }
 
-  /// Get the highest detail LOD of this sprite (the base LOD).
-  csSpriteLOD* GetBaseLOD () { return lod; }
+  /**
+   * Get the base triangle mesh of this sprite.
+   */
+  csTriangleMesh* GetBaseMesh () { return base_mesh; }
 
-  /// Get some LOD level.
-  csSpriteLOD* GetLOD (int level) { return level ? lod2 : lod; }
+  /// Get the 'emerge_from' array from which you can construct triangles.
+  int* GetEmergeFrom () { return emerge_from; }
 
-  /// Generate some LOD level.
-  void GenerateLOD (int level, int pct);
+  /**
+   * Generate the collapse order.
+   * This function will also reorder all the vertices in the template.
+   * So be careful!
+   */
+  void GenerateLOD ();
 
   /// Set the number of vertices
   void SetNumVertices (int v) { num_vertices = v; }
@@ -279,7 +218,7 @@ public:
   ITextureHandle* GetTextureHandle () const { return cstxt->GetTextureHandle (); }
   /// Set the texture used for this sprite
   void SetTexture (csTextureList* textures, char *texname);
-  
+
   CSOBJTYPE;
 };
 
@@ -296,6 +235,12 @@ public:
   /// List of sectors where this sprite is.
   csObjVector sectors;
 
+  /**
+   * Configuration value for global LOD. 0 is lowest detail, 1 is maximum.
+   * If negative then the base mesh is used and no LOD reduction/computation is done.
+   */
+  static float cfg_lod_detail;
+
 private:
   /// Object to world transformation.
   csVector3 v_obj2world;
@@ -303,6 +248,14 @@ private:
   csMatrix3 m_obj2world;
   /// World to object transformation.
   csMatrix3 m_world2obj;
+
+  /**
+   * A mesh which contains a number of triangles as generated
+   * by the LOD algorithm. This is static since it will likely
+   * change every frame anyway. We hold it static also since
+   * we don't want to allocate it again every time.
+   */
+  static csTriangleMesh mesh;
 
   /**
    * Array of colors for the vertices. If not set then this
@@ -399,6 +352,12 @@ public:
    * Relative transform.
    */
   void Transform (csMatrix3& matrix);
+
+  /**
+   * Fill the static mesh with the current sprite
+   * for a given LOD level.
+   */
+  void GenerateSpriteLOD (int num_vts);
 
   /**
    * Draw this sprite given a camera transformation.

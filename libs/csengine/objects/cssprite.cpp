@@ -19,6 +19,7 @@
 #include "sysdef.h"
 #include "csengine/sysitf.h"
 #include "csengine/objects/cssprite.h"
+#include "csengine/basic/triangle.h"
 #include "csengine/camera.h"
 #include "csengine/world.h"
 #include "csengine/texture.h"
@@ -71,6 +72,23 @@ void csFrame::AddVertex (int num)
   vertices = new_vertices;
 }
 
+void csFrame::RemapVertices (int* mapping, int num_vertices)
+{
+  int i;
+  CHK (csVector3* new_vertices = new csVector3 [num_vertices]);
+  CHK (csVector2* new_texels = new csVector2 [num_vertices]);
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    new_vertices[mapping[i]] = vertices[i];
+    new_texels[mapping[i]] = texels[i];
+  }
+  CHK (delete [] vertices);
+  CHK (delete [] texels);
+  vertices = new_vertices;
+  texels = new_texels;
+}
+
+
 csSpriteAction::csSpriteAction() : frames (8, 8), delays (8, 8)
 {
   name = NULL;
@@ -99,181 +117,48 @@ void csSpriteAction::AddFrame (csFrame * f, int d)
   delays.Push ((csSome)d);
 }
 
-void csSpriteEdges::AddEdge (int v1, int v2, int triangle, csVector3& vec1, csVector3& vec2)
-{
-  if (v1 > v2) { int sw = v1; v1 = v2; v2 = sw; }
-  int i;
-  for (i = 0 ; i < num_edges ; i++)
-    if (edges[i].v1 == v1 && edges[i].v2 == v2)
-    {
-      edges[i].triangles[edges[i].num_triangles] = triangle;
-      edges[i].num_triangles++;
-      return;
-    }
-  edges[num_edges].triangles[0] = triangle;
-  edges[num_edges].num_triangles = 1;
-  edges[num_edges].sqlength = csSquaredDist::PointPoint (vec1, vec2);
-  edges[num_edges].v1 = v1;
-  edges[num_edges].v2 = v2;
-  num_edges++;
-}
-
-csSpriteEdges::csSpriteEdges (csSpriteTemplate* tpl)
-{
-  csSpriteLOD* lod = tpl->GetBaseLOD ();
-  CHK (edges = new csSpriteEdge [lod->GetNumTriangles ()*3]);	// Theoretical maximum number of edges.
-  num_edges = 0;
-
-  csFrame* fr = tpl->GetFrame (0);
-
-  int i;
-  for (i = 0 ; i < lod->GetNumTriangles () ; i++)
-  {
-    csTriangle* tri = &lod->GetTriangles ()[i];
-    AddEdge (tri->a, tri->b, i, fr->GetVertex (tri->a), fr->GetVertex (tri->b));
-    AddEdge (tri->b, tri->c, i, fr->GetVertex (tri->b), fr->GetVertex (tri->c));
-    AddEdge (tri->c, tri->a, i, fr->GetVertex (tri->c), fr->GetVertex (tri->a));
-  }
-}
-
-csSpriteEdges::~csSpriteEdges ()
-{
-  CHK (delete [] edges);
-}
-
-int compare_edges (const void* p1, const void* p2)
-{
-  csSpriteEdge* e1 = (csSpriteEdge*)p1;
-  csSpriteEdge* e2 = (csSpriteEdge*)p2;
-  if (e1->num_triangles < e2->num_triangles) return -1;
-  else if (e1->num_triangles > e2->num_triangles) return 1;
-  if (e1->sqlength < e2->sqlength) return -1;
-  else if (e1->sqlength > e2->sqlength) return 1;
-  return 0;
-}
-
-void csSpriteEdges::SortEdges ()
-{
-  qsort (edges, num_edges, sizeof (csSpriteEdge), compare_edges);
-}
-
-csSpriteLOD::csSpriteLOD ()
-{
-  triangles = NULL;
-  max_triangles = num_triangles = 0;
-}
-
-csSpriteLOD::~csSpriteLOD ()
-{
-  CHK (delete [] triangles);
-}
-
-void csSpriteLOD::AddTriangle (int a, int b, int c)
-{
-  if (num_triangles >= max_triangles)
-  {
-    CHK (csTriangle* new_triangles = new csTriangle [max_triangles+8]);
-    if (triangles)
-    {
-      memcpy (new_triangles, triangles, sizeof (csTriangle)*max_triangles);
-      CHK (delete [] triangles);
-    }
-    triangles = new_triangles;
-    max_triangles += 8;
-  }
-  triangles[num_triangles].a = a;
-  triangles[num_triangles].b = b;
-  triangles[num_triangles].c = c;
-  num_triangles++;
-}
-
-csSpriteLOD* csSpriteLOD::GenerateLOD (int pct, csSpriteEdges* edges)
-{
-  edges->SortEdges ();
-  int num_to_delete = num_triangles - num_triangles*pct/100;
-  CHK (csSpriteLOD* new_lod = new csSpriteLOD ());
-  int i, j, cnt;
-
-  // First copy all triangles from the current lod to a temporary buffer.
-  CHK (csTriangle* new_triangles = new csTriangle [max_triangles]);
-  memcpy (new_triangles, triangles, sizeof (csTriangle)*max_triangles);
-  
-  // Initialize an array which holds 1 for all vertices that have been deleted
-  // (i.e. collapsed to some other).
-  CHK (char* vertices = new char [max_triangles*3]);
-  memset ((void*)vertices, 0, max_triangles*3);
-
-  // Then we delete all edges.
-  i = 0;
-  int v1 = edges->GetEdge (i).v1;
-  int v2 = edges->GetEdge (i).v2;
-  while (num_to_delete > 0)
-  {
-    // @@@ Currently, when deleting an edge we simply collapse v2 to v1.
-    // We should be more clever here and see if in some cases it might be
-    // better to collapse v1 to v2 instead.
-
-    // For every edge that is deleted we collapse one vertex to the other.
-    // We traverse the triangle list and change all vertex indices.
-    for (j = 0 ; j < num_triangles ; j++)
-    {
-      if (new_triangles[j].a == v2) new_triangles[j].a = v1;
-      if (new_triangles[j].b == v2) new_triangles[j].b = v1;
-      if (new_triangles[j].c == v2) new_triangles[j].c = v1;
-    }
-    vertices[v2] = 1;	// 'v2' is deleted.
-    num_to_delete -= edges->GetEdge (i).num_triangles;
-
-    // Scan for the next edge which still has undeleted vertices.
-    while (i < edges->GetNumEdges ())
-    {
-      i++;
-      v1 = edges->GetEdge (i).v1;
-      v2 = edges->GetEdge (i).v2;
-      if (!vertices[v1] && !vertices[v2]) break;
-    }
-    if (i >= edges->GetNumEdges ()) break;
-  }
-
-  // Now we rebuilt the new triangle table. All triangles which
-  // have less than three different vertices have collapsed and thus
-  // can be deleted.
-  CHK (csSpriteLOD* newlod = new csSpriteLOD ());
-  for (i = 0 ; i < num_triangles ; i++)
-    if (new_triangles[i].a != new_triangles[i].b &&
-        new_triangles[i].a != new_triangles[i].c &&
-	new_triangles[i].b != new_triangles[i].c)
-      newlod->AddTriangle (new_triangles[i].a, new_triangles[i].b, new_triangles[i].c);
-
-  CHK (delete [] new_triangles);
-  CHK (delete [] vertices);
-
-  return newlod;
-}
-
-CSOBJTYPE_IMPL(csSpriteTemplate,csObject);
+CSOBJTYPE_IMPL (csSpriteTemplate, csObject)
 
 csSpriteTemplate::csSpriteTemplate ()
   : csObject (), frames (8, 8), actions (8, 8)
 {
   cstxt = NULL;
-  lod = NULL;
-  lod2 = NULL;
   num_vertices = 0;
-  CHK (lod = new csSpriteLOD ());
+  CHK (base_mesh = new csTriangleMesh ());
+  emerge_from = NULL;
 }
 
 csSpriteTemplate::~csSpriteTemplate ()
 {
-  CHK (delete lod);
-  CHK (delete lod2);
+  CHK (delete base_mesh);
+  CHK (delete [] emerge_from);
 }
 
-void csSpriteTemplate::GenerateLOD (int level, int pct)
+void csSpriteTemplate::GenerateLOD ()
 {
-  CHK (csSpriteEdges* edges = new csSpriteEdges (this));
-  lod2 = lod->GenerateLOD (pct, edges);
-  CHK (delete edges);
+  CHK (csTriangleVertices* verts = new csTriangleVertices (GetBaseMesh (), GetFrame (0)->GetVertices (), num_vertices));
+  CHK (delete [] emerge_from);
+  CHK (emerge_from = new int [num_vertices]);
+  CHK (int* translate = new int [num_vertices]);
+  CHK (csTriangleMesh* new_mesh = new csTriangleMesh (*GetBaseMesh ()));
+  csLOD::CalculateLOD (new_mesh, verts, translate, emerge_from);
+  int i;
+  for (i = 0 ; i < frames.Length () ; i++)
+  {
+    csFrame* fr = (csFrame*)frames[i];
+    fr->RemapVertices (translate, num_vertices);
+  }
+  for (i = 0 ; i < GetBaseMesh ()->GetNumTriangles () ; i++)
+  {
+    csTriangle& tr = GetBaseMesh ()->GetTriangles ()[i];
+    tr.a = translate[tr.a];
+    tr.b = translate[tr.b];
+    tr.c = translate[tr.c];
+  }
+
+  CHK (delete [] translate);
+  CHK (delete verts);
+  CHK (delete new_mesh);
 }
 
 csFrame* csSpriteTemplate::AddFrame ()
@@ -328,7 +213,7 @@ csSpriteAction* csSpriteTemplate::FindAction (char *n)
 
 //=============================================================================
 
-CSOBJTYPE_IMPL(csSprite3D,csObject);
+CSOBJTYPE_IMPL (csSprite3D, csObject)
 
 csSprite3D::csSprite3D () : csObject ()
 {
@@ -418,6 +303,39 @@ void csSprite3D::ResetVertexColors ()
   vertex_colors = NULL;
 }
 
+csTriangleMesh csSprite3D::mesh;
+float csSprite3D::cfg_lod_detail = 1;
+
+int map (int* emerge_from, int idx, int num_verts)
+{
+  if (num_verts <= 0) return 0;
+  while (idx >= num_verts)
+  {
+    int idx2 = emerge_from[idx];
+    // @@@ THIS SHOULD NOT BE NEEDED! DEBUG WHY IT IS NEEDED
+    if (idx == idx2) return idx;
+    idx = idx2;
+  }
+  return idx;
+}
+
+void csSprite3D::GenerateSpriteLOD (int num_vts)
+{
+  int* emerge_from = tpl->GetEmergeFrom ();
+  csTriangleMesh* base_mesh = tpl->GetBaseMesh ();
+  mesh.Reset ();
+  int i, from;
+  int a, b, c;
+  for (i = 0 ; i < base_mesh->GetNumTriangles () ; i++)
+  {
+    csTriangle& tr = base_mesh->GetTriangles ()[i];
+    a = map (emerge_from, tr.a, num_vts);
+    b = map (emerge_from, tr.b, num_vts);
+    c = map (emerge_from, tr.c, num_vts);
+    if (a != b && b != c && a != c) mesh.AddTriangle (a, b, c);
+  }
+}
+
 void csSprite3D::Draw (csRenderView& rview)
 {
   if (!tpl->cstxt)
@@ -440,14 +358,52 @@ void csSprite3D::Draw (csRenderView& rview)
 
   csFrame * cframe = cur_action->GetFrame (cur_frame);
 
+  // Calculate the right LOD level for this sprite.
+  // Select the appropriate mesh.
+  csTriangleMesh* m;
+  int* emerge_from;
+  int num_verts;
+  float fnum;
+  if (cfg_lod_detail < 0)
+  {
+    m = tpl->GetBaseMesh ();
+    num_verts = tpl->num_vertices;
+  }
+  else
+  {
+    m = &mesh;
+    // We calculate the number of vertices to use for this LOD
+    // level. The integer part will be the number of vertices.
+    // The fractional part will determine how much to morph
+    // between the new vertex and the previous last vertex.
+    fnum = cfg_lod_detail*(float)tpl->num_vertices;
+    num_verts = (int)(cfg_lod_detail*tpl->num_vertices);
+    fnum -= num_verts;	// fnum is now the fractional part.
+    GenerateSpriteLOD (num_verts);
+    emerge_from = tpl->GetEmergeFrom ();
+  }
+
   // Transform all vertices from object to camera space and do perspective
   // correction as well.
-  for (i = 0 ; i < tpl->num_vertices ; i++)
+  for (i = 0 ; i < num_verts ; i++)
   {
     csVector3 v;
-    v = m_o2c * ( cframe->GetVertex (i) ) + v_o2c;
+    csVector2 uv;
+    if (cfg_lod_detail < 0 || i < num_verts-1)
+    {
+      v = cframe->GetVertex (i);
+      uv = cframe->GetTexel (i);
+    }
+    else
+    {
+      // Morph between the last vertex and the one we morphed from.
+      v = (1-fnum)*cframe->GetVertex (emerge_from[i]) + fnum*cframe->GetVertex (i);
+      uv = (1-fnum)*cframe->GetTexel (emerge_from[i]) + fnum*cframe->GetTexel (i);
+    }
+    v = m_o2c * v + v_o2c;
+
     tr_frame->SetVertex (i, v.x, v.y, v.z);
-    tr_frame->SetTexel (i, cframe->GetTexel (i).x, cframe->GetTexel (i).y);
+    tr_frame->SetTexel (i, uv.x, uv.y);
     if (v.z >= SMALL_Z)
     {
       float iz = csCamera::aspect/v.z;
@@ -469,17 +425,19 @@ void csSprite3D::Draw (csRenderView& rview)
   rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, true);
   rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
 
-  // Draw all triangles.
-  static int COUNTER = 0;	//@@@DUMMY CODE!
-  csSpriteLOD* lod = tpl->GetLOD ((COUNTER>>4)&1);
-  COUNTER++;
-  if (!lod) lod = tpl->GetBaseLOD ();
+  if (force_otherskin)
+    poly.txt_handle = cstxt->GetTextureHandle ();
+  else
+    poly.txt_handle = tpl->cstxt->GetTextureHandle ();
 
-  for (i = 0 ; i < lod->GetNumTriangles () ; i++)
+  rview.g3d->StartPolygonQuick (poly.txt_handle, vertex_colors != NULL);
+
+  // Draw all triangles.
+  for (i = 0 ; i < m->GetNumTriangles () ; i++)
   {
-    int a = lod->GetTriangles ()[i].a;
-    int b = lod->GetTriangles ()[i].b;
-    int c = lod->GetTriangles ()[i].c;
+    int a = m->GetTriangles ()[i].a;
+    int b = m->GetTriangles ()[i].b;
+    int c = m->GetTriangles ()[i].c;
     if (visible[a] && visible[b] && visible[c])
     {
       //-----
@@ -511,11 +469,6 @@ void csSprite3D::Draw (csRenderView& rview)
 
       poly.num = rescount;
       
-      if (force_otherskin)
-  	poly.txt_handle = cstxt->GetTextureHandle ();
-      else
-  	poly.txt_handle = tpl->cstxt->GetTextureHandle ();
-
       poly.pi_triangle = (csVector2 *)triangle;
       int trivert [3] = { a, b, c };
       int j;
@@ -612,6 +565,9 @@ void csSprite3D::Draw (csRenderView& rview)
       rview.g3d->DrawPolygonQuick (poly, vertex_colors != NULL);
     }
   }
+
+  rview.g3d->FinishPolygonQuick ();
+
   CHK (delete [] poly.pi_texcoords);
 }
 
