@@ -15,6 +15,12 @@ The history order is reversed so that new features are at the top.
 	      backwards-incompatible change: iNetworkPacket has been changed
 	      to iNetworkPacket2 (this is for handling iNetworkSocket2
 	      sockets), so that now iNetworkPacket is used for cssocket.
+	- Oktal made the following fixes to the csperl5 plugin:
+	    - Moved the generated csperlxs.c file out of the source tree
+	      since generation would fail if the source tree was read-only.
+	    - Moved the csperlxs_fallback.inc file back to include/cssys so
+	      it can still be accessed by the moved csperlxs.c file.
+	    - Added csperlxs.c to the Jamfile clean target.
 9-May-2003
 	- Philip Wyett did the following:
 	    - Added 'Makefile' to 'jam distclean', so at distclean the 'CS/'

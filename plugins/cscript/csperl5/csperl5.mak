@@ -25,6 +25,8 @@ csperl5clean:
 	$(MAKE_CLEAN)
 csperl5distclean:
 	$(MAKE_CLEAN)
+swigperl5gen:
+	$(MAKE_TARGET)
 
 endif
 
@@ -48,7 +50,7 @@ SRC.CSPERL5 = $(wildcard $(addprefix $(SRCDIR)/,plugins/cscript/csperl5/*.cpp))
 OBJ.CSPERL5 = $(addprefix $(OUT)/,$(notdir $(SRC.CSPERL5:.cpp=$O)))
 DEP.CSPERL5 = CSTOOL CSGEOM CSSYS CSUTIL CSSYS CSUTIL
 
-PERLXSI.C = $(SRCDIR)/plugins/cscript/csperl5/csperlxs.c
+PERLXSI.C = $(OUTDERIVED)/csperlxs.c
 PERLXSI.O = $(OUT)/$(notdir $(PERLXSI.C:.c=$O))
 
 SWIG.I = $(SRCDIR)/include/ivaria/cspace.i
@@ -81,8 +83,7 @@ DEP.MSCSPERL5 = $(DEP.CSPERL5)
 MSVC.DSP += MSCSPERL5SWIG
 DSP.MSCSPERL5SWIG.NAME = csperl5s
 DSP.MSCSPERL5SWIG.TYPE = plugin
-DSP.MSCSPERL5SWIG.CFLAGS = \
-  $(DSP.MSCSPERL5.CFLAGS) /D "PERL_POLLUTE"
+DSP.MSCSPERL5SWIG.CFLAGS = $(DSP.MSCSPERL5.CFLAGS) /D "PERL_POLLUTE"
 MSCSPERL5SWIG = $(SWIG.PERL5.DLL)
 LIB.MSCSPERL5SWIG = $(LIB.MSCSPERL5)
 SRC.MSCSPERL5SWIG = $(SWIG.PERL5.C)
@@ -115,7 +116,7 @@ ifeq ($(PERL5.EXTUTILS.EMBED.AVAILABLE),yes)
     -o $(PERLXSI.C) -std cspace
   endif
 else
-  PERLXSI.MK = echo "\#include \"csperlxs_fallback.inc\"" > $(PERLXSI.C)
+  PERLXSI.MK = echo "\#include \"cssys/csperlxs_fallback.inc\"" > $(PERLXSI.C)
 endif
 
 $(PERLXSI.C):
@@ -155,8 +156,8 @@ clean: csperl5clean
 distclean: csperl5distclean
 
 csperl5clean:
-	-$(RMDIR) $(CSPERL5) $(OBJ.CSPERL5) $(OUTDLL)/$(notdir $(SCF.CSPERL5)) $(PERLXSI.O) $(PERLXSI.C) \
-	$(CSPERL5.PM) $(SWIG.PERL5.O) $(SWIG.PERL5.DLL)
+	-$(RMDIR) $(CSPERL5) $(OBJ.CSPERL5) $(OUTDLL)/$(notdir $(SCF.CSPERL5)) \
+$(PERLXSI.O) $(PERLXSI.C) $(CSPERL5.PM) $(SWIG.PERL5.O) $(SWIG.PERL5.DLL)
 
 swigperl5clean:
 	$(RM) $(SWIG.PERL5.DOC) $(SWIG.PERL5.C) $(SWIG.PERL5.PM)

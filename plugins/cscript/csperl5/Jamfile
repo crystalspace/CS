@@ -25,7 +25,7 @@ if $(CMD.PERL5)
   {
     actions PerlEmbedGlueFile
     {
-      echo '#include "csperlxs_fallback.inc"' > $(<)
+      echo '#include "cssys/csperlxs_fallback.inc"' > $(<)
     }
   }
 }
@@ -51,7 +51,8 @@ if $(PERL5.AVAILABLE) = "yes"
 
   local perlxs = [ FGristFiles csperlxs.c ] ;
   PerlEmbedGlueFile $(perlxs) ;
-  LOCATE on $(perlxs) = $(SUBDIR) ;
+  LOCATE on $(perlxs) = $(LOCATE_TARGET) ;
+  SEARCH on $(perlxs) = $(LOCATE_TARGET) ;
   
   FILES = csperl5.cpp csperl5.h cswigpl5.cpp csperlxs.c ;
   
@@ -61,4 +62,6 @@ if $(PERL5.AVAILABLE) = "yes"
   LinkWith csperl5 : cstool csgeom cssys csutil ;
   ExternalLibs csperl5 : PERL5 ;
   Help csperl5 : "Crystal Script Perl5 plug-in" ;
+  Clean clean : $(perlxs) ;
+  Clean csperl5clean : $(perlxs) ;
 }
