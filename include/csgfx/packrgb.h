@@ -167,19 +167,20 @@ inline void csDiscardUnpackedRGBcolor (const csRGBcolor* pixels)
  * \return An array containing the source data in csRGBpixel structs.
  */
 
-/**\fn csRGBpixel* csCopyUnpackRGBAtoRGBpixel (const uint8* pixels, int numPixels)
+/**\fn csRGBpixel* csCopyUnpackRGBAtoRGBpixel(const uint8*pixels,int numPixels)
  * Unpack a RGBA byte array into an array of csRGBpixel. 
  * \remarks
  * Never returns \p pixels.
  * Allocate memory. Free it using delete[] when finished.
- * \param rgba Source array of RGBA data
+ * \param pixels Source array of RGBA data
  * \param numPixels Number of pixels in the array
  * \return An array containing the source data in csRGBpixel structs.
  */
 
-/**\fn void csDiscardUnpackedRGBpixel (const csRGBpixel* pixels)
+/**\fn void csDiscardUnpackedRGBpixel(const csRGBpixel* pixels)
  * Frees memory possibly allocated by csUnpackRGBAtoRGBpixel().
- * \param pixels Pointer to csRGBpixel array returned by csUnpackRGBAtoRGBpixel().
+ * \param pixels Pointer to csRGBpixel array returned by
+ * csUnpackRGBAtoRGBpixel().
  */
 
 #ifdef CS_RGBPIXEL_SANE

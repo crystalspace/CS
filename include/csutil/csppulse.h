@@ -31,15 +31,15 @@ struct iConsoleOutput;
  * is generally used as a sort of pulse beat during indeterminately lengthy
  * computational operations in order to let the user know that progress is
  * being made and that the program is not hanging.  By default, the pulse beat
- * is presented to the user by passing CS_MSG_INITIALIZATION to the system print
- * function.  This setting may be changed with the SetMessageType() method.
- * To animate the pulse object, call the Step() method each time a unit of
- * work has been completed.  At each step a backspace (\b) followed by one of
- * the pulse characters (-, \, |, or /) is printed, except for the very first
- * step, in which case the backspace is omitted.  Erase() clears the pulse, if
- * necessary, by printing a backspace, followed by a space (' '), followed by
- * one more backspace.  Reset() erases the pulse and then resets the state.
- * Erase() is called automatically by the destructor.
+ * is presented to the user by passing CS_MSG_INITIALIZATION to the system
+ * print function.  This setting may be changed with the SetMessageType()
+ * method.  To animate the pulse object, call the Step() method each time a
+ * unit of work has been completed.  At each step a backspace (@\b) followed by
+ * one of the pulse characters (-, \, |, or /) is printed, except for the very
+ * first step, in which case the backspace is omitted.  Erase() clears the
+ * pulse, if necessary, by printing a backspace, followed by a space (' '),
+ * followed by one more backspace.  Reset() erases the pulse and then resets
+ * the state.  Erase() is called automatically by the destructor.
  */
 class CS_CSUTIL_EXPORT csProgressPulse
 {

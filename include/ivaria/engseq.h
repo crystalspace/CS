@@ -82,7 +82,7 @@ struct iParameterESM : public iBase
    * Get the value based on userdata which is given to the
    * operations. If IsConstant() returns true then the params
    * parameter will not be used!
-   * \params is given to the operations as userdata.
+   * \param params Is given to the operations as userdata.
    */
   virtual iBase* GetValue (iBase* params = 0) const = 0;
 
@@ -311,8 +311,8 @@ struct iSequenceWrapper : public iBase
   /**
    * Operation: set a material on a polygon.
    * \param time is the relative time at which this operation will fire.
-   * \param mesh is a parameter that represents a polygon on which the material
-   * should be set.
+   * \param polygon is a parameter that represents a polygon on which the
+   * material should be set.
    * \param mat is a parameter that represents the material to set.
    */
   virtual void AddOperationSetPolygonMaterial (csTicks time,

@@ -25,7 +25,9 @@
 
 struct iObjectRegistry;
 
-/// \internal Helper class for csPluginLoader.
+/** \internal
+ * Helper class for csPluginLoader.
+ */
 struct csPluginLoadRec
 {
   char* Tag;
@@ -38,7 +40,9 @@ struct csPluginLoadRec
   { delete [] ClassID; delete [] Tag; }
 };
 
-/// \internal Helper class for csPluginLoader.
+/** \internal
+ * Helper class for csPluginLoader.
+ */
 class CS_CSUTIL_EXPORT csPluginList : public csPDelArray<csPluginLoadRec>
 {
 public:

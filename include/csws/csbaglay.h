@@ -145,17 +145,14 @@ public:
     NORTHWEST = 18
   };
 
-  /// \internal used internally  (do not use!)
-  enum  GRID_BAG_CONSTANTS_INTERNAL
+  enum GRID_BAG_CONSTANTS_INTERNAL
   {
     _LEFT     = 20,
     _CENTER   = 21,
     _RIGHT    = 22
   };
 
-  /// \internal for internal uses
   bool bSized;
-  /// \internal for internal uses
   csPoint mPrefCompSize;
 };
 

@@ -35,9 +35,13 @@
 
 SCF_VERSION (iImageIO, 1, 0, 0);
 
-/// \internal format can be read
+/** \internal
+ * Format can be read.
+ */
 #define CS_IMAGEIO_LOAD 1
-/// \internal format can be written
+/** \internal
+ * Format can be written.
+ */
 #define CS_IMAGEIO_SAVE 2
 
 /// Description for a file format supported by an image loader.
@@ -107,7 +111,7 @@ struct iImageIO : public iBase
     const char* extraoptions = 0) = 0;
 
   /**
-   * Save an image using format <mime>.
+   * Save an image using format MIME.
    * If omitted format selection is left to the plugin.
    */
   virtual csPtr<iDataBuffer> Save (iImage *image, const char *mime = 0,

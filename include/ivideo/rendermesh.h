@@ -110,14 +110,14 @@ struct csCoreRenderMesh
    * scaling. Basically, in almost any case it should be set to the camera's
    * mirror mode.
    *
-   * \example
+   * \code
    * iCamera* camera;
    * csRenderMesh myMesh;
    *   ...
    * myMesh.object2camera = camera->GetTransform () / 
    *   movable->GetFullTransform ();
    * myMesh.do_mirror = camera->IsMirrored ();
-   * \endexample
+   * \endcode
    */
   bool do_mirror;
 

@@ -52,7 +52,7 @@ struct iInputBinder : public iBase
    * \remarks Note that cmd is used as an array index so the numbers you use
    *   should be consecutive, starting with 0.
    */
-  virtual void BindButton (const csInputDefinition &def, unsigned cmd,
+  virtual void BindButton (csInputDefinition const& def, unsigned int cmd,
     bool toggle = false) = 0;
 
   /**
@@ -63,7 +63,7 @@ struct iInputBinder : public iBase
    * \remarks Note that cmd is used as an array index so the numbers you use
    *   should be consecutive, starting with 0.
    */
-  virtual void BindAxis (const csInputDefinition &def, unsigned cmd,
+  virtual void BindAxis (csInputDefinition const& def, unsigned int cmd,
     int sensitivity = 1) = 0;
 
   /// Remove a binding.

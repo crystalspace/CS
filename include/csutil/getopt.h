@@ -76,7 +76,8 @@ extern CS_CSUTIL_EXPORT int optopt;
    of `struct option' terminated by an element containing a name which is
    zero.
 
-   The field `has_arg' is:<pre
+   The field `has_arg' is:
+   <pre>
    no_argument		(or 0) if the option does not take an argument,
    required_argument	(or 1) if the option requires an argument,
    optional_argument 	(or 2) if the option takes an optional argument.

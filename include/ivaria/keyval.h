@@ -28,10 +28,9 @@ SCF_VERSION (iKeyValuePair, 0, 0, 2);
 
 /**
  * A Key Value pair. This object contains a 'key' string and one or more
- * 'value' strings.
- * Typically key value pairs are specified in map files (using the <key> tag).
- * They allow a game developer to tag game specific information to any Crystal
- * Space object.
+ * 'value' strings.  Typically key value pairs are specified in map files
+ * (using the \<key\> tag).  They allow a game developer to tag game specific
+ * information to any Crystal Space object.
  * <p>
  * Main creators of instances implementing this interface:
  *   <ul>

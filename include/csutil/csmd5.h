@@ -82,7 +82,9 @@ public:
   /// 32-bit word
   typedef unsigned int md5_word_t;
 
-  /// \internal Define the state of the MD5 Algorithm.
+  /** \internal
+   * Define the state of the MD5 Algorithm.
+   */
   struct CS_CSUTIL_EXPORT md5_state_t
   {
     size_t count[2]; // message length in bits, lsw first

@@ -160,7 +160,7 @@ struct iReporter : public iBase
 {
   /**
    * Report something. The given message ID should be formed like:
-   * 'crystalspace.<source>.<type>.<detail>'. Example:
+   * 'crystalspace.{source}.{type}.{detail}'. Example:
    * 'crystalspace.sprite2dloader.parse.material'.
    */
   virtual void Report (int severity, const char* msgId,

@@ -136,7 +136,9 @@ protected:
   } *scfiPlugin;
   friend class csAppPlugin;
 
-  /// \internal A structure for keeping modal information on a stack.
+  /** \internal
+   * A structure for keeping modal information on a stack.
+   */
   struct csModalInfo
   {
     /// Component that is modal

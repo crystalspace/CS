@@ -180,7 +180,7 @@ struct iStream : public iBase
    */
   virtual void GetStreamDescription (csStreamDescription &desc) = 0;
   /**
-   * Next frame to be examined at frameindex.  Note that <frame> does not
+   * Next frame to be examined at frameindex.  Note that `frame' does not
    * necessarily mean a video frame.  It is the datachunk a stream is separated
    * into by the underlying protocol/format like RIFF for instance.
    */

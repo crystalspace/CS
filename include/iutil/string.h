@@ -230,11 +230,11 @@ struct iString : public iBase
 
   /**
    * Replace contents of this string with the contents of another.
-   * \param Str String from which new content of this string will be copied.
-   * \param Count Number of characters to copy.  If (size_t)-1 is specified,
+   * \param str String from which new content of this string will be copied.
+   * \param count Number of characters to copy.  If (size_t)-1 is specified,
    *   then all characters will be copied.
    */
-  virtual void Replace (const iString* iStr, size_t iCount = (size_t)-1) = 0;
+  virtual void Replace (const iString* str, size_t count = (size_t)-1) = 0;
 
   /**
    * Check if another string is equal to this one.

@@ -89,6 +89,7 @@ struct iRenderBuffer : public iBase
   /**
    * Lock the buffer to allow writing and give us a pointer to the data.
    * The pointer will be (void*)-1 if there was some error.
+   * \param lockType The type of lock desired.
    * \param samePointer Specifies whether the same pointer as last time should 
    *  be returned (ie all the old data will be still there, useful if only
    *  a part of the data is changed). However, setting this to 'true' may 

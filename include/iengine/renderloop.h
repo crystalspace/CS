@@ -103,7 +103,7 @@ struct iRenderLoopManager : public iBase
   virtual bool Unregister (iRenderLoop* loop) = 0;
   /**
    * Load a renderloop from VFS file. This file should be a renderloop
-   * XML file with <params> as the root.
+   * XML file with \<params\> as the root.
    * \param fileName is the VFS path.
    */
   virtual csPtr<iRenderLoop> Load (const char* fileName) = 0;

@@ -205,7 +205,6 @@ struct iDynamicSystem : public iBase
    * \param radius the radius of the sphere
    * \param offset a translation of the sphere's center
    * from the default (0,0,0)
-   * \param trans a hard transform to apply to the mesh
    * \param friction how much friction this body has,
    * ranges from 0 (no friction) to infinity (perfect friction)
    * \param elasticity the "bouncyness" of this object, from 0
@@ -221,7 +220,6 @@ struct iDynamicSystem : public iBase
   /**
    * Attaches a static collider plane to world
    * \param plane describes the plane to added
-   * \param trans a hard transform to apply to the mesh
    * \param friction how much friction this body has,
    * ranges from 0 (no friction) to infinity (perfect friction)
    * \param elasticity the "bouncyness" of this object, from 0
@@ -349,6 +347,7 @@ struct iRigidBody : public iBase
 
   /**
    * Add a collider with a associated friction coefficient
+   * \param mesh the mesh object which will act as collider
    * \param trans a hard transform to apply to the mesh
    * \param friction how much friction this body has,
    * ranges from 0 (no friction) to infinity (perfect friction)
@@ -367,6 +366,8 @@ struct iRigidBody : public iBase
 
   /**
    * Cylinder orientated along its local z axis
+   * \param length length of the cylinder
+   * \param radius radius of the cylinder
    * \param trans a hard transform to apply to the mesh
    * \param friction how much friction this body has,
    * ranges from 0 (no friction) to infinity (perfect friction)
@@ -385,6 +386,7 @@ struct iRigidBody : public iBase
 
   /**
    * Add a collider box with given properties
+   * \param size the box's dimensions
    * \param trans a hard transform to apply to the mesh
    * \param friction how much friction this body has,
    * ranges from 0 (no friction) to infinity (perfect friction)
@@ -403,7 +405,8 @@ struct iRigidBody : public iBase
 
   /**
    * Add a collider sphere with given properties
-   * \param trans a hard transform to apply to the mesh
+   * \param radius radius of sphere
+   * \param offset position of sphere
    * \param friction how much friction this body has,
    * ranges from 0 (no friction) to infinity (perfect friction)
    * \param density the density of this rigid body (used to calculate
@@ -421,7 +424,7 @@ struct iRigidBody : public iBase
 
   /**
    * Add a collider plane with given properties
-   * \param trans a hard transform to apply to the mesh
+   * \param plane the plane which will act as collider
    * \param friction how much friction this body has,
    * ranges from 0 (no friction) to infinity (perfect friction)
    * \param density the density of this rigid body (used to calculate

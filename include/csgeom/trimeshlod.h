@@ -182,16 +182,21 @@ public:
    * 'translate' contains a mapping from the old order of vertices to
    * the new one. The new ordering of vertices is done in a way so that
    * the first vertex is the one which is always present in the model
-   * and with increasing detail, vertices are added in ascending vertex order.
-   * 'emerge_from' contains (for a given index in the new order) from
-   * which this vertex arises (or seen the other way around: to what this
+   * and with increasing detail; vertices are added in ascending vertex order.
+   * 'emerge_from' indicates (for a given index in the new order) from
+   * which each vertex arises (or seen the other way around: to what this
    * vertex had collapsed).
+   * \param mesh the source triangle mesh.
+   * \param verts the vertex costs.
+   * \param translate contains a mapping from the old order of vertices to
+   * the new one.
+   * \param emerge_from indicates from which each vertex arises.
    * \param lodalgo is the lod algorithm.
-   * <p>
-   * Note. The given 'mesh' and 'verts' objects are no longer valid after
-   * calling this function. Don't expect any useful information here.
+   * \remarks Note: The given 'mesh' and 'verts' objects are no longer valid
+   * after calling this function. Don't expect any useful information here.
    */
-  static void CalculateLOD (csTriangleMesh* mesh, csTriangleVerticesCost* verts,
+  static void CalculateLOD (csTriangleMesh* mesh,
+        csTriangleVerticesCost* verts,
   	int* translate, int* emerge_from, csTriangleLODAlgo* lodalgo);
 
   /**
@@ -200,10 +205,14 @@ public:
    * triangle mesh is returned (and number of triangles is set to
    * num_triangles). You must delete[] the returned list of triangles
    * if you don't want to use it anymore.
-   * \param lodalgo is the lod algorithm.
-   * <p>
-   * Note. The given 'mesh' and 'verts' objects are no longer valid after
-   * calling this function. Don't expect any useful information here.
+   * \param mesh the source triangle mesh.
+   * \param verts the vertex costs.
+   * \param max_cost the cost which sets the limit for the simplification.
+   * \param num_triangles receives the number of triangles in the simplified
+   * set.
+   * \param lodalgo is the Lod algorithm.
+   * \remarks Note: The given 'mesh' and 'verts' objects are no longer valid
+   * after calling this function. Don't expect any useful information here.
    */
   static csTriangle* CalculateLOD (csTriangleMesh* mesh,
   	csTriangleVerticesCost* verts, float max_cost, int& num_triangles,
@@ -212,18 +221,21 @@ public:
   /**
    * This is a faster version of CalculateLOD() which doesn't recalculate
    * the cost of a vertex after edge collapse. It is less accurate in
-   * cases where the cost of a vertex can change after edge collapse but
-   * it calculates a LOT faster.
+   * cases where the cost of a vertex can change after edge collapse but it
+   * calculates a LOT faster. You must delete[] the returned list of triangles
+   * if you don't want to use it anymore.
+   * \param mesh the source triangle mesh.
+   * \param verts the vertex costs.
+   * \param max_cost the cost which sets the limit for the simplification.
+   * \param num_triangles receives the number of triangles in the simplified
+   * set.
    * \param lodalgo is the lod algorithm.
-   * <p>
-   * Note. The given 'mesh' and 'verts' objects are no longer valid after
-   * calling this function. Don't expect any useful information here.
+   * \remarks Note: The given 'mesh' and 'verts' objects are no longer valid
+   * after calling this function. Don't expect any useful information here.
    */
   static csTriangle* CalculateLODFast (csTriangleMesh* mesh,
   	csTriangleVerticesCost* verts, float max_cost, int& num_triangles,
 	csTriangleLODAlgo* lodalgo);
 };
 
-
 #endif // __CS_TRIMESHLOD_H__
-

@@ -45,7 +45,7 @@ struct iMovable;
  */
 struct iCurve : public iBase
 {
-  /// Get the original curve (@@@UGLY).
+  /// Get the original curve (@@@ UGLY).
   virtual csCurve* GetOriginalObject () = 0;
   /// Get the iObject for this curve.
   virtual iObject *QueryObject() = 0;

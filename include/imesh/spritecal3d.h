@@ -134,6 +134,7 @@ struct iSpriteCal3DFactoryState : public iBase
    * This loads the supplied file as one animation action for the sprite.
    * @param vfs The ref to the vfs plugin used when loading the anim file
    * @param filename The VFS path to the anim file.
+   * @param name The animation's name.
    * @param type The type of anim this file represents.
    * @param base_velocity On movement type anims, this represents the native
    *   traversal speed of the model implied by this animation.
@@ -151,25 +152,27 @@ struct iSpriteCal3DFactoryState : public iBase
    *   minimum time between these overrides.
    * @param max_interval  Max interval between these override idle actions.
    *   The model will randomly choose a time between min and max.
-   * @idle_pct For anims of type action, if the model is idling it will
+   * @param idle_pct For anims of type action, if the model is idling it will
    *   randomly choose among these based on the idle_pct weights specified
    *   here.  This param should total 100 across all anims for the model if
    *   used.
-   * @lock This specifies whether the animation is to be locked on last frame
-   *   or not. If not locked, the action will return to the base keyframe when
-   *   complete.  If locked, the action will stay in the final keyframe
+   * @param lock This specifies whether the animation is to be locked on last
+   *   frame or not. If not locked, the action will return to the base keyframe
+   *   when complete.  If locked, the action will stay in the final keyframe
    *   position until cleared.  (This is usually for anims like "death".)
    */
-  virtual int  LoadCoreAnimation(iVFS *vfs,const char *filename,
-				 const char *name,
-				 int type,
-				 float base_velocity,
-				 float min_velocity,
-				 float max_velocity,
-                 int min_interval,
-                 int max_interval,
-                 int idle_pct,
-                 bool lock) = 0;
+  virtual int LoadCoreAnimation(
+	iVFS *vfs,
+	const char *filename,
+	const char *name,
+	int type,
+	float base_velocity,
+	float min_velocity,
+	float max_velocity,
+        int min_interval,
+        int max_interval,
+        int idle_pct,
+        bool lock) = 0;
 
   /**
    * This loads a submesh which will attach to this skeleton.
@@ -188,6 +191,7 @@ struct iSpriteCal3DFactoryState : public iBase
   /**
    * This adds a mesh as a morph target of another mesh.
    *
+   * @param vfs The VFS object where `filename' resides.
    * @param mesh_index The index of the mesh we are going to add a morph
    *   target to.
    * @param filename The name of the file of the mesh of the morph tarrget.
@@ -195,7 +199,7 @@ struct iSpriteCal3DFactoryState : public iBase
    *
    * @return The index of the morph target.
    */
-  virtual int LoadCoreMorphTarget(iVFS *vfs,int mesh_index,
+  virtual int LoadCoreMorphTarget(iVFS *vfs, int mesh_index,
   	const char *filename, const char *name) = 0;
 
   /**
@@ -211,8 +215,8 @@ struct iSpriteCal3DFactoryState : public iBase
    * This adds a mesh and one of its morph target to the given morph animation.
    *
    * @param morphanimation_index The index of the morph animation.
-   * @param mesh_index The index of the mesh.
-   * @param morphtarget_index The index of the morph target of the mesh.
+   * @param mesh_name The name of the mesh.
+   * @param morphtarget_name The name of the morph target of the mesh.
    *
    * @return True if successfull.
    */
@@ -249,7 +253,7 @@ struct iSpriteCal3DFactoryState : public iBase
   /**
    * Returns the number of morph targets of a mesh.
    *
-   * @parm mesh_id The id of the mesh.
+   * @param mesh_id The id of the mesh.
    *
    * @return The number of morph targets of a mesh.
    *         -1 if something went wrong.
@@ -465,9 +469,9 @@ struct iSpriteCal3DState : public iBase
   /**
    * Blends the morph target.
    *
-   * @parm mesh_id The id of the morph animation we want to blend.
-   * @parm weight The weight of the morph target.
-   * @parm delay The delay untill the full weight is reached.
+   * @param morph_animation_id The id of the morph animation we want to blend.
+   * @param weight The weight of the morph target.
+   * @param delay The delay untill the full weight is reached.
    *
    * @return False if something went wrong.
    */
@@ -477,8 +481,8 @@ struct iSpriteCal3DState : public iBase
   /**
    * Clears the morph target.
    *
-   * @parm mesh_id The id of the morph animation we want to clear.
-   * @parm delay The delay untill the morph target is cleared.
+   * @param morph_animation_id The id of the morph animation we want to clear.
+   * @param delay The delay untill the morph target is cleared.
    *
    * @return False if something went wrong.
    */

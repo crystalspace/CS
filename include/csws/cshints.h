@@ -71,12 +71,19 @@ public:
  */
 class CS_CSWS_EXPORT csHintManager : public csArray<void*>
 {
-  /// \internal This structure holds the data about one hint
+private:
+  /** \internal
+   * This structure holds the data about one hint
+   */
   struct HintStore
   {
-    /// \internal The component associated with the hint
+    /** \internal
+     * The component associated with the hint.
+     */
     csComponent *comp;
-    /// \internal The text string starts right after the end of this structure
+    /** \internal
+     * The text string starts right after the end of this structure.
+     */
     char text [1];
   };
 
@@ -122,7 +129,9 @@ public:
   void SetFont (iFont *iNewFont, int iSize);
 
 private:
-  /// \internal Check if this child has an associated hint
+  /** \internal
+   * Check if this child has an associated hint
+   */
   static bool do_checkhint (csComponent *comp, void *data);
 };
 

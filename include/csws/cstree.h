@@ -350,7 +350,9 @@ public:
  * @{ */
 /// Child tree items should be re-positioned
 #define CSS_TREEBOX_PLACEITEMS	0x00010000
-/// \internal Temporarily ignore cscmdTreeMakeVisible commands (used internally)
+/** \internal
+ * Temporarily ignore cscmdTreeMakeVisible commands (used internally)
+ */
 #define CSS_TREEBOX_LOCKVISIBLE	0x00020000
 /** @} */
 
@@ -399,29 +401,29 @@ enum csTreeFrameStyle
  *     item3 = new csTreeItem (item2, "Public stuff");
  *</pre>
  * Keyboard navigation:
- * <dl>
- *   <dt>Up/Down</dt><dd>Select previous/next tree item</dd>
- *   <dt>Left/Right</dt><dd>Scroll tree horizontally (if meaningful)</dd>
- *   <dt>Ctrl+Left/Right</dt><dd>Scroll horizontally in big steps</dd>
- *   <dt>PgUp/PgDn</dt><dd>Go to the previous/next page of the tree.</dd>
- *   <dt>Shift+PgUp/PgDn</dt><dd>Show the previous/next page of the tree
- *     (does not move the caret).</dd>
- *   <dt>Ctrl+PgUp/PgDn</dd><dd>Go to the first/last tree item</dd>
- *   <dt>Home/End</dt><dd>Scroll to left/right margin.</dd>
- *   <dt>Ctrl+Home/End</dt><dd>Scroll to the beginning/end of the tree
- *     (does not move the caret).</dd>
- *   <dt>Keypad PLUS/MINUS</dt><dd>Expand/collapse current branch.</dd>
- *   <dt>Ctrl+Keypad PLUS/MINUS</dt><dd>Expand/collapse all branches
- *     at once.</dd>
- *   <dt>Shift+Keypad PLUS/MINUS</dt><dd>Expand/collapse all the items
- *     contained in the current branch.</dd>
- *   <dt>Space</dt><dd>Toggle expand/collapse current branch</dd>
- *   <dt>Any other symbols</dt><dd>Find the next item that starts with
+ * <ul>
+ *   <li>Up/Down -- Select previous/next tree item</li>
+ *   <li>Left/Right -- Scroll tree horizontally (if meaningful)</li>
+ *   <li>Ctrl+Left/Right -- Scroll horizontally in big steps</li>
+ *   <li>PgUp/PgDn -- Go to the previous/next page of the tree.</li>
+ *   <li>Shift+PgUp/PgDn -- Show the previous/next page of the tree
+ *     (does not move the caret).</li>
+ *   <li>Ctrl+PgUp/PgDn -- Go to the first/last tree item</li>
+ *   <li>Home/End -- Scroll to left/right margin.</li>
+ *   <li>Ctrl+Home/End -- Scroll to the beginning/end of the tree
+ *     (does not move the caret).</li>
+ *   <li>Keypad PLUS/MINUS -- Expand/collapse current branch.</li>
+ *   <li>Ctrl+Keypad PLUS/MINUS -- Expand/collapse all branches
+ *     at once.</li>
+ *   <li>Shift+Keypad PLUS/MINUS -- Expand/collapse all the items
+ *     contained in the current branch.</li>
+ *   <li>Space -- Toggle expand/collapse current branch</li>
+ *   <li>Any other symbols -- Find the next item that starts with
  *     given character. For example, pressing 'a' will find the first
  *     item following current which starts with 'A' or 'a'; if there
  *     is no one until the end of tree, the search is restarted from
- *     top; if there is no such item at all, the cursor stays still.</dd>
- * </dl>
+ *     top; if there is no such item at all, the cursor stays still.</li>
+ * </ul>
  */
 class CS_CSWS_EXPORT csTreeBox : public csComponent
 {

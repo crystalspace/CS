@@ -44,7 +44,7 @@ struct csPolyTextureMapping;
 SCF_VERSION (iVertexBuffer, 0, 1, 1);
 
 /**
- * @@@OR@@@
+ * @@@ OR @@@
  * This interface represents a black-box vertex buffer.
  * Using the vertex buffer manager (see below) you can create objects
  * that implement this interface. These objects are managed by the
@@ -90,7 +90,7 @@ struct iVertexBuffer : public iBase
 SCF_VERSION (iPolygonBuffer, 0, 3, 0);
 
 /**
- * @@@OR@@@
+ * @@@ OR @@@
  * This interface represents a black-box polygon buffer.
  * It is used to draw a mesh of polygons. The vertex buffer manager
  * will create instances of iPolygonBuffer. Internally it will hold
@@ -191,7 +191,7 @@ struct iVertexBufferManagerClient : public iBase
 SCF_VERSION (iVertexBufferManager, 0, 0, 2);
 
 /**
- * @@@OR@@@
+ * @@@ OR @@@
  * This interface represents the vertex buffer manager. You can use this
  * to create vertex buffers which can be used by the 3D renderer.
  */

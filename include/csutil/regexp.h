@@ -184,9 +184,15 @@ public:
   csRegExpMatchError Match (const char* string, int flags = 0);
 
   /**
-   * \copydoc Match()
-   * \param matches Array containing the locations of individual
+   * Match a string against the pattern.
+   * \param string String against which to attempt match.
+   * \param matches Array receiving the locations of individual
    *  (sub)expression matches.
+   * \param flags One or more of csRegExpMatchFlags.  Flags are combined using
+   *   the bitwise-or \p | operator.
+   * \return NoError in case of success, else an error code.
+   * \note Also check the "Implementation note" in the csRegExpMatcher
+   *  description.
    */
   csRegExpMatchError Match (const char* string, 
     csArray<csRegExpMatch>& matches, int flags = 0);

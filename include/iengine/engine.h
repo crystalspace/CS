@@ -226,7 +226,7 @@ struct iEngine : public iBase
    * this function directly, because it will be called by Prepare().
    * If the optional 'region' parameter is given then only lights will
    * be recalculated for the given region.
-   * \param If supplied, only calculate lighting for lights and objects
+   * \param region If supplied, only calculate lighting for lights and objects
    * in the given region.
    * \param meter If supplied, the meter object will be called back
    * periodically to report the progress of engine lighting calculation.
@@ -353,16 +353,16 @@ struct iEngine : public iBase
    * \param h the texture height (must be a power of 2, eg 64, 128, 256, 512...)
    * \param transp pixels in the image with this key color will be considered
    * transparent instead of being drawn
-   * \param iFlags see CreateTexture()
+   * \param flags see CreateTexture()
    * \see CreateTexture() note about registering/preparing textures.
    */
   virtual iTextureWrapper* CreateBlackTexture (const char *name,
-	int w, int h, csColor *iTransp, int iFlags) = 0;
+	int w, int h, csColor *transp, int flags) = 0;
 
   /**
    * Register a material to be loaded during Prepare()
-   * \param name the engine name for this material
-   * \param the texture to use for this material
+   * \param name engine name for this material
+   * \param texture texture to use for this material
    */
   virtual iMaterialWrapper* CreateMaterial (const char *name,
   	iTextureWrapper* texture) = 0;
@@ -854,6 +854,8 @@ struct iEngine : public iBase
    * as a child.
    * \param destSector is the sector where the single portal that is created
    * inside the portal object will point too.
+   * \param vertices list of vertices comprising the portal.
+   * \param num_vertices number of elements in 'vertices'.
    * \param portal is a return value for the created portal.
    * \return The meshwrapper on success (assign to a csRef),
    * or 0 on failure.
@@ -874,10 +876,12 @@ struct iEngine : public iBase
    * portal container then a new mesh will be created.
    * \param sourceSector is the sector where the portal container will be
    * placed.
-   * \param pos is the position inside that sector.
-   * \param destSector is the sector where the single portal that is created
+   * \param pos the position inside that sector.
+   * \param destSector the sector where the single portal that is created
    * inside the portal object will point too.
-   * \param portal is a return value for the created portal.
+   * \param vertices list of vertices comprising the portal.
+   * \param num_vertices number of elements in 'vertices'.
+   * \param portal return value for the created portal.
    * \return The meshwrapper on success (assign to a csRef),
    * or 0 on failure.
    */

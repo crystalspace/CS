@@ -243,14 +243,14 @@ struct iGeneralFactoryState : public iGeneralMeshCommonState
   	const = 0;
 
   /**
-   * @@@NR@@@
+   * @@@ NR @@@
    * Adds an independantly named stream, sets to VertexCount
    */
   virtual bool AddRenderBuffer (const char *name, 
     csRenderBufferComponentType component_type, int component_size) = 0;
 
   /**
-   * @@@NR@@@
+   * @@@ NR @@@
    * Adds a component to stream with name
    */
   virtual bool SetRenderBufferComponent (const char *name, int index,
@@ -259,7 +259,7 @@ struct iGeneralFactoryState : public iGeneralMeshCommonState
   	int component, int value) = 0; 
 
   /**
-   * @@@NR@@@
+   * @@@ NR @@@
    * Sets the stream based on the input array
    */
   virtual bool SetRenderBuffer (const char *name, float *value) = 0;

@@ -241,6 +241,7 @@ struct iVFS : public iBase
   /**
    * Expand given virtual path, interpret all "." and ".."'s relative to
    * 'currend virtual directory'.
+   * \param Path The path to expand.
    * \param IsDir If true, the expanded path will be terminated with '/'.
    * \return A new iDataBuffer object.
    */
@@ -285,6 +286,7 @@ struct iVFS : public iBase
 
   /**
    * Write an entire file in one pass.
+   * \param Name Name of file to write.
    * \param Data Pointer to the data to be written.
    * \param Size Number of bytes to write.
    * \return True if the write succeeded, else false.

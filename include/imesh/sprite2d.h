@@ -56,7 +56,7 @@ struct iSprite2DUVAnimationFrame : public iBase
   virtual const char *GetName () const = 0;
 
   /**
-   * Get the u,v coordinates of the <idx>-th vertex
+   * Get the u,v coordinates of the idx'th vertex
    */
   virtual csVector2 &GetUVCoo (int idx) = 0;
 
@@ -71,7 +71,7 @@ struct iSprite2DUVAnimationFrame : public iBase
   virtual int GetUVCount () = 0;
 
   /**
-   * Set the (u,v) coordinate of <idx>-th coo. Set idx to -1 to append it
+   * Set the (u,v) coordinate of idx'th coordinate. Set idx to -1 to append it.
    */
   virtual void SetUV (int idx, float u, float v) = 0;
 
@@ -81,7 +81,7 @@ struct iSprite2DUVAnimationFrame : public iBase
   virtual void SetFrameData (const char *name, int duration, int num, float *uv) = 0;
 
   /**
-   * Remove the <idx>-th coordinate.
+   * Remove the idx'th coordinate.
    */
   virtual void RemoveUV (int idx) = 0;
 
@@ -122,30 +122,30 @@ struct iSprite2DUVAnimation : public iBase
   virtual int GetFrameCount () = 0;
 
   /**
-   * Get the <idx>-th frame in the animation.
+   * Get the idx'th frame in the animation.
    * Set idx to -1 to get the current to be played.
    */
   virtual iSprite2DUVAnimationFrame *GetFrame (int idx) = 0;
 
   /**
-   * Get the frame <name> in the animation.
+   * Get the frame name in the animation.
    */
   virtual iSprite2DUVAnimationFrame *GetFrame (const char *name) = 0;
 
   /**
-   * Create a new frame that will be inserted before the <idx> frame.
-   * Set <idx> to -1 to append the frame to the sequence.
+   * Create a new frame that will be inserted before the idx'th frame.
+   * Set `idx' to -1 to append the frame to the sequence.
    */
   virtual iSprite2DUVAnimationFrame *CreateFrame (int idx) = 0;
 
   /**
-   * Move the <frame>-th frame before the <idx>-th frame. Set idx to -1
+   * Move the frame'th frame before the idx'th frame. Set idx to -1
    * to move the frame to the end of the sequence.
    */
   virtual void MoveFrame (int frame, int idx) = 0;
 
   /**
-   * Remove the <idx>-th from the animation
+   * Remove the idx'th from the animation
    */
   virtual void RemoveFrame (int idx) = 0;
 
@@ -227,8 +227,8 @@ struct iSprite2DState : public iSprite2DFactoryState
    * no animation to show.
    * Style:
    * 0   .. use the time values supplied in the frames
-   * > 0 .. every <style> millisecond skip to next frame
-   * < 0 .. every -1*<style>-th frame skip to next frame
+   * > 0 .. every `style' millisecond skip to next frame
+   * < 0 .. every -1*`style'th frame skip to next frame
    * Loop:
    * true  .. after last frame animations starts over from the beginning
    * false .. after last frame the normal texture is shown
@@ -252,18 +252,18 @@ struct iSprite2DState : public iSprite2DFactoryState
                                                 bool &loop) const = 0;
 
   /**
-   * Stop the animation and show the <idx>-th frame.
+   * Stop the animation and show the idx'th frame.
    * Set idx to -1 to stop it at its current position.
    */
   virtual void StopUVAnimation (int idx) = 0;
 
   /**
-   * Play the animation starting from the <idx>-th frame.
+   * Play the animation starting from the idx'th frame.
    * Set idx to -1 to start it fro its current position.
    * Style:
    * 0   .. use the time values supplied in the frames
-   * > 0 .. every <style> millisecond skip to next frame
-   * < 0 .. every -1*<style>-th frame skip to next frame
+   * > 0 .. every `style' millisecond skip to next frame
+   * < 0 .. every -1*`style'th frame skip to next frame
    * Loop:
    * true  .. after last frame animations starts over from the beginning
    * false .. after last frame the normal texture is shown

@@ -85,11 +85,11 @@ struct iConsoleOutput : public iBase
 {
   /**
    * Put some text to the console. Console acts like a simple
-   * TTY and should interpret basical symbols like '\n' and '\b'.
-   * The '\r' character has a special meaning: it sets a flag that
+   * TTY and should interpret basical symbols like '@\n' and '@\b'.
+   * The '@\r' character has a special meaning: it sets a flag that
    * tells console to clear the current line before next character
    * is output. That is, you can emmit non-persistent messages
-   * this way: PutText ("some text\r"); This message will disappear
+   * this way: PutText ("some text@\r"); This message will disappear
    * as soon as any other message will be sent to console.
    *
    * Remember that if you are not using the printf-style functionality, and

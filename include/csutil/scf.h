@@ -667,7 +667,7 @@ void* CS_EXPORTED_NAME(Class,_Create)(iBase *iParent)			\
  * Used in conjunction with SCF_REGISTER_STATIC_LIBRARY to ensure that a
  * reference to the class(s) registered via SCF_REGISTER_STATIC_LIBRARY are
  * actually linked into the application.  Invoke this macro once for each
- * <implementation> mentioned in the MetaInfo registered with
+ * \<implementation\> node mentioned in the MetaInfo registered with
  * SCF_REGISTER_STATIC_LIBRARY.  Invocations of this macro must appear after
  * the the invocation of SCF_REGISTER_STATIC_LIBRARY.
  */
@@ -1019,10 +1019,10 @@ struct iSCF : public iBase
 
   /**
    * Associate a factory function (the function which instantiates a class)
-   * with an implementation name (the value in the <implementation> node of the
-   * meta information; also the name of the iFactoryClass in RegisterClass).
-   * Returns true upon sucess, or false if the class does not exist or already
-   * has an associated creation function.
+   * with an implementation name (the value in the \<implementation\> node of
+   * the meta information; also the name of the iFactoryClass in
+   * RegisterClass).  Returns true upon sucess, or false if the class does not
+   * exist or already has an associated creation function.
    */
   virtual bool RegisterFactoryFunc (scfFactoryFunc, const char *FactClass) = 0;
 

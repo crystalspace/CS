@@ -49,11 +49,12 @@ CS_CSUTIL_EXPORT csLibraryHandle csLoadLibrary (char const* iName);
 /**
  * Return a pointer to a symbol within given shared library.
  * Note that generally Crystal Space needs just one exported symbol
- * from every shared library; the symbol is called <library>_scfInitialize.
+ * from every shared library; the symbol is called {library}_scfInitialize.
  * If your OS is short on features, you may implement querying of just
  * this symbol.
  */
-CS_CSUTIL_EXPORT void* csGetLibrarySymbol (csLibraryHandle Handle, char const* iName);
+CS_CSUTIL_EXPORT void* csGetLibrarySymbol (csLibraryHandle Handle,
+					   char const* iName);
 
 /**
  * Unload a shared library given its handle.

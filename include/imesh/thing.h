@@ -310,6 +310,7 @@ struct iThingFactoryState : public iBase
    * Set the name of all polygons in the given range.
    * \param range is one of the #CS_POLYRANGE defines to specify a polygon
    * range.
+   * \param name the name to be assigned to the indicated polygons.
    */
   virtual void SetPolygonName (const csPolygonRange& range,
   	const char* name) = 0;
@@ -337,6 +338,7 @@ struct iThingFactoryState : public iBase
    * Set the material of all polygons in the given range.
    * \param range is one of the #CS_POLYRANGE defines to specify a polygon
    * range.
+   * \param material the material to be assigned to the indicated polygons.
    */
   virtual void SetPolygonMaterial (const csPolygonRange& range,
   	iMaterialWrapper* material) = 0;
@@ -352,6 +354,7 @@ struct iThingFactoryState : public iBase
    * Add a vertex to all polygons in the given range.
    * \param range is one of the #CS_POLYRANGE defines to specify a polygon
    * range.
+   * \param vt the vertex index to be added to the polygons.
    */
   virtual void AddPolygonVertex (const csPolygonRange& range,
   	const csVector3& vt) = 0;
@@ -360,6 +363,7 @@ struct iThingFactoryState : public iBase
    * Add a vertex index to all polygons in the given range.
    * \param range is one of the #CS_POLYRANGE defines to specify a polygon
    * range.
+   * \param vt the vertex index to be added to the polygons.
    */
   virtual void AddPolygonVertex (const csPolygonRange& range, int vt) = 0;
 
@@ -368,6 +372,8 @@ struct iThingFactoryState : public iBase
    * It is more optimal to call this routine as opposed to calling
    * AddPolygonVertex() all the time.
    * \param range is one of the #CS_POLYRANGE defines to specify a polygon
+   * \param num number of entires in `indices'.
+   * \param indices polygon index table to be assigned to range.
    * range.
    */
   virtual void SetPolygonVertexIndices (const csPolygonRange& range,
@@ -384,6 +390,7 @@ struct iThingFactoryState : public iBase
    * Get a vertex from a polygon.
    * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last
    * created polygon.
+   * \param vertex_idx the desired vertex.
    */
   virtual const csVector3& GetPolygonVertex (int polygon_idx,
   	int vertex_idx) = 0;
@@ -402,6 +409,8 @@ struct iThingFactoryState : public iBase
    * to specify texture mapping like this. It is recommended to use one
    * of the other texture mapping routines.
    * \param range is one of the #CS_POLYRANGE defines to specify a polygon
+   * \param m the matrix which defines the mapping.
+   * \param v the vector which defines the mapping.
    * range.
    */
   virtual void SetPolygonTextureMapping (const csPolygonRange& range,
@@ -412,6 +421,9 @@ struct iThingFactoryState : public iBase
    * given uv coordinates for the first three vertices of every polygon.
    * \param range is one of the #CS_POLYRANGE defines to specify a polygon
    * range.
+   * \param uv1 uv coordinates for vertex 1.
+   * \param uv2 uv coordinates for vertex 2.
+   * \param uv3 uv coordinates for vertex 3.
    */
   virtual void SetPolygonTextureMapping (const csPolygonRange& range,
   	const csVector2& uv1, const csVector2& uv2, const csVector2& uv3) = 0;
@@ -423,6 +435,12 @@ struct iThingFactoryState : public iBase
    * the same plane.
    * \param range is one of the #CS_POLYRANGE defines to specify a polygon
    * range.
+   * \param p1 vertex 1.
+   * \param uv1 uv coordinates for vertex 1.
+   * \param p2 vertex 2.
+   * \param uv2 uv coordinates for vertex 2.
+   * \param p3 vertex 3.
+   * \param uv3 uv coordinates for vertex 3.
    */
   virtual void SetPolygonTextureMapping (const csPolygonRange& range,
   	const csVector3& p1, const csVector2& uv1,
@@ -435,15 +453,18 @@ struct iThingFactoryState : public iBase
    * first vertex is seen as the origin and the second as the u-axis of the
    * texture space coordinate system. The v-axis is calculated on the plane
    * of the polygons and orthogonal to the given u-axis. The length of the
-   * u-axis and the v-axis is given as the 'len1' parameter.
+   * u-axis and the v-axis is given as the 'len' parameter.
    * <p>
-   * For example, if 'len1' is equal to 2 this means that texture will be
-   * tiled exactly two times between vertex 'v_orig' and 'v1'.
+   * For example, if 'len' is equal to 2 this means that texture will be
+   * tiled exactly two times between vertex 'v_orig' and 'v'.
    * \param range is one of the #CS_POLYRANGE defines to specify a polygon
    * range.
+   * \param v_orig origin.
+   * \param v u-axis in texture space coordinate system.
+   * \param len length of u-axis.
    */
   virtual void SetPolygonTextureMapping (const csPolygonRange& range,
-  	const csVector3& v_orig, const csVector3& v1, float len1) = 0;
+  	const csVector3& v_orig, const csVector3& v, float len) = 0;
 
   /**
    * Set texture mapping of all polygons in the given range to use the
@@ -457,6 +478,11 @@ struct iThingFactoryState : public iBase
    * tiled exactly two times between vertex 'v_orig' and 'v1'.
    * \param range is one of the #CS_POLYRANGE defines to specify a polygon
    * range.
+   * \param v_orig origin.
+   * \param v1 u-axis in texture space coordinate system.
+   * \param len1 length of u-axis.
+   * \param v2 v-axis in texture space coordinate system.
+   * \param len2 length of v-axis.
    */
   virtual void SetPolygonTextureMapping (const csPolygonRange& range,
   	const csVector3& v_orig,
@@ -469,28 +495,34 @@ struct iThingFactoryState : public iBase
    * first vertex is seen as the origin and the second as the u-axis of the
    * texture space coordinate system. The v-axis is calculated on the plane
    * of the polygons and orthogonal to the given u-axis. The length of the
-   * u-axis and the v-axis is given as the 'len1' parameter.
+   * u-axis and the v-axis is given as the 'len' parameter.
    * <p>
    * For example, if 'len1' is equal to 2 this means that texture will be
    * tiled exactly two times between the two first vertices.
    * \param range is one of the #CS_POLYRANGE defines to specify a polygon
    * range.
+   * \param len length of the u-axis and the v-axis is given as the 'len1'
+   * parameter.
    */
   virtual void SetPolygonTextureMapping (const csPolygonRange& range,
-  	float len1) = 0;
+  	float len) = 0;
 
   /**
    * Get the texture space information for the specified polygon.
    * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last
    * created polygon.
+   * \param m the matrix which will receive the mapping.
+   * \param v the vector which will receive the mapping.
    */
   virtual void GetPolygonTextureMapping (int polygon_idx,
   	csMatrix3& m, csVector3& v) = 0;
 
   /**
-   * Disable or enable texture mapping for the range of polygons.
+   * Enable or disable texture mapping for the range of polygons.
    * \param range is one of the #CS_POLYRANGE defines to specify a polygon
    * range.
+   * \param enabled boolean flag indicating if mapping should be enabled or
+   * disabled.
    */
   virtual void SetPolygonTextureMappingEnabled (const csPolygonRange& range,
   	bool enabled) = 0;
@@ -506,6 +538,8 @@ struct iThingFactoryState : public iBase
    * Set the given flags to all polygons in the range.
    * \param range is one of the #CS_POLYRANGE defines to specify a polygon
    * range.
+   * \param flags a mask of the polygon flags, such as #CS_POLY_LIGHTING,
+   * #CS_POLY_COLLDET, etc.
    */
   virtual void SetPolygonFlags (const csPolygonRange& range, uint32 flags) = 0;
 
@@ -513,6 +547,11 @@ struct iThingFactoryState : public iBase
    * Set the given flags to all polygons in the range.
    * \param range is one of the #CS_POLYRANGE defines to specify a polygon
    * range.
+   * \param mask a mask of the polygon flags, such as #CS_POLY_LIGHTING,
+   * #CS_POLY_COLLDET, etc. Only the indicated bits from `flags' will be
+   * assigned.
+   * \param flags The set of bits to assign to the corresponding flags
+   * indicated by `mask'.
    */
   virtual void SetPolygonFlags (const csPolygonRange& range, uint32 mask,
   	uint32 flags) = 0;
@@ -521,6 +560,8 @@ struct iThingFactoryState : public iBase
    * Reset the given flags to all polygons in the range.
    * \param range is one of the #CS_POLYRANGE defines to specify a polygon
    * range.
+   * \param flags a mask of the polygon flags, such as #CS_POLY_LIGHTING,
+   * #CS_POLY_COLLDET, etc.
    */
   virtual void ResetPolygonFlags (const csPolygonRange& range,
   	uint32 flags) = 0;
@@ -551,6 +592,7 @@ struct iThingFactoryState : public iBase
    * the given polygon.
    * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last
    * created polygon.
+   * \param v the point in object space to test against the polygon.
    */
   virtual bool PointOnPolygon (int polygon_idx, const csVector3& v) = 0;
 

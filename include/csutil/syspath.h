@@ -178,6 +178,8 @@ public:
    * Add a path, but only if it isn't in the list already.
    * \param path Path to add to the list. 
    * \param scanRecursive Mark the path to be scanned recursively.
+   * \param type An arbitrary string assigning a type to the directory
+   *  (i.e. "app", "crystal", etc.).
    * \param overrideRecursive If the path is already in the list, just set
    *  the 'scan recursive' flag.
    * \return Index of path in the list.

@@ -231,7 +231,7 @@ struct iAwsKeyContainer : public iAwsKey
 
 SCF_VERSION(iAwsComponentNode, 0, 0, 1);
 
-/// @@@Document me!
+/// Document me!@@@
 struct iAwsComponentNode : public iAwsKeyContainer
 {
   /// So that we can find out what sort of component type this should be

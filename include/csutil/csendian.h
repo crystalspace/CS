@@ -20,11 +20,9 @@
 #define __CS_CSENDIAN_H__
 
 /**\file
+ * Helpers for dealing with endian conversions.
  */
 /**\addtogroup util
- * @{
- */
-/**\name Helpers for dealing with endianness
  * @{
  */
 
@@ -79,9 +77,9 @@ static inline uint16 big_endian_short (uint16 s)
 { return uint16((s >> 8) | (s << 8)); }
 
 /// Convert a big-endian floating-point number to machine format
-//@@WARNING: Should be removed -- use float2long instead
 static inline float big_endian_float (float f)
 {
+  //@@WARNING: Should be removed -- use float2long instead
   unsigned char tmp;
   csEndianSwap4 *pf = (csEndianSwap4 *)&f;
   tmp = pf->b1; pf->b1 = pf->b4; pf->b4 = tmp;
@@ -203,13 +201,14 @@ static inline double longlong2double (int64 i)
   return ldexp (mant, exp);
 }
 
-/**
+/**\name Floating point conversions.
  * The following routines are used for converting floating-point numbers
  * into 16-bit shorts and back. This is useful for low-precision data.
  * They use the 1.4.12 format. The range of numbers that can be represented
  * in this format is from 2^-8 to 2^7. The precision for numbers near to
  * 2^-8 (0.00390625) is near 0.000001, for numbers near 2^7 (128) is near 0.03.
- * @{ */
+ */
+/** @{ */
 
 /// Convert a float to a cross-platform 16-bit format (no endianess adjustments!)
 static inline short float2short (float f)
@@ -321,8 +320,6 @@ inline void set_le_float32 (void *buff, float f)
 /// Set a little-endian 16-bit float on a address
 inline void set_le_float16 (void *buff, float f)
 { set_le_short (buff, float2short (f)); }
-
-/** @} */
 
 /** @} */
 

@@ -159,23 +159,23 @@ public:
    * Test collision between one collider and an array of colliders.
    * This function is mainly used by CollidePath() below.
    * \param colsys is the collider system.
-   * \param collider is the collider of the object that we are going
-   * to move along the path.
+   * \param collider is the collider of the object that we are going to move
+   *        along the path.
    * \param trans is the transform of that object (see Collide()).
-   * \param newpos is the new position of that object.
-   * \param num_colliders is the number of colliders that we are going
-   * to use to collide with.
-   * \param colliders is an array of colliders. Typically you can obtain
-   * such a list by doing iEngine->GetNearbyMeshes() and then getting
-   * the colliders from all meshes you get (possibly using csColliderWrapper).
-   * Note that it is safe to have 'collider' sitting in this list. This
-   * function will ignore that collider.
-   * \param transforms is an array of transforms that belong with the
-   * array of colliders.
+   * \param num_colliders is the number of colliders that we are going * to use
+   *        to collide with.
+   * \param colliders is an array of colliders. Typically you can obtain * such
+   *        a list by doing iEngine->GetNearbyMeshes() and then getting * the
+   *        colliders from all meshes you get (possibly using
+   *        csColliderWrapper).  * Note that it is safe to have 'collider'
+   *        sitting in this list. This * function will ignore that collider.
+   * \param transforms is an array of transforms that belong with the * array
+   *        of colliders.
    */
   static bool CollideArray (
 	iCollideSystem* colsys,
-	iCollider* collider, const csReversibleTransform* trans,
+	iCollider* collider,
+	const csReversibleTransform* trans,
   	int num_colliders,
 	iCollider** colliders,
 	csReversibleTransform **transforms);

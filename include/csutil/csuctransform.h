@@ -159,7 +159,7 @@ public:
   
   /**
    * Decode an Unicode character encoded in UTF-16.
-   * \copydoc UTF8Decode()
+   * \copydoc UTF8Decode(const utf8_char*,size_t,utf32_char&,bool*)
    */
   inline static int UTF16Decode (const utf16_char* str, size_t strlen, 
     utf32_char& ch, bool* isValid = 0)
@@ -204,7 +204,7 @@ public:
   
   /**
    * Decode an Unicode character encoded in UTF-32.
-   * \copydoc UTF8Decode()
+   * \copydoc UTF8Decode(const utf8_char*,size_t,utf32_char&,bool*)
    */
   inline static int UTF32Decode (const utf32_char* str, size_t strlen, 
     utf32_char& ch, bool* isValid = 0)
@@ -299,7 +299,7 @@ public:
     
   /**
    * Encode an Unicode character to UTF-16.
-   * \copydoc EncodeUTF8()
+   * \copydoc EncodeUTF8(const utf32_char,utf8_char*,bufsize)
    */
   inline static int EncodeUTF16 (const utf32_char ch, utf16_char* buf, 
     size_t bufsize)
@@ -326,7 +326,7 @@ public:
 
   /**
    * Encode an Unicode character to UTF-32.
-   * \copydoc EncodeUTF8()
+   * \copydoc EncodeUTF8(const utf32_char,utf8_char*,bufsize)
    */
   inline static int EncodeUTF32 (const utf32_char ch, utf32_char* buf, 
     size_t bufsize)
@@ -416,29 +416,29 @@ public:
   UCTF_CONVERTER (UTF8to16, utf8_char, UTF8Decode, utf16_char, EncodeUTF16);
   /**
    * Convert UTF-8 to UTF-32.
-   * \copydoc UTF8to16()
+   * \copydoc UTF8to16(utf16_char*,size_t,const utf8_char*,size_t)
    */
   UCTF_CONVERTER (UTF8to32, utf8_char, UTF8Decode, utf32_char, EncodeUTF32);
 
   /**
    * Convert UTF-16 to UTF-8.
-   * \copydoc UTF8to16()
+   * \copydoc UTF8to16(utf16_char*,size_t,const utf8_char*,size_t)
    */
   UCTF_CONVERTER (UTF16to8, utf16_char, UTF16Decode, utf8_char, EncodeUTF8);
   /**
    * Convert UTF-16 to UTF-32.
-   * \copydoc UTF8to16()
+   * \copydoc UTF8to16(utf16_char*,size_t,const utf8_char*,size_t)
    */
   UCTF_CONVERTER (UTF16to32, utf16_char, UTF16Decode, utf32_char, EncodeUTF32);
   
   /**
    * Convert UTF-32 to UTF-8.
-   * \copydoc UTF8to16()
+   * \copydoc UTF8to16(utf16_char*,size_t,const utf8_char*,size_t)
    */
   UCTF_CONVERTER (UTF32to8, utf32_char, UTF32Decode, utf8_char, EncodeUTF8);
   /**
    * Convert UTF-32 to UTF-16.
-   * \copydoc UTF8to16()
+   * \copydoc UTF8to16(utf16_char*,size_t,const utf8_char*,size_t)
    */
   UCTF_CONVERTER (UTF32to16, utf32_char, UTF32Decode, utf16_char, EncodeUTF16);
   /** @} */
@@ -516,7 +516,7 @@ public:
    * @{ */
   /**
    * Convert UTF-8 to platform-specific wide chars.
-   * \copydoc UTF8to16()
+   * \copydoc UTF8to16(utf16_char*,size_t,const utf8_char*,size_t)
    */
   inline static size_t UTF8toWC (wchar_t* dest, size_t destSize, 
     const utf8_char* source, size_t srcSize)
@@ -526,7 +526,7 @@ public:
 
   /**
    * Convert UTF-16 to platform-specific wide chars.
-   * \copydoc UTF8toWC()
+   * \copydoc UTF8toWC(wchar_t*,size_t,utf8_char*,size_t)
    */
   inline static size_t UTF16toWC (wchar_t* dest, size_t destSize, 
     const utf16_char* source, size_t srcSize)
@@ -549,7 +549,7 @@ public:
 
   /**
    * Convert UTF-32 to platform-specific wide chars.
-   * \copydoc UTF8toWC()
+   * \copydoc UTF8toWC(wchar_t*,size_t,utf8_char*,size_t)
    */
   inline static size_t UTF32toWC (wchar_t* dest, size_t destSize, 
     const utf32_char* source, size_t srcSize)
@@ -559,7 +559,7 @@ public:
   
   /**
    * Convert platform-specific wide chars to UTF-8.
-   * \copydoc UTF8toWC()
+   * \copydoc UTF8toWC(wchar_t*,size_t,utf8_char*,size_t)
    */
   inline static size_t WCtoUTF8 (utf8_char* dest, size_t destSize, 
     const wchar_t* source, size_t srcSize)
@@ -569,7 +569,7 @@ public:
 
   /**
    * Convert platform-specific wide chars to UTF-16.
-   * \copydoc UTF8toWC()
+   * \copydoc UTF8toWC(wchar_t*,size_t,utf8_char*,size_t)
    */
   inline static size_t WCtoUTF16 (utf16_char* dest, size_t destSize, 
     const wchar_t* source, size_t srcSize)
@@ -592,7 +592,7 @@ public:
 
   /**
    * Convert platform-specific wide chars to UTF-32.
-   * \copydoc UTF8toWC()
+   * \copydoc UTF8toWC(wchar_t*,size_t,utf8_char*,size_t)
    */
   inline static size_t WCtoUTF32 (utf32_char* dest, size_t destSize, 
     const wchar_t* source, size_t srcSize)
@@ -744,7 +744,7 @@ public:
   /**
    * Determine how many characters in an UTF-16 buffer need to be skipped to 
    * get to the next encoded char.
-   * \copydoc UTF8Skip()
+   * \copydoc UTF8Skip(const utf8_char*,size_t)
    */
   inline static int UTF16Skip (const utf16_char* str, size_t maxSkip)
   {
@@ -757,7 +757,7 @@ public:
   /**
    * Determine how many characters in an UTF-16 buffer need to skipped back to
    * get to the start of the previous encoded character.
-   * \copydoc UTF8Rewind()
+   * \copydoc UTF8Rewind(const utf8_char*,size_t)
    */
   inline static int UTF16Rewind (const utf16_char* str, size_t maxRew)
   {
@@ -778,7 +778,7 @@ public:
   /**
    * Determine how many characters in an UTF-32 buffer need to be skipped to 
    * get to the next encoded char.
-   * \copydoc UTF8Skip()
+   * \copydoc UTF8Skip(const utf8_char*,size_t)
    */
   inline static int UTF32Skip (const utf32_char* str, size_t maxSkip)
   {
@@ -788,7 +788,7 @@ public:
   /**
    * Determine how many characters in an UTF-32 buffer need to skipped back to
    * get to the start of the previous encoded character.
-   * \copydoc UTF8Rewind()
+   * \copydoc UTF8Rewind(const utf8_char*,size_t)
    */
   inline static int UTF32Rewind (const utf32_char* str, size_t maxRew)
   {
