@@ -32,6 +32,11 @@ The history order is reversed so that new features are at the top.
 	  on SCF_REGISTER_STATIC_LIBRARY().
 	- Eric Sunshine fixed 3dsout.cpp so that it now emits `CULLER' rather
 	  than the obsolete `STATBSP' keyword.
+	- Eric Sunshine repaired some Texinfo mark-up problems which were
+	  introduced into apimod19.txi.  Also rewrote some of the newly added
+	  discussion and repaired several `overfull hbox' warnings reported by
+	  TeX.
+	- Eric Sunshine removed the now obsolete data/config/MazeD.cfg,
 25-Jun-2001
 	- Added iBase::GetRefCount(). This way you can now get the reference
 	  counter from any SCF interface. Note that this is ONLY for debugging

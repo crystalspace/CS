@@ -640,14 +640,6 @@ iSystem* sys = @dots{};
 iVFS* vfs = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_VFS, iVFS);
 @end example
 
-@subheading @code{csEngine::NextFrame()} removed
-@cindex @code{csEngine::NextFrame()}
-@cindex @code{iEngine::NextFrame()}
-
-@code{csEngine::NextFrame()} and @code{iEngine::NextFrame()} are removed.
-This is now done automatically in @code{csEngine::Draw()} and it is no
-longer needed to manually call it.
-
 @subheading @sc{ddg} Terrain Engine Removed
 @cindex @sc{ddg} Terrain Engine
 
@@ -655,9 +647,9 @@ The @sc{ddg} landscape engine which used to be featured in Crystal Space has
 been removed and was replaced with a simpler landscape engine, but one which is
 better integrated with the project.
 
-@subheading @sc{csws} Modal Changes
+@subheading @sc{csws} Modal Session Paradigm Shift
 @cindex @sc{csws}
-@cindex @code{csMessageBox}
+@cindex @code{csMessageBox()}
 @cindex @code{csApp::Execute()}
 @cindex @code{csApp::StartModal()}
 @cindex @code{csApp::StopModal()}
@@ -665,36 +657,40 @@ better integrated with the project.
 @cindex @code{csApp::GetTopModalComponent()}
 @cindex @code{iMessageBoxData}
 
-@code{csApp::Execute()} has been removed. This code enabled a modal way
-of using dialogs. @code{Execute()} would only return when the dialog was
-finished. Instead of @code{Execute()} there is now @code{csApp::StartModal()}
-and @code{csApp::StopModal()}. @code{StartModal()} will set up modality
-for the given component but it will return immediatelly. From the perspective
-of the GUI user the component behaves modal but from the perspective of
-the application programmer it is not. Instead the application will have
-to wait for the command (event type @code{csevCommand}) @code{cscmdStopModal}
-which will be called (to @code{csApp::HandleEvent()}) when the component
-finishes modality (i.e. ok or cancel is pressed in many cases).
+@code{csApp::Execute()} has been removed.  This method ran a modal session for
+dialog panels, and would only return control to the caller when the dialog was
+dismissed.  As a replacement for @code{Execute()}, @code{csApp::StartModal()}
+and @code{csApp::StopModal()} have been introduced.  @code{StartModal()} sets
+up modality for the given component and then immediatelly returns to the
+caller.  From the perspective of the @sc{gui} user the component behaves in the
+standard modal fashion, but from the perspective of the application programmer
+this represents a paradigm shift since the application must now watch events
+arriving in its @code{csApp::HandleEvent()} method in order to determine when
+the modal session has terminated.  Notification arrives in the form of a
+@samp{csevCommand} event with command code @code{cscmdStopModal}.  This is sent
+when then component's modal session terminates, such as when the ``@sc{ok}'' or
+``Cancel'' button is pressed.
 
-With @code{StartModal()} you can give userdata (which is an @sc{scf} interface
-that you can implement on your own). That userdata will be available
-to the event handler (while processing @code{cscmdStopModal}) through
-the function @code{csApp::GetTopModalUserdata()}. The modal component can
-be retrieved with @code{csApp::GetTopModalComponent()}. The
-@code{Event.Command.Info} field will be an integer containing the ID of
-the pressed button (i.e. @code{cscmdOK}, @code{cscmdCancel}, ...).
+With @code{StartModal()} you can provide a @dfn{userdata} argument (which is an
+@sc{scf} interface that you can implement on your own).  The userdata will be
+available at any time while the modal session is active by calling
+@code{csApp::GetTopModalUserdata()}.  The modal component can be retrieved with
+@code{csApp::GetTopModalComponent()}.  The @samp{Event.Command.Info} field will
+be an integer containing the @sc{id} of the pressed button (i.e.
+@code{cscmdOK}, @code{cscmdCancel}, etc.).
 
-A related change has happened with @code{csMessageBox()}. It also returns
-immediatelly now. It will send a simmilar message to the application when
-it is closed (ok or cancel). The userdata will implement @code{iMessageBoxData}
-so you can use @code{SCF_QUERY_INTERFACE} to check if it does.
+A related change was made to @code{csMessageBox()}.  It also now returns
+immediatelly.  It nows sends a similar message to the application when the
+message box is closed (via ``@sc{ok}'' or ``Cancel'').  In this case, the
+userdata object will implement the @sc{scf} interface @code{iMessageBoxData},
+so you can use @code{SCF_QUERY_INTERFACE()} to check for this.
 
-Here is an example on how to define your own data to do the processing.
+Here is an example on how to define your own userdata object.
 
 @example
 struct ModalData : public iBase
 @{
-  @dots{}  // Some data...
+  @dots{}
   SCF_DECLARE_IBASE;
   ModalData ()
   @{
@@ -712,13 +708,26 @@ bool MyApp::HandleEvent (iEvent &Event)
     case csevCommand:
       switch (Event.Command.Code)
       @{
+	case APP_OPEN_FILE:
+	@{ // Allow user to select a file with csFileDialog.
+          csWindow* d = csFileDialog (this, "test file dialog");
+	  ModalData* data = new ModalData ();
+	  @dots{}
+	  StartModal (d, data);
+	  data->DecRef ();
+          return true;
+	@}
         case cscmdStopModal:
 	@{
 	  csComponent* d = GetTopModalComponent ();
 	  int rc = (int)Event.Command.Info;
-	  if (rc == 0 || rc == cscmdCancel) { delete d; return true; }
-	  iMessageBoxData* mbd = SCF_QUERY_INTERFACE (GetTopModalUserdata (),
-	  	iMessageBoxData);
+	  if (rc == 0 || rc == cscmdCancel)
+	  @{
+	    delete d;
+	    return true;
+	  @}
+	  iMessageBoxData* mbd =
+	    SCF_QUERY_INTERFACE (d, iMessageBoxData);
 	  if (mbd)
 	  @{
 	    mbd->DecRef ();
@@ -726,17 +735,8 @@ bool MyApp::HandleEvent (iEvent &Event)
 	    return true;
 	  @}
 	  ModalData* md = (ModalData*)GetTopModalUserdata ();
-	  @dots{}
+	  @dots{} // csFileDialog was closed.
 	  return true;
-	@}
-	case CODE:
-	@{
-          csWindow* d = csFileDialog (this, "test file dialog");
-	  ModalData* data = new ModalData ();
-	  @dots{}
-	  StartModal (d, data);
-	  data->DecRef ();
-          return true;
 	@}
 	@dots{}
 @}
@@ -745,6 +745,11 @@ bool MyApp::HandleEvent (iEvent &Event)
 @subheading Miscellaneous Changes
 @cindex @code{iPortal}
 @cindex @code{csMeshWrapper}
+@cindex @code{csEngine::NextFrame()}
+@cindex @code{iEngine::NextFrame()}
+
+@code{csEngine::NextFrame()} and @code{iEngine::NextFrame()} are removed.
+This is now done automatically in @code{csEngine::Draw()}.
 
 Renamed @code{iPortal::GetPortal()} to @code{GetSector()} and
 @code{iPortal::SetPortal()} to @code{SetSector()}.
