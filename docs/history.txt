@@ -36,6 +36,8 @@ chronological order.
 	- Jorrit added a random value to the pause between setup of polygon
 	  mesh and cleanup (in thing plugin). That way the load of cleaning
 	  up all polygon meshes will be spread in time.
+	- Eric Sunshine fixed a bug in cs-config where the value of
+	  $(LIB.EXE.PLATFORMS) was not emitted by cs-config's --libs option.
 30-Sep-2003
 	- Jorrit fixed a bug in thing polygon mesh helper where it would not
 	  clean up old data if the thing changes and at the same time the

@@ -90,7 +90,7 @@ $(CSCONFIG.EXE): $(CSCONFIG.DEP)
 	@echo $"if test -r "$${prefix}/lib"; then$"	>> cs-config
 	@echo $"  libdir="$${prefix}/lib"$"		>> cs-config
 	@echo $"fi$"					>> cs-config
-	@echo $"syslibs="$(LIBS.EXE) $(LFLAGS.GENERAL)"$" >> cs-config
+	@echo $"syslibs="$(LIBS.EXE) $(LIBS.EXE.PLATFORM) $(LFLAGS.GENERAL)"$" >> cs-config
 	@echo $"common_cflags="$(CFLAGS)"$"		>> cs-config
 	@echo $"common_cxxflags="$(CFLAGS)"$"		>> cs-config
 	@echo $"$"					>> cs-config
