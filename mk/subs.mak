@@ -13,6 +13,9 @@ ifneq ($(LIBRARY_SUBMAKEFILES),)
 endif
 
 ifeq ($(PLUGINS_SUBMAKEFILES),)
+  ifeq ($(USE_SHARED_PLUGINS),yes)
+    PLUGINS += $(PLUGINS.DYNAMIC)
+  endif
   PLUGINS_SUBMAKEFILES=$(wildcard $(addsuffix /*.mak,$(addprefix plugins/,$(sort $(PLUGINS)))))
 endif
 ifneq ($(PLUGINS_SUBMAKEFILES),)
