@@ -5,6 +5,9 @@ The history order has been reversed so that new features are at the top.
 	  the iLoader interface and renamed iLoaderNew to iLoader.
 	- Martin also made the csparser stats counter a non-static member
 	  of csloader
+	- Martin added a parameter to the Delete(), Replace() and
+	  DeleteAll() functions of csVector that lets you choose whether
+	  to free the deleted element.
 	- Philip Wyett did the following:
 	  Brought VC6 port into the new millennium by updating png lib
 	  used from 1.0.0.2 to 1.0.1.0. This update offers many little
@@ -34,6 +37,8 @@ The history order has been reversed so that new features are at the top.
 	  terrain almost four to five times faster on a GeForce. This
 	  is still not the best solution. The best solution is that the
 	  hardware itself performs the clipping somehow (stencil?).
+	- Philip Wyett did a minor update to win32.txi.
+	- Richard D. Shank did a minor update to win32.txi.
 14-Apr-2001
 	- Philip Wyett added 'include imap/parser.h" and fixed many
 	  of a slew of compiler errors in the app. App is
