@@ -20,9 +20,9 @@ if ! [ Property build : projgen ]
 
     # Construct a rule for copying the generated sources from Bison and Flex
     # into the source directories.
-    FILES = skinpars.cpp skinpars.hpp skinlex.cpp ;
-    FILES = $(FILES:G=awsfreeze) ;
-    for i in $(FILES)
+    FREEZEFILES = skinpars.cpp skinpars.hpp skinlex.cpp ;
+    FREEZEFILES = $(FREEZEFILES:G=awsfreeze) ;
+    for i in $(FREEZEFILES)
     {
       SEARCH on $(i) = $(LOCATE_TARGET) ;
       local targetfile = $(i:D=$(SUBDIR)) ;

@@ -14,6 +14,14 @@ chronological order.
 	  account new Python.framework in MacOS/X 10.3.
 	- Eric Sunshine fixed bug in csPerl5::Init() where it was using the
 	  unreliable VFS /this/scripts directory to initialize the interpreter.
+	- Wouter Wijngaards changed plugins/aws/Jamfile. The section where
+	  the awsfreeze rule is generated was using the FILES variable,
+	  however, this variable was already being used for holding the
+	  files for the Plugin rule. By overwriting the FILES variable with
+	  only the files needed for awsfreeze, the main target was caused
+	  to compile only skinlex and skinpars. All other aws*cpp files were
+	  not compiled. To fix this, replaced FILES with FREEZEFILES for
+	  the awsfreeze rule construction (but not for the main plugin rule).
 24-Apr-2004
 	- Jorrit fixed a compile bug in glshader_fixed. 'friend' needs
 	  'struct'.
