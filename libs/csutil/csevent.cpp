@@ -80,8 +80,9 @@ csEvent::csEvent (csTicks iTime, int eType, int cCode, void *cInfo)
     Flags = CSEF_BROADCAST;
 }
 
-csEvent::csEvent (csEvent const& e)
+csEvent::csEvent (csEvent const& e) : iEvent()
 {
+  SCF_CONSTRUCT_IBASE (NULL);
   Type = e.Type;
   Category = e.Category;
   SubCategory = e.SubCategory;
