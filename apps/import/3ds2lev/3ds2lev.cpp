@@ -43,6 +43,7 @@ enum
 {
   FLAG_VERBOSE	= 0x0001,
   FLAG_LIST     = 0x0002,    /* List all objects in this 3ds     */
+  FLAG_SPRITE	= 0x0004
 };
 
 enum xyzmode
@@ -162,7 +163,8 @@ void Lib3dsConvertXYZ (Lib3dsFile* p3dsFile, xyzmode mode)
  */
 int main (int argc, char * argv[])
 {
-  char * infn=0, * outfn=0;
+  char* infn=0, *outfn=0;
+  char* spritename=0;
   float xscale = 1, yscale = 1, zscale = 1;
   float xrelocate = 0, yrelocate = 0, zrelocate = 0;
   xyzmode mode_xyz = MODE_XZY;
@@ -264,7 +266,14 @@ int main (int argc, char * argv[])
 	    writer.SetFlags (LevelWriter::FLAG_SWAP_V);
 	  break;
 	case '3':
-	  writer.SetFlags (LevelWriter::FLAG_SPRITE);
+	  if (n+1<argc)
+	    spritename=argv[++n];
+	  else
+	  {
+      	    fprintf (stderr, "Missing sprite name!\n");
+	    return 1;
+	  }
+	  flags |= FLAG_SPRITE;
 	  break;
 	case 'L':
 	  flags |= FLAG_LIST;
@@ -345,7 +354,7 @@ int main (int argc, char * argv[])
         // get the numbers in the current mesh
         fprintf(stderr, "===================================================\n");
         fprintf(stderr, "%-14s  %5ld  %5ld  %5d    %s\n",
-              mesh->name, mesh->faces, mesh->points, -1, " ");
+	    mesh->name, mesh->faces, mesh->points, -1, " ");
     }
 
     exit(0);
@@ -359,7 +368,12 @@ int main (int argc, char * argv[])
   if (flags & FLAG_VERBOSE)
     fprintf (stderr, "Writing output in CS format...");
   
-  csRef<iDocument> document = writer.WriteDocument ();
+  csRef<iDocument> document;
+  if (flags & FLAG_SPRITE)
+    document = writer.WriteSprite(spritename);
+  else
+    document = writer.WriteDocument();
+  
   iString* str = new scfString;
   document->Write (str);
   

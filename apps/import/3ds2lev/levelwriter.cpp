@@ -76,56 +76,49 @@ csPtr<iDocument> LevelWriter::WriteDocument ()
   csRef<iDocument> document = xml->CreateDocument();
   csRef<iDocumentNode> rootnode = document->CreateRoot ();
 
-  if (! (flags & FLAG_SPRITE))
-  {
-    // Generate a normal world file
-    csRef<iDocumentNode> worldnode = 
-      rootnode->CreateNodeBefore (CS_NODE_ELEMENT);
-    worldnode->SetValue ("world");
+  // Generate a normal world file
+  csRef<iDocumentNode> worldnode = 
+    rootnode->CreateNodeBefore (CS_NODE_ELEMENT);
+  worldnode->SetValue ("world");
     
-    WriteTexturesMaterials (worldnode);
-    WritePlugins (worldnode);
-    WriteStartPoints (worldnode);
+  WriteTexturesMaterials (worldnode);
+  WritePlugins (worldnode);
+  WriteStartPoints (worldnode);
 
-    csRef<iDocumentNode> sectornode = 
-      worldnode->CreateNodeBefore (CS_NODE_ELEMENT);
-    sectornode->SetValue ("sector");
-    sectornode->SetAttribute ("name", "room");
+  csRef<iDocumentNode> sectornode = 
+    worldnode->CreateNodeBefore (CS_NODE_ELEMENT);
+  sectornode->SetValue ("sector");
+  sectornode->SetAttribute ("name", "room");
 
-    // use dynavis culler
-    csRef<iDocumentNode> cullerpnode =
-      sectornode->CreateNodeBefore (CS_NODE_ELEMENT);
-    cullerpnode->SetValue ("cullerp");
-    csRef<iDocumentNode> textnode =
-      cullerpnode->CreateNodeBefore (CS_NODE_TEXT);
-    textnode->SetValue ("crystalspace.culling.dynavis");
+  // use dynavis culler
+  csRef<iDocumentNode> cullerpnode =
+    sectornode->CreateNodeBefore (CS_NODE_ELEMENT);
+  cullerpnode->SetValue ("cullerp");
+  csRef<iDocumentNode> textnode =
+    cullerpnode->CreateNodeBefore (CS_NODE_TEXT);
+  textnode->SetValue ("crystalspace.culling.dynavis");
     
-    WriteObjects (sectornode);
-    WriteLights (sectornode);
+  WriteObjects (sectornode);
+  WriteLights (sectornode);
 
-    // create settings section
-    csRef<iDocumentNode> settingsnode =
-	worldnode->CreateNodeBefore(CS_NODE_ELEMENT);
-    settingsnode->SetValue ("settings");
+  // create settings section
+  csRef<iDocumentNode> settingsnode =
+    worldnode->CreateNodeBefore(CS_NODE_ELEMENT);
+  settingsnode->SetValue ("settings");
 
-    if (flags & FLAG_CLEARZBUFCLEARSCREEN)
-    {
-      csRef<iDocumentNode> clearzbuf =
-	settingsnode->CreateNodeBefore (CS_NODE_ELEMENT);
-      clearzbuf->SetValue ("clearzbuf");
-      textnode = clearzbuf->CreateNodeBefore (CS_NODE_TEXT);
-      textnode->SetValue ("yes");
-
-      csRef<iDocumentNode> clearscreen =
-	settingsnode->CreateNodeBefore (CS_NODE_ELEMENT);
-      clearscreen->SetValue ("clearscreen");
-      textnode = clearscreen->CreateNodeBefore (CS_NODE_TEXT);
-      textnode->SetValue ("yes");
-    }
-  }
-  else
+  if (flags & FLAG_CLEARZBUFCLEARSCREEN)
   {
-    WriteSprite (rootnode);
+    csRef<iDocumentNode> clearzbuf =
+      settingsnode->CreateNodeBefore (CS_NODE_ELEMENT);
+    clearzbuf->SetValue ("clearzbuf");
+    textnode = clearzbuf->CreateNodeBefore (CS_NODE_TEXT);
+    textnode->SetValue ("yes");
+
+    csRef<iDocumentNode> clearscreen =
+      settingsnode->CreateNodeBefore (CS_NODE_ELEMENT);
+    clearscreen->SetValue ("clearscreen");
+    textnode = clearscreen->CreateNodeBefore (CS_NODE_TEXT);
+    textnode->SetValue ("yes");
   }
 
   return csPtr<iDocument> (document);
@@ -200,9 +193,6 @@ void LevelWriter::WriteTexturesMaterials (iDocumentNode* worldnode)
 
 void LevelWriter::WritePlugins (iDocumentNode* worldnode)
 {
-  if (flags & FLAG_SPRITE)
-    return;
-
   csRef<iDocumentNode> pluginsnode = 
     worldnode->CreateNodeBefore (CS_NODE_ELEMENT);
   pluginsnode->SetValue("plugins");
@@ -291,9 +281,10 @@ void LevelWriter::WriteLights (iDocumentNode* sectornode)
   }
 }
 
-void LevelWriter::WriteVertices (iDocumentNode* paramsnode, Lib3dsMesh* mesh)
+void LevelWriter::WriteVertices (iDocumentNode* paramsnode, Lib3dsMesh* mesh,
+				 bool writesprite)
 {
-  if (flags & FLAG_SPRITE)
+  if (writesprite)
   {
     for (unsigned int vn = 0; vn < mesh->points; vn++)
     {
@@ -524,9 +515,10 @@ pointfound:
 
 // lighting=flase creates polygon lit with full bright texture colours
 void LevelWriter::WriteFaces(iDocumentNode* paramsnode, 
-    Lib3dsMesh* mesh, bool lighting, unsigned int numMesh)
+    Lib3dsMesh* mesh, bool lighting, unsigned int numMesh,
+    bool writesprite)
 {
-  if (flags & FLAG_SPRITE)
+  if (writesprite)
   {
     for (unsigned int f = 0; f < mesh->faces; f++)
     {
@@ -700,11 +692,14 @@ void LevelWriter::WriteFaces(iDocumentNode* paramsnode,
   }
 }
 
-void LevelWriter::WriteSprite (iDocumentNode* rootnode)
+csPtr<iDocument> LevelWriter::WriteSprite (const char* spritename)
 {
-  Lib3dsMesh* mesh = p3dsFile->meshes;
+  Lib3dsMesh* mesh = lib3ds_file_mesh_by_name(p3dsFile, spritename);
   if (!mesh)
-    return;
+    return 0;
+
+  csRef<iDocument> document = xml->CreateDocument();
+  csRef<iDocumentNode> rootnode = document->CreateRoot ();  
   
   // Generate a sprite file
   csRef<iDocumentNode> meshfactnode =
@@ -735,9 +730,9 @@ void LevelWriter::WriteSprite (iDocumentNode* rootnode)
   framenode->SetValue ("frame");
   framenode->SetAttribute ("name", "f1");
 
-  WriteVertices (framenode, mesh);
+  WriteVertices (framenode, mesh, true);
 
-  WriteFaces (paramsnode, mesh, false, 0);
+  WriteFaces (paramsnode, mesh, false, 0, true);
 
   csRef<iDocumentNode> actionnode =
     paramsnode->CreateNodeBefore (CS_NODE_ELEMENT);
@@ -748,6 +743,8 @@ void LevelWriter::WriteSprite (iDocumentNode* rootnode)
   fnode->SetValue ("f");
   fnode->SetAttribute ("name", "f1");
   fnode->SetAttributeAsInt ("delay", 1000);
+
+  return csPtr<iDocument> (document);
 }
 
 /**

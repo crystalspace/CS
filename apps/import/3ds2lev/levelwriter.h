@@ -46,7 +46,6 @@ public:
   {
     FLAG_VERBOSE  = 0x0001,
     FLAG_LIGHTING = 0x0002,
-    FLAG_SPRITE	  = 0x0008,
     FLAG_SWAP_V	  = 0x0010,
     FLAG_COMBINEFACES = 0x0020,
     FLAG_REMOVEDOUBLEVERTICES = 0x0040,
@@ -59,8 +58,7 @@ public:
   void Set3dsFile (Lib3dsFile* file3ds);
   void SetFlags (int flags);
   csPtr<iDocument> WriteDocument ();
-
-  void WriteSprite (iDocumentNode* rootnode);
+  csPtr<iDocument> WriteSprite (const char* name);
   
   void WriteTexturesMaterials (iDocumentNode* worldnode);
   void WritePlugins (iDocumentNode* worldnode);
@@ -69,9 +67,11 @@ public:
   void WriteObjects (iDocumentNode* sectornore);
   void WriteLights (iDocumentNode* sectornode);
   
-  void WriteVertices (iDocumentNode* paramsnode, Lib3dsMesh* mesh);
+  void WriteVertices (iDocumentNode* paramsnode, Lib3dsMesh* mesh,
+		      bool writesprite = false);
   void WriteFaces (iDocumentNode* paramsnode, Lib3dsMesh* mesh,
-		   bool lighting, unsigned int numMesh);
+		   bool lighting, unsigned int numMesh,
+		   bool writesprite = false);
 
   void SetScale(float x, float y, float z);
   void SetTranslate(float x, float y, float z);
