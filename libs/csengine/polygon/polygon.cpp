@@ -571,9 +571,7 @@ void csPolygon3D::SplitWithPlane (
       if (sideA < 0)
       {
         // Compute the intersection point of the line
-
         // from point A to point B with the partition
-
         // plane. This is a simple ray-plane intersection.
         csVector3 v = ptB;
         v -= ptA;
@@ -592,9 +590,7 @@ void csPolygon3D::SplitWithPlane (
       if (sideA > 0)
       {
         // Compute the intersection point of the line
-
         // from point A to point B with the partition
-
         // plane. This is a simple ray-plane intersection.
         csVector3 v = ptB;
         v -= ptA;
@@ -619,9 +615,7 @@ void csPolygon3D::SplitWithPlane (
   }
 
   //@@@ Not needed?
-
   //np1->Finish ();
-
   //np2->Finish ();
 }
 
@@ -631,19 +625,12 @@ bool csPolygon3D::Overlaps (csPolygonInt *overlapped)
   csPolygon3D *totest = (csPolygon3D *)overlapped;
 
   // Algorithm: if any of the vertices of the 'totest' polygon
-
   // is facing away from the front of this polygon (i.e. the vertex
-
   // cannot see this polygon) then there is a chance that this polygon
-
   // overlaps the other. If this is not the case then we can return false
-
   // already. Otherwise we have to see that the 'totest' polygon is
-
   // itself not facing away from this polygon. To test that we see if
-
   // there is a vertex of this polygon that is in front of the 'totest'
-
   // polygon. If that is the case then we return true.
   csPlane3 &this_plane = plane->GetObjectPlane ();
   csPlane3 &test_plane = totest->plane->GetObjectPlane ();

@@ -162,7 +162,8 @@ private:
   void ProcessTodo (csBspNode* node);
 
   /// Cache this node and children.
-  void Cache (csBspNode* node, iFile* cf);
+  void Cache (iFile* cf, csBspNode* node,
+  	csPolygonInt** polygons, int num);
 
   /// Read this tree from cache.
   bool ReadFromCache (iFile* cf, csBspNode* node,
@@ -220,7 +221,7 @@ public:
   bool IsEmpty () { return root ? root->IsEmpty () : false; }
 
   /// Cache this tree.
-  void Cache (iFile* cf);
+  void Cache (iFile* cf, csPolygonInt** polygons, int num);
 
   /// Read this tree from cache.
   bool ReadFromCache (iFile* cf, csPolygonInt** polygons, int num);

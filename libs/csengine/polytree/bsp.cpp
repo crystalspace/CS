@@ -16,6 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
+#include "iutil/vfs.h"
 #include "csengine/polyint.h"
 #include "csengine/treeobj.h"
 #include "csengine/bspbbox.h"
@@ -634,7 +635,7 @@ void csBspTree::Statistics (
   }
 }
 
-int compare_int (const void *p1, const void *p2)
+static int compare_int (const void *p1, const void *p2)
 {
   int i1 = *(int *)p1;
   int i2 = *(int *)p2;
@@ -687,20 +688,81 @@ int *csBspTree::GetVertices (int &count)
   return indices;
 }
 
-void csBspTree::Cache (csBspNode *node, iFile *cf)
+void csBspTree::Cache (iFile* cf, csBspNode *node,
+	csPolygonInt** polygons, int num)
 {
   if (!node) return ;
   WriteLong (cf, node->polygons.GetPolygonCount ());  // Consistency check
   WriteBool (cf, node->polygons_on_splitter);
   if (!node->polygons_on_splitter) return ;
   WritePlane3 (cf, node->splitter);
-  if (node->front) Cache ((csBspNode *)node->front, cf);
-  if (node->back) Cache ((csBspNode *)node->back, cf);
+
+  // Now we split the node according to the plane of that polygon.
+  // We do this so that we can correctly cache how the splits operated.
+  // Previously we only cached the splitting plane and then we let
+  // the cache reader split everything again. But due to small inacuraccies
+  // in floating point calculations this is not robust and sometimes a
+  // cached octree is not valid for another platform.
+  csPolygonInt **front_poly = new csPolygonInt *[num];
+  csPolygonInt **back_poly = new csPolygonInt *[num];
+  int front_idx = 0, back_idx = 0;
+
+  // Here we calculate a bit array with two bits for every polygon.
+  // The value of these two bits will be one of CS_POL results calculated
+  // below.
+  int size_bits = (num+3)/4;
+  uint8* bits = new uint8[size_bits];
+
+  int cnt_same = 0;
+  int i;
+  for (i = 0 ; i < num ; i++)
+  {
+    int c = polygons[i]->Classify (node->splitter);
+    switch (c)
+    {
+      case CS_POL_SAME_PLANE:
+        cnt_same++;
+        break;
+      case CS_POL_FRONT:
+        front_poly[front_idx++] = polygons[i];
+        break;
+      case CS_POL_BACK:
+        back_poly[back_idx++] = polygons[i];
+        break;
+      case CS_POL_SPLIT_NEEDED:
+        {
+          csPolygonInt *np1, *np2;
+          polygons[i]->SplitWithPlane (&np1, &np2, node->splitter);
+          front_poly[front_idx++] = np1;
+          back_poly[back_idx++] = np2;
+        }
+        break;
+    }
+    int byte_idx = i/4;
+    int bit_idx = (i%4)<<1;
+    int bit_mask = 3 << bit_idx;
+    bits[byte_idx] = (bits[byte_idx] & ~bit_mask) | (c << bit_idx);
+  }
+
+  WriteLong (cf, size_bits);
+  cf->Write ((const char*)bits, size_bits);
+  delete[] bits;
+
+  if (cnt_same != node->polygons.GetPolygonCount ())
+  {
+    printf ("INTERNAL ERROR!\n");
+    fflush (stdout);
+  }
+
+  if (node->front) Cache (cf, (csBspNode *)node->front, front_poly,
+  	front_idx);
+  if (node->back) Cache (cf, (csBspNode *)node->back, back_poly,
+  	back_idx);
 }
 
-void csBspTree::Cache (iFile *cf)
+void csBspTree::Cache (iFile *cf, csPolygonInt** polygons, int num)
 {
-  Cache ((csBspNode *)root, cf);
+  Cache (cf, (csBspNode *)root, polygons, num);
 }
 
 bool csBspTree::ReadFromCache (
@@ -729,14 +791,25 @@ bool csBspTree::ReadFromCache (
 
   ReadPlane3 (cf, node->splitter);
 
+  int size_bits = ReadLong (cf);
+  uint8* bits = new uint8[size_bits];
+  cf->Read ((char*)bits, size_bits);
+
   // Now we split the node according to the plane of that polygon.
   csPolygonInt **front_poly = new csPolygonInt *[num];
   csPolygonInt **back_poly = new csPolygonInt *[num];
   int front_idx = 0, back_idx = 0;
 
-  for (i = 0; i < num; i++)
+  for (i = 0 ; i < num ; i++)
   {
-    int c = polygons[i]->Classify (node->splitter);
+    // Using the classify function should have been perfect but since
+    // there can be floating point inaccuracies this isn't compatible
+    // on all platforms. So I use the bit array here.
+    //int c = polygons[i]->Classify (node->splitter);
+    int byte_idx = i/4;
+    int bit_idx = (i%4)<<1;
+    int bit_mask = 3 << bit_idx;
+    int c = ((bits[byte_idx] & bit_mask) >> bit_idx) & 3;
     switch (c)
     {
       case CS_POL_SAME_PLANE:
@@ -758,6 +831,8 @@ bool csBspTree::ReadFromCache (
         break;
     }
   }
+
+  delete[] bits;
 
   if (check_num_polygons != node->polygons.GetPolygonCount ())
   {

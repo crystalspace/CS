@@ -7,6 +7,13 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug in the octree cache. It was using *(char**)memfile
 	  to get to the data. This is incorrect and has been
 	  changed to (char*)memfile.GetData ().
+	- Fixed yet another bug in the octree cache. It appeared that
+	  debug/optimize cache could have some differences. This is probably
+	  related to small changes in floating point calculations and
+	  the polygon splitting routine is very sensitive to that.
+	  This has now been fixed by saving additional information to the
+	  octree cache. This means the octree cache is now bigger but
+	  more robust on different platforms/debug/optimize mode.
 14-Mar-2002
 	- Norman Kramer did some fixes on the DOS port.
 13-Mar-2002

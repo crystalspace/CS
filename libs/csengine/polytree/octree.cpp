@@ -989,7 +989,8 @@ void csOctree::Cache (csOctreeNode *node, iFile *cf)
   if (num == 0) return ;
   if (node->minibsp)
   {
-    node->minibsp->Cache (cf);
+    node->minibsp->Cache (cf, node->unsplit_polygons.GetPolygons (),
+    	node->unsplit_polygons.GetPolygonCount ());
     return ;
   }
 
