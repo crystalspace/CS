@@ -15,7 +15,7 @@
 
 #include "video/canvas/macosx/common/OSXDelegate2D.h"
 
-#define DEL2D_FUNC(ret, func) __private_extern__ "C" inline ret OSXDelegate2D_##func
+#define DEL2D_FUNC(ret, func) __private_extern__ "C" ret OSXDelegate2D_##func
 
 DEL2D_FUNC(bool, blitToWindow)(OSXDelegate2D delegate, unsigned char *buffer, int width, int height, int depth);
 
