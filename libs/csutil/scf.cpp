@@ -327,7 +327,10 @@ void scfFactory::IncRef ()
 	if (CreateFunc == 0)
 	  csPrintLibraryError(sym);
       }
+    } else {
+      csPrintLibraryError(NULL);
     }
+      
 
     if (!Library->ok () || CreateFunc == 0)
     {

@@ -64,6 +64,9 @@ chronological order.
 	  of trees with a single object.
 	  The definition of the nullmesh is important. The bounding box
 	  should be larger then all objects that are inside it.
+	- DeSigna made SCF emit a proper diagnostic error message when
+	  it cannot load a library, not just on symbol-loading
+	  errors. Tested on Linux. 
 11-Aug-2003
         - Philip Wyett changed #include "cal3d/cal3d" to
           #include <cal3d/cal3d.h> and dropped below other includes fixing
