@@ -29,8 +29,8 @@ chronological order.
 	  desired behaviour.
 	- res added a paragraph about iGraphics2D::WriteBaseline() to 
 	  apimod98.txi.
-	- res fixed a crahs in the fixed function shader programs. A shader 
-	  var wasn't properly set up.
+	- res fixed a crash in the fixed function shader programs. A shader 
+	  variable wasn't properly set up.
 	- res added a fix from Marten to 
 	  csShaderVariableContextHelper::FillVariableList().
 	  Previously, not all provided variables were actually filled.
