@@ -19,12 +19,6 @@
 #ifndef __CS_WIN32_H__
 #define __CS_WIN32_H__
 
-#if defined (OS_WIN32)
-// Windows compilers has a different idea of program entry point behaviour,
-// compared to other platform compilers.
-#define main csMain
-#endif
-
 #ifdef COMP_BC
 #  ifndef __CSOSDEFS_H__
 #     error csosdefs.h should be included before win32.h
