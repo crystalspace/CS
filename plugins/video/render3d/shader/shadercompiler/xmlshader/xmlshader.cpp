@@ -79,7 +79,26 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
     object_reg, "crystalspace.shared.stringset", iStringSet);
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  if (!synldr)
+  {
+    csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+    synldr = CS_LOAD_PLUGIN (plugin_mgr,
+      "crystalspace.syntax.loader.service.text", iSyntaxService);
+    if (!synldr)
+    {
+      Report(CS_REPORTER_SEVERITY_ERROR, "Could not load the syntax service!");
+      return false;
+    }
+    if (!object_reg->Register (synldr, "iSyntaxService"))
+    {
+      Report(CS_REPORTER_SEVERITY_ERROR, "Could not register the syntax service!");
+      return false;
+    }
+  }
+  
+
   csRef<iCommandLineParser> cmdline =
     CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
   if (cmdline)
