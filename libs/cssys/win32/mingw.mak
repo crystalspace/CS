@@ -6,8 +6,7 @@ DESCRIPTION.mingw = Win32 with Mingw GCC
 # Choose which drivers you want to build/use
 # cs2d/ddraw6 cs2d/ddraw cs3d/direct3d5 cs3d/direct3d6 cs3d/opengl
 #
-DRIVERS+= cs2d/openglwin cs3d/opengl
-
+DRIVERS+= cs2d/ddraw cs3d/software
 #  csnetdrv/null csnetman/null csnetman/simple \
 #  cssnddrv/null cssndrdr/null cssndrdr/software
 
@@ -60,10 +59,10 @@ NEED_SOCKET_LIB=
 CFLAGS.INCLUDE=-Ilibs/zlib -Ilibs/libpng -Ilibs/libjpeg
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM)
+CFLAGS.GENERAL=-fvtable-thunks -DWIN32_VOLATILE -Wall $(CFLAGS.SYSTEM)
 
 # Flags for the compiler which are used when optimizing.
-CFLAGS.optimize=-s -O3 -fomit-frame-pointer -DWIN32_VOLATILE
+CFLAGS.optimize=-s -O3 -fomit-frame-pointer
 
 # Flags for the compiler which are used when debugging.
 CFLAGS.debug=-g
@@ -75,10 +74,10 @@ CFLAGS.profile=-pg -O -g
 CFLAGS.DLL=
 
 # General flags for the linker which are used in any case.
-LFLAGS.GENERAL=
+LFLAGS.GENERAL=-mwindows
 
 # Flags for the linker which are used when optimizing.
-LFLAGS.optimize=-s
+LFLAGS.optimize=
 
 # Flags for the linker which are used when debugging.
 LFLAGS.debug=-g
@@ -91,6 +90,8 @@ LFLAGS.DLL=
 
 # Typical extension for objects and static libraries
 LIB=.a
+# Setup 'lib' prefix
+LIB_PREFIX=lib
 define AR
   @rm -f $@
   ar
@@ -98,7 +99,7 @@ endef
 ARFLAGS=cr
 
 # System-dependent flags to pass to NASM
-NASMFLAGS.SYSTEM=-f mingw -DEXTERNC_UNDERSCORE
+NASMFLAGS.SYSTEM=-f win32 -DEXTERNC_UNDERSCORE
 
 # System dependent source files included into CSSYS library
 SRC.SYS_CSSYS = libs/cssys/win32/printf.cpp libs/cssys/win32/timing.cpp \
@@ -114,7 +115,7 @@ CC=gcc -c
 CXX=c++ -c
 
 # The linker.
-LINK=gcc
+LINK=c++
 
 # Command sequence for creating a directory.
 # Note that directories will have forward slashes. Please
@@ -127,7 +128,7 @@ NETSOCK_LIBS=
 SYS_SED_DEPEND=-e "s/\.ob*j*\:/\$$O:/g"
 
 # Flags for linking a GUI and a console executable
-LFLAGS.EXE=-mwindows
+LFLAGS.EXE=
 LFLAGS.CONSOLE.EXE=
 
 # Use makedep to build dependencies
