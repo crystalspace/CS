@@ -297,6 +297,18 @@ bool awsWindow::Execute (const char *action, iAwsParmList* parmlist)
   return false;
 }
 
+void awsWindow::Show ()
+{
+  awsPanel::Show ();
+  Broadcast (sWindowShown);
+}
+
+void awsWindow::Hide ()
+{
+  awsPanel::Hide ();
+  Broadcast (sWindowHidden);
+}
+
 bool awsWindow::IsActiveWindow()
 {
   // check to see if there are any sibbling windows above this one

@@ -170,6 +170,12 @@ public:
   /// Executes scriptable actions for this window
   bool Execute (const char *action, iAwsParmList* parmlist);
 
+  /// Shows window and broadcast signal
+  void Show ();
+
+  /// Hides window and broadcast signal
+  void Hide ();
+
   /// Gets the preferred size of the awsComponent
   virtual csRect getPreferredSize ();
 
