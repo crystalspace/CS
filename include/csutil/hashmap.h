@@ -67,6 +67,8 @@ class csGlobalHashIterator
 private:
   /// Next bucket we are iterating over. 0 if no more elements.
   csHashBucket* bucket;
+  /// Const version of bucket.
+  const csHashBucket* cbucket;
   /// index of next item in bucket.
   int element_index;
   /// Current bucket index in hashmap.
@@ -77,10 +79,15 @@ private:
   uint32 nbuckets;
   /// Pointer to the hashmap.
   csHashMap* hash;
+  /// Const version of hash.
+  const csHashMap* chash;
 
 private:
   /// Go to next element.
   void GotoNextElement ();
+
+  /// Const version of GotoNextElement().
+  void GotoNextElementConst ();
 
 public:
   /**
@@ -90,10 +97,17 @@ public:
    */
   csGlobalHashIterator (csHashMap* hash);
 
+  /**
+   * Construct from a const hashmap. Can do everything except DeleteNext().
+   */
+  csGlobalHashIterator (const csHashMap* hash);
+
   /// Is there a next element in this iterator?
-  bool HasNext ();
+  bool HasNext () const;
   /// Get the next element.
   csHashObject Next ();
+  /// Const version of Next().
+  const csHashObject NextConst ();
   /**
    * Delete next element and fetches new one.
    * @@@ Not implemented yet!
@@ -117,6 +131,8 @@ class csHashIterator
 private:
   /// Next bucket we are iterating over. 0 if no more elements.
   csHashBucket* bucket;
+  /// Const version of bucket
+  const csHashBucket* cbucket;
   /// index of next item in bucket.
   int element_index;
   /// Current index in bucket.
@@ -127,10 +143,15 @@ private:
   csHashKey key;
   /// Pointer to the hashmap.
   csHashMap* hash;
+  /// Const version of hash.
+  const csHashMap* chash;
 
 private:
   /// Go to next element with same key.
   void GotoNextSameKey ();
+
+  /// Const version of GotoNextSameKey().
+  void GotoNextSameKeyConst ();
 
 public:
   /**
@@ -140,10 +161,17 @@ public:
    */
   csHashIterator (csHashMap* hash, csHashKey Key);
 
+  /**
+   * Construct from a const hashmap. Can do everything except DeleteNext().
+   */
+  csHashIterator (const csHashMap* hash, csHashKey Key);
+
   /// Is there a next element in this iterator?
-  bool HasNext ();
+  bool HasNext () const;
   /// Get the next element.
   csHashObject Next ();
+  /// Const version of Next().
+  const csHashObject NextConst ();
   /**
    * Delete next element and fetches new one.
    * @@@ Not implemented yet!

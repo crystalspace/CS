@@ -51,7 +51,8 @@ csHashKey csHashCompute(char const* s)
 csGlobalHashIterator::csGlobalHashIterator (csHashMap *hm)
 {
   hash = hm;
-  bucket = 0;
+  chash = 0;
+  cbucket = bucket = 0;
   bucket_len = 0;
   element_index = 0;
   bucket_index = (uint32)-1;
@@ -59,9 +60,21 @@ csGlobalHashIterator::csGlobalHashIterator (csHashMap *hm)
   GotoNextElement ();
 }
 
-bool csGlobalHashIterator::HasNext ()
+csGlobalHashIterator::csGlobalHashIterator (const csHashMap *hm)
 {
-  return bucket != 0;
+  chash = hm;
+  hash = 0;
+  cbucket = bucket = 0;
+  bucket_len = 0;
+  element_index = 0;
+  bucket_index = (uint32)-1;
+  nbuckets = (uint32)chash->Buckets.Length();
+  GotoNextElementConst ();
+}
+
+bool csGlobalHashIterator::HasNext () const
+{
+  return bucket != 0 || cbucket != 0;
 }
 
 void csGlobalHashIterator::GotoNextElement ()
@@ -86,10 +99,39 @@ void csGlobalHashIterator::GotoNextElement ()
   }
 }
 
+void csGlobalHashIterator::GotoNextElementConst ()
+{
+  element_index++;
+  if (element_index >= (int)bucket_len)
+  {
+    // Next bucket.
+    bucket_index++;
+    while (bucket_index < nbuckets)
+    {
+      cbucket = &chash->Buckets[bucket_index];
+      bucket_len = cbucket->Length ();
+      if (bucket_len != 0)
+      {
+        element_index = 0;
+	return;
+      }
+      bucket_index++;
+    }
+    cbucket = 0;
+  }
+}
+
 csHashObject csGlobalHashIterator::Next ()
 {
   csHashObject obj = ((*bucket)[element_index]).object;
   GotoNextElement ();
+  return obj;
+}
+
+const csHashObject csGlobalHashIterator::NextConst ()
+{
+  csHashObject obj = ((*cbucket)[element_index]).object;
+  GotoNextElementConst ();
   return obj;
 }
 
@@ -105,7 +147,9 @@ csHashIterator::csHashIterator (csHashMap *hm, csHashKey hkey)
   uint32 idx = hkey % hm->NumBuckets;
 
   hash = hm;
+  chash = 0;
   bucket = &(hm->Buckets[idx]);
+  cbucket = 0;
   element_index = -1;
   current_index = -1;
   bucket_index = idx;
@@ -113,9 +157,26 @@ csHashIterator::csHashIterator (csHashMap *hm, csHashKey hkey)
   GotoNextSameKey ();
 }
 
-bool csHashIterator::HasNext ()
+csHashIterator::csHashIterator (const csHashMap *hm, csHashKey hkey)
 {
-  return bucket && bucket->Length () > 0;
+  uint32 idx = hkey % hm->NumBuckets;
+
+  hash = 0;
+  chash = hm;
+  bucket = 0;
+  cbucket = &(hm->Buckets[idx]);
+  element_index = -1;
+  current_index = -1;
+  bucket_index = idx;
+  key = hkey;
+  GotoNextSameKeyConst ();
+}
+
+bool csHashIterator::HasNext () const
+{
+  if (bucket) return bucket->Length () > 0;
+  else if (cbucket) return cbucket->Length () > 0;
+  else return false;
 }
 
 void csHashIterator::GotoNextSameKey ()
@@ -130,11 +191,31 @@ void csHashIterator::GotoNextSameKey ()
   if (element_index >= bucket->Length ()) bucket = 0;
 }
 
+void csHashIterator::GotoNextSameKeyConst ()
+{
+  if (!cbucket) return;
+  element_index++;
+  while (element_index < cbucket->Length () &&
+  	cbucket->Get(element_index).key != key)
+  {
+    element_index++;
+  }
+  if (element_index >= cbucket->Length ()) cbucket = 0;
+}
+
 csHashObject csHashIterator::Next ()
 {
   csHashObject obj = ((*bucket)[element_index]).object;
   current_index = element_index;
   GotoNextSameKey ();
+  return obj;
+}
+
+const csHashObject csHashIterator::NextConst ()
+{
+  csHashObject obj = ((*bucket)[element_index]).object;
+  current_index = element_index;
+  GotoNextSameKeyConst ();
   return obj;
 }
 

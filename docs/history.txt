@@ -35,6 +35,10 @@ for each given day, however, are in normal (ascending) chronological order.
 	  pointers are casted to ints/longs (it appears that long on 64-bit 
 	  MSVC is still 32 bits large, so it can't be used. Tho I'm not sure.)
 	- res augmented configure to check the sizeof(wchar_t). 
+	- Oktal added overloaded constructors to csHashIterator and
+	  csGlobalHashIterator that allow them to be initialized from const
+	  hashmaps, and added methods to them for the manipulation of
+	  iterators initialized from const hashmaps.
 28-Jul-2003
 	- Jorrit removed several csVector's throughout CS:
 	    - Replaced 'render_priorities' in the engine with csStringArray.
