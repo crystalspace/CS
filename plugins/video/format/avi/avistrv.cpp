@@ -299,6 +299,7 @@ void csAVIStreamVideo::yuv_channel_2_rgba_interleave (char *data[3])
   int idx=0, uvidx=0, tidx=0;
   int sw = strdesc.width;
   int sh = strdesc.height;
+  int halfsw = sw>>1;
   int tw = rc.Width ();
   int th = rc.Height ();
   int ytic=th, xtic;
@@ -315,7 +316,7 @@ void csAVIStreamVideo::yuv_channel_2_rgba_interleave (char *data[3])
     {
       if (uvidx != (sc>>1)) // this YUV is a 1:4:4 scheme
       {
-	uvidx = (sr * sw  + sc)/4;
+	uvidx = (sr>>1) * halfsw  + (sc>>1);
 	u=((float)(unsigned char)udata[uvidx]) - 128.f;
 	v=((float)(unsigned char)vdata[uvidx]) - 128.f;
 	uf1 = 2.018f * u;
