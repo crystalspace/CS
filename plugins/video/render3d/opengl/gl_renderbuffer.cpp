@@ -91,7 +91,7 @@ void* csVBORenderBuffer::RenderLock (csGLRenderBufferLockType type)
   ext->glBindBufferARB (bufferTarget, bufferId);
   lastRLock = type;
 
-  return (void*)offset; // Offset for an interleaved buffer
+  return (void*) ((intptr_t) offset); // Offset for an interleaved buffer
 }
 
 //-----------------------------------------------------------------
