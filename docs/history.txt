@@ -10,6 +10,17 @@ The history order is reversed so that new features are at the top.
 	  and ModuleHandle variables. Those are now members of the
 	  Win32Assistant and the values are retrieved at it's construction.
 	- Matze fixed a crasher in the maploader.
+	- duhprey did the following to odedynam:
+	  - Added linear and angular global dampening hack
+	  - Added interface for anonymous colliders in system, these have body 0 in
+	    ode terms which makes then immune to gravity and collision response
+	  - Modified joint interface to survive being attached to only one body, the
+	    other is attached to body 0 and static on the other end.
+	  - Allowed an arbitrary execute callback for use when a mesh or a bone
+		is not attached to a body, but there is a callback handler.
+    - duhprey also did the following to physldr:
+	  - Fixed a few bugs in the parsing
+	  - Added parse commands for the new features in odedynam
 29-May-2003
 	- Oktal removed the clean target from from swig.jam as it was deleting
 	  the Swig-generated Python and Perl source files.
