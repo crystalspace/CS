@@ -339,7 +339,7 @@ bool Simple::Initialize ()
 
   // Load a sprite template.
   csRef<iMeshFactoryWrapper> imeshfact;
-  imeshfact = engine->GetMeshFactories()->FindByName("example");
+  imeshfact = engine->GetMeshFactories()->FindByName("motion");
   if (imeshfact == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
