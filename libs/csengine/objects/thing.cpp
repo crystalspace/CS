@@ -1419,7 +1419,6 @@ bool csThing::HitBeamOutline (const csVector3& start,
     // Version without culler.
     int i;
     float r;
-    csPolygon3D *best_p = NULL;
 
     // @@@ This routine is not very optimal. Especially for things
     // with large number of polygons.
