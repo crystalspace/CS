@@ -53,6 +53,12 @@ chronological order.
 	  <castshadows> mesh object parameter.
 	- res fixed some coordinate swappage in chunklod, causing it to cast 
 	  wrong shadows.
+	- res removed the user-defined exception feature from the Win32 
+	  assistant. This can be handled as well (if not better) by the app.
+	- res added some helpers for Win32 to easily create minidumps that 
+	  contain some extra useful info and set up an exception handler 
+	  (which creates such minidumps).
+	- res augmented walktest to create such minidumps.
 25-Apr-2004
 	- Jorrit changed the way render priorities work in the engine. The
 	  RenderQueues field no longer contains all meshes for all render

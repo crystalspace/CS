@@ -21,11 +21,22 @@
 
 #include "csutil/garray.h"
 #include "csutil/sysfunc.h"
+#include "csutil/archive.h"
+#include "csutil/callstack.h"
+#include "csutil/physfile.h"
+#include "csutil/ref.h"
+#include "csutil/util.h"
+#include "csutil/win32/callstack.h"
+#include "csutil/win32/win32.h"
+
+#include "iutil/objreg.h"
+#include "ivaria/stdrep.h"
 
 #include "cachedll.h"
 #include "csutil/win32/minidump.h"
 #include "csutil/memfile.h"
 
+#include <winuser.h>
 #include <tlhelp32.h>
 
 static void WriteRangeInfo (HANDLE tempFile, HANDLE rangeFile, 
@@ -99,14 +110,6 @@ static void CollectHeapInfo (HANDLE snap, HANDLE tempFile,
 
   WriteRangeInfo (tempFile, rangeFile, rangeStart, rangeSize, rangeOffset, 
     rangeCount);
-
-  /*size_t mdSize = sizeof (MINIDUMP_MEMORY_DESCRIPTOR) * ranges.Length();
-  PMINIDUMP_MEMORY_LIST ml = 
-    (PMINIDUMP_MEMORY_LIST)malloc (sizeof (ULONG32) + mdSize);
-  ml->NumberOfMemoryRanges = ranges.Length();
-  MINIDUMP_MEMORY_DESCRIPTOR* MemoryRanges =
-    (MINIDUMP_MEMORY_DESCRIPTOR*)((ULONG32*)ml + 1);
-  memcpy (MemoryRanges, ranges.GetArray(), mdSize);*/
 }
 
 static bool PostprocessMiniDump (HANDLE dumpFile, HANDLE rangeFile,
@@ -176,9 +179,6 @@ static bool PostprocessMiniDump (HANDLE dumpFile, HANDLE rangeFile,
 	    (MINIDUMP_MEMORY_DESCRIPTOR*)((ULONG32*)myMemList + 1);
 	  for (uint i = 0; i < myMemList->NumberOfMemoryRanges; i++)
 	  {
-	    //MINIDUMP_MEMORY_DESCRIPTOR& md = MemoryRanges[i];
-	    //md.Memory.Rva += dumpSize;
-	    //ranges.Push (MemoryRanges[i]);
 	    DWORD bytesWritten;
 	    WriteFile (rangeFile, MemoryRanges + i, 
 	      sizeof (MINIDUMP_MEMORY_DESCRIPTOR), &bytesWritten, 0);
@@ -198,6 +198,10 @@ static bool PostprocessMiniDump (HANDLE dumpFile, HANDLE rangeFile,
 
   return didProcess;
 }
+
+csWeakRef<iObjectRegistry> cswinMinidumpWriter::object_reg;
+cswinMinidumpWriter::FnCrashMinidumpHandler cswinMinidumpWriter::customHandler = 0;
+LPTOP_LEVEL_EXCEPTION_FILTER cswinMinidumpWriter::oldFilter = 0;
 
 const char* cswinMinidumpWriter::WriteMinidump (
   PMINIDUMP_EXCEPTION_INFORMATION except, bool dumpHeap)
@@ -306,11 +310,6 @@ const char* cswinMinidumpWriter::WriteMinidump (
       if (bytesWritten == 0) break;
     }
 
-    /*WriteFile (dumpFile, &rangeNum, sizeof (ULONG32), &bytesWritten, 0);
-    WriteFile (dumpFile, ranges.GetArray(), 
-      ranges.Length() * sizeof (MINIDUMP_MEMORY_DESCRIPTOR), &bytesWritten, 
-      0);*/
-
     // Copy over the actual memory data
     SetFilePointer (hHeapDump, 0, 0, FILE_BEGIN);
     while (1)
@@ -353,4 +352,169 @@ const char* cswinMinidumpWriter::WriteMinidump (
   else
     return 0;
 
+}
+
+static void CopyPhysicalToArchive (const char* fn, csArchive* archive, 
+				   const char* entryName)
+{
+  HANDLE srcFile = CreateFile (fn, GENERIC_READ, 
+    FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, 
+    FILE_FLAG_SEQUENTIAL_SCAN, 0);
+
+  if (srcFile != INVALID_HANDLE_VALUE)
+  {
+    void* entry = archive->NewFile (entryName, GetFileSize (srcFile, 0));
+
+    char buf[0x40000];
+    DWORD bytesRead;
+
+    while (1)
+    {
+      ReadFile (srcFile, buf, sizeof (buf), &bytesRead, 0);
+      if (bytesRead == 0) break;
+    
+      archive->Write (entry, buf, bytesRead);
+    }
+
+    CloseHandle (srcFile);
+  }
+}
+
+const char* cswinMinidumpWriter::WriteWrappedMinidump (
+  iObjectRegistry* object_reg, PMINIDUMP_EXCEPTION_INFORMATION except, 
+  bool dumpHeap)
+{
+  CONTEXT context (*except->ExceptionPointers->ContextRecord);
+  csCallStack* stack = cswinCallStackHelper::CreateCallStack (
+    GetCurrentProcess(), GetCurrentThread(), context,
+    -1);
+  const char* dumpFileName = cswinMinidumpWriter::WriteMinidump (except);
+
+  if (dumpFileName != 0)
+  {
+    char tempPath[MAX_PATH];
+    GetTempPath (sizeof (tempPath), tempPath);
+    static char reportName[MAX_PATH+32];
+    cs_snprintf (reportName, sizeof (reportName), "%s\\cscrash%u.zip", tempPath, 
+      GetCurrentProcessId ());
+
+    csArchive* reportZip = new csArchive (reportName);
+    CopyPhysicalToArchive (dumpFileName, reportZip, "crash.dmp");
+    reportZip->Flush ();
+
+    DeleteFileA (dumpFileName);
+
+    if (object_reg)  
+    {
+      csRef<iVFS> vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+      csRef<iStandardReporterListener> stdrep = CS_QUERY_REGISTRY (object_reg,
+	iStandardReporterListener);
+      if (vfs && stdrep)
+      {
+	csRef<iDataBuffer> realConPath = 
+	  vfs->GetRealPath (stdrep->GetDebugFile ());
+	CopyPhysicalToArchive ((char*)realConPath->GetData(), reportZip, 
+	  "console.txt");
+      }
+    }
+    reportZip->Flush ();
+
+    if (stack)
+    {
+      void* callstackEntry = reportZip->NewFile ("callstack.txt");
+      csString s;
+      csString line;
+      for (int i = 0; i < stack->GetEntryCount(); i++)
+      {
+	line.Clear();
+	bool hasFunc = stack->GetFunctionName (i, s);
+	line = hasFunc ? s : "<unknown>";
+	if (stack->GetLineNumber (i, s))
+	  line << " @" << s;
+	if (stack->GetParameters (i, s))
+	  line << " (" << s << ")";
+	line << "\n";
+
+	reportZip->Write (callstackEntry, line.GetData(), line.Length());
+      }
+      reportZip->Flush ();
+      stack->Free();
+    }
+
+    delete reportZip;
+
+    return reportName;
+  }
+  return 0;
+}
+
+#define TEST_EXCEPTION_HANDLER
+
+LONG WINAPI cswinMinidumpWriter::ExceptionFilter (
+  struct _EXCEPTION_POINTERS* ExceptionInfo)
+{
+#ifdef TEST_EXCEPTION_HANDLER
+  MessageBoxA (0, "Attach debugger now", "Exception handler test", 
+    MB_OK | MB_ICONWARNING);
+#endif
+
+  LONG ret = EXCEPTION_EXECUTE_HANDLER;
+
+  static bool nest = false;
+  if (nest) return ret;
+
+  nest = true;
+ 
+  MINIDUMP_EXCEPTION_INFORMATION mei;
+  mei.ClientPointers = true;
+  mei.ExceptionPointers = ExceptionInfo;
+  mei.ThreadId = GetCurrentThreadId();
+  const char* dumpFileName = WriteWrappedMinidump (object_reg, &mei);
+
+  if (dumpFileName)
+  {
+    if (customHandler)
+    {
+      customHandler (dumpFileName);
+    }
+    else
+    {
+      char buf[512];
+      sprintf (buf, "The application crashed. Dump has been written to %s", 
+	dumpFileName);
+      MessageBoxA (0, buf, 0, MB_OK | MB_ICONERROR);
+    }
+  }
+
+#ifdef CS_DEBUG
+  if (oldFilter != 0)
+    ret = oldFilter (ExceptionInfo);
+  nest = false;
+  return ret;
+#else
+  ExitProcess (0xb4dc0de);
+  nest = false;
+  return ret;
+#endif
+}
+
+void cswinMinidumpWriter::EnableCrashMinidumps (FnCrashMinidumpHandler handler)
+{
+  if (oldFilter == 0)
+  {
+    oldFilter = SetUnhandledExceptionFilter (&ExceptionFilter);
+  }
+  customHandler = handler;
+}
+
+void cswinMinidumpWriter::SetCrashMinidumpObjectReg (iObjectRegistry* object_reg)
+{
+  cswinMinidumpWriter::object_reg = object_reg;
+}
+
+void cswinMinidumpWriter::DisableCrashMinidumps ()
+{
+  if (oldFilter != 0)
+    SetUnhandledExceptionFilter (oldFilter);
+  oldFilter = 0;
 }

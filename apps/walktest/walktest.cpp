@@ -77,6 +77,10 @@
 #include "iengine/campos.h"
 #include "iutil/plugin.h"
 
+#if defined(OS_WIN32)
+#include "csutil/win32/minidump.h"
+#endif
+
 #if defined(OS_DOS) || defined(OS_WIN32)
 #  include <io.h>
 #elif defined(OS_UNIX)
@@ -1096,6 +1100,10 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   object_reg = csInitializer::CreateEnvironment (argc, argv);
   if (!object_reg) return false;
 
+#if defined(OS_WIN32)
+  cswinMinidumpWriter::SetCrashMinidumpObjectReg (Sys->object_reg);
+#endif
+
   if (!csInitializer::SetupConfigManager (object_reg, iConfigName))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Failed to initialize config!");
@@ -1607,6 +1615,9 @@ static void CreateSystem(void)
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
+#if defined(OS_WIN32)
+  cswinMinidumpWriter::EnableCrashMinidumps ();
+#endif
   // Initialize the random number generator
   srand (time (0));
 

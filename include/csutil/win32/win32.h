@@ -34,36 +34,7 @@
 /// CrystalSpace window class (Unicode version)
 #define CS_WIN32_WINDOW_CLASS_NAMEW L"CrystalSpaceWin32"
 
-SCF_VERSION (iWin32ExceptionHandler, 0, 0, 1);
-
-/**
- * Exception handler.
- */
-struct iWin32ExceptionHandler : public iBase
-{
-  /// What to do after the user-defined handler finished
-  enum ExceptAction
-  {
-    /**
-     * Call the default exception handler (usually causes termination,
-     * but may also pop up some messages)
-     */
-    CallDefaultHandler,
-    /**
-     * Call the old exception handler (usually causes a message to pop
-     * up, or Dr. Watson to be called)
-     */
-    CallOldHandler,
-    /// Just terminate the process.
-    JustTerminate
-  };
-  /**
-   * User-defined exception handler.
-   */
-  virtual ExceptAction HandleException (struct _EXCEPTION_POINTERS* info) = 0;
-};
-
-SCF_VERSION (iWin32Assistant, 0, 0, 5);
+SCF_VERSION (iWin32Assistant, 0, 1, 0);
 
 /**
  * This interface describes actions specific to the Windows platform.
@@ -98,11 +69,6 @@ struct iWin32Assistant : public iBase
    * Gets whether CS should get Messages on it's own
    */
   virtual bool HasOwnMessageLoop () = 0;
-
-  /**
-   * Set the handler for unfiltered exceptions.
-   */
-  virtual void SetExceptionHandler (iWin32ExceptionHandler* handler) = 0;
 };
 
 #endif // __CS_WIN32_H__

@@ -107,11 +107,6 @@ private:
   static LRESULT CALLBACK WindowProc (HWND hWnd, UINT message,
     WPARAM wParam, LPARAM lParam);
   static LRESULT CALLBACK CBTProc (int nCode, WPARAM wParam, LPARAM lParam);
-
-  csRef<iWin32ExceptionHandler> exceptionHandler;
-  LPTOP_LEVEL_EXCEPTION_FILTER oldFilter;
-  static LONG WINAPI ExceptionFilter (
-    struct _EXCEPTION_POINTERS* ExceptionInfo);
 public:
   SCF_DECLARE_IBASE;
   Win32Assistant (iObjectRegistry*);
@@ -131,7 +126,6 @@ public:
 
   virtual void UseOwnMessageLoop(bool ownmsgloop);
   virtual bool HasOwnMessageLoop();
-  virtual void SetExceptionHandler (iWin32ExceptionHandler* handler);
 
   iEventOutlet* GetEventOutlet();
 
@@ -331,8 +325,7 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
   console_window (false),  
   is_console_app(false),
   cmdline_help_wanted(false),
-  EventOutlet (0),
-  oldFilter (0)
+  EventOutlet (0)
 {
   SCF_CONSTRUCT_IBASE(0);
 
@@ -528,7 +521,6 @@ Win32Assistant::~Win32Assistant ()
     FreeConsole();
   if (exceptHandlerDLL != 0)
     FreeLibrary ((HMODULE)exceptHandlerDLL);
-  SetExceptionHandler (0);
   SCF_DESTRUCT_IBASE();
 }
 
@@ -950,46 +942,4 @@ bool Win32Assistant::HandleKeyMessage (HWND hWnd, UINT message,
 				       WPARAM wParam, LPARAM lParam)
 {
   return kbdDriver->HandleKeyMessage (hWnd, message, wParam, lParam);
-}
-
-void Win32Assistant::SetExceptionHandler (iWin32ExceptionHandler* handler)
-{
-  if (handler != 0)
-  {
-    if (oldFilter == 0)
-      oldFilter = SetUnhandledExceptionFilter (&ExceptionFilter);
-    exceptionHandler = handler;
-  }
-  else
-  {
-    exceptionHandler = 0;
-    if (oldFilter != 0)
-      oldFilter = SetUnhandledExceptionFilter (oldFilter);
-    oldFilter = 0;
-  }
-}
-
-LONG Win32Assistant::ExceptionFilter (struct _EXCEPTION_POINTERS* ExceptionInfo)
-{
-  LONG ret = EXCEPTION_EXECUTE_HANDLER;
-  if (GLOBAL_ASSISTANT != 0)
-  {
-    iWin32ExceptionHandler::ExceptAction action = 
-      iWin32ExceptionHandler::CallOldHandler;
-    if (GLOBAL_ASSISTANT->exceptionHandler != 0)
-      action = GLOBAL_ASSISTANT->exceptionHandler->HandleException (ExceptionInfo);
-    switch (action)
-    {
-      case iWin32ExceptionHandler::CallDefaultHandler:
-	break;
-      case iWin32ExceptionHandler::CallOldHandler:
-	if (GLOBAL_ASSISTANT->oldFilter != 0)
-	  ret = GLOBAL_ASSISTANT->oldFilter (ExceptionInfo);
-	break;
-      case iWin32ExceptionHandler::JustTerminate:
-	ExitProcess (0xb4dc0de);
-	break;
-    }
-  }
-  return ret;
 }
