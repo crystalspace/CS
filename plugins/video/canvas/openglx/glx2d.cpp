@@ -19,12 +19,14 @@
 #include <stdarg.h>
 #include "sysdef.h"
 #include "cs2d/openglx/glx2d.h"
+#include "cs3d/opengl/ogl_txtmgr.h"
 #include "cscom/com.h"
 #include "csinput/csevent.h"
 #include "csinput/csinput.h"
 #include "cssys/unix/iunix.h"
 #include "csgeom/csrect.h"
 #include "isystem.h"
+#include "itexture.h"
 
 BEGIN_INTERFACE_TABLE (csGraphics2DGLX)
   IMPLEMENTS_COMPOSITE_INTERFACE_EX (IGraphics2D, XGraphics2D)
@@ -34,6 +36,7 @@ END_INTERFACE_TABLE ()
 IMPLEMENT_UNKNOWN_NODELETE (csGraphics2DGLX)
 
 csGraphics2DOpenGLFontServer *csGraphics2DGLX::LocalFontServer = NULL;
+OpenGLTextureCache *csGraphics2DGLX::texture_cache = NULL;
 
 // csGraphics2DGLX function
 csGraphics2DGLX::csGraphics2DGLX (ISystem* piSystem) :
@@ -233,6 +236,11 @@ bool csGraphics2DGLX::Open(char *Title)
        		fontindex < 8;
 		fontindex++)
 	   LocalFontServer->AddFont(FontList[fontindex]);
+  }
+
+  if (texture_cache == NULL)
+  {
+    CHK (texture_cache = new OpenGLTextureCache(1<<24,24));
   }
 
   Clear (0);
@@ -511,6 +519,42 @@ void csGraphics2DGLX::WriteCharGL (int x, int y, int fg, int bg, char c)
 void csGraphics2DGLX::DrawSpriteGL (ITextureHandle *hTex, int sx, int sy,
   int sw, int sh, int tx, int ty, int tw, int th)
 {
+  texture_cache->Add (hTex);
+
+  // cache the texture if we haven't already.
+  csTextureMMOpenGL* txt_mm = (csTextureMMOpenGL*)GetcsTextureMMFromITextureHandle (hTex);
+
+  HighColorCache_Data *cachedata;
+  cachedata = txt_mm->get_hicolorcache ();
+  GLuint texturehandle = *( (GLuint *) (cachedata->pData) );
+
+  glShadeModel(GL_FLAT);
+  glEnable(GL_TEXTURE_2D);
+  glDisable (GL_BLEND);
+  glDisable (GL_DEPTH_TEST);
+  glBindTexture(GL_TEXTURE_2D,texturehandle);
+  
+  int bitmapwidth=0, bitmapheight=0;
+  hTex->GetBitmapDimensions(bitmapwidth,bitmapheight);
+
+  // convert texture coords given above to normalized (0-1.0) texture coordinates
+  float ntx1,nty1,ntx2,nty2;
+  ntx1 = tx/bitmapwidth;
+  ntx2 = (tx+tw)/bitmapwidth;
+  nty1 = ty/bitmapheight;
+  nty2 = (ty+th)/bitmapheight;
+
+  // draw the bitmap
+  glBegin(GL_TRIANGLE_FAN);
+  glTexCoord2f(ntx1,nty1);
+  glVertex2i(sx,Height-sy-1);
+  glTexCoord2f(ntx2,nty1);
+  glVertex2i(sx+sw,Height-sy-1);
+  glTexCoord2f(ntx2,nty2);
+  glVertex2i(sx+sw,Height-sy-sh-1);
+  glTexCoord2f(ntx1,nty2);
+  glVertex2i(sx,Height-sy-sh-1);
+  glEnd();
 }
 
 unsigned char* csGraphics2DGLX::GetPixelAtGL (int /*x*/, int /*y*/)
