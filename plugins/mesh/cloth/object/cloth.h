@@ -31,8 +31,8 @@ struct iClothFactoryState;
 //#define      EULER_PROVOT
 #define      AMPC_PROVOT  
 	
-#define      STATIC_CONSTRAINT
-//#define      DYNAMIC_CONSTRAINT
+//#define      STATIC_CONSTRAINT
+#define      DYNAMIC_CONSTRAINT
 
 class Constraint
 {
@@ -444,10 +444,10 @@ class Integrator
 				cloth_object -> object_bbox -> AddBoundingVertexSmart ( vertices[i] + *(cloth_object->shift) );
 			};
 		//printf("vertice[0]=%f",(vertices[0] + *cloth_object->shift).x);	
-		
-		ApplyShearProvotConstraint();	
-		ApplyProvotConstraint();
 		//ApplyShearProvotConstraint();	
+		ApplyProvotConstraint();
+		ApplyShearProvotConstraint();	
+		ApplyProvotConstraint();	
 			
 // <<<<<<<<<<<<<<<-----Predictor Corrector-compute---------->>>>>>>>>>>>>>>			
 #elif defined(AMPC_PROVOT)      // Adams Moulton predictor corrector

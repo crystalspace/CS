@@ -421,7 +421,7 @@ class StuffFactory : public iMeshObjectFactory
 	
 } scfiClothFactoryState;
 
-friend csClothFactoryState;
+friend class csClothFactoryState;
 
 };
 
