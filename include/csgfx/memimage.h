@@ -20,7 +20,6 @@
 #ifndef __MEMIMAGE_H__
 #define __MEMIMAGE_H__
 
-
 #include "csimage.h"
 
 /**

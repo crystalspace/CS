@@ -153,31 +153,43 @@ struct csColorBox
   void CountPixels ()
   {
     PixelCount = ColorCount = 0;
-    for (int b = Bm; b <= Bx; b++)
-      for (int g = Gm; g <= Gx; g++)
+	int b;
+    for (b = Bm; b <= Bx; b++)
+	{
+	  int g;
+      for (g = Gm; g <= Gx; g++)
       {
         UShort *hp = &hist [INDEX (Rm, g, b)];
-        for (int r = Rx - Rm; r >= 0; r--, hp++)
+		int r;
+        for (r = Rx - Rm; r >= 0; r--, hp++)
+		{
           if (*hp)
           {
             PixelCount += *hp;
             ColorCount++;
           } /* endif */
+		}
       } /* endfor */
+	}
   }
+
   // Move Rm up until we find pixels that contain this value
   bool ShrinkRm ()
   {
     UByte iRm = Rm;
     for (; Rm <= Rx; Rm++)
-      for (UByte b = Bm; b <= Bx; b++)
+	{
+	  UByte b;
+      for (b = Bm; b <= Bx; b++)
       {
         UShort *hp = &hist [INDEX (Rm, Gm, b)];
         for (int g = Gx - Gm; g >= 0; g--, hp += HIST_R_MAX)
           if (*hp) return (Rm != iRm);
       }
+	}
     return (Rm != iRm);
   }
+
   // Move Rx down until we find pixels that contain this value
   bool ShrinkRx ()
   {
@@ -186,63 +198,83 @@ struct csColorBox
       for (UByte b = Bm; b <= Bx; b++)
       {
         UShort *hp = &hist [INDEX (Rx, Gm, b)];
-        for (int g = Gx - Gm; g >= 0; g--, hp += HIST_R_MAX)
+		int g;
+        for (g = Gx - Gm; g >= 0; g--, hp += HIST_R_MAX)
           if (*hp) return (Rx != iRx);
       }
     return (Rx != iRx);
   }
+
   // Move Gm up until we find pixels that contain this value
   bool ShrinkGm ()
   {
     UByte iGm = Gm;
+
     for (; Gm <= Gx; Gm++)
-      for (UByte b = Bm; b <= Bx; b++)
+	{
+	  UByte b;
+      for (b = Bm; b <= Bx; b++)
       {
         UShort *hp = &hist [INDEX (Rm, Gm, b)];
-        for (int r = Rx - Rm; r >= 0; r--, hp++)
+		int r;
+        for (r = Rx - Rm; r >= 0; r--, hp++)
           if (*hp) return (Gm != iGm);
       }
+	}
     return (Gm != iGm);
   }
+
   // Move Gx down until we find pixels that contain this value
   bool ShrinkGx ()
   {
     UByte iGx = Gx;
     for (; Gx >= Gm; Gx--)
-      for (UByte b = Bm; b <= Bx; b++)
+	{
+	  UByte b;
+      for (b = Bm; b <= Bx; b++)
       {
         UShort *hp = &hist [INDEX (Rm, Gx, b)];
         for (int r = Rx - Rm; r >= 0; r--, hp++)
           if (*hp) return (Gx != iGx);
       }
+	}
     return (Gx != iGx);
   }
+
   // Move Bm up until we find pixels that contain this value
   bool ShrinkBm ()
   {
     UByte iBm = Bm;
     for (; Bm <= Bx; Bm++)
-      for (UByte g = Gm; g <= Gx; g++)
+	{
+	  UByte g;
+      for (g = Gm; g <= Gx; g++)
       {
         UShort *hp = &hist [INDEX (Rm, g, Bm)];
         for (int r = Rx - Rm; r >= 0; r--, hp++)
           if (*hp) return (Bm != iBm);
       }
+	}
     return (Bm != iBm);
   }
+
   // Move Bx down until we find pixels that contain this value
   bool ShrinkBx ()
   {
     UByte iBx = Bx;
     for (; Bx >= Bm; Bx--)
-      for (UByte g = Gm; g <= Gx; g++)
+	{
+	  UByte g;
+      for (g = Gm; g <= Gx; g++)
       {
         UShort *hp = &hist [INDEX (Rm, g, Bx)];
         for (int r = Rx - Rm; r >= 0; r--, hp++)
           if (*hp) return (Bx != iBx);
       }
+	}
     return (Bx != iBx);
   }
+
   // Shrink box: move min/max bounds until we hit an existing color
   void Shrink ()
   {
@@ -260,11 +292,13 @@ struct csColorBox
   {
     unsigned rs = 0, gs = 0, bs = 0;
     unsigned count = 0;
-    for (int b = Bm; b <= Bx; b++)
+	int b;
+    for (b = Bm; b <= Bx; b++)
       for (int g = Gm; g <= Gx; g++)
       {
         UShort *hp = &hist [INDEX (Rm, g, b)];
-        for (int r = Rm; r <= Rx; r++, hp++)
+		int r;
+        for (r = Rm; r <= Rx; r++, hp++)
           if (*hp)
           {
             unsigned pixc = *hp;
@@ -289,9 +323,13 @@ struct csColorBox
   void FillInverseCMap (UByte *icmap, UByte index)
   {
     int Rcount = Rx - Rm + 1;
-    for (int b = Bm; b <= Bx; b++)
-      for (int g = Gm; g <= Gx; g++)
+	int b;
+    for (b = Bm; b <= Bx; b++)
+	{
+	  int g;
+      for (g = Gm; g <= Gx; g++)
         memset (&icmap [INDEX (Rm, g, b)], index, Rcount);
+	}
   }
 };
 
@@ -650,8 +688,11 @@ void csQuantizeRemapDither (csRGBpixel *image, int pixels, int pixperline,
     csInverseColormap (colors - delta, palette + delta,
       HIST_R_BITS, HIST_G_BITS, HIST_B_BITS, icmap);
     if (transp)
-      for (int i = 0; i < HIST_R_MAX * HIST_G_MAX * HIST_B_MAX; i++)
+	{
+	  int i;
+      for (i = 0; i < HIST_R_MAX * HIST_G_MAX * HIST_B_MAX; i++)
         icmap [i]++;
+	}
     qState = qsRemap;
   }
 
@@ -711,7 +752,8 @@ void csQuantizeRemapDither (csRGBpixel *image, int pixels, int pixperline,
     int err10g = 0, err01g = 0, err11g = 0;
     int err10b = 0, err01b = 0, err11b = 0;
 
-    for (int fspix = pixperline; fspix; fspix--,
+	int fspix;
+    for (fspix = pixperline; fspix; fspix--,
       cursrc += dir, curdst += dir,
       curerr += dir3, nexterr += dir3)
     {

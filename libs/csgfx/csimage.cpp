@@ -28,7 +28,7 @@
 #include "csgfx/quantize.h"
 #include "csutil/util.h"
 
-//------------------------------------------------------ Helper functions -----
+//---------------------- Helper functions ---------------------------
 
 #define MIPMAP_NAME	mipmap_0
 #define MIPMAP_LEVEL	0
@@ -375,7 +375,8 @@ int csImageFile::closest_index (csRGBpixel *iColor)
   int closest_idx = -1;
   unsigned closest_dst = (unsigned)-1;
 
-  for (int idx = 0; idx < 256; idx++)
+  int idx;
+  for (idx = 0; idx < 256; idx++)
   {
     unsigned dst = sqr (iColor->red   - Palette [idx].red)   * R_COEF_SQ +
                    sqr (iColor->green - Palette [idx].green) * G_COEF_SQ +

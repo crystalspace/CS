@@ -20,6 +20,7 @@
 #define __CS_BUMPMAP_H__
 
 #include "cstypes.h"
+
 struct iImage;
 
 /** 
