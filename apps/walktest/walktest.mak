@@ -14,7 +14,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: walk walkclean
 
-walkall: walk vfs soft csfont simpcon perfstat rapid
+walkall: walk vfs soft csfont simpcon perfstat rapid sndload
 all apps: walk
 walk:
 	$(MAKE_TARGET)
