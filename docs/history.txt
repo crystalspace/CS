@@ -3,95 +3,92 @@ The history order is reversed so that new features are at the top.
 15-Oct-2001
 	- All func-id's are now changed so that they are equal to their
 	  interface name. Basically this means:
-	  	VFS -> iVFS
-		VideoDriver -> iGraphics3D
-		VideoCanvas -> iGraphics2D
-		SoundRender -> iSoundRender
-		ImageLoader -> iImageIO
-		SoundLoader -> iSoundLoader
-		LevelLoader -> iLoader
-		FontServer -> iFontServer
-		NetDriver -> iNetworkDriver
-		Console.Output -> iConsoleOutput
-		Console.Input -> iConsoleInput
-		Engine -> iEngine
-		MotionManager -> iMotionManager
-		Reporter -> iReporter
-		Converter -> iModelConverter
-		CrossBuilder -> iCrossBuilder
-		TextSyntaxService -> iSyntaxService
-	  This change was done in preparation for the removal of the
-	  function id's.
+	    VFS -> iVFS
+	    VideoDriver -> iGraphics3D
+	    VideoCanvas -> iGraphics2D
+	    SoundRender -> iSoundRender
+	    ImageLoader -> iImageIO
+	    SoundLoader -> iSoundLoader
+	    LevelLoader -> iLoader
+	    FontServer -> iFontServer
+	    NetDriver -> iNetworkDriver
+	    Console.Output -> iConsoleOutput
+	    Console.Input -> iConsoleInput
+	    Engine -> iEngine
+	    MotionManager -> iMotionManager
+	    Reporter -> iReporter
+	    Converter -> iModelConverter
+	    CrossBuilder -> iCrossBuilder
+	    TextSyntaxService -> iSyntaxService
+	  This change was done in preparation for the removal of the function
+	  ID's.
 	- All 'System.Plugins' entries in the config files have to be modified
 	  to the new func-id's above. For example, instead of:
-		System.Plugins.VideoDriver = crystalspace.graphics3d.software
+	    System.Plugins.VideoDriver = crystalspace.graphics3d.software
 	  you will now have to say:
-		System.Plugins.iGraphics3D = crystalspace.graphics3d.software
+	    System.Plugins.iGraphics3D = crystalspace.graphics3d.software
 	- In the future loading plugins like above (with interface name) will
-	  mark them as the default plugin for that interface (using the
-	  object registry). So if you do
-	  	CS_QUERY_REGISTRY(object_reg, iGraphics3D);
-	  you will get the default plugin implementing iGraphics3D. If you
-	  want to load additional plugins implementing some interface but
-	  not mark them as default you can do this like this:
-	  	System.Plugins.iGraphics3D.Extra = ...
+	  mark them as the default plugin for that interface (using the object
+	  registry).  So if you do
+	    CS_QUERY_REGISTRY(object_reg, iGraphics3D);
+	  you will get the default plugin implementing iGraphics3D.  If you
+	  want to load additional plugins implementing some interface but not
+	  mark them as default you can do this like this:
+	    System.Plugins.iGraphics3D.Extra = ...
 	  This will put them in the object registry with the tag
 	  "iGraphics3D.Extra" (not at this moment though).
-	- CS_LOAD_PLUGIN no longer accepts the FuncID argument. Instead it
-	  will use the interface name as the FuncID. This conforms well
-	  with the rename of the FuncID's above. If you still want to load
-	  a plugin with another FuncID then you can temporarily use
-	  CS_LOAD_PLUGIN_OLD.
-	- Renamed the _CS_LOAD_PLUGIN (mark the additional underscore in
-	  front) to CS_LOAD_PLUGIN_ALWAYS. Also removed the FuncID parameter.
-	- Removed the FuncID parameter from CS_QUERY_PLUGIN_CLASS. Instead
-	  the interface name is used as the FuncID.
-	- Made networking driver optional in Blocks (it gave an error when
-	  this plugin wasn't present).
-	- csInitializer::RequestPlugins() no longer needs a func-id after
-	  the plugin name. This means that if you use CS_REQUEST_PLUGIN
-	  you better remove everything after the ':' in the plugin name
-	  (including the ':'). Note that in the future this notation will
-	  still be useful. If given this will be used as the tag to register
-	  this plugin with the object registry. That way you can request
-	  plugins with another tag (normally it would be the default tag
-	  which is the same as the interface name).
-	- Removed an arbitrary limit in csPluginLoader of 255 plugins.
-	  This limitation was only there for an optimization which is
-	  certainly not very important. Remember the time when people
-	  said 640K was PLENTY!
-	- Plugins or components implementing some interface as default
-	  are now registered to the object registry using the interface
-	  name as tag. CS_QUERY_REGISTRY has been modified to search
-	  for tag name instead of interface (syntax doesn't change).
-	  CS_QUERY_REGISTRY_FAST has been removed because this doesn't make
-	  sense anymore. Note that CS_QUERY_REGISTRY will still check if
-	  the given interface is actually implemented and it will also
-	  return the pointer to that interface and not just the plugin.
-	- Added iObjectRegistryIterator with which you can iterate over
-	  objects in the object registry. Removed iObjectRegistry::Get()
-	  with which you could query the object registry based on
-	  SCF interface. Instead there is now iObjectRegistry::Get()
-	  with which you can query all objects in the object registry
-	  that implement a given interface. This will return an iterator.
-	  Also added iObjectRegistry::Get() which returns an iterator
-	  to iterate over all objects from the object registry.
+	- CS_LOAD_PLUGIN no longer accepts the FuncID argument.  Instead it
+	  will use the interface name as the FuncID.  This conforms well with
+	  the rename of the FuncID's above.  If you still want to load a plugin
+	  with another FuncID then you can temporarily use CS_LOAD_PLUGIN_OLD.
+	- Renamed the _CS_LOAD_PLUGIN (mark the additional underscore in front)
+	  to CS_LOAD_PLUGIN_ALWAYS.  Also removed the FuncID parameter.
+	- Removed the FuncID parameter from CS_QUERY_PLUGIN_CLASS.  Instead the
+	  interface name is used as the FuncID.
+	- Made networking driver optional in Blocks (it gave an error when this
+	  plugin wasn't present).
+	- csInitializer::RequestPlugins() no longer needs a func-id after the
+	  plugin name.  This means that if you use CS_REQUEST_PLUGIN you better
+	  remove everything after the ':' in the plugin name (including the
+	  ':').  Note that in the future this notation will still be useful.
+	  If given this will be used as the tag to register this plugin with
+	  the object registry.  That way you can request plugins with another
+	  tag (normally it would be the default tag which is the same as the
+	  interface name).
+	- Removed an arbitrary limit in csPluginLoader of 255 plugins.  This
+	  limitation was only there for an optimization which is certainly not
+	  very important.  Remember the time when people said 640K was PLENTY!
+	- Plugins or components implementing some interface as default are now
+	  registered to the object registry using the interface name as tag.
+	  CS_QUERY_REGISTRY has been modified to search for tag name instead of
+	  interface (syntax doesn't change).  CS_QUERY_REGISTRY_FAST has been
+	  removed because this doesn't make sense anymore.  Note that
+	  CS_QUERY_REGISTRY will still check if the given interface is actually
+	  implemented and it will also return the pointer to that interface and
+	  not just the plugin.
+	- Added iObjectRegistryIterator with which you can iterate over objects
+	  in the object registry.  Removed iObjectRegistry::Get() with which
+	  you could query the object registry based on SCF interface.  Instead
+	  there is now iObjectRegistry::Get() with which you can query all
+	  objects in the object registry that implement a given interface.
+	  This will return an iterator.  Also added iObjectRegistry::Get()
+	  which returns an iterator to iterate over all objects from the object
+	  registry.
 	- csPluginLoader now uses everything after the ':' as the tag to
-	  register the loaded plugin in the object registry. Make sure
-	  to use a tag name equal to the interface name if you want to mark
-	  a plugin as the default plugin for that interface. This will then
-	  be the plugin that is returned with CS_QUERY_REGISTRY.
-	- Eliminated all usage of the FuncID's. This means that the
-	  defines CS_FUNCID_... are now removed. CS_QUERY_PLUGIN_ID is
-	  also removed. CS_QUERY_PLUGIN is still there but it should be
-	  considered unsafe to use. Everything related to FuncID is also
-	  removed from the plugin manager.
-	  Note! This has been said before but you should now use the
-	  object registry to find plugins. The csPluginLoader class (which
-	  is used by csInitializer::RequestPlugins()) will actually register
-	  all plugins with the tag found in the config file.
-	- Added a new version of 3ds2lev from Luca Pancallo. Read README.1st
-	  for more information. Keep in mind that this version now requires
+	  register the loaded plugin in the object registry.  Make sure to use
+	  a tag name equal to the interface name if you want to mark a plugin
+	  as the default plugin for that interface.  This will then be the
+	  plugin that is returned with CS_QUERY_REGISTRY.
+	- Eliminated all usage of the FuncID's.  This means that the defines
+	  CS_FUNCID_...  are now removed.  CS_QUERY_PLUGIN_ID is also removed.
+	  CS_QUERY_PLUGIN is still there but it should be considered unsafe to
+	  use.  Everything related to FuncID is also removed from the plugin
+	  manager.  Note!  This has been said before but you should now use the
+	  object registry to find plugins.  The csPluginLoader class (which is
+	  used by csInitializer::RequestPlugins()) will actually register all
+	  plugins with the tag found in the config file.
+	- Added a new version of 3ds2lev from Luca Pancallo.  Read README.1st
+	  for more information.  Keep in mind that this version now requires
 	  the lib3ds library!
 	- Eric Sunshine eliminated an "unused variable" compilation warning
 	  from cswseng.cpp.
@@ -121,19 +118,24 @@ The history order is reversed so that new features are at the top.
 	  iEventHandler via embedding rather than multiple-inheritance.  This
 	  allows CSWS to once again operate correctly (not crash) on a certain
 	  nameless platform.
+	- Eric Sunshine made the following changes to the documentation:
+	    - Repaired a number of Texinfo mark-up errors.
+	    - Worked around a bug in texi2html where it complains if a
+	      @heading has the same name as a @node.
+	    - Eliminated a significant number of overfull and underfull `hbox'
+	      reported by TeX.
 14-Oct-2001
-	- The 'stdrep' plugin now depends on output console and
-	  reporter plugins in SCF. This means that it will be loaded
-	  after those two other plugins by csPluginLoader. This
-	  fixes a bug where the stdrep plugin was not correctly
-	  initialized in some cases.
+	- The 'stdrep' plugin now depends on output console and reporter
+	  plugins in SCF.  This means that it will be loaded after those two
+	  other plugins by csPluginLoader.  This fixes a bug where the stdrep
+	  plugin was not correctly initialized in some cases.
 	- Eric Sunshine eliminated a compilation warning from ogl_txtmgr.cpp.
 13-Oct-2001
 	- Fixed compilation error in OpenGL Canvas for X.
 12-Oct-2001
-	- Fixed a bug in AWS where it would try to load something
-	  from VFS ONLY if VFS could NOT be loaded. I think it should
-	  be the opposite rather :-)
+	- Fixed a bug in AWS where it would try to load something from VFS ONLY
+	  if VFS could NOT be loaded.  I think it should be the opposite
+	  rather.  :-)
 	- Avoided nearly all usage of CS_QUERY_PLUGIN and CS_QUERY_PLUGIN_ID
 	  in CS. The reason CS_QUERY_PLUGIN is bad is that it queries the
 	  plugin manager based on interface but there is no way to control

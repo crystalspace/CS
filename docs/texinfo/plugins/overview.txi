@@ -52,20 +52,20 @@ plugin instead. @xref{csEngine}.
 Mesh objects are 3D objects that can be used and displayed by the engine.
 Examples are 3D sprites, 2D sprites, particle systems, terrain mesh, ....
 This functionality used to be in the engine but has been removed from the
-engine for greater flexibility. @xref{MeshObject}
+engine for greater flexibility. @xref{MeshObject}.
 
 @item
 @emph{Map Loader}
 
 This plug-in provides map loading capabilities for your game. In addition
 it also contains functions to load mesh objects, textures, and sounds.
-@xref{csParser}
+@xref{csParser}.
 
 @item
 @emph{Model Converters}
 
 Helps loading model files of various formats (3DS, ASE, MDL, MD2, ...)
-and store them in a common data structure. @xref{Model Conversion}
+and store them in a common data structure. @xref{Model Conversion}.
 
 @item
 @emph{Image Loaders}

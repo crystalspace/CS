@@ -28,6 +28,7 @@ available online.  The @sc{api} documentation can be generated locally or
 viewed online.  @xref{Where to Get}.
 
 @menu
+* Simple Basic Concepts:: Basic Crystal Space Concepts
 * Simple Minimum Requirements:: Minimum Application Requirements
 * Simple Main Structure::
 * Simple Event Handling:: Event Handling
@@ -36,7 +37,7 @@ viewed online.  @xref{Where to Get}.
 * Simple Locomotion:: Locomotion (Moving Around)
 @end menu
 
-@node Simple Basic Concepts
+@node Simple Basic Concepts, Simple Minimum Requirements, Tutorial Simple, Tutorial Simple
 @subsection Basic Crystal Space Concepts
 @cindex Basic Crystal Space Concepts
 @cindex Simple Tutorial
@@ -46,14 +47,14 @@ that you need to know about. Here we will give a quick overview of all
 important things you need to know about when writing Crystal Space
 applications.
 
-@subsubsection @sc{scf}
+@subsubheading The @sc{scf} Facility
 @cindex @sc{scf}
 
 The @sc{scf} (@pxref{SCF}) system is the core low-level memory framework
 for Crystal Space. You must initialize this before doing anything else
 (one way is to use @code{csInitializer::InitializeSCF()}).
 
-@subsubsection The Object Registry
+@subsubheading The Object Registry
 @cindex @code{iObjectRegistry}
 @cindex Object Registry
 
@@ -65,7 +66,7 @@ registry. You can create an object registry using
 @code{csInitializer::CreateObjectRegistry()} or
 @code{csInitializer::CreateEnvironment()}.
 
-@subsubsection The Plugin Manager
+@subsubheading The Plugin Manager
 @cindex @code{iPluginManager}
 @cindex Plugin Manager
 
@@ -78,7 +79,7 @@ is an important object. You can create the plugin manager with
 @code{csInitializer::CreatePluginManager()} or
 @code{csInitializer::CreateEnvironment()}.
 
-@subsubsection The Event Queue
+@subsubheading The Event Queue
 @cindex @code{iEventQueue}
 @cindex The Event Queue
 @cindex @code{iEventHandler}
@@ -99,7 +100,7 @@ done in response to the @code{cscmdProcess} event) and also catching
 keyboard/mouse input. But there is much more. To setup an event handler
 for the application you can use @code{csInitializer::SetupEventHandler()}.
 
-@subsubsection The Virtual Clock
+@subsubheading The Virtual Clock
 @cindex @code{iVirtualClock}
 @cindex Virtual Clock
 
@@ -116,7 +117,7 @@ The virtual clock can be created with
 @code{csInitializer::CreateVirtualClock()} or
 @code{csInitializer::CreateEnvironment()}.
 
-@subsubsection The Commandline Parser
+@subsubheading The Commandline Parser
 @cindex @code{iCommandLineParser}
 @cindex Commandline Parser
 
@@ -130,29 +131,46 @@ initialized. The commandline parser can be created with
 @code{csInitializer::CreateEnvironment()}. You can setup the commandline
 parser with @code{csInitializer::SetupCommandLineParser()}.
 
-@subsubsection The Config Manager
+@subsubheading The Configuration Manager
 @cindex @code{iConfigManager}
-@cindex Config Manager
+@cindex Configuration Manager
 
-The config manager is responsible for reading options from config files.
-All config files are put in a global pool which is managed by the config
-manager. Several Crystal Space plugins and modules will query options
-from the config manager and Crystal Space applications can also do that
-if they want. You can create the config manager with
-@code{csInitializer::CreateConfigManager()} or
-@code{csInitializer::CreateEnvironment()}. You can setup the config manager
-with @code{csInitializer::SetupConfigManager()}.
+The configuration manager is responsible for reading options from configuration
+files.  All configuration files are put in a global pool which is managed by
+the configuration manager.  Several Crystal Space plugins and modules will
+query options from the configuration manager and Crystal Space applications can
+also do that if they want.
 
-@subsubsection The Input Drivers
+You can create the configuration manager with:
+
+@code{csInitializer::CreateConfigManager()}@*
+
+@noindent
+or
+
+@code{csInitializer::CreateEnvironment()}
+
+You can setup the configuration manager with:
+
+@code{csInitializer::SetupConfigManager()}.
+
+@subsubheading The Input Drivers
 @cindex Input Drivers
 
 There are three standard input drivers included with Crystal Space:
-keyboard, mouse, and joystick. The @code{csInitializer::CreateInputDrivers()}
-function (or @code{csInitializer::CreateEnvironment()}) will create them
-and register them with the object registry. These drivers will post events
-to the global event queue.
+keyboard, mouse, and joystick. Calling
 
-@subsubsection The @code{csInitializer} class
+@code{csInitializer::CreateInputDrivers()}
+
+@noindent
+or
+
+@code{csInitializer::CreateEnvironment()}
+
+will create the drivers and publish them via the object registry.  These
+drivers will post events to the global event queue.
+
+@subsubheading The @code{csInitializer} class
 @cindex @code{csInitializer}
 
 We already mentioned several of the functions above. This class (for which
@@ -162,7 +180,7 @@ get the application running. In the tutorial below we will use several of the
 functions from @code{csInitializer}. This class contains only static member
 functions.
 
-@node Simple Minimum Requirements, Simple Main Structure, Tutorial Simple, Tutorial Simple
+@node Simple Minimum Requirements, Simple Main Structure, Simple Basic Concepts, Tutorial Simple
 @subsection Minimum Application Requirements
 @cindex Tutorial Minimum Application Requirements
 @cindex Minimum Application Requirements, Tutorial
@@ -178,7 +196,7 @@ be included by a header file.
 
 @item
 @code{CS_IMPLEMENT_APPLICATION} needs to be put in the beginning of
-the file (@em{after} the includes).
+the file (@emph{after} the includes).
 
 @item
 The @code{main()} function must be declared with the following prototype:
@@ -195,8 +213,7 @@ and runs on all platforms supported by Crystal Space.
 @cindex Tutorial Simple Main Structure
 @cindex Simple Main Structure, Tutorial
 
-@@@@@@@@@@@@@@@@@@@@@@@
-TUTORIAL NO LONGER VALID FROM THIS POINT ON!
+@@@@@@ TUTORIAL NO LONGER VALID FROM THIS POINT ON!
 
 First a little explanation.  @samp{SysSystemDriver} is a system dependent
 class which is reponsible for controlling the main Crystal Space stuff.  It
@@ -511,7 +528,8 @@ bool Simple::HandleEvent (iEvent& Event)
 
   if (Event.Type == csevKeyDown && Event.Key.Code == CSKEY_ESC)
   @{
-    iEventQueue* q = CS_QUERY_REGISTRY (GetObjectRegistry (), iEventQueue);
+    iEventQueue* q =
+      CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
     if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
     return true;
   @}

@@ -37,9 +37,15 @@ Space, i.e. @file{zlib.dll}, @file{libjpeg.dll}, @file{png.dll} and
 @file{msvc_libs_0.19.zip} can be downloaded from:
 
 @noindent
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc_libs_0.19.zip}
-or
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc_libs_0.19.zip}@*
+or@*
+@ifnottex
 @uref{http://www.philipwyett.dsl.pipex.com/crystal_space/msvc/downloads/msvc_libs_0.19.zip}
+@end ifnottex
+@iftex
+@code{http://www.philipwyett.dsl.pipex.com/crystal_space/msvc/downloads/}@*
+@code{msvc_libs_0.19.zip}
+@end iftex
 
 Once you have downloaded the msvc_libs package, extract it too your @file{CS\}
 root directory.
@@ -132,17 +138,30 @@ version i.e. 2.0.
 @subsubheading BisonFlex
 
 To successfully build the Crystal Space Alternate Windowing System (AWS) plugin
-with Visual C++ requires you have @emph{BisonFlex} by @uref{http://www.fg-soup.com}
-installed on your system. To download the version of @emph{BisonFlex} for your
-@emph{Visual C++} version, use the corresponding link below.
+with Visual C++ requires you have @emph{BisonFlex} by
+@uref{http://www.fg-soup.com} installed on your system.  To download the
+version of @emph{BisonFlex} for your @emph{Visual C++} version, use the
+corresponding link below.
 
 For Visual C++ 5:
 
+@ifnottex
 @uref{http://www.philipwyett.dsl.pipex.com/crystal_space/msvc/downloads/bfwizard-1.5.zip}
+@end ifnottex
+@iftex
+@code{http://www.philipwyett.dsl.pipex.com/crystal_space/msvc/downloads/}@*
+@code{bfwizard-1.5.zip}
+@end iftex
 
 For Visual C++ 6:
 
+@ifnottex
 @uref{http://www.philipwyett.dsl.pipex.com/crystal_space/msvc/downloads/bfwizard-1.6.zip}
+@end ifnottex
+@iftex
+@code{http://www.philipwyett.dsl.pipex.com/crystal_space/msvc/downloads/}@*
+@code{bfwizard-1.6.zip}
+@end iftex
 
 @subsubheading Setting up and building the AWS plugin
 
@@ -151,15 +170,24 @@ Open @file{CS\mk\visualc\csall.dsw}.
 In the left hand @emph{Workspace} window click on the @emph{FileView} tab
 at the bottom, then in the window look for and find the project @emph{plgaws}.
 
-Now expand the aws project in the tree and then the @emph{Resource Files} directory.
+Now expand the aws project in the tree and then the @emph{Resource Files}
+directory.
 
 Right click on @file{skinlang.flx} and click on @emph{Settings}.
 
-You will now be presented with the @emph{Project Settings} dialog for that file.
+You will now be presented with the @emph{Project Settings} dialog for that
+file.
 
-Click on the @emph{Custom Build} tab. In the text box @emph{Commands} enter the following:
+Click on the @emph{Custom Build} tab.  In the text box @emph{Commands} enter
+the following:
 
+@ifnottex
 @code{flex.exe -Plex_cpp -L -t ..\..\plugins\aws\skinlang.flx > ..\..\plugins\aws\sllex.cpp}
+@end ifnottex
+@iftex
+@code{flex.exe -Plex_cpp -L -t ..\..\plugins\aws\skinlang.flx >}@*
+@code{..\..\plugins\aws\sllex.cpp}
+@end iftex
 
 Now in the @emph{Outputs} text box enter the following:
 
@@ -168,7 +196,8 @@ Now in the @emph{Outputs} text box enter the following:
 Next click on the @emph{General} tab and check the box
 @emph{Always use the custom build step}
 
-Now just @emph{Ok} out of that dialog box and do a @emph{Save all} and re-build CS.
+Now just @emph{Ok} out of that dialog box and do a @emph{Save all} and re-build
+CS.
 
 You need not compile all parts of Crystal Space.  For example, if you don't
 want to use DirectX (DDRAW/D3D) for graphics or have Python scripting support,

@@ -25,8 +25,10 @@ another system.
 To load a collision detection system you can use the following code:
 
 @example
-iPluginManager* plugmgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-iConfigManager* config = CS_QUERY_REGISTRY (object_reg, iConfigManager);
+iPluginManager* plugmgr =
+  CS_QUERY_REGISTRY (object_reg, iPluginManager);
+iConfigManager* config =
+  CS_QUERY_REGISTRY (object_reg, iConfigManager);
 const char* p = config->GetStr ("MyGame.Settings.CollDetPlugin",
   	"crystalspace.collisiondetection.rapid");
 iCollideSystem* cd_sys =
@@ -87,8 +89,9 @@ use the following code instead of the @code{InitCollider()} routine
 above:
 
 @example
-csColliderWrapper* colwrap = new csColliderWrapper (mymesh->QueryObject (),
-	cd_sys, 
+csColliderWrapper* colwrap =
+  new csColliderWrapper(mymesh->QueryObject(), cd_sys, 
+
 bool MyGame::InitCollider (iMeshWrapper* mesh)
 @{
   iPolygonMesh* polmesh = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),

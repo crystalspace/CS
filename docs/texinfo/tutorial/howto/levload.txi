@@ -13,27 +13,28 @@ ways to make sure you have this plugin in your application. You can put
 a line in your config file like this:
 
 @example
-  System.Plugins.LevelLoader = crystalspace.level.loader
+System.Plugins.LevelLoader = crystalspace.level.loader
 @end example
 
 Or you can put the following line in your @code{main} routine right
 before calling @code{csSystemDriver::Initialize()}:
 
 @example
-  System->RequestPlugin ("crystalspace.level.loader:LevelLoader");
-  ...
-  if (!System->Initialize (argc, argv, NULL))
-  @{
-    ...
+System->RequestPlugin ("crystalspace.level.loader:LevelLoader");
+@dots{}
+if (!System->Initialize (argc, argv, NULL))
+@{
+@dots{}
 @end example
 
 To finally be able to use the level loader in your application you
 need to do:
 
 @example
-  iPluginManager* plugmgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  iLoader* level_loader = CS_QUERY_PLUGIN_ID (plugmgr,
-  	CS_FUNCID_LVLLOADER, iLoader);
+iPluginManager* plugmgr =
+  CS_QUERY_REGISTRY(object_reg, iPluginManager);
+iLoader* level_loader =
+  CS_QUERY_PLUGIN_ID(plugmgr, CS_FUNCID_LVLLOADER, iLoader);
 @end example
 
 When you don't need it anymore you must call @code{level_loader->DecRef ()}.
@@ -43,9 +44,9 @@ When you don't need it anymore you must call @code{level_loader->DecRef ()}.
 Loading a map is simple. You just do:
 
 @example
-  VFS->ChDir ("/lev/mymap");
-  level_loader->LoadMapFile ("world");
-  engine->Prepare ();
+VFS->ChDir ("/lev/mymap");
+level_loader->LoadMapFile ("world");
+engine->Prepare ();
 @end example
 
 This will first set the current directory to the right @sc{vfs} dir
@@ -65,8 +66,7 @@ lightmaps will be loaded from the cache, ...).
 The include files useful for this section are:
 
 @example
-  #include "isys/vfs.h"
-  #include "imap/parser.h"
-  #include "iengine/engine.h"
+#include "isys/vfs.h"
+#include "imap/parser.h"
+#include "iengine/engine.h"
 @end example
-
