@@ -39,7 +39,10 @@ chronological order.
 	- res changed the ApplicationIcon Jam rule to set the icon path to
 	  SEARCH_SOURCE if no path was explicitly provided. Without this 
 	  change, was apparently not utilized and the icon file not found.
-	- res updated msvcgen to honor the Jam-set application icon.
+	- Eric Sunshine applied the same SEARCH_SOURCE fix to the
+	  ApplicationIconDefault rule.
+	- res updated msvcgen.jam to honor application icon specified by
+	  ApplicationIconDefault and ApplicationIcon.
 	- res changed the cslight Jamfile to use the ApplicationIcon rule to
 	  set its icon.
 3-May-2004

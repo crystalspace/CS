@@ -24,11 +24,11 @@
 ##    If invoked with three or more arguments, specifies the default icon for
 ##    applications of the specified type for the given platform, which may be
 ##    'macosx', 'win32', or 'unix'.  Type should be 'all', 'gui', or 'console'.
-##    This setting can be overriden for a individual application with the
-##    ApplicationIcon rule.  This rule must be invoked before invoking any
-##    Application rules if it is to have any effect.  If invoked with two
-##    arguments, returns the default icon (if any) for the given platform and
-##    type.
+##    If pathcomponents is omitted, SEARCH_SOURCE is used.  This setting can be
+##    overriden for an individual application with the ApplicationIcon rule.
+##    This rule must be invoked before invoking any Application rules if it is
+##    to have any effect.  If invoked with two arguments, returns the default
+##    icon (if any) for the given platform and type.
 rule ApplicationIconDefault
 {
   local platform = $(1) ;
@@ -44,6 +44,10 @@ rule ApplicationIconDefault
     {
       SEARCH on $(icon) = [ ConcatDirs $(iconpath) ] ;
     }
+    else
+    {
+      SEARCH on $(icon) = $(SEARCH_SOURCE) ;
+    }
   }
 
   local result = [ Property appicon : $(key) ] ;
@@ -56,7 +60,7 @@ rule ApplicationIconDefault
 
 ## ApplicationIcon platform : basename [ : icon [ : pathcomponents ]]
 ##    If invoked with three or more arguments, specifies the icon for the
-##    application given by basename for the given platform, which may be
+##    application given by basename for the indicated platform, which may be
 ##    'macosx', 'win32', or 'unix'.  If pathcomponents is omitted,
 ##    SEARCH_SOURCE is used.  If this rule is not invoked, then the icon
 ##    specified via ApplicationIconDefault is used, if any.  This rule must be
