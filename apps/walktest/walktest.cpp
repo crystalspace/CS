@@ -47,8 +47,6 @@
 #include "csengine/world.h"
 #include "csengine/covtree.h"
 #include "csengine/solidbsp.h"
-#include "csscript/csscript.h"
-#include "csscript/intscri.h"
 #include "csengine/cspixmap.h"
 #include "csengine/terrain.h"
 #include "csengine/cssprite.h"
@@ -102,7 +100,6 @@ WalkTest::WalkTest () :
   extern bool CommandHandler (const char *cmd, const char *arg);
   Command::ExtraHandler = CommandHandler;
   auto_script = NULL;
-  layer = NULL;
   view = NULL;
   infinite_maze = NULL;
   huge_room = NULL;
@@ -155,7 +152,6 @@ WalkTest::~WalkTest ()
   if (collide_system) collide_system->DecRef ();
   delete wf;
   delete [] auto_script;
-  delete layer;
   delete view;
   delete infinite_maze;
   delete huge_room;
@@ -737,8 +733,6 @@ void WalkTest::PrepareFrame (time_t elapsed_time, time_t current_time)
     time0 = SysGetTime ();
   }
   cnt--;
-
-  layer->step_run ();
 }
 
 void perf_test (int num)
@@ -750,7 +744,6 @@ void perf_test (int num)
   int i;
   for (i = 0 ; i < num ; i++)
   {
-    Sys->layer->step_run ();
     Sys->DrawFrame (SysGetTime ()-t, SysGetTime ());
     t = SysGetTime ();
   }
@@ -810,15 +803,6 @@ void debug_dump ()
   Sys->Printf (MSG_DEBUG_0, "Camera dumped in debug.txt\n");
   Dumper::dump (Sys->world);
   Sys->Printf (MSG_DEBUG_0, "World dumped in debug.txt\n");
-}
-
-/*
- * A sample script which just prints a message on screen.
- */
-bool do_message_script (IntRunScript* sc, char* data)
-{
-  sc->get_layer ()->message (data);
-  return true;
 }
 
 //---------------------------------------------------------------------------
@@ -1029,12 +1013,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   // Initialize the command processor with the world and camera.
   Command::Initialize (world, view->GetCamera (), Gfx3D, System->Console, System);
 
-  // Create the language layer needed for scripting.
-  // Also register a small C script so that it can be used
-  // by levels. large.zip uses this script.
-  layer = new LanguageLayer (world, view->GetCamera ());
-  int_script_reg.reg ("message", &do_message_script);
-
   // Now we have two choices. Either we create an infinite
   // maze (random). This happens when the '-infinite' commandline
   // option is given. Otherwise we load the given world.
@@ -1145,7 +1123,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
 
 
     // Load the world from the file.
-    if (!csLoader::LoadWorldFile (world, layer, "world"))
+    if (!csLoader::LoadWorldFile (world, "world"))
     {
       Printf (MSG_FATAL_ERROR, "Loading of world failed!\n");
       return false;
@@ -1317,11 +1295,25 @@ void init_sig ()
 
 #endif //OS_UNIX
 
+
+#include "csgeom/frustum.h"
 /*---------------------------------------------------------------------*
  * Main function
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
+  //csVector3 rectfr[4];
+  //rectfr[0].Set(0,1,1);
+  //rectfr[1].Set(1,1,1);
+  //rectfr[2].Set(1,0,1);
+  //rectfr[3].Set(0,0,1);
+  //csVector3 trifr[4];
+  //trifr[0].Set(0,0,2);
+  //trifr[1].Set(8,8,2);
+  //trifr[2].Set(8,0,2);
+  //int classres = csFrustum::Classify(rectfr, 4, trifr, 3);
+  //printf("Classify says %d  (0=out, 1=in, 2=cover, 3=part)\n", classres);
+
 #ifdef OS_UNIX
   init_sig ();
 #endif

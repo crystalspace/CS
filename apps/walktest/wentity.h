@@ -21,8 +21,10 @@
 
 #include "csobject/dataobj.h"
 #include "csgeom/vector3.h"
+#include "csutil/cscolor.h"
 
 class csThing;
+class csLight;
 
 /**
  * This is a global object that holds all 'busy' entities.
@@ -76,6 +78,80 @@ public:
   void SetHinge (const csVector3& h) { hinge = h; }
 
   /// Activate this entity (open/close door).
+  virtual void Activate ();
+
+  /// Handle next frame.
+  virtual void NextFrame (float elapsed_time);
+
+  CSOBJTYPE;
+};
+
+/**
+ * A Rotating object.
+ */
+class csRotatingObject : public csWalkEntity
+{
+private:
+  /// If 'always' is true it rotates continuously.
+  bool always;
+  /// The rotation angles.
+  csVector3 angles;
+  /// Parent thing.
+  csThing* parent;
+  /// Time remaining before we stop rotating (if always == false).
+  float remaining;
+
+public:
+  /// Create this object.
+  csRotatingObject (csThing* p);
+
+  /// Set rotation angles.
+  void SetAngles (const csVector3& a) { angles = a; }
+
+  /// Set the 'always' flag.
+  void SetAlways (bool a) { always = a; }
+
+  /// Activate this entity (start rotation).
+  virtual void Activate ();
+
+  /// Handle next frame.
+  virtual void NextFrame (float elapsed_time);
+
+  CSOBJTYPE;
+};
+
+/**
+ * An object controlling a pseudo-dynamic light.
+ */
+class csLightObject : public csWalkEntity
+{
+private:
+  /// The light that is controlled by this entity.
+  csLight* light;
+  /// The color to set this light to on activation.
+  csColor start_color;
+  /// The color we will end up with when activation ends.
+  csColor end_color;
+  /// On activation, the time to take to go from start to end.
+  float act_time;
+  /// Current elapsed time.
+  float cur_time;
+
+public:
+  /// Create this object.
+  csLightObject (csLight* p);
+
+  /// Set colors.
+  void SetColors (const csColor& start_color, const csColor& end_color)
+  {
+    csLightObject::start_color = start_color;
+    csLightObject::end_color = end_color;
+  }
+
+  /// Set total time to take for animation.
+  void SetTotalTime (float t) { act_time = t; }
+
+  /// Activate this entity.
   virtual void Activate ();
 
   /// Handle next frame.

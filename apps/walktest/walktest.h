@@ -32,7 +32,6 @@
 
 class Polygon3D;
 class WalkTest;
-class LanguageLayer;
 class csView;
 class csSoundData;
 class csWorld;
@@ -189,9 +188,6 @@ public:
   /// The main engine interface
   /// (when interface will be complete, csWorld will not be needed anymore)
   iWorld *World;
-
-  /// For scripting.
-  LanguageLayer* layer;
 
   /// The view on the world.
   csView* view;

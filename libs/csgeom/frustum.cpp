@@ -400,6 +400,7 @@ int csFrustum::Classify (csVector3* frustum, int num_frust,
       if ((prev_d < 0 && d > 0)
        || (prev_d > 0 && d < 0))
       {
+//@@@@@@ More efficient: (v1%p1)*p2 >= 0 or (v2%p1)*p2 >= 0
         // If the segment intersects with the frustum plane somewhere
         // between two limiting lines, we have the CS_FRUST_PARTIAL case.
         csVector3 p = poly [pvp] - (poly [pv] - poly [pvp])

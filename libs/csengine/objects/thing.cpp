@@ -641,8 +641,6 @@ void csThing::UpdateInPolygonTrees ()
   // If thing has not been placed in a sector we do nothing here.
   if (!sector) return;
 
-  tree_bbox.RemoveFromTree ();
-
   // If we are not in a sector which has a polygon tree
   // then we don't really update. We should consider if this is
   // a good idea. Do we only want this object updated when we
@@ -655,84 +653,10 @@ void csThing::UpdateInPolygonTrees ()
 
   csBox3 b;
   GetBoundingBox (b);
-  csVector3Array& va = tree_bbox.GetVertices ();
-  va.MakeEmpty ();
 
   //csTransform trans = csTransform (m_obj2world, m_world2obj * -v_obj2world);
   csReversibleTransform trans = obj.GetInverse ();
-
-  // Add the eight corner points of the bounding box to the container.
-  // Transform from object to world space here.
-  int pt_xyz = va.AddVertex (trans.Other2This (b.GetCorner (BOX_CORNER_xyz)));
-  int pt_Xyz = va.AddVertex (trans.Other2This (b.GetCorner (BOX_CORNER_Xyz)));
-  int pt_xYz = va.AddVertex (trans.Other2This (b.GetCorner (BOX_CORNER_xYz)));
-  int pt_XYz = va.AddVertex (trans.Other2This (b.GetCorner (BOX_CORNER_XYz)));
-  int pt_xyZ = va.AddVertex (trans.Other2This (b.GetCorner (BOX_CORNER_xyZ)));
-  int pt_XyZ = va.AddVertex (trans.Other2This (b.GetCorner (BOX_CORNER_XyZ)));
-  int pt_xYZ = va.AddVertex (trans.Other2This (b.GetCorner (BOX_CORNER_xYZ)));
-  int pt_XYZ = va.AddVertex (trans.Other2This (b.GetCorner (BOX_CORNER_XYZ)));
-
-  csBspPolygon* poly;
-
-  poly = (csBspPolygon*)csBspPolygon::GetPolygonPool().Alloc ();
-  tree_bbox.AddPolygon (poly);
-  poly->SetOriginator (this);
-  poly->GetPolygon ().AddVertex (pt_xYz);
-  poly->GetPolygon ().AddVertex (pt_XYz);
-  poly->GetPolygon ().AddVertex (pt_Xyz);
-  poly->GetPolygon ().AddVertex (pt_xyz);
-  poly->SetPolyPlane (csPlane3 (0, 0, 1, -b.MinZ ()));
-  poly->Transform (trans);
-
-  poly = (csBspPolygon*)csBspPolygon::GetPolygonPool().Alloc ();
-  tree_bbox.AddPolygon (poly);
-  poly->SetOriginator (this);
-  poly->GetPolygon ().AddVertex (pt_XYz);
-  poly->GetPolygon ().AddVertex (pt_XYZ);
-  poly->GetPolygon ().AddVertex (pt_XyZ);
-  poly->GetPolygon ().AddVertex (pt_Xyz);
-  poly->SetPolyPlane (csPlane3 (-1, 0, 0, b.MaxX ()));
-  poly->Transform (trans);
-
-  poly = (csBspPolygon*)csBspPolygon::GetPolygonPool().Alloc ();
-  tree_bbox.AddPolygon (poly);
-  poly->SetOriginator (this);
-  poly->GetPolygon ().AddVertex (pt_XYZ);
-  poly->GetPolygon ().AddVertex (pt_xYZ);
-  poly->GetPolygon ().AddVertex (pt_xyZ);
-  poly->GetPolygon ().AddVertex (pt_XyZ);
-  poly->SetPolyPlane (csPlane3 (0, 0, -1, b.MaxZ ()));
-  poly->Transform (trans);
-
-  poly = (csBspPolygon*)csBspPolygon::GetPolygonPool().Alloc ();
-  tree_bbox.AddPolygon (poly);
-  poly->SetOriginator (this);
-  poly->GetPolygon ().AddVertex (pt_xYZ);
-  poly->GetPolygon ().AddVertex (pt_xYz);
-  poly->GetPolygon ().AddVertex (pt_xyz);
-  poly->GetPolygon ().AddVertex (pt_xyZ);
-  poly->SetPolyPlane (csPlane3 (1, 0, 0, -b.MinX ()));
-  poly->Transform (trans);
-
-  poly = (csBspPolygon*)csBspPolygon::GetPolygonPool().Alloc ();
-  tree_bbox.AddPolygon (poly);
-  poly->SetOriginator (this);
-  poly->GetPolygon ().AddVertex (pt_xYZ);
-  poly->GetPolygon ().AddVertex (pt_XYZ);
-  poly->GetPolygon ().AddVertex (pt_XYz);
-  poly->GetPolygon ().AddVertex (pt_xYz);
-  poly->SetPolyPlane (csPlane3 (0, -1, 0, b.MaxY ()));
-  poly->Transform (trans);
-
-  poly = (csBspPolygon*)csBspPolygon::GetPolygonPool().Alloc ();
-  tree_bbox.AddPolygon (poly);
-  poly->SetOriginator (this);
-  poly->GetPolygon ().AddVertex (pt_xyz);
-  poly->GetPolygon ().AddVertex (pt_Xyz);
-  poly->GetPolygon ().AddVertex (pt_XyZ);
-  poly->GetPolygon ().AddVertex (pt_xyZ);
-  poly->SetPolyPlane (csPlane3 (0, 1, 0, -b.MinY ()));
-  poly->Transform (trans);
+  tree_bbox.Update (b, trans, this);
 
   // Here we need to insert in trees where this thing lives.
   tree = sector->GetStaticTree ();

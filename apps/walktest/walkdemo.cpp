@@ -48,7 +48,6 @@
 #include "csparser/snddatao.h"
 #include "csparser/csloader.h"
 #include "csparser/crossbld.h"
-#include "csscript/csscript.h"
 #include "csgeom/math3d.h"
 #include "isndsrc.h"
 #include "isndlstn.h"

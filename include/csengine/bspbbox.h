@@ -29,6 +29,9 @@
 #include "csobject/csobject.h"
 
 class csPolyTreeBBox;
+class csPolygonTree;
+class csTransform;
+class csBox3;
 
 /**
  * A factor for creating instances of csBspPolygon.
@@ -200,6 +203,19 @@ public:
   
   /// Get camera vector array for this container.
   csVector3Array& GetCameraVertices () { return cam_vertices; }
+
+  /**
+   * Update this object using an object space bounding box
+   * and a transformation.
+   */
+  void Update (const csBox3& object_bbox, const csTransform& o2w,
+  	csObject* originator);
+
+  /**
+   * Update this object using a world space bounding box.
+   */
+  void Update (const csBox3& world_bbox,
+  	csObject* originator);
 
   /// Add a polygon to this container.
   void AddPolygon (csPolygonInt* poly)

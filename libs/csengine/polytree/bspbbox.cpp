@@ -797,6 +797,195 @@ void csPolyTreeBBox::World2Camera (const csTransform& trans)
   is_cam_transf = true;
 }
 
+void csPolyTreeBBox::Update (const csBox3& object_bbox, const csTransform& o2w,
+	csObject* originator)
+{
+  RemoveFromTree ();
+
+  const csBox3& b = object_bbox;
+  csVector3Array& va = GetVertices ();
+  va.MakeEmpty ();
+
+  // Add the eight corner points of the bounding box to the container.
+  // Transform from object to world space here.
+  world_bbox.StartBoundingBox ();
+  csVector3 v;
+  v = o2w.Other2This (b.GetCorner (BOX_CORNER_xyz));
+  int pt_xyz = va.AddVertex (v);
+  world_bbox.AddBoundingVertex (v);
+  v = o2w.Other2This (b.GetCorner (BOX_CORNER_Xyz));
+  int pt_Xyz = va.AddVertex (v);
+  world_bbox.AddBoundingVertex (v);
+  v = o2w.Other2This (b.GetCorner (BOX_CORNER_xYz));
+  int pt_xYz = va.AddVertex (v);
+  world_bbox.AddBoundingVertex (v);
+  v = o2w.Other2This (b.GetCorner (BOX_CORNER_XYz));
+  int pt_XYz = va.AddVertex (v);
+  world_bbox.AddBoundingVertex (v);
+  v = o2w.Other2This (b.GetCorner (BOX_CORNER_xyZ));
+  int pt_xyZ = va.AddVertex (v);
+  world_bbox.AddBoundingVertex (v);
+  v = o2w.Other2This (b.GetCorner (BOX_CORNER_XyZ));
+  int pt_XyZ = va.AddVertex (v);
+  world_bbox.AddBoundingVertex (v);
+  v = o2w.Other2This (b.GetCorner (BOX_CORNER_xYZ));
+  int pt_xYZ = va.AddVertex (v);
+  world_bbox.AddBoundingVertex (v);
+  v = o2w.Other2This (b.GetCorner (BOX_CORNER_XYZ));
+  int pt_XYZ = va.AddVertex (v);
+  world_bbox.AddBoundingVertex (v);
+
+  csBspPolygon* poly;
+
+  poly = (csBspPolygon*)csBspPolygon::GetPolygonPool().Alloc ();
+  AddPolygon (poly);
+  poly->SetOriginator (originator);
+  poly->GetPolygon ().AddVertex (pt_xYz);
+  poly->GetPolygon ().AddVertex (pt_XYz);
+  poly->GetPolygon ().AddVertex (pt_Xyz);
+  poly->GetPolygon ().AddVertex (pt_xyz);
+  poly->SetPolyPlane (csPlane3 (0, 0, 1, -b.MinZ ()));
+  poly->Transform (o2w);
+
+  poly = (csBspPolygon*)csBspPolygon::GetPolygonPool().Alloc ();
+  AddPolygon (poly);
+  poly->SetOriginator (originator);
+  poly->GetPolygon ().AddVertex (pt_XYz);
+  poly->GetPolygon ().AddVertex (pt_XYZ);
+  poly->GetPolygon ().AddVertex (pt_XyZ);
+  poly->GetPolygon ().AddVertex (pt_Xyz);
+  poly->SetPolyPlane (csPlane3 (-1, 0, 0, b.MaxX ()));
+  poly->Transform (o2w);
+
+  poly = (csBspPolygon*)csBspPolygon::GetPolygonPool().Alloc ();
+  AddPolygon (poly);
+  poly->SetOriginator (originator);
+  poly->GetPolygon ().AddVertex (pt_XYZ);
+  poly->GetPolygon ().AddVertex (pt_xYZ);
+  poly->GetPolygon ().AddVertex (pt_xyZ);
+  poly->GetPolygon ().AddVertex (pt_XyZ);
+  poly->SetPolyPlane (csPlane3 (0, 0, -1, b.MaxZ ()));
+  poly->Transform (o2w);
+
+  poly = (csBspPolygon*)csBspPolygon::GetPolygonPool().Alloc ();
+  AddPolygon (poly);
+  poly->SetOriginator (originator);
+  poly->GetPolygon ().AddVertex (pt_xYZ);
+  poly->GetPolygon ().AddVertex (pt_xYz);
+  poly->GetPolygon ().AddVertex (pt_xyz);
+  poly->GetPolygon ().AddVertex (pt_xyZ);
+  poly->SetPolyPlane (csPlane3 (1, 0, 0, -b.MinX ()));
+  poly->Transform (o2w);
+
+  poly = (csBspPolygon*)csBspPolygon::GetPolygonPool().Alloc ();
+  AddPolygon (poly);
+  poly->SetOriginator (originator);
+  poly->GetPolygon ().AddVertex (pt_xYZ);
+  poly->GetPolygon ().AddVertex (pt_XYZ);
+  poly->GetPolygon ().AddVertex (pt_XYz);
+  poly->GetPolygon ().AddVertex (pt_xYz);
+  poly->SetPolyPlane (csPlane3 (0, -1, 0, b.MaxY ()));
+  poly->Transform (o2w);
+
+  poly = (csBspPolygon*)csBspPolygon::GetPolygonPool().Alloc ();
+  AddPolygon (poly);
+  poly->SetOriginator (originator);
+  poly->GetPolygon ().AddVertex (pt_xyz);
+  poly->GetPolygon ().AddVertex (pt_Xyz);
+  poly->GetPolygon ().AddVertex (pt_XyZ);
+  poly->GetPolygon ().AddVertex (pt_xyZ);
+  poly->SetPolyPlane (csPlane3 (0, 1, 0, -b.MinY ()));
+  poly->Transform (o2w);
+}
+
+void csPolyTreeBBox::Update (const csBox3& world_bbox, csObject* originator)
+{
+  csPolyTreeObject::world_bbox = world_bbox;
+// printf ("%f,%f,%f %f,%f,%f\n", world_bbox.MinX (), world_bbox.MinY (), world_bbox.MinZ (),
+// world_bbox.MaxX (), world_bbox.MaxY (), world_bbox.MaxZ ());
+
+  RemoveFromTree ();
+
+  csVector3Array& va = GetVertices ();
+  va.MakeEmpty ();
+
+  // Identity transformation.
+  csTransform trans;
+  const csBox3& b = world_bbox;
+
+  // Add the eight corner points of the bounding box to the container.
+  int pt_xyz = va.AddVertex (b.GetCorner (BOX_CORNER_xyz));
+  int pt_Xyz = va.AddVertex (b.GetCorner (BOX_CORNER_Xyz));
+  int pt_xYz = va.AddVertex (b.GetCorner (BOX_CORNER_xYz));
+  int pt_XYz = va.AddVertex (b.GetCorner (BOX_CORNER_XYz));
+  int pt_xyZ = va.AddVertex (b.GetCorner (BOX_CORNER_xyZ));
+  int pt_XyZ = va.AddVertex (b.GetCorner (BOX_CORNER_XyZ));
+  int pt_xYZ = va.AddVertex (b.GetCorner (BOX_CORNER_xYZ));
+  int pt_XYZ = va.AddVertex (b.GetCorner (BOX_CORNER_XYZ));
+
+  csBspPolygon* poly;
+
+  poly = (csBspPolygon*)csBspPolygon::GetPolygonPool().Alloc ();
+  AddPolygon (poly);
+  poly->SetOriginator (originator);
+  poly->GetPolygon ().AddVertex (pt_xYz);
+  poly->GetPolygon ().AddVertex (pt_XYz);
+  poly->GetPolygon ().AddVertex (pt_Xyz);
+  poly->GetPolygon ().AddVertex (pt_xyz);
+  poly->SetPolyPlane (csPlane3 (0, 0, 1, -b.MinZ ()));
+  poly->Transform (trans);
+
+  poly = (csBspPolygon*)csBspPolygon::GetPolygonPool().Alloc ();
+  AddPolygon (poly);
+  poly->SetOriginator (originator);
+  poly->GetPolygon ().AddVertex (pt_XYz);
+  poly->GetPolygon ().AddVertex (pt_XYZ);
+  poly->GetPolygon ().AddVertex (pt_XyZ);
+  poly->GetPolygon ().AddVertex (pt_Xyz);
+  poly->SetPolyPlane (csPlane3 (-1, 0, 0, b.MaxX ()));
+  poly->Transform (trans);
+
+  poly = (csBspPolygon*)csBspPolygon::GetPolygonPool().Alloc ();
+  AddPolygon (poly);
+  poly->SetOriginator (originator);
+  poly->GetPolygon ().AddVertex (pt_XYZ);
+  poly->GetPolygon ().AddVertex (pt_xYZ);
+  poly->GetPolygon ().AddVertex (pt_xyZ);
+  poly->GetPolygon ().AddVertex (pt_XyZ);
+  poly->SetPolyPlane (csPlane3 (0, 0, -1, b.MaxZ ()));
+  poly->Transform (trans);
+
+  poly = (csBspPolygon*)csBspPolygon::GetPolygonPool().Alloc ();
+  AddPolygon (poly);
+  poly->SetOriginator (originator);
+  poly->GetPolygon ().AddVertex (pt_xYZ);
+  poly->GetPolygon ().AddVertex (pt_xYz);
+  poly->GetPolygon ().AddVertex (pt_xyz);
+  poly->GetPolygon ().AddVertex (pt_xyZ);
+  poly->SetPolyPlane (csPlane3 (1, 0, 0, -b.MinX ()));
+  poly->Transform (trans);
+
+  poly = (csBspPolygon*)csBspPolygon::GetPolygonPool().Alloc ();
+  AddPolygon (poly);
+  poly->SetOriginator (originator);
+  poly->GetPolygon ().AddVertex (pt_xYZ);
+  poly->GetPolygon ().AddVertex (pt_XYZ);
+  poly->GetPolygon ().AddVertex (pt_XYz);
+  poly->GetPolygon ().AddVertex (pt_xYz);
+  poly->SetPolyPlane (csPlane3 (0, -1, 0, b.MaxY ()));
+  poly->Transform (trans);
+
+  poly = (csBspPolygon*)csBspPolygon::GetPolygonPool().Alloc ();
+  AddPolygon (poly);
+  poly->SetOriginator (originator);
+  poly->GetPolygon ().AddVertex (pt_xyz);
+  poly->GetPolygon ().AddVertex (pt_Xyz);
+  poly->GetPolygon ().AddVertex (pt_XyZ);
+  poly->GetPolygon ().AddVertex (pt_xyZ);
+  poly->SetPolyPlane (csPlane3 (0, 1, 0, -b.MinY ()));
+  poly->Transform (trans);
+}
+
 //---------------------------------------------------------------------------
 
 void* csSphereStub::Visit (csSector* sector, csTreeVisitFunc* func, void* data)
@@ -815,6 +1004,7 @@ csSphereTreeObject::csSphereTreeObject (csObject* owner,
 {
   base_stub = (csSphereStub*)stub_pool.Alloc (&stub_fact);
   base_stub->IncRef (); // Make sure this object is locked.
+  // @@@@@@ WE NEED TO FILL WORLD_BBOX HERE!
 }
 
 void csSphereTreeObject::SplitWithPlane (csObjectStub* stub,

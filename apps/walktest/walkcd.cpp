@@ -39,8 +39,6 @@
 #include "csengine/sector.h"
 #include "csengine/world.h"
 #include "csengine/keyval.h"
-#include "csscript/csscript.h"
-#include "csscript/intscri.h"
 #include "csengine/collider.h"
 #include "csengine/cspixmap.h"
 #include "csengine/cssprite.h"

@@ -910,8 +910,8 @@ void csSector::Draw (csRenderView& rview)
 
   csCBuffer* c_buffer = csWorld::current_world->GetCBuffer ();
   csCoverageMaskTree* covtree = csWorld::current_world->GetCovtree ();
-  //csQuadTree3D* quad3d = csWorld::current_world->GetQuad3D ();
-  if (c_buffer || covtree)
+  csQuadTree3D* quad3d = csWorld::current_world->GetQuad3D ();
+  if (c_buffer || covtree || quad3d)
   {
     //-----
     // In this part of the rendering we use the c-buffer and or another
@@ -933,7 +933,11 @@ void csSector::Draw (csRenderView& rview)
         for (i = 0 ; i < sprites.Length () ; i++)
         {
           csSprite* sp = (csSprite*)sprites[i];
-	  sp->MarkInvisible ();
+	  csPolyTreeObject* pt = sp->GetPolyTreeObject ();
+	  if (pt->GetWorldBoundingBox ().In (rview.GetOrigin ()))
+	    sp->MarkVisible ();
+	  else
+	    sp->MarkInvisible ();
 	  sp->VisTestReset ();
         }
       // Similarly mark all things as invisible and clear the camera
@@ -941,7 +945,11 @@ void csSector::Draw (csRenderView& rview)
       th = first_thing;
       while (th)
       {
-	th->MarkInvisible ();
+	csPolyTreeObject* pt = th->GetPolyTreeObject ();
+	if (pt->GetWorldBoundingBox ().In (rview.GetOrigin ()))
+	  th->MarkVisible ();
+	else
+	  th->MarkInvisible ();
 	th->VisTestReset ();
 	th = (csThing*)(th->GetNext ());
       }

@@ -1,7 +1,6 @@
 The history order has been reversed so that new features are at the top.
 
 18-Jul-2000
-	- Renamed cmd_Door to entity_Door in WalkTest.
 	- Fixed another bug in csFrustum::Classify() where it would
 	  misclassify adjacent frustum/polygon as covered instead of
 	  outside.
@@ -9,6 +8,49 @@ The history order has been reversed so that new features are at the top.
 	  misclassify overlapping frustum/polygon as outside instead
 	  of partial. In this case the bug was that the edges either
 	  fully cover each other or intersect at corners.
+	- Renamed cmd_Door to entity_Door in WalkTest.
+	- Added entity_Light and entity_Rotate entities. With entity_Light
+	  you can control the animation for a light at activation time.
+	  With entity_Rotate you can have an object that rotates all
+	  the time or one that rotates at activation time.
+	  entity_Rotate has the following syntax:
+	  	KEY ("entity_Rotate", "x,y,z")
+	  (with x,y,z the x, y, and z angles in degrees).
+	  These angles represent the rotation in one second.
+	  entity_Light has the following syntax:
+	  	KEY ("entity_Light", "sector,light,r1,g1,b1,r2,g2,b2,time")
+	  Sector and light are the name of the sector and light to find
+	  the light that is controlled by this entity. The two given
+	  colors are the start and end color (start is at activation time).
+	  'time' is the time (in miliseconds) to go from start to end.
+	- Fixed explosion bounding box (partsys) so that it isn't updated
+	  every frame. This makes it faster but slightly less accurate.
+	  It is possible (but not very likely) that the partsys will
+	  not be drawn even if it is visible.
+	- Added a bounding box to csPolyTreeObject. This bounding box
+	  is used to fix a bug that when the camera is inside the bounding
+	  box of a dynamic object, the object cannot be seen.
+	- Moved updating of the dynamic object to csPolyTreeBBox.
+	  Makes the code for csSprite, csThing, and csParticleSystem simpler.
+	  Note that visibility culling for particle systems still doesn't
+	  work correctly at the moment. I'm investigating.
+	- Removed support for LIGHTX in worlds. The parser will still
+	  recognize the keyword and say that it is obsolete.
+	- Removed support for SCRIPT, ACTIVATE, and TRIGGER in the world file
+	  (keywords still recognized). The scripting system is now obsolete
+	  and replaced with the new entity system in WalkTest.
+	- Added support for named lights in the world file parser.
+	- Completely removed support for the obsolete csscript from CS.
+	  This is a significant change with lots of small effects at various
+	  places.
+	- 'activate' console command is now completely obsolete and
+	  doesn't work anymore. Use 'action' instead which fires the
+	  new entity system.
+	- Fixed a bug in csengine which caused the new csQuadTree3D
+	  optimization not to work at all. Note that this optimization
+	  still doesn't work at the moment.
+	- Removed an assert in map2cs to make converting some badly
+	  formed levels easier :-)
 17-Jul-2000
 	- Added LGPL notice to a few .inc files.
 	- Change to OpenGL renderer so that lightmaps are only cached

@@ -33,7 +33,6 @@ class csCollection;
 class csStatLight;
 class csThing;
 class csWorld;
-class LanguageLayer;
 class csCurveTemplate;
 class csSoundDataObject;
 class csSpriteTemplate;
@@ -69,7 +68,7 @@ class csLoader
   /// Parse a collection definition and return a new object
   static csCollection* load_collection (char* name, char* buf);
   /// Parse a static light definition and return a new object
-  static csStatLight* load_statlight (char* buf);
+  static csStatLight* load_statlight (char* name, char* buf);
   /// Parse a static fire definition and return a new object
   static csParticleSystem* load_fire (char* name, char* buf);
   /// Parse a static fountain definition and return a new object
@@ -124,9 +123,6 @@ class csLoader
   static csSector* load_room (char* secname, char* buf);
   /// Parse a sector definition and return a new object
   static csSector* load_sector (char* secname, char* buf);
-
-  /// Load a definition for an old-style dynamic light (obsolete)
-  static void load_light (char* name, char* buf);
 
   /// Load a sound and return a new object
   static csSoundDataObject* load_sound (char* name, const char* filename);
@@ -187,7 +183,7 @@ class csLoader
 
 public:
   /// Load file into a world.
-  static bool LoadWorldFile (csWorld* world, LanguageLayer* layer, const char* filename);
+  static bool LoadWorldFile (csWorld* world, const char* filename);
 
   /// Load library from a VFS file
   static bool LoadLibraryFile (csWorld* world, const char* filename);

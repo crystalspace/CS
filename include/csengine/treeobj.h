@@ -21,6 +21,7 @@
 
 #include "csutil/csvector.h"
 #include "csgeom/math3d.h"
+#include "csgeom/box.h"
 #include "csengine/polyint.h"
 #include "csengine/polytree.h"
 
@@ -240,9 +241,14 @@ private:
    */
   csObjectStub* first_stub;
 
+protected:
+  /// Bounding box for this object.
+  csBox3 world_bbox;
+
 public:
   /// A pool of polygon stubs.
   static csObjectStubPool stub_pool;
+
 protected:
   /// A factory which is responsible for creating stubs for this object.
   csObjectStubFactory* stub_factory;
@@ -327,6 +333,16 @@ public:
    * Link a stub to the stub list.
    */
   void LinkStub (csObjectStub* ps);
+
+  /**
+   * Get the bounding box that represents this object.
+   * If the camera is inside this bbox then the object
+   * is certainly visible.
+   */
+  const csBox3& GetWorldBoundingBox ()
+  {
+    return world_bbox;
+  }
 };
 
 /**

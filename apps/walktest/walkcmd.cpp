@@ -52,7 +52,6 @@
 #include "csparser/snddatao.h"
 #include "csparser/csloader.h"
 #include "csparser/crossbld.h"
-#include "csscript/csscript.h"
 #include "csgeom/math3d.h"
 #include "isndsrc.h"
 #include "isndlstn.h"
@@ -319,7 +318,7 @@ void WalkTest::ParseKeyCmds (csObject* src)
         anim_sky = ((csSector*)src)->GetSky (name);
       }
     }
-    else if (!strcmp (kp->GetKey (), "cmd_Door"))
+    else if (!strcmp (kp->GetKey (), "entity_Door"))
     {
       if (src->GetType () == csThing::Type)
       {
@@ -328,6 +327,58 @@ void WalkTest::ParseKeyCmds (csObject* src)
 	csDoor* door = new csDoor ((csThing*)src);
 	door->SetHinge (hinge);
         src->ObjAdd (door);
+      }
+    }
+    else if (!strcmp (kp->GetKey (), "entity_Rotate"))
+    {
+      if (src->GetType () == csThing::Type)
+      {
+	csVector3 angle;
+	bool always;
+        ScanStr (kp->GetValue (), "%f,%f,%f,%b", &angle.x, &angle.y, &angle.z,
+		&always);
+	csRotatingObject* rotobj = new csRotatingObject ((csThing*)src);
+	rotobj->SetAngles (angle);
+	rotobj->SetAlways (always);
+        src->ObjAdd (rotobj);
+	if (always)
+	  Sys->busy_entities.ObjAdd (rotobj);
+      }
+    }
+    else if (!strcmp (kp->GetKey (), "entity_Light"))
+    {
+      if (src->GetType () == csThing::Type)
+      {
+	csColor start_col, end_col;
+	float act_time;
+	char sector_name[100];
+	char light_name[100];
+        ScanStr (kp->GetValue (), "%s,%s,%f,%f,%f,%f,%f,%f,%f",
+	  sector_name, light_name,
+	  &start_col.red, &start_col.green, &start_col.blue,
+	  &end_col.red, &end_col.green, &end_col.blue, &act_time);
+	csSector* sect = (csSector*)world->sectors.FindByName (sector_name);
+	if (!sect)
+	{
+	  CsPrintf (MSG_WARNING, "Sector '%s' not found! 'entity_Light' is ignored!\n",
+	  	sector_name);
+	}
+	else
+	{
+	  csLight* l = (csLight*)sect->lights.FindByName (light_name);
+	  if (!l)
+	  {
+	    CsPrintf (MSG_WARNING, "Light '%s' not found! 'entity_Light' is ignored!\n",
+	  	light_name);
+	  }
+	  else
+	  {
+	    csLightObject* lobj = new csLightObject (l);
+	    lobj->SetColors (start_col, end_col);
+	    lobj->SetTotalTime (act_time);
+            src->ObjAdd (lobj);
+	  }
+	}
       }
     }
     else

@@ -52,15 +52,11 @@
 #include "cssfxldr/sndload.h"
 #include "csparser/snddatao.h"
 #include "csgfxldr/csimage.h"
-#include "csscript/objtrig.h"
-#include "csscript/scripts.h"
 #include "itxtmgr.h"
 
 typedef char ObName[30];
 /// The world we are currently processing
 static csWorld* World;
-/// The language layer we are currently working with
-static LanguageLayer* Layer;
 /// Loader flags
 static int flags = 0;
 
@@ -475,81 +471,6 @@ csPolyTxtPlane* csLoader::load_polyplane (char* buf, char* name)
 
 //---------------------------------------------------------------------------
 
-void csLoader::load_light (char* name, char* buf)
-{
-  TOKEN_TABLE_START(commands)
-    TOKEN_TABLE (ACTIVE)
-    TOKEN_TABLE (STATELESS)
-    TOKEN_TABLE (PRIMARY_ACTIVE)
-    TOKEN_TABLE (SECONDARY_ACTIVE)
-    TOKEN_TABLE (BECOMING_ACTIVE)
-    TOKEN_TABLE (PRIMARY_INACTIVE)
-    TOKEN_TABLE (SECONDARY_INACTIVE)
-    TOKEN_TABLE (BECOMING_INACTIVE)
-  TOKEN_TABLE_END
-
-  CLights *theLite = new CLights();
-  theLite->SetName (name);
-
-  long cmd;
-  char *params;
-  int state, theType, thePeriod, dp, intensity, di;
-  while ((cmd = csGetCommand(&buf, commands, &params)) > 0)
-  {
-    switch (cmd)
-    {
-      case TOKEN_ACTIVE:
-        sscanf(params, "%d", &state);
-        theLite->SetInitallyActive(state);
-        break;
-      case TOKEN_STATELESS:
-        sscanf(params, "%d", &state);
-        theLite->SetStateType(state);
-        break;
-      case TOKEN_PRIMARY_ACTIVE:
-        sscanf(params, "%d,%d,%d,%d,%d", &theType, &thePeriod,
-                                         &dp, &intensity, &di);
-        theLite->SetFunctionData(CLights::kStatePrimaryActive, theType,
-                                 thePeriod, dp, intensity, di);
-        break;
-      case TOKEN_SECONDARY_ACTIVE:
-        sscanf(params, "%d,%d,%d,%d,%d", &theType, &thePeriod,
-                                         &dp, &intensity, &di);
-        theLite->SetFunctionData(CLights::kStateSecondaryActive, theType,
-                                 thePeriod, dp, intensity, di);
-        break;
-      case TOKEN_BECOMING_ACTIVE:
-        sscanf(params, "%d,%d,%d,%d,%d", &theType, &thePeriod,
-                                         &dp, &intensity, &di);
-        theLite->SetFunctionData(CLights::kStateBecomingActive, theType,
-                                 thePeriod, dp, intensity, di);
-        break;
-      case TOKEN_PRIMARY_INACTIVE:
-        sscanf(params, "%d,%d,%d,%d,%d", &theType, &thePeriod,
-                                         &dp, &intensity, &di);
-        theLite->SetFunctionData(CLights::kStatePrimaryInactive, theType,
-                                 thePeriod, dp, intensity, di);
-        break;
-      case TOKEN_SECONDARY_INACTIVE:
-        sscanf(params, "%d,%d,%d,%d,%d", &theType, &thePeriod,
-                                         &dp, &intensity, &di);
-        theLite->SetFunctionData(CLights::kStateSecondaryInactive, theType,
-                                 thePeriod, dp, intensity, di);
-        break;
-      case TOKEN_BECOMING_INACTIVE:
-        sscanf(params, "%d,%d,%d,%d,%d", &theType, &thePeriod,
-                                        &dp, &intensity, &di);
-        theLite->SetFunctionData(CLights::kStateBecomingInactive, theType,
-                                 thePeriod, dp, intensity, di);
-        break;
-    }
-  }
-  // start the light
-  theLite->Start();
-}
-
-//---------------------------------------------------------------------------
-
 csCollection* csLoader::load_collection (char* name, char* buf)
 {
   TOKEN_TABLE_START(commands)
@@ -629,41 +550,8 @@ csCollection* csLoader::load_collection (char* name, char* buf)
         }
         break;
       case TOKEN_TRIGGER:
-        {
-          char str2[255];
-          char str3[255];
-          ScanStr (params, "%s,%s->%s", str, str2, str3);
-          csObject* cs = collection->FindObject (str);
-          if (!cs)
-          {
-            CsPrintf (MSG_FATAL_ERROR, "Object '%s' not found!\n", str);
-            fatal_exit (0, false);
-          }
-
-          if (!strcmp (str2, "activate"))
-          {
-            csScript* s = csScriptList::GetScript(str3);
-            if (!s)
-            {
-              CsPrintf (MSG_FATAL_ERROR, "Don't know script '%s'!\n", str3);
-              fatal_exit (0, false);
-            }
-            csObjectTrigger *objtrig = csObjectTrigger::GetTrigger(*cs);
-            if (!objtrig)
-            {
-              objtrig = new csObjectTrigger();
-              cs->ObjAdd(objtrig);
-            }
-            objtrig->NewActivateTrigger(s,collection);
-          }
-          else
-          {
-            CsPrintf (MSG_FATAL_ERROR,
-                      "Trigger '%s' not supported or known for object '%s'!\n",
-                      str2, xname);
-            fatal_exit (0, false);
-          }
-        }
+        CsPrintf (MSG_WARNING, "Warning! TRIGGER statement is obsolete"
+                                 " and does not do anything!\n");
         break;
     }
   }
@@ -1111,7 +999,7 @@ csParticleSystem* csLoader::load_snow (char* name, char* buf)
   return partsys;
 }
 
-csStatLight* csLoader::load_statlight (char* buf)
+csStatLight* csLoader::load_statlight (char* name, char* buf)
 {
   TOKEN_TABLE_START(commands)
     TOKEN_TABLE (ATTENUATION)
@@ -1199,6 +1087,7 @@ csStatLight* csLoader::load_statlight (char* buf)
   }
 
   csStatLight* l = new csStatLight (x, y, z, dist, r, g, b, dyn);
+  l->SetName (name);
   if (halo)
   {
     l->flags.Set (CS_LIGHT_HALO, CS_LIGHT_HALO);
@@ -1282,7 +1171,7 @@ csMapNode* csLoader::load_node (char* name, char* buf, csSector* sec)
 csPolygonSet& csLoader::ps_process (csPolygonSet& ps, PSLoadInfo& info,
   int cmd, char* name, char* params)
 {
-  char str[255], str2[255];
+  char str[255];
   switch (cmd)
   {
     case TOKEN_VERTEX:
@@ -1361,53 +1250,16 @@ csPolygonSet& csLoader::ps_process (csPolygonSet& ps, PSLoadInfo& info,
       info.use_tex_set=true;
       break;
     case TOKEN_LIGHTX:
-      ScanStr (params, "%s", str);
-      info.default_lightx = CLights::FindByName (str);
+      CsPrintf (MSG_WARNING, "Warning! LIGHTX statement is obsolete"
+                               " and does not do anything!\n");
       break;
     case TOKEN_ACTIVATE:
-      ScanStr (params, "%s", str);
-      {
-        csScript* s = csScriptList::GetScript(str);
-        if (!s)
-        {
-          CsPrintf (MSG_FATAL_ERROR, "Don't know script '%s'!\n", str);
-          fatal_exit (0, false);
-        }
-        csObjectTrigger* objtrig = csObjectTrigger::GetTrigger(ps);
-        if (!objtrig)
-        {
-          objtrig = new csObjectTrigger();
-          ps.ObjAdd(objtrig);
-        }
-        objtrig->NewActivateTrigger (s);
-        objtrig->DoActivateTriggers ();
-      }
+      CsPrintf (MSG_WARNING, "Warning! ACTIVATE statement is obsolete"
+                                 " and does not do anything!\n");
       break;
     case TOKEN_TRIGGER:
-      ScanStr (params, "%s,%s", str, str2);
-      if (!strcmp (str, "activate"))
-      {
-        csScript* s = csScriptList::GetScript(str2);
-        if (!s)
-        {
-          CsPrintf (MSG_FATAL_ERROR, "Don't know script '%s'!\n", str2);
-          fatal_exit (0, false);
-        }
-        csObjectTrigger *objtrig = csObjectTrigger::GetTrigger(ps);
-        if (!objtrig)
-        {
-          objtrig = new csObjectTrigger();
-          ps.ObjAdd(objtrig);
-        }
-        objtrig->NewActivateTrigger(s);
-      }
-      else
-      {
-        CsPrintf (MSG_FATAL_ERROR,
-                  "Trigger '%s' not supported or known for object '%s'!\n",
-                  str, ps.GetName ());
-        fatal_exit (0, false);
-      }
+      CsPrintf (MSG_WARNING, "Warning! TRIGGER statement is obsolete"
+                                 " and does not do anything!\n");
       break;
     case TOKEN_BSP:
       CsPrintf (MSG_FATAL_ERROR,
@@ -1440,6 +1292,7 @@ csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
     TOKEN_TABLE (ACTIVATE)
     TOKEN_TABLE (FOG)
     TOKEN_TABLE (CONVEX)
+    TOKEN_TABLE (KEY)
   TOKEN_TABLE_END
 
   TOKEN_TABLE_START (tok_matvec)
@@ -1467,7 +1320,6 @@ csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
   float r;
 
   char str[255];
-  char str2[255];
   long cmd;
   char* params;
 
@@ -1586,48 +1438,16 @@ csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
                  &v[0].x, &v[0].y, &v[0].z, &v[1].x, &v[1].y, &v[1].z,
                  &v[5].x, &v[5].y, &v[5].z, &v[4].x, &v[4].y, &v[4].z);
         break;
+      case TOKEN_KEY:
+        load_key (params, thing);
+        break;
       case TOKEN_ACTIVATE:
-        ScanStr (params, "%s", str);
-        {
-          csScript* s = csScriptList::GetScript(str);
-          if (!s)
-          {
-            CsPrintf (MSG_FATAL_ERROR, "Don't know script '%s'!\n", str);
-            fatal_exit (0, false);
-          }
-          csObjectTrigger *objtrig = csObjectTrigger::GetTrigger(*thing);
-          if (!objtrig)
-          {
-            objtrig = new csObjectTrigger();
-            thing->ObjAdd(objtrig);
-          }
-          objtrig->NewActivateTrigger (s);
-          objtrig->DoActivateTriggers ();
-        }
+        CsPrintf (MSG_WARNING, "Warning! ACTIVATE statement is obsolete"
+                                 " and does not do anything!\n");
         break;
       case TOKEN_TRIGGER:
-        ScanStr (params, "%s,%s", str, str2);
-        if (!strcmp (str, "activate"))
-        {
-          csScript* s = csScriptList::GetScript(str2);
-          if (!s)
-          {
-            CsPrintf (MSG_FATAL_ERROR, "Don't know script '%s'!\n", str2);
-            fatal_exit (0, false);
-          }
-          csObjectTrigger *objtrig = csObjectTrigger::GetTrigger(*thing);
-          if (!objtrig)
-          {
-            objtrig = new csObjectTrigger();
-            thing->ObjAdd(objtrig);
-          }
-          objtrig->NewActivateTrigger (s);
-        }
-        else
-        {
-          CsPrintf (MSG_FATAL_ERROR, "Trigger '%s' not supported or known for object!\n", str2);
-          fatal_exit (0, false);
-        }
+        CsPrintf (MSG_WARNING, "Warning! TRIGGER statement is obsolete"
+                                 " and does not do anything!\n");
         break;
     }
   }
@@ -2060,9 +1880,8 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
         }
         break;
       case TOKEN_LIGHTX:
-        ScanStr (params, "%s", str);
-  	pol_lm = poly3d->GetLightMapInfo ();
-        if (pol_lm) pol_lm->SetUniformDynLight (CLights::FindByName (str));
+        CsPrintf (MSG_WARNING, "Warning! LIGHTX statement is obsolete"
+                               " and does not do anything!\n");
         break;
       case TOKEN_TEXTURE:
         while ((cmd = csGetObject (&params, tex_commands, &name, &params2)) > 0)
@@ -3557,6 +3376,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
     TOKEN_TABLE (RAIN)
     TOKEN_TABLE (SNOW)
     TOKEN_TABLE (FIRE)
+    TOKEN_TABLE (KEY)
   TOKEN_TABLE_END
 
   TOKEN_TABLE_START (portal_commands)
@@ -3625,7 +3445,6 @@ csSector* csLoader::load_room (char* secname, char* buf)
   float r;
 
   char str[255];
-  char str2[255];
   csParticleSystem* partsys;
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
@@ -3689,10 +3508,8 @@ csSector* csLoader::load_room (char* secname, char* buf)
         num_colors++;
         break;
       case TOKEN_LIGHTX:
-        ScanStr (params, "%s,%s", str, str2);
-        strcpy (dlights[num_light].poly, str);
-        strcpy (dlights[num_light].light, str2);
-        num_light++;
+        CsPrintf (MSG_WARNING, "Warning! LIGHTX statement is obsolete"
+                               " and does not do anything!\n");
         break;
       case TOKEN_TEX:
         load_tex (&params, colors, num_colors, name);
@@ -3753,7 +3570,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
                  &v5.x, &v5.y, &v5.z, &v4.x, &v4.y, &v4.z);
         break;
       case TOKEN_LIGHT:
-        sector->AddLight ( load_statlight(params) );
+        sector->AddLight ( load_statlight(name, params) );
         break;
       case TOKEN_SIXFACE:
         sector->AddThing (load_sixface (name,params,sector));
@@ -3764,6 +3581,9 @@ csSector* csLoader::load_room (char* secname, char* buf)
           f.enabled = true;
           ScanStr (params, "%f,%f,%f,%f", &f.red, &f.green, &f.blue, &f.density);
         }
+        break;
+      case TOKEN_KEY:
+        load_key (params, sector);
         break;
       case TOKEN_FIRE:
         partsys = load_fire (name, params);
@@ -3898,48 +3718,12 @@ csSector* csLoader::load_room (char* secname, char* buf)
         }
         break;
       case TOKEN_ACTIVATE:
-        ScanStr (params, "%s", str);
-        {
-          csScript* s = csScriptList::GetScript(str);
-          if (!s)
-          {
-            CsPrintf (MSG_FATAL_ERROR, "Don't know script '%s'!\n", str);
-            fatal_exit (0, false);
-          }
-          csObjectTrigger* objtrig = csObjectTrigger::GetTrigger(*sector);
-          if (!objtrig)
-          {
-            objtrig = new csObjectTrigger();
-            sector->ObjAdd(objtrig);
-          }
-          objtrig->NewActivateTrigger (s);
-          objtrig->DoActivateTriggers ();
-        }
+        CsPrintf (MSG_WARNING, "Warning! ACTIVATE statement is obsolete"
+                                 " and does not do anything!\n");
         break;
       case TOKEN_TRIGGER:
-        ScanStr (params, "%s,%s", str, str2);
-        if (!strcmp (str, "activate"))
-        {
-          csScript* s = csScriptList::GetScript(str2);
-          if (!s)
-          {
-            CsPrintf (MSG_FATAL_ERROR, "Don't know script '%s'!\n", str2);
-            fatal_exit (0, false);
-          }
-          csObjectTrigger* objtrig = csObjectTrigger::GetTrigger(*sector);
-          if (!objtrig)
-          {
-            objtrig = new csObjectTrigger();
-            sector->ObjAdd(objtrig);
-          }
-          objtrig->NewActivateTrigger (s);
-        }
-        else
-        {
-          CsPrintf (MSG_FATAL_ERROR,
-                    "Trigger '%s' not supported or known for object!\n", str2);
-          fatal_exit (0, false);
-        }
+        CsPrintf (MSG_WARNING, "Warning! TRIGGER statement is obsolete"
+                                 " and does not do anything!\n");
         break;
       default:
         CsPrintf (MSG_FATAL_ERROR, "Unrecognized token in room '%s'!\n",
@@ -4230,7 +4014,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
         sector->AddThing ( load_sixface(name,params,sector) );
         break;
       case TOKEN_LIGHT:
-        sector->AddLight ( load_statlight(params) );
+        sector->AddLight ( load_statlight(name, params) );
         break;
       case TOKEN_NODE:
         sector->ObjAdd ( load_node(name, params, sector) ); 
@@ -4646,7 +4430,8 @@ bool csLoader::LoadWorld (char* buf)
           World->collections.Push (load_collection (name, params));
           break;
         case TOKEN_SCRIPT:
-          csScriptList::NewScript (Layer, name, params);
+          CsPrintf (MSG_WARNING, "Warning! SCRIPT statement is obsolete"
+                                 " and does not do anything!\n");
           break;
 	case TOKEN_TEX_SET:
           if (!LoadTextures (params, name))
@@ -4669,7 +4454,8 @@ bool csLoader::LoadWorld (char* buf)
             World->sectors.Push (load_room (name, params));
           break;
         case TOKEN_LIGHTX:
-          load_light (name, params);
+          CsPrintf (MSG_WARNING, "Warning! LIGHTX statement is obsolete"
+                                 " and does not do anything!\n");
           break;
         case TOKEN_LIBRARY:
           LoadLibraryFile (World, name);
@@ -4727,10 +4513,9 @@ bool csLoader::LoadWorld (char* buf)
   return true;
 }
 
-bool csLoader::LoadWorldFile (csWorld* world, LanguageLayer* layer, const char* file)
+bool csLoader::LoadWorldFile (csWorld* world, const char* file)
 {
   World = world;
-  Layer = layer;
 
   world->StartWorld ();
   csLoaderStat::Init ();
