@@ -1,5 +1,7 @@
 The history order has been reversed so that new features are at the top.
 
+12-Nov-2000
+	- Eric Sunshine enabled automatic DSP generation for 3ds2lev.
 10-Nov-2000
 	- Samuel Humphreys did some fixes for bit rot in the procedural
 	  textures and prepared for dumping dtsimple.
