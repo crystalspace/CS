@@ -9,9 +9,16 @@ chronological order.
 19-Jan-2004
 	- Steven Geens changed the calling of PositionChild to a hierarchical
 	  scheme.
-	- Norman Kraemer changed render3d Jamfile to include shader subdir 
+	- Norman Kraemer changed render3d Jamfile to include shader subdir
 	  only if new renderer is configured or msvc project file generation
 	  is in progress.
+	- Eric Sunshine reverted Norman's change since MSVC_QUIET is not a
+	  reliable way to check if the MSVC project file generation is in
+	  progress.  This variable is just an optional variable used by
+	  the generation process itself, and is not guaranteed to be set during
+	  generation.  If you need to generate render3d shader project files,
+	  it should be sufficient to invoke mk/msvcgen/msvcgen.sh with the
+	  argument "-sUSE_NEW_RENDERER=yes".
 18-Jan-2004
 	- Jorrit removed unused 'next'/'prev' fields in csLight. These
 	  are no longer needed after the redesign of two days ago.
@@ -21,21 +28,21 @@ chronological order.
 	  to actually use this so that these functions now use the correct
 	  world space vertices.
 	- Luca compiled the new renderer with VC6 and did some fixing:
-	  * Added a "friend MeshTreeNode" to the class 
-	  csChunkLodTerrainFactory to let the former to access private 
-	  members of the latter.
-	  * Converted a "for (int i =" to "int i; for (i = " in 
-	  mesh/partgen/particle.cpp
-	  * Added CSGFX dependency (DEP.XXX in the makefile) to emit.mak,
-	  fountain.mak, fire.mak, explo.mak, genmesh.mak, rain.mak, 
-	  spiral.mak, snow.mak, spr3d.mak.
-	  * Fixed a compilation error in odedynam.h.
+	    - Added a "friend MeshTreeNode" to the class
+	      csChunkLodTerrainFactory to let the former to access private
+	      members of the latter.
+	    - Converted a "for (int i =" to "int i; for (i = " in
+	      mesh/partgen/particle.cpp
+	    - Added CSGFX dependency (DEP.XXX in the makefile) to emit.mak,
+	      fountain.mak, fire.mak, explo.mak, genmesh.mak, rain.mak,
+	      spiral.mak, snow.mak, spr3d.mak.
+	    - Fixed a compilation error in odedynam.h.
 	- Luca modified his last commit, upon advice of res, using the right
-	  order for the libraries' dependency, id est: cstool csgfx csgeom 
+	  order for the libraries' dependency, id est: cstool csgfx csgeom
 	  csutil.
-    - acraig Fixed two problems in sprcal3d. First was a check to make sure
-      it does not attach the same mesh more then once.  Second is a fix to 
-      SetMaterial() to use the right mesh id.  
+	- Andrew Craig fixed two problems in sprcal3d.  First was a check to
+	  make sure it does not attach the same mesh more then once.  Second is
+	  a fix to SetMaterial() to use the right mesh ID.
 17-Jan-2004
         - Steven Geens added HitBeamOutline and HitBeamObject for sprcal3d.
 	  He's not completely sure it works, but it doesn't seem to break
