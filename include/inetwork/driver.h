@@ -59,7 +59,7 @@ struct csNetworkDriverCapabilities
 };
 
 
-SCF_VERSION (iNetworkEndPoint, 0, 0, 1);
+SCF_VERSION (iNetworkEndPoint, 0, 1, 0);
 
 /**
  * This is the network end-point interface for CS.  It represents one end of
@@ -76,7 +76,7 @@ struct iNetworkEndPoint : public iBase
 };
 
 
-SCF_VERSION (iNetworkConnection, 0, 0, 1);
+SCF_VERSION (iNetworkConnection, 0, 1, 0);
 
 /**
  * This is the network connection interface for CS.  It represents a single
@@ -87,8 +87,11 @@ struct iNetworkConnection : public iNetworkEndPoint
   /// Send nbytes of data over the connection.
   virtual bool Send(const void* data, size_t nbytes) = 0;
 
+  /// See if the connection is still connected.
+  virtual bool IsConnected () const = 0;
+
   /**
-   * Receive data from the connection.  If the connection is in blocking
+   * Receive data from the connection.  If the endpoint is in blocking
    * mode, then the function does not return until data has been read, an
    * error has occurred, or the connection was closed.  In non-blocking mode,
    * Receive returns immediately.  If data is available then it returns the
@@ -97,10 +100,17 @@ struct iNetworkConnection : public iNetworkEndPoint
    * returns CS_NET_ERR_NO_ERROR.
    */
   virtual size_t Receive(void* buff, size_t maxbytes) = 0;
+
+  /**
+   * This provides a lightweight alternative to bruteforce polling Receive
+   * in case there are any data to read. You should call this function first
+   * to see if there are data waiting, and only call Receive if it returns true.
+   */
+  virtual bool IsDataWaiting() const = 0;
 };
 
 
-SCF_VERSION (iNetworkListener, 0, 0, 2);
+SCF_VERSION (iNetworkListener, 0, 1, 0);
 
 /**
  * This is the network listener interface for CS.  It represents a single
@@ -134,12 +144,11 @@ struct iNetworkDriver : public iBase
    * Create a new network connection.  The 'target' parameter is driver
    * dependent.  For example, with a socket driver, the target might be
    * "host:port/protocol"; with a modem driver it might be
-   * "Device:PhoneNumber"; etc. The 'reliable' flag determines whether a
-   * reliable connection is made (sometimes known as connection-oriented)
-   * or an unreliable one (sometimes known as connectionless).  The 'blocking'
-   * flag determines whether operations on the connection return immediately
-   * in all cases or wait until the operation can be completed successfully.
-   * Returns the new connection object or NULL if the connection failed.
+   * "Device:PhoneNumber"; etc. The 'reliable' flag is deprecated.
+   * The 'blocking' flag determines whether operations on the connection
+   * return immediately in all cases or wait until the operation can be
+   * completed successfully. Returns the new connection object or NULL
+   * if the connection failed.
    */
   virtual csPtr<iNetworkConnection> NewConnection(const char* target,
     bool reliable = true, bool blocking = false) = 0;
@@ -148,7 +157,7 @@ struct iNetworkDriver : public iBase
    * Create a new network listener.  The 'source' parameter is driver
    * dependent.  For example, with a socket driver, the source might be
    * "port/protocol"; with a modem driver it might be "comport"; etc.
-   * The 'reliable' determines whether or not a reliable connection is made.
+   * The 'reliable' flag is deprecated.
    * The 'blockingListener' flag determines whether or not the Accept() method
    * blocks while being called.  The 'blockingConnection' flag determines
    * whether or not methods in the resulting connection object block.

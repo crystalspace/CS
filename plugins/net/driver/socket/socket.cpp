@@ -20,6 +20,7 @@
 #define __USE_W32_SOCKETS
 #endif
 
+#define CS_SYSDEF_PROVIDE_SELECT
 #include "cssysdef.h"
 #include "cssys/sockets.h"
 
@@ -81,23 +82,23 @@ csSocketEndPoint::~csSocketEndPoint() { CloseSocket(); }
 void csSocketEndPoint::Terminate()    { CloseSocket(); }
 void csSocketEndPoint::ClearError()   { LastError = CS_NET_ERR_NO_ERROR; }
 
-csSocketEndPoint::csSocketEndPoint(csNetworkSocket s, bool blocks) :
-  Socket(s), LastError(CS_NET_ERR_NO_ERROR)
+csSocketEndPoint::csSocketEndPoint(csNetworkSocket s, bool blocks, bool r) :
+  Reliable(r), Socket(s), LastError(CS_NET_ERR_NO_ERROR)
 {
   if (!PlatformSetBlocking(blocks))
   {
     LastError = CS_NET_ERR_CANNOT_SET_BLOCKING_MODE;
-    CloseSocket();
+    if (Reliable) CloseSocket();
   }
 }
 
 void csSocketEndPoint::CloseSocket()
 {
   ClearError();
-  if (Socket != CS_NET_SOCKET_INVALID)
+  if (Reliable && Socket != CS_NET_SOCKET_INVALID)
   {
-      CS_CLOSESOCKET(Socket);
-      Socket = CS_NET_SOCKET_INVALID;
+    CS_CLOSESOCKET(Socket);
+    Socket = CS_NET_SOCKET_INVALID;
   }
 }
 
@@ -119,7 +120,8 @@ bool csSocketEndPoint::PlatformSetBlocking(bool blocks)
 // csSocketConnection ---------------------------------------------------------
 
 csSocketConnection::csSocketConnection(
-  iBase* p, csNetworkSocket s, bool blocking) : csSocketEndPoint(s, blocking)
+  iBase* p, csNetworkSocket s, bool blocking, bool r, sockaddr addr)
+  : csSocketEndPoint(s, blocking, r), thisaddr (addr)
 {
   SCF_CONSTRUCT_IBASE(p);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiNetworkSocket);
@@ -132,7 +134,8 @@ bool csSocketConnection::Send(const void* data, size_t nbytes)
   {
     do
     {
-      size_t sent = send(Socket, (char*)data + totalsent, nbytes, 0);
+      size_t sent = sendto(Socket, (char*)data + totalsent, nbytes, 0,
+        & thisaddr, sizeof(thisaddr));
       if (sent == (size_t)-1)
       {
         LastError = CS_NET_ERR_CANNOT_SEND;
@@ -152,6 +155,7 @@ bool csSocketConnection::Send(const void* data, size_t nbytes)
 
 size_t csSocketConnection::Receive(void* buff, size_t maxbytes)
 {
+  if (! Reliable) CS_ASSERT(IsDataWaiting ());
   size_t received = 0;
   if (ValidateSocket())
   {
@@ -166,6 +170,38 @@ size_t csSocketConnection::Receive(void* buff, size_t maxbytes)
   return received;
 }
 
+bool csSocketConnection::IsDataWaiting () const
+{
+  static timeval nowait = { 0, 0 };
+  static fd_set readfds;
+  FD_ZERO (& readfds);
+  FD_SET (Socket, & readfds);
+  if (select (Socket + 1, & readfds, NULL, NULL, & nowait) < 1) return false;
+
+  if (Reliable)
+    return true;
+  else
+  {
+    struct sockaddr addr;
+    unsigned addrlen = sizeof(addr);
+    addr.sa_family = AF_INET;
+    if (recvfrom(Socket, NULL, 0, MSG_PEEK, & addr, & addrlen) == -1)
+      return false;
+    else
+      return memcmp (& addr, & thisaddr, addrlen) == 0;
+  }
+}
+
+bool csSocketConnection::IsConnected () const
+{
+  if (! Reliable) return true;
+  static timeval nowait = { 0, 0 };
+  static fd_set exceptfds;
+  FD_ZERO (& exceptfds);
+  FD_SET (Socket, & exceptfds);
+  return select (Socket + 1, NULL, NULL, & exceptfds, & nowait) < 1;
+}
+
 csNetworkSocket csSocketConnection::csSocket::GetSocket() const
 { return scfParent->GetSocket(); }
 
@@ -173,9 +209,8 @@ csNetworkSocket csSocketConnection::csSocket::GetSocket() const
 // csSocketListener -----------------------------------------------------------
 
 csSocketListener::csSocketListener(iBase* p, csNetworkSocket s,
-  unsigned short port, bool reliable, bool blockingListener,
-  bool blockingConnection) :
-  csSocketEndPoint(s, blockingListener), BlockingConnection(blockingConnection)
+  unsigned short port, bool blockingListener, bool blockingConnection, bool r) :
+  csSocketEndPoint(s, blockingListener, r), BlockingConnection(blockingConnection)
 {
   SCF_CONSTRUCT_IBASE(p);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiNetworkSocket);
@@ -188,7 +223,7 @@ csSocketListener::csSocketListener(iBase* p, csNetworkSocket s,
   bool ok = false;
   if (bind(Socket, (struct sockaddr*)&addr, sizeof(addr)) == -1)
     LastError = CS_NET_ERR_CANNOT_BIND;
-  else if (reliable && listen(Socket, CS_NET_LISTEN_QUEUE_SIZE) == -1)
+  else if (Reliable && listen(Socket, CS_NET_LISTEN_QUEUE_SIZE) == -1)
     LastError = CS_NET_ERR_CANNOT_LISTEN;
   else
     ok = true;
@@ -202,13 +237,34 @@ csPtr<iNetworkConnection> csSocketListener::Accept()
   iNetworkConnection* connection = NULL;
   if (ValidateSocket())
   {
-    struct sockaddr addr;
-    socklen_t addrlen = sizeof(sockaddr);
-    csNetworkSocket s = accept(Socket, &addr, &addrlen);
-    if (s != CS_NET_SOCKET_INVALID)
-      connection = new csSocketConnection(scfParent, s, BlockingConnection);
-    else if (CS_GETSOCKETERROR != EWOULDBLOCK)
-      LastError = CS_NET_ERR_CANNOT_ACCEPT;
+    if (Reliable)
+    {
+      struct sockaddr addr;
+      socklen_t addrlen = sizeof(sockaddr);
+      csNetworkSocket s = accept(Socket, &addr, &addrlen);
+      if (s != CS_NET_SOCKET_INVALID)
+        connection = new csSocketConnection(scfParent, s, BlockingConnection, Reliable, addr);
+      else if (CS_GETSOCKETERROR != EWOULDBLOCK)
+        LastError = CS_NET_ERR_CANNOT_ACCEPT;
+    }
+    else
+    {
+      static timeval nowait = { 0, 0 };
+      static fd_set readfds;
+      FD_ZERO (& readfds);
+      FD_SET (Socket, & readfds);
+      select (Socket + 1, & readfds, NULL, NULL, & nowait);
+      if (FD_ISSET (Socket, & readfds))
+      {
+        struct sockaddr addr;
+        unsigned addrlen = sizeof(addr);
+        addr.sa_family = AF_INET;
+        if (recvfrom(Socket, NULL, 0, MSG_PEEK, & addr, & addrlen) != -1)
+          connection = new csSocketConnection (scfParent, Socket, BlockingConnection, Reliable, addr);
+        else
+          LastError = CS_NET_ERR_CANNOT_RECEIVE;
+      }
+    }
   }
   return csPtr<iNetworkConnection> (connection);
 }
@@ -296,8 +352,8 @@ csPtr<iNetworkConnection> csSocketDriver::NewConnection(
       if (proto)
       {
         host[proto - target] = '\0';
-        if (strcasecmp (proto + 1, "tcp")) reliable = true;
-        else if (strcasecmp (proto + 1, "udp")) reliable = false;
+        if (strcasecmp (proto + 1, "tcp") == 0) reliable = true;
+        else if (strcasecmp (proto + 1, "udp") == 0) reliable = false;
       }
       port = atoi(p + 1);
     }
@@ -318,7 +374,8 @@ csPtr<iNetworkConnection> csSocketDriver::NewConnection(
 	  addr.sin_addr.s_addr = htonl(address);
 	  addr.sin_port = htons(port);
 	  if (connect(s, (struct sockaddr*)&addr, sizeof(addr)) != -1)
-	    connection = new csSocketConnection(this, s, blocking);
+	    connection = new csSocketConnection(this, s, blocking, reliable,
+              *(struct sockaddr*)&addr);
 	  else
 	    LastError = CS_NET_ERR_CANNOT_CONNECT;
 	}
@@ -339,8 +396,8 @@ csPtr<iNetworkListener> csSocketDriver::NewListener(const char* source,
   const char* proto = strchr(source, '/');
   if (proto)
   {
-    if (strcasecmp (proto + 1, "tcp")) reliable = true;
-    else if (strcasecmp (proto + 1, "udp")) reliable = false;
+    if (strcasecmp (proto + 1, "tcp") == 0) reliable = true;
+    else if (strcasecmp (proto + 1, "udp") == 0) reliable = false;
   }
   const unsigned short port = atoi(source);
   if (port == 0)
@@ -350,8 +407,8 @@ csPtr<iNetworkListener> csSocketDriver::NewListener(const char* source,
   {
     csNetworkSocket s = CreateSocket(reliable);
     if (s != CS_NET_SOCKET_INVALID)
-      listener = new csSocketListener(this, s, port, reliable,
-        blockingListener, blockingConnection);
+      listener = new csSocketListener(this, s, port, blockingListener,
+        blockingConnection, reliable);
   }
   return csPtr<iNetworkListener> (listener);
 }

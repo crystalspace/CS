@@ -16,6 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "csutil/ref.h"
+#include "csutil/refarr.h"
 #include "inetwork/netman.h"
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
@@ -24,40 +26,49 @@
 #include "csutil/csvector.h"
 
 struct iEventQueue;
-struct iNetworkSocket2;
 struct iObjectRegistry;
 struct iEvent;
 
 class csNetworkManager : public iNetworkManager
 {
-  private:
-
-  csVector connections, listeners;
+ private:
+  csRefArray<iNetworkConnection> connections;
+  csRefArray<iNetworkListener> listeners;
   csHashMap packets, strings;
+
+  csRefArray<iNetworkSocket2> enconnections, enlisteners;
+  csHashMap enpackets, enstrings;
+
   csRef<iEventQueue> eventq;
   csRef<iEventOutlet> eventout;
 
-  void Poll (iNetworkSocket2 *, csTicks t);
+  void Poll (iNetworkConnection *, csTicks);
+  void Poll (iNetworkSocket2 *, csTicks);
 
-  protected:
-
+ protected:
   bool Initialize (iObjectRegistry *);
   bool HandleEvent (iEvent &);
 
-  public:
-
+ public:
   SCF_DECLARE_IBASE;
 
   csNetworkManager (iBase *);
   virtual ~csNetworkManager ();
 
-  virtual void RegisterConnectedSocket (iNetworkSocket2 *, iNetworkPacket *);
+  virtual void RegisterConnection (iNetworkConnection *, iNetworkPacket *);
+  virtual void RegisterListener (iNetworkListener *, iNetworkPacket *);
+  virtual bool UnregisterEndPoint (iNetworkEndPoint *);
+
+  virtual bool Send (iNetworkConnection *, iNetworkPacket *);
+  virtual bool SendToAll (iNetworkPacket *);
+
+  virtual void RegisterConnectedSocket (iNetworkSocket2 *, iNetworkPacket2 *);
   virtual bool UnregisterConnectedSocket (iNetworkSocket2 *);
-  virtual void RegisterListeningSocket (iNetworkSocket2 *, iNetworkPacket *);
+  virtual void RegisterListeningSocket (iNetworkSocket2 *, iNetworkPacket2 *);
   virtual bool UnregisterListeningSocket (iNetworkSocket2 *);
 
-  virtual bool Send (iNetworkSocket2 *, iNetworkPacket *);
-  virtual bool SendToAll (iNetworkPacket *);
+  virtual bool Send (iNetworkSocket2 *, iNetworkPacket2 *);
+  virtual bool SendToAll (iNetworkPacket2 *);
 
   struct eiComponent : public iComponent
   {

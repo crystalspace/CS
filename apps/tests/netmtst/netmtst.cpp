@@ -25,14 +25,15 @@
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 #include "iutil/evdefs.h"
-#include "inetwork/driver2.h"
-#include "inetwork/socket2.h"
-#include "inetwork/sockerr.h"
+#include "inetwork/driver.h"
 #include "inetwork/netman.h"
 #include "csutil/datastrm.h"
 
 #include <stdio.h>
 #include <string.h>
+
+#define PORT "1234"
+#define PROTO "udp"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -54,14 +55,15 @@ class SendPacket : public iNetworkPacket
 
   void SetData (char d []) { data = d; }
 
-  virtual bool Read (csDataStream &st, iNetworkSocket2 *so) { return false; }
+  virtual bool Read (csDataStream &st, iNetworkConnection *so) { return false; }
   virtual char* Write (size_t &size)
   {
     size = strlen (data);
     return data;
   }
-  virtual iNetworkPacket* New () { return new SendPacket (); }
-  virtual bool FilterSocket (iNetworkSocket2 *s) { return true; }
+  virtual csPtr<iNetworkPacket> New ()
+    { return csPtr<iNetworkPacket> (new SendPacket ()); }
+  virtual bool FilterSocket (iNetworkConnection *s) { return true; }
 };
 
 SCF_IMPLEMENT_IBASE (SendPacket)
@@ -84,7 +86,7 @@ class RecvPacket : public iNetworkPacket
 
   const int8* GetData () { return data; }
 
-  virtual bool Read (csDataStream &stream, iNetworkSocket2 *sock)
+  virtual bool Read (csDataStream &stream, iNetworkConnection *sock)
   {
     while (stream.ReadInt8 (data [position])) position++;
     if (position >= strlen (testdata))
@@ -96,8 +98,9 @@ class RecvPacket : public iNetworkPacket
       return false;
   }
   virtual char* Write (size_t &size) { return NULL; }
-  virtual iNetworkPacket* New () { return new RecvPacket (); }
-  virtual bool FilterSocket (iNetworkSocket2 *s) { return true; }
+  virtual csPtr<iNetworkPacket> New ()
+    { return csPtr<iNetworkPacket> (new RecvPacket ()); }
+  virtual bool FilterSocket (iNetworkConnection *s) { return true; }
 };
 
 SCF_IMPLEMENT_IBASE (RecvPacket)
@@ -125,7 +128,7 @@ int main (int argc, char *argv[])
   }
 
   bool plugins_ok = csInitializer::RequestPlugins (objreg,
-    CS_REQUEST_PLUGIN ("crystalspace.network.driver.sockets2", iNetworkDriver2),
+    CS_REQUEST_PLUGIN ("crystalspace.network.driver.sockets", iNetworkDriver),
     CS_REQUEST_PLUGIN ("crystalspace.network.manager.standard", iNetworkManager),
     CS_REQUEST_END);
   if (! plugins_ok)
@@ -148,7 +151,7 @@ int main (int argc, char *argv[])
   }
 
   {
-    csRef<iNetworkDriver2> driver = CS_QUERY_REGISTRY (objreg, iNetworkDriver2);
+    csRef<iNetworkDriver> driver = CS_QUERY_REGISTRY (objreg, iNetworkDriver);
     if (! driver)
     {
       fprintf (stderr, "Failed to find network driver plugin!\n");
@@ -165,30 +168,27 @@ int main (int argc, char *argv[])
     csInitializer::OpenApplication (objreg);
 
     RecvPacket recvpkt;
-    csRef<iNetworkSocket2> listener = driver->CreateSocket (CS_NET_SOCKET_TYPE_UDP);
-    listener->SetSocketBlock (false);
-    listener->WaitForConnection (0, 1234, 1);
-    if (listener->LastError () != CS_NET_SOCKET_NOERROR)
+    csRef<iNetworkListener> listener = driver->NewListener (PORT "/" PROTO);
+    if (listener->GetLastError () != CS_NET_ERR_NO_ERROR)
     {
       fprintf (stderr, "Failed to set up listening socket!\n");
       return 6;
     }
-    netman->RegisterListeningSocket (listener, & recvpkt);
+    netman->RegisterListener (listener, & recvpkt);
 
     SendPacket sendpkt;
-    csRef<iNetworkSocket2> sender = driver->CreateSocket (CS_NET_SOCKET_TYPE_UDP);
-    sender->SetSocketBlock (false);
-    sender->Connect ("127.0.0.1", 1234);
-    if (sender->LastError () != CS_NET_SOCKET_NOERROR)
+    csRef<iNetworkConnection> sender = driver->NewConnection ("localhost:" PORT "/" PROTO);
+    if (sender->GetLastError () != CS_NET_ERR_NO_ERROR)
     {
       fprintf (stderr, "Failed to connect socket!\n");
       return 7;
     }
-    netman->RegisterConnectedSocket (sender, & sendpkt);
+    netman->RegisterConnection (sender, & sendpkt);
 
     printf ("Sending '%s' over loopback...\n", testdata);
     sendpkt.SetData (testdata);
     netman->Send (sender, & sendpkt);
+    netman->UnregisterEndPoint (sender);
 
     csDefaultRunLoop (objreg);
   }

@@ -6,6 +6,15 @@ The history order is reversed so that new features are at the top.
 10-May-2003
 	- Philip Wyett eliminated the 88 double to float conversion compiler
           warnings in gtreeldr.cpp under MSVC 6.
+	- Oktal made the following changes to the networking code:
+	    - Finished updating the cssocket driver to allow it to use UDP
+	      in a useful way. The API now gives a connection-based wrapper
+	      over the connectionless protocol.
+	    - Modified the network manager so it can manage sockets from the
+	      cssocket API aswell as those from ensocket. This includes a
+	      backwards-incompatible change: iNetworkPacket has been changed
+	      to iNetworkPacket2 (this is for handling iNetworkSocket2
+	      sockets), so that now iNetworkPacket is used for cssocket.
 9-May-2003
 	- Philip Wyett did the following:
 	    - Added 'Makefile' to 'jam distclean', so at distclean the 'CS/'

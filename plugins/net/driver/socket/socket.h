@@ -27,6 +27,7 @@
 class csSocketEndPoint
 {
 protected:
+  bool Reliable;
   csNetworkSocket Socket;
   csNetworkDriverError LastError;
   void CloseSocket();
@@ -34,7 +35,7 @@ protected:
   bool ValidateSocket();
   bool PlatformSetBlocking(bool);
 public:
-  csSocketEndPoint(csNetworkSocket s, bool blocks);
+  csSocketEndPoint(csNetworkSocket s, bool blocks, bool reliable);
   virtual ~csSocketEndPoint();
   virtual void Terminate();
   virtual csNetworkDriverError GetLastError() const { return LastError; }
@@ -45,11 +46,15 @@ public:
 class csSocketConnection : public iNetworkConnection, public csSocketEndPoint
 {
   typedef csSocketEndPoint superclass;
+  struct sockaddr thisaddr;
 public:
-  csSocketConnection(iBase* p, csNetworkSocket, bool blocking);
+  csSocketConnection(iBase* p, csNetworkSocket, bool blocking, bool reliable,
+    struct sockaddr addr);
   virtual bool Send(const void* data, size_t nbytes);
   virtual size_t Receive(void* buff, size_t maxbytes);
+  virtual bool IsDataWaiting() const;
   virtual void Terminate() { superclass::Terminate(); }
+  virtual bool IsConnected() const;
   virtual csNetworkDriverError GetLastError() const
     { return superclass::GetLastError(); }
 
@@ -69,7 +74,7 @@ protected:
   bool BlockingConnection;
 public:
   csSocketListener(iBase* p, csNetworkSocket s, unsigned short port,
-    bool reliable, bool blockingListener, bool blockingConnection);
+    bool blockingListener, bool blockingConnection, bool reliable);
   virtual csPtr<iNetworkConnection> Accept();
   virtual void Terminate() { superclass::Terminate(); }
   virtual csNetworkDriverError GetLastError() const

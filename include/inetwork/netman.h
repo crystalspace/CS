@@ -21,11 +21,17 @@
 #define __CS_INETWORK_NETMAN_H__
 
 #include "csutil/scf.h"
+#include "csutil/ref.h"
+
+struct iNetworkEndPoint;
+struct iNetworkConnection;
+struct iNetworkListener;
 
 struct iNetworkSocket2;
+
 class csDataStream;
 
-SCF_VERSION (iNetworkPacket, 0, 0, 2);
+SCF_VERSION (iNetworkPacket, 0, 1, 0);
 
 /**
  * The application writes an implementation of the network packet
@@ -34,8 +40,49 @@ SCF_VERSION (iNetworkPacket, 0, 0, 2);
  * These packets are used as buffers for incoming data.
  * Other instances are passed to the transmission methods and
  * their data is sent to remote hosts.
+ * This is for the CS networking API.
  */
 struct iNetworkPacket : public iBase
+{
+  /// Read in data received over the network.
+  /// Returns true if the entire packet has been read,
+  /// and a network event should be posted.
+  /// Otherwise, further calls to Read() are neccessary.
+  /// Resets length to the amount of data actually read.
+  /// If not all the data was read, the remaining data can be
+  /// assumed to be part of the next packet.
+  /// Write-only packets may ignore this.
+  virtual bool Read (csDataStream &data, iNetworkConnection *socket) = 0;
+
+  /// Returns the packet as flat data which can be sent over the network.
+  /// Sets length to the length of the buffer.
+  /// Read-only packets may ignore this.
+  virtual char* Write (size_t &length) = 0;
+
+  /// Return a new instance of this implementation.
+  /// Used for packets associated with listeners to create a new packet
+  /// for each new connection created from the listener.
+  virtual csPtr<iNetworkPacket> New () = 0;
+
+  /// Return true from this function if this packet should be sent over
+  /// the given socket, false otherwise.
+  /// Used by iNetworkManager::SendToAll() to filter out unwanted sockets.
+  /// Read-only packets may ignore this.
+  virtual bool FilterSocket (iNetworkConnection *) = 0;
+};
+
+SCF_VERSION (iNetworkPacket2, 0, 0, 1);
+
+/**
+ * The application writes an implementation of the network packet
+ * interface and a new instance of that implementation is passed
+ * to the network manager with each new connection registered.
+ * These packets are used as buffers for incoming data.
+ * Other instances are passed to the transmission methods and
+ * their data is sent to remote hosts.
+ * This is for the ENSocket plugin API.
+ */
+struct iNetworkPacket2 : public iBase
 {
   /// Read in data received over the network.
   /// Returns true if the entire packet has been read,
@@ -55,7 +102,7 @@ struct iNetworkPacket : public iBase
   /// Return a new instance of this implementation.
   /// Used for packets associated with listeners to create a new packet
   /// for each new connection created from the listener.
-  virtual iNetworkPacket* New () = 0;
+  virtual csPtr<iNetworkPacket2> New () = 0;
 
   /// Return true from this function if this packet should be sent over
   /// the given socket, false otherwise.
@@ -78,25 +125,43 @@ SCF_VERSION (iNetworkManager, 0, 0, 1);
 struct iNetworkManager : public iBase
 {
   /// Register a connection for polling with its associated packet.
-  virtual void RegisterConnectedSocket
-    (iNetworkSocket2 *, iNetworkPacket *) = 0;
-
-  /// Unregister a connection.
-  virtual bool UnregisterConnectedSocket (iNetworkSocket2 *) = 0;
+  virtual void RegisterConnection
+    (iNetworkConnection *, iNetworkPacket *) = 0;
 
   /// Register a listener for polling with its associated packet.
-  virtual void RegisterListeningSocket
-    (iNetworkSocket2 *, iNetworkPacket *) = 0;
+  virtual void RegisterListener
+    (iNetworkListener *, iNetworkPacket *) = 0;
 
-  /// Unregister a listener.
-  virtual bool UnregisterListeningSocket (iNetworkSocket2 *) = 0;
+  /// Unregister a connection or listener.
+  virtual bool UnregisterEndPoint (iNetworkEndPoint *) = 0;
 
-  /// Send a packet on a connected socket.
-  virtual bool Send (iNetworkSocket2 *, iNetworkPacket *) = 0;
+  /// Send a packet on a connection.
+  virtual bool Send (iNetworkConnection *, iNetworkPacket *) = 0;
 
-  /// Send a packet to all registered, connected sockets
+  /// Send a packet to all registered connections
   /// that iNetworkPacket::FilterSocket() returns true for.
   virtual bool SendToAll (iNetworkPacket *) = 0;
+
+  /// Register an ENSocket connection for polling with its associated packet.
+  virtual void RegisterConnectedSocket
+    (iNetworkSocket2 *, iNetworkPacket2 *) = 0;
+
+  /// Unregister an ENSocket connection.
+  virtual bool UnregisterConnectedSocket (iNetworkSocket2 *) = 0;
+
+  /// Register an ENSocket listener for polling with its associated packet.
+  virtual void RegisterListeningSocket
+    (iNetworkSocket2 *, iNetworkPacket2 *) = 0;
+
+  /// Unregister an ENSocket listener.
+  virtual bool UnregisterListeningSocket (iNetworkSocket2 *) = 0;
+
+  /// Send a packet on a connected ENSocket socket.
+  virtual bool Send (iNetworkSocket2 *, iNetworkPacket2 *) = 0;
+
+  /// Send a packet to all registered, connected ENSocket sockets
+  /// that iNetworkPacket2::FilterSocket() returns true for.
+  virtual bool SendToAll (iNetworkPacket2 *) = 0;
 };
 
 #endif // __CS_INETWORK_NETMAN_H__

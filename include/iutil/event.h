@@ -31,17 +31,20 @@
  * @{ */
 
 enum {
-  CS_MUSCLE_PROTOCOL = 1347235888L, // 'PM00'
-  CS_CRYSTAL_PROTOCOL = 1129525296L, // 'CS00'
-  CS_XML_PROTOCOL = 1481460784L // 'XML0'
+  CS_CRYSTAL_PROTOCOL = 0x43533030L, // 'CS00'
+  CS_MUSCLE_PROTOCOL = 0x504d3030L, // 'PM00'
+  CS_XML_PROTOCOL = 0x584d4d30L // 'XML0'
 };
 
 struct iEventHandler;
 
-struct iNetworkSocket2;
+struct iNetworkConnection;
 struct iNetworkPacket;
 
-SCF_VERSION (iEvent, 0, 0, 2);
+struct iNetworkSocket2;
+struct iNetworkPacket2;
+
+SCF_VERSION (iEvent, 0, 1, 1);
 
 // Event data structs. Defined outside of iEvent to allow SWIG to
 // handle the nested structs and union. Does not break any code.
@@ -100,10 +103,20 @@ struct csEventCommandData
 /// Network event data in iEvent.
 struct csEventNetworkData
 {
-  /// Socket data recieved on	
-  iNetworkSocket2 *From;
-  /// Packet of data recieved
-  iNetworkPacket *Data;
+  union
+  {
+    /// Connection data received on
+    iNetworkConnection *From;
+    /// Socket data recieved on
+    iNetworkSocket2 *From2;
+  };
+  union
+  {
+    /// Packet of data received
+    iNetworkPacket *Data;
+    /// Packet of data recieved
+    iNetworkPacket2 *Data2;
+  };
 };
 
 /**
