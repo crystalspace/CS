@@ -195,7 +195,7 @@ static bool output_heightmap (const char *fname, iImage *ifile)
   int h = ifile->GetHeight ();
   uint8 *img = (uint8 *)ifile->GetImageData ();
 
-  int height [257], tc;
+  int height [257], tc = 0;
   RGBPixel *pal = ifile->GetPalette ();
   height [256] = transpcolor.Intensity ();
   for (int i = 0; i < 256; i++)
