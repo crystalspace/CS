@@ -1,6 +1,44 @@
 The history order is reversed so that new features are at the top.
 
+15-Aug-2001
+	- Philip Wyett removed the cslua plugin from the MSVC port.
+	- Christopher Nelson added awsdef.zip which is the binary resource
+	  package for aws. Currently it has only three .png bitmaps for
+	  windows. It will eventually serve as the default skin repository
+	  and contain a number of other images.
 14-Aug-2001
+	- Christopher Nelson reports: redrawing code works now, updated some
+	  stuff. Had to had some reset code into the top-level redraw
+	  function. Noticed clunky bug in OpenGL, and odd transparency bug
+	  in software mode when you start in fullscreen mode.
+	- Christopher Nelson made the following changes to AWS:
+	    1. Added a number of new colors to the preference manager:
+                AC_HIGHLIGHT2: a slightly darker highlight
+                AC_SHADOW: a slightly lighter highlight
+                AC_BLACK, AC_WHITE: black and white
+                AC_RED,AC_GREEN,AC_BLUE: colors that are always midpoint red, green, and blue solid colors.
+               Note that these colors are, in the case of HIGHLIGHT and
+	       SHADOW derived BUT NOT SPECIFIED by the user. The constant
+	       colors, Red, Green, Blue, etc are not user definable. They are
+	       intended to be those colors ALWAYS.           
+               I'm contemplating taking the POV-Ray colors definition file
+	       and turning it into a symbolic list of colors that can be
+	       specified via the definitions file so that you don't have to
+	       figure out what RGB colors you want. I'm thinking this might
+	       be nice for non-programmers who don't have a good grasp on
+	       RGB composition.
+	    2. Added a bunch of drawing code for windows, and all the
+	       frame_style and frame_options flags.  These still need
+	       to be extended into the constant-ref so that they can be
+	       looked up.  I also need to extend options fields so that
+	       we can make lists of options like:
+			Window "My Window"
+			{
+                          ...
+                          FrameOptions: Control, Zoom, Minimize, Beveled
+			}
+	- Philip Wyett fixed a missing variable "i" in for loop for
+	  awsmgr.cpp.
 	- Fixed a bug in the lighting code which prevented the falling
 	  blocks in Blocks to be lit correctly.
 	- Fixed a bug with the ball mesh not clipping correctly to the
@@ -39,6 +77,53 @@ The history order is reversed so that new features are at the top.
 	    means that it scans through all triangles looking
 	    for the closest hit. csSector::HitBeam() now uses
 	    the outline for faster processing.
+13-Aug-2001
+	- Philip Wyett started the beginings of a optimization schedule.
+		- Loop optimization.
+		- Removed over-use and bad use of variables in some code.
+		- Altered some code code to use bitwise shifting for
+		  "if ( var == 1)" etc. testing. This is an optimization
+		  which eliminates assembler level CMP in speed critical
+		  code. Some may not like this and can be removed if it
+		  makes people un-comfortable.
+		- Did some altering of code to bring within CS coding style.
+	  Work in progress. The benefits of changes can been seen in
+	  Windows port with faster apps starts (by-product), more efficient
+	  proc textures i.e. animation speed of certain elements improved.
+	  e.g demosky and screen FX (F4 - F6) keys when running walktest.
+	  General FPS is also up a fraction...
+	- Philip Wyett did a pedantic change to PI and PI / 2 :-)
+	  Removed over use of variables in "for" loops within fuctions.
+	  This is well illustrated by the amount of "int i"'s there were
+	  in "protex2d.cpp" :-) Did a little bit of loop optimization.
+	  Bug to be verified: In csvid->opengl, are videos palying upside
+	  down for others are they are for me?
+	- Christopher Nelson reports:
+	  Finally!  Got all the bugs straightened out.
+	     1. There was a circular dependency which I accidentally
+	        introduced in some test code.  Previously, the palette
+		setup was in the SetDefaultContext code.  It's now inside
+		the SetDefaultSkin code, which makes more sense, since the
+		palette is dependent on the skin anyway.
+	     2. Some miscellaneous blunders were fixed, and a lot of debug
+	        code was added.  Modules which have a const bool DEBUG_xxx
+		at the top contain debug code which can be activating by
+		setting the DEBUG_xxx switches to true.  All modern compilers
+		can eliminate this dead code in release builds, so it
+		doesn't slow down an optimized system.  This was recommended
+		in last months C/C++ Programmers Journal vs. #ifdef's
+		because it keeps you from maintaining two or three separate
+		programs, as is the case when using #ifdef debugging.
+		I mention it in case anyone wonders why, and the rational in
+		case anyone would like to use this technique as well.
+	- Brandon Ehle did the following:
+	    - Fixed csLua for recent engine interface changes
+	    - Removed junk from both csPython and csLua
+	    - Changed iScript::Store interface to handle both csPython and csLua
+	      and hopefully and new languages.
+	    - Made both csPython and csLua store their object_reg ptrs
+	      throught Store().
+	    - Fixed cslua.mak for luaswig-1.2.1
 12-Aug-2001
 	- Eric Sunshine converted the Apple/NeXT ports over to the new
 	  platform-specific shared `helper' object paradigm as much as possible
@@ -89,6 +174,8 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine removed some unnecessary and incorrectly used `-F'
 	  directives from CFLAGS in the MacOS/X, MacOS/X Server 1.0, and
 	  OpenStep makefiles.
+	- Martin Geisse added the model importers to the build process.
+	- Martin also added the plugin framework for all model importers.
 11-Aug-2001
 	- Michael Voase made the following change: Texture manager (all
 	  drivers): Removed GetRefCount() kludge in the delete method.  This
@@ -108,6 +195,29 @@ The history order is reversed so that new features are at the top.
 	      starting with the ones caused by myself.  The texture manager
 	      will now clean up correctly and completely under csfedit and some
 	      csws based applications.
+	- Martin Geisse did the following:
+	    - Added the model converter and crossbuilder plugins to walktest.
+	    - Did some minor changes to the mdltest level to make it look
+	      better.
+	    - Disabled the old 3ds importer (it is no more invoked
+	      automatically when the .3ds extension is found).
+	    - Changed the way the model converters give information about
+	      supported formats. GetFormat(index) no longer returns the name
+	      of the format, but a struct which contains the name and
+	      additional information, such as supported features.
+	    - Removed SupportsFormat() from the converters.
+	    - Removed the 'converter test' in the initialization of Walktest.
+	      This test seemed to do nothing, and the old converter is to be
+	      removed anyway.
+	    - Walktest now queries the model converter and the crossbuilder
+	      and uses them in load_meshobj() if the old converter fails.
+10-Aug-2001
+	- Martin Geisse fixed a bug in the sprite crossbuilder.
+	- Martin also changed the way csLoader imports model files: First,
+	  the old converter is used. If that fails, the new one is used.
+	  Also added a test level that imports a model to cs/data/mdltest.
+	- Samuel Humphreys fixed a bug in xextshm.cpp pointed out by
+	  Andrew Topp.
 9-Aug-2001
 	- Martin Geisse reverted recent changes to csObject because they
 	  contradict with the ideas of reference counting.
