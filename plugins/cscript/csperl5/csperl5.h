@@ -102,8 +102,8 @@ class csPerl5 : public iScript
     bool SetTruth (const char *name, bool data)
     { return Call (name, "%d", data ? 1 : 0); }
     bool SetPointer (iBase *data)
-    { SV *p = SvRV (sv); if (! SvOK (p)) return false;
-      sv_setiv (p, (int) p)); return true; }
+    { SV *p = SvRV (self); if (! SvOK (p)) return false;
+      sv_setiv (p, (int) data); return true; }
 
     bool Get (const char *name, int &data) const
     { return ((Object *) this)->Call (name, data, ""); }
@@ -118,7 +118,7 @@ class csPerl5 : public iScript
     bool GetTruth (const char *name, bool &data) const
     { return ((Object *) this)->Call (name, (int &) data, ""); }
     iBase* GetPointer () const
-    { SV *p = SvRV (sv); if (SvOK (p)) return (iBase *) SvIV (p); return 0; }
+    { SV *p = SvRV (self); if (SvOK (p)) return (iBase *) SvIV (p); return 0; }
   };
   friend class Object;
 

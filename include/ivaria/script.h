@@ -53,7 +53,7 @@ struct iScriptObject : public iBase
    * If the object is an interface pointer from the cspace module, this will
    * set its value and return true, otherwise false.
    */
-  virtual bool SetPointer (iBase *) const = 0;
+  virtual bool SetPointer (iBase *) = 0;
 
   /**
    * Call a method in the object, with no return value.

@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+22-Aug-2003
+	- Oktal fixed a couple of typos in the Perl plugin, and fixed a bit of
+	  const correctness in iScriptObject.
 21-Aug-2003
 	- Jorrit fixed a bug in the mesh-sphere intersection code (ODE). The bug
 	  was that intersection with triangles used <0. But that means something
