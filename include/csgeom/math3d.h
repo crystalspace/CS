@@ -1,17 +1,17 @@
 /*
     Copyright (C) 1998 by Jorrit Tyberghein
     Largely rewritten by Ivan Avramovic <ivan@avramovic.com>
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -44,7 +44,7 @@ public:
   csVector3 () { x = y = z = 0; }
 
   /// Make a new vector and initialize with the given values.
-  csVector3 (float x, float y, float z = 0) 
+  csVector3 (float x, float y, float z = 0)
    { csVector3::x = x; csVector3::y = y; csVector3::z = z; }
 
   /// Add two vectors.
@@ -61,8 +61,8 @@ public:
 
   /// Take the cross product of two vectors.
   inline friend csVector3 operator% (const csVector3& v1, const csVector3& v2)
-  { 
-    return csVector3 (v1.y*v2.z-v1.z*v2.y, 
+  {
+    return csVector3 (v1.y*v2.z-v1.z*v2.y,
                     v1.z*v2.x-v1.x*v2.z,
                     v1.x*v2.y-v1.y*v2.x);
   }
@@ -104,7 +104,7 @@ public:
   { return ABS(v.x)<f && ABS(v.y)<f && ABS(v.z)<f; }
 
 	/// Returns n-th component of the vector
-  inline float operator[](int n) {return !n?x:n&1?y:z;}
+  inline float operator[](int n) const {return !n?x:n&1?y:z;}
 
   /// Add another vector to this vector.
   inline csVector3& operator+= (const csVector3& v)
@@ -239,7 +239,7 @@ public:
   inline csMatrix3 operator+ () const { return *this; }
   /// Unary - operator.
   inline csMatrix3 operator- () const
-  { 
+  {
    return csMatrix3(-m11,-m12,-m13,
                     -m21,-m22,-m23,
                     -m31,-m32,-m33);
@@ -316,7 +316,7 @@ public:
 
 /**
  * A plane in 3D space.
- * The plane is given by the equation AAx + BBy + CCz + DD = 0, 
+ * The plane is given by the equation AAx + BBy + CCz + DD = 0,
  * Where (AA,BB,CC) is given by the vector 'norm'.
  */
 class csPlane
@@ -357,7 +357,7 @@ public:
   inline float Classify (const csVector3& pt) const { return norm*pt+DD; }
 
   /// Classify a vector with regards to four plane components.
-  static float Classify (float A, float B, float C, float D, 
+  static float Classify (float A, float B, float C, float D,
                          const csVector3& pt)
   { return A*pt.x + B*pt.y + C*pt.z + D; }
 
@@ -366,15 +366,15 @@ public:
    * This function assumes that 'norm' is a unit vector.  If not, the function
    * returns distance times the magnitude of 'norm'.
    */
-  inline float Distance (const csVector3& pt) const 
+  inline float Distance (const csVector3& pt) const
   { return ABS (Classify (pt)); }
 
   /// Reverses the direction of the plane while maintianing the plane itself.
   void Invert() { norm = -norm;  DD = -DD; }
-  
+
   /// Normalizes the plane equation so that 'norm' is a unit vector.
   void Normalize()
-  { 
+  {
     float f = norm.Norm();
     if (f) { norm /= f;  DD /= f; }
   }
@@ -395,7 +395,7 @@ public:
    *      or 0 if point p lies on plane '0-v1-v2'.
    * Plane '0-v1-v2' is the plane passing through points <0,0,0>, v1, and v2.
    */
-  static int WhichSide3D (const csVector3& p, 
+  static int WhichSide3D (const csVector3& p,
                           const csVector3& v1, const csVector3& v2);
 
   /**
@@ -417,13 +417,13 @@ public:
   /**
    * Calculates a vector lying a specified distance between two other vectors.
    * Given vectors v1 and v2, this function will calculate and return vector
-   * v lying between them.  
+   * v lying between them.
    * If pct != -1, vector v will be the point which is pct % of the
    * way from v1 to v2.
    * Otherwise, if pct equals -1, v will be the point along 'v1-v2' which is
    * distance wid from v1.
    */
-  static void Between (const csVector3& v1, const csVector3& v2, csVector3& v, 
+  static void Between (const csVector3& v1, const csVector3& v2, csVector3& v,
                        float pct, float wid);
 
   /**
@@ -432,20 +432,20 @@ public:
    * and minimum values specified by min and max.  If the limits are
    * exceeded, new min or max values will be set.
    */
-  static void SetMinMax (const csVector3& v, 
+  static void SetMinMax (const csVector3& v,
                          csVector3& min, csVector3& max)
   {
     if (v.x > max.x) max.x = v.x; else if (v.x < min.x ) min.x = v.x;
     if (v.y > max.y) max.y = v.y; else if (v.y < min.y ) min.y = v.y;
     if (v.z > max.z) max.z = v.z; else if (v.z < min.z ) min.z = v.z;
-  } 
+  }
 
   /**
    * Compute twice the signed area of triangle composed by three points.
    * This function returns 2 x the area of the triangle formed by the points
    * a, b, and c.
    */
-  inline static float Area3 (const csVector3 &a, const csVector3 &b, 
+  inline static float Area3 (const csVector3 &a, const csVector3 &b,
                              const csVector3 &c)
   {
     csVector3 v1 = b - a;
@@ -459,8 +459,8 @@ public:
    * This function will calculate the normal to the plane formed by vectors
    * v1, v2, and v3, and store the result in norm.
    */
-  inline static void CalcNormal (csVector3& norm,     const csVector3& v1, 
-                                 const csVector3& v2, const csVector3& v3) 
+  inline static void CalcNormal (csVector3& norm,     const csVector3& v1,
+                                 const csVector3& v2, const csVector3& v3)
   {
 #   ifdef CS_ASM__CALC_PLANE_NORMAL
       CS_ASM__CALC_PLANE_NORMAL
@@ -474,7 +474,7 @@ public:
    * This function will calculat the normal to a polygon with two edges
    * represented by v and u.  The result is stored in norm.
    */
-  static void CalcNormal (csVector3& norm, 
+  static void CalcNormal (csVector3& norm,
                           const csVector3& v, const csVector3& u)
   { norm = u%v; /* NOT v%u - vertexes are defined clockwise */ }
 
@@ -484,23 +484,23 @@ public:
    * will calculate the plane equation and return the result in 'normal'
    * and 'D'.
    */
-  static void CalcPlane (const csVector3& v1, const csVector3& v2, 
+  static void CalcPlane (const csVector3& v1, const csVector3& v2,
          const csVector3& v3, csVector3& normal, float& D)
   {
     normal = (v1-v2)%(v1-v3);
     D = - (normal * v1);
   }
 
-  /** 
+  /**
    * Check if two planes are close together.
    * The function returns true iff each component of the plane equation for
    * one plane is within .001 of the corresponding component of the other
    * plane.
    */
-  static bool PlanesClose (const csPlane& p1, const csPlane& p2) 
-  { 
-    return ( ( p1.norm - p2.norm) < (float).001 ) && 
-             (  ABS (p1.DD-p2.DD) < (float).001 ); 
+  static bool PlanesClose (const csPlane& p1, const csPlane& p2)
+  {
+    return ( ( p1.norm - p2.norm) < (float).001 ) &&
+             (  ABS (p1.DD-p2.DD) < (float).001 );
   }
 
 };
@@ -517,7 +517,7 @@ public:
   {  csVector3 v = p1-p2;  return v*v; }
 
   /// Returns the squared distance between a point and a line.
-  static float PointLine (const csVector3& p, 
+  static float PointLine (const csVector3& p,
                           const csVector3& l1, const csVector3& l2);
 
   /// Returns the squared distance between a point and a normalized plane.
@@ -530,7 +530,7 @@ public:
    * plane distance.  V is an array of vertices, n is the number of
    * vertices, and plane is the polygon plane.
    */
-  static float PointPoly (const csVector3& p, csVector3 *V, int n, 
+  static float PointPoly (const csVector3& p, csVector3 *V, int n,
                           const csPlane& plane, float sqdist = -1);
 };
 
@@ -589,11 +589,11 @@ public:
    * is an intersection (fails if the segment is parallel to the plane),
    * and returns the distance from u to the intersection point.
    * The intersection point is returned in isect.
-   */ 
+   */
   static float ZPlane (float zval,      // plane z = zval
     const csVector3& u, const csVector3& v, // segment
     csVector3& isect);                    // intersection point
-  
+
   /**
    * Intersect a 3D segment with the frustrum plane Ax + z = 0.
    * Assumes an intersection, and returns the intersection point in isect.
