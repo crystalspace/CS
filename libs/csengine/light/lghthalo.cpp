@@ -17,6 +17,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
+#include "cssys/sysfunc.h"
 #include "qint.h"
 #include "csengine/halo.h"
 #include "csengine/engine.h"
@@ -254,29 +255,24 @@ bool csLightHalo::Process (csTicks ElapsedTime, const csEngine &Engine)
 
   halo_vis = IsVisible (Engine, v);
 
-  //if (halo_vis) // originally here, but this removes any fading out
-  // of the halo. I commented it out, Wouter 24/2/2001.
+  // Create a rectangle containing the halo and clip it against screen
+  float hw = Handle->GetWidth () * 0.5f;
+  float hh = Handle->GetHeight () * 0.5f;
+  
+  csVector2 HaloPoly[4] =
   {
-    // Create a rectangle containing the halo and clip it against screen
-    int hw = Handle->GetWidth ();
-    int hh = Handle->GetHeight ();
-    float hw2 = float (hw) / 2.0f;
-    float hh2 = float (hh) / 2.0f;
-    csVector2 HaloPoly[4] =
-    {
-      csVector2 (v.x - hw2, v.y - hh2),
-      csVector2 (v.x - hw2, v.y + hh2),
-      csVector2 (v.x + hw2, v.y + hh2),
-      csVector2 (v.x + hw2, v.y - hh2)
-    };
+    csVector2 (v.x - hw, v.y - hh),
+    csVector2 (v.x - hw, v.y + hh),
+    csVector2 (v.x + hw, v.y + hh),
+    csVector2 (v.x + hw, v.y - hh)
+  };
 
-    // Clip the halo against clipper
-    if (Engine.top_clipper->Clip (HaloPoly, 4, HaloClip, HaloVCount))
-    {
-      xtl = HaloPoly[0].x;
-      ytl = HaloPoly[0].y;
-      draw_halo = true;
-    }
+  // Clip the halo against clipper
+  if (Engine.top_clipper->Clip (HaloPoly, 4, HaloClip, HaloVCount))
+  {
+    xtl = HaloPoly[0].x;
+    ytl = HaloPoly[0].y;
+    draw_halo = true;
   }
 
   float hintensity = Light->GetHalo ()->GetIntensity ();
@@ -472,26 +468,24 @@ void csLightFlareHalo::ProcessFlareComponent (
   csVector2 const &deltapos)
 {
 #ifndef CS_USE_NEW_RENDERER
-  int i;
-
-  /// compute size and position of this component
-  float compw = float (halosize) * comp->width;
-  float comph = float (halosize) * comp->height;
   csVector2 pos = start + comp->position * deltapos;
 
   /// drawing info for the polygon
   G3DPolygonDPFX dpfx;
-
+  
+  /// Compute size and position of this component
+  float hw = (halosize * comp->width) * 0.5f;
+  float hh = (halosize * comp->height) * 0.5f;
+  
   // Create a rectangle containing the halo and clip it against screen
-  float hw2 = compw / 2.0f;
-  float hh2 = comph / 2.0f;
   csVector2 HaloPoly[4] =
   {
-    csVector2 (pos.x - hw2, pos.y - hh2),
-    csVector2 (pos.x - hw2, pos.y + hh2),
-    csVector2 (pos.x + hw2, pos.y + hh2),
-    csVector2 (pos.x + hw2, pos.y - hh2)
+    csVector2 (pos.x - hw, pos.y - hh),
+    csVector2 (pos.x - hw, pos.y + hh),
+    csVector2 (pos.x + hw, pos.y + hh),
+    csVector2 (pos.x + hw, pos.y - hh)
   };
+
   csVector2 HaloUV[4] =
   {
     csVector2 (0.0, 0.0),
@@ -516,8 +510,10 @@ void csLightFlareHalo::ProcessFlareComponent (
   // draw the halo
   float intensity = flare->GetIntensity ();
   uint mode = comp->mixmode;
-  if ((mode&CS_FX_ADD) && (intensity < 1.0)) mode |= CS_FX_GOURAUD;
-  else intensity = 1.0;
+  if ((mode&CS_FX_ADD) && (intensity < 1.0f))
+    mode |= CS_FX_GOURAUD;
+  else
+    intensity = 1.0f;
 
   //if(flare->GetIntensity() < 1.0)
   //return; // many drivers do not support combinations of weird modes
@@ -546,6 +542,7 @@ void csLightFlareHalo::ProcessFlareComponent (
   engine.G3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_NONE);
 
   // copy info
+  int i;
   for (i = 0; i < 4; i++)
   {
     dpfx.vertices[i].z = SMALL_Z;
