@@ -73,6 +73,9 @@ Full screen effects (fading, whiteout, etc).
 Procedural textures. @xref{ProcTextures}, @xref{Texture Mapping}.
 
 @item
+Level of Detail. @xref{Level of Detail}.
+
+@item
 2D animations.
 
 @item

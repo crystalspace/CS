@@ -33,6 +33,7 @@ chronological order.
 	- Troy in physldr.cpp added softness parameter to ParseCollider & 
 	  ParseSystemColliderMesh.  Will add softness to remaining colliders
 	  when i get tests built for them.
+	- Jorrit added documentation about static lod.
 13-Aug-2003
 	- res renamed the rlloader, rlsstd and rlsstencil plugins to less
 	  cryptic rendloop_loader, rendstep_std and rendstep_stencil.

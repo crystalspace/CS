@@ -18,6 +18,7 @@ Currently only some separate documents about the engine are available:
 * Rendering Loop::
 * 3D Sprites::
 * Dynamic Worlds::
+* Level of Detail::
 @end menu
 
 @importss{plugins,engine,worldcmp.txi}
@@ -30,3 +31,4 @@ Currently only some separate documents about the engine are available:
 @importss{plugins,engine,render.txi}
 @importss{plugins,engine,3dsprite.txi}
 @importss{plugins,engine,dynworld.txi}
+@importss{plugins,engine,lod.txi}
