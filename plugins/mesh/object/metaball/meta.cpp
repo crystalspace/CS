@@ -332,8 +332,9 @@ void csMetaBall::NextFrame( cs_time )
 
     csVector3 &c = meta_balls[i].center;
     c.x = 4 * m * sin (m * alpha + i * M_PI / 4);
-    c.y = 3 * m * cos (1.4 * m * alpha + m * M_PI / 6);
-    c.z = 11 + 2 * sin (m * alpha * 1.3214);
+    c.y = 4 * m * cos (1.4 * m * alpha + m * M_PI / 6);
+    c.z = 4 * sin (m * alpha * 1.3214);
+
 //  printf("Ball %d, (%f,%f,%f)\n",i, c.x,c.y,c.z);
   }
 #endif

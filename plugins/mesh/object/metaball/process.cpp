@@ -29,12 +29,12 @@
 #define X_RIGHT 10.5
 #define Y_LEFT  -10.5
 #define Y_RIGHT 10.5
-#define Z_LEFT  -4.0
-#define Z_RIGHT 16.5
+#define Z_LEFT  -10.5
+#define Z_RIGHT 10.5
 
 #define RES_X   26
 #define RES_Y   26
-#define RES_Z   14
+#define RES_Z   26
 
 #define EPS 0.0001
 
@@ -53,14 +53,13 @@ static char where[RES_X+1][RES_Y+1][RES_Z+1];
 float csMetaBall::potential(const csVector3 &p)
 { 
   int i;
-  float res = -mp.iso_level;
+  float res = -mp.iso_level,dx,dy,dz;
 
   for (i=0;i<num_meta_balls;i++)
   {
-    float dx=meta_balls[i].center.x-p.x;
-    float dy=meta_balls[i].center.y-p.y;
-    float dz=meta_balls[i].center.z-p.z;
-
+    dx=meta_balls[i].center.x-p.x;
+    dy=meta_balls[i].center.y-p.y;
+    dz=meta_balls[i].center.z-p.z;
     res += mp.charge/(dx*dx+dy*dy+dz*dz);
   }
 
@@ -221,7 +220,7 @@ void csMetaBall::CalculateBlob(int dx,int dy,int dz)
     goto ret_back;
   if (_y == -1 || _y == RES_Y)
     goto ret_back;
-  if (_z == -1 || _z > RES_Z)
+  if (_z == -1 || _z == RES_Z)
     goto ret_back;
 
   // already done this blob
