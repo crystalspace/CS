@@ -309,40 +309,37 @@ bool csStuffObject::HitBeamOutline (const csVector3& start,
 	
 bool csStuffObject::HitBeamObject (const csVector3& start,
   const csVector3& end, csVector3& isect, float* pr)
+{
+  // This is now closer to an outline hitting method. It will
+  // return as soon as it touches any triangle in the mesh, and
+  // will be a bit faster than its more accurate cousin (below).
+  
+  csSegment3 seg (start, end);
+  int i, max = mesh.num_triangles;
+  csTriangle *tr = mesh.triangles;
+  csVector3 *vrt = vertices;
+  for (i = 0 ; i < max ; i++)
   {
-    // This is now closer to an outline hitting method. It will
-    // return as soon as it touches any triangle in the mesh, and
-    // will be a bit faster than its more accurate cousin (below).
-    
-    csSegment3 seg (start, end);
-    int i, max = mesh.num_triangles;
-    csTriangle *tr = mesh.triangles;
-    csVector3 *vrt = vertices;
-    for (i = 0 ; i < max ; i++)
+    if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],vrt[tr[i].c], seg, isect))
     {
-      if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],
-    	vrt[tr[i].c], seg, isect))
-      {
-        if (pr) *pr = qsqrt (csSquaredDist::PointPoint (start, isect) /
-	csSquaredDist::PointPoint (start, end));
+      if (pr) *pr = qsqrt (csSquaredDist::PointPoint (start, isect) / csSquaredDist::PointPoint (start, end))
         return true;
-      }
     }
-    return false;
   }
+  return false;
+}
   
 void csStuffObject::SetLogicalParent (iBase *) 
- {}
+{}
    
 iBase *csStuffObject::GetLogicalParent () const 
- { return NULL; }
+{ return NULL; }
  
 // iObjectModel *csStuffObject::GetObjectModel () { return NULL; };
 
 //-----------Vertex Buffer Manager Client embedded implementation
-void csStuffObject::eiVertexBufferManagerClient::ManagerClosing() { };
-
-
+void csStuffObject::eiVertexBufferManagerClient::ManagerClosing() 
+{ }
 
 //--//--//--//--//-- StuffFactory
 
@@ -356,16 +353,16 @@ SCF_IMPLEMENT_EMBEDDED_IBASE(StuffFactory::csClothFactoryState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
  
 StuffFactory::StuffFactory(iBase* parent) 
- {
-   SCF_CONSTRUCT_IBASE( parent )
-   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiClothFactoryState)	
-   object_reg       = NULL;
-   material         = NULL;		
-   factory_vertices = NULL; 
-   factory_texels   = NULL;
-   factory_colors   = NULL;
-   factory_triangles= NULL;
-  };
+{
+  SCF_CONSTRUCT_IBASE( parent )
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiClothFactoryState)	
+  object_reg       = NULL;
+  material         = NULL;		
+  factory_vertices = NULL; 
+  factory_texels   = NULL;
+  factory_colors   = NULL;
+  factory_triangles= NULL;
+}
 
 StuffFactory::~StuffFactory() 
 {
@@ -401,7 +398,7 @@ void StuffFactory::SetLogicalParent(iBase *)
 {}
   
 iBase *StuffFactory::GetLogicalParent ()const 
-  { return NULL; }
+{ return NULL; }
   
 //----------------------------------------------------------------------
 
