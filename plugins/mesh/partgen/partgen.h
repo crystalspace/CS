@@ -252,7 +252,7 @@ public:
   {
     return vis_cb;
   }
-  virtual void NextFrame (csTicks current_time)
+  virtual void NextFrame (csTicks current_time, const csVector3& /*pos*/)
   {
     csTicks elaps = 0;
     if (prev_time != 0) elaps = current_time-prev_time;

@@ -284,7 +284,7 @@ void csMeshWrapper::DrawIntFull (iRenderView *rview)
       {
         if (lt != last_anim_time)
         {
-          mesh->NextFrame (lt);
+          mesh->NextFrame (lt,movable.GetPosition ());
           last_anim_time = lt;
         }
       }

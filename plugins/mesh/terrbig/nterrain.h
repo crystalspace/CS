@@ -473,7 +473,7 @@ public:
   virtual void GetRadius (csVector3& rad, csVector3& cent);
 
   /// For animation.
-  virtual void NextFrame (csTicks) { }
+  virtual void NextFrame (csTicks, const csVector3& /*pos*/) { }
 
   /// For dieing.
   virtual bool WantToDie () const { return false; }

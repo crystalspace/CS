@@ -275,7 +275,7 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
 
 	  int FrameIndex = Frames.Find (ver);
 	  CS_ASSERT (FrameIndex != -1);
-	  StoreActionFrame (FrameIndex, int(Delay * 1000));
+	  StoreActionFrame (FrameIndex, int(Delay * 1000),0);
 	}
       }
       FinishAction ();
@@ -286,7 +286,7 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
   if (!FoundDefault)
   {
     BeginAction ("default");
-    StoreActionFrame (0, 1000);
+    StoreActionFrame (0, 1000,0);
     FinishAction ();
   }
 
@@ -359,9 +359,9 @@ void csSpriteBuilderFile::FinishAction ()
   Out << "    )\n";
 }
 
-void csSpriteBuilderFile::StoreActionFrame (int Frame, csTicks Delay)
+void csSpriteBuilderFile::StoreActionFrame (int Frame, csTicks Delay, float displacement)
 {
-  Out << "      F ('frame" << Frame << "', " << Delay << ")\n";
+  Out << "      F ('frame" << Frame << "', " << Delay << "," << displacement << ")\n";
 }
 
 csPtr<iDataBuffer> csSpriteBuilderFile::Build (iModelDataObject *Input)
@@ -445,9 +445,9 @@ void csSpriteBuilderMesh::FinishAction ()
 {
 }
 
-void csSpriteBuilderMesh::StoreActionFrame (int Frame, csTicks Delay)
+void csSpriteBuilderMesh::StoreActionFrame (int Frame, csTicks Delay, float displacement)
 {
-  CurrentAction->AddFrame (Out->GetFrame (Frame), Delay);
+  CurrentAction->AddFrame (Out->GetFrame (Frame), Delay, displacement);
 }
 
 bool csSpriteBuilderMesh::Build (iModelDataObject *Input,

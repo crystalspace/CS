@@ -251,7 +251,7 @@ public:
     return vis_cb;
   }
 
-  virtual void NextFrame (csTicks ticks)
+  virtual void NextFrame (csTicks ticks, const csVector3& /*pos*/)
   {
     if (factory_state) factory_state->AddTime (ticks);
   }

@@ -420,7 +420,7 @@ void csSprite2DMeshObject::CreateRegularVertices (int n, bool setuv)
   FireListeners ();
 }
 
-void csSprite2DMeshObject::NextFrame (csTicks current_time)
+void csSprite2DMeshObject::NextFrame (csTicks current_time, const csVector3& /*pos*/)
 {
   if (uvani.animate && !uvani.halted)
     uvani.Advance (current_time);

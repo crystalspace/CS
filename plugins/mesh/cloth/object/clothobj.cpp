@@ -273,7 +273,7 @@ void csStuffObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
  };
  void csStuffObject::SetVisibleCallback(iMeshObjectDrawCallback *cb) { vis_cb=cb; };
  iMeshObjectDrawCallback* csStuffObject::GetVisibleCallback () const { return vis_cb; };
- void csStuffObject::NextFrame (unsigned int ticks)
+ void csStuffObject::NextFrame (unsigned int ticks, const csVector3& /*pos*/)
  {
      Dynamics->Update(ticks);
  };

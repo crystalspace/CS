@@ -308,8 +308,12 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
 
       // Read the delay
       int delay = convert_endian(*((int32 *)p)); p += sizeof(int);
-
-      act->AddFrame (ff, delay);
+      float disp = 0;
+      if (!delay)  // read optional displacement if no delay
+      {
+        disp = convert_endian(*((float *)p)); p += sizeof(float);
+      }
+      act->AddFrame (ff, delay,disp);
     }
   }
 

@@ -106,7 +106,7 @@ struct iMeshObject : public iBase
   /**
    * Control animation of this object.
    */
-  virtual void NextFrame (csTicks current_time) = 0;
+  virtual void NextFrame (csTicks current_time,const csVector3& pos) = 0;
 
   /**
    * If this method returns true this object wants to die. The

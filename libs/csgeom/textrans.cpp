@@ -107,8 +107,8 @@ void csTextureTrans::compute_texture_space (
   float invl1 = qisqrt (d);
 
   //if (ABS (l1) < SMALL_EPSILON) l1 = SMALL_EPSILON;
-  d = csSquaredDist::PointPoint (v_orig, v2);
-  float invl2 = qisqrt (d);
+  d = csSquaredDist::PointPoint  (v_orig, v2);
+  float invl2 = (d) ? qisqrt (d) : 0;
 
   //if (ABS (l2) < SMALL_EPSILON) l2 = SMALL_EPSILON;
   csVector3 v_u = (v1 - v_orig) * len1 * invl1;

@@ -1390,7 +1390,7 @@ public:
     virtual void SetVisibleCallback (iMeshObjectDrawCallback* /*cb*/) { }
     virtual iMeshObjectDrawCallback* GetVisibleCallback () const
     { return NULL; }
-    virtual void NextFrame (csTicks /*current_time*/) { }
+    virtual void NextFrame (csTicks /*current_time*/,const csVector3& /*pos*/) { }
     virtual bool WantToDie () const { return false; }
     virtual void HardTransform (const csReversibleTransform& t)
     {

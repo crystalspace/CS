@@ -90,7 +90,7 @@ public:
   {
     return vis_cb;
   }
-  virtual void NextFrame (csTicks /*current_time*/) { }
+  virtual void NextFrame (csTicks /*current_time*/, const csVector3& /*pos*/) { }
   virtual bool WantToDie () const { return false; }
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }

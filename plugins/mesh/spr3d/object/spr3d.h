@@ -127,9 +127,9 @@ public:
   virtual ~csSpriteAction2 ();
 
   /// Add a frame to this action.
-  void AddCsFrame (csSpriteFrame* frame, int delay);
+  void AddCsFrame (csSpriteFrame* frame, int delay, float displace);
   /// Add a frame to this action
-  virtual void AddFrame (iSpriteFrame* frame, int delay);
+  virtual void AddFrame (iSpriteFrame* frame, int delay, float displace);
   /// Set action name
   virtual void SetName (char const*);
   /// Get action name
@@ -152,6 +152,9 @@ public:
   /// Get delay for frame number f
   virtual int GetFrameDelay (int f)
   { return (int)delays [f]; }
+  /// Get displacement for frame number f
+  virtual float GetFrameDisplacement (int f)
+  { return * (float*) & displacements [f]; }
 
   SCF_DECLARE_IBASE;
 
@@ -159,6 +162,7 @@ private:
   char *name;
   csVector frames;
   csVector delays;
+  csVector displacements;
 };
 
 
@@ -1094,7 +1098,10 @@ private:
 
   /// The last frame time action.
   csTicks last_time;
-
+  /// The last frame position (used for displacement calcs).
+  csVector3 last_pos;
+  /// The last frame displacement left over from whole frame increment.
+  float last_displacement;
   /// Animation tweening ratio:  next frame / this frame.
   float tween_ratio;
 
@@ -1285,10 +1292,11 @@ public:
   void GenerateSpriteLOD (int num_vts);
 
   /**
-   * Go to the next frame depending on the current time in milliseconds.
+   * Go to the next frame depending on the current time in milliseconds OR
+   * depending on the distance displacement from the last render.
    */
-  bool OldNextFrame (csTicks current_time, bool onestep = false,
-    bool stoptoend = false);
+  bool OldNextFrame (csTicks current_time, const csVector3& new_pos, 
+    bool onestep = false, bool stoptoend = false);
 
   /**
    * Go to a specified frame.
@@ -1412,9 +1420,9 @@ public:
   {
     return vis_cb;
   }
-  virtual void NextFrame (csTicks current_time)
-  {
-    OldNextFrame (current_time, !loopaction, !loopaction);
+  virtual void NextFrame (csTicks current_time,const csVector3& new_pos)
+  {   
+    OldNextFrame (current_time, new_pos, !loopaction, !loopaction);
   }
   virtual bool WantToDie () const { return false; }
   virtual void HardTransform (const csReversibleTransform&) { }

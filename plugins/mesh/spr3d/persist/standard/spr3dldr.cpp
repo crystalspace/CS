@@ -336,6 +336,7 @@ csPtr<iBase> csSprite3DFactoryLoader::Parse (iDocumentNode* node,
 	        {
 		  const char* fn = childchild->GetAttributeValue ("name");
 		  int d = childchild->GetAttributeValueAsInt ("delay");
+		  float disp = childchild->GetAttributeValueAsFloat ("displacement");
                   iSpriteFrame* ff = spr3dLook->FindFrame (fn);
                   if (!ff)
                   {
@@ -346,7 +347,7 @@ csPtr<iBase> csSprite3DFactoryLoader::Parse (iDocumentNode* node,
 		      fn, act->GetName ());
                     return NULL;
 	          }
-                  act->AddFrame (ff, d);
+                  act->AddFrame (ff, d, disp);
                 }
                 break;
 	      default:

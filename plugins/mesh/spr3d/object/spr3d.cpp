@@ -110,16 +110,18 @@ void csSpriteAction2::SetName (char const* n)
     name = 0;
 }
 
-void csSpriteAction2::AddCsFrame (csSpriteFrame * f, int d)
+void csSpriteAction2::AddCsFrame (csSpriteFrame * f, int d, float displacement)
 {
   frames.Push (f);
   delays.Push ((csSome)d);
+  displacements.Push ((csSome)*(float **)&displacement);
 }
 
-void csSpriteAction2::AddFrame (iSpriteFrame * f, int d)
+void csSpriteAction2::AddFrame (iSpriteFrame * f, int d, float displacement)
 {
   frames.Push ((csSpriteFrame*)f);
   delays.Push ((csSome)d);
+  displacements.Push ((csSome)*(float **)&displacement);
 }
 
 //--------------------------------------------------------------------------
@@ -1580,10 +1582,13 @@ void csSprite3DMeshObject::InitSprite ()
   if (!cur_action) { SetFrame (0); cur_action = factory->GetFirstAction (); }
 
   last_time = csGetTicks ();
+  last_pos = csVector3(0,0,0);
+  last_displacement = 0;
 }
 
+
 bool csSprite3DMeshObject::OldNextFrame (csTicks current_time,
-	bool onestep, bool stoptoend)
+	const csVector3& cur_pos, bool onestep, bool stoptoend)
 {
   bool ret = false;
 
@@ -1591,16 +1596,27 @@ bool csSprite3DMeshObject::OldNextFrame (csTicks current_time,
   {
     return true;
   }
+  float cur_displacement = qsqrt (csSquaredDist::PointPoint (last_pos, cur_pos));
+  last_pos = cur_pos;
+//  float save_displacement = cur_displacement;
 
   // If the sprite has only one frame we disable tweening here.
   if (cur_action->GetFrameCount () <= 1) do_tweening = false;
 
   if (onestep)
   {
-    if (current_time > last_time+
-    	cur_action->GetFrameDelay (cur_frame)/speedfactor)
+    if (((cur_action->GetFrameDelay (cur_frame) ) &&
+	 (current_time > last_time+
+    	   cur_action->GetFrameDelay (cur_frame)/speedfactor)) || 
+	((cur_action->GetFrameDisplacement(cur_frame) &&
+	 (cur_displacement + last_displacement >
+	       cur_action->GetFrameDisplacement (cur_frame)/speedfactor)))
+	)
     {
       last_time = current_time;
+ //     last_pos = cur_pos;
+      last_displacement = cur_displacement + last_displacement -
+	          cur_action->GetFrameDisplacement (cur_frame)/speedfactor;
       cur_frame++;
       if (stoptoend && cur_frame + 1 >= cur_action->GetFrameCount ())
       {
@@ -1617,31 +1633,66 @@ bool csSprite3DMeshObject::OldNextFrame (csTicks current_time,
   }
   else
   {
+    cur_displacement += last_displacement;  // include partial from last frame
+
     while (1)
     {
-      if (current_time > last_time+
-      	cur_action->GetFrameDelay (cur_frame)/speedfactor)
+      if (cur_action->GetFrameDelay(cur_frame)) // time based frame delays
       {
-        last_time += csTicks(cur_action->GetFrameDelay (cur_frame)/speedfactor);
-        cur_frame++;
-        if (cur_frame >= cur_action->GetFrameCount ())
+        if (current_time > last_time+
+      	   cur_action->GetFrameDelay (cur_frame)/speedfactor)
         {
-          cur_frame = 0;
-          ret = true;
+          last_time += csTicks(cur_action->GetFrameDelay (cur_frame)/speedfactor);
+          cur_frame++;
+          if (cur_frame >= cur_action->GetFrameCount ())
+          {
+            cur_frame = 0;
+            ret = true;
+          }
         }
+        else break;
       }
-      else break;
+      else  // distance based frame delays
+      {
+        if (cur_displacement > 
+      	     cur_action->GetFrameDisplacement (cur_frame)/speedfactor)
+        {
+          cur_displacement -= cur_action->GetFrameDisplacement (cur_frame)/speedfactor;
+          cur_frame++;
+          if (cur_frame >= cur_action->GetFrameCount ())
+          {
+            cur_frame = 0;
+            ret = true;
+          }
+        }
+        else
+	{
+          last_displacement = cur_displacement;
+	  break;
+	}
+      }
     }
   }
 
   if (do_tweening)
   {
-    if (current_time <= last_time) tween_ratio = 0;
-    else tween_ratio = (current_time - last_time)
-    	/ float (cur_action->GetFrameDelay (cur_frame)/speedfactor);
+    if (cur_action->GetFrameDelay(cur_frame))
+    {
+      if (current_time <= last_time) tween_ratio = 0;
+      else tween_ratio = (current_time - last_time)
+        / float (cur_action->GetFrameDelay (cur_frame)/speedfactor);
+    }
+    else
+    {
+      if (cur_displacement <= 0) tween_ratio = 0;
+      else tween_ratio = cur_displacement /
+        (cur_action->GetFrameDisplacement (cur_frame)/speedfactor);
+    }
   }
   else
     tween_ratio = 0;
+
+//  printf("Disp: %1.4f Frame #%d TweenDisp:%1.4f  Tween:%1.4f\n",save_displacement,cur_frame,last_displacement,tween_ratio);
 
   return ret;
 }

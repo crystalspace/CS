@@ -551,7 +551,7 @@ void add_skeleton_tree (iSector* where, csVector3 const& pos, int depth,
     fr->SetName ("f");
     iSpriteAction* act = state->AddAction ();
     act->SetName ("a");
-    act->AddFrame (fr, 100);
+    act->AddFrame (fr, 100,0);
     create_skeltree (state, fr, vertex_idx, depth, width);
 
     iMeshWrapper* spr = add_meshobj (skelname, "__skeltree__",
@@ -787,7 +787,7 @@ void add_skeleton_ghost (iSector* where, csVector3 const& pos, int maxdepth,
     fr->SetName ("f");
     iSpriteAction* act = fstate->AddAction ();
     act->SetName ("a");
-    act->AddFrame (fr, 100);
+    act->AddFrame (fr, 100,0);
     create_skelghost (fstate, fr, vertex_idx, maxdepth, width);
   }
 

@@ -161,7 +161,7 @@ bool csMetaBall::Initialize (iObjectRegistry* object_reg)
     mesh.do_morph_texels = false;
     mesh.do_morph_colors = false;
     mesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
-    NextFrame(0);
+    NextFrame(0,csVector3(0,0,0));
   }
   return true;
 }
@@ -430,7 +430,7 @@ bool csMetaBall::HitBeamObject( const csVector3& start, const csVector3& end,
   return true;
 }
 
-void csMetaBall::NextFrame(csTicks)
+void csMetaBall::NextFrame(csTicks, const csVector3& /*pos*/)
 {
   if ((num_mesh_vertices == 0) || (mp.rate != 0))
   {
