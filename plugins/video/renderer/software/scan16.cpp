@@ -711,43 +711,26 @@ void csScan_16_draw_scanline_fog_view_565 (int xx, unsigned char* d,
 
 #ifndef NO_draw_scanline_fog_plane_555
 
-void csScan_16_draw_scanline_fog_plane_555 (int /*xx*/, unsigned char* /*d*/,
-  unsigned long* /*z_buf*/, float /*inv_z*/, float /*u_div_z*/, float /*v_div_z*/)
+void csScan_16_draw_scanline_fog_plane_555 (int xx, unsigned char* d,
+  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
 {
-  // this should be either redone like Z fog above
-  // or completely removed. It looks completely unoptimal to me - A.Z.
-#if 0
   if (xx <= 0) return;
-  (void)u_div_z; (void)v_div_z;
+  (void)u_div_z; (void)v_div_z; (void)inv_z; (void)z_buf;
   UShort* _dest = (UShort*)d;
-  UShort* _destend = _dest + xx-1;
-  int izz;
-  izz = QInt24 (inv_z);
-
-  ULong fog_dens = Scan.FogDensity;
-  int fog_r = 256+Scan.FogR;
-  int fog_g = 256+Scan.FogG;
-  int fog_b = 256+Scan.FogB;
-
-  long dist1 = QInt16 (1. / (1.+.3));
-  long dist2 = QInt16 (1. / (1.+0));
+  UShort* _destend = _dest + xx;
+  int fog_r = Scan.FogR;
+  int fog_g = Scan.FogG;
+  int fog_b = Scan.FogB;
+  int fd = tables.exp_256 [Scan.FogDensity * PLANAR_FOG_DENSITY_COEF];
 
   do
   {
-    int dens_dist = tables.exp_table_2[fog_dens / dist1 - fog_dens / dist2];
-    int r = (*_dest) >> 10;
-    int g = ((*_dest) >> 5) & 0x1f;
-    int b = (*_dest) & 0x1f;
-
-    r += tables.mul_table [dens_dist + fog_r - r];
-    g += tables.mul_table [dens_dist + fog_g - g];
-    b += tables.mul_table [dens_dist + fog_b - b];
-
-    *_dest++ = (r<<10) | (g<<5) | b;
-    z_buf++;
+    register int r = ((fd * ((*_dest & 0x7c00) - fog_r) >> 8) + fog_r);
+    register int g = ((fd * ((*_dest & 0x03e0) - fog_g) >> 8) + fog_g);
+    register int b = ((fd * ((*_dest & 0x001f) - fog_b) >> 8) + fog_b);
+    *_dest++ = (r & 0x7c00) | (g & 0x03e0) | b;
   }
-  while (_dest <= _destend);
-#endif
+  while (_dest < _destend);
 }
 
 #endif // NO_draw_scanline_fog_plane_555
@@ -756,9 +739,26 @@ void csScan_16_draw_scanline_fog_plane_555 (int /*xx*/, unsigned char* /*d*/,
 
 #ifndef NO_draw_scanline_fog_plane_565
 
-void csScan_16_draw_scanline_fog_plane_565 (int /*xx*/, unsigned char* /*d*/,
-  unsigned long* /*z_buf*/, float /*inv_z*/, float /*u_div_z*/, float /*v_div_z*/)
+void csScan_16_draw_scanline_fog_plane_565 (int xx, unsigned char* d,
+  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
 {
+  if (xx <= 0) return;
+  (void)u_div_z; (void)v_div_z; (void)inv_z; (void)z_buf;
+  UShort* _dest = (UShort*)d;
+  UShort* _destend = _dest + xx;
+  int fog_r = Scan.FogR;
+  int fog_g = Scan.FogG;
+  int fog_b = Scan.FogB;
+  int fd = tables.exp_256 [Scan.FogDensity * PLANAR_FOG_DENSITY_COEF];
+
+  do
+  {
+    register int r = ((fd * ((*_dest & 0xf800) - fog_r) >> 8) + fog_r);
+    register int g = ((fd * ((*_dest & 0x07e0) - fog_g) >> 8) + fog_g);
+    register int b = ((fd * ((*_dest & 0x001f) - fog_b) >> 8) + fog_b);
+    *_dest++ = (r & 0xf800) | (g & 0x07e0) | b;
+  }
+  while (_dest < _destend);
 }
 
 #endif // NO_draw_scanline_fog_plane_565

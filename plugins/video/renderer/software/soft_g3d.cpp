@@ -228,6 +228,14 @@ csGraphics3DSoftware::csGraphics3DSoftware (ISystem* piSystem) : m_piG2D(NULL)
   ilace_fastmove = false;
   do_texel_filt = false;
   do_bilin_filt = false;
+  do_transp = true;
+  do_textured = true;
+  rstate_mipmap = 0;
+  rstate_edges = false;
+  rstate_gouraud = true;
+  rstate_specular = true;
+  rstate_dither = false;
+
   dbg_max_polygons_to_draw = 2000000000;        // After 2 billion polygons we give up :-)
 
   fogMode = G3DFOGMETHOD_ZBUFFER;
@@ -387,17 +395,17 @@ void csGraphics3DSoftware::ScanSetup ()
         csScan_16_draw_pi_scanline_tex_zuse;
 
       ScanProcPIG [SCANPROCPI_FLAT_GOURAUD_ZFIL] = (pfmt.GreenBits == 5) ?
-          csScan_16_draw_pi_scanline_flat_gouraud_zfil_565 :
-          csScan_16_draw_pi_scanline_flat_gouraud_zfil_555;
+        csScan_16_draw_pi_scanline_flat_gouraud_zfil_565 :
+        csScan_16_draw_pi_scanline_flat_gouraud_zfil_555;
       ScanProcPIG [SCANPROCPI_FLAT_GOURAUD_ZUSE] = (pfmt.GreenBits == 5) ?
-          csScan_16_draw_pi_scanline_flat_gouraud_zuse_555 :
-          csScan_16_draw_pi_scanline_flat_gouraud_zuse_565;
+        csScan_16_draw_pi_scanline_flat_gouraud_zuse_555 :
+        csScan_16_draw_pi_scanline_flat_gouraud_zuse_565;
       ScanProcPIG [SCANPROCPI_TEX_GOURAUD_ZFIL] = (pfmt.GreenBits == 5) ?
-          csScan_16_draw_pi_scanline_tex_gouraud_zfil_555 :
-          csScan_16_draw_pi_scanline_tex_gouraud_zfil_565;
+        csScan_16_draw_pi_scanline_tex_gouraud_zfil_555 :
+        csScan_16_draw_pi_scanline_tex_gouraud_zfil_565;
       ScanProcPIG [SCANPROCPI_TEX_GOURAUD_ZUSE] = (pfmt.GreenBits == 5) ?
-          csScan_16_draw_pi_scanline_tex_gouraud_zuse_555 :
-          csScan_16_draw_pi_scanline_tex_gouraud_zuse_565;
+        csScan_16_draw_pi_scanline_tex_gouraud_zuse_555 :
+        csScan_16_draw_pi_scanline_tex_gouraud_zuse_565;
 
       ScanProcPIFX[SCANPROCPIFX_ZUSE] = (pfmt.GreenBits == 5) ?
           csScan_16_draw_pifx_scanline_zuse_555 :
@@ -442,9 +450,15 @@ void csGraphics3DSoftware::ScanSetup ()
 //    ScanProc [SCANPROC_MAP_KEY_ZFIL] = csScan_32_draw_scanline_map_key_zfil;
 //    ScanProc [SCANPROC_MAP_KEY_ZUSE] = csScan_32_draw_scanline_map_key_zuse;
 
-      ScanProc [SCANPROC_FOG] = csScan_32_draw_scanline_fog;
-      ScanProc [SCANPROC_FOG_VIEW] = csScan_32_draw_scanline_fog_view;
-      ScanProc [SCANPROC_FOG_PLANE] = csScan_32_draw_scanline_fog_plane;
+      ScanProc [SCANPROC_FOG] = (pfmt.RedShift == 0) ?
+        csScan_32_draw_scanline_fog_BGR :
+        csScan_32_draw_scanline_fog_RGB;
+      ScanProc [SCANPROC_FOG_VIEW] = (pfmt.RedShift == 0) ?
+        csScan_32_draw_scanline_fog_view_BGR :
+        csScan_32_draw_scanline_fog_view_RGB;
+      ScanProc [SCANPROC_FOG_PLANE] = (pfmt.RedShift == 0) ?
+        csScan_32_draw_scanline_fog_plane_BGR :
+        csScan_32_draw_scanline_fog_plane_RGB;
 
       ScanProcPI [SCANPROCPI_FLAT_ZFIL] = csScan_32_draw_pi_scanline_flat_zfil;
       ScanProcPI [SCANPROCPI_FLAT_ZUSE] = csScan_32_draw_pi_scanline_flat_zuse;
@@ -575,11 +589,6 @@ STDMETHODIMP csGraphics3DSoftware::Initialize ()
   z_buf_mode = ZBuf_None;
 
   width = height = -1;
-
-  do_transp = true;
-  do_textured = true;
-  rstate_mipmap = 0;
-  rstate_edges = false;
 
   fog_buffers = NULL;
   line_table = NULL;
@@ -1831,7 +1840,7 @@ STDMETHODIMP csGraphics3DSoftware::StartPolygonQuick (ITextureHandle* handle,
   if (!do_lighting) gouraud = false;
   if (!do_textured) pqinfo.textured = false;
   if (!handle) pqinfo.textured = false;
-  pqinfo.do_gouraud = gouraud || !handle;
+  pqinfo.do_gouraud = rstate_gouraud && (gouraud || !handle);
 
   int itw, ith;
 
@@ -2233,7 +2242,7 @@ STDMETHODIMP csGraphics3DSoftware::StartPolygonFX(ITextureHandle* handle,
                                                   float alpha,
                                                   bool gouraud)
 {
-  pqinfo.do_gouraud = gouraud;
+  pqinfo.do_gouraud = rstate_gouraud && gouraud;
   pqinfo.mixmode    = mode;
 
   csTextureMMSoftware* txt_mm;
@@ -2245,7 +2254,7 @@ STDMETHODIMP csGraphics3DSoftware::StartPolygonFX(ITextureHandle* handle,
     if (!do_lighting) gouraud = false;
     if (!do_textured) pqinfo.textured = false;
     if (!handle) pqinfo.textured = false;
-    pqinfo.do_gouraud = gouraud || !handle;
+    pqinfo.do_gouraud = rstate_gouraud && (gouraud || !handle);
   }
 
   int itw, ith;
@@ -2883,6 +2892,9 @@ STDMETHODIMP csGraphics3DSoftware::SetRenderState (G3D_RENDERSTATEOPTION op,
       dbg_max_polygons_to_draw = value;
       if (dbg_max_polygons_to_draw < 0) dbg_max_polygons_to_draw = 0;
       break;
+    case G3DRENDERSTATE_GOURAUDENABLE:
+      rstate_gouraud = value;
+      break;
     default:
       return E_INVALIDARG;
   }
@@ -2954,6 +2966,9 @@ STDMETHODIMP csGraphics3DSoftware::GetRenderState(G3D_RENDERSTATEOPTION op, long
       break;
     case G3DRENDERSTATE_MAXPOLYGONSTODRAW:
       retval = dbg_max_polygons_to_draw;
+      break;
+    case G3DRENDERSTATE_GOURAUDENABLE:
+      retval = rstate_gouraud;
       break;
     default:
       retval = 0;
@@ -3602,9 +3617,10 @@ csOptionDescription IXConfig3DSoft::config_options[] =
   { 9, "dmipmap1", "Mipmap distance 1", CSVAR_FLOAT },
   { 10, "dmipmap2", "Mipmap distance 2", CSVAR_FLOAT },
   { 11, "dmipmap3", "Mipmap distance 3", CSVAR_FLOAT },
+  { 12, "gouraud", "Gouraud shading", CSVAR_BOOL },
 };
 
-#define NUM_OPTIONS 12
+#define NUM_OPTIONS 13
 
 STDMETHODIMP IXConfig3DSoft::SetOption (int id, csVariant* value)
 {
@@ -3626,6 +3642,7 @@ STDMETHODIMP IXConfig3DSoft::SetOption (int id, csVariant* value)
     case 9: pThis->zdist_mipmap1 = value->v.fVal; break;
     case 10: pThis->zdist_mipmap2 = value->v.fVal; break;
     case 11: pThis->zdist_mipmap3 = value->v.fVal; break;
+    case 12: pThis->rstate_gouraud = value->v.bVal; break;
     default: return E_FAIL;
   }
   pThis->ScanSetup ();
@@ -3652,6 +3669,7 @@ STDMETHODIMP IXConfig3DSoft::GetOption (int id, csVariant* value)
     case 9: value->v.fVal = pThis->zdist_mipmap1; break;
     case 10: value->v.fVal = pThis->zdist_mipmap2; break;
     case 11: value->v.fVal = pThis->zdist_mipmap3; break;
+    case 12: value->v.bVal = pThis->rstate_gouraud; break;
     default: return E_FAIL;
   }
   return S_OK;

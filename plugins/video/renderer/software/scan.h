@@ -42,6 +42,9 @@ typedef unsigned char RGB8map[256];	// do we need entire soft_txt.h?
 // Specifies boundary where texel filtering does not occur
 #define BAILOUT_CONSTANT	32768
 
+// A coefficient for planar fog density: bigger is denser
+#define PLANAR_FOG_DENSITY_COEF	6
+
 //---//---//---//---//---//---//---//---//---//---//---/ Precomputed data /---//
 
 /*
@@ -369,13 +372,18 @@ extern "C" csDrawScanline csScan_32_draw_scanline_map_zfil;
 /// Draw one horizontal scanline (Z buffer and lighting).
 extern "C" csDrawScanline csScan_32_draw_scanline_map_zuse;
 
-
-/// Draw one horizontal scanline for fog.
-extern "C" csDrawScanline csScan_32_draw_scanline_fog;
-/// Draw one horizontal scanline for fog assuming the camera is in fog.
-extern "C" csDrawScanline csScan_32_draw_scanline_fog_view;
-/// Draw a fogged horizontal scanline (no texture)
-extern "C" csDrawScanline csScan_32_draw_scanline_fog_plane;
+/// Draw one horizontal scanline for fog in R/G/B modes
+extern "C" csDrawScanline csScan_32_draw_scanline_fog_RGB;
+/// Draw one horizontal scanline for fog in B/G/R modes
+extern "C" csDrawScanline csScan_32_draw_scanline_fog_BGR;
+/// Draw one horizontal scanline for fog assuming the camera is in fog in R/G/B modes
+extern "C" csDrawScanline csScan_32_draw_scanline_fog_view_RGB;
+/// Draw one horizontal scanline for fog assuming the camera is in fog in B/G/R modes
+extern "C" csDrawScanline csScan_32_draw_scanline_fog_view_BGR;
+/// Draw a fogged horizontal scanline (no texture) in R/G/B modes
+extern "C" csDrawScanline csScan_32_draw_scanline_fog_plane_RGB;
+/// Draw a fogged horizontal scanline (no texture) in B/G/R modes
+extern "C" csDrawScanline csScan_32_draw_scanline_fog_plane_BGR;
 
 /// Draw one horizontal scanline (lighting and alpha transparency).
 extern "C" csDrawScanline csScan_32_draw_scanline_map_alpha50;

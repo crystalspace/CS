@@ -337,7 +337,7 @@ csGraphics3DGlide3x::csGraphics3DGlide3x(ISystem* piSystem) :
   rstate_specular = false;
   rstate_bilinearmap = false;
   rstate_trilinearmap = false;
-  rstate_gouraud = false;
+  rstate_gouraud = true;
   rstate_flat = false;
   rstate_alphablend = false;
   rstate_mipmap = false;
@@ -1074,6 +1074,9 @@ STDMETHODIMP csGraphics3DGlide3x::SetRenderState (G3D_RENDERSTATEOPTION op, long
     else
       m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, FALSE);
   break;
+  case G3DRENDERSTATE_GOURAUDENABLE:
+    rstate_gouraud = value;
+    break;
 */
   default:
     return E_NOTIMPL;

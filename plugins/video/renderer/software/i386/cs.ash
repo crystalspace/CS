@@ -32,14 +32,16 @@
 		segment	BSS32  use32 align=4 class=BSS
 		group	FLAT
 		group	DGROUP BSS32 DATA32
-		%xdefine __TEXT_SECT__ segment TEXT32
-		%xdefine __DATA_SECT__ segment DATA32
-		%xdefine __BSS_SECT__ segment BSS32
+		%xdefine __TEXT_SECT__	segment TEXT32
+		%xdefine __DATA_SECT__	segment DATA32
+		%xdefine __BSS_SECT__	segment BSS32
 %else
-		%xdefine __TEXT_SECT__
-		%xdefine __DATA_SECT__
-		%xdefine __BSS_SECT__
+		%xdefine __TEXT_SECT__	section .text
+		%xdefine __DATA_SECT__	section .data
+		%xdefine __BSS_SECT__	section .bss
 %endif
+
+__TEXT_SECT__
 
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 ; Summary:

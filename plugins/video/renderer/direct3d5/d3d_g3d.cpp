@@ -1113,7 +1113,7 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygonDP& poly)
 
 STDMETHODIMP csGraphics3DDirect3DDx5::StartPolygonQuick(ITextureHandle* handle, bool gouraud )
 { 
-  m_gouraud = gouraud;
+  m_gouraud = gouraud && rstate_gouraud;
 
   HighColorCache_Data *pTexData;
   
@@ -1165,7 +1165,7 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygonQuick (G3DPolygonDPQ& poly)
 
 STDMETHODIMP csGraphics3DDirect3DDx5::StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, float alpha, bool gouraud)
 {
-  m_gouraud = gouraud;
+  m_gouraud = gouraud && rstate_gouraud;
   m_mixmode = mode;
   m_alpha   = alpha;
 
@@ -1397,6 +1397,9 @@ STDMETHODIMP csGraphics3DDirect3DDx5::SetRenderState(G3D_RENDERSTATEOPTION optio
   case G3DRENDERSTATE_INTERLACINGENABLE :
   case G3DRENDERSTATE_MMXENABLE :
     break;
+  case G3DRENDERSTATE_GOURAUDENABLE:
+    rstate_gouraud = value;
+    break;
   default:
     return E_INVALIDARG;
   }
@@ -1444,6 +1447,9 @@ STDMETHODIMP csGraphics3DDirect3DDx5::GetRenderState(G3D_RENDERSTATEOPTION op, l
       break;
     case G3DRENDERSTATE_EDGESENABLE:
       retval = rstate_edges;
+      break;
+    case G3DRENDERSTATE_GOURAUDENABLE:
+      retval = rstate_gouraud;
       break;
     default:
       retval = 0;

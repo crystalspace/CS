@@ -188,7 +188,7 @@
 
 		add	edi,2
 		cmp	edi,%$destend
-		jbe	%$sloop1
+		jb	%$sloop1
 
 %$sexit:
 	%ifdef PIC

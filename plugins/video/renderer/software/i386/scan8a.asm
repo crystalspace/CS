@@ -964,7 +964,7 @@ proc		csScan_8_mmx_draw_pi_scanline_tex_zuse,20,ebx,esi,edi,ebp
 		add	ebp,4			; zbuff++		; 36
 
 %$zbufok:	cmp	edi,%$destend					; 37
-		ja	near %$sbyone					; 37
+		jae	near %$sbyone					; 37
 
 ; Load MMX registers
 		movd	mm1,%$dz		; mm1 = 0|dz

@@ -124,8 +124,6 @@ private:
   bool rstate_dither;
   /// Do we want specular lighting? (dummy for now)
   bool rstate_specular;
-  /// Do we want Gouraud Shaded polygons?
-  bool rstate_gouraud;
   /// Do we want mipmaps?
   int rstate_mipmap;
   /// Do we want visible edges (mostly debug)?
@@ -196,6 +194,8 @@ public:
   bool do_perfect;
   /// Option variables: mipmap distances
   float zdist_mipmap1, zdist_mipmap2, zdist_mipmap3;
+  /// Do we want Gouraud Shaded polygons?
+  bool rstate_gouraud;
 
   /**
    * Option variable: draw white borders around the area of all polygons hit

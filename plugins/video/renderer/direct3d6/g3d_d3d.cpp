@@ -210,11 +210,11 @@ m_piSystem(piSystem)
   rstate_specular = false;
   rstate_bilinearmap = false;
   rstate_trilinearmap = false;
-  rstate_gouraud = false;
   rstate_flat = false;
   rstate_alphablend = false;
   rstate_mipmap = false;
   rstate_edges = false;
+  rstate_gouraud = true;
 }
 
 STDMETHODIMP csGraphics3DDirect3DDx6::Open(char* Title)
@@ -1160,6 +1160,9 @@ STDMETHODIMP csGraphics3DDirect3DDx6::SetRenderState(G3D_RENDERSTATEOPTION optio
   case G3DRENDERSTATE_INTERLACINGENABLE :
   case G3DRENDERSTATE_MMXENABLE :
     break;
+  case G3DRENDERSTATE_GOURAUDENABLE:
+    rstate_gouraud = value;
+    break;
   default:
     return E_INVALIDARG;
   }
@@ -1206,6 +1209,9 @@ STDMETHODIMP csGraphics3DDirect3DDx6::GetRenderState(G3D_RENDERSTATEOPTION op, l
       break;
     case G3DRENDERSTATE_EDGESENABLE:
       retval = rstate_edges;
+      break;
+    case G3DRENDERSTATE_GOURAUDENABLE:
+      retval = rstate_gouraud;
       break;
     default:
       retval = 0;
