@@ -410,94 +410,6 @@ bool csGraphics2DGlideX::SetMouseCursor (int iShape, ITextureHandle* /*iBitmap*/
   } /* endif */
 }
 
-void csGraphics2DGlideX::ProcessEvents (void *Param)
-{
-  static int button_mapping[6] = {0, 1, 3, 2, 4, 5};
-  csGraphics2DGlideX *Self = (csGraphics2DGlideX *)Param;
-  XEvent event;
-  int state, key;
-  bool down;
-
-  while (XCheckMaskEvent (Self->dpy, ~0, &event))
-    switch (event.type)
-    {
-      case ButtonPress:
-        state = ((XButtonEvent*)&event)->state;
-        Self->UnixSystem->MouseEvent (button_mapping[event.xbutton.button],
-          true, event.xbutton.x, event.xbutton.y,
-          (state & ShiftMask ? CSMASK_SHIFT : 0) |
-	  (state & Mod1Mask ? CSMASK_ALT : 0) |
-	  (state & ControlMask ? CSMASK_CTRL : 0));
-          break;
-      case ButtonRelease:
-        Self->UnixSystem->MouseEvent (button_mapping [event.xbutton.button],
-          false, event.xbutton.x, event.xbutton.y, 0);
-        break;
-      case MotionNotify:
-        Self->UnixSystem->MouseEvent (0, false, event.xbutton.x, event.xbutton.y, 0);
-        break;
-      case KeyPress:
-      case KeyRelease:
-        down = (event.type == KeyPress);
-        key = XLookupKeysym (&event.xkey, 0);
-        state = event.xkey.state;
-        switch (key)
-        {
-          case XK_Meta_L:
-	  case XK_Meta_R:
-	  case XK_Alt_L:
-          case XK_Alt_R:      key = CSKEY_ALT; break;
-          case XK_Control_L:
-          case XK_Control_R:  key = CSKEY_CTRL; break;
-          case XK_Shift_L:
-          case XK_Shift_R:    key = CSKEY_SHIFT; break;
-          case XK_Up:         key = CSKEY_UP; break;
-          case XK_Down:       key = CSKEY_DOWN; break;
-          case XK_Left:       key = CSKEY_LEFT; break;
-          case XK_Right:      key = CSKEY_RIGHT; break;
-          case XK_BackSpace:  key = CSKEY_BACKSPACE; break;
-          case XK_Insert:     key = CSKEY_INS; break;
-          case XK_Delete:     key = CSKEY_DEL; break;
-          case XK_Page_Up:    key = CSKEY_PGUP; break;
-          case XK_Page_Down:  key = CSKEY_PGDN; break;
-          case XK_Home:       key = CSKEY_HOME; break;
-          case XK_End:        key = CSKEY_END; break;
-          case XK_Escape:     key = CSKEY_ESC; break;
-          case XK_Tab:        key = CSKEY_TAB; break;
-          case XK_Return:     key = CSKEY_ENTER; break;
-          case XK_F1:         key = CSKEY_F1; break;
-          case XK_F2:         key = CSKEY_F2; break;
-          case XK_F3:         key = CSKEY_F3; break;
-          case XK_F4:         key = CSKEY_F4; break;
-          case XK_F5:         key = CSKEY_F5; break;
-          case XK_F6:         key = CSKEY_F6; break;
-          case XK_F7:         key = CSKEY_F7; break;
-          case XK_F8:         key = CSKEY_F8; break;
-          case XK_F9:         key = CSKEY_F9; break;
-          case XK_F10:        key = CSKEY_F10; break;
-          case XK_F11:        key = CSKEY_F11; break;
-          case XK_F12:        key = CSKEY_F12; break;
-          default:            break;
-        }
-	Self->UnixSystem->KeyboardEvent (key, down);
-        break;
-      case FocusIn:
-      case FocusOut:
-        Self->UnixSystem->FocusEvent (event.type == FocusIn);
-        break;
-      case Expose:
-      {
-        csRect rect (event.xexpose.x, event.xexpose.y,
-	  event.xexpose.x + event.xexpose.width, event.xexpose.y + event.xexpose.height);
-	Self->Print (&rect);
-	break;
-      }
-      default:
-        //if (event.type == CompletionType) shm_busy = 0;
-        break;
-    }
-}
-
 void csGraphics2DGlideX::DrawLine (int x1, int y1, int x2, int y2, int color)
 {
   // can't do this while framebuffer is locked...
@@ -551,4 +463,128 @@ unsigned char* csGraphics2DGlideX::GetPixelAtGlide (int x, int y)
 {
   // not implemented yet...
   return NULL;
+}
+
+Bool CheckKeyPress (Display *dpy, XEvent *event, XPointer arg)
+{
+  XEvent *curevent = (XEvent *)arg;
+  if ((event->type == KeyPress)
+   && (event->xkey.keycode == curevent->xkey.keycode)
+   && (event->xkey.state == curevent->xkey.state))
+    return true;
+  return false;
+}
+
+void csGraphics2DGlideX::ProcessEvents (void *Param)
+{
+  static int button_mapping[6] = {0, 1, 3, 2, 4, 5};
+  csGraphics2DGlideX *Self = (csGraphics2DGlideX *)Param;
+  XEvent event;
+  int state, key;
+  bool down;
+
+  while (XCheckMaskEvent (Self->dpy, ~0, &event))
+    switch (event.type)
+    {
+      case ButtonPress:
+        state = ((XButtonEvent*)&event)->state;
+        Self->UnixSystem->MouseEvent (button_mapping [event.xbutton.button],
+          true, event.xbutton.x, event.xbutton.y,
+          ((state & ShiftMask) ? CSMASK_SHIFT : 0) |
+	  ((state & Mod1Mask) ? CSMASK_ALT : 0) |
+	  ((state & ControlMask) ? CSMASK_CTRL : 0));
+          break;
+      case ButtonRelease:
+        Self->UnixSystem->MouseEvent (button_mapping [event.xbutton.button],
+          false, event.xbutton.x, event.xbutton.y, 0);
+        break;
+      case MotionNotify:
+        Self->UnixSystem->MouseEvent (0, false,
+	  event.xbutton.x, event.xbutton.y, 0);
+        break;
+      case KeyPress:
+      case KeyRelease:
+        // Neat trick: look in event queue if we have KeyPress events ahead
+	// with same keycode. If this is the case, discard the KeyUp event
+	// in favour of KeyDown since this is most (sure?) an autorepeat
+        XCheckIfEvent (event.xkey.display, &event, CheckKeyPress, (XPointer)&event);
+        down = (event.type == KeyPress);
+        key = XLookupKeysym (&event.xkey, 0);
+        state = event.xkey.state;
+        switch (key)
+        {
+          case XK_Meta_L:
+	  case XK_Meta_R:
+	  case XK_Alt_L:
+          case XK_Alt_R:      key = CSKEY_ALT; break;
+          case XK_Control_L:
+          case XK_Control_R:  key = CSKEY_CTRL; break;
+          case XK_Shift_L:
+          case XK_Shift_R:    key = CSKEY_SHIFT; break;
+	  case XK_KP_Up:
+	  case XK_KP_8:
+          case XK_Up:         key = CSKEY_UP; break;
+	  case XK_KP_Down:
+	  case XK_KP_2:
+          case XK_Down:       key = CSKEY_DOWN; break;
+	  case XK_KP_Left:
+	  case XK_KP_4:
+          case XK_Left:       key = CSKEY_LEFT; break;
+	  case XK_KP_Right:
+	  case XK_KP_6:
+          case XK_Right:      key = CSKEY_RIGHT; break;
+          case XK_BackSpace:  key = CSKEY_BACKSPACE; break;
+	  case XK_KP_Insert:
+	  case XK_KP_0:
+          case XK_Insert:     key = CSKEY_INS; break;
+	  case XK_KP_Delete:
+	  case XK_KP_Decimal:
+          case XK_Delete:     key = CSKEY_DEL; break;
+	  case XK_KP_Page_Up:
+	  case XK_KP_9:
+          case XK_Page_Up:    key = CSKEY_PGUP; break;
+	  case XK_KP_Page_Down:
+	  case XK_KP_3:
+          case XK_Page_Down:  key = CSKEY_PGDN; break;
+	  case XK_KP_Home:
+	  case XK_KP_7:
+          case XK_Home:       key = CSKEY_HOME; break;
+	  case XK_KP_End:
+	  case XK_KP_1:
+          case XK_End:        key = CSKEY_END; break;
+          case XK_Escape:     key = CSKEY_ESC; break;
+          case XK_Tab:        key = CSKEY_TAB; break;
+	  case XK_KP_Enter:
+          case XK_Return:     key = CSKEY_ENTER; break;
+          case XK_F1:         key = CSKEY_F1; break;
+          case XK_F2:         key = CSKEY_F2; break;
+          case XK_F3:         key = CSKEY_F3; break;
+          case XK_F4:         key = CSKEY_F4; break;
+          case XK_F5:         key = CSKEY_F5; break;
+          case XK_F6:         key = CSKEY_F6; break;
+          case XK_F7:         key = CSKEY_F7; break;
+          case XK_F8:         key = CSKEY_F8; break;
+          case XK_F9:         key = CSKEY_F9; break;
+          case XK_F10:        key = CSKEY_F10; break;
+          case XK_F11:        key = CSKEY_F11; break;
+          case XK_F12:        key = CSKEY_F12; break;
+          default:            break;
+        }
+	Self->UnixSystem->KeyboardEvent (key, down);
+        break;
+      case FocusIn:
+      case FocusOut:
+        Self->UnixSystem->FocusEvent (event.type == FocusIn);
+        break;
+      case Expose:
+      {
+        csRect rect (event.xexpose.x, event.xexpose.y,
+	  event.xexpose.x + event.xexpose.width, event.xexpose.y + event.xexpose.height);
+	Self->Print (&rect);
+        break;
+      }
+      default:
+        //if (event.type == CompletionType) shm_busy = 0;
+        break;
+    }
 }
