@@ -145,8 +145,8 @@ void DemoSky::SetTexSpace(csProcSkyTexture *skytex, iPolygon3D *poly,
   texorig -= vvector / float(size);
   texu += uvector / float(size);
   texv += vvector / float(size);
-  texulen += ulen * 2. / float(size);
-  texvlen += vlen * 2. / float(size);
+  texulen += ulen * 2.0f / float(size);
+  texvlen += vlen * 2.0f / float(size);
   poly->SetTextureSpace (texorig, texu, texulen, texv, texvlen);
   skytex->SetTextureSpace(texorig, texu-texorig, texv-texorig);
 }
@@ -315,7 +315,7 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   p->CreateVertex (csVector3 (-size, -simi, -size));
 
   SetTexSpace (sky_d, p, 256, p->GetVertex  (0), p->GetVertex  (1),
-	       2.*size, p->GetVertex (3), 2.*size);
+    2.0f * size, p->GetVertex (3), 2.0f * size);
   p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
 
   p = walls_state->CreatePolygon ();
@@ -326,7 +326,7 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   p->CreateVertex (csVector3 (-size, simi, size));
 
   SetTexSpace (sky_u, p, 256, p->GetVertex  (0), p->GetVertex  (1),
-	       2.*size, p->GetVertex (3), 2.*size);
+    2.0f * size, p->GetVertex (3), 2.0f * size);
   p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
 
   p = walls_state->CreatePolygon ();
@@ -337,7 +337,7 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   p->CreateVertex (csVector3 (-size, -size, simi));
 
   SetTexSpace (sky_f, p, 256, p->GetVertex  (0), p->GetVertex  (1),
-	       2.*size, p->GetVertex (3), 2.*size);
+    2.0f * size, p->GetVertex (3), 2.0f * size);
   p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
 
   p = walls_state->CreatePolygon ();
@@ -348,7 +348,7 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   p->CreateVertex (csVector3 (simi, -size, size));
 
   SetTexSpace (sky_r, p, 256, p->GetVertex  (0), p->GetVertex  (1),
-	       2.*size, p->GetVertex (3), 2.*size);
+    2.0f * size, p->GetVertex (3), 2.0f * size);
   p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
 
   p = walls_state->CreatePolygon ();
@@ -359,7 +359,7 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   p->CreateVertex (csVector3 (-simi, -size, -size));
 
   SetTexSpace (sky_l, p, 256, p->GetVertex  (0), p->GetVertex  (1),
-	       2.*size, p->GetVertex (3), 2.*size);
+	       2.0f * size, p->GetVertex (3), 2.0f * size);
   p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
 
   p = walls_state->CreatePolygon ();
@@ -370,7 +370,7 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   p->CreateVertex (csVector3 (size, -size, -simi));
 
   SetTexSpace (sky_b, p, 256, p->GetVertex  (0), p->GetVertex  (1),
-	       2.*size, p->GetVertex (3), 2.*size);
+	       2.0f * size, p->GetVertex (3), 2.0f * size);
   p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
   walls_state->DecRef ();
   walls->DecRef ();
@@ -406,7 +406,7 @@ void DemoSky::SetupFrame ()
   flock->Update(elapsed_time);
 
   // Now rotate the camera according to keyboard state
-  float speed = (elapsed_time / 1000.) * (0.03 * 20);
+  float speed = (elapsed_time / 1000.0f) * (0.03f * 20.0f);
 
   if (kbd->GetKeyState (CSKEY_RIGHT))
     view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed);
@@ -489,44 +489,44 @@ Flock::Flock(iEngine *engine, int num, iMaterialWrapper *mat, iSector *sector)
   csVector3 pos;
 
   focus = startpos;
-  foc_speed.Set(-5, 0, +5);
-  foc_accel.Set(0,0,0);
+  foc_speed.Set(-5.0f, 0.0f, +5.0f);
+  foc_accel.Set(0.0f, 0.0f, 0.0f);
 
   for(i=0; i<nr; i++)
   {
     pos = startpos;
-    speed[i].Set(0,0,0);
-    speed[i].x = (float(rand()+1.)/float(RAND_MAX))*3. - 1.5;
-    speed[i].y = (float(rand()+1.)/float(RAND_MAX))*1. - 0.5;
-    speed[i].z = (float(rand()+1.)/float(RAND_MAX))*3. - 1.5;
-    speed[i] += foc_speed*1.0;
-    accel[i].Set(0,0,0);
-    pos.x += (float(rand()+1.)/float(RAND_MAX))*20. ;
-    pos.z -= (float(rand()+1.)/float(RAND_MAX))*20. ;
+    speed[i].Set(0.0f, 0.0f, 0.0f);
+    speed[i].x = (float(rand() + 1.0f) / float(RAND_MAX)) * 3.0f - 1.5f;
+    speed[i].y = (float(rand() + 1.0f) / float(RAND_MAX)) * 1.0f - 0.5f;
+    speed[i].z = (float(rand() + 1.0f) / float(RAND_MAX)) * 3.0f - 1.5f;
+    speed[i] += foc_speed * 1.0f;
+    accel[i].Set(0.0f, 0.0f, 0.0f);
+    pos.x += (float(rand() + 1.0f) / float(RAND_MAX)) * 20.0f;
+    pos.z -= (float(rand() + 1.0f) / float(RAND_MAX)) * 20.0f;
     spr[i] = engine->CreateMeshWrapper(fact, "Bird", sector, pos);
 
     iSprite2DState *sprstate = SCF_QUERY_INTERFACE(spr[i]->GetMeshObject(),
       iSprite2DState);
     sprstate->GetVertices().SetLimit(4);
     sprstate->GetVertices().SetLength(4);
-    sprstate->GetVertices()[0].color_init.Set(1.0,1.0,1.0);
-    sprstate->GetVertices()[1].color_init.Set(1.0,1.0,1.0);
-    sprstate->GetVertices()[2].color_init.Set(1.0,1.0,1.0);
-    sprstate->GetVertices()[3].color_init.Set(1.0,1.0,1.0);
+    sprstate->GetVertices()[0].color_init.Set(1.0f, 1.0f, 1.0f);
+    sprstate->GetVertices()[1].color_init.Set(1.0f, 1.0f, 1.0f);
+    sprstate->GetVertices()[2].color_init.Set(1.0f, 1.0f, 1.0f);
+    sprstate->GetVertices()[3].color_init.Set(1.0f, 1.0f, 1.0f);
 
     float sz = 1.0;
     sprstate->GetVertices()[0].pos.Set(-sz, sz);
-    sprstate->GetVertices()[0].u = 0.2;
-    sprstate->GetVertices()[0].v = 0;
+    sprstate->GetVertices()[0].u = 0.2f;
+    sprstate->GetVertices()[0].v = 0.0f;
     sprstate->GetVertices()[1].pos.Set(+sz, sz);
-    sprstate->GetVertices()[1].u = 0.8;
-    sprstate->GetVertices()[1].v = 0;
+    sprstate->GetVertices()[1].u = 0.8f;
+    sprstate->GetVertices()[1].v = 0.0f;
     sprstate->GetVertices()[2].pos.Set(+sz, -sz);
-    sprstate->GetVertices()[2].u = 0.8;
-    sprstate->GetVertices()[2].v = 1.0;
+    sprstate->GetVertices()[2].u = 0.8f;
+    sprstate->GetVertices()[2].v = 1.0f;
     sprstate->GetVertices()[3].pos.Set(-sz, -sz);
-    sprstate->GetVertices()[3].u = 0.2;
-    sprstate->GetVertices()[3].v = 1.0;
+    sprstate->GetVertices()[3].u = 0.2f;
+    sprstate->GetVertices()[3].v = 1.0f;
     sprstate->DecRef();
 
   }
@@ -552,14 +552,14 @@ static void Clamp( float &val, float max)
 
 void Flock::Update(csTicks elapsed)
 {
-  float dt = float(elapsed)*0.001; /// delta t in seconds
+  float dt = float(elapsed) * 0.001f; /// delta t in seconds
   /// move focus
   /// physics
   int i;
   csVector3 avg(0,0,0);
   for(i=0; i<nr; i++)
     avg += spr[i]->GetMovable()->GetPosition();
-  avg /= nr;
+  avg /= float(nr);
 
   foc_accel = (-avg)*0.1 - focus*0.1;
   foc_accel.y = 0;
@@ -576,23 +576,23 @@ void Flock::Update(csTicks elapsed)
     if(accel[i].SquaredNorm() > maxaccel)
     {
       Clamp(accel[i].x, maxaccel);
-      Clamp(accel[i].y, maxaccel/2.0);
+      Clamp(accel[i].y, maxaccel / 2.0f);
       Clamp(accel[i].z, maxaccel);
     }
     /// physics
     speed[i] += accel[i] * dt;
-    float maxspeed = 10.0;
+    float maxspeed = 10.0f;
     if(accel[i].SquaredNorm() > maxspeed)
     {
       Clamp(speed[i].x, maxspeed);
-      Clamp(speed[i].y, maxspeed/2.0);
+      Clamp(speed[i].y, maxspeed / 2.0f);
       Clamp(speed[i].z, maxspeed);
     }
-    float perturb = 0.1;
-    speed[i].x += (float(rand()+1.)/float(RAND_MAX))*perturb - perturb *0.5;
-    speed[i].y += (float(rand()+1.)/float(RAND_MAX))*perturb - perturb *0.5;
-    speed[i].z += (float(rand()+1.)/float(RAND_MAX))*perturb - perturb *0.5;
-    speed[i].z *= 1.0 + (float(rand()+1.)/float(RAND_MAX))*0.2 - 0.1;
+    float perturb = 0.1f;
+    speed[i].x += (float(rand() + 1.0f) / float(RAND_MAX)) * perturb - perturb * 0.5f;
+    speed[i].y += (float(rand() + 1.0f) / float(RAND_MAX)) * perturb - perturb * 0.5f;
+    speed[i].z += (float(rand() + 1.0f) / float(RAND_MAX)) * perturb - perturb * 0.5f;
+    speed[i].z *= 1.0f + (float(rand() + 1.0f) / float(RAND_MAX)) * 0.2f - 0.1f;
     csVector3 move = speed[i] * dt;
     spr[i]->GetMovable()->MovePosition(move);
     spr[i]->GetMovable()->UpdateMove();

@@ -346,11 +346,11 @@ void DemoSky::SetupFrame ()
 
   //printf("elapsed %d\n", (int)elapsed_time);
 
-  float speed = (elapsed_time / 1000.) * (0.03 * 20);
+  float speed = (elapsed_time / 1000.0f) * (0.03f * 20.0f);
   // animate sky
   float secsperday = 30.;
-  skytime += (elapsed_time / ( 1000. * secsperday ));
-  while(skytime > 1.0) skytime -= 1.0;
+  skytime += (elapsed_time / ( 1000.0f * secsperday ));
+  while(skytime > 1.0f) skytime -= 1.0f;
   iBallState *ballstate = SCF_QUERY_INTERFACE( skydome->GetMeshObject(),
     iBallState);
   ballstate->PaintSky(skytime, NULL, NULL, NULL, NULL);
@@ -382,7 +382,7 @@ void DemoSky::SetupFrame ()
 
   char buf[255];
   const char *text = "Escape to quit. Arrow keys/pgup/pgdown to move.";
-  float hour = skytime * 24. + 8;
+  float hour = skytime * 24.0f + 8.0f;
   sprintf(buf, "%2dhr. %s", int(hour)%24, text);
   int txtx = 10;
   int txty = myG2D->GetHeight() - 20;

@@ -1112,7 +1112,7 @@ void csTreeBox::SetState (int mask, bool enable)
   csComponent::SetState (mask, enable);
   if ((oldstate ^ state) & CSS_DISABLED)
   {
-    bool dis = GetState (CSS_DISABLED);
+    bool dis = GetState (CSS_DISABLED) ? true : false;
     if (hscroll)
       hscroll->SetState (CSS_DISABLED, dis);
     if (vscroll)

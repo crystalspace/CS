@@ -437,7 +437,7 @@ void csImageFile::CheckAlpha ()
 
 bool csImageFile::HasKeycolor ()
 {
-  return has_keycolour;
+  return has_keycolour ? true : false;
 }
 
 void csImageFile::GetKeycolor (int &r, int &g, int &b)

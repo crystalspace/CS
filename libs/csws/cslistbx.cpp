@@ -110,7 +110,7 @@ bool csListBoxItem::HandleEvent (iEvent &Event)
         case cscmdListBoxItemSet:
           if (Event.Command.Info)
             parent->SetFocused (this);
-          SetState (CSS_LISTBOXITEM_SELECTED, (bool)Event.Command.Info);
+          SetState (CSS_LISTBOXITEM_SELECTED, Event.Command.Info ? true : false);
           return true;
         case cscmdListBoxItemScrollVertically:
           if (bound.IsEmpty ())
@@ -743,7 +743,7 @@ void csListBox::SetState (int mask, bool enable)
   csComponent::SetState (mask, enable);
   if ((oldstate ^ state) & CSS_DISABLED)
   {
-    bool dis = GetState (CSS_DISABLED);
+    bool dis = GetState (CSS_DISABLED) ? true : false;
     if (hscroll)
       hscroll->SetState (CSS_DISABLED, dis);
     if (vscroll)

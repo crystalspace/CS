@@ -157,7 +157,7 @@ bool csMouse::HandleEvent (iEvent &Event)
       switch (Event.Command.Code)
       {
         case cscmdFocusChanged:
-          AppFocused = (bool)Event.Command.Info;
+          AppFocused = Event.Command.Info ? true : false;
           break;
       } /* endswitch */
       return true;

@@ -40,7 +40,7 @@ void csDefaultTitlebarSkin::Draw (csComponent &iComp)
 {
   csTitleBar &This = (csTitleBar &)iComp;
 
-  bool focused = This.parent->GetState (CSS_FOCUSED);
+  bool focused = This.parent->GetState (CSS_FOCUSED) ? true : false;
   int indx = focused ? CSPAL_TITLEBAR_ABACKGROUND :
     CSPAL_TITLEBAR_PBACKGROUND;
 

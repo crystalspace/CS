@@ -760,9 +760,9 @@ bool csMenu::HandleEvent (iEvent &Event)
           Event.Command.Info = (void *)SubMenuOpened;
           return true;
         case cscmdMenuSetDropFlag:
-          if (SubMenuOpened != (bool)Event.Command.Info)
+          if (SubMenuOpened != (Event.Command.Info ? true : false))
           {
-            SubMenuOpened = (bool)Event.Command.Info;
+            SubMenuOpened = (Event.Command.Info ? true : false);
             if (current)
               current->Invalidate ();
             Event.Command.Info = this;

@@ -426,7 +426,7 @@ void Video::SetupFrame ()
   current_time = vc->GetCurrentTicks ();
 
   // Now rotate the camera according to keyboard state
-  float speed = (elapsed_time / 1000.) * (0.03 * 20);
+  float speed = (elapsed_time / 1000.0f) * (0.03f * 20.0f);
 
   if (kbd->GetKeyState (CSKEY_RIGHT))
     view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed);

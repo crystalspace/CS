@@ -496,7 +496,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	// The above procedure will have filled list[i] with times
 	// relative to the speed and length. Now we will correct that
 	// list so that the last element is equal to 1.
-	float correct = 1. / tot;
+	float correct = 1.0f / tot;
 	for (i = 1 ; i < num ; i++) list[i] *= correct;
 
 	np->SetTimeValues (list);
@@ -534,7 +534,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	v0.Set (xv[0], yv[0], zv[0]);
 	float* list = new float[10000];
 	list[0] = 0;
-	float tot = 0;
+	float tot = 0.0f;
 	for (i = 1 ; i < num ; i++)
 	{
 	  v1.Set (xv[i], yv[i], zv[i]);

@@ -115,7 +115,7 @@ bool ceEngineView::HandleEvent (iEvent &Event)
 	vc->DecRef ();
 
         // Now rotate the camera according to keyboard state
-        float speed = (elapsed_time / 1000.) * (0.03 * 20);
+        float speed = (elapsed_time / 1000.0f) * (0.03f * 20.0f);
 
         if (motion & 0x00000001)
           view->GetCamera ()->Move (CS_VEC_FORWARD * 4.0f * speed);

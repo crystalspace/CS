@@ -382,7 +382,7 @@ void DemoSequenceManager::DebugDrawPath (csNamedPath* np, bool hi,
   if (hi) col = demo->col_white;
   float r;
   csVector3 p;
-  for (r = 0 ; r <= 1 ; r += .001)
+  for (r = 0 ; r <= 1 ; r += 0.001f)
   {
     np->Calculate (r);
     np->GetInterpolatedPosition (p);
@@ -667,7 +667,7 @@ float DemoSequenceManager::GetFPS ()
 {
   csTicks cur_time = seqmgr->GetMainTime ();
   csTicks dt = cur_time-main_start_time;
-  return (float (num_frames) / float (dt)) * 1000.;
+  return (float (num_frames) / float (dt)) * 1000.0f;
 }
 
 //-----------------------------------------------------------------------------

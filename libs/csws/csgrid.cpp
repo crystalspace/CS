@@ -210,7 +210,7 @@ csGridCell::csGridCell () : csComponent (NULL), inUse (false)
 
 void csGridCell::DrawLine (int x1, int y1, int x2, int y2, csCellBorder& border)
 {
-  bool sel = GetState (CSS_GRIDCELL_SELECTED);
+  bool sel = GetState (CSS_GRIDCELL_SELECTED) ? true : false;
 
   if (border.style == gcbsLine)
     Box (MIN (x1, x2), y1, MAX (x1, x2), y2,
@@ -252,7 +252,7 @@ void csGridCell::DrawLine (int x1, int y1, int x2, int y2, csCellBorder& border)
 void csGridCell::Draw ()
 {
   int lx = 0, rx = 0, ty = 0, by = 0; // offsets if borders are drawn;
-  bool sel = GetState (CSS_GRIDCELL_SELECTED);
+  bool sel = GetState (CSS_GRIDCELL_SELECTED) ? true : false;
 
   if (upper.style != gcbsNone)
   {

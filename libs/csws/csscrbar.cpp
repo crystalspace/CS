@@ -349,7 +349,7 @@ void csScrollBar::SetValue (int iValue)
     return;
   status.value = iValue;
 
-  bool disable = GetState (CSS_DISABLED);
+  bool disable = GetState (CSS_DISABLED) ? true : false;
   scroller->SetState (CSS_DISABLED, disable);
 
   if (disable || (status.maxvalue <= 0))

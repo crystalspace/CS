@@ -294,8 +294,8 @@ static void SetTexSpace (iPolygon3D* poly,
   texorig -= vvector / float(size);
   texu += uvector / float(size);
   texv += vvector / float(size);
-  texulen += ulen * 2. / float(size);
-  texvlen += vlen * 2. / float(size);
+  texulen += ulen * 2.0f / float(size);
+  texvlen += vlen * 2.0f / float(size);
   poly->SetTextureSpace (texorig, texu, texulen, texv, texvlen);
 }
 
@@ -320,7 +320,7 @@ void Demo::SetupSector ()
   p->CreateVertex (csVector3 (size, -size, -size));
   p->CreateVertex (csVector3 (-size, -size, -size));
   SetTexSpace (p, 256, p->GetVertex (2), p->GetVertex (3),
-  	2.*size, p->GetVertex (1), 2.*size);
+  	2.0f * size, p->GetVertex (1), 2.0f * size);
   p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
 
   p = walls_state->CreatePolygon ("u");
@@ -331,7 +331,7 @@ void Demo::SetupSector ()
   p->CreateVertex (csVector3 (size, size, size));
   p->CreateVertex (csVector3 (-size, size, size));
   SetTexSpace (p, 256, p->GetVertex (0), p->GetVertex (1),
-  	2.*size, p->GetVertex (3), 2.*size);
+  	2.0f * size, p->GetVertex (3), 2.0f * size);
   p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
 
   p = walls_state->CreatePolygon ("f");
@@ -342,7 +342,7 @@ void Demo::SetupSector ()
   p->CreateVertex (csVector3 (size, -size, size));
   p->CreateVertex (csVector3 (-size, -size, size));
   SetTexSpace (p, 256, p->GetVertex (0), p->GetVertex (1),
-	2.*size, p->GetVertex (3), 2.*size);
+    2.0f * size, p->GetVertex (3), 2.0f * size);
   p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
 
   p = walls_state->CreatePolygon ("r");
@@ -353,7 +353,7 @@ void Demo::SetupSector ()
   p->CreateVertex (csVector3 (size, -size, -size));
   p->CreateVertex (csVector3 (size, -size, size));
   SetTexSpace (p, 256, p->GetVertex (0), p->GetVertex (1),
-  	2.*size, p->GetVertex (3), 2.*size);
+  	2.0f * size, p->GetVertex (3), 2.0f * size);
   p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
 
   p = walls_state->CreatePolygon ("l");
@@ -364,7 +364,7 @@ void Demo::SetupSector ()
   p->CreateVertex (csVector3 (-size, -size, size));
   p->CreateVertex (csVector3 (-size, -size, -size));
   SetTexSpace (p, 256, p->GetVertex (0), p->GetVertex (1),
-  	2.*size, p->GetVertex (3), 2.*size);
+  	2.0f * size, p->GetVertex (3), 2.0f * size);
   p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
 
   p = walls_state->CreatePolygon ("b");
@@ -375,7 +375,7 @@ void Demo::SetupSector ()
   p->CreateVertex (csVector3 (-size, -size, -size));
   p->CreateVertex (csVector3 (size, -size, -size));
   SetTexSpace (p, 256, p->GetVertex (0), p->GetVertex (1),
-	2.*size, p->GetVertex (3), 2.*size);
+    2.0f * size, p->GetVertex (3), 2.0f * size);
   p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
 
   walls_state->DecRef ();
@@ -400,7 +400,7 @@ void Demo::SetupSector ()
   p->CreateVertex (csVector3 (size, -size, -size));
   p->CreateVertex (csVector3 (-size, -size, -size));
   SetTexSpace (p, 256, p->GetVertex (2), p->GetVertex (3),
-  	1.*size, p->GetVertex (1), 1.*size);
+  	1.0f * size, p->GetVertex (1), 1.0f * size);
   p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
   iPolyTexType* pt = p->GetPolyTexType ();
   pt->SetMixMode (CS_FX_ADD);
@@ -413,7 +413,7 @@ void Demo::SetupSector ()
   p->CreateVertex (csVector3 (size, size, size));
   p->CreateVertex (csVector3 (-size, size, size));
   SetTexSpace (p, 256, p->GetVertex (0), p->GetVertex (1),
-  	1.*size, p->GetVertex (3), 1.*size);
+  	1.0f * size, p->GetVertex (3), 1.0f * size);
   p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
   pt = p->GetPolyTexType ();
   pt->SetMixMode (CS_FX_ADD);
@@ -426,7 +426,7 @@ void Demo::SetupSector ()
   p->CreateVertex (csVector3 (size, -size, size));
   p->CreateVertex (csVector3 (-size, -size, size));
   SetTexSpace (p, 256, p->GetVertex (0), p->GetVertex (1),
-	1.*size, p->GetVertex (3), 1.*size);
+    1.0f * size, p->GetVertex (3), 1.0f * size);
   p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
   pt = p->GetPolyTexType ();
   pt->SetMixMode (CS_FX_ADD);
@@ -439,7 +439,7 @@ void Demo::SetupSector ()
   p->CreateVertex (csVector3 (size, -size, -size));
   p->CreateVertex (csVector3 (size, -size, size));
   SetTexSpace (p, 256, p->GetVertex (0), p->GetVertex (1),
-  	1.*size, p->GetVertex (3), 1.*size);
+  	1.0f * size, p->GetVertex (3), 1.0f * size);
   p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
   pt = p->GetPolyTexType ();
   pt->SetMixMode (CS_FX_ADD);
@@ -452,7 +452,7 @@ void Demo::SetupSector ()
   p->CreateVertex (csVector3 (-size, -size, size));
   p->CreateVertex (csVector3 (-size, -size, -size));
   SetTexSpace (p, 256, p->GetVertex (0), p->GetVertex (1),
-  	1.*size, p->GetVertex (3), 1.*size);
+  	1.0f * size, p->GetVertex (3), 1.0f * size);
   p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
   pt = p->GetPolyTexType ();
   pt->SetMixMode (CS_FX_ADD);
@@ -465,7 +465,7 @@ void Demo::SetupSector ()
   p->CreateVertex (csVector3 (-size, -size, -size));
   p->CreateVertex (csVector3 (size, -size, -size));
   SetTexSpace (p, 256, p->GetVertex (0), p->GetVertex (1),
-	1.*size, p->GetVertex (3), 1.*size);
+    1.0f * size, p->GetVertex (3), 1.0f * size);
   p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
   pt = p->GetPolyTexType ();
   pt->SetMixMode (CS_FX_ADD);
@@ -491,22 +491,22 @@ void Demo::SetupSector ()
   	FindByName ("flare_spark4");
   iMaterialWrapper* ifm5 = engine->GetMaterialList ()->
   	FindByName ("flare_spark5");
-  flare->AddComponent (0.0, 1.2, 1.2, CS_FX_ADD, ifmc); // pos, w, h, mixmode
-  flare->AddComponent (0.3, 0.1, 0.1, CS_FX_ADD, ifm3);
-  flare->AddComponent (0.6, 0.4, 0.4, CS_FX_ADD, ifm4);
-  flare->AddComponent (0.8, .05, .05, CS_FX_ADD, ifm5);
-  flare->AddComponent (1.0, 0.7, 0.7, CS_FX_ADD, ifm1);
-  flare->AddComponent (1.3, 0.1, 0.1, CS_FX_ADD, ifm3);
-  flare->AddComponent (1.5, 0.3, 0.3, CS_FX_ADD, ifm4);
-  flare->AddComponent (1.8, 0.1, 0.1, CS_FX_ADD, ifm5);
-  flare->AddComponent (2.0, 0.5, 0.5, CS_FX_ADD, ifm2);
-  flare->AddComponent (2.1, .15, .15, CS_FX_ADD, ifm3);
+  flare->AddComponent (0.0f, 1.2f, 1.2f, CS_FX_ADD, ifmc); // pos, w, h, mixmode
+  flare->AddComponent (0.3f, 0.1f, 0.1f, CS_FX_ADD, ifm3);
+  flare->AddComponent (0.6f, 0.4f, 0.4f, CS_FX_ADD, ifm4);
+  flare->AddComponent (0.8f, 0.05f, 0.05f, CS_FX_ADD, ifm5);
+  flare->AddComponent (1.0f, 0.7f, 0.7f, CS_FX_ADD, ifm1);
+  flare->AddComponent (1.3f, 0.1f, 0.1f, CS_FX_ADD, ifm3);
+  flare->AddComponent (1.5f, 0.3f, 0.3f, CS_FX_ADD, ifm4);
+  flare->AddComponent (1.8f, 0.1f, 0.1f, CS_FX_ADD, ifm5);
+  flare->AddComponent (2.0f, 0.5f, 0.5f, CS_FX_ADD, ifm2);
+  flare->AddComponent (2.1f, 0.15f, 0.15f, CS_FX_ADD, ifm3);
 
-  flare->AddComponent (2.5, 0.2, 0.2, CS_FX_ADD, ifm3);
-  flare->AddComponent (2.8, 0.4, 0.4, CS_FX_ADD, ifm4);
-  flare->AddComponent (3.0, 3.0, 3.0, CS_FX_ADD, ifm1);
-  flare->AddComponent (3.1, 0.05, 0.05, CS_FX_ADD, ifm5);
-  flare->AddComponent (3.3, .15, .15, CS_FX_ADD, ifm2);
+  flare->AddComponent (2.5f, 0.2f, 0.2f, CS_FX_ADD, ifm3);
+  flare->AddComponent (2.8f, 0.4f, 0.4f, CS_FX_ADD, ifm4);
+  flare->AddComponent (3.0f, 3.0f, 3.0f, CS_FX_ADD, ifm1);
+  flare->AddComponent (3.1f, 0.05f, 0.05f, CS_FX_ADD, ifm5);
+  flare->AddComponent (3.3f, 0.15f, 0.15f, CS_FX_ADD, ifm2);
 
   il->DecRef ();
   room->GetLights ()->Add (light->QueryLight ());
@@ -527,10 +527,10 @@ void Demo::SetupSector ()
   iStarsState *starstate = SCF_QUERY_INTERFACE( starbox->GetMeshObject(),
     iStarsState);
   starstate->SetBox(csBox3(-500, -500, -500, 500, 500, 500));
-  starstate->SetColor(csColor(0.9,0.9,1));
-  starstate->SetDensity(.0001);
-  starstate->SetMaxDistance(100);
-  starstate->SetMaxColor( csColor(0,0,0) );
+  starstate->SetColor(csColor(0.9f, 0.9f, 1.0f));
+  starstate->SetDensity(0.0001f);
+  starstate->SetMaxDistance(100.0f);
+  starstate->SetMaxColor( csColor(0.0f, 0.0f, 0.0f) );
   starstate->DecRef();
   mf->DecRef();
   starbox->DecRef();
@@ -616,7 +616,7 @@ void Demo::SetupObjects ()
   spr3d->SetZBufMode (CS_ZBUF_USE);
   spr3d->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   s3d = SCF_QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
-  s3d->SetBaseColor (csColor (.15, .15, .15));
+  s3d->SetBaseColor (csColor (0.15f, 0.15f, 0.15f));
   s3d->DecRef ();
 
   iMeshWrapper* tail = LoadObject ("FighterTail1",
@@ -636,7 +636,7 @@ void Demo::SetupObjects ()
   spr3d->SetZBufMode (CS_ZBUF_USE);
   spr3d->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   s3d = SCF_QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
-  s3d->SetBaseColor (csColor (.15, .15, .15));
+  s3d->SetBaseColor (csColor (0.15f, 0.15f, 0.15f));
   s3d->DecRef ();
 
   tail = LoadObject ("FighterTail2",
@@ -657,7 +657,7 @@ void Demo::SetupObjects ()
   spr3d->SetZBufMode (CS_ZBUF_USE);
   spr3d->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   s3d = SCF_QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
-  s3d->SetBaseColor (csColor (.15, .15, .15));
+  s3d->SetBaseColor (csColor (0.15f, 0.15f, 0.15f));
   s3d->DecRef ();
 
   tail = LoadObject ("ShuttleTail",
@@ -678,7 +678,7 @@ void Demo::SetupObjects ()
   spr3d->SetZBufMode (CS_ZBUF_USE);
   spr3d->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   s3d = SCF_QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
-  s3d->SetBaseColor (csColor (.15, .15, .15));
+  s3d->SetBaseColor (csColor (0.15f, 0.15f, 0.15f));
   s3d->DecRef ();
 
   tail = LoadObject ("ShuttleTail2",
@@ -701,7 +701,7 @@ void Demo::SetupObjects ()
   s3d = SCF_QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
   s3d->SetMixMode (CS_FX_ADD);
   s3d->SetLighting (false);
-  s3d->SetBaseColor (csColor (.1, .1, 1));
+  s3d->SetBaseColor (csColor (0.1f, 0.1f, 1.0f));
   s3d->DecRef ();
   spr3d->DecRef ();
 
@@ -713,7 +713,7 @@ void Demo::SetupObjects ()
   s3d = SCF_QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
   s3d->SetMixMode (CS_FX_ADD);
   s3d->SetLighting (false);
-  s3d->SetBaseColor (csColor (.1, .1, 1));
+  s3d->SetBaseColor (csColor (0.1f, 0.1f, 1.0f));
   s3d->DecRef ();
   spr3d->DecRef ();
 
@@ -725,7 +725,7 @@ void Demo::SetupObjects ()
   s3d = SCF_QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
   s3d->SetMixMode (CS_FX_ADD);
   s3d->SetLighting (false);
-  s3d->SetBaseColor (csColor (.1, .1, 1));
+  s3d->SetBaseColor (csColor (0.1f, 0.1f, 1.0f));
   s3d->DecRef ();
   spr3d->DecRef ();
 
@@ -992,8 +992,8 @@ bool Demo::Initialize (int argc, const char* const argv[],
 
   view = new csView (engine, myG3D);
   view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, -900));
-  view->GetCamera ()->GetTransform ().RotateThis (csVector3 (0, 1, 0), .8);
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0.0f, 0.0f, -900.0f));
+  view->GetCamera ()->GetTransform ().RotateThis (csVector3 (0.0f, 1.0f, 0.0f), 0.8f);
   view->SetRectangle (0, 0, myG2D->GetWidth (), myG2D->GetHeight ());
 
   txtmgr->SetPalette ();
@@ -1078,7 +1078,7 @@ void Demo::SetupFrame ()
   csReversibleTransform& camtrans = view->GetCamera ()->GetTransform ();
   if (map_enabled < MAP_EDIT)
   {
-    float speed = (elapsed_time / 1000.) * (0.03 * 20);
+    float speed = (elapsed_time / 1000.0f) * (0.03f * 20.0f);
     if (kbd->GetKeyState (CSKEY_RIGHT))
       camtrans.RotateThis (CS_VEC_ROT_RIGHT, speed);
     if (kbd->GetKeyState (CSKEY_LEFT))
@@ -1137,7 +1137,7 @@ void Demo::SetupFrame ()
     view->Draw ();
     seqmgr->Draw3DEffects (myG3D);
     if (map_enabled == MAP_EDIT_FORWARD)
-      csfxFadeToColor (myG3D, .3, csColor (0, 0, 1));
+      csfxFadeToColor (myG3D, 0.3f, csColor (0.0f, 0.0f, 1.0f));
   }
 
   // Start drawing 2D graphics.
@@ -1230,7 +1230,7 @@ void Demo::DrawEditInfo ()
       float d = qsqrt (csSquaredDist::PointPoint (v, v1));
       float t1 = np->GetTimeValue (map_selpoint-1);
       float dr = t-t1;
-      float speed = fabs (dr) / d;
+      float speed = (float) fabs (dr) / d;
       csTicks tms1 = int (t1*total);
       GfxWrite (ww+20, hh, col_black, col_white, "len %g", d); hh += fh;
       GfxWrite (ww+20, hh, col_black, col_white, "dr %g", dr); hh += fh;
@@ -1246,7 +1246,7 @@ void Demo::DrawEditInfo ()
       float t1 = np->GetTimeValue (map_selpoint+1);
       float dr = t1-t;
       float d = qsqrt (csSquaredDist::PointPoint (v, v1));
-      float speed = fabs (dr) / d;
+      float speed = (float) fabs (dr) / d;
       csTicks tms1 = int (t1*total);
       GfxWrite (ww+20, hh, col_black, col_white, "len %g", d); hh += fh;
       GfxWrite (ww+20, hh, col_black, col_white, "dr %g", dr); hh += fh;
@@ -1278,9 +1278,9 @@ bool Demo::DemoHandleEvent (iEvent &Event)
       {
         float dx = map_br.x - map_tl.x;
         float speed;
-        if (shift) speed = dx/20.;
-        else if (ctrl) speed = dx/600.;
-        else speed = dx/100.;
+        if (shift) speed = dx / 20.0f;
+        else if (ctrl) speed = dx / 600.0f;
+        else speed = dx / 100.0f;
         if (Event.Key.Code == CSKEY_UP)
         {
           csVector3 v;
@@ -1306,8 +1306,8 @@ bool Demo::DemoHandleEvent (iEvent &Event)
 	  np->GetForwardVector (map_selpoint, forward);
 	  csReversibleTransform trans = view->GetCamera ()->GetTransform ();
           trans.LookAt (forward.Unit (), up.Unit ());
-	  trans.RotateThis (csVector3 (0, 0, 1), -.1);
-	  up = trans.This2Other (csVector3 (0, 1, 0)) - trans.GetOrigin ();
+	  trans.RotateThis (csVector3 (0.0f, 0.0f, 1.0f), -0.1f);
+	  up = trans.This2Other (csVector3 (0.0f, 1.0f, 0.0f)) - trans.GetOrigin ();
 	  np->SetUpVector (map_selpoint, up);
 	  ShowMessage ("Up vector set at '%.3g,%.3g,%.3g'", up.x, up.y, up.z);
           return true;
@@ -1319,8 +1319,8 @@ bool Demo::DemoHandleEvent (iEvent &Event)
 	  np->GetForwardVector (map_selpoint, forward);
 	  csReversibleTransform trans = view->GetCamera ()->GetTransform ();
           trans.LookAt (forward.Unit (), up.Unit ());
-	  trans.RotateThis (csVector3 (0, 0, 1), .1);
-	  up = trans.This2Other (csVector3 (0, 1, 0)) - trans.GetOrigin ();
+	  trans.RotateThis (csVector3 (0.0f, 0.0f, 1.0f), 0.1f);
+	  up = trans.This2Other (csVector3 (0.0f, 1.0f, 0.0f)) - trans.GetOrigin ();
 	  np->SetUpVector (map_selpoint, up);
 	  ShowMessage ("Up vector set at '%.3g,%.3g,%.3g'", up.x, up.y, up.z);
           return true;
@@ -1465,17 +1465,17 @@ bool Demo::DemoHandleEvent (iEvent &Event)
       float dx = map_br.x - map_tl.x;
       float dy = map_br.y - map_tl.y;
       float speed;
-      if (shift) speed = dx/20.;
-      else if (ctrl) speed = dx/600.;
-      else speed = dx/100.;
+      if (shift) speed = dx / 20.0f;
+      else if (ctrl) speed = dx / 600.0f;
+      else speed = dx / 100.0f;
       if (np)
       {
         if (Event.Key.Code == CSKEY_UP)
         {
 	  if (alt)
 	  {
-	    map_tl.y -= dy/10.;
-	    map_br.y -= dy/10.;
+	    map_tl.y -= dy / 10.0f;
+	    map_br.y -= dy / 10.0f;
 	  }
 	  else
 	  {
@@ -1490,8 +1490,8 @@ bool Demo::DemoHandleEvent (iEvent &Event)
         {
 	  if (alt)
 	  {
-	    map_tl.y += dy/10.;
-	    map_br.y += dy/10.;
+	    map_tl.y += dy / 10.0f;
+	    map_br.y += dy / 10.0f;
 	  }
 	  else
 	  {
@@ -1506,8 +1506,8 @@ bool Demo::DemoHandleEvent (iEvent &Event)
         {
 	  if (alt)
 	  {
-	    map_tl.x -= dx/10.;
-	    map_br.x -= dx/10.;
+	    map_tl.x -= dx / 10.0f;
+	    map_br.x -= dx / 10.0f;
 	  }
 	  else
 	  {
@@ -1522,8 +1522,8 @@ bool Demo::DemoHandleEvent (iEvent &Event)
         {
 	  if (alt)
 	  {
-	    map_tl.x += dx/10.;
-	    map_br.x += dx/10.;
+	    map_tl.x += dx / 10.0f;
+	    map_br.x += dx / 10.0f;
 	  }
 	  else
 	  {
@@ -1630,7 +1630,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
 	      np->SetForwardVector (map_selpoint, (v1+v2)/2.);
 	      np->SetTimeValue (map_selpoint,
 	    	  (np->GetTimeValue (map_selpoint-1)+
-		   np->GetTimeValue (map_selpoint+1))/2.);
+		   np->GetTimeValue (map_selpoint+1)) / 2.0f);
 	    }
 	  }
           break;
@@ -1681,9 +1681,9 @@ bool Demo::DemoHandleEvent (iEvent &Event)
 	case '/':
 	  if (np && map_selpoint > 0 && map_selpoint < np->GetPointCount ()-1)
 	  {
-	    float t1 = np->GetTimeValue (map_selpoint-1);
-	    float t2 = np->GetTimeValue (map_selpoint+1);
-	    np->SetTimeValue (map_selpoint, (t1+t2)/2.);
+	    float t1 = np->GetTimeValue (map_selpoint - 1);
+	    float t2 = np->GetTimeValue (map_selpoint + 1);
+	    np->SetTimeValue (map_selpoint, (t1+t2) / 2.0f);
 	  }
 	  break;
 	case '?':
@@ -1745,31 +1745,31 @@ bool Demo::DemoHandleEvent (iEvent &Event)
 	  break;
         case '+':
 	  {
-	    float dx = (map_br.x-map_tl.x)/2.;
-	    float dy = (map_br.y-map_tl.y)/2.;
-	    float cx = (map_br.x+map_tl.x)/2.;
-	    float cy = (map_br.y+map_tl.y)/2.;
-	    map_tl.x = cx-dx*.9;
-	    map_tl.y = cy-dy*.9;
-	    map_br.x = cx+dx*.9;
-	    map_br.y = cy+dy*.9;
+	    float dx = (map_br.x-map_tl.x) / 2.0f;
+	    float dy = (map_br.y-map_tl.y) / 2.0f;
+	    float cx = (map_br.x+map_tl.x) / 2.0f;
+	    float cy = (map_br.y+map_tl.y) / 2.0f;
+	    map_tl.x = cx-dx * 0.9f;
+	    map_tl.y = cy-dy * 0.9f;
+	    map_br.x = cx+dx * 0.9f;
+	    map_br.y = cy+dy * 0.9f;
 	  }
 	  break;
         case '-':
 	  {
-	    float dx = (map_br.x-map_tl.x)/2.;
-	    float dy = (map_br.y-map_tl.y)/2.;
-	    float cx = (map_br.x+map_tl.x)/2.;
-	    float cy = (map_br.y+map_tl.y)/2.;
-	    map_tl.x = cx-dx*1.1;
-	    map_tl.y = cy-dy*1.1;
-	    map_br.x = cx+dx*1.1;
-	    map_br.y = cy+dy*1.1;
+	    float dx = (map_br.x-map_tl.x) / 2.0f;
+	    float dy = (map_br.y-map_tl.y) / 2.0f;
+	    float cx = (map_br.x+map_tl.x) / 2.0f;
+	    float cy = (map_br.y+map_tl.y) / 2.0f;
+	    map_tl.x = cx-dx * 1.1f;
+	    map_tl.y = cy-dy * 1.1f;
+	    map_br.x = cx+dx * 1.1f;
+	    map_br.y = cy+dy * 1.1f;
 	  }
 	  break;
         case '=':
-	  map_tl.Set (-1000, 1000);
-	  map_br.Set (1000, -1000);
+	  map_tl.Set (-1000.0f, 1000.0f);
+	  map_br.Set (1000.0f, -1000.0f);
 	  break;
         case '[':
 	  seqmgr->SelectPreviousPath (map_selpath);
@@ -1868,8 +1868,8 @@ bool Demo::DemoHandleEvent (iEvent &Event)
       {
         p.y = Event.Mouse.y;
 	int dim = myG2D->GetHeight ()-10;
-	float dx = (map_br.x-map_tl.x)/2.;
-	float dy = (map_br.y-map_tl.y)/2.;
+	float dx = (map_br.x-map_tl.x) / 2.0f;
+	float dy = (map_br.y-map_tl.y) / 2.0f;
 	float cx = map_tl.x + (map_br.x-map_tl.x)*(1-(dim-p.x)/dim);
 	float cy = map_tl.y + (map_br.y-map_tl.y)*(1-(dim-p.y)/dim);
 	map_tl.x = cx-dx*.9;

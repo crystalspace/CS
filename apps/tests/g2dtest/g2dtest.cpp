@@ -728,8 +728,8 @@ void G2DTestSystemDriver::DrawTextTest ()
   int i;
   for (i = 0; i < w; i += 4)
   {
-    myG2D->DrawLine (i, 0, i + 50, h, dsteel);
-    myG2D->DrawLine (w - i, 0, w - i - 50, h, dsteel);
+    myG2D->DrawLine (float(i), 0.0f, float(i) + 50.0f, float(h), dsteel);
+    myG2D->DrawLine (float(w - i), 0.0f, float(w - i) - 50.0f, float(h), dsteel);
   }
 
   SetFont (CSFONT_ITALIC);
@@ -769,7 +769,7 @@ void G2DTestSystemDriver::DrawTextTest ()
     myG2D->PerformExtension ("flush");
     delta_time = csGetTicks () - start_time;
   } while (delta_time < 500);
-  float perf = char_count * (1000.0 / delta_time);
+  float perf = char_count * (1000.0f / delta_time);
   SetFont (CSFONT_LARGE);
   WriteCentered (0, 16*1, green, black, " Performance: %20.1f characters/second ", perf);
 }
@@ -782,8 +782,8 @@ void G2DTestSystemDriver::DrawTextTest2 ()
   int x;
   for (x = 0; x < w; x += 4)
   {
-    myG2D->DrawLine (x, 0, x + 50, h, dsteel);
-    myG2D->DrawLine (w - x, 0, w - x - 50, h, dsteel);
+    myG2D->DrawLine (float(x), 0.0f, float(x) + 50.0f, float(h), dsteel);
+    myG2D->DrawLine (float(w - x), 0.0f, float(w - x) - 50.0f, float(h), dsteel);
   }
 
   SetFont (CSFONT_ITALIC);
@@ -821,7 +821,7 @@ void G2DTestSystemDriver::DrawTextTest2 ()
     myG2D->PerformExtension ("flush");
     delta_time = csGetTicks () - start_time;
   } while (delta_time < 500);
-  float perf = char_count * (1000.0 / delta_time);
+  float perf = char_count * (1000.0f / delta_time);
   SetFont (CSFONT_LARGE);
   WriteCentered (0, 16*1, green, black, " Performance: %20.1f characters/second ", perf);
 }

@@ -79,7 +79,7 @@ void csInputLine::SetTextExt (const char *iText)
 void csInputLine::Draw ()
 {
   int dx = 0, dy = 0;
-  bool Disabled = GetState (CSS_DISABLED);
+  bool Disabled = GetState (CSS_DISABLED) ? true : false;
 
   switch (FrameStyle)
   {
