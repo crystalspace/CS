@@ -1,9 +1,13 @@
 The history order is reversed so that new features are at the top.
 
 14-Jun-2001
-	  all four vertices. This speeds up vis testing a little.
-	  Unfortunatelly it doesn't solve a bug which seems to cull away
-	  terrain blocks wrongly.
+	- Made the terrain visibility checker more efficient and more robust.
+	  The calculation of the extent works completely different now and
+	  first calculates the left/right indices of the bounding box.  Then it
+	  will compute the angles only of those two vertices instead of all
+	  four vertices.  This speeds up vis testing a little.  Unfortunatelly
+	  it doesn't solve a bug which seems to cull away terrain blocks
+	  wrongly.
 	- Added csBox2::SquaredOriginDist() similar to the already existing
 	  csBox3 version.
 	- Added csBox2/3::SquaredOriginMaxDist() which returnes the maximum
