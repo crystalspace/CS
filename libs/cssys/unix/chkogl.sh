@@ -55,18 +55,18 @@ else
 fi
 
 if [ ${GL_OK} -eq 1 ]; then
-  echo << EOGL
+  cat << EOGL
 GL.AVAILABLE = yes
-GL.CFLAGS = $(X_CFLAGS) -I${OPENGL_HPATH}
-GL.LFLAGS = $(X_PRE_LIBS) $(X_LIBS) -lXext -lX11 $(X_EXTRA_LIBS)
+GL.CFLAGS = \$(X_CFLAGS) -I${OPENGL_HPATH}
+GL.LFLAGS = \$(X_PRE_LIBS) \$(X_LIBS) -lXext -lX11 \$(X_EXTRA_LIBS)
 GL.LFLAGS += -L${OPENGL_LPATH}
-ifneq ($(USE_MESA),1)
+ifneq (\$(USE_MESA),1)
   GL.LFLAGS += -lGL
 else
   GL.LFLAGS += -lMesaGL
   ifdef MESA_PATH
-    GL.CFLAGS += -I$(MESA_PATH)/include
-    GL.LFLAGS += -I$(MESA_PATH)/lib
+    GL.CFLAGS += -I\$(MESA_PATH)/include
+    GL.LFLAGS += -I\$(MESA_PATH)/lib
   endif
 endif
 EOGL
