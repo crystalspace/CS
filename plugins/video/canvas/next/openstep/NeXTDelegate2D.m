@@ -23,6 +23,7 @@
 #include "NeXTView.h"
 #import <AppKit/NSApplication.h>
 #import <AppKit/NSCursor.h>
+#import <AppKit/NSEvent.h>
 #import <AppKit/NSImage.h>
 #import <AppKit/NSWindow.h>
 #import <Foundation/NSString.h>

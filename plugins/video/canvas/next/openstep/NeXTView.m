@@ -22,6 +22,7 @@
 #include <assert.h>
 #import <AppKit/NSApplication.h>
 #import <AppKit/NSBitmapImageRep.h>
+#import <AppKit/NSWindow.h>
 
 //=============================================================================
 // IMPLEMENTATION

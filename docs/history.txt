@@ -10,6 +10,8 @@ The history order is reversed so that new features are at the top.
 	  platforms in wavefile.cpp.
 	- Eric Sunshine eliminated several compilation warnings about unused
 	  variables in wavefile.cpp.
+	- Eric Sunshine eliminated several compilation warnings from NeXTView.m
+	  and NeXTDelegate2D.m by including needed header files on MacOS/X.
 23-May-2001
 	- Added 'virtual' before the csView destructor and also fixed a
 	  warning in the csView constructor.
