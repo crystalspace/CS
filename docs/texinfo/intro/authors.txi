@@ -136,7 +136,7 @@ Crystal Clear has now been removed from the Crystal Space project however
 due to lack of maintenance and interest.
 
 @item
-Wyatt Miler (@email{wmiler@@milertronics.com})
+Wyatt Miler (@email{wmiler@@nyx.net})
 
 Wyatt was involved in improving and correcting mark-up problems in the aborted
 conversion of Crystal Space documentation to LaTex. He currently is correcting 
