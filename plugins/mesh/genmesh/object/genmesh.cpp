@@ -122,6 +122,7 @@ csGenmeshMeshObject::~csGenmeshMeshObject ()
 
 void csGenmeshMeshObject::CheckLitColors ()
 {
+  if (do_manual_colors) return;
   if (factory->GetVertexCount () != num_lit_mesh_colors)
   {
     num_lit_mesh_colors = factory->GetVertexCount ();
