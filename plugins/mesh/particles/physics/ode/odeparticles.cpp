@@ -193,7 +193,8 @@ void csODEParticlePhysics::Execute (float stepsize)
     
     csVector3 emitter;
     po.particles->GetEmitPosition (emitter);
-    for (int j = 0; j < (int)po.new_particles; j ++)
+    int j;
+    for (j = 0; j < (int)po.new_particles; j ++)
     {
       csParticlesData &point = po.data.Get(j+dead_offset);
       csVector3 start;
@@ -237,7 +238,7 @@ void csODEParticlePhysics::Execute (float stepsize)
     po.dead_particles -= (int)po.new_particles;
     po.new_particles -= (int)po.new_particles;
 
-    for (int j = 0; j < dead_offset; j ++)
+    for (j = 0; j < dead_offset; j ++)
     {
       CS_ASSERT (po.data[j].time_to_live > 0);
       po.data[j].time_to_live -= stepsize;
