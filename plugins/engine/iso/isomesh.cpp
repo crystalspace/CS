@@ -115,6 +115,13 @@ public:
      return updatenumber;
   }
 
+  virtual bool IsTransformIdentity () const { return false; }
+  virtual bool IsFullTransformIdentity () const { return false; }
+  virtual void TransformIdentity ()
+  {
+    isomesh->SetTransform (csMatrix3 ());
+    isomesh->SetPosition (csVector3 (0));
+  }
 };
 
 SCF_IMPLEMENT_IBASE (csIsoFakeMovable)
