@@ -56,7 +56,6 @@ MSVC.PLUGINS.REQUIRED =         \
   net/driver/ensocket		\
   physics/odedynam              \
   sound/driver/waveoutsd        \
-  sound/loader/mod              \
   sound/loader/ogg              \
   sound/renderer/ds3d           \
   sound/renderer/openal         \
