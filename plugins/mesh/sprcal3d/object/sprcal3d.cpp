@@ -784,7 +784,7 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
   default_idle_anim = -1;
   last_locked_anim = -1;
 
-  do_update = true;
+  do_update = -1;
   updateanim_sqdistance1 = 10*10;
   updateanim_skip1 = 5;		// Skip every 5 frames.
   updateanim_sqdistance2 = 20*20;
@@ -1636,20 +1636,20 @@ csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n,
   float sqdist = camera_origin.x * camera_origin.x
   	+ camera_origin.y * camera_origin.y
   	+ camera_origin.z * camera_origin.z;
-  if (sqdist < updateanim_sqdistance1) do_update = 0;
+  if (sqdist < updateanim_sqdistance1) do_update = -1;
   else if (sqdist < updateanim_sqdistance2)
   {
-    if (do_update == 0 || do_update > updateanim_skip1)
+    if (do_update == -1 || do_update > updateanim_skip1)
       do_update = updateanim_skip1;
   }
   else if (sqdist < updateanim_sqdistance3)
   {
-    if (do_update == 0 || do_update > updateanim_skip2)
+    if (do_update == -1 || do_update > updateanim_skip2)
       do_update = updateanim_skip2;
   }
   else
   {
-    if (do_update == 0 || do_update > updateanim_skip3)
+    if (do_update == -1 || do_update > updateanim_skip3)
       do_update = updateanim_skip3;
   }
 
@@ -1737,10 +1737,12 @@ void csSpriteCal3DMeshObject::SetupRenderMeshes ()
 
 bool csSpriteCal3DMeshObject::Advance (csTicks current_time)
 {
-  if (do_update > 0)
+  if (do_update != -1)
   {
-    do_update--;
-    return true;
+    if (do_update >= 0)
+      do_update--;
+    if (do_update >= 0)
+      return true;
   }
 
   // update anim frames, etc. here
