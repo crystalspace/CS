@@ -103,7 +103,7 @@ public:
   /// Override Help to show additional arguments help
   virtual void Help ();
   /// Override DemoWrite for nice demo messaging
-  virtual void DemoWrite (char* msg);
+  virtual void DemoWrite (const char* msg);
 
 private:
   ///

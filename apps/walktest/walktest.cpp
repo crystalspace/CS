@@ -360,7 +360,7 @@ DemoInfo* demo_info = NULL;
 /*
  * The routine to update the screen in demo mode.
  */
-void WalkTest::DemoWrite (char* buf)
+void WalkTest::DemoWrite (const char* buf)
 {
   if (Console)
   {
@@ -608,7 +608,7 @@ int main (int argc, char* argv[])
     world->Prepare (Gfx3D);
 
     // Look for the start sector in this world.
-    char* strt = world->start_sector ? world->start_sector : "room";
+    char* strt = (char*)(world->start_sector ? world->start_sector : "room");
     room = (csSector*)world->sectors.FindByName (strt);
     if (!room)
     {
