@@ -77,7 +77,7 @@ void csGraphics3DOGLCommon::DetectExtensions ()
 // This optimization alone doesn't appear to be enough.
 // We need better state caching. I keep it here to remind
 // us of this.
-static GLuint prev_handle = 0;
+//static GLuint prev_handle = 0;
 void csglBindTexture (GLenum target, GLuint handle)
 {
   //if (prev_handle != handle)
@@ -1653,6 +1653,8 @@ void csGraphics3DOGLCommon::SetGLZBufferFlags ()
     glEnable (GL_DEPTH_TEST);
     glDepthFunc (GL_GREATER);
     glDepthMask (GL_TRUE);
+    break;
+  default:
     break;
   }
 }
