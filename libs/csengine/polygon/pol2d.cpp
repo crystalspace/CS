@@ -776,8 +776,9 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
     g3dpoly.alpha           = poly->GetAlpha();
     g3dpoly.z_value         = poly->Vcam(0).z;
 #ifdef DO_HW_UVZ
+#if 0
     g3dpoly.mirror          = mirror;
-    if (poly->isClipped || rview->view->DidClipping ())
+    if (poly->isClipped || rview->view->LastClipResult () == CS_CLIP_INSIDE)
        g3dpoly.uvz = NULL;
     else
     {
@@ -787,6 +788,9 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
         g3dpoly.uvz[i].z = poly->Vcam(i).z;
       }
     }
+#else
+       g3dpoly.uvz = NULL;
+#endif
 #endif
 
     g3dpoly.poly_texture = poly->GetLightMapInfo ()->GetPolyTex ();

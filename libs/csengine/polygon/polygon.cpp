@@ -583,7 +583,7 @@ void csPolygon3D::Finish ()
 {
   if (orig_poly) return;
 #ifdef DO_HW_UVZ
-  if( uvz ) { delete [] uvz; }
+  if( uvz ) { delete [] uvz; uvz=NULL; }
   isClipped=false;
 #endif
   if (GetTextureType () == POLYTXT_GOURAUD || CheckFlags (CS_POLY_FLATSHADING))
@@ -607,10 +607,10 @@ void csPolygon3D::Finish ()
     GetSector ()->GetAmbientColor (r, g, b);
     lmi->tex->lm->Alloc (LMW (lmi->tex), LMH (lmi->tex), r, g, b);
     lm->DecRef ();
+  }
 #ifdef DO_HW_UVZ
     SetupHWUV();
 #endif
-  }
 }
 
 #ifdef DO_HW_UVZ
