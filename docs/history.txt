@@ -10,6 +10,8 @@ The history order is reversed so that new features are at the top.
 	  which classes are preferred, and which should be avoided.
 	- Eric Sunshine eliminated `hbox' warnings from the Texinfo files
 	  reported by TeX.
+	- Eric Sunshine merged the new csArray<T> from the main branch into the
+	  R0_96 branch so that it will be available for the 0.96r003 release.
 10-Feb-2003
 	- Philip Wyett removed duplicate CS_REPORTER_SEVERITY_DEBUG, which
 	  caused perftest to output results twice.
