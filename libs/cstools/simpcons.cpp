@@ -61,10 +61,10 @@ csSimpleConsole::csSimpleConsole (csIniFile *iConfig, csSimpleCommand* pc) : com
   buf = config->GetStr ("SimpleConsole", "CONFONT", "auto");
   if (!strcasecmp (buf, "auto"))
   {
-    long screen_surface = System->FrameWidth * System->FrameHeight;
-    if (screen_surface <= 320*200)
+    // choose a font that allows at least 80 columns of text
+    if (System->FrameWidth <= 560)
       console_font = csFontTiny;
-    else if (screen_surface <= 640*480)
+    else if (System->FrameWidth <= 640)
       console_font = csFontCourier;
     else
       console_font = csFontPolice;
