@@ -221,8 +221,9 @@ public:
   /**
    * Allocate the lightmap. 'w' and 'h' are the size of the
    * bounding box in lightmap space.
+   * r,g,b is the ambient light color used to initialize the lightmap.
    */
-  void Alloc (int w, int h, int lms, csPolygon3D* poly);
+  void Alloc (int w, int h, int lms, int r, int g, int b);
 
   /**
    * Allocate this lightmap by mipmapping the given source lightmap.

@@ -180,7 +180,7 @@ void csLightMap::SetSize (int w, int h, int lms)
   rheight = lheight;
 }
 
-void csLightMap::Alloc (int w, int h, int lms, csPolygon3D* poly)
+void csLightMap::Alloc (int w, int h, int lms, int r, int g, int b)
 {
   SetSize (w, h, lms);
   int i;
@@ -207,24 +207,17 @@ void csLightMap::Alloc (int w, int h, int lms, csPolygon3D* poly)
     real_lm.AllocBlue (lm_size);
   }
 
-  if (poly)
+  for (i = 0 ; i < lm_size ; i++)
   {
-    csSector* s = poly->GetSector ();
-    if (s)
-      for (i = 0 ; i < lm_size ; i++)
-      {
-	int r, g, b;
-	s->GetAmbientColor (r, g, b);
-        static_lm.mapR[i] = r;
-        if (static_lm.mapG) static_lm.mapG[i] = g;
-        if (static_lm.mapB) static_lm.mapB[i] = b;
-      }
+    static_lm.mapR[i] = r;
+    if (static_lm.mapG) static_lm.mapG[i] = g;
+    if (static_lm.mapB) static_lm.mapB[i] = b;
   }
 }
 
 void csLightMap::MipmapLightmap (int w, int h, int lms, csLightMap* source, int w2, int h2, int lms2)
 {
-  Alloc (w, h, lms, NULL);
+  Alloc (w, h, lms, 0, 0, 0);
 
   if (size > 1000000 || source->size > 1000000) return;
   int lw2 = source->GetWidth ();
