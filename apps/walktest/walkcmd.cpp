@@ -1334,7 +1334,11 @@ bool CommandHandler (const char *cmd, const char *arg)
     csVector3 where = Sys->view->GetCamera ()->GetTransform ().This2Other (
     	3.0f*CS_VEC_FORWARD);
     int pidx;
-    iMeshWrapper* mesh = Sys->view->GetCamera ()->GetHit (where, &pidx);
+    csVector3 isect;
+    iMeshWrapper* mesh = 
+      Sys->view->GetCamera ()->GetSector ()->HitBeamPortals (
+      Sys->view->GetCamera ()->GetTransform ().GetOrigin (), where, isect, &pidx);
+
     if (mesh && pidx != -1)
     {
       //Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
