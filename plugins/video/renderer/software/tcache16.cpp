@@ -213,6 +213,10 @@ void TextureCache16::create_lighted_24bit (TCacheData& tcd, TCacheLightedTexture
   int Imin_u = tcd.Imin_u;
   int Imin_v = tcd.Imin_v;
 
+  int rs24 = txtmgr->pixel_format ().RedShift;
+  int gs24 = txtmgr->pixel_format ().GreenShift;
+  int bs24 = txtmgr->pixel_format ().BlueShift;
+
   unsigned char* mapR = tcd.mapR;
   unsigned char* mapG = tcd.mapG;
   unsigned char* mapB = tcd.mapB;
@@ -286,8 +290,9 @@ void TextureCache16::create_lighted_24bit (TCacheData& tcd, TCacheLightedTexture
 	    for (uu = u+Imin_u ; uu < end_u ; uu++)
 	    {
 	      RGB = ot[uu & and_w];
-	      *tm++ = ( (RGB >> 16) * (whi>>16) >> 11) << 10| ((RGB >> 8 & 0xff) * (whi>>16) >>
-		    11) << 5| (RGB & 0xff) * (whi>>16) >> 11;
+	      *tm++ = ((((RGB >> rs24) & 0xff) * (whi >> 16) >> 11) << 10) |
+                      ((((RGB >> gs24) & 0xff) * (whi >> 16) >> 11) << 5) |
+                      ((((RGB >> bs24) & 0xff) * (whi >> 16) >> 11));
 	      whi += whi_d;
 	    }
 	    tm = tm2;
@@ -330,8 +335,9 @@ void TextureCache16::create_lighted_24bit (TCacheData& tcd, TCacheLightedTexture
 	  for (uu = u+Imin_u ; uu < end_u ; uu++)
 	  {
 	    RGB = ot[uu & and_w];
-	    *tm++ = ( (RGB >> 16) * (red>>16) >> 11) << 10| ((RGB >> 8 & 0xff) * (gre>>16) >>
-		    11) << 5| (RGB & 0xff) * (blu>>16) >> 11;
+	    *tm++ = ((((RGB >> rs24) & 0xff) * (red >> 16) >> 11) << 10) |
+                    ((((RGB >> gs24) & 0xff) * (gre >> 16) >> 11) << 5) |
+                    ((((RGB >> bs24) & 0xff) * (blu >> 16) >> 11));
 
 	    red += red_d;
 	    gre += gre_d;
@@ -444,9 +450,9 @@ void TextureCache16::create_lighted_true_rgb_priv (TCacheData& tcd, TCacheLighte
 	    //*tm++ = i_tc->add_light_red_private (*rgb, red) |
 	    //	    i_tc->add_light_green_private (*(rgb+1), gre) |
 	    //	    i_tc->add_light_blue_private (*(rgb+2), blu);
-	    *tm++ = lt_light[*rgb].red[red>>16] |
-	    	    lt_light[*(rgb+1)].green[gre>>16] |
-	    	    lt_light[*(rgb+2)].blue[blu>>16];
+	    *tm++ = lt_light [*rgb].red [red>>16] |
+	    	    lt_light [*(rgb+1)].green [gre>>16] |
+	    	    lt_light [*(rgb+2)].blue [blu>>16];
 	    red += red_d;
 	    gre += gre_d;
 	    blu += blu_d;

@@ -51,7 +51,6 @@ void TextureCache::set_cache_size (long size)
   clear ();
 }
 
-
 void dump_pool (MemoryHeap *h)
 {
   (void)h;
