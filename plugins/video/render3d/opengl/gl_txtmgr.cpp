@@ -36,9 +36,11 @@
 
 // csGLTexture stuff
 
-csGLTexture::csGLTexture(csGLTextureHandle *p)
+csGLTexture::csGLTexture(csGLTextureHandle *p, iImage *Image)
 {
-  w = h = d = size = 0;
+  d = 1;
+  w = Image->GetWidth ();
+  h = Image->GetHeight ();
   image_data = 0;
   Parent = p;
   image_data = NULL;
@@ -48,8 +50,7 @@ csGLTexture::csGLTexture(csGLTextureHandle *p)
 
 csGLTexture::~csGLTexture()
 {
-  if(image_data)
-    delete[] image_data;
+  delete[] image_data;
 }
 /*
 *
@@ -64,28 +65,62 @@ SCF_IMPLEMENT_IBASE_END
 csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, int target, int bpp,
                                       GLenum sourceFormat, csGLRender3D *iR3D)
 {
-  this->sourceFormat = sourceFormat;
-  this->R3D = iR3D;
-  this->flags = flags;
+  SCF_CONSTRUCT_IBASE(NULL);
   this->target = target;
-  cachedata = 0;
+  (R3D = iR3D)->IncRef();
+  (txtmgr = R3D->txtmgr)->IncRef();
+  has_alpha = false;
+  this->sourceFormat = sourceFormat;
   this->bpp = bpp;
-  
+  size = 0;
+  was_render_target = false;
+
   images = new csImageVector();
-  (*images)[0] = image;
+  image->IncRef();
+  images->AddImage(image,0);
+
+  this->flags = flags;
+  transp = false;
+  transp_color.red = transp_color.green = transp_color.blue = 0;
+
+  if (image->HasKeycolor ())
+  {
+    int r,g,b;
+    image->GetKeycolor (r,g,b);
+    SetKeyColor (r, g, b);
+  }
+  cachedata = NULL;
 }
 
 csGLTextureHandle::csGLTextureHandle (csRef<iImageVector> image, int flags, int target, int bpp,
     GLenum sourceFormat, csGLRender3D *iR3D)
 {
-  images = image;
-  
-  this->bpp = bpp;
-  this->flags = flags;
+  SCF_CONSTRUCT_IBASE(NULL);
   this->target = target;
+  (R3D = iR3D)->IncRef();
+  (txtmgr = R3D->txtmgr)->IncRef();
+  has_alpha = false;
   this->sourceFormat = sourceFormat;
-  this->R3D = iR3D;
-  cachedata = 0;
+  this->bpp = bpp;
+  size = 0;
+  was_render_target = false;
+
+  images = image;
+  int i=0;
+  for (i=0; i < images->Length(); i++)
+    (*images)[i]->IncRef();
+
+  this->flags = flags;
+  transp = false;
+  transp_color.red = transp_color.green = transp_color.blue = 0;
+
+  if ((*images)[0]->HasKeycolor ())
+  {
+    int r,g,b;
+    (*images)[0]->GetKeycolor (r,g,b);
+    SetKeyColor (r, g, b);
+  }
+  cachedata = NULL;
 }
 
 void csGLTextureManager::DetermineStorageSizes ()
@@ -452,72 +487,236 @@ void csGLTextureHandle::AdjustSizePo2 ()
   }
 }
 
+csGLTexture *csGLTextureHandle::NewTexture (iImage *Image, bool ismipmap)
+{
+  ismipmap = false;
+  return new csGLTexture (this, Image);
+}
+
 void csGLTextureHandle::CreateMipMaps()
 {
 
+  csRGBpixel *tc = transp ? &transp_color : (csRGBpixel *)NULL;
+
+  //  printf ("delete old\n");
   // Delete existing mipmaps, if any
   int i;
   for (i = vTex.Length ()-1; i >= 0; i--)
   {
     if (vTex [i])
     {
+      DG_UNLINK (this, vTex[i]);
       delete vTex [i];
     }
   }
   vTex.DeleteAll ();
-  
-  // This function assumes that alle images in images have the same dimension / bpp
-  // Calculate how many mip map levels we will need
-  int mipmaplevelcount = 0;
 
-  int lwidth, lheight, ldepth;
-  GetOriginalDimensions(lwidth, lheight, ldepth);
-  int ltemp = MAX(lwidth, MAX(lheight, ldepth));
-  while(ltemp)
+  size = 0;
+  //  printf ("push 0\n");
+  csGLTexture* ntex = NewTexture ((*images)[0], false);
+  ntex->d = images->Length();
+  vTex.Push (ntex);
+  DG_LINK (this, ntex);
+
+  //  printf ("transform 0\n");
+  transform (images, vTex[0]);
+
+  // Create each new level by creating a level 2 mipmap from previous level
+  // we do this down to 1x1 as opengl defines it
+
+  iImageVector* prevImages = images;
+  csRef<iImageVector> thisImages =  new csImageVector(); 
+
+  int w = (*prevImages)[0]->GetWidth ();
+  int h = (*prevImages)[0]->GetHeight ();
+  int nTex = 0;
+
+  for (i=0; i < prevImages->Length(); i++)
   {
-    ltemp >>= 1;
-    mipmaplevelcount++;
-  };
-  // lmipmaplevels now contains the number of mipmaplevels we need
-
-  // For every Mipmaplevel we have to create a csGLTexture
-  // and store it in vTex
-  int lcurmip; 
-
-  for (i=0; csGLTextureManager::glformats[i].sourceFormat != sourceFormat
-   && csGLTextureManager::glformats[i].components; i++);
-
-  for(lcurmip = 0; lcurmip < mipmaplevelcount; lcurmip++)
-  {
-    csGLTexture *newtex = new csGLTexture(this);
-
-    newtex->w = (lwidth > 1) ? lwidth >> lcurmip : 1;
-    newtex->h = (lheight > 1) ? lheight >> lcurmip : 1;
-    newtex->d = (ldepth > 1) ? ldepth >> lcurmip : 1;
-
-    newtex->size = lwidth * lheight * ldepth * csGLTextureManager::glformats[i].components;
-    newtex->image_data = new uint8[newtex->size];
-    newtex->internalFormat = csGLTextureManager::glformats[i].targetFormat;
-
-
-    int lcurdepth;
-    for(lcurdepth = 0; lcurdepth < ldepth; lcurdepth++)
-    {
-      csRef<iImage> tmpimg;
-      if (lcurmip == 0)
-        tmpimg = (*images)[lcurdepth];
-      else
-        tmpimg = (*images)[lcurdepth]->MipMap(lcurmip, 0);
-      int curdepthsize = tmpimg->GetWidth() * tmpimg->GetHeight() * csGLTextureManager::glformats[i].components;
-
-      memcpy(newtex->image_data + curdepthsize*lcurdepth, 
-        tmpimg->GetImageData(), 
-        curdepthsize);
-
-//      tmpimg->DecRef();
-    }
-    vTex.Push (newtex);
+      (*prevImages)[i]->IncRef();
   }
+
+  while (w != 1 || h != 1)
+  {
+    nTex++;
+    //  printf ("make mipmap %d\n", nTex);
+    for (i=0; i<prevImages->Length();i++)
+    {
+      csRef<iImage> cimg = (*prevImages)[i]->MipMap (1, tc);
+      (*thisImages)[i] = cimg;
+    }
+
+    //  printf ("push %d\n", nTex);
+    csGLTexture* ntex = NewTexture ((*thisImages)[0], true);
+    ntex->d = thisImages->Length();
+    vTex.Push (ntex);
+    DG_LINK (this, ntex);
+    //  printf ("transform %d\n", nTex);
+    transform (thisImages, vTex[nTex]);
+    w = (*thisImages)[0]->GetWidth ();
+    h = (*thisImages)[0]->GetHeight ();
+    for (i=0; i < prevImages->Length(); i++)
+    {
+      (*prevImages)[i]->DecRef();
+    }
+    for (i=0; i < thisImages->Length(); i++)
+    {
+      (*thisImages)[i]->IncRef();
+    }
+    for (i=0; i < thisImages->Length(); i++)
+    {
+      (*prevImages)[i] = (*thisImages)[i];
+    }
+  }
+
+  for (i=0; i < prevImages->Length(); i++)
+  {
+      (*prevImages)[i]->DecRef();
+  }
+
+}
+
+
+bool csGLTextureHandle::transform (iImageVector *ImageVector, csGLTexture *tex)
+{
+  iImage* Image = (*ImageVector)[0];
+  uint8 *h;
+  uint8 *&image_data = tex->get_image_data ();
+  //csRGBpixel *data = (csRGBpixel *)Image->GetImageData ();
+  csRGBpixel *data = NULL;
+  int n = Image->GetWidth ()*Image->GetHeight ();
+  int d = ImageVector->Length();
+  int i=0, j=0;
+  int nCompo;
+
+  // First we determine the exact sourceformat if targetformat is given
+  // without bit specifications.
+  switch (csGLTextureManager::glformats[formatidx].sourceFormat)
+  {
+    case GL_ALPHA: i++;  // Fall thru
+    case GL_BLUE: i++;  // Fall thru
+    case GL_GREEN: i++;  // Fall thru
+    case GL_RED:
+      image_data = new uint8 [n * d];
+      for (j=0; j < d; j++)
+      {
+        data = (csRGBpixel *)(*ImageVector)[j]->GetImageData();
+        h = (uint8*)data;
+        h += i;
+        for (i=0; i<n; i++, h += 4)
+          *image_data++ = *h;
+      }
+      break;
+    case GL_INTENSITY:
+      image_data = new uint8 [n*d];
+      for (j=0; j < d; j++)
+      {
+        data = (csRGBpixel *)(*ImageVector)[j]->GetImageData();
+        for (i=0; i<n; i++, data++)
+          *image_data++ = data->Intensity ();
+      }
+      break;
+    case GL_LUMINANCE:
+      image_data = new uint8 [n*d];
+      for (j=0; j < d; j++)
+      {
+        data = (csRGBpixel *)(*ImageVector)[j]->GetImageData();
+        for (i=0; i<n; i++, data++)
+          *image_data++ = data->Luminance ();
+      }
+      break;
+    case GL_LUMINANCE_ALPHA:
+      image_data = new uint8 [n*2*d];
+      for (j=0; j < d; j++)
+      {
+        data = (csRGBpixel *)(*ImageVector)[j]->GetImageData();
+        for (i=0; i<n; i++, data++)
+        {
+          *image_data++ = data->Luminance ();
+          *image_data++ = data->alpha;
+        }
+      }
+      break;
+    default: // RGB/RGBA branch
+      switch (sourceType)
+      {
+        case GL_UNSIGNED_BYTE:
+	  nCompo = csGLTextureManager::glformats[formatidx].components;
+	  h = image_data = new uint8 [n*nCompo*d];
+          for (j=0; j<d; j++)
+          {
+            data = (csRGBpixel *)(*ImageVector)[0]->GetImageData();
+	    for (i=0; i<n; i++, data++, h+=nCompo)
+	      memcpy (h, data, nCompo);
+          }
+	  break;
+        case GL_UNSIGNED_BYTE_3_3_2:
+	  h = image_data = new uint8 [n*d];
+          for (j=0; j < d; j++)
+          {
+            data = (csRGBpixel *)(*ImageVector)[j]->GetImageData();
+	    for (i=0; i<n; i++, data++)
+	      *h++ = (data->red & 0xe0) | (data->green & 0xe0)>>5
+               | (data->blue >> 6);
+          }
+	  break;
+        case GL_UNSIGNED_SHORT_4_4_4_4:
+	  {
+	    image_data = new uint8 [n*2*d];
+	    unsigned short *ush = (unsigned short *)image_data;
+            for (j=0; j < d; j++)
+            {
+              data = (csRGBpixel *)(*ImageVector)[j]->GetImageData();
+	      for (i=0; i<n; i++, data++)
+	        *ush++ = ((unsigned short)(data->red & 0xf0))<<8
+                | ((unsigned short)(data->green & 0xf0))<<4
+		| (unsigned short)(data->blue & 0xf0)
+		| (unsigned short)(data->alpha >> 4) ;
+            }
+	  }
+	  break;
+        case GL_UNSIGNED_SHORT_5_5_5_1:
+	  {
+	    image_data = new uint8 [n*2*d];
+	    unsigned short *ush = (unsigned short *)image_data;
+            for (j=0; j < d; j++)
+            {
+              data = (csRGBpixel *)(*ImageVector)[j]->GetImageData();
+	      for (i=0; i<n; i++, data++)
+	      *ush++ = ((unsigned short)(data->red & 0xf8))<<8
+	    	  | ((unsigned short)(data->green & 0xf8))<<3
+		  | ((unsigned short)(data->blue & 0xf8))>>2
+		  | (unsigned short)(data->alpha >> 7) ;
+            }
+	  }
+	  break;
+        case GL_UNSIGNED_SHORT_5_6_5:
+	  {
+	    image_data = new uint8 [n*2];
+	    unsigned short *ush = (unsigned short *)image_data;
+            for (j=0; j < d; j++)
+            {
+              data = (csRGBpixel *)(*ImageVector)[j]->GetImageData();
+	      for (i=0; i<n; i++, data++)
+	        *ush++ = ((unsigned short)(data->red & 0xf8))<<8
+		  | ((unsigned short)(data->green & 0xfc))<<3
+		  | (unsigned short)(data->blue >> 3);
+            }
+	  }
+	  break;
+        default:
+	  printf ("OpenGL Warning: no sourceType %x\n",
+	  	(unsigned int)sourceType);
+      }
+  }
+
+
+  {
+    tex->size = n * csGLTextureManager::glformats[formatidx].texelbytes;
+  }
+
+  size += tex->size;
+  return true;
 }
 
 iGraphics2D* csGLTextureHandle::GetCanvas ()

@@ -42,7 +42,7 @@ class csGLTextureManager;
 class csGLTexture
 {
 public:
-  csGLTexture(csGLTextureHandle *p);
+  csGLTexture(csGLTextureHandle *p, iImage* Image);
   virtual ~csGLTexture();
 
   csGLTextureHandle *Parent;
@@ -68,13 +68,14 @@ public:
 
 class csGLTextureHandle : public iTextureHandle
 {
+private:
   /// texturemanager handle
   csGLTextureManager *txtmgr;
 
   int formatidx;
   GLenum sourceFormat, targetFormat;
   GLenum sourceType; // what size does each fragment have? e.g. GL_UNSIGNED_BYTE
-  
+
 
   /// 2D Canvas
   csRef<iGraphics2D> canvas;
@@ -85,6 +86,9 @@ class csGLTextureHandle : public iTextureHandle
   
   /// used until Prepare() is called
   csRef<iImageVector> images;
+
+  /// Does color 0 mean "transparent" for this texture?
+  bool transp;
 
   bool has_alpha;
   bool texupdate_needed;
@@ -98,9 +102,14 @@ class csGLTextureHandle : public iTextureHandle
     { return (csGLTexture*)csVector::Get (idx);}
     int Push (csGLTexture *t){ return csVector::Push ((csSome)t);}
   };
+  
+  bool transform (iImageVector *ImageVec, csGLTexture *tex);
+
+  csGLTexture *NewTexture (iImage *Image, bool ismipmap);
 
 public:
-  int bpp;
+    int bpp;
+  int orig_width, orig_height;
   texVector vTex;
   csGLRender3D *R3D;
   long size;

@@ -161,10 +161,11 @@ void csGLTextureCache::Uncache (iTextureHandle *texh)
 
 void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
 {
+ 
   iTextureHandle *txt_handle = (iTextureHandle *)d->Source;
   csGLTextureHandle *txt_mm = (csGLTextureHandle *)
     txt_handle->GetPrivateObject ();
-  
+
   if (reload)
   {
     if(txt_mm->target == iTextureHandle::CS_TEX_IMG_1D)
@@ -213,9 +214,16 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
       glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
       glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
     }
-
-   
   }
+
+
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+    rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
+
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+      rstate_bilinearmap ? GL_LINEAR_MIPMAP_LINEAR
+                         : GL_NEAREST_MIPMAP_NEAREST);
+
 
   for (int i=0; i < txt_mm->vTex.Length (); i++)
   {
@@ -288,64 +296,16 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
 
         
       }
-
-      
     }
     else
-    {
-      R3D->ext.glCompressedTexImage2DARB (
-        GL_TEXTURE_2D, i, (GLenum)togl->internalFormat,
-        togl->get_width (), togl->get_height (), 0,
-        togl->size, togl->image_data);
-    }
-  
+      R3D->ext.glCompressedTexImage2DARB (GL_TEXTURE_2D, 
+                                          i,
+                                          (GLenum)togl->internalFormat,
+                                          togl->get_width (),
+                                          togl->get_height (),
+                                          0,
+                                          togl->size, 
+                                          togl->image_data);
   }
-/*
-  if (reload)
-  {
-    glBindTexture (GL_TEXTURE_2D, d->Handle);
-  }
-  else
-  {
-    GLuint texturehandle;
-
-    glGenTextures (1, &texturehandle);
-    d->Handle = texturehandle;
-    glBindTexture (
-      GL_TEXTURE_2D, texturehandle);
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  }
-
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-    rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
-  if (((txt_mm->GetFlags () & (CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS))
-  	== CS_TEXTURE_3D))
-  {
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-      rstate_bilinearmap ? GL_LINEAR_MIPMAP_LINEAR
-                         : GL_NEAREST_MIPMAP_NEAREST);
-  }
-  else
-  {
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-      rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
-  }
-
-  for (int i=0; i < txt_mm->vTex.Length (); i++)
-  {
-    csGLTexture *togl = txt_mm->vTex[i];
-    if (togl->compressed == GL_FALSE)
-      glTexImage2D (GL_TEXTURE_2D, i, txt_mm->TargetFormat (),
-        togl->get_width (), togl->get_height (),
-  0, txt_mm->SourceFormat (), txt_mm->SourceType (), togl->image_data);
-    else
-      R3D->ext.glCompressedTexImage2DARB (
-        GL_TEXTURE_2D, i, (GLenum)togl->internalFormat,
-  togl->get_width (), togl->get_height (), 0,
-  togl->size, togl->image_data);
-  
-  }
-  */
 }
 
