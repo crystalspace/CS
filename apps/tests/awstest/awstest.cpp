@@ -68,7 +68,11 @@
 #include <stdio.h>
 
 
-const bool AWSTEST_SINGLEPROCTEXCANVAS=false;
+const int AWSTEST_MULTIPROC  = 0;
+const int AWSTEST_SINGLEPROC = 1;
+const int AWSTEST_SCREEN     = 2;
+
+const int AWSTEST_CANVAS=AWSTEST_SCREEN;
 
 //-----------------------------------------------------------------------------
 
@@ -378,14 +382,19 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   col_cyan = txtmgr->FindRGB (0, 255, 255);
   col_green = txtmgr->FindRGB (0, 255, 0);
   
-  if (AWSTEST_SINGLEPROCTEXCANVAS)
+  if (AWSTEST_CANVAS == AWSTEST_SINGLEPROC)
   {
     awsCanvas = aws->CreateDefaultCanvas(engine, myG3D->GetTextureManager(), 512, 512, NULL);
-    //aws->SetFlag(AWSF_AlwaysEraseWindows);  // Only set for surface or direct-drawing
+    //aws->SetFlag(AWSF_AlwaysEraseWindows);  // Only set for surface or direct-drawing w/o engine
+  } 
+  else if (AWSTEST_CANVAS == AWSTEST_MULTIPROC)
+  {
+    awsCanvas = aws->CreateDefaultCanvas(engine, myG3D->GetTextureManager());
   }
   else
   {
-    awsCanvas = aws->CreateDefaultCanvas(engine, myG3D->GetTextureManager());
+    awsCanvas = aws->CreateCustomCanvas(myG2D, myG3D);
+    aws->SetFlag(AWSF_AlwaysRedrawWindows);     // Only set for direct-drawing with engine
   }
 
   aws->SetCanvas(awsCanvas);
