@@ -3018,7 +3018,11 @@ bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
   csThingObjectType::object_reg = object_reg;
   csRef<iEngine> e = CS_QUERY_REGISTRY (object_reg, iEngine);
   engine = e;	// We don't want a real ref here to avoid circular refs.
+#ifndef CS_USE_NEW_RENDERER
   csRef<iGraphics3D> g = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+#else
+  csRef<iGraphics3D> g = CS_QUERY_REGISTRY (object_reg, iRender3D);
+#endif // CS_USE_NEW_RENDERER
   G3D = g;
 
   lightpatch_pool = new csLightPatchPool ();
