@@ -445,6 +445,8 @@ DirectX support.
 MacOS/X canvas support.
 @item crystalspace_opengl
 OpenGL support.
+@item crystalspace_python
+Python support.
 @item crystalspace_windows
 Windows support.
 @end table
@@ -1492,4 +1494,4 @@ documentations.
 
 @subheading @sc{csws} Removal
 
-The @sc{csws} library was removed. 
+The Crystal Space Windowing System (@sc{csws}) was removed. 
