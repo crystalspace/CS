@@ -35,6 +35,16 @@ SCF_VERSION (iStringSet, 0, 1, 0);
  * string has an ID number. The most important operation is to request a
  * string, which means to return the ID for the string, adding it to the
  * list if it is not already there.
+ *
+ * To obtain the default string set (to be used when string ID are shared by
+ * multiple plugins, e.g. as done in the shader system) use a code snipped 
+ * similar to the following:
+ *
+ * \code
+ * csRef<iObjectRegistry> object_reg = ...;
+ * csRef<iStringSet> Strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+ *   object_reg, "crystalspace.shared.stringset", iStringSet);
+ * \endcode
  */
 struct iStringSet : public iBase
 {

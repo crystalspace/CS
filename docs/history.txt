@@ -24,6 +24,8 @@ chronological order.
 	      targets in external projects where _static_init.cpp was compiled
 	      without any special compiler flags, thus it was unable to locate
 	      header files, such as cssysdef.h, scf.h, etc.
+	- res added an example on how to obtain the global string set to the
+	  iStringSet doxygen docu.
 13-Jul-2004
 	- Eric Sunshine changed cspace.i so that it no longer exports any
 	  va_list functions, such as csPrintfV(), PerformExtensionV(),
