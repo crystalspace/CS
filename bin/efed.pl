@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl -w
 #==============================================================================
 #
 #    Eric's File Editor (tm)
@@ -32,7 +32,7 @@ use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'efed.pl';
-my $PROG_VERSION = '1.0';
+my $PROG_VERSION = '1.1';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
@@ -44,6 +44,7 @@ my $COPYRIGHT = "Copyright (C) 2000 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
 $main::opt_descend = 0;
 $main::opt_verbose = 0;
 $main::opt_v = 0;	# Alias for 'verbose'.
+$main::opt_quiet = 0;
 $main::opt_test = 0;
 $main::opt_version = 0;
 $main::opt_V = 0;	# Alias for 'version'.
@@ -57,12 +58,14 @@ my @script_options = (
     'descend!',
     'verbose!',
     'v!',		# Alias for 'verbose'.
+    'quiet!',
     'test!',
     'version',
     'V',		# Alias for 'version'.
     'help'
 );
 
+$main::verbosity = 0;
 @main::paths = ();
 $main::total_files = 0;
 $main::total_files_ignored = 0;
@@ -92,6 +95,20 @@ sub warning {
 sub print_title {
     my $msg = shift;
     print "$msg\n", '-' x length($msg), "\n";
+}
+
+#------------------------------------------------------------------------------
+# Should script be verbose?
+#------------------------------------------------------------------------------
+sub verbose {
+    return $main::verbosity > 0;
+}
+
+#------------------------------------------------------------------------------
+# Should script be quiet?
+#------------------------------------------------------------------------------
+sub quiet {
+    return $main::verbosity < 0;
 }
 
 #------------------------------------------------------------------------------
@@ -167,7 +184,7 @@ sub normalize_edit {
 }
 
 #------------------------------------------------------------------------------
-# Noramlize all edit operations and patterns.
+# Normalize all edit operations and patterns.
 #------------------------------------------------------------------------------
 sub normalize {
     my $s;
@@ -183,26 +200,43 @@ sub normalize {
 }
 
 #------------------------------------------------------------------------------
+# Recognize and replace special alias convenience patterns:
+#   `old=new' --> `s/\.old$/\.new/' (filename suffix substitution)
+#   `old:new' --> `s/\.old$/\.new/' (ditto)
+#------------------------------------------------------------------------------
+sub process_aliases {
+    my $s;
+    foreach $s (@main::opt_rename) {
+	$s = "s/\\.$1\$/\\.$2/" if $s =~ /^(\w+)[=:](\w+)$/;
+    }
+}
+
+#------------------------------------------------------------------------------
 # Scan a directory for filenames.
 #------------------------------------------------------------------------------
 sub scandir {
     my $dir = shift;
-    opendir(DIR, $dir) or die "Directory scan failed ($dir): $!";
+    opendir(DIR, $dir) or fatal("Directory scan failed ($dir): $!");
     my @files = grep(!/^\.\.?$/, readdir(DIR));
     closedir(DIR);
     return sort { lc($main::a) cmp lc($main::b) } map("$dir/$_", @files);
 }
 
 #------------------------------------------------------------------------------
-# Pre-scan paths.  Always recurse into top-level directories.  Deeper
-# recursion occurs later on, but only if $opt_descend is enabled.
+# As a convenience, always descend one level deep into directories explicitly
+# mentioned on the command-line even if recursion was not requested.  This
+# pre-processing step is skipped if recursion is enabled since the directory
+# contents will be examined later on anyhow; otherwise the contents would be
+# examined twice.
 #------------------------------------------------------------------------------
 sub prescan {
-    my ($path, @paths) = ('', ());
-    foreach $path (@main::paths) {
-	push(@paths, scandir($path)) if -d $path;
+    if (!$main::opt_descend) {
+	my ($path, @paths) = ('', ());
+	foreach $path (@main::paths) {
+	    push(@paths, scandir($path)) if -d $path;
+	}
+	push(@main::paths, @paths);
     }
-    @main::paths = @paths;
 }
 
 #------------------------------------------------------------------------------
@@ -213,9 +247,9 @@ sub load_file {
     my $content = '';
     my $size = -s $path;
     if ($size) {
-	open(FILE, "<$path") or die "Unable to open $path: $!";
+	open(FILE, "<$path") or fatal("Unable to open $path: $!");
 	read(FILE, $content, $size) == $size
-	    or die "Failed to read all $size bytes of $path: $!";
+	    or fatal("Failed to read all $size bytes of $path: $!");
 	close(FILE);
     }
     return $content;
@@ -226,7 +260,7 @@ sub load_file {
 #------------------------------------------------------------------------------
 sub save_file {
     my ($path, $content) = @_;
-    open (FILE, ">$path") or die "Unable to open $path: $!";
+    open (FILE, ">$path") or fatal("Unable to create $path: $!");
     print FILE $content if length($content);
     close(FILE);
 }
@@ -238,7 +272,7 @@ sub rename_file {
     my ($oldpath, $newpath) = @_;
     unlink($newpath) if -e $newpath;
     rename($oldpath, $newpath)
-	or die "Failed to rename $oldpath to $newpath: $!";
+	or fatal("Failed to rename $oldpath to $newpath: $!");
 }
 
 #------------------------------------------------------------------------------
@@ -250,47 +284,60 @@ sub should_ignore {
     my $ignore = !match_accept($name) || match_ignore($name);
     if ($ignore) {
 	$main::total_files_ignored++;
-	print "Ignored: $path\n" if $main::opt_verbose;
+	print "Ignored: $path\n" if verbose();
     }
     return $ignore;
 }
 
 #------------------------------------------------------------------------------
-# Process a single file.
+# Process a path rename operation.
 #------------------------------------------------------------------------------
-sub process_file {
+sub process_rename {
+    my ($oldpath, $newpath) = @_;
+    rename_file($oldpath, $newpath) unless $main::opt_test;
+    print "Renamed: $newpath (was ", basename($oldpath), ")\n" if verbose();
+}
+
+#------------------------------------------------------------------------------
+# Process a single path.
+#------------------------------------------------------------------------------
+sub process_path {
     my $path = shift;
     $path =~ s:^\./::;	# Strip leading "./".
     $main::total_files++;
     return if should_ignore($path);
     my ($name, $dir) = fileparse($path);
-    $dir = '' if $dir eq '.';
+    $dir = '' if $dir =~ m:\./?$:;
     my $newname = $name;
     my $renamed = apply_rename($newname);
     my $newpath = "$dir$newname";
     $main::total_files_renamed++ if $renamed;
 
-    my $content = load_file($path);
-    my $edits = apply_edits($content);
-
-    if ($edits) {
-	$main::total_files_edited++;
-	$main::total_edits += $edits;
-	unless ($main::opt_test) {
-	    my $backuppath = "$path.save";
-	    rename_file($path, $backuppath) unless $renamed;
-	    save_file($newpath, $content);
-	    unlink($renamed ? $path : $backuppath);
-	}
-	print "Changed: $dir$newname [$edits edits]",
-	    ($renamed ? " (was $name)" : ''), "\n" if $main::opt_verbose;
-    }
-    elsif ($renamed) {
-	rename_file($path, $newpath) unless $main::opt_test;
-	print "Renamed: $dir$newname (was $name)\n" if $main::opt_verbose;
+    if (-d $path) {
+	process_rename($path, $newpath) if $renamed;
     }
     else {
-	print "Studied: $dir$newname (no changes)\n" if $main::opt_verbose;
+	my $content = load_file($path);
+	my $edits = apply_edits($content);
+    
+	if ($edits) {
+	    $main::total_files_edited++;
+	    $main::total_edits += $edits;
+	    unless ($main::opt_test) {
+		my $backuppath = "$path.save";
+		rename_file($path, $backuppath) unless $renamed;
+		save_file($newpath, $content);
+		unlink($renamed ? $path : $backuppath);
+	    }
+	    print "Changed: $newpath [$edits edits]",
+		($renamed ? " (was $name)" : ''), "\n" if verbose();
+	}
+	elsif ($renamed) {
+	    process_rename($path, $newpath);
+	}
+	else {
+	    print "Studied: $newpath (no changes)\n" if verbose();
+	}
     }
 }
 
@@ -299,17 +346,13 @@ sub process_file {
 #------------------------------------------------------------------------------
 sub process {
     prescan();
-    print_title("Processing") if $main::opt_verbose;
+    print_title("Processing") if verbose();
     while (@main::paths) {
 	my $path = shift @main::paths;
-	if (-d $path) {
-	    push(@main::paths, scandir($path)) if $main::opt_descend;
-	}
-	else {
-	    process_file($path);
-	}
+	process_path($path);
+	push(@main::paths, scandir($path)) if $main::opt_descend and -d $path;
     }
-    print "\n" if $main::opt_verbose;
+    print "\n" if verbose();
 }
 
 #------------------------------------------------------------------------------
@@ -399,6 +442,10 @@ Options:
                  s///, tr///, or y/// may be used.  The standard pattern
                  modifiers can be specified.  Unlike edit patterns, the 'g'
                  modifier is not automatically assumed for s/// operations.
+                 As a convencience, the patterns `old=new' and `old:new' are
+                 automatically converted to `s/\\.old\$/\\.new/' to simplify
+                 the task of changing a filename's suffix since this is such
+                 a common procedure.
     -a <pattern>
     --accept=<pattern>
                  Specifies a Perl regular-expression used as a filename
@@ -421,6 +468,8 @@ Options:
                  negated with --nodescend.  Default is --nodescend.
     -v --verbose Emit informational messages about the processing.  Can be
                  negated with --noverbose.  Deafult is --noverbose.
+    -q --quiet   Suppress all output except for error messages.  Can be
+                 negated with --noquiet.  Default is --noquiet.
     -t --test    Perform all edits but do not actually modify any files.  Can
                  be negated with --notest.  Default is --notest.
     -V --version Display the version number of $PROG_NAME.
@@ -438,10 +487,13 @@ sub process_options {
     usage_error("Must specify at least one input file.") if @ARGV == 0;
     usage_error("Must specify at least one edit or rename pattern.")
 	unless (@main::opt_rename or @main::opt_edit);
-    print "\n$PROG_NAME version $PROG_VERSION\n$COPYRIGHT\n\n";
-    print "Non-destructive testing mode enabled.\n\n" if $main::opt_test;
-    $main::opt_verbose = 1 if $main::opt_v;
+    $main::verbosity =  1 if $main::opt_verbose or $main::opt_v;
+    $main::verbosity = -1 if $main::opt_quiet;
     @main::paths = @ARGV;
+    if (!quiet()) {
+	banner();
+	print "Non-destructive testing mode enabled.\n\n" if $main::opt_test;
+    }
 }
 
 sub print_version {
@@ -465,8 +517,9 @@ sub usage_error {
 # Perform the complete repair process.
 #------------------------------------------------------------------------------
 process_options();
+process_aliases();
 normalize();
-summarize_options();
+summarize_options() unless quiet();
 compile();
 process();
-summarize_edits();
+summarize_edits() unless quiet();

@@ -3,21 +3,35 @@ The history order has been reversed so that new features are at the top.
 27-Oct-2000
 	- Added GetSector(idx) to the swig interface file (cs.i) so that
 	  Python scripts can use it.
+	- Eric Sunshine made the following changes to efed.pl:
+	    - Fixed bug: Was ignoring files mentioned on the command-line and
+	      only processing directories.
+	    - Addressed shortcoming: Was not applying --rename patterns to
+	      directory names.
+	    - Added filename suffix convenience to --rename.  Now
+	      automatically translates 'old=new' or 'old:new' to the
+	      expression 's/\.old$/\.new/' to change the filename's suffix
+	      from '.old' to '.new'.
+	    - Added --quiet option.
+	    - Worked around differences between Perl versions in
+	      File::Basename::fileparse().  Some versions return the directory
+	      portion of a path as '.', whereas others return './' for a path
+	      containing only a filename.
 26-Oct-2000
-	- Norman Kramer added suggestsize to inputline and listbox in CSWS.
-	- Norman also fixed disappearing elements in gridbaglayout.
-	- Norman uses the original size of the component and not the one
-	  after last resize.
+	- Norman Kramer made these changes to the CSWS layout managers:
+	    - Added suggestsize to inputline and listbox.
+	    - Fixed disappearing elements in gridbaglayout.
+	    - Now uses the original size of the component and not the one
+	      after last resize.
 25-Oct-2000
-	- Brandon Ehle turned off console printing for the python
-	  script plugin.
+	- Brandon Ehle disabled console printing for the python script plugin.
 24-Oct-2000
 	- Philip Wyett eliminated a compiler warning in
 	  csFlowLayout::SuggestSize().
 	- Andrew Zabolotny did the following change:
-	    Made the csArchive::Write() method a lot faster in the case
+	    Made the csArchive::Write() method a lot faster in the case when
 	    you did not specify the max file size when you opened the
-	    file for writing by the following means:
+	    file for writing, by the following means:
 		- The buffer size is increased in 1K blocks rather than
 		  adding just the size of appended block. This means the
 		  memory will be allocated just once per many calls (in the
@@ -26,8 +40,8 @@ The history order has been reversed so that new features are at the top.
 		- Using realloc() instead of new[] and memcpy() which also
 		  should increase the speed a lot on platforms with properly
 		  implemented realloc().
-	    Now writing files into archives in small chunks (e.g. PVS)
-	    should work a lot faster (same speed as csMemFile).
+	    Now writing files into archives in small chunks (e.g. PVS) should
+	    work a lot faster (same speed as csMemFile).
 23-Oct-2000
 	- Norman Kramer added various layout managers for CSWS.
 	- Norman Kramer added an example for the layoutmanager to cswstest.
@@ -35,8 +49,8 @@ The history order has been reversed so that new features are at the top.
 	- Andrew Zabolotny reverted his previous change to vfs.mak. Instead
 	  he has fixed win32gcc.mak. DO.SHARED.PLUGIN should contain
 	  a reference to $(LIBS). This was not the case for win32gcc.
-	- Andrew also fixed the dependency file name from "waveout.dep" to
-	  "wos.dep".
+	- Andrew Zabolotny fixed the dependency file name from "waveout.dep"
+	  to "wos.dep".
 	- Set minimum canvas size for X to 32x32 instead of 320x200.
 	- Eric Sunshine made the following changes to the installation target:
 	    - csengine.mak is no longer responsible for vfs.cfg and scf.cfg.
