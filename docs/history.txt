@@ -23,6 +23,8 @@ The history order is reversed so that new features are at the top.
 		RegisterPlugIn -> RegisterPlugin
 		GetPlugIn -> GetPlugin
 		GetPlugInCount -> GetPluginCount
+		csPlugInsVector -> csPluginVector
+		iSaverPlugIn -> iSaverPlugin
 	  This change is a change of PlugIn for Plugin in
 	  all instances inside the libs, plugins and apps.
 2-Jul-2001
