@@ -62,7 +62,7 @@ void sys_fatalerror(char *str, HRESULT hRes = S_OK)
 
 /////The 2D Graphics Driver//////////////
 
-/*
+
 IMPLEMENT_FACTORY (csGraphics2DDDraw3)
 
 EXPORT_CLASS_TABLE (ddraw)
@@ -71,7 +71,7 @@ EXPORT_CLASS_TABLE (ddraw)
   EXPORT_CLASS (csGraphics2DDDraw3, "crystalspace.graphics2d.direct3d.dx5",
     "DirectDraw DX5 2D graphics driver for Crystal Space")
 EXPORT_CLASS_TABLE_END
-*/
+
 
 IMPLEMENT_IBASE (csGraphics2DDDraw3)
   IMPLEMENTS_INTERFACE (iPlugIn)
@@ -168,7 +168,8 @@ void CreateIdentityPalette(RGBpaletteEntry *p)
 extern DirectDetection DDetection;
 extern DirectDetectionDevice * DirectDevice;
 
-csGraphics2DDDraw3::csGraphics2DDDraw3(iSystem* piSystem, bool bUses3D) : 
+				       //iSystem* piSystem, bool bUses3D) : 
+csGraphics2DDDraw3::csGraphics2DDDraw3(iBase *iParent) :
   csGraphics2D (),
   m_hWnd(NULL),
   m_bDisableDoubleBuffer(false),
@@ -182,10 +183,10 @@ csGraphics2DDDraw3::csGraphics2DDDraw3(iSystem* piSystem, bool bUses3D) :
   m_nActivePage(0),
   m_nGraphicsReady(true),
   m_bLocked(false),
-  m_piWin32System(NULL),
-  m_bUses3D(bUses3D)
+  m_piWin32System(NULL)
+  //m_bUses3D(bUses3D)
 {
-  CONSTRUCT_IBASE (piSystem);
+  CONSTRUCT_IBASE (iParent);
 
   HRESULT ddrval;
 

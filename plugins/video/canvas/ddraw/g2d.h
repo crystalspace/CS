@@ -31,7 +31,9 @@ class csGraphics2DDDraw3 : public csGraphics2D, public iGraphics2DDDraw3
 public:
   DECLARE_IBASE;
 
-  csGraphics2DDDraw3(iSystem* piSystem, bool bUses3D=false);
+  csGraphics2DDDraw3(iBase *iParent);
+  // Uses3D is currently not specified
+  // virtual init(iSystem* piSystem, bool bUses3D=false);
   virtual ~csGraphics2DDDraw3(void);
   
   virtual bool Open (const char *Title);
