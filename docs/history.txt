@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+10-Jul-2004
+	- res fixed the Win32 manifest resource generation code to not emit
+	  non-numerical characters when writing the version number - Windows
+	  doesn't like non-numerical characters. Note: Not needed for CS
+	  itself, but external projects may have versions with alphabetical
+	  characters.
 9-Jul-2004
 	- Jorrit fixed the engine so that before removing a sector, all
 	  objects in that sector are unlinked from it. Added an
