@@ -378,6 +378,12 @@ void csGenmeshMeshObject::StaticLightChanged (iStatLight* statlight)
   lighting_dirty = true;
 }
 
+void csGenmeshMeshObject::StaticLightDisconnect (iStatLight* statlight)
+{
+  affecting_lights.Delete (statlight->QueryLight ());
+  lighting_dirty = true;
+}
+
 void csGenmeshMeshObject::AppendShadows (iMovable* movable,
 	iShadowBlockList* shadows, const csVector3& origin)
 {

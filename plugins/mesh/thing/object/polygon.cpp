@@ -1205,6 +1205,10 @@ void csPolygon3D::DynamicLightDisconnect (iDynLight* dynlight)
   }
 }
 
+void csPolygon3D::StaticLightDisconnect (iStatLight* statlight)
+{
+}
+
 void csPolygon3D::UnlinkLightpatch (csLightPatch *lp)
 {
   lp->RemoveList (lightpatches);

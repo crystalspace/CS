@@ -1175,6 +1175,24 @@ void csEngine::ForceRelight (iStatLight* light, iRegion* region)
 
 void csEngine::RemoveLight (iStatLight* light)
 {
+#ifndef CS_USE_NEW_RENDERER
+  G3D->ClearCache ();
+#endif // CS_USE_NEW_RENDERER
+
+  int sn;
+  int num_meshes = meshes.GetCount ();
+
+  for (sn = 0; sn < num_meshes; sn++)
+  {
+    iMeshWrapper *s = meshes.Get (sn);
+    iLightingInfo* linfo = s->GetLightingInfo ();
+    if (linfo)
+    {
+      linfo->StaticLightDisconnect (light);
+    }
+  }
+  light->QueryLight ()->GetSector ()->GetLights ()
+  	->Remove (light->QueryLight ());
 }
 
 void csEngine::SetCacheManager (iCacheManager* cache_mgr)

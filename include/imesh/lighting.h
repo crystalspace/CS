@@ -25,7 +25,7 @@ struct iCacheManager;
 struct iDynLight;
 struct iStatLight;
 
-SCF_VERSION (iLightingInfo, 0, 1, 5);
+SCF_VERSION (iLightingInfo, 0, 2, 0);
 
 /**
  * This interface is implemented by mesh objects that have some kind
@@ -88,6 +88,11 @@ struct iLightingInfo : public iBase
    * Indicate that some pseudo-dynamic light has changed color.
    */
   virtual void StaticLightChanged (iStatLight* statlight) = 0;
+
+  /**
+   * Indicate that some pseudo-dynamic light no longer affects this mesh.
+   */
+  virtual void StaticLightDisconnect (iStatLight* statlight) = 0;
 };
 
 #endif // __CS_IMESH_LIGHTING_H__

@@ -43,6 +43,7 @@ struct iMaterialHandle;
 struct iMaterialWrapper;
 struct iCacheManager;
 struct iDynLight;
+struct iStatLight;
 struct iCamera;
 
 /**
@@ -198,6 +199,8 @@ public:
 
   /// @@@
   void DynamicLightDisconnect (iDynLight* dynlight);
+  /// @@@
+  void StaticLightDisconnect (iStatLight* statlight);
   /// Add a lightpatch to this curves list of light patches
   void AddLightPatch (csBezierLightPatch* lp);
   /// Remove a lightpatch from this curves list

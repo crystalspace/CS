@@ -909,6 +909,12 @@ public:
   void DynamicLightDisconnect (iDynLight* dynlight);
 
   /**
+   * Disconnect a static light from this polygon.
+   * Only works for pseudo-dynamic lights.
+   */
+  void StaticLightDisconnect (iStatLight* statlight);
+
+  /**
    * Unlink a light patch from the light patch list.
    * Warning! This function does not test if the light patch
    * is really on the list!

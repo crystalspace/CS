@@ -295,6 +295,17 @@ void csBezierMesh::StaticLightChanged (iStatLight* /*statlight*/)
   MarkLightmapsDirty ();
 }
 
+void csBezierMesh::StaticLightDisconnect (iStatLight* statlight)
+{
+  MarkLightmapsDirty ();
+  int i;
+  for (i = 0; i < curves.Length (); i++)
+  {
+    csCurve *c = GetCurve (i);
+    c->StaticLightDisconnect (statlight);
+  }
+}
+
 void csBezierMesh::WorUpdate ()
 {
   if (cached_movable && cached_movable->GetUpdateNumber () != movablenr)

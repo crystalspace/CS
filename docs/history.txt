@@ -36,6 +36,12 @@ The history order is reversed so that new features are at the top.
 	  telling the lighting sub-system if the lighting information should
 	  be cleared or not. This allows correct handling when a single light
 	  is added in case of genmesh and bezier curves.
+	- Jorrit added iLightingInfo->StaticLightDisconnect() so that a light
+	  can be removed.
+	- Jorrit implemented iEngine->RemoveLight(). However since none
+	  of the mesh objects correctly implement StaticLightDisconnect()
+	  the function will not actually work even though it is fully
+	  bugfree :-)
 	- Eric Sunshine augmented the Jam system so that it now builds the
 	  new renderer if --enable-new-renderer was specified with configure.
 12-Jun-2003

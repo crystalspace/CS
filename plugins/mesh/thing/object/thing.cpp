@@ -954,6 +954,17 @@ void csThing::StaticLightChanged (iStatLight* /*statlight*/)
   MarkLightmapsDirty ();
 }
 
+void csThing::StaticLightDisconnect (iStatLight* statlight)
+{
+  MarkLightmapsDirty ();
+  int i;
+  for (i = 0 ; i < polygons.Length () ; i++)
+  {
+    csPolygon3D *p = GetPolygon3D (i);
+    p->StaticLightDisconnect (statlight);
+  }
+}
+
 void csThing::SetMovingOption (int opt)
 {
   cfg_moving = opt;

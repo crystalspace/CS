@@ -233,6 +233,10 @@ void csCurve::DynamicLightDisconnect (iDynLight* dynlight)
   }
 }
 
+void csCurve::StaticLightDisconnect (iStatLight* statlight)
+{
+}
+
 void csCurve::AddLightPatch (csBezierLightPatch *lp)
 {
   lp->AddList (LightPatches);
