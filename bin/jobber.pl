@@ -192,7 +192,7 @@ my $PUBLIC_DOC_DIR = '/home/groups/c/cr/crystal/htdocs/docs';
 my $BROWSEABLE_DIR = "$PUBLIC_DOC_DIR/online";
 my $PACKAGE_DIR = "$PUBLIC_DOC_DIR/download";
 my $OWNER_GROUP = 'crystal';
-my $TEMPDIR = '/tmp';
+my $TEMPDIR = '/home/groups/c/cr/crystal';
 my @BINARY = ('(?i)\.(dsw|dsp)$');
 
 my @TARGETS =

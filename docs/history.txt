@@ -3,6 +3,12 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+5-May-2003
+	- Eric Sunshine changed jobber.pl and snapshot.py to once again use
+	  /home/groups/c/cr/crystal as a working area rather than /tmp.  It
+	  seems that the snapshot script runs out of disk space when using
+	  /tmp on shell1.sourceforge.net even though there appears to be
+	  nearly 0.5GB available.
 4-May-2003
 	- Eric Sunshine made the following changes:
 	    - Updated Swig test in configure.ac to utilize new optional version
@@ -56,14 +62,15 @@ The history order is reversed so that new features are at the top.
 	      fail when executed from cron (though not when run from an
 	      interactive shell session).
 	- res added a prototype for csGetPlatformConfig() to cssys/sysfunc.h.
-	  This can be used to retrieve a platform-specific configuration storage
-	  facility, intended for user-set settings/setting changed at runtime.
+	  This can be used to retrieve a platform-specific configuration
+	  storage facility, intended for user-set settings/setting changed at
+	  runtime.
 	- res implemented csGetPlatformConfig() for Win32. The implementation 
 	  uses the registry.
 	- res also changed RegCreateKey() to RegOpenKeyEx() in instpath.cpp.
-	  RegCreateKey() is not only deprecated, but it also creates a registry
-	  key if needed, which is unnecessary as we just want to read something
-	  there.
+	  RegCreateKey() is not only deprecated, but it also creates a
+	  registry key if needed, which is unnecessary as we just want to read
+	  something there.
 3-May-2003
 	- Matze changed -Wno-unused-function and -Wno-unused-label flags to
 	  -Wno-unused in aws Jamfile. Seems gcc2.9x doesn't like the first 2
