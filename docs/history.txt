@@ -42,6 +42,10 @@ The history order is reversed so that new features are at the top.
 	    - Added a new compile group 'walkall'.
 	    - Added a Jamfile for partedit.
 	- Eric Sunshine corrected `hbox' warnings reported by TeX.
+	- res fixed a problem with the C compiler flags for the VC project 
+	  cflags when using the FreeType2 external lib. The "/I" command line 
+	  parameter was errorneously treated like a path to a file. Luckily 
+	  the MSC compiler also accepts "-I" style parameters.
 21-Jul-2003
 	- Oktal added missing doxygen comment at the top of csSymbolTable.
         - Philip Wyett removed CVS conflict data from gl_render3d.cpp.
