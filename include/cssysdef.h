@@ -699,7 +699,8 @@ extern void* operator new[] (size_t s, void* filename, int line);
 // Use fast csQint and csQround on CPUs that are known to support it
 #if !defined (CS_NO_IEEE_OPTIMIZATIONS)
 #  if !defined (CS_IEEE_DOUBLE_FORMAT)
-#    if defined (CS_PROCESSOR_X86) || defined (CS_PROCESSOR_M68K)
+#    if (CS_PROCESSOR_SIZE == 32) && \
+        (defined (CS_PROCESSOR_X86) || defined (CS_PROCESSOR_M68K))
 #      define CS_IEEE_DOUBLE_FORMAT
 #    endif
 #  endif

@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+22-Feb-2005
+	- Eric Sunshine disabled CS_IEEE_DOUBLE_FORMAT for 64-bit Intel style
+	  platforms. This works around problem where csQint() failed on such
+	  platforms.
 21-Feb-2005
 	- res tweaked the VC7 project files to disable manifest generation on
 	  VC8 (yay forward compatibility).
