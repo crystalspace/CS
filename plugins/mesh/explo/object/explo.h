@@ -50,7 +50,7 @@ protected:
   int amt;
 
   csVector3 push;
-  int number, nr_sides;
+  int nr_sides;
   float part_radius;
   bool lighted_particles;
   float spread_pos;
@@ -74,12 +74,10 @@ public:
   virtual ~csExploMeshObject ();
 
   /// Set the number of particles to use.
-  void SetParticleCount (int num)
+  virtual void SetParticleCount (int num)
   {
-    initialized = false;
-    number = num;
+    csParticleSystem::SetParticleCount (num);
     SetCount (number);
-    scfiObjectModel.ShapeChanged ();
   }
   /// Get the number of particles
   int GetParticleCount () const {return number;}

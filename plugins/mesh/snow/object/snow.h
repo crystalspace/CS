@@ -39,11 +39,9 @@ class csSnowMeshObject : public csParticleSystem
 protected:
   csBox3 rainbox;
   csVector3 rain_dir;
-  csVector3 *part_pos;
   csVector3 *part_speed;
   float swirl_amount;
   float drop_width, drop_height;
-  int number;
 
   bool lighted_particles;
 
@@ -68,16 +66,6 @@ public:
   /// Destructor.
   virtual ~csSnowMeshObject ();
 
-  /// Set the number of particles to use.
-  void SetParticleCount (int num)
-  {
-    initialized = false;
-    number = num;
-    scfiObjectModel.ShapeChanged ();
-  }
-  /// Get the number of particles used.
-  int GetParticleCount () const
-  { return number; }
   /// Set the size of the drops.
   void SetDropSize (float dropwidth, float dropheight)
   {

@@ -73,6 +73,7 @@ void csFireMeshObject::SetupObject ()
 {
   if (!initialized)
   {
+    csParticleSystem::SetupObject ();
     initialized = true;
     RemoveParticles ();
     delete[] part_pos;

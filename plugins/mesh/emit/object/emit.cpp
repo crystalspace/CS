@@ -594,6 +594,7 @@ void csEmitMeshObject::SetupObject ()
 {
   if (!initialized)
   {
+    csParticleSystem::SetupObject ();
     initialized = true;
     RemoveParticles ();
     delete[] ages;

@@ -27,12 +27,15 @@
 #include "iengine/mesh.h"
 #include "iengine/rview.h"
 #include "iengine/camera.h"
+#include "iengine/material.h"
 #include "iutil/plugin.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/objreg.h"
+#include "iutil/strset.h"
 #include "imesh/sprite2d.h"
 #include "iengine/movable.h"
-#include "iutil/objreg.h"
+#include "ivideo/rendermesh.h"
 #include <math.h>
 #include <stdlib.h>
 
@@ -51,16 +54,15 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csParticleSystem::ParticleState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csParticleSystem::csParticleSystem (iObjectRegistry* object_reg,
-				    iMeshObjectFactory* factory) : 
-  rmHolder(false)
+				    iMeshObjectFactory* factory) 
 {
   SCF_CONSTRUCT_IBASE (factory);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiParticleState);
   initialized = false;
   csParticleSystem::factory = factory;
+  csParticleSystem::object_reg = object_reg;
   logparent = 0;
-  particles.SetLength (0);
   self_destruct = false;
   time_to_live = 0;
   // defaults
@@ -89,10 +91,29 @@ csParticleSystem::csParticleSystem (iObjectRegistry* object_reg,
   csRef<iEngine> eng = CS_QUERY_REGISTRY (object_reg, iEngine);
   engine = eng;	// We don't want to keep a reference.
   light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
+
+#ifdef CS_USE_NEW_RENDERER 
+  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+
+  vertices = 0;
+  texels = 0;
+  triangles = 0;
+  colors = 0;
+  part_sides = 0;
+
+  svcontext.AttachNew (new csShaderVariableContext);
+#endif
 }
 
 csParticleSystem::~csParticleSystem()
 {
+#ifdef CS_USE_NEW_RENDERER 
+  delete[] vertices;
+  delete[] texels;
+  delete[] triangles;
+  delete[] colors;
+#endif
+
   if (vis_cb) vis_cb->DecRef ();
   RemoveParticles ();
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
@@ -100,12 +121,96 @@ csParticleSystem::~csParticleSystem()
   SCF_DESTRUCT_IBASE ();
 }
 
+void csParticleSystem::SetupObject ()
+{
+#ifdef CS_USE_NEW_RENDERER
+  if (!initialized)
+  {
+    part_sides = 0;
+  }
+#endif
+}
+
+#ifdef CS_USE_NEW_RENDERER
+void csParticleSystem::SetupBuffers (int part_sides)
+{
+  if (csParticleSystem::part_sides == part_sides) return;
+  csParticleSystem::part_sides = part_sides;
+
+  VertexCount = number * part_sides;
+  TriangleCount = number * (part_sides-2);
+
+  delete[] texels;
+  texels = new csVector2 [VertexCount];
+  delete[] triangles;
+  triangles = new csTriangle [TriangleCount];
+  delete[] colors;
+  colors = new csColor [VertexCount];
+  delete[] vertices;
+  vertices = new csVector3 [VertexCount];
+
+  int i;
+  csTriangle* tri = triangles;
+  for (i = 0 ; i < number ; i++)
+  {
+    // fill the triangle table
+    int j;
+    for (j = 2 ; j < part_sides ; j++)
+    {
+      *tri++ = csTriangle (i*part_sides+0, i*part_sides+j-1, i*part_sides+j);
+    }
+  }
+
+  csStringID vertex_name, texel_name, normal_name, color_name, index_name;
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
+	"crystalspace.shared.stringset", iStringSet);
+  vertex_name = strings->Request ("vertices");
+  texel_name = strings->Request ("texture coordinates");
+  normal_name = strings->Request ("normals");
+  color_name = strings->Request ("colors");
+  index_name = strings->Request ("indices");
+
+  vertex_buffer = g3d->CreateRenderBuffer (
+        sizeof (csVector3)*VertexCount, CS_BUF_STATIC, 
+        CS_BUFCOMP_FLOAT, 3, false);
+  texel_buffer = g3d->CreateRenderBuffer (
+        sizeof (csVector2)*VertexCount, CS_BUF_STATIC, 
+        CS_BUFCOMP_FLOAT, 2, false);
+#if 0
+  normal_buffer = g3d->CreateRenderBuffer (
+        sizeof (csVector3)*VertexCount, CS_BUF_STATIC,
+        CS_BUFCOMP_FLOAT, 3, false);
+#endif
+  color_buffer = g3d->CreateRenderBuffer (
+        sizeof (csColor)*VertexCount, CS_BUF_STATIC,
+        CS_BUFCOMP_FLOAT, 3, false);
+  index_buffer = g3d->CreateRenderBuffer (
+        sizeof (unsigned int)*TriangleCount*3, CS_BUF_STATIC,
+        CS_BUFCOMP_UNSIGNED_INT, 1, true);
+  csShaderVariable *sv;
+  sv = svcontext->GetVariableAdd (vertex_name);
+  sv->SetValue (vertex_buffer);
+  sv = svcontext->GetVariableAdd (texel_name);
+  sv->SetValue (texel_buffer);
+#if 0
+  sv = svcontext->GetVariableAdd (normal_name);
+  sv->SetValue (normal_buffer);
+#endif
+  sv = svcontext->GetVariableAdd (color_name);
+  sv->SetValue (color_buffer);
+  sv = svcontext->GetVariableAdd (index_name);
+  sv->SetValue (index_buffer);
+}
+#endif
+
 void csParticleSystem::RemoveParticles ()
 {
   if (particles.Length () <= 0) return;
 
   particles.DeleteAll ();
+  sprite2ds.DeleteAll ();
   scfiObjectModel.ShapeChanged ();
+  initialized = false;
 }
 
 void csParticleSystem::AppendRectSprite (float width, float height,
@@ -128,7 +233,7 @@ void csParticleSystem::AppendRectSprite (float width, float height,
   state->SetLighting (lighted);
   part->SetColor (csColor (1.0, 1.0, 1.0));
   state->SetMaterialWrapper (mat);
-  AppendParticle (part);
+  AppendParticle (part, state);
   scfiObjectModel.ShapeChanged ();
 }
 
@@ -145,7 +250,7 @@ void csParticleSystem::AppendRegularSprite (int n, float radius,
   state->SetLighting (lighted);
   part->SetColor (csColor (1.0, 1.0, 1.0));
 
-  AppendParticle (part);
+  AppendParticle (part, state);
   scfiObjectModel.ShapeChanged ();
 }
 
@@ -265,26 +370,72 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
     return 0;
   }
 
-  csDirtyAccessArray<csRenderMesh*>& meshes = 
-    rmHolder.GetUnusedMeshes (rview->GetCurrentFrameNumber ());
-  meshes.Empty();
+  int ClipPortal, ClipPlane, ClipZ;
+  rview->CalculateClipSettings (frustum_mask, ClipPortal, ClipPlane, ClipZ);
 
-  for (int i = 0 ; i < particles.Length() ; i++)
+  // get the object-to-camera transformation
+  iCamera *camera = rview->GetCamera ();
+  csReversibleTransform trans = camera->GetTransform ();
+  if (!movable->IsFullTransformIdentity ())
+    trans /= movable->GetFullTransform ();
+
+  SetupBuffers (sprite2ds[0]->GetVertices ().Length ());
+
+  int i;
+  csColor* c = colors;
+  csVector3* vt = vertices;
+  csVector2* txt = texels;
+  for (i = 0 ; i < sprite2ds.Length () ; i++)
   {
-    int partMeshNum;
-    csRenderMesh** partMeshes = 
-      GetParticle (i)->GetRenderMeshes (partMeshNum, rview, movable,
-      	frustum_mask);
+    csColoredVertices& sprvt = sprite2ds[i]->GetVertices ();
+    // transform to eye coordinates
+    csVector3 pos = trans.Other2This (particles[i]->GetPosition ());
 
-    if (partMeshes != 0)
+    int j;
+    for (j = 0 ; j < part_sides ; j++)
     {
-      while (partMeshNum-- > 0)
-	meshes.Push (partMeshes[partMeshNum]);
+      *vt++ = pos + csVector3 (sprvt[j].pos.x, sprvt[j].pos.y, 0);
+      *c++ = sprvt[j].color;
+      (*txt++).Set (sprvt[j].u, sprvt[j].v);
     }
   }
 
-  n = meshes.Length();
-  return meshes.GetArray();
+  iMaterialWrapper* m = sprite2ds[0]->GetMaterialWrapper ();
+  m->Visit ();
+
+  vertex_buffer->CopyToBuffer (vertices, sizeof (csVector3) * VertexCount);
+  texel_buffer->CopyToBuffer (texels, sizeof (csVector2) * VertexCount);
+  color_buffer->CopyToBuffer (colors, sizeof (csColor) * VertexCount);
+  index_buffer->CopyToBuffer (triangles,
+      	sizeof (unsigned int) * TriangleCount *3);
+
+  bool meshCreated;
+  csRenderMesh*& rm = rmHolder.GetUnusedMesh (meshCreated, 
+    rview->GetCurrentFrameNumber ());
+
+  if (meshCreated)
+  {
+    rm->variablecontext = svcontext;
+  }
+
+  // Prepare for rendering.
+  rm->mixmode = sprite2ds[0]->GetMixMode ();
+  rm->clip_portal = ClipPortal;
+  rm->clip_plane = ClipPlane;
+  rm->clip_z_plane = ClipZ;
+  rm->do_mirror = false/* camera->IsMirrored () */; 
+    /*
+      Force to false as the front-face culling will let the particle 
+      disappear. 
+     */
+  rm->meshtype = CS_MESHTYPE_TRIANGLES;
+  rm->indexstart = 0;
+  rm->indexend = TriangleCount * 3;
+  rm->material = m;
+  rm->object2camera = csReversibleTransform ();
+ 
+  n = 1;
+  return &rm;
 }
 
 bool csParticleSystem::Draw (iRenderView* rview, iMovable* movable,

@@ -19,6 +19,12 @@ chronological order.
 	  out of configure.ac and into the project-agnostic
 	  mk/autoconf/checkpthread.m4 so that it can be used by external
 	  projects.
+	- Jorrit fixed explo, fire, snow, spiral, and emit so that they
+	  now use a single csRenderMesh (if NR is enabled) instead of
+	  one for every particle. In case of a very complex emit particle
+	  system that I tested with this improves performance from 10
+	  to 40 fps! The explo particle systems seems broken though.
+	  I have to investigate that.
 13-May-2004
 	- Eric Sunshine generalized the CS_EMIT_PACKAGEINFO() macro in
 	  packageinfo.m4 so that it can work with any suitable emitter macro,

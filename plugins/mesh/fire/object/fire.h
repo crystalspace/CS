@@ -59,7 +59,6 @@ protected:
   csBox3 origin;
   float swirl;
   float color_scale;
-  csVector3* part_pos;
   csVector3* part_speed;
   float *part_age;
   float total_time;
@@ -67,7 +66,6 @@ protected:
   float time_left; // from previous update
   int next_oldest;
 
-  int number;
   float drop_width, drop_height;
   bool lighted_particles;
 
@@ -106,15 +104,6 @@ public:
    */
   void AddLight (iEngine*, iSector*);
 
-  /// Set the number of particles to use.
-  void SetParticleCount (int num)
-  {
-    initialized = false;
-    number = num;
-    scfiObjectModel.ShapeChanged ();
-  }
-  /// Get the number of particles.
-  int GetParticleCount () const { return number; }
   /// Set the size of the fire drops.
   void SetDropSize (float dropwidth, float dropheight)
   {

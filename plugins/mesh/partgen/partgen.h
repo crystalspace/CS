@@ -30,7 +30,9 @@
 #include "imesh/object.h"
 #include "imesh/partsys.h"
 #include "imesh/particle.h"
+#include "imesh/sprite2d.h"
 #include "iengine/lightmgr.h"
+#include "csgfx/shadervarcontext.h"
 
 struct iMeshObjectFactory;
 struct iMaterialWrapper;
@@ -48,6 +50,7 @@ struct iMeshWrapper;
 class csParticleSystem : public iMeshObject
 {
 protected:
+  iObjectRegistry* object_reg;
   iMeshObjectFactory* factory;
   iBase* logparent;
   iEngine* engine;
@@ -55,6 +58,7 @@ protected:
   /// Object space radius.
   csVector3 radius;
   /// iParticle ptrs to the particles.
+  csRefArray<iSprite2DState> sprite2ds;
   csRefArray<iParticle> particles;
   /// Self destruct and when.
   bool self_destruct;
@@ -90,11 +94,45 @@ protected:
 
   csFlags flags;
 
-  csRenderMeshHolderMultiple rmHolder;
+  // Number of particles.
+  int number;
+  /// particle position
+  csVector3 *part_pos;
+
+  csRenderMeshHolderSingle rmHolder;
+
+#ifdef CS_USE_NEW_RENDERER
+  csRef<csShaderVariableContext> svcontext;
+  int VertexCount;
+  int TriangleCount;
+  csVector3* vertices;
+  csTriangle* triangles;
+  csVector2* texels;
+  csColor* colors;
+
+  /// Setup the buffers for the particles.
+  void SetupBuffers (int part_sides);
+  int part_sides;	// Number of vertices per particle (for buffers).
+
+  csRef<iRenderBuffer> vertex_buffer;
+  csRef<iRenderBuffer> texel_buffer;
+  csRef<iRenderBuffer> normal_buffer;
+  csRef<iRenderBuffer> color_buffer;
+  csRef<iRenderBuffer> index_buffer;
+
+  csRef<iGraphics3D> g3d;
+#endif
 
   bool initialized;
-  /// Set up this object.
-  virtual void SetupObject () = 0;
+  /// Setup this object.
+  virtual void SetupObject ();
+
+  // Call if object needs changing.
+  void ChangeObject ()
+  {
+    initialized = false;
+    scfiObjectModel.ShapeChanged ();
+  }
 
 protected:
   /// Helping func. Returns vector of with -1..+1 members. Varying length!
@@ -116,6 +154,15 @@ public:
    */
   virtual ~csParticleSystem ();
 
+  /// Set the number of particles to use.
+  virtual void SetParticleCount (int num)
+  {
+    number = num;
+    ChangeObject ();
+  }
+  /// Get the number of particles
+  int GetParticleCount () const { return number; }
+
   void UpdateLighting (const csArray<iLight*>& lights, iMovable* movable);
 
   /// How many particles the system currently has.
@@ -127,8 +174,11 @@ public:
   void RemoveParticles ();
 
   /// Add a new particle, increases num_particles. Do a DecRef yourself.
-  inline void AppendParticle (iParticle *part)
-  { particles.Push(part); }
+  inline void AppendParticle (iParticle *part, iSprite2DState* spr2d)
+  {
+    sprite2ds.Push (spr2d);
+    particles.Push (part);
+  }
 
   /**
    * Add an rectangle shaped sprite2d particle. Pass along half w and h.

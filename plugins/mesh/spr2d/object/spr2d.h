@@ -283,6 +283,7 @@ public:
   public:
     SCF_DECLARE_EMBEDDED_IBASE (csSprite2DMeshObject);
     virtual void SetPosition (const csVector3& pos) { part_pos = pos; }
+    virtual const csVector3& GetPosition () const { return part_pos; }
     virtual void MovePosition (const csVector3& move) { part_pos += move; }
     virtual void SetColor (const csColor& col);
     virtual void AddColor (const csColor& col);

@@ -203,8 +203,6 @@ public:
 class csEmitMeshObject : public csParticleSystem
 {
 protected:
-  /// number of particles
-  int number;
   ///
   bool lighted_particles;
   /// the start position generator
@@ -238,8 +236,6 @@ protected:
 
   /// the ages (time they lived) of the particles, in msec.
   int* ages;
-  /// particle position
-  csVector3 *part_pos;
   /// particle speed m/s
   csVector3 *part_speed;
   /// particle acceleration m/s*s
@@ -254,13 +250,6 @@ protected:
 
   void SetupObject ();
 
-  // Call if object needs changing.
-  void ChangeObject ()
-  {
-    initialized = false;
-    scfiObjectModel.ShapeChanged ();
-  }
-
 public:
   /**
    */
@@ -268,14 +257,6 @@ public:
   /// Destructor.
   virtual ~csEmitMeshObject ();
 
-  /// Set the number of particles to use.
-  void SetParticleCount (int num)
-  {
-    number = num;
-    ChangeObject ();
-  }
-  /// Get the number of particles
-  int GetParticleCount () const { return number; }
   /// Enable or disable lighting.
   void SetLighting (bool l)
   {

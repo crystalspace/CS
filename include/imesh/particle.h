@@ -44,6 +44,7 @@ struct iParticle : public iBase
    * to the parent particle system.
    */
   virtual void SetPosition (const csVector3& pos) = 0;
+  virtual const csVector3& GetPosition () const = 0;
   /**
    * Move the particle relative to position.
    */

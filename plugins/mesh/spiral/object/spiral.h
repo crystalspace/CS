@@ -35,14 +35,12 @@
 class csSpiralMeshObject : public csParticleSystem
 {
 protected:
-  int number;
   float part_time;
   float time_left; // from previous update
   csVector3 source; // x,y,z
   csVector3 part_source; // cached source: radius, height, angle
   csVector3 part_random; // radius, height, angle
   int last_reuse;
-  csVector3 * part_pos; // pos:   radius, height, angle
   csVector3 part_speed; // speed: radius, height, angle
   float * part_age;
   float part_width, part_height;
@@ -57,16 +55,6 @@ public:
   csSpiralMeshObject (iObjectRegistry* object_reg, iMeshObjectFactory* factory);
   /// Destructor.
   virtual ~csSpiralMeshObject ();
-
-  /// Set the number of particles to use.
-  void SetParticleCount (int num)
-  {
-    initialized = false;
-    number = num;
-    scfiObjectModel.ShapeChanged ();
-  }
-  /// Get the number of particles.
-  int GetParticleCount () const { return number; }
 
   void SetParticleSize (float partwidth, float partheight)
   {
