@@ -285,7 +285,6 @@ char* TextEntryMenu::GetSelectedEntry ()
 }
 
 //-----------------------------------------------------------------------------
-
 Blocks::Blocks ()
 {
   world = NULL;
@@ -3013,8 +3012,17 @@ int main (int argc, char* argv[])
   Sys->world->EnableLightingCache (false);
 
   // Change to virtual directory where Blocks data is stored
-  Sys->VFS->ChDir (Sys->Config->GetStr ("Blocks", "DATA", "/data/blocks"));
+  //if (!)
 
+  csString world_file(Sys->Config->GetStr ("Blocks", "DATA", "/data/blocks"));
+  
+  if (!Sys->VFS->Exists (world_file.GetData()))
+  {
+    Sys->Printf (MSG_FATAL_ERROR, "The directory on VFS (%s) for world file does not exist!\n", world_file.GetData());
+    return -1;
+  }
+
+  Sys->VFS->ChDir (world_file.GetData());
   Sys->ReadConfig ();
   Sys->InitWorld ();
 

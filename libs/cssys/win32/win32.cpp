@@ -131,7 +131,7 @@ DWORD WINAPI s_threadroutine (LPVOID param)
   LPDIRECTINPUTDEVICE lpMouse = NULL; 
 
   HANDLE hEvent [2];
-  HANDLE hevtMouse;
+//  HANDLE hevtMouse;
 
   // Use 0x0300 instead of DIRECTINPUT_VERSION
   // to allow the binaries run under NT4 (which has just DX3)
@@ -377,18 +377,18 @@ IMPLEMENT_IBASE_EXT_END
 SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 {
   WNDCLASS wc;
-  wc.style         = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
-  wc.lpfnWndProc   = WindowProc;
-  //wc.cbClsExtra    = sizeof(HCURSOR);
-	wc.cbClsExtra    = 0;
-  wc.cbWndExtra    = 0;
-  wc.hInstance     = ModuleHandle;
-  wc.hIcon         = LoadIcon( NULL, IDI_APPLICATION );
-  wc.hCursor       = NULL; 
-  wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
-  wc.lpszClassName = WINDOWCLASSNAME;
+  wc.hCursor        = LoadCursor(0, IDC_ARROW);
+  wc.hIcon          = LoadIcon( NULL, IDI_APPLICATION );
+  wc.lpszMenuName   = NULL;
+  wc.lpszClassName  = WINDOWCLASSNAME;
+  wc.hbrBackground  = 0;
+  wc.hInstance      = ModuleHandle;
+  wc.style          = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;;
+  wc.lpfnWndProc    = WindowProc;
+  wc.cbClsExtra     = 0;
+  wc.cbWndExtra     = 0;
 
-  RegisterClass (&wc);
+  ASSERT(RegisterClass (&wc));
 }
 
 bool SysSystemDriver::Open (const char *Title)
