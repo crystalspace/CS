@@ -1,24 +1,24 @@
 # Application description
-DESCRIPTION.nettut = Crystal Space network tutorial
+DESCRIPTION.netut = Crystal Space network tutorial
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
 APPHELP += \
-  $(NEWLINE)echo $"  make nettut     Make the $(DESCRIPTION.nettut)$"
+  $(NEWLINE)echo $"  make netut     Make the $(DESCRIPTION.netut)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: nettut nettutclean
+.PHONY: netut netutclean
 
-all apps: nettut
-nettut:
+all apps: netut
+netut:
 	$(MAKE_TARGET)
-nettutclean:
+netutclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -46,16 +46,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: nettut nettutclean
+.PHONY: netut netutclean
 
 all: $(NETTUT.EXE)
-nettut: $(OUTDIRS) $(NETTUT.EXE)
-clean: nettutclean
+netut: $(OUTDIRS) $(NETTUT.EXE)
+clean: netutclean
 
 $(NETTUT.EXE): $(DEP.EXE) $(OBJ.NETTUT) $(LIB.NETTUT)
 	$(DO.LINK.EXE)
 
-nettutclean:
+netutclean:
 	-$(RM) $(NETTUT.EXE) $(OBJ.NETTUT)
 
 ifdef DO_DEPEND
