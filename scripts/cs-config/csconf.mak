@@ -5,7 +5,7 @@ DESCRIPTION.cs-config = cs-config build options script
 ifeq ($(MAKESECTION),rootdefines)
 
 PSEUDOHELP += \
-  $(NEWLINE)echo $"  make cs-config     Build the $(DESCRIPTION.cs-config)$"
+  $(NEWLINE)echo $"  make cs-config    Build the $(DESCRIPTION.cs-config)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
