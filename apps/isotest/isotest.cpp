@@ -372,7 +372,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   scenelight->SetColor(csColor(0.0, 0.4, 1.0));
 
   /// add maze grid
-  AddMazeGrid(world, 20, 20, math2, math1);
+  //AddMazeGrid(world, 20, 20, math2, math1);
 
   // prepare texture manager
   txtmgr->PrepareTextures ();
@@ -398,13 +398,17 @@ static void AddWall(iIsoEngine *engine, iIsoWorld *world, iIsoGrid *grid,
   iIsoSprite *sprite = 0;
   if(bot != height)
   {
+    height -= bot;
+    height = 1.0;
     sprite = engine->CreateZWallSprite(csVector3(y+offy+0.999,bot,x+offy), 
       1.0, height);
     sprite->SetMaterialWrapper(side);
+    //sprite->SetMixMode( CS_FX_COPY | CS_FX_TILING );
     world->AddSprite(sprite);
     sprite = engine->CreateXWallSprite(csVector3(y+offy,bot,x+offy), 
       1.0, height);
     sprite->SetMaterialWrapper(side);
+    //sprite->SetMixMode( CS_FX_COPY | CS_FX_TILING );
     world->AddSprite(sprite);
   }
   sprite = engine->CreateFloorSprite(csVector3(y+offy,height,x+offx), 1.0, 1.0);
