@@ -199,20 +199,20 @@ public:
     iDynamicsMoveCallback* GetDefaultMoveCallback ()
     { return scfParent->GetDefaultMoveCallback (); }
 	bool AttachColliderMesh (iMeshWrapper* mesh, const csOrthoTransform& trans,
-	    float friction, float elasticity)
-	{ return scfParent->AttachColliderMesh (mesh, trans, friction, elasticity); }
+	    float friction, float elasticity, float softness)
+	{ return scfParent->AttachColliderMesh (mesh, trans, friction, elasticity, softness); }
 	bool AttachColliderCylinder (float length, float radius,
-  	    const csOrthoTransform& trans, float friction, float elasticity)
-    { return scfParent->AttachColliderCylinder (length, radius, trans, friction, elasticity); }
+  	    const csOrthoTransform& trans, float friction, float elasticity, float softness)
+    { return scfParent->AttachColliderCylinder (length, radius, trans, friction, elasticity, softness); }
 	bool AttachColliderBox (const csVector3 &size, const csOrthoTransform&
-	    trans, float friction, float elasticity)
-    { return scfParent->AttachColliderBox (size, trans, friction, elasticity); }
+	    trans, float friction, float elasticity, float softness)
+    { return scfParent->AttachColliderBox (size, trans, friction, elasticity, softness); }
     bool AttachColliderSphere (float radius, const csVector3 &offset,
-  	    float friction, float elasticity)
-    { return scfParent->AttachColliderSphere (radius, offset, friction, elasticity); }
+  	    float friction, float elasticity, float softness)
+    { return scfParent->AttachColliderSphere (radius, offset, friction, elasticity, softness); }
     bool AttachColliderPlane (const csPlane3 &plane, float friction,
-        float elasticity)
-    { return scfParent->AttachColliderPlane (plane, friction, elasticity); }
+        float elasticity, float softness)
+    { return scfParent->AttachColliderPlane (plane, friction, elasticity, softness); }
   } scfiDynamicSystem;
   friend struct DynamicSystem;
 
@@ -245,15 +245,15 @@ public:
   virtual iDynamicsMoveCallback* GetDefaultMoveCallback () { return move_cb; }
 
   virtual bool AttachColliderMesh (iMeshWrapper* mesh,
-  	const csOrthoTransform& trans, float friction, float elasticity);
+  	const csOrthoTransform& trans, float friction, float elasticity, float softness);
   virtual bool AttachColliderCylinder (float length, float radius,
-  	const csOrthoTransform& trans, float friction, float elasticity);
+  	const csOrthoTransform& trans, float friction, float elasticity, float softness);
   virtual bool AttachColliderBox (const csVector3 &size,
-  	const csOrthoTransform& trans, float friction, float elasticity);
+  	const csOrthoTransform& trans, float friction, float elasticity, float softness);
   virtual bool AttachColliderSphere (float radius, const csVector3 &offset,
-  	float friction, float elasticity);
+  	float friction, float elasticity, float softness);
   virtual bool AttachColliderPlane (const csPlane3 &plane, float friction,
-    float elasticity);
+    float elasticity, float softness);
 };
 
 class csODERigidBody;
@@ -320,20 +320,20 @@ public:
     csRef<iBodyGroup> GetGroup (void) 
     { return scfParent->GetGroup (); }
     bool AttachColliderMesh (iMeshWrapper* mesh, const csOrthoTransform& trans, 
-	float friction, float density, float elasticity)
-    { return scfParent->AttachColliderMesh (mesh, trans, friction, density, elasticity); }
+	float friction, float density, float elasticity, float softness)
+    { return scfParent->AttachColliderMesh (mesh, trans, friction, density, elasticity, softness); }
     bool AttachColliderCylinder (float length, float radius, 
-	const csOrthoTransform& trans, float friction, float density, float elasticity)
-    { return scfParent->AttachColliderCylinder (length, radius, trans, friction, density, elasticity); }
+	const csOrthoTransform& trans, float friction, float density, float elasticity, float softness)
+    { return scfParent->AttachColliderCylinder (length, radius, trans, friction, density, elasticity, softness); }
     bool AttachColliderBox (const csVector3 &size, 
-	const csOrthoTransform& trans, float friction, float density, float elasticity)
-    { return scfParent->AttachColliderBox (size, trans, friction, density, elasticity); }
+	const csOrthoTransform& trans, float friction, float density, float elasticity, float softness)
+    { return scfParent->AttachColliderBox (size, trans, friction, density, elasticity, softness); }
     bool AttachColliderSphere (float radius, const csVector3 &offset, 
-	float friction, float density, float elasticity)
-    { return scfParent->AttachColliderSphere (radius, offset, friction, density, elasticity); }
+	float friction, float density, float elasticity, float softness)
+    { return scfParent->AttachColliderSphere (radius, offset, friction, density, elasticity, softness); }
     bool AttachColliderPlane (const csPlane3 &plane, float friction,
-    float density, float elasticity)
-	{ return scfParent->AttachColliderPlane (plane, friction, density, elasticity); }
+    float density, float elasticity, float softness)
+	{ return scfParent->AttachColliderPlane (plane, friction, density, elasticity, softness); }
     void SetPosition (const csVector3& trans) 
     { scfParent->SetPosition (trans); }
     const csVector3 GetPosition () const
@@ -417,18 +417,18 @@ public:
 
   bool AttachColliderMesh (iMeshWrapper* mesh,
   	const csOrthoTransform& trans, float friction, float density,
-	float elasticity);
+	float elasticity, float softness);
   bool AttachColliderCylinder (float length, float radius,
   	const csOrthoTransform& trans, float friction, float density,
-	float elasticity);
+	float elasticity, float softness);
   bool AttachColliderBox (const csVector3 &size,
   	const csOrthoTransform& trans, float friction, float density,
-	float elasticity);
+	float elasticity, float softness);
   bool AttachColliderSphere (float radius, const csVector3 &offset,
-  	float friction, float density, float elasticity);
+  	float friction, float density, float elasticity, float softness);
   /// ODE planes are globally transformed, immobile, infinitely dense
   bool AttachColliderPlane (const csPlane3 &plane, float friction,
-    float density, float elasticity);
+    float density, float elasticity, float softness);
 
   void SetPosition (const csVector3& trans);
   const csVector3 GetPosition () const;
