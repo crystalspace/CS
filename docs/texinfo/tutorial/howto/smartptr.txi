@@ -161,7 +161,61 @@ In future it is possible that @code{csPtr} is removed. Making sure
 you set that flag to yes will ensure that your code will not break
 when we make that change.
 
-@subsubheading Warnings!
+@subsubheading To Clarify: What to do With a Function Return Value?
+
+In the current Crystal Space API there are now three possible return
+values for functions (assuming the function returns a pointer):
+
+@itemize
+@item
+The function returns a normal pointer. In this case you can assign it
+to a @code{csRef} in which case the @code{csRef} will increment the
+reference count and decrement it again when it is destroyed. You can also assign
+this to a normal pointer and not worry about reference counting either
+(but you will not own the reference).
+@item
+The function returns a @code{csPtr}. In this case you can assign it
+to a @code{csRef} which will inherit the reference from the @code{csPtr} (i.e.
+the reference count is not incremented). When the @code{csRef} is destroyed
+the reference count is decremented. So functions returning @code{csPtr}
+actually transfer a reference to the caller. If @samp{STRICT_SMART_POINTERS}
+is NOT enabled then you can also assign the result of a @code{csPtr} returning
+function to a normal pointer. In that case nothing will happen and the
+caller is responsible for decrementing the reference count later. This
+corresponds to old style API usage.
+@item
+The function returns a @code{csRef}. In this case you can assign
+it to another @code{csRef} which will work correctly with regards
+to reference counts. It is also safe to not store the pointer
+but directly use it like this: @code{Function()->DoSomething()}. This is
+something that is not legal with @code{csPtr}. However it is NOT safe
+to assign the result of a function returning @code{csRef} to a normal
+pointer as after assignment an immediate @code{DecRef} will happen
+(which may cause destruction of the object in some cases). So functions
+returning @code{csRef} are not compatible with old style API.
+@end itemize
+
+@subsubheading Warnings About csPtr!
+
+As already noted above, only use @code{csPtr} for returning already
+incremented references and for wrapping a new object before storing
+it in a @code{csRef}. Do not use it for anything else.
+
+Also, when a function returns a @code{csPtr} you MUST assign the
+result to either a @code{csRef} or else a normal pointer (and call
+@code{DecRef}) later. If you don't do that then you will have a memory
+leak (or reference leak). i.e the following code is illegal because
+it ignores the returned mesh wrapper:
+
+@example
+  engine->CreateMeshWrapper (@dots{});	// Don't do this!
+@end example
+
+Note that if you have enabled @samp{STRICT_SMART_POINTERS} and you
+are in debug mode then CS will add a runtime test for this bad usage
+(i.e. your program will crash when you use something like the above).
+
+@subsubheading Warning About DestroyApplication!
 
 Due to the way the current implementation of
 @code{csInitializer::DestroyApplication()} works, you MUST make sure that
