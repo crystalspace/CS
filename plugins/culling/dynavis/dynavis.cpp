@@ -96,6 +96,7 @@ csDynaVis::csDynaVis (iBase *iParent)
   debug_camera = NULL;
   model_mgr = new csObjectModelManager ();
   write_queue = new csWriteQueue ();
+  current_visnr = 1;
 
   stats_cnt_vistest = 0;
   stats_total_vistest_time = 0;
@@ -252,8 +253,6 @@ void csDynaVis::UpdateObjects (bool update_prev_visstate)
     }
     if (update_prev_visstate)
       visobj_wrap->MarkInvisible (INVISIBLE_PARENT);
-    else
-      visobj->MarkInvisible ();
   }
 }
 
@@ -668,11 +667,11 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 
   csVisibilityObjectHistory* hist = obj->history;
 
-  if (!obj->visobj->IsVisible ())
+  if (obj->visobj->GetVisibilityNumber () != current_visnr)
   {
     if (do_cull_history && hist->vis_cnt > 0)
     {
-      obj->MarkVisible (VISIBLE_HISTORY, hist->vis_cnt-1);
+      obj->MarkVisible (VISIBLE_HISTORY, hist->vis_cnt-1, current_visnr);
       do_write_object = true;
       goto end;
     }
@@ -681,7 +680,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
     const csVector3& pos = data->pos;
     if (obj_bbox.Contains (pos))
     {
-      obj->MarkVisible (VISIBLE_INSIDE, RAND_HISTORY);
+      obj->MarkVisible (VISIBLE_INSIDE, RAND_HISTORY, current_visnr);
       do_write_object = true;
       goto end;
     }
@@ -784,7 +783,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
     //---------------------------------------------------------------
 
     // Object is visible so we should write it to the coverage buffer.
-    obj->MarkVisible (VISIBLE, RAND_HISTORY);
+    obj->MarkVisible (VISIBLE, RAND_HISTORY, current_visnr);
     do_write_object = true;
   }
 
@@ -891,6 +890,8 @@ end:
 
 bool csDynaVis::VisTest (iRenderView* rview)
 {
+  current_visnr++;
+
   // Statistics and debugging.
   static csTicks t2 = 0;
   csTicks t1 = csGetTicks ();
@@ -912,9 +913,7 @@ bool csDynaVis::VisTest (iRenderView* rview)
         visobj_vector[i];
       iVisibilityObject* visobj = visobj_wrap->visobj;
       if (visobj_wrap->history->prev_visstate)
-        visobj->MarkVisible ();
-      else
-        visobj->MarkInvisible ();
+        visobj->SetVisibilityNumber (current_visnr);
     }
     return true;
   }
@@ -1011,6 +1010,7 @@ bool csDynaVis::VisTest (iRenderView* rview)
 
 struct VisTestBox_Front2BackData
 {
+  uint32 current_visnr;
   csBox3 box;
 };
 
@@ -1048,7 +1048,7 @@ static bool VisTestBox_Front2Back (csKDTree* treenode, void* userdata,
       const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
       if (obj_bbox.TestIntersect (data->box))
       {
-	visobj_wrap->visobj->MarkVisible ();
+	visobj_wrap->visobj->SetVisibilityNumber (data->current_visnr);
       }
     }
   }
@@ -1058,9 +1058,12 @@ static bool VisTestBox_Front2Back (csKDTree* treenode, void* userdata,
 
 bool csDynaVis::VisTest (const csBox3& box)
 {
+  current_visnr++;
+
   UpdateObjects (false);
   VisTestBox_Front2BackData data;
   data.box = box;
+  data.current_visnr = current_visnr;
   kdtree->Front2Back (box.GetCenter (), VisTestBox_Front2Back, (void*)&data);
   return true;
 }
@@ -1069,6 +1072,7 @@ bool csDynaVis::VisTest (const csBox3& box)
 
 struct VisTestSphere_Front2BackData
 {
+  uint32 current_visnr;
   csVector3 pos;
   float sqradius;
 };
@@ -1107,7 +1111,7 @@ static bool VisTestSphere_Front2Back (csKDTree* treenode, void* userdata,
       const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
       if (csIntersect3::BoxSphere (obj_bbox, data->pos, data->sqradius))
       {
-	visobj_wrap->visobj->MarkVisible ();
+	visobj_wrap->visobj->SetVisibilityNumber (data->current_visnr);
       }
     }
   }
@@ -1117,8 +1121,11 @@ static bool VisTestSphere_Front2Back (csKDTree* treenode, void* userdata,
 
 bool csDynaVis::VisTest (const csSphere& sphere)
 {
+  current_visnr++;
+
   UpdateObjects (false);
   VisTestSphere_Front2BackData data;
+  data.current_visnr = current_visnr;
   data.pos = sphere.GetCenter ();
   data.sqradius = sphere.GetRadius () * sphere.GetRadius ();
   kdtree->Front2Back (data.pos, VisTestSphere_Front2Back, (void*)&data);
@@ -1249,6 +1256,8 @@ bool csDynaVis::IntersectSegment (const csVector3& start,
     const csVector3& end, csVector3& isect, float* pr,
     iMeshWrapper** p_mesh, iPolygon3D** poly)
 {
+  current_visnr++;
+
   IntersectSegment_Front2BackData data;
   data.seg.Set (start, end);
   data.r = 0;
@@ -1268,6 +1277,7 @@ bool csDynaVis::IntersectSegment (const csVector3& start,
 
 struct CastShadows_Front2BackData
 {
+  uint32 current_visnr;
   iFrustumView* fview;
   csPlane3 planes[32];
   uint32 planes_mask;
@@ -1331,17 +1341,13 @@ static bool CastShadows_Front2Back (csKDTree* treenode, void* userdata,
       // If visible we mark as visible and add shadows if possible.
       if (vis)
       {
-	visobj_wrap->visobj->MarkVisible ();
+	visobj_wrap->visobj->SetVisibilityNumber (data->current_visnr);
         if (visobj_wrap->caster && fview->ThingShadowsEnabled () &&
             fview->CheckShadowMask (visobj_wrap->mesh->GetFlags ().Get ()))
         {
           visobj_wrap->caster->AppendShadows (
 	  	visobj_wrap->visobj->GetMovable (), shadows, center);
 	}
-      }
-      else
-      {
-	visobj_wrap->visobj->MarkInvisible ();
       }
     }
   }
@@ -1356,7 +1362,7 @@ static bool CastShadows_Front2Back (csKDTree* treenode, void* userdata,
       	objects[i]->GetObject ();
 
       // If visible we mark as visible and add shadows if possible.
-      if (visobj_wrap->visobj->IsVisible ())
+      if (visobj_wrap->visobj->GetVisibilityNumber () == data->current_visnr)
       {
         if (visobj_wrap->receiver
 		&& fview->CheckProcessMask (
@@ -1374,8 +1380,11 @@ static bool CastShadows_Front2Back (csKDTree* treenode, void* userdata,
 
 void csDynaVis::CastShadows (iFrustumView* fview)
 {
+  current_visnr++;
+
   UpdateObjects (false);
   CastShadows_Front2BackData data;
+  data.current_visnr = current_visnr;
   data.fview = fview;
 
   const csVector3& center = fview->GetFrustumContext ()->GetLightFrustum ()
@@ -1634,7 +1643,7 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
 	csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
 	  visobj_vector[i];
 	iVisibilityObject* visobj = visobj_wrap->visobj;
-        if (visobj->IsVisible ())
+        if (visobj->GetVisibilityNumber () == current_visnr)
 	{
 	  // Only render outline if visible.
           const csReversibleTransform& camtrans = debug_camera->GetTransform ();
@@ -1994,7 +2003,6 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
     {
       csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
         visobj_vector[i];
-      visobj_wrap->visobj->MarkInvisible ();
       iPolygonMesh* polymesh = visobj_wrap->visobj->GetObjectModel ()
       	->GetSmallerPolygonMesh ();
       visobj_wrap->history->prev_visstate = false;
@@ -2004,7 +2012,7 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
         excul->GetObjectStatus (visobj_wrap, vispix, totpix);
 	if (vispix)
 	{
-	  visobj_wrap->visobj->MarkVisible ();
+	  visobj_wrap->visobj->SetVisibilityNumber (current_visnr);
           visobj_wrap->history->prev_visstate = true;
         }
       }

@@ -98,7 +98,7 @@ static int comp_mesh (const void *el1, const void *el2)
 }
 
 iMeshWrapper** csRenderQueueSet::SortAll (iRenderView* rview,
-	int& tot_num)
+	int& tot_num, uint32 current_visnr)
 {
   tot_num = 0;
 
@@ -121,7 +121,7 @@ iMeshWrapper** csRenderQueueSet::SortAll (iRenderView* rview,
       for (int i = 0 ; i < v->Length () ; i++)
       {
         iMeshWrapper *sp = v->Get (i);
-        if (sp->GetPrivateObject ()->IsVisible ())
+        if (sp->GetPrivateObject ()->GetVisibilityNumber () == current_visnr)
         {
           meshes[tot_num++] = sp;
         }

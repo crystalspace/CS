@@ -2155,10 +2155,12 @@ void csEngine::GetNearbyObjectList (iSector* sector,
     int& max_objects)
 {
   iVisibilityCuller* culler = sector->GetVisibilityCuller ();
+  uint32 current_visnr = 1;
   if (!(culler && culler->VisTest (csSphere (pos, radius))))
   {
     // There was no culler or culler failed. In that case
     // mark objects manually.
+    current_visnr = 1;
     int i;
     iMeshList* ml = sector->GetMeshes ();
     for (i = 0 ; i < ml->GetCount () ; i++)
@@ -2167,9 +2169,10 @@ void csEngine::GetNearbyObjectList (iSector* sector,
       csMeshWrapper* mw = imw->GetPrivateObject ();
       //@@@ SHOULD USE BBOX HERE!!!
       //@@@ NOT OPTIMAL!
-      mw->MarkVisible ();
+      mw->SetVisibilityNumber (current_visnr);
     }
   }
+  else if (culler) current_visnr = culler->GetCurrentVisibilityNumber ();
 
   int i;
   //@@@@@@@@ TODO ALSO SUPPORT LIGHTS!
@@ -2178,7 +2181,7 @@ void csEngine::GetNearbyObjectList (iSector* sector,
   {
     iMeshWrapper *imw = ml->Get (i);
     csMeshWrapper* mw = imw->GetPrivateObject ();
-    if (mw->IsVisible ())
+    if (mw->GetVisibilityNumber () == current_visnr)
     {
       AddObject (list, num_objects, max_objects, imw->QueryObject ());
       csRef<iThingState> st (

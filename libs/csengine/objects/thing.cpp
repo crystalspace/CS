@@ -185,6 +185,7 @@ csThing::csThing (iBase *parent) :
 
   obj_normals = NULL;
   smoothed = false;
+  current_visnr = 1;
 }
 
 csThing::~csThing ()
@@ -1986,7 +1987,8 @@ void *csThing::TestQueuePolygonArray (
   int num,
   iRenderView *d,
   csPolygon2DQueue *poly_queue,
-  bool pvs)
+  bool pvs,
+  uint32 current_visnr)
 {
   csPolygon3D *p;
   csVector3 *verts;
@@ -2026,7 +2028,7 @@ void *csThing::TestQueuePolygonArray (
       // We're dealing with a csBspPolygon.
       csBspPolygon *bsppol = (csBspPolygon *)polygon[i];
       csVisObjInfo *obj = bsppol->GetOriginator ();
-      bool obj_vis = obj->visobj->IsVisible ();
+      bool obj_vis = obj->visobj->GetVisibilityNumber () == current_visnr;
       csPolyTreeBBox *tbb = obj->bbox;
 
       // If the object is already marked visible then we don't have
@@ -2093,7 +2095,7 @@ void *csThing::TestQueuePolygonArray (
           }
         }
 
-        if (mark_vis) obj->visobj->MarkVisible ();
+        if (mark_vis) obj->visobj->SetVisibilityNumber (current_visnr);
         if (clip) render_pool->Free (clip);
       }
     }
@@ -3155,6 +3157,7 @@ the_end:
 struct csPolygonVisInfo :
   public iBase
 {
+  uint32 current_visnr;
   csPolygon2DQueue *poly_queue;
   csPolygonVisInfo (int num);
   virtual~csPolygonVisInfo()
@@ -3178,9 +3181,7 @@ void *csThing::TestQueuePolygons (
   csThing *thing,
   csPolygonInt **polygon,
   int num,
-  bool
-
-  /*same_plane*/,
+  bool /*same_plane*/,
   void *data)
 {
   iRenderView *d = (iRenderView *)data;
@@ -3198,7 +3199,8 @@ void *csThing::TestQueuePolygons (
       num,
       d,
       pvi->poly_queue,
-      d->GetEngine ()->IsPVS ());
+      d->GetEngine ()->IsPVS (),
+      pvi->current_visnr);
 }
 
 void csThing::DrawPolygonsFromQueue (
@@ -3526,6 +3528,7 @@ void csThing::CheckVisUpdate (csVisObjInfo *vinf)
 bool csThing::VisTest (iRenderView *irview)
 {
   if (!static_tree) return false;
+  current_visnr++;
 
   iEngine *iengine = irview->GetEngine ();
   iCamera *icam = irview->GetCamera ();
@@ -3558,7 +3561,7 @@ bool csThing::VisTest (iRenderView *irview)
       {
         // If the object represents the object of the culler then
         // the object is automatically visible.
-        vo->MarkVisible ();
+        vo->SetVisibilityNumber (current_visnr);
       }
       else
       {
@@ -3567,9 +3570,7 @@ bool csThing::VisTest (iRenderView *irview)
         csBox3 bbox;
         vo->GetObjectModel ()->GetObjectBoundingBox (bbox, CS_BBOX_MAX);
         if (bbox.In (origin))
-          vo->MarkVisible ();
-        else
-          vo->MarkInvisible ();
+          vo->SetVisibilityNumber (current_visnr);
       }
 
       vinf->bbox->ClearTransform ();
@@ -3589,6 +3590,7 @@ bool csThing::VisTest (iRenderView *irview)
     // The octree is traversed front to back but we want to render
     // back to front. That's one of the reasons for this queue.
     csPolygonVisInfo *pvi = new csPolygonVisInfo (GetPolygonCount ());
+    pvi->current_visnr = current_visnr;
     irview->AttachRenderContextData ((void *)this, (iBase *)pvi);
 
     // Update the transformation for the static tree. This will
@@ -3630,6 +3632,7 @@ bool csThing::VisTest (iRenderView *irview)
 bool csThing::VisTest (const csBox3& box)
 {
   if (!static_tree) return false;
+  current_visnr++;
 
   // @@@ Very ugly implementation. Should at least try
   // to use the octree!!!
@@ -3642,9 +3645,7 @@ bool csThing::VisTest (const csBox3& box)
     csPolyTreeBBox *pt_bbox = vinf->bbox;
     const csBox3& bbox = pt_bbox->GetWorldBoundingBox ();
     if (bbox.TestIntersect (box))
-      vo->MarkVisible ();
-    else
-      vo->MarkInvisible ();
+      vo->SetVisibilityNumber (current_visnr);
   }
   return true;
 }
@@ -3652,6 +3653,7 @@ bool csThing::VisTest (const csBox3& box)
 bool csThing::VisTest (const csSphere& sphere)
 {
   if (!static_tree) return false;
+  current_visnr++;
 
   // @@@ Very ugly implementation. Should at least try
   // to use the octree!!!
@@ -3666,9 +3668,7 @@ bool csThing::VisTest (const csSphere& sphere)
     csPolyTreeBBox *pt_bbox = vinf->bbox;
     const csBox3& bbox = pt_bbox->GetWorldBoundingBox ();
     if (csIntersect3::BoxSphere (bbox, pos, sqradius))
-      vo->MarkVisible ();
-    else
-      vo->MarkInvisible ();
+      vo->SetVisibilityNumber (current_visnr);
   }
   return true;
 }
@@ -3917,6 +3917,7 @@ static bool CullOctreeNodeLighting (
 void csThing::CastShadows (iFrustumView *fview)
 {
   CS_ASSERT (static_tree != NULL);
+  current_visnr++;
 
   iShadowBlockList *shadows = fview->GetFrustumContext ()->GetShadows ();
   // Mark a new region so that we can restore the shadows later.
@@ -4331,6 +4332,7 @@ bool csThing::VisCull::IntersectSegment (
   iMeshWrapper **p_mesh,
   iPolygon3D** poly)
 {
+  scfParent->current_visnr++;
   csMeshWrapper *m;
   csPolygon3D *p = scfParent->IntersectSegmentFull (
       start,

@@ -67,9 +67,10 @@ public:
    * later. Returns NULL if there are no visible objects.
    * The number of objects returned in 'tot_num' is the size of the
    * returned array. Note that this function will only add
-   * visible objects to the array (i.e. IsVisible() function)!
+   * visible objects to the array (i.e. iVisibilityObject)!
    */
-  iMeshWrapper** SortAll (iRenderView* rview, int& tot_num);
+  iMeshWrapper** SortAll (iRenderView* rview, int& tot_num,
+	uint32 current_visnr);
 
   /// Sort this queue based on the flags for that queue.
   void Sort (iRenderView* rview, int priority);

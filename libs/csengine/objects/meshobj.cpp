@@ -66,7 +66,7 @@ csMeshWrapper::csMeshWrapper (
   defered_num_lights = 0;
   defered_lighting_flags = 0;
   last_anim_time = 0;
-  is_visible = false;
+  visnr = 0;
   wor_bbox_movablenr = -1;
   Parent = theParent;
   movable.SetMeshWrapper (this);
@@ -96,7 +96,7 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent) :
   defered_num_lights = 0;
   defered_lighting_flags = 0;
   last_anim_time = 0;
-  is_visible = false;
+  visnr = 0;
   imposter_active = false;
   imposter_mesh = NULL;
   wor_bbox_movablenr = -1;

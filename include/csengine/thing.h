@@ -175,6 +175,8 @@ private:
   unsigned long last_polygon_id;
   /// Name of the cache to use for lightmapping.
   char* cachename;
+  /// Current visibility number.
+  uint32 current_visnr;
 
   /// Number of vertices
   int num_vertices;
@@ -409,7 +411,8 @@ private:
    * If 'pvs' is true then the PVS is used (polygon->IsVisible()).
    */
   static void* TestQueuePolygonArray (csPolygonInt** polygon, int num,
-	iRenderView* d, csPolygon2DQueue* poly_queue, bool pvs);
+	iRenderView* d, csPolygon2DQueue* poly_queue, bool pvs,
+	uint32 current_visnr);
 
 #ifndef CS_USE_NEW_RENDERER
   /**
@@ -1296,6 +1299,10 @@ public:
     virtual void CastShadows (iFrustumView* fview)
     {
       scfParent->CastShadows (fview);
+    }
+    virtual uint32 GetCurrentVisibilityNumber () const
+    {
+      return scfParent->current_visnr;
     }
   } scfiVisibilityCuller;
   friend struct VisCull;

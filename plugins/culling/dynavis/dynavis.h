@@ -84,9 +84,9 @@ public:
     history->DecRef ();
   }
 
-  void MarkVisible (csVisReason reason, int cnt)
+  void MarkVisible (csVisReason reason, int cnt, uint32 current_visnr)
   {
-    visobj->MarkVisible ();
+    visobj->SetVisibilityNumber (current_visnr);
     history->reason = reason;
     history->vis_cnt = cnt;
     history->prev_visstate = true;
@@ -94,7 +94,6 @@ public:
 
   void MarkInvisible (csVisReason reason)
   {
-    visobj->MarkInvisible ();
     history->reason = reason;
     history->prev_visstate = false;
   }
@@ -115,6 +114,7 @@ private:
   csObjectModelManager* model_mgr;
   csWriteQueue* write_queue;
   int scr_width, scr_height;	// Screen dimensions.
+  uint32 current_visnr;
 
   // For Debug_Dump(g3d): keep the last original camera.
   iCamera* debug_camera;
@@ -195,6 +195,7 @@ public:
     const csVector3& end, csVector3& isect, float* pr = NULL,
     iMeshWrapper** p_mesh = NULL, iPolygon3D** poly = NULL);
   virtual void CastShadows (iFrustumView* fview);
+  virtual uint32 GetCurrentVisibilityNumber () const { return current_visnr; }
 
   // Debugging functions.
   csPtr<iString> Debug_UnitTest ();

@@ -171,12 +171,9 @@ protected:
   csTicks last_anim_time;
 
   /**
-   * Flag which is set to true when the object is visible.
-   * This is used by the c-buffer/bsp routines. The object itself
-   * will not use this flag in any way at all. It is simply intended
-   * for external visibility culling routines.
+   * Current visibility number used by the visibility culler.
    */
-  bool is_visible;
+  uint32 visnr;
 
   /**
    * Position in the world.
@@ -327,13 +324,10 @@ public:
   }
 
   /// Mark this object as visible.
-  void MarkVisible () { is_visible = true; }
-
-  /// Mark this object as invisible.
-  void MarkInvisible () { is_visible = false; }
+  void SetVisibilityNumber (uint32 vis) { visnr = vis; }
 
   /// Return if this object is visible.
-  bool IsVisible () const { return is_visible; }
+  uint32 GetVisibilityNumber () const { return visnr; }
 
   /**
    * Light object according to the given array of lights (i.e.
@@ -667,9 +661,14 @@ public:
     {
       return &(scfParent->movable.scfiMovable);
     }
-    virtual void MarkVisible () { scfParent->MarkVisible (); }
-    virtual void MarkInvisible () { scfParent->MarkInvisible (); }
-    virtual bool IsVisible () const { return scfParent->IsVisible (); }
+    virtual void SetVisibilityNumber (uint32 vis)
+    {
+      scfParent->SetVisibilityNumber (vis);
+    }
+    virtual uint32 GetVisibilityNumber () const
+    {
+      return scfParent->GetVisibilityNumber ();
+    }
     virtual iObjectModel* GetObjectModel ()
     {
       return scfParent->mesh->GetObjectModel ();

@@ -3,6 +3,12 @@ The history order is reversed so that new features are at the top.
 31-Oct-2002
 	- Optimized frustvis and dynavis by removing some SCF_QUERY_INTERFACE
 	  calls.
+	- Changed the way that objects are marked as visible by the
+	  visibility cullers. Using this way they no longer need to be
+	  marked as invisible. Instead a global number is increased which
+	  automatically marks all objects as invisible. This change is
+	  already an optimization but it also preparation for a more
+	  fundamental and significant optimization that will follow later.
 30-Oct-2002
 	- Replaced ReportError() with ReportWarning() when an image couldn't
 	  be loaded in the main loader.

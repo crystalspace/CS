@@ -75,6 +75,7 @@ csFrustumVis::csFrustumVis (iBase *iParent)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   object_reg = NULL;
   kdtree = NULL;
+  current_visnr = 1;
 }
 
 csFrustumVis::~csFrustumVis ()
@@ -199,7 +200,6 @@ void csFrustumVis::UpdateObjects ()
       visobj_wrap->shape_number = visobj->GetObjectModel ()->GetShapeNumber ();
       visobj_wrap->update_number = movable->GetUpdateNumber ();
     }
-    visobj->MarkInvisible ();
   }
 }
 
@@ -250,12 +250,12 @@ bool csFrustumVis::TestNodeVisibility (csSimpleKDTree* treenode,
 bool csFrustumVis::TestObjectVisibility (csFrustVisObjectWrapper* obj,
   	FrustTest_Front2BackData* data)
 {
-  if (!obj->visobj->IsVisible ())
+  if (obj->visobj->GetVisibilityNumber () != current_visnr)
   {
     const csBox3& obj_bbox = obj->child->GetBBox ();
     if (obj_bbox.Contains (data->pos))
     {
-      obj->MarkVisible ();
+      obj->visobj->SetVisibilityNumber (current_visnr);
       return true;
     }
   
@@ -266,7 +266,7 @@ bool csFrustumVis::TestObjectVisibility (csFrustVisObjectWrapper* obj,
       return false;
     }
 
-    obj->MarkVisible ();
+    obj->visobj->SetVisibilityNumber (current_visnr);
   }
 
   return true;
@@ -323,6 +323,8 @@ end:
 
 bool csFrustumVis::VisTest (iRenderView* rview)
 {
+  current_visnr++;
+
   // Update all objects (mark them invisible and update in kdtree if needed).
   UpdateObjects ();
 
@@ -335,7 +337,7 @@ bool csFrustumVis::VisTest (iRenderView* rview)
     csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
       visobj_vector[i];
     iVisibilityObject* visobj = visobj_wrap->visobj;
-    visobj->MarkVisible ();
+    visobj->SetVisibilityNumber (current_visnr);
   }
 
 return true;
@@ -385,6 +387,7 @@ return true;
 
 struct FrustTestBox_Front2BackData
 {
+  uint32 current_visnr;
   csBox3 box;
 };
 
@@ -422,7 +425,7 @@ static bool FrustTestBox_Front2Back (csSimpleKDTree* treenode, void* userdata,
       const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
       if (obj_bbox.TestIntersect (data->box))
       {
-	visobj_wrap->visobj->MarkVisible ();
+	visobj_wrap->visobj->SetVisibilityNumber (data->current_visnr);
       }
     }
   }
@@ -432,8 +435,10 @@ static bool FrustTestBox_Front2Back (csSimpleKDTree* treenode, void* userdata,
 
 bool csFrustumVis::VisTest (const csBox3& box)
 {
+  current_visnr++;
   UpdateObjects ();
   FrustTestBox_Front2BackData data;
+  data.current_visnr = current_visnr;
   data.box = box;
   kdtree->Front2Back (box.GetCenter (), FrustTestBox_Front2Back, (void*)&data);
   return true;
@@ -443,6 +448,7 @@ bool csFrustumVis::VisTest (const csBox3& box)
 
 struct FrustTestSphere_Front2BackData
 {
+  uint32 current_visnr;
   csVector3 pos;
   float sqradius;
 };
@@ -482,7 +488,7 @@ static bool FrustTestSphere_Front2Back (csSimpleKDTree* treenode,
       const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
       if (csIntersect3::BoxSphere (obj_bbox, data->pos, data->sqradius))
       {
-	visobj_wrap->visobj->MarkVisible ();
+	visobj_wrap->visobj->SetVisibilityNumber (data->current_visnr);
       }
     }
   }
@@ -492,8 +498,10 @@ static bool FrustTestSphere_Front2Back (csSimpleKDTree* treenode,
 
 bool csFrustumVis::VisTest (const csSphere& sphere)
 {
+  current_visnr++;
   UpdateObjects ();
   FrustTestSphere_Front2BackData data;
+  data.current_visnr = current_visnr;
   data.pos = sphere.GetCenter ();
   data.sqradius = sphere.GetRadius () * sphere.GetRadius ();
   kdtree->Front2Back (data.pos, FrustTestSphere_Front2Back, (void*)&data);
@@ -623,6 +631,7 @@ bool csFrustumVis::IntersectSegment (const csVector3& start,
     const csVector3& end, csVector3& isect, float* pr,
     iMeshWrapper** p_mesh, iPolygon3D** poly)
 {
+  current_visnr++;
   IntersectSegment_Front2BackData data;
   data.seg.Set (start, end);
   data.r = 0;
@@ -642,6 +651,7 @@ bool csFrustumVis::IntersectSegment (const csVector3& start,
 
 struct CastShadows_Front2BackData
 {
+  uint32 current_visnr;
   iFrustumView* fview;
   csPlane3 planes[32];
   uint32 planes_mask;
@@ -705,17 +715,13 @@ static bool CastShadows_Front2Back (csSimpleKDTree* treenode, void* userdata,
       // If visible we mark as visible and add shadows if possible.
       if (vis)
       {
-	visobj_wrap->visobj->MarkVisible ();
+	visobj_wrap->visobj->SetVisibilityNumber (data->current_visnr);
         if (visobj_wrap->caster && fview->ThingShadowsEnabled () &&
             fview->CheckShadowMask (visobj_wrap->mesh->GetFlags ().Get ()))
         {
           visobj_wrap->caster->AppendShadows (
 	  	visobj_wrap->visobj->GetMovable (), shadows, center);
 	}
-      }
-      else
-      {
-	visobj_wrap->visobj->MarkInvisible ();
       }
     }
   }
@@ -730,7 +736,7 @@ static bool CastShadows_Front2Back (csSimpleKDTree* treenode, void* userdata,
       	objects[i]->GetObject ();
 
       // If visible we mark as visible and add shadows if possible.
-      if (visobj_wrap->visobj->IsVisible ())
+      if (visobj_wrap->visobj->GetVisibilityNumber () == data->current_visnr)
       {
         if (visobj_wrap->receiver
 		&& fview->CheckProcessMask (
@@ -748,8 +754,10 @@ static bool CastShadows_Front2Back (csSimpleKDTree* treenode, void* userdata,
 
 void csFrustumVis::CastShadows (iFrustumView* fview)
 {
+  current_visnr++;
   UpdateObjects ();
   CastShadows_Front2BackData data;
+  data.current_visnr = current_visnr;
   data.fview = fview;
 
   const csVector3& center = fview->GetFrustumContext ()->GetLightFrustum ()

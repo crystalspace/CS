@@ -712,6 +712,7 @@ void csSector::Draw (iRenderView *rview)
   {
     // Mark visible objects.
     culler->VisTest (rview);
+    uint32 current_visnr = culler->GetCurrentVisibilityNumber ();
 
     // get a pointer to the previous sector
     iSector *prev_sector = rview->GetPreviousSector ();
@@ -738,7 +739,8 @@ void csSector::Draw (iRenderView *rview)
     // a big list of visible objects. This will use the visibility
     // information calculated by VisTest() above.
     int num_objects;
-    iMeshWrapper** objects = RenderQueues.SortAll (rview, num_objects);
+    iMeshWrapper** objects = RenderQueues.SortAll (rview, num_objects,
+		    current_visnr);
 
     // Draw the meshes.
     for (i = 0 ; i < num_objects ; i++)

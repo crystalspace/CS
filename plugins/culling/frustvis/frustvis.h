@@ -59,11 +59,6 @@ public:
   ~csFrustVisObjectWrapper ()
   {
   }
-
-  void MarkVisible ()
-  {
-    visobj->MarkVisible ();
-  }
 };
 
 /**
@@ -76,6 +71,7 @@ private:
   csSimpleKDTree* kdtree;
   csVector visobj_vector;
   int scr_width, scr_height;	// Screen dimensions.
+  uint32 current_visnr;
 
   // Scan all objects, mark them as invisible and check if they
   // have moved since last frame (and update them in the kdtree then).
@@ -111,6 +107,7 @@ public:
     const csVector3& end, csVector3& isect, float* pr = NULL,
     iMeshWrapper** p_mesh = NULL, iPolygon3D** poly = NULL);
   virtual void CastShadows (iFrustumView* fview);
+  virtual uint32 GetCurrentVisibilityNumber () const { return current_visnr; }
 
   struct eiComponent : public iComponent
   {

@@ -41,7 +41,7 @@ class csVector3;
 class csBox3;
 class csSphere;
 
-SCF_VERSION (iVisibilityCuller, 0, 1, 0);
+SCF_VERSION (iVisibilityCuller, 0, 1, 1);
 
 /**
  * This interface represents a visibility culling system.
@@ -102,9 +102,17 @@ struct iVisibilityCuller : public iBase
    * Start casting shadows from a given point in space.
    */
   virtual void CastShadows (iFrustumView* fview) = 0;
+
+  /**
+   * Get the current visibility number. You can compare this number
+   * to the visibility number as returned by
+   * iVisibilityObject->GetVisibilityNumber(). If equal then the object
+   * was visible.
+   */
+  virtual uint32 GetCurrentVisibilityNumber () const = 0;
 };
 
-SCF_VERSION (iVisibilityObject, 0, 0, 6);
+SCF_VERSION (iVisibilityObject, 0, 1, 0);
 
 /**
  * An object that wants to know if it is visible or not
@@ -115,20 +123,17 @@ struct iVisibilityObject : public iBase
   /// Get the reference to the movable from this object.
   virtual iMovable* GetMovable () const = 0;
   /**
-   * Mark the object as visible. This will be called by the visibility
-   * culler whenever it thinks the object is visible.
+   * Set the visibility number for this object. A visibility culler
+   * will set the visibility number of an object equal to the current
+   * visibility culler number if the object is visible.
    */
-  virtual void MarkVisible () = 0;
+  virtual void SetVisibilityNumber (uint32 visnr) = 0;
   /**
-   * Mark the object as invisible. This will be called by the visibility
-   * culler at initialization time.
+   * Get the visibility number. You can compare this with
+   * iVisibilityCuller->GetCurrentVisibilityNumber(). If equal then
+   * this object is visible.
    */
-  virtual void MarkInvisible () = 0;
-  /**
-   * After running iVisibilityCuller::VisTest() this function can be used
-   * to test if the object is visible or not.
-   */
-  virtual bool IsVisible () const = 0;
+  virtual uint32 GetVisibilityNumber () const = 0;
 
   /**
    * Get the object model corresponding with this object.
