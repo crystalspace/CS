@@ -42,11 +42,20 @@
 #include "ivaria/reporter.h"
 #include "quadtree.h"
 
-bool Inside (csBox3 bbox, csVector3 *point)
+static bool Inside (csBox3 bbox, csVector3 *point)
 {
   if ( ( point->x <= bbox.MaxX () ) && ( point->x >= bbox.MinX () ) 
     && ( point->z <= bbox.MaxZ () ) && ( point->z >= bbox.MinZ () )
     && ( point->y <= bbox.MaxY () ) )
+    return true;
+  else
+    return false;
+}
+
+static bool InsideExt (csBox3 bbox, csVector3 *point)
+{
+  if ( ( point->x <= bbox.MaxX () ) && ( point->x >= bbox.MinX () ) 
+    && ( point->z <= bbox.MaxZ () ) && ( point->z >= bbox.MinZ () ) )
     return true;
   else
     return false;
@@ -94,7 +103,9 @@ void csColQuad::HeightTestExact (csVector3  *point,
         {
           csVector3 newpoint;
           float u, v;
+          int width;
           csVector3 temp[4];
+          width = blocks[i]->owner->hor_length;          
   u = ( point->x - blocks[i]->bbox.MinX () )
     / (blocks[i]->bbox.MaxX () - blocks[i]->bbox.MinX ());
   v = (blocks[i]->bbox.MaxZ () - point->z)
@@ -103,10 +114,10 @@ void csColQuad::HeightTestExact (csVector3  *point,
           if (v < 0.0f) v = -v;
           if (u > 1.0f) u = 1.0f;
           if (v > 1.0f) v = 1.0f;
-          temp[0] = BezierControlCompute (v, blocks[i]->verts, 4);
-          temp[1] = BezierControlCompute (v, &blocks[i]->verts[1], 4);
-          temp[2] = BezierControlCompute (v, &blocks[i]->verts[2], 4);
-          temp[3] = BezierControlCompute (v, &blocks[i]->verts[3], 4);
+          temp[0] = BezierControlCompute (v, blocks[i]->controlpoint, width);
+          temp[1] = BezierControlCompute (v, &blocks[i]->controlpoint[1], width);
+          temp[2] = BezierControlCompute (v, &blocks[i]->controlpoint[2], width);
+          temp[3] = BezierControlCompute (v, &blocks[i]->controlpoint[3], width);
           newpoint =  BezierCompute (u, temp);
           if ( (newpoint.y > point->y) || 
                (point->y < (newpoint.y + 2.0f)))
@@ -129,18 +140,18 @@ void csColQuad::HeightTestExact (csVector3  *point,
 void csColQuad::HeightTestExt (csVector3  *point, 
     int &hits)
 {
-  if ( Inside (bbox, point) )
+  if ( InsideExt (bbox, point) )
   {
     int i;
     for (i = 0; i < num_blocks; i++)
     {
-      if ( Inside (blocks[i]->bbox, point) )
+      if ( InsideExt (blocks[i]->bbox, point) )
       {
-        if (point->y <= blocks[i]->bbox.MaxY ())
-        {
           csVector3 newpoint;
           float u, v;
           csVector3 temp[4];
+          int width;
+          width = blocks[i]->owner->hor_length;
   u = ( point->x - blocks[i]->bbox.MinX () )
     / (blocks[i]->bbox.MaxX () - blocks[i]->bbox.MinX ());
   v = (blocks[i]->bbox.MaxZ () - point->z)
@@ -149,10 +160,10 @@ void csColQuad::HeightTestExt (csVector3  *point,
           if (v < 0.0f) v = -v;
           if (u > 1.0f) u = 1.0f;
           if (v > 1.0f) v = 1.0f;
-          temp[0] = BezierControlCompute (v, blocks[i]->verts, 4);
-          temp[1] = BezierControlCompute (v, &blocks[i]->verts[1], 4);
-          temp[2] = BezierControlCompute (v, &blocks[i]->verts[2], 4);
-          temp[3] = BezierControlCompute (v, &blocks[i]->verts[3], 4);
+          temp[0] = BezierControlCompute (v, blocks[i]->controlpoint, width);
+          temp[1] = BezierControlCompute (v, &blocks[i]->controlpoint[1], width);
+          temp[2] = BezierControlCompute (v, &blocks[i]->controlpoint[2], width);
+          temp[3] = BezierControlCompute (v, &blocks[i]->controlpoint[3], width);
           newpoint =  BezierCompute (u, temp);
           newpoint.y += 2.0f;
           if ( newpoint.y > point->y)
@@ -176,8 +187,7 @@ void csColQuad::HeightTestExt (csVector3  *point,
             if (newpoint.y > point->y)
               point->y = newpoint.y;
           }*/
-          //point->y = newpoint.y + 10.0f;
-        }
+          //point->y = newpoint.y + 10.0f;        
       }			
     }
     if (children[0])
