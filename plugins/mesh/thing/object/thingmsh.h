@@ -56,7 +56,7 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE(csThingMeshObjectType);
     virtual void Clear ()
     {
-      return scfParent->TE ()->Clear ();
+      scfParent->TE ()->Clear ();
     }
     virtual csPtr<iPolyTxtPlane> CreatePolyTxtPlane (const char* name = NULL)
     {
