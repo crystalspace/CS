@@ -1,6 +1,15 @@
 The history order has been reversed so that new features are at the top.
 
+11-Jan-2001
+	- Wyatt Miler updated the Macintosh project files.
 10-Jan-2001
+	- Martin Geisse fixed some minor naming and comment flaws in
+	  the idungeon interface file.
+	- Martin changed the win32 docs: grouped msvc5 stuff in one
+	  section and added a FAQ entry.
+	- Martin also committed a patch to win32.cpp from Ed Halley.
+	- Martin added some information to the procedural texture docs and
+	  added better explanation of the Print() function of the 2d and 3d gfx driver.
 	- Eric Sunshine fixed a typo in win32.txi and made several other minor
 	  changes.
 	- Eric Sunshine changed the file extension on the HTML files in the
@@ -8,7 +17,12 @@ The history order has been reversed so that new features are at the top.
 	  insistence.  :-)
 	- Eric Sunshine lowered the verbosity level of the build process for
 	  the HTML version of the User's Manual (make htmldoc).
+	- Andrew Zabolotny fixed qsqrt() so that both binutils 2.9.1 and 2.9.5
+	  assemble it exactly the same way.
 9-Jan-2001
+	- Wouter Wijngaards fixed a compile warning in WalkTest.
+	- Wouter Wijngaards and Eric Sunshine fixed a bug for Solaris
+	  in the BMP image loader. short != UShort. Fixed now.
 	- Eric Sunshine fixed a problem in bmpimage.cpp which caused loading
 	  of BMP files on big-endian Solaris to fail.
 	- Andrew Zabolotny made the following changes:
