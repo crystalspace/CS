@@ -63,6 +63,8 @@ chronological order.
 	  emits a more aesthetically pleasing answer.
 	- Duhprey commited a patch from Leandro Motta Barros to expose some
 	  ode specific parameters for joints (Done via iODEJointState)
+	- Duhprey commited a patch from Troy Chard for motor and bounce 
+	  parameters on joints.
 10-Dec-2003
 	- Eric Sunshine fixed bug in unix.mak where it was incorrectly
 	  exporting the hard-coded "-ldl -lm" to cs-config's --libs option even
