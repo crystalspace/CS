@@ -28,7 +28,7 @@ class csSoundWrapper : public csObject
 {
 protected:
   ///
-  iSoundHandle* SoundHandle;
+  csRef<iSoundHandle> SoundHandle;
 
 public:
 
