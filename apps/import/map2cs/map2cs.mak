@@ -57,7 +57,7 @@ build.map2cs: $(OUTDIRS) $(MAP2CS.EXE)
 clean: map2csclean
 
 $(MAP2CS.EXE): $(OBJ.MAP2CS) $(LIB.MAP2CS)
-	$(DO.LINK.CONSOLE.EXE)
+	$(DO.LINK.CONSOLE.EXE) $(ZLIB.LFLAGS)
 
 map2csclean:
 	-$(RMDIR) $(MAP2CS.EXE) $(OBJ.MAP2CS)
