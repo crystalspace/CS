@@ -19,6 +19,8 @@ Short-term cleanups that need to be done:
 	  unixconf.sh.  Modified various makefiles to invoke haspythn.sh.
 	- Eric Sunshine changed the way unixconf.sh and booltest.sh are
 	  invoked so that Seth can use the 'linux' target from DOS. :-O
+	- Eric Sunshine fixed a number of syntactic problems which were
+	  recently introduced into csColor.h.
 26-Oct-1999
 	- Eric Sunshine fixed a bug which was causing the engine to crash
 	  when a non-coplaner polygon was found in a world.
