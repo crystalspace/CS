@@ -5,10 +5,26 @@ The history order is reversed so that new features are at the top.
 	- Added iEngine::GetCameraPosition() which takes a name as a parameter
 	  instead of an index.
 	- Fixed a warning in engine.cpp.
+	- Added new apps/examples dir. This dir will contain small applications
+	  that demonstrate a single feature.
+	- Added apps/examples/cswseng which is a small app that demonstrates
+	  how to use CSWS and Engine in same application. It is a derivative
+	  from the old levtool but a few bugs are fixed and it is simpler.
+	- Removed levtool since the demo functionality is no longer needed
+	  (cswseng does this) and it is otherwise not functional.
 	- Eric fixed the new CS_BEGIN_TYPED_IBASE_VECTOR_WITH_SUPERCLASS macro
 	  so that it compiles error-free on NextStep.  It was reporting this
 	  error: "type `foo' is derived from private `csIBaseVector'".  Also
 	  made the TestIBaseVectorInhertiance() implementation more obvious.
+	- Philip Wyett did the following changes:
+		LoadPlugIn -> LoadPlugin
+		QueryPlugIn -> QueryPlugin
+		UnloadPlugIn -> UnloadPlugin
+		RegisterPlugIn -> RegisterPlugin
+		GetPlugIn -> GetPlugin
+		GetPlugInCount -> GetPluginCount
+	  This change is a change of PlugIn for Plugin in
+	  all instances inside the libs, plugins and apps.
 2-Jul-2001
 	- Removed the bad and global 'thisclass' pointer from the Python
 	  plugin.  Removed the 'GetSystem()' call from 'cs.i'.  The Python

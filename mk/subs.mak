@@ -46,6 +46,13 @@ ifneq ($(TUTORIAL_SUBMAKEFILES),)
   include $(TUTORIAL_SUBMAKEFILES)
 endif
 
+ifeq ($(EXAMPLES_SUBMAKEFILES),)
+  EXAMPLES_SUBMAKEFILES=$(wildcard apps/examples/*/*.mak)
+endif
+ifneq ($(EXAMPLES_SUBMAKEFILES),)
+  include $(EXAMPLES_SUBMAKEFILES)
+endif
+
 ifeq ($(COMPOSITE_SUBMAKEFILES),)
   COMPOSITE_SUBMAKEFILES=docs/docs.mak mk/install.mak mk/msvcgen/msvcgen.mak \
     mk/static.mak
