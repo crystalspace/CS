@@ -34,6 +34,7 @@ csObject *csNamedObjVector::FindByName (const char* name)
 
 int csNamedObjVector::Compare (csSome Item1, csSome Item2, int Mode) const
 {
+  (void)Mode;
   return strcmp (((csObject *)Item1)->GetName (), ((csObject *)Item2)->GetName ());
 }
 

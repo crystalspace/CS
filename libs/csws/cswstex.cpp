@@ -84,5 +84,6 @@ bool csWSTexVector::FreeItem (csSome Item)
 
 int csWSTexVector::CompareKey (csSome Item, csConstSome Key, int Mode) const
 {
+  (void) Mode;
   return strcmp (((csWSTexture *)Item)->GetName (), (char *)Key);
 }

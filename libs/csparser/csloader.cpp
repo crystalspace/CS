@@ -1661,7 +1661,7 @@ ImageFile* csLoader::load_image (const char* name)
   return ifile;
 }
 
-void csLoader::txt_process (char *name, char* buf, csTextureList* textures, csWorld *world)
+void csLoader::txt_process (char *name, char* buf, csTextureList* textures, csWorld* /*world*/)
 {
   TOKEN_TABLE_START (commands)
     TOKEN_TABLE (TRANSPARENT)

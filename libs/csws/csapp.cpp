@@ -199,7 +199,9 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
   char *buffer = strnew (iTexParams);
   char *bufptr = buffer;
   bool transp = false;
-  float tr, tg, tb;
+  float tr=0;
+  float tg=0;
+  float tb=0;
 
   int cmd;
   char *name, *params;

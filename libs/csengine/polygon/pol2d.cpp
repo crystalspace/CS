@@ -235,12 +235,14 @@ void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts,
 #define FOG_EXP_TABLE_SIZE 1600
 static float *fog_exp_table = NULL;
 
+#ifdef USE_EXP_FOG
 static void InitializeFogTable ()
 {
   CHK (fog_exp_table = new float [FOG_EXP_TABLE_SIZE]);
   for (int i = 0; i < FOG_EXP_TABLE_SIZE; i++)
     fog_exp_table [i] = 1 - exp (-float (i) / 256.);
 }
+#endif
 
 #define SMALL_D 0.01
 void CalculateFogPolygon (csRenderView* rview, G3DPolygonDP& poly)
