@@ -48,6 +48,7 @@ The history order is reversed so that new features are at the top.
 	- Oktal added reference counting to the interface implementation
 	  wrapping macros for their internal Perl variable, and added a
 	  paragraph to the documentation about same.
+	- res fixed double compilation of cssys/win32/syspath.cpp with jam.
 16-Jun-2003
 	- Oktal separated a multiple-argument %ignore directive into several
 	  single-argument ones, in perlpre.i, in order to support older
