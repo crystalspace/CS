@@ -22,9 +22,14 @@
 #include "NeXTMenu.h"
 #include "ievdefs.h"
 #include "cssys/next/NeXTSystemDriver.h"
+#include <errno.h>
+#include <libc.h>
+#include <string.h>
+#include <unistd.h>
 #import <appkit/Application.h>
 #import <appkit/Menu.h>
 #import <appkit/View.h>
+#import <defaults/defaults.h>
 #import <dpsclient/wraps.h>
 
 typedef void* NeXTDelegateHandle;
@@ -683,6 +688,34 @@ ND_PROTO(void,stop_event_loop)( NeXTDelegateHandle handle )
 
 
 //-----------------------------------------------------------------------------
+// locateResourceDirectory
+//	If the CrystalSpaceRoot default value is set, then its value is used to
+//	set the current working directory.  This will allow Crystal Space to
+//	locate its resource files even when launched from the Workspace which
+//	does not otherwise provide a meaningful working directory.  However, if
+//	CrystalSpaceRootIgnore is set to "yes", then ignore the
+//	CrystalSpaceRoot setting.  This can be used to force a particular
+//	application to ignore a CrystalSpaceRoot setting inherited from the
+//	"global" domain.
+//-----------------------------------------------------------------------------
++ (void)locateResourceDirectory
+    {
+    char const* s =
+	NXGetDefaultValue( [NXApp appName], "CrystalSpaceRootIgnore" );
+    if (s == 0 || strchr( "YyTtOo1", *s ) == 0) // Yes, True, On, 1
+	{
+	s = NXGetDefaultValue( [NXApp appName], "CrystalSpaceRoot" );
+	if (s != 0 && chdir(s) != 0)
+	    fprintf( stderr,
+		"\nWARNING: Unable to set working directory from "
+		    "`CrystalSpaceRoot'"
+		"\nWARNING: Value: %s"
+		"\nWARNING: Reason: %s\n\n", s, strerror(errno) );
+	}
+    }
+
+
+//-----------------------------------------------------------------------------
 // startup
 //	Interaction with AppKit is initiated here with instantiation of an
 //	Application object and a NeXTDelegate which oversees AppKit-related
@@ -695,6 +728,7 @@ ND_PROTO(void,stop_event_loop)( NeXTDelegateHandle handle )
     DPSSetDeadKeysEnabled( [NXApp context], 0 );
     controller = [[NeXTDelegate alloc] initWithDriver:handle];
     [NXApp setDelegate:controller];
+    [self locateResourceDirectory];
     return controller;
     }
 

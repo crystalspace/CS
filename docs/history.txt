@@ -39,6 +39,30 @@ The history order has been reversed so that new features are at the top.
 	    - Eliminated underfull and overfull hbox warning messages reported
 	      by TeX.
 	    - Performed a bit of clean up in apimod18.txi.
+	- Eric Sunshine modified the Apple/NeXT system driver so that it now
+	  recognizes the new defaults `CrystalSpaceRoot' and
+	  `CrystalSpaceRootIgnore'.  The first setting allows the user to
+	  configure the location of the root directory which contains the
+	  Crystal Space resources.  This allows any Crystal Space application
+	  to locate its resources even when launched from the Workspace.  The
+	  reason that this is necessary, is that the Workspace launches the
+	  application without providing any path information (that is, argv[0]
+	  is the bare program name) and without setting the current working
+	  directory to a meaningful value.  The use of this setting is similar
+	  to the CRYSTAL environment variable, but since the Workspace does not
+	  allow environment variables to be set, the Apple/NeXT defaults system
+	  is used instead.  The second setting tells the application to ignore
+	  the first variable.  This is useful in cases when the first variable
+	  is set in the "global" domain, but a particular application wants to
+	  ignore the setting.  The upshot of this change is that it is now
+	  possible to launch Crystal Space applications via double-click in the
+	  Workspace on NextStep.  Unfortunately, this does not yet work on
+	  OpenStep due to some, as yet, undetermined problem where the
+	  NSApplication object throws an exception.  On MacOS/X and OpenStep,
+	  these defaults can be set as illustrated below:
+		defaults write NSGlobalDomain CrystalSpaceRoot /Library/CS
+	  On NextStep, the following command would be used:
+		dwrite -g CrystalSpaceRoot /LocalLibrary/CS
 8-Feb-2001
 	- Martin Geisse changed DirectInput version number from 0x0700
 	  to 0x0300.
