@@ -140,12 +140,21 @@
   %}
 %enddef
 
+%typemap(in) int8
+{
+  $1 = SvIV ($input);
+}
+%typemap(out) int8
+{
+  $result = newSViv ($1);
+}
+
 %define TYPEMAP_OUT_csRef_BODY(pT, cT)
-  if (ref.IsValid ())
+  if (rf.IsValid ())
   {
-    ref->IncRef ();
+    rf->IncRef ();
     SV *rv = newSVsv (& PL_sv_undef);
-    sv_setref_pv (rv, pT, (void *) (cT *) ref);
+    sv_setref_pv (rv, pT, (void *) (cT *) rf);
     $result = rv;
   }
   else
@@ -159,7 +168,7 @@
 %define TYPEMAP_OUT_csRef(T)
   %typemap(out) csRef<T>
   {
-    csRef<T> ref ($1);
+    csRef<T> rf ($1);
     TYPEMAP_OUT_csRef_BODY(#T, T)
   }
 %enddef
@@ -168,7 +177,7 @@
 %define TYPEMAP_OUT_csPtr(T)
   %typemap(out) csPtr<T>
   {
-    csRef<T> ref ($1);
+    csRef<T> rf ($1);
     TYPEMAP_OUT_csRef_BODY(#T, T)
   }
 %enddef
@@ -177,7 +186,7 @@
 %define TYPEMAP_OUT_csWrapPtr
   %typemap(out) csWrapPtr
   {
-    csRef<iBase> ref ($1.Ref);
+    csRef<iBase> rf ($1.Ref);
     TYPEMAP_OUT_csRef_BODY($1.Type, iBase)
   }
 %enddef

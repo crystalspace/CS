@@ -22,6 +22,20 @@ The history order is reversed so that new features are at the top.
 	    obsolete/misleading information: intro/foreward.txi
 	  - Text tweaks and grammar fixups: intro/guide.txi
 	  - Updated bug reporting practice: intro/feedback.txi
+	- Oktal added empty stub functions to cspython for the new iScript
+	  interface methods, until they get implemented. Then the csperl5
+	  implementation of the update can be used.
+	- Oktal made the following changes to csperl5:
+	  - Somewhere a macro was being defined called "ref", which was
+	    interfering with variables of the same name, so renamed them.
+	  - Swig was causing a "conversion lacks cast" error when it tried to
+	    store an int8 as a string of length 1, so overrode the typemap to
+	    force it to store it as an int32.
+	  - Added an %ignore csGetPlatformConfig; to cspace.i because that
+	    function is only defined for win32 and will cause a link error on
+	    other platforms.
+	  - Added #undef for MIN and MAX to csperl5.cpp to stop the macro
+	    redefinition errors when they're defined by the Perl headers.
 23-May-2003
 	- Jorrit fixed a bug with 3D sprites. If the factory was
 	  HardTransformed() the shape indicator was not changed.

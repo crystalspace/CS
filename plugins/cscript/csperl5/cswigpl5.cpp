@@ -11,4 +11,6 @@
 */
 
 #include "css.h"
+#undef MIN
+#undef MAX
 #include "cswigpl5.inc"

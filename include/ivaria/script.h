@@ -1,5 +1,6 @@
 /*
     Copyright (C) 1999 by Brandon Ehle <azverkan@yahoo.com>
+              (C) 2003 by Mat Sutcliffe <oktal@gmx.co.uk>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -181,7 +182,6 @@ struct iScript : public iBase
   /// Load a module in the script interpreter.
   virtual bool LoadModule (const char *name) = 0;
 
-#if 0 // not yet implemented in Python
   /**
    * Call a subroutine in the script, with no return value.
    * Returns false if the subroutine named does not exist.
@@ -299,7 +299,6 @@ struct iScript : public iBase
   /// Remove a variable from the script interpreter.
   /// Returns false if the named variable does not exist.
   virtual bool Remove (const char *name) = 0;
-#endif
 };
 
 #endif // __CS_IVARIA_SCRIPT_H__

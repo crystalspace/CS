@@ -479,6 +479,7 @@ TYPEMAP_OUT_csWrapPtr
 %rename(asRGBcolor) csRGBpixel::operator csRGBcolor;
 %include "csgfx/rgbpixel.h"
 
+%ignore csGetPlatformConfig;
 %include "cssys/sysfunc.h"
 
 %ignore csInitializer::RequestPlugins;
