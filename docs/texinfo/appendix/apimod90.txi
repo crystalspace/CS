@@ -603,7 +603,7 @@ request that @file{cssysdef.h} @emph{provides} certain facilities.
 
 Methods in many classes and @sc{scf} interfaces have been renamed in order to
 improve naming consistency throughout the project.
-The following method names changes follow the pattern where
+The following method name changes follow the pattern where
 @code{GetNumSomething()} or @code{GetNumberSomething()} became
 @code{GetSomethingCount()}.
 
