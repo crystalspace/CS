@@ -13,7 +13,7 @@ DESCRIPTION.os2gcc = OS/2 with GCC/EMX
 
 # Choose which drivers you want to build/use
 DRIVERS=\
-  csnetdrv/null csnetman/null csnetman/simple \
+  csnetdrv/null csnetdrv/sockets csnetman/null csnetman/simple \
   cssnddrv/null cssndrdr/null cssndrdr/software \
   cs2d/csdive cs3d/software \
   cs2d/openglos2 cs3d/opengl
@@ -69,6 +69,9 @@ JPG_LIBS=-Llibs/libjpeg -ljpegdll
 
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=
+
+# Does this system require libsocket.a?
+NEED_SOCKET_LIB=yes
 
 # Indicate where special include files can be found.
 CFLAGS.INCLUDE=-Ilibs/zlib -Ilibs/libpng -Ilibs/libjpeg
