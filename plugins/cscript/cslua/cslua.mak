@@ -93,9 +93,11 @@ $(OUT)/%$O: plugins/cscript/cslua/%.cpp
 $(OUT)/%$O: plugins/cscript/cslua/%.c
 	$(DO.COMPILE.C) $(CFLAGS.LUA)
 
+ifdef LUASWIGBIN
 $(SWIG.CSLUA): $(SWIG.INTERFACE)
-	luaswig -shadow -c++ -o $(SWIG.CSLUA) $(SWIG.INTERFACE)
-	mv plugins/cscript/cslua/cspace.lua scripts/lua/
+	$(LUASWIGBIN) -shadow -c++ -o $(SWIG.CSLUA) $(SWIG.INTERFACE)
+	$(MV) plugins/cscript/cslua/cspace.lua scripts/lua/
+endif
 
 $(CSLUA): $(OBJ.CSLUA) $(LIB.CSLUA)
 	$(DO.PLUGIN.PREAMBLE) \

@@ -39,3 +39,8 @@ if [ -n "${SWIGBIN}" ]; then
     echo "SWIGBIN = ${SWIGBIN}"
 fi
 
+LUASWIGBIN=`which luaswig 2>&1 | grep -v "[Nn]o"`
+if [ -n "${SWIGBIN}" ]; then
+    echo "LUASWIGBIN = ${LUASWIGBIN}"
+fi
+
