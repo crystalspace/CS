@@ -25,6 +25,7 @@
 
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
+#include "ivideo/gfxmem.h"
 
 #if THREAD_SUPPORT
 extern "C" {
@@ -64,7 +65,13 @@ public:
   virtual void FinishDraw();
 
   virtual void Print(csRect* area = 0);
-  virtual unsigned char *GetImage();
+
+  unsigned char *GetImage();
+  struct eiGraphicsMemory : public iGraphicsMemory
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csGraphicsMemory);
+    virtual unsigned char *GetImage() { return scfParent->GetImage(); }
+  } scfiGraphicsMemory;
 
 #if THREAD_SUPPORT
 protected:

@@ -20,7 +20,6 @@
 */
 
 #include "cssysdef.h"
-#include "csutil/scf.h"
 #include "csgeom/csrect.h"
 
 #define THREAD_SUPPORT 0
@@ -37,10 +36,14 @@ extern "C" {
 CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_FACTORY (csGraphicsMemory)
 
-
 SCF_IMPLEMENT_IBASE_EXT (csGraphicsMemory)
   SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iGraphicsMemory)
 SCF_IMPLEMENT_IBASE_EXT_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphicsMemory::eiGraphicsMemory)
+  SCF_IMPLEMENTS_INTERFACE (iGraphicsMemory)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 #if THREAD_SUPPORT
 void *csGraphicsMemory::updateThread(void *obj)
@@ -61,6 +64,7 @@ void *csGraphicsMemory::updateThread(void *obj)
 csGraphicsMemory::csGraphicsMemory (iBase* p) :
   superclass(p), buff_a(0), res(0)
 {
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiGraphicsMemory);
 #if THREAD_SUPPORT
 	buff_b = 0;
 #endif
