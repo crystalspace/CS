@@ -31,6 +31,8 @@
 #include "iengine/material.h"
 #include "ivideo/material.h"
 #include "csgeom/transfrm.h"
+#include "csgfx/shadervar.h"
+#include "csgfx/shadervarcontext.h"
 
 #include "fullquad.h"
 
@@ -42,15 +44,17 @@ private:
   csRef<iRenderBuffer> indices;
   csRef<iRenderBuffer> texcoords;
 
+  csShaderVariableContext* varcontext;
+
   csStringID vertices_name, indices_name, texcoords_name;
 
 public:
 
-  SCF_DECLARE_IBASE;
+  //SCF_DECLARE_IBASE;
 
   csFullscreenQuad (iGraphics3D* g3d, iStringSet* strings)
   {
-    SCF_CONSTRUCT_IBASE (0)
+    //SCF_CONSTRUCT_IBASE (0)
 
     csFullscreenQuad::g3d = g3d;
 
@@ -85,13 +89,28 @@ public:
     vertices_name = strings->Request ("vertices");
     indices_name = strings->Request ("indices");
     texcoords_name = strings->Request ("texture coordinates");
-  }
-  virtual ~csFullscreenQuad ()
-  {
-    SCF_DESTRUCT_IBASE();
+
+    varcontext = new csShaderVariableContext ();
+    csShaderVariable* sv;
+    sv = varcontext->GetVariableAdd (vertices_name);
+    sv->SetValue(vertices);
+    sv = varcontext->GetVariableAdd (indices_name);
+    sv->SetValue(indices);
+    sv = varcontext->GetVariableAdd (texcoords_name);
+    sv->SetValue(texcoords);
   }
 
-  iRenderBuffer* GetRenderBuffer(csStringID name)
+  virtual ~csFullscreenQuad ()
+  {
+    //SCF_DESTRUCT_IBASE();
+  }
+
+  csShaderVariableContext* GetContext ()
+  {
+    return varcontext;
+  }
+
+  /*iRenderBuffer* GetRenderBuffer(csStringID name)
   {
     if (name == vertices_name)
       return vertices;
@@ -100,11 +119,12 @@ public:
     if (name == texcoords_name)
       return texcoords;
     return 0;
-  }
+  }*/
 };
 
-SCF_IMPLEMENT_IBASE (csFullscreenQuad)
-SCF_IMPLEMENT_IBASE_END
+/*SCF_IMPLEMENT_IBASE (csFullscreenQuad)
+  SCF_IMPLEMENTS_INTERFACE (iRenderBufferSource)
+SCF_IMPLEMENT_IBASE_END*/
 
 //---------------------------------------------------------------------------
 
@@ -215,6 +235,7 @@ csFullScreenQuadRenderStep::csFullScreenQuadRenderStep (
   fullquad = new csFullscreenQuad (g3d, strings);
 
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+
   material = "";
 }
 
@@ -224,12 +245,12 @@ csFullScreenQuadRenderStep::~csFullScreenQuadRenderStep ()
   SCF_DESTRUCT_IBASE();
 }
 
-void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* sector)
+void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* sector,
+  CS_SHADERVAR_STACK &stacks)
 {
   /*
     @@@ FIXME: Render buffers -> SV
    */
-#if 0
   csRef<iGraphics3D> g3d = rview->GetGraphics3D();
 
   //g3d->BeginDraw (CSDRAW_3DGRAPHICS);
@@ -244,15 +265,9 @@ void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* sector)
 
     if (shader != 0)
     {
-      csArray<iShaderVariableContext*> dynDomain;
       int numPasses = shader->GetNumberOfPasses ();
       for (int p=0; p < numPasses; p++)
       {
-        dynDomain.Empty ();
-        dynDomain.Push (mat->GetMaterial ());
-
-        //iShaderPass *pass = tech->GetPass (p);
-
         csRenderMesh mesh;
         mesh.clip_plane = CS_CLIP_NOT;
         mesh.clip_portal = CS_CLIP_NOT;
@@ -260,13 +275,13 @@ void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* sector)
         mesh.do_mirror = false;
         mesh.indexstart = 0;
         mesh.indexend = 4;
-        mesh.buffersource = fullquad;
         csReversibleTransform trans = csReversibleTransform (
 		csMatrix3(), csVector3 (0, 0, -2.0f));
         mesh.object2camera = trans;
         mesh.meshtype = CS_MESHTYPE_QUADS;
         mesh.z_buf_mode = CS_ZBUF_NONE;
         mesh.material = mat;
+        //mesh.variablecontext = fullquad->GetContext ();
 
         /*uint mixmode = pass->GetMixmodeOverride ();
         if (mixmode != 0)
@@ -277,8 +292,8 @@ void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* sector)
         pass->Activate (0);
         pass->SetupState (&mesh, dynDomain);*/
 	shader->ActivatePass (p);
-	shader->SetupPass (&mesh, dynDomain);
-        g3d->DrawMesh (&mesh);
+	shader->SetupPass (&mesh, stacks);
+        g3d->DrawMesh (&mesh, stacks);
 	shader->TeardownPass ();
 	shader->DeactivatePass ();
       }
@@ -310,8 +325,6 @@ void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* sector)
   shader->GetBestTechnique ()->GetPass (0)->ResetState ();
   shader->GetBestTechnique ()->GetPass (0)->Deactivate ();
   g3d->FinishDraw ();
-#endif
-
 #endif
 }
 

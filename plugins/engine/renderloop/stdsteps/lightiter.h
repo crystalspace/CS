@@ -90,7 +90,8 @@ public:
   virtual ~csLightIterRenderStep ();
 
   void InitVariables ();
-  virtual void Perform (iRenderView* rview, iSector* sector);
+  virtual void Perform (iRenderView* rview, iSector* sector,
+    CS_SHADERVAR_STACK &stacks);
 
   virtual int AddStep (iRenderStep* step);
   virtual int GetStepCount ();

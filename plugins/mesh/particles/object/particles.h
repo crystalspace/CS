@@ -466,7 +466,7 @@ private:
   iBase* logparent;
   csParticlesFactory* pFactory;
   iMeshObjectDrawCallback* vis_cb;
-  csRef<csShaderVariableContext> dynDomain;
+  csRef<csShaderVariableContext> svcontext;
   csRef<iParticlesPhysics> physics;
 
   csRef<iMaterialWrapper> matwrap;

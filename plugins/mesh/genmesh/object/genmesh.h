@@ -85,7 +85,7 @@ private:
 #ifdef CS_USE_NEW_RENDERER
   csRenderMesh mesh;
   csRenderMesh* meshPtr;
-  csShaderVariableContext* dynDomain;
+  csShaderVariableContext* svcontext;
   csRef<iGraphics3D> g3d;
   bool mesh_colors_dirty_flag;
 

@@ -80,7 +80,7 @@ private:
   static csStringID nameTextureLayer3;
   static csStringID nameTextureLayer4;
 
-  csShaderVariableContextHelper svContextHelper;
+  csShaderVariableContext svcontext;
 
 
 public:
@@ -204,26 +204,28 @@ public:
 
 
   //=================== iShaderVariableContext ================//
+
   /// Add a variable to this context
-  virtual void AddVariable (csShaderVariable *variable)
-  { svContextHelper.AddVariable (variable); }
+  void AddVariable (csShaderVariable *variable)
+  { svcontext.AddVariable (variable); }
 
   /// Get a named variable from this context
-  virtual csShaderVariable* GetVariable (csStringID name) const
-  { return svContextHelper.GetVariable (name); }
+  csShaderVariable* GetVariable (csStringID name) const
+  { return svcontext.GetVariable (name); }
 
-  /// Get a named variable from this context, and any context above/outer
-  virtual csShaderVariable* GetVariableRecursive (csStringID name) const
-  {
-    csShaderVariable* var;
-    var=GetVariable (name);
-    if(var) return var;
-    return 0;
-  }
+  /**
+  * Push the variables of this context onto the variable stacks
+  * supplied in the "stacks" argument
+  */
+  void PushVariables (CS_SHADERVAR_STACK &stacks) const
+  { svcontext.PushVariables (stacks); }
 
-  /// Fill a csShaderVariableList
-  virtual unsigned int FillVariableList (csShaderVariableProxyList* list) const
-  { return svContextHelper.FillVariableList (list); }
+  /**
+  * Pop the variables of this context off the variable stacks
+  * supplied in the "stacks" argument
+  */
+  void PopVariables (CS_SHADERVAR_STACK &stacks) const
+  { svcontext.PopVariables (stacks); }
 };
 
 /**

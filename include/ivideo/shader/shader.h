@@ -41,7 +41,7 @@ struct iShaderCompiler;
 
 struct csRenderMesh;
 
-
+#define CS_SHADERVAR_STACK csArray< csArray<csShaderVariable*> >
 
 SCF_VERSION (iShaderVariableContext, 0, 0, 1);
 
@@ -57,15 +57,7 @@ struct iShaderVariableContext : public iBase
   /// Get a named variable from this context
   virtual csShaderVariable* GetVariable (csStringID name) const = 0;
 
-  /// Get a named variable from this context, and any context above/outer
-  virtual csShaderVariable* GetVariableRecursive (csStringID name) const = 0;
-
-  /// Fill a csShaderVariableList. Return number of variables filled
-  virtual unsigned int FillVariableList (csShaderVariableProxyList *list) const = 0;
-
-  /**
-   * Like GetVariable(), but it also adds it if doesn't exist already.
-   */
+  /// Like GetVariable(), but it also adds it if doesn't exist already.
   csShaderVariable* GetVariableAdd (csStringID name)
   {
     csShaderVariable* sv;
@@ -81,19 +73,16 @@ struct iShaderVariableContext : public iBase
   }
 
   /**
-   * Like GetVariable(), but it also adds it if doesn't exist already.
-   */
-  csShaderVariable* GetVariableRecursiveAdd (csStringID name)
-  {
-    csShaderVariable* sv;
-    sv = GetVariableRecursive (name);
-    if (sv == 0)
-    {
-      sv = new csShaderVariable (name);
-      AddVariable (sv);
-    }
-    return sv;
-  }
+  * Push the variables of this context onto the variable stacks
+  * supplied in the "stacks" argument
+  */
+  virtual void PushVariables (CS_SHADERVAR_STACK &stacks) const = 0;
+
+  /**
+  * Pop the variables of this context off the variable stacks
+  * supplied in the "stacks" argument
+  */
+  virtual void PopVariables (CS_SHADERVAR_STACK &stacks) const = 0;
 };
 
 SCF_VERSION (iShaderManager, 0, 1, 0);
@@ -103,7 +92,10 @@ SCF_VERSION (iShaderManager, 0, 1, 0);
  */
 struct iShaderManager : public iShaderVariableContext
 {
-  /// Register a shader to the shadermanager. Compiler should register all shaders
+  /**
+   * Register a shader to the shadermanager.
+   * Compiler should register all shaders
+   */
   virtual void RegisterShader(iShader* shader) = 0;
   /// Get a shader by name
   virtual iShader* GetShader(const char* name) = 0;
@@ -142,9 +134,9 @@ struct iShader : public iShaderVariableContext
   /// Activate a pass for rendering
   virtual bool ActivatePass(unsigned int number) = 0;
 
-  /// Setup a pass.
+  /// Setup a pass
   virtual bool SetupPass (csRenderMesh *mesh,
-    const csArray<iShaderVariableContext*> &dynamicDomains) = 0;
+    const CS_SHADERVAR_STACK &stacks) = 0;
 
   /**
    * Tear down current state, and prepare for a new mesh 

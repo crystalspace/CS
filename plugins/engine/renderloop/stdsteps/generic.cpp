@@ -166,15 +166,17 @@ csGenericRenderStep::~csGenericRenderStep ()
 void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
                                         iShader* shader, 
                                         csRenderMesh** meshes, 
-                                        int num)
+                                        int num,
+                                        CS_SHADERVAR_STACK &stacks)
 {
   if (num == 0) return;
   ToggleStepSettings (g3d, true);
-  csArray<iShaderVariableContext*> dynDomain;
   if (!shaderManager)
   {
     shaderManager = CS_QUERY_REGISTRY (objreg, iShaderManager);
   }
+
+  iMaterial *material = 0;
 
   int numPasses = shader->GetNumberOfPasses ();
   for (int p=0; p < numPasses; p++)
@@ -185,19 +187,37 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
     for (j = 0; j < num; j++)
     {
       csRenderMesh* mesh = meshes[j];
-      dynDomain.Empty ();
-      dynDomain.Push (shaderManager);
-      dynDomain.Push (mesh->material->GetMaterial ());
-      if (mesh->dynDomain) dynDomain.Insert (0, mesh->dynDomain);
-      shader->SetupPass (mesh, dynDomain);
-      g3d->DrawMesh (mesh);
+      if (mesh->material->GetMaterial () != material)
+      {
+        if (material != 0)
+        {
+          shader->PopVariables (stacks);
+          material->PopVariables (stacks);
+        }
+        material = mesh->material->GetMaterial ();
+        material->PushVariables (stacks);
+        shader->PushVariables (stacks);
+      }
+      if (mesh->variablecontext)
+        mesh->variablecontext->PushVariables (stacks);
+      shader->SetupPass (mesh, stacks);
+      g3d->DrawMesh (mesh, stacks);
       shader->TeardownPass ();
+      if (mesh->variablecontext)
+        mesh->variablecontext->PopVariables (stacks);
     }
     shader->DeactivatePass ();
   }
+
+  if (material != 0)
+  {
+    shader->PopVariables (stacks);
+    material->PopVariables (stacks);
+  }
 }
 
-void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
+void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
+  CS_SHADERVAR_STACK &stacks)
 {
   iGraphics3D* g3d = rview->GetGraphics3D();
 
@@ -220,7 +240,8 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
       {
         if (shader != 0)
 	{
-          RenderMeshes (g3d, shader, sameShaderMeshes+lastidx, numSSM);
+          RenderMeshes (g3d, shader, sameShaderMeshes+lastidx, 
+            numSSM, stacks);
           shader = 0;
 	}
         numSSM = 0;
@@ -238,7 +259,8 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
         // @@@ Need error reporter
         if (shader != 0)
 	{
-          RenderMeshes (g3d, shader, sameShaderMeshes+lastidx, numSSM);
+          RenderMeshes (g3d, shader, sameShaderMeshes+lastidx, 
+            numSSM, stacks);
 	}
 	lastidx = n;
         shader = meshShader;
@@ -252,7 +274,8 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
   {
     // @@@ Need error reporter
     if (shader != 0)
-      RenderMeshes (g3d, shader, sameShaderMeshes+lastidx, numSSM);
+      RenderMeshes (g3d, shader, sameShaderMeshes+lastidx, 
+        numSSM, stacks);
   }
 
   ToggleStepSettings (g3d, false);
@@ -279,9 +302,10 @@ void csGenericRenderStep::ToggleStepSettings (iGraphics3D* g3d,
 }
 
 void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
-				   iLight* light)
+				   iLight* light,
+                                   CS_SHADERVAR_STACK &stacks)
 {
-  Perform (rview, sector);
+  Perform (rview, sector, stacks);
 }
 
 void csGenericRenderStep::SetShaderType (const char* type)

@@ -27,7 +27,7 @@ SCF_VERSION(iShaderProgram, 0,2,0);
  * A helper for shaders that which to use the general plugins.
  * This is the main program plugin interface
  */
-struct iShaderProgram : public iShaderVariableContext
+struct iShaderProgram : iBase
 {
   /// Sets this program to be the one used when rendering
   virtual void Activate() = 0;
@@ -37,7 +37,7 @@ struct iShaderProgram : public iShaderVariableContext
 
   /// Setup states needed for proper operation of the shaderprogram
   virtual void SetupState (csRenderMesh* mesh, 
-    const csArray<iShaderVariableContext*> &dynamicDomains) = 0;
+    const CS_SHADERVAR_STACK &stacks) = 0;
 
   /// Reset states to original
   virtual void ResetState () = 0;

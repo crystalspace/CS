@@ -4755,12 +4755,13 @@ bool csLoader::ParseShaderList (iDocumentNode* node)
 	}
 	else
 	{
-	  shaderNode = child;
+	  shaderNode = child->GetNode ("shader");
 	}
 
 	csRef<iShaderManager> shmgr (CS_QUERY_REGISTRY(object_reg, 
 	  iShaderManager));
-	csRef<iShaderCompiler> shcom (shmgr->GetCompiler ("XMLShader"));
+	csRef<iShaderCompiler> shcom (shmgr->GetCompiler (
+          shaderNode->GetAttributeValue ("type")));
 	csRef<iShader> shader = 
 	  shcom->CompileShader (shaderNode);
 

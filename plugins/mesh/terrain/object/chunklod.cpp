@@ -700,19 +700,19 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
 void csChunkLodTerrainFactory::MeshTreeNode::UpdateBufferSV ()
 {
   csShaderVariable *sv;
-  sv = dynDomain.GetVariableAdd(pFactory->vertex_name);
+  sv = svcontext.GetVariableAdd(pFactory->vertex_name);
   sv->SetValue(GetRenderBuffer(pFactory->vertex_name));
-  sv = dynDomain.GetVariableAdd(pFactory->normal_name);
+  sv = svcontext.GetVariableAdd(pFactory->normal_name);
   sv->SetValue(GetRenderBuffer(pFactory->normal_name));
-  sv = dynDomain.GetVariableAdd(pFactory->tangent_name);
+  sv = svcontext.GetVariableAdd(pFactory->tangent_name);
   sv->SetValue(GetRenderBuffer(pFactory->tangent_name));
-  sv = dynDomain.GetVariableAdd(pFactory->binormal_name);
+  sv = svcontext.GetVariableAdd(pFactory->binormal_name);
   sv->SetValue(GetRenderBuffer(pFactory->binormal_name));
-  sv = dynDomain.GetVariableAdd(pFactory->texcors_name);
+  sv = svcontext.GetVariableAdd(pFactory->texcors_name);
   sv->SetValue(GetRenderBuffer(pFactory->texcors_name));
-  sv = dynDomain.GetVariableAdd(pFactory->color_name);
+  sv = svcontext.GetVariableAdd(pFactory->color_name);
   sv->SetValue(GetRenderBuffer(pFactory->color_name));
-  sv = dynDomain.GetVariableAdd(pFactory->index_name);
+  sv = svcontext.GetVariableAdd(pFactory->index_name);
   sv->SetValue(GetRenderBuffer(pFactory->index_name));
 }
 
@@ -912,7 +912,7 @@ bool csChunkLodTerrainObject::DrawTestQuad (iRenderView* rv,
     meshes[len].z_buf_mode = CS_ZBUF_TEST;
     meshes[len].mixmode = CS_FX_COPY;
     node->UpdateBufferSV();
-    meshes[len].dynDomain = &node->dynDomain;
+    meshes[len].variablecontext = &node->svcontext;
     meshes[len].indexstart = 0;
     meshes[len].indexend = node->Count ();
     meshes[len].meshtype = CS_MESHTYPE_TRIANGLESTRIP;
@@ -935,7 +935,7 @@ bool csChunkLodTerrainObject::DrawTestQuad (iRenderView* rv,
         palette_meshes[i][len].z_buf_mode = CS_ZBUF_TEST;
         palette_meshes[i][len].mixmode = CS_FX_COPY;
         node->UpdateBufferSV();
-        palette_meshes[i][len].dynDomain = &node->dynDomain;
+        palette_meshes[i][len].variablecontext = &node->svcontext;
         palette_meshes[i][len].indexstart = 0;
         palette_meshes[i][len].indexend = node->Count ();
         palette_meshes[i][len].meshtype = CS_MESHTYPE_TRIANGLESTRIP;
@@ -986,7 +986,7 @@ csRenderMesh** csChunkLodTerrainObject::GetRenderMeshes (int &n)
     meshes.GetExtend(0).z_buf_mode = CS_ZBUF_TEST;
     meshes[0].mixmode = CS_FX_COPY;
     pFactory->root->UpdateBufferSV ();
-    meshes[0].dynDomain = &pFactory->root->dynDomain;
+    meshes[0].variablecontext = &pFactory->root->svcontext;
     meshes[0].indexstart = 0;
     meshes[0].indexend = pFactory->root->Count ();
     meshes[0].meshtype = CS_MESHTYPE_TRIANGLESTRIP;

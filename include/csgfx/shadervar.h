@@ -99,7 +99,7 @@ public:
   void SetAccessor (iShaderVariableAccessor* a) { accessor = a;}
 
   /// Get the name of the variable
-  csStringID GetName() const { return Name; }
+  csStringID GetName () const { return Name; }
 
   /// Retireve an int
   bool GetValue (int& value)
@@ -261,126 +261,5 @@ public:
   }
 
 };
-
-struct csShaderVariableProxy
-{
-public:
-  csShaderVariableProxy () :
-      Name (csInvalidStringID), userData (0), shaderVariable(0), realLocation(0)
-  {}
-
-  csShaderVariableProxy (csStringID name, void* ud, 
-    csRef<csShaderVariable>* realplace = 0) :
-      Name (name), userData(ud), shaderVariable(0), realLocation(realplace)
-  {}
-        
-  csStringID Name;
-  void* userData;
-  csShaderVariable *shaderVariable;
-  csRef<csShaderVariable>* realLocation;
-};
-
-
-static int ShaderVariableCompare (csShaderVariable* const &item1,
-                                  csShaderVariable* const &item2)
-{
-  if (item1->Name < item2->Name) return -1;
-  else if (item1->Name > item2->Name) return 1;
-  else return 0;
-}
-
-static int ShaderVariableKeyCompare (csShaderVariable* const& item1, void* item2)
-{
-  csStringID key = (csStringID)item2;
-  if (item1->Name < key) return -1;
-  else if (item1->Name > key) return 1;
-  else return 0;
-}
-
-
-/**
- * Sorted list of shadervariables
- */
-class csShaderVariableProxyList : 
-  public csArray<csShaderVariableProxy>
-{
-public:
-  int InsertSorted (csShaderVariableProxy item);
-  int Push (csShaderVariableProxy item);
-  void PrepareFill ();
-};
-
-class csShaderVariableContextHelper
-{
-public:
-  csShaderVariableContextHelper () 
-  {}
-
-  ~csShaderVariableContextHelper()
-  {
-  }
-
-  /// Add a variable to this context
-  inline void AddVariable (csShaderVariable *variable) 
-  {
-    csShaderVariable* var = GetVariable(variable->Name);
-    if (var == 0)
-      variables.InsertSorted (variable, ShaderVariableCompare);
-    else
-      *var = *variable;
-  }
-
-  /// Get a named variable from this context
-  inline csShaderVariable* GetVariable (csStringID name) const 
-  {
-    int idx = variables.FindSortedKey ((void*)name, ShaderVariableKeyCompare);
-    if (idx >= 0) return variables.Get (idx);
-    else return 0;
-  }
-
-  /**
-  * Fill a csShaderVariableList
-  * It requires the passed list to be sorted.
-  */
-  inline unsigned int FillVariableList (csShaderVariableProxyList *list) const
-  {
-    unsigned int count = 0;
-    if (list->Length ()== 0 || variables.Length() == 0) return 0;
-
-    csRefArray<csShaderVariable>::Iterator varIter (variables.GetIterator ());
-    csShaderVariableProxyList::Iterator inputIter (list->GetIterator ());
-    csShaderVariable* curVar=0;
-    curVar=varIter.Next ();
-
-    while (inputIter.HasNext())
-    {
-      csShaderVariableProxy *curInput = (csShaderVariableProxy*)&inputIter.Next();
-      while (varIter.HasNext () && curVar->Name < curInput->Name)
-      {
-        curVar=varIter.Next ();
-      }
-      if (curVar->Name == curInput->Name && curInput->shaderVariable == 0)
-      {
-        curInput->shaderVariable = curVar;
-        if (curInput->realLocation!=0) (*curInput->realLocation) = curVar;
-        count++;
-      }
-      else if (curVar->Name > curInput->Name)
-        continue;
-      else if (varIter.HasNext ())
-        continue; //still may have more
-      else if (curVar->Name > curInput->Name)
-        continue;  
-      else
-        return count;
-    }
-    return count;
-  }
-
-private:
-  /// List all variables. They are owned by this class
-  csRefArray<csShaderVariable> variables;
-};
-
 
 #endif

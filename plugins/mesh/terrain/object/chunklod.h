@@ -150,7 +150,7 @@ private:
     void ProcessEdge (int start, int end, int move, const Data& mod);
     
   public:
-    csShaderVariableContext dynDomain;
+    csShaderVariableContext svcontext;
     SCF_DECLARE_IBASE;
   
     MeshTreeNode (csChunkLodTerrainFactory* p, int x, int y, int w, int h,

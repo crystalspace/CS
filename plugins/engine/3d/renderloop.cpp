@@ -90,12 +90,18 @@ void csRenderLoop::Draw (iCamera *c, iClipper2D *view)
   csRenderView rview (c, view, engine->G3D, engine->G2D);
   StartDraw (c, view, rview);
 
+  csRef<iShaderManager> shadermanager = 
+    CS_QUERY_REGISTRY (engine->object_reg, iShaderManager);
+
+
   // First initialize G3D with the right clipper.
   engine->G3D->SetClipper (view, CS_CLIPPER_TOPLEVEL);  // We are at top-level.
   engine->G3D->ResetNearPlane ();
   engine->G3D->SetPerspectiveAspect (c->GetFOV ());
   
+  shadermanager->PushVariables (svstacks);
   Draw (&rview, c->GetSector());
+  shadermanager->PushVariables (svstacks);
 
   // draw all halos on the screen
 /*  if (halos.Length () > 0)
@@ -119,7 +125,7 @@ void csRenderLoop::Draw (iRenderView *rview, iSector *s)
     int i;
     for (i = 0; i < steps.Length(); i++)
     {
-      steps[i]->Perform (rview, s);
+      steps[i]->Perform (rview, s, svstacks);
     }
     s->DecRecLevel ();
   }

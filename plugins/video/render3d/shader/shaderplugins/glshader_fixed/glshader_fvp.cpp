@@ -72,21 +72,12 @@ void csGLShaderFVP::Deactivate()
 }
 
 void csGLShaderFVP::SetupState (
-  csRenderMesh *mesh, const csArray<iShaderVariableContext*> &dynamicDomains)
+  csRenderMesh *mesh, const CS_SHADERVAR_STACK &stacks)
 {
   int i;
 
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
     object_reg, "crystalspace.shared.stringset", iStringSet);
-
-  if (dynamicVars.Length() > 0)
-  {
-    dynamicVars.PrepareFill ();
-    for(i=0;i<dynamicDomains.Length();i++)
-    {
-      dynamicDomains[i]->FillVariableList (&dynamicVars);
-    }
-  }
 
   if (do_lighting)
   {
@@ -108,10 +99,16 @@ void csGLShaderFVP::SetupState (
       int l = lights[i].lightnum;
       glEnable (GL_LIGHT0+l);
 
-      if (lights[i].positionVarRef)
+      csRef<csShaderVariable> var = 0;
+
+      var = lights[i].positionVarRef;
+      if (!var && lights[i].positionvar < stacks.Length ()
+          && stacks[lights[i].positionvar].Length () > 0)
+        var = stacks[lights[i].positionvar].Top ();
+      if (var)
       {
         csVector4 v;
-        lights[i].positionVarRef->GetValue (v);
+        var->GetValue (v);
         glLightfv (GL_LIGHT0+l, GL_POSITION, (float*)&v);
       }
       else
@@ -120,10 +117,14 @@ void csGLShaderFVP::SetupState (
         glLightfv (GL_LIGHT0+l, GL_POSITION, (float*)&v);
       }
 
-      if (lights[i].diffuseVarRef)
+      var = lights[i].diffuseVarRef;
+      if (!var && lights[i].diffusevar < stacks.Length ()
+          && stacks[lights[i].diffusevar].Length () > 0)
+        var = stacks[lights[i].diffusevar].Top ();
+      if (var)
       {
         csVector4 v;
-        lights[i].diffuseVarRef->GetValue (v);
+        var->GetValue (v);
         glLightfv (GL_LIGHT0+l, GL_DIFFUSE, (float*)&v);
       }
       else
@@ -132,10 +133,14 @@ void csGLShaderFVP::SetupState (
         glLightfv (GL_LIGHT0+l, GL_DIFFUSE, (float*)&v);
       }
 
-      if (lights[i].specularVarRef)
+      var = lights[i].specularVarRef;
+      if (!var && lights[i].specularvar < stacks.Length ()
+          && stacks[lights[i].diffusevar].Length () > 0)
+        var = stacks[lights[i].diffusevar].Top ();
+      if (var)
       {
         csVector4 v;
-        lights[i].specularVarRef->GetValue (v);
+        var->GetValue (v);
         glLightfv (GL_LIGHT0+l, GL_SPECULAR, (float*)&v);
       }
       else
@@ -144,10 +149,14 @@ void csGLShaderFVP::SetupState (
         glLightfv (GL_LIGHT0+l, GL_SPECULAR, (float*)&v);
       }
 
-      if (lights[i].attenuationVarRef)
+      var = lights[i].attenuationVarRef;
+      if (!var && lights[i].attenuationvar < stacks.Length ()
+          && stacks[lights[i].attenuationvar].Length () > 0)
+        var = stacks[lights[i].attenuationvar].Top ();
+      if (var)
       {
         csVector4 v;
-        lights[i].attenuationVarRef->GetValue (v);
+        var->GetValue (v);
         glLightf (GL_LIGHT0+l, GL_CONSTANT_ATTENUATION, v.x);
         glLightf (GL_LIGHT0+l, GL_LINEAR_ATTENUATION, v.y);
         glLightf (GL_LIGHT0+l, GL_QUADRATIC_ATTENUATION, v.z);
@@ -167,8 +176,12 @@ void csGLShaderFVP::SetupState (
     glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, (float*)&v);
     glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, (float*)&v);
 
-    if (ambientVarRef)
-      ambientVarRef->GetValue (v);
+    csRef<csShaderVariable> var = ambientVarRef;
+    if (!var && ambientvar < stacks.Length ()
+        && stacks[ambientvar].Length () > 0)
+      var = stacks[ambientvar].Top ();
+    if (var)
+      var->GetValue (v);
     else
       v = csVector4 (0, 0, 0, 1);
     glLightModelfv (GL_LIGHT_MODEL_AMBIENT, (float*)&v);
@@ -369,87 +382,45 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
   return true;
 }
 
-bool csGLShaderFVP::Compile(csArray<iShaderVariableContext*> &staticdomains)
+bool csGLShaderFVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
 {
   shaderPlug->Open ();
 
-  //go through the lights and get direct refs (if we can)
-  dynamicVars.Empty ();
   int i, j;
 
   if ((environment == ENVIRON_REFLECT_CUBE) &&
     !shaderPlug->ext->CS_GL_ARB_texture_cube_map)
     return false;
 
-  ambientVarRef = svContextHelper.GetVariable (ambientvar);
-  if (!ambientVarRef)
+  for (j=0; j<staticContexts.Length(); j++)
   {
-    for (j=0;j<staticdomains.Length();j++)
-    {
-      ambientVarRef = staticdomains[j]->GetVariable (ambientvar);
-      if (ambientVarRef) break;
-    }
+    ambientVarRef = staticContexts[j]->GetVariable (ambientvar);
+    if (ambientVarRef) break;
   }
-  if (!ambientVarRef)
-    dynamicVars.InsertSorted (csShaderVariableProxy (ambientvar, 0,
-    &ambientVarRef));
 
   for (i = 0; i < lights.Length (); i++)
   {
     lightingentry &ent = lights.Get (i);
-    //query, it turn current and all levels above
-    ent.positionVarRef = svContextHelper.GetVariable (ent.positionvar);
-    if(!ent.positionVarRef)
-    {
-      for (j=0;j<staticdomains.Length();j++)
-      {
-        ent.positionVarRef = staticdomains[j]->GetVariable (ent.positionvar);
-        if (ent.positionVarRef) break;
-      }
-    }
-    if(!ent.positionVarRef)
-      ent.dynVars.InsertSorted (csShaderVariableProxy(ent.positionvar, 0,
-      &ent.positionVarRef));
 
-    ent.diffuseVarRef = svContextHelper.GetVariable (ent.diffusevar);
-    if(!ent.diffuseVarRef)
+    lights[i].positionVarRef = 0;
+    lights[i].diffuseVarRef = 0;
+    lights[i].specularVarRef = 0;
+    lights[i].attenuationVarRef = 0;
+    for (j=0; j<staticContexts.Length(); j++)
     {
-      for (j=0;j<staticdomains.Length();j++)
-      {
-        ent.diffuseVarRef = staticdomains[j]->GetVariable (ent.diffusevar);
-        if (ent.diffuseVarRef) break;
-      }
+      if (!lights[i].positionVarRef)
+        lights[i].positionVarRef = 
+          staticContexts[j]->GetVariable (lights[i].positionvar);
+      if (!lights[i].diffuseVarRef)
+        lights[i].diffuseVarRef = 
+          staticContexts[j]->GetVariable (lights[i].diffusevar);
+      if (!lights[i].specularVarRef)
+        lights[i].specularVarRef = 
+          staticContexts[j]->GetVariable (lights[i].specularvar);
+      if (!lights[i].attenuationVarRef)
+        lights[i].attenuationVarRef = 
+          staticContexts[j]->GetVariable (lights[i].attenuationvar);
     }
-    if(!ent.diffuseVarRef)
-      ent.dynVars.InsertSorted (csShaderVariableProxy(ent.diffusevar, 0,
-      &ent.diffuseVarRef));
-
-    ent.specularVarRef = svContextHelper.GetVariable (ent.specularvar);
-    if(!ent.specularVarRef)
-    {
-      for (j=0;j<staticdomains.Length();j++)
-      {
-        ent.specularVarRef = staticdomains[j]->GetVariable (ent.specularvar);
-        if (ent.specularVarRef) break;
-      }
-    }
-    if(!ent.specularVarRef)
-      ent.dynVars.InsertSorted (csShaderVariableProxy(ent.specularvar, 0,
-      &ent.specularVarRef));
-
-    ent.attenuationVarRef = svContextHelper.GetVariable (ent.attenuationvar);
-    if(!ent.attenuationVarRef)
-    {
-      for (j=0;j<staticdomains.Length();j++)
-      {
-        ent.attenuationVarRef =
-	  staticdomains[j]->GetVariable (ent.attenuationvar);
-        if (ent.attenuationVarRef) break;
-      }
-    }
-    if(!ent.attenuationVarRef)
-      ent.dynVars.InsertSorted (csShaderVariableProxy(ent.attenuationvar, 0,
-      &ent.attenuationVarRef));
   }
 
   return true;

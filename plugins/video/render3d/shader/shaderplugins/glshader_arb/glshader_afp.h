@@ -21,6 +21,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __GLSHADER_AFP_H__
 
 #include "../../common/shaderplugin.h"
+#include "csgfx/shadervarcontext.h"
 #include "ivideo/shader/shader.h"
 #include "csutil/strhash.h"
 
@@ -41,7 +42,9 @@ private:
     variablemapentry() { name = csInvalidStringID; }
     csStringID name;
     int registernum;
-    csRef<csShaderVariable> ref;
+    // Variables that can be resolved statically at shader load
+    // or compilation is put in "statlink"
+    csRef<csShaderVariable> statlink;
   };
 
   csArray<variablemapentry> variablemap;
@@ -59,8 +62,8 @@ private:
   bool validProgram;
 
   void Report (int severity, const char* msg, ...);
-  csShaderVariableContextHelper svContextHelper;
-  csShaderVariableProxyList dynamicVars;
+
+  csShaderVariableContext svcontext;
 
 public:
   SCF_DECLARE_IBASE;
@@ -96,7 +99,7 @@ public:
 
   /// Setup states needed for proper operation of the shader
   virtual void SetupState (csRenderMesh* mesh,
-    const csArray<iShaderVariableContext*> &dynamicDomains);
+    const CS_SHADERVAR_STACK &stacks);
 
   /// Reset states to original
   virtual void ResetState ();
@@ -108,30 +111,7 @@ public:
   virtual bool Load(iDocumentNode* node);
 
   /// Compile a program
-  virtual bool Compile(csArray<iShaderVariableContext*> &staticDomains);
-
-
-  //=================== iShaderVariableContext ================//
-  /// Add a variable to this context
-  virtual void AddVariable (csShaderVariable *variable)
-  { svContextHelper.AddVariable (variable); }
-
-  /// Get a named variable from this context
-  virtual csShaderVariable* GetVariable (csStringID name) const
-  { return svContextHelper.GetVariable (name); }
-
-  /// Fill a csShaderVariableList
-  virtual unsigned int FillVariableList (csShaderVariableProxyList *list) const
-  { return svContextHelper.FillVariableList (list); }
-
-  /// Get a named variable from this context, and any context above/outer
-  virtual csShaderVariable* GetVariableRecursive (csStringID name) const
-  {
-    csShaderVariable* var;
-    var=GetVariable (name);
-    if(var) return var;
-    return 0;
-  }
+  virtual bool Compile(csArray<iShaderVariableContext*> &staticContexts);
 };
 
 

@@ -24,3 +24,52 @@ SCF_IMPLEMENT_IBASE(csShaderVariableContext)
   SCF_IMPLEMENTS_INTERFACE(iShaderVariableContext)
 SCF_IMPLEMENT_IBASE_END
 
+csShaderVariableContext::csShaderVariableContext ()
+{
+  SCF_CONSTRUCT_IBASE(0);
+}
+
+csShaderVariableContext::~csShaderVariableContext ()
+{
+  SCF_DESTRUCT_IBASE ();
+}
+
+void csShaderVariableContext::AddVariable 
+  (csShaderVariable *variable) 
+{
+  csShaderVariable* var = GetVariable(variable->Name);
+  if (var == 0)
+    variables.Push (variable);
+  else
+    *var = *variable;
+}
+
+csShaderVariable* csShaderVariableContext::GetVariable 
+  (csStringID name) const 
+{
+  for (int i=0; i<variables.Length (); ++i)
+  {
+    if (variables[i]->GetName () == name)
+      return variables[i];
+  }
+  return 0;
+}
+
+void csShaderVariableContext::PushVariables 
+  (CS_SHADERVAR_STACK &stacks) const
+{
+  for (int i=0; i<variables.Length (); ++i)
+  {
+    csStringID name = variables[i]->GetName ();
+    if (stacks.Length ()<=name)
+      stacks.SetLength (name+1);
+    stacks[name].Push (variables[i]);
+  }
+}
+
+void csShaderVariableContext::PopVariables 
+  (CS_SHADERVAR_STACK &stacks) const
+{
+  for (int i=0; i<variables.Length (); ++i)
+    stacks[variables[i]->GetName ()].Pop ();
+}

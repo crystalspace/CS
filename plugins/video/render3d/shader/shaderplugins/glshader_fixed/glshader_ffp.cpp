@@ -259,7 +259,7 @@ bool csGLShaderFFP::LoadLayer(mtexlayer* layer, iDocumentNode* node)
 
 }*/
 
-bool csGLShaderFFP::Compile(csArray<iShaderVariableContext*> &staticDomains)
+bool csGLShaderFFP::Compile(csArray<iShaderVariableContext*> &staticContexts)
 {
   shaderPlug->Open ();
   ext = shaderPlug->ext;
@@ -354,8 +354,8 @@ void csGLShaderFFP::Deactivate()
   }
 }
 
-void csGLShaderFFP::SetupState (
-  csRenderMesh *mesh, const csArray<iShaderVariableContext*> &dynamicDomains)
+void csGLShaderFFP::SetupState (csRenderMesh *mesh, 
+                                const CS_SHADERVAR_STACK &stacks)
 {
 }
 

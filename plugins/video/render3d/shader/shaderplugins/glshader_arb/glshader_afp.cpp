@@ -69,7 +69,7 @@ void csShaderGLAFP::Deactivate()
 }
 
 void csShaderGLAFP::SetupState (csRenderMesh *mesh, 
-	const csArray<iShaderVariableContext*>& dynamicDomains)
+	const CS_SHADERVAR_STACK &stacks)
 {
   const csGLExtensionManager* ext = shaderPlug->ext;
   int i;
@@ -77,7 +77,12 @@ void csShaderGLAFP::SetupState (csRenderMesh *mesh,
   // set variables
   for(i = 0; i < variablemap.Length(); ++i)
   {
-    csShaderVariable* lvar = variablemap[i].ref;
+    // Check if it's statically linked
+    csRef<csShaderVariable> lvar = variablemap[i].statlink;
+    // If not, we check the stack
+    if (!lvar && variablemap[i].name<stacks.Length ()
+        && stacks[variablemap[i].name].Length () > 0)
+      lvar = stacks[variablemap[i].name].Top ();
 
     if(lvar)
     {
@@ -85,33 +90,8 @@ void csShaderGLAFP::SetupState (csRenderMesh *mesh,
       if (lvar->GetValue (v4))
       {
         ext->glProgramLocalParameter4fvARB (GL_FRAGMENT_PROGRAM_ARB, 
-	  variablemap[i].registernum, &v4.x);
+          variablemap[i].registernum, &v4.x);
       }
-    }
-  }
-
-  if (dynamicVars.Length() > 0)
-  {
-    dynamicVars.PrepareFill ();
-    for(i = 0; i < dynamicDomains.Length (); i++)
-    {
-      dynamicDomains[i]->FillVariableList (&dynamicVars);
-    }
-  }
-
-  for(i = 0; i < dynamicVars.Length(); ++i)
-  {
-    csShaderVariable* lvar = dynamicVars.Get(i).shaderVariable;
-
-    if(lvar)
-    {
-      csVector4 v4;
-      if (lvar->GetValue (v4))
-      {
-        ext->glProgramLocalParameter4fvARB (GL_FRAGMENT_PROGRAM_ARB, 
-          (int)dynamicVars.Get(i).userData, &v4.x);
-      }
-      dynamicVars.Get (i).shaderVariable = 0;
     }
   }
 }
@@ -242,6 +222,7 @@ bool csShaderGLAFP::Load(iDocumentNode* program)
               new csShaderVariable (strings->Request(child->GetAttributeValue ("name"))));
 
             // @@@ Will leak! Should do proper refcounting.
+            // @@@ Is this still needed? Someone need to sort this out.
             var->IncRef ();
 
             csStringID idtype = xmltokens.Request (
@@ -262,7 +243,7 @@ bool csShaderGLAFP::Load(iDocumentNode* program)
                 var->SetValue( v );
                 break;
             }
-            //AddVariable (var);
+            svcontext.AddVariable (var);
           }
           break;
         case XMLTOKEN_VARIABLEMAP:
@@ -286,81 +267,32 @@ bool csShaderGLAFP::Load(iDocumentNode* program)
   return true;
 }
 
-  
-/*bool csShaderGLAFP::Prepare(iShaderPass *pass)
-{
-  //compile variables
-  variablemapentry tempEntry;
-  csShaderVariableProxy tempProx;
-  csArray<variablemapentry> newStat;
-  csShaderVariable *var;
-  int i;
-
-  for (i = 0; i < variablemap.Length (); i++)
-  {
-    var = GetVariable(variablemap[i].name);
-    if (!var)
-      var = pass->GetVariableRecursive (variablemap[i].name);
-    if (var)
-    {
-      //static
-      tempEntry = variablemap[i];
-      tempEntry.ref = var;
-      newStat.Push (tempEntry);
-    }
-    else
-    {
-      //dynamic
-      tempProx.Name = variablemap[i].name;
-      tempProx.userData = variablemap[i].registernum;
-      dynamicVars.InsertSorted (tempProx);
-    }
-  }
-  variablemap.Empty ();
-  newStat.TransferTo (variablemap);
-
-  return LoadProgramStringToGL(programstring);
-}
-*/
-
-bool csShaderGLAFP::Compile(csArray<iShaderVariableContext*> &staticDomains)
+bool csShaderGLAFP::Compile(csArray<iShaderVariableContext*> &staticContexts)
 {
   shaderPlug->Open ();
 
-  variablemapentry tempEntry;
-  csShaderVariableProxy tempProx;
-  csArray<variablemapentry> newStat;
   csShaderVariable *var;
   int i,j;
 
   for (i = 0; i < variablemap.Length (); i++)
   {
-    var = GetVariable(variablemap[i].name);
+    // Check if we've got it locally
+    var = svcontext.GetVariable(variablemap[i].name);
     if (!var)
     {
-      for (j=0;j<staticDomains.Length();j++)
+      // If not, check the static contexts
+      for (j=0;j<staticContexts.Length();j++)
       {
-        var = staticDomains[j]->GetVariable (variablemap[i].name);
+        var = staticContexts[j]->GetVariable (variablemap[i].name);
         if (var) break;
       }
     }
     if (var)
     {
-      //static
-      tempEntry = variablemap[i];
-      tempEntry.ref = var;
-      newStat.Push (tempEntry);
-    }
-    else
-    {
-      //dynamic
-      tempProx.Name = variablemap[i].name;
-      tempProx.userData = (void*)variablemap[i].registernum;
-      dynamicVars.InsertSorted (tempProx);
+      // We found it, so we add it as a static mapping
+      variablemap[i].statlink = var;
     }
   }
-  variablemap.Empty ();
-  newStat.TransferTo (variablemap);
 
   return LoadProgramStringToGL(programstring);
 }

@@ -242,20 +242,20 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
 
   running = false;
 
-  dynDomain = new csShaderVariableContext ();
+  svcontext = new csShaderVariableContext ();
 
   csShaderVariable* sv;
-  sv = dynDomain->GetVariableAdd (vertex_name);
+  sv = svcontext->GetVariableAdd (vertex_name);
   sv->SetAccessor (&scfiShaderVariableAccessor);
-  sv = dynDomain->GetVariableAdd (color_name);
+  sv = svcontext->GetVariableAdd (color_name);
   sv->SetAccessor (&scfiShaderVariableAccessor);
-  sv = dynDomain->GetVariableAdd (texcoord_name);
+  sv = svcontext->GetVariableAdd (texcoord_name);
   sv->SetAccessor (&scfiShaderVariableAccessor);
-  sv = dynDomain->GetVariableAdd (index_name);
+  sv = svcontext->GetVariableAdd (index_name);
   sv->SetAccessor (&scfiShaderVariableAccessor);
-  sv = dynDomain->GetVariableAdd (radius_name);
+  sv = svcontext->GetVariableAdd (radius_name);
   sv->SetValue (particle_radius);
-  sv = dynDomain->GetVariableAdd (scale_name);
+  sv = svcontext->GetVariableAdd (scale_name);
   sv->SetValue (1.0f);
 
   LoadPhysicsPlugin (p->physics_plugin);
@@ -305,9 +305,9 @@ bool csParticlesObject::LoadPhysicsPlugin (const char *plugin_id)
 void csParticlesObject::SetParticleRadius (float rad)
 {
   particle_radius = rad;
-  if (dynDomain)
+  if (svcontext)
   {
-    csShaderVariable* sv = dynDomain->GetVariableAdd (radius_name);
+    csShaderVariable* sv = svcontext->GetVariableAdd (radius_name);
     if (sv) sv->SetValue (particle_radius);
   }
 }
@@ -384,7 +384,7 @@ bool csParticlesObject::DrawTest (iRenderView* rview, iMovable* movable)
       camera_fov = fov;
       camera_pixels = fov_pixels;
       float lambda = (float)(fov_pixels / (2.0 * tan (fov / 360.0 * PI)));
-      csShaderVariable* sv = dynDomain->GetVariable (scale_name);
+      csShaderVariable* sv = svcontext->GetVariable (scale_name);
       sv->SetValue (1.0f / (lambda * particle_radius * 3));
     }
   }
@@ -403,7 +403,8 @@ bool csParticlesObject::DrawTest (iRenderView* rview, iMovable* movable)
   mesh->object2camera = tr_o2c;
   mesh->indexstart = 0;
   mesh->indexend = vertnum;
-  mesh->dynDomain = (iShaderVariableContext*)dynDomain; // Cast for gcc 2.95.x.
+  mesh->variablecontext = 
+    (iShaderVariableContext*)svcontext; // Cast for gcc 2.95.x.
   if (point_sprites)
     mesh->meshtype = CS_MESHTYPE_POINT_SPRITES;
   else

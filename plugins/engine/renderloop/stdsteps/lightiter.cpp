@@ -192,7 +192,8 @@ void csLightIterRenderStep::InitVariables ()
   }
 }
 
-void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector)
+void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
+  CS_SHADERVAR_STACK &stacks)
 {
   InitVariables ();
 
@@ -226,7 +227,7 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector)
       int i;
       for (i = 0; i < steps.Length(); i++)
       {
-        steps[i]->Perform (rview, sector, light);
+        steps[i]->Perform (rview, sector, light, stacks);
       }
     }
   }

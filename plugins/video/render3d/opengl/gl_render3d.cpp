@@ -621,8 +621,6 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
     stencil_enabled = true;
     // Use the stencil area.
     statecache->Enable_GL_STENCIL_TEST ();
-    //statecache->SetStencilFunc (GL_EQUAL, stencilclipnum, (unsigned)-1);
-    statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
   }
 
   int planes = SetupClipPlanes (how_clip == 'p', 
@@ -634,6 +632,9 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
     for (int i = 0; i < planes; i++)
       glEnable ((GLenum)(GL_CLIP_PLANE0+i));
   }
+  // @@@ Hard coded max number of planes (6). Maybe not so good.
+  for (int i = planes; i<6; i++)
+    glDisable ((GLenum)(GL_CLIP_PLANE0+i));
 }
 
 void csGLGraphics3D::ApplyObjectToCamera ()
@@ -1531,16 +1532,19 @@ void csGLGraphics3D::SetTextureState (int* units, iTextureHandle** textures,
   }
 }
 
-void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
+void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh,
+  const CS_SHADERVAR_STACK &stacks)
 {
-  SetupClipper (mymesh->clip_portal, 
+  /*SetupClipper (mymesh->clip_portal, 
                 mymesh->clip_plane, 
-                mymesh->clip_z_plane);
+                mymesh->clip_z_plane);*/
 
   SetObjectToCamera (&mymesh->object2camera);
-
-  CS_ASSERT(mymesh->dynDomain);
-  csShaderVariable* indexBufSV = mymesh->dynDomain->GetVariable (string_indices);
+  
+  csShaderVariable* indexBufSV;
+  if (string_indices<stacks.Length ()
+      && stacks[string_indices].Length () > 0)
+    indexBufSV = stacks[string_indices].Top ();
   CS_ASSERT(indexBufSV);
   iRenderBuffer* iIndexbuf = 0;
   indexBufSV->GetValue (iIndexbuf);
@@ -1570,8 +1574,20 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
         break;
       }
       float radius, scale;
-      mymesh->dynDomain->GetVariable(string_point_radius)->GetValue (radius);
-      mymesh->dynDomain->GetVariable(string_point_scale)->GetValue (scale);
+      csShaderVariable* radiusSV;
+      if (string_point_radius<stacks.Length ()
+          && stacks[string_point_radius].Length () > 0)
+        csShaderVariable* indexBufSV = stacks[string_point_radius].Top ();
+      CS_ASSERT (radiusSV);
+      radiusSV->GetValue (radius);
+
+      csShaderVariable* scaleSV;
+      if (string_point_scale<stacks.Length ()
+          && stacks[string_point_scale].Length () > 0)
+        csShaderVariable* scaleSV = stacks[string_point_scale].Top ();
+      CS_ASSERT (scaleSV);
+      scaleSV->GetValue (scale);
+
       glPointSize (1.0f);
       GLfloat atten[3] = {0.0f, 0.0f, scale * scale};
       ext->glPointParameterfvARB (GL_POINT_DISTANCE_ATTENUATION_ARB, atten);
@@ -1603,27 +1619,30 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
   {
     case CS_SHADOW_VOLUME_PASS1:
       statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_INCR);
-      statecache->SetStencilFunc (GL_ALWAYS, 0, 255);
+      statecache->SetStencilFunc (GL_ALWAYS, 0, 127);
       break;
     case CS_SHADOW_VOLUME_FAIL1:
       statecache->SetStencilOp (GL_KEEP, GL_INCR, GL_KEEP);
-      statecache->SetStencilFunc (GL_ALWAYS, 0, 255);
+      statecache->SetStencilFunc (GL_ALWAYS, 0, 127);
       break;
     case CS_SHADOW_VOLUME_PASS2:
       statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_DECR);
-      statecache->SetStencilFunc (GL_ALWAYS, 0, 255);
+      statecache->SetStencilFunc (GL_ALWAYS, 0, 127);
       break;
     case CS_SHADOW_VOLUME_FAIL2:
       statecache->SetStencilOp (GL_KEEP, GL_DECR, GL_KEEP);
-      statecache->SetStencilFunc (GL_ALWAYS, 0, 255);
+      statecache->SetStencilFunc (GL_ALWAYS, 0, 127);
       break;
     case CS_SHADOW_VOLUME_USE:
       statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
-      if (stencil_enabled)
-        statecache->SetStencilFunc (GL_EQUAL, 0, 255);
-      else
-        statecache->SetStencilFunc (GL_EQUAL, 0, 127);
+      statecache->SetStencilFunc (GL_EQUAL, 0, 127);
       break;
+    default:
+      if (stencil_enabled)
+      {
+        statecache->SetStencilFunc (GL_EQUAL, 0, 255);
+        statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
+      }
   }
 
   if (current_shadow_state == CS_SHADOW_VOLUME_PASS2 ||
@@ -1687,7 +1706,7 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
   }
 
   //if (clip_planes_enabled)
-  {
+  /*{
     clip_planes_enabled = false;
     for (int i = 0; i < 6; i++)
       glDisable ((GLenum)(GL_CLIP_PLANE0+i));
@@ -1696,7 +1715,7 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
   {
     //stencil_enabled = false;
     //statecache->Disable_GL_STENCIL_TEST ();
-  }
+  }*/
 }
 
 void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
@@ -1864,6 +1883,15 @@ void csGLGraphics3D::SetClipper (iClipper2D* clipper, int cliptype)
   clipplane_initialized = false;
   stencil_initialized = false;
   frustum_valid = false;
+  stencil_enabled = false;
+  if (cliptype != CS_CLIPPER_NONE)
+  {
+    SetupClipper (CS_CLIP_NEEDED, CS_CLIP_NEEDED, CS_CLIP_NEEDED);
+  } else {
+    for (int i = 0; i<6; i++)
+      glDisable ((GLenum)(GL_CLIP_PLANE0+i));
+    statecache->Disable_GL_STENCIL_TEST ();
+  }
 }
 
 // @@@ doesn't serve any purpose for now, but might in the future.
@@ -1909,7 +1937,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh)
   bool useShader = (mesh.shader != 0);
 
   csShaderVariable* sv;
-  sv = scrapDomain.GetVariableAdd (string_indices);
+  sv = scrapContext.GetVariableAdd (string_indices);
   if (mesh.indices)
   {
     scrapIndices->CopyToBuffer (mesh.indices, 
@@ -1920,7 +1948,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh)
   {
     sv->SetValue (0);
   }
-  sv = scrapDomain.GetVariableAdd (string_vertices);
+  sv = scrapContext.GetVariableAdd (string_vertices);
   if (mesh.vertices)
   {
     scrapVertices->CopyToBuffer (mesh.vertices, 
@@ -1937,7 +1965,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh)
     else
       DeactivateBuffer (CS_VATTRIB_POSITION);
   }
-  sv = scrapDomain.GetVariableAdd (string_texture_coordinates);
+  sv = scrapContext.GetVariableAdd (string_texture_coordinates);
   if (mesh.texcoords)
   {
     scrapTexcoords->CopyToBuffer (mesh.texcoords, 
@@ -1954,7 +1982,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh)
     else
       DeactivateBuffer (CS_VATTRIB_TEXCOORD);
   }
-  sv = scrapDomain.GetVariableAdd (string_colors);
+  sv = scrapContext.GetVariableAdd (string_colors);
   if (mesh.colors)
   {
     scrapColors->CopyToBuffer (mesh.colors, 
@@ -1973,7 +2001,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh)
   }
   if (useShader)
   {
-    sv = scrapDomain.GetVariableAdd (string_texture_diffuse);
+    sv = scrapContext.GetVariableAdd (string_texture_diffuse);
     sv->SetValue (mesh.texture);
   }
   else
@@ -2002,18 +2030,23 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh)
   rmesh.meshtype = mesh.meshtype;
   rmesh.indexstart = 0;
   rmesh.indexend = mesh.indexCount;
-  rmesh.dynDomain = &scrapDomain;
+  rmesh.variablecontext = &scrapContext;
+
+  CS_SHADERVAR_STACK stacks;
+  shadermgr->PushVariables (stacks);
+  scrapContext.PushVariables (stacks);
 
   if (mesh.alphaType.autoAlphaMode)
   {
     csAlphaMode::AlphaType autoMode = csAlphaMode::alphaNone;
 
     iTextureHandle* tex = 0;
-    if ((mesh.alphaType.autoModeTexture != csInvalidStringID) &&
-      (mesh.dynDomain != 0))
+    if (mesh.alphaType.autoModeTexture != csInvalidStringID
+        && mesh.alphaType.autoModeTexture < stacks.Length ()
+        && stacks[mesh.alphaType.autoModeTexture].Length () > 0)
     {
-      csShaderVariable* texVar = mesh.dynDomain->GetVariableRecursive (
-	mesh.alphaType.autoModeTexture);
+      csShaderVariable* texVar = 
+        stacks[mesh.alphaType.autoModeTexture].Top ();
       if (texVar)
 	texVar->GetValue (tex);
     }
@@ -2029,23 +2062,15 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh)
     rmesh.alphaType = mesh.alphaType.alphaType;
   }
 
-  csArray<iShaderVariableContext*> dynDomain;
-  if (useShader)
-  {
-    dynDomain.Push (shadermgr);
-    dynDomain.Push (&scrapDomain);
-    if (mesh.dynDomain != 0) dynDomain.Push (mesh.dynDomain);
-  }
-
   SetZMode (mesh.z_buf_mode);
   for (int p = 0; p < passCount; p++)
   {
     if (mesh.shader != 0)
     {
       mesh.shader->ActivatePass (p);
-      mesh.shader->SetupPass (&rmesh, dynDomain);
+      mesh.shader->SetupPass (&rmesh, stacks);
     }
-    DrawMesh (&rmesh);
+    DrawMesh (&rmesh, stacks);
     if (mesh.shader != 0)
     {
       mesh.shader->TeardownPass ();

@@ -79,7 +79,7 @@ csStencilShadowCacheEntry::csStencilShadowCacheEntry (
   meshWrapper = mesh;
   model = 0;
   closedMesh = 0;
-  dynDomain = new csShaderVariableContext;
+  svcontext = new csShaderVariableContext;
 
   csRef<iObjectModel> model = mesh->GetMeshObject ()->GetObjectModel ();
   model->AddListener (this);
@@ -89,7 +89,7 @@ csStencilShadowCacheEntry::csStencilShadowCacheEntry (
 csStencilShadowCacheEntry::~csStencilShadowCacheEntry ()
 {
   delete closedMesh;
-  delete dynDomain;
+  delete svcontext;
   SCF_DESTRUCT_IBASE();
 }
 
@@ -396,11 +396,11 @@ iRenderBuffer *csStencilShadowCacheEntry::GetRenderBuffer (csStringID name)
 void csStencilShadowCacheEntry::UpdateBuffers ()
 {
   csShaderVariable *sv;
-  sv = dynDomain->GetVariableAdd (parent->shadow_vertex_name);
+  sv = svcontext->GetVariableAdd (parent->shadow_vertex_name);
   sv->SetValue (shadow_vertex_buffer);
-  sv = dynDomain->GetVariableAdd (parent->shadow_normal_name);
+  sv = svcontext->GetVariableAdd (parent->shadow_normal_name);
   sv->SetValue (shadow_normal_buffer);
-  sv = dynDomain->GetVariableAdd (parent->shadow_index_name);
+  sv = svcontext->GetVariableAdd (parent->shadow_index_name);
   sv->SetValue (active_index_buffer);
 }
 
@@ -496,21 +496,20 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
   rmesh.z_buf_mode = CS_ZBUF_TEST;
   //rmesh.mixmode = shader->GetMixmodeOverride (); //CS_FX_COPY;
   rmesh.material = 0;
-  rmesh.dynDomain = shadowCacheEntry->dynDomain;
+  rmesh.variablecontext = shadowCacheEntry->svcontext;
   rmesh.meshtype = CS_MESHTYPE_TRIANGLES;
 
   // probably shouldn't need to check this in general
   // but just in case, no need to draw if no edges are drawn
   if (edge_start < index_range) 
   {
-    static csArray<iShaderVariableContext*> dynContext;
-    dynContext.Empty ();
+    static CS_SHADERVAR_STACK stacks;
+    stacks.Empty ();
 
     shadowCacheEntry->UpdateBuffers ();
-    dynContext.Push(shadowCacheEntry->dynDomain);
-    dynContext.Push(shmgr);
-    if (rmesh.dynDomain) dynContext.Insert (0, rmesh.dynDomain);
-    shader->SetupPass(&rmesh, dynContext);
+    shmgr->PushVariables (stacks);
+    shadowCacheEntry->svcontext->PushVariables (stacks);
+    shader->SetupPass(&rmesh, stacks);
     if (shadowCacheEntry->ShadowCaps())
     {
       rmesh.indexstart = 0;
@@ -519,38 +518,39 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
         @@@ Try to get rid of drawing the mesh twice
        */
       g3d->SetShadowState (CS_SHADOW_VOLUME_FAIL1);
-      g3d->DrawMesh (&rmesh);
+      g3d->DrawMesh (&rmesh, stacks);
       g3d->SetShadowState (CS_SHADOW_VOLUME_FAIL2);
-      g3d->DrawMesh (&rmesh);
+      g3d->DrawMesh (&rmesh, stacks);
     }
     else 
     {
       rmesh.indexstart = edge_start;
       rmesh.indexend = index_range;
       g3d->SetShadowState (CS_SHADOW_VOLUME_PASS1);
-      g3d->DrawMesh (&rmesh);
+      g3d->DrawMesh (&rmesh, stacks);
       g3d->SetShadowState (CS_SHADOW_VOLUME_PASS2);
-      g3d->DrawMesh (&rmesh);
+      g3d->DrawMesh (&rmesh, stacks);
     }
     shader->TeardownPass();
   }
 }
 
-void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector)
+void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
+  CS_SHADERVAR_STACK &stacks)
 {
   /// TODO: Report error (no light)
   return;
 }
 
 void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
-	iLight* light)
+	iLight* light, CS_SHADERVAR_STACK &stacks)
 {
   iShader* shadow;
   if ((shadow = type->GetShadow ()) == 0)
   {
     for (int i = 0; i < steps.Length (); i++)
     {
-      steps[i]->Perform (rview, sector, light);
+      steps[i]->Perform (rview, sector, light, stacks);
     }
     return;
   }
@@ -683,7 +683,7 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
 
   for (int i = 0; i < steps.Length (); i++)
   {
-    steps[i]->Perform (rview, sector, light);
+    steps[i]->Perform (rview, sector, light, stacks);
   }
 
   g3d->SetShadowState (CS_SHADOW_VOLUME_FINISH);

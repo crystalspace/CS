@@ -1878,15 +1878,15 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n)
 #ifdef CS_USE_NEW_RENDERER
   {
     csShaderVariable* sv;
-    sv = dynDomain.GetVariableAdd (vertices_name);
+    sv = svcontext.GetVariableAdd (vertices_name);
     sv->SetValue (GetRenderBuffer (vertices_name));
-    sv = dynDomain.GetVariableAdd (normals_name);
+    sv = svcontext.GetVariableAdd (normals_name);
     sv->SetValue (GetRenderBuffer (normals_name));
-    sv = dynDomain.GetVariableAdd (texcoords_name);
+    sv = svcontext.GetVariableAdd (texcoords_name);
     sv->SetValue (GetRenderBuffer (texcoords_name));
-    sv = dynDomain.GetVariableAdd (colors_name);
+    sv = svcontext.GetVariableAdd (colors_name);
     sv->SetValue (GetRenderBuffer (colors_name));
-    sv = dynDomain.GetVariableAdd (indices_name);
+    sv = svcontext.GetVariableAdd (indices_name);
     sv->SetValue (GetRenderBuffer (indices_name));
   }
   n = 1;
@@ -1899,7 +1899,7 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n)
   rendermesh.indexstart = 0;
   rendermesh.indexend = final_num_triangles * 3;
   
-  rendermesh.dynDomain = &dynDomain;
+  rendermesh.variablecontext = &svcontext;
   rendermesh.meshtype = CS_MESHTYPE_TRIANGLES;
   meshptr = &rendermesh;
   return &meshptr;

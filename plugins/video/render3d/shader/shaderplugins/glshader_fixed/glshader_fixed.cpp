@@ -97,6 +97,8 @@ bool csGLShader_FIXED::SupportType(const char* type)
 
 csPtr<iShaderProgram> csGLShader_FIXED::CreateProgram(const char* type)
 {
+  /*if (!enable)
+    return 0;*/
   if( strcasecmp(type, "fp") == 0)
     return csPtr<iShaderProgram>(new csGLShaderFFP (this));
   else if( strcasecmp(type, "vp") == 0)

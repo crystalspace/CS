@@ -20,15 +20,6 @@
 #include "cssysdef.h"
 #include "csgfx/shadervar.h"
 
-static int ShaderVariableWrapperCompare (csShaderVariableProxy const &item1,
-                                         csShaderVariableProxy const &item2)
-{
-  if (item1.Name < item2.Name) return -1;
-  else if (item1.Name > item2.Name) return 1;
-  else return 0;
-}
-
-
 csShaderVariable::csShaderVariable (csStringID name) :
   csRefCount (), TextureHandValue (0), TextureWrapValue (0), VectorValue (0),
   accessor (0), Name (name)
@@ -79,27 +70,4 @@ csShaderVariable& csShaderVariable::operator= (csShaderVariable& copyFrom)
       break;
   }
   return *this;
-}
-
-int csShaderVariableProxyList::InsertSorted (csShaderVariableProxy item)
-{
-  return csArray<csShaderVariableProxy>::InsertSorted(
-    item, ShaderVariableWrapperCompare);
-}
-
-int csShaderVariableProxyList::Push (csShaderVariableProxy item)
-{
-  return csArray<csShaderVariableProxy>::InsertSorted(
-    item, ShaderVariableWrapperCompare);
-}
-
-void csShaderVariableProxyList::PrepareFill ()
-{
-  csShaderVariableProxyList::Iterator it (GetIterator ());
-  while(it.HasNext())
-  {
-    csShaderVariableProxy *cur = (csShaderVariableProxy*)&it.Next();
-    cur->shaderVariable = 0;
-    if (cur->realLocation) *cur->realLocation = 0;
-  }
 }

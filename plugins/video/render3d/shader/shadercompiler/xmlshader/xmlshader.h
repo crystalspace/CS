@@ -38,64 +38,62 @@ public:
   virtual ~csXMLShader();
 
   /// Retrieve name of shader
-  virtual const char* GetName()
+  virtual const char* GetName ()
   {
     return name;
   }
 
   /// Get number of passes this shader have
-  virtual int GetNumberOfPasses()
+  virtual int GetNumberOfPasses ()
   {
     return passesCount;
   }
 
   /// Activate a pass for rendering
-  virtual bool ActivatePass(unsigned int number);
+  virtual bool ActivatePass (unsigned int number);
 
   /// Setup a pass.
-  virtual bool SetupPass(csRenderMesh *mesh,
-    const csArray<iShaderVariableContext*> &dynamicDomains);
+  virtual bool SetupPass (csRenderMesh *mesh,
+    const CS_SHADERVAR_STACK &stacks);
 
   /**
   * Tear down current state, and prepare for a new mesh 
   * (for which SetupPass is called)
   */
-  virtual bool TeardownPass();
+  virtual bool TeardownPass ();
 
   /// Completly deactivate a pass
-  virtual bool DeactivatePass();
+  virtual bool DeactivatePass ();
 
   friend class csXMLShaderCompiler;
 
-  /// iShaderVariableContext members
+  //=================== iShaderVariableContext ================//
+
+  /// Add a variable to this context
+  void AddVariable (csShaderVariable *variable)
+  { svcontext.AddVariable (variable); }
+
   /// Get a named variable from this context
-  virtual csShaderVariable* GetVariable (csStringID name) const 
-  {
-    return staticVariables.GetVariable (name);
-  }
-  /// Get a named variable from this context, and any context above/outer
-  virtual csShaderVariable* GetVariableRecursive (csStringID name) const
-  {
-    csShaderVariable* var;
-    var=GetVariable (name);
-    if(var) return var;
-    return 0;
-  }
-  /// Fill a csShaderVariableList. Return number of variables filled
-  virtual unsigned int FillVariableList (csShaderVariableProxyList *list) const
-  {
-    return staticVariables.FillVariableList (list);
-  }
+  csShaderVariable* GetVariable (csStringID name) const
+  { return svcontext.GetVariable (name); }
+
+  /**
+  * Push the variables of this context onto the variable stacks
+  * supplied in the "stacks" argument
+  */
+  void PushVariables (CS_SHADERVAR_STACK &stacks) const
+  { svcontext.PushVariables (stacks); }
+
+  /**
+  * Pop the variables of this context off the variable stacks
+  * supplied in the "stacks" argument
+  */
+  void PopVariables (CS_SHADERVAR_STACK &stacks) const
+  { svcontext.PopVariables (stacks); }
 
 private:
-  /// Add a variable to this context
-  virtual void AddVariable (csShaderVariable *variable) {}
 
-  //helpers for static and dynamic variables
-  csShaderVariableContextHelper staticVariables;
-  csShaderVariableProxyList dynamicVariables;
-
-  struct shaderPass : public iShaderVariableContext
+  struct shaderPass
   {
     //mix and alpha mode
     uint mixMode;
@@ -103,41 +101,11 @@ private:
     csZBufMode zMode;
     bool overrideZmode;
 
-    SCF_DECLARE_IBASE;
-
     shaderPass () 
     { 
-      SCF_CONSTRUCT_IBASE (0);
       mixMode = CS_FX_MESH;
       overrideZmode = false;
     }
-
-    virtual ~shaderPass () 
-    { 
-      SCF_DESTRUCT_IBASE();
-    }
-
-    /// Get a named variable from this context
-    virtual csShaderVariable* GetVariable (csStringID name) const
-    {
-      return staticVariables.GetVariable (name);
-    }
-    /// Get a named variable from this context, and any context above/outer
-    virtual csShaderVariable* GetVariableRecursive (csStringID name) const
-    {
-      csShaderVariable* var;
-      var=GetVariable (name);
-      if(var) return var;
-      return owner->GetVariableRecursive (name);
-    }
-    /// Fill a csShaderVariableList. Return number of variables filled
-    virtual unsigned int FillVariableList (
-	csShaderVariableProxyList *list) const
-    {
-      return staticVariables.FillVariableList (list);
-    }
-    /// Add a variable to this context
-    virtual void AddVariable (csShaderVariable *variable) {}
 
     enum
     {
@@ -147,7 +115,7 @@ private:
 
     //buffer mappings
     csStringID bufferID[STREAMMAX];
-    csRef<csShaderVariable> bufferRef[STREAMMAX];
+    csRef<csShaderVariable> bufferRef[TEXTUREMAX];
     csVertexAttrib vertexattributes[STREAMMAX];
     bool bufferGeneric[STREAMMAX];
     int bufferCount;
@@ -166,12 +134,14 @@ private:
     //writemasks
     bool wmRed, wmGreen, wmBlue, wmAlpha;
 
-    //helpers for static and dynamic variables
-    csShaderVariableContextHelper staticVariables;
-    csShaderVariableProxyList dynamicVariables;
+    //variable context
+    csShaderVariableContext svcontext;
 
     csXMLShader *owner;
   };
+
+  //variable context
+  csShaderVariableContext svcontext;
 
   //optimization stuff
   static iRenderBuffer* last_buffers[shaderPass::STREAMMAX*2];
@@ -247,8 +217,7 @@ private:
   bool LoadPass (iDocumentNode *node, csXMLShader::shaderPass *pass);
 
   // load a shaderdefinition block
-  bool LoadSVBlock (iDocumentNode *node, csShaderVariableContextHelper*
-    staticVariables, csShaderVariableProxyList *dynamicVariables) ;
+  bool LoadSVBlock (iDocumentNode *node, iShaderVariableContext *context);
 
   // load a shaderprogram
   csPtr<iShaderProgram> LoadProgram (iDocumentNode *node,

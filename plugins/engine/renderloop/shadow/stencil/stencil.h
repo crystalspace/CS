@@ -92,7 +92,7 @@ private:
   void HandleEdge (EdgeInfo* e, csHash<EdgeInfo*>& edge_stack);
 public:
   SCF_DECLARE_IBASE;
-  csShaderVariableContext *dynDomain;
+  csShaderVariableContext *svcontext;
 
   csStencilShadowCacheEntry (csStencilShadowStep* parent, 
     iMeshWrapper* mesh);
@@ -145,8 +145,10 @@ public:
 
   bool Initialize (iObjectRegistry* objreg);
   
-  void Perform (iRenderView* rview, iSector* sector);
-  void Perform (iRenderView* rview, iSector* sector, iLight* light);
+  void Perform (iRenderView* rview, iSector* sector,
+    CS_SHADERVAR_STACK &stacks);
+  void Perform (iRenderView* rview, iSector* sector, iLight* light,
+    CS_SHADERVAR_STACK &stacks);
 
   virtual int AddStep (iRenderStep* step);
   virtual int GetStepCount ();

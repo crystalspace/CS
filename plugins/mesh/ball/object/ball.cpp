@@ -152,7 +152,7 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   ball_colors_dirty_flag = false;
   ball_triangle_dirty_flag = false;
 
-  dynDomain.AttachNew (new csShaderVariableContext);
+  svcontext.AttachNew (new csShaderVariableContext);
 #endif
 }
 
@@ -649,27 +649,27 @@ void csBallMeshObject::UpdateBufferSV()
   csShaderVariable *sv;
   if (ball_vertices_dirty_flag)
   {
-    sv = dynDomain->GetVariableAdd (vertex_name);
+    sv = svcontext->GetVariableAdd (vertex_name);
     sv->SetValue (GetRenderBuffer(vertex_name));
   }
   if (ball_texels_dirty_flag)
   {
-    sv = dynDomain->GetVariableAdd (texel_name);
+    sv = svcontext->GetVariableAdd (texel_name);
     sv->SetValue (GetRenderBuffer(texel_name));
   }
   if (ball_normals_dirty_flag)
   {
-    sv = dynDomain->GetVariableAdd (normal_name);
+    sv = svcontext->GetVariableAdd (normal_name);
     sv->SetValue (GetRenderBuffer(normal_name));
   }
   if (ball_colors_dirty_flag)
   {
-    sv = dynDomain->GetVariableAdd (color_name);
+    sv = svcontext->GetVariableAdd (color_name);
     sv->SetValue (GetRenderBuffer(color_name));
   }
   if (ball_triangle_dirty_flag)
   {
-    sv = dynDomain->GetVariableAdd (index_name);
+    sv = svcontext->GetVariableAdd (index_name);
     sv->SetValue (GetRenderBuffer(index_name));
   }
 }
@@ -699,7 +699,7 @@ csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num)
   mesh.indexend = ball_triangles * 3;
   //mesh.mathandle = mater->GetMaterialHandle();
   mesh.material = mater;
-  mesh.dynDomain = dynDomain;
+  mesh.variablecontext = svcontext;
 
   mesh.meshtype = CS_MESHTYPE_TRIANGLES;
   meshPtr = &mesh;

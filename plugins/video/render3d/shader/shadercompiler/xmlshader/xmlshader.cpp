@@ -43,10 +43,6 @@ SCF_IMPLEMENT_IBASE(csXMLShader)
   SCF_IMPLEMENTS_INTERFACE(iShader)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_IBASE(csXMLShader::shaderPass)
-  SCF_IMPLEMENTS_INTERFACE(iShaderVariableContext)
-SCF_IMPLEMENT_IBASE_END
-
 csXMLShaderCompiler::csXMLShaderCompiler(iBase* parent)
 {
   SCF_CONSTRUCT_IBASE(parent);
@@ -200,16 +196,14 @@ csPtr<csXMLShader> csXMLShaderCompiler::CompileTechnique (
     csRef<iDocumentNode> varNode = parentSV->GetNode(
       xmltokens.Request (XMLTOKEN_SHADERVARS));
     if (varNode)
-      LoadSVBlock (varNode, &newShader->staticVariables,
-      	&newShader->dynamicVariables);
+      LoadSVBlock (varNode, newShader);
   }
 
   csRef<iDocumentNode> varNode = node->GetNode(
     xmltokens.Request (XMLTOKEN_SHADERVARS));
 
   if (varNode)
-    LoadSVBlock (varNode, &newShader->staticVariables,
-    	&newShader->dynamicVariables);
+    LoadSVBlock (varNode, newShader);
 
   //alloc passes
   newShader->passes = 
@@ -249,7 +243,7 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
     xmltokens.Request (XMLTOKEN_SHADERVARS));
  
   if (varNode)
-    LoadSVBlock (varNode, &pass->staticVariables, &pass->dynamicVariables);
+    LoadSVBlock (varNode, &pass->svcontext);
 
   //load vp
   csRef<iDocumentNode> programNode;
@@ -357,18 +351,12 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
     if (pass->alphaMode.autoModeTexture != csInvalidStringID)
     {
       csShaderVariable *var;
-      var = pass->GetVariableRecursive(pass->alphaMode.autoModeTexture);
+      var = pass->svcontext.GetVariable (pass->alphaMode.autoModeTexture);
 
       if(!var)
-	var = pass->owner->GetVariableRecursive(
-	  pass->alphaMode.autoModeTexture);
+	var = pass->owner->GetVariable (pass->alphaMode.autoModeTexture);
       if (var)
 	pass->autoAlphaTexRef = var;
-      else
-      {
-	pass->dynamicVariables.InsertSorted (csShaderVariableProxy (
-	  pass->alphaMode.autoModeTexture, 0, &pass->autoAlphaTexRef));
-      }
     }
   }
 
@@ -455,19 +443,13 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
 
       csShaderVariable *varRef=0;
       //csRef<csShaderVariable>& varRef = pass->bufferRef[a];
-      varRef = pass->GetVariableRecursive(pass->bufferID[pass->bufferCount]);
+      varRef = pass->svcontext.GetVariable(pass->bufferID[pass->bufferCount]);
 
       if(!varRef)
-        varRef = pass->owner->GetVariableRecursive (
+        varRef = pass->owner->GetVariable (
 		pass->bufferID[pass->bufferCount]);
 
-      //pass->bufferRef[a] = varRef; //FETCH REF IF IT EXSISTS AT THIS POINT
-      if (!varRef)
-      {
-	pass->dynamicVariables.InsertSorted (csShaderVariableProxy (varID, 
-	  0, &pass->bufferRef[pass->bufferCount]));
-      }
-      else
+      if (varRef)
 	pass->bufferRef[pass->bufferCount] = varRef;
       pass->vertexattributes[pass->bufferCount] = attrib;
       pass->bufferCount++;
@@ -520,22 +502,15 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
 
       csShaderVariable *varRef=0;
       //csRef<csShaderVariable>& varRef = pass->bufferRef[a];
-      varRef = pass->GetVariableRecursive (varID);
+      varRef = pass->svcontext.GetVariable (varID);
 
       if(!varRef)
-        varRef = pass->owner->GetVariableRecursive(varID);
+        varRef = pass->owner->GetVariable (varID);
 
-      //pass->bufferRef[a] = varRef; //FETCH REF IF IT EXSISTS AT THIS POINT
-      if (!varRef)
-      {
-	pass->dynamicVariables.InsertSorted (csShaderVariableProxy (varID, 
-	  0, &pass->textureRef[texUnit]));
-      }
-      else
+      if (varRef)
 	pass->textureRef[texUnit] = varRef;
 
       pass->textureCount = MAX(pass->textureCount, texUnit + 1);
-      //pass->textureCount++;
     }
   }
 
@@ -551,10 +526,8 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
 }
 
 bool csXMLShaderCompiler::LoadSVBlock (iDocumentNode *node,
-  csShaderVariableContextHelper *staticVariables,
-  csShaderVariableProxyList *dynamicVariables)
+  iShaderVariableContext *context)
 {
-  (void)dynamicVariables;
   csRef<csShaderVariable> svVar;
   
   csRef<iDocumentNodeIterator> it = node->GetNodes ("shadervar");
@@ -565,7 +538,7 @@ bool csXMLShaderCompiler::LoadSVBlock (iDocumentNode *node,
       strings->Request(var->GetAttributeValue ("name"))));
 
     if (synldr->ParseShaderVar (var, *svVar))
-      staticVariables->AddVariable(svVar);
+      context->AddVariable(svVar);
   }
 
   return true;
@@ -644,10 +617,10 @@ csPtr<iShaderProgram> csXMLShaderCompiler::LoadProgram (
     programNode = node;
   program->Load (programNode);
 
-  csArray<iShaderVariableContext*> staticDomains;
-  staticDomains.Push (pass);
-  staticDomains.Push (pass->owner);
-  if (!program->Compile (staticDomains))
+  csArray<iShaderVariableContext*> staticContexts;
+  staticContexts.Push (&pass->svcontext);
+  staticContexts.Push (pass->owner);
+  if (!program->Compile (staticContexts))
     return 0;
 
   return csPtr<iShaderProgram> (program);
@@ -772,40 +745,30 @@ bool csXMLShader::DeactivatePass ()
   return true;
 }
 
-bool csXMLShader::SetupPass (csRenderMesh *mesh,
-	const csArray<iShaderVariableContext*> &dynamicDomains)
+bool csXMLShader::SetupPass (csRenderMesh *mesh, 
+	const CS_SHADERVAR_STACK &stacks)
 {
   if(currentPass>=passesCount)
     return false;
 
   shaderPass *thispass = &passes[currentPass];
 
-  //Fill all dynamic vars
-  thispass->dynamicVariables.PrepareFill ();
-  int varsFilled=0;
-  int i;
-  for(i=0;i<dynamicDomains.Length();i++)
-  {
-    varsFilled +=
-      dynamicDomains[i]->FillVariableList (&thispass->dynamicVariables);
-    if (varsFilled>=thispass->dynamicVariables.Length ())
-      break;
-  }
-  
-#if 0
-  for(i = 0; i < thispass->dynamicVariables.Length (); i++)
-  {
-    *((csRef<csShaderVariable>*)thispass->dynamicVariables.Get(i).userData) = 
-      thispass->dynamicVariables.Get(i).shaderVariable;
-    thispass->dynamicVariables.Get(i).shaderVariable = 0;
-  }
-#endif
-
   //now map our buffers. all refs should be set
+  int i;
   for (i = 0; i < thispass->bufferCount; i++)
   {
-    if (thispass->bufferRef[i])
+    if (thispass->bufferRef[i] != 0)
       thispass->bufferRef[i]->GetValue(last_buffers[i]);
+    else if (thispass->bufferID[i] < stacks.Length ())
+    {
+      csShaderVariable* var = 0;
+      if (stacks[thispass->bufferID[i]].Length () > 0)
+        var = stacks[thispass->bufferID[i]].Top ();
+      if (var)
+        var->GetValue(last_buffers[i]);
+      else
+        last_buffers[i] = 0;
+    }
     else
       last_buffers[i] = 0;
   }
@@ -814,18 +777,32 @@ bool csXMLShader::SetupPass (csRenderMesh *mesh,
   lastBufferCount = thispass->bufferCount;
 
   //and the textures
-  for(i = 0; i < thispass->textureCount; i++)
+  for (i = 0; i < thispass->textureCount; i++)
   {
-    if (thispass->textureRef[i])
+    if (thispass->textureRef[i] != 0)
     {
-      thispass->textureRef[i]->GetValue (last_textures[i]);
-      if (!last_textures[i])
+      iTextureWrapper* wrap;
+      thispass->textureRef[i]->GetValue(wrap);
+      if (wrap) 
+        last_textures[i] = wrap->GetTextureHandle ();
+      else
+        last_textures[i] = 0;
+    } else if (thispass->textureID[i] < stacks.Length ())
+    {
+      csShaderVariable* var = 0;
+      if (stacks[thispass->textureID[i]].Length () > 0)
+        var = stacks[thispass->textureID[i]].Top ();
+      if (var)
       {
         iTextureWrapper* wrap;
-        thispass->textureRef[i]->GetValue(wrap);
-        if (wrap) last_textures[i] = wrap->GetTextureHandle ();
-      }
-    } 
+        var->GetValue(wrap);
+        if (wrap) 
+          last_textures[i] = wrap->GetTextureHandle ();
+        else 
+          var->GetValue(last_textures[i]);
+      } else
+        last_textures[i] = 0;
+    }
     else
       last_textures[i] = 0;
   }
@@ -839,6 +816,17 @@ bool csXMLShader::SetupPass (csRenderMesh *mesh,
     iTextureHandle* tex = 0;
     if (thispass->autoAlphaTexRef != 0)
       thispass->autoAlphaTexRef->GetValue (tex);
+    else if (thispass->alphaMode.autoModeTexture != csInvalidStringID)
+    {
+      if (thispass->alphaMode.autoModeTexture < stacks.Length ())
+      {
+        csShaderVariable* var = 0;
+        if (stacks[thispass->alphaMode.autoModeTexture].Length ()>0)
+          var = stacks[thispass->alphaMode.autoModeTexture].Top ();
+        if (var)
+          var->GetValue (tex);
+      }
+    }
     if (tex != 0)
       mesh->alphaType = tex->GetAlphaType ();
     else
@@ -855,8 +843,8 @@ bool csXMLShader::SetupPass (csRenderMesh *mesh,
   else
     mesh->mixmode = thispass->mixMode;
 
-  if(thispass->vp) thispass->vp->SetupState (mesh, dynamicDomains);
-  if(thispass->fp) thispass->fp->SetupState (mesh, dynamicDomains);
+  if(thispass->vp) thispass->vp->SetupState (mesh, stacks);
+  if(thispass->fp) thispass->fp->SetupState (mesh, stacks);
 
   return true;
 }

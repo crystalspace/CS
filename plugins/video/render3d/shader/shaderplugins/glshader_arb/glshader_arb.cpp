@@ -84,6 +84,8 @@ bool csGLShader_ARB::SupportType(const char* type)
 
 csPtr<iShaderProgram> csGLShader_ARB::CreateProgram (const char* type)
 {
+  /*if (!enable)
+    return 0;*/
   if (strcasecmp (type, "vp") == 0)
     return csPtr<iShaderProgram> (new csShaderGLAVP (this));
   if (strcasecmp (type, "fp") == 0)

@@ -1340,7 +1340,7 @@ private:
   csStringID vertices_name, normals_name,
     texcoords_name, colors_name, indices_name, 
     shadow_verts_name, shadow_norms_name;
-  csShaderVariableContext dynDomain;
+  csShaderVariableContext svcontext;
 
 #endif // CS_USE_NEW_RENDERER
 

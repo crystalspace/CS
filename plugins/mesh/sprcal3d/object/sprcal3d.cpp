@@ -1527,27 +1527,25 @@ void csSpriteCal3DMeshObject::SetupRenderMeshes ()
       rm.indexend = submesh->getFaceCount () * 3;
       rm.meshtype = CS_MESHTYPE_TRIANGLES;
       rm.material = (iMaterialWrapper *)submesh->getCoreMaterialId ();
-      rm.dynDomain.AttachNew (new csShaderVariableContext ());
-      /*sv = dynDomain->GetVariableAdd (csGenmeshMeshObjectFactory::index_name);
-      sv->SetAccessor (&factory->shaderVarAccessor);*/
+      rm.variablecontext.AttachNew (new csShaderVariableContext ());
 
       csShaderVariable* sv;
       csRef<iShaderVariableAccessor> accessor (
 	csPtr<iShaderVariableAccessor> (new BaseAccessor (this, m, s)));
-      sv = rm.dynDomain->GetVariableAdd (
-      	csSpriteCal3DMeshObjectFactory::index_name);
+      sv = rm.variablecontext->GetVariableAdd (
+        csSpriteCal3DMeshObjectFactory::index_name);
       sv->SetAccessor (accessor);
-      sv = rm.dynDomain->GetVariableAdd (
-      	csSpriteCal3DMeshObjectFactory::texel_name);
+      sv = rm.variablecontext->GetVariableAdd (
+        csSpriteCal3DMeshObjectFactory::texel_name);
       sv->SetAccessor (accessor);
-      sv = rm.dynDomain->GetVariableAdd (
-      	csSpriteCal3DMeshObjectFactory::normal_name);
+      sv = rm.variablecontext->GetVariableAdd (
+        csSpriteCal3DMeshObjectFactory::normal_name);
       sv->SetAccessor (accessor);
-      sv = rm.dynDomain->GetVariableAdd (
-      	csSpriteCal3DMeshObjectFactory::color_name);
+      sv = rm.variablecontext->GetVariableAdd (
+        csSpriteCal3DMeshObjectFactory::color_name);
       sv->SetAccessor (accessor);
-      sv = rm.dynDomain->GetVariableAdd (
-      	csSpriteCal3DMeshObjectFactory::vertex_name);
+      sv = rm.variablecontext->GetVariableAdd (
+        csSpriteCal3DMeshObjectFactory::vertex_name);
       sv->SetAccessor (accessor);
 
       allRenderMeshes.Push (&rm);

@@ -33,6 +33,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/graph3d.h"
 #include "csgeom/transfrm.h"
 #include "ivideo/shader/shader.h"
+#include "csgfx/shadervarcontext.h"
 
 class csVector3;
 class csVector2;
@@ -54,7 +55,6 @@ struct csRenderMesh
     clip_z_plane = 0;
     do_mirror = false;
     indexstart = indexend = 0;
-    dynDomain = 0;
     portal = 0;
   }
 
@@ -94,7 +94,7 @@ struct csRenderMesh
   /// Transform to use for this mesh (object->camera)
   csReversibleTransform object2camera;
 
-  csRef<iShaderVariableContext> dynDomain;
+  csRef<iShaderVariableContext> variablecontext;
   
   csAlphaMode::AlphaType alphaType;
 

@@ -1080,10 +1080,10 @@ void csThingStatic::FillRenderMeshes (
     rm->mixmode = mixmode; 
     rm->material = pg.material;
     rm->meshtype = CS_MESHTYPE_POLYGON;
-    rm->dynDomain.AttachNew (new csShaderVariableContext ());
+    rm->variablecontext.AttachNew (new csShaderVariableContext ());
     csRef<csShaderVariable> sv (
       csPtr<csShaderVariable> (new csShaderVariable (texLightmapName)));
-    rm->dynDomain->AddVariable (sv);
+    rm->variablecontext->AddVariable (sv);
 
     /*csShaderVariable* sv;
     sv = dynDomain->GetVariableAdd (index_name);
@@ -2434,8 +2434,8 @@ bool csThing::DrawTest (iRenderView *rview, iMovable *movable)
     rm->clip_z_plane = clip_z_plane;
     rm->do_mirror = icam->IsMirrored ();  
 
-    rm->dynDomain->GetVariable (static_data->texLightmapName)->SetValue (
-      i < litPolys.Length() ? litPolys[i]->SLM->GetTexture() : 0);
+    rm->variablecontext->GetVariable (static_data->texLightmapName)->
+      SetValue (i < litPolys.Length() ? litPolys[i]->SLM->GetTexture() : 0);
   }
 
   UpdateDirtyLMs (); // @@@ Here?
@@ -2660,8 +2660,9 @@ void csThing::PrepareRenderMeshes ()
   int i;
   for (i = 0; i < renderMeshes.Length () ; i++)
   {
-    if (renderMeshes[i]->dynDomain != 0)
-      renderMeshes[i]->dynDomain->DecRef ();
+    // @@@ Is this needed?
+    if (renderMeshes[i]->variablecontext != 0)
+      renderMeshes[i]->variablecontext->DecRef ();
     delete renderMeshes[i];
   }
   renderMeshes.DeleteAll ();

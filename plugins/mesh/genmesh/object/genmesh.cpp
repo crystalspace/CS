@@ -145,7 +145,7 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory) :
   ambient_version = 0;
 
 #ifdef CS_USE_NEW_RENDERER
-  dynDomain = 0;
+  svcontext = 0;
 
   g3d = CS_QUERY_REGISTRY (factory->object_reg, iGraphics3D);
   buffers_version = (uint)-1;
@@ -518,22 +518,22 @@ void csGenmeshMeshObject::SetupObject ()
     material_needs_visit = mater->IsVisitRequired ();
 
 #ifdef CS_USE_NEW_RENDERER
-    if (dynDomain == 0)
-      dynDomain = new csShaderVariableContext ();
+    if (svcontext == 0)
+      svcontext = new csShaderVariableContext ();
 
     csShaderVariable* sv;
-    sv = dynDomain->GetVariableAdd (csGenmeshMeshObjectFactory::index_name);
+    sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::index_name);
     sv->SetAccessor (&factory->scfiShaderVariableAccessor);
-    sv = dynDomain->GetVariableAdd (csGenmeshMeshObjectFactory::vertex_name);
+    sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::vertex_name);
     sv->SetAccessor (&factory->scfiShaderVariableAccessor);
-    sv = dynDomain->GetVariableAdd (csGenmeshMeshObjectFactory::texel_name);
+    sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::texel_name);
     sv->SetAccessor (&factory->scfiShaderVariableAccessor);
-    sv = dynDomain->GetVariableAdd (csGenmeshMeshObjectFactory::normal_name);
+    sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::normal_name);
     sv->SetAccessor (&factory->scfiShaderVariableAccessor);
 
     /*sv = dynDomain->GetVariableAdd (csGenmeshMeshObjectFactory::color_name);
     sv->SetAccessor (&factory->shaderVarAccessor);*/
-    sv = dynDomain->GetVariableAdd (csGenmeshMeshObjectFactory::color_name);
+    sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::color_name);
     sv->SetAccessor (&scfiShaderVariableAccessor);
 #endif // CS_USE_NEW_RENDERER
   }
@@ -1001,7 +1001,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (int& n)
   mesh.indexstart = 0;
   mesh.indexend = factory->GetTriangleCount () * 3;
   mesh.material = mater;
-  mesh.dynDomain = dynDomain;
+  mesh.variablecontext = svcontext;
   mesh.meshtype = CS_MESHTYPE_TRIANGLES;
 
   meshPtr = &mesh;

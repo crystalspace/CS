@@ -44,6 +44,8 @@ protected:
   csEngine* engine;
 
   csRefArray<iRenderStep> steps;
+
+  CS_SHADERVAR_STACK svstacks;
 public:
   SCF_DECLARE_IBASE;
 

@@ -142,7 +142,6 @@ private:
   bool LoadLayer(mtexlayer* layer, iDocumentNode* node);
   bool LoadEnvironment(mtexlayer* layer, iDocumentNode* node);
 
-  csShaderVariableContextHelper svContextHelper;
 public:
   SCF_DECLARE_IBASE;
 
@@ -159,9 +158,9 @@ public:
   /// Deactivate program so that it's not used in next rendering
   virtual void Deactivate ();
 
-    /// Setup states needed for proper operation of the shader
+  /// Setup states needed for proper operation of the shader
   virtual void SetupState (csRenderMesh* mesh,
-    const csArray<iShaderVariableContext*> &dynamicDomains);
+    const CS_SHADERVAR_STACK &stacks);
 
   /// Reset states to original
   virtual void ResetState ();
@@ -170,30 +169,7 @@ public:
   virtual bool Load(iDocumentNode* node);
 
   /// Compile a program
-  virtual bool Compile(csArray<iShaderVariableContext*> &staticDomains);
-
-
-  //=================== iShaderVariableContext ================//
-  /// Add a variable to this context
-  virtual void AddVariable (csShaderVariable *variable)
-  { svContextHelper.AddVariable (variable); }
-
-  /// Get a named variable from this context
-  virtual csShaderVariable* GetVariable (csStringID name) const
-  { return svContextHelper.GetVariable (name); }
-
-  /// Fill a csShaderVariableList
-  virtual unsigned int FillVariableList (csShaderVariableProxyList* list) const
-  { return svContextHelper.FillVariableList (list); }
-
-  /// Get a named variable from this context, and any context above/outer
-  virtual csShaderVariable* GetVariableRecursive (csStringID name) const
-  {
-    csShaderVariable* var;
-    var=GetVariable (name);
-    if(var) return var;
-    return 0;
-  }
+  virtual bool Compile(csArray<iShaderVariableContext*> &staticContexts);
 };
 
 

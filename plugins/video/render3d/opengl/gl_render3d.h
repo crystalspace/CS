@@ -165,7 +165,7 @@ private:
   csRef<iRenderBuffer> scrapVertices;
   csRef<iRenderBuffer> scrapTexcoords;
   csRef<iRenderBuffer> scrapColors;
-  csShaderVariableContext scrapDomain;
+  csShaderVariableContext scrapContext;
 
   ////////////////////////////////////////////////////////////////////
   //                         Private helpers
@@ -353,7 +353,7 @@ public:
   void Print (csRect const* area);
 
   /// Drawroutine. Only way to draw stuff
-  void DrawMesh (csRenderMesh* mymesh);
+  void DrawMesh (csRenderMesh* mymesh, const CS_SHADERVAR_STACK &stacks);
 
   /// Draw a 2D sprite
   virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy,

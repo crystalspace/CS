@@ -20,6 +20,10 @@
 #ifndef __CS_IENGINE_RENDERSTEPS_IRENDERSTEP_H__
 #define __CS_IENGINE_RENDERSTEPS_IRENDERSTEP_H__
 
+#include "csgfx/shadervar.h"
+#include "csutil/refarr.h"
+#include "ivideo/shader/shader.h"
+
 struct iRenderView;
 struct iSector;
 
@@ -28,7 +32,8 @@ SCF_VERSION (iRenderStep, 0, 0, 1);
 /// Document me!@@@
 struct iRenderStep : public iBase
 {
-  virtual void Perform (iRenderView* rview, iSector* sector) = 0;
+  virtual void Perform (iRenderView* rview, iSector* sector,
+    CS_SHADERVAR_STACK &stacks) = 0;
 };
 
 #endif

@@ -81,7 +81,8 @@ public:
   csFullScreenQuadRenderStep (iObjectRegistry* object_reg);
   virtual ~csFullScreenQuadRenderStep ();
 
-  virtual void Perform (iRenderView* rview, iSector* sector);
+  virtual void Perform (iRenderView* rview, iSector* sector,
+    CS_SHADERVAR_STACK &stacks);
 
   void SetMaterial (const char* m)
   { material = m; }

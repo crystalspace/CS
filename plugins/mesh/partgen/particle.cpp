@@ -84,7 +84,7 @@ csNewParticleSystem::csNewParticleSystem (
 
   vertices = 0;
 
-  mesh.dynDomain.AttachNew (new csShaderVariableContext);
+  mesh.variablecontext.AttachNew (new csShaderVariableContext);
   mesh.object2camera = csReversibleTransform ();
   mesh.meshtype = CS_MESHTYPE_TRIANGLES;
   meshPtr = &mesh;
@@ -264,17 +264,17 @@ void csNewParticleSystem::SetupObject ()
         sizeof (unsigned int)*TriangleCount*3, CS_BUF_STATIC,
         CS_BUFCOMP_UNSIGNED_INT, 1, true);
     csShaderVariable *sv;
-    sv = mesh.dynDomain->GetVariableAdd (vertex_name);
+    sv = mesh.variablecontext->GetVariableAdd (vertex_name);
     sv->SetValue (vertex_buffer);
-    sv = mesh.dynDomain->GetVariableAdd (texel_name);
+    sv = mesh.variablecontext->GetVariableAdd (texel_name);
     sv->SetValue (texel_buffer);
 #if 0
-    sv = mesh.dynDomain->GetVariableAdd (normal_name);
+    sv = mesh.variablecontext->GetVariableAdd (normal_name);
     sv->SetValue (normal_buffer);
 #endif
-    sv = mesh.dynDomain->GetVariableAdd (color_name);
+    sv = mesh.variablecontext->GetVariableAdd (color_name);
     sv->SetValue (color_buffer);
-    sv = mesh.dynDomain->GetVariableAdd (index_name);
+    sv = mesh.variablecontext->GetVariableAdd (index_name);
     sv->SetValue (index_buffer);
 #endif
   }

@@ -96,7 +96,7 @@ private:
   bool ball_normals_dirty_flag;
   bool ball_colors_dirty_flag;
   bool ball_triangle_dirty_flag;
-  csRef<csShaderVariableContext> dynDomain;
+  csRef<csShaderVariableContext> svcontext;
   csStringID vertex_name, texel_name, normal_name, color_name, index_name;
 
 #else

@@ -28,6 +28,7 @@
  * \addtogroup gfx3d
  * @{ */
  
+#include "csutil/refarr.h"
 #include "csutil/scf.h"
 #include "csgeom/plane3.h"
 #include "csgeom/vector2.h"
@@ -44,6 +45,7 @@ class csVector2;
 class csPlane3;
 class csRect;
 class csReversibleTransform;
+class csShaderVariable;
 
 struct iGraphics2D;
 struct iPolygonBuffer;
@@ -888,7 +890,8 @@ struct iGraphics3D : public iBase
   	int count) = 0;
 
   /// Drawroutine. Only way to draw stuff
-  virtual void DrawMesh (csRenderMesh* mymesh) = 0;
+  virtual void DrawMesh (csRenderMesh* mymesh,
+    const csArray< csArray<csShaderVariable*> > &stacks) = 0;
 
   /// Set the masking of color and/or alpha values to framebuffer
   virtual void SetWriteMask (bool red, bool green, bool blue, bool alpha) = 0;

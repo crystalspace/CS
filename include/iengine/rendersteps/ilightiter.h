@@ -36,7 +36,7 @@ SCF_VERSION (iLightRenderStep, 0, 0, 1);
 struct iLightRenderStep : public iBase
 {
   virtual void Perform (iRenderView* rview, iSector* sector,
-    iLight* light) = 0;
+    iLight* light, CS_SHADERVAR_STACK &stacks) = 0;
 };
 
 #endif

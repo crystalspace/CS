@@ -29,30 +29,33 @@
 
 class csShaderVariableContext : public iShaderVariableContext
 {
-  csShaderVariableContextHelper svContextHelper;
+  csRefArray<csShaderVariable> variables;
 public:
   SCF_DECLARE_IBASE;
 
-  csShaderVariableContext ()
-  {
-    SCF_CONSTRUCT_IBASE(0);
-  }
-  virtual ~csShaderVariableContext ()
-  {
-    SCF_DESTRUCT_IBASE ();
-  }
+  csShaderVariableContext ();
 
-  virtual void AddVariable (csShaderVariable *variable)
-    { svContextHelper.AddVariable (variable); }
+  virtual ~csShaderVariableContext ();
 
-  virtual csShaderVariable* GetVariable (csStringID name) const
-    { return svContextHelper.GetVariable (name); }
+  /// Add a variable to this context
+  virtual void AddVariable (csShaderVariable *variable);
 
-  virtual csShaderVariable* GetVariableRecursive (csStringID name) const
-    { return GetVariable (name); }
-  
-  virtual unsigned int FillVariableList (csShaderVariableProxyList* list) const
-    { return svContextHelper.FillVariableList (list); }
+  /// Get a named variable from this context
+  virtual csShaderVariable* GetVariable (csStringID name) const;
+
+  /**
+   * Push the variables of this context onto the variable stacks
+   * supplied in the "stacks" argument
+   */
+  virtual void PushVariables 
+    (CS_SHADERVAR_STACK &stacks) const;
+
+  /**
+  * Pop the variables of this context off the variable stacks
+  * supplied in the "stacks" argument
+  */
+  virtual void PopVariables 
+    (CS_SHADERVAR_STACK &stacks) const;
 };
 
 #endif // __CS_CSGFX_SHADERVARCONTEXT_H__
