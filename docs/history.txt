@@ -16,6 +16,12 @@ Short-term cleanups that need to be done:
 	- Removed test on rstate_gouraud in software renderer because it
 	  is plain wrong.
 	- Received and integrated patch from David Huen for the BeOS port.
+	- Fixed include file problem on Unix for updated sockets driver.
+	- BIG BIG improvement in speed in PreparePolygonQuick(). This should
+	  make a huge difference when showing sprites (and curved surfaces).
+	  And not only for the software renderer. It was the engine!
+26-Jun-99:
+	- Serguei Narojnyi (Snaar) SQUASHED a bug in the network driver :-)
 25-Jun-99:
 	- New csSprite3D::UpdateLighting() to update the lighting of a
 	  sprite given an array of lights.
@@ -30,6 +36,12 @@ Short-term cleanups that need to be done:
 	  from standard.zip or from the level). The size is a scale
 	  factor for the sprite. The sprite is put at the current
 	  location.
+	- Small changes to Crystal Shooter from Thomas Hieber.
+	- Update to INSTALL.Win from Thomas.
+	- Thomas also added lots of additional error checks in debug
+	  mode for the Direct3D5 renderer.
+	- Some small other changes from Thomas.
+	- Update and fixes to VC project files from Thomas.
 24-Jun-99:
 	- Renamed MarkVisibleThing() to GetVisibleThings().
 	- The optimization with lighting and bounding boxes is active now.
