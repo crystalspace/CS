@@ -1,9 +1,0 @@
-@c -*-texinfo-*-
-@ifnottex
-@node History, Index, ApiMods17, Top
-@appendix History
-
-This section will eventually contain Crystal Space's history log.  This
-appendix is not present in the printed manual, but is present in online
-representations.
-@end ifnottex

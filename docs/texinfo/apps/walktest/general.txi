@@ -24,7 +24,7 @@ Give information about the contents of the texture cache.
 Clear the texture cache.
 
 @item activate
-Activate the object that is right in front of you (OBSOLETE).
+Activate the object that is right in front of you (@emph{obsolete}).
 
 @item action
 Activate the object that is right in front of you. This command
@@ -133,22 +133,23 @@ Crystal Space may assign some action to this command but another version
 may remove this action again.
 
 @item extension
-Perform the specified system specific extension. Currently the X11 port is
-the only port that has extensions (sim_pal, sim_grey, and sim_332). They
-are used when simulating 15/16-bit display mode on a 8-bit display.
+Perform the specified system specific extension.  Currently the X11 port is
+the only port that has extensions (@samp{sim_pal}, @samp{sim_grey}, and
+@samp{sim_332}).  They are used when simulating 15/16-bit display mode on a
+8-bit display.
 
 @item bind
-Bind a key to a command. The given key can be anything like @key{alt-c},
-@key{shift-pgdn}, @key{home}, @key{ctrl-space},... The command can be
-anything that you can execute in the console. If you only give a key this
-command will show the current command that is bound to that key. If you
-give no parameters then all current key-bindings will be listed. Note that
-if you bind a key which has already been bound then the old key-binding
-will be removed.
+Bind a key to a command.  The given key can be anything like @key{alt-c},
+@key{shift-pgdn}, @key{home}, @key{ctrl-space}, @dots{}.  The command can be
+anything that you can execute in the console.  If you only give a key this
+command will show the current command that is bound to that key.  If you give
+no parameters then all current key-bindings will be listed.  Note that if you
+bind a key which has already been bound then the old key-binding will be
+removed.
 
-@item snd_play
-Play the given @file{wav} file (currently only has effect on Windows) as an
-@samp{ephemeral} wave.
+@item snd_play @var{file}
+Play the given @file{@var{file}.wav} file (currently only has effect on
+Windows) as an @dfn{ephemeral} sound.
 
 @item s_fog
 If no arguments are given this command will show the fog settings for the
@@ -186,19 +187,30 @@ Rotate player left. Uses gravity system if @samp{move3d} is disabled.
 @item rotate_right
 Rotate player right. Uses gravity system if @samp{move3d} is disabled.
 
-@item i_forward, i_backward, i_left, i_right, i_up, i_down
-Move. The first argument is 0 or 1. If 1 we will move @emph{very} slowly (for
-debugging). The second argument is 0 or 1. If 1 we will move very fast.
+@item i_forward @var{slow},@var{fast}
+@itemx i_backward @var{slow},@var{fast}
+@itemx i_left @var{slow},@var{fast}
+@itemx i_right @var{slow},@var{fast}
+@itemx i_up @var{slow},@var{fast}
+@itemx i_down @var{slow},@var{fast}
+Move.  The first argument is 0 or 1.  If 1 we will move @emph{very} slowly
+(for debugging).  The second argument is 0 or 1.  If 1 we will move very fast.
 This command only works if @samp{move3d} is enabled.
 
-@item i_rotleftc, i_rotleftw, i_rotrightc, i_rotrightw
-Rotate left or right. The @samp{c} versions rotate along the camera axis.
-The @samp{w} version along the world axis. The first argument is 0 or 1.
-If 1 we will move @emph{very} slowly (for debugging). The second argument is
-0 or 1. If 1 we will move very fast. This command only works if
-@samp{move3d} is enabled.
+@item i_rotleftc @var{slow},@var{fast}
+@itemx i_rotleftw @var{slow},@var{fast}
+@itemx i_rotrightc @var{slow},@var{fast}
+@itemx i_rotrightw @var{slow},@var{fast}
+Rotate left or right.  The @samp{c} versions rotate along the camera axis.
+The @samp{w} version along the world axis.  The first argument is 0 or 1.  If
+1 we will move @emph{very} slowly (for debugging).  The second argument is 0
+or 1.  If 1 we will move very fast.  This command only works if @samp{move3d}
+is enabled.
 
-@item i_rotleftx, i_rotleftz, i_rotrightx, i_rotrightz
+@item i_rotleftx @var{slow},@var{fast}
+@itemx i_rotleftz @var{slow},@var{fast}
+@itemx i_rotrightx @var{slow},@var{fast}
+@itemx i_rotrightz @var{slow},@var{fast}
 Rotate the camera. The first argument is 0 or 1. If 1 we will move @emph{very}
 slowly (for debugging). The second argument is 0 or 1. If 1 we will move very
 fast. This command only works if @samp{move3d} is enabled.
@@ -209,36 +221,32 @@ Add a sprite that moves randomly through the dungeon.
 @item delbot
 Remove the last added bot.
 
-@item loadsprite
-Load a sprite from a model file (currently 3DS version 3 and MD2 are
-supported) and add it as a sprite template. Later you can use
-@samp{addsprite} to really add the sprite visually. Parameters are
-@samp{filename}, @samp{templatename}, @samp{texturename}. The texture
-should be one which is already loaded in memory. This is a current
-limitation. The filename represents a file within the VFS directory
-hierarchy.
+@item loadsprite @var{file},@var{template},@var{texture}
+Load a sprite from a model file (currently @sc{3ds} version 3 and @sc{md2} are
+supported) and add it as a sprite template.  Later you can use
+@samp{addsprite} to really add the sprite visually.  Parameters are
+@var{file}, @var{template}, @var{texture}.  The texture should be one which is
+already loaded in memory.  This is a current limitation.  The filename
+represents a file within the @sc{vfs} directory hierarchy.
 
-@item addsprite
-Add a sprite from a template already in memory.
-@samp{addsprite <sname>,<tname>,<size>}. @sampe{sname} is the name of the
-sprite. @samp{tname} is the name of a sprite template which has to be
-loaded in memory (either from @file{standard.zip} or from the level).
-The @samp{size} is a scale factor for the sprite. The sprite is put at
-the current location.
+@item addsprite @var{sname},@var{tname},@var{size}
+Add a sprite from a template already in memory.  @var{sname} is the name of
+the sprite.  @var{tname} is the name of a sprite template which has to be
+loaded in memory (either from @file{standard.zip} or from the level).  The
+@var{size} is a scale factor for the sprite.  The sprite is put at the current
+location.
 
-@item delsprite
+@item delsprite @var{name}
 Delete a sprite from the world with the given name.
 
-@item listactions
-Lists the actions of a sprite.
-@samp{listactions <name>}. @samp{name} is the name of the sprite which you want
-to list the actions of.
+@item listactions @var{name}
+Lists the actions of a sprite.  @var{name} is the name of the sprite for which
+you want to list the actions.
 
-@item setaction
-Sets the action of the specified sprite.
-@samp{setaction <spritename>,<action>}. @samp{spritename} is the name of the 
-sprite which you want to list the actions of. @samp{action} is the name of 
-the action which you want the sprite to use.
+@item setaction @var{spritename},@var{action}
+Sets the action of the specified sprite.  @var{spritename} is the name of the
+sprite which you want to list the actions of.  @var{action} is the name of the
+action which you want the sprite to use.
 
 @item listsprites
 Lists all of the sprites in the world.
@@ -249,56 +257,55 @@ depth of 1 will create a root and one layer above. The second argument is
 the width. This is the number of branches created at every depth. A good
 tree is @samp{addskel 3,3}. Be careful with large numbers here. The number
 of triangles grows @emph{very} fast! If the width parameter is negative the
-choosen width will be random between 1 and @code{-width} (inclusive).
+choosen width will be random between 1 and @samp{-width} (inclusive).
 
-@item addghost
+@item addghost @var{depth},@var{width}
 Add a floating transparent green ghost. The first argument is the depth. A
 depth of 1 will create a root and one layer above. The second argument is
 the width. This is the number of arms for the ghost.
 
-@item rain
-Add a particle system simulating rain. The three parameter for this
-command are the texture to use for the particles (raindrop.png is good),
-the number of particles and the speed (in meter per second). The default
-number of particles is 500 and the default speed is 2. All parameters
-are optional.
+@item rain @var{texture},@var{nparticles},@var{speed}
+Add a particle system simulating rain.  The three parameter for this command
+are the texture to use for the particles (@file{raindrop.png} is good), the
+number of particles and the speed (in meter per second).  The default number
+of particles is 500 and the default speed is 2.  All parameters are optional.
 
-@item snow
-Add a particle system simulating rain. The three parameter for this
-command are the texture to use for the particles (snow.jpg is good),
-the number of particles and the speed (in meter per second). The
-default number of particles is 500 and the default speed is 0.3. All
-parameters are optional.
+@item snow @var{texture},@var{nparticles},@var{speed}
+Add a particle system simulating rain.  The three parameter for this command
+are the texture to use for the particles (@file{snow.jpg} is good), the number
+of particles and the speed (in meter per second).  The default number of
+particles is 500 and the default speed is 0.3.  All parameters are optional.
 
-@item fountain
-Add a particle system simulating a fountain. The two parameter for this
-command are the texture to use for the particles and
-the number of particles. The default number of particles is 50.
+@item fountain @var{texture},@var{nparticles}
+Add a particle system simulating a fountain.  The two parameter for this
+command are the texture to use for the particles and the number of particles.
+The default number of particles is 50.
 
-@item flame
-Add a particle system simulating a flame. The two parameter for this
-command are the texture to use for the particles and
-the number of particles. The default number of particles is 50.
+@item flame @var{texture},@var{nparticles}
+Add a particle system simulating a flame.  The two parameter for this command
+are the texture to use for the particles and the number of particles.  The
+default number of particles is 50.
 
-@item explosion
-Add a particle system simulating an explosion. The parameter for this
-command is the texture to use for the particles.
+@item explosion @var{texture}
+Add a particle system simulating an explosion.  The parameter for this command
+is the texture to use for the particles.
 
-@item spiral
-Add a particle system simulating an spiral. The parameter for this
-command is the texture to use for the particles. Experimental!
+@item spiral @var{texture}
+Add a particle system simulating an spiral.  The parameter for this command is
+the texture to use for the particles.  Experimental!
 
 @item dumpvis
 This command takes the current view and dumps information for the rendering
-process. You will see what sectors and polygons are rendered and how they
-are clipped. This is useful for debugging purposes. The output comes into
-@samp{debug.txt}.
+process.  You will see what sectors and polygons are rendered and how they are
+clipped.  This is useful for debugging purposes.  The output comes into a file
+named @file{debug.txt}.
 
 @item clrlights
 Clear all pseudo-dynamic lights in the world to black.
 
-@item setlight
-Set the color for the selected pseudo-dynamic light to r,g,b.
+@item setlight @var{r},@var{g},@var{b}
+Set the color for the selected pseudo-dynamic light to @var{r}, @var{g},
+@var{b}.
 
 @item db_osolid
 Debug command to create things from all solid space node boundaries for
@@ -315,40 +322,42 @@ memory then a the new camera movements will be appended.
 @item clrrec
 Clear a recording.
 
-@item loadrec
-Load a recording from /this/record. Note that a recording is only valid
-when played in the same (or VERY similar) level.
+@item loadrec @var{file}
+Load a recording from @sc{vfs} path @file{/this/@var{file}} where @var{file}
+is the argument specified with the @samp{loadrec} command.  If @var{file} is
+not specified, then it looks for a file named @file{/this/record}.  Note that
+a recording is only valid when played in the same (or @emph{very} similar)
+world.
 
-@item loadrec <file>
-With <file> option walktest attempts to load /this/<file>.rec
-
-@item saverec
-Save a recording to /this/record.
-
-@item saverec <file>
-Save a recording to /this/<file>.rec
+@item saverec @var{file}
+Save a recording to @sc{vfs} path @file{/this/@var{file}} where @var{file} is
+the argument specified with the @samp{saverec} command.  If @var{file} is not
+specified then the recording is saved with the name @file{/this/record}.
 
 @item play
-Play a recording (if there is one). Note that a recording is only valid
-when played in the same (or VERY similar) level.
+Play a recording loaded with @samp{loadrec} (if there is one).  Note that a
+recording is only valid when played in the same (or @emph{very} similar)
+level.
 
-@item play <file> 
-This outputs summary statistics for the demo  played to <file>.rps. 'rps' stands
-for Recorded Performance Statistics.
+@item play @var{file}
+This outputs summary statistics for the demo played to @file{@var{file}.rps}.
+The @file{.rps} extension stands for @dfn{Recorded Performance Statistics}.
 
-@item play res, x, <file> 
-The 'res'(olution) option tells walktest to record statistics every 'x' frames 
-and output to <file>.rps.
+@item play res, @var{x}, @var{file}
+The @samp{res} option stands for @dfn{resolution} and tells WalkTest to record
+statistics every @var{x} frames and output the summary to
+@file{@var{file}.rps}.
 
-@item play break, x  
-The break option when compiled in debug mode will trip off a signal trap on 
-the 'x'th frame.  Useful once you take note of the frame number of something 
-interesting in a <file>.rps
+@item play break, @var{x}
+The @samp{break} option, when WalkTest is compiled in debug mode, will trip
+off a signal trap frame number @var{x}.  This is useful once you take note of
+the frame number of something interesting in an @file{.rps} file.
 
-@item recsubperf <name> 
-Once a recording has begun this command is used to record the statistics of a 
-subsection of the demo and is reported as such in the outputted <file>.rps when 
-played back. To finish the subsection call the command again without an argument.
-Stands for 'rec(ord)sub(section)perf(ormance)'
+@item recsubperf @var{file}
+Once a recording has begun this command is used to record the statistics of a
+subsection of the demo and is reported as such in the output
+@file{@var{file}.rps} when played back.  To finish the subsection call the
+command again without an argument.  @samp{recsubperf} stands for @dfn{record
+subsection performance}.
 
 @end table

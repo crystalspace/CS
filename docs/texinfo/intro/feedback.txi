@@ -4,8 +4,9 @@
 @cindex Feedback
 @cindex Bug Reporting
 
-If you find a bug in Crystal Space you should send a bug report to the Crystal
-Space mailing list at the following email address:
+If you find a bug in Crystal Space, consider subscribing to the main Crytal
+Space mailing list (@pxref{Mailing Lists}) and sending a bug report to it via
+the following email address:
 
 @email{crystal-main@@lists.sourceforge.net}
 

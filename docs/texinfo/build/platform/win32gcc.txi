@@ -2,68 +2,94 @@
 @node GCC Windows, , MS-DOS, Platform Instructions
 @subsection @sc{gcc} and Mingw for Windows
 
-@strong{Warning}: @emph{These instructions are extremely incomplete.  You
-should not rely upon them at this time.  Andrew Zabolotny
-(@email{bit@@eltech.ru}) intends to update them as time permits.}
-Update by Norman Krämer (@email{norman@users.sourceforge.net}).
+@noindent
+@emph{Updated by Norman Kr@"amer (@email{norman@@users.sourceforge.net}).}
 
 These instructions are for building Crystal Space with a @sc{gnu} compiler for
 Windows.  Unfortunately, there are many different versions of the @sc{gnu}
 Windows compiler and problems arise with some Windows header files containing
 non-standard code used by Microsoft.
 
-@subsubheading Download the following packages
-@itemize @bullt
+@subsubheading Necessary Resources
+
+Download the following packages:
+
+@itemize @bullet
 @item
-All files in @uref{ftp://ftp.linuxgames.com/crystal/support/mingw32/}
+All support files from the Mingw32 support directory at Linux Games@*
+@uref{ftp://ftp.linuxgames.com/crystal/support/mingw32/}
+
 @item
 @sc{nasm} (Netwide Assembler) for Windows@*
 @uref{ftp://ftp.linuxgames.com/crystal/nasm/nasm-0.98e-bin-w32.zip}
+
 @item
-Get the Mingw compiler itself, the most recently updated and well supported @sc{gcc} Windows compiler: @url{http://www.mingw.org/} - Note: Get the latest @strong{release} (either the *-msvcrt.exe or *-crtdll.exe, the first is optimized the later is assured to work on all win32 platforms)
+Get the Mingw compiler itself, the most recently updated and well supported
+@sc{gcc} Windows compiler, @url{http://www.mingw.org/}.  @emph{Note}: Get the
+@emph{latest} release; either @file{*-msvcrt.exe} or @file{*-crtdll.exe}.  The
+first is optimized the latter is assured to work on all win32 platforms.
 @end itemize
 
-@subsubheading Installing the downloaded packages
+@subsubheading Installation
 
-@itemize @bullt
+Follow these instructions to install the packages which you downloaded.
+
+@itemize @bullet
 @item
-First install the MingW compiler. Do this in @samp{c:\mingw32} for example. The further description expects the installation there.
+First install the Mingw compiler.  Place it in @file{c:\mingw32}, for
+instance.  The following instructions assume that it has been installed there.
+
 @item
-Unzip the @sc{nasm} zip files and copy the .exe files into @samp{c:\mingw32\bin}
+Unzip the @sc{nasm} archive files and copy the @file{.exe} files into
+@file{c:\mingw32\bin}.
+
 @item
-Now unzip all files from @url{ftp://ftp.linuxgames.com/crystal/support/mingw32/} into @samp{c:\}. This will also overwrite the original make program in @samp{c:\mingw32\bin}.
+Unzip all files from the Mingw support package (downloaded from Linux Games)
+into @file{c:\}.  This will also overwrite the original @file{make} program in
+@file{c:\mingw32\bin}.
+
 @item
-You are almost done. The last thing to do is adjusting your @samp{PATH} variable.
-On @sc{win9x} edit your @samp{c:\autoexec.bat} and add the following entry.
+Adjust your @samp{PATH} environment variable.  On Windows 95 and 98 edit the
+@file{c:\autoexec.bat} file and add the following entry.
+
 @example
 SET PATH=c:\mingw32\bin;c:\mingw32\lib;%PATH%
 @end example
+
+@noindent
+On Windows NT and Windows 2000, use the System control panel to edit the
+environment variable.
+
 @item
-Also if you're going to develop with mingw32 you should add the following line:
+Also if you plan to do development with Mingw32 you should add the following
+additional environment variable:
+
 @example
 set C_INCLUDE_PATH=c:\mingw32\i386-mingw32msvc\include
 @end example
-to autoexec.bat since otherwise the makedep tool won't know where to look for
-mingw32's system include files, and will emmit a lot of warnings.
+
+If you fail to do so, then the makedep tool will not know where to look for
+Mingw32's system include files, and will emit a lot of warnings.
+
 @item
-Now reboot your computer.
+Reboot your computer.
 @end itemize
 
 @subsubheading Building
 
-From within the Crystal Space directory (@file{CS}), run the @samp{make}
-command and follow the instructions.
-The usual commands to issue are:
-@itemize
-@item
+From within the Crystal Space directory (@file{CS/}), run the @samp{make}
+command and follow the instructions.  Typically, you would issue the following
+commands:
+
+@example
 make win32gcc MODE=debug
-@item
 make clean depend all
-@end itemize
+@end example
 
 @subsubheading Customizing
 
-Specifics for the win32gcc port you find in @file{CS\libs\cssys\win32\win32gcc.mak}.
-Check the the following variables: @samp{LIBS.GL3D.SYSTEM, LIBS.SOCKET.SYSTEM
-LIBS.SOUND.SYSTEM}. Adjust them to match your systems libraries.
-In @file{CS\mk\user.mak} you define what plugins to compile.
+You may need to customize settings in the Mingw32 makefile which resides at
+@file{CS\libs\cssys\win32\win32gcc.mak}.  Check the the following variables:
+@samp{LIBS.GL3D.SYSTEM}, @samp{LIBS.SOCKET.SYSTEM}, and
+@samp{LIBS.SOUND.SYSTEM}.  Adjust them to match your system libraries.  Also
+in the file @file{CS\mk\user.mak} select which plugins you wish to compile.

@@ -4,249 +4,251 @@
 @cindex Procedural Texture System
 
 @noindent
-@emph{Written by Samuel Humphreys}
+@emph{Written by Samuel Humphreys, @email{samuel@@users.sourceforge.net}.}
 
-@subsubheading Procedural Texture Support
+At the time of this writing procedural texture support is available with the
+following configurations:
 
-At the time of writing procedural texture support is available with the following 
-configurations:
 @itemize @bullet
 @item
-In 8/15/16/32 bit software on all platforms.
+In 8, 15, 16, and 32-bit software renderer on all platforms.
+
 @item
-In Opengl on the platforms which support opengl. Currently there is a hardware 
-backbuffer implementation and a 16(opengl1.2 only)/32bit software implementation.
-More on 
-which is below.
+In OpenGL on platforms which support OpenGL.  Currently there is a hardware
+backbuffer implementation and a 16/32-bit software implementation.  (The
+16-bit implementation works with OpenGL 1.2, only.)
+
 @item
-In Glide on platforms which support glide. Currently there is a hardware backbuffer
-implementation.
+In Glide on platforms which support Glide.  Currently there is a hardware
+backbuffer implementation.
+
 @item
-DirectX support is yet to be added.
+DirectX support has yet to be added.
 @end itemize
 
-@subsubheading Overview of Creating And Using A Procedural Texture
+@subsubheading Creating and Using a Procedural Texture
 
-Here is the basic minimum to render some text to a procedural texture.
+Here is the basic, minimum code required to render text onto a procedural
+texture.
 
 @example
-    // Initialise a procedural texture of dimension 128x128
-    // Presuming you have already decided on which flags to use
+// Initialize a procedural texture of dimension 128x128.
+// Presuming you have already decided on which flags to use.
+iImage* proc_image = (iImage*)new csImageMemory(128,128);
+int flags = CS_TEXTURE_PROC | proc_tex_flags;
+iTextureHandle* proc_tex =
+  main_txtmgr->RegisterTexture(proc_image,flags);
+main_txtmgr->PrepareTexture(proc_tex);
 
-    iImage *proc_image = (iImage*) new csImageMemory (128, 128);
-    int flags = CS_TEXTURE_PROC | proc_tex_flags;
-    iTextureHandle *proc_tex = main_txtmgr->RegisterTexture (proc_image, flags);
-    main_txtmgr->PrepareTexture (proc_tex);
+// Get the interface to the procedural texture buffer.
+iGraphics3D* proc_G3D = proc_tex->GetProcTextureInterface();
+int colour = proc_G3D->GetTextureManager()->FindRGB(255,255,255);
 
-    // Get the interface to the procedural texture buffer
-    iGraphics3D *proc_G3D = proc_tex->GetProcTextureInterface ();
-
-    int colour = proc_G3D->GetTextureManager ()->FindRGB (255, 255, 255);
-
-    // Before you render with the main renderer, render to the procedural 
-    // texture buffer in the usual way
-    if (proc_G3D->BeginDraw (CSDRAW_2DGRAPHICS | CSDRAW_CLEARSCREEN))
-    {
-       proc_G3D->GetDriver2D ()->Write (10, 10, colour, -1, "procedural texture");
-       proc_G3D->FinishDraw ();
-       proc_G3D->Print (NULL);
-    }
+// Before rendering with the main renderer, render to the
+// procedural texture buffer in the usual fashion.
+if (proc_G3D->BeginDraw(CSDRAW_2DGRAPHICS | CSDRAW_CLEARSCREEN))
+@{
+   proc_G3D->GetDriver2D()->Write(
+     10, 10, colour, -1, "procedural texture");
+   proc_G3D->FinishDraw();
+   proc_G3D->Print(NULL);
+@}
 @end example
 
-Note: it would be better not to clear the screen each time and it would be also 
-better to calculate the extents of the text message as a csRect and pass it to 
-Print (csRect *).
+@emph{Note}: It would be better not to clear the screen each time and it would
+be also better to calculate the extents of the text message as a @samp{csRect}
+and pass it to @code{Print(csRect*)}.
 
-The main design goal of the procedural texture subsystem is that you should be 
-able to treat the iGraphics3D pointer the same as you would an iGraphics3D
-pointer to the main renderer. The mucky details of its implementation only 
-surfaces to the application programmer when setting the flags while registering
-the procedural texture. Almost everything else is taken care of transparently.
+The main design goal of the procedural texture subsystem is that you should be
+able to treat the @samp{iGraphics3D} pointer the same as you would an
+@samp{iGraphics3D} pointer to the main renderer.  The mucky details of its
+implementation only surfaces to the application programmer when setting the
+flags while registering the procedural texture.  Almost everything else is
+taken care of transparently.
+
 The only blemish on an otherwise consistent interface and behavious across all
-platforms and implementations is to do with the texture manager. This arises 
+platforms and implementations is to do with the texture manager.  This arises
 because there is a too good an optimisation to lose with the software drivers,
-which requires a little care from the app programmer. It is basically this:
-When you query for the texture manager from the procedural texture buffer 
+which requires a little care from the app programmer.  It is basically this:
+When you query for the texture manager from the procedural texture buffer
 interface it may or may not be the same texture manager as that which is used
-by the main renderer. So you need to test for this and act accordingly. See 
-the test app dtsimple for an example of how to deal with this. More details
-on this quirk is found below.
+by the main renderer.  So you need to test for this and act accordingly.  See
+the example application @samp{dtsimple} for an example of how to deal with
+this.  More details on this quirk are found below.
  
-The rest of this document is really about the choice of flags, and to be able to 
-choose the right flags it is necessary to know something about how it all works. 
+The rest of this document is really about the choice of flags, and to be able
+to choose the right flags it is necessary to know something about how it all
+works.
 
-@subsubheading Considerations Before Creating A Procedural Texture
+@subsubheading Considerations Before Creating a Procedural Texture
 
-Firstly a warning: Procedural textures are quite expensive to utilise so if they
+First a warning: Procedural textures are quite expensive to utilize so if they
 are to be used at all, use them sparingly.
 
 For the most part procedural textures are useful if you intend for the texture
-images' content to respond to the user and where it would be impossible or
-too expensive to precompute all possible outcomes.
+images' content to respond to the user and where it would be impossible or too
+expensive to precompute all possible outcomes.
 
-The dtsimple test application demonstrates in more detail how to setup and use
-procedural textures in ways which I wouldn't recommended for the normal 
-application.
-The procedural textures it uses are all quite expensive and are really done that
-way to test the code. It is not recommended to have the engine render to a 
-procedural texture unless thats absolutely what you need to do :)
+The @samp{dtsimple} test application demonstrates in more detail how to setup
+and use procedural textures in ways which I wouldn't recommended for the
+normal application.  The procedural textures it uses are all quite expensive
+and are really done that way to test the code.  It is not recommended to have
+the engine render to a procedural texture unless thats absolutely what you
+need to do.
 
-@subsubheading Considerations When Creating A Procedural Texture
+@subsubheading Considerations When Creating a Procedural Texture
+
 The questions you need to ask yourself at this stage in order to set the right
 flags are:
+
 @enumerate
 @item
-Do I wish to render textures on to my procedural texture? If so do I want to use
-these textures to render on the main screen also?
+Do I wish to render textures on to my procedural texture?  If so do I want to
+use these textures to render on the main screen also?
 
-Flag: CS_TEXTURE_PROC_ALONE_HINT
+@noindent
+Flag: @code{CS_TEXTURE_PROC_ALONE_HINT}
 
-If you can get away with having a set of textures devoted specifically to
-the procedural texture subsystem or none at all this is a big performance bonus 
-on some configurations, while incurring no performance penalty on others. 
-So I would strongly recommend setting this flag under these circumstances.
+If you can get away with having a set of textures devoted specifically to the
+procedural texture subsystem or none at all this is a big performance bonus on
+some configurations, while incurring no performance penalty on others.  So I
+would strongly recommend setting this flag under these circumstances.
 
 @itemize @bullet
 @item
-Software Specific Details:
+Software Specific Details
+
 The first distinction to draw when dealing with procedural textures in Crystal
-Space is whether or not the texture manager is going to be shared with the main
-renderer. If you are running at a screen depth of bigger than 8bit it is better 
-for the software procedural textures to have their own texture manager. 
-The reason for this is that the software texture managers' native
-format is really 8bit. When a true colour image is registered and prepared with 
-the software texture manager, a texture specific 256 colour palette is calculated
-and the image converted to utilise this palette. When the software renderer is in 
-15/16/32 bit modes it is only the final framebuffer writing stage which has 
-anything to do with these true colour pixelformats, and only in the sense the 
-palette points to 15/16/32bit colours. The implication for this is
-that if the procedural textures have their own texture manager they can render
-at 8bit and utilise a fully 8bit texture manager. This means that the 8bit frame 
-buffer can directly update the textures image without any conversions or palette
-recalculations. However this adds the restriction that you cannot use the texture 
-handles received from registering images with the procedural textures' texture 
-manager with the main renderer as its texture manager would know nothing about 
-them. To overcome this and the number of texture images you wish to use with
-both texture managers is small, then just re-register the images with the main 
-texture manager and be careful to use the right texture handle with the correct 
-texture manager. Unfortunately if you wish to use the engine for example to render 
-to both textures and the engine will use the same texturehandles on both textures, 
-you will have to share the texture manager between the procedural texture 
-renderers and the main screen renderer. This is quite a performance hit if the 
-screen depth is bigger than 8bit. In these circumstances the procedural textures 
-buffer will have the same depth as the screens' because the texture manager has 
-set the palette to point at colours at screen depth. Once it is written to, a new 
-palette will have to be calculated and the buffer re-converted to 8bit. Note it is
-quite workable to have procedural textures bearing this flag co-existing with 
-other procedural textures which don't. Bear in mind however that texture handles 
-can only be used with the texture manager with which they were registered so you 
-can't use the same texture handle with procedural textures which differ in this 
-flag setting. 
+Space is whether or not the texture manager is going to be shared with the
+main renderer.  If you are running at a screen depth of bigger than 8-bit it
+is better for the software procedural textures to have their own texture
+manager.
 
-For these reasons it is necessary to be careful with which texture manager youre
-dealing with as noted above.
+The reason for this is that the software texture manager's native format is
+really 8-bit.  When a true colour image is registered and prepared with the
+software texture manager, a texture specific 256 colour palette is calculated
+and the image converted to utilize this palette.  When the software renderer
+is in 15/16/32 bit modes it is only the final framebuffer writing stage which
+has anything to do with these true colour pixel formats, and only in the sense
+the palette points to 15/16/32 bit colours.
+
+The implication for this is that if the procedural textures have their own
+texture manager they can render at 8-bit and utilize a fully 8-bit texture
+manager.  This means that the 8-bit frame buffer can directly update the
+textures image without any conversions or palette recalculations.  However
+this adds the restriction that you cannot use the texture handles received
+from registering images with the procedural textures' texture manager with the
+main renderer as its texture manager would know nothing about them.
+
+To overcome this and the number of texture images you wish to use with both
+texture managers is small, then just re-register the images with the main
+texture manager and be careful to use the right texture handle with the
+correct texture manager.  Unfortunately if you wish to use the engine, for
+example, to render to both textures and the engine will use the same texture
+handles on both textures, you will have to share the texture manager between
+the procedural texture renderers and the main screen renderer.
+
+This is quite a performance hit if the screen depth is deeper than 8-bit.  In
+these circumstances the procedural textures buffer will have the same depth as
+the screen's because the texture manager has set the palette to point at
+colours at screen depth.  Once it is written to, a new palette will have to be
+calculated and the buffer re-converted to 8-bit.
+
+Note that it is quite workable to have procedural textures bearing this flag
+co-existing with other procedural textures which do not.  Bear in mind,
+however, that texture handles can only be used with the texture manager with
+which they were registered so you can not use the same texture handle with
+procedural textures which differ in this flag setting.
+
+For these reasons it is necessary to be careful with which texture manager you
+are dealing with, as noted above.
 
 @item
-OpenGL Specific Details:
-With the back buffer implementation, this flag has no effect as it always utilises
-the same texture manager as the main renderer.
-With the software implementation, this flag has the same effect with the pure 
-software version.
+OpenGL Specific Details
+
+With the back buffer implementation, this flag has no effect as it always
+utilizes the same texture manager as the main renderer.  With the software
+implementation, this flag has the same effect as with the pure software
+version, as detailed above.
 
 @item
-GLIDE Specific Details:
-This flag has no effect on the glide implementation.
+Glide Specific Details
+
+This flag has no effect on the Glide implementation.
 @end itemize
 
 @item
 Do I require the procedural texture buffer to be persistent between frames?
 
-Flag: CS_TEXTURE_PROC_PERSISTENT
+Flag: @code{CS_TEXTURE_PROC_PERSISTENT}
 
-If you require that what you render into the texture buffer still be there when
-you come back to render into it you must set this flag to guarantee this to be the
-case for all implementations.
+If you require that what you render into the texture buffer still be there
+when you come back to render into it you must set this flag to guarantee this
+to be the case for all implementations.
 
 @itemize @bullet
 @item
-Software Specific Details:
-This flag has no effect for the software drivers as the buffer is always 
+Software Specific Details
+
+This flag has no effect for the software drivers as the buffer is always
 persistent.
 
 @item
-OpenGL Specific Details:
-With the hardware backbuffer implementation, the image you render to the backbuffer
-is of course overwritten by the main renderer. If you set this flag then the 
-backbuffer drivers will rewrite the texture to the backbuffer when you call 
-BeginDraw so you can carry on working as usual as if it was always there.
+OpenGL Specific Details
+
+With the hardware backbuffer implementation, the image you render to the
+backbuffer is of course overwritten by the main renderer.  If you set this
+flag then the backbuffer drivers will rewrite the texture to the backbuffer
+when you call BeginDraw so you can carry on working as usual as if it was
+always there.
 
 @item
-Glide Specific Details:
-The same thing happens with the glide back buffer implementation as it does with 
-opengl.
+Glide Specific Details
+
+The same thing happens with the glide back buffer implementation as it does
+with opengl.
 @end itemize
 
 @item
 Do I require mip-mapping?
 
-Flags: CS_TEXTURE_NOMIPMAPPING, CS_TEXTURE_PROC_MIPMAP_ON_SYNC
+Flag: @code{CS_TEXTURE_NOMIPMAPPING}@*
+Flag: @code{CS_TEXTURE_PROC_MIPMAP_ON_SYNC}
 
-Naturally it would be better if you didn't specify mip-mapping, as this would be
-very expensive to do each time you update the procedural texture, so if you can
-possibly avoid it do so and specify CS_TEXTURE_NOMIPMAPPING :) Otherwise the 
-next best is to specify it to mip map on sync. You can command to refresh
-mip mapping with the method iTexturehandle->ProcTextureSync ().
+Naturally, it would be better if you did not specify mip-mapping, as this
+would be very expensive to do each time you update the procedural texture, so
+if you can possibly avoid it, do so by specifying
+@samp{CS_TEXTURE_NOMIPMAPPING}.  Otherwise the next best approach is to
+specify it to mip map on sync.  You can command to refresh mip mapping with
+the method @code{iTexturehandle->ProcTextureSync()}.
 
 
 @item
 What about visibility considerations?
 
-Hopefully this issue shouldn't arise, because it would be unwise to refresh
-procedural textures each frame automatically when the texture is visible 
-(Although dtsimple pretty much does this :). Also the procedural textures are 
-all implemented at the graphics driver level and the engine (which has all the 
-visibility determination code) doesn't know anything about procedural textures, so
-if you did require to determine visiblility before refreshing then currently you 
-would have to implement your own little visibility test. Unless there is a huge
-demand or a really compelling reason to change the current situation, I dont
-expect this to change.
-@end itemize
+Hopefully this issue should not arise, because it would be unwise to refresh
+procedural textures each frame automatically when the texture is visible
+(Although @samp{dtsimple} pretty much does so.)  Also the procedural textures
+are all implemented at the graphics driver level and the engine (which has all
+the visibility determination code) doesn't know anything about procedural
+textures, so if you did require to determine visiblility before refreshing
+then currently you would have to implement your own little visibility test.
+Unless there is a huge demand or a really compelling reason to change the
+current situation, I don't expect this to change.
+@end enumerate
 
 @subsubheading Considerations When Using a Procedural Texture
 
-The biggest thing to defnitley do when rendering to procedural textures is to do it
-before you render to the main screen. This is because with opengl and glide 
-the procedural texture buffer may be the backbuffer. Lastly of course try and 
-utilise the iGraphics3D->Print (csRect *) ability to just update a small portion
-of the buffer.
+The biggest thing to definitely do when rendering to procedural textures is to
+do it before you render to the main screen.  This is because with OpenGL and
+Glide, the procedural texture buffer may be the backbuffer.  Lastly, of
+course, try and utilize the @code{iGraphics3D->Print(csRect*)} ability to just
+update a small portion of the buffer.
 
-@subsubheading Considerations After You've Finished  Using a Procedural Texture
+@subsubheading Considerations After Using a Procedural Texture
 
-None really, destroy the texture handle as you would an ordinary texture. The only
-thing to bear in mind is that the interfaces to the buffers are destroyed also, 
-so if for some reason you absolutely need to hang on to them for a while you just 
-need to call IncRef ().
-
-Thats it..... enjoy!
-@end enumerate
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Nothing particularly special needs to be done.  Destroy the texture handle as
+you would an ordinary texture.  The only thing to bear in mind is that the
+interfaces to the buffers are destroyed also, so if for some reason you
+absolutely need to hang on to them for a while you just need to call
+@code{IncRef()}.

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node ApiMods17, History, Todo, Top
+@node ApiMods17, Index, FAQ, Top
 @appendix Significant @sc{api} Changes
 @cindex @sc{api} Changes
 

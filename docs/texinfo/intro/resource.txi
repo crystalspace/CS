@@ -18,13 +18,26 @@ know.
 @noindent
 The Crystal Space home page is located at:
 
-@uref{http://crystal.linuxgames.com}
+@uref{http://crystal.linuxgames.com/}
 
 @noindent
-The released Crystal Space packages can also be downloaded directly via
-@sc{ftp} from the following location:
+The Crystal Space @emph{Jump Start} page, from which you can jump to many
+destinations, is located at:
 
-@uref{ftp://ftp.linuxgames.com/crystal}
+@uref{http://crystal.sourceforge.net/}
+
+@noindent
+The Crystal Space Developer's Project page is located at:
+
+@uref{http://sourceforge.net/projects/crystal/}
+
+@noindent
+The released Crystal Space packages can be downloaded directly via @sc{ftp}
+from the following locations:
+
+@uref{ftp://ftp.linuxgames.com/crystal/}
+
+@uref{http://sourceforge.net/project/showfiles.php?group_id=649}
 
 @subheading Bleeding-Edge Developmental Releases (@sc{cvs})
 @cindex CVS
@@ -50,6 +63,11 @@ or @sc{ftp}.  Snapshots are generated daily and are accompanied by standard
 
 @uref{ftp://crystal.sourceforge.net/pub/crystal/cvs-snapshots/}
 
+You can also view the contents of the @sc{cvs} repository online including
+all of the historical information and administrative information.
+
+@uref{http://cvs.sourceforge.net/cgi-bin/cvsweb.cgi/CS/?cvsroot=crystal}
+
 @subheading Documentation
 @cindex Documentation, Obtaining
 @cindex Documentation, Online
@@ -62,37 +80,52 @@ or @sc{ftp}.  Snapshots are generated daily and are accompanied by standard
 @anchor{Documentation Resources}
 Documentation is included with the Crystal Space distribution.  A gateway to
 all documentation can be found in the file @file{CS/docs/README.htm}.  You can
-also read the Crystal Space manual with your web browser by loading the file
-@file{CS/docs/html/index.htm}.
+also read the @cite{Crystal Space User's Manual} with your web browser by
+loading the file @file{CS/docs/html/index.htm}, as well as the @cite{Crystal
+Space Public API Reference Manual} by viewing the file
+@file{CS/docs/pubapi/index.htm}.
 
-Documentation is also available online.  A version of this manual is available
-online at this location:
+Documentation is also available for online viewing.  The @cite{Crystal Space
+User's Manual} is available for online viewing at this location:
 
 @url{http://crystal.sourceforge.net/docs/online/manual/}
 
-The @cite{Public @sc{api}} reference for programmers utilizing Crystal Space
-is available online here:
+The @cite{Public @sc{api} Reference Manual}, for programmers utilizing Crystal
+Space, is available for online viewing here:
 
-@url{http://crystal.sourceforge.net/docs/online/api/}
+@url{http://crystal.sourceforge.net/docs/online/pubapi/}
 
-The @cite{Developer's Documentation and @sc{api}} for programmers actually
-working on Crystal Space itself is available here:
+The @cite{Developer's @sc{api} Reference Manual}, for programmers actually
+working on Crystal Space itself, is available here:
 
-@url{http://crystal.sourceforge.net/docs/online/dev/}
+@url{http://crystal.sourceforge.net/docs/online/devapi/}
 
-Additionally, @sc{html}, @sc{pdf}, and PostScript conversions of this manual
-can be downloaded as a single archive for offline perusal or printing.  The
-@cite{Public @sc{api}} and @cite{Developer's Documentation and @sc{api}} can
-each be downloaded as a single archive as well.  These archives may be found
-here:
+In addition, all of the above documents may be downloaded for offline viewing
+via @sc{http} or @sc{ftp} from the following locations, and are packaged with
+a variety of compression technologies, including @sc{bzip2}, @sc{gzip}, and
+@sc{zip}.
 
 @url{http://crystal.sourceforge.net/docs/download/}
 
-Developers can generate the @cite{Public @sc{api}} and @cite{Developer's
-Documentation and @sc{api}} documents themselves by invoking the makefile
-targets @samp{apidoc} and @samp{devdoc}.  Output from these targets is placed
-in the @file{CS/out/docs/api} and @file{CS/out/docs/dev} directories,
-respectively.
+@url{ftp://crystal.sourceforge.net/pub/crystal/docs/download/}
+
+@noindent
+Currently these documents are only available in @sc{html} format, but may
+someday be available as @sc{pdf}, PostScript, and possibly other formats as
+well.
+
+Developers can generate their own copies of these manuals from the Crystal
+Space source package by invoking certain makefile targets.  The @cite{User's
+Manual} can be built as various output formats by invoking any of the targets
+@samp{htmldoc}, @samp{psdoc}, @samp{pdfdoc}, and @samp{infodoc}.
+
+The @cite{Public @sc{api} Reference Manual} and @cite{Developer's API
+Reference Manual} can be generated in @sc{html} format by invoking the
+@samp{pubapi} and @samp{devapi} makefile targets, respectively.
+
+These makefile targets place the generated output in subdirectories of
+@file{CS/out/docs}.  The hierarchy of subdirectories mirrors that of
+@file{CS/docs} where the master copies of these documents are kept.
 
 @subheading Texture Archive
 @cindex Texture Archive
@@ -100,17 +133,17 @@ respectively.
 
 A Crystal Space texture archive is maintained at:
 
-@uref{http://server.empathy.com/crystal}.
+@uref{http://server.empathy.com/crystal/}.
 
 @node Mailing Lists, Internet Relay Chat (IRC), Where to Get, CS Introduction
 @section Mailing Lists
 @cindex Mailing Lists
 
-There are two mailing lists for the Crystal Space project which may be of
+There are three mailing lists for the Crystal Space project which may be of
 interest to users and developers.
 
-The first list is the discussion list used for general and in-depth
-discussion of Crystal Space and related projects.
+The discussion list used for general and in-depth discussion of Crystal Space
+and related projects.
 
 @noindent
 Mailing List: @email{crystal-main@@lists.sourceforge.net}.
@@ -119,12 +152,25 @@ To subscribe to this list visit the mailing list administration page and
 follow the instructions there.  This page also contains instructions for
 unsubscribing.
 
-@uref{http://lists.sourceforge.net/mailman/listinfo/crystal-main}
+@uref{http://lists.sourceforge.net/mailman/listinfo/crystal-main/}
 
-The second list is for people who are interested in being notified of
-changes which are made to Crystal Space's CVS repository.  A notification
-message is sent to members of this list each time a change is made to some
-resource in the CVS repository.
+The announcement list is for people interested in being notified of
+important announcements which affect the Crystal Space community, such as
+new releases, new important features, and the like.
+
+@noindent
+Mailing List: @email{crystal-announce@@lists.sourceforge.net}.
+
+To subscribe to this list visit the mailing list administration page and
+follow the instructions there.  This page also contains instructions for
+unsubscribing.
+
+@uref{http://lists.sourceforge.net/mailman/listinfo/crystal-announce/}
+
+People who are interested in being notified of changes which are made to
+Crystal Space's @sc{cvs} repository can subscribe the the @sc{cvs}
+notification list.  A notification message is sent to members of this list
+each time a change is made to resources within the @sc{cvs} repository.
 
 @noindent
 Mailing List: @email{crystal-cvs@@lists.sourceforge.net}.
@@ -133,7 +179,7 @@ To subscribe to this list visit the mailing list administration page and
 follow the instructions there.  This page also contains instructions for
 unsubscribing.
 
-@uref{http://lists.sourceforge.net/mailman/listinfo/crystal-cvs}
+@uref{http://lists.sourceforge.net/mailman/listinfo/crystal-cvs/}
 
 @node Internet Relay Chat (IRC), Feedback, Mailing Lists, CS Introduction
 @section Internet Relay Chat (@sc{irc})
