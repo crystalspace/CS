@@ -29,7 +29,6 @@
 #endif // CS_BUILD_SHARED_LIBS
 
 #if defined(COMP_VC)
-
   #pragma warning(disable:4097)   // use of xxx as synonym for a classname
   #pragma warning(disable:4099)   // type seen as both 'struct' and `class'
   #pragma warning(disable:4100)   // Use of void* as a formal function parameter
@@ -77,6 +76,17 @@
 
 #ifndef WINVER
 #define WINVER 0x0400
+#endif
+
+// Although MSVC6 generally supports templated functions within templated
+// classes, nevertheless it crashes and burns horribly when arguments to those
+// functions are function-pointers or functors.  In fact, such usage triggers a
+// slew of bugs, mostly "internal compiler error" but also several other
+// Worse, the bugs manifest in "random" locations throughout the project, often
+// in completely unrelated code.  Consequently, instruct csArray<> to avoid
+// such usage for MSVC6.
+#if defined(COMP_VC) && (_MSC_VER < 1300)
+#define CSARRAY_INHIBIT_TYPED_KEYS
 #endif
 
 // So many things require this. IF you have an issue with something defined
