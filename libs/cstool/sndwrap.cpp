@@ -21,7 +21,7 @@
 #include <string.h>
 #include "cssysdef.h"
 #include "isound/handle.h"
-#include "csparser/snddatao.h"
+#include "cstool/sndwrap.h"
 #include "csutil/csobject.h"
 
 SCF_IMPLEMENT_IBASE (csSoundWrapper);

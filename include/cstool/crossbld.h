@@ -24,7 +24,7 @@
 #ifndef __CS_CROSSBLD_H__
 #define __CS_CROSSBLD_H__
 
-#include "csparser/impexp.h"
+#include "cstool/impexp.h"
 
 struct iSprite3DFactoryState;
 struct iMeshObjectFactory;

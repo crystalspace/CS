@@ -29,10 +29,10 @@
 #include "cstool/prplasma.h"
 #include "cstool/prwater.h"
 #include "cstool/keyval.h"
+#include "cstool/crossbld.h"
+#include "cstool/sndwrap.h"
 #include "csgfx/csimage.h"
-#include "csparser/crossbld.h"
 #include "csparser/csloader.h"
-#include "csparser/snddatao.h"
 
 #include "iutil/databuff.h"
 #include "imap/reader.h"

@@ -22,7 +22,7 @@
 // can be used in a Crystal Space engine.
 
 #include "cssysdef.h"
-#include "csparser/crossbld.h"
+#include "cstool/crossbld.h"
 #include "csgfx/csimage.h"
 #include "cssys/system.h"
 #include "csutil/scfstrv.h"

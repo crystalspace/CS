@@ -26,11 +26,11 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp libs/csparser libs/csparser/impexp
+vpath %.cpp libs/csparser
 
 CSPARSER.LIB = $(OUT)$(LIB_PREFIX)csparser$(LIB_SUFFIX)
 INC.CSPARSER = $(wildcard libs/csparser/*.h include/csparser/*.h)
-SRC.CSPARSER = $(wildcard libs/csparser/*.cpp libs/csparser/impexp/*.cpp)
+SRC.CSPARSER = $(wildcard libs/csparser/*.cpp)
 OBJ.CSPARSER = $(addprefix $(OUT),$(notdir $(SRC.CSPARSER:.cpp=$O)))
 
 TO_INSTALL.STATIC_LIBS += $(CSPARSER.LIB)

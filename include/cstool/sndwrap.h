@@ -18,8 +18,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SNDDATAO_H__
-#define __SNDDATAO_H__
+#ifndef __SNDWRAP_H__
+#define __SNDWRAP_H__
 
 #include "csutil/csobject.h"
 #include "isound/wrapper.h"
@@ -50,4 +50,4 @@ public:
   } scfiSoundWrapper;
 };
 
-#endif // __SNDDATAO_H__
+#endif // __SNDWRAP_H__
