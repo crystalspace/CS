@@ -22,7 +22,6 @@
 #include "walktest.h"
 #include "bot.h"
 #include "infmaze.h"
-#include "hugeroom.h"
 #include "command.h"
 #include "imesh/thing/polygon.h"
 #include "csutil/scanstr.h"
@@ -377,12 +376,29 @@ void WalkTest::rotate (float speed,int keep_old)
 
 void WalkTest::look (float speed,int keep_old)
 {
+  (void) speed; (void) keep_old;
   if (move_3d || map_mode) return;
   static float step_speed = 0;
   if (!keep_old)
     step_speed = speed*cfg_look_accelerate;
+  
+  //XXX: how to do this without angle?
+#if 0
   if (ABS (angle.x+step_speed) <= (355.0/113.0/4))
     angle.x += step_speed;
+#endif
+  RotateCam (-step_speed, 0);
+}
+
+void WalkTest::RotateCam(float x, float y)
+{
+  csMatrix3 mat = view->GetCamera ()->GetTransform ().GetO2T ();
+  if(x)
+    mat = csXRotMatrix3(x) * mat;
+  if(y)
+    mat *= csYRotMatrix3(y);
+  view->GetCamera ()->SetTransform ( csOrthoTransform 
+	  (mat, view->GetCamera ()->GetTransform ().GetOrigin ()));
 }
 
 void WalkTest::imm_forward (float speed, bool slow, bool fast)
@@ -713,16 +729,9 @@ bool WalkTest::WalkHandleEvent (iEvent &Event)
           myG2D->SetMousePosition (FRAME_WIDTH / 2, FRAME_HEIGHT / 2);
           if (!first_time)
           {
-          /*
-            if(move_3d)
-              view->GetCamera ()->RotateThis (CS_VEC_ROT_RIGHT, ((float)( last_x - (FRAME_WIDTH / 2) )) / (FRAME_WIDTH*2) );
-            else
-              view->GetCamera ()->RotateOther (CS_VEC_ROT_RIGHT, ((float)( last_x - (FRAME_WIDTH / 2) )) / (FRAME_WIDTH*2) );
-            view->GetCamera ()->RotateThis (CS_VEC_TILT_UP, -((float)( last_y - (FRAME_HEIGHT / 2) )) / (FRAME_HEIGHT*2) );
-          */
-
-            this->angle.y+=((float)(last_x - (FRAME_WIDTH / 2) )) / (FRAME_WIDTH*2);
-            this->angle.x+=((float)(last_y - (FRAME_HEIGHT / 2) )) / (FRAME_HEIGHT*2)*(1-2*(int)inverse_mouse);
+	    RotateCam (
+		-((float)(last_y - (FRAME_HEIGHT / 2) )) / (FRAME_HEIGHT*2)*(1-2*(int)inverse_mouse),
+		((float)(last_x - (FRAME_WIDTH / 2) )) / (FRAME_WIDTH*2));
           }
           else
             first_time = false;

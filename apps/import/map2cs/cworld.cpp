@@ -673,11 +673,25 @@ bool CCSWorld::WritePlayerStart()
         {
           //The strings format matched
           WriteIndent();
-          fprintf(m_fd, "START ('%s', %g, %g, %g)\n\n",
+	  CdVector3 forw(0,0,1);
+	  // rotate angle
+	  double angle;
+	  if (pEntity->GetNumValueOfKey("angle", angle))
+	  {
+	    angle = M_PI * angle/180;
+	    forw = CdMatrix3 (cos(angle), 0, -sin(angle),
+			       0,          1,           0,
+			       sin(angle), 0, cos(angle)) * forw;
+	  }
+	  
+          fprintf(m_fd, "START (SECTOR ('%s') POSITION(%g, %g, %g)"
+			" UP(0, 1, 0) FORWARD(%g, %g, %g))\n\n",
                   pSector->GetName(),
                   x*m_ScaleFactor,
                   z*m_ScaleFactor,
-                  y*m_ScaleFactor);
+                  y*m_ScaleFactor,
+		  forw.x, forw.y, forw.z
+		  );
           return true;
         }
         else

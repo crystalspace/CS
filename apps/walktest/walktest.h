@@ -40,7 +40,6 @@ class WalkTest;
 class csPixmap;
 class csWireFrameCam;
 class InfiniteMaze;
-class HugeRoom;
 struct iEngine;
 struct iRegion;
 struct iSoundHandle;
@@ -99,7 +98,6 @@ struct csRecordedCamera
 {
   csMatrix3 mat;
   csVector3 vec;
-  csVector3 angle;
   bool mirror;
   iSector* sector;
   char *cmd;
@@ -117,7 +115,6 @@ struct csRecordedCameraFile
   int32 m21, m22, m23;
   int32 m31, m32, m33;
   int32 x, y, z;
-  int32 ax, ay, az;
   unsigned char mirror;
 };
 
@@ -157,7 +154,7 @@ public:
   csVector3 velocity;
 
   /// Camera angles. X and Y are user controllable, Z is not.
-  csVector3 angle;
+  //csVector3 angle;
 
   /**
    * Angular velocity: angle_velocity.x is constantly added to angle.x
@@ -319,9 +316,6 @@ public:
 
   /// Our infinite maze object if used.
   InfiniteMaze* infinite_maze;
-
-  /// Our huge room object if used.
-  HugeRoom* huge_room;
 
   /// Some sounds.
   iSoundHandle* wMissile_boom;
@@ -520,6 +514,8 @@ public:
   void imm_rot_right_xaxis (float speed, bool slow, bool fast);
   void imm_rot_left_zaxis (float speed, bool slow, bool fast);
   void imm_rot_right_zaxis (float speed, bool slow, bool fast);
+
+  void RotateCam(float x, float y);
   
   ///
   void handle_key_forward (float speed, bool shift, bool alt, bool ctrl);

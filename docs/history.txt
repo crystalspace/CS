@@ -10,6 +10,12 @@ The history order is reversed so that new features are at the top.
 	  $(TEMP), if that doesn't exist it will try $(TMP). Otherwise it
 	  will use the temp dir in the Windows directory.
 	- Added fflush (stdout) to vshell so that it works on mingw correctly.
+	- Matze changed map2cs to support angle in info_player_start
+	- Matze removed hugeroom from walktest and cleaned small other things
+	- Matze changed walktest to load camera position AND direction at
+	  startup
+	- Matze eleminated angle vector in walktest which fixes the walking
+          through space warping portal bug
 	- Fixed several cases in AWS where SCF implementations were not
 	  calling SCF_CONSTRUCT_IBASE() from the constructor. This is BAD.
 12-Feb-2002

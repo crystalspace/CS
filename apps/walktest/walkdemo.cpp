@@ -20,7 +20,6 @@
 #include "walktest.h"
 #include "bot.h"
 #include "infmaze.h"
-#include "hugeroom.h"
 #include "command.h"
 #include "ivaria/view.h"
 #include "iengine/dynlight.h"

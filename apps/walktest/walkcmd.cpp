@@ -20,7 +20,6 @@
 #include "walktest.h"
 #include "bot.h"
 #include "infmaze.h"
-#include "hugeroom.h"
 #include "wentity.h"
 #include "command.h"
 #include "ivaria/view.h"
@@ -96,9 +95,6 @@ void SaveRecording (iVFS* vfs, const char* fName)
     camint.x = convert_endian (float2long (reccam->vec.x));
     camint.y = convert_endian (float2long (reccam->vec.y));
     camint.z = convert_endian (float2long (reccam->vec.z));
-    camint.ax = convert_endian (float2long (reccam->angle.x));
-    camint.ay = convert_endian (float2long (reccam->angle.y));
-    camint.az = convert_endian (float2long (reccam->angle.z));
     camint.mirror = reccam->mirror;
     cf->Write ((char*)&camint, sizeof (camint));
     unsigned char len;
@@ -171,9 +167,6 @@ void LoadRecording (iVFS* vfs, const char* fName)
     reccam->vec.x = long2float (convert_endian (camint.x));
     reccam->vec.y = long2float (convert_endian (camint.y));
     reccam->vec.z = long2float (convert_endian (camint.z));
-    reccam->angle.x = long2float (convert_endian (camint.ax));
-    reccam->angle.y = long2float (convert_endian (camint.ay));
-    reccam->angle.z = long2float (convert_endian (camint.az));
     reccam->mirror = camint.mirror;
     unsigned char len;
     cf->Read ((char*)&len, 1);
@@ -231,8 +224,7 @@ void SaveCamera (iVFS* vfs, const char *fName)
     << m_o2t.m21 << ' ' << m_o2t.m22 << ' ' << m_o2t.m23 << '\n'
     << m_o2t.m31 << ' ' << m_o2t.m32 << ' ' << m_o2t.m33 << '\n'
     << '"' << c->GetSector ()->QueryObject ()->GetName () << "\"\n"
-    << c->IsMirrored () << '\n'
-    << Sys->angle.x << ' ' << Sys->angle.y << ' ' << Sys->angle.z << '\n';
+    << c->IsMirrored () << '\n';
   vfs->WriteFile (fName, s.GetData(), s.Length());
 }
 
@@ -248,27 +240,25 @@ bool LoadCamera (iVFS* vfs, const char *fName)
     Sys->Report (CS_REPORTER_SEVERITY_ERROR,
 		 "Could not read camera file '%s'!", fName);
   csMatrix3 m;
-  csVector3 v, angle;
+  csVector3 v;
   int imirror = false;
   char* sector_name = 0;
   if (ok)
     sector_name = new char [data->GetSize ()];
-  
-  IFFAIL (17 == csScanStr (**data,
+
+  IFFAIL (14 == csScanStr (**data,
 			   "%f %f %f\n"
 			   "%f %f %f\n"
 			   "%f %f %f\n"
 			   "%f %f %f\n"
 			   "%S\n"
-			   "%d\n"
-			   "%f %f %f",
+			   "%d",
 			   &v.x, &v.y, &v.z,
 			   &m.m11, &m.m12, &m.m13,
 			   &m.m21, &m.m22, &m.m23,
 			   &m.m31, &m.m32, &m.m33,
 			   sector_name,
-			   &imirror,
-			   &angle.x, &angle.y, &angle.z))
+			   &imirror))
     Sys->Report (CS_REPORTER_SEVERITY_ERROR,
 		 "Wrong format for camera file '%s'", fName);
   iSector* s = 0;
@@ -283,7 +273,6 @@ bool LoadCamera (iVFS* vfs, const char *fName)
     c->SetMirrored ((bool)imirror);
     c->GetTransform ().SetO2T (m);
     c->GetTransform ().SetOrigin (v);
-    Sys->angle = angle;
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Camera loaded");
   }
   SCF_DEC_REF (data);

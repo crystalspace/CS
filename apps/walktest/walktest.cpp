@@ -24,7 +24,6 @@
 #include "cssys/sysfunc.h"
 #include "walktest.h"
 #include "infmaze.h"
-#include "hugeroom.h"
 #include "command.h"
 #include "csgeom/frustum.h"
 #include "iengine/region.h"
@@ -115,7 +114,6 @@ WalkTest::WalkTest () :
   auto_script = NULL;
   view = NULL;
   infinite_maze = NULL;
-  huge_room = NULL;
   wMissile_boom = NULL;
   wMissile_whoosh = NULL;
   cslogo = NULL;
@@ -140,7 +138,6 @@ WalkTest::WalkTest () :
   do_show_z = false;
   do_show_palette = false;
   do_infinite = false;
-  do_huge = false;
   do_cd = true;
   do_freelook = false;
   do_logo = true;
@@ -172,7 +169,6 @@ WalkTest::WalkTest () :
   plbody = pllegs = NULL;
 
   velocity.Set (0, 0, 0);
-  angle.Set (0, 0, 0);
   angle_velocity.Set (0, 0, 0);
 
   timeFPS = 0.0;
@@ -215,7 +211,6 @@ WalkTest::~WalkTest ()
   delete [] auto_script;
   SCF_DEC_REF (view);
   delete infinite_maze;
-  delete huge_room;
   delete cslogo;
   /*
   if (Engine)
@@ -297,9 +292,6 @@ void WalkTest::SetDefaults ()
   if (cmdline->GetOption ("infinite"))
     do_infinite = true;
 
-  if (cmdline->GetOption ("huge"))
-    do_huge = true;
-
   extern bool do_bots;
   if (cmdline->GetOption ("bots"))
     do_bots = true;
@@ -345,7 +337,6 @@ void WalkTest::Help ()
   printf ("  -[no]colldet       collision detection system (default '%scolldet')\n", do_cd ? "" : "no");
   printf ("  -[no]logo          draw logo (default '%slogo')\n", do_logo ? "" : "no");
   printf ("  -infinite          special infinite level generation (ignores map file!)\n");
-  printf ("  -huge              special huge level generation (ignores map file!)\n");
   printf ("  -bots              allow random generation of bots\n");
   printf ("  <path>             load map from VFS <path> (default '%s')\n",
         cfg->GetStr ("Walktest.Settings.WorldFile", "world"));
@@ -905,7 +896,6 @@ void WalkTest::DrawFrame (csTicks elapsed_time, csTicks current_time)
       reccam->vec = v;
       reccam->mirror = c->IsMirrored ();
       reccam->sector = c->GetSector ();
-      reccam->angle = angle;
       reccam->cmd = recorded_cmd;
       reccam->arg = recorded_arg;
       recorded_cmd = recorded_arg = NULL;
@@ -931,7 +921,6 @@ void WalkTest::DrawFrame (csTicks elapsed_time, csTicks current_time)
 	}
       }
       iCamera* c = view->GetCamera ();
-      angle = reccam->angle;
       c->SetSector (reccam->sector);
       c->SetMirrored (reccam->mirror);
       c->GetTransform ().SetO2T (reccam->mat);
@@ -1020,10 +1009,8 @@ void WalkTest::PrepareFrame (csTicks elapsed_time, csTicks current_time)
       }
       else
       {
-        view->GetCamera ()->GetTransform ().SetT2O (csMatrix3 ());
-        view->GetCamera ()->GetTransform ().RotateOther (csVector3 (0,1,0), angle.y);
-        if (!do_gravity)
-          view->GetCamera ()->GetTransform ().RotateThis (csVector3 (1,0,0), angle.x);
+	// Rotate Camera
+	RotateCam(angle_velocity.x, angle_velocity.y);
       }
 
       csVector3 vel = view->GetCamera ()->GetTransform ().GetT2O ()*velocity;
@@ -1038,12 +1025,6 @@ void WalkTest::PrepareFrame (csTicks elapsed_time, csTicks current_time)
 	if (check_once == false) { check_once = true; DoGravity (pos, vel); }
       }
       else { check_once = false; DoGravity (pos, vel); }
-
-      if (do_gravity && !move_3d)
-        view->GetCamera ()->GetTransform ().RotateThis (csVector3 (1,0,0), angle.x);
-
-      // Apply angle velocity to camera angle
-      angle += angle_velocity;
     }
   }
 }
@@ -1448,12 +1429,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   csCommandProcessor::Initialize (Engine, view->GetCamera (),
     Gfx3D, myConsole, object_reg);
 
-  // Now we have two choices. Either we create an infinite
-  // maze (random). This happens when the '-infinite' commandline
-  // option is given. Otherwise we load the given map.
-  iSector* room;
-
-  if (do_infinite || do_huge)
+  if (do_infinite)
   {
     // The infinite maze.
 
@@ -1481,6 +1457,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 
     if (do_infinite)
     {
+      iSector* room;
       // Create the initial (non-random) part of the maze.
       infinite_maze = new InfiniteMaze ();
       room = infinite_maze->create_six_room (Engine, 0, 0, 0)->sector;
@@ -1512,12 +1489,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
       infinite_maze->connect_infinite (0, 0, 3, 0, 1, 3);
       infinite_maze->connect_infinite (0, 1, 3, 0, 2, 3);
       infinite_maze->create_loose_portal (-2, 0, 4, -2, 1, 4);
-    }
-    else
-    {
-      // Create the huge world.
-      huge_room = new HugeRoom ();
-      room = huge_room->create_huge_world (Engine);
+      view->GetCamera ()->SetSector(room);
     }
 
     // Prepare the engine. This will calculate all lighting and
@@ -1588,23 +1560,29 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     Create2DSprites ();
 
     // Look for the start sector in this map.
-    iCameraPosition *cp = Engine->GetCameraPositions ()->FindByName ("Start");
-    const char *room_name;
-    if (cp)
+    bool camok = false;
+    if (!camok && Engine->GetCameraPositions ()->GetCount () > 0)
     {
-      room_name = cp->GetSector ();
-      if (!cp->Load (view->GetCamera (), Engine))
-        room_name = "room";
+      iCameraPosition *cp = Engine->GetCameraPositions ()->Get (0);
+      if (cp->Load(view->GetCamera (), Engine))
+	camok = true;
+      
     }
-    else
-      room_name = "room";
+    if (!camok) 
+    {
+      iSector* room = Engine->GetSectors ()->FindByName ("room");
+      if (room)
+      {
+	view->GetCamera ()->SetSector (room);
+	camok = true;
+      }
+    }
 
-    room = Engine->GetSectors ()->FindByName (room_name);
-    if (!room)
+    if (!camok)
     {
       Report (CS_REPORTER_SEVERITY_ERROR,
-        "Map does not contain a room called '%s'"
-        " which is used\nas a starting point!", room_name);
+        "Map does not contain a valid starting point!\n"
+        "Try adding a room called 'room' or a START keyword");
       return false;
     }
   }
@@ -1666,8 +1644,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   // Reinit console object for 3D engine use.
   if (myConsole) myConsole->Clear ();
 
-  // Initialize our 3D view.
-  view->GetCamera ()->SetSector (room);
   // We use the width and height from the 3D renderer because this
   // can be different from the frame size (rendering in less res than
   // real window for example).
