@@ -398,7 +398,8 @@ SCF_VERSION (iDocumentSystem, 0, 0, 1);
  *   <li>XmlRead Document System plugin (crystalspace.documentsystem.xmlread)
  *   <li>XmlTiny Document System plugin (crystalspace.documentsystem.tinyxml)
  *   <li>Binary Document System plugin (crystalspace.documentsystem.binary)
- *   <li>Document System Multiplexer plugin (crystalspace.documentsystem.multiplexer)
+ *   <li>Document System Multiplexer plugin
+ *       (crystalspace.documentsystem.multiplexer)
  *   </ul>
  * Main ways to get pointers to this interface:
  *   <ul>
