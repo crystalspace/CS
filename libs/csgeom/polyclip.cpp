@@ -62,7 +62,9 @@ bool csBoxClipper::Clip (csVector2 *Polygon, int& Count, int MaxCount,
   csVector2 *OutPolygon = OutPoly;
   int OutVertices = Count;
   int vert; 
-
+  
+  bClipped=false;
+  
   if (!region.Overlap (*BoundingBox)) return false;
 
   
@@ -72,6 +74,8 @@ bool csBoxClipper::Clip (csVector2 *Polygon, int& Count, int MaxCount,
     bool pVertIn = (px > region.MinX ());
     OutVertices = 0;
     int isectCount = 0;
+    bClipped=true;
+    
     for (vert = 1; vert <= InVertices; vert++)
     {
      float cx, cy;
@@ -119,6 +123,9 @@ bool csBoxClipper::Clip (csVector2 *Polygon, int& Count, int MaxCount,
     bool pVertIn = (py > region.MinY ());
     OutVertices = 0;
     int isectCount = 0;
+    
+    bClipped=true;
+
     for (vert = 1; vert <= InVertices; vert++)
     {
      float cx, cy;
@@ -166,6 +173,9 @@ bool csBoxClipper::Clip (csVector2 *Polygon, int& Count, int MaxCount,
     bool pVertIn = (px < region.MaxX ());
     OutVertices = 0;
     int isectCount = 0;
+    
+    bClipped=true;
+    
     for (vert = 1; vert <= InVertices; vert++)
     {
      float cx, cy;
@@ -213,6 +223,9 @@ bool csBoxClipper::Clip (csVector2 *Polygon, int& Count, int MaxCount,
     bool pVertIn = (py < region.MaxY ());
     OutVertices = 0;
     int isectCount = 0;
+    
+    bClipped=true;
+
     for (vert = 1; vert <= InVertices; vert++)
     {
      float cx, cy;

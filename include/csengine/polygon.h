@@ -437,6 +437,11 @@ private:
    */
   void PlaneNormal (float* yz, float* zx, float* xy);
 
+#ifdef DO_HW_UVZ
+  /// Precompute the (u,v) values for all vertices of the polygon
+  void SetupHWUV();
+#endif
+  
 public:
   /// Option variable: force lightmap recalculation?
   static bool do_force_recalc;
@@ -448,6 +453,11 @@ public:
   static bool do_lightmap_highqual;
   /// Option variable: cache lightmaps.
   static bool do_cache_lightmaps;
+
+#ifdef DO_HW_UVZ
+  csVector3 *uvz;
+  bool isClipped;
+#endif
 
   /**
    * If this flag is true then this polygon will never be drawn.

@@ -980,7 +980,6 @@ void csWorld::Draw (csCamera* c, csClipper* view)
 
   csSector* s = c->GetSector ();
   s->Draw (rview);
-
   // draw all halos on the screen
   for (int halo = halos.Length () - 1; halo >= 0; halo--)
     if (!ProcessHalo (halos.Get (halo)))

@@ -275,6 +275,10 @@ csPolygon3D::csPolygon3D (csTextureHandle* texture) : csObject (),
   SetTextureType (POLYTXT_LIGHTMAP);
 
   VectorArray.IncRef ();
+#ifdef DO_HW_UVZ
+  uvz = NULL;
+  isClipped=false;
+#endif
 }
 
 csPolygon3D::csPolygon3D (csPolygon3D& poly) : csObject (), csPolygonInt (),
@@ -310,6 +314,10 @@ csPolygon3D::csPolygon3D (csPolygon3D& poly) : csObject (), csPolygonInt (),
   light_info.dyn_dirty = false;
 
   VectorArray.IncRef ();
+#ifdef DO_HW_UVZ
+  uvz = NULL;
+  isClipped=false;
+#endif
 }
 
 csPolygon3D::~csPolygon3D ()
@@ -320,6 +328,9 @@ csPolygon3D::~csPolygon3D ()
   while (light_info.lightpatches)
     csWorld::current_world->lightpatch_pool->Free (light_info.lightpatches);
   VectorArray.DecRef ();
+#ifdef DO_HW_UVZ
+  if ( uvz ) delete [] uvz;
+#endif
 }
 
 void csPolygon3D::SetTextureType (int type)
@@ -343,6 +354,9 @@ void csPolygon3D::SetTextureType (int type)
 void csPolygon3D::Reset ()
 {
   vertices.MakeEmpty ();
+#ifdef DO_HW_UVZ
+  if ( uvz ) { delete [] uvz; uvz=NULL; }
+#endif
 }
 
 void csPolygon3D::SetCSPortal (csSector* sector)
@@ -581,6 +595,10 @@ void csPolygon3D::ObjectToWorld (const csReversibleTransform& t)
 void csPolygon3D::Finish ()
 {
   if (orig_poly) return;
+#ifdef DO_HW_UVZ
+  if( uvz ) { delete [] uvz; }
+  isClipped=false;
+#endif
   if (GetTextureType () == POLYTXT_GOURAUD || CheckFlags (CS_POLY_FLATSHADING))
   	return;
   csLightMapped *lmi = GetLightMapInfo ();
@@ -610,8 +628,28 @@ void csPolygon3D::Finish ()
     lmi->tex2->SetLightMap (lm);
     lmi->tex3->SetLightMap (lm);
     lm->DecRef ();
+#ifdef DO_HW_UVZ
+    SetupHWUV();
+#endif
   }
 }
+
+#ifdef DO_HW_UVZ
+void csPolygon3D::SetupHWUV()
+{
+  csVector3 v_o2t;
+  csMatrix3 m_o2t;
+  int i;
+  
+  csLightMapped* lmi = GetLightMapInfo ();
+  lmi->txt_plane->GetTextureSpace( m_o2t, v_o2t );
+  uvz = new csVector3[ GetNumVertices() ];
+  
+  for( i=0; i < GetNumVertices(); i++ ){
+    uvz[i] = m_o2t * ( Vobj( i ) - v_o2t );
+  }
+}
+#endif
 
 void csPolygon3D::CreateLightMaps (iGraphics3D* g3d)
 {
@@ -1041,11 +1079,17 @@ bool csPolygon3D::ClipToPlane (csPlane* portal_plane, const csVector3& v_w2c,
       csIntersect3::Plane (Vcam (i1), Vcam (i), A, B, C, D, verts[num_verts], r);
       num_verts++;
       verts[num_verts++] = Vcam (i);
+#ifdef DO_HW_UVZ
+      isClipped = true;
+#endif            
     }
     else if (!z1s && zs)
     {
       csIntersect3::Plane (Vcam (i1), Vcam (i), A, B, C, D, verts[num_verts], r);
       num_verts++;
+#ifdef DO_HW_UVZ
+      isClipped = true;
+#endif            
     }
     else if (!z1s && !zs)
     {
@@ -1095,6 +1139,9 @@ bool csPolygon3D::DoPerspective (const csTransform& trans,
 //    if (GetTextureType () == POLYTXT_GOURAUD || CheckFlags (CS_POLY_FLATSHADING))
 //      return false;
 
+#ifdef DO_HW_UVZ
+    isClipped = true;
+#endif
     csVector3 *exit = NULL, *exitn = NULL, *reenter = NULL, *reentern = NULL;
     csVector2 *evert = NULL;
 

@@ -391,6 +391,10 @@ csGraphics3DGlide2x::csGraphics3DGlide2x(iBase* iParent) :
   m_thTex = NULL;
   m_verts = NULL;
   m_vertsize = 0;
+  m_dpverts = NULL;
+  m_dpvertsize = 0;
+  poly_alpha = -1;
+  poly_fog = false;
 
   // default
   m_Caps.ColorModel = G3DCOLORMODEL_RGB;
@@ -868,46 +872,11 @@ void csGraphics3DGlide2x::SetupPolygon( G3DPolygonDP& poly, float& J1, float& J2
                                                             float& K1, float& K2, float& K3,
                                                             float& M,  float& N,  float& O  )
 {
-  float P1, P2, P3, P4, Q1, Q2, Q3, Q4;
-  
-  float Ac = poly.normal.A, 
-    Bc = poly.normal.B, 
-    Cc = poly.normal.C, 
-    Dc = poly.normal.D;
-  
-  float inv_aspect = poly.inv_aspect;
-  
   // Get the plane normal of the polygon. Using this we can calculate
   // '1/z' at every screen space point.
   
-  if (ABS (Dc) < 0.06)
+  if (ABS (poly.normal.D) < 0.06)
   {
-    M = 0;
-    N = 0;
-    O = 1/poly.z_value;
-  }
-  else
-  {
-    float inv_Dc = 1/Dc;
-    
-    M = -Ac*inv_Dc*inv_aspect;
-    N = -Bc*inv_Dc*inv_aspect;
-    O = -Cc*inv_Dc;
-  }
-  
-  P1 = poly.plane.m_cam2tex->m11;
-  P2 = poly.plane.m_cam2tex->m12;
-  P3 = poly.plane.m_cam2tex->m13;
-  P4 = -(P1*poly.plane.v_cam2tex->x + P2*poly.plane.v_cam2tex->y + P3*poly.plane.v_cam2tex->z);
-  Q1 = poly.plane.m_cam2tex->m21;
-  Q2 = poly.plane.m_cam2tex->m22;
-  Q3 = poly.plane.m_cam2tex->m23;
-  Q4 = -(Q1*poly.plane.v_cam2tex->x + Q2*poly.plane.v_cam2tex->y + Q3*poly.plane.v_cam2tex->z);
-  
-  
-  if (ABS (Dc) < 0.06)
-  {
-    // The Dc component of the plane of the polygon is too small.
     J1= 0;
     J2= 0;
     J3= 0;
@@ -917,35 +886,66 @@ void csGraphics3DGlide2x::SetupPolygon( G3DPolygonDP& poly, float& J1, float& J2
   }
   else
   {
+    float inv_aspect = poly.inv_aspect;
+  
+    float P1, P2, P3, P4, Q1, Q2, Q3, Q4;
+      
+
+    P1 = poly.plane.m_cam2tex->m11;
+    P2 = poly.plane.m_cam2tex->m12;
+    P3 = poly.plane.m_cam2tex->m13;
+    P4 = -(P1*poly.plane.v_cam2tex->x + P2*poly.plane.v_cam2tex->y + P3*poly.plane.v_cam2tex->z);
+
+    Q1 = poly.plane.m_cam2tex->m21;
+    Q2 = poly.plane.m_cam2tex->m22;
+    Q3 = poly.plane.m_cam2tex->m23;
+    Q4 = -(Q1*poly.plane.v_cam2tex->x + Q2*poly.plane.v_cam2tex->y + Q3*poly.plane.v_cam2tex->z);
+
     J1 = P1 * inv_aspect + P4*M;
     J2 = P2 * inv_aspect + P4*N;
     J3 = P3              + P4*O;
+
     K1 = Q1 * inv_aspect + Q4*M;
     K2 = Q2 * inv_aspect + Q4*N;
     K3 = Q3              + Q4*O;
-  }
+
+  }  
+  
 }
 
 void csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
 {
-  GrVertex * verts;
 
-  if (poly.num < 3) 
-  {
-    return;
-    // return E_INVALIDARG;
-  }
+  if (poly.num < 3) return;
 
   bool lm_exists=true;
   bool is_transparent = false;
   bool is_colorkeyed = false;
-  int  poly_alpha;
   iPolygonTexture* pTex;
   float J1, J2, J3, K1, K2, K3;
   float M, N, O;
-  
+  int i,j;
+
   // set up the geometry.
-  SetupPolygon( poly, J1, J2, J3, K1, K2, K3, M, N, O );
+#ifdef DO_HW_UVZ
+  if ( !poly.uvz )
+#endif
+    {
+      float inv_aspect = poly.inv_aspect;
+      float inv_Dc = 1/poly.normal.D;
+  
+      if (ABS (poly.normal.D) < 0.06)
+	{
+	  M = 0;
+	  N = 0;
+	  O = 1/poly.z_value;
+	}else{
+	  M = -poly.normal.A*inv_Dc*inv_aspect;
+	  N = -poly.normal.B*inv_Dc*inv_aspect;
+	  O = -poly.normal.C*inv_Dc;
+	}
+      SetupPolygon( poly, J1, J2, J3, K1, K2, K3, M, N, O );
+    }
 
   // retrieve the texture.
   pTex = poly.poly_texture[0];
@@ -956,15 +956,26 @@ void csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
   
 
   if (!pTex) return;
-//     return E_INVALIDARG;
 
   CacheTexture (pTex);
 
-  poly_alpha     = poly.alpha;
-  is_transparent = poly_alpha ? true : false;
+  if ( poly_alpha != poly.alpha ){
 
-  //HighColorCacheAndManage_Data* tcache;
-  //HighColorCacheAndManage_Data* lcache;
+    poly_alpha     = poly.alpha;
+    is_transparent = poly_alpha ? true : false;
+    if(is_transparent)
+      {
+	GrColor_t c = 0x00FFFFFF;
+	c |= ((int)((float)(poly_alpha)/100.0f*255.0f) << 24);
+	GlideLib_grConstantColorValue(c);
+      }
+    else
+      {
+	GlideLib_grConstantColorValue(0xFFFFFFFF);
+      }
+  }
+        
+
   csHighColorCacheData* tcache = NULL;
   csHighColorCacheData* lcache = NULL;
   
@@ -989,46 +1000,49 @@ void csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
     lm_exists=false;
   }
 
-  if(is_transparent)
-  {
-    GrColor_t c = 0x00FFFFFF;
-    c |= ((int)((float)(poly_alpha)/100.0f*255.0f) << 24);
-    GlideLib_grConstantColorValue(c);
+  if ( m_dpvertsize < poly.num ){
+    m_dpverts=new GrVertex[poly.num];
+    m_dpvertsize = poly.num;
+    for( i=0; i < poly.num; i++ ){
+      m_dpverts[i].r = 255;
+      m_dpverts[i].g = 255;
+      m_dpverts[i].b = 255;
+    }
   }
-  else
-  {
-    GlideLib_grConstantColorValue(0xFFFFFFFF);
-  }
-        
-  verts=new GrVertex[poly.num];
-  float q,x,y,ooz,z,u,v,lu,lv;
-  int i;
+  float x,y,ooz,z,u,v,lu,lv;
+  int from, to, inc;
   TextureHandler *thLm =NULL, 
                  *thTex = (TextureHandler *)tcache->pData;
-                       
-  q = 255;
-  for(i=0;i<poly.num;i++)
+                  
+  for(i=0;i < poly.num;i++)
     {
-      x = poly.vertices[i].sx;
-      y = poly.vertices[i].sy;
-      verts[i].x = x + SNAP;
-      verts[i].y =/* FRAME_HEIGHT -1 - */y + SNAP; 
-      x-=m_nHalfWidth;
-      y-=m_nHalfHeight;
-      ooz = (M*(x) + N*(y) + O);
-      verts[i].z = z = 1/ooz;
-      u = (J1 * (x) + J2 * (y) + J3)*z;
-      v = (K1 * (x) + K2 * (y) + K3)*z;
-      verts[i].tmuvtx[0].sow= u; 
-      verts[i].tmuvtx[0].tow= v; 
-      verts[i].oow /*= verts[i].tmuvtx[0].oow = verts[i].tmuvtx[1].oow */= ooz;
-      verts[i].r = q;
-      verts[i].g = q;
-      verts[i].b = q;
-      //verts[i].a = poly_alpha; // Not used
-      //verts[i].a = poly_alpha; // Not used
-      //verts[i].x -= SNAP;  // You can forget it
-      //verts[i].y -= SNAP;  // This one also
+#ifdef DO_HW_UVZ
+      if ( poly.uvz ){
+	m_dpverts[i].x = poly.vertices[i].sx + SNAP;
+	m_dpverts[i].y = poly.vertices[i].sy + SNAP; 
+	j = poly.mirror ? poly.num-i-1 : i;
+	u = poly.uvz[ j ].x;
+	v = poly.uvz[ j ].y;
+	m_dpverts[i].z = z = poly.uvz[ j ].z;
+	ooz = 1/z;
+	
+      }else
+#endif
+	{
+	  x = poly.vertices[i].sx;
+	  y = poly.vertices[i].sy;
+	  m_dpverts[i].x = x + SNAP;
+	  m_dpverts[i].y = y + SNAP; 
+	  x-=m_nHalfWidth;
+	  y-=m_nHalfHeight;
+	  ooz = (M*(x) + N*(y) + O);
+	  m_dpverts[i].z = z = 1/ooz;
+	  u = (J1 * (x) + J2 * (y) + J3)*z;
+	  v = (K1 * (x) + K2 * (y) + K3)*z;
+	}
+      m_dpverts[i].tmuvtx[0].sow= u; 
+      m_dpverts[i].tmuvtx[0].tow= v; 
+      m_dpverts[i].oow /*= verts[i].tmuvtx[0].oow = verts[i].tmuvtx[1].oow */= ooz;
     }
 
   if(lm_exists)
@@ -1062,36 +1076,31 @@ void csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
       
       for(i=0;i<poly.num;i++)
         {
-          lu = (verts[i].tmuvtx[0].sow- lu_dif) * lu_scale;
-          lv = (verts[i].tmuvtx[0].tow- lv_dif) * lv_scale;
-          verts[i].tmuvtx[1].sow= lu; 
-          verts[i].tmuvtx[1].tow= lv; 
+          lu = (m_dpverts[i].tmuvtx[0].sow- lu_dif) * lu_scale;
+          lv = (m_dpverts[i].tmuvtx[0].tow- lv_dif) * lv_scale;
+          m_dpverts[i].tmuvtx[1].sow= lu; 
+          m_dpverts[i].tmuvtx[1].tow= lv; 
         }
     }
   
   if(is_colorkeyed)
     GlideLib_grChromakeyMode(GR_CHROMAKEY_ENABLE);
   
-  if(poly.use_fog){
-//      GlideLib_grFogMode( GR_FOG_WITH_ITERATED_ALPHA );
-        GlideLib_grFogMode( GR_FOG_WITH_TABLE );
-	GlideLib_grFogTable( fogtable );
-//      GlideLib_grFogColorValue( 0 );
+  if(poly_fog != poly.use_fog){
+    poly_fog = poly.use_fog;
+    if ( poly_fog ){
+      GlideLib_grFogMode( GR_FOG_WITH_TABLE );
+      GlideLib_grFogTable( fogtable );
       GlideLib_grFogColorValue( 0xFFC0C0C0 );
+    }else
+      GlideLib_grFogMode( GR_FOG_DISABLE );
   }
       
-  RenderPolygon(verts,poly.num,lm_exists,thTex,thLm,is_transparent);
+  RenderPolygon(m_dpverts,poly.num,lm_exists,thTex,thLm,is_transparent);
 
   if(is_colorkeyed)
     GlideLib_grChromakeyMode(GR_CHROMAKEY_DISABLE);
   
-  if(is_transparent)
-    GlideLib_grConstantColorValue(0xFFFFFFFF);
-  
-//  if(poly.use_fog){
-      GlideLib_grFogMode( GR_FOG_DISABLE );
-//  }
-  delete[] verts;
 }
 
 void csGraphics3DGlide2x::StartPolygonFX(iTextureHandle *handle,  UInt mode)

@@ -51,7 +51,7 @@ else
   LIB_SUFFIX = $(LIB)
 endif
 
-.SUFFIXES: $O $(EXE) $(LIB) $(DLL) .S .c .cpp .h .asm .ash
+.SUFFIXES: $O $(EXE) $(LIB) $(DLL) .S .c .cpp .h .asm .ash .y
 
 # Define paths automatically searched for source files
 vpath %.c support/gnu
@@ -70,6 +70,7 @@ CFLAGS.INCLUDE+=$(CFLAGS.I). $(CFLAGS.I)./include $(CFLAGS.I)./libs \
 CFLAGS=$(CFLAGS.GENERAL) $(CFLAGS.$(MODE)) $(MEM)
 LFLAGS=$(LFLAGS.GENERAL) $(LFLAGS.$(MODE)) $(LFLAGS.L)$(OUT)
 LIBS=$(LIBS.EXE) $(Z_LIBS)
+YFLAGS=
 
 ifeq ($(MAKE_DLL),yes)
   CFLAGS+=$(CFLAGS.DLL)

@@ -525,12 +525,15 @@ void csSector::Draw (csRenderView& rview)
 
   if (rview.callback)
   {
+
     rview.callback (&rview, CALLBACK_SECTOR, (void*)this);
   }
   else if (HasFog ())
   {
+
     if ((fogmethod = rview.g3d->GetFogMode ()) == G3DFOGMETHOD_VERTEX)
     {
+
       CHK (csFogInfo* fog_info = new csFogInfo ());
       fog_info->next = rview.fog_info;
       if (rview.portal_polygon)
@@ -548,6 +551,7 @@ void csSector::Draw (csRenderView& rview)
     }
     else if (fogmethod != G3DFOGMETHOD_NONE)
     {
+
       rview.g3d->OpenFogObject (GetID (), &GetFog ());
     }
   }

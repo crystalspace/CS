@@ -157,6 +157,7 @@ configbanner:
 config.tmp:
 	@echo MODE = $(MODE)>>config.tmp
 	@echo USE_SHARED_PLUGINS = $(USE_SHARED_PLUGINS)>>config.tmp
+	@echo USE_HW_UVZ = $(USE_HW_UVZ)>>config.tmp
 	@$(SYSCONFIG)
 	$(subst DEST,config.mak,$(UPD))
 

@@ -2159,6 +2159,7 @@ int main (int argc, char* argv[])
   // You don't have to use csView as you can do the same by
   // manually creating a camera and a clipper but it makes things a little
   // easier.
+
   view = new csView (Sys->world, Gfx3D);
 
   // Create our world.

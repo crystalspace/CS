@@ -35,12 +35,14 @@ class csClipper
 protected:
   /// This variable holds a pool for 2D polygons as used by the clipper.
   static csPoly2DPool polypool;
-
+  /// Did we really clipp the poly
+  bool bClipped;
+  
 public:
   /**
    * Clip a set of 2D points and return in 'dest_poly'.
    * 'dest_poly' must be big enough to hold the clipped polygon.
-   * Return false if polygon is not visible (clipped away).
+   * Return 0 if polygon is not visible (clipped away).
    */
   virtual bool Clip (csVector2 *Polygon, csVector2* dest_poly, int Count,
   	int &OutCount) = 0;
@@ -74,6 +76,9 @@ public:
 
   /// Return a pointer to the array of csVector2's
   virtual csVector2 *GetClipPoly () = 0;
+  
+  /// Return whether we applied clipping ( or the poly was fully within the area )
+  bool Clipped(){ return bClipped; }
 };
 
 /**

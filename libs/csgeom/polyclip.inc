@@ -28,6 +28,7 @@
   int OutVertices = 0;                  // Number of output vertices
   int edge, vert;                       // Current clipper edge & input vertex
 
+  bClipped = false;
   for (edge = 0; edge < ClipPolyVertices; edge++)
   {
     // Is this the last vertex being considered?
@@ -113,6 +114,7 @@
 
         } /* endif */
         IntersectionCount++;
+	bClipped=true;
 #ifdef USE_POLYCLIP_OPTIM
         if (IntersectionCount >= 2)
         {

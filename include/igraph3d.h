@@ -25,6 +25,7 @@
 
 class csMatrix3;
 class csVector3;
+class csVector2;
 class csRect;
 
 struct iGraphics2D;
@@ -146,6 +147,7 @@ struct G3DPolygonDP
   int num;
   /// Vertices that form the polygon.
   G3DVertex vertices[100];
+
   /// Extra optional fog information.
   G3DFogInfo fog_info[100];
   /// Use fog info?
@@ -181,6 +183,11 @@ struct G3DPolygonDP
 
   ///z value (in camera space) of vertex[0]
   float z_value;
+
+#ifdef DO_HW_UVZ
+  csVector3* uvz;
+  bool mirror;
+#endif
 };
 
 /// Structure containing all info needed by DrawPolygonFlat (DPF)

@@ -671,6 +671,18 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
     g3dpoly.alpha           = poly->GetAlpha();
     g3dpoly.uses_mipmaps    = poly->CheckFlags (CS_POLY_MIPMAP);
     g3dpoly.z_value         = poly->Vcam(0).z;
+#ifdef DO_HW_UVZ
+    g3dpoly.mirror          = mirror;
+    if ( poly->isClipped || rview->view->Clipped() )
+       g3dpoly.uvz = NULL;
+    else{
+       g3dpoly.uvz = poly->uvz;
+      for (i = 0 ; i < num_vertices ; i++)
+      {
+        g3dpoly.uvz[i].z = poly->Vcam(i).z;
+      }
+    }
+#endif
 
     for (int mipmaplevel = 0; mipmaplevel<4; mipmaplevel++)
       g3dpoly.poly_texture[mipmaplevel] = poly->GetLightMapInfo ()->GetPolyTex
@@ -697,6 +709,11 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
       CalculateFogPolygon (rview, g3dpoly);
       rview->g3d->DrawPolygon (g3dpoly);
     }
+    
+#ifdef DO_HW_UVZ
+    poly->isClipped = false;
+    g3dpoly.uvz = NULL;
+#endif
   }
 }
 

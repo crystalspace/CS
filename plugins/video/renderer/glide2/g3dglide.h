@@ -50,8 +50,10 @@ private:
   /// texturehandler for FX polygon drawing
   TextureHandler *m_thTex;
   /// vertex array for FX polygon drawing
-  GrVertex *m_verts;
-  int m_vertsize;
+  GrVertex *m_verts, *m_dpverts;
+  int m_vertsize, m_dpvertsize;
+  int  poly_alpha;
+  bool poly_fog;
 
   csTextureManagerGlide* txtmgr; 
   /// Does require multipass rendering for lightmap (if TRUE, then there is only one TMU!)

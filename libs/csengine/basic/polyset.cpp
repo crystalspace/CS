@@ -421,6 +421,7 @@ void csPolygonSet::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
   }
   else if (!d->callback)
     poly->DrawFilled (d, p, p->GetPlane (), use_z_buf);
+  
 }
 
 void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num,
