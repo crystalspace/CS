@@ -443,7 +443,7 @@ bool csGraphics2DDDraw3::SetMousePosition (int x, int y)
   return true;
 }
 
-bool csGraphics2DDDraw3::PerformExtensionV (char const* command, va_list)
+bool csGraphics2DDDraw3::PerformExtensionV (char const* command, va_list args)
 {
   bool rc = true;
   if (!strcmp (command, "fullscreen"))
