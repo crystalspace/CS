@@ -1,8 +1,11 @@
 The history order has been reversed so that new features are at the top.
 
 3-May-2000
-	- Fixed bug in Blocks which caused the menu not to work
-	  properly (left/right arrows were gone).
+	- Fixed bug in Blocks which caused the menu not to work properly
+	  (left/right arrows were gone).
+	- Eric Sunshine changed the CVS snapshot script (bin/snapshot.py) so
+	  that it now uses /tmp as its working directory rather than polluting
+	  the snapshot directory with temporary files.
 2-May-2000
 	- Added csPoly3D::ProjectAxisPlane() which is similar to
 	  ProjectXPlane() but for a general axis aligned plane.
@@ -11,15 +14,16 @@ The history order has been reversed so that new features are at the top.
 	- Frank O'Connor defaulted DO_DINPUT_KEYBOARD in Win32 built.
 	- Frank also fixed hardware cursor problem for DDraw.
 	- Frank also did several VC project file changes.
-	- Paul Garceau modified ddraw makefile to accomodate generic
-	  ddraw make. Added ifdefs to accomodate Borland, COMP_GCC,
-	  and COMP_VC.
+	- Paul Garceau modified ddraw makefile to accomodate generic ddraw
+	  make.  Added ifdefs to accomodate Borland, COMP_GCC, and COMP_VC.
 	- Gary Haussmann corrected bad transform in DrawTriangleMesh.
 	- Gary added detection of other extensions
 	  (GL_EXT_compiled_vertex_array and GLX_ARB_get_proc_address).
-	- Gary disabled code to detect opengl extensions, as this
-	  will break compiles on some platforms.
+	- Gary disabled code to detect opengl extensions, as this will break
+	  compiles on some platforms.
 	- Martin Geisse fixed a bug in dungeon plugin.
+	- Eric Sunshine fixed several compilation warnings and problems
+	  throughout the project.
 1-May-2000
 	- Norman Kramer added CSSTA_CHARWRAP and CSSTA_WORDWRAP to show
 	  text in a static text control that is longer than the control
