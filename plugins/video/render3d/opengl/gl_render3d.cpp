@@ -1812,15 +1812,15 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   {
     case CS_MESHTYPE_QUADS:
       num_tri = (mymesh->indexend-mymesh->indexstart)/2;
-      primitivetype = forceWireframe ? GL_LINES : GL_QUADS;
+      primitivetype = GL_QUADS;
       break;
     case CS_MESHTYPE_TRIANGLESTRIP:
       num_tri = (mymesh->indexend-mymesh->indexstart)-2;
-      primitivetype = forceWireframe ? GL_LINE_STRIP : GL_TRIANGLE_STRIP;
+      primitivetype = GL_TRIANGLE_STRIP;
       break;
     case CS_MESHTYPE_TRIANGLEFAN:
       num_tri = (mymesh->indexend-mymesh->indexstart)-2;
-      primitivetype = forceWireframe ? GL_LINE_STRIP : GL_TRIANGLE_FAN;
+      primitivetype = GL_TRIANGLE_FAN;
       break;
     case CS_MESHTYPE_POINTS:
       primitivetype = GL_POINTS;
@@ -1871,7 +1871,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     case CS_MESHTYPE_TRIANGLES:
     default:
       num_tri = (mymesh->indexend-mymesh->indexstart)/3;
-      primitivetype = forceWireframe ? GL_LINES : GL_TRIANGLES;
+      primitivetype = GL_TRIANGLES;
       break;
   }
 
@@ -2403,6 +2403,10 @@ bool csGLGraphics3D::SetRenderState (G3D_RENDERSTATEOPTION op, long val)
   {
     case G3DRENDERSTATE_EDGES:
       forceWireframe = (val != 0);
+      if (forceWireframe)
+        glPolygonMode (GL_BACK, GL_LINE);
+      else
+        glPolygonMode (GL_BACK, GL_FILL);
       return true;
     default:
       return false;

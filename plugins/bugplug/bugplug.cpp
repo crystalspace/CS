@@ -1048,6 +1048,13 @@ bool csBugPlug::EatKey (iEvent& event)
         break;
       case DEBUGCMD_EDGES:
         ToggleG3DState (G3DRENDERSTATE_EDGES, "edge drawing");
+	{
+	  if (Engine && (Engine->GetBeginDrawFlags () & CSDRAW_CLEARSCREEN))
+	    break;
+	  bool v;
+	  v = G3D->GetRenderState (G3DRENDERSTATE_EDGES);
+	  if (v && !do_clear) do_clear = true;
+	}
         break;
       case DEBUGCMD_TEXTURE:
         ToggleG3DState (G3DRENDERSTATE_TEXTUREMAPPINGENABLE, "texture mapping");

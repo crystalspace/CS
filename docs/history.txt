@@ -6,6 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-Feb-2005
+	- Jorrit fixed edge drawing by the OpenGL renderer by using
+	  glPolygonMode(GL_BACK,GL_LINE) instead of the way it was currently
+	  done. This produces correct edges now. The previous method was
+	  incorrect in many cases (missing edges and so on).
+	- Jorrit changed bugplug so it automatically switches the mode to
+	  clearing the screen automatically if edge drawing is selected.
+	  Otherwise the edges are hard to see and cause HOM.
 23-Feb-2005
 	- res moved the code from the various "common" libraries into a
 	  library "csplugincommon" (and libraries with Win32, OpenGL and
