@@ -8,6 +8,12 @@ The history order has been reversed so that new features are at the top.
 	  than the default. Also made raindrop.png and snow.jpg default
 	  so you can type just 'rain' or 'snow'. Default number of particles
 	  is now 500.
+	- Tried an experimental change to OpenGL to minimize the amount
+	  of processing between glBegin/glEnd. There is an OpenGL
+	  performance FAQ which says you should do almost nothing except
+	  glVertex,glNormal, glTexCoords, ... calls between glBegin/glEnd.
+	  So I changed DrawPolygon so that it first calculates and copies
+	  the results in a few arrays.
 18-Jun-2000
 	- Norman Kramer fixed Squawk and csgame following the recent modifications
 	  in sprite creation.
