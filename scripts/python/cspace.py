@@ -6566,6 +6566,7 @@ class iCacheManager(iBase):
     def CacheData(*args): return _cspace.iCacheManager_CacheData(*args)
     def ReadCache(*args): return _cspace.iCacheManager_ReadCache(*args)
     def ClearCache(*args): return _cspace.iCacheManager_ClearCache(*args)
+    def Flush(*args): return _cspace.iCacheManager_Flush(*args)
     def __del__(self, destroy=_cspace.delete_iCacheManager):
         try:
             if self.thisown: destroy(self)
@@ -8239,6 +8240,7 @@ class iGraphics2D(iBase):
     def GetPalette(*args): return _cspace.iGraphics2D_GetPalette(*args)
     def SetRGB(*args): return _cspace.iGraphics2D_SetRGB(*args)
     def FindRGB(*args): return _cspace.iGraphics2D_FindRGB(*args)
+    def GetRGB(*args): return _cspace.iGraphics2D_GetRGB(*args)
     def SetClipRect(*args): return _cspace.iGraphics2D_SetClipRect(*args)
     def GetClipRect(*args): return _cspace.iGraphics2D_GetClipRect(*args)
     def BeginDraw(*args): return _cspace.iGraphics2D_BeginDraw(*args)
