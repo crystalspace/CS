@@ -1,5 +1,22 @@
 The history order is reversed so that new features are at the top.
 
+7-Nov-2002
+	- Removed a warning in Dynavis reported by valgrind. Was not
+	  really harmful though.
+	- Removed another warning in Dynavis reported by valgrind. Was
+	  not correctly initializing the tiles in the tiled coverage
+	  buffer.
+	- Removed a warning in Bugplug reported by valgrind. Was
+	  using 'delete' instead of 'delete[]' for a char array.
+	- Slightly optimized csBox3::ProjectBox().
+	- Enabled tiled culling again in Dynavis. This speed up culling
+	  considerably and it seems to work fine now. However! The tiled
+	  culler cannot cope will with polygons that are not coplanar
+	  (i.e. a polygon of four or more vertices of which all vertices
+	  are not exactly on the same plane). It is even possible to get
+	  crashes in that case. You can check if your level contains
+	  non-coplanar polygons by using levtool as follows:
+	  	levtool -validate your_level.zip
 6-Nov-2002
 	- Enabled tiled culling by default in Dynavis. This gives a big
 	  improvement in fps and it seems to work properly.

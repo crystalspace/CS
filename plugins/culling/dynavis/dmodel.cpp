@@ -156,6 +156,7 @@ bool csObjectModelManager::CheckObjectModel (csObjectModel* model,
 	iMeshWrapper* mw)
 {
   CS_ASSERT (model->ref_cnt > 0);
+  model->use_outline_filler = true;
   if (model->imodel->GetShapeNumber () != model->shape_number)
   {
     model->shape_number = model->imodel->GetShapeNumber ();
@@ -181,7 +182,6 @@ bool csObjectModelManager::CheckObjectModel (csObjectModel* model,
       // one adjacent polygon. If we find such an edge then we will not use
       // outline based culling for this object. This is not good as it will
       // slow down culling so you should try to avoid this situation in levels.
-      model->use_outline_filler = true;
       int i;
       for (i = 0 ; i < model->num_edges ; i++)
         if (model->edges[i].poly2 == -1)

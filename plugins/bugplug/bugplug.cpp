@@ -168,7 +168,7 @@ csBugPlug::~csBugPlug ()
   while (mappings)
   {
     csKeyMap* n = mappings->next;
-    delete mappings->args;
+    delete[] mappings->args;
     delete mappings;
     mappings = n;
   }

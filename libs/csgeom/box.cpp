@@ -731,8 +731,7 @@ bool csBox3::ProjectBox (const csTransform& trans, float fov,
   const Outline &ol = outlines[idx];
   int num_array = MIN (ol.num, 6);
 
-  csBox3 cbox;
-  cbox.StartBoundingBox (trans * GetCorner (ol.vertices[0]));
+  csBox3 cbox (trans * GetCorner (ol.vertices[0]));
   int i;
   for (i = 1; i < num_array; i++)
   {

@@ -115,6 +115,7 @@ public:
   {
     operations = new csLineOperation [16];
     MakePrecalcTables ();
+    MakeEmpty ();
   }
 
   ~csCoverageTile ()

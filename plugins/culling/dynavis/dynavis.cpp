@@ -190,7 +190,7 @@ csDynaVis::csDynaVis (iBase *iParent)
   do_cull_coverage = COVERAGE_OUTLINE;
   do_cull_history = true;
   do_cull_writequeue = true;
-  do_cull_tiled = false;
+  do_cull_tiled = true;
   do_cull_ignoresmall = false;
   do_freeze_vis = false;
 
