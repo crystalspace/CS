@@ -598,7 +598,7 @@ void csFoliageMeshObjectFactory::GenerateFoliage ()
     / float (genfoliage_res);
   */
   int x, y;
-  int idx;
+  int idx = 0;
 
   // Sample a region...
   /*
