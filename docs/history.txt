@@ -32,6 +32,8 @@ The history order is reversed so that new features are at the top.
 	  callback.
 	- Removed csStatLight::LightingFunc().
 	- Renamed CALLBACK_... to CS_CALLBACK_...
+	- Fixed several of the howto's to some of the recent changes.
+	  Also completed the howto on collision detection.
 29-Aug-2001
 	- Andrew Zabolotny reports: OS/2 port strikes back :-)
 	    - Fixed csdive plugin.

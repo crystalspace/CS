@@ -31,7 +31,8 @@ To finally be able to use the level loader in your application you
 need to do:
 
 @example
-  iLoader* level_loader = CS_QUERY_PLUGIN_ID (System,
+  iPluginManager* plugmgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  iLoader* level_loader = CS_QUERY_PLUGIN_ID (plugmgr,
   	CS_FUNCID_LVLLOADER, iLoader);
 @end example
 

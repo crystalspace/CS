@@ -1,6 +1,7 @@
 @c -*-texinfo-*-
 @node HOWTO Collision Detection, HOWTO Mesh LightAnim, HOWTO, HOWTO
 @subsection Doing Collision Detection
+@cindex @code{csColliderWrapper}
 @cindex @code{iCollideSystem}
 @cindex @code{iCollider}
 @cindex @code{iPolygonMesh}
@@ -24,13 +25,17 @@ another system.
 To load a collision detection system you can use the following code:
 
 @example
-const char* p = Config->GetStr ("MyGame.Settings.CollDetPlugin",
+iPluginManager* plugmgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+iConfigManager* config = CS_QUERY_REGISTRY (object_reg, iConfigManager);
+const char* p = config->GetStr ("MyGame.Settings.CollDetPlugin",
   	"crystalspace.collisiondetection.rapid");
 iCollideSystem* cd_sys =
-  CS_LOAD_PLUGIN (System, p, "CollDet", iCollideSystem);
+  CS_LOAD_PLUGIN (plugmgr, p, "CollDet", iCollideSystem);
 if (!cd_sys)
 @{
-  Printf (CS_MSG_FATAL_ERROR, "No Collision Detection plugin found!\n");
+  csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+	"crystalspace.application.myapp",
+  	"No Collision Detection plugin found!");
   return false;
 @}
 @end example
@@ -70,11 +75,44 @@ Usually in a game you have entity classes which will have a pointer to the
 mesh. In that case you can easily store the collider in that entity class.
 
 However, you can also use the @samp{iObject} system to attach your collider
-to the mesh itself (@@@@@@FIXME: The pseudo-@sc{rtti} system is going away
-and will be replaced entirely by @sc{scf}.)
+to the mesh itself. An easy way to do this is to use the
+@code{csColliderWrapper} class that you can find in the @code{cstool}
+library. @code{csColliderWrapper} is a subclass of @code{csObject} which
+means that you can attach this object to any other @code{csObject}.
+@code{csColliderWrapper} additionally holds a pointer to an @code{iCollider}.
+This means that you can create a @code{csColliderWrapper} to hold your
+@code{iCollider} for some mesh object and then you can attach
+that @code{csColliderWrapper} to the mesh object itself. To do this
+use the following code instead of the @code{InitCollider()} routine
+above:
 
-@@@@@@TODO: More info about how to add this collider for all objects loaded
-in the engine.
+@example
+csColliderWrapper* colwrap = new csColliderWrapper (mymesh->QueryObject (),
+	cd_sys, 
+bool MyGame::InitCollider (iMeshWrapper* mesh)
+@{
+  iPolygonMesh* polmesh = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+  	iPolygonMesh);
+  if (polmesh)
+  @{
+    new csColliderWrapper (mesh->QueryObject (), cd_sys, polmesh);
+    return true;
+  @}
+  else
+    return false;
+@}
+@end example
+
+This example creates a new instance of @code{csColliderWrapper} which
+is automatically stored with the @code{iObject} that belongs
+with the given mesh. So there is no need to store it otherwise. Later
+on you can retrieve the collider for some mesh by doing:
+
+@example
+csColliderWrapper* colwrap = csColliderWrapper::GetColliderWrapper (
+	mesh->QueryObject ());
+iCollider* collider = colwrap->GetCollider ();
+@end example
 
 @subsubheading The Player Collider
 
@@ -135,4 +173,6 @@ The include files useful for this section are:
 #include "ivaria/collider.h"
 #include "ivaria/polymesh.h"
 #include "iengine/mesh.h"
+#include "cstool/collider.h"
 @end example
+

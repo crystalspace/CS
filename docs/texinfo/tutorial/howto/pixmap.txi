@@ -39,8 +39,9 @@ To finally be able to use the image loader in your application you
 need to do:
 
 @example
+iPluginManager* plugmgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 iImageIO* imgldr =
-  CS_QUERY_PLUGIN_ID (System, CS_FUNCID_IMGLOADER, iImageIO);
+  CS_QUERY_PLUGIN_ID (plugmgr, CS_FUNCID_IMGLOADER, iImageIO);
 @end example
 
 When you don't need it anymore you must call @code{imgldr->DecRef ()}.

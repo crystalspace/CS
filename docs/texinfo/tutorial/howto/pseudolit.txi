@@ -46,16 +46,10 @@ use the following code:
 @example
   iStatLight* light = engine->CreateLight ("DynLight",
   	csVector3 (23, 1, 5), 10, csColor (1, 0, 0), true);
-  sector->AddLight (light);
+  sector->GetLights ()->AddLight (light->QueryLight ());
 @end example
 
 This will create exactly the same light as the one specified above.
-
-To find a light with a given name you can use:
-
-@example
-  iStatLight* light = engine->FindLight ("DynLight");
-@end example
 
 At some point you may want to change the color of the light. You can
 do this with the following code:
