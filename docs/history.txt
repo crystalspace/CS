@@ -15,6 +15,7 @@ The history order is reversed so that new features are at the top.
 	  the changes!
 	- Wouter updated viewmesh to call ShineLights on the meshwrapper.
 	  This lights thing objects correctly.
+        - Philip Wyett added physics loader to MSVC build process.
 19-Jun-2003
 	- Oktal made the following changes to the Perl plugin and module:
 	    - Got rid of all the warnings in the Perl plugin and module,
