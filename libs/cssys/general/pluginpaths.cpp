@@ -22,32 +22,6 @@
 #include "cssys/syspath.h"
 #include "csutil/util.h"
 
-int csPluginPaths::AddOnce (const char* path, bool scanRecursive, 
-    bool overrideRecursive)
-{
-  if (path == 0) return -1;
-  char* pathExpanded = csExpandPath (path);
-  if (pathExpanded == 0) return -1;
-
-  int i;
-  for (i = 0; i < paths.Length(); i++)
-  {
-    if (csPathsIdentical (pathExpanded, paths[i].path))
-    {
-      if (overrideRecursive)
-      {
-	paths[i].scanRecursive = scanRecursive;
-      }
-      delete[] pathExpanded;
-
-      return i;
-    }
-  }
-
-  csPluginPath pluginPath (pathExpanded, scanRecursive);
-  return (paths.Push (pluginPath));
-}
-
 csPluginPaths* csGetPluginPaths (const char* argv0)
 {
   csPluginPaths* paths = new csPluginPaths;

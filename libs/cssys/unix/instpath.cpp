@@ -91,5 +91,26 @@ char* csGetConfigPath ()
   return 0;
 }
 
-
+csPluginPath* csGetPluginPaths ()
+{
+  csPluginPaths* paths = new csPluginPaths;
+  const char* crystal = getenv ("CRYSTAL");
+ 
+  if (!crystal)
+  {
+    paths->AddOnce (CS_PLUGINDIR, true);
+    paths->AddOnce (".");
+ 
+    return paths;
+  }
+ 
+  paths->AddOnce (crystal);
+  char* temp = new char[1024];
+  strncpy (temp, crystal, 1000);
+  strcat (temp, "/lib");
+  paths->AddOnce (temp, true);
+  paths->AddOnce (".");
+ 
+  return paths;
+}
 

@@ -23,6 +23,8 @@ The history order is reversed so that new features are at the top.
 	    - Eliminated a bit of redundant code and used more macros in
 	      the GL extension manager to reduce it's bloat a bit.
 	    - Renamed "win32/syspath.cpp" to "win32/winsyspath.cpp".
+	- res fixed mdl2spr and nettut for the changed scfInitialize() syntax.
+	- res restored the 'old' unix csGetPluginPaths ().
 17-Jun-2003
 	- Marten fixed an error with uninitialized extensions in render3d.
 	- Marten fixed jamfiles for glshader_. They need to link to GL.
