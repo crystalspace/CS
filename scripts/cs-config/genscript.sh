@@ -2,9 +2,9 @@
 # This generates the cs-config script
 
 verfile=include/csver.h
-vmajor=`sed -e '/#define[ 	][ 	]*CS_VERSION_MAJOR/!d' -e '/#define[ 	][ 	]*CS_VERSION_MAJOR/s/\(#define[ 	][ 	]*CS_VERSION_MAJOR[ 	][ 	]*"\)\(.*\)"\(.*\)/\2/' < ${verfile}`
-vminor=`sed -e '/#define[ 	][ 	]*CS_VERSION_MINOR/!d' -e '/#define[ 	][ 	]*CS_VERSION_MINOR/s/\(#define[ 	][ 	]*CS_VERSION_MINOR[ 	][ 	]*"\)\(.*\)"\(.*\)/\2/' < ${verfile}`
-rdate=`sed -e '/#define[ 	][ 	]*CS_RELEASE_DATE/!d' -e '/#define[ 	][ 	]*CS_RELEASE_DATE/s/\(#define[ 	][ 	]*CS_RELEASE_DATE[ 	][ 	]*"\)\(.*\)"\(.*\)/\2/' < ${verfile}`
+vmajor=`sed -e '/#define[ 	][ 	]*CS_VERSION_MAJOR/!d' -e '/#define[ 	][ 	]*CS_VERSION_MAJOR/s/\(#define[ 	][ 	]*CS_VERSION_MAJOR[ 	][ 	]*"\)\([^\"]*\)"\(.*\)/\2/' < ${verfile}`
+vminor=`sed -e '/#define[ 	][ 	]*CS_VERSION_MINOR/!d' -e '/#define[ 	][ 	]*CS_VERSION_MINOR/s/\(#define[ 	][ 	]*CS_VERSION_MINOR[ 	][ 	]*"\)\([^\"]*\)"\(.*\)/\2/' < ${verfile}`
+rdate=`sed -e '/#define[ 	][ 	]*CS_RELEASE_DATE/!d' -e '/#define[ 	][ 	]*CS_RELEASE_DATE/s/\(#define[ 	][ 	]*CS_RELEASE_DATE[ 	][ 	]*"\)\([^\"]*\)"\(.*\)/\2/' < ${verfile}`
 
 if test -x cs-config; then
 	rm cs-config
