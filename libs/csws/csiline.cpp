@@ -448,6 +448,20 @@ void csInputLine::SetCursorPos (int NewPos, bool ExtendSel)
   } /* endif */
 }
 
+void csInputLine::SuggestSize (int &w, int &h)
+{
+  if (text)
+  {
+    w = TextWidth (&text [0]);
+    h = TextHeight ();
+  }
+  else
+    w = h = 0;
+  
+  w = MAX (w, bound.Width ());
+  h = MAX (h, bound.Height ());
+}
+
 bool csInputLine::IsValidPos (int NewPos)
 {
   return (NewPos >= 0) && (NewPos <= (int)strlen (text));

@@ -22,7 +22,8 @@ csGridBagConstraint::csGridBagConstraint (csComponent *comp)
     fill   ( NONE ),
     insets ( 0,0,0,0 ),
     ipadx  ( 0 ),
-    ipady  ( 0 )
+    ipady  ( 0 ),
+    bSized (false)
 {}
 
 csGridBagConstraint::csGridBagConstraint (csComponent *comp, int _gridx,
@@ -47,7 +48,8 @@ csGridBagConstraint::csGridBagConstraint (csComponent *comp, int _gridx,
     fill   ( _fill ),
     insets ( _insets ),
     ipadx  ( _ipadx ),
-    ipady  ( _ipady )
+    ipady  ( _ipady ),
+    bSized (false)
 {}
 
 csGridBagConstraint::csGridBagConstraint (const csGridBagConstraint &c) : csLayoutConstraint (c.comp)
@@ -66,7 +68,7 @@ csGridBagConstraint::csGridBagConstraint (const csGridBagConstraint &c) : csLayo
   insets.right = c.insets.right;
   ipadx = c.ipadx;
   ipady = c.ipady;
- 
+  bSized = false;
 }
 
 csLayoutConstraint *csGridBagConstraint::Clone ()
@@ -92,6 +94,14 @@ csGridBagLayout::~csGridBagLayout ()
 }
 
 // impl. of LayoutManager
+
+void csGridBagLayout::RemoveLayoutComponent (csComponent* comp)
+{
+  // force matrix recalc
+  ClearCachedData();
+  
+  csLayout2::RemoveLayoutComponent (comp);
+}
 
 void csGridBagLayout::SuggestSize (int &sugw, int &sugh)
 {
@@ -150,12 +160,6 @@ double csGridBagLayout::GetLayoutAlignmentX ()
 double csGridBagLayout::GetLayoutAlignmentY ()
 {
   return 0;
-}
-
-void csGridBagLayout::InvalidateLayout ()
-{
-  ClearCachedData();
-  csLayout2::InvalidateLayout ();
 }
 
 /*** protected mehtods ***/
@@ -266,7 +270,7 @@ void csGridBagLayout::LayoutCells (CellInfo* cells, int xCnt, int yCnt,
     actualSpaceUsed = 0;
     for (x = 0; x != xCnt; ++x)
     {
-      int extraSpaceForCol = (int)( extraSpace * ( colSpaces[x] / sum ) );
+      int extraSpaceForCol = (int)(sum != 0 ? ( extraSpace * ( colSpaces[x] / sum )): 0.0 );
       // elimniate round-off errors at the expence of last column
       if (x == xCnt - 1 && hasStrechedCells) 
 	extraSpaceForCol = extraSpace - spaceUsed;
@@ -458,8 +462,12 @@ void csGridBagLayout::CreateMatrix ()
   {
     int w=0, h=0;
     csGridBagConstraint& c = *(csGridBagConstraint*)vConstraints.Get (i);
-    c.comp->SuggestSize (w, h);
-    c.mPrefCompSize.Set (w, h);
+    if (!c.bSized)
+    {
+      c.comp->SuggestSize (w, h);
+      c.mPrefCompSize.Set (w, h);
+      c.bSized = true;
+    }
 
     if (c.gridx != csGridBagConstraint::RELATIVE ) nextX = c.gridx;
     if (c.gridy != csGridBagConstraint::RELATIVE ) nextY = c.gridy;
@@ -644,3 +652,4 @@ void csGridBagLayout::SetComponentLocations ()
       }
     }
 } 
+

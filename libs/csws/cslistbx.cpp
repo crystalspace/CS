@@ -393,6 +393,18 @@ void csListBox::PlaceItems (bool setscrollbars)
   } /* endif */
 }
 
+void csListBox::SuggestSize (int &w, int &h)
+{
+  w = h = 0;
+  if (hscroll)
+    h = hscroll->bound.Height ();
+  if (vscroll)
+    w = vscroll->bound.Width ();
+
+  h = MAX (bound.Height (), h);
+  w = MAX (bound.Width (), w);
+}
+
 bool csListBox::SetRect (int xmin, int ymin, int xmax, int ymax)
 {
   if (csComponent::SetRect (xmin, ymin, xmax, ymax))
