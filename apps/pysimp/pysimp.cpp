@@ -86,12 +86,6 @@ void PySimple::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-void PySimple::Help ()
-{
-  printf ("  -python            Test the csPython plugin\n");
-  printf ("  -lua               Test the csLua plugin\n");
-}
-
 void Cleanup ()
 {
   csPrintf ("Cleaning up...\n");
@@ -110,11 +104,6 @@ static bool PyEventHandler (iEvent& ev)
   else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
   {
     System->FinishFrame ();
-    return true;
-  }
-  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdCommandLineHelp)
-  {
-    System->Help ();
     return true;
   }
   else
@@ -217,59 +206,22 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif");
   iSector *room = engine->CreateSector ("room");
 
-  int testpython=0, testlua=0, i;
-  for (i=1; i<argc; i++)
-  {
-    if (!strcasecmp(argv[i], "-python"))
-    {
-      testpython=1;
-    }
-    if (!strcasecmp(argv[i], "-lua"))
-    {
-      testlua=1;
-    }
-  }
-
-  if (!testpython && !testlua)
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR,
-      "Please select -python or -lua to select which scripting engine to test!");
-    return 0;
-  }
-
   csRef<iPluginManager> plugin_mgr (
   	CS_QUERY_REGISTRY (object_reg, iPluginManager));
-  if(testpython)
-  {
-    // Initialize the python plugin.
-    csRef<iScript> is (CS_LOAD_PLUGIN (plugin_mgr,
+  // Initialize the python plugin.
+  csRef<iScript> is (CS_LOAD_PLUGIN (plugin_mgr,
       "crystalspace.script.python", iScript));
-    if (is)
-    {
-      // Load a python module (scripts/python/pysimp.py).
-      if (!is->LoadModule ("pysimp"))
-        return 0;
-
-      // Set up our room.
-      // Execute one method defined in pysimp.py
-      // This will create the polygons in the room.
-      if (!is->RunText ("pysimp.CreateRoom('stone')"))
-        return 0;
-    }
-  }
-
-  if (testlua)
+  if (is)
   {
-    //Now try some lua scripting stuff
-    csRef<iScript> is (CS_LOAD_PLUGIN (plugin_mgr,
-      "crystalspace.script.lua", iScript));
-    if (is)
-    {
-      if (!is->LoadModule ("scripts/lua/pysimp.lua"))
-        return 0;
-      if (!is->RunText ("CreateRoom('stone')"))
-        return 0;
-    }
+    // Load a python module (scripts/python/pysimp.py).
+    if (!is->LoadModule ("pysimp"))
+      return 0;
+
+    // Set up our room.
+    // Execute one method defined in pysimp.py
+    // This will create the polygons in the room.
+    if (!is->RunText ("pysimp.CreateRoom('stone')"))
+      return 0;
   }
 
   csRef<iStatLight> light;

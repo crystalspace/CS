@@ -49,7 +49,6 @@ public:
   PySimple ();
   virtual ~PySimple ();
 
-  void Help ();
   bool Initialize (int argc, const char* const argv[],
     const char *iConfigName);
   void SetupFrame ();
