@@ -23,6 +23,8 @@
 const int MODE_EXCLUDE=0;
 const int MODE_INCLUDE=1;
 
+
+
 csRectRegion::csRectRegion() : region(0), region_count(0), region_max(0) {}
 csRectRegion::~csRectRegion()
 {
@@ -286,13 +288,14 @@ csRectRegion::gatherFragments()
 
   while(j<region_count)
   {
-    for(i=0; i<32; ++i)
+    for(i=0; i<FRAGMENT_BUFFER_SIZE; ++i)
       if (fragment[i].IsEmpty())
       {
         fragment[i].Set(region[j]);
-        j++;
         break;
       }
+
+    j++;
   }
 
   region_count=gather_mark;
@@ -316,7 +319,7 @@ void csRectRegion::Include(csRect &nrect)
   csRect rect(nrect);
 
   /// Clear the fragment buffer
-  for(i=0; i<32; ++i)
+  for(i=0; i<FRAGMENT_BUFFER_SIZE; ++i)
     fragment[i].MakeEmpty();
 
   do
@@ -381,7 +384,7 @@ void csRectRegion::Include(csRect &nrect)
     if (!rect.IsEmpty() && untouched) pushRect(rect);
 
     // Check and see if we have fragments to consider
-    for(i=0; i<32; ++i)
+    for(i=0; i<FRAGMENT_BUFFER_SIZE; ++i)
     {
       if (!(fragment[i].IsEmpty()))
       {
@@ -410,7 +413,7 @@ csRectRegion::Exclude(csRect &nrect)
   csRect rect(nrect);
 
   /// Clear the fragment buffer
-  for(i=0; i<32; ++i)
+  for(i=0; i<FRAGMENT_BUFFER_SIZE; ++i)
     fragment[i].MakeEmpty();
 
     // Otherwise, we have to see if this rect overlaps or touches any other.
@@ -458,7 +461,7 @@ csRectRegion::Exclude(csRect &nrect)
     } // end for
 
     // Check and see if we have fragments to consider
-    /*for(i=0; i<32; ++i)
+    /*for(i=0; i<FRAGMENT_BUFFER_SIZE; ++i)
     {
       if (!(fragment[i].IsEmpty()))
       {
