@@ -510,6 +510,11 @@ public:
 
   /// This may eventually return a changing number.
   virtual long GetShapeNumber () const { return 1; }
+
+  ///////////////////////////////////////////////////////////////////
+
+  /// Set the materials list
+  void SetMaterialsList(iMaterialHandle **matlist);
 };
 
 
