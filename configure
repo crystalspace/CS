@@ -25388,6 +25388,8 @@ fi
 
 fi
 
+	cs_header_text="${cs_header_text}#define CS_HAS_ODE
+"
 else
   cs_cv_libode_opcode_cflags=''
 	cs_cv_libode_opcode_lflags=''

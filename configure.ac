@@ -1317,7 +1317,10 @@ AS_IF([test $cs_cv_libode_recent = yes],
 	[AC_LANG_PROGRAM(
 	    [[#include <ode/ode.h>]],
 	    [dGeomTriMeshDataCreate();])],
-	[], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libode], [ODE])], [], [],
+	[], [C++],
+	[CS_EMIT_BUILD_RESULT([cs_cv_libode], [ODE])
+	CS_HEADER_PROPERTY([CS_HAS_ODE])],
+	[], [],
 	[$cs_cv_libode_cflags], [$cs_cv_libode_lflags], [$cs_cv_libode_libs])],
 	[cs_cv_libode_opcode=no])
 

@@ -96,7 +96,7 @@ chronological order.
 	  Currently no animation is occuring but you can see test messages
 	  appear on stdout. Still work in progress.
 	- Jorrit fixed initialization errors in the new gmeshanim.
-	- PK added multi-include protection to DbgHelpAPI.h
+	- PK added multi-include protection to DbgHelpAPI.h.
 	- Jorrit added new csArray::DeleteIndexFast() and
 	  csArray::DeleteFast() routines. They work the same as DeleteIndex()
 	  and Delete() but they don't preserve order of the remaining
@@ -105,6 +105,11 @@ chronological order.
 	  is not important then it is recommended to use this function.
 	- Jorrit changed a few (only a few) cases where DeleteIndexFast() can
 	  be used easily.
+	- Eric Sunshine augmented configure.ac so that the ODE check emits
+	  CS_HAS_ODE to csconfig.h when ODE is present. ivaria/ode.h now checks
+	  for the presence of this control macro before trying to #include
+	  <ode/ode.h>. This allows ode.h to work correctly with
+	  <crystalspace.h> and <ivaria.h> even if ODE is not present.
 13-Sep-2004
 	- Eric Sunshine renamed the following symbols in order to avoid
 	  global namespace pollution:
