@@ -83,8 +83,7 @@ public:
 
   virtual ~csSysRenderBuffer ()
   {
-    if (buffer != 0)
-      delete[] (char *)buffer;
+    delete[] (char *)buffer;
   }
 
   /**
