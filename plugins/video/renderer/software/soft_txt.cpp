@@ -244,32 +244,6 @@ void csTextureHandleSoftware::ComputeMeanColor ()
 
   csRGBpixel *tc = transp ? &transp_color : 0;
 
-  csRGBpixel bias[8];
-  bias[0].red = 255;
-  bias[0].green = 0;
-  bias[0].blue = 0;
-  bias[1].red = 0;
-  bias[1].green = 255;
-  bias[1].blue = 0;
-  bias[2].red = 0;
-  bias[2].green = 0;
-  bias[2].blue = 255;
-  bias[3].red = 255;
-  bias[3].green = 0;
-  bias[3].blue = 255;
-  bias[4].red = 255;
-  bias[4].green = 255;
-  bias[4].blue = 0;
-  bias[5].red = 0;
-  bias[5].green = 255;
-  bias[5].blue = 255;
-  bias[6].red = 255;
-  bias[6].green = 255;
-  bias[6].blue = 255;
-  bias[7].red = 0;
-  bias[7].green = 0;
-  bias[7].blue = 0;
-
   for (i = 0; i < 4; i++)
     if (tex [i])
     {
@@ -279,7 +253,21 @@ void csTextureHandleSoftware::ComputeMeanColor ()
         t->get_size (), tc);
     }
 #if 0
-  quant.Count (bias, 8, NULL);
+  // This code makes sure the palette also has sufficient
+  // information to encode a standard 3:3:2 palette.
+  // This is useful when the texture is used as a procedural
+  // texture.
+  csRGBpixel bias[256];
+  for (i = 0 ; i < 256 ; i++)
+  {
+    int r = ((i & 0xe0) >> 5) << (8-3);
+    int g = ((i & 0x1c) >> 2) << (8-3);
+    int b = ((i & 0x03) >> 0) << (8-2);
+    bias[i].red = r;
+    bias[i].green = g;
+    bias[i].blue = b;
+  }
+  quant.Count (bias, 256, NULL);
 #endif
 
   csRGBpixel *pal = palette;
