@@ -22978,6 +22978,18 @@
 	    <enable trigger="anim_sky" />
 	</sequence>
 
+	<sequence name="seq_lightning">
+	    <!-- Sequence fired by application and not by trigger.-->
+	    <setambient sector="large" red="1.5" green="1.5" blue="1.5" />
+	    <delay>75</delay>
+	    <setambient sector="large" red="0" green="0" blue="0" />
+	    <delay>75</delay>
+	    <setambient sector="large" red="1.5" green="1.5" blue="1.5" />
+	    <delay>150</delay>
+	    <setambient sector="large" red="0" green="0" blue="0" />
+	    <delay>3000</delay>
+	</sequence>
+
 	<sequence name="animhugelight">
 	    <fadelight light="hugeroom_light1" red="0" green="0" blue=".2"
 	    	duration="3000" />

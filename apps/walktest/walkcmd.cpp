@@ -1929,6 +1929,11 @@ bool CommandHandler (const char *cmd, const char *arg)
     extern void fire_missile ();
     fire_missile ();
   }
+  else if (!strcasecmp (cmd, "lightning"))
+  {
+    extern void show_lightning ();
+    show_lightning ();
+  }
   else if (!strcasecmp (cmd, "rain"))
   {
     char txtname[100];

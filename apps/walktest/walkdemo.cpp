@@ -22,6 +22,7 @@
 #include "infmaze.h"
 #include "command.h"
 #include "ivaria/view.h"
+#include "ivaria/engseq.h"
 #include "iengine/dynlight.h"
 #include "iengine/light.h"
 #include "iengine/campos.h"
@@ -104,7 +105,7 @@ void add_particles_rain (iSector* sector, char* matname, int num, float speed)
 					  csVector3 (0, 0, 0)));
 
   exp->SetZBufMode(CS_ZBUF_TEST);
-
+  {
   csRef<iParticleState> partstate (
   	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iParticleState));
   partstate->SetMaterialWrapper (mat);
@@ -118,6 +119,8 @@ void add_particles_rain (iSector* sector, char* matname, int num, float speed)
   rainstate->SetLighting (false);
   rainstate->SetBox (bbox.Min (), bbox.Max ());
   rainstate->SetFallSpeed (csVector3 (0, -speed, 0));
+  }
+  printf("Rain mesh refcount is %d.\n",exp->GetRefCount());
 }
 
 //===========================================================================
@@ -1107,6 +1110,22 @@ void HandleDynLight (iDynLight* dyn)
       break;
     }
   }
+}
+
+void show_lightning()
+{
+    csRef<iEngineSequenceManager> seqmgr(CS_QUERY_REGISTRY (Sys->object_reg,
+  	iEngineSequenceManager));
+
+    if (seqmgr)
+    {
+	seqmgr->RunSequenceByName("seq_lightning",0);
+    }
+    else
+    {
+	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	             "Could not find engine sequence manager!");
+    }
 }
 
 void fire_missile ()
