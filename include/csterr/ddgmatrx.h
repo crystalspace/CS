@@ -137,10 +137,31 @@ public:
 	{ m0.set(v1); m1.set(v2); m2.set(v3); m3.set(v4); }
 	/// Set a matrix to the value of a 16 element float array.
 	ddgMatrix4( float u[16] )
-	{ memcpy(*this,u, sizeof(*this)); } // @@@ Dangerous!!
+	{
+		const float *p = u;
+		for (int i = 0; i < 4; i++, p++)
+		{
+			m0.v[i] = *(p +  0);
+			m1.v[i] = *(p +  4);
+			m2.v[i] = *(p +  8);
+			m3.v[i] = *(p + 12);
+		}
+	}
 	/// Assign the value of a matrix to a 16 element float array.
 	void assignto( float u[16] )
-	{ memcpy(u,*this, sizeof(*this)); } // @@@ Dangerous!!
+	{
+		float *p0 = u +  0;
+		float *p1 = u +  4;
+		float *p2 = u +  8;
+		float *p3 = u + 12;
+		for (int i = 0; i < 4; i++, p0++, p1++, p2++, p3++)
+		{
+			*p0 = m0.v[i];
+			*p1 = m1.v[i];
+			*p2 = m2.v[i];
+			*p3 = m3.v[i];
+		}
+	}
 	/// Return object a pointer to array of floats.
 	operator float*() { return (float*)this; };
 	/// Find the inverset matrix A' such that A A' = I (identity).

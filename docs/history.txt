@@ -17,6 +17,9 @@ Short-term cleanups that need to be done:
 	  full-screen support by the BeOS OpenGL driver.
 	- Eric Sunshine updated the csPython plug-in so that it once again
 	  builds following recent changes to SCF.
+	- Eric Sunshine removed the last of the dangerous code in ddgmatrix.h,
+	  which made unportable and potentially unsafe assumptions about the
+	  exact layout of the structure.
 2-Mar-2000
 	- Norman Kramer completely rewrote the glide texture cache
 	  handling. It now holds alphamaps too. On single TMU systems the
