@@ -7,6 +7,9 @@ The history order is reversed so that new features are at the top.
         - Philip Wyett fixed inconsistent swig -I flag in make build
           and aligning it with jam build. cs_pyth.cpp will now be identical
           whether make or jam built.
+	- Keith Fulton added /apps/tools/partedit particle system editor.
+ 	  This is still unfinished but should at least run.  Code was by
+	  Peter Holko, who is still working on it.
 21-Jul-2003
 	- Oktal added missing doxygen comment at the top of csSymbolTable.
         - Philip Wyett removed CVS conflict data from gl_render3d.cpp.
