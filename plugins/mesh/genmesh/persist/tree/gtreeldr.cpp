@@ -776,18 +776,18 @@ csConstructionGeometry::csConstructionGeometry ()
   triangles = NULL;
   num_output_connectors = 0;
   output_connectors = NULL;
-  int i;
-  for (i = 0 ; i < num_output_connectors ; i++)
-  {
-    delete output_connectors[i];
-  }
-  delete[] output_connectors;
 }
 
 csConstructionGeometry::~csConstructionGeometry ()
 {
   delete[] vertices;
   delete[] triangles;
+  int i;
+  for (i = 0 ; i < num_output_connectors ; i++)
+  {
+    delete output_connectors[i];
+  }
+  delete[] output_connectors;
 }
 
 void csConstructionGeometry::SetVertices (
