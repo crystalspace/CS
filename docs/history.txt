@@ -13,6 +13,16 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+17-Nov-1999
+	- Eric Sunshine performed the SCF conversion on the BeOS port.  He
+	  also reformatted, removed unused / unneeded code, and generally
+	  cleaned up on the port.
+	- Eric Sunshine fixed a memory leak in the 3D software renderer.  He
+	  also patched it so that the "-video=" command-line argument works
+	  (though a better solution is needed).
+	- Eric Sunshine fixed the pytest makefile again to remove platform
+	  dependancies (and other buggy stuff).
+	- Eric Sunshine fixed the help message in WalkTest.
 16-Nov-1999
 	- Eric Sunshine worked around some additional severe bugs in the
 	  NextStep compiler which were triggered by the SCF conversion.  The
