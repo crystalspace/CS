@@ -232,7 +232,8 @@ bool csGraphics3DOGLCommon::Initialize (iObjectRegistry* p)
 void csGraphics3DOGLCommon::InitGLExtensions ()
 {
 # define CSGL_FUNCTION(fType,fName) \
-fName = (fType) G2DGL->GetProcAddress ( #fName );
+fName = (fType) G2DGL->GetProcAddress ( #fName ); \
+allFound = allFound && fName != NULL;
 
   if (G2D)
   {
@@ -263,41 +264,56 @@ fName = (fType) G2DGL->GetProcAddress ( #fName );
 	    Report (CS_REPORTER_SEVERITY_NOTIFY, "Found extension: %s\n", ext);
 	    if (!strcmp (ext, "GL_ARB_multitexture"))
 	    {
+	      bool &allFound = ARB_multitexture;
+	      allFound = true;
 #             define _CSGLEXT_
 #             define CSGL_ARB_multitexture
 #             include "csglext.h"
 #             undef CSGL_ARB_multitexture
-	      GLint maxtextures;
-	      glGetIntegerv (GL_MAX_TEXTURE_UNITS_ARB, &maxtextures);
-	      if (maxtextures > 1) 
-	      {
-		m_config_options.do_multitexture_level = maxtextures;
-		DrawPolygonCall = &csGraphics3DOGLCommon::DrawPolygonMultiTexture;
-		ARB_multitexture = true;
+	      if (!allFound)
 		Report (CS_REPORTER_SEVERITY_NOTIFY,
-			"Using multitexture extension with %d texture units", maxtextures);
-	      } 
-	      else 
+			"Could not get all function addresse for %s", ext);
+	      else
 	      {
-		Report (CS_REPORTER_SEVERITY_NOTIFY, "WARNING: driver supports multitexture"
-			" extension but only allows one texture unit!");
+		GLint maxtextures;
+		glGetIntegerv (GL_MAX_TEXTURE_UNITS_ARB, &maxtextures);
+		if (maxtextures > 1) 
+		{
+		  m_config_options.do_multitexture_level = maxtextures;
+		  DrawPolygonCall = &csGraphics3DOGLCommon::DrawPolygonMultiTexture;
+		  Report (CS_REPORTER_SEVERITY_NOTIFY,
+			  "Using multitexture extension with %d texture units", maxtextures);
+		} 
+		else 
+		{
+		  Report (CS_REPORTER_SEVERITY_NOTIFY, "WARNING: driver supports multitexture"
+			  " extension but only allows one texture unit!");
+		}
 	      }
 	    }
 	    else if (!strcmp (ext, "GL_ARB_texture_compression"))
 	    {
+	      bool &allFound = ARB_texture_compression;
+	      allFound = true;
 #             define _CSGLEXT_
 #             define CSGL_ARB_texture_compression
 #             include "csglext.h"
 #             undef CSGL_ARB_texture_compression
-	      ARB_texture_compression = true;
+	      if (!allFound)
+		Report (CS_REPORTER_SEVERITY_NOTIFY,
+			"Could not get all function addresse for %s", ext);
 	    }
 	    else if (!strcmp (ext, "GL_NV_vertex_array_range"))
 	    {
+	      bool &allFound = NV_vertex_array_range;
+	      allFound = true;
 #             define _CSGLEXT_
 #             define CSGL_NV_vertex_array_range
 #             include "csglext.h"
 #             undef CSGL_NV_vertex_array_range
-	      NV_vertex_array_range = true;
+	      if (!allFound)
+		Report (CS_REPORTER_SEVERITY_NOTIFY,
+			"Could not get all function addresse for %s", ext);
 	    }
 	  }
 	  // find next occurance -- we could have multiple matches if we match the
