@@ -352,7 +352,7 @@ bool Simple::Initialize ()
   // Create the sprite and add it to the engine.
   csRef<iMeshWrapper> sprite (engine->CreateMeshWrapper (
   	imeshfact, "MySprite", room,
-	csVector3 (-3, 5, 0)));
+	csVector3 (-1, 4, 0)));
   csMatrix3 m; m.Identity (); // m *= 5.;
   sprite->GetMovable ()->SetTransform (m);
   sprite->GetMovable ()->UpdateMove ();
