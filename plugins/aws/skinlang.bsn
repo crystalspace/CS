@@ -96,12 +96,12 @@ connection_item:
 connection_item_list:
 	connection_item
 		{ awsKeyContainer* kc = new awsKeyContainer;
-		  kc->Add($1);
+		  if ($1) kc->Add($1);
 		  $$ = kc;
 		}
 	| connection_item_list connection_item
 		{ awsKeyContainer* kc = $1;
-		  kc->Add($2);
+		  if ($2) kc->Add($2);
 		  $$ = kc;
 		}
 ;
