@@ -49,7 +49,7 @@ Short-term cleanups that need to be done:
 	  Unfortunatelly the tree does not seem to be as good with this new
 	  splitter in comparison to just minimzing splits.
 	- Removed the old and obsolete support for dynamic polygons in polygon
-	  trees. This is not supported through other means.
+	  trees. This is now supported through other means.
 	- Martin Geisse submitted updates to some of the Texinfo documents
 	  which improve formatting.
 	- Thomas Hieber worked around a workaround from Eric Sunshine in MazeD.
