@@ -55,10 +55,13 @@ bool csSoundSourceDS3D::Initialize(csSoundRenderDS3D *srdr,
   srdr->IncRef();
   Renderer = srdr;
 
-  // if number of samples is unknown this should be a streamed sound
-  if (Data->GetNumSamples()==-1) return false;
+  // @@@ if we may not precache build a streamed sound
+  if (!Data->MayPrecache()) return false;
 
-  unsigned long BufferBytes = Data->GetNumSamples() *
+  long NumSamples = -1;
+  void *databuf = Data->Read(NumSamples);
+    
+  unsigned long BufferBytes = NumSamples *
     Data->GetFormat()->Channels * Data->GetFormat()->Bits/8;
 
   DSBUFFERDESC dsbd;
@@ -89,12 +92,9 @@ bool csSoundSourceDS3D::Initialize(csSoundRenderDS3D *srdr,
     return false;
   }
 
-  // this can possibly be optimized without CopyMemory()
-  long num = Data->GetNumSamples();
-  void *d = Data->Read(num);
-  CopyMemory(pbWrite1, d, BufferBytes);
-  Data->DiscardBuffer(d);
-    
+  CopyMemory(pbWrite1, databuf, BufferBytes);
+  Data->DiscardBuffer(databuf);
+
   if (Buffer2D->Unlock(pbWrite1, BufferBytes, pbWrite2, 0) != DS_OK) {
     if (pbWrite1) Buffer2D->Unlock(pbWrite1, BufferBytes, pbWrite2, 0);
     return false;
