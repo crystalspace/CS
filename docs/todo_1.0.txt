@@ -327,17 +327,21 @@ Global Additions and Stuff:
 	[**] Remove Squawk after implementing a multi-view demo in WalkTest.
 
 Documentation Updates:
+	- More simple HOWTO's like:
+	    - Loading a mesh for the 3DS plugin.
+	    - Creating a dynamic light.
+	    - Howto make an explosion.
+	    - For every plugin: a simple example on how to use it.
+	    - More sophisticated tutorial about portals and space warping.
+	    - csAnimationTemplate and csAnimatedPixmap.
+	- Document event system.
 	- Update the 'Configuration Files Section'.
 	- Write docs and/or HOWTO on the Python and other scripting plugins.
 	- Write doc on the heightmap texture generation utility.
-	- Write HOWTO on creation of a mesh object.
 	- Write doc on how to create your own mesh object plugins.
 	- Write HOWTO on plugin creation in general.
 	- Complete docs on metaballs mesh object.
 	- Complete docs on haze mesh object.
-	- Write a HOWTO or other doc that explains the best way to create a
-	  level (i.e.  detail objects, occluders, ...).  Also explains when to
-	  use portals/sectors and when not.
 	- Tutorial on isometric engine.
 	- HOWTO on how to work with regions and load/unload parts of a map
 	  (dynamic loading/unloading).
