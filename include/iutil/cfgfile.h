@@ -34,10 +34,7 @@ SCF_VERSION(iConfigFile, 0, 0, 2);
  */
 struct iConfigFile : public iBase
 {
-  /**
-   * Get configuration file name.  Also consult GetVFS() to determine which
-   * (if any) VFS object was used for the file's storage.
-   */
+  /// Get configuration file name.
   virtual const char* GetFileName () const = 0;
 
   /**
