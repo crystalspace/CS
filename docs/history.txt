@@ -15,6 +15,9 @@ The history order has been reversed so that new features are at the top.
 	  reported by MSVC.
 	- Eric Sunshine added YY_NEVER_INTERACTIVE to the Dungeon plugin in
 	  order to resolve the isatty() warning under MSVC.
+	- Eric Sunshine had to re-add some special case code to scfreg.mak in
+	  order to allow all plugins to register correctly on NeXT.  In
+	  particular, csclear and csnsmgr were having difficulty.
 17-May-2000
 	- Thomas Riemer added scaffolding functions to allow loading world
 	  into NetSpace world.
