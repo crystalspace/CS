@@ -193,6 +193,35 @@ public:
       { return scfParent->tr; }
     virtual void SetTransform (const csReversibleTransform& tr)
       { (void)tr; }
+    virtual iLODControl* CreateStaticLOD ()
+    {
+      return 0;
+    }
+    virtual void DestroyStaticLOD ()
+    {
+    }
+    virtual iLODControl* GetStaticLOD ()
+    {
+      return 0;
+    }
+    virtual void RemoveMeshFromStaticLOD (iMeshWrapper* mesh)
+    {
+    }
+    virtual void AddMeshToStaticLOD (int lod, iMeshWrapper* mesh)
+    {
+    }
+    virtual void SetStaticLOD (float m, float a)
+    {
+    }
+    virtual void GetStaticLOD (float& m, float& a) const
+    {
+    }
+    virtual void RemoveFactoryFromStaticLOD (iMeshFactoryWrapper* fact)
+    {
+    }
+    virtual void AddFactoryToStaticLOD (int lod, iMeshFactoryWrapper* fact)
+    {
+    }
   } scfiMeshFactoryWrapper;
   friend struct MeshFactoryWrapper;
 };
