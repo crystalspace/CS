@@ -183,11 +183,7 @@ public:
   struct MaterialWrapper : public iMaterialWrapper
   {
     SCF_DECLARE_EMBEDDED_IBASE (csIsoMaterialWrapper);
-    //// @@@ cast is wrong! It is an csIsoMaterialWrapper
-    virtual csMaterialWrapper* GetPrivateObject ()
-    {
-      return (csMaterialWrapper*)scfParent;
-    }
+    csIsoMaterialWrapper* GetPrivateObject () { return scfParent; }
     virtual iMaterialWrapper *Clone () const
     {
       return &(new csIsoMaterialWrapper (*scfParent))->scfiMaterialWrapper;
@@ -316,7 +312,8 @@ public:
     }
     virtual int Find (iMaterialWrapper *imw) const
     {
-      return scfParent->Find ((csIsoMaterialWrapper*)(imw->GetPrivateObject ()));
+      return scfParent->Find (((csIsoMaterialWrapper::MaterialWrapper*)imw)->
+      	GetPrivateObject ());
     }
   } scfiMaterialList;
 };
