@@ -1020,18 +1020,18 @@ case 6:
 { yyerrok;      ;
     break;}
 case 7:
-{ static_awsparser->MapSourceToSink (yyvsp[-6].val, yyvsp[-3].str, yyvsp[0].str); ;
+{ yyval.key = static_awsparser->MapSourceToSink (yyvsp[-6].val, yyvsp[-3].str, yyvsp[0].str); ;
     break;}
 case 8:
-{ awsConnectionNode* cn = new awsConnectionNode;
-		  cn->Add(cn);
-		  yyval.keycont = cn;
+{ awsKeyContainer* kc = new awsKeyContainer;
+		  kc->Add(yyvsp[0].key);
+		  yyval.keycont = kc;
 		;
     break;}
 case 9:
-{ awsConnectionNode* cn = (awsConnectionNode*) yyvsp[-1].keycont;
-		  cn->Add(yyvsp[0].key);
-		  yyval.keycont = cn;
+{ awsKeyContainer* kc = yyvsp[-1].keycont;
+		  kc->Add(yyvsp[0].key);
+		  yyval.keycont = kc;
 		;
     break;}
 case 10:

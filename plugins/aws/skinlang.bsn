@@ -90,19 +90,19 @@ line:            '\n'
 
 connection_item:
 	exp '-' '>' TOKEN_ATTR ':' ':' TOKEN_ATTR
-		{ static_awsparser->MapSourceToSink ($1, $4, $7); }
+		{ $$ = static_awsparser->MapSourceToSink ($1, $4, $7); }
 ;
 
 connection_item_list:
 	connection_item
-		{ awsConnectionNode* cn = new awsConnectionNode;
-		  cn->Add(cn);
-		  $$ = cn;
+		{ awsKeyContainer* kc = new awsKeyContainer;
+		  kc->Add($1);
+		  $$ = kc;
 		}
 	| connection_item_list connection_item
-		{ awsConnectionNode* cn = (awsConnectionNode*) $1;
-		  cn->Add($2);
-		  $$ = cn;
+		{ awsKeyContainer* kc = $1;
+		  kc->Add($2);
+		  $$ = kc;
 		}
 ;
 

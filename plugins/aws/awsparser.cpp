@@ -38,9 +38,17 @@ awsKey* awsParser::MapSourceToSink (unsigned long signal, const char* sinkname, 
   iAwsSink* sink = aws->GetSinkMgr()->FindSink(sinkname);
   
   if (sink == NULL)
+  {
+    ReportError ("Couldn't find sink '%s'.", sinkname);
     return NULL;
+  }
   
   unsigned long trigger = sink->GetTriggerID(triggername);
+  if (sink->GetError () != 0)
+  {
+    ReportError ("Couldn't find Trigger '%s' in Sink '%s'.", triggername, sinkname);
+    return NULL;
+  }
   
   return new awsConnectionKey ("connection", sink, trigger, signal);
 }
