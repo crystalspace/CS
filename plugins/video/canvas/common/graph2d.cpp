@@ -180,6 +180,10 @@ bool csGraphics2D::Initialize (iObjectRegistry* r, int width, int height,
   Palette = new csRGBpixel [256];
   if (Depth == 8)
   {
+    pfmt.RedMask    = 0xff;
+    pfmt.GreenMask  = 0xff;
+    pfmt.BlueMask   = 0xff;
+    pfmt.AlphaMask  = 0xff;
     pfmt.PalEntries = 256;
     pfmt.PixelBytes = 1;
   }
@@ -189,10 +193,10 @@ bool csGraphics2D::Initialize (iObjectRegistry* r, int width, int height,
     _GetPixelAt = GetPixelAt16;
 
     // Set pixel format
-    pfmt.RedMask   = 0x1f << 11;
-    pfmt.GreenMask = 0x3f << 5;
-    pfmt.BlueMask  = 0x1f;
-    pfmt.AlphaMask = 0;
+    pfmt.RedMask    = 0x1f << 11;
+    pfmt.GreenMask  = 0x3f << 5;
+    pfmt.BlueMask   = 0x1f << 0;
+    pfmt.AlphaMask  = 0x00;
     pfmt.PixelBytes = 2;
     pfmt.PalEntries = 0;
   }
@@ -202,10 +206,10 @@ bool csGraphics2D::Initialize (iObjectRegistry* r, int width, int height,
     _GetPixelAt = GetPixelAt32;
 
     // calculate CS's pixel format structure.
-    pfmt.RedMask = 0xff << 16;
-    pfmt.GreenMask = 0xff << 8;
-    pfmt.BlueMask = 0xff;
-    pfmt.AlphaMask = 0xff << 24;
+    pfmt.RedMask    = 0xff << 16;
+    pfmt.GreenMask  = 0xff << 8;
+    pfmt.BlueMask   = 0xff << 0;
+    pfmt.AlphaMask  = 0xff << 24;
     pfmt.PixelBytes = 4;
     pfmt.PalEntries = 0;
   }

@@ -35,9 +35,8 @@ chronological order.
 	- Eric Sunshine renamed the 'drivers2d' and 'drivers3d' compile groups
 	  to 'canvases' and 'renderers', respectively. (The old names, though
 	  deprecated, are still recognized for backward compatibility.)
-	- Eric Sunshine fixed bug in csGraphics2DNull::Initialize() in the
-	  null2d canvas where it neglected to initialize
-	  csPixelFormat::AlphaMask.  The subsequent call to
+	- Eric Sunshine fixed bugs in several canvases where they neglected to
+	  initialize csPixelFormat::AlphaMask.  A subsequent call to
 	  csPixelFormat::complete() then accessed the uninitialized AlphaMask
 	  field.
 24-Nov-2004

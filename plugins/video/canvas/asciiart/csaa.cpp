@@ -116,6 +116,7 @@ bool csGraphics2DAA::Initialize (iObjectRegistry *object_reg)
   pfmt.RedMask    = 0xff;
   pfmt.GreenMask  = 0xff;
   pfmt.BlueMask   = 0xff;
+  pfmt.AlphaMask  = 0x00;
   pfmt.complete ();
 
   csRef<iEventQueue> q = CS_QUERY_REGISTRY(object_reg, iEventQueue);

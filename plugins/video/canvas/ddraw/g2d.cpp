@@ -729,7 +729,6 @@ HRESULT csGraphics2DDDraw3::InitSurfaces ()
   pfmt.AlphaMask = ddpf.dwRGBAlphaBitMask;
   Depth = ddpf.dwRGBBitCount;
 
-  if (fontCache) delete fontCache; fontCache = 0;
   if (Depth == 8)
   {
     pfmt.PalEntries = 256;
@@ -754,6 +753,8 @@ HRESULT csGraphics2DDDraw3::InitSurfaces ()
     pfmt.PalEntries = 0;
   }
   pfmt.complete ();
+
+  if (fontCache) delete fontCache; fontCache = 0;
   CreateDefaultFontCache ();
   fontCache->SetClipRect (ClipX1, ClipY1, ClipX2, ClipY2);
 

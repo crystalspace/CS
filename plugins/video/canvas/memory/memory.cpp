@@ -115,7 +115,8 @@ bool csGraphicsMemory::Initialize(iObjectRegistry* obj_reg)
     Depth = 16;
     pfmt.RedMask   = 0x1f << 11;
     pfmt.GreenMask = 0x3f << 5;
-    pfmt.BlueMask  = 0x1f;
+    pfmt.BlueMask  = 0x1f << 0;
+    pfmt.AlphaMask = 0x00;
     pfmt.PalEntries = 0;
     pfmt.PixelBytes = 2;
     pfmt.complete();

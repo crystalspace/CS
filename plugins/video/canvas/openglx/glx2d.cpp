@@ -113,8 +113,12 @@ bool csGraphics2DGLX::Initialize (iObjectRegistry *object_reg)
   dpy = xwin->GetDisplay ();
   screen_num = xwin->GetScreen ();
 
-  // The texture manager only needs to know this:
-  pfmt.PalEntries = 0;
+  pfmt.RedMask = 0;
+  pfmt.GreenMask = 0;
+  pfmt.BlueMask = 0;
+  pfmt.AlphaMask = 0;
+  pfmt.PalEntries = 0; // Texture mananger needs to know this.
+  pfmt.PixelBytes = 0;
 
   // Create the event outlet
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
@@ -375,8 +379,7 @@ bool csGraphics2DGLX::CreateVisuals ()
   }
   currentFormat[glpfvAccumColorBits] = accumBits;
   currentFormat[glpfvAccumAlphaBits] = accumAlpha;
-	    
-    
+
   if (ctype)
   {
     if (pfmt.RedMask > pfmt.BlueMask)
