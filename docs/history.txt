@@ -1,12 +1,37 @@
 The history order is reversed so that new features are at the top.
 
 24-Aug-2001
+	- Philip Wyett tried to fix the metaballs plugin from crashing.
 	- Fixed metaballs plugin so that it really works again now.
 	  This caused walktest+flarge to crash.
 	- Fixed ptlab and metademo. These apps were not calling
 	  csInitializeApplication so a lot was missing in the object
 	  registry. Some of the changes I did yesterday assumed that
 	  there was an instance of iGraphics3D in the object registry.
+	- Added iPolygonBuffer. This represents an object that holds the
+	  most efficient way to represent a set of polygons for a given
+	  3D renderer. For a software renderer the polygons can just be
+	  stored as such. For a hardware renderer it may be more efficient
+	  to store the polygons as a triangle mesh or a vertex fan/strip.
+	  The vertex buffer manager also serves as the class that implements
+	  polygon buffers. Polygon buffers are supposed to work together
+	  with vertex buffers as the polygons are given as indices in such
+	  a buffer. Implemented a primitive polygon buffer support for all
+	  renderers.
+	  Currently polygon buffers are not used. In the near future
+	  DrawPolygonMesh will use them.
+	- Changed the way that vertex buffers work. In addition to the vertex
+	  information that was already present there is now also texel (texture
+	  mapping) and color information. This means the 3D renderer will also
+	  be able to optimize for those. This also means that the vertex_colors
+	  and texels arrays are gone from G3DTriangleMesh.
+	- Removed the 'extern "C"' arround the include of Python.h in the
+	  python plugin. This caused problems with MSVC in combination with
+	  Python 2.0. Since the extern "C" doesn't seem to be needed for
+	  Python 1.5 I removed it. One disadvantage of this removal is that
+	  there is now a warning about ignored pragma though.
+	  Note that I could not remove the extern "C" in cs_pyth.cpp since
+	  that file is automatically generated. We have to fix that somehow.
 23-Aug-2001
 	- Fog should now work for the metaballs plugin.
 	- Started work on vertex buffer support in the 3D renderers. There is
@@ -36,6 +61,11 @@ The history order is reversed so that new features are at the top.
 	  on a mesh with locked vertex buffers.
 	- Added CS_ASSERT() at various places to make sure the locked status
 	  of the vertex buffer is as expected.
+	- Christopher Nelson added ability to grab title bar of windows to
+	  move them.
+	- Martin Geisse did the following:
+	    - Added the framework for an MDL converter.
+	    - Fixed a bug in the MD2 converter.
 22-Aug-2001
 	- Norman Kramer made a few comments in polygon.h a bit better.
 	- Norman saved a few cycles in min_z calculation in software
