@@ -25,8 +25,6 @@ csperl5clean:
 	$(MAKE_CLEAN)
 csperl5distclean:
 	$(MAKE_CLEAN)
-swigperl5gen:
-	$(MAKE_TARGET)
 
 endif
 
