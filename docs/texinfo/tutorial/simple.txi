@@ -28,9 +28,8 @@ available online.  The @sc{api} documentation can be generated locally or
 viewed online.  @xref{Where to Get}.
 
 @menu
-* Simple Basic Concepts:: Basic Crystal Space Concepts
 * Simple Minimum Requirements:: Minimum Application Requirements
-* Simple Main Structure:: Simple Main Structure
+* Simple Main Structure::
 * Simple Event Handling:: Event Handling
 * Simple World:: Creating a ``World''
 * Simple Camera:: The Camera
@@ -163,7 +162,7 @@ get the application running. In the tutorial below we will use several of the
 functions from @code{csInitializer}. This class contains only static member
 functions.
 
-@node Simple Minimum Requirements, Simple System Driver, Tutorial Simple, Tutorial Simple
+@node Simple Minimum Requirements, Simple Main Structure, Tutorial Simple, Tutorial Simple
 @subsection Minimum Application Requirements
 @cindex Tutorial Minimum Application Requirements
 @cindex Minimum Application Requirements, Tutorial
@@ -483,7 +482,7 @@ where the application really starts running and interacting with the user.
 This call returns as soon as an exit message was received by the system at
 which point we call @code{Cleanup()} to clean up everything.
 
-@node Simple Event Handling, Simple World, Simple System Driver, Tutorial Simple
+@node Simple Event Handling, Simple World, Simple Main Structure, Tutorial Simple
 @subsection Event Handling
 @cindex Event Handling, Simple Tutorial
 @cindex Simple Tutorial Event Handling
