@@ -178,8 +178,6 @@ void fcn_set_no_rewind( ctEntity *ppe )
 // - don't forget to handle 'tunneling' problem as well.
 errorcode ctWorld::evolve( real t1, real t2 )
 {
-  static real collision_epsilon = 0.02;
-  static real time_epsilon = 0.001;
   real ta, tb;
   ctCatastropheManager *cat;
   ctLinkList_ctCatastropheManager recent_cat;
@@ -218,7 +216,7 @@ errorcode ctWorld::evolve( real t1, real t2 )
     if( max_cat_dist > 0 ){
       // if interpenetrations distance is very small => time of impact found
       // or if the time step is really small
-      if( max_cat_dist <= collision_epsilon || ( tb - ta ) <= time_epsilon ){
+      if( max_cat_dist <= cat->get_epsilon() || ( tb - ta ) <= TIME_EPSILON ){
         // respond to collision
         //!me collision_response( space_world );
 
@@ -241,7 +239,7 @@ errorcode ctWorld::evolve( real t1, real t2 )
       ta = tb;
       // if we are at our min time step, just finish this time step, collision
       // will get resolved next time.
-      if( (t2 - ta) <= time_epsilon ){
+      if( (t2 - ta) <= TIME_EPSILON ){
         tb = t2;
         do_time_step( ta, tb );
 
