@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+2-Feb-2002
+	- Eric Sunshine replaced fabsf() with fabs() in terrbig plugin for
+	  improved portability since not all platforms have fabsf().  (An
+	  alternate solution would be to check for fabsf via configure.  We
+	  will probably want to do this in the future.)
 2-Feb-2003
 	- Eric Sunshine modified tutorial/intro.txi so that it gives the full
 	  name of SCF and features a hyperlink to the SCF section.

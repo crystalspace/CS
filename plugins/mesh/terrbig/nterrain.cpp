@@ -627,7 +627,7 @@ void csBigTerrainObject::ComputeLod (nBlock *heightmap, int i, int j, int di, in
   nBlock *b = &heightmap[i + j * width];
   nBlock *l = &heightmap[i - di + (j - dj) * width];
   nBlock *r = &heightmap[i + di + (j + dj) * width];
-  b->error = fabsf (b->pos.y - (l->pos.y + r->pos.y) / 2.0);
+  b->error = (float)fabs(b->pos.y - (l->pos.y + r->pos.y) / 2.0);
   if (n) {
     dj = (di + dj) / 2;
     di -= dj;
