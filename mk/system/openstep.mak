@@ -36,8 +36,11 @@ NEXT.SOURCE_DIRS=openstep
 NEXT.INCLUDE_DIRS=-FAppKit -FFoundation
 NEXT.CFLAGS.GENERAL=-Wmost $(CFLAGS.D)_POSIX_SOURCE $(CFLAGS.D)__STRICT_ANSI__
 NEXT.CFLAGS.DEBUG=-finline-functions
+NEXT.CFLAGS.DLL=
 NEXT.LIBS=
 NEXT.LFLAGS.GENERAL=-framework AppKit -framework Foundation
+NEXT.LFLAGS.EXE=
+NEXT.LFLAGS.DLL=-bundle -undefined suppress
 
 NEXT.FRIEND=yes
 include mk/system/next.mak
