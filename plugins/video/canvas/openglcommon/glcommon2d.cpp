@@ -440,7 +440,9 @@ iImage *csGraphics2DGLCommon::ScreenShot ()
       break;
   }
 
-// Pixel formats expect AXXX not XXXA so swap
+// Pixel format is read as RGBA (in a byte array) but as soon as we
+// cast it to a 32 bit integer we have to deal with endianess, so convert
+// to big endian and convert RGBA to ARGB
 // On ABGR machines, we also need to swap B/R bytes
   if (pfmt.PixelBytes == 4)
   {
@@ -448,6 +450,7 @@ iImage *csGraphics2DGLCommon::ScreenShot ()
     int i;
     for (i = 0 ; i < Width*Height ; i++)
     {
+        *s = big_endian_long(*s);
 #if (CS_24BIT_PIXEL_LAYOUT == CS_24BIT_PIXEL_ABGR)
         *s = ((*s & 0x000000FF) << 24) | ((*s & 0x0000FF00) << 8) |
                 ((*s & 0x00FF0000) >> 8) | ((*s & 0xFF000000) >> 24);
