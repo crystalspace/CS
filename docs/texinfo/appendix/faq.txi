@@ -171,12 +171,12 @@ are quite popular these days and can perform extremely well, especially when
 compared to Crystal Space's software renderer. Framerates of 100 fps and more
 are not uncommon if you have a properly configured OpenGL renderer. Note that
 by default Crystal Space does not use OpenGL. You have to use the
-@samp{-video=opengl} commandline option to enable OpenGL rendering.
+@samp{-video=opengl} command-line option to enable OpenGL rendering.
 
 @item
-@strong{Q}: I'm using OpenGL with Crystal Space (using the commandline
-option @samp{-video=opengl} for example) but it really goes extremely slow.
-What's wrong?
+@strong{Q}: I'm using OpenGL with Crystal Space (via the @samp{-video=opengl}
+command-line option, for example) and the animation is extremely slow.  What's
+wrong?
 
 @strong{A}: When this happens this usually means that your OpenGL renderer
 is not using hardware acceleration. If you are sure that you actually have
@@ -268,7 +268,7 @@ The following section lists some more technical questions.
 command-line) but it seems some files are missing.
 
 @strong{A}: When doing an update from @sc{cvs} it is important not to
-forget the @samp{-d} and @samp{-P} commandline options. Otherwise you
+forget the @samp{-d} and @samp{-P} command-line options. Otherwise you
 will not get new directories and old empty directories will be
 everywhere. Using @samp{WinCVS} it is also possible to set these
 options.  @xref{WinCVS Tutorial}.
@@ -309,7 +309,7 @@ texture to add detail (this only works for OpenGL).
 correctly lit.  What did I do wrong?
 
 @strong{A}: Crystal Space does not automatically recalculate lighting.
-To do that you have to use the @samp{-relight} commandline option.
+To do that you have to use the @samp{-relight} command-line option.
 
 @item
 @strong{Q}: I'm confused by the Crystal Space coordinate system.  The 3D
@@ -471,8 +471,8 @@ registry. There are two basic ways to load a plugin: the first is to use
 @code{csInitializer::RequestPlugins()} and the second is to manually
 load the plugin using @code{CS_LOAD_PLUGIN}. @code{RequestPlugins()} is
 best because it actually registers the plugin with the object
-registry and it also correctly manages config file, commandline and
-request plugins (so you can override a plugin on commandline/config file).
+registry and it also correctly manages config file, command-line and
+request plugins (so you can override a plugin on command-line/config file).
 
 @item
 @strong{Q}: How can I show FPS (frame rate) in my Crystal Space application?

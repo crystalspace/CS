@@ -186,29 +186,24 @@ VFS.Mount.map3 =
 ; section below).
 
 ; Unix-style filesystems
-VFS.Alias.Solaris         = VFS.Unix
-VFS.Alias.Linux           = VFS.Unix
-VFS.Alias.BSD             = VFS.Unix
-VFS.Alias.Irix            = VFS.Unix
-VFS.Alias.MacOS/X         = VFS.Unix
+VFS.Alias.Unix    = VFS.Unix
+VFS.Alias.MacOS/X = VFS.Unix
 
 ; CP/M-style filesystems
-VFS.Alias.Win32           = VFS.CP/M
-VFS.Alias.DOS             = VFS.CP/M
+VFS.Alias.Win32   = VFS.CP/M
+VFS.Alias.DOS     = VFS.CP/M
 
-; strange key names follow:
+; Strange key names follow:
 ; VFS.Unix.. means key '.' in section VFS.Unix.*
 ; VFS.Unix... means key '..' in section VFS.Unix.*
 VFS.Unix.. = .
 VFS.Unix... = ..
-VFS.Unix.CD = /mnt/cdrom
+VFS.Unix.CDROM = /mnt/cdrom
+VFS.Unix.TMP = /tmp
 
 VFS.CP/M.. = .
 VFS.CP/M... = ..
 VFS.CP/M.HOME = $(HOMEDIR:$(HOMEPATH:.))
-VFS.CP/M.CD = x:
-
-VFS.Macintosh.. = 
-VFS.Macintosh... = ..
-VFS.Macintosh.HOME = 
+VFS.CP/M.CDROM = x:
+VFS.CP/M.TMP = $(TEMP:$(TMP:$(SYSTEMROOT)$/temp))
 @end example
