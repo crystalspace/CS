@@ -25,6 +25,7 @@
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 
 #if defined(CS_OPENGL_PATH)
 #include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
@@ -91,53 +92,82 @@ void csOpenGLProcBackBuffer::Prepare (csGraphics3DOGLCommon *g3d,
   SharedInitialize (g3d);
   SharedOpen (g3d);
 
+  rstate_bilinearmap = g3d->GetRenderState(G3DRENDERSTATE_BILINEARMAPPINGENABLE);
+
   // We are going to use an inverted orthographic projection matrix
   inverted = true;
 
   // Set up a temporary buffer for glReadPixel conversions when the texture is
   // not in the cache.
 
-  if (pfmt.PixelBytes == 2)
-  {
-    buffer = new char[width*height*2];
-    memset (buffer, 0, sizeof(char)*width*height*2);
-  }
-  else
-  {
-    // need to test this.
-    buffer = new char[width*height*4];
-    memset (buffer, 0, sizeof(char)*width*height*3);
-  }
+  buffer = new char[tex_0->size];
+
+  backbuffercopy = new char[width*height*3];
 #ifdef CS_DEBUG
-  printf ("GL backbuffer procedural texture\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY,
+    "%dx%d GL %sbackbuffer procedural texture", 
+    width, height, persistent?"persistent ":"");
 #endif
 }
 
 bool csOpenGLProcBackBuffer::BeginDraw (int DrawFlags)
 {
   bool do_quad = false;
+
   // if 2D graphics is not locked, lock it
-  if ((DrawFlags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
+ if ((DrawFlags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
       && (!(DrawMode & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))))
-  {
+ {
     if (!G2D->BeginDraw ())
       return false;
 
+    g3d->FlushDrawPolygon ();
+    g3d->lightmap_cache->Flush ();
+    g3d->FlushDrawFog ();
+
+/*    GLenum format, type;
+    switch (pixel_bytes)
+    {
+      case 1:
+	format = GL_COLOR_INDEX;
+	type = GL_UNSIGNED_BYTE;
+	break;
+  #ifdef GL_VERSION_1_2
+      case 2:
+	format = GL_RGB;
+	type = GL_UNSIGNED_SHORT_5_6_5;
+	break;
+  #endif
+      case 4:
+	format = GL_RGBA;
+	type = GL_UNSIGNED_BYTE;
+	break;
+      default:
+	return false; // invalid format
+    }
+    glReadPixels (0, 0, width, height,
+      format, type, backbuffercopy);  */
+
+    g2d->GetClipRect(oldminx, oldminy, oldmaxx, oldmaxy);
+    g2d->SetClipRect(0, 0, frame_width, frame_height);
+
+    glViewport(0,0,width,height);
+
     glMatrixMode (GL_PROJECTION);
+    glPushMatrix();
     glLoadIdentity ();
     // We set this transform to be the size of the procedural texture and to be
     // inverted so that all the action takes place on the lower left hand
     // corner of the screen and upside down.
-    //glOrtho (0.0f, (GLdouble) width, (GLdouble) height, 0.0f, -1.0f, 10.0f);
-	// @@@ ^^^^ This doesn't seem to work...
-    glOrtho (0.0f, (GLdouble) width, 0.0f, (GLdouble) height, -1.0f, 10.0f);
+    glOrtho (0.0f, (GLdouble) width, (GLdouble) height, 0.0f, -1.0f, 10.0f);
+    // but this flips front/back of walls...
+    glCullFace (GL_BACK);
 
     glMatrixMode (GL_MODELVIEW);
+    glPushMatrix();
     glLoadIdentity ();
-    glColor3f (1.0f, 0.0f, 0.0f);
+    glColor3f (1.0f, 1.0f, 1.0f);
     glClearColor (0.0f, 0.0f, 0.0f, 0.0f);
-
-    glViewport(0,0,width,height);
 
     if (persistent)
     {
@@ -146,12 +176,13 @@ bool csOpenGLProcBackBuffer::BeginDraw (int DrawFlags)
 
       // Get texture handle
       GLuint texturehandle =
-        ((csTxtCacheData *)tex_mm->GetCacheData ())->Handle;
+	((csTxtCacheData *)tex_mm->GetCacheData ())->Handle;
       glShadeModel (GL_FLAT);
       glEnable (GL_TEXTURE_2D);
       glColor4f (1.0f,1.0f,1.0f,1.0f);
       glBindTexture (GL_TEXTURE_2D, texturehandle);
       do_quad = true;
+      csGraphics3DOGLCommon::SetupBlend (CS_FX_COPY, 0, false);
     }
   }
 
@@ -186,18 +217,21 @@ bool csOpenGLProcBackBuffer::BeginDraw (int DrawFlags)
   if (do_quad)
   {
     glBegin (GL_QUADS);
-    glTexCoord2i (0, 1);
+    glTexCoord2f (0, 1);
     glVertex3i (0, 0, 0);
 
-    glTexCoord2i (1, 1);
-    glVertex3i (width,0, 0);
+    glTexCoord2f (0, 0);
+    glVertex3i (0, height, 0);
 
-    glTexCoord2i (1, 0);
+    glTexCoord2f (1, 0);
     glVertex3i (width, height, 0);
 
-    glTexCoord2i (0, 0);
-    glVertex3i (0, height, 0);
+    glTexCoord2f (1, 1);
+    glVertex3i (width, 0, 0);
     glEnd ();
+  } else {
+    csGraphics3DOGLCommon::SetGLZBufferFlags (CS_ZBUF_NONE);
+    csGraphics3DOGLCommon::SetupBlend (CS_FX_COPY, 0, false);
   }
 
   DrawMode = DrawFlags;
@@ -207,8 +241,16 @@ bool csOpenGLProcBackBuffer::BeginDraw (int DrawFlags)
 
 void csOpenGLProcBackBuffer::FinishDraw ()
 {
+  if ((!(DrawMode & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))))
+    return;
   csGraphics3DOGLCommon::FinishDraw ();
+  glCullFace (GL_FRONT);
+  glMatrixMode (GL_PROJECTION);
+  glPopMatrix();
+  glMatrixMode (GL_MODELVIEW);
+  glPopMatrix();
   glViewport (0,0,frame_width, frame_height);
+  g2d->SetClipRect(oldminx, oldminy, oldmaxx, oldmaxy);
 }
 
 void csOpenGLProcBackBuffer::Print (csRect *area)
@@ -218,7 +260,6 @@ void csOpenGLProcBackBuffer::Print (csRect *area)
   glEnable (GL_TEXTURE_2D);
   csGraphics3DOGLCommon::SetGLZBufferFlags (CS_ZBUF_NONE);
   csGraphics3DOGLCommon::SetupBlend (CS_FX_COPY, 0, false);
-  glDisable (GL_DITHER);
   glDisable (GL_ALPHA_TEST);
 
   csTxtCacheData *tex_data = (csTxtCacheData*) tex_mm->GetCacheData();
@@ -231,31 +272,28 @@ void csOpenGLProcBackBuffer::Print (csRect *area)
     // as of Mesa CVS 6/6/2000. Unfortunately this change has broken the
     // glCopyTexSubImage command, so I cant test this with just updating
     // the rectangle as it is intended to be.
-    glDeleteTextures (1, &tex_data->Handle);
+    /*glDeleteTextures (1, &tex_data->Handle);
     tex_data->Handle = 0;
-    glGenTextures (1, &tex_data->Handle);
+    glGenTextures (1, &tex_data->Handle);*/
     // Texture is in tha cache, update texture directly.
     glBindTexture (GL_TEXTURE_2D, tex_data->Handle);
     //glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+/*    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
 		     rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-		     rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
+		     rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);*/
 
     glCopyTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, 0,0,width,height,0);
-//      glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, width, height);
   }
   else
   {
-    printf ("not cached \n");
-    glReadPixels (0,0, width, height, tex_mm->SourceFormat (),
-		  tex_mm->SourceType (), tex_0->get_image_data ());
-#ifdef GL_VERSION_1_2x
     // Not in cache.
+    //printf ("not cached \n");
+#ifdef GL_VERSION_1_2x
     if (pfmt.PixelBytes == 2)
     {
 
@@ -278,8 +316,35 @@ void csOpenGLProcBackBuffer::Print (csRect *area)
     else
       glReadPixels (0, 0, width, height,
 		    GL_RGBA, GL_UNSIGNED_BYTE, tex_0->get_image_data());
+#else
+    glReadPixels (0,0, width, height, tex_mm->SourceFormat (),
+		  tex_mm->SourceType (), tex_0->get_image_data ());
 #endif
   }
+
+/*  GLenum format, type;
+  switch (pixel_bytes)
+  {
+    case 1:
+      format = GL_COLOR_INDEX;
+      type = GL_UNSIGNED_BYTE;
+      break;
+#ifdef GL_VERSION_1_2
+    case 2:
+      format = GL_RGB;
+      type = GL_UNSIGNED_SHORT_5_6_5;
+      break;
+#endif
+    case 4:
+      format = GL_RGBA;
+      type = GL_UNSIGNED_BYTE;
+      break;
+    default:
+      return; // invalid format
+  }
+  glRasterPos2i(0, 0);
+  glDrawPixels(width, height,
+      format, type, backbuffercopy);*/
 }
 
 float csOpenGLProcBackBuffer::GetZBuffValue (int x, int y)

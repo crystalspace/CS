@@ -24,7 +24,7 @@
  * And here is the basic idea:
  * On call of a BeginDraw we copy the texture in question into the backbuffer.
  * Then normal rendering occurs.
- * On Print we copy the area rendered to back to the texture. TODO..
+ * On Print we copy the area rendered to back to the texture. 
  * To keep the backbuffer intact we save and restore the area. TODO..
  */
 
@@ -41,6 +41,7 @@
 class csTextureHandleOpenGL;
 class csTextureProcOpenGL;
 struct iNativeWindow;
+struct iClipper2D;
 
 class csOpenGLProcBackBuffer : public csGraphics3DOGLCommon
 {
@@ -59,8 +60,13 @@ class csOpenGLProcBackBuffer : public csGraphics3DOGLCommon
   /// Does the user expect the buffer to seem to remain intact between frames?
   bool persistent;
 
-  /// Temporarty buffer to convert glReadPixels to csRGBpixel
+  /// Temporary buffer to convert glReadPixels to csRGBpixel
   char *buffer;
+
+  /// to keep backbuffer intact
+  char *backbuffercopy;
+
+  int oldminx, oldminy, oldmaxx, oldmaxy;
 
  public:
   csOpenGLProcBackBuffer (iBase*);
