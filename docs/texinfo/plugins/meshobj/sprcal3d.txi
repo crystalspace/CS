@@ -131,6 +131,33 @@ csRef<iMeshWrapper> sprite = engine->CreateMeshWrapper(
 Now build simple1 (jam simple1) and run it from the CS directory.
 You should be looking right at the model.
 
+@subsubheading Controling the model
+
+We can now display the model but we cannot set animations etc.
+
+After the previously added code in "apps/tutorial/simple1/simple1.cpp":
+@example
+// Making it do something.
+csRef<iSpriteCal3DFactoryState> factstate(SCF_QUERY_INTERFACE(imeshfact,
+      iSpriteCal3DFactoryState));
+csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
+      iSpriteCal3DState));
+cal3dstate->SetAnimCycle("strut",1.0f);
+@end example
+
+Don't forget to add this to the includes:
+@example
+#include "imesh/spritecal3d.h"
+@end example
+
+Now build simple1 (jam simple1) and run it from the CS directory.
+You should now see the Cally model strutting.
+
+Note: You can look at http://crystal.sourceforge.net/docs/online/api/structiSpriteCal3DFactoryState.php
+to get an idea of what iSpriteCal3DFactoryState can do.
+
+Note: You can look at http://crystal.sourceforge.net/docs/online/api/structiSpriteCal3DState.php
+to get an idea of what iSpriteCal3DState can do.
 
 @subsubheading Morph Animations
 
