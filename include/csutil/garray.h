@@ -56,7 +56,7 @@
     void SetLimit (int iLimit)						\
     {									\
       if (limit == iLimit) return;					\
-      if ((limit = iLimit))						\
+      if ((limit = iLimit)!=0)						\
         root = (Type *)realloc (root, limit * sizeof (Type));		\
       else								\
       { if (root) { free (root); root = NULL; } }			\
