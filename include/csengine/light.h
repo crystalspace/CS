@@ -24,10 +24,9 @@
 #include "csutil/cscolor.h"
 #include "csutil/flags.h"
 #include "csengine/rview.h"
-#include "lightdef.h"
-#include "ilight.h"
-#include "istlight.h"
-#include "idlight.h"
+#include "iengine/ilight.h"
+#include "iengine/istlight.h"
+#include "iengine/idlight.h"
 
 class csSector;
 class csLightMap;

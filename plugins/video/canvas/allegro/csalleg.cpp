@@ -24,7 +24,7 @@
 #include "cssys/csinput.h"
 #include "csutil/csrect.h"
 #include "csutil/csstring.h"
-#include "isystem.h"
+#include "isys/isystem.h"
 #include "allegro.h"
 
 static unsigned short ScanCodeToChar [128] =

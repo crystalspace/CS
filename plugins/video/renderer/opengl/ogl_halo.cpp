@@ -27,7 +27,7 @@
 #include "csgeom/math2d.h"
 #include "csutil/util.h"
 #include "ogl_g3dcom.h"
-#include "ihalo.h"
+#include "ivideo/ihalo.h"
 
 class csOpenGLHalo : public iHalo
 {

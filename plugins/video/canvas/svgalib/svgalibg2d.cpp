@@ -22,7 +22,7 @@
 #include "video/canvas/svgalib/svga.h"
 #include "csutil/csrect.h"
 #include "cssys/csinput.h"
-#include "isystem.h"
+#include "isys/isystem.h"
 
 static unsigned short ScanCodeToChar[128] =
 {

@@ -23,7 +23,8 @@
 #include "csobject/csobject.h"
 #include "csobject/pobject.h"
 #include "csobject/nobjvec.h"
-#include "imater.h"
+#include "ivideo/imater.h"
+#include "iengine/imater.h"
 
 class csTextureWrapper;
 struct iTextureManager;

@@ -21,11 +21,12 @@
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "spr2dldr.h"
-#include "imeshobj.h"
-#include "iengine.h"
-#include "isystem.h"
-#include "imspr2d.h"
-#include "igraph3d.h"
+#include "imesh/imeshobj.h"
+#include "iengine/imeshobj.h"
+#include "iengine/iengine.h"
+#include "isys/isystem.h"
+#include "imesh/imspr2d.h"
+#include "ivideo/igraph3d.h"
 #include "qint.h"
 
 CS_TOKEN_DEF_START

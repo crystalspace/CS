@@ -21,7 +21,7 @@
 #ifndef __CSSOUNDBUFFERSOFTWARE_H__
 #define __CSSOUNDBUFFERSOFTWARE_H__
 
-#include "isndsrc.h"
+#include "isound/isndsrc.h"
 
 class csSoundRenderSoftware;
 class csSoundHandleSoftware;

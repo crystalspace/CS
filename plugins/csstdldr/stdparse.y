@@ -25,13 +25,13 @@
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 
-#include "iengine.h"
-#include "itxtmgr.h"
-#include "isector.h"
+#include "iengine/iengine.h"
+#include "ivideo/itxtmgr.h"
+#include "iengine/isector.h"
 #include "ipolyset.h"
-#include "ipolygon.h"
-#include "ithing.h"
-#include "iportal.h"
+#include "iengine/ipolygon.h"
+#include "iengine/ithing.h"
+#include "iengine/iportal.h"
 
 /* Define this to debug parser */
 //#define YYDEBUG	1

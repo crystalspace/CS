@@ -21,8 +21,8 @@
 #define __SOFT_TXT_H__
 
 #include "video/renderer/common/txtmgr.h"
-#include "iimage.h"
-#include "igraph2d.h"
+#include "igraphic/iimage.h"
+#include "ivideo/igraph2d.h"
 
 class csGraphics3DSoftwareCommon;
 class csTextureManagerSoftware;

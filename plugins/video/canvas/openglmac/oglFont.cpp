@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include "cssysdef.h"
 #include "video/canvas/common/graph2d.h"
-#include "isystem.h"
+#include "isys/isystem.h"
 #include "oglFont.h"
 
 /** The constructor initializes it member variables and constructs the

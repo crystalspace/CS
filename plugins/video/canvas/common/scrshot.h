@@ -19,8 +19,8 @@
 #ifndef __SCRSHOT_H__
 #define __SCRSHOT_H__
 
-#include "igraph2d.h"
-#include "iimage.h"
+#include "ivideo/igraph2d.h"
+#include "igraphic/iimage.h"
 
 class csScreenShot : public iImage
 {

@@ -19,7 +19,7 @@
 #ifndef _FIRELDR_H_
 #define _FIRELDR_H_
 
-#include "ildrplug.h"
+#include "imap/ildrplug.h"
 
 struct iEngine;
 struct iSystem;

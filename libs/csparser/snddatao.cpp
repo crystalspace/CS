@@ -20,7 +20,7 @@
 
 #include <string.h>
 #include "cssysdef.h"
-#include "isnddata.h"
+#include "isound/isnddata.h"
 #include "csparser/snddatao.h"
 
 IMPLEMENT_CSOBJTYPE (csSoundDataObject,csObject);

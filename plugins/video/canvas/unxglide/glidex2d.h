@@ -23,7 +23,7 @@
 #include "video/canvas/common/graph2d.h"
 #include "video/canvas/glide2common/iglide2d.h"
 #include "video/canvas/glide2common/glide2common2d.h"
-#include "ievent.h"
+#include "isys/ievent.h"
 
 #include <glide.h>
 

@@ -23,8 +23,8 @@
 
 #include "cssysdef.h"
 #include "csutil/scf.h"
-#include "isystem.h"
-#include "isndrdr.h"
+#include "isys/isystem.h"
+#include "isound/isndrdr.h"
 #include "macsdrv.h"
 
 static pascal void SoundDoubleBackProc(

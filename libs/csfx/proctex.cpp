@@ -20,11 +20,11 @@
 #include <math.h>
 #include "cssysdef.h"
 
-#include "igraph2d.h"
-#include "igraph3d.h"
-#include "iimage.h"
-#include "isystem.h"
-#include "itxtmgr.h"
+#include "ivideo/igraph2d.h"
+#include "ivideo/igraph3d.h"
+#include "igraphic/iimage.h"
+#include "isys/isystem.h"
+#include "ivideo/itxtmgr.h"
 
 #include "csgfxldr/memimage.h"
 #include "csengine/texture.h"

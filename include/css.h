@@ -42,12 +42,13 @@
 
 // CS Interfaces
 #ifndef NO_CSINTERFACE
-#include "iimage.h"
-#include "ithing.h"
-#include "itxtmgr.h"
-#include "iview.h"
-#include "itexture.h"
-#include "iengine.h"
+#include "igraphic/iimage.h"
+#include "iengine/ithing.h"
+#include "ivideo/itxtmgr.h"
+#include "iengine/iview.h"
+#include "ivideo/itexture.h"
+#include "iengine/itexture.h"
+#include "iengine/iengine.h"
 #endif
 
 // CS Geom

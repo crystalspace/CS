@@ -22,7 +22,7 @@
 #include "cstypes.h"
 #include "csutil/scf.h"
 #include "csutil/bitset.h"
-#include "ipolygon.h"
+#include "iengine/ipolygon.h"
 
 class csGraphics3DSoftwareCommon;
 class csTextureManagerSoftware;

@@ -23,7 +23,7 @@
 #include "cssysdef.h"
 #include "video/canvas/dosraw/raw.h"
 #include "csutil/csrect.h"
-#include "isystem.h"
+#include "isys/isystem.h"
 
 #include "djvidsys.h"
 

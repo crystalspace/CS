@@ -22,7 +22,7 @@
 
 #include "csgeom/math3d.h"
 #include "csengine/light.h"
-#include "ihalo.h"
+#include "ivideo/ihalo.h"
 
 class csEngine;
 struct iMaterialWrapper;

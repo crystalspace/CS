@@ -20,7 +20,7 @@
 #ifndef __SIMPINP_H__
 #define __SIMPINP_H__
 
-#include "iconinp.h"
+#include "ivaria/iconinp.h"
 #include "csutil/csstrvec.h"
 
 /**

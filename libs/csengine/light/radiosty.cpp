@@ -35,9 +35,10 @@
 #include "csgeom/vector3.h"
 #include "csgeom/frustum.h"
 #include "qsqrt.h"
-#include "iimage.h"
-#include "ilghtmap.h"
-#include "itexture.h"
+#include "igraphic/iimage.h"
+#include "iengine/ilghtmap.h"
+#include "ivideo/itexture.h"
+#include "iengine/itexture.h"
 #include <math.h>
 #include "qint.h"
 

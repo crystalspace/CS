@@ -21,7 +21,7 @@
 #define __NULL_TXT_H__
 
 #include "video/renderer/common/txtmgr.h"
-#include "iimage.h"
+#include "igraphic/iimage.h"
 
 class csTextureManagerNull;
 

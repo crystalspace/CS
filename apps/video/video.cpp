@@ -29,9 +29,9 @@
 #include "csengine/texture.h"
 #include "csengine/thing.h"
 #include "csparser/csloader.h"
-#include "igraph3d.h"
-#include "itxtmgr.h"
-#include "iconsole.h"
+#include "ivideo/igraph3d.h"
+#include "ivideo/itxtmgr.h"
+#include "ivaria/iconsole.h"
 
 //------------------------------------------------- We need the 3D engine -----
 

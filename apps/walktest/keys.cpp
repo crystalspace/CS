@@ -36,7 +36,7 @@
 #include "csutil/scanstr.h"
 #include "csparser/impexp.h"
 #include "csobject/dataobj.h"
-#include "isnddata.h"
+#include "isound/isnddata.h"
 #include "csparser/snddatao.h"
 #include "csparser/csloader.h"
 #include "csparser/crossbld.h"
@@ -44,8 +44,8 @@
 #include "cssys/system.h"
 #include "csfx/cspixmap.h"
 #include "qint.h"
-#include "igraph3d.h"
-#include "igraph2d.h"
+#include "ivideo/igraph3d.h"
+#include "ivideo/igraph2d.h"
 
 extern WalkTest* Sys;
 

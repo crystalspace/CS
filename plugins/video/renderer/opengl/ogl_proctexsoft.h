@@ -19,8 +19,8 @@
 #ifndef _OGL_PROCTEXSOFT_H_
 #define _OGL_PROCTEXSOFT_H_
 
-#include "igraph3d.h"
-#include "igraph2d.h" // for csPixelFormat
+#include "ivideo/igraph3d.h"
+#include "ivideo/igraph2d.h" // for csPixelFormat
 
 class csGraphics3DOGLCommon;
 class csTextureHandleOpenGL;

@@ -18,9 +18,10 @@
 
 #include "cssysdef.h"
 #include "avistrv.h"
-#include "isystem.h"
-#include "itexture.h"
-#include "itxtmgr.h"
+#include "isys/isystem.h"
+#include "ivideo/itexture.h"
+#include "iengine/itexture.h"
+#include "ivideo/itxtmgr.h"
 
 IMPLEMENT_IBASE (csAVIStreamVideo)
   IMPLEMENTS_INTERFACE (iVideoStream)

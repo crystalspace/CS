@@ -19,7 +19,7 @@
 #ifndef _SNOWLDR_H_
 #define _SNOWLDR_H_
 
-#include "ildrplug.h"
+#include "imap/ildrplug.h"
 
 struct iEngine;
 struct iSystem;

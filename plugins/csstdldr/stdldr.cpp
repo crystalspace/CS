@@ -30,12 +30,12 @@
 #include "csutil/csvector.h"
 #include "csutil/util.h"
 
-#include "itxtmgr.h"
-#include "isystem.h"
-#include "iengine.h"
-#include "ivfs.h"
-#include "ipolygon.h"
-#include "iportal.h"
+#include "ivideo/itxtmgr.h"
+#include "isys/isystem.h"
+#include "iengine/iengine.h"
+#include "isys/ivfs.h"
+#include "iengine/ipolygon.h"
+#include "iengine/iportal.h"
 
 // This character, if encountered, is considered to start either a keyword
 // or a non-quoted string. Having too much symbols here can hurt since these

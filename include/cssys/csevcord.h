@@ -21,7 +21,7 @@
 #define __CS_EVCORD__
 
 #include "csutil/scf.h"
-#include "ievent.h"
+#include "isys/ievent.h"
 
 struct iPlugIn;
 

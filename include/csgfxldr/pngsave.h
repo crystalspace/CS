@@ -20,7 +20,7 @@
 #ifndef __PNGSAVE_H__
 #define __PNGSAVE_H__
 
-#include "iimage.h"
+#include "igraphic/iimage.h"
 
 /**
  * This function will save an iImage into a .PNG format file.

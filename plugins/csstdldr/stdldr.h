@@ -20,7 +20,7 @@
 #ifndef __CS_STDLDR_H__
 #define __CS_STDLDR_H__
 
-#include "iloader.h"
+#include "imap/iloader.h"
 #include "csgeom/math3d.h"
 #include "csgeom/transfrm.h"
 #include "csutil/csstrvec.h"

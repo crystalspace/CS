@@ -23,11 +23,12 @@
 #include "d3d_txtmgr.h"
 #include "d3d_g3d.h"
 #include "csutil/scanstr.h"
-#include "itexture.h"
-#include "ipolygon.h"
-#include "ilghtmap.h"
-#include "iimage.h"
-#include "isystem.h"
+#include "ivideo/itexture.h"
+#include "iengine/itexture.h"
+#include "iengine/ipolygon.h"
+#include "iengine/ilghtmap.h"
+#include "igraphic/iimage.h"
+#include "isys/isystem.h"
 
 //---------------------------------------------------------------------------
 

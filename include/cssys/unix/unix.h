@@ -22,7 +22,7 @@
 #include "csutil/scf.h"
 #include "cssys/csinput.h"
 #include "cssys/system.h"
-#include "igraph2d.h"
+#include "ivideo/igraph2d.h"
 
 /// Unix version.
 class SysSystemDriver : public csSystemDriver

@@ -21,7 +21,7 @@
 #include "belibg2d.h"
 #include "CrystWindow.h"
 #include "csutil/csrect.h"
-#include "isystem.h"
+#include "isys/isystem.h"
 #include <Screen.h>
 
 IMPLEMENT_FACTORY (csGraphics2DBeLib)

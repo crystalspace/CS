@@ -36,9 +36,10 @@
 #include "csgeom/matrix2.h"
 #include "qint.h"
 #include "qsqrt.h"
-#include "igraph3d.h"
-#include "itexture.h"
-#include "itxtmgr.h"
+#include "ivideo/igraph3d.h"
+#include "ivideo/itexture.h"
+#include "iengine/itexture.h"
+#include "ivideo/itxtmgr.h"
 
 bool csPolygon3D::do_cache_lightmaps = true;
 

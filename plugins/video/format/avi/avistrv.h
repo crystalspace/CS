@@ -19,12 +19,13 @@
 #ifndef _AVI_VIDEOSTREAM_H_
 #define _AVI_VIDEOSTREAM_H_
 
-#include "ividecod.h"
+#include "ivideo/ividecod.h"
 #include "csavi.h"
 #include "csutil/csrect.h"
-#include "imater.h"
-#include "igraph3d.h"
-#include "igraph2d.h"
+#include "ivideo/imater.h"
+#include "iengine/imater.h"
+#include "ivideo/igraph3d.h"
+#include "ivideo/igraph2d.h"
 #include "csgfxldr/memimage.h"
 
 class csAVIStreamVideo : public iVideoStream

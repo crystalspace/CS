@@ -21,8 +21,8 @@
 #include "protex2d.h"
 #include "csutil/scf.h"
 #include "csutil/csrect.h"
-#include "isystem.h"
-#include "ievent.h"
+#include "isys/isystem.h"
+#include "isys/ievent.h"
 
 IMPLEMENT_IBASE (csProcTextureSoft2D)
   IMPLEMENTS_INTERFACE (iPlugIn)

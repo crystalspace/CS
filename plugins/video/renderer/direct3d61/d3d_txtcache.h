@@ -25,7 +25,7 @@
 #include <d3dcaps.h>
 
 #include "d3d_g3d.h"
-#include "igraph3d.h"
+#include "ivideo/igraph3d.h"
 
 struct iTextureHandle;
 struct iPolygonTexture;

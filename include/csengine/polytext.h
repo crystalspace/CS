@@ -21,7 +21,7 @@
 
 #include "csgeom/math3d.h"
 #include "csengine/rview.h"
-#include "ipolygon.h"
+#include "iengine/ipolygon.h"
 
 class csPolygon3D;
 class Textures;

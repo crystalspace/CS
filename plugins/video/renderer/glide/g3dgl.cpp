@@ -33,12 +33,13 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-#include "isystem.h"
-#include "itexture.h"
-#include "itxtmgr.h"
-#include "ilghtmap.h"
-#include "igraph2d.h"
-#include "icfgfile.h"
+#include "isys/isystem.h"
+#include "ivideo/itexture.h"
+#include "iengine/itexture.h"
+#include "ivideo/itxtmgr.h"
+#include "iengine/ilghtmap.h"
+#include "ivideo/igraph2d.h"
+#include "iutil/icfgfile.h"
 
 #include "csgeom/plane3.h"
 #include "csutil/scanstr.h"

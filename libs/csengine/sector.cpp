@@ -43,14 +43,15 @@
 #include "csengine/cbufcube.h"
 #include "csengine/bsp.h"
 #include "csengine/octree.h"
-#include "igraph3d.h"
-#include "igraph2d.h"
-#include "itxtmgr.h"
-#include "itexture.h"
-#include "ivfs.h"
-#include "istlight.h"
-#include "iviscull.h"
-#include "irview.h"
+#include "ivideo/igraph3d.h"
+#include "ivideo/igraph2d.h"
+#include "ivideo/itxtmgr.h"
+#include "ivideo/itexture.h"
+#include "iengine/itexture.h"
+#include "isys/ivfs.h"
+#include "iengine/istlight.h"
+#include "iengine/iviscull.h"
+#include "iengine/irview.h"
 
 // Option variable: render portals?
 bool csSector::do_portals = true;
@@ -588,7 +589,6 @@ csPolygon3D* csSector::IntersectSphere (csVector3& center, float radius,
   float d, min_d = radius;
   int i;
   csPolygon3D* p, * min_p = NULL;
-  csVector3 hit;
   csVector3 obj_center;
   csReversibleTransform movtrans;
 
@@ -1125,7 +1125,6 @@ void* CheckFrustumPolygonsFB (csThing* thing,
 	        csThing* th = ith->GetPrivateObject ();
 		if ((th->flags.Get () & lview->shadow_thing_mask) == lview->shadow_thing_value)
 		{
-		  csSector* sector = thing->GetMovable ().GetSector (0);
 	          shadows = th->GetShadows (center);
 	          lview->shadows->AppendShadowBlock (shadows);
 		}

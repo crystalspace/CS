@@ -25,11 +25,11 @@
 #include "csutil/cfgacc.h"
 #include "csgeom/transfrm.h"
 #include "null_txt.h"
-#include "iconfig.h"
-#include "igraph2d.h"
-#include "igraph3d.h"
-#include "ihalo.h"
-#include "iplugin.h"
+#include "iutil/iconfig.h"
+#include "ivideo/igraph2d.h"
+#include "ivideo/igraph3d.h"
+#include "ivideo/ihalo.h"
+#include "isys/iplugin.h"
 
 class csClipper;
 class csReversibleTransform;

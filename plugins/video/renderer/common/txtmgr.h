@@ -20,11 +20,13 @@
 #define __TXTMGR_H__
 
 #include "csutil/csvector.h"
-#include "itxtmgr.h"
-#include "imater.h"
-#include "itexture.h"
-#include "igraph3d.h"
-#include "igraph2d.h"
+#include "ivideo/itxtmgr.h"
+#include "ivideo/imater.h"
+#include "iengine/imater.h"
+#include "ivideo/itexture.h"
+#include "iengine/itexture.h"
+#include "ivideo/igraph3d.h"
+#include "ivideo/igraph2d.h"
 #include "csgfxldr/rgbpixel.h"
 
 class csTexture;

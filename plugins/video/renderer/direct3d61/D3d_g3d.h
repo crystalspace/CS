@@ -42,10 +42,10 @@
 #include "csutil/cfgacc.h"
 #include "csgeom/transfrm.h"
 #include "cssys/win32/IDDetect.h"
-#include "igraph3d.h"
-#include "ihalo.h"
-#include "iplugin.h"
-#include "ipolygon.h"
+#include "ivideo/igraph3d.h"
+#include "ivideo/ihalo.h"
+#include "isys/iplugin.h"
+#include "iengine/ipolygon.h"
 
 //DIRECT3D DRIVER HRESULTS/////////////////////////////
 

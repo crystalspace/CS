@@ -23,7 +23,7 @@
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
 #include "cssys/unix/unix.h"
-#include "ievent.h"
+#include "isys/ievent.h"
 
 #include <SDL.h>
 #include <SDL_mutex.h>

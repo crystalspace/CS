@@ -28,9 +28,9 @@
 #include "csutil/rng.h"
 #include "qint.h"
 
-#include "ivfs.h"
-#include "igraph2d.h"
-#include "ifontsrv.h"
+#include "isys/ivfs.h"
+#include "ivideo/igraph2d.h"
+#include "ivideo/ifontsrv.h"
 
 #define APP_TITLE	"Graphics canvas plugin test"
 

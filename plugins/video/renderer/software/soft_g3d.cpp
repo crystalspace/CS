@@ -22,9 +22,9 @@
 #include "cssysdef.h"
 #include "soft_g3d.h"
 #include "protex3d.h"
-#include "isystem.h"
-#include "igraph2d.h"
-#include "icfgfile.h"
+#include "isys/isystem.h"
+#include "ivideo/igraph2d.h"
+#include "iutil/icfgfile.h"
 
 IMPLEMENT_FACTORY (csGraphics3DSoftware)
 IMPLEMENT_FACTORY (csSoftProcTexture3D)

@@ -354,7 +354,7 @@ char *SWIG_GetPtr(char *_c, void **ptr, char *_t)
     return SCF_CONSTRUCT_VERSION(version0, version1, version2);
   }
 
-#include "isystem.h"
+#include "isys/isystem.h"
 #include "csparser/csloader.h"
 #include "plugins/cscript/cspython/cspython.h"
 iSystem* GetSystem()

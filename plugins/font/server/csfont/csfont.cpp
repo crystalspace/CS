@@ -20,8 +20,8 @@
 
 #include "cssysdef.h"
 #include "csfont.h"
-#include "ivfs.h"
-#include "isystem.h"
+#include "isys/ivfs.h"
+#include "isys/isystem.h"
 #include "csutil/util.h"
 #include "csutil/csvector.h"
 

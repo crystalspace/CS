@@ -23,9 +23,9 @@
 #include "apps/perftest/ptests3d.h"
 #include "apps/perftest/ptests2d.h"
 #include "csgfxldr/csimage.h"
-#include "igraph3d.h"
-#include "itxtmgr.h"
-#include "iconsole.h"
+#include "ivideo/igraph3d.h"
+#include "ivideo/itxtmgr.h"
+#include "ivaria/iconsole.h"
 
 //-----------------------------------------------------------------------------
 

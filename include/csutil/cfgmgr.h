@@ -19,7 +19,7 @@
 #ifndef __CFGMGR_H__
 #define __CFGMGR_H__
 
-#include "icfgmgr.h"
+#include "iutil/icfgmgr.h"
 #include "csutil/csvector.h"
 
 class csConfigManager : public iConfigManager

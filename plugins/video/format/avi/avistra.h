@@ -19,7 +19,7 @@
 #ifndef _AVI_AUDIOSTREAM_H_
 #define _AVI_AUDIOSTREAM_H_
 
-#include "ividecod.h"
+#include "ivideo/ividecod.h"
 #include "csavi.h"
 
 class csAVIStreamAudio : public iAudioStream

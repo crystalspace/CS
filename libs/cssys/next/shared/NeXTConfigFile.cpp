@@ -17,7 +17,7 @@
 //
 //-----------------------------------------------------------------------------
 #include "cssysdef.h"
-#include "icfgfile.h"
+#include "iutil/icfgfile.h"
 #include "NeXTConfigFile.h"
 
 #define NCF_PROTO(RET,FUNC) RET NeXTConfigFile_##FUNC

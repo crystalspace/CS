@@ -35,7 +35,7 @@
     return SCF_CONSTRUCT_VERSION(version0, version1, version2);
   }
 
-#include "isystem.h"
+#include "isys/isystem.h"
 #include "csparser/csloader.h"
 iSystem* GetSystem() {
 	return NULL;

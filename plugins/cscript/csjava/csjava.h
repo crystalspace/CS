@@ -20,8 +20,8 @@
 #ifndef __CSJAVA_H__
 #define __CSJAVA_H__
 
-#include "iscript.h"
-#include "isystem.h"
+#include "ivaria/iscript.h"
+#include "isys/isystem.h"
 #include "cssys/csinput.h"
 #include "csutil/csvector.h"
 

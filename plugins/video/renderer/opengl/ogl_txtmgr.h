@@ -22,8 +22,9 @@
 #include "csutil/scf.h"
 #include "video/renderer/common/txtmgr.h"
 #include "ogl_proctexsoft.h"
-#include "itexture.h"
-#include "iimage.h"
+#include "ivideo/itexture.h"
+#include "iengine/itexture.h"
+#include "igraphic/iimage.h"
 
 class csGraphics3DOGLCommon;
 class csTextureManagerOpenGL;

@@ -29,12 +29,12 @@
 #include "scan.h"
 #include "tcache.h"
 #include "soft_txt.h"
-#include "ipolygon.h"
-#include "isystem.h"
-#include "igraph2d.h"
-#include "ilghtmap.h"
+#include "iengine/ipolygon.h"
+#include "isys/isystem.h"
+#include "ivideo/igraph2d.h"
+#include "iengine/ilghtmap.h"
 #include "sft3dcom.h"
-#include "icfgfile.h"
+#include "iutil/icfgfile.h"
 
 #if defined (DO_MMX)
 #  include "video/renderer/software/i386/cpuid.h"

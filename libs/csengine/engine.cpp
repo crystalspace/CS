@@ -55,13 +55,13 @@
 #include "csgfxldr/csimage.h"
 #include "csutil/util.h"
 #include "csutil/cfgacc.h"
-#include "iimage.h"
-#include "ivfs.h"
-#include "ihalo.h"
-#include "itxtmgr.h"
-#include "igraph3d.h"
-#include "ievent.h"
-#include "icfgmgr.h"
+#include "igraphic/iimage.h"
+#include "isys/ivfs.h"
+#include "ivideo/ihalo.h"
+#include "ivideo/itxtmgr.h"
+#include "ivideo/igraph3d.h"
+#include "isys/ievent.h"
+#include "iutil/icfgmgr.h"
 
 //---------------------------------------------------------------------------
 
@@ -690,7 +690,7 @@ bool csEngine::Initialize (iSystem* sys)
     return false;
   
   csConfigAccess cfg(System, "/config/engine.cfg");
-  ReadConfig ();
+  ReadConfig (cfg);
 
   return true;
 }
@@ -1486,10 +1486,8 @@ void csEngine::NextFrame (cs_time current_time)
   }
 }
 
-void csEngine::ReadConfig ()
+void csEngine::ReadConfig (iConfigFile* Config)
 {
-  if (!System) return;
-  iConfigFile *Config = System->GetConfig ();
   csLightMap::SetLightCellSize (Config->GetInt ("Engine.Lighting.LightmapSize", 16));
 
   csLight::ambient_red = Config->GetInt ("Engine.Lighting.Ambient.Red", DEFAULT_LIGHT_LEVEL);

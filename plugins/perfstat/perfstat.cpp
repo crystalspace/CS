@@ -22,13 +22,13 @@
 #include "version.h"
 #include "csutil/scf.h"
 #include "perfstat.h"
-#include "isystem.h"
-#include "igraph3d.h"
-#include "igraph2d.h"
-#include "ivfs.h"
-#include "ievent.h"
+#include "isys/isystem.h"
+#include "ivideo/igraph3d.h"
+#include "ivideo/igraph2d.h"
+#include "isys/ivfs.h"
+#include "isys/ievent.h"
 
-#include "iengine.h"
+#include "iengine/iengine.h"
 
 IMPLEMENT_FACTORY (csPerfStats)
 

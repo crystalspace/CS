@@ -20,8 +20,9 @@
 #include "cssysdef.h"
 #include "csws/cswstex.h"
 #include "csutil/util.h"
-#include "itexture.h"
-#include "itxtmgr.h"
+#include "ivideo/itexture.h"
+#include "iengine/itexture.h"
+#include "ivideo/itxtmgr.h"
 
 //--//--//--//--//--//--//--//--//--//--//--//-- Windowing system texture --//--
 

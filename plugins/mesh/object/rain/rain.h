@@ -23,7 +23,7 @@
 #include "csgeom/box.h"
 #include "csutil/cscolor.h"
 #include "plugins/mesh/object/partgen/partgen.h"
-#include "imrain.h"
+#include "imesh/imrain.h"
 
 struct iMaterialWrapper;
 

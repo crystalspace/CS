@@ -26,7 +26,7 @@
 #include "csutil/scf.h"
 #include "video/canvas/openglmac/oglg2d.h"
 #include "cssys/mac/MacRSRCS.h"
-#include "isystem.h"
+#include "isys/isystem.h"
 
 #if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
 #define GetWindowPort(n) ( (CGrafPtr)(n) )

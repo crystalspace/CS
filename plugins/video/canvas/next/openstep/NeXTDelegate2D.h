@@ -21,7 +21,7 @@
 //	OpenStep, and NextStep.
 //
 //-----------------------------------------------------------------------------
-#include "icursor.h"
+#include "ivideo/icursor.h"
 
 #if !defined(__cplusplus)
 

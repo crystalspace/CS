@@ -22,8 +22,8 @@
 #include "video/renderer/glide/gllib.h"
 #include "glidedsp.h"
 #include "video/canvas/openglx/iogldisp.h"
-#include "iplugin.h"
-#include "isystem.h"
+#include "isys/iplugin.h"
+#include "isys/isystem.h"
 
 IMPLEMENT_FACTORY(csOpenGLGlideDisp)
 

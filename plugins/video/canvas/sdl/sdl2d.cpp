@@ -25,7 +25,7 @@
 #include "cssys/unix/unix.h"
 #include "csutil/csrect.h"
 #include "cssys/csinput.h"
-#include "isystem.h"
+#include "isys/isystem.h"
 
 #include <SDL.h>
 #include <SDL_mutex.h>

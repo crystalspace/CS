@@ -22,11 +22,12 @@
 #include "csutil/scanstr.h"
 #include "csutil/cscolor.h"
 #include "ballldr.h"
-#include "imeshobj.h"
-#include "iengine.h"
-#include "isystem.h"
-#include "imball.h"
-#include "igraph3d.h"
+#include "imesh/imeshobj.h"
+#include "iengine/imeshobj.h"
+#include "iengine/iengine.h"
+#include "isys/isystem.h"
+#include "imesh/imball.h"
+#include "ivideo/igraph3d.h"
 #include "qint.h"
 
 CS_TOKEN_DEF_START

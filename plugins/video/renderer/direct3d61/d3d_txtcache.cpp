@@ -24,8 +24,9 @@
 #include "d3dcaps.h"
 
 #include "d3d_g3d.h"
-#include "itexture.h"
-#include "ilghtmap.h"
+#include "ivideo/itexture.h"
+#include "iengine/itexture.h"
+#include "iengine/ilghtmap.h"
 #include "IGraph3d.h"
 #include "csutil/util.h"
 

@@ -19,9 +19,9 @@
 */
 
 #include "cssysdef.h"
-#include "isystem.h"
-#include "isndlstn.h"
-#include "isnddata.h"
+#include "isys/isystem.h"
+#include "isound/isndlstn.h"
+#include "isound/isnddata.h"
 #include "srdrsrc.h"
 #include "srdrcom.h"
 

@@ -22,11 +22,11 @@
 #include <stdio.h>
 
 #include "cssysdef.h"
-#include "isystem.h"
-#include "icfgfile.h"
-#include "isnddrv.h"
-#include "isnddata.h"
-#include "ievent.h"
+#include "isys/isystem.h"
+#include "iutil/icfgfile.h"
+#include "isound/isnddrv.h"
+#include "isound/isnddata.h"
+#include "isys/ievent.h"
 
 #include "srdrcom.h"
 #include "srdrlst.h"

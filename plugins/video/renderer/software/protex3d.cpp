@@ -18,13 +18,14 @@
 
 #include "cssysdef.h"
 #include "protex3d.h"
-#include "isystem.h"
-#include "igraph2d.h"
+#include "isys/isystem.h"
+#include "ivideo/igraph2d.h"
 #include "soft_txt.h"
 #include "tcache.h"
 #include "csgfxldr/memimage.h"
 #include "csgfxldr/rgbpixel.h"
-#include "itexture.h"
+#include "ivideo/itexture.h"
+#include "iengine/itexture.h"
 
 DECLARE_FACTORY (csSoftProcTexture3D)
 

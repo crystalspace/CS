@@ -23,10 +23,10 @@
 #include "csws/csgfxppl.h"
 #include "csws/csmouse.h"
 #include "csutil/util.h"
-#include "isystem.h"
-#include "igraph2d.h"
-#include "igraph3d.h"
-#include "ifontsrv.h"
+#include "isys/isystem.h"
+#include "ivideo/igraph2d.h"
+#include "ivideo/igraph3d.h"
+#include "ivideo/ifontsrv.h"
 
 #define INCLUDE_MIN_POINT(x, y)						\
 {									\

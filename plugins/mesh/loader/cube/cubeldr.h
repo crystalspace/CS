@@ -19,7 +19,7 @@
 #ifndef _CUBELDR_H_
 #define _CUBELDR_H_
 
-#include "ildrplug.h"
+#include "imap/ildrplug.h"
 
 struct iEngine;
 struct iSystem;

@@ -21,7 +21,7 @@
 #ifndef __CSSOUNDLISTENERSOFTWARE_H__
 #define __CSSOUNDLISTENERSOFTWARE_H__
 
-#include "isndlstn.h"
+#include "isound/isndlstn.h"
 
 class csSoundListenerSoftware : public iSoundListener
 {

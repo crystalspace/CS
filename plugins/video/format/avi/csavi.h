@@ -19,8 +19,8 @@
 #ifndef _CSAVI_H_
 #define _CSAVI_H_
 
-#include "ividecod.h"
-#include "ivfs.h"
+#include "ivideo/ividecod.h"
+#include "isys/ivfs.h"
 #include "csutil/csvector.h"
 #include "cssys/csendian.h"
 

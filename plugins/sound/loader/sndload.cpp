@@ -18,10 +18,10 @@
 
 #include "cssysdef.h"
 #include "csutil/csvector.h"
-#include "isndldr.h"
-#include "isystem.h"
-#include "ivfs.h"
-#include "isnddata.h"
+#include "isound/isndldr.h"
+#include "isys/isystem.h"
+#include "isys/ivfs.h"
+#include "isound/isnddata.h"
 
 #include "sndload.h"
 

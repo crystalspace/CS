@@ -22,7 +22,7 @@
 
 #include "csutil/scf.h"
 #include "oglg2d.h"
-#include "isystem.h"
+#include "isys/isystem.h"
 
 #ifndef CDS_UPDATEREGISTRY
 #  define CDS_UPDATEREGISTRY  0x00000001

@@ -50,19 +50,19 @@
 #include "cssys/csendian.h"
 #include "csfx/cspixmap.h"
 #include "qint.h"
-#include "isnddata.h"
-#include "isndsrc.h"
-#include "isndlstn.h"
-#include "isndsrc.h"
-#include "isndrdr.h"
-#include "iskel.h"
-#include "iskelbon.h"
-#include "igraph3d.h"
-#include "igraph2d.h"
-#include "ivfs.h"
-#include "imotion.h"
-#include "iperstat.h"
-#include "imspr3d.h"
+#include "isound/isnddata.h"
+#include "isound/isndsrc.h"
+#include "isound/isndlstn.h"
+#include "isound/isndsrc.h"
+#include "isound/isndrdr.h"
+#include "imesh/iskel.h"
+#include "iengine/iskelbon.h"
+#include "ivideo/igraph3d.h"
+#include "ivideo/igraph2d.h"
+#include "isys/ivfs.h"
+#include "iengine/imotion.h"
+#include "ivaria/iperstat.h"
+#include "imesh/imspr3d.h"
 
 extern WalkTest* Sys;
 
@@ -969,8 +969,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     csThing* stat = room->GetStaticThing ();
     if (stat)
     {
-      csPolygonTree* tree = stat->GetStaticTree ();
-      csOctree* otree = (csOctree*)tree;
+      //csPolygonTree* tree = stat->GetStaticTree ();
+      //csOctree* otree = (csOctree*)tree;
       //bool vis1 = otree->BoxCanSeeBox (Sys->debug_box1, Sys->debug_box2);
       //bool vis2 = otree->BoxCanSeeBox (Sys->debug_box2, Sys->debug_box1);
       //CsPrintf (MSG_CONSOLE, "Box1->box2:%d box2->box1:%d\n", vis1, vis2);
@@ -1206,13 +1206,15 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       csOctree* octree = (csOctree*)(c->GetSector ()->GetStaticThing ()->GetStaticTree ());
       Dumper::dump_stubs (octree);
+#if 0
       csNamedObjVector& meshes = Sys->view->GetEngine ()->meshes;
       int i;
       for (i = 0 ; i < meshes.Length () ; i++)
       {
         csMeshWrapper* spr = (csMeshWrapper*)meshes[i];
-	//@@@@Dumper::dump_stubs (spr->GetPolyTreeObject ());
+	@@@@Dumper::dump_stubs (spr->GetPolyTreeObject ());
       }
+#endif
     }
     //Sys->Printf (MSG_CONSOLE, "No debug0 implementation in this version.\n");
   }

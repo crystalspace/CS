@@ -28,10 +28,10 @@
 #include "csutil/csrect.h"
 #include "csutil/cfgacc.h"
 #include "cssys/csevent.h"
-#include "igraph2d.h"
-#include "itxtmgr.h"
-#include "isystem.h"
-#include "icfgmgr.h"
+#include "ivideo/igraph2d.h"
+#include "ivideo/itxtmgr.h"
+#include "isys/isystem.h"
+#include "iutil/icfgmgr.h"
 
 #define SIZE_LINE	256
 

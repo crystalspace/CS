@@ -19,7 +19,7 @@
 #ifndef _SPR2DLDR_H_
 #define _SPR2DLDR_H_
 
-#include "ildrplug.h"
+#include "imap/ildrplug.h"
 
 struct iEngine;
 struct iSystem;

@@ -17,8 +17,9 @@
 */
 
 #include "cssysdef.h"
-#include "igraph3d.h"
-#include "itexture.h"
+#include "ivideo/igraph3d.h"
+#include "ivideo/itexture.h"
+#include "iengine/itexture.h"
 #include "csutil/garray.h"
 #include "csgeom/math3d.h"
 #include "csgeom/transfrm.h"

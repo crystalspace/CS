@@ -19,7 +19,7 @@
 #ifndef __CS_CSCON_H__
 #define __CS_CSCON_H__
 
-#include "iconsole.h"
+#include "ivaria/iconsole.h"
 #include "csutil/scf.h"
 #include "csutil/csrect.h"
 #include "csgfxldr/rgbpixel.h"

@@ -22,7 +22,7 @@
 
 #include "csutil/csbase.h"
 #include "cstypes.h"
-#include "isystem.h"
+#include "isys/isystem.h"
 
 /**
  * The csProgressPulse class provides a simple twirling textual cursor built

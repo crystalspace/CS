@@ -17,10 +17,10 @@
 */
 
 #include "cssysdef.h"
-#include "itxtmgr.h"
+#include "ivideo/itxtmgr.h"
 #include "cssys/system.h"
-#include "igraph2d.h"
-#include "igraph3d.h"
+#include "ivideo/igraph2d.h"
+#include "ivideo/igraph3d.h"
 #include "csutil/cscolor.h"
 #include "csutil/util.h"
 

@@ -21,7 +21,8 @@
 
 #include "csutil/scf.h"
 #include "video/renderer/common/txtmgr.h"
-#include "itexture.h"
+#include "ivideo/itexture.h"
+#include "iengine/itexture.h"
 
 class csGraphics3DDirect3DDx6;
 class csTextureDirect3D;

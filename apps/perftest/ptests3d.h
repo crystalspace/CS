@@ -21,7 +21,7 @@
 #define __PTESTS3D_H__
 
 #include <stdarg.h>
-#include "igraph3d.h"
+#include "ivideo/igraph3d.h"
 #include "apps/perftest/perftest.h"
 
 // Number of horizontal and vertical polygons for every multi-polygon test.

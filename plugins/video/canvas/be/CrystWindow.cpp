@@ -20,9 +20,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "cssysdef.h"
-#include "ievent.h"
-#include "igraph2d.h"
-#include "isystem.h"
+#include "isys/ievent.h"
+#include "ivideo/igraph2d.h"
+#include "isys/isystem.h"
 #include "CrystWindow.h"
 
 CrystView::CrystView(BRect frame, iSystem* isys, BBitmap* ibmap) :

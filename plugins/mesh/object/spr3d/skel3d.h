@@ -24,8 +24,8 @@
 #include "csgeom/box.h"
 #include "csgeom/transfrm.h"
 #include "plugins/mesh/object/spr3d/spr3d.h"
-#include "iskel.h"
-#include "iskelbon.h"
+#include "imesh/iskel.h"
+#include "iengine/iskelbon.h"
 
 class csSkelLimbState;
 class csPoly3D;

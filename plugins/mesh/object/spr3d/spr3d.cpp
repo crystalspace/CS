@@ -21,14 +21,13 @@
 #include "csgeom/polyclip.h"
 #include "csutil/garray.h"
 #include "csutil/rng.h"
-#include "igraph3d.h"
-#include "isystem.h"
-#include "icamera.h"
-#include "irview.h"
-#include "imovable.h"
-#include "ilight.h"
+#include "ivideo/igraph3d.h"
+#include "isys/isystem.h"
+#include "iengine/icamera.h"
+#include "iengine/irview.h"
+#include "iengine/imovable.h"
+#include "iengine/ilight.h"
 #include "qsqrt.h"
-#include "lightdef.h"
 
 // Set the default lighting quality.
 // See header file for CS_SPR_LIGHTING_* definitions.

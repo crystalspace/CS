@@ -18,9 +18,11 @@
 */
 
 #include "cssysdef.h"
-#include "igraph3d.h"
-#include "itexture.h"
-#include "imater.h"
+#include "ivideo/igraph3d.h"
+#include "ivideo/itexture.h"
+#include "iengine/itexture.h"
+#include "ivideo/imater.h"
+#include "iengine/imater.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "apps/perftest/ptests3d.h"

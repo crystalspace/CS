@@ -20,7 +20,8 @@
 #ifndef __CSMOUSE_H__
 #define __CSMOUSE_H__
 
-#include "itexture.h"
+#include "ivideo/itexture.h"
+#include "iengine/itexture.h"
 #include "csutil/csvector.h"
 #include "csws/csgfxppl.h"
 

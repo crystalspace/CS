@@ -21,7 +21,7 @@
 #ifndef __CSFONT_H__
 #define __CSFONT_H__
 
-#include "ifontsrv.h"
+#include "ivideo/ifontsrv.h"
 #include "csutil/csvector.h"
 
 struct iSystem;

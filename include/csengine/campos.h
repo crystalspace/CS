@@ -24,7 +24,7 @@
 #include "csobject/nobjvec.h"
 #include "csgeom/vector3.h"
 #include "csengine/camera.h"
-#include "icampos.h"
+#include "iengine/icampos.h"
 
 class csEngine;
 

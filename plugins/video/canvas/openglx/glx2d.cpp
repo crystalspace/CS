@@ -25,9 +25,10 @@
 #include "cssys/csinput.h"
 #include "csutil/csrect.h"
 #include "csutil/cfgacc.h"
-#include "isystem.h"
-#include "itexture.h"
-#include "icfgfile.h"
+#include "isys/isystem.h"
+#include "ivideo/itexture.h"
+#include "iengine/itexture.h"
+#include "iutil/icfgfile.h"
 
 IMPLEMENT_FACTORY (csGraphics2DGLX)
 

@@ -26,8 +26,8 @@
 
 #include "csutil/scf.h"
 #include "csutil/cfgacc.h"
-#include "isnddrv.h"
-#include "isystem.h"
+#include "isound/isnddrv.h"
+#include "isys/isystem.h"
 
 class csSoundDriverWaveOut : public iSoundDriver
 {

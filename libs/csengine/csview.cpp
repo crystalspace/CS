@@ -23,8 +23,8 @@
 #include "csengine/engine.h"
 #include "csengine/pol2d.h"
 #include "csengine/camera.h"
-#include "igraph3d.h"
-#include "isector.h"
+#include "ivideo/igraph3d.h"
+#include "iengine/isector.h"
 #include "qint.h"
 
 IMPLEMENT_IBASE (csView)

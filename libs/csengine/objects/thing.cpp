@@ -37,11 +37,12 @@
 #include "csengine/meshobj.h"
 #include "csengine/quadtr3d.h"
 #include "csutil/csstring.h"
-#include "igraph3d.h"
-#include "itxtmgr.h"
-#include "itexture.h"
-#include "ivfs.h"
-#include "irview.h"
+#include "ivideo/igraph3d.h"
+#include "ivideo/itxtmgr.h"
+#include "ivideo/itexture.h"
+#include "iengine/itexture.h"
+#include "isys/ivfs.h"
+#include "iengine/irview.h"
 #include "qint.h"
 
 long csThing::current_light_frame_number = 0;
@@ -406,7 +407,7 @@ void csThing::CompressVertices ()
   // of the vector.
   csVector3* new_obj = new csVector3 [count_unique];
   new_obj[0] = obj_verts[vt[0].orig_idx];
-  csVector3* new_wor;
+  csVector3* new_wor = 0;
   if (cfg_moving == CS_THING_MOVE_OCCASIONAL)
   {
     new_wor = new csVector3 [count_unique];
@@ -1751,7 +1752,6 @@ bool csThing::DrawFoggy (iRenderView* d, iMovable* movable)
   draw_busy++;
   iCamera* icam = d->GetCamera ();
   const csReversibleTransform& camtrans = icam->GetTransform ();
-  csReversibleTransform movtrans = movable->GetFullTransform ();
   UpdateTransformation (camtrans, icam->GetCameraNumber ());
   csPolygon3D* p;
   csVector3* verts;

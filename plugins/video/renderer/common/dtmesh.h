@@ -19,7 +19,7 @@
 #ifndef __CS_DTMESH_H__
 #define __CS_DTMESH_H__
 
-#include "igraph3d.h"
+#include "ivideo/igraph3d.h"
 class csClipper;
 
 void DefaultDrawTriangleMesh (

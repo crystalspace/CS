@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include "csgfxldr/rgbpixel.h"
 #include "cstypes.h"
-#include "iimage.h"
+#include "igraphic/iimage.h"
 
 /**
  * An abstract class representing an abstract image. For every image

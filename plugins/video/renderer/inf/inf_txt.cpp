@@ -23,8 +23,8 @@
 #include "inf_txt.h"
 #include "csgfxldr/quantize.h"
 #include "csutil/scanstr.h"
-#include "isystem.h"
-#include "iimage.h"
+#include "isys/isystem.h"
+#include "igraphic/iimage.h"
 
 #define SysPrintf System->Printf
 

@@ -20,7 +20,7 @@
 
 #include "cssysdef.h"
 #include "csutil/scf.h"
-#include "isystem.h"
+#include "isys/isystem.h"
 
 #include "dsound.h"
 #include "eax.h"

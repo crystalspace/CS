@@ -21,8 +21,8 @@
 #include "csengine/solidbsp.h"
 #include "csengine/pol2d.h"
 #include "csengine/engine.h"
-#include "igraph2d.h"
-#include "itxtmgr.h"
+#include "ivideo/igraph2d.h"
+#include "ivideo/itxtmgr.h"
 
 //---------------------------------------------------------------------------
 

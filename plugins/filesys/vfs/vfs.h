@@ -22,8 +22,8 @@
 
 #include "csutil/cfgfile.h"
 #include "csutil/csstrvec.h"
-#include "ivfs.h"
-#include "iplugin.h"
+#include "isys/ivfs.h"
+#include "isys/iplugin.h"
 
 class VfsNode;
 struct iConfigFile;

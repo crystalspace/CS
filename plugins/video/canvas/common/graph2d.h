@@ -21,8 +21,8 @@
 #define __GRAPH2D_H__
 
 #include "csutil/scf.h"
-#include "igraph2d.h"
-#include "ifontsrv.h"
+#include "ivideo/igraph2d.h"
+#include "ivideo/ifontsrv.h"
 
 ///
 #define CsPrintf System->Printf

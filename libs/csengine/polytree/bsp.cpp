@@ -24,7 +24,7 @@
 #include "csengine/thing.h"
 #include "csengine/engine.h"
 #include "csengine/polygon.h"
-#include "isystem.h"
+#include "isys/isystem.h"
 
 //---------------------------------------------------------------------------
 

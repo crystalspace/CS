@@ -24,9 +24,9 @@
 #include "csengine/wirefrm.h"
 #include "csengine/engine.h"
 #include "csengine/camera.h"
-#include "igraph3d.h"
-#include "igraph2d.h"
-#include "itxtmgr.h"
+#include "ivideo/igraph3d.h"
+#include "ivideo/igraph2d.h"
+#include "ivideo/itxtmgr.h"
 
 csWfColor::csWfColor (iTextureManager* txtmgr, int r, int g, int b)
 {

@@ -19,7 +19,7 @@
 #ifndef _EXPLOLDR_H_
 #define _EXPLOLDR_H_
 
-#include "ildrplug.h"
+#include "imap/ildrplug.h"
 
 struct iEngine;
 struct iSystem;

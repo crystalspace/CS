@@ -21,7 +21,7 @@
 #ifndef __CSSOUNDLISTENEREAX_H__
 #define __CSSOUNDLISTENEREAX_H__
 
-#include "isndlstn.h"
+#include "isound/isndlstn.h"
 
 class csSoundRenderEAX;
 

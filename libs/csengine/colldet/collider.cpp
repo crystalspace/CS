@@ -19,7 +19,7 @@
 
 #include "cssysdef.h"
 #include "csengine/collider.h"
-#include "icollide.h"
+#include "iengine/icollide.h"
 
 
 //----------------------------------------------------------------------

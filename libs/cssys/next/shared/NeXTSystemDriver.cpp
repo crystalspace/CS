@@ -21,7 +21,7 @@
 #include "cssysdef.h"
 #include "cssys/next/NeXTSystemDriver.h"
 #include "NeXTDelegate.h"
-#include "icfgfile.h"
+#include "iutil/icfgfile.h"
 #include "version.h"
 #include <stdarg.h>
 

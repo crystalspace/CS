@@ -39,8 +39,8 @@
 #include "csengine/octree.h"
 #include "csutil/csrect.h"
 #include "csobject/dataobj.h"
-#include "igraph3d.h"
-#include "itxtmgr.h"
+#include "ivideo/igraph3d.h"
+#include "ivideo/itxtmgr.h"
 
 #define Gfx3D System->G3D
 #define Gfx2D System->G2D
@@ -193,7 +193,7 @@ void select_object (csRenderView* rview, int type, void* entity)
 #endif
 }
 
-
+#if 0
 /// Static vertex array.
 static DECLARE_GROWING_ARRAY (walkdbg_tr_verts, csVector3);
 /// The perspective corrected vertices.
@@ -363,6 +363,7 @@ static void WalkDbgDrawMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
     }
   }
 }
+#endif
 
 // Callback for DrawFunc() to show an outline for all polygons and lights.
 // If callback_data in 'rview' is not NULL then we only show outline for

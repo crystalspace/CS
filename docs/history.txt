@@ -1,5 +1,22 @@
 The history order has been reversed so that new features are at the top.
 
+8-Mar-2001
+	- Eric Sunshine moved all of the pure SCF interface header files (the
+	  filenames beginning with `i') into subdirectories of CS/include.
+	  They no longer reside directly in CS/include.  The new subdirectories
+	  within CS/include are iengine, igame, igeom, igraphic, imap, imesh,
+	  inetwork, iobject, isound, isys, iterrain, iutil, ivaria, and ivideo.
+	  Also, several files were decomposed into multiple new files, so you
+	  may need to include one or more of the new files in place of the old
+	  ones.  The files which were specially split are:
+	    itexture.h -> iengine/itexture.h & ivideo/itexture.h
+	    imater.h   -> iengine/imater.h   & ivideo/imater.h
+	    imeshobj.h -> iengine/imeshobj.h & imesh/imeshobj.h
+	    iterrobj.h -> iengine/iterrobj.h & iterrain/iterrobj.h
+	  Also updated all source & header files, documentation files, and
+	  makefiles to reflect this change.
+	- Eric Sunshine eliminated several compilation warnings throughout the
+	  project.
 7-Mar-2001
 	- Martin Geisse changed CSWS to use the new config system.
 	- Thomas Hieber completely changed the way data from XML maps to

@@ -21,7 +21,7 @@
 
 #include "csutil/util.h"
 #include "csutil/csvector.h"
-#include "iperstat.h"
+#include "ivaria/iperstat.h"
 
 struct iSystem;
 struct iEngine;

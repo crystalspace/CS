@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "cssys/unix/unix.h"
 #include "cssys/system.h"
-#include "igraph3d.h"
+#include "ivideo/igraph3d.h"
 
 //------------------------------------------------------ The System driver ---//
 SysSystemDriver::SysSystemDriver () : csSystemDriver ()

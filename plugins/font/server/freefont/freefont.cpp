@@ -21,8 +21,8 @@
 #include "cssysdef.h"
 #include "csutil/csstrvec.h"
 #include "csutil/csstring.h"
-#include "icfgfile.h"
-#include "ivfs.h"
+#include "iutil/icfgfile.h"
+#include "isys/ivfs.h"
 #include "freefont.h"
 
 IMPLEMENT_FACTORY (csFreeTypeServer)

@@ -18,7 +18,7 @@
 
 #include "cssysdef.h"
 #include "avistra.h"
-#include "isystem.h"
+#include "isys/isystem.h"
 
 IMPLEMENT_IBASE (csAVIStreamAudio)
   IMPLEMENTS_INTERFACE (iAudioStream)

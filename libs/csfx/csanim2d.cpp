@@ -19,7 +19,7 @@
 
 #include "cssysdef.h"
 #include "csfx/csanim2d.h"
-#include "igraph3d.h"
+#include "ivideo/igraph3d.h"
 
 csAnimationTemplate::csAnimationTemplate() {
 }

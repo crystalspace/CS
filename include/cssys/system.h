@@ -27,10 +27,10 @@
 #include "csutil/csobjvec.h"
 #include "cssys/csinput.h"
 #include "cssys/csevcord.h"
-#include "isystem.h"
-#include "ivfs.h"
-#include "ievent.h"
-#include "iconfig.h"
+#include "isys/isystem.h"
+#include "isys/ivfs.h"
+#include "isys/ievent.h"
+#include "iutil/iconfig.h"
 
 class csKeyboardDriver;
 class csMouseDriver;

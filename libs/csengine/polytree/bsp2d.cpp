@@ -18,7 +18,7 @@
 
 #include "cssysdef.h"
 #include "csengine/bsp2d.h"
-#include "isystem.h"
+#include "isys/isystem.h"
 
 //---------------------------------------------------------------------------
 

@@ -19,7 +19,7 @@
 #ifndef __CS_SOFT_G3D_H__
 #define __CS_SOFT_G3D_H__
 
-#include "iconfig.h"
+#include "iutil/iconfig.h"
 #include "sft3dcom.h"
 
 /// Software 3D renderer

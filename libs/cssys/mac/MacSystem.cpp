@@ -40,8 +40,8 @@
 #include "cssys/system.h"
 #include "cssys/sysdriv.h"
 #include "IMacGraphics.h"
-#include "igraph3d.h"
-#include "igraph2d.h"
+#include "ivideo/igraph3d.h"
+#include "ivideo/igraph2d.h"
 
 #if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
 #define SetQDGlobalsRandomSeed( n ) ( qd.randSeed = n )

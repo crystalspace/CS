@@ -24,9 +24,9 @@
 #include "NeXTFrameBuffer15.h"
 #include "NeXTFrameBuffer32.h"
 #include "csutil/cfgacc.h"
-#include "icfgfile.h"
-#include "ievent.h"
-#include "isystem.h"
+#include "iutil/icfgfile.h"
+#include "isys/ievent.h"
+#include "isys/isystem.h"
 #include "version.h"
 
 typedef void* NeXTDriverHandle2D;

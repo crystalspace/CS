@@ -22,7 +22,6 @@
 #include "csengine/terrobj.h"
 #include "csengine/engine.h"
 #include "csengine/light.h"
-#include "igraph3d.h"  // RDS NOTE: will this be needed???
 
 IMPLEMENT_CSOBJTYPE (csTerrainWrapper, csObject)
 
@@ -94,10 +93,8 @@ void csTerrainWrapper::ClearSectors()
 
 void csTerrainWrapper::Draw( iRenderView *iRView, bool bUseZBuf )
 {
-/*
-  if (mesh->DrawTest (irv, imov))
-  {
-*/
+// if (mesh->DrawTest (irv, imov))
+// {
     pTerrObj->Draw( iRView, bUseZBuf );
 // }
 
@@ -111,7 +108,7 @@ int csTerrainWrapper::CollisionDetect( csTransform *pTrans )
 void csTerrainWrapper::UpdateLighting( iLight** lights, int iNumLights )
 {
   lights = lights;
-  iNumLights;
+  (void)iNumLights;
   // nothing doing for now
 }
 

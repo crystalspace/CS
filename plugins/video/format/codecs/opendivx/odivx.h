@@ -19,7 +19,7 @@
 #ifndef _ODIVX_H_
 #define _ODIVX_H_
 
-#include "ividecod.h"
+#include "ivideo/ividecod.h"
 
 class csOpenDivX : public iCodec
 {

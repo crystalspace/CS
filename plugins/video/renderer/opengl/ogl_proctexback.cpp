@@ -23,7 +23,7 @@
 #include "ogl_proctexback.h"
 #include "ogl_g3dcom.h"
 #include "csgeom/polyclip.h"
-#include "ievent.h"
+#include "isys/ievent.h"
 
 IMPLEMENT_IBASE (csOpenGLProcBackBuffer)
   IMPLEMENTS_INTERFACE (iGraphics3D)

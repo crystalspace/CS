@@ -26,7 +26,7 @@
 
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
-#include "ievent.h"
+#include "isys/ievent.h"
 
 /// SVGALIB version.
 class csGraphics2DSVGALib : public csGraphics2D, public iEventPlug

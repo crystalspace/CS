@@ -19,7 +19,7 @@
 #ifndef __CS_CFGFILE_H__
 #define __CS_CFGFILE_H__
 
-#include "icfgfile.h"
+#include "iutil/icfgfile.h"
 #include "csutil/csvector.h"
 class csConfigNode;
 class csConfigIterator;

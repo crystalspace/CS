@@ -22,9 +22,10 @@
 #include "csgeom/vector3.h"
 #include "csgeom/transfrm.h"
 #include "csutil/cscolor.h"
-#include "imeshobj.h"
-#include "imball.h"
-#include "igraph3d.h"
+#include "imesh/imeshobj.h"
+#include "iengine/imeshobj.h"
+#include "imesh/imball.h"
+#include "ivideo/igraph3d.h"
 
 struct iMaterialWrapper;
 class csBallMeshObjectFactory;

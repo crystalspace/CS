@@ -19,7 +19,7 @@
 //-----------------------------------------------------------------------------
 #include "NeXTDelegate.h"
 #include "NeXTMenu.h"
-#include "ievdefs.h"
+#include "isys/ievdefs.h"
 #include "cssys/next/NeXTSystemDriver.h"
 #include "volatile.h"		// OS_NEXT_OPENSTEP, OS_NEXT_MACOSXS
 #include <stdio.h>

@@ -22,7 +22,7 @@
 #ifndef __FONTPLEX_H__
 #define __FONTPLEX_H__
 
-#include "ifontsrv.h"
+#include "ivideo/ifontsrv.h"
 #include "csutil/csvector.h"
 
 /**

@@ -19,7 +19,7 @@
 
 #include <stdlib.h>
 #include "cssysdef.h"
-#include "isystem.h"
+#include "isys/isystem.h"
 #include "csutil/csvector.h"
 #include "fontplex.h"
 

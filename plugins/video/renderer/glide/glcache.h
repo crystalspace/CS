@@ -25,9 +25,10 @@
 
 
 #include "csutil/scf.h"
-#include "ipolygon.h"
-#include "itexture.h"
-#include "ilghtmap.h"
+#include "iengine/ipolygon.h"
+#include "ivideo/itexture.h"
+#include "iengine/itexture.h"
+#include "iengine/ilghtmap.h"
 #include "glalpha.h"
 #include "video/renderer/common/texmem.h"
 #include <glide.h>

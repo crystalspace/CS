@@ -22,7 +22,7 @@
 #include "csutil/scanstr.h"
 #include "csws/csmouse.h"
 #include "csws/csapp.h"
-#include "isystem.h"
+#include "isys/isystem.h"
 
 #define MOUSE_TEXTURE_NAME	"csws::Mouse"
 #define NO_VIRTUAL_POS		-999999

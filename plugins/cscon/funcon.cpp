@@ -20,19 +20,20 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include "cssysdef.h"
-#include "iconsole.h"
-#include "igraph2d.h"
-#include "isystem.h"
-#include "itxtmgr.h"
-#include "imater.h"
-#include "ievent.h"
+#include "ivaria/iconsole.h"
+#include "ivideo/igraph2d.h"
+#include "isys/isystem.h"
+#include "ivideo/itxtmgr.h"
+#include "ivideo/imater.h"
+#include "iengine/imater.h"
+#include "isys/ievent.h"
 #include "csutil/csrect.h"
 #include "csutil/scf.h"
 #include "csutil/csstring.h"
 #include "csutil/cfgacc.h"
 #include "funcon.h"
 #include "conbuffr.h"
-#include "icfgfile.h"
+#include "iutil/icfgfile.h"
 #include "csgfxldr/csimage.h"
 
 IMPLEMENT_IBASE(funConsole)

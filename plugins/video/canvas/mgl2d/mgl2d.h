@@ -60,7 +60,7 @@
 
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
-#include "ievent.h"
+#include "isys/ievent.h"
 
 class csGraphics2DMGL : public csGraphics2D, public iEventPlug
 {

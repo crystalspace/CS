@@ -22,7 +22,7 @@
 
 #include <GL/gl.h>
 #include "csutil/csvector.h"
-#include "ifontsrv.h"
+#include "ivideo/ifontsrv.h"
 
 // Define the following macro to use glBitmap() text drawing approach
 // rather than default "font-on-a-texture" approach.

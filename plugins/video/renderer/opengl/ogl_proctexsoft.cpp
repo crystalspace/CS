@@ -23,11 +23,11 @@
 #include "ogl_txtmgr.h"
 #include "ogl_proctexsoft.h"
 #include "ogl_g3dcom.h"
-#include "isystem.h"
-#include "isprotex.h"
-#include "itxtmgr.h"
-#include "ipolygon.h"
-#include "ievent.h"
+#include "isys/isystem.h"
+#include "ivideo/isprotex.h"
+#include "ivideo/itxtmgr.h"
+#include "iengine/ipolygon.h"
+#include "isys/ievent.h"
 
 IMPLEMENT_IBASE (csOpenGLProcSoftware)
   IMPLEMENTS_INTERFACE (iGraphics3D)

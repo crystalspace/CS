@@ -20,8 +20,9 @@
 #ifndef __CSPIXMAP_H__
 #define __CSPIXMAP_H__
 
-#include "igraph3d.h"
-#include "itexture.h"
+#include "ivideo/igraph3d.h"
+#include "ivideo/itexture.h"
+#include "iengine/itexture.h"
 #include "csutil/csbase.h"
 
 /// alignment settings for drawing pixmaps

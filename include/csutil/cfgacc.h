@@ -20,7 +20,7 @@
 #define __CFGACC_H__
 
 #include "csutil/csvector.h"
-#include "isystem.h"
+#include "isys/isystem.h"
 struct iConfigFile;
 
 /**

@@ -22,10 +22,10 @@
 #include "cssysdef.h"
 #include "csutil/scf.h"
 #include "meta.h"
-#include "igraph3d.h"
-#include "igraph2d.h"
-#include "icfgmgr.h"
-#include "isystem.h"
+#include "ivideo/igraph3d.h"
+#include "ivideo/igraph2d.h"
+#include "iutil/icfgmgr.h"
+#include "isys/isystem.h"
 
 IMPLEMENT_FACTORY (csMetaBalls)
 

@@ -24,7 +24,7 @@
 #include <stdarg.h>
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
-#include "imetabal.h"
+#include "ivaria/imetabal.h"
 
 class csMaterialHandle;
 struct G3DPolygonDPFX;

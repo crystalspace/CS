@@ -30,10 +30,12 @@
 #include "csgfxldr/csimage.h"
 #include "cssys/system.h"
 #include "csutil/scfstrv.h"
-#include "itexture.h"
-#include "itxtmgr.h"
-#include "imspr3d.h"
-#include "imeshobj.h"
+#include "ivideo/itexture.h"
+#include "iengine/itexture.h"
+#include "ivideo/itxtmgr.h"
+#include "imesh/imspr3d.h"
+#include "imesh/imeshobj.h"
+#include "iengine/imeshobj.h"
 
 //
 // definitions of method for the base csCrossBuild_Factory

@@ -25,10 +25,10 @@
 #include "csengine/arrays.h"
 #include "csengine/rview.h"
 #include "csobject/csobject.h"
-#include "igraph3d.h"
-#include "isystem.h"
-#include "iengine.h"
-#include "iconfig.h"
+#include "ivideo/igraph3d.h"
+#include "isys/isystem.h"
+#include "iengine/iengine.h"
+#include "iutil/iconfig.h"
 
 class csRegion;
 class csRadiosity;
@@ -885,7 +885,7 @@ public:
    * specific values. This function is called by Initialize() so you
    * normally do not need to call it yourselves.
    */
-  void ReadConfig ();
+  void ReadConfig (iConfigFile*);
 
   /**
    * Prepare for creation of a world. This function is called

@@ -25,7 +25,7 @@
 
 #include "sndrdr.h"
 #include "sndsrc.h"
-#include "isystem.h"
+#include "isys/isystem.h"
 
 #define REFRESH_RATE    10
 

@@ -19,7 +19,7 @@
 #ifndef _SPIRALLDR_H_
 #define _SPIRALLDR_H_
 
-#include "ildrplug.h"
+#include "imap/ildrplug.h"
 
 struct iEngine;
 struct iSystem;

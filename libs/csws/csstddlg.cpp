@@ -34,7 +34,7 @@
 #include "csws/csiline.h"
 #include "csws/cscwheel.h"
 #include "csws/cswsaux.h"
-#include "isystem.h"
+#include "isys/isystem.h"
 
 #define MSGBOX_TEXTURE "csws::MessageBoxIcons"
 

@@ -29,14 +29,15 @@
 #include "struct/ddgtmesh.h"
 #include "struct/ddgbtree.h"
 #include "struct/ddgvarr.h"
-#include "icamera.h"
-#include "iengine.h"
-#include "igraph3d.h"
-#include "imater.h"
-#include "irview.h"
-#include "isystem.h"
-#include "itxtmgr.h"
-#include "ivfs.h"
+#include "iengine/icamera.h"
+#include "iengine/iengine.h"
+#include "ivideo/igraph3d.h"
+#include "ivideo/imater.h"
+#include "iengine/imater.h"
+#include "iengine/irview.h"
+#include "isys/isystem.h"
+#include "ivideo/itxtmgr.h"
+#include "isys/ivfs.h"
 
 static ddgControl control;
 

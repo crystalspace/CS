@@ -22,10 +22,11 @@
 #include "csgeom/matrix3.h"
 #include "csgeom/transfrm.h"
 #include "partgen.h"
-#include "imeshobj.h"
-#include "isystem.h"
-#include "imspr2d.h"
-#include "imovable.h"
+#include "imesh/imeshobj.h"
+#include "iengine/imeshobj.h"
+#include "isys/isystem.h"
+#include "imesh/imspr2d.h"
+#include "iengine/imovable.h"
 #include <math.h>
 #include <stdlib.h>
 

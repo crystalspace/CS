@@ -27,8 +27,8 @@
 #include <Sound.h>
 
 #include "csutil/scf.h"
-#include "isnddrv.h"
-#include "isystem.h"
+#include "isound/isnddrv.h"
+#include "isys/isystem.h"
 
 class csSoundDriverMac : public iSoundDriver
 {

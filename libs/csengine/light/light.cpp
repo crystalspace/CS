@@ -30,6 +30,9 @@
 #include "csengine/curve.h"
 #include "csengine/halo.h"
 
+/// Max number of polygons that can be lit by one light. (bad practice !!!@@@)
+#define MAX_NUM_LIGHTMAP 2000
+
 int csLight::ambient_red = DEFAULT_LIGHT_LEVEL;
 int csLight::ambient_green = DEFAULT_LIGHT_LEVEL;
 int csLight::ambient_blue = DEFAULT_LIGHT_LEVEL;

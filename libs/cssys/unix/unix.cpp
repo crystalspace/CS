@@ -25,7 +25,7 @@
 #include "cssysdef.h"
 #include "cssys/unix/unix.h"
 #include "cssys/system.h"
-#include "igraph3d.h"
+#include "ivideo/igraph3d.h"
 
 // Put an #ifndef OS_XXX around this if your system does not support locale.
 // In a long-term perspective, if we find such a system, we should add the

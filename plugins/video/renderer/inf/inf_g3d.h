@@ -28,11 +28,11 @@
 #include "video/renderer/common/dpmesh.h"
 #include "video/canvas/common/graph2d.h"
 #include "inf_txt.h"
-#include "iconfig.h"
-#include "igraph2d.h"
-#include "igraph3d.h"
-#include "ihalo.h"
-#include "iplugin.h"
+#include "iutil/iconfig.h"
+#include "ivideo/igraph2d.h"
+#include "ivideo/igraph3d.h"
+#include "ivideo/ihalo.h"
+#include "isys/iplugin.h"
 
 class csClipper;
 struct iGraphics2D;

@@ -23,7 +23,7 @@
 #if defined(__cplusplus)
 
 #include "cssys/system.h"
-#include "ievent.h"
+#include "isys/ievent.h"
 typedef void* NeXTDelegateHandle;
 
 class NeXTSystemDriver : public csSystemDriver

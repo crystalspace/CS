@@ -21,7 +21,7 @@
 
 #include "csgeom/transfrm.h"
 #include "csutil/csvector.h"
-#include "imovable.h"
+#include "iengine/imovable.h"
 
 class csSector;
 class csObject;

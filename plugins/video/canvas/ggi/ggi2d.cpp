@@ -23,7 +23,7 @@
 #include "video/canvas/ggi/ggi2d.h"
 #include "csutil/csrect.h"
 #include "cssys/csinput.h"
-#include "isystem.h"
+#include "isys/isystem.h"
 
 #include <ggi/ggi.h>
 

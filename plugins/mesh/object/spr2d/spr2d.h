@@ -22,11 +22,12 @@
 #include "csgeom/vector3.h"
 #include "csgeom/transfrm.h"
 #include "csutil/cscolor.h"
-#include "imeshobj.h"
-#include "imspr2d.h"
-#include "igraph3d.h"
-#include "iconfig.h"
-#include "iparticl.h"
+#include "imesh/imeshobj.h"
+#include "iengine/imeshobj.h"
+#include "imesh/imspr2d.h"
+#include "ivideo/igraph3d.h"
+#include "iutil/iconfig.h"
+#include "imesh/iparticl.h"
 
 struct iMaterialWrapper;
 class csSprite2DMeshObjectFactory;

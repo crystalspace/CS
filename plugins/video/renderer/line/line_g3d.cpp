@@ -26,11 +26,11 @@
 #include "csgeom/polyclip.h"
 #include "video/renderer/line/line_g3d.h"
 #include "video/renderer/line/line_txt.h"
-#include "icfgfile.h"
-#include "ipolygon.h"
-#include "isystem.h"
-#include "igraph2d.h"
-#include "ilghtmap.h"
+#include "iutil/icfgfile.h"
+#include "iengine/ipolygon.h"
+#include "isys/isystem.h"
+#include "ivideo/igraph2d.h"
+#include "iengine/ilghtmap.h"
 
 #define SysPrintf System->Printf
 

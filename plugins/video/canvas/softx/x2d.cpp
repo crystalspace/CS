@@ -23,8 +23,8 @@
 #include "video/canvas/common/x11comm.h"
 #include "video/canvas/common/scancode.h"
 #include "csutil/csrect.h"
-#include "isystem.h"
-#include "ievent.h"
+#include "isys/isystem.h"
+#include "isys/ievent.h"
 #include "x2d.h"
 
 IMPLEMENT_FACTORY (csGraphics2DXLib)

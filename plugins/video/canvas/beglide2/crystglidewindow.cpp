@@ -20,8 +20,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "cssysdef.h"
-#include "ievent.h"
-#include "isystem.h"
+#include "isys/ievent.h"
+#include "isys/isystem.h"
 #include "crystglidewindow.h"
 #include "glidebe2d.h"
 

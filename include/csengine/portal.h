@@ -21,7 +21,7 @@
 
 #include "csgeom/transfrm.h"
 #include "csutil/flags.h"
-#include "iportal.h"
+#include "iengine/iportal.h"
 
 class csObject;
 class csSector;

@@ -21,7 +21,7 @@
 #ifndef __CSSOUNDLISTENERDS3D_H__
 #define __CSSOUNDLISTENERDS3D_H__
 
-#include "isndlstn.h"
+#include "isound/isndlstn.h"
 
 class csSoundRenderDS3D;
 

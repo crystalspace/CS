@@ -18,12 +18,12 @@
 
 #include "cssysdef.h"
 #include "qint.h"
-#include "isystem.h"
+#include "isys/isystem.h"
 #include "csutil/csrect.h"
 #include "csutil/cfgacc.h"
 #include "plugins/video/canvas/common/scancode.h"
 #include "mgl2d.h"
-#include "icfgfile.h"
+#include "iutil/icfgfile.h"
 
 IMPLEMENT_FACTORY (csGraphics2DMGL)
 

@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "ivfs.h"
+#include "isys/ivfs.h"
 
 #if _MSC_VER > 1000
 #pragma once
