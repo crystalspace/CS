@@ -229,9 +229,14 @@ $(SWIG.PERL5.INSTALLPM): $(SWIG.PERL5.PM.IN)
 	$(CP) $(SWIG.PERL5.PM.IN) $@
 
 $(CEX.CSPERL5): $(CIN.CSPERL5)
-	@echo Generating perl5 cs-config extension...
-	$(PERL5) $(CIN.CSPERL5) \
-	$"CFLAGS=$(PERL5.CFLAGS)$" $"LFLAGS=$(PERL5.LFLAGS)$" > $@
+	@echo $"Generate perl5 cs-config extension...$"
+	@echo $"#!/bin/sh$" > $(CEX.CSPERL5)
+	@echo $"# WARNING: This file is generated automatically by csperl5.mak$" >> $(CEX.CSPERL5)
+	@echo $"PERL5_LIBS="$(PERL5.LFLAGS)"$"      >> $(CEX.CSPERL5)
+	@echo $"PERL5_CFLAGS="$(PERL5.CFLAGS)"$"    >> $(CEX.CSPERL5)
+	@echo $"PERL5_CXXFLAGS="$(PERL5.CFLAGS)"$"  >> $(CEX.CSPERL5)
+	@echo $"PERL5_DEPS=""$"		            >> $(CEX.CSPERL5)
+	@cat $(SRCDIR)/plugins/cscript/csperl5/perl5.cin >> $(CEX.CSPERL5)
 
 clean: csperl5clean
 maintainerclean: csperl5maintainerclean

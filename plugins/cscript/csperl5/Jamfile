@@ -53,6 +53,7 @@ if $(PERL5.AVAILABLE) = "yes" && ! [ Property build : projgen ]
       [ ConcatDirs $(TOP) include ] :
       [ ConcatDirs $(TOP) include ivaria ] :
       [ ConcatDirs $(TOP) scripts perl5 ] ;
+    Depends csperl5clean : perl5swigclean ;
   }
   else
   {
@@ -70,4 +71,36 @@ if $(PERL5.AVAILABLE) = "yes" && ! [ Property build : projgen ]
     [ FIncludes $(targetdir) ]
     $(COMPILER.C++FLAGS.WARNING.NO_UNUSED)
     $(COMPILER.C++FLAGS.WARNING.NO_UNINITIALIZED) ;
+
+  # Note that '__EOF__' is purposely quoted to prevent shell from intrepreting
+  # dollar signs in quoted block.
+  actions Perl5Cex
+  {
+    cat > $(<) << '__EOF__'
+#! /bin/sh
+# This file is generated automatically by csperl5/Jamfile
+PERL5_LIBS="$(PERL5.LFLAGS[1])"
+PERL5_CFLAGS="$(PERL5.CFLAGS[1])"
+PERL5_CXXFLAGS="$(PERL5.CFLAGS[1])"
+PERL5_DEPS=""
+
+if test -z "$1"; then
+    echo "Do not invoke this sub-component of cs-config directly."
+    exit 1
+fi
+
+case $1 in
+    --libs) echo "$PERL5_LIBS" ;;
+    --deps) echo "$PERL5_DEPS" ;;
+    --cflags) echo "$PERL5_CFLAGS" ;;
+    --cxxflags) echo "$PERL5_CXXFLAGS" ;;
+    *) echo "Unknown option"; exit 1 ;;
+esac
+__EOF__
+  }
+
+  local cexfile = perl5.cex ;
+  ShellScript $(cexfile) : Perl5Cex ;
+  Depends csperl5 : $(cexfile) ;
+  Depends csperl5clean : $(cexfile)clean ;
 }

@@ -16,8 +16,16 @@ chronological order.
 	  now utilized when building Swig-generated code for Python and Perl.
 	  (To be fair to gcc, however, Swig _is_ generating crash-worthy code,
 	  so the warning message is warranted.)
-	- Luca fixed a compilation error that the VisualC++ 6.0 was complaining 
+	- Luca fixed a compilation error that the VisualC++ 6.0 was complaining
 	  about.
+	- Eric Sunshine made the following changes to the build system:
+	    - Augmented cspython/Jamfile so that it creates python.cex.
+	    - Augmented csperl5/Jamfile so that it creates perl5.cex.
+	    - Made the cspythonclean and csperl5clean targets depend upon the
+	      pythonswigclean and perl5swigclean targets, respectively, so that
+	      they also remove the Swig-generated files.
+	    - Fixed generation of perl5.cex by cspython.mak. The script it
+	      created was entirely dysfunctional and completely useless.
 22-Apr-2004
 	- Jorrit removed motion and motldr from Jamrules for static
 	  compilation.
