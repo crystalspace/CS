@@ -178,7 +178,14 @@ DWORD WINAPI s_threadroutine(LPVOID param)
     dpd.diph.dwObj=0;
     dpd.diph.dwHow=DIPH_DEVICE;
     dpd.dwData=10; // The size of the buffer (should be more than sufficient)
-    CHK_FAILED(lpKbd->SetProperty(DIPROP_BUFFERSIZE,&dpd));
+#if DIRECTINPUT_VERSION < 0x0700
+  CHK_FAILED(lpKbd->SetProperty(DIPROP_BUFFERSIZE,&dpd));
+#else 
+  //For incomprehensible reason, SetProperty() parameters type has
+  //changed between DX6.1 and DX7 SDK
+  CHK_FAILED(lpKbd->SetProperty(DIPROP_BUFFERSIZE,&dpd.diph));
+#endif
+
   }
 #endif
   hEvent[0]=::CreateEvent(NULL,FALSE,FALSE,NULL);
@@ -203,7 +210,25 @@ DWORD WINAPI s_threadroutine(LPVOID param)
     ::ExitProcess(1);
     break;
   }
-  CHK_FAILED(lpKbd->Acquire());
+
+  while(1)
+  {
+    hr=lpKbd->Acquire();
+    if(SUCCEEDED(hr))
+      break;
+    if(WaitForSingleObject(hEvent[1],0)==WAIT_OBJECT_0+1)
+    {
+      CloseHandle(hEvent[0]);
+      CloseHandle(hEvent[1]);
+      CHK_RELEASE(lpKbd);
+      CHK_RELEASE(lpdi);
+#ifndef DI_USEGETDEVICEDATA
+      if(oldbuffer) delete[] oldbuffer;
+#endif
+      return 0;
+    }
+  }
+
 #ifndef DI_USEGETDEVICEDATA
   oldbuffer=new char[256];
   hr=lpKbd->GetDeviceState(256,oldbuffer);
@@ -323,7 +348,9 @@ DWORD WINAPI s_threadroutine(LPVOID param)
       CloseHandle(hEvent[1]);
       CHK_RELEASE(lpKbd);
       CHK_RELEASE(lpdi);
+#ifndef DI_USEGETDEVICEDATA
       if(oldbuffer) delete[] oldbuffer;
+#endif
       return 0;
     }
   }
