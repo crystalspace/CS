@@ -136,7 +136,7 @@ bool csGraphics2DGLX::Open()
 {
   if (is_open) return true;
 
-  Report (CS_REPORTER_SEVERITY_NOTIFY, "Opening GLX2D\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Opening GLX2D");
   // We now select the visual here as with a mesa bug it is not possible
   // to destroy double buffered contexts and then create a single buffered
   // one.
@@ -214,26 +214,43 @@ static const char *visual_class_name (int cls)
 
 bool csGraphics2DGLX::CreateVisuals ()
 {
-  int desired_attributes[] =
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating Context");
+  
+  GLPixelFormat format;
+  csGLPixelFormatPicker picker (this);
+  
+  while (picker.GetNextFormat (format))
   {
-    GLX_RGBA,
-    GLX_DEPTH_SIZE, 8,
-    GLX_RED_SIZE, 4,
-    GLX_BLUE_SIZE, 4,
-    GLX_GREEN_SIZE, 4,
-    GLX_DOUBLEBUFFER,
-#ifdef CS_USE_NEW_RENDERER
-    GLX_ALPHA_SIZE, 8,
-    GLX_STENCIL_SIZE, 8,
-#else
-    GLX_STENCIL_SIZE, 1,
-#endif
-    None
-  };
-  Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating Context\n");
-  // find a visual that supports all the features we need
-  xvis = glXChooseVisual (dpy, screen_num, desired_attributes);
-  hardwareaccelerated = true;
+    const int colorBits = format[glpfvColorBits];
+    const int colorComponentSize = 
+	((colorBits % 32) == 0) ? colorBits / 4 : colorBits / 3;
+    const int accumBits = format[glpfvAccumColorBits];
+    const int accumComponentSize = 
+	((accumBits % 32) == 0) ? accumBits / 4 : accumBits / 3;
+    int desired_attributes[] =
+    {
+      GLX_RGBA,
+      GLX_DEPTH_SIZE, format[glpfvDepthBits],
+      GLX_RED_SIZE, colorComponentSize,
+      GLX_BLUE_SIZE, colorComponentSize,
+      GLX_GREEN_SIZE, colorComponentSize,
+      GLX_DOUBLEBUFFER,
+      GLX_ALPHA_SIZE, format[glpfvAlphaBits],
+      GLX_STENCIL_SIZE, format[glpfvStencilBits],
+      GLX_ACCUM_RED_SIZE, accumComponentSize,
+      GLX_ACCUM_BLUE_SIZE, accumComponentSize,
+      GLX_ACCUM_GREEN_SIZE, accumComponentSize,
+      GLX_ACCUM_ALPHA_SIZE, format[glpfvAccumAlphaBits],
+      None
+    };
+    // find a visual that supports all the features we need
+    xvis = glXChooseVisual (dpy, screen_num, desired_attributes);
+    if (xvis)
+    {
+      hardwareaccelerated = true;
+      break;
+    }
+  }
 
   // if a visual was found that we can use, make a graphics context which
   // will be bound to the application window.  If a visual was not
@@ -287,7 +304,8 @@ bool csGraphics2DGLX::CreateVisuals ()
     xvis->visual, AllocNone);
 
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Video driver GL/X version %s",
-    glXIsDirect (dpy, active_GLContext) ? "(direct renderer)" : "");
+    glXIsDirect (dpy, active_GLContext) ? "(direct renderer)" : 
+    "indirect renderer");
 
   Depth = xvis->depth;
 
@@ -296,7 +314,7 @@ bool csGraphics2DGLX::CreateVisuals ()
   else
     pfmt.PixelBytes = 2;
 
-  Report (CS_REPORTER_SEVERITY_NOTIFY, "Visual ID: %x, %dbit %sn",
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Visual ID: %x, %dbit %s",
     xvis->visualid, Depth, visual_class_name (xvis->c_class));
 
   int ctype, frame_buffer_depth, size_depth_buffer, level;
@@ -306,6 +324,7 @@ bool csGraphics2DGLX::CreateVisuals ()
   glXGetConfig(dpy, xvis, GLX_DEPTH_SIZE, &size_depth_buffer);
   glXGetConfig(dpy, xvis, GLX_LEVEL, &level);
 
+  int color_bits = 0;
   int alpha_bits = 0;
   if (ctype)
   {
@@ -313,8 +332,11 @@ bool csGraphics2DGLX::CreateVisuals ()
     pfmt.GreenMask = xvis->green_mask;
     pfmt.BlueMask = xvis->blue_mask;
     glXGetConfig(dpy, xvis, GLX_RED_SIZE, &pfmt.RedBits);
+    color_bits += pfmt.RedBits;
     glXGetConfig(dpy, xvis, GLX_GREEN_SIZE, &pfmt.GreenBits);
+    color_bits += pfmt.GreenBits;
     glXGetConfig(dpy, xvis, GLX_BLUE_SIZE, &pfmt.BlueBits);
+    color_bits += pfmt.BlueBits;
     glXGetConfig(dpy, xvis, GLX_ALPHA_SIZE, &alpha_bits);
       
     int bit;
@@ -324,8 +346,27 @@ bool csGraphics2DGLX::CreateVisuals ()
   }
 
   // Report Info
-  Report (CS_REPORTER_SEVERITY_NOTIFY,
-    "Frame buffer: %dbit ", frame_buffer_depth);
+  currentFormat[glpfvColorBits] = color_bits;
+  currentFormat[glpfvAlphaBits] = alpha_bits;
+  currentFormat[glpfvDepthBits] = size_depth_buffer;
+  int stencilSize = 0;
+  glXGetConfig(dpy, xvis, GLX_STENCIL_SIZE, &stencilSize);
+  currentFormat[glpfvStencilBits] = stencilSize;
+  int accumBits = 0;
+  int accumAlpha = 0;
+  {
+    int dummy;
+    glXGetConfig(dpy, xvis, GLX_RED_SIZE, &dummy);
+    accumBits += dummy;
+    glXGetConfig(dpy, xvis, GLX_GREEN_SIZE, &dummy);
+    accumBits += dummy;
+    glXGetConfig(dpy, xvis, GLX_BLUE_SIZE, &dummy);
+    accumBits += dummy;
+    glXGetConfig(dpy, xvis, GLX_ALPHA_SIZE, &accumAlpha);
+  }
+  currentFormat[glpfvAccumColorBits] = accumBits;
+  currentFormat[glpfvAccumAlphaBits] = accumAlpha;
+	    
     
   if (ctype)
   {
@@ -342,7 +383,6 @@ bool csGraphics2DGLX::CreateVisuals ()
   }
     
   Report (CS_REPORTER_SEVERITY_NOTIFY, "level %d, double buffered", level);
-  Report (CS_REPORTER_SEVERITY_NOTIFY, "Depth buffer: %dbit", size_depth_buffer);
 
   pfmt.complete ();
   return true;

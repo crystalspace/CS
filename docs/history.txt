@@ -14,6 +14,8 @@ chronological order.
 	- Jorrit fixed the NR GL renderer so that it doesn't attempt to
 	  implement floating portals if the stencil buffer is broken
 	  or not available.
+	- res (semi-blindly) augmented the glx canvas to use the format
+	  picker.
 2-Jul-2004
 	- Jorrit fixed compile errors in sprcal3d and terrfunc.
 	- res changed the type of csArray<> indices and sizes from int to
