@@ -19,6 +19,32 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+6-Jun-99:
+	- Added 'dump' function in Dumper for csFrustrum.
+	- Continued work on csFrustrum.
+	- Patch from Denis Dmitriev so that DrawPolygonQuick does not
+	  need the original pi_triangle. This is another significant
+	  step towards trying to make a general polygon drawer from
+	  DrawPolygonQuick.
+5-Jun-99:
+	- Added radius argument to 'addbot' so that an optional
+	  dynamic light is created with the specified radius which
+	  moves with the bot.
+4-Jun-99:
+	- Fix inifile.cpp to use strcasecmp instead of stricmp.
+	- Added Unix makefile for MetaBalls.
+3-Jun-99:
+	- Started new csFrustrum class.
+1-Jun-99:
+	- Denis Dmitriev added MetaDemo.
+	- Robert Bate added define for stricmp (for Macintosh).
+	- Robert fixed problems with the palette for 8 bit color (Macintosh).
+31-May-99:
+	- Denis Dmitriev fixed reading of ini file so that it is case
+	  insensitive.
+30-May-99:
+	- Thomas Hieber provided consistency concerning linking of libraries.
+	  Now all project files are declared as much, not using DLL.
 27-May-99:
 	- FLATCOL shading works better now.
 	- Michael Dale Long updated the GGI makefile so that it compiles
@@ -34,6 +60,9 @@ Short-term cleanups that need to be done:
 	  curve lightmap calculations.
 	- I removed a limitation in the LightMap class for the size of
 	  lightmaps.
+	- Thomas Hieber fixed a small bug in the guids.cpp file.
+	- Robert Bate updated the Macintosh project files. He also increased
+	  the memory partition so that the created apps will run.
 26-May-99:
 	- Received update to MazeD from Siu-Hang <shor@cse.cuhk.edu.hk>.
 	  It enables the creation of sectors and portals so that you can
