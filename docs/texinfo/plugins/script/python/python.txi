@@ -1,9 +1,77 @@
-@node Python Bindings, Perl Bindings, The iScript Interface, Scripting Languages
+@node Python Bindings, , Perl Bindings, Scripting Languages
 @subsection Python Bindings
 @cindex Python
 @cindex @code{csPython}
 
-The CS Python bindings are extensive, but not yet documented.
+@noindent
+@emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}}.
 
-There are, however, a few example apps written entirely in Python, distributed
-as part of CS.
+Crystal Space is accessible from Python in two ways: (1) as a Crystal Space
+plugin module in which C++ code can call upon Python code, and in which Python
+code can call upon Crystal Space; (2) as a pure Python module named
+@file{cspace} which one can @samp{import} from within Python programs.  To use
+the first option, load the @file{cspython} plugin as you would load any other
+Crystal Space plugin, and interact with it via the @sc{scf} @samp{iScript}
+interface (@pxref{iScript Interface}).  The second approach allows you to write
+Crystal Space applications entirely in Python, without any C++ coding.
+
+Once Crystal Space is built and optionally installed, you can use the Python
+bindings. To do so, you need to make sure that Python can locate the
+appropriate Crystal Space resources. Follow these instructions:
+
+@enumerate
+@item
+Tell Python where to find @file{cspace.pm} by setting your @samp{PYTHONPATH}
+environment variable to mention the directory where @file{cspace.pm}
+resides. If you installed Crystal Space, then it will reside at:
+
+@noindent
+@code{$@{prefix@}/share/crystalspace/bindings/python}
+
+@noindent
+where $@{prefix@} is the installation path (typically, @file{/usr/local}). If
+you did not install Crystal space, then @file{cspace.pm} will be in the
+top-level build directory (this will be the @file{CS} directory if you
+configured and built in the @file{CS} directory).
+
+@item
+Optionally tell Python where to find the @file{_cspace} shared library. Python
+should be able to locate the library by consulting @samp{PYTHONPATH} which you
+already set, but if this fails, mention the directory containing the library in
+your @samp{LD_LIBRARY_PATH} environment variable on Unix, your @samp{PATH}
+variable on Windows, or your @samp{DYLD_LIBRARY_PATH} variable on MacOS/X. On
+Unix and MacOS/X, the library's name is @file{_cspace.so}; and on Windows it is
+@file{_cspace.dll}. If you installed Crystal Space, then the library will
+reside at:
+
+@noindent
+@code{$@{prefix@}/share/crystalspace/bindings/python}
+
+@noindent
+If you did not install Crystal Space, then it will be in the top-level build
+directory.
+
+@item
+If necessary, set your @samp{CRYSTAL} environment variable to allow Crystal
+Space to locate its plugin modules and other resources.
+@end enumerate
+
+There are a number of examples illustrating how to @samp{import} the
+@samp{cspace} module and utilize Crystal Space from within pure Python scripts.
+These scripts are installed at:
+
+@noindent
+@code{$@{prefix@}/share/crystalspace/bindings/python}
+
+@noindent
+If you did not install Crystal Space, then you can find the scripts within the
+source tree at @file{CS/scripts/python}. In particular, the @file{tutorial#.py}
+scripts should be of interest since they mirror the first several C++ tutorial
+programs (@pxref{Tutorial Simple}).
+
+You can also access Python from a C++ program by loading the @file{cspython}
+Crystal Space plugin module and interacting with it via the @sc{scf}
+@samp{iScript} interface (@pxref{iScript Interface}).  The @file{pysimp}
+example program (@file{CS/apps/pysimp}) illustrates how to do so. In addition
+to loading the @file{cspython} plugin, it loads and executes Python code from a
+sample script (which resides along with the other Python examples noted above).

@@ -1,16 +1,15 @@
-@node The iScript Interface, Python Bindings, Scripting Languages, Scripting Languages
+@node iScript Interface, Java Bindings, Scripting Languages, Scripting Languages
 @subsection The iScript Interface
 @cindex @code{iScript}
 
-This is the interface used from C++ code to access parts of scripting
-language interpreters. In enables one to create and destroy variables and
+The @samp{iScript} interface is used from C++ code to access parts of scripting
+language interpreters. It enables one to create and destroy variables and
 set and get their values, call subroutines, create and destroy objects
 and set and get their properties and call their methods.
 
-Interface calls which call script functions and methods take a variable
-length argument list specified with a printf-style format string.
+Interface calls which call script functions and methods take a variable length
+argument list specified with a printf-style format string.  Supported types
+are: @samp{int}, @samp{float}, @samp{double}, @samp{string} and script object.
 
-Supported types are: int, float, double, string and script object.
-
-The interface is fully documented in the Public API Reference, so this
-page is only here to draw attention to its existence.
+The @samp{iScript} interface is defined in @file{ivaria/script.h}, and
+documented in the Public @sc{api} Reference.

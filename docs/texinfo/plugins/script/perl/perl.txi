@@ -1,30 +1,51 @@
-@node Perl Bindings, , Python Bindings, Scripting Languages
+@node Perl Bindings, Python Bindings, Java Bindings, Scripting Languages
 @subsection Perl Bindings
 @cindex Perl
 @cindex @code{csPerl}
 
-Crystal Space has extensive bindings for Perl version 5.
+Crystal Space is accessible from Perl in two ways: (1) as a Crystal Space
+plugin module in which C++ code can call upon Perl code, and in which Perl code
+can call upon Crystal Space; (2) as a pure Perl module named @file{cspace}
+which one can @samp{use} from within Perl programs.  To use the first option,
+load the @file{csperl5} plugin as you would load any other Crystal Space
+plugin, and interact with it via the @sc{scf} @samp{iScript} interface
+(@pxref{iScript Interface}).  The second approach allows you to write Crystal
+Space applications entirely in Perl, without any C++ coding.  The rest of this
+document pertains to the second method of using Crystal Space from Perl, though
+much of the discussion is meaningful to both methods.
 
-@subheading Getting Started
+To make use of Crystal Space classes from a pure Perl script, first make sure
+that the file @samp{cspace.pm} is available to Perl.  This file is installed
+at:
 
-To make use of Crystal Space classes from a Perl script, first make sure that
-the file @samp{cspace.pm} is available to Perl.  This file is installed at
-@file{$@{prefix@}/share/crystalspace/perl5}, where @file{$@{prefix@}} is the
-location at which Crystal Space was installed (typically,
-@file{/usr/local}). You may also find a copy of this file in the
-@file{CS/scripts/perl5} source directory.  The easiest way to tell Perl where this file resides is via the @samp{lib} pragma:
+@noindent
+@code{$@{prefix@}/share/crystalspace/bindings/perl5/cspace.pm}
+
+@noindent
+where @file{$@{prefix@}} is the location at which Crystal Space was installed
+(typically, @file{/usr/local}). If you have not installed Crystal Space, then
+you can find this file in the top level build directory after building the
+project (the @file{CS} directory if you built and configured there).  There are
+several ways to tell Perl where this file resides. One way is to use the
+@samp{lib} pragma within your Perl code:
 
 @example
-use lib "$ENV@{CRYSTAL@}/share/crystalspace/perl5";
+use lib "$ENV@{CRYSTAL@}/share/crystalspace/bindings/perl5";
 @end example
 
+@noindent
 You can also use Perl's @samp{-I} command-line option to tell it the location
-of this file.
+of this file. Finally, you can set the @samp{PERL5LIB} environment variable so
+that it mentions the directory containing @file{cspace.pm}.
 
-The @file{cspace.so} (Unix, Linux, MacOS/X) or @file{cspace.dll} (Windows)
-shared library file should reside the same directory as the @file{cspace.pm}
-file. This happens automatically when you install Crystal Space (via @samp{make
-instal} or @samp{jam install}).
+In addition to the @samp{.pm} file, there is also a shared library,
+@file{cspace}, which contains the low-level bindings between Perl and Crystal
+Space. On Unix and MacOS/X, this file is named @file{cspace.so}; on Windows it
+is named @file{cspace.dll}. The shared library file should reside in the same
+directory as the @file{cspace.pm} file. This happens automatically when you
+install Crystal Space (via @samp{make install} or @samp{jam install}). If you
+have not installed Crystal Space, then the shared library will be in the
+top-level build directory, along with @file{cspace.pm}.
 
 To actually utilize Crystal Space from within your script, begin with:
 
@@ -32,7 +53,7 @@ To actually utilize Crystal Space from within your script, begin with:
 use cspace;
 @end example
 
-@subheading Quick Start
+@subheading Getting Started
 
 To get started with pure Perl scripts, you probably want to know how to
 initialize Crystal Space and obtain an @samp{iObjectRegistry} pointer:
@@ -52,7 +73,7 @@ char const* str = "Hello, world!";
 int key = csHashCompute(str);
 @end example
 
-Perl is almost exactly the same, the most notable difference being the
+Perl is almost exactly the same, the most notable difference is the
 @code{cspace::} prefix:
 
 @example
@@ -75,18 +96,20 @@ There are three ways to access object properties:
 
 @example
 print $vect->x;       # Preferred way, conforms to Perl convention
-print $vect->@{"x"@}; # Swig's generated primary way
-print $vect->get_x(); # Swig's generated secondary way
+print $vect->@{"x"@}; # Swig's primary way
+print $vect->get_x(); # Swig's secondary way
 @end example
 
+@noindent
 And, three ways to modify object properties:
 
 @example
 $vect->x(123);        # Preferred way, conforms to Perl convention
-$vect->@{"x"@} = 123; # Swig's generated primary way
-$vect->set_x(123);    # Swig's generated secondary way
+$vect->@{"x"@} = 123; # Swig's primary way
+$vect->set_x(123);    # Swig's secondary way
 @end example
 
+@noindent
 Calling methods works as you might expect:
 
 @example
@@ -102,7 +125,6 @@ a Crystal Space C++ function, a Perl array reference is used.
 
 Operator overloading is not yet supported. All the code required to support it
 has been written, but the code requires some non-existant features of Swig.
-
 The operators that exist in C++ and which Perl can overload are:
 @code{+ - * / % << >> & | ^ && || ! ~ < <= == >= > != ++ --
 = += -= *= /= %= <<= >>= &= |= ^=}
@@ -115,12 +137,12 @@ stringify and numerify.
 
 @subheading Interface Pointers
 
-Supposing you call a function that returns a pointer to some interface.
+Suppose you call a function that returns a pointer to some @sc{scf} interface.
 You can store the returned value in a variable, and use it similarly to how
-objects are used in Perl (see above). You can call their methods in the same
-way, and pass them on to further functions as parameters where appropriate.
+objects are used in Perl (see above). You can call methods in the same
+way, and pass them on to other functions as arguments where appropriate.
 
-The Perl bindings automatically correctly handle @code{csRef<>} and
+The Perl bindings automatically and correctly handle @code{csRef<>} and
 @code{csPtr<>}.
 
 @subheading Implementing Interfaces
@@ -154,16 +176,20 @@ $eventq->RegisterListener($handler);
 
 @subheading Special Cases
 
-Take note of these special cases.
+Take note of the following special cases.
 
 @subsubheading Macros Accepting Interfaces as Parameters
 
 In Perl, Crystal Space macros that take interface names as parameters---for
-instance @code{CS_QUERY_REGISTRY()}---take those interface names as strings:
+instance @code{CS_QUERY_REGISTRY()}---take interface names as strings:
 
 @example
 my $engine = cspace::CS_QUERY_REGISTRY($object_reg, "iEngine");
 @end example
+
+@noindent
+This differs from the C++ @code{CS_QUERY_REGISTRY()} macro in which
+@samp{iEngine} would not be quoted.
 
 @subsubheading @code{csRGBpixel}
 

@@ -1,0 +1,148 @@
+@node Java Bindings, Perl Bindings, iScript Interface, Scripting Languages
+@subsection Java Bindings
+@cindex Java
+@cindex csJava
+@cindex Scripting, Java
+
+@noindent
+@emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}}.
+
+The csJava module provides access to Crystal Space from Java in the form of a
+set of classes in the package @samp{com.crystalspace} which can be imported
+into pure Java programs. The csJava module consists of a @sc{jar} package,
+@file{crystalspace.jar}, and a shared library, @file{csjava}.
+
+The Crystal Space classes, interfaces, and methods exported to Java are used in
+almost the same fashion as in C++. Consequently, the Crystal Space Public
+@sc{api} Reference can be consulted in most cases. There is also a nice sample
+program which show concretely how to utilize Crystal Space from Java. It
+performs the same functionality as the first C++ tutorial
+(@pxref{Tutorial Simple}).
+
+Presently, the caJava module can be built only by people using Jam or ``make''
+to build Crystal Space. To build csJava, follow these instructions:
+
+@enumerate
+@item
+Install Swig.
+
+@noindent
+@uref{http://www.swig.org/}
+
+@item
+Install a Java @sc{sdk}. Crystal Space has been tested with Sun's Java2
+@sc{sdk}, Standard Edition 1.4.x. After installing Java, be sure that the
+@samp{java} and @samp{javac} commands are found by your @samp{PATH} environment
+variable, or set @samp{JAVA_HOME}.
+
+@noindent
+@uref{http://java.sun.com/j2ee/1.4/download.html}
+
+@item
+Install Ant, a ``make''-like tool for Java. After installing Ant, be sure that
+the @samp{ant} command is found by your @samp{PATH} environment variable, or
+set @samp{ANT_HOME}.
+
+@noindent
+@uref{http://ant.apache.org/}
+
+@item
+Configure Crystal Space. The configure script should recognize the @samp{java},
+@samp{javac}, @samp{ant}, and @samp{swig} commands, and perform a ``Java SDK
+usability'' check. If all checks succeed, continue to the next step.
+
+@item
+Build and optionally install Crystal Space. The csJava module will be built
+along with the rest of the project.
+@end enumerate
+
+Once Crystal Space is built and optionally installed, you can use the csJava
+module in your own programs. To do so, follow these instructions:
+
+@enumerate
+@item
+Tell Java where to find @file{crystalspace.jar} by setting your
+@samp{CLASSPATH} environment variable to point at the @sc{jar} file. If you
+installed Crystal Space, then the @sc{jar} file will reside at:
+
+@noindent
+@code{$@{prefix@}/share/crystalspace/bindings/java/crystalspace.jar}
+
+@noindent
+where $@{prefix@} is the installation path (typically, @file{/usr/local}). If
+you did not install Crystal space, then the @sc{jar} file will be in the
+top-level build directory (this will be the @file{CS} directory if you
+configured and built in the @file{CS} directory). For convenience in testing,
+you can also point your @samp{CLASSPATH} variable at the current directory
+(@samp{.}).
+
+@item
+Tell Java where to find the csJava shared library by setting your
+@samp{LD_LIBRARY_PATH} environment variable on Unix, your @samp{PATH} variable
+on Windows, or your @samp{DYLD_LIBRARY_PATH} variable on MacOS/X. On Unix, the
+library's name is @file{libcsjava.so}; on Windows it is @file{csjava.dll}; and
+on MacOS/X, it is @file{libcsjava.jnilib}. If you installed Crystal Space, then
+the library will reside at:
+
+@noindent
+@code{$@{prefix@}/share/crystalspace/bindings/java}
+
+@noindent
+If you did not install Crystal Space, then it will be in the top-level build
+directory.
+
+@item
+If necessary, set your @samp{CRYSTAL} environment variable to allow Crystal
+Space to locate its plugin modules and other resources.
+
+@item
+In the directory containing your Java program, @file{myprog.java}, compile it
+with the @samp{javac} command: @samp{javac myprog.java}
+
+@item
+Run your program: @samp{java myprog}
+@end enumerate
+
+The sample program @file{SimpleRoom.java} provides a nice example of how to
+utilize Crystal Space from Java. It provides the same functionality as the
+first C++ tutorial (@pxref{Tutorial Simple}).  If you installed Crystal Space,
+then @file{SimpleRoom.java} will reside at:
+
+@noindent
+@code{$@{prefix@}/share/crystalspace/bindings/java/SimpleRoom.java}
+
+@noindent
+If you did not install Crystal Space, then you can find it in the Crystal Space
+source tree at @file{CS/scripts/java/SimpleRoom.java}. To experiment with
+@file{SimpleRoom.java}, copy it to a convenient work directory, compile it with
+@samp{javac}, and run it with @samp{java}.  Here is a sample session on Linux
+illustrating the above instructions:
+
+@example
+% cd CS
+% ./configure
+...
+checking for swig... swig
+checking if swig version >= 1.3.20... yes (version 1.3.22)
+checking for java... /usr/java/j2sdk1.4.2_06/bin/java
+checking for javac... /usr/java/j2sdk1.4.2_06/bin/javac
+checking if Java2 SDK is usable... yes
+checking for ant... /usr/local/ant/bin/ant
+...
+% jam install # (or 'make install')
+
+% csjavadir=/usr/local/share/crystalspace/bindings/java
+% CLASSPATH=$CLASSPATH:.:$csjavadir/crystalspace.jar
+% export CLASSPATH
+% LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$csjavadir
+% export LD_LIBRARY_PATH
+% CRYSTAL=/usr/local
+% export CRYSTAL
+% mkdir $HOME/javatest
+% cd $HOME/javatest
+% cp $csjavadir/SimpleRoom.java .
+% javac SimpleRoom.java
+% java SimpleRoom
+@end example
+
+On Windows and MacOS/X, the procedure is almost identical. The primary difference is that, rather than setting @samp{LD_LIBRARY_PATH}, you need to set the @samp{PATH} environment variable on Windows to point at the directory containing @file{csjava.dll}; or the @samp{DYLD_LIBRARY_PATH} variable on MacOS/X to point at the directory containing @file{libcsjava.jnilib}.

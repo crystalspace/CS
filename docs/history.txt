@@ -11,6 +11,9 @@ chronological order.
 	  treating its `csArray<> face_normals' as if it was a
 	  csDirtyAccessArray<>.  Although this "works" today, it is considered
 	  illegal and may not work in the future.
+	- Eric Sunshine wrote sections for the CS user manual explaining the
+	  Java and Python bindings. Also rewrote portions of the Perl section
+	  and the scripting introduction.
 7-Nov-2004
 	- Eric Sunshine made the following Python-related changes:
 	    - Fixed cspython plugin so that it works correctly when installed.
