@@ -14,6 +14,7 @@ The history order has been reversed so that new features are at the top.
 	      mechanism into NeXTDelegate.m since it is needed from a couple
 	      different places.  Added a new extension to
 	      NeXTSystemDriver::SystemExtension() named "flushgraphicscontext".
+	- Release of 0.18r001.
 19-Feb-2001
 	- Fixed a bug in csMeshWrapper::SetMeshObject().
 	- Fixed a bug in csMovable. The parent reference should not
