@@ -78,6 +78,7 @@ struct iLoaderContext;
 struct iSequenceTrigger;
 struct iSequenceWrapper;
 struct iEngineSequenceParameters;
+struct iSharedVariable;
 
 enum
 {
@@ -375,6 +376,9 @@ private:
   iMapNode* ParseNode (iDocumentNode* node, iSector* sec);
   /// Parse a sector definition and add the sector to the engine
   iSector* ParseSector (iDocumentNode* node);
+  /// Find the named shared variable and verify its type if specified
+  iSharedVariable *FindSharedVariable(const char *colvar,
+				      int verify_type );
 
   /// -----------------------------------------------------------------------
 

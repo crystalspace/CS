@@ -32,6 +32,7 @@
 struct iObjectRegistry;
 class csEngineSequenceManager;
 class OpStandard;
+struct iSharedVariable;
 
 /**
  * Implementation of iEngineSequenceParameters.
@@ -135,7 +136,7 @@ public:
   void AddOperationFadeLight (csTicks time, iParameterESM* light,
 		  const csColor& color, csTicks duration);
   void AddOperationSetAmbient (csTicks time, iParameterESM* light,
-		  const csColor& color);
+		  const csColor& color,iSharedVariable *var);
   void AddOperationFadeAmbient (csTicks time, iParameterESM* light,
 		  const csColor& color, csTicks duration);
   void AddOperationRandomDelay(csTicks time,int min, int max);
@@ -222,9 +223,9 @@ public:
       scfParent->AddOperationFadeLight (time, light, color, duration);
     }
     virtual void AddOperationSetAmbient (csTicks time, iParameterESM* light,
-		  const csColor& color)
+		  const csColor& color, iSharedVariable *colorvar)
     {
-      scfParent->AddOperationSetAmbient (time, light, color);
+      scfParent->AddOperationSetAmbient (time, light, color, colorvar);
     }
     virtual void AddOperationFadeAmbient (csTicks time, iParameterESM* light,
 		  const csColor& color, csTicks duration)

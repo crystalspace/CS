@@ -384,7 +384,11 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
   ResolveOnlyRegion = iOnlyRegion;
   ldr_context = NULL;
 
+  csTicks startticks = csGetTicks();
+  ReportWarning ("crystalspace.maploader.perf","Started load here.",startticks);
   csRef<iDataBuffer> buf (VFS->ReadFile (file));
+  csTicks loadticks = csGetTicks();
+  ReportWarning ("crystalspace.maploader.perf","Loading the file took %d ticks",loadticks-startticks);
 
   if (!buf || !buf->GetSize ())
   {
@@ -398,10 +402,16 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
 
   csRef<iDocument> doc;
   bool er = TestXml (file, buf, doc);
+
+  csTicks xmlticks = csGetTicks();
+  ReportWarning ("crystalspace.maploader.perf","Parsing the xml took %d ticks",xmlticks-loadticks);
+
   if (!er) return false;
   if (doc)
   {
     if (!LoadMap (doc->GetRoot ())) return false;
+    csTicks lastticks = csGetTicks();
+    ReportWarning ("crystalspace.maploader.perf","Loading the map into the engine took %d ticks",lastticks-xmlticks);
   }
   else
   {
@@ -3123,17 +3133,38 @@ void csLoader::ParseSharedVariable (iDocumentNode* node)
 {
   iSharedVariable *v = Engine->GetVariableList()->New();
 
-  v->Set(node->GetAttributeValueAsFloat ("value"));
   v->SetName(node->GetAttributeValue ("name"));
 
   if (v->GetName())
   {
-//  ReportWarning("csLoader::ParseSharedVariable",node,"Adding value of %s=%f.",v->GetName(),v->Get());
-    Engine->GetVariableList()->Add(v);
+    const char *type = node->GetAttributeValue ("type");
+    if (type)
+    {
+      if (!strcmp (type,"float"))
+      {
+        v->Set(node->GetAttributeValueAsFloat ("value"));
+      }
+      else if (!strcmp (type,"color"))
+      {
+        v->SetColor (csColor(node->GetAttributeValueAsFloat ("red"),
+			     node->GetAttributeValueAsFloat ("green"),
+			     node->GetAttributeValueAsFloat ("blue") ) );
+      }
+      else if (!strcmp (type,"vector3"))
+      {
+        v->SetVector (node->GetAttributeValueAsFloat ("x"),
+		      node->GetAttributeValueAsFloat ("y"),
+		      node->GetAttributeValueAsFloat ("z") );
+      }
+      else
+	  ; // Empty vars are technically allowed but not very useful
+    }
+    Engine->GetVariableList ()->Add (v);
   }
   else
   {
-    ReportWarning("csLoader::ParseSharedVariable",node,"Variable tag does not have name attribute.");
+    v->DecRef();
+    ReportWarning("csLoader::ParseSharedVariable",node,"Variable tag does not have 'name' attribute.");
   }
 }
 

@@ -29,6 +29,7 @@
 #include "iengine/region.h"
 #include "iengine/light.h"
 #include "iengine/statlght.h"
+#include "iengine/sharevar.h"
 #include "iengine/mesh.h"
 #include "imesh/thing/thing.h"
 #include "imesh/object.h"
@@ -942,12 +943,29 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
 	  csRef<iParameterESM> sector = ResolveOperationParameter (
 	  	child, PARTYPE_SECTOR, "sector", seqname, base_params);
 	  if (!sector) return NULL;
-
+	  iSharedVariable *var=NULL;
 	  csColor col;
-	  col.red = child->GetAttributeValueAsFloat ("red");
-	  col.green = child->GetAttributeValueAsFloat ("green");
-	  col.blue = child->GetAttributeValueAsFloat ("blue");
-	  sequence->AddOperationSetAmbient (cur_time, sector, col);
+	  const char *colvar;
+	  if (colvar = child->GetAttributeValue ("color_var")) // variable set at run time
+	  {
+	    var = FindSharedVariable(colvar,
+				     iSharedVariable::SV_COLOR );
+	    if (!var)
+	    {
+	      SyntaxService->ReportError (
+			"crystalspace.maploader.parse.sequence",
+			child, "Shared variable '%s' not found or not a color!",
+			colvar);
+	      return NULL;
+	    }
+	  }
+	  else
+	  {
+	    col.red = child->GetAttributeValueAsFloat ("red");
+	    col.green = child->GetAttributeValueAsFloat ("green");
+	    col.blue = child->GetAttributeValueAsFloat ("blue");
+	  }
+	  sequence->AddOperationSetAmbient (cur_time, sector, col, var);
 	}
         break;
       case XMLTOKEN_FADEFOG:
@@ -1114,3 +1132,16 @@ bool csLoader::LoadSequences (iDocumentNode* node)
   return true;
 }
 
+iSharedVariable *csLoader::FindSharedVariable(const char *colvar,
+					      int verify_type )
+{
+    iSharedVariable *found = Engine->GetVariableList ()->
+				FindByName (colvar);
+    if (found)
+    {
+      if (verify_type == iSharedVariable::SV_UNKNOWN ||
+	  found->GetType() == verify_type)
+	return found;
+    }
+    return NULL;
+}

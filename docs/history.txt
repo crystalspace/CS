@@ -7,6 +7,12 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine removed the -ggdb check from configure.ac since it
 	  breaks the MacOS/X Jaguar port (assembler barfs on generated
 	  assembly), and it wasn't really used/needed anyhow.
+	- Keith Fulton added csColor and csVector3 types to iSharedVariable.
+	- Keith Fulton added ability to reference an iSharedVariable
+	  from a <setambient> sequence command using a color_var attribute.
+	  Walktest now sets the ambient in the large room to the color of
+	  light on the stairs at the moment you hit Ctrl-L to start the
+	  lightning.
 15-Jan-2003
 	- Started removing a few csVector usages and replacing them
 	  with typed versions. In particular changed:

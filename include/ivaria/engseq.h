@@ -37,6 +37,7 @@ class csReversibleTransform;
 class csVector3;
 class csBox3;
 class csSphere;
+struct iSharedVariable;
 
 SCF_VERSION (iParameterESM, 0, 0, 1);
 
@@ -227,7 +228,7 @@ struct iSequenceWrapper : public iBase
    * Operation: set dynamic ambient light color.
    */
   virtual void AddOperationSetAmbient (csTicks time, iParameterESM* light,
-		  const csColor& color) = 0;
+		  const csColor& color,iSharedVariable *colorvar) = 0;
 
   /**
    * Operation: fade dynamic ambient light to some color during some time.

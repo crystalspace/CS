@@ -51,6 +51,7 @@
 #include "imesh/stars.h"
 #include "imesh/terrfunc.h"
 #include "imesh/thing/polygon.h"
+#include "iengine/sharevar.h"
 #include "engseq.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -392,17 +393,25 @@ class OpSetAmbientLight : public OpStandard
 private:
   csRef<iSector> sector;
   csColor color;
+  iSharedVariable *colorvar;
 
 public:
-  OpSetAmbientLight (iParameterESM* sectorpar, const csColor& color)
+  OpSetAmbientLight (iParameterESM* sectorpar, const csColor& color,
+		     iSharedVariable *varcolor)
   {
     sector = SCF_QUERY_INTERFACE (sectorpar->GetValue (), iSector);
-    OpSetAmbientLight::color = color;
+    if (varcolor)
+      colorvar = varcolor;
+    else
+    {
+      colorvar = NULL;
+      OpSetAmbientLight::color = color;
+    }
   }
 
   virtual void Do (csTicks /*dt*/, iBase* params)
   {
-    sector->SetDynamicAmbientLight (color);
+    sector->SetDynamicAmbientLight (colorvar?colorvar->GetColor():color);
   }
 };
 
@@ -960,6 +969,34 @@ SCF_IMPLEMENT_IBASE (constantPar)
   SCF_IMPLEMENTS_INTERFACE (iParameterESM)
 SCF_IMPLEMENT_IBASE_END
 
+class sharedvarPar : public iParameterESM
+{
+private:
+  csRef<iBase> value;
+
+public:
+  sharedvarPar (iBase* value)
+  {
+    SCF_CONSTRUCT_IBASE (NULL);
+    sharedvarPar::value = value;
+  }
+  virtual ~sharedvarPar () { }
+  SCF_DECLARE_IBASE;
+  virtual iBase* GetValue (iBase* params = NULL) const
+  {
+    (void)params;
+    return value;
+  }
+  virtual bool IsConstant () const
+  {
+    return false;
+  }
+};
+
+SCF_IMPLEMENT_IBASE (sharedvarPar)
+  SCF_IMPLEMENTS_INTERFACE (iParameterESM)
+SCF_IMPLEMENT_IBASE_END
+
 //---------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE (csEngineSequenceParameters)
@@ -1058,9 +1095,9 @@ void csSequenceWrapper::AddOperationFadeLight (csTicks time,
 }
 
 void csSequenceWrapper::AddOperationSetAmbient (csTicks time,
-	iParameterESM* light, const csColor& color)
+	iParameterESM* light, const csColor& color,iSharedVariable *var)
 {
-  OpSetAmbientLight* op = new OpSetAmbientLight (light, color);
+  OpSetAmbientLight* op = new OpSetAmbientLight (light, color,var);
   sequence->AddOperation (time, op);
   op->DecRef ();
 }

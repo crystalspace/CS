@@ -99,8 +99,9 @@
         </texture>
     </textures>
     <variables>
-	<variable name="Std Thing Angle" value="0.54321" />
-	<variable name="Std Thing Range" value="50.5" />
+	<variable name="Std Thing Angle" type="float" value="0.54321" />
+	<variable name="Std Thing Range" type="float" value="50.5" />
+	<variable name="Lightning Restore Color" type="color" red="0" green="0" blue="0" />
     </variables>
     <materials>
         <material name="tree">
@@ -23001,13 +23002,13 @@
     
 	<sequence name="seq_lightning">
 	    <!-- Sequence fired by application and not by trigger.-->
-	    <fadeambient sector="large" red="1.0" green="1.0" blue="1.5" duration="80" />
+	    <setambient sector="large" red="1.0" green="1.0" blue="1.5" duration="80" />
 	    <delay time="75" />
 	    <fadeambient sector="large" red="0" green="0" blue="0" duration="120" />
 	    <delay time="75" />
 	    <fadeambient sector="large" red="1.0" green="1.0" blue="1.5" duration="80" />
 	    <delay time="150" />
-	    <fadeambient sector="large" red="0" green="0" blue="0" duration="120" />
+	    <setambient sector="large" color_var="Lightning Restore Color" />
 	    <delay time="3000" />
 	</sequence>
 
