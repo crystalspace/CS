@@ -132,8 +132,14 @@ CFLAGS.profile = -pg -O -g
 # Flags for the compiler which are used when building a shared library.
 CFLAGS.DLL = $(NEXT.CFLAGS.DLL)
 
-# General flags for the linker which are used in any case.
-LFLAGS.GENERAL = $(NEXT.ARCH_FLAGS) $(NEXT.LFLAGS.GENERAL) \
+# General flags for the linker which are used in any case.  The "arch" flags
+# are derived above.  The "general" flags come from the platform-specific
+# makefile wrapper.  The "config" flags are determined at configuration time
+# and come from CS/config.mak.
+LFLAGS.GENERAL = \
+  $(NEXT.ARCH_FLAGS) \
+  $(NEXT.LFLAGS.GENERAL) \
+  $(NEXT.LFLAGS.CONFIG) \
   $(LFLAGS.L)libs/zlib $(LFLAGS.L)libs/libpng $(LFLAGS.L)libs/libjpeg
 
 # Flags for the linker which are used when debugging.
@@ -146,7 +152,7 @@ LFLAGS.profile = -pg
 LFLAGS.EXE = $(NEXT.LFLAGS.EXE)
 
 # Flags for the linker which are used when building a console executable.
-LFLAGS.CONSOLE.EXE = $(NEXT.LFLAGS.EXE)
+LFLAGS.CONSOLE.EXE = $(NEXT.LFLAGS.EXE.CONSOLE)
 
 # Flags for the linker which are used when building a shared library.
 LFLAGS.DLL = $(NEXT.LFLAGS.DLL)
@@ -261,7 +267,7 @@ ifeq ($(ROOTCONFIG),config)	  # ROOTCONFIG, but we only need to run once.
 ifneq ($(strip $(TARGET_ARCHS)),)
   SYSCONFIG += $(NEWLINE)echo TARGET_ARCHS = $(NEXT.TARGET_ARCHS)>>config.tmp
 endif
-SYSCONFIG += \
+SYSCONFIG += $(NEXT.SYSCONFIG) \
   $(NEWLINE)bin/comptest.sh cc>>config.tmp \
   $(NEWLINE)bin/haspythn.sh>> config.tmp \
   $(NEWLINE)echo override DO_ASM = $(DO_ASM)>>config.tmp

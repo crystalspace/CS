@@ -9,7 +9,7 @@
 # copyright notice is retained.  Send comments to <sunshine@sunshineco.com>.
 #
 #==============================================================================
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # openstep.mak
 #
 #	Build-time configuration options for the OpenStep platform.
@@ -26,7 +26,7 @@
 #	minimal optimization (-O) and force use of inline functions
 #	(-finline-functions) when compiling for debug.
 #
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
 NEXT.TARGET=openstep
 NEXT.TARGET.DESCRIPTION=$(NEXT.TARGET)
@@ -43,7 +43,9 @@ NEXT.CFLAGS.DLL=
 NEXT.LIBS=
 NEXT.LFLAGS.GENERAL=-framework AppKit -framework Foundation
 NEXT.LFLAGS.EXE=
+NEXT.LFLAGS.EXE.CONSOLE=
 NEXT.LFLAGS.DLL=-bundle -undefined suppress
+NEXT.SYSCONFIG=
 
 NEXT.FRIEND=yes
 include libs/cssys/next/next.mak

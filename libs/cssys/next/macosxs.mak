@@ -65,7 +65,9 @@ NEXT.CFLAGS.DLL=
 NEXT.LIBS=
 NEXT.LFLAGS.GENERAL=-framework AppKit -framework Foundation
 NEXT.LFLAGS.EXE=
+NEXT.LFLAGS.EXE.CONSOLE=
 NEXT.LFLAGS.DLL=-bundle -undefined suppress
+NEXT.SYSCONFIG=
 
 NEXT.FRIEND=yes
 include libs/cssys/next/next.mak

@@ -73,7 +73,7 @@ SRC.NEXT2D = $(wildcard $(SRC.COMMON.DRV2D) \
   $(addsuffix /*.m,$(NEXT.SOURCE_2D_PATHS)))
 OBJ.NEXT2D = $(addprefix $(OUT), \
   $(notdir $(subst .cpp,$O,$(SRC.NEXT2D:.m=$O))))
-DEP.NEXT2D = CSUTIL
+DEP.NEXT2D = CSSYS CSUTIL
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

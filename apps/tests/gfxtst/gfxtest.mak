@@ -51,8 +51,12 @@ ifeq ($(MAKESECTION),targets)
 gfxtst: $(OUTDIRS) $(GFXTEST.EXE)
 clean: gfxtstclean
 
+# Unfortunately, this command-line utility uses the plugin loading facilities
+# of the system driver, and on some platforms, that requires linking via
+# DO.LINK.EXE rather than the expected DO.LINK.CONSOLE.EXE.  We need to
+# resolve this issue in the future so that DO.LINK.CONSOLE.EXE can be used.
 $(GFXTEST.EXE): $(OBJ.GFXTEST) $(LIB.GFXTEST)
-	$(DO.LINK.CONSOLE.EXE)
+	$(DO.LINK.EXE)
 
 gfxtstclean:
 	-$(RM) $(GFXTEST.EXE) $(OBJ.GFXTEST)

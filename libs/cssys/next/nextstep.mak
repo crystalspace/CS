@@ -69,7 +69,9 @@ NEXT.CFLAGS.DLL=
 NEXT.LIBS=$(LFLAGS.l)NeXT_s $(LFLAGS.l)sys_s
 NEXT.LFLAGS.GENERAL=
 NEXT.LFLAGS.EXE=-u libNeXT_s -u libsys_s
+NEXT.LFLAGS.EXE.CONSOLE=$(NEXT.LFLAGS.EXE)
 NEXT.LFLAGS.DLL=-nostdlib -r
+NEXT.SYSCONFIG=
 
 NEXT.FRIEND=yes
 include libs/cssys/next/next.mak
