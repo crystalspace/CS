@@ -62,7 +62,7 @@ public:
   /// Request string for an ID.
   virtual const char* RequestString (csStringID id) = 0;
   /// Get our csEffectStrings
-  virtual inline csEffectStrings* GetStandardStrings() = 0;
+  virtual csEffectStrings* GetStandardStrings() = 0;
 };
 
 /** @} */
