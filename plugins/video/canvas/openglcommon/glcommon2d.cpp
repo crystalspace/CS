@@ -310,8 +310,8 @@ csImageArea *csGraphics2DGLCommon::SaveArea (int x, int y, int w, int h)
   if (!Area)
     return NULL;
   int actual_width = pfmt.PixelBytes * w;
-  GLubyte *dest;
-  Area->data = (char *)dest = new GLubyte [actual_width * h];
+  GLubyte* dest = new GLubyte [actual_width * h];
+  Area->data = (char *)dest;
   if (!dest)
   {
     delete Area;

@@ -481,8 +481,6 @@ void csCurve::GetCoverageMatrix (csFrustumView& lview,
 
 void csCurve::CalculateLighting (csFrustumView& lview)
 {
-  CS_ASSERT(_o2w);
-
   if (lview.dynamic)
   {
     // We are working for a dynamic light. In this case we create
