@@ -19,6 +19,8 @@ chronological order.
 	  destructor and FreeImage() and clearing the 'Image' pointer if
 	  destroy_image is not set. This fixes a bug with map2cs.
 	- duhprey removed collision detection for the sky in terrain
+	- John Harger fixed a the constants, the SUB and the PHASE instructions
+	  in the PS1 shader plugin for ATI cards.
 10-Mar-2004
 	- res made the following changes related to fonts:
 	    - Removed iFontServer::GetFont() and GetFontCount().

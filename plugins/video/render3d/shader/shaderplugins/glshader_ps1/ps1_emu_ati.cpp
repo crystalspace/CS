@@ -59,6 +59,7 @@ void csShaderGLPS1_ATI::Deactivate()
 void csShaderGLPS1_ATI::SetupState (csRenderMesh *mesh, 
 	const CS_SHADERVAR_STACK &stacks)
 {
+  csGLExtensionManager *ext = shaderPlug->ext;
   // set variables
   for(int i = 0; i < variablemap.Length(); ++i)
   {
@@ -74,9 +75,9 @@ void csShaderGLPS1_ATI::SetupState (csRenderMesh *mesh,
       csVector4 v4;
       if (lvar->GetValue (v4))
       {
-        // const csGLExtensionManager* ext = shaderPlug->ext;
-        //ext->glProgramLocalParameter4fvARB (GL_VERTEX_PROGRAM_ARB, 
-        //  variablemap[i].registernum, &v4.x);
+        ext->glSetFragmentShaderConstantATI (
+          GL_CON_0_ATI + variablemap[i].registernum,
+          &v4.x);
       }
     }
   }
@@ -190,7 +191,7 @@ bool csShaderGLPS1_ATI::GetATIShaderCommand
   case CS_PS_INS_MAD: op = GL_MAD_ATI; break;
   case CS_PS_INS_MOV: op = GL_MOV_ATI; break;
   case CS_PS_INS_MUL: op = GL_MUL_ATI; break;
-  case CS_PS_INS_SUB: op = GL_ADD_ATI; break;
+  case CS_PS_INS_SUB: op = GL_SUB_ATI; break;
   }
   switch(args)
   {

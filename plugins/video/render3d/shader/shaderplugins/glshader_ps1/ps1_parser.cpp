@@ -156,6 +156,7 @@ void csPixelShaderParser::RegisterInstructions ()
   // Phase Instruction (PS 1.4 only)
   PS_Instructions[CS_PS_INS_PHASE].id = strings.Request ("phase");
   PS_Instructions[CS_PS_INS_PHASE].versions = CS_PS_1_4;
+  PS_Instructions[CS_PS_INS_PHASE].arguments = 0;
 
   // Unsupported instructions
   PS_Instructions[CS_PS_INS_BEM].supported = false;
