@@ -189,6 +189,8 @@ protected:
 
   /// Critical section wrapping the EmptyBlocks queue which must be accessable by both the background thread and the MMsystem callback.
   CRITICAL_SECTION critsec_EmptyBlocks;
+  /// An event that is signalled by the callback when empty blocks are ready to be processed
+  HANDLE hevent_EmptyBlocksReady;
 
   /// CS representation of running background thread
   csRef<csThread> csbgThread;

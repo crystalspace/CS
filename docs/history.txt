@@ -7,6 +7,12 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 
+2-Oct-2004
+	- Rhad improved windows waveout sound driver performance through
+	  brute force threading.
+	- Added an event to trigger buffer filling instead of timeslice
+	  based filling.
+	- Background thread is now set to time critical priority.
 1-Oct-2004
 	- Rhad added Get,set MinimumDistance and MaximumDistance interface
 	  functions to the iSoundSource interface

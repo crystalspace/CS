@@ -65,6 +65,7 @@ csSoundDriverWaveOut::csSoundDriverWaveOut(iBase *piBase)
   SoundRender = 0;
   MemorySize = 0;
   Memory = 0;
+  hevent_EmptyBlocksReady = 0;
 }
 
 csSoundDriverWaveOut::~csSoundDriverWaveOut()
@@ -97,6 +98,13 @@ bool csSoundDriverWaveOut::Initialize (iObjectRegistry *r)
    *  is not an option!
   */
   InitializeCriticalSection(&critsec_EmptyBlocks);
+
+  SECURITY_ATTRIBUTES event_sec;
+  event_sec.nLength=sizeof(SECURITY_ATTRIBUTES);
+  event_sec.lpSecurityDescriptor=NULL;
+  event_sec.bInheritHandle=true;
+
+  hevent_EmptyBlocksReady = CreateEvent(&event_sec,true,false,NULL);
 
   return true;
 }
@@ -199,10 +207,13 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency,
 void csSoundDriverWaveOut::Close()
 {
   int wait_timer=0;
-  // Signal background thread to halt
+  // Tell the background thread to halt
   bgThread->RequestStop();
 
-  // Wait a bit for it to shut down nicely.  If it doesn't 
+  // Signal the event that the background thread may be waiting on
+  SetEvent(hevent_EmptyBlocksReady);
+
+  // Wait a bit for it to shut down nicely.
   while (bgThread->IsRunning() && wait_timer++<120000)
     csSleep(0);
 
@@ -218,6 +229,7 @@ void csSoundDriverWaveOut::Close()
 
   LeaveCriticalSection(&critsec_EmptyBlocks);
   DeleteCriticalSection(&critsec_EmptyBlocks);
+  CloseHandle(hevent_EmptyBlocksReady);
 
   delete AllocatedBlocks;
   AllocatedBlocks=NULL;
@@ -308,9 +320,13 @@ void CALLBACK csSoundDriverWaveOut::waveOutProc(HWAVEOUT /*WaveOut*/,
 
 void csSoundDriverWaveOut::RecycleBlock(SoundBlock *Block)
 {
+  // Add to the empty blocks list
   EnterCriticalSection(&critsec_EmptyBlocks);
   EmptyBlocks.Push(Block);
   LeaveCriticalSection(&critsec_EmptyBlocks);
+
+  // Signal the background thread to pick it up and refill it
+  SetEvent(hevent_EmptyBlocksReady);
 }
 
 
@@ -446,6 +462,10 @@ void csSoundDriverWaveOut::BackgroundThread::Run()
   int shutdown_wait_counter=0;
   running=true;
 
+  // Cheating some.  csThread should be able to abstract this functionality, but it's not there
+  //  So we'll go straight to the windows API.
+  SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_TIME_CRITICAL);
+
   // Startup waveOut device
   result = waveOutOpen (&WaveOut, parent_driver->waveout_device_index, &(parent_driver->Format),
     (LONG)&waveOutProc, 0L, CALLBACK_FUNCTION);
@@ -458,6 +478,9 @@ void csSoundDriverWaveOut::BackgroundThread::Run()
 
     // Grab a lock on the available blocks list
     EnterCriticalSection(&(parent_driver->critsec_EmptyBlocks));
+
+    // Reset the event, if a block comes in from here forward, the event will be set again by the time we try to wait
+    ResetEvent(parent_driver->hevent_EmptyBlocksReady);
 
     // Fill all available blocks
     block_count=parent_driver->EmptyBlocks.Length();
@@ -479,8 +502,9 @@ void csSoundDriverWaveOut::BackgroundThread::Run()
 
     // Release the lock
     LeaveCriticalSection(&(parent_driver->critsec_EmptyBlocks));
+    
     // Give up timeslice
-    csSleep(0);
+    WaitForSingleObject(parent_driver->hevent_EmptyBlocksReady,INFINITE);
   }
 
   // Request all blocks to stop and be returned 
