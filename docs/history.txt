@@ -19,6 +19,53 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+19-May-99:
+	- Denis Detriev fixed the lightmap calculator so that there no longer
+	  any ugly borders. Thanks Denis!!!
+18-May-99:
+	- Started adding csVolume class to csgeom to help lighting routines.
+	- Fixed LOD vertex morphing for sprites. It was broken (which caused
+	  the top of the bots to be removed).
+	- Small fix for lightmap calculation for curves. The lightmap was
+	  not properly initialized to black before being filled in.
+	  This should cause the garbage in the lightmaps to be removed but
+	  it does not solve all the lightmap problems yet.
+	- Finally fixed sprite triangle drawing. The fix is not perfect yet
+	  but at least the triangles look fine in all cases. I have to ask
+	  Andrew to have a better look at this.
+17-May-99:
+	- Patch from Andrew Zabolotny:
+		- Fixed CSWSTEST and added some features to have a better
+		  test suite for the 2D drivers.
+		- Bugfix in CSWS when mouse is grabbed and button is
+		  not pressed.
+		- Changes to OS/2 script and some other OS/2 changes.
+		- Modified GetTransparent methods to return a bool
+		  instead of integer. Also fixed transparent color handling
+		  in textures for 16bpp and 32bpp. 0 in transparent textures
+		  means transparent. Opaque black color is replaced
+		  by a very very dark color.
+		- Fixed all DrawSpriteXX routines to use 0 as transparent
+		  color. Also unified the code of all DrawSpriteXX routines
+		  to make it easier to modify them.
+		- Renamed mkdir to MKDIR to avoid conflicts with system
+		  include files.
+		- csRect should inherit from csBase. csBase has now moved
+		  to include/csutil/csbase.h.
+		- Some cleanup.
+		- Fixed 'make depend' to work again.
+	- Thomas Hieber fixed a nasty bug in the console.
+	- Update to Macintosh port from Robert Bate. He made some changes
+	  to make adding OpenGL support for the Mac easier.
+16-May-99:
+	- Gert Steenssens fixed Linux Glide driver with a temporary fix
+	  for WriteChar problem.
+	- Bruce Williams started work on a faster DX driver which makes
+	  best use of the new StartPolygonQuick function. Nothing
+	  functional yet.
+15-May-99:
+	- Thomas Hieber fixed his logo code so that it doesn't crash if
+	  the logo can't be found.
 14-May-99:
 	- Fix so that config.mak is replaced and not appended too.
 	- Precalculated lighting also works through portals on things now.
@@ -37,6 +84,14 @@ Short-term cleanups that need to be done:
 		- No dynamic lighting yet.
 		- Curves don't listen to the 'textured' and 'lighted' flags
 		  to disable texture mapping and lighting.
+	- Fixes from Andrew Zabolotny to 'make depend' (not completely ready
+	  yet). Rename of COLOREDBG to TRANSPBG in cryst.cfg. Several fixes
+	  to console as well (it should now work well on double buffered
+	  displays).
+	- Thomas Hieber added a startup logo to WalkTest. It does not look very
+	  well currently because of a bug with transparent textures in the 2D
+	  driver. Note that you need a new 'standard.zip' for this.
+	- Michael Dale Long changed cs.mak to add sound support for Linux.
 13-May-99:
 	- Ivan Avramovic fixed a bug causing segfaults when deleting
 	  copied csObjects. He also added documentation to several files

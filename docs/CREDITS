@@ -396,7 +396,11 @@ convex object into slices parallel to the view plane (useful for volumetric
 fog). He also added a progress bar to the console (during lighting) and
 added a new way to do bilinear filtering for the software renderer.
 
-Thomas Hieber <thieber@gmx.net> helped on the Windows project files.
+Thomas Hieber <thieber@gmx.net> helped on the Windows project files and also
+contributed various other things.
+
+Bruce Williams <brucewil@pacbell.net> helped optimize the Direct3D
+driver.
 
 Sylvain Rochette <srochette@telweb.com> gave me a few fixes for the Windows
 port.
