@@ -76,6 +76,28 @@ struct iBallState : public iBase
   virtual void SetCylindricalMapping (bool m) = 0;
   /// Test if cylindrical texture mapping is used.
   virtual bool IsCylindricalMapping () const = 0;
+
+  /** Set the colours of the dome to a gradient, vertically.
+   *  the horizon_height is 0, the zenith_height is 1,
+   *  the gradient is then interpolated to get the colour.
+   *  The gradient is specified using a float**, where entry
+   *  gradient[nr] is an array of 4 elements {height, r, g, b}.
+   *  The entries must be in sorted order, low to high. End with a NULL
+   *  e.g. (0.0, 100.0, { {0.0, 1,0,1}, {1.0, 0,0,0}, 0} for a 
+   *  gradient from purple to black.
+   */ 
+  virtual void ApplyVertGradient(float horizon_height, float zenith_height,
+    float** gradient) = 0;
+  /** Create a lightspot on the colours of the dome.
+   *  The position indicates the direction of center of the lightspot
+   *  wrt. the center of the ball mesh.
+   *  The size gives the size of the spot, 1.0 for the sun.
+   *  The gradient is used to get the colours for the lightspot.
+   *  pass NULL for a sunlike gradient.
+   */
+  virtual void ApplyLightSpot(const csVector3& position, float size,
+    float **gradient) = 0;
+
 };
 
 #endif

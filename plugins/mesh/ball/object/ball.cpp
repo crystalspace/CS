@@ -689,6 +689,92 @@ void csBallMeshObject::eiVertexBufferManagerClient::ManagerClosing ()
 }
 
 
+/// interpolate a gradient
+static void GetGradientColor(float **gradient, float val, csColor& col)
+{
+  if(gradient == NULL || gradient[0] == NULL)
+  {
+    col.Set(0,0,0);
+    return;
+  }
+  int entry = 0;
+  while( gradient[entry] && (gradient[entry][0] < val) ) entry++;
+  if(gradient[entry] == NULL)
+  {
+    if(entry>0) col.Set( gradient[entry-1][1], gradient[entry-1][2], 
+      gradient[entry-1][3]);
+    else col.Set(0,0,0);
+    return;
+  }
+  if(entry <= 0)
+  {
+    col.Set( gradient[0][1], gradient[0][2], gradient[0][3]);
+    return;
+  }
+  // entry at least 1 and exists - interpolate between entry-1 and entry
+  // assumes sorted entries.
+  CS_ASSERT( gradient[entry][0] >= gradient[entry-1][0] );
+  float sc1 = val - gradient[entry-1][0];
+  float sc2 = gradient[entry][0] - val;
+  float invdist = 1.0 / (gradient[entry][0] - gradient[entry-1][0]);
+  sc1 *= invdist;
+  sc2 *= invdist;
+
+  col.red = gradient[entry-1][1] * sc2 + gradient[entry][1] * sc1;
+  col.green = gradient[entry-1][2] * sc2 + gradient[entry][2] * sc1;
+  col.blue = gradient[entry-1][3] * sc2 + gradient[entry][3] * sc1;
+  //printf("val %g, entry %d gives %g,%g,%g\n", val, entry,
+   // col.red, col.green,  col.blue);
+}
+
+void csBallMeshObject::ApplyVertGradient(float horizon_height, 
+  float zenith_height, float**gradient)
+{
+  SetupObject();
+  CS_ASSERT( zenith_height > horizon_height );
+  //printf("ApplyVertGradient\n");
+  float invdist = 1.0 / (zenith_height - horizon_height);
+  csColor color(0,0,0);
+  for(int i=0; i<num_ball_vertices; i++)
+  {
+    float val = (ball_vertices[i].y - horizon_height) * invdist;
+    GetGradientColor(gradient, val, color);
+    ball_colors[i] = color;
+  }
+}
+
+void csBallMeshObject::ApplyLightSpot(const csVector3& position, float size, 
+  float**gradient)
+{
+  /// compute position on the sphere.
+  csVector3 pos = position - shift;
+  float len = pos.Norm();
+  pos = pos * (radiusy/len);
+  pos += shift;
+  /// see if gradient is given
+  float sun1[] = {0., 1.,1.,.6};
+  float sun2[] = {1., 1.,0.8,.6};
+  float *sungrad[] = {sun1, sun2, NULL};
+  float **grad = sungrad;
+  if(gradient) grad = gradient;
+  /// compute the max distance for the lightspot given radius.
+  float maxdist = radiusy * size / 1.4;
+  //float maxdist = radiusy * radiusy * size / 2.4;
+  /// apply the spot
+  csColor color(0,0,0);
+  for(int i=0; i<num_ball_vertices; i++)
+  {
+    float val = (ball_vertices[i] - pos).Norm() / maxdist;
+    GetGradientColor(grad, val, color);
+    float apply = 1.0-val;
+    if(apply <= 0.0) continue;
+    //if(apply >= 1.0) apply = 1.0;
+    //ball_colors[i] = ball_colors[i]*(1-apply) + color*apply;
+    ball_colors[i] += color*apply;
+    ball_colors[i].Clamp(2,2,2);
+  }
+}
+
 //----------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE (csBallMeshObjectFactory)

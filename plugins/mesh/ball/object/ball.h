@@ -193,6 +193,12 @@ public:
     return cyl_mapping;
   }
 
+  /// apply vertical gradient
+  void ApplyVertGradient(float horizon_height, float zenith_height,
+    float** gradient);
+  /// apply light spot
+  void ApplyLightSpot(const csVector3& position, float size, float** gradient);
+
   //----------------------- iMeshObject implementation ------------------------
   SCF_DECLARE_IBASE;
 
@@ -287,6 +293,16 @@ public:
     virtual bool IsCylindricalMapping () const
     {
       return scfParent->IsCylindricalMapping ();
+    }
+    virtual void ApplyVertGradient(float horizon_height, float zenith_height,
+      float** gradient)
+    {
+      scfParent->ApplyVertGradient(horizon_height, zenith_height, gradient);
+    }
+    virtual void ApplyLightSpot(const csVector3& position, float size,
+      float** gradient)
+    {
+      scfParent->ApplyLightSpot(position, size, gradient);
     }
   } scfiBallState;
   friend class BallState;
