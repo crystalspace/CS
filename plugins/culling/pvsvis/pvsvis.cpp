@@ -48,6 +48,7 @@
 #include "imesh/object.h"
 #include "iutil/object.h"
 #include "ivaria/reporter.h"
+#include "ivaria/bugplug.h"
 #include "imap/services.h"
 #include "pvsvis.h"
 
@@ -60,10 +61,15 @@ SCF_IMPLEMENT_IBASE (csPVSVis)
   SCF_IMPLEMENTS_INTERFACE (iVisibilityCuller)
   SCF_IMPLEMENTS_INTERFACE (iPVSCuller)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iDebugHelper)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csPVSVis::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csPVSVis::DebugHelper)
+  SCF_IMPLEMENTS_INTERFACE (iDebugHelper)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 //----------------------------------------------------------------------
@@ -150,6 +156,7 @@ csPVSVis::csPVSVis (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
   object_reg = 0;
   current_vistest_nr = 1;
   vistest_objects_inuse = false;
@@ -159,6 +166,7 @@ csPVSVis::csPVSVis (iBase *iParent)
 csPVSVis::~csPVSVis ()
 {
   ClearObjects ();
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_DESTRUCT_IBASE ();
 }
@@ -1230,5 +1238,71 @@ void csPVSVis::CastShadows (iFrustumView* fview)
     sh->DecRef ();
   }
   shadows->RestoreRegion (prev_region);
+}
+
+bool csPVSVis::Debug_DebugCommand (const char* cmd)
+{
+  if (!strcmp (cmd, "setup_debugsector"))
+  {
+    csRef<iBugPlug> bugplug = CS_QUERY_REGISTRY (object_reg, iBugPlug);
+    if (bugplug)
+    {
+#if 0
+      bugplug->SetupDebugSector ();
+      size_t i;
+      for (i = 0 ; i < visobj_vector.Length () ; i++)
+      {
+        csVisibilityObjectWrapper* visobj_wrap = visobj_vector[i];
+        iVisibilityObject* visobj = visobj_wrap->visobj;
+	csBox3 box;
+	iMovable* movable = visobj->GetMovable ();
+	visobj_wrap->full_transform_identity =
+		movable->IsFullTransformIdentity ();
+	CalculateVisObjBBox (visobj, box, visobj_wrap->full_transform_identity);
+	bugplug->DebugSectorBox (box,
+		float (reason_colors[visobj_wrap->history->reason].r) / 256.0,
+		float (reason_colors[visobj_wrap->history->reason].g) / 256.0,
+		float (reason_colors[visobj_wrap->history->reason].b) / 256.0);
+      }
+      csVector3 origin (0);
+      const csReversibleTransform& trans = debug_camera->GetTransform ();
+      csVector3 topleft (debug_lx, debug_ty, 1); topleft *= 100.0;
+      csVector3 topright (debug_rx, debug_ty, 1); topright *= 100.0;
+      csVector3 botleft (debug_lx, debug_by, 1); botleft *= 100.0;
+      csVector3 botright (debug_rx, debug_by, 1); botright *= 100.0;
+      origin = trans.This2Other (origin);
+      topleft = trans.This2Other (topleft);
+      topright = trans.This2Other (topright);
+      botleft = trans.This2Other (botleft);
+      botright = trans.This2Other (botright);
+
+      for (i = 0 ; i < 5 ; i++)
+      {
+	csVector3 v1, v2;
+	float fact = float (i) / 5.0;
+	v1 = topleft + fact * (topright-topleft);
+	v2 = topleft + (fact+.1) * (topright-topleft);
+        bugplug->DebugSectorTriangle (origin, v1, v2, .5, 0, 0);
+	v1 = botright + fact * (topright-botright);
+	v2 = botright + (fact+.1) * (topright-botright);
+        bugplug->DebugSectorTriangle (origin, v1, v2, 0, .5, 0);
+	v1 = topleft + fact * (botleft-topleft);
+	v2 = topleft + (fact+.1) * (botleft-topleft);
+        bugplug->DebugSectorTriangle (origin, v1, v2, 0, 0, .5);
+	v1 = botleft + fact * (botright-botleft);
+	v2 = botleft + (fact+.1) * (botright-botleft);
+        bugplug->DebugSectorTriangle (origin, v1, v2, .5, .5, 0);
+      }
+      bugplug->SwitchDebugSector (trans);
+#endif
+    }
+    else
+    {
+      csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+        "crystalspace.dynavis", "BugPlug not found!");
+    }
+    return true;
+  }
+  return false;
 }
 

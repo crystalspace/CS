@@ -177,6 +177,17 @@ public:
   virtual void CastShadows (iFrustumView* fview);
   virtual const char* ParseCullerParameters (iDocumentNode* node);
 
+  // For iPVSCuller
+  virtual iStaticPVSTree* GetPVSTree () { return &pvstree; }
+
+  // Debugging functions.
+  csPtr<iString> Debug_UnitTest () { return 0; }
+  csPtr<iString> Debug_StateTest () { return 0; }
+  csPtr<iString> Debug_Dump () { return 0; }
+  csTicks Debug_Benchmark (int num_iterations) { return 0; }
+  void Debug_Dump (iGraphics3D*) { }
+  bool Debug_DebugCommand (const char* cmd);
+
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE (csPVSVis);
@@ -184,8 +195,38 @@ public:
     { return scfParent->Initialize (p); }
   } scfiComponent;
 
-  // For iPVSCuller
-  virtual iStaticPVSTree* GetPVSTree () { return &pvstree; }
+  struct DebugHelper : public iDebugHelper
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csPVSVis);
+    virtual int GetSupportedTests () const
+    {
+      return CS_DBGHELP_GFXDUMP;
+    }
+    virtual csPtr<iString> UnitTest ()
+    {
+      return scfParent->Debug_UnitTest ();
+    }
+    virtual csPtr<iString> StateTest ()
+    {
+      return scfParent->Debug_StateTest ();
+    }
+    virtual csTicks Benchmark (int num_iterations)
+    {
+      return scfParent->Debug_Benchmark (num_iterations);
+    }
+    virtual csPtr<iString> Dump ()
+    {
+      return scfParent->Debug_Dump ();
+    }
+    virtual void Dump (iGraphics3D* g3d)
+    {
+      scfParent->Debug_Dump (g3d);
+    }
+    virtual bool DebugCommand (const char* cmd)
+    {
+      return scfParent->Debug_DebugCommand (cmd);
+    }
+  } scfiDebugHelper;
 };
 
 #endif // __CS_PVSVIS_H__
