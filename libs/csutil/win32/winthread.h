@@ -60,7 +60,7 @@ class CS_CSUTIL_EXPORT csWinThread : public csThread
   /**
    * Return the last eror description and 0 if there was none.
    */
-  virtual char const* GetLastError ();
+  virtual char const* GetLastError () const;
 
  protected:
   static uint __stdcall ThreadRun (void* param);
@@ -75,19 +75,21 @@ class CS_CSUTIL_EXPORT csWinThread : public csThread
 class CS_CSUTIL_EXPORT csWinMutex : public csMutex
 {
 public:
-  csWinMutex ();
+  csWinMutex (bool recursive);
   virtual ~csWinMutex ();
   
   virtual bool LockWait ();
   virtual bool LockTry  ();
   virtual bool Release  ();
-  virtual char const* GetLastError ();
+  virtual char const* GetLastError () const;
+  virtual bool IsRecursive () const;
 
  private:
   bool Destroy ();
  protected:
   HANDLE mutex;
   char* lasterr;
+  bool recursive;
   friend class csWinCondition;
 };
 
@@ -101,7 +103,7 @@ public:
   virtual bool LockTry ();
   virtual bool Release ();
   virtual uint32 Value ();
-  virtual char const* GetLastError ();
+  virtual char const* GetLastError () const;
 
  protected:
   char* lasterr;
@@ -119,7 +121,7 @@ class CS_CSUTIL_EXPORT csWinCondition : public csCondition
 
   virtual void Signal (bool bAll);
   virtual bool Wait (csMutex*, csTicks timeout);
-  virtual char const* GetLastError ();
+  virtual char const* GetLastError () const;
 
  private:
   bool LockWait (DWORD nMilliSec);

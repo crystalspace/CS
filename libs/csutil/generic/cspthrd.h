@@ -65,7 +65,7 @@ class csPosixThread : public csThread
   /**
    * Return the last eror description and 0 if there was none.
    */
-  virtual char const* GetLastError ();
+  virtual char const* GetLastError () const;
 
  protected:
   static void* ThreadRun (void* param);
@@ -86,11 +86,12 @@ public:
   virtual bool LockWait ();
   virtual bool LockTry  ();
   virtual bool Release  ();
-  virtual char const* GetLastError ();
+  virtual char const* GetLastError () const;
+  virtual bool IsRecursive() const ;
 
 protected:
   friend class csMutex;
-  csPosixMutex (pthread_mutexattr_t* attr);
+  csPosixMutex (pthread_mutexattr_t* attr, bool recursive);
   
   static void Cleanup (void* arg);
 private:
@@ -98,16 +99,16 @@ private:
 
 protected:
   pthread_mutex_t mutex;
-  
   int lasterr;
+  bool recursive;
   friend class csPosixCondition;
 };
 
 #ifndef CS_PTHREAD_NUTEX_RECURSIVE
-class csPosixMutexRecursive : public csPosixMutex
+class csPosixMutexRecursiveEmulator : public csPosixMutex
 {
 public:
-  virtual ~csPosixMutexRecursive ();
+  virtual ~csPosixMutexRecursiveEmulator ();
 
   virtual bool LockWait ();
   virtual bool LockTry ();
@@ -115,7 +116,7 @@ public:
   
 protected:
   friend class csMutex;
-  csPosixMutexRecursive (pthread_mutexattr_t* attr);
+  csPosixMutexRecursiveEmulator (pthread_mutexattr_t* attr, bool recursive);
 
 private:
   int count;
@@ -133,7 +134,7 @@ public:
   virtual bool LockTry ();
   virtual bool Release ();
   virtual uint32 Value ();
-  virtual char const* GetLastError ();
+  virtual char const* GetLastError () const;
 
 protected:
   char const *lasterr;
@@ -151,7 +152,7 @@ public:
 
   virtual void Signal (bool WakeAll = false);
   virtual bool Wait (csMutex*, csTicks timeout = 0);
-  virtual char const* GetLastError ();
+  virtual char const* GetLastError () const;
 
 private:
   bool Destroy ();

@@ -112,7 +112,7 @@ public:
   /**
    * Return the last error description, else 0 if there was none.
    */
-  virtual char const* GetLastError () = 0;
+  virtual char const* GetLastError () const = 0;
 };
 
 
@@ -127,14 +127,20 @@ class CS_CSUTIL_EXPORT csMutex : public csRefCount
 {
 public:
   /**
-   * Create a mutex.  Note that the mutexes on Windows are always recursive
-   * (ie.  the same thread is able to Lock the mutex multiple times), while on
-   * other platforms non recursive threads may be the default since they are
-   * can be implemented more efficiently.  If you need recursive behaviour set
-   * needrecursive to true.  Note: It seems that "conditionals" on Linux only
-   * work with non-recursive mutexes.
+   * Create a mutex.
+   * \param recursive If true, the same thread can lock the mutex even when it
+   *   already holds the lock without deadlocking. If false, then recursive
+   *   locking within the same thread is not supported, and will probably
+   *   deadlock.
+   * \return The new mutex.
+   * \remarks Recursive mutexes are <b>not</b> compatible with conditions and
+   *   must not be used with #csCondition.
+   * <p>
+   * \remarks On Windows, mutexes are always recursive, while on other
+   *   platforms, such as Linux, non-recursive threads may be the default since
+   *   they are can be implemented more efficiently.
    */
-  static csRef<csMutex> Create (bool needrecursive = false);
+  static csRef<csMutex> Create (bool recursive = false);
 
   /**
    * Lock the mutex.  Suspends execution of the thread until the mutex can be
@@ -163,7 +169,12 @@ public:
   /**
    * Return the last error description, else 0 if there was none.
    */
-  virtual char const* GetLastError () = 0;
+  virtual char const* GetLastError () const = 0;
+
+  /**
+   * Return true if the mutex is recursive.
+   */
+  virtual bool IsRecursive () const = 0;
 };
 
 
@@ -206,7 +217,7 @@ public:
   /**
    * Return the last error description, else 0 if there was none.
    */
-  virtual char const* GetLastError () = 0;
+  virtual char const* GetLastError () const = 0;
 };
 
 
@@ -231,20 +242,33 @@ public:
 
   /**
    * Wait for some change of condition.  Suspends the calling thread until some
-   * other thread invokes Signal() to notify a change of condition.  The caller
-   * must already hold a lock on the mutex before calling Wait(), and all
-   * threads waiting on the condition must be using the same mutex.  When
-   * called, Wait() releases the caller's lock on the mutex and suspends the
-   * caller's thread.  Upon return from Wait(), the caller's lock on the mutex
-   * is restored.  Returns true if the caller was wakened normally.  Returns
-   * false if the wait timed out.
+   * other thread invokes Signal() to notify a change of condition.
+   * \param mutex The mutex to associate with this condition. The mutex must
+   *   <b>not</b> be recursive.  The caller must already hold a lock on the
+   *   mutex before calling Wait(), and all threads waiting on the condition
+   *   must be using the same mutex.  When called, Wait() releases the caller's
+   *   lock on the mutex and suspends the caller's thread.  Upon return from
+   *   Wait(), the caller's lock on the mutex is restored.
+   * \param timeout The amount of time in milliseconds to wait for the the
+   *   condition's state to change. If zero, the default, then it waits for a
+   *   state change without timing-out.  If non-zero, and the indicated time
+   *   elapses without a state change being signaled, then false is returned.
+   * \return Returns true if the caller was wakened normally.  Returns false if
+   *   the wait timed out, or if invoked with a recursive mutex, which is an
+   *   invalid invocation style.
+   * \remarks The reason that the mutex must be non-recursive is because the
+   *   implicit unlock performed by Wait() <em>must</em> actually release the
+   *   mutex in order for other threads to be able to satisfy the
+   *   condition. With recursive mutexes, there is no guarantee that unlocking
+   *   the mutex actually releases it since it might have been locked multiple
+   *   times within the same thread.
    */
-  virtual bool Wait (csMutex*, csTicks timeout = 0) = 0;
+  virtual bool Wait (csMutex* mutex, csTicks timeout = 0) = 0;
 
   /**
-   * Return the last error description, else 0 if there was none.
+   * Return the last error description, else null if there was none.
    */
-  virtual char const* GetLastError () = 0;
+  virtual char const* GetLastError () const = 0;
 };
 
 #endif // __CS_CSSYS_THREAD_H__

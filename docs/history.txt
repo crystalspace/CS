@@ -11,6 +11,27 @@ chronological order.
 	  catches EINVAL from pthread_cond_timedwait().
 	- Jorrit fixed smooth in thing. It was using the normals in object
 	  space which is wrong.
+	- Eric Sunshine upgraded the documentation for csMutex and csCondition
+	  so that it explains that recursive mutexes are incompatible with
+	  conditions.
+	- Eric Sunshine upgraded the various csCondition implementations so
+	  that they flag an error when csCondition::Wait() is invoked with a
+	  recursive mutex, thus enforcing the requirement that the mutex must
+	  be non-recursive.  The reason that the mutex must be non-recursive is
+	  because the implicit unlock performed by Wait() must actually release
+	  the mutex in order for other threads to be able to satisfy the
+	  condition. With recursive mutexes, there is no guarantee that
+	  unlocking the mutex actually releases it since it might have been
+	  locked multiple times within the same thread. Although most older
+	  pthread implementatons were lax about this requirement, more modern
+	  ones, such as NPTL, actually enforce it. We also now enforce this
+	  requirement.
+	- Eric Sunshine upgraded the CS_CHECK_PTHREAD() macro in checkpython.m4
+	  so that it also determines if "timed" mutexes are available, and
+	  figures out the actual constant representing such mutexes (usually
+	  either PTHREAD_MUTEX_TIMED or PTHREAD_MUTEX_TIMED_NP). If available,
+	  configure.ac now emits CS_PTHREAD_MUTEX_TIMED to csconfig.h with the
+	  appropriate value.
 17-Jan-2004
 	- Eric Sunshine applied patch from Lukas Erlinghagen <erluk@web.de>
 	  which fixes crash in csSCF::RegisterClassesInt() triggered by the

@@ -229,9 +229,12 @@ AS_IF([test $ac_cv_lib_m_cosf = no && test $ac_cv_lib_mx_cosf = no],
 #------------------------------------------------------------------------------
 CS_CHECK_PTHREAD([cygwin*])
 CS_EMIT_BUILD_RESULT([cs_cv_sys_pthread], [PTHREAD])
-AS_IF([test $cs_cv_sys_pthread_recursive != no],
+AS_IF([test $cs_cv_sys_pthread_mutex_recursive != no],
     [CS_HEADER_PROPERTY([CS_PTHREAD_MUTEX_RECURSIVE],
-	[$cs_cv_sys_pthread_recursive])])
+	[$cs_cv_sys_pthread_mutex_recursive])])
+AS_IF([test $cs_cv_sys_pthread_mutex_timed != no],
+    [CS_HEADER_PROPERTY([CS_PTHREAD_MUTEX_TIMED],
+	[$cs_cv_sys_pthread_mutex_timed])])
 
 
 

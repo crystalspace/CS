@@ -57,15 +57,13 @@ static inline void TestError (bool result, const char* message, char*& lasterr)
 
 #define CS_TEST(x)    TestError ((x), #x, lasterr);
 
-// ignore recursive switch... windows mutexes are always recursive.
-csRef<csMutex> csMutex::Create (bool )
+csRef<csMutex> csMutex::Create (bool recursive)
 {
-  return csPtr<csMutex>(new csWinMutex ());
+  return csPtr<csMutex>(new csWinMutex (recursive));
 }
 
-csWinMutex::csWinMutex ()
+csWinMutex::csWinMutex (bool recurse) : lasterr(0), recursive(recurse)
 {
-  lasterr = 0;
   CS_TEST ((mutex = CreateMutex (0, false, 0)) != 0);
 }
 
@@ -106,9 +104,14 @@ bool csWinMutex::Release ()
   return rc;
 }
 
-char const* csWinMutex::GetLastError ()
+char const* csWinMutex::GetLastError () const
 {
   return (char const*)lasterr;
+}
+
+bool csWinMutex::IsRecursive() const
+{
+  return recursive;
 }
 
 
@@ -171,7 +174,7 @@ bool csWinSemaphore::Destroy ()
   return rc;
 }
 
-char const* csWinSemaphore::GetLastError ()
+char const* csWinSemaphore::GetLastError () const
 {
   return (char const*)lasterr;
 }
@@ -202,11 +205,23 @@ void csWinCondition::Signal (bool /*WakeAll*/)
 
 bool csWinCondition::Wait (csMutex* mutex, csTicks timeout)
 {
-  // @@@ SignalObjectAndWait() is only available in WinNT 4.0 and above
-  // so we use the potentially dangerous version below
-  if (mutex->Release () && LockWait (timeout==0?INFINITE:(DWORD)timeout))
-    return mutex->LockWait ();
-  return false;
+  bool ok = false;
+  if (!mutex->IsRecursive())
+  {
+    // @@@ FIXME: SignalObjectAndWait() is only available in WinNT 4.0 and
+    // above so we use the potentially dangerous version below
+    if (mutex->Release () && LockWait (timeout==0?INFINITE:(DWORD)timeout))
+      ok = mutex->LockWait ();
+  }
+  else
+  {
+    lasterr = csStrNew("csCondition::Wait() ERROR: Incorrectly invoked with "
+      "recursive mutex; conditions and recursive mutexes are mutually "
+      "exclusive");
+    // This is a programming error, so emit diagnostic unconditionally.
+    csPrintfErr("%s\n", lasterr);
+  }
+  return ok;
 }
 
 bool csWinCondition::LockWait (DWORD nMilliSec)
@@ -223,7 +238,7 @@ bool csWinCondition::Destroy ()
   return rc;
 }
 
-char const* csWinCondition::GetLastError ()
+char const* csWinCondition::GetLastError () const
 {
   return (char const*)lasterr;
 }
@@ -292,7 +307,7 @@ bool csWinThread::Stop ()
   return !running;
 }
 
-char const* csWinThread::GetLastError ()
+char const* csWinThread::GetLastError () const
 {
   return (char const*)lasterr;
 }

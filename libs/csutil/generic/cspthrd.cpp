@@ -22,6 +22,7 @@
 
 #include "cssysdef.h"
 #include "cspthrd.h"
+#include "csutil/sysfunc.h"
 #include <sys/time.h>
 
 // Depending upon the platform, one of these headers declares strerror().
@@ -30,31 +31,29 @@
 #include <string.h>
 
 #ifdef CS_DEBUG
-#define CS_SHOW_ERROR if (lasterr) printf ("%s\n", GetLastError ())
+#define CS_SHOW_ERROR if (lasterr) csPrintfErr("%s\n", GetLastError ())
 #else
 #define CS_SHOW_ERROR
 #endif
 
-csRef<csMutex> csMutex::Create (bool needrecursive)
+csRef<csMutex> csMutex::Create (bool recurse)
 {
 #ifdef CS_PTHREAD_MUTEX_RECURSIVE
-  if (needrecursive)
+  if (recurse)
   {
     pthread_mutexattr_t attr;
     pthread_mutexattr_init (&attr);
     pthread_mutexattr_settype (&attr, CS_PTHREAD_MUTEX_RECURSIVE);
-
-    return csPtr<csMutex> (new csPosixMutex (&attr));
+    return csPtr<csMutex> (new csPosixMutex (&attr, recurse));
   }
-  
-  return csPtr<csMutex> (new csPosixMutex (0));
+  return csPtr<csMutex> (new csPosixMutex (0, recurse));
 #else
-  return csPtr<csMutex>(new csPosixMutexRecursive (0));
+  return csPtr<csMutex>(new csPosixMutexRecursiveEmulator (0, recurse));
 #endif
 }
 
-csPosixMutex::csPosixMutex (pthread_mutexattr_t* attr)
-  : lasterr (0)
+csPosixMutex::csPosixMutex (pthread_mutexattr_t* attr, bool recurse) :
+  lasterr(0), recursive(recurse)
 {
   pthread_mutex_init (&mutex, attr);
 }
@@ -62,14 +61,12 @@ csPosixMutex::csPosixMutex (pthread_mutexattr_t* attr)
 csPosixMutex::~csPosixMutex ()
 {
   lasterr = pthread_mutex_destroy (&mutex);
-
   CS_SHOW_ERROR;
 }
 
 bool csPosixMutex::LockWait()
 {
   lasterr = pthread_mutex_lock (&mutex);
-
   CS_SHOW_ERROR;
   return lasterr == 0;
 }
@@ -77,7 +74,6 @@ bool csPosixMutex::LockWait()
 bool csPosixMutex::LockTry ()
 {
   lasterr = pthread_mutex_trylock (&mutex);
-  
   CS_SHOW_ERROR;
   return lasterr == 0;
 }
@@ -85,12 +81,11 @@ bool csPosixMutex::LockTry ()
 bool csPosixMutex::Release ()
 {
   lasterr = pthread_mutex_unlock (&mutex);
-  
   CS_SHOW_ERROR;
   return lasterr == 0;
 }
 
-char const* csPosixMutex::GetLastError ()
+char const* csPosixMutex::GetLastError () const
 {
   switch (lasterr)
   {
@@ -105,20 +100,27 @@ char const* csPosixMutex::GetLastError ()
   }
 }
 
+bool csPosixMutex::IsRecursive() const
+{
+  return recursive;
+}
+
 //---------------------------------------------------------------------------
 
 #ifndef CS_PTHREAD_MUTEX_RECURSIVE
-csPosixMutexRecursive::csPosixMutexRecursive (pthread_mutexattr_t* attr)
-  : csPosixMutex(attr), count(0), owner(0)
+
+csPosixMutexRecursiveEmulator::csPosixMutexRecursiveEmulator (
+  pthread_mutexattr_t* attr, bool recurse) :
+  csPosixMutex(attr,recurse), count(0), owner(0)
 {
 }
 
-csPosixMutexRecursive::~csPosixMutexRecursive ()
+csPosixMutexRecursiveEmulator::~csPosixMutexRecursiveEmulator ()
 {
   CS_ASSERT (count==0);
 }
 
-bool csPosixMutexRecursive::LockWait ()
+bool csPosixMutexRecursiveEmulator::LockWait ()
 {
   pthread_t self = pthread_self ();
   
@@ -135,7 +137,7 @@ bool csPosixMutexRecursive::LockWait ()
   return lasterr == 0;
 }
 
-bool csPosixMutexRecursive::LockTry ()
+bool csPosixMutexRecursiveEmulator::LockTry ()
 {
   int rc = pthread_mutex_trylock (&mutex); 
 
@@ -157,7 +159,7 @@ bool csPosixMutexRecursive::LockTry ()
   return false;
 }
 
-bool csPosixMutexRecursive::Release ()
+bool csPosixMutexRecursiveEmulator::Release ()
 {
   pthread_t self = pthread_self ();
   
@@ -245,7 +247,7 @@ bool csPosixSemaphore::Destroy ()
   return rc == 0;
 }
 
-char const* csPosixSemaphore::GetLastError ()
+char const* csPosixSemaphore::GetLastError () const
 {
   return lasterr;
 }
@@ -278,37 +280,48 @@ void csPosixCondition::Signal (bool WakeAll)
 bool csPosixCondition::Wait (csMutex* mutex, csTicks timeout)
 {
   int rc = 0;
-  if (timeout > 0)
+  if (!mutex->IsRecursive())
   {
-    struct timeval now;
-    struct timezone tz;
-    struct timespec to;
-    gettimeofday (&now, &tz);
-    to.tv_sec = now.tv_sec + (timeout / 1000);
-    to.tv_nsec = (now.tv_usec + (timeout % 1000) * 1000) * 1000;
-    rc = pthread_cond_timedwait (&cond, &((csPosixMutex*)mutex)->mutex, &to);
-    switch (rc)
+    if (timeout > 0)
     {
-    case ETIMEDOUT:
-      lasterr = "Timeout";
-      return false; 
-    case EINTR:
-      lasterr = "Wait interrupted";
-      break;
-    case EINVAL:
-      lasterr = "Invalid argument (timeout, mutex, or condition)";
-      break;
-    case 0:
-      lasterr = 0;
-      break;
-    default:
-      lasterr = "Unknown error while timed waiting for condition";
-      break;
+      struct timeval now;
+      struct timezone tz;
+      struct timespec to;
+      gettimeofday (&now, &tz);
+      to.tv_sec = now.tv_sec + (timeout / 1000);
+      to.tv_nsec = (now.tv_usec + (timeout % 1000) * 1000) * 1000;
+      rc = pthread_cond_timedwait (&cond, &((csPosixMutex*)mutex)->mutex, &to);
+      switch (rc)
+      {
+      case ETIMEDOUT:
+	lasterr = "Timeout";
+	return false; 
+      case EINTR:
+	lasterr = "Wait interrupted";
+	break;
+      case EINVAL:
+	lasterr = "Invalid argument (timeout, mutex, or condition)";
+	break;
+      case 0:
+	lasterr = 0;
+	break;
+      default:
+	lasterr = "Unknown error while timed waiting for condition";
+	break;
+      }
     }
+    else
+      pthread_cond_wait (&cond, &((csPosixMutex*)mutex)->mutex);
+    CS_SHOW_ERROR;
   }
   else
-    pthread_cond_wait (&cond, &((csPosixMutex*)mutex)->mutex);
-  CS_SHOW_ERROR;
+  {
+    rc = -1;
+    lasterr = "csCondition::Wait() ERROR: Incorrectly invoked with recursive "
+      "mutex; conditions and recursive mutexes are mutually exclusive\n";
+    // This is a programming error, so emit diagnostic unconditionally.
+    csPrintfErr("%s\n", lasterr);
+  }
   return rc == 0;
 }
 
@@ -331,7 +344,7 @@ bool csPosixCondition::Destroy ()
   return rc == 0;
 }
 
-char const* csPosixCondition::GetLastError ()
+char const* csPosixCondition::GetLastError () const
 {
   return lasterr;
 }
@@ -457,7 +470,7 @@ void csPosixThread::Yield ()
   if (running) sched_yield();
 }
 
-char const* csPosixThread::GetLastError ()
+char const* csPosixThread::GetLastError () const
 {
   return lasterr;
 }

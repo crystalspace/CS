@@ -1,6 +1,6 @@
 # checkpthread.m4                                              -*- Autoconf -*-
 #==============================================================================
-# Copyright (C)2003,2004 by Eric Sunshine <sunshine@sunshineco.com>
+# Copyright (C)2003-2005 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or modify it
 #    under the terms of the GNU Library General Public License as published by
@@ -22,23 +22,32 @@ AC_PREREQ([2.56])
 #------------------------------------------------------------------------------
 # CS_CHECK_PTHREAD([REJECT-MASK])
 #	Check for pthread.  Also check if the pthread implementation supports
-#	the recursive mutex extension. The shell variable cs_cv_sys_pthread is
-#	set to "yes" if pthread is available, else "no". If available, then the
-#	variables cs_cv_sys_pthread_cflags, cs_cv_sys_pthread_lflags, and
-#	cs_cv_sys_pthread_libs are set. (As a convenience, these variables can
-#	be emitted to an output file with CS_EMIT_BUILD_RESULT() by passing
-#	"cs_cv_sys_pthread" as its CACHE-VAR argument.) If the recursive mutex
-#	extension is supported, then cs_cv_sys_pthread_recursive will be set
-#	with the literal name of the constant which must be passed to
+#	the recursive and timed mutex extensions. (Timed mutexes are needed for
+#	the NPTL: New Posix Thread Library on Linux if the mutex is going to be
+#	used with any of the timed condition-wait functions.) The shell
+#	variable cs_cv_sys_pthread is set to "yes" if pthread is available,
+#	else "no". If available, then the variables cs_cv_sys_pthread_cflags,
+#	cs_cv_sys_pthread_lflags, and cs_cv_sys_pthread_libs are set. (As a
+#	convenience, these variables can be emitted to an output file with
+#	CS_EMIT_BUILD_RESULT() by passing "cs_cv_sys_pthread" as its CACHE-VAR
+#	argument.)  If the recursive mutex extension is supported, then
+#	cs_cv_sys_pthread_mutex_recursive will be set with the literal name of
+#	the constant which must be passed to pthread_mutexattr_settype() to
+#	enable this feature. The constant name will be typically
+#	PTHREAD_MUTEX_RECURSIVE or PTHREAD_MUTEX_RECURSIVE_NP. If the recursive
+#	mutex extension is not available, then
+#	cs_cv_sys_pthread_mutex_recursive will be set to "no".  If the timed
+#	mutex extension is supported, then cs_cv_sys_pthread_mutex_timed will
+#	be set with the literal name of the constant which must be passed to
 #	pthread_mutexattr_settype() to enable this feature. The constant name
-#	will be typically PTHREAD_MUTEX_RECURSIVE or
-#	PTHREAD_MUTEX_RECURSIVE_NP. If the recursive mutex extension is not
-#	available, then cs_cv_sys_pthread_recursive will be set to "no".
-#	REJECT-MASK can be used to limit the platforms on which the pthread
-#	test is performed. It is compared against $host_os; matches are
-#	rejected. If omitted, then the test is performed on all
-#	platforms. Examples: To avoid testing on Cygwin, use "cygwin*"; to
-#	avoid testing on Cygwin and AIX, use "cygwin*|aix*".
+#	will be typically PTHREAD_MUTEX_TIMED or PTHREAD_MUTEX_TIMED_NP. If the
+#	timed mutex extension is not available, then
+#	cs_cv_sys_pthread_mutex_timed will be set to "no".  REJECT-MASK can be
+#	used to limit the platforms on which the pthread test is performed. It
+#	is compared against $host_os; matches are rejected. If omitted, then
+#	the test is performed on all platforms. Examples: To avoid testing on
+#	Cygwin, use "cygwin*"; to avoid testing on Cygwin and AIX, use
+#	"cygwin*|aix*".
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_PTHREAD],
     [AC_REQUIRE([AC_CANONICAL_HOST])
@@ -62,25 +71,29 @@ AC_DEFUN([CS_CHECK_PTHREAD],
 		[cs_pthread_flags])
 	    ;;
     esac
+    _CS_CHECK_MUTEX_FEATURE([PTHREAD_MUTEX_RECURSIVE],
+	[cs_cv_sys_pthread_mutex_recursive], [for pthread recursive mutexes])
+    _CS_CHECK_MUTEX_FEATURE([PTHREAD_MUTEX_TIMED],
+	[cs_cv_sys_pthread_mutex_timed], [for pthread timed mutexes])])
 
-    AS_IF([test $cs_cv_sys_pthread = yes],
-	[AC_CACHE_CHECK([for pthread recursive mutexes],
-	    [cs_cv_sys_pthread_recursive],
+# _CS_CHECK_MUTEX_FEATURE(FEATURE, CACHE-VAR, MESSAGE)
+AC_DEFUN([_CS_CHECK_MUTEX_FEATURE],
+    [AS_IF([test $cs_cv_sys_pthread = yes],
+	[AC_CACHE_CHECK([$3], [$2],
 	    [CS_BUILD_IFELSE(
 		[AC_LANG_PROGRAM(
 		    [[#include <pthread.h>]],
 		    [pthread_mutexattr_t attr;
-		    pthread_mutexattr_settype (&attr, CS_RECURSIVE);])],
-		[CS_CREATE_TUPLE([-DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE]) \
-		CS_CREATE_TUPLE([-DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE_NP])],
+		    pthread_mutexattr_settype(&attr, CS_MUTEX_FEATURE);])],
+		[CS_CREATE_TUPLE([-DCS_MUTEX_FEATURE=$1]) \
+		CS_CREATE_TUPLE([-DCS_MUTEX_FEATURE=$1_NP])],
 		[],
-		[cs_cv_sys_pthread_recursive=`echo $cs_build_cflags | \
-		    sed 's/.*\(PTHREAD_MUTEX_RECURSIVE_*N*P*\).*/\1/'`],
-		[cs_cv_sys_pthread_recursive=no],
+		[$2=`echo $cs_build_cflags | sed 's/.*\($1_*N*P*\).*/\1/'`],
+		[$2=no],
 		[$cs_cv_sys_pthread_cflags -D_GNU_SOURCE],
 		[$cs_cv_sys_pthread_lflags],
 		[$cs_cv_sys_pthread_libs])])],
-	[cs_cv_sys_pthread_recursive=no])])])
+	[$2=no])])
 
 m4_define([cs_pthread_flags],
     [CS_CREATE_TUPLE() \
