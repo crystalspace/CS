@@ -1728,7 +1728,7 @@ void csThing::DrawPolygonArrayDPM (
   mesh.vertex_fog = NULL;
   mesh.mixmode = CS_FX_COPY;
 
-  // @@@ fog not supported yet.
+  rview->CalculateFogMesh(tr_o2c,mesh);
   rview->GetGraphics3D ()->DrawPolygonMesh (mesh);
 }
 

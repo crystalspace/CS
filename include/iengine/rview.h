@@ -294,6 +294,17 @@ struct iRenderView : public iBase
   virtual void CalculateFogMesh (const csTransform& tr_o2c,
   	G3DTriangleMesh& mesh) = 0;
 
+    /**
+   * Calculate the fog information in the given G3DPolygonMesh
+   * structure. This function assumes the fog array is already preallocated
+   * and the rest of the structure should be filled in.
+   * This function will take care of correctly enabling/disabling fog.
+   */
+
+  virtual void CalculateFogMesh (const csTransform &tr_o2c, 
+    G3DPolygonMesh &mesh) = 0;
+
+
   /**
    * Test if the given bounding sphere (in object space coordinates)
    * is visibile in this render view. The optional will

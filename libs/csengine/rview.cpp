@@ -499,6 +499,174 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDPFX &poly)
 
 void csRenderView::CalculateFogMesh (
   const csTransform &tr_o2c,
+  G3DPolygonMesh &mesh)
+{
+  if (!ctxt->fog_info)
+  {
+    mesh.do_fog = false;
+    return ;
+  }
+
+  mesh.do_fog = true;
+
+#ifdef USE_EXP_FOG
+  if (!fog_exp_table) InitializeFogTable ();
+#endif
+  //CS_ASSERT (mesh.buffers[0]->IsLocked ());
+
+  int i;
+  int num_vertices = mesh.polybuf->GetVertexCount ();
+  csVector3 *verts = mesh.polybuf->GetVertices ();
+  if(!mesh.vertex_fog) mesh.vertex_fog = new G3DFogInfo[num_vertices];
+  for (i = 0; i < num_vertices; i++)
+  {
+    // This is stupid!!! The purpose of DrawTriangleMesh is to be
+
+    // able to avoid doing camera transformation in the engine at all.
+
+    // And here we do it again... So this remains here until someone
+
+    // fixes this calculation to work with object/world space coordinates
+
+    // (depending on how the mesh is defined). For now this works and
+
+    // that's most important :-)
+    csVector3 v;
+    if (mesh.vertex_mode == G3DPolygonMesh::VM_VIEWSPACE)
+      v = verts[i];
+    else
+    {
+      v = tr_o2c * verts[i];
+    }
+
+    // Initialize fog vertex.
+    mesh.vertex_fog[i].r = 0;
+    mesh.vertex_fog[i].g = 0;
+    mesh.vertex_fog[i].b = 0;
+    mesh.vertex_fog[i].intensity = 0;
+    mesh.vertex_fog[i].intensity2 = 0;
+
+    // Consider a ray between (0,0,0) and v and calculate the thickness of every
+
+    // fogged sector in between.
+    csFogInfo *finfo = ctxt->fog_info;
+    while (finfo)
+    {
+      float dist1, dist2;
+      if (finfo->has_incoming_plane)
+      {
+        const csPlane3 &pl = finfo->incoming_plane;
+        float denom = pl.norm.x * v.x + pl.norm.y * v.y + pl.norm.z * v.z;
+
+        //dist1 = v.Norm () * (-pl.DD / denom);
+        dist1 = v.z * (-pl.DD / denom);
+      }
+      else
+        dist1 = 0;
+
+      //@@@ assume all FX polygons have no outgoing plane
+      if (!ctxt->added_fog_info)
+      {
+        const csPlane3 &pl = finfo->outgoing_plane;
+        float denom = pl.norm.x * v.x + pl.norm.y * v.y + pl.norm.z * v.z;
+
+        //dist2 = v.Norm () * (-pl.DD / denom);
+        dist2 = v.z * (-pl.DD / denom);
+      }
+      else
+        dist2 = v.Norm ();
+
+#ifdef USE_EXP_FOG
+      // Implement semi-exponential fog (linearily approximated)
+      uint table_index = QRound (
+          (100 * ABS (dist2 - dist1)) * finfo->fog->density);
+      float I2;
+      if (table_index < FOG_EXP_TABLE_SIZE)
+        I2 = fog_exp_table[table_index];
+      else
+        I2 = fog_exp_table[FOG_EXP_TABLE_SIZE - 1];
+#else
+      float I2 = ABS (dist2 - dist1) * finfo->fog->density;
+#endif
+      if (I2 > CS_FOG_MAXVALUE)
+        I2 = CS_FOGTABLE_CLAMPVALUE;
+      else
+        I2 = I2 * CS_FOGTABLE_DISTANCESCALE;
+
+      if (mesh.vertex_fog[i].intensity)
+      {
+        // We already have a previous fog level. In this case we do some
+
+        // mathematical tricks to combine both fog levels. Substitute one
+
+        // fog expresion in the other. The basic fog expression is:
+
+        //	C = I*F + (1-I)*P
+
+        //	with I = intensity
+
+        //	     F = fog color
+
+        //	     P = polygon color
+
+        //	     C = result
+        float I1 = mesh.vertex_fog[i].intensity;
+        float I = I1 + I2 - I1 * I2;
+        if (I > CS_FOGTABLE_CLAMPVALUE) I = CS_FOGTABLE_CLAMPVALUE;
+        mesh.vertex_fog[i].intensity = I;
+
+        float fact = 1.0f / I;
+        mesh.vertex_fog[i].r =
+          (
+            I2 *
+            finfo->fog->red +
+            I1 *
+            mesh.vertex_fog[i].r +
+            I1 *
+            I2 *
+            mesh.vertex_fog[i].r
+          ) *
+          fact;
+        mesh.vertex_fog[i].g =
+          (
+            I2 *
+            finfo->fog->green +
+            I1 *
+            mesh.vertex_fog[i].g +
+            I1 *
+            I2 *
+            mesh.vertex_fog[i].g
+          ) *
+          fact;
+        mesh.vertex_fog[i].b =
+          (
+            I2 *
+            finfo->fog->blue +
+            I1 *
+            mesh.vertex_fog[i].b +
+            I1 *
+            I2 *
+            mesh.vertex_fog[i].b
+          ) *
+          fact;
+      }
+      else
+      {
+        // The first fog level.
+        mesh.vertex_fog[i].intensity = I2;
+        mesh.vertex_fog[i].r = finfo->fog->red;
+        mesh.vertex_fog[i].g = finfo->fog->green;
+        mesh.vertex_fog[i].b = finfo->fog->blue;
+      }
+
+      finfo = finfo->next;
+    }
+  }
+}
+
+
+void csRenderView::CalculateFogMesh (
+  const csTransform &tr_o2c,
   G3DTriangleMesh &mesh)
 {
   if (!ctxt->fog_info)

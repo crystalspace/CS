@@ -110,6 +110,14 @@ struct iPolygonBuffer : public iBase
    * Get a material.
    */
   virtual iMaterialHandle* GetMaterial (int idx) const = 0;
+
+  /// Gets the numebr of vertices
+  virtual GetVertexCount() const = 0;
+
+  ///Gets the array of vertices
+
+  virtual csVector3* GetVertices() const = 0;
+
   /**
    * Set a previously added material (this can be used to change
    * a material handle).

@@ -183,6 +183,11 @@ public:
   {
     mesh.do_fog = false;
   }
+  virtual void CalculateFogMesh (const csTransform& , G3DPolygonMesh& mesh)
+  {
+    mesh.do_fog = false;
+  }
+
   virtual bool TestBSphere (const csReversibleTransform& o2c,
 	const csSphere& sphere)
   {
