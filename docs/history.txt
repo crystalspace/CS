@@ -20,6 +20,11 @@ The history order is reversed so that new features are at the top.
 	- Removed all calls to DecRef() in vsh.
 	- Removed all calls to DecRef() in simpcd tutorial.
 	- Removed a few more DecRef() calls in some other apps.
+	- Changed iObject->GetIterator() to return a csPtr.
+	- Fixed DecRef memory leak in csTypedObjectIterator when
+	  the iterator was not used to the end.
+	- Removed a few csPtr casts for LoadFont(). LoadFont() already
+	  returns a csPtr.
 5-Sep-2002
 	- Fixed a very subtle bug in the csRef assignement operators.
 	  It is very important FIRST to assign the new value to the

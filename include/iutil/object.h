@@ -111,7 +111,7 @@ struct iObject : public iBase
    * Return an iterator for all child objects. Note that you should not
    * remove child objects while iterating.
    */
-  virtual iObjectIterator *GetIterator () = 0;
+  virtual csPtr<iObjectIterator> GetIterator () = 0;
 
   // @@@ temporary fix
   virtual void ObjReleaseOld (iObject *obj) = 0;

@@ -885,14 +885,13 @@ void csModelDataTools::Describe (iObject *obj, csString &out)
   CS_MDLTOOL_TRY_BEGIN (obj, iModelDataMaterial)
   CS_MDLTOOL_TRY_END
 
-  iObjectIterator *it = obj->GetIterator ();
+  csRef<iObjectIterator> it (obj->GetIterator ());
   while (!it->IsFinished ())
   {
     Describe (it->GetObject (), contents);
     it->Next ();
   }
 
-  it->DecRef ();
   Indent -= 2;
   Indention [Indent] = 0;
 
@@ -925,17 +924,15 @@ void csModelDataTools::CompressVertices (iModelDataObject *Object)
 
   // collect all vertex frames and polygons
   VertexFrames.Push (Object->GetDefaultVertices ());
-  iObjectIterator *it = Object->QueryObject ()->GetIterator ();
+  csRef<iObjectIterator> it (Object->QueryObject ()->GetIterator ());
   while (!it->IsFinished ())
   {
-    iModelDataPolygon *Polygon =
-      SCF_QUERY_INTERFACE (it->GetObject (), iModelDataPolygon);
+    csRef<iModelDataPolygon> Polygon (
+      SCF_QUERY_INTERFACE (it->GetObject (), iModelDataPolygon));
     if (Polygon)
-    {
       Polygons.Push (Polygon);
-      Polygon->DecRef ();
-    }
 
+    // @@@ MEMORY LEAK!!!???
     iModelDataAction *Action =
       SCF_QUERY_INTERFACE (it->GetObject (), iModelDataAction);
     if (Action)
@@ -953,7 +950,6 @@ void csModelDataTools::CompressVertices (iModelDataObject *Object)
     }
     it->Next ();
   }
-  it->DecRef ();
 
   // extract the data from one of the vertex frames into growing arrays
   csVector3ArrayType VertexList;

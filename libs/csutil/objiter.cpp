@@ -22,21 +22,15 @@
 csTypedObjectIterator::csTypedObjectIterator (iObject *Parent)
 {
   iter = Parent->GetIterator ();
-  CurrentTypedObject = NULL;
 }
 
 csTypedObjectIterator::~csTypedObjectIterator ()
 {
-  iter->DecRef ();
 }
 
 void csTypedObjectIterator::FetchObject ()
 {
-  if (CurrentTypedObject)
-  {
-    CurrentTypedObject->DecRef ();
-    CurrentTypedObject = NULL;
-  }
+  CurrentTypedObject = NULL;
   if (iter->IsFinished ())
     return;
 
@@ -44,6 +38,8 @@ void csTypedObjectIterator::FetchObject ()
   int ver;
   GetRequestedInterface (id, ver);
 
-  CurrentTypedObject = (iBase*)(iter->GetObject ()->QueryInterface (id, ver));
+  CurrentTypedObject = csPtr<iBase> (
+  	(iBase*)(iter->GetObject ()->QueryInterface (id, ver)));
   if (!CurrentTypedObject) Next ();
 }
+

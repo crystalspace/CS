@@ -101,10 +101,11 @@ bool csCrossBuilder::BuildThing (iModelDataObject *Object, iThingState *tgt,
     tgt->CreateVertex (Vertices->GetVertex (i));
 
   // copy the polygons
-  iObjectIterator *it = Object->QueryObject ()->GetIterator ();
+  csRef<iObjectIterator> it (Object->QueryObject ()->GetIterator ());
   while (!it->IsFinished ())
   {
     // test if this is a valid polygon
+    // @@@ MEMORY LEAK???
     iModelDataPolygon *Polygon =
       SCF_QUERY_INTERFACE (it->GetObject (), iModelDataPolygon);
     if (!Polygon || Polygon->GetVertexCount () < 3)
@@ -136,7 +137,6 @@ bool csCrossBuilder::BuildThing (iModelDataObject *Object, iThingState *tgt,
 
     it->Next ();
   }
-  it->DecRef ();
 
   return true;
 }

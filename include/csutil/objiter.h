@@ -40,7 +40,7 @@
     inline NAME (iObject *Parent) : csTypedObjectIterator (Parent)	\
       { FetchObject (); }						\
     inline INTERFACE *Get ()						\
-      { return (INTERFACE*)CurrentTypedObject; }			\
+      { return (INTERFACE*)(iBase*)CurrentTypedObject; }		\
   };
 
 /**
@@ -49,8 +49,8 @@
 class csTypedObjectIterator
 {
 protected:
-  iObjectIterator *iter;
-  iBase *CurrentTypedObject;
+  csRef<iObjectIterator> iter;
+  csRef<iBase> CurrentTypedObject;
 
   void FetchObject ();
   virtual void GetRequestedInterface (scfInterfaceID &id, int &ver) const = 0;

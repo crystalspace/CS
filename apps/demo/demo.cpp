@@ -287,7 +287,7 @@ bool Demo::Initialize (int argc, const char* const argv[],
   txtmgr->ResetPalette ();
   txtmgr->SetPalette ();
 
-  font = csPtr<iFont> (myG2D->GetFontServer ()->LoadFont (CSFONT_LARGE));
+  font = myG2D->GetFontServer ()->LoadFont (CSFONT_LARGE);
 
   // Some commercials...
   Report (CS_REPORTER_SEVERITY_NOTIFY,

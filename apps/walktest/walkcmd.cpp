@@ -434,8 +434,7 @@ void load_thing (iSector* sector, csVector3 position,
     return;
   }
 
-  csRef<iObjectIterator> it2 (csPtr<iObjectIterator> (
-  	Model->QueryObject()->GetIterator()));
+  csRef<iObjectIterator> it2 (Model->QueryObject()->GetIterator());
   GenerateThing(it2,mat,spriteName,sector,position, ParseScaleFactor(it));
   Model->DecRef();
 }
@@ -844,7 +843,7 @@ void BuildObject(iSector * sector,
 
 void WalkTest::ParseKeyNodes(iObject* src)
 {
-  csRef<iObjectIterator> it (csPtr<iObjectIterator> (src->GetIterator()));
+  csRef<iObjectIterator> it (src->GetIterator());
   csRef<iSector> sector (SCF_QUERY_INTERFACE(src,iSector));
 
   while(!it->IsFinished())
@@ -855,8 +854,7 @@ void WalkTest::ParseKeyNodes(iObject* src)
       it->Next();
       continue;
     }
-    csRef<iObjectIterator> it2 (csPtr<iObjectIterator> (
-    	it->GetObject()->GetIterator()));
+    csRef<iObjectIterator> it2 (it->GetObject()->GetIterator());
 
     BuildObject(sector,it2, Engine, node->GetPosition(), myG3D,
 		LevelLoader, object_reg);
@@ -866,7 +864,7 @@ void WalkTest::ParseKeyNodes(iObject* src)
 
 void WalkTest::ParseKeyCmds (iObject* src)
 {
-  csRef<iObjectIterator> it (csPtr<iObjectIterator> (src->GetIterator ()));
+  csRef<iObjectIterator> it (src->GetIterator ());
   while (!it->IsFinished ())
   {
     csRef<iKeyValuePair> kp (
@@ -1061,7 +1059,7 @@ void WalkTest::ParseKeyCmds ()
 
 void WalkTest::ActivateObject (iObject* src)
 {
-  csRef<iObjectIterator> it (csPtr<iObjectIterator> (src->GetIterator ()));
+  csRef<iObjectIterator> it (src->GetIterator ());
   while (!it->IsFinished ())
   {
     csRef<csWalkEntity> wentity (SCF_QUERY_INTERFACE (it->GetObject (),

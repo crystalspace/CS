@@ -58,18 +58,17 @@ csRegion::~csRegion ()
 
 void csRegion::DeleteAll ()
 {
-  iObjectIterator *iter;
+  csRef<iObjectIterator> iter;
 
   // First we need to copy the objects to a csVector to avoid
   // messing up the iterator while we are deleting them.
   csObjectVectorNodelete copy;
-  for (iter = GetIterator (); !iter->IsFinished (); iter->Next ())
+  iter = GetIterator ();
+  for ( ; !iter->IsFinished (); iter->Next ())
   {
     iObject *o = iter->GetObject ();
     copy.Push (o);
   }
-
-  iter->DecRef ();
 
   // Now we iterate over all objects in the 'copy' vector and
   // delete them. This will release them as csObject children
@@ -246,79 +245,63 @@ Object name is '%s'",
 
 bool csRegion::PrepareTextures ()
 {
-  iObjectIterator *iter;
+  csRef<iObjectIterator> iter;
   iTextureManager *txtmgr = csEngine::current_engine->G3D->GetTextureManager ();
 
   //txtmgr->ResetPalette ();
   // First register all textures to the texture manager.
   {
-    for (iter = GetIterator (); !iter->IsFinished (); iter->Next ())
+    iter = GetIterator ();
+    for ( ; !iter->IsFinished (); iter->Next ())
     {
-      iTextureWrapper *csth = SCF_QUERY_INTERFACE (
+      csRef<iTextureWrapper> csth (SCF_QUERY_INTERFACE (
           iter->GetObject (),
-          iTextureWrapper);
+          iTextureWrapper));
       if (csth)
-      {
         if (!csth->GetTextureHandle ()) csth->Register (txtmgr);
-        csth->DecRef ();
-      }
     }
-
-    iter->DecRef ();
   }
 
   // Prepare all the textures.
 
   //@@@ Only prepare new textures: txtmgr->PrepareTextures ();
   {
-    for (iter = GetIterator (); !iter->IsFinished (); iter->Next ())
+    iter = GetIterator ();
+    for ( ; !iter->IsFinished (); iter->Next ())
     {
-      iTextureWrapper *csth = SCF_QUERY_INTERFACE (
+      csRef<iTextureWrapper> csth (SCF_QUERY_INTERFACE (
           iter->GetObject (),
-          iTextureWrapper);
+          iTextureWrapper));
       if (csth)
-      {
         csth->GetTextureHandle ()->Prepare ();
-        csth->DecRef ();
-      }
     }
-
-    iter->DecRef ();
   }
 
   // Then register all materials to the texture manager.
   {
-    for (iter = GetIterator (); !iter->IsFinished (); iter->Next ())
+    iter = GetIterator ();
+    for ( ; !iter->IsFinished (); iter->Next ())
     {
-      iMaterialWrapper *csmh = SCF_QUERY_INTERFACE (
+      csRef<iMaterialWrapper> csmh (SCF_QUERY_INTERFACE (
           iter->GetObject (),
-          iMaterialWrapper);
+          iMaterialWrapper));
       if (csmh)
-      {
         if (!csmh->GetMaterialHandle ()) csmh->Register (txtmgr);
-        csmh->DecRef ();
-      }
     }
-
-    iter->DecRef ();
   }
 
   // Prepare all the materials.
   //@@@ Only prepare new materials: txtmgr->PrepareMaterials ();
   {
-    for (iter = GetIterator (); !iter->IsFinished (); iter->Next ())
+    iter = GetIterator ();
+    for ( ; !iter->IsFinished (); iter->Next ())
     {
-      iMaterialWrapper *csmh = SCF_QUERY_INTERFACE (
+      csRef<iMaterialWrapper> csmh (SCF_QUERY_INTERFACE (
           iter->GetObject (),
-          iMaterialWrapper);
+          iMaterialWrapper));
       if (csmh)
-      {
         csmh->GetMaterialHandle ()->Prepare ();
-        csmh->DecRef ();
-      }
     }
-
-    iter->DecRef ();
   }
 
   return true;

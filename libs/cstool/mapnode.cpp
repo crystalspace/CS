@@ -80,22 +80,17 @@ iMapNode* csMapNode::GetNode (iSector *pSector, const char* name,
 //---------------------------------------------------------------------------
 
 csNodeIterator::csNodeIterator (iSector* pSector, const char* classname)
-  : Iterator (NULL), Classname (classname), CurrentNode (NULL)
+  : Classname (classname)
 {
   Reset (pSector, Classname);
 }
 
 csNodeIterator::~csNodeIterator ()
 {
-  if (CurrentNode) CurrentNode->DecRef ();
-  if (Iterator) Iterator->DecRef ();
 }
 
 void csNodeIterator::Reset (iSector *pSector, const char *classname)
 {
-  if (CurrentNode) CurrentNode->DecRef ();
-  if (Iterator) Iterator->DecRef ();
-
   Iterator = pSector->QueryObject ()->GetIterator ();
   Classname = classname;
   CurrentNode = SCF_QUERY_INTERFACE (Iterator->GetObject (), iMapNode);
@@ -124,12 +119,11 @@ void csNodeIterator::SkipWrongClassname ()
   if (Classname)
     while (!Iterator->IsFinished ())
     {
-      iKeyValuePair *KeyVal = CS_GET_NAMED_CHILD_OBJECT
-        (CurrentNode->QueryObject (), iKeyValuePair, "classname");
+      csRef<iKeyValuePair> KeyVal (CS_GET_NAMED_CHILD_OBJECT
+        (CurrentNode->QueryObject (), iKeyValuePair, "classname"));
       if (KeyVal)
       {
         bool done = !strcmp (KeyVal->GetValue (), Classname);
-	KeyVal->DecRef ();
 	if (done) return;
       }
       NextNode ();
@@ -138,10 +132,10 @@ void csNodeIterator::SkipWrongClassname ()
 
 void csNodeIterator::NextNode ()
 {
-  if (CurrentNode) CurrentNode->DecRef ();
   Iterator->Next ();
   if (Iterator->IsFinished ())
     CurrentNode = NULL;
   else
     CurrentNode = SCF_QUERY_INTERFACE (Iterator->GetObject (), iMapNode);
 }
+

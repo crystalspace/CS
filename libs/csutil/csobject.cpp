@@ -122,13 +122,12 @@ csObject::csObject (csObject &o) : iObject(), Children (NULL), Name (NULL)
   SCF_CONSTRUCT_IBASE (NULL);
   InitializeObject ();
 
-  iObjectIterator *it = o.GetIterator ();
+  csRef<iObjectIterator> it (o.GetIterator ());
   while (!it->IsFinished ())
   {
     ObjAdd (it->GetObject ());
     it->Next ();
   }
-  it->DecRef ();
   SetName (o.GetName ());
 }
 
@@ -255,13 +254,12 @@ void csObject::ObjRemoveAll ()
 
 void csObject::ObjAddChildren (iObject *Parent)
 {
-  iObjectIterator *it = Parent->GetIterator ();
+  csRef<iObjectIterator> it (Parent->GetIterator ());
   while (!it->IsFinished ())
   {
     ObjAdd (it->GetObject ());
     it->Next ();
   }
-  it->DecRef ();
 }
 
 void* csObject::GetChild (int InterfaceID, int Version,
@@ -307,9 +305,9 @@ iObject* csObject::GetChild (const char *Name) const
   return NULL;
 }
 
-iObjectIterator *csObject::GetIterator ()
+csPtr<iObjectIterator> csObject::GetIterator ()
 {
-  return new csObjectIterator (this);
+  return csPtr<iObjectIterator> (new csObjectIterator (this));
 }
 
 //------------------- miscelaneous simple classes derived from csObject -----//

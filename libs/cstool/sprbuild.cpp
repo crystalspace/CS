@@ -40,7 +40,7 @@ CS_TYPEDEF_GROWING_ARRAY (UsedVerticesInfo, UsedVertexInfo);
 bool csSpriteBuilder::Build (iModelDataObject *Object)
 {
   int i,j;
-  iObjectIterator *it1;
+  csRef<iObjectIterator> it1;
   iModelDataMaterial *Material = NULL;
 
   //--- preparation stage: arrange and validate incoming data locally --------
@@ -51,8 +51,8 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
   it1 = Object->QueryObject ()->GetIterator ();
   while (!it1->IsFinished ())
   {
-    iModelDataAction *ac = SCF_QUERY_INTERFACE (it1->GetObject (),
-    	iModelDataAction);
+    csRef<iModelDataAction> ac (SCF_QUERY_INTERFACE (it1->GetObject (),
+    	iModelDataAction));
     if (ac)
     {
       for (i=0; i<ac->GetFrameCount (); i++)
@@ -65,11 +65,9 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
 	  ver->DecRef ();
 	}
       }
-      ac->DecRef ();
     }
     it1->Next ();
   }
-  it1->DecRef ();
 
   // we need at least one vertex frame
   if (Frames.Length () == 0)
@@ -105,7 +103,6 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
     }
     it1->Next ();
   }
-  it1->DecRef ();
 
   // reserve memory
   SpriteVertices.SetLimit (vertices+1);
@@ -137,7 +134,6 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
     }
     it1->Next ();
   }
-  it1->DecRef ();
 
 #else
 /*
@@ -162,8 +158,8 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
   it1 = Object->QueryObject ()->GetIterator ();
   while (!it1->IsFinished ())
   {
-    iModelDataPolygon *poly =
-      SCF_QUERY_INTERFACE (it1->GetObject (), iModelDataPolygon);
+    csRef<iModelDataPolygon> poly (
+      SCF_QUERY_INTERFACE (it1->GetObject (), iModelDataPolygon));
     if (poly)
     {
       csIntArray PolyVertices;
@@ -207,12 +203,9 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
       // store the material if we don't have any yet
       if (!Material && poly->GetMaterial ())
         Material = poly->GetMaterial ();
-
-      poly->DecRef ();
     }
     it1->Next ();
   }
-  it1->DecRef ();
 
   delete[] usedvertices;
 #endif
@@ -276,6 +269,7 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
 	 * in 3d sprites.
 	 */
         int FrameIndex = (i == 0) ? (ac->GetFrameCount ()-1) : (i-1);
+	// @@@ MEMORY LEAK???
         iModelDataVertices *ver = SCF_QUERY_INTERFACE (
 		ac->GetState (FrameIndex), iModelDataVertices);
 	if (ver)
@@ -293,7 +287,6 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
     }
     it1->Next ();
   }
-  it1->DecRef ();
 
   if (!FoundDefault)
   {

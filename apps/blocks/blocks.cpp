@@ -3162,7 +3162,7 @@ int main (int argc, char* argv[])
   Sys->myNetDrv = CS_QUERY_REGISTRY (object_reg, iNetworkDriver);
 
   // Get a font handle
-  Sys->font = csPtr<iFont> (Gfx2D->GetFontServer ()->LoadFont (CSFONT_LARGE));
+  Sys->font = Gfx2D->GetFontServer ()->LoadFont (CSFONT_LARGE);
 
   // Get the level loader
   Sys->LevelLoader = CS_QUERY_REGISTRY (object_reg, iLoader);

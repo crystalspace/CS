@@ -109,7 +109,7 @@ public:
    * Return an iterator for all child objects. Note that you should not
    * remove child objects while iterating.
    */
-  virtual iObjectIterator *GetIterator ();
+  virtual csPtr<iObjectIterator> GetIterator ();
 
   SCF_DECLARE_IBASE;
 

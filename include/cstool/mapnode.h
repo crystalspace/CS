@@ -110,9 +110,9 @@ protected:
   /// Step to the next node in the sector, ignoring its classname
   void NextNode ();
 
-  iObjectIterator *Iterator;
+  csRef<iObjectIterator> Iterator;
   const char *Classname;
-  iMapNode *CurrentNode;
+  csRef<iMapNode> CurrentNode;
 };
 
 #endif // __MAPNODE_H__

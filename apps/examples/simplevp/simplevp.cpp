@@ -320,10 +320,8 @@ bool Simple::Initialize ()
   csRef<iStatLight> light;
   iLightList* ll = room->GetLights ();
 
-  light = csPtr<iStatLight> (
-  	engine->CreateLight (NULL, csVector3 (-3, 5, 0), 10,
-  	csColor (1, 1, 1), false));
-
+  light = engine->CreateLight (NULL, csVector3 (-3, 5, 0), 10,
+  	csColor (1, 1, 1), false);
   ll->Add (light->QueryLight ());
 
   engine->Prepare ();
