@@ -569,7 +569,7 @@ private:
   csPDelArray<csSpriteCal3DSocket> sockets;
 
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   iVertexBufferManager* vbufmgr;
   csRef<iVertexBuffer> vbuf;
 //  csArray<G3DTriangleMesh>  mesh;
@@ -647,7 +647,7 @@ private:
   int FindAnimCycleNamePos(char const*) const;
   void ClearAnimCyclePos(int pos, float delay);
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   void SetupVertexBuffer (int mesh, int submesh, int num_vertices,
     int num_triangles, csTriangle *triangles);
   bool DrawSubmesh (iGraphics3D* g3d, iRenderView* rview, 
@@ -1101,7 +1101,7 @@ public:
   } scfiLODControl;
   friend struct LODControl;
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   /// interface to receive state of vertexbuffermanager
   struct eiVertexBufferManagerClient : public iVertexBufferManagerClient
   {

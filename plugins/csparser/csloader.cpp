@@ -237,7 +237,7 @@ iLight* StdLoaderContext::FindLight (const char *name)
 
 iShader* StdLoaderContext::FindShader (const char *name)
 {
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   csRef<iShaderManager> shaderMgr = CS_QUERY_REGISTRY (
   	loader->object_reg, iShaderManager);
   if (!shaderMgr) return 0;
@@ -438,7 +438,7 @@ iLight* ThreadedLoaderContext::FindLight (const char *name)
 
 iShader* ThreadedLoaderContext::FindShader (const char *name)
 {
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   csRef<iShaderManager> shaderMgr = CS_QUERY_REGISTRY (
   	loader->object_reg, iShaderManager);
   if (!shaderMgr) return 0;
@@ -1378,9 +1378,9 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* node)
           break;
         case XMLTOKEN_SHADERS:
 	  shader_given = true;
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
           ParseShaderList (ldr_context, child);
-#endif //CS_USE_NEW_RENDERER
+#endif //CS_USE_OLD_RENDERER
           break;
 	default:
 	  SyntaxService->ReportBadToken (child);
@@ -1473,10 +1473,10 @@ bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* node)
             return false;
           break;
         case XMLTOKEN_SHADERS:
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
           if (!ParseShaderList (ldr_context, child))
 	    return false;
-#endif //CS_USE_NEW_RENDERER
+#endif //CS_USE_OLD_RENDERER
           break;
 	case  XMLTOKEN_VARIABLELIST:
 	  if (!ParseVariableList (ldr_context, child))
@@ -2864,7 +2864,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       }
       break;
     case XMLTOKEN_CAST_HW_SHADOW:
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
       TEST_MISSING_MESH 
       else
       {
@@ -3746,7 +3746,7 @@ bool csLoader::LoadSettings (iDocumentNode* node)
         }
 	break;
       case XMLTOKEN_RENDERLOOP:
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
 	{
 	  const char* loopName = child->GetContentsValue ();
 	  if (loopName)
@@ -4038,7 +4038,7 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
 
   csVector3 attenvec (0, 0, 0);
   float distbright = 1;
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   float influenceRadius = 0;
   bool influenceOverride = false;
 #endif
@@ -4087,7 +4087,7 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
   pos.x = pos.y = pos.z = 0;
   color.red = color.green = color.blue = 1;
   dyn = CS_LIGHT_DYNAMICTYPE_STATIC;
-//#ifndef CS_USE_NEW_RENDERER
+//#ifdef CS_USE_OLD_RENDERER
   dist = 1;
 //#endif
 
@@ -4302,14 +4302,14 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
 	  attenvec.z = child->GetAttributeValueAsFloat ("q");
 	}
 	break;
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
       case XMLTOKEN_INFLUENCERADIUS:
 	{
 	  influenceRadius = child->GetContentsValueAsFloat();
 	  influenceOverride = true;
 	}
 	break;
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
       case XMLTOKEN_ATTENUATIONVECTOR:
         {
 	  //@@@ should be scrapped in favor of specification via
@@ -4387,7 +4387,7 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
       l->SetAttenuationVector (attenvec);
     }
   }
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   if (influenceOverride)
     l->SetInfluenceRadius (influenceRadius);
 #endif
@@ -4702,7 +4702,7 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
     switch (id)
     {
       case XMLTOKEN_RENDERLOOP:
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
 	{
 	  const char* loopName = child->GetContentsValue ();
 	  if (loopName)
@@ -5051,7 +5051,7 @@ bool csLoader::ParseSharedVariable (iLoaderContext* ldr_context,
 //========================================================================
 //========================================================================
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
 bool csLoader::ParseShaderList (iLoaderContext* ldr_context,
 	iDocumentNode* node)
 {
@@ -5165,7 +5165,7 @@ bool csLoader::ParseShader (iLoaderContext* ldr_context,
   return true;
 }
 
-#endif //CS_USE_NEW_RENDERER
+#endif //CS_USE_OLD_RENDERER
 
 void csLoader::CollectAllChildren (iMeshWrapper* meshWrapper,
 	csRefArray<iMeshWrapper>& meshesArray)

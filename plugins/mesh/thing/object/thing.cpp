@@ -188,7 +188,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csThingStatic::ObjectModel)
   SCF_IMPLEMENTS_INTERFACE(iObjectModel)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
 csStringID csThingStatic::texLightmapName = csInvalidStringID;
 #endif
 
@@ -220,7 +220,7 @@ csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type) :
   logparent = 0;
   thingmesh_type = thing_type;
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   r3d = CS_QUERY_REGISTRY (thing_type->object_reg, iGraphics3D);
 
   if ((texLightmapName == csInvalidStringID))
@@ -1053,7 +1053,7 @@ void csThingStatic::GetRadius (csVector3 &rad, csVector3 &cent)
   cent = b.GetCenter ();
 }
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
 void csThingStatic::FillRenderMeshes (
 	csDirtyAccessArray<csRenderMesh*>& rmeshes,
 	const csArray<RepMaterial>& repMaterials,
@@ -1119,7 +1119,7 @@ void csThingStatic::FillRenderMeshes (
   }
 
 }
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
 
 int csThingStatic::FindPolygonByName (const char* name)
 {
@@ -1584,9 +1584,9 @@ csThing::csThing (iBase *parent, csThingStatic* static_data) :
 
   static_data_nr = 0xfffffffd;	// (static_nr of csThingStatic is init to -1)
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   polybuf = 0;
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
   current_visnr = 1;
 
   SetLmDirty (true);
@@ -1594,9 +1594,9 @@ csThing::csThing (iBase *parent, csThingStatic* static_data) :
 
 csThing::~csThing ()
 {
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   if (polybuf) polybuf->DecRef ();
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
 
   ClearLMs ();
 
@@ -1664,10 +1664,10 @@ char* csThing::GenerateCacheName ()
 
 void csThing::MarkLightmapsDirty ()
 {
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   if (polybuf)
     polybuf->MarkLightmapsDirty ();
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
   SetLmDirty (true);
   light_version++;
 }
@@ -1841,7 +1841,7 @@ void csThing::Prepare ()
       if (cached_movable) movablenr = cached_movable->GetUpdateNumber ()-1;
       else movablenr--;
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
       if (polybuf)
       {
 	polybuf->DecRef ();
@@ -1850,7 +1850,7 @@ void csThing::Prepare ()
       polybuf_materials.DeleteAll ();
 #else
       rmHolder.Clear();
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
 
       materials_to_visit.DeleteAll ();
 
@@ -1881,7 +1881,7 @@ void csThing::Prepare ()
   if (cached_movable) movablenr = cached_movable->GetUpdateNumber ()-1;
   else movablenr--;
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   if (polybuf)
   {
     polybuf->DecRef ();
@@ -1890,7 +1890,7 @@ void csThing::Prepare ()
   polybuf_materials.DeleteAll ();
 #else
   rmHolder.Clear();
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
 
   materials_to_visit.DeleteAll ();
 
@@ -1996,14 +1996,14 @@ const csPlane3& csThing::GetPolygonWorldPlaneNoCheck (int polygon_idx) const
 
 void csThing::InvalidateThing ()
 {
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   if (polybuf)
   {
     polybuf->DecRef ();
     polybuf = 0;
   }
   polybuf_materials.DeleteAll ();
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
   materials_to_visit.DeleteAll ();
 
   SetPrepared (false);
@@ -2054,7 +2054,7 @@ struct MatPol
   csPolygon3D *poly;
 };
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
 static int ComparePointer (iMaterialWrapper* const& item1,
 			   iMaterialWrapper* const& item2)
 {
@@ -2068,7 +2068,7 @@ static int ComparePointer (iMaterialWrapper* const& item1,
 
 void csThing::PreparePolygonBuffer ()
 {
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   if (polybuf) return;
 
   struct csPolyLMCoords
@@ -2165,14 +2165,14 @@ void csThing::PreparePolygonBuffer ()
 
 
   polybuf->Prepare ();
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
 }
 
 #else // if __USE_MATERIALS_REPLACEMENT__
 
 void csThing::PreparePolygonBuffer ()
 {
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   //
   //If 'polybuf' is null, create it.
   if (!polybuf)
@@ -2322,7 +2322,7 @@ void csThing::PreparePolygonBuffer ()
 
 
   polybuf->Prepare ();
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
 }
 
 #endif // if __USE_MATERIALS_REPLACEMENT__
@@ -2332,7 +2332,7 @@ void csThing::DrawPolygonArrayDPM (
   iMovable *movable,
   csZBufMode zMode)
 {
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   PreparePolygonBuffer ();
 
   iCamera *icam = rview->GetCamera ();
@@ -2367,7 +2367,7 @@ void csThing::DrawPolygonArrayDPM (
 
 void csThing::InvalidateMaterialHandles ()
 {
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   size_t i;
   for (i = 0; i < polybuf_materials.Length (); i++)
   {
@@ -2602,7 +2602,7 @@ bool csThing::DrawTest (iRenderView *rview, iMovable *movable,
   cached_movable = movable;
   WorUpdate ();
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
   	clip_z_plane);
 #endif
@@ -2805,7 +2805,7 @@ void csThing::PrepareLighting ()
   PrepareLMs ();
 }
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
 
 void csThing::PrepareRenderMeshes (
   csDirtyAccessArray<csRenderMesh*>& renderMeshes)
@@ -2855,7 +2855,7 @@ void csThing::PrepareForUse ()
 
   UpdateDirtyLMs ();
 #endif // __USE_MATERIALS_REPLACEMENT__
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   csDirtyAccessArray<csRenderMesh*>& renderMeshes =
     rmHolder.GetUnusedMeshes (0);
   if (renderMeshes.Length() == 0)
@@ -2874,7 +2874,7 @@ void csThing::PrepareForUse ()
 csRenderMesh **csThing::GetRenderMeshes (int &num, iRenderView* rview, 
                                          iMovable* movable, uint32 frustum_mask)
 {
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
 
 #if DO_TIMING
 struct timeval tv1, tv2, tv3, tv4, tv5, tv6;

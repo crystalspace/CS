@@ -222,7 +222,7 @@ void csRegion::DeleteAll ()
     }
   }
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   csRef<iShaderManager> shmgr = CS_QUERY_REGISTRY (
   	csEngine::current_engine->object_reg, iShaderManager);
   if (shmgr)

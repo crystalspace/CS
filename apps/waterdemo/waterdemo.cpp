@@ -55,7 +55,7 @@
 #include "ivideo/graph3d.h"
 #include "iutil/plugin.h"
 #include "imesh/genmesh.h"
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
 #  include "ivideo/shader/shader.h"
 #  include "ivideo/rndbuf.h"
 #  include "iengine/renderloop.h"
@@ -429,7 +429,7 @@ bool csWaterDemo::Initialize ()
     CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
     "crystalspace.shared.stringset", iStringSet);
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   //get a custom renderloop
   csRef<iRenderLoop> rl = engine->GetRenderLoopManager ()->Create ();
   
@@ -467,7 +467,7 @@ bool csWaterDemo::Initialize ()
   csRef<iShaderManager> shmgr (CS_QUERY_REGISTRY(object_reg, iShaderManager));
   csRef<iShaderCompiler> shcom (shmgr->GetCompiler ("XMLShader"));
   shader = shcom->CompileShader (shaderDoc->GetRoot ()->GetNode ("shader"));
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
 
   // setup the mesh 
   csRef<iMeshObjectType> gType = CS_QUERY_PLUGIN_CLASS(plugin_mgr, 
@@ -506,7 +506,7 @@ bool csWaterDemo::Initialize ()
   
   //setup a material
   csRef<iMaterial> mat = engine->CreateBaseMaterial (0);
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   mat->SetShader (strings->Request ("general"), shader);
 #endif
   csRef<iMaterialWrapper> matW = engine->GetMaterialList ()->NewMaterial (mat);

@@ -195,7 +195,7 @@ public:
     int lm_x1, int lm_y1, int lm_x2, int lm_y2,
     float& lm_u1, float& lm_v1, float &lm_u2, float& lm_v2);
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   virtual csPtr<iTextureHandle> RegisterTexture (iImageVector *image, int flags, int target)
   { return csPtr<iTextureHandle>(0);  }
 #endif

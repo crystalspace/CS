@@ -44,7 +44,7 @@ private:
 
   /// flat shading color
   csRGBcolor flat_color;
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   /// the texture of the material (can be 0)
   csRef<iTextureWrapper> texture;
   /// Number of texture layers (currently maximum 4).
@@ -66,7 +66,7 @@ private:
   csHash<csRef<iShader>, csStringID> shaders;
   csEngine* engine;
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   csShaderVariable* GetVar (csStringID name, bool create = false);
 #endif
 
@@ -127,7 +127,7 @@ public:
   /// Set reflection of the material
   void SetReflection (float val);
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   /// Get the base diffuse texture (if none 0 is returned)
   iTextureWrapper* GetTextureWrapper ()
   {
@@ -140,7 +140,7 @@ public:
   /// Set the base diffuse texture (pass 0 to set no texture)
   void SetTextureWrapper (iTextureWrapper* tex);
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   /// Add a texture layer (currently only one supported).
   void AddTextureLayer (iTextureWrapper* txtwrap, uint mode,
         float uscale, float vscale, float ushift, float vshift);
@@ -168,7 +168,7 @@ public:
    * Get a texture from the material.
    */
   virtual iTextureHandle *GetTexture (csStringID name);
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   /// Get num texture layers.
   virtual int GetTextureLayerCount ();
   /// Get a texture layer.

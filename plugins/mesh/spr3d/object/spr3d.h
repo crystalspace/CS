@@ -384,7 +384,7 @@ public:
   csWeakRef<iGraphics3D> g3d;
   csRef<iLightManager> light_mgr;
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   csAnonRenderBufferManager *anon_buffers;
 #endif
 
@@ -1220,7 +1220,7 @@ private:
    * Array of colors for the vertices. If not set then this
    * sprite does not have colored vertices.
    */
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   csColor4* vertex_colors;
   /**
    * Base color that will be added to the sprite colors.
@@ -1291,12 +1291,12 @@ private:
   long cur_movablenr;
 
   // Remembered info between DrawTest and Draw.
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   G3DTriangleMesh g3dmesh;
 #else
   csRenderMeshHolderSingle rmHolder;  
 
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
 
   bool initialized;
 
@@ -1308,7 +1308,7 @@ private:
    * of frames. Do we create a vertex buffer for every frame?
    * @@@
    */
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   iVertexBufferManager* vbufmgr;
   csRef<iVertexBuffer> vbuf;
   /// Vertex buffer for tweening.
@@ -1342,12 +1342,12 @@ private:
     shadow_verts_name, shadow_norms_name;
   csShaderVariableContext svcontext;
 
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
 
   /// Setup this object.
   void SetupObject ();
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   /// interface to receive state of vertexbuffermanager
   struct eiVertexBufferManagerClient : public iVertexBufferManagerClient
   {
@@ -1355,7 +1355,7 @@ private:
     virtual void ManagerClosing ();
   }scfiVertexBufferManagerClient;
   friend struct eiVertexBufferManagerClient;
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
 
 private:
   /**
@@ -1416,7 +1416,7 @@ public:
   void SetMixMode (uint mode)
   {
     MixMode = mode;
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
     if (MixMode & CS_FX_ALPHA)
       base_color.alpha = 1.0 - float (MixMode & CS_FX_MASK_ALPHA) / 255.0;
     else
@@ -1451,7 +1451,7 @@ public:
   void SetBaseColor (const csColor& col)
   {
     base_color.Set (col);
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
     if (MixMode & CS_FX_ALPHA)
       base_color.alpha = 1.0 - float (MixMode & CS_FX_MASK_ALPHA) / 255.0;
 #endif
@@ -2006,7 +2006,7 @@ public:
   friend struct LODControl;
 
   //------------------ iShaderVariableAccessor implementation ------------
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   class eiShaderVariableAccessor : public iShaderVariableAccessor
   {
   private:
@@ -2033,7 +2033,7 @@ public:
   csRef<eiShaderVariableAccessor> scfiShaderVariableAccessor;
 
   void PreGetShaderVariableValue (csShaderVariable* variable);
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
 };
 
 /**

@@ -46,7 +46,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csProtoMeshObject::ProtoMeshState)
   SCF_IMPLEMENTS_INTERFACE (iProtoMeshState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
 SCF_IMPLEMENT_IBASE (csProtoMeshObject::ShaderVariableAccessor)
   SCF_IMPLEMENTS_INTERFACE (iShaderVariableAccessor)
 SCF_IMPLEMENT_IBASE_END
@@ -56,7 +56,7 @@ csProtoMeshObject::csProtoMeshObject (csProtoMeshObjectFactory* factory)
 {
   SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiProtoMeshState);
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   scfiShaderVariableAccessor = new ShaderVariableAccessor (this);
 #endif
 
@@ -81,7 +81,7 @@ csProtoMeshObject::csProtoMeshObject (csProtoMeshObjectFactory* factory)
 
 csProtoMeshObject::~csProtoMeshObject ()
 {
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   scfiShaderVariableAccessor->DecRef ();
 #endif
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiProtoMeshState);
@@ -96,7 +96,7 @@ bool csProtoMeshObject::SetMaterialWrapper (iMaterialWrapper* mat)
 
 void csProtoMeshObject::SetupShaderVariableContext ()
 {
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   if (svcontext == 0)
     svcontext.AttachNew (new csShaderVariableContext ());
   csShaderVariable* sv;
@@ -160,7 +160,7 @@ csRenderMesh** csProtoMeshObject::GetRenderMeshes (
 {
   n = 0;
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
 
   SetupObject ();
@@ -290,7 +290,7 @@ iObjectModel* csProtoMeshObject::GetObjectModel ()
   return factory->GetObjectModel ();
 }
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
 void csProtoMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
 {
   if (var->Name == csProtoMeshObjectFactory::color_name)
@@ -336,7 +336,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csProtoMeshObjectFactory::ObjectModel)
   SCF_IMPLEMENTS_INTERFACE (iObjectModel)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
 SCF_IMPLEMENT_IBASE (csProtoMeshObjectFactory::ShaderVariableAccessor)
   SCF_IMPLEMENTS_INTERFACE (iShaderVariableAccessor)
 SCF_IMPLEMENT_IBASE_END
@@ -354,7 +354,7 @@ csProtoMeshObjectFactory::csProtoMeshObjectFactory (iMeshObjectType *pParent,
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiProtoFactoryState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   scfiShaderVariableAccessor = new ShaderVariableAccessor (this);
 #endif
   csProtoMeshObjectFactory::object_reg = object_reg;
@@ -374,7 +374,7 @@ csProtoMeshObjectFactory::csProtoMeshObjectFactory (iMeshObjectType *pParent,
   polygons = 0;
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
     "crystalspace.shared.stringset", iStringSet);
 
@@ -400,7 +400,7 @@ csProtoMeshObjectFactory::csProtoMeshObjectFactory (iMeshObjectType *pParent,
 
 csProtoMeshObjectFactory::~csProtoMeshObjectFactory ()
 {
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   scfiShaderVariableAccessor->DecRef ();
 #endif
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiProtoFactoryState);
@@ -450,13 +450,13 @@ void csProtoMeshObjectFactory::SetupFactory ()
   {
     initialized = true;
     object_bbox_valid = false;
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
     PrepareBuffers ();
 #endif
   }
 }
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
 void csProtoMeshObjectFactory::PreGetShaderVariableValue (
   csShaderVariable* var)
 {
@@ -489,7 +489,7 @@ void csProtoMeshObjectFactory::Invalidate ()
   delete[] polygons;
   polygons = 0;
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   mesh_vertices_dirty_flag = true;
   mesh_texels_dirty_flag = true;
   mesh_normals_dirty_flag = true;
@@ -500,7 +500,7 @@ void csProtoMeshObjectFactory::Invalidate ()
   scfiObjectModel.ShapeChanged ();
 }
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
 void csProtoMeshObjectFactory::PrepareBuffers ()
 {
   if (mesh_vertices_dirty_flag)

@@ -944,7 +944,7 @@ bool csEngine::Initialize (iObjectRegistry *object_reg)
   csConfigAccess cfg (object_reg, "/config/engine.cfg");
   ReadConfig (cfg);
 
-#if defined(CS_USE_NEW_RENDERER)
+#ifndef CS_USE_OLD_RENDERER
   // Set up the RL manager.
   renderLoopManager = new csRenderLoopManager (this);
 
@@ -986,7 +986,7 @@ bool csEngine::HandleEvent (iEvent &Event)
 	    Strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
 	      object_reg, "crystalspace.shared.stringset", iStringSet);
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
             const csGraphics3DCaps *caps = G3D->GetCaps ();
             fogmethod = caps->fog;
             MaxAspectRatio = caps->MaxAspectRatio;
@@ -1038,15 +1038,15 @@ bool csEngine::HandleEvent (iEvent &Event)
               GetNode ("shader"));
             ShaderManager->RegisterShader (portal_shader);
 
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
             frame_width = G3D->GetWidth ();
             frame_height = G3D->GetHeight ();
           }
           else
           {
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
             fogmethod = G3DFOGMETHOD_NONE;
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
             MaxAspectRatio = 4096;
             frame_width = 640;
             frame_height = 480;
@@ -1111,9 +1111,9 @@ iMeshObjectType* csEngine::GetThingType ()
 void csEngine::DeleteAll ()
 {
   nextframe_pending = 0;
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   if (G3D) G3D->ClearCache ();
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
   halos.DeleteAll ();
   collections.DeleteAll ();
 
@@ -1258,7 +1258,7 @@ void csEngine::ResetWorldSpecificSettings()
   	default_ambient_red / 255.0f,
 	default_ambient_green / 255.0f, 
         default_ambient_blue / 255.0f));
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   iRenderLoop* defaultRL = renderLoopManager->Retrieve 
     (CS_DEFAULT_RENDERLOOP_NAME);
   SetCurrentDefaultRenderloop (defaultRL);
@@ -1302,13 +1302,13 @@ bool csEngine::Prepare (iProgressMeter *meter)
   PrepareTextures ();
   PrepareMeshes ();
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   G3D->ClearCache ();
 #else
   /*csRef<iShaderManager> shadermgr = 
     CS_QUERY_REGISTRY(object_reg, iShaderManager);
   shadermgr->PrepareShaders ();*/
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
 
   // Prepare lightmaps if we have any sectors
   if (sectors.GetCount ()) ShineLights (0, meter);
@@ -1320,9 +1320,9 @@ bool csEngine::Prepare (iProgressMeter *meter)
 
 void csEngine::ForceRelight (iRegion* region, iProgressMeter *meter)
 {
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   G3D->ClearCache ();
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
   int old_lightcache_mode = lightcache_mode;
   lightcache_mode &= ~CS_ENGINE_CACHE_READ;
   lightcache_mode &= ~CS_ENGINE_CACHE_NOUPDATE;
@@ -1332,9 +1332,9 @@ void csEngine::ForceRelight (iRegion* region, iProgressMeter *meter)
 
 void csEngine::ForceRelight (iLight* light, iRegion* region)
 {
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   G3D->ClearCache ();
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
 
   int sn;
   int num_meshes = meshes.GetCount ();
@@ -1380,9 +1380,9 @@ void csEngine::ForceRelight (iLight* light, iRegion* region)
 
 void csEngine::RemoveLight (iLight* light)
 {
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   G3D->ClearCache ();
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
 
   int sn;
   int num_meshes = meshes.GetCount ();
@@ -1801,7 +1801,7 @@ iEngineSequenceManager* csEngine::GetEngineSequenceManager ()
 
 void csEngine::PrecacheMesh (iMeshWrapper* s, iRenderView* rview)
 {
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   int num;
   if (s->GetMeshObject ())
     s->GetMeshObject ()->GetRenderMeshes (num, rview,
@@ -1899,7 +1899,7 @@ void csEngine::Draw (iCamera *c, iClipper2D *view)
   G3D->SetPerspectiveAspect (c->GetFOV ());
 
   iSector *s = c->GetSector ();
-#if defined(CS_USE_NEW_RENDERER)
+#ifndef CS_USE_OLD_RENDERER
   if (s) 
   {
     csReversibleTransform camTransR = c->GetTransform();
@@ -1910,7 +1910,7 @@ void csEngine::Draw (iCamera *c, iClipper2D *view)
   }
 #else
   if (s) s->Draw (&rview);
-#endif	// CS_USE_NEW_RENDERER
+#endif	// CS_USE_OLD_RENDERER
 
   // draw all halos on the screen
   if (halos.Length () > 0)
@@ -1924,7 +1924,7 @@ void csEngine::Draw (iCamera *c, iClipper2D *view)
 }
 
 
-#if defined(CS_USE_NEW_RENDERER)
+#ifndef CS_USE_OLD_RENDERER
 csPtr<iRenderLoop> csEngine::CreateDefaultRenderLoop ()
 {
   csRef<iRenderLoop> loop = renderLoopManager->Create ();
@@ -1962,7 +1962,7 @@ csPtr<iRenderLoop> csEngine::CreateDefaultRenderLoop ()
 
 void csEngine::LoadDefaultRenderLoop (const char* fileName)
 {
-#if defined(CS_USE_NEW_RENDERER)
+#ifndef CS_USE_OLD_RENDERER
   csRef<iRenderLoop> newDefault = renderLoopManager->Load (fileName);
   if (newDefault != 0)
     defaultRenderLoop = newDefault;
@@ -2901,10 +2901,10 @@ iMaterialWrapper *csEngine::CreateMaterial (
   iMaterialWrapper *wrapper = materials->NewMaterial (mat);
   wrapper->QueryObject ()->SetName (iName);
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   mat->SetShader (default_shadertype, default_shader);
   mat->shadersCustomized = false;
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
   mat->DecRef ();
 
   return wrapper;
@@ -2949,10 +2949,10 @@ csPtr<iMaterial> csEngine::CreateBaseMaterial (iTextureWrapper *txt)
 
   csRef<iMaterial> imat (SCF_QUERY_INTERFACE (mat, iMaterial));
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   mat->SetShader (default_shadertype, default_shader);
   mat->shadersCustomized = false;
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
   mat->DecRef ();
 
   return csPtr<iMaterial> (imat);
@@ -2967,7 +2967,7 @@ csPtr<iMaterial> csEngine::CreateBaseMaterial (
   csMaterial *mat = new csMaterial (this);
   if (txt) mat->SetTextureWrapper (txt);
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   int i;
   for (i = 0; i < num_layers; i++)
   {
@@ -2983,10 +2983,10 @@ csPtr<iMaterial> csEngine::CreateBaseMaterial (
 
   csRef<iMaterial> imat (SCF_QUERY_INTERFACE (mat, iMaterial));
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   mat->SetShader (default_shadertype, default_shader);
   mat->shadersCustomized = false;
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
   mat->DecRef ();
 
   return csPtr<iMaterial> (imat);
@@ -3185,7 +3185,7 @@ iTextureWrapper* EngineLoaderContext::FindNamedTexture (const char* name,
 
 iShader* EngineLoaderContext::FindShader (const char* name)
 {
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   if (!curRegOnly || !region)
     return csEngine::current_engine->ShaderManager->GetShader (name);
 

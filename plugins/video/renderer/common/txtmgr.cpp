@@ -242,7 +242,7 @@ csMaterialHandle::csMaterialHandle (iMaterial* m, csTextureManager *parent)
     }
     material->GetReflection (diffuse, ambient, reflection);
     material->GetFlatColor (flat_color);
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
     num_texture_layers = material->GetTextureLayerCount ();
 #else
     num_texture_layers = 0;
@@ -251,7 +251,7 @@ csMaterialHandle::csMaterialHandle (iMaterial* m, csTextureManager *parent)
     int i;
     for (i = 0 ; i < num_texture_layers ; i++)
     {
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
       texture_layers[i] = *(material->GetTextureLayer (i));
 #endif
       texture_layer_translate[i] =

@@ -116,16 +116,16 @@ bool csLoader::ParseTextureList (iLoaderContext* ldr_context,
 	        return false;
         break;
       case XMLTOKEN_CUBEMAP:
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
         if (!ParseCubemap (ldr_context, child))
           return false;
 #endif
         break;
       case XMLTOKEN_TEXTURE3D:
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
         if (!ParseTexture3D (ldr_context, child))
           return false;
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
         break;
       default:
         SyntaxService->ReportBadToken (child);
@@ -481,13 +481,13 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
   float diffuse = CS_DEFMAT_DIFFUSE;
   float ambient = CS_DEFMAT_AMBIENT;
   float reflection = CS_DEFMAT_REFLECTION;
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   int num_txt_layer = 0;
   iTextureWrapper* txt_layers[4];
   csTextureLayer layers[4];
 #endif
   
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   bool shaders_mentioned = false;	// If true there were shaders.
   csArray<csStringID> shadertypes;
   //csArray<iShader*> shaders;
@@ -496,7 +496,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
 
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
     object_reg, "crystalspace.shared.stringset", iStringSet);
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
 
   csRefArray<iDocumentNode> key_nodes;
 
@@ -547,7 +547,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
         break;
       case XMLTOKEN_LAYER:
         // @@@ TODO: add shortcut to support NR!
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
 	{
 	  if (num_txt_layer >= 4)
 	  {
@@ -620,7 +620,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
 #endif
         break;
       case XMLTOKEN_SHADER:
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
         {
 	  shaders_mentioned = true;
           csRef<iShaderManager> shaderMgr = CS_QUERY_REGISTRY (object_reg,
@@ -652,10 +652,10 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
 	  //csRef<iShaderWrapper> wrapper = shaderMgr->CreateWrapper (shader);
 	  shaders.Push (shader);
         }
-#endif //CS_USE_NEW_RENDERER
+#endif //CS_USE_OLD_RENDERER
         break;
       case XMLTOKEN_SHADERVAR:
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
         {
           csRef<iShaderManager> shaderMgr = CS_QUERY_REGISTRY (object_reg,
             iShaderManager);
@@ -679,7 +679,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
           }
           shadervars.Push (var);
         }
-#endif //CS_USE_NEW_RENDERER
+#endif //CS_USE_OLD_RENDERER
         break;
       default:
 	SyntaxService->ReportBadToken (child);
@@ -687,7 +687,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
     }
   }
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   csRef<iMaterial> material = Engine->CreateBaseMaterial (texh);
 #else
   csRef<iMaterial> material = Engine->CreateBaseMaterial (texh,
@@ -714,13 +714,13 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
   }
   
   size_t i;
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   for (i=0; i<shaders.Length (); i++)
     //if (shaders[i]->Prepare ())
       material->SetShader (shadertypes[i], shaders[i]);
   for (i=0; i<shadervars.Length (); i++)
     material->AddVariable (shadervars[i]);
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
   // dereference material since mat already incremented it
 
   for (i = 0 ; i < key_nodes.Length () ; i++)
@@ -742,7 +742,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
   return mat;
 }
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
 /// Parse a Cubemap texture definition and add the texture to the engine
 iTextureWrapper* csLoader::ParseCubemap (iLoaderContext* ldr_context,
     iDocumentNode* node)
@@ -913,4 +913,4 @@ iTextureWrapper* csLoader::ParseTexture3D (iLoaderContext* ldr_context,
 
   return itexwrap;
 }
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER

@@ -483,7 +483,7 @@ struct G3DPolygonDPFX
   /// Use fog info?
   bool use_fog;
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   /// The material handle as returned by iTextureManager.
   iMaterialHandle *mat_handle;
 #else

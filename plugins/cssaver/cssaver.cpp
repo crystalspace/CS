@@ -206,7 +206,7 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
 
 bool csSaver::SaveMaterials(iDocumentNode *parent)
 {
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   csRef<iStringSet> stringset =
     CS_QUERY_REGISTRY_TAG_INTERFACE(object_reg, 
     "crystalspace.shared.stringset", iStringSet);
@@ -254,7 +254,7 @@ bool csSaver::SaveMaterials(iDocumentNode *parent)
         CreateValueNode(child, "texture", texname);
     }
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
     int layerCount = mat->GetTextureLayerCount();
     for(int i = 0; i < layerCount; i++)
     {
@@ -455,7 +455,7 @@ bool csSaver::SaveMaterials(iDocumentNode *parent)
 
 bool csSaver::SaveShaders (iDocumentNode *parent)
 {
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   csRef<iDocumentNode> shadersNode = CreateNode(parent, "shaders");
   csRef<iShaderManager> shaderMgr = 
     CS_QUERY_REGISTRY (object_reg, iShaderManager);
@@ -949,7 +949,7 @@ bool csSaver::SaveSettings (iDocumentNode* node)
   engine->GetAmbientLight(c);
   synldr->WriteColor(ambientNode, &c);
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
 //case XMLTOKEN_RENDERLOOP:
   iRenderLoop* renderloop = engine->GetCurrentDefaultRenderloop();
   const char* loopName = engine->GetRenderLoopManager()->GetName(renderloop);

@@ -863,7 +863,7 @@ csRenderMesh** csHazeMeshObject::GetRenderMeshes (int &n, iRenderView* rview,
   g3dpoly->var [i].component = v1 + t * (v2 - v1); \
 }
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
 static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
   csVector2* clipped_verts, int num_vertices, csVertexStatus* clipped_vtstats,
   int orig_num_vertices, bool gouraud)
@@ -975,7 +975,7 @@ void csHazeMeshObject::ComputeHullOutline(iHazeHull *hull, float layer_scale,
   //printf("has outline of size %d: ", layer_num);
   if(layer_num <= 0) return;
   layer_pts = new csVector3[layer_num];
-#if defined(CS_USE_NEW_RENDERER)
+#ifndef CS_USE_OLD_RENDERER
   *cam_pts = new csVector3[layer_num];
 #endif
   for(i=0; i<layer_num; i++)
@@ -983,7 +983,7 @@ void csHazeMeshObject::ComputeHullOutline(iHazeHull *hull, float layer_scale,
     //printf(" %d", layer_poly[i]);
     csVector3 objpos;
     hull->GetVertex(objpos, layer_poly[i] );
-#if defined(CS_USE_NEW_RENDERER)
+#ifndef CS_USE_OLD_RENDERER
     ProjectO2S(tr_o2c, fov, shx, shy, objpos, layer_pts[i],
       &((*cam_pts)[i]));
 #else
@@ -1259,7 +1259,7 @@ void csHazeMeshObject::ProjectO2S(csReversibleTransform& tr_o2c, float fov,
   float shiftx, float shifty, const csVector3& objpos, csVector3& scrpos, 
   csVector3* campos)
 {
-#if defined(CS_USE_NEW_RENDERER)
+#ifndef CS_USE_OLD_RENDERER
   *campos =
 #endif
   scrpos = tr_o2c * objpos;  // to camera space
@@ -1272,7 +1272,7 @@ void csHazeMeshObject::ProjectO2S(csReversibleTransform& tr_o2c, float fov,
 void csHazeMeshObject::DrawPoly(iRenderView *rview, iGraphics3D *g3d,
   iMaterialHandle *mat, int num, const csVector3* pts, const csVector2* uvs)
 {
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   g3dpolyfx.use_fog = false;
   g3dpolyfx.num = num;
   g3dpolyfx.mat_handle = mat;

@@ -84,17 +84,12 @@ must install Python 2.2 or later, which can be obtained from:
 
 @subsubheading Selecting the Renderer Architecture
 
-At this moment we have two completely different renderer architectures
-in Crystal Space. The old renderer (which is still default) and the new
-renderer. The new renderer hasn't been made default yet because it is still
-considered to be experimental and some features haven't been ported yet
-(like software renderer which works only partially and fog). On the other
-hand the new renderer supports shaders, stencil shadows, and other advanced
-OpenGL stuff and for most people it seems to work very well. So we personally
-recommend trying out the new renderer first. If it doesn't work right for
-you then you should send us a report and go back to old renderer then.
-To use the new renderer you should use the @file{wksnewrenderer.dsw} instead
-of @file{wkstypical.dsw} (see below).
+At this moment we have two completely different renderer architectures in
+Crystal Space. The old renderer and the new renderer. The new renderer is
+nearly feature complete and is now the default.  If it doesn't work right for
+you then you should send us a report and go back to old renderer.  To use the
+old renderer you should open the @file{wksoldrenderer.dsw} instead of
+@file{wkstypical.dsw} (see below).
 
 @subsubheading Compiling Crystal Space
 
@@ -104,9 +99,9 @@ anything doesn't work, see the Win32 @sc{faq}, @ref{MSVC6 FAQ}.
 @enumerate
 @item
 Load @file{CS\mk\msvc\wkstypical.dsw}.  (On the other hand, if you want to
-try out the experimental new renderer, open the workspace
-@file{wksnewrenderer.dsw} in the same directory, and select either the
-Release_NR or Debug_NR build mode.)
+try out the old renderer, open the workspace
+@file{wksoldrenderer.dsw} in the same directory, and select either the
+Release_OR or Debug_OR build mode.)
 
 @item
 Remove all projects you don't want to compile.  To do this, right-click on the
@@ -121,12 +116,11 @@ on it and then clicking on @emph{Set as Active Project}.
 @item
 From the file menu select @emph{Build->Rebuild All} or alternatively hit your
 @kbd{@key{F7}} key.  @strong{Note} that you must build the project using the
-@emph{Release} or @emph{Debug} build modes.  Do @strong{not} use the
-special-purpose @emph{Release_NR}, @emph{Debug_NR}, or @emph{ExtensiveMemDebug}
-build modes (which are reserved for specific developmental activities on
-Crystal Space itself).  @strong{Note} that you
-@strong{must} use @emph{Release_NR} or @emph{Debug_NR} if you selected
-@file{wksnewrenderer.dsw}.
+@emph{Release} or @emph{Debug} build modes if you are using
+@file{wkstypical.dsw}. Do @strong{not} use the special-purpose
+@emph{Release_OR}, @emph{Debug_OR}, or @emph{ExtensiveMemDebug} build modes. On
+the other hand, if you are using @file{wksoldrenderer.dsw}, then you
+@strong{must} use @emph{Release_OR} or @emph{Debug_OR}.
 
 @item
 After a while the compilation should finish without error.  The signal for a
@@ -181,10 +175,12 @@ Crystal Space.
 @c @file{wksall.dsw} --- Builds all modules, even the experimental ones.
 @c 
 @item
-@file{wksnewrenderer.dsw} --- Same as @file{wkstypical.dsw}, but builds the new
-experimental renderer, rather than the old one.  When using this workspace, you
-also need to select either the @emph{Release_NR} or @emph{Debug_NR} build mode,
-rather than the @emph{Release} or @emph{Debug} build mode.
+@file{wksoldrenderer.dsw} --- Same as @file{wkstypical.dsw}, but builds the old
+renderer, rather than the old one.  Use this workspace if the new renderer
+fails to work for you (though submit a bug report explaining what went
+wrong). When using this workspace, you also need to select either the
+@emph{Release_OR} or @emph{Debug_OR} build mode, rather than the @emph{Release}
+or @emph{Debug} build mode.
 @end itemize
 
 The workspace uses a prefix system for naming contained projects:

@@ -263,7 +263,7 @@ void csFancyConsole::Draw3D (csRect *oArea)
     poly.z [i] = 1;
   }
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   poly.mat_handle = deco.bgnd.mat;
 #else
   poly.tex_handle = deco.bgnd.mat->GetTexture();
@@ -383,7 +383,7 @@ void csFancyConsole::DrawBorder (int x, int y, int width, int height,
       poly.colors [i].blue = 1;
     }
 
-  #ifndef CS_USE_NEW_RENDERER
+  #ifdef CS_USE_OLD_RENDERER
     poly.mat_handle = border.mat;
   #else
     poly.tex_handle = border.mat->GetTexture();

@@ -24,12 +24,12 @@ SubInclude TOP plugins mesh stars ;
 SubInclude TOP plugins mesh thing ;
 SubInclude TOP plugins mesh protomesh ;
 
-if ! [ Property build : newrenderer ] || [ Property build : projgen ]
+if [ Property build : oldrenderer ] || [ Property build : projgen ]
 {
   SubInclude TOP plugins mesh terrfunc ;
 }
 
-if [ Property build : newrenderer ] || [ Property build : projgen ]
+if ! [ Property build : oldrenderer ] || [ Property build : projgen ]
 {
   SubInclude TOP plugins mesh terrain ;
   SubInclude TOP plugins mesh terrain_brute ;

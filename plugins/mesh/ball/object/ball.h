@@ -79,7 +79,7 @@ private:
   csBox3 object_bbox;
   csFlags flags;
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   unsigned int* ball_indices;
   int ball_triangles;
   
@@ -126,7 +126,7 @@ private:
    */
   void SetupObject ();
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   /// Generate a mesh with a sphere.
   void GenerateSphere (int num_circle);
 #else
@@ -250,7 +250,7 @@ public:
   virtual csRenderMesh **GetRenderMeshes (int &num, iRenderView* rview, 
     iMovable* movable, uint32 frustum_mask);
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   int GetTriangleCount () { SetupObject(); return top_mesh.num_triangles; }
   csTriangle* GetTriangles () { SetupObject (); return top_mesh.triangles; }
 #else
@@ -425,7 +425,7 @@ public:
     }
     virtual csTriangle* GetTriangles ()
     {
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
       return (csTriangle*)(ball->ball_indices);
 #else
       return ball->top_mesh.triangles;

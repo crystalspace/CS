@@ -70,7 +70,7 @@ csLight::csLight (
 
   halo = 0;
 
-//#ifndef CS_USE_NEW_RENDERER
+//#ifdef CS_USE_OLD_RENDERER
   attenuation = CS_ATTN_LINEAR;
   influenceRadius = d;
   influenceRadiusSq = d * d;
@@ -150,7 +150,7 @@ const char* csLight::GenerateUniqueID ()
   mf.Write ((char*)&l, 4);
   l = convert_endian ((int32)csQint ((center.z * 1000)+.5));
   mf.Write ((char*)&l, 4);
-//#ifndef CS_USE_NEW_RENDERER
+//#ifdef CS_USE_OLD_RENDERER
   l = convert_endian ((int32)csQint ((influenceRadius * 1000)+.5));
   mf.Write ((char*)&l, 4);
 //#else
@@ -310,7 +310,7 @@ void csLight::SetInfluenceRadius (float radius)
   influenceRadius = radius;
   influenceRadiusSq = radius*radius;
   inv_dist = 1.0 / influenceRadius;
-//#ifdef CS_USE_NEW_RENDERER
+//#ifndef CS_USE_OLD_RENDERER
   int oldatt = attenuation;
   CalculateAttenuationVector (attenuation, radius, 
     1.0f / influenceIntensityFraction);
@@ -321,7 +321,7 @@ void csLight::SetInfluenceRadius (float radius)
 
 void csLight::CalculateInfluenceRadius ()
 {
-//#ifdef CS_USE_NEW_RENDERER
+//#ifndef CS_USE_OLD_RENDERER
   float y = 0.28*color.red + 0.59*color.green + 0.13*color.blue;
   float radius;
   if (!GetDistanceForBrightness (1 / (y * influenceIntensityFraction), radius))

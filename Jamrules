@@ -36,10 +36,8 @@ if ! [ IsElem cssysdef.h : $(buildheaders:BS) ]
 }
 
 # List of plugins which should be linked in when building static.
-if $(USE_NEW_RENDERER) = "yes"
+if $(USE_OLD_RENDERER) != "yes"
 {
-  SetProperty build : newrenderer ;
-
   STATIC.PLUGINLIST =
     ball
     ballldr
@@ -113,6 +111,8 @@ if $(USE_NEW_RENDERER) = "yes"
 }
 else
 {
+  SetProperty build : oldrenderer ;
+
   STATIC.PLUGINLIST =
     ball
     ballldr

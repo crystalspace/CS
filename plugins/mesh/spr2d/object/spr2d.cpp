@@ -38,7 +38,7 @@
 
 CS_LEAKGUARD_IMPLEMENT (csSprite2DMeshObject);
 CS_LEAKGUARD_IMPLEMENT (csSprite2DMeshObjectFactory);
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
 CS_LEAKGUARD_IMPLEMENT (csSprite2DMeshObject::eiShaderVariableAccessor);
 #endif
 
@@ -63,7 +63,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DMeshObject::Particle)
   SCF_IMPLEMENTS_INTERFACE (iParticle)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
 SCF_IMPLEMENT_IBASE (csSprite2DMeshObject::eiShaderVariableAccessor)
   SCF_IMPLEMENTS_INTERFACE (iShaderVariableAccessor)
 SCF_IMPLEMENT_IBASE_END
@@ -91,7 +91,7 @@ csSprite2DMeshObject::csSprite2DMeshObject (csSprite2DMeshObjectFactory* factory
   current_lod = 1;
   current_features = 0;
   uvani = 0;
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   vertices_dirty = true;
   texels_dirty = true;
   colors_dirty = true;
@@ -134,7 +134,7 @@ void csSprite2DMeshObject::SetupObject ()
     float max_dist = csQsqrt (max_sq_dist);
     radius.Set (max_dist, max_dist, max_dist);
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
     if ((vertex_name == csInvalidStringID) ||
       (color_name == csInvalidStringID) ||
       (texel_name == csInvalidStringID) ||
@@ -224,7 +224,7 @@ void csSprite2DMeshObject::UpdateLighting (const csArray<iLight*>& lights,
     vertices[j].color = vertices[j].color_init + color;
     vertices[j].color.Clamp (2, 2, 2);
   }
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   colors_dirty = true;
 #endif
 }
@@ -263,7 +263,7 @@ void csSprite2DMeshObject::UpdateLighting (const csArray<iLight*>& lights,
   g3dpoly->var [i].component = v1 + t * (v2 - v1); \
 }
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
 static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
   csVector2* clipped_verts, int num_vertices, csVertexStatus* clipped_vtstats,
   int orig_num_vertices, bool gouraud)
@@ -365,7 +365,7 @@ static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
 bool csSprite2DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 	csZBufMode mode)
 {
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
 // @@@ TODO:
 //     - Z fill vs Z use
   if (!material)
@@ -457,7 +457,7 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
 						      uint32 frustum_mask,
 						      csVector3 offset)
 {
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   SetupObject ();
 
   iCamera* camera = rview->GetCamera ();
@@ -522,7 +522,7 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
   return 0;
 }
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
 void csSprite2DMeshObject::PreGetShaderVariableValue (csShaderVariable* variable)
 {
   const csStringID name = variable->GetName ();
@@ -666,7 +666,7 @@ void csSprite2DMeshObject::CreateRegularVertices (int n, bool setuv)
     vertices [i].color.Set (1, 1, 1);
     vertices [i].color_init.Set (1, 1, 1);
   }
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   vertices_dirty = true;
   texels_dirty = true;
   colors_dirty = true;
@@ -677,12 +677,12 @@ void csSprite2DMeshObject::CreateRegularVertices (int n, bool setuv)
 void csSprite2DMeshObject::NextFrame (csTicks current_time, const csVector3& /*pos*/)
 {
   if (uvani && !uvani->halted)
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   {
 	int old_frame_index = uvani->frameindex;
 #endif
     uvani->Advance (current_time);
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
 	texels_dirty = old_frame_index != uvani->frameindex;
   }
 #endif
@@ -722,7 +722,7 @@ void csSprite2DMeshObject::Particle::SetColor (const csColor& col)
   if (!scfParent->lighting)
     for (i = 0 ; i < vertices.Length () ; i++)
       vertices[i].color = col;
-#ifdef CS_USE_NEW_RENDERER  
+#ifndef CS_USE_OLD_RENDERER  
   scfParent->colors_dirty = true;
 #endif
 }
@@ -736,7 +736,7 @@ void csSprite2DMeshObject::Particle::AddColor (const csColor& col)
   if (!scfParent->lighting)
     for (i = 0 ; i < vertices.Length () ; i++)
       vertices[i].color = vertices[i].color_init;
-#ifdef CS_USE_NEW_RENDERER  
+#ifndef CS_USE_OLD_RENDERER  
   scfParent->colors_dirty = true;
 #endif
 }
@@ -747,7 +747,7 @@ void csSprite2DMeshObject::Particle::ScaleBy (float factor)
   size_t i;
   for (i = 0; i < vertices.Length (); i++)
     vertices[i].pos *= factor;
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   scfParent->vertices_dirty = true;
 #endif
   scfParent->scfiObjectModel.ShapeChanged ();
@@ -759,7 +759,7 @@ void csSprite2DMeshObject::Particle::Rotate (float angle)
   size_t i;
   for (i = 0; i < vertices.Length (); i++)
     vertices[i].pos.Rotate (angle);
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   scfParent->vertices_dirty = true;
 #endif
   scfParent->scfiObjectModel.ShapeChanged ();

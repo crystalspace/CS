@@ -44,13 +44,13 @@ if $(GL.AVAILABLE) = "yes"
   CompileGroups openglcanvas : walkall ;
   CompileGroups softcanvas : walkall ;
 }
-if [ Property build : newrenderer ] || [ Property build : projgen ]
+if ! [ Property build : oldrenderer ] || [ Property build : projgen ]
 {
   CompileGroups nrall : walkall ;
   CompileGroups softrender3d : walkall ;
   CompileGroups softshader : walkall ;
 }
-if ! [ Property build : newrenderer ] || [ Property build : projgen ]
+if [ Property build : oldrenderer ] || [ Property build : projgen ]
 {
   CompileGroups soft3d : walkall ;
   if $(GL.AVAILABLE) = "yes"

@@ -141,7 +141,7 @@ private:
   csVector3* uv2Normal;
 
   /// Vertex buffer.
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   csRef<iVertexBuffer> vbuf;
   iVertexBufferManager* vbufmgr;
 
@@ -155,7 +155,7 @@ private:
     virtual void ManagerClosing ();
   }scfiVertexBufferManagerClient;
   friend struct eiVertexBufferManagerClient;
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
 
 
 public:
@@ -181,11 +181,11 @@ public:
   /// Get the vertex buffer for this curve.
   iVertexBuffer* GetVertexBuffer () const
   {
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
     return vbuf;
 #else
     return 0;
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
   }
 
   /// Return the material handle for this curve

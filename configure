@@ -902,8 +902,8 @@ Optional Features:
                           per source file (default NO)
   --enable-leak-guard     enable the leak guard protection which warns about
                           objects not freed at program exit (default NO)
-  --enable-new-renderer   enable use of new renderer (_EXPERIMENTAL_!)
-                          (default NO)
+  --enable-old-renderer   enable use of legacy renderer architecture (default
+                          NO)
   --enable-make-emulation enable emulation layer allowing project to be built
                           with `make', in addition to `jam' (default YES)
 
@@ -52372,30 +52372,30 @@ fi
 
 
 #------------------------------------------------------------------------------
-# Determine whether the new renderer should be activated.
+# Determine whether the old renderer should be activated.
 #------------------------------------------------------------------------------
-echo "$as_me:$LINENO: checking whether to use new renderer" >&5
-echo $ECHO_N "checking whether to use new renderer... $ECHO_C" >&6
-# Check whether --enable-new-renderer or --disable-new-renderer was given.
-if test "${enable_new_renderer+set}" = set; then
-  enableval="$enable_new_renderer"
+echo "$as_me:$LINENO: checking whether to use old renderer" >&5
+echo $ECHO_N "checking whether to use old renderer... $ECHO_C" >&6
+# Check whether --enable-old-renderer or --disable-old-renderer was given.
+if test "${enable_old_renderer+set}" = set; then
+  enableval="$enable_old_renderer"
 
 else
-  enable_new_renderer=no
+  enable_old_renderer=no
 fi;
-echo "$as_me:$LINENO: result: $enable_new_renderer" >&5
-echo "${ECHO_T}$enable_new_renderer" >&6
-cs_build_prop_val="$enable_new_renderer"
+echo "$as_me:$LINENO: result: $enable_old_renderer" >&5
+echo "${ECHO_T}$enable_old_renderer" >&6
+cs_build_prop_val="$enable_old_renderer"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}USE_NEW_RENDERER ?= \"$cs_build_prop_val\" ;
+  cs_jamconfig_text="${cs_jamconfig_text}USE_OLD_RENDERER ?= \"$cs_build_prop_val\" ;
 "
 fi
 
-if test $enable_new_renderer = yes; then
-  cs_header_text="${cs_header_text}#define CS_USE_NEW_RENDERER
+if test $enable_old_renderer = yes; then
+  cs_header_text="${cs_header_text}#define CS_USE_OLD_RENDERER
 "
-  cs_build_prop_val="-DCS_USE_NEW_RENDERER"
+  cs_build_prop_val="-DCS_USE_OLD_RENDERER"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}SWIG.FLAGS += \"$cs_build_prop_val\" ;

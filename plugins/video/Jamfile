@@ -6,7 +6,7 @@ SubInclude TOP plugins video loader ;
 SubInclude TOP plugins video render3d ;
 SubInclude TOP plugins video cursor ;
 
-if ! [ Property build : newrenderer ] || [ Property build : projgen ]
+if [ Property build : oldrenderer ] || [ Property build : projgen ]
 {
   SubInclude TOP plugins video renderer ;
 }

@@ -28,13 +28,13 @@
 #include "csqint.h"
 
 SCF_IMPLEMENT_IBASE_EXT (csNewParticleSystem)
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVertexBufferManagerClient)
 #endif
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iParticleState)
 SCF_IMPLEMENT_IBASE_EXT_END
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
 SCF_IMPLEMENT_EMBEDDED_IBASE (csNewParticleSystem::eiVertexBufferManagerClient)
   SCF_IMPLEMENTS_INTERFACE (iVertexBufferManagerClient)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
@@ -47,7 +47,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 csNewParticleSystem::csNewParticleSystem (
 	iEngine *eng, iMeshObjectFactory *fact, int flags) : csMeshObject (eng)
 {
-#ifndef CS_USE_NEW_RENDERER 
+#ifdef CS_USE_OLD_RENDERER 
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
 #endif
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiParticleState);
@@ -79,7 +79,7 @@ csNewParticleSystem::csNewParticleSystem (
   alphapersecond = 0.0f;
   alpha_now = 1.0f;
 
-#ifdef CS_USE_NEW_RENDERER 
+#ifndef CS_USE_OLD_RENDERER 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 
   vertices = 0;
@@ -104,7 +104,7 @@ csNewParticleSystem::~csNewParticleSystem ()
   delete[] texels;
   delete[] triangles;
   delete[] colors;
-#ifdef CS_USE_NEW_RENDERER 
+#ifndef CS_USE_OLD_RENDERER 
   delete[] vertices;
 #else
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
@@ -231,7 +231,7 @@ void csNewParticleSystem::SetupObject ()
       *c++ = Color;
     }
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
     csStringID vertex_name, texel_name, normal_name, color_name, index_name;
     csMeshFactory* mf = (csMeshFactory*)Factory;
     iObjectRegistry* object_reg = mf->GetObjectRegistry ();
@@ -284,7 +284,7 @@ void csNewParticleSystem::SetupObject ()
 void csNewParticleSystem::SetupParticles (
   const csReversibleTransform& trans,
   csVector3* vertices,
-  csBox3& bbox)	// Not for CS_USE_NEW_RENDERER
+  csBox3& bbox)	// @@@ For CS_USE_OLD_RENDERER
 {
   int i;
 
@@ -345,25 +345,25 @@ void csNewParticleSystem::SetupParticles (
     csVector3 pos = trans.Other2This (PositionArray [i]);
 
     *vertices = pos - x_axis - y_axis;
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
     bbox.AddBoundingVertex (*vertices++);
 #else
     vertices++;
 #endif
     *vertices = pos - x_axis + y_axis;
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
     bbox.AddBoundingVertex (*vertices++);
 #else
     vertices++;
 #endif
     *vertices = pos + x_axis + y_axis;
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
     bbox.AddBoundingVertex (*vertices++);
 #else
     vertices++;
 #endif
     *vertices = pos + x_axis - y_axis;
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
     bbox.AddBoundingVertex (*vertices++);
 #else
     vertices++;
@@ -422,7 +422,7 @@ void csNewParticleSystem::UpdateLighting (const csArray<iLight*>& lights,
   }
 }
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
 void csNewParticleSystem::eiVertexBufferManagerClient::ManagerClosing ()
 {
   scfParent->vbuf = 0;
@@ -432,7 +432,7 @@ void csNewParticleSystem::eiVertexBufferManagerClient::ManagerClosing ()
 bool csNewParticleSystem::Draw (iRenderView* rview, iMovable* mov,
 	csZBufMode mode)
 {
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   // some generic setup
   if (VisCallback) VisCallback->BeforeDrawing (this, rview);
   iGraphics3D* g3d = rview->GetGraphics3D ();
@@ -496,7 +496,7 @@ csRenderMesh **csNewParticleSystem::GetRenderMeshes (int &num,
 	iRenderView* rview, 
 	iMovable* movable, uint32 frustum_mask)
 {
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   num = 0;
   SetupObject ();
 

@@ -492,7 +492,7 @@ private:
   iTextureWrapper* ParseTexture (iLoaderContext* ldr_context,
   	iDocumentNode* node);
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   /// Parse a Cubemap texture definition and add the texture to the engine
   iTextureWrapper* ParseCubemap (iLoaderContext* ldr_context,
     iDocumentNode* node);
@@ -501,7 +501,7 @@ private:
   iTextureWrapper* ParseTexture3D (iLoaderContext* ldr_context,
     iDocumentNode* node);
 
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
   /// Parse a proc texture definition and add the texture to the engine
   //iTextureWrapper* ParseProcTex (iDocumentNode* node);
   /// Parse a material definition and add the material to the engine
@@ -542,12 +542,12 @@ private:
 
   /// -----------------------------------------------------------------------
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   /// Parse a shaderlist
   bool ParseShaderList (iLoaderContext* ldr_context, iDocumentNode* node);
   bool ParseShader (iLoaderContext* ldr_context, iDocumentNode* node,
     iShaderManager* shaderMgr);
-#endif //CS_USE_NEW_RENDERER
+#endif //CS_USE_OLD_RENDERER
 
   /// For heightgen.
   csGenerateImageTexture* ParseHeightgenTexture (iDocumentNode* node);

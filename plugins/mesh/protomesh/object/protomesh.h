@@ -42,7 +42,7 @@ struct iObjectRegistry;
 class csProtoMeshObject : public iMeshObject
 {
 private:
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   // The render mesh holder is used by GetRenderMeshes() to supply
   // render meshes that can be returned by that function.
   csRenderMeshHolderSingle rmHolder;
@@ -217,7 +217,7 @@ public:
   friend class ProtoMeshState;
 
   //------------------ iShaderVariableAccessor implementation ------------
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   class ShaderVariableAccessor : public iShaderVariableAccessor
   {
   private:
@@ -242,7 +242,7 @@ public:
   friend class ShaderVariableAccessor;
 
   void PreGetShaderVariableValue (csShaderVariable* variable);
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
 };
 
 /**
@@ -276,7 +276,7 @@ private:
   bool initialized;
   csWeakRef<iGraphics3D> g3d;
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   // Buffers for the renderers.
   csRef<iRenderBuffer> vertex_buffer;
   csRef<iRenderBuffer> texel_buffer;
@@ -440,7 +440,7 @@ public:
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
 
   //------------------ iShaderVariableAccessor implementation ------------
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   class ShaderVariableAccessor : public iShaderVariableAccessor
   {
   public:
@@ -463,7 +463,7 @@ public:
   friend class ShaderVariableAccessor;
 
   void PreGetShaderVariableValue (csShaderVariable* variable);
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
 };
 
 /**

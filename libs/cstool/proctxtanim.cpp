@@ -62,7 +62,7 @@ void csProcAnimated::Animate (csTicks current_time)
     if (first || animation->Animate (current_time - last_time))
     {
       last_time = current_time;
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
       tex->GetTextureHandle ()->Blit (0, 0, mat_w, mat_h, (unsigned char*)
 	  image->GetImageData ());
 #else

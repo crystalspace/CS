@@ -102,7 +102,7 @@ protected:
 
   csRenderMeshHolderSingle rmHolder;
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   csRef<csShaderVariableContext> svcontext;
   size_t VertexCount;
   size_t TriangleCount;

@@ -119,7 +119,7 @@ bool csNullFactoryLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
 
 bool csNullFactoryLoader::ParseRenderBuffer(iDocumentNode *node,
 	iNullFactoryState* state)
@@ -262,7 +262,7 @@ bool csNullFactoryLoader::ParseRenderBuffer(iDocumentNode *node,
   
   return true;
 }
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
 
 csPtr<iBase> csNullFactoryLoader::Parse (iDocumentNode* node,
 	iLoaderContext* ldr_context, iBase* context)
@@ -310,7 +310,7 @@ csPtr<iBase> csNullFactoryLoader::Parse (iDocumentNode* node,
         state->SetRadius (child->GetContentsValueAsFloat ());
 	break;
       case XMLTOKEN_RENDERBUFFER:
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
         ParseRenderBuffer(child, state);
 #endif
         break;

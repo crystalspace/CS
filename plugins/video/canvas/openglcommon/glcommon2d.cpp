@@ -296,7 +296,7 @@ bool csGraphics2DGLCommon::BeginDraw ()
   }
   else
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   statecache->SetColorMask (true, true, true, true);
 #endif
     
@@ -864,7 +864,7 @@ csGraphics2DGLCommon::csGLPixelFormatPicker::~csGLPixelFormatPicker()
 
 void csGraphics2DGLCommon::csGLPixelFormatPicker::ReadStartValues ()
 {
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   #define RENDERER_DEPENDENT(vNR, vOR)	(vOR)
 #else
   #define RENDERER_DEPENDENT(vNR, vOR)	(vNR)

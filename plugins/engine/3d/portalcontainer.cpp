@@ -699,7 +699,7 @@ bool csPortalContainer::DoPerspective (
   return true;
 }
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
 static void FillZBuf (
   const csPoly2D& poly,
   iRenderView *rview,
@@ -783,7 +783,7 @@ void csPortalContainer::DrawOnePortal (
   const csPlane3& camera_plane)
 {
   iGraphics3D* g3d = rview->GetGraphics3D ();
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   csRenderView* csrview = (csRenderView*)rview;
   if (csrview->AddedFogInfo ())
   {
@@ -814,7 +814,7 @@ void csPortalContainer::DrawOnePortal (
   // the maximum number that a sector is drawn (for mirrors).
   if (po->Draw (poly, movtrans, rview, keep_plane))
   {
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
     if (is_this_fog)
     {
       AddFogPolygon (poly, g3d,
@@ -832,7 +832,7 @@ void csPortalContainer::DrawOnePortal (
 #endif
   }
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   if (is_this_fog && fog_shader)
   {
     csSimpleRenderMesh mesh;

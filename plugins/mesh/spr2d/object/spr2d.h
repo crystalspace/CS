@@ -65,7 +65,7 @@ protected:
 
   uvAnimationControl* uvani;
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   class eiShaderVariableAccessor : public iShaderVariableAccessor
   {
   private:

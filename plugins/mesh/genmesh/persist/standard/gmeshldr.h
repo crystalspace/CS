@@ -59,9 +59,9 @@ public:
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iLoaderContext* ldr_context, iBase* context);
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   bool ParseRenderBuffer(iDocumentNode *node, iGeneralFactoryState* state);
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
 
   struct eiComponent : public iComponent
   {

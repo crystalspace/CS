@@ -333,7 +333,7 @@ void csProcFire::Animate (csTicks /*current_time*/)
 	*d++ = palette[col].blue;
 	*d++ = 0xff;
       }
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
     tex->GetTextureHandle ()->Blit (0, 0, mat_w,mat_h, blitbuf);
 #else
     g3d->SetRenderTarget (tex->GetTextureHandle ());

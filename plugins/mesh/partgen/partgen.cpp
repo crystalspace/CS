@@ -93,7 +93,7 @@ csParticleSystem::csParticleSystem (iObjectRegistry* object_reg,
   engine = eng;	// We don't want to keep a reference.
   light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
 
-#ifdef CS_USE_NEW_RENDERER 
+#ifndef CS_USE_OLD_RENDERER 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 
   vertices = 0;
@@ -107,7 +107,7 @@ csParticleSystem::csParticleSystem (iObjectRegistry* object_reg,
 
 csParticleSystem::~csParticleSystem()
 {
-#ifdef CS_USE_NEW_RENDERER 
+#ifndef CS_USE_OLD_RENDERER 
   delete[] vertices;
   delete[] texels;
   delete[] colors;
@@ -122,7 +122,7 @@ csParticleSystem::~csParticleSystem()
 
 void csParticleSystem::SetupObject ()
 {
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   if (!initialized)
   {
     part_sides = 0;
@@ -132,7 +132,7 @@ void csParticleSystem::SetupObject ()
 
 void csParticleSystem::SetupBuffers (size_t part_sides)
 {
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   if (csParticleSystem::part_sides == part_sides) return;
   csParticleSystem::part_sides = part_sides;
 
@@ -366,7 +366,7 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
 						  iMovable* movable,
 						  uint32 frustum_mask)
 {
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   if ((sprite2ds.Length() == 0) || !DrawTest (rview, movable, frustum_mask))
   {
     n = 0;

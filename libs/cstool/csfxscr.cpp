@@ -107,7 +107,7 @@ void csfxWhiteOut(iGraphics3D *g3d, float fadevalue)
 void csfxShadeVert(iGraphics3D *g3d, const csColor& topcolor,
   const csColor& bottomcolor, uint mixmode)
 {
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   G3DPolygonDPFX dpfx;
   dpfx.num = 4;
   dpfx.use_fog = false;
@@ -208,14 +208,14 @@ void csfxShadeVert(iGraphics3D *g3d, const csColor& topcolor,
   colors[3].Set (topcolor.red, topcolor.green, topcolor.blue, fa);
 
   g3d->DrawSimpleMesh (mesh);
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
 }
 
 
 void csfxScreenDPFX(iGraphics3D *g3d, iMaterialHandle *mat, uint mixmode,
   uint8 r, uint8 g, uint8 b)
 {
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   G3DPolygonDPFX dpfx;
   dpfx.num = 4;
   dpfx.use_fog = false;
@@ -263,13 +263,13 @@ void csfxScreenDPFX(iGraphics3D *g3d, iMaterialHandle *mat, uint mixmode,
 #else
   csfxScreenDPFXPartial (g3d, 0, 0, g3d->GetWidth (), g3d->GetHeight (),
     mat, mixmode, r, g, b);
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
 }
 
 void csfxScreenDPFXPartial(iGraphics3D *g3d, int x, int y, int w, int h,
   iMaterialHandle *mat, uint mixmode, uint8 r, uint8 g, uint8 b)
 {
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   float sx = float (x);
   float sy = float (g3d->GetHeight() - y - 1);
   float smx = sx + float (w);
@@ -366,6 +366,6 @@ void csfxScreenDPFXPartial(iGraphics3D *g3d, int x, int y, int w, int h,
   colors[3].Set (fr, fg, fb, fa);
 
   g3d->DrawSimpleMesh (mesh, csSimpleMeshScreenspace);
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
 }
 

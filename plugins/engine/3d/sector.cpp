@@ -45,7 +45,7 @@
 
 #include "ivaria/bugplug.h"
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
 #include "ivideo/rendermesh.h"
 #endif
 
@@ -331,7 +331,7 @@ public:
         MarkMeshAndChildrenVisible (meshes[i], frustum_mask);
     }
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
     int num;
     csRenderMesh** meshes = cmesh->GetRenderMeshes (num, rview, 
       &(cmesh->GetCsMovable ()).scfiMovable, frustum_mask);
@@ -356,7 +356,7 @@ public:
   virtual void ObjectVisible (iVisibilityObject* visobj, iMeshWrapper *mesh,
   	uint32 frustum_mask)
   {
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
     if (privMeshlist == 0)
       return;
 #endif
@@ -632,7 +632,7 @@ iSector *csSector::FollowSegment (
 
 void csSector::PrepareDraw (iRenderView *rview)
 {
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   draw_busy++;
 #endif
 
@@ -792,7 +792,7 @@ void csSector::PrepareDraw (iRenderView *rview)
  */
 void csSector::Draw (iRenderView *rview)
 {
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   csRenderView* csrview = (csRenderView*)rview;
   csrview->SetupClipPlanes ();
 
@@ -949,7 +949,7 @@ void csSector::Draw (iRenderView *rview)
   iRenderLoop* rl = renderloop;
   if (!rl) rl = engine->GetCurrentDefaultRenderloop ();
   rl->Draw (rview, (iSector*)&scfiSector);
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
 }
 
 void csSector::CheckFrustum (iFrustumView *lview)

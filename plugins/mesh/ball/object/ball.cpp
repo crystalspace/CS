@@ -44,7 +44,7 @@ SCF_IMPLEMENT_IBASE (csBallMeshObject)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iBallState)
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVertexBufferManagerClient)
 #endif
   {
@@ -65,7 +65,7 @@ SCF_IMPLEMENT_IBASE (csBallMeshObject)
   }
 SCF_IMPLEMENT_IBASE_END
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
 SCF_IMPLEMENT_EMBEDDED_IBASE (csBallMeshObject::eiVertexBufferManagerClient)
   SCF_IMPLEMENTS_INTERFACE (iVertexBufferManagerClient)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
@@ -88,7 +88,7 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiBallState);
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
 #endif
   csBallMeshObject::factory = factory;
@@ -114,7 +114,7 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   ball_vertices = 0;
   ball_colors = 0;
   ball_texels = 0;
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   ball_indices = 0;
 #else
   top_mesh.triangles = 0;
@@ -133,7 +133,7 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   current_features = 0;
   polygons = 0;
   
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   g3d = CS_QUERY_REGISTRY (
   	((csBallMeshObjectFactory*)factory)->object_reg, iGraphics3D);
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
@@ -164,7 +164,7 @@ csBallMeshObject::~csBallMeshObject ()
   delete[] ball_colors;
   delete[] ball_texels;
   delete[] polygons;
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   delete[] ball_indices;
 #else
   delete[] top_mesh.triangles;
@@ -174,7 +174,7 @@ csBallMeshObject::~csBallMeshObject ()
 
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiBallState);
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
 #endif
   SCF_DESTRUCT_IBASE();
@@ -267,7 +267,7 @@ float csBallMeshObject::GetScreenBoundingBox (long cameranr,
   return cbox.MaxZ ();
 }
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
 void csBallMeshObject::GenerateSphere (int num)
 #else
 void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
@@ -460,7 +460,7 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
     }
 
   // Scale and shift all the vertices.
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   top_normals = new csVector3[num_vertices];
 #else
   normals = new csVector3[num_vertices];
@@ -470,7 +470,7 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
     vertices[i].x *= radiusx;
     vertices[i].y *= radiusy;
     vertices[i].z *= radiusz;
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
     top_normals[i] = vertices[i].Unit ();
 #else
     normals[i] = vertices[i].Unit ();
@@ -499,7 +499,7 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
   for (i = 0 ; i < num_vertices ; i++)
     ball_colors[i].Set (1.0f, 1.0f, 1.0f);
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   ball_triangles = num_triangles;
   ball_indices = new unsigned int[num_triangles*3];
   memcpy (ball_indices, triangles, sizeof(csTriangle)*num_triangles);
@@ -528,7 +528,7 @@ void csBallMeshObject::SetupObject ()
   {
     initialized = true;
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
     delete[] ball_indices;
     ball_indices = 0;
 #else
@@ -549,7 +549,7 @@ void csBallMeshObject::SetupObject ()
     ball_colors = 0;
     ball_texels = 0;
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
     GenerateSphere (verts_circle);
 #else
     GenerateSphere (verts_circle, top_mesh, top_normals);
@@ -558,7 +558,7 @@ void csBallMeshObject::SetupObject ()
       csVector3 (-radiusx, -radiusy, -radiusz) + shift);
     object_bbox.AddBoundingVertexSmart (
       csVector3 ( radiusx,  radiusy,  radiusz) + shift);
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
     top_mesh.morph_factor = 0.0f;
     top_mesh.num_vertices_pool = 1;
     top_mesh.do_morph_texels = false;
@@ -568,7 +568,7 @@ void csBallMeshObject::SetupObject ()
   }
 }
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
 iRenderBuffer* csBallMeshObject::GetRenderBuffer (csStringID name)
 {
   if (name == vertex_name)
@@ -643,7 +643,7 @@ iRenderBuffer* csBallMeshObject::GetRenderBuffer (csStringID name)
 }
 #endif
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
 void csBallMeshObject::UpdateBufferSV()
 {
   csShaderVariable *sv;
@@ -673,13 +673,13 @@ void csBallMeshObject::UpdateBufferSV()
     sv->SetValue (GetRenderBuffer(index_name));
   }
 }
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
 
 csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num, iRenderView* rview, 
                                                   iMovable* movable,
 						  uint32 frustum_mask)
 {
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   SetupObject ();
 
   num = 0;
@@ -750,7 +750,7 @@ csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num, iRenderView* rview,
 #endif
 }
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
 
 void csBallMeshObject::SetupVertexBuffer ()
 {
@@ -791,7 +791,7 @@ bool csBallMeshObject::DrawTest (iRenderView* rview, iMovable* movable,
   rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
   	clip_z_plane);
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   iGraphics3D* g3d = rview->GetGraphics3D ();
   g3d->SetObjectToCamera (&tr_o2c);
   top_mesh.clip_portal = clip_portal;
@@ -816,7 +816,7 @@ void csBallMeshObject::UpdateLighting (const csArray<iLight*>& lights,
 {
   if (generated_colors) return;
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   ball_colors_dirty_flag = true;
 #endif
 
@@ -905,7 +905,7 @@ bool csBallMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 
   if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   iGraphics3D* g3d = rview->GetGraphics3D ();
 
   // Prepare for rendering.
@@ -950,7 +950,7 @@ bool csBallMeshObject::HitBeamOutline (const csVector3& start,
 
   csSegment3 seg (start, end);
   int i, max;
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   csTriangle *tr = (csTriangle*)ball_indices;
   max = ball_triangles;
 #else
@@ -988,7 +988,7 @@ bool csBallMeshObject::HitBeamObject(const csVector3& start,
   float itot_dist = 1.0f / tot_dist;
   dist = temp = tot_dist;
   csVector3 *vrt = ball_vertices, tmp;
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   csTriangle *tr = (csTriangle*)ball_indices;
   max = ball_triangles;
 #else
@@ -1014,7 +1014,7 @@ bool csBallMeshObject::HitBeamObject(const csVector3& start,
   return true;
 }
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
 void csBallMeshObject::eiVertexBufferManagerClient::ManagerClosing ()
 {
   if (scfParent->vbuf)
@@ -1255,7 +1255,7 @@ csMeshedPolygon* csBallMeshObject::GetPolygons ()
 {
   if (!polygons)
   {
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
     csTriangle* triangles = (csTriangle*)ball_indices;
     polygons = new csMeshedPolygon [ball_triangles];
     int i;

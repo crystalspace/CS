@@ -26,8 +26,8 @@
 builds = builds.merge([
   {
     tag => 'release',
-    name => 'Release_NR',
-    defines => ['NDEBUG','CS_USE_NEW_RENDERER'],
+    name => 'Release_OR',
+    defines => ['NDEBUG','CS_USE_OLD_RENDERER'],
     defineskey => 'define',
     cflagskey => 'cflags',
     lflagskey => 'lflags',
@@ -36,8 +36,8 @@ builds = builds.merge([
   },
   {
     tag => 'debug',
-    name => 'Debug_NR',
-    defines => ['_DEBUG','CS_DEBUG','CS_USE_NEW_RENDERER'],
+    name => 'Debug_OR',
+    defines => ['_DEBUG','CS_DEBUG','CS_USE_OLD_RENDERER'],
     defineskey => 'definedebug',
     cflagskey => 'cflagsdebug',
     lflagskey => 'lflagsdebug',
@@ -56,8 +56,8 @@ builds = builds.merge([
   },
   {
     tag => 'debug',
-    name => 'ExtensiveMemDebug_NR',
-    defines => ['_DEBUG','CS_DEBUG','CS_USE_NEW_RENDERER',
+    name => 'ExtensiveMemDebug_OR',
+    defines => ['_DEBUG','CS_DEBUG','CS_USE_OLD_RENDERER',
 		'CS_EXTENSIVE_MEMDEBUG'],
     defineskey => 'definedebug',
     cflagskey => 'cflagsdebug',

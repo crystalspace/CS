@@ -376,7 +376,7 @@ bool csLightFlareHalo::Process (csTicks elapsed_time, iCamera* camera,
     g3dpoly->var[i].component = v1 + t * (v2 - v1); \
   }
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
 static void PreparePolygonFX2 (
   G3DPolygonDPFX *g3dpoly,
   csVector2 *clipped_verts,
@@ -481,7 +481,7 @@ static void PreparePolygonFX2 (
     }
   }
 }
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
 
 #undef INTERPOLATE
 #undef INTERPOLATE1
@@ -505,7 +505,7 @@ void csLightFlareHalo::ProcessFlareComponent (
     csVector2 (1.0, 0.0)
   };
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   // Create a rectangle containing the halo and clip it against screen
   csVector2 HaloPoly[4] =
   {
@@ -648,5 +648,5 @@ void csLightFlareHalo::ProcessFlareComponent (
   mesh.mixmode = ((mode & CS_FX_MASK_MIXMODE) != CS_FX_ALPHA) ? mode : CS_FX_COPY;
 
   engine.G3D->DrawSimpleMesh (mesh, csSimpleMeshScreenspace);
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
 }

@@ -298,7 +298,7 @@ public:
    */
   float cosinus_factor;
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   csWeakRef<iGraphics3D> r3d;
 
   csRefArray<iPolygonRenderer> polyRenderers;
@@ -531,7 +531,7 @@ public:
   } scfiObjectModel;
   friend class ObjectModel;
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   void FillRenderMeshes (csDirtyAccessArray<csRenderMesh*>& rmeshes,
     const csArray<RepMaterial>& repMaterials, uint mixmode);
 #endif
@@ -602,7 +602,7 @@ private:
   /// Optional array of materials to replace.
   csArray<RepMaterial> replace_materials;
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   /**
    * @@@OR@@@
    * If we are a detail object then this will contain a reference to a
@@ -666,7 +666,7 @@ private:
   bool IsLmDirty() { return internalFlags.Check (8); }
   void SetLmDirty (bool b) { internalFlags.SetBool (8, b); }
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   csRenderMeshHolderMultiple rmHolder;
 
   void PrepareRenderMeshes (csDirtyAccessArray<csRenderMesh*>& renderMeshes);

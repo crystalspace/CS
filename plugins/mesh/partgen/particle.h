@@ -64,7 +64,7 @@ protected:
   csRef<iLightManager> light_mgr;
 
   bool initialized;
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_OLD_RENDERER
   csRenderMeshHolderSingle rmHolder;
   csRef<csShaderVariableContext> svcontext;
 
@@ -160,7 +160,7 @@ protected:
   void SetupParticles (
     const csReversibleTransform& trans,
     csVector3* vertices,
-    csBox3& box);	// @@@ Not for CS_USE_NEW_RENDERER
+    csBox3& box);	// @@@ For CS_USE_OLD_RENDERER
 
 public:
   /// constructor
@@ -284,7 +284,7 @@ public:
   inline bool GetChangeRotation (float& angle) const
   { if(!change_rotation) return false; angle = anglepersecond; return true; }
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
   /// interface to receive state of vertexbuffermanager
   struct eiVertexBufferManagerClient : public iVertexBufferManagerClient
   {

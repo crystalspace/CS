@@ -23,8 +23,6 @@
 
 #define CS_MATERIAL_MAX_TEXTURE_LAYERS 4
 
-#define __CS_USE_NEW_RENDERER_NEW_TEXTURE_MANAGER 1
-
 #include "csgfx/rgbpixel.h"
 #include "ivideo/texture.h"
 #include "ivideo/material.h"

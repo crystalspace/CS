@@ -1128,7 +1128,7 @@ void csPolygon3D::Finish (csPolygon3DStatic* spoly)
       	spoly->polygon_data.tmapping->GetLitHeight ());
       /*lm->InitColor (128, 128, 128);*/
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_OLD_RENDERER
       csThingObjectType* thing_type = thing->GetStaticData ()->thing_type;
       if (!thing_type->G3D->IsLightmapOK (lm->GetWidth(), lm->GetHeight(),
 	lm->lightcell_size))
@@ -1137,7 +1137,7 @@ void csPolygon3D::Finish (csPolygon3DStatic* spoly)
          "for polygon '%s'", spoly->GetName());
         spoly->flags.Set (CS_POLY_LM_REFUSED, CS_POLY_LM_REFUSED);
       }
-#endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_OLD_RENDERER
     }
   }
 }
