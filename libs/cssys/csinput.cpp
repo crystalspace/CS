@@ -91,7 +91,7 @@ bool csKeyboardDriver::GetKeyState (int iKey)
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--> Mouse driver <--//--/
 
-time_t csMouseDriver::DoubleClickTime;
+cs_time csMouseDriver::DoubleClickTime;
 size_t csMouseDriver::DoubleClickDist;
 
 csMouseDriver::csMouseDriver (csSystemDriver *system)
@@ -123,7 +123,7 @@ void csMouseDriver::do_button (int button, bool down, int x, int y)
 
   Button [button - 1] = down;
 
-  time_t evtime = System->GetTime ();
+  cs_time evtime = System->GetTime ();
   int ev = down ? csevMouseDown : csevMouseUp;
 
   if (down)

@@ -404,7 +404,7 @@ void csApp::StartFrame ()
     FinishFrame ();
   InFrame = true;
 
-  time_t elapsed_time;
+  cs_time elapsed_time;
   System->GetElapsedTime (elapsed_time, CurrentTime);
 
   GfxPpl->StartFrame (Mouse);

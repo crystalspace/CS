@@ -810,12 +810,12 @@ public:
   /**
    * Advance the frames of all sprites given the current time.
    */
-  void AdvanceSpriteFrames (time_t current_time);
+  void AdvanceSpriteFrames (cs_time current_time);
 
   /**
    * Update the particle systemns given an elapsed time.
    */
-  void UpdateParticleSystems (time_t elapsed_time);
+  void UpdateParticleSystems (cs_time elapsed_time);
 
   /**
    * Unlink a sprite from the world (but do not delete it).

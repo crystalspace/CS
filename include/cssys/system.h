@@ -223,7 +223,7 @@ class csSystemDriver : public iSystem
   void QueryOptions (iPlugIn *iObject);
 
   // Elapsed time between last two frames and absolute time in milliseconds
-  time_t ElapsedTime, CurrentTime;
+  cs_time ElapsedTime, CurrentTime;
 
 public:
   /// -------------------------- plug-ins --------------------------
@@ -340,7 +340,7 @@ public:
    * Return time in milliseconds (if not supported by a system
    * just return the time in seconds multiplied by 1000).
    */
-  static time_t Time ();
+  static cs_time Time ();
 
   /// Print a string into debug.txt
   static void debug_out (bool flush, const char* str);
@@ -392,14 +392,14 @@ public:
   /// returns the configuration.
   virtual void GetSettings (int &oWidth, int &oHeight, int &oDepth, bool &oFullScreen);
   /// get the time in milliseconds.
-  virtual time_t GetTime ();
+  virtual cs_time GetTime ();
   /// print a string to the specified device.
   virtual void Printf (int mode, const char *format, ...);
   /// execute a system-dependent extension command
   virtual bool SystemExtension (const char *iCommand, ...)
   { (void)iCommand; return false; }
   /// Query the elapsed time between last frames and absolute time
-  virtual void GetElapsedTime (time_t &oElapsedTime, time_t &oCurrentTime)
+  virtual void GetElapsedTime (cs_time &oElapsedTime, cs_time &oCurrentTime)
   { oElapsedTime = ElapsedTime; oCurrentTime = CurrentTime; }
 
   /// Load a plugin and initialize it

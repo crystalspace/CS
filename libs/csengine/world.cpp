@@ -821,7 +821,7 @@ void csWorld::ShineLights ()
     meter.Step();
   }
 
-  time_t start, stop;
+  cs_time start, stop;
   start = System->GetTime ();
   CsPrintf (MSG_INITIALIZATION, "\nShining lights (%d lights):\n  ", light_count);
   meter.SetTotal (light_count);
@@ -1219,7 +1219,7 @@ void csWorld::RemoveDynLight (csDynLight* dyn)
   dyn->SetPrev (NULL);
 }
 
-void csWorld::UpdateParticleSystems (time_t elapsed_time)
+void csWorld::UpdateParticleSystems (cs_time elapsed_time)
 {
   int i;
   for (i = 0 ; i < sprites.Length () ; i++)
@@ -1248,7 +1248,7 @@ void csWorld::UpdateParticleSystems (time_t elapsed_time)
 
 }
 
-void csWorld::AdvanceSpriteFrames (time_t current_time)
+void csWorld::AdvanceSpriteFrames (cs_time current_time)
 {
   int i;
   for (i = 0 ; i < sprites.Length () ; i++)

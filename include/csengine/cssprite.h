@@ -632,7 +632,7 @@ private:
   csSpriteAction* cur_action;
 
   /// The last frame time action.
-  time_t last_time;
+  cs_time last_time;
 
   /// Animation tweening ratio:  next frame / this frame.
   float tween_ratio;
@@ -832,7 +832,7 @@ public:
   /**
    * Go to the next frame depending on the current time in milliseconds.
    */
-  bool NextFrame (time_t current_time, bool onestep = false, bool stoptoend = false);
+  bool NextFrame (cs_time current_time, bool onestep = false, bool stoptoend = false);
 
   /**
    * Go to a specified frame.

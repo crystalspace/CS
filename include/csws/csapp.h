@@ -76,7 +76,7 @@ protected:
   /// This is equal to 8 if any of physical r,g,b masks is 0xff000000
   int PhysColorShift;
   /// The time at the start of current frame
-  time_t CurrentTime;
+  cs_time CurrentTime;
   /// The system event outlet
   iEventOutlet *EventOutlet;
   /// Are we inbetween StartFrame() and FinishFrame()?
@@ -209,7 +209,7 @@ public:
   bool GetKeyState (int iKey);
 
   /// Query current time
-  time_t GetCurrentTime ()
+  cs_time GetCurrentTime ()
   { return CurrentTime; }
 
   /// Show window list

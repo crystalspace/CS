@@ -330,10 +330,10 @@ public:
   ///
   virtual void NextFrame ();
   ///
-  void PrepareFrame (time_t elapsed_time, time_t current_time);
+  void PrepareFrame (cs_time elapsed_time, cs_time current_time);
 
   /// Move bots, particle systems, players, etc. for each frame.
-  virtual void MoveSystems (time_t elapsed_time, time_t current_time);
+  virtual void MoveSystems (cs_time elapsed_time, cs_time current_time);
 
   /**
    * Draw a frame in map mode.
@@ -368,9 +368,9 @@ public:
    * Draw everything for a frame. This includes 3D graphics
    * and everything related to 2D drawing as well (console, debugging, ...).
    */
-  virtual void DrawFrame (time_t elapsed_time, time_t current_time);
+  virtual void DrawFrame (cs_time elapsed_time, cs_time current_time);
   /// Draws 3D objects to screen
-  virtual void DrawFrame3D (int drawflags, time_t current_time);
+  virtual void DrawFrame3D (int drawflags, cs_time current_time);
   /// Draws 2D objects to screen
   virtual void DrawFrame2D (void);
 

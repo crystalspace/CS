@@ -45,7 +45,7 @@ csEngine::~csEngine ()
 
 bool csEngine::Initialize (iSystem* sys)
 {
-  time_t t = sys->GetTime ();
+  cs_time t = sys->GetTime ();
   world = new csWorld (NULL);
   world->Initialize (sys);
   return true;

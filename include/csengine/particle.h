@@ -47,7 +47,7 @@ protected:
   csVector particles;
   /// Self destruct and when.
   bool self_destruct;
-  time_t time_to_live; // msec
+  cs_time time_to_live; // msec
   /// If this system should be deleted.
   bool to_delete;
   /// Color change
@@ -111,14 +111,14 @@ public:
     bool lighted);
 
   /// Set selfdestruct mode on, and msec to live.
-  inline void SetSelfDestruct (time_t t) 
+  inline void SetSelfDestruct (cs_time t) 
   { self_destruct=true; time_to_live = t; };
   /// system will no longer self destruct
   inline void UnSetSelfDestruct () { self_destruct=false; }
   /// returns whether the system will self destruct
   inline bool GetSelfDestruct () { return self_destruct; }
   /// if the system will self destruct, returns the time to live in msec.
-  inline time_t GetTimeToLive () { return time_to_live; }
+  inline cs_time GetTimeToLive () { return time_to_live; }
 
   /// Whether this system should be deleted when possible.
   inline void SetDelete (bool b) { to_delete = b; }
@@ -189,7 +189,7 @@ public:
    * this member function will set to_delete if self_destruct is
    * enabled and time is up.
    */
-  virtual void Update (time_t elapsed_time);
+  virtual void Update (cs_time elapsed_time);
 
   /**
    * Draw the particle system.
@@ -232,7 +232,7 @@ public:
   virtual ~csNewtonianParticleSystem ();
 
   /// Moves the particles depending on their acceleration and speed.
-  virtual void Update (time_t elapsed_time);
+  virtual void Update (cs_time elapsed_time);
 
   /// Get a particles speed. speeds are in metres/second.
   inline csVector3& GetSpeed (int idx) { return part_speed[idx]; }
@@ -257,7 +257,7 @@ class csSpiralParticleSystem : public csNewtonianParticleSystem
 {
 protected:
   int max;
-  time_t time_before_new_particle;
+  cs_time time_before_new_particle;
   csVector3 source;
   int last_reuse;
   csMaterialHandle* mat;
@@ -270,7 +270,7 @@ public:
   virtual ~csSpiralParticleSystem ();
 
   /// Moves the particles depending on their acceleration and speed.
-  virtual void Update (time_t elapsed_time);
+  virtual void Update (cs_time elapsed_time);
 
   /// Move all particles to a sector, virtual so subclass can move more.
   virtual void MoveToSector (csSector *sector);
@@ -292,10 +292,10 @@ protected:
   csSector *light_sector;
   csWorld *light_world;
   csDynLight *explight;
-  time_t light_fade;
+  cs_time light_fade;
   /// scaling of particles.
   bool scale_particles;
-  time_t fade_particles;
+  cs_time fade_particles;
   /// starting bbox.
   csBox3 startbox;
   float maxspeed, maxaccel, radiusnow;
@@ -322,7 +322,7 @@ public:
   /**
    * Update and light is flickered as well. particles will be scaled.
    */
-  virtual void Update (time_t elapsed_time);
+  virtual void Update (cs_time elapsed_time);
 
   /// Move particles and light(if any) to a sector.
   virtual void MoveToSector (csSector *sector);
@@ -336,7 +336,7 @@ public:
    * Add a light at explosion center. add msec when light starts fading,
    * which is used when time_to_live is set / SelfDestruct is used.
    */
-  void AddLight (csWorld *world, csSector *sec, time_t fade = 200);
+  void AddLight (csWorld *world, csSector *sec, cs_time fade = 200);
   /// Remove the light.
   void RemoveLight ();
 
@@ -346,7 +346,7 @@ public:
    * Set particles to be scaled to nothing starting at fade_particles msec 
    * before self-destruct.
    */
-  void SetFadeSprites(time_t fade_time) 
+  void SetFadeSprites(cs_time fade_time) 
   {scale_particles=true; fade_particles = fade_time; }
 
   CSOBJTYPE;
@@ -388,7 +388,7 @@ public:
   /**
    * Update and light is flickered as well. particles will be scaled.
    */
-  virtual void Update (time_t elapsed_time);
+  virtual void Update (cs_time elapsed_time);
 
   CSOBJTYPE;
 };
@@ -432,7 +432,7 @@ public:
   /**
    * Update 
    */
-  virtual void Update (time_t elapsed_time);
+  virtual void Update (cs_time elapsed_time);
 
   CSOBJTYPE;
 };
@@ -489,7 +489,7 @@ public:
   /**
    * Update
    */
-  virtual void Update (time_t elapsed_time);
+  virtual void Update (cs_time elapsed_time);
 
   CSOBJTYPE;
 };
@@ -545,7 +545,7 @@ public:
   /**
    * Update
    */
-  virtual void Update (time_t elapsed_time);
+  virtual void Update (cs_time elapsed_time);
 
   /// You can set a pseudo-static light here
   void SetControlledLight(csLight *l) {light = l;}

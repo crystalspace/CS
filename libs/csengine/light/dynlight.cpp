@@ -58,7 +58,7 @@ static int numLights = 0;
 
 static inline unsigned long CLOCK ()
 {
-  time_t tm = csWorld::System->GetTime ();
+  cs_time tm = csWorld::System->GetTime ();
   return (unsigned long)(tm * 60 / 1000);
 }
 

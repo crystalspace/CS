@@ -208,11 +208,11 @@ public:
 
 private:
   /// Time left until messages will scroll up
-  time_t LineTime;
+  cs_time LineTime;
   /// Cursor state
   bool CursorState;
   /// Cursor switch time
-  time_t CursorTime;
+  cs_time CursorTime;
 
   /// Console contents
   char **Line;

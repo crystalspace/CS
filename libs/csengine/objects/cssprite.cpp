@@ -1128,7 +1128,7 @@ void csSprite3D::InitSprite ()
   MixMode = CS_FX_COPY;
 }
 
-bool csSprite3D::NextFrame (time_t current_time, bool onestep, bool stoptoend)
+bool csSprite3D::NextFrame (cs_time current_time, bool onestep, bool stoptoend)
 {
   bool ret = false;
 

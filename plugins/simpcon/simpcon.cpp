@@ -315,7 +315,7 @@ void csSimpleConsole::Clear (bool)
 void csSimpleConsole::Draw2D (csRect* area)
 {
   int i;
-  time_t CurrentTime = System->GetTime ();
+  cs_time CurrentTime = System->GetTime ();
 
   G2D->SetFontID (console_font);
 

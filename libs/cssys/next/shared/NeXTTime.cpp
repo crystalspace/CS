@@ -21,7 +21,7 @@
 #include <libc.h>
 #include <sys/time.h>
 
-time_t csSystemDriver::Time()
+cs_time csSystemDriver::Time()
     {
     struct timezone z = { 0, 0 };
     struct timeval r;

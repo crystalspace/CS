@@ -162,7 +162,7 @@ protected:
   iSystem *System;
   csRect size, invalid;
   int font, cursor, cx, cy;
-  time_t flash_time, flash_interval;
+  cs_time flash_time, flash_interval;
   bool cursor_visible;
   bool clear_input;
   bool auto_update;

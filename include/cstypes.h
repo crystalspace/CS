@@ -69,4 +69,7 @@ typedef unsigned int uint32;
 typedef int int32;
 #endif
 
+// Time in milli (1/1000) seconds
+typedef unsigned long cs_time;
+
 #endif // __CS_CSTYPES_H__

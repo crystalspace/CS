@@ -58,7 +58,7 @@ public:
   virtual void SetPosition(const csVector3& p) { csSprite3D::SetPosition(p); }
 
   /// Time-base move.
-  void move (time_t elapsed_time);
+  void move (cs_time elapsed_time);
 
   /// Set movement vector.
   void set_bot_move (const csVector3& v);

@@ -200,7 +200,7 @@ void csParticleSystem :: Rotate(float angle)
 }
 
 
-void csParticleSystem :: Update(time_t elapsed_time)
+void csParticleSystem :: Update(cs_time elapsed_time)
 {
   if(self_destruct)
   {
@@ -306,7 +306,7 @@ void csSpiralParticleSystem::MoveToSector (csSector *sector)
   csNewtonianParticleSystem::MoveToSector (sector);
 }
 
-void csSpiralParticleSystem::Update (time_t elapsed_time)
+void csSpiralParticleSystem::Update (cs_time elapsed_time)
 {
   int i;
   // Update the acceleration vectors first.
@@ -371,7 +371,7 @@ csNewtonianParticleSystem :: ~csNewtonianParticleSystem()
 }
 
 
-void csNewtonianParticleSystem :: Update(time_t elapsed_time)
+void csNewtonianParticleSystem :: Update(cs_time elapsed_time)
 {
   csVector3 move;
   csParticleSystem::Update(elapsed_time);
@@ -442,7 +442,7 @@ csParSysExplosion :: ~csParSysExplosion()
 }
 
 
-void csParSysExplosion :: Update(time_t elapsed_time)
+void csParSysExplosion :: Update(cs_time elapsed_time)
 {
   csNewtonianParticleSystem::Update(elapsed_time);
 
@@ -476,7 +476,7 @@ void csParSysExplosion :: MoveToSector(csSector *sector)
 }
 
 
-void csParSysExplosion :: AddLight(csWorld *world, csSector *sec, time_t fade)
+void csParSysExplosion :: AddLight(csWorld *world, csSector *sec, cs_time fade)
 {
   if(has_light) return;
   light_world = world;
@@ -532,7 +532,7 @@ csRainParticleSystem :: ~csRainParticleSystem()
   delete[] part_pos;
 }
 
-void csRainParticleSystem :: Update(time_t elapsed_time)
+void csRainParticleSystem :: Update(cs_time elapsed_time)
 {
   csParticleSystem::Update(elapsed_time);
   float delta_t = elapsed_time / 1000.0f; // in seconds
@@ -608,7 +608,7 @@ csSnowParticleSystem :: ~csSnowParticleSystem()
   delete[] part_speed;
 }
 
-void csSnowParticleSystem :: Update(time_t elapsed_time)
+void csSnowParticleSystem :: Update(cs_time elapsed_time)
 {
   csParticleSystem::Update(elapsed_time);
   float delta_t = elapsed_time / 1000.0f; // in seconds
@@ -743,7 +743,7 @@ int csFountainParticleSystem :: FindOldest()
   return ret;
 }
 
-void csFountainParticleSystem :: Update(time_t elapsed_time)
+void csFountainParticleSystem :: Update(cs_time elapsed_time)
 {
   csParticleSystem::Update(elapsed_time);
   float delta_t = elapsed_time / 1000.0f; // in seconds
@@ -879,7 +879,7 @@ int csFireParticleSystem :: FindOldest()
   return ret;
 }
 
-void csFireParticleSystem :: Update(time_t elapsed_time)
+void csFireParticleSystem :: Update(cs_time elapsed_time)
 {
   csParticleSystem::Update(elapsed_time);
   if(light)

@@ -214,16 +214,16 @@ long csGraphics3DInfinite::GetAccurateTime ()
   return System->GetTime ();
 }
 
-static time_t start2d = 0;
-static time_t start3d = 0;
-static time_t startnone = 0;
-static time_t startfirst = 0;
+static cs_time start2d = 0;
+static cs_time start3d = 0;
+static cs_time startnone = 0;
+static cs_time startfirst = 0;
 
 bool csGraphics3DInfinite::BeginDraw (int DrawFlags)
 {
   if (startfirst == 0) startfirst = GetAccurateTime ();
 
-  time_t endnone = GetAccurateTime ();
+  cs_time endnone = GetAccurateTime ();
   if (startnone != 0)
   {
     total_none_time += endnone-startnone;
@@ -236,7 +236,7 @@ bool csGraphics3DInfinite::BeginDraw (int DrawFlags)
   }
   else if (!(DrawFlags & CSDRAW_3DGRAPHICS) && (DrawMode & CSDRAW_3DGRAPHICS))
   {
-    time_t end3d = GetAccurateTime ();
+    cs_time end3d = GetAccurateTime ();
     total_3d_time += end3d-start3d;
   }
 
@@ -246,7 +246,7 @@ bool csGraphics3DInfinite::BeginDraw (int DrawFlags)
   }
   else if (!(DrawFlags & CSDRAW_2DGRAPHICS) && (DrawMode & CSDRAW_2DGRAPHICS))
   {
-    time_t end2d = GetAccurateTime ();
+    cs_time end2d = GetAccurateTime ();
     total_2d_time += end2d-start2d;
   }
 

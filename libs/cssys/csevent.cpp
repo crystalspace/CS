@@ -21,7 +21,7 @@
 #include "cssysdef.h"
 #include "cssys/csevent.h"
 
-csEvent::csEvent (time_t iTime, int eType, int kCode, int kChar, int kModifiers)
+csEvent::csEvent (cs_time iTime, int eType, int kCode, int kChar, int kModifiers)
 {
   Time = iTime;
   Type = eType;
@@ -31,7 +31,7 @@ csEvent::csEvent (time_t iTime, int eType, int kCode, int kChar, int kModifiers)
   Key.Modifiers = kModifiers;
 }
 
-csEvent::csEvent (time_t iTime, int eType, int mx, int my,
+csEvent::csEvent (cs_time iTime, int eType, int mx, int my,
   int mButton, int mModifiers)
 {
   Time = iTime;
@@ -43,7 +43,7 @@ csEvent::csEvent (time_t iTime, int eType, int mx, int my,
   Mouse.Modifiers = mModifiers;
 }
 
-csEvent::csEvent (time_t iTime, int eType, int jn, int jx, int jy,
+csEvent::csEvent (cs_time iTime, int eType, int jn, int jx, int jy,
   int jButton, int jModifiers)
 {
   Time = iTime;
@@ -56,7 +56,7 @@ csEvent::csEvent (time_t iTime, int eType, int jn, int jx, int jy,
   Joystick.Modifiers = jModifiers;
 }
 
-csEvent::csEvent (time_t iTime, int eType, int cCode, void *cInfo)
+csEvent::csEvent (cs_time iTime, int eType, int cCode, void *cInfo)
 {
   Time = iTime;
   Type = eType;

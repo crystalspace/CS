@@ -276,7 +276,7 @@ extern bool CommandHandler (const char *cmd, const char *arg);
 
 void WalkTest::NextFrame ()
 {
-  time_t elapsed_time, current_time;
+  cs_time elapsed_time, current_time;
   GetElapsedTime (elapsed_time, current_time);
   // The following will fetch all events from queue and handle them
   SysSystemDriver::NextFrame ();
@@ -315,7 +315,7 @@ void WalkTest::NextFrame ()
 }
 
 
-void WalkTest::MoveSystems (time_t elapsed_time, time_t current_time)
+void WalkTest::MoveSystems (cs_time elapsed_time, cs_time current_time)
 {
   // First move the sky.
   if (anim_sky)
@@ -370,7 +370,7 @@ void WalkTest::MoveSystems (time_t elapsed_time, time_t current_time)
   if (do_bots)
   {
     static long first_time = -1;
-    static time_t next_bot_at;
+    static cs_time next_bot_at;
     if (first_time == -1)
     {
       first_time = current_time;
@@ -421,7 +421,7 @@ void WalkTest::MoveSystems (time_t elapsed_time, time_t current_time)
     }
   }
 
-  extern void move_bots (time_t);
+  extern void move_bots (cs_time);
   move_bots (elapsed_time);
 
   if (move_forward)
@@ -591,7 +591,7 @@ void WalkTest::DrawFrameConsole ()
 }
 
 
-void WalkTest::DrawFrame3D (int drawflags, time_t current_time)
+void WalkTest::DrawFrame3D (int drawflags, cs_time current_time)
 {
   // Tell Gfx3D we're going to display 3D things
   if (!Gfx3D->BeginDraw (world->GetBeginDrawFlags () | drawflags
@@ -751,7 +751,7 @@ void WalkTest::DrawFrameMap ()
   }
 }
 
-void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
+void WalkTest::DrawFrame (cs_time elapsed_time, cs_time current_time)
 {
   if (!Console || !Console->GetVisible ())
   {
@@ -848,11 +848,11 @@ void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
 }
 
 int cnt = 1;
-time_t time0 = (time_t)-1;
+cs_time time0 = (cs_time)-1;
 
-void WalkTest::PrepareFrame (time_t elapsed_time, time_t current_time)
+void WalkTest::PrepareFrame (cs_time elapsed_time, cs_time current_time)
 {
-  static time_t prev_time = 0;
+  static cs_time prev_time = 0;
   if (prev_time == 0) prev_time = Time () - 10;
 
   // If the time interval is too big, limit to something reasonable
@@ -931,7 +931,7 @@ void WalkTest::PrepareFrame (time_t elapsed_time, time_t current_time)
 void perf_test (int num)
 {
   Sys->busy_perf_test = true;
-  time_t t1, t2, t;
+  cs_time t1, t2, t;
   Sys->Printf (MSG_CONSOLE, "Performance test busy...\n");
   t = t1 = Sys->Time ();
   int i;
@@ -946,7 +946,7 @@ void perf_test (int num)
   Sys->Printf (MSG_DEBUG_0, "%f secs to render %d frames: %f fps\n",
         (float)(t2-t1)/1000., num, 100000./(float)(t2-t1));
   cnt = 1;
-  time0 = (time_t)-1;
+  time0 = (cs_time)-1;
   Sys->busy_perf_test = false;
 }
 
@@ -1413,7 +1413,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   }
 
   // Wait one second before starting.
-  time_t t = Sys->Time ()+1000;
+  cs_time t = Sys->Time ()+1000;
   while (Sys->Time () < t) ;
 
   // Allocate the palette as calculated by the texture manager.

@@ -347,7 +347,7 @@ public:
   unsigned char Category;	// Event category (unused by CSWS)
   unsigned char SubCategory;	// Finer granularity
   unsigned char UnusedField;	// Reserved for Great Future Extensions
-  time_t Time;			// Time when the event occured
+  cs_time Time;			// Time when the event occured
   union
   {
     struct
@@ -380,16 +380,16 @@ public:
   csEvent () {}
 
   /// Create a keyboard event object
-  csEvent (time_t eTime, int eType, int kCode, int kChar, int kModifiers);
+  csEvent (cs_time eTime, int eType, int kCode, int kChar, int kModifiers);
 
   /// Create a mouse event object
-  csEvent (time_t eTime, int eType, int mx, int my, int mButton, int mModifiers);
+  csEvent (cs_time eTime, int eType, int mx, int my, int mButton, int mModifiers);
 
   /// Create a joystick event object
-  csEvent (time_t eTime, int eType, int jn, int jx, int jy, int jButton, int jModifiers);
+  csEvent (cs_time eTime, int eType, int jn, int jx, int jy, int jButton, int jModifiers);
 
   /// Create a command event object
-  csEvent (time_t eTime, int eType, int cCode, void *cInfo = NULL);
+  csEvent (cs_time eTime, int eType, int cCode, void *cInfo = NULL);
 };
 
 #endif // __CSEVENT_H__

@@ -264,7 +264,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
 void Phyztest::NextFrame ()
 {
   SysSystemDriver::NextFrame ();
-  time_t elapsed_time, current_time;
+  cs_time elapsed_time, current_time;
   GetElapsedTime (elapsed_time, current_time);
 
   int i;

@@ -106,7 +106,7 @@ protected:
   FrameEntry *frame;
 
   /// self explanatory
-  time_t total_time;
+  cs_time total_time;
   int frame_num;
   float lowest_fps;
   float highest_fps;
@@ -120,12 +120,12 @@ protected:
 /*    int total_portals_drawn; */
 
   int cnt;
-  time_t time0;
+  cs_time time0;
 
   // Convenience functions.
-  void AccumulateTotals (time_t elapsed_time);
+  void AccumulateTotals (cs_time elapsed_time);
   void CalculateFpsStats ();
-  void SubsectionNextFrame (time_t elapsed_time, float fps);
+  void SubsectionNextFrame (cs_time elapsed_time, float fps);
   void SaveStats ();
   void WriteSummaryStats ();
   void WriteMainHeader ();

@@ -97,7 +97,7 @@ bool csPerfStats::HandleEvent (csEvent &event)
 
   if (!paused)
   {
-    time_t elapsed_time, current_time;
+    cs_time elapsed_time, current_time;
     System->GetElapsedTime (elapsed_time, current_time);
     if (!elapsed_time)
     {
@@ -138,7 +138,7 @@ bool csPerfStats::Pause (bool pause)
   paused = pause;
   if (!paused && ret)
   {
-    time_t elapsed_time;
+    cs_time elapsed_time;
     System->GetElapsedTime (elapsed_time, time0);
     cnt = resolution;
   }
@@ -169,7 +169,7 @@ void csPerfStats::SetResolution (int res)
     sub_section->SetResolution (res);
 }
 
-void csPerfStats::SubsectionNextFrame (time_t elapsed_time, float fps)
+void csPerfStats::SubsectionNextFrame (cs_time elapsed_time, float fps)
 {
   AccumulateTotals (elapsed_time);
   if (fps != -1)
@@ -182,7 +182,7 @@ void csPerfStats::SubsectionNextFrame (time_t elapsed_time, float fps)
 }
 
 
-void csPerfStats::AccumulateTotals (time_t elapsed_time)
+void csPerfStats::AccumulateTotals (cs_time elapsed_time)
 {
   frame_num++;
 #ifdef CS_DEBUG
