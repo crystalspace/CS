@@ -1,7 +1,4 @@
-#ifndef __CS_AWS_H__
-#define __CS_AWS_H__
-
-/**************************************************************************
+/*
     Copyright (C) 2000-2001 by Christopher Nelson
 
     This library is free software; you can redistribute it and/or
@@ -17,7 +14,11 @@
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-*****************************************************************************/
+*/
+
+#ifndef __CS_AWS_H__
+#define __CS_AWS_H__
+
 # include "iaws/aws.h"
 # include "iaws/awsparm.h"
 # include "iaws/awscnvs.h"
@@ -35,10 +36,10 @@
 # include "awswin.h"
 
 /**
- *
- *  This is the alternate windowing system plugin.  It defines a simple, lightweight alternative to the current CSWS
- * windowing system.  It supports simple skinning via the .skn defintions, and creation of windows from .win definitions.
- *
+ * This is the alternate windowing system plugin.  It defines a simple,
+ * lightweight alternative to the current CSWS windowing system.  It supports
+ * simple skinning via the .skn defintions, and creation of windows from
+ * .win definitions.
  */
 
 /**
@@ -74,31 +75,35 @@ private:
   /// Handle to the sink manager
   csRef<iAwsSinkManager> sinkmgr;
 
-  /** This is the dirty region.  All clean/dirty code now utilizes the update
-   *  region facility for non-contiguous rectangular spaces.  This buffer
-   *  holds an infinite amount of optimal rectangular regions.
+  /**
+   * This is the dirty region.  All clean/dirty code now utilizes the
+   * update region facility for non-contiguous rectangular spaces.  This
+   * buffer holds an infinite amount of optimal rectangular regions.
    */
   csRectRegion dirty;
 
-  /** This is the erase region.  All windows will call the Erase() function if the
-   *  AlwaysEraseWindows flag is set.  That function will add a rect into this region
-   *  which requires erasure.  Right before final redraw, all dirty regions will be
-   *  excluded from the erasure region, and the erasure region will be painted with
-   *  the transparent color.
+  /**
+   * This is the erase region.  All windows will call the Erase() function
+   * if the AlwaysEraseWindows flag is set.  That function will add a rect
+   * into this region which requires erasure.  Right before final redraw, all
+   * dirty regions will be excluded from the erasure region, and the erasure
+   * region will be painted with the transparent color.
    */
   csRectRegion erase;
 
-  /** This is the update store.  The update store contains all of the regions
-   *  that actually contain anything useful, and thus the only regions that
-   *  need to be thrown to the screen.  The store must be cleared and rethrown
-   *  during window move operations.
+  /**
+   * This is the update store.  The update store contains all of the regions
+   * that actually contain anything useful, and thus the only regions that
+   * need to be thrown to the screen.  The store must be cleared and rethrown
+   * during window move operations.
    */
   csRectRegion updatestore;
 
   /// True if the update store needs to be cleared and updated.
   bool updatestore_dirty;
 
-  /** This is the maximum frame for any window, because it's the size of our
+  /**
+   * This is the maximum frame for any window, because it's the size of our
    * canvas, be it the virtual one or otherwise.
    */
   csRect frame;
@@ -137,18 +142,17 @@ private:
   csRef<iAwsCanvas> canvas;
 
   /**
-    * Defines the mapping between a factory and it's interned name.  Used for window template instantiation.
-    */
+   * Defines the mapping between a factory and it's interned name.  Used for
+   * window template instantiation.
+   */
   struct awsComponentFactoryMap
   {
     csRef<iAwsComponentFactory> factory;
     unsigned long id;
     awsComponentFactoryMap ()
-	: id(0)
-    {}
+      : id(0) {}
     awsComponentFactoryMap (const awsComponentFactoryMap& other)
-	: factory(other.factory), id(other.id)
-    {}
+      : factory(other.factory), id(other.id) {}
   };
 
   /// Contains the list of factory to ID mappings.
@@ -178,8 +182,8 @@ public:
 
   /// Register a component factory
   virtual void RegisterComponentFactory (
-                iAwsComponentFactory *factory,
-                const char *name);
+    iAwsComponentFactory *factory,
+    const char *name);
 
   /// Find a component factory
   virtual iAwsComponentFactory *FindComponentFactory (const char *name);
@@ -197,22 +201,22 @@ public:
   virtual iAwsComponent *GetFocusedComponent ();
 
   /// Get the component with the keyboard focus
-  virtual iAwsComponent *GetKeyboardFocusedComponent();
+  virtual iAwsComponent *GetKeyboardFocusedComponent ();
 
   /// Set the focused component
   virtual void SetFocusedComponent (iAwsComponent *_focused);
 
   /// Returns the lowest-level visible component (if any) at the screen coordinates
-  virtual iAwsComponent* ComponentAt(int x, int y);
+  virtual iAwsComponent* ComponentAt (int x, int y);
 
   /// Returns true if part of this window is inside the dirty zones
   virtual bool ComponentIsDirty (iAwsComponent *win);
 
   /// Returns true if window is in transition
-  virtual bool ComponentIsInTransition(iAwsComponent *win);
+  virtual bool ComponentIsInTransition (iAwsComponent *win);
 
   /// Returns true if the mouse is inside any of the top-level components.
-  virtual bool MouseInComponent(int x, int y);
+  virtual bool MouseInComponent (int x, int y);
  
   /// Causes the current view of the window system to be drawn to the given graphics device.
   virtual void Print (iGraphics3D *g3d, uint8 Alpha = 0);
@@ -242,14 +246,11 @@ public:
   virtual void ReleaseMouse ();
 
   /// Set this component to be a modal dialog.
-  virtual void SetModal(iAwsComponent *comp);
+  virtual void SetModal (iAwsComponent *comp);
 
   /// Set no active modal dialogs.
-  virtual void UnSetModal();
-
-
+  virtual void UnSetModal ();
 protected:
-
   /// Redraws a window only if it has areas in the dirtyarea
   void RedrawWindow (iAwsComponent *comp, csRect dirtyarea);
 
@@ -258,34 +259,36 @@ protected:
 
   /// Raises all components starting from cmp and working towards the root
   /// that have AWSF_CMP_TOP_SELECT set
-  void RaiseComponents(iAwsComponent* cmp);
+  void RaiseComponents (iAwsComponent* cmp);
 
-  /** This moves mouse focus to cmp. 
-    * We assure that every parent entered and exited traversing from
-    * mouse_in to cmp will receive enter/exit messages
-    * This function returns true if focus reaches cmp and false if not. ( this can
-    * happen when some component captures the mouse in response to losing focus )
-    */
-  bool ChangeMouseFocus(iAwsComponent *cmp, iEvent &Event);
+  /**
+   * This moves mouse focus to cmp. We assure that every parent entered and
+   * exited traversing from mouse_in to cmp will receive enter/exit messages
+   * This function returns true if focus reaches cmp and false if not.
+   * (this can happen when some component captures the mouse in response to
+   * losing focus )
+   */
+  bool ChangeMouseFocus (iAwsComponent *cmp, iEvent &Event);
 
-  /** Dispatches MouseEnter/Exit for focus change if necessary.
-    * Returns true if cmp is now focused, false if not. ( this can
-    * happen when some component captures the mouse in response to
-    * losing focus )
-    */
+  /**
+   * Dispatches MouseEnter/Exit for focus change if necessary.
+   * Returns true if cmp is now focused, false if not. ( this can
+   * happen when some component captures the mouse in response to
+   * losing focus )
+   */
   bool ChangeMouseFocusHelper (iAwsComponent *cmp, iEvent &Event);
 
   /// Changes keyboard focus to cmp if necessary
-  void ChangeKeyboardFocus(iAwsComponent* cmp, iEvent &Event);
+  void ChangeKeyboardFocus (iAwsComponent* cmp, iEvent &Event);
 
   /// Returns the first common parent of cmp1 and cmp2
-  iAwsComponent* FindCommonParent(iAwsComponent* cmp1, iAwsComponent* cmp2);
+  iAwsComponent* FindCommonParent (iAwsComponent* cmp1, iAwsComponent* cmp2);
 
   /// Recursively creates child components and adds them into a parent.  
   void CreateChildrenFromDef (
-        iAws *wmgr,
-        iAwsComponent *parent,
-        iAwsComponentNode *settings);
+    iAws *wmgr,
+    iAwsComponent *parent,
+    iAwsComponentNode *settings);
 
   /// Checks the updatestore_dirty flag and refreshes the store accordingly.
   void UpdateStore ();
@@ -294,11 +297,10 @@ protected:
   void RegisterCommonComponents ();
 
   /// Performs transitioning on a window.
-  bool PerformTransition(iAwsComponent *win);
+  bool PerformTransition (iAwsComponent *win);
 
   /// Finds a transition for the given window.
-  awsWindowTransition*  FindTransition(iAwsComponent *win);
-
+  awsWindowTransition* FindTransition (iAwsComponent *win);
 public:
   /// Instantiates a window based on a window definition.
   virtual iAwsComponent *CreateWindowFrom (const char *defname);
@@ -310,33 +312,35 @@ public:
   virtual iAwsParmList *CreateParmList ();
 
   /// Creates and enables a transition for a window
-  virtual void CreateTransition(iAwsComponent *win, unsigned transition_type, csTicks duration=250);
+  virtual void CreateTransition (iAwsComponent *win, unsigned transition_type,
+    csTicks duration=250);
 
   /// Creates and enables a transition for a window
-  virtual void CreateTransitionEx(iAwsComponent *win, unsigned transition_type, csTicks duration, csRect &user);
-
+  virtual void CreateTransitionEx (iAwsComponent *win, unsigned transition_type,
+    csTicks duration, csRect &user);
 public:
   /// Set the contexts however you want
-  virtual bool SetupCanvas(iAwsCanvas *newCanvas, iGraphics2D *g2d=0, iGraphics3D *g3d=0);
+  virtual bool SetupCanvas (iAwsCanvas *newCanvas, iGraphics2D *g2d = 0,
+    iGraphics3D *g3d = 0);
 
   /// Get the current context
   virtual iAwsCanvas *GetCanvas ();
 
   /// Create a default canvas, covering the whole screen
   /*virtual iAwsCanvas *CreateDefaultCanvas (
-                        iEngine *engine,
-                        iTextureManager *txtmgr);*/
+      iEngine *engine,
+      iTextureManager *txtmgr);*/
 
   /// Create a default canvas, just a single proctex
   /*virtual iAwsCanvas *CreateDefaultCanvas (
-                        iEngine *engine,
-                        iTextureManager *txtmgr,
-                        int width,
-                        int height,
-                        const char *name);*/
+      iEngine *engine,
+      iTextureManager *txtmgr,
+      int width,
+      int height,
+      const char *name);*/
 
   /// Create a canvas that uses custom graphics devices (e.g. the screen)
-  ///virtual iAwsCanvas *CreateCustomCanvas (iGraphics2D *g2d, iGraphics3D *g3d);
+  //virtual iAwsCanvas *CreateCustomCanvas (iGraphics2D *g2d, iGraphics3D *g3d);
 
   /// Get the iGraphics2D interface so that components can use it.
   virtual iGraphics2D *G2D ();
@@ -362,9 +366,6 @@ public:
   /// Returns true if all windows are presently hidden
   bool AllWindowsHidden ();
 
-  //////////////////////////////////////
-
-  // Implement iComponent interface.
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(awsManager);
@@ -374,20 +375,21 @@ public:
     }
   }
   scfiComponent;
+
   struct EventHandler : public iEventHandler
   {
-private:
+  private:
     awsManager *parent;
-public:
+  public:
     SCF_DECLARE_IBASE;
-    EventHandler(awsManager * parent)
+    EventHandler (awsManager * parent)
     {
-      SCF_CONSTRUCT_IBASE(0);
+      SCF_CONSTRUCT_IBASE (0);
       EventHandler::parent = parent;
     }
-    virtual ~EventHandler()
+    virtual ~EventHandler ()
     {
-      SCF_DESTRUCT_IBASE();
+      SCF_DESTRUCT_IBASE ();
     }
     virtual bool HandleEvent (iEvent &) { return false; }
   }
@@ -395,4 +397,3 @@ public:
 };
 
 #endif // __CS_AWS_H__
-

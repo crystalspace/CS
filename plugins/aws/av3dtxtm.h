@@ -15,8 +15,9 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#ifndef __CS_TXTMGR_H__
-#define __CS_TXTMGR_H__
+
+#ifndef __CS_AWS_AV3DTXTM_H__
+#define __CS_AWS_AV3DTXTM_H__
 
 # include "csutil/array.h"
 # include "ivideo/txtmgr.h"
@@ -53,8 +54,7 @@ struct iObjectRegistry;
  * memory occupied by the original textures, but it also means you
  * cannot call TextureManager::Prepare() again.
  */
-class csTextureHandle :
-  public iTextureHandle
+class csTextureHandle : public iTextureHandle
 {
 protected:
   /// The original image object.
@@ -106,7 +106,7 @@ public:
   void AdjustSizePo2 ();
 
   /// Get the transparent color as a RGB pixel
-  csRGBpixel *get_transparent ()  { return &transp_color; }
+  csRGBpixel *get_transparent () { return &transp_color; }
 
   /// Create a new texture object (should be implemented by heirs)
   virtual csTexture *NewTexture (iImage *Image) = 0;
@@ -153,7 +153,8 @@ public:
   virtual void SetCacheData (void *d) { cachedata = d; }
 
   /// Get the csTextureHandle object associated with the texture handle
-  virtual void *GetPrivateObject ()               { return (csTextureHandle *)this; }
+  virtual void *GetPrivateObject ()
+  { return (csTextureHandle *)this; }
 
   /**
    * Query if the texture has an alpha channel.<p>
@@ -162,8 +163,11 @@ public:
    */
   virtual bool GetAlphaMap () { return false; }
 
-  virtual iGraphics2D* GetCanvas() { csRef<iGraphics2D> g = SCF_QUERY_INTERFACE(image, iGraphics2D); 
-  	return (iGraphics2D*)g; }
+  virtual iGraphics2D* GetCanvas ()
+  {
+    csRef<iGraphics2D> g = SCF_QUERY_INTERFACE (image, iGraphics2D); 
+  	return (iGraphics2D*)g;
+  }
 };
 
 /**
@@ -190,10 +194,10 @@ protected:
   /// Width and height
   int w, h;
 
-  /// log2(width) and log2(height)
+  /// log2 (width) and log2 (height)
   int shf_w, shf_h;
 
-  /// (1 << log2(width)) - 1 and (1 << log2(height)) - 1
+  /// (1 << log2 (width)) - 1 and (1 << log2 (height)) - 1
   int and_w, and_h;
 
   /// Compute shf_x and and_x values
@@ -206,16 +210,16 @@ public:
   virtual ~csTexture ();
 
   ///
-  int get_width ()  { return w; }
+  int get_width () { return w; }
 
   ///
   int get_height () { return h; }
 
   ///
-  int get_w_shift ()  { return shf_w; }
+  int get_w_shift () { return shf_w; }
 
   ///
-  int get_h_shift ()  { return shf_h; }
+  int get_h_shift () { return shf_h; }
 
   ///
   int get_w_mask () { return and_w; }
@@ -227,14 +231,13 @@ public:
   int get_size () { return w * h; }
 
   ///
-  csTextureHandle *get_parent ()  { return parent; }
+  csTextureHandle *get_parent () { return parent; }
 };
 
 /**
  * This class is the top-level representation of a material.
  */
-class csMaterialHandle :
-  public iMaterialHandle
+class csMaterialHandle : public iMaterialHandle
 {
 protected:
   /// A texture.
@@ -300,7 +303,7 @@ public:
    * Get the flat color. If the material has a texture assigned, this
    * will return the mean texture color.
    */
-  virtual void GetFlatColor (csRGBpixel &oColor)  { oColor = flat_color; }
+  virtual void GetFlatColor (csRGBpixel &oColor) { oColor = flat_color; }
 
   /**
    * Get light reflection parameters for this material.
@@ -335,8 +338,7 @@ public:
  * Each 3D driver should derive a texture manager class from this one
  * and implement the missing functionality.
  */
-class csTextureManager :
-  public iTextureManager
+class csTextureManager : public iTextureManager
 {
 protected:
   typedef csArray<csTextureHandle*> csTexVector;
@@ -420,4 +422,5 @@ public:
    */
   virtual void FreeMaterials ();
 };
-#endif // __CS_TXTMGR_H__
+
+#endif // __CS_AWS_AV3DTXTM_H__

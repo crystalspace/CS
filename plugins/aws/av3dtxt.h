@@ -16,6 +16,7 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
 #ifndef __CS_AWS_AV3DTXT_H__
 #define __CS_AWS_AV3DTXT_H__
 
@@ -31,8 +32,7 @@ class csTextureManagerNull;
  * colormap. The private colormap is common for all mipmapped variants.
  * The colormap is stored inside the parent csTextureHandle object.
  */
-class csTextureNull :
-  public csTexture
+class csTextureNull : public csTexture
 {
 public:
   /// The bitmap
@@ -46,7 +46,7 @@ public:
 
   /// Create a csTexture object
   csTextureNull (csTextureHandle *Parent, iImage *Image) :
-  csTexture(Parent)
+  csTexture (Parent)
   {
     bitmap = 0;
     alphamap = 0;
@@ -57,7 +57,7 @@ public:
   }
 
   /// Destroy the texture
-  virtual~csTextureNull ()
+  virtual ~csTextureNull ()
   {
     delete[] bitmap;
     delete[] alphamap;
@@ -65,18 +65,17 @@ public:
   }
 
   /// Return a pointer to texture data
-  uint8 *get_bitmap ()  { return bitmap; }
+  uint8 *get_bitmap () { return bitmap; }
 
   /// Return a pointer to alpha map data
-  uint8 *get_alphamap ()  { return alphamap; }
+  uint8 *get_alphamap () { return alphamap; }
 };
 
 /**
  * csTextureHandleNull represents a texture and all its mipmapped
  * variants.
  */
-class csTextureHandleNull :
-  public csTextureHandle
+class csTextureHandleNull : public csTextureHandle
 {
 protected:
   /**
@@ -120,10 +119,10 @@ public:
   void remap_texture (csTextureManager *texman);
 
   /// Query the private texture colormap
-  csRGBpixel *GetColorMap ()  { return palette; }
+  csRGBpixel *GetColorMap () { return palette; }
 
   /// Query the number of colors in the colormap
-  int GetColorMapSize ()  { return palette_size; }
+  int GetColorMapSize () { return palette_size; }
 
   /// Query palette -> native format table
   void *GetPaletteToGlobal () { return pal2glob; }
@@ -148,7 +147,7 @@ public:
   virtual void GetOriginalDimensions (int& mw, int& mh, int &md)
   { mw = 0; mh = 0; md = 0;}
 
-  virtual void SetTextureTarget(int target) { }
+  virtual void SetTextureTarget (int target) { }
 #endif // CS_USE_NEW_RENDERER
 };
 
@@ -159,8 +158,7 @@ public:
  * a lot of work regarding palette management and the creation
  * of lots of lookup tables.
  */
-class csTextureManagerNull :
-  public csTextureManager
+class csTextureManagerNull : public csTextureManager
 {
 private:
   /// We need a pointer to the 2D driver
@@ -196,7 +194,8 @@ public:
   ///
   virtual void UnregisterTexture (csTextureHandleNull *handle);
 
-  virtual csPtr<iSuperLightmap> CreateSuperLightmap (int w, int)
+  virtual csPtr<iSuperLightmap> CreateSuperLightmap (int w, int h)
   { return 0; }
 };
+
 #endif // __CS_AWS_AV3DTXT_H__
