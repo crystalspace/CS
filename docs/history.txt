@@ -5,6 +5,10 @@ The history order has been reversed so that new features are at the top.
 	  it up for general use later (in WalkTest).
 	- Added 'loadrec' and 'saverec' commands to load and save
 	  a recording. VERY primitive now...
+	- Wouter Wijngaards improved the snow texture.
+	- Wouter also worked on the 3D quadtree (which is possibly
+	  going to be used for fast visibility).
+	- I decreased the snow particle size from 1 to .7.
 29-Jun-2000
 	- Added csOctree::GetLeaf() function that calculates the leaf where
 	  the given position is in.

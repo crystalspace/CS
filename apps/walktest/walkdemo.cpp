@@ -188,7 +188,7 @@ void add_particles_snow (csSector* sector, char* txtname, int num, float speed)
 
     csSnowParticleSystem* exp = new csSnowParticleSystem (
     	  Sys->view->GetWorld (), num,
-  	  txt, CS_FX_ADD, false, .1, .1,
+  	  txt, CS_FX_ADD, false, .07, .07,
 	  bbox.Min (), bbox.Max (),
 	  csVector3 (0, -speed, 0), .2);
     exp->MoveToSector (sector);
