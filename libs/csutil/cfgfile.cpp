@@ -243,6 +243,12 @@ IMPLEMENT_IBASE(csConfigFile);
   IMPLEMENTS_INTERFACE(iConfigFileNew);
 IMPLEMENT_IBASE_END;
 
+csConfigFile::csConfigFile(iBase *pBase)
+{
+  csConfigFile (NULL, NULL);
+  CONSTRUCT_IBASE (pBase);
+}
+  
 csConfigFile::csConfigFile(const char *file, iVFS *vfs)
 {
   CONSTRUCT_IBASE(NULL);
