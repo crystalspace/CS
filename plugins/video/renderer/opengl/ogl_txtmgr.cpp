@@ -219,10 +219,7 @@ void csTextureManagerOpenGL::Clear ()
   {
     csMaterialHandle *mat = materials.Get (i);
     UnregisterMaterial (mat);
-    mat->DecRef ();
   }
-
-  csTextureManager::Clear ();
 }
 
 void csTextureManagerOpenGL::read_config (iConfigFile *config)

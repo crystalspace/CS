@@ -267,6 +267,7 @@ csTextureManager::csTextureManager (iSystem* iSys, iGraphics2D *iG2D)
 csTextureManager::~csTextureManager()
 {
   Clear ();
+    printf("Texture manager now going bye byes...\n"); //@@@ Debugging. MHV
 }
 
 void csTextureManager::read_config (iConfigFile* /*config*/)
@@ -339,5 +340,14 @@ void csTextureManager::FreeMaterials ()
 {
   for (int i = 0; i < materials.Length (); i++)
     materials.Get (i)->FreeMaterial ();
+}
+
+//----------------------------------------------------------- csMatVector ----//
+
+bool csTextureManager::csMatVector::FreeTypedItem(csMaterialHandle *Item)
+{
+    Item->DecRef();
+    Item = NULL;
+    return true;
 }
 

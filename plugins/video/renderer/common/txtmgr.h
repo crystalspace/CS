@@ -20,6 +20,7 @@
 #define __TXTMGR_H__
 
 #include "csutil/csvector.h"
+#include "csutil/typedvec.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/material.h"
 #include "iengine/material.h"
@@ -317,16 +318,7 @@ protected:
   csTexVector textures;
 
   // Private class used to keep a list of objects derived from csMaterialHandle
-  class csMatVector : public csVector
-  {
-  public:
-    // Initialize the array
-    csMatVector (int iLimit, int iDelta) : csVector (iLimit, iDelta)
-    { }
-    // Shortcut to avoid typecasts
-    csMaterialHandle *Get (int index)
-    { return (csMaterialHandle *)csVector::Get (index); }
-  };
+  CS_DECLARE_TYPED_VECTOR_USERDELETE (csMatVector, csMaterialHandle);
 
   /// List of materials.
   csMatVector materials;

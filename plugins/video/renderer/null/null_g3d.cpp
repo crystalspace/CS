@@ -72,7 +72,8 @@ csGraphics3DNull::csGraphics3DNull (iBase *iParent) : G2D (NULL)
 csGraphics3DNull::~csGraphics3DNull ()
 {
   Close ();
-  delete texman;
+  texman->Clear();
+  texman->DecRef(); texman = NULL;
   if (G2D)
     G2D->DecRef ();
 }
@@ -175,6 +176,9 @@ void csGraphics3DNull::Close()
   if ((width == height) && (width == -1))
     return;
 
+  texman->Clear();
+  texman->DecRef(); texman = NULL;
+  
   G2D->Close ();
   width = height = -1;
 }

@@ -1235,7 +1235,8 @@ void csGraphics3DSoftwareCommon::Close ()
 
   delete tcache; tcache = NULL;
   if (clipper) { clipper->DecRef (); clipper = NULL; cliptype = CS_CLIPPER_NONE; }
-  delete texman; texman = NULL;
+  texman->Clear();
+  texman->DecRef(); texman = NULL;
 
   delete [] z_buffer; z_buffer = NULL;
   delete [] smaller_buffer; smaller_buffer = NULL;

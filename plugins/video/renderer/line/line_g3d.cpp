@@ -99,7 +99,8 @@ csGraphics3DLine::csGraphics3DLine (iBase *iParent) : G2D (NULL)
 csGraphics3DLine::~csGraphics3DLine ()
 {
   Close ();
-  delete texman;
+  texman->Clear();
+  texman->DecRef(); texman = NULL;
   if (G2D)
     G2D->DecRef ();
 }
@@ -202,6 +203,9 @@ void csGraphics3DLine::Close()
 {
   if ((width == height) && (width == -1))
     return;
+
+  texman->Clear();
+  texman->DecRef(); texman = NULL;
 
   if (clipper) { clipper->DecRef (); clipper = NULL; }
   G2D->Close ();

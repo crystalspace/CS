@@ -537,10 +537,8 @@ void csTextureManagerSoftware::Clear ()
   {
     csMaterialHandle *mat = materials.Get (i);
     UnregisterMaterial (mat);
-    mat->DecRef ();
   }
 
-  csTextureManager::Clear ();
   delete alpha_tables; alpha_tables = NULL;
 }
 

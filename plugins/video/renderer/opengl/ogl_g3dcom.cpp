@@ -847,7 +847,8 @@ void csGraphics3DOGLCommon::Close ()
     return;
 
   // we should remove all texture handles before we kill the graphics context
-  delete txtmgr; txtmgr = NULL;
+  txtmgr->Clear();
+  txtmgr->DecRef(); txtmgr = NULL;
   delete texture_cache; texture_cache = NULL;
   delete lightmap_cache; lightmap_cache = NULL;
   if (clipper)

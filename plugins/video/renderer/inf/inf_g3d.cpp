@@ -110,7 +110,8 @@ csGraphics3DInfinite::csGraphics3DInfinite (iBase *iParent) :
 csGraphics3DInfinite::~csGraphics3DInfinite ()
 {
   Close ();
-  delete texman;
+  texman->Clear();
+  texman->DecRef(); texman = NULL;
   if (G2D) G2D->DecRef ();
 }
 
@@ -206,6 +207,9 @@ void csGraphics3DInfinite::Close()
     printf ("   Pixels DrawPolygon: %d\n", (int)pixels_drawn);
     printf ("   Pixels DrawPolygonFX: %d\n", (int)pixels_drawn_fx);
   }
+
+  texman->Clear();
+  texman->DecRef(); texman = NULL;
 
   if ((width == height) && (width == -1))
     return;
