@@ -198,7 +198,7 @@ void csBugPlug::HideSpider (iCamera* camera)
   if (camera)
   {
     char buf[80];
-    System->Printf (CS_MSG_CONSOLE, "Spider catched a camera!\n");
+    System->Printf (CS_MSG_CONSOLE, "Spider caught a camera!\n");
     switch (spider_command)
     {
       case DEBUGCMD_DUMPCAM:
@@ -259,25 +259,29 @@ void csBugPlug::MouseButton2 (iCamera*)
 void csBugPlug::MouseButton3 (iCamera* camera)
 {
   csVector3 v;
-  csVector2 p (mouse_x, mouse_y);
+  // Setup perspective vertex, invert mouse Y axis.
+  csVector2 p (mouse_x, camera->GetShiftY() * 2 - mouse_y);
 
   camera->InvPerspective (p, 1, v);
   csVector3 vw = camera->GetTransform ().This2Other (v);
 
   iSector* sector = camera->GetSector ();
   csVector3 origin = camera->GetTransform ().GetO2TTranslation ();
-  csVector3 isect;
-  sector->HitBeam (origin, origin + (vw-origin) * 60, isect);
-  iObject* sel = sector->HitBeam (origin, origin + (vw-origin) * 60, NULL);
+  csVector3 isect, end = origin + (vw - origin) * 60;
+
+  sector->HitBeam (origin, end, isect);
+  iObject* sel = sector->HitBeam (origin, end, isect, NULL);
 
   vw = isect;
   v = camera->GetTransform ().Other2This (vw);
+#ifdef CS_DEBUG
   System->Printf (CS_MSG_CONSOLE,
     "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)\n",
     v.x, v.y, v.z, vw.x, vw.y, vw.z);
   System->Printf (CS_MSG_DEBUG_0,
     "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)\n",
     v.x, v.y, v.z, vw.x, vw.y, vw.z);
+#endif
 
   if (sel)
   {
@@ -298,10 +302,12 @@ void csBugPlug::MouseButton3 (iCamera* camera)
       const char* n = selected_mesh->QueryObject ()->GetName ();
       System->Printf (CS_MSG_CONSOLE, "BugPlug found mesh '%s'!\n",
       	n ? n : "<noname>");
-      bool bbox, rad;
-      shadow->GetShowOptions (bbox, rad);
+      bool bbox, rad, bm;
+      shadow->GetShowOptions (bbox, rad, bm);
       shadow->SetShadowMesh (selected_mesh);
-      if (bbox || rad)
+
+	  shadow->SetBeam(origin, end, isect);
+      if (bbox || rad || bm)
 	shadow->AddToEngine (Engine);
       else
 	shadow->RemoveFromEngine (Engine);
@@ -587,14 +593,14 @@ bool csBugPlug::EatKey (iEvent& event)
         break;
       case DEBUGCMD_MESHBBOX:
 	{
-	  bool bbox, rad;
-	  shadow->GetShowOptions (bbox, rad);
+	  bool bbox, rad, bm;
+	  shadow->GetShowOptions (bbox, rad, bm);
           bbox = !bbox;
 	  System->Printf (CS_MSG_CONSOLE,
 	    	"BugPlug %s bounding box display.\n",
 		bbox ? "enabled" : "disabled");
-	  shadow->SetShowOptions (bbox, rad);
-	  if ((bbox || rad) && selected_mesh)
+	  shadow->SetShowOptions (bbox, rad, bm);
+	  if ((bbox || rad || bm) && selected_mesh)
 	    shadow->AddToEngine (Engine);
 	  else
 	    shadow->RemoveFromEngine (Engine);
@@ -602,14 +608,14 @@ bool csBugPlug::EatKey (iEvent& event)
         break;
       case DEBUGCMD_MESHRAD:
         {
-	  bool bbox, rad;
-	  shadow->GetShowOptions (bbox, rad);
+	  bool bbox, rad, bm;
+	  shadow->GetShowOptions (bbox, rad, bm);
           rad = !rad;
 	  System->Printf (CS_MSG_CONSOLE,
 	    	"BugPlug %s bounding sphere display.\n",
 		rad ? "enabled" : "disabled");
-	  shadow->SetShowOptions (bbox, rad);
-	  if ((bbox || rad) && selected_mesh)
+	  shadow->SetShowOptions (bbox, rad, bm);
+	  if ((bbox || rad || bm) && selected_mesh)
 	    shadow->AddToEngine (Engine);
 	  else
 	    shadow->RemoveFromEngine (Engine);

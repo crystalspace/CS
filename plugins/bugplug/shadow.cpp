@@ -38,6 +38,8 @@ csShadow::csShadow ()
   shadow_mesh = NULL;
   do_bbox = true;
   do_rad = true;
+  do_beam = true;
+  beam[0] = beam[1] = isec = csVector3();
 }
 
 csShadow::~csShadow ()
@@ -71,7 +73,8 @@ bool csShadow::Draw (iRenderView* rview, iMovable*, csZBufMode)
   iGraphics3D* G3D = rview->GetGraphics3D ();
   G3D->BeginDraw (CSDRAW_2DGRAPHICS);
 
-  csReversibleTransform tr_o2c = rview->GetCamera ()->GetTransform ()
+  csTransform tr_w2c = rview->GetCamera ()->GetTransform ();
+  csReversibleTransform tr_o2c = tr_w2c 
     	* shadow_movable->GetFullTransform ().GetInverse ();
   float fov = G3D->GetPerspectiveAspect ();
   if (do_bbox)
@@ -113,7 +116,17 @@ bool csShadow::Draw (iRenderView* rview, iMovable*, csZBufMode)
     r.Set (0, 0, radius.z);
     G3D->DrawLine (trans_o-r, trans_o+r, fov, rad_color);
   }
-
+  if (do_beam)
+  {
+	int beam_color = G3D->GetTextureManager ()->FindRGB (0, 255, 0);
+	int isec_color = G3D->GetTextureManager ()->FindRGB (255, 255, 0);
+	int isec2_color = G3D->GetTextureManager ()->FindRGB (255, 0, 0);
+	csVector3 st = tr_w2c * beam[0], fin = tr_w2c * beam[1], 
+	  isc = tr_w2c * isec;
+	G3D->DrawLine( st, isc, fov, isec_color);
+	G3D->DrawLine( st, fin, fov, beam_color);
+	G3D->DrawLine( isc, fin, fov, isec2_color);
+  }
   G3D->BeginDraw (CSDRAW_3DGRAPHICS);
   return true;
 }

@@ -31,6 +31,8 @@
 #include "iengine/light.h"
 #include "qsqrt.h"
 
+//#define BALL_DEBUG
+
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csBallMeshObject)
@@ -582,7 +584,7 @@ bool csBallMeshObject::HitBeamObject(const csVector3& start,
   // @@@ We might consider checking to a lower LOD version only.
   // This function is not very fast if the bounding box test succeeds.
   // Plagarism notice: Ripped form Sprite3D.
-#ifdef CS_DEBUG
+#ifdef BALL_DEBUG
   printf("Ball:Hit Beam Object\n");
   printf("Debug:\n");
   printf("Segment: (%f,%f,%f) to (%f,%f,%f)\n",start.x,start.y,start.z,
@@ -612,7 +614,7 @@ bool csBallMeshObject::HitBeamObject(const csVector3& start,
         *pr = qsqrt (csSquaredDist::PointPoint (start, isect) /
 		csSquaredDist::PointPoint (start, end));
       }
-#ifdef CS_DEBUG
+#ifdef BALL_DEBUG
       printf("Ball:Hit Beam Object: HIT! intersect : (%f,%f,%f)\n",
         isect.x, isect.y, isect.z);
 #endif

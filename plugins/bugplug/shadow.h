@@ -48,6 +48,9 @@ private:
   iMeshWrapper* shadow_mesh;
   bool do_bbox;	// Show bounding box.
   bool do_rad;	// Show bounding sphere.
+  bool do_beam; // Show the intersection beam.
+  csVector3 beam[2];
+  csVector3 isec;
 
 public:
   csShadow ();
@@ -71,19 +74,28 @@ public:
   /**
    * Set what we are showing.
    */
-  void SetShowOptions (bool bbox, bool rad)
+  void SetShowOptions (bool bbox, bool rad, bool beam)
   {
     do_bbox = bbox;
     do_rad = rad;
+	do_beam = beam;
   }
 
   /**
    * Get what we are showing.
    */
-  void GetShowOptions (bool& bbox, bool& rad) const
+  void GetShowOptions (bool& bbox, bool& rad, bool& beam) const
   {
     bbox = do_bbox;
     rad = do_rad;
+	beam = do_beam;
+  }
+
+  void SetBeam( csVector3& start, csVector3& finish, csVector3& intersect )
+  {
+	beam[0] = start;
+	beam[1] = finish;
+	isec = intersect;
   }
 
   SCF_DECLARE_IBASE;

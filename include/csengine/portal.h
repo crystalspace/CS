@@ -198,7 +198,7 @@ public:
    * Optionally returns the polygon in 'polygonPtr'.
    */
   csObject* HitBeam (const csVector3& start, const csVector3& end,
-  	csPolygon3D** polygonPtr);
+  	csVector3& isect, csPolygon3D** polygonPtr);
 
   /**
    * Check if the destination sector is NULL and if so call

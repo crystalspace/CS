@@ -145,7 +145,7 @@ struct iSector : public iBase
    * If polygonPtr is null then the polygon will not be filled in.
    */
   virtual iObject* HitBeam (const csVector3& start, const csVector3& end,
-  	iPolygon3D** polygonPtr) = 0;
+  	csVector3& intersect, iPolygon3D** polygonPtr) = 0;
 
   /**
    * Follow a segment starting at this sector. If the segment intersects

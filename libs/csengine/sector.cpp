@@ -340,12 +340,11 @@ csPolygon3D* csSector::HitBeam (const csVector3& start, const csVector3& end,
   else return NULL;
 }
 
-csObject* csSector::HitBeam (const csVector3& start, const csVector3& end,
+csObject* csSector::HitBeam (const csVector3& start, const csVector3& end, csVector3& isect,
 	csPolygon3D** polygonPtr)
 {
   float r, best_mesh_r = 10000000000.;
   csMeshWrapper* near_mesh = NULL;
-  csVector3 isect;
 
   // First check all meshes in this sector.
   int i;
@@ -372,7 +371,7 @@ csObject* csSector::HitBeam (const csVector3& start, const csVector3& end,
     {
       draw_busy++;
       csVector3 new_start = isect;
-      csObject* obj = po->HitBeam (new_start, end, polygonPtr);
+      csObject* obj = po->HitBeam (new_start, end, isect, polygonPtr);
       draw_busy--;
       return obj;
     }
@@ -1198,10 +1197,10 @@ iPolygon3D* csSector::eiSector::HitBeam (const csVector3& start,
 }
 
 iObject* csSector::eiSector::HitBeam (const csVector3& start,
-	const csVector3& end, iPolygon3D** polygonPtr)
+	const csVector3& end, csVector3& isect, iPolygon3D** polygonPtr)
 {
   csPolygon3D* p = NULL;
-  csObject* obj = scfParent->HitBeam (start, end, polygonPtr ? &p : NULL);
+  csObject* obj = scfParent->HitBeam (start, end, isect, polygonPtr ? &p : NULL);
   if (obj)
   {
     if (p)

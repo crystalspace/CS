@@ -333,7 +333,7 @@ public:
    * filled with the polygon that was hit.
    * If polygonPtr is null then the polygon will not be filled in.
    */
-  csObject* HitBeam (const csVector3& start, const csVector3& end,
+  csObject* HitBeam (const csVector3& start, const csVector3& end, csVector3& intersect,
   	csPolygon3D** polygonPtr);
 
   /**
@@ -523,7 +523,7 @@ public:
     virtual iPolygon3D* HitBeam (const csVector3& start, const csVector3& end,
   	csVector3& isect);
     virtual iObject* HitBeam (const csVector3& start, const csVector3& end,
-  	iPolygon3D** polygonPtr);
+  	csVector3& intersect, iPolygon3D** polygonPtr);
     virtual iSector* FollowSegment (csReversibleTransform& t,
   	csVector3& new_position, bool& mirror);
   } scfiSector;
