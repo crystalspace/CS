@@ -1007,6 +1007,15 @@ public:
   	const char* name, const char* loaderClassId,
 	iDataBuffer* input, iSector* sector, const csVector3& pos);
 
+  // For portal containers.
+  virtual csPtr<iMeshWrapper> CreatePortalContainer (const char* name,
+  	iSector* sector = 0, const csVector3& pos = csVector3 (0, 0, 0));
+  virtual csPtr<iMeshWrapper> CreatePortal (
+  	iMeshWrapper* parentMesh, iSector* destSector);
+  virtual csPtr<iMeshWrapper> CreatePortal (
+  	iSector* sourceSector, const csVector3& pos,
+	iSector* destSector);
+
   virtual iClipper2D* GetTopLevelClipper () const;
 
   /// Set the amount of ambient light

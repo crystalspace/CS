@@ -143,7 +143,7 @@ struct iRenderLoop;
 #define CS_RENDPRI_FRONT2BACK 2
 /** @} */
 
-SCF_VERSION (iEngine, 0, 21, 0);
+SCF_VERSION (iEngine, 0, 22, 0);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -309,7 +309,7 @@ struct iEngine : public iBase
 
   /**
    * Create a base material that can be used to give to the texture
-   * manager. Assign to a csRef or use DecRef().
+   * manager. Assign to a csRef.
    * \param txt The texture map this material will use.
    * \note You will need to call iMaterialWrapper::Register() and 
    * iMaterialWrapper::GetMaterialHandler()->Prepare() on you new material
@@ -320,7 +320,7 @@ struct iEngine : public iBase
   /**
    * Create a base material that can be used to give to the texture
    * manager. This version also supports texture layers.
-   * Assign to a csRef or use DecRef().
+   * Assign to a csRef.
    * \param txt the base texture (lowermost texture layer)
    * \param num_layers the number of texture layers supplid in 
    * the next parameter
@@ -383,7 +383,7 @@ struct iEngine : public iBase
    * it will have #CS_ZBUF_FILL set (so that the Z-buffer will be filled
    * by the polygons of this object) and have 'wall' as render
    * priority. This version creates a mesh wrapper.
-   * Assign to a csRef or use DecRef().
+   * Assign to a csRef.
    * \param sector the sector to add walls to
    * \param name the engine name of the walls mesh that will be created
    */
@@ -395,7 +395,7 @@ struct iEngine : public iBase
    * This mesh will have #CS_ZBUF_USE set (use Z-buffer fully)
    * and have 'object' as render priority. This means this function
    * is useful for general objects.
-   * Assign to a csRef or use DecRef().
+   * Assign to a csRef.
    * \param sector the sector to add the object to
    * \param name the engine name of the mesh that will be created
    */
@@ -643,13 +643,13 @@ struct iEngine : public iBase
 
   /**
    * Create a new camera.
-   * Assign to a csRef or use DecRef().
+   * Assign to a csRef.
    */
   virtual csPtr<iCamera> CreateCamera () = 0;
 
   /**
    * Create a static/pseudo-dynamic light.
-   * Assign to a csRef or use DecRef().
+   * Assign to a csRef.
    * \param name the engine name for this light (may be 0)
    * \param pos the position of this light in world coordinates
    * \param radius the maximum distance at which this light will affect
@@ -676,7 +676,7 @@ struct iEngine : public iBase
 
   /**
    * Create an iterator to iterate over all static lights of the engine.
-   * Assign to a csRef or use DecRef().
+   * Assign to a csRef.
    * \param region only iterate over the lights in this region                     * (otherwise iterate over all lights)
    */
   virtual csPtr<iLightIterator> GetLightIterator (iRegion* region = 0) = 0;
@@ -735,17 +735,17 @@ struct iEngine : public iBase
 
   /**
    * Create a mesh factory wrapper for an existing mesh factory
-   * Assign to a csRef or use DecRef().
+   * Assign to a csRef.
    * \param factory the mesh factory to be wrapped, the engine doesn't
    * "know" about a mesh factory until associated with a FactoryWrapper
    * \param name the engine name for the factory wrapper
    */
-  virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (iMeshObjectFactory * factory,
-  	const char* name) = 0;
+  virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (
+  	iMeshObjectFactory * factory, const char* name) = 0;
 
   /**
    * Create an uninitialized mesh factory wrapper
-   * Assign to a csRef or use DecRef().
+   * Assign to a csRef.
    * \param name the engine name for the factory wrapper
    */
   virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (const char* name) = 0;
@@ -756,7 +756,7 @@ struct iEngine : public iBase
    * \param region optional loader region
    * \param curRegOnly if region is valid and and curRegOnly is true 
    * then only that region will be searched. 
-   * Assign to a csRef or use DecRef().
+   * Assign to a csRef.
    */
   virtual csPtr<iLoaderContext> CreateLoaderContext (
   	iRegion* region = 0, bool curRegOnly = true) = 0;
@@ -766,7 +766,7 @@ struct iEngine : public iBase
    * \param name engine name for the mesh factory
    * \param loaderClassId the SCF class name of the desired mesh factory plugin
    * \param input data to initialize the mesh factory (plugin-specific)
-   * Assign to a csRef or use DecRef().
+   * Assign to a csRef.
    */
   virtual csPtr<iMeshFactoryWrapper> LoadMeshFactory (
   	const char* name, const char* loaderClassId,
@@ -782,12 +782,12 @@ struct iEngine : public iBase
    * \param sector the sector to initially place this mesh in
    * If 'sector' is 0 then the mesh object will not be set to a position.
    * \param pos the position in the sector
-   * \return The meshwrapper on success (assign to a csRef or use DecRef()),
+   * \return The meshwrapper on success (assign to a csRef),
    * or 0 on failure.
    */
   virtual csPtr<iMeshWrapper> CreateMeshWrapper (iMeshFactoryWrapper* factory,
   	const char* name, iSector* sector = 0,
-	const csVector3& pos = csVector3(0, 0, 0)) = 0;
+	const csVector3& pos = csVector3 (0, 0, 0)) = 0;
 
   /**
    * Create a mesh wrapper for an existing mesh object.
@@ -798,12 +798,12 @@ struct iEngine : public iBase
    * \param sector the sector to initially place this mesh in
    * If 'sector' is 0 then the mesh object will not be set to a position.
    * \param pos the position in the sector
-   * \return The meshwrapper on success (assign to a csRef or use DecRef()),
+   * \return The meshwrapper on success (assign to a csRef),
    * or 0 on failure.
    */
   virtual csPtr<iMeshWrapper> CreateMeshWrapper (iMeshObject* meshobj,
   	const char* name, iSector* sector = 0,
-	const csVector3& pos = csVector3(0, 0, 0)) = 0;
+	const csVector3& pos = csVector3 (0, 0, 0)) = 0;
 
   /**
    * Create a mesh wrapper from a class id.
@@ -821,16 +821,16 @@ struct iEngine : public iBase
    * \param sector the sector to initially place this mesh in
    * If 'sector' is 0 then the mesh object will not be set to a position.
    * \param pos the position in the sector
-   * \return The meshwrapper on success (assign to a csRef or use DecRef()),
+   * \return The meshwrapper on success (assign to a csRef),
    * or 0 on failure.
    */
   virtual csPtr<iMeshWrapper> CreateMeshWrapper (const char* classid,
   	const char* name, iSector* sector = 0,
-	const csVector3& pos = csVector3(0, 0, 0)) = 0;
+	const csVector3& pos = csVector3 (0, 0, 0)) = 0;
 
   /**
    * Create an uninitialized mesh wrapper
-   * Assign to a csRef or use DecRef().
+   * Assign to a csRef.
    */
   virtual csPtr<iMeshWrapper> CreateMeshWrapper (const char* name) = 0;
 
@@ -845,12 +845,59 @@ struct iEngine : public iBase
    * \param sector the sector to initially place this mesh in
    * If 'sector' is 0 then the mesh object will not be set to a position.
    * \param pos the position in the sector
-   * \return The meshwrapper on success (assign to a csRef or use DecRef()),
+   * \return The meshwrapper on success (assign to a csRef),
    * or 0 on failure.
    */
   virtual csPtr<iMeshWrapper> LoadMeshWrapper (
   	const char* name, const char* loaderClassId,
 	iDataBuffer* input, iSector* sector, const csVector3& pos) = 0;
+
+  /**
+   * Create an empty portal container in some sector. Use this portal
+   * container to create portals to other sectors. Use SCF_QUERY_INTERFACE with
+   * iPortalContainer on the mesh object inside the returned mesh to
+   * control the portals.
+   * \param name of the portal mesh.
+   * \param sector is the location of the portal object and not the sector
+   * the portals will point too. If not given then the portal container is
+   * not put in any mesh.
+   * \param pos is an optional position inside the sector (if given).
+   * \return The meshwrapper on success (assign to a csRef),
+   * or 0 on failure.
+   */
+  virtual csPtr<iMeshWrapper> CreatePortalContainer (const char* name,
+  	iSector* sector = 0, const csVector3& pos = csVector3 (0, 0, 0)) = 0;
+
+  /**
+   * Conveniance function to create a portal from one sector to another
+   * and make this portal a child mesh of another mesh. Use SCF_QUERY_INTERFACE
+   * with iPortalContainer on the returned mesh for more control over the
+   * portal(s) in the portal object.
+   * \param parentMesh is the mesh where the portal container will be placed
+   * as a child.
+   * \param destSector is the sector where the single portal that is created
+   * inside the portal object will point too.
+   * \return The meshwrapper on success (assign to a csRef),
+   * or 0 on failure.
+   */
+  virtual csPtr<iMeshWrapper> CreatePortal (
+  	iMeshWrapper* parentMesh, iSector* destSector) = 0;
+
+  /**
+   * Conveniance function to create a portal from one sector to another.
+   * Use SCF_QUERY_INTERFACE with iPortalContainer on the returned mesh for
+   * more control over the portal(s) in the portal object.
+   * \param sourceSector is the sector where the portal container will be
+   * placed.
+   * \param pos is the position inside that sector.
+   * \param destSector is the sector where the single portal that is created
+   * inside the portal object will point too.
+   * \return The meshwrapper on success (assign to a csRef),
+   * or 0 on failure.
+   */
+  virtual csPtr<iMeshWrapper> CreatePortal (
+  	iSector* sourceSector, const csVector3& pos,
+	iSector* destSector) = 0;
 
   /**
    * Draw the 3D world given a camera and a clipper. Note that
@@ -925,7 +972,7 @@ struct iEngine : public iBase
   /**
    * This routine returns an iterator to iterate over
    * all nearby sectors.
-   * Assign to a csRef or use DecRef().
+   * Assign to a csRef.
    */
   virtual csPtr<iSectorIterator> GetNearbySectors (iSector* sector,
   	const csVector3& pos, float radius) = 0;

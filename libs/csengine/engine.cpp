@@ -36,6 +36,7 @@
 #include "csengine/region.h"
 #include "csengine/radiosty.h"
 #include "csengine/objwatch.h"
+#include "csengine/portalcontainer.h"
 #include "iengine/portal.h"
 #include "csgeom/fastsqrt.h"
 #include "csgeom/sphere.h"
@@ -3220,6 +3221,34 @@ csPtr<iMeshWrapper> csEngine::LoadMeshWrapper (
   csRef<iMeshObject> mof2 (SCF_QUERY_INTERFACE (mof, iMeshObject));
   meshwrap->SetMeshObject (mof2);
   return csPtr<iMeshWrapper> (imw);
+}
+
+
+csPtr<iMeshWrapper> csEngine::CreatePortalContainer (const char* name,
+  	iSector* sector, const csVector3& pos)
+{
+  csPortalContainer* pc = new csPortalContainer (this);
+  csRef<iMeshWrapper> mesh = CreateMeshWrapper ((iMeshObject*)pc,
+  	name, sector, pos);
+  pc->DecRef ();
+  return csPtr<iMeshWrapper> (mesh);
+}
+
+csPtr<iMeshWrapper> csEngine::CreatePortal (
+  	iMeshWrapper* parentMesh, iSector* destSector)
+{
+  csRef<iMeshWrapper> mesh = CreatePortalContainer (0);
+  /* @@@ TODO */
+  return csPtr<iMeshWrapper> (mesh);
+}
+
+csPtr<iMeshWrapper> csEngine::CreatePortal (
+  	iSector* sourceSector, const csVector3& pos,
+	iSector* destSector)
+{
+  csRef<iMeshWrapper> mesh = CreatePortalContainer (0, sourceSector, pos);
+  /* @@@ TODO */
+  return csPtr<iMeshWrapper> (mesh);
 }
 
 csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (

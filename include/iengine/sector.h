@@ -219,11 +219,11 @@ struct iSector : public iBase
    */
   virtual const csSet<iMeshWrapper*>& GetPortalMeshes () const = 0;
   /**
-   * Register a mesh with a portal.
+   * Register a mesh with a portal. @@@ TO BE REMOVED...
    */
   virtual void RegisterPortalMesh (iMeshWrapper* mesh) = 0;
   /**
-   * Unregister a mesh with a portal.
+   * Unregister a mesh with a portal. @@@ TO BE REMOVED...
    */
   virtual void UnregisterPortalMesh (iMeshWrapper* mesh) = 0;
 };
