@@ -299,21 +299,26 @@ public:
   /// Dispatches events to the proper components
   virtual bool HandleEvent(iEvent&)=0;
 
-  /// Set the contexts however you want
-  virtual void SetCanvas(iAwsCanvas *newCanvas)=0;
+  /** Sets up the canvas to draw on.
+   * @param newCanvas The canvas to draw on.  If this parameter is NULL, then g2d and g3d MUST be present.  AWS will use them to create a default, direct to screen canvas. 
+   * @param g2d A pointer to a valid iGraphics2D instance. (If newCanvas is NOT null, this param may be ommitted.)
+   * @param g3d A pointer to a valid iGraphics3D instance. (If newCanvas is NOT null, this param may be ommitted.)
+   * @return True if everything works, False otherwise.  If this function returns False AWS will NOT work.
+   */
+  virtual bool SetupCanvas(iAwsCanvas *newCanvas, iGraphics2D *g2d=NULL, iGraphics3D *g3d=NULL)=0;
 
   /// Get the current context
   virtual iAwsCanvas* GetCanvas()=0;
 
   /// Create a default canvas, covering the whole screen
-  virtual iAwsCanvas *CreateDefaultCanvas(iEngine* engine, iTextureManager* txtmgr)=0;
+  //virtual iAwsCanvas *CreateDefaultCanvas(iEngine* engine, iTextureManager* txtmgr)=0;
 
   /// Create a default canvas, just a single proctex
-  virtual iAwsCanvas *CreateDefaultCanvas(iEngine* engine, iTextureManager* txtmgr,
-    int width, int height, const char *name)=0;
+  //virtual iAwsCanvas *CreateDefaultCanvas(iEngine* engine, iTextureManager* txtmgr,
+  //  int width, int height, const char *name)=0;
 
   /// Create a canvas that uses custom graphics devices
-  virtual iAwsCanvas *CreateCustomCanvas(iGraphics2D *g2d, iGraphics3D *g3d)=0;
+  //virtual iAwsCanvas *CreateCustomCanvas(iGraphics2D *g2d, iGraphics3D *g3d)=0;
 
   /// Get the iGraphics2D interface so that components can use it.
   virtual iGraphics2D *G2D()=0;
