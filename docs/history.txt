@@ -30,6 +30,8 @@ chronological order.
 	      visible ones.
 	    - Speed up pvscalc a bit more by testing more beams
 	      before doing the expensive calculations.
+	- Jorrit made precache default in walktest. There is now a
+	  -noprecache option to disable it.
 14-Feb-2005
 	- Chris made the minimum polygon UV determinant into a #define
 	  so that it would be more amenable to experimentation. 

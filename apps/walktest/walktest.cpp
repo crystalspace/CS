@@ -283,7 +283,7 @@ void WalkTest::Help ()
   printf ("  -[no]logo          draw logo (default '%slogo')\n", do_logo ? "" : "no");
   printf ("  -regions           load every map in a separate region (default off)\n");
   printf ("  -dupes             check for duplicate objects in multiple maps (default off)\n");
-  printf ("  -precache          after loading precache to speed up rendering (default off)\n");
+  printf ("  -noprecache        after loading don't precache to speed up rendering\n");
   printf ("  -infinite          special infinite level generation (ignores map file!)\n");
   printf ("  -bots              allow random generation of bots\n");
   printf ("  <path>             load map from VFS <path> (default '%s')\n",
@@ -1431,7 +1431,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
       delete meter;
     }
 
-    if (cmdline->GetOption ("precache"))
+    if (!cmdline->GetOption ("noprecache"))
     {
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Precaching all things...");
       Engine->PrecacheDraw ();
