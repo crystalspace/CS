@@ -876,8 +876,6 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
     currentFrame);
   meshes.SetLength (GetCurveCount(), 0);
 
-  iGraphics3D* g3d = rview->GetGraphics3D ();
-  
   csCurve *c;
   for (i = 0; i < GetCurveCount (); i++)
   {

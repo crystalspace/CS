@@ -379,7 +379,7 @@ void ImageTgaFile::TgaLoader::get_pixel (uint8*& iBuffer, csRGBpixel* dest,
 					 int Size, bool alpha)
 {
   //int Red, Grn, Blu, Alpha;
-  unsigned int l;
+  unsigned int l = 0;
   unsigned char j, k;
 
   /* Check if run length encoded. */

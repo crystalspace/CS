@@ -1823,7 +1823,6 @@ void csChunkLodTerrainObject::MeshTreeNodeRBA::PreGetBuffer
 {
   if (!holder) return;
   csChunkLodTerrainObject* obj = wrapper->obj;
-  csChunkLodTerrainFactory* factory = obj->pFactory;
   if (buffer == CS_BUFFER_COLOR)
   {
     if (!colorBuffer || (colorVersion != obj->colorVersion))

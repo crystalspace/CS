@@ -170,7 +170,7 @@ bool csGeneralFactoryLoader::ParseRenderBuffer(iDocumentNode *node,
   if (!buf.IsValid()) return false;
 
   size_t rbElem = buf->GetElementCount();
-  if (state->GetVertexCount() != rbElem)
+  if ((size_t)state->GetVertexCount() != rbElem)
   {
     synldr->ReportError ("crystalspace.genmeshfactoryloader.parse",
       node, "Render buffer vertex count(%u) different from "
@@ -686,7 +686,7 @@ bool csGeneralMeshLoader::ParseRenderBuffer(iDocumentNode *node,
   if (!buf.IsValid()) return false;
 
   size_t rbElem = buf->GetElementCount();
-  if (factstate->GetVertexCount() != rbElem)
+  if ((size_t)factstate->GetVertexCount() != rbElem)
   {
     synldr->ReportError ("crystalspace.genmeshloader.parse",
       node, "Render buffer vertex count(%u) different from "

@@ -272,7 +272,6 @@ void csGLVBOBufferManager::AttachBuffer (csGLVBOBufferSlot *slot,
   slot->renderBufferPtr = buffer;
   auxData.vboSlot = slot;
   auxData.vbooffset = slot->offset;
-  const csRenderBufferComponentType componentType = buffer->GetComponentType();
   bufferData.PutUnique (buffer, auxData);
 }
 
@@ -539,7 +538,7 @@ csGLVBOBufferSlot* csGLVBOBufferManager::csGLVBOBuffer::FindEmptySlot (
           
           //try to find blocksToMerge blocks after eachother
           size_t blocksize = GetSizeFromIndex (minIdx);
-          int slotsFound = 1, sortSlotidx = -1;
+          int sortSlotidx = -1;
           uint j = 0;
 
           csGLVBOBufferSlot* tmpSlot = slots[minIdx].head;
@@ -556,28 +555,28 @@ csGLVBOBufferSlot* csGLVBOBufferManager::csGLVBOBuffer::FindEmptySlot (
               for (j = 0; j<sortList.Length (); j++)
               {
                 SlotSortStruct *t = sortList[j];
-                if (tmpSlot->offset == (sortList[j]->lastOffset+blocksize))
+                if (tmpSlot->offset == (t->lastOffset+blocksize))
                 {
                   //follows directly
-                  sortList[j]->lastOffset = tmpSlot->offset;
-                  sortList[j]->slotList.Push (tmpSlot);
+                  t->lastOffset = tmpSlot->offset;
+                  t->slotList.Push (tmpSlot);
                   handled = true;
                 }
-                if (tmpSlot->offset == (sortList[j]->firstOffset-blocksize))
+                if (tmpSlot->offset == (t->firstOffset-blocksize))
                 {
                   //follows directly
-                  sortList[j]->firstOffset = tmpSlot->offset;
-                  sortList[j]->slotList.Push (tmpSlot);
+                  t->firstOffset = tmpSlot->offset;
+                  t->slotList.Push (tmpSlot);
                   handled = true;
                 }
                 
-                if (sortList[j]->slotList.Length ()>=blocksToMerge)
+                if (t->slotList.Length ()>=blocksToMerge)
                 {
                   sortSlotidx = j;
                   break;
                 }
 
-                if (tmpSlot->offset < sortList[j]->firstOffset ||handled) break;
+                if (tmpSlot->offset < t->firstOffset ||handled) break;
               }
 
               //ok, don't follow, add it to a new pile

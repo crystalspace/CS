@@ -42,6 +42,8 @@ chronological order.
 	  coverage. (Unfortunately, we can not use -ansi and -pedantic globally
 	  since CS relies upon some language features, such as `long long',
 	  which are not part of the present standard.)
+	- Eric Sunshine eliminated a number of compilation warnings throughout
+	  the project.
 2-Mar-2005
 	- Jorrit changed pvscalc to use the Description() method to print
 	  out boxes and vectors instead of the ugly B2F and other macros.
