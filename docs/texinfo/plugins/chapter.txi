@@ -32,7 +32,6 @@ information you need in the introduction to the simple tutorial
 * Network Drivers::
 * csEngine:: The 3D Engine (@code{csEngine})
 * csParser:: The Map File Parser (@code{csParser})
-* XML File Format:: Format of Map File (XML)
 * MeshObject:: Mesh Object Plug-In System
 * Scripting Languages::
 * Animation::

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MeshObject, Scripting Languages, XML File Format, Plug-In Drivers
+@node MeshObject, Scripting Languages, csParser, Plug-In Drivers
 @section Mesh Object Plug-In System
 @cindex MeshObject Plug-In
 @cindex Plug-In, MeshObject

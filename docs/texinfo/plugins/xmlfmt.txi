@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
-@node XML File Format, MeshObject, csParser, Plug-In Drivers
-@section Format of Map File (XML)
+@node XML File Format, Old Map File Format, csParser, csParser
+@subsection Format of Map File (XML)
 @cindex Format of Map File
 @cindex Map File Format
 @cindex XML
@@ -34,7 +34,6 @@ It deals strictly with plain-text @sc{xml}-format files.
 * XML World Element Section:: World Element Section
 * XML World Definition Section:: World Definition Section
 * XML Action Section:: Action Section
-* Old Map File Format:: Old Format of Map File
 @end menu
 
 @subsubheading Basic Structure
@@ -89,7 +88,7 @@ triggers are used to define interactions and other special actions on
 objects and other objects in the world.
 
 @node XML Init Section, XML World Element Section, XML File Format, XML File Format
-@subsection Initalization Section
+@subsubsection Initalization Section
 
 This section describes the initialization section.
 
@@ -371,7 +370,7 @@ essentially adding information to the engine class. Here is an example:
 @end example
 
 @node XML World Element Section, XML World Definition Section, XML Init Section, XML File Format
-@subsection World Element Section
+@subsubsection World Element Section
 
 This section describes the world element section.
 
@@ -490,7 +489,7 @@ define mesh objects you can create them from that factory. In case of
 Mesh factories can contain keys and addons.
 
 @node XML World Definition Section, XML Action Section, XML World Element Section, XML File Format
-@subsection World Definition Section
+@subsubsection World Definition Section
 
 This section describes the world definition section.
 
@@ -642,8 +641,8 @@ Here is an example collection:
 
 Collections can also contain keys.
 
-@node XML Action Section, Old Map File Format, XML World Definition Section, XML File Format
-@subsection Action Section
+@node XML Action Section, , XML World Definition Section, XML File Format
+@subsubsection Action Section
 
 This section describes the action section.
 
