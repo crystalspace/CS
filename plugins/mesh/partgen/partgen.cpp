@@ -93,6 +93,9 @@ csParticleSystem::~csParticleSystem()
 {
   if (vis_cb) vis_cb->DecRef ();
   RemoveParticles ();
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiParticleState);
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csParticleSystem::RemoveParticles ()

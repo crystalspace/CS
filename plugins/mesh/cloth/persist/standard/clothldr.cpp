@@ -503,10 +503,14 @@ csClothMeshLoader::csClothMeshLoader (iBase* pParent)
 
 csClothFactoryLoader::~csClothFactoryLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 };
 
 csClothMeshLoader::~csClothMeshLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 };
 
 bool csClothFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -939,6 +943,8 @@ csClothFactorySaver::csClothFactorySaver (iBase* pParent)
 
 csClothFactorySaver::~csClothFactorySaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 };
 
 bool csClothFactorySaver::Initialize (iObjectRegistry* object_reg)

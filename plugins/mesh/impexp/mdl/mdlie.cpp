@@ -119,6 +119,8 @@ csModelConverterMDL::csModelConverterMDL (iBase *pBase)
 
 csModelConverterMDL::~csModelConverterMDL ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csModelConverterMDL::Initialize (iObjectRegistry *)

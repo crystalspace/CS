@@ -67,6 +67,8 @@ csChunkLodTerrainType::csChunkLodTerrainType (iBase* p) : parent(p)
 
 csChunkLodTerrainType::~csChunkLodTerrainType ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent)
+  SCF_DESTRUCT_IBASE ()
 }
 
 csPtr<iMeshObjectFactory> csChunkLodTerrainType::NewFactory ()
@@ -123,6 +125,10 @@ csChunkLodTerrainFactory::csChunkLodTerrainFactory (csChunkLodTerrainType* p,
 csChunkLodTerrainFactory::~csChunkLodTerrainFactory ()
 {
   if (root) delete root;
+
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel)
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiTerrainFactoryState)
+  SCF_DESTRUCT_IBASE (p)
 }
 
 csPtr<iMeshObject> csChunkLodTerrainFactory::NewInstance ()
@@ -485,6 +491,7 @@ csChunkLodTerrainFactory::MeshTreeNode::~MeshTreeNode ()
     delete children[2];
     delete children[3];
   }
+  SCF_DESTRUCT_IBASE ()
 }
 
 iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
@@ -830,6 +837,10 @@ csChunkLodTerrainObject::~csChunkLodTerrainObject ()
 {
   if (meshpp)
     delete [] meshpp;
+
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiTerrainObjectState)
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel)
+  SCF_DESTRUCT_IBASE ()
 }
 
 int optimized_meshes;

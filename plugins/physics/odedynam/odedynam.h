@@ -775,7 +775,7 @@ public:
      void SetParam (int parameter, float value);
      float GetParam (int parameter);
    } scfiODEJointState;
-    friend ODEJointState;
+   friend struct ODEJointState;
 
 private:
 

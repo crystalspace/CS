@@ -108,6 +108,8 @@ csLightningFactoryLoader::csLightningFactoryLoader (iBase* pParent)
 
 csLightningFactoryLoader::~csLightningFactoryLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csLightningFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -252,6 +254,8 @@ csLightningFactorySaver::csLightningFactorySaver (iBase* pParent)
 
 csLightningFactorySaver::~csLightningFactorySaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csLightningFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -280,6 +284,8 @@ csLightningLoader::csLightningLoader (iBase* pParent)
 
 csLightningLoader::~csLightningLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csLightningLoader::Initialize (iObjectRegistry* object_reg)
@@ -348,6 +354,8 @@ csLightningSaver::csLightningSaver (iBase* pParent)
 
 csLightningSaver::~csLightningSaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csLightningSaver::Initialize (iObjectRegistry* object_reg)

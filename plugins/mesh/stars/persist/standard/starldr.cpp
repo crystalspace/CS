@@ -121,6 +121,8 @@ csStarFactoryLoader::csStarFactoryLoader (iBase* pParent)
 
 csStarFactoryLoader::~csStarFactoryLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csStarFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -163,6 +165,8 @@ csStarFactorySaver::csStarFactorySaver (iBase* pParent)
 
 csStarFactorySaver::~csStarFactorySaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csStarFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -189,6 +193,8 @@ csStarLoader::csStarLoader (iBase* pParent)
 
 csStarLoader::~csStarLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csStarLoader::Initialize (iObjectRegistry* object_reg)
@@ -286,6 +292,8 @@ csStarSaver::csStarSaver (iBase* pParent)
 
 csStarSaver::~csStarSaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csStarSaver::Initialize (iObjectRegistry* object_reg)

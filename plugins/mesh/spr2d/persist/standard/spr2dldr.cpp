@@ -109,6 +109,8 @@ csSprite2DFactoryLoader::csSprite2DFactoryLoader (iBase* pParent)
 
 csSprite2DFactoryLoader::~csSprite2DFactoryLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSprite2DFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -281,6 +283,8 @@ csSprite2DFactorySaver::csSprite2DFactorySaver (iBase* pParent)
 
 csSprite2DFactorySaver::~csSprite2DFactorySaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSprite2DFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -305,6 +309,8 @@ csSprite2DLoader::csSprite2DLoader (iBase* pParent)
 
 csSprite2DLoader::~csSprite2DLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSprite2DLoader::Initialize (iObjectRegistry* object_reg)
@@ -466,6 +472,8 @@ csSprite2DSaver::csSprite2DSaver (iBase* pParent)
 
 csSprite2DSaver::~csSprite2DSaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSprite2DSaver::Initialize (iObjectRegistry* object_reg)

@@ -127,6 +127,8 @@ csModelConverter3ds::csModelConverter3ds( iBase *pBase )
 
 csModelConverter3ds::~csModelConverter3ds ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csModelConverter3ds::Initialize( iObjectRegistry * )

@@ -111,6 +111,8 @@ csFireFactoryLoader::csFireFactoryLoader (iBase* pParent)
 
 csFireFactoryLoader::~csFireFactoryLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csFireFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -145,6 +147,8 @@ csFireFactorySaver::csFireFactorySaver (iBase* pParent)
 
 csFireFactorySaver::~csFireFactorySaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csFireFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -170,6 +174,8 @@ csFireLoader::csFireLoader (iBase* pParent)
 
 csFireLoader::~csFireLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csFireLoader::Initialize (iObjectRegistry* object_reg)
@@ -327,6 +333,8 @@ csFireSaver::csFireSaver (iBase* pParent)
 
 csFireSaver::~csFireSaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csFireSaver::Initialize (iObjectRegistry* object_reg)

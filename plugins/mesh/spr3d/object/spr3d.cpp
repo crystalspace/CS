@@ -77,6 +77,7 @@ csSpriteFrame::csSpriteFrame (int anm_idx, int tex_idx)
 csSpriteFrame::~csSpriteFrame ()
 {
   delete [] name;
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csSpriteFrame::SetName (char const* n)
@@ -102,6 +103,7 @@ csSpriteAction2::csSpriteAction2() : frames (8, 8), delays (8, 8)
 csSpriteAction2::~csSpriteAction2()
 {
   delete [] name;
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csSpriteAction2::SetName (char const* n)
@@ -147,6 +149,7 @@ csSpriteSocket::csSpriteSocket()
 csSpriteSocket::~csSpriteSocket ()
 {
   delete [] name;
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csSpriteSocket::SetName (char const* n)
@@ -255,6 +258,12 @@ csSprite3DMeshObjectFactory::~csSprite3DMeshObjectFactory ()
   delete tri_verts;
   delete[] cachename;
   ClearLODListeners ();
+
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiSprite3DFactoryState);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiLODControl);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csSprite3DMeshObjectFactory::GenerateCacheName ()
@@ -1070,6 +1079,16 @@ csSprite3DMeshObject::~csSprite3DMeshObject ()
   delete skeleton_state;
   delete rand_num;
   ClearLODListeners ();
+  
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiSprite3DState);
+#ifndef CS_USE_NEW_RENDERER
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
+#else
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiRenderBufferSource);
+#endif // CS_USE_NEW_RENDERER
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiLODControl);
+  SCF_DESTRUCT_IBASE ();
 }
 
 int csSprite3DMeshObject::GetLODPolygonCount (float lod) const
@@ -2713,6 +2732,10 @@ csSprite3DMeshObjectType::csSprite3DMeshObjectType (iBase* pParent)
 
 csSprite3DMeshObjectType::~csSprite3DMeshObjectType ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiConfig);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiLODControl);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSprite3DMeshObjectType::Initialize (iObjectRegistry* object_reg)

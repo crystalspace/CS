@@ -112,6 +112,8 @@ csExplosionFactoryLoader::csExplosionFactoryLoader (iBase* pParent)
 
 csExplosionFactoryLoader::~csExplosionFactoryLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csExplosionFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -146,6 +148,8 @@ csExplosionFactorySaver::csExplosionFactorySaver (iBase* pParent)
 
 csExplosionFactorySaver::~csExplosionFactorySaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csExplosionFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -169,6 +173,8 @@ csExplosionLoader::csExplosionLoader (iBase* pParent)
 
 csExplosionLoader::~csExplosionLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csExplosionLoader::Initialize (iObjectRegistry* object_reg)
@@ -320,6 +326,8 @@ csExplosionSaver::csExplosionSaver (iBase* pParent)
 
 csExplosionSaver::~csExplosionSaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csExplosionSaver::Initialize (iObjectRegistry* object_reg)

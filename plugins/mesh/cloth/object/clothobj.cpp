@@ -173,6 +173,11 @@ csStuffObject::~csStuffObject()
   delete [] mesh.vertex_fog;
   delete    Fabric;
   delete    Dynamics;
+  
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiVertexBufferManagerClient);
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiObjectModel);
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiClothMeshState);
+  SCF_DESTRUCT_IBASE();
 };
 
 bool csStuffObject::DrawTest(iRenderView *rview, iMovable *movable) 
@@ -376,6 +381,9 @@ StuffFactory::~StuffFactory()
   if (factory_texels)    { delete [] factory_texels;   };
   if (factory_colors)    { delete [] factory_colors;   };
   if (factory_triangles) { delete [] factory_triangles; };	
+
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiClothFactoryState);
+  SCF_DESTRUCT_IBASE();
 }
 
 bool StuffFactory::Initialize(iObjectRegistry* iO_R)
@@ -427,7 +435,10 @@ StuffMeshObjectType::StuffMeshObjectType (iBase* pParent)
 }
 
 StuffMeshObjectType::~StuffMeshObjectType ()
-{}
+{
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
+}
 
 csPtr<iMeshObjectFactory> StuffMeshObjectType::NewFactory ()
 {

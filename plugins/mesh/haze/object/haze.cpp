@@ -70,6 +70,7 @@ csHazeHull::~csHazeHull()
   total_poly = 0;
   total_vert = 0;
   total_edge = 0;
+  SCF_DESTRUCT_IBASE ();
 }
 
 
@@ -311,6 +312,8 @@ csHazeHullBox::csHazeHullBox(const csVector3& a, const csVector3& b)
 
 csHazeHullBox::~csHazeHullBox()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiHazeHullBox);
+  SCF_DESTRUCT_IBASE ();
 }
 
 //------------ csHazeHullCone -----------------------------------
@@ -409,6 +412,8 @@ csHazeHullCone::csHazeHullCone(int nr_sides, const csVector3& start,
 
 csHazeHullCone::~csHazeHullCone()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiHazeHullCone);
+  SCF_DESTRUCT_IBASE ();
 }
 
 //------------ csHazeMeshObject -------------------------------
@@ -461,6 +466,10 @@ csHazeMeshObject::csHazeMeshObject (csHazeMeshObjectFactory* factory)
 csHazeMeshObject::~csHazeMeshObject ()
 {
   if (vis_cb) vis_cb->DecRef ();
+
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiHazeState);
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csHazeMeshObject::SetupObject ()
@@ -1106,6 +1115,9 @@ csHazeMeshObjectFactory::csHazeMeshObjectFactory (iBase *pParent)
 
 csHazeMeshObjectFactory::~csHazeMeshObjectFactory ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiHazeFactoryState);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiHazeHullCreation);
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObject> csHazeMeshObjectFactory::NewInstance ()
@@ -1138,6 +1150,8 @@ csHazeMeshObjectType::csHazeMeshObjectType (iBase* pParent)
 
 csHazeMeshObjectType::~csHazeMeshObjectType ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObjectFactory> csHazeMeshObjectType::NewFactory ()

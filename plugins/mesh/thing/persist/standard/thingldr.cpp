@@ -129,6 +129,8 @@ csThingLoader::csThingLoader (iBase* pParent)
 
 csThingLoader::~csThingLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csThingLoader::Initialize (iObjectRegistry* object_reg)
@@ -352,6 +354,7 @@ public:
   virtual ~MissingSectorCallback ()
   {
     delete[] sectorname;
+    SCF_DESTRUCT_IBASE ();
   }
   
   virtual bool Traverse (iPortal* portal, iBase* /*context*/)
@@ -1227,6 +1230,8 @@ csThingSaver::csThingSaver (iBase* pParent)
 
 csThingSaver::~csThingSaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csThingSaver::Initialize (iObjectRegistry* object_reg)

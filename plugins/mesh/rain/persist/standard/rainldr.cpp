@@ -108,6 +108,8 @@ csRainFactoryLoader::csRainFactoryLoader (iBase* pParent)
 
 csRainFactoryLoader::~csRainFactoryLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csRainFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -141,6 +143,8 @@ csRainFactorySaver::csRainFactorySaver (iBase* pParent)
 
 csRainFactorySaver::~csRainFactorySaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csRainFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -165,6 +169,8 @@ csRainLoader::csRainLoader (iBase* pParent)
 
 csRainLoader::~csRainLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csRainLoader::Initialize (iObjectRegistry* object_reg)
@@ -308,6 +314,8 @@ csRainSaver::csRainSaver (iBase* pParent)
 
 csRainSaver::~csRainSaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csRainSaver::Initialize (iObjectRegistry* object_reg)

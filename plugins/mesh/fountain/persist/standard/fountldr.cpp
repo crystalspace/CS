@@ -112,6 +112,8 @@ csFountainFactoryLoader::csFountainFactoryLoader (iBase* pParent)
 
 csFountainFactoryLoader::~csFountainFactoryLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csFountainFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -146,6 +148,8 @@ csFountainFactorySaver::csFountainFactorySaver (iBase* pParent)
 
 csFountainFactorySaver::~csFountainFactorySaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csFountainFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -171,6 +175,8 @@ csFountainLoader::csFountainLoader (iBase* pParent)
 
 csFountainLoader::~csFountainLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csFountainLoader::Initialize (iObjectRegistry* object_reg)
@@ -330,6 +336,8 @@ csFountainSaver::csFountainSaver (iBase* pParent)
 
 csFountainSaver::~csFountainSaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csFountainSaver::Initialize (iObjectRegistry* object_reg)

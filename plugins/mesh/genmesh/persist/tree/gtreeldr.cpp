@@ -218,6 +218,9 @@ csGeneralTreeFactoryLoader::~csGeneralTreeFactoryLoader ()
   delete cg_debug4;
   delete cg_branch;
   delete cg_smallbranch;
+
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csGeneralTreeFactoryLoader::GenerateTrunk (csConstructionGeometry* co,

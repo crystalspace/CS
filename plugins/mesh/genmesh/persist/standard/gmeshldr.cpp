@@ -115,6 +115,8 @@ csGeneralFactoryLoader::csGeneralFactoryLoader (iBase* pParent)
 
 csGeneralFactoryLoader::~csGeneralFactoryLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csGeneralFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -453,6 +455,8 @@ csGeneralFactorySaver::csGeneralFactorySaver (iBase* pParent)
 
 csGeneralFactorySaver::~csGeneralFactorySaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csGeneralFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -480,6 +484,8 @@ csGeneralMeshLoader::csGeneralMeshLoader (iBase* pParent)
 
 csGeneralMeshLoader::~csGeneralMeshLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csGeneralMeshLoader::Initialize (iObjectRegistry* object_reg)
@@ -604,6 +610,8 @@ csGeneralMeshSaver::csGeneralMeshSaver (iBase* pParent)
 
 csGeneralMeshSaver::~csGeneralMeshSaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csGeneralMeshSaver::Initialize (iObjectRegistry* object_reg)

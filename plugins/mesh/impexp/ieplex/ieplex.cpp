@@ -90,6 +90,8 @@ csModelConverterMultiplexer::~csModelConverterMultiplexer ()
   // don't delete the elements of the 'formats' vector. We don't own them!
   classlist = 0;
   plugin_mgr = 0;
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csModelConverterMultiplexer::Initialize (iObjectRegistry *object_reg)

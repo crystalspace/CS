@@ -142,7 +142,7 @@ public:
   csSkelConnection (csTransform& tr) : trans (tr) { }
 
   /// Destructor.
-  virtual ~csSkelConnection () { }
+  virtual ~csSkelConnection ();
 
   /// Set the transformation.
   virtual void SetTransformation (const csTransform& tr) { trans = tr; }
@@ -175,7 +175,7 @@ public:
   csSkel ();
 
   /// Destructor.
-  virtual ~csSkel () { }
+  virtual ~csSkel ();
 
   /// Create a csSkelState from this csSkel.
   virtual csSkelLimbState* CreateState ();
@@ -296,7 +296,7 @@ protected:
 
 public:
   /// Destructor.
-  virtual ~csSkelConnectionState () { }
+  virtual ~csSkelConnectionState ();
 
   /// Transform the vertices in the given frame to the destination frame.
   virtual void Transform (const csTransform& tr, csVector3* source,
@@ -389,7 +389,7 @@ protected:
 
 public:
   /// Destructor.
-  virtual ~csSkelState () { }
+  virtual ~csSkelState ();
 
   /// Calculate the real bounding box for the given state.
   virtual void ComputeBoundingBox (const csTransform& tr, csBox3& box,

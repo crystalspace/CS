@@ -144,6 +144,7 @@ csFireMeshObject::~csFireMeshObject()
   delete[] part_pos;
   delete[] part_speed;
   delete[] part_age;
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiFireState);
 }
 
 void csFireMeshObject::SetControlledLight (iLight *l)
@@ -272,6 +273,7 @@ csFireMeshObjectFactory::csFireMeshObjectFactory(iBase* b, iObjectRegistry* s)
 
 csFireMeshObjectFactory::~csFireMeshObjectFactory ()
 {
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObject> csFireMeshObjectFactory::NewInstance ()
@@ -305,6 +307,8 @@ csFireMeshObjectType::csFireMeshObjectType (iBase* pParent)
 
 csFireMeshObjectType::~csFireMeshObjectType ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObjectFactory> csFireMeshObjectType::NewFactory ()

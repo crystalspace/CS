@@ -106,6 +106,7 @@ csEmitFixed::csEmitFixed(iBase *parent)
 
 csEmitFixed::~csEmitFixed()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 void csEmitFixed::GetValue(csVector3& value, csVector3 & /*given*/)
@@ -127,6 +128,7 @@ csEmitBox::csEmitBox(iBase *parent)
 
 csEmitBox::~csEmitBox()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 void csEmitBox::GetValue(csVector3& value, csVector3 & /*given*/)
@@ -158,6 +160,7 @@ csEmitSphere::csEmitSphere(iBase *parent)
 
 csEmitSphere::~csEmitSphere()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 void csEmitSphere::GetValue(csVector3& value, csVector3 & /*given*/)
@@ -215,6 +218,7 @@ csEmitCone::csEmitCone(iBase *parent)
 
 csEmitCone::~csEmitCone()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 void csEmitCone::GetValue(csVector3& value, csVector3 & /*given*/)
@@ -285,6 +289,7 @@ csEmitMix::~csEmitMix()
     delete p;
     p = np;
   }
+  SCF_DESTRUCT_IBASE();
 }
 
 void csEmitMix::GetValue(csVector3& value, csVector3 & given)
@@ -386,6 +391,7 @@ csEmitLine::csEmitLine(iBase *parent)
 
 csEmitLine::~csEmitLine()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 void csEmitLine::GetValue(csVector3& value, csVector3 & /*given*/)
@@ -433,6 +439,7 @@ static void FindAxis(const csVector3& n, csVector3& res)
 
 csEmitCylinder::~csEmitCylinder()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 void csEmitCylinder::GetValue(csVector3& value, csVector3 & /*given*/)
@@ -484,6 +491,7 @@ csEmitCylinderTangent::csEmitCylinderTangent(iBase *parent)
 
 csEmitCylinderTangent::~csEmitCylinderTangent()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 void csEmitCylinderTangent::GetValue(csVector3& value, csVector3 &given)
@@ -535,6 +543,7 @@ csEmitSphereTangent::csEmitSphereTangent(iBase *parent)
 
 csEmitSphereTangent::~csEmitSphereTangent()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 void csEmitSphereTangent::GetValue(csVector3& value, csVector3 & given)
@@ -719,6 +728,7 @@ csEmitMeshObject::~csEmitMeshObject()
     delete p;
     p = np;
   }
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiEmitState);
 }
 
 void csEmitMeshObject::StartParticle (int i)
@@ -1019,6 +1029,8 @@ csEmitMeshObjectFactory::csEmitMeshObjectFactory (iBase *p, iObjectRegistry* s)
 
 csEmitMeshObjectFactory::~csEmitMeshObjectFactory ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiEmitFactoryState);
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObject> csEmitMeshObjectFactory::NewInstance ()
@@ -1052,6 +1064,8 @@ csEmitMeshObjectType::csEmitMeshObjectType (iBase* pParent)
 
 csEmitMeshObjectType::~csEmitMeshObjectType ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObjectFactory> csEmitMeshObjectType::NewFactory ()

@@ -112,6 +112,8 @@ csModelConverterASE::csModelConverterASE (iBase *pBase)
 
 csModelConverterASE::~csModelConverterASE ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csModelConverterASE::Initialize (iObjectRegistry *)

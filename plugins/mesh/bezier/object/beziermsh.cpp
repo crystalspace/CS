@@ -215,6 +215,16 @@ csBezierMesh::csBezierMesh (iBase *parent, csBezierMeshObjectType* thing_type) :
 csBezierMesh::~csBezierMesh ()
 {
   delete static_data;
+
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiBezierState);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiBezierFactoryState);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiShadowCaster);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiShadowReceiver);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiMeshObject);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiMeshObjectFactory);
+  SCF_DESTRUCT_IBASE ();
 }
 
 char* csBezierMesh::GenerateCacheName ()
@@ -680,6 +690,11 @@ SCF_IMPLEMENT_IBASE_END
 csBezierMesh::PolyMeshLOD::PolyMeshLOD () : BezierPolyMeshHelper ()
 {
   SCF_CONSTRUCT_IBASE (0);
+}
+
+csBezierMesh::PolyMeshLOD::~PolyMeshLOD ()
+{
+  SCF_DESTRUCT_IBASE ();
 }
 
 //-------------------------------------------------------------------------
@@ -1196,6 +1211,10 @@ csBezierMeshObjectType::csBezierMeshObjectType (
 csBezierMeshObjectType::~csBezierMeshObjectType ()
 {
   delete lightpatch_pool;
+
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiConfig);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csBezierMeshObjectType::Initialize (iObjectRegistry *object_reg)

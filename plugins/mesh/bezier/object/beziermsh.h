@@ -717,6 +717,7 @@ public:
   struct PolyMeshLOD : public BezierPolyMeshHelper
   {
     PolyMeshLOD ();
+    virtual ~PolyMeshLOD ();
     // @@@ Not embedded because we can't have two iPolygonMesh implementations
     // in csBezierMesh.
     SCF_DECLARE_IBASE;

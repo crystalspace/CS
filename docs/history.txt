@@ -14,6 +14,10 @@ chronological order.
 	  is #defined empty in winbase.h, causing trouble. #undefined in 
 	  win32/csosdefs.h now.
 	- res updated the "cal3d sufficiently recent" configure test.
+	- res fixed the remaining plugins in plugins/mesh to utilize the
+	  SCF_DESTRUCT_* macros.
+	- res fixed a compile error on odedynam on gcc 3.3, reported by andres
+	  from IRC.
 19-Dec-2003
 	- Eric Sunshine added the new method
 	  csInitializer::RequestPlugins(csArray<csPluginRequest> const&) to

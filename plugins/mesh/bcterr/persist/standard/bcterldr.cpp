@@ -103,6 +103,8 @@ csBCTerrFactoryLoader::csBCTerrFactoryLoader (iBase *pParent)
 
 csBCTerrFactoryLoader::~csBCTerrFactoryLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csBCTerrFactoryLoader::Initialize (iObjectRegistry *object_reg)
@@ -249,6 +251,8 @@ csBCTerrLoader::csBCTerrLoader (iBase *pParent)
 
 csBCTerrLoader::~csBCTerrLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csBCTerrLoader::Initialize (iObjectRegistry* object_reg)

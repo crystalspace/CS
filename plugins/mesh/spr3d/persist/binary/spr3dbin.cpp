@@ -113,6 +113,8 @@ csSprite3DBinFactoryLoader::csSprite3DBinFactoryLoader (iBase* pParent)
  */
 csSprite3DBinFactoryLoader::~csSprite3DBinFactoryLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 /**
@@ -383,6 +385,8 @@ csSprite3DBinFactorySaver::csSprite3DBinFactorySaver (iBase* pParent)
  */
 csSprite3DBinFactorySaver::~csSprite3DBinFactorySaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 /**

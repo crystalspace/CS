@@ -81,6 +81,8 @@ csModelConverterSPR::csModelConverterSPR (iBase *pBase)
 
 csModelConverterSPR::~csModelConverterSPR ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csModelConverterSPR::Initialize (iObjectRegistry *)

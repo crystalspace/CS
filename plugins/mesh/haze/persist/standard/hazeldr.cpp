@@ -107,6 +107,8 @@ csHazeFactoryLoader::csHazeFactoryLoader (iBase* pParent)
 
 csHazeFactoryLoader::~csHazeFactoryLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csHazeFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -276,6 +278,8 @@ csHazeFactorySaver::csHazeFactorySaver (iBase* pParent)
 
 csHazeFactorySaver::~csHazeFactorySaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csHazeFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -332,6 +336,8 @@ csHazeLoader::csHazeLoader (iBase* pParent)
 
 csHazeLoader::~csHazeLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csHazeLoader::Initialize (iObjectRegistry* object_reg)
@@ -446,6 +452,8 @@ csHazeSaver::csHazeSaver (iBase* pParent)
 
 csHazeSaver::~csHazeSaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csHazeSaver::Initialize (iObjectRegistry* object_reg)

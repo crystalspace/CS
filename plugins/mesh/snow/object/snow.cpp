@@ -93,6 +93,7 @@ csSnowMeshObject::~csSnowMeshObject()
 {
   delete[] part_pos;
   delete[] part_speed;
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiSnowState);
 }
 
 
@@ -163,6 +164,7 @@ csSnowMeshObjectFactory::csSnowMeshObjectFactory (iBase* p, iObjectRegistry* s)
 
 csSnowMeshObjectFactory::~csSnowMeshObjectFactory ()
 {
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObject> csSnowMeshObjectFactory::NewInstance ()
@@ -196,6 +198,8 @@ csSnowMeshObjectType::csSnowMeshObjectType (iBase* pParent)
 
 csSnowMeshObjectType::~csSnowMeshObjectType ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObjectFactory> csSnowMeshObjectType::NewFactory ()

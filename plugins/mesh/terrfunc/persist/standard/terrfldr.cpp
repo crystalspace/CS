@@ -108,6 +108,8 @@ csTerrFuncFactoryLoader::csTerrFuncFactoryLoader (iBase* pParent)
 
 csTerrFuncFactoryLoader::~csTerrFuncFactoryLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csTerrFuncFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -150,6 +152,8 @@ csTerrFuncLoader::csTerrFuncLoader (iBase* pParent)
 
 csTerrFuncLoader::~csTerrFuncLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csTerrFuncLoader::Initialize (iObjectRegistry* object_reg)

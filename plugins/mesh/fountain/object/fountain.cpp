@@ -104,6 +104,7 @@ csFountainMeshObject::~csFountainMeshObject()
   delete[] part_pos;
   delete[] part_speed;
   delete[] part_age;
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiFountainState);
 }
 
 
@@ -197,6 +198,7 @@ csFountainMeshObjectFactory::csFountainMeshObjectFactory (iBase *p,
 
 csFountainMeshObjectFactory::~csFountainMeshObjectFactory ()
 {
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObject> csFountainMeshObjectFactory::NewInstance ()
@@ -230,6 +232,8 @@ csFountainMeshObjectType::csFountainMeshObjectType (iBase* pParent)
 
 csFountainMeshObjectType::~csFountainMeshObjectType ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObjectFactory> csFountainMeshObjectType::NewFactory ()

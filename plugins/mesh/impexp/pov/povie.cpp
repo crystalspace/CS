@@ -85,6 +85,8 @@ csModelConverterPOV::csModelConverterPOV (iBase *pBase)
 
 csModelConverterPOV::~csModelConverterPOV ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csModelConverterPOV::Initialize (iObjectRegistry *)

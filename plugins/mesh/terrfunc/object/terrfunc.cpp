@@ -345,9 +345,15 @@ struct QuadDivHeightFunc : public iTerrainHeightFunction
   float sch, offh;
 
   SCF_DECLARE_IBASE;
-  QuadDivHeightFunc () { SCF_CONSTRUCT_IBASE (0); hf=0;
-    scx=scy=sch=1.0; offx=offy=offh=0.0f;}
-  virtual ~QuadDivHeightFunc () {}
+  QuadDivHeightFunc () 
+  { 
+    SCF_CONSTRUCT_IBASE (0); 
+    hf=0; scx=scy=sch=1.0; offx=offy=offh=0.0f;
+  }
+  virtual ~QuadDivHeightFunc () 
+  {
+    SCF_DESTRUCT_IBASE (); 
+  }
   /// get height using world space in world space answers
   virtual float GetHeight (float x, float y)
   {
@@ -379,8 +385,15 @@ struct QuadDivNormalFunc : public iTerrainNormalFunction
   float inv_totx, inv_toty;
 
   SCF_DECLARE_IBASE;
-  QuadDivNormalFunc () { SCF_CONSTRUCT_IBASE (0); nf=0; hf=0;}
-  virtual ~QuadDivNormalFunc () {}
+  QuadDivNormalFunc () 
+  { 
+    SCF_CONSTRUCT_IBASE (0); 
+    nf=0; hf=0;
+    }
+  virtual ~QuadDivNormalFunc () 
+  {
+    SCF_DESTRUCT_IBASE (); 
+  }
   /// get Normal using world space in world space answers
   virtual csVector3 GetNormal (float x, float y)
   {
@@ -423,7 +436,14 @@ SCF_IMPLEMENT_IBASE_END
 struct DefaultFunction : public iTerrainHeightFunction
 {
   SCF_DECLARE_IBASE;
-  DefaultFunction () { SCF_CONSTRUCT_IBASE (0); }
+  DefaultFunction () 
+  { 
+    SCF_CONSTRUCT_IBASE (0); 
+  }
+  ~DefaultFunction () 
+  { 
+    SCF_DESTRUCT_IBASE (); 
+  }
   virtual float GetHeight (float x, float y)
   {
     return 8. * (sin (x*40.)+cos (y*40.));
@@ -444,10 +464,14 @@ struct HeightMapData : public iTerrainHeightFunction
   bool flipx, flipy;
   SCF_DECLARE_IBASE;
 
-  HeightMapData () : im (0) { SCF_CONSTRUCT_IBASE (0); }
+  HeightMapData () : im (0) 
+  { 
+    SCF_CONSTRUCT_IBASE (0); 
+  }
   virtual ~HeightMapData ()
   {
     if (im) im->DecRef ();
+    SCF_DESTRUCT_IBASE (); 
   }
   virtual float GetHeight (float dx, float dy);
 };
@@ -559,6 +583,11 @@ csTerrFuncObject::~csTerrFuncObject ()
   if (vbufmgr) vbufmgr->RemoveClient (&scfiVertexBufferManagerClient);
   delete[] blocks;
   delete quad_height;
+  
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiTerrFuncState);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
+  SCF_DESTRUCT_IBASE ()
 }
 
 void csTerrFuncObject::CorrectSeams (int tw, int th)
@@ -2115,6 +2144,7 @@ csTerrFuncObjectFactory::csTerrFuncObjectFactory (iObjectRegistry* object_reg)
 
 csTerrFuncObjectFactory::~csTerrFuncObjectFactory ()
 {
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObject> csTerrFuncObjectFactory::NewInstance ()
@@ -2145,6 +2175,8 @@ csTerrFuncObjectType::csTerrFuncObjectType (iBase* pParent)
 
 csTerrFuncObjectType::~csTerrFuncObjectType ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObjectFactory> csTerrFuncObjectType::NewFactory()

@@ -53,6 +53,7 @@ csRainMeshObject::csRainMeshObject (iEngine *engine, iMeshObjectFactory *fact)
 
 csRainMeshObject::~csRainMeshObject ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiRainState);
 }
 
 void csRainMeshObject::Spread (int first, int limit)

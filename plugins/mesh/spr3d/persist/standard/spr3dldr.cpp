@@ -121,6 +121,8 @@ csSprite3DFactoryLoader::csSprite3DFactoryLoader (iBase* pParent)
 
 csSprite3DFactoryLoader::~csSprite3DFactoryLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSprite3DFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -481,6 +483,8 @@ csSprite3DFactorySaver::csSprite3DFactorySaver (iBase* pParent)
 
 csSprite3DFactorySaver::~csSprite3DFactorySaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSprite3DFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -539,6 +543,8 @@ csSprite3DLoader::csSprite3DLoader (iBase* pParent)
 
 csSprite3DLoader::~csSprite3DLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSprite3DLoader::Initialize (iObjectRegistry* object_reg)
@@ -765,6 +771,8 @@ csSprite3DSaver::csSprite3DSaver (iBase* pParent)
 
 csSprite3DSaver::~csSprite3DSaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSprite3DSaver::Initialize (iObjectRegistry* object_reg)

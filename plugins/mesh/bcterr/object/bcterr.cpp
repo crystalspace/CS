@@ -1393,6 +1393,8 @@ BCPolyMesh::~BCPolyMesh ()
     delete culling_mesh;
   }    
   delete[] triangles;
+  
+  SCF_DESTRUCT_IBASE ();
 } 
 
 
@@ -1454,6 +1456,12 @@ csBCTerrObject::~csBCTerrObject ()
   // int x, z;
   delete [] control_points;
   delete [] blocks;
+
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiBCTerrState);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiTerrFuncState);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csBCTerrObject::Build ()
@@ -2275,6 +2283,9 @@ csBCTerrObjectFactory::~csBCTerrObjectFactory ()
     object_list[i] = 0;
   }
   delete [] object_list;
+  
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiBCTerrFactoryState);
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csBCTerrObjectFactory::AddTerrObject (csBCTerrObject* obj)
@@ -2548,6 +2559,8 @@ csBCTerrObjectType::csBCTerrObjectType (iBase* pParent)
 
 csBCTerrObjectType::~csBCTerrObjectType ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObjectFactory> csBCTerrObjectType::NewFactory()

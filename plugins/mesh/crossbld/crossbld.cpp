@@ -44,6 +44,9 @@ public:
   /// constructor
   csCrossBuilder (iBase *parent);
 
+  /// destructor
+  virtual ~csCrossBuilder ();
+
   /// Build a thing from a model data object
   virtual bool BuildThing (iModelDataObject *Data, iThingFactoryState *tgt,
 	iMaterialWrapper *defMat) const;
@@ -83,6 +86,12 @@ csCrossBuilder::csCrossBuilder (iBase *parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
+}
+
+csCrossBuilder::~csCrossBuilder ()
+{
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csCrossBuilder::BuildThing (iModelDataObject *Object,

@@ -538,6 +538,11 @@ csBigTerrainObject::~csBigTerrainObject()
     delete [] info->light_list;
   }
   delete info;
+
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiTerrBigState);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
+  SCF_DESTRUCT_IBASE ()
 }
 
 bool csBigTerrainObject::LoadHeightMapFile (const char *filename) 
@@ -867,6 +872,7 @@ csBigTerrainObjectFactory::csBigTerrainObjectFactory (iBase *pParent, iObjectReg
 
 csBigTerrainObjectFactory::~csBigTerrainObjectFactory ()
 {
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObject> csBigTerrainObjectFactory::NewInstance ()
@@ -896,6 +902,8 @@ csBigTerrainObjectType::csBigTerrainObjectType (iBase *pParent)
 
 csBigTerrainObjectType::~csBigTerrainObjectType ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObjectFactory> csBigTerrainObjectType::NewFactory ()

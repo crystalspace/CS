@@ -125,6 +125,8 @@ csEmitFactoryLoader::csEmitFactoryLoader (iBase* pParent)
 
 csEmitFactoryLoader::~csEmitFactoryLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csEmitFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -162,6 +164,8 @@ csEmitFactorySaver::csEmitFactorySaver (iBase* pParent)
 
 csEmitFactorySaver::~csEmitFactorySaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csEmitFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -187,6 +191,8 @@ csEmitLoader::csEmitLoader (iBase* pParent)
 
 csEmitLoader::~csEmitLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csEmitLoader::Initialize (iObjectRegistry* object_reg)
@@ -598,6 +604,8 @@ csEmitSaver::csEmitSaver (iBase* pParent)
 
 csEmitSaver::~csEmitSaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csEmitSaver::Initialize (iObjectRegistry* object_reg)

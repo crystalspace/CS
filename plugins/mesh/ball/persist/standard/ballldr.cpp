@@ -172,6 +172,8 @@ csBallFactorySaver::csBallFactorySaver (iBase* pParent)
 
 csBallFactorySaver::~csBallFactorySaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csBallFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -198,6 +200,8 @@ csBallLoader::csBallLoader (iBase* pParent)
 
 csBallLoader::~csBallLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csBallLoader::Initialize (iObjectRegistry* object_reg)
@@ -353,6 +357,8 @@ csBallSaver::csBallSaver (iBase* pParent)
 
 csBallSaver::~csBallSaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csBallSaver::Initialize (iObjectRegistry* object_reg)

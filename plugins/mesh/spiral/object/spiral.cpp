@@ -96,6 +96,7 @@ csSpiralMeshObject::csSpiralMeshObject (iObjectRegistry* object_reg,
 
 csSpiralMeshObject::~csSpiralMeshObject()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiSpiralState);
 }
 
 void csSpiralMeshObject::SetPosition(int index)
@@ -196,6 +197,7 @@ csSpiralMeshObjectFactory::csSpiralMeshObjectFactory (iBase *p,
 
 csSpiralMeshObjectFactory::~csSpiralMeshObjectFactory ()
 {
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObject> csSpiralMeshObjectFactory::NewInstance ()
@@ -229,6 +231,8 @@ csSpiralMeshObjectType::csSpiralMeshObjectType (iBase* pParent)
 
 csSpiralMeshObjectType::~csSpiralMeshObjectType ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObjectFactory> csSpiralMeshObjectType::NewFactory ()

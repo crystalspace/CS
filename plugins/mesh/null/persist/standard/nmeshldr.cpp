@@ -103,6 +103,8 @@ csNullFactoryLoader::csNullFactoryLoader (iBase* pParent)
 
 csNullFactoryLoader::~csNullFactoryLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csNullFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -330,6 +332,8 @@ csNullFactorySaver::csNullFactorySaver (iBase* pParent)
 
 csNullFactorySaver::~csNullFactorySaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csNullFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -357,6 +361,8 @@ csNullMeshLoader::csNullMeshLoader (iBase* pParent)
 
 csNullMeshLoader::~csNullMeshLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csNullMeshLoader::Initialize (iObjectRegistry* object_reg)
@@ -431,6 +437,8 @@ csNullMeshSaver::csNullMeshSaver (iBase* pParent)
 
 csNullMeshSaver::~csNullMeshSaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csNullMeshSaver::Initialize (iObjectRegistry* object_reg)

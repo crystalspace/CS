@@ -108,6 +108,8 @@ csSnowFactoryLoader::csSnowFactoryLoader (iBase* pParent)
 
 csSnowFactoryLoader::~csSnowFactoryLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSnowFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -142,6 +144,8 @@ csSnowFactorySaver::csSnowFactorySaver (iBase* pParent)
 
 csSnowFactorySaver::~csSnowFactorySaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSnowFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -166,6 +170,8 @@ csSnowLoader::csSnowLoader (iBase* pParent)
 
 csSnowLoader::~csSnowLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSnowLoader::Initialize (iObjectRegistry* object_reg)
@@ -306,6 +312,8 @@ csSnowSaver::csSnowSaver (iBase* pParent)
 
 csSnowSaver::~csSnowSaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSnowSaver::Initialize (iObjectRegistry* object_reg)

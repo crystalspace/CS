@@ -41,6 +41,7 @@ csSkelLimb::~csSkelLimb ()
     children = n;
   }
   delete[] name;
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csSkelLimb::AddVertex (int v)
@@ -232,6 +233,11 @@ csSkelConnection::csSkelConnection ()
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSkeletonConnection);
 }
 
+csSkelConnection::~csSkelConnection ()
+{
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiSkeletonConnection);
+}
+
 SCF_IMPLEMENT_IBASE_EXT (csSkel)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSkeleton)
 SCF_IMPLEMENT_IBASE_EXT_END
@@ -242,7 +248,12 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csSkel::csSkel ()
 {
-SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSkeleton);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSkeleton);
+}
+
+csSkel::~csSkel ()
+{
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiSkeleton);
 }
 
 //---------------------------------------------------------------------------
@@ -267,6 +278,7 @@ csSkelLimbState::~csSkelLimbState ()
     children = n;
   }
   delete[] name;
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csSkelLimbState::Transform (const csTransform& tr, csVector3* source,
@@ -454,6 +466,12 @@ csSkelConnectionState::csSkelConnectionState ()
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSkeletonConnectionState);
 }
 
+csSkelConnectionState::~csSkelConnectionState ()
+{
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiSkeletonBone);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiSkeletonConnectionState);
+}
+
 void csSkelConnectionState::ComputeBoundingBox (
   const csTransform& tr, csBox3& box, csPoly3D* source)
 {
@@ -485,6 +503,12 @@ csSkelState::csSkelState ()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSkeletonState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSkeletonBone);
+}
+
+csSkelState::~csSkelState ()
+{
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiSkeletonState);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiSkeletonBone);
 }
 
 void csSkelState::ComputeBoundingBox (const csTransform& tr,

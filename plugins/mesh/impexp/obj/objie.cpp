@@ -86,6 +86,8 @@ csModelConverterOBJ::csModelConverterOBJ (iBase *pBase)
 
 csModelConverterOBJ::~csModelConverterOBJ ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csModelConverterOBJ::Initialize (iObjectRegistry *)

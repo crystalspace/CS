@@ -178,6 +178,15 @@ csBallMeshObject::~csBallMeshObject ()
   delete[] top_mesh.vertex_fog;
   if (vbufmgr) vbufmgr->RemoveClient (&scfiVertexBufferManagerClient);
 #endif
+
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiBallState);
+#ifdef CS_USE_NEW_RENDERER
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiRenderBufferSource);
+#else
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
+#endif
+  SCF_DESTRUCT_IBASE();
 }
 
 void csBallMeshObject::GetTransformedBoundingBox (long cameranr,
@@ -1289,6 +1298,7 @@ csBallMeshObjectFactory::csBallMeshObjectFactory (iBase *pParent,
 
 csBallMeshObjectFactory::~csBallMeshObjectFactory ()
 {
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObject> csBallMeshObjectFactory::NewInstance ()
@@ -1321,6 +1331,8 @@ csBallMeshObjectType::csBallMeshObjectType (iBase* pParent)
 
 csBallMeshObjectType::~csBallMeshObjectType ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObjectFactory> csBallMeshObjectType::NewFactory ()

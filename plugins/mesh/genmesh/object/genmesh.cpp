@@ -160,6 +160,17 @@ csGenmeshMeshObject::~csGenmeshMeshObject ()
   delete[] static_mesh_colors;
 
   ClearPseudoDynLights ();
+
+#ifdef CS_USE_NEW_RENDERER
+  //SCF_DESTRUCT_EMBEDDED_IBASE (scfiRenderBufferSource);
+#endif
+  //SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiGeneralMeshState);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiShadowCaster);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiShadowReceiver);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csGenmeshMeshObject::ClearPseudoDynLights ()
@@ -1269,6 +1280,16 @@ csGenmeshMeshObjectFactory::~csGenmeshMeshObjectFactory ()
 #ifdef CS_USE_NEW_RENDERER
   delete [] mesh_triangles;
 #endif
+
+#ifdef CS_USE_NEW_RENDERER
+  //SCF_DESTRUCT_EMBEDDED_IBASE (scfiRenderBufferSource);
+#endif
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiGeneralFactoryState);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
+#ifndef CS_USE_NEW_RENDERER 
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
+#endif
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csGenmeshMeshObjectFactory::CalculateBBoxRadius ()
@@ -2016,6 +2037,8 @@ csGenmeshMeshObjectType::csGenmeshMeshObjectType (iBase* pParent)
 
 csGenmeshMeshObjectType::~csGenmeshMeshObjectType ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObjectFactory> csGenmeshMeshObjectType::NewFactory ()

@@ -74,6 +74,9 @@ csNewParticleSystem::~csNewParticleSystem ()
   delete[] MaterialArray;
   delete[] AxisArray;
   delete[] LitColors;
+#ifndef CS_USE_NEW_RENDERER 
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
+#endif
 }
 
 #define UPDATE_ARRAY_FLAG(FLAG,NAME,TYPE)                               \

@@ -104,6 +104,7 @@ csExploMeshObject::csExploMeshObject (iObjectRegistry* object_reg,
 
 csExploMeshObject::~csExploMeshObject()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiExplosionState);
 }
 
 
@@ -144,6 +145,7 @@ csExploMeshObjectFactory::csExploMeshObjectFactory (iBase *p,
 
 csExploMeshObjectFactory::~csExploMeshObjectFactory ()
 {
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObject> csExploMeshObjectFactory::NewInstance ()
@@ -177,6 +179,8 @@ csExploMeshObjectType::csExploMeshObjectType (iBase* pParent)
 
 csExploMeshObjectType::~csExploMeshObjectType ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObjectFactory> csExploMeshObjectType::NewFactory ()

@@ -77,6 +77,10 @@ csSprite2DMeshObject::~csSprite2DMeshObject ()
 {
   if (vis_cb) vis_cb->DecRef ();
   delete uvani;
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiSprite2DState);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiParticle);
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csSprite2DMeshObject::SetupObject ()
@@ -713,6 +717,8 @@ csSprite2DMeshObjectFactory::csSprite2DMeshObjectFactory (iBase *pParent)
 
 csSprite2DMeshObjectFactory::~csSprite2DMeshObjectFactory ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiSprite2DFactoryState);
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObject> csSprite2DMeshObjectFactory::NewInstance ()
@@ -745,6 +751,8 @@ csSprite2DMeshObjectType::csSprite2DMeshObjectType (iBase* pParent)
 
 csSprite2DMeshObjectType::~csSprite2DMeshObjectType ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObjectFactory> csSprite2DMeshObjectType::NewFactory ()

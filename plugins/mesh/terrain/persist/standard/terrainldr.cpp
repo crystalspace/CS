@@ -72,6 +72,8 @@ csTerrainFactoryLoader::csTerrainFactoryLoader (iBase* parent)
 
 csTerrainFactoryLoader::~csTerrainFactoryLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csTerrainFactoryLoader::Initialize (iObjectRegistry* objreg)
@@ -218,6 +220,8 @@ csTerrainFactorySaver::csTerrainFactorySaver (iBase* parent)
 
 csTerrainFactorySaver::~csTerrainFactorySaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csTerrainFactorySaver::Initialize (iObjectRegistry* objreg)
@@ -249,6 +253,8 @@ csTerrainObjectLoader::csTerrainObjectLoader (iBase* parent)
 
 csTerrainObjectLoader::~csTerrainObjectLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csTerrainObjectLoader::Initialize (iObjectRegistry* objreg)
@@ -454,6 +460,8 @@ csTerrainObjectSaver::csTerrainObjectSaver (iBase* parent)
 
 csTerrainObjectSaver::~csTerrainObjectSaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csTerrainObjectSaver::Initialize (iObjectRegistry *objreg)

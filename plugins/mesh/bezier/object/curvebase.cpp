@@ -194,6 +194,11 @@ csCurve::~csCurve ()
 #ifndef CS_USE_NEW_RENDERER
   if (vbufmgr) vbufmgr->RemoveClient (&scfiVertexBufferManagerClient);
 #endif // CS_USE_NEW_RENDERER
+
+#ifndef CS_USE_NEW_RENDERER
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
+#endif // CS_USE_NEW_RENDERER
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiCurve);
 }
 
 #ifndef CS_USE_NEW_RENDERER

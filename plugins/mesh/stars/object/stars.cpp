@@ -74,6 +74,10 @@ csStarsMeshObject::csStarsMeshObject (iMeshObjectFactory* factory)
 csStarsMeshObject::~csStarsMeshObject ()
 {
   if (vis_cb) vis_cb->DecRef ();
+
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiStarsState);
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csStarsMeshObject::SetupObject ()
@@ -293,6 +297,7 @@ csStarsMeshObjectFactory::csStarsMeshObjectFactory (iBase *pParent)
 
 csStarsMeshObjectFactory::~csStarsMeshObjectFactory ()
 {
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObject> csStarsMeshObjectFactory::NewInstance ()
@@ -325,6 +330,8 @@ csStarsMeshObjectType::csStarsMeshObjectType (iBase* pParent)
 
 csStarsMeshObjectType::~csStarsMeshObjectType ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObjectFactory> csStarsMeshObjectType::NewFactory ()

@@ -109,6 +109,8 @@ csBezierLoader::csBezierLoader (iBase* pParent)
 
 csBezierLoader::~csBezierLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csBezierLoader::Initialize (iObjectRegistry* object_reg)
@@ -401,6 +403,8 @@ csBezierSaver::csBezierSaver (iBase* pParent)
 
 csBezierSaver::~csBezierSaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csBezierSaver::Initialize (iObjectRegistry* object_reg)

@@ -93,6 +93,9 @@ csLightningMeshObject::csLightningMeshObject (csLightningMeshObjectFactory* fact
 csLightningMeshObject::~csLightningMeshObject ()
 {
   if (vis_cb) vis_cb->DecRef ();
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiLightningState);
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csLightningMeshObject::SetupObject ()
@@ -170,7 +173,6 @@ csLightningMeshObjectFactory::csLightningMeshObjectFactory (iBase *pParent, iObj
   directional.Set (0, 0, 1);  
   logparent = 0;
   
-  SCF_CONSTRUCT_IBASE (pParent);  
   csRef<iPluginManager> PlugMgr (CS_QUERY_REGISTRY (object_registry, iPluginManager));
   CS_ASSERT (PlugMgr);
   csRef<iMeshObjectType> MeshType (CS_LOAD_PLUGIN(PlugMgr,
@@ -184,6 +186,8 @@ csLightningMeshObjectFactory::csLightningMeshObjectFactory (iBase *pParent, iObj
 
 csLightningMeshObjectFactory::~csLightningMeshObjectFactory ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiLightningFactoryState);
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csLightningMeshObjectFactory::CalculateFractal (int left, int right,
@@ -279,6 +283,8 @@ csLightningMeshObjectType::csLightningMeshObjectType (iBase* pParent)
 
 csLightningMeshObjectType::~csLightningMeshObjectType ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObjectFactory> csLightningMeshObjectType::NewFactory ()

@@ -72,6 +72,11 @@ csNullmeshMeshObject::csNullmeshMeshObject (iMeshObjectFactory* factory)
 csNullmeshMeshObject::~csNullmeshMeshObject ()
 {
   if (vis_cb) vis_cb->DecRef ();
+
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiMeshObjectFactory);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiNullMeshState);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csNullmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
@@ -181,6 +186,8 @@ csNullmeshMeshObjectType::csNullmeshMeshObjectType (iBase* pParent)
 
 csNullmeshMeshObjectType::~csNullmeshMeshObjectType ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObjectFactory> csNullmeshMeshObjectType::NewFactory ()
