@@ -35,7 +35,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/shader/shader.h"
 
 #include "video/canvas/openglcommon/glextmanager.h"
-#include "../../opengl/gl_helper.h"
 
 #include "glshader_avp.h"
 
@@ -80,7 +79,7 @@ bool csGLShader_ARB::SupportType(const char* type)
 csPtr<iShaderProgram> csGLShader_ARB::CreateProgram(const char* type)
 {
   if( strcasecmp(type, "gl_arb_vp") == 0)
-    return csPtr<iShaderProgram>(new csShaderGLAVP(object_reg, ext, varr));
+    return csPtr<iShaderProgram>(new csShaderGLAVP(object_reg, ext));
   else
     return 0;
 }
@@ -95,7 +94,6 @@ void csGLShader_ARB::Open()
 
   r->GetDriver2D()->PerformExtension ("getextmanager", &ext);
   ext->InitGL_ARB_vertex_program ();
-  varr = (csGLVertexArrayHelper*) sri->GetPrivateObject ("varr");
 }
 
 csPtr<iString> csGLShader_ARB::GetProgramID(const char* programstring)

@@ -26,7 +26,6 @@ class csGLShader_ARB : public iShaderProgramPlugin
 {
 private:
   csGLExtensionManager* ext;
-  csGLVertexArrayHelper* varr;
   csRef<iObjectRegistry> object_reg;
 
 public:
