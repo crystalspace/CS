@@ -652,7 +652,7 @@ SCF_IMPLEMENT_IBASE_END
 
 bool csTextSyntaxService::ParsePoly3d (
 	iLoaderContext* ldr_context,
-	iEngine* engine, iPolygon3D* poly3d, char* buf,
+	iEngine* , iPolygon3D* poly3d, char* buf,
 	float default_texlen,
 	iThingState* thing_state, int vt_offset)
 {
