@@ -239,8 +239,8 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
         if (shader != 0)
 	{
           RenderMeshes (g3d, shader, sameShaderMeshes, numSSM);
-          shader = meshShader;
 	}
+        shader = meshShader;
         numSSM = 0;
       }
       sameShaderMeshes[numSSM++] = mesh;
